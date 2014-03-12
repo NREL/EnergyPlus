@@ -1,0 +1,4783 @@
+#ifndef ObjexxFCL_Format_hh_INCLUDED
+#define ObjexxFCL_Format_hh_INCLUDED
+
+// Format Support
+//
+// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+//
+// Version: 4.0.0
+//
+// Language: C++
+//
+// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Use of this source code or any derivative of it is restricted by license.
+// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+
+// ObjexxFCL Headers
+#include <ObjexxFCL/byte.fwd.hh>
+#include <ObjexxFCL/ubyte.fwd.hh>
+#include <ObjexxFCL/char.constants.hh>
+#include <ObjexxFCL/Fstring.fwd.hh>
+#include <ObjexxFCL/string.constants.hh>
+#include <ObjexxFCL/string.functions.hh>
+#include <ObjexxFCL/TraitsA.hh>
+#include <ObjexxFCL/TraitsB.hh>
+#include <ObjexxFCL/TraitsF.hh>
+#include <ObjexxFCL/TraitsG.hh>
+#include <ObjexxFCL/TraitsI.hh>
+
+// C++ Headers
+#include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <cstddef>
+#include <iostream>
+#include <limits>
+#include <string>
+#include <utility>
+#include <vector>
+
+namespace ObjexxFCL {
+
+// List-Directed Input Entry
+struct EntryLD
+{
+
+	typedef  std::size_t  Size;
+
+	// Constructor
+	inline
+	explicit
+	EntryLD( std::string const & str, bool const has = true, Size const rep = 1ul ) :
+		s( str ),
+		h( has ),
+		r( has ? rep : 0ul )
+	{}
+
+	// Has a Non-Null Entry? (And decrement counter)
+	inline
+	bool
+	has()
+	{
+		if ( r > 0ul ) {
+			--r;
+			return h;
+		} else { // Counter was at zero
+			return false;
+		}
+	}
+
+	std::string s; // Entry string
+	bool h; // Has non-null entry?
+	Size r; // Repeat counter
+
+}; // EntryLD
+
+// Format Base Class
+class Format
+{
+
+public: // Types
+
+	typedef  std::size_t  Size;
+	typedef  std::string  Token;
+	typedef  std::vector< Token >  Tokens;
+	typedef  std::vector< Format * >  Formats;
+
+protected: // Creation
+
+	// Constructor
+	inline
+	explicit
+	Format( Format * p, Size const r = 1ul ) :
+		p_( p ),
+		r_( r ),
+		u_( false ),
+		i_( 0ul )
+	{}
+
+	// Constructor
+	inline
+	Format( Format * p, char const star ) :
+		p_( p ),
+		r_( -1 ),
+		u_( true ),
+		i_( 0ul )
+	{
+		assert( star == '*' );
+	}
+
+	// Copy Constructor
+	inline
+	Format( Format const & f ) :
+		p_( f.p_ ),
+		r_( f.r_ ),
+		u_( f.u_ ),
+		i_( f.i_ )
+	{}
+
+	// Move Constructor
+	inline
+	Format( Format && f ) :
+		p_( f.p_ ),
+		r_( f.r_ ),
+		u_( f.u_ ),
+		i_( f.i_ )
+	{}
+
+public: // Creation
+
+	// Clone
+	virtual
+	Format *
+	clone() const = 0;
+
+	// Destructor
+	inline
+	virtual
+	~Format()
+	{}
+
+protected: // Assignment
+
+	// Copy Assignment
+	inline
+	void
+	operator =( Format const & f )
+	{
+		if ( this != &f ) {
+			p_ = f.p_;
+			r_ = f.r_;
+			u_ = f.u_;
+			i_ = f.i_;
+		}
+	}
+
+public: // Properties
+
+	// Parent Format
+	inline
+	Format const *
+	p() const
+	{
+		return p_;
+	}
+
+	// Parent Format
+	inline
+	Format *
+	p()
+	{
+		return p_;
+	}
+
+	// Uses an Argument?
+	inline
+	virtual
+	bool
+	uses_arg() const
+	{ // Default implementation
+		return false;
+	}
+
+	// Uses an Argument?
+	inline
+	bool
+	no_arg() const
+	{
+		return ! uses_arg();
+	}
+
+	// Format Group?
+	inline
+	virtual
+	bool
+	is_group() const
+	{ // Default implementation
+		return false;
+	}
+
+	// Format List?
+	inline
+	virtual
+	bool
+	is_list() const
+	{ // Default implementation
+		return false;
+	}
+
+	// List-Directed?
+	inline
+	virtual
+	bool
+	is_list_directed() const
+	{ // Default implementation
+		return false;
+	}
+
+	// Repeat Count
+	inline
+	Size
+	r() const
+	{
+		return r_;
+	}
+
+	// Unlimited Repeat?
+	inline
+	bool
+	u() const
+	{
+		return u_;
+	}
+
+	// Can Repeat with Given Index?
+	inline
+	bool
+	can_repeat( Size const i ) const
+	{
+		return ( u_ || ( i < r_ ) );
+	}
+
+	// P Scaling State
+	inline
+	virtual
+	int
+	P() const
+	{
+		assert( p_ );
+		return p_->P();
+	}
+
+	// P Scaling State
+	inline
+	virtual
+	int &
+	P()
+	{
+		assert( p_ );
+		return p_->P();
+	}
+
+	// Active index
+	inline
+	Size
+	i() const
+	{
+		return i_;
+	}
+
+	// Active index
+	inline
+	Size &
+	i()
+	{
+		return i_;
+	}
+
+	// Blank Null?
+	inline
+	bool
+	blank_null() const
+	{
+		return ! blank_zero();
+	}
+
+	// Blank Zero?
+	inline
+	virtual
+	bool
+	blank_zero() const
+	{
+		assert( p_ );
+		return p_->blank_zero();
+	}
+
+	// Blank Zero?
+	inline
+	virtual
+	bool &
+	blank_zero()
+	{
+		assert( p_ );
+		return p_->blank_zero();
+	}
+
+	// Colon Terminated?
+	inline
+	virtual
+	bool
+	colon_terminated() const
+	{
+		assert( p_ );
+		return p_->colon_terminated();
+	}
+
+	// Colon Terminated?
+	inline
+	virtual
+	bool &
+	colon_terminated()
+	{
+		assert( p_ );
+		return p_->colon_terminated();
+	}
+
+	// Not Colon Terminated?
+	inline
+	bool
+	not_colon_terminated() const
+	{
+		return ! colon_terminated();
+	}
+
+	// Slash Terminated?
+	inline
+	virtual
+	bool
+	slash_terminated() const
+	{
+		assert( p_ );
+		return p_->slash_terminated();
+	}
+
+	// Slash Terminated?
+	inline
+	virtual
+	bool &
+	slash_terminated()
+	{
+		assert( p_ );
+		return p_->slash_terminated();
+	}
+
+	// Not Slash Terminated?
+	inline
+	bool
+	not_slash_terminated() const
+	{
+		return ! slash_terminated();
+	}
+
+	// Terminated?
+	inline
+	bool
+	terminated() const
+	{
+		return ( colon_terminated() || slash_terminated() );
+	}
+
+	// Not Terminated?
+	inline
+	bool
+	not_terminated() const
+	{
+		return ( ( ! colon_terminated() ) && ( ! slash_terminated() ) );
+	}
+
+	// Non-Advancing?
+	inline
+	virtual
+	bool
+	non_advancing() const
+	{
+		assert( p_ );
+		return p_->non_advancing();
+	}
+
+	// Non-Advancing?
+	inline
+	virtual
+	bool &
+	non_advancing()
+	{
+		assert( p_ );
+		return p_->non_advancing();
+	}
+
+	// Reverted?
+	inline
+	virtual
+	bool
+	reverted() const
+	{
+		assert( p_ );
+		return p_->reverted();
+	}
+
+	// Reverted?
+	inline
+	virtual
+	bool &
+	reverted()
+	{
+		assert( p_ );
+		return p_->reverted();
+	}
+
+	// Revert Count
+	inline
+	virtual
+	Size
+	reverts() const
+	{
+		assert( p_ );
+		return p_->reverts();
+	}
+
+	// Spacer?
+	inline
+	virtual
+	bool
+	spacer() const
+	{
+		assert( p_ );
+		return p_->spacer();
+	}
+
+	// Spacer?
+	inline
+	virtual
+	bool &
+	spacer()
+	{
+		assert( p_ );
+		return p_->spacer();
+	}
+
+	// Current Format
+	virtual
+	Format *
+	current() = 0;
+
+	// Next Format
+	virtual
+	Format *
+	next() = 0;
+
+	// Next Format: Upward Call
+	virtual
+	Format *
+	next_up() = 0;
+
+public: // Input Methods
+
+	// Input without Argument
+	inline
+	std::istream &
+	input( std::istream & stream, std::streampos const poa, std::streampos & por )
+	{
+		in( stream, poa, por );
+		return stream;
+	}
+
+	// Input with Argument
+	template< typename T >
+	inline
+	std::istream &
+	input( std::istream & stream, std::streampos const poa, std::streampos & por, T & t )
+	{
+		stream.seekg( poa + por, std::ios::beg ); // Position the stream at the virtual position: Could check that it is <= end but read could still exceed stream bounds
+		in( stream, t );
+		por = stream.tellg() - poa; // After reading a value the current stream position is also the virtual position
+		return stream;
+	}
+
+	// Input Pad/Position
+	inline
+	void
+	input_pos( std::istream & stream, std::streampos const pos ) // pos == absolute position
+	{
+		stream.seekg( pos, std::ios::beg ); // Position the stream at the virtual position
+	}
+
+	// Input
+	inline
+	virtual
+	void
+	in( std::istream &, std::streampos const, std::streampos & )
+	{} // Default implementation
+
+	// Input
+	inline
+	virtual
+	void
+	in( std::istream & stream, bool & b )
+	{ // Default implementation
+		skip_chunk( stream );
+		b = false;
+		io_err( stream );
+	}
+
+	// Input
+	virtual
+	void
+	in( std::istream & stream, byte & b );
+
+	// Input
+	virtual
+	void
+	in( std::istream & stream, ubyte & b );
+
+	// Input
+	inline
+	virtual
+	void
+	in( std::istream & stream, short int & i )
+	{ // Default implementation
+		skip_chunk( stream );
+		i = 0;
+		io_err( stream );
+	}
+
+	// Input
+	inline
+	virtual
+	void
+	in( std::istream & stream, unsigned short int & i )
+	{ // Default implementation
+		skip_chunk( stream );
+		i = 0;
+		io_err( stream );
+	}
+
+	// Input
+	inline
+	virtual
+	void
+	in( std::istream & stream, int & i )
+	{ // Default implementation
+		skip_chunk( stream );
+		i = 0;
+		io_err( stream );
+	}
+
+	// Input
+	inline
+	virtual
+	void
+	in( std::istream & stream, unsigned int & i )
+	{ // Default implementation
+		skip_chunk( stream );
+		i = 0;
+		io_err( stream );
+	}
+
+	// Input
+	inline
+	virtual
+	void
+	in( std::istream & stream, long int & i )
+	{ // Default implementation
+		skip_chunk( stream );
+		i = 0;
+		io_err( stream );
+	}
+
+	// Input
+	inline
+	virtual
+	void
+	in( std::istream & stream, unsigned long int & i )
+	{ // Default implementation
+		skip_chunk( stream );
+		i = 0;
+		io_err( stream );
+	}
+
+	// Input
+	inline
+	virtual
+	void
+	in( std::istream & stream, long long int & i )
+	{ // Default implementation
+		skip_chunk( stream );
+		i = 0;
+		io_err( stream );
+	}
+
+	// Input
+	inline
+	virtual
+	void
+	in( std::istream & stream, unsigned long long int & i )
+	{ // Default implementation
+		skip_chunk( stream );
+		i = 0;
+		io_err( stream );
+	}
+
+	// Input
+	inline
+	virtual
+	void
+	in( std::istream & stream, float & v )
+	{ // Default implementation
+		skip_chunk( stream );
+		v = 0;
+		io_err( stream );
+	}
+
+	// Input
+	inline
+	virtual
+	void
+	in( std::istream & stream, double & v )
+	{ // Default implementation
+		skip_chunk( stream );
+		v = 0;
+		io_err( stream );
+	}
+
+	// Input
+	inline
+	virtual
+	void
+	in( std::istream & stream, long double & v )
+	{ // Default implementation
+		skip_chunk( stream );
+		v = 0;
+		io_err( stream );
+	}
+
+	// Input
+	inline
+	virtual
+	void
+	in( std::istream & stream, char & c )
+	{ // Default implementation
+		skip_chunk( stream );
+		c = SPC;
+		io_err( stream );
+	}
+
+	// Input
+	inline
+	virtual
+	void
+	in( std::istream & stream, std::string & s )
+	{ // Default implementation
+		skip_chunk( stream );
+		s.clear();
+		io_err( stream );
+	}
+
+	// Input
+	virtual
+	void
+	in( std::istream & stream, Fstring & s );
+
+public: // Output Methods
+
+	// Output without Argument
+	inline
+	std::ostream &
+	output( std::ostream & stream, std::streampos & pos )
+	{
+		out( stream, pos );
+		return stream;
+	}
+
+	// Output with Argument
+	template< typename T >
+	inline
+	std::ostream &
+	output( std::ostream & stream, std::streampos & pos, T const t )
+	{
+		output_pad( stream, pos );
+		out( stream, t );
+		pos = stream.tellp(); // After writing a value the current stream position is also the virtual position
+		return stream;
+	}
+
+	// Output Pad/Position
+	inline
+	void
+	output_pos( std::ostream & stream, std::streampos & pos )
+	{
+		output_pad( stream, pos );
+	}
+
+	// Spacing and Reversion Linefeed String
+	std::string
+	spc( bool const is_spacer = false );
+
+	// Output
+	inline
+	virtual
+	void
+	out( std::ostream &, std::streampos & )
+	{} // Default implementation
+
+	// Output
+	inline
+	virtual
+	void
+	out( std::ostream & stream, bool const )
+	{ // Default implementation
+		io_err( stream );
+	}
+
+	// Output
+	inline
+	virtual
+	void
+	out( std::ostream & stream, byte const & )
+	{ // Default implementation
+		io_err( stream );
+	}
+
+	// Output
+	inline
+	virtual
+	void
+	out( std::ostream & stream, ubyte const & )
+	{ // Default implementation
+		io_err( stream );
+	}
+
+	// Output
+	inline
+	virtual
+	void
+	out( std::ostream & stream, short int const )
+	{ // Default implementation
+		io_err( stream );
+	}
+
+	// Output
+	inline
+	virtual
+	void
+	out( std::ostream & stream, unsigned short int const )
+	{ // Default implementation
+		io_err( stream );
+	}
+
+	// Output
+	inline
+	virtual
+	void
+	out( std::ostream & stream, int const )
+	{ // Default implementation
+		io_err( stream );
+	}
+
+	// Output
+	inline
+	virtual
+	void
+	out( std::ostream & stream, unsigned int const )
+	{ // Default implementation
+		io_err( stream );
+	}
+
+	// Output
+	inline
+	virtual
+	void
+	out( std::ostream & stream, long int const )
+	{ // Default implementation
+		io_err( stream );
+	}
+
+	// Output
+	inline
+	virtual
+	void
+	out( std::ostream & stream, unsigned long int const )
+	{ // Default implementation
+		io_err( stream );
+	}
+
+	// Output
+	inline
+	virtual
+	void
+	out( std::ostream & stream, long long int const )
+	{ // Default implementation
+		io_err( stream );
+	}
+
+	// Output
+	inline
+	virtual
+	void
+	out( std::ostream & stream, unsigned long long int const )
+	{ // Default implementation
+		io_err( stream );
+	}
+
+	// Output
+	inline
+	virtual
+	void
+	out( std::ostream & stream, float const )
+	{ // Default implementation
+		io_err( stream );
+	}
+
+	// Output
+	inline
+	virtual
+	void
+	out( std::ostream & stream, double const )
+	{ // Default implementation
+		io_err( stream );
+	}
+
+	// Output
+	inline
+	virtual
+	void
+	out( std::ostream & stream, long double const )
+	{ // Default implementation
+		io_err( stream );
+	}
+
+	// Output
+	inline
+	virtual
+	void
+	out( std::ostream & stream, char const )
+	{ // Default implementation
+		io_err( stream );
+	}
+
+	// Output
+	inline
+	void
+	out( std::ostream & stream, char const * s ) // Non-virtual forwarding wrapper
+	{
+		return out( stream, std::string( s ) );
+	}
+
+	// Output
+	inline
+	virtual
+	void
+	out( std::ostream & stream, std::string const & )
+	{ // Default implementation
+		io_err( stream );
+	}
+
+	// Output
+	inline
+	virtual
+	void
+	out( std::ostream & stream, Fstring const & )
+	{ // Default implementation
+		io_err( stream );
+	}
+
+public: // Static Methods
+
+	// Skip Rest of Line and Line Terminator (Manipulator)
+	inline
+	static
+	std::istream &
+	skip( std::istream & stream )
+	{
+		return stream.ignore( std::numeric_limits< std::streamsize >::max(), NL );
+	}
+
+	// Skip Over a Number of Characters in a Stream
+	static
+	void
+	skip( std::istream & stream, Size const w = 1ul );
+
+protected: // Methods
+
+	// Read List-Directed Entry from a Stream
+	EntryLD
+	read_ld( std::istream & stream, bool const numeric = false, char const mode = 'C' ); // Use mode = 'F' for reading files that can't be changed to C-style quote escapes
+
+	// Skip Chunk from Stream and Discard
+	inline
+	void
+	skip_chunk( std::istream & stream, Size const w = NOSIZE ) const
+	{
+		skip( stream, wid( w ) );
+	}
+
+	// Width to Read
+	inline
+	virtual
+	Size
+	wid( Size const w = NOSIZE ) const
+	{ // Default implementation
+		return ( w == NOSIZE ? Size( 0 ) : w );
+	}
+
+	// Apply Blank Processing to String
+	std::string
+	blank_process( std::string const & s ) const;
+
+protected: // Static Methods
+
+	// Read from a Stream
+	static
+	std::string
+	read( std::istream & stream, Size const w = NOSIZE );
+
+	// Read Floating Point from a Stream
+	static
+	std::string
+	read_float( std::istream & stream, Size const w = NOSIZE );
+
+	// string is Blank?
+	inline
+	static
+	bool
+	is_blank( std::string const & s )
+	{
+		return ( s.empty() ? true : s.find_first_not_of( SPC ) == std::string::npos );
+	}
+
+	// Character is a List-Directed Whitespace Separator?
+	inline
+	static
+	bool
+	is_space_ld( char const c )
+	{
+#ifdef OBJEXXFCL_INTEL_LIST_DIRECTED_IO
+		return ( ( c == SPC ) || ( c == TAB ) ); // Intel Fortran treats tabs as separators
+#else
+		return ( c == SPC );
+#endif
+	}
+
+	// Number of a String
+	template< typename T >
+	inline
+	static
+	T
+	number_of( std::string const & s )
+	{
+		if ( is_type< T >( s ) ) {
+			return type_of< T >( s );
+		} else { // Bad input
+			return 0;
+		}
+	}
+
+	// Float String has Exponent?
+	inline
+	static
+	bool
+	has_exponent( std::string const & s )
+	{
+		return has_any_of( s, "Ee" ); // Assumes D/d already converted to E/e
+	}
+
+	// Pad Output Stream to Output Position
+	inline
+	static
+	void
+	output_pad( std::ostream & stream, std::streampos const & pos )
+	{
+		stream.seekp( 0, std::ios::end );
+		std::streampos const end( stream.tellp() );
+		if ( pos > end ) stream << std::string( pos - end, SPC ); // Space fill before output
+		stream.seekp( pos, std::ios::beg ); // Position the stream at the virtual position: Could check that it is <= end but read could still exceed stream bounds
+	}
+
+	// Clear EOF State if No Error
+	inline
+	static
+	void
+	clear_eof( std::istream & stream )
+	{
+		if ( stream && stream.eof() ) stream.clear( stream.rdstate() & ~std::ios::eofbit );
+	}
+
+	// Set Stream Fail Bit for I/O Error
+	inline
+	static
+	void
+#ifndef OBJEXXFCL_IO_RELAX
+	io_err( std::ios & stream )
+	{
+		stream.setstate( std::ios::failbit );
+	}
+#else
+	io_err( std::ios & ) // Avoid unused argument warnings
+	{}
+#endif
+
+private: // Data
+
+	Format * p_; // Parent format (non-owning)
+	Size r_; // Repeat count
+	bool u_; // Unlimited repeat?
+	Size i_; // Active repeat or member index
+
+protected: // Static Data
+
+	static Size const NOSIZE;
+
+}; // Format
+
+// Format Combining Child Formats Base Class
+class FormatCombo : public Format
+{
+
+protected: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatCombo( Format * p, Size const r = 1ul ) :
+		Format( p, r )
+	{}
+
+	// Constructor
+	inline
+	FormatCombo( Format * p, char const star ) :
+		Format( p, star )
+	{}
+
+	// Copy Constructor
+	inline
+	FormatCombo( FormatCombo const & f ) :
+		Format( f )
+	{}
+
+	// Move Constructor
+	inline
+	FormatCombo( FormatCombo && f ) :
+		Format( std::move( f ) )
+	{}
+
+public: // Creation
+
+	// Destructor
+	inline
+	virtual
+	~FormatCombo()
+	{}
+
+protected: // Assignment
+
+	// Copy Assignment
+	inline
+	void
+	operator =( FormatCombo const & f )
+	{
+		if ( this != &f ) {
+			Format::operator =( f );
+		}
+	}
+
+}; // FormatCombo
+
+// Format Expression for List of Formats
+class FormatList : public FormatCombo
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatList( Format * p, Formats const & formats = Formats() ) :
+		FormatCombo( p ),
+		formats_( formats )
+	{}
+
+	// Copy Constructor
+	inline
+	FormatList( FormatList const & f ) :
+		FormatCombo( f )
+	{
+		for ( Format * format : f.formats() ) formats_.push_back( format->clone() );
+	}
+
+	// Move Constructor
+	inline
+	FormatList( FormatList && f ) :
+		FormatCombo( std::move( f ) ),
+		formats_( std::move( f.formats_ ) )
+	{}
+
+	// Clone
+	inline
+	FormatList *
+	clone() const
+	{
+		return new FormatList( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatList()
+	{
+		for ( Format * format : formats_ ) delete format;
+	}
+
+public: // Assignment
+
+	// Copy Assignment
+	FormatList &
+	operator =( FormatList const & f );
+
+public: // Properties
+
+	// Format List?
+	inline
+	bool
+	is_list() const
+	{
+		return true;
+	}
+
+	// Current Format
+	inline
+	Format *
+	current()
+	{
+		return ( ! formats_.empty() ? ( formats_[ i() ] ? formats_[ i() ]->current() : nullptr ) : nullptr );
+	}
+
+	// Next Format
+	inline
+	Format *
+	next()
+	{
+		return ( ! formats_.empty() ? ( formats_[ i() ] ? formats_[ i() ]->next() : nullptr ) : nullptr );
+	}
+
+	// Next Format: Upward Call
+	Format *
+	next_up();
+
+	// Size
+	inline
+	Size
+	size() const
+	{
+		return formats_.size();
+	}
+
+	// Formats
+	inline
+	Formats const &
+	formats() const
+	{
+		return formats_;
+	}
+
+	// Formats
+	inline
+	Formats &
+	formats()
+	{
+		return formats_;
+	}
+
+	// Set the Formats
+	inline
+	void
+	formats( Formats & f )
+	{
+		for ( Format * format : formats_ ) delete format;
+		formats_ = f;
+	}
+
+private: // Data
+
+	Formats formats_;
+
+}; // FormatList
+
+// Format Group Base Class
+class FormatGroup : public FormatCombo
+{
+
+protected: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatGroup( Format * p, Format * format = nullptr ) :
+		FormatCombo( p ),
+		format_( format )
+	{}
+
+	// Constructor
+	inline
+	FormatGroup( Format * p, Size const r, Format * format = nullptr ) :
+		FormatCombo( p, r ),
+		format_( format )
+	{}
+
+	// Constructor
+	inline
+	FormatGroup( Format * p, char const star, Format * format = nullptr ) :
+		FormatCombo( p, star ),
+		format_( format )
+	{}
+
+	// Copy Constructor
+	inline
+	FormatGroup( FormatGroup const & f ) :
+		FormatCombo( f ),
+		format_( f.format() ? f.format()->clone() : nullptr )
+	{}
+
+	// Move Constructor
+	inline
+	FormatGroup( FormatGroup && f ) :
+		FormatCombo( std::move( f ) ),
+		format_( f.format_ )
+	{
+		f.format_ = nullptr;
+	}
+
+public: // Creation
+
+	// Destructor
+	inline
+	virtual
+	~FormatGroup()
+	{
+		if ( format_ ) delete format_;
+	}
+
+protected: // Assignment
+
+	// Copy Assignment
+	FormatGroup &
+	operator =( FormatGroup const & f );
+
+public: // Properties
+
+	// Format Group?
+	inline
+	bool
+	is_group() const
+	{
+		return true;
+	}
+
+	// Current Format
+	inline
+	Format *
+	current()
+	{
+		return ( format_ ? format_->current() : nullptr );
+	}
+
+	// Next Format
+	inline
+	Format *
+	next()
+	{
+		return ( format_ ? format_->next() : nullptr );
+	}
+
+	// Next Format: Upward Call
+	Format *
+	next_up();
+
+	// Format
+	inline
+	Format const *
+	format() const
+	{
+		return format_;
+	}
+
+	// Format
+	inline
+	Format *
+	format()
+	{
+		return format_;
+	}
+
+	// Set the Format
+	inline
+	virtual
+	void
+	format( Format * f )
+	{
+		if ( format_ ) delete format_;
+		format_ = f;
+	}
+
+private: // Data
+
+	Format * format_;
+
+}; // FormatGroup
+
+// Format Top Group
+class FormatGroupTop : public FormatGroup
+{
+
+public: // Types
+
+	using FormatGroup::format;
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatGroupTop( Format * format = nullptr ) :
+		FormatGroup( nullptr, format ),
+		P_( 0 ),
+		blank_zero_( false ),
+		colon_terminated_( false ),
+		slash_terminated_( false ),
+		non_advancing_( false ),
+		reverted_( false ),
+		reverts_( 0ul ),
+		ir_( 0ul ),
+		fr_( nullptr ),
+		spacer_( false )
+	{}
+
+	// Constructor
+	inline
+	explicit
+	FormatGroupTop( Size const r, Format * format = nullptr ) :
+		FormatGroup( nullptr, r, format ),
+		blank_zero_( false ),
+		colon_terminated_( false ),
+		slash_terminated_( false ),
+		non_advancing_( false ),
+		reverted_( false ),
+		reverts_( 0ul ),
+		ir_( 0ul ),
+		fr_( nullptr ),
+		spacer_( false )
+	{}
+
+	// Constructor
+	inline
+	explicit
+	FormatGroupTop( char const star, Format * format = nullptr ) :
+		FormatGroup( nullptr, star, format ),
+		blank_zero_( false ),
+		colon_terminated_( false ),
+		slash_terminated_( false ),
+		non_advancing_( false ),
+		reverted_( false ),
+		reverts_( 0ul ),
+		ir_( 0ul ),
+		fr_( nullptr ),
+		spacer_( false )
+	{}
+
+	// Copy Constructor
+	inline
+	FormatGroupTop( FormatGroupTop const & f ) :
+		FormatGroup( f ),
+		P_( f.P_ ),
+		blank_zero_( f.blank_zero_ ),
+		colon_terminated_( f.colon_terminated_ ),
+		slash_terminated_( f.slash_terminated_ ),
+		non_advancing_( f.non_advancing_ ),
+		reverted_( false ),
+		reverts_( 0ul ),
+		ir_( 0ul ),
+		fr_( nullptr ),
+		spacer_( false )
+	{}
+
+	// Move Constructor
+	inline
+	FormatGroupTop( FormatGroupTop && f ) :
+		FormatGroup( std::move( f ) ),
+		P_( f.P_ ),
+		blank_zero_( f.blank_zero_ ),
+		colon_terminated_( f.colon_terminated_ ),
+		slash_terminated_( f.slash_terminated_ ),
+		non_advancing_( f.non_advancing_ ),
+		reverted_( false ),
+		reverts_( 0ul ),
+		ir_( 0ul ),
+		fr_( f.fr_ ),
+		spacer_( false )
+	{
+		f.fr_ = nullptr;
+	}
+
+	// Clone
+	inline
+	FormatGroupTop *
+	clone() const
+	{
+		return new FormatGroupTop( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatGroupTop()
+	{}
+
+public: // Assignment
+
+	// Copy Assignment
+	inline
+	FormatGroupTop &
+	operator =( FormatGroupTop const & f )
+	{
+		if ( this != &f ) {
+			FormatGroup::operator =( f );
+			P_ = f.P_;
+			blank_zero_ = f.blank_zero_;
+			colon_terminated_ = f.colon_terminated_;
+			slash_terminated_ = f.slash_terminated_;
+			non_advancing_ = f.non_advancing_;
+			reverted_ = false;
+			reverts_ = 0ul;
+			ir_ = 0ul;
+			fr_ = nullptr;
+			spacer_ = false;
+		}
+		return *this;
+	}
+
+public: // Properties
+
+	// P Scaling State
+	inline
+	int
+	P() const
+	{
+		return P_;
+	}
+
+	// P Scaling State
+	inline
+	int &
+	P()
+	{
+		return P_;
+	}
+
+	// Blank Zero?
+	inline
+	bool
+	blank_zero() const
+	{
+		return blank_zero_;
+	}
+
+	// Blank Zero?
+	inline
+	bool &
+	blank_zero()
+	{
+		return blank_zero_;
+	}
+
+	// Colon Terminated?
+	inline
+	bool
+	colon_terminated() const
+	{
+		return colon_terminated_;
+	}
+
+	// Colon Terminated?
+	inline
+	bool &
+	colon_terminated()
+	{
+		return colon_terminated_;
+	}
+
+	// Slash Terminated?
+	inline
+	bool
+	slash_terminated() const
+	{
+		return slash_terminated_;
+	}
+
+	// Slash Terminated?
+	inline
+	bool &
+	slash_terminated()
+	{
+		return slash_terminated_;
+	}
+
+	// Non-Advancing?
+	inline
+	bool
+	non_advancing() const
+	{
+		return non_advancing_;
+	}
+
+	// Non-Advancing?
+	inline
+	bool &
+	non_advancing()
+	{
+		return non_advancing_;
+	}
+
+	// Reverted?
+	inline
+	bool
+	reverted() const
+	{
+		return reverted_;
+	}
+
+	// Reverted?
+	inline
+	bool &
+	reverted()
+	{
+		return reverted_;
+	}
+
+	// Revert Count
+	inline
+	Size
+	reverts() const
+	{
+		return reverts_;
+	}
+
+	// Spacer?
+	inline
+	bool
+	spacer() const
+	{
+		return spacer_;
+	}
+
+	// Spacer?
+	inline
+	bool &
+	spacer()
+	{
+		return spacer_;
+	}
+
+	// Next Format: Upward Call
+	inline
+	Format *
+	next_up()
+	{
+		reverted_ = true;
+		++reverts_;
+		return revert();
+	}
+
+private: // Methods
+
+	// Reversion Format Setup
+	Format *
+	revert();
+
+private: // Data
+
+	int P_; // P scaling
+	bool blank_zero_; // Treat blanks in numeric inputs as zero?
+	bool colon_terminated_; // Colon terminated? (Stops all i/o after last item)
+	bool slash_terminated_; // Slash terminated? (Stops list-directed read)
+	bool non_advancing_; // Non-advancing output?
+	bool reverted_; // Reverted since any output performed?
+	Size reverts_; // Number of reversions
+	Size ir_; // Reversion Format list index
+	Format * fr_; // Reversion Format
+	bool spacer_; // Spacer item output last?
+
+}; // FormatGroupTop
+
+// Format Sub-Group
+class FormatGroupSub : public FormatGroup
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatGroupSub( Format * p, Format * format = nullptr ) :
+		FormatGroup( p, format )
+	{}
+
+	// Constructor
+	inline
+	FormatGroupSub( Format * p, Size const r, Format * format = nullptr ) :
+		FormatGroup( p, r, format )
+	{}
+
+	// Constructor
+	inline
+	FormatGroupSub( Format * p, char const star, Format * format = nullptr ) :
+		FormatGroup( p, star, format )
+	{}
+
+	// Clone
+	inline
+	FormatGroupSub *
+	clone() const
+	{
+		return new FormatGroupSub( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatGroupSub()
+	{}
+
+}; // FormatGroupSub
+
+// Format Leaf Base Class
+class FormatLeaf : public Format
+{
+
+protected: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatLeaf( Format * p, Size const r = 1ul ) :
+		Format( p, r )
+	{}
+
+	// Copy Constructor
+	inline
+	FormatLeaf( FormatLeaf const & f ) :
+		Format( f )
+	{}
+
+	// Move Constructor
+	inline
+	FormatLeaf( FormatLeaf && f ) :
+		Format( std::move( f ) )
+	{}
+
+public: // Creation
+
+	// Destructor
+	inline
+	virtual
+	~FormatLeaf()
+	{}
+
+protected: // Assignment
+
+	// Copy Assignment
+	inline
+	void
+	operator =( FormatLeaf const & f )
+	{
+		if ( this != &f ) {
+			Format::operator =( f );
+		}
+	}
+
+public: // Properties
+
+	// Current Format
+	inline
+	Format *
+	current()
+	{
+		return this;
+	}
+
+	// Next Format
+	Format *
+	next();
+
+	// Next Format: Upward Call
+	inline
+	Format *
+	next_up()
+	{
+		assert( false ); // next_up() should never be called on a leaf Format
+		return nullptr; // Done
+	}
+
+}; // FormatLeaf
+
+// Literal String Format
+class FormatString : public FormatLeaf
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatString( Format * p, std::string const & s ) :
+		FormatLeaf( p ),
+		s_( replaced( replaced( s, "\\\\", "\\" ), "\\\"", "\"" ) )
+	{}
+
+	// Clone
+	inline
+	FormatString *
+	clone() const
+	{
+		return new FormatString( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatString()
+	{}
+
+public: // Methods
+
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos const, std::streampos & por )
+	{
+		por += s_.length(); // Some Fortran versions/compilers allow literal strings on input to skip the string's length
+	}
+
+	// Output
+	inline
+	void
+	out( std::ostream & stream, std::streampos & pos )
+	{
+		output_pad( stream, pos );
+		stream << spc() + s_;
+		pos = stream.tellp();
+	}
+
+private: // Data
+
+	std::string const s_;
+
+}; // FormatString
+
+// Literal Character Format
+class FormatChar : public FormatLeaf
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatChar( Format * p, std::string const & s ) :
+		FormatLeaf( p ),
+		s_( replaced( replaced( s, "\\\\", "\\" ), "\\'", "'" ) )
+	{}
+
+	// Clone
+	inline
+	FormatChar *
+	clone() const
+	{
+		return new FormatChar( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatChar()
+	{}
+
+public: // Methods
+
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos const, std::streampos & por )
+	{
+		por += s_.length(); // Some Fortran versions/compilers allow literal strings on input to skip the string's length
+	}
+
+	// Output
+	inline
+	void
+	out( std::ostream & stream, std::streampos & pos )
+	{
+		output_pad( stream, pos );
+		stream << spc() + s_;
+		pos = stream.tellp();
+	}
+
+private: // Data
+
+	std::string const s_;
+
+}; // FormatChar
+
+// Blank=NULL Mode Format
+class FormatBN : public FormatLeaf
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatBN( Format * p ) :
+		FormatLeaf( p )
+	{}
+
+	// Clone
+	inline
+	FormatBN *
+	clone() const
+	{
+		return new FormatBN( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatBN()
+	{}
+
+public: // Methods
+
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos const, std::streampos & )
+	{
+		blank_zero() = false;
+	}
+
+}; // FormatBN
+
+// Blank=Zero Mode Format
+class FormatBZ : public FormatLeaf
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatBZ( Format * p ) :
+		FormatLeaf( p )
+	{}
+
+	// Clone
+	inline
+	FormatBZ *
+	clone() const
+	{
+		return new FormatBZ( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatBZ()
+	{}
+
+public: // Methods
+
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos const, std::streampos & )
+	{
+		blank_zero() = true;
+	}
+
+}; // FormatBZ
+
+class FormatS : public FormatLeaf
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatS( Format * p ) :
+		FormatLeaf( p )
+	{}
+
+	// Clone
+	inline
+	FormatS *
+	clone() const
+	{
+		return new FormatS( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatS()
+	{}
+
+}; // FormatS
+
+class FormatSP : public FormatLeaf
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatSP( Format * p ) :
+		FormatLeaf( p )
+	{}
+
+	// Clone
+	inline
+	FormatSP *
+	clone() const
+	{
+		return new FormatSP( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatSP()
+	{}
+
+}; // FormatSP
+
+class FormatSS : public FormatLeaf
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatSS( Format * p ) :
+		FormatLeaf( p )
+	{}
+
+	// Clone
+	inline
+	FormatSS *
+	clone() const
+	{
+		return new FormatSS( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatSS()
+	{}
+
+}; // FormatSS
+
+class FormatSU : public FormatLeaf
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatSU( Format * p ) :
+		FormatLeaf( p )
+	{}
+
+	// Clone
+	inline
+	FormatSU *
+	clone() const
+	{
+		return new FormatSU( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatSU()
+	{}
+
+}; // FormatSU
+
+// Blank Spaces Format
+class FormatX : public FormatLeaf
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatX( Format * p, Size const n = 1ul ) :
+		FormatLeaf( p ),
+		n_( n )
+	{}
+
+	// Clone
+	inline
+	FormatX *
+	clone() const
+	{
+		return new FormatX( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatX()
+	{}
+
+public: // Methods
+
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos const, std::streampos & por )
+	{
+		por += n_;
+	}
+
+	// Output
+	inline
+	void
+	out( std::ostream &, std::streampos & por )
+	{
+		por += n_;
+	}
+
+private: // Data
+
+	Size n_; // Number of spaces
+
+}; // FormatX
+
+// Radix Format
+class FormatR : public FormatLeaf
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatR( Format * p, Size const radix ) :
+		FormatLeaf( p ),
+		radix_( radix )
+	{}
+
+	// Clone
+	inline
+	FormatR *
+	clone() const
+	{
+		return new FormatR( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatR()
+	{}
+
+private: // Data
+
+	Size radix_;
+
+}; // FormatR
+
+// Line Feed Format
+class FormatLinefeed : public FormatLeaf
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatLinefeed( Format * p, Size const r = 1ul ) :
+		FormatLeaf( p, r )
+	{}
+
+	// Clone
+	inline
+	FormatLinefeed *
+	clone() const
+	{
+		return new FormatLinefeed( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatLinefeed()
+	{}
+
+public: // Methods
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, std::streampos const poa, std::streampos & por )
+	{
+		stream.seekg( poa + por, std::ios::beg );
+		stream >> skip;
+		por = stream.tellg() - poa; // After reading a value the current stream position is also the virtual position
+	}
+
+	// Output
+	inline
+	void
+	out( std::ostream & stream, std::streampos & pos )
+	{
+		output_pad( stream, pos );
+		stream << spc() + NL;
+		pos = stream.tellp();
+	}
+
+}; // FormatLinefeed
+
+// Terminator Format
+class FormatColon : public FormatLeaf
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatColon( Format * p ) :
+		FormatLeaf( p )
+	{}
+
+	// Clone
+	inline
+	FormatColon *
+	clone() const
+	{
+		return new FormatColon( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatColon()
+	{}
+
+public: // Methods
+
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos const, std::streampos & )
+	{
+		colon_terminated() = true;
+	}
+
+	// Output
+	inline
+	void
+	out( std::ostream &, std::streampos & )
+	{
+		colon_terminated() = true;
+	}
+
+}; // FormatColon
+
+// Line Feed Suppression Format
+class FormatDollar : public FormatLeaf
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatDollar( Format * p ) :
+		FormatLeaf( p )
+	{}
+
+	// Clone
+	inline
+	FormatDollar *
+	clone() const
+	{
+		return new FormatDollar( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatDollar()
+	{}
+
+public: // Methods
+
+	// Output
+	inline
+	void
+	out( std::ostream &, std::streampos & )
+	{
+		non_advancing() = true;
+	}
+
+}; // FormatDollar
+
+// Format: Format Expression for Tab Positioning
+class FormatT : public FormatLeaf
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	FormatT( Format * p, Size const n ) :
+		FormatLeaf( p ),
+		n_( n > 0 ? n : 1ul ) // Assure that n_ > 0
+	{}
+
+	// Clone
+	inline
+	FormatT *
+	clone() const
+	{
+		return new FormatT( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatT()
+	{}
+
+public: // Methods
+
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos const, std::streampos & por )
+	{
+		por = n_ - 1; // Stream positions are zero-based but Fortran tab positions are 1-based
+	}
+
+	// Output
+	inline
+	void
+	out( std::ostream &, std::streampos & pos )
+	{
+		pos = n_ - 1; // Stream positions are zero-based but Fortran tab positions are 1-based
+	}
+
+private: // Data
+
+	Size n_;
+
+}; // FormatT
+
+// Tab-Left Positioning Format
+class FormatTL : public FormatLeaf
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	FormatTL( Format * p, Size const n ) :
+		FormatLeaf( p ),
+		n_( n )
+	{}
+
+	// Clone
+	inline
+	FormatTL *
+	clone() const
+	{
+		return new FormatTL( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatTL()
+	{}
+
+public: // Methods
+
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos const, std::streampos & por )
+	{
+		por -= n_;
+	}
+
+	// Output
+	inline
+	void
+	out( std::ostream &, std::streampos & pos )
+	{
+		pos -= n_;
+	}
+
+private: // Data
+
+	Size n_;
+
+}; // FormatTL
+
+// Tab-Right Positioning Format
+class FormatTR : public FormatLeaf
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	FormatTR( Format * p, Size const n ) :
+		FormatLeaf( p ),
+		n_( n )
+	{}
+
+	// Clone
+	inline
+	FormatTR *
+	clone() const
+	{
+		return new FormatTR( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatTR()
+	{}
+
+public: // Methods
+
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos const, std::streampos & por )
+	{
+		por += n_;
+	}
+
+	// Output
+	inline
+	void
+	out( std::ostream &, std::streampos & pos )
+	{
+		pos += n_;
+	}
+
+private: // Data
+
+	Size n_;
+
+}; // FormatTR
+
+// String Format
+class FormatA : public FormatLeaf
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatA( Format * p, Size const r = 1ul, Size const w = NOSIZE ) :
+		FormatLeaf( p, r ),
+		w_( w )
+	{}
+
+	// Clone
+	inline
+	FormatA *
+	clone() const
+	{
+		return new FormatA( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatA()
+	{}
+
+public: // Properties
+
+	// Uses an Argument?
+	inline
+	bool
+	uses_arg() const
+	{
+		return true;
+	}
+
+	// Has a Width?
+	inline
+	bool
+	has_w() const
+	{
+		return ( w_ != NOSIZE );
+	}
+
+public: // Methods
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, bool & b )
+	{
+		read_val_reinterpret( stream, b );
+		b = false;
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, byte & b )
+	{
+		read_val_reinterpret( stream, b );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, ubyte & b )
+	{
+		read_val_reinterpret( stream, b );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, short int & i )
+	{
+		read_val_reinterpret( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, unsigned short int & i )
+	{
+		read_val_reinterpret( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, int & i )
+	{
+		read_val_reinterpret( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, unsigned int & i )
+	{
+		read_val_reinterpret( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, long int & i )
+	{
+		read_val_reinterpret( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, unsigned long int & i )
+	{
+		read_val_reinterpret( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, long long int & i )
+	{
+		read_val_reinterpret( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, unsigned long long int & i )
+	{
+		read_val_reinterpret( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, float & v )
+	{
+		read_val_reinterpret( stream, v );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, double & v )
+	{
+		read_val_reinterpret( stream, v );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, long double & v )
+	{
+		read_val_reinterpret( stream, v );
+	}
+
+	// Input
+	void
+	in( std::istream & stream, char & c );
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, std::string & s )
+	{
+		s = read( stream, w_ ); // Reads the whole record if w_ unspecified since std::string is variable length
+	}
+
+	// Input
+	void
+	in( std::istream & stream, Fstring & s );
+
+	// Output
+	inline
+	void
+	out( std::ostream & stream, bool const b )
+	{
+		write_val_reinterpret( stream, b ); // Bit rep of LOGICAL(4) .TRUE. value varies across compilers: Intel Fortran it is FFFFFFFF and on GFortran it is 01000000
+	}
+
+	// Output
+	void
+	out( std::ostream & stream, byte const & b )
+	{
+		write_val_reinterpret( stream, b );
+	}
+
+	// Output
+	void
+	out( std::ostream & stream, ubyte const & b )
+	{
+		write_val_reinterpret( stream, b );
+	}
+
+	// Output
+	void
+	out( std::ostream & stream, short int const i )
+	{
+		write_val_reinterpret( stream, i );
+	}
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned short int const i )
+	{
+		write_val_reinterpret( stream, i );
+	}
+
+	// Output
+	void
+	out( std::ostream & stream, int const i )
+	{
+		write_val_reinterpret( stream, i );
+	}
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned int const i )
+	{
+		write_val_reinterpret( stream, i );
+	}
+
+	// Output
+	void
+	out( std::ostream & stream, long int const i )
+	{
+		write_val_reinterpret( stream, i );
+	}
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned long int const i )
+	{
+		write_val_reinterpret( stream, i );
+	}
+
+	// Output
+	void
+	out( std::ostream & stream, long long int const i )
+	{
+		write_val_reinterpret( stream, i );
+	}
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned long long int const i )
+	{
+		write_val_reinterpret( stream, i );
+	}
+
+	// Output
+	void
+	out( std::ostream & stream, float const v )
+	{
+		write_val_reinterpret( stream, v );
+	}
+
+	// Output
+	void
+	out( std::ostream & stream, double const v )
+	{
+		write_val_reinterpret( stream, v );
+	}
+
+	// Output
+	void
+	out( std::ostream & stream, long double const v )
+	{
+		write_val_reinterpret( stream, v );
+	}
+
+	// Output
+	inline
+	void
+	out( std::ostream & stream, char const c )
+	{
+		stream << spc() + std::string( ( has_w() && ( w_ > 1ul ) ? w_ - 1ul : 0ul ), SPC ) + c;
+	}
+
+	// Output
+	inline
+	void
+	out( std::ostream & stream, std::string const & s )
+	{
+		std::string::size_type const l( s.length() );
+		stream << spc() + std::string( ( has_w() && ( w_ > l ) ? w_ - l : 0ul ), SPC ) + s;
+	}
+
+	// Output
+	void
+	out( std::ostream & stream, Fstring const & );
+
+private: // Methods
+
+	// Read Value from Stream and Reinterpret as Type T
+	template< typename T >
+	inline
+	void
+	read_val_reinterpret( std::istream & stream, T & t ) const
+	{
+		Size const w( TraitsA< T >::w() );
+		std::string s( read( stream, wid( w ) ) );
+		std::string::size_type const ls( s.length() );
+		if ( ( w > 0ul ) && ( ls < w ) ) s += std::string( w - ls, SPC ); // Right-pad to width needed by T
+		if ( ! s.empty() ) {
+			void const * vp( s.substr( s.length() - w ).c_str() );
+			t = *reinterpret_cast< T const * >( vp );
+		} else { // Nothing read
+			t = T( 0 );
+			io_err( stream );
+		}
+	}
+
+	// Write Type T Value Reinterpreted as String to Stream
+	template< typename T >
+	inline
+	void
+	write_val_reinterpret( std::ostream & stream, T const & t )
+	{
+		Size const w( TraitsA< T >::w() );
+		Size const ww( wid( w ) );
+		Size const wt( std::min( w, ww ) );
+		std::string s( ww, SPC );
+		void const * vp( &t );
+		s.replace( 0, wt, reinterpret_cast< c_cstring >( vp ), wt );
+		stream << spc() + s;
+	}
+
+	// Write bool Value Reinterpreted as String to Stream: Override to Treat bool as 4 Byte Equivalent of LOGICAL(4)
+	inline
+	void
+	write_val_reinterpret( std::ostream & stream, bool const b )
+	{
+		Size const w( TraitsA< bool >::w() );
+		Size const ww( wid( w ) );
+		Size const wt( std::min( w, ww ) );
+		std::string s( ww, SPC );
+		Size const l( sizeof( b ) );
+		void const * vp( &b );
+		if ( l >= wt ) { // Use all bits of b
+			s.replace( 0, wt, reinterpret_cast< c_cstring >( vp ), wt );
+		} else { // Tail-fill with nul: Used for bool that is treated as 4 bytes to correspond with Fortran LOGICAL(4)
+			Size const n( wt - l );
+			s.replace( 0, l, reinterpret_cast< c_cstring >( vp ), l );
+			s.replace( l, n, n, NUL );
+		}
+		stream << spc() + s;
+	}
+
+	// Width for I/O
+	inline
+	Size
+	wid( Size const w ) const
+	{
+		return ( w_ != NOSIZE ? w_ : w );
+	}
+
+private: // Data
+
+	Size w_;
+
+}; // FormatA
+
+// Logical Format
+class FormatL : public FormatLeaf
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatL( Format * p, Size const r = 1ul, Size const w = NOSIZE ) :
+		FormatLeaf( p, r ),
+		w_( w )
+	{}
+
+	// Clone
+	inline
+	FormatL *
+	clone() const
+	{
+		return new FormatL( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatL()
+	{}
+
+public: // Properties
+
+	// Uses an Argument?
+	inline
+	bool
+	uses_arg() const
+	{
+		return true;
+	}
+
+	// Has a Width?
+	inline
+	bool
+	has_w() const
+	{
+		return ( w_ != NOSIZE );
+	}
+
+public: // Methods
+
+	// Input
+	void
+	in( std::istream & stream, bool & b );
+
+	// Output
+	inline
+	void
+	out( std::ostream & stream, bool const b )
+	{
+		stream << spc() + std::string( has_w() && ( w_ > 0ul ) ? w_ - 1ul : 0ul, SPC ) + ( b ? 'T' : 'F' );
+	}
+
+private: // Methods
+
+	// Width for I/O
+	inline
+	Size
+	wid( Size const w ) const
+	{
+		return ( w_ != NOSIZE ? w_ : w );
+	}
+
+private: // Data
+
+	Size w_;
+
+}; // FormatL
+
+// Integer Format Base Class
+class FormatInteger : public FormatLeaf
+{
+
+protected: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatInteger( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const m = 0ul ) :
+		FormatLeaf( p, r ),
+		w_( w ),
+		m_( m )
+	{}
+
+	// Copy Constructor
+	inline
+	FormatInteger( FormatInteger const & f ) :
+		FormatLeaf( f ),
+		w_( f.w_ ),
+		m_( f.m_ )
+	{}
+
+	// Move Constructor
+	inline
+	FormatInteger( FormatInteger && f ) :
+		FormatLeaf( std::move( f ) ),
+		w_( f.w_ ),
+		m_( f.m_ )
+	{}
+
+public: // Creation
+
+	// Destructor
+	inline
+	virtual
+	~FormatInteger()
+	{}
+
+protected: // Assignment
+
+	// Copy Assignment
+	inline
+	void
+	operator =( FormatInteger const & f )
+	{
+		if ( this != &f ) {
+			FormatLeaf::operator =( f );
+			w_ = f.w_;
+			m_ = f.m_;
+		}
+	}
+
+public: // Properties
+
+	// Uses an Argument?
+	inline
+	bool
+	uses_arg() const
+	{
+		return true;
+	}
+
+	// Has a Width?
+	inline
+	bool
+	has_w() const
+	{
+		return ( w_ != NOSIZE );
+	}
+
+	// Field Width
+	inline
+	Size
+	w() const
+	{
+		return w_;
+	}
+
+	// Min Width
+	inline
+	Size
+	m() const
+	{
+		return m_;
+	}
+
+public: // Methods
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, bool & b )
+	{
+		int i;
+		read_int( stream, i );
+		b = ( std::abs( i ) % 2 == 1 ); // Intel Fortran behavior
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, byte & b )
+	{
+		read_int( stream, b );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, ubyte & b )
+	{
+		read_int( stream, b );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, short int & i )
+	{
+		read_int( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, unsigned short int & i )
+	{
+		read_int( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, int & i )
+	{
+		read_int( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, unsigned int & i )
+	{
+		read_int( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, long int & i )
+	{
+		read_int( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, unsigned long int & i )
+	{
+		read_int( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, long long int & i )
+	{
+		read_int( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, unsigned long long int & i )
+	{
+		read_int( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, float & v )
+	{
+		read_int_reinterpret( stream, v );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, double & v )
+	{
+		read_int_reinterpret( stream, v );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, long double & v )
+	{
+		read_int_reinterpret( stream, v );
+	}
+
+protected: // Methods
+
+	// Read Integer from Stream
+	template< typename T >
+	inline
+	void
+	read_int( std::istream & stream, T & t ) const
+	{
+		std::string const s( blank_process( read( stream, wid( TraitsI< T >::w() ) ) ) );
+		t = read_int_base( stream, s );
+	}
+
+	// Read Integer from Stream and Reinterpret as Type T
+	template< typename T >
+	inline
+	void
+	read_int_reinterpret( std::istream & stream, T & t ) const
+	{
+		std::string const s( blank_process( read( stream, wid( TraitsI< T >::w() ) ) ) );
+		read_int_reinterpret( stream, s, t );
+	}
+
+	// Read Integer from String and Reinterpret as Type T
+	template< typename T >
+	inline
+	void
+	read_int_reinterpret( std::istream & stream, std::string const & s, T & t ) const
+	{
+		if ( is_int_base( s ) ) {
+			long int const l( read_int_base( stream, s ) );
+			bool ok( true );
+			if ( sizeof( T ) < sizeof( int ) ) {
+				ok = ( ( ( long int )( std::numeric_limits< int >::min() ) <= l ) && ( l <= ( long int )( std::numeric_limits< int >::max() ) ) );
+				int const v( l );
+				void const * vp( &v );
+				t = *reinterpret_cast< T const * >( vp ); // Probably not what user wants: May want to throw an error here
+			} else if ( sizeof( T ) == sizeof( int ) ) {
+				ok = ( ( ( long int )( std::numeric_limits< int >::min() ) <= l ) && ( l <= ( long int )( std::numeric_limits< int >::max() ) ) );
+				int const v( l );
+				void const * vp( &v );
+				t = *reinterpret_cast< T const * >( vp );
+			} else if ( sizeof( T ) == sizeof( long int ) ) {
+				void const * vp( &l );
+				t = *reinterpret_cast< T const * >( vp );
+			} else if ( sizeof( T ) == sizeof( long long int ) ) {
+				long long int const v( l );
+				void const * vp( &v );
+				t = *reinterpret_cast< T const * >( vp );
+			} else {
+				long long int const v( l );
+				void const * vp( &v );
+				t = *reinterpret_cast< T const * >( vp ); // Probably not what user wants: May want to throw an error here
+			}
+			if ( ! ok ) io_err( stream );
+		} else { // Bad input
+			t = T( 0 );
+			io_err( stream );
+		}
+	}
+
+	// Width for I/O
+	inline
+	Size
+	wid( Size const w ) const
+	{
+		return ( w_ != NOSIZE ? w_ : w );
+	}
+
+	// Can Convert String in Integer Base Format to Integer?
+	virtual
+	bool
+	is_int_base( std::string const & s ) const = 0;
+
+	// Convert String in Integer Base Format to Integer
+	virtual
+	long int
+	read_int_base( std::istream & stream, std::string const & s ) const = 0;
+
+private: // Data
+
+	Size w_;
+	Size m_;
+
+}; // FormatInteger
+
+// Decimal Integer Format
+class FormatI : public FormatInteger
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatI( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const m = 0ul ) :
+		FormatInteger( p, r, w, m )
+	{}
+
+	// Clone
+	inline
+	FormatI *
+	clone() const
+	{
+		return new FormatI( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatI()
+	{}
+
+public: // Methods
+
+	// Output
+	void
+	out( std::ostream & stream, byte const & b );
+
+	// Output
+	void
+	out( std::ostream & stream, ubyte const & b );
+
+	// Output
+	void
+	out( std::ostream & stream, short int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned short int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, long int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned long int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, long long int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned long long int const i );
+
+protected: // Methods
+
+	// Can Convert String in Integer Base Format to Integer?
+	inline
+	bool
+	is_int_base( std::string const & s ) const
+	{
+		return is_decimal( s );
+	}
+
+	// Convert String in Integer Base Format to Integer
+	inline
+	long int
+	read_int_base( std::istream & stream, std::string const & s ) const
+	{
+		if ( is_decimal( s ) ) {
+			return decimal_of( s );
+		} else { // Bad input
+			io_err( stream );
+			return 0l;
+		}
+	}
+
+}; // FormatI
+
+// Binary Integer Format
+class FormatB : public FormatInteger
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatB( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const m = 0ul ) :
+		FormatInteger( p, r, w, m )
+	{}
+
+	// Clone
+	inline
+	FormatB *
+	clone() const
+	{
+		return new FormatB( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatB()
+	{}
+
+public: // Methods
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, bool & b )
+	{
+		int i;
+		read_binary( stream, i );
+		b = ( std::abs( i ) % 2 == 1 ); // Intel Fortran behavior
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, byte & b )
+	{
+		read_binary( stream, b );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, ubyte & b )
+	{
+		read_binary( stream, b );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, short int & i )
+	{
+		read_binary( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, unsigned short int & i )
+	{
+		read_binary( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, int & i )
+	{
+		read_binary( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, unsigned int & i )
+	{
+		read_binary( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, long int & i )
+	{
+		read_binary( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, unsigned long int & i )
+	{
+		read_binary( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, long long int & i )
+	{
+		read_binary( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, unsigned long long int & i )
+	{
+		read_binary( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, float & v )
+	{
+		read_binary_reinterpret( stream, v );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, double & v )
+	{
+		read_binary_reinterpret( stream, v );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, long double & v )
+	{
+		read_binary_reinterpret( stream, v );
+	}
+
+	// Output
+	void
+	out( std::ostream & stream, byte const & b );
+
+	// Output
+	void
+	out( std::ostream & stream, ubyte const & b );
+
+	// Output
+	void
+	out( std::ostream & stream, short int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned short int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, long int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned long int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, long long int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned long long int const i );
+
+protected: // Methods
+
+	// Read Integer Value from Stream
+	template< typename T >
+	inline
+	void
+	read_binary( std::istream & stream, T & t ) const
+	{
+		std::string const s( blank_process( read( stream, wid( TraitsB< T >::w() ) ) ) );
+		t = read_int_base( stream, s );
+	}
+
+	// Read Binary from Stream and Reinterpret as Type T
+	template< typename T >
+	inline
+	void
+	read_binary_reinterpret( std::istream & stream, T & t ) const
+	{
+		std::string const s( blank_process( read( stream, wid( TraitsB< T >::w() ) ) ) );
+		read_int_reinterpret( stream, s, t );
+	}
+
+	// Can Convert String in Integer Base Format to Integer?
+	inline
+	bool
+	is_int_base( std::string const & s ) const
+	{
+		return is_binary( s, false );
+	}
+
+	// Convert String in Integer Base Format to Integer
+	inline
+	long int
+	read_int_base( std::istream & stream, std::string const & s ) const
+	{
+		if ( is_binary( s, false ) ) {
+			return binary_of( s );
+		} else { // Bad input
+			io_err( stream );
+			return 0l;
+		}
+	}
+
+}; // FormatB
+
+// Octal Integer Format
+class FormatO : public FormatInteger
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatO( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const m = 0ul ) :
+		FormatInteger( p, r, w, m )
+	{}
+
+	// Clone
+	inline
+	FormatO *
+	clone() const
+	{
+		return new FormatO( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatO()
+	{}
+
+public: // Methods
+
+	// Output
+	void
+	out( std::ostream & stream, byte const & b );
+
+	// Output
+	void
+	out( std::ostream & stream, ubyte const & b );
+
+	// Output
+	void
+	out( std::ostream & stream, short int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned short int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, long int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned long int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, long long int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned long long int const i );
+
+protected: // Methods
+
+	// Can Convert String in Integer Base Format to Integer?
+	inline
+	bool
+	is_int_base( std::string const & s ) const
+	{
+		return is_octal( s, false );
+	}
+
+	// Convert String in Integer Base Format to Integer
+	inline
+	long int
+	read_int_base( std::istream & stream, std::string const & s ) const
+	{
+		if ( is_octal( s, false ) ) {
+			return octal_of( s );
+		} else { // Bad input
+			io_err( stream );
+			return 0l;
+		}
+	}
+
+}; // FormatO
+
+// Hexidecimal Integer Format
+class FormatZ : public FormatInteger
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatZ( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const m = 0ul ) :
+		FormatInteger( p, r, w, m )
+	{}
+
+	// Clone
+	inline
+	FormatZ *
+	clone() const
+	{
+		return new FormatZ( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatZ()
+	{}
+
+public: // Methods
+
+	// Output
+	void
+	out( std::ostream & stream, byte const & b );
+
+	// Output
+	void
+	out( std::ostream & stream, ubyte const & b );
+
+	// Output
+	void
+	out( std::ostream & stream, short int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned short int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, long int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned long int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, long long int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned long long int const i );
+
+protected: // Methods
+
+	// Can Convert String in Integer Base Format to Integer?
+	inline
+	bool
+	is_int_base( std::string const & s ) const
+	{
+		return is_hexidecimal( s, false );
+	}
+
+	// Convert String in Integer Base Format to Integer
+	inline
+	long int
+	read_int_base( std::istream & stream, std::string const & s ) const
+	{
+		if ( is_hexidecimal( s, false ) ) {
+			return hexidecimal_of( s );
+		} else { // Bad input
+			io_err( stream );
+			return 0l;
+		}
+	}
+
+}; // FormatZ
+
+// Scaling Format
+class FormatP : public FormatLeaf
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatP( Format * p, int k = 1 ) :
+		FormatLeaf( p ),
+		k_( k )
+	{}
+
+	// Clone
+	inline
+	FormatP *
+	clone() const
+	{
+		return new FormatP( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatP()
+	{}
+
+public: // Methods
+
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos const, std::streampos & )
+	{
+		P() = k_; // Set P scaling
+	}
+
+	// Output
+	inline
+	void
+	out( std::ostream &, std::streampos & )
+	{
+		P() = k_; // Set P scaling
+	}
+
+private: // Data
+
+	int const k_;
+
+}; // FormatP
+
+// Floating Format
+class FormatFloat : public FormatLeaf
+{
+
+protected: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatFloat( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const d = 0ul ) :
+		FormatLeaf( p, r ),
+		w_( w ),
+		d_( d )
+	{}
+
+	// Copy Constructor
+	inline
+	FormatFloat( FormatFloat const & f ) :
+		FormatLeaf( f ),
+		w_( f.w_ ),
+		d_( f.d_ )
+	{}
+
+	// Move Constructor
+	inline
+	FormatFloat( FormatFloat && f ) :
+		FormatLeaf( std::move( f ) ),
+		w_( f.w_ ),
+		d_( f.d_ )
+	{}
+
+public: // Creation
+
+	// Destructor
+	inline
+	virtual
+	~FormatFloat()
+	{}
+
+protected: // Assignment
+
+	// Copy Assignment
+	inline
+	void
+	operator =( FormatFloat const & f )
+	{
+		if ( this != &f ) {
+			FormatLeaf::operator =( f );
+			w_ = f.w_;
+			d_ = f.d_;
+		}
+	}
+
+public: // Properties
+
+	// Uses an Argument?
+	inline
+	bool
+	uses_arg() const
+	{
+		return true;
+	}
+
+	// Has a Width?
+	inline
+	bool
+	has_w() const
+	{
+		return ( w_ != NOSIZE );
+	}
+
+	// Field Width
+	inline
+	Size
+	w() const
+	{
+		return w_;
+	}
+
+	// Field Digits
+	inline
+	Size
+	d() const
+	{
+		return d_;
+	}
+
+public: // Methods
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, bool & b )
+	{
+		std::string const s( blank_process( read_float( stream, wid( TraitsF< bool >::w() ) ) ) );
+		if ( s.length() > 0 ) {
+			bool ok( is_type< float >( s ) );
+			float const v( val_of< float >( s ) );
+			void const * vp( &v );
+			b = *reinterpret_cast< bool const * >( vp );
+			if ( ! ok ) io_err( stream );
+		} else { // Nothing read
+			b = false;
+			io_err( stream );
+		}
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, int & i )
+	{
+		read_val_reinterpret( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, unsigned int & i )
+	{
+		read_val_reinterpret( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, long int & i )
+	{
+		read_val_reinterpret( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, unsigned long int & i )
+	{
+		read_val_reinterpret( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, long long int & i )
+	{
+		read_val_reinterpret( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, unsigned long long int & i )
+	{
+		read_val_reinterpret( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, float & v )
+	{
+		read_val( stream, v );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, double & v )
+	{
+		read_val( stream, v );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, long double & v )
+	{
+		read_val( stream, v );
+	}
+
+protected: // Methods
+
+	// Read Value from Stream
+	template< typename T >
+	inline
+	void
+	read_val( std::istream & stream, T & t ) const
+	{
+		std::string const s( blank_process( read_float( stream, wid( TraitsF< T >::w() ) ) ) );
+		if ( is_type< T >( s ) ) {
+			t = type_of< T >( s );
+			if ( ( d_ > 0ul ) && ( t != T( 0 ) ) && ( ! has( s, '.' ) ) ) t /= std::pow( T( 10 ), d_ ); // Apply implied decimal point
+			if ( ( P() != 0 ) && ( t != T( 0 ) ) && ( ! has_exponent( s ) ) ) t /= std::pow( T( 10 ), P() ); // Apply scaling
+		} else { // Bad input
+			t = 0;
+			io_err( stream );
+		}
+	}
+
+	// Read Value from Stream and Reinterpret as Type T
+	template< typename T >
+	inline
+	void
+	read_val_reinterpret( std::istream & stream, T & t ) const
+	{
+		std::string const s( blank_process( read_float( stream, wid( TraitsF< T >::w() ) ) ) );
+		if ( s.length() > 0 ) {
+			bool ok( true );
+			if ( sizeof( T ) < sizeof( float ) ) {
+				ok = is_type< float >( s );
+				float const v( val_of< float >( s ) );
+				void const * vp( &v );
+				t = *reinterpret_cast< T const * >( vp ); // Probably not what user wants: May want to throw an error here
+			} else if ( sizeof( T ) == sizeof( float ) ) {
+				ok = is_type< float >( s );
+				float const v( val_of< float >( s ) );
+				void const * vp( &v );
+				t = *reinterpret_cast< T const * >( vp );
+			} else if ( sizeof( T ) == sizeof( double ) ) {
+				ok = is_type< double >( s );
+				double const v( val_of< double >( s ) );
+				void const * vp( &v );
+				t = *reinterpret_cast< T const * >( vp );
+			} else if ( sizeof( T ) == sizeof( long double ) ) {
+				ok = is_type< long double >( s );
+				long double const v( val_of< long double >( s ) );
+				void const * vp( &v );
+				t = *reinterpret_cast< T const * >( vp );
+			} else {
+				ok = is_type< long double >( s );
+				long double const v( val_of< long double >( s ) );
+				void const * vp( &v );
+				t = *reinterpret_cast< T const * >( vp ); // Probably not what user wants: May want to throw an error here
+			}
+			if ( ! ok ) io_err( stream );
+		} else { // Nothing read
+			t = T( 0 );
+			io_err( stream );
+		}
+	}
+
+	// Width for I/O
+	inline
+	Size
+	wid( Size const w ) const
+	{
+		return ( w_ != NOSIZE ? w_ : w );
+	}
+
+	// Value of Type F from a String
+	template< typename F >
+	inline
+	F
+	val_of( std::string const & s ) const
+	{
+		F v( number_of< F >( s ) );
+		if ( ( d_ > 0ul ) && ( v != F( 0 ) ) && ( ! has( s, '.' ) ) ) v /= std::pow( F( 10 ), d_ ); // Apply implied decimal point
+		if ( ( P() != 0 ) && ( v != F( 0 ) ) && ( ! has_exponent( s ) ) ) v /= std::pow( F( 10 ), P() ); // Apply scaling
+		return v;
+	}
+
+private: // Data
+
+	Size w_;
+	Size d_;
+
+}; // FormatFloat
+
+// Fixed Point Format
+class FormatF : public FormatFloat
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatF( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const d = 0ul ) :
+		FormatFloat( p, r, w, d )
+	{}
+
+	// Clone
+	inline
+	FormatF *
+	clone() const
+	{
+		return new FormatF( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatF()
+	{}
+
+public: // Methods
+
+	// Output
+	void
+	out( std::ostream & stream, float const v );
+
+	// Output
+	void
+	out( std::ostream & stream, double const v );
+
+	// Output
+	void
+	out( std::ostream & stream, long double const v );
+
+}; // FormatF
+
+// Floating with Exponent Format Base Class
+class FormatGED : public FormatFloat
+{
+
+protected: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatGED( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const d = 0ul, Size const e = 2ul ) :
+		FormatFloat( p, r, w, d ),
+		e_( e )
+	{}
+
+	// Copy Constructor
+	inline
+	FormatGED( FormatGED const & f ) :
+		FormatFloat( f ),
+		e_( f.e_ )
+	{}
+
+	// Move Constructor
+	inline
+	FormatGED( FormatGED && f ) :
+		FormatFloat( std::move( f ) ),
+		e_( f.e_ )
+	{}
+
+public: // Creation
+
+	// Destructor
+	inline
+	virtual
+	~FormatGED()
+	{}
+
+protected: // Assignment
+
+	// Copy Assignment
+	inline
+	void
+	operator =( FormatGED const & f )
+	{
+		if ( this != &f ) {
+			FormatFloat::operator =( f );
+			e_ = f.e_;
+		}
+	}
+
+public: // Properties
+
+	// Field Exponent Digits
+	inline
+	Size
+	e() const
+	{
+		return e_;
+	}
+
+private: // Data
+
+	Size e_;
+
+}; // FormatGED
+
+// General Floating with Exponent Format
+class FormatG : public FormatGED
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatG( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const d = 0ul, Size const e = 2ul ) :
+		FormatGED( p, r, w, d, e )
+	{}
+
+	// Clone
+	inline
+	FormatG *
+	clone() const
+	{
+		return new FormatG( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatG()
+	{}
+
+public: // Methods
+
+	// Input
+	void
+	in( std::istream & stream, bool & b );
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, byte & b )
+	{
+		read_int( stream, b );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, ubyte & b )
+	{
+		read_int( stream, b );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, short int & i )
+	{
+		read_int( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, unsigned short int & i )
+	{
+		read_int( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, int & i )
+	{
+		read_int( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, unsigned int & i )
+	{
+		read_int( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, long int & i )
+	{
+		read_int( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, unsigned long int & i )
+	{
+		read_int( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, long long int & i )
+	{
+		read_int( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, unsigned long long int & i )
+	{
+		read_int( stream, i );
+	}
+
+	// Input
+	void
+	in( std::istream & stream, char & c );
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, std::string & s )
+	{
+		s = read( stream, w() ); // Reads the whole record if w() unspecified since std::string is variable length
+	}
+
+	// Input
+	void
+	in( std::istream & stream, Fstring & s );
+
+	// Output
+	void
+	out( std::ostream & stream, byte const & b );
+
+	// Output
+	void
+	out( std::ostream & stream, ubyte const & b );
+
+	// Output
+	void
+	out( std::ostream & stream, short int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned short int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, long int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned long int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, long long int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned long long int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, float const v );
+
+	// Output
+	void
+	out( std::ostream & stream, double const v );
+
+	// Output
+	void
+	out( std::ostream & stream, long double const v );
+
+protected: // Methods
+
+	// Read Integer from Stream
+	template< typename T >
+	inline
+	void
+	read_int( std::istream & stream, T & t ) const
+	{
+		std::string const s( blank_process( read( stream, wid( TraitsG< T >::w() ) ) ) );
+		if ( is_type< T >( s ) ) {
+			t = type_of< T >( s );
+		} else { // Bad input
+			t = 0;
+			io_err( stream );
+		}
+	}
+
+}; // FormatG
+
+// Floating with Exponent Format
+class FormatE : public FormatGED
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatE( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const d = 0ul, Size const e = 2ul ) :
+		FormatGED( p, r, w, d, e )
+	{}
+
+	// Clone
+	inline
+	FormatE *
+	clone() const
+	{
+		return new FormatE( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatE()
+	{}
+
+public: // Methods
+
+	// Output
+	void
+	out( std::ostream & stream, float const v );
+
+	// Output
+	void
+	out( std::ostream & stream, double const v );
+
+	// Output
+	void
+	out( std::ostream & stream, long double const v );
+
+}; // FormatE
+
+// Engineering Floating Format
+class FormatEN : public FormatGED
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatEN( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const d = 0ul, Size const e = 2ul ) :
+		FormatGED( p, r, w, d, e )
+	{}
+
+	// Clone
+	inline
+	FormatEN *
+	clone() const
+	{
+		return new FormatEN( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatEN()
+	{}
+
+public: // Methods
+
+	// Output
+	void
+	out( std::ostream & stream, float const v );
+
+	// Output
+	void
+	out( std::ostream & stream, double const v );
+
+	// Output
+	void
+	out( std::ostream & stream, long double const v );
+
+}; // FormatEN
+
+// Scientific Floating Format
+class FormatES : public FormatGED
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatES( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const d = 0ul, Size const e = 2ul ) :
+		FormatGED( p, r, w, d, e )
+	{}
+
+	// Clone
+	inline
+	FormatES *
+	clone() const
+	{
+		return new FormatES( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatES()
+	{}
+
+public: // Methods
+
+	// Output
+	void
+	out( std::ostream & stream, float const v );
+
+	// Output
+	void
+	out( std::ostream & stream, double const v );
+
+	// Output
+	void
+	out( std::ostream & stream, long double const v );
+
+}; // FormatES
+
+// Double Precision Floating Format
+class FormatD : public FormatGED
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatD( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const d = 0ul, Size const e = 2ul ) :
+		FormatGED( p, r, w, d, e )
+	{}
+
+	// Clone
+	inline
+	FormatD *
+	clone() const
+	{
+		return new FormatD( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatD()
+	{}
+
+public: // Methods
+
+	// Output
+	void
+	out( std::ostream & stream, float const v );
+
+	// Output
+	void
+	out( std::ostream & stream, double const v );
+
+	// Output
+	void
+	out( std::ostream & stream, long double const v );
+
+}; // FormatD
+
+// List-Directed Format
+class FormatLD : public FormatLeaf
+{
+
+public: // Creation
+
+	// Constructor
+	inline
+	explicit
+	FormatLD( Format * p ) :
+		FormatLeaf( p ),
+		entry_( std::string(), true, 0ul )
+	{}
+
+	// Clone
+	inline
+	FormatLD *
+	clone() const
+	{
+		return new FormatLD( *this );
+	}
+
+	// Destructor
+	inline
+	virtual
+	~FormatLD()
+	{}
+
+public: // Properties
+
+	// Uses an Argument?
+	inline
+	bool
+	uses_arg() const
+	{
+		return true;
+	}
+
+	// List-Directed?
+	inline
+	bool
+	is_list_directed() const
+	{
+		return true;
+	}
+
+	// Next Format
+	inline
+	Format *
+	next()
+	{
+		++i(); // Increment repeat index
+		if ( can_repeat( i() ) ) { // This Format again
+			return this;
+		} else { // Parent's next Format
+			i() = 0ul; // Reset repeat index
+			if ( p() ) {
+				if ( p()->p() ) { // Nested
+					return p()->next_up();
+				} else { // Parent is top-level: Repeat without reversion
+					return this; // Top-level * can repeat indefinitely
+				}
+			} else { // Top (no parent)
+				return this; // Top-level * can repeat indefinitely
+			}
+		}
+	}
+
+public: // Methods
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, bool & b )
+	{
+		read_bool( stream, b );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, byte & b )
+	{
+		read_num( stream, b );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, ubyte & b )
+	{
+		read_num( stream, b );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, short int & i )
+	{
+		read_num( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, unsigned short int & i )
+	{
+		read_num( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, int & i )
+	{
+		read_num( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, unsigned int & i )
+	{
+		read_num( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, long int & i )
+	{
+		read_num( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, unsigned long int & i )
+	{
+		read_num( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, long long int & i )
+	{
+		read_num( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, unsigned long long int & i )
+	{
+		read_num( stream, i );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, float & v )
+	{
+		read_num( stream, v );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, double & v )
+	{
+		read_num( stream, v );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, long double & v )
+	{
+		read_num( stream, v );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, char & c )
+	{
+		read_char( stream, c );
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, std::string & s )
+	{
+		read_string( stream, s );
+	}
+
+	// Input
+	void
+	in( std::istream & stream, Fstring & s );
+
+	// Output
+	void
+	out( std::ostream & stream, bool const b );
+
+	// Output
+	void
+	out( std::ostream & stream, byte const & b );
+
+	// Output
+	void
+	out( std::ostream & stream, ubyte const & b );
+
+	// Output
+	void
+	out( std::ostream & stream, short int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned short int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, long int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned long int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, long long int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, unsigned long long int const i );
+
+	// Output
+	void
+	out( std::ostream & stream, float const v );
+
+	// Output
+	void
+	out( std::ostream & stream, double const v );
+
+	// Output
+	void
+	out( std::ostream & stream, long double const v );
+
+	// Output
+	void
+	out( std::ostream & stream, char const c );
+
+	// Output
+	void
+	out( std::ostream & stream, std::string const & s );
+
+	// Output
+	void
+	out( std::ostream & stream, Fstring const & s );
+
+protected: // Methods
+
+	// Read Boolean from Stream
+	void
+	read_bool( std::istream & stream, bool & b );
+
+	// Read Number from Stream
+	template< typename T >
+	inline
+	void
+	read_num( std::istream & stream, T & t )
+	{
+		if ( entry_.r == 0ul ) entry_ = read_ld( stream, true ); // Get a new entry if no repeats left on current entry
+		if ( entry_.has() ) { // Non-null entry
+			std::string const & s( entry_.s );
+			if ( is_type< T >( s ) ) {
+				t = type_of< T >( s );
+			} else { // Bad input
+				t = T();
+				io_err( stream );
+			}
+		}
+	}
+
+	// Read Character from Stream
+	template< typename T >
+	inline
+	void
+	read_char( std::istream & stream, T & t )
+	{
+		if ( entry_.r == 0ul ) entry_ = read_ld( stream ); // Get a new entry if no repeats left on current entry
+		if ( entry_.has() ) { // Non-null entry
+			std::string const & s( entry_.s );
+			t = ( s.length() > 0 ? s[ 0 ] : SPC );
+		}
+	}
+
+	// Read String from Stream
+	template< typename T >
+	inline
+	void
+	read_string( std::istream & stream, T & t )
+	{
+		if ( entry_.r == 0ul ) entry_ = read_ld( stream ); // Get a new entry if no repeats left on current entry
+		if ( entry_.has() ) { // Non-null entry
+			std::string const & s( entry_.s );
+			t = T( s );
+		}
+	}
+
+private: // Data
+
+	EntryLD entry_; // Active input entry
+
+}; // FormatLD
+
+// Format: Format Expression Factory
+class FormatFactory
+{
+
+public: // Types
+
+	typedef  std::size_t  Size;
+	typedef  std::string  Token;
+	typedef  std::vector< Token >  Tokens;
+	typedef  std::vector< Format * >  Formats;
+
+private: // Creation
+
+	// Default Constructor
+	inline
+	FormatFactory()
+	{}
+
+public: // Creation
+
+	// Create Format
+	static
+	Format *
+	create(
+		std::string const & s,
+		Format * p = nullptr
+	);
+
+}; // FormatFactory
+
+} // ObjexxFCL
+
+#endif // ObjexxFCL_Format_hh_INCLUDED

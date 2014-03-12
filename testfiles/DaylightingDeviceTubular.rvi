@@ -1,0 +1,30 @@
+eplusout.eso
+eplusout.csv
+Zone Air Temperature
+Site Solar Altitude Angle
+Site Solar Azimuth Angle
+Site Direct Solar Radiation Rate per Area
+Site Diffuse Solar Radiation Rate per Area
+Daylighting Reference Point 1 Illuminance
+Daylighting Reference Point 2 Illuminance
+Tubular Daylighting Device Transmitted Solar Radiation Rate
+Tubular Daylighting Device Pipe Absorbed Solar Radiation Rate
+Tubular Daylighting Device Heat Gain Rate
+Tubular Daylighting Device Heat Loss Rate
+Tubular Daylighting Device Beam Solar Transmittance
+Tubular Daylighting Device Beam Visible Transmittance
+Tubular Daylighting Device Diffuse Solar Transmittance
+Tubular Daylighting Device Diffuse Visible Transmittance
+Dome1,Surface Outside Face Incident Solar Radiation Rate per Area
+Diffuser1,Surface Outside Face Incident Solar Radiation Rate per Area
+Dome2,Surface Outside Face Incident Solar Radiation Rate per Area
+Diffuser2,Surface Outside Face Incident Solar Radiation Rate per Area
+Surface Window Transmitted Solar Radiation Rate
+Surface Window Total Glazing Layers Absorbed Solar Radiation Rate
+Electricity:Zone:Standard Zone
+Electricity:Zone:Daylit Zone
+Standard Zone,Zone Air System Sensible Cooling Rate
+Standard Zone,Zone Air System Sensible Heating Rate
+Daylit Zone,Zone Air System Sensible Cooling Rate
+Daylit Zone,Zone Air System Sensible Heating Rate
+0

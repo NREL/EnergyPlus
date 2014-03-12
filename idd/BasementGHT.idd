@@ -1,0 +1,404 @@
+! Basement foundation heat transfer module Input Data Dictionary file
+! Written 8/18/2000 by Edward Clements
+!  Modified by LKL to standard IDD format.
+!
+! Description format: Refer to standard IDD documentation
+!       Field names are Fortran variable: Description
+!
+! Default IP conversions (no \ip-units necessary)
+!     m                      =>   ft                  3.281
+!     W                      =>   Btu/h               3.412
+!     m3/s                   =>   ft3/min             2118.6438
+!     C                      =>   F                   1.8 (plus 32)
+!     kg/J                   =>   lb/Btu              2325.83774250441
+!     Pa                     =>   psi                 0.0001450377
+!     W/m-K                  =>   Btu-in/h-ft2-F      6.93481276005548
+!     W/K                    =>   Btu/h-F             1.8987
+!     deltaC                 =>   deltaF              1.8
+!     m2                     =>   ft2                 10.764961
+!     K                      =>   R                   1.8
+!     (kg/s)/W               =>   (lbm/sec)/(Btu/hr)  0.646078115385742
+!     J/kg                   =>   Btu/lb              0.0004299
+!     kg-H2O/kg-air          =>   lb-H2O/lb-air       1
+!     kJ/kg                  =>   Btu/lb              0.429925
+!     lux                    =>   foot-candles        0.092902267
+!     kg/m3                  =>   lb/ft3              0.062428
+!     kg/s                   =>   lb/s                2.2046
+!     kg/s-m                 =>   lb/s-ft             0.67194
+!     m3                     =>   ft3                 35.319837041
+!     m3                     =>   gal                 264.172
+!     W/m2-K                 =>   Btu/h-ft2-F         0.17611835153223
+!     1/m                    =>   1/ft                0.304785126485827
+!     J/kg-K                 =>   Btu/lb-F            0.000239005736137667
+!     J/m3-K                 =>   Btu/ft3-F           1.49237004739337E-05
+!     m/s                    =>   ft/min              196.86
+!     m/s                    =>   miles/hr            2.2369
+!     m2-K/W                 =>   ft2-F-hr/Btu        5.68181818181818
+!     W/m2                   =>   Btu/h-ft2           0.316957210776545
+!     A/K                    =>   A/F                 0.555555555555556
+!     g/kg                   =>   grains/lb           6.99300699300699
+!     g/m-s                  =>   lb/ft-s             0.000671968949659
+!     g/m-s-K                =>   lb/ft-s-F           0.000373574867724868
+!     J/K                    =>   Btu/F               0.000526917584820558
+!     J/kg-K2                =>   Btu/lb-F2           0.000132889924714692
+!     J/m3                   =>   Btu/ft3             2.68096514745308E-05
+!     kg/kg-K                =>   lb/lb-F             0.555555555555556
+!     kPa                    =>   psi                 0.145038
+!     kPa                    =>   inHg                0.29523
+!     m2/s                   =>   ft2/s               10.764961
+!     m3/kg                  =>   ft3/lb              16.018
+!     m3/m3                  =>   ft3/ft3             1
+!     N-s/m2                 =>   lbf-s/ft2           0.0208857913669065
+!     V/K                    =>   V/F                 0.555555555555556
+!     W/m-K2                 =>   Btu/h-F2-ft         0.321418310071648
+!     m3/s-m                 =>   ft3/min-ft          645.89
+!
+! Other conversions supported (needs the \ip-units code)
+
+!     m                      =>   in                  39.37
+!     W                      =>   W                   1
+!     m3/s                   =>   gal/min             15852
+!     Pa                     =>   inHg                0.00029613
+!     Pa                     =>   inH2O               0.00401463
+!     Pa                     =>   ftH2O               0.00033455
+
+SimParameters,
+     N1,  \field F: Multiplier for the ADI solution
+          \note 0<F<1.0,
+          \note typically 0.1 (0.3 for high k soil - saturated sand is about 2.6 w/m-K)
+          \minimum> 0.0
+          \maximum 1.0
+     N2;  \field IYRS: Maximum number of yearly iterations:
+          \note typically 15-30]
+          \minimum 0
+          \default 15
+
+MatlProps,
+     N1,  \field NMAT: Number of materials in this domain
+          \maximum 6
+          \required-field
+     N2,  \field Density for Foundation Wall
+          \minimum> 0.0
+          \default 2243
+          \units kg/m3
+     N3,  \field density for Floor Slab
+          \minimum> 0.0
+          \default 2243
+          \units kg/m3
+     N4,  \field density for Ceiling
+          \minimum> 0.0
+          \default 311
+          \units kg/m3
+     N5,  \field density for Soil
+          \minimum> 0.0
+          \default 1500
+          \units kg/m3
+     N6,  \field density for Gravel
+          \minimum> 0.0
+          \default 2000
+          \units kg/m3
+     N7,  \field density for Wood
+          \minimum> 0.0
+          \default 449
+          \units kg/m3
+     N8,  \field Specific heat for foundation wall
+          \minimum> 0.0
+          \default 880
+          \units J/kg-K
+     N9,  \field Specific heat for floor slab
+          \minimum> 0.0
+          \default 880
+          \units J/kg-K
+     N10, \field Specific heat for ceiling
+          \minimum> 0.0
+          \default 1530
+          \units J/kg-K
+     N11, \field Specific heat for soil
+          \minimum> 0.0
+          \default 840
+          \units J/kg-K
+     N12, \field Specific heat for gravel
+          \minimum> 0.0
+          \default 720
+          \units J/kg-K
+     N13, \field Specific heat for wood
+          \minimum> 0.0
+          \default 1530
+          \units J/kg-K
+     N14, \field Thermal conductivity for foundation wall
+          \minimum> 0.0
+          \default 1.4
+          \units W/m-K
+     N15, \field Thermal conductivity for floor slab
+          \minimum> 0.0
+          \default 1.4
+          \units W/m-K
+     N16, \field Thermal conductivity for ceiling
+          \minimum> 0.0
+          \default 0.09
+          \units W/m-K
+     N17,  \field thermal conductivity for soil
+          \minimum> 0.0
+          \default 1.1
+          \units W/m-K
+     N18, \field thermal conductivity for gravel
+          \minimum> 0.0
+          \default 1.9
+          \units W/m-K
+     N19; \field thermal conductivity for wood
+          \minimum> 0.0
+          \default 0.12
+          \units W/m-K
+
+Insulation,
+     N1,  \field REXT: R Value of any exterior insulation
+          \minimum> 0.0
+          \units m2-K/W
+     A1;  \field INSFULL: Flag: Is the wall fully insulated?
+          \required-field
+          \type choice
+          \key TRUE
+          \key FALSE
+          \default FALSE
+          \note  True for full insulation
+          \note  False for insulation half way down side wall from grade line
+
+SurfaceProps,
+     N1,  \field ALBEDO: Surface albedo for No snow conditions
+          \minimum 0.0
+          \maximum 1.0
+          \default 0.16
+     N2,  \field ALBEDO: Surface albedo for snow conditions
+          \minimum 0.0
+          \maximum 1.0
+          \default 0.40
+     N3,  \field EPSLN: Surface emissivity No Snow
+          \minimum 0.0
+          \maximum 1.0
+          \default 0.94
+     N4,  \field EPSLN: Surface emissivity with Snow
+          \minimum 0.0
+          \maximum 1.0
+          \default 0.86
+     N5,  \field VEGHT: Surface roughness No snow conditions
+          \minimum 0.0
+          \default 6.0
+          \units cm
+     N6,  \field VEGHT: Surface roughness Snow conditions
+          \minimum 0.0
+          \default 0.25
+          \units cm
+     A1;  \field PET: Flag, Potential evapotranspiration on?
+          \note  Typically, PET is False
+          \required-field
+          \type choice
+          \key TRUE
+          \key FALSE
+          \default FALSE
+
+BldgData,
+     N1,  \field DWALL: Wall thickness
+          \units m
+          \minimum 0.2
+          \default 0.2
+     N2,  \field DSLAB: Floor slab thickness
+          \units m
+          \minimum> 0.0
+          \maximum 0.25
+          \default 0.1
+     N3,  \field DGRAVXY: Width of gravel pit beside basement wall
+          \minimum> 0.0
+          \units  m
+          \default 0.3
+     N4,  \field DGRAVZN: Gravel depth extending above the floor slab
+          \minimum> 0.0
+          \units m
+          \default 0.2
+     N5;  \field DGRAVZP: Gravel depth below the floor slab
+          \minimum> 0.0
+          \units m
+          \default 0.1
+
+Interior,
+     A1,  \field COND: Flag: Is the basement conditioned?
+          \required-field
+          \type choice
+          \key TRUE
+          \key FALSE
+          \default TRUE
+          \note for EnergyPlus this should be TRUE
+     N1,  \field HIN: Downward convection only heat transfer coefficient
+          \units W/m2-K
+          \minimum> 0.0
+          \default 0.92
+     N2,  \field HIN: Upward convection only heat transfer coefficient
+          \units W/m2-K
+          \minimum> 0.0
+          \default 4.04
+     N3,  \field HIN: Horizontal convection only heat transfer coefficient
+          \units W/m2-K
+          \minimum> 0.0
+          \default 3.08
+     N4,  \field HIN: Downward combined (convection and radiation) heat transfer coefficient
+          \units W/m2-K
+          \minimum> 0.0
+          \default 6.13
+     N5,  \field HIN: Upward combined (convection and radiation) heat transfer coefficient
+          \units W/m2-K
+          \minimum> 0.0
+          \default 9.26
+     N6;  \field HIN: Horizontal combined (convection and radiation) heat transfer coefficient
+          \units W/m2-K
+          \minimum> 0.0
+          \default 8.29
+
+ComBldg,
+   \memo ComBldg contains the monthly average temperatures (C) and possibility of daily variation amplitude
+     N1,  \field January average temperature
+          \units C
+          \default 22
+     N2,  \field February average temperature
+          \units C
+          \default 22
+     N3,  \field March average temperature
+          \units C
+          \default 22
+     N4,  \field April average temperature
+          \units C
+          \default 22
+     N5,  \field May average temperature
+          \units C
+          \default 22
+     N6,  \field June average temperature
+          \units C
+          \default 22
+     N7,  \field July average temperature
+          \units C
+          \default 22
+     N8,  \field August average temperature
+          \units C
+          \default 22
+     N9,  \field September average temperature
+          \units C
+          \default 22
+     N10, \field October average temperature
+          \units C
+          \default 22
+     N11, \field November average temperature
+          \units C
+          \default 22
+     N12, \field December average temperature
+          \units C
+          \default 22
+     N13; \field Daily variation sine wave amplitude
+          \units deltaC
+          \default 0
+          \note (Normally zero, just for checking)
+
+EquivSlab,  !  Supplies the EquivSizing Flag
+    \memo Using an equivalent slab allows non-rectangular shapes to be
+    \memo modeled accurately.
+    \memo The simulation default should be EquivSizing=True
+     N1,  \field APRatio: The area to perimeter ratio for this slab
+          \minimum> 0.0
+          \units m
+          \required-field
+     A1;  \field EquivSizing: Flag
+          \required-field
+          \type choice
+          \key TRUE
+          \key FALSE
+          \default TRUE
+          \note Will the dimensions of an equivalent slab be calculated (TRUE)
+          \note or will the dimensions be input directly? (FALSE)]
+          \note Only advanced special simulations should use FALSE.
+
+EquivAutoGrid,
+    \memo EquivAutoGrid necessary when EquivSizing=TRUE, TRUE is is the normal case.
+     N1,  \field CLEARANCE: Distance from outside of wall to edge of 3-D ground domain
+          \minimum 0.0
+          \units m
+          \default 15
+     N2,  \field SlabDepth: Thickness of the floor slab
+          \minimum 0.0
+          \units m
+          \default  0.1
+     N3;  \field BaseDepth: Depth of the basement wall below grade
+          \minimum 0.0
+          \units  m
+          \default 2
+
+AutoGrid,
+    \memo AutoGrid only necessary when EquivSizing is false
+    \memo If the modelled building is not a rectangle or square, Equivalent
+    \memo sizing MUST be used to get accurate results
+     N1,  \field CLEARANCE: Distance from outside of wall to edge,
+          \minimum 0
+          \units m
+          \default 15
+     N2,  \field SLABX: X dimension of the building slab
+          \required-field
+          \units m
+          \minimum 0
+          \maximum 60
+     N3,  \field SLABY: Y dimension of the building slab
+          \required-field
+          \units m
+          \minimum 0
+          \maximum 60
+     N4,  \field ConcAGHeight: Height of the foundation wall above grade
+          \units m
+          \minimum 0
+          \default 0
+     N5,  \field SlabDepth: Thickness of the floor slab
+          \units m
+          \default 0.1
+     N6;  \field BaseDepth: Depth of the basement wall below grade
+          \units m
+          \minimum 0
+          \default 2
+
+ManualGrid,
+    \memo Manual Grid only necessary using manual gridding (not recommended)
+     N1,  \field NX: Number of cells in the X direction: 20]
+          \minimum 1
+          \required-field
+     N2,  \field NY: Number of cells in the Y direction: 20]
+          \minimum 1
+          \required-field
+     N3,  \field NZAG: Number of cells in the Z direction. above grade: 4 Always]
+          \minimum 1
+          \required-field
+     N4,  \field NZBG: Number of cells in Z direction. below grade: 10-35]
+          \minimum 1
+          \required-field
+     N5,  \field IBASE: X direction cell indicator of slab edge: 5-20]
+          \required-field
+     N6,  \field JBASE: Y direction cell indicator of slab edge: 5-20]
+          \required-field
+     N7;  \field KBASE: Z direction cell indicator of the top of the floor slab: 5-20]
+          \required-field
+
+XFACE,       ! NOTE: This is only needed when using manual gridding
+    \memo This is only needed when using manual gridding (not recommended)
+    \memo XFACE: X Direction cell face coordinates: m
+       N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14, \note fields as indicated
+       N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26,  \note fields as indicated
+       N27, N28, N29, N30, N31, N32, N33, N34, N35, N36, N37, N38,  \note fields as indicated
+       N39, N40, N41, N42, N43, N44;                                \note fields as indicated
+
+YFACE,  ! NOTE: This is only needed when using manual gridding
+    \memo This is only needed when using manual gridding (not recommended)
+    \memo YFACE: Y Direction cell face coordinates: m
+       N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14, \note fields as indicated
+       N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26,  \note fields as indicated
+       N27, N28, N29, N30, N31, N32, N33, N34, N35, N36, N37, N38,  \note fields as indicated
+       N39, N40, N41, N42, N43, N44;                                \note fields as indicated
+
+ZFACE,  ! NOTE: This is only needed when using manual gridding
+    \memo This is only needed when using manual gridding (not recommended)
+    \memo ZFACE: Z Direction cell face coordinates: m
+       N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14, \note fields as indicated
+       N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26,  \note fields as indicated
+       N27, N28, N29, N30, N31, N32, N33, N34, N35, N36, N37, N38,  \note fields as indicated
+       N39, N40;                                                    \note fields as indicated

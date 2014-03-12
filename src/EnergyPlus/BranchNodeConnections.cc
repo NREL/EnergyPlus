@@ -1,0 +1,2045 @@
+// ObjexxFCL Headers
+#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Fmath.hh>
+#include <ObjexxFCL/MArray.functions.hh>
+
+// EnergyPlus Headers
+#include <BranchNodeConnections.hh>
+#include <DataBranchNodeConnections.hh>
+#include <DataGlobals.hh>
+#include <DataLoopNode.hh>
+#include <General.hh>
+#include <InputProcessor.hh>
+#include <UtilityRoutines.hh>
+
+namespace EnergyPlus {
+
+namespace BranchNodeConnections {
+
+	// Module containing the routines dealing with the Branch/Node Connections (CompSets, etc)
+
+	// MODULE INFORMATION:
+	//       AUTHOR         Linda Lawrie
+	//       DATE WRITTEN   May 2005
+	//       MODIFIED       na
+	//       RE-ENGINEERED  na
+
+	// PURPOSE OF THIS MODULE:
+	// This module encapsulates the connection data necessary for some of the checks
+	// needed in the branch-node data
+
+	// METHODOLOGY EMPLOYED:
+	// na
+
+	// REFERENCES:
+	// na
+
+	// OTHER NOTES:
+	// na
+
+	// Using/Aliasing
+	using DataGlobals::MaxNameLength;
+	using DataGlobals::OutputFileDebug;
+	using namespace DataLoopNode;
+	using namespace DataBranchNodeConnections;
+
+	// Data
+	// MODULE PARAMETER DEFINITIONS:
+	Fstring const Blank;
+
+	// DERIVED TYPE DEFINITIONS:
+	// na
+
+	// MODULE VARIABLE DECLARATIONS:
+	// na
+
+	// SUBROUTINE SPECIFICATIONS FOR MODULE
+
+	// Functions
+
+	void
+	RegisterNodeConnection(
+		int const NodeNumber, // Number for this Node
+		Fstring const & NodeName, // Name of this Node
+		Fstring const & ObjectType, // Type of object this Node is connected to (e.g. Chiller:Electric)
+		Fstring const & ObjectName, // Name of object this Node is connected to (e.g. MyChiller)
+		Fstring const & ConnectionType, // Connection Type for this Node (must be valid)
+		int const FluidStream, // Count on Fluid Streams
+		bool const IsParent, // True when node is a parent node
+		bool & errFlag, // Will be True if errors already detected or if errors found here
+		Optional_Fstring_const InputFieldName // Input Field Name
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Linda K. Lawrie
+		//       DATE WRITTEN   February 2004
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine registers a node connection in the Node Connection data structure.  This
+		// structure is intended to help with HVAC diagramming as well as validation of nodes.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::SameString;
+		using InputProcessor::MakeUPPERCase;
+		using InputProcessor::FindItemInList;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static Fstring const RoutineName( "RegisterNodeConnection: " );
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		bool ErrorsFoundHere;
+		int Count;
+		bool MakeNew;
+		int Found;
+
+		ErrorsFoundHere = false;
+		if ( ! IsValidConnectionType( ConnectionType ) ) {
+			ShowSevereError( RoutineName + "Invalid ConnectionType=" + trim( ConnectionType ) );
+			ShowContinueError( "Occurs for Node=" + trim( NodeName ) + ", ObjectType=" + trim( ObjectType ) + ", ObjectName=" + trim( ObjectName ) );
+			ErrorsFoundHere = true;
+		}
+
+		MakeNew = true;
+		for ( Count = 1; Count <= NumOfNodeConnections; ++Count ) {
+			if ( NodeConnections( Count ).NodeNumber != NodeNumber ) continue;
+			if ( ! SameString( NodeConnections( Count ).ObjectType, ObjectType ) ) continue;
+			if ( ! SameString( NodeConnections( Count ).ObjectName, ObjectName ) ) continue;
+			if ( ! SameString( NodeConnections( Count ).ConnectionType, ConnectionType ) ) continue;
+			if ( NodeConnections( Count ).FluidStream != FluidStream ) continue;
+			if ( ( NodeConnections( Count ).ObjectIsParent && ! IsParent ) || ( ! NodeConnections( Count ).ObjectIsParent && IsParent ) ) {
+				ShowSevereError( RoutineName + "Node registered for both Parent and \"not\" Parent" );
+				ShowContinueError( "Occurs for Node=" + trim( NodeName ) + ", ObjectType=" + trim( ObjectType ) + ", ObjectName=" + trim( ObjectName ) );
+				ErrorsFoundHere = true;
+			}
+			MakeNew = false;
+		}
+		if ( MakeNew ) {
+			++NumOfNodeConnections;
+			if ( NumOfNodeConnections > 1 && NumOfNodeConnections > MaxNumOfNodeConnections ) {
+				tmpNodeConnections.allocate( MaxNumOfNodeConnections + NodeConnectionAlloc );
+				tmpNodeConnections( {1,NumOfNodeConnections - 1} ) = NodeConnections( {1,NumOfNodeConnections - 1} );
+				NodeConnections.deallocate();
+				NodeConnections.allocate( MaxNumOfNodeConnections + NodeConnectionAlloc );
+				NodeConnections( {1,NumOfNodeConnections - 1} ) = tmpNodeConnections( {1,NumOfNodeConnections - 1} );
+				tmpNodeConnections.deallocate();
+				MaxNumOfNodeConnections += NodeConnectionAlloc;
+			} else if ( NumOfNodeConnections == 1 ) {
+				NodeConnections.allocate( NodeConnectionAlloc );
+				MaxNumOfNodeConnections = NodeConnectionAlloc;
+			}
+
+			NodeConnections( NumOfNodeConnections ).NodeNumber = NodeNumber;
+			NodeConnections( NumOfNodeConnections ).NodeName = NodeName;
+			NodeConnections( NumOfNodeConnections ).ObjectType = MakeUPPERCase( ObjectType );
+			NodeConnections( NumOfNodeConnections ).ObjectName = ObjectName;
+			NodeConnections( NumOfNodeConnections ).ConnectionType = ConnectionType;
+			NodeConnections( NumOfNodeConnections ).FluidStream = FluidStream;
+			NodeConnections( NumOfNodeConnections ).ObjectIsParent = IsParent;
+
+		}
+
+		if ( SameString( ObjectType( 1, min( len_trim( ObjectType ), 12 ) ), "AirTerminal:" ) ) {
+			if ( present( InputFieldName ) ) {
+				++NumOfAirTerminalNodes;
+				if ( NumOfAirTerminalNodes > 1 && NumOfAirTerminalNodes > MaxNumOfAirTerminalNodes ) {
+					tmpEqNodeConnections.allocate( MaxNumOfAirTerminalNodes );
+					tmpEqNodeConnections( {1,NumOfAirTerminalNodes - 1} ) = AirTerminalNodeConnections( {1,NumOfAirTerminalNodes - 1} );
+					AirTerminalNodeConnections.deallocate();
+					AirTerminalNodeConnections.allocate( MaxNumOfAirTerminalNodes + EqNodeConnectionAlloc );
+					AirTerminalNodeConnections( {1,NumOfAirTerminalNodes - 1} ) = tmpEqNodeConnections( {1,NumOfAirTerminalNodes - 1} );
+					tmpEqNodeConnections.deallocate();
+					MaxNumOfAirTerminalNodes += EqNodeConnectionAlloc;
+				} else if ( NumOfAirTerminalNodes == 1 ) {
+					AirTerminalNodeConnections.allocate( EqNodeConnectionAlloc );
+					MaxNumOfAirTerminalNodes = EqNodeConnectionAlloc;
+				}
+
+				// Check out AirTerminal inlet/outlet nodes
+				Found = FindItemInList( NodeName, AirTerminalNodeConnections.NodeName(), NumOfAirTerminalNodes - 1 );
+				if ( Found != 0 ) { // Nodename already used
+					ShowSevereError( RoutineName + trim( ObjectType ) + "=\"" + trim( ObjectName ) + "\" node name duplicated." );
+					ShowContinueError( "NodeName=\"" + trim( NodeName ) + "\", entered as type=" + trim( ConnectionType ) );
+					ShowContinueError( "In Field=" + trim( InputFieldName ) );
+					ShowContinueError( "Already used in " + trim( AirTerminalNodeConnections( Found ).ObjectType ) + "=\"" + trim( AirTerminalNodeConnections( Found ).ObjectName ) + "\"." );
+					ShowContinueError( " as type=" + trim( AirTerminalNodeConnections( Found ).ConnectionType ) + ", In Field=" + trim( AirTerminalNodeConnections( Found ).InputFieldName ) );
+					ErrorsFoundHere = true;
+				} else {
+					AirTerminalNodeConnections( NumOfAirTerminalNodes ).NodeName = NodeName;
+					AirTerminalNodeConnections( NumOfAirTerminalNodes ).ObjectType = ObjectType;
+					AirTerminalNodeConnections( NumOfAirTerminalNodes ).ObjectName = ObjectName;
+					AirTerminalNodeConnections( NumOfAirTerminalNodes ).ConnectionType = ConnectionType;
+					AirTerminalNodeConnections( NumOfAirTerminalNodes ).InputFieldName = InputFieldName;
+				}
+			} else {
+				ShowSevereError( RoutineName + trim( ObjectType ) + ", Developer Error: Input Field Name not included." );
+				ShowContinueError( "Node names not checked for duplication." );
+			}
+		}
+
+		if ( ErrorsFoundHere ) {
+			errFlag = true;
+		}
+
+	}
+
+	bool
+	IsValidConnectionType( Fstring const & ConnectionType )
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Linda K. Lawrie
+		//       DATE WRITTEN   August 2003
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function determines if a connection type is valid.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Return value
+		bool IsValid;
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int Count;
+
+		IsValid = false;
+		for ( Count = 1; Count <= NumValidConnectionTypes; ++Count ) {
+			if ( ConnectionType != ValidConnectionTypes( Count ) ) continue;
+			IsValid = true;
+			break;
+		}
+
+		return IsValid;
+
+	}
+
+	void
+	CheckNodeConnections( bool & ErrorsFound )
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   March 2004
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine processes the node connection data structure looking at:
+		// 1.  In the NodeConnections list, for any node which appears as a sensor or an
+		// actuator, the same node must also appear in the connections list at least once
+		// as a node type which is not sensor or actuator or outsideair.
+		// 2.  In the NodeConnections list, for any node which appears as a setpoint, the
+		// same node must also appear in the connections list at least once as a node type
+		// which is not a setpoint or outsideair.
+		// 3.  Every ZoneInlet must appear as an outlet from something, otherwise it will
+		// do nothing.
+		// 4.  Every ZoneExhaust must appear as an inlet to something,
+		// otherwise it will do nothing.
+		// 5.  Every inlet node should match either an Outlet, ZoneReturn, ZoneExhaust, ReliefAir,
+		// or OutsideAir node.
+		//  With the current data structure, when checking inlets:
+		//    a)  If an InletNode's object is AirLoopHVAC, CondenserLoop, or PlantLoop, then skip the test.
+		//    b)  If an InletNode's object is not one of the above types, it is valid if the
+		//        same node name appears as an INLET to an AirLoopHVAC, CondenserLoop, or PlantLoop.
+		// 6.  Any given node can only be an inlet once in the list of Non-Parent Node Connections
+		// 7.  Any given node can only be an outlet once in the list of Non-Parent Node Connections
+
+		// METHODOLOGY EMPLOYED:
+		// Needs description, as appropriate.
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::SameString;
+		using General::RoundSigDigits;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int Loop1;
+		int Loop2;
+		bool IsValid;
+		bool IsInlet;
+		bool IsOutlet;
+		bool MatchedAtLeastOne;
+		int ErrorCounter;
+		int Object;
+		int StartConnect;
+		int EndConnect;
+		FArray1D_int FluidStreamInletCount;
+		FArray1D_int FluidStreamOutletCount;
+		FArray1D_int NodeObjects;
+		FArray1D_bool FluidStreamCounts;
+		int NumObjects;
+		int MaxFluidStream;
+
+		ErrorCounter = 0;
+		//  Check 1 -- check sensor and actuator nodes
+		for ( Loop1 = 1; Loop1 <= NumOfNodeConnections; ++Loop1 ) {
+			if ( NodeConnections( Loop1 ).ConnectionType != ValidConnectionTypes( NodeConnectionType_Sensor ) ) continue;
+			IsValid = false;
+			for ( Loop2 = 1; Loop2 <= NumOfNodeConnections; ++Loop2 ) {
+				if ( Loop1 == Loop2 ) continue;
+				if ( NodeConnections( Loop1 ).NodeNumber != NodeConnections( Loop2 ).NodeNumber ) continue;
+				if ( NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_Actuator ) ) continue;
+				if ( NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_Sensor ) ) continue;
+				IsValid = true;
+			}
+			if ( ! IsValid ) {
+				ShowSevereError( "Node Connection Error, Node=\"" + trim( NodeConnections( Loop1 ).NodeName ) + "\", Sensor node did not find a matching node of appropriate type (other than Actuator or Sensor)." );
+				ShowContinueError( "Reference Object=" + trim( NodeConnections( Loop1 ).ObjectType ) + ", Name=" + trim( NodeConnections( Loop1 ).ObjectName ) );
+				++ErrorCounter;
+				ErrorsFound = true;
+			}
+		}
+
+		for ( Loop1 = 1; Loop1 <= NumOfNodeConnections; ++Loop1 ) {
+			if ( NodeConnections( Loop1 ).ConnectionType != ValidConnectionTypes( NodeConnectionType_Actuator ) ) continue;
+			IsValid = false;
+			for ( Loop2 = 1; Loop2 <= NumOfNodeConnections; ++Loop2 ) {
+				if ( Loop1 == Loop2 ) continue;
+				if ( NodeConnections( Loop1 ).NodeNumber != NodeConnections( Loop2 ).NodeNumber ) continue;
+				if ( NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_Actuator ) ) continue;
+				if ( NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_Sensor ) ) continue;
+				if ( NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_OutsideAir ) ) continue;
+				IsValid = true;
+			}
+			if ( ! IsValid ) {
+				ShowSevereError( "Node Connection Error, Node=\"" + trim( NodeConnections( Loop1 ).NodeName ) + "\", Actuator node did not find a matching node of appropriate type (other than Actuator, Sensor, OutsideAir)." );
+				ShowContinueError( "Reference Object=" + trim( NodeConnections( Loop1 ).ObjectType ) + ", Name=" + trim( NodeConnections( Loop1 ).ObjectName ) );
+				++ErrorCounter;
+				ErrorsFound = true;
+			}
+		}
+
+		// Check 2 -- setpoint nodes
+		// Check 2a -- setpoint node must also be an inlet or an outlet (CR8212)
+		for ( Loop1 = 1; Loop1 <= NumOfNodeConnections; ++Loop1 ) {
+			if ( NodeConnections( Loop1 ).ConnectionType != ValidConnectionTypes( NodeConnectionType_SetPoint ) ) continue;
+			IsValid = false;
+			IsInlet = false;
+			IsOutlet = false;
+			for ( Loop2 = 1; Loop2 <= NumOfNodeConnections; ++Loop2 ) {
+				if ( Loop1 == Loop2 ) continue;
+				if ( NodeConnections( Loop1 ).NodeNumber != NodeConnections( Loop2 ).NodeNumber ) continue;
+				if ( NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_SetPoint ) ) continue;
+				if ( NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_OutsideAir ) ) continue;
+				if ( NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_Inlet ) ) IsInlet = true;
+				if ( NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_Outlet ) ) IsOutlet = true;
+				IsValid = true;
+			}
+			if ( ! IsValid ) {
+				ShowSevereError( "Node Connection Error, Node=\"" + trim( NodeConnections( Loop1 ).NodeName ) + "\", Setpoint node did not find a matching node of appropriate type (other than Setpoint, OutsideAir)." );
+				ShowContinueError( "Reference Object=" + trim( NodeConnections( Loop1 ).ObjectType ) + ", Name=" + trim( NodeConnections( Loop1 ).ObjectName ) );
+				++ErrorCounter;
+				ErrorsFound = true;
+			}
+			if ( ! IsInlet && ! IsOutlet ) {
+				ShowSevereError( "Node Connection Error, Node=\"" + trim( NodeConnections( Loop1 ).NodeName ) + "\", Setpoint node did not find a matching node of type Inlet or Outlet." );
+				ShowContinueError( "It appears this node is not part of the HVAC system." );
+				ShowContinueError( "Reference Object=" + trim( NodeConnections( Loop1 ).ObjectType ) + ", Name=" + trim( NodeConnections( Loop1 ).ObjectName ) );
+				++ErrorCounter;
+				//      ErrorsFound=.TRUE.
+			}
+		}
+
+		// Check 2a -- setpoint node must also be an inlet or an outlet (CR8212)
+		//  DO Loop1=1,NumOfNodeConnections
+		//    IF (NodeConnections(Loop1)%ConnectionType /= ValidConnectionTypes(NodeConnectionType_SetPoint)) CYCLE
+		//    IsValid=.FALSE.
+		//    IsInlet=.FALSE.
+		//    IsOutlet=.FALSE.
+		//    DO Loop2=1, NumOfNodeConnections
+		//      IF (Loop1 == Loop2) CYCLE
+		//      IF (NodeConnections(Loop1)%NodeNumber /= NodeConnections(Loop2)%NodeNumber) CYCLE
+		//      IF (NodeConnections(Loop2)%ConnectionType == ValidConnectionTypes(NodeConnectionType_Inlet)) IsInlet=.TRUE.
+		//      IF (NodeConnections(Loop2)%ConnectionType == ValidConnectionTypes(NodeConnectionType_Outlet)) IsOutlet=.TRUE.
+		//      IF (IsInlet .or. IsOutlet) EXIT
+		//    ENDDO
+		//    IF (.not. IsInlet .and. .not. IsOutlet) THEN
+		//      CALL ShowSevereError('Node Connection Error, Node="'//TRIM(NodeConnections(Loop1)%NodeName)//  &
+		//            '", Setpoint node did not find a matching node of type Inlet or Outlet.')
+		//      CALL ShowContinueError('It appears this node is not part of the HVAC system.')
+		//      CALL ShowContinueError('Reference Object='//TRIM(NodeConnections(Loop1)%ObjectType)//  &
+		//             ', Name='//TRIM(NodeConnections(Loop1)%ObjectName))
+		//      ErrorCounter=ErrorCounter+1
+		//      ErrorsFound=.TRUE.
+		//    ENDIF
+		//  ENDDO
+
+		// Check 3 -- zone inlet nodes -- must be an outlet somewhere
+		for ( Loop1 = 1; Loop1 <= NumOfNodeConnections; ++Loop1 ) {
+			if ( NodeConnections( Loop1 ).ConnectionType != ValidConnectionTypes( NodeConnectionType_ZoneInlet ) ) continue;
+			IsValid = false;
+			for ( Loop2 = 1; Loop2 <= NumOfNodeConnections; ++Loop2 ) {
+				if ( Loop1 == Loop2 ) continue;
+				if ( NodeConnections( Loop1 ).NodeNumber != NodeConnections( Loop2 ).NodeNumber ) continue;
+				if ( NodeConnections( Loop2 ).ConnectionType != ValidConnectionTypes( NodeConnectionType_Outlet ) ) continue;
+				IsValid = true;
+			}
+			if ( ! IsValid ) {
+				ShowSevereError( "Node Connection Error, Node=\"" + trim( NodeConnections( Loop1 ).NodeName ) + "\", ZoneInlet node did not find an outlet node." );
+				ShowContinueError( "Reference Object=" + trim( NodeConnections( Loop1 ).ObjectType ) + ", Name=" + trim( NodeConnections( Loop1 ).ObjectName ) );
+				++ErrorCounter;
+				//      ErrorsFound=.TRUE.
+			}
+		}
+
+		// Check 4 -- zone exhaust nodes -- must be an inlet somewhere
+		for ( Loop1 = 1; Loop1 <= NumOfNodeConnections; ++Loop1 ) {
+			if ( NodeConnections( Loop1 ).ConnectionType != ValidConnectionTypes( NodeConnectionType_ZoneExhaust ) ) continue;
+			IsValid = false;
+			for ( Loop2 = 1; Loop2 <= NumOfNodeConnections; ++Loop2 ) {
+				if ( Loop1 == Loop2 ) continue;
+				if ( NodeConnections( Loop1 ).NodeNumber != NodeConnections( Loop2 ).NodeNumber ) continue;
+				if ( NodeConnections( Loop2 ).ConnectionType != ValidConnectionTypes( NodeConnectionType_Inlet ) ) continue;
+				IsValid = true;
+			}
+			if ( ! IsValid ) {
+				ShowSevereError( "Node Connection Error, Node=\"" + trim( NodeConnections( Loop1 ).NodeName ) + "\", ZoneExhaust node did not find a matching inlet node." );
+				ShowContinueError( "Reference Object=" + trim( NodeConnections( Loop1 ).ObjectType ) + ", Name=" + trim( NodeConnections( Loop1 ).ObjectName ) );
+				++ErrorCounter;
+				//      ErrorsFound=.TRUE.
+			}
+		}
+
+		// Check 5 -- return plenum induced air outlet nodes -- must be an inlet somewhere
+		for ( Loop1 = 1; Loop1 <= NumOfNodeConnections; ++Loop1 ) {
+			if ( NodeConnections( Loop1 ).ConnectionType != ValidConnectionTypes( NodeConnectionType_InducedAir ) ) continue;
+			IsValid = false;
+			for ( Loop2 = 1; Loop2 <= NumOfNodeConnections; ++Loop2 ) {
+				if ( Loop1 == Loop2 ) continue;
+				if ( NodeConnections( Loop1 ).NodeNumber != NodeConnections( Loop2 ).NodeNumber ) continue;
+				if ( NodeConnections( Loop2 ).ConnectionType != ValidConnectionTypes( NodeConnectionType_Inlet ) ) continue;
+				IsValid = true;
+			}
+			if ( ! IsValid ) {
+				ShowSevereError( "Node Connection Error, Node=\"" + trim( NodeConnections( Loop1 ).NodeName ) + "\", Return plenum induced air outlet node did not find a matching inlet node." );
+				ShowContinueError( "Reference Object=" + trim( NodeConnections( Loop1 ).ObjectType ) + ", Name=" + trim( NodeConnections( Loop1 ).ObjectName ) );
+				++ErrorCounter;
+				ErrorsFound = true;
+			}
+		}
+
+		// Check 6 -- every inlet should have a matching outlet, zonereturn, zoneexhaust, induced air, reliefair or outsideair
+		//    a)  If an InletNode's object is AirLoopHVAC, CondenserLoop, or PlantLoop, then skip the test.
+		//    b)  If an InletNode's object is not one of the above types, it is valid if the
+		//        same node name appears as an INLET to an AirLoopHVAC, CondenserLoop, or PlantLoop.
+		for ( Loop1 = 1; Loop1 <= NumOfNodeConnections; ++Loop1 ) {
+			if ( NodeConnections( Loop1 ).ConnectionType != ValidConnectionTypes( NodeConnectionType_Inlet ) ) continue;
+			if ( NodeConnections( Loop1 ).ObjectType == "AIRLOOPHVAC" || NodeConnections( Loop1 ).ObjectType == "CONDENSERLOOP" || NodeConnections( Loop1 ).ObjectType == "PLANTLOOP" ) continue;
+			IsValid = false;
+			MatchedAtLeastOne = false;
+			for ( Loop2 = 1; Loop2 <= NumOfNodeConnections; ++Loop2 ) {
+				if ( Loop1 == Loop2 ) continue;
+				if ( NodeConnections( Loop1 ).NodeNumber != NodeConnections( Loop2 ).NodeNumber ) continue;
+				if ( NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_Outlet ) || NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_ZoneReturn ) || NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_ZoneExhaust ) || NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_InducedAir ) || NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_ReliefAir ) || NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_OutsideAir ) ) {
+					MatchedAtLeastOne = true;
+					continue;
+				}
+				if ( NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_Inlet ) && ( NodeConnections( Loop2 ).ObjectType == "AIRLOOPHVAC" || NodeConnections( Loop2 ).ObjectType == "CONDENSERLOOP" || NodeConnections( Loop2 ).ObjectType == "PLANTLOOP" ) ) {
+					MatchedAtLeastOne = true;
+					continue;
+				}
+				IsValid = false;
+			}
+			if ( ! IsValid && ! MatchedAtLeastOne ) {
+				ShowSevereError( "Node Connection Error, Node=\"" + trim( NodeConnections( Loop1 ).NodeName ) + "\", Inlet node did not find an appropriate matching \"outlet\" node." );
+				ShowContinueError( "If this is an outdoor air inlet node, " "it must be listed in an OutdoorAir:Node or OutdoorAir:NodeList object." );
+				ShowContinueError( "Reference Object=" + trim( NodeConnections( Loop1 ).ObjectType ) + ", Name=" + trim( NodeConnections( Loop1 ).ObjectName ) );
+				++ErrorCounter;
+				//      ErrorsFound=.TRUE.
+			}
+		}
+
+		// Check 7 -- non-parent inlet nodes -- must never be an inlet more than once
+		for ( Loop1 = 1; Loop1 <= NumOfNodeConnections; ++Loop1 ) {
+			// Only non-parent node connections
+			if ( NodeConnections( Loop1 ).ObjectIsParent ) continue;
+			if ( NodeConnections( Loop1 ).ConnectionType != ValidConnectionTypes( NodeConnectionType_Inlet ) ) continue;
+			for ( Loop2 = Loop1; Loop2 <= NumOfNodeConnections; ++Loop2 ) {
+				if ( Loop1 == Loop2 ) continue;
+				if ( NodeConnections( Loop2 ).ObjectIsParent ) continue;
+				if ( NodeConnections( Loop2 ).ConnectionType != ValidConnectionTypes( NodeConnectionType_Inlet ) ) continue;
+				if ( NodeConnections( Loop2 ).NodeNumber == NodeConnections( Loop1 ).NodeNumber ) {
+					ShowSevereError( "Node Connection Error, Node=\"" + trim( NodeConnections( Loop1 ).NodeName ) + "\", The same node appears as a non-parent Inlet node more than once." );
+					ShowContinueError( "Reference Object=" + trim( NodeConnections( Loop1 ).ObjectType ) + ", Name=" + trim( NodeConnections( Loop1 ).ObjectName ) );
+					ShowContinueError( "Reference Object=" + trim( NodeConnections( Loop2 ).ObjectType ) + ", Name=" + trim( NodeConnections( Loop2 ).ObjectName ) );
+					++ErrorCounter;
+					//        ErrorsFound=.TRUE.
+					break;
+				}
+			}
+		}
+
+		// Check 8 -- non-parent outlet nodes -- must never be an outlet more than once
+		for ( Loop1 = 1; Loop1 <= NumOfNodeConnections; ++Loop1 ) {
+			// Only non-parent node connections
+			if ( NodeConnections( Loop1 ).ObjectIsParent ) continue;
+			if ( NodeConnections( Loop1 ).ConnectionType != ValidConnectionTypes( NodeConnectionType_Outlet ) ) continue;
+			// Skip if DIRECT AIR, because it only has one node which is an outlet, so it dupes the outlet which feeds it
+			if ( NodeConnections( Loop1 ).ObjectType == "AIRTERMINAL:SINGLEDUCT:UNCONTROLLED" ) continue;
+			IsValid = true;
+			for ( Loop2 = Loop1; Loop2 <= NumOfNodeConnections; ++Loop2 ) {
+				if ( Loop1 == Loop2 ) continue;
+				if ( NodeConnections( Loop2 ).ObjectIsParent ) continue;
+				if ( NodeConnections( Loop2 ).ConnectionType != ValidConnectionTypes( NodeConnectionType_Outlet ) ) continue;
+				// Skip if DIRECT AIR, because it only has one node which is an outlet, so it dupes the outlet which feeds it
+				if ( NodeConnections( Loop2 ).ObjectType == "AIRTERMINAL:SINGLEDUCT:UNCONTROLLED" ) continue;
+				if ( NodeConnections( Loop2 ).NodeNumber == NodeConnections( Loop1 ).NodeNumber ) {
+					// Skip if one of the
+					ShowSevereError( "Node Connection Error, Node=\"" + trim( NodeConnections( Loop1 ).NodeName ) + "\", The same node appears as a non-parent Outlet node more than once." );
+					ShowContinueError( "Reference Object=" + trim( NodeConnections( Loop1 ).ObjectType ) + ", Name=" + trim( NodeConnections( Loop1 ).ObjectName ) );
+					ShowContinueError( "Reference Object=" + trim( NodeConnections( Loop2 ).ObjectType ) + ", Name=" + trim( NodeConnections( Loop2 ).ObjectName ) );
+					++ErrorCounter;
+					//        ErrorsFound=.TRUE.
+					break;
+				}
+			}
+		}
+
+		// Check 9 -- nodes of type OutsideAirReference must be registered as NodeConnectionType_OutsideAir
+		for ( Loop1 = 1; Loop1 <= NumOfNodeConnections; ++Loop1 ) {
+			if ( NodeConnections( Loop1 ).ConnectionType != ValidConnectionTypes( NodeConnectionType_OutsideAirReference ) ) continue;
+			IsValid = false;
+			for ( Loop2 = 1; Loop2 <= NumOfNodeConnections; ++Loop2 ) {
+				if ( Loop1 == Loop2 ) continue;
+				if ( NodeConnections( Loop1 ).NodeNumber != NodeConnections( Loop2 ).NodeNumber ) continue;
+				if ( NodeConnections( Loop2 ).ConnectionType != ValidConnectionTypes( NodeConnectionType_OutsideAir ) ) continue;
+				IsValid = true;
+				break;
+			}
+			if ( ! IsValid ) {
+				ShowSevereError( "Node Connection Error, Node=\"" + trim( NodeConnections( Loop1 ).NodeName ) + "\", Outdoor Air Reference did not find an appropriate \"outdoor air\" node." );
+				ShowContinueError( "This node must be listed in an OutdoorAir:Node or OutdoorAir:NodeList " "object in order to set its conditions." );
+				ShowContinueError( "Reference Object=" + trim( NodeConnections( Loop1 ).ObjectType ) + ", Name=" + trim( NodeConnections( Loop1 ).ObjectName ) );
+				++ErrorCounter;
+				//      ErrorsFound=.TRUE.
+			}
+		}
+
+		// Check 10 -- fluid streams cannot have multiple inlet/outlet nodes on same component
+		//  can have multiple inlets with one outlet or vice versa but cannot have multiple both inlet and outlet
+		if ( NumOfNodeConnections > 0 ) {
+			MaxFluidStream = maxval( NodeConnections.FluidStream() );
+			FluidStreamInletCount.allocate( MaxFluidStream );
+			FluidStreamOutletCount.allocate( MaxFluidStream );
+			FluidStreamCounts.allocate( MaxFluidStream );
+			NodeObjects.allocate( NumOfNodeConnections );
+			FluidStreamInletCount = 0;
+			FluidStreamOutletCount = 0;
+			NodeObjects = 0;
+			FluidStreamCounts = false;
+			// Following code relies on node connections for single object type/name being grouped together
+			Object = 1;
+			StartConnect = 1;
+			EndConnect = 0;
+			NumObjects = 2;
+			NodeObjects( 1 ) = 1;
+			while ( Object < NumOfNodeConnections ) {
+				if ( NodeConnections( Object ).ObjectType != NodeConnections( Object + 1 ).ObjectType || NodeConnections( Object ).ObjectName != NodeConnections( Object + 1 ).ObjectName ) {
+					EndConnect = Object + 1;
+					NodeObjects( NumObjects ) = EndConnect;
+					if ( Object + 1 < NumOfNodeConnections ) ++NumObjects;
+				}
+				++Object;
+			}
+			// NodeObjects now contains each consecutive object...
+			for ( Object = 1; Object <= NumObjects - 1; ++Object ) {
+				IsValid = true;
+				FluidStreamInletCount = 0;
+				FluidStreamOutletCount = 0;
+				FluidStreamCounts = false;
+				Loop1 = NodeObjects( Object );
+				if ( NodeConnections( Loop1 ).ObjectIsParent ) continue;
+				if ( NodeConnections( Loop1 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_Inlet ) ) ++FluidStreamInletCount( NodeConnections( Loop1 ).FluidStream );
+				if ( NodeConnections( Loop1 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_Outlet ) ) ++FluidStreamOutletCount( NodeConnections( Loop1 ).FluidStream );
+				for ( Loop2 = Loop1 + 1; Loop2 <= NodeObjects( Object + 1 ) - 1; ++Loop2 ) {
+					if ( NodeConnections( Loop2 ).ObjectIsParent ) continue;
+					if ( NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_Inlet ) ) ++FluidStreamInletCount( NodeConnections( Loop2 ).FluidStream );
+					if ( NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_Outlet ) ) ++FluidStreamOutletCount( NodeConnections( Loop2 ).FluidStream );
+				}
+				for ( Loop2 = 1; Loop2 <= MaxFluidStream; ++Loop2 ) {
+					if ( FluidStreamInletCount( Loop2 ) > 1 && FluidStreamOutletCount( Loop2 ) > 1 ) {
+						IsValid = false;
+						FluidStreamCounts( Loop2 ) = true;
+					}
+				}
+				if ( ! IsValid ) {
+					ShowSevereError( "(Developer) Node Connection Error, Object=" + trim( NodeConnections( Loop1 ).ObjectType ) + ":" + trim( NodeConnections( Loop1 ).ObjectName ) );
+					ShowContinueError( "Object has multiple connections on both inlet and outlet fluid streams." );
+					for ( Loop2 = 1; Loop2 <= MaxFluidStream; ++Loop2 ) {
+						if ( FluidStreamCounts( Loop2 ) ) ShowContinueError( "...occurs in Fluid Stream [" + trim( RoundSigDigits( Loop2 ) ) + "]." );
+					}
+					++ErrorCounter;
+					ErrorsFound = true;
+				}
+			}
+			FluidStreamInletCount.deallocate();
+			FluidStreamOutletCount.deallocate();
+			FluidStreamCounts.deallocate();
+			NodeObjects.deallocate();
+		}
+
+		NumNodeConnectionErrors += ErrorCounter;
+
+	}
+
+	bool
+	IsParentObject(
+		Fstring const & ComponentType,
+		Fstring const & ComponentName
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   May 2005
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This routine determines if a component name is a parent node.
+
+		// METHODOLOGY EMPLOYED:
+		// Traverses CompSet structure.
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Return value
+		bool IsParent; // True if this combination is a parent
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int Loop;
+
+		IsParent = false;
+		for ( Loop = 1; Loop <= NumOfNodeConnections; ++Loop ) {
+			if ( NodeConnections( Loop ).ObjectType == ComponentType && NodeConnections( Loop ).ObjectName == ComponentName ) {
+				if ( NodeConnections( Loop ).ObjectIsParent ) {
+					IsParent = true;
+				}
+				break;
+			}
+		}
+		if ( ! IsParent ) {
+			IsParent = IsParentObjectCompSet( ComponentType, ComponentName );
+		}
+
+		return IsParent;
+
+	}
+
+	int
+	WhichParentSet(
+		Fstring const & ComponentType,
+		Fstring const & ComponentName
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   May 2005
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This routine determines which parent node list (number) for a given component name
+		// and type.
+
+		// METHODOLOGY EMPLOYED:
+		// Traverses CompSet structure.
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Return value
+		int WhichOne;
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int Loop;
+
+		WhichOne = 0;
+		for ( Loop = 1; Loop <= NumOfActualParents; ++Loop ) {
+			if ( ParentNodeList( Loop ).CType == ComponentType && ParentNodeList( Loop ).CName == ComponentName ) {
+				WhichOne = Loop;
+				break;
+			}
+		}
+
+		return WhichOne;
+
+	}
+
+	void
+	GetParentData(
+		Fstring const & ComponentType,
+		Fstring const & ComponentName,
+		Fstring & InletNodeName,
+		int & InletNodeNum,
+		Fstring & OutletNodeName,
+		int & OutletNodeNum,
+		bool & ErrorsFound
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   May 2005
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This routine gets node data for a given Parent Component Type and Name Name.
+
+		// METHODOLOGY EMPLOYED:
+		// Traverses CompSet structure.
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItemInList;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		//  INTEGER Loop
+		bool ErrInObject;
+		int Which;
+
+		InletNodeName = Blank;
+		InletNodeNum = 0;
+		OutletNodeName = Blank;
+		OutletNodeNum = 0;
+		ErrInObject = false;
+
+		Which = WhichParentSet( ComponentType, ComponentName );
+		if ( Which != 0 ) {
+			InletNodeName = ParentNodeList( Which ).InletNodeName;
+			OutletNodeName = ParentNodeList( Which ).OutletNodeName;
+			// Get Node Numbers
+			InletNodeNum = FindItemInList( InletNodeName, NodeID( {1,NumOfNodes} ), NumOfNodes );
+			OutletNodeNum = FindItemInList( OutletNodeName, NodeID( {1,NumOfNodes} ), NumOfNodes );
+			//    IF (InletNodeNum == 0 .and. ComponentType /= 'ZONEHVAC:AIRDISTRIBUTIONUNIT') THEN
+			//      CALL ShowWarningError('GetParentData: Component Type='//TRIM(ComponentType)//  &
+			//        ', Component Name='//TRIM(ComponentName))
+			//      CALL ShowContinueError('..Inlet Node Name, not found='//TRIM(InletNodeName))
+			//!      ErrInObject=.TRUE.
+			//    ENDIF
+			//    IF (OutletNodeNum == 0) THEN
+			//      CALL ShowWarningError('GetParentData: Component Type='//TRIM(ComponentType)//  &
+			//        ', Component Name='//TRIM(ComponentName))
+			//      CALL ShowContinueError('..Outlet Node Name, not found='//TRIM(OutletNodeName))
+			//!      ErrInObject=.TRUE.
+			//    ENDIF
+		} else if ( IsParentObjectCompSet( ComponentType, ComponentName ) ) {
+			Which = WhichCompSet( ComponentType, ComponentName );
+			if ( Which != 0 ) {
+				InletNodeName = CompSets( Which ).InletNodeName;
+				OutletNodeName = CompSets( Which ).OutletNodeName;
+				InletNodeNum = FindItemInList( InletNodeName, NodeID( {1,NumOfNodes} ), NumOfNodes );
+				OutletNodeNum = FindItemInList( OutletNodeName, NodeID( {1,NumOfNodes} ), NumOfNodes );
+				//      IF (InletNodeNum == 0 .and. ComponentType /= 'ZONEHVAC:AIRDISTRIBUTIONUNIT') THEN
+				//        CALL ShowWarningError('GetParentData: Component Type='//TRIM(ComponentType)//  &
+				//          ', Component Name='//TRIM(ComponentName))
+				//        CALL ShowContinueError('..Inlet Node Name, not found='//TRIM(InletNodeName))
+				//  !      ErrInObject=.TRUE.
+				//      ENDIF
+				//      IF (OutletNodeNum == 0) THEN
+				//        CALL ShowWarningError('GetParentData: Component Type='//TRIM(ComponentType)//  &
+				//          ', Component Name='//TRIM(ComponentName))
+				//        CALL ShowContinueError('..Outlet Node Name, not found='//TRIM(OutletNodeName))
+				//  !      ErrInObject=.TRUE.
+				//      ENDIF
+			} else {
+				ErrInObject = true;
+				ShowWarningError( "GetParentData: Component Type=" + trim( ComponentType ) + ", Component Name=" + trim( ComponentName ) + " not found." );
+			}
+		} else {
+			ErrInObject = true;
+			ShowWarningError( "GetParentData: Component Type=" + trim( ComponentType ) + ", Component Name=" + trim( ComponentName ) + " not found." );
+		}
+
+		if ( ErrInObject ) ErrorsFound = true;
+
+	}
+
+	bool
+	IsParentObjectCompSet(
+		Fstring const & ComponentType,
+		Fstring const & ComponentName
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   May 2005
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This routine determines if a component name is a parent node.
+
+		// METHODOLOGY EMPLOYED:
+		// Traverses CompSet structure.
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Return value
+		bool IsParent; // True if this combination is a parent
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int Loop;
+
+		IsParent = false;
+		for ( Loop = 1; Loop <= NumCompSets; ++Loop ) {
+			if ( CompSets( Loop ).ParentCType == ComponentType && CompSets( Loop ).ParentCName == ComponentName ) {
+				IsParent = true;
+				break;
+			}
+		}
+
+		return IsParent;
+
+	}
+
+	int
+	WhichCompSet(
+		Fstring const & ComponentType,
+		Fstring const & ComponentName
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   May 2005
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This routine determines which comp set (number) for a given component name
+		// and type.
+
+		// METHODOLOGY EMPLOYED:
+		// Traverses CompSet structure.
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Return value
+		int WhichOne;
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int Loop;
+
+		WhichOne = 0;
+		for ( Loop = 1; Loop <= NumCompSets; ++Loop ) {
+			if ( CompSets( Loop ).CType == ComponentType && CompSets( Loop ).CName == ComponentName ) {
+				WhichOne = Loop;
+				break;
+			}
+		}
+
+		return WhichOne;
+
+	}
+
+	int
+	WhichParentCompSet(
+		Fstring const & ComponentType,
+		Fstring const & ComponentName
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   May 2005
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This routine determines which comp set (number) for a given component name
+		// and type.
+
+		// METHODOLOGY EMPLOYED:
+		// Traverses CompSet structure.
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Return value
+		int WhichOne;
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int Loop;
+
+		WhichOne = 0;
+		for ( Loop = 1; Loop <= NumCompSets; ++Loop ) {
+			if ( CompSets( Loop ).ParentCType == ComponentType && CompSets( Loop ).ParentCName == ComponentName ) {
+				WhichOne = Loop;
+				break;
+			}
+		}
+
+		return WhichOne;
+
+	}
+
+	int
+	GetNumChildren(
+		Fstring const & ComponentType,
+		Fstring const & ComponentName
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   May 2005
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This routine counts the number of children for a parent Component Set.
+
+		// METHODOLOGY EMPLOYED:
+		// Traverses CompSet structure.
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Return value
+		int NumChildren;
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int Loop;
+
+		NumChildren = 0;
+		if ( IsParentObject( ComponentType, ComponentName ) ) {
+			for ( Loop = 1; Loop <= NumCompSets; ++Loop ) {
+				if ( CompSets( Loop ).ParentCType == ComponentType && CompSets( Loop ).ParentCName == ComponentName ) {
+					++NumChildren;
+				}
+			}
+		}
+
+		return NumChildren;
+
+	}
+
+	void
+	GetComponentData(
+		Fstring const & ComponentType,
+		Fstring const & ComponentName,
+		bool & IsParent,
+		int & NumInlets,
+		FArray1D_Fstring & InletNodeNames,
+		FArray1D_int & InletNodeNums,
+		FArray1D_int & InletFluidStreams,
+		int & NumOutlets,
+		FArray1D_Fstring & OutletNodeNames,
+		FArray1D_int & OutletNodeNums,
+		FArray1D_int & OutletFluidStreams,
+		bool & ErrorsFound
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   May 2005
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This routine gets data for a given Component Type and Name Name.
+
+		// METHODOLOGY EMPLOYED:
+		// Traverses CompSet structure.
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItemInList;
+		using InputProcessor::SameString;
+
+		// Argument array dimensioning
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		//  INTEGER Loop
+		bool ErrInObject;
+		int Which;
+		//unused1109  LOGICAL FoundObject
+
+		if ( allocated( InletNodeNames ) ) InletNodeNames.deallocate();
+		if ( allocated( InletNodeNums ) ) InletNodeNums.deallocate();
+		if ( allocated( InletFluidStreams ) ) InletFluidStreams.deallocate();
+		if ( allocated( OutletNodeNames ) ) OutletNodeNames.deallocate();
+		if ( allocated( OutletNodeNums ) ) OutletNodeNums.deallocate();
+		if ( allocated( OutletFluidStreams ) ) OutletFluidStreams.deallocate();
+
+		NumInlets = 0;
+		NumOutlets = 0;
+
+		//  FoundObject=.FALSE.
+		IsParent = false;
+		for ( Which = 1; Which <= NumOfNodeConnections; ++Which ) {
+			if ( NodeConnections( Which ).ObjectType != ComponentType || NodeConnections( Which ).ObjectName != ComponentName ) continue;
+			//    FoundObject=.TRUE.
+			if ( NodeConnections( Which ).ObjectIsParent ) IsParent = true;
+			if ( SameString( NodeConnections( Which ).ConnectionType, "Inlet" ) ) ++NumInlets;
+			if ( SameString( NodeConnections( Which ).ConnectionType, "Outlet" ) ) ++NumOutlets;
+		}
+
+		InletNodeNames.allocate( NumInlets );
+		InletNodeNums.allocate( NumInlets );
+		InletFluidStreams.allocate( NumInlets );
+		OutletNodeNames.allocate( NumOutlets );
+		OutletNodeNums.allocate( NumOutlets );
+		OutletFluidStreams.allocate( NumOutlets );
+
+		InletNodeNames = Blank;
+		InletNodeNums = 0;
+		InletFluidStreams = 0;
+		OutletNodeNames = Blank;
+		OutletNodeNums = 0;
+		OutletFluidStreams = 0;
+		NumInlets = 0;
+		NumOutlets = 0;
+		ErrInObject = false;
+
+		//  IF (IsParentObject(ComponentType,ComponentName)) THEN
+		//    IsParent=.TRUE.
+		//  ENDIF
+
+		for ( Which = 1; Which <= NumOfNodeConnections; ++Which ) {
+			if ( NodeConnections( Which ).ObjectType != ComponentType || NodeConnections( Which ).ObjectName != ComponentName ) continue;
+			if ( SameString( NodeConnections( Which ).ConnectionType, "Inlet" ) ) {
+				++NumInlets;
+				InletNodeNames( NumInlets ) = NodeConnections( Which ).NodeName;
+				InletNodeNums( NumInlets ) = NodeConnections( Which ).NodeNumber;
+				InletFluidStreams( NumInlets ) = NodeConnections( Which ).FluidStream;
+			}
+			if ( SameString( NodeConnections( Which ).ConnectionType, "Outlet" ) ) {
+				++NumOutlets;
+				OutletNodeNames( NumOutlets ) = NodeConnections( Which ).NodeName;
+				OutletNodeNums( NumOutlets ) = NodeConnections( Which ).NodeNumber;
+				OutletFluidStreams( NumOutlets ) = NodeConnections( Which ).FluidStream;
+			}
+		}
+		if ( ErrInObject ) {
+			ShowWarningError( "GetComponentData: Component Type=" + trim( ComponentType ) + ", Component Name=" + trim( ComponentName ) + " not found." );
+		}
+
+		if ( ErrInObject ) ErrorsFound = true;
+
+	}
+
+	void
+	GetChildrenData(
+		Fstring const & ComponentType,
+		Fstring const & ComponentName,
+		int & NumChildren,
+		FArray1S_Fstring ChildrenCType,
+		FArray1S_Fstring ChildrenCName,
+		FArray1S_Fstring InletNodeName,
+		FArray1S_int InletNodeNum,
+		FArray1S_Fstring OutletNodeName,
+		FArray1S_int OutletNodeNum,
+		bool & ErrorsFound
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   May 2005
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This routine gets children data for given parent node.
+
+		// METHODOLOGY EMPLOYED:
+		// Traverses CompSet structure.
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItemInList;
+
+		// Argument array dimensioning
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		FArray1D_Fstring ChildCType( sFstring( MaxNameLength ) );
+		FArray1D_Fstring ChildCName( sFstring( MaxNameLength ) );
+		FArray1D_Fstring ChildInNodeName( sFstring( MaxNameLength ) );
+		FArray1D_Fstring ChildOutNodeName( sFstring( MaxNameLength ) );
+		FArray1D_int ChildInNodeNum;
+		FArray1D_int ChildOutNodeNum;
+		int Loop;
+		int CountNum;
+		bool ErrInObject;
+		Fstring MatchNodeName( MaxNameLength );
+		Fstring ParentInletNodeName( MaxNameLength );
+		Fstring ParentOutletNodeName( MaxNameLength );
+		int ParentInletNodeNum;
+		int ParentOutletNodeNum;
+		//unused1109  LOGICAL Matched
+		int CountMatchLoop;
+
+		ChildrenCType = Blank;
+		ChildrenCName = Blank;
+		InletNodeName = Blank;
+		InletNodeNum = 0;
+		OutletNodeName = Blank;
+		OutletNodeNum = 0;
+		ErrInObject = false;
+
+		if ( IsParentObject( ComponentType, ComponentName ) ) {
+			NumChildren = GetNumChildren( ComponentType, ComponentName );
+			if ( NumChildren == 0 ) {
+				ShowWarningError( "GetChildrenData: Parent Node has no children, node=" + trim( ComponentType ) + ":" + trim( ComponentName ) );
+			} else {
+				GetParentData( ComponentType, ComponentName, ParentInletNodeName, ParentInletNodeNum, ParentOutletNodeName, ParentOutletNodeNum, ErrInObject );
+				ChildCType.allocate( NumChildren );
+				ChildCName.allocate( NumChildren );
+				ChildInNodeName.allocate( NumChildren );
+				ChildOutNodeName.allocate( NumChildren );
+				ChildInNodeNum.allocate( NumChildren );
+				ChildOutNodeNum.allocate( NumChildren );
+				ChildCType = Blank;
+				ChildCName = Blank;
+				ChildInNodeName = Blank;
+				ChildOutNodeName = Blank;
+				ChildInNodeNum = 0;
+				ChildOutNodeNum = 0;
+				CountNum = 0;
+				for ( Loop = 1; Loop <= NumCompSets; ++Loop ) {
+					if ( CompSets( Loop ).ParentCType == ComponentType && CompSets( Loop ).ParentCName == ComponentName ) {
+						++CountNum;
+						ChildCType( CountNum ) = CompSets( Loop ).CType;
+						ChildCName( CountNum ) = CompSets( Loop ).CName;
+						ChildInNodeName( CountNum ) = CompSets( Loop ).InletNodeName;
+						ChildOutNodeName( CountNum ) = CompSets( Loop ).OutletNodeName;
+						// Get Node Numbers
+						ChildInNodeNum( CountNum ) = FindItemInList( ChildInNodeName( CountNum ), NodeID( {1,NumOfNodes} ), NumOfNodes );
+						//          IF (ChildInNodeNum(CountNum) == 0) THEN
+						//            CALL ShowSevereError('GetChildrenData: Inlet Node not previously assigned, Node='//  &
+						//                    TRIM(ChildInNodeName(CountNum)))
+						//            CALL ShowContinueError('..Component='//TRIM(ChildCType(CountNum))//':'//TRIM(ChildCName(CountNum)))
+						//            CALL ShowContinueError('..Parent Object='//TRIM(ComponentType)//':'//TRIM(ComponentName))
+						//            ErrInObject=.TRUE.
+						//          ENDIF
+						ChildOutNodeNum( CountNum ) = FindItemInList( ChildOutNodeName( CountNum ), NodeID( {1,NumOfNodes} ), NumOfNodes );
+						//          IF (ChildOutNodeNum(CountNum) == 0) THEN
+						//            CALL ShowSevereError('GetChildrenData: Outlet Node not previously assigned, Node='//  &
+						//                    TRIM(ChildOutNodeName(CountNum)))
+						//            CALL ShowContinueError('..Component='//TRIM(ChildCType(CountNum))//':'//TRIM(ChildCName(CountNum)))
+						//            CALL ShowContinueError('..Parent Object='//TRIM(ComponentType)//':'//TRIM(ComponentName))
+						//            ErrInObject=.TRUE.
+						//          ENDIF
+					}
+				}
+				if ( CountNum != NumChildren ) {
+					ShowSevereError( "GetChildrenData: Counted nodes not equal to GetNumChildren count" );
+					ErrInObject = true;
+				} else {
+					// Children arrays built.  Now "sort" for flow connection order(?)
+					MatchNodeName = ParentInletNodeName;
+					CountNum = 0;
+					CountMatchLoop = 0;
+					while ( CountMatchLoop < NumChildren ) {
+						++CountMatchLoop;
+						//          Matched=.FALSE.
+						for ( Loop = 1; Loop <= NumChildren; ++Loop ) {
+							if ( ChildInNodeName( Loop ) == MatchNodeName ) {
+								++CountNum;
+								ChildrenCType( CountNum ) = ChildCType( Loop );
+								ChildrenCName( CountNum ) = ChildCName( Loop );
+								InletNodeName( CountNum ) = ChildInNodeName( Loop );
+								InletNodeNum( CountNum ) = ChildInNodeNum( Loop );
+								OutletNodeName( CountNum ) = ChildOutNodeName( Loop );
+								OutletNodeNum( CountNum ) = ChildOutNodeNum( Loop );
+								ChildInNodeName( Loop ) = Blank; // So it won't match anymore
+								//              Matched=.TRUE.
+								MatchNodeName = ChildOutNodeName( Loop );
+								break;
+							}
+						}
+						//          IF (.not. Matched .and. MatchNodeName /= blank) THEN
+						//            IF (CountMatchLoop > 1) THEN
+						//              CALL ShowSevereError('GetChildrenData: Sorting for flow connection order..'//  &
+						//                                 'Required Child Node, not matched.  Expected Inlet Node='//  &
+						//                                 TRIM(MatchNodeName))
+						//            ELSE
+						//              CALL ShowSevereError('GetChildrenData: Sorting for 1st node in flow connection order..'//  &
+						//                                 'Required Child Node, not matched.  Expected Inlet Node='//  &
+						//                                 TRIM(MatchNodeName))
+						//            ENDIF
+						//            CALL ShowContinueError('..Parent Object='//TRIM(ComponentType)//':'//TRIM(ComponentName))
+						//            ErrInObject=.TRUE.
+						//          ENDIF
+					}
+					if ( MatchNodeName != ParentOutletNodeName ) {
+						for ( Loop = 1; Loop <= NumChildren; ++Loop ) {
+							if ( ChildInNodeName( Loop ) == Blank ) continue;
+							if ( ChildOutNodeName( Loop ) == ParentOutletNodeName ) break;
+							//            CALL ShowSevereError('GetChildrenData: Sorting for flow connection order..'//  &
+							//                                 'Required Child Node, not matched.  Expected (Last) Outlet Node='//  &
+							//                                 TRIM(MatchNodeName))
+							//            CALL ShowContinueError('..does not match Parent Outlet Node='//TRIM(ParentOutletNodeName))
+							//            CALL ShowContinueError('..Parent Object='//TRIM(ComponentType)//':'//TRIM(ComponentName))
+							break;
+							//          ErrInObject=.TRUE.
+						}
+					}
+					for ( Loop = 1; Loop <= NumChildren; ++Loop ) {
+						if ( ChildInNodeName( Loop ) == Blank ) continue;
+						++CountNum;
+						ChildrenCType( CountNum ) = ChildCType( Loop );
+						ChildrenCName( CountNum ) = ChildCName( Loop );
+						InletNodeName( CountNum ) = ChildInNodeName( Loop );
+						InletNodeNum( CountNum ) = ChildInNodeNum( Loop );
+						OutletNodeName( CountNum ) = ChildOutNodeName( Loop );
+						OutletNodeNum( CountNum ) = ChildOutNodeNum( Loop );
+					}
+					ChildCType.deallocate();
+					ChildCName.deallocate();
+					ChildInNodeName.deallocate();
+					ChildOutNodeName.deallocate();
+					ChildInNodeNum.deallocate();
+					ChildOutNodeNum.deallocate();
+				}
+			}
+		} else {
+			ShowSevereError( "GetChildrenData: Requested Children Data for non Parent Node=" + trim( ComponentType ) + ":" + trim( ComponentName ) );
+			ErrInObject = true;
+		}
+
+		if ( ErrInObject ) ErrorsFound = true;
+
+	}
+
+	void
+	SetUpCompSets(
+		Fstring const & ParentType, // Parent Object Type
+		Fstring const & ParentName, // Parent Object Name
+		Fstring const & CompType, // Component Type
+		Fstring const & CompName, // Component Name
+		Fstring const & InletNode, // Inlet Node Name
+		Fstring const & OutletNode, // Outlet Node Name
+		Optional_Fstring_const Description // Description
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   November 2001
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine sets up "Component Sets" as input in the branch
+		// lists.  These can be used later to verify that the proper names and
+		// inlet/outlet nodes have been input.  This routine assumes that identical
+		// "CompSets" cannot be used in multiple places and issues a warning if they are.
+		// This subroutine also
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::MakeUPPERCase;
+		using InputProcessor::SameString;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Fstring CompTypeUC( MaxNameLength ); // Component type in upper case
+		Fstring ParentTypeUC( MaxNameLength ); // Parent component type in upper case
+		int Count;
+		int Count2;
+		int Found;
+		int Found2;
+
+		// Object Data
+		FArray1D< ComponentListData > TempCompSets;
+
+		ParentTypeUC = MakeUPPERCase( ParentType );
+		CompTypeUC = MakeUPPERCase( CompType );
+		Found = 0;
+
+		// See if Component-Nodes set is already there - should be unique
+		// Try to fill in blanks (passed in as undefined
+		for ( Count = 1; Count <= NumCompSets; ++Count ) {
+			//    IF (CompTypeUC /= CompSets(Count)%CType .or. CompName /= CompSets(Count)%CName) CYCLE
+			if ( CompName != CompSets( Count ).CName ) continue;
+			if ( CompTypeUC != "UNDEFINED" ) {
+				if ( CompTypeUC != CompSets( Count ).CType ) continue;
+			}
+			// Component name matches, component type matches or is undefined
+			if ( InletNode != "UNDEFINED" ) {
+				if ( CompSets( Count ).InletNodeName != "UNDEFINED" ) {
+					if ( InletNode != CompSets( Count ).InletNodeName ) continue;
+				}
+			}
+			if ( OutletNode != "UNDEFINED" ) {
+				if ( CompSets( Count ).OutletNodeName != "UNDEFINED" ) {
+					if ( OutletNode != CompSets( Count ).OutletNodeName ) continue;
+				}
+			}
+			//  See if something undefined and set here
+			if ( CompSets( Count ).ParentCType == "UNDEFINED" && CompSets( Count ).ParentCName == "UNDEFINED" ) {
+				// Assume this is a further definition for this compset
+				CompSets( Count ).ParentCType = ParentTypeUC;
+				CompSets( Count ).ParentCName = ParentName;
+				if ( present( Description ) ) CompSets( Count ).Description = Description;
+				Found = Count;
+				break;
+			}
+		}
+		if ( Found == 0 ) {
+			for ( Count = 1; Count <= NumCompSets; ++Count ) {
+				Found = 0;
+				// Test if inlet node has been used before as an inlet node
+				// If the matching node name does not belong to the parent object, then error
+				// For example a fan may share the same inlet node as the furnace object which is its parent
+				if ( InletNode != CompSets( Count ).InletNodeName ) {
+					continue;
+					// If parent type is "UNDEFINED" then no error
+				} else if ( ( ParentTypeUC == "UNDEFINED" ) || ( CompSets( Count ).ParentCType == "UNDEFINED" ) ) {
+					// If node name is "UNDEFINED" then no error
+				} else if ( InletNode != "UNDEFINED" ) {
+					// If the matching node name does not belong to the parent or child object, then error
+					// For example a fan may share the same inlet node as the furnace object which is its parent
+					if ( ( trim( ParentTypeUC ) == trim( CompSets( Count ).CType ) ) && ( trim( ParentName ) == trim( CompSets( Count ).CName ) ) ) {
+						// OK - The duplicate inlet node belongs to this component's parent
+					} else if ( ( trim( CompTypeUC ) == trim( CompSets( Count ).ParentCType ) ) && ( trim( CompName ) == trim( CompSets( Count ).ParentCName ) ) ) {
+						// OK - The duplicate inlet node belongs to a child of this component
+					} else {
+						// Due to possibility of grandparents or more, if the matching node name
+						// belongs to a component that appears as a parent, then OK
+						Found2 = 0;
+						for ( Count2 = 1; Count2 <= NumCompSets; ++Count2 ) {
+							if ( ( trim( CompSets( Count ).CType ) == trim( CompSets( Count2 ).ParentCType ) ) && ( trim( CompSets( Count ).CName ) == trim( CompSets( Count2 ).ParentCName ) ) ) Found2 = 1;
+							if ( ( trim( CompTypeUC ) == trim( CompSets( Count2 ).ParentCType ) ) && ( trim( CompName ) == trim( CompSets( Count2 ).ParentCName ) ) ) Found2 = 1;
+						}
+						if ( Found2 == 0 ) {
+							ShowWarningError( "Node used as an inlet more than once: " + trim( InletNode ) );
+							ShowContinueError( "  Used by     : " + trim( CompSets( Count ).ParentCType ) + ", name=" + trim( CompSets( Count ).ParentCName ) );
+							ShowContinueError( "  as inlet for: " + trim( CompSets( Count ).CType ) + ", name=" + trim( CompSets( Count ).CName ) );
+							ShowContinueError( "  and  by     : " + trim( ParentTypeUC ) + ", name=" + trim( ParentName ) );
+							ShowContinueError( "  as inlet for: " + trim( CompTypeUC ) + ", name=" + trim( CompName ) );
+						}
+					}
+				}
+				// Test if outlet node has been used before as an outlet node
+				// If the matching node name does not belong to the parent or child object, then error
+				// For example a fan may share the same outlet node as the furnace object which is its parent
+				if ( OutletNode != CompSets( Count ).OutletNodeName ) {
+					continue;
+					// If parent type is "UNDEFINED" then no error
+				} else if ( ( ParentTypeUC == "UNDEFINED" ) || ( CompSets( Count ).ParentCType == "UNDEFINED" ) ) {
+					// If node name is "UNDEFINED" then no error
+				} else if ( OutletNode != "UNDEFINED" ) {
+					if ( ( trim( ParentTypeUC ) == trim( CompSets( Count ).CType ) ) && ( trim( ParentName ) == trim( CompSets( Count ).CName ) ) ) {
+						// OK - The duplicate outlet node belongs to this component's parent
+					} else if ( ( trim( CompTypeUC ) == trim( CompSets( Count ).ParentCType ) ) && ( trim( CompName ) == trim( CompSets( Count ).ParentCName ) ) ) {
+						// OK - The duplicate outlet node belongs to a child of this component
+					} else {
+						// Due to possibility of grandparents or more, if the matching node name
+						// belongs to a component that appears as a parent, then OK
+						Found2 = 0;
+						for ( Count2 = 1; Count2 <= NumCompSets; ++Count2 ) {
+							if ( ( trim( CompSets( Count ).CType ) == trim( CompSets( Count2 ).ParentCType ) ) && ( trim( CompSets( Count ).CName ) == trim( CompSets( Count2 ).ParentCName ) ) ) Found2 = 1;
+							if ( ( trim( CompTypeUC ) == trim( CompSets( Count2 ).ParentCType ) ) && ( trim( CompName ) == trim( CompSets( Count2 ).ParentCName ) ) ) Found2 = 1;
+						}
+						// This rule is violated by dual duct units, so let it pass
+						if ( ( Found2 == 0 ) && ( ! SameString( CompSets( Count ).CType( {1,21} ), "AirTerminal:DualDuct:" ) ) && ( ! SameString( CompTypeUC( 1, 21 ), "AirTerminal:DualDuct:" ) ) ) {
+							ShowWarningError( "Node used as an outlet more than once: " + trim( OutletNode ) );
+							ShowContinueError( "  Used by     : " + trim( CompSets( Count ).ParentCType ) + ", name=" + trim( CompSets( Count ).ParentCName ) );
+							ShowContinueError( "  as outlet for: " + trim( CompSets( Count ).CType ) + ", name=" + trim( CompSets( Count ).CName ) );
+							ShowContinueError( "  and  by     : " + trim( ParentTypeUC ) + ", name=" + trim( ParentName ) );
+							ShowContinueError( "  as outlet for: " + trim( CompTypeUC ) + ", name=" + trim( CompName ) );
+						}
+					}
+				}
+				if ( CompTypeUC != CompSets( Count ).CType && CompTypeUC != "UNDEFINED" ) continue;
+				if ( CompName != CompSets( Count ).CName ) continue;
+				Found = Count;
+				break;
+			}
+		}
+		if ( Found == 0 ) {
+			++NumCompSets;
+			TempCompSets.allocate( NumCompSets );
+			if ( NumCompSets > 1 ) {
+				TempCompSets( {1,NumCompSets - 1} ) = CompSets;
+				CompSets.deallocate();
+			}
+			TempCompSets( NumCompSets ).CName = Blank;
+			TempCompSets( NumCompSets ).CType = Blank;
+			TempCompSets( NumCompSets ).InletNodeName = Blank;
+			TempCompSets( NumCompSets ).OutletNodeName = Blank;
+			TempCompSets( NumCompSets ).ParentCType = Blank;
+			TempCompSets( NumCompSets ).ParentCName = Blank;
+			TempCompSets( NumCompSets ).Description = "UNDEFINED";
+			CompSets.allocate( NumCompSets );
+			CompSets = TempCompSets;
+			TempCompSets.deallocate();
+			CompSets( NumCompSets ).ParentCType = ParentTypeUC;
+			CompSets( NumCompSets ).ParentCName = ParentName;
+			CompSets( NumCompSets ).CType = CompTypeUC;
+			CompSets( NumCompSets ).CName = CompName;
+			CompSets( NumCompSets ).InletNodeName = InletNode;
+			CompSets( NumCompSets ).OutletNodeName = OutletNode;
+			if ( present( Description ) ) {
+				CompSets( NumCompSets ).Description = Description;
+			} else {
+				CompSets( NumCompSets ).Description = "UNDEFINED";
+			}
+		}
+
+	}
+
+	void
+	TestInletOutletNodes( bool & ErrorsFound )
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   November 2001
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine tests the branches to see if a duplicate inlet node
+		// exists under a different name in the sequence; likewise for outlet.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int Count;
+		int Other;
+		FArray1D_bool AlreadyNoted;
+
+		// Test component sets created by branches
+		AlreadyNoted.allocate( NumCompSets );
+		AlreadyNoted = false;
+		for ( Count = 1; Count <= NumCompSets; ++Count ) {
+			for ( Other = 1; Other <= NumCompSets; ++Other ) {
+				if ( Count == Other ) continue;
+				if ( CompSets( Count ).InletNodeName != CompSets( Other ).InletNodeName ) continue;
+				if ( AlreadyNoted( Count ) ) continue;
+				//  All other values must match
+				if ( CompSets( Count ).CType != CompSets( Other ).CType || CompSets( Count ).CName != CompSets( Other ).CName || CompSets( Count ).OutletNodeName != CompSets( Other ).OutletNodeName ) {
+					AlreadyNoted( Other ) = true;
+					ShowWarningError( "Node used as an inlet more than once: " + trim( CompSets( Count ).InletNodeName ) );
+					ShowContinueError( "  Used by     : " + trim( CompSets( Count ).ParentCType ) + ", name=" + trim( CompSets( Count ).ParentCName ) );
+					ShowContinueError( "  as inlet for: " + trim( CompSets( Count ).CType ) + ", name=" + trim( CompSets( Count ).CName ) );
+					ShowContinueError( "  and  by     : " + trim( CompSets( Other ).ParentCType ) + ", name=" + trim( CompSets( Other ).ParentCName ) );
+					ShowContinueError( "  as inlet for: " + trim( CompSets( Other ).CType ) + ", name=" + trim( CompSets( Other ).CName ) );
+					//        ErrorsFound=.TRUE.
+				}
+			}
+		}
+
+		AlreadyNoted = false;
+		for ( Count = 1; Count <= NumCompSets; ++Count ) {
+			for ( Other = 1; Other <= NumCompSets; ++Other ) {
+				if ( Count == Other ) continue;
+				if ( CompSets( Count ).OutletNodeName != CompSets( Other ).OutletNodeName ) continue;
+				if ( AlreadyNoted( Count ) ) continue;
+				//  All other values must match
+				if ( CompSets( Count ).CType != CompSets( Other ).CType || CompSets( Count ).CName != CompSets( Other ).CName || CompSets( Count ).InletNodeName != CompSets( Other ).InletNodeName ) {
+					AlreadyNoted( Other ) = true;
+					ShowWarningError( "Node used as an outlet more than once: " + trim( CompSets( Count ).OutletNodeName ) );
+					ShowContinueError( "  Used by      : " + trim( CompSets( Count ).ParentCType ) + ", name=" + trim( CompSets( Count ).ParentCName ) );
+					ShowContinueError( "  as outlet for: " + trim( CompSets( Count ).CType ) + ", name=" + trim( CompSets( Count ).CName ) );
+					ShowContinueError( "  and  by      : " + trim( CompSets( Other ).ParentCType ) + ", name=" + trim( CompSets( Other ).ParentCName ) );
+					ShowContinueError( "  as outlet for: " + trim( CompSets( Other ).CType ) + ", name=" + trim( CompSets( Other ).CName ) );
+					//        ErrorsFound=.TRUE.
+				}
+			}
+		}
+
+		AlreadyNoted.deallocate();
+
+	}
+
+	void
+	TestCompSet(
+		Fstring const & CompType, // Component Type
+		Fstring const & CompName, // Component Name
+		Fstring const & InletNode, // Inlet Node Name
+		Fstring const & OutletNode, // Outlet Node Name
+		Fstring const & Description // Description of Node Pair (for warning message)
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Linda K. Lawrie
+		//       DATE WRITTEN   November 2001
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Register a child component in the CompSets data structure.
+		// NOTE:  This function was originally designed to test the stored "Component Sets" to
+		// see if there was one of this combination in there.  Thus the name "TestCompSet".
+		// However, this was based on a false assumption that input would always be gotten
+		// first for the parent object, then for the child object.  But this is often not the
+		// case.  Ultimately, the name of this function should be changed or it should be merged
+		// into SetUpCompSets.
+		// Until then, this function does the following:
+		//   a)  Search CompSets for this combination of component type, component name,
+		//       inlet node and outlet node.  If component type/name match and the existing
+		//       node names are UNDEFINED, this compset is assumed to be a match.
+		//   b)  If found, fill in any missing data such as node names or node description
+		//   c)  If not found, call SetUpCompSets (with parent type and name UNDEFINED)
+		//       to add a new item in the CompSets array
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::MakeUPPERCase;
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int Count;
+		int Found;
+		Fstring CompTypeUC( MaxNameLength ); // Component type in upper case
+
+		CompTypeUC = MakeUPPERCase( CompType );
+
+		// See if Already there
+		Found = 0;
+		for ( Count = 1; Count <= NumCompSets; ++Count ) {
+			if ( ( CompTypeUC != CompSets( Count ).CType ) && ( CompSets( Count ).CType != "UNDEFINED" ) ) continue;
+			if ( CompName != CompSets( Count ).CName ) continue;
+			if ( ( InletNode != CompSets( Count ).InletNodeName ) && ( CompSets( Count ).InletNodeName != "UNDEFINED" ) && ( InletNode != "UNDEFINED" ) ) continue;
+			if ( ( OutletNode != CompSets( Count ).OutletNodeName ) && ( CompSets( Count ).OutletNodeName != "UNDEFINED" ) && ( OutletNode != "UNDEFINED" ) ) continue;
+
+			Found = Count;
+			break;
+		}
+
+		if ( Found == 0 ) {
+			SetUpCompSets( "UNDEFINED", "UNDEFINED", CompType, CompName, InletNode, OutletNode, Description );
+		} else {
+			// Fill in node names and component type for previously undefined values:
+			//   If the parent object did not specify a component type or inlet or outlet node, then that value
+			//   is UNDEFINED in CompSets.  When a component calls TestCompSet, the comp type and inlet and
+			//   outlet nodes are known, so they can be filled in for future reference.
+			if ( CompSets( Found ).CType == "UNDEFINED" ) CompSets( Found ).CType = CompTypeUC;
+			if ( CompSets( Found ).InletNodeName == "UNDEFINED" ) CompSets( Found ).InletNodeName = InletNode;
+			if ( CompSets( Found ).OutletNodeName == "UNDEFINED" ) CompSets( Found ).OutletNodeName = OutletNode;
+			if ( CompSets( Found ).Description == "UNDEFINED" ) CompSets( Found ).Description = Description;
+		}
+
+	}
+
+	void
+	TestCompSetInletOutletNodes( bool & ErrorsFound )
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   March 2008
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine tests the comp sets to see if a duplicate comp name
+		// exists under a different set of inlet/outlet nodes.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int Count;
+		int Other;
+		FArray1D_bool AlreadyNoted;
+
+		// Test component sets created by branches
+		AlreadyNoted.allocate( NumCompSets );
+		AlreadyNoted = false;
+		for ( Count = 1; Count <= NumCompSets; ++Count ) {
+			for ( Other = 1; Other <= NumCompSets; ++Other ) {
+				if ( Count == Other ) continue;
+				if ( CompSets( Count ).CType == "SOLARCOLLECTOR:UNGLAZEDTRANSPIRED" ) continue;
+				if ( CompSets( Count ).CType != CompSets( Other ).CType || CompSets( Count ).CName != CompSets( Other ).CName ) continue;
+				if ( CompSets( Count ).Description != CompSets( Other ).Description ) {
+					if ( CompSets( Count ).Description != "UNDEFINED" && CompSets( Other ).Description != "UNDEFINED" ) continue;
+				}
+				if ( CompSets( Count ).InletNodeName == CompSets( Other ).InletNodeName ) continue;
+				if ( CompSets( Count ).OutletNodeName == CompSets( Other ).OutletNodeName ) continue;
+				if ( AlreadyNoted( Count ) ) continue;
+				//  All other values must match
+				AlreadyNoted( Other ) = true;
+				ShowSevereError( "Same component name and type has differing Node Names." );
+				ShowContinueError( "   Component:    " + trim( CompSets( Count ).CType ) + ", name=" + trim( CompSets( Count ).CName ) );
+				ShowContinueError( "   Nodes, inlet: " + trim( CompSets( Count ).InletNodeName ) + ", outlet: " + trim( CompSets( Count ).OutletNodeName ) );
+				ShowContinueError( " & Nodes, inlet: " + trim( CompSets( Other ).InletNodeName ) + ", outlet: " + trim( CompSets( Other ).OutletNodeName ) );
+				ShowContinueError( "   Node Types:   " + trim( CompSets( Count ).Description ) + " & " + trim( CompSets( Other ).Description ) );
+				ErrorsFound = true;
+			}
+		}
+
+		//  AlreadyNoted=.FALSE.
+		//  DO Count=1,NumCompSets
+		//    DO Other=1,NumCompSets
+		//      IF (Count == Other) CYCLE
+		//      IF (CompSets(Count)%InletNodeName /= CompSets(Other)%InletNodeName) CYCLE
+		//      IF (AlreadyNoted(Count)) CYCLE
+		//      !  All other values must match
+		//      IF (CompSets(Count)%ParentCType == 'BRANCH' .or. CompSets(Other)%ParentCType == 'BRANCH') CYCLE
+		//      IF (CompSets(Count)%Description /= CompSets(Other)%Description) CYCLE
+		//      IF (CompSets(Count)%CType == CompSets(Other)%CType) THEN
+		//        AlreadyNoted(Other)=.TRUE.
+		//        CALL ShowWarningError('Node used as an inlet more than once: '//TRIM(CompSets(Count)%InletNodeName))
+		//        CALL ShowContinueError('  Used by     : '//TRIM(CompSets(Count)%ParentCType)//  &
+		//                                                         ', name='//TRIM(CompSets(Count)%ParentCName))
+		//        CALL ShowContinueError('  as inlet for: '//TRIM(CompSets(Count)%CType)//', name='//TRIM(CompSets(Count)%CName))
+		//        CALL ShowContinueError('  and  by     : '//TRIM(CompSets(Other)%ParentCType)//  &
+		//                                                         ', name='//TRIM(CompSets(Other)%ParentCName))
+		//        CALL ShowContinueError('  as inlet for: '//TRIM(CompSets(Other)%CType)//', name='//TRIM(CompSets(Other)%CName))
+		//        ErrorsFound=.TRUE.
+		//      ENDIF
+		//    ENDDO
+		//  ENDDO
+
+		//  AlreadyNoted=.FALSE.
+		//  DO Count=1,NumCompSets
+		//    DO Other=1,NumCompSets
+		//      IF (Count == Other) CYCLE
+		//      IF (CompSets(Count)%OutletNodeName /= CompSets(Other)%OutletNodeName) CYCLE
+		//      IF (AlreadyNoted(Count)) CYCLE
+		//      !  All other values must match
+		//      IF (CompSets(Count)%ParentCType == 'BRANCH' .or. CompSets(Other)%ParentCType == 'BRANCH') CYCLE
+		//      IF (CompSets(Count)%Description /= CompSets(Other)%Description) CYCLE
+		//      IF (CompSets(Count)%CType /= CompSets(Other)%CType) THEN
+		//        AlreadyNoted(Other)=.TRUE.
+		//        CALL ShowWarningError('Node used as an outlet more than once: '//TRIM(CompSets(Count)%OutletNodeName))
+		//        CALL ShowContinueError('  Used by      : '//TRIM(CompSets(Count)%ParentCType)//  &
+		//                                ', name='//TRIM(CompSets(Count)%ParentCName))
+		//        CALL ShowContinueError('  as outlet for: '//TRIM(CompSets(Count)%CType)//', name='//TRIM(CompSets(Count)%CName))
+		//        CALL ShowContinueError('  and  by      : '//TRIM(CompSets(Other)%ParentCType)//  &
+		//                                ', name='//TRIM(CompSets(Other)%ParentCName))
+		//        CALL ShowContinueError('  as outlet for: '//TRIM(CompSets(Other)%CType)//', name='//TRIM(CompSets(Other)%CName))
+		//        ErrorsFound=.TRUE.
+		//      ENDIF
+		//    ENDDO
+		//  ENDDO
+
+		AlreadyNoted.deallocate();
+
+	}
+
+	void
+	GetNodeConnectionType(
+		int const NodeNumber,
+		FArray1D_int & NodeConnectType,
+		bool & errFlag
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Lixing Gu
+		//       DATE WRITTEN   Jan 2007
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function provides a connection type with given node number
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItemInList;
+
+		// Argument array dimensioning
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int NodeConnectIndex;
+		int NumInList;
+		FArray1D_int ListArray;
+
+		if ( allocated( NodeConnectType ) ) NodeConnectType.deallocate();
+
+		FindAllNumbersInList( NodeNumber, NodeConnections.NodeNumber(), NumOfNodeConnections, NumInList, ListArray );
+
+		NodeConnectType.allocate( NumInList );
+
+		if ( NumInList > 0 ) {
+			for ( NodeConnectIndex = 1; NodeConnectIndex <= NumInList; ++NodeConnectIndex ) {
+				NodeConnectType( NodeConnectIndex ) = FindItemInList( NodeConnections( ListArray( NodeConnectIndex ) ).ConnectionType, ValidConnectionTypes, NumValidConnectionTypes );
+			}
+		} else {
+			if ( NodeNumber > 0 ) {
+				ShowWarningError( "Node not found = " + trim( NodeID( NodeNumber ) ) + "." );
+			} else {
+				ShowWarningError( "Invalid node number passed = 0." );
+			}
+			errFlag = true;
+		}
+
+	}
+
+	void
+	FindAllNumbersInList(
+		int const WhichNumber,
+		FArray1A_int const ListOfItems,
+		int const NumItems,
+		int & CountOfItems, // Number of items found
+		FArray1D_int & AllNumbersInList // Index array to all numbers found
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         R. Raustad
+		//       DATE WRITTEN   January 2007
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function looks up a number(integer) in a similar list of
+		// items and returns the index of the item in the list, if
+		// found.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Argument array dimensioning
+		ListOfItems.dim( star );
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int Count; // Counter for DO loops
+
+		CountOfItems = 0;
+
+		if ( allocated( AllNumbersInList ) ) AllNumbersInList.deallocate();
+
+		for ( Count = 1; Count <= NumItems; ++Count ) {
+			if ( WhichNumber == ListOfItems( Count ) ) {
+				++CountOfItems;
+			}
+		}
+
+		if ( CountOfItems > 0 ) {
+
+			AllNumbersInList.allocate( CountOfItems );
+			AllNumbersInList = 0;
+			CountOfItems = 0;
+
+			for ( Count = 1; Count <= NumItems; ++Count ) {
+				if ( WhichNumber == ListOfItems( Count ) ) {
+					++CountOfItems;
+					AllNumbersInList( CountOfItems ) = Count;
+				}
+			}
+
+		}
+
+	}
+
+	//     NOTICE
+
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     and The Regents of the University of California through Ernest Orlando Lawrence
+	//     Berkeley National Laboratory.  All rights reserved.
+
+	//     Portions of the EnergyPlus software package have been developed and copyrighted
+	//     by other individuals, companies and institutions.  These portions have been
+	//     incorporated into the EnergyPlus software package under license.   For a complete
+	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+
+	//     NOTICE: The U.S. Government is granted for itself and others acting on its
+	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
+	//     reproduce, prepare derivative works, and perform publicly and display publicly.
+	//     Beginning five (5) years after permission to assert copyright is granted,
+	//     subject to two possible five year renewals, the U.S. Government is granted for
+	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
+	//     worldwide license in this data to reproduce, prepare derivative works,
+	//     distribute copies to the public, perform publicly and display publicly, and to
+	//     permit others to do so.
+
+	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+
+} // BranchNodeConnections
+
+} // EnergyPlus

@@ -1,0 +1,1488 @@
+#ifndef OutputProcessor_hh_INCLUDED
+#define OutputProcessor_hh_INCLUDED
+
+// ObjexxFCL Headers
+#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/FArray1S.hh>
+#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Fstring.hh>
+#include <ObjexxFCL/Optional.hh>
+#include <ObjexxFCL/Reference.hh>
+
+// EnergyPlus Headers
+#include <EnergyPlus.hh>
+#include <DataGlobals.hh>
+
+namespace EnergyPlus {
+
+namespace OutputProcessor {
+
+	// Using/Aliasing
+	using DataGlobals::MaxNameLength;
+
+	// Data
+	// in this file should obey a USE OutputProcessor, ONLY: rule.
+
+	// MODULE PARAMETER DEFINITIONS:
+	extern int const ReportEach; // Write out each time UpdatedataandReport is called
+	extern int const ReportTimeStep; // Write out at 'EndTimeStepFlag'
+	extern int const ReportHourly; // Write out at 'EndHourFlag'
+	extern int const ReportDaily; // Write out at 'EndDayFlag'
+	extern int const ReportMonthly; // Write out at end of month (must be determined)
+	extern int const ReportSim; // Write out once per environment 'EndEnvrnFlag'
+
+	extern int const ReportVDD_No; // Don't report the variable dictionaries in any form
+	extern int const ReportVDD_Yes; // Report the variable dictionaries in "report format"
+	extern int const ReportVDD_IDF; // Report the variable dictionaries in "IDF format"
+
+	extern Real64 const MinSetValue;
+	extern Real64 const MaxSetValue;
+	extern int const IMinSetValue;
+	extern int const IMaxSetValue;
+
+	extern int const ZoneVar; // Type value for those variables reported on the Zone Time Step
+	extern int const HVACVar; // Type value for those variables reported on the System Time Step
+
+	extern int const AveragedVar; // Type value for "averaged" variables
+	extern int const SummedVar; // Type value for "summed" variables
+
+	extern int const VarType_NotFound; // ref: GetVariableKeyCountandType, 0 = not found
+	extern int const VarType_Integer; // ref: GetVariableKeyCountandType, 1 = integer
+	extern int const VarType_Real; // ref: GetVariableKeyCountandType, 2 = real
+	extern int const VarType_Meter; // ref: GetVariableKeyCountandType, 3 = meter
+	extern int const VarType_Schedule; // ref: GetVariableKeyCountandType, 4 = schedule
+
+	extern int const MeterType_Normal; // Type value for normal meters
+	extern int const MeterType_Custom; // Type value for custom meters
+	extern int const MeterType_CustomDec; // Type value for custom meters that decrement another meter
+	extern int const MeterType_CustomDiff; // Type value for custom meters that difference another meter
+
+	extern Fstring const TimeStampFormat;
+	extern Fstring const DailyStampFormat;
+	extern Fstring const MonthlyStampFormat;
+	extern Fstring const RunPeriodStampFormat;
+	extern Fstring const fmta;
+	extern FArray1D_Fstring const DayTypes;
+	extern Fstring const BlankString;
+	extern int const UnitsStringLength;
+
+	extern int const RVarAllocInc;
+	extern int const LVarAllocInc;
+	extern int const IVarAllocInc;
+
+	//  For IP Units (tabular reports) certain resources will be put in sub-tables
+	//INTEGER, PARAMETER :: RT_IPUnits_Consumption=0
+	extern int const RT_IPUnits_Electricity;
+	extern int const RT_IPUnits_Gas;
+	extern int const RT_IPUnits_Cooling;
+	extern int const RT_IPUnits_Water;
+	extern int const RT_IPUnits_OtherKG;
+	extern int const RT_IPUnits_OtherM3;
+	extern int const RT_IPUnits_OtherL;
+	extern int const RT_IPUnits_OtherJ;
+
+	// DERIVED TYPE DEFINITIONS:
+
+	extern int InstMeterCacheSize; // the maximum size of the instant meter cache used in GetInstantMeterValue
+	extern int InstMeterCacheSizeInc; // the increment for the instant meter cache used in GetInstantMeterValue
+	extern FArray1D_int InstMeterCache; // contains a list of RVariableTypes that make up a specific meter
+	extern FArray1D_int InstMeterCacheCopy; // for dynamic array resizing
+	extern int InstMeterCacheLastUsed; // the last item in the instant meter cache used
+
+	// INTERFACE BLOCK SPECIFICATIONS:
+	// na
+
+	// MODULE VARIABLE DECLARATIONS:
+
+	extern int CurrentReportNumber;
+	extern int NumVariablesForOutput;
+	extern int MaxVariablesForOutput;
+	extern int NumOfRVariable_Setup;
+	extern int NumTotalRVariable;
+	extern int NumOfRVariable_Sum;
+	extern int NumOfRVariable_Meter;
+	extern int NumOfRVariable;
+	extern int MaxRVariable;
+	extern int NumOfIVariable_Setup;
+	extern int NumTotalIVariable;
+	extern int NumOfIVariable_Sum;
+	extern int NumOfIVariable;
+	extern int MaxIVariable;
+	extern bool OutputInitialized;
+	extern int ProduceReportVDD;
+	extern int OutputFileRVDD; // Unit number for Report Variables Data Dictionary (output)
+	extern int OutputFileMVDD; // Unit number for Meter Variables Data Dictionary (output)
+	extern int OutputFileMeterDetails; // Unit number for Meter Details file (output)
+	extern int NumHoursInDay;
+	extern int NumHoursInMonth;
+	extern int NumHoursInSim;
+	extern FArray1D_int ReportList;
+	extern int NumReportList;
+	extern int NumExtraVars;
+	extern FArray2D_Fstring FreqNotice; // =(/'! Each Call','! TimeStep',' !Hourly',',Daily',',Monthly',',Environment'/)
+
+	extern int NumOfReqVariables; // Current number of Requested Report Variables
+
+	extern int NumVarMeterArrays; // Current number of Arrays pointing to meters
+
+	extern int NumEnergyMeters; // Current number of Energy Meters
+	extern FArray1D< Real64 > MeterValue; // This holds the current timestep value for each meter.
+
+	extern int TimeStepStampReportNbr; // TimeStep and Hourly Report number
+	extern Fstring TimeStepStampReportChr; // TimeStep and Hourly Report number (character -- for printing)
+	extern bool TrackingHourlyVariables; // Requested Hourly Report Variables
+	extern int DailyStampReportNbr; // Daily Report number
+	extern Fstring DailyStampReportChr; // Daily Report number (character -- for printing)
+	extern bool TrackingDailyVariables; // Requested Daily Report Variables
+	extern int MonthlyStampReportNbr; // Monthly Report number
+	extern Fstring MonthlyStampReportChr; // Monthly Report number (character -- for printing)
+	extern bool TrackingMonthlyVariables; // Requested Monthly Report Variables
+	extern int RunPeriodStampReportNbr; // RunPeriod Report number
+	extern Fstring RunPeriodStampReportChr; // RunPeriod Report number (character -- for printing)
+	extern bool TrackingRunPeriodVariables; // Requested RunPeriod Report Variables
+	extern Real64 SecondsPerTimeStep; // Seconds from NumTimeStepInHour
+	extern bool ErrorsLogged;
+	extern bool ProduceVariableDictionary;
+
+	extern int MaxNumSubcategories;
+
+	// All routines should be listed here whether private or not
+	//PUBLIC  ReallocateTVar
+	//PUBLIC  SetReportNow
+
+	// Types
+
+	struct TimeSteps
+	{
+		// Members
+		Reference< Real64 > TimeStep; // Pointer to the Actual Time Step Variable (Zone or HVAC)
+		Real64 CurMinute; // Current minute (decoded from real Time Step Value)
+
+		// Default Constructor
+		TimeSteps()
+		{}
+
+		// Member Constructor
+		TimeSteps(
+			Reference< Real64 > const TimeStep, // Pointer to the Actual Time Step Variable (Zone or HVAC)
+			Real64 const CurMinute // Current minute (decoded from real Time Step Value)
+		) :
+			TimeStep( TimeStep ),
+			CurMinute( CurMinute )
+		{}
+
+	};
+
+	struct RealVariables
+	{
+		// Members
+		Reference< Real64 > Which; // The POINTER to the actual variable holding the value
+		Real64 Value; // Current Value of the variable (to resolution of Zone Time Step)
+		Real64 TSValue; // Value of this variable at the Zone Time Step
+		Real64 EITSValue; // Value of this variable at the Zone Time Step for external interface
+		Real64 StoreValue; // At end of Zone Time Step, value is placed here for later reporting
+		Real64 NumStored; // Number of hours stored
+		int StoreType; // Variable Type (Summed/Non-Static or Average/Static)
+		bool Stored; // True when value is stored
+		bool Report; // User has requested reporting of this variable in the IDF
+		bool tsStored; // if stored for this zone timestep
+		bool thisTSStored; // if stored for this zone timestep
+		int thisTSCount;
+		int ReportFreq; // How often to report this variable
+		Real64 MaxValue; // Maximum reporting (only for Averaged variables, and those greater than Time Step)
+		int maxValueDate; // Date stamp of maximum
+		Real64 MinValue; // Minimum reporting (only for Averaged variables, and those greater than Time Step)
+		int minValueDate; // Date stamp of minimum
+		int ReportID; // Report variable ID number
+		Fstring ReportIDChr; // Report variable ID number (character -- for printing)
+		int SchedPtr; // If scheduled, this points to the schedule
+		int MeterArrayPtr; // If metered, this points to an array of applicable meters
+		int ZoneMult; // If metered, Zone Multiplier is applied
+		int ZoneListMult; // If metered, Zone List Multiplier is applied
+
+		// Default Constructor
+		RealVariables() :
+			Value( 0.0 ),
+			TSValue( 0.0 ),
+			EITSValue( 0.0 ),
+			StoreValue( 0.0 ),
+			NumStored( 0.0 ),
+			StoreType( 0 ),
+			Stored( false ),
+			Report( false ),
+			tsStored( false ),
+			thisTSStored( false ),
+			thisTSCount( 0 ),
+			ReportFreq( 0 ),
+			MaxValue( -9999. ),
+			maxValueDate( 0 ),
+			MinValue( 9999. ),
+			minValueDate( 0 ),
+			ReportID( 0 ),
+			ReportIDChr( 16, BlankString ),
+			SchedPtr( 0 ),
+			MeterArrayPtr( 0 ),
+			ZoneMult( 1 ),
+			ZoneListMult( 1 )
+		{}
+
+		// Member Constructor
+		RealVariables(
+			Reference< Real64 > const Which, // The POINTER to the actual variable holding the value
+			Real64 const Value, // Current Value of the variable (to resolution of Zone Time Step)
+			Real64 const TSValue, // Value of this variable at the Zone Time Step
+			Real64 const EITSValue, // Value of this variable at the Zone Time Step for external interface
+			Real64 const StoreValue, // At end of Zone Time Step, value is placed here for later reporting
+			Real64 const NumStored, // Number of hours stored
+			int const StoreType, // Variable Type (Summed/Non-Static or Average/Static)
+			bool const Stored, // True when value is stored
+			bool const Report, // User has requested reporting of this variable in the IDF
+			bool const tsStored, // if stored for this zone timestep
+			bool const thisTSStored, // if stored for this zone timestep
+			int const thisTSCount,
+			int const ReportFreq, // How often to report this variable
+			Real64 const MaxValue, // Maximum reporting (only for Averaged variables, and those greater than Time Step)
+			int const maxValueDate, // Date stamp of maximum
+			Real64 const MinValue, // Minimum reporting (only for Averaged variables, and those greater than Time Step)
+			int const minValueDate, // Date stamp of minimum
+			int const ReportID, // Report variable ID number
+			Fstring const & ReportIDChr, // Report variable ID number (character -- for printing)
+			int const SchedPtr, // If scheduled, this points to the schedule
+			int const MeterArrayPtr, // If metered, this points to an array of applicable meters
+			int const ZoneMult, // If metered, Zone Multiplier is applied
+			int const ZoneListMult // If metered, Zone List Multiplier is applied
+		) :
+			Which( Which ),
+			Value( Value ),
+			TSValue( TSValue ),
+			EITSValue( EITSValue ),
+			StoreValue( StoreValue ),
+			NumStored( NumStored ),
+			StoreType( StoreType ),
+			Stored( Stored ),
+			Report( Report ),
+			tsStored( tsStored ),
+			thisTSStored( thisTSStored ),
+			thisTSCount( thisTSCount ),
+			ReportFreq( ReportFreq ),
+			MaxValue( MaxValue ),
+			maxValueDate( maxValueDate ),
+			MinValue( MinValue ),
+			minValueDate( minValueDate ),
+			ReportID( ReportID ),
+			ReportIDChr( 16, ReportIDChr ),
+			SchedPtr( SchedPtr ),
+			MeterArrayPtr( MeterArrayPtr ),
+			ZoneMult( ZoneMult ),
+			ZoneListMult( ZoneListMult )
+		{}
+
+	};
+
+	struct IntegerVariables
+	{
+		// Members
+		Reference_int Which; // The POINTER to the actual variable holding the value
+		Real64 Value; // Current Value of the variable (to resolution of Zone Time Step)
+		Real64 TSValue; // Value of this variable at the Zone Time Step
+		Real64 EITSValue; // Value of this variable at the Zone Time Step for external interface
+		Real64 StoreValue; // At end of Zone Time Step, value is placed here for later reporting
+		Real64 NumStored; // Number of hours stored
+		int StoreType; // Variable Type (Summed/Non-Static or Average/Static)
+		bool Stored; // True when value is stored
+		bool Report; // User has requested reporting of this variable in the IDF
+		bool tsStored; // if stored for this zone timestep
+		bool thisTSStored; // if stored for this zone timestep
+		int thisTSCount;
+		int ReportFreq; // How often to report this variable
+		int MaxValue; // Maximum reporting (only for Averaged variables, and those greater than Time Step)
+		int maxValueDate; // Date stamp of maximum
+		int MinValue; // Minimum reporting (only for Averaged variables, and those greater than Time Step)
+		int minValueDate; // Date stamp of minimum
+		int ReportID; // Report variable ID number
+		Fstring ReportIDChr; // Report variable ID number (character -- for printing)
+		int SchedPtr; // If scheduled, this points to the schedule
+
+		// Default Constructor
+		IntegerVariables() :
+			Value( 0.0 ),
+			TSValue( 0.0 ),
+			EITSValue( 0.0 ),
+			StoreValue( 0.0 ),
+			NumStored( 0.0 ),
+			StoreType( 0 ),
+			Stored( false ),
+			Report( false ),
+			tsStored( false ),
+			thisTSStored( false ),
+			thisTSCount( 0 ),
+			ReportFreq( 0 ),
+			MaxValue( -9999 ),
+			maxValueDate( 0 ),
+			MinValue( 9999 ),
+			minValueDate( 0 ),
+			ReportID( 0 ),
+			ReportIDChr( 16, BlankString ),
+			SchedPtr( 0 )
+		{}
+
+		// Member Constructor
+		IntegerVariables(
+			Reference_int const Which, // The POINTER to the actual variable holding the value
+			Real64 const Value, // Current Value of the variable (to resolution of Zone Time Step)
+			Real64 const TSValue, // Value of this variable at the Zone Time Step
+			Real64 const EITSValue, // Value of this variable at the Zone Time Step for external interface
+			Real64 const StoreValue, // At end of Zone Time Step, value is placed here for later reporting
+			Real64 const NumStored, // Number of hours stored
+			int const StoreType, // Variable Type (Summed/Non-Static or Average/Static)
+			bool const Stored, // True when value is stored
+			bool const Report, // User has requested reporting of this variable in the IDF
+			bool const tsStored, // if stored for this zone timestep
+			bool const thisTSStored, // if stored for this zone timestep
+			int const thisTSCount,
+			int const ReportFreq, // How often to report this variable
+			int const MaxValue, // Maximum reporting (only for Averaged variables, and those greater than Time Step)
+			int const maxValueDate, // Date stamp of maximum
+			int const MinValue, // Minimum reporting (only for Averaged variables, and those greater than Time Step)
+			int const minValueDate, // Date stamp of minimum
+			int const ReportID, // Report variable ID number
+			Fstring const & ReportIDChr, // Report variable ID number (character -- for printing)
+			int const SchedPtr // If scheduled, this points to the schedule
+		) :
+			Which( Which ),
+			Value( Value ),
+			TSValue( TSValue ),
+			EITSValue( EITSValue ),
+			StoreValue( StoreValue ),
+			NumStored( NumStored ),
+			StoreType( StoreType ),
+			Stored( Stored ),
+			Report( Report ),
+			tsStored( tsStored ),
+			thisTSStored( thisTSStored ),
+			thisTSCount( thisTSCount ),
+			ReportFreq( ReportFreq ),
+			MaxValue( MaxValue ),
+			maxValueDate( maxValueDate ),
+			MinValue( MinValue ),
+			minValueDate( minValueDate ),
+			ReportID( ReportID ),
+			ReportIDChr( 16, ReportIDChr ),
+			SchedPtr( SchedPtr )
+		{}
+
+	};
+
+	struct VariableTypeForDDOutput
+	{
+		// Members
+		int IndexType; // Type whether Zone or HVAC
+		int StoreType; // Variable Type (Summed/Non-Static or Average/Static)
+		int VariableType; // Integer, Real.
+		int Next; // Next variable of same name (different units)
+		bool ReportedOnDDFile; // true after written to .rdd/.mdd file
+		Fstring VarNameOnly; // Name of Variable
+		Fstring UnitsString; // Units for Variable (no brackets)
+
+		// Default Constructor
+		VariableTypeForDDOutput() :
+			IndexType( 0 ),
+			StoreType( 0 ),
+			VariableType( VarType_NotFound ),
+			Next( 0 ),
+			ReportedOnDDFile( false ),
+			VarNameOnly( MaxNameLength, BlankString ),
+			UnitsString( UnitsStringLength, BlankString )
+		{}
+
+		// Member Constructor
+		VariableTypeForDDOutput(
+			int const IndexType, // Type whether Zone or HVAC
+			int const StoreType, // Variable Type (Summed/Non-Static or Average/Static)
+			int const VariableType, // Integer, Real.
+			int const Next, // Next variable of same name (different units)
+			bool const ReportedOnDDFile, // true after written to .rdd/.mdd file
+			Fstring const & VarNameOnly, // Name of Variable
+			Fstring const & UnitsString // Units for Variable (no brackets)
+		) :
+			IndexType( IndexType ),
+			StoreType( StoreType ),
+			VariableType( VariableType ),
+			Next( Next ),
+			ReportedOnDDFile( ReportedOnDDFile ),
+			VarNameOnly( MaxNameLength, VarNameOnly ),
+			UnitsString( UnitsStringLength, UnitsString )
+		{}
+
+	};
+
+	struct RealVariableType
+	{
+		// Members
+		int IndexType; // Type whether Zone or HVAC
+		int StoreType; // Variable Type (Summed/Non-Static or Average/Static)
+		int ReportID; // Report variable ID number
+		Fstring VarName; // Name of Variable key:variable
+		Fstring VarNameUC; // Name of Variable (Uppercase)
+		Fstring VarNameOnly; // Name of Variable
+		Fstring VarNameOnlyUC; // Name of Variable with out key in uppercase
+		Fstring KeyNameOnlyUC; // Name of key only witht out variable in uppercase
+		Fstring UnitsString; // Units for Variable (no brackets)
+		Reference< RealVariables > VarPtr; // Pointer used to real Variables structure
+
+		// Default Constructor
+		RealVariableType() :
+			IndexType( 0 ),
+			StoreType( 0 ),
+			ReportID( 0 ),
+			VarName( MaxNameLength * 2 + 1, BlankString ),
+			VarNameUC( MaxNameLength * 2 + 1, BlankString ),
+			VarNameOnly( MaxNameLength, BlankString ),
+			VarNameOnlyUC( MaxNameLength, BlankString ),
+			KeyNameOnlyUC( MaxNameLength, BlankString ),
+			UnitsString( UnitsStringLength, BlankString )
+		{}
+
+		// Member Constructor
+		RealVariableType(
+			int const IndexType, // Type whether Zone or HVAC
+			int const StoreType, // Variable Type (Summed/Non-Static or Average/Static)
+			int const ReportID, // Report variable ID number
+			Fstring const & VarName, // Name of Variable key:variable
+			Fstring const & VarNameUC, // Name of Variable (Uppercase)
+			Fstring const & VarNameOnly, // Name of Variable
+			Fstring const & VarNameOnlyUC, // Name of Variable with out key in uppercase
+			Fstring const & KeyNameOnlyUC, // Name of key only witht out variable in uppercase
+			Fstring const & UnitsString, // Units for Variable (no brackets)
+			Reference< RealVariables > const VarPtr // Pointer used to real Variables structure
+		) :
+			IndexType( IndexType ),
+			StoreType( StoreType ),
+			ReportID( ReportID ),
+			VarName( MaxNameLength * 2 + 1, VarName ),
+			VarNameUC( MaxNameLength * 2 + 1, VarNameUC ),
+			VarNameOnly( MaxNameLength, VarNameOnly ),
+			VarNameOnlyUC( MaxNameLength, VarNameOnlyUC ),
+			KeyNameOnlyUC( MaxNameLength, KeyNameOnlyUC ),
+			UnitsString( UnitsStringLength, UnitsString ),
+			VarPtr( VarPtr )
+		{}
+
+	};
+
+	struct IntegerVariableType
+	{
+		// Members
+		int IndexType; // Type whether Zone or HVAC
+		int StoreType; // Variable Type (Summed/Non-Static or Average/Static)
+		int ReportID; // Report variable ID number
+		Fstring VarName; // Name of Variable
+		Fstring VarNameUC; // Name of Variable
+		Fstring VarNameOnly; // Name of Variable
+		Fstring UnitsString; // Units for Variable (no brackets)
+		Reference< IntegerVariables > VarPtr; // Pointer used to integer Variables structure
+
+		// Default Constructor
+		IntegerVariableType() :
+			IndexType( 0 ),
+			StoreType( 0 ),
+			ReportID( 0 ),
+			VarName( MaxNameLength * 2 + 1, BlankString ),
+			VarNameUC( MaxNameLength * 2 + 1, BlankString ),
+			VarNameOnly( MaxNameLength, BlankString ),
+			UnitsString( UnitsStringLength, BlankString )
+		{}
+
+		// Member Constructor
+		IntegerVariableType(
+			int const IndexType, // Type whether Zone or HVAC
+			int const StoreType, // Variable Type (Summed/Non-Static or Average/Static)
+			int const ReportID, // Report variable ID number
+			Fstring const & VarName, // Name of Variable
+			Fstring const & VarNameUC, // Name of Variable
+			Fstring const & VarNameOnly, // Name of Variable
+			Fstring const & UnitsString, // Units for Variable (no brackets)
+			Reference< IntegerVariables > const VarPtr // Pointer used to integer Variables structure
+		) :
+			IndexType( IndexType ),
+			StoreType( StoreType ),
+			ReportID( ReportID ),
+			VarName( MaxNameLength * 2 + 1, VarName ),
+			VarNameUC( MaxNameLength * 2 + 1, VarNameUC ),
+			VarNameOnly( MaxNameLength, VarNameOnly ),
+			UnitsString( UnitsStringLength, UnitsString ),
+			VarPtr( VarPtr )
+		{}
+
+	};
+
+	struct ReqReportVariables // Structure for requested Report Variables
+	{
+		// Members
+		Fstring Key; // Could be blank or "*"
+		Fstring VarName; // Name of Variable
+		int ReportFreq; // Reporting Frequency
+		int SchedPtr; // Index of the Schedule
+		Fstring SchedName; // Schedule Name
+		bool Used; // True when this combination (key, varname, frequency) has been set
+
+		// Default Constructor
+		ReqReportVariables() :
+			Key( MaxNameLength, BlankString ),
+			VarName( MaxNameLength, BlankString ),
+			ReportFreq( 0 ),
+			SchedPtr( 0 ),
+			SchedName( MaxNameLength, BlankString ),
+			Used( false )
+		{}
+
+		// Member Constructor
+		ReqReportVariables(
+			Fstring const & Key, // Could be blank or "*"
+			Fstring const & VarName, // Name of Variable
+			int const ReportFreq, // Reporting Frequency
+			int const SchedPtr, // Index of the Schedule
+			Fstring const & SchedName, // Schedule Name
+			bool const Used // True when this combination (key, varname, frequency) has been set
+		) :
+			Key( MaxNameLength, Key ),
+			VarName( MaxNameLength, VarName ),
+			ReportFreq( ReportFreq ),
+			SchedPtr( SchedPtr ),
+			SchedName( MaxNameLength, SchedName ),
+			Used( Used )
+		{}
+
+	};
+
+	struct MeterArrayType
+	{
+		// Members
+		int NumOnMeters; // Number of OnMeter Entries for variable
+		int RepVariable; // Backwards pointer to real Variable
+		FArray1D_int OnMeters; // Forward pointer to Meter Numbers
+		int NumOnCustomMeters; // Number of OnCustomMeter Entries for variable
+		FArray1D_int OnCustomMeters; // Forward pointer to Custom Meter Numbers
+
+		// Default Constructor
+		MeterArrayType() :
+			NumOnMeters( 0 ),
+			RepVariable( 0 ),
+			OnMeters( 6, 0 ),
+			NumOnCustomMeters( 0 )
+		{}
+
+		// Member Constructor
+		MeterArrayType(
+			int const NumOnMeters, // Number of OnMeter Entries for variable
+			int const RepVariable, // Backwards pointer to real Variable
+			FArray1_int const & OnMeters, // Forward pointer to Meter Numbers
+			int const NumOnCustomMeters, // Number of OnCustomMeter Entries for variable
+			FArray1_int const & OnCustomMeters // Forward pointer to Custom Meter Numbers
+		) :
+			NumOnMeters( NumOnMeters ),
+			RepVariable( RepVariable ),
+			OnMeters( 6, OnMeters ),
+			NumOnCustomMeters( NumOnCustomMeters ),
+			OnCustomMeters( OnCustomMeters )
+		{}
+
+	};
+
+	struct MeterType
+	{
+		// Members
+		Fstring Name; // Name of the meter
+		Fstring ResourceType; // Resource Type of the meter
+		Fstring EndUse; // End Use of the meter
+		Fstring EndUseSub; // End Use subcategory of the meter
+		Fstring Group; // Group of the meter
+		Fstring Units; // Units for the Meter
+		int RT_forIPUnits; // Resource type number for IP Units (tabular) reporting
+		int TypeOfMeter; // type of meter
+		int SourceMeter; // for custom decrement meters, this is the meter number for the subtraction
+		Real64 TSValue; // TimeStep Value
+		Real64 CurTSValue; // Current TimeStep Value (internal access)
+		bool RptTS; // Report at End of TimeStep (Zone)
+		bool RptTSFO; // Report at End of TimeStep (Zone) -- meter file only
+		int TSRptNum; // Report Number for TS Values
+		Fstring TSRptNumChr; // Report Number for TS Values (character -- for printing)
+		Real64 HRValue; // Hourly Value
+		bool RptHR; // Report at End of Hour
+		bool RptHRFO; // Report at End of Hour -- meter file only
+		Real64 HRMaxVal; // Maximum Value (Hour)
+		int HRMaxValDate; // Date stamp of maximum
+		Real64 HRMinVal; // Minimum Value (Hour)
+		int HRMinValDate; // Date stamp of minimum
+		int HRRptNum; // Report Number for HR Values
+		Fstring HRRptNumChr; // Report Number for HR Values (character -- for printing)
+		Real64 DYValue; // Daily Value
+		bool RptDY; // Report at End of Day
+		bool RptDYFO; // Report at End of Day -- meter file only
+		Real64 DYMaxVal; // Maximum Value (Day)
+		int DYMaxValDate; // Date stamp of maximum
+		Real64 DYMinVal; // Minimum Value (Day)
+		int DYMinValDate; // Date stamp of minimum
+		int DYRptNum; // Report Number for DY Values
+		Fstring DYRptNumChr; // Report Number for DY Values (character -- for printing)
+		Real64 MNValue; // Monthly Value
+		bool RptMN; // Report at End of Month
+		bool RptMNFO; // Report at End of Month -- meter file only
+		Real64 MNMaxVal; // Maximum Value (Month)
+		int MNMaxValDate; // Date stamp of maximum
+		Real64 MNMinVal; // Minimum Value (Month)
+		int MNMinValDate; // Date stamp of minimum
+		int MNRptNum; // Report Number for MN Values
+		Fstring MNRptNumChr; // Report Number for MN Values (character -- for printing)
+		Real64 SMValue; // Simulation Value
+		bool RptSM; // Report at End of Environment/Simulation
+		bool RptSMFO; // Report at End of Environment/Simulation -- meter file only
+		Real64 SMMaxVal; // Maximum Value (Sim)
+		int SMMaxValDate; // Date stamp of maximum
+		Real64 SMMinVal; // Minimum Value (Sim)
+		int SMMinValDate; // Date stamp of minimum
+		int SMRptNum; // Report Number for SM Values
+		Fstring SMRptNumChr; // Report Number for SM Values (character -- for printing)
+		Real64 LastSMValue; // Simulation Value
+		Real64 LastSMMaxVal; // Maximum Value (Sim)
+		int LastSMMaxValDate; // Date stamp of maximum
+		Real64 LastSMMinVal; // Minimum Value (Sim)
+		int LastSMMinValDate; // Date stamp of minimum
+		bool RptAccTS; // Report Cumulative Meter at Time Step
+		bool RptAccTSFO; // Report Cumulative Meter at Time Step -- meter file only
+		bool RptAccHR; // Report Cumulative Meter at Hour
+		bool RptAccHRFO; // Report Cumulative Meter at Hour -- meter file only
+		bool RptAccDY; // Report Cumulative Meter at Day
+		bool RptAccDYFO; // Report Cumulative Meter at Day -- meter file only
+		bool RptAccMN; // Report Cumulative Meter at Month
+		bool RptAccMNFO; // Report Cumulative Meter at Month -- meter file only
+		bool RptAccSM; // Report Cumulative Meter at Run Period
+		bool RptAccSMFO; // Report Cumulative Meter at Run Period -- meter file only
+		int TSAccRptNum; // Report Number for Acc Values
+		int HRAccRptNum; // Report Number for Acc Values
+		int DYAccRptNum; // Report Number for Acc Values
+		int MNAccRptNum; // Report Number for Acc Values
+		int SMAccRptNum; // Report Number for Acc Values
+		int InstMeterCacheStart; // index of the beginning of the instant meter cache
+		int InstMeterCacheEnd; // index of the end of the instant meter cache
+
+		// Default Constructor
+		MeterType() :
+			Name( MaxNameLength * 2, BlankString ),
+			ResourceType( MaxNameLength, BlankString ),
+			EndUse( MaxNameLength, BlankString ),
+			EndUseSub( MaxNameLength, BlankString ),
+			Group( MaxNameLength, BlankString ),
+			Units( UnitsStringLength, BlankString ),
+			RT_forIPUnits( 0 ),
+			TypeOfMeter( MeterType_Normal ),
+			SourceMeter( 0 ),
+			TSValue( 0.0 ),
+			CurTSValue( 0.0 ),
+			RptTS( false ),
+			RptTSFO( false ),
+			TSRptNum( 0 ),
+			TSRptNumChr( 16, BlankString ),
+			HRValue( 0.0 ),
+			RptHR( false ),
+			RptHRFO( false ),
+			HRMaxVal( -99999. ),
+			HRMaxValDate( 0 ),
+			HRMinVal( 99999. ),
+			HRMinValDate( 0 ),
+			HRRptNum( 0 ),
+			HRRptNumChr( 16, BlankString ),
+			DYValue( 0.0 ),
+			RptDY( false ),
+			RptDYFO( false ),
+			DYMaxVal( -99999. ),
+			DYMaxValDate( 0 ),
+			DYMinVal( 99999. ),
+			DYMinValDate( 0 ),
+			DYRptNum( 0 ),
+			DYRptNumChr( 16, BlankString ),
+			MNValue( 0.0 ),
+			RptMN( false ),
+			RptMNFO( false ),
+			MNMaxVal( -99999. ),
+			MNMaxValDate( 0 ),
+			MNMinVal( 99999. ),
+			MNMinValDate( 0 ),
+			MNRptNum( 0 ),
+			MNRptNumChr( 16, BlankString ),
+			SMValue( 0.0 ),
+			RptSM( false ),
+			RptSMFO( false ),
+			SMMaxVal( -99999. ),
+			SMMaxValDate( 0 ),
+			SMMinVal( 99999. ),
+			SMMinValDate( 0 ),
+			SMRptNum( 0 ),
+			SMRptNumChr( 16, BlankString ),
+			LastSMValue( 0.0 ),
+			LastSMMaxVal( -99999. ),
+			LastSMMaxValDate( 0 ),
+			LastSMMinVal( 99999. ),
+			LastSMMinValDate( 0 ),
+			RptAccTS( false ),
+			RptAccTSFO( false ),
+			RptAccHR( false ),
+			RptAccHRFO( false ),
+			RptAccDY( false ),
+			RptAccDYFO( false ),
+			RptAccMN( false ),
+			RptAccMNFO( false ),
+			RptAccSM( false ),
+			RptAccSMFO( false ),
+			TSAccRptNum( 0 ),
+			HRAccRptNum( 0 ),
+			DYAccRptNum( 0 ),
+			MNAccRptNum( 0 ),
+			SMAccRptNum( 0 ),
+			InstMeterCacheStart( 0 ),
+			InstMeterCacheEnd( 0 )
+		{}
+
+		// Member Constructor
+		MeterType(
+			Fstring const & Name, // Name of the meter
+			Fstring const & ResourceType, // Resource Type of the meter
+			Fstring const & EndUse, // End Use of the meter
+			Fstring const & EndUseSub, // End Use subcategory of the meter
+			Fstring const & Group, // Group of the meter
+			Fstring const & Units, // Units for the Meter
+			int const RT_forIPUnits, // Resource type number for IP Units (tabular) reporting
+			int const TypeOfMeter, // type of meter
+			int const SourceMeter, // for custom decrement meters, this is the meter number for the subtraction
+			Real64 const TSValue, // TimeStep Value
+			Real64 const CurTSValue, // Current TimeStep Value (internal access)
+			bool const RptTS, // Report at End of TimeStep (Zone)
+			bool const RptTSFO, // Report at End of TimeStep (Zone) -- meter file only
+			int const TSRptNum, // Report Number for TS Values
+			Fstring const & TSRptNumChr, // Report Number for TS Values (character -- for printing)
+			Real64 const HRValue, // Hourly Value
+			bool const RptHR, // Report at End of Hour
+			bool const RptHRFO, // Report at End of Hour -- meter file only
+			Real64 const HRMaxVal, // Maximum Value (Hour)
+			int const HRMaxValDate, // Date stamp of maximum
+			Real64 const HRMinVal, // Minimum Value (Hour)
+			int const HRMinValDate, // Date stamp of minimum
+			int const HRRptNum, // Report Number for HR Values
+			Fstring const & HRRptNumChr, // Report Number for HR Values (character -- for printing)
+			Real64 const DYValue, // Daily Value
+			bool const RptDY, // Report at End of Day
+			bool const RptDYFO, // Report at End of Day -- meter file only
+			Real64 const DYMaxVal, // Maximum Value (Day)
+			int const DYMaxValDate, // Date stamp of maximum
+			Real64 const DYMinVal, // Minimum Value (Day)
+			int const DYMinValDate, // Date stamp of minimum
+			int const DYRptNum, // Report Number for DY Values
+			Fstring const & DYRptNumChr, // Report Number for DY Values (character -- for printing)
+			Real64 const MNValue, // Monthly Value
+			bool const RptMN, // Report at End of Month
+			bool const RptMNFO, // Report at End of Month -- meter file only
+			Real64 const MNMaxVal, // Maximum Value (Month)
+			int const MNMaxValDate, // Date stamp of maximum
+			Real64 const MNMinVal, // Minimum Value (Month)
+			int const MNMinValDate, // Date stamp of minimum
+			int const MNRptNum, // Report Number for MN Values
+			Fstring const & MNRptNumChr, // Report Number for MN Values (character -- for printing)
+			Real64 const SMValue, // Simulation Value
+			bool const RptSM, // Report at End of Environment/Simulation
+			bool const RptSMFO, // Report at End of Environment/Simulation -- meter file only
+			Real64 const SMMaxVal, // Maximum Value (Sim)
+			int const SMMaxValDate, // Date stamp of maximum
+			Real64 const SMMinVal, // Minimum Value (Sim)
+			int const SMMinValDate, // Date stamp of minimum
+			int const SMRptNum, // Report Number for SM Values
+			Fstring const & SMRptNumChr, // Report Number for SM Values (character -- for printing)
+			Real64 const LastSMValue, // Simulation Value
+			Real64 const LastSMMaxVal, // Maximum Value (Sim)
+			int const LastSMMaxValDate, // Date stamp of maximum
+			Real64 const LastSMMinVal, // Minimum Value (Sim)
+			int const LastSMMinValDate, // Date stamp of minimum
+			bool const RptAccTS, // Report Cumulative Meter at Time Step
+			bool const RptAccTSFO, // Report Cumulative Meter at Time Step -- meter file only
+			bool const RptAccHR, // Report Cumulative Meter at Hour
+			bool const RptAccHRFO, // Report Cumulative Meter at Hour -- meter file only
+			bool const RptAccDY, // Report Cumulative Meter at Day
+			bool const RptAccDYFO, // Report Cumulative Meter at Day -- meter file only
+			bool const RptAccMN, // Report Cumulative Meter at Month
+			bool const RptAccMNFO, // Report Cumulative Meter at Month -- meter file only
+			bool const RptAccSM, // Report Cumulative Meter at Run Period
+			bool const RptAccSMFO, // Report Cumulative Meter at Run Period -- meter file only
+			int const TSAccRptNum, // Report Number for Acc Values
+			int const HRAccRptNum, // Report Number for Acc Values
+			int const DYAccRptNum, // Report Number for Acc Values
+			int const MNAccRptNum, // Report Number for Acc Values
+			int const SMAccRptNum, // Report Number for Acc Values
+			int const InstMeterCacheStart, // index of the beginning of the instant meter cache
+			int const InstMeterCacheEnd // index of the end of the instant meter cache
+		) :
+			Name( MaxNameLength * 2, Name ),
+			ResourceType( MaxNameLength, ResourceType ),
+			EndUse( MaxNameLength, EndUse ),
+			EndUseSub( MaxNameLength, EndUseSub ),
+			Group( MaxNameLength, Group ),
+			Units( UnitsStringLength, Units ),
+			RT_forIPUnits( RT_forIPUnits ),
+			TypeOfMeter( TypeOfMeter ),
+			SourceMeter( SourceMeter ),
+			TSValue( TSValue ),
+			CurTSValue( CurTSValue ),
+			RptTS( RptTS ),
+			RptTSFO( RptTSFO ),
+			TSRptNum( TSRptNum ),
+			TSRptNumChr( 16, TSRptNumChr ),
+			HRValue( HRValue ),
+			RptHR( RptHR ),
+			RptHRFO( RptHRFO ),
+			HRMaxVal( HRMaxVal ),
+			HRMaxValDate( HRMaxValDate ),
+			HRMinVal( HRMinVal ),
+			HRMinValDate( HRMinValDate ),
+			HRRptNum( HRRptNum ),
+			HRRptNumChr( 16, HRRptNumChr ),
+			DYValue( DYValue ),
+			RptDY( RptDY ),
+			RptDYFO( RptDYFO ),
+			DYMaxVal( DYMaxVal ),
+			DYMaxValDate( DYMaxValDate ),
+			DYMinVal( DYMinVal ),
+			DYMinValDate( DYMinValDate ),
+			DYRptNum( DYRptNum ),
+			DYRptNumChr( 16, DYRptNumChr ),
+			MNValue( MNValue ),
+			RptMN( RptMN ),
+			RptMNFO( RptMNFO ),
+			MNMaxVal( MNMaxVal ),
+			MNMaxValDate( MNMaxValDate ),
+			MNMinVal( MNMinVal ),
+			MNMinValDate( MNMinValDate ),
+			MNRptNum( MNRptNum ),
+			MNRptNumChr( 16, MNRptNumChr ),
+			SMValue( SMValue ),
+			RptSM( RptSM ),
+			RptSMFO( RptSMFO ),
+			SMMaxVal( SMMaxVal ),
+			SMMaxValDate( SMMaxValDate ),
+			SMMinVal( SMMinVal ),
+			SMMinValDate( SMMinValDate ),
+			SMRptNum( SMRptNum ),
+			SMRptNumChr( 16, SMRptNumChr ),
+			LastSMValue( LastSMValue ),
+			LastSMMaxVal( LastSMMaxVal ),
+			LastSMMaxValDate( LastSMMaxValDate ),
+			LastSMMinVal( LastSMMinVal ),
+			LastSMMinValDate( LastSMMinValDate ),
+			RptAccTS( RptAccTS ),
+			RptAccTSFO( RptAccTSFO ),
+			RptAccHR( RptAccHR ),
+			RptAccHRFO( RptAccHRFO ),
+			RptAccDY( RptAccDY ),
+			RptAccDYFO( RptAccDYFO ),
+			RptAccMN( RptAccMN ),
+			RptAccMNFO( RptAccMNFO ),
+			RptAccSM( RptAccSM ),
+			RptAccSMFO( RptAccSMFO ),
+			TSAccRptNum( TSAccRptNum ),
+			HRAccRptNum( HRAccRptNum ),
+			DYAccRptNum( DYAccRptNum ),
+			MNAccRptNum( MNAccRptNum ),
+			SMAccRptNum( SMAccRptNum ),
+			InstMeterCacheStart( InstMeterCacheStart ),
+			InstMeterCacheEnd( InstMeterCacheEnd )
+		{}
+
+	};
+
+	struct EndUseCategoryType
+	{
+		// Members
+		Fstring Name; // End use category name
+		Fstring DisplayName; // Display name for output table
+		int NumSubcategories;
+		FArray1D_Fstring SubcategoryName; // Array of subcategory names
+
+		// Default Constructor
+		EndUseCategoryType() :
+			Name( MaxNameLength, BlankString ),
+			DisplayName( MaxNameLength, BlankString ),
+			NumSubcategories( 0 ),
+			SubcategoryName( sFstring( MaxNameLength ) )
+		{}
+
+		// Member Constructor
+		EndUseCategoryType(
+			Fstring const & Name, // End use category name
+			Fstring const & DisplayName, // Display name for output table
+			int const NumSubcategories,
+			FArray1_Fstring const & SubcategoryName // Array of subcategory names
+		) :
+			Name( MaxNameLength, Name ),
+			DisplayName( MaxNameLength, DisplayName ),
+			NumSubcategories( NumSubcategories ),
+			SubcategoryName( SubcategoryName )
+		{}
+
+	};
+
+	// Object Data
+	extern FArray1D< TimeSteps > TimeValue; // Pointers to the actual TimeStep variables
+	extern FArray1D< RealVariableType > RVariableTypes; // Variable Types structure (use NumOfRVariables to traverse)
+	extern FArray1D< IntegerVariableType > IVariableTypes; // Variable Types structure (use NumOfIVariables to traverse)
+	extern FArray1D< VariableTypeForDDOutput > DDVariableTypes; // Variable Types structure (use NumVariablesForOutput to traverse)
+	extern Reference< RealVariables > RVariable;
+	extern Reference< IntegerVariables > IVariable;
+	extern Reference< RealVariables > RVar;
+	extern Reference< IntegerVariables > IVar;
+	extern FArray1D< ReqReportVariables > ReqRepVars;
+	extern FArray1D< MeterArrayType > VarMeterArrays;
+	extern FArray1D< MeterType > EnergyMeters;
+	extern FArray1D< EndUseCategoryType > EndUseCategory;
+
+	// Functions
+
+	void
+	InitializeOutput();
+
+	void
+	SetupTimePointers(
+		Fstring const & IndexKey, // Which timestep is being set up, 'Zone'=1, 'HVAC'=2
+		Real64 & TimeStep // The timestep variable.  Used to get the address
+	);
+
+	void
+	CheckReportVariable(
+		Fstring const & KeyedValue, // Associated Key for this variable
+		Fstring const & VarName // String Name of variable (without units)
+	);
+
+	void
+	BuildKeyVarList(
+		Fstring const & KeyedValue, // Associated Key for this variable
+		Fstring const & VariableName, // String Name of variable
+		int const MinIndx, // Min number (from previous routine) for this variable
+		int const MaxIndx // Max number (from previous routine) for this variable
+	);
+
+	void
+	AddBlankKeys(
+		Fstring const & VariableName, // String Name of variable
+		int const MinIndx, // Min number (from previous routine) for this variable
+		int const MaxIndx // Max number (from previous routine) for this variable
+	);
+
+	void
+	GetReportVariableInput();
+
+	void
+	DetermineFrequency(
+		Fstring const & FreqString,
+		int & ReportFreq
+	);
+
+	void
+	ProduceMinMaxString(
+		Fstring & String, // Current value
+		int const DateValue, // Date of min/max
+		int const ReportFreq // Reporting Frequency
+	);
+
+	void
+	ProduceMinMaxStringWStartMinute(
+		Fstring & String, // Current value
+		int const DateValue, // Date of min/max
+		int const ReportFreq // Reporting Frequency
+	);
+
+	void
+	ReallocateIntegerArray(
+		FArray1D_int & Array,
+		int & ArrayMax, // Current and resultant dimension for Array
+		int const ArrayInc // increment for redimension
+	);
+
+	void
+	ReallocateRVar();
+
+	void
+	ReallocateIVar();
+
+	int
+	ValidateIndexType(
+		Fstring const & IndexTypeKey, // Index type (Zone, HVAC) for variables
+		Fstring const & CalledFrom // Routine called from (for error messages)
+	);
+
+	Fstring
+	StandardIndexTypeKey( int const IndexType );
+
+	int
+	ValidateVariableType( Fstring const & VariableTypeKey );
+
+	Fstring
+	StandardVariableTypeKey( int const VariableType );
+
+	Fstring
+	GetVariableUnitsString( Fstring const & VariableName );
+
+	// *****************************************************************************
+	// The following routines implement Energy Meters in EnergyPlus.
+	// *****************************************************************************
+
+	void
+	InitializeMeters();
+
+	void
+	GetCustomMeterInput( bool & ErrorsFound );
+
+	void
+	GetStandardMeterResourceType(
+		Fstring & OutResourceType,
+		Fstring const & UserInputResourceType,
+		bool & ErrorsFound
+	);
+
+	void
+	AddMeter(
+		Fstring const & Name, // Name for the meter
+		Fstring const & MtrUnits, // Units for the meter
+		Fstring const & ResourceType, // ResourceType for the meter
+		Fstring const & EndUse, // EndUse for the meter
+		Fstring const & EndUseSub, // EndUse subcategory for the meter
+		Fstring const & Group // Group for the meter
+	);
+
+	void
+	AttachMeters(
+		Fstring const & MtrUnits, // Units for this meter
+		Fstring & ResourceType, // Electricity, Gas, etc.
+		Fstring & EndUse, // End-use category (Lights, Heating, etc.)
+		Fstring & EndUseSub, // End-use subcategory (user-defined, e.g., General Lights, Task Lights, etc.)
+		Fstring & Group, // Group key (Facility, Zone, Building, etc.)
+		Fstring const & ZoneName, // Zone key only applicable for Building group
+		int const RepVarNum, // Number of this report variable
+		int & MeterArrayPtr, // Output set of Pointers to Meters
+		bool & ErrorsFound // True if errors in this call
+	);
+
+	void
+	AttachCustomMeters(
+		Fstring const & MtrUnits, // Units for this meter
+		int const RepVarNum, // Number of this report variable
+		int & MeterArrayPtr, // Input/Output set of Pointers to Meters
+		int const MeterIndex, // Which meter this is
+		bool & ErrorsFound // True if errors in this call
+	);
+
+	void
+	ValidateNStandardizeMeterTitles(
+		Fstring const & MtrUnits, // Units for the meter
+		Fstring & ResourceType, // Electricity, Gas, etc.
+		Fstring & EndUse, // End Use Type (Lights, Heating, etc.)
+		Fstring & EndUseSub, // End Use Sub Type (General Lights, Task Lights, etc.)
+		Fstring & Group, // Group key (Facility, Zone, Building, etc.)
+		bool & ErrorsFound, // True if errors in this call
+		Optional_Fstring_const ZoneName = _ // ZoneName when Group=Building
+	);
+
+	void
+	DetermineMeterIPUnits(
+		int & CodeForIPUnits, // Output Code for IP Units
+		Fstring const & ResourceType, // Resource Type
+		Fstring const & MtrUnits, // Meter units
+		bool & ErrorsFound // true if errors found during subroutine
+	);
+
+	void
+	UpdateMeterValues(
+		Real64 const TimeStepValue, // Value of this variable at the current time step.
+		int const NumOnMeters, // Number of meters this variable is "on".
+		FArray1S_int const OnMeters, // Which meters this variable is on (index values)
+		Optional_int_const NumOnCustomMeters = _, // Number of custom meters this variable is "on".
+		Optional< FArray1S_int const > OnCustomMeters = _ // Which custom meters this variable is on (index values)
+	);
+
+	void
+	UpdateMeters( int const TimeStamp ); // Current TimeStamp (for max/min)
+
+	void
+	SetMinMax(
+		Real64 const TestValue, // Candidate new value
+		int const TimeStamp, // TimeStamp to be stored if applicable
+		Real64 & CurMaxValue, // Current Maximum Value
+		int & CurMaxValDate, // Current Maximum Value Date Stamp
+		Real64 & CurMinValue, // Current Minimum Value
+		int & CurMinValDate // Current Minimum Value Date Stamp
+	);
+
+	void
+	ReportTSMeters(
+		Real64 const StartMinute, // Start Minute for TimeStep
+		Real64 const EndMinute, // End Minute for TimeStep
+		bool & PrintESOTimeStamp // True if the ESO Time Stamp also needs to be printed
+	);
+
+	void
+	ReportHRMeters();
+
+	void
+	ReportDYMeters();
+
+	void
+	ReportMNMeters();
+
+	void
+	ReportSMMeters();
+
+	void
+	ReportForTabularReports();
+
+	Fstring
+	DateToStringWithMonth( int const codedDate ); // word containing encoded month, day, hour, minute
+
+	void
+	ReportMeterDetails();
+
+	// *****************************************************************************
+	// End of routines for Energy Meters implementation in EnergyPlus.
+	// *****************************************************************************
+
+	void
+	AddEndUseSubcategory(
+		Fstring const & ResourceName,
+		Fstring const & EndUseName,
+		Fstring const & EndUseSubName
+	);
+
+	int
+	WriteTimeStampFormatData(
+		int const unitNumber, // the Fortran output unit number
+		int const reportingInterval, // See Module Parameter Definitons for ReportEach, ReportTimeStep, ReportHourly, etc.
+		int const reportID, // The ID of the time stamp
+		Fstring const & reportIDString, // The ID of the time stamp
+		int const DayOfSim, // the number of days simulated so far
+		Fstring const & DayOfSimChr, // the number of days simulated so far
+		Optional_int_const Month = _, // the month of the reporting interval
+		Optional_int_const DayOfMonth = _, // The day of the reporting interval
+		Optional_int_const Hour = _, // The hour of the reporting interval
+		Optional< Real64 const > EndMinute = _, // The last minute in the reporting interval
+		Optional< Real64 const > StartMinute = _, // The starting minute of the reporting interval
+		Optional_int_const DST = _, // A flag indicating whether daylight savings time is observed
+		Optional_Fstring_const DayType = _ // The day tied for the data (e.g., Monday)
+	);
+
+	void
+	WriteReportVariableDictionaryItem(
+		int const reportingInterval, // The reporting interval (e.g., hourly, daily)
+		int const storeType,
+		int const reportID, // The reporting ID for the data
+		int const indexGroupKey, // The reporting group (e.g., Zone, Plant Loop, etc.)
+		Fstring const & indexGroup, // The reporting group (e.g., Zone, Plant Loop, etc.)
+		Fstring const & reportIDChr, // The reporting ID for the data
+		Fstring const & keyedValue, // The key name for the data
+		Fstring const & variableName, // The variable's actual name
+		int const indexType,
+		Fstring const & UnitsString, // The variables units
+		Optional_Fstring_const ScheduleName = _
+	);
+
+	void
+	WriteMeterDictionaryItem(
+		int const reportingInterval, // The reporting interval (e.g., hourly, daily)
+		int const storeType,
+		int const reportID, // The reporting ID in for the variable
+		int const indexGroupKey, // The reporting group for the variable
+		Fstring const & indexGroup, // The reporting group for the variable
+		Fstring const & reportIDChr, // The reporting ID in for the variable
+		Fstring const & meterName, // The variable's meter name
+		Fstring const & UnitsString, // The variables units
+		bool const cumulativeMeterFlag, // A flag indicating cumulative data
+		bool const meterFileOnlyFlag // A flag indicating whether the data is to be written to standard output
+	);
+
+	void
+	WriteRealVariableOutput(
+		int const reportType, // The report type or interval (e.g., hourly)
+		int const timeIndex // An index that points to the timestamp
+	);
+
+	void
+	WriteReportRealData(
+		int const reportID, // The variable's report ID
+		Fstring const & creportID, // variable ID in characters
+		int const timeIndex, // An index that points to the timestamp
+		Real64 const repValue, // The variable's value
+		int const storeType, // Averaged or Sum
+		Real64 const numOfItemsStored, // The number of items (hours or timesteps) of data stored
+		int const reportingInterval, // The variable's reporting interval (e.g., daily)
+		Real64 const minValue, // The variable's minimum value during the reporting interval
+		int const minValueDate, // The date the minimum value occurred
+		Real64 const MaxValue, // The variable's maximum value during the reporting interval
+		int const maxValueDate // The date the maximum value occurred
+	);
+
+	void
+	WriteCumulativeReportMeterData(
+		int const reportID, // The variable's report ID
+		Fstring const & creportID, // variable ID in characters
+		int const timeIndex, // An index that points to the timestamp
+		Real64 const repValue, // The variable's value
+		bool const meterOnlyFlag // A flag that indicates if the data should be written to standard output
+	);
+
+	void
+	WriteReportMeterData(
+		int const reportID, // The variable's report ID
+		Fstring const & creportID, // variable ID in characters
+		int const timeIndex, // An index that points to the timestamp
+		Real64 const repValue, // The variable's value
+		int const reportingInterval, // The variable's reporting interval (e.g., hourly)
+		Real64 const minValue, // The variable's minimum value during the reporting interval
+		int const minValueDate, // The date the minimum value occurred
+		Real64 const MaxValue, // The variable's maximum value during the reporting interval
+		int const maxValueDate, // The date of the maximum value
+		bool const meterOnlyFlag // Indicates whether the data is for the meter file only
+	);
+
+	void
+	WriteRealData(
+		int const reportID, // The variable's reporting ID
+		Fstring const & creportID, // variable ID in characters
+		int const timeIndex, // An index that points to the timestamp for the variable
+		Real64 const repValue // The variable's value
+	);
+
+	void
+	WriteIntegerVariableOutput(
+		int const reportType, // The report type (i.e., the reporting interval)
+		int const timeIndex // An index that points to the timestamp for this data
+	);
+
+	void
+	WriteReportIntegerData(
+		int const reportID, // The variable's reporting ID
+		Fstring const & reportIDString, // The variable's reporting ID (character)
+		int const timeIndex, // An index that points to this timestamp for this data
+		Real64 const repValue, // The variable's value
+		int const storeType, // Type of item (averaged or summed)
+		Optional< Real64 const > numOfItemsStored = _, // The number of items (hours or timesteps) of data stored //Autodesk:OPTIONAL Used without PRESENT check
+		Optional_int_const reportingInterval = _, // The reporting interval (e.g., monthly) //Autodesk:OPTIONAL Used without PRESENT check
+		Optional_int_const minValue = _, // The variable's minimum value during the reporting interval //Autodesk:OPTIONAL Used without PRESENT check
+		Optional_int_const minValueDate = _, // The date the minimum value occurred //Autodesk:OPTIONAL Used without PRESENT check
+		Optional_int_const MaxValue = _, // The variable's maximum value during the reporting interval //Autodesk:OPTIONAL Used without PRESENT check
+		Optional_int_const maxValueDate = _ // The date the maximum value occurred //Autodesk:OPTIONAL Used without PRESENT check
+	);
+
+	void
+	WriteIntegerData(
+		int const reportID, // the reporting ID of the data
+		Fstring const & reportIDString, // the reporting ID of the data (character)
+		int const timeIndex, // an index that points to the data's timestamp
+		Optional_int_const IntegerValue = _, // the value of the data
+		Optional< Real64 const > RealValue = _ // the value of the data
+	);
+
+	int
+	DetermineIndexGroupKeyFromMeterName( Fstring const & meterName ); // the meter name
+
+	Fstring
+	DetermineIndexGroupFromMeterGroup( MeterType const & meter ); // the meter
+
+	void
+	SetInternalVariableValue(
+		int const varType, // 1=integer, 2=real, 3=meter
+		int const keyVarIndex, // Array index
+		Real64 const SetRealVal, // real value to set, if type is real or meter
+		int const SetIntVal // integer value to set if type is integer
+	);
+
+} // OutputProcessor
+
+//==============================================================================================
+// *****************************************************************************
+// These routines are available outside the OutputProcessor Module (i.e. calling
+// routines do not have to "USE OutputProcessor".  But each of these routines
+// will use the OutputProcessor and take advantage that everything is PUBLIC
+// within the OutputProcessor.
+// *****************************************************************************
+
+void
+SetupOutputVariable(
+	Fstring const & VariableName, // String Name of variable (with units)
+	Real64 & ActualVariable, // Actual Variable, used to set up pointer
+	Fstring const & IndexTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+	Fstring const & VariableTypeKey, // State, Average=1, NonState, Sum=2
+	Fstring const & KeyedValue, // Associated Key for this variable
+	Optional_Fstring_const ReportFreq = _, // Internal use -- causes reporting at this freqency
+	Optional_Fstring_const ResourceTypeKey = _, // Meter Resource Type (Electricity, Gas, etc)
+	Optional_Fstring_const EndUseKey = _, // Meter End Use Key (Lights, Heating, Cooling, etc)
+	Optional_Fstring_const EndUseSubKey = _, // Meter End Use Sub Key (General Lights, Task Lights, etc)
+	Optional_Fstring_const GroupKey = _, // Meter Super Group Key (Building, System, Plant)
+	Optional_Fstring_const ZoneKey = _, // Meter Zone Key (zone name)
+	Optional_int_const ZoneMult = _, // Zone Multiplier, defaults to 1
+	Optional_int_const ZoneListMult = _, // Zone List Multiplier, defaults to 1
+	Optional_int_const indexGroupKey = _ // Group identifier for SQL output
+);
+
+void
+SetupOutputVariable(
+	Fstring const & VariableName, // String Name of variable
+	int & ActualVariable, // Actual Variable, used to set up pointer
+	Fstring const & IndexTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+	Fstring const & VariableTypeKey, // State, Average=1, NonState, Sum=2
+	Fstring const & KeyedValue, // Associated Key for this variable
+	Optional_Fstring_const ReportFreq = _, // Internal use -- causes reporting at this freqency
+	Optional_int_const indexGroupKey = _ // Group identifier for SQL output
+);
+
+void
+SetupOutputVariable(
+	Fstring const & VariableName, // String Name of variable
+	Real64 & ActualVariable, // Actual Variable, used to set up pointer
+	Fstring const & IndexTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+	Fstring const & VariableTypeKey, // State, Average=1, NonState, Sum=2
+	int const KeyedValue, // Associated Key for this variable
+	Optional_Fstring_const ReportFreq = _, // Internal use -- causes reporting at this freqency
+	Optional_Fstring_const ResourceTypeKey = _, // Meter Resource Type (Electricity, Gas, etc)
+	Optional_Fstring_const EndUseKey = _, // Meter End Use Key (Lights, Heating, Cooling, etc)
+	Optional_Fstring_const EndUseSubKey = _, // Meter End Use Sub Key (General Lights, Task Lights, etc)
+	Optional_Fstring_const GroupKey = _, // Meter Super Group Key (Building, System, Plant)
+	Optional_Fstring_const ZoneKey = _, // Meter Zone Key (zone name)
+	Optional_int_const ZoneMult = _, // Zone Multiplier, defaults to 1
+	Optional_int_const ZoneListMult = _, // Zone List Multiplier, defaults to 1
+	Optional_int_const indexGroupKey = _ // Group identifier for SQL output
+);
+
+void
+UpdateDataandReport( int const IndexTypeKey ); // What kind of data to update (Zone, HVAC)
+
+void
+AssignReportNumber( int & ReportNumber );
+
+void
+GenOutputVariablesAuditReport();
+
+void
+UpdateMeterReporting();
+
+void
+SetInitialMeterReportingAndOutputNames(
+	int const WhichMeter, // Which meter number
+	bool const MeterFileOnlyIndicator, // true if this is a meter file only reporting
+	int const FrequencyIndicator, // at what frequency is the meter reported
+	bool const CumulativeIndicator // true if this is a Cumulative meter reporting
+);
+
+int
+GetMeterIndex( Fstring const & MeterName );
+
+Fstring
+GetMeterResourceType( int const MeterNumber ); // Which Meter Number (from GetMeterIndex)
+
+Real64
+GetCurrentMeterValue( int const MeterNumber ); // Which Meter Number (from GetMeterIndex)
+
+Real64
+GetInstantMeterValue(
+	int const MeterNumber, // Which Meter Number (from GetMeterIndex)
+	int const IndexType // Whether this is zone of HVAC
+);
+
+void
+IncrementInstMeterCache();
+
+Real64
+GetInternalVariableValue(
+	int const varType, // 1=integer, 2=real, 3=meter
+	int const keyVarIndex // Array index
+);
+
+Real64
+GetInternalVariableValueExternalInterface(
+	int const varType, // 1=integer, 2=REAL(r64), 3=meter
+	int const keyVarIndex // Array index
+);
+
+int
+GetNumMeteredVariables(
+	Fstring const & ComponentType, // Given Component Type
+	Fstring const & ComponentName // Given Component Name (user defined)
+);
+
+void
+GetMeteredVariables(
+	Fstring const & ComponentType, // Given Component Type
+	Fstring const & ComponentName, // Given Component Name (user defined)
+	FArray1S_int VarIndexes, // Variable Numbers
+	FArray1S_int VarTypes, // Variable Types (1=integer, 2=real, 3=meter)
+	FArray1S_int IndexTypes, // Variable Index Types (1=Zone,2=HVAC)
+	FArray1S_Fstring UnitsStrings, // UnitsStrings for each variable
+	FArray1S_int ResourceTypes, // ResourceTypes for each variable
+	Optional< FArray1S_Fstring > EndUses = _, // EndUses for each variable
+	Optional< FArray1S_Fstring > Groups = _, // Groups for each variable
+	Optional< FArray1S_Fstring > Names = _, // Variable Names for each variable
+	Optional_int NumFound = _, // Number Found
+	Optional< FArray1S_int > VarIDs = _ // Variable Report Numbers
+);
+
+void
+GetVariableKeyCountandType(
+	Fstring const & varName, // Standard variable name
+	int & numKeys, // Number of keys found
+	int & varType, // 0=not found, 1=integer, 2=real, 3=meter
+	int & varAvgSum, // Variable  is Averaged=1 or Summed=2
+	int & varStepType, // Variable time step is Zone=1 or HVAC=2
+	Fstring & varUnits // Units sting, may be blank
+);
+
+void
+GetVariableKeys(
+	Fstring const & varName, // Standard variable name
+	int const varType, // 1=integer, 2=real, 3=meter
+	FArray1S_Fstring keyNames, // Specific key name
+	FArray1S_int keyVarIndexes // Array index for
+);
+
+bool
+ReportingThisVariable( Fstring const & RepVarName );
+
+void
+InitPollutionMeterReporting( Fstring const & ReportFreqName );
+
+void
+ProduceRDDMDD();
+
+void
+AddToOutputVariableList(
+	Fstring const & VarName, // Variable Name
+	int const IndexType,
+	int const StateType,
+	int const VariableType,
+	Fstring const & UnitsString
+);
+
+//     NOTICE
+//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+//     and The Regents of the University of California through Ernest Orlando Lawrence
+//     Berkeley National Laboratory.  All rights reserved.
+//     Portions of the EnergyPlus software package have been developed and copyrighted
+//     by other individuals, companies and institutions.  These portions have been
+//     incorporated into the EnergyPlus software package under license.   For a complete
+//     list of contributors, see "Notice" located in EnergyPlus.f90.
+//     NOTICE: The U.S. Government is granted for itself and others acting on its
+//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
+//     reproduce, prepare derivative works, and perform publicly and display publicly.
+//     Beginning five (5) years after permission to assert copyright is granted,
+//     subject to two possible five year renewals, the U.S. Government is granted for
+//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
+//     worldwide license in this data to reproduce, prepare derivative works,
+//     distribute copies to the public, perform publicly and display publicly, and to
+//     permit others to do so.
+//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+
+
+} // EnergyPlus
+
+#endif

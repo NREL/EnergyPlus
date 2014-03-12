@@ -1,0 +1,22 @@
+// String Constants
+//
+// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+//
+// Version: 4.0.0
+//
+// Language: C++
+//
+// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Use of this source code or any derivative of it is restricted by license.
+// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+
+// ObjexxFCL Headers
+#include <ObjexxFCL/string.constants.hh>
+
+namespace ObjexxFCL {
+
+std::string const READ_STOPPERS( '\n' + std::string( 1, std::char_traits< char >::eof() ) );
+std::string const VERSION( "4.0.0" );
+std::string const WHITESPACE( " \t\0", 3 ); // Need the 3 arg so it includes the nul
+
+} // ObjexxFCL

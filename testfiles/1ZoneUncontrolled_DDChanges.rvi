@@ -1,0 +1,14 @@
+eplusout.eso
+eplusout.csv
+Site Outdoor Air Drybulb Temperature
+Sizing Period Site Drybulb Temperature Range Modifier Schedule Value
+Site Outdoor Air Relative Humidity
+Sizing Period Site Humidity Condition Schedule Value
+Site Direct Solar Radiation Rate per Area
+Sizing Period Site Beam Solar Schedule Value
+Site Diffuse Solar Radiation Rate per Area
+Sizing Period Site Diffuse Solar Schedule Value
+Site Sky Temperature
+Sizing Period Site Sky Temperature Schedule Value
+Zone Mean Air Temperature
+

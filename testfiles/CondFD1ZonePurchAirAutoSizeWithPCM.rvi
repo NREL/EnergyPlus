@@ -1,0 +1,20 @@
+eplusout.eso
+eplusout.csv
+Site Outdoor Air Drybulb Temperature
+Zone Mean Air Temperature
+Zone Mean Radiant Temperature
+Site Outdoor Air Humidity Ratio
+Zone Air System Sensible Cooling Rate
+Zone Air System Sensible Heating Rate
+Zone Air Temperature
+Zone Air Humidity Ratio
+Zone Ideal Loads Supply Air Sensible Cooling Rate
+Zone Ideal Loads Supply Air Sensible Heating Rate
+Zone Ideal Loads Supply Air Total Cooling Rate
+Surface Inside Face Temperature
+Surface Outside Face Temperature
+CondFD Surface Temperature Node
+Surface Outside Face Conduction Heat Transfer Rate per Area
+Surface Inside Face Conduction Heat Transfer Rate per Area
+0
+

@@ -1,0 +1,18 @@
+eplusout.eso
+eplusout.csv
+Site Outdoor Air Drybulb Temperature
+Site Daylight Saving Time Status
+Site Day Type Index
+Zone Mean Air Temperature
+Zone Total Internal Latent Gain Energy
+Zone Mean Radiant Temperature
+Zone Air Heat Balance Surface Convection Rate
+Zone Air Heat Balance Air Energy Storage Rate
+Surface Inside Face Temperature
+Surface Outside Face Temperature
+Surface Inside Face Convection Heat Transfer Coefficient
+Surface Outside Face Convection Heat Transfer Coefficient
+Surface Inside Face Conduction Heat Transfer Rate per Area
+Surface Outside Face Conduction Heat Transfer Rate per Area
+CondFD Surface Temperature Node
+0

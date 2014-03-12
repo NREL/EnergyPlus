@@ -1,0 +1,176 @@
+// ObjexxFCL Headers
+#include <ObjexxFCL/Fmath.hh>
+#include <ObjexxFCL/gio.hh>
+
+// EnergyPlus Headers
+#include <DisplayRoutines.hh>
+#include <DataGlobals.hh>
+#include <DataSystemVariables.hh>
+
+namespace EnergyPlus {
+
+void
+DisplayString( Fstring const & String ) // String to be displayed
+{
+
+	// SUBROUTINE INFORMATION:
+	//       AUTHOR         Linda Lawrie
+	//       DATE WRITTEN   Version 1.0
+	//       MODIFIED       na
+	//       RE-ENGINEERED  na
+
+	// PURPOSE OF THIS SUBROUTINE:
+	// This subroutine provides a call to display strings during program execution.
+
+	// METHODOLOGY EMPLOYED:
+	// usage:=  call DisplayString(string)
+
+	// REFERENCES:
+	// na
+
+	// Using/Aliasing
+	using DataGlobals::KickOffSimulation;
+	using DataSystemVariables::DeveloperFlag;
+
+	// Locals
+	// SUBROUTINE ARGUMENT DEFINITIONS:
+
+	// SUBROUTINE PARAMETER DEFINITIONS:
+	Fstring const FmtA( "(1X,A)" );
+
+	// INTERFACE BLOCK SPECIFICATIONS
+	// na
+
+	// DERIVED TYPE DEFINITIONS
+	// na
+
+	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+	// na
+
+	if ( KickOffSimulation && ! DeveloperFlag ) return;
+	gio::write( FmtA ) << trim( String );
+
+}
+
+void
+DisplayNumberAndString(
+	int const Number, // number to be displayed
+	Fstring const & String // String to be displayed
+)
+{
+
+	// SUBROUTINE INFORMATION:
+	//       AUTHOR         Linda Lawrie
+	//       DATE WRITTEN   Version 1.0
+	//       MODIFIED       na
+	//       RE-ENGINEERED  na
+
+	// PURPOSE OF THIS SUBROUTINE:
+	// This subroutine provides a call to display (at set point on screen for screen positioning models) card images
+	// during program parsing.
+
+	// METHODOLOGY EMPLOYED:
+	// usage:= call DisplayNumberAndString(numbr,string)
+
+	// REFERENCES:
+	// na
+
+	// Using/Aliasing
+	using DataGlobals::KickOffSimulation;
+	using DataSystemVariables::DeveloperFlag;
+
+	// Locals
+	// SUBROUTINE ARGUMENT DEFINITIONS:
+
+	// SUBROUTINE PARAMETER DEFINITIONS:
+	Fstring const FmtA( "(1X,A)" );
+
+	// INTERFACE BLOCK SPECIFICATIONS
+	// na
+
+	// DERIVED TYPE DEFINITIONS
+	// na
+
+	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+	Fstring NumString( 25 );
+
+	if ( KickOffSimulation && ! DeveloperFlag ) return;
+	gio::write( NumString, "*" ) << Number;
+	NumString = adjustl( NumString );
+
+	gio::write( FmtA ) << trim( String ) + trim( NumString );
+}
+
+void
+DisplaySimDaysProgress(
+	int const CurrentSimDay, // Current Simulation Day
+	int const TotalSimDays // Total number of Simulation Days
+)
+{
+
+	// SUBROUTINE INFORMATION:
+	//       AUTHOR         Linda Lawrie
+	//       DATE WRITTEN   Version 1.0
+	//       MODIFIED       na
+	//       RE-ENGINEERED  na
+
+	// PURPOSE OF THIS SUBROUTINE:
+	// This subroutine provides a call for "progress" during simulation.
+	// Progress is percent of current days vs total days.
+
+	// METHODOLOGY EMPLOYED:
+	// Needs description, as appropriate.
+
+	// REFERENCES:
+	// na
+
+	// Using/Aliasing
+	using DataGlobals::KickOffSimulation;
+	using DataSystemVariables::DeveloperFlag;
+
+	// Locals
+	// SUBROUTINE ARGUMENT DEFINITIONS:
+
+	// SUBROUTINE PARAMETER DEFINITIONS:
+	// na
+
+	// INTERFACE BLOCK SPECIFICATIONS
+	// na
+
+	// DERIVED TYPE DEFINITIONS
+	// na
+
+	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+	static int percent( 0 ); // Current percent progress
+
+	if ( KickOffSimulation && ! DeveloperFlag ) return;
+	if ( TotalSimDays > 0 ) {
+		percent = nint( ( CurrentSimDay / TotalSimDays ) * 100.0 );
+		percent = min( percent, 100 );
+	} else {
+		percent = 0;
+	}
+
+}
+
+//     NOTICE
+//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+//     and The Regents of the University of California through Ernest Orlando Lawrence
+//     Berkeley National Laboratory.  All rights reserved.
+//     Portions of the EnergyPlus software package have been developed and copyrighted
+//     by other individuals, companies and institutions.  These portions have been
+//     incorporated into the EnergyPlus software package under license.   For a complete
+//     list of contributors, see "Notice" located in EnergyPlus.f90.
+//     NOTICE: The U.S. Government is granted for itself and others acting on its
+//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
+//     reproduce, prepare derivative works, and perform publicly and display publicly.
+//     Beginning five (5) years after permission to assert copyright is granted,
+//     subject to two possible five year renewals, the U.S. Government is granted for
+//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
+//     worldwide license in this data to reproduce, prepare derivative works,
+//     distribute copies to the public, perform publicly and display publicly, and to
+//     permit others to do so.
+//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+
+
+} // EnergyPlus

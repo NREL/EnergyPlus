@@ -1,0 +1,130 @@
+#ifndef WaterManager_hh_INCLUDED
+#define WaterManager_hh_INCLUDED
+
+// ObjexxFCL Headers
+#include <ObjexxFCL/Fstring.hh>
+
+// EnergyPlus Headers
+#include <EnergyPlus.hh>
+
+namespace EnergyPlus {
+
+namespace WaterManager {
+
+	// Data
+	// MODULE PARAMETER DEFINITIONS:
+	// na
+
+	// DERIVED TYPE DEFINITIONS:
+	// na
+
+	// MODULE VARIABLE DECLARATIONS:
+	// na
+
+	// SUBROUTINE SPECIFICATIONS FOR MODULE WaterManager:
+	// pointers for water storage tanks and their supply arrays
+	// pointers for water storage tanks and their demand arrays
+
+	// Functions
+
+	void
+	ManageWater();
+
+	void
+	ManageWaterInits();
+
+	void
+	GetWaterManagerInput();
+
+	void
+	UpdatePrecipitation();
+
+	void
+	UpdateIrrigation();
+
+	void
+	SizeWaterManager();
+
+	void
+	CalcWaterStorageTank( int const TankNum ); // Index of storage tank
+
+	void
+	SetupTankSupplyComponent(
+		Fstring const & CompName,
+		Fstring const & CompType,
+		Fstring const & TankName,
+		bool & ErrorsFound,
+		int & TankIndex,
+		int & WaterSupplyIndex
+	);
+
+	void
+	InternalSetupTankSupplyComponent(
+		Fstring const & CompName,
+		Fstring const & CompType,
+		Fstring const & TankName,
+		bool & ErrorsFound,
+		int & TankIndex,
+		int & WaterSupplyIndex
+	);
+
+	void
+	SetupTankDemandComponent(
+		Fstring const & CompName,
+		Fstring const & CompType,
+		Fstring const & TankName,
+		bool & ErrorsFound,
+		int & TankIndex,
+		int & WaterDemandIndex
+	);
+
+	void
+	InternalSetupTankDemandComponent(
+		Fstring const & CompName,
+		Fstring const & CompType,
+		Fstring const & TankName,
+		bool & ErrorsFound,
+		int & TankIndex,
+		int & WaterDemandIndex
+	);
+
+	void
+	CalcRainCollector( int const RainColNum ); // Index of rain collector
+
+	void
+	CalcGroundwaterWell( int const WellNum ); // Index of well
+
+	void
+	UpdateWaterManager();
+
+	void
+	ReportWaterManager();
+
+	//     NOTICE
+
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     and The Regents of the University of California through Ernest Orlando Lawrence
+	//     Berkeley National Laboratory.  All rights reserved.
+
+	//     Portions of the EnergyPlus software package have been developed and copyrighted
+	//     by other individuals, companies and institutions.  These portions have been
+	//     incorporated into the EnergyPlus software package under license.   For a complete
+	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+
+	//     NOTICE: The U.S. Government is granted for itself and others acting on its
+	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
+	//     reproduce, prepare derivative works, and perform publicly and display publicly.
+	//     Beginning five (5) years after permission to assert copyright is granted,
+	//     subject to two possible five year renewals, the U.S. Government is granted for
+	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
+	//     worldwide license in this data to reproduce, prepare derivative works,
+	//     distribute copies to the public, perform publicly and display publicly, and to
+	//     permit others to do so.
+
+	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+
+} // WaterManager
+
+} // EnergyPlus
+
+#endif

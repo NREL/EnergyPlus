@@ -1,0 +1,194 @@
+#ifndef ObjexxFCL_Sticky_hh_INCLUDED
+#define ObjexxFCL_Sticky_hh_INCLUDED
+
+// Sticky Value Wrapper
+//
+// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+//
+// Version: 4.0.0
+//
+// Language: C++
+//
+// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Use of this source code or any derivative of it is restricted by license.
+// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+
+// ObjexxFCL Headers
+#include <ObjexxFCL/Sticky.fwd.hh>
+
+// C++ Headers
+#include <cassert>
+
+namespace ObjexxFCL {
+
+// Sticky Argument Wrapper
+template< typename T >
+class Sticky
+{
+
+public: // Types
+
+	typedef  T  Value; // Type: Includes const attribute for const argument
+
+public: // Creation
+
+	// Default Constructor
+	inline
+	Sticky()
+	{}
+
+	// Value Constructor
+	inline
+	explicit
+	Sticky( Value const & val ) :
+		val_( val )
+	{}
+
+	// Value Constructor Template
+	template< typename U >
+	inline
+	explicit
+	Sticky( U const & val ) :
+		val_( val )
+	{}
+
+public: // Assignment
+
+	// Value Assignment
+	inline
+	Sticky &
+	operator =( Value const & val )
+	{
+		val_ = val;
+		return *this;
+	}
+
+	// Value Assignment Template
+	template< typename U >
+	inline
+	Sticky &
+	operator =( U const & val )
+	{
+		val_ = val;
+		return *this;
+	}
+
+public: // Conversion
+
+	// Value Conversion
+	inline
+	operator Value const &() const
+	{
+		return val_;
+	}
+
+	// Value Conversion
+	inline
+	operator Value &()
+	{
+		return val_;
+	}
+
+public: // Operators
+
+	// Value
+	inline
+	Value const &
+	operator ()() const
+	{
+		return val_;
+	}
+
+	// Value
+	inline
+	Value &
+	operator ()()
+	{
+		return val_;
+	}
+
+private: // Data
+
+	Value val_; // Object
+
+}; // Sticky
+
+// Functions
+
+// Sticky Maker
+template< typename T >
+inline
+Sticky< T >
+make_Sticky( T const & t )
+{
+	return Sticky< T >( t );
+}
+
+// Sticky Maker
+template< typename T >
+inline
+Sticky< T >
+sticky( T const & t )
+{
+	return Sticky< T >( t );
+}
+
+// Comparison
+
+// Sticky == Sticky
+template< typename T >
+inline
+bool
+operator ==( Sticky< T > const & a, Sticky< T > const & b )
+{
+	return ( a() == b() );
+}
+
+// Sticky != Sticky
+template< typename T >
+inline
+bool
+operator !=( Sticky< T > const & a, Sticky< T > const & b )
+{
+	return ( a() != b() );
+}
+
+// Sticky == Value
+template< typename T >
+inline
+bool
+operator ==( Sticky< T > const & a, T const & b )
+{
+	return ( a() == b );
+}
+
+// Sticky != Value
+template< typename T >
+inline
+bool
+operator !=( Sticky< T > const & a, T const & b )
+{
+	return ( a() != b );
+}
+
+// Value == Sticky
+template< typename T >
+inline
+bool
+operator ==( T const & a, Sticky< T > const & b )
+{
+	return ( a == b() );
+}
+
+// Value != Sticky
+template< typename T >
+inline
+bool
+operator !=( T const & a, Sticky< T > const & b )
+{
+	return ( a != b() );
+}
+
+} // ObjexxFCL
+
+#endif // ObjexxFCL_Sticky_hh_INCLUDED

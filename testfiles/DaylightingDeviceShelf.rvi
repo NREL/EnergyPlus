@@ -1,0 +1,15 @@
+eplusout.eso
+eplusout.csv
+Zone Air Temperature
+Site Solar Altitude Angle
+Site Solar Azimuth Angle
+Site Direct Solar Radiation Rate per Area
+Site Diffuse Solar Radiation Rate per Area
+Outside Shelf,Surface Outside Face Sunlit Area
+Outside Shelf,Surface Outside Face Incident Solar Radiation Rate per Area
+Upper Window,Surface Outside Face Incident Solar Radiation Rate per Area
+Lower Window,Surface Outside Face Incident Solar Radiation Rate per Area
+Surface Window Transmitted Solar Radiation Rate
+Daylighting Reference Point 1 Illuminance
+Daylighting Reference Point 2 Illuminance
+0
