@@ -22,6 +22,21 @@ The build process is setup by Cmake.  On all platforms, you will want to clone t
 
 ## Linux
 
+These instructions were written around Ubuntu 12.04, but should be valid for other Debian/*buntu and Linux-in-general distributions.  The differences will be in the package-management system commands, and possibly in the shell being used (sh, bash, zsh, etc.).
+
+0. Make sure g++ is sufficient for compiling the code.  It is recommended to have g++ 4.8.1+.  This version is not currently available in the default Ubuntu 12.04 repositories, but can be installed alongside 4.6.  Newer distributions should have a more up to date GCC distribution included.
+1. Install cmake, for Debian/Ubuntu it should be as simple as apt-get cmake.  The terminal (curses) GUI can also be gotten with apt-get install cmake-curses-gui.
+2. Navigate in the terminal to the root of the build tree.  You will launch the cmake GUI from this location.  The program must be passed an argument that specifies the location of the root of the source tree.  For example, if the build directory is directly next to the source directory, the command could be called for the default build environment by calling the GUI as such: 
+```
+ccmake "../EnergyPlusTeam"
+```
+Optionally, a build environment can be specified.  For example, if cmake is being used to set up an Eclipse build environment, the following calling signature should be used:
+```
+ccmake -G "Eclipse CDT4 - Unix Makefiles" "../EnergyPlusTeam"
+```
+3. 
+
+
 ## Mac
 
 # Platform Status
