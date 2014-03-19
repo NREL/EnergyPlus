@@ -819,6 +819,30 @@ public: // Slice Proxy Generators
 		return FArray1S< T >( data_, -shift_, d );
 	}
 
+#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) // VC++2013 bug work-around
+
+	// array( {s} ) const
+	inline
+	FArray1S< T >
+	operator ()( std::initializer_list< int > const l ) const
+	{
+		IS const s( l );
+		DS const d( I(), s );
+		return FArray1S< T >( data_, -shift_, d );
+	}
+
+	// array( {s} )
+	inline
+	FArray1S< T >
+	operator ()( std::initializer_list< int > const l )
+	{
+		IS const s( l );
+		DS const d( I(), s );
+		return FArray1S< T >( data_, -shift_, d );
+	}
+
+#else
+
 	// array( {s} ) const
 	template< typename U >
 	inline
@@ -840,6 +864,8 @@ public: // Slice Proxy Generators
 		DS const d( I(), s );
 		return FArray1S< T >( data_, -shift_, d );
 	}
+
+#endif
 
 public: // Predicate
 

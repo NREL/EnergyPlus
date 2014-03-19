@@ -219,7 +219,7 @@ private: // Static Methods
 			if ( -vexp < 309 ) {
 				v *= std::pow( 10, -vexp );
 			} else {
-				v *= std::pow< long double, long double >( 10, -vexp );
+				v *= std::pow( (long double) 10, (long double) -vexp ); // VC++ 2013 is missing C++11 pow template overload
 			}
 			if ( k_ >= 0 ) {
 				std::string const k_str( "1" + std::string( k_, '0' ) + "." );

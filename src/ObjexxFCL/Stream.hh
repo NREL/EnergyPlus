@@ -116,14 +116,24 @@ public: // Properties
 	}
 
 	// Stream
+#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) // VC++2013 covariant return bug work-around
+	std::ios const &
+	stream() const;
+#else
 	virtual
 	std::ios const &
 	stream() const = 0;
+#endif
 
 	// Stream
+#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) // VC++2013 covariant return bug work-around
+	std::ios &
+	stream();
+#else
 	virtual
 	std::ios &
 	stream() = 0;
+#endif
 
 	// Read?
 	virtual
@@ -167,7 +177,9 @@ public: // Operators
 
 	// Stream Conversion
 	inline
+#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) // VC++2013 covariant return bug work-around
 	virtual
+#endif
 	operator std::ios const &() const
 	{
 		return stream();
@@ -175,7 +187,9 @@ public: // Operators
 
 	// Stream Conversion
 	inline
+#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) // VC++2013 covariant return bug work-around
 	virtual
+#endif
 	operator std::ios &()
 	{
 		return stream();
@@ -183,7 +197,9 @@ public: // Operators
 
 	// Stream
 	inline
+#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) // VC++2013 covariant return bug work-around
 	virtual
+#endif
 	std::ios const &
 	operator ()() const
 	{
@@ -192,7 +208,9 @@ public: // Operators
 
 	// Stream
 	inline
+#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) // VC++2013 covariant return bug work-around
 	virtual
+#endif
 	std::ios &
 	operator ()()
 	{

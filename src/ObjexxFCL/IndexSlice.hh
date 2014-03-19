@@ -23,6 +23,7 @@
 #include <cstddef>
 #include <initializer_list>
 #include <iosfwd>
+#include <type_traits>
 #include <utility>
 
 namespace ObjexxFCL {

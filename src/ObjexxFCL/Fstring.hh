@@ -1028,84 +1028,39 @@ public: // Generator
 public: // Concatenation
 
 	// Fstring + Fstring
-	inline
 	friend
 	Fstring
-	operator +( Fstring const & s, Fstring const & t )
-	{
-		Fstring u( static_cast< size_type >( s.len_ + t.len_ ) );
-		std::memcpy( u.str_, s.str_, s.len_ );
-		std::memcpy( u.str_ + s.len_, t.str_, t.len_ );
-		return u;
-	}
+	operator +( Fstring const & s, Fstring const & t );
 
 	// Fstring + string
-	inline
 	friend
 	std::string
-	operator +( Fstring const & s, std::string const & t )
-	{
-		return ( static_cast< std::string >( s ) + t );
-	}
+	operator +( Fstring const & s, std::string const & t );
 
 	// string + Fstring
-	inline
 	friend
 	std::string
-	operator +( std::string const & t, Fstring const & s )
-	{
-		return ( t + static_cast< std::string >( s ) );
-	}
+	operator +( std::string const & t, Fstring const & s );
 
 	// Fstring + cstring
-	inline
 	friend
 	Fstring
-	operator +( Fstring const & s, c_cstring const t )
-	{
-		size_type const t_len( std::strlen( t ) );
-		Fstring u( s.len_ + t_len );
-		std::memcpy( u.str_, s.str_, s.len_ );
-		std::memcpy( u.str_ + s.len_, t, t_len );
-		return u;
-	}
+	operator +( Fstring const & s, c_cstring const t );
 
 	// cstring + Fstring
-	inline
 	friend
 	Fstring
-	operator +( c_cstring const s, Fstring const & t )
-	{
-		size_type const s_len( std::strlen( s ) );
-		Fstring u( s_len + t.len_ );
-		std::memcpy( u.str_, s, s_len );
-		std::memcpy( u.str_ + s_len, t.str_, t.len_ );
-		return u;
-	}
+	operator +( c_cstring const s, Fstring const & t );
 
 	// Fstring + char
-	inline
 	friend
 	Fstring
-	operator +( Fstring const & s, char const c )
-	{
-		Fstring u( s.len_ + 1 );
-		std::memcpy( u.str_, s.str_, s.len_ );
-		u.str_[ s.len_ ] = c;
-		return u;
-	}
+	operator +( Fstring const & s, char const c );
 
 	// char + Fstring
-	inline
 	friend
 	Fstring
-	operator +( char const c, Fstring const & s )
-	{
-		Fstring u( 1 + s.len_ );
-		u.str_[ 0 ] = c;
-		std::memcpy( u.str_ + 1, s.str_, s.len_ );
-		return u;
-	}
+	operator +( char const c, Fstring const & s );
 
 public: // Comparison
 
@@ -1115,13 +1070,9 @@ public: // Comparison
 	operator ==( Fstring const & s, Fstring const & t );
 
 	// Fstring != Fstring
-	inline
 	friend
 	bool
-	operator !=( Fstring const & s, Fstring const & t )
-	{
-		return !( s == t );
-	}
+	operator !=( Fstring const & s, Fstring const & t );
 
 	// Fstring == string
 	friend
@@ -1129,31 +1080,19 @@ public: // Comparison
 	operator ==( Fstring const & s, std::string const & t );
 
 	// string == Fstring
-	inline
 	friend
 	bool
-	operator ==( std::string const & t, Fstring const & s )
-	{
-		return ( s == t );
-	}
+	operator ==( std::string const & t, Fstring const & s );
 
 	// Fstring != string
-	inline
 	friend
 	bool
-	operator !=( Fstring const & s, std::string const & t )
-	{
-		return !( s == t );
-	}
+	operator !=( Fstring const & s, std::string const & t );
 
 	// string != Fstring
-	inline
 	friend
 	bool
-	operator !=( std::string const & t, Fstring const & s )
-	{
-		return !( s == t );
-	}
+	operator !=( std::string const & t, Fstring const & s );
 
 	// Fstring == cstring
 	friend
@@ -1161,31 +1100,19 @@ public: // Comparison
 	operator ==( Fstring const & s, c_cstring const t );
 
 	// cstring == Fstring
-	inline
 	friend
 	bool
-	operator ==( c_cstring const t, Fstring const & s )
-	{
-		return ( s == t );
-	}
+	operator ==( c_cstring const t, Fstring const & s );
 
 	// Fstring != cstring
-	inline
 	friend
 	bool
-	operator !=( Fstring const & s, c_cstring const t )
-	{
-		return !( s == t );
-	}
+	operator !=( Fstring const & s, c_cstring const t );
 
 	// cstring != Fstring
-	inline
 	friend
 	bool
-	operator !=( c_cstring const t, Fstring const & s )
-	{
-		return !( s == t );
-	}
+	operator !=( c_cstring const t, Fstring const & s );
 
 	// Fstring == char
 	friend
@@ -1193,115 +1120,59 @@ public: // Comparison
 	operator ==( Fstring const & s, char const c );
 
 	// char == Fstring
-	inline
 	friend
 	bool
-	operator ==( char const c, Fstring const & s )
-	{
-		return ( s == c );
-	}
+	operator ==( char const c, Fstring const & s );
 
 	// Fstring != char
-	inline
 	friend
 	bool
-	operator !=( Fstring const & s, char const c )
-	{
-		return !( s == c );
-	}
+	operator !=( Fstring const & s, char const c );
 
 	// char != Fstring
-	inline
 	friend
 	bool
-	operator !=( char const c, Fstring const & s )
-	{
-		return !( s == c );
-	}
+	operator !=( char const c, Fstring const & s );
 
 	// Fstring == Fstring Case-Insensitively?
-	inline
 	friend
 	bool
-	equali( Fstring const & s, Fstring const & t )
-	{
-		return ( s.lowercased() == t.lowercased() );
-	}
+	equali( Fstring const & s, Fstring const & t );
 
 	// Fstring == string Case-Insensitively?
-	inline
 	friend
 	bool
-	equali( Fstring const & s, std::string const & t )
-	{
-		return ( s.lowercased() == ObjexxFCL::lowercased( t ) );
-	}
+	equali( Fstring const & s, std::string const & t );
 
 	// string == Fstring Case-Insensitively?
-	inline
 	friend
 	bool
-	equali( std::string const & s, Fstring const & t )
-	{
-		return ( ObjexxFCL::lowercased( s ) == t.lowercased() );
-	}
+	equali( std::string const & s, Fstring const & t );
 
 	// Fstring == char Case-Insensitively?
-	inline
 	friend
 	bool
-	equali( Fstring const & s, char const c )
-	{
-		return ( s.lowercased() == char( std::tolower( c ) ) );
-	}
+	equali( Fstring const & s, char const c );
 
 	// char == Fstring Case-Insensitively?
-	inline
 	friend
 	bool
-	equali( char const c, Fstring const & s )
-	{
-		return ( s.lowercased() == char( std::tolower( c ) ) );
-	}
+	equali( char const c, Fstring const & s );
 
 	// Fstring == Fstring Case-Optionally?
-	inline
 	friend
 	bool
-	equal( Fstring const & s, Fstring const & t, bool const exact_case = true )
-	{
-		if ( exact_case ) {
-			return ( s == t );
-		} else {
-			return ( s.lowercased() == t.lowercased() );
-		}
-	}
+	equal( Fstring const & s, Fstring const & t, bool const exact_case );
 
 	// Fstring == char Case-Optionally?
-	inline
 	friend
 	bool
-	equal( Fstring const & s, char const c, bool const exact_case = true )
-	{
-		if ( exact_case ) {
-			return ( s == c );
-		} else {
-			return ( s.lowercased() == char( std::tolower( c ) ) );
-		}
-	}
+	equal( Fstring const & s, char const c, bool const exact_case );
 
 	// char == Fstring Case-Optionally?
-	inline
 	friend
 	bool
-	equal( char const c, Fstring const & s, bool const exact_case = true )
-	{
-		if ( exact_case ) {
-			return ( s == c );
-		} else {
-			return ( s.lowercased() == char( std::tolower( c ) ) );
-		}
-	}
+	equal( char const c, Fstring const & s, bool const exact_case );
 
 	// Fstring <= Fstring
 	friend
@@ -1314,22 +1185,14 @@ public: // Comparison
 	operator <( Fstring const & s, Fstring const & t );
 
 	// Fstring >= Fstring
-	inline
 	friend
 	bool
-	operator >=( Fstring const & s, Fstring const & t )
-	{
-		return !( s < t );
-	}
+	operator >=( Fstring const & s, Fstring const & t );
 
 	// Fstring > Fstring
-	inline
 	friend
 	bool
-	operator >( Fstring const & s, Fstring const & t )
-	{
-		return !( s <= t );
-	}
+	operator >( Fstring const & s, Fstring const & t );
 
 	// Fstring <= string
 	friend
@@ -1342,58 +1205,34 @@ public: // Comparison
 	operator <( Fstring const & s, std::string const & t );
 
 	// Fstring >= string
-	inline
 	friend
 	bool
-	operator >=( Fstring const & s, std::string const & t )
-	{
-		return !( s < t );
-	}
+	operator >=( Fstring const & s, std::string const & t );
 
 	// Fstring > string
-	inline
 	friend
 	bool
-	operator >( Fstring const & s, std::string const & t )
-	{
-		return !( s <= t );
-	}
+	operator >( Fstring const & s, std::string const & t );
 
 	// string <= Fstring
-	inline
 	friend
 	bool
-	operator <=( std::string const & s, Fstring const & t )
-	{
-		return ( t >= s );
-	}
+	operator <=( std::string const & s, Fstring const & t );
 
 	// string < Fstring
-	inline
 	friend
 	bool
-	operator <( std::string const & s, Fstring const & t )
-	{
-		return ( t > s );
-	}
+	operator <( std::string const & s, Fstring const & t );
 
 	// string >= Fstring
-	inline
 	friend
 	bool
-	operator >=( std::string const & s, Fstring const & t )
-	{
-		return ( t <= s );
-	}
+	operator >=( std::string const & s, Fstring const & t );
 
 	// string > Fstring
-	inline
 	friend
 	bool
-	operator >( std::string const & s, Fstring const & t )
-	{
-		return ( t < s );
-	}
+	operator >( std::string const & s, Fstring const & t );
 
 	// Fstring <= cstring
 	friend
@@ -1406,58 +1245,34 @@ public: // Comparison
 	operator <( Fstring const & s, c_cstring const t );
 
 	// Fstring >= cstring
-	inline
 	friend
 	bool
-	operator >=( Fstring const & s, c_cstring const t )
-	{
-		return !( s < t );
-	}
+	operator >=( Fstring const & s, c_cstring const t );
 
 	// Fstring > cstring
-	inline
 	friend
 	bool
-	operator >( Fstring const & s, c_cstring const t )
-	{
-		return !( s <= t );
-	}
+	operator >( Fstring const & s, c_cstring const t );
 
 	// cstring <= Fstring
-	inline
 	friend
 	bool
-	operator <=( c_cstring const s, Fstring const & t )
-	{
-		return ( t >= s );
-	}
+	operator <=( c_cstring const s, Fstring const & t );
 
 	// cstring < Fstring
-	inline
 	friend
 	bool
-	operator <( c_cstring const s, Fstring const & t )
-	{
-		return ( t > s );
-	}
+	operator <( c_cstring const s, Fstring const & t );
 
 	// cstring >= Fstring
-	inline
 	friend
 	bool
-	operator >=( c_cstring const s, Fstring const & t )
-	{
-		return ( t <= s );
-	}
+	operator >=( c_cstring const s, Fstring const & t );
 
 	// cstring > Fstring
-	inline
 	friend
 	bool
-	operator >( c_cstring const s, Fstring const & t )
-	{
-		return ( t < s );
-	}
+	operator >( c_cstring const s, Fstring const & t );
 
 public: // Substring
 
@@ -1562,226 +1377,6 @@ private: // Data
 	bool const sub_; // Substring flag
 
 }; // Fstring
-
-// Fstring + Fstring
-Fstring
-operator +( Fstring const & s, Fstring const & t );
-
-// Fstring + string
-std::string
-operator +( Fstring const & s, std::string const & t );
-
-// string + Fstring
-std::string
-operator +( std::string const & t, Fstring const & s );
-
-// Fstring + cstring
-Fstring
-operator +( Fstring const & s, c_cstring const t );
-
-// cstring + Fstring
-Fstring
-operator +( c_cstring const s, Fstring const & t );
-
-// Fstring + char
-Fstring
-operator +( Fstring const & s, char const c );
-
-// char + Fstring
-Fstring
-operator +( char const c, Fstring const & s );
-
-// Fstring == Fstring
-bool
-operator ==( Fstring const & s, Fstring const & t );
-
-// Fstring != Fstring
-bool
-operator !=( Fstring const & s, Fstring const & t );
-
-// Fstring == string
-bool
-operator ==( Fstring const & s, std::string const & t );
-
-// string == Fstring
-bool
-operator ==( std::string const & t, Fstring const & s );
-
-// Fstring != string
-bool
-operator !=( Fstring const & s, std::string const & t );
-
-// string != Fstring
-bool
-operator !=( std::string const & t, Fstring const & s );
-
-// Fstring == cstring
-bool
-operator ==( Fstring const & s, c_cstring const t );
-
-// cstring == Fstring
-bool
-operator ==( c_cstring const t, Fstring const & s );
-
-// Fstring != cstring
-bool
-operator !=( Fstring const & s, c_cstring const t );
-
-// cstring != Fstring
-bool
-operator !=( c_cstring const t, Fstring const & s );
-
-// Fstring == char
-bool
-operator ==( Fstring const & s, char const c );
-
-// char == Fstring
-bool
-operator ==( char const c, Fstring const & s );
-
-// Fstring != char
-bool
-operator !=( Fstring const & s, char const c );
-
-// char != Fstring
-bool
-operator !=( char const c, Fstring const & s );
-
-// Fstring == Fstring Case-Insensitively?
-bool
-equali( Fstring const & s, Fstring const & t );
-
-// Fstring == string Case-Insensitively?
-bool
-equali( Fstring const & s, std::string const & t );
-
-// string == Fstring Case-Insensitively?
-bool
-equali( std::string const & s, Fstring const & t );
-
-// Fstring == char Case-Insensitively?
-bool
-equali( Fstring const & s, char const c );
-
-// char == Fstring Case-Insensitively?
-bool
-equali( char const c, Fstring const & s );
-
-// Fstring == Fstring Case-Optionally?
-bool
-equal( Fstring const & s, Fstring const & t, bool const exact_case );
-
-// Fstring == char Case-Optionally?
-bool
-equal( Fstring const & s, char const c, bool const exact_case );
-
-// char == Fstring Case-Optionally?
-bool
-equal( char const c, Fstring const & s, bool const exact_case );
-
-// Fstring <= Fstring
-bool
-operator <=( Fstring const & s, Fstring const & t );
-
-// Fstring < Fstring
-bool
-operator <( Fstring const & s, Fstring const & t );
-
-// Fstring >= Fstring
-bool
-operator >=( Fstring const & s, Fstring const & t );
-
-// Fstring > Fstring
-bool
-operator >( Fstring const & s, Fstring const & t );
-
-// Fstring <= string
-bool
-operator <=( Fstring const & s, std::string const & t );
-
-// Fstring < string
-bool
-operator <( Fstring const & s, std::string const & t );
-
-// Fstring >= string
-bool
-operator >=( Fstring const & s, std::string const & t );
-
-// Fstring > string
-bool
-operator >( Fstring const & s, std::string const & t );
-
-// string <= Fstring
-bool
-operator <=( std::string const & s, Fstring const & t );
-
-// string < Fstring
-bool
-operator <( std::string const & s, Fstring const & t );
-
-// string >= Fstring
-bool
-operator >=( std::string const & s, Fstring const & t );
-
-// string > Fstring
-bool
-operator >( std::string const & s, Fstring const & t );
-
-// Fstring <= cstring
-bool
-operator <=( Fstring const & s, c_cstring const t );
-
-// Fstring < cstring
-bool
-operator <( Fstring const & s, c_cstring const t );
-
-// Fstring >= cstring
-bool
-operator >=( Fstring const & s, c_cstring const t );
-
-// Fstring > cstring
-bool
-operator >( Fstring const & s, c_cstring const t );
-
-// cstring <= Fstring
-bool
-operator <=( c_cstring const s, Fstring const & t );
-
-// cstring < Fstring
-bool
-operator <( c_cstring const s, Fstring const & t );
-
-// cstring >= Fstring
-bool
-operator >=( c_cstring const s, Fstring const & t );
-
-// cstring > Fstring
-bool
-operator >( c_cstring const s, Fstring const & t );
-
-// Stream Input
-std::istream &
-operator >>( std::istream & stream, Fstring & s );
-
-// Get from Stream
-std::istream &
-get( std::istream & stream, Fstring & s );
-
-// Get Line from Stream
-std::istream &
-getline( std::istream & stream, Fstring & s );
-
-// Read from Stream
-std::istream &
-read( std::istream & stream, Fstring & s );
-
-// Read Available Characters from Stream
-std::istream &
-readsome( std::istream & stream, Fstring & s );
-
-// Stream Output
-std::ostream &
-operator <<( std::ostream & stream, Fstring const & s );
 
 // Fstring Member Function Explicit Specializations
 
@@ -1902,6 +1497,8 @@ public: // Modifier
 
 }; // Fsubstring
 
+// Fstring Member Function Definitions
+
 	// Constant Substring: s( {l,u} )
 	template< typename U >
 	Fsubstring const
@@ -1949,6 +1546,413 @@ public: // Modifier
 			break;
 		}
 	}
+
+// Fstring Friends
+
+// Fstring + Fstring
+inline
+Fstring
+operator +( Fstring const & s, Fstring const & t )
+{
+	Fstring u( static_cast< Fstring::size_type >( s.len_ + t.len_ ) );
+	std::memcpy( u.str_, s.str_, s.len_ );
+	std::memcpy( u.str_ + s.len_, t.str_, t.len_ );
+	return u;
+}
+
+// Fstring + string
+inline
+std::string
+operator +( Fstring const & s, std::string const & t )
+{
+	return ( static_cast< std::string >( s ) + t );
+}
+
+// string + Fstring
+inline
+std::string
+operator +( std::string const & t, Fstring const & s )
+{
+	return ( t + static_cast< std::string >( s ) );
+}
+
+// Fstring + cstring
+inline
+Fstring
+operator +( Fstring const & s, c_cstring const t )
+{
+	Fstring::size_type const t_len( std::strlen( t ) );
+	Fstring u( s.len_ + t_len );
+	std::memcpy( u.str_, s.str_, s.len_ );
+	std::memcpy( u.str_ + s.len_, t, t_len );
+	return u;
+}
+
+// cstring + Fstring
+inline
+Fstring
+operator +( c_cstring const s, Fstring const & t )
+{
+	Fstring::size_type const s_len( std::strlen( s ) );
+	Fstring u( s_len + t.len_ );
+	std::memcpy( u.str_, s, s_len );
+	std::memcpy( u.str_ + s_len, t.str_, t.len_ );
+	return u;
+}
+
+// Fstring + char
+inline
+Fstring
+operator +( Fstring const & s, char const c )
+{
+	Fstring u( s.len_ + 1 );
+	std::memcpy( u.str_, s.str_, s.len_ );
+	u.str_[ s.len_ ] = c;
+	return u;
+}
+
+// char + Fstring
+inline
+Fstring
+operator +( char const c, Fstring const & s )
+{
+	Fstring u( 1 + s.len_ );
+	u.str_[ 0 ] = c;
+	std::memcpy( u.str_ + 1, s.str_, s.len_ );
+	return u;
+}
+
+// Fstring == Fstring
+bool
+operator ==( Fstring const & s, Fstring const & t );
+
+// Fstring != Fstring
+inline
+bool
+operator !=( Fstring const & s, Fstring const & t )
+{
+	return !( s == t );
+}
+
+// Fstring == string
+bool
+operator ==( Fstring const & s, std::string const & t );
+
+// string == Fstring
+inline
+bool
+operator ==( std::string const & t, Fstring const & s )
+{
+	return ( s == t );
+}
+
+// Fstring != string
+inline
+bool
+operator !=( Fstring const & s, std::string const & t )
+{
+	return !( s == t );
+}
+
+// string != Fstring
+inline
+bool
+operator !=( std::string const & t, Fstring const & s )
+{
+	return !( s == t );
+}
+
+// Fstring == cstring
+bool
+operator ==( Fstring const & s, c_cstring const t );
+
+// cstring == Fstring
+inline
+bool
+operator ==( c_cstring const t, Fstring const & s )
+{
+	return ( s == t );
+}
+
+// Fstring != cstring
+inline
+bool
+operator !=( Fstring const & s, c_cstring const t )
+{
+	return !( s == t );
+}
+
+// cstring != Fstring
+inline
+bool
+operator !=( c_cstring const t, Fstring const & s )
+{
+	return !( s == t );
+}
+
+// Fstring == char
+bool
+operator ==( Fstring const & s, char const c );
+
+// char == Fstring
+inline
+bool
+operator ==( char const c, Fstring const & s )
+{
+	return ( s == c );
+}
+
+// Fstring != char
+inline
+bool
+operator !=( Fstring const & s, char const c )
+{
+	return !( s == c );
+}
+
+// char != Fstring
+inline
+bool
+operator !=( char const c, Fstring const & s )
+{
+	return !( s == c );
+}
+
+// Fstring == Fstring Case-Insensitively?
+inline
+bool
+equali( Fstring const & s, Fstring const & t )
+{
+	return ( s.lowercased() == t.lowercased() );
+}
+
+// Fstring == string Case-Insensitively?
+inline
+bool
+equali( Fstring const & s, std::string const & t )
+{
+	return ( s.lowercased() == ObjexxFCL::lowercased( t ) );
+}
+
+// string == Fstring Case-Insensitively?
+inline
+bool
+equali( std::string const & s, Fstring const & t )
+{
+	return ( ObjexxFCL::lowercased( s ) == t.lowercased() );
+}
+
+// Fstring == char Case-Insensitively?
+inline
+bool
+equali( Fstring const & s, char const c )
+{
+	return ( s.lowercased() == char( std::tolower( c ) ) );
+}
+
+// char == Fstring Case-Insensitively?
+inline
+bool
+equali( char const c, Fstring const & s )
+{
+	return ( s.lowercased() == char( std::tolower( c ) ) );
+}
+
+// Fstring == Fstring Case-Optionally?
+inline
+bool
+equal( Fstring const & s, Fstring const & t, bool const exact_case = true )
+{
+	if ( exact_case ) {
+		return ( s == t );
+	} else {
+		return ( s.lowercased() == t.lowercased() );
+	}
+}
+
+// Fstring == char Case-Optionally?
+inline
+bool
+equal( Fstring const & s, char const c, bool const exact_case = true )
+{
+	if ( exact_case ) {
+		return ( s == c );
+	} else {
+		return ( s.lowercased() == char( std::tolower( c ) ) );
+	}
+}
+
+// char == Fstring Case-Optionally?
+inline
+bool
+equal( char const c, Fstring const & s, bool const exact_case = true )
+{
+	if ( exact_case ) {
+		return ( s == c );
+	} else {
+		return ( s.lowercased() == char( std::tolower( c ) ) );
+	}
+}
+
+// Fstring <= Fstring
+bool
+operator <=( Fstring const & s, Fstring const & t );
+
+// Fstring < Fstring
+bool
+operator <( Fstring const & s, Fstring const & t );
+
+// Fstring >= Fstring
+inline
+bool
+operator >=( Fstring const & s, Fstring const & t )
+{
+	return !( s < t );
+}
+
+// Fstring > Fstring
+inline
+bool
+operator >( Fstring const & s, Fstring const & t )
+{
+	return !( s <= t );
+}
+
+// Fstring <= string
+bool
+operator <=( Fstring const & s, std::string const & t );
+
+// Fstring < string
+bool
+operator <( Fstring const & s, std::string const & t );
+
+// Fstring >= string
+inline
+bool
+operator >=( Fstring const & s, std::string const & t )
+{
+	return !( s < t );
+}
+
+// Fstring > string
+inline
+bool
+operator >( Fstring const & s, std::string const & t )
+{
+	return !( s <= t );
+}
+
+// string <= Fstring
+inline
+bool
+operator <=( std::string const & s, Fstring const & t )
+{
+	return ( t >= s );
+}
+
+// string < Fstring
+inline
+bool
+operator <( std::string const & s, Fstring const & t )
+{
+	return ( t > s );
+}
+
+// string >= Fstring
+inline
+bool
+operator >=( std::string const & s, Fstring const & t )
+{
+	return ( t <= s );
+}
+
+// string > Fstring
+inline
+bool
+operator >( std::string const & s, Fstring const & t )
+{
+	return ( t < s );
+}
+
+// Fstring <= cstring
+bool
+operator <=( Fstring const & s, c_cstring const t );
+
+// Fstring < cstring
+bool
+operator <( Fstring const & s, c_cstring const t );
+
+// Fstring >= cstring
+inline
+bool
+operator >=( Fstring const & s, c_cstring const t )
+{
+	return !( s < t );
+}
+
+// Fstring > cstring
+inline
+bool
+operator >( Fstring const & s, c_cstring const t )
+{
+	return !( s <= t );
+}
+
+// cstring <= Fstring
+inline
+bool
+operator <=( c_cstring const s, Fstring const & t )
+{
+	return ( t >= s );
+}
+
+// cstring < Fstring
+inline
+bool
+operator <( c_cstring const s, Fstring const & t )
+{
+	return ( t > s );
+}
+
+// cstring >= Fstring
+inline
+bool
+operator >=( c_cstring const s, Fstring const & t )
+{
+	return ( t <= s );
+}
+
+// cstring > Fstring
+inline
+bool
+operator >( c_cstring const s, Fstring const & t )
+{
+	return ( t < s );
+}
+
+// Stream Input
+std::istream &
+operator >>( std::istream & stream, Fstring & s );
+
+// Get from Stream
+std::istream &
+get( std::istream & stream, Fstring & s );
+
+// Get Line from Stream
+std::istream &
+getline( std::istream & stream, Fstring & s );
+
+// Read from Stream
+std::istream &
+read( std::istream & stream, Fstring & s );
+
+// Read Available Characters from Stream
+std::istream &
+readsome( std::istream & stream, Fstring & s );
+
+// Stream Output
+std::ostream &
+operator <<( std::ostream & stream, Fstring const & s );
 
 // Fortran-Intrinsic-Compatible String Functions
 

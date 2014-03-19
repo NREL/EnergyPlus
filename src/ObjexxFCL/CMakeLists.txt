@@ -264,6 +264,7 @@ SET(SRC
   StaticIndexRange.hh
   Sticky.fwd.hh
   Sticky.hh
+  Stream.cc
   Stream.fwd.hh
   Stream.hh
   string.constants.hh

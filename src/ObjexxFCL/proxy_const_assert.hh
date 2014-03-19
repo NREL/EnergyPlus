@@ -15,7 +15,7 @@
 
 // C++ Headers
 #include <cassert>
-#if !defined (NDEBUG) && defined (__linux__) && defined (__GNUC__) && OBJEXXFCL_PROXY_CONST_CHECKS == 2
+#if !defined(NDEBUG) && defined(__linux__) && defined(__GNUC__) && OBJEXXFCL_PROXY_CONST_CHECKS == 2
 #include <cstddef>
 #include <cstdio>
 #include <execinfo.h>
@@ -24,7 +24,7 @@
 namespace ObjexxFCL {
 
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-#if !defined (NDEBUG) && defined (__linux__) && defined (__GNUC__) && OBJEXXFCL_PROXY_CONST_CHECKS == 2
+#if !defined(NDEBUG) && defined(__linux__) && defined(__GNUC__) && OBJEXXFCL_PROXY_CONST_CHECKS == 2
 void
 proxy_const_backtrace( char const * file, int const line )
 {

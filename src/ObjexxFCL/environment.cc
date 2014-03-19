@@ -51,6 +51,7 @@ getenvqq( Fstring const & name, Fstring & value )
 	value = ( cval ? cval : "" );
 	return value.length();
 }
+
 // Set Environment Variable Value
 bool
 setenvqq( Fstring const & name_eq_value )
@@ -61,7 +62,11 @@ setenvqq( Fstring const & name_eq_value )
 #ifdef __GNUC__
 	return ( putenv( const_cast< char * >( name_eq_value.c_str() ) ) == 0 ? true : false ); // Hack for non-const interface: Should really copy the string or use setenv
 #else
-	return ( putenv( name_eq_value.c_str() ) == 0 ? true : false ); // Not standard but widely supported: VC prefers _putenv but this still works
+#if defined(_MSC_VER) && !defined(__INTEL_COMPILER)
+	return ( _putenv( name_eq_value.c_str() ) == 0 ? true : false );
+#else
+	return ( putenv( name_eq_value.c_str() ) == 0 ? true : false ); // Not standard but widely supported
+#endif
 #endif
 #endif
 }

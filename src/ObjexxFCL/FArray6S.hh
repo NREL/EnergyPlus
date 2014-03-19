@@ -229,7 +229,7 @@ public: // Assignment
 					for ( int i4 = 1, e4 = u4_; i4 <= e4; ++i4 ) {
 						for ( int i3 = 1, e3 = u3_; i3 <= e3; ++i3 ) {
 							for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
-								for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+								for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
 									operator()( i1, i2, i3, i4, i5, i6 ) = a( i1, i2, i3, i4, i5, i6 );
 								}
 							}
@@ -253,7 +253,7 @@ public: // Assignment
 				for ( int i4 = 1, e4 = u4_; i4 <= e4; ++i4 ) {
 					for ( int i3 = 1, e3 = u3_; i3 <= e3; ++i3 ) {
 						for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
-							for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+							for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
 								operator()( i1, i2, i3, i4, i5, i6 ) = a( i1, i2, i3, i4, i5, i6 );
 							}
 						}

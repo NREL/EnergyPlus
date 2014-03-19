@@ -20,6 +20,7 @@
 // C++ Headers
 #include <cassert>
 #include <iosfwd>
+#include <type_traits>
 #include <utility>
 
 namespace ObjexxFCL {

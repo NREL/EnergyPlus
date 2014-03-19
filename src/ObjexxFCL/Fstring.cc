@@ -1195,301 +1195,6 @@ namespace ObjexxFCL {
 		return len_copied;
 	}
 
-	// Fstring == Fstring
-	bool
-	operator ==( Fstring const & s, Fstring const & t )
-	{
-		Fstring::size_type const min_len( std::min( s.len_, t.len_ ) );
-		for ( Fstring::size_type i = 0; i < min_len; ++i ) {
-			if ( s.str_[ i ] != t.str_[ i ] ) return false;
-		}
-		if ( s.len_ < t.len_ ) {
-			for ( Fstring::size_type i = s.len_, e = t.len_; i < e; ++i ) {
-				if ( t.str_[ i ] != SPC ) return false;
-			}
-		} else if ( s.len_ > t.len_ ) {
-			for ( Fstring::size_type i = t.len_, e = s.len_; i < e; ++i ) {
-				if ( s.str_[ i ] != SPC ) return false;
-			}
-		}
-		return true;
-	}
-
-	// Fstring == string
-	bool
-	operator ==( Fstring const & s, std::string const & t )
-	{
-		Fstring::size_type const t_len( t.length() );
-		Fstring::size_type const min_len( std::min( s.len_, t_len ) );
-		for ( Fstring::size_type i = 0; i < min_len; ++i ) {
-			if ( s.str_[ i ] != t[ i ] ) return false;
-		}
-		if ( s.len_ < t_len ) {
-			for ( Fstring::size_type i = s.len_; i < t_len; ++i ) {
-				if ( t[ i ] != SPC ) return false;
-			}
-		} else if ( s.len_ > t_len ) {
-			for ( Fstring::size_type i = t_len, e = s.len_; i < e; ++i ) {
-				if ( s.str_[ i ] != SPC ) return false;
-			}
-		}
-		return true;
-	}
-
-	// Fstring == cstring
-	bool
-	operator ==( Fstring const & s, c_cstring const t )
-	{
-		Fstring::size_type const t_len( std::strlen( t ) );
-		Fstring::size_type const min_len( std::min( s.len_, t_len ) );
-		for ( Fstring::size_type i = 0; i < min_len; ++i ) {
-			if ( s.str_[ i ] != t[ i ] ) return false;
-		}
-		if ( s.len_ < t_len ) {
-			for ( Fstring::size_type i = s.len_; i < t_len; ++i ) {
-				if ( t[ i ] != SPC ) return false;
-			}
-		} else if ( s.len_ > t_len ) {
-			for ( Fstring::size_type i = t_len, e = s.len_; i < e; ++i ) {
-				if ( s.str_[ i ] != SPC ) return false;
-			}
-		}
-		return true;
-	}
-
-	// Fstring == char
-	bool
-	operator ==( Fstring const & s, char const c )
-	{
-		if ( s.empty() ) { // Zero-length Fstring
-			return false;
-		} else if ( s.str_[ 0 ] == c ) { // First character matches
-			return ( s( 2 ).is_blank() ); // Rest is blank
-		} else { // First character doesn't match
-			return false;
-		}
-	}
-
-	// Fstring <= Fstring
-	bool
-	operator <=( Fstring const & s, Fstring const & t )
-	{
-		Fstring::size_type const min_len( std::min( s.len_, t.len_ ) );
-		for ( Fstring::size_type i = 0; i < min_len; ++i ) {
-			unsigned char const s_i( s.str_[ i ] );
-			unsigned char const t_i( t.str_[ i ] );
-			if ( s_i < t_i ) {
-				return true;
-			} else if ( s_i > t_i ) {
-				return false;
-			}
-		}
-		if ( s.len_ < t.len_ ) {
-			for ( Fstring::size_type i = s.len_, e = t.len_; i < e; ++i ) {
-				unsigned char const t_i( t.str_[ i ] );
-				if ( SPC < t_i ) {
-					return true;
-				} else if ( SPC > t_i ) {
-					return false;
-				}
-			}
-		} else if ( s.len_ > t.len_ ) {
-			for ( Fstring::size_type i = t.len_, e = s.len_; i < e; ++i ) {
-				unsigned char const s_i( s.str_[ i ] );
-				if ( s_i < SPC ) {
-					return true;
-				} else if ( s_i > SPC ) {
-					return false;
-				}
-			}
-		}
-		return true; // Equal
-	}
-
-	// Fstring < Fstring
-	bool
-	operator <( Fstring const & s, Fstring const & t )
-	{
-		Fstring::size_type const min_len( std::min( s.len_, t.len_ ) );
-		for ( Fstring::size_type i = 0; i < min_len; ++i ) {
-			unsigned char const s_i( s.str_[ i ] );
-			unsigned char const t_i( t.str_[ i ] );
-			if ( s_i < t_i ) {
-				return true;
-			} else if ( s_i > t_i ) {
-				return false;
-			}
-		}
-		if ( s.len_ < t.len_ ) {
-			for ( Fstring::size_type i = s.len_, e = t.len_; i < e; ++i ) {
-				unsigned char const t_i( t.str_[ i ] );
-				if ( SPC < t_i ) {
-					return true;
-				} else if ( SPC > t_i ) {
-					return false;
-				}
-			}
-		} else if ( s.len_ > t.len_ ) {
-			for ( Fstring::size_type i = t.len_, e = s.len_; i < e; ++i ) {
-				unsigned char const s_i( s.str_[ i ] );
-				if ( s_i < SPC ) {
-					return true;
-				} else if ( s_i > SPC ) {
-					return false;
-				}
-			}
-		}
-		return false; // Equal
-	}
-
-	// Fstring <= string
-	bool
-	operator <=( Fstring const & s, std::string const & t )
-	{
-		Fstring::size_type const t_len( t.length() );
-		Fstring::size_type const min_len( std::min( s.len_, t_len ) );
-		for ( Fstring::size_type i = 0; i < min_len; ++i ) {
-			unsigned char const s_i( s.str_[ i ] );
-			unsigned char const t_i( t[ i ] );
-			if ( s_i < t_i ) {
-				return true;
-			} else if ( s_i > t_i ) {
-				return false;
-			}
-		}
-		if ( s.len_ < t_len ) {
-			for ( Fstring::size_type i = s.len_; i < t_len; ++i ) {
-				unsigned char const t_i( t[ i ] );
-				if ( SPC < t_i ) {
-					return true;
-				} else if ( SPC > t_i ) {
-					return false;
-				}
-			}
-		} else if ( s.len_ > t_len ) {
-			for ( Fstring::size_type i = t_len, e = s.len_; i < e; ++i ) {
-				unsigned char const s_i( s.str_[ i ] );
-				if ( s_i < SPC ) {
-					return true;
-				} else if ( s_i > SPC ) {
-					return false;
-				}
-			}
-		}
-		return true; // Equal
-	}
-
-	// Fstring < string
-	bool
-	operator <( Fstring const & s, std::string const & t )
-	{
-		Fstring::size_type const t_len( t.length() );
-		Fstring::size_type const min_len( std::min( s.len_, t_len ) );
-		for ( Fstring::size_type i = 0; i < min_len; ++i ) {
-			unsigned char const s_i( s.str_[ i ] );
-			unsigned char const t_i( t[ i ] );
-			if ( s_i < t_i ) {
-				return true;
-			} else if ( s_i > t_i ) {
-				return false;
-			}
-		}
-		if ( s.len_ < t_len ) {
-			for ( Fstring::size_type i = s.len_; i < t_len; ++i ) {
-				unsigned char const t_i( t[ i ] );
-				if ( SPC < t_i ) {
-					return true;
-				} else if ( SPC > t_i ) {
-					return false;
-				}
-			}
-		} else if ( s.len_ > t_len ) {
-			for ( Fstring::size_type i = t_len, e = s.len_; i < e; ++i ) {
-				unsigned char const s_i( s.str_[ i ] );
-				if ( s_i < SPC ) {
-					return true;
-				} else if ( s_i > SPC ) {
-					return false;
-				}
-			}
-		}
-		return false; // Equal
-	}
-
-	// Fstring <= cstring
-	bool
-	operator <=( Fstring const & s, c_cstring const t )
-	{
-		Fstring::size_type const t_len( std::strlen( t ) );
-		Fstring::size_type const min_len( std::min( s.len_, t_len ) );
-		for ( Fstring::size_type i = 0; i < min_len; ++i ) {
-			unsigned char const s_i( s.str_[ i ] );
-			unsigned char const t_i( t[ i ] );
-			if ( s_i < t_i ) {
-				return true;
-			} else if ( s_i > t_i ) {
-				return false;
-			}
-		}
-		if ( s.len_ < t_len ) {
-			for ( Fstring::size_type i = s.len_; i < t_len; ++i ) {
-				unsigned char const t_i( t[ i ] );
-				if ( SPC < t_i ) {
-					return true;
-				} else if ( SPC > t_i ) {
-					return false;
-				}
-			}
-		} else if ( s.len_ > t_len ) {
-			for ( Fstring::size_type i = t_len, e = s.len_; i < e; ++i ) {
-				unsigned char const s_i( s.str_[ i ] );
-				if ( s_i < SPC ) {
-					return true;
-				} else if ( s_i > SPC ) {
-					return false;
-				}
-			}
-		}
-		return true; // Equal
-	}
-
-	// Fstring < cstring
-	bool
-	operator <( Fstring const & s, c_cstring const t )
-	{
-		Fstring::size_type const t_len( std::strlen( t ) );
-		Fstring::size_type const min_len( std::min( s.len_, t_len ) );
-		for ( Fstring::size_type i = 0; i < min_len; ++i ) {
-			unsigned char const s_i( s.str_[ i ] );
-			unsigned char const t_i( t[ i ] );
-			if ( s_i < t_i ) {
-				return true;
-			} else if ( s_i > t_i ) {
-				return false;
-			}
-		}
-		if ( s.len_ < t_len ) {
-			for ( Fstring::size_type i = s.len_; i < t_len; ++i ) {
-				unsigned char const t_i( t[ i ] );
-				if ( SPC < t_i ) {
-					return true;
-				} else if ( SPC > t_i ) {
-					return false;
-				}
-			}
-		} else if ( s.len_ > t_len ) {
-			for ( Fstring::size_type i = t_len, e = s.len_; i < e; ++i ) {
-				unsigned char const s_i( s.str_[ i ] );
-				if ( s_i < SPC ) {
-					return true;
-				} else if ( s_i > SPC ) {
-					return false;
-				}
-			}
-		}
-		return false; // Equal
-	}
-
 	// Constant Substring: s( l, u )
 	Fsubstring const
 	Fstring::operator ()( size_type const l, size_type const u ) const
@@ -1662,66 +1367,6 @@ namespace ObjexxFCL {
 		return Fsubstring( *this, len_trim() + 1 );
 	}
 
-	// Stream Input
-	std::istream &
-	operator >>( std::istream & stream, Fstring & s )
-	{
-		std::string ss;
-		stream >> std::setw( s.len_ ) >> ss;
-		s = ss;
-		return stream;
-	}
-
-	// Get from Stream
-	std::istream &
-	get( std::istream & stream, Fstring & s )
-	{
-		if ( s.len_ > 0u ) {
-			char * const buff( new char[ s.len_ + 1 ] );
-			stream.get( buff, s.len_ + 1 ); // get adds null-terminator
-			std::size_t const lb( std::strlen( buff ) );
-			std::memcpy( s.str_, buff, lb );
-			std::memset( s.str_ + lb, SPC, s.len_ - lb );
-			delete[] buff;
-		}
-		return stream;
-	}
-
-	// Get Line from Stream
-	std::istream &
-	getline( std::istream & stream, Fstring & s )
-	{
-		std::string ss;
-		stream.width( s.len_ );
-		std::getline( stream, ss );
-		s = ss;
-		return stream;
-	}
-
-	// Read from Stream
-	std::istream &
-	read( std::istream & stream, Fstring & s )
-	{
-		stream.read( s.str_, s.len_ );
-		return stream;
-	}
-
-	// Read Available Characters from Stream
-	std::istream &
-	readsome( std::istream & stream, Fstring & s )
-	{
-		stream.readsome( s.str_, s.len_ );
-		return stream;
-	}
-
-	// Stream Output
-	std::ostream &
-	operator <<( std::ostream & stream, Fstring const & s )
-	{
-		stream.write( s.str_, s.len_ );
-		return stream;
-	}
-
 	// Copy Assignment
 	Fsubstring &
 	Fsubstring::operator =( Fsubstring const & s )
@@ -1790,5 +1435,362 @@ namespace ObjexxFCL {
 		}
 		return *this;
 	}
+
+// Fstring Friends
+
+// Fstring == Fstring
+bool
+operator ==( Fstring const & s, Fstring const & t )
+{
+	Fstring::size_type const min_len( std::min( s.len_, t.len_ ) );
+	for ( Fstring::size_type i = 0; i < min_len; ++i ) {
+		if ( s.str_[ i ] != t.str_[ i ] ) return false;
+	}
+	if ( s.len_ < t.len_ ) {
+		for ( Fstring::size_type i = s.len_, e = t.len_; i < e; ++i ) {
+			if ( t.str_[ i ] != SPC ) return false;
+		}
+	} else if ( s.len_ > t.len_ ) {
+		for ( Fstring::size_type i = t.len_, e = s.len_; i < e; ++i ) {
+			if ( s.str_[ i ] != SPC ) return false;
+		}
+	}
+	return true;
+}
+
+// Fstring == string
+bool
+operator ==( Fstring const & s, std::string const & t )
+{
+	Fstring::size_type const t_len( t.length() );
+	Fstring::size_type const min_len( std::min( s.len_, t_len ) );
+	for ( Fstring::size_type i = 0; i < min_len; ++i ) {
+		if ( s.str_[ i ] != t[ i ] ) return false;
+	}
+	if ( s.len_ < t_len ) {
+		for ( Fstring::size_type i = s.len_; i < t_len; ++i ) {
+			if ( t[ i ] != SPC ) return false;
+		}
+	} else if ( s.len_ > t_len ) {
+		for ( Fstring::size_type i = t_len, e = s.len_; i < e; ++i ) {
+			if ( s.str_[ i ] != SPC ) return false;
+		}
+	}
+	return true;
+}
+
+// Fstring == cstring
+bool
+operator ==( Fstring const & s, c_cstring const t )
+{
+	Fstring::size_type const t_len( std::strlen( t ) );
+	Fstring::size_type const min_len( std::min( s.len_, t_len ) );
+	for ( Fstring::size_type i = 0; i < min_len; ++i ) {
+		if ( s.str_[ i ] != t[ i ] ) return false;
+	}
+	if ( s.len_ < t_len ) {
+		for ( Fstring::size_type i = s.len_; i < t_len; ++i ) {
+			if ( t[ i ] != SPC ) return false;
+		}
+	} else if ( s.len_ > t_len ) {
+		for ( Fstring::size_type i = t_len, e = s.len_; i < e; ++i ) {
+			if ( s.str_[ i ] != SPC ) return false;
+		}
+	}
+	return true;
+}
+
+// Fstring == char
+bool
+operator ==( Fstring const & s, char const c )
+{
+	if ( s.empty() ) { // Zero-length Fstring
+		return false;
+	} else if ( s.str_[ 0 ] == c ) { // First character matches
+		return ( s( 2 ).is_blank() ); // Rest is blank
+	} else { // First character doesn't match
+		return false;
+	}
+}
+
+// Fstring <= Fstring
+bool
+operator <=( Fstring const & s, Fstring const & t )
+{
+	Fstring::size_type const min_len( std::min( s.len_, t.len_ ) );
+	for ( Fstring::size_type i = 0; i < min_len; ++i ) {
+		unsigned char const s_i( s.str_[ i ] );
+		unsigned char const t_i( t.str_[ i ] );
+		if ( s_i < t_i ) {
+			return true;
+		} else if ( s_i > t_i ) {
+			return false;
+		}
+	}
+	if ( s.len_ < t.len_ ) {
+		for ( Fstring::size_type i = s.len_, e = t.len_; i < e; ++i ) {
+			unsigned char const t_i( t.str_[ i ] );
+			if ( SPC < t_i ) {
+				return true;
+			} else if ( SPC > t_i ) {
+				return false;
+			}
+		}
+	} else if ( s.len_ > t.len_ ) {
+		for ( Fstring::size_type i = t.len_, e = s.len_; i < e; ++i ) {
+			unsigned char const s_i( s.str_[ i ] );
+			if ( s_i < SPC ) {
+				return true;
+			} else if ( s_i > SPC ) {
+				return false;
+			}
+		}
+	}
+	return true; // Equal
+}
+
+// Fstring < Fstring
+bool
+operator <( Fstring const & s, Fstring const & t )
+{
+	Fstring::size_type const min_len( std::min( s.len_, t.len_ ) );
+	for ( Fstring::size_type i = 0; i < min_len; ++i ) {
+		unsigned char const s_i( s.str_[ i ] );
+		unsigned char const t_i( t.str_[ i ] );
+		if ( s_i < t_i ) {
+			return true;
+		} else if ( s_i > t_i ) {
+			return false;
+		}
+	}
+	if ( s.len_ < t.len_ ) {
+		for ( Fstring::size_type i = s.len_, e = t.len_; i < e; ++i ) {
+			unsigned char const t_i( t.str_[ i ] );
+			if ( SPC < t_i ) {
+				return true;
+			} else if ( SPC > t_i ) {
+				return false;
+			}
+		}
+	} else if ( s.len_ > t.len_ ) {
+		for ( Fstring::size_type i = t.len_, e = s.len_; i < e; ++i ) {
+			unsigned char const s_i( s.str_[ i ] );
+			if ( s_i < SPC ) {
+				return true;
+			} else if ( s_i > SPC ) {
+				return false;
+			}
+		}
+	}
+	return false; // Equal
+}
+
+// Fstring <= string
+bool
+operator <=( Fstring const & s, std::string const & t )
+{
+	Fstring::size_type const t_len( t.length() );
+	Fstring::size_type const min_len( std::min( s.len_, t_len ) );
+	for ( Fstring::size_type i = 0; i < min_len; ++i ) {
+		unsigned char const s_i( s.str_[ i ] );
+		unsigned char const t_i( t[ i ] );
+		if ( s_i < t_i ) {
+			return true;
+		} else if ( s_i > t_i ) {
+			return false;
+		}
+	}
+	if ( s.len_ < t_len ) {
+		for ( Fstring::size_type i = s.len_; i < t_len; ++i ) {
+			unsigned char const t_i( t[ i ] );
+			if ( SPC < t_i ) {
+				return true;
+			} else if ( SPC > t_i ) {
+				return false;
+			}
+		}
+	} else if ( s.len_ > t_len ) {
+		for ( Fstring::size_type i = t_len, e = s.len_; i < e; ++i ) {
+			unsigned char const s_i( s.str_[ i ] );
+			if ( s_i < SPC ) {
+				return true;
+			} else if ( s_i > SPC ) {
+				return false;
+			}
+		}
+	}
+	return true; // Equal
+}
+
+// Fstring < string
+bool
+operator <( Fstring const & s, std::string const & t )
+{
+	Fstring::size_type const t_len( t.length() );
+	Fstring::size_type const min_len( std::min( s.len_, t_len ) );
+	for ( Fstring::size_type i = 0; i < min_len; ++i ) {
+		unsigned char const s_i( s.str_[ i ] );
+		unsigned char const t_i( t[ i ] );
+		if ( s_i < t_i ) {
+			return true;
+		} else if ( s_i > t_i ) {
+			return false;
+		}
+	}
+	if ( s.len_ < t_len ) {
+		for ( Fstring::size_type i = s.len_; i < t_len; ++i ) {
+			unsigned char const t_i( t[ i ] );
+			if ( SPC < t_i ) {
+				return true;
+			} else if ( SPC > t_i ) {
+				return false;
+			}
+		}
+	} else if ( s.len_ > t_len ) {
+		for ( Fstring::size_type i = t_len, e = s.len_; i < e; ++i ) {
+			unsigned char const s_i( s.str_[ i ] );
+			if ( s_i < SPC ) {
+				return true;
+			} else if ( s_i > SPC ) {
+				return false;
+			}
+		}
+	}
+	return false; // Equal
+}
+
+// Fstring <= cstring
+bool
+operator <=( Fstring const & s, c_cstring const t )
+{
+	Fstring::size_type const t_len( std::strlen( t ) );
+	Fstring::size_type const min_len( std::min( s.len_, t_len ) );
+	for ( Fstring::size_type i = 0; i < min_len; ++i ) {
+		unsigned char const s_i( s.str_[ i ] );
+		unsigned char const t_i( t[ i ] );
+		if ( s_i < t_i ) {
+			return true;
+		} else if ( s_i > t_i ) {
+			return false;
+		}
+	}
+	if ( s.len_ < t_len ) {
+		for ( Fstring::size_type i = s.len_; i < t_len; ++i ) {
+			unsigned char const t_i( t[ i ] );
+			if ( SPC < t_i ) {
+				return true;
+			} else if ( SPC > t_i ) {
+				return false;
+			}
+		}
+	} else if ( s.len_ > t_len ) {
+		for ( Fstring::size_type i = t_len, e = s.len_; i < e; ++i ) {
+			unsigned char const s_i( s.str_[ i ] );
+			if ( s_i < SPC ) {
+				return true;
+			} else if ( s_i > SPC ) {
+				return false;
+			}
+		}
+	}
+	return true; // Equal
+}
+
+// Fstring < cstring
+bool
+operator <( Fstring const & s, c_cstring const t )
+{
+	Fstring::size_type const t_len( std::strlen( t ) );
+	Fstring::size_type const min_len( std::min( s.len_, t_len ) );
+	for ( Fstring::size_type i = 0; i < min_len; ++i ) {
+		unsigned char const s_i( s.str_[ i ] );
+		unsigned char const t_i( t[ i ] );
+		if ( s_i < t_i ) {
+			return true;
+		} else if ( s_i > t_i ) {
+			return false;
+		}
+	}
+	if ( s.len_ < t_len ) {
+		for ( Fstring::size_type i = s.len_; i < t_len; ++i ) {
+			unsigned char const t_i( t[ i ] );
+			if ( SPC < t_i ) {
+				return true;
+			} else if ( SPC > t_i ) {
+				return false;
+			}
+		}
+	} else if ( s.len_ > t_len ) {
+		for ( Fstring::size_type i = t_len, e = s.len_; i < e; ++i ) {
+			unsigned char const s_i( s.str_[ i ] );
+			if ( s_i < SPC ) {
+				return true;
+			} else if ( s_i > SPC ) {
+				return false;
+			}
+		}
+	}
+	return false; // Equal
+}
+
+// Stream Input
+std::istream &
+operator >>( std::istream & stream, Fstring & s )
+{
+	std::string ss;
+	stream >> std::setw( s.len_ ) >> ss;
+	s = ss;
+	return stream;
+}
+
+// Get from Stream
+std::istream &
+get( std::istream & stream, Fstring & s )
+{
+	if ( s.len_ > 0u ) {
+		char * const buff( new char[ s.len_ + 1 ] );
+		stream.get( buff, s.len_ + 1 ); // get adds null-terminator
+		std::size_t const lb( std::strlen( buff ) );
+		std::memcpy( s.str_, buff, lb );
+		std::memset( s.str_ + lb, SPC, s.len_ - lb );
+		delete[] buff;
+	}
+	return stream;
+}
+
+// Get Line from Stream
+std::istream &
+getline( std::istream & stream, Fstring & s )
+{
+	std::string ss;
+	stream.width( s.len_ );
+	std::getline( stream, ss );
+	s = ss;
+	return stream;
+}
+
+// Read from Stream
+std::istream &
+read( std::istream & stream, Fstring & s )
+{
+	stream.read( s.str_, s.len_ );
+	return stream;
+}
+
+// Read Available Characters from Stream
+std::istream &
+readsome( std::istream & stream, Fstring & s )
+{
+	stream.readsome( s.str_, s.len_ );
+	return stream;
+}
+
+// Stream Output
+std::ostream &
+operator <<( std::ostream & stream, Fstring const & s )
+{
+	stream.write( s.str_, s.len_ );
+	return stream;
+}
 
 } // ObjexxFCL

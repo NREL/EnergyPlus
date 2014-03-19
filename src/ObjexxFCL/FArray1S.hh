@@ -20,6 +20,7 @@
 
 // C++ Headers
 #include <initializer_list>
+#include <type_traits>
 
 namespace ObjexxFCL {
 

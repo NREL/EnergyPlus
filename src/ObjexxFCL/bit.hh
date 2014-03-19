@@ -21,6 +21,10 @@
 #include <cassert>
 #include <cmath>
 #include <type_traits>
+#if defined(_MSC_VER) && !defined(__INTEL_COMPILER)
+#include <bitset>
+#include <limits>
+#endif
 
 namespace ObjexxFCL {
 
@@ -188,7 +192,12 @@ T
 bit_shift( T const & x, S const & shift, typename std::enable_if< std::is_unsigned< T >::value >::type * = 0 )
 {
 	assert( std::abs( shift ) <= bit_size( x ) );
+#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) // VC++2013 bug work-around
+	std::bitset< std::numeric_limits< T >::digits > b( x );
+	return ( shift >= S( 0 ) ? b <<= shift : b >>= -shift ).to_ullong();
+#else
 	return ( shift >= S( 0 ) ? x << shift : x >> -shift );
+#endif
 }
 
 // Bit Shifted
@@ -198,7 +207,13 @@ T
 bit_shift( T const & x, S const & shift, typename std::enable_if< std::is_signed< T >::value >::type * = 0 ) // x<0 behavior varies in Fortran ISHFT: We do a logical shift like Intel Fortran and GFortran
 {
 	assert( std::abs( shift ) <= bit_size( x ) );
-	return ( shift >= S( 0 ) ? *reinterpret_cast< typename std::make_unsigned< T const >::type * >( &x ) << shift : *reinterpret_cast< typename std::make_unsigned< T const >::type * >( &x ) >> -shift );
+#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) // VC++2013 bug work-around
+	std::bitset< std::numeric_limits< T >::digits + 1 > b( x );
+	return ( shift >= S( 0 ) ? b <<= shift : b >>= -shift ).to_ullong();
+#else
+	auto const & u( *reinterpret_cast< typename std::make_unsigned< T const >::type * >( &x ) );
+	return ( shift >= S( 0 ) ? u << shift : u >> -shift );
+#endif
 }
 
 // Bit Left Shifted
@@ -209,7 +224,12 @@ bit_lshift( T const & x, S const & shift, typename std::enable_if< std::is_unsig
 {
 	assert( shift >= S( 0 ) );
 	assert( shift <= bit_size( x ) );
+#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) // VC++2013 bug work-around
+	std::bitset< std::numeric_limits< T >::digits > b( x );
+	return ( b <<= shift ).to_ullong();
+#else
 	return x << shift;
+#endif
 }
 
 // Bit Left Shifted
@@ -220,7 +240,12 @@ bit_lshift( T const & x, S const & shift, typename std::enable_if< std::is_signe
 {
 	assert( shift >= S( 0 ) );
 	assert( shift <= bit_size( x ) );
+#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) // VC++2013 bug work-around
+	std::bitset< std::numeric_limits< T >::digits + 1 > b( x );
+	return ( b <<= shift ).to_ullong();
+#else
 	return *reinterpret_cast< typename std::make_unsigned< T const >::type * >( &x ) << shift;
+#endif
 }
 
 // Bit Right Shifted
@@ -252,7 +277,12 @@ T
 bit_cshift( T const & x, S const & shift, typename std::enable_if< std::is_unsigned< T >::value >::type * = 0 )
 {
 	assert( std::abs( shift ) <= bit_size( x ) );
+#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) // VC++2013 bug work-around
+	std::bitset< std::numeric_limits< T >::digits > const b( x );
+	return ( shift >= S( 0 ) ? b << shift | b >> ( bit_size( x ) - shift ) : b >> -shift | b << ( bit_size( x ) + shift ) ).to_ullong();
+#else
 	return ( shift >= S( 0 ) ? x << shift | x >> ( bit_size( x ) - shift ) : x >> -shift | x << ( bit_size( x ) + shift ) );
+#endif
 }
 
 // Bit Circularly Shifted
@@ -262,8 +292,13 @@ T
 bit_cshift( T const & x, S const & shift, typename std::enable_if< std::is_signed< T >::value >::type * = 0 ) // x<0 behavior varies in Fortran ISHFTC: We do a logical shift like Intel Fortran and GFortran
 {
 	assert( std::abs( shift ) <= bit_size( x ) );
+#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) // VC++2013 bug work-around
+	std::bitset< std::numeric_limits< T >::digits + 1 > const b( x );
+	return ( shift >= S( 0 ) ? b << shift | b >> ( bit_size( x ) - shift ) : b >> -shift | b << ( bit_size( x ) + shift ) ).to_ullong();
+#else
 	auto const & u( *reinterpret_cast< typename std::make_unsigned< T const >::type * >( &x ) );
 	return ( shift >= S( 0 ) ? u << shift | u >> ( bit_size( x ) - shift ) : u >> -shift | u << ( bit_size( x ) + shift ) );
+#endif
 }
 
 // Bit Arithmetic Shifted
