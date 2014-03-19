@@ -967,8 +967,8 @@ namespace HVACUnitarySystem {
 		int const OutNode, // coil outlet node number
 		int const ControlNode, // control node number
 		Real64 & OnOffAirFlowRatio,
-		Real64 const OAUCoilOutletTemp, // "ONLY" for zoneHVAC:OutdoorAirUnit
 		bool const FirstHVACIteration,
+		Optional< Real64 const > OAUCoilOutletTemp, // "ONLY" for zoneHVAC:OutdoorAirUnit
 		Optional< Real64 > ZoneLoad,
 		Optional< Real64 const > MaxOutletTemp // limits heating coil outlet temp [C]
 	)
@@ -6669,7 +6669,7 @@ namespace HVACUnitarySystem {
 		if ( UnitarySystem( UnitarySysNum ).CoolingCoilUpstream ) {
 
 			if ( UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
-				UpdateUnitarySystemControl( UnitarySysNum, AirLoopNum, UnitarySystem( UnitarySysNum ).CoolCoilOutletNodeNum, UnitarySystem( UnitarySysNum ).SystemCoolControlNodeNum, OnOffAirFlowRatio, OAUCoilOutTemp, FirstHVACIteration );
+				UpdateUnitarySystemControl( UnitarySysNum, AirLoopNum, UnitarySystem( UnitarySysNum ).CoolCoilOutletNodeNum, UnitarySystem( UnitarySysNum ).SystemCoolControlNodeNum, OnOffAirFlowRatio, FirstHVACIteration, OAUCoilOutTemp );
 				ControlCoolingSystem( UnitarySysNum, FirstHVACIteration, HXUnitOn );
 				PartLoadRatio = UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac;
 				CompOn = 0;
@@ -6677,7 +6677,7 @@ namespace HVACUnitarySystem {
 				CalcUnitaryCoolingSystem( UnitarySysNum, FirstHVACIteration, PartLoadRatio, CompOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn );
 			}
 			if ( UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
-				UpdateUnitarySystemControl( UnitarySysNum, AirLoopNum, UnitarySystem( UnitarySysNum ).HeatCoilOutletNodeNum, UnitarySystem( UnitarySysNum ).SystemHeatControlNodeNum, OnOffAirFlowRatio, OAUCoilOutTemp, FirstHVACIteration, _, UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp );
+				UpdateUnitarySystemControl( UnitarySysNum, AirLoopNum, UnitarySystem( UnitarySysNum ).HeatCoilOutletNodeNum, UnitarySystem( UnitarySysNum ).SystemHeatControlNodeNum, OnOffAirFlowRatio, FirstHVACIteration, OAUCoilOutTemp, _, UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp );
 				ControlHeatingSystem( UnitarySysNum, FirstHVACIteration );
 				PartLoadRatio = UnitarySystem( UnitarySysNum ).HeatingPartLoadFrac;
 				CompOn = 0;
@@ -6688,7 +6688,7 @@ namespace HVACUnitarySystem {
 		} else {
 
 			if ( UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
-				UpdateUnitarySystemControl( UnitarySysNum, AirLoopNum, UnitarySystem( UnitarySysNum ).HeatCoilOutletNodeNum, UnitarySystem( UnitarySysNum ).SystemHeatControlNodeNum, OnOffAirFlowRatio, OAUCoilOutTemp, FirstHVACIteration, _, UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp );
+				UpdateUnitarySystemControl( UnitarySysNum, AirLoopNum, UnitarySystem( UnitarySysNum ).HeatCoilOutletNodeNum, UnitarySystem( UnitarySysNum ).SystemHeatControlNodeNum, OnOffAirFlowRatio, FirstHVACIteration, OAUCoilOutTemp, _, UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp );
 				ControlHeatingSystem( UnitarySysNum, FirstHVACIteration );
 				PartLoadRatio = UnitarySystem( UnitarySysNum ).HeatingPartLoadFrac;
 				CompOn = 0;
@@ -6696,7 +6696,7 @@ namespace HVACUnitarySystem {
 				CalcUnitaryHeatingSystem( UnitarySysNum, FirstHVACIteration, PartLoadRatio, CompOn, OnOffAirFlowRatio );
 			}
 			if ( UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
-				UpdateUnitarySystemControl( UnitarySysNum, AirLoopNum, UnitarySystem( UnitarySysNum ).CoolCoilOutletNodeNum, UnitarySystem( UnitarySysNum ).SystemCoolControlNodeNum, OnOffAirFlowRatio, OAUCoilOutTemp, FirstHVACIteration );
+				UpdateUnitarySystemControl( UnitarySysNum, AirLoopNum, UnitarySystem( UnitarySysNum ).CoolCoilOutletNodeNum, UnitarySystem( UnitarySysNum ).SystemCoolControlNodeNum, OnOffAirFlowRatio, FirstHVACIteration, OAUCoilOutTemp );
 				ControlCoolingSystem( UnitarySysNum, FirstHVACIteration, HXUnitOn );
 				PartLoadRatio = UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac;
 				CompOn = 0;
@@ -6712,7 +6712,7 @@ namespace HVACUnitarySystem {
 
 		if ( UnitarySystem( UnitarySysNum ).SuppCoilExists ) {
 			SuppHeatingCoilFlag = true;
-			UpdateUnitarySystemControl( UnitarySysNum, AirLoopNum, UnitarySystem( UnitarySysNum ).SuppCoilAirOutletNode, UnitarySystem( UnitarySysNum ).SuppHeatControlNodeNum, OnOffAirFlowRatio, OAUCoilOutTemp, FirstHVACIteration, _, UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp );
+			UpdateUnitarySystemControl( UnitarySysNum, AirLoopNum, UnitarySystem( UnitarySysNum ).SuppCoilAirOutletNode, UnitarySystem( UnitarySysNum ).SuppHeatControlNodeNum, OnOffAirFlowRatio, FirstHVACIteration, OAUCoilOutTemp, _, UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp );
 			ControlSuppHeatSystem( UnitarySysNum, FirstHVACIteration );
 			CalcUnitarySuppSystemToSP( UnitarySysNum, FirstHVACIteration );
 			SuppHeatingCoilFlag = false;
@@ -6783,7 +6783,7 @@ namespace HVACUnitarySystem {
 
 		OnOffAirFlowRatio = 1.0;
 		QZnReq = 0.0;
-		UpdateUnitarySystemControl( UnitarySysNum, AirLoopNum, UnitarySystem( UnitarySysNum ).CoolCoilOutletNodeNum, UnitarySystem( UnitarySysNum ).SystemCoolControlNodeNum, OnOffAirFlowRatio, OAUCoilOutTemp, FirstHVACIteration, ZoneLoad );
+		UpdateUnitarySystemControl( UnitarySysNum, AirLoopNum, UnitarySystem( UnitarySysNum ).CoolCoilOutletNodeNum, UnitarySystem( UnitarySysNum ).SystemCoolControlNodeNum, OnOffAirFlowRatio, FirstHVACIteration, OAUCoilOutTemp, ZoneLoad );
 
 		// will not be running supplemental heater on this CALL (simulate with supplemental heater off)
 		FullSensibleOutput = 0.0;

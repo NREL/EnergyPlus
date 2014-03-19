@@ -254,7 +254,7 @@ namespace SystemReports {
 		int SubSubEquipNum;
 		int CtrlZoneNum;
 		int NodeIndex;
-		int Index;
+		int Idx;
 		int TempIndex;
 		int ListNum;
 		int SAPNum;
@@ -433,10 +433,10 @@ namespace SystemReports {
 								ZoneEquipList( ListNum ).EquipData( AirDistUnitNum ).EnergyTransComp = EnergyTransfer;
 								CompType = ZoneEquipList( ListNum ).EquipData( AirDistUnitNum ).TypeOf;
 								CompName = ZoneEquipList( ListNum ).EquipData( AirDistUnitNum ).Name;
-								Index = 0;
+								Idx = 0;
 								FindDemandSideMatch( CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp );
-								if ( MatchFound ) UpdateZoneCompPtrArray( Index, ListNum, AirDistUnitNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp );
-								ZoneEquipList( ListNum ).EquipData( AirDistUnitNum ).ZoneEqToPlantPtr = Index;
+								if ( MatchFound ) UpdateZoneCompPtrArray( Idx, ListNum, AirDistUnitNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp );
+								ZoneEquipList( ListNum ).EquipData( AirDistUnitNum ).ZoneEqToPlantPtr = Idx;
 								break;
 							}
 						}
@@ -446,10 +446,10 @@ namespace SystemReports {
 									ZoneEquipList( ListNum ).EquipData( AirDistUnitNum ).SubEquipData( SubEquipNum ).EnergyTransComp = EnergyTransfer;
 									CompType = ZoneEquipList( ListNum ).EquipData( AirDistUnitNum ).SubEquipData( SubEquipNum ).TypeOf;
 									CompName = ZoneEquipList( ListNum ).EquipData( AirDistUnitNum ).SubEquipData( SubEquipNum ).Name;
-									Index = 0;
+									Idx = 0;
 									FindDemandSideMatch( CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp );
-									if ( MatchFound ) UpdateZoneSubCompPtrArray( Index, ListNum, AirDistUnitNum, SubEquipNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp );
-									ZoneEquipList( ListNum ).EquipData( AirDistUnitNum ).SubEquipData( SubEquipNum ).ZoneEqToPlantPtr = Index;
+									if ( MatchFound ) UpdateZoneSubCompPtrArray( Idx, ListNum, AirDistUnitNum, SubEquipNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp );
+									ZoneEquipList( ListNum ).EquipData( AirDistUnitNum ).SubEquipData( SubEquipNum ).ZoneEqToPlantPtr = Idx;
 									break;
 								}
 							}
@@ -459,10 +459,10 @@ namespace SystemReports {
 										ZoneEquipList( ListNum ).EquipData( AirDistUnitNum ).SubEquipData( SubEquipNum ).SubSubEquipData( SubSubEquipNum ).EnergyTransComp = EnergyTransfer;
 										CompType = ZoneEquipList( ListNum ).EquipData( AirDistUnitNum ).SubEquipData( SubEquipNum ).SubSubEquipData( SubSubEquipNum ).TypeOf;
 										CompName = ZoneEquipList( ListNum ).EquipData( AirDistUnitNum ).SubEquipData( SubEquipNum ).SubSubEquipData( SubSubEquipNum ).Name;
-										Index = 0;
+										Idx = 0;
 										FindDemandSideMatch( CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp );
-										if ( MatchFound ) UpdateZoneSubSubCompPtrArray( Index, ListNum, AirDistUnitNum, SubEquipNum, SubSubEquipNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp );
-										ZoneEquipList( ListNum ).EquipData( AirDistUnitNum ).SubEquipData( SubEquipNum ).SubSubEquipData( SubSubEquipNum ).ZoneEqToPlantPtr = Index;
+										if ( MatchFound ) UpdateZoneSubSubCompPtrArray( Idx, ListNum, AirDistUnitNum, SubEquipNum, SubSubEquipNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp );
+										ZoneEquipList( ListNum ).EquipData( AirDistUnitNum ).SubEquipData( SubEquipNum ).SubSubEquipData( SubSubEquipNum ).ZoneEqToPlantPtr = Idx;
 										break;
 									}
 								}
@@ -513,24 +513,24 @@ namespace SystemReports {
 						TempZoneCompToPlant.LastDemandSidePtr() = 0;
 
 						ArrayCount = 0;
-						for ( Index = 1; Index <= EquipNum; ++Index ) {
+						for ( Idx = 1; Idx <= EquipNum; ++Idx ) {
 							Duplicate = false;
 							for ( TempIndex = 1; TempIndex <= EquipNum; ++TempIndex ) {
-								if ( ZoneCompToPlant( Index ).ZoneEqListNum == TempZoneCompToPlant( TempIndex ).ZoneEqListNum && ZoneCompToPlant( Index ).ZoneEqCompNum == ZoneCompToPlant( TempIndex ).ZoneEqCompNum ) {
+								if ( ZoneCompToPlant( Idx ).ZoneEqListNum == TempZoneCompToPlant( TempIndex ).ZoneEqListNum && ZoneCompToPlant( Idx ).ZoneEqCompNum == ZoneCompToPlant( TempIndex ).ZoneEqCompNum ) {
 									Duplicate = true;
 									break;
 								}
 							}
 							if ( ! Duplicate ) {
 								++ArrayCount;
-								TempZoneCompToPlant( ArrayCount ).ZoneEqListNum = ZoneCompToPlant( Index ).ZoneEqListNum;
-								TempZoneCompToPlant( ArrayCount ).ZoneEqCompNum = ZoneCompToPlant( Index ).ZoneEqCompNum;
-								TempZoneCompToPlant( ArrayCount ).PlantLoopType = ZoneCompToPlant( Index ).PlantLoopType;
-								TempZoneCompToPlant( ArrayCount ).PlantLoopNum = ZoneCompToPlant( Index ).PlantLoopNum;
-								TempZoneCompToPlant( ArrayCount ).PlantLoopBranch = ZoneCompToPlant( Index ).PlantLoopBranch;
-								TempZoneCompToPlant( ArrayCount ).PlantLoopComp = ZoneCompToPlant( Index ).PlantLoopComp;
-								TempZoneCompToPlant( ArrayCount ).FirstDemandSidePtr = ZoneCompToPlant( Index ).FirstDemandSidePtr;
-								TempZoneCompToPlant( ArrayCount ).LastDemandSidePtr = ZoneCompToPlant( Index ).LastDemandSidePtr;
+								TempZoneCompToPlant( ArrayCount ).ZoneEqListNum = ZoneCompToPlant( Idx ).ZoneEqListNum;
+								TempZoneCompToPlant( ArrayCount ).ZoneEqCompNum = ZoneCompToPlant( Idx ).ZoneEqCompNum;
+								TempZoneCompToPlant( ArrayCount ).PlantLoopType = ZoneCompToPlant( Idx ).PlantLoopType;
+								TempZoneCompToPlant( ArrayCount ).PlantLoopNum = ZoneCompToPlant( Idx ).PlantLoopNum;
+								TempZoneCompToPlant( ArrayCount ).PlantLoopBranch = ZoneCompToPlant( Idx ).PlantLoopBranch;
+								TempZoneCompToPlant( ArrayCount ).PlantLoopComp = ZoneCompToPlant( Idx ).PlantLoopComp;
+								TempZoneCompToPlant( ArrayCount ).FirstDemandSidePtr = ZoneCompToPlant( Idx ).FirstDemandSidePtr;
+								TempZoneCompToPlant( ArrayCount ).LastDemandSidePtr = ZoneCompToPlant( Idx ).LastDemandSidePtr;
 							}
 						}
 
@@ -557,25 +557,25 @@ namespace SystemReports {
 						TempZoneSubCompToPlant.LastDemandSidePtr() = 0;
 
 						ArrayCount = 0;
-						for ( Index = 1; Index <= SubEquipNum; ++Index ) {
+						for ( Idx = 1; Idx <= SubEquipNum; ++Idx ) {
 							Duplicate = false;
 							for ( TempIndex = 1; TempIndex <= SubEquipNum; ++TempIndex ) {
-								if ( ZoneSubCompToPlant( Index ).ZoneEqListNum == TempZoneSubCompToPlant( TempIndex ).ZoneEqListNum && ZoneSubCompToPlant( Index ).ZoneEqCompNum == TempZoneSubCompToPlant( TempIndex ).ZoneEqCompNum && ZoneSubCompToPlant( Index ).ZoneEqSubCompNum == TempZoneSubCompToPlant( TempIndex ).ZoneEqSubCompNum ) {
+								if ( ZoneSubCompToPlant( Idx ).ZoneEqListNum == TempZoneSubCompToPlant( TempIndex ).ZoneEqListNum && ZoneSubCompToPlant( Idx ).ZoneEqCompNum == TempZoneSubCompToPlant( TempIndex ).ZoneEqCompNum && ZoneSubCompToPlant( Idx ).ZoneEqSubCompNum == TempZoneSubCompToPlant( TempIndex ).ZoneEqSubCompNum ) {
 									Duplicate = true;
 									break;
 								}
 							}
 							if ( ! Duplicate ) {
 								++ArrayCount;
-								TempZoneSubCompToPlant( ArrayCount ).ZoneEqListNum = ZoneSubCompToPlant( Index ).ZoneEqListNum;
-								TempZoneSubCompToPlant( ArrayCount ).ZoneEqCompNum = ZoneSubCompToPlant( Index ).ZoneEqCompNum;
-								TempZoneSubCompToPlant( ArrayCount ).ZoneEqSubCompNum = ZoneSubCompToPlant( Index ).ZoneEqSubCompNum;
-								TempZoneSubCompToPlant( ArrayCount ).PlantLoopType = ZoneSubCompToPlant( Index ).PlantLoopType;
-								TempZoneSubCompToPlant( ArrayCount ).PlantLoopNum = ZoneSubCompToPlant( Index ).PlantLoopNum;
-								TempZoneSubCompToPlant( ArrayCount ).PlantLoopBranch = ZoneSubCompToPlant( Index ).PlantLoopBranch;
-								TempZoneSubCompToPlant( ArrayCount ).PlantLoopComp = ZoneSubCompToPlant( Index ).PlantLoopComp;
-								TempZoneSubCompToPlant( ArrayCount ).FirstDemandSidePtr = ZoneSubCompToPlant( Index ).FirstDemandSidePtr;
-								TempZoneSubCompToPlant( ArrayCount ).LastDemandSidePtr = ZoneSubCompToPlant( Index ).LastDemandSidePtr;
+								TempZoneSubCompToPlant( ArrayCount ).ZoneEqListNum = ZoneSubCompToPlant( Idx ).ZoneEqListNum;
+								TempZoneSubCompToPlant( ArrayCount ).ZoneEqCompNum = ZoneSubCompToPlant( Idx ).ZoneEqCompNum;
+								TempZoneSubCompToPlant( ArrayCount ).ZoneEqSubCompNum = ZoneSubCompToPlant( Idx ).ZoneEqSubCompNum;
+								TempZoneSubCompToPlant( ArrayCount ).PlantLoopType = ZoneSubCompToPlant( Idx ).PlantLoopType;
+								TempZoneSubCompToPlant( ArrayCount ).PlantLoopNum = ZoneSubCompToPlant( Idx ).PlantLoopNum;
+								TempZoneSubCompToPlant( ArrayCount ).PlantLoopBranch = ZoneSubCompToPlant( Idx ).PlantLoopBranch;
+								TempZoneSubCompToPlant( ArrayCount ).PlantLoopComp = ZoneSubCompToPlant( Idx ).PlantLoopComp;
+								TempZoneSubCompToPlant( ArrayCount ).FirstDemandSidePtr = ZoneSubCompToPlant( Idx ).FirstDemandSidePtr;
+								TempZoneSubCompToPlant( ArrayCount ).LastDemandSidePtr = ZoneSubCompToPlant( Idx ).LastDemandSidePtr;
 							}
 						}
 
@@ -604,26 +604,26 @@ namespace SystemReports {
 						TempZoneSubSubCompToPlant.LastDemandSidePtr() = 0;
 
 						ArrayCount = 0;
-						for ( Index = 1; Index <= SubSubEquipNum; ++Index ) {
+						for ( Idx = 1; Idx <= SubSubEquipNum; ++Idx ) {
 							Duplicate = false;
 							for ( TempIndex = 1; TempIndex <= SubSubEquipNum; ++TempIndex ) {
-								if ( ZoneSubSubCompToPlant( Index ).ZoneEqListNum == TempZoneSubSubCompToPlant( TempIndex ).ZoneEqListNum && ZoneSubSubCompToPlant( Index ).ZoneEqCompNum == TempZoneSubSubCompToPlant( TempIndex ).ZoneEqCompNum && ZoneSubSubCompToPlant( Index ).ZoneEqSubCompNum == TempZoneSubSubCompToPlant( TempIndex ).ZoneEqSubCompNum && ZoneSubSubCompToPlant( Index ).ZoneEqSubSubCompNum == TempZoneSubSubCompToPlant( TempIndex ).ZoneEqSubSubCompNum ) {
+								if ( ZoneSubSubCompToPlant( Idx ).ZoneEqListNum == TempZoneSubSubCompToPlant( TempIndex ).ZoneEqListNum && ZoneSubSubCompToPlant( Idx ).ZoneEqCompNum == TempZoneSubSubCompToPlant( TempIndex ).ZoneEqCompNum && ZoneSubSubCompToPlant( Idx ).ZoneEqSubCompNum == TempZoneSubSubCompToPlant( TempIndex ).ZoneEqSubCompNum && ZoneSubSubCompToPlant( Idx ).ZoneEqSubSubCompNum == TempZoneSubSubCompToPlant( TempIndex ).ZoneEqSubSubCompNum ) {
 									Duplicate = true;
 									break;
 								}
 							}
 							if ( ! Duplicate ) {
 								++ArrayCount;
-								TempZoneSubSubCompToPlant( ArrayCount ).ZoneEqListNum = ZoneSubSubCompToPlant( Index ).ZoneEqListNum;
-								TempZoneSubSubCompToPlant( ArrayCount ).ZoneEqCompNum = ZoneSubSubCompToPlant( Index ).ZoneEqCompNum;
-								TempZoneSubSubCompToPlant( ArrayCount ).ZoneEqSubCompNum = ZoneSubSubCompToPlant( Index ).ZoneEqSubCompNum;
-								TempZoneSubSubCompToPlant( ArrayCount ).ZoneEqSubSubCompNum = ZoneSubSubCompToPlant( Index ).ZoneEqSubSubCompNum;
-								TempZoneSubSubCompToPlant( ArrayCount ).PlantLoopType = ZoneSubSubCompToPlant( Index ).PlantLoopType;
-								TempZoneSubSubCompToPlant( ArrayCount ).PlantLoopNum = ZoneSubSubCompToPlant( Index ).PlantLoopNum;
-								TempZoneSubSubCompToPlant( ArrayCount ).PlantLoopBranch = ZoneSubSubCompToPlant( Index ).PlantLoopBranch;
-								TempZoneSubSubCompToPlant( ArrayCount ).PlantLoopComp = ZoneSubSubCompToPlant( Index ).PlantLoopComp;
-								TempZoneSubSubCompToPlant( ArrayCount ).FirstDemandSidePtr = ZoneSubSubCompToPlant( Index ).FirstDemandSidePtr;
-								TempZoneSubSubCompToPlant( ArrayCount ).LastDemandSidePtr = ZoneSubSubCompToPlant( Index ).LastDemandSidePtr;
+								TempZoneSubSubCompToPlant( ArrayCount ).ZoneEqListNum = ZoneSubSubCompToPlant( Idx ).ZoneEqListNum;
+								TempZoneSubSubCompToPlant( ArrayCount ).ZoneEqCompNum = ZoneSubSubCompToPlant( Idx ).ZoneEqCompNum;
+								TempZoneSubSubCompToPlant( ArrayCount ).ZoneEqSubCompNum = ZoneSubSubCompToPlant( Idx ).ZoneEqSubCompNum;
+								TempZoneSubSubCompToPlant( ArrayCount ).ZoneEqSubSubCompNum = ZoneSubSubCompToPlant( Idx ).ZoneEqSubSubCompNum;
+								TempZoneSubSubCompToPlant( ArrayCount ).PlantLoopType = ZoneSubSubCompToPlant( Idx ).PlantLoopType;
+								TempZoneSubSubCompToPlant( ArrayCount ).PlantLoopNum = ZoneSubSubCompToPlant( Idx ).PlantLoopNum;
+								TempZoneSubSubCompToPlant( ArrayCount ).PlantLoopBranch = ZoneSubSubCompToPlant( Idx ).PlantLoopBranch;
+								TempZoneSubSubCompToPlant( ArrayCount ).PlantLoopComp = ZoneSubSubCompToPlant( Idx ).PlantLoopComp;
+								TempZoneSubSubCompToPlant( ArrayCount ).FirstDemandSidePtr = ZoneSubSubCompToPlant( Idx ).FirstDemandSidePtr;
+								TempZoneSubSubCompToPlant( ArrayCount ).LastDemandSidePtr = ZoneSubSubCompToPlant( Idx ).LastDemandSidePtr;
 							}
 						}
 
@@ -652,25 +652,25 @@ namespace SystemReports {
 						TempAirSysCompToPlant.LastDemandSidePtr() = 0;
 
 						ArrayCount = 0;
-						for ( Index = 1; Index <= CompNum; ++Index ) {
+						for ( Idx = 1; Idx <= CompNum; ++Idx ) {
 							Duplicate = false;
 							for ( TempIndex = 1; TempIndex <= CompNum; ++TempIndex ) {
-								if ( AirSysCompToPlant( Index ).AirLoopNum == TempAirSysCompToPlant( TempIndex ).AirLoopNum && AirSysCompToPlant( Index ).AirLoopBranch == TempAirSysCompToPlant( TempIndex ).AirLoopBranch && AirSysCompToPlant( Index ).AirLoopComp == TempAirSysCompToPlant( TempIndex ).AirLoopComp ) {
+								if ( AirSysCompToPlant( Idx ).AirLoopNum == TempAirSysCompToPlant( TempIndex ).AirLoopNum && AirSysCompToPlant( Idx ).AirLoopBranch == TempAirSysCompToPlant( TempIndex ).AirLoopBranch && AirSysCompToPlant( Idx ).AirLoopComp == TempAirSysCompToPlant( TempIndex ).AirLoopComp ) {
 									Duplicate = true;
 									break;
 								}
 							}
 							if ( ! Duplicate ) {
 								++ArrayCount;
-								TempAirSysCompToPlant( ArrayCount ).AirLoopNum = AirSysCompToPlant( Index ).AirLoopNum;
-								TempAirSysCompToPlant( ArrayCount ).AirLoopBranch = AirSysCompToPlant( Index ).AirLoopBranch;
-								TempAirSysCompToPlant( ArrayCount ).AirLoopComp = AirSysCompToPlant( Index ).AirLoopComp;
-								TempAirSysCompToPlant( ArrayCount ).PlantLoopType = AirSysCompToPlant( Index ).PlantLoopType;
-								TempAirSysCompToPlant( ArrayCount ).PlantLoopNum = AirSysCompToPlant( Index ).PlantLoopNum;
-								TempAirSysCompToPlant( ArrayCount ).PlantLoopBranch = AirSysCompToPlant( Index ).PlantLoopBranch;
-								TempAirSysCompToPlant( ArrayCount ).PlantLoopComp = AirSysCompToPlant( Index ).PlantLoopComp;
-								TempAirSysCompToPlant( ArrayCount ).FirstDemandSidePtr = AirSysCompToPlant( Index ).FirstDemandSidePtr;
-								TempAirSysCompToPlant( ArrayCount ).LastDemandSidePtr = AirSysCompToPlant( Index ).LastDemandSidePtr;
+								TempAirSysCompToPlant( ArrayCount ).AirLoopNum = AirSysCompToPlant( Idx ).AirLoopNum;
+								TempAirSysCompToPlant( ArrayCount ).AirLoopBranch = AirSysCompToPlant( Idx ).AirLoopBranch;
+								TempAirSysCompToPlant( ArrayCount ).AirLoopComp = AirSysCompToPlant( Idx ).AirLoopComp;
+								TempAirSysCompToPlant( ArrayCount ).PlantLoopType = AirSysCompToPlant( Idx ).PlantLoopType;
+								TempAirSysCompToPlant( ArrayCount ).PlantLoopNum = AirSysCompToPlant( Idx ).PlantLoopNum;
+								TempAirSysCompToPlant( ArrayCount ).PlantLoopBranch = AirSysCompToPlant( Idx ).PlantLoopBranch;
+								TempAirSysCompToPlant( ArrayCount ).PlantLoopComp = AirSysCompToPlant( Idx ).PlantLoopComp;
+								TempAirSysCompToPlant( ArrayCount ).FirstDemandSidePtr = AirSysCompToPlant( Idx ).FirstDemandSidePtr;
+								TempAirSysCompToPlant( ArrayCount ).LastDemandSidePtr = AirSysCompToPlant( Idx ).LastDemandSidePtr;
 							}
 						}
 
@@ -699,26 +699,26 @@ namespace SystemReports {
 						TempAirSysSubCompToPlant.LastDemandSidePtr() = 0;
 
 						ArrayCount = 0;
-						for ( Index = 1; Index <= SubCompNum; ++Index ) {
+						for ( Idx = 1; Idx <= SubCompNum; ++Idx ) {
 							Duplicate = false;
 							for ( TempIndex = 1; TempIndex <= SubCompNum; ++TempIndex ) {
-								if ( AirSysSubCompToPlant( Index ).AirLoopNum == TempAirSysSubCompToPlant( TempIndex ).AirLoopNum && AirSysSubCompToPlant( Index ).AirLoopBranch == TempAirSysSubCompToPlant( TempIndex ).AirLoopBranch && AirSysSubCompToPlant( Index ).AirLoopComp == TempAirSysSubCompToPlant( TempIndex ).AirLoopComp && AirSysSubCompToPlant( Index ).AirLoopSubComp == TempAirSysSubCompToPlant( TempIndex ).AirLoopSubComp ) {
+								if ( AirSysSubCompToPlant( Idx ).AirLoopNum == TempAirSysSubCompToPlant( TempIndex ).AirLoopNum && AirSysSubCompToPlant( Idx ).AirLoopBranch == TempAirSysSubCompToPlant( TempIndex ).AirLoopBranch && AirSysSubCompToPlant( Idx ).AirLoopComp == TempAirSysSubCompToPlant( TempIndex ).AirLoopComp && AirSysSubCompToPlant( Idx ).AirLoopSubComp == TempAirSysSubCompToPlant( TempIndex ).AirLoopSubComp ) {
 									Duplicate = true;
 									break;
 								}
 							}
 							if ( ! Duplicate ) {
 								++ArrayCount;
-								TempAirSysSubCompToPlant( ArrayCount ).AirLoopNum = AirSysSubCompToPlant( Index ).AirLoopNum;
-								TempAirSysSubCompToPlant( ArrayCount ).AirLoopBranch = AirSysSubCompToPlant( Index ).AirLoopBranch;
-								TempAirSysSubCompToPlant( ArrayCount ).AirLoopComp = AirSysSubCompToPlant( Index ).AirLoopComp;
-								TempAirSysSubCompToPlant( ArrayCount ).AirLoopSubComp = AirSysSubCompToPlant( Index ).AirLoopSubComp;
-								TempAirSysSubCompToPlant( ArrayCount ).PlantLoopType = AirSysSubCompToPlant( Index ).PlantLoopType;
-								TempAirSysSubCompToPlant( ArrayCount ).PlantLoopNum = AirSysSubCompToPlant( Index ).PlantLoopNum;
-								TempAirSysSubCompToPlant( ArrayCount ).PlantLoopBranch = AirSysSubCompToPlant( Index ).PlantLoopBranch;
-								TempAirSysSubCompToPlant( ArrayCount ).PlantLoopComp = AirSysSubCompToPlant( Index ).PlantLoopComp;
-								TempAirSysSubCompToPlant( ArrayCount ).FirstDemandSidePtr = AirSysSubCompToPlant( Index ).FirstDemandSidePtr;
-								TempAirSysSubCompToPlant( ArrayCount ).LastDemandSidePtr = AirSysSubCompToPlant( Index ).LastDemandSidePtr;
+								TempAirSysSubCompToPlant( ArrayCount ).AirLoopNum = AirSysSubCompToPlant( Idx ).AirLoopNum;
+								TempAirSysSubCompToPlant( ArrayCount ).AirLoopBranch = AirSysSubCompToPlant( Idx ).AirLoopBranch;
+								TempAirSysSubCompToPlant( ArrayCount ).AirLoopComp = AirSysSubCompToPlant( Idx ).AirLoopComp;
+								TempAirSysSubCompToPlant( ArrayCount ).AirLoopSubComp = AirSysSubCompToPlant( Idx ).AirLoopSubComp;
+								TempAirSysSubCompToPlant( ArrayCount ).PlantLoopType = AirSysSubCompToPlant( Idx ).PlantLoopType;
+								TempAirSysSubCompToPlant( ArrayCount ).PlantLoopNum = AirSysSubCompToPlant( Idx ).PlantLoopNum;
+								TempAirSysSubCompToPlant( ArrayCount ).PlantLoopBranch = AirSysSubCompToPlant( Idx ).PlantLoopBranch;
+								TempAirSysSubCompToPlant( ArrayCount ).PlantLoopComp = AirSysSubCompToPlant( Idx ).PlantLoopComp;
+								TempAirSysSubCompToPlant( ArrayCount ).FirstDemandSidePtr = AirSysSubCompToPlant( Idx ).FirstDemandSidePtr;
+								TempAirSysSubCompToPlant( ArrayCount ).LastDemandSidePtr = AirSysSubCompToPlant( Idx ).LastDemandSidePtr;
 							}
 						}
 
@@ -749,27 +749,27 @@ namespace SystemReports {
 						TempAirSysSubSubCompToPlant.LastDemandSidePtr() = 0;
 
 						ArrayCount = 0;
-						for ( Index = 1; Index <= SubSubCompNum; ++Index ) {
+						for ( Idx = 1; Idx <= SubSubCompNum; ++Idx ) {
 							Duplicate = false;
 							for ( TempIndex = 1; TempIndex <= SubSubCompNum; ++TempIndex ) {
-								if ( AirSysSubSubCompToPlant( Index ).AirLoopNum == TempAirSysSubSubCompToPlant( TempIndex ).AirLoopNum && AirSysSubSubCompToPlant( Index ).AirLoopBranch == TempAirSysSubSubCompToPlant( TempIndex ).AirLoopBranch && AirSysSubSubCompToPlant( Index ).AirLoopComp == TempAirSysSubSubCompToPlant( TempIndex ).AirLoopComp && AirSysSubSubCompToPlant( Index ).AirLoopSubComp == TempAirSysSubSubCompToPlant( TempIndex ).AirLoopSubComp && AirSysSubSubCompToPlant( Index ).AirLoopSubSubComp == TempAirSysSubSubCompToPlant( TempIndex ).AirLoopSubSubComp ) {
+								if ( AirSysSubSubCompToPlant( Idx ).AirLoopNum == TempAirSysSubSubCompToPlant( TempIndex ).AirLoopNum && AirSysSubSubCompToPlant( Idx ).AirLoopBranch == TempAirSysSubSubCompToPlant( TempIndex ).AirLoopBranch && AirSysSubSubCompToPlant( Idx ).AirLoopComp == TempAirSysSubSubCompToPlant( TempIndex ).AirLoopComp && AirSysSubSubCompToPlant( Idx ).AirLoopSubComp == TempAirSysSubSubCompToPlant( TempIndex ).AirLoopSubComp && AirSysSubSubCompToPlant( Idx ).AirLoopSubSubComp == TempAirSysSubSubCompToPlant( TempIndex ).AirLoopSubSubComp ) {
 									Duplicate = true;
 									break;
 								}
 							}
 							if ( ! Duplicate ) {
 								++ArrayCount;
-								TempAirSysSubSubCompToPlant( ArrayCount ).AirLoopNum = AirSysSubSubCompToPlant( Index ).AirLoopNum;
-								TempAirSysSubSubCompToPlant( ArrayCount ).AirLoopBranch = AirSysSubSubCompToPlant( Index ).AirLoopBranch;
-								TempAirSysSubSubCompToPlant( ArrayCount ).AirLoopComp = AirSysSubSubCompToPlant( Index ).AirLoopComp;
-								TempAirSysSubSubCompToPlant( ArrayCount ).AirLoopSubComp = AirSysSubSubCompToPlant( Index ).AirLoopSubComp;
-								TempAirSysSubSubCompToPlant( ArrayCount ).AirLoopSubSubComp = AirSysSubSubCompToPlant( Index ).AirLoopSubSubComp;
-								TempAirSysSubSubCompToPlant( ArrayCount ).PlantLoopType = AirSysSubSubCompToPlant( Index ).PlantLoopType;
-								TempAirSysSubSubCompToPlant( ArrayCount ).PlantLoopNum = AirSysSubSubCompToPlant( Index ).PlantLoopNum;
-								TempAirSysSubSubCompToPlant( ArrayCount ).PlantLoopBranch = AirSysSubSubCompToPlant( Index ).PlantLoopBranch;
-								TempAirSysSubSubCompToPlant( ArrayCount ).PlantLoopComp = AirSysSubSubCompToPlant( Index ).PlantLoopComp;
-								TempAirSysSubSubCompToPlant( ArrayCount ).FirstDemandSidePtr = AirSysSubSubCompToPlant( Index ).FirstDemandSidePtr;
-								TempAirSysSubSubCompToPlant( ArrayCount ).LastDemandSidePtr = AirSysSubSubCompToPlant( Index ).LastDemandSidePtr;
+								TempAirSysSubSubCompToPlant( ArrayCount ).AirLoopNum = AirSysSubSubCompToPlant( Idx ).AirLoopNum;
+								TempAirSysSubSubCompToPlant( ArrayCount ).AirLoopBranch = AirSysSubSubCompToPlant( Idx ).AirLoopBranch;
+								TempAirSysSubSubCompToPlant( ArrayCount ).AirLoopComp = AirSysSubSubCompToPlant( Idx ).AirLoopComp;
+								TempAirSysSubSubCompToPlant( ArrayCount ).AirLoopSubComp = AirSysSubSubCompToPlant( Idx ).AirLoopSubComp;
+								TempAirSysSubSubCompToPlant( ArrayCount ).AirLoopSubSubComp = AirSysSubSubCompToPlant( Idx ).AirLoopSubSubComp;
+								TempAirSysSubSubCompToPlant( ArrayCount ).PlantLoopType = AirSysSubSubCompToPlant( Idx ).PlantLoopType;
+								TempAirSysSubSubCompToPlant( ArrayCount ).PlantLoopNum = AirSysSubSubCompToPlant( Idx ).PlantLoopNum;
+								TempAirSysSubSubCompToPlant( ArrayCount ).PlantLoopBranch = AirSysSubSubCompToPlant( Idx ).PlantLoopBranch;
+								TempAirSysSubSubCompToPlant( ArrayCount ).PlantLoopComp = AirSysSubSubCompToPlant( Idx ).PlantLoopComp;
+								TempAirSysSubSubCompToPlant( ArrayCount ).FirstDemandSidePtr = AirSysSubSubCompToPlant( Idx ).FirstDemandSidePtr;
+								TempAirSysSubSubCompToPlant( ArrayCount ).LastDemandSidePtr = AirSysSubSubCompToPlant( Idx ).LastDemandSidePtr;
 							}
 						}
 
@@ -1122,7 +1122,7 @@ namespace SystemReports {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int BranchNum;
-		int Index;
+		int Idx;
 		int DemandSideLoopNum;
 		int DemandSideBranchNum;
 		int DemandSideCompNum;
@@ -1214,8 +1214,8 @@ namespace SystemReports {
 
 							found = false;
 							gio::write( OutputFileDebug, "*" ) << "1271=lstacksize" << size( LoopStack );
-							for ( Index = 1; Index <= isize( LoopStack ); ++Index ) {
-								if ( DemandSideLoopNum == LoopStack( Index ).LoopNum && DemandSideLoopType == LoopStack( Index ).LoopType ) {
+							for ( Idx = 1; Idx <= isize( LoopStack ); ++Idx ) {
+								if ( DemandSideLoopNum == LoopStack( Idx ).LoopNum && DemandSideLoopType == LoopStack( Idx ).LoopType ) {
 									found = true;
 									break;
 								}
@@ -1273,8 +1273,8 @@ namespace SystemReports {
 							DemandSideConnect( ArrayCount ).CompNum = DemandSideCompNum;
 
 							found = false;
-							for ( Index = 1; Index <= isize( LoopStack ); ++Index ) {
-								if ( DemandSideLoopNum == LoopStack( Index ).LoopNum && DemandSideLoopType == LoopStack( Index ).LoopType ) {
+							for ( Idx = 1; Idx <= isize( LoopStack ); ++Idx ) {
+								if ( DemandSideLoopNum == LoopStack( Idx ).LoopNum && DemandSideLoopType == LoopStack( Idx ).LoopType ) {
 									found = true;
 									break;
 								}
@@ -1318,7 +1318,7 @@ namespace SystemReports {
 
 	void
 	UpdateZoneCompPtrArray(
-		int & Index,
+		int & Idx,
 		int const ListNum,
 		int const AirDistUnitNum,
 		int const PlantLoopType,
@@ -1383,13 +1383,13 @@ namespace SystemReports {
 		}
 
 		if ( ArrayCounter < ArrayLimit ) {
-			Index = ArrayCounter;
-			ZoneCompToPlant( Index ).ZoneEqListNum = ListNum;
-			ZoneCompToPlant( Index ).ZoneEqCompNum = AirDistUnitNum;
-			ZoneCompToPlant( Index ).PlantLoopType = PlantLoopType;
-			ZoneCompToPlant( Index ).PlantLoopNum = PlantLoop;
-			ZoneCompToPlant( Index ).PlantLoopBranch = PlantBranch;
-			ZoneCompToPlant( Index ).PlantLoopComp = PlantComp;
+			Idx = ArrayCounter;
+			ZoneCompToPlant( Idx ).ZoneEqListNum = ListNum;
+			ZoneCompToPlant( Idx ).ZoneEqCompNum = AirDistUnitNum;
+			ZoneCompToPlant( Idx ).PlantLoopType = PlantLoopType;
+			ZoneCompToPlant( Idx ).PlantLoopNum = PlantLoop;
+			ZoneCompToPlant( Idx ).PlantLoopBranch = PlantBranch;
+			ZoneCompToPlant( Idx ).PlantLoopComp = PlantComp;
 			++ArrayCounter;
 		} else {
 			TempZoneCompToPlant = ZoneCompToPlant;
@@ -1417,20 +1417,20 @@ namespace SystemReports {
 			TempZoneCompToPlant.FirstDemandSidePtr() = 0;
 			TempZoneCompToPlant.LastDemandSidePtr() = 0;
 
-			Index = ArrayCounter;
-			ZoneCompToPlant( Index ).ZoneEqListNum = ListNum;
-			ZoneCompToPlant( Index ).ZoneEqCompNum = AirDistUnitNum;
-			ZoneCompToPlant( Index ).PlantLoopType = PlantLoopType;
-			ZoneCompToPlant( Index ).PlantLoopNum = PlantLoop;
-			ZoneCompToPlant( Index ).PlantLoopBranch = PlantBranch;
-			ZoneCompToPlant( Index ).PlantLoopComp = PlantComp;
+			Idx = ArrayCounter;
+			ZoneCompToPlant( Idx ).ZoneEqListNum = ListNum;
+			ZoneCompToPlant( Idx ).ZoneEqCompNum = AirDistUnitNum;
+			ZoneCompToPlant( Idx ).PlantLoopType = PlantLoopType;
+			ZoneCompToPlant( Idx ).PlantLoopNum = PlantLoop;
+			ZoneCompToPlant( Idx ).PlantLoopBranch = PlantBranch;
+			ZoneCompToPlant( Idx ).PlantLoopComp = PlantComp;
 			++ArrayCounter;
 		}
 	}
 
 	void
 	UpdateZoneSubCompPtrArray(
-		int & Index,
+		int & Idx,
 		int const ListNum,
 		int const AirDistUnitNum,
 		int const SubCompNum,
@@ -1497,14 +1497,14 @@ namespace SystemReports {
 		}
 
 		if ( ArrayCounter < ArrayLimit ) {
-			Index = ArrayCounter;
-			ZoneSubCompToPlant( Index ).ZoneEqListNum = ListNum;
-			ZoneSubCompToPlant( Index ).ZoneEqCompNum = AirDistUnitNum;
-			ZoneSubCompToPlant( Index ).ZoneEqSubCompNum = SubCompNum;
-			ZoneSubCompToPlant( Index ).PlantLoopType = PlantLoopType;
-			ZoneSubCompToPlant( Index ).PlantLoopNum = PlantLoop;
-			ZoneSubCompToPlant( Index ).PlantLoopBranch = PlantBranch;
-			ZoneSubCompToPlant( Index ).PlantLoopComp = PlantComp;
+			Idx = ArrayCounter;
+			ZoneSubCompToPlant( Idx ).ZoneEqListNum = ListNum;
+			ZoneSubCompToPlant( Idx ).ZoneEqCompNum = AirDistUnitNum;
+			ZoneSubCompToPlant( Idx ).ZoneEqSubCompNum = SubCompNum;
+			ZoneSubCompToPlant( Idx ).PlantLoopType = PlantLoopType;
+			ZoneSubCompToPlant( Idx ).PlantLoopNum = PlantLoop;
+			ZoneSubCompToPlant( Idx ).PlantLoopBranch = PlantBranch;
+			ZoneSubCompToPlant( Idx ).PlantLoopComp = PlantComp;
 			++ArrayCounter;
 		} else {
 			TempZoneSubCompToPlant = ZoneSubCompToPlant;
@@ -1534,21 +1534,21 @@ namespace SystemReports {
 			TempZoneSubCompToPlant.FirstDemandSidePtr() = 0;
 			TempZoneSubCompToPlant.LastDemandSidePtr() = 0;
 
-			Index = ArrayCounter;
-			ZoneSubCompToPlant( Index ).ZoneEqListNum = ListNum;
-			ZoneSubCompToPlant( Index ).ZoneEqCompNum = AirDistUnitNum;
-			ZoneSubCompToPlant( Index ).ZoneEqSubCompNum = SubCompNum;
-			ZoneSubCompToPlant( Index ).PlantLoopType = PlantLoopType;
-			ZoneSubCompToPlant( Index ).PlantLoopNum = PlantLoop;
-			ZoneSubCompToPlant( Index ).PlantLoopBranch = PlantBranch;
-			ZoneSubCompToPlant( Index ).PlantLoopComp = PlantComp;
+			Idx = ArrayCounter;
+			ZoneSubCompToPlant( Idx ).ZoneEqListNum = ListNum;
+			ZoneSubCompToPlant( Idx ).ZoneEqCompNum = AirDistUnitNum;
+			ZoneSubCompToPlant( Idx ).ZoneEqSubCompNum = SubCompNum;
+			ZoneSubCompToPlant( Idx ).PlantLoopType = PlantLoopType;
+			ZoneSubCompToPlant( Idx ).PlantLoopNum = PlantLoop;
+			ZoneSubCompToPlant( Idx ).PlantLoopBranch = PlantBranch;
+			ZoneSubCompToPlant( Idx ).PlantLoopComp = PlantComp;
 			++ArrayCounter;
 		}
 	}
 
 	void
 	UpdateZoneSubSubCompPtrArray(
-		int & Index,
+		int & Idx,
 		int const ListNum,
 		int const AirDistUnitNum,
 		int const SubCompNum,
@@ -1618,15 +1618,15 @@ namespace SystemReports {
 		}
 
 		if ( ArrayCounter < ArrayLimit ) {
-			Index = ArrayCounter;
-			ZoneSubSubCompToPlant( Index ).ZoneEqListNum = ListNum;
-			ZoneSubSubCompToPlant( Index ).ZoneEqCompNum = AirDistUnitNum;
-			ZoneSubSubCompToPlant( Index ).ZoneEqSubCompNum = SubCompNum;
-			ZoneSubSubCompToPlant( Index ).ZoneEqSubSubCompNum = SubSubCompNum;
-			ZoneSubSubCompToPlant( Index ).PlantLoopType = PlantLoopType;
-			ZoneSubSubCompToPlant( Index ).PlantLoopNum = PlantLoop;
-			ZoneSubSubCompToPlant( Index ).PlantLoopBranch = PlantBranch;
-			ZoneSubSubCompToPlant( Index ).PlantLoopComp = PlantComp;
+			Idx = ArrayCounter;
+			ZoneSubSubCompToPlant( Idx ).ZoneEqListNum = ListNum;
+			ZoneSubSubCompToPlant( Idx ).ZoneEqCompNum = AirDistUnitNum;
+			ZoneSubSubCompToPlant( Idx ).ZoneEqSubCompNum = SubCompNum;
+			ZoneSubSubCompToPlant( Idx ).ZoneEqSubSubCompNum = SubSubCompNum;
+			ZoneSubSubCompToPlant( Idx ).PlantLoopType = PlantLoopType;
+			ZoneSubSubCompToPlant( Idx ).PlantLoopNum = PlantLoop;
+			ZoneSubSubCompToPlant( Idx ).PlantLoopBranch = PlantBranch;
+			ZoneSubSubCompToPlant( Idx ).PlantLoopComp = PlantComp;
 			++ArrayCounter;
 		} else {
 			TempZoneSubSubCompToPlant = ZoneSubSubCompToPlant;
@@ -1658,22 +1658,22 @@ namespace SystemReports {
 			TempZoneSubSubCompToPlant.FirstDemandSidePtr() = 0;
 			TempZoneSubSubCompToPlant.LastDemandSidePtr() = 0;
 
-			Index = ArrayCounter;
-			ZoneSubSubCompToPlant( Index ).ZoneEqListNum = ListNum;
-			ZoneSubSubCompToPlant( Index ).ZoneEqCompNum = AirDistUnitNum;
-			ZoneSubSubCompToPlant( Index ).ZoneEqSubCompNum = SubCompNum;
-			ZoneSubSubCompToPlant( Index ).ZoneEqSubSubCompNum = SubSubCompNum;
-			ZoneSubSubCompToPlant( Index ).PlantLoopType = PlantLoopType;
-			ZoneSubSubCompToPlant( Index ).PlantLoopNum = PlantLoop;
-			ZoneSubSubCompToPlant( Index ).PlantLoopBranch = PlantBranch;
-			ZoneSubSubCompToPlant( Index ).PlantLoopComp = PlantComp;
+			Idx = ArrayCounter;
+			ZoneSubSubCompToPlant( Idx ).ZoneEqListNum = ListNum;
+			ZoneSubSubCompToPlant( Idx ).ZoneEqCompNum = AirDistUnitNum;
+			ZoneSubSubCompToPlant( Idx ).ZoneEqSubCompNum = SubCompNum;
+			ZoneSubSubCompToPlant( Idx ).ZoneEqSubSubCompNum = SubSubCompNum;
+			ZoneSubSubCompToPlant( Idx ).PlantLoopType = PlantLoopType;
+			ZoneSubSubCompToPlant( Idx ).PlantLoopNum = PlantLoop;
+			ZoneSubSubCompToPlant( Idx ).PlantLoopBranch = PlantBranch;
+			ZoneSubSubCompToPlant( Idx ).PlantLoopComp = PlantComp;
 			++ArrayCounter;
 		}
 	}
 
 	void
 	UpdateAirSysCompPtrArray(
-		int & Index,
+		int & Idx,
 		int const AirLoopNum,
 		int const BranchNum,
 		int const CompNum,
@@ -1740,14 +1740,14 @@ namespace SystemReports {
 		}
 
 		if ( ArrayCounter < ArrayLimit ) {
-			Index = ArrayCounter;
-			AirSysCompToPlant( Index ).AirLoopNum = AirLoopNum;
-			AirSysCompToPlant( Index ).AirLoopBranch = BranchNum;
-			AirSysCompToPlant( Index ).AirLoopComp = CompNum;
-			AirSysCompToPlant( Index ).PlantLoopType = PlantLoopType;
-			AirSysCompToPlant( Index ).PlantLoopNum = PlantLoop;
-			AirSysCompToPlant( Index ).PlantLoopBranch = PlantBranch;
-			AirSysCompToPlant( Index ).PlantLoopComp = PlantComp;
+			Idx = ArrayCounter;
+			AirSysCompToPlant( Idx ).AirLoopNum = AirLoopNum;
+			AirSysCompToPlant( Idx ).AirLoopBranch = BranchNum;
+			AirSysCompToPlant( Idx ).AirLoopComp = CompNum;
+			AirSysCompToPlant( Idx ).PlantLoopType = PlantLoopType;
+			AirSysCompToPlant( Idx ).PlantLoopNum = PlantLoop;
+			AirSysCompToPlant( Idx ).PlantLoopBranch = PlantBranch;
+			AirSysCompToPlant( Idx ).PlantLoopComp = PlantComp;
 			++ArrayCounter;
 		} else {
 			TempAirSysCompToPlant = AirSysCompToPlant;
@@ -1777,21 +1777,21 @@ namespace SystemReports {
 			TempAirSysCompToPlant.FirstDemandSidePtr() = 0;
 			TempAirSysCompToPlant.LastDemandSidePtr() = 0;
 
-			Index = ArrayCounter;
-			AirSysCompToPlant( Index ).AirLoopNum = AirLoopNum;
-			AirSysCompToPlant( Index ).AirLoopBranch = BranchNum;
-			AirSysCompToPlant( Index ).AirLoopComp = CompNum;
-			AirSysCompToPlant( Index ).PlantLoopType = PlantLoopType;
-			AirSysCompToPlant( Index ).PlantLoopNum = PlantLoop;
-			AirSysCompToPlant( Index ).PlantLoopBranch = PlantBranch;
-			AirSysCompToPlant( Index ).PlantLoopComp = PlantComp;
+			Idx = ArrayCounter;
+			AirSysCompToPlant( Idx ).AirLoopNum = AirLoopNum;
+			AirSysCompToPlant( Idx ).AirLoopBranch = BranchNum;
+			AirSysCompToPlant( Idx ).AirLoopComp = CompNum;
+			AirSysCompToPlant( Idx ).PlantLoopType = PlantLoopType;
+			AirSysCompToPlant( Idx ).PlantLoopNum = PlantLoop;
+			AirSysCompToPlant( Idx ).PlantLoopBranch = PlantBranch;
+			AirSysCompToPlant( Idx ).PlantLoopComp = PlantComp;
 			++ArrayCounter;
 		}
 	}
 
 	void
 	UpdateAirSysSubCompPtrArray(
-		int & Index,
+		int & Idx,
 		int const AirLoopNum,
 		int const BranchNum,
 		int const CompNum,
@@ -1861,15 +1861,15 @@ namespace SystemReports {
 		}
 
 		if ( ArrayCounter < ArrayLimit ) {
-			Index = ArrayCounter;
-			AirSysSubCompToPlant( Index ).AirLoopNum = AirLoopNum;
-			AirSysSubCompToPlant( Index ).AirLoopBranch = BranchNum;
-			AirSysSubCompToPlant( Index ).AirLoopComp = CompNum;
-			AirSysSubCompToPlant( Index ).AirLoopSubComp = SubCompNum;
-			AirSysSubCompToPlant( Index ).PlantLoopType = PlantLoopType;
-			AirSysSubCompToPlant( Index ).PlantLoopNum = PlantLoop;
-			AirSysSubCompToPlant( Index ).PlantLoopBranch = PlantBranch;
-			AirSysSubCompToPlant( Index ).PlantLoopComp = PlantComp;
+			Idx = ArrayCounter;
+			AirSysSubCompToPlant( Idx ).AirLoopNum = AirLoopNum;
+			AirSysSubCompToPlant( Idx ).AirLoopBranch = BranchNum;
+			AirSysSubCompToPlant( Idx ).AirLoopComp = CompNum;
+			AirSysSubCompToPlant( Idx ).AirLoopSubComp = SubCompNum;
+			AirSysSubCompToPlant( Idx ).PlantLoopType = PlantLoopType;
+			AirSysSubCompToPlant( Idx ).PlantLoopNum = PlantLoop;
+			AirSysSubCompToPlant( Idx ).PlantLoopBranch = PlantBranch;
+			AirSysSubCompToPlant( Idx ).PlantLoopComp = PlantComp;
 			++ArrayCounter;
 		} else {
 			TempAirSysSubCompToPlant = AirSysSubCompToPlant;
@@ -1901,22 +1901,22 @@ namespace SystemReports {
 			TempAirSysSubCompToPlant.FirstDemandSidePtr() = 0;
 			TempAirSysSubCompToPlant.LastDemandSidePtr() = 0;
 
-			Index = ArrayCounter;
-			AirSysSubCompToPlant( Index ).AirLoopNum = AirLoopNum;
-			AirSysSubCompToPlant( Index ).AirLoopBranch = BranchNum;
-			AirSysSubCompToPlant( Index ).AirLoopComp = CompNum;
-			AirSysSubCompToPlant( Index ).AirLoopSubComp = SubCompNum;
-			AirSysSubCompToPlant( Index ).PlantLoopType = PlantLoopType;
-			AirSysSubCompToPlant( Index ).PlantLoopNum = PlantLoop;
-			AirSysSubCompToPlant( Index ).PlantLoopBranch = PlantBranch;
-			AirSysSubCompToPlant( Index ).PlantLoopComp = PlantComp;
+			Idx = ArrayCounter;
+			AirSysSubCompToPlant( Idx ).AirLoopNum = AirLoopNum;
+			AirSysSubCompToPlant( Idx ).AirLoopBranch = BranchNum;
+			AirSysSubCompToPlant( Idx ).AirLoopComp = CompNum;
+			AirSysSubCompToPlant( Idx ).AirLoopSubComp = SubCompNum;
+			AirSysSubCompToPlant( Idx ).PlantLoopType = PlantLoopType;
+			AirSysSubCompToPlant( Idx ).PlantLoopNum = PlantLoop;
+			AirSysSubCompToPlant( Idx ).PlantLoopBranch = PlantBranch;
+			AirSysSubCompToPlant( Idx ).PlantLoopComp = PlantComp;
 			++ArrayCounter;
 		}
 	}
 
 	void
 	UpdateAirSysSubSubCompPtrArray(
-		int & Index,
+		int & Idx,
 		int const AirLoopNum,
 		int const BranchNum,
 		int const CompNum,
@@ -1989,16 +1989,16 @@ namespace SystemReports {
 		}
 
 		if ( ArrayCounter < ArrayLimit ) {
-			Index = ArrayCounter;
-			AirSysSubSubCompToPlant( Index ).AirLoopNum = AirLoopNum;
-			AirSysSubSubCompToPlant( Index ).AirLoopBranch = BranchNum;
-			AirSysSubSubCompToPlant( Index ).AirLoopComp = CompNum;
-			AirSysSubSubCompToPlant( Index ).AirLoopSubComp = SubCompNum;
-			AirSysSubSubCompToPlant( Index ).AirLoopSubSubComp = SubSubCompNum;
-			AirSysSubSubCompToPlant( Index ).PlantLoopType = PlantLoopType;
-			AirSysSubSubCompToPlant( Index ).PlantLoopNum = PlantLoop;
-			AirSysSubSubCompToPlant( Index ).PlantLoopBranch = PlantBranch;
-			AirSysSubSubCompToPlant( Index ).PlantLoopComp = PlantComp;
+			Idx = ArrayCounter;
+			AirSysSubSubCompToPlant( Idx ).AirLoopNum = AirLoopNum;
+			AirSysSubSubCompToPlant( Idx ).AirLoopBranch = BranchNum;
+			AirSysSubSubCompToPlant( Idx ).AirLoopComp = CompNum;
+			AirSysSubSubCompToPlant( Idx ).AirLoopSubComp = SubCompNum;
+			AirSysSubSubCompToPlant( Idx ).AirLoopSubSubComp = SubSubCompNum;
+			AirSysSubSubCompToPlant( Idx ).PlantLoopType = PlantLoopType;
+			AirSysSubSubCompToPlant( Idx ).PlantLoopNum = PlantLoop;
+			AirSysSubSubCompToPlant( Idx ).PlantLoopBranch = PlantBranch;
+			AirSysSubSubCompToPlant( Idx ).PlantLoopComp = PlantComp;
 			++ArrayCounter;
 		} else {
 			TempAirSysSubSubCompToPlant = AirSysSubSubCompToPlant;
@@ -2032,16 +2032,16 @@ namespace SystemReports {
 			TempAirSysSubSubCompToPlant.FirstDemandSidePtr() = 0;
 			TempAirSysSubSubCompToPlant.LastDemandSidePtr() = 0;
 
-			Index = ArrayCounter;
-			AirSysSubSubCompToPlant( Index ).AirLoopNum = AirLoopNum;
-			AirSysSubSubCompToPlant( Index ).AirLoopBranch = BranchNum;
-			AirSysSubSubCompToPlant( Index ).AirLoopComp = CompNum;
-			AirSysSubSubCompToPlant( Index ).AirLoopSubComp = SubCompNum;
-			AirSysSubSubCompToPlant( Index ).AirLoopSubSubComp = SubSubCompNum;
-			AirSysSubSubCompToPlant( Index ).PlantLoopType = PlantLoopType;
-			AirSysSubSubCompToPlant( Index ).PlantLoopNum = PlantLoop;
-			AirSysSubSubCompToPlant( Index ).PlantLoopBranch = PlantBranch;
-			AirSysSubSubCompToPlant( Index ).PlantLoopComp = PlantComp;
+			Idx = ArrayCounter;
+			AirSysSubSubCompToPlant( Idx ).AirLoopNum = AirLoopNum;
+			AirSysSubSubCompToPlant( Idx ).AirLoopBranch = BranchNum;
+			AirSysSubSubCompToPlant( Idx ).AirLoopComp = CompNum;
+			AirSysSubSubCompToPlant( Idx ).AirLoopSubComp = SubCompNum;
+			AirSysSubSubCompToPlant( Idx ).AirLoopSubSubComp = SubSubCompNum;
+			AirSysSubSubCompToPlant( Idx ).PlantLoopType = PlantLoopType;
+			AirSysSubSubCompToPlant( Idx ).PlantLoopNum = PlantLoop;
+			AirSysSubSubCompToPlant( Idx ).PlantLoopBranch = PlantBranch;
+			AirSysSubSubCompToPlant( Idx ).PlantLoopComp = PlantComp;
 			++ArrayCounter;
 		}
 	}
@@ -2393,7 +2393,7 @@ namespace SystemReports {
 		//Dimension GetMeteredVariables arrays
 		FArray1D_int VarIndexes; // Variable Numbers
 		FArray1D_int VarTypes; // Variable Types (1=integer, 2=real, 3=meter)
-		FArray1D_int IndexTypes; // Variable Index Types (1=Zone,2=HVAC)
+		FArray1D_int IndexTypes; // Variable Idx Types (1=Zone,2=HVAC)
 		FArray1D_Fstring UnitsStrings( sFstring( MaxNameLength ) ); // UnitsStrings for each variable
 		FArray1D_int ResourceTypes; // ResourceTypes for each variable
 		FArray1D_Fstring EndUses( sFstring( MaxNameLength ) ); // EndUses for each variable
@@ -3220,7 +3220,7 @@ namespace SystemReports {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Fstring CompType( MaxNameLength );
 		Fstring CompName( MaxNameLength );
-		int Index; // loop counter
+		int Idx; // loop counter
 		int nodes; // loop counter
 		int CtrlZoneNum; // ZONE counter
 		int ZoneInNum; // counter for zone air distribution inlets
@@ -3400,14 +3400,14 @@ namespace SystemReports {
 					ADUHeatFlowrate = 0.0;
 				}
 
-				for ( Index = 1; Index <= 2; ++Index ) {
+				for ( Idx = 1; Idx <= 2; ++Idx ) {
 					EquipListNum = ZoneEquipConfig( CtrlZoneNum ).EquipListIndex;
 
-					if ( Index == 1 ) {
+					if ( Idx == 1 ) {
 						ADUCoolNum = max( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).AirDistUnitIndex, 0 );
 						if ( ADUCoolNum == 0 ) continue;
 						ADUNum = ADUCoolNum;
-					} else { //(Index =2)THEN
+					} else { //(Idx =2)THEN
 						ADUHeatNum = max( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).AirDistUnitIndex, 0 );
 						if ( ADUHeatNum == 0 ) continue;
 						ADUNum = ADUHeatNum;
@@ -3416,11 +3416,11 @@ namespace SystemReports {
 					CompLoad = 0.0;
 					if ( ZoneEquipList( EquipListNum ).EquipData( ADUNum ).NumInlets > 0 ) {
 						for ( nodes = 1; nodes <= ZoneEquipList( EquipListNum ).EquipData( ADUNum ).NumInlets; ++nodes ) {
-							InletNodeNum = ZoneEquipList( EquipListNum ).EquipData( ADUNum ).InletNodeNums( Index );
+							InletNodeNum = ZoneEquipList( EquipListNum ).EquipData( ADUNum ).InletNodeNums( Idx );
 							CompLoad += ( PsyHFnTdbW( Node( InletNodeNum ).Temp, Node( InletNodeNum ).HumRat ) * Node( InletNodeNum ).MassFlowRate );
 						}
 						for ( nodes = 1; nodes <= ZoneEquipList( EquipListNum ).EquipData( ADUNum ).NumOutlets; ++nodes ) {
-							OutletNodeNum = ZoneEquipList( EquipListNum ).EquipData( ADUNum ).OutletNodeNums( Index );
+							OutletNodeNum = ZoneEquipList( EquipListNum ).EquipData( ADUNum ).OutletNodeNums( Idx );
 							CompLoad -= ( PsyHFnTdbW( Node( OutletNodeNum ).Temp, Node( OutletNodeNum ).HumRat ) * Node( OutletNodeNum ).MassFlowRate );
 						}
 					}
@@ -3479,7 +3479,7 @@ namespace SystemReports {
 							}
 						} //SubSubCompNum
 					} //SubCompNum
-				} //Index
+				} //Idx
 			} // ZoneInNum
 		} // Controlled Zone Loop
 
@@ -4259,7 +4259,7 @@ namespace SystemReports {
 		int MatchBranch; // Branch number of the match
 		int MatchComp; // Component number of the match
 		int MatchLoopType;
-		int Index;
+		int Idx;
 
 		for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
 			for ( VarNum = 1; VarNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).NumMeteredVars; ++VarNum ) {
@@ -4267,10 +4267,10 @@ namespace SystemReports {
 					PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).EnergyTransComp = EnergyTrans;
 					CompType = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf;
 					CompName = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).Name;
-					Index = 0;
+					Idx = 0;
 					FindDemandSideMatch( CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp );
-					if ( MatchFound ) UpdateAirSysCompPtrArray( Index, AirLoopNum, BranchNum, CompNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp );
-					PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).AirSysToPlantPtr = Index;
+					if ( MatchFound ) UpdateAirSysCompPtrArray( Idx, AirLoopNum, BranchNum, CompNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp );
+					PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).AirSysToPlantPtr = Idx;
 					break;
 				}
 			}
@@ -4281,10 +4281,10 @@ namespace SystemReports {
 						PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).EnergyTransComp = EnergyTrans;
 						CompType = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).TypeOf;
 						CompName = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).Name;
-						Index = 0;
+						Idx = 0;
 						FindDemandSideMatch( CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp );
-						if ( MatchFound ) UpdateAirSysSubCompPtrArray( Index, AirLoopNum, BranchNum, CompNum, SubCompNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp );
-						PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).AirSysToPlantPtr = Index;
+						if ( MatchFound ) UpdateAirSysSubCompPtrArray( Idx, AirLoopNum, BranchNum, CompNum, SubCompNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp );
+						PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).AirSysToPlantPtr = Idx;
 						break;
 					}
 				}
@@ -4295,10 +4295,10 @@ namespace SystemReports {
 							PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).EnergyTransComp = EnergyTrans;
 							CompType = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).TypeOf;
 							CompName = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).Name;
-							Index = 0;
+							Idx = 0;
 							FindDemandSideMatch( CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp );
-							if ( MatchFound ) UpdateAirSysSubSubCompPtrArray( Index, AirLoopNum, BranchNum, CompNum, SubCompNum, SubSubCompNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp );
-							PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).AirSysToPlantPtr = Index;
+							if ( MatchFound ) UpdateAirSysSubSubCompPtrArray( Idx, AirLoopNum, BranchNum, CompNum, SubCompNum, SubSubCompNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp );
+							PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).AirSysToPlantPtr = Idx;
 							break;
 						}
 					}

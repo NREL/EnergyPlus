@@ -1245,8 +1245,8 @@ namespace HVACUnitarySystem {
 		int const OutNode, // coil outlet node number
 		int const ControlNode, // control node number
 		Real64 & OnOffAirFlowRatio,
-		Real64 const OAUCoilOutletTemp, // "ONLY" for zoneHVAC:OutdoorAirUnit
 		bool const FirstHVACIteration,
+		Optional< Real64 const > OAUCoilOutletTemp = _, // "ONLY" for zoneHVAC:OutdoorAirUnit
 		Optional< Real64 > ZoneLoad = _,
 		Optional< Real64 const > MaxOutletTemp = _ // limits heating coil outlet temp [C]
 	);

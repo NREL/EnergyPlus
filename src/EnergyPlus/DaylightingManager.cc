@@ -6975,7 +6975,7 @@ namespace DaylightingManager {
 		Real64 FA; // Intermediate variables
 		Real64 FB;
 
-		static FArray2D< Real64 > const PF( 7, 5, reshape2( { 1.00, .492, .226, .128, .081, .061, .057, .123, .119, .065, .043, .029, .026, .023, .019, .026, .019, .016, .014, .011, .011, .008, .008, .008, .008, .008, .006, .006, 0.00, 0.00, .003, .003, .003, .003, .003 }, { 7, 5 } ) ); // Position factor array
+		static FArray2D< Real64 > const PF( 7, 5, reshape2< Real64, int >( { 1.00, 0.492, 0.226, 0.128, 0.081, 0.061, 0.057, 0.123, 0.119, 0.065, 0.043, 0.029, 0.026, 0.023, 0.019, 0.026, 0.019, 0.016, 0.014, 0.011, 0.011, 0.008, 0.008, 0.008, 0.008, 0.008, 0.006, 0.006, 0.0, 0.0, 0.003, 0.003, 0.003, 0.003, 0.003 }, { 7, 5 } ) ); // Position factor array // Explicit reshape2 template args are work-around for VC++2013 bug
 
 		// FLOW:
 		DayltgGlarePositionFactor = 0.0;

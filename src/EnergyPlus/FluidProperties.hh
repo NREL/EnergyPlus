@@ -951,7 +951,7 @@ namespace FluidProperties {
 	//*****************************************************************************
 
 	Fstring
-	GetGlycolNameByIndex( int const Index ); // carries in substance index
+	GetGlycolNameByIndex( int const Idx ); // carries in substance index
 
 	//*****************************************************************************
 

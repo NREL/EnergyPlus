@@ -239,7 +239,7 @@ namespace MatrixDataManager {
 
 	void
 	Get2DMatrix(
-		int const Index, // pointer index to location in MatData
+		int const Idx, // pointer index to location in MatData
 		FArray2S< Real64 > Mat2D
 	)
 	{
@@ -278,8 +278,8 @@ namespace MatrixDataManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		if ( Index > 0 ) { // protect hard crash
-			Mat2D = MatData( Index ).Mat2D;
+		if ( Idx > 0 ) { // protect hard crash
+			Mat2D = MatData( Idx ).Mat2D;
 		} else {
 			// do nothing (?) throw dev error
 
@@ -289,7 +289,7 @@ namespace MatrixDataManager {
 
 	void
 	Get2DMatrixDimensions(
-		int const Index, // pointer index to location in MatData
+		int const Idx, // pointer index to location in MatData
 		int & NumRows,
 		int & NumCols
 	)
@@ -325,9 +325,9 @@ namespace MatrixDataManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		if ( Index > 0 ) {
-			NumRows = MatData( Index ).Dim( 1 );
-			NumCols = MatData( Index ).Dim( 2 );
+		if ( Idx > 0 ) {
+			NumRows = MatData( Idx ).Dim( 1 );
+			NumCols = MatData( Idx ).Dim( 2 );
 		} else {
 			// do nothing (?) throw dev error?
 

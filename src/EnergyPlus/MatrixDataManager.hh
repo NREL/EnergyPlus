@@ -87,13 +87,13 @@ namespace MatrixDataManager {
 
 	void
 	Get2DMatrix(
-		int const Index, // pointer index to location in MatData
+		int const Idx, // pointer index to location in MatData
 		FArray2S< Real64 > Mat2D
 	);
 
 	void
 	Get2DMatrixDimensions(
-		int const Index, // pointer index to location in MatData
+		int const Idx, // pointer index to location in MatData
 		int & NumRows,
 		int & NumCols
 	);

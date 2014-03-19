@@ -1462,7 +1462,7 @@ namespace PlantLoopSolver {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static FArray1D_int const InitCompArray( 1, { 0 } );
+		static FArray1D_int const InitCompArray( 1, 0 );
 
 		Demand = EvaluateLoopSetPointLoad( LoopNum, ThisSide, 1, 1, InitCompArray );
 

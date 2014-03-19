@@ -368,7 +368,7 @@ namespace Vectors {
 		costheta = dot( z3, ZUnit );
 
 		//    if ( fabs(costheta) < 1.0d0) { // normal cases
-		if ( std::abs( costheta ) < 1.0 ) {
+		if ( std::abs( costheta ) < 1.0 - 1.12e-16 ) { //Autodesk Added - 1.12e-16 to treat 1 bit from 1.0 as 1.0 to correct different behavior seen in release vs debug build due to slight precision differences: May want larger epsilon here
 			//    // azimuth
 			//    Vec3d    x2 = cross(Ref_CS[2],z3); // order is important; x2 = x1
 			//    RotAng[0] = ATAN2(dot(x2,Ref_CS[1]),dot(x2,Ref_CS[0]));
@@ -395,8 +395,16 @@ namespace Vectors {
 		if ( az < 0.0 ) az += 360.0;
 		az = mod( az, 360. );
 
-		// Normalize the azimuth angle so it is positive
-		if ( std::abs( az - 360.0 ) < 1.0e-3 ) az = 0.0;
+		// Clean up angle precision
+		if ( std::abs( az - 360.0 ) < 1.0e-3 ) { // Bring small angles to zero
+			az = 0.0;
+		} else if ( std::abs( az - 180.0 ) < 1.0e-6 ) { // Bring angles near 180 to 180 //Autodesk Added to clean up debug--release discrepancies
+			az = 180.0;
+		}
+		if ( std::abs( tlt - 180.0 ) < 1.0e-6 ) { // Bring angles near 180 to 180 //Autodesk Added to clean up debug--release discrepancies
+			tlt = 180.0;
+		}
+
 		Azimuth = az;
 		Tilt = tlt;
 

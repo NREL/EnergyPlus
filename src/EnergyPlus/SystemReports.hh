@@ -242,7 +242,7 @@ namespace SystemReports {
 
 	void
 	UpdateZoneCompPtrArray(
-		int & Index,
+		int & Idx,
 		int const ListNum,
 		int const AirDistUnitNum,
 		int const PlantLoopType,
@@ -253,7 +253,7 @@ namespace SystemReports {
 
 	void
 	UpdateZoneSubCompPtrArray(
-		int & Index,
+		int & Idx,
 		int const ListNum,
 		int const AirDistUnitNum,
 		int const SubCompNum,
@@ -265,7 +265,7 @@ namespace SystemReports {
 
 	void
 	UpdateZoneSubSubCompPtrArray(
-		int & Index,
+		int & Idx,
 		int const ListNum,
 		int const AirDistUnitNum,
 		int const SubCompNum,
@@ -278,7 +278,7 @@ namespace SystemReports {
 
 	void
 	UpdateAirSysCompPtrArray(
-		int & Index,
+		int & Idx,
 		int const AirLoopNum,
 		int const BranchNum,
 		int const CompNum,
@@ -290,7 +290,7 @@ namespace SystemReports {
 
 	void
 	UpdateAirSysSubCompPtrArray(
-		int & Index,
+		int & Idx,
 		int const AirLoopNum,
 		int const BranchNum,
 		int const CompNum,
@@ -303,7 +303,7 @@ namespace SystemReports {
 
 	void
 	UpdateAirSysSubSubCompPtrArray(
-		int & Index,
+		int & Idx,
 		int const AirLoopNum,
 		int const BranchNum,
 		int const CompNum,

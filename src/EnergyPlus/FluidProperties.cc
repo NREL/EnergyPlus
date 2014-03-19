@@ -5578,7 +5578,7 @@ namespace FluidProperties {
 	//*****************************************************************************
 
 	Fstring
-	GetGlycolNameByIndex( int const Index ) // carries in substance index
+	GetGlycolNameByIndex( int const Idx ) // carries in substance index
 	{
 
 		// FUNCTION INFORMATION:
@@ -5628,8 +5628,8 @@ namespace FluidProperties {
 		// Check to see if this glycol shows up in the glycol data
 		//  ArrayLength = SIZE(GlycolData)
 
-		if ( Index > 0 && Index <= NumOfGlycols ) {
-			GetGlycolNameByIndex = GlycolData( Index ).Name;
+		if ( Idx > 0 && Idx <= NumOfGlycols ) {
+			GetGlycolNameByIndex = GlycolData( Idx ).Name;
 		} else { // return blank - error checking in calling proceedure
 			GetGlycolNameByIndex = " ";
 		}
