@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <cstdlib>
 #include <type_traits>
 #if defined(_MSC_VER) && !defined(__INTEL_COMPILER)
 #include <bitset>

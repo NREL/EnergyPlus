@@ -16,6 +16,7 @@
 // C++ Headers
 #include <climits>
 #include <cmath>
+#include <cstdlib>
 #include <iomanip>
 #include <sstream>
 #include <string>
