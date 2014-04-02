@@ -1712,6 +1712,11 @@ public: // Properties
 class FormatString : public FormatLeaf
 {
 
+public: // Types
+
+	using FormatLeaf::in;
+	using FormatLeaf::out;
+
 public: // Creation
 
 	// Constructor
@@ -1765,6 +1770,11 @@ private: // Data
 // Literal Character Format
 class FormatChar : public FormatLeaf
 {
+
+public: // Types
+
+	using FormatLeaf::in;
+	using FormatLeaf::out;
 
 public: // Creation
 
@@ -1820,6 +1830,10 @@ private: // Data
 class FormatBN : public FormatLeaf
 {
 
+public: // Types
+
+	using FormatLeaf::in;
+
 public: // Creation
 
 	// Constructor
@@ -1858,6 +1872,10 @@ public: // Methods
 // Blank=Zero Mode Format
 class FormatBZ : public FormatLeaf
 {
+
+public: // Types
+
+	using FormatLeaf::in;
 
 public: // Creation
 
@@ -2010,6 +2028,11 @@ public: // Creation
 class FormatX : public FormatLeaf
 {
 
+public: // Types
+
+	using FormatLeaf::in;
+	using FormatLeaf::out;
+
 public: // Creation
 
 	// Constructor
@@ -2096,6 +2119,11 @@ private: // Data
 class FormatLinefeed : public FormatLeaf
 {
 
+public: // Types
+
+	using FormatLeaf::in;
+	using FormatLeaf::out;
+
 public: // Creation
 
 	// Constructor
@@ -2147,6 +2175,11 @@ public: // Methods
 class FormatColon : public FormatLeaf
 {
 
+public: // Types
+
+	using FormatLeaf::in;
+	using FormatLeaf::out;
+
 public: // Creation
 
 	// Constructor
@@ -2194,6 +2227,10 @@ public: // Methods
 class FormatDollar : public FormatLeaf
 {
 
+public: // Types
+
+	using FormatLeaf::out;
+
 public: // Creation
 
 	// Constructor
@@ -2232,6 +2269,11 @@ public: // Methods
 // Format: Format Expression for Tab Positioning
 class FormatT : public FormatLeaf
 {
+
+public: // Types
+
+	using FormatLeaf::in;
+	using FormatLeaf::out;
 
 public: // Creation
 
@@ -2284,6 +2326,11 @@ private: // Data
 class FormatTL : public FormatLeaf
 {
 
+public: // Types
+
+	using FormatLeaf::in;
+	using FormatLeaf::out;
+
 public: // Creation
 
 	// Constructor
@@ -2335,6 +2382,11 @@ private: // Data
 class FormatTR : public FormatLeaf
 {
 
+public: // Types
+
+	using FormatLeaf::in;
+	using FormatLeaf::out;
+
 public: // Creation
 
 	// Constructor
@@ -2385,6 +2437,11 @@ private: // Data
 // String Format
 class FormatA : public FormatLeaf
 {
+
+public: // Types
+
+	using FormatLeaf::in;
+	using FormatLeaf::out;
 
 public: // Creation
 
@@ -2754,6 +2811,11 @@ private: // Data
 class FormatL : public FormatLeaf
 {
 
+public: // Types
+
+	using FormatLeaf::in;
+	using FormatLeaf::out;
+
 public: // Creation
 
 	// Constructor
@@ -2829,6 +2891,10 @@ private: // Data
 // Integer Format Base Class
 class FormatInteger : public FormatLeaf
 {
+
+public: // Types
+
+	using FormatLeaf::in;
 
 protected: // Creation
 
@@ -3118,6 +3184,10 @@ private: // Data
 class FormatI : public FormatInteger
 {
 
+public: // Types
+
+	using FormatInteger::out;
+
 public: // Creation
 
 	// Constructor
@@ -3211,6 +3281,11 @@ protected: // Methods
 // Binary Integer Format
 class FormatB : public FormatInteger
 {
+
+public: // Types
+
+	using FormatInteger::in;
+	using FormatInteger::out;
 
 public: // Creation
 
@@ -3440,6 +3515,10 @@ protected: // Methods
 class FormatO : public FormatInteger
 {
 
+public: // Types
+
+	using FormatInteger::out;
+
 public: // Creation
 
 	// Constructor
@@ -3533,6 +3612,10 @@ protected: // Methods
 // Hexidecimal Integer Format
 class FormatZ : public FormatInteger
 {
+
+public: // Types
+
+	using FormatInteger::out;
 
 public: // Creation
 
@@ -3628,6 +3711,11 @@ protected: // Methods
 class FormatP : public FormatLeaf
 {
 
+public: // Types
+
+	using FormatLeaf::in;
+	using FormatLeaf::out;
+
 public: // Creation
 
 	// Constructor
@@ -3679,6 +3767,10 @@ private: // Data
 // Floating Format
 class FormatFloat : public FormatLeaf
 {
+
+public: // Types
+
+	using FormatLeaf::in;
 
 protected: // Creation
 
@@ -3947,6 +4039,10 @@ private: // Data
 class FormatF : public FormatFloat
 {
 
+public: // Types
+
+	using FormatFloat::out;
+
 public: // Creation
 
 	// Constructor
@@ -4054,6 +4150,11 @@ private: // Data
 // General Floating with Exponent Format
 class FormatG : public FormatGED
 {
+
+public: // Types
+
+	using FormatGED::in;
+	using FormatGED::out;
 
 public: // Creation
 
@@ -4255,6 +4356,10 @@ protected: // Methods
 class FormatE : public FormatGED
 {
 
+public: // Types
+
+	using FormatGED::out;
+
 public: // Creation
 
 	// Constructor
@@ -4297,6 +4402,10 @@ public: // Methods
 // Engineering Floating Format
 class FormatEN : public FormatGED
 {
+
+public: // Types
+
+	using FormatGED::out;
 
 public: // Creation
 
@@ -4341,6 +4450,10 @@ public: // Methods
 class FormatES : public FormatGED
 {
 
+public: // Types
+
+	using FormatGED::out;
+
 public: // Creation
 
 	// Constructor
@@ -4384,6 +4497,10 @@ public: // Methods
 class FormatD : public FormatGED
 {
 
+public: // Types
+
+	using FormatGED::out;
+
 public: // Creation
 
 	// Constructor
@@ -4426,6 +4543,11 @@ public: // Methods
 // List-Directed Format
 class FormatLD : public FormatLeaf
 {
+
+public: // Types
+
+	using FormatLeaf::in;
+	using FormatLeaf::out;
 
 public: // Creation
 

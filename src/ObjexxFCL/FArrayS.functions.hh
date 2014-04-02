@@ -1712,7 +1712,7 @@ inline
 T
 product( FArray1S< T > const & a )
 {
-	T p( 0 );
+	T p( 1 );
 	for ( int i = 1, e = a.u(); i <= e; ++i ) {
 		p *= a( i );
 	}
@@ -1724,7 +1724,7 @@ inline
 T
 product( FArray2S< T > const & a )
 {
-	T p( 0 );
+	T p( 1 );
 	for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 			p *= a( i1, i2 );
@@ -1738,7 +1738,7 @@ inline
 T
 product( FArray3S< T > const & a )
 {
-	T p( 0 );
+	T p( 1 );
 	for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
@@ -1754,7 +1754,7 @@ inline
 T
 product( FArray4S< T > const & a )
 {
-	T p( 0 );
+	T p( 1 );
 	for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
 		for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
@@ -1772,7 +1772,7 @@ inline
 T
 product( FArray5S< T > const & a )
 {
-	T p( 0 );
+	T p( 1 );
 	for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -1792,7 +1792,7 @@ inline
 T
 product( FArray6S< T > const & a )
 {
-	T p( 0 );
+	T p( 1 );
 	for ( int i6 = 1, e6 = a.u6(); i6 <= e6; ++i6 ) {
 		for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
 			for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
@@ -1815,7 +1815,7 @@ T
 product( FArray1S< T > const & a, int const dim )
 {
 	assert( dim == 1 );
-	T p( 0 );
+	T p( 1 );
 	for ( int i = 1, e = a.u(); i <= e; ++i ) {
 		p *= a( i );
 	}
@@ -1832,7 +1832,7 @@ product( FArray2S< T > const & a, int const dim )
 		{
 			FArray1D< T > prds( a.size2(), 0 );
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-				T p( 0 );
+				T p( 1 );
 				for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 					p *= a( i1, i2 );
 				}
@@ -1844,7 +1844,7 @@ product( FArray2S< T > const & a, int const dim )
 		{
 			FArray1D< T > prds( a.size1(), 0 );
 			for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-				T p( 0 );
+				T p( 1 );
 				for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 					p *= a( i1, i2 );
 				}
@@ -1864,7 +1864,7 @@ T
 product( FArray1S< T > const & a, FArray1< bool > const & mask )
 {
 	assert( conformable( a, mask ) );
-	T p( 0 );
+	T p( 1 );
 	for ( int i = 1, e = a.u(), k = mask.l(); i <= e; ++i, ++k ) {
 		if ( mask( k ) ) p *= a( i );
 	}
@@ -1877,7 +1877,7 @@ T
 product( FArray2S< T > const & a, FArray2< bool > const & mask )
 {
 	assert( conformable( a, mask ) );
-	T p( 0 );
+	T p( 1 );
 	for ( int i2 = 1, e2 = a.u2(), k2 = mask.l2(); i2 <= e2; ++i2, ++k2 ) {
 		for ( int i1 = 1, e1 = a.u1(), k1 = mask.l1(); i1 <= e1; ++i1, ++k1 ) {
 			if ( mask( k1, k2 ) ) p *= a( i1, i2 );
@@ -1892,7 +1892,7 @@ T
 product( FArray3S< T > const & a, FArray3< bool > const & mask )
 {
 	assert( conformable( a, mask ) );
-	T p( 0 );
+	T p( 1 );
 	for ( int i3 = 1, e3 = a.u3(), k3 = mask.l3(); i3 <= e3; ++i3, ++k3 ) {
 		for ( int i2 = 1, e2 = a.u2(), k2 = mask.l2(); i2 <= e2; ++i2, ++k2 ) {
 			for ( int i1 = 1, e1 = a.u1(), k1 = mask.l1(); i1 <= e1; ++i1, ++k1 ) {
@@ -1909,7 +1909,7 @@ T
 product( FArray4S< T > const & a, FArray4< bool > const & mask )
 {
 	assert( conformable( a, mask ) );
-	T p( 0 );
+	T p( 1 );
 	for ( int i4 = 1, e4 = a.u4(), k4 = mask.l4(); i4 <= e4; ++i4, ++k4 ) {
 		for ( int i3 = 1, e3 = a.u3(), k3 = mask.l3(); i3 <= e3; ++i3, ++k3 ) {
 			for ( int i2 = 1, e2 = a.u2(), k2 = mask.l2(); i2 <= e2; ++i2, ++k2 ) {
@@ -1928,7 +1928,7 @@ T
 product( FArray5S< T > const & a, FArray5< bool > const & mask )
 {
 	assert( conformable( a, mask ) );
-	T p( 0 );
+	T p( 1 );
 	for ( int i5 = 1, e5 = a.u5(), k5 = mask.l5(); i5 <= e5; ++i5, ++k5 ) {
 		for ( int i4 = 1, e4 = a.u4(), k4 = mask.l4(); i4 <= e4; ++i4, ++k4 ) {
 			for ( int i3 = 1, e3 = a.u3(), k3 = mask.l3(); i3 <= e3; ++i3, ++k3 ) {
@@ -1949,7 +1949,7 @@ T
 product( FArray6S< T > const & a, FArray6< bool > const & mask )
 {
 	assert( conformable( a, mask ) );
-	T p( 0 );
+	T p( 1 );
 	for ( int i6 = 1, e6 = a.u6(), k6 = mask.l6(); i6 <= e6; ++i6, ++k6 ) {
 		for ( int i5 = 1, e5 = a.u5(), k5 = mask.l5(); i5 <= e5; ++i5, ++k5 ) {
 			for ( int i4 = 1, e4 = a.u4(), k4 = mask.l4(); i4 <= e4; ++i4, ++k4 ) {

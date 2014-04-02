@@ -1445,7 +1445,7 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 	FArray1D_bool FoundSupplyPlenum;
 	FArray1D_bool FoundZoneSplitter;
 	FArray1D_Fstring FoundNames( sFstring( MaxNameLength ) );
-	int NumErr; // Error Counter
+	int NumErr( 0 ); // Error Counter //Autodesk:Init Initialization added
 	int BCount;
 	int Found;
 	Fstring ChrOut( 20 );

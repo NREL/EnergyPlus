@@ -342,7 +342,7 @@ T
 bit_bits( T const & x, P const & pos, L const & len, typename std::enable_if< std::is_unsigned< T >::value >::type * = 0 )
 {
 	assert( pos >= T( 0 ) );
-	assert( pos + len <= bit_size( x ) );
+	assert( int( pos + len ) <= bit_size( x ) );
 	T const siz( bit_size( x ) );
 	return x << ( siz - ( pos + len ) ) >> ( siz - len );
 }
@@ -354,7 +354,7 @@ T
 bit_bits( T const & x, P const & pos, L const & len, typename std::enable_if< std::is_signed< T >::value >::type * = 0 )
 {
 	assert( pos >= T( 0 ) );
-	assert( pos + len <= bit_size( x ) );
+	assert( int( pos + len ) <= bit_size( x ) );
 	T const siz( bit_size( x ) );
 	return *reinterpret_cast< typename std::make_unsigned< T const >::type * >( &x ) << ( siz - ( pos + len ) ) >> ( siz - len );
 }

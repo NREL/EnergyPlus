@@ -2010,7 +2010,6 @@ namespace OutdoorAirUnit {
 		using ScheduleManager::GetCurrentScheduleValue;
 		using General::TrimSigDigits;
 		using NodeInputManager::GetOnlySingleNode;
-		using Fans::SimulateFanComponents;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using HeatRecovery::SimHeatRecovery;

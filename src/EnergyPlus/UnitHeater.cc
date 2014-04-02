@@ -1352,7 +1352,7 @@ namespace UnitHeater {
 			FanOpMode = ContFanCycCoil;
 		}
 		if ( FanOpMode != CycFanCycCoil ) {
-			SimulateFanComponents( UnitHeat( UnitHeatNum ).FanName, FirstHVACIteration, UnitHeat( UnitHeatNum ).Fan_Index, ZoneCompTurnFansOn = ZoneCompTurnFansOn, ZoneCompTurnFansOff = ZoneCompTurnFansOff );
+			SimulateFanComponents( UnitHeat( UnitHeatNum ).FanName, FirstHVACIteration, UnitHeat( UnitHeatNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 
 			{ auto const SELECT_CASE_var( UnitHeat( UnitHeatNum ).HCoilType );
 
@@ -1398,7 +1398,7 @@ namespace UnitHeater {
 
 			if ( QCoilReq < 0.0 ) QCoilReq = 0.0; // a heating coil can only heat, not cool
 
-			SimulateFanComponents( UnitHeat( UnitHeatNum ).FanName, FirstHVACIteration, UnitHeat( UnitHeatNum ).Fan_Index, ZoneCompTurnFansOn = ZoneCompTurnFansOn, ZoneCompTurnFansOff = ZoneCompTurnFansOff );
+			SimulateFanComponents( UnitHeat( UnitHeatNum ).FanName, FirstHVACIteration, UnitHeat( UnitHeatNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 
 			{ auto const SELECT_CASE_var( UnitHeat( UnitHeatNum ).HCoilType );
 
