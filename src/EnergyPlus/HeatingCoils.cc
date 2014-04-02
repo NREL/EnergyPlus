@@ -1766,7 +1766,7 @@ namespace HeatingCoils {
 	void
 	CalcGasHeatingCoil(
 		int const CoilNum, // index to heating coil
-		Real64 & QCoilReq,
+		Real64 const QCoilReq,
 		Real64 & QCoilActual, // coil load actually delivered (W)
 		int const FanOpMode, // fan operating mode
 		Real64 const PartLoadRatio // part-load ratio of heating coil
@@ -2011,7 +2011,7 @@ namespace HeatingCoils {
 		Real64 TotCapLS; // total capacity at low stage [W]
 		Real64 TotCap; // total capacity at current stage [W]
 		Real64 EffHS; // efficiency at high stage
-		Real64 EffLS; // efficiency at low stage
+		Real64 EffLS( 0.0 ); // efficiency at low stage
 		Real64 EffAvg; // average efficiency
 		Real64 OutdoorPressure; // Outdoor barometric pressure at condenser (Pa)
 		int StageNumHS; // High stage number
@@ -2025,7 +2025,7 @@ namespace HeatingCoils {
 		Real64 HSFullLoadOutAirEnth; // Outlet full load enthalpy at high stage
 		Real64 LSGasHeatingPower; // Full load power at low stage
 		Real64 HSGasHeatingPower; // Full load power at high stage
-		Real64 PartLoadRat; // part load ratio
+		Real64 PartLoadRat( 0.0 ); // part load ratio
 		Real64 PLF; // part load factor used to calculate RTF
 
 		// FLOW
@@ -2177,7 +2177,7 @@ namespace HeatingCoils {
 		// If the PLF curve is defined the gas usage needs to be modified.
 		// The PLF curve is only used when the coil cycles.
 		if ( HeatingCoil( CoilNum ).PLFCurveIndex > 0 ) {
-			if ( PartLoadRat > 0 && StageNum < 2 ) {
+			if ( PartLoadRat > 0.0 && StageNum < 2 ) {
 				PLF = CurveValue( HeatingCoil( CoilNum ).PLFCurveIndex, PartLoadRat );
 				if ( PLF < 0.7 ) {
 					if ( HeatingCoil( CoilNum ).PLFErrorCount < 1 ) {

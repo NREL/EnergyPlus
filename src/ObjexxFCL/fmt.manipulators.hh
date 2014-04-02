@@ -65,6 +65,8 @@ struct Signed< true >
 struct Binary_num_put : std::num_put< char >
 {
 
+	using std::num_put< char >::do_put;
+
 	// Constructor
 	inline
 	Binary_num_put()
@@ -87,6 +89,20 @@ struct Binary_num_put : std::num_put< char >
 	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, unsigned long int v ) const
+	{
+		return binary_do_put( out, str, fill, v );
+	}
+
+	inline
+	iter_type
+	do_put( iter_type out, std::ios_base & str, char_type fill, long long int v ) const
+	{
+		return binary_do_put( out, str, fill, static_cast< unsigned long int >( v ) ); // Fortran treat's value as unsigned
+	}
+
+	inline
+	iter_type
+	do_put( iter_type out, std::ios_base & str, char_type fill, unsigned long long int v ) const
 	{
 		return binary_do_put( out, str, fill, v );
 	}
@@ -144,6 +160,8 @@ private: // Static Methods
 struct Exponent_num_put : std::num_put< char >
 {
 
+	using std::num_put< char >::do_put;
+
 	// Constructor
 	inline
 	explicit
@@ -171,6 +189,20 @@ struct Exponent_num_put : std::num_put< char >
 	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, unsigned long int v ) const
+	{
+		return exponent_do_put( out, str, fill, v );
+	}
+
+	inline
+	iter_type
+	do_put( iter_type out, std::ios_base & str, char_type fill, long long int v ) const
+	{
+		return exponent_do_put( out, str, fill, v );
+	}
+
+	inline
+	iter_type
+	do_put( iter_type out, std::ios_base & str, char_type fill, unsigned long long int v ) const
 	{
 		return exponent_do_put( out, str, fill, v );
 	}
@@ -300,6 +332,8 @@ private: // Data
 struct Engineering_num_put : std::num_put< char >
 {
 
+	using std::num_put< char >::do_put;
+
 	// Constructor
 	inline
 	explicit
@@ -325,6 +359,20 @@ struct Engineering_num_put : std::num_put< char >
 	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, unsigned long int v ) const
+	{
+		return engineering_do_put( out, str, fill, v );
+	}
+
+	inline
+	iter_type
+	do_put( iter_type out, std::ios_base & str, char_type fill, long long int v ) const
+	{
+		return engineering_do_put( out, str, fill, v );
+	}
+
+	inline
+	iter_type
+	do_put( iter_type out, std::ios_base & str, char_type fill, unsigned long long int v ) const
 	{
 		return engineering_do_put( out, str, fill, v );
 	}
@@ -426,6 +474,8 @@ private: // Data
 struct Scientific_num_put : std::num_put< char >
 {
 
+	using std::num_put< char >::do_put;
+
 	// Constructor
 	inline
 	explicit
@@ -451,6 +501,20 @@ struct Scientific_num_put : std::num_put< char >
 	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, unsigned long int v ) const
+	{
+		return scientific_do_put( out, str, fill, v );
+	}
+
+	inline
+	iter_type
+	do_put( iter_type out, std::ios_base & str, char_type fill, long long int v ) const
+	{
+		return scientific_do_put( out, str, fill, v );
+	}
+
+	inline
+	iter_type
+	do_put( iter_type out, std::ios_base & str, char_type fill, unsigned long long int v ) const
 	{
 		return scientific_do_put( out, str, fill, v );
 	}

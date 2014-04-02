@@ -1481,13 +1481,13 @@ sum( FArray2< T > const & a, int const dim )
 {
 	assert( a.size_bounded() );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
+	int const as1( a.size1() );
+	int const as2( a.size2() );
 	size_type l( 0 ); // Linear index
 	switch ( dim ) {
 	case 1:
 		{
-			FArray1D< T > res( as2, 0 );
+			FArray1D< T > res( as2, T( 0 ) );
 			for ( int i2 = 1; i2 <= as2; ++i2 ) {
 				T r( 0 );
 				for ( int i1 = 1; i1 <= as1; ++i1, ++l ) {
@@ -1499,7 +1499,7 @@ sum( FArray2< T > const & a, int const dim )
 		}
 	case 2:
 		{
-			FArray1D< T > res( as1, 0 );
+			FArray1D< T > res( as1, T( 0 ) );
 			for ( int i1 = 1; i1 <= as1; ++i1 ) {
 				T r( 0 );
 				l = i1 - 1;
@@ -1572,13 +1572,13 @@ product( FArray2< T > const & a, int const dim )
 {
 	assert( a.size_bounded() );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
+	int const as1( a.size1() );
+	int const as2( a.size2() );
 	size_type l( 0 ); // Linear index
 	switch ( dim ) {
 	case 1:
 		{
-			FArray1D< T > res( as2, 1 );
+			FArray1D< T > res( as2, T( 1 ) );
 			for ( int i2 = 1; i2 <= as2; ++i2 ) {
 				T r( 1 );
 				for ( int i1 = 1; i1 <= as1; ++i1, ++l ) {
@@ -1590,7 +1590,7 @@ product( FArray2< T > const & a, int const dim )
 		}
 	case 2:
 		{
-			FArray1D< T > res( as1, 0 );
+			FArray1D< T > res( as1, T( 1 ) );
 			for ( int i1 = 1; i1 <= as1; ++i1 ) {
 				T r( 1 );
 				l = i1 - 1;
@@ -1982,7 +1982,7 @@ minloc( FArray1< T > const & a )
 {
 	assert( a.size_bounded() );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
+	int const as1( a.size1() );
 	FArray1D< int > loc( 1, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
 	size_type l( 0 ); // Linear index
@@ -2002,8 +2002,8 @@ minloc( FArray2< T > const & a )
 {
 	assert( a.size_bounded() );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
+	int const as1( a.size1() );
+	int const as2( a.size2() );
 	FArray1D< int > loc( 2, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
 	size_type l( 0 ); // Linear index
@@ -2025,9 +2025,9 @@ minloc( FArray3< T > const & a )
 {
 	assert( a.size_bounded() );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
-	size_type const as3( a.size3() );
+	int const as1( a.size1() );
+	int const as2( a.size2() );
+	int const as3( a.size3() );
 	FArray1D< int > loc( 3, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
 	size_type l( 0 ); // Linear index
@@ -2051,10 +2051,10 @@ minloc( FArray4< T > const & a )
 {
 	assert( a.size_bounded() );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
-	size_type const as3( a.size3() );
-	size_type const as4( a.size4() );
+	int const as1( a.size1() );
+	int const as2( a.size2() );
+	int const as3( a.size3() );
+	int const as4( a.size4() );
 	FArray1D< int > loc( 4, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
 	size_type l( 0 ); // Linear index
@@ -2080,11 +2080,11 @@ minloc( FArray5< T > const & a )
 {
 	assert( a.size_bounded() );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
-	size_type const as3( a.size3() );
-	size_type const as4( a.size4() );
-	size_type const as5( a.size5() );
+	int const as1( a.size1() );
+	int const as2( a.size2() );
+	int const as3( a.size3() );
+	int const as4( a.size4() );
+	int const as5( a.size5() );
 	FArray1D< int > loc( 5, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
 	size_type l( 0 ); // Linear index
@@ -2112,12 +2112,12 @@ minloc( FArray6< T > const & a )
 {
 	assert( a.size_bounded() );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
-	size_type const as3( a.size3() );
-	size_type const as4( a.size4() );
-	size_type const as5( a.size5() );
-	size_type const as6( a.size6() );
+	int const as1( a.size1() );
+	int const as2( a.size2() );
+	int const as3( a.size3() );
+	int const as4( a.size4() );
+	int const as5( a.size5() );
+	int const as6( a.size6() );
 	FArray1D< int > loc( 6, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
 	size_type l( 0 ); // Linear index
@@ -2162,8 +2162,8 @@ minloc( FArray2< T > const & a, int const dim )
 {
 	assert( a.size_bounded() );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
+	int const as1( a.size1() );
+	int const as2( a.size2() );
 	size_type l( 0 ); // Linear index
 	switch ( dim ) {
 	case 1:
@@ -2209,7 +2209,7 @@ minloc( FArray1< T > const & a, FArray1< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
+	int const as1( a.size1() );
 	FArray1D< int > loc( 1, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
 	size_type l( 0 ); // Linear index
@@ -2230,8 +2230,8 @@ minloc( FArray2< T > const & a, FArray2< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
+	int const as1( a.size1() );
+	int const as2( a.size2() );
 	FArray1D< int > loc( 2, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
 	size_type l( 0 ); // Linear index
@@ -2254,9 +2254,9 @@ minloc( FArray3< T > const & a, FArray3< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
-	size_type const as3( a.size3() );
+	int const as1( a.size1() );
+	int const as2( a.size2() );
+	int const as3( a.size3() );
 	FArray1D< int > loc( 3, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
 	size_type l( 0 ); // Linear index
@@ -2281,10 +2281,10 @@ minloc( FArray4< T > const & a, FArray4< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
-	size_type const as3( a.size3() );
-	size_type const as4( a.size4() );
+	int const as1( a.size1() );
+	int const as2( a.size2() );
+	int const as3( a.size3() );
+	int const as4( a.size4() );
 	FArray1D< int > loc( 4, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
 	size_type l( 0 ); // Linear index
@@ -2311,11 +2311,11 @@ minloc( FArray5< T > const & a, FArray5< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
-	size_type const as3( a.size3() );
-	size_type const as4( a.size4() );
-	size_type const as5( a.size5() );
+	int const as1( a.size1() );
+	int const as2( a.size2() );
+	int const as3( a.size3() );
+	int const as4( a.size4() );
+	int const as5( a.size5() );
 	FArray1D< int > loc( 5, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
 	size_type l( 0 ); // Linear index
@@ -2344,12 +2344,12 @@ minloc( FArray6< T > const & a, FArray6< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
-	size_type const as3( a.size3() );
-	size_type const as4( a.size4() );
-	size_type const as5( a.size5() );
-	size_type const as6( a.size6() );
+	int const as1( a.size1() );
+	int const as2( a.size2() );
+	int const as3( a.size3() );
+	int const as4( a.size4() );
+	int const as5( a.size5() );
+	int const as6( a.size6() );
 	FArray1D< int > loc( 6, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
 	size_type l( 0 ); // Linear index
@@ -2381,7 +2381,7 @@ maxloc( FArray1< T > const & a )
 {
 	assert( a.size_bounded() );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
+	int const as1( a.size1() );
 	FArray1D< int > loc( 1, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
 	size_type l( 0 ); // Linear index
@@ -2401,8 +2401,8 @@ maxloc( FArray2< T > const & a )
 {
 	assert( a.size_bounded() );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
+	int const as1( a.size1() );
+	int const as2( a.size2() );
 	FArray1D< int > loc( 2, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
 	size_type l( 0 ); // Linear index
@@ -2424,9 +2424,9 @@ maxloc( FArray3< T > const & a )
 {
 	assert( a.size_bounded() );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
-	size_type const as3( a.size3() );
+	int const as1( a.size1() );
+	int const as2( a.size2() );
+	int const as3( a.size3() );
 	FArray1D< int > loc( 3, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
 	size_type l( 0 ); // Linear index
@@ -2450,10 +2450,10 @@ maxloc( FArray4< T > const & a )
 {
 	assert( a.size_bounded() );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
-	size_type const as3( a.size3() );
-	size_type const as4( a.size4() );
+	int const as1( a.size1() );
+	int const as2( a.size2() );
+	int const as3( a.size3() );
+	int const as4( a.size4() );
 	FArray1D< int > loc( 4, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
 	size_type l( 0 ); // Linear index
@@ -2479,11 +2479,11 @@ maxloc( FArray5< T > const & a )
 {
 	assert( a.size_bounded() );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
-	size_type const as3( a.size3() );
-	size_type const as4( a.size4() );
-	size_type const as5( a.size5() );
+	int const as1( a.size1() );
+	int const as2( a.size2() );
+	int const as3( a.size3() );
+	int const as4( a.size4() );
+	int const as5( a.size5() );
 	FArray1D< int > loc( 5, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
 	size_type l( 0 ); // Linear index
@@ -2511,12 +2511,12 @@ maxloc( FArray6< T > const & a )
 {
 	assert( a.size_bounded() );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
-	size_type const as3( a.size3() );
-	size_type const as4( a.size4() );
-	size_type const as5( a.size5() );
-	size_type const as6( a.size6() );
+	int const as1( a.size1() );
+	int const as2( a.size2() );
+	int const as3( a.size3() );
+	int const as4( a.size4() );
+	int const as5( a.size5() );
+	int const as6( a.size6() );
 	FArray1D< int > loc( 6, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
 	size_type l( 0 ); // Linear index
@@ -2561,8 +2561,8 @@ maxloc( FArray2< T > const & a, int const dim )
 {
 	assert( a.size_bounded() );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
+	int const as1( a.size1() );
+	int const as2( a.size2() );
 	size_type l( 0 ); // Linear index
 	switch ( dim ) {
 	case 1:
@@ -2608,7 +2608,7 @@ maxloc( FArray1< T > const & a, FArray1< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
+	int const as1( a.size1() );
 	FArray1D< int > loc( 1, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
 	size_type l( 0 ); // Linear index
@@ -2629,8 +2629,8 @@ maxloc( FArray2< T > const & a, FArray2< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
+	int const as1( a.size1() );
+	int const as2( a.size2() );
 	FArray1D< int > loc( 2, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
 	size_type l( 0 ); // Linear index
@@ -2653,9 +2653,9 @@ maxloc( FArray3< T > const & a, FArray3< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
-	size_type const as3( a.size3() );
+	int const as1( a.size1() );
+	int const as2( a.size2() );
+	int const as3( a.size3() );
 	FArray1D< int > loc( 3, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
 	size_type l( 0 ); // Linear index
@@ -2680,10 +2680,10 @@ maxloc( FArray4< T > const & a, FArray4< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
-	size_type const as3( a.size3() );
-	size_type const as4( a.size4() );
+	int const as1( a.size1() );
+	int const as2( a.size2() );
+	int const as3( a.size3() );
+	int const as4( a.size4() );
 	FArray1D< int > loc( 4, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
 	size_type l( 0 ); // Linear index
@@ -2710,11 +2710,11 @@ maxloc( FArray5< T > const & a, FArray5< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
-	size_type const as3( a.size3() );
-	size_type const as4( a.size4() );
-	size_type const as5( a.size5() );
+	int const as1( a.size1() );
+	int const as2( a.size2() );
+	int const as3( a.size3() );
+	int const as4( a.size4() );
+	int const as5( a.size5() );
 	FArray1D< int > loc( 5, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
 	size_type l( 0 ); // Linear index
@@ -2743,12 +2743,12 @@ maxloc( FArray6< T > const & a, FArray6< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  typename FArray< T >::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
-	size_type const as3( a.size3() );
-	size_type const as4( a.size4() );
-	size_type const as5( a.size5() );
-	size_type const as6( a.size6() );
+	int const as1( a.size1() );
+	int const as2( a.size2() );
+	int const as3( a.size3() );
+	int const as4( a.size4() );
+	int const as5( a.size5() );
+	int const as6( a.size6() );
 	FArray1D< int > loc( 6, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
 	size_type l( 0 ); // Linear index

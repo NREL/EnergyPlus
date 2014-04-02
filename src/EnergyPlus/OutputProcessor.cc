@@ -5008,7 +5008,7 @@ namespace OutputProcessor {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Fstring NumberOut( 32 ); // Character for producing "number out"
-		Real64 repValue; // for SQLite
+		Real64 repValue( 0.0 ); // for SQLite
 
 		if ( present( IntegerValue ) ) {
 			gio::write( NumberOut, "*" ) << IntegerValue;
@@ -5994,7 +5994,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 
 	if ( IndexType == HVACVar ) return; // All other stuff happens at the "zone" time step call to this routine.
 
-	//! TimeStep Block (Report on Zone TimeStep)
+	// TimeStep Block (Report on Zone TimeStep)
 
 	if ( EndTimeStepFlag ) {
 

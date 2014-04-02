@@ -2342,7 +2342,7 @@ namespace UnitVentilator {
 
 			SimUnitVentOAMixer( UnitVentNum, FanOpMode );
 
-			SimulateFanComponents( UnitVent( UnitVentNum ).FanName, FirstHVACIteration, UnitVent( UnitVentNum ).Fan_Index, ZoneCompTurnFansOn = ZoneCompTurnFansOn, ZoneCompTurnFansOff = ZoneCompTurnFansOff );
+			SimulateFanComponents( UnitVent( UnitVentNum ).FanName, FirstHVACIteration, UnitVent( UnitVentNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 
 			if ( UnitVent( UnitVentNum ).CCoilPresent ) {
 				if ( UnitVent( UnitVentNum ).CCoilType == Cooling_CoilHXAssisted ) {
@@ -2401,7 +2401,7 @@ namespace UnitVentilator {
 
 			SimUnitVentOAMixer( UnitVentNum, FanOpMode );
 
-			SimulateFanComponents( UnitVent( UnitVentNum ).FanName, FirstHVACIteration, UnitVent( UnitVentNum ).Fan_Index, ZoneCompTurnFansOn = ZoneCompTurnFansOn, ZoneCompTurnFansOff = ZoneCompTurnFansOff );
+			SimulateFanComponents( UnitVent( UnitVentNum ).FanName, FirstHVACIteration, UnitVent( UnitVentNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 
 			if ( UnitVent( UnitVentNum ).CCoilPresent ) {
 

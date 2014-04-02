@@ -331,7 +331,7 @@ namespace HeatingCoils {
 	void
 	CalcGasHeatingCoil(
 		int const CoilNum, // index to heating coil
-		Real64 & QCoilReq,
+		Real64 const QCoilReq,
 		Real64 & QCoilActual, // coil load actually delivered (W)
 		int const FanOpMode, // fan operating mode
 		Real64 const PartLoadRatio // part-load ratio of heating coil

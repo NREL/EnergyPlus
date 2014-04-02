@@ -2866,7 +2866,7 @@ namespace PackagedTerminalHeatPump {
 
 		if ( ( PTUnit( PTUnitNum ).DXCoolCoilType_Num == Coil_CoolingWaterToAirHPVSEquationFit || PTUnit( PTUnitNum ).DXCoolCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) && ( 0 == PTUnit( PTUnitNum ).NumOfSpeedCooling ) ) {
 
-			SimVariableSpeedCoils( "", PTUnit( PTUnitNum ).DXCoolCoilIndexNum, 0, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 0, 0.0, 0.0, 1, 0.0, 0.0, 0.0 ); //conduct the sizing operation in the VS WSHP
+			SimVariableSpeedCoils( "", PTUnit( PTUnitNum ).DXCoolCoilIndexNum, 0, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 0, 0.0, 1, 0.0, 0.0, 0.0, 0.0 ); //conduct the sizing operation in the VS WSHP
 			PTUnit( PTUnitNum ).NumOfSpeedCooling = VarSpeedCoil( PTUnit( PTUnitNum ).DXCoolCoilIndexNum ).NumOfSpeeds;
 
 			MulSpeedFlowScale = VarSpeedCoil( PTUnit( PTUnitNum ).DXCoolCoilIndexNum ).RatedAirVolFlowRate / VarSpeedCoil( PTUnit( PTUnitNum ).DXCoolCoilIndexNum ).MSRatedAirVolFlowRate( VarSpeedCoil( PTUnit( PTUnitNum ).DXCoolCoilIndexNum ).NormSpedLevel );
@@ -2878,7 +2878,7 @@ namespace PackagedTerminalHeatPump {
 
 			if ( PTUnit( PTUnitNum ).DXHeatCoilType_Num == Coil_HeatingWaterToAirHPVSEquationFit || PTUnit( PTUnitNum ).DXHeatCoilType_Num == Coil_HeatingAirToAirVariableSpeed ) {
 
-				SimVariableSpeedCoils( "", PTUnit( PTUnitNum ).DXHeatCoilIndex, 0, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 0, 0.0, 0.0, 1, 0.0, 0.0, 0.0 ); //conduct the sizing operation in the VS WSHP
+				SimVariableSpeedCoils( "", PTUnit( PTUnitNum ).DXHeatCoilIndex, 0, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 0, 0.0, 1, 0.0, 0.0, 0.0, 0.0 ); //conduct the sizing operation in the VS WSHP
 
 				PTUnit( PTUnitNum ).NumOfSpeedHeating = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndex ).NumOfSpeeds;
 

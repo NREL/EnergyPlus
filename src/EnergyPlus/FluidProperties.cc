@@ -5686,7 +5686,10 @@ namespace FluidProperties {
 				return UpperBound;
 			} else { // Binary search
 				size_type mid;
-				while ( beg + 1 < end ) ( Value > Array[ mid = ( ( beg + end ) >> 1 ) ] ? beg : end ) = mid;
+				while ( beg + 1 < end ) {
+					mid = ( ( beg + end ) >> 1 );
+					( Value > Array[ mid ] ? beg : end ) = mid;
+				}
 				return Array.l() + beg;
 			}
 		}
@@ -5732,7 +5735,10 @@ namespace FluidProperties {
 				return Array.u();
 			} else { // Binary search
 				size_type beg( 0 ), mid;
-				while ( beg + 1 < end ) ( Value > Array[ mid = ( ( beg + end ) >> 1 ) ] ? beg : end ) = mid;
+				while ( beg + 1 < end ) {
+					mid = ( ( beg + end ) >> 1 );
+					( Value > Array[ mid ] ? beg : end ) = mid;
+				}
 				return Array.l() + beg;
 			}
 		}
