@@ -174,19 +174,24 @@ namespace PlantManager {
 				LoopNum = PlantCallingOrderInfo( HalfLoopNum ).LoopIndex;
 				LoopSide = PlantCallingOrderInfo( HalfLoopNum ).LoopSide;
 				OtherSide = 3 - LoopSide; //will give us 1 if LoopSide is 2, or 2 if LoopSide is 1
-				SimHalfLoopFlag = PlantLoop( LoopNum ).LoopSide( LoopSide ).SimLoopSideNeeded; //set half loop sim flag
+				
+				auto & this_loop( PlantLoop( LoopNum) );
+				auto & this_loop_side( this_loop.LoopSide( LoopSide ) );
+				auto & other_loop_side( this_loop.LoopSide( OtherSide ) );
 
+				SimHalfLoopFlag = this_loop_side.SimLoopSideNeeded; //set half loop sim flag
+				
 				if ( SimHalfLoopFlag || IterPlant <= CurntMinPlantSubIterations ) {
 
-					PlantHalfLoopSolver( FirstHVACIteration, LoopSide, LoopNum, PlantLoop( LoopNum ).LoopSide( OtherSide ).SimLoopSideNeeded );
+					PlantHalfLoopSolver( FirstHVACIteration, LoopSide, LoopNum, other_loop_side.SimLoopSideNeeded );
 
 					// Always set this side to false,  so that it won't keep being turned on just because of first hvac
-					PlantLoop( LoopNum ).LoopSide( LoopSide ).SimLoopSideNeeded = false;
+					this_loop_side.SimLoopSideNeeded = false;
 
 					// If we did the demand side, turn on the supply side (only if we need to do it last)
 					if ( LoopSide == DemandSide ) {
-						if ( PlantLoop( LoopNum ).HasPressureComponents ) {
-							PlantLoop( LoopNum ).LoopSide( OtherSide ).SimLoopSideNeeded = false;
+						if ( this_loop.HasPressureComponents ) {
+							other_loop_side.SimLoopSideNeeded = false;
 						}
 					}
 
@@ -222,10 +227,11 @@ namespace PlantManager {
 		//  could set SimAirLoops, SimElecCircuits, SimZoneEquipment flags for now
 		for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
 			for ( LoopSide = DemandSide; LoopSide <= SupplySide; ++LoopSide ) {
-				if ( PlantLoop( LoopNum ).LoopSide( LoopSide ).SimAirLoopsNeeded ) SimAirLoops = true;
-				if ( PlantLoop( LoopNum ).LoopSide( LoopSide ).SimZoneEquipNeeded ) SimZoneEquipment = true;
-				//  IF (PlantLoop(LoopNum)%LoopSide(LoopSide)%SimNonZoneEquipNeeded) SimNonZoneEquipment = .TRUE.
-				if ( PlantLoop( LoopNum ).LoopSide( LoopSide ).SimElectLoadCentrNeeded ) SimElecCircuits = true;
+			auto & this_loop_side( PlantLoop(LoopNum).LoopSide(LoopSide) );    
+			if ( this_loop_side.SimAirLoopsNeeded ) SimAirLoops = true;
+				if ( this_loop_side.SimZoneEquipNeeded ) SimZoneEquipment = true;
+				//  IF (this_loop_side.SimNonZoneEquipNeeded) SimNonZoneEquipment = .TRUE.
+				if ( this_loop_side.SimElectLoadCentrNeeded ) SimElecCircuits = true;
 			}
 		}
 
@@ -4172,7 +4178,7 @@ namespace PlantManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
@@ -4196,3 +4202,4 @@ namespace PlantManager {
 } // PlantManager
 
 } // EnergyPlus
+
