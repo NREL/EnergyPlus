@@ -807,7 +807,7 @@ namespace PlantManager {
 					for ( CompNum = 1; CompNum <= TempLoop.Branch( BranchNum ).TotalComponents; ++CompNum ) {
                         
                         // set up some references
-                        auto & this_comp_type( this_comp_type );
+                        auto & this_comp_type( CompTypes( CompNum ) );
                         auto & this_comp( TempLoop.Branch( BranchNum ).Comp( CompNum ) );
                         
                         // initialize
