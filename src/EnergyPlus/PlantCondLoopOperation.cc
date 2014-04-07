@@ -2081,15 +2081,19 @@ namespace PlantCondLoopOperation {
 		int BranchNum;
 		int CompNum;
 		int CompIndex;
-		//  INTEGER                  :: EquipNum
 		int NumCompsOnList;
 
+        // start with some references
+        auto & this_loop( PlantLoop( LoopNum ) );
+        auto & this_loopside( this_loop.LoopSide( LoopSideNum ) );
+        auto & this_equiplist( this_loop.OpScheme( CurSchemePtr ).EquipList( ListPtr ) );
+        
 		// load local variables
-		NumCompsOnList = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).EquipList( ListPtr ).NumComps;
+		NumCompsOnList = this_equiplist.NumComps;
 		RemLoopDemand = LoopDemand;
 		if ( NumCompsOnList <= 0 ) return;
 		//set flag to specify optimal or sequential loading of equipment
-		LoadFlag = PlantLoop( LoopNum ).LoadDistribution;
+		LoadFlag = this_loop.LoadDistribution;
 
 		if ( std::abs( RemLoopDemand ) < SmallLoad ) {
 			//no load to distribute
@@ -2100,12 +2104,18 @@ namespace PlantCondLoopOperation {
 				//OPTIMAL DISTRIBUTION SCHEME
 				//step 1: load all machines to optimal PLR
 				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
-					BranchNum = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).EquipList( ListPtr ).Comp( CompIndex ).BranchNumPtr;
-					CompNum = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).EquipList( ListPtr ).Comp( CompIndex ).CompNumPtr;
-					if ( ! PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).Available ) continue;
+                    
+                    // look up topology from the equipment list
+					BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
+					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
-					if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).OptLoad > 0.0 ) {
-						ChangeInLoad = min( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).OptLoad, std::abs( RemLoopDemand ) );
+                    // create a reference to the component itself
+                    auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+
+					if ( ! this_component.Available ) continue;
+
+					if ( this_component.OptLoad > 0.0 ) {
+						ChangeInLoad = min( this_component.OptLoad, std::abs( RemLoopDemand ) );
 					} else {
 						// this is for some components like cooling towers don't have well defined OptLoad
 						ChangeInLoad = std::abs( RemLoopDemand );
@@ -2118,9 +2128,9 @@ namespace PlantCondLoopOperation {
 					AdjustChangeInLoadByHowServed( LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad );
 
 					ChangeInLoad = max( 0.0, ChangeInLoad );
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad = sign( ChangeInLoad, RemLoopDemand );
+					this_component.MyLoad = sign( ChangeInLoad, RemLoopDemand );
 
-					RemLoopDemand -= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad;
+					RemLoopDemand -= this_component.MyLoad;
 					if ( std::abs( RemLoopDemand ) < SmallLoad ) RemLoopDemand = 0.0; //CR8631 don't just exit or %MyLoad on second device isn't reset
 				}
 
@@ -2128,13 +2138,19 @@ namespace PlantCondLoopOperation {
 				if ( std::abs( RemLoopDemand ) > SmallLoad ) {
 					DivideLoad = std::abs( RemLoopDemand ) / NumCompsOnList;
 					for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
-						BranchNum = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).EquipList( ListPtr ).Comp( CompIndex ).BranchNumPtr;
-						CompNum = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).EquipList( ListPtr ).Comp( CompIndex ).CompNumPtr;
-						if ( ! PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).Available ) continue;
-						NewLoad = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad;
-						NewLoad = min( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MaxLoad, std::abs( NewLoad ) + DivideLoad );
-						ChangeInLoad = NewLoad - std::abs( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad );
-						PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad = sign( NewLoad, RemLoopDemand );
+                        
+						BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
+						CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
+                        
+                        // create a reference to the component itself
+                        auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+
+						if ( ! this_component.Available ) continue;
+                        
+						NewLoad = this_component.MyLoad;
+						NewLoad = min( this_component.MaxLoad, std::abs( NewLoad ) + DivideLoad );
+						ChangeInLoad = NewLoad - std::abs( this_component.MyLoad );
+						this_component.MyLoad = sign( NewLoad, RemLoopDemand );
 						RemLoopDemand -= sign( ChangeInLoad, RemLoopDemand );
 						if ( std::abs( RemLoopDemand ) < SmallLoad ) RemLoopDemand = 0.0; //CR8631 don't just exit or %MyLoad on second device isn't reset
 					}
@@ -2143,12 +2159,17 @@ namespace PlantCondLoopOperation {
 				// step 3: If RemLoopDemand is still greater than zero, look for any machine
 				if ( std::abs( RemLoopDemand ) > SmallLoad ) {
 					for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
-						BranchNum = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).EquipList( ListPtr ).Comp( CompIndex ).BranchNumPtr;
-						CompNum = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).EquipList( ListPtr ).Comp( CompIndex ).CompNumPtr;
-						if ( ! PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).Available ) continue;
-						DivideLoad = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MaxLoad - std::abs( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad );
+
+						BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
+						CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
+
+						// create a reference to the component itself
+                        auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+
+                        if ( ! this_component.Available ) continue;
+						DivideLoad = this_component.MaxLoad - std::abs( this_component.MyLoad );
 						ChangeInLoad = min( std::abs( RemLoopDemand ), DivideLoad );
-						PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad += sign( ChangeInLoad, RemLoopDemand );
+						this_component.MyLoad += sign( ChangeInLoad, RemLoopDemand );
 						RemLoopDemand -= sign( ChangeInLoad, RemLoopDemand );
 						if ( std::abs( RemLoopDemand ) < SmallLoad ) RemLoopDemand = 0.0; //CR8631 don't just exit or %MyLoad on second device isn't reset
 					}
@@ -2159,12 +2180,17 @@ namespace PlantCondLoopOperation {
 
 				// step 1: Load machines in list order
 				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
-					BranchNum = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).EquipList( ListPtr ).Comp( CompIndex ).BranchNumPtr;
-					CompNum = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).EquipList( ListPtr ).Comp( CompIndex ).CompNumPtr;
-					if ( ! PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).Available ) continue;
+					
+                    BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
+					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
+					
+                    // create a reference to the component itself
+                    auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
 
-					if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MaxLoad > 0.0 ) { // apply known limit
-						ChangeInLoad = min( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MaxLoad, std::abs( RemLoopDemand ) );
+                    if ( ! this_component.Available ) continue;
+
+					if ( this_component.MaxLoad > 0.0 ) { // apply known limit
+						ChangeInLoad = min( this_component.MaxLoad, std::abs( RemLoopDemand ) );
 					} else {
 						// this is for some components like cooling towers don't have well defined MaxLoad
 						ChangeInLoad = std::abs( RemLoopDemand );
@@ -2177,7 +2203,7 @@ namespace PlantCondLoopOperation {
 					AdjustChangeInLoadByHowServed( LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad );
 
 					ChangeInLoad = max( 0.0, ChangeInLoad );
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad = sign( ChangeInLoad, RemLoopDemand );
+					this_component.MyLoad = sign( ChangeInLoad, RemLoopDemand );
 					RemLoopDemand -= sign( ChangeInLoad, RemLoopDemand );
 					if ( std::abs( RemLoopDemand ) < SmallLoad ) RemLoopDemand = 0.0; //CR8631 don't just exit or %MyLoad on second device isn't reset
 				}
@@ -2188,11 +2214,16 @@ namespace PlantCondLoopOperation {
 				// step 1: distribute load equally to all machines
 				UniformLoad = std::abs( RemLoopDemand ) / NumCompsOnList;
 				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
-					BranchNum = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).EquipList( ListPtr ).Comp( CompIndex ).BranchNumPtr;
-					CompNum = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).EquipList( ListPtr ).Comp( CompIndex ).CompNumPtr;
-					if ( ! PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).Available ) continue;
-					if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MaxLoad > 0.0 ) {
-						ChangeInLoad = min( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MaxLoad, UniformLoad );
+                    
+					BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
+					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
+                    
+                    // create a reference to the component itself
+                    auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+
+					if ( ! this_component.Available ) continue;
+					if ( this_component.MaxLoad > 0.0 ) {
+						ChangeInLoad = min( this_component.MaxLoad, UniformLoad );
 					} else {
 						// this is for some components like cooling towers don't have well defined MaxLoad
 						ChangeInLoad = std::abs( RemLoopDemand );
@@ -2204,7 +2235,7 @@ namespace PlantCondLoopOperation {
 
 					AdjustChangeInLoadByHowServed( LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad );
 					ChangeInLoad = max( 0.0, ChangeInLoad );
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad = sign( ChangeInLoad, RemLoopDemand );
+					this_component.MyLoad = sign( ChangeInLoad, RemLoopDemand );
 					RemLoopDemand -= sign( ChangeInLoad, RemLoopDemand );
 					if ( std::abs( RemLoopDemand ) < SmallLoad ) RemLoopDemand = 0.0;
 				}
@@ -2212,12 +2243,17 @@ namespace PlantCondLoopOperation {
 				// step 2: If RemLoopDemand is not zero, then distribute remainder sequentially.
 				if ( std::abs( RemLoopDemand ) > SmallLoad ) {
 					for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
-						BranchNum = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).EquipList( ListPtr ).Comp( CompIndex ).BranchNumPtr;
-						CompNum = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).EquipList( ListPtr ).Comp( CompIndex ).CompNumPtr;
-						if ( ! PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).Available ) continue;
-						ChangeInLoad = min( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MaxLoad - std::abs( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad ), std::abs( RemLoopDemand ) );
+                        
+						BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
+						CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
+                        
+                        // create a reference to the component itself
+                        auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+
+						if ( ! this_component.Available ) continue;
+						ChangeInLoad = min( this_component.MaxLoad - std::abs( this_component.MyLoad ), std::abs( RemLoopDemand ) );
 						ChangeInLoad = max( 0.0, ChangeInLoad );
-						PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad += sign( ChangeInLoad, RemLoopDemand );
+						this_component.MyLoad += sign( ChangeInLoad, RemLoopDemand );
 						RemLoopDemand -= sign( ChangeInLoad, RemLoopDemand );
 						if ( std::abs( RemLoopDemand ) < SmallLoad ) RemLoopDemand = 0.0;
 					}
@@ -2228,12 +2264,17 @@ namespace PlantCondLoopOperation {
 
 		// now update On flags according to result for MyLoad
 		for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
-			BranchNum = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).EquipList( ListPtr ).Comp( CompIndex ).BranchNumPtr;
-			CompNum = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).EquipList( ListPtr ).Comp( CompIndex ).CompNumPtr;
-			if ( std::abs( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad ) < SmallLoad ) {
-				PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).ON = false;
+            
+			BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
+			CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
+            
+            // create a reference to the component itself
+            auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+
+			if ( std::abs( this_component.MyLoad ) < SmallLoad ) {
+				this_component.ON = false;
 			} else {
-				PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).ON = true;
+				this_component.ON = true;
 			}
 
 		}
