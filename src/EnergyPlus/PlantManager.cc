@@ -805,51 +805,58 @@ namespace PlantManager {
 					TempLoop.Branch( BranchNum ).Comp.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
 
 					for ( CompNum = 1; CompNum <= TempLoop.Branch( BranchNum ).TotalComponents; ++CompNum ) {
-						TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
-						TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf = CompTypes( CompNum );
+                        
+                        // set up some references
+                        auto & this_comp_type( this_comp_type );
+                        auto & this_comp( TempLoop.Branch( BranchNum ).Comp( CompNum ) );
+                        
+                        // initialize
+						this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+						this_comp.TypeOf = this_comp_type;
 
-						if ( SameString( CompTypes( CompNum ), "Pipe:Adiabatic" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_Pipe;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Pipe;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = NoControlOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "Pipe:Adiabatic:Steam" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_PipeSteam;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Pipe;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = NoControlOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "Pipe:Outdoor" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_PipeExterior;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Pipe;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = NoControlOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "Pipe:Indoor" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_PipeInterior;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Pipe;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = NoControlOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "Pipe:Underground" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_PipeUnderground;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Pipe;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = NoControlOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "PipingSystem:Underground:PipeCircuit" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_PipingSystemPipeCircuit;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Pipe;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = NoControlOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum )( 1, 4 ), "Pump" ) || SameString( CompTypes( CompNum )( 1, 13 ), "HeaderedPumps" ) ) {
-							if ( SameString( CompTypes( CompNum )( 1, 18 ), "Pump:VariableSpeed" ) ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_PumpVariableSpeed;
-							} else if ( SameString( CompTypes( CompNum )( 1, 18 ), "Pump:ConstantSpeed" ) ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_PumpConstantSpeed;
-							} else if ( SameString( CompTypes( CompNum )( 1, 29 ), "Pump:VariableSpeed:Condensate" ) ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_PumpCondensate;
-							} else if ( SameString( CompTypes( CompNum )( 1, 27 ), "HeaderedPumps:ConstantSpeed" ) ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_PumpBankConstantSpeed;
-							} else if ( SameString( CompTypes( CompNum )( 1, 27 ), "HeaderedPumps:VariableSpeed" ) ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_PumpBankVariableSpeed;
+                        // then set up the component based on the type
+						if ( SameString( this_comp_type, "Pipe:Adiabatic" ) ) {
+							this_comp.TypeOf_Num = TypeOf_Pipe;
+							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
+							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+						} else if ( SameString( this_comp_type, "Pipe:Adiabatic:Steam" ) ) {
+							this_comp.TypeOf_Num = TypeOf_PipeSteam;
+							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
+							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+						} else if ( SameString( this_comp_type, "Pipe:Outdoor" ) ) {
+							this_comp.TypeOf_Num = TypeOf_PipeExterior;
+							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
+							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+						} else if ( SameString( this_comp_type, "Pipe:Indoor" ) ) {
+							this_comp.TypeOf_Num = TypeOf_PipeInterior;
+							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
+							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+						} else if ( SameString( this_comp_type, "Pipe:Underground" ) ) {
+							this_comp.TypeOf_Num = TypeOf_PipeUnderground;
+							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
+							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+						} else if ( SameString( this_comp_type, "PipingSystem:Underground:PipeCircuit" ) ) {
+							this_comp.TypeOf_Num = TypeOf_PipingSystemPipeCircuit;
+							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
+							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+						} else if ( SameString( this_comp_type( 1, 4 ), "Pump" ) || SameString( this_comp_type( 1, 13 ), "HeaderedPumps" ) ) {
+							if ( SameString( this_comp_type( 1, 18 ), "Pump:VariableSpeed" ) ) {
+								this_comp.TypeOf_Num = TypeOf_PumpVariableSpeed;
+							} else if ( SameString( this_comp_type( 1, 18 ), "Pump:ConstantSpeed" ) ) {
+								this_comp.TypeOf_Num = TypeOf_PumpConstantSpeed;
+							} else if ( SameString( this_comp_type( 1, 29 ), "Pump:VariableSpeed:Condensate" ) ) {
+								this_comp.TypeOf_Num = TypeOf_PumpCondensate;
+							} else if ( SameString( this_comp_type( 1, 27 ), "HeaderedPumps:ConstantSpeed" ) ) {
+								this_comp.TypeOf_Num = TypeOf_PumpBankConstantSpeed;
+							} else if ( SameString( this_comp_type( 1, 27 ), "HeaderedPumps:VariableSpeed" ) ) {
+								this_comp.TypeOf_Num = TypeOf_PumpBankVariableSpeed;
 							} else {
 								//discover unsupported equipment on branches.
 								ShowSevereError( "GetPlantInput: trying to process a pump type that is not supported, dev note" );
-								ShowContinueError( "Component Type =" + trim( CompTypes( CompNum ) ) );
+								ShowContinueError( "Component Type =" + trim( this_comp_type ) );
 							}
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Pump;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = PumpOpSchemeType;
+							this_comp.GeneralEquipType = GenEquipTypes_Pump;
+							this_comp.CurOpSchemeType = PumpOpSchemeType;
 							if ( LoopSideNum == DemandSide ) DemandSideHasPump = true;
 							if ( BranchNum == 1 || BranchNum == TempLoop.TotalBranches ) {
 								ASeriesBranchHasPump = true;
@@ -857,405 +864,405 @@ namespace PlantManager {
 								AParallelBranchHasPump = true;
 							}
 							StoreAPumpOnCurrentTempLoop( LoopNum, LoopSideNum, BranchNum, CompNum, CompNames( CompNum ), OutletNodeNumbers( CompNum ), AParallelBranchHasPump );
-						} else if ( SameString( CompTypes( CompNum ), "WaterHeater:Mixed" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_WtrHeaterMixed;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_WaterThermalTank;
+						} else if ( SameString( this_comp_type, "WaterHeater:Mixed" ) ) {
+							this_comp.TypeOf_Num = TypeOf_WtrHeaterMixed;
+							this_comp.GeneralEquipType = GenEquipTypes_WaterThermalTank;
 							if ( LoopSideNum == DemandSide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
+								this_comp.CurOpSchemeType = DemandOpSchemeType;
 							} else if ( LoopSideNum == SupplySide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
+								this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
 							}
-						} else if ( SameString( CompTypes( CompNum ), "WaterHeater:Stratified" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_WtrHeaterStratified;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_WaterThermalTank;
+						} else if ( SameString( this_comp_type, "WaterHeater:Stratified" ) ) {
+							this_comp.TypeOf_Num = TypeOf_WtrHeaterStratified;
+							this_comp.GeneralEquipType = GenEquipTypes_WaterThermalTank;
 							if ( LoopSideNum == DemandSide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
+								this_comp.CurOpSchemeType = DemandOpSchemeType;
 							} else if ( LoopSideNum == SupplySide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
+								this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
 							}
-						} else if ( SameString( CompTypes( CompNum ), "ChillerHeater:Absorption:Directfired" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_Chiller_DFAbsorption;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Chiller;
-						} else if ( SameString( CompTypes( CompNum ), "ChillerHeater:Absorption:DoubleEffect" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_Chiller_ExhFiredAbsorption;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Chiller;
-						} else if ( SameString( CompTypes( CompNum ), "ThermalStorage:ChilledWater:Mixed" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_ChilledWaterTankMixed;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_ThermalStorage;
+						} else if ( SameString( this_comp_type, "ChillerHeater:Absorption:Directfired" ) ) {
+							this_comp.TypeOf_Num = TypeOf_Chiller_DFAbsorption;
+							this_comp.GeneralEquipType = GenEquipTypes_Chiller;
+						} else if ( SameString( this_comp_type, "ChillerHeater:Absorption:DoubleEffect" ) ) {
+							this_comp.TypeOf_Num = TypeOf_Chiller_ExhFiredAbsorption;
+							this_comp.GeneralEquipType = GenEquipTypes_Chiller;
+						} else if ( SameString( this_comp_type, "ThermalStorage:ChilledWater:Mixed" ) ) {
+							this_comp.TypeOf_Num = TypeOf_ChilledWaterTankMixed;
+							this_comp.GeneralEquipType = GenEquipTypes_ThermalStorage;
 							if ( LoopSideNum == DemandSide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
+								this_comp.CurOpSchemeType = DemandOpSchemeType;
 							} else if ( LoopSideNum == SupplySide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
+								this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
 							}
-						} else if ( SameString( CompTypes( CompNum ), "ThermalStorage:ChilledWater:Stratified" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_ChilledWaterTankStratified;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_ThermalStorage;
+						} else if ( SameString( this_comp_type, "ThermalStorage:ChilledWater:Stratified" ) ) {
+							this_comp.TypeOf_Num = TypeOf_ChilledWaterTankStratified;
+							this_comp.GeneralEquipType = GenEquipTypes_ThermalStorage;
 							if ( LoopSideNum == DemandSide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
+								this_comp.CurOpSchemeType = DemandOpSchemeType;
 							} else if ( LoopSideNum == SupplySide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
+								this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
 							}
-						} else if ( SameString( CompTypes( CompNum ), "WaterUse:Connections" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_WaterUseConnection;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_WaterUse;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "Coil:Cooling:Water" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_CoilWaterCooling;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_DemandCoil;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "Coil:Cooling:Water:DetailedGeometry" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_CoilWaterDetailedFlatCooling;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_DemandCoil;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "Coil:Heating:Water" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_CoilWaterSimpleHeating;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_DemandCoil;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "Coil:Heating:Steam" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_CoilSteamAirHeating;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_DemandCoil;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "SolarCollector:FlatPlate:Water" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_SolarCollectorFlatPlate;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_SolarCollector;
+						} else if ( SameString( this_comp_type, "WaterUse:Connections" ) ) {
+							this_comp.TypeOf_Num = TypeOf_WaterUseConnection;
+							this_comp.GeneralEquipType = GenEquipTypes_WaterUse;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "Coil:Cooling:Water" ) ) {
+							this_comp.TypeOf_Num = TypeOf_CoilWaterCooling;
+							this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "Coil:Cooling:Water:DetailedGeometry" ) ) {
+							this_comp.TypeOf_Num = TypeOf_CoilWaterDetailedFlatCooling;
+							this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "Coil:Heating:Water" ) ) {
+							this_comp.TypeOf_Num = TypeOf_CoilWaterSimpleHeating;
+							this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "Coil:Heating:Steam" ) ) {
+							this_comp.TypeOf_Num = TypeOf_CoilSteamAirHeating;
+							this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "SolarCollector:FlatPlate:Water" ) ) {
+							this_comp.TypeOf_Num = TypeOf_SolarCollectorFlatPlate;
+							this_comp.GeneralEquipType = GenEquipTypes_SolarCollector;
 							if ( LoopSideNum == DemandSide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
+								this_comp.CurOpSchemeType = DemandOpSchemeType;
 							} else if ( LoopSideNum == SupplySide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UncontrolledOpSchemeType;
+								this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
 							}
-						} else if ( SameString( CompTypes( CompNum ), "SolarCollector:IntegralCollectorStorage" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_SolarCollectorICS;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_SolarCollector;
+						} else if ( SameString( this_comp_type, "SolarCollector:IntegralCollectorStorage" ) ) {
+							this_comp.TypeOf_Num = TypeOf_SolarCollectorICS;
+							this_comp.GeneralEquipType = GenEquipTypes_SolarCollector;
 							if ( LoopSideNum == DemandSide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
+								this_comp.CurOpSchemeType = DemandOpSchemeType;
 							} else if ( LoopSideNum == SupplySide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UncontrolledOpSchemeType;
+								this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
 							}
-						} else if ( SameString( CompTypes( CompNum ), "LoadProfile:Plant" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_PlantLoadProfile;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_LoadProfile;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "GroundHeatExchanger:Vertical" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_GrndHtExchgVertical;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UncontrolledOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "GroundHeatExchanger:Surface" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_GrndHtExchgSurface;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UncontrolledOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "GroundHeatExchanger:Pond" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_GrndHtExchgPond;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UncontrolledOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "Chiller:Electric:EIR" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_Chiller_ElectricEIR;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Chiller;
+						} else if ( SameString( this_comp_type, "LoadProfile:Plant" ) ) {
+							this_comp.TypeOf_Num = TypeOf_PlantLoadProfile;
+							this_comp.GeneralEquipType = GenEquipTypes_LoadProfile;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "GroundHeatExchanger:Vertical" ) ) {
+							this_comp.TypeOf_Num = TypeOf_GrndHtExchgVertical;
+							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
+							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+						} else if ( SameString( this_comp_type, "GroundHeatExchanger:Surface" ) ) {
+							this_comp.TypeOf_Num = TypeOf_GrndHtExchgSurface;
+							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
+							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+						} else if ( SameString( this_comp_type, "GroundHeatExchanger:Pond" ) ) {
+							this_comp.TypeOf_Num = TypeOf_GrndHtExchgPond;
+							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
+							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+						} else if ( SameString( this_comp_type, "Chiller:Electric:EIR" ) ) {
+							this_comp.TypeOf_Num = TypeOf_Chiller_ElectricEIR;
+							this_comp.GeneralEquipType = GenEquipTypes_Chiller;
 							if ( LoopSideNum == DemandSide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
+								this_comp.CurOpSchemeType = DemandOpSchemeType;
 							} else if ( LoopSideNum == SupplySide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
+								this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
 							}
-						} else if ( SameString( CompTypes( CompNum ), "Chiller:Electric:ReformulatedEIR" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_Chiller_ElectricReformEIR;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Chiller;
+						} else if ( SameString( this_comp_type, "Chiller:Electric:ReformulatedEIR" ) ) {
+							this_comp.TypeOf_Num = TypeOf_Chiller_ElectricReformEIR;
+							this_comp.GeneralEquipType = GenEquipTypes_Chiller;
 							if ( LoopSideNum == DemandSide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
+								this_comp.CurOpSchemeType = DemandOpSchemeType;
 							} else if ( LoopSideNum == SupplySide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
+								this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
 							}
-						} else if ( SameString( CompTypes( CompNum ), "Chiller:Electric" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_Chiller_Electric;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Chiller;
+						} else if ( SameString( this_comp_type, "Chiller:Electric" ) ) {
+							this_comp.TypeOf_Num = TypeOf_Chiller_Electric;
+							this_comp.GeneralEquipType = GenEquipTypes_Chiller;
 							if ( LoopSideNum == DemandSide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
+								this_comp.CurOpSchemeType = DemandOpSchemeType;
 							} else if ( LoopSideNum == SupplySide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
+								this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
 							}
-						} else if ( SameString( CompTypes( CompNum ), "Chiller:EngineDriven" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_Chiller_EngineDriven;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Chiller;
+						} else if ( SameString( this_comp_type, "Chiller:EngineDriven" ) ) {
+							this_comp.TypeOf_Num = TypeOf_Chiller_EngineDriven;
+							this_comp.GeneralEquipType = GenEquipTypes_Chiller;
 							if ( LoopSideNum == DemandSide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
+								this_comp.CurOpSchemeType = DemandOpSchemeType;
 							} else if ( LoopSideNum == SupplySide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
+								this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
 							}
-						} else if ( SameString( CompTypes( CompNum ), "Chiller:CombustionTurbine" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_Chiller_CombTurbine;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Chiller;
+						} else if ( SameString( this_comp_type, "Chiller:CombustionTurbine" ) ) {
+							this_comp.TypeOf_Num = TypeOf_Chiller_CombTurbine;
+							this_comp.GeneralEquipType = GenEquipTypes_Chiller;
 							if ( LoopSideNum == DemandSide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
+								this_comp.CurOpSchemeType = DemandOpSchemeType;
 							} else if ( LoopSideNum == SupplySide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
+								this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
 							}
-						} else if ( SameString( CompTypes( CompNum ), "Chiller:ConstantCOP" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_Chiller_ConstCOP;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Chiller;
+						} else if ( SameString( this_comp_type, "Chiller:ConstantCOP" ) ) {
+							this_comp.TypeOf_Num = TypeOf_Chiller_ConstCOP;
+							this_comp.GeneralEquipType = GenEquipTypes_Chiller;
 							if ( LoopSideNum == DemandSide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
+								this_comp.CurOpSchemeType = DemandOpSchemeType;
 							} else if ( LoopSideNum == SupplySide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
+								this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
 							}
-						} else if ( SameString( CompTypes( CompNum ), "Boiler:HotWater" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_Boiler_Simple;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Boiler;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "Boiler:Steam" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_Boiler_Steam;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Boiler;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "Chiller:Absorption:Indirect" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_Chiller_Indirect_Absorption;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Chiller;
+						} else if ( SameString( this_comp_type, "Boiler:HotWater" ) ) {
+							this_comp.TypeOf_Num = TypeOf_Boiler_Simple;
+							this_comp.GeneralEquipType = GenEquipTypes_Boiler;
+							this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+						} else if ( SameString( this_comp_type, "Boiler:Steam" ) ) {
+							this_comp.TypeOf_Num = TypeOf_Boiler_Steam;
+							this_comp.GeneralEquipType = GenEquipTypes_Boiler;
+							this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+						} else if ( SameString( this_comp_type, "Chiller:Absorption:Indirect" ) ) {
+							this_comp.TypeOf_Num = TypeOf_Chiller_Indirect_Absorption;
+							this_comp.GeneralEquipType = GenEquipTypes_Chiller;
 							if ( LoopSideNum == DemandSide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
+								this_comp.CurOpSchemeType = DemandOpSchemeType;
 							} else if ( LoopSideNum == SupplySide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
+								this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
 							}
-						} else if ( SameString( CompTypes( CompNum ), "Chiller:Absorption" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_Chiller_Absorption;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Chiller;
+						} else if ( SameString( this_comp_type, "Chiller:Absorption" ) ) {
+							this_comp.TypeOf_Num = TypeOf_Chiller_Absorption;
+							this_comp.GeneralEquipType = GenEquipTypes_Chiller;
 							if ( LoopSideNum == DemandSide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
+								this_comp.CurOpSchemeType = DemandOpSchemeType;
 							} else if ( LoopSideNum == SupplySide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
+								this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
 							}
-						} else if ( SameString( CompTypes( CompNum ), "CoolingTower:SingleSpeed" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_CoolingTower_SingleSpd;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_CoolingTower;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "CoolingTower:TwoSpeed" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_CoolingTower_TwoSpd;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_CoolingTower;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "CoolingTower:VariableSpeed" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_CoolingTower_VarSpd;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_CoolingTower;
-						} else if ( SameString( CompTypes( CompNum ), "CoolingTower:VariableSpeed:Merkel" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_CoolingTower_VarSpdMerkel;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_CoolingTower;
-						} else if ( SameString( CompTypes( CompNum ), "Generator:FuelCell:ExhaustGasToWaterHeatExchanger" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_Generator_FCExhaust;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Generator;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "WaterHeater:HeatPump" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_HeatPumpWtrHeater;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_WaterThermalTank;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "HeatPump:WatertoWater:EquationFit:Cooling" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_HPWaterEFCooling;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_HeatPump;
+						} else if ( SameString( this_comp_type, "CoolingTower:SingleSpeed" ) ) {
+							this_comp.TypeOf_Num = TypeOf_CoolingTower_SingleSpd;
+							this_comp.GeneralEquipType = GenEquipTypes_CoolingTower;
+							this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+						} else if ( SameString( this_comp_type, "CoolingTower:TwoSpeed" ) ) {
+							this_comp.TypeOf_Num = TypeOf_CoolingTower_TwoSpd;
+							this_comp.GeneralEquipType = GenEquipTypes_CoolingTower;
+							this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+						} else if ( SameString( this_comp_type, "CoolingTower:VariableSpeed" ) ) {
+							this_comp.TypeOf_Num = TypeOf_CoolingTower_VarSpd;
+							this_comp.GeneralEquipType = GenEquipTypes_CoolingTower;
+						} else if ( SameString( this_comp_type, "CoolingTower:VariableSpeed:Merkel" ) ) {
+							this_comp.TypeOf_Num = TypeOf_CoolingTower_VarSpdMerkel;
+							this_comp.GeneralEquipType = GenEquipTypes_CoolingTower;
+						} else if ( SameString( this_comp_type, "Generator:FuelCell:ExhaustGasToWaterHeatExchanger" ) ) {
+							this_comp.TypeOf_Num = TypeOf_Generator_FCExhaust;
+							this_comp.GeneralEquipType = GenEquipTypes_Generator;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "WaterHeater:HeatPump" ) ) {
+							this_comp.TypeOf_Num = TypeOf_HeatPumpWtrHeater;
+							this_comp.GeneralEquipType = GenEquipTypes_WaterThermalTank;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "HeatPump:WatertoWater:EquationFit:Cooling" ) ) {
+							this_comp.TypeOf_Num = TypeOf_HPWaterEFCooling;
+							this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
 							if ( LoopSideNum == DemandSide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
+								this_comp.CurOpSchemeType = DemandOpSchemeType;
 							} else if ( LoopSideNum == SupplySide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
+								this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
 							}
-						} else if ( SameString( CompTypes( CompNum ), "HeatPump:WatertoWater:EquationFit:Heating" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_HPWaterEFHeating;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_HeatPump;
+						} else if ( SameString( this_comp_type, "HeatPump:WatertoWater:EquationFit:Heating" ) ) {
+							this_comp.TypeOf_Num = TypeOf_HPWaterEFHeating;
+							this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
 							if ( LoopSideNum == DemandSide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
+								this_comp.CurOpSchemeType = DemandOpSchemeType;
 							} else if ( LoopSideNum == SupplySide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
+								this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
 							}
-						} else if ( SameString( CompTypes( CompNum ), "HeatPump:WaterToWater:ParameterEstimation:Heating" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_HPWaterPEHeating;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_HeatPump;
+						} else if ( SameString( this_comp_type, "HeatPump:WaterToWater:ParameterEstimation:Heating" ) ) {
+							this_comp.TypeOf_Num = TypeOf_HPWaterPEHeating;
+							this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
 							if ( LoopSideNum == DemandSide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
+								this_comp.CurOpSchemeType = DemandOpSchemeType;
 							} else if ( LoopSideNum == SupplySide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
+								this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
 							}
-						} else if ( SameString( CompTypes( CompNum ), "HeatPump:WaterToWater:ParameterEstimation:Cooling" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_HPWaterPECooling;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_HeatPump;
+						} else if ( SameString( this_comp_type, "HeatPump:WaterToWater:ParameterEstimation:Cooling" ) ) {
+							this_comp.TypeOf_Num = TypeOf_HPWaterPECooling;
+							this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
 							if ( LoopSideNum == DemandSide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
+								this_comp.CurOpSchemeType = DemandOpSchemeType;
 							} else if ( LoopSideNum == SupplySide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
+								this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
 							}
-						} else if ( SameString( CompTypes( CompNum ), "AirConditioner:VariableRefrigerantFlow" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_HeatPumpVRF;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_HeatPump;
+						} else if ( SameString( this_comp_type, "AirConditioner:VariableRefrigerantFlow" ) ) {
+							this_comp.TypeOf_Num = TypeOf_HeatPumpVRF;
+							this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
 							if ( LoopSideNum == DemandSide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
+								this_comp.CurOpSchemeType = DemandOpSchemeType;
 							} else if ( LoopSideNum == SupplySide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
+								this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
 							}
-						} else if ( SameString( CompTypes( CompNum ), "DistrictCooling" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_PurchChilledWater;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Purchased;
-						} else if ( SameString( CompTypes( CompNum ), "DistrictHeating" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_PurchHotWater;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Purchased;
-						} else if ( SameString( CompTypes( CompNum ), "ThermalStorage:Ice:Simple" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_TS_IceSimple;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_ThermalStorage;
-						} else if ( SameString( CompTypes( CompNum ), "ThermalStorage:Ice:Detailed" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_TS_IceDetailed;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_ThermalStorage;
-						} else if ( SameString( CompTypes( CompNum ), "TemperingValve" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_ValveTempering;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Valve;
-						} else if ( SameString( CompTypes( CompNum ), "HeatExchanger:FluidToFluid" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_FluidToFluidPlantHtExchg;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_HeatExchanger;
+						} else if ( SameString( this_comp_type, "DistrictCooling" ) ) {
+							this_comp.TypeOf_Num = TypeOf_PurchChilledWater;
+							this_comp.GeneralEquipType = GenEquipTypes_Purchased;
+						} else if ( SameString( this_comp_type, "DistrictHeating" ) ) {
+							this_comp.TypeOf_Num = TypeOf_PurchHotWater;
+							this_comp.GeneralEquipType = GenEquipTypes_Purchased;
+						} else if ( SameString( this_comp_type, "ThermalStorage:Ice:Simple" ) ) {
+							this_comp.TypeOf_Num = TypeOf_TS_IceSimple;
+							this_comp.GeneralEquipType = GenEquipTypes_ThermalStorage;
+						} else if ( SameString( this_comp_type, "ThermalStorage:Ice:Detailed" ) ) {
+							this_comp.TypeOf_Num = TypeOf_TS_IceDetailed;
+							this_comp.GeneralEquipType = GenEquipTypes_ThermalStorage;
+						} else if ( SameString( this_comp_type, "TemperingValve" ) ) {
+							this_comp.TypeOf_Num = TypeOf_ValveTempering;
+							this_comp.GeneralEquipType = GenEquipTypes_Valve;
+						} else if ( SameString( this_comp_type, "HeatExchanger:FluidToFluid" ) ) {
+							this_comp.TypeOf_Num = TypeOf_FluidToFluidPlantHtExchg;
+							this_comp.GeneralEquipType = GenEquipTypes_HeatExchanger;
 							if ( LoopSideNum == DemandSide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
+								this_comp.CurOpSchemeType = DemandOpSchemeType;
 							} else if ( LoopSideNum == SupplySide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = FreeRejectionOpSchemeType;
+								this_comp.CurOpSchemeType = FreeRejectionOpSchemeType;
 							}
-						} else if ( SameString( CompTypes( CompNum ), "Generator:MicroTurbine" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_Generator_MicroTurbine;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Generator;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "Generator:InternalCombustionEngine" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_Generator_ICEngine;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Generator;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "Generator:CombustionTurbine" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_Generator_CTurbine;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Generator;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "Generator:MicroCHP" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_Generator_MicroCHP;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Generator;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "Generator:FuelCell:StackCooler" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_Generator_FCStackCooler;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Generator;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "Fluidcooler:SingleSpeed" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_FluidCooler_SingleSpd;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_FluidCooler;
-						} else if ( SameString( CompTypes( CompNum ), "Fluidcooler:TwoSpeed" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_FluidCooler_TwoSpd;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_FluidCooler;
-						} else if ( SameString( CompTypes( CompNum ), "EvaporativeFluidcooler:SingleSpeed" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_EvapFluidCooler_SingleSpd;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_EvapFluidCooler;
-						} else if ( SameString( CompTypes( CompNum ), "EvaporativeFluidcooler:TwoSpeed" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_EvapFluidCooler_TwoSpd;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_EvapFluidCooler;
-						} else if ( SameString( CompTypes( CompNum ), "SolarCollector:FlatPlate:PhotovoltaicThermal" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_PVTSolarCollectorFlatPlate;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_SolarCollector;
+						} else if ( SameString( this_comp_type, "Generator:MicroTurbine" ) ) {
+							this_comp.TypeOf_Num = TypeOf_Generator_MicroTurbine;
+							this_comp.GeneralEquipType = GenEquipTypes_Generator;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "Generator:InternalCombustionEngine" ) ) {
+							this_comp.TypeOf_Num = TypeOf_Generator_ICEngine;
+							this_comp.GeneralEquipType = GenEquipTypes_Generator;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "Generator:CombustionTurbine" ) ) {
+							this_comp.TypeOf_Num = TypeOf_Generator_CTurbine;
+							this_comp.GeneralEquipType = GenEquipTypes_Generator;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "Generator:MicroCHP" ) ) {
+							this_comp.TypeOf_Num = TypeOf_Generator_MicroCHP;
+							this_comp.GeneralEquipType = GenEquipTypes_Generator;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "Generator:FuelCell:StackCooler" ) ) {
+							this_comp.TypeOf_Num = TypeOf_Generator_FCStackCooler;
+							this_comp.GeneralEquipType = GenEquipTypes_Generator;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "Fluidcooler:SingleSpeed" ) ) {
+							this_comp.TypeOf_Num = TypeOf_FluidCooler_SingleSpd;
+							this_comp.GeneralEquipType = GenEquipTypes_FluidCooler;
+						} else if ( SameString( this_comp_type, "Fluidcooler:TwoSpeed" ) ) {
+							this_comp.TypeOf_Num = TypeOf_FluidCooler_TwoSpd;
+							this_comp.GeneralEquipType = GenEquipTypes_FluidCooler;
+						} else if ( SameString( this_comp_type, "EvaporativeFluidcooler:SingleSpeed" ) ) {
+							this_comp.TypeOf_Num = TypeOf_EvapFluidCooler_SingleSpd;
+							this_comp.GeneralEquipType = GenEquipTypes_EvapFluidCooler;
+						} else if ( SameString( this_comp_type, "EvaporativeFluidcooler:TwoSpeed" ) ) {
+							this_comp.TypeOf_Num = TypeOf_EvapFluidCooler_TwoSpd;
+							this_comp.GeneralEquipType = GenEquipTypes_EvapFluidCooler;
+						} else if ( SameString( this_comp_type, "SolarCollector:FlatPlate:PhotovoltaicThermal" ) ) {
+							this_comp.TypeOf_Num = TypeOf_PVTSolarCollectorFlatPlate;
+							this_comp.GeneralEquipType = GenEquipTypes_SolarCollector;
 							if ( LoopSideNum == DemandSide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
+								this_comp.CurOpSchemeType = DemandOpSchemeType;
 							} else if ( LoopSideNum == SupplySide ) {
-								TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
+								this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
 							}
-						} else if ( SameString( CompTypes( CompNum ), "CentralHeatPumpSystem" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_CentralGroundSourceHeatPump;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_CentralHeatPumpSystem;
+						} else if ( SameString( this_comp_type, "CentralHeatPumpSystem" ) ) {
+							this_comp.TypeOf_Num = TypeOf_CentralGroundSourceHeatPump;
+							this_comp.GeneralEquipType = GenEquipTypes_CentralHeatPumpSystem;
 
 							//now deal with demand components of the ZoneHVAC type served by ControlCompOutput
-						} else if ( SameString( CompTypes( CompNum ), "ZoneHVAC:Baseboard:RadiantConvective:Water" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_Baseboard_Rad_Conv_Water;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "ZoneHVAC:Baseboard:Convective:Water" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_Baseboard_Conv_Water;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "ZoneHVAC:Baseboard:RadiantConvective:Steam" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_Baseboard_Rad_Conv_Steam;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "ZoneHVAC:LowTemperatureRadiant:VariableFlow" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_LowTempRadiant_VarFlow;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "ZoneHVAC:LowTemperatureRadiant:ConstantFlow" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_LowTempRadiant_ConstFlow;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "AirTerminal:SingleDuct:ConstantVolume:CooledBeam" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_CooledBeamAirTerminal;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_MultiSpeedHeatPumpRecovery;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "AirLoopHVAC:UnitarySystem" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_UnitarySystemRecovery;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "Coil:Heating:WaterToAirHeatPump:EquationFit" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_CoilWAHPHeatingEquationFit;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_DemandCoil;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "Coil:Cooling:WaterToAirHeatPump:EquationFit" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_CoilWAHPCoolingEquationFit;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_DemandCoil;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_CoilVSWAHPHeatingEquationFit;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_DemandCoil;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_CoilVSWAHPCoolingEquationFit;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_DemandCoil;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "Coil:Heating:WaterToAirHeatPump:ParameterEstimation" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_CoilWAHPHeatingParamEst;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_DemandCoil;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_CoilWAHPCoolingParamEst;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_DemandCoil;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "Refrigeration:Condenser:WaterCooled" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_RefrigSystemWaterCondenser;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Refrigeration;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "Refrigeration:CompressorRack" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_RefrigerationWaterCoolRack;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Refrigeration;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "PlantComponent:UserDefined" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_PlantComponentUserDefined;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_PlantComponent;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "Coil:UserDefined" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_CoilUserDefined;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_PlantComponent;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "ZoneHVAC:ForcedAir:UserDefined" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_ZoneHVACAirUserDefined;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_PlantComponent;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "AirTerminal:SingleDuct:UserDefined" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_AirTerminalUserDefined;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_PlantComponent;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UnknownStatusOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "PlantComponent:TemperatureSource" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_WaterSource;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_PlantComponent;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = UncontrolledOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum ), "GroundHeatExchanger:HorizontalTrench" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_GrndHtExchgHorizTrench;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Pipe;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = TypeOf_GrndHtExchgHorizTrench;
-						} else if ( SameString( CompTypes( CompNum ), "Coil:Cooling:DX:SingleSpeed:ThermalStorage" ) ) {
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_PackagedTESCoolingCoil;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_DemandCoil;
-							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "ZoneHVAC:Baseboard:RadiantConvective:Water" ) ) {
+							this_comp.TypeOf_Num = TypeOf_Baseboard_Rad_Conv_Water;
+							this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "ZoneHVAC:Baseboard:Convective:Water" ) ) {
+							this_comp.TypeOf_Num = TypeOf_Baseboard_Conv_Water;
+							this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "ZoneHVAC:Baseboard:RadiantConvective:Steam" ) ) {
+							this_comp.TypeOf_Num = TypeOf_Baseboard_Rad_Conv_Steam;
+							this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "ZoneHVAC:LowTemperatureRadiant:VariableFlow" ) ) {
+							this_comp.TypeOf_Num = TypeOf_LowTempRadiant_VarFlow;
+							this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "ZoneHVAC:LowTemperatureRadiant:ConstantFlow" ) ) {
+							this_comp.TypeOf_Num = TypeOf_LowTempRadiant_ConstFlow;
+							this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "AirTerminal:SingleDuct:ConstantVolume:CooledBeam" ) ) {
+							this_comp.TypeOf_Num = TypeOf_CooledBeamAirTerminal;
+							this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed" ) ) {
+							this_comp.TypeOf_Num = TypeOf_MultiSpeedHeatPumpRecovery;
+							this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "AirLoopHVAC:UnitarySystem" ) ) {
+							this_comp.TypeOf_Num = TypeOf_UnitarySystemRecovery;
+							this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "Coil:Heating:WaterToAirHeatPump:EquationFit" ) ) {
+							this_comp.TypeOf_Num = TypeOf_CoilWAHPHeatingEquationFit;
+							this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "Coil:Cooling:WaterToAirHeatPump:EquationFit" ) ) {
+							this_comp.TypeOf_Num = TypeOf_CoilWAHPCoolingEquationFit;
+							this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit" ) ) {
+							this_comp.TypeOf_Num = TypeOf_CoilVSWAHPHeatingEquationFit;
+							this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit" ) ) {
+							this_comp.TypeOf_Num = TypeOf_CoilVSWAHPCoolingEquationFit;
+							this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "Coil:Heating:WaterToAirHeatPump:ParameterEstimation" ) ) {
+							this_comp.TypeOf_Num = TypeOf_CoilWAHPHeatingParamEst;
+							this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation" ) ) {
+							this_comp.TypeOf_Num = TypeOf_CoilWAHPCoolingParamEst;
+							this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "Refrigeration:Condenser:WaterCooled" ) ) {
+							this_comp.TypeOf_Num = TypeOf_RefrigSystemWaterCondenser;
+							this_comp.GeneralEquipType = GenEquipTypes_Refrigeration;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "Refrigeration:CompressorRack" ) ) {
+							this_comp.TypeOf_Num = TypeOf_RefrigerationWaterCoolRack;
+							this_comp.GeneralEquipType = GenEquipTypes_Refrigeration;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "PlantComponent:UserDefined" ) ) {
+							this_comp.TypeOf_Num = TypeOf_PlantComponentUserDefined;
+							this_comp.GeneralEquipType = GenEquipTypes_PlantComponent;
+							this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+						} else if ( SameString( this_comp_type, "Coil:UserDefined" ) ) {
+							this_comp.TypeOf_Num = TypeOf_CoilUserDefined;
+							this_comp.GeneralEquipType = GenEquipTypes_PlantComponent;
+							this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+						} else if ( SameString( this_comp_type, "ZoneHVAC:ForcedAir:UserDefined" ) ) {
+							this_comp.TypeOf_Num = TypeOf_ZoneHVACAirUserDefined;
+							this_comp.GeneralEquipType = GenEquipTypes_PlantComponent;
+							this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+						} else if ( SameString( this_comp_type, "AirTerminal:SingleDuct:UserDefined" ) ) {
+							this_comp.TypeOf_Num = TypeOf_AirTerminalUserDefined;
+							this_comp.GeneralEquipType = GenEquipTypes_PlantComponent;
+							this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+						} else if ( SameString( this_comp_type, "PlantComponent:TemperatureSource" ) ) {
+							this_comp.TypeOf_Num = TypeOf_WaterSource;
+							this_comp.GeneralEquipType = GenEquipTypes_PlantComponent;
+							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+						} else if ( SameString( this_comp_type, "GroundHeatExchanger:HorizontalTrench" ) ) {
+							this_comp.TypeOf_Num = TypeOf_GrndHtExchgHorizTrench;
+							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
+							this_comp.CurOpSchemeType = TypeOf_GrndHtExchgHorizTrench;
+						} else if ( SameString( this_comp_type, "Coil:Cooling:DX:SingleSpeed:ThermalStorage" ) ) {
+							this_comp.TypeOf_Num = TypeOf_PackagedTESCoolingCoil;
+							this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
 						} else {
 							//discover unsupported equipment on branches.
 							ShowSevereError( "GetPlantInput: Branch=\"" + trim( BranchNames( BranchNum ) ) + "\", invalid component on branch." );
-							ShowContinueError( "...invalid component type=\"" + trim( CompTypes( CompNum ) ) + "\", name=\"" + trim( CompNames( CompNum ) ) + "\"." );
+							ShowContinueError( "...invalid component type=\"" + trim( this_comp_type ) + "\", name=\"" + trim( CompNames( CompNum ) ) + "\"." );
 							//            ErrorsFound=.TRUE.
 						}
 
-						TempLoop.Branch( BranchNum ).Comp( CompNum ).Name = CompNames( CompNum );
-						TempLoop.Branch( BranchNum ).Comp( CompNum ).NodeNameIn = InletNodeNames( CompNum );
-						TempLoop.Branch( BranchNum ).Comp( CompNum ).NodeNumIn = InletNodeNumbers( CompNum );
-						TempLoop.Branch( BranchNum ).Comp( CompNum ).NodeNameOut = OutletNodeNames( CompNum );
-						TempLoop.Branch( BranchNum ).Comp( CompNum ).NodeNumOut = OutletNodeNumbers( CompNum );
+						this_comp.Name = CompNames( CompNum );
+						this_comp.NodeNameIn = InletNodeNames( CompNum );
+						this_comp.NodeNumIn = InletNodeNumbers( CompNum );
+						this_comp.NodeNameOut = OutletNodeNames( CompNum );
+						this_comp.NodeNumOut = OutletNodeNumbers( CompNum );
 
 						// Increment pipe counter if component is a pipe
-						if ( TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_Pipe || TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeInterior || TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeExterior || TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeUnderground || TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeSteam ) {
+						if ( this_comp.TypeOf_Num == TypeOf_Pipe || this_comp.TypeOf_Num == TypeOf_PipeInterior || this_comp.TypeOf_Num == TypeOf_PipeExterior || this_comp.TypeOf_Num == TypeOf_PipeUnderground || this_comp.TypeOf_Num == TypeOf_PipeSteam ) {
 							++NumOfPipesInLoop;
 							if ( PlantLoop( LoopNum ).TypeOfLoop == Plant ) {
 								++NumPlantPipes;
@@ -1288,30 +1295,7 @@ namespace PlantManager {
 					ShowSevereError( "Current version does not support Loop pumps and branch pumps together" );
 					ShowContinueError( "Occurs in loop " + trim( TempLoop.Name ) );
 					ErrorsFound = true;
-					//      ELSE IF(.NOT. ASeriesBranchHasPump .AND. .NOT. TempLoop%BranchPump .AND. (LoopSideNum .NE. DemandSide)) THEN
-					//        CALL ShowSevereError('PlantLoop does not have a pump. A pump is required in each loop')
-					//        CALL ShowContinueError('Occurs in loop '// TRIM(TempLoop%Name))
-					//        ErrorsFound = .TRUE.
 				}
-
-				//DSU?      IF(TempLoop%BranchPump) THEN
-				//        ! This makes sure we aren't trying to run a common pipe simulation with branch pumps
-				//        IF (PlantLoop(LoopNum)%CommonPipeType .NE. CommonPipe_No) THEN
-				//           CALL ShowSevereError('Current version cannot simulate a common pipe plant loop with branch pipes.')
-				//           CALL ShowContinueError('To correct, place supply pump on first branch of supply side.')
-				//           CALL ShowContinueError('Error occurs in PlantLoop = '//TRIM(PlantLoop(LoopNum)%Name))
-				//           CALL ShowFatalError('Program terminates due to above conditions.')
-				//        END IF
-
-				// Not sure why we can't do steam with branch pumps, but this is moved here from the Demand Calc procedure
-				//DSU?        IF(PlantLoop(LoopNum)%FluidType==NodeType_Steam) Then
-				//          !STEAM: Plant Loop Fluid Type is Steam: Calc loop Demand For STEAM cannot be done with branch pumps
-				//          CALL ShowSevereError('FluidType=STEAM:Branch Pumps cannot be used in a STEAM Loop')
-				//          CALL ShowContinueError('Occurs in PlantLoop='//TRIM(PlantLoop(LoopNum)%Name))
-				//          CALL ShowFatalError('Program terminates due to above conditions.')
-				//        END IF
-				//      END IF
-				//DSU? End Pump Checks
 
 				// Obtain the Splitter and Mixer information
 				if ( TempLoop.ConnectList == "" ) {
@@ -1590,68 +1574,71 @@ namespace PlantManager {
 
 		//DSU? can we clean this out this next do loop now? looks like bandaids.
 		for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
-			for ( BranchNum = 1; BranchNum <= PlantLoop( LoopNum ).LoopSide( SupplySide ).TotalBranches; ++BranchNum ) {
-				for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-					Pos = index( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, ":" );
-					GeneralEquipType = FindItemInList( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf( {1,Pos - 1} ), GeneralEquipTypes, NumGeneralEquipTypes );
+            auto & this_supply_side( PlantLoop( LoopNum ).LoopSide( SupplySide ) );
+			for ( BranchNum = 1; BranchNum <= this_supply_side.TotalBranches; ++BranchNum ) {
+                auto & this_branch( this_supply_side.Branch( BranchNum ) );
+				for ( CompNum = 1; CompNum <= this_branch.TotalComponents; ++CompNum ) {
+                    auto & this_comp( this_branch.Comp( CompNum ) );
+					Pos = index( this_comp.TypeOf, ":" );
+					GeneralEquipType = FindItemInList( this_comp.TypeOf( {1,Pos - 1} ), GeneralEquipTypes, NumGeneralEquipTypes );
 					if ( GeneralEquipType == 0 ) {
-						if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf( {1,13} ), "HeaderedPumps" ) ) {
+						if ( SameString( this_comp.TypeOf( {1,13} ), "HeaderedPumps" ) ) {
 							GeneralEquipType = GenEquipTypes_Pump;
-						} else if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "WaterHeater:HeatPump" ) ) {
+						} else if ( SameString( this_comp.TypeOf, "WaterHeater:HeatPump" ) ) {
 							GeneralEquipType = GenEquipTypes_WaterThermalTank;
-						} else if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "TemperingValve" ) ) {
+						} else if ( SameString( this_comp.TypeOf, "TemperingValve" ) ) {
 							GeneralEquipType = GenEquipTypes_Valve;
-						} else if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf( {1,14} ), "Pipe:Adiabatic" ) ) {
+						} else if ( SameString( this_comp.TypeOf( {1,14} ), "Pipe:Adiabatic" ) ) {
 							GeneralEquipType = GenEquipTypes_Pipe;
-						} else if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf( {1,12} ), "PipingSystem" ) ) {
+						} else if ( SameString( this_comp.TypeOf( {1,12} ), "PipingSystem" ) ) {
 							GeneralEquipType = GenEquipTypes_Pipe;
-						} else if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf( {1,33} ), "Thermalstorage:ChilledWater:Mixed" ) ) {
+						} else if ( SameString( this_comp.TypeOf( {1,33} ), "Thermalstorage:ChilledWater:Mixed" ) ) {
 							GeneralEquipType = GenEquipTypes_ThermalStorage;
-						} else if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf( {1,38} ), "Thermalstorage:ChilledWater:Stratified" ) ) {
+						} else if ( SameString( this_comp.TypeOf( {1,38} ), "Thermalstorage:ChilledWater:Stratified" ) ) {
 							GeneralEquipType = GenEquipTypes_ThermalStorage;
-						} else if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "ChillerHeater:Absorption:DirectFired" ) ) {
+						} else if ( SameString( this_comp.TypeOf, "ChillerHeater:Absorption:DirectFired" ) ) {
 							GeneralEquipType = GenEquipTypes_Chiller;
-						} else if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "ChillerHeater:Absorption:DoubleEffect" ) ) {
+						} else if ( SameString( this_comp.TypeOf, "ChillerHeater:Absorption:DoubleEffect" ) ) {
 							GeneralEquipType = GenEquipTypes_Chiller;
-						} else if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf( {1,8} ), "District" ) ) {
+						} else if ( SameString( this_comp.TypeOf( {1,8} ), "District" ) ) {
 							GeneralEquipType = GenEquipTypes_Purchased;
-						} else if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "GroundHeatExchanger:Vertical" ) ) {
+						} else if ( SameString( this_comp.TypeOf, "GroundHeatExchanger:Vertical" ) ) {
 							GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
-						} else if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "GroundHeatExchanger:Surface" ) ) {
+						} else if ( SameString( this_comp.TypeOf, "GroundHeatExchanger:Surface" ) ) {
 							GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
-						} else if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "GroundHeatExchanger:Pond" ) ) {
+						} else if ( SameString( this_comp.TypeOf, "GroundHeatExchanger:Pond" ) ) {
 							GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
-						} else if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "PlantComponent:TemperatureSource" ) ) {
+						} else if ( SameString( this_comp.TypeOf, "PlantComponent:TemperatureSource" ) ) {
 							GeneralEquipType = GenEquipTypes_HeatExchanger;
-						} else if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "CENTRALHEATPUMPSYSTEM" ) ) {
+						} else if ( SameString( this_comp.TypeOf, "CENTRALHEATPUMPSYSTEM" ) ) {
 							GeneralEquipType = GenEquipTypes_CentralHeatPumpSystem;
 
 						} else {
 							ShowSevereError( "GetPlantInput: PlantLoop=\"" + trim( PlantLoop( LoopNum ).Name ) + "\" invalid equipment type." );
 							ShowContinueError( "...on Branch=\"" + trim( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Name ) + "\"." );
-							ShowContinueError( "...Equipment type=\"" + trim( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf ) + "\"." );
-							ShowContinueError( "...Equipment name=\"" + trim( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).Name ) + "\"." );
+							ShowContinueError( "...Equipment type=\"" + trim( this_comp.TypeOf ) + "\"." );
+							ShowContinueError( "...Equipment name=\"" + trim( this_comp.Name ) + "\"." );
 							ErrorsFound = true;
 						}
 					}
 
-					PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GeneralEquipType;
+					this_comp.GeneralEquipType = GeneralEquipType;
 
 					// Set up "TypeOf" Num
-					TypeOfNum = FindItemInList( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, SimPlantEquipTypes, NumSimPlantEquipTypes );
+					TypeOfNum = FindItemInList( this_comp.TypeOf, SimPlantEquipTypes, NumSimPlantEquipTypes );
 					if ( TypeOfNum == 0 ) {
-						if ( ! SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf( {1,4} ), "Pump" ) && ! SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf( {1,12} ), "HeaderedPump" ) ) {
+						if ( ! SameString( this_comp.TypeOf( {1,4} ), "Pump" ) && ! SameString( this_comp.TypeOf( {1,12} ), "HeaderedPump" ) ) {
 							// Error.  May have already been flagged under General
 							if ( GeneralEquipType != 0 ) { // if GeneralEquipmentType == 0, then already flagged
 								ShowSevereError( "GetPlantInput: PlantLoop=\"" + trim( PlantLoop( LoopNum ).Name ) + "\" invalid equipment type." );
 								ShowContinueError( "...on Branch=\"" + trim( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Name ) + "\"." );
-								ShowContinueError( "...Equipment type=\"" + trim( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf ) + "\"." );
-								ShowContinueError( "...Equipment name=\"" + trim( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).Name ) + "\"." );
+								ShowContinueError( "...Equipment type=\"" + trim( this_comp.TypeOf ) + "\"." );
+								ShowContinueError( "...Equipment name=\"" + trim( this_comp.Name ) + "\"." );
 								ErrorsFound = true;
 							}
 						}
 					} else {
-						PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOfNum;
+						this_comp.TypeOf_Num = TypeOfNum;
 					}
 
 				}
