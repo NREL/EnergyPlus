@@ -292,7 +292,7 @@ namespace PlantManager {
 
 		// DERIVED TYPE DEFINITIONS
 		// na
-
+		
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int LoopNum; // DO loop counter for loops
 		int PressSimLoop; // DO loop counter for pressure simulation type
@@ -321,7 +321,7 @@ namespace PlantManager {
 		NumCondLoops = GetNumObjectsFound( CurrentModuleObject ); // Get the number of Condenser loops
 		TotNumLoops = NumPlantLoops + NumCondLoops;
 		ErrFound = false;
-
+			
 		if ( TotNumLoops > 0 ) {
 			PlantLoop.allocate( TotNumLoops );
 			PlantConvergence.allocate( TotNumLoops );
@@ -331,18 +331,17 @@ namespace PlantManager {
 		} else {
 			return;
 		}
-
+			
 		for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
 			Alpha = "";
 			Num = 0.0;
             
             //set up some references
             auto & this_loop( PlantLoop( LoopNum ) );
-            auto & this_demand_side( this_loop.LoopSide( 1 ) );
-            auto & this_supply_side( this_loop.LoopSide( 1 ) );
-            
-			this_loop.LoopSide.allocate( 2 );
-			if ( LoopNum <= NumPlantLoops ) {
+            this_loop.LoopSide.allocate( 2 );
+			auto & this_demand_side( this_loop.LoopSide( 1 ) );
+            auto & this_supply_side( this_loop.LoopSide( 2 ) );
+            if ( LoopNum <= NumPlantLoops ) {
 				PlantLoopNum = LoopNum;
 				this_loop.TypeOfLoop = Plant;
 				CurrentModuleObject = "PlantLoop";
@@ -396,7 +395,7 @@ namespace PlantManager {
 			}
 
 			this_loop.OperationScheme = Alpha( 4 ); // Load the Plant Control Scheme Priority List
-			
+
 			// Load the temperature and flow rate maximum and minimum limits
 			this_loop.MaxTemp = Num( 1 );
 			this_loop.MinTemp = Num( 2 );
