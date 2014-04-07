@@ -331,11 +331,11 @@ namespace PlantLoopSolver {
 
 		// REFERENCES:
 		// "other types" of components: basically not load-range based heat transfer components.  This would include:
-		//    • demand based components such as coils
-		//    • component setpoint based operating components
-		//    • heat exchanger components including waterside economizers
+		//    - demand based components such as coils
+		//    - component setpoint based operating components
+		//    - heat exchanger components including waterside economizers
 		// "load-range based" components are heat transfer components which are controlled based on a single load range.
-		//    • currently only one load range based scheme is available at a given time, although other control types
+		//    - currently only one load range based scheme is available at a given time, although other control types
 		//      may be enabled, such as component setpoint.
 		// Pumps are separate components since the pump heat is not accounted for in the flow path order.
 		//  Improvements during the demand side rewrite has allowed pumps to be placed as -not- the first component on a branch
@@ -376,11 +376,14 @@ namespace PlantLoopSolver {
 		bool EncounteredLRB;
 		bool EncounteredNonLRBAfterLRB;
 
+        // set up a loopside reference
+        auto & this_loop_side( PlantLoop( LoopNum ).LoopSide( LoopSideNum ) );
+
 		//~ Initialze
 		ValidLoopSide.Valid = true;
 		EncounteredLRB = false;
 		EncounteredNonLRBAfterLRB = false;
-		NumParallelPaths = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches - 2;
+		NumParallelPaths = this_loop_side.TotalBranches - 2;
 
 		// We'll start by stepping through the first branch, which may be the only branch
 		// If we find a load range based, then trip the flag and just keep moving
@@ -389,9 +392,11 @@ namespace PlantLoopSolver {
 		//  decide if it is a valid path.
 		// If any one path is invalid then all is wrong
 		BranchIndex = 1;
-		for ( CompIndex = 1; CompIndex <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).TotalComponents; ++CompIndex ) {
+		for ( CompIndex = 1; CompIndex <= this_loop_side.Branch( BranchIndex ).TotalComponents; ++CompIndex ) {
 
-			{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).Comp( CompIndex ).CurOpSchemeType );
+            auto & this_component( this_loop_side.Branch( BranchIndex ).Comp( CompIndex ) );
+
+			{ auto const SELECT_CASE_var( this_component.CurOpSchemeType );
 
 			if ( ( SELECT_CASE_var >= LoadRangeBasedMin ) && ( SELECT_CASE_var <= LoadRangeBasedMax ) ) { //~ load range based
 				if ( EncounteredNonLRBAfterLRB ) {
@@ -416,18 +421,8 @@ namespace PlantLoopSolver {
 
 			} else if ( SELECT_CASE_var == UnknownStatusOpSchemeType ) { //~ Uninitialized, this should be a sufficient place to catch for this on branch 1
 				//throw fatal
-				ShowSevereError( "ValidateFlowControlPaths: Uninitialized operation scheme type for component Name: " + trim( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).Comp( CompIndex ).Name ) );
+				ShowSevereError( "ValidateFlowControlPaths: Uninitialized operation scheme type for component Name: " + trim( this_component.Name ) );
 				ShowFatalError( "ValidateFlowControlPaths: developer notice, Inlet path validation loop" );
-				//        WRITE(*,*) 'Uninitialized operation scheme type for the following component: '
-				//        WRITE(*,*) 'Name: '//TRIM(PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchIndex)%Comp(CompIndex)%Name)
-				//        WRITE(*,*) 'TYPE: '//TRIM(PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchIndex)%Comp(CompIndex)%TypeOf)
-				//        WRITE(*,*) 'Location: Loop/LoopSide/Branch/Comp'
-				//        100 FORMAT (3(I2,'//'), I2)
-				//        WRITE(*,100) LoopNum, LoopSideNum, BranchIndex, CompIndex
-				//        WRITE(*,*) 'Occurs in ValidateFlowControlPaths::Inlet path validation loop'
-				//        WRITE(*,*) 'Immediate program closure, press ENTER to end.'
-				//        READ(*,*)
-				//        STOP 45
 
 			} else { //~ Other control type
 				if ( EncounteredLRB ) {
@@ -456,13 +451,15 @@ namespace PlantLoopSolver {
 					BranchIndex = PathCounter + 1;
 				} else if ( ParallelOrOutletIndex == Outlet ) {
 					// The branch index will be the LoopSide outlet node
-					BranchIndex = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches;
+					BranchIndex = this_loop_side.TotalBranches;
 				}
 
-				//Now that we have the branch index, let's do the control type check over all the components
-				for ( CompIndex = 1; CompIndex <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).TotalComponents; ++CompIndex ) {
+                //Now that we have the branch index, let's do the control type check over all the components
+				for ( CompIndex = 1; CompIndex <= this_loop_side.Branch( BranchIndex ).TotalComponents; ++CompIndex ) {
 
-					{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).Comp( CompIndex ).CurOpSchemeType );
+                    auto & this_component( this_loop_side.Branch( BranchIndex ).Comp( CompIndex ) );
+
+					{ auto const SELECT_CASE_var( this_component.CurOpSchemeType );
 
 					if ( ( SELECT_CASE_var >= LoadRangeBasedMin ) && ( SELECT_CASE_var <= LoadRangeBasedMax ) ) { //~ load range based
 						if ( EncounteredNonLRBAfterLRB ) {
@@ -487,17 +484,8 @@ namespace PlantLoopSolver {
 
 					} else if ( SELECT_CASE_var == UnknownStatusOpSchemeType ) { //~ Uninitialized, this should be sufficient place to catch for this on other branches
 						//throw fatal error
-						ShowSevereError( "ValidateFlowControlPaths: Uninitialized operation scheme type for component Name: " + trim( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).Comp( CompIndex ).Name ) );
+						ShowSevereError( "ValidateFlowControlPaths: Uninitialized operation scheme type for component Name: " + trim( this_component.Name ) );
 						ShowFatalError( "ValidateFlowControlPaths: developer notice, problem in Parallel path validation loop" );
-						//            WRITE(*,*) 'Uninitialized operation scheme type for the following component: '
-						//            WRITE(*,*) 'Name: '//TRIM(PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchIndex)%Comp(CompIndex)%Name)
-						//            WRITE(*,*) 'TYPE: '//TRIM(PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchIndex)%Comp(CompIndex)%TypeOf)
-						//            WRITE(*,*) 'Location: Loop/LoopSide/Branch/Comp'
-						//            WRITE(*,100) LoopNum, LoopSideNum, BranchIndex, CompIndex
-						//            WRITE(*,*) 'Occurs in ValidateFlowControlPaths::Parallel path validation loop'
-						//            WRITE(*,*) 'Immediate program closure, press ENTER to end.'
-						//            READ(*,*)
-						//            STOP 45
 
 					} else { //~ Other control type
 						if ( EncounteredLRB ) {
