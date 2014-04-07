@@ -335,15 +335,21 @@ namespace PlantManager {
 		for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
 			Alpha = "";
 			Num = 0.0;
-			PlantLoop( LoopNum ).LoopSide.allocate( SupplySide );
+            
+            //set up some references
+            auto & this_loop( PlantLoop( LoopNum ) );
+            auto & this_demand_side( this_loop.LoopSide( 1 ) );
+            auto & this_supply_side( this_loop.LoopSide( 1 ) );
+            
+			this_loop.LoopSide.allocate( 2 );
 			if ( LoopNum <= NumPlantLoops ) {
 				PlantLoopNum = LoopNum;
-				PlantLoop( LoopNum ).TypeOfLoop = Plant;
+				this_loop.TypeOfLoop = Plant;
 				CurrentModuleObject = "PlantLoop";
 				GetObjectItem( CurrentModuleObject, PlantLoopNum, Alpha, NumAlphas, Num, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			} else {
 				CondLoopNum = LoopNum - NumPlantLoops;
-				PlantLoop( LoopNum ).TypeOfLoop = Condenser;
+				this_loop.TypeOfLoop = Condenser;
 				CurrentModuleObject = "CondenserLoop";
 				GetObjectItem( CurrentModuleObject, CondLoopNum, Alpha, NumAlphas, Num, NumNums, IOStat, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			}
@@ -356,26 +362,26 @@ namespace PlantManager {
 				if ( IsBlank ) Alpha( 1 ) = "xxxxx";
 			}
 
-			PlantLoop( LoopNum ).Name = Alpha( 1 ); // Load the Plant Loop Name
+			this_loop.Name = Alpha( 1 ); // Load the Plant Loop Name
 
 			if ( Alpha( 2 ) == "STEAM" ) {
-				PlantLoop( LoopNum ).FluidType = NodeType_Steam;
-				PlantLoop( LoopNum ).FluidName = Alpha( 2 );
+				this_loop.FluidType = NodeType_Steam;
+				this_loop.FluidName = Alpha( 2 );
 			} else if ( Alpha( 2 ) == "WATER" ) {
-				PlantLoop( LoopNum ).FluidType = NodeType_Water;
-				PlantLoop( LoopNum ).FluidName = Alpha( 2 );
-				PlantLoop( LoopNum ).FluidIndex = FindGlycol( Alpha( 2 ) );
+				this_loop.FluidType = NodeType_Water;
+				this_loop.FluidName = Alpha( 2 );
+				this_loop.FluidIndex = FindGlycol( Alpha( 2 ) );
 			} else if ( Alpha( 2 ) == "USERDEFINEDFLUIDTYPE" ) {
-				PlantLoop( LoopNum ).FluidType = NodeType_Water;
-				PlantLoop( LoopNum ).FluidName = Alpha( 3 );
+				this_loop.FluidType = NodeType_Water;
+				this_loop.FluidName = Alpha( 3 );
 				// check for valid fluid name
 				NumFluids = CheckFluidPropertyName( Alpha( 3 ) );
 				if ( NumFluids == 0 ) {
 					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( Alpha( 1 ) ) + "\", missing fluid data for Plant loop." );
 					ErrorsFound = true;
 				} else {
-					PlantLoop( LoopNum ).FluidIndex = FindGlycol( Alpha( 3 ) );
-					if ( PlantLoop( LoopNum ).FluidIndex == 0 ) {
+					this_loop.FluidIndex = FindGlycol( Alpha( 3 ) );
+					if ( this_loop.FluidIndex == 0 ) {
 						ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( Alpha( 1 ) ) + "\", invalid glycol fluid data for Plant loop." );
 						ErrorsFound = true;
 					}
@@ -384,144 +390,118 @@ namespace PlantManager {
 				ShowWarningError( "Input error: " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( Alpha( 2 ) ) + "entered, in " + trim( CurrentModuleObject ) + "=" + trim( Alpha( 1 ) ) );
 				ShowContinueError( "Will default to Water." );
 
-				PlantLoop( LoopNum ).FluidType = NodeType_Water;
-				PlantLoop( LoopNum ).FluidName = "WATER";
-				PlantLoop( LoopNum ).FluidIndex = FindGlycol( "WATER" );
+				this_loop.FluidType = NodeType_Water;
+				this_loop.FluidName = "WATER";
+				this_loop.FluidIndex = FindGlycol( "WATER" );
 			}
 
-			PlantLoop( LoopNum ).OperationScheme = Alpha( 4 ); // Load the Plant Control Scheme Priority List
-			//   Check to make sure not used previously.
-			//    IF(LoopNum .LE. NumPlantLoops) THEN
-			//      IF (LoopNum-1 > 0) THEN
-			//        OpSchemeFound=FindItemInList(Alpha(4),PlantLoop(1:LoopNum-1)%OperationScheme,LoopNum-1)
-			//      ELSE
-			//        OpSchemeFound=0
-			//      ENDIF
-			//      IF (OpSchemeFound > 0) THEN
-			//        CALL ShowSevereError(RoutineName//'PlantLoop="'//TRIM(PlantLoop(LoopNum)%Name)//'", OperationScheme already used.')
-			//        CALL ShowContinueError('...'//TRIM(cAlphaFieldNames(4))//'="'//TRIM(Alpha(4))//'" used previously in PlantLoop='//  &
-			//           TRIM(PlantLoop(OpSchemeFound)%Name)//'".')
-			//        ErrorsFound=.TRUE.
-			//      ENDIF
-			//    ELSE   ! Condenser Loop
-			//      IF (LoopNum-1 > NumPlantLoops) THEN
-			//        OpSchemeFound=FindItemInList(Alpha(4),PlantLoop(NumPlantLoops+1:LoopNum-1)%OperationScheme,CondLoopNum-1)
-			//      ELSE
-			//        OpSchemeFound=0
-			//      ENDIF
-			//      IF (OpSchemeFound > 0) THEN
-			//        CALL ShowSevereError(RoutineName//'CondenserLoop="'//TRIM(PlantLoop(LoopNum)%Name)//'", OperationScheme already used.')
-			//        CALL ShowContinueError('...'//TRIM(cAlphaFieldNames(4))//'="'//TRIM(Alpha(4))//'" used previously in CondenserLoop='//  &
-			//           TRIM(PlantLoop(OpSchemeFound)%Name)//'".')
-			//        ErrorsFound=.TRUE.
-			//      ENDIF
-			//    ENDIF
-
+			this_loop.OperationScheme = Alpha( 4 ); // Load the Plant Control Scheme Priority List
+			
 			// Load the temperature and flow rate maximum and minimum limits
-			PlantLoop( LoopNum ).MaxTemp = Num( 1 );
-			PlantLoop( LoopNum ).MinTemp = Num( 2 );
-			PlantLoop( LoopNum ).MaxVolFlowRate = Num( 3 );
-			PlantLoop( LoopNum ).MinVolFlowRate = Num( 4 );
+			this_loop.MaxTemp = Num( 1 );
+			this_loop.MinTemp = Num( 2 );
+			this_loop.MaxVolFlowRate = Num( 3 );
+			this_loop.MinVolFlowRate = Num( 4 );
 
 			//The Plant loop volume for both halves of the loop is read in and used in this module for the
 			// correct loop temperature step.  Loop data is read in supply side, but the volume is not used in
 			// a calculation there.
-			PlantLoop( LoopNum ).Volume = Num( 5 );
-			if ( lNumericFieldBlanks( 5 ) ) PlantLoop( LoopNum ).Volume = AutoCalculate;
+			this_loop.Volume = Num( 5 );
+			if ( lNumericFieldBlanks( 5 ) ) this_loop.Volume = AutoCalculate;
 
 			// Load the Loop Inlet and Outlet Nodes and Connection Info (Alpha(7-10) are related to the supply side)
-			PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNameIn = Alpha( 6 );
-			PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNameOut = Alpha( 7 );
-			PlantLoop( LoopNum ).LoopSide( SupplySide ).BranchList = Alpha( 8 );
-			PlantLoop( LoopNum ).LoopSide( SupplySide ).ConnectList = Alpha( 9 );
-			PlantLoop( LoopNum ).LoopSide( DemandSide ).NodeNameIn = Alpha( 10 );
-			PlantLoop( LoopNum ).LoopSide( DemandSide ).NodeNameOut = Alpha( 11 );
-			PlantLoop( LoopNum ).LoopSide( DemandSide ).BranchList = Alpha( 12 );
-			PlantLoop( LoopNum ).LoopSide( DemandSide ).ConnectList = Alpha( 13 );
+			this_supply_side.NodeNameIn = Alpha( 6 );
+			this_supply_side.NodeNameOut = Alpha( 7 );
+			this_supply_side.BranchList = Alpha( 8 );
+			this_supply_side.ConnectList = Alpha( 9 );
+			this_demand_side.NodeNameIn = Alpha( 10 );
+			this_demand_side.NodeNameOut = Alpha( 11 );
+			this_demand_side.BranchList = Alpha( 12 );
+			this_demand_side.ConnectList = Alpha( 13 );
 
-			PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNumIn = GetOnlySingleNode( Alpha( 6 ), ErrorsFound, trim( CurrentModuleObject ), Alpha( 1 ), PlantLoop( LoopNum ).FluidType, NodeConnectionType_Inlet, 1, ObjectIsParent );
+			this_supply_side.NodeNumIn = GetOnlySingleNode( Alpha( 6 ), ErrorsFound, trim( CurrentModuleObject ), Alpha( 1 ), this_loop.FluidType, NodeConnectionType_Inlet, 1, ObjectIsParent );
 
-			PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNumOut = GetOnlySingleNode( Alpha( 7 ), ErrorsFound, trim( CurrentModuleObject ), Alpha( 1 ), PlantLoop( LoopNum ).FluidType, NodeConnectionType_Outlet, 1, ObjectIsParent );
+			this_supply_side.NodeNumOut = GetOnlySingleNode( Alpha( 7 ), ErrorsFound, trim( CurrentModuleObject ), Alpha( 1 ), this_loop.FluidType, NodeConnectionType_Outlet, 1, ObjectIsParent );
 
-			PlantLoop( LoopNum ).LoopSide( DemandSide ).NodeNumIn = GetOnlySingleNode( Alpha( 10 ), ErrorsFound, trim( CurrentModuleObject ), Alpha( 1 ), PlantLoop( LoopNum ).FluidType, NodeConnectionType_Inlet, 1, ObjectIsParent );
+			this_demand_side.NodeNumIn = GetOnlySingleNode( Alpha( 10 ), ErrorsFound, trim( CurrentModuleObject ), Alpha( 1 ), this_loop.FluidType, NodeConnectionType_Inlet, 1, ObjectIsParent );
 
-			PlantLoop( LoopNum ).LoopSide( DemandSide ).NodeNumOut = GetOnlySingleNode( Alpha( 11 ), ErrorsFound, trim( CurrentModuleObject ), Alpha( 1 ), PlantLoop( LoopNum ).FluidType, NodeConnectionType_Outlet, 1, ObjectIsParent );
+			this_demand_side.NodeNumOut = GetOnlySingleNode( Alpha( 11 ), ErrorsFound, trim( CurrentModuleObject ), Alpha( 1 ), this_loop.FluidType, NodeConnectionType_Outlet, 1, ObjectIsParent );
 
-			PlantLoop( LoopNum ).LoopSide( DemandSide ).InletNodeSetPt = IsNodeOnSetPtManager( PlantLoop( LoopNum ).LoopSide( DemandSide ).NodeNumIn, TempSetPt );
-			PlantLoop( LoopNum ).LoopSide( DemandSide ).OutletNodeSetPt = IsNodeOnSetPtManager( PlantLoop( LoopNum ).LoopSide( DemandSide ).NodeNumOut, TempSetPt );
-			PlantLoop( LoopNum ).LoopSide( SupplySide ).InletNodeSetPt = IsNodeOnSetPtManager( PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNumIn, TempSetPt );
-			PlantLoop( LoopNum ).LoopSide( SupplySide ).OutletNodeSetPt = IsNodeOnSetPtManager( PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNumOut, TempSetPt );
+			this_demand_side.InletNodeSetPt = IsNodeOnSetPtManager( this_demand_side.NodeNumIn, TempSetPt );
+			this_demand_side.OutletNodeSetPt = IsNodeOnSetPtManager( this_demand_side.NodeNumOut, TempSetPt );
+			this_supply_side.InletNodeSetPt = IsNodeOnSetPtManager( this_supply_side.NodeNumIn, TempSetPt );
+			this_supply_side.OutletNodeSetPt = IsNodeOnSetPtManager( this_supply_side.NodeNumOut, TempSetPt );
 
-			PlantLoop( LoopNum ).TempSetPointNodeNum = GetOnlySingleNode( Alpha( 5 ), ErrorsFound, trim( CurrentModuleObject ), Alpha( 1 ), PlantLoop( LoopNum ).FluidType, NodeConnectionType_Sensor, 1, ObjectIsParent );
+			this_loop.TempSetPointNodeNum = GetOnlySingleNode( Alpha( 5 ), ErrorsFound, trim( CurrentModuleObject ), Alpha( 1 ), this_loop.FluidType, NodeConnectionType_Sensor, 1, ObjectIsParent );
 
 			// Load the load distribution scheme.
 			LoadingScheme = Alpha( 14 );
 			if ( SameString( LoadingScheme, "Optimal" ) ) {
-				PlantLoop( LoopNum ).LoadDistribution = OptimalLoading;
+				this_loop.LoadDistribution = OptimalLoading;
 			} else if ( SameString( LoadingScheme, "Sequential" ) ) {
-				PlantLoop( LoopNum ).LoadDistribution = SequentialLoading;
+				this_loop.LoadDistribution = SequentialLoading;
 			} else if ( SameString( LoadingScheme, "Uniform" ) ) {
-				PlantLoop( LoopNum ).LoadDistribution = UniformLoading;
+				this_loop.LoadDistribution = UniformLoading;
 			} else {
 				ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alpha( 1 ) ) + "\", Invalid choice." );
 				ShowContinueError( "..." + trim( cAlphaFieldNames( 14 ) ) + "=\"" + trim( Alpha( 14 ) ) + "\"." );
 				ShowContinueError( "Will default to SequentialLoading." ); // TODO rename point
-				PlantLoop( LoopNum ).LoadDistribution = SequentialLoading;
+				this_loop.LoadDistribution = SequentialLoading;
 			}
 
 			//When dual setpoint is allowed in condenser loop modify this code. Sankar 06/29/2009
-			if ( PlantLoop( LoopNum ).TypeOfLoop == Plant ) {
+			if ( this_loop.TypeOfLoop == Plant ) {
 				// Get the Loop Demand Calculation Scheme
 				if ( SameString( Alpha( 16 ), "SingleSetpoint" ) ) {
-					PlantLoop( LoopNum ).LoopDemandCalcScheme = SingleSetPoint;
+					this_loop.LoopDemandCalcScheme = SingleSetPoint;
 				} else if ( SameString( Alpha( 16 ), "DualSetpointDeadband" ) ) {
-					if ( PlantLoop( LoopNum ).FluidType == NodeType_Steam ) {
+					if ( this_loop.FluidType == NodeType_Steam ) {
 						ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alpha( 1 ) ) + "\", Invalid choice." );
 						ShowContinueError( trim( cAlphaFieldNames( 16 ) ) + "=\"" + trim( Alpha( 16 ) ) + "\" not valid for " + trim( cAlphaFieldNames( 2 ) ) + "= Steam" );
 						ShowContinueError( "Will reset " + trim( cAlphaFieldNames( 16 ) ) + " = SingleSetPoint and simulation will continue." );
-						PlantLoop( LoopNum ).LoopDemandCalcScheme = SingleSetPoint;
+						this_loop.LoopDemandCalcScheme = SingleSetPoint;
 					} else {
-						PlantLoop( LoopNum ).LoopDemandCalcScheme = DualSetPointDeadBand;
+						this_loop.LoopDemandCalcScheme = DualSetPointDeadBand;
 					}
 				} else if ( SameString( Alpha( 16 ), "" ) ) {
-					PlantLoop( LoopNum ).LoopDemandCalcScheme = SingleSetPoint;
+					this_loop.LoopDemandCalcScheme = SingleSetPoint;
 				} else {
 					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alpha( 1 ) ) + "\", Invalid choice." );
 					ShowContinueError( "..." + trim( cAlphaFieldNames( 16 ) ) + "=\"" + trim( Alpha( 16 ) ) + "\"." );
 					ShowContinueError( "Will default to SingleSetPoint." ); // TODO rename point
-					PlantLoop( LoopNum ).LoopDemandCalcScheme = SingleSetPoint;
+					this_loop.LoopDemandCalcScheme = SingleSetPoint;
 				}
-			} else if ( PlantLoop( LoopNum ).TypeOfLoop == Condenser ) {
-				PlantLoop( LoopNum ).LoopDemandCalcScheme = SingleSetPoint;
+			} else if ( this_loop.TypeOfLoop == Condenser ) {
+				this_loop.LoopDemandCalcScheme = SingleSetPoint;
 			}
 
 			//When Commonpipe is allowed in condenser loop modify this code. Sankar 06/29/2009
-			if ( PlantLoop( LoopNum ).TypeOfLoop == Plant ) {
+			if ( this_loop.TypeOfLoop == Plant ) {
 				if ( SameString( Alpha( 17 ), "CommonPipe" ) ) {
-					PlantLoop( LoopNum ).CommonPipeType = CommonPipe_Single;
+					this_loop.CommonPipeType = CommonPipe_Single;
 				} else if ( SameString( Alpha( 17 ), "TwoWayCommonPipe" ) ) {
-					PlantLoop( LoopNum ).CommonPipeType = CommonPipe_TwoWay;
+					this_loop.CommonPipeType = CommonPipe_TwoWay;
 				} else if ( SameString( Alpha( 17 ), "None" ) || lAlphaFieldBlanks( 17 ) ) {
-					PlantLoop( LoopNum ).CommonPipeType = CommonPipe_No;
+					this_loop.CommonPipeType = CommonPipe_No;
 				} else {
 					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alpha( 1 ) ) + "\", Invalid choice." );
 					ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 17 ) ) + "=\"" + trim( Alpha( 17 ) ) + "\"." );
 					ShowContinueError( "Refer to I/O reference document for more details." );
 					ErrorsFound = true;
 				}
-			} else if ( PlantLoop( LoopNum ).TypeOfLoop == Condenser ) {
-				PlantLoop( LoopNum ).CommonPipeType = CommonPipe_No;
+			} else if ( this_loop.TypeOfLoop == Condenser ) {
+				this_loop.CommonPipeType = CommonPipe_No;
 			}
 
-			if ( PlantLoop( LoopNum ).CommonPipeType == CommonPipe_TwoWay ) {
-				if ( PlantLoop( LoopNum ).LoopSide( DemandSide ).InletNodeSetPt && PlantLoop( LoopNum ).LoopSide( SupplySide ).InletNodeSetPt ) {
+			if ( this_loop.CommonPipeType == CommonPipe_TwoWay ) {
+				if ( this_demand_side.InletNodeSetPt && this_supply_side.InletNodeSetPt ) {
 					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alpha( 1 ) ) + "\", Invalid condition." );
 					ShowContinueError( "While using a two way common pipe there can be setpoint on only one node other " "than Plant Supply Outlet node." );
 					ShowContinueError( "Currently both Plant Demand inlet and plant supply inlet have setpoints." );
 					ShowContinueError( "Select one of the two nodes and rerun the simulation." );
 					ErrorsFound = true;
 				}
-				if ( ! PlantLoop( LoopNum ).LoopSide( DemandSide ).InletNodeSetPt && ! PlantLoop( LoopNum ).LoopSide( SupplySide ).InletNodeSetPt ) {
+				if ( ! this_demand_side.InletNodeSetPt && ! this_supply_side.InletNodeSetPt ) {
 					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alpha( 1 ) ) + "\", Invalid condition." );
 					ShowContinueError( "While using a two way common pipe there must be a setpoint in addition to " "the Plant Supply Outlet node." );
 					ShowContinueError( "Currently neither plant demand inlet nor plant supply inlet have setpoints." );
@@ -533,7 +513,7 @@ namespace PlantManager {
 			//Pressure Simulation Type Input
 			//First set the alpha index in the object as it is different for plant/condenser
 			//When CommonPipe, etc., is allowed in condenser loop, modify this code.  Edwin/Sankar 08/12/2009
-			if ( PlantLoop( LoopNum ).TypeOfLoop == Plant ) {
+			if ( this_loop.TypeOfLoop == Plant ) {
 				PressSimAlphaIndex = 18;
 			} else {
 				PressSimAlphaIndex = 15;
@@ -545,7 +525,7 @@ namespace PlantManager {
 				//Check all types
 				for ( PressSimLoop = 1; PressSimLoop <= 4; ++PressSimLoop ) {
 					if ( SameString( Alpha( PressSimAlphaIndex ), PressureSimType( PressSimLoop ) ) ) {
-						PlantLoop( LoopNum ).PressureSimType = PressSimLoop;
+						this_loop.PressureSimType = PressSimLoop;
 						MatchedPressureString = true;
 						break;
 					}
@@ -554,7 +534,7 @@ namespace PlantManager {
 				//If we found a match, check to make sure it is one of the valid
 				// ones for this phase of pressure implementation
 				if ( MatchedPressureString ) {
-					if ( ( PlantLoop( LoopNum ).PressureSimType == Press_NoPressure ) || ( PlantLoop( LoopNum ).PressureSimType == Press_PumpPowerCorrection ) || ( PlantLoop( LoopNum ).PressureSimType == Press_FlowCorrection ) ) {
+					if ( ( this_loop.PressureSimType == Press_NoPressure ) || ( this_loop.PressureSimType == Press_PumpPowerCorrection ) || ( this_loop.PressureSimType == Press_FlowCorrection ) ) {
 						//We are OK here, move on
 					} else {
 						//We have an erroneous input, alert user
@@ -571,7 +551,7 @@ namespace PlantManager {
 				//if we made it this far and didn't get a match, check for blank
 				if ( ! MatchedPressureString ) {
 					if ( trim( Alpha( PressSimAlphaIndex ) ) == "" ) {
-						PlantLoop( LoopNum ).PressureSimType = Press_NoPressure;
+						this_loop.PressureSimType = Press_NoPressure;
 						MatchedPressureString = true;
 						break;
 					}
@@ -588,7 +568,7 @@ namespace PlantManager {
 
 			ErrFound = false;
 
-			if ( PlantLoop( LoopNum ).TypeOfLoop == Plant ) {
+			if ( this_loop.TypeOfLoop == Plant ) {
 				GetPlantAvailabilityManager( Alpha( 15 ), LoopNum, TotNumLoops, ErrFound );
 			}
 
@@ -597,46 +577,46 @@ namespace PlantManager {
 				ErrorsFound = true;
 			}
 
-			if ( GetFirstBranchInletNodeName( PlantLoop( LoopNum ).LoopSide( DemandSide ).BranchList ) != PlantLoop( LoopNum ).LoopSide( DemandSide ).NodeNameIn ) {
+			if ( GetFirstBranchInletNodeName( this_demand_side.BranchList ) != this_demand_side.NodeNameIn ) {
 				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alpha( 1 ) ) + "\", Invalid condition." );
 				ShowContinueError( "The inlet node of the first branch in the " + trim( cAlphaFieldNames( 12 ) ) + "=" + trim( Alpha( 12 ) ) ); //"Plant Demand Side Branch List"
 				ShowContinueError( "is not the same as the " + trim( cAlphaFieldNames( 10 ) ) + "=" + trim( Alpha( 10 ) ) ); // "Plant Demand Side Inlet Node Name"
-				ShowContinueError( "Branch List Inlet Node Name=" + trim( GetFirstBranchInletNodeName( PlantLoop( LoopNum ).LoopSide( DemandSide ).BranchList ) ) ); // TODO rename point
+				ShowContinueError( "Branch List Inlet Node Name=" + trim( GetFirstBranchInletNodeName( this_demand_side.BranchList ) ) ); // TODO rename point
 				ShowContinueError( "Branches in a BRANCH LIST must be listed in flow order: " "inlet branch, then parallel branches, then outlet branch." ); // TODO rename point
 				ErrorsFound = true;
 			}
 
-			if ( GetLastBranchOutletNodeName( PlantLoop( LoopNum ).LoopSide( DemandSide ).BranchList ) != PlantLoop( LoopNum ).LoopSide( DemandSide ).NodeNameOut ) {
+			if ( GetLastBranchOutletNodeName( this_demand_side.BranchList ) != this_demand_side.NodeNameOut ) {
 				//"Plant Demand Side Branch List"
 				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alpha( 1 ) ) + "\", Invalid condition." );
 				ShowContinueError( "The outlet node of the last branch in the " + trim( cAlphaFieldNames( 12 ) ) + "=" + trim( Alpha( 12 ) ) );
 				//"Plant Demand Side Outlet Node Name"
 				ShowContinueError( "is not the same as the " + trim( cAlphaFieldNames( 11 ) ) + "=" + trim( Alpha( 11 ) ) );
-				ShowContinueError( "Branch List Outlet Node Name=" + trim( GetLastBranchOutletNodeName( PlantLoop( LoopNum ).LoopSide( DemandSide ).BranchList ) ) ); // TODO rename point
+				ShowContinueError( "Branch List Outlet Node Name=" + trim( GetLastBranchOutletNodeName( this_demand_side.BranchList ) ) ); // TODO rename point
 				// TODO rename point
 				ShowContinueError( "Branches in a BRANCH LIST must be listed in flow order: inlet branch, then parallel branches, " "then outlet branch." );
 				ErrorsFound = true;
 			}
 
-			if ( GetFirstBranchInletNodeName( PlantLoop( LoopNum ).LoopSide( SupplySide ).BranchList ) != PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNameIn ) {
+			if ( GetFirstBranchInletNodeName( this_supply_side.BranchList ) != this_supply_side.NodeNameIn ) {
 				//"Plant Supply Side Branch List"
 				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alpha( 1 ) ) + "\", Invalid condition." );
 				ShowContinueError( "The inlet node of the first branch in the " + trim( cAlphaFieldNames( 8 ) ) + "=" + trim( Alpha( 8 ) ) );
 				//"Plant Supply Side Inlet Node Name
 				ShowContinueError( "is not the same as the " + trim( cAlphaFieldNames( 6 ) ) + "=" + trim( Alpha( 6 ) ) );
-				ShowContinueError( "Branch List Inlet Node Name=" + trim( GetFirstBranchInletNodeName( PlantLoop( LoopNum ).LoopSide( SupplySide ).BranchList ) ) ); // TODO rename point
+				ShowContinueError( "Branch List Inlet Node Name=" + trim( GetFirstBranchInletNodeName( this_supply_side.BranchList ) ) ); // TODO rename point
 				// TODO rename point
 				ShowContinueError( "Branches in a BRANCH LIST must be listed in flow order: inlet branch, then parallel branches, " "then outlet branch." );
 				ErrorsFound = true;
 			}
 
-			if ( GetLastBranchOutletNodeName( PlantLoop( LoopNum ).LoopSide( SupplySide ).BranchList ) != PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNameOut ) {
+			if ( GetLastBranchOutletNodeName( this_supply_side.BranchList ) != this_supply_side.NodeNameOut ) {
 				//"Plant Supply Side Branch List"
 				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alpha( 1 ) ) + "\", Invalid condition." );
 				ShowContinueError( "The outlet node of the last branch in the " + trim( cAlphaFieldNames( 8 ) ) + "=" + trim( Alpha( 8 ) ) );
 				//"Plant Supply Side Outlet Node Name"
 				ShowContinueError( "is not the same as the " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( Alpha( 7 ) ) );
-				ShowContinueError( "Branch List Outlet Node Name=" + trim( GetLastBranchOutletNodeName( PlantLoop( LoopNum ).LoopSide( SupplySide ).BranchList ) ) ); // TODO rename point
+				ShowContinueError( "Branch List Outlet Node Name=" + trim( GetLastBranchOutletNodeName( this_supply_side.BranchList ) ) ); // TODO rename point
 				// TODO rename point
 				ShowContinueError( "Branches in a BRANCH LIST must be listed in flow order: inlet branch, then parallel branches, " "then outlet branch." );
 				ErrorsFound = true;
