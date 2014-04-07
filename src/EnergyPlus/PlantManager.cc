@@ -3472,535 +3472,537 @@ namespace PlantManager {
 
 					for ( CompCtr = 1; CompCtr <= isize( PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp ); ++CompCtr ) {
 
-						{ auto const SELECT_CASE_var( PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).TypeOf_Num );
+                        auto & this_component( PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ) );
+
+						{ auto const SELECT_CASE_var( this_component.TypeOf_Num );
 
 						if ( SELECT_CASE_var == TypeOf_Other ) { //                             = -1
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Unknown;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_Unknown;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_Unknown;
+							this_component.FlowCtrl = ControlType_Unknown;
+							this_component.FlowPriority = LoopFlowStatus_Unknown;
+							this_component.HowLoadServed = HowMet_Unknown;
 						} else if ( SELECT_CASE_var == TypeOf_Boiler_Simple ) { //         =  1
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCapHiOutLimit;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_ByNominalCapHiOutLimit;
 						} else if ( SELECT_CASE_var == TypeOf_Boiler_Steam ) { //                      =  2
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_ByNominalCap;
 						} else if ( SELECT_CASE_var == TypeOf_Chiller_Absorption ) { //                =  3  ! older BLAST absorption chiller
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
+							this_component.FlowCtrl = ControlType_Active;
 							if ( LoopSideCtr == DemandSide ) {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+								this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+								this_component.HowLoadServed = HowMet_NoneDemand;
 							} else {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCapLowOutLimit;
+								this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+								this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
 							}
 						} else if ( SELECT_CASE_var == TypeOf_Chiller_Indirect_Absorption ) { //       =  4  ! revised absorption chiller
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
+							this_component.FlowCtrl = ControlType_Active;
 
 							if ( LoopSideCtr == DemandSide ) {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+								this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+								this_component.HowLoadServed = HowMet_NoneDemand;
 							} else {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCapLowOutLimit;
+								this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+								this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
 							}
 						} else if ( SELECT_CASE_var == TypeOf_Chiller_CombTurbine ) { //           =  5
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
+							this_component.FlowCtrl = ControlType_Active;
 							if ( LoopSideCtr == DemandSide ) {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+								this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+								this_component.HowLoadServed = HowMet_NoneDemand;
 							} else {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCapLowOutLimit;
+								this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+								this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
 							}
 						} else if ( SELECT_CASE_var == TypeOf_Chiller_ConstCOP ) { //                 =  6
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
+							this_component.FlowCtrl = ControlType_Active;
 
 							if ( LoopSideCtr == DemandSide ) {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+								this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+								this_component.HowLoadServed = HowMet_NoneDemand;
 							} else {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCap;
+								this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+								this_component.HowLoadServed = HowMet_ByNominalCap;
 							}
 						} else if ( SELECT_CASE_var == TypeOf_Chiller_DFAbsorption ) { //             =  7
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
+							this_component.FlowCtrl = ControlType_Active;
 							if ( LoopSideCtr == DemandSide ) {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+								this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+								this_component.HowLoadServed = HowMet_NoneDemand;
 							} else {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCapLowOutLimit;
+								this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
+								this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
 							}
 						} else if ( SELECT_CASE_var == TypeOf_Chiller_ExhFiredAbsorption ) { //             =  76
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
+							this_component.FlowCtrl = ControlType_Active;
 							if ( LoopSideCtr == DemandSide ) {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+								this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+								this_component.HowLoadServed = HowMet_NoneDemand;
 							} else {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCapLowOutLimit;
+								this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
+								this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
 							}
 						} else if ( SELECT_CASE_var == TypeOf_Chiller_Electric ) { //                 =  8
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
+							this_component.FlowCtrl = ControlType_Active;
 							if ( LoopSideCtr == DemandSide ) {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+								this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+								this_component.HowLoadServed = HowMet_NoneDemand;
 							} else {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCapLowOutLimit;
+								this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+								this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
 							}
 						} else if ( SELECT_CASE_var == TypeOf_Chiller_ElectricEIR ) { //              =  9
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
+							this_component.FlowCtrl = ControlType_Active;
 							if ( LoopSideCtr == DemandSide ) {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+								this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+								this_component.HowLoadServed = HowMet_NoneDemand;
 							} else {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCapLowOutLimit;
+								this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+								this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
 							}
 						} else if ( SELECT_CASE_var == TypeOf_Chiller_ElectricReformEIR ) { //        = 10
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
+							this_component.FlowCtrl = ControlType_Active;
 							if ( LoopSideCtr == DemandSide ) {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+								this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+								this_component.HowLoadServed = HowMet_NoneDemand;
 							} else {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCapLowOutLimit;
+								this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+								this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
 							}
 						} else if ( SELECT_CASE_var == TypeOf_Chiller_EngineDriven ) { //             = 11
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCapLowOutLimit;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
 							if ( LoopSideCtr == DemandSide ) {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+								this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+								this_component.HowLoadServed = HowMet_NoneDemand;
 							} else {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCapLowOutLimit;
+								this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+								this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
 							}
 						} else if ( SELECT_CASE_var == TypeOf_CoolingTower_SingleSpd ) { //           = 12
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_ByNominalCap;
 						} else if ( SELECT_CASE_var == TypeOf_CoolingTower_TwoSpd ) { //              = 13
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_ByNominalCap;
 						} else if ( SELECT_CASE_var == TypeOf_CoolingTower_VarSpd ) { //              = 14
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_ByNominalCap;
 						} else if ( SELECT_CASE_var == TypeOf_CoolingTower_VarSpdMerkel ) { //              = 89
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_ByNominalCap;
 						} else if ( SELECT_CASE_var == TypeOf_Generator_FCExhaust ) { //              = 15
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_PassiveCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_PassiveCap;
 
 						} else if ( SELECT_CASE_var == TypeOf_HeatPumpWtrHeater ) { //                = 16
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_PassiveCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_PassiveCap;
 						} else if ( SELECT_CASE_var == TypeOf_HPWaterEFCooling ) { //                 = 17
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
+							this_component.FlowCtrl = ControlType_Active;
 							if ( LoopSideCtr == DemandSide ) {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+								this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+								this_component.HowLoadServed = HowMet_NoneDemand;
 							} else {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCap;
+								this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+								this_component.HowLoadServed = HowMet_ByNominalCap;
 							}
 
 						} else if ( SELECT_CASE_var == TypeOf_HPWaterEFHeating ) { //                 = 18
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
+							this_component.FlowCtrl = ControlType_Active;
 							if ( LoopSideCtr == DemandSide ) {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+								this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+								this_component.HowLoadServed = HowMet_NoneDemand;
 							} else {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCap;
+								this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+								this_component.HowLoadServed = HowMet_ByNominalCap;
 							}
 						} else if ( SELECT_CASE_var == TypeOf_HPWaterPECooling ) { //                 = 19
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
+							this_component.FlowCtrl = ControlType_Active;
 							if ( LoopSideCtr == DemandSide ) {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+								this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+								this_component.HowLoadServed = HowMet_NoneDemand;
 							} else {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCap;
+								this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
+								this_component.HowLoadServed = HowMet_ByNominalCap;
 							}
 						} else if ( SELECT_CASE_var == TypeOf_HPWaterPEHeating ) { //                 = 20
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
+							this_component.FlowCtrl = ControlType_Active;
 							if ( LoopSideCtr == DemandSide ) {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+								this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+								this_component.HowLoadServed = HowMet_NoneDemand;
 							} else {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCap;
+								this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
+								this_component.HowLoadServed = HowMet_ByNominalCap;
 							}
 						} else if ( SELECT_CASE_var == TypeOf_Pipe ) { //                             = 21
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 							if ( BranchIsInSplitterMixer ) {
 								if ( NumComponentsOnBranch == 1 ) {
-									PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Bypass;
+									this_component.FlowCtrl = ControlType_Bypass;
 								} else if ( NumComponentsOnBranch > 1 ) {
-									PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Passive;
+									this_component.FlowCtrl = ControlType_Passive;
 								} else {
-									PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Bypass;
+									this_component.FlowCtrl = ControlType_Bypass;
 								}
 							} else {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Passive;
+								this_component.FlowCtrl = ControlType_Passive;
 							}
 						} else if ( SELECT_CASE_var == TypeOf_PipeSteam ) { //                        = 22
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 							if ( BranchIsInSplitterMixer ) {
 								if ( NumComponentsOnBranch == 1 ) {
-									PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Bypass;
+									this_component.FlowCtrl = ControlType_Bypass;
 								} else if ( NumComponentsOnBranch > 1 ) {
-									PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Passive;
+									this_component.FlowCtrl = ControlType_Passive;
 								} else {
-									PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Bypass;
+									this_component.FlowCtrl = ControlType_Bypass;
 								}
 							} else {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Passive;
+								this_component.FlowCtrl = ControlType_Passive;
 							}
 						} else if ( SELECT_CASE_var == TypeOf_PipeExterior ) { //                     = 23
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 							if ( BranchIsInSplitterMixer ) {
 								if ( NumComponentsOnBranch == 1 ) {
-									PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Bypass;
+									this_component.FlowCtrl = ControlType_Bypass;
 								} else if ( NumComponentsOnBranch > 1 ) {
-									PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Passive;
+									this_component.FlowCtrl = ControlType_Passive;
 								} else {
-									PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Bypass;
+									this_component.FlowCtrl = ControlType_Bypass;
 								}
 							} else {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Passive;
+								this_component.FlowCtrl = ControlType_Passive;
 							}
 						} else if ( SELECT_CASE_var == TypeOf_PipeInterior ) { //                     = 24
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 							if ( BranchIsInSplitterMixer ) {
 								if ( NumComponentsOnBranch == 1 ) {
-									PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Bypass;
+									this_component.FlowCtrl = ControlType_Bypass;
 								} else if ( NumComponentsOnBranch > 1 ) {
-									PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Passive;
+									this_component.FlowCtrl = ControlType_Passive;
 								} else {
-									PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Bypass;
+									this_component.FlowCtrl = ControlType_Bypass;
 								}
 							} else {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Passive;
+								this_component.FlowCtrl = ControlType_Passive;
 							}
 						} else if ( SELECT_CASE_var == TypeOf_PipeUnderground ) { //                  = 25
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 							if ( BranchIsInSplitterMixer ) {
 								if ( NumComponentsOnBranch == 1 ) {
-									PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Bypass;
+									this_component.FlowCtrl = ControlType_Bypass;
 								} else if ( NumComponentsOnBranch > 1 ) {
-									PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Passive;
+									this_component.FlowCtrl = ControlType_Passive;
 								} else {
-									PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Bypass;
+									this_component.FlowCtrl = ControlType_Bypass;
 								}
 							} else {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Passive;
+								this_component.FlowCtrl = ControlType_Passive;
 							}
 						} else if ( SELECT_CASE_var == TypeOf_PurchChilledWater ) { //                = 26
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCapLowOutLimit;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
 						} else if ( SELECT_CASE_var == TypeOf_PurchHotWater ) { //                    = 27
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCapHiOutLimit;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_ByNominalCapHiOutLimit;
 						} else if ( SELECT_CASE_var == TypeOf_TS_IceDetailed ) { //                   = 28
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_PassiveCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
+							this_component.HowLoadServed = HowMet_PassiveCap;
 						} else if ( SELECT_CASE_var == TypeOf_TS_IceSimple ) { //                    = 29
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_PassiveCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
+							this_component.HowLoadServed = HowMet_PassiveCap;
 						} else if ( SELECT_CASE_var == TypeOf_ValveTempering ) { //                  = 30
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_WtrHeaterMixed ) { //                   = 31
 							if ( LoopSideCtr == DemandSide ) {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+								this_component.FlowCtrl = ControlType_Active;
+								this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+								this_component.HowLoadServed = HowMet_NoneDemand;
 							} else {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_PassiveCap;
+								this_component.FlowCtrl = ControlType_Active;
+								this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+								this_component.HowLoadServed = HowMet_PassiveCap;
 							}
 						} else if ( SELECT_CASE_var == TypeOf_WtrHeaterStratified ) { //              = 32
 							if ( LoopSideCtr == DemandSide ) {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+								this_component.FlowCtrl = ControlType_Active;
+								this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+								this_component.HowLoadServed = HowMet_NoneDemand;
 							} else {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_PassiveCap;
+								this_component.FlowCtrl = ControlType_Active;
+								this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+								this_component.HowLoadServed = HowMet_PassiveCap;
 							}
 						} else if ( SELECT_CASE_var == TypeOf_PumpVariableSpeed ) { //                 = 33
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_PumpConstantSpeed ) { //                 = 34
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_PumpCondensate ) { //                    = 35
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_PumpBankVariableSpeed ) { //             = 36
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_PumpBankConstantSpeed ) { //             = 37
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_WaterUseConnection ) { //              = 38
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_CoilWaterCooling ) { //               = 39  ! demand side component
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_CoilWaterDetailedFlatCooling ) { //      = 40  ! demand side component
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_CoilWaterSimpleHeating ) { //           = 41  ! demand side component
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_CoilSteamAirHeating ) { //         = 42  ! demand side component
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_SolarCollectorFlatPlate ) { //         = 43  ! demand side component
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_PassiveCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_PassiveCap;
 						} else if ( SELECT_CASE_var == TypeOf_PlantLoadProfile ) { //            = 44  ! demand side component
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_GrndHtExchgVertical ) { //            = 45
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_PassiveCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_PassiveCap;
 						} else if ( SELECT_CASE_var == TypeOf_GrndHtExchgSurface ) { //            = 46
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_PassiveCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_PassiveCap;
 						} else if ( SELECT_CASE_var == TypeOf_GrndHtExchgPond ) { //            = 47
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_PassiveCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_PassiveCap;
 
 						} else if ( SELECT_CASE_var == TypeOf_Generator_MicroTurbine ) { //          = 48  !newer FSEC turbine
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_ByNominalCap;
 						} else if ( SELECT_CASE_var == TypeOf_Generator_ICEngine ) { //             = 49
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_ByNominalCap;
 						} else if ( SELECT_CASE_var == TypeOf_Generator_CTurbine ) { //             = 50  !older BLAST turbine
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_ByNominalCap;
 						} else if ( SELECT_CASE_var == TypeOf_Generator_MicroCHP ) { //              = 51
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_ByNominalCap;
 						} else if ( SELECT_CASE_var == TypeOf_Generator_FCStackCooler ) { //         = 52
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_ByNominalCap;
 						} else if ( SELECT_CASE_var == TypeOf_FluidCooler_SingleSpd ) { //           = 53
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_PassiveCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_PassiveCap;
 						} else if ( SELECT_CASE_var == TypeOf_FluidCooler_TwoSpd ) { //            = 54
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_PassiveCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_PassiveCap;
 						} else if ( SELECT_CASE_var == TypeOf_EvapFluidCooler_SingleSpd ) { //       = 55
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_PassiveCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_PassiveCap;
 						} else if ( SELECT_CASE_var == TypeOf_EvapFluidCooler_TwoSpd ) { //         = 56
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_PassiveCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_PassiveCap;
 						} else if ( SELECT_CASE_var == TypeOf_ChilledWaterTankMixed ) { //         = 57
 							if ( LoopSideCtr == DemandSide ) {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+								this_component.FlowCtrl = ControlType_Active;
+								this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+								this_component.HowLoadServed = HowMet_NoneDemand;
 							} else {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_PassiveCap;
+								this_component.FlowCtrl = ControlType_Active;
+								this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+								this_component.HowLoadServed = HowMet_PassiveCap;
 							}
 						} else if ( SELECT_CASE_var == TypeOf_ChilledWaterTankStratified ) { //      = 58
 							if ( LoopSideCtr == DemandSide ) {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+								this_component.FlowCtrl = ControlType_Active;
+								this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+								this_component.HowLoadServed = HowMet_NoneDemand;
 							} else {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_PassiveCap;
+								this_component.FlowCtrl = ControlType_Active;
+								this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+								this_component.HowLoadServed = HowMet_PassiveCap;
 							}
 						} else if ( SELECT_CASE_var == TypeOf_PVTSolarCollectorFlatPlate ) { //      = 59
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_PassiveCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_PassiveCap;
 							//next batch for ZoneHVAC
 						} else if ( SELECT_CASE_var == TypeOf_Baseboard_Conv_Water ) { //        = 60
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Steam ) { //      = 61
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Water ) { //      = 62
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_LowTempRadiant_VarFlow ) {
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_LowTempRadiant_ConstFlow ) {
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_CooledBeamAirTerminal ) {
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_CoilWAHPHeatingEquationFit ) {
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_CoilWAHPCoolingEquationFit ) {
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_CoilVSWAHPHeatingEquationFit ) {
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_CoilVSWAHPCoolingEquationFit ) {
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_CoilWAHPHeatingParamEst ) {
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_CoilWAHPCoolingParamEst ) {
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_RefrigSystemWaterCondenser ) {
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_PassiveCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_PassiveCap;
 						} else if ( SELECT_CASE_var == TypeOf_RefrigerationWaterCoolRack ) {
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_PassiveCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_PassiveCap;
 						} else if ( SELECT_CASE_var == TypeOf_MultiSpeedHeatPumpRecovery ) {
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_PassiveCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_PassiveCap;
 						} else if ( SELECT_CASE_var == TypeOf_UnitarySystemRecovery ) {
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_PassiveCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_PassiveCap;
 						} else if ( SELECT_CASE_var == TypeOf_PipingSystemPipeCircuit ) {
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_PassiveCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_PassiveCap;
 						} else if ( SELECT_CASE_var == TypeOf_SolarCollectorICS ) { //         = 75
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_PassiveCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_PassiveCap;
 						} else if ( SELECT_CASE_var == TypeOf_PlantComponentUserDefined ) {
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_Unknown;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_Unknown;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_Unknown;
+							this_component.HowLoadServed = HowMet_Unknown;
 						} else if ( SELECT_CASE_var == TypeOf_CoilUserDefined ) {
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_Unknown;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_Unknown;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_Unknown;
+							this_component.HowLoadServed = HowMet_Unknown;
 						} else if ( SELECT_CASE_var == TypeOf_ZoneHVACAirUserDefined ) {
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_Unknown;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_Unknown;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_Unknown;
+							this_component.HowLoadServed = HowMet_Unknown;
 						} else if ( SELECT_CASE_var == TypeOf_AirTerminalUserDefined ) {
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_Unknown;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_Unknown;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_Unknown;
+							this_component.HowLoadServed = HowMet_Unknown;
 						} else if ( SELECT_CASE_var == TypeOf_HeatPumpVRF ) { //       =  82  ! AirConditioner:VariableRefrigerantFlow
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
+							this_component.FlowCtrl = ControlType_Active;
 
 							if ( LoopSideCtr == DemandSide ) {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+								this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+								this_component.HowLoadServed = HowMet_NoneDemand;
 							} else { // should never happen
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_PassiveCap;
+								this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+								this_component.HowLoadServed = HowMet_PassiveCap;
 							}
 						} else if ( SELECT_CASE_var == TypeOf_WaterSource ) {
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCapLowOutLimit;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
 						} else if ( SELECT_CASE_var == TypeOf_GrndHtExchgHorizTrench ) { // = 83  GroundHeatExchanger:HorizontalTrench
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_PassiveCap;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_PassiveCap;
 						} else if ( SELECT_CASE_var == TypeOf_FluidToFluidPlantHtExchg ) { //          = 84
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
+							this_component.FlowCtrl = ControlType_Active;
 							if ( LoopSideCtr == DemandSide ) {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+								this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+								this_component.HowLoadServed = HowMet_NoneDemand;
 							} else {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_PassiveCap;
+								this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+								this_component.HowLoadServed = HowMet_PassiveCap;
 							}
 						} else if ( SELECT_CASE_var == TypeOf_CentralGroundSourceHeatPump ) { // 86
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
+							this_component.FlowCtrl = ControlType_Active;
 							if ( LoopSideCtr == DemandSide ) {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+								this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+								this_component.HowLoadServed = HowMet_NoneDemand;
 							} else {
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_ByNominalCap;
+								this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
+								this_component.HowLoadServed = HowMet_ByNominalCap;
 							}
 						} else if ( SELECT_CASE_var == TypeOf_PackagedTESCoolingCoil ) { // 88
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowCtrl = ControlType_Active;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).FlowPriority = LoopFlowStatus_TakesWhatGets;
-							PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).HowLoadServed = HowMet_NoneDemand;
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else {
 							ShowSevereError( "SetBranchControlTypes: Caught unexpected equipment type of number" );
 
