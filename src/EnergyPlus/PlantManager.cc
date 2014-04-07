@@ -1654,64 +1654,86 @@ namespace PlantManager {
 
 		for ( LoopNum = 1; LoopNum <= NumPlantLoops; ++LoopNum ) {
 
-			VentRepPlantSupplySide( LoopNum ).Name = PlantLoop( LoopNum ).Name;
-			VentRepPlantSupplySide( LoopNum ).NodeNumIn = PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNumIn;
-			VentRepPlantSupplySide( LoopNum ).NodeNameIn = PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNameIn;
-			VentRepPlantSupplySide( LoopNum ).NodeNumOut = PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNumOut;
-			VentRepPlantSupplySide( LoopNum ).NodeNameOut = PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNameOut;
-			VentRepPlantSupplySide( LoopNum ).TotalBranches = PlantLoop( LoopNum ).LoopSide( SupplySide ).TotalBranches;
-			if ( VentRepPlantSupplySide( LoopNum ).TotalBranches > 0 ) VentRepPlantSupplySide( LoopNum ).Branch.allocate( VentRepPlantSupplySide( LoopNum ).TotalBranches );
+            // set up references for this loop
+            auto & this_plant_loop( PlantLoop( LoopNum ) );
+            auto & this_plant_supply ( this_plant_loop.LoopSide( SupplySide ) );
+            auto & this_vent_plant_supply( VentRepPlantSupplySide( LoopNum ) );
+            auto & this_plant_demand ( this_plant_loop.LoopSide( DemandSide ) );
+            auto & this_vent_plant_demand( VentRepPlantDemandSide( LoopNum ) );
 
-			for ( BranchNum = 1; BranchNum <= VentRepPlantSupplySide( LoopNum ).TotalBranches; ++BranchNum ) {
-				VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ).Name = PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Name;
-				VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ).NodeNumIn = PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).NodeNumIn;
-				VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ).NodeNumOut = PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).NodeNumOut;
-				VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ).TotalComponents = PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).TotalComponents;
-				if ( VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ).TotalComponents > 0 ) {
-					TotCompsOnBranch = VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ).TotalComponents;
-					VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ).Comp.allocate( TotCompsOnBranch );
+			this_vent_plant_supply.Name = this_plant_loop.Name;
+			this_vent_plant_supply.NodeNumIn = this_plant_supply.NodeNumIn;
+			this_vent_plant_supply.NodeNameIn = this_plant_supply.NodeNameIn;
+			this_vent_plant_supply.NodeNumOut = this_plant_supply.NodeNumOut;
+			this_vent_plant_supply.NodeNameOut = this_plant_supply.NodeNameOut;
+			this_vent_plant_supply.TotalBranches = this_plant_supply.TotalBranches;
+            
+			if ( this_vent_plant_supply.TotalBranches > 0 ) this_vent_plant_supply.Branch.allocate( this_vent_plant_supply.TotalBranches );
+
+			for ( BranchNum = 1; BranchNum <= this_vent_plant_supply.TotalBranches; ++BranchNum ) {
+                
+                auto & this_plant_supply_branch( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ) );
+                auto & this_vent_plant_supply_branch( VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ) );
+                
+				this_vent_plant_supply_branch.Name = this_plant_supply_branch.Name;
+				this_vent_plant_supply_branch.NodeNumIn = this_plant_supply_branch.NodeNumIn;
+				this_vent_plant_supply_branch.NodeNumOut = this_plant_supply_branch.NodeNumOut;
+				this_vent_plant_supply_branch.TotalComponents = this_plant_supply_branch.TotalComponents;
+				if ( this_vent_plant_supply_branch.TotalComponents > 0 ) {
+					TotCompsOnBranch = this_vent_plant_supply_branch.TotalComponents;
+					this_vent_plant_supply_branch.Comp.allocate( TotCompsOnBranch );
 				}
 
 				for ( CompNum = 1; CompNum <= VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
 
-					VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ).Comp( CompNum ).Name = PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).Name;
-					VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf = PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf;
-					VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ).Comp( CompNum ).NodeNameIn = PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).NodeNameIn;
-					VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ).Comp( CompNum ).NodeNameOut = PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).NodeNameOut;
-					VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn = PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn;
-					VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumOut = PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).NodeNumOut;
+                    auto & this_plant_supply_comp( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ) );
+                    auto & this_vent_plant_supply_comp( VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ).Comp( CompNum ) );
+
+					this_vent_plant_supply_comp.Name = this_plant_supply_comp.Name;
+					this_vent_plant_supply_comp.TypeOf = this_plant_supply_comp.TypeOf;
+					this_vent_plant_supply_comp.NodeNameIn = this_plant_supply_comp.NodeNameIn;
+					this_vent_plant_supply_comp.NodeNameOut = this_plant_supply_comp.NodeNameOut;
+					this_vent_plant_supply_comp.NodeNumIn = this_plant_supply_comp.NodeNumIn;
+					this_vent_plant_supply_comp.NodeNumOut = this_plant_supply_comp.NodeNumOut;
 
 				} // loop over components in branches on the loop (ventilation report data)
 
 			} // loop over branches on the loop (ventilation report data)
+            
+			this_vent_plant_demand.Name = this_plant_loop.Name;
+			this_vent_plant_demand.NodeNumIn = this_plant_demand.NodeNumIn;
+			this_vent_plant_demand.NodeNameIn = this_plant_demand.NodeNameIn;
+			this_vent_plant_demand.NodeNumOut = this_plant_demand.NodeNumOut;
+			this_vent_plant_demand.NodeNameOut = this_plant_demand.NodeNameOut;
+			this_vent_plant_demand.TotalBranches = this_plant_demand.TotalBranches;
 
-			VentRepPlantDemandSide( LoopNum ).Name = PlantLoop( LoopNum ).Name;
-			VentRepPlantDemandSide( LoopNum ).NodeNumIn = PlantLoop( LoopNum ).LoopSide( DemandSide ).NodeNumIn;
-			VentRepPlantDemandSide( LoopNum ).NodeNameIn = PlantLoop( LoopNum ).LoopSide( DemandSide ).NodeNameIn;
-			VentRepPlantDemandSide( LoopNum ).NodeNumOut = PlantLoop( LoopNum ).LoopSide( DemandSide ).NodeNumOut;
-			VentRepPlantDemandSide( LoopNum ).NodeNameOut = PlantLoop( LoopNum ).LoopSide( DemandSide ).NodeNameOut;
-			VentRepPlantDemandSide( LoopNum ).TotalBranches = PlantLoop( LoopNum ).LoopSide( DemandSide ).TotalBranches;
+			if ( this_vent_plant_demand.TotalBranches > 0 ) this_vent_plant_demand.Branch.allocate( this_vent_plant_demand.TotalBranches );
 
-			if ( VentRepPlantDemandSide( LoopNum ).TotalBranches > 0 ) VentRepPlantDemandSide( LoopNum ).Branch.allocate( VentRepPlantDemandSide( LoopNum ).TotalBranches );
-
-			for ( BranchNum = 1; BranchNum <= VentRepPlantDemandSide( LoopNum ).TotalBranches; ++BranchNum ) {
-				VentRepPlantDemandSide( LoopNum ).Branch( BranchNum ).Name = PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).Name;
-				VentRepPlantDemandSide( LoopNum ).Branch( BranchNum ).NodeNumIn = PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).NodeNumIn;
-				VentRepPlantDemandSide( LoopNum ).Branch( BranchNum ).NodeNumOut = PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).NodeNumOut;
-				VentRepPlantDemandSide( LoopNum ).Branch( BranchNum ).TotalComponents = PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).TotalComponents;
-				if ( VentRepPlantDemandSide( LoopNum ).Branch( BranchNum ).TotalComponents > 0 ) {
-					TotCompsOnBranch = VentRepPlantDemandSide( LoopNum ).Branch( BranchNum ).TotalComponents;
-					VentRepPlantDemandSide( LoopNum ).Branch( BranchNum ).Comp.allocate( TotCompsOnBranch );
+			for ( BranchNum = 1; BranchNum <= this_vent_plant_demand.TotalBranches; ++BranchNum ) {
+                
+                auto & this_plant_demand_branch( PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ) );
+                auto & this_vent_plant_demand_branch( VentRepPlantDemandSide( LoopNum ).Branch( BranchNum ) );
+                
+				this_vent_plant_demand_branch.Name = this_plant_demand_branch.Name;
+				this_vent_plant_demand_branch.NodeNumIn = this_plant_demand_branch.NodeNumIn;
+				this_vent_plant_demand_branch.NodeNumOut = this_plant_demand_branch.NodeNumOut;
+				this_vent_plant_demand_branch.TotalComponents = this_plant_demand_branch.TotalComponents;
+				if ( this_vent_plant_demand_branch.TotalComponents > 0 ) {
+					TotCompsOnBranch = this_vent_plant_demand_branch.TotalComponents;
+					this_vent_plant_demand_branch.Comp.allocate( TotCompsOnBranch );
 				}
 
-				for ( CompNum = 1; CompNum <= VentRepPlantDemandSide( LoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
+				for ( CompNum = 1; CompNum <= this_vent_plant_demand_branch.TotalComponents; ++CompNum ) {
 
-					VentRepPlantDemandSide( LoopNum ).Branch( BranchNum ).Comp( CompNum ).Name = PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).Comp( CompNum ).Name;
-					VentRepPlantDemandSide( LoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf = PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).Comp( CompNum ).TypeOf;
-					VentRepPlantDemandSide( LoopNum ).Branch( BranchNum ).Comp( CompNum ).NodeNameIn = PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).Comp( CompNum ).NodeNameIn;
-					VentRepPlantDemandSide( LoopNum ).Branch( BranchNum ).Comp( CompNum ).NodeNameOut = PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).Comp( CompNum ).NodeNameOut;
-					VentRepPlantDemandSide( LoopNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn = PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn;
-					VentRepPlantDemandSide( LoopNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumOut = PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).Comp( CompNum ).NodeNumOut;
+                    auto & this_plant_demand_comp( PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).Comp( CompNum ) );
+                    auto & this_vent_plant_demand_comp( VentRepPlantDemandSide( LoopNum ).Branch( BranchNum ).Comp( CompNum ) );
+
+					this_vent_plant_demand_comp.Name = this_plant_demand_comp.Name;
+					this_vent_plant_demand_comp.TypeOf = this_plant_demand_comp.TypeOf;
+					this_vent_plant_demand_comp.NodeNameIn = this_plant_demand_comp.NodeNameIn;
+					this_vent_plant_demand_comp.NodeNameOut = this_plant_demand_comp.NodeNameOut;
+					this_vent_plant_demand_comp.NodeNumIn = this_plant_demand_comp.NodeNumIn;
+					this_vent_plant_demand_comp.NodeNumOut = this_plant_demand_comp.NodeNumOut;
 
 				} // loop over components in branches on the loop (ventilation report data)
 
@@ -1725,63 +1747,84 @@ namespace PlantManager {
 		for ( LoopNum = 1; LoopNum <= NumCondLoops; ++LoopNum ) {
 			LoopNumInArray = LoopNum + NumPlantLoops;
 
-			VentRepCondSupplySide( LoopNum ).Name = PlantLoop( LoopNumInArray ).Name;
-			VentRepCondSupplySide( LoopNum ).NodeNumIn = PlantLoop( LoopNumInArray ).LoopSide( SupplySide ).NodeNumIn;
-			VentRepCondSupplySide( LoopNum ).NodeNameIn = PlantLoop( LoopNumInArray ).LoopSide( SupplySide ).NodeNameIn;
-			VentRepCondSupplySide( LoopNum ).NodeNumOut = PlantLoop( LoopNumInArray ).LoopSide( SupplySide ).NodeNumOut;
-			VentRepCondSupplySide( LoopNum ).NodeNameOut = PlantLoop( LoopNumInArray ).LoopSide( SupplySide ).NodeNameOut;
-			VentRepCondSupplySide( LoopNum ).TotalBranches = PlantLoop( LoopNumInArray ).LoopSide( SupplySide ).TotalBranches;
-			if ( VentRepCondSupplySide( LoopNum ).TotalBranches > 0 ) VentRepCondSupplySide( LoopNum ).Branch.allocate( VentRepCondSupplySide( LoopNum ).TotalBranches );
+            // set up references for this loop
+            auto & this_cond_loop( PlantLoop( LoopNumInArray ) );
+            auto & this_cond_supply ( this_cond_loop.LoopSide( SupplySide ) );
+            auto & this_vent_cond_supply( VentRepPlantSupplySide( LoopNum ) );
+            auto & this_cond_demand ( this_cond_loop.LoopSide( DemandSide ) );
+            auto & this_vent_cond_demand( VentRepPlantDemandSide( LoopNum ) );
+
+			this_vent_cond_supply.Name = this_cond_loop.Name;
+			this_vent_cond_supply.NodeNumIn = this_cond_supply.NodeNumIn;
+			this_vent_cond_supply.NodeNameIn = this_cond_supply.NodeNameIn;
+			this_vent_cond_supply.NodeNumOut = this_cond_supply.NodeNumOut;
+			this_vent_cond_supply.NodeNameOut = this_cond_supply.NodeNameOut;
+			this_vent_cond_supply.TotalBranches = this_cond_supply.TotalBranches;
+			if ( this_vent_cond_supply.TotalBranches > 0 ) this_vent_cond_supply.Branch.allocate( this_vent_cond_supply.TotalBranches );
 
 			for ( BranchNum = 1; BranchNum <= VentRepCondSupplySide( LoopNum ).TotalBranches; ++BranchNum ) {
-				VentRepCondSupplySide( LoopNum ).Branch( BranchNum ).Name = PlantLoop( LoopNumInArray ).LoopSide( SupplySide ).Branch( BranchNum ).Name;
-				VentRepCondSupplySide( LoopNum ).Branch( BranchNum ).NodeNumIn = PlantLoop( LoopNumInArray ).LoopSide( SupplySide ).Branch( BranchNum ).NodeNumIn;
-				VentRepCondSupplySide( LoopNum ).Branch( BranchNum ).NodeNumOut = PlantLoop( LoopNumInArray ).LoopSide( SupplySide ).Branch( BranchNum ).NodeNumOut;
-				VentRepCondSupplySide( LoopNum ).Branch( BranchNum ).TotalComponents = PlantLoop( LoopNumInArray ).LoopSide( SupplySide ).Branch( BranchNum ).TotalComponents;
-				if ( VentRepCondSupplySide( LoopNum ).Branch( BranchNum ).TotalComponents > 0 ) {
-					TotCompsOnBranch = VentRepCondSupplySide( LoopNum ).Branch( BranchNum ).TotalComponents;
-					VentRepCondSupplySide( LoopNum ).Branch( BranchNum ).Comp.allocate( TotCompsOnBranch );
+                
+                auto & this_cond_supply_branch( this_cond_loop.LoopSide( SupplySide ).Branch( BranchNum ) );
+                auto & this_vent_cond_supply_branch( this_vent_cond_supply.Branch( BranchNum ) );
+                
+				this_vent_cond_supply_branch.Name = this_cond_supply_branch.Name;
+				this_vent_cond_supply_branch.NodeNumIn = this_cond_supply_branch.NodeNumIn;
+				this_vent_cond_supply_branch.NodeNumOut = this_cond_supply_branch.NodeNumOut;
+				this_vent_cond_supply_branch.TotalComponents = this_cond_supply_branch.TotalComponents;
+				if ( this_vent_cond_supply_branch.TotalComponents > 0 ) {
+					TotCompsOnBranch = this_vent_cond_supply_branch.TotalComponents;
+					this_vent_cond_supply_branch.Comp.allocate( TotCompsOnBranch );
 				}
 
-				for ( CompNum = 1; CompNum <= VentRepCondSupplySide( LoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
+				for ( CompNum = 1; CompNum <= this_vent_cond_supply_branch.TotalComponents; ++CompNum ) {
 
-					VentRepCondSupplySide( LoopNum ).Branch( BranchNum ).Comp( CompNum ).Name = PlantLoop( LoopNumInArray ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).Name;
-					VentRepCondSupplySide( LoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf = PlantLoop( LoopNumInArray ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf;
-					VentRepCondSupplySide( LoopNum ).Branch( BranchNum ).Comp( CompNum ).NodeNameIn = PlantLoop( LoopNumInArray ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).NodeNameIn;
-					VentRepCondSupplySide( LoopNum ).Branch( BranchNum ).Comp( CompNum ).NodeNameOut = PlantLoop( LoopNumInArray ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).NodeNameOut;
-					VentRepCondSupplySide( LoopNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn = PlantLoop( LoopNumInArray ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn;
-					VentRepCondSupplySide( LoopNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumOut = PlantLoop( LoopNumInArray ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).NodeNumOut;
+                    auto & this_cond_supply_comp( this_cond_loop.LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ) );
+                    auto & this_vent_cond_supply_comp( this_vent_cond_supply.Branch( BranchNum ).Comp( CompNum ) );
+
+					this_vent_cond_supply_comp.Name = this_cond_supply_comp.Name;
+					this_vent_cond_supply_comp.TypeOf = this_cond_supply_comp.TypeOf;
+					this_vent_cond_supply_comp.NodeNameIn = this_cond_supply_comp.NodeNameIn;
+					this_vent_cond_supply_comp.NodeNameOut = this_cond_supply_comp.NodeNameOut;
+					this_vent_cond_supply_comp.NodeNumIn = this_cond_supply_comp.NodeNumIn;
+					this_vent_cond_supply_comp.NodeNumOut = this_cond_supply_comp.NodeNumOut;
 
 				} // loop over components in branches on the loop (ventilation report data)
 
 			} // loop over branches on the loop (ventilation report data)
 
-			VentRepCondDemandSide( LoopNum ).Name = PlantLoop( LoopNumInArray ).Name;
-			VentRepCondDemandSide( LoopNum ).NodeNumIn = PlantLoop( LoopNumInArray ).LoopSide( DemandSide ).NodeNumIn;
-			VentRepCondDemandSide( LoopNum ).NodeNameIn = PlantLoop( LoopNumInArray ).LoopSide( DemandSide ).NodeNameIn;
-			VentRepCondDemandSide( LoopNum ).NodeNumOut = PlantLoop( LoopNumInArray ).LoopSide( DemandSide ).NodeNumOut;
-			VentRepCondDemandSide( LoopNum ).NodeNameOut = PlantLoop( LoopNumInArray ).LoopSide( DemandSide ).NodeNameOut;
-			VentRepCondDemandSide( LoopNum ).TotalBranches = PlantLoop( LoopNumInArray ).LoopSide( DemandSide ).TotalBranches;
-			if ( VentRepCondDemandSide( LoopNum ).TotalBranches > 0 ) VentRepCondDemandSide( LoopNum ).Branch.allocate( VentRepCondDemandSide( LoopNum ).TotalBranches );
+			this_vent_cond_demand.Name = this_cond_loop.Name;
+			this_vent_cond_demand.NodeNumIn = this_cond_demand.NodeNumIn;
+			this_vent_cond_demand.NodeNameIn = this_cond_demand.NodeNameIn;
+			this_vent_cond_demand.NodeNumOut = this_cond_demand.NodeNumOut;
+			this_vent_cond_demand.NodeNameOut = this_cond_demand.NodeNameOut;
+			this_vent_cond_demand.TotalBranches = this_cond_demand.TotalBranches;
+			if ( this_vent_cond_demand.TotalBranches > 0 ) this_vent_cond_demand.Branch.allocate( this_vent_cond_demand.TotalBranches );
 
-			for ( BranchNum = 1; BranchNum <= VentRepCondDemandSide( LoopNum ).TotalBranches; ++BranchNum ) {
-				VentRepCondDemandSide( LoopNum ).Branch( BranchNum ).Name = PlantLoop( LoopNumInArray ).LoopSide( DemandSide ).Branch( BranchNum ).Name;
-				VentRepCondDemandSide( LoopNum ).Branch( BranchNum ).NodeNumIn = PlantLoop( LoopNumInArray ).LoopSide( DemandSide ).Branch( BranchNum ).NodeNumIn;
-				VentRepCondDemandSide( LoopNum ).Branch( BranchNum ).NodeNumOut = PlantLoop( LoopNumInArray ).LoopSide( DemandSide ).Branch( BranchNum ).NodeNumOut;
-				VentRepCondDemandSide( LoopNum ).Branch( BranchNum ).TotalComponents = PlantLoop( LoopNumInArray ).LoopSide( DemandSide ).Branch( BranchNum ).TotalComponents;
-				if ( VentRepCondDemandSide( LoopNum ).Branch( BranchNum ).TotalComponents > 0 ) {
-					TotCompsOnBranch = VentRepCondDemandSide( LoopNum ).Branch( BranchNum ).TotalComponents;
-					VentRepCondDemandSide( LoopNum ).Branch( BranchNum ).Comp.allocate( TotCompsOnBranch );
+			for ( BranchNum = 1; BranchNum <= this_vent_cond_demand.TotalBranches; ++BranchNum ) {
+                
+                auto & this_cond_demand_branch( this_cond_demand.Branch( BranchNum ) );
+                auto & this_vent_cond_demand_branch( this_vent_cond_demand.Branch( BranchNum ) );
+                
+				this_vent_cond_demand_branch.Name = this_cond_demand_branch.Name;
+				this_vent_cond_demand_branch.NodeNumIn = this_cond_demand_branch.NodeNumIn;
+				this_vent_cond_demand_branch.NodeNumOut = this_cond_demand_branch.NodeNumOut;
+				this_vent_cond_demand_branch.TotalComponents = this_cond_demand_branch.TotalComponents;
+				if ( this_vent_cond_demand_branch.TotalComponents > 0 ) {
+					TotCompsOnBranch = this_vent_cond_demand_branch.TotalComponents;
+					this_vent_cond_demand_branch.Comp.allocate( TotCompsOnBranch );
 				}
 
-				for ( CompNum = 1; CompNum <= VentRepCondDemandSide( LoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
+				for ( CompNum = 1; CompNum <= this_vent_cond_demand_branch.TotalComponents; ++CompNum ) {
 
-					VentRepCondDemandSide( LoopNum ).Branch( BranchNum ).Comp( CompNum ).Name = PlantLoop( LoopNumInArray ).LoopSide( DemandSide ).Branch( BranchNum ).Comp( CompNum ).Name;
-					VentRepCondDemandSide( LoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf = PlantLoop( LoopNumInArray ).LoopSide( DemandSide ).Branch( BranchNum ).Comp( CompNum ).TypeOf;
-					VentRepCondDemandSide( LoopNum ).Branch( BranchNum ).Comp( CompNum ).NodeNameIn = PlantLoop( LoopNumInArray ).LoopSide( DemandSide ).Branch( BranchNum ).Comp( CompNum ).NodeNameIn;
-					VentRepCondDemandSide( LoopNum ).Branch( BranchNum ).Comp( CompNum ).NodeNameOut = PlantLoop( LoopNumInArray ).LoopSide( DemandSide ).Branch( BranchNum ).Comp( CompNum ).NodeNameOut;
-					VentRepCondDemandSide( LoopNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn = PlantLoop( LoopNumInArray ).LoopSide( DemandSide ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn;
-					VentRepCondDemandSide( LoopNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumOut = PlantLoop( LoopNumInArray ).LoopSide( DemandSide ).Branch( BranchNum ).Comp( CompNum ).NodeNumOut;
+                    auto & this_cond_demand_comp( this_cond_demand_branch.Comp( CompNum ) );
+                    auto & this_vent_cond_demand_comp( this_vent_cond_demand_branch.Comp( CompNum ) );
+
+					this_vent_cond_demand_comp.Name = this_cond_demand_comp.Name;
+					this_vent_cond_demand_comp.TypeOf = this_cond_demand_comp.TypeOf;
+					this_vent_cond_demand_comp.NodeNameIn = this_cond_demand_comp.NodeNameIn;
+					this_vent_cond_demand_comp.NodeNameOut = this_cond_demand_comp.NodeNameOut;
+					this_vent_cond_demand_comp.NodeNumIn = this_cond_demand_comp.NodeNumIn;
+					this_vent_cond_demand_comp.NodeNumOut = this_cond_demand_comp.NodeNumOut;
 
 				} // loop over components in branches on the loop (ventilation report data)
 
