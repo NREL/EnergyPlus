@@ -743,7 +743,7 @@ namespace PlantManager {
 		LoopPipe.allocate( NumHalfLoops );
 		HalfLoopNum = 0;
 		SysPipeNum = 0;
-
+        
 		for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) { // Begin demand side loops ... When condenser is added becomes NumLoops
 			DemandSideHasPump = false;
 			TempLoop.LoopHasConnectionComp = false;
@@ -1551,7 +1551,7 @@ namespace PlantManager {
 
 		Pipe.allocate( NumPipes ); // Pipe definition in DataPlant
 		SysPipeNum = 0;
-
+        
 		for ( HalfLoopNum = 1; HalfLoopNum <= NumHalfLoops; ++HalfLoopNum ) {
 			for ( PipeNum = 1; PipeNum <= LoopPipe( HalfLoopNum ).NumPipes; ++PipeNum ) {
 				++SysPipeNum;
@@ -1570,7 +1570,7 @@ namespace PlantManager {
 		}
 
 		LoopPipe.deallocate();
-
+        
 		//DSU? can we clean this out this next do loop now? looks like bandaids.
 		for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
             auto & this_supply_side( PlantLoop( LoopNum ).LoopSide( SupplySide ) );
@@ -1739,20 +1739,21 @@ namespace PlantManager {
 			} // loop over branches on the loop (ventilation report data)
 
 		} // loop over plant supply loops (ventilation report data)
-
-		if ( NumCondLoops > 0 ) VentRepCondSupplySide.allocate( NumCondLoops );
+        
+        if ( NumCondLoops > 0 ) VentRepCondSupplySide.allocate( NumCondLoops );
 		if ( NumCondLoops > 0 ) VentRepCondDemandSide.allocate( NumCondLoops );
-
-		for ( LoopNum = 1; LoopNum <= NumCondLoops; ++LoopNum ) {
+        
+        for ( LoopNum = 1; LoopNum <= NumCondLoops; ++LoopNum ) {
+            
 			LoopNumInArray = LoopNum + NumPlantLoops;
-
+            
             // set up references for this loop
             auto & this_cond_loop( PlantLoop( LoopNumInArray ) );
             auto & this_cond_supply ( this_cond_loop.LoopSide( SupplySide ) );
-            auto & this_vent_cond_supply( VentRepPlantSupplySide( LoopNum ) );
+            auto & this_vent_cond_supply( VentRepCondSupplySide( LoopNum ) );
             auto & this_cond_demand ( this_cond_loop.LoopSide( DemandSide ) );
-            auto & this_vent_cond_demand( VentRepPlantDemandSide( LoopNum ) );
-
+            auto & this_vent_cond_demand( VentRepCondDemandSide( LoopNum ) );
+            
 			this_vent_cond_supply.Name = this_cond_loop.Name;
 			this_vent_cond_supply.NodeNumIn = this_cond_supply.NodeNumIn;
 			this_vent_cond_supply.NodeNameIn = this_cond_supply.NodeNameIn;
@@ -1761,9 +1762,9 @@ namespace PlantManager {
 			this_vent_cond_supply.TotalBranches = this_cond_supply.TotalBranches;
 			if ( this_vent_cond_supply.TotalBranches > 0 ) this_vent_cond_supply.Branch.allocate( this_vent_cond_supply.TotalBranches );
 
-			for ( BranchNum = 1; BranchNum <= VentRepCondSupplySide( LoopNum ).TotalBranches; ++BranchNum ) {
+			for ( BranchNum = 1; BranchNum <= this_vent_cond_supply.TotalBranches; ++BranchNum ) {
                 
-                auto & this_cond_supply_branch( this_cond_loop.LoopSide( SupplySide ).Branch( BranchNum ) );
+                auto & this_cond_supply_branch( this_cond_supply.Branch( BranchNum ) );
                 auto & this_vent_cond_supply_branch( this_vent_cond_supply.Branch( BranchNum ) );
                 
 				this_vent_cond_supply_branch.Name = this_cond_supply_branch.Name;
@@ -1780,7 +1781,7 @@ namespace PlantManager {
                     auto & this_cond_supply_comp( this_cond_loop.LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ) );
                     auto & this_vent_cond_supply_comp( this_vent_cond_supply.Branch( BranchNum ).Comp( CompNum ) );
 
-					this_vent_cond_supply_comp.Name = this_cond_supply_comp.Name;
+                    this_vent_cond_supply_comp.Name = this_cond_supply_comp.Name;
 					this_vent_cond_supply_comp.TypeOf = this_cond_supply_comp.TypeOf;
 					this_vent_cond_supply_comp.NodeNameIn = this_cond_supply_comp.NodeNameIn;
 					this_vent_cond_supply_comp.NodeNameOut = this_cond_supply_comp.NodeNameOut;
@@ -1804,7 +1805,7 @@ namespace PlantManager {
                 auto & this_cond_demand_branch( this_cond_demand.Branch( BranchNum ) );
                 auto & this_vent_cond_demand_branch( this_vent_cond_demand.Branch( BranchNum ) );
                 
-				this_vent_cond_demand_branch.Name = this_cond_demand_branch.Name;
+                this_vent_cond_demand_branch.Name = this_cond_demand_branch.Name;
 				this_vent_cond_demand_branch.NodeNumIn = this_cond_demand_branch.NodeNumIn;
 				this_vent_cond_demand_branch.NodeNumOut = this_cond_demand_branch.NodeNumOut;
 				this_vent_cond_demand_branch.TotalComponents = this_cond_demand_branch.TotalComponents;
@@ -1817,7 +1818,7 @@ namespace PlantManager {
 
                     auto & this_cond_demand_comp( this_cond_demand_branch.Comp( CompNum ) );
                     auto & this_vent_cond_demand_comp( this_vent_cond_demand_branch.Comp( CompNum ) );
-
+                    
 					this_vent_cond_demand_comp.Name = this_cond_demand_comp.Name;
 					this_vent_cond_demand_comp.TypeOf = this_cond_demand_comp.TypeOf;
 					this_vent_cond_demand_comp.NodeNameIn = this_cond_demand_comp.NodeNameIn;
