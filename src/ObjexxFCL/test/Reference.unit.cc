@@ -1,0 +1,111 @@
+// ObjexxFCL::Reference Unit Tests
+//
+// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+//
+// Version: 4.0.0
+//
+// Language: C++
+//
+// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Use of this source code or any derivative of it is restricted by license.
+// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+
+// Google Test Headers
+#include <gtest/gtest.h>
+
+// ObjexxFCL Headers
+#include <ObjexxFCL/Reference.hh>
+
+using namespace ObjexxFCL;
+
+TEST( ReferenceTest, Basic )
+{
+	Reference_int_const r;
+	//EXPECT_EQ( Reference_int_const(), r ); // Can't compare non-associated References for compat with Fortran
+	EXPECT_FALSE( r.attached() );
+	EXPECT_FALSE( r.associated() );
+	int const j( 42 ), k( 59 );
+	r.attach( j );
+	EXPECT_EQ( 42, j );
+	EXPECT_EQ( 42, r );
+	EXPECT_TRUE( r.attached() );
+	EXPECT_TRUE( r.associated() );
+	EXPECT_TRUE( r.attached( j ) );
+	EXPECT_TRUE( r.associated( j ) );
+	EXPECT_FALSE( r.attached( k ) );
+	EXPECT_FALSE( r.associated( k ) );
+	Reference_int_const r2( j );
+	EXPECT_TRUE( r.associated( r2 ) );
+	EXPECT_TRUE( associated( r, r2 ) );
+	r.detach();
+	EXPECT_FALSE( r.attached() );
+	EXPECT_FALSE( r.associated() );
+	EXPECT_FALSE( r.attached( j ) );
+	EXPECT_FALSE( r.associated( j ) );
+	//r = k; // Doesn't compile since r is const ref
+}
+
+TEST( ReferenceTest, Advanced )
+{
+	int j( 42 ), k( 59 );
+	Reference_int r( j );
+	EXPECT_TRUE( r.attached() );
+	EXPECT_TRUE( r.associated() );
+	EXPECT_TRUE( r.attached( j ) );
+	EXPECT_TRUE( r.associated( j ) );
+	EXPECT_FALSE( r.attached( k ) );
+	EXPECT_FALSE( r.associated( k ) );
+	r.detach();
+	EXPECT_FALSE( r.attached() );
+	EXPECT_FALSE( r.associated() );
+	EXPECT_FALSE( r.attached( j ) );
+	EXPECT_FALSE( r.associated( j ) );
+	r.attach( j );
+	r = k;
+	EXPECT_EQ( 59, j );
+	EXPECT_EQ( 59, r );
+//	EXPECT_EQ( &r, &j );
+//	EXPECT_NE( &r, &k );
+	r >>= k;
+	EXPECT_TRUE( r.attached( k ) );
+	EXPECT_TRUE( r.associated( k ) );
+	EXPECT_FALSE( r.attached( j ) );
+	EXPECT_FALSE( r.associated( j ) );
+	Reference_int r1( r ); // Reference of Reference
+	EXPECT_EQ( k, r1 );
+	Reference_int r2( r1 );
+	EXPECT_EQ( k, r2 );
+	r2 >>= j;
+	EXPECT_EQ( j, r2 );
+	EXPECT_EQ( k, r1 );
+	r2 >>= r1;
+	EXPECT_EQ( k, r2 );
+}
+
+TEST( ReferenceTest, ConstInt )
+{
+#ifndef OBJEXXFCL_CATCH_NONCONST_REFERENCE_TO_CONST
+	int const j( 42 );
+	Reference_int r( j ); // Fortran allows POINTER to INTENT(IN) (const) arg
+	EXPECT_TRUE( r.attached() );
+	EXPECT_TRUE( r.associated() );
+	EXPECT_TRUE( r.attached( j ) );
+	EXPECT_TRUE( r.associated( j ) );
+	EXPECT_EQ( j, r );
+	r.detach();
+	EXPECT_FALSE( r.attached() );
+	EXPECT_FALSE( r.associated() );
+	EXPECT_FALSE( r.attached( j ) );
+	EXPECT_FALSE( r.associated( j ) );
+#endif
+}
+
+TEST( ReferenceTest, String )
+{
+	std::string s( "A short phrase" );
+	Reference_string r( s );
+	EXPECT_TRUE( r.attached() );
+	EXPECT_TRUE( r.associated() );
+	EXPECT_TRUE( r.attached( s ) );
+	EXPECT_EQ( s, r );
+}

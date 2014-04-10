@@ -1,4 +1,6 @@
-SET(SRC 
+set( target_name objexx )
+
+set(src 
   Backspace.cc
   char.constants.cc
   char.functions.cc
@@ -284,5 +286,48 @@ SET(SRC
   Write.hh
 ) 
 
-ADD_LIBRARY( objexx ${SRC} )
+set( test_src
+  test/CArray.unit.cc
+  test/CArrayP.unit.cc
+  test/Chunk.unit.cc
+  test/ChunkVector.unit.cc
+  test/Cstring.unit.cc
+  test/Dimension.unit.cc
+  test/DimensionSlice.unit.cc
+  test/DynamicIndexRange.unit.cc
+  test/FArray.unit.cc
+  test/FArray1.unit.cc
+  test/FArray2.unit.cc
+  test/FArrayS.unit.cc
+  test/Fmath.unit.cc
+  test/Fstring.unit.cc
+  test/GlobalStreams.unit.cc
+  test/Index.unit.cc
+  test/IndexSlice.unit.cc
+  test/MArray.unit.cc
+  test/Optional.unit.cc
+  test/Print.unit.cc
+  test/Read.unit.cc
+  test/Reference.Optional.unit.cc
+  test/Reference.unit.cc
+  test/Required.unit.cc
+  test/StaticIndexRange.unit.cc
+  test/Stream.unit.cc
+  test/TypeTraits.unit.cc
+  test/Write.unit.cc
+  test/bit.unit.cc
+  test/byte.unit.cc
+  test/char.functions.unit.cc
+  test/floops.unit.cc
+  test/fmt.unit.cc
+  test/gio.unit.cc
+  test/main.cc
+  test/numeric.unit.cc
+  test/string.functions.unit.cc
+  test/ubyte.unit.cc
+)
+
+add_library( ${target_name} ${src} )
+
+CREATE_TEST_TARGETS( ${target_name} "${test_src}" "" )
 
