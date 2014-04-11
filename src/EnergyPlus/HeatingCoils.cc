@@ -782,7 +782,7 @@ namespace HeatingCoils {
 		// perform error check to make sure duplicate heating sources are not used (i.e. 2 desuperheating coils cannot
 		// use the same heat source). This error check will be expanded in the future to check for duplicates in
 		// desuperheaters used for water heating purposed.
-		for ( CoilNum = NumElecCoil + NumGasCoil + 1; CoilNum <= NumHeatingCoils; ++CoilNum ) {
+		for ( CoilNum = NumElecCoil + NumElecCoilMultiStage + NumGasCoil + NumGasCoilMultiStage + 1; CoilNum <= NumHeatingCoils; ++CoilNum ) {
 			for ( RemainingCoils = CoilNum + 1; RemainingCoils <= NumHeatingCoils; ++RemainingCoils ) {
 				if ( HeatingCoil( CoilNum ).ReclaimHeatingSource == HeatingCoil( RemainingCoils ).ReclaimHeatingSource && HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum == HeatingCoil( RemainingCoils ).ReclaimHeatingSourceIndexNum ) {
 					SourceIndexNum = HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum;
