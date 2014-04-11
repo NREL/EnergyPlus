@@ -783,7 +783,7 @@ public: // I/O
 
 public: // Data
 
-	static size_type const npos = static_cast< size_type >( -1 );
+	static size_type const npos;
 
 private: // Data
 
