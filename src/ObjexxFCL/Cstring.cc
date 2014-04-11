@@ -319,8 +319,7 @@ namespace ObjexxFCL {
 // Static Data Member Definitions
 
 //#ifndef _MSC_VER // Microsoft Visual C++ extensions doesn't need or like these: Enable #ifndef block if not using /Za
-
-	Cstring::size_type const Cstring::npos;
+  Cstring::size_type const Cstring::npos = static_cast< size_type >(-1);
 
 //#endif // _MSC_VER
 

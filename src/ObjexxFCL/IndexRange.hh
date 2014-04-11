@@ -698,11 +698,11 @@ private: // Inspector
 
 public: // Data
 
-	static size_type const npos = static_cast< size_type >( -1 ); // Unbounded "size"
+	static size_type const npos; // Unbounded "size"
 
-	static int const l_min = -( static_cast< int >( ( static_cast< unsigned int >( -1 ) / 2u ) ) - 1 ); // Min lower index
+	static int const l_min; // Min lower index
 
-	static int const u_max = static_cast< int >( ( static_cast< unsigned int >( -1 ) / 2u ) ); // Max upper index
+	static int const u_max; // Max upper index
 
 private: // Data
 
