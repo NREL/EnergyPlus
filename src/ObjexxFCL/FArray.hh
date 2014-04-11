@@ -1084,7 +1084,7 @@ public: // Modifier
 	to_default()
 	{
 		proxy_const_assert( not_const_proxy() );
-		std::fill_n( data_, size_, Traits::initial_array_value() );
+    if (data_) std::fill_n( data_, size_, Traits::initial_array_value() );
 		return *this;
 	}
 
@@ -1095,7 +1095,7 @@ public: // Modifier
 	zero()
 	{
 		proxy_const_assert( not_const_proxy() );
-		std::fill_n( data_, size_, T( 0 ) );
+		if (data_) std::fill_n( data_, size_, T( 0 ) );
 	}
 
 	// Assign Zero to all Elements
@@ -1105,7 +1105,7 @@ public: // Modifier
 	to_zero()
 	{
 		proxy_const_assert( not_const_proxy() );
-		std::fill_n( data_, size_, T( 0 ) );
+		if (data_) std::fill_n( data_, size_, T( 0 ) );
 	}
 
 	// Invert (Elemental)
