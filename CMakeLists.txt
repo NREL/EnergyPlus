@@ -5,6 +5,13 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 option( BUILD_TESTING "Build testing targets" OFF )
 
 #FIND_PACKAGE( CXXFeatures ) 
+
+if(MSVC)
+  add_definitions(/W3)
+else()
+  add_definitions(-Wall -Wnon-virtual-dtor -pedantic -std=c++11)
+endif()
+
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ")
 
 set( gtest_force_shared_crt ON )
