@@ -15,12 +15,14 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Observer.hh>
-#include <ObjexxFCL/SetWrapper.fwd.hh>
 
 // C++ Headers
 #include <cassert>
 
 namespace ObjexxFCL {
+
+// Forward Declarations
+template< typename > class SetWrapper;
 
 // ObserverMulti: Combined Subject + Multi Observer Abstract Base Class
 class ObserverMulti : public Observer

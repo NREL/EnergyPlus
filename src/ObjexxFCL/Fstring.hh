@@ -1,7 +1,7 @@
 #ifndef ObjexxFCL_Fstring_hh_INCLUDED
 #define ObjexxFCL_Fstring_hh_INCLUDED
 
-// Fstring: Fixed-Length Fortran-Compatible String and Substring
+// Fstring: Fixed-Length Fortran-Compatible String
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
@@ -14,8 +14,8 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Fstring.fwd.hh>
 #include <ObjexxFCL/char.constants.hh>
+#include <ObjexxFCL/char.functions.hh>
 #include <ObjexxFCL/Index.hh>
 #include <ObjexxFCL/Sticky.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -55,16 +55,16 @@ typedef  char const *  c_cstring;
 class Fstring
 {
 
-private: // Friend
-
-	friend class Fsubstring;
-
 public: // Types
 
 	// STL Style
+	typedef  char *  iterator;
+	typedef  char const *  const_iterator;
 	typedef  std::size_t  size_type;
 
 	// C++ Style
+	typedef  char *  Iterator;
+	typedef  char const *  ConstIterator;
 	typedef  std::size_t  Size;
 
 	typedef  std::function< void( Fstring & ) >  InitializerFunction;
@@ -83,13 +83,18 @@ public: // Creation
 	}
 
 	// Copy Constructor
-	Fstring( Fstring const & s );
+	inline
+	Fstring( Fstring const & s ) :
+		len_( s.len_ ),
+		str_( len_ > 0u ? new char[ len_ ] : nullptr ),
+		c_str_( nullptr ),
+		sub_( false )
+	{
+		std::memcpy( str_, s.str_, len_ );
+	}
 
 	// Move Constructor
 	Fstring( Fstring && s );
-
-	// Substring Constructor
-	Fstring( Fsubstring const & s );
 
 	// string Constructor
 	Fstring( std::string const & s );
@@ -98,40 +103,16 @@ public: // Creation
 	Fstring( c_cstring const s );
 
 	// char Constructor
-	inline
 	explicit
-	Fstring( char const c ) :
-		len_( 1 ),
-		str_( new char[ 1 ] ),
-		c_str_( nullptr ),
-		sub_( false )
-	{
-		str_[ 0 ] = c;
-	}
+	Fstring( char const c );
 
 	// signed char Constructor
-	inline
 	explicit
-	Fstring( signed char const c ) :
-		len_( 1 ),
-		str_( new char[ 1 ] ),
-		c_str_( nullptr ),
-		sub_( false )
-	{
-		str_[ 0 ] = static_cast< char >( c );
-	}
+	Fstring( signed char const c );
 
 	// unsigned char Constructor
-	inline
 	explicit
-	Fstring( unsigned char const c ) :
-		len_( 1 ),
-		str_( new char[ 1 ] ),
-		c_str_( nullptr ),
-		sub_( false )
-	{
-		str_[ 0 ] = static_cast< char >( c );
-	}
+	Fstring( unsigned char const c );
 
 	// Length Constructor
 	explicit
@@ -174,8 +155,7 @@ public: // Creation
 	// Length + cstring Constructor
 	Fstring( size_type const len, c_cstring const s );
 
-	// Length + char Constructor
-	// Fills with specified char => Use Fstring( len, "c" ) for space-padded single character
+	// Length + Fill char Constructor
 	Fstring( size_type const len, char const c );
 
 	// Length + Initializer Constructor
@@ -183,7 +163,6 @@ public: // Creation
 
 	// Destructor
 	inline
-	virtual
 	~Fstring()
 	{
 		if ( ! sub_ ) delete[] str_; // Substrings don't own/delete data
@@ -193,10 +172,76 @@ public: // Creation
 protected: // Creation
 
 	// Substring Range Constructor
-	Fstring( Fstring const & s, size_type const l, size_type const u );
+	template< typename L, typename U >
+	inline
+	Fstring( Fstring const & s, L const l, U const u, typename std::enable_if< std::is_integral< L >::value && std::is_integral< U >::value && std::is_unsigned< L >::value && std::is_unsigned< U >::value >::type * = 0 ) :
+		len_( l <= std::min( u, s.len_ ) ? std::min( u, s.len_ ) - l + 1u : static_cast< size_type >( 0 ) ),
+		str_( l <= s.len_ ? s.str_ + l - 1u : s.str_ ),
+		c_str_( nullptr ),
+		sub_( true )
+	{
+		assert( l > 0u );
+	}
+
+	// Substring Range Constructor
+	template< typename L, typename U >
+	inline
+	Fstring( Fstring const & s, L const l, U const u, typename std::enable_if< std::is_integral< L >::value && std::is_integral< U >::value && std::is_signed< L >::value && std::is_signed< U >::value >::type * = 0 ) :
+		len_( static_cast< size_type >( l ) <= std::min( static_cast< size_type >( std::max( u, 0 ) ), s.len_ ) ? std::min( static_cast< size_type >( std::max( u, 0 ) ), s.len_ ) - static_cast< size_type >( l ) + 1u : static_cast< size_type >( 0 ) ),
+		str_( static_cast< size_type >( l ) <= s.len_ ? s.str_ + static_cast< size_type >( l ) - 1u : s.str_ ),
+		c_str_( nullptr ),
+		sub_( true )
+	{
+		assert( l > 0 );
+	}
+
+	// Substring Range Constructor
+	template< typename L, typename U >
+	inline
+	Fstring( Fstring const & s, L const l, U const u, typename std::enable_if< std::is_integral< L >::value && std::is_integral< U >::value && std::is_unsigned< L >::value && std::is_signed< U >::value >::type * = 0 ) :
+		len_( l <= std::min( static_cast< size_type >( std::max( u, 0 ) ), s.len_ ) ? std::min( static_cast< size_type >( std::max( u, 0 ) ), s.len_ ) - l + 1u : static_cast< size_type >( 0 ) ),
+		str_( l <= s.len_ ? s.str_ + l - 1u : s.str_ ),
+		c_str_( nullptr ),
+		sub_( true )
+	{
+		assert( l > 0u );
+	}
+
+	// Substring Range Constructor
+	template< typename L, typename U >
+	inline
+	Fstring( Fstring const & s, L const l, U const u, typename std::enable_if< std::is_integral< L >::value && std::is_integral< U >::value && std::is_signed< L >::value && std::is_unsigned< U >::value >::type * = 0 ) :
+		len_( static_cast< size_type >( l ) <= std::min( u, s.len_ ) ? std::min( u, s.len_ ) - static_cast< size_type >( l ) + 1u : static_cast< size_type >( 0 ) ),
+		str_( static_cast< size_type >( l ) <= s.len_ ? s.str_ + static_cast< size_type >( l ) - 1u : s.str_ ),
+		c_str_( nullptr ),
+		sub_( true )
+	{
+		assert( l > 0 );
+	}
 
 	// Substring Tail Constructor
-	Fstring( Fstring const & s, size_type const l );
+	template< typename L >
+	inline
+	Fstring( Fstring const & s, L const l, typename std::enable_if< std::is_integral< L >::value && std::is_unsigned< L >::value >::type * = 0 ) :
+		len_( l <= s.len_ ? s.len_ - l + 1u : static_cast< size_type >( 0 ) ),
+		str_( l <= s.len_ ? s.str_ + l - 1u : s.str_ ),
+		c_str_( nullptr ),
+		sub_( true )
+	{
+		assert( l > 0u );
+	}
+
+	// Substring Tail Constructor
+	template< typename L >
+	inline
+	Fstring( Fstring const & s, L const l, typename std::enable_if< std::is_integral< L >::value && std::is_signed< L >::value >::type * = 0 ) :
+		len_( static_cast< size_type >( l ) <= s.len_ ? s.len_ - static_cast< size_type >( l ) + 1u : static_cast< size_type >( 0 ) ),
+		str_( static_cast< size_type >( l ) <= s.len_ ? s.str_ + static_cast< size_type >( l ) - 1u : s.str_ ),
+		c_str_( nullptr ),
+		sub_( true )
+	{
+		assert( l > 0 );
+	}
 
 	// From Substring Named Constructor
 	inline
@@ -204,6 +249,7 @@ protected: // Creation
 	Fstring
 	of_substring( Fstring const & s, size_type const l, size_type const u )
 	{
+		assert( l > 0u );
 		size_type const len( l <= std::min( u, s.len_ ) ? std::min( u, s.len_ ) - l + 1u : static_cast< size_type >( 0 ) );
 		Fstring r( len );
 		if ( len > 0u ) std::memcpy( r.str_, s.str_ + l - 1u, len );
@@ -216,6 +262,7 @@ protected: // Creation
 	Fstring
 	of_substring( Fstring const & s, size_type const l )
 	{
+		assert( l > 0u );
 		size_type const len( l <= s.len_ ? s.len_ - l + 1u : static_cast< size_type >( 0 ) );
 		Fstring r( len );
 		if ( len > 0u ) std::memcpy( r.str_, s.str_ + l - 1u, len );
@@ -258,23 +305,59 @@ public: // Reassignment
 public: // Subscript
 
 	// Constant char: s[ i ]
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value >::type >
 	inline
 	char
-	operator []( size_type const i ) const
+	operator []( I const i ) const
 	{
-		assert( i > 0 );
-		assert( i <= len_ );
+		assert( i > static_cast< I const >( 0 ) );
+		assert( static_cast< size_type const >( i ) <= len_ );
 		return str_[ i - 1 ];
 	}
 
 	// char: s[ i ]
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value >::type >
 	inline
 	char &
-	operator []( size_type const i )
+	operator []( I const i )
 	{
-		assert( i > 0 );
-		assert( i <= len_ );
+		assert( i > static_cast< I const >( 0 ) );
+		assert( static_cast< size_type const >( i ) <= len_ );
 		return str_[ i - 1 ];
+	}
+
+public: // Iterator
+
+	// const_iterator to Beginning of Array
+	inline
+	const_iterator
+	begin() const
+	{
+		return str_;
+	}
+
+	// iterator to Beginning of Array
+	inline
+	iterator
+	begin()
+	{
+		return str_;
+	}
+
+	// const_iterator to Element Past End of Array
+	inline
+	const_iterator
+	end() const
+	{
+		return str_ + len_;
+	}
+
+	// iterator to Element Past End of Array
+	inline
+	iterator
+	end()
+	{
+		return str_ + len_;
 	}
 
 public: // Predicate
@@ -355,9 +438,37 @@ public: // Predicate
 	bool
 	has_prefix( Fstring const & s, bool const exact_case = true ) const;
 
+	// Has a Prefix Case-Insensitively?
+	inline
+	bool
+	has_prefixi( Fstring const & s )
+	{
+		return has_prefix( s, false );
+	}
+
+	// Has a Prefix Case-Optionally?
+	bool
+	has_prefix( std::string const & s, bool const exact_case = true ) const;
+
+	// Has a Prefix Case-Insensitively?
+	inline
+	bool
+	has_prefixi( std::string const & s )
+	{
+		return has_prefix( s, false );
+	}
+
 	// Has a Prefix Case-Optionally?
 	bool
 	has_prefix( c_cstring const s, bool const exact_case = true ) const;
+
+	// Has a Prefix Case-Insensitively?
+	inline
+	bool
+	has_prefixi( c_cstring const s )
+	{
+		return has_prefix( s, false );
+	}
 
 	// Fstring is Readable as a Type Supporting Stream Input?
 	template< typename T >
@@ -826,16 +937,40 @@ public: // Modifier
 	}
 
 	// Overlay an Fstring
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value >::type >
+	inline
 	Fstring &
-	overlay( Fstring const & s, size_type const pos = 1 );
+	overlay( Fstring const & s, I const pos = 1u )
+	{
+		assert( pos > static_cast< I const >( 0 ) );
+		size_type const l( pos );
+		(*this)( l, std::min( ( l + s.len_ ) - 1u, len_ ) ) = s;
+		return *this;
+	}
 
 	// Overlay a string
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value >::type >
+	inline
 	Fstring &
-	overlay( std::string const & s, size_type const pos = 1 );
+	overlay( std::string const & s, I const pos = 1u )
+	{
+		assert( pos > static_cast< I const >( 0 ) );
+		size_type const l( pos );
+		(*this)( l, std::min( ( l + s.length() ) - 1u, len_ ) ) = s;
+		return *this;
+	}
 
 	// Overlay a cstring
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value >::type >
+	inline
 	Fstring &
-	overlay( c_cstring const s, size_type const pos = 1 );
+	overlay( c_cstring const s, I const pos = 1u )
+	{
+		assert( pos > static_cast< I const >( 0 ) );
+		size_type const l( pos );
+		(*this)( l, std::min( ( l + std::strlen( s ) ) - 1u, len_ ) ) = s;
+		return *this;
+	}
 
 public: // Generator
 
@@ -892,7 +1027,7 @@ public: // Generator
 	Fstring
 	trimmed() const
 	{
-		return Fstring::of_substring( *this, 1, len_trim() );
+		return Fstring::of_substring( *this, 1u, len_trim() );
 	}
 
 	// Trailing Whitespace Trimmed Copy
@@ -900,7 +1035,7 @@ public: // Generator
 	Fstring
 	trimmed_whitespace() const
 	{
-		return Fstring::of_substring( *this, 1, len_trim_whitespace() );
+		return Fstring::of_substring( *this, 1u, len_trim_whitespace() );
 	}
 
 	// Specified Characters Stripped from Tails Copy
@@ -934,7 +1069,7 @@ public: // Generator
 	Fstring
 	rstripped( std::string const & chars ) const
 	{
-		return Fstring::of_substring( *this, 1, find_last_not_of( chars ) );
+		return Fstring::of_substring( *this, 1u, find_last_not_of( chars ) );
 	}
 
 	// Space Stripped from Tails Copy
@@ -968,7 +1103,7 @@ public: // Generator
 	Fstring
 	rstripped() const
 	{
-		return Fstring::of_substring( *this, 1, find_last_not_of( SPC ) );
+		return Fstring::of_substring( *this, 1u, find_last_not_of( SPC ) );
 	}
 
 	// Whitespace Stripped from Tails Copy
@@ -1002,7 +1137,7 @@ public: // Generator
 	Fstring
 	rstripped_whitespace() const
 	{
-		return Fstring::of_substring( *this, 1, find_last_not_of( " \t\000" ) );
+		return Fstring::of_substring( *this, 1u, find_last_not_of( " \t\000" ) );
 	}
 
 	// Null-Terminated cstring Copy of the Fstring that is Owned by the Fstring
@@ -1149,6 +1284,16 @@ public: // Comparison
 	bool
 	equali( std::string const & s, Fstring const & t );
 
+	// Fstring == cstring Case-Insensitively?
+	friend
+	bool
+	equali( Fstring const & s, c_cstring const t );
+
+	// Fstring == cstring Case-Insensitively?
+	friend
+	bool
+	equali( c_cstring const t, Fstring const & s );
+
 	// Fstring == char Case-Insensitively?
 	friend
 	bool
@@ -1163,6 +1308,26 @@ public: // Comparison
 	friend
 	bool
 	equal( Fstring const & s, Fstring const & t, bool const exact_case );
+
+	// Fstring == string Case-Optionally?
+	friend
+	bool
+	equal( Fstring const & s, std::string const & t, bool const exact_case );
+
+	// string == Fstring Case-Optionally?
+	friend
+	bool
+	equal( std::string const & s, Fstring const & t, bool const exact_case );
+
+	// Fstring == cstring Case-Optionally?
+	friend
+	bool
+	equal( Fstring const & s, c_cstring const t, bool const exact_case );
+
+	// Fstring == cstring Case-Optionally?
+	friend
+	bool
+	equal( c_cstring const t, Fstring const & s, bool const exact_case );
 
 	// Fstring == char Case-Optionally?
 	friend
@@ -1277,62 +1442,132 @@ public: // Comparison
 public: // Substring
 
 	// Constant Substring: s( l, u )
-	Fsubstring const
-	operator ()( size_type const l, size_type const u ) const;
+	template< typename L, typename U, class = typename std::enable_if< std::is_integral< L >::value && std::is_integral< U >::value >::type >
+	inline
+	Fstring const
+	operator ()( L const l, U const u ) const
+	{
+		return Fstring( *this, l, u );
+	}
 
 	// Substring: s( l, u )
-	Fsubstring
-	operator ()( size_type const l, size_type const u );
+	template< typename L, typename U, class = typename std::enable_if< std::is_integral< L >::value && std::is_integral< U >::value >::type >
+	inline
+	Fstring
+	operator ()( L const l, U const u )
+	{
+		return Fstring( *this, l, u );
+	}
 
 	// Constant Substring: s( {l,u} )
-	Fsubstring const
-	operator ()( std::initializer_list< int > const lu ) const;
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value >::type >
+	inline
+	Fstring const
+	operator ()( std::initializer_list< I > const lu ) const
+	{
+		size_type const n( lu.size() );
+		auto i( lu.begin() );
+		switch ( n ) {
+		case 0: // {}
+			return Fstring( *this, 1u );
+			break;
+		case 1: // {l}
+			return Fstring( *this, *i );
+			break;
+		case 2: // {l,u}
+			return Fstring( *this, *i, *(i+1) );
+			break;
+		default:
+			assert( false ); // Illegal
+			return Fstring( *this, 1u );
+			break;
+		}
+	}
 
 	// Substring: s( {l,u} )
-	Fsubstring
-	operator ()( std::initializer_list< int > const lu );
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value >::type >
+	inline
+	Fstring
+	operator ()( std::initializer_list< I > const lu )
+	{
+		size_type const n( lu.size() );
+		auto i( lu.begin() );
+		switch ( n ) {
+		case 0: // {}
+			return Fstring( *this, 1u );
+			break;
+		case 1: // {l}
+			return Fstring( *this, *i );
+			break;
+		case 2: // {l,u}
+			return Fstring( *this, *i, *(i+1) );
+			break;
+		default:
+			assert( false ); // Illegal
+			return Fstring( *this, 1u );
+			break;
+		}
+	}
 
 	// Constant Substring: s( {l,u} )
-	template< typename U >
-	Fsubstring const
-	operator ()( std::initializer_list< U > const lu, typename std::enable_if< std::is_constructible< int, U >::value >::type * = 0 ) const;
-
-	// Substring: s( {l,u} )
-	template< typename U >
-	Fsubstring
-	operator ()( std::initializer_list< U > const lu, typename std::enable_if< std::is_constructible< int, U >::value >::type * = 0 );
-
-	// Constant Substring: s( {l,u} )
-	Fsubstring const
+	Fstring const
 	operator ()( std::initializer_list< Index > const lu ) const;
 
 	// Substring: s( {l,u} )
-	Fsubstring
+	Fstring
 	operator ()( std::initializer_list< Index > const lu );
 
 	// Constant Tail Substring: s( l )
+	template< typename L, class = typename std::enable_if< std::is_integral< L >::value >::type >
+	inline
 	Fstring const
-	operator ()( size_type const l ) const;
+	operator ()( L const l ) const
+	{
+		return Fstring( *this, l );
+	}
 
 	// Tail Substring: s( l )
-	Fsubstring
-	operator ()( size_type const l );
+	template< typename L, class = typename std::enable_if< std::is_integral< L >::value >::type >
+	inline
+	Fstring
+	operator ()( L const l )
+	{
+		return Fstring( *this, l );
+	}
 
 	// Space-Free Head Constant Substring
-	Fsubstring const
-	head() const;
+	inline
+	Fstring const
+	head() const
+	{
+		size_type const ie( find( SPC ) );
+		return ( ie == 0 ? Fstring( *this, 1u, len_ ) : Fstring( *this, 1u, ie - 1u ) );
+	}
 
 	// Space-Free Head Substring
-	Fsubstring
-	head();
-
-	// Space Tail Substring
-	Fsubstring
-	tail();
+	inline
+	Fstring
+	head()
+	{
+		size_type const ie( find( SPC ) );
+		return ( ie == 0 ? Fstring( *this, 1u, len_ ) : Fstring( *this, 1u, ie - 1u ) );
+	}
 
 	// Space Tail Constant Substring
-	Fsubstring const
-	tail() const;
+	inline
+	Fstring const
+	tail() const
+	{
+		return Fstring( *this, len_trim() + 1u );
+	}
+
+	// Space Tail Substring
+	inline
+	Fstring
+	tail()
+	{
+		return Fstring( *this, len_trim() + 1u );
+	}
 
 public: // I/O
 
@@ -1416,137 +1651,6 @@ private: // Data
 		return std::string( str_, len_ );
 	}
 
-// Fsubstring: Fixed-Length Fortran-Compatible Substring
-//
-// Note:
-//  Subscripts run from 1 to the length
-//  Space-padding is used in comparisons and assignments
-//  Internal string rep is not null-terminated
-//  Zero-length Fsubstrings are supported but cannot be indexed into (no valid indices)
-//  Fsubstring not for explicit use in client code: Client code uses Fstring::operator () to get substrings
-//  Pass s( i, j ).ref() to a non-const Fstring& argument
-//  Don't return a substring of a local as an Fsubstring since its copy ctor uses ref semantics: Return as an Fstring to get a copy
-class Fsubstring : public Fstring
-{
-
-private: // Types
-
-	typedef  Fstring  Super;
-
-	friend class Fstring;
-
-public: // Creation
-
-	// Copy Constructor
-	inline
-	Fsubstring( Fsubstring const & s ) :
-		Fstring( s, 1, s.len_ )
-	{}
-
-	// Destructor
-	inline
-	virtual
-	~Fsubstring()
-	{}
-
-private: // Creation
-
-	// Fstring Range Constructor
-	inline
-	Fsubstring( Fstring const & s, size_type const i, size_type const j ) :
-		Fstring( s, i, j )
-	{}
-
-	// Fstring Tail Constructor
-	inline
-	Fsubstring( Fstring const & s, size_type const i ) :
-		Fstring( s, i )
-	{}
-
-public: // Assignment
-
-	// Copy Assignment
-	Fsubstring &
-	operator =( Fsubstring const & s );
-
-	// = Fstring
-	Fsubstring &
-	operator =( Fstring const & s );
-
-	// = string
-	Fsubstring &
-	operator =( std::string const & s );
-
-	// = cstring
-	Fsubstring &
-	operator =( c_cstring const s );
-
-	// = char
-	Fsubstring &
-	operator =( char const c );
-
-public: // Modifier
-
-	// Reference to Fstring: Can Pass s( i, j ).ref() to an Fstring& Argument
-	inline
-	Fstring &
-	ref()
-	{
-		return *this;
-	}
-
-}; // Fsubstring
-
-// Fstring Member Function Definitions
-
-	// Constant Substring: s( {l,u} )
-	template< typename U >
-	Fsubstring const
-	Fstring::operator ()( std::initializer_list< U > const lu, typename std::enable_if< std::is_constructible< int, U >::value >::type * ) const
-	{
-		size_type const n( lu.size() );
-		auto i( lu.begin() );
-		switch ( n ) {
-		case 0: // {}
-			return Fsubstring( *this, 1 );
-			break;
-		case 1: // {l}
-			return Fsubstring( *this, *i );
-			break;
-		case 2: // {l,u}
-			return Fsubstring( *this, *i, *(i+1) );
-			break;
-		default:
-			assert( false ); // Illegal
-			return Fsubstring( *this, 1 );
-			break;
-		}
-	}
-
-	// Substring: s( {l,u} )
-	template< typename U >
-	Fsubstring
-	Fstring::operator ()( std::initializer_list< U > const lu, typename std::enable_if< std::is_constructible< int, U >::value >::type * )
-	{
-		size_type const n( lu.size() );
-		auto i( lu.begin() );
-		switch ( n ) {
-		case 0: // {}
-			return Fsubstring( *this, 1 );
-			break;
-		case 1: // {l}
-			return Fsubstring( *this, *i );
-			break;
-		case 2: // {l,u}
-			return Fsubstring( *this, *i, *(i+1) );
-			break;
-		default:
-			assert( false ); // Illegal
-			return Fsubstring( *this, 1 );
-			break;
-		}
-	}
-
 // Fstring Friends
 
 // Fstring + Fstring
@@ -1605,7 +1709,7 @@ inline
 Fstring
 operator +( Fstring const & s, char const c )
 {
-	Fstring u( s.len_ + 1 );
+	Fstring u( s.len_ + 1u );
 	std::memcpy( u.str_, s.str_, s.len_ );
 	u.str_[ s.len_ ] = c;
 	return u;
@@ -1616,7 +1720,7 @@ inline
 Fstring
 operator +( char const c, Fstring const & s )
 {
-	Fstring u( 1 + s.len_ );
+	Fstring u( 1u + s.len_ );
 	u.str_[ 0 ] = c;
 	std::memcpy( u.str_ + 1, s.str_, s.len_ );
 	return u;
@@ -1719,43 +1823,43 @@ operator !=( char const c, Fstring const & s )
 }
 
 // Fstring == Fstring Case-Insensitively?
-inline
 bool
-equali( Fstring const & s, Fstring const & t )
-{
-	return ( s.lowercased() == t.lowercased() );
-}
+equali( Fstring const & s, Fstring const & t );
 
 // Fstring == string Case-Insensitively?
-inline
 bool
-equali( Fstring const & s, std::string const & t )
-{
-	return ( s.lowercased() == ObjexxFCL::lowercased( t ) );
-}
+equali( Fstring const & s, std::string const & t );
 
 // string == Fstring Case-Insensitively?
 inline
 bool
 equali( std::string const & s, Fstring const & t )
 {
-	return ( ObjexxFCL::lowercased( s ) == t.lowercased() );
+	return equali( t, s );
+}
+
+// Fstring == cstring Case-Insensitively?
+bool
+equali( Fstring const & s, c_cstring const t );
+
+// Fstring == cstring Case-Insensitively?
+inline
+bool
+equali( c_cstring const t, Fstring const & s )
+{
+	return equali( s, t );
 }
 
 // Fstring == char Case-Insensitively?
-inline
 bool
-equali( Fstring const & s, char const c )
-{
-	return ( s.lowercased() == char( std::tolower( c ) ) );
-}
+equali( Fstring const & s, char const c );
 
 // char == Fstring Case-Insensitively?
 inline
 bool
 equali( char const c, Fstring const & s )
 {
-	return ( s.lowercased() == char( std::tolower( c ) ) );
+	return equali( s, c );
 }
 
 // Fstring == Fstring Case-Optionally?
@@ -1763,11 +1867,39 @@ inline
 bool
 equal( Fstring const & s, Fstring const & t, bool const exact_case = true )
 {
-	if ( exact_case ) {
-		return ( s == t );
-	} else {
-		return ( s.lowercased() == t.lowercased() );
-	}
+	return ( exact_case ? s == t : equali( s, t ) );
+}
+
+// Fstring == string Case-Optionally?
+inline
+bool
+equal( Fstring const & s, std::string const & t, bool const exact_case )
+{
+	return ( exact_case ? s == t : equali( s, t ) );
+}
+
+// string == Fstring Case-Optionally?
+inline
+bool
+equal( std::string const & s, Fstring const & t, bool const exact_case )
+{
+	return ( exact_case ? s == t : equali( s, t ) );
+}
+
+// Fstring == cstring Case-Optionally?
+inline
+bool
+equal( Fstring const & s, c_cstring const t, bool const exact_case )
+{
+	return ( exact_case ? s == t : equali( s, t ) );
+}
+
+// Fstring == cstring Case-Optionally?
+inline
+bool
+equal( c_cstring const t, Fstring const & s, bool const exact_case )
+{
+	return ( exact_case ? s == t : equali( s, t ) );
 }
 
 // Fstring == char Case-Optionally?
@@ -1775,11 +1907,7 @@ inline
 bool
 equal( Fstring const & s, char const c, bool const exact_case = true )
 {
-	if ( exact_case ) {
-		return ( s == c );
-	} else {
-		return ( s.lowercased() == char( std::tolower( c ) ) );
-	}
+	return ( exact_case ? s == c : equali( s, c ) );
 }
 
 // char == Fstring Case-Optionally?
@@ -1787,11 +1915,7 @@ inline
 bool
 equal( char const c, Fstring const & s, bool const exact_case = true )
 {
-	if ( exact_case ) {
-		return ( s == c );
-	} else {
-		return ( s.lowercased() == char( std::tolower( c ) ) );
-	}
+	return ( exact_case ? s == c : equali( s, c ) );
 }
 
 // Fstring <= Fstring
@@ -2019,193 +2143,270 @@ IACHAR( Fstring const & s )
 // First Index Position of a Substring in an Fstring
 inline
 int
-index( Fstring const & s, Fstring const & ss, bool const back = false )
+index( Fstring const & s, Fstring const & ss, bool const last = false )
 {
-	return ( back ? s.find_last( ss ) : s.find( ss ) );
+	return ( last ? s.find_last( ss ) : s.find( ss ) );
 }
 
 // First Index Position of a Substring in an Fstring
 inline
 int
-index( Fstring const & s, std::string const & ss, bool const back = false )
+index( Fstring const & s, std::string const & ss, bool const last = false )
 {
-	return ( back ? s.find_last( ss ) : s.find( ss ) );
+	return ( last ? s.find_last( ss ) : s.find( ss ) );
 }
 
 // First Index Position of a Substring in an Fstring
 inline
 int
-index( Fstring const & s, c_cstring const ss, bool const back = false )
+index( Fstring const & s, c_cstring const ss, bool const last = false )
 {
-	return ( back ? s.find_last( ss ) : s.find( ss ) );
+	return ( last ? s.find_last( ss ) : s.find( ss ) );
 }
 
 // First Index Position of a Character in an Fstring
 inline
 int
-index( Fstring const & s, char const c, bool const back = false )
+index( Fstring const & s, char const c, bool const last = false )
 {
-	return ( back ? s.find_last( c ) : s.find( c ) );
+	return ( last ? s.find_last( c ) : s.find( c ) );
+}
+
+// Last Index of a Substring
+template< typename T >
+inline
+int
+rindex( Fstring const & s, T const & t )
+{
+	return index( s, t, true );
 }
 
 // First Index Position of a Substring in an Fstring
 inline
 int
-INDEX( Fstring const & s, Fstring const & ss, bool const back = false )
+INDEX( Fstring const & s, Fstring const & ss, bool const last = false )
 {
-	return ( back ? s.find_last( ss ) : s.find( ss ) );
+	return ( last ? s.find_last( ss ) : s.find( ss ) );
 }
 
 // First Index Position of a Substring in an Fstring
 inline
 int
-INDEX( Fstring const & s, std::string const & ss, bool const back = false )
+INDEX( Fstring const & s, std::string const & ss, bool const last = false )
 {
-	return ( back ? s.find_last( ss ) : s.find( ss ) );
+	return ( last ? s.find_last( ss ) : s.find( ss ) );
 }
 
 // First Index Position of a Substring in an Fstring
 inline
 int
-INDEX( Fstring const & s, c_cstring const ss, bool const back = false )
+INDEX( Fstring const & s, c_cstring const ss, bool const last = false )
 {
-	return ( back ? s.find_last( ss ) : s.find( ss ) );
+	return ( last ? s.find_last( ss ) : s.find( ss ) );
 }
 
 // First Index Position of a Character in an Fstring
 inline
 int
-INDEX( Fstring const & s, char const c, bool const back = false )
+INDEX( Fstring const & s, char const c, bool const last = false )
 {
-	return ( back ? s.find_last( c ) : s.find( c ) );
+	return ( last ? s.find_last( c ) : s.find( c ) );
+}
+
+// Index of a Substring in an Fstring Case-Insensitively
+inline
+int
+indexi( Fstring const & s, Fstring const & t, bool const last = false )
+{
+	if ( last ) {
+		auto const i( std::find_end( s.begin(), s.end(), t.begin(), t.end(), equali_char ) );
+		return ( i == s.end() ? 0 : static_cast< int >( i - s.begin() + 1 ) );
+	} else {
+		auto const i( std::search( s.begin(), s.end(), t.begin(), t.end(), equali_char ) );
+		return ( i == s.end() ? 0 : static_cast< int >( i - s.begin() + 1 ) );
+	}
+}
+
+// Index of a Substring in an Fstring Case-Insensitively
+inline
+int
+indexi( Fstring const & s, std::string const & t, bool const last = false )
+{
+	if ( last ) {
+		auto const i( std::find_end( s.begin(), s.end(), t.begin(), t.end(), equali_char ) );
+		return ( i == s.end() ? 0 : static_cast< int >( i - s.begin() + 1 ) );
+	} else {
+		auto const i( std::search( s.begin(), s.end(), t.begin(), t.end(), equali_char ) );
+		return ( i == s.end() ? 0 : static_cast< int >( i - s.begin() + 1 ) );
+	}
+}
+
+// Index of a Substring in an Fstring Case-Insensitively
+inline
+int
+indexi( Fstring const & s, c_cstring const t, bool const last = false )
+{
+	if ( last ) {
+		auto const i( std::find_end( s.begin(), s.end(), t, t + std::strlen( t ), equali_char ) );
+		return ( i == s.end() ? 0 : static_cast< int >( i - s.begin() + 1 ) );
+	} else {
+		auto const i( std::search( s.begin(), s.end(), t, t + std::strlen( t ), equali_char ) );
+		return ( i == s.end() ? 0 : static_cast< int >( i - s.begin() + 1 ) );
+	}
+}
+
+// Index of a Character in an Fstring Case-Insensitively
+inline
+int
+indexi( Fstring const & s, char const c, bool const last = false )
+{
+	if ( last ) {
+		for ( int i = s.length(), e = 1; i >= e; --i ) {
+			if ( equali_char( s[ i ], c ) ) return i;
+		}
+	} else {
+		for ( int i = 1, e = s.length(); i <= e; ++i ) {
+			if ( equali_char( s[ i ], c ) ) return i;
+		}
+	}
+	return 0; // Not found
+}
+
+// Last Index of a Substring Case-Insensitively
+template< typename T >
+inline
+int
+rindexi( Fstring const & s, T const & t )
+{
+	return indexi( s, t, true );
 }
 
 // Find any Characters of Another String
 inline
 int
-scan( Fstring const & s, Fstring const & t, bool const back = false )
+scan( Fstring const & s, Fstring const & t, bool const last = false )
 {
-	return ( back ? s.find_last_of( t ) : s.find_first_of( t ) );
+	return ( last ? s.find_last_of( t ) : s.find_first_of( t ) );
 }
 
 // Find any Characters of Another String
 inline
 int
-scan( Fstring const & s, std::string const & t, bool const back = false )
+scan( Fstring const & s, std::string const & t, bool const last = false )
 {
-	return ( back ? s.find_last_of( t ) : s.find_first_of( t ) );
+	return ( last ? s.find_last_of( t ) : s.find_first_of( t ) );
 }
 
 // Find any Characters of Another String
 inline
 int
-scan( Fstring const & s, c_cstring const t, bool const back = false )
+scan( Fstring const & s, c_cstring const t, bool const last = false )
 {
-	return ( back ? s.find_last_of( t ) : s.find_first_of( t ) );
+	return ( last ? s.find_last_of( t ) : s.find_first_of( t ) );
 }
 
 // Find a Character
 inline
 int
-scan( Fstring const & s, char const c, bool const back = false )
+scan( Fstring const & s, char const c, bool const last = false )
 {
-	return ( back ? s.find_last_of( c ) : s.find_first_of( c ) );
+	return ( last ? s.find_last_of( c ) : s.find_first_of( c ) );
 }
 
 // Find any Characters of Another String
 inline
 int
-SCAN( Fstring const & s, Fstring const & t, bool const back = false )
+SCAN( Fstring const & s, Fstring const & t, bool const last = false )
 {
-	return ( back ? s.find_last_of( t ) : s.find_first_of( t ) );
+	return ( last ? s.find_last_of( t ) : s.find_first_of( t ) );
 }
 
 // Find any Characters of Another String
 inline
 int
-SCAN( Fstring const & s, std::string const & t, bool const back = false )
+SCAN( Fstring const & s, std::string const & t, bool const last = false )
 {
-	return ( back ? s.find_last_of( t ) : s.find_first_of( t ) );
+	return ( last ? s.find_last_of( t ) : s.find_first_of( t ) );
 }
 
 // Find any Characters of Another String
 inline
 int
-SCAN( Fstring const & s, c_cstring const t, bool const back = false )
+SCAN( Fstring const & s, c_cstring const t, bool const last = false )
 {
-	return ( back ? s.find_last_of( t ) : s.find_first_of( t ) );
+	return ( last ? s.find_last_of( t ) : s.find_first_of( t ) );
 }
 
 // Find a Character
 inline
 int
-SCAN( Fstring const & s, char const c, bool const back = false )
+SCAN( Fstring const & s, char const c, bool const last = false )
 {
-	return ( back ? s.find_last_of( c ) : s.find_first_of( c ) );
+	return ( last ? s.find_last_of( c ) : s.find_first_of( c ) );
 }
 
 // Find any Characters not of Another String
 inline
 int
-verify( Fstring const & s, Fstring const & t, bool const back = false )
+verify( Fstring const & s, Fstring const & t, bool const last = false )
 {
-	return ( back ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
+	return ( last ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
 }
 
 // Find any Characters not of Another String
 inline
 int
-verify( Fstring const & s, std::string const & t, bool const back = false )
+verify( Fstring const & s, std::string const & t, bool const last = false )
 {
-	return ( back ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
+	return ( last ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
 }
 
 // Find any Characters not of Another String
 inline
 int
-verify( Fstring const & s, c_cstring const t, bool const back = false )
+verify( Fstring const & s, c_cstring const t, bool const last = false )
 {
-	return ( back ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
+	return ( last ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
 }
 
 // Find Character not a Character
 inline
 int
-verify( Fstring const & s, char const c, bool const back = false )
+verify( Fstring const & s, char const c, bool const last = false )
 {
-	return ( back ? s.find_last_not_of( c ) : s.find_first_not_of( c ) );
+	return ( last ? s.find_last_not_of( c ) : s.find_first_not_of( c ) );
 }
 
 // Find any Characters not of Another String
 inline
 int
-VERIFY( Fstring const & s, Fstring const & t, bool const back = false )
+VERIFY( Fstring const & s, Fstring const & t, bool const last = false )
 {
-	return ( back ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
+	return ( last ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
 }
 
 // Find any Characters not of Another String
 inline
 int
-VERIFY( Fstring const & s, std::string const & t, bool const back = false )
+VERIFY( Fstring const & s, std::string const & t, bool const last = false )
 {
-	return ( back ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
+	return ( last ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
 }
 
 // Find any Characters not of Another String
 inline
 int
-VERIFY( Fstring const & s, c_cstring const t, bool const back = false )
+VERIFY( Fstring const & s, c_cstring const t, bool const last = false )
 {
-	return ( back ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
+	return ( last ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
 }
 
 // Find Character not a Character
 inline
 int
-VERIFY( Fstring const & s, char const c, bool const back = false )
+VERIFY( Fstring const & s, char const c, bool const last = false )
 {
-	return ( back ? s.find_last_not_of( c ) : s.find_first_not_of( c ) );
+	return ( last ? s.find_last_not_of( c ) : s.find_first_not_of( c ) );
 }
 
 // Length

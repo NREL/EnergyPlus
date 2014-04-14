@@ -16,7 +16,7 @@
 namespace ObjexxFCL {
 
 // Forward Declarations
-template< typename, typename, int > class MArrayR;
+template< class, typename, int > class MArrayR;
 
 } // ObjexxFCL
 

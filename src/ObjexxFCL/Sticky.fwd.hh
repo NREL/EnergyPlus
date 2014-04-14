@@ -23,11 +23,11 @@ namespace ObjexxFCL {
 // Forward Declarations
 template< typename > class Sticky;
 class byte;
-typedef  byte  sbyte;
 class ubyte;
 class Fstring;
 
 // Types
+typedef  byte  sbyte;
 typedef  Sticky< bool >                Sticky_bool;
 typedef  Sticky< byte >                Sticky_byte;
 typedef  Sticky< sbyte >               Sticky_sbyte;

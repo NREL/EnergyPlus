@@ -14,7 +14,6 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/MArrayR.fwd.hh>
 #include <ObjexxFCL/MArray.hh>
 
 namespace ObjexxFCL {

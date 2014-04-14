@@ -13,15 +13,18 @@
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Dimension.fwd.hh>
-#include <ObjexxFCL/Observer.fwd.hh>
-
 // C++ Headers
 #include <cassert>
 #include <iosfwd>
 
 namespace ObjexxFCL {
+
+// Forward Declarations
+class Dimension;
+class Observer;
+
+// Types
+typedef  Observer  Subject;
 
 // DimensionExpression: DimensionExpression Interface Class
 class DimensionExpression

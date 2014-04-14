@@ -14,11 +14,11 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Read.fwd.hh>
 #include <ObjexxFCL/Format.hh>
 #include <ObjexxFCL/FArray.all.hh>
 #include <ObjexxFCL/FArrayS.all.hh>
 #include <ObjexxFCL/Fstring.hh>
+#include <ObjexxFCL/gio_Fmt.hh>
 #include <ObjexxFCL/IOFlags.hh>
 #include <ObjexxFCL/MArray.all.hh>
 
@@ -729,13 +729,29 @@ class ReadStream : public ReadBase
 
 public: // Creation
 
-	// Constructor
+	// Format String Constructor
 	inline
-	ReadStream( std::istream & stream, std::string const & format_string, IOFlags & flags ) :
+	ReadStream( std::istream & stream, std::string const & fmt, IOFlags & flags ) :
 		stream_( stream ),
 		poa_( stream.tellg() ),
 		por_( 0 ),
-		format_( FormatFactory::create( format_string ) ),
+		format_( FormatFactory::create( fmt ) ),
+		flags_( flags )
+	{
+		flags_.clear_status();
+		if ( format_ ) {
+			format_->blank_zero() = flags_.blank_zero();
+			format_->non_advancing() = flags_.non_advancing(); // Allowed with list-directed format but Fortran doesn't
+		}
+	}
+
+	// Format Wrapper Constructor
+	inline
+	ReadStream( std::istream & stream, gio::Fmt const & fmt, IOFlags & flags ) :
+		stream_( stream ),
+		poa_( stream.tellg() ),
+		por_( 0 ),
+		format_( fmt.format_clone() ),
 		flags_( flags )
 	{
 		flags_.clear_status();
@@ -867,12 +883,26 @@ class ReadString : public ReadBase
 
 public: // Creation
 
-	// Constructor
+	// Format String Constructor
 	inline
-	ReadString( std::string const & str, std::string const & format_string, IOFlags & flags ) :
+	ReadString( std::string const & str, std::string const & fmt, IOFlags & flags ) :
 		stream_( str ),
 		pos_( 0 ),
-		format_( FormatFactory::create( format_string ) ),
+		format_( FormatFactory::create( fmt ) ),
+		flags_( flags )
+	{
+		flags_.clear_status();
+		if ( format_ ) {
+			format_->blank_zero() = flags_.blank_zero();
+		}
+	}
+
+	// Format Wrapper Constructor
+	inline
+	ReadString( std::string const & str, gio::Fmt const & fmt, IOFlags & flags ) :
+		stream_( str ),
+		pos_( 0 ),
+		format_( fmt.format_clone() ),
 		flags_( flags )
 	{
 		flags_.clear_status();
@@ -985,12 +1015,26 @@ class ReadFstring : public ReadBase
 
 public: // Creation
 
-	// Constructor
+	// Format String Constructor
 	inline
-	ReadFstring( Fstring const & str, std::string const & format_string, IOFlags & flags ) :
+	ReadFstring( Fstring const & str, std::string const & fmt, IOFlags & flags ) :
 		stream_( str ),
 		pos_( 0 ),
-		format_( FormatFactory::create( format_string ) ),
+		format_( FormatFactory::create( fmt ) ),
+		flags_( flags )
+	{
+		flags_.clear_status();
+		if ( format_ ) {
+			format_->blank_zero() = flags_.blank_zero();
+		}
+	}
+
+	// Format Wrapper Constructor
+	inline
+	ReadFstring( Fstring const & str, gio::Fmt const & fmt, IOFlags & flags ) :
+		stream_( str ),
+		pos_( 0 ),
+		format_( fmt.format_clone() ),
 		flags_( flags )
 	{
 		flags_.clear_status();
@@ -1128,68 +1172,134 @@ public: // Creation
 
 	// Stream + Format Constructor
 	inline
-	Read( std::istream & stream, std::string const & format_string ) :
+	Read( std::istream & stream, std::string const & fmt ) :
 		flags_( IOFlags::handler() ),
-		read_( stream.rdbuf() == std::cin.rdbuf() ? nullptr : new ReadStream( stream, format_string, flags_ ) )
+		read_( stream.rdbuf() == std::cin.rdbuf() ? nullptr : new ReadStream( stream, fmt, flags_ ) )
 	{
 		if ( stream.rdbuf() == std::cin.rdbuf() ) { // Do the stdin read
 			std::string s;
 			std::getline( stream, s );
-			read_ = new ReadString( s, format_string, flags_ );
+			read_ = new ReadString( s, fmt, flags_ );
+			flags_.set_status( stream );
+		}
+	}
+
+	// Stream + Format Constructor
+	inline
+	Read( std::istream & stream, gio::Fmt const & fmt ) :
+		flags_( IOFlags::handler() ),
+		read_( stream.rdbuf() == std::cin.rdbuf() ? nullptr : new ReadStream( stream, fmt, flags_ ) )
+	{
+		if ( stream.rdbuf() == std::cin.rdbuf() ) { // Do the stdin read
+			std::string s;
+			std::getline( stream, s );
+			read_ = new ReadString( s, fmt, flags_ );
 			flags_.set_status( stream );
 		}
 	}
 
 	// Stream + Format + Flags Constructor
 	inline
-	Read( std::istream & stream, std::string const & format_string, IOFlags & flags ) :
-		read_( stream.rdbuf() == std::cin.rdbuf() ? nullptr : new ReadStream( stream, format_string, flags ) )
+	Read( std::istream & stream, std::string const & fmt, IOFlags & flags ) :
+		read_( stream.rdbuf() == std::cin.rdbuf() ? nullptr : new ReadStream( stream, fmt, flags ) )
 	{
 		if ( stream.rdbuf() == std::cin.rdbuf() ) { // Do the stdin read
 			std::string s;
 			std::getline( stream, s );
-			read_ = new ReadString( s, format_string, flags );
+			read_ = new ReadString( s, fmt, flags );
+			flags.set_status( stream );
+		}
+	}
+
+	// Stream + Format + Flags Constructor
+	inline
+	Read( std::istream & stream, gio::Fmt const & fmt, IOFlags & flags ) :
+		read_( stream.rdbuf() == std::cin.rdbuf() ? nullptr : new ReadStream( stream, fmt, flags ) )
+	{
+		if ( stream.rdbuf() == std::cin.rdbuf() ) { // Do the stdin read
+			std::string s;
+			std::getline( stream, s );
+			read_ = new ReadString( s, fmt, flags );
 			flags.set_status( stream );
 		}
 	}
 
 	// String + Format Constructor
 	inline
-	Read( std::string const & str, std::string const & format_string ) :
+	Read( std::string const & str, std::string const & fmt ) :
 		flags_( IOFlags::handler() ),
-		read_( new ReadString( str, format_string, flags_ ) )
+		read_( new ReadString( str, fmt, flags_ ) )
+	{}
+
+	// String + Format Constructor
+	inline
+	Read( std::string const & str, gio::Fmt const & fmt ) :
+		flags_( IOFlags::handler() ),
+		read_( new ReadString( str, fmt, flags_ ) )
 	{}
 
 	// String + Format + Flags Constructor
 	inline
-	Read( std::string const & str, std::string const & format_string, IOFlags & flags ) :
-		read_( new ReadString( str, format_string, flags ) )
+	Read( std::string const & str, std::string const & fmt, IOFlags & flags ) :
+		read_( new ReadString( str, fmt, flags ) )
+	{}
+
+	// String + Format + Flags Constructor
+	inline
+	Read( std::string const & str, gio::Fmt const & fmt, IOFlags & flags ) :
+		read_( new ReadString( str, fmt, flags ) )
 	{}
 
 	// Fstring + Format Constructor
 	inline
-	Read( Fstring const & str, std::string const & format_string ) :
+	Read( Fstring const & str, std::string const & fmt ) :
 		flags_( IOFlags::handler() ),
-		read_( new ReadFstring( str, format_string, flags_ ) )
+		read_( new ReadFstring( str, fmt, flags_ ) )
+	{}
+
+	// Fstring + Format Constructor
+	inline
+	Read( Fstring const & str, gio::Fmt const & fmt ) :
+		flags_( IOFlags::handler() ),
+		read_( new ReadFstring( str, fmt, flags_ ) )
 	{}
 
 	// Fstring + Format + Flags Constructor
 	inline
-	Read( Fstring const & str, std::string const & format_string, IOFlags & flags ) :
-		read_( new ReadFstring( str, format_string, flags ) )
+	Read( Fstring const & str, std::string const & fmt, IOFlags & flags ) :
+		read_( new ReadFstring( str, fmt, flags ) )
+	{}
+
+	// Fstring + Format + Flags Constructor
+	inline
+	Read( Fstring const & str, gio::Fmt const & fmt, IOFlags & flags ) :
+		read_( new ReadFstring( str, fmt, flags ) )
 	{}
 
 	// C-String + Format Constructor
 	inline
-	Read( char const * str, std::string const & format_string ) :
+	Read( char const * str, std::string const & fmt ) :
 		flags_( IOFlags::handler() ),
-		read_( new ReadString( std::string( str ), format_string, flags_ ) )
+		read_( new ReadString( std::string( str ), fmt, flags_ ) )
+	{}
+
+	// C-String + Format Constructor
+	inline
+	Read( char const * str, gio::Fmt const & fmt ) :
+		flags_( IOFlags::handler() ),
+		read_( new ReadString( std::string( str ), fmt, flags_ ) )
 	{}
 
 	// C-String + Format + Flags Constructor
 	inline
-	Read( char const * str, std::string const & format_string, IOFlags & flags ) :
-		read_( new ReadString( std::string( str ), format_string, flags ) )
+	Read( char const * str, std::string const & fmt, IOFlags & flags ) :
+		read_( new ReadString( std::string( str ), fmt, flags ) )
+	{}
+
+	// C-String + Format + Flags Constructor
+	inline
+	Read( char const * str, gio::Fmt const & fmt, IOFlags & flags ) :
+		read_( new ReadString( std::string( str ), fmt, flags ) )
 	{}
 
 	// Destructor

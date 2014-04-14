@@ -14,7 +14,6 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Index.fwd.hh>
 #include <ObjexxFCL/Omit.hh>
 
 // C++ Headers

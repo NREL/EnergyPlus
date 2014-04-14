@@ -721,7 +721,7 @@ public: // Assignment
 	{
 		proxy_const_assert( not_const_proxy() );
 		assert( size_bounded() );
-		std::fill_n( data_, size_, t );
+		if ( data_ ) std::fill_n( data_, size_, t );
 		return *this;
 	}
 
@@ -1084,7 +1084,7 @@ public: // Modifier
 	to_default()
 	{
 		proxy_const_assert( not_const_proxy() );
-		std::fill_n( data_, size_, Traits::initial_array_value() );
+		if ( data_ ) std::fill_n( data_, size_, Traits::initial_array_value() );
 		return *this;
 	}
 
@@ -1095,7 +1095,7 @@ public: // Modifier
 	zero()
 	{
 		proxy_const_assert( not_const_proxy() );
-		std::fill_n( data_, size_, T( 0 ) );
+		if ( data_ ) std::fill_n( data_, size_, T( 0 ) );
 	}
 
 	// Assign Zero to all Elements
@@ -1105,7 +1105,7 @@ public: // Modifier
 	to_zero()
 	{
 		proxy_const_assert( not_const_proxy() );
-		std::fill_n( data_, size_, T( 0 ) );
+		if ( data_ ) std::fill_n( data_, size_, T( 0 ) );
 	}
 
 	// Invert (Elemental)
@@ -1126,7 +1126,7 @@ public: // Modifier
 	void
 	data_copy_from( U const * source, size_type const size )
 	{
-		std::memcpy( data_, source, std::min( size, size_ ) );
+		if ( data_ ) std::memcpy( data_, source, std::min( size, size_ ) );
 	}
 
 public: // Comparison: Predicate

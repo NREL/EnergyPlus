@@ -14,7 +14,9 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/sbyte.fwd.hh>
-#include <ObjexxFCL/byte.hh> // sbyte is a typedef for byte
+#include <ObjexxFCL/byte.hh>
+
+// Types
+typedef  byte  sbyte; // Alternative name making it clearer that it is a signed byte type
 
 #endif // ObjexxFCL_sbyte_hh_INCLUDED

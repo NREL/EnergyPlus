@@ -14,7 +14,6 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/IndexSlice.fwd.hh>
 #include <ObjexxFCL/Index.hh>
 
 // C++ Headers
@@ -643,6 +642,9 @@ private: // Data
 	size_type size_; // Size (0 if unknown)
 
 }; // IndexSlice
+
+// Types
+typedef  IndexSlice  ISlice;
 
 // IndexSlice == IndexSlice
 bool

@@ -23,11 +23,11 @@ namespace ObjexxFCL {
 // Forward Declarations
 template< typename > class Reference;
 class byte;
-typedef  byte  sbyte;
 class ubyte;
 class Fstring;
 
 // Types
+typedef  byte  sbyte;
 typedef  Reference< bool >                Reference_bool;
 typedef  Reference< byte >                Reference_byte;
 typedef  Reference< sbyte >               Reference_sbyte;

@@ -16,8 +16,7 @@
 namespace ObjexxFCL {
 
 // Forward Declarations
-template< typename, typename > class MArray6;
-class Fstring; // For project-specific member arrays
+template< class, typename > class MArray6;
 
 } // ObjexxFCL
 

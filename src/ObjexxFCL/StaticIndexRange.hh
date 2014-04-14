@@ -14,7 +14,6 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/StaticIndexRange.fwd.hh>
 #include <ObjexxFCL/IndexRange.hh>
 #include <ObjexxFCL/Dimension.hh>
 
@@ -666,6 +665,9 @@ public: // Modifier
 	}
 
 }; // StaticIndexRange
+
+// Types
+typedef  StaticIndexRange  SRange;
 
 // Functions
 

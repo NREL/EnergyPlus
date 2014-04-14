@@ -17,6 +17,7 @@
 #include <ObjexxFCL/Format.hh>
 #include <ObjexxFCL/FArray.all.hh>
 #include <ObjexxFCL/FArrayS.all.hh>
+#include <ObjexxFCL/gio_Fmt.hh>
 #include <ObjexxFCL/MArray.all.hh>
 
 // C++ Headers
@@ -35,12 +36,21 @@ class Print
 
 public: // Creation
 
-	// Constructor
+	// Format String Constructor
 	inline
 	explicit
-	Print( std::string const & format_string = "*" ) :
+	Print( std::string const & fmt = "*" ) :
 		pos_( 0 ),
-		format_( FormatFactory::create( format_string ) ),
+		format_( FormatFactory::create( fmt ) ),
+		reverts_( 0 )
+	{}
+
+	// Format Wrapper Constructor
+	inline
+	explicit
+	Print( gio::Fmt const & fmt ) :
+		pos_( 0 ),
+		format_( fmt.format_clone() ),
 		reverts_( 0 )
 	{}
 

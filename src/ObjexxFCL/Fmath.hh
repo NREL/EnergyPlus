@@ -26,7 +26,7 @@
 
 namespace ObjexxFCL {
 
-typedef  std::ptrdiff_t  SSize;
+typedef  std::intmax_t  SSize;
 
 // min Functions
 

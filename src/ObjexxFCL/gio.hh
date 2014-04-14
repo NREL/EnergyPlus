@@ -17,8 +17,7 @@
 //  String read/write are non-global convenience functions
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/IOFlags.fwd.hh>
-#include <ObjexxFCL/Fstring.fwd.hh>
+#include <ObjexxFCL/gio_Fmt.hh> // Convenience include
 #include <ObjexxFCL/Print.hh>
 #include <ObjexxFCL/Read.hh>
 #include <ObjexxFCL/Write.hh>
@@ -28,12 +27,16 @@
 #include <string>
 
 namespace ObjexxFCL {
+
+// Forward Declarations
+class Fstring;
+class IOFlags;
+
 namespace gio {
 
 // Types
 typedef  int  Unit;
 typedef  std::string  Name;
-typedef  std::string  Fmt;
 typedef  char const *  c_cstring;
 
 // Unit /////
@@ -52,8 +55,12 @@ bool
 open( Unit const unit, Fstring const & name, IOFlags & flags );
 
 // Open File on Specified Unit
+inline
 bool
-open( Unit const unit, c_cstring const name, IOFlags & flags );
+open( Unit const unit, c_cstring const name, IOFlags & flags )
+{
+	return open( unit, std::string( name ), flags );
+}
 
 // Open File on Specified Unit
 bool
@@ -64,8 +71,12 @@ bool
 open( Unit const unit, Fstring const & name, std::ios_base::openmode const mode );
 
 // Open File on Specified Unit
+inline
 bool
-open( Unit const unit, c_cstring const name, std::ios_base::openmode const mode );
+open( Unit const unit, c_cstring const name, std::ios_base::openmode const mode )
+{
+	return open( unit, std::string( name ), mode );
+}
 
 // Open File on Specified Unit
 bool
@@ -76,8 +87,12 @@ bool
 open( Unit const unit, Fstring const & name );
 
 // Open File on Specified Unit
+inline
 bool
-open( Unit const unit, c_cstring const name );
+open( Unit const unit, c_cstring const name )
+{
+	return open( unit, std::string( name ) );
+}
 
 // Open Default File on Specified Unit
 bool
@@ -100,8 +115,12 @@ Unit
 open( Fstring const & name, IOFlags & flags );
 
 // Open File and Return Unit
+inline
 Unit
-open( c_cstring const name, IOFlags & flags );
+open( c_cstring const name, IOFlags & flags )
+{
+	return open( std::string( name ), flags );
+}
 
 // Open File and Return Unit
 Unit
@@ -112,8 +131,12 @@ Unit
 open( Fstring const & name, std::ios_base::openmode const mode );
 
 // Open File and Return Unit
+inline
 Unit
-open( c_cstring const name, std::ios_base::openmode const mode );
+open( c_cstring const name, std::ios_base::openmode const mode )
+{
+	return open( std::string( name ), mode );
+}
 
 // Open File and Return Unit
 Unit
@@ -124,8 +147,12 @@ Unit
 open( Fstring const & name );
 
 // Open File and Return Unit
+inline
 Unit
-open( c_cstring const name );
+open( c_cstring const name )
+{
+	return open( std::string( name ) );
+}
 
 // Open Default File and Return Unit
 Unit
@@ -139,37 +166,85 @@ open();
 
 // Read from Unit
 Read
-read( Unit const unit, Fmt const & fmt, IOFlags & flags );
+read( Unit const unit, std::string const & fmt, IOFlags & flags );
 
 // Read from Unit
 Read
-read( Unit const unit, Fmt const & fmt );
+read( Unit const unit, gio::Fmt const & fmt, IOFlags & flags );
+
+// Read from Unit
+Read
+read( Unit const unit, std::string const & fmt );
+
+// Read from Unit
+Read
+read( Unit const unit, gio::Fmt const & fmt );
 
 // Read from stdin
 Read
-read( Fmt const & fmt, IOFlags & flags );
+read( std::string const & fmt, IOFlags & flags );
 
 // Read from stdin
 Read
-read( Fmt const & fmt );
+read( gio::Fmt const & fmt, IOFlags & flags );
+
+// Read from stdin
+Read
+read( std::string const & fmt );
+
+// Read from stdin
+Read
+read( gio::Fmt const & fmt );
 
 // Read from String
+inline
 Read
-read( std::string const & str, Fmt const & fmt, IOFlags & flags );
+read( std::string const & str, std::string const & fmt, IOFlags & flags )
+{
+	return Read( str, fmt, flags );
+}
 
 // Read from String
+inline
 Read
-read( std::string const & str, Fmt const & fmt );
+read( std::string const & str, gio::Fmt const & fmt, IOFlags & flags )
+{
+	return Read( str, fmt, flags );
+}
+
+// Read from String
+inline
+Read
+read( std::string const & str, std::string const & fmt )
+{
+	return Read( str, fmt );
+}
+
+// Read from String
+inline
+Read
+read( std::string const & str, gio::Fmt const & fmt )
+{
+	return Read( str, fmt );
+}
 
 // Write /////
 
 // Write to Unit
 Write
-write( Unit const unit, Fmt const & fmt, IOFlags & flags );
+write( Unit const unit, std::string const & fmt, IOFlags & flags );
 
 // Write to Unit
 Write
-write( Unit const unit, Fmt const & fmt );
+write( Unit const unit, gio::Fmt const & fmt, IOFlags & flags );
+
+// Write to Unit
+Write
+write( Unit const unit, std::string const & fmt );
+
+// Write to Unit
+Write
+write( Unit const unit, gio::Fmt const & fmt );
 
 // Write End-of-Line to Unit
 void
@@ -177,29 +252,89 @@ write( Unit const unit );
 
 // Write to stdout
 Write
-write( Fmt const & fmt, IOFlags & flags );
+write( std::string const & fmt, IOFlags & flags );
 
 // Write to stdout
 Write
-write( Fmt const & fmt );
+write( gio::Fmt const & fmt, IOFlags & flags );
+
+// Write to stdout
+Write
+write( std::string const & fmt );
+
+// Write to stdout
+Write
+write( gio::Fmt const & fmt );
 
 // Write to String
+inline
 Write
-write( std::string & str, Fmt const & fmt, IOFlags & flags );
+write( std::string & str, std::string const & fmt, IOFlags & flags )
+{
+	return Write( str, fmt, flags );
+}
 
 // Write to String
+inline
 Write
-write( std::string & str, Fmt const & fmt );
+write( std::string & str, gio::Fmt const & fmt, IOFlags & flags )
+{
+	return Write( str, fmt, flags );
+}
+
+// Write to String
+inline
+Write
+write( std::string & str, std::string const & fmt )
+{
+	return Write( str, fmt );
+}
+
+// Write to String
+inline
+Write
+write( std::string & str, gio::Fmt const & fmt )
+{
+	return Write( str, fmt );
+}
 
 // Write to Fstring
+inline
 Write
-write( Fstring & str, Fmt const & fmt, IOFlags & flags );
+write( Fstring & str, std::string const & fmt, IOFlags & flags )
+{
+	return Write( str, fmt, flags );
+}
 
 // Write to Fstring
+inline
 Write
-write( Fstring & str, Fmt const & fmt );
+write( Fstring & str, gio::Fmt const & fmt, IOFlags & flags )
+{
+	return Write( str, fmt, flags );
+}
+
+// Write to Fstring
+inline
+Write
+write( Fstring & str, std::string const & fmt )
+{
+	return Write( str, fmt );
+}
+
+// Write to Fstring
+inline
+Write
+write( Fstring & str, gio::Fmt const & fmt )
+{
+	return Write( str, fmt );
+}
 
 // Print /////
+
+// Print to stdout
+Print
+print( std::string const & fmt );
 
 // Print to stdout
 Print

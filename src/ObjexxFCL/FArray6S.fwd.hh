@@ -23,11 +23,11 @@ namespace ObjexxFCL {
 // Forward Declarations
 template< typename > class FArray6S;
 class byte;
-typedef  byte  sbyte;
 class ubyte;
 class Fstring;
 
 // Types
+typedef  byte  sbyte;
 typedef  FArray6S< bool >                FArray6S_bool;
 typedef  FArray6S< byte >                FArray6S_byte;
 typedef  FArray6S< sbyte >               FArray6S_sbyte;

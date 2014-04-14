@@ -2773,7 +2773,6 @@ maxloc( FArray6< T > const & a, FArray6< bool > const & mask )
 
 // matmul /////
 
-
 // Matrix (Outer) Product of 1D Arrays
 template< typename T >
 inline

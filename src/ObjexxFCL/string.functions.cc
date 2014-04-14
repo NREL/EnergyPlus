@@ -14,54 +14,9 @@
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/string.constants.hh>
 
-// C++ Headers
-#include <algorithm>
-#include <cctype>
-#include <cstring>
-
 namespace ObjexxFCL {
 
 // Predicate
-
-// char == char Case-Insensitively (non-inline for use by equali below)?
-bool
-char_equali( char const c, char const d )
-{
-	return ( std::tolower( c ) == std::tolower( d ) );
-}
-
-// string == string Case-Insensitively?
-bool
-equali( std::string const & s, std::string const & t )
-{
-	if ( s.length() != t.length() ) {
-		return false;
-	} else {
-		return std::equal( s.begin(), s.end(), t.begin(), char_equali );
-	}
-}
-
-// string == cstring Case-Insensitively?
-bool
-equali( std::string const & s, c_cstring const t )
-{
-	if ( s.length() != std::strlen( t ) ) {
-		return false;
-	} else {
-		return std::equal( s.begin(), s.end(), t, char_equali );
-	}
-}
-
-// cstring == string Case-Insensitively?
-bool
-equali( c_cstring const s, std::string const & t )
-{
-	if ( std::strlen( s ) != t.length() ) {
-		return false;
-	} else {
-		return std::equal( t.begin(), t.end(), s, char_equali );
-	}
-}
 
 // Has a Prefix Case-Optionally?
 bool
@@ -73,9 +28,37 @@ has_prefix( std::string const & s, std::string const & pre, bool const exact_cas
 	} else if ( s.length() < pre_len ) {
 		return false;
 	} else if ( exact_case ) {
-		return ( s.find( pre ) == 0 );
+		for ( std::string::size_type i = 0; i < pre_len; ++i ) {
+			if ( s[ i ] != pre[ i ] ) return false;
+		}
+		return true;
 	} else {
-		return ( lowercased( s ).find( lowercased( pre ) ) == 0 );
+		for ( std::string::size_type i = 0; i < pre_len; ++i ) {
+			if ( ! equali( s[ i ], pre[ i ] ) ) return false;
+		}
+		return true;
+	}
+}
+
+// Has a Prefix Case-Optionally?
+bool
+has_prefix( std::string const & s, c_cstring const pre, bool const exact_case )
+{
+	std::string::size_type const pre_len( std::strlen( pre ) );
+	if ( pre_len == 0 ) {
+		return false;
+	} else if ( s.length() < pre_len ) {
+		return false;
+	} else if ( exact_case ) {
+		for ( std::string::size_type i = 0; i < pre_len; ++i ) {
+			if ( s[ i ] != pre[ i ] ) return false;
+		}
+		return true;
+	} else {
+		for ( std::string::size_type i = 0; i < pre_len; ++i ) {
+			if ( ! equali( s[ i ], pre[ i ] ) ) return false;
+		}
+		return true;
 	}
 }
 
@@ -90,10 +73,45 @@ has_suffix( std::string const & s, std::string const & suf, bool const exact_cas
 		std::string::size_type const s_len( s.length() );
 		if ( s_len < suf_len ) {
 			return false;
-		} else if ( exact_case ) {
-			return ( s.rfind( suf ) == s_len - suf_len );
 		} else {
-			return ( lowercased( s ).rfind( lowercased( suf ) ) == s_len - suf_len );
+			std::string::size_type const del_len( s_len - suf_len );
+			if ( exact_case ) {
+				for ( std::string::size_type i = 0; i < suf_len; ++i ) {
+					if ( s[ del_len + i ] != suf[ i ] ) return false;
+				}
+			} else {
+				for ( std::string::size_type i = 0; i < suf_len; ++i ) {
+					if ( ! equali( s[ del_len + i ], suf[ i ] ) ) return false;
+				}
+			}
+			return true;
+		}
+	}
+}
+
+// Has a Suffix Case-Optionally?
+bool
+has_suffix( std::string const & s, c_cstring const suf, bool const exact_case )
+{
+	std::string::size_type const suf_len( std::strlen( suf ) );
+	if ( suf_len == 0 ) {
+		return false;
+	} else {
+		std::string::size_type const s_len( s.length() );
+		if ( s_len < suf_len ) {
+			return false;
+		} else {
+			std::string::size_type const del_len( s_len - suf_len );
+			if ( exact_case ) {
+				for ( std::string::size_type i = 0; i < suf_len; ++i ) {
+					if ( s[ del_len + i ] != suf[ i ] ) return false;
+				}
+			} else {
+				for ( std::string::size_type i = 0; i < suf_len; ++i ) {
+					if ( ! equali( s[ del_len + i ], suf[ i ] ) ) return false;
+				}
+			}
+			return true;
 		}
 	}
 }
@@ -106,7 +124,7 @@ lowercase( std::string & s )
 {
 	std::string::size_type const s_len( s.length() );
 	for ( std::string::size_type i = 0; i < s_len; ++i ) {
-		s[ i ] = std::tolower( s[ i ] );
+		lowercase( s[ i ] );
 	}
 	return s;
 }
@@ -117,7 +135,7 @@ uppercase( std::string & s )
 {
 	std::string::size_type const s_len( s.length() );
 	for ( std::string::size_type i = 0; i < s_len; ++i ) {
-		s[ i ] = std::toupper( s[ i ] );
+		uppercase( s[ i ] );
 	}
 	return s;
 }
@@ -433,7 +451,7 @@ lowercased( std::string const & s )
 	std::string t( s );
 	std::string::size_type const t_len( t.length() );
 	for ( std::string::size_type i = 0; i < t_len; ++i ) {
-		t[ i ] = std::tolower( t[ i ] );
+		lowercase( t[ i ] );
 	}
 	return t;
 }
@@ -445,7 +463,7 @@ uppercased( std::string const & s )
 	std::string t( s );
 	std::string::size_type const t_len( t.length() );
 	for ( std::string::size_type i = 0; i < t_len; ++i ) {
-		t[ i ] = std::toupper( t[ i ] );
+		uppercase( t[ i ] );
 	}
 	return t;
 }
@@ -705,7 +723,7 @@ std::string
 sized( std::string const & s, std::string::size_type const len )
 {
 	std::string::size_type const s_len( s.length() );
-	if ( s_len < len ) { // Padded
+	if ( s_len < len ) { // Right-padded
 		return s + std::string( len - s_len, SPC );
 	} else if ( s_len == len ) { // Unchanged
 		return s;
@@ -714,11 +732,18 @@ sized( std::string const & s, std::string::size_type const len )
 	}
 }
 
-// Centered wrt Whitespace Copy of a string
+// Left-Sized to a Specified Length Copy of a string
 std::string
-centered( std::string const & s )
+lsized( std::string const & s, std::string::size_type const len )
 {
-	return centered( stripped_whitespace( s ), s.length() );
+	std::string::size_type const s_len( s.length() );
+	if ( s_len < len ) { // Left-padded
+		return std::string( len - s_len, SPC ) + s;
+	} else if ( s_len == len ) { // Unchanged
+		return s;
+	} else { // Truncated
+		return s.substr( 0, len );
+	}
 }
 
 // Centered in a string of Specified Length Copy of a string
@@ -748,15 +773,6 @@ uniqued( std::string const & s )
 		}
 	}
 	return u;
-}
-
-// Substring Replaced Copy of a string
-std::string
-replaced( std::string const & s, std::string const & a, std::string const & b )
-{
-	std::string r( s );
-	replace( r, a, b );
-	return r;
 }
 
 // Space-Free Head Copy of a string

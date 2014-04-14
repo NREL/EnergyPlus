@@ -13,6 +13,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Cstring.hh>
 #include <ObjexxFCL/char.constants.hh>
+#include <ObjexxFCL/char.functions.hh>
 
 // C++ Headers
 #include <cctype>
@@ -125,7 +126,7 @@ namespace ObjexxFCL {
 	Cstring::lowercase()
 	{
 		for ( size_type i = 0; i < std::strlen( str_ ); ++i ) {
-			str_[ i ] = std::tolower( str_[ i ] );
+			str_[ i ] = to_lower( str_[ i ] );
 		}
 		return *this;
 	}
@@ -135,7 +136,7 @@ namespace ObjexxFCL {
 	Cstring::uppercase()
 	{
 		for ( size_type i = 0; i < std::strlen( str_ ); ++i ) {
-			str_[ i ] = std::toupper( str_[ i ] );
+			str_[ i ] = to_upper( str_[ i ] );
 		}
 		return *this;
 	}
@@ -212,7 +213,7 @@ namespace ObjexxFCL {
 			return false;
 		} else {
 			for ( size_type i = 0; i < s_len; ++i ) {
-				if ( std::tolower( s.str_[ i ] ) != std::tolower( t.str_[ i ] ) ) return false;
+				if ( to_lower( s.str_[ i ] ) != to_lower( t.str_[ i ] ) ) return false;
 			}
 			return true;
 		}
@@ -228,7 +229,7 @@ namespace ObjexxFCL {
 			return false;
 		} else {
 			for ( size_type i = 0; i < s_len; ++i ) {
-				if ( std::tolower( s.str_[ i ] ) != std::tolower( t[ i ] ) ) return false;
+				if ( to_lower( s.str_[ i ] ) != to_lower( t[ i ] ) ) return false;
 			}
 			return true;
 		}
@@ -244,7 +245,7 @@ namespace ObjexxFCL {
 			return false;
 		} else {
 			for ( size_type i = 0; i < s_len; ++i ) {
-				if ( std::tolower( s[ i ] ) != std::tolower( t.str_[ i ] ) ) return false;
+				if ( to_lower( s[ i ] ) != to_lower( t.str_[ i ] ) ) return false;
 			}
 			return true;
 		}
@@ -260,7 +261,7 @@ namespace ObjexxFCL {
 			return false;
 		} else {
 			for ( size_type i = 0; i < s_len; ++i ) {
-				if ( std::tolower( s.str_[ i ] ) != std::tolower( t[ i ] ) ) return false;
+				if ( to_lower( s.str_[ i ] ) != to_lower( t[ i ] ) ) return false;
 			}
 			return true;
 		}
@@ -276,7 +277,7 @@ namespace ObjexxFCL {
 			return false;
 		} else {
 			for ( size_type i = 0; i < s_len; ++i ) {
-				if ( std::tolower( s[ i ] ) != std::tolower( t.str_[ i ] ) ) return false;
+				if ( to_lower( s[ i ] ) != to_lower( t.str_[ i ] ) ) return false;
 			}
 			return true;
 		}
@@ -286,14 +287,14 @@ namespace ObjexxFCL {
 	bool
 	equali( Cstring const & s, char const c )
 	{
-		return ( ( s.length() == 1 ) && ( std::tolower( s.str_[ 0 ] ) == std::tolower( c ) ) );
+		return ( ( s.length() == 1 ) && ( to_lower( s.str_[ 0 ] ) == to_lower( c ) ) );
 	}
 
 	// char == Cstring Case-Insensitively?
 	bool
 	equali( char const c, Cstring const & s )
 	{
-		return ( ( s.length() == 1 ) && ( std::tolower( s.str_[ 0 ] ) == std::tolower( c ) ) );
+		return ( ( s.length() == 1 ) && ( to_lower( s.str_[ 0 ] ) == to_lower( c ) ) );
 	}
 
 	// Output to Stream

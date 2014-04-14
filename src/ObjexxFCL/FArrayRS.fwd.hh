@@ -23,11 +23,11 @@ namespace ObjexxFCL {
 // Forward Declarations
 template< typename, int > class FArrayRS;
 class byte;
-typedef  byte  sbyte;
 class ubyte;
 class Fstring;
 
 // Types
+typedef  byte  sbyte;
 #if !defined(_MSC_VER) || (_MSC_VER > 1700) // VC11 and earlier don't support type aliases
 template< int Rank > using FArrayRS_bool       = FArrayRS< bool, Rank >;
 template< int Rank > using FArrayRS_byte       = FArrayRS< byte, Rank >;

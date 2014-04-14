@@ -14,13 +14,15 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/MArray1.fwd.hh>
 #include <ObjexxFCL/MArrayR.hh>
 
 // C++ Headers
 #include <cmath>
 
 namespace ObjexxFCL {
+
+// Forward Declarations
+class Fstring;
 
 // MArray1: 1D Member Array Proxy
 template< class A, typename T >

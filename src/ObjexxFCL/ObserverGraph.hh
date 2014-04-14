@@ -13,15 +13,19 @@
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Observer.fwd.hh>
-
 // C++ Headers
 #include <cstddef>
 #include <map>
 #include <vector>
 
 namespace ObjexxFCL {
+
+// Forward Declarations
+class Observer;
+
+// Types
+typedef  Observer  Subject;
+
 namespace internal {
 
 // ObserverGraph: Observer Graph Representation

@@ -14,7 +14,6 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Dimension.fwd.hh>
 #include <ObjexxFCL/DimensionExpressionCon.hh>
 #include <ObjexxFCL/DimensionExpressionRef.hh>
 #include <ObjexxFCL/DimensionExpressionSum.hh>
@@ -28,6 +27,9 @@
 #include <ObjexxFCL/DimensionExpressionCube.hh>
 
 namespace ObjexxFCL {
+
+// Forward Declarations
+class Dimension;
 
 // Dimension Math
 

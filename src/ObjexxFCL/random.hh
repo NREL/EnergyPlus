@@ -14,7 +14,6 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.fwd.hh>
 #include <ObjexxFCL/FArray1.hh>
 #include <ObjexxFCL/Optional.hh>
 
@@ -22,6 +21,9 @@
 #include <cstdint>
 
 namespace ObjexxFCL {
+
+// Forward Declarations
+template< typename > class FArray;
 
 // Random int on [0,1]
 std::int32_t

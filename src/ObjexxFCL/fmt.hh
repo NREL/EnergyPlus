@@ -14,11 +14,8 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/byte.fwd.hh>
-#include <ObjexxFCL/ubyte.fwd.hh>
 #include <ObjexxFCL/char.constants.hh>
 #include <ObjexxFCL/fmt.manipulators.hh>
-#include <ObjexxFCL/Fstring.fwd.hh>
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/TraitsB.hh>
 #include <ObjexxFCL/TraitsE.hh>
@@ -39,6 +36,12 @@
 #include <string>
 
 namespace ObjexxFCL {
+
+// Forward Declarations
+class byte;
+class ubyte;
+class Fstring;
+
 namespace fmt {
 
 // Types
@@ -47,7 +50,7 @@ typedef  char const *  c_cstring;
 typedef  std::size_t  Size;
 
 // Constants
-static Size const NOSIZE = Size( -1 );
+static Size const NOSIZE = static_cast< Size >( -1 );
 
 // Input /////
 

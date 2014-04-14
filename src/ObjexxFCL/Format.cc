@@ -29,8 +29,6 @@ typedef  std::string  Token;
 typedef  std::vector< Token >  Tokens;
 typedef  std::vector< Format * >  Formats;
 
-	Format::Size const Format::NOSIZE = Size( -1 );
-
 	// Input
 	void
 	Format::in( std::istream & stream, byte & b )
@@ -86,7 +84,7 @@ typedef  std::vector< Format * >  Formats;
 	}
 
 	// Read List-Directed Entry from a Stream
-	EntryLD
+	EntryFormatLD
 	Format::read_ld( std::istream & stream, bool const numeric, char const mode )
 	{
 		std::string s;
@@ -122,11 +120,11 @@ typedef  std::vector< Format * >  Formats;
 					if ( in_body ) break; // End of entry
 				} else if ( c == CMA ) { // End of entry
 					clear_eof( stream );
-					return EntryLD( s, in_body, repeat );
+					return EntryFormatLD( s, in_body, repeat );
 				} else if ( c == '/' ) { // Terminate i/o operation
 					slash_terminated() = true;
 					clear_eof( stream );
-					return EntryLD( s, in_body, repeat );
+					return EntryFormatLD( s, in_body, repeat );
 				} else if ( ( c == '*' ) && ( ! has_repeat ) && ( is_ulong( s ) ) && ( s[ 0 ] != '-' ) ) { // Repeat count: Strict => Add && ( ulong_of( s ) > 0ul )
 					repeat = ulong_of( s );
 					if ( repeat == 0ul ) repeat = 1ul; // Intel Fortran behavior: Zero should really cause repeat spec to be treated as part of entry
@@ -169,7 +167,7 @@ typedef  std::vector< Format * >  Formats;
 			}
 		}
 		clear_eof( stream );
-		return EntryLD( s, ( in_body || in_quote ), repeat );
+		return EntryFormatLD( s, ( in_body || in_quote ), repeat );
 	}
 
 	// Apply Blank Processing to String
@@ -1726,5 +1724,13 @@ alpha_token( Tokens const & tokens )
 			return nullptr;
 		}
 	}
+
+// Static Data Member Definitions
+
+//#ifndef _MSC_VER // Microsoft Visual C++ extensions doesn't need or like these: Enable #ifndef block if not using /Za
+
+	Format::Size const Format::NOSIZE;
+
+//#endif // _MSC_VER
 
 } // ObjexxFCL

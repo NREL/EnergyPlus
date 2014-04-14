@@ -62,7 +62,7 @@ A( Fstring const & s, Size const w )
 	if ( w == 0ul ) {
 		return s;
 	} else if ( l > w ) { // Trim
-		return s( 1, w );
+		return s( 1u, w );
 	} else if ( l == w ) {
 		return s;
 	} else { // l < w: Pad

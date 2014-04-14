@@ -21,13 +21,13 @@
 //   Fortran BACKSPACE will cause file truncation after any new WRITEs: Must add an explicit EOF to get this effect in C++
 //    A full emulation of Fortran formatted sequential files could handle this but would harm migration to native C++ usage
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/IOFlags.fwd.hh>
-
 // C++ Headers
 #include <iosfwd>
 
 namespace ObjexxFCL {
+
+// Forward Declarations
+class IOFlags;
 
 // Backspace Input Stream
 void

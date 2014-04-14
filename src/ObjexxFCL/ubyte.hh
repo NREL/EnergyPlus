@@ -13,9 +13,6 @@
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/ubyte.fwd.hh>
-
 // C++ Headers
 #include <cassert>
 #include <cstddef>

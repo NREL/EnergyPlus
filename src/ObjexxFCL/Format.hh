@@ -14,10 +14,7 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/byte.fwd.hh>
-#include <ObjexxFCL/ubyte.fwd.hh>
 #include <ObjexxFCL/char.constants.hh>
-#include <ObjexxFCL/Fstring.fwd.hh>
 #include <ObjexxFCL/string.constants.hh>
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/TraitsA.hh>
@@ -40,8 +37,13 @@
 
 namespace ObjexxFCL {
 
+// Forward Declarations
+class byte;
+class ubyte;
+class Fstring;
+
 // List-Directed Input Entry
-struct EntryLD
+struct EntryFormatLD
 {
 
 	typedef  std::size_t  Size;
@@ -49,7 +51,7 @@ struct EntryLD
 	// Constructor
 	inline
 	explicit
-	EntryLD( std::string const & str, bool const has = true, Size const rep = 1ul ) :
+	EntryFormatLD( std::string const & str, bool const has = true, Size const rep = 1ul ) :
 		s( str ),
 		h( has ),
 		r( has ? rep : 0ul )
@@ -72,11 +74,15 @@ struct EntryLD
 	bool h; // Has non-null entry?
 	Size r; // Repeat counter
 
-}; // EntryLD
+}; // EntryFormatLD
 
 // Format Base Class
 class Format
 {
+
+private: // Friends
+
+	friend class FormatGroupTop;
 
 public: // Types
 
@@ -87,7 +93,7 @@ public: // Types
 
 protected: // Creation
 
-	// Constructor
+	// Repeat Constructor
 	inline
 	explicit
 	Format( Format * p, Size const r = 1ul ) :
@@ -97,7 +103,7 @@ protected: // Creation
 		i_( 0ul )
 	{}
 
-	// Constructor
+	// Star Constructor
 	inline
 	Format( Format * p, char const star ) :
 		p_( p ),
@@ -110,11 +116,11 @@ protected: // Creation
 
 	// Copy Constructor
 	inline
-	Format( Format const & f ) :
-		p_( f.p_ ),
+	Format( Format const & f, Format * p = nullptr ) :
+		p_( p ? p : f.p_ ),
 		r_( f.r_ ),
 		u_( f.u_ ),
-		i_( f.i_ )
+		i_( 0ul )
 	{}
 
 	// Move Constructor
@@ -123,7 +129,7 @@ protected: // Creation
 		p_( f.p_ ),
 		r_( f.r_ ),
 		u_( f.u_ ),
-		i_( f.i_ )
+		i_( 0ul )
 	{}
 
 public: // Creation
@@ -131,7 +137,7 @@ public: // Creation
 	// Clone
 	virtual
 	Format *
-	clone() const = 0;
+	clone( Format * p = nullptr ) const = 0;
 
 	// Destructor
 	inline
@@ -150,7 +156,7 @@ protected: // Assignment
 			p_ = f.p_;
 			r_ = f.r_;
 			u_ = f.u_;
-			i_ = f.i_;
+			i_ = 0ul;
 		}
 	}
 
@@ -170,6 +176,22 @@ public: // Properties
 	p()
 	{
 		return p_;
+	}
+
+	// Repeat Count
+	inline
+	Size
+	r() const
+	{
+		return r_;
+	}
+
+	// Unlimited Repeat?
+	inline
+	bool
+	u() const
+	{
+		return u_;
 	}
 
 	// Uses an Argument?
@@ -216,22 +238,6 @@ public: // Properties
 		return false;
 	}
 
-	// Repeat Count
-	inline
-	Size
-	r() const
-	{
-		return r_;
-	}
-
-	// Unlimited Repeat?
-	inline
-	bool
-	u() const
-	{
-		return u_;
-	}
-
 	// Can Repeat with Given Index?
 	inline
 	bool
@@ -258,22 +264,6 @@ public: // Properties
 	{
 		assert( p_ );
 		return p_->P();
-	}
-
-	// Active index
-	inline
-	Size
-	i() const
-	{
-		return i_;
-	}
-
-	// Active index
-	inline
-	Size &
-	i()
-	{
-		return i_;
 	}
 
 	// Blank Null?
@@ -446,6 +436,8 @@ public: // Properties
 		return p_->spacer();
 	}
 
+public: // Methods
+
 	// Current Format
 	virtual
 	Format *
@@ -460,6 +452,14 @@ public: // Properties
 	virtual
 	Format *
 	next_up() = 0;
+
+	// Reset
+	virtual
+	void
+	reset()
+	{
+		i_ = 0ul;
+	}
 
 public: // Input Methods
 
@@ -887,10 +887,28 @@ public: // Static Methods
 	void
 	skip( std::istream & stream, Size const w = 1ul );
 
+protected: // Properties
+
+	// Active index
+	inline
+	Size
+	i() const
+	{
+		return i_;
+	}
+
+	// Active index
+	inline
+	Size &
+	i()
+	{
+		return i_;
+	}
+
 protected: // Methods
 
 	// Read List-Directed Entry from a Stream
-	EntryLD
+	EntryFormatLD
 	read_ld( std::istream & stream, bool const numeric = false, char const mode = 'C' ); // Use mode = 'F' for reading files that can't be changed to C-style quote escapes
 
 	// Skip Chunk from Stream and Discard
@@ -1015,7 +1033,7 @@ private: // Data
 
 protected: // Static Data
 
-	static Size const NOSIZE;
+	static Size const NOSIZE = static_cast< Size >( -1 );
 
 }; // Format
 
@@ -1040,8 +1058,8 @@ protected: // Creation
 
 	// Copy Constructor
 	inline
-	FormatCombo( FormatCombo const & f ) :
-		Format( f )
+	FormatCombo( FormatCombo const & f, Format * p = nullptr ) :
+		Format( f, p )
 	{}
 
 	// Move Constructor
@@ -1088,10 +1106,10 @@ public: // Creation
 
 	// Copy Constructor
 	inline
-	FormatList( FormatList const & f ) :
-		FormatCombo( f )
+	FormatList( FormatList const & f, Format * p = nullptr ) :
+		FormatCombo( f, p )
 	{
-		for ( Format * format : f.formats() ) formats_.push_back( format->clone() );
+		for ( Format * format : f.formats() ) formats_.push_back( format->clone( this ) );
 	}
 
 	// Move Constructor
@@ -1104,9 +1122,9 @@ public: // Creation
 	// Clone
 	inline
 	FormatList *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatList( *this );
+		return new FormatList( *this, p );
 	}
 
 	// Destructor
@@ -1222,9 +1240,9 @@ protected: // Creation
 
 	// Copy Constructor
 	inline
-	FormatGroup( FormatGroup const & f ) :
-		FormatCombo( f ),
-		format_( f.format() ? f.format()->clone() : nullptr )
+	FormatGroup( FormatGroup const & f, Format * p = nullptr ) :
+		FormatCombo( f, p ),
+		format_( f.format() ? f.format()->clone( this ) : nullptr )
 	{}
 
 	// Move Constructor
@@ -1375,8 +1393,8 @@ public: // Creation
 
 	// Copy Constructor
 	inline
-	FormatGroupTop( FormatGroupTop const & f ) :
-		FormatGroup( f ),
+	FormatGroupTop( FormatGroupTop const & f, Format * p = nullptr ) :
+		FormatGroup( f, p ),
 		P_( f.P_ ),
 		blank_zero_( f.blank_zero_ ),
 		colon_terminated_( f.colon_terminated_ ),
@@ -1410,9 +1428,9 @@ public: // Creation
 	// Clone
 	inline
 	FormatGroupTop *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatGroupTop( *this );
+		return new FormatGroupTop( *this, p );
 	}
 
 	// Destructor
@@ -1442,6 +1460,17 @@ public: // Assignment
 			spacer_ = false;
 		}
 		return *this;
+	}
+
+	// Reset
+	virtual
+	void
+	reset()
+	{
+		FormatGroup::reset();
+		ir_ = 0ul;
+		fr_ = nullptr;
+		spacer_ = false;
 	}
 
 public: // Properties
@@ -1622,12 +1651,19 @@ public: // Creation
 		FormatGroup( p, star, format )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatGroupSub( FormatGroupSub const & f, Format * p = nullptr ) :
+		FormatGroup( f, p )
+	{}
+
 	// Clone
 	inline
 	FormatGroupSub *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatGroupSub( *this );
+		return new FormatGroupSub( *this, p );
 	}
 
 	// Destructor
@@ -1653,8 +1689,8 @@ protected: // Creation
 
 	// Copy Constructor
 	inline
-	FormatLeaf( FormatLeaf const & f ) :
-		Format( f )
+	FormatLeaf( FormatLeaf const & f, Format * p = nullptr ) :
+		Format( f, p )
 	{}
 
 	// Move Constructor
@@ -1727,12 +1763,20 @@ public: // Creation
 		s_( replaced( replaced( s, "\\\\", "\\" ), "\\\"", "\"" ) )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatString( FormatString const & f, Format * p = nullptr ) :
+		FormatLeaf( f, p ),
+		s_( f.s_ )
+	{}
+
 	// Clone
 	inline
 	FormatString *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatString( *this );
+		return new FormatString( *this, p );
 	}
 
 	// Destructor
@@ -1786,12 +1830,20 @@ public: // Creation
 		s_( replaced( replaced( s, "\\\\", "\\" ), "\\'", "'" ) )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatChar( FormatChar const & f, Format * p = nullptr ) :
+		FormatLeaf( f, p ),
+		s_( f.s_ )
+	{}
+
 	// Clone
 	inline
 	FormatChar *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatChar( *this );
+		return new FormatChar( *this, p );
 	}
 
 	// Destructor
@@ -1843,12 +1895,19 @@ public: // Creation
 		FormatLeaf( p )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatBN( FormatBN const & f, Format * p = nullptr ) :
+		FormatLeaf( f, p )
+	{}
+
 	// Clone
 	inline
 	FormatBN *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatBN( *this );
+		return new FormatBN( *this, p );
 	}
 
 	// Destructor
@@ -1886,12 +1945,19 @@ public: // Creation
 		FormatLeaf( p )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatBZ( FormatBZ const & f, Format * p = nullptr ) :
+		FormatLeaf( f, p )
+	{}
+
 	// Clone
 	inline
 	FormatBZ *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatBZ( *this );
+		return new FormatBZ( *this, p );
 	}
 
 	// Destructor
@@ -1924,12 +1990,19 @@ public: // Creation
 		FormatLeaf( p )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatS( FormatS const & f, Format * p = nullptr ) :
+		FormatLeaf( f, p )
+	{}
+
 	// Clone
 	inline
 	FormatS *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatS( *this );
+		return new FormatS( *this, p );
 	}
 
 	// Destructor
@@ -1952,12 +2025,19 @@ public: // Creation
 		FormatLeaf( p )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatSP( FormatSP const & f, Format * p = nullptr ) :
+		FormatLeaf( f, p )
+	{}
+
 	// Clone
 	inline
 	FormatSP *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatSP( *this );
+		return new FormatSP( *this, p );
 	}
 
 	// Destructor
@@ -1980,12 +2060,19 @@ public: // Creation
 		FormatLeaf( p )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatSS( FormatSS const & f, Format * p = nullptr ) :
+		FormatLeaf( f, p )
+	{}
+
 	// Clone
 	inline
 	FormatSS *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatSS( *this );
+		return new FormatSS( *this, p );
 	}
 
 	// Destructor
@@ -2008,12 +2095,19 @@ public: // Creation
 		FormatLeaf( p )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatSU( FormatSU const & f, Format * p = nullptr ) :
+		FormatLeaf( f, p )
+	{}
+
 	// Clone
 	inline
 	FormatSU *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatSU( *this );
+		return new FormatSU( *this, p );
 	}
 
 	// Destructor
@@ -2043,12 +2137,20 @@ public: // Creation
 		n_( n )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatX( FormatX const & f, Format * p = nullptr ) :
+		FormatLeaf( f, p ),
+		n_( f.n_ )
+	{}
+
 	// Clone
 	inline
 	FormatX *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatX( *this );
+		return new FormatX( *this, p );
 	}
 
 	// Destructor
@@ -2095,12 +2197,20 @@ public: // Creation
 		radix_( radix )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatR( FormatR const & f, Format * p = nullptr ) :
+		FormatLeaf( f, p ),
+		radix_( f.radix_ )
+	{}
+
 	// Clone
 	inline
 	FormatR *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatR( *this );
+		return new FormatR( *this, p );
 	}
 
 	// Destructor
@@ -2133,12 +2243,19 @@ public: // Creation
 		FormatLeaf( p, r )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatLinefeed( FormatLinefeed const & f, Format * p = nullptr ) :
+		FormatLeaf( f, p )
+	{}
+
 	// Clone
 	inline
 	FormatLinefeed *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatLinefeed( *this );
+		return new FormatLinefeed( *this, p );
 	}
 
 	// Destructor
@@ -2189,12 +2306,19 @@ public: // Creation
 		FormatLeaf( p )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatColon( FormatColon const & f, Format * p = nullptr ) :
+		FormatLeaf( f, p )
+	{}
+
 	// Clone
 	inline
 	FormatColon *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatColon( *this );
+		return new FormatColon( *this, p );
 	}
 
 	// Destructor
@@ -2240,12 +2364,19 @@ public: // Creation
 		FormatLeaf( p )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatDollar( FormatDollar const & f, Format * p = nullptr ) :
+		FormatLeaf( f, p )
+	{}
+
 	// Clone
 	inline
 	FormatDollar *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatDollar( *this );
+		return new FormatDollar( *this, p );
 	}
 
 	// Destructor
@@ -2284,12 +2415,20 @@ public: // Creation
 		n_( n > 0 ? n : 1ul ) // Assure that n_ > 0
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatT( FormatT const & f, Format * p = nullptr ) :
+		FormatLeaf( f, p ),
+		n_( f.n_ )
+	{}
+
 	// Clone
 	inline
 	FormatT *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatT( *this );
+		return new FormatT( *this, p );
 	}
 
 	// Destructor
@@ -2340,12 +2479,20 @@ public: // Creation
 		n_( n )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatTL( FormatTL const & f, Format * p = nullptr ) :
+		FormatLeaf( f, p ),
+		n_( f.n_ )
+	{}
+
 	// Clone
 	inline
 	FormatTL *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatTL( *this );
+		return new FormatTL( *this, p );
 	}
 
 	// Destructor
@@ -2396,12 +2543,20 @@ public: // Creation
 		n_( n )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatTR( FormatTR const & f, Format * p = nullptr ) :
+		FormatLeaf( f, p ),
+		n_( f.n_ )
+	{}
+
 	// Clone
 	inline
 	FormatTR *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatTR( *this );
+		return new FormatTR( *this, p );
 	}
 
 	// Destructor
@@ -2453,12 +2608,20 @@ public: // Creation
 		w_( w )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatA( FormatA const & f, Format * p = nullptr ) :
+		FormatLeaf( f, p ),
+		w_( f.w_ )
+	{}
+
 	// Clone
 	inline
 	FormatA *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatA( *this );
+		return new FormatA( *this, p );
 	}
 
 	// Destructor
@@ -2826,12 +2989,20 @@ public: // Creation
 		w_( w )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatL( FormatL const & f, Format * p = nullptr ) :
+		FormatLeaf( f, p ),
+		w_( f.w_ )
+	{}
+
 	// Clone
 	inline
 	FormatL *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatL( *this );
+		return new FormatL( *this, p );
 	}
 
 	// Destructor
@@ -2909,8 +3080,8 @@ protected: // Creation
 
 	// Copy Constructor
 	inline
-	FormatInteger( FormatInteger const & f ) :
-		FormatLeaf( f ),
+	FormatInteger( FormatInteger const & f, Format * p = nullptr ) :
+		FormatLeaf( f, p ),
 		w_( f.w_ ),
 		m_( f.m_ )
 	{}
@@ -3197,12 +3368,19 @@ public: // Creation
 		FormatInteger( p, r, w, m )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatI( FormatI const & f, Format * p = nullptr ) :
+		FormatInteger( f, p )
+	{}
+
 	// Clone
 	inline
 	FormatI *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatI( *this );
+		return new FormatI( *this, p );
 	}
 
 	// Destructor
@@ -3296,12 +3474,19 @@ public: // Creation
 		FormatInteger( p, r, w, m )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatB( FormatB const & f, Format * p = nullptr ) :
+		FormatInteger( f, p )
+	{}
+
 	// Clone
 	inline
 	FormatB *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatB( *this );
+		return new FormatB( *this, p );
 	}
 
 	// Destructor
@@ -3528,12 +3713,19 @@ public: // Creation
 		FormatInteger( p, r, w, m )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatO( FormatO const & f, Format * p = nullptr ) :
+		FormatInteger( f, p )
+	{}
+
 	// Clone
 	inline
 	FormatO *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatO( *this );
+		return new FormatO( *this, p );
 	}
 
 	// Destructor
@@ -3626,12 +3818,19 @@ public: // Creation
 		FormatInteger( p, r, w, m )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatZ( FormatZ const & f, Format * p = nullptr ) :
+		FormatInteger( f, p )
+	{}
+
 	// Clone
 	inline
 	FormatZ *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatZ( *this );
+		return new FormatZ( *this, p );
 	}
 
 	// Destructor
@@ -3726,12 +3925,20 @@ public: // Creation
 		k_( k )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatP( FormatP const & f, Format * p = nullptr ) :
+		FormatLeaf( f, p ),
+		k_( f.k_ )
+	{}
+
 	// Clone
 	inline
 	FormatP *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatP( *this );
+		return new FormatP( *this, p );
 	}
 
 	// Destructor
@@ -3785,8 +3992,8 @@ protected: // Creation
 
 	// Copy Constructor
 	inline
-	FormatFloat( FormatFloat const & f ) :
-		FormatLeaf( f ),
+	FormatFloat( FormatFloat const & f, Format * p = nullptr ) :
+		FormatLeaf( f, p ),
 		w_( f.w_ ),
 		d_( f.d_ )
 	{}
@@ -4052,12 +4259,19 @@ public: // Creation
 		FormatFloat( p, r, w, d )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatF( FormatF const & f, Format * p = nullptr ) :
+		FormatFloat( f, p )
+	{}
+
 	// Clone
 	inline
 	FormatF *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatF( *this );
+		return new FormatF( *this, p );
 	}
 
 	// Destructor
@@ -4098,8 +4312,8 @@ protected: // Creation
 
 	// Copy Constructor
 	inline
-	FormatGED( FormatGED const & f ) :
-		FormatFloat( f ),
+	FormatGED( FormatGED const & f, Format * p = nullptr ) :
+		FormatFloat( f, p ),
 		e_( f.e_ )
 	{}
 
@@ -4165,12 +4379,19 @@ public: // Creation
 		FormatGED( p, r, w, d, e )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatG( FormatG const & f, Format * p = nullptr ) :
+		FormatGED( f, p )
+	{}
+
 	// Clone
 	inline
 	FormatG *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatG( *this );
+		return new FormatG( *this, p );
 	}
 
 	// Destructor
@@ -4369,12 +4590,19 @@ public: // Creation
 		FormatGED( p, r, w, d, e )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatE( FormatE const & f, Format * p = nullptr ) :
+		FormatGED( f, p )
+	{}
+
 	// Clone
 	inline
 	FormatE *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatE( *this );
+		return new FormatE( *this, p );
 	}
 
 	// Destructor
@@ -4416,12 +4644,19 @@ public: // Creation
 		FormatGED( p, r, w, d, e )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatEN( FormatEN const & f, Format * p = nullptr ) :
+		FormatGED( f, p )
+	{}
+
 	// Clone
 	inline
 	FormatEN *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatEN( *this );
+		return new FormatEN( *this, p );
 	}
 
 	// Destructor
@@ -4463,12 +4698,19 @@ public: // Creation
 		FormatGED( p, r, w, d, e )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatES( FormatES const & f, Format * p = nullptr ) :
+		FormatGED( f, p )
+	{}
+
 	// Clone
 	inline
 	FormatES *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatES( *this );
+		return new FormatES( *this, p );
 	}
 
 	// Destructor
@@ -4510,12 +4752,19 @@ public: // Creation
 		FormatGED( p, r, w, d, e )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatD( FormatD const & f, Format * p = nullptr ) :
+		FormatGED( f, p )
+	{}
+
 	// Clone
 	inline
 	FormatD *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatD( *this );
+		return new FormatD( *this, p );
 	}
 
 	// Destructor
@@ -4559,12 +4808,20 @@ public: // Creation
 		entry_( std::string(), true, 0ul )
 	{}
 
+	// Copy Constructor
+	inline
+	explicit
+	FormatLD( FormatLD const & f, Format * p = nullptr ) :
+		FormatLeaf( f, p ),
+		entry_( f.entry_ )
+	{}
+
 	// Clone
 	inline
 	FormatLD *
-	clone() const
+	clone( Format * p = nullptr ) const
 	{
-		return new FormatLD( *this );
+		return new FormatLD( *this, p );
 	}
 
 	// Destructor
@@ -4867,11 +5124,11 @@ protected: // Methods
 
 private: // Data
 
-	EntryLD entry_; // Active input entry
+	EntryFormatLD entry_; // Active input entry
 
 }; // FormatLD
 
-// Format: Format Expression Factory
+// Format Expression Factory
 class FormatFactory
 {
 

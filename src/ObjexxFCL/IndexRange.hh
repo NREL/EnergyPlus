@@ -14,7 +14,6 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/IndexRange.fwd.hh>
 #include <ObjexxFCL/Index.hh>
 #include <ObjexxFCL/Star.hh>
 
@@ -712,6 +711,9 @@ private: // Data
 	size_type size_; // Size (npos iff unbounded)
 
 }; // IndexRange
+
+// Types
+typedef  IndexRange  IRange;
 
 // Comparison
 

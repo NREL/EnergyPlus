@@ -14,11 +14,11 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Write.fwd.hh>
 #include <ObjexxFCL/Format.hh>
 #include <ObjexxFCL/FArray.all.hh>
 #include <ObjexxFCL/FArrayS.all.hh>
 #include <ObjexxFCL/Fstring.hh>
+#include <ObjexxFCL/gio_Fmt.hh>
 #include <ObjexxFCL/IOFlags.hh>
 #include <ObjexxFCL/MArray.all.hh>
 
@@ -469,10 +469,24 @@ public: // Creation
 
 	// Constructor
 	inline
-	WriteStream( std::ostream & stream, std::string const & format_string, IOFlags & flags ) :
+	WriteStream( std::ostream & stream, std::string const & fmt, IOFlags & flags ) :
 		os_( stream ),
 		pos_( 0 ),
-		format_( FormatFactory::create( format_string ) ),
+		format_( FormatFactory::create( fmt ) ),
+		flags_( flags )
+	{
+		flags_.clear_status();
+		if ( format_ ) {
+			format_->non_advancing() = flags_.non_advancing(); // Allowed with list-directed format but Fortran doesn't
+		}
+	}
+
+	// Constructor
+	inline
+	WriteStream( std::ostream & stream, gio::Fmt const & fmt, IOFlags & flags ) :
+		os_( stream ),
+		pos_( 0 ),
+		format_( fmt.format_clone() ),
 		flags_( flags )
 	{
 		flags_.clear_status();
@@ -587,10 +601,21 @@ public: // Creation
 
 	// Constructor
 	inline
-	WriteString( std::string & str, std::string const & format_string, IOFlags & flags ) :
+	WriteString( std::string & str, std::string const & fmt, IOFlags & flags ) :
 		str_( str ),
 		pos_( 0 ),
-		format_( FormatFactory::create( format_string ) ),
+		format_( FormatFactory::create( fmt ) ),
+		flags_( flags )
+	{
+		flags_.clear_status();
+	}
+
+	// Constructor
+	inline
+	WriteString( std::string & str, gio::Fmt const & fmt, IOFlags & flags ) :
+		str_( str ),
+		pos_( 0 ),
+		format_( fmt.format_clone() ),
 		flags_( flags )
 	{
 		flags_.clear_status();
@@ -698,10 +723,21 @@ public: // Creation
 
 	// Constructor
 	inline
-	WriteFstring( Fstring & str, std::string const & format_string, IOFlags & flags ) :
+	WriteFstring( Fstring & str, std::string const & fmt, IOFlags & flags ) :
 		str_( str ),
 		pos_( 0 ),
-		format_( FormatFactory::create( format_string ) ),
+		format_( FormatFactory::create( fmt ) ),
+		flags_( flags )
+	{
+		flags_.clear_status();
+	}
+
+	// Constructor
+	inline
+	WriteFstring( Fstring & str, gio::Fmt const & fmt, IOFlags & flags ) :
+		str_( str ),
+		pos_( 0 ),
+		format_( fmt.format_clone() ),
 		flags_( flags )
 	{
 		flags_.clear_status();
@@ -832,41 +868,80 @@ public: // Creation
 
 	// Stream + Format Constructor
 	inline
-	Write( std::ostream & stream, std::string const & format_string ) :
+	Write( std::ostream & stream, std::string const & fmt ) :
 		flags_( IOFlags::handler() ),
-		write_( new WriteStream( stream, format_string, flags_ ) )
+		write_( new WriteStream( stream, fmt, flags_ ) )
+	{}
+
+	// Stream + Format Constructor
+	inline
+	Write( std::ostream & stream, gio::Fmt const & fmt ) :
+		flags_( IOFlags::handler() ),
+		write_( new WriteStream( stream, fmt, flags_ ) )
 	{}
 
 	// Stream + Format + Flags Constructor
 	inline
-	Write( std::ostream & stream, std::string const & format_string, IOFlags & flags ) :
-		write_( new WriteStream( stream, format_string, flags ) )
+	Write( std::ostream & stream, std::string const & fmt, IOFlags & flags ) :
+		write_( new WriteStream( stream, fmt, flags ) )
+	{}
+
+	// Stream + Format + Flags Constructor
+	inline
+	Write( std::ostream & stream, gio::Fmt const & fmt, IOFlags & flags ) :
+		write_( new WriteStream( stream, fmt, flags ) )
 	{}
 
 	// String + Format Constructor
 	inline
-	Write( std::string & str, std::string const & format_string ) :
+	Write( std::string & str, std::string const & fmt ) :
 		flags_( IOFlags::handler() ),
-		write_( new WriteString( str, format_string, flags_ ) )
+		write_( new WriteString( str, fmt, flags_ ) )
+	{}
+
+	// String + Format Constructor
+	inline
+	Write( std::string & str, gio::Fmt const & fmt ) :
+		flags_( IOFlags::handler() ),
+		write_( new WriteString( str, fmt, flags_ ) )
 	{}
 
 	// String + Format + Flags Constructor
 	inline
-	Write( std::string & str, std::string const & format_string, IOFlags & flags ) :
-		write_( new WriteString( str, format_string, flags ) )
+	Write( std::string & str, std::string const & fmt, IOFlags & flags ) :
+		write_( new WriteString( str, fmt, flags ) )
+	{}
+
+	// String + Format + Flags Constructor
+	inline
+	Write( std::string & str, gio::Fmt const & fmt, IOFlags & flags ) :
+		write_( new WriteString( str, fmt, flags ) )
 	{}
 
 	// Fstring + Format Constructor
 	inline
-	Write( Fstring & str, std::string const & format_string ) :
+	Write( Fstring & str, std::string const & fmt ) :
 		flags_( IOFlags::handler() ),
-		write_( new WriteFstring( str, format_string, flags_ ) )
+		write_( new WriteFstring( str, fmt, flags_ ) )
+	{}
+
+	// Fstring + Format Constructor
+	inline
+	Write( Fstring & str, gio::Fmt const & fmt ) :
+		flags_( IOFlags::handler() ),
+		write_( new WriteFstring( str, fmt, flags_ ) )
 	{}
 
 	// Fstring + Format + Flags Constructor
 	inline
-	Write( Fstring & str, std::string const & format_string, IOFlags & flags ) :
-		write_( new WriteFstring( str, format_string, flags ) )
+	Write( Fstring & str, std::string const & fmt, IOFlags & flags ) :
+		write_( new WriteFstring( str, fmt, flags ) )
+	{}
+
+	// Fstring + Format + Flags Constructor
+	inline
+	Write( Fstring & str, gio::Fmt const & fmt, IOFlags & flags ) :
+		write_( new WriteFstring( str, fmt, flags ) )
 	{}
 
 	// Destructor

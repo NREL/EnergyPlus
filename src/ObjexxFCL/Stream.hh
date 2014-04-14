@@ -17,7 +17,6 @@
 //  Don't open or close underlying file streams directly: That will break the lookup maps
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Stream.fwd.hh>
 #include <ObjexxFCL/IOFlags.hh>
 #include <ObjexxFCL/string.functions.hh>
 
@@ -29,7 +28,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #ifdef WIN32
-	#define stat _stat
+#define stat _stat
 #endif
 
 namespace ObjexxFCL {

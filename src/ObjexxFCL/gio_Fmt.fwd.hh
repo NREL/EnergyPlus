@@ -1,7 +1,7 @@
-#ifndef ObjexxFCL_Omit_hh_INCLUDED
-#define ObjexxFCL_Omit_hh_INCLUDED
+#ifndef ObjexxFCL_gio_Fmt_fwd_hh_INCLUDED
+#define ObjexxFCL_gio_Fmt_fwd_hh_INCLUDED
 
-// Omit: Sentinel for Omitted Argument
+// Global I/O Format Wrapper Forward Declarations
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
@@ -14,23 +14,12 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 namespace ObjexxFCL {
+namespace gio {
 
-// Omit: Sentinel for Omitted Argument
-class Omit
-{
+// Forward Declarations
+class Fmt;
 
-public: // Creation
-
-	// Default Constructor
-	inline
-	Omit()
-	{}
-
-}; // Omit
-
-extern Omit const _;
-extern Omit const omit;
-
+} // gio
 } // ObjexxFCL
 
-#endif // ObjexxFCL_Omit_hh_INCLUDED
+#endif // ObjexxFCL_gio_Fmt_fwd_hh_INCLUDED

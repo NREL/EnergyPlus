@@ -1,7 +1,7 @@
-#ifndef ObjexxFCL_Omit_hh_INCLUDED
-#define ObjexxFCL_Omit_hh_INCLUDED
+#ifndef ObjexxFCL_Print_fwd_hh_INCLUDED
+#define ObjexxFCL_Print_fwd_hh_INCLUDED
 
-// Omit: Sentinel for Omitted Argument
+// Print Forward Declarations
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
@@ -15,22 +15,9 @@
 
 namespace ObjexxFCL {
 
-// Omit: Sentinel for Omitted Argument
-class Omit
-{
-
-public: // Creation
-
-	// Default Constructor
-	inline
-	Omit()
-	{}
-
-}; // Omit
-
-extern Omit const _;
-extern Omit const omit;
+// Forward Declarations
+class Print;
 
 } // ObjexxFCL
 
-#endif // ObjexxFCL_Omit_hh_INCLUDED
+#endif // ObjexxFCL_Print_fwd_hh_INCLUDED

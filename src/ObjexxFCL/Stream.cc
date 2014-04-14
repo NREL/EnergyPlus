@@ -18,8 +18,7 @@ namespace ObjexxFCL {
 	// Stream
 #if defined(_MSC_VER) && !defined(__INTEL_COMPILER) // VC++2013 covariant return bug work-around
 	std::ios const &
-	Stream::
-	stream() const
+	Stream::stream() const
 	{
 		if ( IStream const * p = dynamic_cast< IStream const * >( this ) ) {
 			return p->stream();
@@ -48,8 +47,7 @@ namespace ObjexxFCL {
 	// Stream
 #if defined(_MSC_VER) && !defined(__INTEL_COMPILER) // VC++2013 covariant return bug work-around
 	std::ios &
-	Stream::
-	stream()
+	Stream::stream()
 	{
 		if ( IStream * p = dynamic_cast< IStream * >( this ) ) {
 			return p->stream();

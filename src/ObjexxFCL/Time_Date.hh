@@ -14,7 +14,6 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1.fwd.hh>
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
@@ -23,6 +22,9 @@
 #include <cstdint>
 
 namespace ObjexxFCL {
+
+// Forward Declarations
+template< typename > class FArray1;
 
 // Current Time: HH, MM, SS
 void

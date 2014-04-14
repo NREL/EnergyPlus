@@ -23,11 +23,11 @@ namespace ObjexxFCL {
 // Forward Declarations
 template< typename, typename = void > class Required;
 class byte;
-typedef  byte  sbyte;
 class ubyte;
 class Fstring;
 
 // Types
+typedef  byte  sbyte;
 typedef  Required< bool >                Required_bool;
 typedef  Required< byte >                Required_byte;
 typedef  Required< sbyte >               Required_sbyte;

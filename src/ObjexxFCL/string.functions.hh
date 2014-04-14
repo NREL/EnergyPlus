@@ -16,10 +16,13 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/TypeTraits.hh>
 #include <ObjexxFCL/char.constants.hh>
+#include <ObjexxFCL/char.functions.hh>
 
 // C++ Headers
+#include <algorithm>
 #include <cctype>
 #include <cstdlib>
+#include <cstring>
 #include <iomanip>
 #include <sstream>
 #include <string>
@@ -32,28 +35,86 @@ typedef  char const *  c_cstring;
 
 // Predicate
 
-// string == string Case-Insensitively?
+// char == char Case-Insensitively?
+inline
 bool
-equali( std::string const & s, std::string const & t );
+equali_char( char const c, char const d )
+{
+	return ( to_lower( c ) == to_lower( d ) );
+}
+
+// string == string Case-Insensitively?
+inline
+bool
+equali( std::string const & s, std::string const & t )
+{
+	return ( s.length() == t.length() ? std::equal( s.begin(), s.end(), t.begin(), equali_char ) : false );
+}
 
 // string == cstring Case-Insensitively?
+inline
 bool
-equali( std::string const & s, c_cstring const t );
+equali( std::string const & s, c_cstring const t )
+{
+	return ( s.length() == std::strlen( t ) ? std::equal( s.begin(), s.end(), t, equali_char ) : false );
+}
 
 // cstring == string Case-Insensitively?
+inline
 bool
-equali( c_cstring const s, std::string const & t );
+equali( c_cstring const s, std::string const & t )
+{
+	return ( std::strlen( s ) == t.length() ? std::equal( t.begin(), t.end(), s, equali_char ) : false );
+}
+
+// cstring == cstring Case-Insensitively?
+inline
+bool
+equali( c_cstring const s, c_cstring const t )
+{
+	auto const s_len( std::strlen( s ) );
+	return ( s_len == std::strlen( t ) ? std::equal( s, s + s_len, t, equali_char ) : false );
+}
 
 // string == string Case-Optionally?
 inline
 bool
 equal( std::string const & s, std::string const & t, bool const exact_case = true )
 {
-	if ( exact_case ) {
-		return ( s == t );
-	} else {
-		return equali( s, t );
-	}
+	return ( exact_case ? s == t : equali( s, t ) );
+}
+
+// string == string Case-Optionally?
+inline
+bool
+equal( std::string const & s, c_cstring const t, bool const exact_case = true )
+{
+	return ( exact_case ? s == t : equali( s, t ) );
+}
+
+// string == string Case-Optionally?
+inline
+bool
+equal( c_cstring const s, std::string const & t, bool const exact_case = true )
+{
+	return ( std::strlen( s ) == t.length() ? ( exact_case ? std::equal( t.begin(), t.end(), s ) : std::equal( t.begin(), t.end(), s, equali_char ) ) : false );
+}
+
+// string == string Case-Optionally?
+inline
+bool
+equal( c_cstring const s, c_cstring const t, bool const exact_case = true )
+{
+	auto const s_len( std::strlen( s ) );
+	return ( s_len == std::strlen( t ) ? ( exact_case ? std::equal( s, s + s_len, t ) : std::equal( s, s + s_len, t, equali_char ) ) : false );
+}
+
+// string is Empty?
+inline
+bool
+empty( std::string const & s )
+{
+	return s.empty();
 }
 
 // string is Blank?
@@ -61,11 +122,7 @@ inline
 bool
 is_blank( std::string const & s )
 {
-	if ( s.empty() ) {
-		return true;
-	} else {
-		return ( s.find_first_not_of( SPC ) == std::string::npos );
-	}
+	return ( s.empty() ? true : s.find_first_not_of( SPC ) == std::string::npos );
 }
 
 // string is Not Blank?
@@ -81,11 +138,7 @@ inline
 bool
 is_whitespace( std::string const & s )
 {
-	if ( s.empty() ) {
-		return true;
-	} else {
-		return ( s.find_last_not_of( " \t\000" ) == std::string::npos );
-	}
+	return ( s.empty() ? true : s.find_last_not_of( " \t\000" ) == std::string::npos );
 }
 
 // string is Not Whitespace?
@@ -150,6 +203,15 @@ has( std::string const & s, char const c )
 	return ( s.find( c ) != std::string::npos );
 }
 
+// string has a String/Character Case-Insensitively?
+template< typename T >
+inline
+bool
+hasi( std::string const & s, T const & t )
+{
+	return ( indexi( s, t ) != std::string::npos );
+}
+
 // string has any Character of a string?
 inline
 bool
@@ -202,11 +264,59 @@ has_any_not_of( std::string const & s, char const c )
 bool
 has_prefix( std::string const & s, std::string const & pre, bool const exact_case = true );
 
+// Has a Prefix Case-Insensitively?
+inline
+bool
+has_prefixi( std::string const & s, std::string const & pre )
+{
+	return has_prefix( s, pre, false );
+}
+
+// Has a Prefix Case-Optionally?
+bool
+has_prefix( std::string const & s, c_cstring const pre, bool const exact_case = true );
+
+// Has a Prefix Case-Insensitively?
+inline
+bool
+has_prefixi( std::string const & s, c_cstring const pre )
+{
+	return has_prefix( s, pre, false );
+}
+
 // Has a Suffix Case-Optionally?
 bool
 has_suffix( std::string const & s, std::string const & suf, bool const exact_case = true );
 
+// Has a Suffix Case-Insensitively?
+inline
+bool
+has_suffixi( std::string const & s, std::string const & suf )
+{
+	return has_suffix( s, suf, false );
+}
+
+// Has a Suffix Case-Optionally?
+bool
+has_suffix( std::string const & s, c_cstring const suf, bool const exact_case = true );
+
+// Has a Suffix Case-Insensitively?
+inline
+bool
+has_suffixi( std::string const & s, c_cstring const suf )
+{
+	return has_suffix( s, suf, false );
+}
+
 // Inspector
+
+// Length
+inline
+std::string::size_type
+len( std::string const & s )
+{
+	return s.length();
+}
 
 // Length Space-Trimmed
 inline
@@ -222,6 +332,126 @@ std::string::size_type
 len_trim_whitespace( std::string const & s )
 {
 	return s.find_last_not_of( " \t\000" ) + 1; // Works if npos returned: npos + 1 == 0
+}
+
+// Index of a Substring
+template< typename T >
+inline
+std::string::size_type
+index( std::string const & s, T const & t, bool const last = false )
+{
+	return ( last ? s.rfind( t ) : s.find( t ) );
+}
+
+// Last Index of a Substring
+template< typename T >
+inline
+std::string::size_type
+rindex( std::string const & s, T const & t )
+{
+	return index( s, t, true );
+}
+
+// Index of a Substring Case-Insensitively
+inline
+std::string::size_type
+indexi( std::string const & s, std::string const & t, bool const last = false )
+{
+	if ( last ) {
+		auto const i( std::find_end( s.begin(), s.end(), t.begin(), t.end(), equali_char ) );
+		return ( i == s.end() ? std::string::npos : static_cast< std::string::size_type >( i - s.begin() ) );
+	} else {
+		auto const i( std::search( s.begin(), s.end(), t.begin(), t.end(), equali_char ) );
+		return ( i == s.end() ? std::string::npos : static_cast< std::string::size_type >( i - s.begin() ) );
+	}
+}
+
+// Index of a Substring Case-Insensitively
+inline
+std::string::size_type
+indexi( std::string const & s, c_cstring const t, bool const last = false )
+{
+	if ( last ) {
+		auto const i( std::find_end( s.begin(), s.end(), t, t + std::strlen( t ), equali_char ) );
+		return ( i == s.end() ? std::string::npos : static_cast< std::string::size_type >( i - s.begin() ) );
+	} else {
+		auto const i( std::search( s.begin(), s.end(), t, t + std::strlen( t ), equali_char ) );
+		return ( i == s.end() ? std::string::npos : static_cast< std::string::size_type >( i - s.begin() ) );
+	}
+}
+
+// Index of a Character Case-Insensitively
+inline
+std::string::size_type
+indexi( std::string const & s, char const c, bool const last = false )
+{
+	if ( last ) {
+		for ( std::string::size_type i = s.length() - 1, e = 0; i >= e; --i ) {
+			if ( equali_char( s[ i ], c ) ) return i;
+		}
+	} else {
+		for ( std::string::size_type i = 0, e = s.length(); i < e; ++i ) {
+			if ( equali_char( s[ i ], c ) ) return i;
+		}
+	}
+	return std::string::npos;
+}
+
+// Last Index of a Substring Case-Insensitively
+template< typename T >
+inline
+std::string::size_type
+rindexi( std::string const & s, T const & t )
+{
+	return indexi( s, t, true );
+}
+
+// Find any Characters of Another String
+inline
+std::string::size_type
+scan( std::string const & s, std::string const & t, bool const last = false )
+{
+	return ( last ? s.find_last_of( t ) : s.find_first_of( t ) );
+}
+
+// Find any Characters of Another String
+inline
+std::string::size_type
+scan( std::string const & s, c_cstring const t, bool const last = false )
+{
+	return ( last ? s.find_last_of( t ) : s.find_first_of( t ) );
+}
+
+// Find a Character
+inline
+std::string::size_type
+scan( std::string const & s, char const c, bool const last = false )
+{
+	return ( last ? s.find_last_of( c ) : s.find_first_of( c ) );
+}
+
+// Find any Characters not of Another String
+inline
+std::string::size_type
+verify( std::string const & s, std::string const & t, bool const last = false )
+{
+	return ( last ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
+}
+
+// Find any Characters not of Another String
+inline
+std::string::size_type
+verify( std::string const & s, c_cstring const t, bool const last = false )
+{
+	return ( last ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
+}
+
+// Find Character not a Character
+inline
+std::string::size_type
+verify( std::string const & s, char const c, bool const last = false )
+{
+	return ( last ? s.find_last_not_of( c ) : s.find_first_not_of( c ) );
 }
 
 // Modifier
@@ -449,21 +679,43 @@ rpadded( std::string const & s, std::string::size_type const len );
 std::string
 sized( std::string const & s, std::string::size_type const len );
 
-// Centered wrt Whitespace Copy of a string
+// Left-Sized to a Specified Length Copy of a string
 std::string
-centered( std::string const & s );
+lsized( std::string const & s, std::string::size_type const len );
+
+// Right-Sized to a Specified Length Copy of a string
+inline
+std::string
+rsized( std::string const & s, std::string::size_type const len )
+{
+	return sized( s, len );
+}
 
 // Centered in a string of Specified Length Copy of a string
 std::string
 centered( std::string const & s, std::string::size_type const len );
+
+// Centered wrt Whitespace Copy of a string
+inline
+std::string
+centered( std::string const & s )
+{
+	return centered( stripped_whitespace( s ), s.length() );
+}
 
 // Removed Repeat Characters from a Possibly Unsorted string Preserving Order Copy of a string
 std::string
 uniqued( std::string const & s );
 
 // Substring Replaced Copy of a string
+inline
 std::string
-replaced( std::string const & s, std::string const & a, std::string const & b );
+replaced( std::string const & s, std::string const & a, std::string const & b )
+{
+	std::string r( s );
+	replace( r, a, b );
+	return r;
+}
 
 // Wrapped in Double Quotes Copy of a String
 inline

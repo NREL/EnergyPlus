@@ -44,8 +44,8 @@ namespace gio {
 	// Destructor
 	GlobalStreams::~GlobalStreams()
 	{
-		for ( auto i = fix_name_streams_.begin(), e = fix_name_streams_.end(); i != e; ++i ) delete i->second;
-		for ( auto i = usr_unit_streams_.begin(), e = usr_unit_streams_.end(); i != e; ++i ) delete i->second;
+		for ( auto & s : fix_name_streams_ ) delete s.second;
+		for ( auto & s : usr_unit_streams_ ) delete s.second;
 	}
 
 	// Lookup by Unit
@@ -102,26 +102,26 @@ namespace gio {
 
 	// Unit of Name
 	GlobalStreams::Unit
-	GlobalStreams::unit( Name const & name )
+	GlobalStreams::unit( Name const & name ) const
 	{ // Stream doesn't cache unit so this is not efficient
-		for ( auto i = usr_unit_streams_.begin(), e = usr_unit_streams_.end(); i != e; ++i ) {
-			if ( i->second->name() == name ) return i->first;
+		for ( auto const & s : usr_unit_streams_ ) {
+			if ( s.second->name() == name ) return s.first;
 		}
-		for ( auto i = fix_unit_streams_.begin(), e = fix_unit_streams_.end(); i != e; ++i ) {
-			if ( i->second->name() == name ) return i->first;
+		for ( auto const & s : fix_unit_streams_ ) {
+			if ( s.second->name() == name ) return s.first;
 		}
 		return -1; // => No such name connected
 	}
 
 	// Unit of Stream
 	GlobalStreams::Unit
-	GlobalStreams::unit( Stream const & stream )
+	GlobalStreams::unit( Stream const & stream ) const
 	{ // Stream doesn't cache unit so this is not efficient
-		for ( auto i = usr_unit_streams_.begin(), e = usr_unit_streams_.end(); i != e; ++i ) {
-			if ( i->second == &stream ) return i->first;
+		for ( auto const & s : usr_unit_streams_ ) {
+			if ( s.second == &stream ) return s.first;
 		}
-		for ( auto i = fix_unit_streams_.begin(), e = fix_unit_streams_.end(); i != e; ++i ) {
-			if ( i->second == &stream ) return i->first;
+		for ( auto const & s : fix_unit_streams_ ) {
+			if ( s.second == &stream ) return s.first;
 		}
 		return -1; // => No such name connected
 	}
@@ -191,7 +191,7 @@ namespace gio {
 	void
 	GlobalStreams::clear()
 	{
-		for ( auto i = usr_unit_streams_.begin(), e = usr_unit_streams_.end(); i != e; ++i ) delete i->second;
+		for ( auto & s : usr_unit_streams_ ) delete s.second;
 		usr_unit_streams_.clear();
 		usr_name_streams_.clear();
 	}

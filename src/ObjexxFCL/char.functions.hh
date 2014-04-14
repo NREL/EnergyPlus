@@ -13,6 +13,9 @@
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
+// ObjexxFCL Headers
+#include <ObjexxFCL/char.constants.hh>
+
 // C++ Headers
 #include <string>
 
@@ -21,35 +24,79 @@ namespace ObjexxFCL {
 // Types
 typedef  char const *  c_cstring;
 
+// Inspector
+
+// Lowercased 8-bit ASCII char
+inline
+char
+to_lower( char const c )
+{
+	int const i( static_cast< int >( c ) );
+	return ( ( ( 65 <= i ) && ( i <= 90 ) ) || ( ( 192 <= i ) && ( i <= 223 ) ) ? i + 32 : i );
+}
+
+// Uppercased 8-bit ASCII char
+inline
+char
+to_upper( char const c )
+{
+	int const i( static_cast< int >( c ) );
+	return ( ( ( 97 <= i ) && ( i <= 122 ) ) || ( ( 224 <= i ) && ( i <= 255 ) ) ? i - 32 : i );
+}
+
 // Predicate
 
-// char == char Case-Optionally?
-bool
-equal( char const c, char const d, bool const exact_case = true );
-
 // char == char Case-Insensitively
+inline
 bool
-equali( char const c, char const d );
+equali( char const c, char const d )
+{
+	return ( to_lower( c ) == to_lower( d ) );
+}
+
+// char == char Case-Optionally?
+inline
+bool
+equal( char const c, char const d, bool const exact_case = true )
+{
+	return ( exact_case ? c == d : to_lower( c ) == to_lower( d ) );
+}
 
 // Character is Blank?
+inline
 bool
-is_blank( char const c );
+is_blank( char const c )
+{
+	return ( c == SPC );
+}
 
 // Character is Not Blank?
+inline
 bool
-not_blank( char const c );
+not_blank( char const c )
+{
+	return ( c != SPC );
+}
 
 // Character is in a string?
+inline
 bool
-is_any_of( char const c, std::string const & s );
+is_any_of( char const c, std::string const & s )
+{
+	return ( s.find( c ) != std::string::npos );
+}
 
 // Character is in a cstring?
 bool
 is_any_of( char const c, c_cstring const s );
 
 // Character is not in a string?
+inline
 bool
-not_any_of( char const c, std::string const & s );
+not_any_of( char const c, std::string const & s )
+{
+	return ( s.find( c ) == std::string::npos );
+}
 
 // Character is not in a cstring?
 bool
@@ -58,33 +105,33 @@ not_any_of( char const c, c_cstring const s );
 // ASCII Lexical >= Comparison
 inline
 bool
-lge( char const s, char const t )
+lge( char const c, char const d )
 {
-	return ( s >= t );
+	return ( c >= d );
 }
 
 // ASCII Lexical < Comparison
 inline
 bool
-lgt( char const s, char const t )
+lgt( char const c, char const d )
 {
-	return ( s > t );
+	return ( c > d );
 }
 
 // ASCII Lexical <= Comparison
 inline
 bool
-lle( char const s, char const t )
+lle( char const c, char const d )
 {
-	return ( s <= t );
+	return ( c <= d );
 }
 
 // ASCII Lexical < Comparison
 inline
 bool
-llt( char const s, char const t )
+llt( char const c, char const d )
 {
-	return ( s < t );
+	return ( c < d );
 }
 
 // Integer Conversion
@@ -92,38 +139,56 @@ llt( char const s, char const t )
 // Integer Value of a Given One-Character Fstring
 inline
 int
-ICHAR( char const s )
+ICHAR( char const c )
 {
-	return static_cast< int >( s );
+	return static_cast< int >( c );
 }
 
 // ASCII Integer Value for a Given One-Character Fstring
 inline
 int
-IACHAR( char const s )
+IACHAR( char const c )
 {
-	return static_cast< int >( s );
+	return static_cast< int >( c );
 }
 
 // Modifier
 
 // Lowercase a Character
+inline
 char &
-lowercase( char & c );
+lowercase( char & c )
+{
+	c = to_lower( c );
+	return c;
+}
 
 // Uppercase a Character
+inline
 char &
-uppercase( char & c );
+uppercase( char & c )
+{
+	c = to_upper( c );
+	return c;
+}
 
 // Generator
 
 // Lowercased Copy of a Character
+inline
 char
-lowercased( char const c );
+lowercased( char const c )
+{
+	return to_lower( c );
+}
 
 // Uppercased Copy of a Character
+inline
 char
-uppercased( char const c );
+uppercased( char const c )
+{
+	return to_upper( c );
+}
 
 } // ObjexxFCL
 

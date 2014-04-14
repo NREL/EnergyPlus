@@ -14,7 +14,6 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Dimension.fwd.hh>
 #include <ObjexxFCL/ObserverMulti.hh>
 #include <ObjexxFCL/DimensionExpression.hh>
 

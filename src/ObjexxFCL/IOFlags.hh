@@ -13,13 +13,9 @@
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/IOFlags.fwd.hh>
-#include <ObjexxFCL/string.functions.hh>
-
 // C++ Headers
-#include <cassert>
 #include <cstdlib>
+#include <string>
 #ifndef OBJEXXFCL_IO_ERROR_SUPPRESS
 #include <iostream>
 #else
@@ -333,27 +329,8 @@ public: // Properties
 	}
 
 	// Status String Set
-	inline
 	IOFlags &
-	STATUS( std::string const & status )
-	{
-		std::string const STATUS( uppercased( status ) );
-		if ( STATUS == "OLD" ) {
-			old_on();
-		} else if ( STATUS == "NEW" ) {
-			new_on();
-		} else if ( STATUS == "SCRATCH" ) {
-			scratch_on();
-		} else if ( STATUS == "REPLACE" ) {
-			unknown_on();
-		} else if ( STATUS == "UNKNOWN" ) {
-			unknown_on();
-		} else {
-			assert( false ); // Invalid i/o flag value
-			unknown_on();
-		}
-		return *this;
-	}
+	STATUS( std::string const & status );
 
 	// Open?
 	inline
@@ -483,25 +460,8 @@ public: // Properties
 	}
 
 	// Access String Set
-	inline
 	IOFlags &
-	ACCESS( std::string const & access )
-	{
-		std::string const ACCESS( uppercased( access ) );
-		if ( ACCESS == "DIRECT" ) {
-			// Not supported
-		} else if ( ACCESS == "SEQUENTIAL" ) {
-			// Default
-		} else if ( ACCESS == "STREAM" ) {
-			// Not supported
-		} else if ( ACCESS == "APPEND" ) {
-			append_ = true;
-			asis_ = false;
-		} else {
-			assert( false ); // Invalid i/o flag value
-		}
-		return *this;
-	}
+	ACCESS( std::string const & access );
 
 	// Action String
 	inline
@@ -512,27 +472,8 @@ public: // Properties
 	}
 
 	// Action String Set
-	inline
 	IOFlags &
-	ACTION( std::string const & action )
-	{
-		std::string const ACTION( uppercased( action ) );
-		if ( ACTION == "READ" ) {
-			read_ = true;
-			write_ = false;
-		} else if ( ACTION == "WRITE" ) {
-			read_ = false;
-			write_ = true;
-		} else if ( ACTION == "READWRITE" ) {
-			read_ = true;
-			write_ = true;
-		} else {
-			assert( false ); // Invalid i/o flag value
-			read_ = true;
-			write_ = true;
-		}
-		return *this;
-	}
+	ACTION( std::string const & action );
 
 	// Position String
 	inline
@@ -543,27 +484,8 @@ public: // Properties
 	}
 
 	// Position String Set
-	inline
 	IOFlags &
-	POSITION( std::string const & position )
-	{
-		std::string const POSITION( uppercased( position ) );
-		if ( POSITION == "ASIS" ) {
-			append_ = false;
-			asis_ = true;
-		} else if ( POSITION == "REWIND" ) { // Default
-			append_ = false;
-			asis_ = false;
-		} else if ( POSITION == "APPEND" ) {
-			append_ = true;
-			asis_ = false;
-		} else {
-			assert( false ); // Invalid i/o flag value
-			append_ = false;
-			asis_ = true;
-		}
-		return *this;
-	}
+	POSITION( std::string const & position );
 
 	// Binary?
 	inline
@@ -600,21 +522,8 @@ public: // Properties
 	}
 
 	// Binary String Set
-	inline
 	IOFlags &
-	BINARY( std::string const & binary )
-	{
-		std::string const BINARY( uppercased( binary ) );
-		if ( BINARY == "YES" ) {
-			binary_ = true;
-		} else if ( BINARY == "NO" ) {
-			binary_ = false;
-		} else {
-			assert( false ); // Invalid i/o flag value
-			binary_ = false;
-		}
-		return *this;
-	}
+	BINARY( std::string const & binary );
 
 	// Append?
 	inline
@@ -652,21 +561,8 @@ public: // Properties
 	}
 
 	// Append String Set
-	inline
 	IOFlags &
-	APPEND( std::string const & append )
-	{
-		std::string const APPEND( uppercased( append ) );
-		if ( APPEND == "YES" ) {
-			append_ = true;
-		} else if ( APPEND == "NO" ) {
-			append_ = false;
-		} else {
-			assert( false ); // Invalid i/o flag value
-			append_ = false;
-		}
-		return *this;
-	}
+	APPEND( std::string const & append );
 
 	// Truncate?
 	inline
@@ -766,23 +662,8 @@ public: // Properties
 	}
 
 	// Form String Set
-	inline
 	IOFlags &
-	FORM( std::string const & form )
-	{
-		std::string const FORM( uppercased( form ) );
-		if ( FORM == "FORMATTED" ) {
-			binary_ = false;
-		} else if ( FORM == "UNFORMATTED" ) {
-			binary_ = true; // Unsupported: Treat as binary
-		} else if ( FORM == "BINARY" ) {
-			binary_ = true;
-		} else {
-			assert( false ); // Invalid i/o flag value
-			binary_ = false;
-		}
-		return *this;
-	}
+	FORM( std::string const & form );
 
 	// Formatted String
 	inline
@@ -937,21 +818,8 @@ public: // Properties
 	}
 
 	// Blank String Set
-	inline
 	IOFlags &
-	BLANK( std::string const & blank )
-	{
-		std::string const BLANK( uppercased( blank ) );
-		if ( BLANK == "NULL" ) {
-			bz_ = false;
-		} else if ( BLANK == "ZERO" ) {
-			bz_ = true;
-		} else {
-			assert( false ); // Invalid i/o flag value
-			bz_ = false;
-		}
-		return *this;
-	}
+	BLANK( std::string const & blank );
 
 	// Advancing I/O?
 	inline
@@ -1014,21 +882,8 @@ public: // Properties
 	}
 
 	// Advancing I/O String Set
-	inline
 	IOFlags &
-	ADVANCE( std::string const & advance )
-	{
-		std::string const ADVANCE( uppercased( advance ) );
-		if ( ADVANCE == "YES" ) {
-			nad_ = false;
-		} else if ( ADVANCE == "NO" ) {
-			nad_ = true;
-		} else {
-			assert( false ); // Invalid i/o flag value
-			nad_ = false;
-		}
-		return *this;
-	}
+	ADVANCE( std::string const & advance );
 
 	// Delete?
 	inline
@@ -1065,31 +920,8 @@ public: // Properties
 	}
 
 	// Dispose String Set
-	inline
 	IOFlags &
-	DISPOSE( std::string const & dispose )
-	{
-		std::string const DISPOSE( uppercased( dispose ) );
-		if ( DISPOSE == "KEEP" ) {
-			del_ = false;
-		} else if ( DISPOSE == "SAVE" ) {
-			del_ = false;
-		} else if ( DISPOSE == "DELETE" ) {
-			del_ = true;
-		} else if ( DISPOSE == "PRINT" ) {
-			del_ = false;
-		} else if ( DISPOSE == "PRINT/DELETE" ) {
-			del_ = true;
-		} else if ( DISPOSE == "SUBMIT" ) {
-			del_ = false;
-		} else if ( DISPOSE == "SUBMIT/DELETE" ) {
-			del_ = true;
-		} else {
-			assert( false ); // Invalid i/o flag value
-			del_ = false;
-		}
-		return *this;
-	}
+	DISPOSE( std::string const & dispose );
 
 	// Error?
 	inline

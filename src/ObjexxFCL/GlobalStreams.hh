@@ -13,15 +13,16 @@
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/IOFlags.fwd.hh>
-#include <ObjexxFCL/Stream.fwd.hh>
-
 // C++ Headers
 #include <string>
 #include <unordered_map>
 
 namespace ObjexxFCL {
+
+// Forward Declarations
+class IOFlags;
+class Stream;
+
 namespace gio {
 
 // Global Streams Collection
@@ -94,11 +95,11 @@ public: // Inspectors
 
 	// Unit of Name
 	Unit
-	unit( Name const & name );
+	unit( Name const & name ) const;
 
 	// Unit of Stream
 	Unit
-	unit( Stream const & stream );
+	unit( Stream const & stream ) const;
 
 public: // Methods
 

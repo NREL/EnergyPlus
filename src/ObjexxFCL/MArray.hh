@@ -14,7 +14,6 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/MArray.fwd.hh>
 #include <ObjexxFCL/BArray.hh>
 #include <ObjexxFCL/StaticIndexRange.hh>
 #include <ObjexxFCL/TypeTraits.hh>

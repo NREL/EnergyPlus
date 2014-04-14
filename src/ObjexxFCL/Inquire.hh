@@ -16,17 +16,25 @@
 // Notes:
 //  Supports some common Fortran INQUIRE capabilities
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Fstring.fwd.hh>
-#include <ObjexxFCL/IOFlags.fwd.hh>
-#include <ObjexxFCL/Stream.fwd.hh>
-
 // C++ Headers
 #include <cassert>
 #include <iosfwd>
 #include <string>
 
 namespace ObjexxFCL {
+
+// Forward Declarations
+class Fstring;
+class IOFlags;
+class Stream;
+class IStream;
+class OStream;
+class IStringStream;
+class OStringStream;
+class StringStream;
+class IFileStream;
+class OFileStream;
+class FileStream;
 
 // Types
 typedef  char const *  c_cstring;

@@ -14,7 +14,6 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/DynamicIndexRange.fwd.hh>
 #include <ObjexxFCL/IndexRange.hh>
 #include <ObjexxFCL/ObserverSingle.hh>
 #include <ObjexxFCL/Dimension.hh>
@@ -1126,6 +1125,9 @@ private: // Data
 	Dimension * u_dim_p_; // Upper Dimension pointer (0 iff no Dimension)
 
 }; // DynamicIndexRange
+
+// Types
+typedef  DynamicIndexRange  DRange;
 
 // Functions
 

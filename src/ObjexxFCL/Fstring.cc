@@ -1,4 +1,4 @@
-// Fstring: Fixed-Length Fortran-Compatible String and Substring
+// Fstring: Fixed-Length Fortran-Compatible String
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
@@ -12,25 +12,12 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fstring.hh>
-#include <ObjexxFCL/char.constants.hh>
-#include <ObjexxFCL/char.functions.hh>
 #include <ObjexxFCL/string.constants.hh>
 
 // C++ Headers
-#include <algorithm>
 #include <iostream>
 
 namespace ObjexxFCL {
-
-	// Copy Constructor
-	Fstring::Fstring( Fstring const & s ) :
-		len_( s.len_ ),
-		str_( len_ > 0u ? new char[ len_ ] : nullptr ),
-		c_str_( nullptr ),
-		sub_( false )
-	{
-		std::memcpy( str_, s.str_, len_ );
-	}
 
 	// Move Constructor
 	Fstring::Fstring( Fstring && s ) :
@@ -52,16 +39,6 @@ namespace ObjexxFCL {
 		}
 	}
 
-	// Substring Constructor
-	Fstring::Fstring( Fsubstring const & s ) :
-		len_( s.len_ ),
-		str_( len_ > 0u ? new char[ len_ ] : nullptr ),
-		c_str_( nullptr ),
-		sub_( false )
-	{
-		std::memcpy( str_, s.str_, len_ );
-	}
-
 	// string Constructor
 	Fstring::Fstring( std::string const & s ) :
 		len_( s.length() ),
@@ -80,6 +57,36 @@ namespace ObjexxFCL {
 		sub_( false )
 	{
 		std::memcpy( str_, s, len_ );
+	}
+
+	// char Constructor
+	Fstring::Fstring( char const c ) :
+		len_( 1 ),
+		str_( new char[ 1 ] ),
+		c_str_( nullptr ),
+		sub_( false )
+	{
+		str_[ 0 ] = c;
+	}
+
+	// signed char Constructor
+	Fstring::Fstring( signed char const c ) :
+		len_( 1 ),
+		str_( new char[ 1 ] ),
+		c_str_( nullptr ),
+		sub_( false )
+	{
+		str_[ 0 ] = static_cast< char >( c );
+	}
+
+	// unsigned char Constructor
+	Fstring::Fstring( unsigned char const c ) :
+		len_( 1 ),
+		str_( new char[ 1 ] ),
+		c_str_( nullptr ),
+		sub_( false )
+	{
+		str_[ 0 ] = static_cast< char >( c );
 	}
 
 	// Length Constructor
@@ -209,8 +216,7 @@ namespace ObjexxFCL {
 		}
 	}
 
-	// Length + char Constructor
-	//  Fills with specified char => Use Fstring( len, "c" ) for space-padded single character
+	// Length + Fill char Constructor
 	Fstring::Fstring( size_type const len, char const c ) :
 		len_( len ),
 		str_( len_ > 0u ? new char[ len_ ] : nullptr ),
@@ -229,26 +235,6 @@ namespace ObjexxFCL {
 	{
 		std::memset( str_, SPC, len_ );
 		init( *this );
-	}
-
-	// Substring Range Constructor
-	Fstring::Fstring( Fstring const & s, size_type const l, size_type const u ) :
-		len_( l <= std::min( u, s.len_ ) ? std::min( u, s.len_ ) - l + 1u : static_cast< size_type >( 0 ) ),
-		str_( l <= s.len_ ? s.str_ + l - 1u : s.str_ ),
-		c_str_( nullptr ),
-		sub_( true )
-	{
-		assert( l > 0u );
-	}
-
-	// Substring Tail Constructor
-	Fstring::Fstring( Fstring const & s, size_type const l ) :
-		len_( l <= s.len_ ? s.len_ - l + 1u : static_cast< size_type >( 0 ) ),
-		str_( l <= s.len_ ? s.str_ + l - 1u : s.str_ ),
-		c_str_( nullptr ),
-		sub_( true )
-	{
-		assert( l > 0u );
 	}
 
 	// Copy Assignment
@@ -300,7 +286,7 @@ namespace ObjexxFCL {
 	{
 		if ( len_ > 0u ) {
 			str_[ 0 ] = c;
-			if ( len_ > 1u ) std::memset( str_ + 1, SPC, len_ - 1 ); // Space pad
+			if ( len_ > 1u ) std::memset( str_ + 1, SPC, len_ - 1u ); // Space pad
 		}
 		return *this;
 	}
@@ -420,9 +406,24 @@ namespace ObjexxFCL {
 		} else if ( len_ < s.len_ ) {
 			return false;
 		} else if ( exact_case ) {
-			return ( (*this)( 1, s.len_ ) == s );
+			return ( (*this)( 1u, s.len_ ) == s );
 		} else {
-			return ( lowercased()( 1, s.len_ ) == s.lowercased() );
+			return ( equali( (*this)( 1u, s.len_ ), s ) );
+		}
+	}
+
+	// Has a Prefix Case-Optionally?
+	bool
+	Fstring::has_prefix( std::string const & s, bool const exact_case ) const
+	{
+		if ( s.length() == 0u ) {
+			return false;
+		} else if ( len_ < s.length() ) {
+			return false;
+		} else if ( exact_case ) {
+			return ( (*this)( 1u, s.length() ) == s );
+		} else {
+			return ( equali( (*this)( 1u, s.length() ), s ) );
 		}
 	}
 
@@ -436,9 +437,9 @@ namespace ObjexxFCL {
 		} else if ( len_ < s_len ) {
 			return false;
 		} else if ( exact_case ) {
-			return ( (*this)( 1, s_len ) == s );
+			return ( (*this)( 1u, s_len ) == s );
 		} else {
-			return ( lowercased()( 1, s_len ) == Fstring( s ).lowercase() );
+			return ( equali( (*this)( 1u, s_len ), s ) );
 		}
 	}
 
@@ -448,14 +449,14 @@ namespace ObjexxFCL {
 	{
 #ifdef OBJEXXFCL_NO_UNROLL
 		if ( len_ == 0u ) return 0;
-		for ( size_type i = len_ - 1; i > 0u; --i ) {
+		for ( size_type i = len_ - 1u; i > 0u; --i ) {
 			if ( str_[ i ] != SPC ) return i + 1;
 		}
 		return ( str_[ 0 ] != SPC ? 1 : 0 );
 #else
 		if ( len_ == 0u ) return 0;
 		size_type i( len_ );
-		while ( i >= 8 ) {
+		while ( i >= 8u ) {
 			if ( str_[ --i ] != SPC ) return i + 1;
 			if ( str_[ --i ] != SPC ) return i + 1;
 			if ( str_[ --i ] != SPC ) return i + 1;
@@ -495,7 +496,7 @@ namespace ObjexxFCL {
 	Fstring::len_trim_whitespace() const
 	{
 		if ( len_ == 0u ) return 0;
-		for ( size_type i = len_ - 1; i > 0u; --i ) {
+		for ( size_type i = len_ - 1u; i > 0u; --i ) {
 			char const c( str_[ i ] );
 			if ( ( c != SPC ) && ( c != TAB ) && ( c != NUL ) ) return i + 1;
 		}
@@ -532,7 +533,7 @@ namespace ObjexxFCL {
 	Fstring::find_last_whitespace() const
 	{
 		if ( len_ == 0u ) return 0;
-		for ( size_type i = len_ - 1; i > 0u; --i ) {
+		for ( size_type i = len_ - 1u; i > 0u; --i ) {
 			char const c( str_[ i ] );
 			if ( ( c == SPC ) || ( c == TAB ) || ( c == NUL ) ) return i + 1;
 		}
@@ -545,7 +546,7 @@ namespace ObjexxFCL {
 	Fstring::find_last_non_whitespace() const
 	{
 		if ( len_ == 0u ) return 0;
-		for ( size_type i = len_ - 1; i > 0u; --i ) {
+		for ( size_type i = len_ - 1u; i > 0u; --i ) {
 			char const c( str_[ i ] );
 			if ( ( c != SPC ) && ( c != TAB ) && ( c != NUL ) ) return i + 1;
 		}
@@ -887,7 +888,7 @@ namespace ObjexxFCL {
 	Fstring::lowercase()
 	{
 		for ( size_type i = 0; i < len_; ++i ) {
-			str_[ i ] = std::tolower( str_[ i ] );
+			str_[ i ] = to_lower( str_[ i ] );
 		}
 		return *this;
 	}
@@ -897,7 +898,7 @@ namespace ObjexxFCL {
 	Fstring::uppercase()
 	{
 		for ( size_type i = 0; i < len_; ++i ) {
-			str_[ i ] = std::toupper( str_[ i ] );
+			str_[ i ] = to_upper( str_[ i ] );
 		}
 		return *this;
 	}
@@ -1139,30 +1140,6 @@ namespace ObjexxFCL {
 		return *this;
 	}
 
-	// Overlay an Fstring
-	Fstring &
-	Fstring::overlay( Fstring const & s, size_type const pos )
-	{
-		(*this)( pos, std::min( ( pos + s.len_ ) - 1, len_ ) ) = s;
-		return *this;
-	}
-
-	// Overlay a string
-	Fstring &
-	Fstring::overlay( std::string const & s, size_type const pos )
-	{
-		(*this)( pos, std::min( ( pos + s.length() ) - 1, len_ ) ) = s;
-		return *this;
-	}
-
-	// Overlay a cstring
-	Fstring &
-	Fstring::overlay( c_cstring const s, size_type const pos )
-	{
-		(*this)( pos, std::min( ( pos + std::strlen( s ) ) - 1, len_ ) ) = s;
-		return *this;
-	}
-
 	// Null-Terminated cstring Copy of the Fstring that is Owned by the Fstring
 	c_cstring
 	Fstring::c_str() const
@@ -1195,245 +1172,64 @@ namespace ObjexxFCL {
 		return len_copied;
 	}
 
-	// Constant Substring: s( l, u )
-	Fsubstring const
-	Fstring::operator ()( size_type const l, size_type const u ) const
-	{
-		return Fsubstring( *this, l, u );
-	}
-
-	// Substring: s( l, u )
-	Fsubstring
-	Fstring::operator ()( size_type const l, size_type const u )
-	{
-		return Fsubstring( *this, l, u );
-	}
-
 	// Constant Substring: s( {l,u} )
-	Fsubstring const
-	Fstring::operator ()( std::initializer_list< int > const lu ) const
-	{
-		size_type const n( lu.size() );
-		auto i( lu.begin() );
-		switch ( n ) {
-		case 0: // {}
-			return Fsubstring( *this, 1 );
-			break;
-		case 1: // {l}
-			return Fsubstring( *this, *i );
-			break;
-		case 2: // {l,u}
-			return Fsubstring( *this, *i, *(i+1) );
-			break;
-		default:
-			assert( false ); // Illegal
-			return Fsubstring( *this, 1 );
-			break;
-		}
-	}
-
-	// Substring: s( {l,u} )
-	Fsubstring
-	Fstring::operator ()( std::initializer_list< int > const lu )
-	{
-		size_type const n( lu.size() );
-		auto i( lu.begin() );
-		switch ( n ) {
-		case 0: // {}
-			return Fsubstring( *this, 1 );
-			break;
-		case 1: // {l}
-			return Fsubstring( *this, *i );
-			break;
-		case 2: // {l,u}
-			return Fsubstring( *this, *i, *(i+1) );
-			break;
-		default:
-			assert( false ); // Illegal
-			return Fsubstring( *this, 1 );
-			break;
-		}
-	}
-
-	// Constant Substring: s( {l,u} )
-	Fsubstring const
+	Fstring const
 	Fstring::operator ()( std::initializer_list< Index > const lu ) const
 	{
 		size_type const n( lu.size() );
 		auto i( lu.begin() );
 		switch ( n ) {
 		case 0: // {}
-			return Fsubstring( *this, 1 );
+			return Fstring( *this, 1 );
 			break;
 		case 1: // {l}
-			return Fsubstring( *this, i->initialized() ? int( *i ) : 1 );
+			return Fstring( *this, i->initialized() ? int( *i ) : 1 );
 			break;
 		case 2: // {l,u}
 			{
 				auto const u( i + 1 );
 				if ( u->initialized() ) {
-					return Fsubstring( *this, i->initialized() ? int( *i ) : 1, int( *u ) );
+					return Fstring( *this, i->initialized() ? int( *i ) : 1, int( *u ) );
 				} else {
-					return Fsubstring( *this, i->initialized() ? int( *i ) : 1 );
+					return Fstring( *this, i->initialized() ? int( *i ) : 1 );
 				}
 			}
 			break;
 		default:
 			assert( false ); // Illegal
-			return Fsubstring( *this, 1 );
+			return Fstring( *this, 1 );
 			break;
 		}
 	}
 
 	// Substring: s( {l,u} )
-	Fsubstring
+	Fstring
 	Fstring::operator ()( std::initializer_list< Index > const lu )
 	{
 		size_type const n( lu.size() );
 		auto i( lu.begin() );
 		switch ( n ) {
 		case 0: // {}
-			return Fsubstring( *this, 1 );
+			return Fstring( *this, 1 );
 			break;
 		case 1: // {l}
-			return Fsubstring( *this, i->initialized() ? int( *i ) : 1 );
+			return Fstring( *this, i->initialized() ? int( *i ) : 1 );
 			break;
 		case 2: // {l,u}
 			{
 				auto const u( i + 1 );
 				if ( u->initialized() ) {
-					return Fsubstring( *this, i->initialized() ? int( *i ) : 1, int( *u ) );
+					return Fstring( *this, i->initialized() ? int( *i ) : 1, int( *u ) );
 				} else {
-					return Fsubstring( *this, i->initialized() ? int( *i ) : 1 );
+					return Fstring( *this, i->initialized() ? int( *i ) : 1 );
 				}
 			}
 			break;
 		default:
 			assert( false ); // Illegal
-			return Fsubstring( *this, 1 );
+			return Fstring( *this, 1 );
 			break;
 		}
-	}
-
-	// Constant Tail Substring: s( l )
-	Fstring const
-	Fstring::operator ()( size_type const l ) const
-	{
-		return Fsubstring( *this, l );
-	}
-
-	// Tail Substring: s( l )
-	Fsubstring
-	Fstring::operator ()( size_type const l )
-	{
-		return Fsubstring( *this, l );
-	}
-
-	// Space-Free Head Constant Substring
-	Fsubstring const
-	Fstring::head() const
-	{
-		size_type const ie( find( SPC ) );
-		if ( ie == 0 ) {
-			return Fsubstring( *this, 1, len_ );
-		} else {
-			return Fsubstring( *this, 1, ie - 1 );
-		}
-	}
-
-	// Space-Free Head Substring
-	Fsubstring
-	Fstring::head()
-	{
-		size_type const ie( find( SPC ) );
-		if ( ie == 0 ) {
-			return Fsubstring( *this, 1, len_ );
-		} else {
-			return Fsubstring( *this, 1, ie - 1 );
-		}
-	}
-
-	// Space Tail Constant Substring
-	Fsubstring const
-	Fstring::tail() const
-	{
-		return Fsubstring( *this, len_trim() + 1 );
-	}
-
-	// Space Tail Substring
-	Fsubstring
-	Fstring::tail()
-	{
-		return Fsubstring( *this, len_trim() + 1 );
-	}
-
-	// Copy Assignment
-	Fsubstring &
-	Fsubstring::operator =( Fsubstring const & s )
-	{
-		if ( this != &s ) {
-			if ( len_ > s.len_ ) {
-				if ( s.len_ > 0u ) std::memmove( str_, s.str_, s.len_ );
-				std::memset( str_ + s.len_, SPC, len_ - s.len_ ); // Space pad
-			} else if ( len_ > 0u ) {
-				std::memmove( str_, s.str_, len_ );
-			}
-		}
-		return *this;
-	}
-
-	// = Fstring
-	Fsubstring &
-	Fsubstring::operator =( Fstring const & s )
-	{
-		if ( this != &s ) {
-			if ( len_ > s.len_ ) {
-				if ( s.len_ > 0u ) std::memmove( str_, s.str_, s.len_ );
-				std::memset( str_ + s.len_, SPC, len_ - s.len_ ); // Space pad
-			} else if ( len_ > 0u ) {
-				std::memmove( str_, s.str_, len_ );
-			}
-		}
-		return *this;
-	}
-
-	// = string
-	Fsubstring &
-	Fsubstring::operator =( std::string const & s )
-	{
-		size_type const s_len( s.length() );
-		if ( len_ > s_len ) {
-			if ( s_len > 0u ) s.copy( str_, s_len );
-			std::memset( str_ + s_len, SPC, len_ - s_len ); // Space pad
-		} else if ( len_ > 0u ) {
-			s.copy( str_, len_ );
-		}
-		return *this;
-	}
-
-	// = cstring
-	Fsubstring &
-	Fsubstring::operator =( c_cstring const s )
-	{
-		size_type const s_len( std::strlen( s ) );
-		if ( len_ > s_len ) {
-			if ( s_len > 0u ) std::memmove( str_, s, s_len );
-			std::memset( str_ + s_len, SPC, len_ - s_len ); // Space pad
-		} else if ( len_ > 0u ) {
-			std::memmove( str_, s, len_ );
-		}
-		return *this;
-	}
-
-	// = char
-	Fsubstring &
-	Fsubstring::operator =( char const c )
-	{
-		if ( len_ > 0u ) {
-			str_[ 0 ] = c;
-			if ( len_ > 1u ) std::memset( str_ + 1, SPC, len_ - 1 ); // Space pad
-		}
-		return *this;
 	}
 
 // Fstring Friends
@@ -1507,7 +1303,82 @@ operator ==( Fstring const & s, char const c )
 	if ( s.empty() ) { // Zero-length Fstring
 		return false;
 	} else if ( s.str_[ 0 ] == c ) { // First character matches
-		return ( s( 2 ).is_blank() ); // Rest is blank
+		return ( ( s.len_ == 1 ) || ( s( 2 ).is_blank() ) ); // Rest is blank
+	} else { // First character doesn't match
+		return false;
+	}
+}
+
+// Fstring == Fstring Case-Insensitively?
+bool
+equali( Fstring const & s, Fstring const & t )
+{
+	Fstring::size_type const min_len( std::min( s.len_, t.len_ ) );
+	for ( Fstring::size_type i = 0; i < min_len; ++i ) {
+		if ( to_lower( s.str_[ i ] ) != to_lower( t.str_[ i ] ) ) return false;
+	}
+	if ( s.len_ < t.len_ ) {
+		for ( Fstring::size_type i = s.len_, e = t.len_; i < e; ++i ) {
+			if ( t.str_[ i ] != SPC ) return false;
+		}
+	} else if ( s.len_ > t.len_ ) {
+		for ( Fstring::size_type i = t.len_, e = s.len_; i < e; ++i ) {
+			if ( s.str_[ i ] != SPC ) return false;
+		}
+	}
+	return true;
+}
+
+// Fstring == string Case-Insensitively?
+bool
+equali( Fstring const & s, std::string const & t )
+{
+	Fstring::size_type const t_len( t.length() );
+	Fstring::size_type const min_len( std::min( s.len_, t_len ) );
+	for ( Fstring::size_type i = 0; i < min_len; ++i ) {
+		if ( to_lower( s.str_[ i ] ) != to_lower( t[ i ] ) ) return false;
+	}
+	if ( s.len_ < t_len ) {
+		for ( Fstring::size_type i = s.len_; i < t_len; ++i ) {
+			if ( t[ i ] != SPC ) return false;
+		}
+	} else if ( s.len_ > t_len ) {
+		for ( Fstring::size_type i = t_len, e = s.len_; i < e; ++i ) {
+			if ( s.str_[ i ] != SPC ) return false;
+		}
+	}
+	return true;
+}
+
+// Fstring == cstring Case-Insensitively?
+bool
+equali( Fstring const & s, c_cstring const t )
+{
+	Fstring::size_type const t_len( std::strlen( t ) );
+	Fstring::size_type const min_len( std::min( s.len_, t_len ) );
+	for ( Fstring::size_type i = 0; i < min_len; ++i ) {
+		if ( to_lower( s.str_[ i ] ) != to_lower( t[ i ] ) ) return false;
+	}
+	if ( s.len_ < t_len ) {
+		for ( Fstring::size_type i = s.len_; i < t_len; ++i ) {
+			if ( t[ i ] != SPC ) return false;
+		}
+	} else if ( s.len_ > t_len ) {
+		for ( Fstring::size_type i = t_len, e = s.len_; i < e; ++i ) {
+			if ( s.str_[ i ] != SPC ) return false;
+		}
+	}
+	return true;
+}
+
+// Fstring == char Case-Insensitively?
+bool
+equali( Fstring const & s, char const c )
+{
+	if ( s.empty() ) { // Zero-length Fstring
+		return false;
+	} else if ( to_lower( s.str_[ 0 ] ) == to_lower( c ) ) { // First character matches
+		return ( ( s.len_ == 1 ) || ( s( 2 ).is_blank() ) ); // Rest is blank
 	} else { // First character doesn't match
 		return false;
 	}

@@ -13,9 +13,6 @@
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Fstring.fwd.hh>
-
 // C++ Headers
 #include <cmath>
 #include <complex>
@@ -25,6 +22,9 @@
 #include <type_traits>
 
 namespace ObjexxFCL {
+
+// Forward Declarations
+class Fstring;
 
 inline
 int

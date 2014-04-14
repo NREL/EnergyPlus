@@ -14,7 +14,6 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/DimensionSlice.fwd.hh>
 #include <ObjexxFCL/IndexRange.hh>
 #include <ObjexxFCL/IndexSlice.hh>
 
@@ -258,6 +257,9 @@ private: // Data
 	int u_; // Upper index
 
 }; // DimensionSlice
+
+// Types
+typedef  DimensionSlice  DSlice;
 
 } // ObjexxFCL
 

@@ -23,11 +23,11 @@ namespace ObjexxFCL {
 // Forward Declarations
 template< typename > class ChunkVector;
 class byte;
-typedef  byte  sbyte;
 class ubyte;
 class Fstring;
 
 // Types
+typedef  byte  sbyte;
 typedef  ChunkVector< bool >                ChunkVector_bool;
 typedef  ChunkVector< byte >                ChunkVector_byte;
 typedef  ChunkVector< sbyte >               ChunkVector_sbyte;

@@ -17,14 +17,14 @@
 //  Intel Fortran default values used in this version
 //  List-directed formatting is not standardized and varies across compilers
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/byte.fwd.hh>
-#include <ObjexxFCL/ubyte.fwd.hh>
-
 // C++ Headers
 #include <complex>
 
 namespace ObjexxFCL {
+
+// Forward Declarations
+class byte;
+class ubyte;
 
 // TraitsLD
 template< typename T >

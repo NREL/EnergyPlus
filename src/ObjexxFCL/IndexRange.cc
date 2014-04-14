@@ -154,14 +154,14 @@ namespace ObjexxFCL {
 
 // Static Data Member Definitions
 
-#ifndef _MSC_VER // Microsoft Visual C++ is allowing us to take the address of a static const defined only in the header
-  // The #ifndef could be avoided by just initializing the values here instead of in the .hh file, that would work
-  // accross both compilers.
+//#ifndef _MSC_VER // Microsoft Visual C++ extensions doesn't need or like these: Enable #ifndef block if not using /Za
+
 	IndexRange::size_type const IndexRange::npos; // Unbounded "size"
 
 	int const IndexRange::l_min; // Min lower index
 
 	int const IndexRange::u_max; // Max upper index
-#endif // _MSC_VER
+
+//#endif // _MSC_VER
 
 } // ObjexxFCL
