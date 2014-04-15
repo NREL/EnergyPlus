@@ -1,38 +1,9 @@
 set( target_name objexx )
 
 set(src 
-  ObjexxFCL/Backspace.cc
-  ObjexxFCL/char.constants.cc
-  ObjexxFCL/char.functions.cc
-  ObjexxFCL/Cstring.cc
-  ObjexxFCL/Dimension.cc
-  ObjexxFCL/DimensionExpression.cc
-  ObjexxFCL/DimensionExpressionRef.cc
-  ObjexxFCL/DynamicIndexRange.cc
-  ObjexxFCL/environment.cc
-  ObjexxFCL/fmt.cc
-  ObjexxFCL/Format.cc
-  ObjexxFCL/Fstring.cc
-  ObjexxFCL/gio.cc
-  ObjexxFCL/GlobalStreams.cc
-  ObjexxFCL/Index.cc
-  ObjexxFCL/IndexRange.cc
-  ObjexxFCL/IndexSlice.cc
-  ObjexxFCL/Inquire.cc
-  ObjexxFCL/numeric.cc
-  ObjexxFCL/Observer.cc
-  ObjexxFCL/ObserverGraph.cc
-  ObjexxFCL/ObserverMediator.cc
-  ObjexxFCL/ObserverMulti.cc
-  ObjexxFCL/Omit.cc
-  ObjexxFCL/random.cc
-  ObjexxFCL/Rewind.cc
-  ObjexxFCL/Star.cc
-  ObjexxFCL/string.constants.cc
-  ObjexxFCL/string.functions.cc
-  ObjexxFCL/Time_Date.cc
   ObjexxFCL/array.iterator.hh
   ObjexxFCL/ArrayTraits.hh
+  ObjexxFCL/Backspace.cc
   ObjexxFCL/Backspace.hh
   ObjexxFCL/BArray.fwd.hh
   ObjexxFCL/BArray.hh
@@ -45,132 +16,140 @@ set(src
   ObjexxFCL/CArrayP.fwd.hh
   ObjexxFCL/CArrayP.hh
   ObjexxFCL/CArrayP.io.hh
+  ObjexxFCL/char.constants.cc
   ObjexxFCL/char.constants.hh
+  ObjexxFCL/char.functions.cc
   ObjexxFCL/char.functions.hh
-  ObjexxFCL/Chunk.hh
   ObjexxFCL/ChunkExponent.hh
+  ObjexxFCL/Chunk.hh
   ObjexxFCL/ChunkVector.fwd.hh
   ObjexxFCL/ChunkVector.hh
   ObjexxFCL/ChunkVector.io.hh
+  ObjexxFCL/Cstring.cc
   ObjexxFCL/Cstring.fwd.hh
   ObjexxFCL/Cstring.hh
-  ObjexxFCL/Dimension.fwd.hh
-  ObjexxFCL/Dimension.hh
-  ObjexxFCL/DimensionExpression.hh
+  ObjexxFCL/Dimension.cc
+  ObjexxFCL/DimensionExpression.cc
   ObjexxFCL/DimensionExpressionCon.hh
   ObjexxFCL/DimensionExpressionCube.hh
   ObjexxFCL/DimensionExpressionDiv.hh
+  ObjexxFCL/DimensionExpression.hh
   ObjexxFCL/DimensionExpressionMax.hh
   ObjexxFCL/DimensionExpressionMin.hh
   ObjexxFCL/DimensionExpressionMul.hh
   ObjexxFCL/DimensionExpressionPow.hh
+  ObjexxFCL/DimensionExpressionRef.cc
   ObjexxFCL/DimensionExpressionRef.hh
   ObjexxFCL/DimensionExpressions.hh
   ObjexxFCL/DimensionExpressionSquare.hh
   ObjexxFCL/DimensionExpressionSub.hh
   ObjexxFCL/DimensionExpressionSum.hh
+  ObjexxFCL/Dimension.fwd.hh
+  ObjexxFCL/Dimension.hh
   ObjexxFCL/DimensionSlice.fwd.hh
   ObjexxFCL/DimensionSlice.hh
+  ObjexxFCL/DynamicIndexRange.cc
   ObjexxFCL/DynamicIndexRange.fwd.hh
   ObjexxFCL/DynamicIndexRange.hh
+  ObjexxFCL/environment.cc
   ObjexxFCL/environment.hh
+  ObjexxFCL/FArray1A.fwd.hh
+  ObjexxFCL/FArray1A.hh
+  ObjexxFCL/FArray1.all.fwd.hh
+  ObjexxFCL/FArray1.all.hh
+  ObjexxFCL/FArray1D.fwd.hh
+  ObjexxFCL/FArray1D.hh
+  ObjexxFCL/FArray1.fwd.hh
+  ObjexxFCL/FArray1.hh
+  ObjexxFCL/FArray1.io.hh
+  ObjexxFCL/FArray1P.fwd.hh
+  ObjexxFCL/FArray1P.hh
+  ObjexxFCL/FArray1.Project.MArray.hh
+  ObjexxFCL/FArray1S.fwd.hh
+  ObjexxFCL/FArray1S.hh
+  ObjexxFCL/FArray1S.io.hh
+  ObjexxFCL/FArray1S.Project.MArray.hh
+  ObjexxFCL/FArray2A.fwd.hh
+  ObjexxFCL/FArray2A.hh
+  ObjexxFCL/FArray2.all.fwd.hh
+  ObjexxFCL/FArray2.all.hh
+  ObjexxFCL/FArray2D.fwd.hh
+  ObjexxFCL/FArray2D.hh
+  ObjexxFCL/FArray2.fwd.hh
+  ObjexxFCL/FArray2.hh
+  ObjexxFCL/FArray2.io.hh
+  ObjexxFCL/FArray2P.fwd.hh
+  ObjexxFCL/FArray2P.hh
+  ObjexxFCL/FArray2.Project.MArray.hh
+  ObjexxFCL/FArray2S.fwd.hh
+  ObjexxFCL/FArray2S.hh
+  ObjexxFCL/FArray2S.io.hh
+  ObjexxFCL/FArray2S.Project.MArray.hh
+  ObjexxFCL/FArray3A.fwd.hh
+  ObjexxFCL/FArray3A.hh
+  ObjexxFCL/FArray3.all.fwd.hh
+  ObjexxFCL/FArray3.all.hh
+  ObjexxFCL/FArray3D.fwd.hh
+  ObjexxFCL/FArray3D.hh
+  ObjexxFCL/FArray3.fwd.hh
+  ObjexxFCL/FArray3.hh
+  ObjexxFCL/FArray3.io.hh
+  ObjexxFCL/FArray3P.fwd.hh
+  ObjexxFCL/FArray3P.hh
+  ObjexxFCL/FArray3S.fwd.hh
+  ObjexxFCL/FArray3S.hh
+  ObjexxFCL/FArray3S.io.hh
+  ObjexxFCL/FArray4A.fwd.hh
+  ObjexxFCL/FArray4A.hh
+  ObjexxFCL/FArray4.all.fwd.hh
+  ObjexxFCL/FArray4.all.hh
+  ObjexxFCL/FArray4D.fwd.hh
+  ObjexxFCL/FArray4D.hh
+  ObjexxFCL/FArray4.fwd.hh
+  ObjexxFCL/FArray4.hh
+  ObjexxFCL/FArray4.io.hh
+  ObjexxFCL/FArray4P.fwd.hh
+  ObjexxFCL/FArray4P.hh
+  ObjexxFCL/FArray4S.fwd.hh
+  ObjexxFCL/FArray4S.hh
+  ObjexxFCL/FArray4S.io.hh
+  ObjexxFCL/FArray5A.fwd.hh
+  ObjexxFCL/FArray5A.hh
+  ObjexxFCL/FArray5.all.fwd.hh
+  ObjexxFCL/FArray5.all.hh
+  ObjexxFCL/FArray5D.fwd.hh
+  ObjexxFCL/FArray5D.hh
+  ObjexxFCL/FArray5.fwd.hh
+  ObjexxFCL/FArray5.hh
+  ObjexxFCL/FArray5.io.hh
+  ObjexxFCL/FArray5P.fwd.hh
+  ObjexxFCL/FArray5P.hh
+  ObjexxFCL/FArray5S.fwd.hh
+  ObjexxFCL/FArray5S.hh
+  ObjexxFCL/FArray5S.io.hh
+  ObjexxFCL/FArray6A.fwd.hh
+  ObjexxFCL/FArray6A.hh
+  ObjexxFCL/FArray6.all.fwd.hh
+  ObjexxFCL/FArray6.all.hh
+  ObjexxFCL/FArray6D.fwd.hh
+  ObjexxFCL/FArray6D.hh
+  ObjexxFCL/FArray6.fwd.hh
+  ObjexxFCL/FArray6.hh
+  ObjexxFCL/FArray6.io.hh
+  ObjexxFCL/FArray6P.fwd.hh
+  ObjexxFCL/FArray6P.hh
+  ObjexxFCL/FArray6S.fwd.hh
+  ObjexxFCL/FArray6S.hh
+  ObjexxFCL/FArray6S.io.hh
   ObjexxFCL/FArray.all.fwd.hh
   ObjexxFCL/FArray.all.hh
   ObjexxFCL/FArray.all.io.hh
   ObjexxFCL/FArray.functions.hh
   ObjexxFCL/FArray.fwd.hh
   ObjexxFCL/FArray.hh
-  ObjexxFCL/FArray.io.hh
-  ObjexxFCL/FArray1.all.fwd.hh
-  ObjexxFCL/FArray1.all.hh
-  ObjexxFCL/FArray1.fwd.hh
-  ObjexxFCL/FArray1.hh
-  ObjexxFCL/FArray1.io.hh
-  ObjexxFCL/FArray1.Project.MArray.hh
-  ObjexxFCL/FArray1A.fwd.hh
-  ObjexxFCL/FArray1A.hh
-  ObjexxFCL/FArray1D.fwd.hh
-  ObjexxFCL/FArray1D.hh
-  ObjexxFCL/FArray1P.fwd.hh
-  ObjexxFCL/FArray1P.hh
-  ObjexxFCL/FArray1S.fwd.hh
-  ObjexxFCL/FArray1S.hh
-  ObjexxFCL/FArray1S.io.hh
-  ObjexxFCL/FArray1S.Project.MArray.hh
-  ObjexxFCL/FArray2.all.fwd.hh
-  ObjexxFCL/FArray2.all.hh
-  ObjexxFCL/FArray2.fwd.hh
-  ObjexxFCL/FArray2.hh
-  ObjexxFCL/FArray2.io.hh
-  ObjexxFCL/FArray2.Project.MArray.hh
-  ObjexxFCL/FArray2A.fwd.hh
-  ObjexxFCL/FArray2A.hh
-  ObjexxFCL/FArray2D.fwd.hh
-  ObjexxFCL/FArray2D.hh
-  ObjexxFCL/FArray2P.fwd.hh
-  ObjexxFCL/FArray2P.hh
-  ObjexxFCL/FArray2S.fwd.hh
-  ObjexxFCL/FArray2S.hh
-  ObjexxFCL/FArray2S.io.hh
-  ObjexxFCL/FArray2S.Project.MArray.hh
-  ObjexxFCL/FArray3.all.fwd.hh
-  ObjexxFCL/FArray3.all.hh
-  ObjexxFCL/FArray3.fwd.hh
-  ObjexxFCL/FArray3.hh
-  ObjexxFCL/FArray3.io.hh
-  ObjexxFCL/FArray3A.fwd.hh
-  ObjexxFCL/FArray3A.hh
-  ObjexxFCL/FArray3D.fwd.hh
-  ObjexxFCL/FArray3D.hh
-  ObjexxFCL/FArray3P.fwd.hh
-  ObjexxFCL/FArray3P.hh
-  ObjexxFCL/FArray3S.fwd.hh
-  ObjexxFCL/FArray3S.hh
-  ObjexxFCL/FArray3S.io.hh
-  ObjexxFCL/FArray4.all.fwd.hh
-  ObjexxFCL/FArray4.all.hh
-  ObjexxFCL/FArray4.fwd.hh
-  ObjexxFCL/FArray4.hh
-  ObjexxFCL/FArray4.io.hh
-  ObjexxFCL/FArray4A.fwd.hh
-  ObjexxFCL/FArray4A.hh
-  ObjexxFCL/FArray4D.fwd.hh
-  ObjexxFCL/FArray4D.hh
-  ObjexxFCL/FArray4P.fwd.hh
-  ObjexxFCL/FArray4P.hh
-  ObjexxFCL/FArray4S.fwd.hh
-  ObjexxFCL/FArray4S.hh
-  ObjexxFCL/FArray4S.io.hh
-  ObjexxFCL/FArray5.all.fwd.hh
-  ObjexxFCL/FArray5.all.hh
-  ObjexxFCL/FArray5.fwd.hh
-  ObjexxFCL/FArray5.hh
-  ObjexxFCL/FArray5.io.hh
-  ObjexxFCL/FArray5A.fwd.hh
-  ObjexxFCL/FArray5A.hh
-  ObjexxFCL/FArray5D.fwd.hh
-  ObjexxFCL/FArray5D.hh
-  ObjexxFCL/FArray5P.fwd.hh
-  ObjexxFCL/FArray5P.hh
-  ObjexxFCL/FArray5S.fwd.hh
-  ObjexxFCL/FArray5S.hh
-  ObjexxFCL/FArray5S.io.hh
-  ObjexxFCL/FArray6.all.fwd.hh
-  ObjexxFCL/FArray6.all.hh
-  ObjexxFCL/FArray6.fwd.hh
-  ObjexxFCL/FArray6.hh
-  ObjexxFCL/FArray6.io.hh
-  ObjexxFCL/FArray6A.fwd.hh
-  ObjexxFCL/FArray6A.hh
-  ObjexxFCL/FArray6D.fwd.hh
-  ObjexxFCL/FArray6D.hh
-  ObjexxFCL/FArray6P.fwd.hh
-  ObjexxFCL/FArray6P.hh
-  ObjexxFCL/FArray6S.fwd.hh
-  ObjexxFCL/FArray6S.hh
-  ObjexxFCL/FArray6S.io.hh
   ObjexxFCL/FArrayInitializer.fwd.hh
   ObjexxFCL/FArrayInitializer.hh
+  ObjexxFCL/FArray.io.hh
   ObjexxFCL/FArrayRS.fwd.hh
   ObjexxFCL/FArrayRS.hh
   ObjexxFCL/FArrayS.all.fwd.hh
@@ -184,31 +163,36 @@ set(src
   ObjexxFCL/FArrayTail.hh
   ObjexxFCL/floops.hh
   ObjexxFCL/Fmath.hh
+  ObjexxFCL/fmt.cc
   ObjexxFCL/fmt.hh
   ObjexxFCL/fmt.manipulators.hh
+  ObjexxFCL/Format.cc
   ObjexxFCL/Format.hh
   ObjexxFCL/FormattedIO.hh
+  ObjexxFCL/Fstring.cc
   ObjexxFCL/Fstring.fwd.hh
   ObjexxFCL/Fstring.hh
+  ObjexxFCL/gio.cc
+  ObjexxFCL/gio_Fmt.fwd.hh
+  ObjexxFCL/gio_Fmt.hh
   ObjexxFCL/gio.hh
+  ObjexxFCL/GlobalStreams.cc
   ObjexxFCL/GlobalStreams.hh
+  ObjexxFCL/Index.cc
   ObjexxFCL/Index.fwd.hh
   ObjexxFCL/Index.hh
+  ObjexxFCL/IndexRange.cc
   ObjexxFCL/IndexRange.fwd.hh
   ObjexxFCL/IndexRange.hh
+  ObjexxFCL/IndexSlice.cc
   ObjexxFCL/IndexSlice.fwd.hh
   ObjexxFCL/IndexSlice.hh
   ObjexxFCL/InitializerSentinel.hh
+  ObjexxFCL/Inquire.cc
   ObjexxFCL/Inquire.hh
+  ObjexxFCL/IOFlags.cc
   ObjexxFCL/IOFlags.fwd.hh
   ObjexxFCL/IOFlags.hh
-  ObjexxFCL/MArray.all.fwd.hh
-  ObjexxFCL/MArray.all.hh
-  ObjexxFCL/MArray.all.io.hh
-  ObjexxFCL/MArray.functions.hh
-  ObjexxFCL/MArray.fwd.hh
-  ObjexxFCL/MArray.hh
-  ObjexxFCL/MArray.io.hh
   ObjexxFCL/MArray1.fwd.hh
   ObjexxFCL/MArray1.hh
   ObjexxFCL/MArray1.io.hh
@@ -228,25 +212,40 @@ set(src
   ObjexxFCL/MArray6.fwd.hh
   ObjexxFCL/MArray6.hh
   ObjexxFCL/MArray6.io.hh
+  ObjexxFCL/MArray.all.fwd.hh
+  ObjexxFCL/MArray.all.hh
+  ObjexxFCL/MArray.all.io.hh
+  ObjexxFCL/MArray.functions.hh
+  ObjexxFCL/MArray.fwd.hh
+  ObjexxFCL/MArray.hh
+  ObjexxFCL/MArray.io.hh
   ObjexxFCL/MArrayR.fwd.hh
   ObjexxFCL/MArrayR.hh
+  ObjexxFCL/numeric.cc
   ObjexxFCL/numeric.hh
   ObjexxFCL/ObjexxFCL.fwd.hh
   ObjexxFCL/ObjexxFCL.hh
   ObjexxFCL/ObjexxFCL.Project.hh
+  ObjexxFCL/Observer.cc
   ObjexxFCL/Observer.fwd.hh
-  ObjexxFCL/Observer.hh
+  ObjexxFCL/ObserverGraph.cc
   ObjexxFCL/ObserverGraph.hh
+  ObjexxFCL/Observer.hh
+  ObjexxFCL/ObserverMediator.cc
   ObjexxFCL/ObserverMediator.hh
+  ObjexxFCL/ObserverMulti.cc
   ObjexxFCL/ObserverMulti.hh
   ObjexxFCL/ObserverSingle.hh
+  ObjexxFCL/Omit.cc
   ObjexxFCL/Omit.fwd.hh
   ObjexxFCL/Omit.hh
   ObjexxFCL/Optional.fwd.hh
   ObjexxFCL/Optional.hh
+  ObjexxFCL/Print.fwd.hh
   ObjexxFCL/Print.hh
-  ObjexxFCL/ProxySentinel.hh
   ObjexxFCL/proxy_const_assert.hh
+  ObjexxFCL/ProxySentinel.hh
+  ObjexxFCL/random.cc
   ObjexxFCL/random.hh
   ObjexxFCL/Read.fwd.hh
   ObjexxFCL/Read.hh
@@ -254,12 +253,14 @@ set(src
   ObjexxFCL/Reference.hh
   ObjexxFCL/Required.fwd.hh
   ObjexxFCL/Required.hh
+  ObjexxFCL/Rewind.cc
   ObjexxFCL/Rewind.hh
   ObjexxFCL/rvalue_cast.hh
   ObjexxFCL/sbyte.fwd.hh
   ObjexxFCL/sbyte.hh
   ObjexxFCL/SetWrapper.fwd.hh
   ObjexxFCL/SetWrapper.hh
+  ObjexxFCL/Star.cc
   ObjexxFCL/Star.fwd.hh
   ObjexxFCL/Star.hh
   ObjexxFCL/StaticIndexRange.fwd.hh
@@ -269,8 +270,11 @@ set(src
   ObjexxFCL/Stream.cc
   ObjexxFCL/Stream.fwd.hh
   ObjexxFCL/Stream.hh
+  ObjexxFCL/string.constants.cc
   ObjexxFCL/string.constants.hh
+  ObjexxFCL/string.functions.cc
   ObjexxFCL/string.functions.hh
+  ObjexxFCL/Time_Date.cc
   ObjexxFCL/Time_Date.hh
   ObjexxFCL/TraitsA.hh
   ObjexxFCL/TraitsB.hh
@@ -284,10 +288,6 @@ set(src
   ObjexxFCL/ubyte.hh
   ObjexxFCL/Write.fwd.hh
   ObjexxFCL/Write.hh
-  ObjexxFCL/gio_Fmt.fwd.hh
-  ObjexxFCL/gio_Fmt.hh
-  ObjexxFCL/IOFlags.cc
-  ObjexxFCL/Print.fwd.hh
 ) 
 
 set( test_src
