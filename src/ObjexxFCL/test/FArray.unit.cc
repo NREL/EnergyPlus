@@ -25,6 +25,15 @@
 
 using namespace ObjexxFCL;
 
+TEST( FArrayTest, DefaultConstruction )
+{
+	FArray2D_int A, B;
+	EXPECT_EQ( 0u, A.size() );
+	A.zero(); // Now safe against VC Checked Iterators
+	EXPECT_EQ( 0u, A.size() );
+	EXPECT_TRUE( eq( A.to_default(), B ) ); // Now safe against VC Checked Iterators
+}
+
 TEST( FArrayTest, Construction2DIndexRangeInitializerList )
 {
 	FArray2D_int r( SRange( -1, 1 ), SRange( -1, 1 ), { 1, 2, 3, 4, 5, 6, 7, 8, 9 } );

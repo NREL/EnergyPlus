@@ -169,6 +169,7 @@ TEST( FstringTest, Subscripting )
 	EXPECT_EQ( 't', s[ 3 ] );
 	s[ 1 ] = 'B';
 	EXPECT_EQ( "Bat", s );
+	EXPECT_DEATH( s[ 4 ], ".*Assertion.*" ); // Out of bounds
 }
 
 TEST( FstringTest, Substring )
@@ -180,6 +181,10 @@ TEST( FstringTest, Substring )
 	EXPECT_EQ( "at", s( {2,_} ) );
 	EXPECT_EQ( "Ca", s( {1,2} ) );
 	EXPECT_EQ( "Ca", s( {_,2} ) );
+//	EXPECT_DEATH( s( 2, 4 ), ".*Assertion.*" ); // Out of bounds: Strict Fortran compliance
+	EXPECT_EQ( "at", s( 2, 4 ) ); // Clipped a la Intel Fortran
+	EXPECT_EQ( "", s( 4, 9 ) ); // Zero-length string a la Intel Fortran
+	EXPECT_EQ( "", s( 1, -5 ) ); // Zero-length string
 }
 
 TEST( FstringTest, SubstringAssignment )

@@ -27,6 +27,12 @@ TEST( stringFunctionsTest, CaseChange )
 	uppercase( s );
 	EXPECT_EQ( "FISH", s );
 	EXPECT_TRUE( equali( s, "fiSh" ) );
+	EXPECT_FALSE( equali( s, "fiShY" ) );
+	EXPECT_TRUE( equali( "FISH", "fiSh" ) );
+	EXPECT_FALSE( equali( "FISH", "fiShY" ) );
+	EXPECT_TRUE( equali( "FISH ", "fiSh " ) );
+	EXPECT_FALSE( equali( "FISH", "fiSh " ) );
+	EXPECT_FALSE( equali( "FISH ", "fiSh" ) );
 	EXPECT_EQ( "fish", lowercased( s ) );
 	EXPECT_EQ( "FISH", uppercased( s ) );
 }
