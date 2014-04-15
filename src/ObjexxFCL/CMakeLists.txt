@@ -284,6 +284,10 @@ set(src
   ObjexxFCL/ubyte.hh
   ObjexxFCL/Write.fwd.hh
   ObjexxFCL/Write.hh
+  ObjexxFCL/gio_Fmt.fwd.hh
+  ObjexxFCL/gio_Fmt.hh
+  ObjexxFCL/IOFlags.cc
+  ObjexxFCL/Print.fwd.hh
 ) 
 
 set( test_src
