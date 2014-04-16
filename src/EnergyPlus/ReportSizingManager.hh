@@ -23,6 +23,16 @@ namespace ReportSizingManager {
 		Optional_Fstring_const UsrDesc = _, // the description of a user-specified variable
 		Optional< Real64 const > UsrValue = _ // the value from the user for the desc item
 	);
+	void
+	RequestSizing(
+		Fstring const & CompType, // the type of the component
+		Fstring const & CompName, // the name of the component
+		int const & SizingType, // integerized type of sizing requested (see DataHVACGlobals, e.g. CoolingCapacitySizing)
+		Fstring const & SizingString, // string containing info for eio report
+		Real64 & SizingResult, // result of the sizing procedure
+		bool PrintWarningFlag, // TRUE when requesting output (eio) reporting
+		Fstring const & CallingRoutine // name of calling rotuine for warning messages
+	);
 
 	//     NOTICE
 

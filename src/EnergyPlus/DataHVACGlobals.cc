@@ -40,6 +40,16 @@ namespace DataHVACGlobals {
 	Real64 const RetTempMax( 60.0 ); // maximum return air temperature [deg C]
 	Real64 const RetTempMin( -30.0 ); // minimum return air temperature [deg C]
 
+	// Sizing types
+	int const CoolingAirflowSizing( 1 );
+	int const HeatingAirflowSizing( 2 );
+	int const SystemAirflowSizing( 3 );
+	int const CoolingCapacitySizing( 4 );
+	int const HeatingCapacitySizing( 5 );
+	int const SystemCapacitySizing( 6 );
+	int const CoolingSHRSizing( 7 );
+	int const HeatingDefrostSizing( 8 );
+
 	// Condenser Type (using same numbering scheme as for chillers)
 	int const AirCooled( 1 ); // Air-cooled condenser
 	int const WaterCooled( 2 ); // Water-cooled condenser
@@ -151,6 +161,31 @@ namespace DataHVACGlobals {
 
 	// parameters describing coil performance types
 	int const CoilPerfDX_CoolBypassEmpirical( 100 );
+
+	// Airflow per total capacity range (Regular DX coils)
+	Real64 const MaxRatedVolFlowPerRatedTotCap1(0.00006041); // m3/s per watt = 450 cfm/ton
+	Real64 const MinRatedVolFlowPerRatedTotCap1(0.00004027); // m3/s per watt = 300 cfm/ton
+	Real64 const MaxHeatVolFlowPerRatedTotCap1(0.00008056); // m3/s per watt = 600 cfm/ton
+	Real64 const MaxCoolVolFlowPerRatedTotCap1(0.00006713); // m3/s per watt = 500 cfm/ton
+	Real64 const MinOperVolFlowPerRatedTotCap1(0.00002684); // m3/s per watt = 200 cfm/ton
+
+	// 100% DOAS DX coils Airflow per total capacity ratio
+	Real64 const MaxRatedVolFlowPerRatedTotCap2(0.00003355); // m3/s per watt = 250 cfm/ton
+	Real64 const MinRatedVolFlowPerRatedTotCap2(0.00001677); // m3/s per watt = 125 cfm/ton
+	Real64 const MaxHeatVolFlowPerRatedTotCap2(0.00004026); // m3/s per watt = 300 cfm/ton
+	Real64 const MaxCoolVolFlowPerRatedTotCap2(0.00004026); // m3/s per watt = 300 cfm/ton
+	Real64 const MinOperVolFlowPerRatedTotCap2(0.00001342); // m3/s per watt = 100 cfm/ton
+
+	FArray1D< Real64 > MaxRatedVolFlowPerRatedTotCap(2, { MaxRatedVolFlowPerRatedTotCap1, MaxRatedVolFlowPerRatedTotCap2 });
+	FArray1D< Real64 > MinRatedVolFlowPerRatedTotCap(2, { MinRatedVolFlowPerRatedTotCap1, MinRatedVolFlowPerRatedTotCap2 });
+	FArray1D< Real64 > MaxHeatVolFlowPerRatedTotCap(2, { MaxHeatVolFlowPerRatedTotCap1, MaxHeatVolFlowPerRatedTotCap2 });
+	FArray1D< Real64 > MaxCoolVolFlowPerRatedTotCap(2, { MaxCoolVolFlowPerRatedTotCap1, MaxCoolVolFlowPerRatedTotCap2 });
+	FArray1D< Real64 > MinOperVolFlowPerRatedTotCap(2, { MinOperVolFlowPerRatedTotCap1, MinOperVolFlowPerRatedTotCap2 });
+
+	// dx coil type (DXCT)
+	int const RegularDXCoil(1); // Regular DX coils or mixed air dx coils
+	int const DOASDXCoil(2); // 100% DOAS DX coils
+	int DXCT(1); // dx coil type: regular DX coil ==1, 100% DOAS DX coil = 2
 
 	// Parameters describing Heat Exchanger types
 	int const NumHXTypes( 3 );
