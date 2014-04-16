@@ -134,22 +134,30 @@ namespace DataSizing {
 	int CurOverallSimDay( 0 );
 	int NumTimeStepsInAvg( 0 ); // number of time steps in the averaging window for the design flow and load sequences
 	int SaveNumPlantComps( 0 ); // Number of components using water as an energy source or sink (e.g. water coils)
-	bool TermUnitSingDuct( false ); // TRUE if a non-induction single duct terminal unit
+	int DataDXCT(1); // 1 if regular DX coil, 2 if 100% DOAS DX coil
+	bool DataCoilIsSuppHeater( false ); // TRUE if heating coil used as supplemental heater
+	bool DataIsDXCoil( false ); // TRUE if direct-expansion coil
+	bool DataAutosizable( true ); // TRUE if component is autosizable
+	bool DataEMSOverride( false ); // TRUE if EMS overrides component sizing
+	bool SysSizingRunDone( false ); // True if a system sizing run is successfully completed.
+	bool TermUnitSingDuct(false); // TRUE if a non-induction single duct terminal unit
 	bool TermUnitPIU( false ); // TRUE if a powered induction terminal unit
 	bool TermUnitIU( false ); // TRUE if an unpowered induction terminal unit
 	bool ZoneEqFanCoil( false ); // TRUE if a 4 pipe fan coil unit is being simulated
 	bool ZoneEqDXCoil( false ); // TRUE if a ZoneHVAC DX coil is being simulated
 	bool ZoneCoolingOnlyFan( false ); // TRUE if a ZoneHVAC DX cooling coil is only coil in parent
 	bool ZoneHeatingOnlyFan( false ); // TRUE if zone unit only does heating and contains a fam (such as Unit Heater)
-	bool SysSizingRunDone( false ); // True if a system sizing run is successfully completed.
 	bool ZoneSizingRunDone( false ); // True if a zone sizing run has been successfully completed.
 	Real64 AutoVsHardSizingThreshold( 0.1 ); // criteria threshold used to determine if user hard size and autosize disagree 10%
 	Real64 AutoVsHardSizingDeltaTempThreshold( 1.5 ); // temperature criteria threshold for autosize versus hard size [C]
+	Real64 DataCoolCoilCap( 0.0 ); // cooling coil capacity used for sizing with scalable inputs [W]
+	Real64 DataFlowUsedForSizing( 0.0 ); // air flow rate used for sizing with scalable inputs [m3/s]
+	Real64 DataHeatSizeRatio( 1.0 ); // heating coil size as a ratio of cooling coil capacity
 	Real64 DXCoolCap( 0.0 ); // The ARI cooling capacity of a DX unit.
-	Real64 UnitaryHeatCap( 0.0 ); // the heating capacity of a unitary system
-	Real64 SuppHeatCap( 0.0 ); // the heating capacity of the supplemental heater in a unitary system
 	Real64 GlobalHeatSizingFactor( 0.0 ); // the global heating sizing ratio
 	Real64 GlobalCoolSizingFactor( 0.0 ); // the global cooling sizing ratio
+	Real64 SuppHeatCap( 0.0 ); // the heating capacity of the supplemental heater in a unitary system
+	Real64 UnitaryHeatCap( 0.0 ); // the heating capacity of a unitary system
 	FArray1D< Real64 > ZoneSizThermSetPtHi; // highest zone thermostat setpoint during zone sizing calcs
 	FArray1D< Real64 > ZoneSizThermSetPtLo; // lowest zone thermostat setpoint during zone sizing calcs
 	FArray1D_Fstring CoolPeakDateHrMin( sFstring( 15 ) );
