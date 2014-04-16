@@ -1,0 +1,8 @@
+compilers:
+  - name: Visual Studio
+    version: 12
+  - name: Visual Studio
+    version: 12
+    architecture: Win64
+
+
