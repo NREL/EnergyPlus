@@ -13,8 +13,6 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 
 include(cmake/ProjectMacros.cmake)
 
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src/ )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/ )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/gtest/include/ SYSTEM )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/ObjexxFCL/src/ )
 
