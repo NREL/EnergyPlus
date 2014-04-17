@@ -123,6 +123,14 @@ namespace DataSizing {
 	extern int CurOverallSimDay;
 	extern int NumTimeStepsInAvg; // number of time steps in the averaging window for the design flow and load sequences
 	extern int SaveNumPlantComps; // Number of components using water as an energy source or sink (e.g. water coils)
+	extern bool DataCoilIsSuppHeater; // TRUE if heating coil used as supplemental heater
+	extern bool DataIsDXCoil; // TRUE if direct-expansion coil
+	extern bool DataAutosizable; // TRUE if component is autosizable
+	extern bool DataEMSOverride; // TRUE if EMS overrides component sizing
+	extern int DataDXCT; // 1 if regular DX coil, 2 if 100% DOAS DX coil
+	extern Real64 DataCoolCoilCap; // cooling coil capacity used for sizing with scalable inputs
+	extern Real64 DataFlowUsedForSizing; // air flow rate used for sizing with scalable inputs [m3/s]
+	extern Real64 DataHeatSizeRatio; // heating coil size as a ratio of cooling coil capacity
 	extern bool TermUnitSingDuct; // TRUE if a non-induction single duct terminal unit
 	extern bool TermUnitPIU; // TRUE if a powered induction terminal unit
 	extern bool TermUnitIU; // TRUE if an unpowered induction terminal unit

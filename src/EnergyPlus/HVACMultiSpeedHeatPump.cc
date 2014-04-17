@@ -1713,7 +1713,8 @@ namespace HVACMultiSpeedHeatPump {
 			// Pass the fan cycling schedule index up to the air loop. Set the air loop unitary system flag.
 			AirLoopControlInfo( AirLoopNum ).CycFanSchedPtr = MSHeatPump( MSHeatPumpNum ).FanSchedPtr;
 			AirLoopControlInfo( AirLoopNum ).UnitarySys = true;
-			AirLoopControlInfo( AirLoopNum ).FanOpMode = MSHeatPump( MSHeatPumpNum ).OpMode;
+			AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = false; // affects child coil sizing by allowing coil to size itself instead of parent telling coil what size to use
+			AirLoopControlInfo(AirLoopNum).FanOpMode = MSHeatPump(MSHeatPumpNum).OpMode;
 		}
 
 		if ( allocated( ZoneEquipConfig ) && MyCheckFlag( MSHeatPumpNum ) ) {
