@@ -5,7 +5,12 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 option( BUILD_TESTING "Build testing targets" OFF )
 
 #FIND_PACKAGE( CXXFeatures ) 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ")
+
+if(MSVC)
+  add_definitions(/W3 /MP)
+else()
+  add_definitions(-Wall -Wnon-virtual-dtor -pedantic -std=c++11)
+endif()
 
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
