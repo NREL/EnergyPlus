@@ -41,23 +41,6 @@ namespace DXCoils {
 	extern Real64 const RatedOutdoorAirTempHeat; // 8.33 C or 47F
 	extern Real64 const RatedInletWetBulbTempHeat; // 15.55 or 60F
 
-	// Airflow per total capacity range (Regular DX coils)
-	extern Real64 const MaxRatedVolFlowPerRatedTotCap1; // m3/s per watt = 450 cfm/ton
-	extern Real64 const MinRatedVolFlowPerRatedTotCap1; // m3/s per watt = 300 cfm/ton
-	extern Real64 const MaxHeatVolFlowPerRatedTotCap1; // m3/s per watt = 600 cfm/ton
-	extern Real64 const MaxCoolVolFlowPerRatedTotCap1; // m3/s per watt = 500 cfm/ton
-	extern Real64 const MinOperVolFlowPerRatedTotCap1; // m3/s per watt = 200 cfm/ton
-
-	// dx coil type (DXCT)
-	extern int const RegularDXCoil; // Regular DX coils or mixed air dx coils
-	extern int const DOASDXCoil; // 100% DOAS DX coils
-	// 100% DOAS DX coils Airflow per total capacity ratio
-	extern Real64 const MaxRatedVolFlowPerRatedTotCap2; // m3/s per watt = 250 cfm/ton
-	extern Real64 const MinRatedVolFlowPerRatedTotCap2; // m3/s per watt = 125 cfm/ton
-	extern Real64 const MaxHeatVolFlowPerRatedTotCap2; // m3/s per watt = 300 cfm/ton
-	extern Real64 const MaxCoolVolFlowPerRatedTotCap2; // m3/s per watt = 300 cfm/ton
-	extern Real64 const MinOperVolFlowPerRatedTotCap2; // m3/s per watt = 100 cfm/ton
-
 	extern Real64 const DryCoilOutletHumRatioMin; // dry coil outlet minimum hum ratio kgH2O/kgdry air
 
 	// Curve Types
@@ -124,13 +107,6 @@ namespace DXCoils {
 	extern int NumDXMulSpeedCoolCoils; // number of multispeed DX cooling coils
 	extern int NumDXMulSpeedHeatCoils; // number of multispeed DX heating coils
 	extern FArray1D_bool CheckEquipName;
-
-	extern int DXCT; // dx coil type: regular DX coil ==1, 100% DOAS DX coil = 2
-	extern FArray1D< Real64 > MaxRatedVolFlowPerRatedTotCap;
-	extern FArray1D< Real64 > MinRatedVolFlowPerRatedTotCap;
-	extern FArray1D< Real64 > MaxHeatVolFlowPerRatedTotCap;
-	extern FArray1D< Real64 > MaxCoolVolFlowPerRatedTotCap;
-	extern FArray1D< Real64 > MinOperVolFlowPerRatedTotCap;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
