@@ -117,23 +117,6 @@ namespace DXCoils {
 	Real64 const RatedOutdoorAirTempHeat( 8.33 ); // 8.33 C or 47F
 	Real64 const RatedInletWetBulbTempHeat( 15.55 ); // 15.55 or 60F
 
-	// Airflow per total capacity range (Regular DX coils)
-	Real64 const MaxRatedVolFlowPerRatedTotCap1( 0.00006041 ); // m3/s per watt = 450 cfm/ton
-	Real64 const MinRatedVolFlowPerRatedTotCap1( 0.00004027 ); // m3/s per watt = 300 cfm/ton
-	Real64 const MaxHeatVolFlowPerRatedTotCap1( 0.00008056 ); // m3/s per watt = 600 cfm/ton
-	Real64 const MaxCoolVolFlowPerRatedTotCap1( 0.00006713 ); // m3/s per watt = 500 cfm/ton
-	Real64 const MinOperVolFlowPerRatedTotCap1( 0.00002684 ); // m3/s per watt = 200 cfm/ton
-
-	// dx coil type (DXCT)
-	int const RegularDXCoil( 1 ); // Regular DX coils or mixed air dx coils
-	int const DOASDXCoil( 2 ); // 100% DOAS DX coils
-	// 100% DOAS DX coils Airflow per total capacity ratio
-	Real64 const MaxRatedVolFlowPerRatedTotCap2( 0.00003355 ); // m3/s per watt = 250 cfm/ton
-	Real64 const MinRatedVolFlowPerRatedTotCap2( 0.00001677 ); // m3/s per watt = 125 cfm/ton
-	Real64 const MaxHeatVolFlowPerRatedTotCap2( 0.00004026 ); // m3/s per watt = 300 cfm/ton
-	Real64 const MaxCoolVolFlowPerRatedTotCap2( 0.00004026 ); // m3/s per watt = 300 cfm/ton
-	Real64 const MinOperVolFlowPerRatedTotCap2( 0.00001342 ); // m3/s per watt = 100 cfm/ton
-
 	Real64 const DryCoilOutletHumRatioMin( 0.00001 ); // dry coil outlet minimum hum ratio kgH2O/kgdry air
 
 	// Curve Types
@@ -200,13 +183,6 @@ namespace DXCoils {
 	int NumDXMulSpeedCoolCoils( 0 ); // number of multispeed DX cooling coils
 	int NumDXMulSpeedHeatCoils( 0 ); // number of multispeed DX heating coils
 	FArray1D_bool CheckEquipName;
-
-	int DXCT( 1 ); // dx coil type: regular DX coil ==1, 100% DOAS DX coil = 2
-	FArray1D< Real64 > MaxRatedVolFlowPerRatedTotCap( 2 );
-	FArray1D< Real64 > MinRatedVolFlowPerRatedTotCap( 2 );
-	FArray1D< Real64 > MaxHeatVolFlowPerRatedTotCap( 2 );
-	FArray1D< Real64 > MaxCoolVolFlowPerRatedTotCap( 2 );
-	FArray1D< Real64 > MinOperVolFlowPerRatedTotCap( 2 );
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -1034,16 +1010,6 @@ namespace DXCoils {
 		DXCoilFullLoadOutAirTemp = 0.0;
 		DXCoilFullLoadOutAirHumRat = 0.0;
 
-		MaxRatedVolFlowPerRatedTotCap( 1 ) = MaxRatedVolFlowPerRatedTotCap1;
-		MinRatedVolFlowPerRatedTotCap( 1 ) = MinRatedVolFlowPerRatedTotCap1;
-		MaxHeatVolFlowPerRatedTotCap( 1 ) = MaxHeatVolFlowPerRatedTotCap1;
-		MaxCoolVolFlowPerRatedTotCap( 1 ) = MaxCoolVolFlowPerRatedTotCap1;
-		MinOperVolFlowPerRatedTotCap( 1 ) = MinOperVolFlowPerRatedTotCap1;
-		MaxRatedVolFlowPerRatedTotCap( 2 ) = MaxRatedVolFlowPerRatedTotCap2;
-		MinRatedVolFlowPerRatedTotCap( 2 ) = MinRatedVolFlowPerRatedTotCap2;
-		MaxHeatVolFlowPerRatedTotCap( 2 ) = MaxHeatVolFlowPerRatedTotCap2;
-		MaxCoolVolFlowPerRatedTotCap( 2 ) = MaxCoolVolFlowPerRatedTotCap2;
-		MinOperVolFlowPerRatedTotCap( 2 ) = MinOperVolFlowPerRatedTotCap2;
 		// initialize the coil counter
 		DXCoilNum = 0;
 
