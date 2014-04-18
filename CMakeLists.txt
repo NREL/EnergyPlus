@@ -7,7 +7,7 @@ option( BUILD_TESTING "Build testing targets" OFF )
 #FIND_PACKAGE( CXXFeatures ) 
 
 if(MSVC)
-  add_definitions(/W3 /MP)
+  add_definitions(/W3 /MP /Za)
 else()
   add_definitions(-Wall -Wnon-virtual-dtor -pedantic -std=c++11)
 endif()
