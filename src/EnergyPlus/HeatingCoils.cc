@@ -122,6 +122,7 @@ namespace HeatingCoils {
 
 	// Object Data
 	FArray1D< HeatingCoilEquipConditions > HeatingCoil;
+	FArray1D< HeatingCoilNumericFieldData > HeatingCoilNumericFields;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -355,7 +356,8 @@ namespace HeatingCoils {
 		NumHeatingCoils = NumElecCoil + NumElecCoilMultiStage + NumGasCoil + NumGasCoilMultiStage + NumDesuperheaterCoil;
 		if ( NumHeatingCoils > 0 ) {
 			HeatingCoil.allocate( NumHeatingCoils );
-			ValidSourceType.allocate( NumHeatingCoils );
+			HeatingCoilNumericFields.allocate(NumHeatingCoils);
+			ValidSourceType.allocate(NumHeatingCoils);
 			ValidSourceType = false;
 			CheckEquipName.allocate( NumHeatingCoils );
 			CheckEquipName = true;
@@ -398,6 +400,10 @@ namespace HeatingCoils {
 			CurrentModuleObject = "Coil:Heating:Electric";
 
 			GetObjectItem( CurrentModuleObject, ElecCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+			HeatingCoilNumericFields(CoilNum).FieldNames.allocate(MaxNums);
+			HeatingCoilNumericFields(CoilNum).FieldNames = " ";
+			HeatingCoilNumericFields(CoilNum).FieldNames = cNumericFields;
 
 			IsNotOK = false;
 			IsBlank = false;
@@ -451,6 +457,10 @@ namespace HeatingCoils {
 			CurrentModuleObject = "Coil:Heating:Electric:MultiStage";
 
 			GetObjectItem( CurrentModuleObject, ElecCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+			HeatingCoilNumericFields(CoilNum).FieldNames.allocate(MaxNums);
+			HeatingCoilNumericFields(CoilNum).FieldNames = " ";
+			HeatingCoilNumericFields(CoilNum).FieldNames = cNumericFields;
 
 			IsNotOK = false;
 			IsBlank = false;
@@ -514,6 +524,10 @@ namespace HeatingCoils {
 			CurrentModuleObject = "Coil:Heating:Gas";
 
 			GetObjectItem( CurrentModuleObject, GasCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+			HeatingCoilNumericFields(CoilNum).FieldNames.allocate(MaxNums);
+			HeatingCoilNumericFields(CoilNum).FieldNames = " ";
+			HeatingCoilNumericFields(CoilNum).FieldNames = cNumericFields;
 
 			IsNotOK = false;
 			IsBlank = false;
@@ -580,6 +594,10 @@ namespace HeatingCoils {
 			CurrentModuleObject = "Coil:Heating:Gas:MultiStage";
 
 			GetObjectItem( CurrentModuleObject, GasCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+			HeatingCoilNumericFields(CoilNum).FieldNames.allocate(MaxNums);
+			HeatingCoilNumericFields(CoilNum).FieldNames = " ";
+			HeatingCoilNumericFields(CoilNum).FieldNames = cNumericFields;
 
 			IsNotOK = false;
 			IsBlank = false;
@@ -659,6 +677,10 @@ namespace HeatingCoils {
 			CurrentModuleObject = "Coil:Heating:Desuperheater";
 
 			GetObjectItem( CurrentModuleObject, DesuperheaterCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+			HeatingCoilNumericFields(CoilNum).FieldNames.allocate(MaxNums);
+			HeatingCoilNumericFields(CoilNum).FieldNames = " ";
+			HeatingCoilNumericFields(CoilNum).FieldNames = cNumericFields;
 
 			IsNotOK = false;
 			IsBlank = false;
@@ -1040,14 +1062,18 @@ namespace HeatingCoils {
 		//       AUTHOR         Fred Buhl
 		//       DATE WRITTEN   January 2002
 		//       MODIFIED       August 2013 Daeho Kang, add component sizing table entries
-		//       RE-ENGINEERED  na
+		//       RE-ENGINEERED  Mar 2014 FSEC, moved calculations to common routine in ReportSizingManager
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine is for sizing Heating Coil Components for which nominal cpacities have not been
+		// This subroutine is for sizing Heating Coil Components for which nominal capcities have not been
 		// specified in the input.
 
 		// METHODOLOGY EMPLOYED:
-		// Obtains heating capacities from the zone or system sizing arrays.
+		// Obtains heating capacities from the zone or system sizing arrays or parent object as necessary.
+		// heating coil or other routine sets up any required data varaibles (e.g., DataCoilIsSuppHeater, TermUnitPIU, etc.),
+		// sizing variable (e.g., HeatingCoil( CoilNum ).NominalCapacity in this routine since it can be multi-staged and new routine
+		// currently only handles single values) and associated string representing that sizing variable.
+		// RequestSizing functions handles the actual sizing and reporting.
 
 		// REFERENCES:
 		// na
@@ -1056,16 +1082,18 @@ namespace HeatingCoils {
 		using namespace DataSizing;
 		using DataAirSystems::PrimaryAirSystem;
 		using DataAirLoop::AirLoopControlInfo;
-		using namespace OutputReportPredefined;
-		using ReportSizingManager::ReportSizingOutput;
-		using General::TrimSigDigits;
 		using General::RoundSigDigits;
+		using General::TrimSigDigits;
+		using namespace OutputReportPredefined;
+		using ReportSizingManager::RequestSizing;
+		using ReportSizingManager::ReportSizingOutput;
+
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static Fstring const RoutineName( "SizeHeatingCoil: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1074,276 +1102,73 @@ namespace HeatingCoils {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 CoilInTemp;
-		Real64 CoilOutTemp;
-		Real64 CoilOutHumRat;
-		Real64 DesCoilLoad;
-		Real64 DesPriVolFlow;
-		Real64 DesVolFlow;
-		Real64 DesMassFlow;
-		Real64 CpAir;
-		Real64 OutAirFrac;
-		Real64 MinPriFlowFrac;
-		Real64 RhoAirStd;
-		Real64 CpAirStd;
-		int StageNum;
-		int NumOfStages;
+		Fstring CompName( MaxNameLength ); // component name
+		Fstring	CompType( MaxNameLength ); // component type
+		Fstring SizingString( MaxNameLength ); // input field sizing description (e.g., Nominal Capacity)
 		bool IsAutoSize; // Indicator to autosize for reporting
+		bool bPRINT = true; // TRUE if sizing is reported to output (eio)
 		bool ThisStageAutoSize; // Indicator to autosize at each stage for reporting
-		bool HardSizeNoDesRun; // Indicator to hardsize with no sizing runs for reporting
 		Real64 NominalCapacityDes; // Autosized nominal capacity for reporting
 		Real64 NominalCapacityUser; // Hardsized nominal capacity for reporting
-		//  REAL(r64)           :: MSNominalCapacityDes  ! Autosized multi stage nominal capacity for reporting
-		//  REAL(r64)           :: MSNominalCapacityUser ! Hardsized multi stage nominal capacity for reporting
-		bool SizingDesRunThisAirSys; // true if a particular air system had a Sizing:System object and system sizing done
-		bool SizingDesRunThisZone; // true if a particular zone had a Sizing:Zone object and zone sizing was done
+		Real64 TempCap; // autosized capacity of heating coil [W]
+		int StageNum; // actual stage of multi-stage heating coil
+		int NumOfStages; // total number of stages of multi-stage heating coil
+		int FieldNum = 2; // IDD numeric field number where input field description is found
+		int NumCoilsSized = 0; // counter used to deallocate temporary string array after all coils have been sized
 
-		CoilInTemp = 0.0;
-		CoilOutTemp = 0.0;
-		CoilOutHumRat = 0.0;
-		DesPriVolFlow = 0.0;
-		DesCoilLoad = 0.0;
-		DesVolFlow = 0.0;
-		DesMassFlow = 0.0;
-		CpAir = 0.0;
-		OutAirFrac = 0.0;
-		MinPriFlowFrac = 0.0;
-		CpAirStd = PsyCpAirFnWTdb( 0.0, 20.0 );
-		RhoAirStd = StdRhoAir;
-		NominalCapacityDes = 0.0;
-		NominalCapacityUser = 0.0;
-		//  MSNominalCapacityDes = 0.0d0
-		//  MSNominalCapacityUser = 0.0d0
-		IsAutoSize = false;
-		ThisStageAutoSize = false;
-		if ( SysSizingRunDone || ZoneSizingRunDone ) {
-			HardSizeNoDesRun = false;
-		} else {
-			HardSizeNoDesRun = true;
+		if ( HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingElectric_MultiStage ) {
+			FieldNum = 1 + HeatingCoil( CoilNum ).NumOfStages * 2;
+			TempCap = HeatingCoil( CoilNum ).MSNominalCapacity( HeatingCoil( CoilNum ).NumOfStages );
 		}
-		if ( CurSysNum > 0 ) {
-			CheckThisAirSystemForSizing( CurSysNum, SizingDesRunThisAirSys );
-		} else {
-			SizingDesRunThisAirSys = false;
+		else if ( HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingGas_MultiStage ) {
+			FieldNum = 1 + HeatingCoil( CoilNum ).NumOfStages * 3;
+			TempCap = HeatingCoil( CoilNum ).MSNominalCapacity( HeatingCoil( CoilNum ).NumOfStages );
 		}
-		if ( CurZoneEqNum > 0 ) {
-			CheckThisZoneForSizing( CurZoneEqNum, SizingDesRunThisZone );
-		} else {
-			SizingDesRunThisZone = false;
+		else if ( HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingDesuperheater ) {
+			return; // no autosizable inputs for desupterheater
 		}
-
-		if ( HeatingCoil( CoilNum ).NominalCapacity == AutoSize ) {
-			IsAutoSize = true;
+		else {
+			FieldNum = 2;
+			TempCap = HeatingCoil( CoilNum ).NominalCapacity;
 		}
-
-		if ( CurSysNum > 0 ) {
-			if ( ! IsAutoSize && ! SizingDesRunThisAirSys ) { // Simulation continue
-				HardSizeNoDesRun = true;
-				if ( HeatingCoil( CoilNum ).NominalCapacity > 0.0 ) {
-					ReportSizingOutput( "Coil:" + trim( HeatingCoil( CoilNum ).HeatingCoilType ) + ":" + trim( HeatingCoil( CoilNum ).HeatingCoilModel ), HeatingCoil( CoilNum ).Name, "User-Specified Nominal Capacity [W]", HeatingCoil( CoilNum ).NominalCapacity );
-				}
-			} else { // AutoSize or hardsize with sizing data
-				CheckSysSizing( "Coil:" + trim( HeatingCoil( CoilNum ).HeatingCoilType ) + ":" + trim( HeatingCoil( CoilNum ).HeatingCoilModel ), HeatingCoil( CoilNum ).Name );
-				if ( CurOASysNum > 0 ) {
-					if ( OASysEqSizing( CurOASysNum ).AirFlow ) {
-						DesVolFlow = OASysEqSizing( CurOASysNum ).AirVolFlow;
-					} else {
-						DesVolFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
-					}
-				} else {
-					if ( UnitarySysEqSizing( CurSysNum ).AirFlow ) {
-						DesVolFlow = UnitarySysEqSizing( CurSysNum ).AirVolFlow;
-					} else {
-						{ auto const SELECT_CASE_var( CurDuctType );
-						if ( SELECT_CASE_var == Main ) {
-							DesVolFlow = FinalSysSizing( CurSysNum ).SysAirMinFlowRat * FinalSysSizing( CurSysNum ).DesMainVolFlow;
-						} else if ( SELECT_CASE_var == Cooling ) {
-							DesVolFlow = FinalSysSizing( CurSysNum ).SysAirMinFlowRat * FinalSysSizing( CurSysNum ).DesCoolVolFlow;
-						} else if ( SELECT_CASE_var == Heating ) {
-							DesVolFlow = FinalSysSizing( CurSysNum ).DesHeatVolFlow;
-						} else if ( SELECT_CASE_var == Other ) {
-							DesVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-						} else {
-							DesVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-						}}
-					}
-				}
-				DesMassFlow = RhoAirStd * DesVolFlow;
-				// get the outside air fraction
-				if ( CurOASysNum > 0 ) {
-					OutAirFrac = 1.0;
-				} else if ( FinalSysSizing( CurSysNum ).HeatOAOption == MinOA ) {
-					if ( DesVolFlow > 0.0 ) {
-						OutAirFrac = FinalSysSizing( CurSysNum ).DesOutAirVolFlow / DesVolFlow;
-					} else {
-						OutAirFrac = 1.0;
-					}
-					OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
-				} else {
-					OutAirFrac = 1.0;
-				}
-				// coil inlet temperature
-				if ( CurOASysNum == 0 && PrimaryAirSystem( CurSysNum ).NumOAHeatCoils > 0 ) {
-					CoilInTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PreheatTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).HeatRetTemp;
-				} else {
-					CoilInTemp = OutAirFrac * FinalSysSizing( CurSysNum ).HeatOutTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).HeatRetTemp;
-				}
-
-				// coil load
-				if ( CurOASysNum > 0 ) {
-					if ( OASysEqSizing( CurOASysNum ).Capacity ) {
-						DesCoilLoad = OASysEqSizing( CurOASysNum ).DesHeatingLoad;
-					} else {
-						DesCoilLoad = CpAirStd * DesMassFlow * ( FinalSysSizing( CurSysNum ).PreheatTemp - CoilInTemp );
-					}
-				} else {
-					if ( UnitarySysEqSizing( CurSysNum ).Capacity ) {
-						DesCoilLoad = UnitarySysEqSizing( CurSysNum ).DesHeatingLoad;
-					} else {
-						DesCoilLoad = CpAirStd * DesMassFlow * ( FinalSysSizing( CurSysNum ).HeatSupTemp - CoilInTemp );
-					}
-				}
-
-				if ( AirLoopControlInfo( CurSysNum ).UnitarySys ) {
-					if ( CoilIsSuppHeater ) {
-						NominalCapacityDes = SuppHeatCap;
-					} else {
-						// TRUE for all air loop parent equipment except UnitarySystem where flag is reset to FALSE after simulating
-						// This method allows downstream heating coils to size individually. Probably should do this for all air loop equipment
-						// ChangoverBypass model always sets AirLoopControlInfo%UnitarySys to FALSE so heating coil can individually size
-						if ( AirLoopControlInfo( CurSysNum ).UnitarySysSimulating ) {
-							NominalCapacityDes = UnitaryHeatCap;
-						} else {
-							if ( DesCoilLoad >= SmallLoad ) {
-								NominalCapacityDes = DesCoilLoad;
-							} else {
-								NominalCapacityDes = 0.0;
-							}
-						}
-					}
-				} else {
-					if ( DesCoilLoad >= SmallLoad ) {
-						NominalCapacityDes = DesCoilLoad;
-					} else {
-						NominalCapacityDes = 0.0;
-					}
-				}
-			}
-
-		} else if ( CurZoneEqNum > 0 ) {
-			if ( ! IsAutoSize && ! SizingDesRunThisZone ) { // Simulation continue
-				HardSizeNoDesRun = true;
-				if ( HeatingCoil( CoilNum ).NominalCapacity > 0.0 ) {
-					ReportSizingOutput( "Coil:" + trim( HeatingCoil( CoilNum ).HeatingCoilType ) + ":" + trim( HeatingCoil( CoilNum ).HeatingCoilModel ), HeatingCoil( CoilNum ).Name, "User-Specified Nominal Capacity [W]", HeatingCoil( CoilNum ).NominalCapacity );
-				}
-			} else { // AutoSize or hardsize with sizing data
-
-				CheckZoneSizing( "Coil:" + trim( HeatingCoil( CoilNum ).HeatingCoilType ) + ":" + trim( HeatingCoil( CoilNum ).HeatingCoilModel ), HeatingCoil( CoilNum ).Name );
-				if ( ZoneEqSizing( CurZoneEqNum ).Capacity ) {
-					NominalCapacityDes = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
-				} else if ( FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow >= SmallMassFlow ) {
-					if ( TermUnitPIU ) {
-						MinPriFlowFrac = TermUnitSizing( CurZoneEqNum ).MinFlowFrac;
-						if ( TermUnitSizing( CurZoneEqNum ).InducesPlenumAir ) {
-							CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU * MinPriFlowFrac + FinalZoneSizing( CurZoneEqNum ).ZoneRetTempAtHeatPeak * ( 1.0 - MinPriFlowFrac );
-						} else {
-							CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU * MinPriFlowFrac + FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak * ( 1.0 - MinPriFlowFrac );
-						}
-					} else if ( TermUnitIU ) {
-						CoilInTemp = FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak;
-					} else if ( TermUnitSingDuct ) {
-						CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU;
-					} else {
-						CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
-					}
-					if ( TermUnitSingDuct || TermUnitPIU ) {
-						CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
-						CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
-						CpAir = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) );
-						DesCoilLoad = CpAir * RhoAirStd * TermUnitSizing( CurZoneEqNum ).AirVolFlow * ( CoilOutTemp - CoilInTemp );
-					} else if ( TermUnitIU ) {
-						if ( TermUnitSizing( CurZoneEqNum ).InducRat > 0.01 ) {
-							DesPriVolFlow = TermUnitSizing( CurZoneEqNum ).AirVolFlow / TermUnitSizing( CurZoneEqNum ).InducRat;
-							CpAir = PsyCpAirFnWTdb( FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat, FinalZoneSizing( CurZoneEqNum ).HeatDesTemp );
-							// the design heating coil load is the zone load minus whatever the central system does. Note that
-							// DesHeatCoilInTempTU is really the primary air inlet temperature for the unit.
-							DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad - CpAir * RhoAirStd * DesPriVolFlow * ( FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU - FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak );
-						} else {
-							DesCoilLoad = 0.0;
-						}
-					} else {
-						CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
-						CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
-						CpAir = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) );
-						DesCoilLoad = CpAir * FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow * ( CoilOutTemp - CoilInTemp );
-					}
-					NominalCapacityDes = max( 0.0, DesCoilLoad );
-				} else {
-					NominalCapacityDes = 0.0;
-				}
-			}
-		}
-		if ( ! HardSizeNoDesRun ) {
-			if ( IsAutoSize ) {
-				HeatingCoil( CoilNum ).NominalCapacity = NominalCapacityDes;
-				ReportSizingOutput( "Coil:" + trim( HeatingCoil( CoilNum ).HeatingCoilType ) + ":" + trim( HeatingCoil( CoilNum ).HeatingCoilModel ), HeatingCoil( CoilNum ).Name, "Design Size Nominal Capacity [W]", NominalCapacityDes );
-			} else {
-				if ( HeatingCoil( CoilNum ).NominalCapacity > 0.0 && NominalCapacityDes > 0.0 ) {
-					NominalCapacityUser = HeatingCoil( CoilNum ).NominalCapacity;
-					ReportSizingOutput( "Coil:" + trim( HeatingCoil( CoilNum ).HeatingCoilType ) + ":" + trim( HeatingCoil( CoilNum ).HeatingCoilModel ), HeatingCoil( CoilNum ).Name, "Design Size Nominal Capacity [W]", NominalCapacityDes, "User-Specified Nominal Capacity [W]", NominalCapacityUser );
-					if ( DisplayExtraWarnings ) {
-						if ( ( std::abs( NominalCapacityDes - NominalCapacityUser ) / NominalCapacityUser ) > AutoVsHardSizingThreshold ) {
-							ShowMessage( "SizeHeatingCoil: Potential issue with equipment sizing for " + trim( HeatingCoil( CoilNum ).HeatingCoilType ) + " " + trim( HeatingCoil( CoilNum ).HeatingCoilModel ) + ", " + trim( HeatingCoil( CoilNum ).Name ) );
-							ShowContinueError( "User-Specified Nominal Capacity of " + trim( RoundSigDigits( NominalCapacityUser, 2 ) ) + " [W]" );
-							ShowContinueError( "differs from Design Size Nominal Capacity of " + trim( RoundSigDigits( NominalCapacityDes, 2 ) ) + " [W]" );
-							ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-							ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-						}
-					}
-				}
-			}
-		}
+		SizingString = trim( HeatingCoilNumericFields( CoilNum ).FieldNames( FieldNum ) ) + " [W]";
+		CompType = "Coil:" + trim( HeatingCoil( CoilNum ).HeatingCoilType ) + ":" + trim( HeatingCoil( CoilNum ).HeatingCoilModel );
+		CompName = HeatingCoil( CoilNum ).Name;
+		DataCoilIsSuppHeater = CoilIsSuppHeater; // set global instead of using optional argument
+		RequestSizing( CompType, CompName, HeatingCapacitySizing, trim(SizingString ), TempCap, bPRINT, RoutineName );
+		DataCoilIsSuppHeater = false; // reset global to false so other heating coils are not affected
 
 		if ( HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingElectric_MultiStage || HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingGas_MultiStage ) {
+			HeatingCoil( CoilNum ).MSNominalCapacity( HeatingCoil( CoilNum ).NumOfStages ) = TempCap;
 			IsAutoSize = false;
 			if ( any_eq( HeatingCoil( CoilNum ).MSNominalCapacity, AutoSize ) ) {
 				IsAutoSize = true;
 			}
 			if ( IsAutoSize ) {
 				NumOfStages = HeatingCoil( CoilNum ).NumOfStages;
-				for ( StageNum = NumOfStages; StageNum >= 1; --StageNum ) {
+				for (StageNum = NumOfStages-1; StageNum >= 1; --StageNum) {
+					if ( HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingElectric_MultiStage ) {
+						FieldNum = 1 + StageNum * 2;
+					} else {
+						FieldNum = 1 + StageNum * 3;
+					}
+					SizingString = trim( HeatingCoilNumericFields( CoilNum ).FieldNames( FieldNum ) ) + " [W]";
 					if ( HeatingCoil( CoilNum ).MSNominalCapacity( StageNum ) == AutoSize ) {
 						ThisStageAutoSize = true;
 					}
-					if ( StageNum == NumOfStages ) {
-						if ( CoilIsSuppHeater ) {
-							NominalCapacityDes = SuppHeatCap;
-						} else {
-							if ( AirLoopControlInfo( CurSysNum ).UnitarySysSimulating ) {
-								NominalCapacityDes = UnitaryHeatCap;
-							} else {
-								if ( DesCoilLoad >= SmallLoad ) {
-									NominalCapacityDes = DesCoilLoad;
-								} else {
-									NominalCapacityDes = 0.0;
-								}
-							}
-						}
-					} else {
-						NominalCapacityDes = HeatingCoil( CoilNum ).MSNominalCapacity( NumOfStages ) * StageNum / NumOfStages;
-					}
+					NominalCapacityDes = TempCap * StageNum / NumOfStages;
 					if ( ThisStageAutoSize ) {
 						HeatingCoil( CoilNum ).MSNominalCapacity( StageNum ) = NominalCapacityDes;
-						ReportSizingOutput( "Coil:" + trim( HeatingCoil( CoilNum ).HeatingCoilType ) + ":" + trim( HeatingCoil( CoilNum ).HeatingCoilModel ), HeatingCoil( CoilNum ).Name, "Stage " + trim( TrimSigDigits( StageNum ) ) + " Design Size Nominal Capacity [W]", NominalCapacityDes );
+						ReportSizingOutput( trim( CompType ), trim( CompName ), trim( "Design Size " + trim( SizingString ) ), NominalCapacityDes );
 					} else {
 						if ( HeatingCoil( CoilNum ).MSNominalCapacity( StageNum ) > 0.0 && NominalCapacityDes > 0.0 ) {
-							NominalCapacityUser = HeatingCoil( CoilNum ).MSNominalCapacity( StageNum );
-							ReportSizingOutput( "Coil:" + trim( HeatingCoil( CoilNum ).HeatingCoilType ) + ":" + trim( HeatingCoil( CoilNum ).HeatingCoilModel ), HeatingCoil( CoilNum ).Name, "Stage " + trim( TrimSigDigits( StageNum ) ) + " Design Size Nominal Capacity [W]", NominalCapacityDes, " User-Specified Nominal Capacity [W]", NominalCapacityUser );
+							NominalCapacityUser = TempCap * StageNum / NumOfStages;  // HeatingCoil(CoilNum).MSNominalCapacity(StageNum);
+							ReportSizingOutput( trim( CompType ), trim( CompName ), trim( "Design Size " + trim( SizingString ) ), NominalCapacityDes, trim( "User-Specified " + trim( SizingString ) ), NominalCapacityUser );
 							if ( DisplayExtraWarnings ) {
-								if ( ( std::abs( NominalCapacityDes - NominalCapacityUser ) / NominalCapacityUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeHeatingCoil: Potential issue with equipment sizing for " + trim( HeatingCoil( CoilNum ).HeatingCoilType ) + " " + trim( HeatingCoil( CoilNum ).HeatingCoilModel ) + ", " + trim( HeatingCoil( CoilNum ).Name ) );
-									ShowContinueError( "User-Specified Nominal Capacity of " + trim( RoundSigDigits( NominalCapacityUser, 2 ) ) + " [W]" );
-									ShowContinueError( "differs from Design Size Nominal Capacity of " + trim( RoundSigDigits( NominalCapacityDes, 2 ) ) + " [W]" );
+								if ( ( std::abs (NominalCapacityDes - NominalCapacityUser ) / NominalCapacityUser ) > AutoVsHardSizingThreshold ) {
+									ShowMessage( "SizeHeatingCoil: Potential issue with equipment sizing for " + trim( CompType ) + ", " + trim( CompName ) );
+									ShowContinueError( "User-Specified Nominal Capacity of " + trim( RoundSigDigits( NominalCapacityUser, 2) ) + " [W]");
+									ShowContinueError( "differs from Design Size Nominal Capacity of " + trim( RoundSigDigits( NominalCapacityDes, 2) ) + " [W]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -1351,24 +1176,28 @@ namespace HeatingCoils {
 						}
 					}
 				}
-			} else { // No autosize
+			}
+			else { // No autosize
 				NumOfStages = HeatingCoil( CoilNum ).NumOfStages;
-				for ( StageNum = NumOfStages; StageNum >= 1; --StageNum ) {
+				for ( StageNum = NumOfStages-1; StageNum >= 1; --StageNum ) {
 					if ( HeatingCoil( CoilNum ).MSNominalCapacity( StageNum ) > 0.0 ) {
-						ReportSizingOutput( "Coil:" + trim( HeatingCoil( CoilNum ).HeatingCoilType ) + ":" + trim( HeatingCoil( CoilNum ).HeatingCoilModel ), HeatingCoil( CoilNum ).Name, "Stage " + trim( TrimSigDigits( StageNum ) ) + " User-Specified Nominal Capacity [W]", HeatingCoil( CoilNum ).MSNominalCapacity( StageNum ) );
+						ReportSizingOutput( trim( CompType ), trim( CompName ), trim( "User-Specified " + trim( SizingString ) ), HeatingCoil( CoilNum ).MSNominalCapacity( StageNum ) );
 					}
 				}
 			}
 			// Ensure capacity at lower Stage must be lower or equal to the capacity at higher Stage.
-			//IF (IsAutosize) THEN
 			for ( StageNum = 1; StageNum <= HeatingCoil( CoilNum ).NumOfStages - 1; ++StageNum ) {
 				if ( HeatingCoil( CoilNum ).MSNominalCapacity( StageNum ) > HeatingCoil( CoilNum ).MSNominalCapacity( StageNum + 1 ) ) {
-					ShowSevereError( "SizeHeatingCoil: " + trim( HeatingCoil( CoilNum ).HeatingCoilType ) + " " + trim( HeatingCoil( CoilNum ).Name ) + ", " "Stage " + trim( TrimSigDigits( StageNum ) ) + " Nominal Capacity (" + trim( RoundSigDigits( HeatingCoil( CoilNum ).MSNominalCapacity( StageNum ), 2 ) ) + " W) must be less than or equal to " "Stage " + trim( TrimSigDigits( StageNum + 1 ) ) + " Nominal Capacity (" + trim( RoundSigDigits( HeatingCoil( CoilNum ).MSNominalCapacity( StageNum + 1 ), 2 ) ) + " W)." );
+					ShowSevereError( "SizeHeatingCoil: " + trim( HeatingCoil( CoilNum ).HeatingCoilType ) + " " + trim( HeatingCoil( CoilNum ).Name) + ", " "Stage " + trim( TrimSigDigits( StageNum ) ) + " Nominal Capacity (" + trim( RoundSigDigits( HeatingCoil( CoilNum ).MSNominalCapacity( StageNum ), 2 ) ) + " W) must be less than or equal to " "Stage " + trim( TrimSigDigits( StageNum + 1 ) ) + " Nominal Capacity (" + trim( RoundSigDigits( HeatingCoil( CoilNum ).MSNominalCapacity( StageNum + 1 ), 2 ) ) + " W)." );
 					ShowFatalError( "Preceding conditions cause termination." );
 				}
 			}
-			//ENDIF
+		} else { // not a multi-speed coil
+			HeatingCoil( CoilNum ).NominalCapacity = TempCap;
 		}
+
+		++NumCoilsSized;
+		if ( NumCoilsSized == NumHeatingCoils ) HeatingCoilNumericFields.deallocate(); // remove temporary array for field names at end of sizing
 
 		//create predefined report entries
 		{ auto const SELECT_CASE_var( HeatingCoil( CoilNum ).HCoilType_Num );

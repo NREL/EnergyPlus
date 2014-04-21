@@ -33,6 +33,15 @@ namespace DataHVACGlobals {
 	extern Real64 const RetTempMax; // maximum return air temperature [deg C]
 	extern Real64 const RetTempMin; // minimum return air temperature [deg C]
 
+	extern int const CoolingAirflowSizing; // request sizing for cooling air flow rate
+	extern int const HeatingAirflowSizing; // request sizing for heating air flow rate
+	extern int const SystemAirflowSizing; // request sizing for system air flow rate
+	extern int const CoolingCapacitySizing; // request sizing for cooling capacity
+	extern int const HeatingCapacitySizing; // request sizing for heating capacity
+	extern int const SystemCapacitySizing; // request sizing for system capacity
+	extern int const CoolingSHRSizing; // request sizing for cooling SHR
+	extern int const HeatingDefrostSizing; // request sizing for heating defrost capacity
+
 	// Condenser Type (using same numbering scheme as for chillers)
 	extern int const AirCooled; // Air-cooled condenser
 	extern int const WaterCooled; // Water-cooled condenser
@@ -144,6 +153,31 @@ namespace DataHVACGlobals {
 
 	// parameters describing coil performance types
 	extern int const CoilPerfDX_CoolBypassEmpirical;
+
+	// Airflow per total capacity range (Regular DX coils)
+	extern Real64 const MaxRatedVolFlowPerRatedTotCap1; // m3/s per watt = 450 cfm/ton
+	extern Real64 const MinRatedVolFlowPerRatedTotCap1; // m3/s per watt = 300 cfm/ton
+	extern Real64 const MaxHeatVolFlowPerRatedTotCap1; // m3/s per watt = 600 cfm/ton
+	extern Real64 const MaxCoolVolFlowPerRatedTotCap1; // m3/s per watt = 500 cfm/ton
+	extern Real64 const MinOperVolFlowPerRatedTotCap1; // m3/s per watt = 200 cfm/ton
+
+	// 100% DOAS DX coils Airflow per total capacity ratio
+	extern Real64 const MaxRatedVolFlowPerRatedTotCap2; // m3/s per watt = 250 cfm/ton
+	extern Real64 const MinRatedVolFlowPerRatedTotCap2; // m3/s per watt = 125 cfm/ton
+	extern Real64 const MaxHeatVolFlowPerRatedTotCap2; // m3/s per watt = 300 cfm/ton
+	extern Real64 const MaxCoolVolFlowPerRatedTotCap2; // m3/s per watt = 300 cfm/ton
+	extern Real64 const MinOperVolFlowPerRatedTotCap2; // m3/s per watt = 100 cfm/ton
+
+	extern FArray1D< Real64 > MaxRatedVolFlowPerRatedTotCap;
+	extern FArray1D< Real64 > MinRatedVolFlowPerRatedTotCap;
+	extern FArray1D< Real64 > MaxHeatVolFlowPerRatedTotCap;
+	extern FArray1D< Real64 > MaxCoolVolFlowPerRatedTotCap;
+	extern FArray1D< Real64 > MinOperVolFlowPerRatedTotCap;
+
+	// dx coil type (DXCT)
+	extern int const RegularDXCoil; // Regular DX coils or mixed air dx coils
+	extern int const DOASDXCoil; // 100% DOAS DX coils
+	extern int DXCT; // dx coil type: regular DX coil ==1, 100% DOAS DX coil = 2
 
 	// Parameters describing Heat Exchanger types
 	extern int const NumHXTypes;
