@@ -139,14 +139,14 @@ namespace PlantCondLoopOperation {
 
 		int ListNum; // DO loop index in PlantLoop()%LoopSide()%Branch()%Comp()%OpScheme()%EquipList(ListNum)
 		int CurListNum; // Current list...= ListNum,  used for error checking only
-		//Indices in PlantLoop()%LoopSide()%Branch()%Comp() data structure
+		//Indices in PlantLoop.LoopSide.Branch.Comp data structure
 		int CurCompLevelOpNum; // This is set by the init routine at each FirstHVACIteration.
 		//It tells which scheme for this component is currently scheduled
 		//and is used to avoid a 'schedule search' on each call
-		//It is used as the OpScheme index in PL()%LoopSide()%Branch()%Comp()%OpScheme(CurCompLevelOpNum)
-		//Value of pointers held in PlantLoop()%LoopSide()%Branch()%Comp() data structure
-		//Used as indices in PlantLoop()%OpScheme() data structure
-		int CurSchemePtr; // set by PL()%LoopSide()%Branch()%Comp()%OpScheme(CurCompLevelOpNum)%OpSchemePtr
+		//It is used as the OpScheme index in PlantLoop.LoopSide.Branch.Comp.OpScheme(CurCompLevelOpNum)
+		//Value of pointers held in PlantLoop.LoopSide.Branch.Comp() data structure
+		//Used as indices in PlantLoop.OpScheme() data structure
+		int CurSchemePtr; // set by PlantLoop.LoopSide.Branch.Comp.OpScheme.OpSchemePtr
 		//used to locate data in PL()%OpScheme(CurSchemePtr)
 		int ListPtr; // !set by PL()%LoopSide()%Branch()%Comp()%OpScheme(CurCompLevelOpNum)%EquipList(CurListNum)ListPtr
 		//used to locate data in PL()%OpScheme(CurSchemePtr)%EquipList(ListPtr)
@@ -166,8 +166,6 @@ namespace PlantCondLoopOperation {
 		Real64 HighestRange; // error processing
 		static int TooLowIndex( 0 ); // error processing
 		static int NotTooLowIndex( 0 ); // error processing
-		//INTEGER , SAVE                    :: ErrCount = 0     !number of errors
-		//CHARACTER(len=20)                 :: CharErrOut       !Error message
 		int NumCompsOnList;
 		int CompIndex;
 		int EquipBranchNum;
@@ -1739,8 +1737,8 @@ namespace PlantCondLoopOperation {
 		//ONE TIME INITS
 		if ( MyOneTimeFlag ) {
 			//Set up 'component' to 'op scheme' pointers in Plant data structure
-			//We're looking for matches between a component on a PlantLoop()%OpScheme()%List()
-			//and the same component in the PlantLoop()%LoopSide()%Branch()%Comp() data structure
+			//We're looking for matches between a component on a PlantLoop.OpScheme.List()
+			//and the same component in the PlantLoop.LoopSide.Branch.Comp() data structure
 
 			// first loop over main operation scheme data and finish filling out indexes to plant topology for the components in the lists
 			for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
@@ -2387,17 +2385,19 @@ namespace PlantCondLoopOperation {
 		static Real64 QdotTmp( 0.0 );
 		static int ControlNodeNum( 0 );
 
+		auto & this_component( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ) );
+
 		//start of bad band-aid, need a general and comprehensive approach for determining current capacity of all kinds of equipment
 		// Need to truncate the load down in case outlet temperature will hit a lower/upper limit
-		{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).HowLoadServed );
+		{ auto const SELECT_CASE_var( this_component.HowLoadServed );
 
 		//Chillers
 		if ( SELECT_CASE_var == HowMet_ByNominalCapLowOutLimit ) { // chillers with lower limit on outlet temperature
 
 			//- Retrieve data from the plant loop data structure
-			CurMassFlowRate = Node( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn ).MassFlowRate;
-			ToutLowLimit = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MinOutletTemp;
-			Tinlet = Node( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn ).Temp;
+			CurMassFlowRate = Node( this_component.NodeNumIn ).MassFlowRate;
+			ToutLowLimit = this_component.MinOutletTemp;
+			Tinlet = Node( this_component.NodeNumIn ).Temp;
 			CurSpecHeat = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, Tinlet, PlantLoop( LoopNum ).FluidIndex, "PlantCondLoopOperation:DistributePlantLoad" );
 			QdotTmp = CurMassFlowRate * CurSpecHeat * ( Tinlet - ToutLowLimit );
 
@@ -2409,14 +2409,14 @@ namespace PlantCondLoopOperation {
 		} else if ( SELECT_CASE_var == HowMet_ByNominalCapFreeCoolCntrl ) {
 			// for chillers with free cooling shutdown (HeatExchanger:Hydronic currently)
 			// determine if free cooling controls shut off chiller
-			TinLowLimit = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).FreeCoolCntrlMinCntrlTemp;
-			{ auto const SELECT_CASE_var1( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).FreeCoolCntrlMode );
+			TinLowLimit = this_component.FreeCoolCntrlMinCntrlTemp;
+			{ auto const SELECT_CASE_var1( this_component.FreeCoolCntrlMode );
 			if ( SELECT_CASE_var1 == FreeCoolControlMode_WetBulb ) {
 				Tsensor = OutWetBulbTemp;
 			} else if ( SELECT_CASE_var1 == FreeCoolControlMode_DryBulb ) {
 				Tsensor = OutDryBulbTemp;
 			} else if ( SELECT_CASE_var1 == FreeCoolControlMode_Loop ) {
-				ControlNodeNum = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).FreeCoolCntrlNodeNum;
+				ControlNodeNum = this_component.FreeCoolCntrlNodeNum;
 				if ( ControlNodeNum > 0 ) {
 					Tsensor = Node( ControlNodeNum ).TempLastTimestep; // use lagged value for stability
 				} else {
@@ -2426,24 +2426,24 @@ namespace PlantCondLoopOperation {
 
 			if ( Tsensor < TinLowLimit ) { // turn off chiller to initiate free cooling
 				ChangeInLoad = 0.0;
-				PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).Available = false;
-				PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).FreeCoolCntrlShutDown = true;
+				this_component.Available = false;
+				this_component.FreeCoolCntrlShutDown = true;
 			} else {
-				PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).Available = true;
-				PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).FreeCoolCntrlShutDown = false;
+				this_component.Available = true;
+				this_component.FreeCoolCntrlShutDown = false;
 			}
 
 		} else if ( SELECT_CASE_var == HowMet_ByNominalCapLowOutLimitFreeCoolCntrl ) {
 			// for chillers with free cooling shutdown (HeatExchanger:Hydronic currently)
 			// determine if free cooling controls shut off chiller
-			TinLowLimit = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).FreeCoolCntrlMinCntrlTemp;
-			{ auto const SELECT_CASE_var1( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).FreeCoolCntrlMode );
+			TinLowLimit = this_component.FreeCoolCntrlMinCntrlTemp;
+			{ auto const SELECT_CASE_var1( this_component.FreeCoolCntrlMode );
 			if ( SELECT_CASE_var1 == FreeCoolControlMode_WetBulb ) {
 				Tsensor = OutWetBulbTemp;
 			} else if ( SELECT_CASE_var1 == FreeCoolControlMode_DryBulb ) {
 				Tsensor = OutDryBulbTemp;
 			} else if ( SELECT_CASE_var1 == FreeCoolControlMode_Loop ) {
-				ControlNodeNum = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).FreeCoolCntrlNodeNum;
+				ControlNodeNum = this_component.FreeCoolCntrlNodeNum;
 				if ( ControlNodeNum > 0 ) {
 					Tsensor = Node( ControlNodeNum ).TempLastTimestep; // use lagged value for stability
 				} else {
@@ -2453,15 +2453,15 @@ namespace PlantCondLoopOperation {
 
 			if ( Tsensor < TinLowLimit ) { // turn off chiller to initiate free cooling
 				ChangeInLoad = 0.0;
-				PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).Available = false;
-				PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).FreeCoolCntrlShutDown = true;
+				this_component.Available = false;
+				this_component.FreeCoolCntrlShutDown = true;
 			} else {
 				//- Retrieve data from the plant loop data structure
-				PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).Available = true;
-				PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).FreeCoolCntrlShutDown = false;
-				CurMassFlowRate = Node( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn ).MassFlowRate;
-				ToutLowLimit = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MinOutletTemp;
-				Tinlet = Node( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn ).Temp;
+				this_component.Available = true;
+				this_component.FreeCoolCntrlShutDown = false;
+				CurMassFlowRate = Node( this_component.NodeNumIn ).MassFlowRate;
+				ToutLowLimit = this_component.MinOutletTemp;
+				Tinlet = Node( this_component.NodeNumIn ).Temp;
 				CurSpecHeat = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, Tinlet, PlantLoop( LoopNum ).FluidIndex, "PlantCondLoopOperation:DistributePlantLoad" );
 				QdotTmp = CurMassFlowRate * CurSpecHeat * ( Tinlet - ToutLowLimit );
 
@@ -2473,9 +2473,9 @@ namespace PlantCondLoopOperation {
 
 		} else if ( SELECT_CASE_var == HowMet_ByNominalCapHiOutLimit ) { // boilers with upper limit on outlet temperature
 			//- Retrieve data from the plant loop data structure
-			CurMassFlowRate = Node( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn ).MassFlowRate;
-			ToutHiLimit = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MaxOutletTemp;
-			Tinlet = Node( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn ).Temp;
+			CurMassFlowRate = Node( this_component.NodeNumIn ).MassFlowRate;
+			ToutHiLimit = this_component.MaxOutletTemp;
+			Tinlet = Node( this_component.NodeNumIn ).Temp;
 			CurSpecHeat = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, Tinlet, PlantLoop( LoopNum ).FluidIndex, "PlantCondLoopOperation:DistributePlantLoad" );
 			QdotTmp = CurMassFlowRate * CurSpecHeat * ( ToutHiLimit - Tinlet );
 
@@ -2541,20 +2541,22 @@ namespace PlantCondLoopOperation {
 		Real64 CurrentDemandForCoolingOp;
 		Real64 CurrentDemandForHeatingOp;
 
+		auto & this_component( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ) );
+
 		//find the pointer to the 'PlantLoop()%OpScheme()'...data structure
-		NumEquipLists = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).OpScheme( OpNum ).NumEquipLists;
+		NumEquipLists = this_component.OpScheme( OpNum ).NumEquipLists;
 		if ( NumEquipLists != 1 ) {
 			//CALL Severe error) there should be exactly one list associated with component setpoint scheme
 		}
 
-		OpSchemePtr = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).OpScheme( OpNum ).OpSchemePtr;
-		ListPtr = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).OpScheme( OpNum ).EquipList( 1 ).ListPtr;
-		CompPtr = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).OpScheme( OpNum ).EquipList( 1 ).CompPtr;
+		OpSchemePtr = this_component.OpScheme( OpNum ).OpSchemePtr;
+		ListPtr = this_component.OpScheme( OpNum ).EquipList( 1 ).ListPtr;
+		CompPtr = this_component.OpScheme( OpNum ).EquipList( 1 ).CompPtr;
 
 		//load local variables from the data structures
-		CompMinLoad = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MinLoad;
-		CompMaxLoad = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MaxLoad;
-		CompOptLoad = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).OptLoad;
+		CompMinLoad = this_component.MinLoad;
+		CompMaxLoad = this_component.MaxLoad;
+		CompOptLoad = this_component.OptLoad;
 		DemandMdot = PlantLoop( LoopNum ).OpScheme( OpSchemePtr ).EquipList( ListPtr ).Comp( CompPtr ).SetPointFlowRate;
 		DemandNode = PlantLoop( LoopNum ).OpScheme( OpSchemePtr ).EquipList( ListPtr ).Comp( CompPtr ).DemandNodeNum;
 		SetPtNode = PlantLoop( LoopNum ).OpScheme( OpSchemePtr ).EquipList( ListPtr ).Comp( CompPtr ).SetPointNodeNum;
@@ -2593,52 +2595,52 @@ namespace PlantCondLoopOperation {
 		}}
 
 		if ( TempSetPt == SensedNodeFlagValue ) {
-			PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).ON = false;
-			PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad = 0.0;
-			PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).EquipDemand = 0.0;
+			this_component.ON = false;
+			this_component.MyLoad = 0.0;
+			this_component.EquipDemand = 0.0;
 		} else {
 
 			CompDemand = ( DemandMdot * CurSpecHeat * ( TempSetPt - TempIn ) );
 
 			if ( std::abs( CompDemand ) < LoopDemandTol ) CompDemand = 0.0;
-			PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).EquipDemand = CompDemand;
+			this_component.EquipDemand = CompDemand;
 
 			//set MyLoad and runflag
 			if ( PlantLoop( LoopNum ).OpScheme( OpSchemePtr ).EquipList( ListPtr ).Comp( CompPtr ).CtrlTypeNum == CoolingOp ) {
 				if ( CompDemand < ( -LoopDemandTol ) ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).ON = true;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad = CompDemand;
+					this_component.ON = true;
+					this_component.MyLoad = CompDemand;
 				} else {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).ON = false;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad = 0.0;
+					this_component.ON = false;
+					this_component.MyLoad = 0.0;
 				}
 			} else if ( PlantLoop( LoopNum ).OpScheme( OpSchemePtr ).EquipList( ListPtr ).Comp( CompPtr ).CtrlTypeNum == HeatingOp ) {
 				if ( CompDemand > LoopDemandTol ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).ON = true;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad = CompDemand;
+					this_component.ON = true;
+					this_component.MyLoad = CompDemand;
 				} else {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).ON = false;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad = 0.0;
+					this_component.ON = false;
+					this_component.MyLoad = 0.0;
 				}
 			} else if ( PlantLoop( LoopNum ).OpScheme( OpSchemePtr ).EquipList( ListPtr ).Comp( CompPtr ).CtrlTypeNum == DualOp ) {
 				if ( CompDemand > LoopDemandTol || CompDemand < ( -LoopDemandTol ) ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).ON = true;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad = CompDemand;
+					this_component.ON = true;
+					this_component.MyLoad = CompDemand;
 				} else {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).ON = false;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad = 0.0;
+					this_component.ON = false;
+					this_component.MyLoad = 0.0;
 				}
 			}
 
 			//Check bounds on MyLoad
-			if ( std::abs( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad ) > CompMaxLoad ) {
-				PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad = sign( CompMaxLoad, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad );
+			if ( std::abs( this_component.MyLoad ) > CompMaxLoad ) {
+				this_component.MyLoad = sign( CompMaxLoad, this_component.MyLoad );
 			}
 			//   PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchNum)%Comp(CompNum)%MyLoad = &
 			//   MIN(PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchNum)%Comp(CompNum)%MyLoad,CompMaxLoad)
 
-			if ( std::abs( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad ) < CompMinLoad ) {
-				PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad = sign( CompMinLoad, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad );
+			if ( std::abs( this_component.MyLoad ) < CompMinLoad ) {
+				this_component.MyLoad = sign( CompMinLoad, this_component.MyLoad );
 			}
 			//   PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchNum)%Comp(CompNum)%MyLoad = &
 			//   MAX(PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchNum)%Comp(CompNum)%MyLoad,CompMinLoad)
@@ -2694,8 +2696,10 @@ namespace PlantCondLoopOperation {
 		int CompPtr;
 		int ListPtr;
 
+		auto & this_component( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ) );
+
 		// ListPtr = PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchNum)%Comp(CompNum)%OpScheme(CurCompLevelOpNum)%EquipList(1)%ListPtr
-		CompPtr = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).OpScheme( CurCompLevelOpNum ).EquipList( 1 ).CompPtr;
+		CompPtr = this_component.OpScheme( CurCompLevelOpNum ).EquipList( 1 ).CompPtr;
 
 		// fill internal variable
 		PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).EquipList( 1 ).Comp( CompPtr ).EMSIntVarRemainingLoadValue = LoopDemand;
@@ -2707,13 +2711,13 @@ namespace PlantCondLoopOperation {
 
 		// move actuated value to MyLoad
 
-		PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).EquipList( 1 ).Comp( CompPtr ).EMSActuatorDispatchedLoadValue;
-		PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).EquipDemand = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).EquipList( 1 ).Comp( CompPtr ).EMSActuatorDispatchedLoadValue;
-		if ( std::abs( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad ) > LoopDemandTol ) {
-			PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).ON = true;
+		this_component.MyLoad = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).EquipList( 1 ).Comp( CompPtr ).EMSActuatorDispatchedLoadValue;
+		this_component.EquipDemand = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).EquipList( 1 ).Comp( CompPtr ).EMSActuatorDispatchedLoadValue;
+		if ( std::abs( this_component.MyLoad ) > LoopDemandTol ) {
+			this_component.ON = true;
 
 		} else {
-			PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).ON = false;
+			this_component.ON = false;
 		}
 
 	}
@@ -3067,9 +3071,14 @@ namespace PlantCondLoopOperation {
 
 		//MODULE VARIABLE DECLARATIONS:
 
+		// set up some nice references to avoid lookups
+		auto & this_loop( PlantLoop( LoopNum ) );
+		auto & this_loopside( this_loop.LoopSide( LoopSideNum ) );
+		auto & this_comp( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
+
 		//Loop Control
-		if ( PlantLoop( LoopNum ).EMSCtrl ) {
-			if ( PlantLoop( LoopNum ).EMSValue <= 0.0 ) {
+		if ( this_loop.EMSCtrl ) {
+			if ( this_loop.EMSValue <= 0.0 ) {
 				LoopShutDownFlag = true;
 				TurnOffLoopEquipment( LoopNum );
 				return;
@@ -3081,54 +3090,47 @@ namespace PlantCondLoopOperation {
 		}
 
 		//Half-loop control
-		if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).EMSCtrl ) {
-			if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).EMSValue <= 0.0 ) {
+		if ( this_loopside.EMSCtrl ) {
+			if ( this_loopside.EMSValue <= 0.0 ) {
 				TurnOffLoopSideEquipment( LoopNum, LoopSideNum );
 				return;
 			} else {
 				//do nothing:  can't turn all LoopSide equip. ON with loop switch
 			}
 		}
-
-		if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).EMSLoadOverrideOn ) {
+		
+		if ( this_comp.EMSLoadOverrideOn ) {
 			//EMSValue <= 0 turn component OFF
-			if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).EMSLoadOverrideValue <= 0.0 ) {
-				PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).ON = false;
-				PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).Available = false;
-				PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad = 0.0;
+			if ( this_comp.EMSLoadOverrideValue <= 0.0 ) {
+				this_comp.ON = false;
+				this_comp.Available = false;
+				this_comp.MyLoad = 0.0;
 				return;
 			} else {
 				//EMSValue > 0 Set Component Load and Turn component ON
-				PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).ON = true;
-				PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).Available = false;
-				PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad = min( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MaxLoad, ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MaxLoad * PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).EMSLoadOverrideValue ) );
+				this_comp.ON = true;
+				this_comp.Available = false;
+				this_comp.MyLoad = min( this_comp.MaxLoad, ( this_comp.MaxLoad * this_comp.EMSLoadOverrideValue ) );
 
 				// Check lower/upper temperature limit for chillers
-				{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf_Num );
+				{ auto const SELECT_CASE_var( this_comp.TypeOf_Num );
 				if ( ( SELECT_CASE_var == TypeOf_Chiller_ElectricEIR ) || ( SELECT_CASE_var == TypeOf_Chiller_Electric ) || ( SELECT_CASE_var == TypeOf_Chiller_ElectricReformEIR ) ) {
 
 					//- Retrieve data from the plant loop data structure
-					CurMassFlowRate = Node( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn ).MassFlowRate;
-					ToutLowLimit = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MinOutletTemp;
-					Tinlet = Node( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn ).Temp;
-					CurSpecHeat = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, Tinlet, PlantLoop( LoopNum ).FluidIndex, "ActivateEMSControls" );
+					CurMassFlowRate = Node( this_comp.NodeNumIn ).MassFlowRate;
+					ToutLowLimit = this_comp.MinOutletTemp;
+					Tinlet = Node( this_comp.NodeNumIn ).Temp;
+					CurSpecHeat = GetSpecificHeatGlycol( this_loop.FluidName, Tinlet, this_loop.FluidIndex, "ActivateEMSControls" );
 					QTemporary = CurMassFlowRate * CurSpecHeat * ( Tinlet - ToutLowLimit );
 
 					//- Don't correct if Q is zero, as this could indicate a component which this hasn't been implemented
 					if ( QTemporary > 0.0 ) {
-
-						//unused               ChangeInLoad = MIN(ChangeInLoad,QTemporary)
-						// DSU?  weird ems thing here?
-						if ( std::abs( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad ) > PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MaxLoad ) {
-							PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad = sign( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MaxLoad, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad );
+						if ( std::abs( this_comp.MyLoad ) > this_comp.MaxLoad ) {
+							this_comp.MyLoad = sign( this_comp.MaxLoad, this_comp.MyLoad );
 						}
-						if ( std::abs( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad ) > QTemporary ) {
-							PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad = sign( QTemporary, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad );
+						if ( std::abs( this_comp.MyLoad ) > QTemporary ) {
+							this_comp.MyLoad = sign( QTemporary, this_comp.MyLoad );
 						}
-
-						//               PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchNum)%Comp(CompNum)%MyLoad = &
-						//               MIN((PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchNum)%Comp(CompNum)%MaxLoad * &
-						//                  PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchNum)%Comp(CompNum)%EMSValue),Qtemporary)
 					}
 				} else {
 					//Nothing Changes for now, could add in case statements for boilers, which would use upper limit temp check
@@ -3184,18 +3186,23 @@ namespace PlantCondLoopOperation {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		if ( ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).EMSCtrl ) && ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).EMSValue <= 0.0 ) ) {
+		// set up some nice references to avoid lookups
+		auto & this_loopside( PlantLoop( LoopNum ).LoopSide( LoopSideNum ) );
+		auto & this_branch( this_loopside.Branch( BranchNum ) );
+		auto & this_comp( this_branch.Comp( CompNum ) );
+
+		if ( ( this_loopside.EMSCtrl ) && ( this_loopside.EMSValue <= 0.0 ) ) {
 			ChangeInLoad = 0.0;
 			return;
 		}
 
-		if ( ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).EMSCtrlOverrideOn ) && ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).EMSCtrlOverrideValue <= 0.0 ) ) {
+		if ( ( this_branch.EMSCtrlOverrideOn ) && ( this_branch.EMSCtrlOverrideValue <= 0.0 ) ) {
 			ChangeInLoad = 0.0;
 			return;
 		}
 
-		if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).EMSLoadOverrideOn ) {
-			if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).EMSLoadOverrideValue == 0.0 ) {
+		if ( this_comp.EMSLoadOverrideOn ) {
+			if ( this_comp.EMSLoadOverrideValue == 0.0 ) {
 				ChangeInLoad = 0.0;
 			}
 		}
