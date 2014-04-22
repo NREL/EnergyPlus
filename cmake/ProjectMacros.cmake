@@ -53,3 +53,16 @@ macro( CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES )
   endif()
 endmacro()
 
+macro( ADD_SIMULATION_TEST IDF_FILE )
+  get_filename_component(IDF_NAME "${IDF_FILE}" NAME_WE)
+  add_test(NAME "integration.${IDF_NAME}" COMMAND ${CMAKE_COMMAND}
+           -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
+           -DBINARY_DIR=${CMAKE_BINARY_DIR}
+           -DENERGYPLUS_EXE=$<TARGET_FILE:EnergyPlus>
+           -DIDF_FILE=${IDF_FILE}
+           -P ${CMAKE_SOURCE_DIR}/cmake/RunSimulation.cmake
+  )
+  SET_TESTS_PROPERTIES("integration.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed")
+  SET_TESTS_PROPERTIES("integration.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
+endmacro()
+
