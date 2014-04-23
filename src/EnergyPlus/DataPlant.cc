@@ -467,16 +467,20 @@ namespace DataPlant {
 		}
 
 		PlantLoops: for ( LoopCtr = StartingLoopNum; LoopCtr <= EndingLoopNum; ++LoopCtr ) {
+            auto & this_loop( PlantLoop( LoopCtr ) );
 			for ( LoopSideCtr = 1; LoopSideCtr <= 2; ++LoopSideCtr ) {
-				for ( BranchCtr = 1; BranchCtr <= PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).TotalBranches; ++BranchCtr ) {
-					for ( CompCtr = 1; CompCtr <= PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).TotalComponents; ++CompCtr ) {
-						if ( PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).TypeOf_Num == CompType ) {
-							if ( SameString( CompName, PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).Name ) ) {
+                auto & this_loop_side( this_loop.LoopSide( LoopSideCtr ) );
+				for ( BranchCtr = 1; BranchCtr <= this_loop_side.TotalBranches; ++BranchCtr ) {
+                    auto & this_branch( this_loop_side.Branch( BranchCtr ) );
+					for ( CompCtr = 1; CompCtr <= this_branch.TotalComponents; ++CompCtr ) {
+                        auto & this_component( this_branch.Comp( CompCtr ) );
+						if ( this_component.TypeOf_Num == CompType ) {
+							if ( SameString( CompName, this_component.Name ) ) {
 								FoundCompName = true;
 								if ( present( InletNodeNumber ) ) {
 									if ( InletNodeNumber > 0 ) {
 										// check if inlet nodes agree
-										if ( InletNodeNumber == PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).NodeNumIn ) {
+										if ( InletNodeNumber == this_component.NodeNumIn ) {
 											FoundComponent = true;
 											++FoundCount;
 											LoopNum = LoopCtr;
@@ -494,10 +498,10 @@ namespace DataPlant {
 									CompNum = CompCtr;
 								}
 								if ( present( LowLimitTemp ) ) {
-									PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).MinOutletTemp = LowLimitTemp;
+									this_component.MinOutletTemp = LowLimitTemp;
 								}
 								if ( present( HighLimitTemp ) ) {
-									PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).MaxOutletTemp = HighLimitTemp;
+									this_component.MaxOutletTemp = HighLimitTemp;
 								}
 							}
 						}
@@ -601,11 +605,14 @@ namespace DataPlant {
 		FoundNode = false;
 
 		PlantLoops: for ( LoopCtr = 1; LoopCtr <= TotNumLoops; ++LoopCtr ) {
+            auto & this_loop( PlantLoop( LoopCtr ) );
 			for ( LoopSideCtr = 1; LoopSideCtr <= 2; ++LoopSideCtr ) {
-				for ( BranchCtr = 1; BranchCtr <= PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).TotalBranches; ++BranchCtr ) {
-					for ( CompCtr = 1; CompCtr <= PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).TotalComponents; ++CompCtr ) {
-
-						if ( NodeNum == PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).NodeNumIn ) {
+                auto & this_loop_side( this_loop.LoopSide( LoopSideCtr ) );
+				for ( BranchCtr = 1; BranchCtr <= this_loop_side.TotalBranches; ++BranchCtr ) {
+                    auto & this_branch( this_loop_side.Branch( BranchCtr ) );
+					for ( CompCtr = 1; CompCtr <= this_branch.TotalComponents; ++CompCtr ) {
+                        auto & this_comp( this_branch.Comp( CompCtr ) );
+						if ( NodeNum == this_comp.NodeNumIn ) {
 							FoundNode = true;
 							++inFoundCount;
 							LoopNum = LoopCtr;
@@ -616,7 +623,7 @@ namespace DataPlant {
 							}
 						}
 
-						if ( NodeNum == PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp( CompCtr ).NodeNumOut ) {
+						if ( NodeNum == this_comp.NodeNumOut ) {
 							++outFoundCount;
 							LoopNum = LoopCtr;
 							LoopSideNum = LoopSideCtr;
@@ -721,8 +728,9 @@ namespace DataPlant {
 
 		//Loop over all loops
 		for ( LoopCtr = 1; LoopCtr <= TotNumLoops; ++LoopCtr ) {
-			PlantLoop( LoopCtr ).LoopSide( DemandSide ).SimLoopSideNeeded = Value;
-			PlantLoop( LoopCtr ).LoopSide( SupplySide ).SimLoopSideNeeded = Value;
+            auto & this_loop( PlantLoop( LoopCtr ) );
+			this_loop.LoopSide( DemandSide ).SimLoopSideNeeded = Value;
+			this_loop.LoopSide( SupplySide ).SimLoopSideNeeded = Value;
 		}
 
 	}
@@ -776,12 +784,15 @@ namespace DataPlant {
 			return GetLoopSidePumpIndex;
 		}
 
+        // set up a nice reference
+        auto & this_loop_side( PlantLoop( LoopNum ).LoopSide( LoopSideNum ) );
+
 		// We can also make use of the TypeOfs to exit early
-		if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).GeneralEquipType != GenEquipTypes_Pump ) return GetLoopSidePumpIndex;
+		if ( this_loop_side.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType != GenEquipTypes_Pump ) return GetLoopSidePumpIndex;
 
 		// Loop across all the loops on this loop/LoopSide, and check the branch/comp location
-		for ( PumpCtr = 1; PumpCtr <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalPumps; ++PumpCtr ) {
-			if ( ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Pumps( PumpCtr ).BranchNum == BranchNum ) && ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Pumps( PumpCtr ).CompNum == CompNum ) ) {
+		for ( PumpCtr = 1; PumpCtr <= this_loop_side.TotalPumps; ++PumpCtr ) {
+			if ( ( this_loop_side.Pumps( PumpCtr ).BranchNum == BranchNum ) && ( this_loop_side.Pumps( PumpCtr ).CompNum == CompNum ) ) {
 				GetLoopSidePumpIndex = PumpCtr;
 				break;
 			}
