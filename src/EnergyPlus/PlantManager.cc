@@ -1,6 +1,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <PlantManager.hh>
@@ -279,7 +280,7 @@ namespace PlantManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetPlant/CondenserLoopData: " );
+		static std::string const RoutineName( "GetPlant/CondenserLoopData: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -296,14 +297,14 @@ namespace PlantManager {
 		int NumFluids; // number of fluids in sim
 		int PlantLoopNum;
 		int CondLoopNum;
-		FArray1D_Fstring Alpha( 18, sFstring( MaxNameLength ) ); // dimension to num of alpha fields in input
+		FArray1D_string Alpha( 18 ); // dimension to num of alpha fields in input
 		FArray1D< Real64 > Num( 30 ); // dimension to num of numeric data fields in input
 		static bool ErrorsFound( false );
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		Fstring LoadingScheme( MaxNameLength );
+		std::string LoadingScheme;
 		bool ErrFound;
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in renaming.
+		std::string CurrentModuleObject; // for ease in renaming.
 		bool MatchedPressureString;
 		int PressSimAlphaIndex;
 		//  INTEGER :: OpSchemeFound
@@ -344,7 +345,7 @@ namespace PlantManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alpha( 1 ), PlantLoop.Name(), LoopNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alpha( 1 ), PlantLoop.Name(), LoopNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alpha( 1 ) = "xxxxx";
@@ -365,17 +366,17 @@ namespace PlantManager {
 				// check for valid fluid name
 				NumFluids = CheckFluidPropertyName( Alpha( 3 ) );
 				if ( NumFluids == 0 ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( Alpha( 1 ) ) + "\", missing fluid data for Plant loop." );
+					ShowSevereError( CurrentModuleObject + "=\"" + Alpha( 1 ) + "\", missing fluid data for Plant loop." );
 					ErrorsFound = true;
 				} else {
 					PlantLoop( LoopNum ).FluidIndex = FindGlycol( Alpha( 3 ) );
 					if ( PlantLoop( LoopNum ).FluidIndex == 0 ) {
-						ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( Alpha( 1 ) ) + "\", invalid glycol fluid data for Plant loop." );
+						ShowSevereError( CurrentModuleObject + "=\"" + Alpha( 1 ) + "\", invalid glycol fluid data for Plant loop." );
 						ErrorsFound = true;
 					}
 				}
 			} else {
-				ShowWarningError( "Input error: " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( Alpha( 2 ) ) + "entered, in " + trim( CurrentModuleObject ) + "=" + trim( Alpha( 1 ) ) );
+				ShowWarningError( "Input error: " + cAlphaFieldNames( 2 ) + '=' + Alpha( 2 ) + "entered, in " + CurrentModuleObject + '=' + Alpha( 1 ) );
 				ShowContinueError( "Will default to Water." );
 
 				PlantLoop( LoopNum ).FluidType = NodeType_Water;
@@ -433,20 +434,20 @@ namespace PlantManager {
 			PlantLoop( LoopNum ).LoopSide( DemandSide ).BranchList = Alpha( 12 );
 			PlantLoop( LoopNum ).LoopSide( DemandSide ).ConnectList = Alpha( 13 );
 
-			PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNumIn = GetOnlySingleNode( Alpha( 6 ), ErrorsFound, trim( CurrentModuleObject ), Alpha( 1 ), PlantLoop( LoopNum ).FluidType, NodeConnectionType_Inlet, 1, ObjectIsParent );
+			PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNumIn = GetOnlySingleNode( Alpha( 6 ), ErrorsFound, CurrentModuleObject, Alpha( 1 ), PlantLoop( LoopNum ).FluidType, NodeConnectionType_Inlet, 1, ObjectIsParent );
 
-			PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNumOut = GetOnlySingleNode( Alpha( 7 ), ErrorsFound, trim( CurrentModuleObject ), Alpha( 1 ), PlantLoop( LoopNum ).FluidType, NodeConnectionType_Outlet, 1, ObjectIsParent );
+			PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNumOut = GetOnlySingleNode( Alpha( 7 ), ErrorsFound, CurrentModuleObject, Alpha( 1 ), PlantLoop( LoopNum ).FluidType, NodeConnectionType_Outlet, 1, ObjectIsParent );
 
-			PlantLoop( LoopNum ).LoopSide( DemandSide ).NodeNumIn = GetOnlySingleNode( Alpha( 10 ), ErrorsFound, trim( CurrentModuleObject ), Alpha( 1 ), PlantLoop( LoopNum ).FluidType, NodeConnectionType_Inlet, 1, ObjectIsParent );
+			PlantLoop( LoopNum ).LoopSide( DemandSide ).NodeNumIn = GetOnlySingleNode( Alpha( 10 ), ErrorsFound, CurrentModuleObject, Alpha( 1 ), PlantLoop( LoopNum ).FluidType, NodeConnectionType_Inlet, 1, ObjectIsParent );
 
-			PlantLoop( LoopNum ).LoopSide( DemandSide ).NodeNumOut = GetOnlySingleNode( Alpha( 11 ), ErrorsFound, trim( CurrentModuleObject ), Alpha( 1 ), PlantLoop( LoopNum ).FluidType, NodeConnectionType_Outlet, 1, ObjectIsParent );
+			PlantLoop( LoopNum ).LoopSide( DemandSide ).NodeNumOut = GetOnlySingleNode( Alpha( 11 ), ErrorsFound, CurrentModuleObject, Alpha( 1 ), PlantLoop( LoopNum ).FluidType, NodeConnectionType_Outlet, 1, ObjectIsParent );
 
 			PlantLoop( LoopNum ).LoopSide( DemandSide ).InletNodeSetPt = IsNodeOnSetPtManager( PlantLoop( LoopNum ).LoopSide( DemandSide ).NodeNumIn, TempSetPt );
 			PlantLoop( LoopNum ).LoopSide( DemandSide ).OutletNodeSetPt = IsNodeOnSetPtManager( PlantLoop( LoopNum ).LoopSide( DemandSide ).NodeNumOut, TempSetPt );
 			PlantLoop( LoopNum ).LoopSide( SupplySide ).InletNodeSetPt = IsNodeOnSetPtManager( PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNumIn, TempSetPt );
 			PlantLoop( LoopNum ).LoopSide( SupplySide ).OutletNodeSetPt = IsNodeOnSetPtManager( PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNumOut, TempSetPt );
 
-			PlantLoop( LoopNum ).TempSetPointNodeNum = GetOnlySingleNode( Alpha( 5 ), ErrorsFound, trim( CurrentModuleObject ), Alpha( 1 ), PlantLoop( LoopNum ).FluidType, NodeConnectionType_Sensor, 1, ObjectIsParent );
+			PlantLoop( LoopNum ).TempSetPointNodeNum = GetOnlySingleNode( Alpha( 5 ), ErrorsFound, CurrentModuleObject, Alpha( 1 ), PlantLoop( LoopNum ).FluidType, NodeConnectionType_Sensor, 1, ObjectIsParent );
 
 			// Load the load distribution scheme.
 			LoadingScheme = Alpha( 14 );
@@ -457,8 +458,8 @@ namespace PlantManager {
 			} else if ( SameString( LoadingScheme, "Uniform" ) ) {
 				PlantLoop( LoopNum ).LoadDistribution = UniformLoading;
 			} else {
-				ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alpha( 1 ) ) + "\", Invalid choice." );
-				ShowContinueError( "..." + trim( cAlphaFieldNames( 14 ) ) + "=\"" + trim( Alpha( 14 ) ) + "\"." );
+				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alpha( 1 ) + "\", Invalid choice." );
+				ShowContinueError( "..." + cAlphaFieldNames( 14 ) + "=\"" + Alpha( 14 ) + "\"." );
 				ShowContinueError( "Will default to SequentialLoading." ); // TODO rename point
 				PlantLoop( LoopNum ).LoadDistribution = SequentialLoading;
 			}
@@ -470,9 +471,9 @@ namespace PlantManager {
 					PlantLoop( LoopNum ).LoopDemandCalcScheme = SingleSetPoint;
 				} else if ( SameString( Alpha( 16 ), "DualSetpointDeadband" ) ) {
 					if ( PlantLoop( LoopNum ).FluidType == NodeType_Steam ) {
-						ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alpha( 1 ) ) + "\", Invalid choice." );
-						ShowContinueError( trim( cAlphaFieldNames( 16 ) ) + "=\"" + trim( Alpha( 16 ) ) + "\" not valid for " + trim( cAlphaFieldNames( 2 ) ) + "= Steam" );
-						ShowContinueError( "Will reset " + trim( cAlphaFieldNames( 16 ) ) + " = SingleSetPoint and simulation will continue." );
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alpha( 1 ) + "\", Invalid choice." );
+						ShowContinueError( cAlphaFieldNames( 16 ) + "=\"" + Alpha( 16 ) + "\" not valid for " + cAlphaFieldNames( 2 ) + "= Steam" );
+						ShowContinueError( "Will reset " + cAlphaFieldNames( 16 ) + " = SingleSetPoint and simulation will continue." );
 						PlantLoop( LoopNum ).LoopDemandCalcScheme = SingleSetPoint;
 					} else {
 						PlantLoop( LoopNum ).LoopDemandCalcScheme = DualSetPointDeadBand;
@@ -480,8 +481,8 @@ namespace PlantManager {
 				} else if ( SameString( Alpha( 16 ), "" ) ) {
 					PlantLoop( LoopNum ).LoopDemandCalcScheme = SingleSetPoint;
 				} else {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alpha( 1 ) ) + "\", Invalid choice." );
-					ShowContinueError( "..." + trim( cAlphaFieldNames( 16 ) ) + "=\"" + trim( Alpha( 16 ) ) + "\"." );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alpha( 1 ) + "\", Invalid choice." );
+					ShowContinueError( "..." + cAlphaFieldNames( 16 ) + "=\"" + Alpha( 16 ) + "\"." );
 					ShowContinueError( "Will default to SingleSetPoint." ); // TODO rename point
 					PlantLoop( LoopNum ).LoopDemandCalcScheme = SingleSetPoint;
 				}
@@ -498,8 +499,8 @@ namespace PlantManager {
 				} else if ( SameString( Alpha( 17 ), "None" ) || lAlphaFieldBlanks( 17 ) ) {
 					PlantLoop( LoopNum ).CommonPipeType = CommonPipe_No;
 				} else {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alpha( 1 ) ) + "\", Invalid choice." );
-					ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 17 ) ) + "=\"" + trim( Alpha( 17 ) ) + "\"." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alpha( 1 ) + "\", Invalid choice." );
+					ShowContinueError( "Invalid " + cAlphaFieldNames( 17 ) + "=\"" + Alpha( 17 ) + "\"." );
 					ShowContinueError( "Refer to I/O reference document for more details." );
 					ErrorsFound = true;
 				}
@@ -509,14 +510,14 @@ namespace PlantManager {
 
 			if ( PlantLoop( LoopNum ).CommonPipeType == CommonPipe_TwoWay ) {
 				if ( PlantLoop( LoopNum ).LoopSide( DemandSide ).InletNodeSetPt && PlantLoop( LoopNum ).LoopSide( SupplySide ).InletNodeSetPt ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alpha( 1 ) ) + "\", Invalid condition." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alpha( 1 ) + "\", Invalid condition." );
 					ShowContinueError( "While using a two way common pipe there can be setpoint on only one node other " "than Plant Supply Outlet node." );
 					ShowContinueError( "Currently both Plant Demand inlet and plant supply inlet have setpoints." );
 					ShowContinueError( "Select one of the two nodes and rerun the simulation." );
 					ErrorsFound = true;
 				}
 				if ( ! PlantLoop( LoopNum ).LoopSide( DemandSide ).InletNodeSetPt && ! PlantLoop( LoopNum ).LoopSide( SupplySide ).InletNodeSetPt ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alpha( 1 ) ) + "\", Invalid condition." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alpha( 1 ) + "\", Invalid condition." );
 					ShowContinueError( "While using a two way common pipe there must be a setpoint in addition to " "the Plant Supply Outlet node." );
 					ShowContinueError( "Currently neither plant demand inlet nor plant supply inlet have setpoints." );
 					ShowContinueError( "Select one of the two nodes and rerun the simulation." );
@@ -552,8 +553,8 @@ namespace PlantManager {
 						//We are OK here, move on
 					} else {
 						//We have an erroneous input, alert user
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alpha( 1 ) ) + "\", Invalid choice." );
-						ShowContinueError( "Invalid " + trim( cAlphaFieldNames( PressSimAlphaIndex ) ) + "=\"" + trim( Alpha( PressSimAlphaIndex ) ) + "\"." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alpha( 1 ) + "\", Invalid choice." );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( PressSimAlphaIndex ) + "=\"" + Alpha( PressSimAlphaIndex ) + "\"." );
 						ShowContinueError( "Currently only options are: " );
 						ShowContinueError( "  - " + PressureSimType( Press_NoPressure ) );
 						ShowContinueError( "  - " + PressureSimType( Press_PumpPowerCorrection ) );
@@ -564,7 +565,7 @@ namespace PlantManager {
 
 				//if we made it this far and didn't get a match, check for blank
 				if ( ! MatchedPressureString ) {
-					if ( trim( Alpha( PressSimAlphaIndex ) ) == "" ) {
+					if ( Alpha( PressSimAlphaIndex ) == "" ) {
 						PlantLoop( LoopNum ).PressureSimType = Press_NoPressure;
 						MatchedPressureString = true;
 						break;
@@ -573,8 +574,8 @@ namespace PlantManager {
 
 				//if we made it this far, there was no match, and it wasn't blank
 				if ( ! MatchedPressureString ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alpha( 1 ) ) + "\", Invalid condition." );
-					ShowContinueError( "Invalid " + trim( cAlphaFieldNames( PressSimAlphaIndex ) ) + "=\"" + trim( Alpha( PressSimAlphaIndex ) ) + "\"." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alpha( 1 ) + "\", Invalid condition." );
+					ShowContinueError( "Invalid " + cAlphaFieldNames( PressSimAlphaIndex ) + "=\"" + Alpha( PressSimAlphaIndex ) + "\"." );
 					ErrorsFound = true;
 				}
 
@@ -587,26 +588,26 @@ namespace PlantManager {
 			}
 
 			if ( ErrFound ) {
-				ShowContinueError( "Input errors in  " + trim( CurrentModuleObject ) + "=" + trim( Alpha( 1 ) ) );
+				ShowContinueError( "Input errors in  " + CurrentModuleObject + '=' + Alpha( 1 ) );
 				ErrorsFound = true;
 			}
 
 			if ( GetFirstBranchInletNodeName( PlantLoop( LoopNum ).LoopSide( DemandSide ).BranchList ) != PlantLoop( LoopNum ).LoopSide( DemandSide ).NodeNameIn ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alpha( 1 ) ) + "\", Invalid condition." );
-				ShowContinueError( "The inlet node of the first branch in the " + trim( cAlphaFieldNames( 12 ) ) + "=" + trim( Alpha( 12 ) ) ); //"Plant Demand Side Branch List"
-				ShowContinueError( "is not the same as the " + trim( cAlphaFieldNames( 10 ) ) + "=" + trim( Alpha( 10 ) ) ); // "Plant Demand Side Inlet Node Name"
-				ShowContinueError( "Branch List Inlet Node Name=" + trim( GetFirstBranchInletNodeName( PlantLoop( LoopNum ).LoopSide( DemandSide ).BranchList ) ) ); // TODO rename point
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alpha( 1 ) + "\", Invalid condition." );
+				ShowContinueError( "The inlet node of the first branch in the " + cAlphaFieldNames( 12 ) + '=' + Alpha( 12 ) ); //"Plant Demand Side Branch List"
+				ShowContinueError( "is not the same as the " + cAlphaFieldNames( 10 ) + '=' + Alpha( 10 ) ); // "Plant Demand Side Inlet Node Name"
+				ShowContinueError( "Branch List Inlet Node Name=" + GetFirstBranchInletNodeName( PlantLoop( LoopNum ).LoopSide( DemandSide ).BranchList ) ); // TODO rename point
 				ShowContinueError( "Branches in a BRANCH LIST must be listed in flow order: " "inlet branch, then parallel branches, then outlet branch." ); // TODO rename point
 				ErrorsFound = true;
 			}
 
 			if ( GetLastBranchOutletNodeName( PlantLoop( LoopNum ).LoopSide( DemandSide ).BranchList ) != PlantLoop( LoopNum ).LoopSide( DemandSide ).NodeNameOut ) {
 				//"Plant Demand Side Branch List"
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alpha( 1 ) ) + "\", Invalid condition." );
-				ShowContinueError( "The outlet node of the last branch in the " + trim( cAlphaFieldNames( 12 ) ) + "=" + trim( Alpha( 12 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alpha( 1 ) + "\", Invalid condition." );
+				ShowContinueError( "The outlet node of the last branch in the " + cAlphaFieldNames( 12 ) + '=' + Alpha( 12 ) );
 				//"Plant Demand Side Outlet Node Name"
-				ShowContinueError( "is not the same as the " + trim( cAlphaFieldNames( 11 ) ) + "=" + trim( Alpha( 11 ) ) );
-				ShowContinueError( "Branch List Outlet Node Name=" + trim( GetLastBranchOutletNodeName( PlantLoop( LoopNum ).LoopSide( DemandSide ).BranchList ) ) ); // TODO rename point
+				ShowContinueError( "is not the same as the " + cAlphaFieldNames( 11 ) + '=' + Alpha( 11 ) );
+				ShowContinueError( "Branch List Outlet Node Name=" + GetLastBranchOutletNodeName( PlantLoop( LoopNum ).LoopSide( DemandSide ).BranchList ) ); // TODO rename point
 				// TODO rename point
 				ShowContinueError( "Branches in a BRANCH LIST must be listed in flow order: inlet branch, then parallel branches, " "then outlet branch." );
 				ErrorsFound = true;
@@ -614,11 +615,11 @@ namespace PlantManager {
 
 			if ( GetFirstBranchInletNodeName( PlantLoop( LoopNum ).LoopSide( SupplySide ).BranchList ) != PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNameIn ) {
 				//"Plant Supply Side Branch List"
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alpha( 1 ) ) + "\", Invalid condition." );
-				ShowContinueError( "The inlet node of the first branch in the " + trim( cAlphaFieldNames( 8 ) ) + "=" + trim( Alpha( 8 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alpha( 1 ) + "\", Invalid condition." );
+				ShowContinueError( "The inlet node of the first branch in the " + cAlphaFieldNames( 8 ) + '=' + Alpha( 8 ) );
 				//"Plant Supply Side Inlet Node Name
-				ShowContinueError( "is not the same as the " + trim( cAlphaFieldNames( 6 ) ) + "=" + trim( Alpha( 6 ) ) );
-				ShowContinueError( "Branch List Inlet Node Name=" + trim( GetFirstBranchInletNodeName( PlantLoop( LoopNum ).LoopSide( SupplySide ).BranchList ) ) ); // TODO rename point
+				ShowContinueError( "is not the same as the " + cAlphaFieldNames( 6 ) + '=' + Alpha( 6 ) );
+				ShowContinueError( "Branch List Inlet Node Name=" + GetFirstBranchInletNodeName( PlantLoop( LoopNum ).LoopSide( SupplySide ).BranchList ) ); // TODO rename point
 				// TODO rename point
 				ShowContinueError( "Branches in a BRANCH LIST must be listed in flow order: inlet branch, then parallel branches, " "then outlet branch." );
 				ErrorsFound = true;
@@ -626,11 +627,11 @@ namespace PlantManager {
 
 			if ( GetLastBranchOutletNodeName( PlantLoop( LoopNum ).LoopSide( SupplySide ).BranchList ) != PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNameOut ) {
 				//"Plant Supply Side Branch List"
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alpha( 1 ) ) + "\", Invalid condition." );
-				ShowContinueError( "The outlet node of the last branch in the " + trim( cAlphaFieldNames( 8 ) ) + "=" + trim( Alpha( 8 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alpha( 1 ) + "\", Invalid condition." );
+				ShowContinueError( "The outlet node of the last branch in the " + cAlphaFieldNames( 8 ) + '=' + Alpha( 8 ) );
 				//"Plant Supply Side Outlet Node Name"
-				ShowContinueError( "is not the same as the " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( Alpha( 7 ) ) );
-				ShowContinueError( "Branch List Outlet Node Name=" + trim( GetLastBranchOutletNodeName( PlantLoop( LoopNum ).LoopSide( SupplySide ).BranchList ) ) ); // TODO rename point
+				ShowContinueError( "is not the same as the " + cAlphaFieldNames( 7 ) + '=' + Alpha( 7 ) );
+				ShowContinueError( "Branch List Outlet Node Name=" + GetLastBranchOutletNodeName( PlantLoop( LoopNum ).LoopSide( SupplySide ).BranchList ) ); // TODO rename point
 				// TODO rename point
 				ShowContinueError( "Branches in a BRANCH LIST must be listed in flow order: inlet branch, then parallel branches, " "then outlet branch." );
 				ErrorsFound = true;
@@ -713,7 +714,7 @@ namespace PlantManager {
 		int MixNum;
 		int NumConnectorsInLoop;
 		int ConnNum;
-		int Pos;
+		std::string::size_type Pos;
 		int TotCompsOnBranch;
 		int MaxNumAlphas;
 		int MaxNumNumbers;
@@ -725,14 +726,14 @@ namespace PlantManager {
 		bool ASeriesBranchHasPump;
 		bool AParallelBranchHasPump;
 
-		Fstring LoopIdentifier( 16 );
+		std::string LoopIdentifier;
 
-		static FArray1D_Fstring BranchNames( sFstring( MaxNameLength ) ); // Branch names from GetBranchList call
-		static FArray1D_Fstring CompTypes( sFstring( MaxNameLength ) ); // Branch names from GetBranchList call
-		static FArray1D_Fstring CompNames( sFstring( MaxNameLength ) ); // Branch names from GetBranchList call
+		static FArray1D_string BranchNames; // Branch names from GetBranchList call
+		static FArray1D_string CompTypes; // Branch names from GetBranchList call
+		static FArray1D_string CompNames; // Branch names from GetBranchList call
 		static FArray1D_int CompCtrls; // Branch names from GetBranchList call
-		static FArray1D_Fstring InletNodeNames( sFstring( MaxNameLength ) ); // Node names from GetBranchData call
-		static FArray1D_Fstring OutletNodeNames( sFstring( MaxNameLength ) ); // Node names from GetBranchData call
+		static FArray1D_string InletNodeNames; // Node names from GetBranchData call
+		static FArray1D_string OutletNodeNames; // Node names from GetBranchData call
 		static FArray1D_int InletNodeNumbers; // Node numbers from GetBranchData call
 		static FArray1D_int OutletNodeNumbers; // Node numbers from GetBranchData call
 		static FArray1D_bool SplitOutBranch;
@@ -786,8 +787,8 @@ namespace PlantManager {
 				// Get the branch list and size the Branch portion of the Loop derived type
 				TempLoop.TotalBranches = NumBranchesInBranchList( TempLoop.BranchList );
 				BranchNames.allocate( TempLoop.TotalBranches );
-				BranchNames = " ";
-				GetBranchList( TempLoop.Name, TempLoop.BranchList, TempLoop.TotalBranches, BranchNames, trim( LoopIdentifier ) );
+				BranchNames = "";
+				GetBranchList( TempLoop.Name, TempLoop.BranchList, TempLoop.TotalBranches, BranchNames, LoopIdentifier );
 				TempLoop.Branch.allocate( TempLoop.TotalBranches );
 
 				// Cycle through all of the branches and set up the node data
@@ -800,17 +801,17 @@ namespace PlantManager {
 					TempLoop.Branch( BranchNum ).IsBypass = false;
 
 					CompTypes.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
-					CompTypes = " ";
+					CompTypes = "";
 					CompNames.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
-					CompNames = " ";
+					CompNames = "";
 					CompCtrls.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
 					CompCtrls = 0;
 					InletNodeNames.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
-					InletNodeNames = " ";
+					InletNodeNames = "";
 					InletNodeNumbers.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
 					InletNodeNumbers = 0;
 					OutletNodeNames.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
-					OutletNodeNames = " ";
+					OutletNodeNames = "";
 					OutletNodeNumbers.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
 					OutletNodeNumbers = 0;
 
@@ -846,21 +847,21 @@ namespace PlantManager {
 							TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_PipingSystemPipeCircuit;
 							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Pipe;
 							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = NoControlOpSchemeType;
-						} else if ( SameString( CompTypes( CompNum )( 1, 4 ), "Pump" ) || SameString( CompTypes( CompNum )( 1, 13 ), "HeaderedPumps" ) ) {
-							if ( SameString( CompTypes( CompNum )( 1, 18 ), "Pump:VariableSpeed" ) ) {
+						} else if ( has_prefixi( CompTypes( CompNum ), "Pump" ) || has_prefixi( CompTypes( CompNum ), "HeaderedPumps" ) ) {
+							if ( has_prefixi( CompTypes( CompNum ), "Pump:VariableSpeed" ) ) {
 								TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_PumpVariableSpeed;
-							} else if ( SameString( CompTypes( CompNum )( 1, 18 ), "Pump:ConstantSpeed" ) ) {
+							} else if ( has_prefixi( CompTypes( CompNum ), "Pump:ConstantSpeed" ) ) {
 								TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_PumpConstantSpeed;
-							} else if ( SameString( CompTypes( CompNum )( 1, 29 ), "Pump:VariableSpeed:Condensate" ) ) {
+							} else if ( has_prefixi( CompTypes( CompNum ), "Pump:VariableSpeed:Condensate" ) ) {
 								TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_PumpCondensate;
-							} else if ( SameString( CompTypes( CompNum )( 1, 27 ), "HeaderedPumps:ConstantSpeed" ) ) {
+							} else if ( has_prefixi( CompTypes( CompNum ), "HeaderedPumps:ConstantSpeed" ) ) {
 								TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_PumpBankConstantSpeed;
-							} else if ( SameString( CompTypes( CompNum )( 1, 27 ), "HeaderedPumps:VariableSpeed" ) ) {
+							} else if ( has_prefixi( CompTypes( CompNum ), "HeaderedPumps:VariableSpeed" ) ) {
 								TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num = TypeOf_PumpBankVariableSpeed;
 							} else {
 								//discover unsupported equipment on branches.
 								ShowSevereError( "GetPlantInput: trying to process a pump type that is not supported, dev note" );
-								ShowContinueError( "Component Type =" + trim( CompTypes( CompNum ) ) );
+								ShowContinueError( "Component Type =" + CompTypes( CompNum ) );
 							}
 							TempLoop.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType = GenEquipTypes_Pump;
 							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = PumpOpSchemeType;
@@ -1257,8 +1258,8 @@ namespace PlantManager {
 							TempLoop.Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType = DemandOpSchemeType;
 						} else {
 							//discover unsupported equipment on branches.
-							ShowSevereError( "GetPlantInput: Branch=\"" + trim( BranchNames( BranchNum ) ) + "\", invalid component on branch." );
-							ShowContinueError( "...invalid component type=\"" + trim( CompTypes( CompNum ) ) + "\", name=\"" + trim( CompNames( CompNum ) ) + "\"." );
+							ShowSevereError( "GetPlantInput: Branch=\"" + BranchNames( BranchNum ) + "\", invalid component on branch." );
+							ShowContinueError( "...invalid component type=\"" + CompTypes( CompNum ) + "\", name=\"" + CompNames( CompNum ) + "\"." );
 							//            ErrorsFound=.TRUE.
 						}
 
@@ -1300,7 +1301,7 @@ namespace PlantManager {
 
 				if ( ASeriesBranchHasPump && AParallelBranchHasPump ) {
 					ShowSevereError( "Current version does not support Loop pumps and branch pumps together" );
-					ShowContinueError( "Occurs in loop " + trim( TempLoop.Name ) );
+					ShowContinueError( "Occurs in loop " + TempLoop.Name );
 					ErrorsFound = true;
 					//      ELSE IF(.NOT. ASeriesBranchHasPump .AND. .NOT. TempLoop%BranchPump .AND. (LoopSideNum .NE. DemandSide)) THEN
 					//        CALL ShowSevereError('PlantLoop does not have a pump. A pump is required in each loop')
@@ -1338,7 +1339,7 @@ namespace PlantManager {
 						ErrorsFound = true;
 					}
 					if ( NumofSplitters != NumofMixers ) {
-						ShowSevereError( "GetPlantInput: Loop Name=" + trim( TempLoop.Name ) + ", ConnectorList=" + trim( TempLoop.ConnectList ) + ", unequal number of splitters and mixers" );
+						ShowSevereError( "GetPlantInput: Loop Name=" + TempLoop.Name + ", ConnectorList=" + TempLoop.ConnectList + ", unequal number of splitters and mixers" );
 						ErrorsFound = true;
 					}
 				}
@@ -1387,14 +1388,14 @@ namespace PlantManager {
 							}
 						}
 						if ( ! SplitInBranch ) {
-							ShowSevereError( "Splitter Inlet Branch not found, Splitter=" + trim( TempLoop.Splitter( SplitNum - 1 ).Name ) );
-							ShowContinueError( "Splitter Branch Inlet name=" + trim( TempLoop.Splitter( SplitNum - 1 ).NodeNameIn ) );
-							ShowContinueError( "In Loop=" + trim( TempLoop.Name ) );
+							ShowSevereError( "Splitter Inlet Branch not found, Splitter=" + TempLoop.Splitter( SplitNum - 1 ).Name );
+							ShowContinueError( "Splitter Branch Inlet name=" + TempLoop.Splitter( SplitNum - 1 ).NodeNameIn );
+							ShowContinueError( "In Loop=" + TempLoop.Name );
 							ErrorsFound = true;
 						}
 
 						TempLoop.Splitter( SplitNum - 1 ).NodeNameOut.allocate( TempLoop.Splitter( SplitNum - 1 ).TotalOutletNodes );
-						TempLoop.Splitter( SplitNum - 1 ).NodeNameOut = " ";
+						TempLoop.Splitter( SplitNum - 1 ).NodeNameOut = "";
 						TempLoop.Splitter( SplitNum - 1 ).NodeNumOut.allocate( TempLoop.Splitter( SplitNum - 1 ).TotalOutletNodes );
 						TempLoop.Splitter( SplitNum - 1 ).NodeNumOut = 0;
 						TempLoop.Splitter( SplitNum - 1 ).BranchNumOut.allocate( TempLoop.Splitter( SplitNum - 1 ).TotalOutletNodes );
@@ -1418,11 +1419,11 @@ namespace PlantManager {
 
 						for ( Outlet = 1; Outlet <= TempLoop.Splitter( SplitNum - 1 ).TotalOutletNodes; ++Outlet ) {
 							if ( SplitOutBranch( Outlet ) ) continue;
-							ShowSevereError( "Splitter Outlet Branch not found, Splitter=" + trim( TempLoop.Splitter( SplitNum - 1 ).Name ) );
-							ShowContinueError( "Splitter Branch Outlet node name=" + trim( TempLoop.Splitter( SplitNum - 1 ).NodeNameOut( Outlet ) ) );
-							ShowContinueError( "In Loop=" + trim( TempLoop.Name ) );
-							ShowContinueError( "Loop BranchList=" + trim( TempLoop.BranchList ) );
-							ShowContinueError( "Loop ConnectorList=" + trim( TempLoop.ConnectList ) );
+							ShowSevereError( "Splitter Outlet Branch not found, Splitter=" + TempLoop.Splitter( SplitNum - 1 ).Name );
+							ShowContinueError( "Splitter Branch Outlet node name=" + TempLoop.Splitter( SplitNum - 1 ).NodeNameOut( Outlet ) );
+							ShowContinueError( "In Loop=" + TempLoop.Name );
+							ShowContinueError( "Loop BranchList=" + TempLoop.BranchList );
+							ShowContinueError( "Loop ConnectorList=" + TempLoop.ConnectList );
 							ErrorsFound = true;
 						}
 
@@ -1459,12 +1460,12 @@ namespace PlantManager {
 							}
 						}
 						if ( ! MixerOutBranch ) {
-							ShowSevereError( "Mixer Outlet Branch not found, Mixer=" + trim( TempLoop.Mixer( MixNum - 1 ).Name ) );
+							ShowSevereError( "Mixer Outlet Branch not found, Mixer=" + TempLoop.Mixer( MixNum - 1 ).Name );
 							ErrorsFound = true;
 						}
 
 						TempLoop.Mixer( MixNum - 1 ).NodeNameIn.allocate( TempLoop.Mixer( MixNum - 1 ).TotalInletNodes );
-						TempLoop.Mixer( MixNum - 1 ).NodeNameIn = " ";
+						TempLoop.Mixer( MixNum - 1 ).NodeNameIn = "";
 						TempLoop.Mixer( MixNum - 1 ).NodeNumIn.allocate( TempLoop.Mixer( MixNum - 1 ).TotalInletNodes );
 						TempLoop.Mixer( MixNum - 1 ).NodeNumIn = 0;
 						TempLoop.Mixer( MixNum - 1 ).BranchNumIn.allocate( TempLoop.Mixer( MixNum - 1 ).TotalInletNodes );
@@ -1489,11 +1490,11 @@ namespace PlantManager {
 
 						for ( Inlet = 1; Inlet <= TempLoop.Mixer( MixNum - 1 ).TotalInletNodes; ++Inlet ) {
 							if ( MixerInBranch( Inlet ) ) continue;
-							ShowSevereError( "Mixer Inlet Branch not found, Mixer=" + trim( TempLoop.Mixer( MixNum - 1 ).Name ) );
-							ShowContinueError( "Mixer Branch Inlet name=" + trim( TempLoop.Mixer( MixNum - 1 ).NodeNameIn( Inlet ) ) );
-							ShowContinueError( "In Loop=" + trim( TempLoop.Name ) );
-							ShowContinueError( "Loop BranchList=" + trim( TempLoop.BranchList ) );
-							ShowContinueError( "Loop ConnectorList=" + trim( TempLoop.ConnectList ) );
+							ShowSevereError( "Mixer Inlet Branch not found, Mixer=" + TempLoop.Mixer( MixNum - 1 ).Name );
+							ShowContinueError( "Mixer Branch Inlet name=" + TempLoop.Mixer( MixNum - 1 ).NodeNameIn( Inlet ) );
+							ShowContinueError( "In Loop=" + TempLoop.Name );
+							ShowContinueError( "Loop BranchList=" + TempLoop.BranchList );
+							ShowContinueError( "Loop ConnectorList=" + TempLoop.ConnectList );
 							ErrorsFound = true;
 						}
 
@@ -1573,7 +1574,7 @@ namespace PlantManager {
 			// CR 7883 check for missing demand side pump if common pipe set.
 			if ( ( PlantLoop( LoopNum ).CommonPipeType != CommonPipe_No ) && ( ! DemandSideHasPump ) ) {
 				ShowSevereError( "Input Error: a common pipe arrangement was selected but there is no pump for the secondary loop." );
-				ShowContinueError( "Occurs in PlantLoop = " + trim( TempLoop.Name ) );
+				ShowContinueError( "Occurs in PlantLoop = " + TempLoop.Name );
 				ShowContinueError( "Add a pump to the demand side of this plant loop." );
 				ErrorsFound = true;
 			}
@@ -1606,28 +1607,32 @@ namespace PlantManager {
 		for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
 			for ( BranchNum = 1; BranchNum <= PlantLoop( LoopNum ).LoopSide( SupplySide ).TotalBranches; ++BranchNum ) {
 				for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-					Pos = index( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, ":" );
-					GeneralEquipType = FindItemInList( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf( {1,Pos - 1} ), GeneralEquipTypes, NumGeneralEquipTypes );
+					Pos = index( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, ':' );
+					if ( Pos != std::string::npos ) {
+						GeneralEquipType = FindItemInList( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf.substr( 0, Pos ), GeneralEquipTypes, NumGeneralEquipTypes );
+					} else {
+						GeneralEquipType = 0;
+					}
 					if ( GeneralEquipType == 0 ) {
-						if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf( {1,13} ), "HeaderedPumps" ) ) {
+						if ( has_prefixi( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "HeaderedPumps" ) ) {
 							GeneralEquipType = GenEquipTypes_Pump;
 						} else if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "WaterHeater:HeatPump" ) ) {
 							GeneralEquipType = GenEquipTypes_WaterThermalTank;
 						} else if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "TemperingValve" ) ) {
 							GeneralEquipType = GenEquipTypes_Valve;
-						} else if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf( {1,14} ), "Pipe:Adiabatic" ) ) {
+						} else if ( has_prefixi( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "Pipe:Adiabatic" ) ) {
 							GeneralEquipType = GenEquipTypes_Pipe;
-						} else if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf( {1,12} ), "PipingSystem" ) ) {
+						} else if ( has_prefixi( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "PipingSystem" ) ) {
 							GeneralEquipType = GenEquipTypes_Pipe;
-						} else if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf( {1,33} ), "Thermalstorage:ChilledWater:Mixed" ) ) {
+						} else if ( has_prefixi( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "Thermalstorage:ChilledWater:Mixed" ) ) {
 							GeneralEquipType = GenEquipTypes_ThermalStorage;
-						} else if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf( {1,38} ), "Thermalstorage:ChilledWater:Stratified" ) ) {
+						} else if ( has_prefixi( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "Thermalstorage:ChilledWater:Stratified" ) ) {
 							GeneralEquipType = GenEquipTypes_ThermalStorage;
 						} else if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "ChillerHeater:Absorption:DirectFired" ) ) {
 							GeneralEquipType = GenEquipTypes_Chiller;
 						} else if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "ChillerHeater:Absorption:DoubleEffect" ) ) {
 							GeneralEquipType = GenEquipTypes_Chiller;
-						} else if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf( {1,8} ), "District" ) ) {
+						} else if ( has_prefixi( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "District" ) ) {
 							GeneralEquipType = GenEquipTypes_Purchased;
 						} else if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "GroundHeatExchanger:Vertical" ) ) {
 							GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
@@ -1639,12 +1644,11 @@ namespace PlantManager {
 							GeneralEquipType = GenEquipTypes_HeatExchanger;
 						} else if ( SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "CENTRALHEATPUMPSYSTEM" ) ) {
 							GeneralEquipType = GenEquipTypes_CentralHeatPumpSystem;
-
 						} else {
-							ShowSevereError( "GetPlantInput: PlantLoop=\"" + trim( PlantLoop( LoopNum ).Name ) + "\" invalid equipment type." );
-							ShowContinueError( "...on Branch=\"" + trim( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Name ) + "\"." );
-							ShowContinueError( "...Equipment type=\"" + trim( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf ) + "\"." );
-							ShowContinueError( "...Equipment name=\"" + trim( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).Name ) + "\"." );
+							ShowSevereError( "GetPlantInput: PlantLoop=\"" + PlantLoop( LoopNum ).Name + "\" invalid equipment type." );
+							ShowContinueError( "...on Branch=\"" + PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Name + "\"." );
+							ShowContinueError( "...Equipment type=\"" + PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf + "\"." );
+							ShowContinueError( "...Equipment name=\"" + PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).Name + "\"." );
 							ErrorsFound = true;
 						}
 					}
@@ -1654,13 +1658,13 @@ namespace PlantManager {
 					// Set up "TypeOf" Num
 					TypeOfNum = FindItemInList( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, SimPlantEquipTypes, NumSimPlantEquipTypes );
 					if ( TypeOfNum == 0 ) {
-						if ( ! SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf( {1,4} ), "Pump" ) && ! SameString( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf( {1,12} ), "HeaderedPump" ) ) {
+						if ( ! has_prefixi( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "Pump" ) && ! has_prefixi( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "HeaderedPump" ) ) {
 							// Error.  May have already been flagged under General
 							if ( GeneralEquipType != 0 ) { // if GeneralEquipmentType == 0, then already flagged
-								ShowSevereError( "GetPlantInput: PlantLoop=\"" + trim( PlantLoop( LoopNum ).Name ) + "\" invalid equipment type." );
-								ShowContinueError( "...on Branch=\"" + trim( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Name ) + "\"." );
-								ShowContinueError( "...Equipment type=\"" + trim( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf ) + "\"." );
-								ShowContinueError( "...Equipment name=\"" + trim( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).Name ) + "\"." );
+								ShowSevereError( "GetPlantInput: PlantLoop=\"" + PlantLoop( LoopNum ).Name + "\" invalid equipment type." );
+								ShowContinueError( "...on Branch=\"" + PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Name + "\"." );
+								ShowContinueError( "...Equipment type=\"" + PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).TypeOf + "\"." );
+								ShowContinueError( "...Equipment name=\"" + PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).Name + "\"." );
 								ErrorsFound = true;
 							}
 						}
@@ -1867,7 +1871,7 @@ namespace PlantManager {
 		int BranchNum;
 		int CompNum;
 		int MaxBranches; // Maximum number of branches on any plant loop (used for allocating arrays)
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in renaming.
+		std::string CurrentModuleObject; // for ease in renaming.
 		int FluidIndex;
 
 		// FLOW:
@@ -2061,15 +2065,15 @@ namespace PlantManager {
 				if ( SensedNode > 0 ) {
 					if ( Node( SensedNode ).TempSetPoint == SensedNodeFlagValue ) {
 						if ( ! AnyEnergyManagementSystemInModel ) {
-							ShowSevereError( "PlantManager: No Setpoint Manager Defined for Node=" + trim( NodeID( SensedNode ) ) + " in PlantLoop=" + trim( PlantLoop( LoopNum ).Name ) );
-							ShowContinueError( "Add Temperature Setpoint Manager with Control Variable = " "\"Temperature\" for this PlantLoop." );
+							ShowSevereError( "PlantManager: No Setpoint Manager Defined for Node=" + NodeID( SensedNode ) + " in PlantLoop=" + PlantLoop( LoopNum ).Name );
+							ShowContinueError( "Add Temperature Setpoint Manager with Control Variable = \"Temperature\" for this PlantLoop." );
 							SetPointErrorFlag = true;
 						} else {
 							// need call to EMS to check node
 							CheckIfNodeSetPointManagedByEMS( SensedNode, iTemperatureSetPoint, SetPointErrorFlag );
 							if ( SetPointErrorFlag ) {
-								ShowSevereError( "PlantManager: No Setpoint Manager Defined for Node=" + trim( NodeID( SensedNode ) ) + " in PlantLoop=" + trim( PlantLoop( LoopNum ).Name ) );
-								ShowContinueError( "Add Temperature Setpoint Manager with Control Variable = " "\"Temperature\" for this PlantLoop." );
+								ShowSevereError( "PlantManager: No Setpoint Manager Defined for Node=" + NodeID( SensedNode ) + " in PlantLoop=" + PlantLoop( LoopNum ).Name );
+								ShowContinueError( "Add Temperature Setpoint Manager with Control Variable = \"Temperature\" for this PlantLoop." );
 								ShowContinueError( "Or add EMS Actuator to provide temperature setpoint at this node" );
 							}
 						}
@@ -2162,14 +2166,14 @@ namespace PlantManager {
 						if ( Node( PlantLoop( LoopNum ).TempSetPointNodeNum ).TempSetPointHi == SensedNodeFlagValue ) {
 							if ( ! AnyEnergyManagementSystemInModel ) {
 								ShowSevereError( "Plant Loop: missing high temperature setpoint for dual setpoint deadband demand scheme" );
-								ShowContinueError( "Node Referenced =" + trim( NodeID( PlantLoop( LoopNum ).TempSetPointNodeNum ) ) );
+								ShowContinueError( "Node Referenced =" + NodeID( PlantLoop( LoopNum ).TempSetPointNodeNum ) );
 								ShowContinueError( "Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints" );
 								SetPointErrorFlag = true;
 							} else {
 								CheckIfNodeSetPointManagedByEMS( PlantLoop( LoopNum ).TempSetPointNodeNum, iTemperatureMaxSetPoint, SetPointErrorFlag );
 								if ( SetPointErrorFlag ) {
 									ShowSevereError( "Plant Loop: missing high temperature setpoint for dual setpoint deadband demand scheme" );
-									ShowContinueError( "Node Referenced =" + trim( NodeID( PlantLoop( LoopNum ).TempSetPointNodeNum ) ) );
+									ShowContinueError( "Node Referenced =" + NodeID( PlantLoop( LoopNum ).TempSetPointNodeNum ) );
 									ShowContinueError( "Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints" );
 									ShowContinueError( "Or add EMS Actuator for Temperature Maximum Setpoint" );
 
@@ -2179,14 +2183,14 @@ namespace PlantManager {
 						if ( Node( PlantLoop( LoopNum ).TempSetPointNodeNum ).TempSetPointLo == SensedNodeFlagValue ) {
 							if ( ! AnyEnergyManagementSystemInModel ) {
 								ShowSevereError( "Plant Loop: missing low temperature setpoint for dual setpoint deadband demand scheme" );
-								ShowContinueError( "Node Referenced =" + trim( NodeID( PlantLoop( LoopNum ).TempSetPointNodeNum ) ) );
+								ShowContinueError( "Node Referenced =" + NodeID( PlantLoop( LoopNum ).TempSetPointNodeNum ) );
 								ShowContinueError( "Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints" );
 								SetPointErrorFlag = true;
 							} else {
 								CheckIfNodeSetPointManagedByEMS( PlantLoop( LoopNum ).TempSetPointNodeNum, iTemperatureMinSetPoint, SetPointErrorFlag );
 								if ( SetPointErrorFlag ) {
 									ShowSevereError( "Plant Loop: missing low temperature setpoint for dual setpoint deadband demand scheme" );
-									ShowContinueError( "Node Referenced =" + trim( NodeID( PlantLoop( LoopNum ).TempSetPointNodeNum ) ) );
+									ShowContinueError( "Node Referenced =" + NodeID( PlantLoop( LoopNum ).TempSetPointNodeNum ) );
 									ShowContinueError( "Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints" );
 									ShowContinueError( "Or add EMS Actuator for Temperature Minimum Setpoint" );
 
@@ -2661,10 +2665,10 @@ namespace PlantManager {
 								}
 							}
 							if ( ! ( ActiveCntrlfound ) ) {
-								ShowWarningError( "Check control types on branches between splitter and mixer in " "PlantLoop=" + trim( PlantLoop( LoopNum ).Name ) );
+								ShowWarningError( "Check control types on branches between splitter and mixer in " "PlantLoop=" + PlantLoop( LoopNum ).Name );
 								ShowContinueError( "Found a BYPASS branch with no ACTIVE branch in parallel with it" );
 								ShowContinueError( "In certain (but not all) situations, this can cause problems; please verify your inputs" );
-								ShowContinueError( "Bypass branch named: " + trim( PlantLoop( LoopNum ).LoopSide( SideNum ).Branch( BranchNum ).Name ) );
+								ShowContinueError( "Bypass branch named: " + PlantLoop( LoopNum ).LoopSide( SideNum ).Branch( BranchNum ).Name );
 							}
 						} // bypass present
 
@@ -2710,17 +2714,17 @@ namespace PlantManager {
 									{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopSide( SideNum ).Branch( BranchNum ).ControlType );
 
 									if ( SELECT_CASE_var == ControlType_Unknown ) {
-										ShowWarningError( "Found potential problem with Control Type for Branch named: " + trim( PlantLoop( LoopNum ).LoopSide( SideNum ).Branch( BranchNum ).Name ) );
+										ShowWarningError( "Found potential problem with Control Type for Branch named: " + PlantLoop( LoopNum ).LoopSide( SideNum ).Branch( BranchNum ).Name );
 										ShowContinueError( "This branch should (probably) be ACTIVE but has control type unknown" );
 									} else if ( SELECT_CASE_var == ControlType_Active ) {
 										// do nothing, this is correct control type.
 									} else if ( SELECT_CASE_var == ControlType_Passive ) {
-										ShowWarningError( "Found potential problem with Control Type for Branch named: " + trim( PlantLoop( LoopNum ).LoopSide( SideNum ).Branch( BranchNum ).Name ) );
+										ShowWarningError( "Found potential problem with Control Type for Branch named: " + PlantLoop( LoopNum ).LoopSide( SideNum ).Branch( BranchNum ).Name );
 										ShowContinueError( "This branch should (probably) be ACTIVE but has control type PASSIVE" );
 									} else if ( SELECT_CASE_var == ControlType_SeriesActive ) {
 										// do nothing, should be okay. (? don't really understand SeriesActive though)
 									} else if ( SELECT_CASE_var == ControlType_Bypass ) {
-										ShowWarningError( "Found potential problem with Control Type for Branch named: " + trim( PlantLoop( LoopNum ).LoopSide( SideNum ).Branch( BranchNum ).Name ) );
+										ShowWarningError( "Found potential problem with Control Type for Branch named: " + PlantLoop( LoopNum ).LoopSide( SideNum ).Branch( BranchNum ).Name );
 										ShowContinueError( "This branch should (probably) be ACTIVE but has control type Bypass" );
 									}}
 								} // should be active
@@ -2732,7 +2736,7 @@ namespace PlantManager {
 				//check to see if bypass exists in demand side. If not warn error of possible flow problems
 				if ( ! PlantLoop( LoopNum ).LoopSide( SideNum ).BypassExists ) {
 					if ( SideNum == DemandSide ) {
-						ShowWarningError( "There is no BYPASS component in the demand-side of PlantLoop =" + trim( PlantLoop( LoopNum ).Name ) );
+						ShowWarningError( "There is no BYPASS component in the demand-side of PlantLoop =" + PlantLoop( LoopNum ).Name );
 						ShowContinueError( "You may be able to fix the fatal error above by adding a demand-side BYPASS PIPE." );
 					}
 				}
@@ -3048,8 +3052,8 @@ namespace PlantManager {
 						PlantLoop( LoopNum ).MaxVolFlowRate = PlantSizData( PlantSizNum ).DesVolFlowRate * PlantSizFac;
 					} else {
 						PlantLoop( LoopNum ).MaxVolFlowRate = 0.0;
-						ShowWarningError( "SizePlantLoop: Calculated Plant Sizing Design Volume Flow Rate=[" + trim( RoundSigDigits( PlantSizData( PlantSizNum ).DesVolFlowRate, 2 ) ) + "] is too small. Set to 0.0" );
-						ShowContinueError( "..occurs for PlantLoop=" + trim( PlantLoop( LoopNum ).Name ) );
+						ShowWarningError( "SizePlantLoop: Calculated Plant Sizing Design Volume Flow Rate=[" + RoundSigDigits( PlantSizData( PlantSizNum ).DesVolFlowRate, 2 ) + "] is too small. Set to 0.0" );
+						ShowContinueError( "..occurs for PlantLoop=" + PlantLoop( LoopNum ).Name );
 					}
 					if ( Finalize ) {
 						if ( PlantLoop( LoopNum ).TypeOfLoop == LoopType_Plant ) {
@@ -3062,7 +3066,7 @@ namespace PlantManager {
 				}
 			} else {
 				ShowFatalError( "Autosizing of plant loop requires a loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in PlantLoop object=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowContinueError( "Occurs in PlantLoop object=" + PlantLoop( LoopNum ).Name );
 				ErrorsFound = true;
 			}
 
@@ -3347,7 +3351,7 @@ namespace PlantManager {
 		int const LoopSideNum,
 		int const BranchNum,
 		int const CompNum,
-		Fstring const & PumpName,
+		std::string const & PumpName,
 		int const PumpOutletNode,
 		bool const HasBranchPumps
 	)
@@ -4070,8 +4074,8 @@ namespace PlantManager {
 
 							if ( BypassCount > 0 ) {
 								ShowSevereError( "An active component is on the same branch as a pipe situated between splitter/mixer" );
-								ShowContinueError( "Occurs in Branch=" + trim( PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Name ) );
-								ShowContinueError( "Occurs in Plant Loop=" + trim( PlantLoop( LoopCtr ).Name ) );
+								ShowContinueError( "Occurs in Branch=" + PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Name );
+								ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopCtr ).Name );
 								ShowContinueError( "SetupBranchControlTypes: and the simulation continues" );
 								// DSU3 note not sure why this is so bad.  heat transfer pipe might be a good reason to allow this?
 								//   this used to fatal in older PlantFlowResolver.
@@ -4087,8 +4091,8 @@ namespace PlantManager {
 
 							if ( CompCtr > 1 ) {
 								ShowSevereError( "A pipe used as a bypass should not be in series with another component" );
-								ShowContinueError( "Occurs in Branch = " + trim( PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Name ) );
-								ShowContinueError( "Occurs in PlantLoop = " + trim( PlantLoop( LoopCtr ).Name ) );
+								ShowContinueError( "Occurs in Branch = " + PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Name );
+								ShowContinueError( "Occurs in PlantLoop = " + PlantLoop( LoopCtr ).Name );
 								ShowFatalError( "SetupBranchControlTypes: preceding condition causes termination." );
 							}
 

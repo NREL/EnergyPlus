@@ -509,7 +509,7 @@ public: // Creation
 				if ( format_->non_advancing() ) { // Non-advancing
 					format_->output_pos( stream_, pos_ ); // Move to virtual position
 				} else { // Advancing
-					stream_ << NL; // Add newline
+					stream_ << '\n'; // Add newline
 				}
 				flags_.set_status( stream_ );
 			}

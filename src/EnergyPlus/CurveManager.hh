@@ -7,7 +7,6 @@
 #include <ObjexxFCL/FArray2D.hh>
 #include <ObjexxFCL/FArray2S.hh>
 #include <ObjexxFCL/FArray5D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -19,11 +18,10 @@ namespace EnergyPlus {
 namespace CurveManager {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
-	extern Fstring const Blank;
+	extern std::string const Blank;
 
 	// Curve Type parameters, these can differ from object types (e.g. a CurveType_TableOneIV can be linear, quadratic, etc)
 	extern int const Linear;
@@ -85,7 +83,7 @@ namespace CurveManager {
 	extern int const CurveType_DoubleExponentialDecay;
 	extern int const CurveType_QuadLinear;
 
-	extern FArray1D_Fstring const cCurveTypes;
+	extern FArray1D_string const cCurveTypes;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -277,7 +275,7 @@ namespace CurveManager {
 	struct PerfomanceCurveData
 	{
 		// Members
-		Fstring Name; // Curve Name
+		std::string Name; // Curve Name
 		int ObjectType; // Curve object type (e.g., integer for Curve:Linear above)
 		int CurveType; // Curve type (see parameter definitions above)
 		int InterpolationType; // table interpolation method
@@ -325,7 +323,6 @@ namespace CurveManager {
 
 		// Default Constructor
 		PerfomanceCurveData() :
-			Name( MaxNameLength, Blank ),
 			ObjectType( 0 ),
 			CurveType( 0 ),
 			InterpolationType( 0 ),
@@ -372,7 +369,7 @@ namespace CurveManager {
 
 		// Member Constructor
 		PerfomanceCurveData(
-			Fstring const & Name, // Curve Name
+			std::string const & Name, // Curve Name
 			int const ObjectType, // Curve object type (e.g., integer for Curve:Linear above)
 			int const CurveType, // Curve type (see parameter definitions above)
 			int const InterpolationType, // table interpolation method
@@ -417,7 +414,7 @@ namespace CurveManager {
 			Real64 const CurveInput4, // curve input #1 (e.g., X4 variable)
 			Real64 const CurveInput5 // curve input #1 (e.g., X5 variable)
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ObjectType( ObjectType ),
 			CurveType( CurveType ),
 			InterpolationType( InterpolationType ),
@@ -558,10 +555,10 @@ namespace CurveManager {
 	void
 	ReadTableData(
 		int const CurveNum,
-		Fstring & CurrentModuleObject,
+		std::string & CurrentModuleObject,
 		bool const ReadFromFile,
-		Fstring & FileName,
-		FArray1S_Fstring Alphas,
+		std::string & FileName,
+		FArray1S_string Alphas,
 		FArray1S< Real64 > Numbers,
 		int const NumNumbers,
 		bool & ErrorsFound
@@ -611,8 +608,8 @@ namespace CurveManager {
 	void
 	SolveRegression(
 		int & CurveNum, // index to performance curve
-		Fstring & TableType, // tabular data object type
-		Fstring & CurveName, // performance curve name
+		std::string & TableType, // tabular data object type
+		std::string & CurveName, // performance curve name
 		FArray1S< Real64 > RawDataX, // table data X values (1st independent variable)
 		FArray1S< Real64 > RawDataY, // table data Y values (dependent variables)
 		Optional< FArray1S< Real64 > > RawDataX2 = _ // table data X2 values (2nd independent variable)
@@ -629,28 +626,28 @@ namespace CurveManager {
 	);
 
 	bool
-	IsCurveInputTypeValid( Fstring const & InInputType ); // index of curve in curve array
+	IsCurveInputTypeValid( std::string const & InInputType ); // index of curve in curve array
 
 	bool
-	IsCurveOutputTypeValid( Fstring const & InOutputType ); // index of curve in curve array
+	IsCurveOutputTypeValid( std::string const & InOutputType ); // index of curve in curve array
 
-	Fstring
+	std::string
 	GetCurveType( int const CurveIndex ); // index of curve in curve array
 
-	Fstring
+	std::string
 	GetCurveName( int const CurveIndex ); // index of curve in curve array
 
 	int
-	GetCurveIndex( Fstring const & CurveName ); // name of the curve
+	GetCurveIndex( std::string const & CurveName ); // name of the curve
 
 	// This utility function grabs a curve index and performs the
 	// error checking
 
 	int
 	GetCurveCheck(
-		Fstring const & alph, // curve name
+		std::string const & alph, // curve name
 		bool & errFlag,
-		Fstring const & ObjName // parent object of curve
+		std::string const & ObjName // parent object of curve
 	);
 
 	void
@@ -677,7 +674,7 @@ namespace CurveManager {
 
 	void
 	GetPressureCurveTypeAndIndex(
-		Fstring const & PressureCurveName, // name of the curve
+		std::string const & PressureCurveName, // name of the curve
 		int & PressureCurveType,
 		int & PressureCurveIndex
 	);

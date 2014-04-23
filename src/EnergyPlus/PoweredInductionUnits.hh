@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace PoweredInductionUnits {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
@@ -46,10 +44,10 @@ namespace PoweredInductionUnits {
 	{
 		// Members
 		// input data
-		Fstring Name; // name of unit
-		Fstring UnitType; // type of unit
+		std::string Name; // name of unit
+		std::string UnitType; // type of unit
 		int UnitType_Num; // index for type of unit
-		Fstring Sched; // availability schedule
+		std::string Sched; // availability schedule
 		int SchedPtr; // index to schedule
 		Real64 MaxTotAirVolFlow; // m3/s  (series)
 		Real64 MaxTotAirMassFlow; // kg/s  (series)
@@ -67,15 +65,15 @@ namespace PoweredInductionUnits {
 		int HCoilInAirNode; // unit mixed air node number
 		int ControlCompTypeNum;
 		int CompErrIndex;
-		Fstring MixerName; // name of air mixer component
+		std::string MixerName; // name of air mixer component
 		int Mixer_Num; // index for type of mixer
-		Fstring FanName; // name of fan component
+		std::string FanName; // name of fan component
 		int Fan_Num; // index for fan type
 		int Fan_Index; // store index for this fan
-		Fstring HCoilType; // type of heating coil component
+		std::string HCoilType; // type of heating coil component
 		int HCoilType_Num; // index for heating coil type
 		int HCoil_PlantTypeNum;
-		Fstring HCoil; // name of heating coil component
+		std::string HCoil; // name of heating coil component
 		int HCoil_Index; // index to this heating coil
 		int HCoil_FluidIndex;
 		Real64 MaxVolHotWaterFlow; // m3/s
@@ -103,10 +101,7 @@ namespace PoweredInductionUnits {
 
 		// Default Constructor
 		PowIndUnitData() :
-			Name( MaxNameLength ),
-			UnitType( MaxNameLength ),
 			UnitType_Num( 0 ),
-			Sched( MaxNameLength ),
 			SchedPtr( 0 ),
 			MaxTotAirVolFlow( 0.0 ),
 			MaxTotAirMassFlow( 0.0 ),
@@ -124,15 +119,11 @@ namespace PoweredInductionUnits {
 			HCoilInAirNode( 0 ),
 			ControlCompTypeNum( 0 ),
 			CompErrIndex( 0 ),
-			MixerName( MaxNameLength ),
 			Mixer_Num( 0 ),
-			FanName( MaxNameLength ),
 			Fan_Num( 0 ),
 			Fan_Index( 0 ),
-			HCoilType( MaxNameLength ),
 			HCoilType_Num( 0 ),
 			HCoil_PlantTypeNum( 0 ),
-			HCoil( MaxNameLength ),
 			HCoil_Index( 0 ),
 			HCoil_FluidIndex( 0 ),
 			MaxVolHotWaterFlow( 0.0 ),
@@ -160,10 +151,10 @@ namespace PoweredInductionUnits {
 
 		// Member Constructor
 		PowIndUnitData(
-			Fstring const & Name, // name of unit
-			Fstring const & UnitType, // type of unit
+			std::string const & Name, // name of unit
+			std::string const & UnitType, // type of unit
 			int const UnitType_Num, // index for type of unit
-			Fstring const & Sched, // availability schedule
+			std::string const & Sched, // availability schedule
 			int const SchedPtr, // index to schedule
 			Real64 const MaxTotAirVolFlow, // m3/s  (series)
 			Real64 const MaxTotAirMassFlow, // kg/s  (series)
@@ -181,15 +172,15 @@ namespace PoweredInductionUnits {
 			int const HCoilInAirNode, // unit mixed air node number
 			int const ControlCompTypeNum,
 			int const CompErrIndex,
-			Fstring const & MixerName, // name of air mixer component
+			std::string const & MixerName, // name of air mixer component
 			int const Mixer_Num, // index for type of mixer
-			Fstring const & FanName, // name of fan component
+			std::string const & FanName, // name of fan component
 			int const Fan_Num, // index for fan type
 			int const Fan_Index, // store index for this fan
-			Fstring const & HCoilType, // type of heating coil component
+			std::string const & HCoilType, // type of heating coil component
 			int const HCoilType_Num, // index for heating coil type
 			int const HCoil_PlantTypeNum,
-			Fstring const & HCoil, // name of heating coil component
+			std::string const & HCoil, // name of heating coil component
 			int const HCoil_Index, // index to this heating coil
 			int const HCoil_FluidIndex,
 			Real64 const MaxVolHotWaterFlow, // m3/s
@@ -214,10 +205,10 @@ namespace PoweredInductionUnits {
 			Real64 const SensCoolRate, // unit sensible heat removal rate from zone [W]
 			Real64 const SensCoolEnergy // unit sensible heat removal from zone [J]
 		) :
-			Name( MaxNameLength, Name ),
-			UnitType( MaxNameLength, UnitType ),
+			Name( Name ),
+			UnitType( UnitType ),
 			UnitType_Num( UnitType_Num ),
-			Sched( MaxNameLength, Sched ),
+			Sched( Sched ),
 			SchedPtr( SchedPtr ),
 			MaxTotAirVolFlow( MaxTotAirVolFlow ),
 			MaxTotAirMassFlow( MaxTotAirMassFlow ),
@@ -235,15 +226,15 @@ namespace PoweredInductionUnits {
 			HCoilInAirNode( HCoilInAirNode ),
 			ControlCompTypeNum( ControlCompTypeNum ),
 			CompErrIndex( CompErrIndex ),
-			MixerName( MaxNameLength, MixerName ),
+			MixerName( MixerName ),
 			Mixer_Num( Mixer_Num ),
-			FanName( MaxNameLength, FanName ),
+			FanName( FanName ),
 			Fan_Num( Fan_Num ),
 			Fan_Index( Fan_Index ),
-			HCoilType( MaxNameLength, HCoilType ),
+			HCoilType( HCoilType ),
 			HCoilType_Num( HCoilType_Num ),
 			HCoil_PlantTypeNum( HCoil_PlantTypeNum ),
-			HCoil( MaxNameLength, HCoil ),
+			HCoil( HCoil ),
 			HCoil_Index( HCoil_Index ),
 			HCoil_FluidIndex( HCoil_FluidIndex ),
 			MaxVolHotWaterFlow( MaxVolHotWaterFlow ),
@@ -278,7 +269,7 @@ namespace PoweredInductionUnits {
 
 	void
 	SimPIU(
-		Fstring const & CompName, // name of the PIU
+		std::string const & CompName, // name of the PIU
 		bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
 		int const ZoneNum, // index of zone served by PIU
 		int const ZoneNodeNum, // zone node number of zone served by PIU
@@ -319,7 +310,7 @@ namespace PoweredInductionUnits {
 	// ===================== Utilities =====================================
 
 	bool
-	PIUnitHasMixer( Fstring const & CompName ); // component (mixer) name
+	PIUnitHasMixer( std::string const & CompName ); // component (mixer) name
 
 	void
 	PIUInducesPlenumAir( int const NodeNum ); // induced air node number

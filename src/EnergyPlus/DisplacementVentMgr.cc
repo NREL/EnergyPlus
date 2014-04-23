@@ -5,7 +5,6 @@
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/MArray.functions.hh>
 
 // EnergyPlus Headers
@@ -939,7 +938,7 @@ namespace DisplacementVentMgr {
 			TCMF( ZoneNum ) = ZTAveraged;
 		} else {
 			if ( HeightComfort >= 0.0 && HeightComfort < HeightFloorSubzoneAve ) {
-				ShowWarningError( "Displacement ventilation comfort height is in floor subzone in Zone: " + trim( Zone( ZoneNum ).Name ) );
+				ShowWarningError( "Displacement ventilation comfort height is in floor subzone in Zone: " + Zone( ZoneNum ).Name );
 				TCMF( ZoneNum ) = ZTFloor( ZoneNum );
 			} else if ( HeightComfort >= HeightFloorSubzoneAve && HeightComfort < HeightOccupiedSubzoneAve ) {
 				TCMF( ZoneNum ) = ( ZTFloor( ZoneNum ) * ( HeightOccupiedSubzoneAve - HeightComfort ) + ZTOC( ZoneNum ) * ( HeightComfort - HeightFloorSubzoneAve ) ) / ( HeightOccupiedSubzoneAve - HeightFloorSubzoneAve );
@@ -951,7 +950,7 @@ namespace DisplacementVentMgr {
 			} else if ( HeightComfort >= HeightMixedSubzoneAve && HeightComfort <= CeilingHeight ) {
 				TCMF( ZoneNum ) = ZTMX( ZoneNum );
 			} else {
-				ShowFatalError( "Displacement ventilation comfort height is above ceiling or below floor in Zone: " + trim( Zone( ZoneNum ).Name ) );
+				ShowFatalError( "Displacement ventilation comfort height is above ceiling or below floor in Zone: " + Zone( ZoneNum ).Name );
 			}
 		}
 
@@ -961,7 +960,7 @@ namespace DisplacementVentMgr {
 			TempTstatAir( ZoneNum ) = ZTAveraged;
 		} else {
 			if ( HeightThermostat >= 0.0 && HeightThermostat < HeightFloorSubzoneAve ) {
-				ShowWarningError( "Displacement thermostat is in floor subzone in Zone: " + trim( Zone( ZoneNum ).Name ) );
+				ShowWarningError( "Displacement thermostat is in floor subzone in Zone: " + Zone( ZoneNum ).Name );
 				TempTstatAir( ZoneNum ) = ZTFloor( ZoneNum );
 			} else if ( HeightThermostat >= HeightFloorSubzoneAve && HeightThermostat < HeightOccupiedSubzoneAve ) {
 				TempTstatAir( ZoneNum ) = ( ZTFloor( ZoneNum ) * ( HeightOccupiedSubzoneAve - HeightThermostat ) + ZTOC( ZoneNum ) * ( HeightThermostat - HeightFloorSubzoneAve ) ) / ( HeightOccupiedSubzoneAve - HeightFloorSubzoneAve );
@@ -973,7 +972,7 @@ namespace DisplacementVentMgr {
 			} else if ( HeightThermostat >= HeightMixedSubzoneAve && HeightThermostat <= CeilingHeight ) {
 				TempTstatAir( ZoneNum ) = ZTMX( ZoneNum );
 			} else {
-				ShowFatalError( "Displacement ventilation thermostat height is above ceiling or below floor in Zone: " + trim( Zone( ZoneNum ).Name ) );
+				ShowFatalError( "Displacement ventilation thermostat height is above ceiling or below floor in Zone: " + Zone( ZoneNum ).Name );
 			}
 		}
 

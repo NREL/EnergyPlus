@@ -103,7 +103,7 @@ namespace HVACHXAssistedCoolingCoil {
 
 	void
 	SimHXAssistedCoolingCoil(
-		Fstring const & HXAssistedCoilName, // Name of HXAssistedCoolingCoil
+		std::string const & HXAssistedCoilName, // Name of HXAssistedCoolingCoil
 		bool const FirstHVACIteration, // FirstHVACIteration flag
 		int const CompOp, // compressor operation; 1=on, 0=off
 		Real64 const PartLoadRatio, // Part load ratio of Coil:DX:CoolingBypassFactorEmpirical
@@ -141,7 +141,7 @@ namespace HVACHXAssistedCoolingCoil {
 		// (not used for Coil:Water:DetailedFlatCooling)
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const Blank;
+		static std::string const Blank;
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		//  na
@@ -168,17 +168,17 @@ namespace HVACHXAssistedCoolingCoil {
 		if ( CompIndex == 0 ) {
 			HXAssistedCoilNum = FindItemInList( HXAssistedCoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
 			if ( HXAssistedCoilNum == 0 ) {
-				ShowFatalError( "HX Assisted Coil not found=" + trim( HXAssistedCoilName ) );
+				ShowFatalError( "HX Assisted Coil not found=" + HXAssistedCoilName );
 			}
 			CompIndex = HXAssistedCoilNum;
 		} else {
 			HXAssistedCoilNum = CompIndex;
 			if ( HXAssistedCoilNum > TotalNumHXAssistedCoils || HXAssistedCoilNum < 1 ) {
-				ShowFatalError( "SimHXAssistedCoolingCoil: Invalid CompIndex passed=" + trim( TrimSigDigits( HXAssistedCoilNum ) ) + ", Number of HX Assisted Cooling Coils=" + trim( TrimSigDigits( TotalNumHXAssistedCoils ) ) + ", Coil name=" + trim( HXAssistedCoilName ) );
+				ShowFatalError( "SimHXAssistedCoolingCoil: Invalid CompIndex passed=" + TrimSigDigits( HXAssistedCoilNum ) + ", Number of HX Assisted Cooling Coils=" + TrimSigDigits( TotalNumHXAssistedCoils ) + ", Coil name=" + HXAssistedCoilName );
 			}
 			if ( CheckEquipName( HXAssistedCoilNum ) ) {
 				if ( HXAssistedCoilName != Blank && HXAssistedCoilName != HXAssistedCoil( HXAssistedCoilNum ).Name ) {
-					ShowFatalError( "SimHXAssistedCoolingCoil: Invalid CompIndex passed=" + trim( TrimSigDigits( HXAssistedCoilNum ) ) + ", Coil name=" + trim( HXAssistedCoilName ) + ", stored Coil Name for that index=" + trim( HXAssistedCoil( HXAssistedCoilNum ).Name ) );
+					ShowFatalError( "SimHXAssistedCoolingCoil: Invalid CompIndex passed=" + TrimSigDigits( HXAssistedCoilNum ) + ", Coil name=" + HXAssistedCoilName + ", stored Coil Name for that index=" + HXAssistedCoil( HXAssistedCoilNum ).Name );
 				}
 				CheckEquipName( HXAssistedCoilNum ) = false;
 			}
@@ -266,7 +266,7 @@ namespace HVACHXAssistedCoolingCoil {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetHXAssistedCoolingCoilInput: " ); // include trailing blank space
+		static std::string const RoutineName( "GetHXAssistedCoolingCoilInput: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -293,10 +293,10 @@ namespace HVACHXAssistedCoolingCoil {
 		int SecondaryAirOutletNode; // secondary air outlet node number mined from heat exchanger object (ExchCond structure)
 		int CoolingCoilInletNodeNum; // outlet node number of cooling coil, used for warning messages
 		int CoolingCoilOutletNodeNum; // outlet node number of cooling coil, used for warning messages
-		Fstring CurrentModuleObject( MaxNameLength ); // Object type for getting and error messages
-		FArray1D_Fstring AlphArray( sFstring( MaxNameLength ) ); // Alpha input items for object
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) ); // Numeric field names
+		std::string CurrentModuleObject; // Object type for getting and error messages
+		FArray1D_string AlphArray; // Alpha input items for object
+		FArray1D_string cAlphaFields; // Alpha field names
+		FArray1D_string cNumericFields; // Numeric field names
 		FArray1D< Real64 > NumArray; // Numeric input items for object
 		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
@@ -323,11 +323,11 @@ namespace HVACHXAssistedCoolingCoil {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		AlphArray.allocate( MaxAlphas );
-		AlphArray = " ";
+		AlphArray = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = " ";
+		cAlphaFields = "";
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = " ";
+		cNumericFields = "";
 		NumArray.allocate( MaxNums );
 		NumArray = 0.0;
 		lAlphaBlanks.allocate( MaxAlphas );
@@ -342,7 +342,7 @@ namespace HVACHXAssistedCoolingCoil {
 			GetObjectItem( CurrentModuleObject, HXAssistedCoilNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), HXAssistedCoil.Name(), HXAssistedCoilNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( AlphArray( 1 ), HXAssistedCoil.Name(), HXAssistedCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -359,8 +359,8 @@ namespace HVACHXAssistedCoolingCoil {
 			} else if ( SameString( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType, "HeatExchanger:Desiccant:BalancedFlow" ) ) {
 				HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType_Num = HX_DESICCANT_BALANCED;
 			} else {
-				ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).Name ) + "\"" );
-				ShowContinueError( "Invalid " + trim( cAlphaFields( 2 ) ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType ) + "\"" );
+				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
+				ShowContinueError( "Invalid " + cAlphaFields( 2 ) + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType + "\"" );
 				ErrorsFound = true;
 			}
 
@@ -369,42 +369,42 @@ namespace HVACHXAssistedCoolingCoil {
 
 			if ( SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:DX:SingleSpeed" ) ) {
 				HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num = CoilDX_CoolingSingleSpeed;
-				HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType = trim( CurrentModuleObject );
+				HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType = CurrentModuleObject;
 				HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType_Num = CoilDX_CoolingHXAssisted;
 				CoolingCoilErrFlag = false;
 				GetDXCoilIndex( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex, CoolingCoilErrFlag, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType );
 				if ( CoolingCoilErrFlag ) {
-					ShowContinueError( "...occurs in " + trim( CurrentModuleObject ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).Name ) + "\"" );
+					ShowContinueError( "...occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 					ErrorsFound = true;
 				}
 			} else {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).Name ) + "\"" );
-				ShowContinueError( "Invalid " + trim( cAlphaFields( 4 ) ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType ) + "\"" );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
+				ShowContinueError( "Invalid " + cAlphaFields( 4 ) + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType + "\"" );
 				ErrorsFound = true;
 			}
 
 			HXErrFlag = false;
 			SupplyAirInletNode = GetSupplyInletNode( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName, HXErrFlag );
 			if ( HXErrFlag ) {
-				ShowContinueError( "...Occurs in " + trim( CurrentModuleObject ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).Name ) + "\"" );
+				ShowContinueError( "...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 			}
 
 			HXErrFlag = false;
 			SupplyAirOutletNode = GetSupplyOutletNode( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName, HXErrFlag );
 			if ( HXErrFlag ) {
-				ShowContinueError( "...Occurs in " + trim( CurrentModuleObject ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).Name ) + "\"" );
+				ShowContinueError( "...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 			}
 
 			HXErrFlag = false;
 			SecondaryAirInletNode = GetSecondaryInletNode( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName, HXErrFlag );
 			if ( HXErrFlag ) {
-				ShowContinueError( "...Occurs in " + trim( CurrentModuleObject ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).Name ) + "\"" );
+				ShowContinueError( "...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 			}
 
 			HXErrFlag = false;
 			SecondaryAirOutletNode = GetSecondaryOutletNode( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName, HXErrFlag );
 			if ( HXErrFlag ) {
-				ShowContinueError( "...Occurs in " + trim( CurrentModuleObject ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).Name ) + "\"" );
+				ShowContinueError( "...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 			}
 
 			if ( SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:DX:SingleSpeed" ) ) {
@@ -412,29 +412,29 @@ namespace HVACHXAssistedCoolingCoil {
 				CoolingCoilErrFlag = false;
 				CoolingCoilInletNodeNum = GetDXCoilInletNode( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, CoolingCoilErrFlag );
 				if ( CoolingCoilErrFlag ) {
-					ShowContinueError( "...Occurs in " + trim( CurrentModuleObject ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).Name ) + "\"" );
+					ShowContinueError( "...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 				}
 				if ( SupplyAirOutletNode != CoolingCoilInletNodeNum ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).Name ) + "\"" );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 					ShowContinueError( "Node names are inconsistent in heat exchanger and cooling coil object." );
-					ShowContinueError( "The supply air outlet node name in heat exchanger = " + trim( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName ) + "\"" );
-					ShowContinueError( "must match the cooling coil inlet node name in = " + trim( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName ) + "\"" );
-					ShowContinueError( "Heat exchanger supply air outlet node name=\"" + trim( NodeID( SupplyAirOutletNode ) ) + "\"" );
-					ShowContinueError( "Cooling coil air inlet node name=\"" + trim( NodeID( CoolingCoilInletNodeNum ) ) + "\"" );
+					ShowContinueError( "The supply air outlet node name in heat exchanger = " + HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName + "\"" );
+					ShowContinueError( "must match the cooling coil inlet node name in = " + HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName + "\"" );
+					ShowContinueError( "Heat exchanger supply air outlet node name=\"" + NodeID( SupplyAirOutletNode ) + "\"" );
+					ShowContinueError( "Cooling coil air inlet node name=\"" + NodeID( CoolingCoilInletNodeNum ) + "\"" );
 					ErrorsFound = true;
 				}
 				CoolingCoilErrFlag = false;
 				CoolingCoilOutletNodeNum = GetDXCoilOutletNode( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, CoolingCoilErrFlag );
 				if ( CoolingCoilErrFlag ) {
-					ShowContinueError( "...Occurs in " + trim( CurrentModuleObject ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).Name ) + "\"" );
+					ShowContinueError( "...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 				}
 				if ( SecondaryAirInletNode != CoolingCoilOutletNodeNum ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).Name ) + "\"" );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 					ShowContinueError( "Node names are inconsistent in heat exchanger and cooling coil object." );
-					ShowContinueError( "The secondary air inlet node name in heat exchanger =" + trim( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName ) + "\"" );
-					ShowContinueError( "must match the cooling coil air outlet node name in = " + trim( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName ) + "\"." );
-					ShowContinueError( "Heat exchanger secondary air inlet node name =\"" + trim( NodeID( SecondaryAirInletNode ) ) + "\"." );
-					ShowContinueError( "Cooling coil air outlet node name =\"" + trim( NodeID( CoolingCoilOutletNodeNum ) ) + "\"." );
+					ShowContinueError( "The secondary air inlet node name in heat exchanger =" + HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName + "\"" );
+					ShowContinueError( "must match the cooling coil air outlet node name in = " + HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName + "\"." );
+					ShowContinueError( "Heat exchanger secondary air inlet node name =\"" + NodeID( SecondaryAirInletNode ) + "\"." );
+					ShowContinueError( "Cooling coil air outlet node name =\"" + NodeID( CoolingCoilOutletNodeNum ) + "\"." );
 					ErrorsFound = true;
 				}
 
@@ -442,10 +442,10 @@ namespace HVACHXAssistedCoolingCoil {
 
 			TestCompSet( HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType, HXAssistedCoil( HXAssistedCoilNum ).Name, NodeID( SupplyAirInletNode ), NodeID( SecondaryAirOutletNode ), "Air Nodes" );
 
-			HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilInletNodeNum = GetOnlySingleNode( NodeID( SupplyAirInletNode ), ErrorsFound, trim( CurrentModuleObject ), HXAssistedCoil( HXAssistedCoilNum ).Name, NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
-			CoolingCoilInletNodeNum = GetOnlySingleNode( NodeID( SupplyAirOutletNode ), ErrorsFound, trim( CurrentModuleObject ), HXAssistedCoil( HXAssistedCoilNum ).Name, NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsParent );
-			HXAssistedCoil( HXAssistedCoilNum ).HXExhaustAirInletNodeNum = GetOnlySingleNode( NodeID( SecondaryAirInletNode ), ErrorsFound, trim( CurrentModuleObject ), HXAssistedCoil( HXAssistedCoilNum ).Name, NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsParent );
-			HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilOutletNodeNum = GetOnlySingleNode( NodeID( SecondaryAirOutletNode ), ErrorsFound, trim( CurrentModuleObject ), HXAssistedCoil( HXAssistedCoilNum ).Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
+			HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilInletNodeNum = GetOnlySingleNode( NodeID( SupplyAirInletNode ), ErrorsFound, CurrentModuleObject, HXAssistedCoil( HXAssistedCoilNum ).Name, NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
+			CoolingCoilInletNodeNum = GetOnlySingleNode( NodeID( SupplyAirOutletNode ), ErrorsFound, CurrentModuleObject, HXAssistedCoil( HXAssistedCoilNum ).Name, NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsParent );
+			HXAssistedCoil( HXAssistedCoilNum ).HXExhaustAirInletNodeNum = GetOnlySingleNode( NodeID( SecondaryAirInletNode ), ErrorsFound, CurrentModuleObject, HXAssistedCoil( HXAssistedCoilNum ).Name, NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsParent );
+			HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilOutletNodeNum = GetOnlySingleNode( NodeID( SecondaryAirOutletNode ), ErrorsFound, CurrentModuleObject, HXAssistedCoil( HXAssistedCoilNum ).Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 
 			// Add cooling coil to component sets array
 			SetUpCompSets( HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType, HXAssistedCoil( HXAssistedCoilNum ).Name, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, NodeID( SupplyAirOutletNode ), NodeID( SecondaryAirInletNode ), "Air Nodes" );
@@ -463,7 +463,7 @@ namespace HVACHXAssistedCoolingCoil {
 			GetObjectItem( CurrentModuleObject, HXAssistedCoilNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), HXAssistedCoil.Name(), HXAssistedCoilNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( AlphArray( 1 ), HXAssistedCoil.Name(), HXAssistedCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -481,8 +481,8 @@ namespace HVACHXAssistedCoolingCoil {
 				//       ELSEIF(SameString(HXAssistedCoil(HXAssistedCoilNum)%HeatExchangerType,'HeatExchanger:Desiccant:BalancedFlow')) THEN
 				//         HXAssistedCoil(HXAssistedCoilNum)%HeatExchangerType_Num = HX_DESICCANT_BALANCED
 			} else {
-				ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).Name ) + "\"" );
-				ShowContinueError( "Invalid " + trim( cAlphaFields( 2 ) ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType ) + "\"" );
+				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
+				ShowContinueError( "Invalid " + cAlphaFields( 2 ) + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType + "\"" );
 				ErrorsFound = true;
 			}
 
@@ -492,25 +492,25 @@ namespace HVACHXAssistedCoolingCoil {
 			HXErrFlag = false;
 			SupplyAirInletNode = GetSupplyInletNode( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName, HXErrFlag );
 			if ( HXErrFlag ) {
-				ShowContinueError( "...Occurs in " + trim( CurrentModuleObject ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).Name ) + "\"" );
+				ShowContinueError( "...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 			}
 
 			HXErrFlag = false;
 			SupplyAirOutletNode = GetSupplyOutletNode( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName, HXErrFlag );
 			if ( HXErrFlag ) {
-				ShowContinueError( "...Occurs in " + trim( CurrentModuleObject ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).Name ) );
+				ShowContinueError( "...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name );
 			}
 
 			HXErrFlag = false;
 			SecondaryAirInletNode = GetSecondaryInletNode( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName, HXErrFlag );
 			if ( HXErrFlag ) {
-				ShowContinueError( "...Occurs in " + trim( CurrentModuleObject ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).Name ) + "\"" );
+				ShowContinueError( "...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 			}
 
 			HXErrFlag = false;
 			SecondaryAirOutletNode = GetSecondaryOutletNode( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName, HXErrFlag );
 			if ( HXErrFlag ) {
-				ShowContinueError( "...Occurs in " + trim( CurrentModuleObject ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).Name ) + "\"" );
+				ShowContinueError( "...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 			}
 
 			if ( SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:Water" ) || SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
@@ -520,47 +520,47 @@ namespace HVACHXAssistedCoolingCoil {
 					HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num = Coil_CoolingWater;
 				}
 
-				HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType = trim( CurrentModuleObject );
+				HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType = CurrentModuleObject;
 				HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType_Num = CoilWater_CoolingHXAssisted;
 
 				//         Check node names in heat exchanger and coil objects for consistency
 				CoolingCoilErrFlag = false;
 				CoolingCoilInletNodeNum = GetWaterCoilInletNode( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, CoolingCoilErrFlag );
-				if ( CoolingCoilErrFlag ) ShowContinueError( "...occurs in " + trim( CurrentModuleObject ) + " \"" + trim( HXAssistedCoil( HXAssistedCoilNum ).Name ) + "\"" );
+				if ( CoolingCoilErrFlag ) ShowContinueError( "...occurs in " + CurrentModuleObject + " \"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 				if ( SupplyAirOutletNode != CoolingCoilInletNodeNum ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).Name ) + "\"" );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 					ShowContinueError( "Node names are inconsistent in heat exchanger and cooling coil object." );
-					ShowContinueError( "The supply air outlet node name in heat exchanger = " + trim( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName ) + "\"" );
-					ShowContinueError( "must match the cooling coil inlet node name in = " + trim( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName ) + "\"" );
-					ShowContinueError( "Heat exchanger supply air outlet node name =\"" + trim( NodeID( SupplyAirOutletNode ) ) + "\"" );
-					ShowContinueError( "Cooling coil air inlet node name = \"" + trim( NodeID( CoolingCoilInletNodeNum ) ) + "\"" );
+					ShowContinueError( "The supply air outlet node name in heat exchanger = " + HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName + "\"" );
+					ShowContinueError( "must match the cooling coil inlet node name in = " + HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName + "\"" );
+					ShowContinueError( "Heat exchanger supply air outlet node name =\"" + NodeID( SupplyAirOutletNode ) + "\"" );
+					ShowContinueError( "Cooling coil air inlet node name = \"" + NodeID( CoolingCoilInletNodeNum ) + "\"" );
 					ErrorsFound = true;
 				}
 				CoolingCoilErrFlag = false;
 				CoolingCoilOutletNodeNum = GetWaterCoilOutletNode( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, CoolingCoilErrFlag );
-				if ( CoolingCoilErrFlag ) ShowContinueError( "...occurs in " + trim( CurrentModuleObject ) + " \"" + trim( HXAssistedCoil( HXAssistedCoilNum ).Name ) + "\"" );
+				if ( CoolingCoilErrFlag ) ShowContinueError( "...occurs in " + CurrentModuleObject + " \"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 				if ( SecondaryAirInletNode != CoolingCoilOutletNodeNum ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).Name ) + "\"" );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 					ShowContinueError( "Node names are inconsistent in heat exchanger and cooling coil object." );
-					ShowContinueError( "The secondary air inlet node name in heat exchanger = " + trim( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName ) + "\"" );
-					ShowContinueError( "must match the cooling coil air outlet node name in = " + trim( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName ) + "\"." );
-					ShowContinueError( "Heat exchanger secondary air inlet node name = \"" + trim( NodeID( SecondaryAirInletNode ) ) + "\"." );
-					ShowContinueError( "Cooling coil air outlet node name = \"" + trim( NodeID( CoolingCoilOutletNodeNum ) ) + "\"." );
+					ShowContinueError( "The secondary air inlet node name in heat exchanger = " + HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName + "\"" );
+					ShowContinueError( "must match the cooling coil air outlet node name in = " + HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName + "\"." );
+					ShowContinueError( "Heat exchanger secondary air inlet node name = \"" + NodeID( SecondaryAirInletNode ) + "\"." );
+					ShowContinueError( "Cooling coil air outlet node name = \"" + NodeID( CoolingCoilOutletNodeNum ) + "\"." );
 					ErrorsFound = true;
 				}
 
 			} else {
-				ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).Name ) + "\"" );
-				ShowContinueError( "Invalid " + trim( cAlphaFields( 4 ) ) + "=\"" + trim( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType ) + "\"" );
+				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
+				ShowContinueError( "Invalid " + cAlphaFields( 4 ) + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType + "\"" );
 				ErrorsFound = true;
 			}
 
 			TestCompSet( HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType, HXAssistedCoil( HXAssistedCoilNum ).Name, NodeID( SupplyAirInletNode ), NodeID( SecondaryAirOutletNode ), "Air Nodes" );
 
-			HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilInletNodeNum = GetOnlySingleNode( NodeID( SupplyAirInletNode ), ErrorsFound, trim( CurrentModuleObject ), HXAssistedCoil( HXAssistedCoilNum ).Name, NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
-			CoolingCoilInletNodeNum = GetOnlySingleNode( NodeID( SupplyAirOutletNode ), ErrorsFound, trim( CurrentModuleObject ), HXAssistedCoil( HXAssistedCoilNum ).Name, NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsParent );
-			HXAssistedCoil( HXAssistedCoilNum ).HXExhaustAirInletNodeNum = GetOnlySingleNode( NodeID( SecondaryAirInletNode ), ErrorsFound, trim( CurrentModuleObject ), HXAssistedCoil( HXAssistedCoilNum ).Name, NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsParent );
-			HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilOutletNodeNum = GetOnlySingleNode( NodeID( SecondaryAirOutletNode ), ErrorsFound, trim( CurrentModuleObject ), HXAssistedCoil( HXAssistedCoilNum ).Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
+			HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilInletNodeNum = GetOnlySingleNode( NodeID( SupplyAirInletNode ), ErrorsFound, CurrentModuleObject, HXAssistedCoil( HXAssistedCoilNum ).Name, NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
+			CoolingCoilInletNodeNum = GetOnlySingleNode( NodeID( SupplyAirOutletNode ), ErrorsFound, CurrentModuleObject, HXAssistedCoil( HXAssistedCoilNum ).Name, NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsParent );
+			HXAssistedCoil( HXAssistedCoilNum ).HXExhaustAirInletNodeNum = GetOnlySingleNode( NodeID( SecondaryAirInletNode ), ErrorsFound, CurrentModuleObject, HXAssistedCoil( HXAssistedCoilNum ).Name, NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsParent );
+			HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilOutletNodeNum = GetOnlySingleNode( NodeID( SecondaryAirOutletNode ), ErrorsFound, CurrentModuleObject, HXAssistedCoil( HXAssistedCoilNum ).Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 
 			// Add cooling coil to component sets array
 			SetUpCompSets( HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType, HXAssistedCoil( HXAssistedCoilNum ).Name, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, NodeID( SupplyAirOutletNode ), NodeID( SecondaryAirInletNode ), "Air Nodes" );
@@ -743,10 +743,10 @@ namespace HVACHXAssistedCoolingCoil {
 		if ( Iter > MaxIter ) {
 			if ( HXAssistedCoil( HXAssistedCoilNum ).MaxIterCounter < 1 ) {
 				++HXAssistedCoil( HXAssistedCoilNum ).MaxIterCounter;
-				ShowWarningError( trim( HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType ) + " \"" + trim( HXAssistedCoil( HXAssistedCoilNum ).Name ) + "\" -- Exceeded max iterations (" + trim( TrimSigDigits( MaxIter ) ) + ") while calculating operating conditions." );
-				ShowContinueErrorTimeStamp( " " );
+				ShowWarningError( HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType + " \"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\" -- Exceeded max iterations (" + TrimSigDigits( MaxIter ) + ") while calculating operating conditions." );
+				ShowContinueErrorTimeStamp( "" );
 			} else {
-				ShowRecurringWarningErrorAtEnd( trim( HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType ) + " \"" + trim( HXAssistedCoil( HXAssistedCoilNum ).Name ) + "\" -- Exceeded max iterations error continues...", HXAssistedCoil( HXAssistedCoilNum ).MaxIterIndex );
+				ShowRecurringWarningErrorAtEnd( HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType + " \"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\" -- Exceeded max iterations error continues...", HXAssistedCoil( HXAssistedCoilNum ).MaxIterIndex );
 			}
 		}
 
@@ -760,10 +760,10 @@ namespace HVACHXAssistedCoolingCoil {
 
 	void
 	GetHXDXCoilIndex(
-		Fstring const & HXDXCoilName,
+		std::string const & HXDXCoilName,
 		int & HXDXCoilIndex,
 		bool & ErrorsFound,
-		Optional_Fstring_const CurrentModuleObject
+		Optional_string_const CurrentModuleObject
 	)
 	{
 
@@ -816,9 +816,9 @@ namespace HVACHXAssistedCoolingCoil {
 
 		if ( HXDXCoilIndex == 0 ) {
 			if ( present( CurrentModuleObject ) ) {
-				ShowSevereError( trim( CurrentModuleObject ) + ", GetHXDXCoilIndex: HX Assisted Cooling Coil not found=" + trim( HXDXCoilName ) );
+				ShowSevereError( CurrentModuleObject() + ", GetHXDXCoilIndex: HX Assisted Cooling Coil not found=" + HXDXCoilName );
 			} else {
-				ShowSevereError( "GetHXDXCoilIndex: HX Assisted Cooling Coil not found=" + trim( HXDXCoilName ) );
+				ShowSevereError( "GetHXDXCoilIndex: HX Assisted Cooling Coil not found=" + HXDXCoilName );
 			}
 			ErrorsFound = true;
 		}
@@ -827,8 +827,8 @@ namespace HVACHXAssistedCoolingCoil {
 
 	void
 	CheckHXAssistedCoolingCoilSchedule(
-		Fstring const & CompType, // unused1208
-		Fstring const & CompName,
+		std::string const & CompType, // unused1208
+		std::string const & CompName,
 		Real64 & Value,
 		int & CompIndex
 	)
@@ -885,17 +885,17 @@ namespace HVACHXAssistedCoolingCoil {
 			}
 
 			if ( HXAssistedCoilNum == 0 ) {
-				ShowFatalError( "CheckHXAssistedCoolingCoilSchedule: HX Assisted Coil not found=" + trim( CompName ) );
+				ShowFatalError( "CheckHXAssistedCoolingCoilSchedule: HX Assisted Coil not found=" + CompName );
 			}
 			CompIndex = HXAssistedCoilNum;
 			Value = 1.0; // not scheduled?
 		} else {
 			HXAssistedCoilNum = CompIndex;
 			if ( HXAssistedCoilNum > TotalNumHXAssistedCoils || HXAssistedCoilNum < 1 ) {
-				ShowFatalError( "CheckHXAssistedCoolingCoilSchedule: Invalid CompIndex passed=" + trim( TrimSigDigits( HXAssistedCoilNum ) ) + ", Number of Heating Coils=" + trim( TrimSigDigits( TotalNumHXAssistedCoils ) ) + ", Coil name=" + trim( CompName ) );
+				ShowFatalError( "CheckHXAssistedCoolingCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits( HXAssistedCoilNum ) + ", Number of Heating Coils=" + TrimSigDigits( TotalNumHXAssistedCoils ) + ", Coil name=" + CompName );
 			}
 			if ( CompName != HXAssistedCoil( HXAssistedCoilNum ).Name ) {
-				ShowFatalError( "CheckHXAssistedCoolingCoilSchedule: Invalid CompIndex passed=" + trim( TrimSigDigits( HXAssistedCoilNum ) ) + ", Coil name=" + trim( CompName ) + ", stored Coil Name for that index=" + trim( HXAssistedCoil( HXAssistedCoilNum ).Name ) );
+				ShowFatalError( "CheckHXAssistedCoolingCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits( HXAssistedCoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + HXAssistedCoil( HXAssistedCoilNum ).Name );
 			}
 
 			Value = 1.0; // not scheduled?
@@ -905,8 +905,8 @@ namespace HVACHXAssistedCoolingCoil {
 
 	Real64
 	GetCoilCapacity(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -990,7 +990,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( WhichCoil == 0 ) {
-			ShowSevereError( "GetCoilCapacity: Could not find Coil, Type=\"" + trim( CoilType ) + "\" Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "GetCoilCapacity: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 			ShowContinueError( "... Coil Capacity returned as -1000." );
 			ErrorsFound = true;
 			CoilCapacity = -1000.0;
@@ -1004,8 +1004,8 @@ namespace HVACHXAssistedCoolingCoil {
 
 	int
 	GetCoilGroupTypeNum(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound, // set to true if problem
 		Optional_bool_const PrintWarning // prints warning message if true
 	)
@@ -1073,7 +1073,7 @@ namespace HVACHXAssistedCoolingCoil {
 			TypeNum = HXAssistedCoil( WhichCoil ).HXAssistedCoilType_Num;
 		} else {
 			if ( PrintMessage ) {
-				ShowSevereError( "GetCoilGroupTypeNum: Could not find Coil, Type=\"" + trim( CoilType ) + "\" Name=\"" + trim( CoilName ) + "\"" );
+				ShowSevereError( "GetCoilGroupTypeNum: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 			}
 			ErrorsFound = true;
 			TypeNum = 0;
@@ -1085,8 +1085,8 @@ namespace HVACHXAssistedCoolingCoil {
 
 	int
 	GetCoilObjectTypeNum(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound, // set to true if problem
 		Optional_bool_const PrintWarning // prints warning message if true
 	)
@@ -1154,7 +1154,7 @@ namespace HVACHXAssistedCoolingCoil {
 			TypeNum = HXAssistedCoil( WhichCoil ).CoolingCoilType_Num;
 		} else {
 			if ( PrintMessage ) {
-				ShowSevereError( "GetCoilObjectTypeNum: Could not find Coil, Type=\"" + trim( CoilType ) + "\" Name=\"" + trim( CoilName ) + "\"" );
+				ShowSevereError( "GetCoilObjectTypeNum: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 			}
 			ErrorsFound = true;
 			TypeNum = 0;
@@ -1166,8 +1166,8 @@ namespace HVACHXAssistedCoolingCoil {
 
 	int
 	GetCoilInletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -1226,7 +1226,7 @@ namespace HVACHXAssistedCoolingCoil {
 		if ( WhichCoil != 0 ) {
 			NodeNumber = HXAssistedCoil( WhichCoil ).HXAssistedCoilInletNodeNum;
 		} else {
-			ShowSevereError( "GetCoilInletNode: Could not find Coil, Type=\"" + trim( CoilType ) + "\" Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "GetCoilInletNode: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		}
@@ -1237,8 +1237,8 @@ namespace HVACHXAssistedCoolingCoil {
 
 	int
 	GetCoilWaterInletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -1301,12 +1301,12 @@ namespace HVACHXAssistedCoolingCoil {
 			} else if ( HXAssistedCoil( WhichCoil ).CoolingCoilType_Num == Coil_CoolingWaterDetailed ) {
 				NodeNumber = GetWaterCoilWaterInletNode( HXAssistedCoil( WhichCoil ).CoolingCoilType, HXAssistedCoil( WhichCoil ).CoolingCoilName, ErrorsFound );
 			} else { // even though validated in Get, still check.
-				ShowSevereError( "GetCoilWaterInletNode: Invalid Cooling Coil for HX Assisted Coil, Type=\"" + trim( HXAssistedCoil( WhichCoil ).CoolingCoilType ) + "\" Name=\"" + trim( CoilName ) + "\"" );
+				ShowSevereError( "GetCoilWaterInletNode: Invalid Cooling Coil for HX Assisted Coil, Type=\"" + HXAssistedCoil( WhichCoil ).CoolingCoilType + "\" Name=\"" + CoilName + "\"" );
 				ErrorsFound = true;
 				NodeNumber = 0; //Autodesk:Return Added line to set return value
 			}
 		} else {
-			ShowSevereError( "GetCoilInletNode: Could not find Coil, Type=\"" + trim( CoilType ) + "\" Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "GetCoilInletNode: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		}
@@ -1317,8 +1317,8 @@ namespace HVACHXAssistedCoolingCoil {
 
 	int
 	GetCoilOutletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -1377,7 +1377,7 @@ namespace HVACHXAssistedCoolingCoil {
 		if ( WhichCoil != 0 ) {
 			NodeNumber = HXAssistedCoil( WhichCoil ).HXAssistedCoilOutletNodeNum;
 		} else {
-			ShowSevereError( "GetCoilOutletNode: Could not find Coil, Type=\"" + trim( CoilType ) + "\" Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "GetCoilOutletNode: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		}
@@ -1386,10 +1386,10 @@ namespace HVACHXAssistedCoolingCoil {
 
 	}
 
-	Fstring
+	std::string
 	GetHXDXCoilName(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -1415,7 +1415,7 @@ namespace HVACHXAssistedCoolingCoil {
 		using InputProcessor::FindItem;
 
 		// Return value
-		Fstring DXCoilName( MaxNameLength ); // returned name of cooling coil
+		std::string DXCoilName; // returned name of cooling coil
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -1449,9 +1449,9 @@ namespace HVACHXAssistedCoolingCoil {
 		if ( WhichCoil != 0 ) {
 			DXCoilName = HXAssistedCoil( WhichCoil ).CoolingCoilName;
 		} else {
-			ShowSevereError( "Could not find Coil, Type=\"" + trim( CoilType ) + "\" Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
-			DXCoilName = " ";
+			DXCoilName = "";
 		}
 
 		return DXCoilName;
@@ -1460,8 +1460,8 @@ namespace HVACHXAssistedCoolingCoil {
 
 	int
 	GetActualDXCoilIndex(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -1521,7 +1521,7 @@ namespace HVACHXAssistedCoolingCoil {
 			// this should be the index to the DX cooling coil object, not the HXAssisted object
 			DXCoilIndex = HXAssistedCoil( WhichCoil ).CoolingCoilIndex;
 		} else {
-			ShowSevereError( "Could not find Coil, Type=\"" + trim( CoilType ) + "\" Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			DXCoilIndex = 0;
 		}
@@ -1530,10 +1530,10 @@ namespace HVACHXAssistedCoolingCoil {
 
 	}
 
-	Fstring
+	std::string
 	GetHXCoilType(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -1559,7 +1559,7 @@ namespace HVACHXAssistedCoolingCoil {
 		using InputProcessor::FindItem;
 
 		// Return value
-		Fstring CoolingCoilType( MaxNameLength ); // returned type of cooling coil
+		std::string CoolingCoilType; // returned type of cooling coil
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -1592,9 +1592,9 @@ namespace HVACHXAssistedCoolingCoil {
 		if ( WhichCoil != 0 ) {
 			CoolingCoilType = HXAssistedCoil( WhichCoil ).CoolingCoilType;
 		} else {
-			ShowSevereError( "Could not find Coil, Type=\"" + trim( CoilType ) + "\" Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
-			CoolingCoilType = " ";
+			CoolingCoilType = "";
 		}
 
 		return CoolingCoilType;
@@ -1603,11 +1603,11 @@ namespace HVACHXAssistedCoolingCoil {
 
 	void
 	GetHXCoilTypeAndName(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound, // set to true if problem
-		Fstring & CoolingCoilType, // returned type of cooling coil
-		Fstring & CoolingCoilName // returned name of cooling coil
+		std::string & CoolingCoilType, // returned type of cooling coil
+		std::string & CoolingCoilName // returned name of cooling coil
 	)
 	{
 
@@ -1661,18 +1661,18 @@ namespace HVACHXAssistedCoolingCoil {
 			CoolingCoilType = HXAssistedCoil( WhichCoil ).CoolingCoilType;
 			CoolingCoilName = HXAssistedCoil( WhichCoil ).CoolingCoilName;
 		} else {
-			ShowSevereError( "Could not find Coil, Type=\"" + trim( CoilType ) + "\" Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
-			CoolingCoilType = " ";
-			CoolingCoilName = " ";
+			CoolingCoilType = "";
+			CoolingCoilName = "";
 		}
 
 	}
 
 	Real64
 	GetCoilMaxWaterFlowRate(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -1744,12 +1744,12 @@ namespace HVACHXAssistedCoolingCoil {
 			}
 
 			if ( WhichCoil == 0 ) {
-				ShowSevereError( "GetCoilMaxWaterFlowRate: Could not find Coil, Type=\"" + trim( CoilType ) + "\" Name=\"" + trim( CoilName ) + "\"" );
+				ShowSevereError( "GetCoilMaxWaterFlowRate: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 				ErrorsFound = true;
 				MaxWaterFlowRate = -1000.;
 			}
 		} else {
-			ShowSevereError( "GetCoilMaxWaterFlowRate: Could not find Coil, Type=\"" + trim( CoilType ) + "\" Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "GetCoilMaxWaterFlowRate: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			MaxWaterFlowRate = -1000.;
 		}
@@ -1760,8 +1760,8 @@ namespace HVACHXAssistedCoolingCoil {
 
 	Real64
 	GetHXCoilAirFlowRate(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -1827,12 +1827,12 @@ namespace HVACHXAssistedCoolingCoil {
 			}
 
 			if ( WhichCoil == 0 ) {
-				ShowSevereError( "GetHXCoilAirFlowRate: Could not find HX, Type=\"" + trim( CoilType ) + "\" Name=\"" + trim( CoilName ) + "\"" );
+				ShowSevereError( "GetHXCoilAirFlowRate: Could not find HX, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 				ErrorsFound = true;
 				MaxAirFlowRate = -1000.0;
 			}
 		} else {
-			ShowSevereError( "GetHXCoilAirFlowRate: Could not find HX, Type=\"" + trim( CoilType ) + "\" Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "GetHXCoilAirFlowRate: Could not find HX, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			MaxAirFlowRate = -1000.0;
 		}
@@ -1843,8 +1843,8 @@ namespace HVACHXAssistedCoolingCoil {
 
 	bool
 	VerifyHeatExchangerParent(
-		Fstring const & HXType, // must match coil types in this module
-		Fstring const & HXName // must match coil names for the coil type
+		std::string const & HXType, // must match coil types in this module
+		std::string const & HXName // must match coil names for the coil type
 	)
 	{
 

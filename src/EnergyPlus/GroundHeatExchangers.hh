@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace GroundHeatExchangers {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// DERIVED TYPE DEFINITIONS
@@ -54,7 +52,7 @@ namespace GroundHeatExchangers {
 	struct GlheSpecs
 	{
 		// Members
-		Fstring Name; // user identifier
+		std::string Name; // user identifier
 		bool Available; // need an array of logicals--load identifiers of available equipment
 		bool ON; // simulate the machine at it's operating part load ratio
 		Real64 MaxGlheFlowRate; // design nominal capacity of Pump
@@ -94,7 +92,6 @@ namespace GroundHeatExchangers {
 
 		// Default Constructor
 		GlheSpecs() :
-			Name( MaxNameLength ),
 			Available( false ),
 			ON( false ),
 			MaxGlheFlowRate( 0.0 ),
@@ -126,7 +123,7 @@ namespace GroundHeatExchangers {
 
 		// Member Constructor
 		GlheSpecs(
-			Fstring const & Name, // user identifier
+			std::string const & Name, // user identifier
 			bool const Available, // need an array of logicals--load identifiers of available equipment
 			bool const ON, // simulate the machine at it's operating part load ratio
 			Real64 const MaxGlheFlowRate, // design nominal capacity of Pump
@@ -161,7 +158,7 @@ namespace GroundHeatExchangers {
 			int const BranchNum,
 			int const CompNum
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			Available( Available ),
 			ON( ON ),
 			MaxGlheFlowRate( MaxGlheFlowRate ),
@@ -246,8 +243,8 @@ namespace GroundHeatExchangers {
 
 	void
 	SimGroundHeatExchangers(
-		Fstring const & GlheType,
-		Fstring const & GlheName,
+		std::string const & GlheType,
+		std::string const & GlheName,
 		int & CompIndex,
 		bool const RunFlag,
 		bool const FirstIteration,

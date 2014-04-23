@@ -62,7 +62,6 @@ namespace HighTempRadiantSystem {
 	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::BeginTimeStepFlag;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::ScheduleAlwaysOn;
@@ -73,18 +72,18 @@ namespace HighTempRadiantSystem {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
-	Fstring const cGas( "Gas" );
-	Fstring const cNaturalGas( "NaturalGas" );
-	Fstring const cElectric( "Electric" );
-	Fstring const cElectricity( "Electricity" );
+	std::string const cGas( "Gas" );
+	std::string const cNaturalGas( "NaturalGas" );
+	std::string const cElectric( "Electric" );
+	std::string const cElectricity( "Electricity" );
 	int const Gas( 1 );
 	int const Electric( 2 );
-	Fstring const cMATControl( "MeanAirTemperature" ); // Control for using mean air temperature
-	Fstring const cMRTControl( "MeanRadiantTemperature" ); // Control for using mean radiant temperature
-	Fstring const cOperativeControl( "OperativeTemperature" ); // Control for using operative temperature
-	Fstring const cMATSPControl( "MeanAirTemperatureSetpoint" ); // Control for to MAT setpoint
-	Fstring const cMRTSPControl( "MeanRadiantTemperatureSetpoint" ); // Control for to MRT setpoint
-	Fstring const cOperativeSPControl( "OperativeTemperatureSetpoint" ); // Control for operative temperature setpoint
+	std::string const cMATControl( "MeanAirTemperature" ); // Control for using mean air temperature
+	std::string const cMRTControl( "MeanRadiantTemperature" ); // Control for using mean radiant temperature
+	std::string const cOperativeControl( "OperativeTemperature" ); // Control for using operative temperature
+	std::string const cMATSPControl( "MeanAirTemperatureSetpoint" ); // Control for to MAT setpoint
+	std::string const cMRTSPControl( "MeanRadiantTemperatureSetpoint" ); // Control for to MRT setpoint
+	std::string const cOperativeSPControl( "OperativeTemperatureSetpoint" ); // Control for operative temperature setpoint
 	int const MATControl( 1001 );
 	int const MRTControl( 1002 );
 	int const OperativeControl( 1003 );
@@ -116,7 +115,7 @@ namespace HighTempRadiantSystem {
 
 	void
 	SimHighTempRadiantSystem(
-		Fstring const & CompName, // name of the low temperature radiant system
+		std::string const & CompName, // name of the low temperature radiant system
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		Real64 & LoadMet, // load met by the radiant system, in Watts
 		int & CompIndex
@@ -170,17 +169,17 @@ namespace HighTempRadiantSystem {
 		if ( CompIndex == 0 ) {
 			RadSysNum = FindItemInList( CompName, HighTempRadSys.Name(), NumOfHighTempRadSys );
 			if ( RadSysNum == 0 ) {
-				ShowFatalError( "SimHighTempRadiantSystem: Unit not found=" + trim( CompName ) );
+				ShowFatalError( "SimHighTempRadiantSystem: Unit not found=" + CompName );
 			}
 			CompIndex = RadSysNum;
 		} else {
 			RadSysNum = CompIndex;
 			if ( RadSysNum > NumOfHighTempRadSys || RadSysNum < 1 ) {
-				ShowFatalError( "SimHighTempRadiantSystem:  Invalid CompIndex passed=" + trim( TrimSigDigits( RadSysNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumOfHighTempRadSys ) ) + ", Entered Unit name=" + trim( CompName ) );
+				ShowFatalError( "SimHighTempRadiantSystem:  Invalid CompIndex passed=" + TrimSigDigits( RadSysNum ) + ", Number of Units=" + TrimSigDigits( NumOfHighTempRadSys ) + ", Entered Unit name=" + CompName );
 			}
 			if ( CheckEquipName( RadSysNum ) ) {
 				if ( CompName != HighTempRadSys( RadSysNum ).Name ) {
-					ShowFatalError( "SimHighTempRadiantSystem: Invalid CompIndex passed=" + trim( TrimSigDigits( RadSysNum ) ) + ", Unit name=" + trim( CompName ) + ", stored Unit Name for that index=" + trim( HighTempRadSys( RadSysNum ).Name ) );
+					ShowFatalError( "SimHighTempRadiantSystem: Invalid CompIndex passed=" + TrimSigDigits( RadSysNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + HighTempRadSys( RadSysNum ).Name );
 				}
 				CheckEquipName( RadSysNum ) = false;
 			}
@@ -241,14 +240,14 @@ namespace HighTempRadiantSystem {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const Blank;
+		static std::string const Blank;
 		Real64 const MaxCombustionEffic( 1.00 ); // Limit the combustion efficiency to perfection
 		Real64 const MaxFraction( 1.0 ); // Limit the highest allowed fraction for heat transfer parts
 		Real64 const MinCombustionEffic( 0.01 ); // Limit the minimum combustion efficiency
 		Real64 const MinFraction( 0.0 ); // Limit the lowest allowed fraction for heat transfer parts
 		Real64 const MinThrottlingRange( 0.5 ); // Smallest throttling range allowed in degrees Celsius
 		//  INTEGER,          PARAMETER :: MaxDistribSurfaces = 20    ! Maximum number of surfaces that a radiant heater can radiate to
-		static Fstring const RoutineName( "GetHighTempRadiantSystem: " ); // include trailing blank space
+		static std::string const RoutineName( "GetHighTempRadiantSystem: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -285,7 +284,7 @@ namespace HighTempRadiantSystem {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), HighTempRadSys.Name(), Item - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), HighTempRadSys.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -299,7 +298,7 @@ namespace HighTempRadiantSystem {
 			} else {
 				HighTempRadSys( Item ).SchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 				if ( HighTempRadSys( Item ).SchedPtr == 0 ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 2 ) ) + " entered =" + trim( cAlphaArgs( 2 ) ) + " for " + trim( cAlphaFieldNames( 1 ) ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) + " entered =" + cAlphaArgs( 2 ) + " for " + cAlphaFieldNames( 1 ) + " = " + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -307,8 +306,8 @@ namespace HighTempRadiantSystem {
 			HighTempRadSys( Item ).ZoneName = cAlphaArgs( 3 );
 			HighTempRadSys( Item ).ZonePtr = FindItemInList( cAlphaArgs( 3 ), Zone.Name(), NumOfZones );
 			if ( HighTempRadSys( Item ).ZonePtr == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + " = " + trim( cAlphaArgs( 3 ) ) );
-				ShowContinueError( "Occurs for " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
+				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
@@ -323,8 +322,8 @@ namespace HighTempRadiantSystem {
 			} else if ( SameString( cAlphaArgs( 4 ), cElectric ) ) {
 				HighTempRadSys( Item ).HeaterType = Electric;
 			} else {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 4 ) ) + " = " + trim( cAlphaArgs( 4 ) ) );
-				ShowContinueError( "Occurs for " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + " = " + cAlphaArgs( 4 ) );
+				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
@@ -333,13 +332,13 @@ namespace HighTempRadiantSystem {
 				// Limit the combustion efficiency to between zero and one...
 				if ( HighTempRadSys( Item ).CombustionEffic < MinCombustionEffic ) {
 					HighTempRadSys( Item ).CombustionEffic = MinCombustionEffic;
-					ShowWarningError( trim( cNumericFieldNames( 2 ) ) + " was less than the allowable minimum, reset to minimum value." );
-					ShowContinueError( "Occurs for " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					ShowWarningError( cNumericFieldNames( 2 ) + " was less than the allowable minimum, reset to minimum value." );
+					ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				}
 				if ( HighTempRadSys( Item ).CombustionEffic > MaxCombustionEffic ) {
 					HighTempRadSys( Item ).CombustionEffic = MaxCombustionEffic;
-					ShowWarningError( trim( cNumericFieldNames( 2 ) ) + " was greater than the allowable maximum, reset to maximum value." );
-					ShowContinueError( "Occurs for " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					ShowWarningError( cNumericFieldNames( 2 ) + " was greater than the allowable maximum, reset to maximum value." );
+					ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				}
 			} else {
 				HighTempRadSys( Item ).CombustionEffic = MaxCombustionEffic; // No inefficiency in the heater
@@ -348,44 +347,44 @@ namespace HighTempRadiantSystem {
 			HighTempRadSys( Item ).FracRadiant = rNumericArgs( 3 );
 			if ( HighTempRadSys( Item ).FracRadiant < MinFraction ) {
 				HighTempRadSys( Item ).FracRadiant = MinFraction;
-				ShowWarningError( trim( cNumericFieldNames( 3 ) ) + " was less than the allowable minimum, reset to minimum value." );
-				ShowContinueError( "Occurs for " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowWarningError( cNumericFieldNames( 3 ) + " was less than the allowable minimum, reset to minimum value." );
+				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 			}
 			if ( HighTempRadSys( Item ).FracRadiant > MaxFraction ) {
 				HighTempRadSys( Item ).FracRadiant = MaxFraction;
-				ShowWarningError( trim( cNumericFieldNames( 3 ) ) + " was greater than the allowable maximum, reset to maximum value." );
-				ShowContinueError( "Occurs for " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowWarningError( cNumericFieldNames( 3 ) + " was greater than the allowable maximum, reset to maximum value." );
+				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 			}
 
 			HighTempRadSys( Item ).FracLatent = rNumericArgs( 4 );
 			if ( HighTempRadSys( Item ).FracLatent < MinFraction ) {
 				HighTempRadSys( Item ).FracLatent = MinFraction;
-				ShowWarningError( trim( cNumericFieldNames( 4 ) ) + " was less than the allowable minimum, reset to minimum value." );
-				ShowContinueError( "Occurs for " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowWarningError( cNumericFieldNames( 4 ) + " was less than the allowable minimum, reset to minimum value." );
+				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 			}
 			if ( HighTempRadSys( Item ).FracLatent > MaxFraction ) {
 				HighTempRadSys( Item ).FracLatent = MaxFraction;
-				ShowWarningError( trim( cNumericFieldNames( 4 ) ) + " was greater than the allowable maximum, reset to maximum value." );
-				ShowContinueError( "Occurs for " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowWarningError( cNumericFieldNames( 4 ) + " was greater than the allowable maximum, reset to maximum value." );
+				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 			}
 
 			HighTempRadSys( Item ).FracLost = rNumericArgs( 5 );
 			if ( HighTempRadSys( Item ).FracLost < MinFraction ) {
 				HighTempRadSys( Item ).FracLost = MinFraction;
-				ShowWarningError( trim( cNumericFieldNames( 5 ) ) + " was less than the allowable minimum, reset to minimum value." );
-				ShowContinueError( "Occurs for " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowWarningError( cNumericFieldNames( 5 ) + " was less than the allowable minimum, reset to minimum value." );
+				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 			}
 			if ( HighTempRadSys( Item ).FracLost > MaxFraction ) {
 				HighTempRadSys( Item ).FracLost = MaxFraction;
-				ShowWarningError( trim( cNumericFieldNames( 5 ) ) + " was greater than the allowable maximum, reset to maximum value." );
-				ShowContinueError( "Occurs for " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowWarningError( cNumericFieldNames( 5 ) + " was greater than the allowable maximum, reset to maximum value." );
+				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 			}
 
 			// Based on the input for fractions radiant, latent, and lost, determine the fraction convective (remaining fraction)
 			AllFracsSummed = HighTempRadSys( Item ).FracRadiant + HighTempRadSys( Item ).FracLatent + HighTempRadSys( Item ).FracLost;
 			if ( AllFracsSummed > MaxFraction ) {
-				ShowSevereError( "Fractions radiant, latent, and lost sum up to greater than 1 for" + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Occurs for " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Fractions radiant, latent, and lost sum up to greater than 1 for" + cAlphaArgs( 1 ) );
+				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 				HighTempRadSys( Item ).FracConvect = 0.0;
 			} else {
@@ -406,38 +405,38 @@ namespace HighTempRadiantSystem {
 			} else if ( SameString( cAlphaArgs( 5 ), cOperativeSPControl ) ) {
 				HighTempRadSys( Item ).ControlType = OperativeSPControl;
 			} else {
-				ShowWarningError( "Invalid " + trim( cAlphaFieldNames( 5 ) ) + " = " + trim( cAlphaArgs( 5 ) ) );
-				ShowContinueError( "Occurs for " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Control reset to OPERATIVE control for this " + trim( cCurrentModuleObject ) );
+				ShowWarningError( "Invalid " + cAlphaFieldNames( 5 ) + " = " + cAlphaArgs( 5 ) );
+				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+				ShowContinueError( "Control reset to OPERATIVE control for this " + cCurrentModuleObject );
 				HighTempRadSys( Item ).ControlType = OperativeControl;
 			}
 
 			HighTempRadSys( Item ).ThrottlRange = rNumericArgs( 6 );
 			if ( HighTempRadSys( Item ).ThrottlRange < MinThrottlingRange ) {
 				HighTempRadSys( Item ).ThrottlRange = 1.0;
-				ShowWarningError( trim( cNumericFieldNames( 6 ) ) + " is below the minimum allowed." );
-				ShowContinueError( "Occurs for " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowWarningError( cNumericFieldNames( 6 ) + " is below the minimum allowed." );
+				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				ShowContinueError( "Thus, the throttling range value has been reset to 1.0" );
 			}
 
 			HighTempRadSys( Item ).SetptSched = cAlphaArgs( 6 );
 			HighTempRadSys( Item ).SetptSchedPtr = GetScheduleIndex( cAlphaArgs( 6 ) );
 			if ( ( HighTempRadSys( Item ).SetptSchedPtr == 0 ) && ( ! lAlphaFieldBlanks( 6 ) ) ) {
-				ShowSevereError( trim( cAlphaFieldNames( 6 ) ) + " not found: " + trim( cAlphaArgs( 6 ) ) );
-				ShowContinueError( "Occurs for " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( cAlphaFieldNames( 6 ) + " not found: " + cAlphaArgs( 6 ) );
+				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
 			HighTempRadSys( Item ).FracDistribPerson = rNumericArgs( 7 );
 			if ( HighTempRadSys( Item ).FracDistribPerson < MinFraction ) {
 				HighTempRadSys( Item ).FracDistribPerson = MinFraction;
-				ShowWarningError( trim( cNumericFieldNames( 7 ) ) + " was less than the allowable minimum, reset to minimum value." );
-				ShowContinueError( "Occurs for " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowWarningError( cNumericFieldNames( 7 ) + " was less than the allowable minimum, reset to minimum value." );
+				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 			}
 			if ( HighTempRadSys( Item ).FracDistribPerson > MaxFraction ) {
 				HighTempRadSys( Item ).FracDistribPerson = MaxFraction;
-				ShowWarningError( trim( cNumericFieldNames( 7 ) ) + " was greater than the allowable maximum, reset to maximum value." );
-				ShowContinueError( "Occurs for " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowWarningError( cNumericFieldNames( 7 ) + " was greater than the allowable maximum, reset to maximum value." );
+				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 			}
 
 			HighTempRadSys( Item ).TotSurfToDistrib = NumNumbers - 7;
@@ -457,24 +456,24 @@ namespace HighTempRadiantSystem {
 				HighTempRadSys( Item ).FracDistribToSurf( SurfNum ) = rNumericArgs( SurfNum + 7 );
 				// Error trap for surfaces that do not exist or surfaces not in the zone the radiant heater is in
 				if ( HighTempRadSys( Item ).SurfacePtr( SurfNum ) == 0 ) {
-					ShowSevereError( RoutineName + "Invalid Surface name = " + trim( HighTempRadSys( Item ).SurfaceName( SurfNum ) ) );
-					ShowContinueError( "Occurs for " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( RoutineName + "Invalid Surface name = " + HighTempRadSys( Item ).SurfaceName( SurfNum ) );
+					ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				} else if ( Surface( HighTempRadSys( Item ).SurfacePtr( SurfNum ) ).Zone != HighTempRadSys( Item ).ZonePtr ) {
-					ShowWarningError( "Surface referenced in ZoneHVAC:HighTemperatureRadiant not in same zone as Radiant System," "surface=" + trim( HighTempRadSys( Item ).SurfaceName( SurfNum ) ) );
-					ShowContinueError( "Surface is in Zone=" + trim( Zone( Surface( HighTempRadSys( Item ).SurfacePtr( SurfNum ) ).Zone ).Name ) + " ZoneHVAC:HighTemperatureRadiant in Zone=" + trim( cAlphaArgs( 3 ) ) );
-					ShowContinueError( "Occurs for " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					ShowWarningError( "Surface referenced in ZoneHVAC:HighTemperatureRadiant not in same zone as Radiant System," "surface=" + HighTempRadSys( Item ).SurfaceName( SurfNum ) );
+					ShowContinueError( "Surface is in Zone=" + Zone( Surface( HighTempRadSys( Item ).SurfacePtr( SurfNum ) ).Zone ).Name + " ZoneHVAC:HighTemperatureRadiant in Zone=" + cAlphaArgs( 3 ) );
+					ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				}
 				// Error trap for fractions that are out of range
 				if ( HighTempRadSys( Item ).FracDistribToSurf( SurfNum ) < MinFraction ) {
 					HighTempRadSys( Item ).FracDistribToSurf( SurfNum ) = MinFraction;
-					ShowWarningError( trim( cNumericFieldNames( SurfNum + 7 ) ) + " was less than the allowable minimum, reset to minimum value." );
-					ShowContinueError( "Occurs for " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					ShowWarningError( cNumericFieldNames( SurfNum + 7 ) + " was less than the allowable minimum, reset to minimum value." );
+					ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				}
 				if ( HighTempRadSys( Item ).FracDistribToSurf( SurfNum ) > MaxFraction ) {
 					HighTempRadSys( Item ).FracDistribToSurf( SurfNum ) = MaxFraction;
-					ShowWarningError( trim( cNumericFieldNames( SurfNum + 7 ) ) + " was greater than the allowable maximum, reset to maximum value." );
-					ShowContinueError( "Occurs for " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					ShowWarningError( cNumericFieldNames( SurfNum + 7 ) + " was greater than the allowable maximum, reset to maximum value." );
+					ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				}
 
 				if ( HighTempRadSys( Item ).SurfacePtr( SurfNum ) != 0 ) {
@@ -487,14 +486,14 @@ namespace HighTempRadiantSystem {
 
 			// Error trap if the fractions add up to greater than 1.0
 			if ( AllFracsSummed > ( MaxFraction + 0.01 ) ) {
-				ShowSevereError( "Fraction of radiation distributed to surfaces sums up to greater than 1 for " + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Occurs for " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Fraction of radiation distributed to surfaces sums up to greater than 1 for " + cAlphaArgs( 1 ) );
+				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 			if ( AllFracsSummed < ( MaxFraction - 0.01 ) ) { // User didn't distribute all of the radiation warn that some will be lost
-				ShowWarningError( "Fraction of radiation distributed to surfaces sums up to less than 1 for " + trim( cAlphaArgs( 1 ) ) );
+				ShowWarningError( "Fraction of radiation distributed to surfaces sums up to less than 1 for " + cAlphaArgs( 1 ) );
 				ShowContinueError( "As a result, some of the radiant energy delivered by the high temp radiant heater will be lost." );
-				ShowContinueError( "Occurs for " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 			}
 
 		} // ...end of DO loop through all of the high temperature radiant heaters
@@ -592,7 +591,7 @@ namespace HighTempRadiantSystem {
 			ZoneEquipmentListChecked = true;
 			for ( Loop = 1; Loop <= NumOfHighTempRadSys; ++Loop ) {
 				if ( CheckZoneEquipmentList( "ZoneHVAC:HighTemperatureRadiant", HighTempRadSys( Loop ).Name ) ) continue;
-				ShowSevereError( "InitHighTempRadiantSystem: Unit=[ZoneHVAC:HighTemperatureRadiant," + trim( HighTempRadSys( Loop ).Name ) + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
+				ShowSevereError( "InitHighTempRadiantSystem: Unit=[ZoneHVAC:HighTemperatureRadiant," + HighTempRadSys( Loop ).Name + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
 			}
 		}
 
@@ -697,9 +696,9 @@ namespace HighTempRadiantSystem {
 						ReportSizingOutput( "ZoneHVAC:HighTemperatureRadiant", HighTempRadSys( RadSysNum ).Name, "Design Size Maximum Power Input [W]", MaxPowerCapacDes, "User-Specified Maximum Power Input [W]", MaxPowerCapacUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( MaxPowerCapacDes - MaxPowerCapacUser ) / MaxPowerCapacUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeHighTempRadiantSystem: Potential issue with equipment sizing for " "ZoneHVAC:HighTemperatureRadiant = \"" + trim( HighTempRadSys( RadSysNum ).Name ) + "\"." );
-								ShowContinueError( "User-Specified Maximum Power Input of " + trim( RoundSigDigits( MaxPowerCapacUser, 2 ) ) + " [W]" );
-								ShowContinueError( "differs from Design Size Maximum Power Input of " + trim( RoundSigDigits( MaxPowerCapacDes, 2 ) ) + " [W]" );
+								ShowMessage( "SizeHighTempRadiantSystem: Potential issue with equipment sizing for " "ZoneHVAC:HighTemperatureRadiant = \"" + HighTempRadSys( RadSysNum ).Name + "\"." );
+								ShowContinueError( "User-Specified Maximum Power Input of " + RoundSigDigits( MaxPowerCapacUser, 2 ) + " [W]" );
+								ShowContinueError( "differs from Design Size Maximum Power Input of " + RoundSigDigits( MaxPowerCapacDes, 2 ) + " [W]" );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
@@ -1221,18 +1220,18 @@ namespace HighTempRadiantSystem {
 
 					if ( ThisSurfIntensity > MaxRadHeatFlux ) { // CR 8074, trap for excessive intensity (throws off surface balance )
 						ShowSevereError( "DistributeHTRadGains:  excessive thermal radiation heat flux intensity detected" );
-						ShowContinueError( "Surface = " + trim( Surface( SurfNum ).Name ) );
-						ShowContinueError( "Surface area = " + trim( RoundSigDigits( Surface( SurfNum ).Area, 3 ) ) + " [m2]" );
-						ShowContinueError( "Occurs in ZoneHVAC:HighTemperatureRadiant = " + trim( HighTempRadSys( RadSysNum ).Name ) );
-						ShowContinueError( "Radiation intensity = " + trim( RoundSigDigits( ThisSurfIntensity, 2 ) ) + " [W/m2]" );
+						ShowContinueError( "Surface = " + Surface( SurfNum ).Name );
+						ShowContinueError( "Surface area = " + RoundSigDigits( Surface( SurfNum ).Area, 3 ) + " [m2]" );
+						ShowContinueError( "Occurs in ZoneHVAC:HighTemperatureRadiant = " + HighTempRadSys( RadSysNum ).Name );
+						ShowContinueError( "Radiation intensity = " + RoundSigDigits( ThisSurfIntensity, 2 ) + " [W/m2]" );
 						ShowContinueError( "Assign a larger surface area or more surfaces in ZoneHVAC:HighTemperatureRadiant" );
 						ShowFatalError( "DistributeHTRadGains:  excessive thermal radiation heat flux intensity detected" );
 					}
 				} else { // small surface
 					ShowSevereError( "DistributeHTRadGains:  surface not large enough to receive thermal radiation heat flux" );
-					ShowContinueError( "Surface = " + trim( Surface( SurfNum ).Name ) );
-					ShowContinueError( "Surface area = " + trim( RoundSigDigits( Surface( SurfNum ).Area, 3 ) ) + " [m2]" );
-					ShowContinueError( "Occurs in ZoneHVAC:HighTemperatureRadiant = " + trim( HighTempRadSys( RadSysNum ).Name ) );
+					ShowContinueError( "Surface = " + Surface( SurfNum ).Name );
+					ShowContinueError( "Surface area = " + RoundSigDigits( Surface( SurfNum ).Area, 3 ) + " [m2]" );
+					ShowContinueError( "Occurs in ZoneHVAC:HighTemperatureRadiant = " + HighTempRadSys( RadSysNum ).Name );
 					ShowContinueError( "Assign a larger surface area or more surfaces in ZoneHVAC:HighTemperatureRadiant" );
 					ShowFatalError( "DistributeHTRadGains:  surface not large enough to receive thermal radiation heat flux" );
 

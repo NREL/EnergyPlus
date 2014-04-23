@@ -69,7 +69,6 @@ namespace SingleDuct {
 	using namespace DataLoopNode;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::BeginDayFlag;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::NumOfZones;
@@ -166,7 +165,7 @@ namespace SingleDuct {
 
 	void
 	SimulateSingleDuct(
-		Fstring const & CompName,
+		std::string const & CompName,
 		bool const FirstHVACIteration,
 		int const ZoneNum,
 		int const ZoneNodeNum,
@@ -222,17 +221,17 @@ namespace SingleDuct {
 		if ( CompIndex == 0 ) {
 			SysNum = FindItemInList( CompName, Sys.SysName(), NumSys );
 			if ( SysNum == 0 ) {
-				ShowFatalError( "SimulateSingleDuct: System not found=" + trim( CompName ) );
+				ShowFatalError( "SimulateSingleDuct: System not found=" + CompName );
 			}
 			CompIndex = SysNum;
 		} else {
 			SysNum = CompIndex;
 			if ( SysNum > NumSys || SysNum < 1 ) {
-				ShowFatalError( "SimulateSingleDuct: Invalid CompIndex passed=" + trim( TrimSigDigits( CompIndex ) ) + ", Number of Systems=" + trim( TrimSigDigits( NumSys ) ) + ", System name=" + trim( CompName ) );
+				ShowFatalError( "SimulateSingleDuct: Invalid CompIndex passed=" + TrimSigDigits( CompIndex ) + ", Number of Systems=" + TrimSigDigits( NumSys ) + ", System name=" + CompName );
 			}
 			if ( CheckEquipName( SysNum ) ) {
 				if ( CompName != Sys( SysNum ).SysName ) {
-					ShowFatalError( "SimulateSingleDuct: Invalid CompIndex passed=" + trim( TrimSigDigits( CompIndex ) ) + ", System name=" + trim( CompName ) + ", stored System Name for that index=" + trim( Sys( SysNum ).SysName ) );
+					ShowFatalError( "SimulateSingleDuct: Invalid CompIndex passed=" + TrimSigDigits( CompIndex ) + ", System name=" + CompName + ", stored System Name for that index=" + Sys( SysNum ).SysName );
 				}
 				CheckEquipName( SysNum ) = false;
 			}
@@ -324,7 +323,7 @@ namespace SingleDuct {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetSysInput: " ); // include trailing blank
+		static std::string const RoutineName( "GetSysInput: " ); // include trailing blank
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -353,10 +352,10 @@ namespace SingleDuct {
 		int CtrlZone; // controlled zone do loop index
 		int SupAirIn; // controlled zone supply air inlet index
 		int ADUNum; // air distribution unit index
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in getting objects
-		FArray1D_Fstring Alphas( sFstring( MaxNameLength ) ); // Alpha input items for object
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) ); // Numeric field names
+		std::string CurrentModuleObject; // for ease in getting objects
+		FArray1D_string Alphas; // Alpha input items for object
+		FArray1D_string cAlphaFields; // Alpha field names
+		FArray1D_string cNumericFields; // Numeric field names
 		FArray1D< Real64 > Numbers; // Numeric input items for object
 		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
@@ -410,11 +409,11 @@ namespace SingleDuct {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		Alphas.allocate( MaxAlphas );
-		Alphas = " ";
+		Alphas = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = " ";
+		cAlphaFields = "";
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = " ";
+		cNumericFields = "";
 		Numbers.allocate( MaxNums );
 		Numbers = 0.0;
 		lAlphaBlanks.allocate( MaxAlphas );
@@ -432,13 +431,13 @@ namespace SingleDuct {
 			SysNum = SysIndex;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Sys.SysName(), SysNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), Sys.SysName(), SysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			Sys( SysNum ).SysName = Alphas( 1 );
-			Sys( SysNum ).SysType = trim( CurrentModuleObject );
+			Sys( SysNum ).SysType = CurrentModuleObject;
 			Sys( SysNum ).SysType_Num = SingleDuctVAVReheat;
 			Sys( SysNum ).ReheatComp = Alphas( 7 );
 			if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Gas" ) ) {
@@ -451,15 +450,15 @@ namespace SingleDuct {
 			} else if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Steam" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_SteamAirHeating;
 				Sys( SysNum ).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
-			} else if ( Sys( SysNum ).ReheatComp != " " ) {
-				ShowSevereError( "Illegal " + trim( cAlphaFields( 8 ) ) + " = " + trim( Sys( SysNum ).ReheatComp ) + "." );
-				ShowContinueError( "Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+			} else if ( Sys( SysNum ).ReheatComp != "" ) {
+				ShowSevereError( "Illegal " + cAlphaFields( 8 ) + " = " + Sys( SysNum ).ReheatComp + '.' );
+				ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
 			Sys( SysNum ).ReheatName = Alphas( 8 );
-			ValidateComponent( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK, trim( Sys( SysNum ).SysType ) );
+			ValidateComponent( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK, Sys( SysNum ).SysType );
 			if ( IsNotOK ) {
-				ShowContinueError( "In " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+				ShowContinueError( "In " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
 			Sys( SysNum ).Schedule = Alphas( 2 );
@@ -468,8 +467,8 @@ namespace SingleDuct {
 			} else {
 				Sys( SysNum ).SchedPtr = GetScheduleIndex( Alphas( 2 ) );
 				if ( Sys( SysNum ).SchedPtr == 0 ) {
-					ShowSevereError( trim( cAlphaFields( 2 ) ) + " = " + trim( Alphas( 2 ) ) + " not found." );
-					ShowContinueError( "Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+					ShowSevereError( cAlphaFields( 2 ) + " = " + Alphas( 2 ) + " not found." );
+					ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 					ErrorsFound = true;
 				}
 			}
@@ -487,8 +486,8 @@ namespace SingleDuct {
 			} else if ( SameString( Alphas( 5 ), "Scheduled" ) ) {
 				Sys( SysNum ).ZoneMinAirFracMethod = ScheduledMinFrac;
 			} else {
-				ShowSevereError( trim( cAlphaFields( 5 ) ) + " = " + trim( Alphas( 5 ) ) + " not found." );
-				ShowContinueError( "Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+				ShowSevereError( cAlphaFields( 5 ) + " = " + Alphas( 5 ) + " not found." );
+				ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
 
@@ -506,15 +505,15 @@ namespace SingleDuct {
 
 			Sys( SysNum ).ZoneMinAirFracSchPtr = GetScheduleIndex( Alphas( 6 ) );
 			if ( ( Sys( SysNum ).ZoneMinAirFracSchPtr == 0 ) && ( Sys( SysNum ).ZoneMinAirFracMethod == ScheduledMinFrac ) ) {
-				ShowSevereError( trim( cAlphaFields( 6 ) ) + " = " + trim( Alphas( 6 ) ) + " not found." );
-				ShowContinueError( "Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+				ShowSevereError( cAlphaFields( 6 ) + " = " + Alphas( 6 ) + " not found." );
+				ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ShowContinueError( "A valid schedule is required" );
 				ErrorsFound = true;
 			} else if ( ( Sys( SysNum ).ZoneMinAirFracSchPtr > 0 ) && ( Sys( SysNum ).ZoneMinAirFracMethod == ScheduledMinFrac ) ) {
 				// check range of values in schedule
 				if ( ! CheckScheduleValueMinMax( Sys( SysNum ).ZoneMinAirFracSchPtr, ">=", 0.0, "<=", 1.0 ) ) {
-					ShowSevereError( "Error found in " + trim( cAlphaFields( 6 ) ) + " = " + trim( Alphas( 6 ) ) );
-					ShowContinueError( "Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+					ShowSevereError( "Error found in " + cAlphaFields( 6 ) + " = " + Alphas( 6 ) );
+					ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 					ShowContinueError( "Schedule values must be (>=0., <=1.)" );
 				}
 
@@ -527,14 +526,14 @@ namespace SingleDuct {
 					IsNotOK = false;
 					Sys( SysNum ).ReheatControlNode = GetCoilSteamInletNode( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK );
 					if ( IsNotOK ) {
-						ShowContinueError( "..Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+						ShowContinueError( "..Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 						ErrorsFound = true;
 					}
 				} else {
 					IsNotOK = false;
 					Sys( SysNum ).ReheatControlNode = GetCoilWaterInletNode( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK );
 					if ( IsNotOK ) {
-						ShowContinueError( "..Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+						ShowContinueError( "..Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 						ErrorsFound = true;
 					}
 				}
@@ -568,8 +567,8 @@ namespace SingleDuct {
 					if ( Sys( SysNum ).ReheatAirOutletNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
 						if ( ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode > 0 ) {
 							ShowSevereError( "Error in connecting a terminal unit to a zone" );
-							ShowContinueError( trim( NodeID( Sys( SysNum ).ReheatAirOutletNode ) ) + " already connects to another zone" );
-							ShowContinueError( "Occurs for terminal unit " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+							ShowContinueError( NodeID( Sys( SysNum ).ReheatAirOutletNode ) + " already connects to another zone" );
+							ShowContinueError( "Occurs for terminal unit " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 							ShowContinueError( "Check terminal unit node names for errors" );
 							ErrorsFound = true;
 						} else {
@@ -610,8 +609,8 @@ namespace SingleDuct {
 			if ( ! lAlphaBlanks( 11 ) ) {
 				Sys( SysNum ).OARequirementsPtr = FindItemInList( Alphas( 11 ), OARequirements.Name(), NumOARequirements );
 				if ( Sys( SysNum ).OARequirementsPtr == 0 ) {
-					ShowSevereError( trim( cAlphaFields( 11 ) ) + " = " + trim( Alphas( 11 ) ) + " not found." );
-					ShowContinueError( "Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+					ShowSevereError( cAlphaFields( 11 ) + " = " + Alphas( 11 ) + " not found." );
+					ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 					ErrorsFound = true;
 				} else {
 					Sys( SysNum ).NoOAFlowInputFromUser = false;
@@ -620,7 +619,7 @@ namespace SingleDuct {
 
 			ValidateComponent( Alphas( 7 ), Alphas( 8 ), IsNotOK, Sys( SysNum ).SysType );
 			if ( IsNotOK ) {
-				ShowContinueError( "In " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+				ShowContinueError( "In " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
 
@@ -643,13 +642,13 @@ namespace SingleDuct {
 			SysNum = SysIndex + NumVAVSys;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Sys.SysName(), SysNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), Sys.SysName(), SysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			Sys( SysNum ).SysName = Alphas( 1 );
-			Sys( SysNum ).SysType = trim( CurrentModuleObject );
+			Sys( SysNum ).SysType = CurrentModuleObject;
 			Sys( SysNum ).SysType_Num = SingleDuctCBVAVReheat;
 			Sys( SysNum ).ReheatComp = Alphas( 6 );
 			if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Gas" ) ) {
@@ -662,15 +661,15 @@ namespace SingleDuct {
 			} else if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Steam" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_SteamAirHeating;
 				Sys( SysNum ).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
-			} else if ( Sys( SysNum ).ReheatComp != " " ) {
-				ShowSevereError( "Illegal " + trim( cAlphaFields( 6 ) ) + " = " + trim( Sys( SysNum ).ReheatComp ) + "." );
-				ShowContinueError( "Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+			} else if ( Sys( SysNum ).ReheatComp != "" ) {
+				ShowSevereError( "Illegal " + cAlphaFields( 6 ) + " = " + Sys( SysNum ).ReheatComp + '.' );
+				ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
 			Sys( SysNum ).ReheatName = Alphas( 7 );
 			ValidateComponent( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK, Sys( SysNum ).SysType );
 			if ( IsNotOK ) {
-				ShowContinueError( "In " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+				ShowContinueError( "In " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
 			Sys( SysNum ).Schedule = Alphas( 2 );
@@ -679,8 +678,8 @@ namespace SingleDuct {
 			} else {
 				Sys( SysNum ).SchedPtr = GetScheduleIndex( Alphas( 2 ) );
 				if ( Sys( SysNum ).SchedPtr == 0 ) {
-					ShowSevereError( trim( cAlphaFields( 2 ) ) + " = " + trim( Alphas( 2 ) ) + " not found." );
-					ShowContinueError( "Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+					ShowSevereError( cAlphaFields( 2 ) + " = " + Alphas( 2 ) + " not found." );
+					ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 					ErrorsFound = true;
 				}
 			}
@@ -692,13 +691,13 @@ namespace SingleDuct {
 			Sys( SysNum ).MaxAirVolFlowRate = Numbers( 1 );
 			Sys( SysNum ).ZoneMinAirFrac = Numbers( 2 );
 			if ( Sys( SysNum ).ZoneMinAirFrac < 0.0 ) {
-				ShowWarningError( trim( Sys( SysNum ).SysType ) + " \"" + trim( Sys( SysNum ).SysName ) + "\"" );
-				ShowContinueError( trim( cNumericFields( 2 ) ) + " must be greater than or equal to 0. Resetting to 0 and" " the simulation continues." );
+				ShowWarningError( Sys( SysNum ).SysType + " \"" + Sys( SysNum ).SysName + "\"" );
+				ShowContinueError( cNumericFields( 2 ) + " must be greater than or equal to 0. Resetting to 0 and" " the simulation continues." );
 				Sys( SysNum ).ZoneMinAirFrac = 0.0;
 			}
 			if ( Sys( SysNum ).ZoneMinAirFrac > 1.0 ) {
-				ShowWarningError( trim( Sys( SysNum ).SysType ) + " \"" + trim( Sys( SysNum ).SysName ) + "\"" );
-				ShowContinueError( trim( cNumericFields( 2 ) ) + " must be less than or equal to 1. Resetting to 1 and" " the simulation continues." );
+				ShowWarningError( Sys( SysNum ).SysType + " \"" + Sys( SysNum ).SysName + "\"" );
+				ShowContinueError( cNumericFields( 2 ) + " must be less than or equal to 1. Resetting to 1 and" " the simulation continues." );
 				Sys( SysNum ).ZoneMinAirFrac = 1.0;
 			}
 			// The reheat coil control node is necessary for hot water and steam reheat, but not necessary for
@@ -719,7 +718,7 @@ namespace SingleDuct {
 					IsNotOK = false;
 					Sys( SysNum ).ReheatControlNode = GetCoilSteamInletNode( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK );
 					if ( IsNotOK ) {
-						ShowContinueError( "..Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+						ShowContinueError( "..Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 						ErrorsFound = true;
 					}
 					//                GetOnlySingleNode(Alphas(5),ErrorsFound,Sys(SysNum)%SysType,Alphas(1), &
@@ -728,7 +727,7 @@ namespace SingleDuct {
 					IsNotOK = false;
 					Sys( SysNum ).ReheatControlNode = GetCoilWaterInletNode( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK );
 					if ( IsNotOK ) {
-						ShowContinueError( "..Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+						ShowContinueError( "..Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 						ErrorsFound = true;
 					}
 					//                GetOnlySingleNode(Alphas(5),ErrorsFound,Sys(SysNum)%SysType,Alphas(1), &
@@ -762,8 +761,8 @@ namespace SingleDuct {
 					if ( Sys( SysNum ).ReheatAirOutletNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
 						if ( ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode > 0 ) {
 							ShowSevereError( "Error in connecting a terminal unit to a zone" );
-							ShowContinueError( trim( NodeID( Sys( SysNum ).ReheatAirOutletNode ) ) + " already connects to another zone" );
-							ShowContinueError( "Occurs for terminal unit " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+							ShowContinueError( NodeID( Sys( SysNum ).ReheatAirOutletNode ) + " already connects to another zone" );
+							ShowContinueError( "Occurs for terminal unit " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 							ShowContinueError( "Check terminal unit node names for errors" );
 							ErrorsFound = true;
 						} else {
@@ -785,7 +784,7 @@ namespace SingleDuct {
 
 			ValidateComponent( Alphas( 6 ), Alphas( 7 ), IsNotOK, Sys( SysNum ).SysType );
 			if ( IsNotOK ) {
-				ShowContinueError( "In " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+				ShowContinueError( "In " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
 
@@ -806,7 +805,7 @@ namespace SingleDuct {
 			SysNum = SysIndex + NumVAVSys + NumCBVAVSys;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Sys.SysName(), SysNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), Sys.SysName(), SysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -826,14 +825,14 @@ namespace SingleDuct {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_SteamAirHeating;
 				Sys( SysNum ).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
 			} else {
-				ShowSevereError( "Illegal " + trim( cAlphaFields( 6 ) ) + " = " + trim( Sys( SysNum ).ReheatComp ) + "." );
-				ShowContinueError( "Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+				ShowSevereError( "Illegal " + cAlphaFields( 6 ) + " = " + Sys( SysNum ).ReheatComp + '.' );
+				ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
 			Sys( SysNum ).ReheatName = Alphas( 7 );
 			ValidateComponent( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK, Sys( SysNum ).SysType );
 			if ( IsNotOK ) {
-				ShowContinueError( "In " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+				ShowContinueError( "In " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
 			Sys( SysNum ).Schedule = Alphas( 2 );
@@ -842,8 +841,8 @@ namespace SingleDuct {
 			} else {
 				Sys( SysNum ).SchedPtr = GetScheduleIndex( Alphas( 2 ) );
 				if ( Sys( SysNum ).SchedPtr == 0 ) {
-					ShowSevereError( trim( cAlphaFields( 2 ) ) + " = " + trim( Alphas( 2 ) ) + " not found." );
-					ShowContinueError( "Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+					ShowSevereError( cAlphaFields( 2 ) + " = " + Alphas( 2 ) + " not found." );
+					ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 					ErrorsFound = true;
 				}
 			}
@@ -867,7 +866,7 @@ namespace SingleDuct {
 					IsNotOK = false;
 					Sys( SysNum ).ReheatControlNode = GetCoilSteamInletNode( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK );
 					if ( IsNotOK ) {
-						ShowContinueError( "..Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+						ShowContinueError( "..Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 						ErrorsFound = true;
 					}
 					//                 GetOnlySingleNode(Alphas(5),ErrorsFound,Sys(SysNum)%SysType,Alphas(1), &
@@ -876,7 +875,7 @@ namespace SingleDuct {
 					IsNotOK = false;
 					Sys( SysNum ).ReheatControlNode = GetCoilWaterInletNode( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK );
 					if ( IsNotOK ) {
-						ShowContinueError( "..Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+						ShowContinueError( "..Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 						ErrorsFound = true;
 					}
 					//                 GetOnlySingleNode(Alphas(5),ErrorsFound,Sys(SysNum)%SysType,Alphas(1), &
@@ -918,8 +917,8 @@ namespace SingleDuct {
 					if ( Sys( SysNum ).OutletNodeNum == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
 						if ( ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode > 0 ) {
 							ShowSevereError( "Error in connecting a terminal unit to a zone" );
-							ShowContinueError( trim( NodeID( Sys( SysNum ).OutletNodeNum ) ) + " already connects to another zone" );
-							ShowContinueError( "Occurs for terminal unit " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+							ShowContinueError( NodeID( Sys( SysNum ).OutletNodeNum ) + " already connects to another zone" );
+							ShowContinueError( "Occurs for terminal unit " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 							ShowContinueError( "Check terminal unit node names for errors" );
 							ErrorsFound = true;
 						} else {
@@ -932,7 +931,7 @@ namespace SingleDuct {
 
 			ValidateComponent( Alphas( 6 ), Alphas( 7 ), IsNotOK, Sys( SysNum ).SysType );
 			if ( IsNotOK ) {
-				ShowContinueError( "In " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+				ShowContinueError( "In " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
 
@@ -955,7 +954,7 @@ namespace SingleDuct {
 			SysNum = SysIndex + NumVAVSys + NumCBVAVSys + NumConstVolSys;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Sys.SysName(), SysNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), Sys.SysName(), SysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -963,16 +962,16 @@ namespace SingleDuct {
 			Sys( SysNum ).SysName = Alphas( 1 );
 			Sys( SysNum ).SysType = CurrentModuleObject;
 			Sys( SysNum ).SysType_Num = SingleDuctVAVNoReheat;
-			Sys( SysNum ).ReheatComp = " ";
-			Sys( SysNum ).ReheatName = " ";
+			Sys( SysNum ).ReheatComp = "";
+			Sys( SysNum ).ReheatName = "";
 			Sys( SysNum ).Schedule = Alphas( 2 );
 			if ( lAlphaBlanks( 2 ) ) {
 				Sys( SysNum ).SchedPtr = ScheduleAlwaysOn;
 			} else {
 				Sys( SysNum ).SchedPtr = GetScheduleIndex( Alphas( 2 ) );
 				if ( Sys( SysNum ).SchedPtr == 0 ) {
-					ShowSevereError( trim( cAlphaFields( 2 ) ) + " = " + trim( Alphas( 2 ) ) + " not found." );
-					ShowContinueError( "Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+					ShowSevereError( cAlphaFields( 2 ) + " = " + Alphas( 2 ) + " not found." );
+					ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 					ErrorsFound = true;
 				}
 			}
@@ -987,8 +986,8 @@ namespace SingleDuct {
 			} else if ( SameString( Alphas( 5 ), "Scheduled" ) ) {
 				Sys( SysNum ).ZoneMinAirFracMethod = ScheduledMinFrac;
 			} else {
-				ShowSevereError( trim( cAlphaFields( 5 ) ) + " = " + trim( Alphas( 5 ) ) + " not found." );
-				ShowContinueError( "Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+				ShowSevereError( cAlphaFields( 5 ) + " = " + Alphas( 5 ) + " not found." );
+				ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
 
@@ -1006,15 +1005,15 @@ namespace SingleDuct {
 
 			Sys( SysNum ).ZoneMinAirFracSchPtr = GetScheduleIndex( Alphas( 6 ) );
 			if ( ( Sys( SysNum ).ZoneMinAirFracSchPtr == 0 ) && ( Sys( SysNum ).ZoneMinAirFracMethod == ScheduledMinFrac ) ) {
-				ShowSevereError( trim( cAlphaFields( 6 ) ) + " = " + trim( Alphas( 6 ) ) + " not found." );
-				ShowContinueError( "Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+				ShowSevereError( cAlphaFields( 6 ) + " = " + Alphas( 6 ) + " not found." );
+				ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ShowContinueError( "A valid schedule is required" );
 				ErrorsFound = true;
 			} else if ( ( Sys( SysNum ).ZoneMinAirFracSchPtr > 0 ) && ( Sys( SysNum ).ZoneMinAirFracMethod == ScheduledMinFrac ) ) {
 				// check range of values in schedule
 				if ( ! CheckScheduleValueMinMax( Sys( SysNum ).ZoneMinAirFracSchPtr, ">=", 0.0, "<=", 1.0 ) ) {
-					ShowSevereError( "Error found in " + trim( cAlphaFields( 6 ) ) + " = " + trim( Alphas( 6 ) ) );
-					ShowContinueError( "Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+					ShowSevereError( "Error found in " + cAlphaFields( 6 ) + " = " + Alphas( 6 ) );
+					ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 					ShowContinueError( "Schedule values must be (>=0., <=1.)" );
 				}
 
@@ -1039,8 +1038,8 @@ namespace SingleDuct {
 					if ( Sys( SysNum ).ReheatAirOutletNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
 						if ( ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode > 0 ) {
 							ShowSevereError( "Error in connecting a terminal unit to a zone" );
-							ShowContinueError( trim( NodeID( Sys( SysNum ).ReheatAirOutletNode ) ) + " already connects to another zone" );
-							ShowContinueError( "Occurs for terminal unit " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+							ShowContinueError( NodeID( Sys( SysNum ).ReheatAirOutletNode ) + " already connects to another zone" );
+							ShowContinueError( "Occurs for terminal unit " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 							ShowContinueError( "Check terminal unit node names for errors" );
 							ErrorsFound = true;
 						} else {
@@ -1059,8 +1058,8 @@ namespace SingleDuct {
 			if ( ! lAlphaBlanks( 7 ) ) {
 				Sys( SysNum ).OARequirementsPtr = FindItemInList( Alphas( 7 ), OARequirements.Name(), NumOARequirements );
 				if ( Sys( SysNum ).OARequirementsPtr == 0 ) {
-					ShowSevereError( trim( cAlphaFields( 7 ) ) + " = " + trim( Alphas( 7 ) ) + " not found." );
-					ShowContinueError( "Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+					ShowSevereError( cAlphaFields( 7 ) + " = " + Alphas( 7 ) + " not found." );
+					ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 					ErrorsFound = true;
 				} else {
 					Sys( SysNum ).NoOAFlowInputFromUser = false;
@@ -1082,24 +1081,24 @@ namespace SingleDuct {
 			SysNum = SysIndex + NumVAVSys + NumCBVAVSys + NumConstVolSys + NumNoRHVAVSys;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Sys.SysName(), SysNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), Sys.SysName(), SysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			Sys( SysNum ).SysName = Alphas( 1 );
-			Sys( SysNum ).SysType = trim( CurrentModuleObject );
+			Sys( SysNum ).SysType = CurrentModuleObject;
 			Sys( SysNum ).SysType_Num = SingleDuctCBVAVNoReheat;
-			Sys( SysNum ).ReheatComp = " ";
-			Sys( SysNum ).ReheatName = " ";
+			Sys( SysNum ).ReheatComp = "";
+			Sys( SysNum ).ReheatName = "";
 			Sys( SysNum ).Schedule = Alphas( 2 );
 			if ( lAlphaBlanks( 2 ) ) {
 				Sys( SysNum ).SchedPtr = ScheduleAlwaysOn;
 			} else {
 				Sys( SysNum ).SchedPtr = GetScheduleIndex( Alphas( 2 ) );
 				if ( Sys( SysNum ).SchedPtr == 0 ) {
-					ShowSevereError( trim( cAlphaFields( 2 ) ) + " = " + trim( Alphas( 2 ) ) + " not found." );
-					ShowContinueError( "Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+					ShowSevereError( cAlphaFields( 2 ) + " = " + Alphas( 2 ) + " not found." );
+					ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 					ErrorsFound = true;
 				}
 			}
@@ -1108,13 +1107,13 @@ namespace SingleDuct {
 			Sys( SysNum ).MaxAirVolFlowRate = Numbers( 1 );
 			Sys( SysNum ).ZoneMinAirFrac = Numbers( 2 );
 			if ( Sys( SysNum ).ZoneMinAirFrac < 0.0 ) {
-				ShowWarningError( trim( Sys( SysNum ).SysType ) + " = \"" + trim( Sys( SysNum ).SysName ) );
-				ShowContinueError( trim( cNumericFields( 2 ) ) + " must be greater than or equal to 0. Resetting to 0 and" " the simulation continues." );
+				ShowWarningError( Sys( SysNum ).SysType + " = \"" + Sys( SysNum ).SysName );
+				ShowContinueError( cNumericFields( 2 ) + " must be greater than or equal to 0. Resetting to 0 and" " the simulation continues." );
 				Sys( SysNum ).ZoneMinAirFrac = 0.0;
 			}
 			if ( Sys( SysNum ).ZoneMinAirFrac > 1.0 ) {
-				ShowWarningError( trim( Sys( SysNum ).SysType ) + " = \"" + trim( Sys( SysNum ).SysName ) );
-				ShowContinueError( trim( cNumericFields( 2 ) ) + " must be less than or equal to 1. Resetting to 1 and" " the simulation continues." );
+				ShowWarningError( Sys( SysNum ).SysType + " = \"" + Sys( SysNum ).SysName );
+				ShowContinueError( cNumericFields( 2 ) + " must be less than or equal to 1. Resetting to 1 and" " the simulation continues." );
 				Sys( SysNum ).ZoneMinAirFrac = 1.0;
 			}
 
@@ -1137,8 +1136,8 @@ namespace SingleDuct {
 					if ( Sys( SysNum ).ReheatAirOutletNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
 						if ( ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode > 0 ) {
 							ShowSevereError( "Error in connecting a terminal unit to a zone" );
-							ShowContinueError( trim( NodeID( Sys( SysNum ).ReheatAirOutletNode ) ) + " already connects to another zone" );
-							ShowContinueError( "Occurs for terminal unit " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+							ShowContinueError( NodeID( Sys( SysNum ).ReheatAirOutletNode ) + " already connects to another zone" );
+							ShowContinueError( "Occurs for terminal unit " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 							ShowContinueError( "Check terminal unit node names for errors" );
 							ErrorsFound = true;
 						} else {
@@ -1164,13 +1163,13 @@ namespace SingleDuct {
 			SysNum = SysIndex + NumVAVSys + NumCBVAVSys + NumConstVolSys + NumNoRHVAVSys + NumNoRHCBVAVSys;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Sys.SysName(), SysNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), Sys.SysName(), SysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			Sys( SysNum ).SysName = Alphas( 1 );
-			Sys( SysNum ).SysType = trim( CurrentModuleObject );
+			Sys( SysNum ).SysType = CurrentModuleObject;
 			Sys( SysNum ).SysType_Num = SingleDuctVAVReheatVSFan;
 			Sys( SysNum ).ReheatComp = Alphas( 9 );
 			Sys( SysNum ).ReheatName = Alphas( 10 );
@@ -1179,40 +1178,40 @@ namespace SingleDuct {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Gas;
 				Sys( SysNum ).ReheatAirOutletNode = GetHeatingCoilOutletNode( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK );
 				Sys( SysNum ).ReheatCoilMaxCapacity = GetHeatingCoilCapacity( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK );
-				if ( IsNotOK ) ShowContinueError( "Occurs for terminal unit " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+				if ( IsNotOK ) ShowContinueError( "Occurs for terminal unit " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 			} else if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Electric" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Electric;
 				Sys( SysNum ).ReheatAirOutletNode = GetHeatingCoilOutletNode( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK );
 				Sys( SysNum ).ReheatCoilMaxCapacity = GetHeatingCoilCapacity( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK );
-				if ( IsNotOK ) ShowContinueError( "Occurs for terminal unit " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+				if ( IsNotOK ) ShowContinueError( "Occurs for terminal unit " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 			} else if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Water" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_SimpleHeating;
 				Sys( SysNum ).ReheatComp_PlantType = TypeOf_CoilWaterSimpleHeating;
 			} else if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Steam" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_SteamAirHeating;
 				Sys( SysNum ).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
-			} else if ( Sys( SysNum ).ReheatComp != " " ) {
-				ShowSevereError( "Illegal " + trim( cAlphaFields( 9 ) ) + " = " + trim( Sys( SysNum ).ReheatComp ) + "." );
-				ShowContinueError( "Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+			} else if ( Sys( SysNum ).ReheatComp != "" ) {
+				ShowSevereError( "Illegal " + cAlphaFields( 9 ) + " = " + Sys( SysNum ).ReheatComp + '.' );
+				ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
 			ValidateComponent( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK, Sys( SysNum ).SysType );
 			if ( IsNotOK ) {
-				ShowContinueError( "In " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+				ShowContinueError( "In " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
 			Sys( SysNum ).FanType = Alphas( 7 );
 			if ( SameString( Sys( SysNum ).FanType, "Fan:VariableVolume" ) ) {
 				Sys( SysNum ).Fan_Num = FanType_VS;
-			} else if ( Sys( SysNum ).FanType != " " ) {
-				ShowSevereError( "Illegal " + trim( cAlphaFields( 7 ) ) + " = " + trim( Sys( SysNum ).FanType ) + "." );
-				ShowContinueError( "Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+			} else if ( Sys( SysNum ).FanType != "" ) {
+				ShowSevereError( "Illegal " + cAlphaFields( 7 ) + " = " + Sys( SysNum ).FanType + '.' );
+				ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
 			Sys( SysNum ).FanName = Alphas( 8 );
 			ValidateComponent( Sys( SysNum ).FanType, Sys( SysNum ).FanName, IsNotOK, Sys( SysNum ).SysType );
 			if ( IsNotOK ) {
-				ShowContinueError( "In " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+				ShowContinueError( "In " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
 
@@ -1222,8 +1221,8 @@ namespace SingleDuct {
 			} else {
 				Sys( SysNum ).SchedPtr = GetScheduleIndex( Alphas( 2 ) );
 				if ( Sys( SysNum ).SchedPtr == 0 ) {
-					ShowSevereError( trim( cAlphaFields( 2 ) ) + " = " + trim( Alphas( 2 ) ) + " not found." );
-					ShowContinueError( "Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+					ShowSevereError( cAlphaFields( 2 ) + " = " + Alphas( 2 ) + " not found." );
+					ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 					ErrorsFound = true;
 				}
 			}
@@ -1236,7 +1235,7 @@ namespace SingleDuct {
 
 			Sys( SysNum ).OutletNodeNum = GetFanOutletNode( Sys( SysNum ).FanType, Sys( SysNum ).FanName, IsNotOK );
 			if ( IsNotOK ) {
-				ShowContinueError( "..Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+				ShowContinueError( "..Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
 			//               GetOnlySingleNode(Alphas(5),ErrorsFound,Sys(SysNum)%SysType,Alphas(1), &
@@ -1247,7 +1246,7 @@ namespace SingleDuct {
 			IsNotOK = false;
 			Sys( SysNum ).InletNodeNum = GetFanInletNode( Sys( SysNum ).FanType, Sys( SysNum ).FanName, IsNotOK );
 			if ( IsNotOK ) {
-				ShowContinueError( "..Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+				ShowContinueError( "..Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
 			//               GetOnlySingleNode(Alphas(3),ErrorsFound,Sys(SysNum)%SysType,Alphas(1), &
@@ -1273,7 +1272,7 @@ namespace SingleDuct {
 					IsNotOK = false;
 					Sys( SysNum ).ReheatControlNode = GetCoilSteamInletNode( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK );
 					if ( IsNotOK ) {
-						ShowContinueError( "..Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+						ShowContinueError( "..Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 						ErrorsFound = true;
 					} else {
 						//  A4,     \field Unit supply air outlet node
@@ -1283,7 +1282,7 @@ namespace SingleDuct {
 						IsNotOK = false;
 						Sys( SysNum ).ReheatAirOutletNode = GetCoilAirOutletNode( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK );
 						if ( IsNotOK ) {
-							ShowContinueError( "..Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+							ShowContinueError( "..Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 							ErrorsFound = true;
 						}
 					}
@@ -1293,7 +1292,7 @@ namespace SingleDuct {
 					IsNotOK = false;
 					Sys( SysNum ).ReheatControlNode = GetCoilWaterInletNode( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK );
 					if ( IsNotOK ) {
-						ShowContinueError( "..Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+						ShowContinueError( "..Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 						ErrorsFound = true;
 					} else {
 						//  A4,     \field Unit supply air outlet node
@@ -1303,7 +1302,7 @@ namespace SingleDuct {
 						IsNotOK = false;
 						Sys( SysNum ).ReheatAirOutletNode = GetCoilOutletNode( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK );
 						if ( IsNotOK ) {
-							ShowContinueError( "..Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+							ShowContinueError( "..Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 							ErrorsFound = true;
 						}
 					}
@@ -1345,8 +1344,8 @@ namespace SingleDuct {
 						IsNotOK = false;
 						if ( ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode > 0 ) {
 							ShowSevereError( "Error in connecting a terminal unit to a zone" );
-							ShowContinueError( trim( NodeID( Sys( SysNum ).ReheatAirOutletNode ) ) + " already connects to another zone" );
-							ShowContinueError( "Occurs for terminal unit " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+							ShowContinueError( NodeID( Sys( SysNum ).ReheatAirOutletNode ) + " already connects to another zone" );
+							ShowContinueError( "Occurs for terminal unit " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 							ShowContinueError( "Check terminal unit node names for errors" );
 							ErrorsFound = true;
 						} else {
@@ -1358,7 +1357,7 @@ namespace SingleDuct {
 			}
 			if ( IsNotOK ) {
 				ShowWarningError( "Did not Match Supply Air Outlet Node to any Zone Node" );
-				ShowContinueError( "..Occurs in " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+				ShowContinueError( "..Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 			}
 
 			// Add reheat coil to component sets array
@@ -1380,8 +1379,8 @@ namespace SingleDuct {
 			}
 			// one assumes if there isn't one assigned, it's an error?
 			if ( Sys( SysIndex ).ADUNum == 0 ) {
-				ShowSevereError( RoutineName + "No matching Air Distribution Unit, for System = [" + trim( Sys( SysIndex ).SysType ) + "," + trim( Sys( SysIndex ).SysName ) + "]." );
-				ShowContinueError( "...should have outlet node = " + trim( NodeID( Sys( SysIndex ).ReheatAirOutletNode ) ) );
+				ShowSevereError( RoutineName + "No matching Air Distribution Unit, for System = [" + Sys( SysIndex ).SysType + ',' + Sys( SysIndex ).SysName + "]." );
+				ShowContinueError( "...should have outlet node = " + NodeID( Sys( SysIndex ).ReheatAirOutletNode ) );
 				//          ErrorsFound=.TRUE.
 			}
 		}
@@ -1397,7 +1396,7 @@ namespace SingleDuct {
 						if ( FinalZoneSizing( ZoneSizIndex ).ActualZoneNum == Sys( SysIndex ).ActualZoneNum ) {
 							if ( FinalZoneSizing( ZoneSizIndex ).ZoneSecondaryRecirculation > 0.0 ) {
 								ShowWarningError( RoutineName + "A zone secondary recirculation fraction is specified for zone served by " );
-								ShowContinueError( "...terminal unit \"" + trim( Sys( SysIndex ).SysName ) + "\" , that indicates a single path system" );
+								ShowContinueError( "...terminal unit \"" + Sys( SysIndex ).SysName + "\" , that indicates a single path system" );
 								ShowContinueError( "...The zone secondary recirculation for that zone was set to 0.0" );
 								FinalZoneSizing( ZoneSizIndex ).ZoneSecondaryRecirculation = 0.0;
 								goto SizLoop_exit;
@@ -1520,7 +1519,7 @@ namespace SingleDuct {
 				ScanPlantLoopsForObject( Sys( SysNum ).ReheatName, Sys( SysNum ).ReheatComp_PlantType, Sys( SysNum ).HWLoopNum, Sys( SysNum ).HWLoopSide, Sys( SysNum ).HWBranchIndex, Sys( SysNum ).HWCompIndex, _, _, _, _, _, errFlag );
 
 				if ( errFlag ) {
-					ShowContinueError( "Reference Unit=\"" + trim( Sys( SysNum ).SysName ) + "\", type=" + trim( Sys( SysNum ).SysType ) );
+					ShowContinueError( "Reference Unit=\"" + Sys( SysNum ).SysName + "\", type=" + Sys( SysNum ).SysType );
 					ShowFatalError( "InitSys: Program terminated for previous conditions." );
 				}
 
@@ -1540,8 +1539,8 @@ namespace SingleDuct {
 			for ( SysIndex = 1; SysIndex <= NumSys; ++SysIndex ) {
 				if ( Sys( SysIndex ).ADUNum == 0 ) continue;
 				if ( CheckZoneEquipmentList( "ZoneHVAC:AirDistributionUnit", AirDistUnit( Sys( SysIndex ).ADUNum ).Name ) ) continue;
-				ShowSevereError( "InitSingleDuctSystems: ADU=[Air Distribution Unit," + trim( AirDistUnit( Sys( SysIndex ).ADUNum ).Name ) + "] is not on any ZoneHVAC:EquipmentList." );
-				ShowContinueError( "...System=[" + trim( Sys( SysIndex ).SysType ) + "," + trim( Sys( SysIndex ).SysName ) + "] will not be simulated." );
+				ShowSevereError( "InitSingleDuctSystems: ADU=[Air Distribution Unit," + AirDistUnit( Sys( SysIndex ).ADUNum ).Name + "] is not on any ZoneHVAC:EquipmentList." );
+				ShowContinueError( "...System=[" + Sys( SysIndex ).SysType + ',' + Sys( SysIndex ).SysName + "] will not be simulated." );
 			}
 		}
 
@@ -1557,7 +1556,7 @@ namespace SingleDuct {
 				if ( Sys( SysNum ).ReheatCoilMaxCapacity == AutoSize ) {
 					errFlag = false;
 					Sys( SysNum ).ReheatCoilMaxCapacity = GetHeatingCoilCapacity( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, errFlag );
-					if ( errFlag ) ShowContinueError( "Occurs for terminal unit " + trim( Sys( SysNum ).SysType ) + " = " + trim( Sys( SysNum ).SysName ) );
+					if ( errFlag ) ShowContinueError( "Occurs for terminal unit " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				}
 				if ( Sys( SysNum ).ReheatCoilMaxCapacity != AutoSize ) {
 					GetGasElecHeatCoilCap( SysNum ) = false;
@@ -1828,9 +1827,9 @@ namespace SingleDuct {
 						ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Air Flow Rate [m3/s]", MaxAirVolFlowRateDes, "User-Specified Maximum Air Flow Rate [m3/s]", MaxAirVolFlowRateUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( MaxAirVolFlowRateDes - MaxAirVolFlowRateUser ) / MaxAirVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeHVACSingleDuct: Potential issue with equipment sizing for " + trim( Sys( SysNum ).SysType ) + " = \"" + trim( Sys( SysNum ).SysName ) + "\"." );
-								ShowContinueError( "User-Specified Maximum Air Flow Rate of " + trim( RoundSigDigits( MaxAirVolFlowRateUser, 5 ) ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Maximum Air Flow Rate of " + trim( RoundSigDigits( MaxAirVolFlowRateDes, 5 ) ) + " [m3/s]" );
+								ShowMessage( "SizeHVACSingleDuct: Potential issue with equipment sizing for " + Sys( SysNum ).SysType + " = \"" + Sys( SysNum ).SysName + "\"." );
+								ShowContinueError( "User-Specified Maximum Air Flow Rate of " + RoundSigDigits( MaxAirVolFlowRateUser, 5 ) + " [m3/s]" );
+								ShowContinueError( "differs from Design Size Maximum Air Flow Rate of " + RoundSigDigits( MaxAirVolFlowRateDes, 5 ) + " [m3/s]" );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
@@ -1867,9 +1866,9 @@ namespace SingleDuct {
 						ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Heating Air Flow Rate [m3/s]", MaxHeatAirVolFlowRateDes, "User-Specified Maximum Heating Air Flow Rate [m3/s]", MaxHeatAirVolFlowRateUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( MaxHeatAirVolFlowRateDes - MaxHeatAirVolFlowRateUser ) / MaxHeatAirVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeHVACSingleDuct: Potential issue with equipment sizing for " + trim( Sys( SysNum ).SysType ) + " = \"" + trim( Sys( SysNum ).SysName ) + "\"." );
-								ShowContinueError( "User-Specified Maximum Heating Air Flow Rate of " + trim( RoundSigDigits( MaxHeatAirVolFlowRateUser, 5 ) ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Maximum Heating Air Flow Rate of " + trim( RoundSigDigits( MaxHeatAirVolFlowRateDes, 5 ) ) + " [m3/s]" );
+								ShowMessage( "SizeHVACSingleDuct: Potential issue with equipment sizing for " + Sys( SysNum ).SysType + " = \"" + Sys( SysNum ).SysName + "\"." );
+								ShowContinueError( "User-Specified Maximum Heating Air Flow Rate of " + RoundSigDigits( MaxHeatAirVolFlowRateUser, 5 ) + " [m3/s]" );
+								ShowContinueError( "differs from Design Size Maximum Heating Air Flow Rate of " + RoundSigDigits( MaxHeatAirVolFlowRateDes, 5 ) + " [m3/s]" );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
@@ -1920,9 +1919,9 @@ namespace SingleDuct {
 				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]", MaxAirVolFlowRateDuringReheatDes / Sys( SysNum ).ZoneFloorArea, "User-Specified Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]", MaxAirVolFlowRateDuringReheatUser );
 				if ( DisplayExtraWarnings ) {
 					if ( ( std::abs( MaxAirVolFlowRateDuringReheatDes - MaxAirVolFlowRateDuringReheatUser ) / MaxAirVolFlowRateDuringReheatUser ) > AutoVsHardSizingThreshold ) {
-						ShowMessage( "SizeHVACSingleDuct: Potential issue with equipment sizing for " + trim( Sys( SysNum ).SysType ) + " = \"" + trim( Sys( SysNum ).SysName ) + "\"." );
-						ShowContinueError( "User-Specified Maximum Flow per Zone Floor Area during Reheat of " + trim( RoundSigDigits( MaxAirVolFlowRateDuringReheatUser, 5 ) ) + " [m3/s-m2]" );
-						ShowContinueError( "differs from Design Size Maximum Flow per Zone Floor Area during Reheat of " + trim( RoundSigDigits( MaxAirVolFlowRateDuringReheatDes, 5 ) ) + " [m3/s-m2]" );
+						ShowMessage( "SizeHVACSingleDuct: Potential issue with equipment sizing for " + Sys( SysNum ).SysType + " = \"" + Sys( SysNum ).SysName + "\"." );
+						ShowContinueError( "User-Specified Maximum Flow per Zone Floor Area during Reheat of " + RoundSigDigits( MaxAirVolFlowRateDuringReheatUser, 5 ) + " [m3/s-m2]" );
+						ShowContinueError( "differs from Design Size Maximum Flow per Zone Floor Area during Reheat of " + RoundSigDigits( MaxAirVolFlowRateDuringReheatDes, 5 ) + " [m3/s-m2]" );
 						ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 						ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 					}
@@ -1950,9 +1949,9 @@ namespace SingleDuct {
 				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Flow Fraction during Reheat []", MaxAirVolFractionDuringReheatDes, "User-Specified Maximum Flow Fraction during Reheat []", MaxAirVolFractionDuringReheatUser );
 				if ( DisplayExtraWarnings ) {
 					if ( ( std::abs( MaxAirVolFractionDuringReheatDes - MaxAirVolFractionDuringReheatUser ) / MaxAirVolFractionDuringReheatUser ) > AutoVsHardSizingThreshold ) {
-						ShowMessage( "SizeHVACSingleDuct: Potential issue with equipment sizing for " + trim( Sys( SysNum ).SysType ) + " = \"" + trim( Sys( SysNum ).SysName ) + "\"." );
-						ShowContinueError( "User-Specified Maximum Flow Fraction during Reheat of " + trim( RoundSigDigits( MaxAirVolFractionDuringReheatUser, 5 ) ) + " []" );
-						ShowContinueError( "differs from Design Size Maximum Flow Fraction during Reheat of " + trim( RoundSigDigits( MaxAirVolFractionDuringReheatDes, 5 ) ) + " []" );
+						ShowMessage( "SizeHVACSingleDuct: Potential issue with equipment sizing for " + Sys( SysNum ).SysType + " = \"" + Sys( SysNum ).SysName + "\"." );
+						ShowContinueError( "User-Specified Maximum Flow Fraction during Reheat of " + RoundSigDigits( MaxAirVolFractionDuringReheatUser, 5 ) + " []" );
+						ShowContinueError( "differs from Design Size Maximum Flow Fraction during Reheat of " + RoundSigDigits( MaxAirVolFractionDuringReheatDes, 5 ) + " []" );
 						ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 						ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 					}
@@ -2033,7 +2032,7 @@ namespace SingleDuct {
 						PlantSizingErrorsFound = false;
 						PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Water", Sys( SysNum ).ReheatName, CoilWaterInletNode, CoilWaterOutletNode, PlantSizingErrorsFound );
 						if ( PlantSizingErrorsFound ) {
-							ShowContinueError( "...Occurs in " + trim( Sys( SysNum ).SysType ) + ":" + trim( Sys( SysNum ).SysName ) );
+							ShowContinueError( "...Occurs in " + Sys( SysNum ).SysType + ':' + Sys( SysNum ).SysName );
 							ErrorsFound = true;
 						}
 						if ( PltSizHeatNum > 0 ) {
@@ -2056,7 +2055,7 @@ namespace SingleDuct {
 							}
 						} else {
 							ShowSevereError( "Autosizing of water flow requires a heating loop Sizing:Plant object" );
-							ShowContinueError( "Occurs in AirTerminal Object=" + trim( Sys( SysNum ).SysName ) );
+							ShowContinueError( "Occurs in AirTerminal Object=" + Sys( SysNum ).SysName );
 							ErrorsFound = true;
 						}
 					}
@@ -2070,9 +2069,9 @@ namespace SingleDuct {
 							ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Reheat Water Flow Rate [m3/s]", MaxReheatWaterVolFlowDes, "User-Specified Maximum Reheat Water Flow Rate [m3/s]", MaxReheatWaterVolFlowUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( MaxReheatWaterVolFlowDes - MaxReheatWaterVolFlowUser ) / MaxReheatWaterVolFlowUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeHVACSingleDuct: Potential issue with equipment sizing for " + trim( Sys( SysNum ).SysType ) + " = \"" + trim( Sys( SysNum ).SysName ) + "\"." );
-									ShowContinueError( "User-Specified Maximum Reheat Water Flow Rate of " + trim( RoundSigDigits( MaxReheatWaterVolFlowUser, 5 ) ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Maximum Reheat Water Flow Rate of " + trim( RoundSigDigits( MaxReheatWaterVolFlowDes, 5 ) ) + " [m3/s]" );
+									ShowMessage( "SizeHVACSingleDuct: Potential issue with equipment sizing for " + Sys( SysNum ).SysType + " = \"" + Sys( SysNum ).SysName + "\"." );
+									ShowContinueError( "User-Specified Maximum Reheat Water Flow Rate of " + RoundSigDigits( MaxReheatWaterVolFlowUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Maximum Reheat Water Flow Rate of " + RoundSigDigits( MaxReheatWaterVolFlowDes, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -2103,7 +2102,7 @@ namespace SingleDuct {
 						PlantSizingErrorsFound = false;
 						PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Steam", Sys( SysNum ).ReheatName, CoilSteamInletNode, CoilSteamOutletNode, PlantSizingErrorsFound );
 						if ( PlantSizingErrorsFound ) {
-							ShowContinueError( "...Occurs in " + trim( Sys( SysNum ).SysType ) + ":" + trim( Sys( SysNum ).SysName ) );
+							ShowContinueError( "...Occurs in " + Sys( SysNum ).SysType + ':' + Sys( SysNum ).SysName );
 							ErrorsFound = true;
 						}
 						if ( PltSizHeatNum > 0 ) {
@@ -2128,7 +2127,7 @@ namespace SingleDuct {
 							}
 						} else {
 							ShowSevereError( "Autosizing of Steam flow requires a heating loop Sizing:Plant object" );
-							ShowContinueError( "Occurs in AirTerminal:SingleDuct:ConstantVolume:Reheat Object=" + trim( Sys( SysNum ).SysName ) );
+							ShowContinueError( "Occurs in AirTerminal:SingleDuct:ConstantVolume:Reheat Object=" + Sys( SysNum ).SysName );
 							ErrorsFound = true;
 						}
 					}
@@ -2141,9 +2140,9 @@ namespace SingleDuct {
 							ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Reheat Steam Flow Rate [m3/s]", MaxReheatSteamVolFlowDes, "User-Specified Maximum Reheat Steam Flow Rate [m3/s]", MaxReheatSteamVolFlowUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( MaxReheatSteamVolFlowDes - MaxReheatSteamVolFlowUser ) / MaxReheatSteamVolFlowUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeHVACSingleDuct: Potential issue with equipment sizing for " + trim( Sys( SysNum ).SysType ) + " = \"" + trim( Sys( SysNum ).SysName ) + "\"." );
-									ShowContinueError( "User-Specified Maximum Reheat Steam Flow Rate of " + trim( RoundSigDigits( MaxReheatSteamVolFlowUser, 5 ) ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Maximum Reheat Steam Flow Rate of " + trim( RoundSigDigits( MaxReheatSteamVolFlowDes, 5 ) ) + " [m3/s]" );
+									ShowMessage( "SizeHVACSingleDuct: Potential issue with equipment sizing for " + Sys( SysNum ).SysType + " = \"" + Sys( SysNum ).SysName + "\"." );
+									ShowContinueError( "User-Specified Maximum Reheat Steam Flow Rate of " + RoundSigDigits( MaxReheatSteamVolFlowUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Maximum Reheat Steam Flow Rate of " + RoundSigDigits( MaxReheatSteamVolFlowDes, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -2175,9 +2174,9 @@ namespace SingleDuct {
 				// Only warn when really out of bounds
 				if ( ( Sys( SysNum ).ZoneMinAirFrac * Sys( SysNum ).MaxAirVolFlowRate ) - Sys( SysNum ).MaxAirVolFlowRateDuringReheat > 1.e-8 ) {
 					ShowWarningError( "SingleDuctSystem:SizeSys: Air Terminal Unit flow limits are not consistent, " "minimum flow limit is larger than reheat maximum" );
-					ShowContinueError( "Air Terminal Unit name = " + trim( Sys( SysNum ).SysName ) );
-					ShowContinueError( "Maximum terminal flow during reheat = " + trim( RoundSigDigits( Sys( SysNum ).MaxAirVolFlowRateDuringReheat, 6 ) ) + " [m3/s] or flow fraction = " + trim( RoundSigDigits( ( Sys( SysNum ).MaxAirVolFlowRateDuringReheat / Sys( SysNum ).MaxAirVolFlowRate ), 4 ) ) );
-					ShowContinueError( "Minimum terminal flow = " + trim( RoundSigDigits( ( Sys( SysNum ).ZoneMinAirFrac * Sys( SysNum ).MaxAirVolFlowRate ), 6 ) ) + " [m3/s] or flow fraction = " + trim( RoundSigDigits( Sys( SysNum ).ZoneMinAirFrac, 4 ) ) );
+					ShowContinueError( "Air Terminal Unit name = " + Sys( SysNum ).SysName );
+					ShowContinueError( "Maximum terminal flow during reheat = " + RoundSigDigits( Sys( SysNum ).MaxAirVolFlowRateDuringReheat, 6 ) + " [m3/s] or flow fraction = " + RoundSigDigits( ( Sys( SysNum ).MaxAirVolFlowRateDuringReheat / Sys( SysNum ).MaxAirVolFlowRate ), 4 ) );
+					ShowContinueError( "Minimum terminal flow = " + RoundSigDigits( ( Sys( SysNum ).ZoneMinAirFrac * Sys( SysNum ).MaxAirVolFlowRate ), 6 ) + " [m3/s] or flow fraction = " + RoundSigDigits( Sys( SysNum ).ZoneMinAirFrac, 4 ) );
 					ShowContinueError( "The reheat maximum flow limit will be replaced by the minimum limit, and the simulation continues" );
 				}
 				Sys( SysNum ).MaxAirVolFlowRateDuringReheat = ( Sys( SysNum ).ZoneMinAirFrac * Sys( SysNum ).MaxAirVolFlowRate );
@@ -2591,7 +2590,7 @@ namespace SingleDuct {
 				// If something else is there that is not a reheat coil or a blank then give the error message
 
 			} else {
-				ShowFatalError( "Invalid Reheat Component=" + trim( Sys( SysNum ).ReheatComp ) );
+				ShowFatalError( "Invalid Reheat Component=" + Sys( SysNum ).ReheatComp );
 			}}
 
 			//the COIL is OFF the properties are calculated for this special case.
@@ -2622,7 +2621,7 @@ namespace SingleDuct {
 				// If something else is that is not a reheat coil or a blank then give the error message
 
 			} else {
-				ShowFatalError( "Invalid Reheat Component=" + trim( Sys( SysNum ).ReheatComp ) );
+				ShowFatalError( "Invalid Reheat Component=" + Sys( SysNum ).ReheatComp );
 			}}
 
 		}
@@ -2997,7 +2996,7 @@ namespace SingleDuct {
 				// If something else is there that is not a reheat coil then give the error message below.
 
 			} else {
-				ShowFatalError( "Invalid Reheat Component=" + trim( Sys( SysNum ).ReheatComp ) );
+				ShowFatalError( "Invalid Reheat Component=" + Sys( SysNum ).ReheatComp );
 			}}
 
 			//the COIL is OFF the properties are calculated for this special case.
@@ -3030,7 +3029,7 @@ namespace SingleDuct {
 				// If something else is there that is not a reheat coil then give the error message
 
 			} else {
-				ShowFatalError( "Invalid Reheat Component=" + trim( Sys( SysNum ).ReheatComp ) );
+				ShowFatalError( "Invalid Reheat Component=" + Sys( SysNum ).ReheatComp );
 			}}
 
 		}
@@ -3230,16 +3229,16 @@ namespace SingleDuct {
 				SolveRegulaFalsi( UnitFlowToler, 50, SolFlag, MassFlow, VAVVSCoolingResidual, MinMassFlow, MaxCoolMassFlow, Par );
 				if ( SolFlag == -1 ) {
 					if ( Sys( SysNum ).IterationLimit == 0 ) {
-						ShowWarningError( "Supply air flow control failed in VS VAV terminal unit " + trim( Sys( SysNum ).SysName ) );
+						ShowWarningError( "Supply air flow control failed in VS VAV terminal unit " + Sys( SysNum ).SysName );
 						ShowContinueError( "  Iteration limit exceeded in calculating air flow rate" );
 					}
-					ShowRecurringWarningErrorAtEnd( "Supply air flow Iteration limit exceeded in VS VAV terminal unit " + trim( Sys( SysNum ).SysName ), Sys( SysNum ).IterationLimit );
+					ShowRecurringWarningErrorAtEnd( "Supply air flow Iteration limit exceeded in VS VAV terminal unit " + Sys( SysNum ).SysName, Sys( SysNum ).IterationLimit );
 				} else if ( SolFlag == -2 ) {
 					if ( Sys( SysNum ).IterationFailed == 0 ) {
-						ShowWarningError( "Supply air flow control failed in VS VAV terminal unit " + trim( Sys( SysNum ).SysName ) );
+						ShowWarningError( "Supply air flow control failed in VS VAV terminal unit " + Sys( SysNum ).SysName );
 						ShowContinueError( "  Bad air flow limits" );
 					}
-					ShowRecurringWarningErrorAtEnd( "Supply air flow control failed in VS VAV terminal unit " + trim( Sys( SysNum ).SysName ), Sys( SysNum ).IterationFailed );
+					ShowRecurringWarningErrorAtEnd( "Supply air flow control failed in VS VAV terminal unit " + Sys( SysNum ).SysName, Sys( SysNum ).IterationFailed );
 				}
 
 			} else {
@@ -3287,11 +3286,11 @@ namespace SingleDuct {
 					ErrTolerance = Sys( SysNum ).ControllerOffset;
 					SolveRegulaFalsi( ErrTolerance, 500, SolFlag, HWFlow, VAVVSHWNoFanResidual, MinFlowWater, MaxFlowWater, Par );
 					if ( SolFlag == -1 ) {
-						ShowRecurringWarningErrorAtEnd( "Hot Water flow control failed in VS VAV terminal unit " + trim( Sys( SysNum ).SysName ), Sys( SysNum ).ErrCount1 );
+						ShowRecurringWarningErrorAtEnd( "Hot Water flow control failed in VS VAV terminal unit " + Sys( SysNum ).SysName, Sys( SysNum ).ErrCount1 );
 						ShowRecurringContinueErrorAtEnd( "...Iteration limit (500) exceeded in calculating the hot water flow rate", Sys( SysNum ).ErrCount1c );
 						CalcVAVVS( SysNum, FirstHVACIteration, ZoneNodeNum, HCType, HWFlow, 0.0, FanType, MassFlow, FanOp, QDelivered );
 					} else if ( SolFlag == -2 ) {
-						ShowRecurringWarningErrorAtEnd( "Hot Water flow control failed (bad air flow limits) in VS VAV terminal unit " + trim( Sys( SysNum ).SysName ), Sys( SysNum ).ErrCount2 );
+						ShowRecurringWarningErrorAtEnd( "Hot Water flow control failed (bad air flow limits) in VS VAV terminal unit " + Sys( SysNum ).SysName, Sys( SysNum ).ErrCount2 );
 					}
 				} else if ( QTotLoad >= QHeatFanOffMax - SmallLoad && QTotLoad <= QHeatFanOnMin + SmallLoad ) {
 					MassFlow = MinMassFlow;
@@ -3315,16 +3314,16 @@ namespace SingleDuct {
 					SolveRegulaFalsi( UnitFlowToler, 50, SolFlag, MassFlow, VAVVSHWFanOnResidual, MinMassFlow, MaxHeatMassFlow, Par );
 					if ( SolFlag == -1 ) {
 						if ( Sys( SysNum ).IterationLimit == 0 ) {
-							ShowWarningError( "Supply air flow control failed in VS VAV terminal unit " + trim( Sys( SysNum ).SysName ) );
+							ShowWarningError( "Supply air flow control failed in VS VAV terminal unit " + Sys( SysNum ).SysName );
 							ShowContinueError( "  Iteration limit exceeded in calculating air flow rate" );
 						}
-						ShowRecurringWarningErrorAtEnd( "Supply air flow Iteration limit exceeded in VS VAV terminal unit " + trim( Sys( SysNum ).SysName ), Sys( SysNum ).IterationLimit );
+						ShowRecurringWarningErrorAtEnd( "Supply air flow Iteration limit exceeded in VS VAV terminal unit " + Sys( SysNum ).SysName, Sys( SysNum ).IterationLimit );
 					} else if ( SolFlag == -2 ) {
 						if ( Sys( SysNum ).IterationFailed == 0 ) {
-							ShowWarningError( "Supply air flow control failed in VS VAV terminal unit " + trim( Sys( SysNum ).SysName ) );
+							ShowWarningError( "Supply air flow control failed in VS VAV terminal unit " + Sys( SysNum ).SysName );
 							ShowContinueError( "  Bad air flow limits" );
 						}
-						ShowRecurringWarningErrorAtEnd( "Supply air flow control failed in VS VAV terminal unit " + trim( Sys( SysNum ).SysName ), Sys( SysNum ).IterationFailed );
+						ShowRecurringWarningErrorAtEnd( "Supply air flow control failed in VS VAV terminal unit " + Sys( SysNum ).SysName, Sys( SysNum ).IterationFailed );
 					}
 				} else {
 					MassFlow = MaxHeatMassFlow;
@@ -3355,11 +3354,11 @@ namespace SingleDuct {
 					ErrTolerance = Sys( SysNum ).ControllerOffset;
 					SolveRegulaFalsi( ErrTolerance, 500, SolFlag, HWFlow, VAVVSHWNoFanResidual, MinFlowSteam, MaxFlowSteam, Par );
 					if ( SolFlag == -1 ) {
-						ShowRecurringWarningErrorAtEnd( "Steam flow control failed in VS VAV terminal unit " + trim( Sys( SysNum ).SysName ), Sys( SysNum ).ErrCount1 );
+						ShowRecurringWarningErrorAtEnd( "Steam flow control failed in VS VAV terminal unit " + Sys( SysNum ).SysName, Sys( SysNum ).ErrCount1 );
 						ShowRecurringContinueErrorAtEnd( "...Iteration limit (500) exceeded in calculating the hot water flow rate", Sys( SysNum ).ErrCount1c );
 						CalcVAVVS( SysNum, FirstHVACIteration, ZoneNodeNum, HCType, HWFlow, 0.0, FanType, MassFlow, FanOp, QDelivered );
 					} else if ( SolFlag == -2 ) {
-						ShowRecurringWarningErrorAtEnd( "Steam flow control failed (bad air flow limits) in VS VAV terminal unit " + trim( Sys( SysNum ).SysName ), Sys( SysNum ).ErrCount2 );
+						ShowRecurringWarningErrorAtEnd( "Steam flow control failed (bad air flow limits) in VS VAV terminal unit " + Sys( SysNum ).SysName, Sys( SysNum ).ErrCount2 );
 					}
 				} else if ( QTotLoad >= QHeatFanOffMax - SmallLoad && QTotLoad <= QHeatFanOnMin + SmallLoad ) {
 					MassFlow = MinMassFlow;
@@ -3382,16 +3381,16 @@ namespace SingleDuct {
 					SolveRegulaFalsi( UnitFlowToler, 50, SolFlag, MassFlow, VAVVSHWFanOnResidual, MinMassFlow, MaxHeatMassFlow, Par );
 					if ( SolFlag == -1 ) {
 						if ( Sys( SysNum ).IterationLimit == 0 ) {
-							ShowWarningError( "Steam heating coil control failed in VS VAV terminal unit " + trim( Sys( SysNum ).SysName ) );
+							ShowWarningError( "Steam heating coil control failed in VS VAV terminal unit " + Sys( SysNum ).SysName );
 							ShowContinueError( "  Iteration limit exceeded in calculating air flow rate" );
 						}
-						ShowRecurringWarningErrorAtEnd( "Steam heating coil iteration limit exceeded in VS VAV terminal unit " + trim( Sys( SysNum ).SysName ), Sys( SysNum ).IterationLimit );
+						ShowRecurringWarningErrorAtEnd( "Steam heating coil iteration limit exceeded in VS VAV terminal unit " + Sys( SysNum ).SysName, Sys( SysNum ).IterationLimit );
 					} else if ( SolFlag == -2 ) {
 						if ( Sys( SysNum ).IterationFailed == 0 ) {
-							ShowWarningError( "Steam heating coil control failed in VS VAV terminal unit " + trim( Sys( SysNum ).SysName ) );
+							ShowWarningError( "Steam heating coil control failed in VS VAV terminal unit " + Sys( SysNum ).SysName );
 							ShowContinueError( "  Bad air flow limits" );
 						}
-						ShowRecurringWarningErrorAtEnd( "Steam heating coil control failed in VS VAV terminal unit " + trim( Sys( SysNum ).SysName ), Sys( SysNum ).IterationFailed );
+						ShowRecurringWarningErrorAtEnd( "Steam heating coil control failed in VS VAV terminal unit " + Sys( SysNum ).SysName, Sys( SysNum ).IterationFailed );
 					}
 				} else {
 					MassFlow = MaxHeatMassFlow;
@@ -3421,16 +3420,16 @@ namespace SingleDuct {
 					SolveRegulaFalsi( UnitFlowToler, 50, SolFlag, FracDelivered, VAVVSHCFanOnResidual, 0.0, 1.0, Par );
 					if ( SolFlag == -1 ) {
 						if ( Sys( SysNum ).IterationLimit == 0 ) {
-							ShowWarningError( "Heating coil control failed in VS VAV terminal unit " + trim( Sys( SysNum ).SysName ) );
+							ShowWarningError( "Heating coil control failed in VS VAV terminal unit " + Sys( SysNum ).SysName );
 							ShowContinueError( "  Iteration limit exceeded in calculating air flow rate" );
 						}
-						ShowRecurringWarningErrorAtEnd( "Heating coil control iteration limit exceeded in VS VAV terminal unit " + trim( Sys( SysNum ).SysName ), Sys( SysNum ).IterationLimit );
+						ShowRecurringWarningErrorAtEnd( "Heating coil control iteration limit exceeded in VS VAV terminal unit " + Sys( SysNum ).SysName, Sys( SysNum ).IterationLimit );
 					} else if ( SolFlag == -2 ) {
 						if ( Sys( SysNum ).IterationFailed == 0 ) {
-							ShowWarningError( "Heating coil control failed in VS VAV terminal unit " + trim( Sys( SysNum ).SysName ) );
+							ShowWarningError( "Heating coil control failed in VS VAV terminal unit " + Sys( SysNum ).SysName );
 							ShowContinueError( "  Bad air flow limits" );
 						}
-						ShowRecurringWarningErrorAtEnd( "Heating coil control failed in VS VAV terminal unit " + trim( Sys( SysNum ).SysName ), Sys( SysNum ).IterationFailed );
+						ShowRecurringWarningErrorAtEnd( "Heating coil control failed in VS VAV terminal unit " + Sys( SysNum ).SysName, Sys( SysNum ).IterationFailed );
 					}
 				} else {
 					MassFlow = MaxHeatMassFlow;
@@ -3438,7 +3437,7 @@ namespace SingleDuct {
 					CalcVAVVS( SysNum, FirstHVACIteration, ZoneNodeNum, HCType, 0.0, QTotLoad, FanType, MassFlow, FanOp, QDelivered );
 				}
 			} else {
-				ShowFatalError( "Invalid Reheat Component=" + trim( Sys( SysNum ).ReheatComp ) );
+				ShowFatalError( "Invalid Reheat Component=" + Sys( SysNum ).ReheatComp );
 			}
 
 		} else {
@@ -3591,7 +3590,7 @@ namespace SingleDuct {
 				// Simulate reheat coil for the VAV system
 				SimulateHeatingCoilComponents( Sys( SysNum ).ReheatName, FirstHVACIteration, QZnReq, Sys( SysNum ).ReheatComp_Index );
 			} else {
-				ShowFatalError( "Invalid Reheat Component=" + trim( Sys( SysNum ).ReheatComp ) );
+				ShowFatalError( "Invalid Reheat Component=" + Sys( SysNum ).ReheatComp );
 			}}
 
 			//the COIL is OFF the properties are calculated for this special case.
@@ -3620,7 +3619,7 @@ namespace SingleDuct {
 				// Simulate reheat coil for the Const Volume system
 				SimulateHeatingCoilComponents( Sys( SysNum ).ReheatName, FirstHVACIteration, 0.0, Sys( SysNum ).ReheatComp_Index );
 			} else {
-				ShowFatalError( "Invalid Reheat Component=" + trim( Sys( SysNum ).ReheatComp ) );
+				ShowFatalError( "Invalid Reheat Component=" + Sys( SysNum ).ReheatComp );
 			}}
 
 		}
@@ -3738,7 +3737,7 @@ namespace SingleDuct {
 		} else if ( SELECT_CASE_var == HCoilType_Gas ) { // COIL:GAS:HEATING
 			SimulateHeatingCoilComponents( Sys( SysNum ).ReheatName, FirstHVACIteration, HCoilReq, Sys( SysNum ).ReheatComp_Index );
 		} else {
-			ShowFatalError( "Invalid Reheat Component=" + trim( Sys( SysNum ).ReheatComp ) );
+			ShowFatalError( "Invalid Reheat Component=" + Sys( SysNum ).ReheatComp );
 		}}
 
 		LoadMet = AirMassFlow * CpAirZn * ( Node( HCOutNode ).Temp - Node( ZoneNode ).Temp );
@@ -4204,10 +4203,10 @@ namespace SingleDuct {
 
 	void
 	GetHVACSingleDuctSysIndex(
-		Fstring const & SDSName,
+		std::string const & SDSName,
 		int & SDSIndex,
 		bool & ErrorsFound,
-		Optional_Fstring_const ThisObjectType,
+		Optional_string_const ThisObjectType,
 		Optional_int DamperInletNode, // Damper inlet node number
 		Optional_int DamperOutletNode // Damper outlet node number
 	)
@@ -4254,14 +4253,14 @@ namespace SingleDuct {
 		SDSIndex = FindItemInList( SDSName, Sys.SysName(), NumSys );
 		if ( SDSIndex == 0 ) {
 			if ( present( ThisObjectType ) ) {
-				ShowSevereError( trim( ThisObjectType ) + ", GetHVACSingleDuctSysIndex: Single duct system not found=" + trim( SDSName ) );
+				ShowSevereError( ThisObjectType() + ", GetHVACSingleDuctSysIndex: Single duct system not found=" + SDSName );
 			} else {
-				ShowSevereError( "GetHVACSingleDuctSysIndex: Single duct system not found=" + trim( SDSName ) );
+				ShowSevereError( "GetHVACSingleDuctSysIndex: Single duct system not found=" + SDSName );
 			}
 			ErrorsFound = true;
 		} else {
 			if ( ( Sys( SDSIndex ).SysType_Num != SingleDuctConstVolReheat ) && ( Sys( SDSIndex ).SysType_Num != SingleDuctVAVReheat ) ) {
-				ShowSevereError( trim( ThisObjectType ) + ", GetHVACSingleDuctSysIndex: Could not find allowed types=" + trim( SDSName ) );
+				ShowSevereError( ThisObjectType() + ", GetHVACSingleDuctSysIndex: Could not find allowed types=" + SDSName );
 				ShowContinueError( "The allowed types are: AirTerminal:SingleDuct:ConstantVolume:Reheat and " "AirTerminal:SingleDuct:VAV:Reheat" );
 				ErrorsFound = true;
 			}
@@ -4275,7 +4274,7 @@ namespace SingleDuct {
 
 	void
 	SimATMixer(
-		Fstring const & SysName,
+		std::string const & SysName,
 		bool const FirstHVACIteration,
 		int & SysIndex
 	)
@@ -4317,10 +4316,10 @@ namespace SingleDuct {
 		}
 
 		if ( SysIndex == 0 ) {
-			SysNum = FindItemInList( trim( SysName ), SysATMixer.Name(), NumATMixers );
+			SysNum = FindItemInList( SysName, SysATMixer.Name(), NumATMixers );
 			SysIndex = SysNum;
 			if ( SysNum == 0 ) {
-				ShowFatalError( "Object " + trim( SysName ) + " not found" );
+				ShowFatalError( "Object " + SysName + " not found" );
 			}
 		} else {
 			SysNum = SysIndex;
@@ -4390,7 +4389,7 @@ namespace SingleDuct {
 		int NumInletATMixers; // Number of inlet side mixer air terminal units
 		int NumSupplyATMixers; // Number of supply side mixer air terminal units
 		int IOStat;
-		static Fstring const RoutineName( "GetATMixers: " ); // include trailing blank space
+		static std::string const RoutineName( "GetATMixers: " ); // include trailing blank space
 		static bool ErrorsFound( false ); // Error flag
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
@@ -4411,41 +4410,41 @@ namespace SingleDuct {
 		cCurrentModuleObject = "AirTerminal:SingleDuct:InletSideMixer";
 
 		for ( InletATMixerNum = 1; InletATMixerNum <= NumInletATMixers; ++InletATMixerNum ) {
-			GetObjectItem( trim( cCurrentModuleObject ), InletATMixerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			GetObjectItem( cCurrentModuleObject, InletATMixerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SysATMixer.Name(), InletATMixerNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SysATMixer.Name(), InletATMixerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxxxxx";
 			}
-			SysATMixer( InletATMixerNum ).Name = trim( cAlphaArgs( 1 ) );
+			SysATMixer( InletATMixerNum ).Name = cAlphaArgs( 1 );
 			SysATMixer( InletATMixerNum ).MixerType = 1; // inlet side mixer
-			if ( trim( cAlphaArgs( 2 ) ) == "ZONEHVAC:WATERTOAIRHEATPUMP" ) {
+			if ( cAlphaArgs( 2 ) == "ZONEHVAC:WATERTOAIRHEATPUMP" ) {
 				SysATMixer( InletATMixerNum ).ZoneHVACUnitType = 1;
-			} else if ( trim( cAlphaArgs( 2 ) ) == "ZONEHVAC:FOURPIPEFANCOIL" ) {
+			} else if ( cAlphaArgs( 2 ) == "ZONEHVAC:FOURPIPEFANCOIL" ) {
 				SysATMixer( InletATMixerNum ).ZoneHVACUnitType = 2;
 			}
 
-			SysATMixer( InletATMixerNum ).ZoneHVACUnitName = trim( cAlphaArgs( 3 ) );
+			SysATMixer( InletATMixerNum ).ZoneHVACUnitName = cAlphaArgs( 3 );
 
-			ValidateComponent( cAlphaArgs( 2 ), SysATMixer( InletATMixerNum ).ZoneHVACUnitName, errFlag, trim( cCurrentModuleObject ) );
+			ValidateComponent( cAlphaArgs( 2 ), SysATMixer( InletATMixerNum ).ZoneHVACUnitName, errFlag, cCurrentModuleObject );
 
-			SysATMixer( InletATMixerNum ).MixedAirOutNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent, cAlphaFieldNames( 4 ) );
+			SysATMixer( InletATMixerNum ).MixedAirOutNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent, cAlphaFieldNames( 4 ) );
 
-			SysATMixer( InletATMixerNum ).PriInNode = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent, cAlphaFieldNames( 5 ) );
-			SysATMixer( InletATMixerNum ).SecInNode = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent, cAlphaFieldNames( 6 ) );
+			SysATMixer( InletATMixerNum ).PriInNode = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent, cAlphaFieldNames( 5 ) );
+			SysATMixer( InletATMixerNum ).SecInNode = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent, cAlphaFieldNames( 6 ) );
 			// Check for dupes in the three nodes.
 			if ( SysATMixer( InletATMixerNum ).SecInNode == SysATMixer( InletATMixerNum ).PriInNode ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( SysATMixer( InletATMixerNum ).Name ) + " " + trim( cAlphaArgs( 5 ) ) + " = " + trim( NodeID( SysATMixer( InletATMixerNum ).PriInNode ) ) + " duplicates the " + trim( cAlphaArgs( 4 ) ) + "." );
+				ShowSevereError( cCurrentModuleObject + " = " + SysATMixer( InletATMixerNum ).Name + ' ' + cAlphaArgs( 5 ) + " = " + NodeID( SysATMixer( InletATMixerNum ).PriInNode ) + " duplicates the " + cAlphaArgs( 4 ) + '.' );
 				ErrorsFound = true;
 			} else if ( SysATMixer( InletATMixerNum ).SecInNode == SysATMixer( InletATMixerNum ).MixedAirOutNode ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( SysATMixer( InletATMixerNum ).Name ) + " " + trim( cAlphaArgs( 6 ) ) + " = " + trim( NodeID( SysATMixer( InletATMixerNum ).MixedAirOutNode ) ) + " duplicates the " + trim( cAlphaArgs( 4 ) ) + "." );
+				ShowSevereError( cCurrentModuleObject + " = " + SysATMixer( InletATMixerNum ).Name + ' ' + cAlphaArgs( 6 ) + " = " + NodeID( SysATMixer( InletATMixerNum ).MixedAirOutNode ) + " duplicates the " + cAlphaArgs( 4 ) + '.' );
 				ErrorsFound = true;
 			}
 
 			if ( SysATMixer( InletATMixerNum ).PriInNode == SysATMixer( InletATMixerNum ).MixedAirOutNode ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( SysATMixer( InletATMixerNum ).Name ) + " " + trim( cAlphaArgs( 6 ) ) + " = " + trim( NodeID( SysATMixer( InletATMixerNum ).MixedAirOutNode ) ) + " duplicates the " + trim( cAlphaArgs( 5 ) ) + "." );
+				ShowSevereError( cCurrentModuleObject + " = " + SysATMixer( InletATMixerNum ).Name + ' ' + cAlphaArgs( 6 ) + " = " + NodeID( SysATMixer( InletATMixerNum ).MixedAirOutNode ) + " duplicates the " + cAlphaArgs( 5 ) + '.' );
 				ErrorsFound = true;
 			}
 
@@ -4471,58 +4470,58 @@ namespace SingleDuct {
 			}
 			ControlledZoneLoop_exit: ;
 			if ( ZoneNodeNotFound ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " = \"" + trim( SysATMixer( InletATMixerNum ).Name ) + "\"." " Inlet Side Air Terminal Mixer air inlet node name must be the same as a zone exhaust node name." );
+				ShowSevereError( cCurrentModuleObject + " = \"" + SysATMixer( InletATMixerNum ).Name + "\"." " Inlet Side Air Terminal Mixer air inlet node name must be the same as a zone exhaust node name." );
 				ShowContinueError( "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object." );
-				ShowContinueError( "..Inlet Side Air Terminal Mixer inlet node name = " + trim( NodeID( SysATMixer( InletATMixerNum ).SecInNode ) ) );
+				ShowContinueError( "..Inlet Side Air Terminal Mixer inlet node name = " + NodeID( SysATMixer( InletATMixerNum ).SecInNode ) );
 				ErrorsFound = true;
 			}
 
-			TestCompSet( trim( cCurrentModuleObject ), SysATMixer( InletATMixerNum ).Name, cAlphaArgs( 5 ), cAlphaArgs( 4 ), "Air Nodes" );
+			TestCompSet( cCurrentModuleObject, SysATMixer( InletATMixerNum ).Name, cAlphaArgs( 5 ), cAlphaArgs( 4 ), "Air Nodes" );
 
 		}
 
 		cCurrentModuleObject = "AirTerminal:SingleDuct:SupplySideMixer";
 
 		for ( SupplyATMixerNum = NumInletATMixers + 1; SupplyATMixerNum <= NumInletATMixers + NumSupplyATMixers; ++SupplyATMixerNum ) {
-			GetObjectItem( trim( cCurrentModuleObject ), SupplyATMixerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			GetObjectItem( cCurrentModuleObject, SupplyATMixerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SysATMixer.Name(), SupplyATMixerNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SysATMixer.Name(), SupplyATMixerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxxxxx";
 			}
-			SysATMixer( SupplyATMixerNum ).Name = trim( cAlphaArgs( 1 ) );
+			SysATMixer( SupplyATMixerNum ).Name = cAlphaArgs( 1 );
 			SysATMixer( SupplyATMixerNum ).MixerType = 2; // supply side mixer
-			if ( trim( cAlphaArgs( 2 ) ) == "ZONEHVAC:WATERTOAIRHEATPUMP" ) {
+			if ( cAlphaArgs( 2 ) == "ZONEHVAC:WATERTOAIRHEATPUMP" ) {
 				SysATMixer( SupplyATMixerNum ).ZoneHVACUnitType = 1;
-			} else if ( trim( cAlphaArgs( 2 ) ) == "ZONEHVAC:FOURPIPEFANCOIL" ) {
+			} else if ( cAlphaArgs( 2 ) == "ZONEHVAC:FOURPIPEFANCOIL" ) {
 				SysATMixer( SupplyATMixerNum ).ZoneHVACUnitType = 2;
 			}
 
-			SysATMixer( SupplyATMixerNum ).ZoneHVACUnitName = trim( cAlphaArgs( 3 ) );
+			SysATMixer( SupplyATMixerNum ).ZoneHVACUnitName = cAlphaArgs( 3 );
 
-			ValidateComponent( cAlphaArgs( 2 ), SysATMixer( SupplyATMixerNum ).ZoneHVACUnitName, errFlag, trim( cCurrentModuleObject ) );
+			ValidateComponent( cAlphaArgs( 2 ), SysATMixer( SupplyATMixerNum ).ZoneHVACUnitName, errFlag, cCurrentModuleObject );
 
-			SysATMixer( SupplyATMixerNum ).MixedAirOutNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent, cAlphaFieldNames( 4 ) );
+			SysATMixer( SupplyATMixerNum ).MixedAirOutNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent, cAlphaFieldNames( 4 ) );
 
-			SysATMixer( SupplyATMixerNum ).PriInNode = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent, cAlphaFieldNames( 5 ) );
-			SysATMixer( SupplyATMixerNum ).SecInNode = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent, cAlphaFieldNames( 6 ) );
+			SysATMixer( SupplyATMixerNum ).PriInNode = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent, cAlphaFieldNames( 5 ) );
+			SysATMixer( SupplyATMixerNum ).SecInNode = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent, cAlphaFieldNames( 6 ) );
 			// Check for dupes in the three nodes.
 			if ( SysATMixer( SupplyATMixerNum ).SecInNode == SysATMixer( SupplyATMixerNum ).PriInNode ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( SysATMixer( SupplyATMixerNum ).Name ) + " " + trim( cAlphaArgs( 5 ) ) + " = " + trim( NodeID( SysATMixer( SupplyATMixerNum ).PriInNode ) ) + " duplicates the " + trim( cAlphaArgs( 4 ) ) + "." );
+				ShowSevereError( cCurrentModuleObject + " = " + SysATMixer( SupplyATMixerNum ).Name + ' ' + cAlphaArgs( 5 ) + " = " + NodeID( SysATMixer( SupplyATMixerNum ).PriInNode ) + " duplicates the " + cAlphaArgs( 4 ) + '.' );
 				ErrorsFound = true;
 			} else if ( SysATMixer( SupplyATMixerNum ).SecInNode == SysATMixer( SupplyATMixerNum ).MixedAirOutNode ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( SysATMixer( SupplyATMixerNum ).Name ) + " " + trim( cAlphaArgs( 6 ) ) + " = " + trim( NodeID( SysATMixer( SupplyATMixerNum ).MixedAirOutNode ) ) + " duplicates the " + trim( cAlphaArgs( 4 ) ) + "." );
+				ShowSevereError( cCurrentModuleObject + " = " + SysATMixer( SupplyATMixerNum ).Name + ' ' + cAlphaArgs( 6 ) + " = " + NodeID( SysATMixer( SupplyATMixerNum ).MixedAirOutNode ) + " duplicates the " + cAlphaArgs( 4 ) + '.' );
 				ErrorsFound = true;
 			}
 
 			if ( SysATMixer( SupplyATMixerNum ).PriInNode == SysATMixer( SupplyATMixerNum ).MixedAirOutNode ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( SysATMixer( SupplyATMixerNum ).Name ) + " " + trim( cAlphaArgs( 6 ) ) + " = " + trim( NodeID( SysATMixer( SupplyATMixerNum ).MixedAirOutNode ) ) + " duplicates the " + trim( cAlphaArgs( 5 ) ) + "." );
+				ShowSevereError( cCurrentModuleObject + " = " + SysATMixer( SupplyATMixerNum ).Name + ' ' + cAlphaArgs( 6 ) + " = " + NodeID( SysATMixer( SupplyATMixerNum ).MixedAirOutNode ) + " duplicates the " + cAlphaArgs( 5 ) + '.' );
 				ErrorsFound = true;
 			}
 
-			TestCompSet( trim( cCurrentModuleObject ), SysATMixer( SupplyATMixerNum ).Name, cAlphaArgs( 5 ), cAlphaArgs( 4 ), "Air Nodes" );
+			TestCompSet( cCurrentModuleObject, SysATMixer( SupplyATMixerNum ).Name, cAlphaArgs( 5 ), cAlphaArgs( 4 ), "Air Nodes" );
 
 			// Air Terminal outlet node must be the same as a zone inlet node
 			ZoneNodeNotFound = true;
@@ -4546,9 +4545,9 @@ namespace SingleDuct {
 			}
 			ControlZoneLoop_exit: ;
 			if ( ZoneNodeNotFound ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " = \"" + trim( SysATMixer( SupplyATMixerNum ).Name ) + "\"." " Supply Side Air Terminal Mixer air outlet node name must be the same as a zone inlet node name." );
+				ShowSevereError( cCurrentModuleObject + " = \"" + SysATMixer( SupplyATMixerNum ).Name + "\"." " Supply Side Air Terminal Mixer air outlet node name must be the same as a zone inlet node name." );
 				ShowContinueError( "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object." );
-				ShowContinueError( "..Inlet Side Air Terminal Mixer inlet node name = " + trim( NodeID( SysATMixer( SupplyATMixerNum ).SecInNode ) ) );
+				ShowContinueError( "..Inlet Side Air Terminal Mixer inlet node name = " + NodeID( SysATMixer( SupplyATMixerNum ).SecInNode ) );
 				ErrorsFound = true;
 			}
 		}
@@ -4746,7 +4745,7 @@ namespace SingleDuct {
 
 	void
 	GetATMixerPriNode(
-		Fstring const & ZoneEquipName,
+		std::string const & ZoneEquipName,
 		int & ATMixerPriNode
 	)
 	{
@@ -4797,7 +4796,7 @@ namespace SingleDuct {
 		}
 
 		if ( ATMixerIndex == 0 ) {
-			ShowSevereError( "GetATMixerPriNode: Air Terminal Mixer zone air inlet node not found for zone equipment=" + trim( ZoneEquipName ) );
+			ShowSevereError( "GetATMixerPriNode: Air Terminal Mixer zone air inlet node not found for zone equipment=" + ZoneEquipName );
 			ErrorsFound = true;
 		}
 
@@ -4805,7 +4804,7 @@ namespace SingleDuct {
 
 	void
 	GetATMixerSecNode(
-		Fstring const & ZoneEquipName,
+		std::string const & ZoneEquipName,
 		int & ATMixerSecNode
 	)
 	{
@@ -4856,7 +4855,7 @@ namespace SingleDuct {
 		}
 
 		if ( ATMixerIndex == 0 ) {
-			ShowSevereError( "GetATMixerSecNode: Air Terminal Mixer zone air inlet node not found for zone equipment=" + trim( ZoneEquipName ) );
+			ShowSevereError( "GetATMixerSecNode: Air Terminal Mixer zone air inlet node not found for zone equipment=" + ZoneEquipName );
 			ErrorsFound = true;
 		}
 
@@ -4864,7 +4863,7 @@ namespace SingleDuct {
 
 	void
 	GetATMixerOutNode(
-		Fstring const & ZoneEquipName,
+		std::string const & ZoneEquipName,
 		int & ATMixerOutNode
 	)
 	{
@@ -4915,7 +4914,7 @@ namespace SingleDuct {
 		}
 
 		if ( ATMixerIndex == 0 ) {
-			ShowSevereError( "GetATMixerOutNode: Air Terminal Mixer outlet node not found for zone equipment=" + trim( ZoneEquipName ) );
+			ShowSevereError( "GetATMixerOutNode: Air Terminal Mixer outlet node not found for zone equipment=" + ZoneEquipName );
 			ErrorsFound = true;
 		}
 
@@ -4923,8 +4922,8 @@ namespace SingleDuct {
 
 	void
 	GetATMixer(
-		Fstring const & ZoneEquipName, // zone unit name name
-		Fstring & ATMixerName, // air terminal mixer name
+		std::string const & ZoneEquipName, // zone unit name name
+		std::string & ATMixerName, // air terminal mixer name
 		int & ATMixerNum, // air terminal mixer index
 		int & ATMixerType, // air teminal mixer type
 		int & ATMixerPriNode, // air terminal mixer primary air node number
@@ -4978,7 +4977,7 @@ namespace SingleDuct {
 
 		if ( NumATMixers <= 0 ) {
 			ATMixerNum = 0;
-			ATMixerName = " ";
+			ATMixerName = "";
 			ATMixerPriNode = 0;
 			ATMixerSecNode = 0;
 			ATMixerOutNode = 0;
@@ -4996,7 +4995,7 @@ namespace SingleDuct {
 			ATMixerType = SysATMixer( ATMixerIndex ).MixerType;
 		} else {
 			ATMixerNum = 0;
-			ATMixerName = " ";
+			ATMixerName = "";
 			ATMixerPriNode = 0;
 			ATMixerSecNode = 0;
 			ATMixerOutNode = 0;

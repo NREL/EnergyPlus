@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace DataConvergParams {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// -only module should be available to other modules and routines.
@@ -127,23 +125,22 @@ namespace DataConvergParams {
 	struct HVACZoneInletConvergenceStruct
 	{
 		// Members
-		Fstring ZoneName;
+		std::string ZoneName;
 		int NumInletNodes; // number of inlet nodes for zone
 		FArray1D< HVACNodeConvergLogStruct > InletNode;
 
 		// Default Constructor
 		HVACZoneInletConvergenceStruct() :
-			ZoneName( MaxNameLength ),
 			NumInletNodes( 0 )
 		{}
 
 		// Member Constructor
 		HVACZoneInletConvergenceStruct(
-			Fstring const & ZoneName,
+			std::string const & ZoneName,
 			int const NumInletNodes, // number of inlet nodes for zone
 			FArray1< HVACNodeConvergLogStruct > const & InletNode
 		) :
-			ZoneName( MaxNameLength, ZoneName ),
+			ZoneName( ZoneName ),
 			NumInletNodes( NumInletNodes ),
 			InletNode( InletNode )
 		{}

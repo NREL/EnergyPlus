@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -15,7 +14,6 @@ namespace EnergyPlus {
 namespace SolarCollectors {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -54,7 +52,7 @@ namespace SolarCollectors {
 	struct ParametersData
 	{
 		// Members
-		Fstring Name; // Name of solar collector parameters
+		std::string Name; // Name of solar collector parameters
 		Real64 Area; // Gross area of collector (m2)
 		int TestFluid; // Test fluid (only WATER for now)
 		Real64 TestMassFlowRate; // Test volumetric flow rate (m3/s)
@@ -81,7 +79,6 @@ namespace SolarCollectors {
 
 		// Default Constructor
 		ParametersData() :
-			Name( MaxNameLength ),
 			Area( 0.0 ),
 			TestFluid( WATER ),
 			TestMassFlowRate( 0.0 ),
@@ -104,7 +101,7 @@ namespace SolarCollectors {
 
 		// Member Constructor
 		ParametersData(
-			Fstring const & Name, // Name of solar collector parameters
+			std::string const & Name, // Name of solar collector parameters
 			Real64 const Area, // Gross area of collector (m2)
 			int const TestFluid, // Test fluid (only WATER for now)
 			Real64 const TestMassFlowRate, // Test volumetric flow rate (m3/s)
@@ -129,7 +126,7 @@ namespace SolarCollectors {
 			Real64 const EmissOfAbsPlate, // emissivity Of absorber plate (dimensionless)
 			Real64 const AbsorOfAbsPlate // absorptance of the absorber plate (dimensionless)
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			Area( Area ),
 			TestFluid( TestFluid ),
 			TestMassFlowRate( TestMassFlowRate ),
@@ -160,10 +157,10 @@ namespace SolarCollectors {
 	struct CollectorData
 	{
 		// Members
-		Fstring Name; // Name of solar collector
-		Fstring BCType; // Boundary condition Type
-		Fstring BCName; // Boundary condition Name
-		Fstring OSCMName; // OtherSideConditionsModel
+		std::string Name; // Name of solar collector
+		std::string BCType; // Boundary condition Type
+		std::string BCName; // Boundary condition Name
+		std::string OSCMName; // OtherSideConditionsModel
 		int VentCavIndex; // index of ventilated cavity object
 		int ICSType_Num; // ICS collector type number
 		int TypeNum; // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant !DSU
@@ -242,10 +239,6 @@ namespace SolarCollectors {
 
 		// Default Constructor
 		CollectorData() :
-			Name( MaxNameLength ),
-			BCType( MaxNameLength ),
-			BCName( MaxNameLength ),
-			OSCMName( MaxNameLength ),
 			VentCavIndex( 0 ),
 			ICSType_Num( 0 ),
 			WLoopNum( 0 ),
@@ -320,10 +313,10 @@ namespace SolarCollectors {
 
 		// Member Constructor
 		CollectorData(
-			Fstring const & Name, // Name of solar collector
-			Fstring const & BCType, // Boundary condition Type
-			Fstring const & BCName, // Boundary condition Name
-			Fstring const & OSCMName, // OtherSideConditionsModel
+			std::string const & Name, // Name of solar collector
+			std::string const & BCType, // Boundary condition Type
+			std::string const & BCName, // Boundary condition Name
+			std::string const & OSCMName, // OtherSideConditionsModel
 			int const VentCavIndex, // index of ventilated cavity object
 			int const ICSType_Num, // ICS collector type number
 			int const TypeNum, // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant !DSU
@@ -396,10 +389,10 @@ namespace SolarCollectors {
 			bool const OSCM_ON, // Boundary condition is OSCM
 			bool const InitICS // used to initialize ICS variables only
 		) :
-			Name( MaxNameLength, Name ),
-			BCType( MaxNameLength, BCType ),
-			BCName( MaxNameLength, BCName ),
-			OSCMName( MaxNameLength, OSCMName ),
+			Name( Name ),
+			BCType( BCType ),
+			BCName( BCName ),
+			OSCMName( OSCMName ),
 			VentCavIndex( VentCavIndex ),
 			ICSType_Num( ICSType_Num ),
 			TypeNum( TypeNum ),
@@ -484,7 +477,7 @@ namespace SolarCollectors {
 	void
 	SimSolarCollector(
 		int const EquipTypeNum,
-		Fstring const & CompName,
+		std::string const & CompName,
 		int & CompIndex,
 		bool const InitLoopEquip,
 		bool const FirstHVACIteration

@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -15,7 +14,6 @@ namespace EnergyPlus {
 namespace ZoneEquipmentManager {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
@@ -36,18 +34,16 @@ namespace ZoneEquipmentManager {
 	struct SimulationOrder
 	{
 		// Members
-		Fstring EquipType;
+		std::string EquipType;
 		int EquipType_Num;
-		Fstring EquipName;
+		std::string EquipName;
 		int EquipPtr;
 		int CoolingPriority;
 		int HeatingPriority;
 
 		// Default Constructor
 		SimulationOrder() :
-			EquipType( MaxNameLength ),
 			EquipType_Num( 0 ),
-			EquipName( MaxNameLength ),
 			EquipPtr( 0 ),
 			CoolingPriority( 0 ),
 			HeatingPriority( 0 )
@@ -55,16 +51,16 @@ namespace ZoneEquipmentManager {
 
 		// Member Constructor
 		SimulationOrder(
-			Fstring const & EquipType,
+			std::string const & EquipType,
 			int const EquipType_Num,
-			Fstring const & EquipName,
+			std::string const & EquipName,
 			int const EquipPtr,
 			int const CoolingPriority,
 			int const HeatingPriority
 		) :
-			EquipType( MaxNameLength, EquipType ),
+			EquipType( EquipType ),
 			EquipType_Num( EquipType_Num ),
-			EquipName( MaxNameLength, EquipName ),
+			EquipName( EquipName ),
 			EquipPtr( EquipPtr ),
 			CoolingPriority( CoolingPriority ),
 			HeatingPriority( HeatingPriority )

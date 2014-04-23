@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <HVACInterfaceManager.hh>
@@ -1274,7 +1273,7 @@ namespace HVACInterfaceManager {
 				if ( PlantLoop( CurLoopNum ).LoopSide( SupplySide ).Branch( 1 ).Comp( 1 ).TypeOf_Num == TypeOf_PumpVariableSpeed ) {
 					// If/when the model supports variable-pumping primary, this can be removed.
 					ShowWarningError( "SetupCommonPipes: detected variable speed pump on supply inlet of CommonPipe plant loop" );
-					ShowContinueError( "Occurs on plant loop name = " + trim( PlantLoop( CurLoopNum ).Name ) );
+					ShowContinueError( "Occurs on plant loop name = " + PlantLoop( CurLoopNum ).Name );
 					ShowContinueError( "The common pipe model does not support varying the flow rate on the primary/supply side" );
 					ShowContinueError( "The primary/supply side will operate as if constant speed, and the simulation continues" );
 
@@ -1294,7 +1293,7 @@ namespace HVACInterfaceManager {
 					PlantCommonPipe( CurLoopNum ).SupplySideInletPumpType = VariableFlow;
 					// If/when the model supports variable-pumping primary, this can be removed.
 					ShowWarningError( "SetupCommonPipes: detected variable speed pump on supply inlet of TwoWayCommonPipe plant loop" );
-					ShowContinueError( "Occurs on plant loop name = " + trim( PlantLoop( CurLoopNum ).Name ) );
+					ShowContinueError( "Occurs on plant loop name = " + PlantLoop( CurLoopNum ).Name );
 					ShowContinueError( "The common pipe model does not support varying the flow rate on the primary/supply side" );
 					ShowContinueError( "The primary/supply side will operate as if constant speed, and the simulation continues" );
 

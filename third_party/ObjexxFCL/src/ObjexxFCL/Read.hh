@@ -159,7 +159,7 @@ public: // Operators
 			bool const ld( format()->is_list_directed() );
 			bool bad( false );
 			if ( ld ) {
-				while ( stream() && ( stream().peek() == SPC ) ) stream().ignore();
+				while ( stream() && ( stream().peek() == ' ' ) ) stream().ignore();
 				if ( stream() && stream().peek() == '(' ) {
 					stream().ignore();
 				} else {
@@ -173,7 +173,7 @@ public: // Operators
 			} else {
 				*this >> imag; // Fortran uses separate format descriptors for real and imag
 				if ( ld && stream() ) {
-					while ( stream() && ( stream().peek() == SPC ) ) stream().ignore();
+					while ( stream() && ( stream().peek() == ' ' ) ) stream().ignore();
 					if ( stream() && stream().peek() == ')' ) {
 						stream().ignore();
 					} else {

@@ -84,7 +84,7 @@ namespace ZonePlenum {
 
 	void
 	SimAirZonePlenum(
-		Fstring const & CompName,
+		std::string const & CompName,
 		int const iCompType,
 		int & CompIndex,
 		Optional_bool_const FirstHVACIteration, //Autodesk:OPTIONAL Used without PRESENT check
@@ -150,17 +150,17 @@ namespace ZonePlenum {
 			if ( CompIndex == 0 ) {
 				ZonePlenumNum = FindItemInList( CompName, ZoneRetPlenCond.ZonePlenumName(), NumZoneReturnPlenums );
 				if ( ZonePlenumNum == 0 ) {
-					ShowFatalError( "SimAirZonePlenum: AirLoopHVAC:ReturnPlenum not found=" + trim( CompName ) );
+					ShowFatalError( "SimAirZonePlenum: AirLoopHVAC:ReturnPlenum not found=" + CompName );
 				}
 				CompIndex = ZonePlenumNum;
 			} else {
 				ZonePlenumNum = CompIndex;
 				if ( ZonePlenumNum > NumZoneReturnPlenums || ZonePlenumNum < 1 ) {
-					ShowFatalError( "SimAirZonePlenum: Invalid CompIndex passed=" + trim( TrimSigDigits( ZonePlenumNum ) ) + ", Number of AirLoopHVAC:ReturnPlenum=" + trim( TrimSigDigits( NumZoneReturnPlenums ) ) + ", AirLoopHVAC:ReturnPlenum name=" + trim( CompName ) );
+					ShowFatalError( "SimAirZonePlenum: Invalid CompIndex passed=" + TrimSigDigits( ZonePlenumNum ) + ", Number of AirLoopHVAC:ReturnPlenum=" + TrimSigDigits( NumZoneReturnPlenums ) + ", AirLoopHVAC:ReturnPlenum name=" + CompName );
 				}
 				if ( CheckRetEquipName( ZonePlenumNum ) ) {
 					if ( CompName != ZoneRetPlenCond( ZonePlenumNum ).ZonePlenumName ) {
-						ShowFatalError( "SimAirZonePlenum: Invalid CompIndex passed=" + trim( TrimSigDigits( ZonePlenumNum ) ) + ", AirLoopHVAC:ReturnPlenum name=" + trim( CompName ) + ", stored AirLoopHVAC:ReturnPlenum Name for that index=" + trim( ZoneRetPlenCond( ZonePlenumNum ).ZonePlenumName ) );
+						ShowFatalError( "SimAirZonePlenum: Invalid CompIndex passed=" + TrimSigDigits( ZonePlenumNum ) + ", AirLoopHVAC:ReturnPlenum name=" + CompName + ", stored AirLoopHVAC:ReturnPlenum Name for that index=" + ZoneRetPlenCond( ZonePlenumNum ).ZonePlenumName );
 					}
 					CheckRetEquipName( ZonePlenumNum ) = false;
 				}
@@ -179,17 +179,17 @@ namespace ZonePlenum {
 			if ( CompIndex == 0 ) {
 				ZonePlenumNum = FindItemInList( CompName, ZoneSupPlenCond.ZonePlenumName(), NumZoneSupplyPlenums );
 				if ( ZonePlenumNum == 0 ) {
-					ShowFatalError( "SimAirZonePlenum: AirLoopHVAC:SupplyPlenum not found=" + trim( CompName ) );
+					ShowFatalError( "SimAirZonePlenum: AirLoopHVAC:SupplyPlenum not found=" + CompName );
 				}
 				CompIndex = ZonePlenumNum;
 			} else {
 				ZonePlenumNum = CompIndex;
 				if ( ZonePlenumNum > NumZoneSupplyPlenums || ZonePlenumNum < 1 ) {
-					ShowFatalError( "SimAirZonePlenum: Invalid CompIndex passed=" + trim( TrimSigDigits( ZonePlenumNum ) ) + ", Number of AirLoopHVAC:SupplyPlenum=" + trim( TrimSigDigits( NumZoneReturnPlenums ) ) + ", AirLoopHVAC:SupplyPlenum name=" + trim( CompName ) );
+					ShowFatalError( "SimAirZonePlenum: Invalid CompIndex passed=" + TrimSigDigits( ZonePlenumNum ) + ", Number of AirLoopHVAC:SupplyPlenum=" + TrimSigDigits( NumZoneReturnPlenums ) + ", AirLoopHVAC:SupplyPlenum name=" + CompName );
 				}
 				if ( CheckSupEquipName( ZonePlenumNum ) ) {
 					if ( CompName != ZoneSupPlenCond( ZonePlenumNum ).ZonePlenumName ) {
-						ShowFatalError( "SimAirZonePlenum: Invalid CompIndex passed=" + trim( TrimSigDigits( ZonePlenumNum ) ) + ", AirLoopHVAC:SupplyPlenum name=" + trim( CompName ) + ", stored AirLoopHVAC:SupplyPlenum Name for that index=" + trim( ZoneSupPlenCond( ZonePlenumNum ).ZonePlenumName ) );
+						ShowFatalError( "SimAirZonePlenum: Invalid CompIndex passed=" + TrimSigDigits( ZonePlenumNum ) + ", AirLoopHVAC:SupplyPlenum name=" + CompName + ", stored AirLoopHVAC:SupplyPlenum Name for that index=" + ZoneSupPlenCond( ZonePlenumNum ).ZonePlenumName );
 					}
 					CheckSupEquipName( ZonePlenumNum ) = false;
 				}
@@ -204,8 +204,8 @@ namespace ZonePlenum {
 			ReportZoneSupplyPlenum( ZonePlenumNum );
 
 		} else {
-			ShowSevereError( "SimAirZonePlenum: Errors in Plenum=" + trim( CompName ) );
-			ShowContinueError( "ZonePlenum: Unhandled plenum type found:" + trim( TrimSigDigits( iCompType ) ) );
+			ShowSevereError( "SimAirZonePlenum: Errors in Plenum=" + CompName );
+			ShowContinueError( "ZonePlenum: Unhandled plenum type found:" + TrimSigDigits( iCompType ) );
 			ShowFatalError( "Preceding conditions cause termination." );
 
 		}}
@@ -279,10 +279,10 @@ namespace ZonePlenum {
 		int NodeNum;
 		int IOStat;
 		FArray1D< Real64 > NumArray; // Numeric input items for object
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in getting objects
-		FArray1D_Fstring AlphArray( sFstring( MaxNameLength ) ); // Alpha input items for object
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) ); // Numeric field names
+		std::string CurrentModuleObject; // for ease in getting objects
+		FArray1D_string AlphArray; // Alpha input items for object
+		FArray1D_string cAlphaFields; // Alpha field names
+		FArray1D_string cNumericFields; // Numeric field names
 		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static bool ErrorsFound( false );
@@ -290,8 +290,8 @@ namespace ZonePlenum {
 		bool IsBlank; // Flag for blank name
 		bool NodeListError; // Flag for node list error
 		bool UniqueNodeError;
-		static Fstring const RoutineName( "GetZonePlenumInput: " ); // include trailing blank space
-		Fstring InducedNodeListName( MaxNameLength );
+		static std::string const RoutineName( "GetZonePlenumInput: " ); // include trailing blank space
+		std::string InducedNodeListName;
 
 		// Flow
 		GetObjectDefMaxArgs( "AirLoopHVAC:ReturnPlenum", NumArgs, NumAlphas, NumNums );
@@ -301,11 +301,11 @@ namespace ZonePlenum {
 		MaxNums = max( NumNums, MaxNums );
 		MaxAlphas = max( NumAlphas, MaxAlphas );
 		AlphArray.allocate( MaxAlphas );
-		AlphArray = " ";
+		AlphArray = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = " ";
+		cAlphaFields = "";
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = " ";
+		cNumericFields = "";
 		NumArray.allocate( MaxNums );
 		NumArray = 0.0;
 		lAlphaBlanks.allocate( MaxAlphas );
@@ -316,7 +316,7 @@ namespace ZonePlenum {
 		NodeNums.allocate( NumArgs );
 		NodeNums = 0;
 
-		InducedNodeListName = " ";
+		InducedNodeListName = "";
 
 		NumZoneReturnPlenums = GetNumObjectsFound( "AirLoopHVAC:ReturnPlenum" );
 		NumZoneSupplyPlenums = GetNumObjectsFound( "AirLoopHVAC:SupplyPlenum" );
@@ -340,7 +340,7 @@ namespace ZonePlenum {
 			GetObjectItem( CurrentModuleObject, ZonePlenumNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), ZoneRetPlenCond.ZonePlenumName(), ZonePlenumNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( AlphArray( 1 ), ZoneRetPlenCond.ZonePlenumName(), ZonePlenumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -350,33 +350,33 @@ namespace ZonePlenum {
 			// Check if this zone is also used in another return plenum
 			IOStat = FindItemInList( AlphArray( 2 ), ZoneRetPlenCond.ZoneName(), ZonePlenumNum - 1 );
 			if ( IOStat != 0 ) {
-				ShowSevereError( RoutineName + trim( cAlphaFields( 2 ) ) + " \"" + trim( AlphArray( 2 ) ) + "\" is used more than once as a " + trim( CurrentModuleObject ) + "." );
-				ShowContinueError( "..Only one " + trim( CurrentModuleObject ) + " object may be connected to a given zone." );
-				ShowContinueError( "..occurs in " + trim( CurrentModuleObject ) + " = " + trim( AlphArray( 1 ) ) );
+				ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is used more than once as a " + CurrentModuleObject + '.' );
+				ShowContinueError( "..Only one " + CurrentModuleObject + " object may be connected to a given zone." );
+				ShowContinueError( "..occurs in " + CurrentModuleObject + " = " + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 			ZoneRetPlenCond( ZonePlenumNum ).ZoneName = AlphArray( 2 );
 			// put the X-Ref to the zone heat balance data structure
 			ZoneRetPlenCond( ZonePlenumNum ).ActualZoneNum = FindItemInList( AlphArray( 2 ), Zone.Name(), NumOfZones );
 			if ( ZoneRetPlenCond( ZonePlenumNum ).ActualZoneNum == 0 ) {
-				ShowSevereError( "For " + trim( CurrentModuleObject ) + " = " + trim( AlphArray( 1 ) ) + ", " + trim( cAlphaFields( 2 ) ) + " = " + trim( AlphArray( 2 ) ) + " not found." );
+				ShowSevereError( "For " + CurrentModuleObject + " = " + AlphArray( 1 ) + ", " + cAlphaFields( 2 ) + " = " + AlphArray( 2 ) + " not found." );
 				ErrorsFound = true;
 				continue;
 			}
 			//  Check if this zone is used as a controlled zone
 			ZoneEquipConfigLoop = FindItemInList( AlphArray( 2 ), ZoneEquipConfig.ZoneName(), NumOfZones );
 			if ( ZoneEquipConfigLoop != 0 ) {
-				ShowSevereError( RoutineName + trim( cAlphaFields( 2 ) ) + " \"" + trim( AlphArray( 2 ) ) + "\" is a controlled zone." " It cannot be used as a " + trim( CurrentModuleObject ) );
-				ShowContinueError( "..occurs in " + trim( CurrentModuleObject ) + " = " + trim( AlphArray( 1 ) ) );
+				ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is a controlled zone." " It cannot be used as a " + CurrentModuleObject );
+				ShowContinueError( "..occurs in " + CurrentModuleObject + " = " + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
 			ZoneRetPlenCond( ZonePlenumNum ).ZoneNodeName = AlphArray( 3 );
-			ZoneRetPlenCond( ZonePlenumNum ).ZoneNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
+			ZoneRetPlenCond( ZonePlenumNum ).ZoneNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
 			//Insert the Plenum Zone Number into the Zone Heat Balance data structure for later reference
 			Zone( ZoneRetPlenCond( ZonePlenumNum ).ActualZoneNum ).SystemZoneNodeNumber = ZoneRetPlenCond( ZonePlenumNum ).ZoneNodeNum;
 
-			ZoneRetPlenCond( ZonePlenumNum ).OutletNode = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			ZoneRetPlenCond( ZonePlenumNum ).OutletNode = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 			InducedNodeListName = AlphArray( 5 );
 			NodeListError = false;
@@ -404,13 +404,13 @@ namespace ZonePlenum {
 					UniqueNodeError = false;
 					CheckUniqueNodes( "Return Plenum Induced Air Nodes", "NodeNumber", UniqueNodeError, _, NodeNums( NodeNum ) );
 					if ( UniqueNodeError ) {
-						ShowContinueError( "Occurs for ReturnPlenum = " + trim( AlphArray( 1 ) ) );
+						ShowContinueError( "Occurs for ReturnPlenum = " + AlphArray( 1 ) );
 						ErrorsFound = true;
 					}
 					PIUInducesPlenumAir( ZoneRetPlenCond( ZonePlenumNum ).InducedNode( NodeNum ) );
 				}
 			} else {
-				ShowContinueError( "Invalid Induced Air Outlet Node or NodeList name in AirLoopHVAC:ReturnPlenum object = " + trim( ZoneRetPlenCond( ZonePlenumNum ).ZonePlenumName ) );
+				ShowContinueError( "Invalid Induced Air Outlet Node or NodeList name in AirLoopHVAC:ReturnPlenum object = " + ZoneRetPlenCond( ZonePlenumNum ).ZonePlenumName );
 				ErrorsFound = true;
 			}
 
@@ -449,7 +449,7 @@ namespace ZonePlenum {
 
 			for ( NodeNum = 1; NodeNum <= ZoneRetPlenCond( ZonePlenumNum ).NumInletNodes; ++NodeNum ) {
 
-				ZoneRetPlenCond( ZonePlenumNum ).InletNode( NodeNum ) = GetOnlySingleNode( AlphArray( 5 + NodeNum ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+				ZoneRetPlenCond( ZonePlenumNum ).InletNode( NodeNum ) = GetOnlySingleNode( AlphArray( 5 + NodeNum ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
 			}
 
@@ -467,7 +467,7 @@ namespace ZonePlenum {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), ZoneSupPlenCond.ZonePlenumName(), ZonePlenumNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( AlphArray( 1 ), ZoneSupPlenCond.ZonePlenumName(), ZonePlenumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -477,17 +477,17 @@ namespace ZonePlenum {
 			// Check if this zone is also used in another plenum
 			IOStat = FindItemInList( AlphArray( 2 ), ZoneSupPlenCond.ZoneName(), ZonePlenumNum - 1 );
 			if ( IOStat != 0 ) {
-				ShowSevereError( RoutineName + trim( cAlphaFields( 2 ) ) + " \"" + trim( AlphArray( 2 ) ) + "\" is used more than once as a " + trim( CurrentModuleObject ) + "." );
-				ShowContinueError( "..Only one " + trim( CurrentModuleObject ) + " object may be connected to a given zone." );
-				ShowContinueError( "..occurs in " + trim( CurrentModuleObject ) + " = " + trim( AlphArray( 1 ) ) );
+				ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is used more than once as a " + CurrentModuleObject + '.' );
+				ShowContinueError( "..Only one " + CurrentModuleObject + " object may be connected to a given zone." );
+				ShowContinueError( "..occurs in " + CurrentModuleObject + " = " + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 			if ( NumZoneReturnPlenums > 0 ) { // Check if this zone is also used in another plenum
 				IOStat = FindItemInList( AlphArray( 2 ), ZoneRetPlenCond.ZoneName(), NumZoneReturnPlenums );
 				if ( IOStat != 0 ) {
-					ShowSevereError( RoutineName + trim( cAlphaFields( 2 ) ) + " \"" + trim( AlphArray( 2 ) ) + "\" is used more than once as a " + trim( CurrentModuleObject ) + " or AirLoopHVAC:ReturnPlenum." );
-					ShowContinueError( "..Only one " + trim( CurrentModuleObject ) + " or AirLoopHVAC:ReturnPlenum object" " may be connected to a given zone." );
-					ShowContinueError( "..occurs in " + trim( CurrentModuleObject ) + " = " + trim( AlphArray( 1 ) ) );
+					ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is used more than once as a " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum." );
+					ShowContinueError( "..Only one " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum object" " may be connected to a given zone." );
+					ShowContinueError( "..occurs in " + CurrentModuleObject + " = " + AlphArray( 1 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -495,7 +495,7 @@ namespace ZonePlenum {
 			// put the X-Ref to the zone heat balance data structure
 			ZoneSupPlenCond( ZonePlenumNum ).ActualZoneNum = FindItemInList( AlphArray( 2 ), Zone.Name(), NumOfZones );
 			if ( ZoneSupPlenCond( ZonePlenumNum ).ActualZoneNum == 0 ) {
-				ShowSevereError( "For " + trim( CurrentModuleObject ) + " = " + trim( AlphArray( 1 ) ) + ", " + trim( cAlphaFields( 2 ) ) + " = " + trim( AlphArray( 2 ) ) + " not found." );
+				ShowSevereError( "For " + CurrentModuleObject + " = " + AlphArray( 1 ) + ", " + cAlphaFields( 2 ) + " = " + AlphArray( 2 ) + " not found." );
 				ErrorsFound = true;
 				continue;
 			}
@@ -503,8 +503,8 @@ namespace ZonePlenum {
 			if ( any( ZoneEquipConfig.IsControlled() ) ) {
 				ZoneEquipConfigLoop = FindItemInList( AlphArray( 2 ), ZoneEquipConfig.ZoneName(), NumOfZones );
 				if ( ZoneEquipConfigLoop != 0 ) {
-					ShowSevereError( RoutineName + trim( cAlphaFields( 2 ) ) + " \"" + trim( AlphArray( 2 ) ) + "\" is a controlled zone." " It cannot be used as a " + trim( CurrentModuleObject ) + " or AirLoopHVAC:ReturnPlenum." );
-					ShowContinueError( "..occurs in " + trim( CurrentModuleObject ) + " = " + trim( AlphArray( 1 ) ) );
+					ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is a controlled zone." " It cannot be used as a " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum." );
+					ShowContinueError( "..occurs in " + CurrentModuleObject + " = " + AlphArray( 1 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -522,11 +522,11 @@ namespace ZonePlenum {
 			//      ENDIF
 
 			ZoneSupPlenCond( ZonePlenumNum ).ZoneNodeName = AlphArray( 3 );
-			ZoneSupPlenCond( ZonePlenumNum ).ZoneNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
+			ZoneSupPlenCond( ZonePlenumNum ).ZoneNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
 			//Insert the Plenum Zone Number into the Zone Heat Balance data structure for later reference
 			Zone( ZoneSupPlenCond( ZonePlenumNum ).ActualZoneNum ).SystemZoneNodeNumber = ZoneSupPlenCond( ZonePlenumNum ).ZoneNodeNum;
 
-			ZoneSupPlenCond( ZonePlenumNum ).InletNode = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			ZoneSupPlenCond( ZonePlenumNum ).InletNode = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
 			ZoneSupPlenCond( ZonePlenumNum ).NumOutletNodes = NumAlphas - 4;
 
@@ -562,7 +562,7 @@ namespace ZonePlenum {
 
 			for ( NodeNum = 1; NodeNum <= ZoneSupPlenCond( ZonePlenumNum ).NumOutletNodes; ++NodeNum ) {
 
-				ZoneSupPlenCond( ZonePlenumNum ).OutletNode( NodeNum ) = GetOnlySingleNode( AlphArray( 4 + NodeNum ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+				ZoneSupPlenCond( ZonePlenumNum ).OutletNode( NodeNum ) = GetOnlySingleNode( AlphArray( 4 + NodeNum ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 			}
 

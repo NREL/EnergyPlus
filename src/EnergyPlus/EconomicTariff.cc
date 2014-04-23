@@ -5,6 +5,7 @@
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/numeric.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <EconomicTariff.hh>
@@ -43,7 +44,6 @@ namespace EconomicTariff {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace InputProcessor;
-	using DataGlobals::MaxNameLength;
 	using ScheduleManager::GetScheduleIndex;
 
 	// Data
@@ -70,8 +70,8 @@ namespace EconomicTariff {
 	int const conversionMCF( 6 ); // thousand cubic feet
 	int const conversionCCF( 7 ); // hundred cubic feet
 
-	FArray1D_Fstring const convEneStrings( {0,7}, sFstring( 5 ), { "     ", "kWh  ", "Therm", "MMBtu", "MJ   ", "kBtu ", "MCF  ", "CCF  " } );
-	FArray1D_Fstring const convDemStrings( {0,7}, sFstring( 5 ), { "     ", "kW   ", "Therm", "MMBtu", "MJ   ", "kBtu ", "MCF  ", "CCF  " } );
+	FArray1D_string const convEneStrings( {0,7}, { "", "kWh", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF" } );
+	FArray1D_string const convDemStrings( {0,7}, { "", "kW", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF" } );
 
 	int const demandWindowQuarter( 1 );
 	int const demandWindowHalf( 2 );
@@ -79,7 +79,7 @@ namespace EconomicTariff {
 	int const demandWindowDay( 4 );
 	int const demandWindowWeek( 5 );
 
-	FArray1D_Fstring const demWindowStrings( {0,5}, sFstring( 4 ), { "    ", "/Hr ", "/Hr ", "/Hr ", "/Day", "/Wk " } );
+	FArray1D_string const demWindowStrings( {0,5}, { "", "/Hr", "/Hr", "/Hr", "/Day", "/Wk" } );
 
 	int const buyFromUtility( 1 );
 	int const sellToUtility( 2 );
@@ -372,7 +372,7 @@ namespace EconomicTariff {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetInputEconomicsTariff: " );
+		static std::string const RoutineName( "GetInputEconomicsTariff: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -396,11 +396,11 @@ namespace EconomicTariff {
 		int TypeVar;
 		int AvgSumVar;
 		int StepTypeVar;
-		Fstring UnitsVar( MaxNameLength ); // Units sting, may be blank
-		FArray1D_Fstring NamesOfKeys( sFstring( MaxNameLength ) ); // Specific key name
+		std::string UnitsVar; // Units sting, may be blank
+		FArray1D_string NamesOfKeys; // Specific key name
 		FArray1D_int IndexesForKeyVar; // Array index
 		int jFld;
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in renaming.
+		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "UtilityCost:Tariff";
 		numTariff = GetNumObjectsFound( CurrentModuleObject );
@@ -410,8 +410,8 @@ namespace EconomicTariff {
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				//  args are always turned to upper case but this is okay...
-				if ( index( MakeUPPERCase( cAlphaArgs( jFld ) ), "UTILITYCOST:" ) > 0 ) {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"." );
+				if ( hasi( cAlphaArgs( jFld ), "UtilityCost:" ) ) {
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"." );
 					ShowContinueError( "... a field was found containing UtilityCost: which may indicate a missing comma." );
 				}
 			}
@@ -426,7 +426,7 @@ namespace EconomicTariff {
 				}
 			}
 			if ( found > 0 ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid data" );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
 				ShowContinueError( "...Duplicate name. Name has already been used." );
 				ErrorsFound = true;
 			}
@@ -436,8 +436,8 @@ namespace EconomicTariff {
 			GetVariableKeyCountandType( tariff( iInObj ).reportMeter, KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar );
 			// if no meters found for that name
 			if ( KeyCount == 0 ) {
-				ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" missing meter" );
-				ShowContinueError( "Meter referenced is not present due to a lack of equipment that uses that energy source/meter:\"" + trim( tariff( iInObj ).reportMeter ) + "\"." );
+				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" missing meter" );
+				ShowContinueError( "Meter referenced is not present due to a lack of equipment that uses that energy source/meter:\"" + tariff( iInObj ).reportMeter + "\"." );
 				tariff( iInObj ).reportMeterIndx = 0;
 			} else {
 				NamesOfKeys.allocate( KeyCount );
@@ -445,7 +445,7 @@ namespace EconomicTariff {
 				GetVariableKeys( tariff( iInObj ).reportMeter, TypeVar, NamesOfKeys, IndexesForKeyVar );
 				//although this retrieves all keys for a variable, we only need one so the first one is chosen
 				if ( KeyCount > 1 ) {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" multiple keys" );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" multiple keys" );
 					ShowContinueError( "... Multiple keys for variable select. First key will be used." );
 				}
 				//assign the index
@@ -491,41 +491,41 @@ namespace EconomicTariff {
 				tariff( iInObj ).convChoice = conversionKWH;
 				tariff( iInObj ).energyConv = 0.0000002778;
 				tariff( iInObj ).demandConv = 0.001;
-				ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid data" );
-				ShowContinueError( trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( cAlphaArgs( 3 ) ) + "\", Defaulting to KWH." );
+				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
+				ShowContinueError( cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", Defaulting to KWH." );
 			}
 			//schedules
 			// period schedule
-			if ( len_trim( cAlphaArgs( 4 ) ) > 0 ) {
+			if ( len( cAlphaArgs( 4 ) ) > 0 ) {
 				tariff( iInObj ).periodSchedule = cAlphaArgs( 4 ); //name of the period schedule (time of day)
 				tariff( iInObj ).periodSchIndex = GetScheduleIndex( cAlphaArgs( 4 ) ); //index to the period schedule
 				if ( tariff( iInObj ).periodSchIndex == 0 ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid data" );
-					ShowContinueError( " not found " + trim( cAlphaFieldNames( 4 ) ) + "=\"" + trim( cAlphaArgs( 4 ) ) + "\"." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
+					ShowContinueError( " not found " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
 					ErrorsFound = true;
 				}
 			} else {
 				tariff( iInObj ).periodSchIndex = 0; //flag value for no schedule used
 			}
 			// season schedule
-			if ( len_trim( cAlphaArgs( 5 ) ) > 0 ) {
+			if ( len( cAlphaArgs( 5 ) ) > 0 ) {
 				tariff( iInObj ).seasonSchedule = cAlphaArgs( 5 ); //name of the season schedule (winter/summer)
 				tariff( iInObj ).seasonSchIndex = GetScheduleIndex( cAlphaArgs( 5 ) ); //index to the season schedule
 				if ( tariff( iInObj ).seasonSchIndex == 0 ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid data" );
-					ShowContinueError( " not found " + trim( cAlphaFieldNames( 5 ) ) + "=\"" + trim( cAlphaArgs( 5 ) ) + "\"." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
+					ShowContinueError( " not found " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
 					ErrorsFound = true;
 				}
 			} else {
 				tariff( iInObj ).seasonSchIndex = 0; //flag value for no schedule used
 			}
 			// month schedule
-			if ( len_trim( cAlphaArgs( 6 ) ) > 0 ) {
+			if ( len( cAlphaArgs( 6 ) ) > 0 ) {
 				tariff( iInObj ).monthSchedule = cAlphaArgs( 6 ); //name of month schedule (when months end)
 				tariff( iInObj ).monthSchIndex = GetScheduleIndex( cAlphaArgs( 6 ) ); //index to the month schedule
 				if ( tariff( iInObj ).monthSchIndex == 0 ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid data" );
-					ShowContinueError( " not found " + trim( cAlphaFieldNames( 6 ) ) + "=\"" + trim( cAlphaArgs( 6 ) ) + "\"." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
+					ShowContinueError( " not found " + cAlphaFieldNames( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\"." );
 					ErrorsFound = true;
 				}
 			} else {
@@ -538,14 +538,14 @@ namespace EconomicTariff {
 				if ( ( SELECT_CASE_var == 1 ) || ( SELECT_CASE_var == 3 ) || ( SELECT_CASE_var == 5 ) || ( SELECT_CASE_var == 15 ) ) {
 					tariff( iInObj ).demandWindow = demandWindowHour;
 					tariff( iInObj ).demWinTime = 1.00;
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid data" );
-					ShowContinueError( "Demand window of QuarterHour is not consistent with number of timesteps per hour [" + trim( RoundSigDigits( NumOfTimeStepInHour ) ) + "]." );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
+					ShowContinueError( "Demand window of QuarterHour is not consistent with number of timesteps per hour [" + RoundSigDigits( NumOfTimeStepInHour ) + "]." );
 					ShowContinueError( "Demand window will be set to FullHour, and the simulation continues." );
 				} else if ( ( SELECT_CASE_var == 2 ) || ( SELECT_CASE_var == 6 ) || ( SELECT_CASE_var == 10 ) || ( SELECT_CASE_var == 30 ) ) {
 					tariff( iInObj ).demandWindow = demandWindowHalf;
 					tariff( iInObj ).demWinTime = 0.50;
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid data" );
-					ShowContinueError( "Demand window of QuarterHour is not consistent with number of timesteps per hour [" + trim( RoundSigDigits( NumOfTimeStepInHour ) ) + "]." );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
+					ShowContinueError( "Demand window of QuarterHour is not consistent with number of timesteps per hour [" + RoundSigDigits( NumOfTimeStepInHour ) + "]." );
 					ShowContinueError( "Demand window will be set to HalfHour, and the simulation continues." );
 				} else if ( ( SELECT_CASE_var == 4 ) || ( SELECT_CASE_var == 12 ) || ( SELECT_CASE_var == 20 ) || ( SELECT_CASE_var == 60 ) ) {
 					tariff( iInObj ).demandWindow = demandWindowQuarter;
@@ -556,8 +556,8 @@ namespace EconomicTariff {
 				if ( ( SELECT_CASE_var == 1 ) || ( SELECT_CASE_var == 3 ) || ( SELECT_CASE_var == 5 ) || ( SELECT_CASE_var == 15 ) ) {
 					tariff( iInObj ).demandWindow = demandWindowHour;
 					tariff( iInObj ).demWinTime = 1.00;
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid data" );
-					ShowContinueError( "Demand window of HalfHour is not consistent with number of timesteps per hour [" + trim( RoundSigDigits( NumOfTimeStepInHour ) ) + "]." );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
+					ShowContinueError( "Demand window of HalfHour is not consistent with number of timesteps per hour [" + RoundSigDigits( NumOfTimeStepInHour ) + "]." );
 					ShowContinueError( "Demand window will be set to FullHour, and the simulation continues." );
 				} else if ( ( SELECT_CASE_var == 2 ) || ( SELECT_CASE_var == 4 ) || ( SELECT_CASE_var == 6 ) || ( SELECT_CASE_var == 10 ) || ( SELECT_CASE_var == 12 ) || ( SELECT_CASE_var == 20 ) || ( SELECT_CASE_var == 30 ) || ( SELECT_CASE_var == 60 ) ) {
 					tariff( iInObj ).demandWindow = demandWindowHalf;
@@ -590,7 +590,7 @@ namespace EconomicTariff {
 			tariff( iInObj ).monthChgVal = ProcessNumber( cAlphaArgs( 8 ), isNotNumeric );
 			tariff( iInObj ).monthChgPt = AssignVariablePt( cAlphaArgs( 8 ), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, iInObj );
 			//minimum monthly charge
-			if ( len_trim( cAlphaArgs( 9 ) ) > 0 ) {
+			if ( len( cAlphaArgs( 9 ) ) > 0 ) {
 				tariff( iInObj ).minMonthChgVal = ProcessNumber( cAlphaArgs( 9 ), isNotNumeric );
 			} else {
 				tariff( iInObj ).minMonthChgVal = -huge( -1.0 ); //set to a very negative value
@@ -615,21 +615,21 @@ namespace EconomicTariff {
 			}
 			// check if meter is consistent with buy or sell option
 			if ( ( tariff( iInObj ).buyOrSell == sellToUtility ) && ( ! SameString( tariff( iInObj ).reportMeter, "ELECTRICITYSURPLUSSOLD:FACILITY" ) ) ) {
-				ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" atypical meter" );
-				ShowContinueError( "The meter chosen \"" + trim( tariff( iInObj ).reportMeter ) + "\" is not typically used with the sellToUtility option." );
+				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" atypical meter" );
+				ShowContinueError( "The meter chosen \"" + tariff( iInObj ).reportMeter + "\" is not typically used with the sellToUtility option." );
 				ShowContinueError( "Usually the ElectricitySurplusSold:Facility meter is selected when the sellToUtility option is used." );
 			}
 			if ( ( tariff( iInObj ).buyOrSell == netMetering ) && ( ! SameString( tariff( iInObj ).reportMeter, "ELECTRICITYNET:FACILITY" ) ) ) {
-				ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" atypical meter" );
-				ShowContinueError( "The meter chosen \"" + trim( tariff( iInObj ).reportMeter ) + " is not typically used with the netMetering option." );
+				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" atypical meter" );
+				ShowContinueError( "The meter chosen \"" + tariff( iInObj ).reportMeter + " is not typically used with the netMetering option." );
 				ShowContinueError( "Usually the ElectricityNet:Facility meter is selected when the netMetering option is used." );
 			}
 			//also test the buy option for electricity
 			if ( tariff( iInObj ).buyOrSell == buyFromUtility ) {
-				if ( index( MakeUPPERCase( tariff( iInObj ).reportMeter ), "ELEC" ) > 0 ) { //test if electric meter
+				if ( hasi( tariff( iInObj ).reportMeter, "Elec" ) ) { //test if electric meter
 					if ( ! ( SameString( tariff( iInObj ).reportMeter, "Electricity:Facility" ) || SameString( tariff( iInObj ).reportMeter, "ElectricityPurchased:Facility" ) ) ) {
-						ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" atypical meter" );
-						ShowContinueError( "The meter chosen \"" + trim( tariff( iInObj ).reportMeter ) + " is not typically used with the buyFromUtility option." );
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" atypical meter" );
+						ShowContinueError( "The meter chosen \"" + tariff( iInObj ).reportMeter + " is not typically used with the buyFromUtility option." );
 						ShowContinueError( "Usually the Electricity:Facility meter or the " "ElectricityPurchased:Facility is selected when the buyFromUtility option is used." );
 					}
 				}
@@ -677,7 +677,7 @@ namespace EconomicTariff {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetInputEconomicsQualify: " );
+		static std::string const RoutineName( "GetInputEconomicsQualify: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -694,7 +694,7 @@ namespace EconomicTariff {
 		int IOStat; // IO Status when calling get input subroutine
 		bool isNotNumeric;
 		int jFld;
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in renaming.
+		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "UtilityCost:Qualify";
 		numQualify = GetNumObjectsFound( CurrentModuleObject );
@@ -703,8 +703,8 @@ namespace EconomicTariff {
 			GetObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
-				if ( index( MakeUPPERCase( cAlphaArgs( jFld ) ), "UTILITYCOST:" ) > 0 ) {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"." );
+				if ( hasi( cAlphaArgs( jFld ), "UtilityCost:" ) ) {
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"." );
 					ShowContinueError( "... a field was found containing UtilityCost: which may indicate a missing comma." );
 				}
 			}
@@ -720,8 +720,8 @@ namespace EconomicTariff {
 			} else if ( SameString( cAlphaArgs( 4 ), "Maximum" ) ) {
 				qualify( iInObj ).isMaximum = true;
 			} else {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid data" );
-				ShowContinueError( trim( cAlphaFieldNames( 4 ) ) + "=\"" + trim( cAlphaArgs( 4 ) ) + "\"." );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
+				ShowContinueError( cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
 				ErrorsFound = true;
 				qualify( iInObj ).isMaximum = true;
 			}
@@ -736,8 +736,8 @@ namespace EconomicTariff {
 			} else if ( SameString( cAlphaArgs( 7 ), "Consecutive" ) ) {
 				qualify( iInObj ).isConsecutive = true;
 			} else {
-				ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid data" );
-				ShowContinueError( trim( cAlphaFieldNames( 5 ) ) + "=\"" + trim( cAlphaArgs( 5 ) ) + "\"." );
+				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
+				ShowContinueError( cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
 				ErrorsFound = true;
 				qualify( iInObj ).isConsecutive = true;
 			}
@@ -770,7 +770,7 @@ namespace EconomicTariff {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetInputEconomicsChargeSimple: " );
+		static std::string const RoutineName( "GetInputEconomicsChargeSimple: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -788,7 +788,7 @@ namespace EconomicTariff {
 		int IOStat; // IO Status when calling get input subroutine
 		bool isNotNumeric;
 		int jFld;
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in renaming.
+		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "UtilityCost:Charge:Simple";
 		numChargeSimple = GetNumObjectsFound( CurrentModuleObject );
@@ -797,8 +797,8 @@ namespace EconomicTariff {
 			GetObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
-				if ( index( MakeUPPERCase( cAlphaArgs( jFld ) ), "UTILITYCOST:" ) > 0 ) {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"." );
+				if ( hasi( cAlphaArgs( jFld ), "UtilityCost:" ) ) {
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"." );
 					ShowContinueError( "... a field was found containing UtilityCost: which may indicate a missing comma." );
 				}
 			}
@@ -814,8 +814,8 @@ namespace EconomicTariff {
 			if ( chargeSimple( iInObj ).season != seasonAnnual ) {
 				if ( chargeSimple( iInObj ).tariffIndx != 0 ) {
 					if ( tariff( chargeSimple( iInObj ).tariffIndx ).seasonSchIndex == 0 ) {
-						ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid data" );
-						ShowContinueError( trim( cAlphaFieldNames( 4 ) ) + "=\"" + trim( cAlphaArgs( 4 ) ) + "\"." );
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
+						ShowContinueError( cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
 						ShowContinueError( " a Season other than Annual is used but no Season Schedule Name is specified" " in the UtilityCost:Tariff." );
 					}
 				}
@@ -852,7 +852,7 @@ namespace EconomicTariff {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetInputEconomicsChargeBlock: " );
+		static std::string const RoutineName( "GetInputEconomicsChargeBlock: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -873,7 +873,7 @@ namespace EconomicTariff {
 		int alphaOffset; // offset used in blocks for alpha array
 		Real64 hugeNumber( 0.0 ); //Autodesk Value not used but suppresses warning about huge() call
 		int jFld;
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in renaming.
+		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "UtilityCost:Charge:Block";
 		hugeNumber = huge( hugeNumber );
@@ -883,8 +883,8 @@ namespace EconomicTariff {
 			GetObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
-				if ( index( MakeUPPERCase( cAlphaArgs( jFld ) ), "UTILITYCOST:" ) > 0 ) {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"." );
+				if ( hasi( cAlphaArgs( jFld ), "UtilityCost:" ) ) {
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"." );
 					ShowContinueError( "... a field was found containing UtilityCost: which may indicate a missing comma." );
 				}
 			}
@@ -900,8 +900,8 @@ namespace EconomicTariff {
 			if ( chargeBlock( iInObj ).season != seasonAnnual ) {
 				if ( chargeBlock( iInObj ).tariffIndx != 0 ) {
 					if ( tariff( chargeBlock( iInObj ).tariffIndx ).seasonSchIndex == 0 ) {
-						ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid data" );
-						ShowContinueError( trim( cAlphaFieldNames( 4 ) ) + "=\"" + trim( cAlphaArgs( 4 ) ) + "\"." );
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
+						ShowContinueError( cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
 						ShowContinueError( " a Season other than Annual is used but no Season Schedule Name is specified" " in the UtilityCost:Tariff." );
 					}
 				}
@@ -911,7 +911,7 @@ namespace EconomicTariff {
 			//index of the remaining into variable in the variable array
 			chargeBlock( iInObj ).remainingPt = AssignVariablePt( cAlphaArgs( 6 ), true, varIsAssigned, varNotYetDefined, kindCategory, iInObj, chargeBlock( iInObj ).tariffIndx );
 			//block size multiplier
-			if ( len_trim( cAlphaArgs( 7 ) ) == 0 ) { //if blank
+			if ( len( cAlphaArgs( 7 ) ) == 0 ) { //if blank
 				chargeBlock( iInObj ).blkSzMultVal = 1.0; //default is 1 if left blank
 				chargeBlock( iInObj ).blkSzMultPt = 0;
 			} else {
@@ -963,7 +963,7 @@ namespace EconomicTariff {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetInputEconomicsRatchet: " );
+		static std::string const RoutineName( "GetInputEconomicsRatchet: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -981,7 +981,7 @@ namespace EconomicTariff {
 		int IOStat; // IO Status when calling get input subroutine
 		bool isNotNumeric;
 		int jFld;
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in renaming.
+		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "UtilityCost:Ratchet";
 		numRatchet = GetNumObjectsFound( CurrentModuleObject );
@@ -990,8 +990,8 @@ namespace EconomicTariff {
 			GetObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
-				if ( index( MakeUPPERCase( cAlphaArgs( jFld ) ), "UTILITYCOST:" ) > 0 ) {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"." );
+				if ( hasi( cAlphaArgs( jFld ), "UtilityCost:" ) ) {
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"." );
 					ShowContinueError( "... a field was found containing UtilityCost: which may indicate a missing comma." );
 				}
 			}
@@ -1039,7 +1039,7 @@ namespace EconomicTariff {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetInputEconomicsVariable: " );
+		static std::string const RoutineName( "GetInputEconomicsVariable: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1060,7 +1060,7 @@ namespace EconomicTariff {
 		int jVal;
 		int variablePt;
 		int jFld;
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in renaming.
+		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "UtilityCost:Variable";
 		numEconVarObj = GetNumObjectsFound( CurrentModuleObject );
@@ -1068,8 +1068,8 @@ namespace EconomicTariff {
 			GetObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
-				if ( index( MakeUPPERCase( cAlphaArgs( jFld ) ), "UTILITYCOST:" ) > 0 ) {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"." );
+				if ( hasi( cAlphaArgs( jFld ), "UtilityCost:" ) ) {
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"." );
 					ShowContinueError( "... a field was found containing UtilityCost: which may indicate a missing comma." );
 				}
 			}
@@ -1087,8 +1087,8 @@ namespace EconomicTariff {
 				econVar( variablePt ).varUnitType = varUnitTypeCurrency;
 			} else {
 				econVar( variablePt ).varUnitType = varUnitTypeDimensionless;
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid data" );
-				ShowContinueError( "invalid " + trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( cAlphaArgs( 3 ) ) + "\"." );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
+				ShowContinueError( "invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
 				ErrorsFound = true;
 			}
 			//move number inputs into econVar
@@ -1129,7 +1129,7 @@ namespace EconomicTariff {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetInputEconomicsComputation: " );
+		static std::string const RoutineName( "GetInputEconomicsComputation: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1148,7 +1148,7 @@ namespace EconomicTariff {
 		int IOStat; // IO Status when calling get input subroutine
 		int jLine;
 		int jFld;
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in renaming.
+		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "UtilityCost:Computation";
 		numComputation = GetNumObjectsFound( CurrentModuleObject );
@@ -1162,8 +1162,8 @@ namespace EconomicTariff {
 			GetObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
-				if ( index( MakeUPPERCase( cAlphaArgs( jFld ) ), "UTILITYCOST:" ) > 0 ) {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"." );
+				if ( hasi( cAlphaArgs( jFld ), "UtilityCost:" ) ) {
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"." );
 					ShowContinueError( "... a field was found containing UtilityCost: which may indicate a missing comma." );
 				}
 			}
@@ -1183,15 +1183,15 @@ namespace EconomicTariff {
 					computation( tariffPt ).firstStep = 0;
 					computation( tariffPt ).lastStep = -1;
 					computation( tariffPt ).isUserDef = false;
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid data." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data." );
 					ShowContinueError( "... No lines in the computation can be interpreted " );
 					ErrorsFound = true;
 				} else {
 					computation( tariffPt ).isUserDef = true;
 				}
 			} else {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid data." );
-				ShowContinueError( "... not found " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\"." );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data." );
+				ShowContinueError( "... not found " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
 			}
 		}
@@ -1224,8 +1224,8 @@ namespace EconomicTariff {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const CurrentModuleObject( "CurrencyType" );
-		static Fstring const RoutineName( "GetInputEconomicsCurrencyType: " );
+		static std::string const CurrentModuleObject( "CurrencyType" );
+		static std::string const RoutineName( "GetInputEconomicsCurrencyType: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1257,8 +1257,8 @@ namespace EconomicTariff {
 				}
 			}
 			if ( selectedMonetaryUnit == 0 ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid data." );
-				ShowContinueError( "... invalid " + trim( cAlphaFieldNames( 1 ) ) + "." );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data." );
+				ShowContinueError( "... invalid " + cAlphaFieldNames( 1 ) + '.' );
 				ErrorsFound = true;
 			}
 		} else if ( NumCurrencyType > 1 ) {
@@ -1269,7 +1269,7 @@ namespace EconomicTariff {
 
 	void
 	parseComputeLine(
-		Fstring const & lineOfCompute,
+		std::string const & lineOfCompute,
 		int const fromTariff
 	)
 	{
@@ -1305,12 +1305,12 @@ namespace EconomicTariff {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Fstring word( MaxNameLength );
-		int endOfWord;
+		std::string word;
+		std::string::size_type endOfWord;
 		int token;
 
-		endOfWord = len_trim( lineOfCompute );
-		while ( endOfWord > 0 ) {
+		endOfWord = len( lineOfCompute ) - 1;
+		while ( endOfWord != std::string::npos ) {
 			// get a single word (text string delimited by spaces)
 			GetLastWord( lineOfCompute, endOfWord, word );
 			// first see if word is an operator
@@ -1318,7 +1318,7 @@ namespace EconomicTariff {
 			// if not an operator then look for
 			if ( token == 0 ) {
 				// see if argument or assignment (assignment will be first string on line)
-				if ( endOfWord > 0 ) {
+				if ( endOfWord != std::string::npos ) {
 					token = AssignVariablePt( word, true, varIsArgument, varNotYetDefined, kindUnknown, 0, fromTariff );
 				} else {
 					token = AssignVariablePt( word, true, varIsAssigned, varNotYetDefined, kindAssignCompute, 0, fromTariff );
@@ -1326,8 +1326,8 @@ namespace EconomicTariff {
 			}
 			// if a token is found then put it into step array
 			if ( token == 0 ) {
-				ShowWarningError( "In UtilityCost:Computation line: " + trim( lineOfCompute ) );
-				ShowContinueError( "  Do not recognize: " + trim( word ) + " Will skip." );
+				ShowWarningError( "In UtilityCost:Computation line: " + lineOfCompute );
+				ShowContinueError( "  Do not recognize: " + word + " Will skip." );
 			} else {
 				incrementSteps();
 				steps( numSteps ) = token;
@@ -1339,9 +1339,9 @@ namespace EconomicTariff {
 
 	void
 	GetLastWord(
-		Fstring const & lineOfText,
-		int & endOfScan,
-		Fstring & aWord
+		std::string const & lineOfText,
+		std::string::size_type & endOfScan,
+		std::string & aWord
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -1377,20 +1377,20 @@ namespace EconomicTariff {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int iString;
-		int curEndOfScan;
 		bool isInWord;
 		bool isSpace;
-		int beginOfWord;
-		int endOfWord;
+		std::string::size_type iString;
+		std::string::size_type curEndOfScan;
+		std::string::size_type beginOfWord;
+		std::string::size_type endOfWord;
 
 		curEndOfScan = endOfScan;
-		if ( curEndOfScan > 0 ) {
-			if ( curEndOfScan > len_trim( lineOfText ) ) {
-				curEndOfScan = len_trim( lineOfText );
+		if ( curEndOfScan != std::string::npos ) {
+			if ( curEndOfScan >= len( lineOfText ) ) {
+				curEndOfScan = len( lineOfText ) - 1;
 			}
 			//check if currently on a space or not
-			if ( lineOfText( curEndOfScan, curEndOfScan ) == " " ) {
+			if ( lineOfText[ curEndOfScan ] == ' ' ) {
 				isInWord = false;
 				beginOfWord = 0;
 				endOfWord = 0;
@@ -1400,8 +1400,8 @@ namespace EconomicTariff {
 				endOfWord = curEndOfScan;
 			}
 			//scan backwards from
-			for ( iString = curEndOfScan; iString >= 1; --iString ) {
-				if ( lineOfText( iString, iString ) == " " ) {
+			for ( iString = curEndOfScan; iString <= curEndOfScan; --iString ) { // Unsigned will wrap to npos after 0
+				if ( lineOfText[ iString ] == ' ' ) {
 					isSpace = true;
 				} else {
 					isSpace = false;
@@ -1427,13 +1427,13 @@ namespace EconomicTariff {
 					}
 				}
 			}
-			aWord = lineOfText( beginOfWord, endOfWord );
+			aWord = lineOfText.substr( beginOfWord, endOfWord - beginOfWord + 1 );
 			endOfScan = beginOfWord - 1;
-			if ( endOfScan < 0 ) {
-				endOfScan = 0;
+			if ( endOfScan == std::string::npos ) {
+				endOfScan = std::string::npos;
 			}
 		} else {
-			endOfScan = 0;
+			endOfScan = std::string::npos;
 			aWord = "";
 		}
 	}
@@ -1813,8 +1813,8 @@ namespace EconomicTariff {
 
 	int
 	LookUpSeason(
-		Fstring const & nameOfSeason,
-		Fstring const & nameOfReferingObj
+		std::string const & nameOfSeason,
+		std::string const & nameOfReferingObj
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -1861,7 +1861,7 @@ namespace EconomicTariff {
 		} else if ( SameString( nameOfSeason, "Annual" ) ) {
 			LookUpSeason = seasonAnnual;
 		} else {
-			ShowWarningError( "UtilityCost: Invalid season name " + trim( nameOfSeason ) + " in: " + trim( nameOfReferingObj ) );
+			ShowWarningError( "UtilityCost: Invalid season name " + nameOfSeason + " in: " + nameOfReferingObj );
 			ShowContinueError( "  Defaulting to Annual" );
 			LookUpSeason = seasonAnnual;
 		}
@@ -1870,10 +1870,10 @@ namespace EconomicTariff {
 
 	int
 	FindTariffIndex(
-		Fstring const & nameOfTariff,
-		Fstring const & nameOfReferingObj,
+		std::string const & nameOfTariff,
+		std::string const & nameOfReferingObj,
 		bool & ErrorsFound,
-		Fstring const & nameOfCurObj
+		std::string const & nameOfCurObj
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -1922,8 +1922,8 @@ namespace EconomicTariff {
 		if ( found > 0 ) {
 			FindTariffIndex = found;
 		} else {
-			ShowSevereError( trim( nameOfCurObj ) + "=\"" + trim( nameOfReferingObj ) + "\" invalid tariff referenced" );
-			ShowContinueError( "not found UtilityCost:Tariff=\"" + trim( nameOfTariff ) + "\"." );
+			ShowSevereError( nameOfCurObj + "=\"" + nameOfReferingObj + "\" invalid tariff referenced" );
+			ShowContinueError( "not found UtilityCost:Tariff=\"" + nameOfTariff + "\"." );
 			ErrorsFound = true;
 			FindTariffIndex = 0;
 		}
@@ -1932,10 +1932,10 @@ namespace EconomicTariff {
 
 	void
 	warnIfNativeVarname(
-		Fstring const & objName,
+		std::string const & objName,
 		int const curTariffIndex,
 		bool & ErrorsFound,
-		Fstring const & curobjName
+		std::string const & curobjName
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -2020,17 +2020,17 @@ namespace EconomicTariff {
 		if ( throwError ) {
 			ErrorsFound = true;
 			if ( curTariffIndex >= 1 && curTariffIndex <= numTariff ) {
-				ShowSevereError( "UtilityCost:Tariff=\"" + trim( tariff( curTariffIndex ).tariffName ) + "\" invalid referenced name" );
-				ShowContinueError( trim( curobjName ) + "=\"" + trim( objName ) + "\" You cannot name an object using the same name as a native variable." );
+				ShowSevereError( "UtilityCost:Tariff=\"" + tariff( curTariffIndex ).tariffName + "\" invalid referenced name" );
+				ShowContinueError( curobjName + "=\"" + objName + "\" You cannot name an object using the same name as a native variable." );
 			} else {
-				ShowSevereError( trim( curobjName ) + "=\"" + trim( objName ) + "\" You cannot name an object using the same name as a native variable." );
+				ShowSevereError( curobjName + "=\"" + objName + "\" You cannot name an object using the same name as a native variable." );
 			}
 		}
 	}
 
 	int
 	AssignVariablePt(
-		Fstring const & stringIn,
+		std::string const & stringIn,
 		bool const flagIfNotNumeric,
 		int const useOfVar,
 		int const varSpecific,
@@ -2073,11 +2073,11 @@ namespace EconomicTariff {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Fstring inNoSpaces( 200 );
+		std::string inNoSpaces;
 		int found;
 		int iVar;
 
-		if ( flagIfNotNumeric && ( len_trim( stringIn ) >= 1 ) ) {
+		if ( flagIfNotNumeric && ( len( stringIn ) >= 1 ) ) {
 			inNoSpaces = RemoveSpaces( stringIn );
 			found = 0;
 			if ( allocated( econVar ) ) {
@@ -2247,8 +2247,8 @@ namespace EconomicTariff {
 		steps( numSteps ) = 0;
 	}
 
-	Fstring
-	RemoveSpaces( Fstring const & StringIn )
+	std::string
+	RemoveSpaces( std::string const & StringIn )
 	{
 		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -2267,7 +2267,7 @@ namespace EconomicTariff {
 		// USE STATEMENTS:
 
 		// Return value
-		Fstring StringOut( 200 );
+		std::string StringOut;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2282,21 +2282,18 @@ namespace EconomicTariff {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int iString;
-		bool foundSpaces;
 
-		StringOut = "";
-		foundSpaces = false;
-		for ( iString = 1; iString <= len_trim( StringIn ); ++iString ) {
-			if ( StringIn( iString, iString ) != " " ) {
-				StringOut = trim( StringOut ) + StringIn( iString, iString );
+		bool foundSpaces = false;
+		for ( std::string::size_type iString = 0; iString < len( StringIn ); ++iString ) {
+			if ( StringIn[ iString ] != ' ' ) {
+				StringOut += StringIn[ iString ];
 			} else {
 				foundSpaces = true;
 			}
 		}
 		if ( foundSpaces ) {
-			ShowWarningError( "UtilityCost: Spaces were removed from the variable=\"" + trim( StringIn ) + "\"." );
-			ShowContinueError( "...Resultant variable=\"" + trim( StringOut ) + "\"." );
+			ShowWarningError( "UtilityCost: Spaces were removed from the variable=\"" + StringIn + "\"." );
+			ShowContinueError( "...Resultant variable=\"" + StringOut + "\"." );
 		}
 		return StringOut;
 	}
@@ -2396,7 +2393,7 @@ namespace EconomicTariff {
 	}
 
 	int
-	lookupOperator( Fstring const & opString )
+	lookupOperator( std::string const & opString )
 	{
 		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -2756,10 +2753,10 @@ namespace EconomicTariff {
 				}
 				// make sure no compuation is already user defined
 				if ( computation( iTariff ).firstStep != 0 ) {
-					ShowWarningError( "In UtilityCost:Tariff: Overwriting user defined tariff " + trim( tariff( iTariff ).tariffName ) );
+					ShowWarningError( "In UtilityCost:Tariff: Overwriting user defined tariff " + tariff( iTariff ).tariffName );
 				}
 				//initialize the computation
-				computation( iTariff ).computeName = "Autogenerated - " + trim( tariff( iTariff ).tariffName );
+				computation( iTariff ).computeName = "Autogenerated - " + tariff( iTariff ).tariffName;
 				computation( iTariff ).firstStep = numSteps + 1;
 				computation( iTariff ).lastStep = -1; //this will be incremented by addStep
 				computation( iTariff ).isUserDef = false;
@@ -2833,7 +2830,7 @@ namespace EconomicTariff {
 					++loopCount;
 				}
 				if ( loopCount > 100000 ) {
-					ShowWarningError( "UtilityCost:Tariff: Loop count exceeded when counting dependancies in tariff: " + trim( tariff( iTariff ).tariffName ) );
+					ShowWarningError( "UtilityCost:Tariff: Loop count exceeded when counting dependancies in tariff: " + tariff( iTariff ).tariffName );
 				}
 				//make sure that all variables associated with the tariff are included
 				remainingVarFlag = false;
@@ -2843,14 +2840,14 @@ namespace EconomicTariff {
 					}
 				}
 				if ( remainingVarFlag ) {
-					ShowWarningError( "CreateDefaultComputation: In UtilityCost:Computation: " "Circular or invalid dependencies found in tariff: " + trim( tariff( iTariff ).tariffName ) );
+					ShowWarningError( "CreateDefaultComputation: In UtilityCost:Computation: " "Circular or invalid dependencies found in tariff: " + tariff( iTariff ).tariffName );
 					ShowContinueError( "  UtilityCost variables that may have invalid dependencies and the variables they are dependant on." );
 					for ( iVar = 1; iVar <= numEconVar; ++iVar ) {
 						if ( econVar( iVar ).tariffIndx == iTariff ) {
 							if ( econVar( iVar ).activeNow ) {
-								ShowContinueError( "     " + trim( econVar( iVar ).name ) );
+								ShowContinueError( "     " + econVar( iVar ).name );
 								for ( kOperand = econVar( iVar ).firstOperand; kOperand <= econVar( iVar ).lastOperand; ++kOperand ) {
-									ShowContinueError( "        ->  " + trim( econVar( operand( kOperand ) ).name ) );
+									ShowContinueError( "        ->  " + econVar( operand( kOperand ) ).name );
 								}
 							}
 						}
@@ -2861,7 +2858,7 @@ namespace EconomicTariff {
 				if ( computation( iTariff ).firstStep >= computation( iTariff ).lastStep ) {
 					computation( iTariff ).firstStep = 0;
 					computation( iTariff ).lastStep = -1;
-					ShowWarningError( "CreateDefaultComputation: In UtilityCost:Computation: " "No lines in the auto generated computation can be interpreted in tariff: " + trim( tariff( iTariff ).tariffName ) );
+					ShowWarningError( "CreateDefaultComputation: In UtilityCost:Computation: " "No lines in the auto generated computation can be interpreted in tariff: " + tariff( iTariff ).tariffName );
 				}
 			}
 		}
@@ -3695,14 +3692,14 @@ namespace EconomicTariff {
 				} else if ( SELECT_CASE_var == kindQualify ) {
 					evaluateQualify( variablePointer );
 				} else if ( SELECT_CASE_var == kindUnknown ) {
-					ShowWarningError( "UtilityCost variable not defined: " + trim( econVar( variablePointer ).name ) );
-					ShowContinueError( "   In tariff: " + trim( tariff( econVar( variablePointer ).tariffIndx ).tariffName ) );
+					ShowWarningError( "UtilityCost variable not defined: " + econVar( variablePointer ).name );
+					ShowContinueError( "   In tariff: " + tariff( econVar( variablePointer ).tariffIndx ).tariffName );
 					ShowContinueError( "   This may be the result of a mispelled variable name in the UtilityCost:Computation object." );
 					ShowContinueError( "   All zero values will be assumed for this variable." );
 				} else if ( ( SELECT_CASE_var == kindVariable ) || ( SELECT_CASE_var == kindCategory ) || ( SELECT_CASE_var == kindNative ) || ( SELECT_CASE_var == kindAssignCompute ) || ( SELECT_CASE_var == kindTariff ) || ( SELECT_CASE_var == kindComputation ) ) {
 					// do nothing
 				} else {
-					ShowWarningError( "UtilityCost Debugging issue. Invalid kind of variable used (pushStack). " + trim( IntToStr( econVar( variablePointer ).kindOfObj ) ) + " in tariff: " + trim( tariff( econVar( variablePointer ).tariffIndx ).tariffName ) );
+					ShowWarningError( "UtilityCost Debugging issue. Invalid kind of variable used (pushStack). " + IntToStr( econVar( variablePointer ).kindOfObj ) + " in tariff: " + tariff( econVar( variablePointer ).tariffIndx ).tariffName );
 				}}
 				// if the serviceCharges are being evaluated add in the monthly charges
 				if ( econVar( variablePointer ).specific == catServiceCharges ) addMonthlyCharge( variablePointer );
@@ -3764,7 +3761,7 @@ namespace EconomicTariff {
 			variablePointer = stack( topOfStack ).varPt;
 			monthlyArray = stack( topOfStack ).values;
 		} else {
-			ShowWarningError( "UtilityCost:Tariff: stack underflow in calculation of utility bills. On variable: " + trim( econVar( variablePointer ).name ) );
+			ShowWarningError( "UtilityCost:Tariff: stack underflow in calculation of utility bills. On variable: " + econVar( variablePointer ).name );
 			variablePointer = 0;
 			monthlyArray = 0.0;
 			topOfStack = 0;
@@ -3816,13 +3813,13 @@ namespace EconomicTariff {
 		//check the tariff - make sure they match
 		if ( chargeSimple( indexInChg ).namePt != usingVariable ) {
 			ShowWarningError( "UtilityCost:Tariff Debugging issue. ChargeSimple index does not match variable pointer." );
-			ShowContinueError( "   Between: " + trim( econVar( usingVariable ).name ) );
-			ShowContinueError( "       And: " + trim( econVar( chargeSimple( indexInChg ).namePt ).name ) );
+			ShowContinueError( "   Between: " + econVar( usingVariable ).name );
+			ShowContinueError( "       And: " + econVar( chargeSimple( indexInChg ).namePt ).name );
 		}
 		if ( chargeSimple( indexInChg ).tariffIndx != curTariff ) {
 			ShowWarningError( "UtilityCost:Tariff Debugging issue. ChargeSimple index does not match tariff index." );
-			ShowContinueError( "   Between: " + trim( tariff( curTariff ).tariffName ) );
-			ShowContinueError( "       And: " + trim( tariff( chargeSimple( indexInChg ).tariffIndx ).tariffName ) );
+			ShowContinueError( "   Between: " + tariff( curTariff ).tariffName );
+			ShowContinueError( "       And: " + tariff( chargeSimple( indexInChg ).tariffIndx ).tariffName );
 		}
 		// data from the Charge:Simple
 		sourceVals = econVar( chargeSimple( indexInChg ).sourcePt ).values;
@@ -3904,13 +3901,13 @@ namespace EconomicTariff {
 		//check the tariff - make sure they match
 		if ( chargeBlock( indexInChg ).namePt != usingVariable ) {
 			ShowWarningError( "UtilityCost:Tariff Debugging issue. chargeBlock index does not match variable pointer." );
-			ShowContinueError( "   Between: " + trim( econVar( usingVariable ).name ) );
-			ShowContinueError( "       And: " + trim( econVar( chargeBlock( indexInChg ).namePt ).name ) );
+			ShowContinueError( "   Between: " + econVar( usingVariable ).name );
+			ShowContinueError( "       And: " + econVar( chargeBlock( indexInChg ).namePt ).name );
 		}
 		if ( chargeBlock( indexInChg ).tariffIndx != curTariff ) {
 			ShowWarningError( "UtilityCost:Tariff Debugging issue. chargeBlock index does not match tariff index." );
-			ShowContinueError( "   Between: " + trim( tariff( curTariff ).tariffName ) );
-			ShowContinueError( "       And: " + trim( tariff( chargeBlock( indexInChg ).tariffIndx ).tariffName ) );
+			ShowContinueError( "   Between: " + tariff( curTariff ).tariffName );
+			ShowContinueError( "       And: " + tariff( chargeBlock( indexInChg ).tariffIndx ).tariffName );
 		}
 		// data from the chargeBlock
 		sourceVals = econVar( chargeBlock( indexInChg ).sourcePt ).values;
@@ -3980,7 +3977,7 @@ namespace EconomicTariff {
 				}
 			}
 			if ( ! flagAllZero ) {
-				ShowWarningError( "UtilityCost:Tariff Not all energy or demand was assigned in the block charge: " + trim( econVar( usingVariable ).name ) );
+				ShowWarningError( "UtilityCost:Tariff Not all energy or demand was assigned in the block charge: " + econVar( usingVariable ).name );
 			}
 		}
 		//store the cost in the name of the variable
@@ -4043,13 +4040,13 @@ namespace EconomicTariff {
 		//check the tariff - make sure they match
 		if ( ratchet( indexInChg ).namePt != usingVariable ) {
 			ShowWarningError( "UtilityCost:Tariff Debugging issue. Ratchet index does not match variable pointer." );
-			ShowContinueError( "   Between: " + trim( econVar( usingVariable ).name ) );
-			ShowContinueError( "       And: " + trim( econVar( ratchet( indexInChg ).namePt ).name ) );
+			ShowContinueError( "   Between: " + econVar( usingVariable ).name );
+			ShowContinueError( "       And: " + econVar( ratchet( indexInChg ).namePt ).name );
 		}
 		if ( ratchet( indexInChg ).tariffIndx != curTariff ) {
 			ShowWarningError( "UtilityCost:Tariff Debugging issue. Ratchet index does not match tariff index." );
-			ShowContinueError( "   Between: " + trim( tariff( curTariff ).tariffName ) );
-			ShowContinueError( "       And: " + trim( tariff( ratchet( indexInChg ).tariffIndx ).tariffName ) );
+			ShowContinueError( "   Between: " + tariff( curTariff ).tariffName );
+			ShowContinueError( "       And: " + tariff( ratchet( indexInChg ).tariffIndx ).tariffName );
 		}
 		// data from the Ratchet
 		baselineVals = econVar( ratchet( indexInChg ).baselinePt ).values;
@@ -4191,13 +4188,13 @@ namespace EconomicTariff {
 		//check the tariff - make sure they match
 		if ( qualify( indexInQual ).namePt != usingVariable ) {
 			ShowWarningError( "UtilityCost:Tariff Debugging issue. Qualify index does not match variable pointer." );
-			ShowContinueError( "   Between: " + trim( econVar( usingVariable ).name ) );
-			ShowContinueError( "       And: " + trim( econVar( qualify( indexInQual ).namePt ).name ) );
+			ShowContinueError( "   Between: " + econVar( usingVariable ).name );
+			ShowContinueError( "       And: " + econVar( qualify( indexInQual ).namePt ).name );
 		}
 		if ( qualify( indexInQual ).tariffIndx != curTariff ) {
 			ShowWarningError( "UtilityCost:Tariff Debugging issue. Qualify index does not match tariff index." );
-			ShowContinueError( "   Between: " + trim( tariff( curTariff ).tariffName ) );
-			ShowContinueError( "       And: " + trim( tariff( qualify( indexInQual ).tariffIndx ).tariffName ) );
+			ShowContinueError( "   Between: " + tariff( curTariff ).tariffName );
+			ShowContinueError( "       And: " + tariff( qualify( indexInQual ).tariffIndx ).tariffName );
 		}
 		// data from the Qualify
 		sourceVals = econVar( qualify( indexInQual ).sourcePt ).values;
@@ -4345,8 +4342,8 @@ namespace EconomicTariff {
 		//check the tariff - make sure they match
 		if ( tariff( curTariff ).ptServiceCharges != usingVariable ) {
 			ShowWarningError( "UtilityCost:Tariff Debugging issue. Tariff index for service charge does not match variable pointer." );
-			ShowContinueError( "   Between: " + trim( tariff( curTariff ).tariffName ) );
-			ShowContinueError( "       And: " + trim( tariff( tariff( curTariff ).ptServiceCharges ).tariffName ) );
+			ShowContinueError( "   Between: " + tariff( curTariff ).tariffName );
+			ShowContinueError( "       And: " + tariff( tariff( curTariff ).ptServiceCharges ).tariffName );
 		}
 		if ( tariff( curTariff ).monthChgPt != 0 ) {
 			econVar( usingVariable ).values += econVar( tariff( curTariff ).monthChgPt ).values;
@@ -4666,9 +4663,9 @@ namespace EconomicTariff {
 		Real64 gasTotalCost;
 		Real64 otherTotalCost;
 		Real64 allTotalCost;
-		Fstring elecTariffNames( MaxNameLength );
-		Fstring gasTariffNames( MaxNameLength );
-		Fstring othrTariffNames( MaxNameLength );
+		std::string elecTariffNames;
+		std::string gasTariffNames;
+		std::string othrTariffNames;
 		int elecUnits;
 		int gasUnits;
 		int othrUnits;
@@ -4700,18 +4697,18 @@ namespace EconomicTariff {
 					if ( tariff( iTariff ).kindElectricMtr >= kindMeterElecSimple ) {
 						if ( tariff( iTariff ).totalAnnualEnergy > elecTotalEne ) elecTotalEne = tariff( iTariff ).totalAnnualEnergy;
 						elecTotalCost += tariff( iTariff ).totalAnnualCost;
-						elecTariffNames = trim( elecTariffNames ) + " " + tariff( iTariff ).tariffName;
+						elecTariffNames += ' ' + tariff( iTariff ).tariffName;
 						elecUnits = tariff( iTariff ).convChoice;
 					} else if ( tariff( iTariff ).reportMeterIndx == gasFacilMeter ) {
 						if ( tariff( iTariff ).totalAnnualEnergy > gasTotalEne ) gasTotalEne = tariff( iTariff ).totalAnnualEnergy;
 						gasTotalCost += tariff( iTariff ).totalAnnualCost;
-						gasTariffNames = trim( gasTariffNames ) + " " + tariff( iTariff ).tariffName;
+						gasTariffNames += ' ' + tariff( iTariff ).tariffName;
 						gasUnits = tariff( iTariff ).convChoice;
 						gasDemWindowUnits = tariff( iTariff ).demandWindow;
 					} else {
 						if ( tariff( iTariff ).totalAnnualEnergy > otherTotalEne ) otherTotalEne = tariff( iTariff ).totalAnnualEnergy;
 						otherTotalCost += tariff( iTariff ).totalAnnualCost;
-						othrTariffNames = trim( othrTariffNames ) + " " + tariff( iTariff ).tariffName;
+						othrTariffNames += ' ' + tariff( iTariff ).tariffName;
 						othrUnits = tariff( iTariff ).convChoice;
 						othrDemWindowUnits = tariff( iTariff ).demandWindow;
 					}
@@ -4730,8 +4727,8 @@ namespace EconomicTariff {
 			PreDefTableEntry( pdchLeedEtsEneUnt, "Natural Gas", convEneStrings( gasUnits ) );
 			PreDefTableEntry( pdchLeedEtsEneUnt, "Other", convEneStrings( othrUnits ) );
 			PreDefTableEntry( pdchLeedEtsDemUnt, "Electricity", convDemStrings( elecUnits ) );
-			PreDefTableEntry( pdchLeedEtsDemUnt, "Natural Gas", trim( convDemStrings( gasUnits ) ) + trim( demWindowStrings( gasDemWindowUnits ) ) );
-			PreDefTableEntry( pdchLeedEtsDemUnt, "Other", trim( convDemStrings( othrUnits ) ) + trim( demWindowStrings( othrDemWindowUnits ) ) );
+			PreDefTableEntry( pdchLeedEtsDemUnt, "Natural Gas", convDemStrings( gasUnits ) + demWindowStrings( gasDemWindowUnits ) );
+			PreDefTableEntry( pdchLeedEtsDemUnt, "Other", convDemStrings( othrUnits ) + demWindowStrings( othrDemWindowUnits ) );
 			// total cost
 			PreDefTableEntry( pdchLeedEcsTotal, "Electricity", elecTotalCost, 2 );
 			PreDefTableEntry( pdchLeedEcsTotal, "Natural Gas", gasTotalCost, 2 );
@@ -4793,10 +4790,10 @@ namespace EconomicTariff {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// all arrays are in the format: (row, column)
-		FArray1D_Fstring columnHead( sFstring( MaxNameLength ) );
+		FArray1D_string columnHead;
 		FArray1D_int columnWidth;
-		FArray1D_Fstring rowHead( sFstring( MaxNameLength ) );
-		FArray2D_Fstring tableBody( sFstring( MaxNameLength ) );
+		FArray1D_string rowHead;
+		FArray2D_string tableBody;
 		//other local variables
 		int elecFacilMeter;
 		int gasFacilMeter;
@@ -4804,16 +4801,16 @@ namespace EconomicTariff {
 		Real64 gasTotalCost;
 		Real64 otherTotalCost;
 		Real64 allTotalCost;
-		Fstring outString( 2000 ); // an arbitarilty long string
+		std::string outString; // an arbitarilty long string
 		int curStep;
 		int indexInChg;
 		int iTariff;
 		int kVar;
 		int lStep;
-		static Fstring SIunit( MaxNameLength );
+		static std::string SIunit;
 		static int unitConvIndex( 0 );
 		static Real64 perAreaUnitConv( 0.0 );
-		static Fstring perAreaUnitName( MaxNameLength );
+		static std::string perAreaUnitName;
 
 		// compute floor area if no ABUPS
 		if ( buildingConditionedFloorArea == 0.0 ) {
@@ -4852,8 +4849,8 @@ namespace EconomicTariff {
 			columnHead( 3 ) = "Other";
 			columnHead( 4 ) = "Total";
 			rowHead( 1 ) = "Cost [~~$~~]";
-			rowHead( 2 ) = "Cost per Total Building Area " + trim( perAreaUnitName );
-			rowHead( 3 ) = "Cost per Net Conditioned Building Area " + trim( perAreaUnitName );
+			rowHead( 2 ) = "Cost per Total Building Area " + perAreaUnitName;
+			rowHead( 3 ) = "Cost per Net Conditioned Building Area " + perAreaUnitName;
 			elecTotalCost = 0.0;
 			gasTotalCost = 0.0;
 			otherTotalCost = 0.0;
@@ -4871,21 +4868,21 @@ namespace EconomicTariff {
 					}
 				}
 			}
-			tableBody( 1, 1 ) = trim( RealToStr( elecTotalCost, 2 ) );
-			tableBody( 1, 2 ) = trim( RealToStr( gasTotalCost, 2 ) );
-			tableBody( 1, 3 ) = trim( RealToStr( otherTotalCost, 2 ) );
-			tableBody( 1, 4 ) = trim( RealToStr( allTotalCost, 2 ) );
+			tableBody( 1, 1 ) = RealToStr( elecTotalCost, 2 );
+			tableBody( 1, 2 ) = RealToStr( gasTotalCost, 2 );
+			tableBody( 1, 3 ) = RealToStr( otherTotalCost, 2 );
+			tableBody( 1, 4 ) = RealToStr( allTotalCost, 2 );
 			if ( buildingGrossFloorArea > 0.0 ) {
-				tableBody( 2, 1 ) = trim( RealToStr( ( elecTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 ) );
-				tableBody( 2, 2 ) = trim( RealToStr( ( gasTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 ) );
-				tableBody( 2, 3 ) = trim( RealToStr( ( otherTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 ) );
-				tableBody( 2, 4 ) = trim( RealToStr( ( allTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 ) );
+				tableBody( 2, 1 ) = RealToStr( ( elecTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
+				tableBody( 2, 2 ) = RealToStr( ( gasTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
+				tableBody( 2, 3 ) = RealToStr( ( otherTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
+				tableBody( 2, 4 ) = RealToStr( ( allTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
 			}
 			if ( buildingConditionedFloorArea > 0.0 ) {
-				tableBody( 3, 1 ) = trim( RealToStr( ( elecTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 ) );
-				tableBody( 3, 2 ) = trim( RealToStr( ( gasTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 ) );
-				tableBody( 3, 3 ) = trim( RealToStr( ( otherTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 ) );
-				tableBody( 3, 4 ) = trim( RealToStr( ( allTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 ) );
+				tableBody( 3, 1 ) = RealToStr( ( elecTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
+				tableBody( 3, 2 ) = RealToStr( ( gasTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
+				tableBody( 3, 3 ) = RealToStr( ( otherTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
+				tableBody( 3, 4 ) = RealToStr( ( allTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
 			}
 			columnWidth = 14; //array assignment - same for all columns
 			WriteSubtitle( "Annual Cost" );
@@ -4933,7 +4930,7 @@ namespace EconomicTariff {
 				} else {
 					tableBody( iTariff, 5 ) = tariff( iTariff ).groupName;
 				}
-				tableBody( iTariff, 6 ) = trim( RealToStr( tariff( iTariff ).totalAnnualCost, 2 ) );
+				tableBody( iTariff, 6 ) = RealToStr( tariff( iTariff ).totalAnnualCost, 2 );
 			}
 			columnWidth = 14; //array assignment - same for all columns
 			WriteSubtitle( "Tariff Summary" );
@@ -5099,73 +5096,73 @@ namespace EconomicTariff {
 					curStep = steps( lStep );
 					{ auto const SELECT_CASE_var( curStep );
 					if ( SELECT_CASE_var == 0 ) { //end of line
-						WriteTextLine( outString );
+						WriteTextLine( rstrip( outString ) );
 						outString = "";
 					} else if ( ( SELECT_CASE_var >= 1 ) ) { //all positive values are a reference to an econVar
-						outString = trim( econVar( curStep ).name ) + " " + trim( outString );
+						outString = econVar( curStep ).name + ' ' + outString;
 					} else if ( SELECT_CASE_var == opSUM ) {
-						outString = "SUM " + trim( outString );
+						outString = "SUM " + outString;
 					} else if ( SELECT_CASE_var == opMULTIPLY ) {
-						outString = "MULTIPLY " + trim( outString );
+						outString = "MULTIPLY " + outString;
 					} else if ( SELECT_CASE_var == opSUBTRACT ) {
-						outString = "SUBTRACT " + trim( outString );
+						outString = "SUBTRACT " + outString;
 					} else if ( SELECT_CASE_var == opDIVIDE ) {
-						outString = "DIVIDE " + trim( outString );
+						outString = "DIVIDE " + outString;
 					} else if ( SELECT_CASE_var == opABSOLUTE ) {
-						outString = "ABSOLUTE " + trim( outString );
+						outString = "ABSOLUTE " + outString;
 					} else if ( SELECT_CASE_var == opINTEGER ) {
-						outString = "INTEGER " + trim( outString );
+						outString = "INTEGER " + outString;
 					} else if ( SELECT_CASE_var == opSIGN ) {
-						outString = "SIGN " + trim( outString );
+						outString = "SIGN " + outString;
 					} else if ( SELECT_CASE_var == opROUND ) {
-						outString = "ROUND " + trim( outString );
+						outString = "ROUND " + outString;
 					} else if ( SELECT_CASE_var == opMAXIMUM ) {
-						outString = "MAXIMUM " + trim( outString );
+						outString = "MAXIMUM " + outString;
 					} else if ( SELECT_CASE_var == opMINIMUM ) {
-						outString = "MINIMUM " + trim( outString );
+						outString = "MINIMUM " + outString;
 					} else if ( SELECT_CASE_var == opEXCEEDS ) {
-						outString = "EXCEEDS " + trim( outString );
+						outString = "EXCEEDS " + outString;
 					} else if ( SELECT_CASE_var == opANNUALMINIMUM ) {
-						outString = "ANNUALMINIMUM " + trim( outString );
+						outString = "ANNUALMINIMUM " + outString;
 					} else if ( SELECT_CASE_var == opANNUALMAXIMUM ) {
-						outString = "ANNUALMAXIMUM " + trim( outString );
+						outString = "ANNUALMAXIMUM " + outString;
 					} else if ( SELECT_CASE_var == opANNUALSUM ) {
-						outString = "ANNUALSUM " + trim( outString );
+						outString = "ANNUALSUM " + outString;
 					} else if ( SELECT_CASE_var == opANNUALAVERAGE ) {
-						outString = "ANNUALAVERAGE " + trim( outString );
+						outString = "ANNUALAVERAGE " + outString;
 					} else if ( SELECT_CASE_var == opANNUALOR ) {
-						outString = "ANNUALOR " + trim( outString );
+						outString = "ANNUALOR " + outString;
 					} else if ( SELECT_CASE_var == opANNUALAND ) {
-						outString = "ANNUALAND " + trim( outString );
+						outString = "ANNUALAND " + outString;
 					} else if ( SELECT_CASE_var == opANNUALMAXIMUMZERO ) {
-						outString = "ANNUALMAXIMUMZERO " + trim( outString );
+						outString = "ANNUALMAXIMUMZERO " + outString;
 					} else if ( SELECT_CASE_var == opANNUALMINIMUMZERO ) {
-						outString = "ANNUALMINIMUMZERO " + trim( outString );
+						outString = "ANNUALMINIMUMZERO " + outString;
 					} else if ( SELECT_CASE_var == opIF ) {
-						outString = "IF " + trim( outString );
+						outString = "IF " + outString;
 					} else if ( SELECT_CASE_var == opGREATERTHAN ) {
-						outString = "GREATERTHAN " + trim( outString );
+						outString = "GREATERTHAN " + outString;
 					} else if ( SELECT_CASE_var == opGREATEREQUAL ) {
-						outString = "GREATEREQUAL " + trim( outString );
+						outString = "GREATEREQUAL " + outString;
 					} else if ( SELECT_CASE_var == opLESSTHAN ) {
-						outString = "LESSTHAN " + trim( outString );
+						outString = "LESSTHAN " + outString;
 					} else if ( SELECT_CASE_var == opLESSEQUAL ) {
-						outString = "LESSEQUAL " + trim( outString );
+						outString = "LESSEQUAL " + outString;
 					} else if ( SELECT_CASE_var == opEQUAL ) {
-						outString = "EQUAL " + trim( outString );
+						outString = "EQUAL " + outString;
 					} else if ( SELECT_CASE_var == opNOTEQUAL ) {
-						outString = "NOTEQUAL " + trim( outString );
+						outString = "NOTEQUAL " + outString;
 					} else if ( SELECT_CASE_var == opAND ) {
-						outString = "AND " + trim( outString );
+						outString = "AND " + outString;
 					} else if ( SELECT_CASE_var == opOR ) {
-						outString = "OR " + trim( outString );
+						outString = "OR " + outString;
 					} else if ( SELECT_CASE_var == opNOT ) {
-						outString = "NOT " + trim( outString );
+						outString = "NOT " + outString;
 					} else if ( SELECT_CASE_var == opADD ) {
-						outString = "ADD " + trim( outString );
+						outString = "ADD " + outString;
 					} else if ( SELECT_CASE_var == opNOOP ) { //should clear the outString when done debugging
 						//outString = ''
-						outString = "FROM " + trim( outString );
+						outString = "FROM " + outString;
 					}}
 				}
 			}
@@ -5212,12 +5209,12 @@ namespace EconomicTariff {
 				if ( SELECT_CASE_var == buyFromUtility ) {
 					if ( tariff( iTariff ).totalAnnualCost < 0 ) {
 						ShowWarningError( "UtilityCost:Tariff: " "A negative annual total cost when buying electricity from a utility is unusual. " );
-						ShowContinueError( "  In UtilityCost:Tariff named " + trim( tariff( iTariff ).tariffName ) );
+						ShowContinueError( "  In UtilityCost:Tariff named " + tariff( iTariff ).tariffName );
 					}
 				} else if ( SELECT_CASE_var == sellToUtility ) {
 					if ( tariff( iTariff ).totalAnnualCost > 0 ) {
 						ShowWarningError( "UtilityCost:Tariff: " "A positive annual total cost when selling electricity to a utility is unusual. " );
-						ShowContinueError( "  In UtilityCost:Tariff named " + trim( tariff( iTariff ).tariffName ) );
+						ShowContinueError( "  In UtilityCost:Tariff named " + tariff( iTariff ).tariffName );
 					}
 				}}
 			}
@@ -5280,10 +5277,10 @@ namespace EconomicTariff {
 
 	void
 	ReportEconomicVariable(
-		Fstring const & titleString,
+		std::string const & titleString,
 		bool const includeCategory,
 		bool const showCurrencySymbol,
-		Fstring const & forString
+		std::string const & forString
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -5324,10 +5321,10 @@ namespace EconomicTariff {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// all arrays are in the format: (row, column)
-		FArray1D_Fstring columnHead( sFstring( MaxNameLength ) );
+		FArray1D_string columnHead;
 		FArray1D_int columnWidth;
-		FArray1D_Fstring rowHead( sFstring( MaxNameLength ) );
-		FArray2D_Fstring tableBody( sFstring( MaxNameLength ) );
+		FArray1D_string rowHead;
+		FArray2D_string tableBody;
 		Real64 sumVal;
 		Real64 maximumVal;
 		Real64 curVal;
@@ -5381,9 +5378,9 @@ namespace EconomicTariff {
 			if ( econVar( iVar ).activeNow ) {
 				++nCntOfVar;
 				if ( showCurrencySymbol ) {
-					rowHead( nCntOfVar ) = trim( econVar( iVar ).name ) + " (~~$~~)";
+					rowHead( nCntOfVar ) = econVar( iVar ).name + " (~~$~~)";
 				} else {
-					rowHead( nCntOfVar ) = trim( econVar( iVar ).name );
+					rowHead( nCntOfVar ) = econVar( iVar ).name;
 				}
 			}
 		}
@@ -5395,14 +5392,14 @@ namespace EconomicTariff {
 				for ( jMonth = 1; jMonth <= 12; ++jMonth ) { //note not all months get printed out if more than 12 are used.- need to fix this later
 					curVal = econVar( iVar ).values( jMonth );
 					if ( ( curVal > 0 ) && ( curVal < 1 ) ) {
-						tableBody( nCntOfVar, jMonth ) = trim( RealToStr( curVal, 4 ) );
+						tableBody( nCntOfVar, jMonth ) = RealToStr( curVal, 4 );
 					} else {
-						tableBody( nCntOfVar, jMonth ) = trim( RealToStr( curVal, 2 ) );
+						tableBody( nCntOfVar, jMonth ) = RealToStr( curVal, 2 );
 					}
 				}
 				getMaxAndSum( iVar, sumVal, maximumVal );
-				tableBody( nCntOfVar, 13 ) = trim( RealToStr( sumVal, 2 ) );
-				tableBody( nCntOfVar, 14 ) = trim( RealToStr( maximumVal, 2 ) );
+				tableBody( nCntOfVar, 13 ) = RealToStr( sumVal, 2 );
+				tableBody( nCntOfVar, 14 ) = RealToStr( maximumVal, 2 );
 				if ( includeCategory ) {
 					//first find category
 					curCategory = 0;
@@ -5527,7 +5524,7 @@ namespace EconomicTariff {
 		for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
 			//determine if this is meter related to electricity
 			if ( tariff( iTariff ).reportMeterIndx != 0 ) {
-				{ auto const SELECT_CASE_var( trim( MakeUPPERCase( EnergyMeters( tariff( iTariff ).reportMeterIndx ).ResourceType ) ) );
+				{ auto const SELECT_CASE_var( MakeUPPERCase( EnergyMeters( tariff( iTariff ).reportMeterIndx ).ResourceType ) );
 				if ( SELECT_CASE_var == "ELECTRICITY" ) {
 					tariff( iTariff ).kindElectricMtr = kindMeterElecSimple;
 				} else if ( SELECT_CASE_var == "ELECTRICITYPRODUCED" ) {

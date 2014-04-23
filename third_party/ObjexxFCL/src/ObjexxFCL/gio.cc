@@ -12,7 +12,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/char.constants.hh>
 #include <ObjexxFCL/Backspace.hh>
 #include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/GlobalStreams.hh>
@@ -398,7 +397,7 @@ write( Unit const unit )
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
 		auto stream_p( dynamic_cast< std::ostream * >( &Stream_p->stream() ) );
-		if ( stream_p ) *stream_p << NL;
+		if ( stream_p ) *stream_p << '\n';
 	}
 }
 

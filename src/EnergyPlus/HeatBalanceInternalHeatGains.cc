@@ -16,8 +16,8 @@ namespace EnergyPlus {
 void
 SetupZoneInternalGain(
 	int const ZoneNum,
-	Fstring const & cComponentObject, // object class name for device contributing internal gain
-	Fstring const & cComponentName, // user unique name for device
+	std::string const & cComponentObject, // object class name for device contributing internal gain
+	std::string const & cComponentName, // user unique name for device
 	int const IntGainComp_TypeOfNum,
 	Optional< Real64 > ConvectionGainRate, // pointer target for remote convection gain value to be accessed
 	Optional< Real64 > ReturnAirConvectionGainRate,
@@ -68,8 +68,8 @@ SetupZoneInternalGain(
 	int IntGainsNum;
 	bool FoundIntGainsType;
 	bool FoundDuplicate;
-	Fstring UpperCaseObjectType( MaxNameLength );
-	Fstring UpperCaseObjectName( MaxNameLength );
+	std::string UpperCaseObjectType;
+	std::string UpperCaseObjectName;
 
 	// Object Data
 	FArray1D< GenericComponentZoneIntGainStruct > TempGenDeviceIntGainsArr;
@@ -82,8 +82,8 @@ SetupZoneInternalGain(
 	// Check if IntGainComp_TypeOfNum and cComponentObject are consistent
 	if ( ! SameString( UpperCaseObjectType, ZoneIntGainDeviceTypes( IntGainComp_TypeOfNum ) ) ) {
 		ShowSevereError( "SetupZoneInternalGain: developer error, trapped inconsistent internal gains object types" " sent to SetupZoneInternalGain" );
-		ShowContinueError( "Object type character = " + trim( cComponentObject ) );
-		ShowContinueError( "Type of Num object name = " + trim( ZoneIntGainDeviceTypes( IntGainComp_TypeOfNum ) ) );
+		ShowContinueError( "Object type character = " + cComponentObject );
+		ShowContinueError( "Type of Num object name = " + ZoneIntGainDeviceTypes( IntGainComp_TypeOfNum ) );
 		return;
 	}
 
@@ -99,8 +99,8 @@ SetupZoneInternalGain(
 
 	if ( FoundDuplicate ) {
 		ShowSevereError( "SetupZoneInternalGain: developer error, trapped duplicate internal gains sent to SetupZoneInternalGain" );
-		ShowContinueError( "The duplicate object user name =" + trim( cComponentName ) );
-		ShowContinueError( "The duplicate object type = " + trim( cComponentObject ) );
+		ShowContinueError( "The duplicate object user name =" + cComponentName );
+		ShowContinueError( "The duplicate object type = " + cComponentObject );
 		ShowContinueError( "This internal gain will not be modeled, and the simulation continues" );
 		return;
 	}

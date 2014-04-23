@@ -6,6 +6,7 @@
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/numeric.hh>
+#include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/Time_Date.hh>
 
 // EnergyPlus Headers
@@ -83,7 +84,6 @@ namespace OutputReportTabular {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace InputProcessor;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::BigNumber;
 	using DataGlobals::ZoneTSReporting;
 	using DataGlobals::HVACTSReporting;
@@ -148,7 +148,7 @@ namespace OutputReportTabular {
 	int const numResourceTypes( 14 );
 	int const numSourceTypes( 12 );
 
-	Fstring const validChars( "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_:." );
+	std::string const validChars( "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_:." );
 
 	//MODULE VARIABLE DECLARATIONS:
 
@@ -186,7 +186,7 @@ namespace OutputReportTabular {
 	int unitsStyle( 0 ); // see list of parameters
 	int numStyles( 0 );
 	FArray1D_int TabularOutputFile( maxNumStyles, 0 ); // file number holder for output file
-	FArray1D_Fstring del( maxNumStyles, sFstring( 1 ) ); // the delimiter to use
+	FArray1D_string del( maxNumStyles ); // the delimiter to use
 	FArray1D_int TableStyle( maxNumStyles, 0 ); // see list of parameters
 
 	Real64 timeInYear( 0.0 );
@@ -216,9 +216,9 @@ namespace OutputReportTabular {
 	FArray2D_int meterNumEndUseBEPS( NumEndUses, numResourceTypes, 0 );
 	FArray3D_int meterNumEndUseSubBEPS;
 	// arrays that hold the names of the resource and end uses
-	FArray1D_Fstring resourceTypeNames( numResourceTypes, sFstring( 32 ) );
-	FArray1D_Fstring sourceTypeNames( numSourceTypes, sFstring( 32 ) );
-	FArray1D_Fstring endUseNames( NumEndUses, sFstring( 32 ) );
+	FArray1D_string resourceTypeNames( numResourceTypes );
+	FArray1D_string sourceTypeNames( numSourceTypes );
+	FArray1D_string endUseNames( NumEndUses );
 	// arrays that hold the actual values for the year
 	FArray1D< Real64 > gatherTotalsBEPS( numResourceTypes, 0.0 );
 	FArray1D< Real64 > gatherTotalsBySourceBEPS( numResourceTypes, 0.0 );
@@ -305,7 +305,7 @@ namespace OutputReportTabular {
 	//(8)   Milliseconds (0-999)
 
 	// Design day name storage
-	FArray1D_Fstring DesignDayName( sFstring( MaxNameLength ) );
+	FArray1D_string DesignDayName;
 	int DesignDayCount( 0 );
 
 	//arrays related to pulse and load component reporting
@@ -370,11 +370,11 @@ namespace OutputReportTabular {
 	int maxUniqueKeyCount( 0 );
 
 	// for the XML report must keep track fo the active sub-table name and report set by other routines
-	Fstring activeSubTableName( MaxNameLength );
-	Fstring activeReportNameNoSpace( MaxNameLength );
-	Fstring activeReportName( MaxNameLength );
-	Fstring activeForName( MaxNameLength );
-	Fstring prevReportName( MaxNameLength );
+	std::string activeSubTableName;
+	std::string activeReportNameNoSpace;
+	std::string activeReportName;
+	std::string activeForName;
+	std::string prevReportName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
 	//PRIVATE      DateToStr
@@ -451,7 +451,7 @@ namespace OutputReportTabular {
 			SetupUnitConversions();
 			AddTOCZoneLoadComponentTable();
 			GetInput = false;
-			date_and_time( _, _, _, td );
+			date_and_time_string( _, _, _, td );
 		}
 		if ( DoOutputReporting && WriteTabularFiles && ( KindOfSim == ksRunPeriodWeather ) ) {
 			if ( IndexTypeKey == stepTypeZone ) {
@@ -506,7 +506,7 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const CurrentModuleObject( "Output:Table:Monthly" );
+		static std::string const CurrentModuleObject( "Output:Table:Monthly" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -517,12 +517,12 @@ namespace OutputReportTabular {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int curTable; // index of the current table being processed in MonthlyInput
 		int curAggType; // kind of aggregation identified (see AggType parameters)
-		Fstring curAggString( MaxNameLength ); // Current aggregation sting
+		std::string curAggString; // Current aggregation sting
 		int jField;
 		int NumParams; // Number of elements combined
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
-		FArray1D_Fstring AlphArray( sFstring( MaxNameLength ) ); // character string data
+		FArray1D_string AlphArray; // character string data
 		FArray1D< Real64 > NumArray; // numeric data
 		int IOStat; // IO Status when calling get input subroutine
 		static bool ErrorsFound( false );
@@ -590,8 +590,8 @@ namespace OutputReportTabular {
 					curAggType = aggTypeMinimumDuringHoursShown;
 				} else {
 					curAggType = aggTypeSumOrAvg;
-					ShowWarningError( CurrentModuleObject + "=" + trim( MonthlyInput( TabNum ).name ) + ", Variable name=" + trim( AlphArray( jField ) ) );
-					ShowContinueError( "Invalid aggregation type=\"" + trim( curAggString ) + "\"  Defaulting to SumOrAverage." );
+					ShowWarningError( CurrentModuleObject + '=' + MonthlyInput( TabNum ).name + ", Variable name=" + AlphArray( jField ) );
+					ShowContinueError( "Invalid aggregation type=\"" + curAggString + "\"  Defaulting to SumOrAverage." );
 				}
 				AddMonthlyFieldSetInput( curTable, AlphArray( jField ), "", curAggType );
 			}
@@ -603,7 +603,7 @@ namespace OutputReportTabular {
 
 	int
 	AddMonthlyReport(
-		Fstring const & inReportName,
+		std::string const & inReportName,
 		int const inNumDigitsShown
 	)
 	{
@@ -625,7 +625,6 @@ namespace OutputReportTabular {
 		// USE STATEMENTS:
 
 		// Return value
-		int AddMonthlyReport;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -663,15 +662,14 @@ namespace OutputReportTabular {
 		// initialize new record
 		MonthlyInput( MonthlyInputCount ).name = inReportName;
 		MonthlyInput( MonthlyInputCount ).showDigits = inNumDigitsShown;
-		AddMonthlyReport = MonthlyInputCount;
-		return AddMonthlyReport;
+		return MonthlyInputCount;
 	}
 
 	void
 	AddMonthlyFieldSetInput(
 		int const inMonthReport,
-		Fstring const & inVariMeter,
-		Fstring const & inColHead,
+		std::string const & inVariMeter,
+		std::string const & inColHead,
 		int const inAggregate
 	)
 	{
@@ -790,17 +788,17 @@ namespace OutputReportTabular {
 		int TabNum; // index when cycling through each table
 		int NumColumns; // number of columns specified in the input for an object
 		int FirstColumn; // the first column of the monthly input
-		Fstring curVariMeter( MaxNameLength ); // current variable or meter
+		std::string curVariMeter; // current variable or meter
 		int colNum; // loop index for columns
 		int KeyCount;
 		int TypeVar;
 		int AvgSumVar;
 		int StepTypeVar;
-		Fstring UnitsVar( MaxNameLength ); // Units sting, may be blank
+		std::string UnitsVar; // Units sting, may be blank
 		//CHARACTER(len=MaxNameLength), DIMENSION(:), ALLOCATABLE :: NamesOfKeys      ! Specific key name
 		//INTEGER, DIMENSION(:) , ALLOCATABLE                     :: IndexesForKeyVar ! Array index
-		FArray1D_Fstring UniqueKeyNames( sFstring( MaxNameLength ) );
-		FArray1D_Fstring tempUniqueKeyNames( sFstring( MaxNameLength ) );
+		FArray1D_string UniqueKeyNames;
+		FArray1D_string tempUniqueKeyNames;
 		int UniqueKeyCount;
 		int iKey;
 		int jUnique;
@@ -907,7 +905,7 @@ namespace OutputReportTabular {
 							UniqueKeyNames.deallocate();
 							UniqueKeyNames.allocate( maxUniqueKeyCount + 500 );
 							UniqueKeyNames( {1,maxUniqueKeyCount} ) = tempUniqueKeyNames;
-							UniqueKeyNames( {maxUniqueKeyCount + 1,maxUniqueKeyCount + 500} ) = " ";
+							UniqueKeyNames( {maxUniqueKeyCount + 1,maxUniqueKeyCount + 500} ) = "";
 							tempUniqueKeyNames.deallocate();
 							maxUniqueKeyCount += 500;
 						}
@@ -935,16 +933,16 @@ namespace OutputReportTabular {
 		MonthlyTables.allocate( MonthlyTablesCount );
 		MonthlyColumns.allocate( MonthlyColumnsCount );
 		// Initialize tables and results
-		MonthlyTables.keyValue() = " ";
+		MonthlyTables.keyValue() = "";
 		MonthlyTables.firstColumn() = 0;
 		MonthlyTables.numColumns() = 0;
 
-		MonthlyColumns.varName() = " ";
+		MonthlyColumns.varName() = "";
 		MonthlyColumns.varNum() = 0;
 		MonthlyColumns.typeOfVar() = 0;
 		MonthlyColumns.avgSum() = 0;
 		MonthlyColumns.stepType() = 0;
-		MonthlyColumns.units() = " ";
+		MonthlyColumns.units() = "";
 		MonthlyColumns.aggType() = 0;
 		for ( colNum = 1; colNum <= MonthlyColumnsCount; ++colNum ) {
 			MonthlyColumns( colNum ).reslt = 0.0;
@@ -990,8 +988,8 @@ namespace OutputReportTabular {
 					}
 					//fixing CR5878 removed the showing of the warning once about a specific variable.
 					if ( DisplayExtraWarnings && KindOfSim == ksRunPeriodWeather ) {
-						ShowWarningError( "Processing Monthly Tabular Reports: " + trim( MonthlyInput( TabNum ).name ) );
-						ShowContinueError( "..Variable name=" + trim( curVariMeter ) + " not valid for this simulation." );
+						ShowWarningError( "Processing Monthly Tabular Reports: " + MonthlyInput( TabNum ).name );
+						ShowContinueError( "..Variable name=" + curVariMeter + " not valid for this simulation." );
 						if ( VarWarning ) {
 							ShowContinueError( "..Variables not valid for this simulation will have \"[Invalid/Undefined]\"" " in the Units Column of the Table Report." );
 							VarWarning = false;
@@ -1144,9 +1142,9 @@ namespace OutputReportTabular {
 						}
 						//fixing CR5878 removed the showing of the warning once about a specific variable.
 						if ( DisplayExtraWarnings && KindOfSim == ksRunPeriodWeather ) {
-							ShowWarningError( "Processing Monthly Tabular Reports: " + trim( MonthlyInput( TabNum ).name ) );
-							ShowContinueError( "..Variable name=" + trim( curVariMeter ) + " not valid for this simulation." );
-							ShowContinueError( "..i.e., Variable name=" + trim( UniqueKeyNames( kUniqueKey ) ) + ":" + trim( curVariMeter ) + " not valid for this simulation." );
+							ShowWarningError( "Processing Monthly Tabular Reports: " + MonthlyInput( TabNum ).name );
+							ShowContinueError( "..Variable name=" + curVariMeter + " not valid for this simulation." );
+							ShowContinueError( "..i.e., Variable name=" + UniqueKeyNames( kUniqueKey ) + ':' + curVariMeter + " not valid for this simulation." );
 							if ( VarWarning ) {
 								ShowContinueError( "..Variables not valid for this simulation will have \"[Invalid/Undefined]\"" " in the Units Column of the Table Report." );
 								VarWarning = false;
@@ -1206,7 +1204,7 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const CurrentModuleObject( "Output:Table:TimeBins" );
+		static std::string const CurrentModuleObject( "Output:Table:TimeBins" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1219,7 +1217,7 @@ namespace OutputReportTabular {
 		int NumParams; // Number of elements combined
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
-		FArray1D_Fstring AlphArray( sFstring( MaxNameLength ) ); // character string data
+		FArray1D_string AlphArray; // character string data
 		FArray1D< Real64 > NumArray; // numeric data
 		int IOStat; // IO Status when calling get input subroutine
 		int iTable;
@@ -1229,12 +1227,12 @@ namespace OutputReportTabular {
 		int found;
 		Real64 const bigVal( 0.0 ); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
 
-		FArray1D_Fstring objNames( sFstring( MaxNameLength ) );
+		FArray1D_string objNames;
 		FArray1D_int objVarIDs;
 
 		GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
-		AlphArray = " ";
+		AlphArray = "";
 		NumArray.allocate( NumNums );
 		NumArray = 0.0;
 
@@ -1258,19 +1256,19 @@ namespace OutputReportTabular {
 			OutputTableBinned( iInObj ).keyValue = AlphArray( 1 );
 			OutputTableBinned( iInObj ).varOrMeter = AlphArray( 2 );
 			//if a schedule has been specified assign
-			if ( len_trim( AlphArray( 3 ) ) > 0 ) {
+			if ( len( AlphArray( 3 ) ) > 0 ) {
 				OutputTableBinned( iInObj ).ScheduleName = AlphArray( 3 );
 				OutputTableBinned( iInObj ).scheduleIndex = GetScheduleIndex( AlphArray( 3 ) );
 				if ( OutputTableBinned( iInObj ).scheduleIndex == 0 ) {
-					ShowWarningError( CurrentModuleObject + ": invalid " + trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( AlphArray( 3 ) ) + "\" - not found." );
+					ShowWarningError( CurrentModuleObject + ": invalid " + cAlphaFieldNames( 3 ) + "=\"" + AlphArray( 3 ) + "\" - not found." );
 				}
 			} else {
 				OutputTableBinned( iInObj ).scheduleIndex = 0; //flag value for no schedule used
 			}
 			//validate the kind of variable - not used internally except for validation
-			if ( len_trim( AlphArray( 4 ) ) > 0 ) {
+			if ( len( AlphArray( 4 ) ) > 0 ) {
 				if ( ! ( SameString( AlphArray( 4 ), "ENERGY" ) || SameString( AlphArray( 4 ), "DEMAND" ) || SameString( AlphArray( 4 ), "TEMPERATURE" ) || SameString( AlphArray( 4 ), "FLOWRATE" ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( AlphArray( 1 ) ) + " the Variable Type was not energy, demand, temperature, or flowrate." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + AlphArray( 1 ) + " the Variable Type was not energy, demand, temperature, or flowrate." );
 				}
 			}
 			OutputTableBinned( iInObj ).intervalStart = NumArray( 1 );
@@ -1293,7 +1291,7 @@ namespace OutputReportTabular {
 			}
 			GetVariableKeyCountandType( OutputTableBinned( iInObj ).varOrMeter, OutputTableBinned( iInObj ).numTables, OutputTableBinned( iInObj ).typeOfVar, OutputTableBinned( iInObj ).avgSum, OutputTableBinned( iInObj ).stepType, OutputTableBinned( iInObj ).units );
 			if ( OutputTableBinned( iInObj ).typeOfVar == 0 ) {
-				ShowWarningError( CurrentModuleObject + ": User specified meter or variable not found: " + trim( OutputTableBinned( iInObj ).varOrMeter ) );
+				ShowWarningError( CurrentModuleObject + ": User specified meter or variable not found: " + OutputTableBinned( iInObj ).varOrMeter );
 			}
 			// If only a single table key is requested than only one should be counted
 			// later will reset the numTables array pointer but for now use it to know
@@ -1325,7 +1323,7 @@ namespace OutputReportTabular {
 					BinObjVarID( repIndex ).varMeterNum = objVarIDs( iTable );
 					// check if valid meter or number
 					if ( objVarIDs( iTable ) == 0 ) {
-						ShowWarningError( CurrentModuleObject + ": Specified variable or meter not found: " + trim( objNames( iTable ) ) );
+						ShowWarningError( CurrentModuleObject + ": Specified variable or meter not found: " + objNames( iTable ) );
 					}
 				}
 			} else {
@@ -1342,11 +1340,11 @@ namespace OutputReportTabular {
 					BinObjVarID( firstReport ).namesOfObj = objNames( found );
 					BinObjVarID( firstReport ).varMeterNum = objVarIDs( found );
 				} else {
-					ShowWarningError( CurrentModuleObject + ": Specified key not found, the first key will be used: " + trim( OutputTableBinned( iInObj ).keyValue ) );
+					ShowWarningError( CurrentModuleObject + ": Specified key not found, the first key will be used: " + OutputTableBinned( iInObj ).keyValue );
 					BinObjVarID( firstReport ).namesOfObj = objNames( 1 );
 					BinObjVarID( firstReport ).varMeterNum = objVarIDs( 1 );
 					if ( objVarIDs( 1 ) == 0 ) {
-						ShowWarningError( CurrentModuleObject + ": Specified meter or variable not found: " + trim( objNames( 1 ) ) );
+						ShowWarningError( CurrentModuleObject + ": Specified meter or variable not found: " + objNames( 1 ) );
 					}
 				}
 				// reset the number of tables to one
@@ -1408,8 +1406,8 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const fmta( "(A)" );
-		static Fstring const CurrentModuleObject( "OutputControl:Table:Style" );
+		static gio::Fmt const fmta( "(A)" );
+		static std::string const CurrentModuleObject( "OutputControl:Table:Style" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1422,13 +1420,13 @@ namespace OutputReportTabular {
 		int NumParams; // Number of elements combined
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
-		FArray1D_Fstring AlphArray( sFstring( MaxNameLength ) ); // character string data
+		FArray1D_string AlphArray; // character string data
 		FArray1D< Real64 > NumArray; // numeric data
 		int IOStat; // IO Status when calling get input subroutine
 
 		GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
-		AlphArray = " ";
+		AlphArray = "";
 		NumArray.allocate( NumNums );
 		NumArray = 0.0;
 
@@ -1500,7 +1498,7 @@ namespace OutputReportTabular {
 				TableStyle( 5 ) = tableStyleXML;
 				del( 5 ) = CharSpace; //space - this is not used much for XML output
 			} else {
-				ShowWarningError( CurrentModuleObject + ": Invalid " + trim( cAlphaFieldNames( 1 ) ) + "=\"" + trim( AlphArray( 1 ) ) + "\". Commas will be used." );
+				ShowWarningError( CurrentModuleObject + ": Invalid " + cAlphaFieldNames( 1 ) + "=\"" + AlphArray( 1 ) + "\". Commas will be used." );
 				numStyles = 1;
 				TableStyle( 1 ) = tableStyleComma;
 				del( 1 ) = CharComma; //comma
@@ -1520,7 +1518,7 @@ namespace OutputReportTabular {
 					unitsStyle = unitsStyleInchPound;
 				} else {
 					unitsStyle = unitsStyleNone;
-					ShowWarningError( CurrentModuleObject + ": Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( AlphArray( 2 ) ) + "\". No unit conversion will be performed. Normal SI units will be shown." );
+					ShowWarningError( CurrentModuleObject + ": Invalid " + cAlphaFieldNames( 2 ) + "=\"" + AlphArray( 2 ) + "\". No unit conversion will be performed. Normal SI units will be shown." );
 				}
 			} else {
 				unitsStyle = unitsStyleNone;
@@ -1529,7 +1527,7 @@ namespace OutputReportTabular {
 		} else if ( NumTabularStyle > 1 ) {
 			ShowWarningError( CurrentModuleObject + ": Only one instance of this object is allowed. Commas will be used." );
 			TableStyle = tableStyleComma;
-			del = CharComma; //comma
+			del = std::string( 1, CharComma ); //comma
 			AlphArray( 1 ) = "COMMA";
 			unitsStyle = unitsStyleNone;
 			AlphArray( 2 ) = "None";
@@ -1539,9 +1537,10 @@ namespace OutputReportTabular {
 			gio::write( OutputFileInits, fmta ) << "! <Tabular Report>,Style,Unit Conversion";
 			if ( AlphArray( 1 ) != "HTML" ) {
 				ConvertCaseToLower( AlphArray( 1 ), AlphArray( 2 ) );
-				AlphArray( 1 )( 2 ) = AlphArray( 2 )( 2 );
+				AlphArray( 1 ).erase( 1 );
+				AlphArray( 1 ) += AlphArray( 2 ).substr( 1 );
 			}
-			gio::write( OutputFileInits, "('Tabular Report,',A,',',A)" ) << trim( AlphArray( 1 ) ) << trim( AlphArray( 2 ) );
+			gio::write( OutputFileInits, "('Tabular Report,',A,',',A)" ) << AlphArray( 1 ) << AlphArray( 2 );
 		}
 
 		AlphArray.deallocate();
@@ -1584,7 +1583,7 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const CurrentModuleObject( "Output:Table:SummaryReports" );
+		static std::string const CurrentModuleObject( "Output:Table:SummaryReports" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1597,11 +1596,11 @@ namespace OutputReportTabular {
 		int NumParams;
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
-		FArray1D_Fstring AlphArray( sFstring( MaxNameLength ) );
+		FArray1D_string AlphArray;
 		FArray1D< Real64 > NumArray;
 		int IOStat; // IO Status when calling get input subroutine
 		int iReport;
-		Fstring meterName( MaxNameLength );
+		std::string meterName;
 		int meterNumber;
 		int iResource;
 		int jEndUse;
@@ -1770,8 +1769,8 @@ namespace OutputReportTabular {
 				}
 				//check the reports that are predefined and are created by outputreportpredefined.f90
 				for ( jReport = 1; jReport <= numReportName; ++jReport ) {
-					lenAlpha = len_trim( AlphArray( iReport ) );
-					lenReport = len_trim( reportName( jReport ).name );
+					lenAlpha = len( AlphArray( iReport ) );
+					lenReport = len( reportName( jReport ).name );
 					if ( SameString( AlphArray( iReport ), reportName( jReport ).name ) ) {
 						WriteTabularFiles = true;
 						reportName( jReport ).show = true;
@@ -1792,7 +1791,7 @@ namespace OutputReportTabular {
 					}
 				}
 				if ( ! nameFound ) {
-					ShowSevereError( CurrentModuleObject + " Field[" + trim( RoundSigDigits( iReport ) ) + "]=\"" + trim( AlphArray( iReport ) ) + "\", invalid report name -- will not be reported." );
+					ShowSevereError( CurrentModuleObject + " Field[" + RoundSigDigits( iReport ) + "]=\"" + AlphArray( iReport ) + "\", invalid report name -- will not be reported." );
 					//      ErrorsFound=.TRUE.
 				}
 			}
@@ -1859,17 +1858,17 @@ namespace OutputReportTabular {
 
 			// loop through all of the resources and end uses and sub end uses for the entire facility
 			for ( iResource = 1; iResource <= numResourceTypes; ++iResource ) {
-				meterName = trim( resourceTypeNames( iResource ) ) + ":FACILITY";
+				meterName = resourceTypeNames( iResource ) + ":FACILITY";
 				meterNumber = GetMeterIndex( meterName );
 				meterNumTotalsBEPS( iResource ) = meterNumber;
 
 				for ( jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse ) {
-					meterName = trim( endUseNames( jEndUse ) ) + ":" + trim( resourceTypeNames( iResource ) ); //// ':FACILITY'
+					meterName = endUseNames( jEndUse ) + ':' + resourceTypeNames( iResource ); //// ':FACILITY'
 					meterNumber = GetMeterIndex( meterName );
 					meterNumEndUseBEPS( jEndUse, iResource ) = meterNumber;
 
 					for ( kEndUseSub = 1; kEndUseSub <= EndUseCategory( jEndUse ).NumSubcategories; ++kEndUseSub ) {
-						meterName = trim( EndUseCategory( jEndUse ).SubcategoryName( kEndUseSub ) ) + ":" + trim( endUseNames( jEndUse ) ) + ":" + trim( resourceTypeNames( iResource ) );
+						meterName = EndUseCategory( jEndUse ).SubcategoryName( kEndUseSub ) + ':' + endUseNames( jEndUse ) + ':' + resourceTypeNames( iResource );
 						meterNumber = GetMeterIndex( meterName );
 						meterNumEndUseSubBEPS( iResource, jEndUse, kEndUseSub ) = meterNumber;
 					}
@@ -1877,7 +1876,7 @@ namespace OutputReportTabular {
 			}
 
 			for ( iResource = 1; iResource <= numSourceTypes; ++iResource ) {
-				meterNumber = GetMeterIndex( trim( sourceTypeNames( iResource ) ) + "Emissions:Source" );
+				meterNumber = GetMeterIndex( sourceTypeNames( iResource ) + "Emissions:Source" );
 				meterNumTotalsSource( iResource ) = meterNumber;
 			}
 
@@ -1980,7 +1979,7 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const CurrentModuleObject( "Output:Table:SummaryReports" );
+		static std::string const CurrentModuleObject( "Output:Table:SummaryReports" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1992,7 +1991,7 @@ namespace OutputReportTabular {
 		int NumParams;
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
-		FArray1D_Fstring AlphArray( sFstring( MaxNameLength ) );
+		FArray1D_string AlphArray;
 		FArray1D< Real64 > NumArray;
 		int IOStat; // IO Status when calling get input subroutine
 		int iReport;
@@ -2132,13 +2131,13 @@ namespace OutputReportTabular {
 		namedMonthly( 62 ).title = "MechanicalVentilationLoadsMonthly";
 
 		if ( numNamedMonthly != NumMonthlyReports ) {
-			ShowFatalError( "InitializePredefinedMonthlyTitles: Number of Monthly Reports in OutputReportTabular=[" + trim( RoundSigDigits( numNamedMonthly ) ) + "] does not match number in DataOutputs=[" + trim( RoundSigDigits( NumMonthlyReports ) ) + "]." );
+			ShowFatalError( "InitializePredefinedMonthlyTitles: Number of Monthly Reports in OutputReportTabular=[" + RoundSigDigits( numNamedMonthly ) + "] does not match number in DataOutputs=[" + RoundSigDigits( NumMonthlyReports ) + "]." );
 		} else {
 			for ( xcount = 1; xcount <= numNamedMonthly; ++xcount ) {
 				if ( ! SameString( MonthlyNamedReports( xcount ), namedMonthly( xcount ).title ) ) {
 					ShowSevereError( "InitializePredefinedMonthlyTitles: Monthly Report Titles in OutputReportTabular do not match" " titles in DataOutput." );
-					ShowContinueError( "first mismatch at ORT [" + trim( RoundSigDigits( numNamedMonthly ) ) + "] =\"" + trim( namedMonthly( xcount ).title ) + "\"." );
-					ShowContinueError( "same location in DO =\"" + trim( MonthlyNamedReports( xcount ) ) + "\"." );
+					ShowContinueError( "first mismatch at ORT [" + RoundSigDigits( numNamedMonthly ) + "] =\"" + namedMonthly( xcount ).title + "\"." );
+					ShowContinueError( "same location in DO =\"" + MonthlyNamedReports( xcount ) + "\"." );
 					ShowFatalError( "Preceding condition causes termination." );
 				}
 			}
@@ -3079,9 +3078,9 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const fmta( "(A)" );
-		static Fstring const TimeStampFmt1( "(A,I4,A,I2.2,A,I2.2)" );
-		static Fstring const TimeStampFmt2( "(A,I2.2,A,I2.2,A,I2.2,A)" );
+		static gio::Fmt const fmta( "(A)" );
+		static gio::Fmt const TimeStampFmt1( "(A,I4,A,I2.2,A,I2.2)" );
+		static gio::Fmt const TimeStampFmt2( "(A,I2.2,A,I2.2,A,I2.2,A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3092,7 +3091,7 @@ namespace OutputReportTabular {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int iStyle;
 		int curFH; // current file handle
-		Fstring curDel( 1 );
+		std::string curDel;
 		int write_stat;
 
 		// get a new file unit number
@@ -3110,14 +3109,14 @@ namespace OutputReportTabular {
 					if ( write_stat != 0 ) {
 						ShowFatalError( "OpenOutputTabularFile: Could not open file \"eplustbl.csv\" for output (write)." );
 					}
-					gio::write( curFH, fmta ) << "Program Version:" + curDel + trim( VerString );
+					gio::write( curFH, fmta ) << "Program Version:" + curDel + VerString;
 					gio::write( curFH, "*" ) << "Tabular Output Report in Format: " + curDel + "Comma";
 					gio::write( curFH, fmta ) << "";
-					gio::write( curFH, fmta ) << "Building:" + curDel + trim( BuildingName );
+					gio::write( curFH, fmta ) << "Building:" + curDel + BuildingName;
 					if ( EnvironmentName == WeatherFileLocationTitle ) {
-						gio::write( curFH, fmta ) << "Environment:" + curDel + trim( EnvironmentName );
+						gio::write( curFH, fmta ) << "Environment:" + curDel + EnvironmentName;
 					} else {
-						gio::write( curFH, fmta ) << "Environment:" + curDel + trim( EnvironmentName ) + " ** " + trim( WeatherFileLocationTitle );
+						gio::write( curFH, fmta ) << "Environment:" + curDel + EnvironmentName + " ** " + WeatherFileLocationTitle;
 					}
 					gio::write( curFH, fmta ) << "";
 				} else if ( TableStyle( iStyle ) == tableStyleTab ) {
@@ -3126,14 +3125,14 @@ namespace OutputReportTabular {
 					if ( write_stat != 0 ) {
 						ShowFatalError( "OpenOutputTabularFile: Could not open file \"eplustbl.tab\" for output (write)." );
 					}
-					gio::write( curFH, fmta ) << "Program Version" + curDel + trim( VerString );
+					gio::write( curFH, fmta ) << "Program Version" + curDel + VerString;
 					gio::write( curFH, fmta ) << "Tabular Output Report in Format: " + curDel + "Tab";
 					gio::write( curFH, fmta ) << "";
-					gio::write( curFH, fmta ) << "Building:" + curDel + trim( BuildingName );
+					gio::write( curFH, fmta ) << "Building:" + curDel + BuildingName;
 					if ( EnvironmentName == WeatherFileLocationTitle ) {
-						gio::write( curFH, fmta ) << "Environment:" + curDel + trim( EnvironmentName );
+						gio::write( curFH, fmta ) << "Environment:" + curDel + EnvironmentName;
 					} else {
-						gio::write( curFH, fmta ) << "Environment:" + curDel + trim( EnvironmentName ) + " ** " + trim( WeatherFileLocationTitle );
+						gio::write( curFH, fmta ) << "Environment:" + curDel + EnvironmentName + " ** " + WeatherFileLocationTitle;
 					}
 					gio::write( curFH, fmta ) << "";
 				} else if ( TableStyle( iStyle ) == tableStyleHTML ) {
@@ -3146,9 +3145,9 @@ namespace OutputReportTabular {
 					gio::write( curFH, fmta ) << "<html>";
 					gio::write( curFH, fmta ) << "<head>";
 					if ( EnvironmentName == WeatherFileLocationTitle ) {
-						gio::write( curFH, fmta ) << "<title> " + trim( BuildingName ) + " " + trim( EnvironmentName );
+						gio::write( curFH, fmta ) << "<title> " + BuildingName + ' ' + EnvironmentName;
 					} else {
-						gio::write( curFH, fmta ) << "<title> " + trim( BuildingName ) + " " + trim( EnvironmentName ) + " ** " + trim( WeatherFileLocationTitle );
+						gio::write( curFH, fmta ) << "<title> " + BuildingName + ' ' + EnvironmentName + " ** " + WeatherFileLocationTitle;
 					}
 					gio::write( curFH, TimeStampFmt1 ) << "  " << td( 1 ) << "-" << td( 2 ) << "-" << td( 3 );
 					gio::write( curFH, TimeStampFmt2 ) << "  " << td( 5 ) << ":" << td( 6 ) << ":" << td( 7 ) << " ";
@@ -3157,13 +3156,13 @@ namespace OutputReportTabular {
 					gio::write( curFH, fmta ) << "<body>";
 					gio::write( curFH, fmta ) << "<p><a href=\"#toc\" style=\"float: right\">Table of Contents</a></p>";
 					gio::write( curFH, fmta ) << "<a name=top></a>";
-					gio::write( curFH, fmta ) << "<p>Program Version:<b>" + trim( VerString ) + "</b></p>";
+					gio::write( curFH, fmta ) << "<p>Program Version:<b>" + VerString + "</b></p>";
 					gio::write( curFH, fmta ) << "<p>Tabular Output Report in Format: <b>HTML</b></p>";
-					gio::write( curFH, fmta ) << "<p>Building: <b>" + trim( BuildingName ) + "</b></p>";
+					gio::write( curFH, fmta ) << "<p>Building: <b>" + BuildingName + "</b></p>";
 					if ( EnvironmentName == WeatherFileLocationTitle ) {
-						gio::write( curFH, fmta ) << "<p>Environment: <b>" + trim( EnvironmentName ) + "</b></p>";
+						gio::write( curFH, fmta ) << "<p>Environment: <b>" + EnvironmentName + "</b></p>";
 					} else {
-						gio::write( curFH, fmta ) << "<p>Environment: <b>" + trim( EnvironmentName ) + " ** " + trim( WeatherFileLocationTitle ) + "</b></p>";
+						gio::write( curFH, fmta ) << "<p>Environment: <b>" + EnvironmentName + " ** " + WeatherFileLocationTitle + "</b></p>";
 					}
 					gio::write( curFH, TimeStampFmt1 ) << "<p>Simulation Timestamp: <b>" << td( 1 ) << "-" << td( 2 ) << "-" << td( 3 );
 					gio::write( curFH, TimeStampFmt2 ) << "  " << td( 5 ) << ":" << td( 6 ) << ":" << td( 7 ) << "</b></p>";
@@ -3175,10 +3174,10 @@ namespace OutputReportTabular {
 					}
 					gio::write( curFH, fmta ) << "<?xml version=\"1.0\"?>";
 					gio::write( curFH, fmta ) << "<EnergyPlusTabularReports>";
-					gio::write( curFH, fmta ) << "  <BuildingName>" + trim( BuildingName ) + "</BuildingName>";
-					gio::write( curFH, fmta ) << "  <EnvironmentName>" + trim( EnvironmentName ) + "</EnvironmentName>";
-					gio::write( curFH, fmta ) << "  <WeatherFileLocationTitle>" + trim( WeatherFileLocationTitle ) + "</WeatherFileLocationTitle>";
-					gio::write( curFH, fmta ) << "  <ProgramVersion>" + trim( VerString ) + "</ProgramVersion>";
+					gio::write( curFH, fmta ) << "  <BuildingName>" + BuildingName + "</BuildingName>";
+					gio::write( curFH, fmta ) << "  <EnvironmentName>" + EnvironmentName + "</EnvironmentName>";
+					gio::write( curFH, fmta ) << "  <WeatherFileLocationTitle>" + WeatherFileLocationTitle + "</WeatherFileLocationTitle>";
+					gio::write( curFH, fmta ) << "  <ProgramVersion>" + VerString + "</ProgramVersion>";
 					gio::write( curFH, fmta ) << "  <SimulationTimestamp>";
 					gio::write( curFH, fmta ) << "    <Date>";
 					gio::write( curFH, TimeStampFmt1 ) << "      " << td( 1 ) << "-" << td( 2 ) << "-" << td( 3 );
@@ -3187,21 +3186,21 @@ namespace OutputReportTabular {
 					gio::write( curFH, TimeStampFmt2 ) << "      " << td( 5 ) << ":" << td( 6 ) << ":" << td( 7 ) << " ";
 					gio::write( curFH, fmta ) << "    </Time>";
 					gio::write( curFH, fmta ) << "  </SimulationTimestamp>";
-					gio::write( curFH, fmta ) << " ";
+					gio::write( curFH );
 				} else {
 					DisplayString( "Writing tabular output file results using text format." );
 					{ IOFlags flags; flags.ACTION( "write" ); gio::open( curFH, "eplustbl.txt", flags ); write_stat = flags.ios(); }
 					if ( write_stat != 0 ) {
 						ShowFatalError( "OpenOutputTabularFile: Could not open file \"eplustbl.txt\" for output (write)." );
 					}
-					gio::write( curFH, fmta ) << "Program Version: " + trim( VerString );
+					gio::write( curFH, fmta ) << "Program Version: " + VerString;
 					gio::write( curFH, fmta ) << "Tabular Output Report in Format: " + curDel + "Fixed";
 					gio::write( curFH, fmta ) << "";
-					gio::write( curFH, fmta ) << "Building:        " + trim( BuildingName );
+					gio::write( curFH, fmta ) << "Building:        " + BuildingName;
 					if ( EnvironmentName == WeatherFileLocationTitle ) {
-						gio::write( curFH, fmta ) << "Environment:     " + trim( EnvironmentName );
+						gio::write( curFH, fmta ) << "Environment:     " + EnvironmentName;
 					} else {
-						gio::write( curFH, fmta ) << "Environment:     " + trim( EnvironmentName ) + " ** " + trim( WeatherFileLocationTitle );
+						gio::write( curFH, fmta ) << "Environment:     " + EnvironmentName + " ** " + WeatherFileLocationTitle;
 					}
 					gio::write( curFH, fmta ) << "";
 				}
@@ -3237,7 +3236,7 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const fmta( "(A)" );
+		static gio::Fmt const fmta( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3255,8 +3254,8 @@ namespace OutputReportTabular {
 					gio::write( TabularOutputFile( iStyle ), fmta ) << "</body>";
 					gio::write( TabularOutputFile( iStyle ), fmta ) << "</html>";
 				} else if ( TableStyle( iStyle ) == tableStyleXML ) {
-					if ( len_trim( prevReportName ) != 0 ) {
-						gio::write( TabularOutputFile( iStyle ), fmta ) << "</" + trim( prevReportName ) + ">"; //close the last element if it was used.
+					if ( len( prevReportName ) != 0 ) {
+						gio::write( TabularOutputFile( iStyle ), fmta ) << "</" + prevReportName + '>'; //close the last element if it was used.
 					}
 					gio::write( TabularOutputFile( iStyle ), fmta ) << "</EnergyPlusTabularReports>";
 				}
@@ -3293,7 +3292,7 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const fmta( "(A)" );
+		static gio::Fmt const fmta( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3308,11 +3307,11 @@ namespace OutputReportTabular {
 		int iEntry;
 		int jEntry;
 		int kReport;
-		Fstring curSection( MaxNameLength );
+		std::string curSection;
 		int iStyle;
 		int curFH;
-		Fstring origName( MaxNameLength );
-		Fstring curName( MaxNameLength );
+		std::string origName;
+		std::string curName;
 		int indexUnitConv;
 
 		for ( iStyle = 1; iStyle <= numStyles; ++iStyle ) {
@@ -3323,61 +3322,61 @@ namespace OutputReportTabular {
 				gio::write( curFH, fmta ) << "<p><b>Table of Contents</b></p>";
 				gio::write( curFH, fmta ) << "<a href=\"#top\">Top</a>";
 				if ( displayTabularBEPS ) {
-					gio::write( curFH, fmta ) << "<br><a href=\"#" + trim( MakeAnchorName( "Annual Building Utility Performance Summary", "Entire Facility" ) ) + "\">Annual Building Utility Performance Summary</a>";
+					gio::write( curFH, fmta ) << "<br><a href=\"#" + MakeAnchorName( "Annual Building Utility Performance Summary", "Entire Facility" ) + "\">Annual Building Utility Performance Summary</a>";
 				}
 				if ( displayTabularVeriSum ) {
-					gio::write( curFH, fmta ) << "<br><a href=\"#" + trim( MakeAnchorName( "Input Verification and Results Summary", "Entire Facility" ) ) + "\">Input Verification and Results Summary</a>";
+					gio::write( curFH, fmta ) << "<br><a href=\"#" + MakeAnchorName( "Input Verification and Results Summary", "Entire Facility" ) + "\">Input Verification and Results Summary</a>";
 				}
 				if ( displayDemandEndUse ) {
-					gio::write( curFH, fmta ) << "<br><a href=\"#" + trim( MakeAnchorName( "Demand End Use Components Summary", "Entire Facility" ) ) + "\">Demand End Use Components Summary</a>";
+					gio::write( curFH, fmta ) << "<br><a href=\"#" + MakeAnchorName( "Demand End Use Components Summary", "Entire Facility" ) + "\">Demand End Use Components Summary</a>";
 				}
 				if ( displaySourceEnergyEndUseSummary ) {
-					gio::write( curFH, fmta ) << "<br><a href=\"#" + trim( MakeAnchorName( "Source Energy End Use Components Summary", "Entire Facility" ) ) + "\">Source Energy End Use Components Summary</a>";
+					gio::write( curFH, fmta ) << "<br><a href=\"#" + MakeAnchorName( "Source Energy End Use Components Summary", "Entire Facility" ) + "\">Source Energy End Use Components Summary</a>";
 				}
 				if ( DoCostEstimate ) {
-					gio::write( curFH, fmta ) << "<br><a href=\"#" + trim( MakeAnchorName( "Component Cost Economics Summary", "Entire Facility" ) ) + "\">Component Cost Economics Summary</a>";
+					gio::write( curFH, fmta ) << "<br><a href=\"#" + MakeAnchorName( "Component Cost Economics Summary", "Entire Facility" ) + "\">Component Cost Economics Summary</a>";
 				}
 				if ( displayComponentSizing ) {
-					gio::write( curFH, fmta ) << "<br><a href=\"#" + trim( MakeAnchorName( "Component Sizing Summary", "Entire Facility" ) ) + "\">Component Sizing Summary</a>";
+					gio::write( curFH, fmta ) << "<br><a href=\"#" + MakeAnchorName( "Component Sizing Summary", "Entire Facility" ) + "\">Component Sizing Summary</a>";
 				}
 				if ( displaySurfaceShadowing ) {
-					gio::write( curFH, fmta ) << "<br><a href=\"#" + trim( MakeAnchorName( "Surface Shadowing Summary", "Entire Facility" ) ) + "\">Surface Shadowing Summary</a>";
+					gio::write( curFH, fmta ) << "<br><a href=\"#" + MakeAnchorName( "Surface Shadowing Summary", "Entire Facility" ) + "\">Surface Shadowing Summary</a>";
 				}
 				for ( kReport = 1; kReport <= numReportName; ++kReport ) {
 					if ( reportName( kReport ).show ) {
-						gio::write( curFH, fmta ) << "<br><a href=\"#" + trim( MakeAnchorName( trim( reportName( kReport ).namewithspaces ), "Entire Facility" ) ) + "\">" + trim( reportName( kReport ).namewithspaces ) + "</a>";
+						gio::write( curFH, fmta ) << "<br><a href=\"#" + MakeAnchorName( reportName( kReport ).namewithspaces, "Entire Facility" ) + "\">" + reportName( kReport ).namewithspaces + "</a>";
 					}
 				}
 				if ( DoWeathSim ) {
 					for ( iInput = 1; iInput <= MonthlyInputCount; ++iInput ) {
 						if ( MonthlyInput( iInput ).numTables > 0 ) {
-							gio::write( curFH, fmta ) << "<p><b>" + trim( MonthlyInput( iInput ).name ) + "</b></p> |";
+							gio::write( curFH, fmta ) << "<p><b>" + MonthlyInput( iInput ).name + "</b></p> |";
 							for ( jTable = 1; jTable <= MonthlyInput( iInput ).numTables; ++jTable ) {
 								curTable = jTable + MonthlyInput( iInput ).firstTable - 1;
-								gio::write( curFH, fmta ) << "<a href=\"#" + trim( MakeAnchorName( MonthlyInput( iInput ).name, MonthlyTables( curTable ).keyValue ) ) + "\">" + trim( MonthlyTables( curTable ).keyValue ) + "</a>    |   ";
+								gio::write( curFH, fmta ) << "<a href=\"#" + MakeAnchorName( MonthlyInput( iInput ).name, MonthlyTables( curTable ).keyValue ) + "\">" + MonthlyTables( curTable ).keyValue + "</a>    |   ";
 							}
 						}
 					}
 					for ( iInput = 1; iInput <= OutputTableBinnedCount; ++iInput ) {
 						if ( OutputTableBinned( iInput ).numTables > 0 ) {
 							if ( OutputTableBinned( iInput ).scheduleIndex == 0 ) {
-								gio::write( curFH, fmta ) << "<p><b>" + trim( OutputTableBinned( iInput ).varOrMeter ) + "</b></p> |";
+								gio::write( curFH, fmta ) << "<p><b>" + OutputTableBinned( iInput ).varOrMeter + "</b></p> |";
 							} else {
-								gio::write( curFH, fmta ) << "<p><b>" + trim( OutputTableBinned( iInput ).varOrMeter ) + " [" + trim( OutputTableBinned( iInput ).ScheduleName ) + "]" "</b></p> |";
+								gio::write( curFH, fmta ) << "<p><b>" + OutputTableBinned( iInput ).varOrMeter + " [" + OutputTableBinned( iInput ).ScheduleName + "]</b></p> |";
 							}
 							for ( jTable = 1; jTable <= OutputTableBinned( iInput ).numTables; ++jTable ) {
 								curTable = OutputTableBinned( iInput ).resIndex + ( jTable - 1 );
 								curName = "";
 								if ( unitsStyle == unitsStyleInchPound ) {
-									origName = trim( OutputTableBinned( iInput ).varOrMeter ) + " [" + trim( OutputTableBinned( iInput ).units ) + "]";
+									origName = OutputTableBinned( iInput ).varOrMeter + " [" + OutputTableBinned( iInput ).units + ']';
 									LookupSItoIP( origName, indexUnitConv, curName );
 								} else {
-									curName = trim( OutputTableBinned( iInput ).varOrMeter ) + " [" + trim( OutputTableBinned( iInput ).units ) + "]";
+									curName = OutputTableBinned( iInput ).varOrMeter + " [" + OutputTableBinned( iInput ).units + ']';
 								}
 								if ( OutputTableBinned( iInput ).scheduleIndex == 0 ) {
-									gio::write( curFH, fmta ) << "<a href=\"#" + trim( MakeAnchorName( trim( curName ), BinObjVarID( curTable ).namesOfObj ) ) + "\">" + trim( BinObjVarID( curTable ).namesOfObj ) + "</a>   |  ";
+									gio::write( curFH, fmta ) << "<a href=\"#" + MakeAnchorName( curName, BinObjVarID( curTable ).namesOfObj ) + "\">" + BinObjVarID( curTable ).namesOfObj + "</a>   |  ";
 								} else {
-									gio::write( curFH, fmta ) << "<a href=\"#" + trim( MakeAnchorName( trim( curName ) + trim( OutputTableBinned( iInput ).ScheduleName ), BinObjVarID( curTable ).namesOfObj ) ) + "\">" + trim( BinObjVarID( curTable ).namesOfObj ) + "</a>   |  ";
+									gio::write( curFH, fmta ) << "<a href=\"#" + MakeAnchorName( curName + OutputTableBinned( iInput ).ScheduleName, BinObjVarID( curTable ).namesOfObj ) + "\">" + BinObjVarID( curTable ).namesOfObj + "</a>   |  ";
 								}
 							}
 						}
@@ -3387,11 +3386,11 @@ namespace OutputReportTabular {
 				for ( iEntry = 1; iEntry <= TOCEntriesCount; ++iEntry ) {
 					if ( ! TOCEntries( iEntry ).isWritten ) {
 						curSection = TOCEntries( iEntry ).sectionName;
-						gio::write( curFH, fmta ) << "<p><b>" + trim( curSection ) + "</b></p> |";
+						gio::write( curFH, fmta ) << "<p><b>" + curSection + "</b></p> |";
 						for ( jEntry = iEntry; jEntry <= TOCEntriesCount; ++jEntry ) {
 							if ( ! TOCEntries( jEntry ).isWritten ) {
 								if ( TOCEntries( jEntry ).sectionName == curSection ) {
-									gio::write( curFH, fmta ) << "<a href=\"#" + trim( MakeAnchorName( TOCEntries( jEntry ).sectionName, TOCEntries( jEntry ).reportName ) ) + "\">" + trim( TOCEntries( jEntry ).reportName ) + "</a>   |  ";
+									gio::write( curFH, fmta ) << "<a href=\"#" + MakeAnchorName( TOCEntries( jEntry ).sectionName, TOCEntries( jEntry ).reportName ) + "\">" + TOCEntries( jEntry ).reportName + "</a>   |  ";
 									TOCEntries( jEntry ).isWritten = true;
 								}
 							}
@@ -4872,7 +4871,8 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const degChar( "°" );
+		static std::string const degChar( "°" );
+		static gio::Fmt const fmtA( "(A)" );
 
 		// LineTypes for reading the stat file
 		int const StatisticsLine( 1 );
@@ -4909,7 +4909,7 @@ namespace OutputReportTabular {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		Fstring lineIn( 200 );
+		std::string lineIn;
 		int statFile;
 		bool fileExists;
 		static int lineType( 0 );
@@ -4918,24 +4918,24 @@ namespace OutputReportTabular {
 		bool isASHRAE;
 		bool iscalc;
 		bool isKoppen;
-		int ashPtr;
-		int lnPtr;
+		std::string::size_type ashPtr;
+		std::string::size_type lnPtr;
 		int col1;
 		int col2;
 		int col3;
-		int sposlt;
-		int eposlt;
-		int sposlg;
-		int eposlg;
-		int spostz;
-		int epostz;
-		Fstring ashDesYear( 5 );
-		Fstring ashZone( 2 ); // ashrae climate zone
-		Fstring curNameWithSIUnits( MaxNameLength );
-		Fstring curNameAndUnits( MaxNameLength );
+		std::string::size_type sposlt;
+		std::string::size_type eposlt;
+		std::string::size_type sposlg;
+		std::string::size_type eposlg;
+		std::string::size_type spostz;
+		std::string::size_type epostz;
+		std::string ashDesYear;
+		std::string ashZone; // ashrae climate zone
+		std::string curNameWithSIUnits;
+		std::string curNameAndUnits;
 		int indexUnitConv;
-		Fstring storeASHRAEHDD( 10 );
-		Fstring storeASHRAECDD( 10 );
+		std::string storeASHRAEHDD;
+		std::string storeASHRAECDD;
 		bool heatingDesignlinepassed;
 		bool coolingDesignlinepassed;
 		bool desConditionlinepassed;
@@ -4948,8 +4948,8 @@ namespace OutputReportTabular {
 		heatingDesignlinepassed = false;
 		coolingDesignlinepassed = false;
 		desConditionlinepassed = false;
-		storeASHRAEHDD = " ";
-		storeASHRAECDD = " ";
+		storeASHRAEHDD = "";
+		storeASHRAECDD = "";
 		lineTypeinterim = 0;
 		if ( fileExists ) {
 			statFile = GetNewUnitNumber();
@@ -4957,141 +4957,142 @@ namespace OutputReportTabular {
 			if ( readStat != 0 ) {
 				ShowFatalError( "FillWeatherPredefinedEntries: Could not open file \"in.stat\" for input (read)." );
 			}
+			IOFlags flags;
 			while ( readStat == 0 ) { //end of file, or error
 				lineType = lineTypeinterim;
-				{ IOFlags flags; gio::read( statFile, "(A)", flags ) >> lineIn; readStat = flags.ios(); }
+				gio::read( statFile, fmtA, flags ) >> lineIn; readStat = flags.ios();
 				// reconcile line with different versions of stat file
 				// v7.1 added version as first line.
-				lineIn = adjustl( lineIn );
-				if ( lineIn( 1, 10 ) == "Statistics" ) {
+				strip( lineIn );
+				if ( has_prefix( lineIn, "Statistics" ) ) {
 					lineType = StatisticsLine;
-				} else if ( lineIn( 1, 8 ) == "Location" ) {
+				} else if ( has_prefix( lineIn, "Location" ) ) {
 					lineType = LocationLine;
-				} else if ( lineIn( 1, 1 ) == "{" ) {
+				} else if ( has_prefix( lineIn, "{" ) ) {
 					lineType = LatLongLine;
-				} else if ( lineIn( 1, 9 ) == "Elevation" ) {
+				} else if ( has_prefix( lineIn, "Elevation" ) ) {
 					lineType = ElevationLine;
-				} else if ( lineIn( 1, 17 ) == "Standard Pressure" ) {
+				} else if ( has_prefix( lineIn, "Standard Pressure" ) ) {
 					lineType = StdPressureLine;
-				} else if ( lineIn( 1, 11 ) == "Data Source" ) {
+				} else if ( has_prefix( lineIn, "Data Source" ) ) {
 					lineType = DataSourceLine;
-				} else if ( lineIn( 1, 11 ) == "WMO Station" ) {
+				} else if ( has_prefix( lineIn, "WMO Station" ) ) {
 					lineType = WMOStationLine;
-				} else if ( index( lineIn, "Design Conditions" ) > 0 ) {
+				} else if ( has( lineIn, "Design Conditions" ) ) {
 					if ( ! desConditionlinepassed ) {
 						desConditionlinepassed = true;
 						lineType = DesignConditionsLine;
 					}
-				} else if ( lineIn( 2, 8 ) == "Heating" ) {
+				} else if ( has_prefix( lineIn, "\tHeating" ) ) {
 					if ( ! heatingDesignlinepassed ) {
 						heatingDesignlinepassed = true;
 						lineType = heatingConditionsLine;
 					}
-				} else if ( lineIn( 2, 8 ) == "Cooling" ) {
+				} else if ( has_prefix( lineIn, "\tCooling" ) ) {
 					if ( ! coolingDesignlinepassed ) {
 						coolingDesignlinepassed = true;
 						lineType = coolingConditionsLine;
 					}
-				} else if ( index( lineIn, "(standard) heating degree-days (10°C baseline)" ) > 0 ) {
+				} else if ( has( lineIn, "(standard) heating degree-days (10°C baseline)" ) ) {
 					lineType = stdHDDLine;
-				} else if ( index( lineIn, "(standard) cooling degree-days (18.3°C baseline)" ) > 0 ) {
+				} else if ( has( lineIn, "(standard) cooling degree-days (18.3°C baseline)" ) ) {
 					lineType = stdCDDLine;
-				} else if ( index( lineIn, "Maximum Dry Bulb" ) > 0 ) {
+				} else if ( has( lineIn, "Maximum Dry Bulb" ) ) {
 					lineType = maxDryBulbLine;
-				} else if ( index( lineIn, "Minimum Dry Bulb" ) > 0 ) {
+				} else if ( has( lineIn, "Minimum Dry Bulb" ) ) {
 					lineType = minDryBulbLine;
-				} else if ( index( lineIn, "Maximum Dew Point" ) > 0 ) {
+				} else if ( has( lineIn, "Maximum Dew Point" ) ) {
 					lineType = maxDewPointLine;
-				} else if ( index( lineIn, "Minimum Dew Point" ) > 0 ) {
+				} else if ( has( lineIn, "Minimum Dew Point" ) ) {
 					lineType = minDewPointLine;
-				} else if ( index( lineIn, "(wthr file) heating degree-days (10°C baseline)" ) > 0 || index( lineIn, "heating degree-days (10°C baseline)" ) > 0 ) {
+				} else if ( has( lineIn, "(wthr file) heating degree-days (10°C baseline)" ) || has( lineIn, "heating degree-days (10°C baseline)" ) ) {
 					lineType = wthHDDLine;
-				} else if ( index( lineIn, "(wthr file) cooling degree-days (18°C baseline)" ) > 0 || index( lineIn, "cooling degree-days (18°C baseline)" ) > 0 ) {
+				} else if ( has( lineIn, "(wthr file) cooling degree-days (18°C baseline)" ) || has( lineIn, "cooling degree-days (18°C baseline)" ) ) {
 					lineType = wthCDDLine;
 				}
 				// these not part of big if/else because sequential
 				if ( lineType == KoppenDes1Line && isKoppen ) lineType = KoppenDes2Line;
 				if ( lineType == KoppenLine && isKoppen ) lineType = KoppenDes1Line;
-				if ( index( lineIn, "(Köppen classification)" ) > 0 ) lineType = KoppenLine;
+				if ( has( lineIn, "(Köppen classification)" ) ) lineType = KoppenLine;
 				if ( lineType == AshStdDes2Line ) lineType = AshStdDes3Line;
 				if ( lineType == AshStdDes1Line ) lineType = AshStdDes2Line;
 				if ( lineType == AshStdLine ) lineType = AshStdDes1Line;
-				if ( index( lineIn, "ASHRAE Standards" ) > 0 ) lineType = AshStdLine;
+				if ( has( lineIn, "ASHRAE Standards" ) ) lineType = AshStdLine;
 
 				{ auto const SELECT_CASE_var( lineType );
 				if ( SELECT_CASE_var == StatisticsLine ) { // Statistics for USA_CA_San.Francisco_TMY2
-					PreDefTableEntry( pdchWthrVal, "Reference", lineIn( 16 ) );
+					PreDefTableEntry( pdchWthrVal, "Reference", lineIn.substr( 15 ) );
 				} else if ( SELECT_CASE_var == LocationLine ) { // Location -- SAN_FRANCISCO CA USA
-					PreDefTableEntry( pdchWthrVal, "Site:Location", lineIn( 12 ) );
+					PreDefTableEntry( pdchWthrVal, "Site:Location", lineIn.substr( 11 ) );
 				} else if ( SELECT_CASE_var == LatLongLine ) { //      {N 37° 37'} {W 122° 22'} {GMT -8.0 Hours}
 					// find the {}
-					sposlt = index( lineIn, "{" );
-					eposlt = index( lineIn, "}" );
-					if ( sposlt > 0 && eposlt > 0 ) {
-						PreDefTableEntry( pdchWthrVal, "Latitude", lineIn( sposlt, eposlt ) );
+					sposlt = index( lineIn, '{' );
+					eposlt = index( lineIn, '}' );
+					if ( sposlt != std::string::npos && eposlt!= std::string::npos ) {
+						PreDefTableEntry( pdchWthrVal, "Latitude", lineIn.substr( sposlt, eposlt - sposlt + 1 ) );
 						// redefine so next scan can go with {}
-						lineIn( sposlt, sposlt ) = "[";
-						lineIn( eposlt, eposlt ) = "]";
+						lineIn[ sposlt ] = '[';
+						lineIn[ eposlt ] = ']';
 					} else {
 						PreDefTableEntry( pdchWthrVal, "Latitude", "not found" );
 					}
-					sposlg = index( lineIn, "{" );
-					eposlg = index( lineIn, "}" );
-					if ( sposlg > 0 && eposlg > 0 ) {
-						PreDefTableEntry( pdchWthrVal, "Longitude", lineIn( sposlg, eposlg ) );
+					sposlg = index( lineIn, '{' );
+					eposlg = index( lineIn, '}' );
+					if ( sposlg != std::string::npos && eposlg != std::string::npos ) {
+						PreDefTableEntry( pdchWthrVal, "Longitude", lineIn.substr( sposlg, eposlg - sposlg + 1 ) );
 						// redefine so next scan can go with {}
-						lineIn( sposlg, sposlg ) = "[";
-						lineIn( eposlg, eposlg ) = "]";
+						lineIn[ sposlg ] = '[';
+						lineIn[ eposlg ] = ']';
 					} else {
 						PreDefTableEntry( pdchWthrVal, "Longitude", "not found" );
 					}
-					spostz = index( lineIn, "{" );
-					epostz = index( lineIn, "}" );
-					if ( spostz > 0 && epostz > 0 ) {
-						PreDefTableEntry( pdchWthrVal, "Time Zone", lineIn( spostz, epostz ) );
+					spostz = index( lineIn, '{' );
+					epostz = index( lineIn, '}' );
+					if ( spostz != std::string::npos && epostz != std::string::npos ) {
+						PreDefTableEntry( pdchWthrVal, "Time Zone", lineIn.substr( spostz, epostz - spostz + 1 ) );
 						// redefine so next scan can go with {}
-						lineIn( spostz, spostz ) = "[";
-						lineIn( epostz, epostz ) = "]";
+						lineIn[ spostz ] = '[';
+						lineIn[ epostz ] = ']';
 					} else {
 						PreDefTableEntry( pdchWthrVal, "Time Zone", "not found" );
 					}
 				} else if ( SELECT_CASE_var == ElevationLine ) { // Elevation --     5m above sea level
-					lnPtr = index( lineIn( 13 ), "m" );
-					if ( lnPtr > 0 ) {
-						curNameWithSIUnits = "Elevation (m) " + lineIn( 13 + lnPtr + 1 );
+					lnPtr = index( lineIn.substr( 12 ), 'm' );
+					if ( lnPtr != std::string::npos ) {
+						curNameWithSIUnits = "Elevation (m) " + lineIn.substr( 12 + lnPtr + 2 );
 						if ( unitsStyle == unitsStyleInchPound ) {
 							LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
-							PreDefTableEntry( pdchWthrVal, trim( curNameAndUnits ), trim( RealToStr( ConvertIP( indexUnitConv, StrToReal( lineIn( 13, 13 + lnPtr - 2 ) ) ), 1 ) ) );
+							PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIP( indexUnitConv, StrToReal( lineIn.substr( 12, lnPtr ) ) ), 1 ) );
 						} else {
-							PreDefTableEntry( pdchWthrVal, trim( curNameWithSIUnits ), lineIn( 13, 13 + lnPtr - 2 ) );
+							PreDefTableEntry( pdchWthrVal, curNameWithSIUnits, lineIn.substr( 12, lnPtr ) );
 						}
 					} else {
 						PreDefTableEntry( pdchWthrVal, "Elevation", "not found" );
 					}
 				} else if ( SELECT_CASE_var == StdPressureLine ) { // Standard Pressure at Elevation -- 101265Pa
-					PreDefTableEntry( pdchWthrVal, "Standard Pressure at Elevation", lineIn( 35 ) );
+					PreDefTableEntry( pdchWthrVal, "Standard Pressure at Elevation", lineIn.substr( 34 ) );
 				} else if ( SELECT_CASE_var == DataSourceLine ) { // Data Source -- TMY2-23234
-					PreDefTableEntry( pdchWthrVal, "Data Source", lineIn( 16 ) );
+					PreDefTableEntry( pdchWthrVal, "Data Source", lineIn.substr( 15 ) );
 				} else if ( SELECT_CASE_var == WMOStationLine ) { // WMO Station 724940
-					PreDefTableEntry( pdchWthrVal, "WMO Station", lineIn( 13 ) );
+					PreDefTableEntry( pdchWthrVal, "WMO Station", lineIn.substr( 12 ) );
 				} else if ( SELECT_CASE_var == DesignConditionsLine ) { //  - Using Design Conditions from "Climate Design Data 2005 ASHRAE Handbook"
 					ashPtr = index( lineIn, "ASHRAE" );
-					if ( ashPtr > 0 ) {
+					if ( ashPtr != std::string::npos ) {
 						isASHRAE = true;
 						iscalc = true;
-						if ( ashPtr > 5 ) { //Autodesk:BoundsViolation IF block added to protect against ashPtr<=5
-							ashDesYear = lineIn( ashPtr - 5, ashPtr - 1 );
+						if ( ashPtr > 4u ) { //Autodesk:BoundsViolation IF block added to protect against ashPtr<=5
+							ashDesYear = lineIn.substr( ashPtr - 5, 5 );
 						} else {
 							ashDesYear = "";
 						}
-						PreDefTableEntry( pdchWthrVal, "Weather File Design Conditions ", "Climate Design Data " + ashDesYear + "ASHRAE Handbook" );
-					} else if ( index( lineIn, "not calculated" ) > 0 || lineIn == " " ) {
+						PreDefTableEntry( pdchWthrVal, "Weather File Design Conditions", "Climate Design Data " + ashDesYear + "ASHRAE Handbook" );
+					} else if ( has( lineIn, "not calculated" ) || lineIn == "" ) {
 						iscalc = false;
-						PreDefTableEntry( pdchWthrVal, "Weather File Design Conditions ", "not calculated, Number of days < 1 year" );
+						PreDefTableEntry( pdchWthrVal, "Weather File Design Conditions", "not calculated, Number of days < 1 year" );
 					} else {
 						isASHRAE = false;
 						iscalc = true;
-						PreDefTableEntry( pdchWthrVal, "Weather File Design Conditions ", "Calculated from the weather file" );
+						PreDefTableEntry( pdchWthrVal, "Weather File Design Conditions", "Calculated from the weather file" );
 					}
 				} else if ( SELECT_CASE_var == heatingConditionsLine ) { //  winter/heating design conditions
 					if ( iscalc ) {
@@ -5100,25 +5101,25 @@ namespace OutputReportTabular {
 								if ( unitsStyle == unitsStyleInchPound ) {
 									curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
 									LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
-									PreDefTableEntry( pdchWthrVal, trim( curNameAndUnits ), trim( RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, 2 ) ) ), 1 ) ) + degChar );
-									PreDefTableEntry( pdchWthrVal, "Heating Design Temperature 99% (F)", trim( RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, 3 ) ) ), 1 ) ) + degChar );
+									PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, 2 ) ) ), 1 ) + degChar );
+									PreDefTableEntry( pdchWthrVal, "Heating Design Temperature 99% (F)", RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, 3 ) ) ), 1 ) + degChar );
 								} else {
-									PreDefTableEntry( pdchWthrVal, "Heating Design Temperature 99.6% (C)", trim( GetColumnUsingTabs( lineIn, 2 ) ) + degChar );
-									PreDefTableEntry( pdchWthrVal, "Heating Design Temperature 99% (C)", trim( GetColumnUsingTabs( lineIn, 3 ) ) + degChar );
+									PreDefTableEntry( pdchWthrVal, "Heating Design Temperature 99.6% (C)", GetColumnUsingTabs( lineIn, 2 ) + degChar );
+									PreDefTableEntry( pdchWthrVal, "Heating Design Temperature 99% (C)", GetColumnUsingTabs( lineIn, 3 ) + degChar );
 								}
 							} else { // 2005 and 2009 are the same
 								if ( unitsStyle == unitsStyleInchPound ) {
 									curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
 									LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
-									PreDefTableEntry( pdchWthrVal, trim( curNameAndUnits ), trim( RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, 4 ) ) ), 1 ) ) + degChar );
-									PreDefTableEntry( pdchWthrVal, "Heating Design Temperature 99% (F)", trim( RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, 5 ) ) ), 1 ) ) + degChar );
+									PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, 4 ) ) ), 1 ) + degChar );
+									PreDefTableEntry( pdchWthrVal, "Heating Design Temperature 99% (F)", RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, 5 ) ) ), 1 ) + degChar );
 								} else {
-									PreDefTableEntry( pdchWthrVal, "Heating Design Temperature 99.6% (C)", trim( GetColumnUsingTabs( lineIn, 4 ) ) + degChar );
-									PreDefTableEntry( pdchWthrVal, "Heating Design Temperature 99% (C)", trim( GetColumnUsingTabs( lineIn, 5 ) ) + degChar );
+									PreDefTableEntry( pdchWthrVal, "Heating Design Temperature 99.6% (C)", GetColumnUsingTabs( lineIn, 4 ) + degChar );
+									PreDefTableEntry( pdchWthrVal, "Heating Design Temperature 99% (C)", GetColumnUsingTabs( lineIn, 5 ) + degChar );
 								}
 							}
 						} else { // from weather file
-							if ( GetColumnUsingTabs( lineIn, 5 ) == "  " ) {
+							if ( is_blank( GetColumnUsingTabs( lineIn, 5 ) ) ) {
 								col1 = 3;
 								col2 = 4;
 							} else {
@@ -5128,11 +5129,11 @@ namespace OutputReportTabular {
 							if ( unitsStyle == unitsStyleInchPound ) {
 								curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
 								LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
-								PreDefTableEntry( pdchWthrVal, trim( curNameAndUnits ), trim( RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, col1 ) ) ), 1 ) ) + degChar );
-								PreDefTableEntry( pdchWthrVal, "Heating Design Temperature 99% (F)", trim( RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, col2 ) ) ), 1 ) ) + degChar );
+								PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, col1 ) ) ), 1 ) + degChar );
+								PreDefTableEntry( pdchWthrVal, "Heating Design Temperature 99% (F)", RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, col2 ) ) ), 1 ) + degChar );
 							} else {
-								PreDefTableEntry( pdchWthrVal, "Heating Design Temperature 99.6% (C)", trim( GetColumnUsingTabs( lineIn, col1 ) ) + degChar );
-								PreDefTableEntry( pdchWthrVal, "Heating Design Temperature 99% (C)", trim( GetColumnUsingTabs( lineIn, col2 ) ) + degChar );
+								PreDefTableEntry( pdchWthrVal, "Heating Design Temperature 99.6% (C)", GetColumnUsingTabs( lineIn, col1 ) + degChar );
+								PreDefTableEntry( pdchWthrVal, "Heating Design Temperature 99% (C)", GetColumnUsingTabs( lineIn, col2 ) + degChar );
 							}
 						}
 					}
@@ -5143,29 +5144,29 @@ namespace OutputReportTabular {
 								if ( unitsStyle == unitsStyleInchPound ) {
 									curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
 									LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
-									PreDefTableEntry( pdchWthrVal, trim( curNameAndUnits ), trim( RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, 2 ) ) ), 1 ) ) + degChar );
-									PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 1% (F)", trim( RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, 4 ) ) ), 1 ) ) + degChar );
-									PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 2% (F)", trim( RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, 6 ) ) ), 1 ) ) + degChar );
+									PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, 2 ) ) ), 1 ) + degChar );
+									PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 1% (F)", RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, 4 ) ) ), 1 ) + degChar );
+									PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 2% (F)", RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, 6 ) ) ), 1 ) + degChar );
 								} else {
-									PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 0.4% (C)", trim( GetColumnUsingTabs( lineIn, 2 ) ) + degChar );
-									PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 1% (C)", trim( GetColumnUsingTabs( lineIn, 4 ) ) + degChar );
-									PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 2% (C)", trim( GetColumnUsingTabs( lineIn, 6 ) ) + degChar );
+									PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 0.4% (C)", GetColumnUsingTabs( lineIn, 2 ) + degChar );
+									PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 1% (C)", GetColumnUsingTabs( lineIn, 4 ) + degChar );
+									PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 2% (C)", GetColumnUsingTabs( lineIn, 6 ) + degChar );
 								}
 							} else { // 2005 and 2009 are the same
 								if ( unitsStyle == unitsStyleInchPound ) {
 									curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
 									LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
-									PreDefTableEntry( pdchWthrVal, trim( curNameAndUnits ), trim( RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, 5 ) ) ), 1 ) ) + degChar );
-									PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 1% (F)", trim( RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, 7 ) ) ), 1 ) ) + degChar );
-									PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 2% (F)", trim( RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, 9 ) ) ), 1 ) ) + degChar );
+									PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, 5 ) ) ), 1 ) + degChar );
+									PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 1% (F)", RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, 7 ) ) ), 1 ) + degChar );
+									PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 2% (F)", RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, 9 ) ) ), 1 ) + degChar );
 								} else {
-									PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 0.4% (C)", trim( GetColumnUsingTabs( lineIn, 5 ) ) + degChar );
-									PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 1% (C)", trim( GetColumnUsingTabs( lineIn, 7 ) ) + degChar );
-									PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 2% (C)", trim( GetColumnUsingTabs( lineIn, 9 ) ) + degChar );
+									PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 0.4% (C)", GetColumnUsingTabs( lineIn, 5 ) + degChar );
+									PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 1% (C)", GetColumnUsingTabs( lineIn, 7 ) + degChar );
+									PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 2% (C)", GetColumnUsingTabs( lineIn, 9 ) + degChar );
 								}
 							}
 						} else { // from weather file
-							if ( GetColumnUsingTabs( lineIn, 6 ) == "  " ) {
+							if ( is_blank( GetColumnUsingTabs( lineIn, 6 ) ) ) {
 								col1 = 3;
 								col2 = 4;
 								col3 = 5;
@@ -5177,118 +5178,118 @@ namespace OutputReportTabular {
 							if ( unitsStyle == unitsStyleInchPound ) {
 								curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
 								LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
-								PreDefTableEntry( pdchWthrVal, trim( curNameAndUnits ), trim( RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, col1 ) ) ), 1 ) ) + degChar );
-								PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 1% (F)", trim( RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, col2 ) ) ), 1 ) ) + degChar );
-								PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 2% (F)", trim( RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, col3 ) ) ), 1 ) ) + degChar );
+								PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, col1 ) ) ), 1 ) + degChar );
+								PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 1% (F)", RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, col2 ) ) ), 1 ) + degChar );
+								PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 2% (F)", RealToStr( ConvertIP( indexUnitConv, StrToReal( GetColumnUsingTabs( lineIn, col3 ) ) ), 1 ) + degChar );
 							} else {
-								PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 0.4% (C)", trim( GetColumnUsingTabs( lineIn, col1 ) ) + degChar );
-								PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 1% (C)", trim( GetColumnUsingTabs( lineIn, col2 ) ) + degChar );
-								PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 2% (C)", trim( GetColumnUsingTabs( lineIn, col3 ) ) + degChar );
+								PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 0.4% (C)", GetColumnUsingTabs( lineIn, col1 ) + degChar );
+								PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 1% (C)", GetColumnUsingTabs( lineIn, col2 ) + degChar );
+								PreDefTableEntry( pdchWthrVal, "Cooling Design Temperature 2% (C)", GetColumnUsingTabs( lineIn, col3 ) + degChar );
 							}
 						}
 					}
 				} else if ( SELECT_CASE_var == stdHDDLine ) { //  - 1745 annual (standard) heating degree-days (10°C baseline)
-					storeASHRAEHDD = lineIn( 3, 6 );
+					storeASHRAEHDD = lineIn.substr( 2, 4 );
 				} else if ( SELECT_CASE_var == stdCDDLine ) { //  -  464 annual (standard) cooling degree-days (18.3°C baseline)
-					storeASHRAECDD = lineIn( 3, 6 );
+					storeASHRAECDD = lineIn.substr( 2, 4 );
 				} else if ( SELECT_CASE_var == maxDryBulbLine ) { //   - Maximum Dry Bulb temperature of  35.6°C on Jul  9
 					sposlt = index( lineIn, "of" );
-					eposlt = index( lineIn, "C" );
+					eposlt = index( lineIn, 'C' );
 					sposlt += 2;
 					eposlt -= 2;
-					if ( sposlt > 0 && eposlt > 0 ) {
+					if ( sposlt != std::string::npos && eposlt != std::string::npos ) {
 						if ( unitsStyle == unitsStyleInchPound ) {
 							curNameWithSIUnits = "Maximum Dry Bulb Temperature (C)";
 							LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
-							PreDefTableEntry( pdchWthrVal, trim( curNameAndUnits ), trim( RealToStr( ConvertIP( indexUnitConv, StrToReal( lineIn( sposlt, eposlt ) ) ), 1 ) ) + degChar );
+							PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIP( indexUnitConv, StrToReal( lineIn.substr( sposlt, eposlt - sposlt + 1 ) ) ), 1 ) + degChar );
 						} else {
-							PreDefTableEntry( pdchWthrVal, "Maximum Dry Bulb Temperature (C)", lineIn( sposlt, eposlt ) + degChar );
+							PreDefTableEntry( pdchWthrVal, "Maximum Dry Bulb Temperature (C)", lineIn.substr( sposlt, eposlt - sposlt + 1 ) + degChar );
 						}
 					} else {
 						PreDefTableEntry( pdchWthrVal, "Maximum Dry Bulb Temperature", "not found" );
 					}
 					sposlt = index( lineIn, "on" );
 					sposlt += 2;
-					if ( sposlt > 0 ) {
-						PreDefTableEntry( pdchWthrVal, "Maximum Dry Bulb Occurs on", lineIn( sposlt ) );
+					if ( sposlt != std::string::npos ) {
+						PreDefTableEntry( pdchWthrVal, "Maximum Dry Bulb Occurs on", lineIn.substr( sposlt ) );
 					} else {
 						PreDefTableEntry( pdchWthrVal, "Maximum Dry Bulb Occurs on", "not found" );
 					}
 				} else if ( SELECT_CASE_var == minDryBulbLine ) { //   - Minimum Dry Bulb temperature of -22.8°C on Jan  7
 					sposlt = index( lineIn, "of" );
-					eposlt = index( lineIn, "C" );
+					eposlt = index( lineIn, 'C' );
 					sposlt += 2;
 					eposlt -= 2;
-					if ( sposlt > 0 && eposlt > 0 ) {
+					if ( sposlt != std::string::npos && eposlt != std::string::npos ) {
 						if ( unitsStyle == unitsStyleInchPound ) {
 							curNameWithSIUnits = "Minimum Dry Bulb Temperature (C)";
 							LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
-							PreDefTableEntry( pdchWthrVal, trim( curNameAndUnits ), trim( RealToStr( ConvertIP( indexUnitConv, StrToReal( lineIn( sposlt, eposlt ) ) ), 1 ) ) + degChar );
+							PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIP( indexUnitConv, StrToReal( lineIn.substr( sposlt, eposlt - sposlt + 1 ) ) ), 1 ) + degChar );
 						} else {
-							PreDefTableEntry( pdchWthrVal, "Minimum Dry Bulb Temperature (C)", lineIn( sposlt, eposlt ) + degChar );
+							PreDefTableEntry( pdchWthrVal, "Minimum Dry Bulb Temperature (C)", lineIn.substr( sposlt, eposlt - sposlt + 1 ) + degChar );
 						}
 					} else {
 						PreDefTableEntry( pdchWthrVal, "Minimum Dry Bulb Temperature", "not found" );
 					}
 					sposlt = index( lineIn, "on" );
 					sposlt += 2;
-					if ( sposlt > 0 ) {
-						PreDefTableEntry( pdchWthrVal, "Minimum Dry Bulb Occurs on", lineIn( sposlt ) );
+					if ( sposlt != std::string::npos ) {
+						PreDefTableEntry( pdchWthrVal, "Minimum Dry Bulb Occurs on", lineIn.substr( sposlt ) );
 					} else {
 						PreDefTableEntry( pdchWthrVal, "Minimum Dry Bulb Occurs on", "not found" );
 					}
 				} else if ( SELECT_CASE_var == maxDewPointLine ) { //   - Maximum Dew Point temperature of  25.6°C on Aug  4
 					sposlt = index( lineIn, "of" );
-					eposlt = index( lineIn, "C" );
+					eposlt = index( lineIn, 'C' );
 					sposlt += 2;
 					eposlt -= 2;
-					if ( sposlt > 0 && eposlt > 0 ) {
+					if ( sposlt != std::string::npos && eposlt != std::string::npos ) {
 						if ( unitsStyle == unitsStyleInchPound ) {
 							curNameWithSIUnits = "Maximum Dew Point Temperature (C)";
 							LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
-							PreDefTableEntry( pdchWthrVal, trim( curNameAndUnits ), trim( RealToStr( ConvertIP( indexUnitConv, StrToReal( lineIn( sposlt, eposlt ) ) ), 1 ) ) + degChar );
+							PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIP( indexUnitConv, StrToReal( lineIn.substr( sposlt, eposlt - sposlt + 1 ) ) ), 1 ) + degChar );
 						} else {
-							PreDefTableEntry( pdchWthrVal, "Maximum Dew Point Temperature (C)", lineIn( sposlt, eposlt ) + degChar );
+							PreDefTableEntry( pdchWthrVal, "Maximum Dew Point Temperature (C)", lineIn.substr( sposlt, eposlt - sposlt + 1 ) + degChar );
 						}
 					} else {
 						PreDefTableEntry( pdchWthrVal, "Maximum Dew Point Temperature", "not found" );
 					}
 					sposlt = index( lineIn, "on" );
 					sposlt += 2;
-					if ( sposlt > 0 ) {
-						PreDefTableEntry( pdchWthrVal, "Maximum Dew Point Occurs on", lineIn( sposlt ) );
+					if ( sposlt != std::string::npos ) {
+						PreDefTableEntry( pdchWthrVal, "Maximum Dew Point Occurs on", lineIn.substr( sposlt ) );
 					} else {
 						PreDefTableEntry( pdchWthrVal, "Maximum Dew Point Occurs on", "not found" );
 					}
 				} else if ( SELECT_CASE_var == minDewPointLine ) { //   - Minimum Dew Point temperature of -28.9°C on Dec 31
 					sposlt = index( lineIn, "of" );
-					eposlt = index( lineIn, "C" );
+					eposlt = index( lineIn, 'C' );
 					sposlt += 2;
 					eposlt -= 2;
-					if ( sposlt > 0 && eposlt > 0 ) {
+					if ( sposlt != std::string::npos && eposlt != std::string::npos ) {
 						if ( unitsStyle == unitsStyleInchPound ) {
 							curNameWithSIUnits = "Minimum Dew Point Temperature (C)";
 							LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
-							PreDefTableEntry( pdchWthrVal, trim( curNameAndUnits ), trim( RealToStr( ConvertIP( indexUnitConv, StrToReal( lineIn( sposlt, eposlt ) ) ), 1 ) ) + degChar );
+							PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIP( indexUnitConv, StrToReal( lineIn.substr( sposlt, eposlt - sposlt + 1 ) ) ), 1 ) + degChar );
 						} else {
-							PreDefTableEntry( pdchWthrVal, "Minimum Dew Point Temperature (C)", lineIn( sposlt, eposlt ) + degChar );
+							PreDefTableEntry( pdchWthrVal, "Minimum Dew Point Temperature (C)", lineIn.substr( sposlt, eposlt - sposlt + 1 ) + degChar );
 						}
 					} else {
 						PreDefTableEntry( pdchWthrVal, "Minimum Dew Point Temperature", "not found" );
 					}
 					sposlt = index( lineIn, "on" );
 					sposlt += 2;
-					if ( sposlt > 0 ) {
-						PreDefTableEntry( pdchWthrVal, "Minimum Dew Point Occurs on", lineIn( sposlt ) );
+					if ( sposlt != std::string::npos ) {
+						PreDefTableEntry( pdchWthrVal, "Minimum Dew Point Occurs on", lineIn.substr( sposlt ) );
 					} else {
 						PreDefTableEntry( pdchWthrVal, "Minimum Dew Point Occurs on", "not found" );
 					}
 				} else if ( SELECT_CASE_var == wthHDDLine ) { //  - 1745 (wthr file) annual heating degree-days (10°C baseline)
-					if ( storeASHRAEHDD != " " ) {
+					if ( storeASHRAEHDD != "" ) {
 						if ( unitsStyle == unitsStyleInchPound ) {
 							curNameWithSIUnits = "Standard Heating Degree-Days - base 50°(C)";
 							LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
-							PreDefTableEntry( pdchWthrVal, trim( curNameAndUnits ), trim( RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( storeASHRAEHDD ) ), 1 ) ) );
+							PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( storeASHRAEHDD ) ), 1 ) );
 						} else {
 							PreDefTableEntry( pdchWthrVal, "Standard Heating Degree-Days (base 10°C)", storeASHRAEHDD );
 						}
@@ -5302,18 +5303,18 @@ namespace OutputReportTabular {
 					if ( unitsStyle == unitsStyleInchPound ) {
 						curNameWithSIUnits = "Weather File Heating Degree-Days - base 50°(C)";
 						LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
-						PreDefTableEntry( pdchWthrVal, trim( curNameAndUnits ), trim( RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn( 3, 6 ) ) ), 1 ) ) );
-						PreDefTableEntry( pdchLeedGenData, "Heating Degree Days", trim( RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn( 3, 6 ) ) ), 1 ) ) );
+						PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn.substr( 2, 4 ) ) ), 1 ) );
+						PreDefTableEntry( pdchLeedGenData, "Heating Degree Days", RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn.substr( 2, 4 ) ) ), 1 ) );
 					} else {
-						PreDefTableEntry( pdchWthrVal, "Weather File Heating Degree-Days (base 10°C)", lineIn( 3, 6 ) );
-						PreDefTableEntry( pdchLeedGenData, "Heating Degree Days", lineIn( 3, 6 ) );
+						PreDefTableEntry( pdchWthrVal, "Weather File Heating Degree-Days (base 10°C)", lineIn.substr( 2, 4 ) );
+						PreDefTableEntry( pdchLeedGenData, "Heating Degree Days", lineIn.substr( 2, 4 ) );
 					}
 				} else if ( SELECT_CASE_var == wthCDDLine ) { //  -  464 (wthr file) annual cooling degree-days (18°C baseline)
-					if ( storeASHRAECDD != " " ) {
+					if ( storeASHRAECDD != "" ) {
 						if ( unitsStyle == unitsStyleInchPound ) {
 							curNameWithSIUnits = "Standard Cooling Degree-Days - base 65°(C)";
 							LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
-							PreDefTableEntry( pdchWthrVal, trim( curNameAndUnits ), trim( RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( storeASHRAECDD ) ), 1 ) ) );
+							PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( storeASHRAECDD ) ), 1 ) );
 						} else {
 							PreDefTableEntry( pdchWthrVal, "Standard Cooling Degree-Days (base 18.3°C)", storeASHRAECDD );
 						}
@@ -5327,33 +5328,33 @@ namespace OutputReportTabular {
 					if ( unitsStyle == unitsStyleInchPound ) {
 						curNameWithSIUnits = "Weather File Cooling Degree-Days - base 64.4°(C)";
 						LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
-						PreDefTableEntry( pdchWthrVal, trim( curNameAndUnits ), trim( RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn( 3, 6 ) ) ), 1 ) ) );
-						PreDefTableEntry( pdchLeedGenData, "Cooling Degree Days", trim( RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn( 3, 6 ) ) ), 1 ) ) );
+						PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn.substr( 2, 4 ) ) ), 1 ) );
+						PreDefTableEntry( pdchLeedGenData, "Cooling Degree Days", RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn.substr( 2, 4 ) ) ), 1 ) );
 					} else {
-						PreDefTableEntry( pdchWthrVal, "Weather File Cooling Degree-Days (base 18°C)", lineIn( 3, 6 ) );
-						PreDefTableEntry( pdchLeedGenData, "Cooling Degree Days", lineIn( 3, 6 ) );
+						PreDefTableEntry( pdchWthrVal, "Weather File Cooling Degree-Days (base 18°C)", lineIn.substr( 2, 4 ) );
+						PreDefTableEntry( pdchLeedGenData, "Cooling Degree Days", lineIn.substr( 2, 4 ) );
 					}
 				} else if ( SELECT_CASE_var == KoppenLine ) { // - Climate type "BSk" (Köppen classification)
-					if ( index( lineIn, "not shown" ) == 0 ) {
+					if ( ! has( lineIn, "not shown" ) ) {
 						isKoppen = true;
-						if ( lineIn( 19, 19 ) == "\"" ) { // two character classification
-							PreDefTableEntry( pdchWthrVal, "Köppen Classification", lineIn( 17, 18 ) );
+						if ( lineIn[ 18 ] == '"' ) { // two character classification
+							PreDefTableEntry( pdchWthrVal, "Köppen Classification", lineIn.substr( 16, 2 ) );
 						} else {
-							PreDefTableEntry( pdchWthrVal, "Köppen Classification", lineIn( 17, 19 ) );
+							PreDefTableEntry( pdchWthrVal, "Köppen Classification", lineIn.substr( 16, 3 ) );
 						}
 					} else {
 						isKoppen = false;
-						PreDefTableEntry( pdchWthrVal, "Köppen Recommendation", lineIn( 3 ) );
+						PreDefTableEntry( pdchWthrVal, "Köppen Recommendation", lineIn.substr( 2 ) );
 					}
 				} else if ( SELECT_CASE_var == KoppenDes1Line ) { // - Tropical monsoonal or tradewind-coastal (short dry season, lat. 5-25°)
 					if ( isKoppen ) {
-						PreDefTableEntry( pdchWthrVal, "Köppen Description", lineIn( 3 ) );
+						PreDefTableEntry( pdchWthrVal, "Köppen Description", lineIn.substr( 2 ) );
 					}
 				} else if ( SELECT_CASE_var == KoppenDes2Line ) { // - Unbearably humid periods in summer, but passive cooling is possible
 					if ( isKoppen ) {
-						if ( len_trim( lineIn ) > 3 ) { // avoid blank lines
-							if ( lineIn( 3, 4 ) != "**" ) { // avoid line with warning
-								PreDefTableEntry( pdchWthrVal, "Köppen Recommendation", lineIn( 3 ) );
+						if ( len( lineIn ) > 3 ) { // avoid blank lines
+							if ( lineIn.substr( 2, 2 ) != "**" ) { // avoid line with warning
+								PreDefTableEntry( pdchWthrVal, "Köppen Recommendation", lineIn.substr( 2 ) );
 							} else {
 								PreDefTableEntry( pdchWthrVal, "Köppen Recommendation", "" );
 							}
@@ -5363,9 +5364,9 @@ namespace OutputReportTabular {
 					}
 				} else if ( ( SELECT_CASE_var == AshStdLine ) || ( SELECT_CASE_var == AshStdDes1Line ) || ( SELECT_CASE_var == AshStdDes2Line ) || ( SELECT_CASE_var == AshStdDes3Line ) ) {
 					//  - Climate type "1A" (ASHRAE Standards 90.1-2004 and 90.2-2004 Climate Zone)**
-					if ( index( lineIn, "Standards" ) > 0 ) {
-						ashZone = lineIn( 17, 18 );
-						if ( ashZone( 2, 2 ) == "\"" ) ashZone( 2, 2 ) = " ";
+					if ( has( lineIn, "Standards" ) ) {
+						ashZone = lineIn.substr( 16, 2 );
+						if ( ashZone[ 1 ] == '"' ) ashZone[ 1 ] = ' ';
 						PreDefTableEntry( pdchWthrVal, "ASHRAE Climate Zone", ashZone );
 						PreDefTableEntry( pdchLeedGenData, "Climate Zone", ashZone );
 						if ( ashZone == "1A" ) {
@@ -5419,9 +5420,9 @@ namespace OutputReportTabular {
 		}
 	}
 
-	Fstring
+	std::string
 	GetColumnUsingTabs(
-		Fstring const & inString, // Input String
+		std::string const & inString, // Input String
 		int const colNum // Column number
 	)
 	{
@@ -5440,13 +5441,13 @@ namespace OutputReportTabular {
 		//   na
 
 		// Return value
-		Fstring resultString( len( inString ) ); // Result String
+		std::string resultString; // Result String
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const tb( 1, CHAR( 9 ) ); // tab character
+		static char const tb( '\t' ); // tab character
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -5456,32 +5457,31 @@ namespace OutputReportTabular {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		Fstring procIn( len( inString ) ); // processed input string
-		int startTab;
-		int endTab;
-		int inLen;
-		int i;
+		std::string procIn; // processed input string
+		std::string::size_type startTab;
+		std::string::size_type endTab;
+		std::string::size_type inLen;
 
 		procIn = inString;
 		inLen = len( procIn );
-		startTab = 0;
+		startTab = std::string::npos;
 		endTab = index( procIn, tb );
-		if ( endTab > 0 ) {
-			procIn( endTab, endTab ) = " "; //replace tab with space so next search doesn't find this tab again
+		if ( endTab != std::string::npos ) {
+			procIn[ endTab ] = ' '; // replace tab with space so next search doesn't find this tab again
 		} else {
-			endTab = inLen + 1; //one character past the end of string since substract one when extracting
+			endTab = inLen; // one character past the end of string since substract one when extracting
 		}
-		for ( i = 2; i <= colNum; ++i ) { //already have first column identified so do loop only if for column 2 or greater.
+		for ( int i = 2; i <= colNum; ++i ) { // already have first column identified so do loop only if for column 2 or greater.
 			startTab = endTab;
 			endTab = index( procIn, tb );
-			if ( endTab > 0 ) {
-				procIn( endTab, endTab ) = " "; //replace tab with space so next search doesn't find this tab again
+			if ( endTab != std::string::npos ) {
+				procIn[ endTab ] = ' '; // replace tab with space so next search doesn't find this tab again
 			} else {
-				endTab = inLen + 1; //one character past the end of string since substract one when extracting
+				endTab = inLen; // one character past the end of string since substract one when extracting
 			}
 		}
 		if ( startTab < endTab ) {
-			resultString = procIn( startTab + 1, endTab - 1 ); //extract but leave tab characters out
+			resultString = procIn.substr( startTab + 1, endTab - startTab - 1 ); // extract but leave tab characters out
 		} else {
 			resultString = "";
 		}
@@ -5850,9 +5850,9 @@ namespace OutputReportTabular {
 		// 1.1A-General Information
 		//CALL PreDefTableEntry(pdchLeedGenData,'Principal Heating Source','-')
 		if ( EnvironmentName == WeatherFileLocationTitle ) {
-			PreDefTableEntry( pdchLeedGenData, "Weather File", trim( EnvironmentName ) );
+			PreDefTableEntry( pdchLeedGenData, "Weather File", EnvironmentName );
 		} else {
-			PreDefTableEntry( pdchLeedGenData, "Weather File", trim( EnvironmentName ) + " ** " + trim( WeatherFileLocationTitle ) );
+			PreDefTableEntry( pdchLeedGenData, "Weather File", EnvironmentName + " ** " + WeatherFileLocationTitle );
 		}
 
 		//CALL PreDefTableEntry(pdchLeedGenData,'Climate Zone','-')
@@ -5898,12 +5898,12 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_Fstring columnHead( sFstring( MaxNameLength * 2 ) );
+		FArray1D_string columnHead;
 		FArray1D_int columnWidth;
-		FArray1D_Fstring rowHead( 16, sFstring( MaxNameLength ) );
-		FArray2D_Fstring tableBody( sFstring( MaxNameLength ) );
-		FArray1D_Fstring aggString( 13, sFstring( MaxNameLength ) );
-		Fstring curAggString( MaxNameLength );
+		FArray1D_string rowHead( 16 );
+		FArray2D_string tableBody;
+		FArray1D_string aggString( 13 );
+		std::string curAggString;
 		int iInput;
 		int jTable;
 		int kColumn;
@@ -5920,11 +5920,11 @@ namespace OutputReportTabular {
 		Real64 maxVal;
 		Real64 sumVal;
 		Real64 sumDuration;
-		Fstring curUnits( MaxNameLength );
-		Fstring energyUnitsString( MaxNameLength );
+		std::string curUnits;
+		std::string energyUnitsString;
 		Real64 energyUnitsConversionFactor;
 		int indexUnitConv;
-		Fstring varNameWithUnits( MaxNameLength );
+		std::string varNameWithUnits;
 		Real64 veryLarge;
 		Real64 verySmall;
 
@@ -5965,16 +5965,16 @@ namespace OutputReportTabular {
 		// set the unit conversion
 		{ auto const SELECT_CASE_var( unitsStyle );
 		if ( SELECT_CASE_var == unitsStyleNone ) {
-			energyUnitsString = "J  ";
+			energyUnitsString = "J";
 			energyUnitsConversionFactor = 1.0;
 		} else if ( SELECT_CASE_var == unitsStyleJtoKWH ) {
 			energyUnitsString = "kWh";
 			energyUnitsConversionFactor = 1.0 / 3600000.0;
 		} else if ( SELECT_CASE_var == unitsStyleJtoMJ ) {
-			energyUnitsString = "MJ ";
+			energyUnitsString = "MJ";
 			energyUnitsConversionFactor = 1.0 / 1000000.0;
 		} else if ( SELECT_CASE_var == unitsStyleJtoGJ ) {
-			energyUnitsString = "GJ ";
+			energyUnitsString = "GJ";
 			energyUnitsConversionFactor = 1.0 / 1000000000.0;
 		}}
 
@@ -6006,12 +6006,12 @@ namespace OutputReportTabular {
 				for ( kColumn = 1; kColumn <= MonthlyTables( curTable ).numColumns; ++kColumn ) {
 					curCol = kColumn + MonthlyTables( curTable ).firstColumn - 1;
 					curAggString = aggString( MonthlyColumns( curCol ).aggType );
-					if ( len_trim( curAggString ) > 0 ) {
-						curAggString = " {" + trim( adjustl( curAggString ) ) + "}";
+					if ( len( curAggString ) > 0 ) {
+						curAggString = " {" + stripped( curAggString ) + '}';
 					}
 					//do the unit conversions
 					if ( unitsStyle == unitsStyleInchPound ) {
-						varNameWithUnits = trim( MonthlyColumns( curCol ).varName ) + "[" + trim( MonthlyColumns( curCol ).units ) + "]";
+						varNameWithUnits = MonthlyColumns( curCol ).varName + '[' + MonthlyColumns( curCol ).units + ']';
 						LookupSItoIP( varNameWithUnits, indexUnitConv, curUnits );
 						GetUnitConversion( indexUnitConv, curConversionFactor, curConversionOffset, curUnits );
 					} else { //just do the Joule conversion
@@ -6030,7 +6030,7 @@ namespace OutputReportTabular {
 					if ( ( SELECT_CASE_var == aggTypeSumOrAvg ) || ( SELECT_CASE_var == aggTypeSumOrAverageHoursShown ) ) {
 						++columnRecount;
 						// put in the name of the variable for the column
-						columnHead( columnRecount ) = trim( MonthlyColumns( curCol ).varName ) + trim( curAggString ) + " [" + trim( curUnits ) + "]";
+						columnHead( columnRecount ) = MonthlyColumns( curCol ).varName + curAggString + " [" + curUnits + ']';
 						sumVal = 0.0;
 						sumDuration = 0.0;
 						maxVal = -huge( maxVal );
@@ -6049,7 +6049,7 @@ namespace OutputReportTabular {
 								sumVal += curVal;
 							}
 							if ( IsMonthGathered( lMonth ) ) {
-								tableBody( lMonth, columnRecount ) = trim( RealToStr( curVal, digitsShown ) );
+								tableBody( lMonth, columnRecount ) = RealToStr( curVal, digitsShown );
 								if ( curVal > maxVal ) maxVal = curVal;
 								if ( curVal < minVal ) minVal = curVal;
 							} else {
@@ -6059,31 +6059,31 @@ namespace OutputReportTabular {
 						// add the summary to bottom
 						if ( MonthlyColumns( curCol ).avgSum == isAverage ) { // if it is a average variable divide by duration
 							if ( sumDuration > 0 ) {
-								tableBody( 14, columnRecount ) = trim( RealToStr( sumVal / sumDuration, digitsShown ) );
+								tableBody( 14, columnRecount ) = RealToStr( sumVal / sumDuration, digitsShown );
 							} else {
 								tableBody( 14, columnRecount ) = "";
 							}
 						} else {
-							tableBody( 14, columnRecount ) = trim( RealToStr( sumVal, digitsShown ) );
+							tableBody( 14, columnRecount ) = RealToStr( sumVal, digitsShown );
 						}
 						if ( minVal != huge( maxVal ) ) {
-							tableBody( 15, columnRecount ) = trim( RealToStr( minVal, digitsShown ) );
+							tableBody( 15, columnRecount ) = RealToStr( minVal, digitsShown );
 						}
 						if ( maxVal != -huge( maxVal ) ) {
-							tableBody( 16, columnRecount ) = trim( RealToStr( maxVal, digitsShown ) );
+							tableBody( 16, columnRecount ) = RealToStr( maxVal, digitsShown );
 						}
 					} else if ( ( SELECT_CASE_var == aggTypeHoursZero ) || ( SELECT_CASE_var == aggTypeHoursNonZero ) || ( SELECT_CASE_var == aggTypeHoursPositive ) || ( SELECT_CASE_var == aggTypeHoursNonPositive ) || ( SELECT_CASE_var == aggTypeHoursNegative ) || ( SELECT_CASE_var == aggTypeHoursNonNegative ) ) {
 
 						++columnRecount;
 						// put in the name of the variable for the column
-						columnHead( columnRecount ) = trim( MonthlyColumns( curCol ).varName ) + trim( curAggString ) + " [HOURS]";
+						columnHead( columnRecount ) = MonthlyColumns( curCol ).varName + curAggString + " [HOURS]";
 						sumVal = 0.0;
 						maxVal = -huge( maxVal );
 						minVal = huge( maxVal );
 						for ( lMonth = 1; lMonth <= 12; ++lMonth ) {
 							curVal = MonthlyColumns( curCol ).reslt( lMonth );
 							if ( IsMonthGathered( lMonth ) ) {
-								tableBody( lMonth, columnRecount ) = trim( RealToStr( curVal, digitsShown ) );
+								tableBody( lMonth, columnRecount ) = RealToStr( curVal, digitsShown );
 								sumVal += curVal;
 								if ( curVal > maxVal ) maxVal = curVal;
 								if ( curVal < minVal ) minVal = curVal;
@@ -6092,17 +6092,17 @@ namespace OutputReportTabular {
 							}
 						} //lMonth
 						// add the summary to bottom
-						tableBody( 14, columnRecount ) = trim( RealToStr( sumVal, digitsShown ) );
+						tableBody( 14, columnRecount ) = RealToStr( sumVal, digitsShown );
 						if ( minVal != huge( maxVal ) ) {
-							tableBody( 15, columnRecount ) = trim( RealToStr( minVal, digitsShown ) );
+							tableBody( 15, columnRecount ) = RealToStr( minVal, digitsShown );
 						}
 						if ( maxVal != -huge( maxVal ) ) {
-							tableBody( 16, columnRecount ) = trim( RealToStr( maxVal, digitsShown ) );
+							tableBody( 16, columnRecount ) = RealToStr( maxVal, digitsShown );
 						}
 					} else if ( SELECT_CASE_var == aggTypeValueWhenMaxMin ) {
 						++columnRecount;
 						if ( MonthlyColumns( curCol ).avgSum == isSum ) {
-							curUnits = trim( curUnits ) + "/s";
+							curUnits += "/s";
 						}
 						if ( SameString( curUnits, "J/s" ) ) {
 							curUnits = "W";
@@ -6132,13 +6132,13 @@ namespace OutputReportTabular {
 							curUnits = "ton";
 							curConversionFactor *= 3600.0;
 						}
-						columnHead( columnRecount ) = trim( MonthlyColumns( curCol ).varName ) + trim( curAggString ) + " [" + trim( curUnits ) + "]";
+						columnHead( columnRecount ) = MonthlyColumns( curCol ).varName + curAggString + " [" + curUnits + ']';
 						maxVal = -huge( maxVal );
 						minVal = huge( maxVal );
 						for ( lMonth = 1; lMonth <= 12; ++lMonth ) {
 							curVal = MonthlyColumns( curCol ).reslt( lMonth ) * curConversionFactor + curConversionOffset;
 							if ( IsMonthGathered( lMonth ) ) {
-								tableBody( lMonth, columnRecount ) = trim( RealToStr( curVal, digitsShown ) );
+								tableBody( lMonth, columnRecount ) = RealToStr( curVal, digitsShown );
 								if ( curVal > maxVal ) maxVal = curVal;
 								if ( curVal < minVal ) minVal = curVal;
 							} else {
@@ -6147,16 +6147,16 @@ namespace OutputReportTabular {
 						} //lMonth
 						// add the summary to bottom
 						if ( minVal != huge( maxVal ) ) {
-							tableBody( 15, columnRecount ) = trim( RealToStr( minVal, digitsShown ) );
+							tableBody( 15, columnRecount ) = RealToStr( minVal, digitsShown );
 						}
 						if ( maxVal != -huge( maxVal ) ) {
-							tableBody( 16, columnRecount ) = trim( RealToStr( maxVal, digitsShown ) );
+							tableBody( 16, columnRecount ) = RealToStr( maxVal, digitsShown );
 						}
 					} else if ( ( SELECT_CASE_var == aggTypeMaximum ) || ( SELECT_CASE_var == aggTypeMinimum ) || ( SELECT_CASE_var == aggTypeMaximumDuringHoursShown ) || ( SELECT_CASE_var == aggTypeMinimumDuringHoursShown ) ) {
 						columnRecount += 2;
 						// put in the name of the variable for the column
 						if ( MonthlyColumns( curCol ).avgSum == isSum ) { // if it is a summed variable
-							curUnits = trim( curUnits ) + "/s";
+							curUnits += "/s";
 						}
 						if ( SameString( curUnits, "J/s" ) ) {
 							curUnits = "W";
@@ -6186,8 +6186,8 @@ namespace OutputReportTabular {
 							curUnits = "ton";
 							curConversionFactor *= 3600.0;
 						}
-						columnHead( columnRecount - 1 ) = trim( MonthlyColumns( curCol ).varName ) + trim( curAggString ) + "[" + trim( curUnits ) + "]";
-						columnHead( columnRecount ) = trim( MonthlyColumns( curCol ).varName ) + " {TIMESTAMP} ";
+						columnHead( columnRecount - 1 ) = MonthlyColumns( curCol ).varName + curAggString + '[' + curUnits + ']';
+						columnHead( columnRecount ) = MonthlyColumns( curCol ).varName + " {TIMESTAMP} ";
 						maxVal = -huge( maxVal );
 						minVal = huge( maxVal );
 						for ( lMonth = 1; lMonth <= 12; ++lMonth ) {
@@ -6201,11 +6201,11 @@ namespace OutputReportTabular {
 									if ( curVal > maxVal ) maxVal = curVal;
 									if ( curVal < minVal ) minVal = curVal;
 									if ( curVal < veryLarge && curVal > verySmall ) {
-										tableBody( lMonth, columnRecount - 1 ) = trim( RealToStr( curVal, digitsShown ) );
+										tableBody( lMonth, columnRecount - 1 ) = RealToStr( curVal, digitsShown );
 									} else {
 										tableBody( lMonth, columnRecount - 1 ) = "-";
 									}
-									tableBody( lMonth, columnRecount ) = trim( DateToString( MonthlyColumns( curCol ).timeStamp( lMonth ) ) );
+									tableBody( lMonth, columnRecount ) = DateToString( MonthlyColumns( curCol ).timeStamp( lMonth ) );
 								} else {
 									tableBody( lMonth, columnRecount - 1 ) = "-";
 									tableBody( lMonth, columnRecount ) = "-";
@@ -6218,12 +6218,12 @@ namespace OutputReportTabular {
 						// add the summary to bottom
 						// Don't include if the original min and max values are still present
 						if ( minVal < veryLarge ) {
-							tableBody( 15, columnRecount - 1 ) = trim( RealToStr( minVal, digitsShown ) );
+							tableBody( 15, columnRecount - 1 ) = RealToStr( minVal, digitsShown );
 						} else {
 							tableBody( 15, columnRecount - 1 ) = "-";
 						}
 						if ( maxVal > verySmall ) {
-							tableBody( 16, columnRecount - 1 ) = trim( RealToStr( maxVal, digitsShown ) );
+							tableBody( 16, columnRecount - 1 ) = RealToStr( maxVal, digitsShown );
 						} else {
 							tableBody( 15, columnRecount - 1 ) = "-";
 						}
@@ -6265,7 +6265,7 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const fmta( "(A)" );
+		static gio::Fmt const fmta( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -6280,15 +6280,15 @@ namespace OutputReportTabular {
 		int kMonth;
 		int nCol;
 		//main table
-		FArray1D_Fstring columnHead( sFstring( MaxNameLength ) );
+		FArray1D_string columnHead;
 		FArray1D_int columnWidth;
-		FArray1D_Fstring rowHead( 39, sFstring( MaxNameLength ) );
-		FArray2D_Fstring tableBody( sFstring( MaxNameLength ) );
+		FArray1D_string rowHead( 39 );
+		FArray2D_string tableBody;
 		//stat table
-		FArray1D_Fstring columnHeadStat( 1, sFstring( MaxNameLength ) );
+		FArray1D_string columnHeadStat( 1 );
 		FArray1D_int columnWidthStat( 1 );
-		FArray1D_Fstring rowHeadStat( 6, sFstring( MaxNameLength ) );
-		FArray2D_Fstring tableBodyStat( 6, 1, sFstring( MaxNameLength ) );
+		FArray1D_string rowHeadStat( 6 );
+		FArray2D_string tableBodyStat( 6, 1 );
 
 		Real64 curIntervalStart;
 		Real64 curIntervalSize;
@@ -6305,11 +6305,11 @@ namespace OutputReportTabular {
 		Real64 belowTotal;
 		Real64 tableTotal;
 		//CHARACTER(len=MaxNameLength):: repNameWithUnits ! For time bin reports, varible name with units
-		Fstring repNameWithUnitsandscheduleName( MaxNameLength * 2 + 15 );
+		std::string repNameWithUnitsandscheduleName;
 		Real64 repStDev; // standard deviation
 		Real64 repMean;
-		Fstring curNameWithSIUnits( MaxNameLength );
-		Fstring curNameAndUnits( MaxNameLength );
+		std::string curNameWithSIUnits;
+		std::string curNameAndUnits;
 		int indexUnitConv;
 
 		rowHead( 1 ) = "Interval Start";
@@ -6353,7 +6353,7 @@ namespace OutputReportTabular {
 		rowHead( 39 ) = "Total";
 		for ( iInObj = 1; iInObj <= OutputTableBinnedCount; ++iInObj ) {
 			firstReport = OutputTableBinned( iInObj ).resIndex;
-			curNameWithSIUnits = trim( OutputTableBinned( iInObj ).varOrMeter ) + " [" + trim( OutputTableBinned( iInObj ).units ) + "]";
+			curNameWithSIUnits = OutputTableBinned( iInObj ).varOrMeter + " [" + OutputTableBinned( iInObj ).units + ']';
 			if ( unitsStyle == unitsStyleInchPound ) {
 				LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
 				curIntervalStart = ConvertIP( indexUnitConv, OutputTableBinned( iInObj ).intervalStart );
@@ -6379,16 +6379,16 @@ namespace OutputReportTabular {
 			columnWidth.allocate( curIntervalCount + 3 );
 			columnWidth = 14; //array assignment - same for all columns
 			tableBody.allocate( 39, curIntervalCount + 3 );
-			tableBody = " ";
+			tableBody = "";
 			columnHead = "-";
 			tableBody( 1, 1 ) = "less than";
 			tableBody( 2, 1 ) = RealToStr( curIntervalStart, numIntervalDigits );
 			for ( nCol = 1; nCol <= curIntervalCount; ++nCol ) {
 				columnHead( nCol + 1 ) = IntToStr( nCol );
 				//beginning of interval
-				tableBody( 1, nCol + 1 ) = trim( RealToStr( curIntervalStart + ( nCol - 1 ) * curIntervalSize, numIntervalDigits ) ) + "<=";
+				tableBody( 1, nCol + 1 ) = RealToStr( curIntervalStart + ( nCol - 1 ) * curIntervalSize, numIntervalDigits ) + "<=";
 				//end of interval
-				tableBody( 2, nCol + 1 ) = trim( RealToStr( curIntervalStart + nCol * curIntervalSize, numIntervalDigits ) ) + ">";
+				tableBody( 2, nCol + 1 ) = RealToStr( curIntervalStart + nCol * curIntervalSize, numIntervalDigits ) + '>';
 			}
 			tableBody( 1, curIntervalCount + 2 ) = "equal to or more than";
 			tableBody( 2, curIntervalCount + 2 ) = RealToStr( topValue, numIntervalDigits );
@@ -6399,19 +6399,19 @@ namespace OutputReportTabular {
 				if ( OutputTableBinned( iInObj ).scheduleIndex == 0 ) {
 					repNameWithUnitsandscheduleName = curNameAndUnits;
 				} else {
-					repNameWithUnitsandscheduleName = trim( curNameAndUnits ) + " [" + trim( OutputTableBinned( iInObj ).ScheduleName ) + "]";
+					repNameWithUnitsandscheduleName = curNameAndUnits + " [" + OutputTableBinned( iInObj ).ScheduleName + ']';
 				}
 				WriteReportHeaders( repNameWithUnitsandscheduleName, BinObjVarID( repIndex ).namesOfObj, OutputTableBinned( iInObj ).avgSum );
 				for ( kHour = 1; kHour <= 24; ++kHour ) {
-					tableBody( 14 + kHour, 1 ) = trim( RealToStr( BinResultsBelow( repIndex ).hrly( kHour ), 2 ) );
+					tableBody( 14 + kHour, 1 ) = RealToStr( BinResultsBelow( repIndex ).hrly( kHour ), 2 );
 					tableBody( 14 + kHour, curIntervalCount + 2 ) = RealToStr( BinResultsAbove( repIndex ).hrly( kHour ), 2 );
 					rowTotal = BinResultsBelow( repIndex ).hrly( kHour ) + BinResultsAbove( repIndex ).hrly( kHour );
 					for ( nCol = 1; nCol <= curIntervalCount; ++nCol ) {
-						tableBody( 14 + kHour, nCol + 1 ) = trim( RealToStr( BinResults( repIndex, nCol ).hrly( kHour ), 2 ) );
+						tableBody( 14 + kHour, nCol + 1 ) = RealToStr( BinResults( repIndex, nCol ).hrly( kHour ), 2 );
 						// sum the total for all columns
 						rowTotal += BinResults( repIndex, nCol ).hrly( kHour );
 					}
-					tableBody( 14 + kHour, nCol + 2 ) = trim( RealToStr( rowTotal, 2 ) );
+					tableBody( 14 + kHour, nCol + 2 ) = RealToStr( rowTotal, 2 );
 				}
 				tableTotal = 0.0;
 				for ( kMonth = 1; kMonth <= 12; ++kMonth ) {
@@ -6419,11 +6419,11 @@ namespace OutputReportTabular {
 					tableBody( 2 + kMonth, curIntervalCount + 2 ) = RealToStr( BinResultsAbove( repIndex ).mnth( kMonth ), 2 );
 					rowTotal = BinResultsBelow( repIndex ).mnth( kMonth ) + BinResultsAbove( repIndex ).mnth( kMonth );
 					for ( nCol = 1; nCol <= curIntervalCount; ++nCol ) {
-						tableBody( 2 + kMonth, nCol + 1 ) = trim( RealToStr( BinResults( repIndex, nCol ).mnth( kMonth ), 2 ) );
+						tableBody( 2 + kMonth, nCol + 1 ) = RealToStr( BinResults( repIndex, nCol ).mnth( kMonth ), 2 );
 						// sum the total for all columns
 						rowTotal += BinResults( repIndex, nCol ).mnth( kMonth );
 					}
-					tableBody( 2 + kMonth, nCol + 2 ) = trim( RealToStr( rowTotal, 2 ) );
+					tableBody( 2 + kMonth, nCol + 2 ) = RealToStr( rowTotal, 2 );
 					tableTotal += rowTotal;
 				}
 				// compute total row
@@ -6432,7 +6432,7 @@ namespace OutputReportTabular {
 					for ( kMonth = 1; kMonth <= 12; ++kMonth ) {
 						colTotal += BinResults( repIndex, nCol ).mnth( kMonth );
 					}
-					tableBody( 39, nCol + 1 ) = trim( RealToStr( colTotal, 2 ) );
+					tableBody( 39, nCol + 1 ) = RealToStr( colTotal, 2 );
 				}
 				aboveTotal = 0.0;
 				belowTotal = 0.0;
@@ -6440,11 +6440,11 @@ namespace OutputReportTabular {
 					aboveTotal += BinResultsAbove( repIndex ).mnth( kMonth );
 					belowTotal += BinResultsBelow( repIndex ).mnth( kMonth );
 				}
-				tableBody( 39, 1 ) = trim( RealToStr( belowTotal, 2 ) );
-				tableBody( 39, curIntervalCount + 2 ) = trim( RealToStr( aboveTotal, 2 ) );
-				tableBody( 39, curIntervalCount + 3 ) = trim( RealToStr( tableTotal, 2 ) );
+				tableBody( 39, 1 ) = RealToStr( belowTotal, 2 );
+				tableBody( 39, curIntervalCount + 2 ) = RealToStr( aboveTotal, 2 );
+				tableBody( 39, curIntervalCount + 3 ) = RealToStr( tableTotal, 2 );
 				WriteTextLine( "Values in table are in hours." );
-				WriteTextLine( " " );
+				WriteTextLine( "" );
 				WriteSubtitle( "Time Bin Results" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth, true ); //transpose XML tables
 				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID( repIndex ).namesOfObj, "Time Bin Results" );
@@ -6565,10 +6565,10 @@ namespace OutputReportTabular {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// all arrays are in the format: (row, column)
-		FArray1D_Fstring columnHead( sFstring( MaxNameLength ) );
+		FArray1D_string columnHead;
 		FArray1D_int columnWidth;
-		FArray1D_Fstring rowHead( sFstring( MaxNameLength ) );
-		FArray2D_Fstring tableBody( sFstring( MaxNameLength ) );
+		FArray1D_string rowHead;
+		FArray2D_string tableBody;
 
 		// all arrays are in the format: (row, columnm)
 		FArray2D< Real64 > useVal( 15, 6 );
@@ -6599,15 +6599,15 @@ namespace OutputReportTabular {
 		Real64 StorageChange;
 		int resourcePrimaryHeating;
 		Real64 heatingMaximum;
-		Fstring footnote( 100 );
+		std::string footnote;
 		Real64 waterConversionFactor;
 		Real64 areaConversionFactor;
 		Real64 convBldgGrossFloorArea;
 		Real64 convBldgCondFloorArea;
-		Fstring curNameWithSIUnits( MaxNameLength );
-		Fstring curNameAndUnits( MaxNameLength );
+		std::string curNameWithSIUnits;
+		std::string curNameAndUnits;
 		int indexUnitConv;
-		Fstring tableString( 52 );
+		std::string tableString;
 		Real64 processFraction;
 		Real64 processElecCost;
 		Real64 processGasCost;
@@ -6619,7 +6619,7 @@ namespace OutputReportTabular {
 		FArray1D< Real64 > leedCook( 6 );
 		FArray1D< Real64 > leedIndProc( 6 );
 		FArray1D< Real64 > leedElevEsc( 6 );
-		Fstring subCatName( MaxNameLength );
+		std::string subCatName;
 		Real64 nonMisc;
 		static Real64 leedSiteIntLite( 0.0 );
 		static Real64 leedSiteSpHeat( 0.0 );
@@ -6915,23 +6915,23 @@ namespace OutputReportTabular {
 			netSourceEnergyUse = ( netSourceEnergyUse + netSourceElecPurchasedSold + gatherTotalsBEPS( 3 ) * sourceFactorElectric / efficiencyDistrictCooling + gatherTotalsBEPS( 4 ) * sourceFactorNaturalGas / efficiencyDistrictHeating + gatherTotalsBEPS( 5 ) * sourceFactorSteam ) / largeConversionFactor; // from other fuels | net source from electricity | district cooling | district heating | steam
 
 			// show annual values
-			tableBody( 1, 1 ) = trim( RealToStr( totalSiteEnergyUse, 2 ) );
-			tableBody( 2, 1 ) = trim( RealToStr( netSiteEnergyUse, 2 ) );
-			tableBody( 3, 1 ) = trim( RealToStr( totalSourceEnergyUse, 2 ) );
-			tableBody( 4, 1 ) = trim( RealToStr( netSourceEnergyUse, 2 ) );
+			tableBody( 1, 1 ) = RealToStr( totalSiteEnergyUse, 2 );
+			tableBody( 2, 1 ) = RealToStr( netSiteEnergyUse, 2 );
+			tableBody( 3, 1 ) = RealToStr( totalSourceEnergyUse, 2 );
+			tableBody( 4, 1 ) = RealToStr( netSourceEnergyUse, 2 );
 			// show  per building area
 			if ( convBldgGrossFloorArea > 0 ) {
-				tableBody( 1, 2 ) = trim( RealToStr( totalSiteEnergyUse * kConversionFactor / convBldgGrossFloorArea, 2 ) );
-				tableBody( 2, 2 ) = trim( RealToStr( netSiteEnergyUse * kConversionFactor / convBldgGrossFloorArea, 2 ) );
-				tableBody( 3, 2 ) = trim( RealToStr( totalSourceEnergyUse * kConversionFactor / convBldgGrossFloorArea, 2 ) );
-				tableBody( 4, 2 ) = trim( RealToStr( netSourceEnergyUse * kConversionFactor / convBldgGrossFloorArea, 2 ) );
+				tableBody( 1, 2 ) = RealToStr( totalSiteEnergyUse * kConversionFactor / convBldgGrossFloorArea, 2 );
+				tableBody( 2, 2 ) = RealToStr( netSiteEnergyUse * kConversionFactor / convBldgGrossFloorArea, 2 );
+				tableBody( 3, 2 ) = RealToStr( totalSourceEnergyUse * kConversionFactor / convBldgGrossFloorArea, 2 );
+				tableBody( 4, 2 ) = RealToStr( netSourceEnergyUse * kConversionFactor / convBldgGrossFloorArea, 2 );
 			}
 			// show  per conditioned building area
 			if ( convBldgCondFloorArea > 0 ) {
-				tableBody( 1, 3 ) = trim( RealToStr( totalSiteEnergyUse * kConversionFactor / convBldgCondFloorArea, 2 ) );
-				tableBody( 2, 3 ) = trim( RealToStr( netSiteEnergyUse * kConversionFactor / convBldgCondFloorArea, 2 ) );
-				tableBody( 3, 3 ) = trim( RealToStr( totalSourceEnergyUse * kConversionFactor / convBldgCondFloorArea, 2 ) );
-				tableBody( 4, 3 ) = trim( RealToStr( netSourceEnergyUse * kConversionFactor / convBldgCondFloorArea, 2 ) );
+				tableBody( 1, 3 ) = RealToStr( totalSiteEnergyUse * kConversionFactor / convBldgCondFloorArea, 2 );
+				tableBody( 2, 3 ) = RealToStr( netSiteEnergyUse * kConversionFactor / convBldgCondFloorArea, 2 );
+				tableBody( 3, 3 ) = RealToStr( totalSourceEnergyUse * kConversionFactor / convBldgCondFloorArea, 2 );
+				tableBody( 4, 3 ) = RealToStr( netSourceEnergyUse * kConversionFactor / convBldgCondFloorArea, 2 );
 			}
 
 			// heading for the entire sub-table
@@ -6986,87 +6986,87 @@ namespace OutputReportTabular {
 			//  tableBody(11,1) = TRIM(RealToStr(sourceFactorPropane ,3))
 
 			if ( ! ffSchedUsed( 1 ) ) {
-				tableBody( 1, 1 ) = trim( RealToStr( sourceFactorElectric, 3 ) );
+				tableBody( 1, 1 ) = RealToStr( sourceFactorElectric, 3 );
 			} else if ( gatherTotalsBEPS( 1 ) > SmallValue ) {
-				tableBody( 1, 1 ) = "Effective Factor = " + trim( RealToStr( gatherTotalsBySourceBEPS( 1 ) / gatherTotalsBEPS( 1 ), 3 ) ) + " (calculated using schedule \"" + trim( GetScheduleName( ffSchedIndex( 1 ) ) ) + "\")";
+				tableBody( 1, 1 ) = "Effective Factor = " + RealToStr( gatherTotalsBySourceBEPS( 1 ) / gatherTotalsBEPS( 1 ), 3 ) + " (calculated using schedule \"" + GetScheduleName( ffSchedIndex( 1 ) ) + "\")";
 			} else {
 				tableBody( 1, 1 ) = "N/A";
 			}
 
 			if ( ! ffSchedUsed( 2 ) ) {
-				tableBody( 2, 1 ) = trim( RealToStr( sourceFactorNaturalGas, 3 ) );
+				tableBody( 2, 1 ) = RealToStr( sourceFactorNaturalGas, 3 );
 			} else if ( gatherTotalsBEPS( 2 ) > SmallValue ) {
-				tableBody( 2, 1 ) = "Effective Factor = " + trim( RealToStr( gatherTotalsBySourceBEPS( 2 ) / gatherTotalsBEPS( 2 ), 3 ) ) + " (calculated using schedule \"" + trim( GetScheduleName( ffSchedIndex( 2 ) ) ) + "\")";
+				tableBody( 2, 1 ) = "Effective Factor = " + RealToStr( gatherTotalsBySourceBEPS( 2 ) / gatherTotalsBEPS( 2 ), 3 ) + " (calculated using schedule \"" + GetScheduleName( ffSchedIndex( 2 ) ) + "\")";
 			} else {
 				tableBody( 2, 1 ) = "N/A";
 			}
 
-			tableBody( 3, 1 ) = trim( RealToStr( sourceFactorElectric / efficiencyDistrictCooling, 3 ) ); // District Cooling
+			tableBody( 3, 1 ) = RealToStr( sourceFactorElectric / efficiencyDistrictCooling, 3 ); // District Cooling
 
-			tableBody( 4, 1 ) = trim( RealToStr( sourceFactorNaturalGas / efficiencyDistrictHeating, 3 ) ); // Disctrict Heating
+			tableBody( 4, 1 ) = RealToStr( sourceFactorNaturalGas / efficiencyDistrictHeating, 3 ); // Disctrict Heating
 
-			tableBody( 5, 1 ) = trim( RealToStr( sourceFactorSteam, 3 ) ); // Steam
+			tableBody( 5, 1 ) = RealToStr( sourceFactorSteam, 3 ); // Steam
 
 			if ( ! ffSchedUsed( 6 ) ) {
-				tableBody( 6, 1 ) = trim( RealToStr( sourceFactorGasoline, 3 ) );
+				tableBody( 6, 1 ) = RealToStr( sourceFactorGasoline, 3 );
 			} else if ( gatherTotalsBEPS( 6 ) > SmallValue ) {
-				tableBody( 6, 1 ) = "Effective Factor = " + trim( RealToStr( gatherTotalsBySourceBEPS( 6 ) / gatherTotalsBEPS( 6 ), 3 ) ) + " (calculated using schedule \"" + trim( GetScheduleName( ffSchedIndex( 6 ) ) ) + "\")";
+				tableBody( 6, 1 ) = "Effective Factor = " + RealToStr( gatherTotalsBySourceBEPS( 6 ) / gatherTotalsBEPS( 6 ), 3 ) + " (calculated using schedule \"" + GetScheduleName( ffSchedIndex( 6 ) ) + "\")";
 			} else {
 				tableBody( 6, 1 ) = "N/A";
 			}
 
 			if ( ! ffSchedUsed( 8 ) ) {
-				tableBody( 7, 1 ) = trim( RealToStr( sourceFactorDiesel, 3 ) );
+				tableBody( 7, 1 ) = RealToStr( sourceFactorDiesel, 3 );
 			} else if ( gatherTotalsBEPS( 8 ) > SmallValue ) {
-				tableBody( 7, 1 ) = "Effective Factor = " + trim( RealToStr( gatherTotalsBySourceBEPS( 8 ) / gatherTotalsBEPS( 8 ), 3 ) ) + " (calculated using schedule \"" + trim( GetScheduleName( ffSchedIndex( 8 ) ) ) + "\")";
+				tableBody( 7, 1 ) = "Effective Factor = " + RealToStr( gatherTotalsBySourceBEPS( 8 ) / gatherTotalsBEPS( 8 ), 3 ) + " (calculated using schedule \"" + GetScheduleName( ffSchedIndex( 8 ) ) + "\")";
 			} else {
 				tableBody( 7, 1 ) = "N/A";
 			}
 
 			if ( ! ffSchedUsed( 9 ) ) {
-				tableBody( 8, 1 ) = trim( RealToStr( sourceFactorCoal, 3 ) );
+				tableBody( 8, 1 ) = RealToStr( sourceFactorCoal, 3 );
 			} else if ( gatherTotalsBEPS( 9 ) > SmallValue ) {
-				tableBody( 8, 1 ) = "Effective Factor = " + trim( RealToStr( gatherTotalsBySourceBEPS( 9 ) / gatherTotalsBEPS( 9 ), 3 ) ) + " (calculated using schedule \"" + trim( GetScheduleName( ffSchedIndex( 9 ) ) ) + "\")";
+				tableBody( 8, 1 ) = "Effective Factor = " + RealToStr( gatherTotalsBySourceBEPS( 9 ) / gatherTotalsBEPS( 9 ), 3 ) + " (calculated using schedule \"" + GetScheduleName( ffSchedIndex( 9 ) ) + "\")";
 			} else {
 				tableBody( 8, 1 ) = "N/A";
 			}
 
 			if ( ! ffSchedUsed( 10 ) ) {
-				tableBody( 9, 1 ) = trim( RealToStr( sourceFactorFuelOil1, 3 ) );
+				tableBody( 9, 1 ) = RealToStr( sourceFactorFuelOil1, 3 );
 			} else if ( gatherTotalsBEPS( 10 ) > SmallValue ) {
-				tableBody( 9, 1 ) = "Effective Factor = " + trim( RealToStr( gatherTotalsBySourceBEPS( 10 ) / gatherTotalsBEPS( 10 ), 3 ) ) + " (calculated using schedule \"" + trim( GetScheduleName( ffSchedIndex( 10 ) ) ) + "\")";
+				tableBody( 9, 1 ) = "Effective Factor = " + RealToStr( gatherTotalsBySourceBEPS( 10 ) / gatherTotalsBEPS( 10 ), 3 ) + " (calculated using schedule \"" + GetScheduleName( ffSchedIndex( 10 ) ) + "\")";
 			} else {
 				tableBody( 9, 1 ) = "N/A";
 			}
 
 			if ( ! ffSchedUsed( 11 ) ) {
-				tableBody( 10, 1 ) = trim( RealToStr( sourceFactorFuelOil2, 3 ) );
+				tableBody( 10, 1 ) = RealToStr( sourceFactorFuelOil2, 3 );
 			} else if ( gatherTotalsBEPS( 11 ) > SmallValue ) {
-				tableBody( 10, 1 ) = "Effective Factor = " + trim( RealToStr( gatherTotalsBySourceBEPS( 11 ) / gatherTotalsBEPS( 11 ), 3 ) ) + " (calculated using schedule \"" + trim( GetScheduleName( ffSchedIndex( 11 ) ) ) + "\")";
+				tableBody( 10, 1 ) = "Effective Factor = " + RealToStr( gatherTotalsBySourceBEPS( 11 ) / gatherTotalsBEPS( 11 ), 3 ) + " (calculated using schedule \"" + GetScheduleName( ffSchedIndex( 11 ) ) + "\")";
 			} else {
 				tableBody( 10, 1 ) = "N/A";
 			}
 
 			if ( ! ffSchedUsed( 12 ) ) {
-				tableBody( 11, 1 ) = trim( RealToStr( sourceFactorPropane, 3 ) );
+				tableBody( 11, 1 ) = RealToStr( sourceFactorPropane, 3 );
 			} else if ( gatherTotalsBEPS( 12 ) > SmallValue ) {
-				tableBody( 11, 1 ) = "Effective Factor = " + trim( RealToStr( gatherTotalsBySourceBEPS( 12 ) / gatherTotalsBEPS( 12 ), 3 ) ) + " (calculated using schedule \"" + trim( GetScheduleName( ffSchedIndex( 12 ) ) ) + "\")";
+				tableBody( 11, 1 ) = "Effective Factor = " + RealToStr( gatherTotalsBySourceBEPS( 12 ) / gatherTotalsBEPS( 12 ), 3 ) + " (calculated using schedule \"" + GetScheduleName( ffSchedIndex( 12 ) ) + "\")";
 			} else {
 				tableBody( 11, 1 ) = "N/A";
 			}
 
 			if ( ! ffSchedUsed( 13 ) ) {
-				tableBody( 12, 1 ) = trim( RealToStr( sourceFactorOtherFuel1, 3 ) );
+				tableBody( 12, 1 ) = RealToStr( sourceFactorOtherFuel1, 3 );
 			} else if ( gatherTotalsBEPS( 13 ) > SmallValue ) {
-				tableBody( 12, 1 ) = "Effective Factor = " + trim( RealToStr( gatherTotalsBySourceBEPS( 13 ) / gatherTotalsBEPS( 13 ), 3 ) ) + " (calculated using schedule \"" + trim( GetScheduleName( ffSchedIndex( 13 ) ) ) + "\")";
+				tableBody( 12, 1 ) = "Effective Factor = " + RealToStr( gatherTotalsBySourceBEPS( 13 ) / gatherTotalsBEPS( 13 ), 3 ) + " (calculated using schedule \"" + GetScheduleName( ffSchedIndex( 13 ) ) + "\")";
 			} else {
 				tableBody( 12, 1 ) = "N/A";
 			}
 
 			if ( ! ffSchedUsed( 14 ) ) {
-				tableBody( 13, 1 ) = trim( RealToStr( sourceFactorOtherFuel2, 3 ) );
+				tableBody( 13, 1 ) = RealToStr( sourceFactorOtherFuel2, 3 );
 			} else if ( gatherTotalsBEPS( 14 ) > SmallValue ) {
-				tableBody( 13, 1 ) = "Effective Factor = " + trim( RealToStr( gatherTotalsBySourceBEPS( 14 ) / gatherTotalsBEPS( 14 ), 3 ) ) + " (calculated using schedule \"" + trim( GetScheduleName( ffSchedIndex( 14 ) ) ) + "\")";
+				tableBody( 13, 1 ) = "Effective Factor = " + RealToStr( gatherTotalsBySourceBEPS( 14 ) / gatherTotalsBEPS( 14 ), 3 ) + " (calculated using schedule \"" + GetScheduleName( ffSchedIndex( 14 ) ) + "\")";
 			} else {
 				tableBody( 13, 1 ) = "N/A";
 			}
@@ -7104,10 +7104,10 @@ namespace OutputReportTabular {
 			rowHead( 3 ) = "Unconditioned Building Area";
 
 			tableBody = "";
-			tableBody( 1, 1 ) = trim( RealToStr( convBldgGrossFloorArea, 2 ) );
-			PreDefTableEntry( pdchLeedGenData, "Total gross floor area [m2]", trim( RealToStr( convBldgGrossFloorArea, 2 ) ) );
-			tableBody( 2, 1 ) = trim( RealToStr( convBldgCondFloorArea, 2 ) );
-			tableBody( 3, 1 ) = trim( RealToStr( convBldgGrossFloorArea - convBldgCondFloorArea, 2 ) );
+			tableBody( 1, 1 ) = RealToStr( convBldgGrossFloorArea, 2 );
+			PreDefTableEntry( pdchLeedGenData, "Total gross floor area [m2]", RealToStr( convBldgGrossFloorArea, 2 ) );
+			tableBody( 2, 1 ) = RealToStr( convBldgCondFloorArea, 2 );
+			tableBody( 3, 1 ) = RealToStr( convBldgGrossFloorArea - convBldgCondFloorArea, 2 );
 
 			// heading for the entire sub-table
 			if ( displayTabularBEPS ) {
@@ -7190,9 +7190,9 @@ namespace OutputReportTabular {
 			tableBody = "";
 			for ( iResource = 1; iResource <= 6; ++iResource ) {
 				for ( jEndUse = 1; jEndUse <= 14; ++jEndUse ) {
-					tableBody( jEndUse, iResource ) = trim( RealToStr( useVal( jEndUse, iResource ), 2 ) );
+					tableBody( jEndUse, iResource ) = RealToStr( useVal( jEndUse, iResource ), 2 );
 				}
-				tableBody( 16, iResource ) = trim( RealToStr( useVal( 15, iResource ), 2 ) );
+				tableBody( 16, iResource ) = RealToStr( useVal( 15, iResource ), 2 );
 			}
 			//complete the LEED end use table using the same values
 			// for certain rows in the LEED table the subcategories are necessary so first compute those values
@@ -7367,16 +7367,16 @@ namespace OutputReportTabular {
 			footnote = "";
 			{ auto const SELECT_CASE_var( resourcePrimaryHeating );
 			if ( SELECT_CASE_var == colElectricity ) {
-				footnote = "Note: Electricity appears to be the principal heating source based on energy usage. ";
+				footnote = "Note: Electricity appears to be the principal heating source based on energy usage.";
 				PreDefTableEntry( pdchLeedGenData, "Principal Heating Source", "Electricity" );
 			} else if ( SELECT_CASE_var == colGas ) {
-				footnote = "Note: Natural gas appears to be the principal heating source based on energy usage. ";
+				footnote = "Note: Natural gas appears to be the principal heating source based on energy usage.";
 				PreDefTableEntry( pdchLeedGenData, "Principal Heating Source", "Natural Gas" );
 			} else if ( SELECT_CASE_var == colAdditionalFuel ) {
-				footnote = "Note: Additional fuel appears to be the principal heating source based on energy usage. ";
+				footnote = "Note: Additional fuel appears to be the principal heating source based on energy usage.";
 				PreDefTableEntry( pdchLeedGenData, "Principal Heating Source", "Additional Fuel" );
 			} else if ( SELECT_CASE_var == colPurchHeat ) {
-				footnote = "Note: District heat appears to be the principal heating source based on energy usage. ";
+				footnote = "Note: District heat appears to be the principal heating source based on energy usage.";
 				PreDefTableEntry( pdchLeedGenData, "Principal Heating Source", "District Heat" );
 			}}
 			// heading for the entire sub-table
@@ -7492,16 +7492,16 @@ namespace OutputReportTabular {
 				for ( jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse ) {
 					if ( EndUseCategory( jEndUse ).NumSubcategories > 0 ) {
 						for ( kEndUseSub = 1; kEndUseSub <= EndUseCategory( jEndUse ).NumSubcategories; ++kEndUseSub ) {
-							tableBody( i, iResource + 1 ) = trim( RealToStr( collapsedEndUseSub( iResource, jEndUse, kEndUseSub ), 2 ) );
+							tableBody( i, iResource + 1 ) = RealToStr( collapsedEndUseSub( iResource, jEndUse, kEndUseSub ), 2 );
 							++i;
 						}
 						//put other
 						if ( needOtherRow( jEndUse ) ) {
-							tableBody( i, iResource + 1 ) = trim( RealToStr( endUseSubOther( jEndUse, iResource ), 2 ) );
+							tableBody( i, iResource + 1 ) = RealToStr( endUseSubOther( jEndUse, iResource ), 2 );
 							++i;
 						}
 					} else {
-						tableBody( i, iResource + 1 ) = trim( RealToStr( collapsedEndUse( jEndUse, iResource ), 2 ) );
+						tableBody( i, iResource + 1 ) = RealToStr( collapsedEndUse( jEndUse, iResource ), 2 );
 						++i;
 					}
 				}
@@ -7576,7 +7576,7 @@ namespace OutputReportTabular {
 			if ( convBldgCondFloorArea > 0 ) {
 				for ( iResource = 1; iResource <= 6; ++iResource ) {
 					for ( jEndUse = 1; jEndUse <= 4; ++jEndUse ) {
-						tableBody( jEndUse, iResource ) = trim( RealToStr( normalVal( jEndUse, iResource ) / convBldgCondFloorArea, 2 ) );
+						tableBody( jEndUse, iResource ) = RealToStr( normalVal( jEndUse, iResource ) / convBldgCondFloorArea, 2 );
 					}
 				}
 			}
@@ -7591,7 +7591,7 @@ namespace OutputReportTabular {
 			if ( convBldgGrossFloorArea > 0 ) {
 				for ( iResource = 1; iResource <= 6; ++iResource ) {
 					for ( jEndUse = 1; jEndUse <= 4; ++jEndUse ) {
-						tableBody( jEndUse, iResource ) = trim( RealToStr( normalVal( jEndUse, iResource ) / convBldgGrossFloorArea, 2 ) );
+						tableBody( jEndUse, iResource ) = RealToStr( normalVal( jEndUse, iResource ) / convBldgGrossFloorArea, 2 );
 					}
 				}
 			}
@@ -7642,33 +7642,33 @@ namespace OutputReportTabular {
 			// show annual values
 			unconvert = largeConversionFactor / 1000000000.; //to avoid double converting, the values for the LEED report should be in GJ
 
-			tableBody( 1, 1 ) = trim( RealToStr( gatherPowerFuelFireGen, 2 ) );
-			tableBody( 2, 1 ) = trim( RealToStr( gatherPowerHTGeothermal, 2 ) );
-			tableBody( 3, 1 ) = trim( RealToStr( gatherPowerPV, 2 ) );
+			tableBody( 1, 1 ) = RealToStr( gatherPowerFuelFireGen, 2 );
+			tableBody( 2, 1 ) = RealToStr( gatherPowerHTGeothermal, 2 );
+			tableBody( 3, 1 ) = RealToStr( gatherPowerPV, 2 );
 			PreDefTableEntry( pdchLeedRenAnGen, "Photovoltaic", unconvert * gatherPowerPV, 2 );
-			tableBody( 4, 1 ) = trim( RealToStr( gatherPowerWind, 2 ) );
+			tableBody( 4, 1 ) = RealToStr( gatherPowerWind, 2 );
 			PreDefTableEntry( pdchLeedRenAnGen, "Wind", unconvert * gatherPowerWind, 2 );
-			tableBody( 5, 1 ) = trim( RealToStr( OverallNetEnergyFromStorage, 2 ) );
-			tableBody( 6, 1 ) = trim( RealToStr( gatherElecProduced, 2 ) );
-			tableBody( 8, 1 ) = trim( RealToStr( gatherElecPurchased, 2 ) );
-			tableBody( 9, 1 ) = trim( RealToStr( gatherElecSurplusSold, 2 ) );
-			tableBody( 10, 1 ) = trim( RealToStr( gatherElecPurchased - gatherElecSurplusSold, 2 ) );
-			tableBody( 12, 1 ) = trim( RealToStr( gatherElecProduced + ( gatherElecPurchased - gatherElecSurplusSold ), 2 ) );
-			tableBody( 13, 1 ) = trim( RealToStr( collapsedTotal( 1 ), 2 ) );
+			tableBody( 5, 1 ) = RealToStr( OverallNetEnergyFromStorage, 2 );
+			tableBody( 6, 1 ) = RealToStr( gatherElecProduced, 2 );
+			tableBody( 8, 1 ) = RealToStr( gatherElecPurchased, 2 );
+			tableBody( 9, 1 ) = RealToStr( gatherElecSurplusSold, 2 );
+			tableBody( 10, 1 ) = RealToStr( gatherElecPurchased - gatherElecSurplusSold, 2 );
+			tableBody( 12, 1 ) = RealToStr( gatherElecProduced + ( gatherElecPurchased - gatherElecSurplusSold ), 2 );
+			tableBody( 13, 1 ) = RealToStr( collapsedTotal( 1 ), 2 );
 
 			// show annual percentages
 			if ( collapsedTotal( 1 ) > 0 ) {
-				tableBody( 1, 2 ) = trim( RealToStr( 100.0 * gatherPowerFuelFireGen / collapsedTotal( 1 ), 2 ) );
-				tableBody( 2, 2 ) = trim( RealToStr( 100.0 * gatherPowerHTGeothermal / collapsedTotal( 1 ), 2 ) );
-				tableBody( 3, 2 ) = trim( RealToStr( 100.0 * gatherPowerPV / collapsedTotal( 1 ), 2 ) );
-				tableBody( 4, 2 ) = trim( RealToStr( 100.0 * gatherPowerWind / collapsedTotal( 1 ), 2 ) );
-				tableBody( 5, 2 ) = trim( RealToStr( 100.0 * OverallNetEnergyFromStorage / collapsedTotal( 1 ), 2 ) );
-				tableBody( 6, 2 ) = trim( RealToStr( 100.0 * gatherElecProduced / collapsedTotal( 1 ), 2 ) );
-				tableBody( 8, 2 ) = trim( RealToStr( 100.0 * gatherElecPurchased / collapsedTotal( 1 ), 2 ) );
-				tableBody( 9, 2 ) = trim( RealToStr( 100.0 * gatherElecSurplusSold / collapsedTotal( 1 ), 2 ) );
-				tableBody( 10, 2 ) = trim( RealToStr( 100.0 * ( gatherElecPurchased - gatherElecSurplusSold ) / collapsedTotal( 1 ), 2 ) );
-				tableBody( 12, 2 ) = trim( RealToStr( 100.0 * ( gatherElecProduced + ( gatherElecPurchased - gatherElecSurplusSold ) ) / collapsedTotal( 1 ), 2 ) );
-				tableBody( 13, 2 ) = trim( RealToStr( 100.0, 2 ) );
+				tableBody( 1, 2 ) = RealToStr( 100.0 * gatherPowerFuelFireGen / collapsedTotal( 1 ), 2 );
+				tableBody( 2, 2 ) = RealToStr( 100.0 * gatherPowerHTGeothermal / collapsedTotal( 1 ), 2 );
+				tableBody( 3, 2 ) = RealToStr( 100.0 * gatherPowerPV / collapsedTotal( 1 ), 2 );
+				tableBody( 4, 2 ) = RealToStr( 100.0 * gatherPowerWind / collapsedTotal( 1 ), 2 );
+				tableBody( 5, 2 ) = RealToStr( 100.0 * OverallNetEnergyFromStorage / collapsedTotal( 1 ), 2 );
+				tableBody( 6, 2 ) = RealToStr( 100.0 * gatherElecProduced / collapsedTotal( 1 ), 2 );
+				tableBody( 8, 2 ) = RealToStr( 100.0 * gatherElecPurchased / collapsedTotal( 1 ), 2 );
+				tableBody( 9, 2 ) = RealToStr( 100.0 * gatherElecSurplusSold / collapsedTotal( 1 ), 2 );
+				tableBody( 10, 2 ) = RealToStr( 100.0 * ( gatherElecPurchased - gatherElecSurplusSold ) / collapsedTotal( 1 ), 2 );
+				tableBody( 12, 2 ) = RealToStr( 100.0 * ( gatherElecProduced + ( gatherElecPurchased - gatherElecSurplusSold ) ) / collapsedTotal( 1 ), 2 );
+				tableBody( 13, 2 ) = RealToStr( 100.0, 2 );
 			}
 
 			// heading for the entire sub-table
@@ -7724,22 +7724,22 @@ namespace OutputReportTabular {
 			totalOnsiteHeat = gatherWaterHeatRecovery + gatherAirHeatRecoveryCool + gatherAirHeatRecoveryHeat + gatherHeatHTGeothermal + gatherHeatSolarWater + gatherHeatSolarAir;
 
 			// show annual values
-			tableBody( 1, 1 ) = trim( RealToStr( gatherWaterHeatRecovery, 2 ) );
-			tableBody( 2, 1 ) = trim( RealToStr( gatherAirHeatRecoveryCool, 2 ) );
-			tableBody( 3, 1 ) = trim( RealToStr( gatherAirHeatRecoveryHeat, 2 ) );
-			tableBody( 4, 1 ) = trim( RealToStr( gatherHeatHTGeothermal, 2 ) );
-			tableBody( 5, 1 ) = trim( RealToStr( gatherHeatSolarWater, 2 ) );
-			tableBody( 6, 1 ) = trim( RealToStr( gatherHeatSolarAir, 2 ) );
-			tableBody( 7, 1 ) = trim( RealToStr( totalOnsiteHeat, 2 ) );
+			tableBody( 1, 1 ) = RealToStr( gatherWaterHeatRecovery, 2 );
+			tableBody( 2, 1 ) = RealToStr( gatherAirHeatRecoveryCool, 2 );
+			tableBody( 3, 1 ) = RealToStr( gatherAirHeatRecoveryHeat, 2 );
+			tableBody( 4, 1 ) = RealToStr( gatherHeatHTGeothermal, 2 );
+			tableBody( 5, 1 ) = RealToStr( gatherHeatSolarWater, 2 );
+			tableBody( 6, 1 ) = RealToStr( gatherHeatSolarAir, 2 );
+			tableBody( 7, 1 ) = RealToStr( totalOnsiteHeat, 2 );
 
 			if ( totalOnsiteHeat > 0 ) {
-				tableBody( 1, 2 ) = trim( RealToStr( 100.0 * gatherWaterHeatRecovery / totalOnsiteHeat, 2 ) );
-				tableBody( 2, 2 ) = trim( RealToStr( 100.0 * gatherAirHeatRecoveryCool / totalOnsiteHeat, 2 ) );
-				tableBody( 3, 2 ) = trim( RealToStr( 100.0 * gatherAirHeatRecoveryHeat / totalOnsiteHeat, 2 ) );
-				tableBody( 4, 2 ) = trim( RealToStr( 100.0 * gatherHeatHTGeothermal / totalOnsiteHeat, 2 ) );
-				tableBody( 5, 2 ) = trim( RealToStr( 100.0 * gatherHeatSolarWater / totalOnsiteHeat, 2 ) );
-				tableBody( 6, 2 ) = trim( RealToStr( 100.0 * gatherHeatSolarAir / totalOnsiteHeat, 2 ) );
-				tableBody( 7, 2 ) = trim( RealToStr( 100.0, 2 ) );
+				tableBody( 1, 2 ) = RealToStr( 100.0 * gatherWaterHeatRecovery / totalOnsiteHeat, 2 );
+				tableBody( 2, 2 ) = RealToStr( 100.0 * gatherAirHeatRecoveryCool / totalOnsiteHeat, 2 );
+				tableBody( 3, 2 ) = RealToStr( 100.0 * gatherAirHeatRecoveryHeat / totalOnsiteHeat, 2 );
+				tableBody( 4, 2 ) = RealToStr( 100.0 * gatherHeatHTGeothermal / totalOnsiteHeat, 2 );
+				tableBody( 5, 2 ) = RealToStr( 100.0 * gatherHeatSolarWater / totalOnsiteHeat, 2 );
+				tableBody( 6, 2 ) = RealToStr( 100.0 * gatherHeatSolarAir / totalOnsiteHeat, 2 );
+				tableBody( 7, 2 ) = RealToStr( 100.0, 2 );
 			}
 
 			// heading for the entire sub-table
@@ -7794,10 +7794,10 @@ namespace OutputReportTabular {
 			totalOnsiteWater = gatherRainWater + gatherCondensate + gatherWellwater;
 
 			//  ! show annual values
-			tableBody( 1, 1 ) = trim( RealToStr( gatherRainWater / waterConversionFactor, 2 ) );
-			tableBody( 2, 1 ) = trim( RealToStr( gatherCondensate / waterConversionFactor, 2 ) );
-			tableBody( 3, 1 ) = trim( RealToStr( gatherWellwater / waterConversionFactor, 2 ) );
-			tableBody( 4, 1 ) = trim( RealToStr( totalOnsiteWater / waterConversionFactor, 2 ) );
+			tableBody( 1, 1 ) = RealToStr( gatherRainWater / waterConversionFactor, 2 );
+			tableBody( 2, 1 ) = RealToStr( gatherCondensate / waterConversionFactor, 2 );
+			tableBody( 3, 1 ) = RealToStr( gatherWellwater / waterConversionFactor, 2 );
+			tableBody( 4, 1 ) = RealToStr( totalOnsiteWater / waterConversionFactor, 2 );
 
 			if ( allocated( WaterStorage ) ) {
 				initialStorage = sum( WaterStorage.InitialVolume() );
@@ -7808,29 +7808,29 @@ namespace OutputReportTabular {
 				finalStorage = 0.0;
 				StorageChange = 0.0;
 			}
-			tableBody( 6, 1 ) = trim( RealToStr( initialStorage / waterConversionFactor, 2 ) );
-			tableBody( 7, 1 ) = trim( RealToStr( finalStorage / waterConversionFactor, 2 ) );
-			tableBody( 8, 1 ) = trim( RealToStr( StorageChange / waterConversionFactor, 2 ) );
+			tableBody( 6, 1 ) = RealToStr( initialStorage / waterConversionFactor, 2 );
+			tableBody( 7, 1 ) = RealToStr( finalStorage / waterConversionFactor, 2 );
+			tableBody( 8, 1 ) = RealToStr( StorageChange / waterConversionFactor, 2 );
 
 			totalWater = totalOnsiteWater + gatherMains + StorageChange;
 
-			tableBody( 10, 1 ) = trim( RealToStr( gatherMains / waterConversionFactor, 2 ) );
-			tableBody( 12, 1 ) = trim( RealToStr( totalWater / waterConversionFactor, 2 ) );
-			tableBody( 13, 1 ) = trim( RealToStr( gatherWaterEndUseTotal / waterConversionFactor, 2 ) );
+			tableBody( 10, 1 ) = RealToStr( gatherMains / waterConversionFactor, 2 );
+			tableBody( 12, 1 ) = RealToStr( totalWater / waterConversionFactor, 2 );
+			tableBody( 13, 1 ) = RealToStr( gatherWaterEndUseTotal / waterConversionFactor, 2 );
 
 			if ( gatherWaterEndUseTotal > 0 ) {
-				tableBody( 1, 2 ) = trim( RealToStr( 100.0 * gatherRainWater / gatherWaterEndUseTotal, 2 ) );
-				tableBody( 2, 2 ) = trim( RealToStr( 100.0 * gatherCondensate / gatherWaterEndUseTotal, 2 ) );
-				tableBody( 3, 2 ) = trim( RealToStr( 100.0 * gatherWellwater / gatherWaterEndUseTotal, 2 ) );
-				tableBody( 4, 2 ) = trim( RealToStr( 100.0 * totalOnsiteWater / gatherWaterEndUseTotal, 2 ) );
-				tableBody( 6, 2 ) = trim( RealToStr( 100.0 * initialStorage / gatherWaterEndUseTotal, 2 ) );
-				tableBody( 7, 2 ) = trim( RealToStr( 100.0 * finalStorage / gatherWaterEndUseTotal, 2 ) );
-				tableBody( 8, 2 ) = trim( RealToStr( 100.0 * StorageChange / gatherWaterEndUseTotal, 2 ) );
+				tableBody( 1, 2 ) = RealToStr( 100.0 * gatherRainWater / gatherWaterEndUseTotal, 2 );
+				tableBody( 2, 2 ) = RealToStr( 100.0 * gatherCondensate / gatherWaterEndUseTotal, 2 );
+				tableBody( 3, 2 ) = RealToStr( 100.0 * gatherWellwater / gatherWaterEndUseTotal, 2 );
+				tableBody( 4, 2 ) = RealToStr( 100.0 * totalOnsiteWater / gatherWaterEndUseTotal, 2 );
+				tableBody( 6, 2 ) = RealToStr( 100.0 * initialStorage / gatherWaterEndUseTotal, 2 );
+				tableBody( 7, 2 ) = RealToStr( 100.0 * finalStorage / gatherWaterEndUseTotal, 2 );
+				tableBody( 8, 2 ) = RealToStr( 100.0 * StorageChange / gatherWaterEndUseTotal, 2 );
 
-				tableBody( 10, 2 ) = trim( RealToStr( 100.0 * gatherMains / gatherWaterEndUseTotal, 2 ) );
+				tableBody( 10, 2 ) = RealToStr( 100.0 * gatherMains / gatherWaterEndUseTotal, 2 );
 
-				tableBody( 12, 2 ) = trim( RealToStr( 100.0 * totalWater / gatherWaterEndUseTotal, 2 ) );
-				tableBody( 13, 2 ) = trim( RealToStr( 100.0, 2 ) );
+				tableBody( 12, 2 ) = RealToStr( 100.0 * totalWater / gatherWaterEndUseTotal, 2 );
+				tableBody( 13, 2 ) = RealToStr( 100.0, 2 );
 			}
 
 			//  ! heading for the entire sub-table
@@ -7866,11 +7866,11 @@ namespace OutputReportTabular {
 				rowHead( 2 ) = "Tolerance for Zone Cooling Setpoint Not Met Time";
 
 				if ( unitsStyle != unitsStyleInchPound ) {
-					tableBody( 1, 1 ) = trim( RealToStr( std::abs( deviationFromSetPtThresholdHtg ), 2 ) );
-					tableBody( 2, 1 ) = trim( RealToStr( deviationFromSetPtThresholdClg, 2 ) );
+					tableBody( 1, 1 ) = RealToStr( std::abs( deviationFromSetPtThresholdHtg ), 2 );
+					tableBody( 2, 1 ) = RealToStr( deviationFromSetPtThresholdClg, 2 );
 				} else {
-					tableBody( 1, 1 ) = trim( RealToStr( ConvertIPdelta( indexUnitConv, std::abs( deviationFromSetPtThresholdHtg ) ), 2 ) );
-					tableBody( 2, 1 ) = trim( RealToStr( ConvertIPdelta( indexUnitConv, deviationFromSetPtThresholdClg ), 2 ) );
+					tableBody( 1, 1 ) = RealToStr( ConvertIPdelta( indexUnitConv, std::abs( deviationFromSetPtThresholdHtg ) ), 2 );
+					tableBody( 2, 1 ) = RealToStr( ConvertIPdelta( indexUnitConv, deviationFromSetPtThresholdClg ), 2 );
 				}
 
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
@@ -7898,12 +7898,12 @@ namespace OutputReportTabular {
 			rowHead( 2 ) = "Time Setpoint Not Met During Occupied Cooling";
 			rowHead( 3 ) = "Time Not Comfortable Based on Simple ASHRAE 55-2004";
 
-			tableBody( 1, 1 ) = trim( RealToStr( TotalNotMetHeatingOccupiedForABUPS, 2 ) );
-			tableBody( 2, 1 ) = trim( RealToStr( TotalNotMetCoolingOccupiedForABUPS, 2 ) );
-			PreDefTableEntry( pdchLeedAmData, "Number of hours heating loads not met", trim( RealToStr( TotalNotMetHeatingOccupiedForABUPS, 2 ) ) );
-			PreDefTableEntry( pdchLeedAmData, "Number of hours cooling loads not met", trim( RealToStr( TotalNotMetCoolingOccupiedForABUPS, 2 ) ) );
-			PreDefTableEntry( pdchLeedAmData, "Number of hours not met", trim( RealToStr( TotalNotMetOccupiedForABUPS, 2 ) ) );
-			tableBody( 3, 1 ) = trim( RealToStr( TotalTimeNotSimpleASH55EitherForABUPS, 2 ) );
+			tableBody( 1, 1 ) = RealToStr( TotalNotMetHeatingOccupiedForABUPS, 2 );
+			tableBody( 2, 1 ) = RealToStr( TotalNotMetCoolingOccupiedForABUPS, 2 );
+			PreDefTableEntry( pdchLeedAmData, "Number of hours heating loads not met", RealToStr( TotalNotMetHeatingOccupiedForABUPS, 2 ) );
+			PreDefTableEntry( pdchLeedAmData, "Number of hours cooling loads not met", RealToStr( TotalNotMetCoolingOccupiedForABUPS, 2 ) );
+			PreDefTableEntry( pdchLeedAmData, "Number of hours not met", RealToStr( TotalNotMetOccupiedForABUPS, 2 ) );
+			tableBody( 3, 1 ) = RealToStr( TotalTimeNotSimpleASH55EitherForABUPS, 2 );
 
 			if ( displayTabularBEPS ) {
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
@@ -7966,10 +7966,10 @@ namespace OutputReportTabular {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// all arrays are in the format: (row, column)
-		FArray1D_Fstring columnHead( sFstring( MaxNameLength ) );
+		FArray1D_string columnHead;
 		FArray1D_int columnWidth;
-		FArray1D_Fstring rowHead( sFstring( MaxNameLength ) );
-		FArray2D_Fstring tableBody( sFstring( MaxNameLength ) );
+		FArray1D_string rowHead;
+		FArray2D_string tableBody;
 
 		// all arrays are in the format: (row, columnm)
 		FArray2D< Real64 > useVal( 15, 6 );
@@ -7983,12 +7983,11 @@ namespace OutputReportTabular {
 		int i;
 		Real64 largeConversionFactor;
 		int numRows;
-		static Fstring footnote( 100 );
 		Real64 areaConversionFactor;
 		Real64 convBldgGrossFloorArea;
 		Real64 convBldgCondFloorArea;
-		Fstring curNameWithSIUnits( MaxNameLength );
-		Fstring curNameAndUnits( MaxNameLength );
+		std::string curNameWithSIUnits;
+		std::string curNameAndUnits;
 		int indexUnitConv;
 
 		if ( displaySourceEnergyEndUseSummary ) {
@@ -8114,9 +8113,9 @@ namespace OutputReportTabular {
 			tableBody = "";
 			for ( iResource = 1; iResource <= 5; ++iResource ) {
 				for ( jEndUse = 1; jEndUse <= 14; ++jEndUse ) {
-					tableBody( jEndUse, iResource ) = trim( RealToStr( useVal( jEndUse, iResource ) / largeConversionFactor, 2 ) );
+					tableBody( jEndUse, iResource ) = RealToStr( useVal( jEndUse, iResource ) / largeConversionFactor, 2 );
 				}
-				tableBody( 16, iResource ) = trim( RealToStr( useVal( 15, iResource ) / largeConversionFactor, 2 ) );
+				tableBody( 16, iResource ) = RealToStr( useVal( 15, iResource ) / largeConversionFactor, 2 );
 			}
 
 			// heading for the entire sub-table
@@ -8151,9 +8150,9 @@ namespace OutputReportTabular {
 			if ( convBldgCondFloorArea > 0 ) {
 				for ( iResource = 1; iResource <= 5; ++iResource ) {
 					for ( jEndUse = 1; jEndUse <= 14; ++jEndUse ) {
-						tableBody( jEndUse, iResource ) = trim( RealToStr( useVal( jEndUse, iResource ) / convBldgCondFloorArea, 2 ) );
+						tableBody( jEndUse, iResource ) = RealToStr( useVal( jEndUse, iResource ) / convBldgCondFloorArea, 2 );
 					}
-					tableBody( 16, iResource ) = trim( RealToStr( useVal( 15, iResource ) / convBldgCondFloorArea, 2 ) );
+					tableBody( 16, iResource ) = RealToStr( useVal( 15, iResource ) / convBldgCondFloorArea, 2 );
 				}
 			}
 
@@ -8169,9 +8168,9 @@ namespace OutputReportTabular {
 			if ( convBldgCondFloorArea > 0 ) {
 				for ( iResource = 1; iResource <= 5; ++iResource ) {
 					for ( jEndUse = 1; jEndUse <= 14; ++jEndUse ) {
-						tableBody( jEndUse, iResource ) = trim( RealToStr( useVal( jEndUse, iResource ) / convBldgCondFloorArea, 2 ) );
+						tableBody( jEndUse, iResource ) = RealToStr( useVal( jEndUse, iResource ) / convBldgCondFloorArea, 2 );
 					}
-					tableBody( 16, iResource ) = trim( RealToStr( useVal( 15, iResource ) / convBldgCondFloorArea, 2 ) );
+					tableBody( 16, iResource ) = RealToStr( useVal( 15, iResource ) / convBldgCondFloorArea, 2 );
 				}
 			}
 
@@ -8238,10 +8237,10 @@ namespace OutputReportTabular {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// all arrays are in the format: (row, column)
-		FArray1D_Fstring columnHead( sFstring( MaxNameLength ) );
+		FArray1D_string columnHead;
 		FArray1D_int columnWidth;
-		FArray1D_Fstring rowHead( sFstring( MaxNameLength ) );
-		FArray2D_Fstring tableBody( sFstring( MaxNameLength ) );
+		FArray1D_string rowHead;
+		FArray2D_string tableBody;
 
 		// all arrays are in the format: (row, columnm)
 		FArray2D< Real64 > useVal( 15, 6 );
@@ -8254,7 +8253,7 @@ namespace OutputReportTabular {
 		int kEndUseSub;
 		int i;
 		int numRows;
-		static Fstring footnote( 100 );
+		static std::string footnote;
 		Real64 additionalFuelMax;
 		int additionalFuelSelected;
 		int additionalFuelNonZeroCount;
@@ -8270,7 +8269,7 @@ namespace OutputReportTabular {
 		FArray1D< Real64 > leedIndProc( 6 );
 		FArray1D< Real64 > leedElevEsc( 6 );
 		Real64 unconvert;
-		Fstring subCatName( MaxNameLength );
+		std::string subCatName;
 
 		if ( displayDemandEndUse ) {
 			// show the headers of the report
@@ -8347,12 +8346,12 @@ namespace OutputReportTabular {
 			if ( gatherDemandTotal( 4 ) > gatherDemandTotal( 5 ) ) {
 				distrHeatSelected = 4; // purchased heating
 				if ( bothDistrHeatNonZero ) {
-					footnote = trim( footnote ) + " Steam has non-zero demand but is not shown on this report.";
+					footnote += " Steam has non-zero demand but is not shown on this report.";
 				}
 			} else {
 				distrHeatSelected = 5; // steam
 				if ( bothDistrHeatNonZero ) {
-					footnote = trim( footnote ) + " District heating has non-zero demand but is not shown on this report.";
+					footnote += " District heating has non-zero demand but is not shown on this report.";
 				}
 			}
 			//set the time of peak demand and total demand for the purchased heating/steam
@@ -8500,10 +8499,10 @@ namespace OutputReportTabular {
 			tableBody = "";
 			for ( iResource = 1; iResource <= 6; ++iResource ) {
 				for ( jEndUse = 1; jEndUse <= 14; ++jEndUse ) {
-					tableBody( 1 + jEndUse, iResource ) = trim( RealToStr( useVal( jEndUse, iResource ), 2 ) );
+					tableBody( 1 + jEndUse, iResource ) = RealToStr( useVal( jEndUse, iResource ), 2 );
 				}
-				tableBody( 1, iResource ) = trim( DateToString( collapsedTimeStep( iResource ) ) );
-				tableBody( 17, iResource ) = trim( RealToStr( collapsedTotal( iResource ), 2 ) );
+				tableBody( 1, iResource ) = DateToString( collapsedTimeStep( iResource ) );
+				tableBody( 17, iResource ) = RealToStr( collapsedTotal( iResource ), 2 );
 			}
 
 			//complete the LEED end use table using the same values
@@ -8703,11 +8702,11 @@ namespace OutputReportTabular {
 				for ( jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse ) {
 					if ( EndUseCategory( jEndUse ).NumSubcategories > 0 ) {
 						for ( kEndUseSub = 1; kEndUseSub <= EndUseCategory( jEndUse ).NumSubcategories; ++kEndUseSub ) {
-							tableBody( i, iResource + 1 ) = trim( RealToStr( collapsedEndUseSub( iResource, jEndUse, kEndUseSub ), 2 ) );
+							tableBody( i, iResource + 1 ) = RealToStr( collapsedEndUseSub( iResource, jEndUse, kEndUseSub ), 2 );
 							++i;
 						}
 					} else {
-						tableBody( i, iResource + 1 ) = trim( RealToStr( collapsedEndUse( jEndUse, iResource ), 2 ) );
+						tableBody( i, iResource + 1 ) = RealToStr( collapsedEndUse( jEndUse, iResource ), 2 );
 						++i;
 					}
 				}
@@ -8765,18 +8764,18 @@ namespace OutputReportTabular {
 		FArray2D< Real64 > TableBodyData( 10, 3 );
 		Real64 RefBldgConstCost; // holds interim value for construction component costs: reference bldg.
 		Real64 CurntBldgConstCost; // holds interim value for construction component costs: current bldg.
-		FArray1D_Fstring columnHead( sFstring( MaxNameLength ) );
+		FArray1D_string columnHead;
 		FArray1D_int columnWidth;
-		FArray1D_Fstring rowHead( sFstring( MaxNameLength ) );
-		FArray2D_Fstring tableBody( sFstring( MaxNameLength ) );
+		FArray1D_string rowHead;
+		FArray2D_string tableBody;
 		int item; // do-loop counter for line items
 		int NumRows; // number of rows in report table excluding table header
 		int NumCols; // number of columns in report table
-		static Fstring SIunit( MaxNameLength );
-		static Fstring m2_unitName( MaxNameLength );
+		static std::string SIunit;
+		static std::string m2_unitName;
 		static Real64 m2_unitConv( 0.0 );
 		static int unitConvIndex( 0 );
-		static Fstring IPunitName( MaxNameLength );
+		static std::string IPunitName;
 		Real64 IPqty;
 		Real64 IPsingleValue;
 		Real64 IPvaluePer;
@@ -8823,9 +8822,9 @@ namespace OutputReportTabular {
 		tableBody = "";
 
 		TableBodyData( 1, 1 ) = RefrncBldg.LineItemTot;
-		tableBody( 1, 1 ) = trim( RealToStr( TableBodyData( 1, 1 ), 2 ) );
+		tableBody( 1, 1 ) = RealToStr( TableBodyData( 1, 1 ), 2 );
 		TableBodyData( 2, 1 ) = RefrncBldg.MiscCostperSqMeter * buildingConditionedFloorArea;
-		tableBody( 2, 1 ) = trim( RealToStr( TableBodyData( 2, 1 ), 2 ) );
+		tableBody( 2, 1 ) = RealToStr( TableBodyData( 2, 1 ), 2 );
 
 		if ( RefrncBldg.RegionalModifier != 1.0 ) {
 			TableBodyData( 3, 1 ) = ( RefrncBldg.LineItemTot + RefrncBldg.MiscCostperSqMeter * buildingConditionedFloorArea ) * ( RefrncBldg.RegionalModifier - 1.0 );
@@ -8835,69 +8834,69 @@ namespace OutputReportTabular {
 
 		RefBldgConstCost = sum( TableBodyData( {1,3}, 1 ) );
 
-		tableBody( 3, 1 ) = trim( RealToStr( TableBodyData( 3, 1 ), 2 ) );
+		tableBody( 3, 1 ) = RealToStr( TableBodyData( 3, 1 ), 2 );
 		TableBodyData( 4, 1 ) = RefBldgConstCost * RefrncBldg.DesignFeeFrac;
-		tableBody( 4, 1 ) = trim( RealToStr( TableBodyData( 4, 1 ), 2 ) );
+		tableBody( 4, 1 ) = RealToStr( TableBodyData( 4, 1 ), 2 );
 		TableBodyData( 5, 1 ) = RefBldgConstCost * RefrncBldg.ContractorFeeFrac;
-		tableBody( 5, 1 ) = trim( RealToStr( TableBodyData( 5, 1 ), 2 ) );
+		tableBody( 5, 1 ) = RealToStr( TableBodyData( 5, 1 ), 2 );
 		TableBodyData( 6, 1 ) = RefBldgConstCost * RefrncBldg.ContingencyFrac;
-		tableBody( 6, 1 ) = trim( RealToStr( TableBodyData( 6, 1 ), 2 ) );
+		tableBody( 6, 1 ) = RealToStr( TableBodyData( 6, 1 ), 2 );
 		TableBodyData( 7, 1 ) = RefBldgConstCost * RefrncBldg.BondCostFrac;
-		tableBody( 7, 1 ) = trim( RealToStr( TableBodyData( 7, 1 ), 2 ) );
+		tableBody( 7, 1 ) = RealToStr( TableBodyData( 7, 1 ), 2 );
 		TableBodyData( 8, 1 ) = RefBldgConstCost * RefrncBldg.CommissioningFrac;
-		tableBody( 8, 1 ) = trim( RealToStr( TableBodyData( 8, 1 ), 2 ) );
+		tableBody( 8, 1 ) = RealToStr( TableBodyData( 8, 1 ), 2 );
 		RefrncBldg.GrandTotal = sum( TableBodyData( {1,8}, 1 ) );
 		TableBodyData( 9, 1 ) = RefrncBldg.GrandTotal;
-		tableBody( 9, 1 ) = trim( RealToStr( TableBodyData( 9, 1 ), 2 ) );
+		tableBody( 9, 1 ) = RealToStr( TableBodyData( 9, 1 ), 2 );
 		if ( buildingConditionedFloorArea > 0.0 ) {
 			TableBodyData( 10, 1 ) = TableBodyData( 9, 1 ) / ( buildingConditionedFloorArea * m2_unitConv );
 		}
-		tableBody( 10, 1 ) = trim( RealToStr( TableBodyData( 10, 1 ), 2 ) );
+		tableBody( 10, 1 ) = RealToStr( TableBodyData( 10, 1 ), 2 );
 
 		TableBodyData( 1, 2 ) = CurntBldg.LineItemTot;
-		tableBody( 1, 2 ) = trim( RealToStr( TableBodyData( 1, 2 ), 2 ) );
+		tableBody( 1, 2 ) = RealToStr( TableBodyData( 1, 2 ), 2 );
 		TableBodyData( 2, 2 ) = CurntBldg.MiscCostperSqMeter * buildingConditionedFloorArea;
-		tableBody( 2, 2 ) = trim( RealToStr( TableBodyData( 2, 2 ), 2 ) );
+		tableBody( 2, 2 ) = RealToStr( TableBodyData( 2, 2 ), 2 );
 		if ( CurntBldg.RegionalModifier != 1.0 ) {
 			TableBodyData( 3, 2 ) = ( CurntBldg.LineItemTot + CurntBldg.MiscCostperSqMeter * buildingConditionedFloorArea ) * ( CurntBldg.RegionalModifier - 1.0 );
 		} else {
 			TableBodyData( 3, 2 ) = 0.0;
 		}
-		tableBody( 3, 2 ) = trim( RealToStr( TableBodyData( 3, 2 ), 2 ) );
+		tableBody( 3, 2 ) = RealToStr( TableBodyData( 3, 2 ), 2 );
 
 		CurntBldgConstCost = sum( TableBodyData( {1,3}, 2 ) );
 
 		TableBodyData( 4, 2 ) = CurntBldgConstCost * CurntBldg.DesignFeeFrac;
-		tableBody( 4, 2 ) = trim( RealToStr( TableBodyData( 4, 2 ), 2 ) );
+		tableBody( 4, 2 ) = RealToStr( TableBodyData( 4, 2 ), 2 );
 
 		TableBodyData( 5, 2 ) = CurntBldgConstCost * CurntBldg.ContractorFeeFrac;
-		tableBody( 5, 2 ) = trim( RealToStr( TableBodyData( 5, 2 ), 2 ) );
+		tableBody( 5, 2 ) = RealToStr( TableBodyData( 5, 2 ), 2 );
 		TableBodyData( 6, 2 ) = CurntBldgConstCost * CurntBldg.ContingencyFrac;
-		tableBody( 6, 2 ) = trim( RealToStr( TableBodyData( 6, 2 ), 2 ) );
+		tableBody( 6, 2 ) = RealToStr( TableBodyData( 6, 2 ), 2 );
 		TableBodyData( 7, 2 ) = CurntBldgConstCost * CurntBldg.BondCostFrac;
-		tableBody( 7, 2 ) = trim( RealToStr( TableBodyData( 7, 2 ), 2 ) );
+		tableBody( 7, 2 ) = RealToStr( TableBodyData( 7, 2 ), 2 );
 		TableBodyData( 8, 2 ) = CurntBldgConstCost * CurntBldg.CommissioningFrac;
-		tableBody( 8, 2 ) = trim( RealToStr( TableBodyData( 8, 2 ), 2 ) );
+		tableBody( 8, 2 ) = RealToStr( TableBodyData( 8, 2 ), 2 );
 
 		CurntBldg.GrandTotal = sum( TableBodyData( {1,8}, 2 ) );
 		TableBodyData( 9, 2 ) = CurntBldg.GrandTotal;
-		tableBody( 9, 2 ) = trim( RealToStr( TableBodyData( 9, 2 ), 2 ) );
+		tableBody( 9, 2 ) = RealToStr( TableBodyData( 9, 2 ), 2 );
 		if ( buildingConditionedFloorArea > 0 ) {
 			TableBodyData( 10, 2 ) = TableBodyData( 9, 2 ) / ( buildingConditionedFloorArea * m2_unitConv );
 		}
-		tableBody( 10, 2 ) = trim( RealToStr( TableBodyData( 10, 2 ), 2 ) );
+		tableBody( 10, 2 ) = RealToStr( TableBodyData( 10, 2 ), 2 );
 
 		TableBodyData( {1,10}, 3 ) = TableBodyData( {1,10}, 2 ) - TableBodyData( {1,10}, 1 );
-		tableBody( 1, 3 ) = trim( RealToStr( TableBodyData( 1, 3 ), 2 ) );
-		tableBody( 2, 3 ) = trim( RealToStr( TableBodyData( 2, 3 ), 2 ) );
-		tableBody( 3, 3 ) = trim( RealToStr( TableBodyData( 3, 3 ), 2 ) );
-		tableBody( 4, 3 ) = trim( RealToStr( TableBodyData( 4, 3 ), 2 ) );
-		tableBody( 5, 3 ) = trim( RealToStr( TableBodyData( 5, 3 ), 2 ) );
-		tableBody( 6, 3 ) = trim( RealToStr( TableBodyData( 6, 3 ), 2 ) );
-		tableBody( 7, 3 ) = trim( RealToStr( TableBodyData( 7, 3 ), 2 ) );
-		tableBody( 8, 3 ) = trim( RealToStr( TableBodyData( 8, 3 ), 2 ) );
-		tableBody( 9, 3 ) = trim( RealToStr( TableBodyData( 9, 3 ), 2 ) );
-		tableBody( 10, 3 ) = trim( RealToStr( TableBodyData( 10, 3 ), 2 ) );
+		tableBody( 1, 3 ) = RealToStr( TableBodyData( 1, 3 ), 2 );
+		tableBody( 2, 3 ) = RealToStr( TableBodyData( 2, 3 ), 2 );
+		tableBody( 3, 3 ) = RealToStr( TableBodyData( 3, 3 ), 2 );
+		tableBody( 4, 3 ) = RealToStr( TableBodyData( 4, 3 ), 2 );
+		tableBody( 5, 3 ) = RealToStr( TableBodyData( 5, 3 ), 2 );
+		tableBody( 6, 3 ) = RealToStr( TableBodyData( 6, 3 ), 2 );
+		tableBody( 7, 3 ) = RealToStr( TableBodyData( 7, 3 ), 2 );
+		tableBody( 8, 3 ) = RealToStr( TableBodyData( 8, 3 ), 2 );
+		tableBody( 9, 3 ) = RealToStr( TableBodyData( 9, 3 ), 2 );
+		tableBody( 10, 3 ) = RealToStr( TableBodyData( 10, 3 ), 2 );
 
 		WriteSubtitle( "Construction Cost Estimate Summary" );
 		WriteTable( tableBody, rowHead, columnHead, columnWidth );
@@ -8929,32 +8928,32 @@ namespace OutputReportTabular {
 		columnWidth = { 7, 30, 16, 10, 16, 16 }; //array assignment - for all columns
 
 		for ( item = 1; item <= NumLineItems; ++item ) {
-			tableBody( item, 1 ) = trim( IntToStr( CostLineItem( item ).LineNumber ) );
-			tableBody( item, 2 ) = trim( CostLineItem( item ).LineName );
+			tableBody( item, 1 ) = IntToStr( CostLineItem( item ).LineNumber );
+			tableBody( item, 2 ) = CostLineItem( item ).LineName;
 			if ( unitsStyle == unitsStyleInchPound ) {
 				LookupSItoIP( CostLineItem( item ).Units, unitConvIndex, IPunitName );
 				if ( unitConvIndex != 0 ) {
 					IPqty = ConvertIP( unitConvIndex, CostLineItem( item ).Qty );
-					tableBody( item, 3 ) = trim( RealToStr( IPqty, 2 ) );
-					tableBody( item, 4 ) = trim( IPunitName );
+					tableBody( item, 3 ) = RealToStr( IPqty, 2 );
+					tableBody( item, 4 ) = IPunitName;
 					IPsingleValue = ConvertIP( unitConvIndex, 1.0 );
 					if ( IPsingleValue != 0.0 ) {
 						IPvaluePer = CostLineItem( item ).ValuePer / IPsingleValue;
-						tableBody( item, 5 ) = trim( RealToStr( IPvaluePer, 2 ) );
+						tableBody( item, 5 ) = RealToStr( IPvaluePer, 2 );
 					}
 				} else {
-					tableBody( item, 3 ) = trim( RealToStr( CostLineItem( item ).Qty, 2 ) );
-					tableBody( item, 4 ) = trim( CostLineItem( item ).Units );
-					tableBody( item, 5 ) = trim( RealToStr( CostLineItem( item ).ValuePer, 2 ) );
+					tableBody( item, 3 ) = RealToStr( CostLineItem( item ).Qty, 2 );
+					tableBody( item, 4 ) = CostLineItem( item ).Units;
+					tableBody( item, 5 ) = RealToStr( CostLineItem( item ).ValuePer, 2 );
 				}
 			} else {
-				tableBody( item, 3 ) = trim( RealToStr( CostLineItem( item ).Qty, 2 ) );
-				tableBody( item, 4 ) = trim( CostLineItem( item ).Units );
-				tableBody( item, 5 ) = trim( RealToStr( CostLineItem( item ).ValuePer, 2 ) );
+				tableBody( item, 3 ) = RealToStr( CostLineItem( item ).Qty, 2 );
+				tableBody( item, 4 ) = CostLineItem( item ).Units;
+				tableBody( item, 5 ) = RealToStr( CostLineItem( item ).ValuePer, 2 );
 			}
-			tableBody( item, 6 ) = trim( RealToStr( CostLineItem( item ).LineSubTotal, 2 ) );
+			tableBody( item, 6 ) = RealToStr( CostLineItem( item ).LineSubTotal, 2 );
 		}
-		tableBody( NumRows, 6 ) = trim( RealToStr( CurntBldg.LineItemTot, 2 ) );
+		tableBody( NumRows, 6 ) = RealToStr( CurntBldg.LineItemTot, 2 );
 		WriteSubtitle( "Cost Line Item Details" ); //: '//TRIM(RealToStr(CostEstimateTotal, 2)))
 		WriteTable( tableBody, rowHead, columnHead, columnWidth );
 		CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details" );
@@ -9060,10 +9059,10 @@ namespace OutputReportTabular {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// all arrays are in the format: (row, column)
-		FArray1D_Fstring columnHead( sFstring( MaxNameLength ) );
+		FArray1D_string columnHead;
 		FArray1D_int columnWidth;
-		FArray1D_Fstring rowHead( sFstring( MaxNameLength ) );
-		FArray2D_Fstring tableBody( sFstring( MaxNameLength ) );
+		FArray1D_string rowHead;
+		FArray2D_string tableBody;
 
 		int iSurf;
 		int kOpaque;
@@ -9119,16 +9118,16 @@ namespace OutputReportTabular {
 		static int uncondTotal( 3 );
 		static int notpartTotal( 4 );
 		int iTotal;
-		static Fstring SIunit( MaxNameLength );
+		static std::string SIunit;
 		static int unitConvIndex( 0 );
 		static Real64 m_unitConv( 0.0 );
 		static Real64 m2_unitConv( 0.0 );
 		static Real64 m3_unitConv( 0.0 );
 		static Real64 Wm2_unitConv( 0.0 );
-		static Fstring m_unitName( MaxNameLength );
-		static Fstring m2_unitName( MaxNameLength );
-		static Fstring m3_unitName( MaxNameLength );
-		static Fstring Wm2_unitName( MaxNameLength );
+		static std::string m_unitName;
+		static std::string m2_unitName;
+		static std::string m3_unitName;
+		static std::string Wm2_unitName;
 
 		//zone summary total
 		static FArray1D< Real64 > zstArea( 4, 0.0 );
@@ -9191,7 +9190,7 @@ namespace OutputReportTabular {
 			rowHead( 4 ) = "Latitude [deg]";
 			rowHead( 5 ) = "Longitude [deg]";
 
-			rowHead( 6 ) = "Elevation " + trim( m_unitName );
+			rowHead( 6 ) = "Elevation " + m_unitName;
 			rowHead( 7 ) = "Time Zone";
 			rowHead( 8 ) = "North Axis Angle [deg]";
 			rowHead( 9 ) = "Rotation for Appendix G [deg]";
@@ -9200,16 +9199,16 @@ namespace OutputReportTabular {
 
 			tableBody = "";
 
-			tableBody( 1, 1 ) = trim( VerString ); //program
-			tableBody( 2, 1 ) = trim( EnvironmentName ); //runperiod name
-			tableBody( 3, 1 ) = trim( WeatherFileLocationTitle ); //weather
-			tableBody( 4, 1 ) = trim( RealToStr( Latitude, 2 ) ); //latitude
-			tableBody( 5, 1 ) = trim( RealToStr( Longitude, 2 ) ); //longitude
-			tableBody( 6, 1 ) = trim( RealToStr( Elevation * m_unitConv, 2 ) ); //Elevation
-			tableBody( 7, 1 ) = trim( RealToStr( TimeZoneNumber, 2 ) ); //Time Zone
-			tableBody( 8, 1 ) = trim( RealToStr( BuildingAzimuth, 2 ) ); //north axis angle
-			tableBody( 9, 1 ) = trim( RealToStr( BuildingRotationAppendixG, 2 ) ); //Rotation for Appendix G
-			tableBody( 10, 1 ) = trim( RealToStr( gatherElapsedTimeBEPS, 2 ) ); //hours simulated
+			tableBody( 1, 1 ) = VerString; //program
+			tableBody( 2, 1 ) = EnvironmentName; //runperiod name
+			tableBody( 3, 1 ) = WeatherFileLocationTitle; //weather
+			tableBody( 4, 1 ) = RealToStr( Latitude, 2 ); //latitude
+			tableBody( 5, 1 ) = RealToStr( Longitude, 2 ); //longitude
+			tableBody( 6, 1 ) = RealToStr( Elevation * m_unitConv, 2 ); //Elevation
+			tableBody( 7, 1 ) = RealToStr( TimeZoneNumber, 2 ); //Time Zone
+			tableBody( 8, 1 ) = RealToStr( BuildingAzimuth, 2 ); //north axis angle
+			tableBody( 9, 1 ) = RealToStr( BuildingRotationAppendixG, 2 ); //Rotation for Appendix G
+			tableBody( 10, 1 ) = RealToStr( gatherElapsedTimeBEPS, 2 ); //hours simulated
 			//  tableBody(9,1) = TRIM(IntToStr(numTableEntry)) !number of table entries for predefined tables
 
 			WriteSubtitle( "General" );
@@ -9235,9 +9234,9 @@ namespace OutputReportTabular {
 			columnHead( wwrcSouth ) = "South (135 to 225 deg)";
 			columnHead( wwrcWest ) = "West (225 to 315 deg)";
 
-			rowHead( wwrrWall ) = "Gross Wall Area " + trim( m2_unitName );
-			rowHead( wwrrAbvGndWall ) = "Above Ground Wall Area " + trim( m2_unitName );
-			rowHead( wwrrWindow ) = "Window Opening Area " + trim( m2_unitName );
+			rowHead( wwrrWall ) = "Gross Wall Area " + m2_unitName;
+			rowHead( wwrrAbvGndWall ) = "Above Ground Wall Area " + m2_unitName;
+			rowHead( wwrrWindow ) = "Window Opening Area " + m2_unitName;
 			rowHead( wwrrWWR ) = "Gross Window-Wall Ratio [%]";
 			rowHead( wwrrAbvGndWWR ) = "Above Ground Window-Wall Ratio [%]";
 
@@ -9333,7 +9332,7 @@ namespace OutputReportTabular {
 								}
 							}
 							if ( DetailedWWR ) {
-								gio::write( OutputFileDebug, "(A)" ) << trim( Surface( iSurf ).Name ) + ",Wall," + trim( RoundSigDigits( curArea * mult, 1 ) ) + "," + trim( RoundSigDigits( Surface( iSurf ).Tilt, 1 ) );
+								gio::write( OutputFileDebug, "(A)" ) << Surface( iSurf ).Name + ",Wall," + RoundSigDigits( curArea * mult, 1 ) + ',' + RoundSigDigits( Surface( iSurf ).Tilt, 1 );
 							}
 						} else if ( ( SELECT_CASE_var == SurfaceClass_Window ) || ( SELECT_CASE_var == SurfaceClass_TDD_Dome ) ) {
 							mult = Zone( zonePt ).Multiplier * Zone( zonePt ).ListMultiplier * Surface( iSurf ).Multiplier;
@@ -9351,7 +9350,7 @@ namespace OutputReportTabular {
 								if ( isConditioned ) windowAreaWcond += curArea * mult;
 							}
 							if ( DetailedWWR ) {
-								gio::write( OutputFileDebug, "(A)" ) << trim( Surface( iSurf ).Name ) + ",Window," + trim( RoundSigDigits( curArea * mult, 1 ) ) + "," + trim( RoundSigDigits( Surface( iSurf ).Tilt, 1 ) );
+								gio::write( OutputFileDebug, "(A)" ) << Surface( iSurf ).Name + ",Window," + RoundSigDigits( curArea * mult, 1 ) + ',' + RoundSigDigits( Surface( iSurf ).Tilt, 1 );
 							}
 						}}
 					} else if ( Surface( iSurf ).Tilt < 60. ) { //roof and skylights
@@ -9360,13 +9359,13 @@ namespace OutputReportTabular {
 							mult = Zone( zonePt ).Multiplier * Zone( zonePt ).ListMultiplier;
 							roofArea += curArea * mult;
 							if ( DetailedWWR ) {
-								gio::write( OutputFileDebug, "(A)" ) << trim( Surface( iSurf ).Name ) + ",Roof," + trim( RoundSigDigits( curArea * mult, 1 ) ) + "," + trim( RoundSigDigits( Surface( iSurf ).Tilt, 1 ) );
+								gio::write( OutputFileDebug, "(A)" ) << Surface( iSurf ).Name + ",Roof," + RoundSigDigits( curArea * mult, 1 ) + ',' + RoundSigDigits( Surface( iSurf ).Tilt, 1 );
 							}
 						} else if ( ( SELECT_CASE_var == SurfaceClass_Window ) || ( SELECT_CASE_var == SurfaceClass_TDD_Dome ) ) {
 							mult = Zone( zonePt ).Multiplier * Zone( zonePt ).ListMultiplier * Surface( iSurf ).Multiplier;
 							skylightArea += curArea * mult;
 							if ( DetailedWWR ) {
-								gio::write( OutputFileDebug, "(A)" ) << trim( Surface( iSurf ).Name ) + ",Skylight," + trim( RoundSigDigits( curArea * mult, 1 ) ) + "," + trim( RoundSigDigits( Surface( iSurf ).Tilt, 1 ) );
+								gio::write( OutputFileDebug, "(A)" ) << Surface( iSurf ).Name + ",Skylight," + RoundSigDigits( curArea * mult, 1 ) + ',' + RoundSigDigits( Surface( iSurf ).Tilt, 1 );
 							}
 						}}
 					} else { //floors
@@ -9382,41 +9381,41 @@ namespace OutputReportTabular {
 				gio::write( OutputFileDebug, "(A)" ) << "========================";
 				gio::write( OutputFileDebug, "(A)" ) << "TotalWallArea,WallAreaN,WallAreaS,WallAreaE,WallAreaW";
 				gio::write( OutputFileDebug, "(A)" ) << "TotalWindowArea,WindowAreaN,WindowAreaS,WindowAreaE,WindowAreaW";
-				gio::write( OutputFileDebug, "(A)" ) << trim( RoundSigDigits( TotalWallArea, 2 ) ) + "," + trim( RoundSigDigits( wallAreaN, 2 ) ) + "," + trim( RoundSigDigits( wallAreaS, 2 ) ) + "," + trim( RoundSigDigits( wallAreaE, 2 ) ) + "," + trim( RoundSigDigits( wallAreaW, 2 ) );
-				gio::write( OutputFileDebug, "(A)" ) << trim( RoundSigDigits( TotalWindowArea, 2 ) ) + "," + trim( RoundSigDigits( windowAreaN, 2 ) ) + "," + trim( RoundSigDigits( windowAreaS, 2 ) ) + "," + trim( RoundSigDigits( windowAreaE, 2 ) ) + "," + trim( RoundSigDigits( windowAreaW, 2 ) );
+				gio::write( OutputFileDebug, "(A)" ) << RoundSigDigits( TotalWallArea, 2 ) + ',' + RoundSigDigits( wallAreaN, 2 ) + ',' + RoundSigDigits( wallAreaS, 2 ) + ',' + RoundSigDigits( wallAreaE, 2 ) + ',' + RoundSigDigits( wallAreaW, 2 );
+				gio::write( OutputFileDebug, "(A)" ) << RoundSigDigits( TotalWindowArea, 2 ) + ',' + RoundSigDigits( windowAreaN, 2 ) + ',' + RoundSigDigits( windowAreaS, 2 ) + ',' + RoundSigDigits( windowAreaE, 2 ) + ',' + RoundSigDigits( windowAreaW, 2 );
 			}
 
 			tableBody = "";
 
-			tableBody( wwrrWall, wwrcNorth ) = trim( RealToStr( wallAreaN * m2_unitConv, 2 ) );
-			tableBody( wwrrWall, wwrcSouth ) = trim( RealToStr( wallAreaS * m2_unitConv, 2 ) );
-			tableBody( wwrrWall, wwrcEast ) = trim( RealToStr( wallAreaE * m2_unitConv, 2 ) );
-			tableBody( wwrrWall, wwrcWest ) = trim( RealToStr( wallAreaW * m2_unitConv, 2 ) );
-			tableBody( wwrrWall, wwrcTotal ) = trim( RealToStr( TotalWallArea * m2_unitConv, 2 ) );
+			tableBody( wwrrWall, wwrcNorth ) = RealToStr( wallAreaN * m2_unitConv, 2 );
+			tableBody( wwrrWall, wwrcSouth ) = RealToStr( wallAreaS * m2_unitConv, 2 );
+			tableBody( wwrrWall, wwrcEast ) = RealToStr( wallAreaE * m2_unitConv, 2 );
+			tableBody( wwrrWall, wwrcWest ) = RealToStr( wallAreaW * m2_unitConv, 2 );
+			tableBody( wwrrWall, wwrcTotal ) = RealToStr( TotalWallArea * m2_unitConv, 2 );
 
-			tableBody( wwrrAbvGndWall, wwrcNorth ) = trim( RealToStr( aboveGroundWallAreaN * m2_unitConv, 2 ) );
-			tableBody( wwrrAbvGndWall, wwrcSouth ) = trim( RealToStr( aboveGroundWallAreaS * m2_unitConv, 2 ) );
-			tableBody( wwrrAbvGndWall, wwrcEast ) = trim( RealToStr( aboveGroundWallAreaE * m2_unitConv, 2 ) );
-			tableBody( wwrrAbvGndWall, wwrcWest ) = trim( RealToStr( aboveGroundWallAreaW * m2_unitConv, 2 ) );
-			tableBody( wwrrAbvGndWall, wwrcTotal ) = trim( RealToStr( TotalAboveGroundWallArea * m2_unitConv, 2 ) );
+			tableBody( wwrrAbvGndWall, wwrcNorth ) = RealToStr( aboveGroundWallAreaN * m2_unitConv, 2 );
+			tableBody( wwrrAbvGndWall, wwrcSouth ) = RealToStr( aboveGroundWallAreaS * m2_unitConv, 2 );
+			tableBody( wwrrAbvGndWall, wwrcEast ) = RealToStr( aboveGroundWallAreaE * m2_unitConv, 2 );
+			tableBody( wwrrAbvGndWall, wwrcWest ) = RealToStr( aboveGroundWallAreaW * m2_unitConv, 2 );
+			tableBody( wwrrAbvGndWall, wwrcTotal ) = RealToStr( TotalAboveGroundWallArea * m2_unitConv, 2 );
 
-			tableBody( wwrrWindow, wwrcNorth ) = trim( RealToStr( windowAreaN * m2_unitConv, 2 ) );
-			tableBody( wwrrWindow, wwrcSouth ) = trim( RealToStr( windowAreaS * m2_unitConv, 2 ) );
-			tableBody( wwrrWindow, wwrcEast ) = trim( RealToStr( windowAreaE * m2_unitConv, 2 ) );
-			tableBody( wwrrWindow, wwrcWest ) = trim( RealToStr( windowAreaW * m2_unitConv, 2 ) );
-			tableBody( wwrrWindow, wwrcTotal ) = trim( RealToStr( TotalWindowArea * m2_unitConv, 2 ) );
+			tableBody( wwrrWindow, wwrcNorth ) = RealToStr( windowAreaN * m2_unitConv, 2 );
+			tableBody( wwrrWindow, wwrcSouth ) = RealToStr( windowAreaS * m2_unitConv, 2 );
+			tableBody( wwrrWindow, wwrcEast ) = RealToStr( windowAreaE * m2_unitConv, 2 );
+			tableBody( wwrrWindow, wwrcWest ) = RealToStr( windowAreaW * m2_unitConv, 2 );
+			tableBody( wwrrWindow, wwrcTotal ) = RealToStr( TotalWindowArea * m2_unitConv, 2 );
 
-			tableBody( wwrrWWR, wwrcNorth ) = trim( RealToStr( 100. * SafeDivide( windowAreaN, wallAreaN ), 2 ) );
-			tableBody( wwrrWWR, wwrcSouth ) = trim( RealToStr( 100. * SafeDivide( windowAreaS, wallAreaS ), 2 ) );
-			tableBody( wwrrWWR, wwrcEast ) = trim( RealToStr( 100. * SafeDivide( windowAreaE, wallAreaE ), 2 ) );
-			tableBody( wwrrWWR, wwrcWest ) = trim( RealToStr( 100. * SafeDivide( windowAreaW, wallAreaW ), 2 ) );
-			tableBody( wwrrWWR, wwrcTotal ) = trim( RealToStr( 100. * SafeDivide( TotalWindowArea, TotalWallArea ), 2 ) );
+			tableBody( wwrrWWR, wwrcNorth ) = RealToStr( 100.0 * SafeDivide( windowAreaN, wallAreaN ), 2 );
+			tableBody( wwrrWWR, wwrcSouth ) = RealToStr( 100.0 * SafeDivide( windowAreaS, wallAreaS ), 2 );
+			tableBody( wwrrWWR, wwrcEast ) = RealToStr( 100.0 * SafeDivide( windowAreaE, wallAreaE ), 2 );
+			tableBody( wwrrWWR, wwrcWest ) = RealToStr( 100.0 * SafeDivide( windowAreaW, wallAreaW ), 2 );
+			tableBody( wwrrWWR, wwrcTotal ) = RealToStr( 100.0 * SafeDivide( TotalWindowArea, TotalWallArea ), 2 );
 
-			tableBody( wwrrAbvGndWWR, wwrcNorth ) = trim( RealToStr( 100. * SafeDivide( windowAreaN, aboveGroundWallAreaN ), 2 ) );
-			tableBody( wwrrAbvGndWWR, wwrcSouth ) = trim( RealToStr( 100. * SafeDivide( windowAreaS, aboveGroundWallAreaS ), 2 ) );
-			tableBody( wwrrAbvGndWWR, wwrcEast ) = trim( RealToStr( 100. * SafeDivide( windowAreaE, aboveGroundWallAreaE ), 2 ) );
-			tableBody( wwrrAbvGndWWR, wwrcWest ) = trim( RealToStr( 100. * SafeDivide( windowAreaW, aboveGroundWallAreaW ), 2 ) );
-			tableBody( wwrrAbvGndWWR, wwrcTotal ) = trim( RealToStr( 100. * SafeDivide( TotalWindowArea, TotalAboveGroundWallArea ), 2 ) );
+			tableBody( wwrrAbvGndWWR, wwrcNorth ) = RealToStr( 100.0 * SafeDivide( windowAreaN, aboveGroundWallAreaN ), 2 );
+			tableBody( wwrrAbvGndWWR, wwrcSouth ) = RealToStr( 100.0 * SafeDivide( windowAreaS, aboveGroundWallAreaS ), 2 );
+			tableBody( wwrrAbvGndWWR, wwrcEast ) = RealToStr( 100.0 * SafeDivide( windowAreaE, aboveGroundWallAreaE ), 2 );
+			tableBody( wwrrAbvGndWWR, wwrcWest ) = RealToStr( 100.0 * SafeDivide( windowAreaW, aboveGroundWallAreaW ), 2 );
+			tableBody( wwrrAbvGndWWR, wwrcTotal ) = RealToStr( 100.0 * SafeDivide( TotalWindowArea, TotalAboveGroundWallArea ), 2 );
 
 			WriteSubtitle( "Window-Wall Ratio" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
@@ -9440,9 +9439,9 @@ namespace OutputReportTabular {
 			columnHead( wwrcSouth ) = "South (135 to 225 deg)";
 			columnHead( wwrcWest ) = "West (225 to 315 deg)";
 
-			rowHead( wwrrWall ) = "Gross Wall Area " + trim( m2_unitName );
-			rowHead( wwrrAbvGndWall ) = "Above Ground Wall Area " + trim( m2_unitName );
-			rowHead( wwrrWindow ) = "Window Opening Area " + trim( m2_unitName );
+			rowHead( wwrrWall ) = "Gross Wall Area " + m2_unitName;
+			rowHead( wwrrAbvGndWall ) = "Above Ground Wall Area " + m2_unitName;
+			rowHead( wwrrWindow ) = "Window Opening Area " + m2_unitName;
 			rowHead( wwrrWWR ) = "Gross Window-Wall Ratio [%]";
 			rowHead( wwrrAbvGndWWR ) = "Above Ground Window-Wall Ratio [%]";
 
@@ -9454,35 +9453,35 @@ namespace OutputReportTabular {
 
 			tableBody = "";
 
-			tableBody( wwrrWall, wwrcNorth ) = trim( RealToStr( wallAreaNcond * m2_unitConv, 2 ) );
-			tableBody( wwrrWall, wwrcSouth ) = trim( RealToStr( wallAreaScond * m2_unitConv, 2 ) );
-			tableBody( wwrrWall, wwrcEast ) = trim( RealToStr( wallAreaEcond * m2_unitConv, 2 ) );
-			tableBody( wwrrWall, wwrcWest ) = trim( RealToStr( wallAreaWcond * m2_unitConv, 2 ) );
-			tableBody( wwrrWall, wwrcTotal ) = trim( RealToStr( TotalWallArea * m2_unitConv, 2 ) );
+			tableBody( wwrrWall, wwrcNorth ) = RealToStr( wallAreaNcond * m2_unitConv, 2 );
+			tableBody( wwrrWall, wwrcSouth ) = RealToStr( wallAreaScond * m2_unitConv, 2 );
+			tableBody( wwrrWall, wwrcEast ) = RealToStr( wallAreaEcond * m2_unitConv, 2 );
+			tableBody( wwrrWall, wwrcWest ) = RealToStr( wallAreaWcond * m2_unitConv, 2 );
+			tableBody( wwrrWall, wwrcTotal ) = RealToStr( TotalWallArea * m2_unitConv, 2 );
 
-			tableBody( wwrrAbvGndWall, wwrcNorth ) = trim( RealToStr( aboveGroundWallAreaNcond * m2_unitConv, 2 ) );
-			tableBody( wwrrAbvGndWall, wwrcSouth ) = trim( RealToStr( aboveGroundWallAreaScond * m2_unitConv, 2 ) );
-			tableBody( wwrrAbvGndWall, wwrcEast ) = trim( RealToStr( aboveGroundWallAreaEcond * m2_unitConv, 2 ) );
-			tableBody( wwrrAbvGndWall, wwrcWest ) = trim( RealToStr( aboveGroundWallAreaWcond * m2_unitConv, 2 ) );
-			tableBody( wwrrAbvGndWall, wwrcTotal ) = trim( RealToStr( TotalAboveGroundWallArea * m2_unitConv, 2 ) );
+			tableBody( wwrrAbvGndWall, wwrcNorth ) = RealToStr( aboveGroundWallAreaNcond * m2_unitConv, 2 );
+			tableBody( wwrrAbvGndWall, wwrcSouth ) = RealToStr( aboveGroundWallAreaScond * m2_unitConv, 2 );
+			tableBody( wwrrAbvGndWall, wwrcEast ) = RealToStr( aboveGroundWallAreaEcond * m2_unitConv, 2 );
+			tableBody( wwrrAbvGndWall, wwrcWest ) = RealToStr( aboveGroundWallAreaWcond * m2_unitConv, 2 );
+			tableBody( wwrrAbvGndWall, wwrcTotal ) = RealToStr( TotalAboveGroundWallArea * m2_unitConv, 2 );
 
-			tableBody( wwrrWindow, wwrcNorth ) = trim( RealToStr( windowAreaNcond * m2_unitConv, 2 ) );
-			tableBody( wwrrWindow, wwrcSouth ) = trim( RealToStr( windowAreaScond * m2_unitConv, 2 ) );
-			tableBody( wwrrWindow, wwrcEast ) = trim( RealToStr( windowAreaEcond * m2_unitConv, 2 ) );
-			tableBody( wwrrWindow, wwrcWest ) = trim( RealToStr( windowAreaWcond * m2_unitConv, 2 ) );
-			tableBody( wwrrWindow, wwrcTotal ) = trim( RealToStr( TotalWindowArea * m2_unitConv, 2 ) );
+			tableBody( wwrrWindow, wwrcNorth ) = RealToStr( windowAreaNcond * m2_unitConv, 2 );
+			tableBody( wwrrWindow, wwrcSouth ) = RealToStr( windowAreaScond * m2_unitConv, 2 );
+			tableBody( wwrrWindow, wwrcEast ) = RealToStr( windowAreaEcond * m2_unitConv, 2 );
+			tableBody( wwrrWindow, wwrcWest ) = RealToStr( windowAreaWcond * m2_unitConv, 2 );
+			tableBody( wwrrWindow, wwrcTotal ) = RealToStr( TotalWindowArea * m2_unitConv, 2 );
 
-			tableBody( wwrrWWR, wwrcNorth ) = trim( RealToStr( 100. * SafeDivide( windowAreaNcond, wallAreaNcond ), 2 ) );
-			tableBody( wwrrWWR, wwrcSouth ) = trim( RealToStr( 100. * SafeDivide( windowAreaScond, wallAreaScond ), 2 ) );
-			tableBody( wwrrWWR, wwrcEast ) = trim( RealToStr( 100. * SafeDivide( windowAreaEcond, wallAreaEcond ), 2 ) );
-			tableBody( wwrrWWR, wwrcWest ) = trim( RealToStr( 100. * SafeDivide( windowAreaWcond, wallAreaWcond ), 2 ) );
-			tableBody( wwrrWWR, wwrcTotal ) = trim( RealToStr( 100. * SafeDivide( TotalWindowArea, TotalWallArea ), 2 ) );
+			tableBody( wwrrWWR, wwrcNorth ) = RealToStr( 100.0 * SafeDivide( windowAreaNcond, wallAreaNcond ), 2 );
+			tableBody( wwrrWWR, wwrcSouth ) = RealToStr( 100.0 * SafeDivide( windowAreaScond, wallAreaScond ), 2 );
+			tableBody( wwrrWWR, wwrcEast ) = RealToStr( 100.0 * SafeDivide( windowAreaEcond, wallAreaEcond ), 2 );
+			tableBody( wwrrWWR, wwrcWest ) = RealToStr( 100.0 * SafeDivide( windowAreaWcond, wallAreaWcond ), 2 );
+			tableBody( wwrrWWR, wwrcTotal ) = RealToStr( 100.0 * SafeDivide( TotalWindowArea, TotalWallArea ), 2 );
 
-			tableBody( wwrrAbvGndWWR, wwrcNorth ) = trim( RealToStr( 100. * SafeDivide( windowAreaNcond, aboveGroundWallAreaNcond ), 2 ) );
-			tableBody( wwrrAbvGndWWR, wwrcSouth ) = trim( RealToStr( 100. * SafeDivide( windowAreaScond, aboveGroundWallAreaScond ), 2 ) );
-			tableBody( wwrrAbvGndWWR, wwrcEast ) = trim( RealToStr( 100. * SafeDivide( windowAreaEcond, aboveGroundWallAreaEcond ), 2 ) );
-			tableBody( wwrrAbvGndWWR, wwrcWest ) = trim( RealToStr( 100. * SafeDivide( windowAreaWcond, aboveGroundWallAreaWcond ), 2 ) );
-			tableBody( wwrrAbvGndWWR, wwrcTotal ) = trim( RealToStr( 100. * SafeDivide( TotalWindowArea, TotalAboveGroundWallArea ), 2 ) );
+			tableBody( wwrrAbvGndWWR, wwrcNorth ) = RealToStr( 100.0 * SafeDivide( windowAreaNcond, aboveGroundWallAreaNcond ), 2 );
+			tableBody( wwrrAbvGndWWR, wwrcSouth ) = RealToStr( 100.0 * SafeDivide( windowAreaScond, aboveGroundWallAreaScond ), 2 );
+			tableBody( wwrrAbvGndWWR, wwrcEast ) = RealToStr( 100.0 * SafeDivide( windowAreaEcond, aboveGroundWallAreaEcond ), 2 );
+			tableBody( wwrrAbvGndWWR, wwrcWest ) = RealToStr( 100.0 * SafeDivide( windowAreaWcond, aboveGroundWallAreaWcond ), 2 );
+			tableBody( wwrrAbvGndWWR, wwrcTotal ) = RealToStr( 100.0 * SafeDivide( TotalWindowArea, TotalAboveGroundWallArea ), 2 );
 
 			WriteSubtitle( "Conditioned Window-Wall Ratio" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
@@ -9502,19 +9501,19 @@ namespace OutputReportTabular {
 
 			columnHead( 1 ) = "Total";
 
-			rowHead( 1 ) = "Gross Roof Area " + trim( m2_unitName );
-			rowHead( 2 ) = "Skylight Area " + trim( m2_unitName );
+			rowHead( 1 ) = "Gross Roof Area " + m2_unitName;
+			rowHead( 2 ) = "Skylight Area " + m2_unitName;
 			rowHead( 3 ) = "Skylight-Roof Ratio [%]";
 
 			if ( DetailedWWR ) {
 				gio::write( OutputFileDebug, "(A)" ) << "========================";
 				gio::write( OutputFileDebug, "(A)" ) << "TotalRoofArea,SkylightArea";
-				gio::write( OutputFileDebug, "(A)" ) << trim( RoundSigDigits( roofArea, 2 ) ) + "," + trim( RoundSigDigits( skylightArea, 2 ) );
+				gio::write( OutputFileDebug, "(A)" ) << RoundSigDigits( roofArea, 2 ) + ',' + RoundSigDigits( skylightArea, 2 );
 			}
 
-			tableBody( 1, 1 ) = trim( RealToStr( roofArea * m2_unitConv, 2 ) );
-			tableBody( 2, 1 ) = trim( RealToStr( skylightArea * m2_unitConv, 2 ) );
-			tableBody( 3, 1 ) = trim( RealToStr( 100. * SafeDivide( skylightArea, roofArea ), 2 ) );
+			tableBody( 1, 1 ) = RealToStr( roofArea * m2_unitConv, 2 );
+			tableBody( 2, 1 ) = RealToStr( skylightArea * m2_unitConv, 2 );
+			tableBody( 3, 1 ) = RealToStr( 100.0 * SafeDivide( skylightArea, roofArea ), 2 );
 
 			WriteSubtitle( "Skylight-Roof Ratio" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
@@ -9529,15 +9528,15 @@ namespace OutputReportTabular {
 				pdiff = std::abs( ( wallAreaN + wallAreaS + wallAreaE + wallAreaW ) - ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) + sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) ) ) / ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) + sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) );
 				if ( pdiff > .019 ) {
 					ShowWarningError( "WriteVeriSumTable: InputVerificationsAndResultsSummary: " "Wall area based on [>=60,<=120] degrees (tilt) as walls " );
-					ShowContinueError( "differs ~" + trim( RoundSigDigits( pdiff * 100., 1 ) ) + "% from user entered Wall class surfaces. " "Degree calculation based on ASHRAE 90.1 wall definitions." );
+					ShowContinueError( "differs ~" + RoundSigDigits( pdiff * 100., 1 ) + "% from user entered Wall class surfaces. " "Degree calculation based on ASHRAE 90.1 wall definitions." );
 					//      CALL ShowContinueError('Calculated based on degrees=['//  &
 					//         TRIM(ADJUSTL(RealToStr((wallAreaN + wallAreaS + wallAreaE + wallAreaW),3)))//  &
 					//         '] m2, Calculated from user entered Wall class surfaces=['//  &
 					//         TRIM(ADJUSTL(RealToStr(SUM(Zone(1:NumOfZones)%ExtGrossWallArea_Multiplied),3)))//' m2.')
 					ShowContinueError( "Check classes of surfaces and tilts for discrepancies." );
-					ShowContinueError( "Total wall area by ASHRAE 90.1 definition=" + trim( adjustl( RealToStr( ( wallAreaN + wallAreaS + wallAreaE + wallAreaW ), 3 ) ) ) + " m2." );
-					ShowContinueError( "Total exterior wall area from user entered classes=" + trim( adjustl( RealToStr( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ), 3 ) ) ) + " m2." );
-					ShowContinueError( "Total ground contact wall area from user entered classes=" + trim( adjustl( RealToStr( sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ), 3 ) ) ) + " m2." );
+					ShowContinueError( "Total wall area by ASHRAE 90.1 definition=" + stripped( RealToStr( ( wallAreaN + wallAreaS + wallAreaE + wallAreaW ), 3 ) ) + " m2." );
+					ShowContinueError( "Total exterior wall area from user entered classes=" + stripped( RealToStr( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ), 3 ) ) + " m2." );
+					ShowContinueError( "Total ground contact wall area from user entered classes=" + stripped( RealToStr( sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ), 3 ) ) + " m2." );
 				}
 			}
 			//---- Space Summary Sub-Table
@@ -9549,16 +9548,16 @@ namespace OutputReportTabular {
 			columnWidth = 14; //array assignment - same for all columns
 			tableBody.allocate( NumOfZones + 4, 10 );
 
-			columnHead( 1 ) = "Area " + trim( m2_unitName );
+			columnHead( 1 ) = "Area " + m2_unitName;
 			columnHead( 2 ) = "Conditioned (Y/N)";
 			columnHead( 3 ) = "Part of Total Floor Area (Y/N)";
-			columnHead( 4 ) = "Volume " + trim( m3_unitName );
+			columnHead( 4 ) = "Volume " + m3_unitName;
 			columnHead( 5 ) = "Multipliers";
-			columnHead( 6 ) = "Gross Wall Area " + trim( m2_unitName );
-			columnHead( 7 ) = "Window Glass Area " + trim( m2_unitName );
-			columnHead( 8 ) = "Lighting " + trim( Wm2_unitName );
-			columnHead( 9 ) = "People " + trim( m2_unitName( 1, len_trim( m2_unitName ) - 1 ) ) + " per person" + m2_unitName( len_trim( m2_unitName ), len_trim( m2_unitName ) );
-			columnHead( 10 ) = "Plug and Process " + trim( Wm2_unitName );
+			columnHead( 6 ) = "Gross Wall Area " + m2_unitName;
+			columnHead( 7 ) = "Window Glass Area " + m2_unitName;
+			columnHead( 8 ) = "Lighting " + Wm2_unitName;
+			columnHead( 9 ) = "People " + m2_unitName.substr( 0, len( m2_unitName ) - 1 ) + " per person" + m2_unitName[ len( m2_unitName ) - 1 ];
+			columnHead( 10 ) = "Plug and Process " + Wm2_unitName;
 
 			rowHead = "";
 
@@ -9571,7 +9570,7 @@ namespace OutputReportTabular {
 
 			for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
 				mult = Zone( iZone ).Multiplier * Zone( iZone ).ListMultiplier;
-				rowHead( iZone ) = trim( Zone( iZone ).Name );
+				rowHead( iZone ) = Zone( iZone ).Name;
 				if ( Zone( iZone ).SystemZoneNodeNumber > 0 ) {
 					tableBody( iZone, 2 ) = "Yes";
 					zoneIsCond = true;
@@ -9586,8 +9585,8 @@ namespace OutputReportTabular {
 					tableBody( iZone, 3 ) = "No";
 					usezoneFloorArea = false;
 				}
-				tableBody( iZone, 1 ) = trim( RealToStr( Zone( iZone ).FloorArea * m2_unitConv, 2 ) );
-				tableBody( iZone, 4 ) = trim( RealToStr( Zone( iZone ).Volume * m3_unitConv, 2 ) );
+				tableBody( iZone, 1 ) = RealToStr( Zone( iZone ).FloorArea * m2_unitConv, 2 );
+				tableBody( iZone, 4 ) = RealToStr( Zone( iZone ).Volume * m3_unitConv, 2 );
 				//no unit conversion necessary since done automatically
 				PreDefTableEntry( pdchLeedSutSpArea, Zone( iZone ).Name, Zone( iZone ).FloorArea, 2 );
 				if ( zoneIsCond ) {
@@ -9597,9 +9596,9 @@ namespace OutputReportTabular {
 					PreDefTableEntry( pdchLeedSutOcArea, Zone( iZone ).Name, "0.00" );
 					PreDefTableEntry( pdchLeedSutUnArea, Zone( iZone ).Name, Zone( iZone ).FloorArea, 2 );
 				}
-				tableBody( iZone, 5 ) = trim( RealToStr( mult, 2 ) );
-				tableBody( iZone, 6 ) = trim( RealToStr( Zone( iZone ).ExtGrossWallArea * m2_unitConv, 2 ) );
-				tableBody( iZone, 7 ) = trim( RealToStr( Zone( iZone ).ExtWindowArea * m2_unitConv, 2 ) );
+				tableBody( iZone, 5 ) = RealToStr( mult, 2 );
+				tableBody( iZone, 6 ) = RealToStr( Zone( iZone ).ExtGrossWallArea * m2_unitConv, 2 );
+				tableBody( iZone, 7 ) = RealToStr( Zone( iZone ).ExtWindowArea * m2_unitConv, 2 );
 				// lighting density
 				totLightPower = 0.0;
 				for ( iLight = 1; iLight <= TotLights; ++iLight ) {
@@ -9608,7 +9607,7 @@ namespace OutputReportTabular {
 					}
 				}
 				if ( Zone( iZone ).FloorArea > 0 && usezoneFloorArea ) {
-					tableBody( iZone, 8 ) = trim( RealToStr( Wm2_unitConv * totLightPower / Zone( iZone ).FloorArea, 4 ) );
+					tableBody( iZone, 8 ) = RealToStr( Wm2_unitConv * totLightPower / Zone( iZone ).FloorArea, 4 );
 				}
 				// people density
 				totNumPeople = 0.0;
@@ -9618,7 +9617,7 @@ namespace OutputReportTabular {
 					}
 				}
 				if ( totNumPeople > 0 ) {
-					tableBody( iZone, 9 ) = trim( RealToStr( Zone( iZone ).FloorArea * m2_unitConv / totNumPeople, 2 ) );
+					tableBody( iZone, 9 ) = RealToStr( Zone( iZone ).FloorArea * m2_unitConv / totNumPeople, 2 );
 				}
 				// plug and process density
 				totPlugProcess = 0.0;
@@ -9643,7 +9642,7 @@ namespace OutputReportTabular {
 					}
 				}
 				if ( Zone( iZone ).FloorArea > 0 && usezoneFloorArea ) {
-					tableBody( iZone, 10 ) = trim( RealToStr( totPlugProcess * Wm2_unitConv / Zone( iZone ).FloorArea, 4 ) );
+					tableBody( iZone, 10 ) = RealToStr( totPlugProcess * Wm2_unitConv / Zone( iZone ).FloorArea, 4 );
 				}
 				//total rows for conditioned, unconditioned, and total
 				if ( usezoneFloorArea ) {
@@ -9690,16 +9689,16 @@ namespace OutputReportTabular {
 				}
 			}
 			for ( iTotal = 1; iTotal <= 4; ++iTotal ) {
-				tableBody( NumOfZones + iTotal, 1 ) = trim( RealToStr( zstArea( iTotal ) * m2_unitConv, 2 ) );
-				tableBody( NumOfZones + iTotal, 4 ) = trim( RealToStr( zstVolume( iTotal ) * m3_unitConv, 2 ) );
-				tableBody( NumOfZones + iTotal, 6 ) = trim( RealToStr( zstWallArea( iTotal ) * m2_unitConv, 2 ) );
-				tableBody( NumOfZones + iTotal, 7 ) = trim( RealToStr( zstWindowArea( iTotal ) * m2_unitConv, 2 ) );
+				tableBody( NumOfZones + iTotal, 1 ) = RealToStr( zstArea( iTotal ) * m2_unitConv, 2 );
+				tableBody( NumOfZones + iTotal, 4 ) = RealToStr( zstVolume( iTotal ) * m3_unitConv, 2 );
+				tableBody( NumOfZones + iTotal, 6 ) = RealToStr( zstWallArea( iTotal ) * m2_unitConv, 2 );
+				tableBody( NumOfZones + iTotal, 7 ) = RealToStr( zstWindowArea( iTotal ) * m2_unitConv, 2 );
 				if ( zstArea( iTotal ) != 0 ) {
-					tableBody( NumOfZones + iTotal, 8 ) = trim( RealToStr( zstLight( iTotal ) * Wm2_unitConv / zstArea( iTotal ), 4 ) );
-					tableBody( NumOfZones + iTotal, 10 ) = trim( RealToStr( zstPlug( iTotal ) * Wm2_unitConv / zstArea( iTotal ), 4 ) );
+					tableBody( NumOfZones + iTotal, 8 ) = RealToStr( zstLight( iTotal ) * Wm2_unitConv / zstArea( iTotal ), 4 );
+					tableBody( NumOfZones + iTotal, 10 ) = RealToStr( zstPlug( iTotal ) * Wm2_unitConv / zstArea( iTotal ), 4 );
 				}
 				if ( zstPeople( iTotal ) != 0 ) {
-					tableBody( NumOfZones + iTotal, 9 ) = trim( RealToStr( zstArea( iTotal ) * m2_unitConv / zstPeople( iTotal ), 2 ) );
+					tableBody( NumOfZones + iTotal, 9 ) = RealToStr( zstArea( iTotal ) * m2_unitConv / zstPeople( iTotal ), 2 );
 				}
 			}
 			PreDefTableEntry( pdchLeedSutSpArea, "Totals", zstArea( grandTotal ), 2 );
@@ -9756,10 +9755,10 @@ namespace OutputReportTabular {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		FArray1D_Fstring columnHead( 5, sFstring( MaxNameLength ) );
+		FArray1D_string columnHead( 5 );
 		FArray1D_int columnWidth;
-		FArray1D_Fstring rowHead( sFstring( MaxNameLength ) );
-		FArray2D_Fstring tableBody( sFstring( MaxNameLength ) );
+		FArray1D_string rowHead;
+		FArray2D_string tableBody;
 		static int numPeopleAdaptive( 0 );
 		int i;
 		FArray1D_int peopleInd; // Index the relevant people
@@ -9794,13 +9793,13 @@ namespace OutputReportTabular {
 			for ( i = 1; i <= numPeopleAdaptive; ++i ) {
 				rowHead( i ) = People( i ).Name;
 				if ( People( i ).AdaptiveASH55 ) {
-					tableBody( i, 1 ) = trim( RealToStr( People( peopleInd( i ) ).TimeNotMetASH5590, 2 ) );
-					tableBody( i, 2 ) = trim( RealToStr( People( peopleInd( i ) ).TimeNotMetASH5580, 2 ) );
+					tableBody( i, 1 ) = RealToStr( People( peopleInd( i ) ).TimeNotMetASH5590, 2 );
+					tableBody( i, 2 ) = RealToStr( People( peopleInd( i ) ).TimeNotMetASH5580, 2 );
 				}
 				if ( People( i ).AdaptiveCEN15251 ) {
-					tableBody( i, 3 ) = trim( RealToStr( People( peopleInd( i ) ).TimeNotMetCEN15251CatI, 2 ) );
-					tableBody( i, 4 ) = trim( RealToStr( People( peopleInd( i ) ).TimeNotMetCEN15251CatII, 2 ) );
-					tableBody( i, 5 ) = trim( RealToStr( People( peopleInd( i ) ).TimeNotMetCEN15251CatIII, 2 ) );
+					tableBody( i, 3 ) = RealToStr( People( peopleInd( i ) ).TimeNotMetCEN15251CatI, 2 );
+					tableBody( i, 4 ) = RealToStr( People( peopleInd( i ) ).TimeNotMetCEN15251CatII, 2 );
+					tableBody( i, 5 ) = RealToStr( People( peopleInd( i ) ).TimeNotMetCEN15251CatIII, 2 );
 				}
 			}
 
@@ -9854,19 +9853,19 @@ namespace OutputReportTabular {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// all arrays are in the format: (row, column)
-		FArray1D_Fstring columnHead( sFstring( MaxNameLength ) );
+		FArray1D_string columnHead;
 		FArray1D_int columnWidth;
-		FArray1D_Fstring rowHead( sFstring( MaxNameLength ) );
-		FArray2D_Fstring tableBody( sFstring( MaxNameLength ) );
+		FArray1D_string rowHead;
+		FArray2D_string tableBody;
 		FArray1D_int rowToUnqObjName;
 		FArray1D_int colHeadToColTag;
 		int curNumColumns;
 		int curNumRows;
 		int curColumn;
-		FArray1D_Fstring uniqueObjectName( sFstring( MaxNameLength ) );
+		FArray1D_string uniqueObjectName;
 		FArray1D_bool useUniqueObjectName;
 		int numUnqObjName;
-		Fstring curObjectName( MaxNameLength );
+		std::string curObjectName;
 		int countRow;
 		int countColumn;
 		int found;
@@ -9880,12 +9879,12 @@ namespace OutputReportTabular {
 		int mUnqObjNames;
 		int nColHead;
 		int oRowHead;
-		Fstring colTagWithSI( MaxNameLength );
-		Fstring curColTag( MaxNameLength );
+		std::string colTagWithSI;
+		std::string curColTag;
 		FArray1D_int colUnitConv;
 		int indexUnitConv;
 		int columnUnitConv;
-		Fstring repTableTag( MaxNameLength );
+		std::string repTableTag;
 		Real64 IPvalue;
 
 		// loop through the entries and associate them with the subtable and create
@@ -10021,7 +10020,7 @@ namespace OutputReportTabular {
 									}
 									if ( tableEntry( lTableEntry ).origEntryIsReal && ( columnUnitConv != 0 ) ) {
 										IPvalue = ConvertIP( columnUnitConv, tableEntry( lTableEntry ).origRealEntry );
-										tableBody( rowCurrent, colCurrent ) = trim( RealToStr( IPvalue, tableEntry( lTableEntry ).significantDigits ) );
+										tableBody( rowCurrent, colCurrent ) = RealToStr( IPvalue, tableEntry( lTableEntry ).significantDigits );
 									} else {
 										tableBody( rowCurrent, colCurrent ) = tableEntry( lTableEntry ).charEntry;
 									}
@@ -10094,25 +10093,25 @@ namespace OutputReportTabular {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// all arrays are in the format: (row, column)
-		FArray1D_Fstring columnHead( sFstring( MaxNameLength ) );
+		FArray1D_string columnHead;
 		FArray1D_int columnWidth;
 		FArray1D_int colUnitConv;
-		FArray1D_Fstring rowHead( sFstring( MaxNameLength ) );
-		FArray2D_Fstring tableBody( sFstring( MaxNameLength ) );
-		FArray1D_Fstring uniqueDesc( sFstring( MaxNameLength ) );
+		FArray1D_string rowHead;
+		FArray2D_string tableBody;
+		FArray1D_string uniqueDesc;
 		int numUniqueDesc;
-		FArray1D_Fstring uniqueObj( sFstring( MaxNameLength ) );
+		FArray1D_string uniqueObj;
 		int numUniqueObj;
-		Fstring curDesc( MaxNameLength );
-		Fstring curObj( MaxNameLength );
+		std::string curDesc;
+		std::string curObj;
 		int foundEntry;
 		int foundDesc;
 		int foundObj;
 		int loopLimit;
 		int iTableEntry;
 		int jUnique;
-		static Fstring curColHeadWithSI( MaxNameLength );
-		static Fstring curColHead( MaxNameLength );
+		static std::string curColHeadWithSI;
+		static std::string curColHead;
 		static int indexUnitConv( 0 );
 		static Real64 curValueSI( 0.0 );
 		static Real64 curValue( 0.0 );
@@ -10203,7 +10202,7 @@ namespace OutputReportTabular {
 				colUnitConv.allocate( numUniqueDesc );
 				tableBody.allocate( numUniqueObj, numUniqueDesc );
 				// initialize table body to blanks (in case entries are incomplete)
-				tableBody = " ";
+				tableBody = "";
 				//transfer the row and column headings first
 				for ( jUnique = 1; jUnique <= numUniqueDesc; ++jUnique ) {
 					//do the unit conversions
@@ -10252,9 +10251,9 @@ namespace OutputReportTabular {
 								curValue = curValueSI;
 							}
 							if ( std::abs( curValue ) >= 1.0 ) {
-								tableBody( foundObj, foundDesc ) = trim( RealToStr( curValue, 2 ) );
+								tableBody( foundObj, foundDesc ) = RealToStr( curValue, 2 );
 							} else {
-								tableBody( foundObj, foundDesc ) = trim( RealToStr( curValue, 6 ) );
+								tableBody( foundObj, foundDesc ) = RealToStr( curValue, 6 );
 							}
 							CompSizeTableEntry( iTableEntry ).written = true;
 						}
@@ -10319,16 +10318,16 @@ namespace OutputReportTabular {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// all arrays are in the format: (row, column)
-		FArray1D_Fstring columnHead( sFstring( MaxNameLength ) );
+		FArray1D_string columnHead;
 		FArray1D_int columnWidth;
-		FArray1D_Fstring rowHead( sFstring( MaxNameLength ) );
-		FArray2D_Fstring tableBody( sFstring( 2000 ) );
+		FArray1D_string rowHead;
+		FArray2D_string tableBody;
 		//CHARACTER(len=MaxNameLength),ALLOCATABLE, DIMENSION(:)     :: unique
 		FArray1D_int unique;
 		int numUnique;
 		//CHARACTER(len=MaxNameLength)                               :: curRecSurf
 		int curRecSurf;
-		Fstring listOfSurf( 2000 );
+		std::string listOfSurf;
 		int found;
 		int iShadRel;
 		int jUnique;
@@ -10402,7 +10401,7 @@ namespace OutputReportTabular {
 					for ( iShadRel = 1; iShadRel <= numShadowRelate; ++iShadRel ) {
 						if ( ShadowRelate( iShadRel ).recKind == iKindRec ) {
 							if ( curRecSurf == ShadowRelate( iShadRel ).recSurf ) {
-								listOfSurf = trim( listOfSurf ) + trim( Surface( ShadowRelate( iShadRel ).castSurf ).Name ) + " | "; //'<br>'
+								listOfSurf += Surface( ShadowRelate( iShadRel ).castSurf ).Name + " | "; //'<br>'
 							}
 						}
 					}
@@ -10411,11 +10410,11 @@ namespace OutputReportTabular {
 				//write the table
 				{ auto const SELECT_CASE_var( iKindRec );
 				if ( SELECT_CASE_var == recKindSurface ) {
-					WriteSubtitle( "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces " );
-					CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SurfaceShadowingSummary", "Entire Facility", "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces " );
+					WriteSubtitle( "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces" );
+					CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SurfaceShadowingSummary", "Entire Facility", "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces" );
 				} else if ( SELECT_CASE_var == recKindSubsurface ) {
-					WriteSubtitle( "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces " );
-					CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SurfaceShadowingSummary", "Entire Facility", "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces " );
+					WriteSubtitle( "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces" );
+					CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SurfaceShadowingSummary", "Entire Facility", "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces" );
 				}}
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
 				//deallocate these arrays since they are used to create the next
@@ -11241,15 +11240,15 @@ namespace OutputReportTabular {
 		Real64 totalGrandTotal;
 		Real64 powerConversion;
 		int tempConvIndx; // temperature conversion index
-		Fstring stringWithTemp( MaxNameLength );
+		std::string stringWithTemp;
 		int curExtBoundCond;
 		Real64 mult; // zone multiplier
 
 		// all arrays are in the format: (row, column)
-		FArray1D_Fstring columnHead( sFstring( MaxNameLength ) );
+		FArray1D_string columnHead;
 		FArray1D_int columnWidth;
-		FArray1D_Fstring rowHead( sFstring( MaxNameLength ) );
-		FArray2D_Fstring tableBody( sFstring( MaxNameLength ) );
+		FArray1D_string rowHead;
+		FArray2D_string tableBody;
 
 		if ( displayZoneComponentLoadSummary && CompLoadReportIsReq ) {
 			ComputeDelayedComponents();
@@ -11282,7 +11281,7 @@ namespace OutputReportTabular {
 				if ( mult == 0.0 ) mult = 1.0;
 
 				//---- Cooling Peak Load Components Sub-Table
-				WriteReportHeaders( "Zone Component Load Summary", trim( Zone( iZone ).Name ), isAverage );
+				WriteReportHeaders( "Zone Component Load Summary", Zone( iZone ).Name, isAverage );
 
 				rowHead.allocate( rGrdTot );
 				columnHead.allocate( cPerc );
@@ -11349,161 +11348,161 @@ namespace OutputReportTabular {
 					//PEOPLE
 					seqData = peopleInstantSeq( iZone, _, CoolDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rPeople, cSensInst ) = trim( RealToStr( AvgData( timeCoolMax ), 2 ) );
+					tableBody( rPeople, cSensInst ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rPeople ) += AvgData( timeCoolMax );
 					grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
 
 					seqData = peopleLatentSeq( iZone, _, CoolDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rPeople, cLatent ) = trim( RealToStr( AvgData( timeCoolMax ), 2 ) );
+					tableBody( rPeople, cLatent ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rPeople ) += AvgData( timeCoolMax );
 					grandTotalRow( cLatent ) += AvgData( timeCoolMax );
 
 					seqData = peopleDelaySeq( iZone, _, CoolDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rPeople, cSensDelay ) = trim( RealToStr( AvgData( timeCoolMax ), 2 ) );
+					tableBody( rPeople, cSensDelay ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rPeople ) += AvgData( timeCoolMax );
 					grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
 
 					//LIGHTS
 					seqData = lightInstantSeq( iZone, _, CoolDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rLights, cSensInst ) = trim( RealToStr( AvgData( timeCoolMax ), 2 ) );
+					tableBody( rLights, cSensInst ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rLights ) += AvgData( timeCoolMax );
 					grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
 
 					seqData = lightRetAirSeq( iZone, _, CoolDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rLights, cSensRA ) = trim( RealToStr( AvgData( timeCoolMax ), 2 ) );
+					tableBody( rLights, cSensRA ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rLights ) += AvgData( timeCoolMax );
 					grandTotalRow( cSensRA ) += AvgData( timeCoolMax );
 
 					seqData = lightDelaySeq( iZone, _, CoolDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rLights, cSensDelay ) = trim( RealToStr( AvgData( timeCoolMax ), 2 ) );
+					tableBody( rLights, cSensDelay ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rLights ) += AvgData( timeCoolMax );
 					grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
 
 					//EQUIPMENT
 					seqData = equipInstantSeq( iZone, _, CoolDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rEquip, cSensInst ) = trim( RealToStr( AvgData( timeCoolMax ), 2 ) );
+					tableBody( rEquip, cSensInst ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rEquip ) += AvgData( timeCoolMax );
 					grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
 
 					seqData = equipLatentSeq( iZone, _, CoolDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rEquip, cLatent ) = trim( RealToStr( AvgData( timeCoolMax ), 2 ) );
+					tableBody( rEquip, cLatent ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rEquip ) += AvgData( timeCoolMax );
 					grandTotalRow( cLatent ) += AvgData( timeCoolMax );
 
 					seqData = equipDelaySeq( iZone, _, CoolDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rEquip, cSensDelay ) = trim( RealToStr( AvgData( timeCoolMax ), 2 ) );
+					tableBody( rEquip, cSensDelay ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rEquip ) += AvgData( timeCoolMax );
 					grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
 
 					//REFRIGERATION EQUIPMENT
 					seqData = refrigInstantSeq( iZone, _, CoolDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rRefrig, cSensInst ) = trim( RealToStr( AvgData( timeCoolMax ), 2 ) );
+					tableBody( rRefrig, cSensInst ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rRefrig ) += AvgData( timeCoolMax );
 					grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
 
 					seqData = refrigRetAirSeq( iZone, _, CoolDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rRefrig, cSensRA ) = trim( RealToStr( AvgData( timeCoolMax ), 2 ) );
+					tableBody( rRefrig, cSensRA ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rRefrig ) += AvgData( timeCoolMax );
 					grandTotalRow( cSensRA ) += AvgData( timeCoolMax );
 
 					seqData = refrigLatentSeq( iZone, _, CoolDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rRefrig, cLatent ) = trim( RealToStr( AvgData( timeCoolMax ), 2 ) );
+					tableBody( rRefrig, cLatent ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rRefrig ) += AvgData( timeCoolMax );
 					grandTotalRow( cLatent ) += AvgData( timeCoolMax );
 
 					//WATER USE EQUIPMENT
 					seqData = waterUseInstantSeq( iZone, _, CoolDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rWaterUse, cSensInst ) = trim( RealToStr( AvgData( timeCoolMax ), 2 ) );
+					tableBody( rWaterUse, cSensInst ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rWaterUse ) += AvgData( timeCoolMax );
 					grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
 
 					seqData = waterUseLatentSeq( iZone, _, CoolDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rWaterUse, cLatent ) = trim( RealToStr( AvgData( timeCoolMax ), 2 ) );
+					tableBody( rWaterUse, cLatent ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rWaterUse ) += AvgData( timeCoolMax );
 					grandTotalRow( cLatent ) += AvgData( timeCoolMax );
 
 					//HVAC EQUIPMENT LOSSES
 					seqData = hvacLossInstantSeq( iZone, _, CoolDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rHvacLoss, cSensInst ) = trim( RealToStr( AvgData( timeCoolMax ), 2 ) );
+					tableBody( rHvacLoss, cSensInst ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rHvacLoss ) += AvgData( timeCoolMax );
 					grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
 
 					seqData = hvacLossDelaySeq( iZone, _, CoolDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rHvacLoss, cSensDelay ) = trim( RealToStr( AvgData( timeCoolMax ), 2 ) );
+					tableBody( rHvacLoss, cSensDelay ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rHvacLoss ) += AvgData( timeCoolMax );
 					grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
 
 					//POWER GENERATION EQUIPMENT
 					seqData = powerGenInstantSeq( iZone, _, CoolDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rPowerGen, cSensInst ) = trim( RealToStr( AvgData( timeCoolMax ), 2 ) );
+					tableBody( rPowerGen, cSensInst ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rPowerGen ) += AvgData( timeCoolMax );
 					grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
 
 					seqData = powerGenDelaySeq( iZone, _, CoolDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rPowerGen, cSensDelay ) = trim( RealToStr( AvgData( timeCoolMax ), 2 ) );
+					tableBody( rPowerGen, cSensDelay ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rPowerGen ) += AvgData( timeCoolMax );
 					grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
 
 					//INFILTRATION
 					seqData = infilInstantSeq( iZone, _, CoolDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rInfil, cSensInst ) = trim( RealToStr( AvgData( timeCoolMax ), 2 ) );
+					tableBody( rInfil, cSensInst ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rInfil ) += AvgData( timeCoolMax );
 					grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
 
 					seqData = infilLatentSeq( iZone, _, CoolDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rInfil, cLatent ) = trim( RealToStr( AvgData( timeCoolMax ), 2 ) );
+					tableBody( rInfil, cLatent ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rInfil ) += AvgData( timeCoolMax );
 					grandTotalRow( cLatent ) += AvgData( timeCoolMax );
 
 					//ZONE VENTILATION
 					seqData = zoneVentInstantSeq( iZone, _, CoolDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rZoneVent, cSensInst ) = trim( RealToStr( AvgData( timeCoolMax ), 2 ) );
+					tableBody( rZoneVent, cSensInst ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rZoneVent ) += AvgData( timeCoolMax );
 					grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
 
 					seqData = zoneVentLatentSeq( iZone, _, CoolDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rZoneVent, cLatent ) = trim( RealToStr( AvgData( timeCoolMax ), 2 ) );
+					tableBody( rZoneVent, cLatent ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rZoneVent ) += AvgData( timeCoolMax );
 					grandTotalRow( cLatent ) += AvgData( timeCoolMax );
 
 					//INTERZONE MIXING
 					seqData = interZoneMixInstantSeq( iZone, _, CoolDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rIntZonMix, cSensInst ) = trim( RealToStr( AvgData( timeCoolMax ), 2 ) );
+					tableBody( rIntZonMix, cSensInst ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rIntZonMix ) += AvgData( timeCoolMax );
 					grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
 
 					seqData = interZoneMixLatentSeq( iZone, _, CoolDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rIntZonMix, cLatent ) = trim( RealToStr( AvgData( timeCoolMax ), 2 ) );
+					tableBody( rIntZonMix, cLatent ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rIntZonMix ) += AvgData( timeCoolMax );
 					grandTotalRow( cLatent ) += AvgData( timeCoolMax );
 
 					//FENESTRATION CONDUCTION
 					seqData = feneCondInstantSeq( iZone, _, CoolDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rFeneCond, cSensInst ) = trim( RealToStr( AvgData( timeCoolMax ), 2 ) );
+					tableBody( rFeneCond, cSensInst ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rFeneCond ) += AvgData( timeCoolMax );
 					grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
 
@@ -11516,7 +11515,7 @@ namespace OutputReportTabular {
 
 					seqData = feneSolarDelaySeq( iZone, _, CoolDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rFeneSolr, cSensDelay ) = trim( RealToStr( AvgData( timeCoolMax ), 2 ) );
+					tableBody( rFeneSolr, cSensDelay ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rFeneSolr ) += AvgData( timeCoolMax );
 					grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
 
@@ -11529,7 +11528,7 @@ namespace OutputReportTabular {
 							//if exterior is other side coefficients using ground preprocessor terms then
 							//set it to ground instead of other side coefficients
 							if ( curExtBoundCond == OtherSideCoefNoCalcExt || curExtBoundCond == OtherSideCoefCalcExt ) {
-								if ( SameString( OSC( Surface( kSurf ).OSCPtr ).Name( {1,17} ), "surfPropOthSdCoef" ) ) {
+								if ( has_prefixi( OSC( Surface( kSurf ).OSCPtr ).Name, "surfPropOthSdCoef" ) ) {
 									curExtBoundCond = Ground;
 								}
 							}
@@ -11574,11 +11573,11 @@ namespace OutputReportTabular {
 						}
 					}
 					for ( k = rRoof; k <= rOtherFlr; ++k ) {
-						tableBody( k, cSensDelay ) = trim( RealToStr( delayOpaque( k ), 2 ) );
+						tableBody( k, cSensDelay ) = RealToStr( delayOpaque( k ), 2 );
 						totalColumn( k ) += delayOpaque( k );
 						grandTotalRow( cSensDelay ) += delayOpaque( k );
 					}
-					tableBody( rOpqDoor, cSensDelay ) = trim( RealToStr( delayOpaque( rOpqDoor ), 2 ) );
+					tableBody( rOpqDoor, cSensDelay ) = RealToStr( delayOpaque( rOpqDoor ), 2 );
 					totalColumn( rOpqDoor ) += delayOpaque( rOpqDoor );
 					grandTotalRow( cSensDelay ) += delayOpaque( rOpqDoor );
 				}
@@ -11586,22 +11585,22 @@ namespace OutputReportTabular {
 				//GRAND TOTAL ROW
 				totalGrandTotal = 0.0;
 				for ( k = 1; k <= cLatent; ++k ) {
-					tableBody( rGrdTot, k ) = trim( RealToStr( grandTotalRow( k ), 2 ) );
+					tableBody( rGrdTot, k ) = RealToStr( grandTotalRow( k ), 2 );
 					totalGrandTotal += grandTotalRow( k );
 				}
-				tableBody( rGrdTot, cTotal ) = trim( RealToStr( totalGrandTotal, 2 ) );
+				tableBody( rGrdTot, cTotal ) = RealToStr( totalGrandTotal, 2 );
 
 				//TOTAL COLUMN AND PERCENT COLUMN
 				for ( k = 1; k <= rOpqDoor; ++k ) { //to last row before total
-					tableBody( k, cTotal ) = trim( RealToStr( totalColumn( k ), 2 ) );
+					tableBody( k, cTotal ) = RealToStr( totalColumn( k ), 2 );
 					if ( totalGrandTotal != 0.0 ) {
-						tableBody( k, cPerc ) = trim( RealToStr( 100 * totalColumn( k ) / totalGrandTotal, 2 ) );
+						tableBody( k, cPerc ) = RealToStr( 100 * totalColumn( k ) / totalGrandTotal, 2 );
 					}
 				}
 
 				WriteSubtitle( "Estimated Cooling Peak Load Components" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", trim( Zone( iZone ).Name ), "Estimated Cooling Peak Load Components" );
+				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Estimated Cooling Peak Load Components" );
 
 				columnHead.deallocate();
 				rowHead.deallocate();
@@ -11646,44 +11645,44 @@ namespace OutputReportTabular {
 				if ( timeCoolMax != 0 ) {
 
 					//Time of Peak Load
-					tableBody( 1, 1 ) = trim( CoolPeakDateHrMin( iZone ) );
+					tableBody( 1, 1 ) = CoolPeakDateHrMin( iZone );
 
 					//Outside  Dry Bulb Temperature
-					tableBody( 2, 1 ) = trim( RealToStr( ConvertIP( tempConvIndx, CalcFinalZoneSizing( iZone ).CoolOutTempSeq( timeCoolMax ) ), 2 ) );
+					tableBody( 2, 1 ) = RealToStr( ConvertIP( tempConvIndx, CalcFinalZoneSizing( iZone ).CoolOutTempSeq( timeCoolMax ) ), 2 );
 
 					//Outside  Wet Bulb Temperature
 					//use standard sea level air pressure because air pressure is not tracked with sizing data
 					if ( CalcFinalZoneSizing( iZone ).CoolOutHumRatSeq( timeCoolMax ) < 1.0 && CalcFinalZoneSizing( iZone ).CoolOutHumRatSeq( timeCoolMax ) > 0.0 ) {
-						tableBody( 3, 1 ) = trim( RealToStr( ConvertIP( tempConvIndx, PsyTwbFnTdbWPb( CalcFinalZoneSizing( iZone ).CoolOutTempSeq( timeCoolMax ), CalcFinalZoneSizing( iZone ).CoolOutHumRatSeq( timeCoolMax ), 101325.0 ) ), 2 ) );
+						tableBody( 3, 1 ) = RealToStr( ConvertIP( tempConvIndx, PsyTwbFnTdbWPb( CalcFinalZoneSizing( iZone ).CoolOutTempSeq( timeCoolMax ), CalcFinalZoneSizing( iZone ).CoolOutHumRatSeq( timeCoolMax ), 101325.0 ) ), 2 );
 					}
 
 					//Outside Humidity Ratio at Peak
-					tableBody( 4, 1 ) = trim( RealToStr( CalcFinalZoneSizing( iZone ).CoolOutHumRatSeq( timeCoolMax ), 5 ) );
+					tableBody( 4, 1 ) = RealToStr( CalcFinalZoneSizing( iZone ).CoolOutHumRatSeq( timeCoolMax ), 5 );
 
 					//Zone Dry Bulb Temperature
-					tableBody( 5, 1 ) = trim( RealToStr( ConvertIP( tempConvIndx, CalcFinalZoneSizing( iZone ).CoolZoneTempSeq( timeCoolMax ) ), 2 ) );
+					tableBody( 5, 1 ) = RealToStr( ConvertIP( tempConvIndx, CalcFinalZoneSizing( iZone ).CoolZoneTempSeq( timeCoolMax ) ), 2 );
 
 					//Zone Relative Humdity
 					//use standard sea level air pressure because air pressure is not tracked with sizing data
-					tableBody( 6, 1 ) = trim( RealToStr( 100 * PsyRhFnTdbWPb( CalcFinalZoneSizing( iZone ).CoolZoneTempSeq( timeCoolMax ), CalcFinalZoneSizing( iZone ).CoolZoneHumRatSeq( timeCoolMax ), 101325.0 ), 2 ) );
+					tableBody( 6, 1 ) = RealToStr( 100 * PsyRhFnTdbWPb( CalcFinalZoneSizing( iZone ).CoolZoneTempSeq( timeCoolMax ), CalcFinalZoneSizing( iZone ).CoolZoneHumRatSeq( timeCoolMax ), 101325.0 ), 2 );
 
 					//Zone Humidity Ratio at Peak
-					tableBody( 7, 1 ) = trim( RealToStr( CalcFinalZoneSizing( iZone ).CoolZoneHumRatSeq( timeCoolMax ), 5 ) );
+					tableBody( 7, 1 ) = RealToStr( CalcFinalZoneSizing( iZone ).CoolZoneHumRatSeq( timeCoolMax ), 5 );
 
 				}
 
 				//Peak Design Sensible Load
-				tableBody( 8, 1 ) = trim( RealToStr( ( CalcFinalZoneSizing( iZone ).DesCoolLoad / mult ) * powerConversion, 2 ) );
+				tableBody( 8, 1 ) = RealToStr( ( CalcFinalZoneSizing( iZone ).DesCoolLoad / mult ) * powerConversion, 2 );
 
 				//Estimated Instant + Delayed Sensible Load
-				tableBody( 9, 1 ) = trim( RealToStr( grandTotalRow( cSensInst ) + grandTotalRow( cSensDelay ), 2 ) );
+				tableBody( 9, 1 ) = RealToStr( grandTotalRow( cSensInst ) + grandTotalRow( cSensDelay ), 2 );
 
 				//Difference
-				tableBody( 10, 1 ) = trim( RealToStr( ( CalcFinalZoneSizing( iZone ).DesCoolLoad / mult ) * powerConversion - ( grandTotalRow( cSensInst ) + grandTotalRow( cSensDelay ) ), 2 ) );
+				tableBody( 10, 1 ) = RealToStr( ( CalcFinalZoneSizing( iZone ).DesCoolLoad / mult ) * powerConversion - ( grandTotalRow( cSensInst ) + grandTotalRow( cSensDelay ) ), 2 );
 
 				WriteSubtitle( "Cooling Peak Conditions" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", trim( Zone( iZone ).Name ), "Cooling Peak Conditions" );
+				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Cooling Peak Conditions" );
 
 				columnHead.deallocate();
 				rowHead.deallocate();
@@ -11754,7 +11753,7 @@ namespace OutputReportTabular {
 						if ( ZoneNum != iZone ) continue;
 						if ( ZoneNum == 0 ) continue;
 						if ( ! ZoneEquipConfig( ZoneNum ).IsControlled ) continue;
-						{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(4A)", flags ) << "Radiant to Convective Decay Curves for Cooling," << trim( Zone( iZone ).Name ) << trim( Surface( kSurf ).Name ); }
+						{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(4A)", flags ) << "Radiant to Convective Decay Curves for Cooling," << Zone( iZone ).Name << Surface( kSurf ).Name; }
 						for ( jTime = 1; jTime <= min( NumOfTimeStepInHour * 24, 36 ); ++jTime ) {
 							{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A,F6.3)", flags ) << decayCurveCool( kSurf, jTime ); }
 						}
@@ -11828,161 +11827,161 @@ namespace OutputReportTabular {
 					//PEOPLE
 					seqData = peopleInstantSeq( iZone, _, HeatDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rPeople, cSensInst ) = trim( RealToStr( AvgData( timeHeatMax ), 2 ) );
+					tableBody( rPeople, cSensInst ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rPeople ) += AvgData( timeHeatMax );
 					grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
 
 					seqData = peopleLatentSeq( iZone, _, HeatDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rPeople, cLatent ) = trim( RealToStr( AvgData( timeHeatMax ), 2 ) );
+					tableBody( rPeople, cLatent ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rPeople ) += AvgData( timeHeatMax );
 					grandTotalRow( cLatent ) += AvgData( timeHeatMax );
 
 					seqData = peopleDelaySeq( iZone, _, HeatDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rPeople, cSensDelay ) = trim( RealToStr( AvgData( timeHeatMax ), 2 ) );
+					tableBody( rPeople, cSensDelay ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rPeople ) += AvgData( timeHeatMax );
 					grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
 
 					//LIGHTS
 					seqData = lightInstantSeq( iZone, _, HeatDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rLights, cSensInst ) = trim( RealToStr( AvgData( timeHeatMax ), 2 ) );
+					tableBody( rLights, cSensInst ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rLights ) += AvgData( timeHeatMax );
 					grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
 
 					seqData = lightRetAirSeq( iZone, _, HeatDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rLights, cSensRA ) = trim( RealToStr( AvgData( timeHeatMax ), 2 ) );
+					tableBody( rLights, cSensRA ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rLights ) += AvgData( timeHeatMax );
 					grandTotalRow( cSensRA ) += AvgData( timeHeatMax );
 
 					seqData = lightDelaySeq( iZone, _, HeatDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rLights, cSensDelay ) = trim( RealToStr( AvgData( timeHeatMax ), 2 ) );
+					tableBody( rLights, cSensDelay ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rLights ) += AvgData( timeHeatMax );
 					grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
 
 					//EQUIPMENT
 					seqData = equipInstantSeq( iZone, _, HeatDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rEquip, cSensInst ) = trim( RealToStr( AvgData( timeHeatMax ), 2 ) );
+					tableBody( rEquip, cSensInst ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rEquip ) += AvgData( timeHeatMax );
 					grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
 
 					seqData = equipLatentSeq( iZone, _, HeatDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rEquip, cLatent ) = trim( RealToStr( AvgData( timeHeatMax ), 2 ) );
+					tableBody( rEquip, cLatent ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rEquip ) += AvgData( timeHeatMax );
 					grandTotalRow( cLatent ) += AvgData( timeHeatMax );
 
 					seqData = equipDelaySeq( iZone, _, HeatDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rEquip, cSensDelay ) = trim( RealToStr( AvgData( timeHeatMax ), 2 ) );
+					tableBody( rEquip, cSensDelay ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rEquip ) += AvgData( timeHeatMax );
 					grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
 
 					//REFRIGERATION EQUIPMENT
 					seqData = refrigInstantSeq( iZone, _, HeatDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rRefrig, cSensInst ) = trim( RealToStr( AvgData( timeHeatMax ), 2 ) );
+					tableBody( rRefrig, cSensInst ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rRefrig ) += AvgData( timeHeatMax );
 					grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
 
 					seqData = refrigRetAirSeq( iZone, _, HeatDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rRefrig, cSensRA ) = trim( RealToStr( AvgData( timeHeatMax ), 2 ) );
+					tableBody( rRefrig, cSensRA ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rRefrig ) += AvgData( timeHeatMax );
 					grandTotalRow( cSensRA ) += AvgData( timeHeatMax );
 
 					seqData = refrigLatentSeq( iZone, _, HeatDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rRefrig, cLatent ) = trim( RealToStr( AvgData( timeHeatMax ), 2 ) );
+					tableBody( rRefrig, cLatent ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rRefrig ) += AvgData( timeHeatMax );
 					grandTotalRow( cLatent ) += AvgData( timeHeatMax );
 
 					//WATER USE EQUIPMENT
 					seqData = waterUseInstantSeq( iZone, _, HeatDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rWaterUse, cSensInst ) = trim( RealToStr( AvgData( timeHeatMax ), 2 ) );
+					tableBody( rWaterUse, cSensInst ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rWaterUse ) += AvgData( timeHeatMax );
 					grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
 
 					seqData = waterUseLatentSeq( iZone, _, HeatDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rWaterUse, cLatent ) = trim( RealToStr( AvgData( timeHeatMax ), 2 ) );
+					tableBody( rWaterUse, cLatent ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rWaterUse ) += AvgData( timeHeatMax );
 					grandTotalRow( cLatent ) += AvgData( timeHeatMax );
 
 					//HVAC EQUIPMENT LOSSES
 					seqData = hvacLossInstantSeq( iZone, _, HeatDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rHvacLoss, cSensInst ) = trim( RealToStr( AvgData( timeHeatMax ), 2 ) );
+					tableBody( rHvacLoss, cSensInst ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rHvacLoss ) += AvgData( timeHeatMax );
 					grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
 
 					seqData = hvacLossDelaySeq( iZone, _, HeatDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rHvacLoss, cSensDelay ) = trim( RealToStr( AvgData( timeHeatMax ), 2 ) );
+					tableBody( rHvacLoss, cSensDelay ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rHvacLoss ) += AvgData( timeHeatMax );
 					grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
 
 					//POWER GENERATION EQUIPMENT
 					seqData = powerGenInstantSeq( iZone, _, HeatDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rPowerGen, cSensInst ) = trim( RealToStr( AvgData( timeHeatMax ), 2 ) );
+					tableBody( rPowerGen, cSensInst ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rPowerGen ) += AvgData( timeHeatMax );
 					grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
 
 					seqData = powerGenDelaySeq( iZone, _, HeatDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rPowerGen, cSensDelay ) = trim( RealToStr( AvgData( timeHeatMax ), 2 ) );
+					tableBody( rPowerGen, cSensDelay ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rPowerGen ) += AvgData( timeHeatMax );
 					grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
 
 					//INFILTRATION
 					seqData = infilInstantSeq( iZone, _, HeatDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rInfil, cSensInst ) = trim( RealToStr( AvgData( timeHeatMax ), 2 ) );
+					tableBody( rInfil, cSensInst ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rInfil ) += AvgData( timeHeatMax );
 					grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
 
 					seqData = infilLatentSeq( iZone, _, HeatDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rInfil, cLatent ) = trim( RealToStr( AvgData( timeHeatMax ), 2 ) );
+					tableBody( rInfil, cLatent ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rInfil ) += AvgData( timeHeatMax );
 					grandTotalRow( cLatent ) += AvgData( timeHeatMax );
 
 					//ZONE VENTILATION
 					seqData = zoneVentInstantSeq( iZone, _, HeatDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rZoneVent, cSensInst ) = trim( RealToStr( AvgData( timeHeatMax ), 2 ) );
+					tableBody( rZoneVent, cSensInst ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rZoneVent ) += AvgData( timeHeatMax );
 					grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
 
 					seqData = zoneVentLatentSeq( iZone, _, HeatDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rZoneVent, cLatent ) = trim( RealToStr( AvgData( timeHeatMax ), 2 ) );
+					tableBody( rZoneVent, cLatent ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rZoneVent ) += AvgData( timeHeatMax );
 					grandTotalRow( cLatent ) += AvgData( timeHeatMax );
 
 					//INTERZONE MIXING
 					seqData = interZoneMixInstantSeq( iZone, _, HeatDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rIntZonMix, cSensInst ) = trim( RealToStr( AvgData( timeHeatMax ), 2 ) );
+					tableBody( rIntZonMix, cSensInst ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rIntZonMix ) += AvgData( timeHeatMax );
 					grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
 
 					seqData = interZoneMixLatentSeq( iZone, _, HeatDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rIntZonMix, cLatent ) = trim( RealToStr( AvgData( timeHeatMax ), 2 ) );
+					tableBody( rIntZonMix, cLatent ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rIntZonMix ) += AvgData( timeHeatMax );
 					grandTotalRow( cLatent ) += AvgData( timeHeatMax );
 
 					//FENESTRATION CONDUCTION
 					seqData = feneCondInstantSeq( iZone, _, HeatDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rFeneCond, cSensInst ) = trim( RealToStr( AvgData( timeHeatMax ), 2 ) );
+					tableBody( rFeneCond, cSensInst ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rFeneCond ) += AvgData( timeHeatMax );
 					grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
 
@@ -11995,7 +11994,7 @@ namespace OutputReportTabular {
 
 					seqData = feneSolarDelaySeq( iZone, _, HeatDesSelected ) * powerConversion;
 					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( rFeneSolr, cSensDelay ) = trim( RealToStr( AvgData( timeHeatMax ), 2 ) );
+					tableBody( rFeneSolr, cSensDelay ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rFeneSolr ) += AvgData( timeHeatMax );
 					grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
 
@@ -12008,7 +12007,7 @@ namespace OutputReportTabular {
 							//if exterior is other side coefficients using ground preprocessor terms then
 							//set it to ground instead of other side coefficients
 							if ( curExtBoundCond == OtherSideCoefNoCalcExt || curExtBoundCond == OtherSideCoefCalcExt ) {
-								if ( SameString( OSC( Surface( kSurf ).OSCPtr ).Name( {1,17} ), "surfPropOthSdCoef" ) ) {
+								if ( has_prefixi( OSC( Surface( kSurf ).OSCPtr ).Name, "surfPropOthSdCoef" ) ) {
 									curExtBoundCond = Ground;
 								}
 							}
@@ -12053,11 +12052,11 @@ namespace OutputReportTabular {
 						}
 					}
 					for ( k = rRoof; k <= rOtherFlr; ++k ) {
-						tableBody( k, cSensDelay ) = trim( RealToStr( delayOpaque( k ), 2 ) );
+						tableBody( k, cSensDelay ) = RealToStr( delayOpaque( k ), 2 );
 						totalColumn( k ) += delayOpaque( k );
 						grandTotalRow( cSensDelay ) += delayOpaque( k );
 					}
-					tableBody( rOpqDoor, cSensDelay ) = trim( RealToStr( delayOpaque( rOpqDoor ), 2 ) );
+					tableBody( rOpqDoor, cSensDelay ) = RealToStr( delayOpaque( rOpqDoor ), 2 );
 					totalColumn( rOpqDoor ) += delayOpaque( rOpqDoor );
 					grandTotalRow( cSensDelay ) += delayOpaque( rOpqDoor );
 				}
@@ -12065,22 +12064,22 @@ namespace OutputReportTabular {
 				//GRAND TOTAL ROW
 				totalGrandTotal = 0.0;
 				for ( k = 1; k <= cLatent; ++k ) {
-					tableBody( rGrdTot, k ) = trim( RealToStr( grandTotalRow( k ), 2 ) );
+					tableBody( rGrdTot, k ) = RealToStr( grandTotalRow( k ), 2 );
 					totalGrandTotal += grandTotalRow( k );
 				}
-				tableBody( rGrdTot, cTotal ) = trim( RealToStr( totalGrandTotal, 2 ) );
+				tableBody( rGrdTot, cTotal ) = RealToStr( totalGrandTotal, 2 );
 
 				//TOTAL COLUMN AND PERCENT COLUMN
 				for ( k = 1; k <= rOpqDoor; ++k ) { //to last row before total
-					tableBody( k, cTotal ) = trim( RealToStr( totalColumn( k ), 2 ) );
+					tableBody( k, cTotal ) = RealToStr( totalColumn( k ), 2 );
 					if ( totalGrandTotal != 0.0 ) {
-						tableBody( k, cPerc ) = trim( RealToStr( 100 * totalColumn( k ) / totalGrandTotal, 2 ) );
+						tableBody( k, cPerc ) = RealToStr( 100 * totalColumn( k ) / totalGrandTotal, 2 );
 					}
 				}
 
 				WriteSubtitle( "Estimated Heating Peak Load Components" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", trim( Zone( iZone ).Name ), "Estimated Heating Peak Load Components" );
+				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Estimated Heating Peak Load Components" );
 
 				columnHead.deallocate();
 				rowHead.deallocate();
@@ -12124,44 +12123,44 @@ namespace OutputReportTabular {
 
 				if ( timeHeatMax != 0 ) {
 					//Time of Peak Load
-					tableBody( 1, 1 ) = trim( HeatPeakDateHrMin( iZone ) );
+					tableBody( 1, 1 ) = HeatPeakDateHrMin( iZone );
 
 					//Outside  Dry Bulb Temperature
-					tableBody( 2, 1 ) = trim( RealToStr( ConvertIP( tempConvIndx, CalcFinalZoneSizing( iZone ).HeatOutTempSeq( timeHeatMax ) ), 2 ) );
+					tableBody( 2, 1 ) = RealToStr( ConvertIP( tempConvIndx, CalcFinalZoneSizing( iZone ).HeatOutTempSeq( timeHeatMax ) ), 2 );
 
 					//Outside  Wet Bulb Temperature
 					//use standard sea level air pressure because air pressure is not tracked with sizing data
 					if ( CalcFinalZoneSizing( iZone ).HeatOutHumRatSeq( timeHeatMax ) < 1.0 && CalcFinalZoneSizing( iZone ).HeatOutHumRatSeq( timeHeatMax ) > 0.0 ) {
-						tableBody( 3, 1 ) = trim( RealToStr( ConvertIP( tempConvIndx, PsyTwbFnTdbWPb( CalcFinalZoneSizing( iZone ).HeatOutTempSeq( timeHeatMax ), CalcFinalZoneSizing( iZone ).HeatOutHumRatSeq( timeHeatMax ), 101325.0 ) ), 2 ) );
+						tableBody( 3, 1 ) = RealToStr( ConvertIP( tempConvIndx, PsyTwbFnTdbWPb( CalcFinalZoneSizing( iZone ).HeatOutTempSeq( timeHeatMax ), CalcFinalZoneSizing( iZone ).HeatOutHumRatSeq( timeHeatMax ), 101325.0 ) ), 2 );
 					}
 
 					//Humidity Ratio at Peak
-					tableBody( 4, 1 ) = trim( RealToStr( CalcFinalZoneSizing( iZone ).HeatOutHumRatSeq( timeHeatMax ), 5 ) );
+					tableBody( 4, 1 ) = RealToStr( CalcFinalZoneSizing( iZone ).HeatOutHumRatSeq( timeHeatMax ), 5 );
 
 					//Zone Dry Bulb Temperature
-					tableBody( 5, 1 ) = trim( RealToStr( ConvertIP( tempConvIndx, CalcFinalZoneSizing( iZone ).HeatZoneTempSeq( timeHeatMax ) ), 2 ) );
+					tableBody( 5, 1 ) = RealToStr( ConvertIP( tempConvIndx, CalcFinalZoneSizing( iZone ).HeatZoneTempSeq( timeHeatMax ) ), 2 );
 
 					//Zone Relative Temperature
 					//use standard sea level air pressure because air pressure is not tracked with sizing data
-					tableBody( 6, 1 ) = trim( RealToStr( 100 * PsyRhFnTdbWPb( CalcFinalZoneSizing( iZone ).HeatZoneTempSeq( timeHeatMax ), CalcFinalZoneSizing( iZone ).HeatZoneHumRatSeq( timeHeatMax ), 101325.0 ), 2 ) );
+					tableBody( 6, 1 ) = RealToStr( 100 * PsyRhFnTdbWPb( CalcFinalZoneSizing( iZone ).HeatZoneTempSeq( timeHeatMax ), CalcFinalZoneSizing( iZone ).HeatZoneHumRatSeq( timeHeatMax ), 101325.0 ), 2 );
 
 					//Zone Relative Humdity
-					tableBody( 7, 1 ) = trim( RealToStr( CalcFinalZoneSizing( iZone ).HeatZoneHumRatSeq( timeHeatMax ), 5 ) );
+					tableBody( 7, 1 ) = RealToStr( CalcFinalZoneSizing( iZone ).HeatZoneHumRatSeq( timeHeatMax ), 5 );
 
 				}
 
 				//Peak Design Sensible Load
-				tableBody( 8, 1 ) = trim( RealToStr( ( -CalcFinalZoneSizing( iZone ).DesHeatLoad / mult ) * powerConversion, 2 ) ); //change sign
+				tableBody( 8, 1 ) = RealToStr( ( -CalcFinalZoneSizing( iZone ).DesHeatLoad / mult ) * powerConversion, 2 ); //change sign
 
 				//Estimated Instant + Delayed Sensible Load
-				tableBody( 9, 1 ) = trim( RealToStr( grandTotalRow( cSensInst ) + grandTotalRow( cSensDelay ), 2 ) );
+				tableBody( 9, 1 ) = RealToStr( grandTotalRow( cSensInst ) + grandTotalRow( cSensDelay ), 2 );
 
 				//Difference
-				tableBody( 10, 1 ) = trim( RealToStr( ( -CalcFinalZoneSizing( iZone ).DesHeatLoad / mult ) * powerConversion - ( grandTotalRow( cSensInst ) + grandTotalRow( cSensDelay ) ), 2 ) );
+				tableBody( 10, 1 ) = RealToStr( ( -CalcFinalZoneSizing( iZone ).DesHeatLoad / mult ) * powerConversion - ( grandTotalRow( cSensInst ) + grandTotalRow( cSensDelay ) ), 2 );
 
 				WriteSubtitle( "Heating Peak Conditions" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", trim( Zone( iZone ).Name ), "Heating Peak Conditions" );
+				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Heating Peak Conditions" );
 
 				columnHead.deallocate();
 				rowHead.deallocate();
@@ -12232,7 +12231,7 @@ namespace OutputReportTabular {
 						if ( ZoneNum != iZone ) continue;
 						if ( ZoneNum == 0 ) continue;
 						if ( ! ZoneEquipConfig( ZoneNum ).IsControlled ) continue;
-						{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(4A)", flags ) << "Radiant to Convective Decay Curves for Heating," << trim( Zone( iZone ).Name ) << trim( Surface( kSurf ).Name ); }
+						{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(4A)", flags ) << "Radiant to Convective Decay Curves for Heating," << Zone( iZone ).Name << Surface( kSurf ).Name; }
 						for ( jTime = 1; jTime <= min( NumOfTimeStepInHour * 24, 36 ); ++jTime ) {
 							{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A,F6.3)", flags ) << decayCurveHeat( kSurf, jTime ); }
 						}
@@ -12247,8 +12246,8 @@ namespace OutputReportTabular {
 
 	void
 	WriteReportHeaders(
-		Fstring const & reportName,
-		Fstring const & objectName,
+		std::string const & reportName,
+		std::string const & objectName,
 		int const averageOrSum
 	)
 	{
@@ -12269,9 +12268,9 @@ namespace OutputReportTabular {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const fmta( "(A)" );
-		static Fstring const TimeStampFmt1( "(A,I4,A,I2.2,A,I2.2)" );
-		static Fstring const TimeStampFmt2( "(A,I4.2,A,I2.2,A,I2.2,A)" );
+		static gio::Fmt const fmta( "(A)" );
+		static gio::Fmt const TimeStampFmt1( "(A,I4,A,I2.2,A,I2.2)" );
+		static gio::Fmt const TimeStampFmt2( "(A,I4.2,A,I2.2,A,I2.2,A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -12280,13 +12279,13 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Fstring modifiedReportName( MaxNameLength * 2 );
+		std::string modifiedReportName;
 		int iStyle;
 		int curFH;
-		Fstring curDel( 1 );
+		std::string curDel;
 
 		if ( averageOrSum == isSum ) { // if it is a summed variable CR5959
-			modifiedReportName = trim( reportName ) + " per second";
+			modifiedReportName = reportName + " per second";
 		} else {
 			modifiedReportName = reportName;
 		}
@@ -12296,26 +12295,26 @@ namespace OutputReportTabular {
 			{ auto const SELECT_CASE_var( TableStyle( iStyle ) );
 			if ( ( SELECT_CASE_var == tableStyleComma ) || ( SELECT_CASE_var == tableStyleTab ) ) {
 				gio::write( curFH, fmta ) << "--------------------------------------------------" "--------------------------------------------------";
-				gio::write( curFH, fmta ) << "REPORT:" + curDel + trim( modifiedReportName );
-				gio::write( curFH, fmta ) << "FOR:" + curDel + trim( objectName );
+				gio::write( curFH, fmta ) << "REPORT:" + curDel + modifiedReportName;
+				gio::write( curFH, fmta ) << "FOR:" + curDel + objectName;
 			} else if ( SELECT_CASE_var == tableStyleFixed ) {
 				gio::write( curFH, fmta ) << "--------------------------------------------------" "--------------------------------------------------";
-				gio::write( curFH, fmta ) << "REPORT:      " + curDel + trim( modifiedReportName );
-				gio::write( curFH, fmta ) << "FOR:         " + curDel + trim( objectName );
+				gio::write( curFH, fmta ) << "REPORT:      " + curDel + modifiedReportName;
+				gio::write( curFH, fmta ) << "FOR:         " + curDel + objectName;
 			} else if ( SELECT_CASE_var == tableStyleHTML ) {
 				gio::write( curFH, fmta ) << "<hr>";
 				gio::write( curFH, fmta ) << "<p><a href=\"#toc\" style=\"float: right\">Table of Contents</a></p>";
-				gio::write( curFH, fmta ) << "<a name=" + trim( MakeAnchorName( reportName, objectName ) ) + "></a>";
-				gio::write( curFH, fmta ) << "<p>Report:<b>" + curDel + trim( modifiedReportName ) + "</b></p>";
-				gio::write( curFH, fmta ) << "<p>For:<b>" + curDel + trim( objectName ) + "</b></p>";
+				gio::write( curFH, fmta ) << "<a name=" + MakeAnchorName( reportName, objectName ) + "></a>";
+				gio::write( curFH, fmta ) << "<p>Report:<b>" + curDel + modifiedReportName + "</b></p>";
+				gio::write( curFH, fmta ) << "<p>For:<b>" + curDel + objectName + "</b></p>";
 				gio::write( curFH, TimeStampFmt1 ) << "<p>Timestamp: <b>" << td( 1 ) << "-" << td( 2 ) << "-" << td( 3 );
 				gio::write( curFH, TimeStampFmt2 ) << "  " << td( 5 ) << ":" << td( 6 ) << ":" << td( 7 ) << "</b></p>";
 			} else if ( SELECT_CASE_var == tableStyleXML ) {
-				if ( len_trim( prevReportName ) != 0 ) {
-					gio::write( curFH, fmta ) << "</" + trim( prevReportName ) + ">"; //close the last element if it was used.
+				if ( len( prevReportName ) != 0 ) {
+					gio::write( curFH, fmta ) << "</" + prevReportName + '>'; //close the last element if it was used.
 				}
-				gio::write( curFH, fmta ) << "<" + trim( ConvertToElementTag( modifiedReportName ) ) + ">";
-				gio::write( curFH, fmta ) << "  <for>" + trim( objectName ) + "</for>";
+				gio::write( curFH, fmta ) << "<" + ConvertToElementTag( modifiedReportName ) + '>';
+				gio::write( curFH, fmta ) << "  <for>" + objectName + "</for>";
 				prevReportName = ConvertToElementTag( modifiedReportName ); //save the name for next time
 			}}
 		}
@@ -12328,7 +12327,7 @@ namespace OutputReportTabular {
 	}
 
 	void
-	WriteSubtitle( Fstring const & subtitle )
+	WriteSubtitle( std::string const & subtitle )
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Jason Glazer
@@ -12343,7 +12342,7 @@ namespace OutputReportTabular {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const fmta( "(A)" );
+		static gio::Fmt const fmta( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -12357,11 +12356,11 @@ namespace OutputReportTabular {
 		for ( iStyle = 1; iStyle <= numStyles; ++iStyle ) {
 			{ auto const SELECT_CASE_var( TableStyle( iStyle ) );
 			if ( ( SELECT_CASE_var == tableStyleComma ) || ( SELECT_CASE_var == tableStyleTab ) || ( SELECT_CASE_var == tableStyleFixed ) ) {
-				gio::write( TabularOutputFile( iStyle ), fmta ) << trim( subtitle );
+				gio::write( TabularOutputFile( iStyle ), fmta ) << subtitle;
 				gio::write( TabularOutputFile( iStyle ), fmta ) << "";
 			} else if ( SELECT_CASE_var == tableStyleHTML ) {
-				gio::write( TabularOutputFile( iStyle ), fmta ) << "<b>" + trim( subtitle ) + "</b><br><br>";
-				gio::write( TabularOutputFile( iStyle ), fmta ) << "<!-- FullName:" + trim( activeReportName ) + "_" + trim( activeForName ) + "_" + trim( subtitle ) + "-->";
+				gio::write( TabularOutputFile( iStyle ), fmta ) << "<b>" + subtitle + "</b><br><br>";
+				gio::write( TabularOutputFile( iStyle ), fmta ) << "<!-- FullName:" + activeReportName + '_' + activeForName + '_' + subtitle + "-->";
 			} else if ( SELECT_CASE_var == tableStyleXML ) {
 				//save the active subtable name for the XML reporting
 				activeSubTableName = subtitle;
@@ -12372,7 +12371,7 @@ namespace OutputReportTabular {
 
 	void
 	WriteTextLine(
-		Fstring const & lineOfText,
+		std::string const & lineOfText,
 		Optional_bool_const isBold
 	)
 	{
@@ -12389,7 +12388,7 @@ namespace OutputReportTabular {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const fmta( "(A)" );
+		static gio::Fmt const fmta( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -12410,16 +12409,16 @@ namespace OutputReportTabular {
 		for ( iStyle = 1; iStyle <= numStyles; ++iStyle ) {
 			{ auto const SELECT_CASE_var( TableStyle( iStyle ) );
 			if ( ( SELECT_CASE_var == tableStyleComma ) || ( SELECT_CASE_var == tableStyleTab ) || ( SELECT_CASE_var == tableStyleFixed ) ) {
-				gio::write( TabularOutputFile( iStyle ), fmta ) << trim( lineOfText );
+				gio::write( TabularOutputFile( iStyle ), fmta ) << lineOfText;
 			} else if ( SELECT_CASE_var == tableStyleHTML ) {
 				if ( useBold ) {
-					gio::write( TabularOutputFile( iStyle ), fmta ) << "<b>" + trim( lineOfText ) + "</b><br><br>";
+					gio::write( TabularOutputFile( iStyle ), fmta ) << "<b>" + lineOfText + "</b><br><br>";
 				} else {
-					gio::write( TabularOutputFile( iStyle ), fmta ) << trim( lineOfText ) + "<br>";
+					gio::write( TabularOutputFile( iStyle ), fmta ) << lineOfText + "<br>";
 				}
 			} else if ( SELECT_CASE_var == tableStyleXML ) {
-				if ( len_trim( lineOfText ) != 0 ) {
-					gio::write( TabularOutputFile( iStyle ), fmta ) << "<note>" + trim( lineOfText ) + "</note>";
+				if ( len( lineOfText ) != 0 ) {
+					gio::write( TabularOutputFile( iStyle ), fmta ) << "<note>" + lineOfText + "</note>";
 				}
 			}}
 		}
@@ -12427,12 +12426,12 @@ namespace OutputReportTabular {
 
 	void
 	WriteTable(
-		FArray2S_Fstring const body, // row,column
-		FArray1S_Fstring const rowLabels,
-		FArray1S_Fstring const columnLabels,
+		FArray2S_string const body, // row,column
+		FArray1S_string const rowLabels,
+		FArray1S_string const columnLabels,
 		FArray1S_int widthColumn,
 		Optional_bool_const transposeXML,
-		Optional_Fstring_const footnoteText
+		Optional_string_const footnoteText
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -12460,8 +12459,8 @@ namespace OutputReportTabular {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const fmta( "(A)" );
-		static Fstring const blank;
+		static gio::Fmt const fmta( "(A)" );
+		static std::string const blank;
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -12470,18 +12469,18 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray2D_Fstring colLabelMulti( sFstring( MaxNameLength * 2 ) );
-		Fstring workColumn( 1000 );
-		FArray1D_Fstring rowLabelTags( sFstring( MaxNameLength ) );
-		FArray1D_Fstring columnLabelTags( sFstring( MaxNameLength ) );
-		FArray1D_Fstring rowUnitStrings( sFstring( MaxNameLength ) );
-		FArray1D_Fstring columnUnitStrings( sFstring( MaxNameLength ) );
-		FArray2D_Fstring bodyEsc( sFstring( MaxNameLength ) );
+		FArray2D_string colLabelMulti;
+		std::string workColumn;
+		FArray1D_string rowLabelTags;
+		FArray1D_string columnLabelTags;
+		FArray1D_string rowUnitStrings;
+		FArray1D_string columnUnitStrings;
+		FArray2D_string bodyEsc;
 
 		int numColLabelRows;
 		int maxNumColLabelRows;
-		int widthRowLabel;
-		int maxWidthRowLabel;
+		std::string::size_type widthRowLabel;
+		std::string::size_type maxWidthRowLabel;
 
 		int rowsBody;
 		int colsBody;
@@ -12492,15 +12491,15 @@ namespace OutputReportTabular {
 		int iCol;
 		int jRow;
 		int colWidthLimit;
-		int barLoc;
+		std::string::size_type barLoc;
 
-		Fstring outputLine( 1000 );
-		Fstring spaces( 1000 );
+		std::string outputLine;
+		std::string spaces;
 		int iStyle;
 		int curFH;
-		Fstring curDel( 1 );
-		Fstring tagWithAttrib( MaxNameLength );
-		int col1start;
+		std::string curDel;
+		std::string tagWithAttrib;
+		std::string::size_type col1start;
 		bool doTransposeXML;
 		bool isTableBlank;
 		bool isRecordBlank;
@@ -12551,13 +12550,13 @@ namespace OutputReportTabular {
 			for ( iCol = 1; iCol <= colsColumnLabels; ++iCol ) {
 				numColLabelRows = 0;
 				workColumn = columnLabels( iCol );
-				widthColumn( iCol ) = max( widthColumn( iCol ), len_trim( columnLabels( iCol ) ) );
+				widthColumn( iCol ) = max( widthColumn( iCol ), static_cast< int >( len( columnLabels( iCol ) ) ) );
 				while ( true ) {
-					barLoc = index( workColumn, "|" );
-					if ( barLoc > 0 ) {
+					barLoc = index( workColumn, '|' );
+					if ( barLoc != std::string::npos ) {
 						++numColLabelRows;
-						colLabelMulti( numColLabelRows, iCol ) = workColumn( 1, barLoc - 1 );
-						workColumn = workColumn( barLoc + 1 );
+						colLabelMulti( numColLabelRows, iCol ) = workColumn.substr( 0, barLoc );
+						workColumn.erase( 0, barLoc + 1 );
 					} else {
 						++numColLabelRows;
 						colLabelMulti( numColLabelRows, iCol ) = workColumn;
@@ -12574,12 +12573,12 @@ namespace OutputReportTabular {
 				for ( iCol = 1; iCol <= colsColumnLabels; ++iCol ) {
 					colWidthLimit = widthColumn( iCol );
 					for ( jRow = 1; jRow <= maxNumColLabelRows; ++jRow ) {
-						colLabelMulti( jRow, iCol ) = colLabelMulti( jRow, iCol )( 1, colWidthLimit );
+						pare( colLabelMulti( jRow, iCol ), colWidthLimit );
 					}
 				}
 				maxWidthRowLabel = 0;
 				for ( jRow = 1; jRow <= rowsRowLabels; ++jRow ) {
-					widthRowLabel = len_trim( rowLabels( jRow ) );
+					widthRowLabel = len( rowLabels( jRow ) );
 					if ( widthRowLabel > maxWidthRowLabel ) {
 						maxWidthRowLabel = widthRowLabel;
 					}
@@ -12593,88 +12592,88 @@ namespace OutputReportTabular {
 				for ( jRow = 1; jRow <= maxNumColLabelRows; ++jRow ) {
 					outputLine = curDel; // one leading delimiters on column header lines
 					for ( iCol = 1; iCol <= colsColumnLabels; ++iCol ) {
-						outputLine = trim( outputLine ) + curDel + trim( adjustl( colLabelMulti( jRow, iCol ) ) );
+						outputLine += curDel + stripped( colLabelMulti( jRow, iCol ) );
 					}
-					gio::write( curFH, fmta ) << trim( InsertCurrencySymbol( outputLine, false ) );
+					gio::write( curFH, fmta ) << InsertCurrencySymbol( outputLine, false );
 				}
 				// body with row headers
 				for ( jRow = 1; jRow <= rowsBody; ++jRow ) {
-					outputLine = curDel + trim( rowLabels( jRow ) ); //one leading delimiters on table body lines
+					outputLine = curDel + rowLabels( jRow ); // one leading delimiters on table body lines
 					for ( iCol = 1; iCol <= colsBody; ++iCol ) {
-						outputLine = trim( outputLine ) + curDel + trim( adjustl( body( jRow, iCol ) ) );
+						outputLine += curDel + stripped( body( jRow, iCol ) );
 					}
-					gio::write( curFH, fmta ) << trim( InsertCurrencySymbol( outputLine, false ) );
+					gio::write( curFH, fmta ) << InsertCurrencySymbol( outputLine, false );
 				}
 				if ( present( footnoteText ) ) {
-					if ( len_trim( footnoteText ) > 0 ) {
-						gio::write( curFH, fmta ) << trim( footnoteText );
+					if ( len( footnoteText ) > 0 ) {
+						gio::write( curFH, fmta ) << footnoteText;
 					}
 				}
-				gio::write( curFH, fmta ) << "";
-				gio::write( curFH, fmta ) << "";
+				gio::write( curFH );
+				gio::write( curFH );
 
 			} else if ( SELECT_CASE_var == tableStyleFixed ) {
 				// column headers
 				for ( jRow = 1; jRow <= maxNumColLabelRows; ++jRow ) {
-					outputLine = blank; // spaces(:maxWidthRowLabel+2)  !two extra spaces and leave blank area for row labels
-					col1start = max( maxWidthRowLabel + 2, 3 );
+					outputLine = blank; // spaces(:maxWidthRowLabel+2)  // two extra spaces and leave blank area for row labels
+					col1start = max( maxWidthRowLabel + 2u, static_cast< std::string::size_type >( 3u ) );
 					for ( iCol = 1; iCol <= colsColumnLabels; ++iCol ) {
 						if ( iCol != 1 ) {
-							outputLine = trim( outputLine ) + "  " + adjustr( colLabelMulti( jRow, iCol )( 1, widthColumn( iCol ) ) );
+							outputLine += "  " + rjustified( sized( colLabelMulti( jRow, iCol ), widthColumn( iCol ) ) );
 						} else {
-							outputLine( col1start ) = "  " + adjustr( colLabelMulti( jRow, iCol )( 1, widthColumn( iCol ) ) );
+							outputLine = std::string( col1start - 1, ' ' ) + "  " + rjustified( sized( colLabelMulti( jRow, iCol ), widthColumn( iCol ) ) );
 						}
 					}
-					gio::write( curFH, fmta ) << trim( InsertCurrencySymbol( outputLine, false ) );
+					gio::write( curFH, fmta ) << InsertCurrencySymbol( outputLine, false );
 				}
 				// body with row headers
 				for ( jRow = 1; jRow <= rowsBody; ++jRow ) {
-					outputLine = "  " + adjustr( rowLabels( jRow )( 1, maxWidthRowLabel ) ); //two blank spaces on table body lines
-					col1start = max( len_trim( outputLine ) + 2, maxWidthRowLabel + 2 );
+					outputLine = "  " + rjustified( sized( rowLabels( jRow ), maxWidthRowLabel ) ); // two blank spaces on table body lines
+					//col1start = max( len( outputLine ) + 2u, maxWidthRowLabel + 2u );
 					for ( iCol = 1; iCol <= colsBody; ++iCol ) {
 						if ( iCol != 1 ) {
-							outputLine = trim( outputLine ) + "  " + adjustr( body( jRow, iCol )( 1, widthColumn( iCol ) ) );
+							outputLine += "  " + rjustified( sized( body( jRow, iCol ), widthColumn( iCol ) ) );
 						} else {
-							outputLine( col1start ) = "  " + adjustr( body( jRow, iCol )( 1, widthColumn( iCol ) ) );
+							outputLine += "   " + rjustified( sized( body( jRow, iCol ), widthColumn( iCol ) ) );
 						}
 					}
-					gio::write( curFH, fmta ) << trim( InsertCurrencySymbol( outputLine, false ) );
+					gio::write( curFH, fmta ) << InsertCurrencySymbol( outputLine, false );
 				}
 				if ( present( footnoteText ) ) {
-					if ( len_trim( footnoteText ) > 0 ) {
-						gio::write( curFH, fmta ) << trim( footnoteText );
+					if ( len( footnoteText ) > 0 ) {
+						gio::write( curFH, fmta ) << footnoteText;
 					}
 				}
-				gio::write( curFH, fmta ) << "";
-				gio::write( curFH, fmta ) << "";
+				gio::write( curFH );
+				gio::write( curFH );
 
 			} else if ( SELECT_CASE_var == tableStyleHTML ) {
 				// set up it being a table
 				gio::write( curFH, fmta ) << "<table border=\"1\" cellpadding=\"4\" cellspacing=\"0\">";
 				// column headers
-				gio::write( curFH, fmta ) << "  <tr><td></td>"; //start new row and leave empty cell
+				gio::write( curFH, fmta ) << "  <tr><td></td>"; // start new row and leave empty cell
 				for ( iCol = 1; iCol <= colsColumnLabels; ++iCol ) {
 					outputLine = "    <td align=\"right\">";
 					for ( jRow = 1; jRow <= maxNumColLabelRows; ++jRow ) {
-						outputLine = trim( outputLine ) + trim( colLabelMulti( jRow, iCol ) );
+						outputLine += colLabelMulti( jRow, iCol );
 						if ( jRow < maxNumColLabelRows ) {
-							outputLine = trim( outputLine ) + "<br>";
+							outputLine += "<br>";
 						}
 					}
-					gio::write( curFH, fmta ) << trim( InsertCurrencySymbol( outputLine, true ) ) + "</td>";
+					gio::write( curFH, fmta ) << InsertCurrencySymbol( outputLine, true ) + "</td>";
 				}
 				gio::write( curFH, fmta ) << "  </tr>";
 				// body with row headers
 				for ( jRow = 1; jRow <= rowsBody; ++jRow ) {
 					gio::write( curFH, fmta ) << "  <tr>";
-					if ( trim( rowLabels( jRow ) ) != "" ) {
-						gio::write( curFH, fmta ) << "    <td align=\"right\">" + trim( InsertCurrencySymbol( rowLabels( jRow ), true ) ) + "</td>";
+					if ( rowLabels( jRow ) != "" ) {
+						gio::write( curFH, fmta ) << "    <td align=\"right\">" + InsertCurrencySymbol( rowLabels( jRow ), true ) + "</td>";
 					} else {
 						gio::write( curFH, fmta ) << "    <td align=\"right\">&nbsp;</td>";
 					}
 					for ( iCol = 1; iCol <= colsBody; ++iCol ) {
-						if ( trim( body( jRow, iCol ) ) != "" ) {
-							gio::write( curFH, fmta ) << "    <td align=\"right\">" + trim( InsertCurrencySymbol( body( jRow, iCol ), true ) ) + "</td>";
+						if ( body( jRow, iCol ) != "" ) {
+							gio::write( curFH, fmta ) << "    <td align=\"right\">" + InsertCurrencySymbol( body( jRow, iCol ), true ) + "</td>";
 						} else {
 							gio::write( curFH, fmta ) << "    <td align=\"right\">&nbsp;</td>";
 						}
@@ -12684,8 +12683,8 @@ namespace OutputReportTabular {
 				// end the table
 				gio::write( curFH, fmta ) << "</table>";
 				if ( present( footnoteText ) ) {
-					if ( len_trim( footnoteText ) > 0 ) {
-						gio::write( curFH, fmta ) << "<i>" + trim( footnoteText ) + "</i>";
+					if ( len( footnoteText ) > 0 ) {
+						gio::write( curFH, fmta ) << "<i>" + footnoteText + "</i>";
 					}
 				}
 				gio::write( curFH, fmta ) << "<br><br>";
@@ -12694,7 +12693,7 @@ namespace OutputReportTabular {
 				isTableBlank = true;
 				for ( jRow = 1; jRow <= rowsBody; ++jRow ) {
 					for ( iCol = 1; iCol <= colsBody; ++iCol ) {
-						if ( len_trim( body( jRow, iCol ) ) > 0 ) {
+						if ( len( body( jRow, iCol ) ) > 0 ) {
 							isTableBlank = false;
 							break;
 						}
@@ -12707,11 +12706,11 @@ namespace OutputReportTabular {
 					activeSubTableName = ConvertToElementTag( activeSubTableName );
 					activeReportNameNoSpace = ConvertToElementTag( activeReportName );
 					if ( SameString( activeSubTableName, activeReportNameNoSpace ) ) {
-						activeSubTableName = trim( activeSubTableName ) + "Record";
+						activeSubTableName += "Record";
 					}
 					//if no subtable name use the report name and add "record" to the end
-					if ( len_trim( activeSubTableName ) == 0 ) {
-						activeSubTableName = trim( activeReportNameNoSpace ) + "Record";
+					if ( len( activeSubTableName ) == 0 ) {
+						activeSubTableName = activeReportNameNoSpace + "Record";
 					}
 					// if a single column table, transpose it automatically
 					if ( ( colsBody == 1 ) && ( rowsBody > 1 ) ) {
@@ -12720,7 +12719,7 @@ namespace OutputReportTabular {
 					// first convert all row and column headers into tags compatible with XML strings
 					for ( jRow = 1; jRow <= rowsBody; ++jRow ) {
 						rowLabelTags( jRow ) = ConvertToElementTag( rowLabels( jRow ) );
-						if ( len_trim( rowLabelTags( jRow ) ) == 0 ) {
+						if ( len( rowLabelTags( jRow ) ) == 0 ) {
 							rowLabelTags( jRow ) = "none";
 						}
 						rowUnitStrings( jRow ) = GetUnitSubString( rowLabels( jRow ) );
@@ -12730,7 +12729,7 @@ namespace OutputReportTabular {
 					}
 					for ( iCol = 1; iCol <= colsBody; ++iCol ) {
 						columnLabelTags( iCol ) = ConvertToElementTag( columnLabels( iCol ) );
-						if ( len_trim( columnLabelTags( iCol ) ) == 0 ) {
+						if ( len( columnLabelTags( iCol ) ) == 0 ) {
 							columnLabelTags( iCol ) = "none";
 						}
 						columnUnitStrings( iCol ) = GetUnitSubString( columnLabels( iCol ) );
@@ -12750,28 +12749,28 @@ namespace OutputReportTabular {
 							//check if record is blank and it if is skip generating anything
 							isRecordBlank = true;
 							for ( iCol = 1; iCol <= colsBody; ++iCol ) {
-								if ( len_trim( bodyEsc( jRow, iCol ) ) > 0 ) {
+								if ( len( bodyEsc( jRow, iCol ) ) > 0 ) {
 									isRecordBlank = false;
 									break;
 								}
 							}
 							if ( ! isRecordBlank ) {
-								gio::write( curFH, fmta ) << "  <" + trim( activeSubTableName ) + ">";
-								if ( len_trim( rowLabelTags( jRow ) ) > 0 ) {
-									gio::write( curFH, fmta ) << "    <name>" + trim( rowLabelTags( jRow ) ) + "</name>";
+								gio::write( curFH, fmta ) << "  <" + activeSubTableName + '>';
+								if ( len( rowLabelTags( jRow ) ) > 0 ) {
+									gio::write( curFH, fmta ) << "    <name>" + rowLabelTags( jRow ) + "</name>";
 								}
 								for ( iCol = 1; iCol <= colsBody; ++iCol ) {
-									if ( len_trim( adjustl( bodyEsc( jRow, iCol ) ) ) > 0 ) { //skip blank cells
-										tagWithAttrib = "<" + trim( columnLabelTags( iCol ) );
-										if ( len_trim( columnUnitStrings( iCol ) ) > 0 ) {
-											tagWithAttrib = trim( tagWithAttrib ) + " units=" + CHAR( 34 ) + trim( columnUnitStrings( iCol ) ) + CHAR( 34 ) + ">"; //if units are present add them as an attribute
+									if ( len( stripped( bodyEsc( jRow, iCol ) ) ) > 0 ) { //skip blank cells
+										tagWithAttrib = "<" + columnLabelTags( iCol );
+										if ( len( columnUnitStrings( iCol ) ) > 0 ) {
+											tagWithAttrib += " units=" + CHAR( 34 ) + columnUnitStrings( iCol ) + CHAR( 34 ) + '>'; //if units are present add them as an attribute
 										} else {
-											tagWithAttrib = trim( tagWithAttrib ) + ">";
+											tagWithAttrib += ">";
 										}
-										gio::write( curFH, fmta ) << "    " + trim( tagWithAttrib ) + trim( adjustl( bodyEsc( jRow, iCol ) ) ) + "</" + trim( columnLabelTags( iCol ) ) + ">";
+										gio::write( curFH, fmta ) << "    " + tagWithAttrib + stripped( bodyEsc( jRow, iCol ) ) + "</" + columnLabelTags( iCol ) + '>';
 									}
 								}
-								gio::write( curFH, fmta ) << "  </" + trim( activeSubTableName ) + ">";
+								gio::write( curFH, fmta ) << "  </" + activeSubTableName + '>';
 							}
 						}
 					} else { //transpose XML table
@@ -12780,39 +12779,39 @@ namespace OutputReportTabular {
 							//check if record is blank and it if is skip generating anything
 							isRecordBlank = true;
 							for ( jRow = 1; jRow <= rowsBody; ++jRow ) {
-								if ( len_trim( bodyEsc( jRow, iCol ) ) > 0 ) {
+								if ( len( bodyEsc( jRow, iCol ) ) > 0 ) {
 									isRecordBlank = false;
 									break;
 								}
 							}
 							if ( ! isRecordBlank ) {
-								gio::write( curFH, fmta ) << "  <" + trim( activeSubTableName ) + ">";
+								gio::write( curFH, fmta ) << "  <" + activeSubTableName + '>';
 								// if the column has units put them into the name tag
-								if ( len_trim( columnLabelTags( iCol ) ) > 0 ) {
-									if ( len_trim( columnUnitStrings( iCol ) ) > 0 ) {
-										gio::write( curFH, fmta ) << "    <name units=" + CHAR( 34 ) + trim( columnUnitStrings( iCol ) ) + CHAR( 34 ) + ">" + trim( columnLabelTags( iCol ) ) + "</name>";
+								if ( len( columnLabelTags( iCol ) ) > 0 ) {
+									if ( len( columnUnitStrings( iCol ) ) > 0 ) {
+										gio::write( curFH, fmta ) << "    <name units=" + CHAR( 34 ) + columnUnitStrings( iCol ) + CHAR( 34 ) + '>' + columnLabelTags( iCol ) + "</name>";
 									} else {
-										gio::write( curFH, fmta ) << "    <name>" + trim( columnLabelTags( iCol ) ) + "</name>";
+										gio::write( curFH, fmta ) << "    <name>" + columnLabelTags( iCol ) + "</name>";
 									}
 								}
 								for ( jRow = 1; jRow <= rowsBody; ++jRow ) {
-									if ( len_trim( bodyEsc( jRow, iCol ) ) > 0 ) { //skip blank cells
-										tagWithAttrib = "<" + trim( rowLabelTags( jRow ) );
-										if ( len_trim( rowUnitStrings( jRow ) ) > 0 ) {
-											tagWithAttrib = trim( tagWithAttrib ) + " units=" + CHAR( 34 ) + trim( rowUnitStrings( jRow ) ) + CHAR( 34 ) + ">"; //if units are present add them as an attribute
+									if ( len( bodyEsc( jRow, iCol ) ) > 0 ) { //skip blank cells
+										tagWithAttrib = "<" + rowLabelTags( jRow );
+										if ( len( rowUnitStrings( jRow ) ) > 0 ) {
+											tagWithAttrib += " units=" + CHAR( 34 ) + rowUnitStrings( jRow ) + CHAR( 34 ) + '>'; //if units are present add them as an attribute
 										} else {
-											tagWithAttrib = trim( tagWithAttrib ) + ">";
+											tagWithAttrib += ">";
 										}
-										gio::write( curFH, fmta ) << "    " + trim( tagWithAttrib ) + trim( adjustl( bodyEsc( jRow, iCol ) ) ) + "</" + trim( rowLabelTags( jRow ) ) + ">";
+										gio::write( curFH, fmta ) << "    " + tagWithAttrib + stripped( bodyEsc( jRow, iCol ) ) + "</" + rowLabelTags( jRow ) + '>';
 									}
 								}
-								gio::write( curFH, fmta ) << "  </" + trim( activeSubTableName ) + ">";
+								gio::write( curFH, fmta ) << "  </" + activeSubTableName + '>';
 							}
 						}
 					}
 					if ( present( footnoteText ) ) {
-						if ( len_trim( footnoteText ) > 0 ) {
-							gio::write( curFH, fmta ) << "  <footnote>" + trim( footnoteText ) + "</footnote>";
+						if ( len( footnoteText ) > 0 ) {
+							gio::write( curFH, fmta ) << "  <footnote>" + footnoteText + "</footnote>";
 						}
 					}
 				}
@@ -12828,10 +12827,10 @@ namespace OutputReportTabular {
 		bodyEsc.deallocate();
 	}
 
-	Fstring
+	std::string
 	MakeAnchorName(
-		Fstring const & reportString,
-		Fstring const & objectString
+		std::string const & reportString,
+		std::string const & objectString
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -12852,7 +12851,7 @@ namespace OutputReportTabular {
 		// USE STATEMENTS:
 
 		// Return value
-		Fstring StringOut( MaxNameLength * 2 );
+		std::string StringOut;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -12867,26 +12866,24 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int i;
 
-		StringOut = "";
-		for ( i = 1; i <= len_trim( reportString ); ++i ) {
-			if ( index( validChars, reportString( i, i ) ) > 0 ) {
-				StringOut = trim( StringOut ) + reportString( i, i );
+		for ( std::string::size_type i = 0, e = len( reportString ); i < e; ++i ) {
+			if ( has( validChars, reportString[ i ] ) ) {
+				StringOut += reportString[ i ];
 			}
 		}
-		StringOut = trim( StringOut ) + "::";
-		for ( i = 1; i <= len_trim( objectString ); ++i ) {
-			if ( index( validChars, objectString( i, i ) ) > 0 ) {
-				StringOut = trim( StringOut ) + objectString( i, i );
+		StringOut += "::";
+		for ( std::string::size_type i = 0, e = len( objectString ); i < e; ++i ) {
+			if ( has( validChars, objectString[ i ] ) ) {
+				StringOut += objectString[ i ];
 			}
 		}
 		return StringOut;
 	}
 
-	Fstring
+	std::string
 	InsertCurrencySymbol(
-		Fstring const & inString, // Input String
+		std::string const & inString, // Input String
 		bool const isHTML // True if an HTML string
 	)
 	{
@@ -12905,7 +12902,6 @@ namespace OutputReportTabular {
 		using namespace DataCostEstimate;
 
 		// Return value
-		Fstring outSt( len( inString ) ); // Result String
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -12920,23 +12916,22 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int loc; // location of the ~$~ symbol
 
-		outSt = inString;
-		loc = index( outSt, "~~$~~" );
-		while ( loc > 0 ) {
+		std::string outSt( trimmed( inString ) ); // Result String
+		std::string::size_type loc = index( outSt, "~~$~~" );
+		while ( loc != std::string::npos ) {
 			if ( isHTML ) {
-				outSt = inString( 1, loc - 1 ) + trim( monetaryUnit( selectedMonetaryUnit ).html ) + outSt( loc + 5 );
+				outSt = inString.substr( 0, loc ) + monetaryUnit( selectedMonetaryUnit ).html + outSt.substr( loc + 5 );
 			} else {
-				outSt = inString( 1, loc - 1 ) + trim( monetaryUnit( selectedMonetaryUnit ).txt ) + outSt( loc + 5 );
+				outSt = inString.substr( 0, loc ) + monetaryUnit( selectedMonetaryUnit ).txt + outSt.substr( loc + 5 );
 			}
 			loc = index( outSt, "~~$~~" );
 		}
 		return outSt;
 	}
 
-	Fstring
-	ConvertToElementTag( Fstring const & inString ) // Input String
+	std::string
+	ConvertToElementTag( std::string const & inString ) // Input String
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Jason Glazer
@@ -12953,7 +12948,7 @@ namespace OutputReportTabular {
 		//   na
 
 		// Return value
-		Fstring outString( len( inString ) ); // Result String
+		std::string outString; // Result String
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -12968,44 +12963,33 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int iIn; // index through the string
-		int jOut; // index of the output string
-		int curCharVal; // ascii value of current character
-		bool foundOther; // flag if character found besides A-Z, a-z, 0-9
 
-		outString = " ";
-		jOut = 0;
-		foundOther = true;
-		for ( iIn = 1; iIn <= len_trim( inString ); ++iIn ) {
-			curCharVal = ichar( inString( iIn, iIn ) );
+		bool foundOther = true; // flag if character found besides A-Z, a-z, 0-9
+		for ( std::string::size_type iIn = 0, e = inString.length(); iIn < e; ++iIn ) {
+			char const c( inString[ iIn ] );
+			int const curCharVal = int( c );
 			{ auto const SELECT_CASE_var( curCharVal );
-			if ( ( SELECT_CASE_var >= 65 ) && ( SELECT_CASE_var <= 90 ) ) { //A-Z upper case
-				++jOut;
+			if ( ( SELECT_CASE_var >= 65 ) && ( SELECT_CASE_var <= 90 ) ) { // A-Z upper case
 				if ( foundOther ) {
-					outString( jOut, jOut ) = CHAR( curCharVal ); //keep as upper case after finding a space or another character
+					outString += c; // keep as upper case after finding a space or another character
 				} else {
-					outString( jOut, jOut ) = CHAR( curCharVal + 32 ); //convert to lower case
+					outString += char( curCharVal + 32 ); // convert to lower case
 				}
 				foundOther = false;
-			} else if ( ( SELECT_CASE_var >= 97 ) && ( SELECT_CASE_var <= 122 ) ) { //A-Z lower case
-				++jOut;
+			} else if ( ( SELECT_CASE_var >= 97 ) && ( SELECT_CASE_var <= 122 ) ) { // A-Z lower case
 				if ( foundOther ) {
-					outString( jOut, jOut ) = CHAR( curCharVal - 32 ); //convert to upper case
+					outString += char( curCharVal - 32 ); // convert to upper case
 				} else {
-					outString( jOut, jOut ) = CHAR( curCharVal ); //leave as lower case
+					outString += c; // leave as lower case
 				}
 				foundOther = false;
-			} else if ( ( SELECT_CASE_var >= 48 ) && ( SELECT_CASE_var <= 57 ) ) { //0-9 numbers
-				++jOut;
+			} else if ( ( SELECT_CASE_var >= 48 ) && ( SELECT_CASE_var <= 57 ) ) { // 0-9 numbers
 				// if first character is a number then prepend with the letter "t"
-				if ( jOut == 1 ) {
-					outString( 1, 1 ) = "t";
-					jOut = 2;
-				}
-				outString( jOut, jOut ) = CHAR( curCharVal );
+				if ( outString.length() == 0 ) outString += 't';
+				outString += c;
 				foundOther = false;
 			} else if ( SELECT_CASE_var == 91 ) { // [ bracket
-				break; //stop parsing because unit string was found
+				break; // stop parsing because unit string was found
 			} else {
 				foundOther = true;
 			}}
@@ -13013,8 +12997,8 @@ namespace OutputReportTabular {
 		return outString;
 	}
 
-	Fstring
-	ConvertToEscaped( Fstring const & inString ) // Input String
+	std::string
+	ConvertToEscaped( std::string const & inString ) // Input String
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Jason Glazer
@@ -13031,7 +13015,7 @@ namespace OutputReportTabular {
 		//   na
 
 		// Return value
-		Fstring outString( len( inString ) ); // Result String
+		std::string outString; // Result String
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -13046,37 +13030,25 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int iIn; // index through the string
-		int jOut; // index of the output string
-		int curCharVal; // ascii value of current character
 
-		outString = " ";
-		jOut = 0;
-		for ( iIn = 1; iIn <= len_trim( inString ); ++iIn ) {
-			curCharVal = ichar( inString( iIn, iIn ) );
-			{ auto const SELECT_CASE_var( curCharVal );
-			if ( SELECT_CASE_var == 34 ) { //  "
-				jOut += 6;
-				outString( jOut - 5, jOut ) = "&quot;";
-			} else if ( SELECT_CASE_var == 38 ) { //   &
-				jOut += 5;
-				outString( jOut - 4, jOut ) = "&amp;";
-			} else if ( SELECT_CASE_var == 39 ) { //   '
-				jOut += 6;
-				outString( jOut - 6, jOut ) = "&apos;";
-			} else if ( SELECT_CASE_var == 60 ) { //   <
-				jOut += 4;
-				outString( jOut - 3, jOut ) = "&lt;";
-			} else if ( SELECT_CASE_var == 62 ) { //   >
-				jOut += 4;
-				outString( jOut - 3, jOut ) = "&gt;";
-			} else if ( SELECT_CASE_var == 176 ) { //   degree
-				++jOut;
-				outString( jOut, jOut ) = "*"; //replace degree symbol with asterisk to avoid errors from various XML editors
+		for ( std::string::size_type iIn = 0; iIn < len( inString ); ++iIn ) {
+			char const c( inString[ iIn ] );
+			int const curCharVal = int( c );
+			if ( curCharVal == 34 ) { //  "
+				outString += "&quot;";
+			} else if ( curCharVal == 38 ) { //   &
+				outString += "&amp;";
+			} else if ( curCharVal == 39 ) { //   '
+				outString += "&apos;";
+			} else if ( curCharVal == 60 ) { //   <
+				outString += "&lt;";
+			} else if ( curCharVal == 62 ) { //   >
+				outString += "&gt;";
+			} else if ( curCharVal == 176 ) { //   degree
+				outString += '*'; // replace degree symbol with asterisk to avoid errors from various XML editors
 			} else { //most characters are fine
-				++jOut;
-				outString( jOut, jOut ) = CHAR( curCharVal );
-			}}
+				outString += c;
+			}
 		}
 		return outString;
 	}
@@ -13298,7 +13270,7 @@ namespace OutputReportTabular {
 	//======================================================================================================================
 	//======================================================================================================================
 
-	Fstring
+	std::string
 	RealToStr(
 		Real64 const RealIn,
 		int const numDigits
@@ -13323,16 +13295,16 @@ namespace OutputReportTabular {
 		// na
 
 		// Return value
-		Fstring StringOut( 12 );
+		std::string StringOut;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static FArray1D_Fstring const formDigits( {0,9}, sFstring( 7 ), { "(F12.0)", "(F12.1)", "(F12.2)", "(F12.3)", "(F12.4)", "(F12.5)", "(F12.6)", "(F12.7)", "(F12.8)", "(F12.9)" } ); // formDigits(0) | formDigits(1) | formDigits(2) | formDigits(3) | formDigits(4) | formDigits(5) | formDigits(6) | formDigits(7) | formDigits(8) | formDigits(9)
-		static FArray1D< Real64 > const maxvalDigits( {0,9}, { 9999999999., 999999999., 99999999., 9999999., 999999., 99999., 9999., 999., 99., 9. } ); // maxvalDigits(0) | maxvalDigits(1) | maxvalDigits(2) | maxvalDigits(3) | maxvalDigits(4) | maxvalDigits(5) | maxvalDigits(6) | maxvalDigits(7) | maxvalDigits(8) | maxvalDigits(9)
+		static FArray1D_string const formDigits( {0,9}, { "(F12.0)", "(F12.1)", "(F12.2)", "(F12.3)", "(F12.4)", "(F12.5)", "(F12.6)", "(F12.7)", "(F12.8)", "(F12.9)" } ); // formDigits(0) | formDigits(1) | formDigits(2) | formDigits(3) | formDigits(4) | formDigits(5) | formDigits(6) | formDigits(7) | formDigits(8) | formDigits(9)
+		static FArray1D< Real64 > const maxvalDigits( {0,9}, { 9999999999.0, 999999999.0, 99999999.0, 9999999.0, 999999.0, 99999.0, 9999.0, 999.0, 99.0, 9.0 } ); // maxvalDigits(0) | maxvalDigits(1) | maxvalDigits(2) | maxvalDigits(3) | maxvalDigits(4) | maxvalDigits(5) | maxvalDigits(6) | maxvalDigits(7) | maxvalDigits(8) | maxvalDigits(9)
 
-		static Fstring const fmtd( "(E12.6)" );
+		static gio::Fmt const fmtd( "(E12.6)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -13363,7 +13335,7 @@ namespace OutputReportTabular {
 		return StringOut;
 	}
 
-	Fstring
+	std::string
 	IntToStr( int const intIn )
 	{
 		// SUBROUTINE INFORMATION:
@@ -13376,14 +13348,14 @@ namespace OutputReportTabular {
 		//   Abstract away the internal write concept
 
 		// Return value
-		Fstring StringOut( 12 );
+		std::string StringOut;
 
 		gio::write( StringOut, "*" ) << intIn;
 		return StringOut;
 	}
 
 	Real64
-	StrToReal( Fstring const & stringIn )
+	StrToReal( std::string const & stringIn )
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Linda Lawrie
@@ -13400,11 +13372,11 @@ namespace OutputReportTabular {
 		{ IOFlags flags; gio::read( stringIn, "*", flags ) >> realValue; if ( flags.err() ) goto Label900; }
 		return realValue;
 Label900: ;
-		realValue = -99999.;
+		realValue = -99999.0;
 		return realValue;
 	}
 
-	Fstring
+	std::string
 	DateToString( int const codedDate ) // word containing encoded month, day, hour, minute
 	{
 		// SUBROUTINE INFORMATION:
@@ -13421,56 +13393,54 @@ Label900: ;
 		using General::DecodeMonDayHrMin;
 
 		// Return value
-		Fstring StringOut( 12 );
+		std::string StringOut;
 
 		// Locals
 		// ((month*100 + day)*100 + hour)*100 + minute
-		static Fstring const DateFmt( "(I2.2,'-',A3,'-',I2.2,':',I2.2)" );
+		static gio::Fmt const DateFmt( "(I2.2,'-',A3,'-',I2.2,':',I2.2)" );
 
 		int Month; // month in integer format (1-12)
 		int Day; // day in integer format (1-31)
 		int Hour; // hour in integer format (1-24)
 		int Minute; // minute in integer format (0:59)
-		Fstring monthName( 3 );
+		std::string monthName;
 
 		if ( codedDate != 0 ) {
-			monthName = "";
 			DecodeMonDayHrMin( codedDate, Month, Day, Hour, Minute );
 			--Hour;
 			if ( Minute == 60 ) {
 				++Hour;
 				Minute = 0;
 			}
-			{ auto const SELECT_CASE_var( Month );
-			if ( SELECT_CASE_var == 1 ) {
+			if ( Month == 1 ) {
 				monthName = "JAN";
-			} else if ( SELECT_CASE_var == 2 ) {
+			} else if ( Month == 2 ) {
 				monthName = "FEB";
-			} else if ( SELECT_CASE_var == 3 ) {
+			} else if ( Month == 3 ) {
 				monthName = "MAR";
-			} else if ( SELECT_CASE_var == 4 ) {
+			} else if ( Month == 4 ) {
 				monthName = "APR";
-			} else if ( SELECT_CASE_var == 5 ) {
+			} else if ( Month == 5 ) {
 				monthName = "MAY";
-			} else if ( SELECT_CASE_var == 6 ) {
+			} else if ( Month == 6 ) {
 				monthName = "JUN";
-			} else if ( SELECT_CASE_var == 7 ) {
+			} else if ( Month == 7 ) {
 				monthName = "JUL";
-			} else if ( SELECT_CASE_var == 8 ) {
+			} else if ( Month == 8 ) {
 				monthName = "AUG";
-			} else if ( SELECT_CASE_var == 9 ) {
+			} else if ( Month == 9 ) {
 				monthName = "SEP";
-			} else if ( SELECT_CASE_var == 10 ) {
+			} else if ( Month == 10 ) {
 				monthName = "OCT";
-			} else if ( SELECT_CASE_var == 11 ) {
+			} else if ( Month == 11 ) {
 				monthName = "NOV";
-			} else if ( SELECT_CASE_var == 12 ) {
+			} else if ( Month == 12 ) {
 				monthName = "DEC";
 			} else {
 				monthName = "***";
-			}}
+			}
 			gio::write( StringOut, DateFmt ) << Day << monthName << Hour << Minute;
-			if ( index( StringOut, "*" ) > 0 ) {
+			if ( has( StringOut, "*" ) ) {
 				StringOut = "-";
 			}
 		} else { // codeddate = 0
@@ -13482,8 +13452,8 @@ Label900: ;
 
 	void
 	AddTOCEntry(
-		Fstring const & nameSection,
-		Fstring const & nameReport
+		std::string const & nameSection,
+		std::string const & nameReport
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -13933,8 +13903,8 @@ Label900: ;
 		UnitConv( 92 ).several = true;
 	}
 
-	Fstring
-	GetUnitSubString( Fstring const & inString ) // Input String
+	std::string
+	GetUnitSubString( std::string const & inString ) // Input String
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Jason Glazer
@@ -13950,7 +13920,7 @@ Label900: ;
 		//   na
 
 		// Return value
-		Fstring outUnit( len( inString ) ); // Result String
+		std::string outUnit; // Result String
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -13966,27 +13936,21 @@ Label900: ;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		int posLBrac;
-		int posRBrac;
-
-		outUnit = " ";
 		//check if string has brackets or parentheses
-		posLBrac = index( inString, "[" ); // left bracket
-		posRBrac = index( inString, "]" ); // right bracket
+		std::string::size_type const posLBrac = index( inString, '[' ); // left bracket
+		std::string::size_type const posRBrac = index( inString, ']' ); // right bracket
 		//extract the substring with the units
-		if ( ( posLBrac > 0 ) && ( posRBrac > 0 ) && ( ( posRBrac - posLBrac ) >= 2 ) ) {
-			outUnit = inString( posLBrac + 1, posRBrac - 1 );
-		} else {
-			outUnit = " ";
+		if ( ( posLBrac != std::string::npos ) && ( posRBrac != std::string::npos ) && ( posRBrac - posLBrac >= 2 ) ) {
+			outUnit = inString.substr( posLBrac + 1, posRBrac - posLBrac - 1 );
 		}
 		return outUnit;
 	}
 
 	void
 	LookupSItoIP(
-		Fstring const & stringInWithSI,
+		std::string const & stringInWithSI,
 		int & unitConvIndex,
-		Fstring & stringOutWithIP
+		std::string & stringOutWithIP
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -14030,51 +13994,41 @@ Label900: ;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//    na
-		static Fstring unitSIOnly( MaxNameLength );
-		static int posLBrac( 0 );
-		static int posRBrac( 0 );
-		static int posLParen( 0 );
-		static int posRParen( 0 );
+		std::string unitSIOnly;
 		int modeInString;
 		int const misBrac( 1 );
 		int const misParen( 2 );
 		int const misNoHint( 3 );
-		static int iUnit( 0 );
-		static int defaultConv( 0 );
-		static int foundConv( 0 );
-		static int firstOfSeveral( 0 );
-		Fstring stringInUpper( MaxNameLength * 2 ); // *2 to take care of >100 characters in string.
-		static int selectedConv( 0 );
+		std::string const stringInUpper( MakeUPPERCase( stringInWithSI ) );
 
 		stringOutWithIP = "";
-		stringInUpper = MakeUPPERCase( stringInWithSI );
 		//check if string has brackets or parentheses
-		posLBrac = index( stringInUpper, "[" ); // left bracket
-		posRBrac = index( stringInUpper, "]" ); // right bracket
-		posLParen = index( stringInUpper, "(" ); // left parenthesis
-		posRParen = index( stringInUpper, ")" ); // right parenthesis
+		std::string::size_type posLBrac = index( stringInUpper, '[' ); // left bracket
+		std::string::size_type posRBrac = index( stringInUpper, ']' ); // right bracket
+		std::string::size_type posLParen = index( stringInUpper, '(' ); // left parenthesis
+		std::string::size_type posRParen = index( stringInUpper, ')' ); // right parenthesis
 		//extract the substring with the units
-		if ( ( posLBrac > 0 ) && ( posRBrac > 0 ) && ( ( posRBrac - posLBrac ) >= 2 ) ) {
-			unitSIOnly = stringInUpper( posLBrac + 1, posRBrac - 1 );
+		if ( ( posLBrac != std::string::npos ) && ( posRBrac != std::string::npos ) && ( posRBrac - posLBrac >= 2 ) ) {
+			unitSIOnly = stringInUpper.substr( posLBrac + 1, posRBrac - posLBrac - 1 );
 			modeInString = misBrac;
-		} else if ( ( posLParen > 0 ) && ( posRParen > 0 ) && ( ( posRParen - posLParen ) >= 2 ) ) {
-			unitSIOnly = stringInUpper( posLParen + 1, posRParen - 1 );
+		} else if ( ( posLParen != std::string::npos ) && ( posRParen != std::string::npos ) && ( posRParen - posLParen >= 2 ) ) {
+			unitSIOnly = stringInUpper.substr( posLParen + 1, posRParen - posLParen - 1 );
 			modeInString = misParen;
 		} else {
 			unitSIOnly = stringInUpper;
 			modeInString = misNoHint;
 		}
-		defaultConv = 0;
-		foundConv = 0;
-		firstOfSeveral = 0;
-		for ( iUnit = 1; iUnit <= UnitConvSize; ++iUnit ) {
+		int defaultConv = 0;
+		int foundConv = 0;
+		int firstOfSeveral = 0;
+		for ( int iUnit = 1; iUnit <= UnitConvSize; ++iUnit ) {
 			if ( SameString( UnitConv( iUnit ).siName, unitSIOnly ) ) {
 				if ( UnitConv( iUnit ).several ) {
 					if ( firstOfSeveral == 0 ) firstOfSeveral = iUnit;
 					if ( UnitConv( iUnit ).is_default ) defaultConv = iUnit;
 					// look for the hint string
-					if ( len_trim( UnitConv( iUnit ).hint ) > 0 ) {
-						if ( index( stringInUpper, trim( UnitConv( iUnit ).hint ) ) > 0 ) {
+					if ( len( UnitConv( iUnit ).hint ) > 0 ) {
+						if ( has( stringInUpper, UnitConv( iUnit ).hint ) ) {
 							foundConv = iUnit;
 							break;
 						}
@@ -14088,6 +14042,7 @@ Label900: ;
 		// if it is found set the selected value to what was found. if not found,
 		// directly set it to the default and if no default set it to the first item
 		// in group.  Return zero if not found.
+		int selectedConv( 0 );
 		if ( foundConv > 0 ) {
 			selectedConv = foundConv;
 		} else {
@@ -14104,14 +14059,13 @@ Label900: ;
 		}
 		// if one was selected substitute the units into the output string
 		if ( selectedConv > 0 ) {
-			{ auto const SELECT_CASE_var( modeInString );
-			if ( SELECT_CASE_var == misBrac ) {
-				stringOutWithIP = stringInWithSI( 1, posLBrac ) + trim( UnitConv( selectedConv ).ipName ) + stringInWithSI( posRBrac );
-			} else if ( SELECT_CASE_var == misParen ) {
-				stringOutWithIP = stringInWithSI( 1, posLParen ) + trim( UnitConv( selectedConv ).ipName ) + stringInWithSI( posRParen );
-			} else if ( SELECT_CASE_var == misNoHint ) {
-				stringOutWithIP = trim( UnitConv( selectedConv ).ipName );
-			}}
+			if ( modeInString == misBrac ) {
+				stringOutWithIP = stringInWithSI.substr( 0, posLBrac + 1 ) + UnitConv( selectedConv ).ipName + stringInWithSI.substr( posRBrac );
+			} else if ( modeInString == misParen ) {
+				stringOutWithIP = stringInWithSI.substr( 0, posLParen + 1 ) + UnitConv( selectedConv ).ipName + stringInWithSI.substr( posRParen );
+			} else if ( modeInString == misNoHint ) {
+				stringOutWithIP = UnitConv( selectedConv ).ipName;
+			}
 		} else {
 			// if no conversion just output the input string
 			stringOutWithIP = stringInWithSI;
@@ -14231,7 +14185,7 @@ Label900: ;
 		int const unitConvIndex,
 		Real64 & multiplier,
 		Real64 & offset,
-		Fstring & IPunit
+		std::string & IPunit
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -14272,7 +14226,7 @@ Label900: ;
 		if ( ( unitConvIndex > 0 ) && ( unitConvIndex <= UnitConvSize ) ) {
 			multiplier = UnitConv( unitConvIndex ).mult;
 			offset = UnitConv( unitConvIndex ).offset;
-			IPunit = trim( UnitConv( unitConvIndex ).ipName );
+			IPunit = UnitConv( unitConvIndex ).ipName;
 		} else {
 			multiplier = 0.0;
 			offset = 0.0;
@@ -14282,8 +14236,8 @@ Label900: ;
 
 	Real64
 	getSpecificUnitMultiplier(
-		Fstring const & SIunit,
-		Fstring const & IPunit
+		std::string const & SIunit,
+		std::string const & IPunit
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -14347,8 +14301,8 @@ Label900: ;
 
 	Real64
 	getSpecificUnitDivider(
-		Fstring const & SIunit,
-		Fstring const & IPunit
+		std::string const & SIunit,
+		std::string const & IPunit
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -14404,8 +14358,8 @@ Label900: ;
 
 	Real64
 	getSpecificUnitIndex(
-		Fstring const & SIunit,
-		Fstring const & IPunit
+		std::string const & SIunit,
+		std::string const & IPunit
 	)
 	{
 		// SUBROUTINE INFORMATION:

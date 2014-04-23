@@ -203,3 +203,11 @@ TEST_F( PrintTest, NegZeroES126 )
 	Print( "(ES12.6)" ) << -0.0;
 	EXPECT_EQ( "************\n", buf.str() );
 }
+
+TEST_F( PrintTest, Fmt )
+{
+	gio::Fmt const fmt( "(F7.0$)" );
+	float f( 1.125E3 );
+	Print( fmt ) << f;
+	EXPECT_EQ( "  1125.", buf.str() );
+}

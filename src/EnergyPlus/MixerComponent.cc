@@ -75,7 +75,7 @@ namespace MixerComponent {
 
 	void
 	SimAirMixer(
-		Fstring const & CompName,
+		std::string const & CompName,
 		int & CompIndex
 	)
 	{
@@ -131,17 +131,17 @@ namespace MixerComponent {
 		if ( CompIndex == 0 ) {
 			MixerNum = FindItemInList( CompName, MixerCond.MixerName(), NumMixers );
 			if ( MixerNum == 0 ) {
-				ShowFatalError( "SimAirLoopMixer: Mixer not found=" + trim( CompName ) );
+				ShowFatalError( "SimAirLoopMixer: Mixer not found=" + CompName );
 			}
 			CompIndex = MixerNum;
 		} else {
 			MixerNum = CompIndex;
 			if ( MixerNum > NumMixers || MixerNum < 1 ) {
-				ShowFatalError( "SimAirLoopMixer: Invalid CompIndex passed=" + trim( TrimSigDigits( MixerNum ) ) + ", Number of Mixers=" + trim( TrimSigDigits( NumMixers ) ) + ", Mixer name=" + trim( CompName ) );
+				ShowFatalError( "SimAirLoopMixer: Invalid CompIndex passed=" + TrimSigDigits( MixerNum ) + ", Number of Mixers=" + TrimSigDigits( NumMixers ) + ", Mixer name=" + CompName );
 			}
 			if ( CheckEquipName( MixerNum ) ) {
 				if ( CompName != MixerCond( MixerNum ).MixerName ) {
-					ShowFatalError( "SimAirLoopMixer: Invalid CompIndex passed=" + trim( TrimSigDigits( MixerNum ) ) + ", Mixer name=" + trim( CompName ) + ", stored Mixer Name for that index=" + trim( MixerCond( MixerNum ).MixerName ) );
+					ShowFatalError( "SimAirLoopMixer: Invalid CompIndex passed=" + TrimSigDigits( MixerNum ) + ", Mixer name=" + CompName + ", stored Mixer Name for that index=" + MixerCond( MixerNum ).MixerName );
 				}
 				CheckEquipName( MixerNum ) = false;
 			}
@@ -195,7 +195,7 @@ namespace MixerComponent {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetMixerInput: " ); // include trailing blank space
+		static std::string const RoutineName( "GetMixerInput: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -215,10 +215,10 @@ namespace MixerComponent {
 		int NumParams;
 		int InNodeNum1;
 		int InNodeNum2;
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in getting objects
-		FArray1D_Fstring AlphArray( sFstring( MaxNameLength ) ); // Alpha input items for object
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) ); // Numeric field names
+		std::string CurrentModuleObject; // for ease in getting objects
+		FArray1D_string AlphArray; // Alpha input items for object
+		FArray1D_string cAlphaFields; // Alpha field names
+		FArray1D_string cNumericFields; // Numeric field names
 		FArray1D< Real64 > NumArray; // Numeric input items for object
 		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
@@ -233,13 +233,13 @@ namespace MixerComponent {
 
 		GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
-		AlphArray = " ";
+		AlphArray = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = " ";
+		cAlphaFields = "";
 		lAlphaBlanks.allocate( NumAlphas );
 		lAlphaBlanks = true;
 		cNumericFields.allocate( NumNums );
-		cNumericFields = " ";
+		cNumericFields = "";
 		lNumericBlanks.allocate( NumNums );
 		lNumericBlanks = true;
 		NumArray.allocate( NumNums );
@@ -250,14 +250,14 @@ namespace MixerComponent {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), MixerCond.MixerName(), MixerNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( AlphArray( 1 ), MixerCond.MixerName(), MixerNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
 			}
 			MixerCond( MixerNum ).MixerName = AlphArray( 1 );
 
-			MixerCond( MixerNum ).OutletNode = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			MixerCond( MixerNum ).OutletNode = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 			MixerCond( MixerNum ).NumInletNodes = NumAlphas - 2;
 
 			MixerCond.InitFlag() = true;
@@ -289,9 +289,9 @@ namespace MixerComponent {
 
 			for ( NodeNum = 1; NodeNum <= MixerCond( MixerNum ).NumInletNodes; ++NodeNum ) {
 
-				MixerCond( MixerNum ).InletNode( NodeNum ) = GetOnlySingleNode( AlphArray( 2 + NodeNum ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+				MixerCond( MixerNum ).InletNode( NodeNum ) = GetOnlySingleNode( AlphArray( 2 + NodeNum ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 				if ( lAlphaBlanks( 2 + NodeNum ) ) {
-					ShowSevereError( trim( cAlphaFields( 2 + NodeNum ) ) + " is Blank, " + trim( CurrentModuleObject ) + " = " + trim( AlphArray( 1 ) ) );
+					ShowSevereError( cAlphaFields( 2 + NodeNum ) + " is Blank, " + CurrentModuleObject + " = " + AlphArray( 1 ) );
 					ErrorsFound = true;
 				}
 
@@ -304,17 +304,17 @@ namespace MixerComponent {
 			NodeNum = MixerCond( MixerNum ).OutletNode;
 			for ( InNodeNum1 = 1; InNodeNum1 <= MixerCond( MixerNum ).NumInletNodes; ++InNodeNum1 ) {
 				if ( NodeNum != MixerCond( MixerNum ).InletNode( InNodeNum1 ) ) continue;
-				ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( MixerCond( MixerNum ).MixerName ) + " specifies an inlet node name the same as the outlet node." );
-				ShowContinueError( ".." + trim( cAlphaFields( 2 ) ) + " = " + trim( NodeID( NodeNum ) ) );
-				ShowContinueError( "..Inlet Node #" + trim( TrimSigDigits( InNodeNum1 ) ) + " is duplicate." );
+				ShowSevereError( CurrentModuleObject + " = " + MixerCond( MixerNum ).MixerName + " specifies an inlet node name the same as the outlet node." );
+				ShowContinueError( ".." + cAlphaFields( 2 ) + " = " + NodeID( NodeNum ) );
+				ShowContinueError( "..Inlet Node #" + TrimSigDigits( InNodeNum1 ) + " is duplicate." );
 				ErrorsFound = true;
 			}
 			for ( InNodeNum1 = 1; InNodeNum1 <= MixerCond( MixerNum ).NumInletNodes; ++InNodeNum1 ) {
 				for ( InNodeNum2 = InNodeNum1 + 1; InNodeNum2 <= MixerCond( MixerNum ).NumInletNodes; ++InNodeNum2 ) {
 					if ( MixerCond( MixerNum ).InletNode( InNodeNum1 ) != MixerCond( MixerNum ).InletNode( InNodeNum2 ) ) continue;
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( MixerCond( MixerNum ).MixerName ) + " specifies duplicate inlet nodes in its inlet node list." );
-					ShowContinueError( "..Inlet Node #" + trim( TrimSigDigits( InNodeNum1 ) ) + " Name=" + trim( NodeID( InNodeNum1 ) ) );
-					ShowContinueError( "..Inlet Node #" + trim( TrimSigDigits( InNodeNum2 ) ) + " is duplicate." );
+					ShowSevereError( CurrentModuleObject + " = " + MixerCond( MixerNum ).MixerName + " specifies duplicate inlet nodes in its inlet node list." );
+					ShowContinueError( "..Inlet Node #" + TrimSigDigits( InNodeNum1 ) + " Name=" + NodeID( InNodeNum1 ) );
+					ShowContinueError( "..Inlet Node #" + TrimSigDigits( InNodeNum2 ) + " is duplicate." );
 					ErrorsFound = true;
 				}
 			}

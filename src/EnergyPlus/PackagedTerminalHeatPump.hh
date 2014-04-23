@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -17,7 +16,6 @@ namespace EnergyPlus {
 namespace PackagedTerminalHeatPump {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 	using VariableSpeedCoils::MaxSpedLevels;
 
 	// Data
@@ -74,8 +72,8 @@ namespace PackagedTerminalHeatPump {
 	{
 		// Members
 		// input data
-		Fstring Name; // name of unit
-		Fstring UnitType; // type of unit
+		std::string Name; // name of unit
+		std::string UnitType; // type of unit
 		int UnitType_Num; // paramter equivalent to type of unit
 		int ZoneEquipType; // Type of PT unit
 		int SchedPtr; // index number to availability schedule
@@ -95,41 +93,41 @@ namespace PackagedTerminalHeatPump {
 		int AirOutNode; // outlet air node number
 		int OutsideAirNode; // OAmixer outside air node number
 		int AirReliefNode; // OAmixer relief air node number
-		Fstring OAMixType; // type of outside air mixer
-		Fstring OAMixName; // name of OAmixer
+		std::string OAMixType; // type of outside air mixer
+		std::string OAMixName; // name of OAmixer
 		int OAMixIndex;
-		Fstring FanName; // name of fan
-		Fstring FanType; // type of fan
+		std::string FanName; // name of fan
+		std::string FanType; // type of fan
 		int FanType_Num; // fan type number (see DataHVACGlobals)
 		int FanIndex; // index number to fan
 		int FanSchedPtr; // index number to fan operating mode schedule
 		int FanAvailSchedPtr; // index to fan availability schedule
-		Fstring DXCoolCoilName; // name of DX cooling coil
-		Fstring DXCoolCoilType; // type of DX cooling coil,Coil:DX:CoolingBypassFactorEmpirical or
+		std::string DXCoolCoilName; // name of DX cooling coil
+		std::string DXCoolCoilType; // type of DX cooling coil,Coil:DX:CoolingBypassFactorEmpirical or
 		//                        'CoilSystem:Cooling:DX:HeatExchangerAssisted'
 		int DXCoolCoilType_Num; // numeric equivalent for DX cooling coil type
 		int CoolCoilCompIndex; // cooling coil index number (index for DX coil or HX Assisted object)
 		int DXCoolCoilIndexNum; // actual DX cooling coil index number
 		int CondenserNodeNum; // DX cooling coil condenser node number
 		int DXHeatCoilIndexNum; // actual DX heating coil index number
-		Fstring DXHeatCoilName; // name of DX heating coil
-		Fstring DXHeatCoilType; // type of DX heating coil,Coil:DX:HeatingEmpirical
+		std::string DXHeatCoilName; // name of DX heating coil
+		std::string DXHeatCoilType; // type of DX heating coil,Coil:DX:HeatingEmpirical
 		int DXHeatCoilType_Num; // numeric equivalent for DX heating coil type
 		int DXHeatCoilIndex; // DX heating coil index number
-		Fstring ACHeatCoilName; // name of heating coil for PTAC
-		Fstring ACHeatCoilType; // type of heating coil for PTAC
+		std::string ACHeatCoilName; // name of heating coil for PTAC
+		std::string ACHeatCoilType; // type of heating coil for PTAC
 		Real64 ACHeatCoilCap; // heating coil capacity for PTAC
 		int ACHeatCoilIndex; // heating coil index number for PTAC
 		int HWCoilAirInletNode; // air outlet node number of HW coil for PTAC
 		int HWCoilSteamInletNode; // steam inlet node number of HW coil for PTAC and HP
 		int HWCoilSteamOutletNode; // steam inlet node number of HW coil for PTAC and HP
-		Fstring SuppHeatCoilName; // name of supplemental heating coil
+		std::string SuppHeatCoilName; // name of supplemental heating coil
 		int SuppHeatCoilType_Num; // numeric equivalent for supplemental heating coil type
 		int ACHeatCoilType_Num; // numeric equivalent for PTAC heating coil type
 		int SuppHeatCoilIndex; // supplemental heater index number
 		int SupHeatCoilCap; // supplemental heater coil capacity [W]
 		int SupCoilAirInletNode; // air inlet node for supplemental coil for HP
-		Fstring SuppHeatCoilType; // supplemental heater coil type
+		std::string SuppHeatCoilType; // supplemental heater coil type
 		Real64 MaxSATSupHeat; // maximum supply air temperature from supplemental heater [C]
 		Real64 MaxOATSupHeat; // maximum outdoor air temp for supplemental heater operation [C]
 		int OpMode; // mode of operation; 1=cycling fan, cycling compressor, 2=continuous fan, cycling compresor
@@ -138,7 +136,7 @@ namespace PackagedTerminalHeatPump {
 		Real64 HeatConvergenceTol; // Convergence tolerance, fraction (ZoneLoad - Equip Output)/ZoneLoad
 		Real64 MinOATCompressor; // Minimum OAT for compressor operation [C]
 		int IterErrIndex; // index for recurring warnings
-		Fstring AvailManagerListName; // Name of an availability manager list object
+		std::string AvailManagerListName; // Name of an availability manager list object
 		int WaterCyclingMode; // Heat Pump Coil water flow mode; See definitions in DataHVACGlobals,
 		// 1=water cycling, 2=water constant, 3=water constant on demand (old mode)
 		int PTObjectIndex; // index for PT unit
@@ -155,7 +153,7 @@ namespace PackagedTerminalHeatPump {
 		int CtrlZoneNum; // index of unit in ZoneEquipConfig
 		// addition for OA to Zone Units
 		bool ATMixerExists; // True if there is an ATMixer
-		Fstring ATMixerName; // name of air terminal mixer
+		std::string ATMixerName; // name of air terminal mixer
 		int ATMixerIndex; // index to the air terminal mixer
 		int ATMixerType; // 1 = inlet side mixer, 2 = supply side mixer
 		int ATMixerPriNode; // primary inlet air node number for the air terminal mixer
@@ -219,8 +217,6 @@ namespace PackagedTerminalHeatPump {
 
 		// Default Constructor
 		PTUnitData() :
-			Name( MaxNameLength ),
-			UnitType( MaxNameLength ),
 			UnitType_Num( 0 ),
 			ZoneEquipType( 0 ),
 			SchedPtr( 0 ),
@@ -240,40 +236,28 @@ namespace PackagedTerminalHeatPump {
 			AirOutNode( 0 ),
 			OutsideAirNode( 0 ),
 			AirReliefNode( 0 ),
-			OAMixType( MaxNameLength ),
-			OAMixName( MaxNameLength ),
 			OAMixIndex( 0 ),
-			FanName( MaxNameLength ),
-			FanType( MaxNameLength ),
 			FanType_Num( 0 ),
 			FanIndex( 0 ),
 			FanSchedPtr( 0 ),
 			FanAvailSchedPtr( 0 ),
-			DXCoolCoilName( MaxNameLength ),
-			DXCoolCoilType( MaxNameLength ),
 			DXCoolCoilType_Num( 0 ),
 			CoolCoilCompIndex( 0 ),
 			DXCoolCoilIndexNum( 0 ),
 			CondenserNodeNum( 0 ),
 			DXHeatCoilIndexNum( 0 ),
-			DXHeatCoilName( MaxNameLength ),
-			DXHeatCoilType( MaxNameLength ),
 			DXHeatCoilType_Num( 0 ),
 			DXHeatCoilIndex( 0 ),
-			ACHeatCoilName( MaxNameLength ),
-			ACHeatCoilType( MaxNameLength ),
 			ACHeatCoilCap( 0.0 ),
 			ACHeatCoilIndex( 0 ),
 			HWCoilAirInletNode( 0 ),
 			HWCoilSteamInletNode( 0 ),
 			HWCoilSteamOutletNode( 0 ),
-			SuppHeatCoilName( MaxNameLength ),
 			SuppHeatCoilType_Num( 0 ),
 			ACHeatCoilType_Num( 0 ),
 			SuppHeatCoilIndex( 0 ),
 			SupHeatCoilCap( 0 ),
 			SupCoilAirInletNode( 0 ),
-			SuppHeatCoilType( MaxNameLength ),
 			MaxSATSupHeat( 0.0 ),
 			MaxOATSupHeat( 0.0 ),
 			OpMode( 0 ),
@@ -282,7 +266,6 @@ namespace PackagedTerminalHeatPump {
 			HeatConvergenceTol( 0.0 ),
 			MinOATCompressor( 0.0 ),
 			IterErrIndex( 0 ),
-			AvailManagerListName( MaxNameLength ),
 			WaterCyclingMode( 0 ),
 			PTObjectIndex( 0 ),
 			MaxONOFFCyclesperHour( 0.0 ),
@@ -294,7 +277,6 @@ namespace PackagedTerminalHeatPump {
 			DesignSuppHeatingCapacity( 0.0 ),
 			CtrlZoneNum( 0 ),
 			ATMixerExists( false ),
-			ATMixerName( MaxNameLength ),
 			ATMixerIndex( 0 ),
 			ATMixerType( 0 ),
 			ATMixerPriNode( 0 ),
@@ -356,8 +338,8 @@ namespace PackagedTerminalHeatPump {
 
 		// Member Constructor
 		PTUnitData(
-			Fstring const & Name, // name of unit
-			Fstring const & UnitType, // type of unit
+			std::string const & Name, // name of unit
+			std::string const & UnitType, // type of unit
 			int const UnitType_Num, // paramter equivalent to type of unit
 			int const ZoneEquipType, // Type of PT unit
 			int const SchedPtr, // index number to availability schedule
@@ -377,40 +359,40 @@ namespace PackagedTerminalHeatPump {
 			int const AirOutNode, // outlet air node number
 			int const OutsideAirNode, // OAmixer outside air node number
 			int const AirReliefNode, // OAmixer relief air node number
-			Fstring const & OAMixType, // type of outside air mixer
-			Fstring const & OAMixName, // name of OAmixer
+			std::string const & OAMixType, // type of outside air mixer
+			std::string const & OAMixName, // name of OAmixer
 			int const OAMixIndex,
-			Fstring const & FanName, // name of fan
-			Fstring const & FanType, // type of fan
+			std::string const & FanName, // name of fan
+			std::string const & FanType, // type of fan
 			int const FanType_Num, // fan type number (see DataHVACGlobals)
 			int const FanIndex, // index number to fan
 			int const FanSchedPtr, // index number to fan operating mode schedule
 			int const FanAvailSchedPtr, // index to fan availability schedule
-			Fstring const & DXCoolCoilName, // name of DX cooling coil
-			Fstring const & DXCoolCoilType, // type of DX cooling coil,Coil:DX:CoolingBypassFactorEmpirical or
+			std::string const & DXCoolCoilName, // name of DX cooling coil
+			std::string const & DXCoolCoilType, // type of DX cooling coil,Coil:DX:CoolingBypassFactorEmpirical or
 			int const DXCoolCoilType_Num, // numeric equivalent for DX cooling coil type
 			int const CoolCoilCompIndex, // cooling coil index number (index for DX coil or HX Assisted object)
 			int const DXCoolCoilIndexNum, // actual DX cooling coil index number
 			int const CondenserNodeNum, // DX cooling coil condenser node number
 			int const DXHeatCoilIndexNum, // actual DX heating coil index number
-			Fstring const & DXHeatCoilName, // name of DX heating coil
-			Fstring const & DXHeatCoilType, // type of DX heating coil,Coil:DX:HeatingEmpirical
+			std::string const & DXHeatCoilName, // name of DX heating coil
+			std::string const & DXHeatCoilType, // type of DX heating coil,Coil:DX:HeatingEmpirical
 			int const DXHeatCoilType_Num, // numeric equivalent for DX heating coil type
 			int const DXHeatCoilIndex, // DX heating coil index number
-			Fstring const & ACHeatCoilName, // name of heating coil for PTAC
-			Fstring const & ACHeatCoilType, // type of heating coil for PTAC
+			std::string const & ACHeatCoilName, // name of heating coil for PTAC
+			std::string const & ACHeatCoilType, // type of heating coil for PTAC
 			Real64 const ACHeatCoilCap, // heating coil capacity for PTAC
 			int const ACHeatCoilIndex, // heating coil index number for PTAC
 			int const HWCoilAirInletNode, // air outlet node number of HW coil for PTAC
 			int const HWCoilSteamInletNode, // steam inlet node number of HW coil for PTAC and HP
 			int const HWCoilSteamOutletNode, // steam inlet node number of HW coil for PTAC and HP
-			Fstring const & SuppHeatCoilName, // name of supplemental heating coil
+			std::string const & SuppHeatCoilName, // name of supplemental heating coil
 			int const SuppHeatCoilType_Num, // numeric equivalent for supplemental heating coil type
 			int const ACHeatCoilType_Num, // numeric equivalent for PTAC heating coil type
 			int const SuppHeatCoilIndex, // supplemental heater index number
 			int const SupHeatCoilCap, // supplemental heater coil capacity [W]
 			int const SupCoilAirInletNode, // air inlet node for supplemental coil for HP
-			Fstring const & SuppHeatCoilType, // supplemental heater coil type
+			std::string const & SuppHeatCoilType, // supplemental heater coil type
 			Real64 const MaxSATSupHeat, // maximum supply air temperature from supplemental heater [C]
 			Real64 const MaxOATSupHeat, // maximum outdoor air temp for supplemental heater operation [C]
 			int const OpMode, // mode of operation; 1=cycling fan, cycling compressor, 2=continuous fan, cycling compresor
@@ -419,7 +401,7 @@ namespace PackagedTerminalHeatPump {
 			Real64 const HeatConvergenceTol, // Convergence tolerance, fraction (ZoneLoad - Equip Output)/ZoneLoad
 			Real64 const MinOATCompressor, // Minimum OAT for compressor operation [C]
 			int const IterErrIndex, // index for recurring warnings
-			Fstring const & AvailManagerListName, // Name of an availability manager list object
+			std::string const & AvailManagerListName, // Name of an availability manager list object
 			int const WaterCyclingMode, // Heat Pump Coil water flow mode; See definitions in DataHVACGlobals,
 			int const PTObjectIndex, // index for PT unit
 			Real64 const MaxONOFFCyclesperHour, // Maximum ON/OFF Cycling Rate [cycles/hr]
@@ -431,7 +413,7 @@ namespace PackagedTerminalHeatPump {
 			Real64 const DesignSuppHeatingCapacity, // Nominal Capacity of Supplemental Heating Coil [W]
 			int const CtrlZoneNum, // index of unit in ZoneEquipConfig
 			bool const ATMixerExists, // True if there is an ATMixer
-			Fstring const & ATMixerName, // name of air terminal mixer
+			std::string const & ATMixerName, // name of air terminal mixer
 			int const ATMixerIndex, // index to the air terminal mixer
 			int const ATMixerType, // 1 = inlet side mixer, 2 = supply side mixer
 			int const ATMixerPriNode, // primary inlet air node number for the air terminal mixer
@@ -490,8 +472,8 @@ namespace PackagedTerminalHeatPump {
 			int const ErrIndexCyc,
 			int const ErrIndexVar
 		) :
-			Name( MaxNameLength, Name ),
-			UnitType( MaxNameLength, UnitType ),
+			Name( Name ),
+			UnitType( UnitType ),
 			UnitType_Num( UnitType_Num ),
 			ZoneEquipType( ZoneEquipType ),
 			SchedPtr( SchedPtr ),
@@ -511,40 +493,40 @@ namespace PackagedTerminalHeatPump {
 			AirOutNode( AirOutNode ),
 			OutsideAirNode( OutsideAirNode ),
 			AirReliefNode( AirReliefNode ),
-			OAMixType( MaxNameLength, OAMixType ),
-			OAMixName( MaxNameLength, OAMixName ),
+			OAMixType( OAMixType ),
+			OAMixName( OAMixName ),
 			OAMixIndex( OAMixIndex ),
-			FanName( MaxNameLength, FanName ),
-			FanType( MaxNameLength, FanType ),
+			FanName( FanName ),
+			FanType( FanType ),
 			FanType_Num( FanType_Num ),
 			FanIndex( FanIndex ),
 			FanSchedPtr( FanSchedPtr ),
 			FanAvailSchedPtr( FanAvailSchedPtr ),
-			DXCoolCoilName( MaxNameLength, DXCoolCoilName ),
-			DXCoolCoilType( MaxNameLength, DXCoolCoilType ),
+			DXCoolCoilName( DXCoolCoilName ),
+			DXCoolCoilType( DXCoolCoilType ),
 			DXCoolCoilType_Num( DXCoolCoilType_Num ),
 			CoolCoilCompIndex( CoolCoilCompIndex ),
 			DXCoolCoilIndexNum( DXCoolCoilIndexNum ),
 			CondenserNodeNum( CondenserNodeNum ),
 			DXHeatCoilIndexNum( DXHeatCoilIndexNum ),
-			DXHeatCoilName( MaxNameLength, DXHeatCoilName ),
-			DXHeatCoilType( MaxNameLength, DXHeatCoilType ),
+			DXHeatCoilName( DXHeatCoilName ),
+			DXHeatCoilType( DXHeatCoilType ),
 			DXHeatCoilType_Num( DXHeatCoilType_Num ),
 			DXHeatCoilIndex( DXHeatCoilIndex ),
-			ACHeatCoilName( MaxNameLength, ACHeatCoilName ),
-			ACHeatCoilType( MaxNameLength, ACHeatCoilType ),
+			ACHeatCoilName( ACHeatCoilName ),
+			ACHeatCoilType( ACHeatCoilType ),
 			ACHeatCoilCap( ACHeatCoilCap ),
 			ACHeatCoilIndex( ACHeatCoilIndex ),
 			HWCoilAirInletNode( HWCoilAirInletNode ),
 			HWCoilSteamInletNode( HWCoilSteamInletNode ),
 			HWCoilSteamOutletNode( HWCoilSteamOutletNode ),
-			SuppHeatCoilName( MaxNameLength, SuppHeatCoilName ),
+			SuppHeatCoilName( SuppHeatCoilName ),
 			SuppHeatCoilType_Num( SuppHeatCoilType_Num ),
 			ACHeatCoilType_Num( ACHeatCoilType_Num ),
 			SuppHeatCoilIndex( SuppHeatCoilIndex ),
 			SupHeatCoilCap( SupHeatCoilCap ),
 			SupCoilAirInletNode( SupCoilAirInletNode ),
-			SuppHeatCoilType( MaxNameLength, SuppHeatCoilType ),
+			SuppHeatCoilType( SuppHeatCoilType ),
 			MaxSATSupHeat( MaxSATSupHeat ),
 			MaxOATSupHeat( MaxOATSupHeat ),
 			OpMode( OpMode ),
@@ -553,7 +535,7 @@ namespace PackagedTerminalHeatPump {
 			HeatConvergenceTol( HeatConvergenceTol ),
 			MinOATCompressor( MinOATCompressor ),
 			IterErrIndex( IterErrIndex ),
-			AvailManagerListName( MaxNameLength, AvailManagerListName ),
+			AvailManagerListName( AvailManagerListName ),
 			WaterCyclingMode( WaterCyclingMode ),
 			PTObjectIndex( PTObjectIndex ),
 			MaxONOFFCyclesperHour( MaxONOFFCyclesperHour ),
@@ -565,7 +547,7 @@ namespace PackagedTerminalHeatPump {
 			DesignSuppHeatingCapacity( DesignSuppHeatingCapacity ),
 			CtrlZoneNum( CtrlZoneNum ),
 			ATMixerExists( ATMixerExists ),
-			ATMixerName( MaxNameLength, ATMixerName ),
+			ATMixerName( ATMixerName ),
 			ATMixerIndex( ATMixerIndex ),
 			ATMixerType( ATMixerType ),
 			ATMixerPriNode( ATMixerPriNode ),
@@ -634,7 +616,7 @@ namespace PackagedTerminalHeatPump {
 
 	void
 	SimPackagedTerminalUnit(
-		Fstring const & CompName, // name of the packaged terminal heat pump
+		std::string const & CompName, // name of the packaged terminal heat pump
 		int const ZoneNum, // number of zone being served
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		Real64 & QUnitOut, // sensible capacity delivered to zone

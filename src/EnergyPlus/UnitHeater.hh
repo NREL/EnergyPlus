@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -16,17 +15,16 @@ namespace EnergyPlus {
 namespace UnitHeater {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	extern Fstring const cMO_UnitHeater;
+	extern std::string const cMO_UnitHeater;
 
 	// Character parameters for outside air control types:
-	extern Fstring const ElectricCoil;
-	extern Fstring const GasCoil;
-	extern Fstring const WaterCoil;
-	extern Fstring const SteamCoil;
+	extern std::string const ElectricCoil;
+	extern std::string const GasCoil;
+	extern std::string const WaterCoil;
+	extern std::string const SteamCoil;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -45,14 +43,14 @@ namespace UnitHeater {
 	{
 		// Members
 		// Input data
-		Fstring Name; // name of unit
-		Fstring SchedName; // availability schedule
+		std::string Name; // name of unit
+		std::string SchedName; // availability schedule
 		int SchedPtr; // index to schedule
 		int AirInNode; // inlet air node number
 		int AirOutNode; // outlet air node number
 		int FanType_Num; // Fan type number (see DataHVACGlobals)
-		Fstring FanType; // type of fan
-		Fstring FanName; // name of fan
+		std::string FanType; // type of fan
+		std::string FanName; // name of fan
 		int Fan_Index;
 		int FanSchedPtr; // index to fan operating mode schedule
 		int FanAvailSchedPtr; // index to fan availability schedule
@@ -60,13 +58,13 @@ namespace UnitHeater {
 		int CompErrIndex;
 		Real64 MaxAirVolFlow; // m3/s
 		Real64 MaxAirMassFlow; // kg/s
-		Fstring FanOperatesDuringNoHeating; // Indicates whether fan operates or not during no heating
+		std::string FanOperatesDuringNoHeating; // Indicates whether fan operates or not during no heating
 		int FanOutletNode; // outlet node number for fan exit
 		// (assumes fan is upstream of heating coil)
 		int OpMode; // mode of operation; 1=cycling fan, cycling coil, 2=continuous fan, cycling coil
-		Fstring HCoilType; // type of heating coil (water, gas, electric, etc.)
-		Fstring HCoilTypeCh; // actual object name
-		Fstring HCoilName; // name of heating coil
+		std::string HCoilType; // type of heating coil (water, gas, electric, etc.)
+		std::string HCoilTypeCh; // actual object name
+		std::string HCoilName; // name of heating coil
 		int HCoil_Index;
 		int HCoil_PlantTypeNum;
 		int HCoil_FluidIndex;
@@ -91,21 +89,17 @@ namespace UnitHeater {
 		Real64 HeatEnergy; // unit heating output in J
 		Real64 ElecPower;
 		Real64 ElecEnergy;
-		Fstring AvailManagerListName; // Name of an availability manager list object
+		std::string AvailManagerListName; // Name of an availability manager list object
 		int AvailStatus;
 		bool FanOffNoHeating; // True when fan is on during no heating load
 		Real64 FanPartLoadRatio; // fan part-load ratio for time step
 
 		// Default Constructor
 		UnitHeaterData() :
-			Name( MaxNameLength ),
-			SchedName( MaxNameLength ),
 			SchedPtr( 0 ),
 			AirInNode( 0 ),
 			AirOutNode( 0 ),
 			FanType_Num( 0 ),
-			FanType( MaxNameLength ),
-			FanName( MaxNameLength ),
 			Fan_Index( 0 ),
 			FanSchedPtr( 0 ),
 			FanAvailSchedPtr( 0 ),
@@ -113,12 +107,8 @@ namespace UnitHeater {
 			CompErrIndex( 0 ),
 			MaxAirVolFlow( 0.0 ),
 			MaxAirMassFlow( 0.0 ),
-			FanOperatesDuringNoHeating( MaxNameLength ),
 			FanOutletNode( 0 ),
 			OpMode( 0 ),
-			HCoilType( MaxNameLength ),
-			HCoilTypeCh( MaxNameLength ),
-			HCoilName( MaxNameLength ),
 			HCoil_Index( 0 ),
 			HCoil_PlantTypeNum( 0 ),
 			HCoil_FluidIndex( 0 ),
@@ -142,7 +132,6 @@ namespace UnitHeater {
 			HeatEnergy( 0.0 ),
 			ElecPower( 0.0 ),
 			ElecEnergy( 0.0 ),
-			AvailManagerListName( MaxNameLength ),
 			AvailStatus( 0 ),
 			FanOffNoHeating( false ),
 			FanPartLoadRatio( 0.0 )
@@ -150,14 +139,14 @@ namespace UnitHeater {
 
 		// Member Constructor
 		UnitHeaterData(
-			Fstring const & Name, // name of unit
-			Fstring const & SchedName, // availability schedule
+			std::string const & Name, // name of unit
+			std::string const & SchedName, // availability schedule
 			int const SchedPtr, // index to schedule
 			int const AirInNode, // inlet air node number
 			int const AirOutNode, // outlet air node number
 			int const FanType_Num, // Fan type number (see DataHVACGlobals)
-			Fstring const & FanType, // type of fan
-			Fstring const & FanName, // name of fan
+			std::string const & FanType, // type of fan
+			std::string const & FanName, // name of fan
 			int const Fan_Index,
 			int const FanSchedPtr, // index to fan operating mode schedule
 			int const FanAvailSchedPtr, // index to fan availability schedule
@@ -165,12 +154,12 @@ namespace UnitHeater {
 			int const CompErrIndex,
 			Real64 const MaxAirVolFlow, // m3/s
 			Real64 const MaxAirMassFlow, // kg/s
-			Fstring const & FanOperatesDuringNoHeating, // Indicates whether fan operates or not during no heating
+			std::string const & FanOperatesDuringNoHeating, // Indicates whether fan operates or not during no heating
 			int const FanOutletNode, // outlet node number for fan exit
 			int const OpMode, // mode of operation; 1=cycling fan, cycling coil, 2=continuous fan, cycling coil
-			Fstring const & HCoilType, // type of heating coil (water, gas, electric, etc.)
-			Fstring const & HCoilTypeCh, // actual object name
-			Fstring const & HCoilName, // name of heating coil
+			std::string const & HCoilType, // type of heating coil (water, gas, electric, etc.)
+			std::string const & HCoilTypeCh, // actual object name
+			std::string const & HCoilName, // name of heating coil
 			int const HCoil_Index,
 			int const HCoil_PlantTypeNum,
 			int const HCoil_FluidIndex,
@@ -194,19 +183,19 @@ namespace UnitHeater {
 			Real64 const HeatEnergy, // unit heating output in J
 			Real64 const ElecPower,
 			Real64 const ElecEnergy,
-			Fstring const & AvailManagerListName, // Name of an availability manager list object
+			std::string const & AvailManagerListName, // Name of an availability manager list object
 			int const AvailStatus,
 			bool const FanOffNoHeating, // True when fan is on during no heating load
 			Real64 const FanPartLoadRatio // fan part-load ratio for time step
 		) :
-			Name( MaxNameLength, Name ),
-			SchedName( MaxNameLength, SchedName ),
+			Name( Name ),
+			SchedName( SchedName ),
 			SchedPtr( SchedPtr ),
 			AirInNode( AirInNode ),
 			AirOutNode( AirOutNode ),
 			FanType_Num( FanType_Num ),
-			FanType( MaxNameLength, FanType ),
-			FanName( MaxNameLength, FanName ),
+			FanType( FanType ),
+			FanName( FanName ),
 			Fan_Index( Fan_Index ),
 			FanSchedPtr( FanSchedPtr ),
 			FanAvailSchedPtr( FanAvailSchedPtr ),
@@ -214,12 +203,12 @@ namespace UnitHeater {
 			CompErrIndex( CompErrIndex ),
 			MaxAirVolFlow( MaxAirVolFlow ),
 			MaxAirMassFlow( MaxAirMassFlow ),
-			FanOperatesDuringNoHeating( MaxNameLength, FanOperatesDuringNoHeating ),
+			FanOperatesDuringNoHeating( FanOperatesDuringNoHeating ),
 			FanOutletNode( FanOutletNode ),
 			OpMode( OpMode ),
-			HCoilType( MaxNameLength, HCoilType ),
-			HCoilTypeCh( MaxNameLength, HCoilTypeCh ),
-			HCoilName( MaxNameLength, HCoilName ),
+			HCoilType( HCoilType ),
+			HCoilTypeCh( HCoilTypeCh ),
+			HCoilName( HCoilName ),
 			HCoil_Index( HCoil_Index ),
 			HCoil_PlantTypeNum( HCoil_PlantTypeNum ),
 			HCoil_FluidIndex( HCoil_FluidIndex ),
@@ -243,7 +232,7 @@ namespace UnitHeater {
 			HeatEnergy( HeatEnergy ),
 			ElecPower( ElecPower ),
 			ElecEnergy( ElecEnergy ),
-			AvailManagerListName( MaxNameLength, AvailManagerListName ),
+			AvailManagerListName( AvailManagerListName ),
 			AvailStatus( AvailStatus ),
 			FanOffNoHeating( FanOffNoHeating ),
 			FanPartLoadRatio( FanPartLoadRatio )
@@ -258,7 +247,7 @@ namespace UnitHeater {
 
 	void
 	SimUnitHeater(
-		Fstring const & CompName, // name of the fan coil unit
+		std::string const & CompName, // name of the fan coil unit
 		int const ZoneNum, // number of zone being served
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		Real64 & PowerMet, // Sensible power supplied (W)

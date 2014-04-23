@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -16,7 +15,6 @@ namespace EnergyPlus {
 namespace CoolTower {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
@@ -37,17 +35,17 @@ namespace CoolTower {
 	struct CoolTowerParams
 	{
 		// Members
-		Fstring Name; // The component name
-		Fstring CompType; // Type of component
-		Fstring Schedule; // Available schedule
-		Fstring ZoneName; // Name of zone the component is serving
-		Fstring PumpSchedName; // Available schedule of the water pump
+		std::string Name; // The component name
+		std::string CompType; // Type of component
+		std::string Schedule; // Available schedule
+		std::string ZoneName; // Name of zone the component is serving
+		std::string PumpSchedName; // Available schedule of the water pump
 		int SchedPtr; // Index to schedule
 		int ZonePtr; // Point to this zone
 		int PumpSchedPtr; // Index to schedule for water pump
 		int FlowCtrlType; // Type of cooltower operation
 		int CoolTWaterSupplyMode; // Type of water source
-		Fstring CoolTWaterSupplyName; // Name of water source
+		std::string CoolTWaterSupplyName; // Name of water source
 		int CoolTWaterSupTankID; // Index to water storage tank
 		int CoolTWaterTankDemandARRID; // Index to water storage demand
 		Real64 TowerHeight; // Effective cooltower height in m
@@ -84,17 +82,11 @@ namespace CoolTower {
 
 		// Default Constructor
 		CoolTowerParams() :
-			Name( MaxNameLength ),
-			CompType( MaxNameLength ),
-			Schedule( MaxNameLength ),
-			ZoneName( MaxNameLength ),
-			PumpSchedName( MaxNameLength ),
 			SchedPtr( 0 ),
 			ZonePtr( 0 ),
 			PumpSchedPtr( 0 ),
 			FlowCtrlType( 0 ),
 			CoolTWaterSupplyMode( WaterSupplyFromMains ),
-			CoolTWaterSupplyName( MaxNameLength ),
 			CoolTWaterSupTankID( 0 ),
 			CoolTWaterTankDemandARRID( 0 ),
 			TowerHeight( 0.0 ),
@@ -132,17 +124,17 @@ namespace CoolTower {
 
 		// Member Constructor
 		CoolTowerParams(
-			Fstring const & Name, // The component name
-			Fstring const & CompType, // Type of component
-			Fstring const & Schedule, // Available schedule
-			Fstring const & ZoneName, // Name of zone the component is serving
-			Fstring const & PumpSchedName, // Available schedule of the water pump
+			std::string const & Name, // The component name
+			std::string const & CompType, // Type of component
+			std::string const & Schedule, // Available schedule
+			std::string const & ZoneName, // Name of zone the component is serving
+			std::string const & PumpSchedName, // Available schedule of the water pump
 			int const SchedPtr, // Index to schedule
 			int const ZonePtr, // Point to this zone
 			int const PumpSchedPtr, // Index to schedule for water pump
 			int const FlowCtrlType, // Type of cooltower operation
 			int const CoolTWaterSupplyMode, // Type of water source
-			Fstring const & CoolTWaterSupplyName, // Name of water source
+			std::string const & CoolTWaterSupplyName, // Name of water source
 			int const CoolTWaterSupTankID, // Index to water storage tank
 			int const CoolTWaterTankDemandARRID, // Index to water storage demand
 			Real64 const TowerHeight, // Effective cooltower height in m
@@ -177,17 +169,17 @@ namespace CoolTower {
 			Real64 const PumpElecPower, // Pump power in watts
 			Real64 const PumpElecConsump // Pump energy consumption in Joules
 		) :
-			Name( MaxNameLength, Name ),
-			CompType( MaxNameLength, CompType ),
-			Schedule( MaxNameLength, Schedule ),
-			ZoneName( MaxNameLength, ZoneName ),
-			PumpSchedName( MaxNameLength, PumpSchedName ),
+			Name( Name ),
+			CompType( CompType ),
+			Schedule( Schedule ),
+			ZoneName( ZoneName ),
+			PumpSchedName( PumpSchedName ),
 			SchedPtr( SchedPtr ),
 			ZonePtr( ZonePtr ),
 			PumpSchedPtr( PumpSchedPtr ),
 			FlowCtrlType( FlowCtrlType ),
 			CoolTWaterSupplyMode( CoolTWaterSupplyMode ),
-			CoolTWaterSupplyName( MaxNameLength, CoolTWaterSupplyName ),
+			CoolTWaterSupplyName( CoolTWaterSupplyName ),
 			CoolTWaterSupTankID( CoolTWaterSupTankID ),
 			CoolTWaterTankDemandARRID( CoolTWaterTankDemandARRID ),
 			TowerHeight( TowerHeight ),

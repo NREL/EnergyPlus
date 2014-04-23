@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1A.hh>
 #include <ObjexxFCL/FArray2A.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -15,7 +14,6 @@ namespace EnergyPlus {
 namespace ThermalChimney {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// DERIVED TYPE DEFINITIONS
@@ -34,57 +32,53 @@ namespace ThermalChimney {
 	struct ThermalChimneyData
 	{
 		// Members
-		Fstring Name;
+		std::string Name;
 		int RealZonePtr;
-		Fstring RealZoneName;
+		std::string RealZoneName;
 		int SchedPtr;
-		Fstring SchedName;
+		std::string SchedName;
 		Real64 AbsorberWallWidth;
 		Real64 AirOutletCrossArea;
 		Real64 DischargeCoeff;
 		int TotZoneToDistrib;
 		FArray1D_int ZonePtr;
-		FArray1D_Fstring ZoneName;
+		FArray1D_string ZoneName;
 		FArray1D< Real64 > DistanceThermChimInlet;
 		FArray1D< Real64 > RatioThermChimAirFlow;
 		FArray1D< Real64 > EachAirInletCrossArea;
 
 		// Default Constructor
 		ThermalChimneyData() :
-			Name( MaxNameLength ),
 			RealZonePtr( 0 ),
-			RealZoneName( MaxNameLength ),
 			SchedPtr( 0 ),
-			SchedName( MaxNameLength ),
 			AbsorberWallWidth( 0.0 ),
 			AirOutletCrossArea( 0.0 ),
 			DischargeCoeff( 0.0 ),
-			TotZoneToDistrib( 0 ),
-			ZoneName( sFstring( MaxNameLength ) )
+			TotZoneToDistrib( 0 )
 		{}
 
 		// Member Constructor
 		ThermalChimneyData(
-			Fstring const & Name,
+			std::string const & Name,
 			int const RealZonePtr,
-			Fstring const & RealZoneName,
+			std::string const & RealZoneName,
 			int const SchedPtr,
-			Fstring const & SchedName,
+			std::string const & SchedName,
 			Real64 const AbsorberWallWidth,
 			Real64 const AirOutletCrossArea,
 			Real64 const DischargeCoeff,
 			int const TotZoneToDistrib,
 			FArray1_int const & ZonePtr,
-			FArray1_Fstring const & ZoneName,
+			FArray1_string const & ZoneName,
 			FArray1< Real64 > const & DistanceThermChimInlet,
 			FArray1< Real64 > const & RatioThermChimAirFlow,
 			FArray1< Real64 > const & EachAirInletCrossArea
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			RealZonePtr( RealZonePtr ),
-			RealZoneName( MaxNameLength, RealZoneName ),
+			RealZoneName( RealZoneName ),
 			SchedPtr( SchedPtr ),
-			SchedName( MaxNameLength, SchedName ),
+			SchedName( SchedName ),
 			AbsorberWallWidth( AbsorberWallWidth ),
 			AirOutletCrossArea( AirOutletCrossArea ),
 			DischargeCoeff( DischargeCoeff ),

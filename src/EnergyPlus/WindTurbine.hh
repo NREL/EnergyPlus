@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -16,7 +15,6 @@ namespace EnergyPlus {
 namespace WindTurbine {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
@@ -40,8 +38,8 @@ namespace WindTurbine {
 	struct WindTurbineParams
 	{
 		// Members
-		Fstring Name; // The component name
-		Fstring Schedule; // Available schedule
+		std::string Name; // The component name
+		std::string Schedule; // Available schedule
 		int RotorType; // Rotor type (HAWT or VAWT)
 		int ControlType; // Control type
 		int SchedPtr; // Schedule
@@ -89,8 +87,6 @@ namespace WindTurbine {
 
 		// Default Constructor
 		WindTurbineParams() :
-			Name( MaxNameLength ),
-			Schedule( MaxNameLength ),
 			RotorType( 0 ),
 			ControlType( 0 ),
 			SchedPtr( 0 ),
@@ -139,8 +135,8 @@ namespace WindTurbine {
 
 		// Member Constructor
 		WindTurbineParams(
-			Fstring const & Name, // The component name
-			Fstring const & Schedule, // Available schedule
+			std::string const & Name, // The component name
+			std::string const & Schedule, // Available schedule
 			int const RotorType, // Rotor type (HAWT or VAWT)
 			int const ControlType, // Control type
 			int const SchedPtr, // Schedule
@@ -186,8 +182,8 @@ namespace WindTurbine {
 			Real64 const TotTorque, // Total torque in N.m
 			Real64 const AzimuthAng // Azimuth angle between blades
 		) :
-			Name( MaxNameLength, Name ),
-			Schedule( MaxNameLength, Schedule ),
+			Name( Name ),
+			Schedule( Schedule ),
 			RotorType( RotorType ),
 			ControlType( ControlType ),
 			SchedPtr( SchedPtr ),
@@ -244,7 +240,7 @@ namespace WindTurbine {
 	void
 	SimWindTurbine(
 		int const GeneratorType, // Type of Generator
-		Fstring const & GeneratorName, // User specified name of Generator
+		std::string const & GeneratorName, // User specified name of Generator
 		int & GeneratorIndex, // Generator index
 		bool const RunFlag, // ON or OFF
 		Real64 const WTLoad // Electrical load on WT (not used)

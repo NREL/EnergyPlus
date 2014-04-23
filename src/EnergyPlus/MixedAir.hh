@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -17,7 +16,6 @@ namespace EnergyPlus {
 namespace MixedAir {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 	using DataHVACGlobals::BypassWhenWithinEconomizerLimits;
 
 	// Data
@@ -86,7 +84,7 @@ namespace MixedAir {
 	//INTEGER, PARAMETER :: SOAM_IAQPCOM = 6  ! Take the maximum outdoor air rate from both CO2 and generic contaminant controls
 	//                                        ! based on the generic contaminant setpoint
 
-	extern FArray1D_Fstring const CurrentModuleObjects;
+	extern FArray1D_string const CurrentModuleObjects;
 
 	// Parameters below (CMO - Current Module Object.  used primarily in Get Inputs)
 	// Multiple Get Input routines in this module or these would be in individual routines.
@@ -134,27 +132,24 @@ namespace MixedAir {
 	struct ControllerListProps
 	{
 		// Members
-		Fstring Name;
+		std::string Name;
 		int NumControllers; // number of controllers on list
-		FArray1D_Fstring ControllerType;
-		FArray1D_Fstring ControllerName;
+		FArray1D_string ControllerType;
+		FArray1D_string ControllerName;
 
 		// Default Constructor
 		ControllerListProps() :
-			Name( MaxNameLength ),
-			NumControllers( 0 ),
-			ControllerType( sFstring( MaxNameLength ) ),
-			ControllerName( sFstring( MaxNameLength ) )
+			NumControllers( 0 )
 		{}
 
 		// Member Constructor
 		ControllerListProps(
-			Fstring const & Name,
+			std::string const & Name,
 			int const NumControllers, // number of controllers on list
-			FArray1_Fstring const & ControllerType,
-			FArray1_Fstring const & ControllerName
+			FArray1_string const & ControllerType,
+			FArray1_string const & ControllerName
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NumControllers( NumControllers ),
 			ControllerType( ControllerType ),
 			ControllerName( ControllerName )
@@ -165,8 +160,8 @@ namespace MixedAir {
 	struct OAControllerProps // Derived type for Outside Air Controller data
 	{
 		// Members
-		Fstring Name;
-		Fstring ControllerType;
+		std::string Name;
+		std::string ControllerType;
 		int ControllerType_Num; // Parameter equivalent of controller type
 		int OACtrlIndex;
 		int Lockout; // 0=NoLockoutPossible; 1=LockoutWithHeatingPossible;
@@ -188,7 +183,7 @@ namespace MixedAir {
 		int InletNode; // Inlet Air Node for into Mixer  (BTG Nov 2004)
 		int RelNode; // Relief Air Node Number
 		int RetNode; // Return Air Node Number
-		Fstring MinOASch; // Name of the minimum outside air schedule
+		std::string MinOASch; // Name of the minimum outside air schedule
 		int MinOASchPtr; // Index to the minimum outside air schedule
 		Real64 RelMassFlow;
 		Real64 OAMassFlow;
@@ -208,7 +203,7 @@ namespace MixedAir {
 		Real64 MinOAMassFlowRate; // Minimum outside air flow (kg/s)
 		Real64 MaxOAMassFlowRate; // Maximum outside air flow (kg/s)
 		int ZoneEquipZoneNum;
-		Fstring VentilationMechanicalName; // Name of ventilation:mechanical object used for DCV
+		std::string VentilationMechanicalName; // Name of ventilation:mechanical object used for DCV
 		int VentMechObjectNum; // Index to VENTILATION:MECHANICAL object for this controller
 		int HumidistatZoneNum; // zone number where humidistat is located
 		int NodeNumofHumidistatZone; // node number of zone where humidistat is located
@@ -216,8 +211,8 @@ namespace MixedAir {
 		bool ModifyDuringHighOAMoisture; // flag to Modify outdoor air flow, TRUE when modify any time
 		// FALSE when modify only when indoor air humrat is less than outdoor HR
 		int EconomizerOASchedPtr; // schedule to modify outdoor air flow
-		Fstring MinOAflowSch; // Name of the Minimum fraction of Design/Mixed Mass of air
-		Fstring MaxOAflowSch; // Name of the Maximum fraction of Design/Mixed Mass of air
+		std::string MinOAflowSch; // Name of the Minimum fraction of Design/Mixed Mass of air
+		std::string MaxOAflowSch; // Name of the Maximum fraction of Design/Mixed Mass of air
 		int MinOAflowSchPtr; // Index to the minimum outside air schedule
 		int MaxOAflowSchPtr; // Index to the minimum outside air schedule
 		//   Economizer Status, which is currently following the EconomizerOperationFlag, might be something like "Economizer status
@@ -239,8 +234,6 @@ namespace MixedAir {
 
 		// Default Constructor
 		OAControllerProps() :
-			Name( MaxNameLength ),
-			ControllerType( MaxNameLength ),
 			ControllerType_Num( 0 ),
 			OACtrlIndex( 0 ),
 			Lockout( 0 ),
@@ -259,7 +252,6 @@ namespace MixedAir {
 			InletNode( 0 ),
 			RelNode( 0 ),
 			RetNode( 0 ),
-			MinOASch( MaxNameLength ),
 			MinOASchPtr( 0 ),
 			RelMassFlow( 0.0 ),
 			OAMassFlow( 0.0 ),
@@ -279,15 +271,12 @@ namespace MixedAir {
 			MinOAMassFlowRate( 0.0 ),
 			MaxOAMassFlowRate( 0.0 ),
 			ZoneEquipZoneNum( 0 ),
-			VentilationMechanicalName( MaxNameLength ),
 			VentMechObjectNum( 0 ),
 			HumidistatZoneNum( 0 ),
 			NodeNumofHumidistatZone( 0 ),
 			HighRHOAFlowRatio( 1.0 ),
 			ModifyDuringHighOAMoisture( false ),
 			EconomizerOASchedPtr( 0 ),
-			MinOAflowSch( MaxNameLength ),
-			MaxOAflowSch( MaxNameLength ),
 			MinOAflowSchPtr( 0 ),
 			MaxOAflowSchPtr( 0 ),
 			EconomizerStatus( 0 ),
@@ -304,8 +293,8 @@ namespace MixedAir {
 
 		// Member Constructor
 		OAControllerProps(
-			Fstring const & Name,
-			Fstring const & ControllerType,
+			std::string const & Name,
+			std::string const & ControllerType,
 			int const ControllerType_Num, // Parameter equivalent of controller type
 			int const OACtrlIndex,
 			int const Lockout, // 0=NoLockoutPossible; 1=LockoutWithHeatingPossible;
@@ -324,7 +313,7 @@ namespace MixedAir {
 			int const InletNode, // Inlet Air Node for into Mixer  (BTG Nov 2004)
 			int const RelNode, // Relief Air Node Number
 			int const RetNode, // Return Air Node Number
-			Fstring const & MinOASch, // Name of the minimum outside air schedule
+			std::string const & MinOASch, // Name of the minimum outside air schedule
 			int const MinOASchPtr, // Index to the minimum outside air schedule
 			Real64 const RelMassFlow,
 			Real64 const OAMassFlow,
@@ -344,15 +333,15 @@ namespace MixedAir {
 			Real64 const MinOAMassFlowRate, // Minimum outside air flow (kg/s)
 			Real64 const MaxOAMassFlowRate, // Maximum outside air flow (kg/s)
 			int const ZoneEquipZoneNum,
-			Fstring const & VentilationMechanicalName, // Name of ventilation:mechanical object used for DCV
+			std::string const & VentilationMechanicalName, // Name of ventilation:mechanical object used for DCV
 			int const VentMechObjectNum, // Index to VENTILATION:MECHANICAL object for this controller
 			int const HumidistatZoneNum, // zone number where humidistat is located
 			int const NodeNumofHumidistatZone, // node number of zone where humidistat is located
 			Real64 const HighRHOAFlowRatio, // Modify ratio with respect to maximum outdoor air flow rate (high RH)
 			bool const ModifyDuringHighOAMoisture, // flag to Modify outdoor air flow, TRUE when modify any time
 			int const EconomizerOASchedPtr, // schedule to modify outdoor air flow
-			Fstring const & MinOAflowSch, // Name of the Minimum fraction of Design/Mixed Mass of air
-			Fstring const & MaxOAflowSch, // Name of the Maximum fraction of Design/Mixed Mass of air
+			std::string const & MinOAflowSch, // Name of the Minimum fraction of Design/Mixed Mass of air
+			std::string const & MaxOAflowSch, // Name of the Maximum fraction of Design/Mixed Mass of air
 			int const MinOAflowSchPtr, // Index to the minimum outside air schedule
 			int const MaxOAflowSchPtr, // Index to the minimum outside air schedule
 			int const EconomizerStatus, // Air Economizer status (1 = on, 0 = off or economizer not exists)
@@ -366,8 +355,8 @@ namespace MixedAir {
 			Real64 const EMSOARateValue, // Value EMS is directing to use. [kg/s]
 			int const HeatRecoveryBypassControlType // User input selects type of heat recovery optimization
 		) :
-			Name( MaxNameLength, Name ),
-			ControllerType( MaxNameLength, ControllerType ),
+			Name( Name ),
+			ControllerType( ControllerType ),
 			ControllerType_Num( ControllerType_Num ),
 			OACtrlIndex( OACtrlIndex ),
 			Lockout( Lockout ),
@@ -386,7 +375,7 @@ namespace MixedAir {
 			InletNode( InletNode ),
 			RelNode( RelNode ),
 			RetNode( RetNode ),
-			MinOASch( MaxNameLength, MinOASch ),
+			MinOASch( MinOASch ),
 			MinOASchPtr( MinOASchPtr ),
 			RelMassFlow( RelMassFlow ),
 			OAMassFlow( OAMassFlow ),
@@ -406,15 +395,15 @@ namespace MixedAir {
 			MinOAMassFlowRate( MinOAMassFlowRate ),
 			MaxOAMassFlowRate( MaxOAMassFlowRate ),
 			ZoneEquipZoneNum( ZoneEquipZoneNum ),
-			VentilationMechanicalName( MaxNameLength, VentilationMechanicalName ),
+			VentilationMechanicalName( VentilationMechanicalName ),
 			VentMechObjectNum( VentMechObjectNum ),
 			HumidistatZoneNum( HumidistatZoneNum ),
 			NodeNumofHumidistatZone( NodeNumofHumidistatZone ),
 			HighRHOAFlowRatio( HighRHOAFlowRatio ),
 			ModifyDuringHighOAMoisture( ModifyDuringHighOAMoisture ),
 			EconomizerOASchedPtr( EconomizerOASchedPtr ),
-			MinOAflowSch( MaxNameLength, MinOAflowSch ),
-			MaxOAflowSch( MaxNameLength, MaxOAflowSch ),
+			MinOAflowSch( MinOAflowSch ),
+			MaxOAflowSch( MaxOAflowSch ),
 			MinOAflowSchPtr( MinOAflowSchPtr ),
 			MaxOAflowSchPtr( MaxOAflowSchPtr ),
 			EconomizerStatus( EconomizerStatus ),
@@ -434,8 +423,8 @@ namespace MixedAir {
 	struct VentilationMechanicalProps // Derived type for Ventilation:Mechanical data
 	{
 		// Members
-		Fstring Name; // Name of Ventilation:Mechanical object
-		Fstring SchName; // Name of the mechanical ventilation schedule
+		std::string Name; // Name of Ventilation:Mechanical object
+		std::string SchName; // Name of the mechanical ventilation schedule
 		int SchPtr; // Index to the mechanical ventilation schedule
 		bool DCVFlag; // if true, implement OA based on demand controlled ventilation
 		int NumofVentMechZones; // Number of zones with mechanical ventilation
@@ -452,7 +441,7 @@ namespace MixedAir {
 		FArray1D_int Zone; // Zones requiring mechanical ventilation
 		FArray1D_int ZoneDesignSpecOAObjIndex; // index of the design specification outdoor air object
 		// for each zone in zone list
-		FArray1D_Fstring ZoneDesignSpecOAObjName; // name of the design specification outdoor air object
+		FArray1D_string ZoneDesignSpecOAObjName; // name of the design specification outdoor air object
 		// for each zone in zone list
 		int CO2MaxMinLimitErrorCount; // Counter when max CO2 concentration < min CO2 concentration
 		// For SOAM_ProportionalControl
@@ -467,18 +456,16 @@ namespace MixedAir {
 		// for each zone
 		FArray1D_int ZoneADEffSchPtr; // Pointer to the zone air distribution effectiveness schedule
 		// for each zone
-		FArray1D_Fstring ZoneADEffSchName; // Zone air distribution effectiveness schedule name
+		FArray1D_string ZoneADEffSchName; // Zone air distribution effectiveness schedule name
 		// for each zone
 		FArray1D_int ZoneDesignSpecADObjIndex; // index of the design specification zone air
 		//  distribution object for each zone in the zone list
-		FArray1D_Fstring ZoneDesignSpecADObjName; // name of the design specification zone air
+		FArray1D_string ZoneDesignSpecADObjName; // name of the design specification zone air
 		// distribution object for each zone in the zone list
 		FArray1D< Real64 > ZoneSecondaryRecirculation; // zone air secondary recirculation ratio
 
 		// Default Constructor
 		VentilationMechanicalProps() :
-			Name( MaxNameLength ),
-			SchName( MaxNameLength ),
 			SchPtr( 0 ),
 			DCVFlag( false ),
 			NumofVentMechZones( 0 ),
@@ -488,19 +475,16 @@ namespace MixedAir {
 			TotZoneOAACH( 0.0 ),
 			SystemOAMethod( 0 ),
 			ZoneMaxOAFraction( 1.0 ),
-			ZoneDesignSpecOAObjName( sFstring( MaxNameLength ) ),
 			CO2MaxMinLimitErrorCount( 0 ),
 			CO2MaxMinLimitErrorIndex( 0 ),
 			CO2GainErrorCount( 0 ),
-			CO2GainErrorIndex( 0 ),
-			ZoneADEffSchName( sFstring( MaxNameLength ) ),
-			ZoneDesignSpecADObjName( sFstring( MaxNameLength ) )
+			CO2GainErrorIndex( 0 )
 		{}
 
 		// Member Constructor
 		VentilationMechanicalProps(
-			Fstring const & Name, // Name of Ventilation:Mechanical object
-			Fstring const & SchName, // Name of the mechanical ventilation schedule
+			std::string const & Name, // Name of Ventilation:Mechanical object
+			std::string const & SchName, // Name of the mechanical ventilation schedule
 			int const SchPtr, // Index to the mechanical ventilation schedule
 			bool const DCVFlag, // if true, implement OA based on demand controlled ventilation
 			int const NumofVentMechZones, // Number of zones with mechanical ventilation
@@ -516,7 +500,7 @@ namespace MixedAir {
 			FArray1< Real64 > const & ZoneOAACH, // OA ACH (m3/s/volume) for each zone
 			FArray1_int const & Zone, // Zones requiring mechanical ventilation
 			FArray1_int const & ZoneDesignSpecOAObjIndex, // index of the design specification outdoor air object
-			FArray1_Fstring const & ZoneDesignSpecOAObjName, // name of the design specification outdoor air object
+			FArray1_string const & ZoneDesignSpecOAObjName, // name of the design specification outdoor air object
 			int const CO2MaxMinLimitErrorCount, // Counter when max CO2 concentration < min CO2 concentration
 			int const CO2MaxMinLimitErrorIndex, // Index for max CO2 concentration < min CO2 concentration recurring error message
 			int const CO2GainErrorCount, // Counter when CO2 generation from people is zero for SOAM_ProportionalControl
@@ -524,13 +508,13 @@ namespace MixedAir {
 			FArray1< Real64 > const & ZoneADEffCooling, // Zone air distribution effectiveness in cooling mode
 			FArray1< Real64 > const & ZoneADEffHeating, // Zone air distribution effectiveness in heating mode
 			FArray1_int const & ZoneADEffSchPtr, // Pointer to the zone air distribution effectiveness schedule
-			FArray1_Fstring const & ZoneADEffSchName, // Zone air distribution effectiveness schedule name
+			FArray1_string const & ZoneADEffSchName, // Zone air distribution effectiveness schedule name
 			FArray1_int const & ZoneDesignSpecADObjIndex, // index of the design specification zone air
-			FArray1_Fstring const & ZoneDesignSpecADObjName, // name of the design specification zone air
+			FArray1_string const & ZoneDesignSpecADObjName, // name of the design specification zone air
 			FArray1< Real64 > const & ZoneSecondaryRecirculation // zone air secondary recirculation ratio
 		) :
-			Name( MaxNameLength, Name ),
-			SchName( MaxNameLength, SchName ),
+			Name( Name ),
+			SchName( SchName ),
 			SchPtr( SchPtr ),
 			DCVFlag( DCVFlag ),
 			NumofVentMechZones( NumofVentMechZones ),
@@ -565,7 +549,7 @@ namespace MixedAir {
 	struct OAMixerProps // Derived type for Outside Air Mixing Component
 	{
 		// Members
-		Fstring Name;
+		std::string Name;
 		int MixerIndex; // Set on first call...
 		int MixNode; // Outlet node - mixed air
 		int InletNode; // Inlet node for outside air stream (Nov. 2004 BTG was OANode )
@@ -594,7 +578,6 @@ namespace MixedAir {
 
 		// Default Constructor
 		OAMixerProps() :
-			Name( MaxNameLength ),
 			MixerIndex( 0 ),
 			MixNode( 0 ),
 			InletNode( 0 ),
@@ -624,7 +607,7 @@ namespace MixedAir {
 
 		// Member Constructor
 		OAMixerProps(
-			Fstring const & Name,
+			std::string const & Name,
 			int const MixerIndex, // Set on first call...
 			int const MixNode, // Outlet node - mixed air
 			int const InletNode, // Inlet node for outside air stream (Nov. 2004 BTG was OANode )
@@ -651,7 +634,7 @@ namespace MixedAir {
 			Real64 const RetPressure,
 			Real64 const RetMassFlowRate
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			MixerIndex( MixerIndex ),
 			MixNode( MixNode ),
 			InletNode( InletNode ),
@@ -691,7 +674,7 @@ namespace MixedAir {
 
 	void
 	ManageOutsideAirSystem(
-		Fstring const & OASysName,
+		std::string const & OASysName,
 		bool const FirstHVACIteration,
 		int const AirLoopNum,
 		int & OASysNum
@@ -706,8 +689,8 @@ namespace MixedAir {
 
 	void
 	SimOAComponent(
-		Fstring const & CompType, // the component type
-		Fstring const & CompName, // the component Name
+		std::string const & CompType, // the component type
+		std::string const & CompName, // the component Name
 		int const CompTypeNum, // Component Type -- Integerized for this module
 		bool const FirstHVACIteration,
 		int & CompIndex,
@@ -721,14 +704,14 @@ namespace MixedAir {
 
 	void
 	SimOAMixer(
-		Fstring const & CompName,
+		std::string const & CompName,
 		bool const FirstHVACIteration,
 		int & CompIndex
 	);
 
 	void
 	SimOAController(
-		Fstring const & CtrlName,
+		std::string const & CtrlName,
 		int & CtrlIndex,
 		bool const FirstHVACIteration,
 		int const AirLoopNum
@@ -827,7 +810,7 @@ namespace MixedAir {
 
 	FArray1D_int
 	GetOAMixerNodeNumbers(
-		Fstring const & OAMixerName, // must match OA mixer names for the OA mixer type
+		std::string const & OAMixerName, // must match OA mixer names for the OA mixer type
 		bool & ErrorsFound // set to true if problem
 	);
 
@@ -853,13 +836,13 @@ namespace MixedAir {
 	GetOASysNumCoolingCoils( int const OASysNumber ); // OA Sys Number
 
 	int
-	GetOASystemNumber( Fstring const & OASysName ); // OA Sys Name
+	GetOASystemNumber( std::string const & OASysName ); // OA Sys Name
 
 	int
 	FindOAMixerMatchForOASystem( int const OASysNumber ); // Which OA System
 
 	int
-	GetOAMixerIndex( Fstring const & OAMixerName ); // Which Mixer
+	GetOAMixerIndex( std::string const & OAMixerName ); // Which Mixer
 
 	int
 	GetOAMixerInletNodeNumber( int const OAMixerNumber ); // Which Mixer
@@ -872,8 +855,8 @@ namespace MixedAir {
 
 	bool
 	CheckForControllerWaterCoil(
-		Fstring const & ControllerType, // should be passed in as UPPERCASE
-		Fstring const & ControllerName // should be passed in as UPPERCASE
+		std::string const & ControllerType, // should be passed in as UPPERCASE
+		std::string const & ControllerName // should be passed in as UPPERCASE
 	);
 
 	void
@@ -883,10 +866,10 @@ namespace MixedAir {
 	SetOAControllerData(
 		int const OACtrlNum, // Number of OA Controller
 		bool & ErrorsFound, // Set to true if certain errors found
-		Optional_Fstring Name = _, // Name of Controller
-		Optional_Fstring ControllerType = _, // Controller Type
+		Optional_string Name = _, // Name of Controller
+		Optional_string ControllerType = _, // Controller Type
 		Optional_int ControllerType_Num = _, // Parameter equivalent of Controller Type
-		Optional_Fstring LockoutType = _, // Lock out type
+		Optional_string LockoutType = _, // Lock out type
 		Optional_bool FixedMin = _, // Fixed Minimum or Proportional Minimum
 		Optional< Real64 > TempLim = _, // Temperature Limit
 		Optional< Real64 > TempLowLim = _, // Temperature Lower Limit
@@ -895,7 +878,7 @@ namespace MixedAir {
 		Optional_int EnthalpyCurvePtr = _, // Electronic Enthalpy Limit Curve Index
 		Optional< Real64 > MaxOA = _, // Maximum outside air flow (m3/sec)
 		Optional< Real64 > MinOA = _, // Minimum outside air flow (m3/sec)
-		Optional_Fstring EconoType = _, // EconoType = No Economizer,Differential Enthalpy, Differential Dry bulb,
+		Optional_string EconoType = _, // EconoType = No Economizer,Differential Enthalpy, Differential Dry bulb,
 		Optional_int MixNode = _, // Controlled node (mixed air node)
 		Optional_int OANode = _, // Actuated node (outside air node)
 		Optional_int InletNode = _, // Inlet Air Node for into Mixer  (BTG Nov 2004)
@@ -906,16 +889,16 @@ namespace MixedAir {
 		Optional_bool ModifyDuringHighOAMoisture = _, // TRUE if modify air flow is allowed during high OA humrat conditions
 		Optional_int NodeNumofHumidistatZone = _, // actual node number of controlled zone
 		Optional_int EconomizerOASchedPtr = _, // Time of day schedule for increasing outdoor air
-		Optional_Fstring BypassType = _ // ActivateBypassAtMinOAFlow, SetOAFlowRate
+		Optional_string BypassType = _ // ActivateBypassAtMinOAFlow, SetOAFlowRate
 	);
 
 	void
 	CheckOAControllerName(
-		Fstring const & OAControllerName, // proposed name
+		std::string const & OAControllerName, // proposed name
 		int const NumCurrentOAControllers, // Count on number of controllers
 		bool & IsNotOK, // Pass through to VerifyName
 		bool & IsBlank, // Pass through to VerifyName
-		Fstring const & SourceID // Pass through to VerifyName
+		std::string const & SourceID // Pass through to VerifyName
 	);
 
 	void
@@ -932,13 +915,13 @@ namespace MixedAir {
 	int
 	GetOACompListNumber( int const OASysNum ); // OA Sys Number
 
-	Fstring
+	std::string
 	GetOACompName(
 		int const OASysNum, // OA Sys Number
 		int const InListNum // In-list Number
 	);
 
-	Fstring
+	std::string
 	GetOACompType(
 		int const OASysNum, // OA Sys Number
 		int const InListNum // In-list Number

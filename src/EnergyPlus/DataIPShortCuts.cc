@@ -30,8 +30,6 @@ namespace DataIPShortCuts {
 	// na
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
-	using namespace DataPrecisionGlobals;
 
 	// Data
 	// -only module should be available to other modules and routines.
@@ -47,13 +45,13 @@ namespace DataIPShortCuts {
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
-	FArray1D_Fstring cAlphaFieldNames( sFstring( MaxNameLength + 40 ) );
-	FArray1D_Fstring cNumericFieldNames( sFstring( MaxNameLength + 40 ) );
+	FArray1D_string cAlphaFieldNames;
+	FArray1D_string cNumericFieldNames;
 	FArray1D_bool lNumericFieldBlanks;
 	FArray1D_bool lAlphaFieldBlanks;
-	FArray1D_Fstring cAlphaArgs( sFstring( MaxNameLength ) );
+	FArray1D_string cAlphaArgs;
 	FArray1D< Real64 > rNumericArgs;
-	Fstring cCurrentModuleObject( MaxNameLength );
+	std::string cCurrentModuleObject;
 
 	//     NOTICE
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois

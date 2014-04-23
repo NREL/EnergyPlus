@@ -67,10 +67,10 @@ namespace GlobalNames {
 
 	void
 	VerifyUniqueChillerName(
-		Fstring const & TypeToVerify,
-		Fstring const & NameToVerify,
+		std::string const & TypeToVerify,
+		std::string const & NameToVerify,
 		bool & ErrorFound,
-		Fstring const & StringToDisplay
+		std::string const & StringToDisplay
 	)
 	{
 
@@ -115,8 +115,8 @@ namespace GlobalNames {
 		Found = 0;
 		if ( NumChillers > 0 ) Found = FindItemInList( NameToVerify, ChillerNames.CompName(), NumChillers );
 		if ( Found != 0 ) {
-			ShowSevereError( trim( StringToDisplay ) + ", duplicate name=" + trim( NameToVerify ) + ", Chiller Type=\"" + trim( ChillerNames( Found ).CompType ) + "\"." );
-			ShowContinueError( "...Current entry is Chiller Type=\"" + trim( TypeToVerify ) + "\"." );
+			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Chiller Type=\"" + ChillerNames( Found ).CompType + "\"." );
+			ShowContinueError( "...Current entry is Chiller Type=\"" + TypeToVerify + "\"." );
 			ErrorFound = true;
 		} else if ( NumChillers == 0 ) {
 			CurMaxChillers = 4;
@@ -145,10 +145,10 @@ namespace GlobalNames {
 
 	void
 	VerifyUniqueBaseboardName(
-		Fstring const & TypeToVerify,
-		Fstring const & NameToVerify,
+		std::string const & TypeToVerify,
+		std::string const & NameToVerify,
 		bool & ErrorFound,
-		Fstring const & StringToDisplay
+		std::string const & StringToDisplay
 	)
 	{
 
@@ -195,8 +195,8 @@ namespace GlobalNames {
 		if ( NumBaseboards > 0 ) Found = FindItemInList( NameToVerify, BaseboardNames.CompName(), NumBaseboards );
 
 		if ( Found != 0 ) {
-			ShowSevereError( trim( StringToDisplay ) + ", duplicate name=" + trim( NameToVerify ) + ", Baseboard Type=\"" + trim( BaseboardNames( Found ).CompType ) + "\"." );
-			ShowContinueError( "...Current entry is Baseboard Type=\"" + trim( TypeToVerify ) + "\"." );
+			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Baseboard Type=\"" + BaseboardNames( Found ).CompType + "\"." );
+			ShowContinueError( "...Current entry is Baseboard Type=\"" + TypeToVerify + "\"." );
 			ErrorFound = true;
 		} else if ( NumBaseboards == 0 ) {
 			CurMaxBaseboards = 4;
@@ -225,10 +225,10 @@ namespace GlobalNames {
 
 	void
 	VerifyUniqueBoilerName(
-		Fstring const & TypeToVerify,
-		Fstring const & NameToVerify,
+		std::string const & TypeToVerify,
+		std::string const & NameToVerify,
 		bool & ErrorFound,
-		Fstring const & StringToDisplay
+		std::string const & StringToDisplay
 	)
 	{
 
@@ -274,8 +274,8 @@ namespace GlobalNames {
 		if ( NumBoilers > 0 ) Found = FindItemInList( NameToVerify, BoilerNames.CompName(), NumBoilers );
 
 		if ( Found != 0 ) {
-			ShowSevereError( trim( StringToDisplay ) + ", duplicate name=" + trim( NameToVerify ) + ", Boiler Type=\"" + trim( BoilerNames( Found ).CompType ) + "\"." );
-			ShowContinueError( "...Current entry is Boiler Type=\"" + trim( TypeToVerify ) + "\"." );
+			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Boiler Type=\"" + BoilerNames( Found ).CompType + "\"." );
+			ShowContinueError( "...Current entry is Boiler Type=\"" + TypeToVerify + "\"." );
 			ErrorFound = true;
 		} else if ( NumBoilers == 0 ) {
 			CurMaxBoilers = 4;
@@ -304,10 +304,10 @@ namespace GlobalNames {
 
 	void
 	VerifyUniqueCoilName(
-		Fstring const & TypeToVerify,
-		Fstring const & NameToVerify,
+		std::string const & TypeToVerify,
+		std::string const & NameToVerify,
 		bool & ErrorFound,
-		Fstring const & StringToDisplay
+		std::string const & StringToDisplay
 	)
 	{
 
@@ -352,8 +352,8 @@ namespace GlobalNames {
 		Found = 0;
 		if ( NumCoils > 0 ) Found = FindItemInList( NameToVerify, CoilNames.CompName(), NumCoils );
 		if ( Found != 0 ) {
-			ShowSevereError( trim( StringToDisplay ) + ", duplicate name=" + trim( NameToVerify ) + ", Coil Type=\"" + trim( CoilNames( Found ).CompType ) + "\"" );
-			ShowContinueError( "...Current entry is Coil Type=\"" + trim( TypeToVerify ) + "\"." );
+			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Coil Type=\"" + CoilNames( Found ).CompType + "\"" );
+			ShowContinueError( "...Current entry is Coil Type=\"" + TypeToVerify + "\"." );
 			ErrorFound = true;
 		} else if ( NumCoils == 0 ) {
 			CurMaxCoils = 4;

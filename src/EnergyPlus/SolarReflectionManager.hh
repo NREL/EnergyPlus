@@ -5,7 +5,6 @@
 #include <ObjexxFCL/FArray1A.hh>
 #include <ObjexxFCL/FArray2D.hh>
 #include <ObjexxFCL/FArray3D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -17,7 +16,6 @@ namespace EnergyPlus {
 namespace SolarReflectionManager {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:na
@@ -37,7 +35,7 @@ namespace SolarReflectionManager {
 	{
 		// Members
 		int SurfNum; // Number of heat transfer surface
-		Fstring SurfName; // Name of heat transfer surface
+		std::string SurfName; // Name of heat transfer surface
 		int NumRecPts; // Number of receiving points
 		FArray2D< Real64 > RecPt; // Coordinates of receiving point on receiving surface in global CS (m)
 		FArray1D< Real64 > NormVec; // Unit outward normal to receiving surface
@@ -62,7 +60,6 @@ namespace SolarReflectionManager {
 		// Default Constructor
 		SolReflRecSurfData() :
 			SurfNum( 0 ),
-			SurfName( MaxNameLength ),
 			NumRecPts( 0 ),
 			NormVec( 3, 0.0 ),
 			ThetaNormVec( 0.0 ),
@@ -74,7 +71,7 @@ namespace SolarReflectionManager {
 		// Member Constructor
 		SolReflRecSurfData(
 			int const SurfNum, // Number of heat transfer surface
-			Fstring const & SurfName, // Name of heat transfer surface
+			std::string const & SurfName, // Name of heat transfer surface
 			int const NumRecPts, // Number of receiving points
 			FArray2< Real64 > const & RecPt, // Coordinates of receiving point on receiving surface in global CS (m)
 			FArray1< Real64 > const & NormVec, // Unit outward normal to receiving surface
@@ -93,7 +90,7 @@ namespace SolarReflectionManager {
 			int const NumPossibleObs // Number of possible obstructions for a receiving surface
 		) :
 			SurfNum( SurfNum ),
-			SurfName( MaxNameLength, SurfName ),
+			SurfName( SurfName ),
 			NumRecPts( NumRecPts ),
 			RecPt( RecPt ),
 			NormVec( 3, NormVec ),

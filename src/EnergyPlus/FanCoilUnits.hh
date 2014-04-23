@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -15,12 +14,11 @@ namespace EnergyPlus {
 namespace FanCoilUnits {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
 
-	extern Fstring const cMO_FanCoil;
+	extern std::string const cMO_FanCoil;
 
 	// coil operation
 	extern int const On; // normal coil operation
@@ -61,15 +59,15 @@ namespace FanCoilUnits {
 	{
 		// Members
 		// Input data
-		Fstring Name; // name of unit
-		Fstring UnitType; // type of unit
+		std::string Name; // name of unit
+		std::string UnitType; // type of unit
 		int UnitType_Num;
-		Fstring Sched; // availability schedule
+		std::string Sched; // availability schedule
 		int SchedPtr; // index to schedule
-		Fstring SchedOutAir; // outside air schedule, multipliy maximum outdoor air flow rate
+		std::string SchedOutAir; // outside air schedule, multipliy maximum outdoor air flow rate
 		int SchedOutAirPtr; // index to outside air schedule
 		int FanType_Num; // index to fan type
-		Fstring CapCtrlMeth; // type of capacity control method
+		std::string CapCtrlMeth; // type of capacity control method
 		// 'ConstantFanVariableFlow' or
 		// 'CyclingFan' or
 		// 'VariableFanVariableFlow'
@@ -95,21 +93,21 @@ namespace FanCoilUnits {
 		int ColdPlantOutletNode; // chilled water coil outlet plant node
 		int HotControlNode; // hot water control node
 		int HotPlantOutletNode; // hot water coil outlet plant node
-		Fstring OAMixName; // name of outside air mixer
-		Fstring OAMixType; // type of outside air mixer
+		std::string OAMixName; // name of outside air mixer
+		std::string OAMixType; // type of outside air mixer
 		int OAMixIndex;
-		Fstring FanName; // name of fan
-		Fstring FanType; // type of fan
+		std::string FanName; // name of fan
+		std::string FanType; // type of fan
 		int FanIndex; // index for fan
-		Fstring CCoilName; // name of cooling coil
+		std::string CCoilName; // name of cooling coil
 		int CCoilName_Index; // Index for this Cooling Coil in SimWaterComp
-		Fstring CCoilType; // type of cooling coil:
+		std::string CCoilType; // type of cooling coil:
 		// 'Coil:Cooling:Water' or
 		// 'Coil:Cooling:Water:DetailedGeometry' or
 		// 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
 		int CCoilType_Num; // Numeric equivalent for type of cooling coil
-		Fstring CCoilPlantName; // name of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
-		Fstring CCoilPlantType; // type of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
+		std::string CCoilPlantName; // name of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
+		std::string CCoilPlantType; // type of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
 		int CCoilPlantTypeOfNum;
 		int CWLoopNum; // index for plant loop with chilled water coil
 		int CWLoopSide; // index for plant loop side for chilled water coil
@@ -122,9 +120,9 @@ namespace FanCoilUnits {
 		Real64 MinColdWaterVolFlow; // m3/s
 		Real64 MinColdWaterFlow; // kg/s
 		Real64 ColdControlOffset; // control tolerance
-		Fstring HCoilName; // name of heating coil
+		std::string HCoilName; // name of heating coil
 		int HCoilName_Index;
-		Fstring HCoilType; // type of heating coil:
+		std::string HCoilType; // type of heating coil:
 		// 'Coil:Heating:Water' or
 		int HCoilType_Num; // Numeric equivalent for type of cooling coil
 		int HCoilPlantTypeOfNum;
@@ -138,10 +136,10 @@ namespace FanCoilUnits {
 		Real64 MinHotWaterFlow; // kg/s
 		Real64 HotControlOffset; // control tolerance
 		int AvailStatus;
-		Fstring AvailManagerListName; // Name of an availability manager list object
+		std::string AvailManagerListName; // Name of an availability manager list object
 		// addition for OA to Zone Units
 		bool ATMixerExists; // True if there is an ATMixer
-		Fstring ATMixerName; // name of air terminal mixer
+		std::string ATMixerName; // name of air terminal mixer
 		int ATMixerIndex; // index to the air terminal mixer
 		int ATMixerType; // 1 = inlet side mixer, 2 = supply side mixer
 		int ATMixerPriNode; // primary inlet air node number for the air terminal mixer
@@ -161,15 +159,10 @@ namespace FanCoilUnits {
 
 		// Default Constructor
 		FanCoilData() :
-			Name( MaxNameLength ),
-			UnitType( MaxNameLength ),
 			UnitType_Num( 0 ),
-			Sched( MaxNameLength ),
 			SchedPtr( 0 ),
-			SchedOutAir( MaxNameLength ),
 			SchedOutAirPtr( 0 ),
 			FanType_Num( 0 ),
-			CapCtrlMeth( MaxNameLength ),
 			SpeedFanSel( 0 ),
 			CapCtrlMeth_Num( 0 ),
 			PLR( 0.0 ),
@@ -192,18 +185,10 @@ namespace FanCoilUnits {
 			ColdPlantOutletNode( 0 ),
 			HotControlNode( 0 ),
 			HotPlantOutletNode( 0 ),
-			OAMixName( MaxNameLength ),
-			OAMixType( MaxNameLength ),
 			OAMixIndex( 0 ),
-			FanName( MaxNameLength ),
-			FanType( MaxNameLength ),
 			FanIndex( 0 ),
-			CCoilName( MaxNameLength ),
 			CCoilName_Index( 0 ),
-			CCoilType( MaxNameLength ),
 			CCoilType_Num( 0 ),
-			CCoilPlantName( MaxNameLength ),
-			CCoilPlantType( MaxNameLength ),
 			CCoilPlantTypeOfNum( 0 ),
 			CWLoopNum( 0 ),
 			CWLoopSide( 0 ),
@@ -216,9 +201,7 @@ namespace FanCoilUnits {
 			MinColdWaterVolFlow( 0.0 ),
 			MinColdWaterFlow( 0.0 ),
 			ColdControlOffset( 0.0 ),
-			HCoilName( MaxNameLength ),
 			HCoilName_Index( 0 ),
-			HCoilType( MaxNameLength ),
 			HCoilType_Num( 0 ),
 			HCoilPlantTypeOfNum( 0 ),
 			HWLoopNum( 0 ),
@@ -231,9 +214,7 @@ namespace FanCoilUnits {
 			MinHotWaterFlow( 0.0 ),
 			HotControlOffset( 0.0 ),
 			AvailStatus( 0 ),
-			AvailManagerListName( MaxNameLength ),
 			ATMixerExists( false ),
-			ATMixerName( MaxNameLength ),
 			ATMixerIndex( 0 ),
 			ATMixerType( 0 ),
 			ATMixerPriNode( 0 ),
@@ -253,15 +234,15 @@ namespace FanCoilUnits {
 
 		// Member Constructor
 		FanCoilData(
-			Fstring const & Name, // name of unit
-			Fstring const & UnitType, // type of unit
+			std::string const & Name, // name of unit
+			std::string const & UnitType, // type of unit
 			int const UnitType_Num,
-			Fstring const & Sched, // availability schedule
+			std::string const & Sched, // availability schedule
 			int const SchedPtr, // index to schedule
-			Fstring const & SchedOutAir, // outside air schedule, multipliy maximum outdoor air flow rate
+			std::string const & SchedOutAir, // outside air schedule, multipliy maximum outdoor air flow rate
 			int const SchedOutAirPtr, // index to outside air schedule
 			int const FanType_Num, // index to fan type
-			Fstring const & CapCtrlMeth, // type of capacity control method
+			std::string const & CapCtrlMeth, // type of capacity control method
 			int const SpeedFanSel, // Speed fan selected
 			int const CapCtrlMeth_Num,
 			Real64 const PLR, // Part Load Ratio, fraction of time step fancoil is on
@@ -284,18 +265,18 @@ namespace FanCoilUnits {
 			int const ColdPlantOutletNode, // chilled water coil outlet plant node
 			int const HotControlNode, // hot water control node
 			int const HotPlantOutletNode, // hot water coil outlet plant node
-			Fstring const & OAMixName, // name of outside air mixer
-			Fstring const & OAMixType, // type of outside air mixer
+			std::string const & OAMixName, // name of outside air mixer
+			std::string const & OAMixType, // type of outside air mixer
 			int const OAMixIndex,
-			Fstring const & FanName, // name of fan
-			Fstring const & FanType, // type of fan
+			std::string const & FanName, // name of fan
+			std::string const & FanType, // type of fan
 			int const FanIndex, // index for fan
-			Fstring const & CCoilName, // name of cooling coil
+			std::string const & CCoilName, // name of cooling coil
 			int const CCoilName_Index, // Index for this Cooling Coil in SimWaterComp
-			Fstring const & CCoilType, // type of cooling coil:
+			std::string const & CCoilType, // type of cooling coil:
 			int const CCoilType_Num, // Numeric equivalent for type of cooling coil
-			Fstring const & CCoilPlantName, // name of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
-			Fstring const & CCoilPlantType, // type of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
+			std::string const & CCoilPlantName, // name of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
+			std::string const & CCoilPlantType, // type of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
 			int const CCoilPlantTypeOfNum,
 			int const CWLoopNum, // index for plant loop with chilled water coil
 			int const CWLoopSide, // index for plant loop side for chilled water coil
@@ -308,9 +289,9 @@ namespace FanCoilUnits {
 			Real64 const MinColdWaterVolFlow, // m3/s
 			Real64 const MinColdWaterFlow, // kg/s
 			Real64 const ColdControlOffset, // control tolerance
-			Fstring const & HCoilName, // name of heating coil
+			std::string const & HCoilName, // name of heating coil
 			int const HCoilName_Index,
-			Fstring const & HCoilType, // type of heating coil:
+			std::string const & HCoilType, // type of heating coil:
 			int const HCoilType_Num, // Numeric equivalent for type of cooling coil
 			int const HCoilPlantTypeOfNum,
 			int const HWLoopNum, // index for plant loop with hot water coil
@@ -323,9 +304,9 @@ namespace FanCoilUnits {
 			Real64 const MinHotWaterFlow, // kg/s
 			Real64 const HotControlOffset, // control tolerance
 			int const AvailStatus,
-			Fstring const & AvailManagerListName, // Name of an availability manager list object
+			std::string const & AvailManagerListName, // Name of an availability manager list object
 			bool const ATMixerExists, // True if there is an ATMixer
-			Fstring const & ATMixerName, // name of air terminal mixer
+			std::string const & ATMixerName, // name of air terminal mixer
 			int const ATMixerIndex, // index to the air terminal mixer
 			int const ATMixerType, // 1 = inlet side mixer, 2 = supply side mixer
 			int const ATMixerPriNode, // primary inlet air node number for the air terminal mixer
@@ -342,15 +323,15 @@ namespace FanCoilUnits {
 			Real64 const DesCoolingLoad, // used for reporting in watts
 			Real64 const DesHeatingLoad // used for reporting in watts
 		) :
-			Name( MaxNameLength, Name ),
-			UnitType( MaxNameLength, UnitType ),
+			Name( Name ),
+			UnitType( UnitType ),
 			UnitType_Num( UnitType_Num ),
-			Sched( MaxNameLength, Sched ),
+			Sched( Sched ),
 			SchedPtr( SchedPtr ),
-			SchedOutAir( MaxNameLength, SchedOutAir ),
+			SchedOutAir( SchedOutAir ),
 			SchedOutAirPtr( SchedOutAirPtr ),
 			FanType_Num( FanType_Num ),
-			CapCtrlMeth( MaxNameLength, CapCtrlMeth ),
+			CapCtrlMeth( CapCtrlMeth ),
 			SpeedFanSel( SpeedFanSel ),
 			CapCtrlMeth_Num( CapCtrlMeth_Num ),
 			PLR( PLR ),
@@ -373,18 +354,18 @@ namespace FanCoilUnits {
 			ColdPlantOutletNode( ColdPlantOutletNode ),
 			HotControlNode( HotControlNode ),
 			HotPlantOutletNode( HotPlantOutletNode ),
-			OAMixName( MaxNameLength, OAMixName ),
-			OAMixType( MaxNameLength, OAMixType ),
+			OAMixName( OAMixName ),
+			OAMixType( OAMixType ),
 			OAMixIndex( OAMixIndex ),
-			FanName( MaxNameLength, FanName ),
-			FanType( MaxNameLength, FanType ),
+			FanName( FanName ),
+			FanType( FanType ),
 			FanIndex( FanIndex ),
-			CCoilName( MaxNameLength, CCoilName ),
+			CCoilName( CCoilName ),
 			CCoilName_Index( CCoilName_Index ),
-			CCoilType( MaxNameLength, CCoilType ),
+			CCoilType( CCoilType ),
 			CCoilType_Num( CCoilType_Num ),
-			CCoilPlantName( MaxNameLength, CCoilPlantName ),
-			CCoilPlantType( MaxNameLength, CCoilPlantType ),
+			CCoilPlantName( CCoilPlantName ),
+			CCoilPlantType( CCoilPlantType ),
 			CCoilPlantTypeOfNum( CCoilPlantTypeOfNum ),
 			CWLoopNum( CWLoopNum ),
 			CWLoopSide( CWLoopSide ),
@@ -397,9 +378,9 @@ namespace FanCoilUnits {
 			MinColdWaterVolFlow( MinColdWaterVolFlow ),
 			MinColdWaterFlow( MinColdWaterFlow ),
 			ColdControlOffset( ColdControlOffset ),
-			HCoilName( MaxNameLength, HCoilName ),
+			HCoilName( HCoilName ),
 			HCoilName_Index( HCoilName_Index ),
-			HCoilType( MaxNameLength, HCoilType ),
+			HCoilType( HCoilType ),
 			HCoilType_Num( HCoilType_Num ),
 			HCoilPlantTypeOfNum( HCoilPlantTypeOfNum ),
 			HWLoopNum( HWLoopNum ),
@@ -412,9 +393,9 @@ namespace FanCoilUnits {
 			MinHotWaterFlow( MinHotWaterFlow ),
 			HotControlOffset( HotControlOffset ),
 			AvailStatus( AvailStatus ),
-			AvailManagerListName( MaxNameLength, AvailManagerListName ),
+			AvailManagerListName( AvailManagerListName ),
 			ATMixerExists( ATMixerExists ),
-			ATMixerName( MaxNameLength, ATMixerName ),
+			ATMixerName( ATMixerName ),
 			ATMixerIndex( ATMixerIndex ),
 			ATMixerType( ATMixerType ),
 			ATMixerPriNode( ATMixerPriNode ),
@@ -441,7 +422,7 @@ namespace FanCoilUnits {
 
 	void
 	SimFanCoilUnit(
-		Fstring const & CompName, // name of the fan coil unit
+		std::string const & CompName, // name of the fan coil unit
 		int const ZoneNum, // number of zone being served
 		int const ControlledZoneNum, // index into ZoneEquipConfig array; may not be equal to ZoneNum
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
@@ -501,7 +482,7 @@ namespace FanCoilUnits {
 
 	void
 	GetFanCoilIndex(
-		Fstring const & FanCoilName,
+		std::string const & FanCoilName,
 		int & FanCoilIndex
 	);
 

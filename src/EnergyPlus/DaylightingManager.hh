@@ -6,7 +6,6 @@
 #include <ObjexxFCL/FArray2A.hh>
 #include <ObjexxFCL/FArray2S.hh>
 #include <ObjexxFCL/FArray3D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -71,7 +70,7 @@ namespace DaylightingManager {
 
 	extern FArray1D_bool CheckTDDZone;
 
-	extern Fstring mapLine; // character variable to hold map outputs
+	extern std::string mapLine; // character variable to hold map outputs
 
 	// Functions
 
@@ -594,11 +593,11 @@ namespace DaylightingManager {
 	WriteDaylightMapTitle(
 		int const mapNum,
 		int const unitNo,
-		Fstring const & mapName,
-		Fstring const & environmentName,
+		std::string const & mapName,
+		std::string const & environmentName,
 		int const ZoneNum,
-		Fstring const & refPt1,
-		Fstring const & refPt2,
+		std::string const & refPt1,
+		std::string const & refPt2,
 		Real64 const zcoord
 	);
 

@@ -5,7 +5,6 @@
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray2D.hh>
 #include <ObjexxFCL/FArray2S.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -16,14 +15,13 @@ namespace EnergyPlus {
 namespace MatrixDataManager {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	//INTEGER, PARAMETER :: OneDimensional = 1
 	extern int const TwoDimensional;
 	//INTEGER, PARAMETER :: ThreeDimensional = 3
-	extern Fstring const Blank;
+	extern std::string const Blank;
 	// DERIVED TYPE DEFINITIONS:
 	// na
 
@@ -46,7 +44,7 @@ namespace MatrixDataManager {
 	struct MatrixDataStruct
 	{
 		// Members
-		Fstring Name; // Matrix Name
+		std::string Name; // Matrix Name
 		int MatrixType;
 		FArray1D_int Dim; // matrix dimensions
 		//REAL(r64), DIMENSION(:), ALLOCATABLE     :: Mat1D ! hold data if one dimensional
@@ -55,18 +53,17 @@ namespace MatrixDataManager {
 
 		// Default Constructor
 		MatrixDataStruct() :
-			Name( MaxNameLength, Blank ),
 			MatrixType( 0 )
 		{}
 
 		// Member Constructor
 		MatrixDataStruct(
-			Fstring const & Name, // Matrix Name
+			std::string const & Name, // Matrix Name
 			int const MatrixType,
 			FArray1_int const & Dim, // matrix dimensions
 			FArray2< Real64 > const & Mat2D // hold data if two dimensional
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			MatrixType( MatrixType ),
 			Dim( Dim ),
 			Mat2D( Mat2D )
@@ -83,7 +80,7 @@ namespace MatrixDataManager {
 	GetMatrixInput();
 
 	int
-	MatrixIndex( Fstring const & MatrixName );
+	MatrixIndex( std::string const & MatrixName );
 
 	void
 	Get2DMatrix(

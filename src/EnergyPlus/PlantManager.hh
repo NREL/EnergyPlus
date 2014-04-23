@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -15,7 +14,6 @@ namespace EnergyPlus {
 namespace PlantManager {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 	using DataPlant::BranchData;
 	using DataPlant::MixerData;
 	using DataPlant::PipeData;
@@ -52,10 +50,10 @@ namespace PlantManager {
 	struct TempLoopData
 	{
 		// Members
-		Fstring Name; // Name of the component list
+		std::string Name; // Name of the component list
 		// Loop connections
-		Fstring BranchList; // Branch list name for the half loop
-		Fstring ConnectList; // Connector list name for the half loop
+		std::string BranchList; // Branch list name for the half loop
+		std::string ConnectList; // Connector list name for the half loop
 		int TotalBranches; // Total number of branches on the loop
 		FArray1D< BranchData > Branch; // Branch data
 		FArray1D< SplitterData > Splitter; // Data for splitter on branch (if any)
@@ -67,9 +65,6 @@ namespace PlantManager {
 
 		// Default Constructor
 		TempLoopData() :
-			Name( MaxNameLength ),
-			BranchList( MaxNameLength ),
-			ConnectList( MaxNameLength ),
 			TotalBranches( 0 ),
 			SplitterExists( false ),
 			MixerExists( false ),
@@ -79,9 +74,9 @@ namespace PlantManager {
 
 		// Member Constructor
 		TempLoopData(
-			Fstring const & Name, // Name of the component list
-			Fstring const & BranchList, // Branch list name for the half loop
-			Fstring const & ConnectList, // Connector list name for the half loop
+			std::string const & Name, // Name of the component list
+			std::string const & BranchList, // Branch list name for the half loop
+			std::string const & ConnectList, // Connector list name for the half loop
 			int const TotalBranches, // Total number of branches on the loop
 			FArray1< BranchData > const & Branch, // Branch data
 			FArray1< SplitterData > const & Splitter, // Data for splitter on branch (if any)
@@ -91,9 +86,9 @@ namespace PlantManager {
 			bool const BypassExists,
 			bool const LoopHasConnectionComp
 		) :
-			Name( MaxNameLength, Name ),
-			BranchList( MaxNameLength, BranchList ),
-			ConnectList( MaxNameLength, ConnectList ),
+			Name( Name ),
+			BranchList( BranchList ),
+			ConnectList( ConnectList ),
 			TotalBranches( TotalBranches ),
 			Branch( Branch ),
 			Splitter( Splitter ),
@@ -296,7 +291,7 @@ namespace PlantManager {
 		int const LoopSideNum,
 		int const BranchNum,
 		int const CompNum,
-		Fstring const & PumpName,
+		std::string const & PumpName,
 		int const PumpOutletNode,
 		bool const HasBranchPumps
 	);

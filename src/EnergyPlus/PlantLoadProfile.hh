@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace PlantLoadProfile {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// DERIVED TYPE DEFINITIONS:
@@ -31,7 +29,7 @@ namespace PlantLoadProfile {
 	struct PlantProfileData
 	{
 		// Members
-		Fstring Name; // Name of Plant Load Profile object
+		std::string Name; // Name of Plant Load Profile object
 		int TypeNum; // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant  !DSU
 		int WLoopNum; // water plant loop index number                      !DSU
 		int WLoopSideNum; // water plant loop side index                        !DSU
@@ -61,7 +59,6 @@ namespace PlantLoadProfile {
 
 		// Default Constructor
 		PlantProfileData() :
-			Name( MaxNameLength ),
 			WLoopNum( 0 ),
 			WLoopSideNum( 0 ),
 			WLoopBranchNum( 0 ),
@@ -90,7 +87,7 @@ namespace PlantLoadProfile {
 
 		// Member Constructor
 		PlantProfileData(
-			Fstring const & Name, // Name of Plant Load Profile object
+			std::string const & Name, // Name of Plant Load Profile object
 			int const TypeNum, // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant  !DSU
 			int const WLoopNum, // water plant loop index number                      !DSU
 			int const WLoopSideNum, // water plant loop side index                        !DSU
@@ -117,7 +114,7 @@ namespace PlantLoadProfile {
 			Real64 const CoolingEnergy, // Cooling Energy required to meet the load (J)
 			bool const SetLoopIndexFlag
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			TypeNum( TypeNum ),
 			WLoopNum( WLoopNum ),
 			WLoopSideNum( WLoopSideNum ),
@@ -154,8 +151,8 @@ namespace PlantLoadProfile {
 
 	void
 	SimulatePlantProfile(
-		Fstring const & EquipTypeName, // description of model (not used until different types of profiles)
-		Fstring const & EquipName, // the user-defined name
+		std::string const & EquipTypeName, // description of model (not used until different types of profiles)
+		std::string const & EquipName, // the user-defined name
 		int const EquipTypeNum, // the plant parameter ID for equipment model
 		int & ProfileNum, // the index for specific load profile
 		bool const FirstHVACIteration,

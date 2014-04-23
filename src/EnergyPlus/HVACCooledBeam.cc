@@ -63,7 +63,6 @@ namespace HVACCooledBeam {
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using DataGlobals::BeginEnvrnFlag;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::NumOfZones;
 	using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
@@ -108,7 +107,7 @@ namespace HVACCooledBeam {
 
 	void
 	SimCoolBeam(
-		Fstring const & CompName, // name of the cooled beam unit
+		std::string const & CompName, // name of the cooled beam unit
 		bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
 		int const ZoneNum, // index of zone served by the unit
 		int const ZoneNodeNum, // zone node number of zone served by the unit
@@ -164,23 +163,23 @@ namespace HVACCooledBeam {
 		if ( CompIndex == 0 ) {
 			CBNum = FindItemInList( CompName, CoolBeam.Name(), NumCB );
 			if ( CBNum == 0 ) {
-				ShowFatalError( "SimCoolBeam: Cool Beam Unit not found=" + trim( CompName ) );
+				ShowFatalError( "SimCoolBeam: Cool Beam Unit not found=" + CompName );
 			}
 			CompIndex = CBNum;
 		} else {
 			CBNum = CompIndex;
 			if ( CBNum > NumCB || CBNum < 1 ) {
-				ShowFatalError( "SimCoolBeam: Invalid CompIndex passed=" + trim( TrimSigDigits( CompIndex ) ) + ", Number of Cool Beam Units=" + trim( TrimSigDigits( NumCB ) ) + ", System name=" + trim( CompName ) );
+				ShowFatalError( "SimCoolBeam: Invalid CompIndex passed=" + TrimSigDigits( CompIndex ) + ", Number of Cool Beam Units=" + TrimSigDigits( NumCB ) + ", System name=" + CompName );
 			}
 			if ( CheckEquipName( CBNum ) ) {
 				if ( CompName != CoolBeam( CBNum ).Name ) {
-					ShowFatalError( "SimCoolBeam: Invalid CompIndex passed=" + trim( TrimSigDigits( CompIndex ) ) + ", Cool Beam Unit name=" + trim( CompName ) + ", stored Cool Beam Unit for that index=" + trim( CoolBeam( CBNum ).Name ) );
+					ShowFatalError( "SimCoolBeam: Invalid CompIndex passed=" + TrimSigDigits( CompIndex ) + ", Cool Beam Unit name=" + CompName + ", stored Cool Beam Unit for that index=" + CoolBeam( CBNum ).Name );
 				}
 				CheckEquipName( CBNum ) = false;
 			}
 		}
 		if ( CBNum == 0 ) {
-			ShowFatalError( "Cool Beam Unit not found = " + trim( CompName ) );
+			ShowFatalError( "Cool Beam Unit not found = " + CompName );
 		}
 
 		// initialize the unit
@@ -237,7 +236,7 @@ namespace HVACCooledBeam {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetCoolBeams " ); // include trailing blank space
+		static std::string const RoutineName( "GetCoolBeams " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -250,10 +249,10 @@ namespace HVACCooledBeam {
 
 		int CBIndex; // loop index
 		int CBNum; // current fan coil number
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in getting objects
-		FArray1D_Fstring Alphas( sFstring( MaxNameLength ) ); // Alpha input items for object
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) ); // Numeric field names
+		std::string CurrentModuleObject; // for ease in getting objects
+		FArray1D_string Alphas; // Alpha input items for object
+		FArray1D_string cAlphaFields; // Alpha field names
+		FArray1D_string cNumericFields; // Numeric field names
 		FArray1D< Real64 > Numbers; // Numeric input items for object
 		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
@@ -284,11 +283,11 @@ namespace HVACCooledBeam {
 		TotalArgs = 23;
 
 		Alphas.allocate( NumAlphas );
-		Alphas = " ";
+		Alphas = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = " ";
+		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = " ";
+		cNumericFields = "";
 		Numbers.allocate( NumNumbers );
 		Numbers = 0.0;
 		lAlphaBlanks.allocate( NumAlphas );
@@ -303,7 +302,7 @@ namespace HVACCooledBeam {
 			CBNum = CBIndex;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), CoolBeam.Name(), CBNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), CoolBeam.Name(), CBNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -311,14 +310,14 @@ namespace HVACCooledBeam {
 			CoolBeam( CBNum ).Name = Alphas( 1 );
 			CoolBeam( CBNum ).UnitType = CurrentModuleObject;
 			CoolBeam( CBNum ).UnitType_Num = 1;
-			CoolBeam( CBNum ).CBType = trim( Alphas( 3 ) );
+			CoolBeam( CBNum ).CBType = Alphas( 3 );
 			if ( SameString( CoolBeam( CBNum ).CBType, "Passive" ) ) {
 				CoolBeam( CBNum ).CBType_Num = Passive_Cooled_Beam;
 			} else if ( SameString( CoolBeam( CBNum ).CBType, "Active" ) ) {
 				CoolBeam( CBNum ).CBType_Num = Active_Cooled_Beam;
 			} else {
-				ShowSevereError( "Illegal " + trim( cAlphaFields( 3 ) ) + " = " + trim( CoolBeam( CBNum ).CBType ) + "." );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( CoolBeam( CBNum ).Name ) );
+				ShowSevereError( "Illegal " + cAlphaFields( 3 ) + " = " + CoolBeam( CBNum ).CBType + '.' );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + CoolBeam( CBNum ).Name );
 				ErrorsFound = true;
 			}
 			CoolBeam( CBNum ).Sched = Alphas( 2 );
@@ -327,14 +326,14 @@ namespace HVACCooledBeam {
 			} else {
 				CoolBeam( CBNum ).SchedPtr = GetScheduleIndex( Alphas( 2 ) ); // convert schedule name to pointer
 				if ( CoolBeam( CBNum ).SchedPtr == 0 ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + ": invalid " + trim( cAlphaFields( 2 ) ) + " entered =" + trim( Alphas( 2 ) ) + " for " + trim( cAlphaFields( 1 ) ) + "=" + trim( Alphas( 1 ) ) );
+					ShowSevereError( RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields( 2 ) + " entered =" + Alphas( 2 ) + " for " + cAlphaFields( 1 ) + '=' + Alphas( 1 ) );
 					ErrorsFound = true;
 				}
 			}
-			CoolBeam( CBNum ).AirInNode = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent, cAlphaFields( 4 ) );
-			CoolBeam( CBNum ).AirOutNode = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent, cAlphaFields( 5 ) );
-			CoolBeam( CBNum ).CWInNode = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent, cAlphaFields( 6 ) );
-			CoolBeam( CBNum ).CWOutNode = GetOnlySingleNode( Alphas( 7 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent, cAlphaFields( 7 ) );
+			CoolBeam( CBNum ).AirInNode = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent, cAlphaFields( 4 ) );
+			CoolBeam( CBNum ).AirOutNode = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent, cAlphaFields( 5 ) );
+			CoolBeam( CBNum ).CWInNode = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent, cAlphaFields( 6 ) );
+			CoolBeam( CBNum ).CWOutNode = GetOnlySingleNode( Alphas( 7 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent, cAlphaFields( 7 ) );
 			CoolBeam( CBNum ).MaxAirVolFlow = Numbers( 1 );
 			CoolBeam( CBNum ).MaxCoolWaterVolFlow = Numbers( 2 );
 			CoolBeam( CBNum ).NumBeams = Numbers( 3 );
@@ -353,8 +352,8 @@ namespace HVACCooledBeam {
 			CoolBeam( CBNum ).InDiam = Numbers( 16 );
 
 			// Register component set data
-			TestCompSet( trim( CurrentModuleObject ), CoolBeam( CBNum ).Name, NodeID( CoolBeam( CBNum ).AirInNode ), NodeID( CoolBeam( CBNum ).AirOutNode ), "Air Nodes" );
-			TestCompSet( trim( CurrentModuleObject ), CoolBeam( CBNum ).Name, NodeID( CoolBeam( CBNum ).CWInNode ), NodeID( CoolBeam( CBNum ).CWOutNode ), "Water Nodes" );
+			TestCompSet( CurrentModuleObject, CoolBeam( CBNum ).Name, NodeID( CoolBeam( CBNum ).AirInNode ), NodeID( CoolBeam( CBNum ).AirOutNode ), "Air Nodes" );
+			TestCompSet( CurrentModuleObject, CoolBeam( CBNum ).Name, NodeID( CoolBeam( CBNum ).CWInNode ), NodeID( CoolBeam( CBNum ).CWOutNode ), "Water Nodes" );
 
 			//Setup the Cooled Beam reporting variables
 			SetupOutputVariable( "Zone Air Terminal Beam Sensible Cooling Energy [J]", CoolBeam( CBNum ).BeamCoolingEnergy, "System", "Sum", CoolBeam( CBNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
@@ -379,8 +378,8 @@ namespace HVACCooledBeam {
 				}
 			}
 			if ( ! AirNodeFound ) {
-				ShowSevereError( "The outlet air node from the " + trim( CurrentModuleObject ) + " = " + trim( CoolBeam( CBNum ).Name ) );
-				ShowContinueError( "did not have a matching Zone Equipment Inlet Node, Node =" + trim( Alphas( 5 ) ) );
+				ShowSevereError( "The outlet air node from the " + CurrentModuleObject + " = " + CoolBeam( CBNum ).Name );
+				ShowContinueError( "did not have a matching Zone Equipment Inlet Node, Node =" + Alphas( 5 ) );
 				ErrorsFound = true;
 			}
 
@@ -394,8 +393,8 @@ namespace HVACCooledBeam {
 			}
 			// one assumes if there isn't one assigned, it's an error?
 			if ( CoolBeam( CBNum ).ADUNum == 0 ) {
-				ShowSevereError( RoutineName + "No matching Air Distribution Unit, for Unit = [" + trim( CurrentModuleObject ) + "," + trim( CoolBeam( CBNum ).Name ) + "]." );
-				ShowContinueError( "...should have outlet node=" + trim( NodeID( CoolBeam( CBNum ).AirOutNode ) ) );
+				ShowSevereError( RoutineName + "No matching Air Distribution Unit, for Unit = [" + CurrentModuleObject + ',' + CoolBeam( CBNum ).Name + "]." );
+				ShowContinueError( "...should have outlet node=" + NodeID( CoolBeam( CBNum ).AirOutNode ) );
 				//          ErrorsFound=.TRUE.
 			}
 		}
@@ -472,7 +471,7 @@ namespace HVACCooledBeam {
 		Real64 rho; // local fluid density
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop; // Loop checking control variable
-		Fstring CurrentModuleObject( MaxNameLength );
+		std::string CurrentModuleObject;
 		bool errFlag;
 
 		CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:CooledBeam";
@@ -505,8 +504,8 @@ namespace HVACCooledBeam {
 			for ( Loop = 1; Loop <= NumCB; ++Loop ) {
 				if ( CoolBeam( Loop ).ADUNum == 0 ) continue;
 				if ( CheckZoneEquipmentList( "ZONEHVAC:AIRDISTRIBUTIONUNIT", AirDistUnit( CoolBeam( Loop ).ADUNum ).Name ) ) continue;
-				ShowSevereError( "InitCoolBeam: ADU=[Air Distribution Unit," + trim( AirDistUnit( CoolBeam( Loop ).ADUNum ).Name ) + "] is not on any ZoneHVAC:EquipmentList." );
-				ShowContinueError( "...Unit=[" + trim( CurrentModuleObject ) + "," + trim( CoolBeam( Loop ).Name ) + "] will not be simulated." );
+				ShowSevereError( "InitCoolBeam: ADU=[Air Distribution Unit," + AirDistUnit( CoolBeam( Loop ).ADUNum ).Name + "] is not on any ZoneHVAC:EquipmentList." );
+				ShowContinueError( "...Unit=[" + CurrentModuleObject + ',' + CoolBeam( Loop ).Name + "] will not be simulated." );
 			}
 		}
 
@@ -716,7 +715,7 @@ namespace HVACCooledBeam {
 					ReportSizingOutput( CoolBeam( CBNum ).UnitType, CoolBeam( CBNum ).Name, "Maximum Total Chilled Water Flow Rate [m3/s]", CoolBeam( CBNum ).MaxCoolWaterVolFlow );
 				} else {
 					ShowSevereError( "Autosizing of water flow requires a cooling loop Sizing:Plant object" );
-					ShowContinueError( "Occurs in" + trim( CoolBeam( CBNum ).UnitType ) + " Object=" + trim( CoolBeam( CBNum ).Name ) );
+					ShowContinueError( "Occurs in" + CoolBeam( CBNum ).UnitType + " Object=" + CoolBeam( CBNum ).Name );
 					ErrorsFound = true;
 				}
 
@@ -783,7 +782,7 @@ namespace HVACCooledBeam {
 					ReportSizingOutput( CoolBeam( CBNum ).UnitType, CoolBeam( CBNum ).Name, "Beam Length [m]", CoolBeam( CBNum ).BeamLength );
 				} else {
 					ShowSevereError( "Autosizing of cooled beam length requires a cooling loop Sizing:Plant object" );
-					ShowContinueError( "Occurs in" + trim( CoolBeam( CBNum ).UnitType ) + " Object=" + trim( CoolBeam( CBNum ).Name ) );
+					ShowContinueError( "Occurs in" + CoolBeam( CBNum ).UnitType + " Object=" + CoolBeam( CBNum ).Name );
 					ErrorsFound = true;
 				}
 
@@ -911,10 +910,10 @@ namespace HVACCooledBeam {
 					ErrTolerance = 0.01;
 					SolveRegulaFalsi( ErrTolerance, 50, SolFlag, CWFlow, CoolBeamResidual, MinColdWaterFlow, MaxColdWaterFlow, Par );
 					if ( SolFlag == -1 ) {
-						ShowWarningError( "Cold water control failed in cooled beam unit " + trim( CoolBeam( CBNum ).Name ) );
+						ShowWarningError( "Cold water control failed in cooled beam unit " + CoolBeam( CBNum ).Name );
 						ShowContinueError( "  Iteration limit exceeded in calculating cold water mass flow rate" );
 					} else if ( SolFlag == -2 ) {
-						ShowWarningError( "Cold water control failed in cooled beam unit " + trim( CoolBeam( CBNum ).Name ) );
+						ShowWarningError( "Cold water control failed in cooled beam unit " + CoolBeam( CBNum ).Name );
 						ShowContinueError( "  Bad cold water flow limits" );
 					}
 				} else {

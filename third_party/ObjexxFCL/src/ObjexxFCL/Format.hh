@@ -14,8 +14,6 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/char.constants.hh>
-#include <ObjexxFCL/string.constants.hh>
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/TraitsA.hh>
 #include <ObjexxFCL/TraitsB.hh>
@@ -648,7 +646,7 @@ public: // Input Methods
 	in( std::istream & stream, char & c )
 	{ // Default implementation
 		skip_chunk( stream );
-		c = SPC;
+		c = ' ';
 		io_err( stream );
 	}
 
@@ -879,7 +877,7 @@ public: // Static Methods
 	std::istream &
 	skip( std::istream & stream )
 	{
-		return stream.ignore( std::numeric_limits< std::streamsize >::max(), NL );
+		return stream.ignore( std::numeric_limits< std::streamsize >::max(), '\n' );
 	}
 
 	// Skip Over a Number of Characters in a Stream
@@ -950,7 +948,7 @@ protected: // Static Methods
 	bool
 	is_blank( std::string const & s )
 	{
-		return ( s.empty() ? true : s.find_first_not_of( SPC ) == std::string::npos );
+		return ( s.empty() ? true : s.find_first_not_of( ' ' ) == std::string::npos );
 	}
 
 	// Character is a List-Directed Whitespace Separator?
@@ -960,9 +958,9 @@ protected: // Static Methods
 	is_space_ld( char const c )
 	{
 #ifdef OBJEXXFCL_INTEL_LIST_DIRECTED_IO
-		return ( ( c == SPC ) || ( c == TAB ) ); // Intel Fortran treats tabs as separators
+		return ( ( c == ' ' ) || ( c == '\t' ) ); // Intel Fortran treats tabs as separators
 #else
-		return ( c == SPC );
+		return ( c == ' ' );
 #endif
 	}
 
@@ -997,7 +995,7 @@ protected: // Static Methods
 	{
 		stream.seekp( 0, std::ios::end );
 		std::streampos const end( stream.tellp() );
-		if ( pos > end ) stream << std::string( pos - end, SPC ); // Space fill before output
+		if ( pos > end ) stream << std::string( pos - end, ' ' ); // Space fill before output
 		stream.seekp( pos, std::ios::beg ); // Position the stream at the virtual position: Could check that it is <= end but read could still exceed stream bounds
 	}
 
@@ -2282,7 +2280,7 @@ public: // Methods
 	out( std::ostream & stream, std::streampos & pos )
 	{
 		output_pad( stream, pos );
-		stream << spc() + NL;
+		stream << spc() + '\n';
 		pos = stream.tellp();
 	}
 
@@ -2883,7 +2881,7 @@ public: // Methods
 	void
 	out( std::ostream & stream, char const c )
 	{
-		stream << spc() + std::string( ( has_w() && ( w_ > 1ul ) ? w_ - 1ul : 0ul ), SPC ) + c;
+		stream << spc() + std::string( ( has_w() && ( w_ > 1ul ) ? w_ - 1ul : 0ul ), ' ' ) + c;
 	}
 
 	// Output
@@ -2892,7 +2890,7 @@ public: // Methods
 	out( std::ostream & stream, std::string const & s )
 	{
 		std::string::size_type const l( s.length() );
-		stream << spc() + std::string( ( has_w() && ( w_ > l ) ? w_ - l : 0ul ), SPC ) + s;
+		stream << spc() + std::string( ( has_w() && ( w_ > l ) ? w_ - l : 0ul ), ' ' ) + s;
 	}
 
 	// Output
@@ -2910,7 +2908,7 @@ private: // Methods
 		Size const w( TraitsA< T >::w() );
 		std::string s( read( stream, wid( w ) ) );
 		std::string::size_type const ls( s.length() );
-		if ( ( w > 0ul ) && ( ls < w ) ) s += std::string( w - ls, SPC ); // Right-pad to width needed by T
+		if ( ( w > 0ul ) && ( ls < w ) ) s += std::string( w - ls, ' ' ); // Right-pad to width needed by T
 		if ( ! s.empty() ) {
 			void const * vp( s.substr( s.length() - w ).c_str() );
 			t = *reinterpret_cast< T const * >( vp );
@@ -2929,7 +2927,7 @@ private: // Methods
 		Size const w( TraitsA< T >::w() );
 		Size const ww( wid( w ) );
 		Size const wt( std::min( w, ww ) );
-		std::string s( ww, SPC );
+		std::string s( ww, ' ' );
 		void const * vp( &t );
 		s.replace( 0, wt, reinterpret_cast< c_cstring >( vp ), wt );
 		stream << spc() + s;
@@ -2943,7 +2941,7 @@ private: // Methods
 		Size const w( TraitsA< bool >::w() );
 		Size const ww( wid( w ) );
 		Size const wt( std::min( w, ww ) );
-		std::string s( ww, SPC );
+		std::string s( ww, ' ' );
 		Size const l( sizeof( b ) );
 		void const * vp( &b );
 		if ( l >= wt ) { // Use all bits of b
@@ -2951,7 +2949,7 @@ private: // Methods
 		} else { // Tail-fill with nul: Used for bool that is treated as 4 bytes to correspond with Fortran LOGICAL(4)
 			Size const n( wt - l );
 			s.replace( 0, l, reinterpret_cast< c_cstring >( vp ), l );
-			s.replace( l, n, n, NUL );
+			s.replace( l, n, n, '\0' );
 		}
 		stream << spc() + s;
 	}
@@ -3040,7 +3038,7 @@ public: // Methods
 	void
 	out( std::ostream & stream, bool const b )
 	{
-		stream << spc() + std::string( has_w() && ( w_ > 0ul ) ? w_ - 1ul : 0ul, SPC ) + ( b ? 'T' : 'F' );
+		stream << spc() + std::string( has_w() && ( w_ > 0ul ) ? w_ - 1ul : 0ul, ' ' ) + ( b ? 'T' : 'F' );
 	}
 
 private: // Methods
@@ -5105,7 +5103,7 @@ protected: // Methods
 		if ( entry_.r == 0ul ) entry_ = read_ld( stream ); // Get a new entry if no repeats left on current entry
 		if ( entry_.has() ) { // Non-null entry
 			std::string const & s( entry_.s );
-			t = ( s.length() > 0 ? s[ 0 ] : SPC );
+			t = ( s.length() > 0 ? s[ 0 ] : ' ' );
 		}
 	}
 

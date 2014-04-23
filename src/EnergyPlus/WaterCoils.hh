@@ -5,7 +5,6 @@
 #include <ObjexxFCL/FArray1A.hh>
 #include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/FArray2A.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -17,7 +16,6 @@ namespace EnergyPlus {
 namespace WaterCoils {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//PRIVATE ! Everything private unless explicitly made public
@@ -94,13 +92,13 @@ namespace WaterCoils {
 	struct WaterCoilEquipConditions
 	{
 		// Members
-		Fstring Name; // Name of the WaterCoil
-		Fstring WaterCoilTypeA; // Type of WaterCoil ie. Heating or Cooling
-		Fstring WaterCoilModelA; // Type of WaterCoil ie. Simple, Detailed, etc.
+		std::string Name; // Name of the WaterCoil
+		std::string WaterCoilTypeA; // Type of WaterCoil ie. Heating or Cooling
+		std::string WaterCoilModelA; // Type of WaterCoil ie. Simple, Detailed, etc.
 		int WaterCoilType; // Type of WaterCoil ie. Heating or Cooling
 		int WaterCoilModel; // Type of WaterCoil ie. Simple, Detailed, etc.
 		int WaterCoilType_Num;
-		Fstring Schedule; // WaterCoil Operation Schedule
+		std::string Schedule; // WaterCoil Operation Schedule
 		int SchedPtr; // Pointer to the correct schedule
 		bool RequestingAutoSize; // True if this coil has appropriate autosize fields
 		Real64 InletAirMassFlowRate; // MassFlow through the WaterCoil being Simulated [kg/s]
@@ -207,7 +205,7 @@ namespace WaterCoils {
 		int WaterLoopCompNum; // Plant loop Comp index
 		//begin variables for Water System interactions
 		int CondensateCollectMode; // where does water come from
-		Fstring CondensateCollectName; // name of water source e.g. water storage tank
+		std::string CondensateCollectName; // name of water source e.g. water storage tank
 		int CondensateTankID; // index "pointer" to Storage TAnk array WaterStorage
 		int CondensateTankSupplyARRID; // index pointe to supply Vdot array in WaterStorage
 		Real64 CondensateVdot; // rate of water condensation from air stream [m3/s]
@@ -219,13 +217,9 @@ namespace WaterCoils {
 
 		// Default Constructor
 		WaterCoilEquipConditions() :
-			Name( MaxNameLength ),
-			WaterCoilTypeA( 10 ),
-			WaterCoilModelA( 20 ),
 			WaterCoilType( 0 ),
 			WaterCoilModel( 0 ),
 			WaterCoilType_Num( 0 ),
-			Schedule( MaxNameLength ),
 			SchedPtr( 0 ),
 			RequestingAutoSize( false ),
 			InletAirMassFlowRate( 0.0 ),
@@ -323,7 +317,6 @@ namespace WaterCoils {
 			WaterLoopBranchNum( 0 ),
 			WaterLoopCompNum( 0 ),
 			CondensateCollectMode( CondensateDiscarded ),
-			CondensateCollectName( MaxNameLength ),
 			CondensateTankID( 0 ),
 			CondensateTankSupplyARRID( 0 ),
 			CondensateVdot( 0.0 ),
@@ -334,13 +327,13 @@ namespace WaterCoils {
 
 		// Member Constructor
 		WaterCoilEquipConditions(
-			Fstring const & Name, // Name of the WaterCoil
-			Fstring const & WaterCoilTypeA, // Type of WaterCoil ie. Heating or Cooling
-			Fstring const & WaterCoilModelA, // Type of WaterCoil ie. Simple, Detailed, etc.
+			std::string const & Name, // Name of the WaterCoil
+			std::string const & WaterCoilTypeA, // Type of WaterCoil ie. Heating or Cooling
+			std::string const & WaterCoilModelA, // Type of WaterCoil ie. Simple, Detailed, etc.
 			int const WaterCoilType, // Type of WaterCoil ie. Heating or Cooling
 			int const WaterCoilModel, // Type of WaterCoil ie. Simple, Detailed, etc.
 			int const WaterCoilType_Num,
-			Fstring const & Schedule, // WaterCoil Operation Schedule
+			std::string const & Schedule, // WaterCoil Operation Schedule
 			int const SchedPtr, // Pointer to the correct schedule
 			bool const RequestingAutoSize, // True if this coil has appropriate autosize fields
 			Real64 const InletAirMassFlowRate, // MassFlow through the WaterCoil being Simulated [kg/s]
@@ -438,7 +431,7 @@ namespace WaterCoils {
 			int const WaterLoopBranchNum, // Plant loop branch index
 			int const WaterLoopCompNum, // Plant loop Comp index
 			int const CondensateCollectMode, // where does water come from
-			Fstring const & CondensateCollectName, // name of water source e.g. water storage tank
+			std::string const & CondensateCollectName, // name of water source e.g. water storage tank
 			int const CondensateTankID, // index "pointer" to Storage TAnk array WaterStorage
 			int const CondensateTankSupplyARRID, // index pointe to supply Vdot array in WaterStorage
 			Real64 const CondensateVdot, // rate of water condensation from air stream [m3/s]
@@ -446,13 +439,13 @@ namespace WaterCoils {
 			int const CoilPerfInpMeth, // 1 = UA and Design Water Flow Rate; 2 = Nominal Capacity
 			Real64 const FoulingFactor // Coil fouling factor [m2K/W]
 		) :
-			Name( MaxNameLength, Name ),
-			WaterCoilTypeA( 10, WaterCoilTypeA ),
-			WaterCoilModelA( 20, WaterCoilModelA ),
+			Name( Name ),
+			WaterCoilTypeA( WaterCoilTypeA ),
+			WaterCoilModelA( WaterCoilModelA ),
 			WaterCoilType( WaterCoilType ),
 			WaterCoilModel( WaterCoilModel ),
 			WaterCoilType_Num( WaterCoilType_Num ),
-			Schedule( MaxNameLength, Schedule ),
+			Schedule( Schedule ),
 			SchedPtr( SchedPtr ),
 			RequestingAutoSize( RequestingAutoSize ),
 			InletAirMassFlowRate( InletAirMassFlowRate ),
@@ -550,7 +543,7 @@ namespace WaterCoils {
 			WaterLoopBranchNum( WaterLoopBranchNum ),
 			WaterLoopCompNum( WaterLoopCompNum ),
 			CondensateCollectMode( CondensateCollectMode ),
-			CondensateCollectName( MaxNameLength, CondensateCollectName ),
+			CondensateCollectName( CondensateCollectName ),
 			CondensateTankID( CondensateTankID ),
 			CondensateTankSupplyARRID( CondensateTankSupplyARRID ),
 			CondensateVdot( CondensateVdot ),
@@ -568,7 +561,7 @@ namespace WaterCoils {
 
 	void
 	SimulateWaterCoilComponents(
-		Fstring const & CompName,
+		std::string const & CompName,
 		bool const FirstHVACIteration,
 		int & CompIndex,
 		Optional< Real64 > QActual = _,
@@ -804,51 +797,51 @@ namespace WaterCoils {
 
 	void
 	CheckWaterCoilSchedule(
-		Fstring const & CompType, // unused1208
-		Fstring const & CompName,
+		std::string const & CompType, // unused1208
+		std::string const & CompName,
 		Real64 & Value,
 		int & CompIndex
 	);
 
 	Real64
 	GetCoilMaxWaterFlowRate(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetCoilInletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetCoilOutletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetCoilWaterInletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetCoilWaterOutletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	void
 	SetCoilDesFlow(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		Real64 const CoilDesFlow, // coil volumetric air flow rate [m3/s]
 		bool & ErrorsFound // set to true if problem
 	);
@@ -885,22 +878,22 @@ namespace WaterCoils {
 
 	int
 	GetWaterCoilIndex(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	Real64
 	GetWaterCoilCapacity(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	void
 	UpdateWaterToAirCoilPlantConnection(
 		int const CoilTypeNum,
-		Fstring const & CoilName,
+		std::string const & CoilName,
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int const LoopNum, // Plant loop index for where called from
 		int const LoopSide, // Plant loop side index for where called from
@@ -911,8 +904,8 @@ namespace WaterCoils {
 
 	int
 	GetWaterCoilAvailScheduleIndex(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 

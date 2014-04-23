@@ -41,7 +41,6 @@ namespace OutsideEnergySources {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::SecInHour;
 	using namespace DataEnvironment;
 	using namespace DataHVACGlobals;
@@ -72,8 +71,8 @@ namespace OutsideEnergySources {
 
 	void
 	SimOutsideEnergy(
-		Fstring const & EnergyType,
-		Fstring const & EquipName,
+		std::string const & EnergyType,
+		std::string const & EquipName,
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex,
 		bool const RunFlag,
@@ -134,17 +133,17 @@ namespace OutsideEnergySources {
 		if ( CompIndex == 0 ) {
 			EqNum = FindItemInList( EquipName, EnergySource.Name(), NumDistrictUnits );
 			if ( EqNum == 0 ) {
-				ShowFatalError( "SimOutsideEnergy: Unit not found=" + trim( EquipName ) );
+				ShowFatalError( "SimOutsideEnergy: Unit not found=" + EquipName );
 			}
 			CompIndex = EqNum;
 		} else {
 			EqNum = CompIndex;
 			if ( EnergySource( EqNum ).CheckEquipName ) {
 				if ( EqNum > NumDistrictUnits || EqNum < 1 ) {
-					ShowFatalError( "SimOutsideEnergy:  Invalid CompIndex passed=" + trim( TrimSigDigits( EqNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumDistrictUnits ) ) + ", Entered Unit name=" + trim( EquipName ) );
+					ShowFatalError( "SimOutsideEnergy:  Invalid CompIndex passed=" + TrimSigDigits( EqNum ) + ", Number of Units=" + TrimSigDigits( NumDistrictUnits ) + ", Entered Unit name=" + EquipName );
 				}
 				if ( EquipName != EnergySource( EqNum ).Name ) {
-					ShowFatalError( "SimOutsideEnergy: Invalid CompIndex passed=" + trim( TrimSigDigits( EqNum ) ) + ", Unit name=" + trim( EquipName ) + ", stored Unit Name for that index=" + trim( EnergySource( EqNum ).Name ) );
+					ShowFatalError( "SimOutsideEnergy: Invalid CompIndex passed=" + TrimSigDigits( EqNum ) + ", Unit name=" + EquipName + ", stored Unit Name for that index=" + EnergySource( EqNum ).Name );
 				}
 				EnergySource( EqNum ).CheckEquipName = false;
 			}
@@ -245,19 +244,19 @@ namespace OutsideEnergySources {
 			if ( EnergySourceNum > 1 ) {
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), EnergySource.Name(), EnergySourceNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+				VerifyName( cAlphaArgs( 1 ), EnergySource.Name(), EnergySourceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 				}
 			}
 			EnergySource( EnergySourceNum ).Name = cAlphaArgs( 1 );
-			EnergySource( EnergySourceNum ).PlantLoopID = " ";
-			EnergySource( EnergySourceNum ).SecndryLoopID = " ";
-			EnergySource( EnergySourceNum ).ScheduleID = " ";
-			EnergySource( EnergySourceNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			EnergySource( EnergySourceNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Hot Water Nodes" );
+			EnergySource( EnergySourceNum ).PlantLoopID = "";
+			EnergySource( EnergySourceNum ).SecndryLoopID = "";
+			EnergySource( EnergySourceNum ).ScheduleID = "";
+			EnergySource( EnergySourceNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			EnergySource( EnergySourceNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Hot Water Nodes" );
 			EnergySource( EnergySourceNum ).NomCap = rNumericArgs( 1 );
 			EnergySource( EnergySourceNum ).EnergyTransfer = 0.0;
 			EnergySource( EnergySourceNum ).EnergyRate = 0.0;
@@ -265,13 +264,13 @@ namespace OutsideEnergySources {
 			if ( ! lAlphaFieldBlanks( 4 ) ) {
 				EnergySource( EnergySourceNum ).CapFractionSchedNum = GetScheduleIndex( cAlphaArgs( 4 ) );
 				if ( EnergySource( EnergySourceNum ).CapFractionSchedNum == 0 ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( EnergySource( EnergySourceNum ).Name ) + "\", is not valid" );
-					ShowContinueError( trim( cAlphaFieldNames( 4 ) ) + "=\"" + trim( cAlphaArgs( 4 ) ) + "\" was not found." );
+					ShowSevereError( cCurrentModuleObject + "=\"" + EnergySource( EnergySourceNum ).Name + "\", is not valid" );
+					ShowContinueError( cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" was not found." );
 					ErrorsFound = true;
 				}
 				if ( ! CheckScheduleValueMinMax( EnergySource( EnergySourceNum ).CapFractionSchedNum, ">=", 0.0 ) ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + "=\"" + trim( EnergySource( EnergySourceNum ).Name ) + "\", is not valid" );
-					ShowContinueError( trim( cAlphaFieldNames( 4 ) ) + "=\"" + trim( cAlphaArgs( 4 ) ) + "\" should not have negative values." );
+					ShowWarningError( cCurrentModuleObject + "=\"" + EnergySource( EnergySourceNum ).Name + "\", is not valid" );
+					ShowContinueError( cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" should not have negative values." );
 					ShowContinueError( "Negative values will be treated as zero, and the simulation continues." );
 				}
 			} else {
@@ -280,7 +279,7 @@ namespace OutsideEnergySources {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + trim( cCurrentModuleObject ) + ", Preceding condition caused termination." );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject + ", Preceding condition caused termination." );
 		}
 
 		EnergySourceNum = 0;
@@ -305,19 +304,19 @@ namespace OutsideEnergySources {
 			if ( EnergySourceNum > 1 ) {
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), EnergySource.Name(), EnergySourceNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+				VerifyName( cAlphaArgs( 1 ), EnergySource.Name(), EnergySourceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 				}
 			}
 			EnergySource( EnergySourceNum ).Name = cAlphaArgs( 1 );
-			EnergySource( EnergySourceNum ).PlantLoopID = " ";
-			EnergySource( EnergySourceNum ).SecndryLoopID = " ";
-			EnergySource( EnergySourceNum ).ScheduleID = " ";
-			EnergySource( EnergySourceNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			EnergySource( EnergySourceNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Chilled Water Nodes" );
+			EnergySource( EnergySourceNum ).PlantLoopID = "";
+			EnergySource( EnergySourceNum ).SecndryLoopID = "";
+			EnergySource( EnergySourceNum ).ScheduleID = "";
+			EnergySource( EnergySourceNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			EnergySource( EnergySourceNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Chilled Water Nodes" );
 			EnergySource( EnergySourceNum ).NomCap = rNumericArgs( 1 );
 			EnergySource( EnergySourceNum ).EnergyTransfer = 0.0;
 			EnergySource( EnergySourceNum ).EnergyRate = 0.0;
@@ -325,13 +324,13 @@ namespace OutsideEnergySources {
 			if ( ! lAlphaFieldBlanks( 4 ) ) {
 				EnergySource( EnergySourceNum ).CapFractionSchedNum = GetScheduleIndex( cAlphaArgs( 4 ) );
 				if ( EnergySource( EnergySourceNum ).CapFractionSchedNum == 0 ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( EnergySource( EnergySourceNum ).Name ) + "\", is not valid" );
-					ShowContinueError( trim( cAlphaFieldNames( 4 ) ) + "=\"" + trim( cAlphaArgs( 4 ) ) + "\" was not found." );
+					ShowSevereError( cCurrentModuleObject + "=\"" + EnergySource( EnergySourceNum ).Name + "\", is not valid" );
+					ShowContinueError( cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" was not found." );
 					ErrorsFound = true;
 				}
 				if ( ! CheckScheduleValueMinMax( EnergySource( EnergySourceNum ).CapFractionSchedNum, ">=", 0.0 ) ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + "=\"" + trim( EnergySource( EnergySourceNum ).Name ) + "\", is not valid" );
-					ShowContinueError( trim( cAlphaFieldNames( 4 ) ) + "=\"" + trim( cAlphaArgs( 4 ) ) + "\" should not have negative values." );
+					ShowWarningError( cCurrentModuleObject + "=\"" + EnergySource( EnergySourceNum ).Name + "\", is not valid" );
+					ShowContinueError( cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" should not have negative values." );
 					ShowContinueError( "Negative values will be treated as zero, and the simulation continues." );
 				}
 			} else {
@@ -341,7 +340,7 @@ namespace OutsideEnergySources {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + trim( cCurrentModuleObject ) + ", Preceding condition caused termination." );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject + ", Preceding condition caused termination." );
 		}
 
 		EnergySourceNum = NumDistrictUnitsHeat; //To initialize counter
@@ -421,7 +420,7 @@ namespace OutsideEnergySources {
 			} else if ( EnergySource( EnergySourceNum ).EnergyType == EnergyType_DistrictCooling ) {
 				TempTypeFlag = TypeOf_PurchChilledWater;
 			} else {
-				ShowFatalError( "InitSimVars: Invalid EnergyType for District Heating/Cooling=" + trim( EnergySource( EnergySourceNum ).Name ) );
+				ShowFatalError( "InitSimVars: Invalid EnergyType for District Heating/Cooling=" + EnergySource( EnergySourceNum ).Name );
 			}
 			// Locate the unit on the plant loops for later usage
 			errFlag = false;

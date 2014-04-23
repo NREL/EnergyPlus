@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -15,16 +14,15 @@ namespace EnergyPlus {
 namespace DualDuct {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
 	extern int const DualDuct_ConstantVolume;
 	extern int const DualDuct_VariableVolume;
 	extern int const DualDuct_OutdoorAir;
-	extern Fstring const cCMO_DDConstantVolume;
-	extern Fstring const cCMO_DDVariableVolume;
-	extern Fstring const cCMO_DDVarVolOA;
+	extern std::string const cCMO_DDConstantVolume;
+	extern std::string const cCMO_DDVariableVolume;
+	extern std::string const cCMO_DDVarVolOA;
 
 	extern int const DD_OA_ConstantOAMode;
 	extern int const DD_OA_ScheduleOAMode;
@@ -64,10 +62,10 @@ namespace DualDuct {
 	struct DamperDesignParams
 	{
 		// Members
-		Fstring DamperName; // Name of the Damper
+		std::string DamperName; // Name of the Damper
 		//  CHARACTER(len=MaxNameLength) :: DamperType  = ' ' ! Type of Damper ie. VAV, Mixing, Inducing, etc.
 		int DamperType; // Type of Damper ie. VAV, Mixing, Inducing, etc.
-		Fstring Schedule; // Damper Operation Schedule
+		std::string Schedule; // Damper Operation Schedule
 		int SchedPtr; // Pointer to the correct schedule
 		Real64 MaxAirVolFlowRate; // Max Specified Volume Flow Rate of Damper [m3/sec]
 		Real64 MaxAirMassFlowRate; // Max Specified MAss Flow Rate of Damper [kg/s]
@@ -99,9 +97,7 @@ namespace DualDuct {
 
 		// Default Constructor
 		DamperDesignParams() :
-			DamperName( MaxNameLength ),
 			DamperType( 0 ),
-			Schedule( MaxNameLength ),
 			SchedPtr( 0 ),
 			MaxAirVolFlowRate( 0.0 ),
 			MaxAirMassFlowRate( 0.0 ),
@@ -134,9 +130,9 @@ namespace DualDuct {
 
 		// Member Constructor
 		DamperDesignParams(
-			Fstring const & DamperName, // Name of the Damper
+			std::string const & DamperName, // Name of the Damper
 			int const DamperType, // Type of Damper ie. VAV, Mixing, Inducing, etc.
-			Fstring const & Schedule, // Damper Operation Schedule
+			std::string const & Schedule, // Damper Operation Schedule
 			int const SchedPtr, // Pointer to the correct schedule
 			Real64 const MaxAirVolFlowRate, // Max Specified Volume Flow Rate of Damper [m3/sec]
 			Real64 const MaxAirMassFlowRate, // Max Specified MAss Flow Rate of Damper [kg/s]
@@ -166,9 +162,9 @@ namespace DualDuct {
 			Real64 const OAPerPersonByDesignLevel, // store sum of people and per person rate, constant, m3/s
 			int const AirLoopNum
 		) :
-			DamperName( MaxNameLength, DamperName ),
+			DamperName( DamperName ),
 			DamperType( DamperType ),
-			Schedule( MaxNameLength, Schedule ),
+			Schedule( Schedule ),
 			SchedPtr( SchedPtr ),
 			MaxAirVolFlowRate( MaxAirVolFlowRate ),
 			MaxAirMassFlowRate( MaxAirMassFlowRate ),
@@ -273,7 +269,7 @@ namespace DualDuct {
 
 	void
 	SimulateDualDuct(
-		Fstring const & CompName,
+		std::string const & CompName,
 		bool const FirstHVACIteration,
 		int const ZoneNum,
 		int const ZoneNodeNum,
@@ -365,8 +361,8 @@ namespace DualDuct {
 
 	void
 	GetDualDuctOutdoorAirRecircUse(
-		Fstring const & CompTypeName,
-		Fstring const & CompName,
+		std::string const & CompTypeName,
+		std::string const & CompName,
 		bool & RecircIsUsed
 	);
 

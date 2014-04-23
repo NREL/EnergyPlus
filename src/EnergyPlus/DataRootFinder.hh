@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -59,7 +58,7 @@ namespace DataRootFinder {
 	extern int const iMethodSecant; // Step performed using secant method
 	extern int const iMethodBrent; // Step performed using Brent's method
 	// Names for each solution method type
-	extern FArray1D_Fstring const SolutionMethodTypes;
+	extern FArray1D_string const SolutionMethodTypes;
 
 	// DERIVED TYPE DEFINITIONS
 	// Type declaration for the numerical controls.

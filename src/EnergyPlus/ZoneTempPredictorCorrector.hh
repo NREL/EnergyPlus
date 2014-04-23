@@ -5,7 +5,6 @@
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/FArray2D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -17,7 +16,6 @@ namespace EnergyPlus {
 namespace ZoneTempPredictorCorrector {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -29,11 +27,11 @@ namespace ZoneTempPredictorCorrector {
 	//INTEGER, PUBLIC, PARAMETER :: iPushZoneTimestepHistories    = 5
 	//INTEGER, PUBLIC, PARAMETER :: iPushSystemTimestepHistories  = 6
 
-	extern FArray1D_Fstring const ValidControlTypes;
+	extern FArray1D_string const ValidControlTypes;
 
-	extern FArray1D_Fstring const ValidComfortControlTypes;
+	extern FArray1D_string const ValidComfortControlTypes;
 
-	extern FArray1D_Fstring const cZControlTypes;
+	extern FArray1D_string const cZControlTypes;
 
 	extern int const iZC_TStat;
 	extern int const iZC_TCTStat;
@@ -104,41 +102,37 @@ namespace ZoneTempPredictorCorrector {
 	struct ZoneTempControlType
 	{
 		// Members
-		Fstring Name; // Name of the zone
-		Fstring TempSchedName; // Name of the schedule which determines the zone temp setpoint
+		std::string Name; // Name of the zone
+		std::string TempSchedName; // Name of the schedule which determines the zone temp setpoint
 		int TempSchedIndex;
-		Fstring HeatTempSetptSchedName;
+		std::string HeatTempSetptSchedName;
 		int HeatTempSchedIndex;
-		Fstring CoolTempSetptSchedName;
+		std::string CoolTempSetptSchedName;
 		int CoolTempSchedIndex;
 
 		// Default Constructor
 		ZoneTempControlType() :
-			Name( MaxNameLength ),
-			TempSchedName( MaxNameLength ),
 			TempSchedIndex( 0 ),
-			HeatTempSetptSchedName( MaxNameLength ),
 			HeatTempSchedIndex( 0 ),
-			CoolTempSetptSchedName( MaxNameLength ),
 			CoolTempSchedIndex( 0 )
 		{}
 
 		// Member Constructor
 		ZoneTempControlType(
-			Fstring const & Name, // Name of the zone
-			Fstring const & TempSchedName, // Name of the schedule which determines the zone temp setpoint
+			std::string const & Name, // Name of the zone
+			std::string const & TempSchedName, // Name of the schedule which determines the zone temp setpoint
 			int const TempSchedIndex,
-			Fstring const & HeatTempSetptSchedName,
+			std::string const & HeatTempSetptSchedName,
 			int const HeatTempSchedIndex,
-			Fstring const & CoolTempSetptSchedName,
+			std::string const & CoolTempSetptSchedName,
 			int const CoolTempSchedIndex
 		) :
-			Name( MaxNameLength, Name ),
-			TempSchedName( MaxNameLength, TempSchedName ),
+			Name( Name ),
+			TempSchedName( TempSchedName ),
 			TempSchedIndex( TempSchedIndex ),
-			HeatTempSetptSchedName( MaxNameLength, HeatTempSetptSchedName ),
+			HeatTempSetptSchedName( HeatTempSetptSchedName ),
 			HeatTempSchedIndex( HeatTempSchedIndex ),
-			CoolTempSetptSchedName( MaxNameLength, CoolTempSetptSchedName ),
+			CoolTempSetptSchedName( CoolTempSetptSchedName ),
 			CoolTempSchedIndex( CoolTempSchedIndex )
 		{}
 
@@ -147,41 +141,37 @@ namespace ZoneTempPredictorCorrector {
 	struct ZoneComfortFangerControlType
 	{
 		// Members
-		Fstring Name; // Name of the zone
-		Fstring PMVSchedName; // Name of the schedule which determines the zone temp setpoint
+		std::string Name; // Name of the zone
+		std::string PMVSchedName; // Name of the schedule which determines the zone temp setpoint
 		int PMVSchedIndex; // Index to PMV dual set point schedule
-		Fstring HeatPMVSetptSchedName; // Name of PMV heating set point schedule
+		std::string HeatPMVSetptSchedName; // Name of PMV heating set point schedule
 		int HeatPMVSchedIndex; // Index to PMV heating set point schedule
-		Fstring CoolPMVSetptSchedName; // Name of PMV cooling set point schedule
+		std::string CoolPMVSetptSchedName; // Name of PMV cooling set point schedule
 		int CoolPMVSchedIndex; // INdex to PMV cooling set point schedule
 
 		// Default Constructor
 		ZoneComfortFangerControlType() :
-			Name( MaxNameLength ),
-			PMVSchedName( MaxNameLength ),
 			PMVSchedIndex( 0 ),
-			HeatPMVSetptSchedName( MaxNameLength ),
 			HeatPMVSchedIndex( 0 ),
-			CoolPMVSetptSchedName( MaxNameLength ),
 			CoolPMVSchedIndex( 0 )
 		{}
 
 		// Member Constructor
 		ZoneComfortFangerControlType(
-			Fstring const & Name, // Name of the zone
-			Fstring const & PMVSchedName, // Name of the schedule which determines the zone temp setpoint
+			std::string const & Name, // Name of the zone
+			std::string const & PMVSchedName, // Name of the schedule which determines the zone temp setpoint
 			int const PMVSchedIndex, // Index to PMV dual set point schedule
-			Fstring const & HeatPMVSetptSchedName, // Name of PMV heating set point schedule
+			std::string const & HeatPMVSetptSchedName, // Name of PMV heating set point schedule
 			int const HeatPMVSchedIndex, // Index to PMV heating set point schedule
-			Fstring const & CoolPMVSetptSchedName, // Name of PMV cooling set point schedule
+			std::string const & CoolPMVSetptSchedName, // Name of PMV cooling set point schedule
 			int const CoolPMVSchedIndex // INdex to PMV cooling set point schedule
 		) :
-			Name( MaxNameLength, Name ),
-			PMVSchedName( MaxNameLength, PMVSchedName ),
+			Name( Name ),
+			PMVSchedName( PMVSchedName ),
 			PMVSchedIndex( PMVSchedIndex ),
-			HeatPMVSetptSchedName( MaxNameLength, HeatPMVSetptSchedName ),
+			HeatPMVSetptSchedName( HeatPMVSetptSchedName ),
 			HeatPMVSchedIndex( HeatPMVSchedIndex ),
-			CoolPMVSetptSchedName( MaxNameLength, CoolPMVSetptSchedName ),
+			CoolPMVSetptSchedName( CoolPMVSetptSchedName ),
 			CoolPMVSchedIndex( CoolPMVSchedIndex )
 		{}
 
@@ -295,10 +285,10 @@ namespace ZoneTempPredictorCorrector {
 	);
 
 	bool
-	VerifyThermostatInZone( Fstring const & ZoneName ); // Zone to verify
+	VerifyThermostatInZone( std::string const & ZoneName ); // Zone to verify
 
 	bool
-	VerifyControlledZoneForThermostat( Fstring const & ZoneName ); // Zone to verify
+	VerifyControlledZoneForThermostat( std::string const & ZoneName ); // Zone to verify
 
 	void
 	DetectOscillatingZoneTemp();

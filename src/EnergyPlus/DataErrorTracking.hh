@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -18,30 +17,29 @@ namespace DataErrorTracking {
 
 	// MODULE PARAMETER DEFINITIONS:
 	extern int const SearchCounts;
-	extern FArray1D_Fstring const MessageSearch;
-	extern FArray1D_Fstring const Summaries;
+	extern FArray1D_string const MessageSearch;
+	extern FArray1D_string const Summaries;
 	// in below -- simple line end <CR>.  End of Whole message <CRE>
-	extern int const iDTEstrLeng;
-	extern Fstring const MoreDetails_1; // InterZone Surface Areas -- mismatch
-	extern Fstring const MoreDetails_2; // Interzone surfaces - different zones
-	extern Fstring const MoreDetails_3; // Node Connection Errors
-	extern Fstring const MoreDetails_4; // InterZone Surface Azimuths -- mismatch
-	extern Fstring const MoreDetails_5; // InterZone Surface Tilts -- mismatch
-	extern Fstring const MoreDetails_6; // Likely non-planar surfaces
-	extern Fstring const MoreDetails_7; // Deprecated Features or Key Values
-	extern Fstring const MoreDetails_8; // Incorrect Floor Tilt
-	extern Fstring const MoreDetails_9; // Incorrect Roof/Ceiling Tilt
-	extern Fstring const MoreDetails_10; // Incomplete View factors
-	extern Fstring const MoreDetails_11; // Unbalanced exhaust air flow
-	extern Fstring const MoreDetails_12; // Loads Initialization did not Converge
-	extern Fstring const MoreDetails_13; // CalcDaylightMapPoints: Window
-	extern Fstring const MoreDetails_14; // Zone Air Heat Balance Warnings
-	extern Fstring const MoreDetails_15; // Occupant density is extremely high
-	extern Fstring const MoreDetails_16; // Temperature (low) out of bounds AND Temperature (high) out of bounds
-	extern Fstring const MoreDetails_18; // Nominally unused constructions
-	extern Fstring const MoreDetails_19; // InfraredTransparent constructions in non-interzone surfaces
-	extern Fstring const MoreDetails_20; // No reporting elements requested
-	extern FArray1D_Fstring const MoreDetails; // Details 16 applies to both temperature out of bounds | errors.
+	extern std::string const MoreDetails_1; // InterZone Surface Areas -- mismatch
+	extern std::string const MoreDetails_2; // Interzone surfaces - different zones
+	extern std::string const MoreDetails_3; // Node Connection Errors
+	extern std::string const MoreDetails_4; // InterZone Surface Azimuths -- mismatch
+	extern std::string const MoreDetails_5; // InterZone Surface Tilts -- mismatch
+	extern std::string const MoreDetails_6; // Likely non-planar surfaces
+	extern std::string const MoreDetails_7; // Deprecated Features or Key Values
+	extern std::string const MoreDetails_8; // Incorrect Floor Tilt
+	extern std::string const MoreDetails_9; // Incorrect Roof/Ceiling Tilt
+	extern std::string const MoreDetails_10; // Incomplete View factors
+	extern std::string const MoreDetails_11; // Unbalanced exhaust air flow
+	extern std::string const MoreDetails_12; // Loads Initialization did not Converge
+	extern std::string const MoreDetails_13; // CalcDaylightMapPoints: Window
+	extern std::string const MoreDetails_14; // Zone Air Heat Balance Warnings
+	extern std::string const MoreDetails_15; // Occupant density is extremely high
+	extern std::string const MoreDetails_16; // Temperature (low) out of bounds AND Temperature (high) out of bounds
+	extern std::string const MoreDetails_18; // Nominally unused constructions
+	extern std::string const MoreDetails_19; // InfraredTransparent constructions in non-interzone surfaces
+	extern std::string const MoreDetails_20; // No reporting elements requested
+	extern FArray1D_string const MoreDetails; // Details 16 applies to both temperature out of bounds | errors.
 
 	extern int const MaxRecurringErrorMsgLength; // Maximum error message length for recurring error messages
 
@@ -71,39 +69,35 @@ namespace DataErrorTracking {
 	extern bool AskForSurfacesReport; // Flag used to tell when surfaces should be reported
 	extern bool AskForPlantCheckOnAbort; // flag used to tell if plant structure can be checked
 	extern bool ExitDuringSimulations; // flag used to tell if program is in simulation mode when fatal occurs
-	extern Fstring LastSevereError;
+	extern std::string LastSevereError;
 
 	// Types
 
 	struct RecurringErrorData
 	{
 		// Members
-		Fstring Message; // Message to be written to "error file" at end of simulation
+		std::string Message; // Message to be written to "error file" at end of simulation
 		int Count; // Count of total times this recurring error message has been called
 		int WarmupCount; // Count of times this recurring error message has been called during warmup
 		int SizingCount; // Count of times this recurring error message has been called during sizing
 		Real64 MaxValue; // Max of the values passed for this recurring error message
 		Real64 MinValue; // Min of the values passed for this recurring error message
 		Real64 SumValue; // Sum of the values passed for this recurring error message
-		Fstring MaxUnits; // units for Max values
-		Fstring MinUnits; // units for Min values
-		Fstring SumUnits; // units for Sum values
+		std::string MaxUnits; // units for Max values
+		std::string MinUnits; // units for Min values
+		std::string SumUnits; // units for Sum values
 		bool ReportMax; // Flag to report max value
 		bool ReportMin; // Flag to report min value
 		bool ReportSum; // Flag to report sum value
 
 		// Default Constructor
 		RecurringErrorData() :
-			Message( MaxRecurringErrorMsgLength ),
 			Count( 0 ),
 			WarmupCount( 0 ),
 			SizingCount( 0 ),
 			MaxValue( 0.0 ),
 			MinValue( 0.0 ),
 			SumValue( 0.0 ),
-			MaxUnits( 32 ),
-			MinUnits( 32 ),
-			SumUnits( 32 ),
 			ReportMax( false ),
 			ReportMin( false ),
 			ReportSum( false )
@@ -111,30 +105,30 @@ namespace DataErrorTracking {
 
 		// Member Constructor
 		RecurringErrorData(
-			Fstring const & Message, // Message to be written to "error file" at end of simulation
+			std::string const & Message, // Message to be written to "error file" at end of simulation
 			int const Count, // Count of total times this recurring error message has been called
 			int const WarmupCount, // Count of times this recurring error message has been called during warmup
 			int const SizingCount, // Count of times this recurring error message has been called during sizing
 			Real64 const MaxValue, // Max of the values passed for this recurring error message
 			Real64 const MinValue, // Min of the values passed for this recurring error message
 			Real64 const SumValue, // Sum of the values passed for this recurring error message
-			Fstring const & MaxUnits, // units for Max values
-			Fstring const & MinUnits, // units for Min values
-			Fstring const & SumUnits, // units for Sum values
+			std::string const & MaxUnits, // units for Max values
+			std::string const & MinUnits, // units for Min values
+			std::string const & SumUnits, // units for Sum values
 			bool const ReportMax, // Flag to report max value
 			bool const ReportMin, // Flag to report min value
 			bool const ReportSum // Flag to report sum value
 		) :
-			Message( MaxRecurringErrorMsgLength, Message ),
+			Message( Message ),
 			Count( Count ),
 			WarmupCount( WarmupCount ),
 			SizingCount( SizingCount ),
 			MaxValue( MaxValue ),
 			MinValue( MinValue ),
 			SumValue( SumValue ),
-			MaxUnits( 32, MaxUnits ),
-			MinUnits( 32, MinUnits ),
-			SumUnits( 32, SumUnits ),
+			MaxUnits( MaxUnits ),
+			MinUnits( MinUnits ),
+			SumUnits( SumUnits ),
 			ReportMax( ReportMax ),
 			ReportMin( ReportMin ),
 			ReportSum( ReportSum )

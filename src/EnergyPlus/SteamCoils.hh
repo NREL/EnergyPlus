@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -15,7 +14,6 @@ namespace EnergyPlus {
 namespace SteamCoils {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -54,12 +52,12 @@ namespace SteamCoils {
 	struct SteamCoilEquipConditions
 	{
 		// Members
-		Fstring Name; // Name of the SteamCoil
-		Fstring SteamCoilTypeA; // Type of SteamCoil ie. Heating or Cooling
+		std::string Name; // Name of the SteamCoil
+		std::string SteamCoilTypeA; // Type of SteamCoil ie. Heating or Cooling
 		int SteamCoilType; // Type of SteamCoil ie. Heating or Cooling
 		int SteamCoilModel; // Type of SteamCoil ie. Simple, Detailed, etc.
 		int SteamCoilType_Num;
-		Fstring Schedule; // SteamCoil Operation Schedule
+		std::string Schedule; // SteamCoil Operation Schedule
 		int SchedPtr; // Pointer to the correct schedule
 		Real64 InletAirMassFlowRate; // MassFlow through the SteamCoil being Simulated [kg/s]
 		Real64 OutletAirMassFlowRate; // MassFlow throught the SteamCoil being Simulated[kg/s]
@@ -110,12 +108,9 @@ namespace SteamCoils {
 
 		// Default Constructor
 		SteamCoilEquipConditions() :
-			Name( MaxNameLength ),
-			SteamCoilTypeA( 10 ),
 			SteamCoilType( 0 ),
 			SteamCoilModel( 0 ),
 			SteamCoilType_Num( 0 ),
-			Schedule( MaxNameLength ),
 			SchedPtr( 0 ),
 			InletAirMassFlowRate( 0.0 ),
 			OutletAirMassFlowRate( 0.0 ),
@@ -167,12 +162,12 @@ namespace SteamCoils {
 
 		// Member Constructor
 		SteamCoilEquipConditions(
-			Fstring const & Name, // Name of the SteamCoil
-			Fstring const & SteamCoilTypeA, // Type of SteamCoil ie. Heating or Cooling
+			std::string const & Name, // Name of the SteamCoil
+			std::string const & SteamCoilTypeA, // Type of SteamCoil ie. Heating or Cooling
 			int const SteamCoilType, // Type of SteamCoil ie. Heating or Cooling
 			int const SteamCoilModel, // Type of SteamCoil ie. Simple, Detailed, etc.
 			int const SteamCoilType_Num,
-			Fstring const & Schedule, // SteamCoil Operation Schedule
+			std::string const & Schedule, // SteamCoil Operation Schedule
 			int const SchedPtr, // Pointer to the correct schedule
 			Real64 const InletAirMassFlowRate, // MassFlow through the SteamCoil being Simulated [kg/s]
 			Real64 const OutletAirMassFlowRate, // MassFlow throught the SteamCoil being Simulated[kg/s]
@@ -221,12 +216,12 @@ namespace SteamCoils {
 			int const Coil_PlantTypeNum, // plant level index for coil type
 			Real64 const OperatingCapacity // capacity of steam coil at operating conditions (W)
 		) :
-			Name( MaxNameLength, Name ),
-			SteamCoilTypeA( 10, SteamCoilTypeA ),
+			Name( Name ),
+			SteamCoilTypeA( SteamCoilTypeA ),
 			SteamCoilType( SteamCoilType ),
 			SteamCoilModel( SteamCoilModel ),
 			SteamCoilType_Num( SteamCoilType_Num ),
-			Schedule( MaxNameLength, Schedule ),
+			Schedule( Schedule ),
 			SchedPtr( SchedPtr ),
 			InletAirMassFlowRate( InletAirMassFlowRate ),
 			OutletAirMassFlowRate( OutletAirMassFlowRate ),
@@ -285,7 +280,7 @@ namespace SteamCoils {
 
 	void
 	SimulateSteamCoilComponents(
-		Fstring const & CompName,
+		std::string const & CompName,
 		bool const FirstHVACIteration,
 		int & CompIndex,
 		Optional< Real64 const > QCoilReq = _, // coil load to be met
@@ -343,23 +338,23 @@ namespace SteamCoils {
 
 	int
 	GetSteamCoilIndex(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	void
 	CheckSteamCoilSchedule(
-		Fstring const & CompType,
-		Fstring const & CompName,
+		std::string const & CompType,
+		std::string const & CompName,
 		Real64 & Value,
 		int & CompIndex
 	);
 
 	Real64
 	GetCoilMaxWaterFlowRate(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
@@ -372,77 +367,77 @@ namespace SteamCoils {
 	int
 	GetCoilAirInletNode(
 		int const CoilIndex, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetCoilAirOutletNode(
 		int const CoilIndex, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetCoilAirOutletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetCoilSteamInletNode(
 		int const CoilIndex, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetCoilSteamInletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetCoilSteamOutletNode(
 		int const CoilIndex, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetCoilSteamOutletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	Real64
 	GetCoilCapacity(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetTypeOfCoil(
 		int const CoilIndex, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetSteamCoilControlNodeNum(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorFlag // set to true if problem
 	);
 
 	int
 	GetSteamCoilAvailScheduleIndex(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 

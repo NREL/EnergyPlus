@@ -58,9 +58,9 @@ operator <<( std::ostream & stream, FArray3S< T > const & a )
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				for ( int i3 = 1, e3 = a.u3(); i3 < e3; ++i3 ) {
-					stream << setw( w ) << a( i1, i2, i3 ) << SPC;
+					stream << setw( w ) << a( i1, i2, i3 ) << ' ';
 					if ( ! stream ) break;
-				} stream << setw( w ) << a( i1, i2, a.u3() ) << NL;
+				} stream << setw( w ) << a( i1, i2, a.u3() ) << '\n';
 			} if ( ! stream ) break;
 		}
 
