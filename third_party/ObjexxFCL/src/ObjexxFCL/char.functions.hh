@@ -90,6 +90,22 @@ is_any_of( char const c, std::string const & s )
 bool
 is_any_of( char const c, c_cstring const s );
 
+// Character is in a string?
+inline
+bool
+has_any_of( char const c, std::string const & s )
+{
+	return ( s.find( c ) != std::string::npos );
+}
+
+// Character is in a cstring?
+inline
+bool
+has_any_of( char const c, c_cstring const s )
+{
+	return is_any_of( c, s );
+}
+
 // Character is not in a string?
 inline
 bool
