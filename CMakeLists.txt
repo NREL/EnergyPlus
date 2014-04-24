@@ -1,6 +1,6 @@
-project(EnergyPlus)
+Project(EnergyPlus)
 
-cmake_minimum_required(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 set( CMAKE_VERSION_MAJOR 8 )
 set( CMAKE_VERSION_MINOR 2 )
@@ -13,7 +13,7 @@ option( BUILD_TESTING "Build testing targets" OFF )
 # This will help us set the proper options for c++11 across various configurations
 # FIND_PACKAGE( CXXFeatures ) 
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ")
 
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
@@ -21,8 +21,8 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 
 include(cmake/ProjectMacros.cmake)
 
-include_directories( ${CMAKE_SOURCE_DIR}/src/ )
-include_directories( ${CMAKE_SOURCE_DIR}/src/gtest/include/ SYSTEM )
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/gtest/include/ SYSTEM )
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/ObjexxFCL/src/ )
 
 if( BUILD_PACKAGE )
   include(CPack.cmake)
@@ -33,7 +33,7 @@ if( BUILD_TESTING )
   include(CTest) 
 endif()
 
-add_subdirectory(src/gtest)
-add_subdirectory(src/ObjexxFCL)
-add_subdirectory(src/EnergyPlus)
+ADD_SUBDIRECTORY(third_party/gtest)
+ADD_SUBDIRECTORY(third_party/ObjexxFCL)
+ADD_SUBDIRECTORY(src/EnergyPlus)
 

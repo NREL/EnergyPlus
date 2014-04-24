@@ -1,0 +1,141 @@
+Software License Agreement for the Objexx Fortran Compatibility Library
+
+The following License Agreement applies to any user of the Objexx Fortran
+Compatibility Library (ObjexxFCL). By use of the software, you indicate your
+acceptance of the following Software License Agreement. If you do not agree to
+the terms of this Agreement, promptly return any media and printed materials to
+Objexx Engineering, Inc. for a full refund.
+
+1. This is a legal agreement between Objexx Engineering, Inc. ("Licensor") and
+the Licensee, who is being licensed to use the Objexx Fortran Compatibility
+Library computer software and associated documentation ("Software").
+
+2. Licensee acknowledges that this is only a limited nonexclusive license.
+Licensor is and remains the owner of all titles, rights, and interests in the
+Software. The Software is protected by United States copyright laws and
+international treaty provisions. Therefore, you must treat the Software like
+any other copyrighted material except as otherwise provided for in this License.
+
+3. This License permits use of the Software solely with Licensee's computer
+software Applications for which the Software was licensed. Neither Licensee nor
+any other party may use the Software for another purpose without licensing the
+Software for that use from Licensor.
+
+4. This License permits Licensee to make an unlimited number of copies of the
+Software and to install the Software on more than one computer system for its
+own use with the Applications. Licensee may modify the Software for use in the
+Applications without additional licensing but may not remove the Licensor
+copyright notice from the Software, charge a fee for the Software, or otherwise
+imply or assert ownership of the Software. Modifications made by Licensee to
+the Software for Licensee's use may be attributed to but not copyrighted by
+Licensee and do not preclude Licensor from including similar or identical
+modifications in a future version of the Software, falling under Licensor
+copyright. The purpose of this provision is to prevent the Licensee's ability
+to modify the Software, creating a derived work of the Software, from limiting
+the Licensor's ability to extend the Software's capabilities.
+
+5. This License permits Licensee to include and distribute the Software in
+source or binary form with current and future versions of the Applications
+without limitation and without payment to Licensor. Within the limitations of
+the Applications' licensing, those parties may modify the Software for use in
+the Applications subject to the same conditions as apply to Licensee.
+
+6. This License applies to any other versions or extensions of the Software
+provided by Licensor to Licensee unless a different License is agreed upon by
+Licensor and Licensee.
+
+7. This License is your proof of license to exercise the rights granted herein
+and must be retained by you. You may not rent or lease the Software, but you
+may transfer the Software and user documentation on a permanent basis with the
+sale or transfer of any of the Applications provided the recipient agrees to the
+terms of this Agreement.
+
+8. This Software is subject to a limited warranty. Licensor warrants to
+Licensee that any physical medium on which this Software is distributed is free
+from defects in materials and workmanship under normal use and to the best of
+Licensor's knowledge Licensee's use of this Software according to the
+documentation is not an infringement of any third party's intellectual property
+rights. This limited warranty lasts for a period of 90 days after delivery. No
+agent of Licensor is authorized to make any other warranties or to modify this
+limited warranty. Any action for breach of this limited warranty must be
+commenced within one year of the expiration of the warranty. Because some
+jurisdictions do not allow any limit on the length of an implied warranty, the
+above limitation may not apply to this Licensee. If the law does not allow
+disclaimer of implied warranties, then any implied warranty is limited to 90
+days after delivery of the Software to Licensee. Licensee has specific legal
+rights pursuant to this warranty and, depending on Licensee's jurisdiction, may
+have additional rights.
+
+9. Licensor DOES NOT WARRANT THE FUNCTIONS CONTAINED IN THE SOFTWARE WILL MEET
+YOUR REQUIREMENTS OR THAT THE OPERATION OF THE SOFTWARE WILL BE UNINTERRUPTED OR
+ERROR FREE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE
+IS WITH YOU. TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, Licensor AND
+ITS SUPPLIERS DISCLAIM ALL OTHER WARRANTIES, EITHER EXPRESS OR IMPLIED,
+INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+FOR A PARTICULAR PURPOSE, WITH REGARD TO THE SOFTWARE AND THE ACCOMPANYING
+WRITTEN MATERIALS. THIS LIMITED WARRANTY GIVES YOU SPECIFIC LEGAL RIGHTS. YOU
+MAY HAVE OTHERS WHICH VARY FROM STATE/JURISDICTION TO STATE/JURISDICTION.
+
+10. THE SOFTWARE IS INTENDED TO BE USED ONLY BY TRAINED PROFESSIONALS AND IS
+NOT TO BE A SUBSTITUTE FOR PROFESSIONAL JUDGMENT, TESTING, SAFETY AND UTILITY.
+Licensor IS NOT RESPONSIBLE FOR THE USE OF ANY RESULTS OBTAINED FROM USING THE
+SOFTWARE.
+
+11. In case of a breach of the Limited Warranty, Licensee's exclusive remedy is
+as follows: Licensee will return all copies of the Software to Licensor, at
+Licensee's cost, along with proof of purchase. (Licensee can obtain a
+step-by-step explanation of this procedure by contacting Licensor at Objexx
+Engineering, Inc., 192 South Street, Needham MA 02492, USA by mail
+or by telephoning 1.781.455.1150.) At Licensor's option, Licensor will either
+send Licensee a replacement copy of the Software, at Licensor's expense, or
+issue a full refund.
+
+12. Notwithstanding the foregoing, LICENSOR IS NOT LIABLE TO LICENSEE FOR ANY
+DAMAGES, INCLUDING COMPENSATORY, SPECIAL, INCIDENTAL, EXEMPLARY, PUNITIVE, OR
+CONSEQUENTIAL DAMAGES, CONNECTED WITH OR RESULTING FROM THIS LICENSE AGREEMENT
+OR LICENSEE'S USE OF THIS SOFTWARE. Licensee's jurisdiction may not allow such
+a limitation of damages, so this limitation may not apply.
+
+13. To the extent allowed by Commonwealth of Massachusetts Law, Licensee agrees
+to defend and indemnify Licensor and hold Licensor harmless from all claims,
+losses, damages, complaints, or expenses connected with or resulting from
+Licensee's business operations.
+
+14. Licensor may terminate this License Agreement upon notice if Licensee is in
+material breach of this Agreement and fails within thirty (30) days of a written
+demand for performance to cure such breach.
+
+15. Licensee agrees to return to Licensor or to destroy all copies of the
+Software upon termination of the License.
+
+16. This License Agreement is the entire and exclusive agreement between
+Licensor and Licensee regarding this Software. This License Agreement replaces
+and supersedes all prior negotiations, dealings, and agreements between Licensor
+and Licensee regarding this Software.
+
+17. U.S. GOVERNMENT RESTRICTED RIGHTS-The Software and documentation are
+provided with RESTRICTED RIGHTS. Use, duplication, or disclosure by the
+Government is subject to restrictions as set forth in subparagraph (c)(1)(ii) of
+the Rights in Technical Data and Computer Software clause at DFARS 252.227-7013
+or subparagraphs (c)(1) and (2) of the Commercial Computer Software-Restricted
+Rights at 48 CFR 52.227-19, as applicable. Manufacturer is Objexx Engineering,
+Inc., 192 South Street, Needham MA 02492, USA.
+
+18. This License Agreement is governed by the laws of The Commonwealth of
+Massachusetts, United States of America. Jurisdiction of any disputes shall be
+in the courts of Massachusetts and you hereby submit to the personal
+jurisdiction of said courts. Should any of the provisions of this License be
+declared invalid by any court of competent jurisdiction, the balance of the
+License will remain in full force and effect.
+
+19. This License Agreement is valid without Licensor's signature. It becomes
+effective upon the earlier of Licensee's signature or Licensee's use of the
+Software.
+
+Should you have any questions concerning this Agreement please contact:
+
+Objexx Engineering, Inc.
+192 South Street
+Needham MA 02492
+USA
+Telephone: 1.781.455.1150

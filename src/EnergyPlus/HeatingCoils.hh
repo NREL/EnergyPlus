@@ -262,9 +262,27 @@ namespace HeatingCoils {
 		{}
 
 	};
+	struct HeatingCoilNumericFieldData
+	{
+		// Members
+		FArray1D_Fstring FieldNames;
+
+		// Default Constructor
+		HeatingCoilNumericFieldData() :
+			FieldNames( sFstring( MaxNameLength ) )
+		{}
+
+		// Member Constructor
+		HeatingCoilNumericFieldData(
+			FArray1_Fstring const & FieldNames // Name of the HeatingCoil numeric field descriptions
+	) :
+	    FieldNames( MaxNameLength, FieldNames)
+		{}
+	};
 
 	// Object Data
 	extern FArray1D< HeatingCoilEquipConditions > HeatingCoil;
+	extern FArray1D< HeatingCoilNumericFieldData > HeatingCoilNumericFields;
 
 	// Functions
 

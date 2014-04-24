@@ -331,11 +331,11 @@ namespace PlantLoopSolver {
 
 		// REFERENCES:
 		// "other types" of components: basically not load-range based heat transfer components.  This would include:
-		//    • demand based components such as coils
-		//    • component setpoint based operating components
-		//    • heat exchanger components including waterside economizers
+		//    - demand based components such as coils
+		//    - component setpoint based operating components
+		//    - heat exchanger components including waterside economizers
 		// "load-range based" components are heat transfer components which are controlled based on a single load range.
-		//    • currently only one load range based scheme is available at a given time, although other control types
+		//    - currently only one load range based scheme is available at a given time, although other control types
 		//      may be enabled, such as component setpoint.
 		// Pumps are separate components since the pump heat is not accounted for in the flow path order.
 		//  Improvements during the demand side rewrite has allowed pumps to be placed as -not- the first component on a branch
@@ -376,11 +376,14 @@ namespace PlantLoopSolver {
 		bool EncounteredLRB;
 		bool EncounteredNonLRBAfterLRB;
 
+        // set up a loopside reference
+        auto & this_loop_side( PlantLoop( LoopNum ).LoopSide( LoopSideNum ) );
+
 		//~ Initialze
 		ValidLoopSide.Valid = true;
 		EncounteredLRB = false;
 		EncounteredNonLRBAfterLRB = false;
-		NumParallelPaths = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches - 2;
+		NumParallelPaths = this_loop_side.TotalBranches - 2;
 
 		// We'll start by stepping through the first branch, which may be the only branch
 		// If we find a load range based, then trip the flag and just keep moving
@@ -389,9 +392,11 @@ namespace PlantLoopSolver {
 		//  decide if it is a valid path.
 		// If any one path is invalid then all is wrong
 		BranchIndex = 1;
-		for ( CompIndex = 1; CompIndex <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).TotalComponents; ++CompIndex ) {
+		for ( CompIndex = 1; CompIndex <= this_loop_side.Branch( BranchIndex ).TotalComponents; ++CompIndex ) {
 
-			{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).Comp( CompIndex ).CurOpSchemeType );
+            auto & this_component( this_loop_side.Branch( BranchIndex ).Comp( CompIndex ) );
+
+			{ auto const SELECT_CASE_var( this_component.CurOpSchemeType );
 
 			if ( ( SELECT_CASE_var >= LoadRangeBasedMin ) && ( SELECT_CASE_var <= LoadRangeBasedMax ) ) { //~ load range based
 				if ( EncounteredNonLRBAfterLRB ) {
@@ -416,18 +421,8 @@ namespace PlantLoopSolver {
 
 			} else if ( SELECT_CASE_var == UnknownStatusOpSchemeType ) { //~ Uninitialized, this should be a sufficient place to catch for this on branch 1
 				//throw fatal
-				ShowSevereError( "ValidateFlowControlPaths: Uninitialized operation scheme type for component Name: " + trim( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).Comp( CompIndex ).Name ) );
+				ShowSevereError( "ValidateFlowControlPaths: Uninitialized operation scheme type for component Name: " + trim( this_component.Name ) );
 				ShowFatalError( "ValidateFlowControlPaths: developer notice, Inlet path validation loop" );
-				//        WRITE(*,*) 'Uninitialized operation scheme type for the following component: '
-				//        WRITE(*,*) 'Name: '//TRIM(PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchIndex)%Comp(CompIndex)%Name)
-				//        WRITE(*,*) 'TYPE: '//TRIM(PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchIndex)%Comp(CompIndex)%TypeOf)
-				//        WRITE(*,*) 'Location: Loop/LoopSide/Branch/Comp'
-				//        100 FORMAT (3(I2,'//'), I2)
-				//        WRITE(*,100) LoopNum, LoopSideNum, BranchIndex, CompIndex
-				//        WRITE(*,*) 'Occurs in ValidateFlowControlPaths::Inlet path validation loop'
-				//        WRITE(*,*) 'Immediate program closure, press ENTER to end.'
-				//        READ(*,*)
-				//        STOP 45
 
 			} else { //~ Other control type
 				if ( EncounteredLRB ) {
@@ -456,13 +451,15 @@ namespace PlantLoopSolver {
 					BranchIndex = PathCounter + 1;
 				} else if ( ParallelOrOutletIndex == Outlet ) {
 					// The branch index will be the LoopSide outlet node
-					BranchIndex = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches;
+					BranchIndex = this_loop_side.TotalBranches;
 				}
 
-				//Now that we have the branch index, let's do the control type check over all the components
-				for ( CompIndex = 1; CompIndex <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).TotalComponents; ++CompIndex ) {
+                //Now that we have the branch index, let's do the control type check over all the components
+				for ( CompIndex = 1; CompIndex <= this_loop_side.Branch( BranchIndex ).TotalComponents; ++CompIndex ) {
 
-					{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).Comp( CompIndex ).CurOpSchemeType );
+                    auto & this_component( this_loop_side.Branch( BranchIndex ).Comp( CompIndex ) );
+
+					{ auto const SELECT_CASE_var( this_component.CurOpSchemeType );
 
 					if ( ( SELECT_CASE_var >= LoadRangeBasedMin ) && ( SELECT_CASE_var <= LoadRangeBasedMax ) ) { //~ load range based
 						if ( EncounteredNonLRBAfterLRB ) {
@@ -487,17 +484,8 @@ namespace PlantLoopSolver {
 
 					} else if ( SELECT_CASE_var == UnknownStatusOpSchemeType ) { //~ Uninitialized, this should be sufficient place to catch for this on other branches
 						//throw fatal error
-						ShowSevereError( "ValidateFlowControlPaths: Uninitialized operation scheme type for component Name: " + trim( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).Comp( CompIndex ).Name ) );
+						ShowSevereError( "ValidateFlowControlPaths: Uninitialized operation scheme type for component Name: " + trim( this_component.Name ) );
 						ShowFatalError( "ValidateFlowControlPaths: developer notice, problem in Parallel path validation loop" );
-						//            WRITE(*,*) 'Uninitialized operation scheme type for the following component: '
-						//            WRITE(*,*) 'Name: '//TRIM(PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchIndex)%Comp(CompIndex)%Name)
-						//            WRITE(*,*) 'TYPE: '//TRIM(PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchIndex)%Comp(CompIndex)%TypeOf)
-						//            WRITE(*,*) 'Location: Loop/LoopSide/Branch/Comp'
-						//            WRITE(*,100) LoopNum, LoopSideNum, BranchIndex, CompIndex
-						//            WRITE(*,*) 'Occurs in ValidateFlowControlPaths::Parallel path validation loop'
-						//            WRITE(*,*) 'Immediate program closure, press ENTER to end.'
-						//            READ(*,*)
-						//            STOP 45
 
 					} else { //~ Other control type
 						if ( EncounteredLRB ) {
@@ -641,6 +629,9 @@ namespace PlantLoopSolver {
 		EachSideFlowRequestFinal = 0.0;
 		//  AtLeastOneNonLRBRequested       = .FALSE.
 
+        // reference
+        auto & loop( PlantLoop( LoopNum ) );
+
 		//~ First we need to set up the flow requests on each LoopSide
 		for ( LoopSideCounter = DemandSide; LoopSideCounter <= SupplySide; ++LoopSideCounter ) {
 			// Clear things out for this LoopSide
@@ -654,37 +645,52 @@ namespace PlantLoopSolver {
 			OutletBranchRequestNeedIfOn = 0.0;
 			EachSideFlowRequestNeedAndTurnOn( LoopSideCounter ) = 0.0;
 			EachSideFlowRequestNeedIfOn( LoopSideCounter ) = 0.0;
+            
+            // reference
+            auto & loop_side( loop.LoopSide( LoopSideCounter ) );
+            
 			// Now loop through all the branches on this LoopSide and get flow requests
-			NumBranchesOnThisLoopSide = PlantLoop( LoopNum ).LoopSide( LoopSideCounter ).TotalBranches;
+			NumBranchesOnThisLoopSide = loop_side.TotalBranches;
 			ParallelBranchIndex = 0;
 			for ( BranchCounter = 1; BranchCounter <= NumBranchesOnThisLoopSide; ++BranchCounter ) {
 				ThisBranchFlowRequestNeedAndTurnOn = 0.0;
 				ThisBranchFlowRequestNeedIfOn = 0.0;
+                
+                // reference
+                auto & branch( loop_side.Branch( BranchCounter ) );
+                
 				if ( BranchCounter > 1 && BranchCounter < NumBranchesOnThisLoopSide ) ++ParallelBranchIndex;
-				NumCompsOnThisBranch = PlantLoop( LoopNum ).LoopSide( LoopSideCounter ).Branch( BranchCounter ).TotalComponents;
+				NumCompsOnThisBranch = branch.TotalComponents;
 				for ( CompCounter = 1; CompCounter <= NumCompsOnThisBranch; ++CompCounter ) {
-					NodeToCheckRequest = PlantLoop( LoopNum ).LoopSide( LoopSideCounter ).Branch( BranchCounter ).Comp( CompCounter ).NodeNumIn;
-					FlowPriorityStatus = PlantLoop( LoopNum ).LoopSide( LoopSideCounter ).Branch( BranchCounter ).Comp( CompCounter ).FlowPriority;
-
-					if ( PlantLoop( LoopNum ).LoopSide( LoopSideCounter ).Branch( BranchCounter ).Comp( CompCounter ).GeneralEquipType != GenEquipTypes_Pump ) {
+                    
+                    // reference
+                    auto & component( branch.Comp( CompCounter ) );
+                    
+					NodeToCheckRequest = component.NodeNumIn;
+					FlowPriorityStatus = component.FlowPriority;
+                    
+                    // reference
+                    auto & node_with_request( Node( NodeToCheckRequest ) );
+                    
+					if ( component.GeneralEquipType != GenEquipTypes_Pump ) {
 
 						{ auto const SELECT_CASE_var( FlowPriorityStatus );
 
 						if ( SELECT_CASE_var == LoopFlowStatus_Unknown ) {
 							// do nothing
 						} else if ( SELECT_CASE_var == LoopFlowStatus_NeedyAndTurnsLoopOn ) {
-							ThisBranchFlowRequestNeedAndTurnOn = max( ThisBranchFlowRequestNeedAndTurnOn, Node( NodeToCheckRequest ).MassFlowRateRequest );
-							ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, Node( NodeToCheckRequest ).MassFlowRateRequest );
+							ThisBranchFlowRequestNeedAndTurnOn = max( ThisBranchFlowRequestNeedAndTurnOn, node_with_request.MassFlowRateRequest );
+							ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, node_with_request.MassFlowRateRequest );
 						} else if ( SELECT_CASE_var == LoopFlowStatus_NeedyIfLoopOn ) {
-							ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, Node( NodeToCheckRequest ).MassFlowRateRequest );
+							ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, node_with_request.MassFlowRateRequest );
 						} else if ( SELECT_CASE_var == LoopFlowStatus_TakesWhatGets ) {
 							// do nothing
 						}}
 					} else { // handle pumps differently
-						if ( ( BranchCounter == 1 ) && ( LoopSideCounter == SupplySide ) && ( PlantLoop( LoopNum ).CommonPipeType == CommonPipe_TwoWay ) ) {
+						if ( ( BranchCounter == 1 ) && ( LoopSideCounter == SupplySide ) && ( loop.CommonPipeType == CommonPipe_TwoWay ) ) {
 							// special primary side flow request for two way common pipe
-							CompIndex = PlantLoop( LoopNum ).LoopSide( LoopSideCounter ).Branch( BranchCounter ).Comp( CompCounter ).CompNum;
-							{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopSide( LoopSideCounter ).Branch( BranchCounter ).Comp( CompCounter ).TypeOf_Num );
+							CompIndex = component.CompNum;
+							{ auto const SELECT_CASE_var( component.TypeOf_Num );
 							// remove var speed pumps from this case statement if can set MassFlowRateRequest
 							if ( ( SELECT_CASE_var == TypeOf_PumpConstantSpeed ) || ( SELECT_CASE_var == TypeOf_PumpVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpBankVariableSpeed ) ) {
 
@@ -696,12 +702,12 @@ namespace PlantLoopSolver {
 									ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, PumpEquip( CompIndex ).MassFlowRateMax / PumpEquip( CompIndex ).NumPumpsInBank );
 								}
 							} else {
-								ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, Node( NodeToCheckRequest ).MassFlowRateRequest );
+								ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, node_with_request.MassFlowRateRequest );
 							}}
 
 						} else if ( ( BranchCounter == 1 ) && ( LoopSideCounter == SupplySide ) && ( PlantLoop( LoopNum ).CommonPipeType == CommonPipe_Single ) ) {
-							CompIndex = PlantLoop( LoopNum ).LoopSide( LoopSideCounter ).Branch( BranchCounter ).Comp( CompCounter ).CompNum;
-							{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopSide( LoopSideCounter ).Branch( BranchCounter ).Comp( CompCounter ).TypeOf_Num );
+							CompIndex = component.CompNum;
+							{ auto const SELECT_CASE_var( component.TypeOf_Num );
 							// remove var speed pumps from this case statement if can set MassFlowRateRequest
 							if ( ( SELECT_CASE_var == TypeOf_PumpConstantSpeed ) || ( SELECT_CASE_var == TypeOf_PumpVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpBankVariableSpeed ) ) {
 								if ( CompIndex > 0 ) {
@@ -712,40 +718,42 @@ namespace PlantLoopSolver {
 									ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, PumpEquip( CompIndex ).MassFlowRateMax / PumpEquip( CompIndex ).NumPumpsInBank );
 								}
 							} else {
-								ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, Node( NodeToCheckRequest ).MassFlowRateRequest );
+								ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, node_with_request.MassFlowRateRequest );
 							}}
 						} else {
-							CompIndex = PlantLoop( LoopNum ).LoopSide( LoopSideCounter ).Branch( BranchCounter ).Comp( CompCounter ).CompNum;
-							{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopSide( LoopSideCounter ).Branch( BranchCounter ).Comp( CompCounter ).TypeOf_Num );
+							CompIndex = component.CompNum;
+							{ auto const SELECT_CASE_var( component.TypeOf_Num );
 
 							if ( SELECT_CASE_var == TypeOf_PumpConstantSpeed ) {
 								if ( CompIndex > 0 ) {
+									auto & this_pump( PumpEquip( CompIndex ) );
 									if ( ParallelBranchIndex >= 1 ) { // branch pump
-										if ( PlantLoop( LoopNum ).LoopSide( LoopSideCounter ).Branch( BranchCounter ).max_abs_Comp_MyLoad() > SmallLoad ) { //Autdesk:Tuned any( abs( Comp.MyLoad() ) > SmallLoad ) replaced for efficiency
-											ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, PumpEquip( CompIndex ).MassFlowRateMax );
+										if ( branch.max_abs_Comp_MyLoad() > SmallLoad ) { //Autdesk:Tuned any( abs( Comp.MyLoad() ) > SmallLoad ) replaced for efficiency
+											ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax );
 										} else if ( PlantLoop( LoopNum ).CommonPipeType != CommonPipe_No ) { // common pipe and constant branch pumps
-											ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, PumpEquip( CompIndex ).MassFlowRateMax );
+											ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax );
 										}
 										ThisLoopHasConstantSpeedBranchPumps( LoopSideCounter ) = true;
-										PlantLoop( LoopNum ).LoopSide( LoopSideCounter ).Branch( BranchCounter ).HasConstantSpeedBranchPump = true;
-										PlantLoop( LoopNum ).LoopSide( LoopSideCounter ).Branch( BranchCounter ).ConstantSpeedBranchMassFlow = PumpEquip( CompIndex ).MassFlowRateMax;
+										branch.HasConstantSpeedBranchPump = true;
+										branch.ConstantSpeedBranchMassFlow = this_pump.MassFlowRateMax;
 									} else { // inlet pump
-										ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, PumpEquip( CompIndex ).MassFlowRateMax );
+										ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax );
 									}
 								}
 							} else if ( SELECT_CASE_var == TypeOf_PumpBankConstantSpeed ) {
 								if ( CompIndex > 0 ) {
+                                    auto & this_pump( PumpEquip( CompIndex ) );
 									if ( ParallelBranchIndex >= 1 ) { // branch pump
-										if ( PlantLoop( LoopNum ).LoopSide( LoopSideCounter ).Branch( BranchCounter ).max_abs_Comp_MyLoad() > SmallLoad ) { //Autdesk:Tuned any( abs( Comp.MyLoad() ) > SmallLoad ) replaced for efficiency
-											ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, PumpEquip( CompIndex ).MassFlowRateMax / PumpEquip( CompIndex ).NumPumpsInBank );
+										if ( branch.max_abs_Comp_MyLoad() > SmallLoad ) { //Autdesk:Tuned any( abs( Comp.MyLoad() ) > SmallLoad ) replaced for efficiency
+											ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax / this_pump.NumPumpsInBank );
 										} else if ( PlantLoop( LoopNum ).CommonPipeType != CommonPipe_No ) { // common pipe and constant branch pumps
-											ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, PumpEquip( CompIndex ).MassFlowRateMax / PumpEquip( CompIndex ).NumPumpsInBank );
+											ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax / this_pump.NumPumpsInBank );
 										}
 										ThisLoopHasConstantSpeedBranchPumps( LoopSideCounter ) = true;
-										PlantLoop( LoopNum ).LoopSide( LoopSideCounter ).Branch( BranchCounter ).HasConstantSpeedBranchPump = true;
-										PlantLoop( LoopNum ).LoopSide( LoopSideCounter ).Branch( BranchCounter ).ConstantSpeedBranchMassFlow = PumpEquip( CompIndex ).MassFlowRateMax / PumpEquip( CompIndex ).NumPumpsInBank;
+										branch.HasConstantSpeedBranchPump = true;
+										branch.ConstantSpeedBranchMassFlow = this_pump.MassFlowRateMax / this_pump.NumPumpsInBank;
 									} else { // inlet pump
-										ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, PumpEquip( CompIndex ).MassFlowRateMax / PumpEquip( CompIndex ).NumPumpsInBank );
+										ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax / this_pump.NumPumpsInBank );
 									}
 								}
 							}}
@@ -764,7 +772,7 @@ namespace PlantLoopSolver {
 					OutletBranchRequestNeedIfOn = ThisBranchFlowRequestNeedIfOn;
 				}
 
-				PlantLoop( LoopNum ).LoopSide( LoopSideCounter ).Branch( BranchCounter ).RequestedMassFlow = max( ThisBranchFlowRequestNeedIfOn, ThisBranchFlowRequestNeedAndTurnOn );
+				branch.RequestedMassFlow = max( ThisBranchFlowRequestNeedIfOn, ThisBranchFlowRequestNeedAndTurnOn );
 
 			}
 			EachSideFlowRequestNeedAndTurnOn( LoopSideCounter ) = max( InletBranchRequestNeedAndTurnOn, sum( ParallelBranchRequestsNeedAndTurnOn ), OutletBranchRequestNeedAndTurnOn );
@@ -780,8 +788,8 @@ namespace PlantLoopSolver {
 
 		}
 		// now store final flow requests on each loop side data structure
-		PlantLoop( LoopNum ).LoopSide( ThisSide ).FlowRequest = EachSideFlowRequestFinal( ThisSide );
-		PlantLoop( LoopNum ).LoopSide( OtherSide ).FlowRequest = EachSideFlowRequestFinal( OtherSide );
+		loop.LoopSide( ThisSide ).FlowRequest = EachSideFlowRequestFinal( ThisSide );
+		loop.LoopSide( OtherSide ).FlowRequest = EachSideFlowRequestFinal( OtherSide );
 
 		if ( PlantLoop( LoopNum ).CommonPipeType == CommonPipe_No ) {
 			//we may or may not have a pump on this side, but the flow request is the larger of the two side's final
@@ -845,12 +853,12 @@ namespace PlantLoopSolver {
 								if ( ( tmpLoopFlow > AccumFlowSteps ) && ( tmpLoopFlow <= ( AccumFlowSteps + NoLoadConstantSpeedBranchFlowRateSteps( LoopSideCounter, ParallelBranchIndex ) ) ) ) {
 									//found it set requests and exit
 									tmpLoopFlow = AccumFlowSteps + NoLoadConstantSpeedBranchFlowRateSteps( LoopSideCounter, ParallelBranchIndex );
-									PlantLoop( LoopNum ).LoopSide( LoopSideCounter ).Branch( BranchCounter ).RequestedMassFlow = NoLoadConstantSpeedBranchFlowRateSteps( LoopSideCounter, ParallelBranchIndex );
+									loop.LoopSide( LoopSideCounter ).Branch( BranchCounter ).RequestedMassFlow = NoLoadConstantSpeedBranchFlowRateSteps( LoopSideCounter, ParallelBranchIndex );
 									LoopFlow = tmpLoopFlow;
 									break;
 								} else if ( ( tmpLoopFlow > AccumFlowSteps ) && ( tmpLoopFlow > ( AccumFlowSteps + NoLoadConstantSpeedBranchFlowRateSteps( LoopSideCounter, ParallelBranchIndex ) ) ) ) {
 									AccumFlowSteps += NoLoadConstantSpeedBranchFlowRateSteps( LoopSideCounter, ParallelBranchIndex );
-									PlantLoop( LoopNum ).LoopSide( LoopSideCounter ).Branch( BranchCounter ).RequestedMassFlow = NoLoadConstantSpeedBranchFlowRateSteps( LoopSideCounter, ParallelBranchIndex );
+									loop.LoopSide( LoopSideCounter ).Branch( BranchCounter ).RequestedMassFlow = NoLoadConstantSpeedBranchFlowRateSteps( LoopSideCounter, ParallelBranchIndex );
 								}
 							}
 						}
@@ -1148,9 +1156,11 @@ namespace PlantLoopSolver {
 			EndingComponent = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchCounter ).TotalComponents;
 			for ( CompCounter = StartingComponent; CompCounter <= EndingComponent; ++CompCounter ) {
 
-				{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchCounter ).Comp( CompCounter ).CurOpSchemeType );
+			    auto & this_comp( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchCounter ).Comp( CompCounter ) );
+
+				{ auto const SELECT_CASE_var( this_comp.CurOpSchemeType );
 				if ( SELECT_CASE_var == WSEconOpSchemeType ) { //~ coils
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchCounter ).Comp( CompCounter ).MyLoad = UpdatedDemandToLoopSetPoint;
+					this_comp.MyLoad = UpdatedDemandToLoopSetPoint;
 					SimPlantEquip( LoopNum, LoopSideNum, BranchCounter, CompCounter, FirstHVACIteration, DummyInit, DoNotGetCompSizFac );
 				} else if ( ( SELECT_CASE_var >= LoadRangeBasedMin ) && ( SELECT_CASE_var <= LoadRangeBasedMax ) ) { //~ load range based
 					EncounteredLRBObjDuringPass1 = true;
@@ -1171,8 +1181,8 @@ namespace PlantLoopSolver {
 					SimPlantEquip( LoopNum, LoopSideNum, BranchCounter, CompCounter, FirstHVACIteration, DummyInit, DoNotGetCompSizFac );
 				} else if ( SELECT_CASE_var == EMSOpSchemeType ) {
 					if ( LoopSideNum == SupplySide ) {
-						curCompOpSchemePtr = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchCounter ).Comp( CompCounter ).CurCompLevelOpNum;
-						OpSchemePtr = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchCounter ).Comp( CompCounter ).OpScheme( curCompOpSchemePtr ).OpSchemePtr;
+						curCompOpSchemePtr = this_comp.CurCompLevelOpNum;
+						OpSchemePtr = this_comp.OpScheme( curCompOpSchemePtr ).OpSchemePtr;
 						PlantLoop( LoopNum ).OpScheme( OpSchemePtr ).EMSIntVarLoopDemandRate = InitialDemandToLoopSetPoint;
 					}
 					ManagePlantLoadDistribution( LoopNum, LoopSideNum, BranchCounter, CompCounter, UpdatedDemandToLoopSetPoint, LoadToLoopSetPointThatWasntMet, FirstHVACIteration, LoopShutDownFlag, LoadDistributionWasPerformed );
@@ -1749,14 +1759,16 @@ namespace PlantLoopSolver {
 		// Init to zero, so that if we don't find anything, we exit early
 		ComponentMassFlowRate = 0.0;
 
+		auto & this_comp( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ) );
+
 		// Get information
-		InletNode = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn;
-		OutletNode = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumOut;
+		InletNode = this_comp.NodeNumIn;
+		OutletNode = this_comp.NodeNumOut;
 
 		if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).FlowLock == FlowUnlocked ) {
 
 			// For unlocked flow, use the inlet request -- !DSU? for now
-			{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType );
+			{ auto const SELECT_CASE_var( this_comp.CurOpSchemeType );
 			if ( ( SELECT_CASE_var >= LoadRangeBasedMin ) && ( SELECT_CASE_var <= LoadRangeBasedMax ) ) {
 				// Don't do anything for load based components
 			} else {
@@ -1768,7 +1780,7 @@ namespace PlantLoopSolver {
 		} else if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).FlowLock == FlowLocked ) {
 
 			// For locked flow just use the mass flow rate
-			{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType );
+			{ auto const SELECT_CASE_var( this_comp.CurOpSchemeType );
 			if ( ( SELECT_CASE_var >= LoadRangeBasedMin ) && ( SELECT_CASE_var <= LoadRangeBasedMax ) ) {
 				// Don't do anything for load based components
 			} else {
@@ -1894,50 +1906,19 @@ namespace PlantLoopSolver {
 		int CompInletNode;
 		int CompOutletNode;
 
-		// Error Messages from the old RequestNetworkFlowAndSolve
-
-		//        IF(PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(CurBranch)%ControlType .NE. ControlType_Active .AND. &
-		//           PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(CurBranch)%ControlType .NE. ControlType_Passive) THEN
-		//          CALL ShowSevereError('PlantLoop:An Active component can be in series with active or passive components only')
-		//          CALL ShowContinueError('Occurs in Branch='//TRIM(PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(CurBranch)%Name))
-		//          CALL ShowContinueError('Occurs in Plant Loop='//TRIM(PlantLoop(LoopNum)%Name))
-		//          CALL ShowFatalError('Preceding condition causes termination.')
-		//        END IF
-		//      CASE (ControlType_Bypass)
-		//        IF(CurComp .NE. 1) THEN
-		//          CALL ShowSevereError('PlantLoop:A Bypass pipe cannot be in series with another component')
-		//          CALL ShowContinueError('Occurs in Branch='//TRIM(PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(CurBranch)%Name))
-		//          CALL ShowContinueError('Occurs in Plant Loop='//TRIM(PlantLoop(LoopNum)%Name))
-		//          CALL ShowFatalError('Preceding condition causes termination.')
-		//        END IF                  !Set Branch ByPass Flag
-		//      CASE (ControlType_SeriesActive)
-		//        IF(CurComp .NE. 1) THEN
-		//          IF(PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(CurBranch)%ControlType .NE. ControlType_SeriesActive) THEN
-		//            CALL ShowSevereError('PlantLoop:A SeriesActive component can be in series with SeriesActive components only')
-		//            CALL ShowContinueError('Occurs in Branch='//TRIM(PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(CurBranch)%Name))
-		//            CALL ShowContinueError('Occurs in Plant Loop='//TRIM(PlantLoop(LoopNum)%Name))
-		//            CALL ShowFatalError('Preceding condition causes termination.')
-		//          END IF
-		//        END IF
-		//      CASE (ControlType_Passive)
-		//        IF(PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(CurBranch)%ControlType .NE. ControlType_Active .AND. &
-		//           PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(CurBranch)%ControlType .NE. ControlType_Passive) THEN
-		//          CALL ShowSevereError('PlantLoop:A Passive component can be in series with active or passive components only')
-		//          CALL ShowContinueError('Occurs in Branch='//TRIM(PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(CurBranch)%Name))
-		//          CALL ShowContinueError('Occurs in Plant Loop='//TRIM(PlantLoop(LoopNum)%Name))
-		//          CALL ShowFatalError('Preceding condition causes termination.')
-		//        END IF
+		auto & this_loopside( PlantLoop( LoopNum ).LoopSide( LoopSideNum ) );
 
 		// If there is no splitter then there is no continuity to enforce.
-		if ( ! PlantLoop( LoopNum ).LoopSide( LoopSideNum ).SplitterExists ) {
+		if ( ! this_loopside.SplitterExists ) {
 
 			//If there's only one branch, then RETURN
-			if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches == 1 ) {
+			if ( this_loopside.TotalBranches == 1 ) {
 				// The branch should just try to meet the request previously calculated.  This should be good,
 				// just need to make sure that during FlowUnlocked, no one constrained Min/Max farther.
 				// This would have been propogated down the branch, so we can check the outlet node min/max avail for this.
-				LastNodeOnBranch = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( LoopSideSingleBranch ).NodeNumOut;
-				FirstNodeOnBranch = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( LoopSideSingleBranch ).NodeNumIn;
+				auto & this_single_branch( this_loopside.Branch( LoopSideSingleBranch ) );
+				LastNodeOnBranch = this_single_branch.NodeNumOut;
+				FirstNodeOnBranch = this_single_branch.NodeNumIn;
 				BranchMinAvail = Node( LastNodeOnBranch ).MassFlowRateMinAvail;
 				BranchMaxAvail = Node( LastNodeOnBranch ).MassFlowRateMaxAvail;
 				Node( FirstNodeOnBranch ).MassFlowRate = min( max( ThisLoopSideFlow, BranchMinAvail ), BranchMaxAvail );
@@ -1953,11 +1934,11 @@ namespace PlantLoopSolver {
 		}
 
 		// If a splitter/mixer combination exist on the loop
-		if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).SplitterExists && PlantLoop( LoopNum ).LoopSide( LoopSideNum ).MixerExists ) {
+		if ( this_loopside.SplitterExists && this_loopside.MixerExists ) {
 
 			// Zero out local variables
 			TotParallelBranchFlowReq = 0.0;
-			NumSplitOutlets = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Splitter( SplitNum ).TotalOutletNodes;
+			NumSplitOutlets = this_loopside.Splitter( SplitNum ).TotalOutletNodes;
 			if ( NumSplitOutlets < 1 ) {
 				ShowSevereError( "Plant topology problem for PlantLoop: " + PlantLoop( LoopNum ).Name + ", " + LoopSideName( LoopSideNum ) + " side." );
 				ShowContinueError( "Diagnostic error in PlantLoopSolver::ResolveParallelFlows." );
@@ -1969,10 +1950,13 @@ namespace PlantLoopSolver {
 			ParallelBranchMaxAvail = 0.0;
 			ParallelBranchMinAvail = 0.0;
 			for ( iBranch = 1; iBranch <= NumSplitOutlets; ++iBranch ) {
-				BranchNum = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Splitter( SplitNum ).BranchNumOut( iBranch );
-				SplitterBranchOut = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Splitter( SplitNum ).BranchNumOut( iBranch );
-				LastNodeOnBranch = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).NodeNumOut;
-				FirstNodeOnBranch = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).NodeNumIn;
+			    
+				BranchNum = this_loopside.Splitter( SplitNum ).BranchNumOut( iBranch );
+				auto & this_branch( this_loopside.Branch( BranchNum ) );
+				SplitterBranchOut = this_loopside.Splitter( SplitNum ).BranchNumOut( iBranch );
+				auto & this_splitter_outlet_branch( this_loopside.Branch( SplitterBranchOut ) );
+				LastNodeOnBranch = this_branch.NodeNumOut;
+				FirstNodeOnBranch = this_branch.NodeNumIn;
 				BranchFlowReq = DetermineBranchFlowRequest( LoopNum, LoopSideNum, BranchNum );
 
 				//now, if we are have branch pumps, here is the situation:
@@ -1981,14 +1965,16 @@ namespace PlantLoopSolver {
 				// the DetermineBranchFlowRequest routine only looks at the branch inlet node
 				// for variable speed branch pumps then, this won't work because the branch will be requesting zero
 				// so let's adjust for this here to make sure these branches get good representation
-				for ( CompCounter = 1; CompCounter <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).TotalComponents; ++CompCounter ) {
+				for ( CompCounter = 1; CompCounter <= this_branch.TotalComponents; ++CompCounter ) {
+
+					auto & this_comp( this_branch.Comp( CompCounter ) );
 
 					//if this isn't a variable speed pump then just keep cycling
-					if ( ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompCounter ).TypeOf_Num != TypeOf_PumpVariableSpeed ) && ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompCounter ).TypeOf_Num != TypeOf_PumpBankVariableSpeed ) ) {
+					if ( ( this_comp.TypeOf_Num != TypeOf_PumpVariableSpeed ) && ( this_comp.TypeOf_Num != TypeOf_PumpBankVariableSpeed ) ) {
 						continue;
 					}
 
-					CompInletNode = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompCounter ).NodeNumIn;
+					CompInletNode = this_comp.NodeNumIn;
 					BranchFlowReq = max( BranchFlowReq, Node( CompInletNode ).MassFlowRateRequest );
 
 				}
@@ -1996,7 +1982,7 @@ namespace PlantLoopSolver {
 				BranchMinAvail = Node( LastNodeOnBranch ).MassFlowRateMinAvail;
 				BranchMaxAvail = Node( LastNodeOnBranch ).MassFlowRateMaxAvail;
 				//            !sum the branch flow requests to a total parallel branch flow request
-				if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).ControlType == ControlType_Active || PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).ControlType == ControlType_SeriesActive ) {
+				if ( this_splitter_outlet_branch.ControlType == ControlType_Active || this_splitter_outlet_branch.ControlType == ControlType_SeriesActive ) {
 					TotParallelBranchFlowReq += BranchFlowReq;
 					++NumActiveBranches;
 				}
@@ -2007,31 +1993,34 @@ namespace PlantLoopSolver {
 				ParallelBranchMinAvail += BranchMinAvail;
 			}
 			//            ! Find branch number and flow rates at splitter inlet
-			SplitterBranchIn = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Splitter( SplitNum ).BranchNumIn;
-			LastNodeOnBranch = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchIn ).NodeNumOut;
-			FirstNodeOnBranchIn = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchIn ).NodeNumIn;
+			SplitterBranchIn = this_loopside.Splitter( SplitNum ).BranchNumIn;
+			LastNodeOnBranch = this_loopside.Branch( SplitterBranchIn ).NodeNumOut;
+			FirstNodeOnBranchIn = this_loopside.Branch( SplitterBranchIn ).NodeNumIn;
 			InletBranchMinAvail = Node( LastNodeOnBranch ).MassFlowRateMinAvail;
 			InletBranchMaxAvail = Node( LastNodeOnBranch ).MassFlowRateMaxAvail;
 			//            ! Find branch number and flow rates at mixer outlet
-			MixerBranchOut = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Mixer( SplitNum ).BranchNumOut;
-			LastNodeOnBranch = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( MixerBranchOut ).NodeNumOut;
-			FirstNodeOnBranchOut = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( MixerBranchOut ).NodeNumIn;
+			MixerBranchOut = this_loopside.Mixer( SplitNum ).BranchNumOut;
+			LastNodeOnBranch = this_loopside.Branch( MixerBranchOut ).NodeNumOut;
+			FirstNodeOnBranchOut = this_loopside.Branch( MixerBranchOut ).NodeNumIn;
 			OutletBranchMinAvail = Node( LastNodeOnBranch ).MassFlowRateMinAvail;
 			OutletBranchMaxAvail = Node( LastNodeOnBranch ).MassFlowRateMaxAvail;
 
 			LoopFlowRate = ThisLoopSideFlow;
 
+			auto & first_branch_inlet_node( Node( FirstNodeOnBranchIn ) );
+			auto & last_branch_inlet_node( Node( FirstNodeOnBranchOut ) );
+			
 			//Reset branch inlet node flow rates for the first and last branch on loop
-			Node( FirstNodeOnBranchIn ).MassFlowRate = ThisLoopSideFlow;
-			Node( FirstNodeOnBranchOut ).MassFlowRate = ThisLoopSideFlow;
+			first_branch_inlet_node.MassFlowRate = ThisLoopSideFlow;
+			last_branch_inlet_node.MassFlowRate = ThisLoopSideFlow;
 
 			//Reset branch inlet node Min/MaxAvails for the first and last branch on loop
-			Node( FirstNodeOnBranchIn ).MassFlowRateMaxAvail = min( Node( FirstNodeOnBranchIn ).MassFlowRateMaxAvail, ParallelBranchMaxAvail );
-			Node( FirstNodeOnBranchIn ).MassFlowRateMaxAvail = min( Node( FirstNodeOnBranchIn ).MassFlowRateMaxAvail, Node( FirstNodeOnBranchOut ).MassFlowRateMaxAvail );
-			Node( FirstNodeOnBranchIn ).MassFlowRateMinAvail = max( Node( FirstNodeOnBranchIn ).MassFlowRateMinAvail, ParallelBranchMinAvail );
-			Node( FirstNodeOnBranchIn ).MassFlowRateMinAvail = max( Node( FirstNodeOnBranchIn ).MassFlowRateMinAvail, Node( FirstNodeOnBranchOut ).MassFlowRateMinAvail );
-			Node( FirstNodeOnBranchOut ).MassFlowRateMinAvail = Node( FirstNodeOnBranchIn ).MassFlowRateMinAvail;
-			Node( FirstNodeOnBranchOut ).MassFlowRateMaxAvail = Node( FirstNodeOnBranchIn ).MassFlowRateMaxAvail;
+			first_branch_inlet_node.MassFlowRateMaxAvail = min( first_branch_inlet_node.MassFlowRateMaxAvail, ParallelBranchMaxAvail );
+			first_branch_inlet_node.MassFlowRateMaxAvail = min( first_branch_inlet_node.MassFlowRateMaxAvail, last_branch_inlet_node.MassFlowRateMaxAvail );
+			first_branch_inlet_node.MassFlowRateMinAvail = max( first_branch_inlet_node.MassFlowRateMinAvail, ParallelBranchMinAvail );
+			first_branch_inlet_node.MassFlowRateMinAvail = max( first_branch_inlet_node.MassFlowRateMinAvail, last_branch_inlet_node.MassFlowRateMinAvail );
+			last_branch_inlet_node.MassFlowRateMinAvail = first_branch_inlet_node.MassFlowRateMinAvail;
+			last_branch_inlet_node.MassFlowRateMaxAvail = first_branch_inlet_node.MassFlowRateMaxAvail;
 
 			//Initialize the remaining flow variable
 			FlowRemaining = ThisLoopSideFlow;
@@ -2039,9 +2028,9 @@ namespace PlantLoopSolver {
 			//Initialize flow on passive, bypass and uncontrolled parallel branches to zero.  For these branches
 			//MinAvail is not enforced
 			for ( OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum ) {
-				SplitterBranchOut = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Splitter( SplitNum ).BranchNumOut( OutletNum );
-				FirstNodeOnBranch = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).NodeNumIn;
-				if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).ControlType != ControlType_Active && PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).ControlType != ControlType_SeriesActive ) {
+				SplitterBranchOut = this_loopside.Splitter( SplitNum ).BranchNumOut( OutletNum );
+				FirstNodeOnBranch = this_loopside.Branch( SplitterBranchOut ).NodeNumIn;
+				if ( this_loopside.Branch( SplitterBranchOut ).ControlType != ControlType_Active && this_loopside.Branch( SplitterBranchOut ).ControlType != ControlType_SeriesActive ) {
 					Node( FirstNodeOnBranch ).MassFlowRate = 0.0;
 					PushBranchFlowCharacteristics( LoopNum, LoopSideNum, SplitterBranchOut, Node( FirstNodeOnBranch ).MassFlowRate, FirstHVACIteration );
 				}
@@ -2050,12 +2039,12 @@ namespace PlantLoopSolver {
 			//IF SUFFICIENT FLOW TO MEET ALL PARALLEL BRANCH FLOW REQUESTS
 			if ( FlowRemaining < MassFlowTolerance ) { // no flow available at all for splitter
 				for ( OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum ) {
-					SplitterBranchOut = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Splitter( SplitNum ).BranchNumOut( OutletNum );
-					for ( CompCounter = 1; CompCounter <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).TotalComponents; ++CompCounter ) {
+					SplitterBranchOut = this_loopside.Splitter( SplitNum ).BranchNumOut( OutletNum );
+					for ( CompCounter = 1; CompCounter <= this_loopside.Branch( SplitterBranchOut ).TotalComponents; ++CompCounter ) {
 
-						FirstNodeOnBranch = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).NodeNumIn;
-						CompInletNode = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).Comp( CompCounter ).NodeNumIn;
-						CompOutletNode = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).Comp( CompCounter ).NodeNumOut;
+						FirstNodeOnBranch = this_loopside.Branch( SplitterBranchOut ).NodeNumIn;
+						CompInletNode = this_loopside.Branch( SplitterBranchOut ).Comp( CompCounter ).NodeNumIn;
+						CompOutletNode = this_loopside.Branch( SplitterBranchOut ).Comp( CompCounter ).NodeNumOut;
 						Node( CompInletNode ).MassFlowRate = 0.0;
 						Node( CompInletNode ).MassFlowRateMaxAvail = 0.0;
 						Node( CompOutletNode ).MassFlowRate = 0.0;
@@ -2067,9 +2056,9 @@ namespace PlantLoopSolver {
 
 				// 1) Satisfy flow demand of ACTIVE splitter outlet branches
 				for ( OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum ) {
-					SplitterBranchOut = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Splitter( SplitNum ).BranchNumOut( OutletNum );
-					FirstNodeOnBranch = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).NodeNumIn;
-					if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).ControlType == ControlType_Active || PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).ControlType == ControlType_SeriesActive ) {
+					SplitterBranchOut = this_loopside.Splitter( SplitNum ).BranchNumOut( OutletNum );
+					FirstNodeOnBranch = this_loopside.Branch( SplitterBranchOut ).NodeNumIn;
+					if ( this_loopside.Branch( SplitterBranchOut ).ControlType == ControlType_Active || this_loopside.Branch( SplitterBranchOut ).ControlType == ControlType_SeriesActive ) {
 						// branch flow is min of requested flow and remaining flow
 						Node( FirstNodeOnBranch ).MassFlowRate = min( Node( FirstNodeOnBranch ).MassFlowRate, FlowRemaining );
 						if ( Node( FirstNodeOnBranch ).MassFlowRate < MassFlowTolerance ) Node( FirstNodeOnBranch ).MassFlowRate = 0.0;
@@ -2084,9 +2073,9 @@ namespace PlantLoopSolver {
 				// 2) Distribute remaining flow to PASSIVE branches
 				totalMax = 0.0;
 				for ( OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum ) {
-					SplitterBranchOut = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Splitter( SplitNum ).BranchNumOut( OutletNum );
-					FirstNodeOnBranch = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).NodeNumIn;
-					if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).ControlType == ControlType_Passive ) {
+					SplitterBranchOut = this_loopside.Splitter( SplitNum ).BranchNumOut( OutletNum );
+					FirstNodeOnBranch = this_loopside.Branch( SplitterBranchOut ).NodeNumIn;
+					if ( this_loopside.Branch( SplitterBranchOut ).ControlType == ControlType_Passive ) {
 						//Calculate the total max available
 						totalMax += Node( FirstNodeOnBranch ).MassFlowRateMaxAvail;
 					}
@@ -2094,9 +2083,9 @@ namespace PlantLoopSolver {
 
 				if ( totalMax > 0 ) {
 					for ( OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum ) {
-						SplitterBranchOut = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Splitter( SplitNum ).BranchNumOut( OutletNum );
-						FirstNodeOnBranch = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).NodeNumIn;
-						if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).ControlType == ControlType_Passive ) {
+						SplitterBranchOut = this_loopside.Splitter( SplitNum ).BranchNumOut( OutletNum );
+						FirstNodeOnBranch = this_loopside.Branch( SplitterBranchOut ).NodeNumIn;
+						if ( this_loopside.Branch( SplitterBranchOut ).ControlType == ControlType_Passive ) {
 							FracFlow = FlowRemaining / totalMax;
 							if ( FracFlow <= 1.0 ) { //the passive branches will take all the flow
 								PassiveFlowRate = FracFlow * Node( FirstNodeOnBranch ).MassFlowRateMaxAvail;
@@ -2118,10 +2107,10 @@ namespace PlantLoopSolver {
 				if ( FlowRemaining == 0.0 ) return;
 
 				// 3) Distribute remaining flow to the BYPASS
-				for ( OutletNum = 1; OutletNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Splitter( SplitNum ).TotalOutletNodes; ++OutletNum ) {
-					SplitterBranchOut = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Splitter( SplitNum ).BranchNumOut( OutletNum );
-					FirstNodeOnBranch = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).NodeNumIn;
-					if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).ControlType == ControlType_Bypass ) {
+				for ( OutletNum = 1; OutletNum <= this_loopside.Splitter( SplitNum ).TotalOutletNodes; ++OutletNum ) {
+					SplitterBranchOut = this_loopside.Splitter( SplitNum ).BranchNumOut( OutletNum );
+					FirstNodeOnBranch = this_loopside.Branch( SplitterBranchOut ).NodeNumIn;
+					if ( this_loopside.Branch( SplitterBranchOut ).ControlType == ControlType_Bypass ) {
 						Node( FirstNodeOnBranch ).MassFlowRate = min( FlowRemaining, Node( FirstNodeOnBranch ).MassFlowRateMaxAvail );
 						PushBranchFlowCharacteristics( LoopNum, LoopSideNum, SplitterBranchOut, Node( FirstNodeOnBranch ).MassFlowRate, FirstHVACIteration );
 						FlowRemaining -= Node( FirstNodeOnBranch ).MassFlowRate;
@@ -2134,9 +2123,9 @@ namespace PlantLoopSolver {
 				if ( NumActiveBranches > 0 ) {
 					ActiveFlowRate = FlowRemaining / NumActiveBranches;
 					for ( OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum ) {
-						SplitterBranchOut = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Splitter( SplitNum ).BranchNumOut( OutletNum );
-						FirstNodeOnBranch = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).NodeNumIn;
-						if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).ControlType == ControlType_Active || PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).ControlType == ControlType_SeriesActive ) {
+						SplitterBranchOut = this_loopside.Splitter( SplitNum ).BranchNumOut( OutletNum );
+						FirstNodeOnBranch = this_loopside.Branch( SplitterBranchOut ).NodeNumIn;
+						if ( this_loopside.Branch( SplitterBranchOut ).ControlType == ControlType_Active || this_loopside.Branch( SplitterBranchOut ).ControlType == ControlType_SeriesActive ) {
 							//check Remaining flow (should be correct!)
 							ActiveFlowRate = min( ActiveFlowRate, FlowRemaining );
 							//set the flow rate to the MIN((MassFlowRate+AvtiveFlowRate), MaxAvail)
@@ -2153,9 +2142,9 @@ namespace PlantLoopSolver {
 
 					// 5)  Step 4) could have left ACTIVE branches < MaxAvail.  Check to makes sure all ACTIVE branches are at MaxAvail
 					for ( OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum ) {
-						SplitterBranchOut = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Splitter( SplitNum ).BranchNumOut( OutletNum );
-						FirstNodeOnBranch = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).NodeNumIn;
-						if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).ControlType == ControlType_Active || PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).ControlType == ControlType_SeriesActive ) {
+						SplitterBranchOut = this_loopside.Splitter( SplitNum ).BranchNumOut( OutletNum );
+						FirstNodeOnBranch = this_loopside.Branch( SplitterBranchOut ).NodeNumIn;
+						if ( this_loopside.Branch( SplitterBranchOut ).ControlType == ControlType_Active || this_loopside.Branch( SplitterBranchOut ).ControlType == ControlType_SeriesActive ) {
 							StartingFlowRate = Node( FirstNodeOnBranch ).MassFlowRate;
 							ActiveFlowRate = min( FlowRemaining, ( Node( FirstNodeOnBranch ).MassFlowRateMaxAvail - StartingFlowRate ) );
 							FlowRemaining -= ActiveFlowRate;
@@ -2171,19 +2160,19 @@ namespace PlantLoopSolver {
 				//DSU? do we need this logic?   or should we fatal on a diagnostic error
 				TotParallelBranchFlowReq = 0.0;
 				for ( iBranch = 1; iBranch <= NumSplitOutlets; ++iBranch ) {
-					BranchNum = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Splitter( SplitNum ).BranchNumOut( iBranch );
-					FirstNodeOnBranch = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).NodeNumIn;
+					BranchNum = this_loopside.Splitter( SplitNum ).BranchNumOut( iBranch );
+					FirstNodeOnBranch = this_loopside.Branch( BranchNum ).NodeNumIn;
 					//calculate parallel branch flow rate
 					TotParallelBranchFlowReq += Node( FirstNodeOnBranch ).MassFlowRate;
 				}
 				// Reset the flow on the splitter inlet branch
-				SplitterBranchIn = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Splitter( SplitNum ).BranchNumIn;
-				FirstNodeOnBranchIn = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchIn ).NodeNumIn;
+				SplitterBranchIn = this_loopside.Splitter( SplitNum ).BranchNumIn;
+				FirstNodeOnBranchIn = this_loopside.Branch( SplitterBranchIn ).NodeNumIn;
 				Node( FirstNodeOnBranchIn ).MassFlowRate = TotParallelBranchFlowReq;
 				PushBranchFlowCharacteristics( LoopNum, LoopSideNum, SplitterBranchIn, Node( FirstNodeOnBranchIn ).MassFlowRate, FirstHVACIteration );
 				// Reset the flow on the Mixer outlet branch
-				MixerBranchOut = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Mixer( SplitNum ).BranchNumOut;
-				FirstNodeOnBranchOut = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( MixerBranchOut ).NodeNumIn;
+				MixerBranchOut = this_loopside.Mixer( SplitNum ).BranchNumOut;
+				FirstNodeOnBranchOut = this_loopside.Branch( MixerBranchOut ).NodeNumIn;
 				Node( FirstNodeOnBranchOut ).MassFlowRate = TotParallelBranchFlowReq;
 				PushBranchFlowCharacteristics( LoopNum, LoopSideNum, MixerBranchOut, Node( FirstNodeOnBranchOut ).MassFlowRate, FirstHVACIteration );
 				return;
@@ -2194,10 +2183,10 @@ namespace PlantLoopSolver {
 				//DSU? didn't take the time to figure out what this should be... SplitterFlowIn = SplitterInletFlow(SplitNum)
 				// 1) apportion flow based on requested fraction of total
 				for ( OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum ) {
-					SplitterBranchOut = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Splitter( SplitNum ).BranchNumOut( OutletNum );
+					SplitterBranchOut = this_loopside.Splitter( SplitNum ).BranchNumOut( OutletNum );
 					ThisBranchRequest = DetermineBranchFlowRequest( LoopNum, LoopSideNum, SplitterBranchOut );
-					FirstNodeOnBranch = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).NodeNumIn;
-					if ( ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).ControlType == ControlType_Active ) || ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( SplitterBranchOut ).ControlType == ControlType_SeriesActive ) ) {
+					FirstNodeOnBranch = this_loopside.Branch( SplitterBranchOut ).NodeNumIn;
+					if ( ( this_loopside.Branch( SplitterBranchOut ).ControlType == ControlType_Active ) || ( this_loopside.Branch( SplitterBranchOut ).ControlType == ControlType_SeriesActive ) ) {
 						ThisBranchRequestFrac = ThisBranchRequest / TotParallelBranchFlowReq;
 						//    FracFlow = Node(FirstNodeOnBranch)%MassFlowRate/TotParallelBranchFlowReq
 						//    Node(FirstNodeOnBranch)%MassFlowRate = MIN((FracFlow * Node(FirstNodeOnBranch)%MassFlowRate),FlowRemaining)
@@ -2218,8 +2207,8 @@ namespace PlantLoopSolver {
 				}
 
 				// 2)  ! Reset the flow on the Mixer outlet branch
-				MixerBranchOut = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Mixer( SplitNum ).BranchNumOut;
-				FirstNodeOnBranchOut = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( MixerBranchOut ).NodeNumIn;
+				MixerBranchOut = this_loopside.Mixer( SplitNum ).BranchNumOut;
+				FirstNodeOnBranchOut = this_loopside.Branch( MixerBranchOut ).NodeNumIn;
 				Node( FirstNodeOnBranchOut ).MassFlowRate = TotParallelBranchFlowReq;
 				PushBranchFlowCharacteristics( LoopNum, LoopSideNum, MixerBranchOut, Node( FirstNodeOnBranchOut ).MassFlowRate, FirstHVACIteration );
 
@@ -2333,9 +2322,11 @@ namespace PlantLoopSolver {
 		int BranchOutletNodeNum;
 		int BranchInletNodeNum;
 
+		auto & this_branch( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ) );
+
 		//~ Initialize
-		BranchInletNodeNum = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).NodeNumIn;
-		BranchOutletNodeNum = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).NodeNumOut;
+		BranchInletNodeNum = this_branch.NodeNumIn;
+		BranchOutletNodeNum = this_branch.NodeNumOut;
 		OverallFlowRequest = 0.0;
 
 		{ auto const SELECT_CASE_var( WhichRequestCalculation );
@@ -2344,31 +2335,31 @@ namespace PlantLoopSolver {
 			OverallFlowRequest = Node( BranchOutletNodeNum ).MassFlowRate;
 
 		} else if ( SELECT_CASE_var == InletFlowRequest ) {
-			if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).ControlType != ControlType_SeriesActive ) {
+			if ( this_branch.ControlType != ControlType_SeriesActive ) {
 				OverallFlowRequest = Node( BranchInletNodeNum ).MassFlowRateRequest;
 			} else { // is series active, so take largest request of all the component inlet nodes
-				for ( CompCounter = 1; CompCounter <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).TotalComponents; ++CompCounter ) {
-					CompInletNode = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompCounter ).NodeNumIn;
+				for ( CompCounter = 1; CompCounter <= this_branch.TotalComponents; ++CompCounter ) {
+					CompInletNode = this_branch.Comp( CompCounter ).NodeNumIn;
 					OverallFlowRequest = max( OverallFlowRequest, Node( CompInletNode ).MassFlowRateRequest );
 				}
 			}
 
 		} else if ( SELECT_CASE_var == MaximumRequest ) {
 			// Assumes component inlet node is where request is held...could bandaid to include outlet node, but trying not to...
-			for ( CompCounter = 1; CompCounter <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).TotalComponents; ++CompCounter ) {
-				CompInletNode = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompCounter ).NodeNumIn;
+			for ( CompCounter = 1; CompCounter <= this_branch.TotalComponents; ++CompCounter ) {
+				CompInletNode = this_branch.Comp( CompCounter ).NodeNumIn;
 				OverallFlowRequest = max( OverallFlowRequest, Node( CompInletNode ).MassFlowRateRequest );
 			}
 
 		} else if ( SELECT_CASE_var == MaxNonLRBRequest ) {
 			// Assumes component inlet node is where request is held...could bandaid to include outlet node, but trying not to...
-			for ( CompCounter = 1; CompCounter <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).TotalComponents; ++CompCounter ) {
-				{ auto const SELECT_CASE_var1( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompCounter ).CurOpSchemeType );
+			for ( CompCounter = 1; CompCounter <= this_branch.TotalComponents; ++CompCounter ) {
+				{ auto const SELECT_CASE_var1( this_branch.Comp( CompCounter ).CurOpSchemeType );
 				if ( ( SELECT_CASE_var1 >= LoadRangeBasedMin ) && ( SELECT_CASE_var1 <= LoadRangeBasedMax ) ) {
 					// don't include this request
 				} else {
 					// include this
-					CompInletNode = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompCounter ).NodeNumIn;
+					CompInletNode = this_branch.Comp( CompCounter ).NodeNumIn;
 					OverallFlowRequest = max( OverallFlowRequest, Node( CompInletNode ).MassFlowRateRequest );
 				}}
 			}
@@ -2454,11 +2445,12 @@ namespace PlantLoopSolver {
 		Real64 MassFlowRateFound;
 		Real64 MassFlow;
 		bool PlantIsRigid;
-		//REAL(r64) :: MinAvail
-		// REAL(r64) :: MaxAvail
 
-		BranchInletNode = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).NodeNumIn;
-		BranchOutletNode = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).NodeNumOut;
+		auto & this_loopside( PlantLoop( LoopNum ).LoopSide( LoopSideNum ) );
+		auto & this_branch( this_loopside.Branch( BranchNum ) );
+
+		BranchInletNode = this_branch.NodeNumIn;
+		BranchOutletNode = this_branch.NodeNumOut;
 
 		//~ Possible error handling if needed
 		if ( ValueToPush != Node( BranchInletNode ).MassFlowRate ) {
@@ -2473,13 +2465,15 @@ namespace PlantLoopSolver {
 		PlantIsRigid = CheckPlantConvergence( LoopNum, LoopSideNum, FirstHVACIteration );
 
 		//~ Loop across all component outlet nodes and update their mass flow and max avail
-		for ( CompCounter = 1; CompCounter <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).TotalComponents; ++CompCounter ) {
+		for ( CompCounter = 1; CompCounter <= this_branch.TotalComponents; ++CompCounter ) {
+
+			auto & this_comp( this_branch.Comp( CompCounter ) );
 
 			//~ Pick up some values for convenience
-			ComponentInletNode = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompCounter ).NodeNumIn;
-			ComponentOutletNode = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompCounter ).NodeNumOut;
+			ComponentInletNode = this_comp.NodeNumIn;
+			ComponentOutletNode = this_comp.NodeNumOut;
 			MassFlowRateFound = Node( ComponentOutletNode ).MassFlowRate;
-			ComponentTypeOfNum = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompCounter ).TypeOf_Num;
+			ComponentTypeOfNum = this_comp.TypeOf_Num;
 
 			//~ Push the values through
 			Node( ComponentOutletNode ).MassFlowRate = MassFlow;
@@ -2505,17 +2499,17 @@ namespace PlantLoopSolver {
 			// possibly air-connected components
 			if ( ( SELECT_CASE_var == TypeOf_CoilWaterCooling ) || ( SELECT_CASE_var == TypeOf_CoilWaterDetailedFlatCooling ) || ( SELECT_CASE_var == TypeOf_CoilWaterSimpleHeating ) || ( SELECT_CASE_var == TypeOf_CoilSteamAirHeating ) || ( SELECT_CASE_var == TypeOf_CoilWAHPHeatingEquationFit ) || ( SELECT_CASE_var == TypeOf_CoilWAHPCoolingEquationFit ) || ( SELECT_CASE_var == TypeOf_CoilWAHPHeatingParamEst ) || ( SELECT_CASE_var == TypeOf_CoilWAHPCoolingParamEst ) || ( SELECT_CASE_var == TypeOf_CoilUserDefined ) || ( SELECT_CASE_var == TypeOf_CoilVSWAHPCoolingEquationFit ) || ( SELECT_CASE_var == TypeOf_CoilVSWAHPHeatingEquationFit ) || ( SELECT_CASE_var == TypeOf_PackagedTESCoolingCoil ) ) {
 
-				PlantLoop( LoopNum ).LoopSide( LoopSideNum ).SimAirLoopsNeeded = true;
+				this_loopside.SimAirLoopsNeeded = true;
 				//sometimes these coils are children in ZoneHVAC equipment
 				// PlantLoop(LoopNum)%LoopSide(LoopSideNum)%SimZoneEquipNeeded= .TRUE.
 
 			} else if ( ( SELECT_CASE_var == TypeOf_Baseboard_Conv_Water ) || ( SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Steam ) || ( SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Water ) || ( SELECT_CASE_var == TypeOf_LowTempRadiant_VarFlow ) || ( SELECT_CASE_var == TypeOf_LowTempRadiant_ConstFlow ) || ( SELECT_CASE_var == TypeOf_CooledBeamAirTerminal ) || ( SELECT_CASE_var == TypeOf_ZoneHVACAirUserDefined ) || ( SELECT_CASE_var == TypeOf_AirTerminalUserDefined ) ) { //zone connected components
 
-				PlantLoop( LoopNum ).LoopSide( LoopSideNum ).SimZoneEquipNeeded = true;
+				this_loopside.SimZoneEquipNeeded = true;
 
 			} else if ( ( SELECT_CASE_var == TypeOf_Generator_FCExhaust ) || ( SELECT_CASE_var == TypeOf_Generator_FCStackCooler ) || ( SELECT_CASE_var == TypeOf_Generator_MicroCHP ) || ( SELECT_CASE_var == TypeOf_Generator_MicroTurbine ) || ( SELECT_CASE_var == TypeOf_Generator_ICEngine ) || ( SELECT_CASE_var == TypeOf_Generator_CTurbine ) ) { //electric center connected components
 
-				PlantLoop( LoopNum ).LoopSide( LoopSideNum ).SimElectLoadCentrNeeded = true;
+				this_loopside.SimElectLoadCentrNeeded = true;
 
 			}}
 
@@ -2560,21 +2554,24 @@ namespace PlantLoopSolver {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
 		// store node data in plant
+		auto & this_supplyside( PlantLoop( LoopNum ).LoopSide( SupplySide ) );
+		auto & this_loop_report( PlantReport( LoopNum ) );
+		
 		if ( LoopSide == SupplySide ) {
-			PlantReport( LoopNum ).InletNodeFlowrate = Node( PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNumIn ).MassFlowRate;
-			PlantReport( LoopNum ).InletNodeTemperature = Node( PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNumIn ).Temp;
-			PlantReport( LoopNum ).OutletNodeFlowrate = Node( PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNumOut ).MassFlowRate;
-			PlantReport( LoopNum ).OutletNodeTemperature = Node( PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNumOut ).Temp;
+			this_loop_report.InletNodeFlowrate = Node( this_supplyside.NodeNumIn ).MassFlowRate;
+			this_loop_report.InletNodeTemperature = Node( this_supplyside.NodeNumIn ).Temp;
+			this_loop_report.OutletNodeFlowrate = Node( this_supplyside.NodeNumOut ).MassFlowRate;
+			this_loop_report.OutletNodeTemperature = Node( this_supplyside.NodeNumOut ).Temp;
 
 			// In the baseline code, only reported supply side demand. so putting in "SupplySide" IF block for now but might expand later
 			if ( OtherSideDemand < 0.0 ) {
-				PlantReport( LoopNum ).CoolingDemand = std::abs( OtherSideDemand );
-				PlantReport( LoopNum ).HeatingDemand = 0.0;
-				PlantReport( LoopNum ).DemandNotDispatched = -LocalRemLoopDemand; //  Setting sign based on old logic for now
+				this_loop_report.CoolingDemand = std::abs( OtherSideDemand );
+				this_loop_report.HeatingDemand = 0.0;
+				this_loop_report.DemandNotDispatched = -LocalRemLoopDemand; //  Setting sign based on old logic for now
 			} else {
-				PlantReport( LoopNum ).HeatingDemand = OtherSideDemand;
-				PlantReport( LoopNum ).CoolingDemand = 0.0;
-				PlantReport( LoopNum ).DemandNotDispatched = LocalRemLoopDemand; //  Setting sign based on old logic for now
+				this_loop_report.HeatingDemand = OtherSideDemand;
+				this_loop_report.CoolingDemand = 0.0;
+				this_loop_report.DemandNotDispatched = LocalRemLoopDemand; //  Setting sign based on old logic for now
 			}
 
 			CalcUnmetPlantDemand( LoopNum, LoopSide );
@@ -2633,16 +2630,8 @@ namespace PlantLoopSolver {
 		// DERIVED TYPE DEFINITIONS:
 		// na
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		//  INTEGER              :: BranchCounter      !~ This contains the index for the %Branch(:) structure
-		//  INTEGER              :: BranchIndex        !~ This is a 1 - n value within the current branch group
-		//  INTEGER              :: StartingComponent  !~ The component which "would" be simulated next
-
 		//~ General variables
-		//  REAL(r64)                 :: EnteringTemperature
 		Real64 MassFlowRate;
-		//  REAL(r64)                 :: SumMdotTimesTemp
-		//  REAL(r64)                 :: SumMdot
 		Real64 TargetTemp;
 		Real64 LoopSetPointTemperature;
 		Real64 LoopSetPointTemperatureHi;
@@ -2650,7 +2639,6 @@ namespace PlantLoopSolver {
 		Real64 LoadToHeatingSetPoint;
 		Real64 LoadToCoolingSetPoint;
 		Real64 DeltaTemp;
-		//  INTEGER                   :: EnteringNodeNum
 		Real64 Cp;
 		Real64 EnthalpySteamSatVapor; // Enthalpy of saturated vapor
 		Real64 EnthalpySteamSatLiquid; // Enthalpy of saturated liquid
@@ -2659,21 +2647,22 @@ namespace PlantLoopSolver {
 
 		// Initialize
 		LoadToLoopSetPoint = 0.0;
+		auto & this_loop( PlantLoop( LoopNum ) );
 
 		// Get temperature at loop setpoint node.
-		TargetTemp = Node( PlantLoop( LoopNum ).TempSetPointNodeNum ).Temp;
-		MassFlowRate = Node( PlantLoop( LoopNum ).TempSetPointNodeNum ).MassFlowRate;
+		TargetTemp = Node( this_loop.TempSetPointNodeNum ).Temp;
+		MassFlowRate = Node( this_loop.TempSetPointNodeNum ).MassFlowRate;
 
-		if ( PlantLoop( LoopNum ).FluidType == NodeType_Water ) {
+		if ( this_loop.FluidType == NodeType_Water ) {
 
-			Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, TargetTemp, PlantLoop( LoopNum ).FluidIndex, "PlantLoopSolver::EvaluateLoopSetPointLoad" );
+			Cp = GetSpecificHeatGlycol( this_loop.FluidName, TargetTemp, this_loop.FluidIndex, "PlantLoopSolver::EvaluateLoopSetPointLoad" );
 
-			{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
+			{ auto const SELECT_CASE_var( this_loop.LoopDemandCalcScheme );
 
 			if ( SELECT_CASE_var == SingleSetPoint ) {
 
 				// Pick up the loop setpoint temperature
-				LoopSetPointTemperature = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TempSetPoint;
+				LoopSetPointTemperature = this_loop.LoopSide( LoopSideNum ).TempSetPoint;
 				// Calculate the delta temperature
 				DeltaTemp = LoopSetPointTemperature - TargetTemp;
 
@@ -2683,8 +2672,8 @@ namespace PlantLoopSolver {
 			} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 
 				// Get the range of setpoints
-				LoopSetPointTemperatureHi = Node( PlantLoop( LoopNum ).TempSetPointNodeNum ).TempSetPointHi;
-				LoopSetPointTemperatureLo = Node( PlantLoop( LoopNum ).TempSetPointNodeNum ).TempSetPointLo;
+				LoopSetPointTemperatureHi = Node( this_loop.TempSetPointNodeNum ).TempSetPointHi;
+				LoopSetPointTemperatureLo = Node( this_loop.TempSetPointNodeNum ).TempSetPointLo;
 
 				//Calculate the demand on the loop
 				if ( MassFlowRate > 0.0 ) {
@@ -2708,16 +2697,16 @@ namespace PlantLoopSolver {
 
 			}}
 
-		} else if ( PlantLoop( LoopNum ).FluidType == NodeType_Steam ) {
+		} else if ( this_loop.FluidType == NodeType_Steam ) {
 
-			Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, TargetTemp, PlantLoop( LoopNum ).FluidIndex, "PlantLoopSolver::EvaluateLoopSetPointLoad" );
+			Cp = GetSpecificHeatGlycol( this_loop.FluidName, TargetTemp, this_loop.FluidIndex, "PlantLoopSolver::EvaluateLoopSetPointLoad" );
 
-			{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
+			{ auto const SELECT_CASE_var( this_loop.LoopDemandCalcScheme );
 
 			if ( SELECT_CASE_var == SingleSetPoint ) {
 
 				// Pick up the loop setpoint temperature
-				LoopSetPointTemperature = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TempSetPoint;
+				LoopSetPointTemperature = this_loop.LoopSide( LoopSideNum ).TempSetPoint;
 
 				// Calculate the delta temperature
 				DeltaTemp = LoopSetPointTemperature - TargetTemp;
@@ -2868,18 +2857,22 @@ namespace PlantLoopSolver {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		if ( ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).EMSCtrl ) && ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).EMSValue <= 0.0 ) ) {
+		auto & this_loopside( PlantLoop( LoopNum ).LoopSide( LoopSideNum ) );
+		auto & this_branch( this_loopside.Branch( BranchNum ) );
+		auto & this_comp( this_branch.Comp( CompNum ) );
+		
+		if ( ( this_loopside.EMSCtrl ) && ( this_loopside.EMSValue <= 0.0 ) ) {
 			FlowToRequest = 0.0;
 			return;
 		}
 
-		if ( ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).EMSCtrlOverrideOn ) && ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).EMSCtrlOverrideValue <= 0.0 ) ) {
+		if ( ( this_branch.EMSCtrlOverrideOn ) && ( this_branch.EMSCtrlOverrideValue <= 0.0 ) ) {
 			FlowToRequest = 0.0;
 			return;
 		}
 
-		if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).EMSLoadOverrideOn ) {
-			if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).EMSLoadOverrideValue == 0.0 ) {
+		if ( this_comp.EMSLoadOverrideOn ) {
+			if ( this_comp.EMSLoadOverrideValue == 0.0 ) {
 				FlowToRequest = 0.0;
 			}
 		}
