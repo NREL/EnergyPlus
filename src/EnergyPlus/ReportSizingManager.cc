@@ -258,7 +258,7 @@ namespace ReportSizingManager {
 				}
 			} else { // TypeOfZoneSizing
 //				if ( SizingType == ( CoolingAirflowSizing || HeatingAirflowSizing || SystemAirflowSizing ) ) { // Replaced by below: Pretty clear this is a bug
-				if ( ( SizingType == CoolingAirflowSizing || ( SizingType == HeatingAirflowSizing ) || ( SizingType ==  SystemAirflowSizing ) ) ) {
+				if ( ( SizingType == CoolingAirflowSizing ) || ( SizingType == HeatingAirflowSizing ) || ( SizingType ==  SystemAirflowSizing ) ) {
 				} else if ( SizingType == CoolingSHRSizing ) {
 				} else if ( SizingType == CoolingCapacitySizing ) {
 				} else if ( SizingType == HeatingCapacitySizing ) {
