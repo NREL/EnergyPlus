@@ -37,18 +37,23 @@ namespace DataStringGlobals {
 	std::string const AccentedUpperCase( "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖØÙÚÛÜİ" );
 	std::string const AccentedLowerCase( "àáâãäåæçèéêëìíîïğñòóôõöøùúûüı" );
 	std::string const AllCase( "àáâãäåæçèéêëìíîïğñòóôõöøùúûüıÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖØÙÚÛÜİABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" );
-#ifdef WINDOWS
+#ifdef _WIN32
 	char const pathChar( '\\' );
 	char const altpathChar( '/' );
-#elif defined LINUX
+#elif __linux__
 	char const pathChar( '/' );
 	char const altpathChar( '\\' );
-#elif defined MAC
+#elif __unix__
+	char const pathChar( '/' );
+	char const altpathChar( '\\' );
+#elif __posix__
+	char const pathChar( '/' );
+	char const altpathChar( '\\' );
+#elif __APPLE__
 	char const pathChar( '/' );
 	char const altpathChar( '\\' );
 #else
-	char const pathChar( '\\' ); // default to Windows
-	char const altpathChar( '/' );
+#error "Invalid platform detection in DataStringGlobals."
 #endif
 	char const CharComma( ',' ); // comma
 	char const CharSemicolon( ';' ); // semicolon
