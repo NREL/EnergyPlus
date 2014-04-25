@@ -16,3 +16,12 @@
 *.so.*
 *~
 .directory
+
+# build folder, if the dev chooses to put it there
+#  could also do a wildcard for build-* if we suggest that naming approach
+#  which could be useful for: build-eclipse, build-vs2013, build, etc.
+build
+
+# App-specific project files, for example, for Geany IDE:
+*.geany
+
