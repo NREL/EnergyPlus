@@ -5588,9 +5588,10 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     Cooler_1UnitHeatFan,     !- Supply Air Fan Name
     0.84,                    !- Maximum Supply Air Flow Rate {m3/s}
-    Continuous,              !- Fan Control Type
     Coil:Heating:Electric,   !- Heating Coil Object Type
     Cooler_1UnitHeatHeatingCoil,  !- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    Yes,                     !- Supply Air Fan Operation During No Heating
     ,                        !- Maximum Hot Water or Steam Flow Rate {m3/s}
     ,                        !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
@@ -5663,9 +5664,10 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     Cooler_2UnitHeatFan,     !- Supply Air Fan Name
     0.84,                    !- Maximum Supply Air Flow Rate {m3/s}
-    Continuous,              !- Fan Control Type
     Coil:Heating:Electric,   !- Heating Coil Object Type
     Cooler_2UnitHeatHeatingCoil,  !- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    Yes,                     !- Supply Air Fan Operation During No Heating
     ,                        !- Maximum Hot Water or Steam Flow Rate {m3/s}
     ,                        !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
@@ -5734,9 +5736,10 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     Cooler_3UnitHeatFan,     !- Supply Air Fan Name
     0.84,                    !- Maximum Supply Air Flow Rate {m3/s}
-    Continuous,              !- Fan Control Type
     Coil:Heating:Electric,   !- Heating Coil Object Type
     Cooler_3UnitHeatHeatingCoil,  !- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    Yes,                     !- Supply Air Fan Operation During No Heating
     ,                        !- Maximum Hot Water or Steam Flow Rate {m3/s}
     ,                        !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
@@ -5807,9 +5810,10 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     DockUnitHeatFan,         !- Supply Air Fan Name
     5.,                      !- Maximum Supply Air Flow Rate {m3/s}
-    Continuous,              !- Fan Control Type
     Coil:Heating:Electric,   !- Heating Coil Object Type
     DockUnitHeatHeatingCoil, !- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    Yes,                     !- Supply Air Fan Operation During No Heating
     ,                        !- Maximum Hot Water or Steam Flow Rate {m3/s}
     ,                        !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
@@ -13337,6 +13341,13 @@
   Output:Variable,*,Zone Mixing Total Heat Loss Energy,hourly;
 
   Output:Variable,*,Zone Mixing Total Heat Gain Energy,hourly;
+  
+  Output:Variable,*,Zone Zone Mixing Mass Flow Rate,hourly;
+
+  Output:Variable,*,Zone Zone Mixing Current Density Volumetric Flow Rate,hourly;
+ 
+  Output:Variable,*,Zone Zone Mixing Standard Density Volumetric Flow Rate,hourly;
+
 
   Output:Variable,*,Refrigeration Zone Air Chiller Sensible Heat Ratio,hourly;
 
