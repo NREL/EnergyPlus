@@ -1,7 +1,7 @@
 EnergyPlusTeam
 ==================
 
-This is the root of the EnergyPlus Development Repository.  
+This is the EnergyPlus Development Repository.  
 
 # Build Process
 
