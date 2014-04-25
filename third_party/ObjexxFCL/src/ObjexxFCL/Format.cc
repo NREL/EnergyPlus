@@ -1727,10 +1727,10 @@ alpha_token( Tokens const & tokens )
 
 // Static Data Member Definitions
 
-//#ifndef _MSC_VER // Microsoft Visual C++ extensions doesn't need or like these: Enable #ifndef block if not using /Za
+#ifndef MSC_EXTENSIONS // Define when compiling with Visual C++ extensions (not using /Za)
 
 	Format::Size const Format::NOSIZE;
 
-//#endif // _MSC_VER
+#endif
 
 } // ObjexxFCL

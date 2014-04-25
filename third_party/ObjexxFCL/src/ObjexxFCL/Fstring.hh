@@ -402,21 +402,23 @@ public: // Predicate
 		return ( len_trim_whitespace() > 0 );
 	}
 
-	// Has an Fstring?
+	// Has a Substring?
+	template< typename S >
+	inline
 	bool
-	has( Fstring const & s ) const;
+	has( S const & s ) const
+	{
+		return ( find( s ) != 0 );
+	}
 
-	// Has a string?
+	// Has a Substring Case-Insensitively?
+	template< typename S >
+	inline
 	bool
-	has( std::string const & s ) const;
-
-	// Has a cstring?
-	bool
-	has( c_cstring const s ) const;
-
-	// Has a Character?
-	bool
-	has( char const c ) const;
+	hasi( S const & s ) const
+	{
+		return ( indexi( *this, s ) != 0 );
+	}
 
 	// Has any Character of an Fstring?
 	bool
@@ -639,32 +641,67 @@ public: // Inspector
 	trimmed_whitespace_range( size_type & b, size_type & e ) const;
 
 	// Find First Occurrence of an Fstring
+	inline
 	size_type
-	find( Fstring const & s ) const;
+	find( Fstring const & s ) const
+	{
+		auto const i( std::search( begin(), end(), s.begin(), s.end() ) );
+		return ( i == end() ? static_cast< std::string::size_type >( 0 ) : static_cast< std::string::size_type >( i - begin() + 1 ) );
+	}
 
 	// Find First Occurrence of a string
+	inline
 	size_type
-	find( std::string const & s ) const;
+	find( std::string const & s ) const
+	{
+		auto const i( std::search( begin(), end(), s.begin(), s.end() ) );
+		return ( i == end() ? static_cast< std::string::size_type >( 0 ) : static_cast< std::string::size_type >( i - begin() + 1 ) );
+	}
 
 	// Find First Occurrence of a cstring
+	inline
 	size_type
-	find( c_cstring const s ) const;
+	find( c_cstring const s ) const
+	{
+		auto const i( std::search( begin(), end(), s, s + std::strlen( s ) ) );
+		return ( i == end() ? static_cast< std::string::size_type >( 0 ) : static_cast< std::string::size_type >( i - begin() + 1 ) );
+	}
 
 	// Find First Occurrence of a Character
+	inline
 	size_type
-	find( char const c ) const;
+	find( char const c ) const
+	{
+		auto const i( std::find( begin(), end(), c ) );
+		return ( i == end() ? static_cast< std::string::size_type >( 0 ) : static_cast< std::string::size_type >( i - begin() + 1 ) );
+	}
 
 	// Find Last Occurrence of an Fstring
+	inline
 	size_type
-	find_last( Fstring const & s ) const;
+	find_last( Fstring const & s ) const
+	{
+		auto const i( std::find_end( begin(), end(), s.begin(), s.end() ) );
+		return ( i == end() ? static_cast< std::string::size_type >( 0 ) : static_cast< std::string::size_type >( i - begin() + 1 ) );
+	}
 
 	// Find Last Occurrence of a string
+	inline
 	size_type
-	find_last( std::string const & s ) const;
+	find_last( std::string const & s ) const
+	{
+		auto const i( std::search( begin(), end(), s.begin(), s.end() ) );
+		return ( i == end() ? static_cast< std::string::size_type >( 0 ) : static_cast< std::string::size_type >( i - begin() + 1 ) );
+	}
 
 	// Find Last Occurrence of a cstring
+	inline
 	size_type
-	find_last( c_cstring const s ) const;
+	find_last( c_cstring const s ) const
+	{
+		auto const i( std::search( begin(), end(), s, s + std::strlen( s ) ) );
+		return ( i == end() ? static_cast< std::string::size_type >( 0 ) : static_cast< std::string::size_type >( i - begin() + 1 ) );
+	}
 
 	// Find Last Occurrence of a Character
 	size_type

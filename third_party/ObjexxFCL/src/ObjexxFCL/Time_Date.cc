@@ -289,6 +289,65 @@ date( Fstring & day )
 	day( 4, 6 ) = mmm;
 }
 
+// Current Date String: DD-MMM-YY (Not Y2K Compliant)
+void
+date( std::string & day )
+{
+	int m, d, y;
+	idate( m, d, y );
+	std::stringstream s;
+	s << std::setfill( '0' ) << std::setw( 2 ) << d;
+	day = "  -   -  ";
+	day.replace( 0, 2, s.str() );
+	s.str( "" );
+	s << std::setfill( '0' ) << std::setw( 2 ) << y;
+	day.replace( 7, 2, s.str() );
+	std::string mmm;
+	switch ( m ) {
+	case 1:
+		mmm = "JAN";
+		break;
+	case 2:
+		mmm = "FEB";
+		break;
+	case 3:
+		mmm = "MAR";
+		break;
+	case 4:
+		mmm = "APR";
+		break;
+	case 5:
+		mmm = "MAY";
+		break;
+	case 6:
+		mmm = "JUN";
+		break;
+	case 7:
+		mmm = "JUL";
+		break;
+	case 8:
+		mmm = "AUG";
+		break;
+	case 9:
+		mmm = "SEP";
+		break;
+	case 10:
+		mmm = "OCT";
+		break;
+	case 11:
+		mmm = "NOV";
+		break;
+	case 12:
+		mmm = "DEC";
+		break;
+	default:
+		assert( false );
+		mmm + "   ";
+		break;
+	}
+	day.replace( 3, 3, mmm );
+}
+
 // Current Date String: YYDDD (Not Y2K Compliant)
 Fstring
 jdate()
@@ -373,6 +432,62 @@ date_and_time( Optional< Fstring > date, Optional< Fstring > time, Optional< Fst
 	int const zs( time_zone_offset_seconds() );
 	if ( zone.present() ) {
 		assert( zone().length() >= 5 );
+		int const zh( std::abs( zs ) / 3600 );
+		int const zm( ( std::abs( zs ) - ( zh * 3600 ) ) / 60 );
+		std::stringstream zone_stream;
+		zone_stream << std::setfill( '0' );
+		zone_stream << ( zs >= 0 ? '+' : '-' );
+		zone_stream << std::setw( 2 ) << zh;
+		zone_stream << std::setw( 2 ) << zm;
+		zone = zone_stream.str();
+	}
+
+	if ( values.present() ) {
+		assert( ( values().l() <= 1 ) && ( values().u() >= 8 ) );
+		values()( 1 ) = YY;
+		values()( 2 ) = MM;
+		values()( 3 ) = DD;
+		values()( 4 ) = zs / 60;
+		values()( 5 ) = hh;
+		values()( 6 ) = mm;
+		values()( 7 ) = ss;
+		values()( 8 ) = 0;
+	}
+}
+
+// Current Date and Time
+void
+date_and_time_string( Optional< std::string > date, Optional< std::string > time, Optional< std::string > zone, Optional< FArray1D< int > > values )
+{
+	std::time_t const current_time( std::time( NULL ) );
+	std::tm const * const timeinfo( std::localtime( &current_time ) );
+
+	int const DD( timeinfo->tm_mday ); // Day of month: 1,2,...
+	int const MM( timeinfo->tm_mon + 1 ); // Month of year: 1-12
+	int const YY( timeinfo->tm_year + 1900 ); // Year
+	if ( date.present() ) {
+		std::stringstream date_stream;
+		date_stream << std::setfill( '0' );
+		date_stream << std::setw( 4 ) << YY;
+		date_stream << std::setw( 2 ) << MM;
+		date_stream << std::setw( 2 ) << DD;
+		date = date_stream.str();
+	}
+
+	int const hh( timeinfo->tm_hour );
+	int const mm( timeinfo->tm_min );
+	int const ss( timeinfo->tm_sec );
+	if ( time.present() ) {
+		std::stringstream time_stream;
+		time_stream << std::setfill( '0' );
+		time_stream << std::setw( 2 ) << hh;
+		time_stream << std::setw( 2 ) << mm;
+		time_stream << std::setw( 2 ) << ss << ".000"; // Use a higher resolution time to get msec
+		time = time_stream.str();
+	}
+
+	int const zs( time_zone_offset_seconds() );
+	if ( zone.present() ) {
 		int const zh( std::abs( zs ) / 3600 );
 		int const zm( ( std::abs( zs ) - ( zh * 3600 ) ) / 60 );
 		std::stringstream zone_stream;
