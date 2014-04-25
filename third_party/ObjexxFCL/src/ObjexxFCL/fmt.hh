@@ -364,8 +364,8 @@ G( T const & t, Size w = TraitsG< T >::w(), Size const d = TraitsG< T >::d(), Si
 			Size const n( std::min( e + 2, w ) );
 			return F( t, w - n, d - 1 ) + std::string( n, ' ' );
 		} else {
-			int const p( std::floor( std::log10( m ) + 1 ) ); // Fortran 2003 rounding modes are not supported
-//			int const p( std::log10( m / ( T( 1.0 ) - ( T( 0.5 ) * std::pow( T( 10.0 ), -d ) ) ) ) + T( 1.0 ) ); // "Compatible" rounding mode: r = 0.5
+			int const p( static_cast< int >( std::floor( std::log10( m ) + T( 1 ) ) ) ); // Fortran 2003 rounding modes are not supported
+//			int const p( static_cast< int >( std::log10( m / ( T( 1.0 ) - ( T( 0.5 ) * std::pow( T( 10.0 ), -d ) ) ) ) + T( 1.0 ) ) ); // "Compatible" rounding mode: r = 0.5
 			if ( ( 0 <= p ) && ( p <= int( d ) + 2 ) ) { // Use F editing
 				Size const n( std::min( e + 2, w ) );
 				return F( t, w - n, d - std::min( Size( p ), d ) ) + std::string( n, ' ' );

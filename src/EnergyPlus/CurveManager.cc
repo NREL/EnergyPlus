@@ -3786,7 +3786,7 @@ Label999: ;
 					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\" " + PerfCurve( CurveIndex ).Name + "\"" );
 					ShowContinueError( "...Excess number of independent variables (2) passed to subroutine " "when only 1 is required." );
 				}
-				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\":" " Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 2.0, 2.0 );
+				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 2.0, 2.0 );
 			}
 		} else {
 			if ( TableLookup( TableIndex ).NumIndependentVars > 1 ) {
@@ -3794,7 +3794,7 @@ Label999: ;
 					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\" " + PerfCurve( CurveIndex ).Name + "\"" );
 					ShowContinueError( "...Insufficient number of independent variables (1) passed to subroutine " "when at least 2 are required." );
 				}
-				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\":" " Insufficient number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVLowErrorIndex, 1.0, 1.0 );
+				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Insufficient number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVLowErrorIndex, 1.0, 1.0 );
 			}
 			V2 = 0.0;
 		}
@@ -3806,7 +3806,7 @@ Label999: ;
 					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\" " + PerfCurve( CurveIndex ).Name + "\"" );
 					ShowContinueError( "...Excess number of independent variables (3) passed to subroutine " "when 2 or less are required." );
 				}
-				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\":" " Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 3.0, 3.0 );
+				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 3.0, 3.0 );
 			}
 		} else {
 			if ( TableLookup( TableIndex ).NumIndependentVars > 2 ) {
@@ -3814,7 +3814,7 @@ Label999: ;
 					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\" " + PerfCurve( CurveIndex ).Name + "\"" );
 					ShowContinueError( "...Insufficient number of independent variables (2) passed to subroutine " "when at least 3 are required." );
 				}
-				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\":" " Insufficient number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVLowErrorIndex, 2.0, 2.0 );
+				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Insufficient number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVLowErrorIndex, 2.0, 2.0 );
 			}
 			V3 = 0.0;
 		}
@@ -3826,7 +3826,7 @@ Label999: ;
 					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\" " + PerfCurve( CurveIndex ).Name + "\"" );
 					ShowContinueError( "...Excess number of independent variables (4) passed to subroutine " "when 3 or less are required." );
 				}
-				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\":" " Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 4.0, 4.0 );
+				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 4.0, 4.0 );
 			}
 		} else {
 			if ( TableLookup( TableIndex ).NumIndependentVars > 3 ) {
@@ -3834,7 +3834,7 @@ Label999: ;
 					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\" " + PerfCurve( CurveIndex ).Name + "\"" );
 					ShowContinueError( "...Insufficient number of independent variables (3) passed to subroutine " "when at least 4 are required." );
 				}
-				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\":" " Insufficient number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVLowErrorIndex, 3.0, 3.0 );
+				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Insufficient number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVLowErrorIndex, 3.0, 3.0 );
 			}
 			V4 = 0.0;
 		}
@@ -3846,7 +3846,7 @@ Label999: ;
 					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\" " + PerfCurve( CurveIndex ).Name + "\"" );
 					ShowContinueError( "...Excess number of independent variables (5) passed to subroutine " "when 4 or less are required." );
 				}
-				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\":" " Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 5.0, 5.0 );
+				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 5.0, 5.0 );
 			}
 		} else {
 			if ( TableLookup( TableIndex ).NumIndependentVars > 4 ) {
@@ -3854,7 +3854,7 @@ Label999: ;
 					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\" " + PerfCurve( CurveIndex ).Name + "\"" );
 					ShowContinueError( "...Insufficient number of independent variables (4) passed to subroutine " "when at least 5 are required." );
 				}
-				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\":" " Insufficient number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVLowErrorIndex, 4.0, 4.0 );
+				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Insufficient number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVLowErrorIndex, 4.0, 4.0 );
 			}
 			V5 = 0.0;
 		}

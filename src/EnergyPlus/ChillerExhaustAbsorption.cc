@@ -615,7 +615,7 @@ namespace ChillerExhaustAbsorption {
 				if ( ! AnyEnergyManagementSystemInModel ) {
 					if ( ! ExhaustAbsorber( ChillNum ).ChillSetPointErrDone ) {
 						ShowWarningError( "Missing temperature setpoint on cool side for chiller heater named " + ExhaustAbsorber( ChillNum ).Name );
-						ShowContinueError( "  A temperature setpoint is needed at the outlet node of this chiller " ", use a SetpointManager" );
+						ShowContinueError( "  A temperature setpoint is needed at the outlet node of this chiller, use a SetpointManager" );
 						ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );
 						ExhaustAbsorber( ChillNum ).ChillSetPointErrDone = true;
 					}
@@ -645,7 +645,7 @@ namespace ChillerExhaustAbsorption {
 				if ( ! AnyEnergyManagementSystemInModel ) {
 					if ( ! ExhaustAbsorber( ChillNum ).HeatSetPointErrDone ) {
 						ShowWarningError( "Missing temperature setpoint on heat side for chiller heater named " + ExhaustAbsorber( ChillNum ).Name );
-						ShowContinueError( "  A temperature setpoint is needed at the outlet node of this chiller " ", use a SetpointManager" );
+						ShowContinueError( "  A temperature setpoint is needed at the outlet node of this chiller, use a SetpointManager" );
 						ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );
 						ExhaustAbsorber( ChillNum ).HeatSetPointErrDone = true;
 					}
@@ -1461,14 +1461,14 @@ namespace ChillerExhaustAbsorption {
 			if ( lExhHeatRecPotentialCool < lCoolThermalEnergyUseRate ) {
 				if ( ExhaustAbsorber( ChillNum ).ExhTempLTAbsLeavingTempIndex == 0 ) {
 					ShowWarningError( "ChillerHeater:Absorption:DoubleEffect \"" + ExhaustAbsorber( ChillNum ).Name + "\"" );
-					ShowContinueError( "...Exhaust temperature and flow input from Micro Turbine is not sufficient during cooling " "to run the chiller " );
+					ShowContinueError( "...Exhaust temperature and flow input from Micro Turbine is not sufficient during cooling to run the chiller " );
 					ShowContinueError( "...Value of Exhaust air inlet temp =" + TrimSigDigits( lExhaustInTemp, 4 ) + " C." );
 					ShowContinueError( "... and Exhaust air flow rate of " + TrimSigDigits( lExhaustInFlow, 2 ) + " kg/s." );
 					ShowContinueError( "...Value of minimum absorber leaving temp =" + TrimSigDigits( AbsLeavingTemp, 4 ) + " C." );
-					ShowContinueError( "...Either increase the Exhaust temperature (min required = 350 C )  " "or flow or both of Micro Turbine to meet the min available potential criteria." );
+					ShowContinueError( "...Either increase the Exhaust temperature (min required = 350 C )  or flow or both of Micro Turbine to meet the min available potential criteria." );
 					ShowContinueErrorTimeStamp( "... Simulation will continue." );
 				}
-				ShowRecurringWarningErrorAtEnd( "ChillerHeater:Absorption:DoubleEffect \"" + ExhaustAbsorber( ChillNum ).Name + "\":" " Exhaust temperature from Micro Turbine is not sufficient to run the chiller during cooling warning continues...", ExhaustAbsorber( ChillNum ).ExhTempLTAbsLeavingTempIndex, lExhaustInTemp, AbsLeavingTemp );
+				ShowRecurringWarningErrorAtEnd( "ChillerHeater:Absorption:DoubleEffect \"" + ExhaustAbsorber( ChillNum ).Name + "\": Exhaust temperature from Micro Turbine is not sufficient to run the chiller during cooling warning continues...", ExhaustAbsorber( ChillNum ).ExhTempLTAbsLeavingTempIndex, lExhaustInTemp, AbsLeavingTemp );
 				// If exhaust is not available, it means the avilable thermal energy is 0.0 and Chiller is not available
 				lCoolThermalEnergyUseRate = 0.0;
 				lTowerLoad = 0.0;
@@ -1791,14 +1791,14 @@ namespace ChillerExhaustAbsorption {
 			if ( lExhHeatRecPotentialHeat < lHeatThermalEnergyUseRate ) {
 				if ( ExhaustAbsorber( ChillNum ).ExhTempLTAbsLeavingHeatingTempIndex == 0 ) {
 					ShowWarningError( "ChillerHeater:Absorption:DoubleEffect \"" + ExhaustAbsorber( ChillNum ).Name + "\"" );
-					ShowContinueError( "...Exhaust temperature and flow input from Micro Turbine is not sufficient " "to run the chiller during heating ." );
+					ShowContinueError( "...Exhaust temperature and flow input from Micro Turbine is not sufficient to run the chiller during heating ." );
 					ShowContinueError( "...Value of Exhaust air inlet temp =" + TrimSigDigits( lExhaustInTemp, 4 ) + " C." );
 					ShowContinueError( "... and Exhaust air flow rate of " + TrimSigDigits( lExhaustInFlow, 2 ) + " kg/s." );
 					ShowContinueError( "...Value of minimum absorber leaving temp =" + TrimSigDigits( AbsLeavingTemp, 4 ) + " C." );
-					ShowContinueError( "...Either increase the Exhaust temperature (min required = 350 C  )  " "or flow or both of Micro Turbine to meet the min available potential criteria." );
+					ShowContinueError( "...Either increase the Exhaust temperature (min required = 350 C  )  or flow or both of Micro Turbine to meet the min available potential criteria." );
 					ShowContinueErrorTimeStamp( "... Simulation will continue." );
 				}
-				ShowRecurringWarningErrorAtEnd( "ChillerHeater:Absorption:DoubleEffect \"" + ExhaustAbsorber( ChillNum ).Name + "\":" " Exhaust temperature from Micro Turbine is not sufficient to run the chiller during " "heating warning continues...", ExhaustAbsorber( ChillNum ).ExhTempLTAbsLeavingHeatingTempIndex, lExhaustInTemp, AbsLeavingTemp );
+				ShowRecurringWarningErrorAtEnd( "ChillerHeater:Absorption:DoubleEffect \"" + ExhaustAbsorber( ChillNum ).Name + "\": Exhaust temperature from Micro Turbine is not sufficient to run the chiller during heating warning continues...", ExhaustAbsorber( ChillNum ).ExhTempLTAbsLeavingHeatingTempIndex, lExhaustInTemp, AbsLeavingTemp );
 				// If exhaust is not available, it means the avilable thermal energy is 0.0 and Chiller is not available
 				lHeatThermalEnergyUseRate = 0.0;
 				lHeatElectricPower = 0.0;

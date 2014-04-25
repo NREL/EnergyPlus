@@ -1147,7 +1147,7 @@ namespace HeatBalanceAirManager {
 					}
 					if ( Ventilation( Loop ).MinIndoorTempSchedPtr == 0 && lNumericFieldBlanks( 11 ) && ( ! lAlphaFieldBlanks( 6 ) ) ) {
 						if ( Item1 == 1 ) {
-							ShowWarningError( RoutineName + cNumericFieldNames( 11 ) + ": " "the value field is blank and schedule field is invalid. The default " "value will be used (" + RoundSigDigits( -VentilTempLimit, 1 ) + ") " );
+							ShowWarningError( RoutineName + cNumericFieldNames( 11 ) + ": the value field is blank and schedule field is invalid. The default " "value will be used (" + RoundSigDigits( -VentilTempLimit, 1 ) + ") " );
 							ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 						}
 					}
@@ -1184,7 +1184,7 @@ namespace HeatBalanceAirManager {
 					}
 					if ( Ventilation( Loop ).MaxIndoorTempSchedPtr == 0 && lNumericFieldBlanks( 12 ) && ( ! lAlphaFieldBlanks( 7 ) ) ) {
 						if ( Item1 == 1 ) {
-							ShowWarningError( RoutineName + cNumericFieldNames( 12 ) + ": " "the value field is blank and schedule field is invalid. The default " "value will be used (" + RoundSigDigits( VentilTempLimit, 1 ) + ") " );
+							ShowWarningError( RoutineName + cNumericFieldNames( 12 ) + ": the value field is blank and schedule field is invalid. The default " "value will be used (" + RoundSigDigits( VentilTempLimit, 1 ) + ") " );
 							ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 						}
 					}
@@ -1290,7 +1290,7 @@ namespace HeatBalanceAirManager {
 							}
 						}
 						if ( Ventilation( Loop ).MaxOutdoorTempSchedPtr == 0 && lNumericFieldBlanks( 15 ) && ( ! lAlphaFieldBlanks( 10 ) ) ) {
-							ShowWarningError( RoutineName + cNumericFieldNames( 15 ) + ": " "the value field is blank and schedule field is invalid." " The default value will be used (" + RoundSigDigits( VentilTempLimit, 1 ) + ") " );
+							ShowWarningError( RoutineName + cNumericFieldNames( 15 ) + ": the value field is blank and schedule field is invalid." " The default value will be used (" + RoundSigDigits( VentilTempLimit, 1 ) + ") " );
 							ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 						}
 						// Check Maximum outdoor temperature value and schedule fields
@@ -1439,7 +1439,7 @@ namespace HeatBalanceAirManager {
 				}
 			}
 			if ( Ventilation( VentiCount ).MinIndoorTempSchedPtr == 0 && lNumericFieldBlanks( 6 ) && ( ! lAlphaFieldBlanks( 4 ) ) ) {
-				ShowWarningError( RoutineName + cNumericFieldNames( 6 ) + ": " "the value field is blank and schedule field is invalid. The default " "value will be used (" + RoundSigDigits( -VentilTempLimit, 1 ) + ") " );
+				ShowWarningError( RoutineName + cNumericFieldNames( 6 ) + ": the value field is blank and schedule field is invalid. The default " "value will be used (" + RoundSigDigits( -VentilTempLimit, 1 ) + ") " );
 				ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 			}
 			// Check Minimum indoor temperature value and schedule fields
@@ -1468,7 +1468,7 @@ namespace HeatBalanceAirManager {
 				}
 			}
 			if ( Ventilation( VentiCount ).MaxIndoorTempSchedPtr == 0 && lNumericFieldBlanks( 7 ) && ( ! lAlphaFieldBlanks( 5 ) ) ) {
-				ShowWarningError( RoutineName + cNumericFieldNames( 7 ) + ": " "the value field is blank and schedule field is invalid. The default " "value will be used (" + RoundSigDigits( VentilTempLimit, 1 ) + ") " );
+				ShowWarningError( RoutineName + cNumericFieldNames( 7 ) + ": the value field is blank and schedule field is invalid. The default " "value will be used (" + RoundSigDigits( VentilTempLimit, 1 ) + ") " );
 				ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 			}
 			// Check Maximum indoor temperature value and schedule fields
@@ -1549,7 +1549,7 @@ namespace HeatBalanceAirManager {
 				}
 			}
 			if ( Ventilation( VentiCount ).MaxOutdoorTempSchedPtr == 0 && lNumericFieldBlanks( 10 ) && ( ! lAlphaFieldBlanks( 8 ) ) ) {
-				ShowWarningError( RoutineName + cNumericFieldNames( 10 ) + ": " "the value field is blank and schedule field is invalid." " The default value will be used (" + RoundSigDigits( VentilTempLimit, 1 ) + ") " );
+				ShowWarningError( RoutineName + cNumericFieldNames( 10 ) + ": the value field is blank and schedule field is invalid." " The default value will be used (" + RoundSigDigits( VentilTempLimit, 1 ) + ") " );
 				ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 			}
 			// Check Maximum outdoor temperature value and schedule fields

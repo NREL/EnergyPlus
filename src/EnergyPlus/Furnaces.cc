@@ -8637,7 +8637,7 @@ namespace Furnaces {
 							ShowContinueErrorTimeStamp( "Cycling ratio returned=" + RoundSigDigits( PartLoadFrac, 2 ) );
 						} else {
 							++ErrCountCyc;
-							ShowRecurringWarningErrorAtEnd( Furnace( FurnaceNum ).Name + "\":" " Iteration limit warning exceeding calculating DX unit cycling ratio  continues...", Furnace( FurnaceNum ).ErrIndexCyc, PartLoadFrac, PartLoadFrac );
+							ShowRecurringWarningErrorAtEnd( Furnace( FurnaceNum ).Name + "\": Iteration limit warning exceeding calculating DX unit cycling ratio  continues...", Furnace( FurnaceNum ).ErrIndexCyc, PartLoadFrac, PartLoadFrac );
 						}
 					}
 				} else if ( SolFla == -2 ) {
@@ -8686,7 +8686,7 @@ namespace Furnaces {
 							ShowContinueErrorTimeStamp( "Speed ratio returned=[" + RoundSigDigits( SpeedRatio, 2 ) + "], Speed number =" + RoundSigDigits( SpeedNum ) );
 						} else {
 							++ErrCountVar;
-							ShowRecurringWarningErrorAtEnd( Furnace( FurnaceNum ).Name + "\":" " Iteration limit warning exceeding calculating DX unit speed ratio continues...", Furnace( FurnaceNum ).ErrIndexVar, SpeedRatio, SpeedRatio );
+							ShowRecurringWarningErrorAtEnd( Furnace( FurnaceNum ).Name + "\": Iteration limit warning exceeding calculating DX unit speed ratio continues...", Furnace( FurnaceNum ).ErrIndexVar, SpeedRatio, SpeedRatio );
 						}
 					}
 				} else if ( SolFla == -2 ) {

@@ -1933,9 +1933,9 @@ namespace ScheduleManager {
 		FArray1D_string ShowMinute;
 		int CurMinute;
 		FArray1D_string TimeHHMM;
-		static std::string SchWFmt( "('! <WeekSchedule>,Name" );
-		static std::string SchDFmt;
-		static std::string SchDFmtdata;
+		std::string SchWFmt( "('! <WeekSchedule>,Name" );
+		std::string SchDFmt;
+		std::string SchDFmtdata;
 		std::string YesNo1;
 		std::string YesNo2;
 		std::string Num1;

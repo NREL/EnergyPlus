@@ -1345,8 +1345,8 @@ namespace PlantCentralGSHP {
 					if ( ! AnyEnergyManagementSystemInModel ) {
 						if ( ! Wrapper( WrapperNum ).CoolSetPointErrDone ) {
 							ShowWarningError( "Missing temperature setpoint on cooling side for CentralHeatPumpSystem named " + Wrapper( WrapperNum ).Name );
-							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a CentralHeatPumpSystem " ", use a SetpointManager" );
-							ShowContinueError( "  The overall loop setpoint will be assumed for CentralHeatPumpSystem. " "The simulation continues ... " );
+							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a CentralHeatPumpSystem, use a SetpointManager" );
+							ShowContinueError( "  The overall loop setpoint will be assumed for CentralHeatPumpSystem. The simulation continues ... " );
 							Wrapper( WrapperNum ).CoolSetPointErrDone = true;
 						}
 					} else {
@@ -1359,7 +1359,7 @@ namespace PlantCentralGSHP {
 								ShowContinueError( "A temperature setpoint is needed at the outlet node of a CentralHeatPumpSystem " );
 								ShowContinueError( "use a Setpoint Manager to establish a setpoint at the chiller side outlet node " );
 								ShowContinueError( "or use an EMS actuator to establish a setpoint at the outlet node " );
-								ShowContinueError( "The overall loop setpoint will be assumed for chiller side. " "The simulation continues ... " );
+								ShowContinueError( "The overall loop setpoint will be assumed for chiller side. The simulation continues ... " );
 								Wrapper( WrapperNum ).CoolSetPointErrDone = true;
 							}
 						}
@@ -1372,8 +1372,8 @@ namespace PlantCentralGSHP {
 					if ( ! AnyEnergyManagementSystemInModel ) {
 						if ( ! Wrapper( WrapperNum ).HeatSetPointErrDone ) {
 							ShowWarningError( "Missing temperature setpoint on heating side for CentralHeatPumpSystem named " + Wrapper( WrapperNum ).Name );
-							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a CentralHeatPumpSystem " ", use a SetpointManager" );
-							ShowContinueError( "  The overall loop setpoint will be assumed for CentralHeatPumpSystem. " "The simulation continues ... " );
+							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a CentralHeatPumpSystem, use a SetpointManager" );
+							ShowContinueError( "  The overall loop setpoint will be assumed for CentralHeatPumpSystem. The simulation continues ... " );
 							Wrapper( WrapperNum ).HeatSetPointErrDone = true;
 						}
 					} else {
@@ -1386,7 +1386,7 @@ namespace PlantCentralGSHP {
 								ShowContinueError( "A temperature setpoint is needed at the outlet node of a CentralHeatPumpSystem " );
 								ShowContinueError( "use a Setpoint Manager to establish a setpoint at the chiller side outlet node " );
 								ShowContinueError( "or use an EMS actuator to establish a setpoint at the outlet node " );
-								ShowContinueError( "The overall loop setpoint will be assumed for chiller side. " "The simulation continues ... " );
+								ShowContinueError( "The overall loop setpoint will be assumed for chiller side. The simulation continues ... " );
 								Wrapper( WrapperNum ).HeatSetPointErrDone = true;
 							}
 						}
@@ -1798,7 +1798,7 @@ namespace PlantCentralGSHP {
 						ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
 					} else if ( ! WarmupFlag ) {
 						++Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).ChillerCapFTError;
-						ShowRecurringWarningErrorAtEnd( "ChillerHeaterPerformance:Electric:EIR \"" + Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name + "\":" " ChillerHeater Capacity as a Function of Temperature curve output is negative warning continues...", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).ChillerCapFTErrorIndex, ChillerCapFT, ChillerCapFT );
+						ShowRecurringWarningErrorAtEnd( "ChillerHeaterPerformance:Electric:EIR \"" + Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name + "\": ChillerHeater Capacity as a Function of Temperature curve output is negative warning continues...", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).ChillerCapFTErrorIndex, ChillerCapFT, ChillerCapFT );
 					}
 					ChillerCapFT = 0.0;
 				}
@@ -2343,7 +2343,7 @@ namespace PlantCentralGSHP {
 							ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
 						} else if ( ! WarmupFlag ) {
 							++Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).ChillerCapFTError;
-							ShowRecurringWarningErrorAtEnd( "ChillerHeaterPerformance:Electric:EIR \"" + Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name + "\":" " ChillerHeater Capacity as a Function of Temperature curve output is negative warning continues...", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).ChillerCapFTErrorIndex, ChillerCapFT, ChillerCapFT );
+							ShowRecurringWarningErrorAtEnd( "ChillerHeaterPerformance:Electric:EIR \"" + Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name + "\": ChillerHeater Capacity as a Function of Temperature curve output is negative warning continues...", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).ChillerCapFTErrorIndex, ChillerCapFT, ChillerCapFT );
 						}
 						ChillerCapFT = 0.0;
 					}

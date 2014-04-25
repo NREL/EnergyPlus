@@ -5566,7 +5566,7 @@ namespace PackagedTerminalHeatPump {
 							ShowContinueErrorTimeStamp( "Cycling ratio returned=" + RoundSigDigits( PartLoadFrac, 2 ) );
 						} else {
 							++ErrCountCyc;
-							ShowRecurringWarningErrorAtEnd( PTUnit( PTUnitNum ).Name + "\":" " Iteration limit warning exceeding calculating DX unit cycling ratio  continues...", PTUnit( PTUnitNum ).ErrIndexCyc, PartLoadFrac, PartLoadFrac );
+							ShowRecurringWarningErrorAtEnd( PTUnit( PTUnitNum ).Name + "\": Iteration limit warning exceeding calculating DX unit cycling ratio  continues...", PTUnit( PTUnitNum ).ErrIndexCyc, PartLoadFrac, PartLoadFrac );
 						}
 					}
 				} else if ( SolFla == -2 ) {
@@ -5617,7 +5617,7 @@ namespace PackagedTerminalHeatPump {
 							ShowContinueErrorTimeStamp( "Speed ratio returned=[" + RoundSigDigits( SpeedRatio, 2 ) + "], Speed number =" + RoundSigDigits( SpeedNum ) );
 						} else {
 							++ErrCountVar;
-							ShowRecurringWarningErrorAtEnd( PTUnit( PTUnitNum ).Name + "\":" " Iteration limit warning exceeding calculating DX unit speed ratio continues...", PTUnit( PTUnitNum ).ErrIndexVar, SpeedRatio, SpeedRatio );
+							ShowRecurringWarningErrorAtEnd( PTUnit( PTUnitNum ).Name + "\": Iteration limit warning exceeding calculating DX unit speed ratio continues...", PTUnit( PTUnitNum ).ErrIndexVar, SpeedRatio, SpeedRatio );
 						}
 					}
 				} else if ( SolFla == -2 ) {

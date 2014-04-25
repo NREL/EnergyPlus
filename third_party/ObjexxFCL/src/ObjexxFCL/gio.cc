@@ -104,12 +104,12 @@ open( Unit const unit, Name const & name, IOFlags & flags )
 		} else { // Default to read+write
 			p = streams().add( unit, name, flags );
 		}
-		if ( ! p ) {
+		if ( p == nullptr ) {
 			flags.err( true ).ios( 30 );
 		} else if ( ! p->is_open() ) {
 			flags.err( true ).ios( 600 );
 		}
-		return p;
+		return ( p != nullptr );
 	} else {
 		flags.err( true ).ios( 32 );
 		return false;

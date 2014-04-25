@@ -631,7 +631,7 @@ namespace ChillerGasAbsorption {
 				if ( ! AnyEnergyManagementSystemInModel ) {
 					if ( ! GasAbsorber( ChillNum ).ChillSetPointErrDone ) {
 						ShowWarningError( "Missing temperature setpoint on cool side for chiller heater named " + GasAbsorber( ChillNum ).Name );
-						ShowContinueError( "  A temperature setpoint is needed at the outlet node of this chiller " ", use a SetpointManager" );
+						ShowContinueError( "  A temperature setpoint is needed at the outlet node of this chiller, use a SetpointManager" );
 						ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );
 						GasAbsorber( ChillNum ).ChillSetPointErrDone = true;
 					}
@@ -661,7 +661,7 @@ namespace ChillerGasAbsorption {
 				if ( ! AnyEnergyManagementSystemInModel ) {
 					if ( ! GasAbsorber( ChillNum ).HeatSetPointErrDone ) {
 						ShowWarningError( "Missing temperature setpoint on heat side for chiller heater named " + GasAbsorber( ChillNum ).Name );
-						ShowContinueError( "  A temperature setpoint is needed at the outlet node of this chiller " ", use a SetpointManager" );
+						ShowContinueError( "  A temperature setpoint is needed at the outlet node of this chiller, use a SetpointManager" );
 						ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );
 						GasAbsorber( ChillNum ).HeatSetPointErrDone = true;
 					}

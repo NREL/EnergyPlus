@@ -39,7 +39,7 @@ void
 get_environment_variable( std::string const & name, Optional< std::string > value = _, Optional< int > length = _, Optional< int > status = _, Optional< bool const > trim_name = _ );
 
 // Get Environment Variable Value
-int
+std::string::size_type
 getenvqq( std::string const & name, std::string & value );
 
 // Set Environment Variable Value

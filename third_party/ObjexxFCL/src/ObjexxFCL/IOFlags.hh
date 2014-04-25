@@ -515,7 +515,7 @@ public: // Properties
 
 	// Binary String
 	inline
-	bool
+	std::string
 	BINARY() const
 	{
 		return ( binary_ ? "YES" : "NO" );
@@ -554,7 +554,7 @@ public: // Properties
 
 	// Append String
 	inline
-	bool
+	std::string
 	APPEND() const
 	{
 		return ( append_ ? "YES" : "NO" );

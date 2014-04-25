@@ -48,7 +48,7 @@ getenvqq( Fstring const & name, Fstring & value )
 {
 	char const * const cval( getenv( name.c_str() ) );
 	value = ( cval ? cval : "" );
-	return value.length();
+	return static_cast< int >( value.length() );
 }
 
 // Set Environment Variable Value
@@ -94,7 +94,7 @@ get_environment_variable( std::string const & name, Optional< std::string > valu
 }
 
 // Get Environment Variable Value
-int
+std::string::size_type
 getenvqq( std::string const & name, std::string & value )
 {
 	char const * const cval( getenv( name.c_str() ) );

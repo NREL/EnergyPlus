@@ -1,1 +1,18 @@
-# nothing yet
+*.a
+*.d
+*.dll
+*.exe
+*.lib
+*.log
+*.map
+*.o
+*.o-*
+*.obj
+*.orig
+*.pdb
+*.rc
+*.res
+*.so
+*.so.*
+*~
+.directory

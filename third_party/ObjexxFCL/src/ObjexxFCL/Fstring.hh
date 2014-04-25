@@ -2181,7 +2181,7 @@ inline
 int
 index( Fstring const & s, Fstring const & ss, bool const last = false )
 {
-	return ( last ? s.find_last( ss ) : s.find( ss ) );
+	return static_cast< int >( last ? s.find_last( ss ) : s.find( ss ) );
 }
 
 // First Index Position of a Substring in an Fstring
@@ -2189,7 +2189,7 @@ inline
 int
 index( Fstring const & s, std::string const & ss, bool const last = false )
 {
-	return ( last ? s.find_last( ss ) : s.find( ss ) );
+	return static_cast< int >( last ? s.find_last( ss ) : s.find( ss ) );
 }
 
 // First Index Position of a Substring in an Fstring
@@ -2197,7 +2197,7 @@ inline
 int
 index( Fstring const & s, c_cstring const ss, bool const last = false )
 {
-	return ( last ? s.find_last( ss ) : s.find( ss ) );
+	return static_cast< int >( last ? s.find_last( ss ) : s.find( ss ) );
 }
 
 // First Index Position of a Character in an Fstring
@@ -2205,7 +2205,7 @@ inline
 int
 index( Fstring const & s, char const c, bool const last = false )
 {
-	return ( last ? s.find_last( c ) : s.find( c ) );
+	return static_cast< int >( last ? s.find_last( c ) : s.find( c ) );
 }
 
 // Last Index of a Substring
@@ -2222,7 +2222,7 @@ inline
 int
 INDEX( Fstring const & s, Fstring const & ss, bool const last = false )
 {
-	return ( last ? s.find_last( ss ) : s.find( ss ) );
+	return static_cast< int >( last ? s.find_last( ss ) : s.find( ss ) );
 }
 
 // First Index Position of a Substring in an Fstring
@@ -2230,7 +2230,7 @@ inline
 int
 INDEX( Fstring const & s, std::string const & ss, bool const last = false )
 {
-	return ( last ? s.find_last( ss ) : s.find( ss ) );
+	return static_cast< int >( last ? s.find_last( ss ) : s.find( ss ) );
 }
 
 // First Index Position of a Substring in an Fstring
@@ -2238,7 +2238,7 @@ inline
 int
 INDEX( Fstring const & s, c_cstring const ss, bool const last = false )
 {
-	return ( last ? s.find_last( ss ) : s.find( ss ) );
+	return static_cast< int >( last ? s.find_last( ss ) : s.find( ss ) );
 }
 
 // First Index Position of a Character in an Fstring
@@ -2246,7 +2246,7 @@ inline
 int
 INDEX( Fstring const & s, char const c, bool const last = false )
 {
-	return ( last ? s.find_last( c ) : s.find( c ) );
+	return static_cast< int >( last ? s.find_last( c ) : s.find( c ) );
 }
 
 // Index of a Substring in an Fstring Case-Insensitively
@@ -2297,12 +2297,12 @@ int
 indexi( Fstring const & s, char const c, bool const last = false )
 {
 	if ( last ) {
-		for ( int i = s.length(), e = 1; i >= e; --i ) {
-			if ( equali_char( s[ i ], c ) ) return i;
+		for ( Fstring::size_type i = s.length(), e = 1; i >= e; --i ) {
+			if ( equali_char( s[ i ], c ) ) return static_cast< int >( i );
 		}
 	} else {
-		for ( int i = 1, e = s.length(); i <= e; ++i ) {
-			if ( equali_char( s[ i ], c ) ) return i;
+		for ( Fstring::size_type i = 1, e = s.length(); i <= e; ++i ) {
+			if ( equali_char( s[ i ], c ) ) return static_cast< int >( i );
 		}
 	}
 	return 0; // Not found
@@ -2322,7 +2322,7 @@ inline
 int
 scan( Fstring const & s, Fstring const & t, bool const last = false )
 {
-	return ( last ? s.find_last_of( t ) : s.find_first_of( t ) );
+	return static_cast< int >( last ? s.find_last_of( t ) : s.find_first_of( t ) );
 }
 
 // Find any Characters of Another String
@@ -2330,7 +2330,7 @@ inline
 int
 scan( Fstring const & s, std::string const & t, bool const last = false )
 {
-	return ( last ? s.find_last_of( t ) : s.find_first_of( t ) );
+	return static_cast< int >( last ? s.find_last_of( t ) : s.find_first_of( t ) );
 }
 
 // Find any Characters of Another String
@@ -2338,7 +2338,7 @@ inline
 int
 scan( Fstring const & s, c_cstring const t, bool const last = false )
 {
-	return ( last ? s.find_last_of( t ) : s.find_first_of( t ) );
+	return static_cast< int >( last ? s.find_last_of( t ) : s.find_first_of( t ) );
 }
 
 // Find a Character
@@ -2346,7 +2346,7 @@ inline
 int
 scan( Fstring const & s, char const c, bool const last = false )
 {
-	return ( last ? s.find_last_of( c ) : s.find_first_of( c ) );
+	return static_cast< int >( last ? s.find_last_of( c ) : s.find_first_of( c ) );
 }
 
 // Find any Characters of Another String
@@ -2354,7 +2354,7 @@ inline
 int
 SCAN( Fstring const & s, Fstring const & t, bool const last = false )
 {
-	return ( last ? s.find_last_of( t ) : s.find_first_of( t ) );
+	return static_cast< int >( last ? s.find_last_of( t ) : s.find_first_of( t ) );
 }
 
 // Find any Characters of Another String
@@ -2362,7 +2362,7 @@ inline
 int
 SCAN( Fstring const & s, std::string const & t, bool const last = false )
 {
-	return ( last ? s.find_last_of( t ) : s.find_first_of( t ) );
+	return static_cast< int >( last ? s.find_last_of( t ) : s.find_first_of( t ) );
 }
 
 // Find any Characters of Another String
@@ -2370,7 +2370,7 @@ inline
 int
 SCAN( Fstring const & s, c_cstring const t, bool const last = false )
 {
-	return ( last ? s.find_last_of( t ) : s.find_first_of( t ) );
+	return static_cast< int >( last ? s.find_last_of( t ) : s.find_first_of( t ) );
 }
 
 // Find a Character
@@ -2378,7 +2378,7 @@ inline
 int
 SCAN( Fstring const & s, char const c, bool const last = false )
 {
-	return ( last ? s.find_last_of( c ) : s.find_first_of( c ) );
+	return static_cast< int >( last ? s.find_last_of( c ) : s.find_first_of( c ) );
 }
 
 // Find any Characters not of Another String
@@ -2386,7 +2386,7 @@ inline
 int
 verify( Fstring const & s, Fstring const & t, bool const last = false )
 {
-	return ( last ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
+	return static_cast< int >( last ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
 }
 
 // Find any Characters not of Another String
@@ -2394,7 +2394,7 @@ inline
 int
 verify( Fstring const & s, std::string const & t, bool const last = false )
 {
-	return ( last ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
+	return static_cast< int >( last ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
 }
 
 // Find any Characters not of Another String
@@ -2402,7 +2402,7 @@ inline
 int
 verify( Fstring const & s, c_cstring const t, bool const last = false )
 {
-	return ( last ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
+	return static_cast< int >( last ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
 }
 
 // Find Character not a Character
@@ -2410,7 +2410,7 @@ inline
 int
 verify( Fstring const & s, char const c, bool const last = false )
 {
-	return ( last ? s.find_last_not_of( c ) : s.find_first_not_of( c ) );
+	return static_cast< int >( last ? s.find_last_not_of( c ) : s.find_first_not_of( c ) );
 }
 
 // Find any Characters not of Another String
@@ -2418,7 +2418,7 @@ inline
 int
 VERIFY( Fstring const & s, Fstring const & t, bool const last = false )
 {
-	return ( last ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
+	return static_cast< int >( last ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
 }
 
 // Find any Characters not of Another String
@@ -2426,7 +2426,7 @@ inline
 int
 VERIFY( Fstring const & s, std::string const & t, bool const last = false )
 {
-	return ( last ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
+	return static_cast< int >( last ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
 }
 
 // Find any Characters not of Another String
@@ -2434,7 +2434,7 @@ inline
 int
 VERIFY( Fstring const & s, c_cstring const t, bool const last = false )
 {
-	return ( last ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
+	return static_cast< int >( last ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
 }
 
 // Find Character not a Character
@@ -2442,7 +2442,7 @@ inline
 int
 VERIFY( Fstring const & s, char const c, bool const last = false )
 {
-	return ( last ? s.find_last_not_of( c ) : s.find_first_not_of( c ) );
+	return static_cast< int >( last ? s.find_last_not_of( c ) : s.find_first_not_of( c ) );
 }
 
 // Length
@@ -2450,7 +2450,7 @@ inline
 int
 len( Fstring const & s )
 {
-	return s.length();
+	return static_cast< int >( s.length() );
 }
 
 // Length
@@ -2458,7 +2458,7 @@ inline
 int
 LEN( Fstring const & s )
 {
-	return s.length();
+	return static_cast< int >( s.length() );
 }
 
 // Length Space-Trimmed
@@ -2466,7 +2466,7 @@ inline
 int
 len_trim( Fstring const & s )
 {
-	return s.len_trim();
+	return static_cast< int >( s.len_trim() );
 }
 
 // Length Space-Trimmed
@@ -2474,7 +2474,7 @@ inline
 int
 LEN_TRIM( Fstring const & s )
 {
-	return s.len_trim();
+	return static_cast< int >( s.len_trim() );
 }
 
 // Space-Trimmed Copy
@@ -2624,7 +2624,7 @@ inline
 int
 last_index( Fstring const & s, Fstring const & ss )
 {
-	return s.find_last( ss );
+	return static_cast< int >( s.find_last( ss ) );
 }
 
 // Last Index Position of a Substring in an Fstring
@@ -2632,7 +2632,7 @@ inline
 int
 last_index( Fstring const & s, std::string const & ss )
 {
-	return s.find_last( ss );
+	return static_cast< int >( s.find_last( ss ) );
 }
 
 // Last Index Position of a Substring in an Fstring
@@ -2640,7 +2640,7 @@ inline
 int
 last_index( Fstring const & s, c_cstring const ss )
 {
-	return s.find_last( ss );
+	return static_cast< int >( s.find_last( ss ) );
 }
 
 // Last Index Position of a Character in an Fstring
@@ -2648,7 +2648,7 @@ inline
 int
 last_index( Fstring const & s, char const c )
 {
-	return s.find_last( c );
+	return static_cast< int >( s.find_last( c ) );
 }
 
 // Modifier

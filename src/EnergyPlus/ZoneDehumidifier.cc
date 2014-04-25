@@ -750,7 +750,7 @@ namespace ZoneDehumidifier {
 					ShowContinueError( " Negative value occurs using an inlet air dry-bulb temperature of " + TrimSigDigits( InletAirTemp, 2 ) + " and an inlet air relative humidity of " + TrimSigDigits( InletAirRH, 1 ) + '.' );
 					ShowContinueErrorTimeStamp( " Dehumidifier turned off for this time step but simulation continues." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( ZoneDehumid( ZoneDehumNum ).UnitType + " \"" + ZoneDehumid( ZoneDehumNum ).Name + "\":" " Water Removal Rate Curve output is <= 0.0 warning continues...", ZoneDehumid( ZoneDehumNum ).WaterRemovalCurveErrorIndex, WaterRemovalRateFactor, WaterRemovalRateFactor );
+					ShowRecurringWarningErrorAtEnd( ZoneDehumid( ZoneDehumNum ).UnitType + " \"" + ZoneDehumid( ZoneDehumNum ).Name + "\": Water Removal Rate Curve output is <= 0.0 warning continues...", ZoneDehumid( ZoneDehumNum ).WaterRemovalCurveErrorIndex, WaterRemovalRateFactor, WaterRemovalRateFactor );
 				}
 				WaterRemovalRateFactor = 0.0;
 			}
@@ -777,7 +777,7 @@ namespace ZoneDehumidifier {
 					ShowContinueError( " Negative value occurs using an inlet air dry-bulb temperature of " + TrimSigDigits( InletAirTemp, 2 ) + " and an inlet air relative humidity of " + TrimSigDigits( InletAirRH, 1 ) + '.' );
 					ShowContinueErrorTimeStamp( " Dehumidifier turned off for this time step but simulation continues." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( ZoneDehumid( ZoneDehumNum ).UnitType + " \"" + ZoneDehumid( ZoneDehumNum ).Name + "\":" " Energy Factor Curve output is <= 0.0 warning continues...", ZoneDehumid( ZoneDehumNum ).EnergyFactorCurveErrorIndex, EnergyFactorAdjFactor, EnergyFactorAdjFactor );
+					ShowRecurringWarningErrorAtEnd( ZoneDehumid( ZoneDehumNum ).UnitType + " \"" + ZoneDehumid( ZoneDehumNum ).Name + "\": Energy Factor Curve output is <= 0.0 warning continues...", ZoneDehumid( ZoneDehumNum ).EnergyFactorCurveErrorIndex, EnergyFactorAdjFactor, EnergyFactorAdjFactor );
 				}
 				ElectricPowerAvg = 0.0;
 				PLR = 0.0;
@@ -799,7 +799,7 @@ namespace ZoneDehumidifier {
 						ShowContinueError( " The Part Load Fraction Correlation Curve output is (" + TrimSigDigits( PLF, 2 ) + ") at a part-load ratio =" + TrimSigDigits( PLR, 3 ) );
 						ShowContinueErrorTimeStamp( " PLF curve values must be >= 0.7. " " PLF has been reset to 0.7 and simulation is continuing." );
 					} else {
-						ShowRecurringWarningErrorAtEnd( ZoneDehumid( ZoneDehumNum ).UnitType + " \"" + ZoneDehumid( ZoneDehumNum ).Name + "\":" " Part Load Fraction Correlation Curve output < 0.7 warning continues...", ZoneDehumid( ZoneDehumNum ).LowPLFErrorIndex, PLF, PLF );
+						ShowRecurringWarningErrorAtEnd( ZoneDehumid( ZoneDehumNum ).UnitType + " \"" + ZoneDehumid( ZoneDehumNum ).Name + "\": Part Load Fraction Correlation Curve output < 0.7 warning continues...", ZoneDehumid( ZoneDehumNum ).LowPLFErrorIndex, PLF, PLF );
 					}
 					PLF = 0.7;
 				}
@@ -811,7 +811,7 @@ namespace ZoneDehumidifier {
 						ShowContinueError( " The Part Load Fraction Correlation Curve output is (" + TrimSigDigits( PLF, 2 ) + ") at a part-load ratio =" + TrimSigDigits( PLR, 3 ) );
 						ShowContinueErrorTimeStamp( " PLF curve values must be < 1.0. " " PLF has been reset to 1.0 and simulation is continuing." );
 					} else {
-						ShowRecurringWarningErrorAtEnd( ZoneDehumid( ZoneDehumNum ).UnitType + " \"" + ZoneDehumid( ZoneDehumNum ).Name + "\":" " Part Load Fraction Correlation Curve output > 1.0 warning continues...", ZoneDehumid( ZoneDehumNum ).HighPLFErrorIndex, PLF, PLF );
+						ShowRecurringWarningErrorAtEnd( ZoneDehumid( ZoneDehumNum ).UnitType + " \"" + ZoneDehumid( ZoneDehumNum ).Name + "\": Part Load Fraction Correlation Curve output > 1.0 warning continues...", ZoneDehumid( ZoneDehumNum ).HighPLFErrorIndex, PLF, PLF );
 					}
 					PLF = 1.0;
 				}
@@ -826,7 +826,7 @@ namespace ZoneDehumidifier {
 						ShowContinueError( "Runtime fraction reset to 1 and the simulation will continue." );
 						ShowContinueErrorTimeStamp( "" );
 					} else {
-						ShowRecurringWarningErrorAtEnd( ZoneDehumid( ZoneDehumNum ).UnitType + " \"" + ZoneDehumid( ZoneDehumNum ).Name + "\":" " Part load fraction less than part load ratio warning continues...", ZoneDehumid( ZoneDehumNum ).PLFPLRErrorIndex );
+						ShowRecurringWarningErrorAtEnd( ZoneDehumid( ZoneDehumNum ).UnitType + " \"" + ZoneDehumid( ZoneDehumNum ).Name + "\": Part load fraction less than part load ratio warning continues...", ZoneDehumid( ZoneDehumNum ).PLFPLRErrorIndex );
 					}
 					RunTimeFraction = 1.0;
 				}
@@ -839,7 +839,7 @@ namespace ZoneDehumidifier {
 						ShowContinueError( "Runtime fraction reset to 1 and the simulation will continue." );
 						ShowContinueErrorTimeStamp( "" );
 					} else {
-						ShowRecurringWarningErrorAtEnd( ZoneDehumid( ZoneDehumNum ).UnitType + " \"" + ZoneDehumid( ZoneDehumNum ).Name + "\":" " Runtime fraction for zone dehumidifier exceeded 1.0 warning continues...", ZoneDehumid( ZoneDehumNum ).HighRTFErrorIndex, RunTimeFraction, RunTimeFraction );
+						ShowRecurringWarningErrorAtEnd( ZoneDehumid( ZoneDehumNum ).UnitType + " \"" + ZoneDehumid( ZoneDehumNum ).Name + "\": Runtime fraction for zone dehumidifier exceeded 1.0 warning continues...", ZoneDehumid( ZoneDehumNum ).HighRTFErrorIndex, RunTimeFraction, RunTimeFraction );
 					}
 					RunTimeFraction = 1.0;
 				}

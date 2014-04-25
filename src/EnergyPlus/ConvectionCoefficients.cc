@@ -1156,14 +1156,14 @@ namespace ConvectionCoefficients {
 			} else if ( SELECT_CASE_var == "SUPPLYAIRTEMPERATURE" ) {
 				HcInsideUserCurve( Loop ).ReferenceTempType = RefTempSupplyAirTemp;
 			} else {
-				ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": " "Invalid Key choice Entered, for " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
+				ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Key choice Entered, for " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
 				ErrorsFound = true;
 			}}
 
 			if ( ! lAlphaFieldBlanks( 3 ) ) {
 				HcInsideUserCurve( Loop ).HcFnTempDiffCurveNum = GetCurveIndex( cAlphaArgs( 3 ) );
 				if ( HcInsideUserCurve( Loop ).HcFnTempDiffCurveNum == 0 ) {
-					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": " "Invalid Name Entered, for " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) );
+					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Name Entered, for " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) );
 					ErrorsFound = true;
 				} else { // check type
 					{ auto const SELECT_CASE_var( GetCurveType( HcInsideUserCurve( Loop ).HcFnTempDiffCurveNum ) );
@@ -1184,7 +1184,7 @@ namespace ConvectionCoefficients {
 			if ( ! lAlphaFieldBlanks( 4 ) ) {
 				HcInsideUserCurve( Loop ).HcFnTempDiffDivHeightCurveNum = GetCurveIndex( cAlphaArgs( 4 ) );
 				if ( HcInsideUserCurve( Loop ).HcFnTempDiffDivHeightCurveNum == 0 ) {
-					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": " "Invalid Name Entered, for " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
+					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Name Entered, for " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
 					ErrorsFound = true;
 				} else { // check type
 					{ auto const SELECT_CASE_var( GetCurveType( HcInsideUserCurve( Loop ).HcFnTempDiffDivHeightCurveNum ) );
@@ -1204,7 +1204,7 @@ namespace ConvectionCoefficients {
 			if ( ! lAlphaFieldBlanks( 5 ) ) {
 				HcInsideUserCurve( Loop ).HcFnACHCurveNum = GetCurveIndex( cAlphaArgs( 5 ) );
 				if ( HcInsideUserCurve( Loop ).HcFnACHCurveNum == 0 ) {
-					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": " "Invalid Name Entered, for " + cAlphaFieldNames( 5 ) + '=' + cAlphaArgs( 5 ) );
+					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Name Entered, for " + cAlphaFieldNames( 5 ) + '=' + cAlphaArgs( 5 ) );
 					ErrorsFound = true;
 				} else { // check type
 					{ auto const SELECT_CASE_var( GetCurveType( HcInsideUserCurve( Loop ).HcFnACHCurveNum ) );
@@ -1224,7 +1224,7 @@ namespace ConvectionCoefficients {
 			if ( ! lAlphaFieldBlanks( 6 ) ) {
 				HcInsideUserCurve( Loop ).HcFnACHDivPerimLengthCurveNum = GetCurveIndex( cAlphaArgs( 6 ) );
 				if ( HcInsideUserCurve( Loop ).HcFnACHDivPerimLengthCurveNum == 0 ) {
-					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": " "Invalid Name Entered, for " + cAlphaFieldNames( 6 ) + '=' + cAlphaArgs( 6 ) );
+					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Name Entered, for " + cAlphaFieldNames( 6 ) + '=' + cAlphaArgs( 6 ) );
 					ErrorsFound = true;
 				} else { // check type
 					{ auto const SELECT_CASE_var( GetCurveType( HcInsideUserCurve( Loop ).HcFnACHDivPerimLengthCurveNum ) );
@@ -1261,7 +1261,7 @@ namespace ConvectionCoefficients {
 			} else if ( SELECT_CASE_var == "PARALLELCOMPONENTHEIGHTADJUST" ) {
 				HcOutsideUserCurve( Loop ).WindSpeedType = RefWindParallCompAtZ;
 			} else {
-				ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": " "Invalid Key choice Entered, for " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
+				ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Key choice Entered, for " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
 				ErrorsFound = true;
 			}}
 
@@ -1269,7 +1269,7 @@ namespace ConvectionCoefficients {
 			if ( ! lAlphaFieldBlanks( 3 ) ) {
 				HcOutsideUserCurve( Loop ).HfFnWindSpeedCurveNum = GetCurveIndex( cAlphaArgs( 3 ) );
 				if ( HcOutsideUserCurve( Loop ).HfFnWindSpeedCurveNum == 0 ) {
-					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": " "Invalid Name Entered, for " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) );
+					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Name Entered, for " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) );
 					ErrorsFound = true;
 				} else { // check type
 					{ auto const SELECT_CASE_var( GetCurveType( HcOutsideUserCurve( Loop ).HfFnWindSpeedCurveNum ) );
@@ -1290,7 +1290,7 @@ namespace ConvectionCoefficients {
 			if ( ! lAlphaFieldBlanks( 4 ) ) {
 				HcOutsideUserCurve( Loop ).HnFnTempDiffCurveNum = GetCurveIndex( cAlphaArgs( 4 ) );
 				if ( HcOutsideUserCurve( Loop ).HnFnTempDiffCurveNum == 0 ) {
-					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": " "Invalid Name Entered, for " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
+					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Name Entered, for " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
 					ErrorsFound = true;
 				} else { // check type
 					{ auto const SELECT_CASE_var( GetCurveType( HcOutsideUserCurve( Loop ).HnFnTempDiffCurveNum ) );
@@ -1311,7 +1311,7 @@ namespace ConvectionCoefficients {
 			if ( ! lAlphaFieldBlanks( 5 ) ) {
 				HcOutsideUserCurve( Loop ).HnFnTempDiffDivHeightCurveNum = GetCurveIndex( cAlphaArgs( 5 ) );
 				if ( HcOutsideUserCurve( Loop ).HnFnTempDiffDivHeightCurveNum == 0 ) {
-					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": " "Invalid Name Entered, for " + cAlphaFieldNames( 5 ) + '=' + cAlphaArgs( 5 ) );
+					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Name Entered, for " + cAlphaFieldNames( 5 ) + '=' + cAlphaArgs( 5 ) );
 					ErrorsFound = true;
 				} else { // check type
 					{ auto const SELECT_CASE_var( GetCurveType( HcOutsideUserCurve( Loop ).HnFnTempDiffDivHeightCurveNum ) );

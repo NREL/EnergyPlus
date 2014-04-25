@@ -1025,7 +1025,7 @@ namespace Boilers {
 					ShowContinueError( "...Calculated Boiler efficiency  = " + TrimSigDigits( EffCurveOutput * BoilerEff, 5 ) + " (Boiler efficiency = Nominal Thermal Efficiency * Normalized Boiler Efficiency Curve output)" );
 					ShowContinueErrorTimeStamp( "...Curve output reset to 0.01 and simulation continues." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( "Boiler:HotWater \"" + Boiler( BoilerNum ).Name + "\":" " Boiler Efficiency Curve output is less than or equal to 0 warning continues...", Boiler( BoilerNum ).EffCurveOutputIndex, EffCurveOutput, EffCurveOutput );
+					ShowRecurringWarningErrorAtEnd( "Boiler:HotWater \"" + Boiler( BoilerNum ).Name + "\": Boiler Efficiency Curve output is less than or equal to 0 warning continues...", Boiler( BoilerNum ).EffCurveOutputIndex, EffCurveOutput, EffCurveOutput );
 				}
 			}
 			EffCurveOutput = 0.01;
@@ -1051,7 +1051,7 @@ namespace Boilers {
 					ShowContinueError( "...Calculated Boiler efficiency  = " + TrimSigDigits( EffCurveOutput * BoilerEff, 5 ) + " (Boiler efficiency = Nominal Thermal Efficiency * Normalized Boiler Efficiency Curve output)" );
 					ShowContinueErrorTimeStamp( "...Curve output reset to 1.1 and simulation continues." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( "Boiler:HotWater \"" + Boiler( BoilerNum ).Name + "\":" " Calculated Boiler Efficiency is greater than 1.1 warning continues...", Boiler( BoilerNum ).CalculatedEffIndex, EffCurveOutput * BoilerEff, EffCurveOutput * BoilerEff );
+					ShowRecurringWarningErrorAtEnd( "Boiler:HotWater \"" + Boiler( BoilerNum ).Name + "\": Calculated Boiler Efficiency is greater than 1.1 warning continues...", Boiler( BoilerNum ).CalculatedEffIndex, EffCurveOutput * BoilerEff, EffCurveOutput * BoilerEff );
 				}
 			}
 			EffCurveOutput = 1.1;

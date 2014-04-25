@@ -2527,7 +2527,7 @@ namespace HVACMultiSpeedHeatPump {
 							ShowContinueErrorTimeStamp( "Cycling ratio returned=" + RoundSigDigits( PartLoadFrac, 2 ) );
 						} else {
 							++ErrCountCyc;
-							ShowRecurringWarningErrorAtEnd( MSHeatPump( MSHeatPumpNum ).Name + "\":" " Iteration limit warning exceeding calculating DX unit cycling ratio  continues...", MSHeatPump( MSHeatPumpNum ).ErrIndexCyc, PartLoadFrac, PartLoadFrac );
+							ShowRecurringWarningErrorAtEnd( MSHeatPump( MSHeatPumpNum ).Name + "\": Iteration limit warning exceeding calculating DX unit cycling ratio  continues...", MSHeatPump( MSHeatPumpNum ).ErrIndexCyc, PartLoadFrac, PartLoadFrac );
 						}
 					}
 				} else if ( SolFla == -2 ) {
@@ -2564,7 +2564,7 @@ namespace HVACMultiSpeedHeatPump {
 							ShowContinueErrorTimeStamp( "Speed ratio returned=[" + RoundSigDigits( SpeedRatio, 2 ) + "], Speed number =" + RoundSigDigits( SpeedNum ) );
 						} else {
 							++ErrCountVar;
-							ShowRecurringWarningErrorAtEnd( MSHeatPump( MSHeatPumpNum ).Name + "\":" " Iteration limit warning exceeding calculating DX unit speed ratio continues...", MSHeatPump( MSHeatPumpNum ).ErrIndexVar, SpeedRatio, SpeedRatio );
+							ShowRecurringWarningErrorAtEnd( MSHeatPump( MSHeatPumpNum ).Name + "\": Iteration limit warning exceeding calculating DX unit speed ratio continues...", MSHeatPump( MSHeatPumpNum ).ErrIndexVar, SpeedRatio, SpeedRatio );
 						}
 					}
 				} else if ( SolFla == -2 ) {
@@ -2601,7 +2601,7 @@ namespace HVACMultiSpeedHeatPump {
 									ShowContinueErrorTimeStamp( "Cycling ratio returned=" + RoundSigDigits( PartLoadFrac, 2 ) );
 								} else {
 									++ErrCountCyc;
-									ShowRecurringWarningErrorAtEnd( MSHeatPump( MSHeatPumpNum ).Name + "\":" " Iteration limit warning exceeding calculating DX unit cycling ratio  continues...", MSHeatPump( MSHeatPumpNum ).ErrIndexCyc, PartLoadFrac, PartLoadFrac );
+									ShowRecurringWarningErrorAtEnd( MSHeatPump( MSHeatPumpNum ).Name + "\": Iteration limit warning exceeding calculating DX unit cycling ratio  continues...", MSHeatPump( MSHeatPumpNum ).ErrIndexCyc, PartLoadFrac, PartLoadFrac );
 								}
 							}
 						} else if ( SolFla == -2 ) {
@@ -2631,7 +2631,7 @@ namespace HVACMultiSpeedHeatPump {
 										ShowContinueErrorTimeStamp( "Speed ratio returned=[" + RoundSigDigits( SpeedRatio, 2 ) + "], Speed number =" + RoundSigDigits( SpeedNum ) );
 									} else {
 										++ErrCountVar;
-										ShowRecurringWarningErrorAtEnd( MSHeatPump( MSHeatPumpNum ).Name + "\":" " Iteration limit warning exceeding calculating DX unit speed ratio continues...", MSHeatPump( MSHeatPumpNum ).ErrIndexVar, SpeedRatio, SpeedRatio );
+										ShowRecurringWarningErrorAtEnd( MSHeatPump( MSHeatPumpNum ).Name + "\": Iteration limit warning exceeding calculating DX unit speed ratio continues...", MSHeatPump( MSHeatPumpNum ).ErrIndexVar, SpeedRatio, SpeedRatio );
 									}
 								}
 							} else if ( SolFla == -2 ) {

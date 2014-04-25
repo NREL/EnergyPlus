@@ -195,8 +195,8 @@ namespace EMSManager {
 		} else {
 			ScanForReports( "EnergyManagementSystem", OutputEDDFile );
 			if ( OutputEDDFile ) {
-				ShowWarningError( "CheckIFAnyEMS: No EnergyManagementSystem has been set up in the input file but" " output is requested." );
-				ShowContinueError( "No EDD file will be produced. Refer to EMS Application Guide and/or InputOutput Reference" " to set up your EnergyManagementSystem." );
+				ShowWarningError( "CheckIFAnyEMS: No EnergyManagementSystem has been set up in the input file but output is requested." );
+				ShowContinueError( "No EDD file will be produced. Refer to EMS Application Guide and/or InputOutput Reference to set up your EnergyManagementSystem." );
 			}
 		}
 
@@ -1324,12 +1324,12 @@ namespace EMSManager {
 
 		if ( OutputEMSActuatorAvailFull ) {
 
-			gio::write( OutputEMSFileUnitNum, "(A)" ) << "! <EnergyManagementSystem:Actuator Available>, Component Unique Name," " Component Type,  Control Type, Units";
+			gio::write( OutputEMSFileUnitNum, "(A)" ) << "! <EnergyManagementSystem:Actuator Available>, Component Unique Name, Component Type,  Control Type, Units";
 			for ( ActuatorLoop = 1; ActuatorLoop <= numEMSActuatorsAvailable; ++ActuatorLoop ) {
 				gio::write( OutputEMSFileUnitNum, "(A)" ) << "EnergyManagementSystem:Actuator Available," + EMSActuatorAvailable( ActuatorLoop ).UniqueIDName + ',' + EMSActuatorAvailable( ActuatorLoop ).ComponentTypeName + ',' + EMSActuatorAvailable( ActuatorLoop ).ControlTypeName + ',' + EMSActuatorAvailable( ActuatorLoop ).Units;
 			}
 		} else if ( OutputEMSActuatorAvailSmall ) {
-			gio::write( OutputEMSFileUnitNum, "(A)" ) << "! <EnergyManagementSystem:Actuator Available>, *, Component Type, " "Control Type, Units";
+			gio::write( OutputEMSFileUnitNum, "(A)" ) << "! <EnergyManagementSystem:Actuator Available>, *, Component Type, Control Type, Units";
 
 			TempTypeName.allocate( numEMSActuatorsAvailable );
 			TempTypeName = EMSActuatorAvailable.ComponentTypeName();
@@ -1351,7 +1351,7 @@ namespace EMSManager {
 			}
 			for ( ActuatorLoop = 1; ActuatorLoop <= numEMSActuatorsAvailable; ++ActuatorLoop ) {
 				if ( ! NonUniqueARRflag( ActuatorLoop ) ) {
-					gio::write( OutputEMSFileUnitNum, "(A)" ) << "EnergyManagementSystem:Actuator Available," " *" "," + EMSActuatorAvailable( ActuatorLoop ).ComponentTypeName + ',' + EMSActuatorAvailable( ActuatorLoop ).ControlTypeName + ',' + EMSActuatorAvailable( ActuatorLoop ).Units;
+					gio::write( OutputEMSFileUnitNum, "(A)" ) << "EnergyManagementSystem:Actuator Available, *," + EMSActuatorAvailable( ActuatorLoop ).ComponentTypeName + ',' + EMSActuatorAvailable( ActuatorLoop ).ControlTypeName + ',' + EMSActuatorAvailable( ActuatorLoop ).Units;
 				}
 			}
 
@@ -1407,7 +1407,7 @@ namespace EMSManager {
 
 		if ( OutputEMSInternalVarsFull ) {
 
-			gio::write( OutputEMSFileUnitNum, "(A)" ) << "! <EnergyManagementSystem:InternalVariable Available>, Unique Name, Internal Data Type" ", Units ";
+			gio::write( OutputEMSFileUnitNum, "(A)" ) << "! <EnergyManagementSystem:InternalVariable Available>, Unique Name, Internal Data Type, Units ";
 			for ( InternalDataLoop = 1; InternalDataLoop <= numEMSInternalVarsAvailable; ++InternalDataLoop ) {
 				gio::write( OutputEMSFileUnitNum, "(A)" ) << "EnergyManagementSystem:InternalVariable Available," + EMSInternalVarsAvailable( InternalDataLoop ).UniqueIDName + ',' + EMSInternalVarsAvailable( InternalDataLoop ).DataTypeName + ',' + EMSInternalVarsAvailable( InternalDataLoop ).Units;
 			}
@@ -1428,7 +1428,7 @@ namespace EMSManager {
 			}
 			for ( InternalDataLoop = 1; InternalDataLoop <= numEMSInternalVarsAvailable; ++InternalDataLoop ) {
 				if ( UniqueARRflag( InternalDataLoop ) ) {
-					gio::write( OutputEMSFileUnitNum, "(A)" ) << "EnergyManagementSystem:InternalVariable Available," " *" "," + EMSInternalVarsAvailable( InternalDataLoop ).DataTypeName + ',' + EMSInternalVarsAvailable( InternalDataLoop ).Units;
+					gio::write( OutputEMSFileUnitNum, "(A)" ) << "EnergyManagementSystem:InternalVariable Available, *," + EMSInternalVarsAvailable( InternalDataLoop ).DataTypeName + ',' + EMSInternalVarsAvailable( InternalDataLoop ).Units;
 				}
 			}
 

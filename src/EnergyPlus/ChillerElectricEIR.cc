@@ -1575,7 +1575,7 @@ namespace ChillerElectricEIR {
 				ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
 			} else if ( PlantLoop( PlantLoopNum ).LoopSide( LoopSideNum ).FlowLock != 0 && ! WarmupFlag ) {
 				++ElectricEIRChiller( EIRChillNum ).ChillerCapFTError;
-				ShowRecurringWarningErrorAtEnd( "CHILLER:ELECTRIC:EIR \"" + ElectricEIRChiller( EIRChillNum ).Name + "\":" " Chiller Capacity as a Function of Temperature curve output is negative warning continues...", ElectricEIRChiller( EIRChillNum ).ChillerCapFTErrorIndex, ChillerCapFT, ChillerCapFT );
+				ShowRecurringWarningErrorAtEnd( "CHILLER:ELECTRIC:EIR \"" + ElectricEIRChiller( EIRChillNum ).Name + "\": Chiller Capacity as a Function of Temperature curve output is negative warning continues...", ElectricEIRChiller( EIRChillNum ).ChillerCapFTErrorIndex, ChillerCapFT, ChillerCapFT );
 			}
 			ChillerCapFT = 0.0;
 		}
@@ -1679,7 +1679,7 @@ namespace ChillerElectricEIR {
 					ShowContinueErrorTimeStamp( "" );
 				} else if ( ! WarmupFlag ) {
 					++ElectricEIRChiller( EIRChillNum ).ChillerCapFTError;
-					ShowRecurringWarningErrorAtEnd( "CHILLER:ELECTRIC:EIR \"" + ElectricEIRChiller( EIRChillNum ).Name + "\":" " Evaporator DeltaTemp = 0 in mass flow calculation warning continues...", ElectricEIRChiller( EIRChillNum ).DeltaTErrCountIndex, EvapDeltaTemp, EvapDeltaTemp );
+					ShowRecurringWarningErrorAtEnd( "CHILLER:ELECTRIC:EIR \"" + ElectricEIRChiller( EIRChillNum ).Name + "\": Evaporator DeltaTemp = 0 in mass flow calculation warning continues...", ElectricEIRChiller( EIRChillNum ).DeltaTErrCountIndex, EvapDeltaTemp, EvapDeltaTemp );
 				}
 
 			}
@@ -1792,7 +1792,7 @@ namespace ChillerElectricEIR {
 				ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
 			} else if ( PlantLoop( PlantLoopNum ).LoopSide( LoopSideNum ).FlowLock != 0 && ! WarmupFlag ) {
 				++ElectricEIRChiller( EIRChillNum ).ChillerEIRFTError;
-				ShowRecurringWarningErrorAtEnd( "CHILLER:ELECTRIC:EIR \"" + ElectricEIRChiller( EIRChillNum ).Name + "\":" " Chiller EIR as a Function of Temperature curve output is negative warning continues...", ElectricEIRChiller( EIRChillNum ).ChillerEIRFTErrorIndex, ChillerEIRFT, ChillerEIRFT );
+				ShowRecurringWarningErrorAtEnd( "CHILLER:ELECTRIC:EIR \"" + ElectricEIRChiller( EIRChillNum ).Name + "\": Chiller EIR as a Function of Temperature curve output is negative warning continues...", ElectricEIRChiller( EIRChillNum ).ChillerEIRFTErrorIndex, ChillerEIRFT, ChillerEIRFT );
 			}
 			ChillerEIRFT = 0.0;
 		}
@@ -1807,7 +1807,7 @@ namespace ChillerElectricEIR {
 				ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
 			} else if ( PlantLoop( PlantLoopNum ).LoopSide( LoopSideNum ).FlowLock != 0 && ! WarmupFlag ) {
 				++ElectricEIRChiller( EIRChillNum ).ChillerEIRFPLRError;
-				ShowRecurringWarningErrorAtEnd( "CHILLER:ELECTRIC:EIR \"" + ElectricEIRChiller( EIRChillNum ).Name + "\":" " Chiller EIR as a function of PLR curve output is negative warning continues...", ElectricEIRChiller( EIRChillNum ).ChillerEIRFPLRErrorIndex, ChillerEIRFPLR, ChillerEIRFPLR );
+				ShowRecurringWarningErrorAtEnd( "CHILLER:ELECTRIC:EIR \"" + ElectricEIRChiller( EIRChillNum ).Name + "\": Chiller EIR as a function of PLR curve output is negative warning continues...", ElectricEIRChiller( EIRChillNum ).ChillerEIRFPLRErrorIndex, ChillerEIRFPLR, ChillerEIRFPLR );
 			}
 			ChillerEIRFPLR = 0.0;
 		}
