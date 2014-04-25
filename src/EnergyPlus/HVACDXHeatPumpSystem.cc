@@ -1012,7 +1012,7 @@ namespace HVACDXHeatPumpSystem {
 		CoilIndex = int( Par()( 1 ) );
 		FanOpMode = int( Par()( 5 ) );
 
-		SimVariableSpeedCoils( "  ", CoilIndex, FanOpMode, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, On, PartLoadRatio, SpeedNum, SpeedRatio, QZnReq, QLatReq, OnOffAirFlowRatio );
+		SimVariableSpeedCoils( "", CoilIndex, FanOpMode, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, On, PartLoadRatio, SpeedNum, SpeedRatio, QZnReq, QLatReq, OnOffAirFlowRatio );
 
 		OutletAirTemp = VarSpeedCoil( CoilIndex ).OutletAirDBTemp;
 		Residuum = Par()( 2 ) - OutletAirTemp;
@@ -1083,7 +1083,7 @@ namespace HVACDXHeatPumpSystem {
 		FanOpMode = int( Par()( 5 ) );
 		SpeedNum = int( Par()( 3 ) );
 
-		SimVariableSpeedCoils( "  ", CoilIndex, FanOpMode, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, On, PartLoadRatio, SpeedNum, SpeedRatio, QZnReq, QLatReq, OnOffAirFlowRatio );
+		SimVariableSpeedCoils( "", CoilIndex, FanOpMode, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, On, PartLoadRatio, SpeedNum, SpeedRatio, QZnReq, QLatReq, OnOffAirFlowRatio );
 
 		OutletAirTemp = VarSpeedCoil( CoilIndex ).OutletAirDBTemp;
 		Residuum = Par()( 2 ) - OutletAirTemp;

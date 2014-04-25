@@ -196,7 +196,7 @@ namespace VariableSpeedCoils {
 		// part-load ratio = load/total capacity, passed in by the parent object
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		static std::string const Blank( "" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
