@@ -211,3 +211,20 @@ TEST_F( PrintTest, Fmt )
 	Print( fmt ) << f;
 	EXPECT_EQ( "  1125.", buf.str() );
 }
+
+TEST_F( PrintTest, FArray1DOut )
+{
+	FArray1D_int const A( 3, { 1, 2, 3 } );
+	gio::Fmt const fmt( "(3I3)" );
+	Print( fmt ) << A;
+	EXPECT_EQ( "  1  2  3\n", buf.str() );
+}
+
+TEST_F( PrintTest, FArray1SOut )
+{
+	FArray1D_int const A( 3, { 1, 2, 3 } );
+	FArray1S_int S( A );
+	gio::Fmt const fmt( "(3I3)" );
+	Print( fmt ) << S;
+	EXPECT_EQ( "  1  2  3\n", buf.str() );
+}

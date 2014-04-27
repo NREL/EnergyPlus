@@ -6,7 +6,6 @@
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/FArrayS.functions.hh>
 #include <ObjexxFCL/FArray1S.io.hh>
-#include <ObjexxFCL/FArray2S.io.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/MArray.functions.hh>
@@ -696,14 +695,14 @@ namespace HeatBalanceManager {
 				MinNumberOfWarmupDays = DefaultMinNumberOfWarmupDays;
 			}
 			if ( MinNumberOfWarmupDays > MaxNumberOfWarmupDays ) {
-				ShowWarningError( RoutineName + CurrentModuleObject + ": " + cNumericFieldNames( 5 ) + " [" + RoundSigDigits( MinNumberOfWarmupDays ) + "] " " is greater than " + cNumericFieldNames( 4 ) + " [" + RoundSigDigits( MaxNumberOfWarmupDays ) + "], " + RoundSigDigits( MinNumberOfWarmupDays ) + " will be used." );
+				ShowWarningError( RoutineName + CurrentModuleObject + ": " + cNumericFieldNames( 5 ) + " [" + RoundSigDigits( MinNumberOfWarmupDays ) + "]  is greater than " + cNumericFieldNames( 4 ) + " [" + RoundSigDigits( MaxNumberOfWarmupDays ) + "], " + RoundSigDigits( MinNumberOfWarmupDays ) + " will be used." );
 				MaxNumberOfWarmupDays = MinNumberOfWarmupDays;
 			}
 			if ( MinNumberOfWarmupDays < 6 ) {
-				ShowWarningError( RoutineName + CurrentModuleObject + ": " + cNumericFieldNames( 5 ) + " potentially invalid. " "Experience has shown that most files will converge within " + RoundSigDigits( DefaultMaxNumberOfWarmupDays ) + " warmup days. " );
-				ShowContinueError( "...Choosing less than " + RoundSigDigits( DefaultMinNumberOfWarmupDays ) + " warmup days may have adverse effects on the simulation results, " "particularly design day simulations. " );
-				ShowContinueError( "...Users should only alter this default if they are certain that " "less than " + RoundSigDigits( DefaultMinNumberOfWarmupDays ) + " warmup days is appropriate for a particular file. " );
-				ShowContinueError( "...Verify that convergence to desired results are achieved. You can report values" " during warmup days to ascertain convergence." );
+				ShowWarningError( RoutineName + CurrentModuleObject + ": " + cNumericFieldNames( 5 ) + " potentially invalid. Experience has shown that most files will converge within " + RoundSigDigits( DefaultMaxNumberOfWarmupDays ) + " warmup days. " );
+				ShowContinueError( "...Choosing less than " + RoundSigDigits( DefaultMinNumberOfWarmupDays ) + " warmup days may have adverse effects on the simulation results, particularly design day simulations. " );
+				ShowContinueError( "...Users should only alter this default if they are certain that less than " + RoundSigDigits( DefaultMinNumberOfWarmupDays ) + " warmup days is appropriate for a particular file. " );
+				ShowContinueError( "...Verify that convergence to desired results are achieved. You can report values during warmup days to ascertain convergence." );
 			}
 		} else {
 			ShowSevereError( RoutineName + " A " + CurrentModuleObject + " Object must be entered." );
@@ -735,7 +734,7 @@ namespace HeatBalanceManager {
 			} else if ( ( SELECT_CASE_var == "TARP" ) || ( SELECT_CASE_var == "DETAILED" ) ) {
 				DefaultInsideConvectionAlgo = ASHRAETARP;
 				if ( AlphaName( 1 ) == "DETAILED" ) {
-					ShowSevereError( "GetInsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", " "defaulting to TARP, entered value=" + AlphaName( 1 ) );
+					ShowSevereError( "GetInsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", defaulting to TARP, entered value=" + AlphaName( 1 ) );
 				}
 				AlphaName( 1 ) = "TARP";
 
@@ -745,7 +744,7 @@ namespace HeatBalanceManager {
 
 			} else if ( SELECT_CASE_var == "TROMBEWALL" ) {
 				DefaultInsideConvectionAlgo = TrombeWall;
-				ShowSevereError( "GetInsideConvectionAlgorithm: TrombeWall has been used as a global definition." " This is a zone oriented value.  Will be illegal in the future." );
+				ShowSevereError( "GetInsideConvectionAlgorithm: TrombeWall has been used as a global definition. This is a zone oriented value.  Will be illegal in the future." );
 				AlphaName( 1 ) = "TrombeWall";
 
 			} else if ( SELECT_CASE_var == "ADAPTIVECONVECTIONALGORITHM" ) {
@@ -753,7 +752,7 @@ namespace HeatBalanceManager {
 				AlphaName( 1 ) = "AdaptiveConvectionAlgorithm";
 
 			} else {
-				ShowWarningError( "GetInsideConvectionAlgorithm: Invalid value for " + CurrentModuleObject + ", " "defaulting to TARP, invalid value=" + AlphaName( 1 ) );
+				ShowWarningError( "GetInsideConvectionAlgorithm: Invalid value for " + CurrentModuleObject + ", defaulting to TARP, invalid value=" + AlphaName( 1 ) );
 				DefaultInsideConvectionAlgo = ASHRAETARP;
 				AlphaName( 1 ) = "TARP";
 
@@ -776,17 +775,17 @@ namespace HeatBalanceManager {
 			if ( ( SELECT_CASE_var == "SIMPLECOMBINED" ) || ( SELECT_CASE_var == "SIMPLE" ) ) {
 				DefaultOutsideConvectionAlgo = ASHRAESimple;
 				if ( AlphaName( 1 ) == "SIMPLE" ) {
-					ShowSevereError( "GetOutsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", " "defaulting to SimpleCombined, entered value=" + AlphaName( 1 ) );
+					ShowSevereError( "GetOutsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", defaulting to SimpleCombined, entered value=" + AlphaName( 1 ) );
 				}
 				AlphaName( 1 ) = "SimpleCombined";
 
 			} else if ( ( SELECT_CASE_var == "TARP" ) || ( SELECT_CASE_var == "DETAILED" ) || ( SELECT_CASE_var == "BLAST" ) ) {
 				DefaultOutsideConvectionAlgo = ASHRAETARP;
 				if ( AlphaName( 1 ) == "DETAILED" ) {
-					ShowSevereError( "GetOutsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", " "defaulting to TARP, entered value=" + AlphaName( 1 ) );
+					ShowSevereError( "GetOutsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", defaulting to TARP, entered value=" + AlphaName( 1 ) );
 				}
 				if ( AlphaName( 1 ) == "BLAST" ) {
-					ShowSevereError( "GetOutsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", " "defaulting to TARP, entered value=" + AlphaName( 1 ) );
+					ShowSevereError( "GetOutsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", defaulting to TARP, entered value=" + AlphaName( 1 ) );
 				}
 				AlphaName( 1 ) = "TARP";
 
@@ -797,7 +796,7 @@ namespace HeatBalanceManager {
 			} else if ( ( SELECT_CASE_var == "DOE-2" ) || ( SELECT_CASE_var == "DOE2" ) ) {
 				DefaultOutsideConvectionAlgo = DOE2HcOutside;
 				if ( AlphaName( 1 ) == "DOE2" ) {
-					ShowSevereError( "GetOutsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", " "defaulting to DOE-2, entered value=" + AlphaName( 1 ) );
+					ShowSevereError( "GetOutsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", defaulting to DOE-2, entered value=" + AlphaName( 1 ) );
 				}
 				AlphaName( 1 ) = "DOE-2";
 
@@ -806,7 +805,7 @@ namespace HeatBalanceManager {
 				AlphaName( 1 ) = "AdaptiveConvectionAlgorithm";
 
 			} else {
-				ShowWarningError( "GetOutsideConvectionAlgorithm: Invalid value for " + CurrentModuleObject + ", " "defaulting to DOE-2, invalid value=" + AlphaName( 1 ) );
+				ShowWarningError( "GetOutsideConvectionAlgorithm: Invalid value for " + CurrentModuleObject + ", defaulting to DOE-2, invalid value=" + AlphaName( 1 ) );
 				DefaultOutsideConvectionAlgo = DOE2HcOutside;
 				AlphaName( 1 ) = "DOE-2";
 
@@ -839,7 +838,7 @@ namespace HeatBalanceManager {
 				AlphaName( 1 ) = "CONDFD - Conduction Finite Difference";
 				if ( NumOfTimeStepInHour < 20 ) {
 					ShowSevereError( "GetSolutionAlgorithm: " + CurrentModuleObject + ' ' + cAlphaFieldNames( 1 ) + " is Conduction Finite Difference but Number of TimeSteps in Hour < 20, Value is " + RoundSigDigits( NumOfTimeStepInHour ) + '.' );
-					ShowContinueError( "...Suggested minimum number of time steps in hour for " "Conduction Finite Difference solutions is 20." " Errors or inaccurate calculations may occur." );
+					ShowContinueError( "...Suggested minimum number of time steps in hour for Conduction Finite Difference solutions is 20. Errors or inaccurate calculations may occur." );
 				}
 
 			} else if ( ( SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT" ) || ( SELECT_CASE_var == "HAMT" ) ) {
@@ -847,8 +846,8 @@ namespace HeatBalanceManager {
 				AlphaName( 1 ) = "HAMT - Combined Heat and Moisture Transfer Finite Element";
 				if ( NumOfTimeStepInHour < 20 ) {
 					ShowSevereError( "GetSolutionAlgorithm: " + CurrentModuleObject + ' ' + cAlphaFieldNames( 1 ) + " is Combined Heat and Moisture Finite Element but Number of TimeSteps in Hour < 20, Value is " + RoundSigDigits( NumOfTimeStepInHour ) + '.' );
-					ShowContinueError( "...Suggested minimum number of time steps in hour for " "Combined Heat and Moisture Finite Element solutions is 20." " Errors or inaccurate calculations may occur." );
-					ShowContinueError( "...If the simulation crashes, look at material properties (esp porosity), " "use timestep=60, or less layers in your constructions." );
+					ShowContinueError( "...Suggested minimum number of time steps in hour for Combined Heat and Moisture Finite Element solutions is 20. Errors or inaccurate calculations may occur." );
+					ShowContinueError( "...If the simulation crashes, look at material properties (esp porosity), use timestep=60, or less layers in your constructions." );
 				}
 
 			} else {
@@ -1067,7 +1066,7 @@ namespace HeatBalanceManager {
 		}
 
 		// Write to the initialization output file
-		gio::write( OutputFileInits, "(A)" ) << "! <Environment:Site Atmospheric Variation>,Wind Speed Profile Exponent {}," "Wind Speed Profile Boundary Layer Thickness {m},Air Temperature Gradient Coefficient {K/m}";
+		gio::write( OutputFileInits, "(A)" ) << "! <Environment:Site Atmospheric Variation>,Wind Speed Profile Exponent {},Wind Speed Profile Boundary Layer Thickness {m},Air Temperature Gradient Coefficient {K/m}";
 
 		gio::write( OutputFileInits, Format_720 ) << RoundSigDigits( SiteWindExp, 3 ) << RoundSigDigits( SiteWindBLHeight, 3 ) << RoundSigDigits( SiteTempGradient, 6 );
 
@@ -2439,7 +2438,7 @@ namespace HeatBalanceManager {
 				NominalR( MaterNum ) = ( 1.0 - Material( MaterNum ).Trans ) * Material( MaterNum ).Thickness / Material( MaterNum ).Conductivity;
 			} else {
 				NominalR( MaterNum ) = 1.0;
-				ShowWarningError( "Conductivity for material=\"" + Material( MaterNum ).Name + "\" must be greater than" " 0 for calculating Nominal R-value, Nominal R is defaulted to 1 and the simulation continues." );
+				ShowWarningError( "Conductivity for material=\"" + Material( MaterNum ).Name + "\" must be greater than 0 for calculating Nominal R-value, Nominal R is defaulted to 1 and the simulation continues." );
 			}
 
 			if ( Material( MaterNum ).Trans + Material( MaterNum ).ReflectShade >= 1.0 ) {
@@ -2459,7 +2458,7 @@ namespace HeatBalanceManager {
 			if ( Material( MaterNum ).TransThermal + Material( MaterNum ).AbsorpThermal >= 1.0 ) {
 				ErrorsFound = true;
 				ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Illegal value combination." );
-				ShowSevereError( "Thermal hemispherical emissivity plus open area fraction (1-diameter/spacing)**2" " not < 1.0" );
+				ShowSevereError( "Thermal hemispherical emissivity plus open area fraction (1-diameter/spacing)**2 not < 1.0" );
 			}
 
 		}
@@ -2579,7 +2578,7 @@ namespace HeatBalanceManager {
 			if ( Material( MaterNum ).TransThermal + Material( MaterNum ).AbsorpThermal >= 1.0 ) {
 				ErrorsFound = true;
 				ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Illegal value combination." );
-				ShowSevereError( "Thermal hemispherical emissivity plus open area fraction (1-diameter/spacing)**2" " not < 1.0" );
+				ShowSevereError( "Thermal hemispherical emissivity plus open area fraction (1-diameter/spacing)**2 not < 1.0" );
 			}
 
 		} // TotScreensEQL loop
@@ -2664,7 +2663,7 @@ namespace HeatBalanceManager {
 			if ( ! SameString( MaterialNames( 2 ), "Horizontal" ) && ! SameString( MaterialNames( 2 ), "Vertical" ) ) {
 				ErrorsFound = true;
 				ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Illegal value" );
-				ShowContinueError( cAlphaFieldNames( 2 ) + "=\"" + MaterialNames( 2 ) + "\", must be " " Horizontal or Vertical." );
+				ShowContinueError( cAlphaFieldNames( 2 ) + "=\"" + MaterialNames( 2 ) + "\", must be Horizontal or Vertical." );
 			}
 
 			if ( ( MaterialProps( 6 ) + MaterialProps( 7 ) >= 1.0 ) ) {
@@ -2923,25 +2922,25 @@ namespace HeatBalanceManager {
 			}
 			if ( Material( MaterNum ).SlatSeparation < 0.001 ) {
 				ShowWarningError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Slat Seperation" );
-				ShowContinueError( cNumericFieldNames( 2 ) + " [" + RoundSigDigits( Material( MaterNum ).SlatSeparation, 2 ) + "]." " Slate spacing must be > 0.0" );
+				ShowContinueError( cNumericFieldNames( 2 ) + " [" + RoundSigDigits( Material( MaterNum ).SlatSeparation, 2 ) + "]. Slate spacing must be > 0.0" );
 				ShowContinueError( "...Setting slate spacing to default value of 0.025 m and simulation continues." );
 				Material( MaterNum ).SlatSeparation = 0.025;
 			}
 			if ( Material( MaterNum ).SlatWidth < 0.001 || Material( MaterNum ).SlatWidth >= 2.0 * Material( MaterNum ).SlatSeparation ) {
 				ShowWarningError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Slat Width" );
-				ShowContinueError( cNumericFieldNames( 1 ) + " [" + RoundSigDigits( Material( MaterNum ).SlatWidth, 2 ) + "]." " Slat width range is 0 < Width <= 2*Spacing" );
+				ShowContinueError( cNumericFieldNames( 1 ) + " [" + RoundSigDigits( Material( MaterNum ).SlatWidth, 2 ) + "]. Slat width range is 0 < Width <= 2*Spacing" );
 				ShowContinueError( "...Setting slate width equal to slate spacing and simulation continues." );
 				Material( MaterNum ).SlatWidth = Material( MaterNum ).SlatSeparation;
 			}
 			if ( Material( MaterNum ).SlatCrown < 0.0 || Material( MaterNum ).SlatCrown >= 0.5 * Material( MaterNum ).SlatWidth ) {
 				ShowWarningError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Slat Crown" );
-				ShowContinueError( cNumericFieldNames( 3 ) + " [" + RoundSigDigits( Material( MaterNum ).SlatCrown, 2 ) + "]." " Slat crwon range is 0 <= crown < 0.5*Width" );
+				ShowContinueError( cNumericFieldNames( 3 ) + " [" + RoundSigDigits( Material( MaterNum ).SlatCrown, 2 ) + "]. Slat crwon range is 0 <= crown < 0.5*Width" );
 				ShowContinueError( "...Setting slate crown to 0.0 and simulation continues." );
 				Material( MaterNum ).SlatCrown = 0.0;
 			}
 			if ( Material( MaterNum ).SlatAngle < -90.0 || Material( MaterNum ).SlatAngle > 90.0 ) {
 				ShowWarningError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Slat Angle" );
-				ShowContinueError( cNumericFieldNames( 4 ) + " [" + RoundSigDigits( Material( MaterNum ).SlatAngle, 2 ) + "]." " Slat angle range is -90.0 <= Angle < 90.0" );
+				ShowContinueError( cNumericFieldNames( 4 ) + " [" + RoundSigDigits( Material( MaterNum ).SlatAngle, 2 ) + "]. Slat angle range is -90.0 <= Angle < 90.0" );
 				ShowContinueError( "...Setting slate angle to 0.0 and simulation continues." );
 				Material( MaterNum ).SlatAngle = 0.0;
 			}
@@ -2949,7 +2948,7 @@ namespace HeatBalanceManager {
 			if ( ! SameString( MaterialNames( 2 ), "Horizontal" ) && ! SameString( MaterialNames( 2 ), "Vertical" ) ) {
 				ErrorsFound = true;
 				ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Illegal value" );
-				ShowContinueError( cAlphaFieldNames( 2 ) + "=\"" + MaterialNames( 2 ) + "\", must be " " Horizontal or Vertical." );
+				ShowContinueError( cAlphaFieldNames( 2 ) + "=\"" + MaterialNames( 2 ) + "\", must be Horizontal or Vertical." );
 			}
 
 			if ( ( MaterialProps( 5 ) + MaterialProps( 7 ) >= 1.0 ) ) {
@@ -3148,7 +3147,7 @@ namespace HeatBalanceManager {
 
 		if ( DoReport ) {
 
-			gio::write( OutputFileInits, "(A)" ) << "! <Material Details>,Material Name,ThermalResistance {m2-K/w},Roughness,Thickness {m}," "Conductivity {w/m-K},Density {kg/m3},Specific Heat {J/kg-K},Absorptance:Thermal,Absorptance:Solar,Absorptance:Visible";
+			gio::write( OutputFileInits, "(A)" ) << "! <Material Details>,Material Name,ThermalResistance {m2-K/w},Roughness,Thickness {m},Conductivity {w/m-K},Density {kg/m3},Specific Heat {J/kg-K},Absorptance:Thermal,Absorptance:Solar,Absorptance:Visible";
 
 			gio::write( OutputFileInits, "(A)" ) << "! <Material:Air>,Material Name,ThermalResistance {m2-K/w}";
 
@@ -3258,7 +3257,7 @@ namespace HeatBalanceManager {
 			TotLam = SpecDataNumProp / 4;
 			if ( mod( SpecDataNumProp, 4 ) != 0 ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + SpecDataNames( 1 ) + "\" invalid set." );
-				ShowContinueError( "... set not even multiple of 4 items (Wavelength,Trans,ReflFront,ReflBack)," "number of items in dataset = " + TrimSigDigits( SpecDataNumProp ) );
+				ShowContinueError( "... set not even multiple of 4 items (Wavelength,Trans,ReflFront,ReflBack), number of items in dataset = " + TrimSigDigits( SpecDataNumProp ) );
 				ShowContinueError( "... remainder after div by 4 = " + TrimSigDigits( mod( SpecDataNumProp, 4 ) ) + ", remainder items will be set to 0.0" );
 				SpecDataProps( {SpecDataNumProp + 1,min( SpecDataNumProp + 4, MaxSpectralDataElements * 4 )} ) = 0.0;
 			}
@@ -3295,14 +3294,14 @@ namespace HeatBalanceManager {
 					if ( SpectralData( Loop ).WaveLength( LamNum + 1 ) <= Lam ) {
 						ErrorsFound = true;
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + SpecDataNames( 1 ) + "\" invalid set." );
-						ShowContinueError( "... Wavelengths not in increasing order. " "at wavelength#=" + TrimSigDigits( LamNum ) + ", value=[" + TrimSigDigits( Lam, 4 ) + "], next is [" + TrimSigDigits( SpectralData( Loop ).WaveLength( LamNum + 1 ), 4 ) + "]." );
+						ShowContinueError( "... Wavelengths not in increasing order. at wavelength#=" + TrimSigDigits( LamNum ) + ", value=[" + TrimSigDigits( Lam, 4 ) + "], next is [" + TrimSigDigits( SpectralData( Loop ).WaveLength( LamNum + 1 ), 4 ) + "]." );
 					}
 				}
 
 				if ( Lam < 0.1 || Lam > 4.0 ) {
 					ErrorsFound = true;
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + SpecDataNames( 1 ) + "\" invalid value." );
-					ShowContinueError( "... A wavelength is not in the range 0.1 to 4.0 microns; " "at wavelength#=" + TrimSigDigits( LamNum ) + ", value=[" + TrimSigDigits( Lam, 4 ) + "]." );
+					ShowContinueError( "... A wavelength is not in the range 0.1 to 4.0 microns; at wavelength#=" + TrimSigDigits( LamNum ) + ", value=[" + TrimSigDigits( Lam, 4 ) + "]." );
 				}
 
 				// TH 2/15/2011. CR 8343
@@ -3311,20 +3310,20 @@ namespace HeatBalanceManager {
 				if ( Tau > 1.01 ) {
 					ErrorsFound = true;
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + SpecDataNames( 1 ) + "\" invalid value." );
-					ShowContinueError( "... A transmittance is > 1.0; " "at wavelength#=" + TrimSigDigits( LamNum ) + ", value=[" + TrimSigDigits( Tau, 4 ) + "]." );
+					ShowContinueError( "... A transmittance is > 1.0; at wavelength#=" + TrimSigDigits( LamNum ) + ", value=[" + TrimSigDigits( Tau, 4 ) + "]." );
 				}
 
 				if ( RhoF < 0.0 || RhoF > 1.02 || RhoB < 0.0 || RhoB > 1.02 ) {
 					ErrorsFound = true;
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + SpecDataNames( 1 ) + "\" invalid value." );
-					ShowContinueError( "... A reflectance is < 0.0 or > 1.0; " "at wavelength#=" + TrimSigDigits( LamNum ) + ", RhoF value=[" + TrimSigDigits( RhoF, 4 ) + "]." );
-					ShowContinueError( "... A reflectance is < 0.0 or > 1.0; " "at wavelength#=" + TrimSigDigits( LamNum ) + ", RhoB value=[" + TrimSigDigits( RhoB, 4 ) + "]." );
+					ShowContinueError( "... A reflectance is < 0.0 or > 1.0; at wavelength#=" + TrimSigDigits( LamNum ) + ", RhoF value=[" + TrimSigDigits( RhoF, 4 ) + "]." );
+					ShowContinueError( "... A reflectance is < 0.0 or > 1.0; at wavelength#=" + TrimSigDigits( LamNum ) + ", RhoB value=[" + TrimSigDigits( RhoB, 4 ) + "]." );
 				}
 
 				if ( ( Tau + RhoF ) > 1.03 || ( Tau + RhoB ) > 1.03 ) {
 					ErrorsFound = true;
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + SpecDataNames( 1 ) + "\" invalid value." );
-					ShowContinueError( "... Transmittance + reflectance) > 1.0 for an entry; " "at wavelength#=" + TrimSigDigits( LamNum ) + ", value(Tau+RhoF)=[" + TrimSigDigits( ( Tau + RhoF ), 4 ) + "], value(Tau+RhoB)=[" + TrimSigDigits( ( Tau + RhoB ), 4 ) + "]." );
+					ShowContinueError( "... Transmittance + reflectance) > 1.0 for an entry; at wavelength#=" + TrimSigDigits( LamNum ) + ", value(Tau+RhoF)=[" + TrimSigDigits( ( Tau + RhoF ), 4 ) + "], value(Tau+RhoB)=[" + TrimSigDigits( ( Tau + RhoB ), 4 ) + "]." );
 				}
 
 			}
@@ -3639,7 +3638,7 @@ namespace HeatBalanceManager {
 			}
 			if ( ( Construct( TotRegConstructs + ConstrNum ).TempAfterLayer >= Construct( TotRegConstructs + ConstrNum ).TotLayers ) || ( Construct( TotRegConstructs + ConstrNum ).TempAfterLayer <= 0 ) ) {
 				ShowWarningError( "Construction " + Construct( TotRegConstructs + ConstrNum ).Name + " must have a temperature calculation that is between two layers" );
-				ShowContinueError( "The temperature calculation after layer parameter has been set " "to one less than the number of layers." );
+				ShowContinueError( "The temperature calculation after layer parameter has been set to one less than the number of layers." );
 				Construct( TotRegConstructs + ConstrNum ).TempAfterLayer = Construct( TotRegConstructs + ConstrNum ).TotLayers - 1;
 			}
 
@@ -5284,7 +5283,7 @@ namespace HeatBalanceManager {
 		CheckForActualFileName( DesiredFileName, exists, TempFullFileName );
 		//INQUIRE(FILE=TRIM(DesiredFileName), EXIST=exists)
 		if ( ! exists ) {
-			ShowSevereError( "HeatBalanceManager: SearchWindow5DataFile: " "Could not locate Window5 Data File, expecting it as file name=" + DesiredFileName );
+			ShowSevereError( "HeatBalanceManager: SearchWindow5DataFile: Could not locate Window5 Data File, expecting it as file name=" + DesiredFileName );
 			ShowContinueError( "Certain run environments require a full path to be included with the file name in the input field." );
 			ShowContinueError( "Try again with putting full path and file name in the field." );
 			ShowFatalError( "Program terminates due to these conditions." );
@@ -5383,28 +5382,28 @@ Label20: ;
 				++FileLineCount;
 				{ IOFlags flags; gio::read( NextLine.substr( 19 ), "*", flags ) >> WinHeight( IGlSys ) >> WinWidth( IGlSys ) >> NGlass( IGlSys ) >> UValCenter( IGlSys ) >> SCCenter( IGlSys ) >> SHGCCenter( IGlSys ) >> TVisCenter( IGlSys ); ReadStat = flags.ios(); }
 				if ( ReadStat != 0 ) {
-					ShowSevereError( "HeatBalanceManager: SearchWindow5DataFile: Error in Read of glazing system values." " For glazing system=" + TrimSigDigits( IGlSys ) );
+					ShowSevereError( "HeatBalanceManager: SearchWindow5DataFile: Error in Read of glazing system values. For glazing system=" + TrimSigDigits( IGlSys ) );
 					ShowContinueError( "Line (~" + TrimSigDigits( FileLineCount ) + ") in error (first 100 characters)=" + NextLine.substr( 0, 100 ) );
 					ErrorsFound = true;
 				}
 				if ( WinHeight( IGlSys ) == 0.0 || WinWidth( IGlSys ) == 0.0 ) {
-					ShowSevereError( "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName + " from the Window5 data file cannot be used:" " it has window height or width = 0 for glazing system " + TrimSigDigits( IGlSys ) );
+					ShowSevereError( "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName + " from the Window5 data file cannot be used: it has window height or width = 0 for glazing system " + TrimSigDigits( IGlSys ) );
 					ErrorsFound = true;
 				}
 				if ( NGlass( IGlSys ) <= 0 || NGlass( IGlSys ) > 4 ) {
-					ShowSevereError( "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName + " from the Window5 data file cannot be used:" " it has 0 or more than 4 glass layers in glazing system " + TrimSigDigits( IGlSys ) );
+					ShowSevereError( "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName + " from the Window5 data file cannot be used: it has 0 or more than 4 glass layers in glazing system " + TrimSigDigits( IGlSys ) );
 					ErrorsFound = true;
 				}
 				if ( UValCenter( IGlSys ) <= 0.0 ) {
-					ShowSevereError( "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName + " from the Window5 data file cannot be used:" " it has Center-of-Glass U-value <= 0 in glazing system " + TrimSigDigits( IGlSys ) );
+					ShowSevereError( "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName + " from the Window5 data file cannot be used: it has Center-of-Glass U-value <= 0 in glazing system " + TrimSigDigits( IGlSys ) );
 					ErrorsFound = true;
 				}
 				if ( SCCenter( IGlSys ) <= 0.0 ) {
-					ShowSevereError( "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName + " from the Window5 data file cannot be used:" " it has Shading Coefficient <= 0 in glazing system " + TrimSigDigits( IGlSys ) );
+					ShowSevereError( "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName + " from the Window5 data file cannot be used: it has Shading Coefficient <= 0 in glazing system " + TrimSigDigits( IGlSys ) );
 					ErrorsFound = true;
 				}
 				if ( SHGCCenter( IGlSys ) <= 0.0 ) {
-					ShowSevereError( "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName + " from the Window5 data file cannot be used:" " it has SHGC <= 0 in glazing system " + TrimSigDigits( IGlSys ) );
+					ShowSevereError( "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName + " from the Window5 data file cannot be used: it has SHGC <= 0 in glazing system " + TrimSigDigits( IGlSys ) );
 					ErrorsFound = true;
 				}
 				WinHeight( IGlSys ) *= 0.001;
@@ -5494,7 +5493,7 @@ Label20: ;
 				++FileLineCount;
 				{ IOFlags flags; gio::read( NextLine.substr( 19 ), "*", flags ) >> DividerWidth( IGlSys ) >> DividerProjectionOut( IGlSys ) >> DividerProjectionIn( IGlSys ) >> DividerConductance( IGlSys ) >> DivEdgeToCenterGlCondRatio( IGlSys ) >> DividerSolAbsorp( IGlSys ) >> DividerVisAbsorp( IGlSys ) >> DividerEmis( IGlSys ) >> DividerType( IGlSys ) >> HorDividers( IGlSys ) >> VertDividers( IGlSys ); ReadStat = flags.ios(); }
 				if ( ReadStat != 0 ) {
-					ShowSevereError( "HeatBalanceManager: SearchWindow5DataFile: Error in Read of divider data values. " "For Glazing System=" + TrimSigDigits( IGlSys ) );
+					ShowSevereError( "HeatBalanceManager: SearchWindow5DataFile: Error in Read of divider data values. For Glazing System=" + TrimSigDigits( IGlSys ) );
 					ShowContinueError( "Line (~" + TrimSigDigits( FileLineCount + 11 ) + ") in error (first 100 characters)=" + NextLine.substr( 0, 100 ) );
 					ErrorsFound = true;
 				}
@@ -5663,7 +5662,7 @@ Label20: ;
 						ShowSevereError( "SearchWindow5DataFile: Material=\"" + Material( MaterNum ).Name + "\" has thickness of 0.0.  Will be set to thickness = .001 but inaccuracies may result." );
 						ShowContinueError( "Line being read=" + NextLine );
 						ShowContinueError( "Thickness field starts at column 26=" + NextLine.substr( 25 ) );
-						Material( MaterNum ).Thickness = .001;
+						Material( MaterNum ).Thickness = 0.001;
 					}
 				}
 			}
@@ -5711,7 +5710,7 @@ Label20: ;
 						++FileLineCount;
 						gio::read( NextLine.substr( 19 ), "*" ) >> GasName( IGas ) >> Material( MaterNum ).GasFract( IGas ) >> Material( MaterNum ).GasWght( IGas ) >> Material( MaterNum ).GasCon( IGas, _ ) >> Material( MaterNum ).GasVis( IGas, _ ) >> Material( MaterNum ).GasCp( IGas, _ );
 						// Nominal resistance of gap at room temperature (based on first gas in mixture)
-						NominalR( MaterNum ) = Material( MaterNum ).Thickness / ( Material( MaterNum ).GasCon( 1, 1 ) + Material( MaterNum ).GasCon( 1, 2 ) * 300.0 + Material( MaterNum ).GasCon( 1, 3 ) * 90000. );
+						NominalR( MaterNum ) = Material( MaterNum ).Thickness / ( Material( MaterNum ).GasCon( 1, 1 ) + Material( MaterNum ).GasCon( 1, 2 ) * 300.0 + Material( MaterNum ).GasCon( 1, 3 ) * 90000.0 );
 					}
 				}
 			}
@@ -5882,7 +5881,7 @@ Label20: ;
 						ShowContinueError( "Line (~" + TrimSigDigits( FileLineCount ) + ") in error (first 100 characters)=" + NextLine.substr( 0, 100 ) );
 						ErrorsFound = true;
 					} else if ( any_lt( AbsSol( IGlass, _ ), 0.0 ) || any_gt( AbsSol( IGlass, _ ), 1.0 ) ) {
-						ShowSevereError( "HeatBalanceManager: SearchWindow5DataFile: Error in Read of AbsSol values. " "(out of range [0,1]) For Glass=" + TrimSigDigits( IGlass ) );
+						ShowSevereError( "HeatBalanceManager: SearchWindow5DataFile: Error in Read of AbsSol values. (out of range [0,1]) For Glass=" + TrimSigDigits( IGlass ) );
 						ShowContinueError( "Line (~" + TrimSigDigits( FileLineCount ) + ") in error (first 100 characters)=" + NextLine.substr( 0, 100 ) );
 						ErrorsFound = true;
 					}
@@ -6072,7 +6071,7 @@ Label20: ;
 		return;
 
 Label999: ;
-		ShowFatalError( "HeatBalanceManager: SearchWindow5DataFile: " "Could not open Window5 Data File, expecting it as file name=" + DesiredFileName );
+		ShowFatalError( "HeatBalanceManager: SearchWindow5DataFile: Could not open Window5 Data File, expecting it as file name=" + DesiredFileName );
 		return;
 
 Label1000: ;
@@ -6457,7 +6456,7 @@ Label1000: ;
 		// Check if IDD definition is correct
 		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumeric );
 		if ( NumAlpha != 4 ) {
-			ShowSevereError( RoutineName + cCurrentModuleObject + ": Object Definition indicates " "not = 4 Alpha Objects, Number Indicated=" + TrimSigDigits( NumAlpha ) );
+			ShowSevereError( RoutineName + cCurrentModuleObject + ": Object Definition indicates not = 4 Alpha Objects, Number Indicated=" + TrimSigDigits( NumAlpha ) );
 			ErrorsFound = true;
 		}
 
@@ -6473,7 +6472,7 @@ Label1000: ;
 				IsBlank = false;
 				VerifyName( cAlphaArgs( 1 ), SurfIncSolSSG.Name(), Loop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 				if ( ErrorInName ) {
-					ShowContinueError( "...each SurfaceProperty:SolarIncidentInside name must not duplicate other " "SurfaceProperty:SolarIncidentInside name" );
+					ShowContinueError( "...each SurfaceProperty:SolarIncidentInside name must not duplicate other SurfaceProperty:SolarIncidentInside name" );
 					ErrorsFound = true;
 					continue;
 				}
@@ -6529,7 +6528,7 @@ Label1000: ;
 				IsBlank = false;
 				VerifyName( cAlphaArgs( 1 ), FenLayAbsSSG.Name(), Loop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 				if ( ErrorInName ) {
-					ShowContinueError( "...each ComplexFenestrationProperty:SolarAbsorbedLayers name must not duplicate other " "ComplexFenestrationProperty:SolarAbsorbedLayers name" );
+					ShowContinueError( "...each ComplexFenestrationProperty:SolarAbsorbedLayers name must not duplicate other ComplexFenestrationProperty:SolarAbsorbedLayers name" );
 					ErrorsFound = true;
 					continue;
 				}
@@ -6562,7 +6561,7 @@ Label1000: ;
 					}
 
 					if ( ! NumOfLayersMatch ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Number of scheduled surface gains for each layer does not match number of layers" " in referenced construction." );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Number of scheduled surface gains for each layer does not match number of layers in referenced construction." );
 						ShowContinueError( cAlphaArgs( 1 ) + " have " + TrimSigDigits( NumOfScheduledLayers ) + " scheduled layers and " + cAlphaArgs( 3 ) + " have " + TrimSigDigits( Construct( ConstrNum ).TotSolidLayers ) + " layers." );
 						ErrorsFound = true;
 					}
@@ -6672,7 +6671,7 @@ Label1000: ;
 			if ( ( ! ZoneScheduled ) && ( ! ZoneUnscheduled ) ) {
 				// zone is nor scheduled nor unscheduled
 				ShowWarningError( "Zone " + Zone( ZoneNum ).Name + " does not have all surfaces scheduled with surface gains." );
-				ShowContinueError( "If at least one surface in the zone is scheduled with surface gains, then all other surfaces" " within the same zone should be scheduled as well." );
+				ShowContinueError( "If at least one surface in the zone is scheduled with surface gains, then all other surfaces within the same zone should be scheduled as well." );
 				break;
 			}
 
@@ -7619,7 +7618,7 @@ Label1000: ;
 			if ( mod( ( NumAlphas - 9 ), 3 ) != 0 ) {
 				//throw warning if incomplete field set
 				ErrorsFound = true;
-				ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object." " Incomplete field set found." );
+				ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Incomplete field set found." );
 				ShowContinueError( locAlphaArgs( 1 ) + " is missing some of the layers or/and gaps." );
 			}
 
@@ -7638,14 +7637,14 @@ Label1000: ;
 
 				if ( NumRows != NBasis ) {
 					ErrorsFound = true;
-					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object." " Illegal matrix size has been found." );
-					ShowContinueError( "Solar front transmittance matrix \"" + locAlphaArgs( 6 ) + "\" is not the same size" " as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" + locAlphaArgs( 5 ) + "\"." );
+					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Illegal matrix size has been found." );
+					ShowContinueError( "Solar front transmittance matrix \"" + locAlphaArgs( 6 ) + "\" is not the same size as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" + locAlphaArgs( 5 ) + "\"." );
 				}
 
 				if ( NumRows != NumCols ) {
 					ErrorsFound = true;
-					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + "\", object." " Invalid BSDF matrix dimensions." );
-					ShowContinueError( "Solar front transmittance matrix \"" + locAlphaArgs( 6 ) + "\" must have" " the same number of rows and columns." );
+					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + "\", object. Invalid BSDF matrix dimensions." );
+					ShowContinueError( "Solar front transmittance matrix \"" + locAlphaArgs( 6 ) + "\" must have the same number of rows and columns." );
 				}
 
 				if ( Construct( ConstrNum ).BSDFInput.BasisType == BasisType_Custom ) {
@@ -7656,7 +7655,7 @@ Label1000: ;
 				Construct( ConstrNum ).BSDFInput.SolFrtTrans.allocate( NumRows, NumCols );
 				if ( Construct( ConstrNum ).BSDFInput.SolFrtTransIndex == 0 ) {
 					ErrorsFound = true;
-					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object." " Referenced Matrix:TwoDimension is missing from the input file." );
+					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Referenced Matrix:TwoDimension is missing from the input file." );
 					ShowContinueError( "Solar front transmittance Matrix:TwoDimension = \"" + locAlphaArgs( 6 ) + "\" is missing from the input file." );
 				} else {
 					Get2DMatrix( Construct( ConstrNum ).BSDFInput.SolFrtTransIndex, Construct( ConstrNum ).BSDFInput.SolFrtTrans );
@@ -7672,20 +7671,20 @@ Label1000: ;
 
 				if ( NumRows != NBasis ) {
 					ErrorsFound = true;
-					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object." " Illegal matrix size has been found." );
-					ShowContinueError( "Solar back reflectance matrix \"" + locAlphaArgs( 7 ) + "\" is not the same size" " as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" + locAlphaArgs( 5 ) + "\"." );
+					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Illegal matrix size has been found." );
+					ShowContinueError( "Solar back reflectance matrix \"" + locAlphaArgs( 7 ) + "\" is not the same size as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" + locAlphaArgs( 5 ) + "\"." );
 				}
 
 				if ( NumRows != NumCols ) {
 					ErrorsFound = true;
-					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + "\", object." " Invalid BSDF matrix dimensions." );
-					ShowContinueError( "Solar bakc reflectance matrix \"" + locAlphaArgs( 7 ) + "\" must have" " the same number of rows and columns." );
+					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + "\", object. Invalid BSDF matrix dimensions." );
+					ShowContinueError( "Solar bakc reflectance matrix \"" + locAlphaArgs( 7 ) + "\" must have the same number of rows and columns." );
 				}
 
 				Construct( ConstrNum ).BSDFInput.SolBkRefl.allocate( NumRows, NumCols );
 				if ( Construct( ConstrNum ).BSDFInput.SolBkReflIndex == 0 ) {
 					ErrorsFound = true;
-					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object." " Referenced Matrix:TwoDimension is missing from the input file." );
+					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Referenced Matrix:TwoDimension is missing from the input file." );
 					ShowContinueError( "Solar back reflectance Matrix:TwoDimension = \"" + locAlphaArgs( 7 ) + "\" is missing from the input file." );
 				} else {
 					Get2DMatrix( Construct( ConstrNum ).BSDFInput.SolBkReflIndex, Construct( ConstrNum ).BSDFInput.SolBkRefl );
@@ -7701,20 +7700,20 @@ Label1000: ;
 
 				if ( NumRows != NBasis ) {
 					ErrorsFound = true;
-					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object." " Illegal matrix size has been found." );
-					ShowContinueError( "Visible front transmittance matrix \"" + locAlphaArgs( 8 ) + "\" is not the same size" " as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" + locAlphaArgs( 5 ) + "\"." );
+					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Illegal matrix size has been found." );
+					ShowContinueError( "Visible front transmittance matrix \"" + locAlphaArgs( 8 ) + "\" is not the same size as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" + locAlphaArgs( 5 ) + "\"." );
 				}
 
 				if ( NumRows != NumCols ) {
 					ErrorsFound = true;
-					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + "\", object." " Invalid BSDF matrix dimensions." );
-					ShowContinueError( "Visible front transmittance matrix \"" + locAlphaArgs( 8 ) + "\" must have" " the same number of rows and columns." );
+					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + "\", object. Invalid BSDF matrix dimensions." );
+					ShowContinueError( "Visible front transmittance matrix \"" + locAlphaArgs( 8 ) + "\" must have the same number of rows and columns." );
 				}
 
 				Construct( ConstrNum ).BSDFInput.VisFrtTrans.allocate( NumRows, NumCols );
 				if ( Construct( ConstrNum ).BSDFInput.VisFrtTransIndex == 0 ) {
 					ErrorsFound = true;
-					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object." " Referenced Matrix:TwoDimension is missing from the input file." );
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Referenced Matrix:TwoDimension is missing from the input file." );
 					ShowContinueError( "Visible front transmittance Matrix:TwoDimension = \"" + locAlphaArgs( 8 ) + "\" is missing from the input file." );
 				} else {
 					Get2DMatrix( Construct( ConstrNum ).BSDFInput.VisFrtTransIndex, Construct( ConstrNum ).BSDFInput.VisFrtTrans );
@@ -7730,20 +7729,20 @@ Label1000: ;
 
 				if ( NumRows != NBasis ) {
 					ErrorsFound = true;
-					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object." " Illegal matrix size has been found." );
-					ShowContinueError( "Visible back reflectance matrix \"" + locAlphaArgs( 9 ) + "\" is not the same size" " as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" + locAlphaArgs( 5 ) + "\"." );
+					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Illegal matrix size has been found." );
+					ShowContinueError( "Visible back reflectance matrix \"" + locAlphaArgs( 9 ) + "\" is not the same size as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" + locAlphaArgs( 5 ) + "\"." );
 				}
 
 				if ( NumRows != NumCols ) {
 					ErrorsFound = true;
-					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + "\", object." " Invalid BSDF matrix dimensions." );
-					ShowContinueError( "Visible back reflectance \"" + locAlphaArgs( 9 ) + "\" must have" " the same number of rows and columns." );
+					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + "\", object. Invalid BSDF matrix dimensions." );
+					ShowContinueError( "Visible back reflectance \"" + locAlphaArgs( 9 ) + "\" must have the same number of rows and columns." );
 				}
 
 				Construct( ConstrNum ).BSDFInput.VisBkRefl.allocate( NumRows, NumCols );
 				if ( Construct( ConstrNum ).BSDFInput.VisBkReflIndex == 0 ) {
 					ErrorsFound = true;
-					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object." " Referenced Matrix:TwoDimension is missing from the input file." );
+					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Referenced Matrix:TwoDimension is missing from the input file." );
 					ShowContinueError( "Visble back reflectance Matrix:TwoDimension = \"" + locAlphaArgs( 9 ) + "\" is missing from the input file." );
 				} else {
 					Get2DMatrix( Construct( ConstrNum ).BSDFInput.VisBkReflIndex, Construct( ConstrNum ).BSDFInput.VisBkRefl );
@@ -7769,22 +7768,22 @@ Label1000: ;
 
 						if ( NumRows != 1 ) {
 							ErrorsFound = true;
-							ShowSevereError( RoutineName + locCurrentModuleObject + " = \"" + locAlphaArgs( 1 ) + "\", object." " Incorrect matrix dimension." );
+							ShowSevereError( RoutineName + locCurrentModuleObject + " = \"" + locAlphaArgs( 1 ) + "\", object. Incorrect matrix dimension." );
 							ShowContinueError( "Front absorbtance Matrix:TwoDimension = \"" + locAlphaArgs( AlphaIndex ) + "\" for layer " + RoundSigDigits( currentOpticalLayer ) + " must have only one row." );
 						}
 
 						if ( NumCols != NBasis ) {
 							ErrorsFound = true;
-							ShowSevereError( RoutineName + locCurrentModuleObject + " = \"" + locAlphaArgs( 1 ) + "\", object." " Incorrect matrix dimension." );
+							ShowSevereError( RoutineName + locCurrentModuleObject + " = \"" + locAlphaArgs( 1 ) + "\", object. Incorrect matrix dimension." );
 							ShowContinueError( "Front absorbtance Matrix:TwoDimension = \"" + locAlphaArgs( AlphaIndex ) + "\" for layer " + RoundSigDigits( currentOpticalLayer ) + " must have same number of columns as it is defined by basis matrix." );
-							ShowContinueError( "Matrix has " + RoundSigDigits( NumCols ) + " number of columns, while basis" " definition specifies " + RoundSigDigits( NBasis ) + " number of columns." );
+							ShowContinueError( "Matrix has " + RoundSigDigits( NumCols ) + " number of columns, while basis definition specifies " + RoundSigDigits( NBasis ) + " number of columns." );
 						}
 
 						Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).AbsNcols = NumCols;
 						Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).FrtAbs.allocate( NumRows, NumCols );
 						if ( Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).FrtAbsIndex == 0 ) {
 							ErrorsFound = true;
-							ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object." " Referenced Matrix:TwoDimension is missing from the input file." );
+							ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Referenced Matrix:TwoDimension is missing from the input file." );
 							ShowContinueError( "Front absorbtance Matrix:TwoDimension = \"" + locAlphaArgs( AlphaIndex ) + "\" for layer " + RoundSigDigits( currentOpticalLayer ) + " is missing from the input file." );
 						} else {
 							Get2DMatrix( Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).FrtAbsIndex, Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).FrtAbs );
@@ -7799,21 +7798,21 @@ Label1000: ;
 
 						if ( NumRows != 1 ) {
 							ErrorsFound = true;
-							ShowSevereError( RoutineName + locCurrentModuleObject + " = \"" + locAlphaArgs( 1 ) + "\", object." " Incorrect matrix dimension." );
+							ShowSevereError( RoutineName + locCurrentModuleObject + " = \"" + locAlphaArgs( 1 ) + "\", object. Incorrect matrix dimension." );
 							ShowContinueError( "Back absorbtance Matrix:TwoDimension = \"" + locAlphaArgs( AlphaIndex ) + "\" for layer " + RoundSigDigits( currentOpticalLayer ) + " must have only one row." );
 						}
 
 						if ( NumCols != NBasis ) {
 							ErrorsFound = true;
-							ShowSevereError( RoutineName + locCurrentModuleObject + " = \"" + locAlphaArgs( 1 ) + "\", object." " Incorrect matrix dimension." );
+							ShowSevereError( RoutineName + locCurrentModuleObject + " = \"" + locAlphaArgs( 1 ) + "\", object. Incorrect matrix dimension." );
 							ShowContinueError( "Back absorbtance Matrix:TwoDimension = \"" + locAlphaArgs( AlphaIndex ) + "\" for layer " + RoundSigDigits( currentOpticalLayer ) + " must have same number of columns as it is defined by basis matrix." );
-							ShowContinueError( "Matrix has " + RoundSigDigits( NumCols ) + " number of columns, while basis" " definition specifies " + RoundSigDigits( NBasis ) + " number of columns." );
+							ShowContinueError( "Matrix has " + RoundSigDigits( NumCols ) + " number of columns, while basis definition specifies " + RoundSigDigits( NBasis ) + " number of columns." );
 						}
 
 						Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).BkAbs.allocate( NumRows, NumCols );
 						if ( Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).BkAbsIndex == 0 ) {
 							ErrorsFound = true;
-							ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object." " Referenced Matrix:TwoDimension is missing from the input file." );
+							ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Referenced Matrix:TwoDimension is missing from the input file." );
 							ShowContinueError( "Back absorbtance Matrix:TwoDimension = \"" + locAlphaArgs( AlphaIndex ) + "\" for layer " + RoundSigDigits( currentOpticalLayer ) + " is missing from the input file." );
 						} else {
 							Get2DMatrix( Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).BkAbsIndex, Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).BkAbs );
@@ -7836,20 +7835,20 @@ Label1000: ;
 
 				if ( NumRows != NBasis ) {
 					ErrorsFound = true;
-					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object." " Illegal matrix size has been found." );
-					ShowContinueError( "Solar front transmittance matrix \"" + locAlphaArgs( 6 ) + "\" is not the same size" " as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" + locAlphaArgs( 5 ) + "\"." );
+					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Illegal matrix size has been found." );
+					ShowContinueError( "Solar front transmittance matrix \"" + locAlphaArgs( 6 ) + "\" is not the same size as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" + locAlphaArgs( 5 ) + "\"." );
 				}
 
 				if ( NumRows != NumCols ) {
 					ErrorsFound = true;
-					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + "\", object." " Invalid BSDF matrix dimensions." );
-					ShowContinueError( "Solar front transmittance matrix \"" + locAlphaArgs( 6 ) + "\" must have" " the same number of rows and columns." );
+					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + "\", object. Invalid BSDF matrix dimensions." );
+					ShowContinueError( "Solar front transmittance matrix \"" + locAlphaArgs( 6 ) + "\" must have the same number of rows and columns." );
 				}
 
 				Construct( ConstrNum ).BSDFInput.SolFrtTrans.allocate( NBasis, NBasis );
 				if ( Construct( ConstrNum ).BSDFInput.SolFrtTransIndex == 0 ) {
 					ErrorsFound = true;
-					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object." " Referenced Matrix:TwoDimension is missing from the input file." );
+					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Referenced Matrix:TwoDimension is missing from the input file." );
 					ShowContinueError( "Solar front transmittance Matrix:TwoDimension = \"" + locAlphaArgs( 6 ) + "\" is missing from the input file." );
 				} else {
 					Get2DMatrix( Construct( ConstrNum ).BSDFInput.SolFrtTransIndex, BSDFTempMtrx );
@@ -7870,20 +7869,20 @@ Label1000: ;
 
 				if ( NumRows != NBasis ) {
 					ErrorsFound = true;
-					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object." " Illegal matrix size has been found." );
-					ShowContinueError( "Solar back reflectance matrix \"" + locAlphaArgs( 7 ) + "\" is not the same size" " as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" + locAlphaArgs( 5 ) + "\"." );
+					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Illegal matrix size has been found." );
+					ShowContinueError( "Solar back reflectance matrix \"" + locAlphaArgs( 7 ) + "\" is not the same size as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" + locAlphaArgs( 5 ) + "\"." );
 				}
 
 				if ( NumRows != NumCols ) {
 					ErrorsFound = true;
-					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + "\", object." " Invalid BSDF matrix dimensions." );
-					ShowContinueError( "Solar back reflectance matrix \"" + locAlphaArgs( 7 ) + "\" must have" " the same number of rows and columns." );
+					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + "\", object. Invalid BSDF matrix dimensions." );
+					ShowContinueError( "Solar back reflectance matrix \"" + locAlphaArgs( 7 ) + "\" must have the same number of rows and columns." );
 				}
 
 				Construct( ConstrNum ).BSDFInput.SolBkRefl.allocate( NBasis, NBasis );
 				if ( Construct( ConstrNum ).BSDFInput.SolBkReflIndex == 0 ) {
 					ErrorsFound = true;
-					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object." " Referenced Matrix:TwoDimension is missing from the input file." );
+					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Referenced Matrix:TwoDimension is missing from the input file." );
 					ShowContinueError( "Solar back reflectance Matrix:TwoDimension = \"" + locAlphaArgs( 7 ) + "\" is missing from the input file." );
 				} else {
 					Get2DMatrix( Construct( ConstrNum ).BSDFInput.SolBkReflIndex, BSDFTempMtrx );
@@ -7903,20 +7902,20 @@ Label1000: ;
 
 				if ( NumRows != NBasis ) {
 					ErrorsFound = true;
-					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object." " Illegal matrix size has been found." );
-					ShowContinueError( "Visible front transmittance matrix \"" + locAlphaArgs( 8 ) + "\" is not the same size" " as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" + locAlphaArgs( 5 ) + "\"." );
+					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Illegal matrix size has been found." );
+					ShowContinueError( "Visible front transmittance matrix \"" + locAlphaArgs( 8 ) + "\" is not the same size as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" + locAlphaArgs( 5 ) + "\"." );
 				}
 
 				if ( NumRows != NumCols ) {
 					ErrorsFound = true;
-					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + "\", object." " Invalid BSDF matrix dimensions." );
-					ShowContinueError( "Visible front transmittance matrix \"" + locAlphaArgs( 8 ) + "\" must have" " the same number of rows and columns." );
+					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + "\", object. Invalid BSDF matrix dimensions." );
+					ShowContinueError( "Visible front transmittance matrix \"" + locAlphaArgs( 8 ) + "\" must have the same number of rows and columns." );
 				}
 
 				Construct( ConstrNum ).BSDFInput.VisFrtTrans.allocate( NBasis, NBasis );
 				if ( Construct( ConstrNum ).BSDFInput.VisFrtTransIndex == 0 ) {
 					ErrorsFound = true;
-					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object." " Referenced Matrix:TwoDimension is missing from the input file." );
+					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Referenced Matrix:TwoDimension is missing from the input file." );
 					ShowContinueError( "Visible front transmittance Matrix:TwoDimension = \"" + locAlphaArgs( 8 ) + "\" is missing from the input file." );
 				} else {
 					Get2DMatrix( Construct( ConstrNum ).BSDFInput.VisFrtTransIndex, BSDFTempMtrx );
@@ -7936,20 +7935,20 @@ Label1000: ;
 
 				if ( NumRows != NBasis ) {
 					ErrorsFound = true;
-					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object." " Illegal matrix size has been found." );
-					ShowContinueError( "Visible back reflectance matrix \"" + locAlphaArgs( 9 ) + "\" is not the same size" " as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" + locAlphaArgs( 5 ) + "\"." );
+					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Illegal matrix size has been found." );
+					ShowContinueError( "Visible back reflectance matrix \"" + locAlphaArgs( 9 ) + "\" is not the same size as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" + locAlphaArgs( 5 ) + "\"." );
 				}
 
 				if ( NumRows != NumCols ) {
 					ErrorsFound = true;
-					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + "\", object." " Invalid BSDF matrix dimensions." );
-					ShowContinueError( "Visible back reflectance matrix \"" + locAlphaArgs( 9 ) + "\" must have" " the same number of rows and columns." );
+					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + "\", object. Invalid BSDF matrix dimensions." );
+					ShowContinueError( "Visible back reflectance matrix \"" + locAlphaArgs( 9 ) + "\" must have the same number of rows and columns." );
 				}
 
 				Construct( ConstrNum ).BSDFInput.VisBkRefl.allocate( NBasis, NBasis );
 				if ( Construct( ConstrNum ).BSDFInput.VisBkReflIndex == 0 ) {
 					ErrorsFound = true;
-					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object." " Referenced Matrix:TwoDimension is missing from the input file." );
+					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Referenced Matrix:TwoDimension is missing from the input file." );
 					ShowContinueError( "Visible back reflectance Matrix:TwoDimension = \"" + locAlphaArgs( 9 ) + "\" is missing from the input file." );
 				} else {
 					Get2DMatrix( Construct( ConstrNum ).BSDFInput.VisBkReflIndex, BSDFTempMtrx );
@@ -7988,15 +7987,15 @@ Label1000: ;
 
 						if ( NumRows != 1 ) {
 							ErrorsFound = true;
-							ShowSevereError( RoutineName + locCurrentModuleObject + " = \"" + locAlphaArgs( 1 ) + "\", object." " Incorrect matrix dimension." );
+							ShowSevereError( RoutineName + locCurrentModuleObject + " = \"" + locAlphaArgs( 1 ) + "\", object. Incorrect matrix dimension." );
 							ShowContinueError( "Front absorbtance Matrix:TwoDimension = \"" + locAlphaArgs( AlphaIndex ) + "\" for layer " + RoundSigDigits( currentOpticalLayer ) + " must have only one row." );
 						}
 
 						if ( NumCols != NBasis ) {
 							ErrorsFound = true;
-							ShowSevereError( RoutineName + locCurrentModuleObject + " = \"" + locAlphaArgs( 1 ) + "\", object." " Incorrect matrix dimension." );
+							ShowSevereError( RoutineName + locCurrentModuleObject + " = \"" + locAlphaArgs( 1 ) + "\", object. Incorrect matrix dimension." );
 							ShowContinueError( "Front absorbtance Matrix:TwoDimension = \"" + locAlphaArgs( AlphaIndex ) + "\" for layer " + RoundSigDigits( currentOpticalLayer ) + " must have same number of columns as it is defined by basis matrix." );
-							ShowContinueError( "Matrix has " + RoundSigDigits( NumCols ) + " number of columns, while basis" " definition specifies " + RoundSigDigits( NBasis ) + " number of columns." );
+							ShowContinueError( "Matrix has " + RoundSigDigits( NumCols ) + " number of columns, while basis definition specifies " + RoundSigDigits( NBasis ) + " number of columns." );
 						}
 
 						Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).AbsNcols = NumCols;
@@ -8004,7 +8003,7 @@ Label1000: ;
 
 						if ( Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).FrtAbsIndex == 0 ) {
 							ErrorsFound = true;
-							ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object." " Referenced Matrix:TwoDimension is missing from the input file." );
+							ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Referenced Matrix:TwoDimension is missing from the input file." );
 							ShowContinueError( "Front absorbtance Matrix:TwoDimension = \"" + locAlphaArgs( AlphaIndex ) + "\" for layer " + RoundSigDigits( currentOpticalLayer ) + " is missing from the input file." );
 						} else {
 							Get2DMatrix( Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).FrtAbsIndex, Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).FrtAbs );
@@ -8019,22 +8018,22 @@ Label1000: ;
 
 						if ( NumRows != 1 ) {
 							ErrorsFound = true;
-							ShowSevereError( RoutineName + locCurrentModuleObject + " = \"" + locAlphaArgs( 1 ) + "\", object." " Incorrect matrix dimension." );
+							ShowSevereError( RoutineName + locCurrentModuleObject + " = \"" + locAlphaArgs( 1 ) + "\", object. Incorrect matrix dimension." );
 							ShowContinueError( "Back absorbtance Matrix:TwoDimension = \"" + locAlphaArgs( AlphaIndex ) + "\" for layer " + RoundSigDigits( currentOpticalLayer ) + " must have only one row." );
 						}
 
 						if ( NumCols != NBasis ) {
 							ErrorsFound = true;
-							ShowSevereError( RoutineName + locCurrentModuleObject + " = \"" + locAlphaArgs( 1 ) + "\", object." " Incorrect matrix dimension." );
+							ShowSevereError( RoutineName + locCurrentModuleObject + " = \"" + locAlphaArgs( 1 ) + "\", object. Incorrect matrix dimension." );
 							ShowContinueError( "Back absorbtance Matrix:TwoDimension = \"" + locAlphaArgs( AlphaIndex ) + "\" for layer " + RoundSigDigits( currentOpticalLayer ) + " must have same number of columns as it is defined by basis matrix." );
-							ShowContinueError( "Matrix has " + RoundSigDigits( NumCols ) + " number of columns, while basis" " definition specifies " + RoundSigDigits( NBasis ) + " number of columns." );
+							ShowContinueError( "Matrix has " + RoundSigDigits( NumCols ) + " number of columns, while basis definition specifies " + RoundSigDigits( NBasis ) + " number of columns." );
 						}
 
 						Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).BkAbs.allocate( NumRows, NumCols );
 
 						if ( Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).BkAbsIndex == 0 ) {
 							ErrorsFound = true;
-							ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object." " Referenced Matrix:TwoDimension is missing from the input file." );
+							ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Referenced Matrix:TwoDimension is missing from the input file." );
 							ShowContinueError( "Back absorbtance Matrix:TwoDimension = \"" + locAlphaArgs( AlphaIndex ) + "\" for layer " + RoundSigDigits( currentOpticalLayer ) + " is missing from the input file." );
 						} else {
 							Get2DMatrix( Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).BkAbsIndex, Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).BkAbs );

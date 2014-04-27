@@ -26,13 +26,14 @@ namespace fmt {
 std::istream &
 operator >>( std::istream & stream, Skip const & skip )
 {
-	static std::string const STOPPERS( '\n' + std::string( 1, std::char_traits< char >::eof() ) );
+	static std::string const STOPPERS( '\n' + std::string( 1, std::istream::traits_type::eof() ) );
 	char c;
 	Size i( 0 );
 	while ( ( i < skip.w_ ) && stream && not_any_of( stream.peek(), STOPPERS ) ) {
 		stream.get( c );
 		++i;
 	}
+	// Don't clear eof bit since specified width read
 	return stream;
 }
 

@@ -75,23 +75,24 @@ typedef  std::vector< Format * >  Formats;
 	void
 	Format::skip( std::istream & stream, Size const w )
 	{
-		static std::string const STOPPERS( '\n' + std::string( 1, std::char_traits< char >::eof() ) );
+		static std::string const STOPPERS( '\n' + std::string( 1, std::istream::traits_type::eof() ) );
 		char c;
 		Size i( 0 );
 		while ( ( i < w ) && stream && not_any_of( stream.peek(), STOPPERS ) ) {
 			stream.get( c );
 			++i;
 		}
+		// Don't clear eof bit since specified width read
 	}
 
 	// Read List-Directed Entry from a Stream
 	EntryFormatLD
 	Format::read_ld( std::istream & stream, bool const numeric, char const mode )
 	{
-		static std::string const STOPPERS( '\n' + std::string( 1, std::char_traits< char >::eof() ) );
+		static char const eof( std::istream::traits_type::eof() );
+		static std::string const STOPPERS( '\n' + std::string( 1, eof ) );
 		std::string s;
 		char c( '\0' ), q( '\0' ), peek( stream.peek() );
-		char const eof( std::char_traits< char >::eof() );
 		bool in_body( false );
 		bool in_quote( false );
 		bool has_repeat( false );
@@ -190,7 +191,7 @@ typedef  std::vector< Format * >  Formats;
 	std::string
 	Format::read( std::istream & stream, Size const w )
 	{
-		static std::string const STOPPERS( '\n' + std::string( 1, std::char_traits< char >::eof() ) );
+		static std::string const STOPPERS( '\n' + std::string( 1, std::istream::traits_type::eof() ) );
 		std::string s;
 		char c;
 		Size i( 0 );
@@ -199,6 +200,7 @@ typedef  std::vector< Format * >  Formats;
 			if ( stream ) s += c;
 			++i;
 		}
+		if ( w == NOSIZE ) clear_eof( stream );
 		return s;
 	}
 
@@ -206,7 +208,7 @@ typedef  std::vector< Format * >  Formats;
 	std::string
 	Format::read_float( std::istream & stream, Size const w )
 	{
-		static std::string const STOPPERS( '\n' + std::string( 1, std::char_traits< char >::eof() ) );
+		static std::string const STOPPERS( '\n' + std::string( 1, std::istream::traits_type::eof() ) );
 		static std::string const WHITE( " \t\0", 3 );
 		std::string s;
 		char c;
@@ -229,6 +231,7 @@ typedef  std::vector< Format * >  Formats;
 			if ( stream ) s += c;
 			++i;
 		}
+		if ( w == NOSIZE ) clear_eof( stream );
 		return s;
 	}
 

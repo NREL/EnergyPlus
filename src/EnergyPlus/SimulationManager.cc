@@ -2456,6 +2456,7 @@ namespace SimulationManager {
 		while ( iostatus == 0 ) {
 			{ IOFlags flags; gio::read( CacheIPErrorFile, fmta, flags ) >> ErrorMessage; iostatus = flags.ios(); }
 			if ( iostatus != 0 ) break;
+			if ( is_blank( ErrorMessage ) ) continue;
 			ShowErrorMessage( ErrorMessage );
 			if ( WriteOutputToSQLite ) {
 				// Following code relies on specific formatting of Severes, Warnings, and continues

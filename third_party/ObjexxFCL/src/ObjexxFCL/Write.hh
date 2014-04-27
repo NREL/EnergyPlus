@@ -179,7 +179,7 @@ public: // Operators
 	operator <<( FArray1S< T > const & t )
 	{
 		if ( stream() && format() ) {
-			for ( int i = 1, e = t.u(); i < e; ++i ) {
+			for ( int i = 1, e = t.u(); i <= e; ++i ) {
 				*this << t( i );
 				if ( ! stream() ) break;
 			}
@@ -305,7 +305,7 @@ public: // Operators
 	operator <<( MArray1< A, T > const & t )
 	{
 		if ( stream() && format() ) {
-			for ( int i = 1, e = t.u(); i < e; ++i ) {
+			for ( int i = 1, e = t.u(); i <= e; ++i ) {
 				*this << t( i );
 				if ( ! stream() ) break;
 			}
