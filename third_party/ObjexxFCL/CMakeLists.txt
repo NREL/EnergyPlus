@@ -1,5 +1,10 @@
 set( target_name objexx )
 
+if(MSVC)
+  add_definitions(/Za)
+endif()
+
+
 set(src 
   src/ObjexxFCL/array.iterator.hh
   src/ObjexxFCL/ArrayTraits.hh
