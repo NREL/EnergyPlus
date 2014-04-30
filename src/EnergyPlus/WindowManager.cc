@@ -5,7 +5,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
@@ -450,7 +449,7 @@ namespace WindowManager {
 				SimpleGlazingU = Material( Construct( ConstrNum ).LayerPoint( 1 ) ).SimpleWindowUfactor;
 			}
 
-			if ( Construct( ConstrNum ).Name( {1,28} ) == "BARECONSTRUCTIONWITHSTORMWIN" || Construct( ConstrNum ).Name( {1,30} ) == "SHADEDCONSTRUCTIONWITHSTORMWIN" ) StormWinConst = true;
+			if ( has_prefix( Construct( ConstrNum ).Name, "BARECONSTRUCTIONWITHSTORMWIN" ) || has_prefix( Construct( ConstrNum ).Name, "SHADEDCONSTRUCTIONWITHSTORMWIN" ) ) StormWinConst = true;
 
 			// Get layer number of shade/blind
 			if ( Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group == Shade ) {
@@ -586,8 +585,8 @@ namespace WindowManager {
 					// If there is spectral data for between-glass shades or blinds, calc the average spectral properties for use.
 					if ( BGFlag ) {
 						// 5/16/2012 CR 8793. Add warning message for the glazing defined with full spectral data.
-						ShowWarningError( "Window glazing material \"" + trim( Material( LayPtr ).Name ) + "\" was defined with full spectral data and has been converted to average spectral data" );
-						ShowContinueError( "due to its use with between-glass shades or blinds of the window construction \"" + trim( Construct( ConstrNum ).Name ) + "\"." );
+						ShowWarningError( "Window glazing material \"" + Material( LayPtr ).Name + "\" was defined with full spectral data and has been converted to average spectral data" );
+						ShowContinueError( "due to its use with between-glass shades or blinds of the window construction \"" + Construct( ConstrNum ).Name + "\"." );
 						ShowContinueError( "All occurrences of this glazing material will be modeled as SpectralAverage." );
 						ShowContinueError( "If this material is also used in other window constructions" "  without between-glass shades or blinds," );
 						ShowContinueError( "then make a duplicate material (with new name) if you want to model those windows " " (and reference the new material) using the full spectral data." );
@@ -1554,7 +1553,7 @@ namespace WindowManager {
 							SurfaceWindow( SurfNum ).SolarDiffusing = false;
 							++DifOverrideCount;
 							if ( DisplayExtraWarnings ) {
-								ShowWarningError( "W5InitGlassParameters: Window=\"" + trim( Surface( SurfNum ).Name ) + "\" has interior material with Solar Diffusing=Yes, but existing Window Shading Device sets Diffusing=No." );
+								ShowWarningError( "W5InitGlassParameters: Window=\"" + Surface( SurfNum ).Name + "\" has interior material with Solar Diffusing=Yes, but existing Window Shading Device sets Diffusing=No." );
 							}
 						}
 					}
@@ -1564,9 +1563,9 @@ namespace WindowManager {
 
 		if ( DifOverrideCount > 0 ) {
 			if ( ! DisplayExtraWarnings ) {
-				ShowWarningError( "W5InitGlassParameters: " + trim( RoundSigDigits( DifOverrideCount ) ) + " Windows had Solar Diffusing=Yes overridden by presence of Window Shading Device." );
+				ShowWarningError( "W5InitGlassParameters: " + RoundSigDigits( DifOverrideCount ) + " Windows had Solar Diffusing=Yes overridden by presence of Window Shading Device." );
 			} else {
-				ShowMessage( "W5InitGlassParameters: " + trim( RoundSigDigits( DifOverrideCount ) ) + " Windows had Solar Diffusing=Yes overridden by presence of Window Shading Device." );
+				ShowMessage( "W5InitGlassParameters: " + RoundSigDigits( DifOverrideCount ) + " Windows had Solar Diffusing=Yes overridden by presence of Window Shading Device." );
 			}
 		}
 
@@ -2202,7 +2201,7 @@ namespace WindowManager {
 				//            END DO ! ZoneEquipConfigNum
 				// check whether this zone is a controlled zone or not
 				if ( ! Zone( ZoneNum ).IsControlled ) {
-					ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + trim( Zone( ZoneNum ).Name ) );
+					ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone( ZoneNum ).Name );
 					return;
 				}
 				// determine supply air conditions
@@ -2321,7 +2320,7 @@ namespace WindowManager {
 						// Shade or screen on
 						if ( AnyEnergyManagementSystemInModel ) { // check to make sure the user hasn't messed up the shade control values
 							if ( Material( ShadeLayPtr ).Group == WindowBlind ) {
-								ShowSevereError( "CalcWindowHeatBalance: ShadeFlag indicates Shade but Blind=\"" + trim( Material( ShadeLayPtr ).Name ) + "\" is being used." );
+								ShowSevereError( "CalcWindowHeatBalance: ShadeFlag indicates Shade but Blind=\"" + Material( ShadeLayPtr ).Name + "\" is being used." );
 								ShowContinueError( "This is most likely a fault of the EMS values for shading control." );
 								ShowFatalError( "Preceding condition terminates program." );
 							}
@@ -2342,7 +2341,7 @@ namespace WindowManager {
 					} else {
 						if ( AnyEnergyManagementSystemInModel ) { // check to make sure the user hasn't messed up the shade control values
 							if ( Material( ShadeLayPtr ).Group == Shade || Material( ShadeLayPtr ).Group == Screen ) {
-								ShowSevereError( "CalcWindowHeatBalance: ShadeFlag indicates Blind but Shade/Screen=\"" + trim( Material( ShadeLayPtr ).Name ) + "\" is being used." );
+								ShowSevereError( "CalcWindowHeatBalance: ShadeFlag indicates Blind but Shade/Screen=\"" + Material( ShadeLayPtr ).Name + "\" is being used." );
 								ShowContinueError( "This is most likely a fault of the EMS values for shading control." );
 								ShowFatalError( "Preceding condition terminates program." );
 							}
@@ -2416,7 +2415,7 @@ namespace WindowManager {
 					ZoneEquipConfigNum = ZoneNumAdj;
 					// check whether this zone is a controlled zone or not
 					if ( ! Zone( ZoneNumAdj ).IsControlled ) {
-						ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + trim( Zone( ZoneNum ).Name ) );
+						ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone( ZoneNum ).Name );
 						return;
 					}
 					// determine supply air conditions
@@ -3313,7 +3312,7 @@ namespace WindowManager {
 				}
 
 			} else {
-				ShowFatalError( "SolveForWindowTemperatures: Invalid number of Glass Layers=" + trim( TrimSigDigits( ngllayer ) ) + ", up to 4 allowed." );
+				ShowFatalError( "SolveForWindowTemperatures: Invalid number of Glass Layers=" + TrimSigDigits( ngllayer ) + ", up to 4 allowed." );
 			}}
 
 			LUdecomposition( Aface, nglfacep, indx, d ); // Note that these routines change Aface;
@@ -3454,18 +3453,18 @@ namespace WindowManager {
 			if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == ExtScreenOn ) SurfaceWindow( SurfNum ).ConvCoeffWithShade = hcv;
 		} else {
 			// No convergence after MaxIterations even with relaxed error tolerance
-			ShowSevereError( "Convergence error in SolveForWindowTemperatures for window " + trim( Surface( SurfNum ).Name ) );
-			ShowContinueErrorTimeStamp( " " );
+			ShowSevereError( "Convergence error in SolveForWindowTemperatures for window " + Surface( SurfNum ).Name );
+			ShowContinueErrorTimeStamp( "" );
 
 			if ( DisplayExtraWarnings ) {
 				//report out temperatures
 				for ( i = 1; i <= nglfacep; ++i ) {
-					ShowContinueError( "Glazing face index = " + trim( RoundSigDigits( i ) ) + " ; new temperature =" + trim( RoundSigDigits( thetas( i ) - KelvinConv, 4 ) ) + "C " " ; previous temperature = " + trim( RoundSigDigits( thetasPrev( i ) - KelvinConv, 4 ) ) + "C" );
+					ShowContinueError( "Glazing face index = " + RoundSigDigits( i ) + " ; new temperature =" + RoundSigDigits( thetas( i ) - KelvinConv, 4 ) + "C " " ; previous temperature = " + RoundSigDigits( thetasPrev( i ) - KelvinConv, 4 ) + 'C' );
 				}
 
 			}
 
-			ShowFatalError( "Program halted because of convergence error in SolveForWindowTemperatures for window " + trim( Surface( SurfNum ).Name ) );
+			ShowFatalError( "Program halted because of convergence error in SolveForWindowTemperatures for window " + Surface( SurfNum ).Name );
 
 		}
 
@@ -6946,7 +6945,7 @@ namespace WindowManager {
 		// No convergence after MaxIterations; and/or error tolerance
 		if ( errtemp >= 10 * errtemptol ) {
 			// Fatal error: didn't converge
-			ShowFatalError( "Convergence error in WindowTempsForNominalCond for construction " + trim( Construct( ConstrNum ).Name ) );
+			ShowFatalError( "Convergence error in WindowTempsForNominalCond for construction " + Construct( ConstrNum ).Name );
 		}
 
 	}
@@ -7063,8 +7062,8 @@ namespace WindowManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_Fstring const Roughness( 6, sFstring( 12 ), { "VeryRough   ", "Rough       ", "MediumRough ", "MediumSmooth", "Smooth      ", "VerySmooth  " } );
-		static FArray1D_Fstring const GasTypeName( {0,4}, sFstring( 7 ), { "Custom ", "Air    ", "Argon  ", "Krypton", "Xenon  " } );
+		static FArray1D_string const Roughness( 6, { "VeryRough", "Rough", "MediumRough", "MediumSmooth", "Smooth", "VerySmooth" } );
+		static FArray1D_string const GasTypeName( {0,4}, { "Custom", "Air", "Argon", "Krypton", "Xenon" } );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -7102,27 +7101,27 @@ namespace WindowManager {
 		Real64 TransSolNorm; // Window construction solar transmittance at normal incidence
 		Real64 TransVisNorm; // Window construction visible transmittance at normal incidence
 		int errFlag; // Error flag
-		Fstring SolarDiffusing( 3 ); // 'Yes' if glass is solar diffusing; otherwise 'No' (clear glass)
-		Fstring SpectralDataName( MaxNameLength );
-		Fstring OpticalDataType( MaxNameLength );
-		Fstring SlateOrientation( MaxNameLength );
-		Fstring GapVentType( MaxNameLength );
+		std::string SolarDiffusing; // 'Yes' if glass is solar diffusing; otherwise 'No' (clear glass)
+		std::string SpectralDataName;
+		std::string OpticalDataType;
+		std::string SlateOrientation;
+		std::string GapVentType;
 
 		// Formats
-		std::string const Format_700( "(' WindowConstruction',8(',',A))" );
-		std::string const Format_702( "(' WindowMaterial:Gas',3(',',A))" );
-		std::string const Format_703( "(' WindowMaterial:Shade,',7(',',A))" );
-		std::string const Format_704( "(' WindowMaterial:Blind',8(',',A))" );
-		std::string const Format_706( "(' WindowMaterial:Screen',11(',',A))" );
-		std::string const Format_707( "(' WindowMaterial:Glazing',16(',',A))" );
-		std::string const Format_708( "(' WindowMaterial:Glazing:EquivalentLayer',17(',',A))" );
-		std::string const Format_709( "(' WindowMaterial:Shade:EquivalentLayer',10(',',A))" );
-		std::string const Format_710( "(' WindowMaterial:Drape:EquivalentLayer',11(',',A))" );
-		std::string const Format_711( "(' WindowMaterial:Screen:EquivalentLayer',11(',',A))" );
-		std::string const Format_712( "(' WindowMaterial:Blind:EquivalentLayer',16(',',A))" );
-		std::string const Format_713( "(' WindowMaterial:Gap:EquivalentLayer',4(',',A))" );
-		std::string const Format_799( "(' Construction:WindowEquivalentLayer',6(',',A))" );
-		std::string const Format_800( "(' WindowConstruction:Complex',5(',',A))" );
+		static gio::Fmt const Format_700( "(' WindowConstruction',8(',',A))" );
+		static gio::Fmt const Format_702( "(' WindowMaterial:Gas',3(',',A))" );
+		static gio::Fmt const Format_703( "(' WindowMaterial:Shade,',7(',',A))" );
+		static gio::Fmt const Format_704( "(' WindowMaterial:Blind',8(',',A))" );
+		static gio::Fmt const Format_706( "(' WindowMaterial:Screen',11(',',A))" );
+		static gio::Fmt const Format_707( "(' WindowMaterial:Glazing',16(',',A))" );
+		static gio::Fmt const Format_708( "(' WindowMaterial:Glazing:EquivalentLayer',17(',',A))" );
+		static gio::Fmt const Format_709( "(' WindowMaterial:Shade:EquivalentLayer',10(',',A))" );
+		static gio::Fmt const Format_710( "(' WindowMaterial:Drape:EquivalentLayer',11(',',A))" );
+		static gio::Fmt const Format_711( "(' WindowMaterial:Screen:EquivalentLayer',11(',',A))" );
+		static gio::Fmt const Format_712( "(' WindowMaterial:Blind:EquivalentLayer',16(',',A))" );
+		static gio::Fmt const Format_713( "(' WindowMaterial:Gap:EquivalentLayer',4(',',A))" );
+		static gio::Fmt const Format_799( "(' Construction:WindowEquivalentLayer',6(',',A))" );
+		static gio::Fmt const Format_800( "(' WindowConstruction:Complex',5(',',A))" );
 
 		ScanForReports( "Constructions", DoReport, "Constructions" );
 
@@ -7176,7 +7175,7 @@ namespace WindowManager {
 					CalcComplexWindowThermal( 0, i, TempVar, TempVar, TempVar, TempVar, winterCondition );
 					CalcComplexWindowThermal( 0, i, TempVar, TempVar, TempVar, TempVar, summerCondition );
 
-					gio::write( OutputFileInits, Format_800 ) << trim( Construct( ThisNum ).Name ) << trim( RoundSigDigits( ThisNum ) ) << trim( RoundSigDigits( Construct( ThisNum ).TotSolidLayers ) ) << trim( RoundSigDigits( NominalU( ThisNum ), 3 ) ) << trim( RoundSigDigits( Construct( ThisNum ).SummerSHGC, 3 ) );
+					gio::write( OutputFileInits, Format_800 ) << Construct( ThisNum ).Name << RoundSigDigits( ThisNum ) << RoundSigDigits( Construct( ThisNum ).TotSolidLayers ) << RoundSigDigits( NominalU( ThisNum ), 3 ) << RoundSigDigits( Construct( ThisNum ).SummerSHGC, 3 );
 
 				} else if ( Construct( ThisNum ).TypeIsWindow ) {
 					// Calculate for ASHRAE winter and summer conditions:
@@ -7191,14 +7190,14 @@ namespace WindowManager {
 						// Construct(ThisNum)%SummerSHGC = SHGCSummer
 						Construct( ThisNum ).VisTransNorm = 0.0; // TODO list
 
-						gio::write( OutputFileInits, Format_799 ) << trim( Construct( ThisNum ).Name ) << trim( RoundSigDigits( ThisNum ) ) << trim( RoundSigDigits( Construct( ThisNum ).TotSolidLayers ) ) << trim( RoundSigDigits( NominalU( ThisNum ), 3 ) ) << trim( RoundSigDigits( Construct( ThisNum ).SummerSHGC, 3 ) ) << trim( RoundSigDigits( Construct( ThisNum ).SolTransNorm, 3 ) );
+						gio::write( OutputFileInits, Format_799 ) << Construct( ThisNum ).Name << RoundSigDigits( ThisNum ) << RoundSigDigits( Construct( ThisNum ).TotSolidLayers ) << RoundSigDigits( NominalU( ThisNum ), 3 ) << RoundSigDigits( Construct( ThisNum ).SummerSHGC, 3 ) << RoundSigDigits( Construct( ThisNum ).SolTransNorm, 3 );
 
 					} else {
 
 						CalcNominalWindowCond( ThisNum, 1, NominalConductanceWinter, SHGCWinter, TransSolNorm, TransVisNorm, errFlag );
 
 						if ( errFlag == 1 ) {
-							ShowWarningError( "Window construction " + trim( Construct( ThisNum ).Name ) + " has an interior or exterior blind" );
+							ShowWarningError( "Window construction " + Construct( ThisNum ).Name + " has an interior or exterior blind" );
 							ShowContinueError( "but the corresponding construction without the blind cannot be found." );
 							ShowContinueError( "The ReportGlass entry for this construction will not be printed in eplusout.eio." );
 							continue;
@@ -7208,7 +7207,7 @@ namespace WindowManager {
 						// nominal conductance and SHGC.
 
 						if ( errFlag == 2 ) {
-							ShowWarningError( "Window construction " + trim( Construct( ThisNum ).Name ) + " has a between-glass shade or blind" );
+							ShowWarningError( "Window construction " + Construct( ThisNum ).Name + " has a between-glass shade or blind" );
 							ShowContinueError( "The ReportGlass entry for this construction will not be printed in eplusout.eio." );
 							continue;
 						}
@@ -7221,7 +7220,7 @@ namespace WindowManager {
 						Construct( ThisNum ).SummerSHGC = SHGCSummer;
 						Construct( ThisNum ).VisTransNorm = TransVisNorm;
 
-						gio::write( OutputFileInits, Format_700 ) << trim( Construct( ThisNum ).Name ) << trim( RoundSigDigits( ThisNum ) ) << trim( RoundSigDigits( Construct( ThisNum ).TotLayers ) ) << trim( Roughness( Construct( ThisNum ).OutsideRoughness ) ) << trim( RoundSigDigits( NominalConductanceWinter, 3 ) ) << trim( RoundSigDigits( SHGCSummer, 3 ) ) << trim( RoundSigDigits( TransSolNorm, 3 ) ) << trim( RoundSigDigits( TransVisNorm, 3 ) );
+						gio::write( OutputFileInits, Format_700 ) << Construct( ThisNum ).Name << RoundSigDigits( ThisNum ) << RoundSigDigits( Construct( ThisNum ).TotLayers ) << Roughness( Construct( ThisNum ).OutsideRoughness ) << RoundSigDigits( NominalConductanceWinter, 3 ) << RoundSigDigits( SHGCSummer, 3 ) << RoundSigDigits( TransSolNorm, 3 ) << RoundSigDigits( TransVisNorm, 3 );
 					}
 					//    Write(OutputFileConstrainParams, 705)  TRIM(Construct(ThisNum)%Name), SHGCSummer ,TransVisNorm
 
@@ -7229,50 +7228,50 @@ namespace WindowManager {
 						Layer = Construct( ThisNum ).LayerPoint( i );
 						{ auto const SELECT_CASE_var( Material( Layer ).Group );
 						if ( SELECT_CASE_var == WindowGas ) {
-							gio::write( OutputFileInits, Format_702 ) << trim( Material( Layer ).Name ) << trim( GasTypeName( Material( Layer ).GasType( 1 ) ) ) << trim( RoundSigDigits( Material( Layer ).Thickness, 3 ) );
+							gio::write( OutputFileInits, Format_702 ) << Material( Layer ).Name << GasTypeName( Material( Layer ).GasType( 1 ) ) << RoundSigDigits( Material( Layer ).Thickness, 3 );
 
 							//!fw CASE(WindowGasMixture)
 
 						} else if ( SELECT_CASE_var == Shade ) {
-							gio::write( OutputFileInits, Format_703 ) << trim( Material( Layer ).Name ) << trim( RoundSigDigits( Material( Layer ).Thickness, 3 ) ) << trim( RoundSigDigits( Material( Layer ).Conductivity, 3 ) ) << trim( RoundSigDigits( Material( Layer ).AbsorpThermal, 3 ) ) << trim( RoundSigDigits( Material( Layer ).Trans, 3 ) ) << trim( RoundSigDigits( Material( Layer ).TransVis, 3 ) ) << trim( RoundSigDigits( Material( Layer ).ReflectShade, 3 ) );
+							gio::write( OutputFileInits, Format_703 ) << Material( Layer ).Name << RoundSigDigits( Material( Layer ).Thickness, 3 ) << RoundSigDigits( Material( Layer ).Conductivity, 3 ) << RoundSigDigits( Material( Layer ).AbsorpThermal, 3 ) << RoundSigDigits( Material( Layer ).Trans, 3 ) << RoundSigDigits( Material( Layer ).TransVis, 3 ) << RoundSigDigits( Material( Layer ).ReflectShade, 3 );
 
 						} else if ( SELECT_CASE_var == WindowBlind ) {
 							BlNum = Material( Layer ).BlindDataPtr;
-							gio::write( OutputFileInits, Format_704 ) << trim( Material( Layer ).Name ) << trim( RoundSigDigits( Blind( BlNum ).SlatWidth, 4 ) ) << trim( RoundSigDigits( Blind( BlNum ).SlatSeparation, 4 ) ) << trim( RoundSigDigits( Blind( BlNum ).SlatThickness, 4 ) ) << trim( RoundSigDigits( Blind( BlNum ).SlatAngle, 3 ) ) << trim( RoundSigDigits( Blind( BlNum ).SlatTransSolBeamDiff, 3 ) ) << trim( RoundSigDigits( Blind( BlNum ).SlatFrontReflSolBeamDiff, 3 ) ) << trim( RoundSigDigits( Blind( BlNum ).BlindToGlassDist, 3 ) );
+							gio::write( OutputFileInits, Format_704 ) << Material( Layer ).Name << RoundSigDigits( Blind( BlNum ).SlatWidth, 4 ) << RoundSigDigits( Blind( BlNum ).SlatSeparation, 4 ) << RoundSigDigits( Blind( BlNum ).SlatThickness, 4 ) << RoundSigDigits( Blind( BlNum ).SlatAngle, 3 ) << RoundSigDigits( Blind( BlNum ).SlatTransSolBeamDiff, 3 ) << RoundSigDigits( Blind( BlNum ).SlatFrontReflSolBeamDiff, 3 ) << RoundSigDigits( Blind( BlNum ).BlindToGlassDist, 3 );
 						} else if ( SELECT_CASE_var == Screen ) {
-							if ( Material( Layer ).ScreenDataPtr > 0 ) gio::write( OutputFileInits, Format_706 ) << trim( Material( Layer ).Name ) << trim( RoundSigDigits( Material( Layer ).Thickness, 5 ) ) << trim( RoundSigDigits( Material( Layer ).Conductivity, 3 ) ) << trim( RoundSigDigits( Material( Layer ).AbsorpThermal, 3 ) ) << trim( RoundSigDigits( SurfaceScreens( Material( Layer ).ScreenDataPtr ).BmBmTrans, 3 ) ) << trim( RoundSigDigits( SurfaceScreens( Material( Layer ).ScreenDataPtr ).ReflectSolBeamFront, 3 ) ) << trim( RoundSigDigits( SurfaceScreens( Material( Layer ).ScreenDataPtr ).ReflectVisBeamFront, 3 ) ) << trim( RoundSigDigits( SurfaceScreens( Material( Layer ).ScreenDataPtr ).DifReflect, 3 ) ) << trim( RoundSigDigits( SurfaceScreens( Material( Layer ).ScreenDataPtr ).DifReflectVis, 3 ) ) << trim( RoundSigDigits( SurfaceScreens( Material( Layer ).ScreenDataPtr ).ScreenDiameterToSpacingRatio, 3 ) ) << trim( RoundSigDigits( Material( Layer ).WinShadeToGlassDist, 3 ) );
+							if ( Material( Layer ).ScreenDataPtr > 0 ) gio::write( OutputFileInits, Format_706 ) << Material( Layer ).Name << RoundSigDigits( Material( Layer ).Thickness, 5 ) << RoundSigDigits( Material( Layer ).Conductivity, 3 ) << RoundSigDigits( Material( Layer ).AbsorpThermal, 3 ) << RoundSigDigits( SurfaceScreens( Material( Layer ).ScreenDataPtr ).BmBmTrans, 3 ) << RoundSigDigits( SurfaceScreens( Material( Layer ).ScreenDataPtr ).ReflectSolBeamFront, 3 ) << RoundSigDigits( SurfaceScreens( Material( Layer ).ScreenDataPtr ).ReflectVisBeamFront, 3 ) << RoundSigDigits( SurfaceScreens( Material( Layer ).ScreenDataPtr ).DifReflect, 3 ) << RoundSigDigits( SurfaceScreens( Material( Layer ).ScreenDataPtr ).DifReflectVis, 3 ) << RoundSigDigits( SurfaceScreens( Material( Layer ).ScreenDataPtr ).ScreenDiameterToSpacingRatio, 3 ) << RoundSigDigits( Material( Layer ).WinShadeToGlassDist, 3 );
 
 						} else if ( ( SELECT_CASE_var == WindowGlass ) || ( SELECT_CASE_var == WindowSimpleGlazing ) ) {
 							SolarDiffusing = "No";
 							if ( Material( Layer ).SolarDiffusing ) SolarDiffusing = "Yes";
 							OpticalDataType = "SpectralAverage";
-							SpectralDataName = " ";
+							SpectralDataName = "";
 							if ( Material( Layer ).GlassSpectralDataPtr > 0 ) {
 								OpticalDataType = "Spectral";
 								SpectralDataName = SpectralData( Material( Layer ).GlassSpectralDataPtr ).Name;
 							}
-							gio::write( OutputFileInits, Format_707 ) << trim( Material( Layer ).Name ) << trim( OpticalDataType ) << trim( SpectralDataName ) << trim( RoundSigDigits( Material( Layer ).Thickness, 5 ) ) << trim( RoundSigDigits( Material( Layer ).Trans, 5 ) ) << trim( RoundSigDigits( Material( Layer ).ReflectSolBeamFront, 5 ) ) << trim( RoundSigDigits( Material( Layer ).ReflectSolBeamBack, 5 ) ) << trim( RoundSigDigits( Material( Layer ).TransVis, 5 ) ) << trim( RoundSigDigits( Material( Layer ).ReflectVisBeamFront, 5 ) ) << trim( RoundSigDigits( Material( Layer ).ReflectVisBeamBack, 5 ) ) << trim( RoundSigDigits( Material( Layer ).TransThermal, 5 ) ) << trim( RoundSigDigits( Material( Layer ).AbsorpThermalFront, 5 ) ) << trim( RoundSigDigits( Material( Layer ).AbsorpThermalBack, 5 ) ) << trim( RoundSigDigits( Material( Layer ).Conductivity, 5 ) ) << trim( RoundSigDigits( Material( Layer ).GlassTransDirtFactor, 5 ) ) << trim( SolarDiffusing );
+							gio::write( OutputFileInits, Format_707 ) << Material( Layer ).Name << OpticalDataType << SpectralDataName << RoundSigDigits( Material( Layer ).Thickness, 5 ) << RoundSigDigits( Material( Layer ).Trans, 5 ) << RoundSigDigits( Material( Layer ).ReflectSolBeamFront, 5 ) << RoundSigDigits( Material( Layer ).ReflectSolBeamBack, 5 ) << RoundSigDigits( Material( Layer ).TransVis, 5 ) << RoundSigDigits( Material( Layer ).ReflectVisBeamFront, 5 ) << RoundSigDigits( Material( Layer ).ReflectVisBeamBack, 5 ) << RoundSigDigits( Material( Layer ).TransThermal, 5 ) << RoundSigDigits( Material( Layer ).AbsorpThermalFront, 5 ) << RoundSigDigits( Material( Layer ).AbsorpThermalBack, 5 ) << RoundSigDigits( Material( Layer ).Conductivity, 5 ) << RoundSigDigits( Material( Layer ).GlassTransDirtFactor, 5 ) << SolarDiffusing;
 
 						} else if ( SELECT_CASE_var == GlassEquivalentLayer ) {
 							OpticalDataType = "SpectralAverage";
-							SpectralDataName = " ";
-							gio::write( OutputFileInits, Format_708 ) << trim( Material( Layer ).Name ) << trim( OpticalDataType ) << trim( SpectralDataName ) << trim( RoundSigDigits( Material( Layer ).TausFrontBeamBeam, 5 ) ) << trim( RoundSigDigits( Material( Layer ).TausBackBeamBeam, 5 ) ) << trim( RoundSigDigits( Material( Layer ).ReflFrontBeamBeam, 5 ) ) << trim( RoundSigDigits( Material( Layer ).ReflBackBeamBeam, 5 ) ) << trim( RoundSigDigits( Material( Layer ).TausFrontBeamDiff, 5 ) ) << trim( RoundSigDigits( Material( Layer ).TausBackBeamDiff, 5 ) ) << trim( RoundSigDigits( Material( Layer ).ReflFrontBeamDiff, 5 ) ) << trim( RoundSigDigits( Material( Layer ).ReflBackBeamDiff, 5 ) ) << trim( RoundSigDigits( Material( Layer ).TausDiffDiff, 5 ) ) << trim( RoundSigDigits( Material( Layer ).ReflFrontDiffDiff, 5 ) ) << trim( RoundSigDigits( Material( Layer ).ReflBackDiffDiff, 5 ) ) << trim( RoundSigDigits( Material( Layer ).TausThermal, 5 ) ) << trim( RoundSigDigits( Material( Layer ).EmissThermalFront, 5 ) ) << trim( RoundSigDigits( Material( Layer ).EmissThermalBack, 5 ) );
+							SpectralDataName = "";
+							gio::write( OutputFileInits, Format_708 ) << Material( Layer ).Name << OpticalDataType << SpectralDataName << RoundSigDigits( Material( Layer ).TausFrontBeamBeam, 5 ) << RoundSigDigits( Material( Layer ).TausBackBeamBeam, 5 ) << RoundSigDigits( Material( Layer ).ReflFrontBeamBeam, 5 ) << RoundSigDigits( Material( Layer ).ReflBackBeamBeam, 5 ) << RoundSigDigits( Material( Layer ).TausFrontBeamDiff, 5 ) << RoundSigDigits( Material( Layer ).TausBackBeamDiff, 5 ) << RoundSigDigits( Material( Layer ).ReflFrontBeamDiff, 5 ) << RoundSigDigits( Material( Layer ).ReflBackBeamDiff, 5 ) << RoundSigDigits( Material( Layer ).TausDiffDiff, 5 ) << RoundSigDigits( Material( Layer ).ReflFrontDiffDiff, 5 ) << RoundSigDigits( Material( Layer ).ReflBackDiffDiff, 5 ) << RoundSigDigits( Material( Layer ).TausThermal, 5 ) << RoundSigDigits( Material( Layer ).EmissThermalFront, 5 ) << RoundSigDigits( Material( Layer ).EmissThermalBack, 5 );
 
 						} else if ( SELECT_CASE_var == ShadeEquivalentLayer ) {
-							gio::write( OutputFileInits, Format_709 ) << trim( Material( Layer ).Name ) << trim( RoundSigDigits( Material( Layer ).TausFrontBeamBeam, 4 ) ) << trim( RoundSigDigits( Material( Layer ).TausBackBeamBeam, 4 ) ) << trim( RoundSigDigits( Material( Layer ).TausFrontBeamDiff, 4 ) ) << trim( RoundSigDigits( Material( Layer ).TausBackBeamDiff, 4 ) ) << trim( RoundSigDigits( Material( Layer ).ReflFrontBeamDiff, 4 ) ) << trim( RoundSigDigits( Material( Layer ).ReflBackBeamDiff, 4 ) ) << trim( RoundSigDigits( Material( Layer ).TausThermal, 4 ) ) << trim( RoundSigDigits( Material( Layer ).EmissThermalFront, 4 ) ) << trim( RoundSigDigits( Material( Layer ).EmissThermalBack, 4 ) );
+							gio::write( OutputFileInits, Format_709 ) << Material( Layer ).Name << RoundSigDigits( Material( Layer ).TausFrontBeamBeam, 4 ) << RoundSigDigits( Material( Layer ).TausBackBeamBeam, 4 ) << RoundSigDigits( Material( Layer ).TausFrontBeamDiff, 4 ) << RoundSigDigits( Material( Layer ).TausBackBeamDiff, 4 ) << RoundSigDigits( Material( Layer ).ReflFrontBeamDiff, 4 ) << RoundSigDigits( Material( Layer ).ReflBackBeamDiff, 4 ) << RoundSigDigits( Material( Layer ).TausThermal, 4 ) << RoundSigDigits( Material( Layer ).EmissThermalFront, 4 ) << RoundSigDigits( Material( Layer ).EmissThermalBack, 4 );
 
 						} else if ( SELECT_CASE_var == DrapeEquivalentLayer ) {
-							gio::write( OutputFileInits, Format_710 ) << trim( Material( Layer ).Name ) << trim( RoundSigDigits( Material( Layer ).TausFrontBeamBeam, 4 ) ) << trim( RoundSigDigits( Material( Layer ).TausFrontBeamDiff, 4 ) ) << trim( RoundSigDigits( Material( Layer ).TausBackBeamDiff, 4 ) ) << trim( RoundSigDigits( Material( Layer ).ReflFrontBeamDiff, 4 ) ) << trim( RoundSigDigits( Material( Layer ).ReflBackBeamDiff, 4 ) ) << trim( RoundSigDigits( Material( Layer ).TausThermal, 4 ) ) << trim( RoundSigDigits( Material( Layer ).EmissThermalFront, 4 ) ) << trim( RoundSigDigits( Material( Layer ).EmissThermalBack, 4 ) ) << trim( RoundSigDigits( Material( Layer ).PleatedDrapeWidth, 5 ) ) << trim( RoundSigDigits( Material( Layer ).PleatedDrapeLength, 5 ) );
+							gio::write( OutputFileInits, Format_710 ) << Material( Layer ).Name << RoundSigDigits( Material( Layer ).TausFrontBeamBeam, 4 ) << RoundSigDigits( Material( Layer ).TausFrontBeamDiff, 4 ) << RoundSigDigits( Material( Layer ).TausBackBeamDiff, 4 ) << RoundSigDigits( Material( Layer ).ReflFrontBeamDiff, 4 ) << RoundSigDigits( Material( Layer ).ReflBackBeamDiff, 4 ) << RoundSigDigits( Material( Layer ).TausThermal, 4 ) << RoundSigDigits( Material( Layer ).EmissThermalFront, 4 ) << RoundSigDigits( Material( Layer ).EmissThermalBack, 4 ) << RoundSigDigits( Material( Layer ).PleatedDrapeWidth, 5 ) << RoundSigDigits( Material( Layer ).PleatedDrapeLength, 5 );
 
 						} else if ( SELECT_CASE_var == ScreenEquivalentLayer ) {
-							gio::write( OutputFileInits, Format_711 ) << trim( Material( Layer ).Name ) << trim( RoundSigDigits( Material( Layer ).TausFrontBeamBeam, 4 ) ) << trim( RoundSigDigits( Material( Layer ).TausFrontBeamDiff, 4 ) ) << trim( RoundSigDigits( Material( Layer ).TausBackBeamDiff, 4 ) ) << trim( RoundSigDigits( Material( Layer ).ReflFrontBeamDiff, 4 ) ) << trim( RoundSigDigits( Material( Layer ).ReflBackBeamDiff, 4 ) ) << trim( RoundSigDigits( Material( Layer ).TausThermal, 4 ) ) << trim( RoundSigDigits( Material( Layer ).EmissThermalFront, 4 ) ) << trim( RoundSigDigits( Material( Layer ).EmissThermalBack, 4 ) ) << trim( RoundSigDigits( Material( Layer ).ScreenWireSpacing, 5 ) ) << trim( RoundSigDigits( Material( Layer ).ScreenWireDiameter, 5 ) );
+							gio::write( OutputFileInits, Format_711 ) << Material( Layer ).Name << RoundSigDigits( Material( Layer ).TausFrontBeamBeam, 4 ) << RoundSigDigits( Material( Layer ).TausFrontBeamDiff, 4 ) << RoundSigDigits( Material( Layer ).TausBackBeamDiff, 4 ) << RoundSigDigits( Material( Layer ).ReflFrontBeamDiff, 4 ) << RoundSigDigits( Material( Layer ).ReflBackBeamDiff, 4 ) << RoundSigDigits( Material( Layer ).TausThermal, 4 ) << RoundSigDigits( Material( Layer ).EmissThermalFront, 4 ) << RoundSigDigits( Material( Layer ).EmissThermalBack, 4 ) << RoundSigDigits( Material( Layer ).ScreenWireSpacing, 5 ) << RoundSigDigits( Material( Layer ).ScreenWireDiameter, 5 );
 
 						} else if ( SELECT_CASE_var == BlindEquivalentLayer ) {
 							SlateOrientation = "Horizontal";
 							if ( Material( Layer ).SlatOrientation == Vertical ) {
 								SlateOrientation = "Vertical";
 							}
-							gio::write( OutputFileInits, Format_712 ) << trim( Material( Layer ).Name ) << trim( SlateOrientation ) << trim( RoundSigDigits( Material( Layer ).SlatWidth, 5 ) ) << trim( RoundSigDigits( Material( Layer ).SlatSeparation, 5 ) ) << trim( RoundSigDigits( Material( Layer ).SlatCrown, 5 ) ) << trim( RoundSigDigits( Material( Layer ).SlatAngle, 5 ) ) << trim( RoundSigDigits( Material( Layer ).TausFrontBeamDiff, 5 ) ) << trim( RoundSigDigits( Material( Layer ).TausBackBeamDiff, 5 ) ) << trim( RoundSigDigits( Material( Layer ).ReflFrontBeamDiff, 5 ) ) << trim( RoundSigDigits( Material( Layer ).ReflBackBeamDiff, 5 ) ) << trim( RoundSigDigits( Material( Layer ).TausDiffDiff, 5 ) ) << trim( RoundSigDigits( Material( Layer ).ReflFrontDiffDiff, 5 ) ) << trim( RoundSigDigits( Material( Layer ).ReflBackDiffDiff, 5 ) ) << trim( RoundSigDigits( Material( Layer ).TausThermal, 5 ) ) << trim( RoundSigDigits( Material( Layer ).EmissThermalFront, 5 ) ) << trim( RoundSigDigits( Material( Layer ).EmissThermalBack, 5 ) );
+							gio::write( OutputFileInits, Format_712 ) << Material( Layer ).Name << SlateOrientation << RoundSigDigits( Material( Layer ).SlatWidth, 5 ) << RoundSigDigits( Material( Layer ).SlatSeparation, 5 ) << RoundSigDigits( Material( Layer ).SlatCrown, 5 ) << RoundSigDigits( Material( Layer ).SlatAngle, 5 ) << RoundSigDigits( Material( Layer ).TausFrontBeamDiff, 5 ) << RoundSigDigits( Material( Layer ).TausBackBeamDiff, 5 ) << RoundSigDigits( Material( Layer ).ReflFrontBeamDiff, 5 ) << RoundSigDigits( Material( Layer ).ReflBackBeamDiff, 5 ) << RoundSigDigits( Material( Layer ).TausDiffDiff, 5 ) << RoundSigDigits( Material( Layer ).ReflFrontDiffDiff, 5 ) << RoundSigDigits( Material( Layer ).ReflBackDiffDiff, 5 ) << RoundSigDigits( Material( Layer ).TausThermal, 5 ) << RoundSigDigits( Material( Layer ).EmissThermalFront, 5 ) << RoundSigDigits( Material( Layer ).EmissThermalBack, 5 );
 
 						} else if ( SELECT_CASE_var == GapEquivalentLayer ) {
 							GapVentType = "Sealed";
@@ -7281,7 +7280,7 @@ namespace WindowManager {
 							} else if ( Material( Layer ).GapVentType == 3 ) {
 								GapVentType = "VentedOutdoor";
 							}
-							gio::write( OutputFileInits, Format_713 ) << trim( Material( Layer ).Name ) << trim( GasTypeName( Material( Layer ).GasType( 1 ) ) ) << trim( RoundSigDigits( Material( Layer ).Thickness, 3 ) ) << trim( GapVentType );
+							gio::write( OutputFileInits, Format_713 ) << Material( Layer ).Name << GasTypeName( Material( Layer ).GasType( 1 ) ) << RoundSigDigits( Material( Layer ).Thickness, 3 ) << GapVentType;
 						}}
 					}
 
@@ -7554,7 +7553,7 @@ namespace WindowManager {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const M( 18 );
 		int const N( 18 );
-		static Fstring const fmta( "(A)" );
+		static gio::Fmt const fmta( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -7702,40 +7701,40 @@ namespace WindowManager {
 						}
 					}
 
-					gio::write( ScreenTransUnitNo, fmta ) << "MATERIAL:WINDOWSCREEN:" + trim( Material( SurfaceScreens( ScreenNum ).MaterialNumber ).Name );
+					gio::write( ScreenTransUnitNo, fmta ) << "MATERIAL:WINDOWSCREEN:" + Material( SurfaceScreens( ScreenNum ).MaterialNumber ).Name;
 					gio::write( ScreenTransUnitNo, fmta ) << "Tabular data for beam solar transmittance at varying \"relative\" azimuth (row) and " "altitude (column) angles (deg) [relative to surface normal].";
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( ScreenTransUnitNo, fmta, flags ) << ",90"; }
 					for ( i = 90 / Material( MatNum ).ScreenMapResolution; i >= 2; --i ) {
-						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( ScreenTransUnitNo, fmta, flags ) << "," + trim( RoundSigDigits( ( ( i - 1 ) * Material( MatNum ).ScreenMapResolution ) ) ); }
+						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( ScreenTransUnitNo, fmta, flags ) << "," + RoundSigDigits( ( ( i - 1 ) * Material( MatNum ).ScreenMapResolution ) ); }
 					}
 					gio::write( ScreenTransUnitNo, fmta ) << ",0";
 
 					for ( j = 1; j <= 90 / Material( MatNum ).ScreenMapResolution + 1; ++j ) {
-						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( ScreenTransUnitNo, fmta, flags ) << trim( RoundSigDigits( ( ( j - 1 ) * Material( MatNum ).ScreenMapResolution ) ) ); }
+						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( ScreenTransUnitNo, fmta, flags ) << RoundSigDigits( ( ( j - 1 ) * Material( MatNum ).ScreenMapResolution ) ); }
 						for ( i = 90 / Material( MatNum ).ScreenMapResolution + 1; i >= 2; --i ) {
-							{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( ScreenTransUnitNo, fmta, flags ) << "," + trim( RoundSigDigits( ScreenTrans( ScreenNum ).Trans( j, i ), 6 ) ); }
+							{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( ScreenTransUnitNo, fmta, flags ) << "," + RoundSigDigits( ScreenTrans( ScreenNum ).Trans( j, i ), 6 ); }
 						}
-						gio::write( ScreenTransUnitNo, fmta ) << "," + trim( RoundSigDigits( ScreenTrans( ScreenNum ).Trans( j, i ), 6 ) );
+						gio::write( ScreenTransUnitNo, fmta ) << "," + RoundSigDigits( ScreenTrans( ScreenNum ).Trans( j, i ), 6 );
 					}
-					gio::write( ScreenTransUnitNo, fmta ) << " ";
-					gio::write( ScreenTransUnitNo, fmta ) << " ";
+					gio::write( ScreenTransUnitNo );
+					gio::write( ScreenTransUnitNo );
 
-					gio::write( ScreenTransUnitNo, fmta ) << "MATERIAL:WINDOWSCREEN:" + trim( Material( SurfaceScreens( ScreenNum ).MaterialNumber ).Name );
+					gio::write( ScreenTransUnitNo, fmta ) << "MATERIAL:WINDOWSCREEN:" + Material( SurfaceScreens( ScreenNum ).MaterialNumber ).Name;
 					gio::write( ScreenTransUnitNo, fmta ) << "Tabular data for scattered solar transmittance at varying \"relative\" azimuth (row) and " "altitude (column) angles (deg) [relative to surface normal].";
 					for ( i = 1; i <= 90 / Material( MatNum ).ScreenMapResolution; ++i ) {
-						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( ScreenTransUnitNo, fmta, flags ) << "," + trim( RoundSigDigits( ( ( i - 1 ) * Material( MatNum ).ScreenMapResolution ) ) ); }
+						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( ScreenTransUnitNo, fmta, flags ) << "," + RoundSigDigits( ( ( i - 1 ) * Material( MatNum ).ScreenMapResolution ) ); }
 					}
-					gio::write( ScreenTransUnitNo, fmta ) << "," + trim( RoundSigDigits( ( ( i - 1 ) * Material( MatNum ).ScreenMapResolution ) ) );
+					gio::write( ScreenTransUnitNo, fmta ) << "," + RoundSigDigits( ( ( i - 1 ) * Material( MatNum ).ScreenMapResolution ) );
 
 					for ( j = 1; j <= 90 / Material( MatNum ).ScreenMapResolution + 1; ++j ) {
-						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( ScreenTransUnitNo, fmta, flags ) << trim( RoundSigDigits( ( ( j - 1 ) * Material( MatNum ).ScreenMapResolution ) ) ); }
+						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( ScreenTransUnitNo, fmta, flags ) << RoundSigDigits( ( ( j - 1 ) * Material( MatNum ).ScreenMapResolution ) ); }
 						for ( i = 1; i <= 90 / Material( MatNum ).ScreenMapResolution; ++i ) {
-							{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( ScreenTransUnitNo, fmta, flags ) << "," + trim( RoundSigDigits( ScreenTrans( ScreenNum ).Scatt( j, i ), 6 ) ); }
+							{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( ScreenTransUnitNo, fmta, flags ) << "," + RoundSigDigits( ScreenTrans( ScreenNum ).Scatt( j, i ), 6 ); }
 						}
-						gio::write( ScreenTransUnitNo, fmta ) << "," + trim( RoundSigDigits( ScreenTrans( ScreenNum ).Scatt( j, 90 / Material( MatNum ).ScreenMapResolution + 1 ), 6 ) );
+						gio::write( ScreenTransUnitNo, fmta ) << "," + RoundSigDigits( ScreenTrans( ScreenNum ).Scatt( j, 90 / Material( MatNum ).ScreenMapResolution + 1 ), 6 );
 					}
-					gio::write( ScreenTransUnitNo, fmta ) << " ";
-					gio::write( ScreenTransUnitNo, fmta ) << " ";
+					gio::write( ScreenTransUnitNo );
+					gio::write( ScreenTransUnitNo );
 				}
 			}
 Label99999: ;
@@ -8719,13 +8718,13 @@ Label99999: ;
 		int NumNumbers; // Number of Numbers for each GetobjectItem call
 		int NumArgs;
 		int IOStatus;
-		FArray1D_Fstring cAlphaArgs( sFstring( MaxNameLength ) ); // Alpha input items for object
+		FArray1D_string cAlphaArgs; // Alpha input items for object
 		FArray1D< Real64 > rNumericArgs; // Numeric input items for object
 
 		static bool RunMeOnceFlag( false ); // This subroutine only needs to be run once
-		Fstring cCurrentModuleObject( MaxNameLength );
-		Fstring cSolarSpectrum( MaxNameLength );
-		Fstring cVisibleSpectrum( MaxNameLength );
+		std::string cCurrentModuleObject;
+		std::string cSolarSpectrum;
+		std::string cVisibleSpectrum;
 		static int iSolarSpectrum( 0 );
 		static int iVisibleSpectrum( 0 );
 		static int NumSiteSpectrum( 0 );
@@ -8746,13 +8745,13 @@ Label99999: ;
 
 		// read custom spectrum data from Site:SolarAndVisibleSpectrum
 		if ( NumSiteSpectrum > 1 ) { // throw error
-			ShowSevereError( "Only one " + trim( cCurrentModuleObject ) + " object is allowed" );
+			ShowSevereError( "Only one " + cCurrentModuleObject + " object is allowed" );
 			ErrorsFound = true;
 		}
 
 		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 		cAlphaArgs.allocate( NumAlphas );
-		cAlphaArgs = " ";
+		cAlphaArgs = "";
 		rNumericArgs.allocate( NumNumbers );
 		rNumericArgs = 0.0;
 
@@ -8772,7 +8771,7 @@ Label99999: ;
 			cCurrentModuleObject = "Site:SpectrumData";
 			NumSiteSpectrum = GetNumObjectsFound( cCurrentModuleObject );
 			if ( NumSiteSpectrum == 0 ) { // throw error
-				ShowSevereError( "No " + trim( cCurrentModuleObject ) + " object is found" );
+				ShowSevereError( "No " + cCurrentModuleObject + " object is found" );
 				ErrorsFound = true;
 			}
 
@@ -8781,7 +8780,7 @@ Label99999: ;
 
 			GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 			cAlphaArgs.allocate( NumAlphas );
-			cAlphaArgs = " ";
+			cAlphaArgs = "";
 			rNumericArgs.allocate( NumNumbers );
 			rNumericArgs = 0.0;
 
@@ -8794,7 +8793,7 @@ Label99999: ;
 					iSolarSpectrum = Loop;
 					// overwrite the default solar spectrum
 					if ( NumNumbers > 2 * nume ) {
-						ShowSevereError( "Solar spectrum data pair is more than 107 - " + trim( cCurrentModuleObject ) + " - " + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Solar spectrum data pair is more than 107 - " + cCurrentModuleObject + " - " + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					} else {
 						// Step 3 - overwrite default solar spectrum data
@@ -8813,7 +8812,7 @@ Label99999: ;
 					iVisibleSpectrum = Loop;
 					// overwrite the default solar spectrum
 					if ( NumNumbers > 2 * numt3 ) {
-						ShowSevereError( "Visible spectrum data pair is more than 81 - " + trim( cCurrentModuleObject ) + " - " + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Visible spectrum data pair is more than 81 - " + cCurrentModuleObject + " - " + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					} else {
 						// Step 3 - overwrite default visible spectrum data

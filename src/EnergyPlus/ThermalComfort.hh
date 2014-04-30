@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -15,7 +14,6 @@ namespace EnergyPlus {
 namespace ThermalComfort {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
@@ -331,38 +329,35 @@ namespace ThermalComfort {
 	{
 		// Members
 		FArray1D< Real64 > AngleFactor; // Angle factor of each surface
-		Fstring Name; // Angle factor list name
-		FArray1D_Fstring SurfaceName; // Names of the Surfces
+		std::string Name; // Angle factor list name
+		FArray1D_string SurfaceName; // Names of the Surfces
 		FArray1D_int SurfacePtr; // ALLOCATABLE to the names of the Surfces
 		int TotAngleFacSurfaces; // Total number of surfaces
-		Fstring ZoneName; // Name of zone the system is serving
+		std::string ZoneName; // Name of zone the system is serving
 		int ZonePtr; // Point to this zone in the Zone derived type
 
 		// Default Constructor
 		AngleFactorData() :
-			Name( MaxNameLength ),
-			SurfaceName( sFstring( MaxNameLength ) ),
 			TotAngleFacSurfaces( 0 ),
-			ZoneName( MaxNameLength ),
 			ZonePtr( 0 )
 		{}
 
 		// Member Constructor
 		AngleFactorData(
 			FArray1< Real64 > const & AngleFactor, // Angle factor of each surface
-			Fstring const & Name, // Angle factor list name
-			FArray1_Fstring const & SurfaceName, // Names of the Surfces
+			std::string const & Name, // Angle factor list name
+			FArray1_string const & SurfaceName, // Names of the Surfces
 			FArray1_int const & SurfacePtr, // ALLOCATABLE to the names of the Surfces
 			int const TotAngleFacSurfaces, // Total number of surfaces
-			Fstring const & ZoneName, // Name of zone the system is serving
+			std::string const & ZoneName, // Name of zone the system is serving
 			int const ZonePtr // Point to this zone in the Zone derived type
 		) :
 			AngleFactor( AngleFactor ),
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			SurfaceName( SurfaceName ),
 			SurfacePtr( SurfacePtr ),
 			TotAngleFacSurfaces( TotAngleFacSurfaces ),
-			ZoneName( MaxNameLength, ZoneName ),
+			ZoneName( ZoneName ),
 			ZonePtr( ZonePtr )
 		{}
 

@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -15,7 +14,6 @@ namespace EnergyPlus {
 namespace HeatingCoils {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
@@ -59,11 +57,11 @@ namespace HeatingCoils {
 	struct HeatingCoilEquipConditions
 	{
 		// Members
-		Fstring Name; // Name of the HeatingCoil
-		Fstring HeatingCoilType; // Type of HeatingCoil ie. Heating or Cooling
-		Fstring HeatingCoilModel; // Type of HeatingCoil ie. Simple, Detailed, etc.
+		std::string Name; // Name of the HeatingCoil
+		std::string HeatingCoilType; // Type of HeatingCoil ie. Heating or Cooling
+		std::string HeatingCoilModel; // Type of HeatingCoil ie. Simple, Detailed, etc.
 		int HCoilType_Num;
-		Fstring Schedule; // HeatingCoil Operation Schedule
+		std::string Schedule; // HeatingCoil Operation Schedule
 		int SchedPtr; // Pointer to the correct schedule
 		int InsuffTemperatureWarn; // Used for recurring error message
 		Real64 InletAirMassFlowRate; // MassFlow through the HeatingCoil being Simulated [kg/Sec]
@@ -101,7 +99,7 @@ namespace HeatingCoils {
 		int RTFErrorCount; // used in recurring error warnings
 		int PLFErrorIndex; // used in recurring error warnings
 		int PLFErrorCount; // used in recurring error warnings
-		Fstring ReclaimHeatingCoilName; // Name of reclaim heating coil
+		std::string ReclaimHeatingCoilName; // Name of reclaim heating coil
 		int ReclaimHeatingSourceIndexNum; // Index to reclaim heating source (condenser) of a specific type
 		int ReclaimHeatingSource; // The source for the Reclaim Heating Coil
 		//                                                            COMPRESSOR RACK:REFRIGERATED CASE    = 1
@@ -116,11 +114,7 @@ namespace HeatingCoils {
 
 		// Default Constructor
 		HeatingCoilEquipConditions() :
-			Name( MaxNameLength ),
-			HeatingCoilType( MaxNameLength ),
-			HeatingCoilModel( MaxNameLength ),
 			HCoilType_Num( 0 ),
-			Schedule( MaxNameLength ),
 			SchedPtr( 0 ),
 			InsuffTemperatureWarn( 0 ),
 			InletAirMassFlowRate( 0.0 ),
@@ -156,7 +150,6 @@ namespace HeatingCoils {
 			RTFErrorCount( 0 ),
 			PLFErrorIndex( 0 ),
 			PLFErrorCount( 0 ),
-			ReclaimHeatingCoilName( MaxNameLength ),
 			ReclaimHeatingSourceIndexNum( 0 ),
 			ReclaimHeatingSource( 0 ),
 			NumOfStages( 0 )
@@ -164,11 +157,11 @@ namespace HeatingCoils {
 
 		// Member Constructor
 		HeatingCoilEquipConditions(
-			Fstring const & Name, // Name of the HeatingCoil
-			Fstring const & HeatingCoilType, // Type of HeatingCoil ie. Heating or Cooling
-			Fstring const & HeatingCoilModel, // Type of HeatingCoil ie. Simple, Detailed, etc.
+			std::string const & Name, // Name of the HeatingCoil
+			std::string const & HeatingCoilType, // Type of HeatingCoil ie. Heating or Cooling
+			std::string const & HeatingCoilModel, // Type of HeatingCoil ie. Simple, Detailed, etc.
 			int const HCoilType_Num,
-			Fstring const & Schedule, // HeatingCoil Operation Schedule
+			std::string const & Schedule, // HeatingCoil Operation Schedule
 			int const SchedPtr, // Pointer to the correct schedule
 			int const InsuffTemperatureWarn, // Used for recurring error message
 			Real64 const InletAirMassFlowRate, // MassFlow through the HeatingCoil being Simulated [kg/Sec]
@@ -204,7 +197,7 @@ namespace HeatingCoils {
 			int const RTFErrorCount, // used in recurring error warnings
 			int const PLFErrorIndex, // used in recurring error warnings
 			int const PLFErrorCount, // used in recurring error warnings
-			Fstring const & ReclaimHeatingCoilName, // Name of reclaim heating coil
+			std::string const & ReclaimHeatingCoilName, // Name of reclaim heating coil
 			int const ReclaimHeatingSourceIndexNum, // Index to reclaim heating source (condenser) of a specific type
 			int const ReclaimHeatingSource, // The source for the Reclaim Heating Coil
 			int const NumOfStages, // Number of speeds
@@ -212,11 +205,11 @@ namespace HeatingCoils {
 			FArray1< Real64 > const & MSEfficiency, // Efficiency for MS AC Furnace [dimensionless]
 			FArray1< Real64 > const & MSParasiticElecLoad // Parasitic elec load MS AC Furnace (gas only) [W]
 		) :
-			Name( MaxNameLength, Name ),
-			HeatingCoilType( MaxNameLength, HeatingCoilType ),
-			HeatingCoilModel( MaxNameLength, HeatingCoilModel ),
+			Name( Name ),
+			HeatingCoilType( HeatingCoilType ),
+			HeatingCoilModel( HeatingCoilModel ),
 			HCoilType_Num( HCoilType_Num ),
-			Schedule( MaxNameLength, Schedule ),
+			Schedule( Schedule ),
 			SchedPtr( SchedPtr ),
 			InsuffTemperatureWarn( InsuffTemperatureWarn ),
 			InletAirMassFlowRate( InletAirMassFlowRate ),
@@ -252,7 +245,7 @@ namespace HeatingCoils {
 			RTFErrorCount( RTFErrorCount ),
 			PLFErrorIndex( PLFErrorIndex ),
 			PLFErrorCount( PLFErrorCount ),
-			ReclaimHeatingCoilName( MaxNameLength, ReclaimHeatingCoilName ),
+			ReclaimHeatingCoilName( ReclaimHeatingCoilName ),
 			ReclaimHeatingSourceIndexNum( ReclaimHeatingSourceIndexNum ),
 			ReclaimHeatingSource( ReclaimHeatingSource ),
 			NumOfStages( NumOfStages ),
@@ -265,18 +258,17 @@ namespace HeatingCoils {
 	struct HeatingCoilNumericFieldData
 	{
 		// Members
-		FArray1D_Fstring FieldNames;
+		FArray1D_string FieldNames;
 
 		// Default Constructor
-		HeatingCoilNumericFieldData() :
-			FieldNames( sFstring( MaxNameLength ) )
+		HeatingCoilNumericFieldData()
 		{}
 
 		// Member Constructor
 		HeatingCoilNumericFieldData(
-			FArray1_Fstring const & FieldNames // Name of the HeatingCoil numeric field descriptions
-	) :
-	    FieldNames( MaxNameLength, FieldNames)
+			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+		) :
+			FieldNames( FieldNames )
 		{}
 	};
 
@@ -288,7 +280,7 @@ namespace HeatingCoils {
 
 	void
 	SimulateHeatingCoilComponents(
-		Fstring const & CompName,
+		std::string const & CompName,
 		bool const FirstHVACIteration,
 		Optional< Real64 const > QCoilReq = _, // coil load to be met
 		Optional_int CompIndex = _,
@@ -393,86 +385,86 @@ namespace HeatingCoils {
 
 	void
 	GetCoilIndex(
-		Fstring const & HeatingCoilName,
+		std::string const & HeatingCoilName,
 		int & HeatingCoilIndex,
 		bool & ErrorsFound
 	);
 
 	void
 	CheckHeatingCoilSchedule(
-		Fstring const & CompType, // unused1208
-		Fstring const & CompName,
+		std::string const & CompType, // unused1208
+		std::string const & CompName,
 		Real64 & Value,
 		int & CompIndex
 	);
 
 	Real64
 	GetCoilCapacity(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetCoilAvailScheduleIndex(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetCoilInletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetCoilOutletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetHeatReclaimSourceIndex(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetCoilControlNodeNum(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetHeatingCoilTypeNum(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetHeatingCoilIndex(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetHeatingCoilPLFCurveIndex(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetHeatingCoilNumberOfStages(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 

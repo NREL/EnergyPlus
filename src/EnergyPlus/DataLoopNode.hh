@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace DataLoopNode {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS:
@@ -24,11 +22,11 @@ namespace DataLoopNode {
 	extern int const NodeType_Water; // 'Water'
 	extern int const NodeType_Steam; // 'Steam'
 	extern int const NodeType_Electric; // 'Electric'
-	extern FArray1D_Fstring const ValidNodeFluidTypes;
+	extern FArray1D_string const ValidNodeFluidTypes;
 	extern int const NumValidNodeFluidTypes;
 
 	// Valid Connection Types for Nodes
-	extern FArray1D_Fstring const ValidConnectionTypes;
+	extern FArray1D_string const ValidConnectionTypes;
 
 	extern int const NumValidConnectionTypes;
 
@@ -68,7 +66,7 @@ namespace DataLoopNode {
 	// the following assignments:  Node(somenodenumber)=Node(someothernodenumber) to
 	// set/update Node conditions.  If the Node derived type would include the name
 	// then the name would get changed and bad things would result...
-	extern FArray1D_Fstring NodeID;
+	extern FArray1D_string NodeID;
 
 	// Types
 
@@ -280,29 +278,26 @@ namespace DataLoopNode {
 	{
 		// Members
 		bool IsMarked; // true if this is a marked node
-		Fstring ObjectType; // Object Type that needs it "marked"
-		Fstring ObjectName; // Object Name that needs it "marked"
-		Fstring FieldName; // FieldName that needs it "marked"
+		std::string ObjectType; // Object Type that needs it "marked"
+		std::string ObjectName; // Object Name that needs it "marked"
+		std::string FieldName; // FieldName that needs it "marked"
 
 		// Default Constructor
 		MarkedNodeData() :
-			IsMarked( false ),
-			ObjectType( MaxNameLength ),
-			ObjectName( MaxNameLength ),
-			FieldName( MaxNameLength )
+			IsMarked( false )
 		{}
 
 		// Member Constructor
 		MarkedNodeData(
 			bool const IsMarked, // true if this is a marked node
-			Fstring const & ObjectType, // Object Type that needs it "marked"
-			Fstring const & ObjectName, // Object Name that needs it "marked"
-			Fstring const & FieldName // FieldName that needs it "marked"
+			std::string const & ObjectType, // Object Type that needs it "marked"
+			std::string const & ObjectName, // Object Name that needs it "marked"
+			std::string const & FieldName // FieldName that needs it "marked"
 		) :
 			IsMarked( IsMarked ),
-			ObjectType( MaxNameLength, ObjectType ),
-			ObjectName( MaxNameLength, ObjectName ),
-			FieldName( MaxNameLength, FieldName )
+			ObjectType( ObjectType ),
+			ObjectName( ObjectName ),
+			FieldName( FieldName )
 		{}
 
 	};

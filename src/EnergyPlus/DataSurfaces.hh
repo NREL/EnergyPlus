@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray2D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -18,7 +17,6 @@ namespace DataSurfaces {
 
 	// Using/Aliasing
 	using DataBSDFWindow::BSDFWindowDescript;
-	using DataGlobals::MaxNameLength;
 	using DataVectorTypes::Vector;
 
 	// Data
@@ -53,7 +51,7 @@ namespace DataSurfaces {
 	extern int const OtherSideCondModeledExt;
 	extern int const GroundFCfactorMethod;
 
-	extern FArray1D_Fstring const cExtBoundCondition;
+	extern FArray1D_string const cExtBoundCondition;
 
 	// Parameters to indicate the first "corner" of a surface
 	// Currently, these are used only during input of surfaces
@@ -412,7 +410,7 @@ namespace DataSurfaces {
 	struct SurfaceData
 	{
 		// Members
-		Fstring Name; // User supplied name of the surface (must be unique)
+		std::string Name; // User supplied name of the surface (must be unique)
 		int Construction; // Pointer to the construction in the Construct derived type
 		bool EMSConstructionOverrideON; // if true, EMS is calling to override the construction value
 		int EMSConstructionOverrideValue; // pointer value to use for Construction when overridden
@@ -442,18 +440,18 @@ namespace DataSurfaces {
 		bool HeatTransSurf; // True if surface is a heat transfer surface,
 		// False if a (detached) shadowing (sub)surface
 		int HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
-		Fstring BaseSurfName; // Name of BaseSurf
+		std::string BaseSurfName; // Name of BaseSurf
 		int BaseSurf; // "Base surface" for this surface.  Applies mainly to subsurfaces
 		// in which case it points back to the base surface number.
 		// Equals 0 for detached shading.
 		// BaseSurf equals surface number for all other surfaces.
 		int NumSubSurfaces; // Number of subsurfaces this surface has (doors/windows)
-		Fstring ZoneName; // User supplied name of the Zone
+		std::string ZoneName; // User supplied name of the Zone
 		int Zone; // Interior environment or zone the surface is a part of
 		// Note that though attached shading surfaces are part of a zone, this
 		// value is 0 there to facilitate using them as detached surfaces (more
 		// accurate shading.
-		Fstring ExtBoundCondName; // Name for the Outside Environment Object
+		std::string ExtBoundCondName; // Name for the Outside Environment Object
 		int ExtBoundCond; // For an "interzone" surface, this is the adjacent surface number.
 		// for an internal/adiabatic surface this is the current surface number.
 		// Otherwise, 0=external environment, -1=ground,
@@ -544,8 +542,8 @@ namespace DataSurfaces {
 		Real64 WindSpeed; // Surface outside wind speed, for surface heat balance (m/s)
 		bool WindSpeedEMSOverrideOn;
 		Real64 WindSpeedEMSOverrideValue;
-		Fstring UNomWOFilm; // Nominal U Value without films stored as string
-		Fstring UNomFilm; // Nominal U Value with films stored as string
+		std::string UNomWOFilm; // Nominal U Value without films stored as string
+		std::string UNomFilm; // Nominal U Value with films stored as string
 		bool ExtEcoRoof; // True if the top outside construction material is of type Eco Roof
 		bool ExtCavityPresent; // true if there is an exterior vented cavity on surface
 		int ExtCavNum; // index for this surface in ExtVentedCavity structure (if any)
@@ -580,7 +578,6 @@ namespace DataSurfaces {
 
 		// Default Constructor
 		SurfaceData() :
-			Name( MaxNameLength ),
 			Construction( 0 ),
 			EMSConstructionOverrideON( false ),
 			EMSConstructionOverrideValue( 0 ),
@@ -599,12 +596,9 @@ namespace DataSurfaces {
 			Width( 0.0 ),
 			HeatTransSurf( false ),
 			HeatTransferAlgorithm( HeatTransferModel_NotSet ),
-			BaseSurfName( MaxNameLength ),
 			BaseSurf( 0 ),
 			NumSubSurfaces( 0 ),
-			ZoneName( MaxNameLength ),
 			Zone( 0 ),
-			ExtBoundCondName( MaxNameLength ),
 			ExtBoundCond( 0 ),
 			LowTempErrCount( 0 ),
 			HighTempErrCount( 0 ),
@@ -701,7 +695,7 @@ namespace DataSurfaces {
 
 		// Member Constructor
 		SurfaceData(
-			Fstring const & Name, // User supplied name of the surface (must be unique)
+			std::string const & Name, // User supplied name of the surface (must be unique)
 			int const Construction, // Pointer to the construction in the Construct derived type
 			bool const EMSConstructionOverrideON, // if true, EMS is calling to override the construction value
 			int const EMSConstructionOverrideValue, // pointer value to use for Construction when overridden
@@ -720,12 +714,12 @@ namespace DataSurfaces {
 			Real64 const Width, // Width of the surface (m)
 			bool const HeatTransSurf, // True if surface is a heat transfer surface,
 			int const HeatTransferAlgorithm, // used for surface-specific heat transfer algorithm.
-			Fstring const & BaseSurfName, // Name of BaseSurf
+			std::string const & BaseSurfName, // Name of BaseSurf
 			int const BaseSurf, // "Base surface" for this surface.  Applies mainly to subsurfaces
 			int const NumSubSurfaces, // Number of subsurfaces this surface has (doors/windows)
-			Fstring const & ZoneName, // User supplied name of the Zone
+			std::string const & ZoneName, // User supplied name of the Zone
 			int const Zone, // Interior environment or zone the surface is a part of
-			Fstring const & ExtBoundCondName, // Name for the Outside Environment Object
+			std::string const & ExtBoundCondName, // Name for the Outside Environment Object
 			int const ExtBoundCond, // For an "interzone" surface, this is the adjacent surface number.
 			int const LowTempErrCount,
 			int const HighTempErrCount,
@@ -790,8 +784,8 @@ namespace DataSurfaces {
 			Real64 const WindSpeed, // Surface outside wind speed, for surface heat balance (m/s)
 			bool const WindSpeedEMSOverrideOn,
 			Real64 const WindSpeedEMSOverrideValue,
-			Fstring const & UNomWOFilm, // Nominal U Value without films stored as string
-			Fstring const & UNomFilm, // Nominal U Value with films stored as string
+			std::string const & UNomWOFilm, // Nominal U Value without films stored as string
+			std::string const & UNomFilm, // Nominal U Value with films stored as string
 			bool const ExtEcoRoof, // True if the top outside construction material is of type Eco Roof
 			bool const ExtCavityPresent, // true if there is an exterior vented cavity on surface
 			int const ExtCavNum, // index for this surface in ExtVentedCavity structure (if any)
@@ -820,7 +814,7 @@ namespace DataSurfaces {
 			bool const PartOfVentSlabOrRadiantSurface, // surface cannot be part of both a radiant surface & ventilated slab group
 			Real64 const GenericContam // [ppm] Surface generic contaminant as a storage term for
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			Construction( Construction ),
 			EMSConstructionOverrideON( EMSConstructionOverrideON ),
 			EMSConstructionOverrideValue( EMSConstructionOverrideValue ),
@@ -839,12 +833,12 @@ namespace DataSurfaces {
 			Width( Width ),
 			HeatTransSurf( HeatTransSurf ),
 			HeatTransferAlgorithm( HeatTransferAlgorithm ),
-			BaseSurfName( MaxNameLength, BaseSurfName ),
+			BaseSurfName( BaseSurfName ),
 			BaseSurf( BaseSurf ),
 			NumSubSurfaces( NumSubSurfaces ),
-			ZoneName( MaxNameLength, ZoneName ),
+			ZoneName( ZoneName ),
 			Zone( Zone ),
-			ExtBoundCondName( MaxNameLength, ExtBoundCondName ),
+			ExtBoundCondName( ExtBoundCondName ),
 			ExtBoundCond( ExtBoundCond ),
 			LowTempErrCount( LowTempErrCount ),
 			HighTempErrCount( HighTempErrCount ),
@@ -909,8 +903,8 @@ namespace DataSurfaces {
 			WindSpeed( WindSpeed ),
 			WindSpeedEMSOverrideOn( WindSpeedEMSOverrideOn ),
 			WindSpeedEMSOverrideValue( WindSpeedEMSOverrideValue ),
-			UNomWOFilm( 15, UNomWOFilm ),
-			UNomFilm( 15, UNomFilm ),
+			UNomWOFilm( UNomWOFilm ),
+			UNomFilm( UNomFilm ),
 			ExtEcoRoof( ExtEcoRoof ),
 			ExtCavityPresent( ExtCavityPresent ),
 			ExtCavNum( ExtCavNum ),
@@ -1720,7 +1714,7 @@ namespace DataSurfaces {
 	struct FrameDividerProperties
 	{
 		// Members
-		Fstring Name; // Name of frame/divider
+		std::string Name; // Name of frame/divider
 		Real64 FrameWidth; // Average width of frame in plane of window {m}
 		Real64 FrameProjectionOut; // Distance normal to window between outside face of outer pane
 		//  and outside of frame {m}
@@ -1758,7 +1752,6 @@ namespace DataSurfaces {
 
 		// Default Constructor
 		FrameDividerProperties() :
-			Name( MaxNameLength ),
 			FrameWidth( 0.0 ),
 			FrameProjectionOut( 0.0 ),
 			FrameProjectionIn( 0.0 ),
@@ -1790,7 +1783,7 @@ namespace DataSurfaces {
 
 		// Member Constructor
 		FrameDividerProperties(
-			Fstring const & Name, // Name of frame/divider
+			std::string const & Name, // Name of frame/divider
 			Real64 const FrameWidth, // Average width of frame in plane of window {m}
 			Real64 const FrameProjectionOut, // Distance normal to window between outside face of outer pane
 			Real64 const FrameProjectionIn, // Distance normal to window between inside face of inner pane
@@ -1819,7 +1812,7 @@ namespace DataSurfaces {
 			Real64 const InsideSillSolAbs, // Solar absorptance of inside sill
 			Real64 const InsideRevealSolAbs // Solar absorptance of inside reveal
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			FrameWidth( FrameWidth ),
 			FrameProjectionOut( FrameProjectionOut ),
 			FrameProjectionIn( FrameProjectionIn ),
@@ -1905,7 +1898,7 @@ namespace DataSurfaces {
 	struct WindowShadingControlData
 	{
 		// Members
-		Fstring Name; // User supplied name of this set of shading control data
+		std::string Name; // User supplied name of this set of shading control data
 		int ShadingType; // Shading type (InteriorShade, SwitchableGlazing,
 		//  CHARACTER(len=32) :: ShadingType    = ' ' ! Shading type (InteriorShade, SwitchableGlazing,
 		//  ExteriorShade,InteriorBlind,ExteriorBlind,BetweenGlassShade,
@@ -1985,7 +1978,6 @@ namespace DataSurfaces {
 
 		// Default Constructor
 		WindowShadingControlData() :
-			Name( MaxNameLength ),
 			ShadingType( WSC_ST_NoShade ),
 			ShadedConstruction( 0 ),
 			ShadingDevice( 0 ),
@@ -2001,7 +1993,7 @@ namespace DataSurfaces {
 
 		// Member Constructor
 		WindowShadingControlData(
-			Fstring const & Name, // User supplied name of this set of shading control data
+			std::string const & Name, // User supplied name of this set of shading control data
 			int const ShadingType, // Shading type (InteriorShade, SwitchableGlazing,
 			int const ShadedConstruction, // Pointer to the shaded construction (for ShadingType=ExteriorScreen,InteriorShade,
 			int const ShadingDevice, // Pointer to the material for the shading device (for ShadingType=InteriorShade,
@@ -2014,7 +2006,7 @@ namespace DataSurfaces {
 			int const SlatAngleSchedule, // Pointer to schedule of slat angle values between 0.0 and 180.0 degrees
 			int const SlatAngleControlForBlinds // Takes one of the following values that specifies
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ShadingType( ShadingType ),
 			ShadedConstruction( ShadedConstruction ),
 			ShadingDevice( ShadingDevice ),
@@ -2033,7 +2025,7 @@ namespace DataSurfaces {
 	struct OSCData
 	{
 		// Members
-		Fstring Name; // Name of OSC
+		std::string Name; // Name of OSC
 		Real64 ConstTemp; // User selected constant temperature (degrees C)
 		Real64 ConstTempCoef; // Coefficient modifying the user selected constant temperature
 		Real64 ExtDryBulbCoef; // Coefficient modifying the external dry bulb temperature
@@ -2041,7 +2033,7 @@ namespace DataSurfaces {
 		Real64 SurfFilmCoef; // Combined convective/radiative film coefficient if >0, else use other coefficients
 		Real64 WindSpeedCoef; // Coefficient modifying the wind speed term (s/m)
 		Real64 ZoneAirTempCoef; // Coefficient modifying the zone air temperature part of the equation
-		Fstring ConstTempScheduleName; // Schedule name for scheduled outside temp
+		std::string ConstTempScheduleName; // Schedule name for scheduled outside temp
 		int ConstTempScheduleIndex; // Index for scheduled outside temp.
 		bool SinusoidalConstTempCoef; // If true then ConstTempCoef varies by sine wave
 		Real64 SinusoidPeriod; // period of sine wave variation  (hr)
@@ -2055,7 +2047,6 @@ namespace DataSurfaces {
 
 		// Default Constructor
 		OSCData() :
-			Name( MaxNameLength ),
 			ConstTemp( 0.0 ),
 			ConstTempCoef( 0.0 ),
 			ExtDryBulbCoef( 0.0 ),
@@ -2063,7 +2054,6 @@ namespace DataSurfaces {
 			SurfFilmCoef( 0.0 ),
 			WindSpeedCoef( 0.0 ),
 			ZoneAirTempCoef( 0.0 ),
-			ConstTempScheduleName( MaxNameLength ),
 			ConstTempScheduleIndex( 0 ),
 			SinusoidalConstTempCoef( false ),
 			SinusoidPeriod( 0.0 ),
@@ -2078,7 +2068,7 @@ namespace DataSurfaces {
 
 		// Member Constructor
 		OSCData(
-			Fstring const & Name, // Name of OSC
+			std::string const & Name, // Name of OSC
 			Real64 const ConstTemp, // User selected constant temperature (degrees C)
 			Real64 const ConstTempCoef, // Coefficient modifying the user selected constant temperature
 			Real64 const ExtDryBulbCoef, // Coefficient modifying the external dry bulb temperature
@@ -2086,7 +2076,7 @@ namespace DataSurfaces {
 			Real64 const SurfFilmCoef, // Combined convective/radiative film coefficient if >0, else use other coefficients
 			Real64 const WindSpeedCoef, // Coefficient modifying the wind speed term (s/m)
 			Real64 const ZoneAirTempCoef, // Coefficient modifying the zone air temperature part of the equation
-			Fstring const & ConstTempScheduleName, // Schedule name for scheduled outside temp
+			std::string const & ConstTempScheduleName, // Schedule name for scheduled outside temp
 			int const ConstTempScheduleIndex, // Index for scheduled outside temp.
 			bool const SinusoidalConstTempCoef, // If true then ConstTempCoef varies by sine wave
 			Real64 const SinusoidPeriod, // period of sine wave variation  (hr)
@@ -2098,7 +2088,7 @@ namespace DataSurfaces {
 			bool const MaxLimitPresent, // If TRUE then apply maximum limit on calculated OSC temp
 			Real64 const OSCTempCalc // Result of calculated temperature using OSC (degrees C)
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ConstTemp( ConstTemp ),
 			ConstTempCoef( ConstTempCoef ),
 			ExtDryBulbCoef( ExtDryBulbCoef ),
@@ -2106,7 +2096,7 @@ namespace DataSurfaces {
 			SurfFilmCoef( SurfFilmCoef ),
 			WindSpeedCoef( WindSpeedCoef ),
 			ZoneAirTempCoef( ZoneAirTempCoef ),
-			ConstTempScheduleName( MaxNameLength, ConstTempScheduleName ),
+			ConstTempScheduleName( ConstTempScheduleName ),
 			ConstTempScheduleIndex( ConstTempScheduleIndex ),
 			SinusoidalConstTempCoef( SinusoidalConstTempCoef ),
 			SinusoidPeriod( SinusoidPeriod ),
@@ -2124,8 +2114,8 @@ namespace DataSurfaces {
 	struct OSCMData
 	{
 		// Members
-		Fstring Name; // Name of OSCM
-		Fstring Class; // type of Model for OSCM
+		std::string Name; // Name of OSCM
+		std::string Class; // type of Model for OSCM
 		Real64 TConv; // Temperature of bulk air at other side face (degrees C)
 		bool EMSOverrideOnTConv; // if true then EMS calling for convection bulk air temp override
 		Real64 EMSOverrideTConvValue; // value for convection air temp when overridden
@@ -2141,8 +2131,6 @@ namespace DataSurfaces {
 
 		// Default Constructor
 		OSCMData() :
-			Name( MaxNameLength ),
-			Class( MaxNameLength ),
 			TConv( 20.0 ),
 			EMSOverrideOnTConv( false ),
 			EMSOverrideTConvValue( 0.0 ),
@@ -2159,8 +2147,8 @@ namespace DataSurfaces {
 
 		// Member Constructor
 		OSCMData(
-			Fstring const & Name, // Name of OSCM
-			Fstring const & Class, // type of Model for OSCM
+			std::string const & Name, // Name of OSCM
+			std::string const & Class, // type of Model for OSCM
 			Real64 const TConv, // Temperature of bulk air at other side face (degrees C)
 			bool const EMSOverrideOnTConv, // if true then EMS calling for convection bulk air temp override
 			Real64 const EMSOverrideTConvValue, // value for convection air temp when overridden
@@ -2174,8 +2162,8 @@ namespace DataSurfaces {
 			bool const EMSOverrideOnHrad, // if true then EMS calling for radiation coef override
 			Real64 const EMSOverrideHradValue // value to use for rad coef when overridden
 		) :
-			Name( MaxNameLength, Name ),
-			Class( MaxNameLength, Class ),
+			Name( Name ),
+			Class( Class ),
 			TConv( TConv ),
 			EMSOverrideOnTConv( EMSOverrideOnTConv ),
 			EMSOverrideTConvValue( EMSOverrideTConvValue ),
@@ -2196,10 +2184,10 @@ namespace DataSurfaces {
 	{
 		// Members
 		int WhichSurface; // Which surface number this is applied to
-		Fstring SurfaceName; // Which surface (name)
+		std::string SurfaceName; // Which surface (name)
 		int OverrideType; // Override type, 1=value, 2=schedule, 3=model, 4=user curve
 		Real64 OverrideValue; // User specified value
-		Fstring ScheduleName; // Which surface (name)
+		std::string ScheduleName; // Which surface (name)
 		int ScheduleIndex; // if type="schedule" is used
 		int UserCurveIndex; // if type=UserCurve is used
 		int HcModelEq; // if type is one of specific model equations
@@ -2207,10 +2195,8 @@ namespace DataSurfaces {
 		// Default Constructor
 		ConvectionCoefficient() :
 			WhichSurface( 0 ),
-			SurfaceName( MaxNameLength ),
 			OverrideType( 0 ),
 			OverrideValue( 0.0 ),
-			ScheduleName( MaxNameLength ),
 			ScheduleIndex( 0 ),
 			UserCurveIndex( 0 ),
 			HcModelEq( 0 )
@@ -2219,19 +2205,19 @@ namespace DataSurfaces {
 		// Member Constructor
 		ConvectionCoefficient(
 			int const WhichSurface, // Which surface number this is applied to
-			Fstring const & SurfaceName, // Which surface (name)
+			std::string const & SurfaceName, // Which surface (name)
 			int const OverrideType, // Override type, 1=value, 2=schedule, 3=model, 4=user curve
 			Real64 const OverrideValue, // User specified value
-			Fstring const & ScheduleName, // Which surface (name)
+			std::string const & ScheduleName, // Which surface (name)
 			int const ScheduleIndex, // if type="schedule" is used
 			int const UserCurveIndex, // if type=UserCurve is used
 			int const HcModelEq // if type is one of specific model equations
 		) :
 			WhichSurface( WhichSurface ),
-			SurfaceName( MaxNameLength, SurfaceName ),
+			SurfaceName( SurfaceName ),
 			OverrideType( OverrideType ),
 			OverrideValue( OverrideValue ),
-			ScheduleName( MaxNameLength, ScheduleName ),
+			ScheduleName( ScheduleName ),
 			ScheduleIndex( ScheduleIndex ),
 			UserCurveIndex( UserCurveIndex ),
 			HcModelEq( HcModelEq )
@@ -2270,8 +2256,8 @@ namespace DataSurfaces {
 	{
 		// Members
 		// from input data
-		Fstring Name;
-		Fstring OSCMName; // OtherSideConditionsModel
+		std::string Name;
+		std::string OSCMName; // OtherSideConditionsModel
 		int OSCMPtr; // OtherSideConditionsModel index
 		Real64 Porosity; // fraction of absorber plate [--]
 		Real64 LWEmitt; // Thermal Emissivity of Baffle Surface [dimensionless]
@@ -2307,8 +2293,6 @@ namespace DataSurfaces {
 
 		// Default Constructor
 		ExtVentedCavityStruct() :
-			Name( MaxNameLength ),
-			OSCMName( MaxNameLength ),
 			OSCMPtr( 0 ),
 			Porosity( 0.0 ),
 			LWEmitt( 0.0 ),
@@ -2342,8 +2326,8 @@ namespace DataSurfaces {
 
 		// Member Constructor
 		ExtVentedCavityStruct(
-			Fstring const & Name,
-			Fstring const & OSCMName, // OtherSideConditionsModel
+			std::string const & Name,
+			std::string const & OSCMName, // OtherSideConditionsModel
 			int const OSCMPtr, // OtherSideConditionsModel index
 			Real64 const Porosity, // fraction of absorber plate [--]
 			Real64 const LWEmitt, // Thermal Emissivity of Baffle Surface [dimensionless]
@@ -2375,8 +2359,8 @@ namespace DataSurfaces {
 			Real64 const PassiveMdotWind, // Nat Vent air change rate from Wind-driven [kg/s]
 			Real64 const PassiveMdotTherm // Nat. Vent air change rate from bouyancy-driven flow [kg/s]
 		) :
-			Name( MaxNameLength, Name ),
-			OSCMName( MaxNameLength, OSCMName ),
+			Name( Name ),
+			OSCMName( OSCMName ),
 			OSCMPtr( OSCMPtr ),
 			Porosity( Porosity ),
 			LWEmitt( LWEmitt ),
@@ -2414,14 +2398,13 @@ namespace DataSurfaces {
 	struct SurfaceSolarIncident
 	{
 		// Members
-		Fstring Name;
+		std::string Name;
 		int SurfPtr; // surface pointer
 		int ConstrPtr; // construction pointer
 		int SchedPtr; // schedule pointer
 
 		// Default Constructor
 		SurfaceSolarIncident() :
-			Name( MaxNameLength ),
 			SurfPtr( 0 ),
 			ConstrPtr( 0 ),
 			SchedPtr( 0 )
@@ -2429,12 +2412,12 @@ namespace DataSurfaces {
 
 		// Member Constructor
 		SurfaceSolarIncident(
-			Fstring const & Name,
+			std::string const & Name,
 			int const SurfPtr, // surface pointer
 			int const ConstrPtr, // construction pointer
 			int const SchedPtr // schedule pointer
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			SurfPtr( SurfPtr ),
 			ConstrPtr( ConstrPtr ),
 			SchedPtr( SchedPtr )
@@ -2445,7 +2428,7 @@ namespace DataSurfaces {
 	struct FenestrationSolarAbsorbed
 	{
 		// Members
-		Fstring Name;
+		std::string Name;
 		int SurfPtr; // surface pointer
 		int ConstrPtr; // construction pointer
 		int NumOfSched; // number of scheduled layers
@@ -2453,7 +2436,6 @@ namespace DataSurfaces {
 
 		// Default Constructor
 		FenestrationSolarAbsorbed() :
-			Name( MaxNameLength ),
 			SurfPtr( 0 ),
 			ConstrPtr( 0 ),
 			NumOfSched( 0 )
@@ -2461,13 +2443,13 @@ namespace DataSurfaces {
 
 		// Member Constructor
 		FenestrationSolarAbsorbed(
-			Fstring const & Name,
+			std::string const & Name,
 			int const SurfPtr, // surface pointer
 			int const ConstrPtr, // construction pointer
 			int const NumOfSched, // number of scheduled layers
 			FArray1_int const & SchedPtrs // pointer to schedules for each layer in construction
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			SurfPtr( SurfPtr ),
 			ConstrPtr( ConstrPtr ),
 			NumOfSched( NumOfSched ),
@@ -2493,7 +2475,7 @@ namespace DataSurfaces {
 
 	// Functions
 
-	Fstring
+	std::string
 	cSurfaceClass( int const ClassNo );
 
 	//     NOTICE

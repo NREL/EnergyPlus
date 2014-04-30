@@ -112,7 +112,7 @@ namespace SteamCoils {
 
 	void
 	SimulateSteamCoilComponents(
-		Fstring const & CompName,
+		std::string const & CompName,
 		bool const FirstHVACIteration,
 		int & CompIndex,
 		Optional< Real64 const > QCoilReq, // coil load to be met
@@ -169,17 +169,17 @@ namespace SteamCoils {
 		if ( CompIndex == 0 ) {
 			CoilNum = FindItemInList( CompName, SteamCoil.Name(), NumSteamCoils );
 			if ( CoilNum == 0 ) {
-				ShowFatalError( "SimulateSteamCoilComponents: Coil not found=" + trim( CompName ) );
+				ShowFatalError( "SimulateSteamCoilComponents: Coil not found=" + CompName );
 			}
 			CompIndex = CoilNum;
 		} else {
 			CoilNum = CompIndex;
 			if ( CoilNum > NumSteamCoils || CoilNum < 1 ) {
-				ShowFatalError( "SimulateSteamCoilComponents: Invalid CompIndex passed=" + trim( TrimSigDigits( CoilNum ) ) + ", Number of Steam Coils=" + trim( TrimSigDigits( NumSteamCoils ) ) + ", Coil name=" + trim( CompName ) );
+				ShowFatalError( "SimulateSteamCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Number of Steam Coils=" + TrimSigDigits( NumSteamCoils ) + ", Coil name=" + CompName );
 			}
 			if ( CheckEquipName( CoilNum ) ) {
 				if ( CompName != SteamCoil( CoilNum ).Name ) {
-					ShowFatalError( "SimulateSteamCoilComponents: Invalid CompIndex passed=" + trim( TrimSigDigits( CoilNum ) ) + ", Coil name=" + trim( CompName ) + ", stored Coil Name for that index=" + trim( SteamCoil( CoilNum ).Name ) );
+					ShowFatalError( "SimulateSteamCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + SteamCoil( CoilNum ).Name );
 				}
 				CheckEquipName( CoilNum ) = false;
 			}
@@ -244,7 +244,7 @@ namespace SteamCoils {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetSteamCoilInput: " ); // include trailing blank space
+		static std::string const RoutineName( "GetSteamCoilInput: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -262,10 +262,10 @@ namespace SteamCoils {
 		static bool ErrorsFound( false ); // If errors detected in input
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in getting objects
-		FArray1D_Fstring AlphArray( sFstring( MaxNameLength ) ); // Alpha input items for object
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) ); // Numeric field names
+		std::string CurrentModuleObject; // for ease in getting objects
+		FArray1D_string AlphArray; // Alpha input items for object
+		FArray1D_string cAlphaFields; // Alpha field names
+		FArray1D_string cNumericFields; // Numeric field names
 		FArray1D< Real64 > NumArray; // Numeric input items for object
 		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
@@ -284,11 +284,11 @@ namespace SteamCoils {
 
 		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
-		AlphArray = " ";
+		AlphArray = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = " ";
+		cAlphaFields = "";
 		cNumericFields.allocate( NumNums );
-		cNumericFields = " ";
+		cNumericFields = "";
 		NumArray.allocate( NumNums );
 		NumArray = 0.0;
 		lAlphaBlanks.allocate( NumAlphas );
@@ -304,12 +304,12 @@ namespace SteamCoils {
 			GetObjectItem( CurrentModuleObject, StmHeatNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SteamCoil.Name(), CoilNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( AlphArray( 1 ), SteamCoil.Name(), CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
 			}
-			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, trim( CurrentModuleObject ) + " Name" );
+			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
 			}
@@ -320,8 +320,8 @@ namespace SteamCoils {
 			} else {
 				SteamCoil( CoilNum ).SchedPtr = GetScheduleIndex( AlphArray( 2 ) );
 				if ( SteamCoil( CoilNum ).SchedPtr == 0 ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphArray( 1 ) ) + "\", invalid data." );
-					ShowContinueError( trim( cAlphaFields( 2 ) ) + " not found=" + trim( AlphArray( 2 ) ) );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\", invalid data." );
+					ShowContinueError( cAlphaFields( 2 ) + " not found=" + AlphArray( 2 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -333,18 +333,18 @@ namespace SteamCoils {
 			SteamCoil( CoilNum ).DegOfSubcooling = NumArray( 2 );
 			SteamCoil( CoilNum ).LoopSubcoolReturn = NumArray( 3 );
 
-			SteamCoil( CoilNum ).SteamInletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Steam, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
-			SteamCoil( CoilNum ).SteamOutletNodeNum = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Steam, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
-			SteamCoil( CoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			SteamCoil( CoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 6 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			SteamCoil( CoilNum ).SteamInletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Steam, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+			SteamCoil( CoilNum ).SteamOutletNodeNum = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Steam, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+			SteamCoil( CoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			SteamCoil( CoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 6 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 			{ auto const SELECT_CASE_var( MakeUPPERCase( AlphArray( 7 ) ) );
 			//TEMPERATURE SETPOINT CONTROL or ZONE LOAD CONTROLLED Coils
 			if ( SELECT_CASE_var == "TEMPERATURESETPOINTCONTROL" ) {
 				SteamCoil( CoilNum ).TypeOfCoil = TemperatureSetPointControl;
-				SteamCoil( CoilNum ).TempSetPointNodeNum = GetOnlySingleNode( AlphArray( 8 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+				SteamCoil( CoilNum ).TempSetPointNodeNum = GetOnlySingleNode( AlphArray( 8 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
 				if ( SteamCoil( CoilNum ).TempSetPointNodeNum == 0 ) {
-					ShowSevereError( RoutineName + trim( cAlphaFields( 8 ) ) + " not found for " + trim( CurrentModuleObject ) + " = " + trim( AlphArray( 1 ) ) );
+					ShowSevereError( RoutineName + cAlphaFields( 8 ) + " not found for " + CurrentModuleObject + " = " + AlphArray( 1 ) );
 					ShowContinueError( "..required for Temperature Setpoint Controlled Coils." );
 					ErrorsFound = true;
 				}
@@ -353,23 +353,23 @@ namespace SteamCoils {
 				SteamCoil( CoilNum ).TypeOfCoil = ZoneLoadControl;
 
 				if ( ! lAlphaBlanks( 8 ) ) {
-					ShowWarningError( RoutineName + "ZoneLoad Controlled Coil, so " + trim( cAlphaFields( 8 ) ) + " not needed" );
-					ShowContinueError( "for " + trim( CurrentModuleObject ) + " = " + trim( AlphArray( 1 ) ) );
+					ShowWarningError( RoutineName + "ZoneLoad Controlled Coil, so " + cAlphaFields( 8 ) + " not needed" );
+					ShowContinueError( "for " + CurrentModuleObject + " = " + AlphArray( 1 ) );
 					SteamCoil( CoilNum ).TempSetPointNodeNum = 0;
 				}
 
 			} else {
-				ShowSevereError( RoutineName + "Invalid " + trim( cAlphaFields( 7 ) ) + " [" + trim( AlphArray( 7 ) ) + "] specified for " + trim( CurrentModuleObject ) + " = " + trim( AlphArray( 1 ) ) );
+				ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 7 ) + " [" + AlphArray( 7 ) + "] specified for " + CurrentModuleObject + " = " + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}}
 
-			TestCompSet( trim( CurrentModuleObject ), AlphArray( 1 ), AlphArray( 3 ), AlphArray( 4 ), "Steam Nodes" );
-			TestCompSet( trim( CurrentModuleObject ), AlphArray( 1 ), AlphArray( 5 ), AlphArray( 6 ), "Air Nodes" );
+			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 3 ), AlphArray( 4 ), "Steam Nodes" );
+			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 5 ), AlphArray( 6 ), "Air Nodes" );
 
 			if ( SteamIndex == 0 && CoilNum == 1 ) {
 				SteamIndex = FindRefrigerant( "Steam" );
 				if ( SteamIndex == 0 ) {
-					ShowSevereError( RoutineName + "Steam Properties for " + trim( AlphArray( 1 ) ) + " not found." );
+					ShowSevereError( RoutineName + "Steam Properties for " + AlphArray( 1 ) + " not found." );
 					ShowContinueError( "Steam Fluid Properties should have been included in the input file." );
 					ErrorsFound = true;
 				}
@@ -726,7 +726,7 @@ namespace SteamCoils {
 						//             PlantSizData(PltSizSteamNum)%DeltaT*CPHW(PlantSizData(PltSizSteamNum)%ExitTemp)))
 					} else {
 						SteamCoil( CoilNum ).MaxSteamVolFlowRate = 0.0;
-						ShowWarningError( "The design coil load is zero for COIL:Heating:Steam " + trim( SteamCoil( CoilNum ).Name ) );
+						ShowWarningError( "The design coil load is zero for COIL:Heating:Steam " + SteamCoil( CoilNum ).Name );
 						//CALL ShowContinueError('The autosize value for max Steam flow rate is zero')
 						//CALL ShowContinueError('To change this, input a value for UA, change the heating design day, or lower')
 						//CALL ShowContinueError('  the system heating design supply air temperature')
@@ -770,7 +770,7 @@ namespace SteamCoils {
 					}
 					// issue warning if hw coil has zero flow
 					if ( SteamCoil( CoilNum ).MaxSteamVolFlowRate == 0.0 ) {
-						ShowWarningError( "The design coil load is zero for COIL:Heating:Steam " + trim( SteamCoil( CoilNum ).Name ) );
+						ShowWarningError( "The design coil load is zero for COIL:Heating:Steam " + SteamCoil( CoilNum ).Name );
 						ShowContinueError( "The autosize value for max Steam flow rate is zero" );
 						//CALL ShowContinueError('To change this, input a value for UA, change the heating design day, or lower')
 						//CALL ShowContinueError('  the system heating design supply air temperature')
@@ -783,7 +783,7 @@ namespace SteamCoils {
 			// if there is no heating Plant Sizing object and autosizng was requested, issue an error message
 			if ( SteamCoil( CoilNum ).MaxSteamVolFlowRate == AutoSize ) {
 				ShowSevereError( "Autosizing of Steam coil requires a heating loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in Steam coil object= " + trim( SteamCoil( CoilNum ).Name ) );
+				ShowContinueError( "Occurs in Steam coil object= " + SteamCoil( CoilNum ).Name );
 				ErrorsFound = true;
 			}
 		} // end of heating Plant Sizing existence IF - ELSE
@@ -1324,8 +1324,8 @@ namespace SteamCoils {
 
 	int
 	GetSteamCoilIndex(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -1381,7 +1381,7 @@ namespace SteamCoils {
 		}
 
 		if ( IndexNum == 0 ) {
-			ShowSevereError( "GetSteamCoilIndex: Could not find CoilType=\"" + trim( CoilType ) + "\" with Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "GetSteamCoilIndex: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 		}
 
@@ -1391,8 +1391,8 @@ namespace SteamCoils {
 
 	void
 	CheckSteamCoilSchedule(
-		Fstring const & CompType,
-		Fstring const & CompName,
+		std::string const & CompType,
+		std::string const & CompName,
 		Real64 & Value,
 		int & CompIndex
 	)
@@ -1442,17 +1442,17 @@ namespace SteamCoils {
 		if ( CompIndex == 0 ) {
 			CoilNum = FindItemInList( CompName, SteamCoil.Name(), NumSteamCoils );
 			if ( CoilNum == 0 ) {
-				ShowFatalError( "CheckSteamCoilSchedule: Coil not found=" + trim( CompName ) );
+				ShowFatalError( "CheckSteamCoilSchedule: Coil not found=" + CompName );
 			}
 			CompIndex = CoilNum;
 			Value = GetCurrentScheduleValue( SteamCoil( CoilNum ).SchedPtr ); // not scheduled?
 		} else {
 			CoilNum = CompIndex;
 			if ( CoilNum > NumSteamCoils || CoilNum < 1 ) {
-				ShowFatalError( "SimulateSteamCoilComponents: Invalid CompIndex passed=" + trim( TrimSigDigits( CoilNum ) ) + ", Number of Steam Coils=" + trim( TrimSigDigits( NumSteamCoils ) ) + ", Coil name=" + trim( CompName ) );
+				ShowFatalError( "SimulateSteamCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Number of Steam Coils=" + TrimSigDigits( NumSteamCoils ) + ", Coil name=" + CompName );
 			}
 			if ( CompName != SteamCoil( CoilNum ).Name ) {
-				ShowFatalError( "SimulateSteamCoilComponents: Invalid CompIndex passed=" + trim( TrimSigDigits( CoilNum ) ) + ", Coil name=" + trim( CompName ) + ", stored Coil Name for that index=" + trim( SteamCoil( CoilNum ).Name ) );
+				ShowFatalError( "SimulateSteamCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + SteamCoil( CoilNum ).Name );
 			}
 			Value = GetCurrentScheduleValue( SteamCoil( CoilNum ).SchedPtr ); // not scheduled?
 		}
@@ -1461,8 +1461,8 @@ namespace SteamCoils {
 
 	Real64
 	GetCoilMaxWaterFlowRate(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -1525,7 +1525,7 @@ namespace SteamCoils {
 		}
 
 		if ( WhichCoil == 0 ) {
-			ShowSevereError( "GetCoilMaxWaterFlowRate: Could not find CoilType=\"" + trim( CoilType ) + "\" with Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "GetCoilMaxWaterFlowRate: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			MaxWaterFlowRate = -1000.;
 		}
@@ -1599,7 +1599,7 @@ namespace SteamCoils {
 	int
 	GetCoilAirInletNode(
 		int const CoilIndex, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -1649,7 +1649,7 @@ namespace SteamCoils {
 		}
 
 		if ( CoilIndex == 0 ) {
-			ShowSevereError( "GetCoilAirInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + trim( CoilName ) );
+			ShowSevereError( "GetCoilAirInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		} else {
@@ -1663,7 +1663,7 @@ namespace SteamCoils {
 	int
 	GetCoilAirOutletNode(
 		int const CoilIndex, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -1713,7 +1713,7 @@ namespace SteamCoils {
 		}
 
 		if ( CoilIndex == 0 ) {
-			ShowSevereError( "GetCoilAirOutletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + trim( CoilName ) );
+			ShowSevereError( "GetCoilAirOutletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		} else {
@@ -1726,8 +1726,8 @@ namespace SteamCoils {
 
 	int
 	GetCoilAirOutletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -1796,7 +1796,7 @@ namespace SteamCoils {
 	int
 	GetCoilSteamInletNode(
 		int const CoilIndex, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -1846,7 +1846,7 @@ namespace SteamCoils {
 		}
 
 		if ( CoilIndex == 0 ) {
-			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + trim( CoilName ) );
+			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		} else {
@@ -1859,8 +1859,8 @@ namespace SteamCoils {
 
 	int
 	GetCoilSteamInletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -1917,7 +1917,7 @@ namespace SteamCoils {
 		}
 
 		if ( IndexNum == 0 ) {
-			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + trim( CoilName ) );
+			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		} else {
@@ -1931,7 +1931,7 @@ namespace SteamCoils {
 	int
 	GetCoilSteamOutletNode(
 		int const CoilIndex, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -1981,7 +1981,7 @@ namespace SteamCoils {
 		}
 
 		if ( CoilIndex == 0 ) {
-			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + trim( CoilName ) );
+			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		} else {
@@ -1994,8 +1994,8 @@ namespace SteamCoils {
 
 	int
 	GetCoilSteamOutletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -2052,7 +2052,7 @@ namespace SteamCoils {
 		}
 
 		if ( IndexNum == 0 ) {
-			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + trim( CoilName ) );
+			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		} else {
@@ -2065,8 +2065,8 @@ namespace SteamCoils {
 
 	Real64
 	GetCoilCapacity(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -2127,7 +2127,7 @@ namespace SteamCoils {
 		}
 
 		if ( WhichCoil == 0 ) {
-			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType=\"" + trim( CoilType ) + "\" with Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			Capacity = 0.0;
 		}
@@ -2139,7 +2139,7 @@ namespace SteamCoils {
 	int
 	GetTypeOfCoil(
 		int const CoilIndex, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -2191,7 +2191,7 @@ namespace SteamCoils {
 		}
 
 		if ( CoilIndex == 0 ) {
-			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + trim( CoilName ) );
+			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
 			ErrorsFound = true;
 			TypeOfCoil = 0;
 		} else {
@@ -2204,8 +2204,8 @@ namespace SteamCoils {
 
 	int
 	GetSteamCoilControlNodeNum(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorFlag // set to true if problem
 	)
 	{
@@ -2267,7 +2267,7 @@ namespace SteamCoils {
 		}
 
 		if ( WhichCoil == 0 ) {
-			ShowSevereError( "GetSteamCoilControlNodeNum: Could not find Coil, Type=\"" + trim( CoilType ) + "\" Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "GetSteamCoilControlNodeNum: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 			ErrorFlag = true;
 			NodeNumber = 0;
 		}
@@ -2278,8 +2278,8 @@ namespace SteamCoils {
 
 	int
 	GetSteamCoilAvailScheduleIndex(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -2342,7 +2342,7 @@ namespace SteamCoils {
 		}
 
 		if ( WhichCoil == 0 ) {
-			ShowSevereError( "GetCoilAvailScheduleIndex: Could not find Coil, Type=\"" + trim( CoilType ) + "\" Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "GetCoilAvailScheduleIndex: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			AvailSchIndex = 0;
 		}

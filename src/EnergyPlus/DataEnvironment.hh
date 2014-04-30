@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/MArray1.hh>
 #include <ObjexxFCL/Optional.hh>
 
@@ -106,10 +105,10 @@ namespace DataEnvironment {
 	extern Real64 StdRhoAir; // Standard "rho air" set in WeatherManager - based on StdBaroPress
 	extern Real64 TimeZoneNumber; // Time Zone Number of building location
 	extern Real64 TimeZoneMeridian; // Standard Meridian of TimeZone
-	extern Fstring EnvironmentName; // Current environment name (longer for weather file names)
-	extern Fstring WeatherFileLocationTitle; // Location Title from Weather File
-	extern Fstring CurMnDyHr; // Current Month/Day/Hour timestamp info
-	extern Fstring CurMnDy; // Current Month/Day timestamp info
+	extern std::string EnvironmentName; // Current environment name (longer for weather file names)
+	extern std::string WeatherFileLocationTitle; // Location Title from Weather File
+	extern std::string CurMnDyHr; // Current Month/Day/Hour timestamp info
+	extern std::string CurMnDy; // Current Month/Day timestamp info
 	extern int CurEnvirNum; // current environment number
 	extern int TotDesDays; // Total number of Design days to Setup
 	extern int TotRunDesPersDays; // Total number of Run Design Periods [Days] (Weather data) to Setup
@@ -145,7 +144,7 @@ namespace DataEnvironment {
 	extern bool PrintEnvrnStampWarmupPrinted;
 
 	extern bool RunPeriodEnvironment; // True if Run Period, False if DesignDay
-	extern Fstring EnvironmentStartEnd; // Start/End dates for Environment
+	extern std::string EnvironmentStartEnd; // Start/End dates for Environment
 	extern bool CurrentYearIsLeapYear; // true when current year is leap year (convoluted logic dealing with
 	// whether weather file allows leap years, runperiod inputs.
 
@@ -176,12 +175,12 @@ namespace DataEnvironment {
 		FArray1S< Real64 > const Heights,
 		FArray1S< Real64 > DryBulb,
 		FArray1S< Real64 > WetBulb,
-		Fstring const & Settings
+		std::string const & Settings
 	);
 
 	void
 	SetOutBulbTempAt_error(
-		Fstring const & Settings,
+		std::string const & Settings,
 		Real64 const max_height
 	);
 
@@ -192,7 +191,7 @@ namespace DataEnvironment {
 		H const & Heights,
 		D DryBulb,
 		W WetBulb,
-		Optional_Fstring_const const & Settings = _
+		Optional_string_const const & Settings = _
 	)
 	{
 		Real64 BaseDryTemp; // Base temperature at Z = 0 (C)
@@ -229,7 +228,7 @@ namespace DataEnvironment {
 		int const NumItems,
 		FArray1S< Real64 > const Heights,
 		FArray1S< Real64 > LocalWindSpeed,
-		Fstring const & Settings
+		std::string const & Settings
 	);
 
 	template< class H, class W >
@@ -238,7 +237,7 @@ namespace DataEnvironment {
 		int const NumItems,
 		H const Heights,
 		W LocalWindSpeed,
-		Fstring const & Settings
+		std::string const & Settings
 	)
 	{
 		if ( SiteWindExp == 0.0 ) {

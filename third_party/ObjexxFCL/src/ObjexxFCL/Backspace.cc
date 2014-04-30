@@ -20,7 +20,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Backspace.hh>
-#include <ObjexxFCL/char.constants.hh>
 #include <ObjexxFCL/IOFlags.hh>
 
 // C++ Headers
@@ -40,7 +39,7 @@ Backspace( std::istream & stream )
 	if ( g1 > g0 ) --g1;
 	while ( g1 > g0 ) {
 		stream.seekg( --g1, std::ios::beg ); // Backup by 1
-		if ( stream.peek() == NL ) { // Found end of previous record
+		if ( stream.peek() == '\n' ) { // Found end of previous record
 			++g1;
 			stream.seekg( g1, std::ios::beg ); // Backup by 1
 			break;

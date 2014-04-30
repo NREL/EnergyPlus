@@ -55,7 +55,6 @@ namespace AirflowNetworkSolver {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::Pi;
 	using DataGlobals::DegToRadians;
 	using DataGlobals::KelvinConv;
@@ -162,12 +161,12 @@ namespace AirflowNetworkSolver {
 		int n;
 
 		// Formats
-		std::string const Format_900( "(1X,i2)" );
-		std::string const Format_901( "(1X,2I4,4F9.4)" );
-		std::string const Format_902( "(1X,2I4,4F9.4)" );
-		std::string const Format_903( "(9X,4F9.4)" );
-		std::string const Format_904( "(1X,2I4,1F9.4)" );
-		std::string const Format_910( "(1X,I4,2(I4,F9.4),I4,2F4.1)" );
+		static gio::Fmt const Format_900( "(1X,i2)" );
+		static gio::Fmt const Format_901( "(1X,2I4,4F9.4)" );
+		static gio::Fmt const Format_902( "(1X,2I4,4F9.4)" );
+		static gio::Fmt const Format_903( "(9X,4F9.4)" );
+		static gio::Fmt const Format_904( "(1X,2I4,1F9.4)" );
+		static gio::Fmt const Format_910( "(1X,I4,2(I4,F9.4),I4,2F4.1)" );
 
 		// Assume a network to simulate multizone airflow is a subset of the network to simulate air distribution system.
 		// Network array size is allocated based on the network of air distribution system.
@@ -463,11 +462,11 @@ namespace AirflowNetworkSolver {
 		int ITER;
 
 		// Formats
-		std::string const Format_900( "(,/,11X,'i    n    m       DP',12x,'F1',12X,'F2')" );
-		std::string const Format_901( "(1X,A6,3I5,3F14.6)" );
-		std::string const Format_902( "(,/,11X,'n       P',12x,'sumF')" );
-		std::string const Format_903( "(1X,A6,I5,3F14.6)" );
-		std::string const Format_907( "(,/,' CPU seconds for ',A,F12.3)" );
+		static gio::Fmt const Format_900( "(,/,11X,'i    n    m       DP',12x,'F1',12X,'F2')" );
+		static gio::Fmt const Format_901( "(1X,A6,3I5,3F14.6)" );
+		static gio::Fmt const Format_902( "(,/,11X,'n       P',12x,'sumF')" );
+		static gio::Fmt const Format_903( "(1X,A6,I5,3F14.6)" );
+		static gio::Fmt const Format_907( "(,/,' CPU seconds for ',A,F12.3)" );
 
 		// FLOW:
 		// Compute zone air properties.
@@ -641,7 +640,7 @@ namespace AirflowNetworkSolver {
 		FArray1D< Real64 > CCF( NetworkNumOfNodes );
 
 		// Formats
-		std::string const Format_901( "(A5,I3,2E14.6,0P,F8.4,F24.14)" );
+		static gio::Fmt const Format_901( "(A5,I3,2E14.6,0P,F8.4,F24.14)" );
 
 		// FLOW:
 		ACC1 = 0.0;
@@ -764,8 +763,8 @@ namespace AirflowNetworkSolver {
 		++AirflowNetworkSimu.ExtLargeOpeningErrCount;
 		if ( AirflowNetworkSimu.ExtLargeOpeningErrCount < 2 ) {
 			ShowWarningError( "AirflowNetwork: SOLVER, Changing values for initialization flag, Relative airflow convergence, " "Absolute airflow convergence, Convergence acceleration limit or Maximum Iteration Number may solve the problem." );
-			ShowContinueErrorTimeStamp( " " );
-			ShowContinueError( "..Iterations=" + trim( RoundSigDigits( ITER ) ) + ", Max allowed=" + trim( RoundSigDigits( AirflowNetworkSimu.MaxIteration ) ) );
+			ShowContinueErrorTimeStamp( "" );
+			ShowContinueError( "..Iterations=" + RoundSigDigits( ITER ) + ", Max allowed=" + RoundSigDigits( AirflowNetworkSimu.MaxIteration ) );
 			ShowFatalError( "AirflowNetwork: SOLVER, The previous error causes termination." );
 		} else {
 			ShowRecurringWarningErrorAtEnd( "AirFlowNetwork: Too many iterations (SOLVZP) in AirflowNetwork " " simulation continues.", AirflowNetworkSimu.ExtLargeOpeningErrIndex );
@@ -844,7 +843,7 @@ namespace AirflowNetworkSolver {
 		FArray1D< Real64 > DF( 2 );
 
 		// Formats
-		std::string const Format_901( "(A5,3I3,4E16.7)" );
+		static gio::Fmt const Format_901( "(A5,3I3,4E16.7)" );
 
 		// FLOW:
 		for ( n = 1; n <= NetworkNumOfNodes; ++n ) {
@@ -1090,7 +1089,7 @@ namespace AirflowNetworkSolver {
 		int CompNum;
 
 		// Formats
-		std::string const Format_901( "(A5,I3,6X,4E16.7)" );
+		static gio::Fmt const Format_901( "(A5,I3,6X,4E16.7)" );
 
 		// FLOW:
 		// Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
@@ -1218,7 +1217,7 @@ namespace AirflowNetworkSolver {
 		int CompNum;
 
 		// Formats
-		std::string const Format_901( "(A5,I3,6X,4E16.7)" );
+		static gio::Fmt const Format_901( "(A5,I3,6X,4E16.7)" );
 
 		// FLOW:
 		// Crack standard condition from given inputs
@@ -1365,7 +1364,7 @@ namespace AirflowNetworkSolver {
 		Real64 AA1;
 
 		// Formats
-		std::string const Format_901( "(A5,I3,6X,4E16.7)" );
+		static gio::Fmt const Format_901( "(A5,I3,6X,4E16.7)" );
 
 		// FLOW:
 		CompNum = AirflowNetworkCompData( j ).TypeNum;
@@ -1545,8 +1544,8 @@ namespace AirflowNetworkSolver {
 		Real64 OpenFactor;
 
 		// Formats
-		std::string const Format_900( "(A5,9X,4E16.7)" );
-		std::string const Format_903( "(A5,3I3,4E16.7)" );
+		static gio::Fmt const Format_900( "(A5,9X,4E16.7)" );
+		static gio::Fmt const Format_903( "(A5,3I3,4E16.7)" );
 
 		// FLOW:
 		CompNum = AirflowNetworkCompData( j ).TypeNum;
@@ -1833,7 +1832,7 @@ namespace AirflowNetworkSolver {
 		Real64 FlowExpo;
 
 		// Formats
-		std::string const Format_901( "(A5,I3,5E14.6)" );
+		static gio::Fmt const Format_901( "(A5,I3,5E14.6)" );
 
 		// FLOW:
 		CompNum = AirflowNetworkCompData( JA ).TypeNum;
@@ -2047,7 +2046,7 @@ Label999: ;
 		int CompNum;
 
 		// Formats
-		std::string const Format_901( "(A5,I3,6X,4E16.7)" );
+		static gio::Fmt const Format_901( "(A5,I3,6X,4E16.7)" );
 
 		// FLOW:
 		// Get component number
@@ -2138,7 +2137,7 @@ Label999: ;
 		int CompNum;
 
 		// Formats
-		std::string const Format_901( "(A5,I3,6X,4E16.7)" );
+		static gio::Fmt const Format_901( "(A5,I3,6X,4E16.7)" );
 
 		// FLOW:
 		// Get component properties
@@ -2251,7 +2250,7 @@ Label999: ;
 		int CompNum;
 
 		// Formats
-		std::string const Format_901( "(A5,I3,6X,4E16.7)" );
+		static gio::Fmt const Format_901( "(A5,I3,6X,4E16.7)" );
 
 		// FLOW:
 		// Get component properties
@@ -2461,7 +2460,7 @@ Label999: ;
 		Real64 area;
 
 		// Formats
-		std::string const Format_901( "(A5,I3,6X,4E16.7)" );
+		static gio::Fmt const Format_901( "(A5,I3,6X,4E16.7)" );
 
 		// FLOW:
 		// Get component properties
@@ -2641,7 +2640,7 @@ Label999: ;
 		Real64 area;
 
 		// Formats
-		std::string const Format_901( "(A5,I3,6X,4E16.7)" );
+		static gio::Fmt const Format_901( "(A5,I3,6X,4E16.7)" );
 
 		// FLOW:
 		// Get component properties
@@ -2819,7 +2818,7 @@ Label999: ;
 		int InletNode;
 
 		// Formats
-		std::string const Format_901( "(A5,I3,6X,4E16.7)" );
+		static gio::Fmt const Format_901( "(A5,I3,6X,4E16.7)" );
 
 		// FLOW:
 		CompNum = AirflowNetworkCompData( j ).TypeNum;
@@ -3287,7 +3286,7 @@ Label999: ;
 		Real64 RhoCor;
 
 		// Formats
-		std::string const Format_901( "(A5,6X,4E16.7)" );
+		static gio::Fmt const Format_901( "(A5,6X,4E16.7)" );
 
 		// FLOW:
 		// Calculate normal density and viscocity at Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
@@ -3492,7 +3491,7 @@ Label999: ;
 			}
 			if ( AD( k ) - SUMD == 0.0 ) {
 				ShowSevereError( "AirflowNetworkSolver: L-U factorization in Subroutine FACSKY." );
-				ShowContinueError( "The denominator used in L-U factorizationis equal to 0.0 at node = " + trim( AirflowNetworkNodeData( k ).Name ) + "." );
+				ShowContinueError( "The denominator used in L-U factorizationis equal to 0.0 at node = " + AirflowNetworkNodeData( k ).Name + '.' );
 				ShowContinueError( "One possible cause is that this node may not be connected directly, or indirectly via airflow " "network connections " );
 				ShowContinueError( "(e.g., AirflowNetwork:Multizone:SurfaceCrack, AirflowNetwork:Multizone:Component:" "SimpleOpening, etc.), to an external" );
 				ShowContinueError( "node (AirflowNetwork:MultiZone:Surface)." );
@@ -3691,7 +3690,7 @@ Label999: ;
 
 	void
 	DUMPVD(
-		Fstring const & S, // Description
+		std::string const & S, // Description
 		FArray1A< Real64 > const V, // Output values
 		int const n, // Array size
 		int const UOUT // Output file unit
@@ -3737,8 +3736,8 @@ Label999: ;
 		int i;
 
 		// Formats
-		std::string const Format_901( "(1X,A,$)" );
-		std::string const Format_902( "(1X,5E15.07,$)" );
+		static gio::Fmt const Format_901( "(1X,A,$)" );
+		static gio::Fmt const Format_902( "(1X,5E15.07,$)" );
 
 		// FLOW:
 		// Write values for debug
@@ -3751,7 +3750,7 @@ Label999: ;
 
 	void
 	DUMPVR(
-		Fstring const & S, // Description
+		std::string const & S, // Description
 		FArray1A< Real64 > const V, // Output values
 		int const n, // Array size
 		int const UOUT // Output file unit
@@ -3797,8 +3796,8 @@ Label999: ;
 		int i;
 
 		// Formats
-		std::string const Format_901( "(1X,A,$)" );
-		std::string const Format_902( "(1X,5E15.07,$)" );
+		static gio::Fmt const Format_901( "(1X,A,$)" );
+		static gio::Fmt const Format_902( "(1X,5E15.07,$)" );
 
 		// FLOW:
 		gio::write( UOUT, Format_901 ) << S;
@@ -3944,7 +3943,7 @@ Label999: ;
 				HFact = MultizoneCompDetOpeningData( CompNum ).HeightFac1 + ( Fact - MultizoneCompDetOpeningData( CompNum ).OpenFac1 ) / ( MultizoneCompDetOpeningData( CompNum ).OpenFac2 - MultizoneCompDetOpeningData( CompNum ).OpenFac1 ) * ( MultizoneCompDetOpeningData( CompNum ).HeightFac2 - MultizoneCompDetOpeningData( CompNum ).HeightFac1 );
 				Cfact = MultizoneCompDetOpeningData( CompNum ).DischCoeff1 + ( Fact - MultizoneCompDetOpeningData( CompNum ).OpenFac1 ) / ( MultizoneCompDetOpeningData( CompNum ).OpenFac2 - MultizoneCompDetOpeningData( CompNum ).OpenFac1 ) * ( MultizoneCompDetOpeningData( CompNum ).DischCoeff2 - MultizoneCompDetOpeningData( CompNum ).DischCoeff1 );
 			} else {
-				ShowFatalError( "Open Factor is above the maximum input range for opening factors in " "AirflowNetwork:MultiZone:Component:DetailedOpening = " + trim( MultizoneCompDetOpeningData( CompNum ).Name ) );
+				ShowFatalError( "Open Factor is above the maximum input range for opening factors in " "AirflowNetwork:MultiZone:Component:DetailedOpening = " + MultizoneCompDetOpeningData( CompNum ).Name );
 			}
 		}
 
@@ -3958,7 +3957,7 @@ Label999: ;
 				HFact = MultizoneCompDetOpeningData( CompNum ).HeightFac2 + ( Fact - MultizoneCompDetOpeningData( CompNum ).OpenFac2 ) / ( MultizoneCompDetOpeningData( CompNum ).OpenFac3 - MultizoneCompDetOpeningData( CompNum ).OpenFac2 ) * ( MultizoneCompDetOpeningData( CompNum ).HeightFac3 - MultizoneCompDetOpeningData( CompNum ).HeightFac2 );
 				Cfact = MultizoneCompDetOpeningData( CompNum ).DischCoeff2 + ( Fact - MultizoneCompDetOpeningData( CompNum ).OpenFac2 ) / ( MultizoneCompDetOpeningData( CompNum ).OpenFac3 - MultizoneCompDetOpeningData( CompNum ).OpenFac2 ) * ( MultizoneCompDetOpeningData( CompNum ).DischCoeff3 - MultizoneCompDetOpeningData( CompNum ).DischCoeff2 );
 			} else {
-				ShowFatalError( "Open Factor is above the maximum input range for opening factors in " "AirflowNetwork:MultiZone:Component:DetailedOpening = " + trim( MultizoneCompDetOpeningData( CompNum ).Name ) );
+				ShowFatalError( "Open Factor is above the maximum input range for opening factors in " "AirflowNetwork:MultiZone:Component:DetailedOpening = " + MultizoneCompDetOpeningData( CompNum ).Name );
 			}
 		}
 
@@ -3976,7 +3975,7 @@ Label999: ;
 				HFact = MultizoneCompDetOpeningData( CompNum ).HeightFac3 + ( Fact - MultizoneCompDetOpeningData( CompNum ).OpenFac3 ) / ( MultizoneCompDetOpeningData( CompNum ).OpenFac4 - MultizoneCompDetOpeningData( CompNum ).OpenFac3 ) * ( MultizoneCompDetOpeningData( CompNum ).HeightFac4 - MultizoneCompDetOpeningData( CompNum ).HeightFac3 );
 				Cfact = MultizoneCompDetOpeningData( CompNum ).DischCoeff3 + ( Fact - MultizoneCompDetOpeningData( CompNum ).OpenFac3 ) / ( MultizoneCompDetOpeningData( CompNum ).OpenFac4 - MultizoneCompDetOpeningData( CompNum ).OpenFac3 ) * ( MultizoneCompDetOpeningData( CompNum ).DischCoeff4 - MultizoneCompDetOpeningData( CompNum ).DischCoeff3 );
 			} else {
-				ShowFatalError( "Open Factor is above the maximum input range for opening factors in " "AirflowNetwork:MultiZone:Component:DetailedOpening = " + trim( MultizoneCompDetOpeningData( CompNum ).Name ) );
+				ShowFatalError( "Open Factor is above the maximum input range for opening factors in " "AirflowNetwork:MultiZone:Component:DetailedOpening = " + MultizoneCompDetOpeningData( CompNum ).Name );
 			}
 		}
 
@@ -4021,22 +4020,22 @@ Label999: ;
 			if ( ActLw == 0.0 ) {
 				++MultizoneCompDetOpeningData( CompNum ).WidthErrCount;
 				if ( MultizoneCompDetOpeningData( CompNum ).WidthErrCount < 2 ) {
-					ShowWarningError( "The actual width of the AirflowNetwork:MultiZone:Component:DetailedOpening of " + trim( MultizoneCompDetOpeningData( CompNum ).Name ) + " is 0." );
+					ShowWarningError( "The actual width of the AirflowNetwork:MultiZone:Component:DetailedOpening of " + MultizoneCompDetOpeningData( CompNum ).Name + " is 0." );
 					ShowContinueError( "The actual width is set to 1.0E-6 m." );
-					ShowContinueErrorTimeStamp( " Occurrence info: " );
+					ShowContinueErrorTimeStamp( "Occurrence info:" );
 				} else {
-					ShowRecurringWarningErrorAtEnd( "The actual width of the " "AirflowNetwork:MultiZone:Component:DetailedOpening of " + trim( MultizoneCompDetOpeningData( CompNum ).Name ) + " is 0 error continues.", MultizoneCompDetOpeningData( CompNum ).WidthErrIndex, ActLw, ActLw );
+					ShowRecurringWarningErrorAtEnd( "The actual width of the " "AirflowNetwork:MultiZone:Component:DetailedOpening of " + MultizoneCompDetOpeningData( CompNum ).Name + " is 0 error continues.", MultizoneCompDetOpeningData( CompNum ).WidthErrIndex, ActLw, ActLw );
 				}
 				ActLw = 1.0e-6;
 			}
 			if ( ActLh == 0.0 ) {
 				++MultizoneCompDetOpeningData( CompNum ).HeightErrCount;
 				if ( MultizoneCompDetOpeningData( CompNum ).HeightErrCount < 2 ) {
-					ShowWarningError( "The actual height of the AirflowNetwork:MultiZone:Component:DetailedOpening of " + trim( MultizoneCompDetOpeningData( CompNum ).Name ) + " is 0." );
+					ShowWarningError( "The actual height of the AirflowNetwork:MultiZone:Component:DetailedOpening of " + MultizoneCompDetOpeningData( CompNum ).Name + " is 0." );
 					ShowContinueError( "The actual height is set to 1.0E-6 m." );
-					ShowContinueErrorTimeStamp( " Occurrence info: " );
+					ShowContinueErrorTimeStamp( "Occurrence info:" );
 				} else {
-					ShowRecurringWarningErrorAtEnd( "The actual width of the " "AirflowNetwork:MultiZone:Component:DetailedOpening of " + trim( MultizoneCompDetOpeningData( CompNum ).Name ) + " is 0 error continues.", MultizoneCompDetOpeningData( CompNum ).HeightErrIndex, ActLh, ActLh );
+					ShowRecurringWarningErrorAtEnd( "The actual width of the " "AirflowNetwork:MultiZone:Component:DetailedOpening of " + MultizoneCompDetOpeningData( CompNum ).Name + " is 0 error continues.", MultizoneCompDetOpeningData( CompNum ).HeightErrIndex, ActLh, ActLh );
 				}
 				ActLh = 1.0e-6;
 			}

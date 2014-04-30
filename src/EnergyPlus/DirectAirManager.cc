@@ -81,7 +81,7 @@ namespace DirectAirManager {
 
 	void
 	SimDirectAir(
-		Fstring const & EquipName,
+		std::string const & EquipName,
 		int const ControlledZoneNum,
 		bool const FirstHVACIteration,
 		Real64 & SensOutputProvided,
@@ -134,23 +134,23 @@ namespace DirectAirManager {
 		if ( CompIndex == 0 ) {
 			DirectAirNum = FindItemInList( EquipName, DirectAir.EquipID(), NumDirectAir );
 			if ( DirectAirNum == 0 ) {
-				ShowFatalError( "SimDirectAir: Unit not found=" + trim( EquipName ) );
+				ShowFatalError( "SimDirectAir: Unit not found=" + EquipName );
 			}
 			CompIndex = DirectAirNum;
 		} else {
 			DirectAirNum = CompIndex;
 			if ( DirectAirNum > NumDirectAir || DirectAirNum < 1 ) {
-				ShowFatalError( "SimDirectAir:  Invalid CompIndex passed=" + trim( TrimSigDigits( DirectAirNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumDirectAir ) ) + ", Entered Unit name=" + trim( EquipName ) );
+				ShowFatalError( "SimDirectAir:  Invalid CompIndex passed=" + TrimSigDigits( DirectAirNum ) + ", Number of Units=" + TrimSigDigits( NumDirectAir ) + ", Entered Unit name=" + EquipName );
 			}
 			if ( CheckEquipName( DirectAirNum ) ) {
 				if ( EquipName != DirectAir( DirectAirNum ).EquipID ) {
-					ShowFatalError( "SimDirectAir: Invalid CompIndex passed=" + trim( TrimSigDigits( DirectAirNum ) ) + ", Unit name=" + trim( EquipName ) + ", stored Unit Name for that index=" + trim( DirectAir( DirectAirNum ).EquipID ) );
+					ShowFatalError( "SimDirectAir: Invalid CompIndex passed=" + TrimSigDigits( DirectAirNum ) + ", Unit name=" + EquipName + ", stored Unit Name for that index=" + DirectAir( DirectAirNum ).EquipID );
 				}
 				CheckEquipName( DirectAirNum ) = false;
 			}
 		}
 		if ( DirectAirNum <= 0 ) {
-			ShowFatalError( "SimDirectAir: Unit not found=" + trim( EquipName ) );
+			ShowFatalError( "SimDirectAir: Unit not found=" + EquipName );
 		}
 
 		// With the correct DirectAirNum to Initialize the system
@@ -211,7 +211,7 @@ namespace DirectAirManager {
 		int NumAlphas; // Number of alphanumerics returned by GetObjectItem
 		int DirectAirNum;
 		int IOStat;
-		static Fstring const RoutineName( "GetDirectAirInput: " ); // include trailing blank space
+		static std::string const RoutineName( "GetDirectAirInput: " ); // include trailing blank space
 		static bool ErrorsFound( false );
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
@@ -236,7 +236,7 @@ namespace DirectAirManager {
 				GetObjectItem( cCurrentModuleObject, DirectAirNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), DirectAir.EquipID(), DirectAirNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+				VerifyName( cAlphaArgs( 1 ), DirectAir.EquipID(), DirectAirNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxxxxx";
@@ -248,14 +248,14 @@ namespace DirectAirManager {
 				} else {
 					DirectAir( DirectAirNum ).SchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 					if ( DirectAir( DirectAirNum ).SchedPtr == 0 ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-						ShowContinueError( "..invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\"." );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+						ShowContinueError( "..invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 						ErrorsFound = true;
 					}
 				}
 				// Direct air is a problem for node connections since it only has a single node
 				// make this an outlet
-				DirectAir( DirectAirNum ).ZoneSupplyAirNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent, cAlphaFieldNames( 3 ) );
+				DirectAir( DirectAirNum ).ZoneSupplyAirNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent, cAlphaFieldNames( 3 ) );
 				//Load the maximum volume flow rate
 				DirectAir( DirectAirNum ).MaxAirVolFlowRate = rNumericArgs( 1 );
 
@@ -379,7 +379,7 @@ namespace DirectAirManager {
 			ZoneEquipmentListChecked = true;
 			for ( Loop = 1; Loop <= NumDirectAir; ++Loop ) {
 				if ( CheckZoneEquipmentList( DirectAir( DirectAirNum ).cObjectName, DirectAir( Loop ).EquipID ) ) continue;
-				ShowWarningError( "InitDirectAir: [" + trim( DirectAir( DirectAirNum ).cObjectName ) + " = " + trim( DirectAir( Loop ).EquipID ) + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
+				ShowWarningError( "InitDirectAir: [" + DirectAir( DirectAirNum ).cObjectName + " = " + DirectAir( Loop ).EquipID + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
 			}
 		}
 		if ( ! SysSizingCalc && MySizeFlag( DirectAirNum ) ) {
@@ -513,10 +513,10 @@ namespace DirectAirManager {
 			// Check if all are hard-sized
 			if ( ! IsAutoSize && ! SizingDesRunThisZone ) { // simulation should continue
 				if ( DirectAir( DirectAirNum ).MaxAirVolFlowRate > 0.0 ) {
-					ReportSizingOutput( trim( DirectAir( DirectAirNum ).cObjectName ), DirectAir( DirectAirNum ).EquipID, "User-Specified Maximum Air Flow Rate [m3/s]", DirectAir( DirectAirNum ).MaxAirVolFlowRate );
+					ReportSizingOutput( DirectAir( DirectAirNum ).cObjectName, DirectAir( DirectAirNum ).EquipID, "User-Specified Maximum Air Flow Rate [m3/s]", DirectAir( DirectAirNum ).MaxAirVolFlowRate );
 				}
 			} else { // AutoSize or hard-size with design run
-				CheckZoneSizing( trim( DirectAir( DirectAirNum ).cObjectName ), DirectAir( DirectAirNum ).EquipID );
+				CheckZoneSizing( DirectAir( DirectAirNum ).cObjectName, DirectAir( DirectAirNum ).EquipID );
 				MaxAirVolFlowRateDes = max( TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
 				if ( MaxAirVolFlowRateDes < SmallAirVolFlow ) {
 					MaxAirVolFlowRateDes = 0.0;
@@ -530,9 +530,9 @@ namespace DirectAirManager {
 						ReportSizingOutput( DirectAir( DirectAirNum ).cObjectName, DirectAir( DirectAirNum ).EquipID, "Design Size Maximum Air Flow Rate [m3/s]", MaxAirVolFlowRateDes, "User-Specified Maximum Air Flow Rate [m3/s]", MaxAirVolFlowRateUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( MaxAirVolFlowRateDes - MaxAirVolFlowRateUser ) / MaxAirVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeDirectAir: Potential issue with equipment sizing for AirTerminal:SingleDuct:Uncontrolled=\"" + trim( DirectAir( DirectAirNum ).EquipID ) + "\"." );
-								ShowContinueError( "User-Specified Maximum Air Flow Rate of " + trim( RoundSigDigits( MaxAirVolFlowRateUser, 5 ) ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Maximum Air Flow Rate of " + trim( RoundSigDigits( MaxAirVolFlowRateDes, 5 ) ) + " [m3/s]" );
+								ShowMessage( "SizeDirectAir: Potential issue with equipment sizing for AirTerminal:SingleDuct:Uncontrolled=\"" + DirectAir( DirectAirNum ).EquipID + "\"." );
+								ShowContinueError( "User-Specified Maximum Air Flow Rate of " + RoundSigDigits( MaxAirVolFlowRateUser, 5 ) + " [m3/s]" );
+								ShowContinueError( "differs from Design Size Maximum Air Flow Rate of " + RoundSigDigits( MaxAirVolFlowRateDes, 5 ) + " [m3/s]" );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}

@@ -48,7 +48,6 @@ namespace MundtSimMgr {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using InputProcessor::SameString;
 
 	// Data
@@ -284,7 +283,7 @@ namespace MundtSimMgr {
 		MundtAirSurf.Temp() = 25.0;
 		MundtAirSurf.Hc() = 0.0;
 		MundtAirSurf.TMeanAir() = 25.0;
-		LineNode.AirNodeName() = " ";
+		LineNode.AirNodeName() = "";
 		LineNode.ClassType() = -1;
 		LineNode.Height() = 0.0;
 		LineNode.Temp() = 25.0;
@@ -334,7 +333,7 @@ namespace MundtSimMgr {
 
 						// error check for debugging
 						if ( ! AirNodeFoundFlag ) {
-							ShowSevereError( "InitMundtModel: Air Node in Zone=\"" + trim( Zone( ZoneIndex ).Name ) + "\" is not found." );
+							ShowSevereError( "InitMundtModel: Air Node in Zone=\"" + Zone( ZoneIndex ).Name + "\" is not found." );
 							ErrorsFound = true;
 							continue;
 						}
@@ -453,7 +452,7 @@ namespace MundtSimMgr {
 		ZoneEquipConfigNum = ZoneNum;
 		// check whether this zone is a controlled zone or not
 		if ( ! Zone( ZoneNum ).IsControlled ) {
-			ShowFatalError( "Zones must be controlled for Mundt air model. No system serves zone " + trim( Zone( ZoneNum ).Name ) );
+			ShowFatalError( "Zones must be controlled for Mundt air model. No system serves zone " + Zone( ZoneNum ).Name );
 			return;
 		}
 
@@ -599,7 +598,7 @@ namespace MundtSimMgr {
 				FloorSurf( SurfNum ).Area = MundtAirSurf( MundtZoneNum, FloorSurfSetIDs( SurfNum ) ).Area;
 			}
 		} else {
-			ShowSevereError( "SetupMundtModel: Mundt model has no FloorAirNode, Zone=" + trim( Zone( ZoneNum ).Name ) );
+			ShowSevereError( "SetupMundtModel: Mundt model has no FloorAirNode, Zone=" + Zone( ZoneNum ).Name );
 			ErrorsFound = true;
 		}
 

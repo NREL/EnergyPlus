@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,12 +13,11 @@ namespace EnergyPlus {
 namespace ElectricBaseboardRadiator {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
 	extern int const BaseboardRadiator_Electric;
-	extern Fstring const cCMO_BBRadiator_Electric;
+	extern std::string const cCMO_BBRadiator_Electric;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -41,10 +39,10 @@ namespace ElectricBaseboardRadiator {
 	struct ElecBaseboardParams
 	{
 		// Members
-		Fstring EquipName;
+		std::string EquipName;
 		int EquipType;
-		Fstring Schedule;
-		FArray1D_Fstring SurfaceName;
+		std::string Schedule;
+		FArray1D_string SurfaceName;
 		FArray1D_int SurfacePtr;
 		int ZonePtr;
 		int SchedPtr;
@@ -71,10 +69,7 @@ namespace ElectricBaseboardRadiator {
 
 		// Default Constructor
 		ElecBaseboardParams() :
-			EquipName( MaxNameLength ),
 			EquipType( 0 ),
-			Schedule( MaxNameLength ),
-			SurfaceName( sFstring( MaxNameLength ) ),
 			ZonePtr( 0 ),
 			SchedPtr( 0 ),
 			TotSurfToDistrib( 0 ),
@@ -100,10 +95,10 @@ namespace ElectricBaseboardRadiator {
 
 		// Member Constructor
 		ElecBaseboardParams(
-			Fstring const & EquipName,
+			std::string const & EquipName,
 			int const EquipType,
-			Fstring const & Schedule,
-			FArray1_Fstring const & SurfaceName,
+			std::string const & Schedule,
+			FArray1_string const & SurfaceName,
 			FArray1_int const & SurfacePtr,
 			int const ZonePtr,
 			int const SchedPtr,
@@ -128,9 +123,9 @@ namespace ElectricBaseboardRadiator {
 			Real64 const RadEnergy,
 			FArray1< Real64 > const & FracDistribToSurf
 		) :
-			EquipName( MaxNameLength, EquipName ),
+			EquipName( EquipName ),
 			EquipType( EquipType ),
-			Schedule( MaxNameLength, Schedule ),
+			Schedule( Schedule ),
 			SurfaceName( SurfaceName ),
 			SurfacePtr( SurfacePtr ),
 			ZonePtr( ZonePtr ),
@@ -166,7 +161,7 @@ namespace ElectricBaseboardRadiator {
 
 	void
 	SimElecBaseboard(
-		Fstring const & EquipName,
+		std::string const & EquipName,
 		int const ActualZoneNum,
 		int const ControlledZoneNum,
 		bool const FirstHVACIteration,

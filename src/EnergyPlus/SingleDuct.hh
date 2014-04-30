@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -16,7 +15,6 @@ namespace EnergyPlus {
 namespace SingleDuct {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
@@ -78,22 +76,22 @@ namespace SingleDuct {
 	struct SysDesignParams
 	{
 		// Members
-		Fstring SysName; // Name of the Sys
-		Fstring SysType; // Type of Sys ie. VAV, Mixing, Inducing, etc.
+		std::string SysName; // Name of the Sys
+		std::string SysType; // Type of Sys ie. VAV, Mixing, Inducing, etc.
 		int SysType_Num; // Numeric Equivalent for System type
-		Fstring Schedule; // Sys Operation Schedule
+		std::string Schedule; // Sys Operation Schedule
 		int SchedPtr; // Pointer to the correct schedule
-		Fstring ReheatComp; // Type of the Reheat Coil Object
+		std::string ReheatComp; // Type of the Reheat Coil Object
 		int ReheatComp_Num; // Numeric Equivalent in this module for Coil type
 		int ReheatComp_Index; // Returned Index number from other routines
-		Fstring ReheatName; // name of reheat coil
+		std::string ReheatName; // name of reheat coil
 		int ReheatComp_PlantType; // typeOf_ number for plant type of heating coil
-		Fstring FanType; // Type of the Fan Object
+		std::string FanType; // Type of the Fan Object
 		int Fan_Num; // Numeric Equivalent in this module for fan type
 		int Fan_Index; // Returned Index number from other routines
 		int ControlCompTypeNum;
 		int CompErrIndex;
-		Fstring FanName; // name of fan
+		std::string FanName; // name of fan
 		Real64 MaxAirVolFlowRate; // Max Specified Volume Flow Rate of Sys (cooling max) [m3/sec]
 		Real64 AirMassFlowRateMax; // Max Specified Mass Flow Rate of Sys (cooling max) [kg/sec]
 		Real64 MaxHeatAirVolFlowRate; // Max specified volume flow rate of unit at max heating [m3/s]
@@ -146,8 +144,8 @@ namespace SingleDuct {
 		int HWLoopSide; // plant topology, loop side number
 		int HWBranchIndex; // plant topology, Branch number
 		int HWCompIndex; // plant topology, Component number
-		Fstring ZoneHVACUnitType; // type of Zone HVAC unit for air terminal mixer units
-		Fstring ZoneHVACUnitName; // name of Zone HVAC unit for air terminal mixer units
+		std::string ZoneHVACUnitType; // type of Zone HVAC unit for air terminal mixer units
+		std::string ZoneHVACUnitName; // name of Zone HVAC unit for air terminal mixer units
 		int SecInNode; // zone or zone unit air node number
 		// warning variables
 		int IterationLimit; // Used for RegulaFalsi error -1
@@ -155,22 +153,15 @@ namespace SingleDuct {
 
 		// Default Constructor
 		SysDesignParams() :
-			SysName( MaxNameLength ),
-			SysType( MaxNameLength ),
 			SysType_Num( 0 ),
-			Schedule( MaxNameLength ),
 			SchedPtr( 0 ),
-			ReheatComp( MaxNameLength ),
 			ReheatComp_Num( 0 ),
 			ReheatComp_Index( 0 ),
-			ReheatName( MaxNameLength ),
 			ReheatComp_PlantType( 0 ),
-			FanType( MaxNameLength ),
 			Fan_Num( 0 ),
 			Fan_Index( 0 ),
 			ControlCompTypeNum( 0 ),
 			CompErrIndex( 0 ),
-			FanName( MaxNameLength ),
 			MaxAirVolFlowRate( 0.0 ),
 			AirMassFlowRateMax( 0.0 ),
 			MaxHeatAirVolFlowRate( 0.0 ),
@@ -222,8 +213,6 @@ namespace SingleDuct {
 			HWLoopSide( 0 ),
 			HWBranchIndex( 0 ),
 			HWCompIndex( 0 ),
-			ZoneHVACUnitType( MaxNameLength ),
-			ZoneHVACUnitName( MaxNameLength ),
 			SecInNode( 0 ),
 			IterationLimit( 0 ),
 			IterationFailed( 0 )
@@ -231,22 +220,22 @@ namespace SingleDuct {
 
 		// Member Constructor
 		SysDesignParams(
-			Fstring const & SysName, // Name of the Sys
-			Fstring const & SysType, // Type of Sys ie. VAV, Mixing, Inducing, etc.
+			std::string const & SysName, // Name of the Sys
+			std::string const & SysType, // Type of Sys ie. VAV, Mixing, Inducing, etc.
 			int const SysType_Num, // Numeric Equivalent for System type
-			Fstring const & Schedule, // Sys Operation Schedule
+			std::string const & Schedule, // Sys Operation Schedule
 			int const SchedPtr, // Pointer to the correct schedule
-			Fstring const & ReheatComp, // Type of the Reheat Coil Object
+			std::string const & ReheatComp, // Type of the Reheat Coil Object
 			int const ReheatComp_Num, // Numeric Equivalent in this module for Coil type
 			int const ReheatComp_Index, // Returned Index number from other routines
-			Fstring const & ReheatName, // name of reheat coil
+			std::string const & ReheatName, // name of reheat coil
 			int const ReheatComp_PlantType, // typeOf_ number for plant type of heating coil
-			Fstring const & FanType, // Type of the Fan Object
+			std::string const & FanType, // Type of the Fan Object
 			int const Fan_Num, // Numeric Equivalent in this module for fan type
 			int const Fan_Index, // Returned Index number from other routines
 			int const ControlCompTypeNum,
 			int const CompErrIndex,
-			Fstring const & FanName, // name of fan
+			std::string const & FanName, // name of fan
 			Real64 const MaxAirVolFlowRate, // Max Specified Volume Flow Rate of Sys (cooling max) [m3/sec]
 			Real64 const AirMassFlowRateMax, // Max Specified Mass Flow Rate of Sys (cooling max) [kg/sec]
 			Real64 const MaxHeatAirVolFlowRate, // Max specified volume flow rate of unit at max heating [m3/s]
@@ -298,28 +287,28 @@ namespace SingleDuct {
 			int const HWLoopSide, // plant topology, loop side number
 			int const HWBranchIndex, // plant topology, Branch number
 			int const HWCompIndex, // plant topology, Component number
-			Fstring const & ZoneHVACUnitType, // type of Zone HVAC unit for air terminal mixer units
-			Fstring const & ZoneHVACUnitName, // name of Zone HVAC unit for air terminal mixer units
+			std::string const & ZoneHVACUnitType, // type of Zone HVAC unit for air terminal mixer units
+			std::string const & ZoneHVACUnitName, // name of Zone HVAC unit for air terminal mixer units
 			int const SecInNode, // zone or zone unit air node number
 			int const IterationLimit, // Used for RegulaFalsi error -1
 			int const IterationFailed // Used for RegulaFalsi error -2
 		) :
-			SysName( MaxNameLength, SysName ),
-			SysType( MaxNameLength, SysType ),
+			SysName( SysName ),
+			SysType( SysType ),
 			SysType_Num( SysType_Num ),
-			Schedule( MaxNameLength, Schedule ),
+			Schedule( Schedule ),
 			SchedPtr( SchedPtr ),
-			ReheatComp( MaxNameLength, ReheatComp ),
+			ReheatComp( ReheatComp ),
 			ReheatComp_Num( ReheatComp_Num ),
 			ReheatComp_Index( ReheatComp_Index ),
-			ReheatName( MaxNameLength, ReheatName ),
+			ReheatName( ReheatName ),
 			ReheatComp_PlantType( ReheatComp_PlantType ),
-			FanType( MaxNameLength, FanType ),
+			FanType( FanType ),
 			Fan_Num( Fan_Num ),
 			Fan_Index( Fan_Index ),
 			ControlCompTypeNum( ControlCompTypeNum ),
 			CompErrIndex( CompErrIndex ),
-			FanName( MaxNameLength, FanName ),
+			FanName( FanName ),
 			MaxAirVolFlowRate( MaxAirVolFlowRate ),
 			AirMassFlowRateMax( AirMassFlowRateMax ),
 			MaxHeatAirVolFlowRate( MaxHeatAirVolFlowRate ),
@@ -371,8 +360,8 @@ namespace SingleDuct {
 			HWLoopSide( HWLoopSide ),
 			HWBranchIndex( HWBranchIndex ),
 			HWCompIndex( HWCompIndex ),
-			ZoneHVACUnitType( MaxNameLength, ZoneHVACUnitType ),
-			ZoneHVACUnitName( MaxNameLength, ZoneHVACUnitName ),
+			ZoneHVACUnitType( ZoneHVACUnitType ),
+			ZoneHVACUnitName( ZoneHVACUnitName ),
 			SecInNode( SecInNode ),
 			IterationLimit( IterationLimit ),
 			IterationFailed( IterationFailed )
@@ -384,10 +373,10 @@ namespace SingleDuct {
 	{
 		// Members
 		// Input data
-		Fstring Name; // name of unit
+		std::string Name; // name of unit
 		int MixerType; // type of inlet mixer, 1 = inlet side, 2 = supply side
 		int ZoneHVACUnitType; // type of Zone HVAC unit. ZoneHVAC:WaterToAirHeatPump =1, ZoneHVAC:FourPipeFanCoil = 2
-		Fstring ZoneHVACUnitName; // name of Zone HVAC unit
+		std::string ZoneHVACUnitName; // name of Zone HVAC unit
 		int SecInNode; // secondary air inlet node number
 		int PriInNode; // primary air inlet node number
 		int MixedAirOutNode; // mixed air outlet node number
@@ -410,10 +399,8 @@ namespace SingleDuct {
 
 		// Default Constructor
 		AirTerminalMixerData() :
-			Name( MaxNameLength ),
 			MixerType( 0 ),
 			ZoneHVACUnitType( 0 ),
-			ZoneHVACUnitName( MaxNameLength ),
 			SecInNode( 0 ),
 			PriInNode( 0 ),
 			MixedAirOutNode( 0 ),
@@ -437,10 +424,10 @@ namespace SingleDuct {
 
 		// Member Constructor
 		AirTerminalMixerData(
-			Fstring const & Name, // name of unit
+			std::string const & Name, // name of unit
 			int const MixerType, // type of inlet mixer, 1 = inlet side, 2 = supply side
 			int const ZoneHVACUnitType, // type of Zone HVAC unit. ZoneHVAC:WaterToAirHeatPump =1, ZoneHVAC:FourPipeFanCoil = 2
-			Fstring const & ZoneHVACUnitName, // name of Zone HVAC unit
+			std::string const & ZoneHVACUnitName, // name of Zone HVAC unit
 			int const SecInNode, // secondary air inlet node number
 			int const PriInNode, // primary air inlet node number
 			int const MixedAirOutNode, // mixed air outlet node number
@@ -461,10 +448,10 @@ namespace SingleDuct {
 			Real64 const MixedAirMassFlowRate, // mixed air in mass flow rate
 			Real64 const MaxAirMassFlowRate // maximum air mass flow rate allowed through component
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			MixerType( MixerType ),
 			ZoneHVACUnitType( ZoneHVACUnitType ),
-			ZoneHVACUnitName( MaxNameLength, ZoneHVACUnitName ),
+			ZoneHVACUnitName( ZoneHVACUnitName ),
 			SecInNode( SecInNode ),
 			PriInNode( PriInNode ),
 			MixedAirOutNode( MixedAirOutNode ),
@@ -541,7 +528,7 @@ namespace SingleDuct {
 
 	void
 	SimulateSingleDuct(
-		Fstring const & CompName,
+		std::string const & CompName,
 		bool const FirstHVACIteration,
 		int const ZoneNum,
 		int const ZoneNodeNum,
@@ -672,17 +659,17 @@ namespace SingleDuct {
 
 	void
 	GetHVACSingleDuctSysIndex(
-		Fstring const & SDSName,
+		std::string const & SDSName,
 		int & SDSIndex,
 		bool & ErrorsFound,
-		Optional_Fstring_const ThisObjectType = _,
+		Optional_string_const ThisObjectType = _,
 		Optional_int DamperInletNode = _, // Damper inlet node number
 		Optional_int DamperOutletNode = _ // Damper outlet node number
 	);
 
 	void
 	SimATMixer(
-		Fstring const & SysName,
+		std::string const & SysName,
 		bool const FirstHVACIteration,
 		int & SysIndex
 	);
@@ -704,26 +691,26 @@ namespace SingleDuct {
 
 	void
 	GetATMixerPriNode(
-		Fstring const & ZoneEquipName,
+		std::string const & ZoneEquipName,
 		int & ATMixerPriNode
 	);
 
 	void
 	GetATMixerSecNode(
-		Fstring const & ZoneEquipName,
+		std::string const & ZoneEquipName,
 		int & ATMixerSecNode
 	);
 
 	void
 	GetATMixerOutNode(
-		Fstring const & ZoneEquipName,
+		std::string const & ZoneEquipName,
 		int & ATMixerOutNode
 	);
 
 	void
 	GetATMixer(
-		Fstring const & ZoneEquipName, // zone unit name name
-		Fstring & ATMixerName, // air terminal mixer name
+		std::string const & ZoneEquipName, // zone unit name name
+		std::string & ATMixerName, // air terminal mixer name
 		int & ATMixerNum, // air terminal mixer index
 		int & ATMixerType, // air teminal mixer type
 		int & ATMixerPriNode, // air terminal mixer primary air node number

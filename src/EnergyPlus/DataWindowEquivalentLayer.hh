@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace DataWindowEquivalentLayer {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// CFSTY: Complex Fenestration System
@@ -140,7 +138,7 @@ namespace DataWindowEquivalentLayer {
 	struct CFSLAYER
 	{
 		// Members
-		Fstring Name; // ID of layer
+		std::string Name; // ID of layer
 		int LTYPE; // layer type (see ltyXXX above)
 		int iGZS; // re spectral glazing
 		//   = GZSTbl idx of LTYPE=ltyGZS (spectral glazing)
@@ -186,7 +184,6 @@ namespace DataWindowEquivalentLayer {
 
 		// Default Constructor
 		CFSLAYER() :
-			Name( MaxNameLength ),
 			LTYPE( 0 ),
 			iGZS( 0 ),
 			S( 0.0 ),
@@ -198,7 +195,7 @@ namespace DataWindowEquivalentLayer {
 
 		// Member Constructor
 		CFSLAYER(
-			Fstring const & Name, // ID of layer
+			std::string const & Name, // ID of layer
 			int const LTYPE, // layer type (see ltyXXX above)
 			int const iGZS, // re spectral glazing
 			CFSSWP const & SWP_MAT, // ltyGZS: derived from GSZ file data
@@ -211,7 +208,7 @@ namespace DataWindowEquivalentLayer {
 			Real64 const PHI_DEG, // Angle
 			int const CNTRL // VB: lscNONE:   PHI_DEG not changed
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			LTYPE( LTYPE ),
 			iGZS( iGZS ),
 			SWP_MAT( SWP_MAT ),
@@ -230,7 +227,7 @@ namespace DataWindowEquivalentLayer {
 	struct CFSFILLGAS
 	{
 		// Members
-		Fstring Name; // Gas Type (AIR, ARGON, XENON, KRYPTON, CUSTOM)
+		std::string Name; // Gas Type (AIR, ARGON, XENON, KRYPTON, CUSTOM)
 		//Gas Conductivity: K = AK + BK*T + CK*T*T
 		Real64 AK; // conductivity coeff constant term,  (W/m-K)
 		Real64 BK; // conductivity coeff of T term, (W/m-K2)
@@ -247,7 +244,6 @@ namespace DataWindowEquivalentLayer {
 
 		// Default Constructor
 		CFSFILLGAS() :
-			Name( MaxNameLength ),
 			AK( 0.0 ),
 			BK( 0.0 ),
 			CK( 0.0 ),
@@ -262,7 +258,7 @@ namespace DataWindowEquivalentLayer {
 
 		// Member Constructor
 		CFSFILLGAS(
-			Fstring const & Name, // Gas Type (AIR, ARGON, XENON, KRYPTON, CUSTOM)
+			std::string const & Name, // Gas Type (AIR, ARGON, XENON, KRYPTON, CUSTOM)
 			Real64 const AK, // conductivity coeff constant term,  (W/m-K)
 			Real64 const BK, // conductivity coeff of T term, (W/m-K2)
 			Real64 const CK, // conductivity coeff of T^2 term, (W/m-K^3)
@@ -274,7 +270,7 @@ namespace DataWindowEquivalentLayer {
 			Real64 const CVISC, // viscosity coeff of T^2 term, (N-sec/m2-K^2)
 			Real64 const MHAT // apparent molecular weight of gas
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			AK( AK ),
 			BK( BK ),
 			CK( CK ),
@@ -292,7 +288,7 @@ namespace DataWindowEquivalentLayer {
 	struct CFSGAP
 	{
 		// Members
-		Fstring Name; // Gap layer name
+		std::string Name; // Gap layer name
 		int GTYPE; // gap type (gtyXXX above)
 		Real64 TAS; // actual surface-surface gap thickness, mm (always > 0)
 		//   VB: minimum tip-surface distance (slats normal to CFS plane)
@@ -305,7 +301,6 @@ namespace DataWindowEquivalentLayer {
 
 		// Default Constructor
 		CFSGAP() :
-			Name( MaxNameLength ),
 			GTYPE( 0 ),
 			TAS( 0.0 ),
 			TAS_EFF( 0.0 ),
@@ -314,14 +309,14 @@ namespace DataWindowEquivalentLayer {
 
 		// Member Constructor
 		CFSGAP(
-			Fstring const & Name, // Gap layer name
+			std::string const & Name, // Gap layer name
 			int const GTYPE, // gap type (gtyXXX above)
 			Real64 const TAS, // actual surface-surface gap thickness, mm (always > 0)
 			Real64 const TAS_EFF, // effective gap thickness, mm (always > 0)
 			CFSFILLGAS const & FG, // fill gas properties (see above)
 			Real64 const RHOGAS // fill gas density (kg/m3)
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			GTYPE( GTYPE ),
 			TAS( TAS ),
 			TAS_EFF( TAS_EFF ),
@@ -334,7 +329,7 @@ namespace DataWindowEquivalentLayer {
 	struct CFSTY
 	{
 		// Members
-		Fstring Name; // ID (Fenestration Name)
+		std::string Name; // ID (Fenestration Name)
 		int NL; // number of layers
 		FArray1D< CFSLAYER > L; // layer array, L(1) is outside layer
 		FArray1D< CFSGAP > G; // gap array, G(1) is outside-most, betw L(1) and L(2)
@@ -342,7 +337,6 @@ namespace DataWindowEquivalentLayer {
 
 		// Default Constructor
 		CFSTY() :
-			Name( MaxNameLength ),
 			NL( 0 ),
 			L( CFSMAXNL ),
 			G( CFSMAXNL-1 ),
@@ -351,13 +345,13 @@ namespace DataWindowEquivalentLayer {
 
 		// Member Constructor
 		CFSTY(
-			Fstring const & Name, // ID (Fenestration Name)
+			std::string const & Name, // ID (Fenestration Name)
 			int const NL, // number of layers
 			FArray1< CFSLAYER > const & L, // layer array, L(1) is outside layer
 			FArray1< CFSGAP > const & G, // gap array, G(1) is outside-most, betw L(1) and L(2)
 			bool const ISControlled // CFS is not controlled, or has no controlled VB layer
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NL( NL ),
 			L( CFSMAXNL, L ),
 			G( CFSMAXNL-1, G ),

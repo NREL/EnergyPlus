@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -50,7 +49,7 @@ namespace DXFEarClipping {
 		FArray1D< dTriangle > & outtriangles,
 		Real64 const surfazimuth, // surface azimuth angle (outward facing normal)
 		Real64 const surftilt, // surface tilt angle
-		Fstring const & surfname, // surface name (for error messages)
+		std::string const & surfname, // surface name (for error messages)
 		int const surfclass // surface class
 	);
 

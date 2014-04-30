@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -16,7 +15,6 @@ namespace EnergyPlus {
 namespace PackagedThermalStorageCoil {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 	using namespace DataHVACGlobals;
 
 	// Data
@@ -59,7 +57,7 @@ namespace PackagedThermalStorageCoil {
 	struct PackagedTESCoolingCoilStruct
 	{
 		// Members
-		Fstring Name; // Name of TES cooling package
+		std::string Name; // Name of TES cooling package
 		int AvailSchedNum; // pointer to availability schedule
 		int ModeControlType; // how are operation modes controlled
 		int ControlModeSchedNum; // pointer to control schedule if used
@@ -243,16 +241,16 @@ namespace PackagedThermalStorageCoil {
 		int BasinHeaterAvailSchedNum; // basin heater availability schedule pointer num
 		Real64 BasinHeaterSetpointTemp; // evap water basin temperature setpoint [C]
 		int EvapWaterSupplyMode; // where does evap water come from
-		Fstring EvapWaterSupplyName; // name of water source e.g. water storage tank
+		std::string EvapWaterSupplyName; // name of water source e.g. water storage tank
 		int EvapWaterSupTankID; // supply tank index, if any
 		int EvapWaterTankDemandARRID; // evap water demand array index
 		int CondensateCollectMode; // where does condensate  water go to
-		Fstring CondensateCollectName; // name of water source e.g. water storage tank
+		std::string CondensateCollectName; // name of water source e.g. water storage tank
 		int CondensateTankID;
 		int CondensateTankSupplyARRID;
 		// TES tank
 		int StorageMedia; // water/fluid or ice based TES
-		Fstring StorageFluidName; // if user defined, name of fluid type
+		std::string StorageFluidName; // if user defined, name of fluid type
 		int StorageFluidIndex; // if user defined, index of fluid type
 		Real64 FluidStorageVolume; // volume of water in storage tank for water systems [m3/s]
 		Real64 IceStorageCapacity; // capacity of storage in J
@@ -307,7 +305,6 @@ namespace PackagedThermalStorageCoil {
 
 		// Default Constructor
 		PackagedTESCoolingCoilStruct() :
-			Name( MaxNameLength ),
 			AvailSchedNum( 0 ),
 			ModeControlType( 0 ),
 			ControlModeSchedNum( 0 ),
@@ -447,15 +444,12 @@ namespace PackagedThermalStorageCoil {
 			BasinHeaterAvailSchedNum( 0 ),
 			BasinHeaterSetpointTemp( 0.0 ),
 			EvapWaterSupplyMode( WaterSupplyFromMains ),
-			EvapWaterSupplyName( MaxNameLength ),
 			EvapWaterSupTankID( 0 ),
 			EvapWaterTankDemandARRID( 0 ),
 			CondensateCollectMode( CondensateDiscarded ),
-			CondensateCollectName( MaxNameLength ),
 			CondensateTankID( 0 ),
 			CondensateTankSupplyARRID( 0 ),
 			StorageMedia( 0 ),
-			StorageFluidName( MaxNameLength ),
 			StorageFluidIndex( 0 ),
 			FluidStorageVolume( 0.0 ),
 			IceStorageCapacity( 0.0 ),
@@ -510,7 +504,7 @@ namespace PackagedThermalStorageCoil {
 
 		// Member Constructor
 		PackagedTESCoolingCoilStruct(
-			Fstring const & Name, // Name of TES cooling package
+			std::string const & Name, // Name of TES cooling package
 			int const AvailSchedNum, // pointer to availability schedule
 			int const ModeControlType, // how are operation modes controlled
 			int const ControlModeSchedNum, // pointer to control schedule if used
@@ -650,15 +644,15 @@ namespace PackagedThermalStorageCoil {
 			int const BasinHeaterAvailSchedNum, // basin heater availability schedule pointer num
 			Real64 const BasinHeaterSetpointTemp, // evap water basin temperature setpoint [C]
 			int const EvapWaterSupplyMode, // where does evap water come from
-			Fstring const & EvapWaterSupplyName, // name of water source e.g. water storage tank
+			std::string const & EvapWaterSupplyName, // name of water source e.g. water storage tank
 			int const EvapWaterSupTankID, // supply tank index, if any
 			int const EvapWaterTankDemandARRID, // evap water demand array index
 			int const CondensateCollectMode, // where does condensate  water go to
-			Fstring const & CondensateCollectName, // name of water source e.g. water storage tank
+			std::string const & CondensateCollectName, // name of water source e.g. water storage tank
 			int const CondensateTankID,
 			int const CondensateTankSupplyARRID,
 			int const StorageMedia, // water/fluid or ice based TES
-			Fstring const & StorageFluidName, // if user defined, name of fluid type
+			std::string const & StorageFluidName, // if user defined, name of fluid type
 			int const StorageFluidIndex, // if user defined, index of fluid type
 			Real64 const FluidStorageVolume, // volume of water in storage tank for water systems [m3/s]
 			Real64 const IceStorageCapacity, // capacity of storage in J
@@ -710,7 +704,7 @@ namespace PackagedThermalStorageCoil {
 			Real64 const EvapCondPumpElecPower,
 			Real64 const EvapCondPumpElecConsumption
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			AvailSchedNum( AvailSchedNum ),
 			ModeControlType( ModeControlType ),
 			ControlModeSchedNum( ControlModeSchedNum ),
@@ -850,15 +844,15 @@ namespace PackagedThermalStorageCoil {
 			BasinHeaterAvailSchedNum( BasinHeaterAvailSchedNum ),
 			BasinHeaterSetpointTemp( BasinHeaterSetpointTemp ),
 			EvapWaterSupplyMode( EvapWaterSupplyMode ),
-			EvapWaterSupplyName( MaxNameLength, EvapWaterSupplyName ),
+			EvapWaterSupplyName( EvapWaterSupplyName ),
 			EvapWaterSupTankID( EvapWaterSupTankID ),
 			EvapWaterTankDemandARRID( EvapWaterTankDemandARRID ),
 			CondensateCollectMode( CondensateCollectMode ),
-			CondensateCollectName( MaxNameLength, CondensateCollectName ),
+			CondensateCollectName( CondensateCollectName ),
 			CondensateTankID( CondensateTankID ),
 			CondensateTankSupplyARRID( CondensateTankSupplyARRID ),
 			StorageMedia( StorageMedia ),
-			StorageFluidName( MaxNameLength, StorageFluidName ),
+			StorageFluidName( StorageFluidName ),
 			StorageFluidIndex( StorageFluidIndex ),
 			FluidStorageVolume( FluidStorageVolume ),
 			IceStorageCapacity( IceStorageCapacity ),
@@ -920,7 +914,7 @@ namespace PackagedThermalStorageCoil {
 
 	void
 	SimTESCoil(
-		Fstring const & CompName, // name of the fan coil unit
+		std::string const & CompName, // name of the fan coil unit
 		int & CompIndex,
 		int const FanOpMode, // allows parent object to control fan mode
 		int & TESOpMode,
@@ -993,10 +987,10 @@ namespace PackagedThermalStorageCoil {
 
 	void
 	GetTESCoilIndex(
-		Fstring const & CoilName,
+		std::string const & CoilName,
 		int & CoilIndex,
 		bool & ErrorsFound,
-		Optional_Fstring_const CurrentModuleObject = _
+		Optional_string_const CurrentModuleObject = _
 	);
 
 	//     NOTICE

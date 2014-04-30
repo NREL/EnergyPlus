@@ -52,7 +52,7 @@ operator <<( std::ostream & stream, MArray1< A, T > const & a )
 		// Output array to stream
 		int const w( Traits::width() );
 		for ( int i = 1, e = a.u(); i < e; ++i ) {
-			stream << setw( w ) << a( i ) << SPC;
+			stream << setw( w ) << a( i ) << ' ';
 			if ( ! stream ) break;
 		} stream << setw( w ) << a( a.u() );
 

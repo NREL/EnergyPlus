@@ -49,7 +49,7 @@ namespace SortAndStringUtilities {
 
 	void
 	SetupAndSort(
-		FArray1S_Fstring Alphas, // Alphas to be sorted
+		FArray1S_string Alphas, // Alphas to be sorted
 		FArray1S_int iAlphas // Pointers -- this is the array that is actually sorted
 	)
 	{
@@ -98,7 +98,7 @@ namespace SortAndStringUtilities {
 
 	void
 	QsortC(
-		FArray1S_Fstring Alphas, // Alphas to be sorted
+		FArray1S_string Alphas, // Alphas to be sorted
 		FArray1S_int iAlphas // Pointers -- this is the array that is actually sorted
 	)
 	{
@@ -150,7 +150,7 @@ namespace SortAndStringUtilities {
 
 	void
 	QsortPartition(
-		FArray1S_Fstring Alphas, // Alphas to be sorted
+		FArray1S_string Alphas, // Alphas to be sorted
 		FArray1S_int iAlphas, // Pointers -- this is the array that is actually sorted
 		int & marker
 	)
@@ -172,7 +172,6 @@ namespace SortAndStringUtilities {
 		// na
 
 		// Using/Aliasing
-		using DataGlobals::MaxNameLength;
 
 		// Argument array dimensioning
 
@@ -192,8 +191,8 @@ namespace SortAndStringUtilities {
 		int i;
 		int j;
 		int itemp;
-		Fstring ctemp( MaxNameLength * 2 );
-		Fstring cpivot( MaxNameLength * 2 ); // pivot point
+		std::string ctemp;
+		std::string cpivot; // pivot point
 
 		cpivot = Alphas( 1 );
 		i = 0;

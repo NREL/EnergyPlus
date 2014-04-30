@@ -195,7 +195,7 @@ namespace ThermalISO15099Calc {
 		FArray1A< Real64 > hrgas,
 		Real64 & shgc,
 		int & nperr,
-		Fstring & ErrorMessage,
+		std::string & ErrorMessage,
 		Real64 & shgct,
 		Real64 & tamb,
 		Real64 & troom,
@@ -836,7 +836,7 @@ namespace ThermalISO15099Calc {
 		FArray1A< Real64 > hrgas,
 		Real64 & ufactor,
 		int & nperr,
-		Fstring & ErrorMessage,
+		std::string & ErrorMessage,
 		Real64 & tamb,
 		Real64 & troom,
 		FArray1A_int const ibc,
@@ -1051,8 +1051,8 @@ namespace ThermalISO15099Calc {
 		//logical :: TurnOnNewton
 
 		// Formats
-		std::string const Format_1111( "('Outdoor: ',F9.6,' ;  alt2: ',F9.6,' ; alt3: ',F9.6,' ; alt4: ',F9.6)" );
-		std::string const Format_1112( "('Indoor:  ',F9.6,' ;  alt2: ',F9.6,' ; alt3: ',F9.6,' ; alt4: ',F9.6)" );
+		static gio::Fmt const Format_1111( "('Outdoor: ',F9.6,' ;  alt2: ',F9.6,' ; alt3: ',F9.6,' ; alt4: ',F9.6)" );
+		static gio::Fmt const Format_1112( "('Indoor:  ',F9.6,' ;  alt2: ',F9.6,' ; alt3: ',F9.6,' ; alt4: ',F9.6)" );
 
 		SDLayerIndex = -1;
 
@@ -1578,7 +1578,7 @@ namespace ThermalISO15099Calc {
 		FArray1A< Real64 > const Ebb,
 		int const nlayer,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	)
 	{
 		//***********************************************************************
@@ -1821,7 +1821,7 @@ namespace ThermalISO15099Calc {
 		int const index,
 		FArray1A_int const ibc,
 		int & nperr,
-		Fstring & ErrorMessage,
+		std::string & ErrorMessage,
 		Real64 & hrin,
 		Real64 & hrout,
 		FArray1A< Real64 > Ra,
@@ -2037,7 +2037,7 @@ namespace ThermalISO15099Calc {
 		Real64 & hcin,
 		int const ibc,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	)
 	{
 		//***********************************************************************
@@ -2168,7 +2168,7 @@ namespace ThermalISO15099Calc {
 		FArray1A< Real64 > Rayleigh,
 		FArray1A< Real64 > Nu,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	)
 	{
 		//***********************************************************************
@@ -2291,7 +2291,7 @@ namespace ThermalISO15099Calc {
 		FArray1A< Real64 > hcgas,
 		Real64 const VacuumMaxGapThickness,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	)
 	{
 		//***********************************************************************
@@ -2317,8 +2317,8 @@ namespace ThermalISO15099Calc {
 		static Real64 aveGlassConductivity( 0.0 );
 		static int i( 0 );
 		static int k( 0 );
-		Fstring a( 12 );
-		Fstring b( 12 );
+		std::string a;
+		std::string b;
 
 		for ( i = 1; i <= nlayer - 1; ++i ) {
 			k = 2 * i + 1;
@@ -2350,7 +2350,7 @@ namespace ThermalISO15099Calc {
 		Real64 const asp,
 		Real64 & gnu,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	)
 	{
 		//***********************************************************************
@@ -2541,7 +2541,7 @@ namespace ThermalISO15099Calc {
 		FArray1A< Real64 > hgas,
 		FArray1A< Real64 > hhat,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	)
 	{
 
@@ -2732,12 +2732,12 @@ namespace ThermalISO15099Calc {
 		//character(len=*), intent(inout) :: ErrorMessage
 
 		//localy used
-		static Fstring dynFormat( 1024 );
-		Fstring a( 3 );
+		static std::string dynFormat;
+		std::string a;
 		int i;
 
 		// Formats
-		std::string const Format_1000( "(I3)" );
+		static gio::Fmt const Format_1000( "(I3)" );
 
 		//open(unit=InArgumentsFile,  file=TRIM(DBGD)//'TarcogIterations.dbg',  status='unknown', position='APPEND',  &
 		//          &  form='formatted', iostat=nperr)
@@ -2784,14 +2784,14 @@ namespace ThermalISO15099Calc {
 				dynFormat = "('";
 			}
 			if ( mod( i, 2 ) == 1 ) {
-				dynFormat = trim( dynFormat ) + "Ebf(" + a + ")";
+				dynFormat += "Ebf(" + a + ')';
 			} else {
-				dynFormat = trim( dynFormat ) + "Ebb(" + a + ")";
+				dynFormat += "Ebb(" + a + ')';
 			}
 			if ( i == 2 * nlayer ) {
-				dynFormat = trim( dynFormat ) + "')";
+				dynFormat += "')";
 			} else {
-				dynFormat = trim( dynFormat ) + "===";
+				dynFormat += "===";
 			}
 		}
 		gio::write( TarcogIterationsFileNumber, dynFormat );
@@ -2812,14 +2812,14 @@ namespace ThermalISO15099Calc {
 				dynFormat = "('";
 			}
 			if ( mod( i, 2 ) == 1 ) {
-				dynFormat = trim( dynFormat ) + "Rf(" + a + ")";
+				dynFormat += "Rf(" + a + ')';
 			} else {
-				dynFormat = trim( dynFormat ) + "Rb(" + a + ")";
+				dynFormat += "Rb(" + a + ')';
 			}
 			if ( i == 2 * nlayer ) {
-				dynFormat = trim( dynFormat ) + "')";
+				dynFormat += "')";
 			} else {
-				dynFormat = trim( dynFormat ) + "===";
+				dynFormat += "===";
 			}
 		}
 		gio::write( TarcogIterationsFileNumber, dynFormat );
@@ -2838,11 +2838,11 @@ namespace ThermalISO15099Calc {
 			if ( i == 1 ) {
 				dynFormat = "('";
 			}
-			dynFormat = trim( dynFormat ) + "theta(" + a + ")";
+			dynFormat += "theta(" + a + ')';
 			if ( i == ( 2 * nlayer ) ) {
-				dynFormat = trim( dynFormat ) + "')";
+				dynFormat += "')";
 			} else {
-				dynFormat = trim( dynFormat ) + "==";
+				dynFormat += "==";
 			}
 		}
 		gio::write( TarcogIterationsFileNumber, dynFormat );
@@ -2862,12 +2862,12 @@ namespace ThermalISO15099Calc {
 			for ( i = 1; i <= 2 * nlayer; ++i ) {
 				gio::write( a, Format_1000 ) << i; //this is just to simulate correct integer in brackets
 				if ( i != 2 * nlayer ) {
-					dynFormat = trim( dynFormat ) + "theta(" + a + "),";
+					dynFormat += "theta(" + a + "),";
 				} else {
-					dynFormat = trim( dynFormat ) + "theta(" + a + ")";
+					dynFormat += "theta(" + a + ')';
 				}
 			}
-			dynFormat = trim( dynFormat ) + "')";
+			dynFormat += "')";
 			gio::write( IterationCSVFileNumber, dynFormat );
 		}
 		gio::write( IterationCSVFileNumber, "(f16.8,'   ',f16.8,$)" ) << theta( 1 ) - KelvinConv;

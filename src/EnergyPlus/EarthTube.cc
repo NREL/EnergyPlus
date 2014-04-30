@@ -173,7 +173,7 @@ namespace EarthTube {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const Blank;
+		static std::string const Blank;
 		Real64 const EarthTubeTempLimit( 100.0 ); // degrees Celsius
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -209,7 +209,7 @@ namespace EarthTube {
 			// First Alpha is Zone Name
 			EarthTubeSys( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone.Name(), NumOfZones );
 			if ( EarthTubeSys( Loop ).ZonePtr == 0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ": " + trim( cAlphaFieldNames( 1 ) ) + " not found=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( cCurrentModuleObject + ": " + cAlphaFieldNames( 1 ) + " not found=" + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
@@ -218,9 +218,9 @@ namespace EarthTube {
 			EarthTubeSys( Loop ).SchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 			if ( EarthTubeSys( Loop ).SchedPtr == 0 ) {
 				if ( lAlphaFieldBlanks( 2 ) ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + ": " + trim( cAlphaFieldNames( 2 ) ) + " is required, missing for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( cCurrentModuleObject + ": " + cAlphaFieldNames( 2 ) + " is required, missing for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 				} else {
-					ShowSevereError( trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 2 ) ) + " entered=" + trim( cAlphaArgs( 2 ) ) + " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) + " entered=" + cAlphaArgs( 2 ) + " for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 				}
 				ErrorsFound = true;
 			}
@@ -230,15 +230,15 @@ namespace EarthTube {
 
 			EarthTubeSys( Loop ).MinTemperature = rNumericArgs( 2 );
 			if ( ( EarthTubeSys( Loop ).MinTemperature < -EarthTubeTempLimit ) || ( EarthTubeSys( Loop ).MinTemperature > EarthTubeTempLimit ) ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ": " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) + " must have a minimum temperature between -" + trim( RoundSigDigits( EarthTubeTempLimit, 0 ) ) + "C and " + trim( RoundSigDigits( EarthTubeTempLimit, 0 ) ) + "C" );
-				ShowContinueError( "Entered value=" + trim( RoundSigDigits( EarthTubeSys( Loop ).MinTemperature, 0 ) ) );
+				ShowSevereError( cCurrentModuleObject + ": " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) + " must have a minimum temperature between -" + RoundSigDigits( EarthTubeTempLimit, 0 ) + "C and " + RoundSigDigits( EarthTubeTempLimit, 0 ) + 'C' );
+				ShowContinueError( "Entered value=" + RoundSigDigits( EarthTubeSys( Loop ).MinTemperature, 0 ) );
 				ErrorsFound = true;
 			}
 
 			EarthTubeSys( Loop ).MaxTemperature = rNumericArgs( 3 );
 			if ( ( EarthTubeSys( Loop ).MaxTemperature < -EarthTubeTempLimit ) || ( EarthTubeSys( Loop ).MaxTemperature > EarthTubeTempLimit ) ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ": " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) + " must have a maximum temperature between -" + trim( RoundSigDigits( EarthTubeTempLimit, 0 ) ) + "C and " + trim( RoundSigDigits( EarthTubeTempLimit, 0 ) ) + "C" );
-				ShowContinueError( "Entered value=" + trim( RoundSigDigits( EarthTubeSys( Loop ).MaxTemperature, 0 ) ) );
+				ShowSevereError( cCurrentModuleObject + ": " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) + " must have a maximum temperature between -" + RoundSigDigits( EarthTubeTempLimit, 0 ) + "C and " + RoundSigDigits( EarthTubeTempLimit, 0 ) + 'C' );
+				ShowContinueError( "Entered value=" + RoundSigDigits( EarthTubeSys( Loop ).MaxTemperature, 0 ) );
 				ErrorsFound = true;
 			}
 
@@ -252,31 +252,31 @@ namespace EarthTube {
 			} else if ( ( SELECT_CASE_var == "NATURAL" ) || ( SELECT_CASE_var == "NONE" ) || ( SELECT_CASE_var == Blank ) ) {
 				EarthTubeSys( Loop ).FanType = NaturalEarthTube;
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + ": " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) + ", " + trim( cAlphaFieldNames( 3 ) ) + " invalid=" + trim( cAlphaArgs( 3 ) ) );
+				ShowSevereError( cCurrentModuleObject + ": " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) + ", " + cAlphaFieldNames( 3 ) + " invalid=" + cAlphaArgs( 3 ) );
 				ErrorsFound = true;
 			}}
 
 			EarthTubeSys( Loop ).FanPressure = rNumericArgs( 5 );
 			if ( EarthTubeSys( Loop ).FanPressure < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ": " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) + ", " + trim( cNumericFieldNames( 5 ) ) + " must be positive, entered value=" + trim( RoundSigDigits( EarthTubeSys( Loop ).FanPressure, 2 ) ) );
+				ShowSevereError( cCurrentModuleObject + ": " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) + ", " + cNumericFieldNames( 5 ) + " must be positive, entered value=" + RoundSigDigits( EarthTubeSys( Loop ).FanPressure, 2 ) );
 				ErrorsFound = true;
 			}
 
 			EarthTubeSys( Loop ).FanEfficiency = rNumericArgs( 6 );
 			if ( ( EarthTubeSys( Loop ).FanEfficiency <= 0.0 ) || ( EarthTubeSys( Loop ).FanEfficiency > 1.0 ) ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ": " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) + ", " + trim( cNumericFieldNames( 6 ) ) + " must be greater than zero and less than or equal to one, entered value=" + trim( RoundSigDigits( EarthTubeSys( Loop ).FanEfficiency, 2 ) ) );
+				ShowSevereError( cCurrentModuleObject + ": " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) + ", " + cNumericFieldNames( 6 ) + " must be greater than zero and less than or equal to one, entered value=" + RoundSigDigits( EarthTubeSys( Loop ).FanEfficiency, 2 ) );
 				ErrorsFound = true;
 			}
 
 			EarthTubeSys( Loop ).r1 = rNumericArgs( 7 );
 			if ( EarthTubeSys( Loop ).r1 <= 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ": " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) + ", " + trim( cNumericFieldNames( 7 ) ) + " must be positive, entered value=" + trim( RoundSigDigits( EarthTubeSys( Loop ).r1, 2 ) ) );
+				ShowSevereError( cCurrentModuleObject + ": " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) + ", " + cNumericFieldNames( 7 ) + " must be positive, entered value=" + RoundSigDigits( EarthTubeSys( Loop ).r1, 2 ) );
 				ErrorsFound = true;
 			}
 
 			EarthTubeSys( Loop ).r2 = rNumericArgs( 8 );
 			if ( EarthTubeSys( Loop ).r2 <= 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ": " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) + ", " + trim( cNumericFieldNames( 8 ) ) + " must be positive, entered value=" + trim( RoundSigDigits( EarthTubeSys( Loop ).r2, 2 ) ) );
+				ShowSevereError( cCurrentModuleObject + ": " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) + ", " + cNumericFieldNames( 8 ) + " must be positive, entered value=" + RoundSigDigits( EarthTubeSys( Loop ).r2, 2 ) );
 				ErrorsFound = true;
 			}
 
@@ -284,23 +284,23 @@ namespace EarthTube {
 
 			EarthTubeSys( Loop ).PipeLength = rNumericArgs( 9 );
 			if ( EarthTubeSys( Loop ).PipeLength <= 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ": " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) + ", " + trim( cNumericFieldNames( 9 ) ) + " must be positive, entered value=" + trim( RoundSigDigits( EarthTubeSys( Loop ).PipeLength, 2 ) ) );
+				ShowSevereError( cCurrentModuleObject + ": " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) + ", " + cNumericFieldNames( 9 ) + " must be positive, entered value=" + RoundSigDigits( EarthTubeSys( Loop ).PipeLength, 2 ) );
 				ErrorsFound = true;
 			}
 
 			EarthTubeSys( Loop ).PipeThermCond = rNumericArgs( 10 );
 			if ( EarthTubeSys( Loop ).PipeThermCond <= 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ": " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) + ", " + trim( cNumericFieldNames( 10 ) ) + " must be positive, entered value=" + trim( RoundSigDigits( EarthTubeSys( Loop ).PipeThermCond, 2 ) ) );
+				ShowSevereError( cCurrentModuleObject + ": " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) + ", " + cNumericFieldNames( 10 ) + " must be positive, entered value=" + RoundSigDigits( EarthTubeSys( Loop ).PipeThermCond, 2 ) );
 				ErrorsFound = true;
 			}
 
 			EarthTubeSys( Loop ).z = rNumericArgs( 11 );
 			if ( EarthTubeSys( Loop ).z <= 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ": " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) + ", " + trim( cNumericFieldNames( 11 ) ) + " must be positive, entered value=" + trim( RoundSigDigits( EarthTubeSys( Loop ).z, 2 ) ) );
+				ShowSevereError( cCurrentModuleObject + ": " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) + ", " + cNumericFieldNames( 11 ) + " must be positive, entered value=" + RoundSigDigits( EarthTubeSys( Loop ).z, 2 ) );
 				ErrorsFound = true;
 			}
 			if ( EarthTubeSys( Loop ).z <= ( EarthTubeSys( Loop ).r1 + EarthTubeSys( Loop ).r2 + EarthTubeSys( Loop ).r3 ) ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ": " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) + ", " + trim( cNumericFieldNames( 11 ) ) + " must be greater than 3*" + trim( cNumericFieldNames( 7 ) ) + " + " + trim( cNumericFieldNames( 8 ) ) + " entered value=" + trim( RoundSigDigits( EarthTubeSys( Loop ).z, 2 ) ) + " ref sum=" + trim( RoundSigDigits( EarthTubeSys( Loop ).r1 + EarthTubeSys( Loop ).r2 + EarthTubeSys( Loop ).r3, 2 ) ) );
+				ShowSevereError( cCurrentModuleObject + ": " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) + ", " + cNumericFieldNames( 11 ) + " must be greater than 3*" + cNumericFieldNames( 7 ) + " + " + cNumericFieldNames( 8 ) + " entered value=" + RoundSigDigits( EarthTubeSys( Loop ).z, 2 ) + " ref sum=" + RoundSigDigits( EarthTubeSys( Loop ).r1 + EarthTubeSys( Loop ).r2 + EarthTubeSys( Loop ).r3, 2 ) );
 				ErrorsFound = true;
 			}
 
@@ -318,7 +318,7 @@ namespace EarthTube {
 				EarthTubeSys( Loop ).SoilThermDiff = 0.024192;
 				EarthTubeSys( Loop ).SoilThermCond = 0.346;
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + ": " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) + ", " + trim( cAlphaFieldNames( 4 ) ) + " invalid=" + trim( cAlphaArgs( 4 ) ) );
+				ShowSevereError( cCurrentModuleObject + ": " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) + ", " + cAlphaFieldNames( 4 ) + " invalid=" + cAlphaArgs( 4 ) );
 				ErrorsFound = true;
 			}}
 
@@ -362,7 +362,7 @@ namespace EarthTube {
 		for ( Loop = 1; Loop <= TotEarthTube; ++Loop ) {
 			for ( Loop1 = Loop + 1; Loop1 <= TotEarthTube - 1; ++Loop1 ) {
 				if ( EarthTubeSys( Loop ).ZonePtr == EarthTubeSys( Loop1 ).ZonePtr ) {
-					ShowSevereError( trim( cAlphaArgs( 1 ) ) + " is assigned to more than one " + trim( cCurrentModuleObject ) );
+					ShowSevereError( cAlphaArgs( 1 ) + " is assigned to more than one " + cCurrentModuleObject );
 					ShowContinueError( "Only one such assignment is allowed." );
 					ErrorsFound = true;
 				}
@@ -370,7 +370,7 @@ namespace EarthTube {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( trim( cCurrentModuleObject ) + ": Errors getting input.  Program terminates." );
+			ShowFatalError( cCurrentModuleObject + ": Errors getting input.  Program terminates." );
 		}
 
 	}

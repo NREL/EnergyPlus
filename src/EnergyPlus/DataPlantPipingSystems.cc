@@ -33,7 +33,6 @@ namespace DataPlantPipingSystems {
 
 	// Using/Aliasing
 	using DataGlobals::Pi;
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:

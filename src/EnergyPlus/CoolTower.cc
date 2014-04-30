@@ -163,8 +163,8 @@ namespace CoolTower {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const Blank;
-		static Fstring const CurrentModuleObject( "ZoneCoolTower:Shower" );
+		static std::string const Blank;
+		static std::string const CurrentModuleObject( "ZoneCoolTower:Shower" );
 		Real64 const MaximumWaterFlowRate( 0.016667 ); // Maximum limit of water flow rate in m3/s (1000 l/min)
 		Real64 const MinimumWaterFlowRate( 0.0 ); // Minimum limit of water flow rate
 		Real64 const MaxHeight( 30.0 ); // Maximum effective tower height in m
@@ -189,9 +189,9 @@ namespace CoolTower {
 		int NumNumbers; // Number of Numbers for each GetobjectItem call
 		int NumArgs;
 		int IOStat;
-		FArray1D_Fstring cAlphaArgs( sFstring( MaxNameLength ) ); // Alpha input items for object
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) ); // Numeric field names
+		FArray1D_string cAlphaArgs; // Alpha input items for object
+		FArray1D_string cAlphaFields; // Alpha field names
+		FArray1D_string cNumericFields; // Numeric field names
 		FArray1D< Real64 > rNumericArgs; // Numeric input items for object
 		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
@@ -199,11 +199,11 @@ namespace CoolTower {
 		// Initializations and allocations
 		GetObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 		cAlphaArgs.allocate( NumAlphas );
-		cAlphaArgs = " ";
+		cAlphaArgs = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = " ";
+		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = " ";
+		cNumericFields = "";
 		rNumericArgs.allocate( NumNumbers );
 		rNumericArgs = 0.0;
 		lAlphaBlanks.allocate( NumAlphas );
@@ -235,8 +235,8 @@ namespace CoolTower {
 			} else {
 				CoolTowerSys( CoolTowerNum ).SchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 				if ( CoolTowerSys( CoolTowerNum ).SchedPtr == 0 ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid data" );
-					ShowContinueError( "Invalid-Schedule not found " + trim( cAlphaFields( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\"." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
+					ShowContinueError( "Invalid-Schedule not found " + cAlphaFields( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 					ErrorsFound = true;
 				}
 			}
@@ -245,9 +245,9 @@ namespace CoolTower {
 			CoolTowerSys( CoolTowerNum ).ZonePtr = FindItemInList( cAlphaArgs( 3 ), Zone.Name(), NumOfZones );
 			if ( CoolTowerSys( CoolTowerNum ).ZonePtr == 0 ) {
 				if ( lAlphaBlanks( 3 ) ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 3 ) ) + " is required but input is blank." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 3 ) + " is required but input is blank." );
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 3 ) ) + "=\"" + trim( cAlphaArgs( 3 ) ) + "\" not found." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\" not found." );
 				}
 				ErrorsFound = true;
 			}
@@ -262,10 +262,10 @@ namespace CoolTower {
 			{ auto const SELECT_CASE_var( cAlphaArgs( 5 ) ); // Type of flow control
 			if ( SELECT_CASE_var == "WATERFLOWSCHEDULE" ) {
 				CoolTowerSys( CoolTowerNum ).FlowCtrlType = WaterFlowSchedule;
-			} else if ( ( SELECT_CASE_var == "WINDDRIVENFLOW" ) || ( SELECT_CASE_var == "NONE" ) || ( SELECT_CASE_var == " " ) ) {
+			} else if ( ( SELECT_CASE_var == "WINDDRIVENFLOW" ) || ( SELECT_CASE_var == "NONE" ) || ( SELECT_CASE_var == "" ) ) {
 				CoolTowerSys( CoolTowerNum ).FlowCtrlType = WindDrivenFlow;
 			} else {
-				ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 5 ) ) + "=\"" + trim( cAlphaArgs( 5 ) ) + "\"." );
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
 				ErrorsFound = true;
 			}}
 
@@ -273,9 +273,9 @@ namespace CoolTower {
 			CoolTowerSys( CoolTowerNum ).PumpSchedPtr = GetScheduleIndex( cAlphaArgs( 6 ) );
 			if ( CoolTowerSys( CoolTowerNum ).PumpSchedPtr == 0 ) {
 				if ( lAlphaBlanks( 6 ) ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 6 ) ) + " is required but input is blank." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 6 ) + " is required but input is blank." );
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 6 ) ) + "=\"" + trim( cAlphaArgs( 6 ) ) + "\" not found." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\" not found." );
 				}
 				ErrorsFound = true;
 			}
@@ -283,85 +283,85 @@ namespace CoolTower {
 			CoolTowerSys( CoolTowerNum ).MaxWaterFlowRate = rNumericArgs( 1 ); // Maximum limit of water supply
 			if ( CoolTowerSys( CoolTowerNum ).MaxWaterFlowRate > MaximumWaterFlowRate ) {
 				CoolTowerSys( CoolTowerNum ).MaxWaterFlowRate = MaximumWaterFlowRate;
-				ShowWarningError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 1 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 1 ), 2 ) ) + "]." );
-				ShowContinueError( "...Maximum Allowable=[" + trim( RoundSigDigits( MaximumWaterFlowRate, 2 ) ) + "]." );
+				ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 1 ) + "=[" + RoundSigDigits( rNumericArgs( 1 ), 2 ) + "]." );
+				ShowContinueError( "...Maximum Allowable=[" + RoundSigDigits( MaximumWaterFlowRate, 2 ) + "]." );
 			}
 			if ( CoolTowerSys( CoolTowerNum ).MaxWaterFlowRate < MinimumWaterFlowRate ) {
 				CoolTowerSys( CoolTowerNum ).MaxWaterFlowRate = MinimumWaterFlowRate;
-				ShowWarningError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 1 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 1 ), 2 ) ) + "]." );
-				ShowContinueError( "...Minimum Allowable=[" + trim( RoundSigDigits( MinimumWaterFlowRate, 2 ) ) + "]." );
+				ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 1 ) + "=[" + RoundSigDigits( rNumericArgs( 1 ), 2 ) + "]." );
+				ShowContinueError( "...Minimum Allowable=[" + RoundSigDigits( MinimumWaterFlowRate, 2 ) + "]." );
 			}
 
 			CoolTowerSys( CoolTowerNum ).TowerHeight = rNumericArgs( 2 ); // Get effctive tower height
 			if ( CoolTowerSys( CoolTowerNum ).TowerHeight > MaxHeight ) {
 				CoolTowerSys( CoolTowerNum ).TowerHeight = MaxHeight;
-				ShowWarningError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 2 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 2 ), 2 ) ) + "]." );
-				ShowContinueError( "...Maximum Allowable=[" + trim( RoundSigDigits( MaxHeight, 2 ) ) + "]." );
+				ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 2 ) + "=[" + RoundSigDigits( rNumericArgs( 2 ), 2 ) + "]." );
+				ShowContinueError( "...Maximum Allowable=[" + RoundSigDigits( MaxHeight, 2 ) + "]." );
 			}
 			if ( CoolTowerSys( CoolTowerNum ).TowerHeight < MinHeight ) {
 				CoolTowerSys( CoolTowerNum ).TowerHeight = MinHeight;
-				ShowWarningError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 2 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 2 ), 2 ) ) + "]." );
-				ShowContinueError( "...Minimum Allowable=[" + trim( RoundSigDigits( MinHeight, 2 ) ) + "]." );
+				ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 2 ) + "=[" + RoundSigDigits( rNumericArgs( 2 ), 2 ) + "]." );
+				ShowContinueError( "...Minimum Allowable=[" + RoundSigDigits( MinHeight, 2 ) + "]." );
 			}
 
 			CoolTowerSys( CoolTowerNum ).OutletArea = rNumericArgs( 3 ); // Get outlet area
 			if ( CoolTowerSys( CoolTowerNum ).OutletArea > MaxValue ) {
 				CoolTowerSys( CoolTowerNum ).OutletArea = MaxValue;
-				ShowWarningError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 3 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 3 ), 2 ) ) + "]." );
-				ShowContinueError( "...Maximum Allowable=[" + trim( RoundSigDigits( MaxValue, 2 ) ) + "]." );
+				ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 3 ) + "=[" + RoundSigDigits( rNumericArgs( 3 ), 2 ) + "]." );
+				ShowContinueError( "...Maximum Allowable=[" + RoundSigDigits( MaxValue, 2 ) + "]." );
 			}
 			if ( CoolTowerSys( CoolTowerNum ).OutletArea < MinValue ) {
 				CoolTowerSys( CoolTowerNum ).OutletArea = MinValue;
-				ShowWarningError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 3 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 3 ), 2 ) ) + "]." );
-				ShowContinueError( "...Minimum Allowable=[" + trim( RoundSigDigits( MinValue, 2 ) ) + "]." );
+				ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 3 ) + "=[" + RoundSigDigits( rNumericArgs( 3 ), 2 ) + "]." );
+				ShowContinueError( "...Minimum Allowable=[" + RoundSigDigits( MinValue, 2 ) + "]." );
 			}
 
 			CoolTowerSys( CoolTowerNum ).MaxAirVolFlowRate = rNumericArgs( 4 ); // Maximum limit of air flow to the space
 			if ( CoolTowerSys( CoolTowerNum ).MaxAirVolFlowRate > MaxValue ) {
 				CoolTowerSys( CoolTowerNum ).MaxAirVolFlowRate = MaxValue;
-				ShowWarningError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 4 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 4 ), 2 ) ) + "]." );
-				ShowContinueError( "...Maximum Allowable=[" + trim( RoundSigDigits( MaxValue, 2 ) ) + "]." );
+				ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 4 ) + "=[" + RoundSigDigits( rNumericArgs( 4 ), 2 ) + "]." );
+				ShowContinueError( "...Maximum Allowable=[" + RoundSigDigits( MaxValue, 2 ) + "]." );
 			}
 			if ( CoolTowerSys( CoolTowerNum ).MaxAirVolFlowRate < MinValue ) {
 				CoolTowerSys( CoolTowerNum ).MaxAirVolFlowRate = MinValue;
-				ShowWarningError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 4 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 4 ), 2 ) ) + "]." );
-				ShowContinueError( "...Minimum Allowable=[" + trim( RoundSigDigits( MinValue, 2 ) ) + "]." );
+				ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 4 ) + "=[" + RoundSigDigits( rNumericArgs( 4 ), 2 ) + "]." );
+				ShowContinueError( "...Minimum Allowable=[" + RoundSigDigits( MinValue, 2 ) + "]." );
 			}
 
 			CoolTowerSys( CoolTowerNum ).MinZoneTemp = rNumericArgs( 5 ); // Get minimum temp limit which gets this cooltower off
 			if ( CoolTowerSys( CoolTowerNum ).MinZoneTemp > MaxValue ) {
 				CoolTowerSys( CoolTowerNum ).MinZoneTemp = MaxValue;
-				ShowWarningError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 5 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 5 ), 2 ) ) + "]." );
-				ShowContinueError( "...Maximum Allowable=[" + trim( RoundSigDigits( MaxValue, 2 ) ) + "]." );
+				ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 5 ) + "=[" + RoundSigDigits( rNumericArgs( 5 ), 2 ) + "]." );
+				ShowContinueError( "...Maximum Allowable=[" + RoundSigDigits( MaxValue, 2 ) + "]." );
 			}
 			if ( CoolTowerSys( CoolTowerNum ).MinZoneTemp < MinValue ) {
 				CoolTowerSys( CoolTowerNum ).MinZoneTemp = MinValue;
-				ShowWarningError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 5 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 5 ), 2 ) ) + "]." );
-				ShowContinueError( "...Minimum Allowable=[" + trim( RoundSigDigits( MinValue, 2 ) ) + "]." );
+				ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 5 ) + "=[" + RoundSigDigits( rNumericArgs( 5 ), 2 ) + "]." );
+				ShowContinueError( "...Minimum Allowable=[" + RoundSigDigits( MinValue, 2 ) + "]." );
 			}
 
 			CoolTowerSys( CoolTowerNum ).FracWaterLoss = rNumericArgs( 6 ); // Fraction of water loss
 			if ( CoolTowerSys( CoolTowerNum ).FracWaterLoss > MaxFrac ) {
 				CoolTowerSys( CoolTowerNum ).FracWaterLoss = MaxFrac;
-				ShowWarningError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 6 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 6 ), 2 ) ) + "]." );
-				ShowContinueError( "...Maximum Allowable=[" + trim( RoundSigDigits( MaxFrac, 2 ) ) + "]." );
+				ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 6 ) + "=[" + RoundSigDigits( rNumericArgs( 6 ), 2 ) + "]." );
+				ShowContinueError( "...Maximum Allowable=[" + RoundSigDigits( MaxFrac, 2 ) + "]." );
 			}
 			if ( CoolTowerSys( CoolTowerNum ).FracWaterLoss < MinFrac ) {
 				CoolTowerSys( CoolTowerNum ).FracWaterLoss = MinFrac;
-				ShowWarningError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 6 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 6 ), 2 ) ) + "]." );
-				ShowContinueError( "...Minimum Allowable=[" + trim( RoundSigDigits( MinFrac, 2 ) ) + "]." );
+				ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 6 ) + "=[" + RoundSigDigits( rNumericArgs( 6 ), 2 ) + "]." );
+				ShowContinueError( "...Minimum Allowable=[" + RoundSigDigits( MinFrac, 2 ) + "]." );
 			}
 
 			CoolTowerSys( CoolTowerNum ).FracFlowSched = rNumericArgs( 7 ); // Fraction of loss of air flow
 			if ( CoolTowerSys( CoolTowerNum ).FracFlowSched > MaxFrac ) {
 				CoolTowerSys( CoolTowerNum ).FracFlowSched = MaxFrac;
-				ShowWarningError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 7 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 7 ), 2 ) ) + "]." );
-				ShowContinueError( "...Maximum Allowable=[" + trim( RoundSigDigits( MaxFrac, 2 ) ) + "]." );
+				ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 7 ) + "=[" + RoundSigDigits( rNumericArgs( 7 ), 2 ) + "]." );
+				ShowContinueError( "...Maximum Allowable=[" + RoundSigDigits( MaxFrac, 2 ) + "]." );
 			}
 			if ( CoolTowerSys( CoolTowerNum ).FracFlowSched < MinFrac ) {
 				CoolTowerSys( CoolTowerNum ).FracFlowSched = MinFrac;
-				ShowWarningError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 7 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 7 ), 5 ) ) + "]." );
-				ShowContinueError( "...Minimum Allowable=[" + trim( RoundSigDigits( MinFrac, 2 ) ) + "]." );
+				ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 7 ) + "=[" + RoundSigDigits( rNumericArgs( 7 ), 5 ) + "]." );
+				ShowContinueError( "...Minimum Allowable=[" + RoundSigDigits( MinFrac, 2 ) + "]." );
 			}
 
 			CoolTowerSys( CoolTowerNum ).RatedPumpPower = rNumericArgs( 8 ); // Get rated pump power
@@ -514,7 +514,7 @@ namespace CoolTower {
 
 				if ( OutletTemp < OutWetBulbTemp ) {
 					ShowSevereError( "Cooltower outlet temperature exceed the outdoor wet bulb temperature " "reset to input values" );
-					ShowContinueError( "Occurs in Cooltower =" + trim( CoolTowerSys( CoolTowerNum ).Name ) );
+					ShowContinueError( "Occurs in Cooltower =" + CoolTowerSys( CoolTowerNum ).Name );
 				}
 
 				WaterFlowRate /= UCFactor;

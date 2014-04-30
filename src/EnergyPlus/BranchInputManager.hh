@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -17,14 +16,13 @@ namespace EnergyPlus {
 namespace BranchInputManager {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 	using DataLoopNode::NodeType_Unknown;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
-	extern Fstring const cMIXER;
-	extern Fstring const cSPLITTER;
-	extern Fstring const Blank;
+	extern std::string const cMIXER;
+	extern std::string const cSPLITTER;
+	extern std::string const Blank;
 
 	//DERIVED TYPE DEFINITIONS
 
@@ -42,7 +40,7 @@ namespace BranchInputManager {
 	extern bool GetConnectorListInputFlag; // Flag used to retrieve Input
 	extern bool InvalidBranchDefinitions;
 
-	extern Fstring CurrentModuleObject; // for ease in getting objects
+	extern std::string CurrentModuleObject; // for ease in getting objects
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE BranchInputManager
 	//PUBLIC  TestAirPathIntegrity
@@ -55,36 +53,33 @@ namespace BranchInputManager {
 	struct ConnectorData
 	{
 		// Members
-		Fstring Name; // Name for this Connector
+		std::string Name; // Name for this Connector
 		int NumOfConnectors; // Number of Connectors in this group
 		int NumOfSplitters; // Number of Splitters in this connector group
 		int NumOfMixers; // Number of Mixers in this connector group
-		FArray1D_Fstring ConnectorType; // Connector:Splitter or Connector:Mixer
-		FArray1D_Fstring ConnectorName; // Name for that Connector:Splitter or Connector:Mixer
+		FArray1D_string ConnectorType; // Connector:Splitter or Connector:Mixer
+		FArray1D_string ConnectorName; // Name for that Connector:Splitter or Connector:Mixer
 		FArray1D_int ConnectorMatchNo; // Pointer to index where this Splitter or Mixer matches
 		// Splitter => Mixer or Mixer => Splitter.  0 indicates no match
 
 		// Default Constructor
 		ConnectorData() :
-			Name( MaxNameLength, Blank ),
 			NumOfConnectors( 0 ),
 			NumOfSplitters( 0 ),
-			NumOfMixers( 0 ),
-			ConnectorType( sFstring( 32 ) ),
-			ConnectorName( sFstring( MaxNameLength ) )
+			NumOfMixers( 0 )
 		{}
 
 		// Member Constructor
 		ConnectorData(
-			Fstring const & Name, // Name for this Connector
+			std::string const & Name, // Name for this Connector
 			int const NumOfConnectors, // Number of Connectors in this group
 			int const NumOfSplitters, // Number of Splitters in this connector group
 			int const NumOfMixers, // Number of Mixers in this connector group
-			FArray1_Fstring const & ConnectorType, // Connector:Splitter or Connector:Mixer
-			FArray1_Fstring const & ConnectorName, // Name for that Connector:Splitter or Connector:Mixer
+			FArray1_string const & ConnectorType, // Connector:Splitter or Connector:Mixer
+			FArray1_string const & ConnectorName, // Name for that Connector:Splitter or Connector:Mixer
 			FArray1_int const & ConnectorMatchNo // Pointer to index where this Splitter or Mixer matches
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NumOfConnectors( NumOfConnectors ),
 			NumOfSplitters( NumOfSplitters ),
 			NumOfMixers( NumOfMixers ),
@@ -98,34 +93,30 @@ namespace BranchInputManager {
 	struct BranchListData
 	{
 		// Members
-		Fstring Name; // Name of this Branch List
+		std::string Name; // Name of this Branch List
 		int NumOfBranchNames; // Number of Branches on the Branch List
-		FArray1D_Fstring BranchNames; // Names of the branches on this branch list
-		Fstring LoopName; // Name of Loop this Branch list belongs to
-		Fstring LoopType; // Loop type this branch is on
+		FArray1D_string BranchNames; // Names of the branches on this branch list
+		std::string LoopName; // Name of Loop this Branch list belongs to
+		std::string LoopType; // Loop type this branch is on
 
 		// Default Constructor
 		BranchListData() :
-			Name( MaxNameLength, Blank ),
-			NumOfBranchNames( 0 ),
-			BranchNames( sFstring( MaxNameLength ) ),
-			LoopName( MaxNameLength, Blank ),
-			LoopType( 20, Blank )
+			NumOfBranchNames( 0 )
 		{}
 
 		// Member Constructor
 		BranchListData(
-			Fstring const & Name, // Name of this Branch List
+			std::string const & Name, // Name of this Branch List
 			int const NumOfBranchNames, // Number of Branches on the Branch List
-			FArray1_Fstring const & BranchNames, // Names of the branches on this branch list
-			Fstring const & LoopName, // Name of Loop this Branch list belongs to
-			Fstring const & LoopType // Loop type this branch is on
+			FArray1_string const & BranchNames, // Names of the branches on this branch list
+			std::string const & LoopName, // Name of Loop this Branch list belongs to
+			std::string const & LoopType // Loop type this branch is on
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NumOfBranchNames( NumOfBranchNames ),
 			BranchNames( BranchNames ),
-			LoopName( MaxNameLength, LoopName ),
-			LoopType( 20, LoopType )
+			LoopName( LoopName ),
+			LoopType( LoopType )
 		{}
 
 	};
@@ -133,41 +124,37 @@ namespace BranchInputManager {
 	struct ComponentData
 	{
 		// Members
-		Fstring CType; // Component Type (Cannot be SPLITTER or MIXER)
-		Fstring Name; // Component Name
+		std::string CType; // Component Type (Cannot be SPLITTER or MIXER)
+		std::string Name; // Component Name
 		int CtrlType; // Active, Passive, Bypass (1,2,3)
-		Fstring InletNodeName; // Inlet Node ID
+		std::string InletNodeName; // Inlet Node ID
 		int InletNode; // Inlet Node Number
-		Fstring OutletNodeName; // Outlet Node ID
+		std::string OutletNodeName; // Outlet Node ID
 		int OutletNode; // Outlet Node Number
 
 		// Default Constructor
 		ComponentData() :
-			CType( MaxNameLength, Blank ),
-			Name( MaxNameLength, Blank ),
 			CtrlType( 0 ),
-			InletNodeName( MaxNameLength, Blank ),
 			InletNode( 0 ),
-			OutletNodeName( MaxNameLength, Blank ),
 			OutletNode( 0 )
 		{}
 
 		// Member Constructor
 		ComponentData(
-			Fstring const & CType, // Component Type (Cannot be SPLITTER or MIXER)
-			Fstring const & Name, // Component Name
+			std::string const & CType, // Component Type (Cannot be SPLITTER or MIXER)
+			std::string const & Name, // Component Name
 			int const CtrlType, // Active, Passive, Bypass (1,2,3)
-			Fstring const & InletNodeName, // Inlet Node ID
+			std::string const & InletNodeName, // Inlet Node ID
 			int const InletNode, // Inlet Node Number
-			Fstring const & OutletNodeName, // Outlet Node ID
+			std::string const & OutletNodeName, // Outlet Node ID
 			int const OutletNode // Outlet Node Number
 		) :
-			CType( MaxNameLength, CType ),
-			Name( MaxNameLength, Name ),
+			CType( CType ),
+			Name( Name ),
 			CtrlType( CtrlType ),
-			InletNodeName( MaxNameLength, InletNodeName ),
+			InletNodeName( InletNodeName ),
 			InletNode( InletNode ),
-			OutletNodeName( MaxNameLength, OutletNodeName ),
+			OutletNodeName( OutletNodeName ),
 			OutletNode( OutletNode )
 		{}
 
@@ -176,8 +163,8 @@ namespace BranchInputManager {
 	struct BranchData
 	{
 		// Members
-		Fstring Name; // Name for this Branch
-		Fstring AssignedLoopName; // Loop Name for this branch
+		std::string Name; // Name for this Branch
+		std::string AssignedLoopName; // Loop Name for this branch
 		Real64 MaxFlowRate; // Max Flow Rate of the Branch
 		int PressureCurveType; // Integer index of pressure curve type
 		int PressureCurveIndex; // Integer index of pressure curve
@@ -187,8 +174,6 @@ namespace BranchInputManager {
 
 		// Default Constructor
 		BranchData() :
-			Name( MaxNameLength, Blank ),
-			AssignedLoopName( MaxNameLength, Blank ),
 			MaxFlowRate( 0.0 ),
 			PressureCurveType( 0 ),
 			PressureCurveIndex( 0 ),
@@ -198,8 +183,8 @@ namespace BranchInputManager {
 
 		// Member Constructor
 		BranchData(
-			Fstring const & Name, // Name for this Branch
-			Fstring const & AssignedLoopName, // Loop Name for this branch
+			std::string const & Name, // Name for this Branch
+			std::string const & AssignedLoopName, // Loop Name for this branch
 			Real64 const MaxFlowRate, // Max Flow Rate of the Branch
 			int const PressureCurveType, // Integer index of pressure curve type
 			int const PressureCurveIndex, // Integer index of pressure curve
@@ -207,8 +192,8 @@ namespace BranchInputManager {
 			int const NumOfComponents, // Number of Components on this Branch
 			FArray1< ComponentData > const & Component // Component definitions for each component
 		) :
-			Name( MaxNameLength, Name ),
-			AssignedLoopName( MaxNameLength, AssignedLoopName ),
+			Name( Name ),
+			AssignedLoopName( AssignedLoopName ),
 			MaxFlowRate( MaxFlowRate ),
 			PressureCurveType( PressureCurveType ),
 			PressureCurveIndex( PressureCurveIndex ),
@@ -222,28 +207,25 @@ namespace BranchInputManager {
 	struct SplitterData
 	{
 		// Members
-		Fstring Name; // Splitter Name
-		Fstring InletBranchName; // Splitter Inlet Branch Name
+		std::string Name; // Splitter Name
+		std::string InletBranchName; // Splitter Inlet Branch Name
 		int NumOutletBranches; // Number of outlets on this Splitter
-		FArray1D_Fstring OutletBranchNames; // Names of the Outlet Branches
+		FArray1D_string OutletBranchNames; // Names of the Outlet Branches
 
 		// Default Constructor
 		SplitterData() :
-			Name( MaxNameLength, Blank ),
-			InletBranchName( MaxNameLength, Blank ),
-			NumOutletBranches( 0 ),
-			OutletBranchNames( sFstring( MaxNameLength ) )
+			NumOutletBranches( 0 )
 		{}
 
 		// Member Constructor
 		SplitterData(
-			Fstring const & Name, // Splitter Name
-			Fstring const & InletBranchName, // Splitter Inlet Branch Name
+			std::string const & Name, // Splitter Name
+			std::string const & InletBranchName, // Splitter Inlet Branch Name
 			int const NumOutletBranches, // Number of outlets on this Splitter
-			FArray1_Fstring const & OutletBranchNames // Names of the Outlet Branches
+			FArray1_string const & OutletBranchNames // Names of the Outlet Branches
 		) :
-			Name( MaxNameLength, Name ),
-			InletBranchName( MaxNameLength, InletBranchName ),
+			Name( Name ),
+			InletBranchName( InletBranchName ),
 			NumOutletBranches( NumOutletBranches ),
 			OutletBranchNames( OutletBranchNames )
 		{}
@@ -253,28 +235,25 @@ namespace BranchInputManager {
 	struct MixerData
 	{
 		// Members
-		Fstring Name; // Mixer Name
-		Fstring OutletBranchName; // Mixer Outlet Branch Name
+		std::string Name; // Mixer Name
+		std::string OutletBranchName; // Mixer Outlet Branch Name
 		int NumInletBranches; // Number of inlets for this Mixer
-		FArray1D_Fstring InletBranchNames; // Names of Inlet Branches
+		FArray1D_string InletBranchNames; // Names of Inlet Branches
 
 		// Default Constructor
 		MixerData() :
-			Name( MaxNameLength, Blank ),
-			OutletBranchName( MaxNameLength, Blank ),
-			NumInletBranches( 0 ),
-			InletBranchNames( sFstring( MaxNameLength ) )
+			NumInletBranches( 0 )
 		{}
 
 		// Member Constructor
 		MixerData(
-			Fstring const & Name, // Mixer Name
-			Fstring const & OutletBranchName, // Mixer Outlet Branch Name
+			std::string const & Name, // Mixer Name
+			std::string const & OutletBranchName, // Mixer Outlet Branch Name
 			int const NumInletBranches, // Number of inlets for this Mixer
-			FArray1_Fstring const & InletBranchNames // Names of Inlet Branches
+			FArray1_string const & InletBranchNames // Names of Inlet Branches
 		) :
-			Name( MaxNameLength, Name ),
-			OutletBranchName( MaxNameLength, OutletBranchName ),
+			Name( Name ),
+			OutletBranchName( OutletBranchName ),
 			NumInletBranches( NumInletBranches ),
 			InletBranchNames( InletBranchNames )
 		{}
@@ -299,40 +278,40 @@ namespace BranchInputManager {
 
 	void
 	GetBranchList(
-		Fstring const & LoopName, // Name of Loop Branch List is on
-		Fstring const & BranchListName, // Branch List Name from Input
+		std::string const & LoopName, // Name of Loop Branch List is on
+		std::string const & BranchListName, // Branch List Name from Input
 		int & NumBranchNames, // Number of Branches for this Branch List
-		FArray1S_Fstring BranchNames, // Names of Branches on this Branch List
-		Fstring const & LoopType // Type of Loop Branch list is on
+		FArray1S_string BranchNames, // Names of Branches on this Branch List
+		std::string const & LoopType // Type of Loop Branch list is on
 	);
 
 	int
-	NumBranchesInBranchList( Fstring const & BranchListName );
+	NumBranchesInBranchList( std::string const & BranchListName );
 
 	void
 	GetBranchData(
-		Fstring const & LoopName, // Loop Name of this Branch
-		Fstring const & BranchName, // Requested Branch Name
+		std::string const & LoopName, // Loop Name of this Branch
+		std::string const & BranchName, // Requested Branch Name
 		Real64 & BranchMaxFlow, // Max Flow Rate for Branch
 		int & PressCurveType, // Index of a pressure curve object
 		int & PressCurveIndex, // Index of a pressure curve object
 		int & NumComps, // Number of Components on Branch
-		FArray1S_Fstring CompType, // Component Type for each item on Branch
-		FArray1S_Fstring CompName, // Component Name for each item on Branch
-		FArray1S_Fstring CompInletNodeNames, // Component Inlet Node IDs for each item on Branch
+		FArray1S_string CompType, // Component Type for each item on Branch
+		FArray1S_string CompName, // Component Name for each item on Branch
+		FArray1S_string CompInletNodeNames, // Component Inlet Node IDs for each item on Branch
 		FArray1S_int CompInletNodeNums, // Component Inlet Node Numbers for each item on Branch
-		FArray1S_Fstring CompOutletNodeNames, // Component Outlet Node IDs for each item on Branch
+		FArray1S_string CompOutletNodeNames, // Component Outlet Node IDs for each item on Branch
 		FArray1S_int CompOutletNodeNums, // Component Outlet Node Numbers for each item on Branch
 		bool & ErrorsFound
 	);
 
 	int
-	NumCompsInBranch( Fstring const & BranchName );
+	NumCompsInBranch( std::string const & BranchName );
 
 	int
 	GetAirBranchIndex(
-		Fstring const & CompType,
-		Fstring const & CompName
+		std::string const & CompType,
+		std::string const & CompName
 	);
 
 	Real64
@@ -341,23 +320,23 @@ namespace BranchInputManager {
 	void
 	GetBranchFanTypeName(
 		int const BranchNum,
-		Fstring & FanType,
-		Fstring & FanName,
+		std::string & FanType,
+		std::string & FanName,
 		bool & ErrFound
 	);
 
 	void
 	CheckBranchForOASys(
-		Fstring const & CompType,
-		Fstring const & CompName,
+		std::string const & CompType,
+		std::string const & CompName,
 		bool & OASysFlag,
 		bool & ErrFound
 	);
 
 	void
 	GetInternalBranchData(
-		Fstring const & LoopName, // Loop Name for Branch
-		Fstring const & BranchName, // Requested Branch Name
+		std::string const & LoopName, // Loop Name for Branch
+		std::string const & BranchName, // Requested Branch Name
 		Real64 & BranchMaxFlow, // Max Flow Rate for Branch
 		int & PressCurveType, // Index of pressure curve object
 		int & PressCurveIndex, // Index of pressure curve object
@@ -368,8 +347,8 @@ namespace BranchInputManager {
 
 	void
 	GetNumSplitterMixerInConntrList(
-		Fstring const & LoopName, // Loop Name for this Splitter (used in error message)
-		Fstring const & ConnectorListName, // Requested Connector List Name
+		std::string const & LoopName, // Loop Name for this Splitter (used in error message)
+		std::string const & ConnectorListName, // Requested Connector List Name
 		int & NumSplitters, // Number of splitters in the loop
 		int & NumMixers, // Number of mixers in the loop
 		bool & ErrorsFound // if no connector list
@@ -377,21 +356,21 @@ namespace BranchInputManager {
 
 	void
 	GetConnectorList(
-		Fstring const & ConnectorListName, // Requested Connector List
+		std::string const & ConnectorListName, // Requested Connector List
 		ConnectorData & Connectoid, // Returned Connector Data
 		Optional_int_const NumInList = _ // Number of the current connector in the list of connectors
 	);
 
 	void
 	GetLoopMixer(
-		Fstring const & LoopName, // Loop Name for Mixer
-		Fstring const & ConnectorListName, // Requested Connector List Name
-		Fstring & MixerName, // Name of Mixer
+		std::string const & LoopName, // Loop Name for Mixer
+		std::string const & ConnectorListName, // Requested Connector List Name
+		std::string & MixerName, // Name of Mixer
 		bool & IsMixer, // True when Mixer is on this connector
-		Fstring & OutletNodeName, // Outlet Node ID
+		std::string & OutletNodeName, // Outlet Node ID
 		int & OutletNodeNum, // Outlet Node Number
 		int & NumInletNodes, // Number of Inlet Nodes
-		FArray1S_Fstring InletNodeNames, // Inlet Node IDs
+		FArray1S_string InletNodeNames, // Inlet Node IDs
 		FArray1S_int InletNodeNums, // Inlet Node Numbers
 		bool & ErrorsFound,
 		Optional_int_const ConnectorNumber = _, // number of the current item in connector list
@@ -400,30 +379,30 @@ namespace BranchInputManager {
 
 	void
 	GetLoopSplitter(
-		Fstring const & LoopName, // Loop Name for this Splitter
-		Fstring const & ConnectorListName, // Requested Connector List Name
-		Fstring & SplitterName, // Name of Splitter
+		std::string const & LoopName, // Loop Name for this Splitter
+		std::string const & ConnectorListName, // Requested Connector List Name
+		std::string & SplitterName, // Name of Splitter
 		bool & IsSplitter, // True if splitter on this connector list
-		Fstring & InletNodeName, // Inlet Node ID
+		std::string & InletNodeName, // Inlet Node ID
 		int & InletNodeNum, // Inlet Node Number
 		int & NumOutletNodes, // Number of Outlet Nodes
-		FArray1S_Fstring OutletNodeNames, // Outlet Node IDs
+		FArray1S_string OutletNodeNames, // Outlet Node IDs
 		FArray1S_int OutletNodeNums, // Outlet Node Numbers
 		bool & ErrorsFound,
 		Optional_int_const ConnectorNumber = _, // number of the current item in connector list
 		Optional_int SplitterNumber = _ // splitter number for this specific splitter
 	);
 
-	Fstring
-	GetFirstBranchInletNodeName( Fstring const & BranchListName ); // Branch List name to search
+	std::string
+	GetFirstBranchInletNodeName( std::string const & BranchListName ); // Branch List name to search
 
-	Fstring
-	GetLastBranchOutletNodeName( Fstring const & BranchListName ); // Branch List name to search
+	std::string
+	GetLastBranchOutletNodeName( std::string const & BranchListName ); // Branch List name to search
 
 	void
 	CheckSystemBranchFlow(
-		Fstring const & SystemType, // type of air loop equipment
-		Fstring const & SystemName, // name of air loop equipment
+		std::string const & SystemType, // type of air loop equipment
+		std::string const & SystemName, // name of air loop equipment
 		Real64 & BranchFlow, // branch volumetric flow rate [m3/s]
 		Real64 const BranchFanFlow, // branch flow rate [m3/s]
 		bool & ErrFound // logical error flag
@@ -450,39 +429,39 @@ namespace BranchInputManager {
 
 	void
 	FindPlantLoopBranchConnection(
-		Fstring const & BranchListName,
-		Fstring & FoundPlantLoopName,
+		std::string const & BranchListName,
+		std::string & FoundPlantLoopName,
 		int & FoundPlantLoopNum,
-		Fstring & FoundSupplyDemand,
+		std::string & FoundSupplyDemand,
 		Real64 & FoundVolFlowRate,
 		bool & MatchedPlantLoop
 	);
 
 	void
 	FindCondenserLoopBranchConnection(
-		Fstring const & BranchListName,
-		Fstring & FoundCondLoopName,
+		std::string const & BranchListName,
+		std::string & FoundCondLoopName,
 		int & FoundCondLoopNum,
-		Fstring & FoundSupplyDemand,
+		std::string & FoundSupplyDemand,
 		Real64 & FoundVolFlowRate,
 		bool & MatchedCondLoop
 	);
 
 	void
 	FindAirLoopBranchConnection(
-		Fstring const & BranchListName,
-		Fstring & FoundAirLoopName,
+		std::string const & BranchListName,
+		std::string & FoundAirLoopName,
 		int & FoundAirLoopNum,
-		Fstring & FoundAir,
+		std::string & FoundAir,
 		Real64 & FoundVolFlowRate,
 		bool & MatchedAirLoop
 	);
 
 	void
 	FindAirPlantCondenserLoopFromBranchList(
-		Fstring const & BranchListName, // Branch List Name
-		Fstring & LoopType, // LoopType (if found, Plant,Condenser or Air)
-		Fstring & LoopSupplyDemandAir, // Supply if "Supply" or Demand if "Demand" or Air if "Air"
+		std::string const & BranchListName, // Branch List Name
+		std::string & LoopType, // LoopType (if found, Plant,Condenser or Air)
+		std::string & LoopSupplyDemandAir, // Supply if "Supply" or Demand if "Demand" or Air if "Air"
 		bool & MatchedLoop // true if found
 	);
 
@@ -493,8 +472,8 @@ namespace BranchInputManager {
 	void
 	AuditBranches(
 		bool const mustprint, // true if the warning should be printed.
-		Optional_Fstring_const CompType = _, // when mustprint (ScanPlantLoop)  use CompType in error message and scan
-		Optional_Fstring_const CompName = _ // when mustprint (ScanPlantLoop)  use CompName in error message and scan
+		Optional_string_const CompType = _, // when mustprint (ScanPlantLoop)  use CompType in error message and scan
+		Optional_string_const CompName = _ // when mustprint (ScanPlantLoop)  use CompName in error message and scan
 	);
 
 	void

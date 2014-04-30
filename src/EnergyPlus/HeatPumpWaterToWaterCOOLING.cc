@@ -4,6 +4,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <HeatPumpWaterToWaterCOOLING.hh>
@@ -51,7 +52,6 @@ namespace HeatPumpWaterToWaterCOOLING {
 	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::BeginSimFlag;
 	using DataGlobals::InitConvTemp;
 	using DataGlobals::BeginEnvrnFlag;
@@ -67,8 +67,8 @@ namespace HeatPumpWaterToWaterCOOLING {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	Fstring const ModuleCompName( "HeatPump:WaterToWater:ParameterEstimation:Cooling" );
-	Fstring const ModuleCompNameUC( "HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:COOLING" );
+	std::string const ModuleCompName( "HeatPump:WaterToWater:ParameterEstimation:Cooling" );
+	std::string const ModuleCompNameUC( "HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:COOLING" );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -79,7 +79,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 	// MODULE VARIABLE DECLARATIONS:
 	FArray1D_bool CheckEquipName;
 
-	Fstring GSHPRefrigerant( "R22" ); // refrigerent name and index
+	std::string GSHPRefrigerant( "R22" ); // refrigerent name and index
 	int GSHPRefrigIndex( 0 );
 
 	int NumGSHPs( 0 ); // number of Gshps specified in input
@@ -107,8 +107,8 @@ namespace HeatPumpWaterToWaterCOOLING {
 
 	void
 	SimHPWatertoWaterCOOLING(
-		Fstring const & GSHPType, // type ofGSHP
-		Fstring const & GSHPName, // user specified name ofGSHP
+		std::string const & GSHPType, // type ofGSHP
+		std::string const & GSHPName, // user specified name ofGSHP
 		int & CompIndex,
 		bool const FirstHVACIteration,
 		bool & InitLoopEquip, // If not zero, calculate the max load for operating conditions
@@ -167,17 +167,17 @@ namespace HeatPumpWaterToWaterCOOLING {
 		if ( CompIndex == 0 ) {
 			GSHPNum = FindItemInList( GSHPName, GSHP.Name(), NumGSHPs );
 			if ( GSHPNum == 0 ) {
-				ShowFatalError( "SimHPWatertoWaterCOOLING: Unit not found=" + trim( GSHPName ) );
+				ShowFatalError( "SimHPWatertoWaterCOOLING: Unit not found=" + GSHPName );
 			}
 			CompIndex = GSHPNum;
 		} else {
 			GSHPNum = CompIndex;
 			if ( GSHPNum > NumGSHPs || GSHPNum < 1 ) {
-				ShowFatalError( "SimHPWatertoWaterCOOLING:  Invalid CompIndex passed=" + trim( TrimSigDigits( GSHPNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumGSHPs ) ) + ", Entered Unit name=" + trim( GSHPName ) );
+				ShowFatalError( "SimHPWatertoWaterCOOLING:  Invalid CompIndex passed=" + TrimSigDigits( GSHPNum ) + ", Number of Units=" + TrimSigDigits( NumGSHPs ) + ", Entered Unit name=" + GSHPName );
 			}
 			if ( CheckEquipName( GSHPNum ) ) {
 				if ( GSHPName != GSHP( GSHPNum ).Name ) {
-					ShowFatalError( "SimHPWatertoWaterCOOLING: Invalid CompIndex passed=" + trim( TrimSigDigits( GSHPNum ) ) + ", Unit name=" + trim( GSHPName ) + ", stored Unit Name for that index=" + trim( GSHP( GSHPNum ).Name ) );
+					ShowFatalError( "SimHPWatertoWaterCOOLING: Invalid CompIndex passed=" + TrimSigDigits( GSHPNum ) + ", Unit name=" + GSHPName + ", stored Unit Name for that index=" + GSHP( GSHPNum ).Name );
 				}
 				CheckEquipName( GSHPNum ) = false;
 			}
@@ -199,7 +199,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 		} else if ( LoopNum == GSHP( GSHPNum ).SourceLoopNum ) { // condenser loop
 			UpdateChillerComponentCondenserSide( GSHP( GSHPNum ).SourceLoopNum, GSHP( GSHPNum ).SourceLoopSideNum, TypeOf_HPWaterEFCooling, GSHP( GSHPNum ).SourceSideInletNodeNum, GSHP( GSHPNum ).SourceSideOutletNodeNum, GSHPReport( GSHPNum ).QSource, GSHPReport( GSHPNum ).SourceSideWaterInletTemp, GSHPReport( GSHPNum ).SourceSideWaterOutletTemp, GSHPReport( GSHPNum ).SourceSidemdot, FirstHVACIteration );
 		} else {
-			ShowFatalError( "SimHPWatertoWaterCOOLING:: Invalid loop connection " + ModuleCompName + ", Requested Unit=" + trim( GSHPName ) );
+			ShowFatalError( "SimHPWatertoWaterCOOLING:: Invalid loop connection " + ModuleCompName + ", Requested Unit=" + GSHPName );
 		}
 
 	}
@@ -252,7 +252,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_Fstring AlphArray( 5, sFstring( MaxNameLength ) ); // character string data
+		FArray1D_string AlphArray( 5 ); // character string data
 		FArray1D< Real64 > NumArray( 23 ); // numeric data
 
 		static bool ErrorsFound( false );
@@ -289,7 +289,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 
 			GSHP( GSHPNum ).COP = NumArray( 1 );
 			if ( NumArray( 1 ) == 0.0 ) {
-				ShowSevereError( ModuleCompName + ":COP = 0.0, Heatpump=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( ModuleCompName + ":COP = 0.0, Heatpump=" + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
@@ -305,60 +305,60 @@ namespace HeatPumpWaterToWaterCOOLING {
 
 			GSHP( GSHPNum ).LoadSideVolFlowRate = NumArray( 6 );
 			if ( NumArray( 6 ) == 0.0 ) {
-				ShowSevereError( ModuleCompName + ":Load Side Vol Flow Rate = 0.0, Heatpump=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( ModuleCompName + ":Load Side Vol Flow Rate = 0.0, Heatpump=" + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
 			GSHP( GSHPNum ).SourceSideVolFlowRate = NumArray( 7 );
 			if ( NumArray( 7 ) == 0.0 ) {
-				ShowSevereError( ModuleCompName + ":Source Side Vol Flow Rate = 0.0, Heatpump=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( ModuleCompName + ":Source Side Vol Flow Rate = 0.0, Heatpump=" + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
 			GSHP( GSHPNum ).LoadSideUACoeff = NumArray( 8 );
 			if ( NumArray( 9 ) == 0.0 ) {
-				ShowSevereError( ModuleCompName + ":Load Side Heat Transfer Coeffcient = 0.0, Heatpump=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( ModuleCompName + ":Load Side Heat Transfer Coeffcient = 0.0, Heatpump=" + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
 			GSHP( GSHPNum ).SourceSideUACoeff = NumArray( 9 );
 			if ( NumArray( 8 ) == 0.0 ) {
-				ShowSevereError( ModuleCompName + ":Source Side Heat Transfer Coeffcient = 0.0, Heatpump=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( ModuleCompName + ":Source Side Heat Transfer Coeffcient = 0.0, Heatpump=" + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
 			GSHP( GSHPNum ).CompPistonDisp = NumArray( 10 );
 			if ( NumArray( 10 ) == 0.0 ) {
-				ShowSevereError( ModuleCompName + ":Compressor Piston displacement/Storke = 0.0, Heatpump=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( ModuleCompName + ":Compressor Piston displacement/Storke = 0.0, Heatpump=" + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
 			GSHP( GSHPNum ).CompClearanceFactor = NumArray( 11 );
 			if ( NumArray( 11 ) == 0.0 ) {
-				ShowSevereError( ModuleCompName + ":Compressor Clearance Factor = 0.0, Heatpump=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( ModuleCompName + ":Compressor Clearance Factor = 0.0, Heatpump=" + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
 			GSHP( GSHPNum ).CompSucPressDrop = NumArray( 12 );
 			if ( NumArray( 12 ) == 0.0 ) {
-				ShowSevereError( ModuleCompName + ": Pressure Drop = 0.0, Heatpump=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( ModuleCompName + ": Pressure Drop = 0.0, Heatpump=" + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
 			GSHP( GSHPNum ).SuperheatTemp = NumArray( 13 );
 			if ( NumArray( 13 ) == 0.0 ) {
-				ShowSevereError( ModuleCompName + ":Source Side SuperHeat = 0.0, Heatpump=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( ModuleCompName + ":Source Side SuperHeat = 0.0, Heatpump=" + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
 			GSHP( GSHPNum ).PowerLosses = NumArray( 14 );
 			if ( NumArray( 14 ) == 0.0 ) {
-				ShowSevereError( ModuleCompName + ":Compressor Power Loss = 0.0, Heatpump=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( ModuleCompName + ":Compressor Power Loss = 0.0, Heatpump=" + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 			GSHP( GSHPNum ).LossFactor = NumArray( 15 );
 			if ( NumArray( 15 ) == 0.0 ) {
-				ShowSevereError( ModuleCompName + ":Efficiency = 0.0, Heatpump=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( ModuleCompName + ":Efficiency = 0.0, Heatpump=" + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
@@ -409,7 +409,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 
 		GSHPRefrigIndex = FindRefrigerant( GSHPRefrigerant );
 		if ( GSHPRefrigIndex == 0 ) {
-			ShowFatalError( "Refrigerant for HeatPump:WaterToWater Heating not found, should have been=" + trim( GSHPRefrigerant ) );
+			ShowFatalError( "Refrigerant for HeatPump:WaterToWater Heating not found, should have been=" + GSHPRefrigerant );
 		}
 
 		//CurrentModuleObject='HeatPump:WaterToWater:ParameterEstimation:Cooling'
@@ -549,8 +549,8 @@ namespace HeatPumpWaterToWaterCOOLING {
 
 	void
 	CalcGshpModel(
-		Fstring const & GSHPType, // type ofGSHP
-		Fstring const & GSHPName, // user specified name ofGSHP
+		std::string const & GSHPType, // type ofGSHP
+		std::string const & GSHPName, // user specified name ofGSHP
 		int const GSHPNum, // GSHP Number
 		Real64 & MyLoad, // Operating Load
 		bool const FirstHVACIteration
@@ -629,7 +629,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 		Real64 CompSuctionSatTemp;
 		Real64 HighPressCutoff;
 		Real64 LowPressCutoff;
-		Fstring ErrString( 25 );
+		std::string ErrString;
 		Real64 DutyFactor;
 		int IterationCount;
 
@@ -762,16 +762,16 @@ namespace HeatPumpWaterToWaterCOOLING {
 			LoadSidePressure = GetSatPressureRefrig( GSHPRefrigerant, LoadSideRefridgTemp, GSHPRefrigIndex, "CalcGSHPModel" );
 
 			if ( SourceSidePressure < LowPressCutoff ) {
-				ShowSevereError( ModuleCompName + "=\"" + trim( GSHPName ) + "\" Cooling Source Side Pressure Less than the Design Minimum" );
-				ShowContinueError( "Cooling Source Side Pressure=" + trim( TrimSigDigits( SourceSidePressure, 2 ) ) + " and user specified Design Minimum Pressure=" + trim( TrimSigDigits( LowPressCutoff, 2 ) ) );
-				ShowContinueErrorTimeStamp( "  " );
+				ShowSevereError( ModuleCompName + "=\"" + GSHPName + "\" Cooling Source Side Pressure Less than the Design Minimum" );
+				ShowContinueError( "Cooling Source Side Pressure=" + TrimSigDigits( SourceSidePressure, 2 ) + " and user specified Design Minimum Pressure=" + TrimSigDigits( LowPressCutoff, 2 ) );
+				ShowContinueErrorTimeStamp( "" );
 				ShowFatalError( "Preceding Conditions cause termination." );
 			}
 
 			if ( LoadSidePressure > HighPressCutoff ) {
-				ShowSevereError( ModuleCompName + "=\"" + trim( GSHPName ) + "\" Cooling Load Side Pressure greater than the Design Maximum" );
-				ShowContinueError( "Cooling Load Side Pressure=" + trim( TrimSigDigits( LoadSidePressure, 2 ) ) + " and user specified Design Maximum Pressure=" + trim( TrimSigDigits( HighPressCutoff, 2 ) ) );
-				ShowContinueErrorTimeStamp( "  " );
+				ShowSevereError( ModuleCompName + "=\"" + GSHPName + "\" Cooling Load Side Pressure greater than the Design Maximum" );
+				ShowContinueError( "Cooling Load Side Pressure=" + TrimSigDigits( LoadSidePressure, 2 ) + " and user specified Design Maximum Pressure=" + TrimSigDigits( HighPressCutoff, 2 ) );
+				ShowContinueErrorTimeStamp( "" );
 				ShowFatalError( "Preceding Conditions cause termination." );
 			}
 			// Determine Suction Pressure at compressor inlet
@@ -780,16 +780,16 @@ namespace HeatPumpWaterToWaterCOOLING {
 			DischargePr = SourceSidePressure + PressureDrop;
 
 			if ( SuctionPr < LowPressCutoff ) {
-				ShowSevereError( ModuleCompName + "=\"" + trim( GSHPName ) + "\" Cooling Suction Pressure Less than the Design Minimum" );
-				ShowContinueError( "Cooling Suction Pressure=" + trim( TrimSigDigits( SuctionPr, 2 ) ) + " and user specified Design Minimum Pressure=" + trim( TrimSigDigits( LowPressCutoff, 2 ) ) );
-				ShowContinueErrorTimeStamp( "  " );
+				ShowSevereError( ModuleCompName + "=\"" + GSHPName + "\" Cooling Suction Pressure Less than the Design Minimum" );
+				ShowContinueError( "Cooling Suction Pressure=" + TrimSigDigits( SuctionPr, 2 ) + " and user specified Design Minimum Pressure=" + TrimSigDigits( LowPressCutoff, 2 ) );
+				ShowContinueErrorTimeStamp( "" );
 				ShowFatalError( "Preceding Conditions cause termination." );
 			}
 
 			if ( DischargePr > HighPressCutoff ) {
-				ShowSevereError( ModuleCompName + "=\"" + trim( GSHPName ) + "\" Cooling Discharge Pressure greater than the Design Maximum" );
-				ShowContinueError( "Cooling Discharge Pressure=" + trim( TrimSigDigits( DischargePr, 2 ) ) + " and user specified Design Maximum Pressure=" + trim( TrimSigDigits( HighPressCutoff, 2 ) ) );
-				ShowContinueErrorTimeStamp( "  " );
+				ShowSevereError( ModuleCompName + "=\"" + GSHPName + "\" Cooling Discharge Pressure greater than the Design Maximum" );
+				ShowContinueError( "Cooling Discharge Pressure=" + TrimSigDigits( DischargePr, 2 ) + " and user specified Design Maximum Pressure=" + TrimSigDigits( HighPressCutoff, 2 ) );
+				ShowContinueErrorTimeStamp( "" );
 				ShowFatalError( "Preceding Conditions cause termination." );
 			}
 
@@ -855,22 +855,22 @@ namespace HeatPumpWaterToWaterCOOLING {
 			if ( std::abs( ( QSource - initialQSource ) / ( initialQSource + SmallNum ) ) < HeatBalTol || IterationCount > IterationLimit ) {
 				if ( IterationCount > IterationLimit ) {
 					ShowWarningError( "HeatPump:WaterToWater:ParameterEstimation, Cooling did not converge" );
-					ShowContinueErrorTimeStamp( "  " );
-					ShowContinueError( "Heatpump Name = " + trim( GSHP( GSHPNum ).Name ) );
+					ShowContinueErrorTimeStamp( "" );
+					ShowContinueError( "Heatpump Name = " + GSHP( GSHPNum ).Name );
 					gio::write( ErrString, "*" ) << std::abs( 100.0 * ( QSource - initialQSource ) / ( initialQSource + SmallNum ) );
-					ShowContinueError( "Heat Inbalance (%)             = " + trim( adjustl( ErrString ) ) );
+					ShowContinueError( "Heat Inbalance (%)             = " + stripped( ErrString ) );
 					gio::write( ErrString, "*" ) << QLoad;
-					ShowContinueError( "Load-side heat transfer rate   = " + trim( adjustl( ErrString ) ) );
+					ShowContinueError( "Load-side heat transfer rate   = " + stripped( ErrString ) );
 					gio::write( ErrString, "*" ) << QSource;
-					ShowContinueError( "Source-side heat transfer rate = " + trim( adjustl( ErrString ) ) );
+					ShowContinueError( "Source-side heat transfer rate = " + stripped( ErrString ) );
 					gio::write( ErrString, "*" ) << SourceSideWaterMassFlowRate;
-					ShowContinueError( "Source-side mass flow rate     = " + trim( adjustl( ErrString ) ) );
+					ShowContinueError( "Source-side mass flow rate     = " + stripped( ErrString ) );
 					gio::write( ErrString, "*" ) << LoadSideWaterMassFlowRate;
-					ShowContinueError( "Load-side mass flow rate       = " + trim( adjustl( ErrString ) ) );
+					ShowContinueError( "Load-side mass flow rate       = " + stripped( ErrString ) );
 					gio::write( ErrString, "*" ) << SourceSideWaterInletTemp;
-					ShowContinueError( "Source-side inlet temperature  = " + trim( adjustl( ErrString ) ) );
+					ShowContinueError( "Source-side inlet temperature  = " + stripped( ErrString ) );
 					gio::write( ErrString, "*" ) << LoadSideWaterInletTemp;
-					ShowContinueError( "Load-side inlet temperature    = " + trim( adjustl( ErrString ) ) );
+					ShowContinueError( "Load-side inlet temperature    = " + stripped( ErrString ) );
 
 				}
 				goto LOOPSourceEnth_exit;

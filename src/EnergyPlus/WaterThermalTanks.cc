@@ -7,6 +7,7 @@
 #include <ObjexxFCL/floops.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <WaterThermalTanks.hh>
@@ -81,7 +82,6 @@ namespace WaterThermalTanks {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::NumOfTimeStepInHour;
 	using DataGlobals::InitConvTemp;
 	using DataGlobals::SecInHour;
@@ -97,10 +97,10 @@ namespace WaterThermalTanks {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
-	Fstring const cMixedWHModuleObj( "WaterHeater:Mixed" );
-	Fstring const cStratifiedWHModuleObj( "WaterHeater:Stratified" );
-	Fstring const cMixedCWTankModuleObj( "ThermalStorage:ChilledWater:Mixed" );
-	Fstring const cStratifiedCWTankModuleObj( "ThermalStorage:ChilledWater:Stratified" );
+	std::string const cMixedWHModuleObj( "WaterHeater:Mixed" );
+	std::string const cStratifiedWHModuleObj( "WaterHeater:Stratified" );
+	std::string const cMixedCWTankModuleObj( "ThermalStorage:ChilledWater:Mixed" );
+	std::string const cStratifiedCWTankModuleObj( "ThermalStorage:ChilledWater:Stratified" );
 
 	int const HeatMode( 1 ); // heating source is on, source will not turn off until setpoint temp is reached
 	int const FloatMode( 0 ); // heating source is off, source will not turn on until cutin temp is reached
@@ -207,7 +207,7 @@ namespace WaterThermalTanks {
 	void
 	SimWaterThermalTank(
 		int const CompType,
-		Fstring const & CompName,
+		std::string const & CompName,
 		int & CompIndex,
 		bool const RunFlag, // unused1208
 		bool const InitLoopEquip,
@@ -242,7 +242,6 @@ namespace WaterThermalTanks {
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::KickOffSimulation;
 		using InputProcessor::FindItem;
-		using InputProcessor::MakeUPPERCase;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -281,17 +280,17 @@ namespace WaterThermalTanks {
 			if ( CompIndex == 0 ) {
 				CompNum = FindItem( CompName, WaterThermalTank.Name(), NumWaterThermalTank );
 				if ( CompNum == 0 ) {
-					ShowFatalError( "SimWaterThermalTank:  Unit not found=" + trim( CompName ) );
+					ShowFatalError( "SimWaterThermalTank:  Unit not found=" + CompName );
 				}
 				CompIndex = CompNum;
 			} else {
 				CompNum = CompIndex;
 				if ( CompNum > NumWaterThermalTank || CompNum < 1 ) {
-					ShowFatalError( "SimWaterThermalTank:  Invalid CompIndex passed=" + trim( TrimSigDigits( CompNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumWaterThermalTank ) ) + ", Entered Unit name=" + trim( CompName ) );
+					ShowFatalError( "SimWaterThermalTank:  Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of Units=" + TrimSigDigits( NumWaterThermalTank ) + ", Entered Unit name=" + CompName );
 				}
 				if ( CheckWTTEquipName( CompNum ) ) {
 					if ( CompName != WaterThermalTank( CompNum ).Name ) {
-						ShowFatalError( "SimWaterThermalTank: Invalid CompIndex passed=" + trim( TrimSigDigits( CompNum ) ) + ", Unit name=" + trim( CompName ) + ", stored Unit Name for that index=" + trim( WaterThermalTank( CompNum ).Name ) );
+						ShowFatalError( "SimWaterThermalTank: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + WaterThermalTank( CompNum ).Name );
 					}
 					CheckWTTEquipName( CompNum ) = false;
 				}
@@ -300,17 +299,17 @@ namespace WaterThermalTanks {
 			if ( CompIndex == 0 ) {
 				CompNum = FindItem( CompName, HPWaterHeater.Name(), NumHeatPumpWaterHeater );
 				if ( CompNum == 0 ) {
-					ShowFatalError( "SimWaterThermalTank:  Unit not found=" + trim( CompName ) );
+					ShowFatalError( "SimWaterThermalTank:  Unit not found=" + CompName );
 				}
 				CompIndex = CompNum;
 			} else {
 				CompNum = CompIndex;
 				if ( CompNum > NumWaterThermalTank || CompNum < 1 ) {
-					ShowFatalError( "SimWaterThermalTank:  Invalid CompIndex passed=" + trim( TrimSigDigits( CompNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumHeatPumpWaterHeater ) ) + ", Entered Unit name=" + trim( CompName ) );
+					ShowFatalError( "SimWaterThermalTank:  Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of Units=" + TrimSigDigits( NumHeatPumpWaterHeater ) + ", Entered Unit name=" + CompName );
 				}
 				if ( CheckHPWHEquipName( CompNum ) ) {
 					if ( CompName != HPWaterHeater( CompNum ).Name ) {
-						ShowFatalError( "SimWaterThermalTank: Invalid CompIndex passed=" + trim( TrimSigDigits( CompNum ) ) + ", Unit name=" + trim( CompName ) + ", stored Unit Name for that index=" + trim( HPWaterHeater( CompNum ).Name ) );
+						ShowFatalError( "SimWaterThermalTank: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + HPWaterHeater( CompNum ).Name );
 					}
 					CheckHPWHEquipName( CompNum ) = false;
 				}
@@ -466,8 +465,8 @@ namespace WaterThermalTanks {
 			ReportWaterThermalTank( HPWaterHeater( CompNum ).WaterHeaterTankNum );
 
 		} else {
-			ShowSevereError( "SimWaterThermalTank: Invalid Water Thermal Tank Equipment Type=" + trim( TrimSigDigits( CompType ) ) );
-			ShowContinueError( "Occurs in Water Thermal Tank Equipment named = " + trim( CompName ) );
+			ShowSevereError( "SimWaterThermalTank: Invalid Water Thermal Tank Equipment Type=" + TrimSigDigits( CompType ) );
+			ShowContinueError( "Occurs in Water Thermal Tank Equipment named = " + CompName );
 			ShowFatalError( "Preceding condition causes termination." );
 
 		}}
@@ -526,7 +525,7 @@ namespace WaterThermalTanks {
 			TestNum = WaterHeaterNum;
 			SimWaterThermalTank( WaterThermalTank( WaterHeaterNum ).TypeNum, WaterThermalTank( WaterHeaterNum ).Name, TestNum, LocalRunFlag, LocalInitLoopEquip, MyLoad, MinCap, MaxCap, OptCap, FirstHVACIteration );
 			if ( TestNum != WaterHeaterNum ) {
-				ShowFatalError( "SimulateWaterHeaterStandAlone: Input WaterHeater Num [" + trim( TrimSigDigits( WaterHeaterNum ) ) + "] does not match returned WaterHeater Num[" + trim( TrimSigDigits( TestNum ) ) + "] Name=\"" + trim( WaterThermalTank( WaterHeaterNum ).Name ) + "\"." );
+				ShowFatalError( "SimulateWaterHeaterStandAlone: Input WaterHeater Num [" + TrimSigDigits( WaterHeaterNum ) + "] does not match returned WaterHeater Num[" + TrimSigDigits( TestNum ) + "] Name=\"" + WaterThermalTank( WaterHeaterNum ).Name + "\"." );
 			}
 
 			// HPWHs with inlet air from a zone and not connected to a plant loop are simulated through a CALL from ZoneEquipmentManager.
@@ -550,7 +549,7 @@ namespace WaterThermalTanks {
 				TestNum = WaterHeaterNum;
 				SimWaterThermalTank( WaterThermalTank( WaterHeaterNum ).TypeNum, WaterThermalTank( WaterHeaterNum ).Name, TestNum, LocalRunFlag, LocalInitLoopEquip, MyLoad, MinCap, MaxCap, OptCap, FirstHVACIteration );
 				if ( TestNum != WaterHeaterNum ) {
-					ShowFatalError( "SimulateWaterHeaterStandAlone: Input WaterHeater Num [" + trim( TrimSigDigits( WaterHeaterNum ) ) + "] does not match returned WaterHeater Num[" + trim( TrimSigDigits( TestNum ) ) + "] Name=\"" + trim( WaterThermalTank( WaterHeaterNum ).Name ) + "\"." );
+					ShowFatalError( "SimulateWaterHeaterStandAlone: Input WaterHeater Num [" + TrimSigDigits( WaterHeaterNum ) + "] does not match returned WaterHeater Num[" + TrimSigDigits( TestNum ) + "] Name=\"" + WaterThermalTank( WaterHeaterNum ).Name + "\"." );
 				}
 			}
 		}
@@ -559,7 +558,7 @@ namespace WaterThermalTanks {
 
 	void
 	SimHeatPumpWaterHeater(
-		Fstring const & CompName,
+		std::string const & CompName,
 		bool const FirstHVACIteration,
 		Real64 & SensLoadMet, // sensible load met by this equipment and sent to zone, W
 		Real64 & LatLoadMet, // net latent load met and sent to zone (kg/s), dehumid = negative
@@ -607,13 +606,13 @@ namespace WaterThermalTanks {
 		if ( CompIndex == 0 ) {
 			HeatPumpNum = FindItemInList( CompName, HPWaterHeater.Name(), NumHeatPumpWaterHeater );
 			if ( HeatPumpNum == 0 ) {
-				ShowFatalError( "SimHeatPumpWaterHeater: Unit not found=" + trim( CompName ) );
+				ShowFatalError( "SimHeatPumpWaterHeater: Unit not found=" + CompName );
 			}
 			CompIndex = HeatPumpNum;
 		} else {
 			HeatPumpNum = CompIndex;
 			if ( HeatPumpNum > NumHeatPumpWaterHeater || HeatPumpNum < 1 ) {
-				ShowFatalError( "SimHeatPumpWaterHeater:  Invalid CompIndex passed=" + trim( TrimSigDigits( HeatPumpNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumHeatPumpWaterHeater ) ) + ", Entered Unit name=" + trim( CompName ) );
+				ShowFatalError( "SimHeatPumpWaterHeater:  Invalid CompIndex passed=" + TrimSigDigits( HeatPumpNum ) + ", Number of Units=" + TrimSigDigits( NumHeatPumpWaterHeater ) + ", Entered Unit name=" + CompName );
 			}
 		}
 
@@ -757,7 +756,6 @@ namespace WaterThermalTanks {
 		// Standard EnergyPlus methodology.
 
 		// Using/Aliasing
-		using DataGlobals::MaxNameLength;
 		using DataGlobals::NumOfZones;
 		using DataGlobals::AutoCalculate;
 		using DataGlobals::ScheduleAlwaysOn;
@@ -826,8 +824,8 @@ namespace WaterThermalTanks {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const Blank;
-		static Fstring const RoutineName( "GetWaterThermalTankInput: " );
+		static std::string const Blank;
+		static std::string const RoutineName( "GetWaterThermalTankInput: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 
@@ -852,10 +850,10 @@ namespace WaterThermalTanks {
 		bool IsBlank; // Flag for blank name
 		bool IsValid; // Flag for validating PLF curve, OutsideAirNode
 		static bool ErrorsFound( false ); // Flag for any error found during GetWaterThermalTankInput
-		static Fstring FanInletNode( MaxNameLength ); // Used to set up comp set
-		static Fstring FanOutletNode( MaxNameLength ); // Used to set up comp set
-		static Fstring CoilInletNode( MaxNameLength ); // Used to set up comp set
-		static Fstring CoilOutletNode( MaxNameLength ); // Used to set up comp set
+		static std::string FanInletNode; // Used to set up comp set
+		static std::string FanOutletNode; // Used to set up comp set
+		static std::string CoilInletNode; // Used to set up comp set
+		static std::string CoilOutletNode; // Used to set up comp set
 		static int SupAirIn( 0 ); // Used for error checking HPWHs
 		static int ExhAirOut( 0 ); // Used for error checking HPWHs
 		static bool FoundInletNode( false ); // Used for error checking HPWHs
@@ -882,30 +880,26 @@ namespace WaterThermalTanks {
 		struct WaterHeaterSaveNodes
 		{
 			// Members
-			Fstring InletNodeName1;
-			Fstring OutletNodeName1;
-			Fstring InletNodeName2;
-			Fstring OutletNodeName2;
+			std::string InletNodeName1;
+			std::string OutletNodeName1;
+			std::string InletNodeName2;
+			std::string OutletNodeName2;
 
 			// Default Constructor
-			WaterHeaterSaveNodes() :
-				InletNodeName1( MaxNameLength ),
-				OutletNodeName1( MaxNameLength ),
-				InletNodeName2( MaxNameLength ),
-				OutletNodeName2( MaxNameLength )
+			WaterHeaterSaveNodes()
 			{}
 
 			// Member Constructor
 			WaterHeaterSaveNodes(
-				Fstring const & InletNodeName1,
-				Fstring const & OutletNodeName1,
-				Fstring const & InletNodeName2,
-				Fstring const & OutletNodeName2
+				std::string const & InletNodeName1,
+				std::string const & OutletNodeName1,
+				std::string const & InletNodeName2,
+				std::string const & OutletNodeName2
 			) :
-				InletNodeName1( MaxNameLength, InletNodeName1 ),
-				OutletNodeName1( MaxNameLength, OutletNodeName1 ),
-				InletNodeName2( MaxNameLength, InletNodeName2 ),
-				OutletNodeName2( MaxNameLength, OutletNodeName2 )
+				InletNodeName1( InletNodeName1 ),
+				OutletNodeName1( OutletNodeName1 ),
+				InletNodeName2( InletNodeName2 ),
+				OutletNodeName2( OutletNodeName2 )
 			{}
 
 		};
@@ -916,13 +910,13 @@ namespace WaterThermalTanks {
 		FArray1D< WaterHeaterSaveNodes > CoilSaveNodeNames; // temporary for coil node names used in later checks
 
 		// Formats
-		std::string const Format_720( "('! <Water Heater Information>,Type,Name,Volume {m3},Maximum Capacity {W},Standard Rated Recovery Efficiency, ','Standard Rated Energy Factor')" );
-		std::string const Format_721( "('! <Heat Pump Water Heater Information>,Type,Name,Volume {m3},Maximum Capacity {W},','Standard Rated Recovery Efficiency,Standard Rated Energy Factor,\"DX Coil Total Cooling Rate {W, HPWH Only}\"')" );
-		std::string const Format_722( "('! <Water Heater Stratified Node Information>,Node Number,Height {m},Volume {m3},Maximum Capacity {W},','Off-Cycle UA {W/K},On-Cycle UA {W/K},Number Of Inlets,Number Of Outlets')" );
-		std::string const Format_725( "('! <Chilled Water Tank Information>,Type,Name,Volume {m3},Use Side Design Flow Rate {m3/s}, ','Source Side Design Flow Rate {m3/s}')" );
-		std::string const Format_726( "('! <Chilled Water Tank Stratified Node Information>,Node Number,Height {m},Volume {m3},','UA {W/K},Number Of Inlets,Number Of Outlets')" );
-		std::string const Format_723( "('Water Heater Stratified Node Information',8(',',A))" );
-		std::string const Format_724( "('Chilled Water Tank Stratified Node Information',6(',',A))" );
+		static gio::Fmt const Format_720( "('! <Water Heater Information>,Type,Name,Volume {m3},Maximum Capacity {W},Standard Rated Recovery Efficiency, ','Standard Rated Energy Factor')" );
+		static gio::Fmt const Format_721( "('! <Heat Pump Water Heater Information>,Type,Name,Volume {m3},Maximum Capacity {W},','Standard Rated Recovery Efficiency,Standard Rated Energy Factor,\"DX Coil Total Cooling Rate {W, HPWH Only}\"')" );
+		static gio::Fmt const Format_722( "('! <Water Heater Stratified Node Information>,Node Number,Height {m},Volume {m3},Maximum Capacity {W},','Off-Cycle UA {W/K},On-Cycle UA {W/K},Number Of Inlets,Number Of Outlets')" );
+		static gio::Fmt const Format_725( "('! <Chilled Water Tank Information>,Type,Name,Volume {m3},Use Side Design Flow Rate {m3/s}, ','Source Side Design Flow Rate {m3/s}')" );
+		static gio::Fmt const Format_726( "('! <Chilled Water Tank Stratified Node Information>,Node Number,Height {m},Volume {m3},','UA {W/K},Number Of Inlets,Number Of Outlets')" );
+		static gio::Fmt const Format_723( "('Water Heater Stratified Node Information',8(',',A))" );
+		static gio::Fmt const Format_724( "('Chilled Water Tank Stratified Node Information',6(',',A))" );
 
 		// FLOW:
 
@@ -978,12 +972,12 @@ namespace WaterThermalTanks {
 
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), WaterHeaterDesuperheater.Name(), DesuperheaterNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+					VerifyName( cAlphaArgs( 1 ), WaterHeaterDesuperheater.Name(), DesuperheaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 					}
-					VerifyUniqueCoilName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, trim( cCurrentModuleObject ) + " Name" );
+					VerifyUniqueCoilName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 					if ( errFlag ) {
 						ErrorsFound = true;
 					}
@@ -994,8 +988,8 @@ namespace WaterThermalTanks {
 					if ( ! lAlphaFieldBlanks( 2 ) ) {
 						WaterHeaterDesuperheater( DesuperheaterNum ).AvailSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 						if ( WaterHeaterDesuperheater( DesuperheaterNum ).AvailSchedPtr == 0 ) {
-							ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
-							ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+							ShowSevereError( "Invalid, " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
+							ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 							ErrorsFound = true;
 						}
 					} else {
@@ -1005,14 +999,14 @@ namespace WaterThermalTanks {
 					//       convert schedule name to pointer
 					WaterHeaterDesuperheater( DesuperheaterNum ).SetPointTempSchedule = GetScheduleIndex( cAlphaArgs( 3 ) );
 					if ( WaterHeaterDesuperheater( DesuperheaterNum ).SetPointTempSchedule == 0 ) {
-						ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 3 ) ) + " = " + trim( cAlphaArgs( 3 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid, " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					}
 
 					WaterHeaterDesuperheater( DesuperheaterNum ).DeadBandTempDiff = rNumericArgs( 1 );
 					if ( WaterHeaterDesuperheater( DesuperheaterNum ).DeadBandTempDiff <= 0.0 || WaterHeaterDesuperheater( DesuperheaterNum ).DeadBandTempDiff > 20.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + ": " + trim( cNumericFieldNames( 1 ) ) + " must be > 0 and <= 20. " + trim( cNumericFieldNames( 1 ) ) + " = " + trim( TrimSigDigits( rNumericArgs( 1 ), 1 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + WaterHeaterDesuperheater( DesuperheaterNum ).Name + ": " + cNumericFieldNames( 1 ) + " must be > 0 and <= 20. " + cNumericFieldNames( 1 ) + " = " + TrimSigDigits( rNumericArgs( 1 ), 1 ) );
 						ErrorsFound = true;
 					}
 
@@ -1026,7 +1020,7 @@ namespace WaterThermalTanks {
 					if ( ! lAlphaFieldBlanks( 4 ) ) {
 						WaterHeaterDesuperheater( DesuperheaterNum ).HEffFTemp = GetCurveIndex( cAlphaArgs( 4 ) );
 						if ( WaterHeaterDesuperheater( DesuperheaterNum ).HEffFTemp == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + ":  " + trim( cAlphaFieldNames( 4 ) ) + " not found = " + trim( cAlphaArgs( 4 ) ) );
+							ShowSevereError( cCurrentModuleObject + " = " + WaterHeaterDesuperheater( DesuperheaterNum ).Name + ":  " + cAlphaFieldNames( 4 ) + " not found = " + cAlphaArgs( 4 ) );
 							ErrorsFound = true;
 						} else {
 							// Verify Curve Object, only legal type is Quadratic
@@ -1037,23 +1031,23 @@ namespace WaterThermalTanks {
 								if ( WaterHeaterDesuperheater( DesuperheaterNum ).HEffFTemp > 0 ) {
 									HEffFTemp = min( 1.0, max( 0.0, CurveValue( WaterHeaterDesuperheater( DesuperheaterNum ).HEffFTemp, WaterHeaterDesuperheater( DesuperheaterNum ).RatedInletWaterTemp, WaterHeaterDesuperheater( DesuperheaterNum ).RatedOutdoorAirTemp ) ) );
 									if ( std::abs( HEffFTemp - 1.0 ) > 0.05 ) {
-										ShowWarningError( trim( cCurrentModuleObject ) + ", \"" + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + "\":" );
-										ShowContinueError( "The " + trim( cAlphaFieldNames( 4 ) ) + " should be normalized " );
+										ShowWarningError( cCurrentModuleObject + ", \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\":" );
+										ShowContinueError( "The " + cAlphaFieldNames( 4 ) + " should be normalized " );
 										ShowContinueError( " to 1.0 at the rating point. Curve output at the rating point = " + TrimSigDigits( HEffFTemp, 3 ) );
 										ShowContinueError( " The simulation continues using the user-specified curve." );
 									}
 								}
 
 							} else {
-								ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + "\" illegal " + trim( cAlphaFieldNames( 4 ) ) + " type for this object = " + trim( GetCurveType( WaterHeaterDesuperheater( DesuperheaterNum ).HEffFTemp ) ) );
+								ShowSevereError( cCurrentModuleObject + ", \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\" illegal " + cAlphaFieldNames( 4 ) + " type for this object = " + GetCurveType( WaterHeaterDesuperheater( DesuperheaterNum ).HEffFTemp ) );
 								ErrorsFound = true;
 							}}
 						}
 					}
 
-					WaterHeaterDesuperheater( DesuperheaterNum ).WaterInletNode = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsParent );
+					WaterHeaterDesuperheater( DesuperheaterNum ).WaterInletNode = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsParent );
 
-					WaterHeaterDesuperheater( DesuperheaterNum ).WaterOutletNode = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsParent );
+					WaterHeaterDesuperheater( DesuperheaterNum ).WaterOutletNode = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsParent );
 
 					CoilSaveNodeNames( DesuperheaterNum ).InletNodeName1 = cAlphaArgs( 5 );
 					CoilSaveNodeNames( DesuperheaterNum ).OutletNodeName1 = cAlphaArgs( 6 );
@@ -1062,8 +1056,8 @@ namespace WaterThermalTanks {
 
 					if ( ! SameString( WaterHeaterDesuperheater( DesuperheaterNum ).TankType, cMixedWHModuleObj ) && ! SameString( WaterHeaterDesuperheater( DesuperheaterNum ).TankType, cStratifiedWHModuleObj ) ) {
 
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( HPWaterHeater( DesuperheaterNum ).Name ) + ":" );
-						ShowContinueError( "Desuperheater can only be used with " + cMixedWHModuleObj + " or " + cStratifiedWHModuleObj + "." );
+						ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( DesuperheaterNum ).Name + ':' );
+						ShowContinueError( "Desuperheater can only be used with " + cMixedWHModuleObj + " or " + cStratifiedWHModuleObj + '.' );
 						ErrorsFound = true;
 					}
 
@@ -1077,14 +1071,14 @@ namespace WaterThermalTanks {
 						errFlag = false;
 						GetDXCoilIndex( WaterHeaterDesuperheater( DesuperheaterNum ).HeatingSourceName, HeatingSourceNum, errFlag, cCurrentModuleObject );
 						if ( errFlag ) {
-							ShowContinueError( "...occurs in " + trim( cCurrentModuleObject ) + "=" + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) );
+							ShowContinueError( "...occurs in " + cCurrentModuleObject + '=' + WaterHeaterDesuperheater( DesuperheaterNum ).Name );
 							ErrorsFound = true;
 						}
 					} else if ( ( SameString( cAlphaArgs( 9 ), "Refrigeration:CompressorRack" ) ) || ( SameString( cAlphaArgs( 9 ), "Refrigeration:Condenser:AirCooled" ) ) || ( SameString( cAlphaArgs( 9 ), "Refrigeration:Condenser:EvaporativeCooled" ) ) || ( SameString( cAlphaArgs( 9 ), "Refrigeration:Condenser:WaterCooled" ) ) ) {
 						WaterHeaterDesuperheater( DesuperheaterNum ).HeatingSourceType = cAlphaArgs( 9 );
 						WaterHeaterDesuperheater( DesuperheaterNum ).HeatingSourceName = cAlphaArgs( 10 );
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + ":" );
+						ShowSevereError( cCurrentModuleObject + " = " + WaterHeaterDesuperheater( DesuperheaterNum ).Name + ':' );
 						ShowContinueError( " desuperheater can only be used with Coil:Cooling:DX:SingleSpeed, " );
 						ShowContinueError( " Coil:Cooling:DX:TwoSpeed, Coil:Cooling:DX:TwoStageWithHumidityControlMode, " "Refrigeration:CompressorRack," );
 						ShowContinueError( " Refrigeration:Condenser:AirCooled ,Refrigeration:Condenser:EvaporativeCooled, " );
@@ -1105,7 +1099,7 @@ namespace WaterThermalTanks {
 							break;
 						}
 						if ( WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSourceIndexNum == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + "\" desuperheater heat source object not found: " + trim( cAlphaArgs( 9 ) ) + " \"" + trim( cAlphaArgs( 10 ) ) + "\"" );
+							ShowSevereError( cCurrentModuleObject + ", \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\" desuperheater heat source object not found: " + cAlphaArgs( 9 ) + " \"" + cAlphaArgs( 10 ) + "\"" );
 							ErrorsFound = true;
 						}
 					} else if ( ( SameString( cAlphaArgs( 9 ), "Refrigeration:Condenser:AirCooled" ) ) || ( SameString( cAlphaArgs( 9 ), "Refrigeration:Condenser:EvaporativeCooled" ) ) || ( SameString( cAlphaArgs( 9 ), "Refrigeration:Condenser:WaterCooled" ) ) ) {
@@ -1117,7 +1111,7 @@ namespace WaterThermalTanks {
 							break;
 						}
 						if ( WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSourceIndexNum == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + "\" desuperheater heat source object not found: " + trim( cAlphaArgs( 9 ) ) + " \"" + trim( cAlphaArgs( 10 ) ) + "\"" );
+							ShowSevereError( cCurrentModuleObject + ", \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\" desuperheater heat source object not found: " + cAlphaArgs( 9 ) + " \"" + cAlphaArgs( 10 ) + "\"" );
 							ErrorsFound = true;
 						}
 					} else if ( SameString( cAlphaArgs( 9 ), "Coil:Cooling:DX:SingleSpeed" ) ) {
@@ -1129,7 +1123,7 @@ namespace WaterThermalTanks {
 							break;
 						}
 						if ( WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSourceIndexNum == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + "\" desuperheater heat source object not found: " + trim( cAlphaArgs( 9 ) ) + " \"" + trim( cAlphaArgs( 10 ) ) + "\"" );
+							ShowSevereError( cCurrentModuleObject + ", \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\" desuperheater heat source object not found: " + cAlphaArgs( 9 ) + " \"" + cAlphaArgs( 10 ) + "\"" );
 							ErrorsFound = true;
 						}
 					} else if ( SameString( cAlphaArgs( 9 ), "Coil:Cooling:DX:TwoSpeed" ) ) {
@@ -1141,7 +1135,7 @@ namespace WaterThermalTanks {
 							break;
 						}
 						if ( WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSourceIndexNum == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + "\" desuperheater heat source object not found: " + trim( cAlphaArgs( 9 ) ) + " \"" + trim( cAlphaArgs( 10 ) ) + "\"" );
+							ShowSevereError( cCurrentModuleObject + ", \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\" desuperheater heat source object not found: " + cAlphaArgs( 9 ) + " \"" + cAlphaArgs( 10 ) + "\"" );
 							ErrorsFound = true;
 						}
 					} else if ( SameString( cAlphaArgs( 9 ), "Coil:Cooling:DX:TwoStageWithHumidityControlMode" ) ) {
@@ -1153,11 +1147,11 @@ namespace WaterThermalTanks {
 							break;
 						}
 						if ( WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSourceIndexNum == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + "\" desuperheater heat source object not found: " + trim( cAlphaArgs( 9 ) ) + " \"" + trim( cAlphaArgs( 10 ) ) + "\"" );
+							ShowSevereError( cCurrentModuleObject + ", \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\" desuperheater heat source object not found: " + cAlphaArgs( 9 ) + " \"" + cAlphaArgs( 10 ) + "\"" );
 							ErrorsFound = true;
 						}
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + "\" invalid desuperheater heat source object: " + trim( cAlphaArgs( 9 ) ) + " \"" + trim( cAlphaArgs( 10 ) ) + "\"" );
+						ShowSevereError( cCurrentModuleObject + ", \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\" invalid desuperheater heat source object: " + cAlphaArgs( 9 ) + " \"" + cAlphaArgs( 10 ) + "\"" );
 						ErrorsFound = true;
 					}
 
@@ -1168,7 +1162,7 @@ namespace WaterThermalTanks {
 						} else {
 							WaterHeaterDesuperheater( DesuperheaterNum ).HeatReclaimRecoveryEff = rNumericArgs( 2 );
 							if ( WaterHeaterDesuperheater( DesuperheaterNum ).HeatReclaimRecoveryEff <= 0.0 || WaterHeaterDesuperheater( DesuperheaterNum ).HeatReclaimRecoveryEff > 0.9 ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + ": " + trim( cNumericFieldNames( 2 ) ) + " must be > 0.0 and <= 0.9, Efficiency = " + trim( TrimSigDigits( WaterHeaterDesuperheater( DesuperheaterNum ).HeatReclaimRecoveryEff, 3 ) ) );
+								ShowSevereError( cCurrentModuleObject + " = " + WaterHeaterDesuperheater( DesuperheaterNum ).Name + ": " + cNumericFieldNames( 2 ) + " must be > 0.0 and <= 0.9, Efficiency = " + TrimSigDigits( WaterHeaterDesuperheater( DesuperheaterNum ).HeatReclaimRecoveryEff, 3 ) );
 								ErrorsFound = true;
 							}
 						} //Blank Num(2)
@@ -1178,7 +1172,7 @@ namespace WaterThermalTanks {
 						} else {
 							WaterHeaterDesuperheater( DesuperheaterNum ).HeatReclaimRecoveryEff = rNumericArgs( 2 );
 							if ( WaterHeaterDesuperheater( DesuperheaterNum ).HeatReclaimRecoveryEff <= 0.0 || WaterHeaterDesuperheater( DesuperheaterNum ).HeatReclaimRecoveryEff > 0.3 ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + ": " + trim( cNumericFieldNames( 2 ) ) + " must be > 0.0 and <= 0.3, " + trim( cNumericFieldNames( 2 ) ) + " = " + trim( TrimSigDigits( WaterHeaterDesuperheater( DesuperheaterNum ).HeatReclaimRecoveryEff, 3 ) ) );
+								ShowSevereError( cCurrentModuleObject + " = " + WaterHeaterDesuperheater( DesuperheaterNum ).Name + ": " + cNumericFieldNames( 2 ) + " must be > 0.0 and <= 0.3, " + cNumericFieldNames( 2 ) + " = " + TrimSigDigits( WaterHeaterDesuperheater( DesuperheaterNum ).HeatReclaimRecoveryEff, 3 ) );
 								ErrorsFound = true;
 							}
 						} //Blank Num(2)
@@ -1186,44 +1180,44 @@ namespace WaterThermalTanks {
 
 					WaterHeaterDesuperheater( DesuperheaterNum ).OperatingWaterFlowRate = rNumericArgs( 6 );
 					if ( WaterHeaterDesuperheater( DesuperheaterNum ).OperatingWaterFlowRate <= 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + ": " + trim( cNumericFieldNames( 6 ) ) + " must be greater than 0. " + trim( cNumericFieldNames( 6 ) ) + " = " + trim( TrimSigDigits( rNumericArgs( 6 ), 6 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + WaterHeaterDesuperheater( DesuperheaterNum ).Name + ": " + cNumericFieldNames( 6 ) + " must be greater than 0. " + cNumericFieldNames( 6 ) + " = " + TrimSigDigits( rNumericArgs( 6 ), 6 ) );
 						ErrorsFound = true;
 					}
 
 					WaterHeaterDesuperheater( DesuperheaterNum ).PumpElecPower = rNumericArgs( 7 );
 					if ( WaterHeaterDesuperheater( DesuperheaterNum ).PumpElecPower < 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + ": " + trim( cNumericFieldNames( 7 ) ) + " must be >= 0. " + trim( cNumericFieldNames( 7 ) ) + " = " + trim( TrimSigDigits( rNumericArgs( 7 ), 2 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + WaterHeaterDesuperheater( DesuperheaterNum ).Name + ": " + cNumericFieldNames( 7 ) + " must be >= 0. " + cNumericFieldNames( 7 ) + " = " + TrimSigDigits( rNumericArgs( 7 ), 2 ) );
 						ErrorsFound = true;
 					}
 
 					if ( ( WaterHeaterDesuperheater( DesuperheaterNum ).PumpElecPower / WaterHeaterDesuperheater( DesuperheaterNum ).OperatingWaterFlowRate ) > 7.9264e6 ) {
-						ShowWarningError( trim( cCurrentModuleObject ) + " = " + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + ": " + trim( cNumericFieldNames( 7 ) ) + " to " + trim( cNumericFieldNames( 6 ) ) + " ratio > 7.9264E6." " " + trim( cNumericFieldNames( 7 ) ) + " to " + trim( cNumericFieldNames( 6 ) ) + " = " + trim( TrimSigDigits( ( WaterHeaterDesuperheater( DesuperheaterNum ).PumpElecPower / WaterHeaterDesuperheater( DesuperheaterNum ).OperatingWaterFlowRate ), 3 ) ) );
-						ShowContinueError( " Suggest reducing " + trim( cNumericFieldNames( 7 ) ) + " or increasing " + trim( cNumericFieldNames( 6 ) ) + "." );
+						ShowWarningError( cCurrentModuleObject + " = " + WaterHeaterDesuperheater( DesuperheaterNum ).Name + ": " + cNumericFieldNames( 7 ) + " to " + cNumericFieldNames( 6 ) + " ratio > 7.9264E6." " " + cNumericFieldNames( 7 ) + " to " + cNumericFieldNames( 6 ) + " = " + TrimSigDigits( ( WaterHeaterDesuperheater( DesuperheaterNum ).PumpElecPower / WaterHeaterDesuperheater( DesuperheaterNum ).OperatingWaterFlowRate ), 3 ) );
+						ShowContinueError( " Suggest reducing " + cNumericFieldNames( 7 ) + " or increasing " + cNumericFieldNames( 6 ) + '.' );
 						ShowContinueError( " The simulation will continue using the user defined values." );
 					}
 
 					WaterHeaterDesuperheater( DesuperheaterNum ).PumpFracToWater = rNumericArgs( 8 );
 					if ( WaterHeaterDesuperheater( DesuperheaterNum ).PumpFracToWater < 0.0 || WaterHeaterDesuperheater( DesuperheaterNum ).PumpFracToWater > 1.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + ": " + trim( cNumericFieldNames( 8 ) ) + " must be >= 0 or <= 1. " + trim( cNumericFieldNames( 8 ) ) + " = " + trim( TrimSigDigits( rNumericArgs( 8 ), 3 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + WaterHeaterDesuperheater( DesuperheaterNum ).Name + ": " + cNumericFieldNames( 8 ) + " must be >= 0 or <= 1. " + cNumericFieldNames( 8 ) + " = " + TrimSigDigits( rNumericArgs( 8 ), 3 ) );
 						ErrorsFound = true;
 					}
 
 					WaterHeaterDesuperheater( DesuperheaterNum ).OnCycParaLoad = rNumericArgs( 9 );
 					if ( WaterHeaterDesuperheater( DesuperheaterNum ).OnCycParaLoad < 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + ": " + trim( cNumericFieldNames( 9 ) ) + " must be >= 0. " + trim( cNumericFieldNames( 9 ) ) + " = " + trim( TrimSigDigits( rNumericArgs( 9 ), 2 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + WaterHeaterDesuperheater( DesuperheaterNum ).Name + ": " + cNumericFieldNames( 9 ) + " must be >= 0. " + cNumericFieldNames( 9 ) + " = " + TrimSigDigits( rNumericArgs( 9 ), 2 ) );
 						ErrorsFound = true;
 					}
 
 					WaterHeaterDesuperheater( DesuperheaterNum ).OffCycParaLoad = rNumericArgs( 10 );
 					if ( WaterHeaterDesuperheater( DesuperheaterNum ).OffCycParaLoad < 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + ": " + trim( cNumericFieldNames( 10 ) ) + " must be >= 0. " + trim( cNumericFieldNames( 10 ) ) + " = " + trim( TrimSigDigits( rNumericArgs( 10 ), 2 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + WaterHeaterDesuperheater( DesuperheaterNum ).Name + ": " + cNumericFieldNames( 10 ) + " must be >= 0. " + cNumericFieldNames( 10 ) + " = " + TrimSigDigits( rNumericArgs( 10 ), 2 ) );
 						ErrorsFound = true;
 					}
 
 				}
 
 				if ( ErrorsFound ) {
-					ShowFatalError( "Errors found in getting " + trim( cCurrentModuleObject ) + " input. Preceding condition causes termination." );
+					ShowFatalError( "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition causes termination." );
 				}
 
 			}
@@ -1239,7 +1233,7 @@ namespace WaterThermalTanks {
 
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), HPWaterHeater.Name(), HPWaterHeaterNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+					VerifyName( cAlphaArgs( 1 ), HPWaterHeater.Name(), HPWaterHeaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1253,8 +1247,8 @@ namespace WaterThermalTanks {
 					if ( ! lAlphaFieldBlanks( 2 ) ) {
 						HPWaterHeater( HPWaterHeaterNum ).AvailSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 						if ( HPWaterHeater( HPWaterHeaterNum ).AvailSchedPtr == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\", not found" );
-							ShowContinueError( trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\"." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", not found" );
+							ShowContinueError( cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 							ErrorsFound = true;
 						}
 					} else {
@@ -1265,39 +1259,39 @@ namespace WaterThermalTanks {
 					if ( ! lAlphaFieldBlanks( 3 ) ) {
 						HPWaterHeater( HPWaterHeaterNum ).SetPointTempSchedule = GetScheduleIndex( cAlphaArgs( 3 ) );
 						if ( HPWaterHeater( HPWaterHeaterNum ).SetPointTempSchedule == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\", not found" );
-							ShowContinueError( trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( cAlphaArgs( 3 ) ) + "\"." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", not found" );
+							ShowContinueError( cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
 							ErrorsFound = true;
 						}
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\", " );
-						ShowContinueError( "required " + trim( cAlphaFieldNames( 3 ) ) + " is blank." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", " );
+						ShowContinueError( "required " + cAlphaFieldNames( 3 ) + " is blank." );
 						ErrorsFound = true;
 					}
 
 					HPWaterHeater( HPWaterHeaterNum ).DeadBandTempDiff = rNumericArgs( 1 );
 					if ( HPWaterHeater( HPWaterHeaterNum ).DeadBandTempDiff <= 0.0 || HPWaterHeater( HPWaterHeaterNum ).DeadBandTempDiff > 20.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\", " );
-						ShowContinueError( trim( cNumericFieldNames( 1 ) ) + " difference must be > 0 and <= 20. Dead band = " + trim( TrimSigDigits( rNumericArgs( 1 ), 1 ) ) );
+						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", " );
+						ShowContinueError( cNumericFieldNames( 1 ) + " difference must be > 0 and <= 20. Dead band = " + TrimSigDigits( rNumericArgs( 1 ), 1 ) );
 						ErrorsFound = true;
 					}
 
-					HPWaterHeater( HPWaterHeaterNum ).CondWaterInletNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsParent );
+					HPWaterHeater( HPWaterHeaterNum ).CondWaterInletNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsParent );
 					HPWHSaveNodeNames( HPWaterHeaterNum ).InletNodeName1 = cAlphaArgs( 4 );
-					HPWaterHeater( HPWaterHeaterNum ).CondWaterOutletNode = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsParent );
+					HPWaterHeater( HPWaterHeaterNum ).CondWaterOutletNode = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsParent );
 					HPWHSaveNodeNames( HPWaterHeaterNum ).OutletNodeName1 = cAlphaArgs( 5 );
 
 					HPWaterHeater( HPWaterHeaterNum ).OperatingWaterFlowRate = rNumericArgs( 2 );
 					if ( HPWaterHeater( HPWaterHeaterNum ).OperatingWaterFlowRate <= 0.0 && rNumericArgs( 2 ) != AutoCalculate ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\", " );
-						ShowContinueError( trim( cNumericFieldNames( 2 ) ) + " must be greater than 0. Condenser water flow rate = " + trim( TrimSigDigits( rNumericArgs( 2 ), 6 ) ) );
+						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", " );
+						ShowContinueError( cNumericFieldNames( 2 ) + " must be greater than 0. Condenser water flow rate = " + TrimSigDigits( rNumericArgs( 2 ), 6 ) );
 						ErrorsFound = true;
 					}
 
 					HPWaterHeater( HPWaterHeaterNum ).OperatingAirFlowRate = rNumericArgs( 3 );
 					if ( HPWaterHeater( HPWaterHeaterNum ).OperatingAirFlowRate <= 0.0 && rNumericArgs( 3 ) != AutoCalculate ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\", " );
-						ShowContinueError( trim( cNumericFieldNames( 3 ) ) + " must be greater than 0. Evaporator air flow rate = " + trim( TrimSigDigits( rNumericArgs( 3 ), 6 ) ) );
+						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", " );
+						ShowContinueError( cNumericFieldNames( 3 ) + " must be greater than 0. Evaporator air flow rate = " + TrimSigDigits( rNumericArgs( 3 ), 6 ) );
 						ErrorsFound = true;
 					}
 
@@ -1308,31 +1302,31 @@ namespace WaterThermalTanks {
 						if ( ! lAlphaFieldBlanks( 11 ) ) {
 							HPWaterHeater( HPWaterHeaterNum ).AmbientTempSchedule = GetScheduleIndex( cAlphaArgs( 11 ) );
 							if ( HPWaterHeater( HPWaterHeaterNum ).AmbientTempSchedule == 0 ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\", not found" );
-								ShowContinueError( trim( cAlphaFieldNames( 11 ) ) + "=\"" + trim( cAlphaArgs( 11 ) ) + "\"." );
+								ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", not found" );
+								ShowContinueError( cAlphaFieldNames( 11 ) + "=\"" + cAlphaArgs( 11 ) + "\"." );
 								ErrorsFound = true;
 							}
 						} else {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\", " );
-							ShowContinueError( "required " + trim( cAlphaFieldNames( 11 ) ) + " is blank." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", " );
+							ShowContinueError( "required " + cAlphaFieldNames( 11 ) + " is blank." );
 							ErrorsFound = true;
 						}
 						if ( ! lAlphaFieldBlanks( 12 ) ) {
 							HPWaterHeater( HPWaterHeaterNum ).AmbientRHSchedule = GetScheduleIndex( cAlphaArgs( 12 ) );
 							if ( HPWaterHeater( HPWaterHeaterNum ).AmbientRHSchedule == 0 ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\", not found" );
-								ShowContinueError( trim( cAlphaFieldNames( 12 ) ) + "=\"" + trim( cAlphaArgs( 12 ) ) + "\"." );
+								ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", not found" );
+								ShowContinueError( cAlphaFieldNames( 12 ) + "=\"" + cAlphaArgs( 12 ) + "\"." );
 								ErrorsFound = true;
 							} else {
 								if ( ! CheckScheduleValueMinMax( HPWaterHeater( HPWaterHeaterNum ).AmbientRHSchedule, ">=", 0.0, "<=", 1.0 ) ) {
-									ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\", invalid values" );
-									ShowContinueError( trim( cAlphaFieldNames( 12 ) ) + "=\"" + trim( cAlphaArgs( 12 ) ) + "\"," " schedule values must be (>=0., <=1.)" );
+									ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", invalid values" );
+									ShowContinueError( cAlphaFieldNames( 12 ) + "=\"" + cAlphaArgs( 12 ) + "\"," " schedule values must be (>=0., <=1.)" );
 									ErrorsFound = true;
 								}
 							}
 						} else {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\", " );
-							ShowContinueError( "required " + trim( cAlphaFieldNames( 12 ) ) + " is blank." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", " );
+							ShowContinueError( "required " + cAlphaFieldNames( 12 ) + " is blank." );
 							ErrorsFound = true;
 						}
 
@@ -1341,13 +1335,13 @@ namespace WaterThermalTanks {
 						if ( ! lAlphaFieldBlanks( 13 ) ) {
 							HPWaterHeater( HPWaterHeaterNum ).AmbientTempZone = FindItemInList( cAlphaArgs( 13 ), Zone.Name(), NumOfZones );
 							if ( HPWaterHeater( HPWaterHeaterNum ).AmbientTempZone == 0 ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\", not found" );
-								ShowContinueError( trim( cAlphaFieldNames( 13 ) ) + "=\"" + trim( cAlphaArgs( 13 ) ) + "\"." );
+								ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", not found" );
+								ShowContinueError( cAlphaFieldNames( 13 ) + "=\"" + cAlphaArgs( 13 ) + "\"." );
 								ErrorsFound = true;
 							}
 						} else {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\", " );
-							ShowContinueError( "required " + trim( cAlphaFieldNames( 13 ) ) + " is blank." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", " );
+							ShowContinueError( "required " + cAlphaFieldNames( 13 ) + " is blank." );
 							ErrorsFound = true;
 						}
 
@@ -1359,13 +1353,13 @@ namespace WaterThermalTanks {
 						if ( ! lAlphaFieldBlanks( 13 ) ) {
 							HPWaterHeater( HPWaterHeaterNum ).AmbientTempZone = FindItemInList( cAlphaArgs( 13 ), Zone.Name(), NumOfZones );
 							if ( HPWaterHeater( HPWaterHeaterNum ).AmbientTempZone == 0 ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\", not found" );
-								ShowContinueError( trim( cAlphaFieldNames( 13 ) ) + "=\"" + trim( cAlphaArgs( 13 ) ) + "\"." );
+								ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", not found" );
+								ShowContinueError( cAlphaFieldNames( 13 ) + "=\"" + cAlphaArgs( 13 ) + "\"." );
 								ErrorsFound = true;
 							}
 						} else {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\", " );
-							ShowContinueError( "required " + trim( cAlphaFieldNames( 13 ) ) + " is blank." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", " );
+							ShowContinueError( "required " + cAlphaFieldNames( 13 ) + " is blank." );
 							ErrorsFound = true;
 						}
 
@@ -1377,8 +1371,8 @@ namespace WaterThermalTanks {
 					HPWaterHeater( HPWaterHeaterNum ).TankType = cAlphaArgs( 14 );
 
 					if ( ! SameString( HPWaterHeater( HPWaterHeaterNum ).TankType, cMixedWHModuleObj ) && ! SameString( HPWaterHeater( HPWaterHeaterNum ).TankType, cStratifiedWHModuleObj ) ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\":" );
-						ShowContinueError( "Heat pump water heater can only be used with " + cMixedWHModuleObj + " or " + cStratifiedWHModuleObj + "." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
+						ShowContinueError( "Heat pump water heater can only be used with " + cMixedWHModuleObj + " or " + cStratifiedWHModuleObj + '.' );
 						ErrorsFound = true;
 					}
 
@@ -1391,8 +1385,8 @@ namespace WaterThermalTanks {
 					HPWHSaveNodeNames( HPWaterHeaterNum ).OutletNodeName2 = cAlphaArgs( 17 );
 
 					if ( ! lAlphaFieldBlanks( 16 ) && ! lAlphaFieldBlanks( 17 ) ) {
-						HPWaterHeater( HPWaterHeaterNum ).WHUseInletNode = GetOnlySingleNode( cAlphaArgs( 16 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsParent );
-						HPWaterHeater( HPWaterHeaterNum ).WHUseOutletNode = GetOnlySingleNode( cAlphaArgs( 17 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsParent );
+						HPWaterHeater( HPWaterHeaterNum ).WHUseInletNode = GetOnlySingleNode( cAlphaArgs( 16 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsParent );
+						HPWaterHeater( HPWaterHeaterNum ).WHUseOutletNode = GetOnlySingleNode( cAlphaArgs( 17 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsParent );
 					}
 
 					//       get Coil:DX:HeatPumpWaterHeater object
@@ -1401,7 +1395,7 @@ namespace WaterThermalTanks {
 
 					//       check that the DX Coil exists
 					if ( ! SameString( HPWaterHeater( HPWaterHeaterNum ).DXCoilType, "Coil:WaterHeating:AirToWaterHeatPump" ) ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\":" );
+						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
 						ShowContinueError( "Heat pump water heater can only be used with Coil:WaterHeating:AirToWaterHeatPump." );
 						ErrorsFound = true;
 					}
@@ -1409,8 +1403,8 @@ namespace WaterThermalTanks {
 					DXCoilErrFlag = false;
 					GetDXCoilIndex( HPWaterHeater( HPWaterHeaterNum ).DXCoilName, HPWaterHeater( HPWaterHeaterNum ).DXCoilNum, DXCoilErrFlag, cCurrentModuleObject );
 					if ( DXCoilErrFlag ) {
-						ShowContinueError( "...occurs in WaterHeater:HeatPump =" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) );
-						ShowContinueError( "...entered DX CoilType=" + trim( HPWaterHeater( HPWaterHeaterNum ).DXCoilType ) );
+						ShowContinueError( "...occurs in WaterHeater:HeatPump =" + HPWaterHeater( HPWaterHeaterNum ).Name );
+						ShowContinueError( "...entered DX CoilType=" + HPWaterHeater( HPWaterHeaterNum ).DXCoilType );
 						ErrorsFound = true;
 					}
 
@@ -1421,8 +1415,8 @@ namespace WaterThermalTanks {
 
 					HPWaterHeater( HPWaterHeaterNum ).MinAirTempForHPOperation = rNumericArgs( 4 );
 					if ( HPWaterHeater( HPWaterHeaterNum ).MinAirTempForHPOperation < 5 ) {
-						ShowWarningError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\": minimum inlet air temperature for heat pump compressor operation must be greater than or equal to 5 C." );
-						ShowContinueError( "...Minimum inlet air temperature = " + trim( TrimSigDigits( rNumericArgs( 4 ), 1 ) ) );
+						ShowWarningError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\": minimum inlet air temperature for heat pump compressor operation must be greater than or equal to 5 C." );
+						ShowContinueError( "...Minimum inlet air temperature = " + TrimSigDigits( rNumericArgs( 4 ), 1 ) );
 					}
 
 					//       Get compressor location
@@ -1432,31 +1426,31 @@ namespace WaterThermalTanks {
 						if ( ! lAlphaFieldBlanks( 21 ) ) {
 							HPWaterHeater( HPWaterHeaterNum ).CrankcaseTempSchedule = GetScheduleIndex( cAlphaArgs( 21 ) );
 							if ( HPWaterHeater( HPWaterHeaterNum ).CrankcaseTempSchedule == 0 ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\", not found" );
-								ShowContinueError( trim( cAlphaFieldNames( 21 ) ) + "=\"" + trim( cAlphaArgs( 21 ) ) + "\"." );
+								ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", not found" );
+								ShowContinueError( cAlphaFieldNames( 21 ) + "=\"" + cAlphaArgs( 21 ) + "\"." );
 								ErrorsFound = true;
 							}
 						} else {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\", " );
-							ShowContinueError( "required " + trim( cAlphaFieldNames( 21 ) ) + " is blank." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", " );
+							ShowContinueError( "required " + cAlphaFieldNames( 21 ) + " is blank." );
 							ErrorsFound = true;
 						}
 
 					} else if ( SELECT_CASE_var == "ZONE" ) {
 						HPWaterHeater( HPWaterHeaterNum ).CrankcaseTempIndicator = CrankcaseTempZone;
 						if ( HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempOutsideAir || HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempSchedule ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\":  Inlet Air Configuration must be Zone Air Only or Zone And" );
+							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\":  Inlet Air Configuration must be Zone Air Only or Zone And" );
 							ShowContinueError( " Outdoor Air when compressor location equals ZONE." );
 							ErrorsFound = true;
 						}
 
 						if ( ! lAlphaFieldBlanks( 21 ) ) {
-							ShowWarningError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"  " + trim( cAlphaFieldNames( 21 ) ) + " was provided but will not be used based" " on compressor location input=\"" + trim( cAlphaArgs( 20 ) ) + "\"." );
+							ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"  " + cAlphaFieldNames( 21 ) + " was provided but will not be used based" " on compressor location input=\"" + cAlphaArgs( 20 ) + "\"." );
 						}
 					} else if ( SELECT_CASE_var == "OUTDOORS" ) {
 						HPWaterHeater( HPWaterHeaterNum ).CrankcaseTempIndicator = CrankcaseTempExterior;
 						if ( ! lAlphaFieldBlanks( 21 ) ) {
-							ShowWarningError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"  " + trim( cAlphaFieldNames( 21 ) ) + " was provided but will not be used based" " on " + trim( cAlphaFieldNames( 21 ) ) + "=\"" + trim( cAlphaArgs( 20 ) ) + "\"." );
+							ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"  " + cAlphaFieldNames( 21 ) + " was provided but will not be used based" " on " + cAlphaFieldNames( 21 ) + "=\"" + cAlphaArgs( 20 ) + "\"." );
 						}
 
 					}}
@@ -1468,7 +1462,7 @@ namespace WaterThermalTanks {
 					errFlag = false;
 					GetFanIndex( HPWaterHeater( HPWaterHeaterNum ).FanName, HPWaterHeater( HPWaterHeaterNum ).FanNum, errFlag, cCurrentModuleObject );
 					if ( errFlag ) {
-						ShowContinueError( "...occurs in unit=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\"." );
+						ShowContinueError( "...occurs in unit=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\"." );
 						ErrorsFound = true;
 					}
 
@@ -1479,15 +1473,15 @@ namespace WaterThermalTanks {
 						ErrorsFound = true;
 					} else {
 						if ( HPWaterHeater( HPWaterHeaterNum ).FanType_Num != FanType_SimpleOnOff ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + " illegal fan type specified." );
-							ShowContinueError( "Occurs in unit=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\"." );
-							ShowContinueError( " The fan object (" + trim( HPWaterHeater( HPWaterHeaterNum ).FanName ) + ") type must be Fan:OnOff when used with a heat pump water heater" );
+							ShowSevereError( cCurrentModuleObject + " illegal fan type specified." );
+							ShowContinueError( "Occurs in unit=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\"." );
+							ShowContinueError( " The fan object (" + HPWaterHeater( HPWaterHeaterNum ).FanName + ") type must be Fan:OnOff when used with a heat pump water heater" );
 							ErrorsFound = true;
 						} else {
 							if ( ! SameString( HPWaterHeater( HPWaterHeaterNum ).FanType, "Fan:OnOff" ) ) {
-								ShowWarningError( trim( cCurrentModuleObject ) + " illegal fan type = " + trim( HPWaterHeater( HPWaterHeaterNum ).FanType ) );
-								ShowContinueError( "Occurs in unit = " + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) );
-								ShowContinueError( " The fan object (" + trim( HPWaterHeater( HPWaterHeaterNum ).FanName ) + ") is actually the correct fan type and the simulation continues." );
+								ShowWarningError( cCurrentModuleObject + " illegal fan type = " + HPWaterHeater( HPWaterHeaterNum ).FanType );
+								ShowContinueError( "Occurs in unit = " + HPWaterHeater( HPWaterHeaterNum ).Name );
+								ShowContinueError( " The fan object (" + HPWaterHeater( HPWaterHeaterNum ).FanName + ") is actually the correct fan type and the simulation continues." );
 								ShowContinueError( " Node connection errors will result due to the inconsistent fan type." );
 							}
 						}
@@ -1497,9 +1491,9 @@ namespace WaterThermalTanks {
 
 					if ( FanVolFlow != AutoSize && ! errFlag ) {
 						if ( FanVolFlow < HPWaterHeater( HPWaterHeaterNum ).OperatingAirFlowRate ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + " - air flow rate = " + trim( TrimSigDigits( FanVolFlow, 7 ) ) + " in fan object " + trim( HPWaterHeater( HPWaterHeaterNum ).FanName ) + " is less than the  HPWHs evaporator air flow rate." );
+							ShowSevereError( cCurrentModuleObject + " - air flow rate = " + TrimSigDigits( FanVolFlow, 7 ) + " in fan object " + HPWaterHeater( HPWaterHeaterNum ).FanName + " is less than the  HPWHs evaporator air flow rate." );
 							ShowContinueError( " The fan flow rate must be >= to the HPWHs evaporator volumetric air flow rate." );
-							ShowContinueError( " Occurs in unit = " + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) );
+							ShowContinueError( " Occurs in unit = " + HPWaterHeater( HPWaterHeaterNum ).Name );
 							ErrorsFound = true;
 						}
 					}
@@ -1511,8 +1505,8 @@ namespace WaterThermalTanks {
 						HPWaterHeater( HPWaterHeaterNum ).FanPlacement = DrawThru;
 
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\", invalid " );
-						ShowContinueError( trim( cAlphaFieldNames( 24 ) ) + "=\"" + trim( cAlphaArgs( 24 ) ) + "\"." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", invalid " );
+						ShowContinueError( cAlphaFieldNames( 24 ) + "=\"" + cAlphaArgs( 24 ) + "\"." );
 						ErrorsFound = true;
 					}
 
@@ -1523,7 +1517,7 @@ namespace WaterThermalTanks {
 						HPWaterHeater( HPWaterHeaterNum ).DXCoilPLFFPLR = DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).PLFFPLR( 1 );
 						//         check the range of condenser pump power to be <= 5 gpm/ton
 						if ( DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).HPWHCondPumpElecNomPower / DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).RatedTotCap2 > 0.1422 ) {
-							ShowWarningError( trim( DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).DXCoilType ) + "= " + trim( DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).Name ) + ": Rated condenser pump power per watt of rated heating capacity has exceeded the recommended" " maximum of 0.1422 W/W (41.67 watt/MBH). Condenser pump power per watt = " + trim( TrimSigDigits( ( DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).HPWHCondPumpElecNomPower / DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).RatedTotCap2 ), 4 ) ) );
+							ShowWarningError( DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).DXCoilType + "= " + DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).Name + ": Rated condenser pump power per watt of rated heating capacity has exceeded the recommended" " maximum of 0.1422 W/W (41.67 watt/MBH). Condenser pump power per watt = " + TrimSigDigits( ( DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).HPWHCondPumpElecNomPower / DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).RatedTotCap2 ), 4 ) );
 						}
 					}
 
@@ -1539,30 +1533,30 @@ namespace WaterThermalTanks {
 
 					HPWaterHeater( HPWaterHeaterNum ).OnCycParaLoad = rNumericArgs( 5 );
 					if ( HPWaterHeater( HPWaterHeaterNum ).OnCycParaLoad < 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\"," );
-						ShowContinueError( trim( cNumericFieldNames( 5 ) ) + " must be >= 0. " + trim( cNumericFieldNames( 5 ) ) + " = " + trim( TrimSigDigits( rNumericArgs( 5 ), 2 ) ) );
+						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\"," );
+						ShowContinueError( cNumericFieldNames( 5 ) + " must be >= 0. " + cNumericFieldNames( 5 ) + " = " + TrimSigDigits( rNumericArgs( 5 ), 2 ) );
 						ErrorsFound = true;
 					}
 
 					HPWaterHeater( HPWaterHeaterNum ).OffCycParaLoad = rNumericArgs( 6 );
 					if ( HPWaterHeater( HPWaterHeaterNum ).OffCycParaLoad < 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\"," );
-						ShowContinueError( trim( cNumericFieldNames( 6 ) ) + " must be >= 0. " + trim( cNumericFieldNames( 6 ) ) + " = " + trim( TrimSigDigits( rNumericArgs( 6 ), 2 ) ) );
+						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\"," );
+						ShowContinueError( cNumericFieldNames( 6 ) + " must be >= 0. " + cNumericFieldNames( 6 ) + " = " + TrimSigDigits( rNumericArgs( 6 ), 2 ) );
 						ErrorsFound = true;
 					}
 
 					if ( SameString( cAlphaArgs( 25 ), "Zone" ) ) {
 						HPWaterHeater( HPWaterHeaterNum ).ParasiticTempIndicator = AmbientTempZone;
 						if ( HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempOutsideAir || HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempSchedule ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\"," );
-							ShowContinueError( trim( cAlphaFieldNames( 25 ) ) + " must be ZoneAirOnly or ZoneAndOutdoorAir" );
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\"," );
+							ShowContinueError( cAlphaFieldNames( 25 ) + " must be ZoneAirOnly or ZoneAndOutdoorAir" );
 							ShowContinueError( " when parasitic heat rejection location equals Zone." );
 							ErrorsFound = true;
 						}
 					} else if ( SameString( cAlphaArgs( 25 ), "Outdoors" ) ) {
 						HPWaterHeater( HPWaterHeaterNum ).ParasiticTempIndicator = AmbientTempOutsideAir;
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\":" );
+						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
 						ShowContinueError( " parasitic heat rejection location must be either Zone or Outdoors." );
 						ErrorsFound = true;
 					}
@@ -1573,11 +1567,11 @@ namespace WaterThermalTanks {
 						if ( HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempZoneAndOA ) {
 							HPWaterHeater( HPWaterHeaterNum ).InletAirMixerNode = GetOnlySingleNode( cAlphaArgs( 26 ), ErrorsFound, "WaterHeater:HeatPump inlet air mixer", cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 						} else {
-							ShowWarningError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\":" );
+							ShowWarningError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
 							ShowContinueError( "Inlet air mixer node name specified but only required " "when Inlet Air Configuration is selected" " as Zone and OutdoorAir. Node name disregarded and simulation continues." );
 						}
 					} else if ( lAlphaFieldBlanks( 26 ) && HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempZoneAndOA ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\":" );
+						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
 						ShowContinueError( "Inlet air mixer node name required " "when Inlet Air Configuration is selected as ZoneAndOutdoorAir." );
 						ErrorsFound = true;
 					}
@@ -1585,13 +1579,13 @@ namespace WaterThermalTanks {
 					if ( ! lAlphaFieldBlanks( 27 ) ) {
 						//         For the outlet air splitter node, NodeConnectionType is inlet to the HPWH outlet air node
 						if ( HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempZoneAndOA ) {
-							HPWaterHeater( HPWaterHeaterNum ).OutletAirSplitterNode = GetOnlySingleNode( cAlphaArgs( 27 ), ErrorsFound, trim( cCurrentModuleObject ) + "-OUTLET AIR SPLITTER", cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+							HPWaterHeater( HPWaterHeaterNum ).OutletAirSplitterNode = GetOnlySingleNode( cAlphaArgs( 27 ), ErrorsFound, cCurrentModuleObject + "-OUTLET AIR SPLITTER", cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 						} else {
-							ShowWarningError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\":" );
+							ShowWarningError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
 							ShowContinueError( "Outlet air splitter node name specified but only required when " "Inlet Air Configuration is selected" " as ZoneAndOutdoorAir. Node name disregarded and simulation continues." );
 						}
 					} else if ( lAlphaFieldBlanks( 27 ) && HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempZoneAndOA ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\":" );
+						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
 						ShowContinueError( "Outlet air splitter node name required when " "Inlet Air Configuration is selected as ZoneAndOutdoorAir." );
 						ErrorsFound = true;
 					}
@@ -1600,44 +1594,44 @@ namespace WaterThermalTanks {
 					if ( HPWaterHeater( HPWaterHeaterNum ).InletAirMixerNode != 0 ) {
 						//         when mixer/splitter nodes are used the HPWH's inlet/outlet node are set up as ObjectIsNotParent
 
-						HPWaterHeater( HPWaterHeaterNum ).HeatPumpAirInletNode = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, trim( cCurrentModuleObject ) + "-INLET AIR MIXER", cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+						HPWaterHeater( HPWaterHeaterNum ).HeatPumpAirInletNode = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, cCurrentModuleObject + "-INLET AIR MIXER", cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
-						HPWaterHeater( HPWaterHeaterNum ).HeatPumpAirOutletNode = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, trim( cCurrentModuleObject ) + "-OUTLET AIR SPLITTER", cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+						HPWaterHeater( HPWaterHeaterNum ).HeatPumpAirOutletNode = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, cCurrentModuleObject + "-OUTLET AIR SPLITTER", cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-						HPWaterHeater( HPWaterHeaterNum ).OutsideAirNode = GetOnlySingleNode( cAlphaArgs( 9 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsParent );
-						if ( cAlphaArgs( 9 ) != " " ) {
+						HPWaterHeater( HPWaterHeaterNum ).OutsideAirNode = GetOnlySingleNode( cAlphaArgs( 9 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsParent );
+						if ( cAlphaArgs( 9 ) != "" ) {
 							CheckAndAddAirNodeNumber( HPWaterHeater( HPWaterHeaterNum ).OutsideAirNode, Okay );
 							if ( ! Okay ) {
-								ShowWarningError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\": Adding outdoor air node=" + trim( cAlphaArgs( 9 ) ) );
+								ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\": Adding outdoor air node=" + cAlphaArgs( 9 ) );
 							}
 						}
 
-						HPWaterHeater( HPWaterHeaterNum ).ExhaustAirNode = GetOnlySingleNode( cAlphaArgs( 10 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsParent );
+						HPWaterHeater( HPWaterHeaterNum ).ExhaustAirNode = GetOnlySingleNode( cAlphaArgs( 10 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsParent );
 
 					} else {
 						//         when mixer/splitter nodes are NOT used the HPWH's inlet/outlet nodes are set up as ObjectIsParent
 						if ( HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempSchedule ) {
 							//           for scheduled HPWH's the inlet node is not on any branch or parent object, make it an outlet node
 							//           to avoid node connection errors
-							HPWaterHeater( HPWaterHeaterNum ).HeatPumpAirInletNode = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
+							HPWaterHeater( HPWaterHeaterNum ).HeatPumpAirInletNode = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 
-							HPWaterHeater( HPWaterHeaterNum ).HeatPumpAirOutletNode = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
+							HPWaterHeater( HPWaterHeaterNum ).HeatPumpAirOutletNode = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 
 						} else { // HPWH is connected to a zone with no mixer/splitter nodes
 							if ( HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempZone ) {
-								HPWaterHeater( HPWaterHeaterNum ).HeatPumpAirInletNode = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
+								HPWaterHeater( HPWaterHeaterNum ).HeatPumpAirInletNode = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
 
-								HPWaterHeater( HPWaterHeaterNum ).HeatPumpAirOutletNode = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
+								HPWaterHeater( HPWaterHeaterNum ).HeatPumpAirOutletNode = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 							} else { // HPWH is located outdoors
-								HPWaterHeater( HPWaterHeaterNum ).OutsideAirNode = GetOnlySingleNode( cAlphaArgs( 9 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsParent );
+								HPWaterHeater( HPWaterHeaterNum ).OutsideAirNode = GetOnlySingleNode( cAlphaArgs( 9 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsParent );
 								if ( ! lAlphaFieldBlanks( 9 ) ) {
 									CheckAndAddAirNodeNumber( HPWaterHeater( HPWaterHeaterNum ).OutsideAirNode, Okay );
 									if ( ! Okay ) {
-										ShowWarningError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\": Adding outdoor air node =" + trim( cAlphaArgs( 9 ) ) );
+										ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\": Adding outdoor air node =" + cAlphaArgs( 9 ) );
 									}
 								}
 
-								HPWaterHeater( HPWaterHeaterNum ).ExhaustAirNode = GetOnlySingleNode( cAlphaArgs( 10 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsParent );
+								HPWaterHeater( HPWaterHeaterNum ).ExhaustAirNode = GetOnlySingleNode( cAlphaArgs( 10 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsParent );
 							}
 						}
 					}
@@ -1665,20 +1659,20 @@ namespace WaterThermalTanks {
 									FoundInletNode = true;
 								}
 								if ( ! FoundInletNode ) {
-									ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\":" );
-									ShowContinueError( "The HPWH's air inlet node name = " + trim( cAlphaArgs( 7 ) ) + " was not properly specified " );
-									ShowContinueError( "as an exhaust air node for zone = " + trim( cAlphaArgs( 13 ) ) + " in a " "ZoneHVAC:EquipmentConnections object." );
+									ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
+									ShowContinueError( "The HPWH's air inlet node name = " + cAlphaArgs( 7 ) + " was not properly specified " );
+									ShowContinueError( "as an exhaust air node for zone = " + cAlphaArgs( 13 ) + " in a " "ZoneHVAC:EquipmentConnections object." );
 									ErrorsFound = true;
 								}
 								if ( ! FoundOutletNode ) {
-									ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\":" );
-									ShowContinueError( "The HPWH's air outlet node name = " + trim( cAlphaArgs( 8 ) ) + " was not properly specified " );
-									ShowContinueError( "as an inlet air node for zone = " + trim( cAlphaArgs( 13 ) ) + " in a " "ZoneHVAC:EquipmentConnections object." );
+									ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
+									ShowContinueError( "The HPWH's air outlet node name = " + cAlphaArgs( 8 ) + " was not properly specified " );
+									ShowContinueError( "as an inlet air node for zone = " + cAlphaArgs( 13 ) + " in a " "ZoneHVAC:EquipmentConnections object." );
 									ErrorsFound = true;
 								}
 							}
 						} else {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\":" );
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
 							ShowContinueError( "Heat pump water heater air inlet node name and air outlet node name must be" " listed in a ZoneHVAC:EquipmentConnections object when Inlet Air Configuration" " is equal to ZoneAirOnly or ZoneAndOutdoorAir." );
 							ErrorsFound = true;
 						}
@@ -1688,15 +1682,15 @@ namespace WaterThermalTanks {
 					if ( ! lAlphaFieldBlanks( 28 ) && HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempZoneAndOA ) {
 						HPWaterHeater( HPWaterHeaterNum ).InletAirMixerSchPtr = GetScheduleIndex( cAlphaArgs( 28 ) );
 						if ( HPWaterHeater( HPWaterHeaterNum ).InletAirMixerSchPtr == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\", not found" );
-							ShowContinueError( trim( cAlphaFieldNames( 28 ) ) + "=\"" + trim( cAlphaArgs( 28 ) ) + "\"," );
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", not found" );
+							ShowContinueError( cAlphaFieldNames( 28 ) + "=\"" + cAlphaArgs( 28 ) + "\"," );
 							ErrorsFound = true;
 						} else {
 							//           check schedule values to be between 0 and 1
 							ValidScheduleValue = CheckScheduleValueMinMax( HPWaterHeater( HPWaterHeaterNum ).InletAirMixerSchPtr, ">=", 0.0, "<=", 1.0 );
 							if ( ! ValidScheduleValue ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\", not found" );
-								ShowContinueError( trim( cAlphaFieldNames( 28 ) ) + " values out of range of 0 to 1, Schedule=\"" + trim( cAlphaArgs( 28 ) ) + "\"." );
+								ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", not found" );
+								ShowContinueError( cAlphaFieldNames( 28 ) + " values out of range of 0 to 1, Schedule=\"" + cAlphaArgs( 28 ) + "\"." );
 								ErrorsFound = true;
 							}
 							//           set outlet air splitter schedule index equal to inlet air mixer schedule index
@@ -1802,8 +1796,8 @@ namespace WaterThermalTanks {
 						} else if ( SELECT_CASE_var == "USEOUTLET" ) {
 							HPWaterHeater( HPWaterHeaterNum ).ControlSensorLocation = UseOutletHPWHControl;
 						} else {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "\", invalid " );
-							ShowContinueError( trim( cAlphaFieldNames( 29 ) ) + "=\"" + trim( cAlphaArgs( 29 ) ) + "\"." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", invalid " );
+							ShowContinueError( cAlphaFieldNames( 29 ) + "=\"" + cAlphaArgs( 29 ) + "\"." );
 							ErrorsFound = true;
 						}}
 
@@ -1812,7 +1806,7 @@ namespace WaterThermalTanks {
 				} // DO HPWaterHeaterNum = 1, NumHeatPumpWaterHeater
 
 				if ( ErrorsFound ) {
-					ShowFatalError( "Errors found in getting " + trim( cCurrentModuleObject ) + " input. Preceding condition causes termination." );
+					ShowFatalError( "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition causes termination." );
 				}
 
 			} //IF (NumHeatPumpWaterHeater > 0) THEN
@@ -1826,7 +1820,7 @@ namespace WaterThermalTanks {
 
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), WaterThermalTank.Name(), WaterThermalTankNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+					VerifyName( cAlphaArgs( 1 ), WaterThermalTank.Name(), WaterThermalTankNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1850,11 +1844,11 @@ namespace WaterThermalTanks {
 
 					WaterThermalTank( WaterThermalTankNum ).SetPointTempSchedule = GetScheduleIndex( cAlphaArgs( 2 ) );
 					if ( lAlphaFieldBlanks( 2 ) ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", missing data." );
-						ShowContinueError( "blank field, missing " + trim( cAlphaFieldNames( 2 ) ) + " is required" );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", missing data." );
+						ShowContinueError( "blank field, missing " + cAlphaFieldNames( 2 ) + " is required" );
 						ErrorsFound = true;
 					} else if ( WaterThermalTank( WaterThermalTankNum ).SetPointTempSchedule == 0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  " + trim( cAlphaFieldNames( 2 ) ) + " not found = " + trim( cAlphaArgs( 2 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  " + cAlphaFieldNames( 2 ) + " not found = " + cAlphaArgs( 2 ) );
 						ErrorsFound = true;
 					}
 
@@ -1876,7 +1870,7 @@ namespace WaterThermalTanks {
 					WaterThermalTank( WaterThermalTankNum ).MaxCapacity = rNumericArgs( 4 );
 
 					if ( ( rNumericArgs( 5 ) > WaterThermalTank( WaterThermalTankNum ).MaxCapacity ) && ( WaterThermalTank( WaterThermalTankNum ).MaxCapacity != AutoSize ) ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Heater Minimum Capacity cannot be greater than Heater Maximum Capacity" );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Heater Minimum Capacity cannot be greater than Heater Maximum Capacity" );
 						ErrorsFound = true;
 					} else {
 						WaterThermalTank( WaterThermalTankNum ).MinCapacity = rNumericArgs( 5 );
@@ -1896,7 +1890,7 @@ namespace WaterThermalTanks {
 						//CASE ('MODULATE WITH UNDERHEAT')  ! Not yet implemented
 
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Invalid Control Type entered=" + trim( cAlphaArgs( 3 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Invalid Control Type entered=" + cAlphaArgs( 3 ) );
 						ErrorsFound = true;
 					}}
 					WaterThermalTank( WaterThermalTankNum ).VolFlowRateMin = rNumericArgs( 6 );
@@ -1944,7 +1938,7 @@ namespace WaterThermalTanks {
 						WaterThermalTank( WaterThermalTankNum ).FuelType = "DistrictHeating";
 
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Invalid Heater Fuel Type entered=" + trim( cAlphaArgs( 4 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Invalid Heater Fuel Type entered=" + cAlphaArgs( 4 ) );
 						// Set to Electric to avoid errors when setting up output variables
 						WaterThermalTank( WaterThermalTankNum ).FuelType = "Electric";
 						ErrorsFound = true;
@@ -1953,20 +1947,20 @@ namespace WaterThermalTanks {
 					if ( rNumericArgs( 8 ) > 0.0 ) {
 						WaterThermalTank( WaterThermalTankNum ).Efficiency = rNumericArgs( 8 );
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Heater Thermal Efficiency must be greater than zero" );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Heater Thermal Efficiency must be greater than zero" );
 						ErrorsFound = true;
 					}
 
 					if ( cAlphaArgs( 5 ) != Blank ) {
 						WaterThermalTank( WaterThermalTankNum ).PLFCurve = GetCurveIndex( cAlphaArgs( 5 ) );
 						if ( WaterThermalTank( WaterThermalTankNum ).PLFCurve == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Part Load Factor curve not found = " + trim( cAlphaArgs( 5 ) ) );
+							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Part Load Factor curve not found = " + cAlphaArgs( 5 ) );
 							ErrorsFound = true;
 						} else {
 							ValidatePLFCurve( WaterThermalTank( WaterThermalTankNum ).PLFCurve, IsValid );
 
 							if ( ! IsValid ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Part Load Factor curve failed to evaluate to greater than zero for all numbers in the domain of 0 to 1" );
+								ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Part Load Factor curve failed to evaluate to greater than zero for all numbers in the domain of 0 to 1" );
 								ErrorsFound = true;
 							}
 						}
@@ -2016,7 +2010,7 @@ namespace WaterThermalTanks {
 						WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelType = "DistrictHeating";
 
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Invalid Off-Cycle Parasitic Fuel Type entered=" + trim( cAlphaArgs( 6 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Invalid Off-Cycle Parasitic Fuel Type entered=" + cAlphaArgs( 6 ) );
 						// Set to Electric to avoid errors when setting up output variables
 						WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelType = "Electric";
 						ErrorsFound = true;
@@ -2068,7 +2062,7 @@ namespace WaterThermalTanks {
 						WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelType = "DistrictHeating";
 
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Invalid On-Cycle Parasitic Fuel Type entered=" + trim( cAlphaArgs( 7 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Invalid On-Cycle Parasitic Fuel Type entered=" + cAlphaArgs( 7 ) );
 						// Set to Electric to avoid errors when setting up output variables
 						WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelType = "Electric";
 						ErrorsFound = true;
@@ -2081,7 +2075,7 @@ namespace WaterThermalTanks {
 						WaterThermalTank( WaterThermalTankNum ).AmbientTempIndicator = AmbientTempSchedule;
 						WaterThermalTank( WaterThermalTankNum ).AmbientTempSchedule = GetScheduleIndex( cAlphaArgs( 9 ) );
 						if ( WaterThermalTank( WaterThermalTankNum ).AmbientTempSchedule == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Ambient Temperature Schedule not found = " + trim( cAlphaArgs( 9 ) ) );
+							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Ambient Temperature Schedule not found = " + cAlphaArgs( 9 ) );
 							ErrorsFound = true;
 						}
 
@@ -2089,27 +2083,27 @@ namespace WaterThermalTanks {
 						WaterThermalTank( WaterThermalTankNum ).AmbientTempIndicator = AmbientTempZone;
 						WaterThermalTank( WaterThermalTankNum ).AmbientTempZone = FindItemInList( cAlphaArgs( 10 ), Zone.Name(), NumOfZones );
 						if ( WaterThermalTank( WaterThermalTankNum ).AmbientTempZone == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Ambient Temperature Zone not found = " + trim( cAlphaArgs( 10 ) ) );
+							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Ambient Temperature Zone not found = " + cAlphaArgs( 10 ) );
 							ErrorsFound = true;
 						}
 
 					} else if ( SELECT_CASE_var == "OUTDOORS" ) {
 						WaterThermalTank( WaterThermalTankNum ).AmbientTempIndicator = AmbientTempOutsideAir;
-						WaterThermalTank( WaterThermalTankNum ).AmbientTempOutsideAirNode = GetOnlySingleNode( cAlphaArgs( 11 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
-						if ( cAlphaArgs( 11 ) != " " ) {
+						WaterThermalTank( WaterThermalTankNum ).AmbientTempOutsideAirNode = GetOnlySingleNode( cAlphaArgs( 11 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
+						if ( cAlphaArgs( 11 ) != "" ) {
 							if ( ! CheckOutAirNodeNumber( WaterThermalTank( WaterThermalTankNum ).AmbientTempOutsideAirNode ) ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ": Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node" );
-								ShowContinueError( "...Referenced Node Name=" + trim( cAlphaArgs( 11 ) ) );
+								ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node" );
+								ShowContinueError( "...Referenced Node Name=" + cAlphaArgs( 11 ) );
 								ErrorsFound = true;
 							}
 						} else {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 							ShowContinueError( "An Ambient Outdoor Air Node name must be used when" " the Ambient Temperature Indicator is Outdoors." );
 							ErrorsFound = true;
 						}
 
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Invalid Ambient Temperature Indicator entered=" + trim( cAlphaArgs( 8 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Invalid Ambient Temperature Indicator entered=" + cAlphaArgs( 8 ) );
 						ShowContinueError( " Valid entries are SCHEDULE, ZONE, and OUTDOORS." );
 						ErrorsFound = true;
 					}}
@@ -2126,7 +2120,7 @@ namespace WaterThermalTanks {
 						if ( cAlphaArgs( 12 ) != Blank ) {
 							WaterThermalTank( WaterThermalTankNum ).FlowRateSchedule = GetScheduleIndex( cAlphaArgs( 12 ) );
 							if ( WaterThermalTank( WaterThermalTankNum ).FlowRateSchedule == 0 ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Flow Rate Schedule not found = " + trim( cAlphaArgs( 12 ) ) );
+								ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Flow Rate Schedule not found = " + cAlphaArgs( 12 ) );
 								ErrorsFound = true;
 							}
 						}
@@ -2135,14 +2129,14 @@ namespace WaterThermalTanks {
 					if ( cAlphaArgs( 13 ) != Blank ) {
 						WaterThermalTank( WaterThermalTankNum ).UseInletTempSchedule = GetScheduleIndex( cAlphaArgs( 13 ) );
 						if ( WaterThermalTank( WaterThermalTankNum ).UseInletTempSchedule == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Cold Water Supply Temperature Schedule not found = " + trim( cAlphaArgs( 13 ) ) );
+							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Cold Water Supply Temperature Schedule not found = " + cAlphaArgs( 13 ) );
 							ErrorsFound = true;
 						}
 					}
 
 					if ( NumNums > 17 ) {
 						if ( ( rNumericArgs( 18 ) > 1 ) || ( rNumericArgs( 18 ) < 0 ) ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Use Side Effectiveness is out of bounds (0 to 1)" );
+							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Use Side Effectiveness is out of bounds (0 to 1)" );
 							ErrorsFound = true;
 						}
 						WaterThermalTank( WaterThermalTankNum ).UseEffectiveness = rNumericArgs( 18 );
@@ -2151,7 +2145,7 @@ namespace WaterThermalTanks {
 					}
 
 					if ( ( rNumericArgs( 19 ) > 1 ) || ( rNumericArgs( 19 ) < 0 ) ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Source Side Effectiveness is out of bounds (0 to 1)" );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Source Side Effectiveness is out of bounds (0 to 1)" );
 						ErrorsFound = true;
 					}
 					WaterThermalTank( WaterThermalTankNum ).SourceEffectiveness = rNumericArgs( 19 );
@@ -2182,28 +2176,28 @@ namespace WaterThermalTanks {
 					}
 
 					if ( ( cAlphaArgs( 14 ) != Blank ) || ( cAlphaArgs( 15 ) != Blank ) ) {
-						WaterThermalTank( WaterThermalTankNum ).UseInletNode = GetOnlySingleNode( cAlphaArgs( 14 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+						WaterThermalTank( WaterThermalTankNum ).UseInletNode = GetOnlySingleNode( cAlphaArgs( 14 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 						WHSaveNodeNames( WaterThermalTankNum ).InletNodeName1 = cAlphaArgs( 14 );
-						WaterThermalTank( WaterThermalTankNum ).UseOutletNode = GetOnlySingleNode( cAlphaArgs( 15 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+						WaterThermalTank( WaterThermalTankNum ).UseOutletNode = GetOnlySingleNode( cAlphaArgs( 15 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 						WHSaveNodeNames( WaterThermalTankNum ).OutletNodeName1 = cAlphaArgs( 15 );
 
 						if ( rNumericArgs( 17 ) > 0 ) {
-							ShowWarningError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Use side nodes are specified; Peak Volumetric Use Flow Rate will not be used" );
+							ShowWarningError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Use side nodes are specified; Peak Volumetric Use Flow Rate will not be used" );
 						}
 
 						if ( WaterThermalTank( WaterThermalTankNum ).FlowRateSchedule > 0 ) {
-							ShowWarningError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Use side nodes are specified; Use Flow Rate Fraction Schedule will not be used" );
+							ShowWarningError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Use side nodes are specified; Use Flow Rate Fraction Schedule will not be used" );
 						}
 
 						if ( WaterThermalTank( WaterThermalTankNum ).UseInletTempSchedule > 0 ) {
-							ShowWarningError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Use side nodes are specified; Cold Water Supply Temperature Schedule will not be used" );
+							ShowWarningError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Use side nodes are specified; Cold Water Supply Temperature Schedule will not be used" );
 						}
 					}
 
 					if ( ( cAlphaArgs( 16 ) != Blank ) || ( cAlphaArgs( 17 ) != Blank ) ) {
-						WaterThermalTank( WaterThermalTankNum ).SourceInletNode = GetOnlySingleNode( cAlphaArgs( 16 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+						WaterThermalTank( WaterThermalTankNum ).SourceInletNode = GetOnlySingleNode( cAlphaArgs( 16 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
 						WHSaveNodeNames( WaterThermalTankNum ).InletNodeName2 = cAlphaArgs( 16 );
-						WaterThermalTank( WaterThermalTankNum ).SourceOutletNode = GetOnlySingleNode( cAlphaArgs( 17 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+						WaterThermalTank( WaterThermalTankNum ).SourceOutletNode = GetOnlySingleNode( cAlphaArgs( 17 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 						WHSaveNodeNames( WaterThermalTankNum ).OutletNodeName2 = cAlphaArgs( 17 );
 
 					}
@@ -2217,7 +2211,7 @@ namespace WaterThermalTanks {
 						} else if ( SELECT_CASE_var == "INDIRECTHEATALTERNATESETPOINT" ) {
 							WaterThermalTank( WaterThermalTankNum ).SourceSideControlMode = SourceSideIndirectHeatAltSetpoint;
 						} else {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Invalid Control Mode entered=" + trim( cAlphaArgs( 18 ) ) );
+							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Invalid Control Mode entered=" + cAlphaArgs( 18 ) );
 							ErrorsFound = true;
 						}}
 					} else {
@@ -2227,7 +2221,7 @@ namespace WaterThermalTanks {
 					if ( ! lAlphaFieldBlanks( 19 ) ) {
 						WaterThermalTank( WaterThermalTankNum ).SourceSideAltSetpointSchedNum = GetScheduleIndex( cAlphaArgs( 19 ) );
 						if ( WaterThermalTank( WaterThermalTankNum ).SourceSideAltSetpointSchedNum == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  " + trim( cAlphaFieldNames( 19 ) ) + " not found = " + trim( cAlphaArgs( 19 ) ) );
+							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  " + cAlphaFieldNames( 19 ) + " not found = " + cAlphaArgs( 19 ) );
 							ErrorsFound = true;
 						}
 					}
@@ -2235,7 +2229,7 @@ namespace WaterThermalTanks {
 				} // WaterThermalTankNum
 
 				if ( ErrorsFound ) {
-					ShowFatalError( "Errors found in getting " + trim( cCurrentModuleObject ) + " input. Preceding condition causes termination." );
+					ShowFatalError( "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition causes termination." );
 				}
 
 			}
@@ -2250,7 +2244,7 @@ namespace WaterThermalTanks {
 
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), WaterThermalTank.Name(), WaterThermalTankNum - NumWaterHeaterMixed - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+					VerifyName( cAlphaArgs( 1 ), WaterThermalTank.Name(), WaterThermalTankNum - NumWaterHeaterMixed - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2282,12 +2276,12 @@ namespace WaterThermalTanks {
 						if ( rNumericArgs( 3 ) > 0.0 ) {
 							WaterThermalTank( WaterThermalTankNum ).Perimeter = rNumericArgs( 3 );
 						} else {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Tank Perimeter must be greater than zero for Tank Shape=OTHER" );
+							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Tank Perimeter must be greater than zero for Tank Shape=OTHER" );
 							ErrorsFound = true;
 						}
 
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Invalid Tank Shape entered=" + trim( cAlphaArgs( 3 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Invalid Tank Shape entered=" + cAlphaArgs( 3 ) );
 						WaterThermalTank( WaterThermalTankNum ).Shape = TankShapeVertCylinder;
 						ErrorsFound = true;
 					}}
@@ -2308,17 +2302,17 @@ namespace WaterThermalTanks {
 						WaterThermalTank( WaterThermalTankNum ).ControlType = PrioritySimultaneous;
 
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Invalid Heater Priority Control entered=" + trim( cAlphaArgs( 4 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Invalid Heater Priority Control entered=" + cAlphaArgs( 4 ) );
 						ErrorsFound = true;
 					}}
 
 					WaterThermalTank( WaterThermalTankNum ).SetPointTempSchedule = GetScheduleIndex( cAlphaArgs( 5 ) );
 					if ( lAlphaFieldBlanks( 5 ) ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", missing data." );
-						ShowContinueError( "blank field, missing " + trim( cAlphaFieldNames( 5 ) ) + " is required" );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", missing data." );
+						ShowContinueError( "blank field, missing " + cAlphaFieldNames( 5 ) + " is required" );
 						ErrorsFound = true;
 					} else if ( WaterThermalTank( WaterThermalTankNum ).SetPointTempSchedule == 0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ": " + trim( cAlphaFieldNames( 5 ) ) + " not found = " + trim( cAlphaArgs( 5 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": " + cAlphaFieldNames( 5 ) + " not found = " + cAlphaArgs( 5 ) );
 						ErrorsFound = true;
 					}
 
@@ -2334,19 +2328,19 @@ namespace WaterThermalTanks {
 
 					//Test if Heater height is within range
 					if ( ( WaterThermalTank( WaterThermalTankNum ).Height != AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).HeaterHeight1 > WaterThermalTank( WaterThermalTankNum ).Height ) ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ": Heater 1 is located higher than overall tank height." );
-						ShowContinueError( trim( cNumericFieldNames( 2 ) ) + " = " + trim( RoundSigDigits( rNumericArgs( 2 ), 4 ) ) );
-						ShowContinueError( trim( cNumericFieldNames( 7 ) ) + " = " + trim( RoundSigDigits( rNumericArgs( 7 ), 4 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": Heater 1 is located higher than overall tank height." );
+						ShowContinueError( cNumericFieldNames( 2 ) + " = " + RoundSigDigits( rNumericArgs( 2 ), 4 ) );
+						ShowContinueError( cNumericFieldNames( 7 ) + " = " + RoundSigDigits( rNumericArgs( 7 ), 4 ) );
 						ErrorsFound = true;
 					}
 
 					WaterThermalTank( WaterThermalTankNum ).SetPointTempSchedule2 = GetScheduleIndex( cAlphaArgs( 6 ) );
 					if ( lAlphaFieldBlanks( 6 ) ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", missing data." );
-						ShowContinueError( "blank field, missing " + trim( cAlphaFieldNames( 6 ) ) + " is required" );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", missing data." );
+						ShowContinueError( "blank field, missing " + cAlphaFieldNames( 6 ) + " is required" );
 						ErrorsFound = true;
 					} else if ( WaterThermalTank( WaterThermalTankNum ).SetPointTempSchedule2 == 0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  " + trim( cAlphaFieldNames( 6 ) ) + " not found = " + trim( cAlphaArgs( 6 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  " + cAlphaFieldNames( 6 ) + " not found = " + cAlphaArgs( 6 ) );
 						ErrorsFound = true;
 					}
 
@@ -2362,9 +2356,9 @@ namespace WaterThermalTanks {
 
 					//Test if Heater height is within range
 					if ( ( WaterThermalTank( WaterThermalTankNum ).Height != AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).HeaterHeight2 > WaterThermalTank( WaterThermalTankNum ).Height ) ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ": Heater 2 is located higher than overall tank height." );
-						ShowContinueError( trim( cNumericFieldNames( 2 ) ) + " = " + trim( RoundSigDigits( rNumericArgs( 2 ), 4 ) ) );
-						ShowContinueError( trim( cNumericFieldNames( 10 ) ) + " = " + trim( RoundSigDigits( rNumericArgs( 10 ), 4 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": Heater 2 is located higher than overall tank height." );
+						ShowContinueError( cNumericFieldNames( 2 ) + " = " + RoundSigDigits( rNumericArgs( 2 ), 4 ) );
+						ShowContinueError( cNumericFieldNames( 10 ) + " = " + RoundSigDigits( rNumericArgs( 10 ), 4 ) );
 						ErrorsFound = true;
 					}
 
@@ -2407,7 +2401,7 @@ namespace WaterThermalTanks {
 						WaterThermalTank( WaterThermalTankNum ).FuelType = "DistrictHeating";
 
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Invalid Heater Fuel Type entered=" + trim( cAlphaArgs( 7 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Invalid Heater Fuel Type entered=" + cAlphaArgs( 7 ) );
 						// Set to Electric to avoid errors when setting up output variables
 						WaterThermalTank( WaterThermalTankNum ).FuelType = "Electric";
 						ErrorsFound = true;
@@ -2416,7 +2410,7 @@ namespace WaterThermalTanks {
 					if ( rNumericArgs( 11 ) > 0.0 ) {
 						WaterThermalTank( WaterThermalTankNum ).Efficiency = rNumericArgs( 11 );
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Heater Thermal Efficiency must be greater than zero" );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Heater Thermal Efficiency must be greater than zero" );
 						ErrorsFound = true;
 					}
 
@@ -2464,7 +2458,7 @@ namespace WaterThermalTanks {
 						WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelType = "DistrictHeating";
 
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Invalid Off-Cycle Parasitic Fuel Type entered=" + trim( cAlphaArgs( 8 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Invalid Off-Cycle Parasitic Fuel Type entered=" + cAlphaArgs( 8 ) );
 						// Set to Electric to avoid errors when setting up output variables
 						WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelType = "Electric";
 						ErrorsFound = true;
@@ -2517,7 +2511,7 @@ namespace WaterThermalTanks {
 						WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelType = "DistrictHeating";
 
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Invalid On-Cycle Parasitic Fuel Type entered=" + trim( cAlphaArgs( 9 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Invalid On-Cycle Parasitic Fuel Type entered=" + cAlphaArgs( 9 ) );
 						// Set to Electric to avoid errors when setting up output variables
 						WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelType = "Electric";
 						ErrorsFound = true;
@@ -2531,7 +2525,7 @@ namespace WaterThermalTanks {
 						WaterThermalTank( WaterThermalTankNum ).AmbientTempIndicator = AmbientTempSchedule;
 						WaterThermalTank( WaterThermalTankNum ).AmbientTempSchedule = GetScheduleIndex( cAlphaArgs( 11 ) );
 						if ( WaterThermalTank( WaterThermalTankNum ).AmbientTempSchedule == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Ambient Temperature Schedule not found = " + trim( cAlphaArgs( 11 ) ) );
+							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Ambient Temperature Schedule not found = " + cAlphaArgs( 11 ) );
 							ErrorsFound = true;
 						}
 
@@ -2539,27 +2533,27 @@ namespace WaterThermalTanks {
 						WaterThermalTank( WaterThermalTankNum ).AmbientTempIndicator = AmbientTempZone;
 						WaterThermalTank( WaterThermalTankNum ).AmbientTempZone = FindItemInList( cAlphaArgs( 12 ), Zone.Name(), NumOfZones );
 						if ( WaterThermalTank( WaterThermalTankNum ).AmbientTempZone == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Ambient Temperature Zone not found = " + trim( cAlphaArgs( 12 ) ) );
+							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Ambient Temperature Zone not found = " + cAlphaArgs( 12 ) );
 							ErrorsFound = true;
 						}
 
 					} else if ( SELECT_CASE_var == "OUTDOORS" ) {
 						WaterThermalTank( WaterThermalTankNum ).AmbientTempIndicator = AmbientTempOutsideAir;
-						WaterThermalTank( WaterThermalTankNum ).AmbientTempOutsideAirNode = GetOnlySingleNode( cAlphaArgs( 13 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-						if ( cAlphaArgs( 13 ) != " " ) {
+						WaterThermalTank( WaterThermalTankNum ).AmbientTempOutsideAirNode = GetOnlySingleNode( cAlphaArgs( 13 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+						if ( cAlphaArgs( 13 ) != "" ) {
 							if ( ! CheckOutAirNodeNumber( WaterThermalTank( WaterThermalTankNum ).AmbientTempOutsideAirNode ) ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ": Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node" );
-								ShowContinueError( "...Referenced Node Name=" + trim( cAlphaArgs( 13 ) ) );
+								ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node" );
+								ShowContinueError( "...Referenced Node Name=" + cAlphaArgs( 13 ) );
 								ErrorsFound = true;
 							}
 						} else {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 							ShowContinueError( "An Ambient Outdoor Air Node name must be used when" " the Ambient Temperature Indicator is Outdoors." );
 							ErrorsFound = true;
 						}
 
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Invalid Ambient Temperature Indicator entered=" + trim( cAlphaArgs( 10 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Invalid Ambient Temperature Indicator entered=" + cAlphaArgs( 10 ) );
 						ShowContinueError( " Valid entries are Schedule, Zone, and Outdoors." );
 						ErrorsFound = true;
 					}}
@@ -2577,7 +2571,7 @@ namespace WaterThermalTanks {
 						if ( cAlphaArgs( 14 ) != Blank ) {
 							WaterThermalTank( WaterThermalTankNum ).FlowRateSchedule = GetScheduleIndex( cAlphaArgs( 14 ) );
 							if ( WaterThermalTank( WaterThermalTankNum ).FlowRateSchedule == 0 ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Flow Rate Schedule not found = " + trim( cAlphaArgs( 14 ) ) );
+								ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Flow Rate Schedule not found = " + cAlphaArgs( 14 ) );
 								ErrorsFound = true;
 							}
 						}
@@ -2586,7 +2580,7 @@ namespace WaterThermalTanks {
 					if ( cAlphaArgs( 15 ) != Blank ) {
 						WaterThermalTank( WaterThermalTankNum ).UseInletTempSchedule = GetScheduleIndex( cAlphaArgs( 15 ) );
 						if ( WaterThermalTank( WaterThermalTankNum ).UseInletTempSchedule == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Cold Water Supply Temperature Schedule not found = " + trim( cAlphaArgs( 15 ) ) );
+							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Cold Water Supply Temperature Schedule not found = " + cAlphaArgs( 15 ) );
 							ErrorsFound = true;
 						}
 					}
@@ -2604,9 +2598,9 @@ namespace WaterThermalTanks {
 						WaterThermalTank( WaterThermalTankNum ).UseInletHeight = 0.0;
 					}
 					if ( ( WaterThermalTank( WaterThermalTankNum ).Height != AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).UseInletHeight > WaterThermalTank( WaterThermalTankNum ).Height ) ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ": Use inlet is located higher than overall tank height." );
-						ShowContinueError( trim( cNumericFieldNames( 2 ) ) + " = " + trim( RoundSigDigits( rNumericArgs( 2 ), 4 ) ) );
-						ShowContinueError( trim( cNumericFieldNames( 24 ) ) + " = " + trim( RoundSigDigits( rNumericArgs( 24 ), 4 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": Use inlet is located higher than overall tank height." );
+						ShowContinueError( cNumericFieldNames( 2 ) + " = " + RoundSigDigits( rNumericArgs( 2 ), 4 ) );
+						ShowContinueError( cNumericFieldNames( 24 ) + " = " + RoundSigDigits( rNumericArgs( 24 ), 4 ) );
 						ErrorsFound = true;
 					}
 
@@ -2617,9 +2611,9 @@ namespace WaterThermalTanks {
 						WaterThermalTank( WaterThermalTankNum ).UseOutletHeight = WaterThermalTank( WaterThermalTankNum ).Height;
 					}
 					if ( ( WaterThermalTank( WaterThermalTankNum ).Height != AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).UseOutletHeight > WaterThermalTank( WaterThermalTankNum ).Height ) ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ": Use outlet is located higher than overall tank height." );
-						ShowContinueError( trim( cNumericFieldNames( 2 ) ) + " = " + trim( RoundSigDigits( rNumericArgs( 2 ), 4 ) ) );
-						ShowContinueError( trim( cNumericFieldNames( 25 ) ) + " = " + trim( RoundSigDigits( rNumericArgs( 25 ), 4 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": Use outlet is located higher than overall tank height." );
+						ShowContinueError( cNumericFieldNames( 2 ) + " = " + RoundSigDigits( rNumericArgs( 2 ), 4 ) );
+						ShowContinueError( cNumericFieldNames( 25 ) + " = " + RoundSigDigits( rNumericArgs( 25 ), 4 ) );
 						ErrorsFound = true;
 					}
 
@@ -2636,9 +2630,9 @@ namespace WaterThermalTanks {
 						WaterThermalTank( WaterThermalTankNum ).SourceInletHeight = WaterThermalTank( WaterThermalTankNum ).Height;
 					}
 					if ( ( WaterThermalTank( WaterThermalTankNum ).Height != AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).SourceInletHeight > WaterThermalTank( WaterThermalTankNum ).Height ) ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ": Source inlet is located higher than overall tank height." );
-						ShowContinueError( trim( cNumericFieldNames( 2 ) ) + " = " + trim( RoundSigDigits( rNumericArgs( 2 ), 4 ) ) );
-						ShowContinueError( trim( cNumericFieldNames( 27 ) ) + " = " + trim( RoundSigDigits( rNumericArgs( 27 ), 4 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": Source inlet is located higher than overall tank height." );
+						ShowContinueError( cNumericFieldNames( 2 ) + " = " + RoundSigDigits( rNumericArgs( 2 ), 4 ) );
+						ShowContinueError( cNumericFieldNames( 27 ) + " = " + RoundSigDigits( rNumericArgs( 27 ), 4 ) );
 						ErrorsFound = true;
 					}
 
@@ -2649,9 +2643,9 @@ namespace WaterThermalTanks {
 						WaterThermalTank( WaterThermalTankNum ).SourceOutletHeight = 0.0;
 					}
 					if ( ( WaterThermalTank( WaterThermalTankNum ).Height != AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).SourceOutletHeight > WaterThermalTank( WaterThermalTankNum ).Height ) ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ": Source outlet is located higher than overall tank height." );
-						ShowContinueError( trim( cNumericFieldNames( 2 ) ) + " = " + trim( RoundSigDigits( rNumericArgs( 2 ), 4 ) ) );
-						ShowContinueError( trim( cNumericFieldNames( 28 ) ) + " = " + trim( RoundSigDigits( rNumericArgs( 28 ), 4 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": Source outlet is located higher than overall tank height." );
+						ShowContinueError( cNumericFieldNames( 2 ) + " = " + RoundSigDigits( rNumericArgs( 2 ), 4 ) );
+						ShowContinueError( cNumericFieldNames( 28 ) + " = " + RoundSigDigits( rNumericArgs( 28 ), 4 ) );
 						ErrorsFound = true;
 					}
 
@@ -2681,28 +2675,28 @@ namespace WaterThermalTanks {
 					WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopSide = DemandSupply_No;
 
 					if ( ( cAlphaArgs( 16 ) != Blank ) || ( cAlphaArgs( 17 ) != Blank ) ) {
-						WaterThermalTank( WaterThermalTankNum ).UseInletNode = GetOnlySingleNode( cAlphaArgs( 16 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+						WaterThermalTank( WaterThermalTankNum ).UseInletNode = GetOnlySingleNode( cAlphaArgs( 16 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 						WHSaveNodeNames( WaterThermalTankNum ).InletNodeName1 = cAlphaArgs( 16 );
-						WaterThermalTank( WaterThermalTankNum ).UseOutletNode = GetOnlySingleNode( cAlphaArgs( 17 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+						WaterThermalTank( WaterThermalTankNum ).UseOutletNode = GetOnlySingleNode( cAlphaArgs( 17 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 						WHSaveNodeNames( WaterThermalTankNum ).OutletNodeName1 = cAlphaArgs( 17 );
 
 						if ( rNumericArgs( 22 ) > 0 ) {
-							ShowWarningError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Use side nodes are specified; Peak Volumetric Use Flow Rate will not be used" );
+							ShowWarningError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Use side nodes are specified; Peak Volumetric Use Flow Rate will not be used" );
 						}
 
 						if ( WaterThermalTank( WaterThermalTankNum ).FlowRateSchedule > 0 ) {
-							ShowWarningError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Use side nodes are specified; Use Flow Rate Fraction Schedule will not be used" );
+							ShowWarningError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Use side nodes are specified; Use Flow Rate Fraction Schedule will not be used" );
 						}
 
 						if ( WaterThermalTank( WaterThermalTankNum ).UseInletTempSchedule > 0 ) {
-							ShowWarningError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Use side nodes are specified; Cold Water Supply Temperature Schedule will not be used" );
+							ShowWarningError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Use side nodes are specified; Cold Water Supply Temperature Schedule will not be used" );
 						}
 					}
 
 					if ( ( cAlphaArgs( 18 ) != Blank ) || ( cAlphaArgs( 19 ) != Blank ) ) {
-						WaterThermalTank( WaterThermalTankNum ).SourceInletNode = GetOnlySingleNode( cAlphaArgs( 18 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+						WaterThermalTank( WaterThermalTankNum ).SourceInletNode = GetOnlySingleNode( cAlphaArgs( 18 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
 						WHSaveNodeNames( WaterThermalTankNum ).InletNodeName2 = cAlphaArgs( 18 );
-						WaterThermalTank( WaterThermalTankNum ).SourceOutletNode = GetOnlySingleNode( cAlphaArgs( 19 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+						WaterThermalTank( WaterThermalTankNum ).SourceOutletNode = GetOnlySingleNode( cAlphaArgs( 19 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 						WHSaveNodeNames( WaterThermalTankNum ).OutletNodeName2 = cAlphaArgs( 19 );
 
 					}
@@ -2730,7 +2724,7 @@ namespace WaterThermalTanks {
 					}
 
 					if ( NumNums > 33 + WaterThermalTank( WaterThermalTankNum ).Nodes ) {
-						ShowWarningError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  More Additional Loss Coefficients were entered than the number of nodes; extra coefficients will not be used" );
+						ShowWarningError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  More Additional Loss Coefficients were entered than the number of nodes; extra coefficients will not be used" );
 					}
 
 					SetupStratifiedNodes( WaterThermalTankNum );
@@ -2744,7 +2738,7 @@ namespace WaterThermalTanks {
 						} else if ( SELECT_CASE_var == "INDIRECTHEATALTERNATESETPOINT" ) {
 							WaterThermalTank( WaterThermalTankNum ).SourceSideControlMode = SourceSideIndirectHeatAltSetpoint;
 						} else {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Invalid Control Mode entered=" + trim( cAlphaArgs( 21 ) ) );
+							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Invalid Control Mode entered=" + cAlphaArgs( 21 ) );
 							ErrorsFound = true;
 						}}
 					} else {
@@ -2754,7 +2748,7 @@ namespace WaterThermalTanks {
 					if ( ! lAlphaFieldBlanks( 22 ) ) {
 						WaterThermalTank( WaterThermalTankNum ).SourceSideAltSetpointSchedNum = GetScheduleIndex( cAlphaArgs( 22 ) );
 						if ( WaterThermalTank( WaterThermalTankNum ).SourceSideAltSetpointSchedNum == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  " + trim( cAlphaFieldNames( 22 ) ) + " not found = " + trim( cAlphaArgs( 22 ) ) );
+							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  " + cAlphaFieldNames( 22 ) + " not found = " + cAlphaArgs( 22 ) );
 							ErrorsFound = true;
 						}
 					}
@@ -2762,7 +2756,7 @@ namespace WaterThermalTanks {
 				} // WaterThermalTankNum
 
 				if ( ErrorsFound ) {
-					ShowFatalError( "Errors found in getting " + trim( cCurrentModuleObject ) + " input. Preceding condition causes termination." );
+					ShowFatalError( "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition causes termination." );
 				}
 
 			}
@@ -2776,7 +2770,7 @@ namespace WaterThermalTanks {
 
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), WaterThermalTank.Name(), WaterThermalTankNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+					VerifyName( cAlphaArgs( 1 ), WaterThermalTank.Name(), WaterThermalTankNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2795,8 +2789,8 @@ namespace WaterThermalTanks {
 
 					WaterThermalTank( WaterThermalTankNum ).SetPointTempSchedule = GetScheduleIndex( cAlphaArgs( 2 ) );
 					if ( WaterThermalTank( WaterThermalTankNum ).SetPointTempSchedule == 0 ) {
-						ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid, " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 
 						ErrorsFound = true;
 					}
@@ -2836,8 +2830,8 @@ namespace WaterThermalTanks {
 						WaterThermalTank( WaterThermalTankNum ).AmbientTempIndicator = AmbientTempSchedule;
 						WaterThermalTank( WaterThermalTankNum ).AmbientTempSchedule = GetScheduleIndex( cAlphaArgs( 4 ) );
 						if ( WaterThermalTank( WaterThermalTankNum ).AmbientTempSchedule == 0 ) {
-							ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 4 ) ) + " = " + trim( cAlphaArgs( 4 ) ) );
-							ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+							ShowSevereError( "Invalid, " + cAlphaFieldNames( 4 ) + " = " + cAlphaArgs( 4 ) );
+							ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 							ShowContinueError( "Schedule was not found." );
 							ErrorsFound = true;
 						}
@@ -2846,30 +2840,30 @@ namespace WaterThermalTanks {
 						WaterThermalTank( WaterThermalTankNum ).AmbientTempIndicator = AmbientTempZone;
 						WaterThermalTank( WaterThermalTankNum ).AmbientTempZone = FindItemInList( cAlphaArgs( 5 ), Zone.Name(), NumOfZones );
 						if ( WaterThermalTank( WaterThermalTankNum ).AmbientTempZone == 0 ) {
-							ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 5 ) ) + " = " + trim( cAlphaArgs( 5 ) ) );
-							ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+							ShowSevereError( "Invalid, " + cAlphaFieldNames( 5 ) + " = " + cAlphaArgs( 5 ) );
+							ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 							ShowContinueError( "Zone was not found." );
 							ErrorsFound = true;
 						}
 
 					} else if ( SELECT_CASE_var == "OUTDOORS" ) {
 						WaterThermalTank( WaterThermalTankNum ).AmbientTempIndicator = AmbientTempOutsideAir;
-						WaterThermalTank( WaterThermalTankNum ).AmbientTempOutsideAirNode = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
+						WaterThermalTank( WaterThermalTankNum ).AmbientTempOutsideAirNode = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
 						if ( ! lAlphaFieldBlanks( 6 ) ) {
 							if ( ! CheckOutAirNodeNumber( WaterThermalTank( WaterThermalTankNum ).AmbientTempOutsideAirNode ) ) {
-								ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 6 ) ) + " = " + trim( cAlphaArgs( 6 ) ) );
-								ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+								ShowSevereError( "Invalid, " + cAlphaFieldNames( 6 ) + " = " + cAlphaArgs( 6 ) );
+								ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 								ShowContinueError( "Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node" );
 								ErrorsFound = true;
 							}
 						} else {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 							ShowContinueError( "An Ambient Outdoor Air Node name must be used when" " the Ambient Temperature Indicator is Outdoors." );
 							ErrorsFound = true;
 						}
 
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Invalid Ambient Temperature Indicator entered=" + trim( cAlphaArgs( 3 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Invalid Ambient Temperature Indicator entered=" + cAlphaArgs( 3 ) );
 						ShowContinueError( " Valid entries are Schedule, Zone, and Outdoors." );
 						ErrorsFound = true;
 					}}
@@ -2889,13 +2883,13 @@ namespace WaterThermalTanks {
 					WaterThermalTank( WaterThermalTankNum ).UseSideAvailSchedNum = ScheduleAlwaysOn;
 
 					if ( ( rNumericArgs( 6 ) > 1 ) || ( rNumericArgs( 6 ) < 0 ) ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Use Side Effectiveness is out of bounds (0 to 1)" );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Use Side Effectiveness is out of bounds (0 to 1)" );
 						ErrorsFound = true;
 					}
 					WaterThermalTank( WaterThermalTankNum ).UseEffectiveness = rNumericArgs( 6 );
 
 					if ( ( rNumericArgs( 8 ) > 1 ) || ( rNumericArgs( 8 ) < 0 ) ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Source Side Effectiveness is out of bounds (0 to 1)" );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Source Side Effectiveness is out of bounds (0 to 1)" );
 						ErrorsFound = true;
 					}
 					WaterThermalTank( WaterThermalTankNum ).SourceEffectiveness = rNumericArgs( 8 );
@@ -2913,8 +2907,8 @@ namespace WaterThermalTanks {
 					} else {
 						WaterThermalTank( WaterThermalTankNum ).UseSideAvailSchedNum = GetScheduleIndex( cAlphaArgs( 9 ) );
 						if ( WaterThermalTank( WaterThermalTankNum ).UseSideAvailSchedNum == 0 ) {
-							ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 9 ) ) + " = " + trim( cAlphaArgs( 9 ) ) );
-							ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+							ShowSevereError( "Invalid, " + cAlphaFieldNames( 9 ) + " = " + cAlphaArgs( 9 ) );
+							ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 							ShowContinueError( "Schedule was not found." );
 							ErrorsFound = true;
 						}
@@ -2933,8 +2927,8 @@ namespace WaterThermalTanks {
 					} else {
 						WaterThermalTank( WaterThermalTankNum ).SourceSideAvailSchedNum = GetScheduleIndex( cAlphaArgs( 12 ) );
 						if ( WaterThermalTank( WaterThermalTankNum ).SourceSideAvailSchedNum == 0 ) {
-							ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 12 ) ) + " = " + trim( cAlphaArgs( 12 ) ) );
-							ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+							ShowSevereError( "Invalid, " + cAlphaFieldNames( 12 ) + " = " + cAlphaArgs( 12 ) );
+							ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 							ShowContinueError( "Schedule was not found." );
 							ErrorsFound = true;
 						}
@@ -2946,17 +2940,17 @@ namespace WaterThermalTanks {
 					}
 
 					if ( ( ! lAlphaFieldBlanks( 7 ) ) || ( ! lAlphaFieldBlanks( 8 ) ) ) {
-						WaterThermalTank( WaterThermalTankNum ).UseInletNode = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+						WaterThermalTank( WaterThermalTankNum ).UseInletNode = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 						WHSaveNodeNames( WaterThermalTankNum ).InletNodeName1 = cAlphaArgs( 7 );
-						WaterThermalTank( WaterThermalTankNum ).UseOutletNode = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+						WaterThermalTank( WaterThermalTankNum ).UseOutletNode = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 						WHSaveNodeNames( WaterThermalTankNum ).OutletNodeName1 = cAlphaArgs( 8 );
 
 					}
 
 					if ( ( ! lAlphaFieldBlanks( 10 ) ) || ( ! lAlphaFieldBlanks( 11 ) ) ) {
-						WaterThermalTank( WaterThermalTankNum ).SourceInletNode = GetOnlySingleNode( cAlphaArgs( 10 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+						WaterThermalTank( WaterThermalTankNum ).SourceInletNode = GetOnlySingleNode( cAlphaArgs( 10 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
 						WHSaveNodeNames( WaterThermalTankNum ).InletNodeName2 = cAlphaArgs( 10 );
-						WaterThermalTank( WaterThermalTankNum ).SourceOutletNode = GetOnlySingleNode( cAlphaArgs( 11 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+						WaterThermalTank( WaterThermalTankNum ).SourceOutletNode = GetOnlySingleNode( cAlphaArgs( 11 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 						WHSaveNodeNames( WaterThermalTankNum ).OutletNodeName2 = cAlphaArgs( 11 );
 
 					}
@@ -2968,7 +2962,7 @@ namespace WaterThermalTanks {
 				} // WaterThermalTankNum
 
 				if ( ErrorsFound ) {
-					ShowFatalError( "Errors found in getting " + trim( cCurrentModuleObject ) + " input. Preceding condition causes termination." );
+					ShowFatalError( "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition causes termination." );
 				}
 
 			}
@@ -2985,7 +2979,7 @@ namespace WaterThermalTanks {
 
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), WaterThermalTank.Name(), WaterThermalTankNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+					VerifyName( cAlphaArgs( 1 ), WaterThermalTank.Name(), WaterThermalTankNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -3013,12 +3007,12 @@ namespace WaterThermalTanks {
 						if ( rNumericArgs( 3 ) > 0.0 ) {
 							WaterThermalTank( WaterThermalTankNum ).Perimeter = rNumericArgs( 3 );
 						} else {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Tank Perimeter must be greater than zero for Tank Shape=OTHER" );
+							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Tank Perimeter must be greater than zero for Tank Shape=OTHER" );
 							ErrorsFound = true;
 						}
 
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Invalid Tank Shape entered=" + trim( cAlphaArgs( 2 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Invalid Tank Shape entered=" + cAlphaArgs( 2 ) );
 						WaterThermalTank( WaterThermalTankNum ).Shape = TankShapeVertCylinder;
 						ErrorsFound = true;
 					}}
@@ -3032,8 +3026,8 @@ namespace WaterThermalTanks {
 
 					WaterThermalTank( WaterThermalTankNum ).SetPointTempSchedule = GetScheduleIndex( cAlphaArgs( 3 ) );
 					if ( WaterThermalTank( WaterThermalTankNum ).SetPointTempSchedule == 0 ) {
-						ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 3 ) ) + " = " + trim( cAlphaArgs( 3 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid, " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 						ShowContinueError( "Schedule was not found." );
 						ErrorsFound = true;
 					}
@@ -3067,8 +3061,8 @@ namespace WaterThermalTanks {
 						WaterThermalTank( WaterThermalTankNum ).AmbientTempIndicator = AmbientTempSchedule;
 						WaterThermalTank( WaterThermalTankNum ).AmbientTempSchedule = GetScheduleIndex( cAlphaArgs( 5 ) );
 						if ( WaterThermalTank( WaterThermalTankNum ).AmbientTempSchedule == 0 ) {
-							ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 5 ) ) + " = " + trim( cAlphaArgs( 5 ) ) );
-							ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+							ShowSevereError( "Invalid, " + cAlphaFieldNames( 5 ) + " = " + cAlphaArgs( 5 ) );
+							ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 							ShowContinueError( "Schedule was not found." );
 							ErrorsFound = true;
 						}
@@ -3077,8 +3071,8 @@ namespace WaterThermalTanks {
 						WaterThermalTank( WaterThermalTankNum ).AmbientTempIndicator = AmbientTempZone;
 						WaterThermalTank( WaterThermalTankNum ).AmbientTempZone = FindItemInList( cAlphaArgs( 6 ), Zone.Name(), NumOfZones );
 						if ( WaterThermalTank( WaterThermalTankNum ).AmbientTempZone == 0 ) {
-							ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 6 ) ) + " = " + trim( cAlphaArgs( 6 ) ) );
-							ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+							ShowSevereError( "Invalid, " + cAlphaFieldNames( 6 ) + " = " + cAlphaArgs( 6 ) );
+							ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 							ShowContinueError( "Zone was not found." );
 							ErrorsFound = true;
 						}
@@ -3086,22 +3080,22 @@ namespace WaterThermalTanks {
 
 					} else if ( SELECT_CASE_var == "OUTDOORS" ) {
 						WaterThermalTank( WaterThermalTankNum ).AmbientTempIndicator = AmbientTempOutsideAir;
-						WaterThermalTank( WaterThermalTankNum ).AmbientTempOutsideAirNode = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+						WaterThermalTank( WaterThermalTankNum ).AmbientTempOutsideAirNode = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 						if ( ! lAlphaFieldBlanks( 7 ) ) {
 							if ( ! CheckOutAirNodeNumber( WaterThermalTank( WaterThermalTankNum ).AmbientTempOutsideAirNode ) ) {
-								ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 7 ) ) + " = " + trim( cAlphaArgs( 7 ) ) );
-								ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+								ShowSevereError( "Invalid, " + cAlphaFieldNames( 7 ) + " = " + cAlphaArgs( 7 ) );
+								ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 								ShowContinueError( "Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node" );
 								ErrorsFound = true;
 							}
 						} else {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 							ShowContinueError( "An Ambient Outdoor Air Node name must be used when" " the Ambient Temperature Indicator is Outdoors." );
 							ErrorsFound = true;
 						}
 
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Invalid Ambient Temperature Indicator entered=" + trim( cAlphaArgs( 4 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Invalid Ambient Temperature Indicator entered=" + cAlphaArgs( 4 ) );
 						ShowContinueError( "  Valid entries are Schedule, Zone, and Outdoors." );
 						ErrorsFound = true;
 					}}
@@ -3125,17 +3119,17 @@ namespace WaterThermalTanks {
 						WaterThermalTank( WaterThermalTankNum ).UseInletHeight = WaterThermalTank( WaterThermalTankNum ).Height; // top of tank
 					}
 					if ( WaterThermalTank( WaterThermalTankNum ).UseInletHeight > WaterThermalTank( WaterThermalTankNum ).Height ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ": Use inlet is located higher than overall tank height." );
-						ShowContinueError( trim( cNumericFieldNames( 2 ) ) + " = " + trim( RoundSigDigits( rNumericArgs( 2 ), 4 ) ) );
-						ShowContinueError( trim( cNumericFieldNames( 10 ) ) + " = " + trim( RoundSigDigits( rNumericArgs( 10 ), 4 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": Use inlet is located higher than overall tank height." );
+						ShowContinueError( cNumericFieldNames( 2 ) + " = " + RoundSigDigits( rNumericArgs( 2 ), 4 ) );
+						ShowContinueError( cNumericFieldNames( 10 ) + " = " + RoundSigDigits( rNumericArgs( 10 ), 4 ) );
 						ErrorsFound = true;
 					}
 
 					WaterThermalTank( WaterThermalTankNum ).UseOutletHeight = rNumericArgs( 11 );
 					if ( WaterThermalTank( WaterThermalTankNum ).UseOutletHeight > WaterThermalTank( WaterThermalTankNum ).Height ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ": Use outlet is located higher than overall tank height." );
-						ShowContinueError( trim( cNumericFieldNames( 2 ) ) + " = " + trim( RoundSigDigits( rNumericArgs( 2 ), 4 ) ) );
-						ShowContinueError( trim( cNumericFieldNames( 11 ) ) + " = " + trim( RoundSigDigits( rNumericArgs( 11 ), 4 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": Use outlet is located higher than overall tank height." );
+						ShowContinueError( cNumericFieldNames( 2 ) + " = " + RoundSigDigits( rNumericArgs( 2 ), 4 ) );
+						ShowContinueError( cNumericFieldNames( 11 ) + " = " + RoundSigDigits( rNumericArgs( 11 ), 4 ) );
 						ErrorsFound = true;
 					}
 
@@ -3143,9 +3137,9 @@ namespace WaterThermalTanks {
 
 					WaterThermalTank( WaterThermalTankNum ).SourceInletHeight = rNumericArgs( 14 );
 					if ( WaterThermalTank( WaterThermalTankNum ).SourceInletHeight > WaterThermalTank( WaterThermalTankNum ).Height ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ": Source inlet is located higher than overall tank height." );
-						ShowContinueError( trim( cNumericFieldNames( 2 ) ) + " = " + trim( RoundSigDigits( rNumericArgs( 2 ), 4 ) ) );
-						ShowContinueError( trim( cNumericFieldNames( 14 ) ) + " = " + trim( RoundSigDigits( rNumericArgs( 14 ), 4 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": Source inlet is located higher than overall tank height." );
+						ShowContinueError( cNumericFieldNames( 2 ) + " = " + RoundSigDigits( rNumericArgs( 2 ), 4 ) );
+						ShowContinueError( cNumericFieldNames( 14 ) + " = " + RoundSigDigits( rNumericArgs( 14 ), 4 ) );
 						ErrorsFound = true;
 					}
 
@@ -3154,9 +3148,9 @@ namespace WaterThermalTanks {
 						WaterThermalTank( WaterThermalTankNum ).SourceOutletHeight = WaterThermalTank( WaterThermalTankNum ).Height; // top of tank
 					}
 					if ( WaterThermalTank( WaterThermalTankNum ).SourceOutletHeight > WaterThermalTank( WaterThermalTankNum ).Height ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ": Source outlet is located higher than overall tank height." );
-						ShowContinueError( trim( cNumericFieldNames( 2 ) ) + " = " + trim( RoundSigDigits( rNumericArgs( 2 ), 4 ) ) );
-						ShowContinueError( trim( cNumericFieldNames( 15 ) ) + " = " + trim( RoundSigDigits( rNumericArgs( 15 ), 4 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": Source outlet is located higher than overall tank height." );
+						ShowContinueError( cNumericFieldNames( 2 ) + " = " + RoundSigDigits( rNumericArgs( 2 ), 4 ) );
+						ShowContinueError( cNumericFieldNames( 15 ) + " = " + RoundSigDigits( rNumericArgs( 15 ), 4 ) );
 						ErrorsFound = true;
 					}
 
@@ -3181,17 +3175,17 @@ namespace WaterThermalTanks {
 					WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopSide = DemandSupply_No;
 
 					if ( ( ! lAlphaFieldBlanks( 8 ) ) || ( ! lAlphaFieldBlanks( 9 ) ) ) {
-						WaterThermalTank( WaterThermalTankNum ).UseInletNode = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+						WaterThermalTank( WaterThermalTankNum ).UseInletNode = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 						WHSaveNodeNames( WaterThermalTankNum ).InletNodeName1 = cAlphaArgs( 8 );
-						WaterThermalTank( WaterThermalTankNum ).UseOutletNode = GetOnlySingleNode( cAlphaArgs( 9 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+						WaterThermalTank( WaterThermalTankNum ).UseOutletNode = GetOnlySingleNode( cAlphaArgs( 9 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 						WHSaveNodeNames( WaterThermalTankNum ).OutletNodeName1 = cAlphaArgs( 9 );
 
 					}
 
 					if ( ( ! lAlphaFieldBlanks( 11 ) ) || ( ! lAlphaFieldBlanks( 12 ) ) ) {
-						WaterThermalTank( WaterThermalTankNum ).SourceInletNode = GetOnlySingleNode( cAlphaArgs( 11 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+						WaterThermalTank( WaterThermalTankNum ).SourceInletNode = GetOnlySingleNode( cAlphaArgs( 11 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
 						WHSaveNodeNames( WaterThermalTankNum ).InletNodeName2 = cAlphaArgs( 11 );
-						WaterThermalTank( WaterThermalTankNum ).SourceOutletNode = GetOnlySingleNode( cAlphaArgs( 12 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+						WaterThermalTank( WaterThermalTankNum ).SourceOutletNode = GetOnlySingleNode( cAlphaArgs( 12 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 						WHSaveNodeNames( WaterThermalTankNum ).OutletNodeName2 = cAlphaArgs( 12 );
 
 					}
@@ -3201,8 +3195,8 @@ namespace WaterThermalTanks {
 					} else {
 						WaterThermalTank( WaterThermalTankNum ).UseSideAvailSchedNum = GetScheduleIndex( cAlphaArgs( 10 ) );
 						if ( WaterThermalTank( WaterThermalTankNum ).UseSideAvailSchedNum == 0 ) {
-							ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 10 ) ) + " = " + trim( cAlphaArgs( 10 ) ) );
-							ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+							ShowSevereError( "Invalid, " + cAlphaFieldNames( 10 ) + " = " + cAlphaArgs( 10 ) );
+							ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 							ShowContinueError( "Schedule was not found." );
 							ErrorsFound = true;
 						}
@@ -3217,8 +3211,8 @@ namespace WaterThermalTanks {
 					} else {
 						WaterThermalTank( WaterThermalTankNum ).SourceSideAvailSchedNum = GetScheduleIndex( cAlphaArgs( 13 ) );
 						if ( WaterThermalTank( WaterThermalTankNum ).SourceSideAvailSchedNum == 0 ) {
-							ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 13 ) ) + " = " + trim( cAlphaArgs( 13 ) ) );
-							ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+							ShowSevereError( "Invalid, " + cAlphaFieldNames( 13 ) + " = " + cAlphaArgs( 13 ) );
+							ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 							ShowContinueError( "Schedule was not found." );
 							ErrorsFound = true;
 						}
@@ -3247,7 +3241,7 @@ namespace WaterThermalTanks {
 					}
 
 					if ( NumNums > 19 + WaterThermalTank( WaterThermalTankNum ).Nodes ) {
-						ShowWarningError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  More Additional Loss Coefficients were entered than the number of nodes; extra coefficients will not be used" );
+						ShowWarningError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  More Additional Loss Coefficients were entered than the number of nodes; extra coefficients will not be used" );
 					}
 
 					SetupStratifiedNodes( WaterThermalTankNum );
@@ -3255,7 +3249,7 @@ namespace WaterThermalTanks {
 				} // WaterThermalTankNum
 
 				if ( ErrorsFound ) {
-					ShowFatalError( "Errors found in getting " + trim( cCurrentModuleObject ) + " input. Preceding condition causes termination." );
+					ShowFatalError( "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition causes termination." );
 				}
 
 			}
@@ -3278,26 +3272,26 @@ namespace WaterThermalTanks {
 
 						//         verify Desuperheater/tank source node connections
 						if ( WaterHeaterDesuperheater( DesuperheaterNum ).WaterInletNode != WaterThermalTank( CheckWaterHeaterNum ).SourceOutletNode ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + ":" );
+							ShowSevereError( cCurrentModuleObject + " = " + WaterHeaterDesuperheater( DesuperheaterNum ).Name + ':' );
 							ShowContinueError( "Desuperheater inlet node name does not match " " thermal tank source outlet node name." );
-							ShowContinueError( "Desuperheater water inlet and outlet node names = " + trim( CoilSaveNodeNames( DesuperheaterNum ).InletNodeName1 ) + " and " + trim( CoilSaveNodeNames( DesuperheaterNum ).OutletNodeName1 ) );
-							ShowContinueError( "Thermal tank source side inlet and outlet node names      = " + trim( WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName2 ) + " and " + trim( WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName2 ) );
+							ShowContinueError( "Desuperheater water inlet and outlet node names = " + CoilSaveNodeNames( DesuperheaterNum ).InletNodeName1 + " and " + CoilSaveNodeNames( DesuperheaterNum ).OutletNodeName1 );
+							ShowContinueError( "Thermal tank source side inlet and outlet node names      = " + WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName2 + " and " + WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName2 );
 							ErrorsFound = true;
 						}
 
 						if ( WaterHeaterDesuperheater( DesuperheaterNum ).WaterOutletNode != WaterThermalTank( CheckWaterHeaterNum ).SourceInletNode ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + ":" );
+							ShowSevereError( cCurrentModuleObject + " = " + WaterHeaterDesuperheater( DesuperheaterNum ).Name + ':' );
 							ShowContinueError( "Desuperheater water outlet node name does not match thermal" " tank source inlet node name." );
-							ShowContinueError( "Desuperheater water inlet and outlet node names = " + trim( CoilSaveNodeNames( DesuperheaterNum ).InletNodeName1 ) + " and " + trim( CoilSaveNodeNames( DesuperheaterNum ).OutletNodeName1 ) );
-							ShowContinueError( "Thermal tank source side inlet and outlet node names      = " + trim( WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName2 ) + " and " + trim( WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName2 ) );
+							ShowContinueError( "Desuperheater water inlet and outlet node names = " + CoilSaveNodeNames( DesuperheaterNum ).InletNodeName1 + " and " + CoilSaveNodeNames( DesuperheaterNum ).OutletNodeName1 );
+							ShowContinueError( "Thermal tank source side inlet and outlet node names      = " + WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName2 + " and " + WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName2 );
 							ErrorsFound = true;
 						}
 
 					} // DO CheckWaterHeaterNum = 1, NumWaterHeater
 
 					if ( WaterHeaterDesuperheater( DesuperheaterNum ).WaterHeaterTankNum == 0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + ":" );
-						ShowContinueError( " Water heater tank = " + trim( WaterHeaterDesuperheater( DesuperheaterNum ).TankName ) + " not found." );
+						ShowSevereError( cCurrentModuleObject + " = " + WaterHeaterDesuperheater( DesuperheaterNum ).Name + ':' );
+						ShowContinueError( " Water heater tank = " + WaterHeaterDesuperheater( DesuperheaterNum ).TankName + " not found." );
 						ErrorsFound = true;
 					}
 
@@ -3325,7 +3319,7 @@ namespace WaterThermalTanks {
 						HPWaterHeater( HPWaterHeaterNum ).WHPLFCurve = WaterThermalTank( CheckWaterHeaterNum ).PLFCurve;
 
 						if ( WaterThermalTank( CheckWaterHeaterNum ).Type == "WATER HEATER:SIMPLE" ) { // name change issue here.
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + ":" );
+							ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
 							ShowContinueError( "WaterHeater:HeatPump cannot be used with WATER HEATER:SIMPLE." );
 							ErrorsFound = true;
 						} else if ( ( WaterThermalTank( CheckWaterHeaterNum ).Type == cMixedWHModuleObj ) || ( WaterThermalTank( CheckWaterHeaterNum ).Type == cStratifiedWHModuleObj ) ) {
@@ -3334,15 +3328,15 @@ namespace WaterThermalTanks {
 							//           WaterThermalTank%TypeNum = HeatPumpWaterHeater for a HPWH
 							//            WaterThermalTank(CheckWaterHeaterNum)%TypeNum = HPWaterHeater(HPWaterHeaterNum)%TypeNum
 						} else {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + ":" );
-							ShowContinueError( "Invalid water heater tank type =" + trim( WaterThermalTank( CheckWaterHeaterNum ).Type ) );
+							ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
+							ShowContinueError( "Invalid water heater tank type =" + WaterThermalTank( CheckWaterHeaterNum ).Type );
 							ErrorsFound = true;
 						}
 
 						//         do not allow modulating control for HPWH's (i.e. modulating control usually used for tankless WH's)
 						if ( WaterThermalTank( CheckWaterHeaterNum ).ControlType == ControlTypeModulate ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + ":" );
-							ShowContinueError( "Heater Control Type for " + trim( WaterThermalTank( CheckWaterHeaterNum ).Type ) + " = " + trim( WaterThermalTank( CheckWaterHeaterNum ).Name ) + " must be CYCLE." );
+							ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
+							ShowContinueError( "Heater Control Type for " + WaterThermalTank( CheckWaterHeaterNum ).Type + " = " + WaterThermalTank( CheckWaterHeaterNum ).Name + " must be CYCLE." );
 							ErrorsFound = true;
 						}
 
@@ -3350,12 +3344,12 @@ namespace WaterThermalTanks {
 						HPWaterHeater( HPWaterHeaterNum ).WaterHeaterTankNum = CheckWaterHeaterNum;
 
 						if ( WaterThermalTank( CheckWaterHeaterNum ).DesuperheaterNum > 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + "and Coil:WaterHeating:Desuperheater = " + trim( WaterHeaterDesuperheater( CheckWaterHeaterNum ).Name ) + ":  cannot be connected to the same water heater tank = " + trim( WaterThermalTank( CheckWaterHeaterNum ).Name ) );
+							ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + "and Coil:WaterHeating:Desuperheater = " + WaterHeaterDesuperheater( CheckWaterHeaterNum ).Name + ":  cannot be connected to the same water heater tank = " + WaterThermalTank( CheckWaterHeaterNum ).Name );
 						}
 
 						//         check that water heater source side effectiveness is greater than 0
 						if ( WaterThermalTank( CheckWaterHeaterNum ).SourceEffectiveness <= 0.0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + ":  Invalid source side effectiveness for heat pump water heater = " + TrimSigDigits( WaterThermalTank( CheckWaterHeaterNum ).SourceEffectiveness, 3 ) );
+							ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ":  Invalid source side effectiveness for heat pump water heater = " + TrimSigDigits( WaterThermalTank( CheckWaterHeaterNum ).SourceEffectiveness, 3 ) );
 							ShowContinueError( " water heater source effectiveness will default to 1.0 and simulation continues." );
 							WaterThermalTank( CheckWaterHeaterNum ).SourceEffectiveness = 1.0;
 						}
@@ -3364,10 +3358,10 @@ namespace WaterThermalTanks {
 						if ( WaterThermalTank( CheckWaterHeaterNum ).UseInletNode == 0 && WaterThermalTank( CheckWaterHeaterNum ).UseOutletNode == 0 ) HPWaterHeater( HPWaterHeaterNum ).StandAlone = true;
 
 						if ( HPWaterHeater( HPWaterHeaterNum ).WHUseInletNode != WaterThermalTank( CheckWaterHeaterNum ).UseInletNode || HPWaterHeater( HPWaterHeaterNum ).WHUseOutletNode != WaterThermalTank( CheckWaterHeaterNum ).UseOutletNode ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + ":" );
-							ShowContinueError( "Heat pump water heater tank use side inlet and outlet node names must match" " the use side inlet and outlet node names for water heater tank = " + trim( HPWaterHeater( HPWaterHeaterNum ).TankType ) + ": " + trim( HPWaterHeater( HPWaterHeaterNum ).TankName ) );
-							ShowContinueError( "Heat pump water heater use side inlet and outlet node names = " + trim( HPWHSaveNodeNames( HPWaterHeaterNum ).InletNodeName2 ) + " and " + trim( HPWHSaveNodeNames( HPWaterHeaterNum ).OutletNodeName2 ) );
-							ShowContinueError( "Water heater tank use side inlet and outlet node names      = " + trim( WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName1 ) + " and " + trim( WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName1 ) );
+							ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
+							ShowContinueError( "Heat pump water heater tank use side inlet and outlet node names must match" " the use side inlet and outlet node names for water heater tank = " + HPWaterHeater( HPWaterHeaterNum ).TankType + ": " + HPWaterHeater( HPWaterHeaterNum ).TankName );
+							ShowContinueError( "Heat pump water heater use side inlet and outlet node names = " + HPWHSaveNodeNames( HPWaterHeaterNum ).InletNodeName2 + " and " + HPWHSaveNodeNames( HPWaterHeaterNum ).OutletNodeName2 );
+							ShowContinueError( "Water heater tank use side inlet and outlet node names      = " + WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName1 + " and " + WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName1 );
 							ErrorsFound = true;
 						} else {
 							if ( ! HPWaterHeater( HPWaterHeaterNum ).StandAlone ) {
@@ -3382,18 +3376,18 @@ namespace WaterThermalTanks {
 
 						//         verify HP/tank source node connections
 						if ( HPWaterHeater( HPWaterHeaterNum ).CondWaterInletNode != WaterThermalTank( CheckWaterHeaterNum ).SourceOutletNode ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + ":" );
+							ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
 							ShowContinueError( "Heat Pump condenser water inlet node name does not match water" " heater tank source outlet node name." );
-							ShowContinueError( "Heat pump condenser water inlet and outlet node names = " + trim( HPWHSaveNodeNames( HPWaterHeaterNum ).InletNodeName1 ) + " and " + trim( HPWHSaveNodeNames( HPWaterHeaterNum ).OutletNodeName1 ) );
-							ShowContinueError( "Water heater tank source side inlet and outlet node names      = " + trim( WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName2 ) + " and " + trim( WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName2 ) );
+							ShowContinueError( "Heat pump condenser water inlet and outlet node names = " + HPWHSaveNodeNames( HPWaterHeaterNum ).InletNodeName1 + " and " + HPWHSaveNodeNames( HPWaterHeaterNum ).OutletNodeName1 );
+							ShowContinueError( "Water heater tank source side inlet and outlet node names      = " + WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName2 + " and " + WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName2 );
 							ErrorsFound = true;
 						}
 
 						if ( HPWaterHeater( HPWaterHeaterNum ).CondWaterOutletNode != WaterThermalTank( CheckWaterHeaterNum ).SourceInletNode ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + ":" );
+							ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
 							ShowContinueError( "Heat Pump condenser water outlet node name does not match water heater" " tank source inlet node name." );
-							ShowContinueError( "Heat pump condenser water inlet and outlet node names = " + trim( HPWHSaveNodeNames( HPWaterHeaterNum ).InletNodeName1 ) + " and " + trim( HPWHSaveNodeNames( HPWaterHeaterNum ).OutletNodeName1 ) );
-							ShowContinueError( "Water heater tank source side inlet and outlet node names      = " + trim( WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName2 ) + " and " + trim( WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName2 ) );
+							ShowContinueError( "Heat pump condenser water inlet and outlet node names = " + HPWHSaveNodeNames( HPWaterHeaterNum ).InletNodeName1 + " and " + HPWHSaveNodeNames( HPWaterHeaterNum ).OutletNodeName1 );
+							ShowContinueError( "Water heater tank source side inlet and outlet node names      = " + WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName2 + " and " + WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName2 );
 							ErrorsFound = true;
 						}
 
@@ -3418,7 +3412,7 @@ namespace WaterThermalTanks {
 													break;
 												} // EquipmentTypeNum
 												if ( ! FoundTankInList ) {
-													ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + ":" );
+													ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
 													ShowContinueError( "Heat pump water heater type and name must be listed in the correct" " ZoneHVAC:EquipmentList object when Inlet Air Configuration is equal" " to ZoneAirOnly or ZoneAndOutdoorAir." );
 													ErrorsFound = true;
 												}
@@ -3430,7 +3424,7 @@ namespace WaterThermalTanks {
 													}
 												} // EquipmentTypeNum
 												if ( TankNotLowestPriority && FoundTankInList ) {
-													ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + ":" );
+													ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
 													ShowContinueError( "Heat pump water heaters must have lower priorities than" " all other equipment types in a ZoneHVAC:EquipmentList." );
 													ErrorsFound = true;
 												}
@@ -3441,7 +3435,7 @@ namespace WaterThermalTanks {
 									} // ZoneEquipConfigNum .LE. NumOfZones
 								} // ZoneEquipConfigNum
 							} else {
-								ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + ":" );
+								ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
 								ShowContinueError( "ZoneHVAC:EquipmentList and ZoneHVAC:EquipmentConnections objects are " " required when Inlet Air Configuration is either ZoneAirOnly or ZoneAndOutdoorAir." );
 								ErrorsFound = true;
 							} // ALLOCATED
@@ -3450,15 +3444,15 @@ namespace WaterThermalTanks {
 					} // DO CheckWaterHeaterNum = 1, NumWaterHeater
 
 					if ( ! HPWaterHeater( HPWaterHeaterNum ).FoundTank ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( HPWaterHeater( HPWaterHeaterNum ).Name ) + ":" );
-						ShowContinueError( "Water heater tank object not found = " + trim( HPWaterHeater( HPWaterHeaterNum ).TankType ) + ", " + trim( HPWaterHeater( HPWaterHeaterNum ).TankName ) );
+						ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
+						ShowContinueError( "Water heater tank object not found = " + HPWaterHeater( HPWaterHeaterNum ).TankType + ", " + HPWaterHeater( HPWaterHeaterNum ).TankName );
 						ErrorsFound = true;
 					}
 
 				} // DO HPWaterHeaterNum = 1, NumHeatPumpWaterHeater
 
 				if ( ErrorsFound ) {
-					ShowFatalError( "Errors found in getting " + trim( cCurrentModuleObject ) + " input. Preceding condition causes termination." );
+					ShowFatalError( "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition causes termination." );
 				}
 
 			}
@@ -3476,7 +3470,7 @@ namespace WaterThermalTanks {
 					WaterThermalTankNum = FindItemInList( cAlphaArgs( 1 ), WaterThermalTank.Name(), NumWaterThermalTank );
 					if ( WaterThermalTankNum == 0 ) {
 						// did not match name throw warning.
-						ShowSevereError( trim( cCurrentModuleObject ) + " object name: " + trim( cAlphaArgs( 1 ) ) + " does not match " "any of the water heaters defined in the file" );
+						ShowSevereError( cCurrentModuleObject + " object name: " + cAlphaArgs( 1 ) + " does not match " "any of the water heaters defined in the file" );
 						ErrorsFound = true;
 						continue;
 					} else { // we have a match
@@ -3496,7 +3490,7 @@ namespace WaterThermalTanks {
 							WaterThermalTank( WaterThermalTankNum ).Sizing.DesignMode = SizePerSolarColArea;
 						} else {
 							// wrong design mode entered, throw error
-							ShowSevereError( trim( cCurrentModuleObject ) + " object named: " + trim( cAlphaArgs( 1 ) ) + " contains an incorrect Design Mode of: " + trim( cAlphaArgs( 2 ) ) );
+							ShowSevereError( cCurrentModuleObject + " object named: " + cAlphaArgs( 1 ) + " contains an incorrect Design Mode of: " + cAlphaArgs( 2 ) );
 							ErrorsFound = true;
 						}
 
@@ -3521,24 +3515,24 @@ namespace WaterThermalTanks {
 							// do nothing, error thrown if design mode not found
 						} else if ( SELECT_CASE_var == SizePeakDraw ) { // need to have entered a reasonable value for TankDrawTime
 							if ( WaterThermalTank( WaterThermalTankNum ).Sizing.TankDrawTime <= 0.0 ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + ", named " + trim( cAlphaArgs( 1 ) ) + ", design mode set to Peak Draw but needs a positive value for tank draw time" );
+								ShowSevereError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + ", design mode set to Peak Draw but needs a positive value for tank draw time" );
 								ErrorsFound = true;
 							}
 							//constrain crazy sizes by limiting to 10 years or 8760*10
 							if ( WaterThermalTank( WaterThermalTankNum ).Sizing.TankDrawTime > 87600.0 ) {
-								ShowWarningError( trim( cCurrentModuleObject ) + ", named " + trim( cAlphaArgs( 1 ) ) + ",  has input with an unreasonably large Tank Draw Time, more than 10 years" );
+								ShowWarningError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + ",  has input with an unreasonably large Tank Draw Time, more than 10 years" );
 								ErrorsFound = true;
 							}
 							// if both volume and demand side flow connections are autosized, must be a good NominalVolForSizingDemandSideFlow
 							if ( ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopSide == DemandSide ) && ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate == AutoSize ) ) {
 								if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NominalVolForSizingDemandSideFlow <= 0.0 ) {
-									ShowWarningError( trim( cCurrentModuleObject ) + ", named " + trim( cAlphaArgs( 1 ) ) + " needs a value for Nominal Tank Volume for Autosizing Plant Connections" );
+									ShowWarningError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + " needs a value for Nominal Tank Volume for Autosizing Plant Connections" );
 									ErrorsFound = true;
 								}
 							}
 							if ( ( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopSide == DemandSide ) && ( WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate == AutoSize ) ) {
 								if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NominalVolForSizingDemandSideFlow <= 0.0 ) {
-									ShowWarningError( trim( cCurrentModuleObject ) + ", named " + trim( cAlphaArgs( 1 ) ) + " needs a value for Nominal Tank Volume for Autosizing Plant Connections" );
+									ShowWarningError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + " needs a value for Nominal Tank Volume for Autosizing Plant Connections" );
 									ErrorsFound = true;
 								}
 							}
@@ -3546,55 +3540,55 @@ namespace WaterThermalTanks {
 						} else if ( SELECT_CASE_var == SizeResidentialMin ) {
 							// it would have to have at least on bedroom and any more than 10 is crazy for this mode
 							if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBedrooms < 1 ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + ", named " + trim( cAlphaArgs( 1 ) ) + ", mode needs at least one bedroom" );
+								ShowSevereError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + ", mode needs at least one bedroom" );
 								ErrorsFound = true;
 							}
 							if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBedrooms > 10 ) {
-								ShowWarningError( trim( cCurrentModuleObject ) + ", named " + trim( cAlphaArgs( 1 ) ) + ", probably has too many bedrooms for the selected design mode" );
+								ShowWarningError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + ", probably has too many bedrooms for the selected design mode" );
 							}
 
 						} else if ( SELECT_CASE_var == SizePerPerson ) {
 
 							if ( ( WaterThermalTank( WaterThermalTankNum ).Volume == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerPerson <= 0.0 ) ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + ", named " + trim( cAlphaArgs( 1 ) ) + ", PerPerson mode needs positive value input for storage capacity per person" );
+								ShowSevereError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + ", PerPerson mode needs positive value input for storage capacity per person" );
 								ErrorsFound = true;
 							}
 
 							if ( ( WaterThermalTank( WaterThermalTankNum ).MaxCapacity == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.RecoveryCapacityPerPerson <= 0.0 ) ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + ", named " + trim( cAlphaArgs( 1 ) ) + ", PerPerson mode needs positive value input for recovery capacity per person" );
+								ShowSevereError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + ", PerPerson mode needs positive value input for recovery capacity per person" );
 								ErrorsFound = true;
 							}
 
 						} else if ( SELECT_CASE_var == SizePerFloorArea ) {
 							if ( ( WaterThermalTank( WaterThermalTankNum ).Volume == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerArea <= 0.0 ) ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + ", named " + trim( cAlphaArgs( 1 ) ) + ", PerArea mode needs positive value input for storage capacity per floor area" );
+								ShowSevereError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + ", PerArea mode needs positive value input for storage capacity per floor area" );
 								ErrorsFound = true;
 							}
 							if ( ( WaterThermalTank( WaterThermalTankNum ).MaxCapacity == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.RecoveryCapacityPerArea <= 0.0 ) ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + ", named " + trim( cAlphaArgs( 1 ) ) + ", PerArea mode needs positive value input for recovery capacity per floor area" );
+								ShowSevereError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + ", PerArea mode needs positive value input for recovery capacity per floor area" );
 								ErrorsFound = true;
 							}
 
 						} else if ( SELECT_CASE_var == SizePerUnit ) {
 							if ( ( WaterThermalTank( WaterThermalTankNum ).Volume == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerUnit <= 0.0 ) ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + ", named " + trim( cAlphaArgs( 1 ) ) + ", PerUnit mode needs positive value input for storage capacity per unit" );
+								ShowSevereError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + ", PerUnit mode needs positive value input for storage capacity per unit" );
 								ErrorsFound = true;
 							}
 							if ( ( WaterThermalTank( WaterThermalTankNum ).Volume == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfUnits <= 0.0 ) ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + ", named " + trim( cAlphaArgs( 1 ) ) + ", PerUnit mode needs positive value input for number of units" );
+								ShowSevereError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + ", PerUnit mode needs positive value input for number of units" );
 								ErrorsFound = true;
 							}
 							if ( ( WaterThermalTank( WaterThermalTankNum ).MaxCapacity == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.RecoveryCapacityPerUnit <= 0.0 ) ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + ", named " + trim( cAlphaArgs( 1 ) ) + ", PerUnit mode needs positive value input for recovery capacity per unit" );
+								ShowSevereError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + ", PerUnit mode needs positive value input for recovery capacity per unit" );
 								ErrorsFound = true;
 							}
 							if ( ( WaterThermalTank( WaterThermalTankNum ).MaxCapacity == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfUnits <= 0.0 ) ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + ", named " + trim( cAlphaArgs( 1 ) ) + ", PerUnit mode needs positive value input for number of units" );
+								ShowSevereError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + ", PerUnit mode needs positive value input for number of units" );
 								ErrorsFound = true;
 							}
 						} else if ( SELECT_CASE_var == SizePerSolarColArea ) {
 							if ( ( WaterThermalTank( WaterThermalTankNum ).Volume == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerCollectorArea <= 0.0 ) ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + ", named " + trim( cAlphaArgs( 1 ) ) + ", PerSolarCollectorArea mode needs positive value input for storage capacity per collector area" );
+								ShowSevereError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + ", PerSolarCollectorArea mode needs positive value input for storage capacity per collector area" );
 								ErrorsFound = true;
 							}
 						}}
@@ -3603,7 +3597,7 @@ namespace WaterThermalTanks {
 				} // loop over sizing objects
 
 				if ( ErrorsFound ) {
-					ShowFatalError( "Errors found in getting " + trim( cCurrentModuleObject ) + " input. Preceding condition causes termination." );
+					ShowFatalError( "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition causes termination." );
 				}
 
 			} // any water heater sizing objects
@@ -3613,15 +3607,15 @@ namespace WaterThermalTanks {
 				for ( WaterThermalTankNum = 1; WaterThermalTankNum <= NumWaterThermalTank; ++WaterThermalTankNum ) {
 
 					if ( ( WaterThermalTank( WaterThermalTankNum ).Volume == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.DesignMode == SizeNotSet ) ) {
-						ShowWarningError( "Water heater named " + trim( WaterThermalTank( WaterThermalTankNum ).Name ) + "has tank volume set to AUTOSIZE but it is missing associated WaterHeater:Sizing object" );
+						ShowWarningError( "Water heater named " + WaterThermalTank( WaterThermalTankNum ).Name + "has tank volume set to AUTOSIZE but it is missing associated WaterHeater:Sizing object" );
 						ErrorsFound = true;
 					}
 					if ( ( WaterThermalTank( WaterThermalTankNum ).MaxCapacity == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.DesignMode == SizeNotSet ) ) {
-						ShowWarningError( "Water heater named " + trim( WaterThermalTank( WaterThermalTankNum ).Name ) + "has heater capacity set to AUTOSIZE but it is missing associated WaterHeater:Sizing object" );
+						ShowWarningError( "Water heater named " + WaterThermalTank( WaterThermalTankNum ).Name + "has heater capacity set to AUTOSIZE but it is missing associated WaterHeater:Sizing object" );
 						ErrorsFound = true;
 					}
 					if ( ( WaterThermalTank( WaterThermalTankNum ).Height == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.DesignMode == SizeNotSet ) ) {
-						ShowWarningError( "Water heater named " + trim( WaterThermalTank( WaterThermalTankNum ).Name ) + "has tank height set to AUTOSIZE but it is missing associated WaterHeater:Sizing object" );
+						ShowWarningError( "Water heater named " + WaterThermalTank( WaterThermalTankNum ).Name + "has tank height set to AUTOSIZE but it is missing associated WaterHeater:Sizing object" );
 						ErrorsFound = true;
 					}
 				}
@@ -3706,22 +3700,22 @@ namespace WaterThermalTanks {
 						if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
 							SetupOutputVariable( "Water Heater Electric Power [W]", WaterThermalTank( WaterThermalTankNum ).FuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 						} else {
-							SetupOutputVariable( "Water Heater " + trim( WaterThermalTank( WaterThermalTankNum ).FuelType ) + " Rate [W]", WaterThermalTank( WaterThermalTankNum ).FuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+							SetupOutputVariable( "Water Heater " + WaterThermalTank( WaterThermalTankNum ).FuelType + " Rate [W]", WaterThermalTank( WaterThermalTankNum ).FuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 						}
-						SetupOutputVariable( "Water Heater " + trim( WaterThermalTank( WaterThermalTankNum ).FuelType ) + " Energy [J]", WaterThermalTank( WaterThermalTankNum ).FuelEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name, _, WaterThermalTank( WaterThermalTankNum ).FuelType, "DHW", WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName, "Plant" );
+						SetupOutputVariable( "Water Heater " + WaterThermalTank( WaterThermalTankNum ).FuelType + " Energy [J]", WaterThermalTank( WaterThermalTankNum ).FuelEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name, _, WaterThermalTank( WaterThermalTankNum ).FuelType, "DHW", WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName, "Plant" );
 						if ( SameString( WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelType, "Electric" ) ) {
 							SetupOutputVariable( "Water Heater Off Cycle Parasitic Electric Power [W]", WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 						} else {
-							SetupOutputVariable( "Water Heater Off Cycle Parasitic " + trim( WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelType ) + " Rate [W]", WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+							SetupOutputVariable( "Water Heater Off Cycle Parasitic " + WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelType + " Rate [W]", WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 						}
-						SetupOutputVariable( "Water Heater Off Cycle Parasitic " + trim( WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelType ) + " Energy [J]", WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name, _, WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelType, "DHW", WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName, "Plant" );
+						SetupOutputVariable( "Water Heater Off Cycle Parasitic " + WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelType + " Energy [J]", WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name, _, WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelType, "DHW", WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName, "Plant" );
 						if ( SameString( WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelType, "Electric" ) ) {
 							SetupOutputVariable( "Water Heater On Cycle Parasitic Electric Power [W]", WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 						} else {
-							SetupOutputVariable( "Water Heater On Cycle Parasitic " + trim( WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelType ) + " Rate [W]", WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+							SetupOutputVariable( "Water Heater On Cycle Parasitic " + WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelType + " Rate [W]", WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 						}
 
-						SetupOutputVariable( "Water Heater On Cycle Parasitic " + trim( WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelType ) + " Energy [J]", WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name, _, WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelType, "DHW", WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName, "Plant" );
+						SetupOutputVariable( "Water Heater On Cycle Parasitic " + WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelType + " Energy [J]", WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name, _, WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelType, "DHW", WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName, "Plant" );
 
 						SetupOutputVariable( "Water Heater Water Volume Flow Rate [m3/s]", WaterThermalTank( WaterThermalTankNum ).VolFlowRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 						SetupOutputVariable( "Water Heater Water Volume [m3]", WaterThermalTank( WaterThermalTankNum ).VolumeConsumed, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name, _, "Water", "DHW", WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName, "Plant" );
@@ -3767,18 +3761,18 @@ namespace WaterThermalTanks {
 							SetupOutputVariable( "Water Heater Heater 2 Runtime Fraction []", WaterThermalTank( WaterThermalTankNum ).RuntimeFraction2, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 
 							for ( NodeNum = 1; NodeNum <= WaterThermalTank( WaterThermalTankNum ).Nodes; ++NodeNum ) {
-								SetupOutputVariable( "Water Heater Temperature Node " + trim( TrimSigDigits( NodeNum ) ) + " [C]", WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).TempAvg, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+								SetupOutputVariable( "Water Heater Temperature Node " + TrimSigDigits( NodeNum ) + " [C]", WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).TempAvg, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 							}
 
 							for ( NodeNum = 1; NodeNum <= WaterThermalTank( WaterThermalTankNum ).Nodes; ++NodeNum ) {
-								SetupOutputVariable( "Water Heater Final Temperature Node " + trim( TrimSigDigits( NodeNum ) ) + "  [C]", WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Temp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+								SetupOutputVariable( "Water Heater Final Temperature Node " + TrimSigDigits( NodeNum ) + "  [C]", WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Temp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 							}
 						}
 
 						if ( WaterThermalTank( WaterThermalTankNum ).TypeNum == StratifiedWaterHeater ) {
 
 							for ( NodeNum = 1; NodeNum <= WaterThermalTank( WaterThermalTankNum ).Nodes; ++NodeNum ) {
-								gio::write( OutputFileInits, Format_723 ) << trim( TrimSigDigits( NodeNum ) ) << trim( TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Height, 4 ) ) << trim( TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Volume, 4 ) ) << trim( TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).MaxCapacity, 3 ) ) << trim( TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).OffCycLossCoeff, 4 ) ) << trim( TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).OnCycLossCoeff, 4 ) ) << trim( TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Inlets ) ) << trim( TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Outlets ) );
+								gio::write( OutputFileInits, Format_723 ) << TrimSigDigits( NodeNum ) << TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Height, 4 ) << TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Volume, 4 ) << TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).MaxCapacity, 3 ) << TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).OffCycLossCoeff, 4 ) << TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).OnCycLossCoeff, 4 ) << TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Inlets ) << TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Outlets );
 							}
 						}
 
@@ -3816,18 +3810,18 @@ namespace WaterThermalTanks {
 						if ( WaterThermalTank( WaterThermalTankNum ).TypeNum == StratifiedChilledWaterStorage ) {
 
 							for ( NodeNum = 1; NodeNum <= WaterThermalTank( WaterThermalTankNum ).Nodes; ++NodeNum ) {
-								SetupOutputVariable( "Chilled Water Thermal Storage Temperature Node " + trim( TrimSigDigits( NodeNum ) ) + " [C]", WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).TempAvg, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+								SetupOutputVariable( "Chilled Water Thermal Storage Temperature Node " + TrimSigDigits( NodeNum ) + " [C]", WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).TempAvg, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 							}
 
 							for ( NodeNum = 1; NodeNum <= WaterThermalTank( WaterThermalTankNum ).Nodes; ++NodeNum ) {
-								SetupOutputVariable( "Chilled Water Thermal Storage Final Temperature Node " + trim( TrimSigDigits( NodeNum ) ) + " [C]", WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Temp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+								SetupOutputVariable( "Chilled Water Thermal Storage Final Temperature Node " + TrimSigDigits( NodeNum ) + " [C]", WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Temp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 							}
 						}
 
 						if ( WaterThermalTank( WaterThermalTankNum ).TypeNum == StratifiedChilledWaterStorage ) {
 
 							for ( NodeNum = 1; NodeNum <= WaterThermalTank( WaterThermalTankNum ).Nodes; ++NodeNum ) {
-								gio::write( OutputFileInits, Format_724 ) << trim( TrimSigDigits( NodeNum ) ) << trim( TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Height, 4 ) ) << trim( TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Volume, 4 ) ) << trim( TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).OffCycLossCoeff, 4 ) ) << trim( TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Inlets ) ) << trim( TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Outlets ) );
+								gio::write( OutputFileInits, Format_724 ) << TrimSigDigits( NodeNum ) << TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Height, 4 ) << TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Volume, 4 ) << TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).OffCycLossCoeff, 4 ) << TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Inlets ) << TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Outlets );
 							}
 						}
 
@@ -4295,7 +4289,7 @@ namespace WaterThermalTanks {
 				WaterThermalTank( WaterThermalTankNum ).Mass = WaterThermalTank( WaterThermalTankNum ).Volume * rho;
 				WaterThermalTank( WaterThermalTankNum ).UseSidePlantSizNum = PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).PlantSizNum;
 				if ( ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantSizNum == 0 ) ) {
-					ShowSevereError( "InitWaterThermalTank: Did not find Sizing:Plant object for use side of plant thermal tank = " + trim( WaterThermalTank( WaterThermalTankNum ).Name ) );
+					ShowSevereError( "InitWaterThermalTank: Did not find Sizing:Plant object for use side of plant thermal tank = " + WaterThermalTank( WaterThermalTankNum ).Name );
 					ShowFatalError( "InitWaterThermalTank: Program terminated due to previous condition(s)." );
 				}
 			}
@@ -4312,7 +4306,7 @@ namespace WaterThermalTanks {
 				WaterThermalTank( WaterThermalTankNum ).Mass = WaterThermalTank( WaterThermalTankNum ).Volume * rho;
 				WaterThermalTank( WaterThermalTankNum ).UseSidePlantSizNum = PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).PlantSizNum;
 				if ( ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantSizNum == 0 ) ) {
-					ShowSevereError( "InitWaterThermalTank: Did not find Sizing:Plant object for use side of plant thermal tank = " + trim( WaterThermalTank( WaterThermalTankNum ).Name ) );
+					ShowSevereError( "InitWaterThermalTank: Did not find Sizing:Plant object for use side of plant thermal tank = " + WaterThermalTank( WaterThermalTankNum ).Name );
 					ShowFatalError( "InitWaterThermalTank: Program terminated due to previous condition(s)." );
 				}
 			}
@@ -4330,7 +4324,7 @@ namespace WaterThermalTanks {
 				WaterThermalTank( WaterThermalTankNum ).PlantSourceMassFlowRateMax = WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate * rho;
 				WaterThermalTank( WaterThermalTankNum ).SourceSidePlantSizNum = PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).PlantSizNum;
 				if ( ( WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantSizNum == 0 ) ) {
-					ShowSevereError( "InitWaterThermalTank: Did not find Sizing:Plant object for source side of plant thermal tank = " + trim( WaterThermalTank( WaterThermalTankNum ).Name ) );
+					ShowSevereError( "InitWaterThermalTank: Did not find Sizing:Plant object for source side of plant thermal tank = " + WaterThermalTank( WaterThermalTankNum ).Name );
 					ShowFatalError( "InitWaterThermalTank: Program terminated due to previous condition(s)." );
 				}
 			}
@@ -4433,11 +4427,11 @@ namespace WaterThermalTanks {
 						TankChangeRateScale = WaterThermalTank( WaterThermalTankNum ).Volume / MaxSideVolFlow;
 						if ( TankChangeRateScale < 60. ) { // nominal change over in less than one minute
 							ShowSevereError( "InitWaterThermalTank: Detected problem for stratified tank model.  Model cannot be applied." );
-							ShowContinueError( "Occurs for stratified tank name = " + trim( WaterThermalTank( WaterThermalTankNum ).Name ) );
-							ShowContinueError( "Tank volume = " + trim( RoundSigDigits( WaterThermalTank( WaterThermalTankNum ).Volume, 4 ) ) + " [m3]" );
-							ShowContinueError( "Tank use side volume flow rate = " + trim( RoundSigDigits( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate, 4 ) ) + " [m3/s]" );
-							ShowContinueError( "Tank source side volume flow rate = " + trim( RoundSigDigits( WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate, 4 ) ) + " [m3/s]" );
-							ShowContinueError( "Nominal tank change over rate = " + trim( RoundSigDigits( TankChangeRateScale, 2 ) ) + " [s]" );
+							ShowContinueError( "Occurs for stratified tank name = " + WaterThermalTank( WaterThermalTankNum ).Name );
+							ShowContinueError( "Tank volume = " + RoundSigDigits( WaterThermalTank( WaterThermalTankNum ).Volume, 4 ) + " [m3]" );
+							ShowContinueError( "Tank use side volume flow rate = " + RoundSigDigits( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate, 4 ) + " [m3/s]" );
+							ShowContinueError( "Tank source side volume flow rate = " + RoundSigDigits( WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate, 4 ) + " [m3/s]" );
+							ShowContinueError( "Nominal tank change over rate = " + RoundSigDigits( TankChangeRateScale, 2 ) + " [s]" );
 							ShowContinueError( "Change over rate is too fast, increase tank volume, decrease connection flow rates" " or use mixed tank model" );
 
 							ShowFatalError( "InitWaterThermalTank: Simulation halted because of sizing problem in stratified tank model." );
@@ -4612,8 +4606,8 @@ namespace WaterThermalTanks {
 					WaterThermalTank( WaterThermalTankNum ).SetPointTemp = WaterThermalTank( WaterThermalTankNum ).TankTempLimit - 1.0;
 
 					if ( WaterThermalTank( WaterThermalTankNum ).ShowSetPointWarning ) {
-						ShowSevereError( "Water heater = " + trim( WaterThermalTank( WaterThermalTankNum ).Name ) + ":  Water heater tank set point temperature is greater than the maximum tank temperature limit." );
-						ShowContinueErrorTimeStamp( " Water heater tank set point temperature is reset to Tank Temperature" " Limit minus 1 C (" + trim( TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).SetPointTemp, 2 ) ) + ") and simulation continues. " );
+						ShowSevereError( "Water heater = " + WaterThermalTank( WaterThermalTankNum ).Name + ":  Water heater tank set point temperature is greater than the maximum tank temperature limit." );
+						ShowContinueErrorTimeStamp( "Water heater tank set point temperature is reset to Tank Temperature Limit minus 1 C (" + TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).SetPointTemp, 2 ) + ") and simulation continues." );
 						WaterThermalTank( WaterThermalTankNum ).ShowSetPointWarning = false;
 					}
 
@@ -4624,8 +4618,8 @@ namespace WaterThermalTanks {
 					WaterThermalTank( WaterThermalTankNum ).SetPointTemp = WaterThermalTank( WaterThermalTankNum ).TankTempLimit + 1.0;
 
 					if ( WaterThermalTank( WaterThermalTankNum ).ShowSetPointWarning ) {
-						ShowSevereError( "Chilled Water Tank = " + trim( WaterThermalTank( WaterThermalTankNum ).Name ) + ":  Water heater tank set point temperature is lower than the minimum tank temperature limit." );
-						ShowContinueErrorTimeStamp( " Chilled water tank set point temperature is reset to Tank Temperature" " Limit plus 1 C (" + trim( TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).SetPointTemp, 2 ) ) + ") and simulation continues. " );
+						ShowSevereError( "Chilled Water Tank = " + WaterThermalTank( WaterThermalTankNum ).Name + ":  Water heater tank set point temperature is lower than the minimum tank temperature limit." );
+						ShowContinueErrorTimeStamp( "Chilled water tank set point temperature is reset to Tank Temperature Limit plus 1 C (" + TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).SetPointTemp, 2 ) + ") and simulation continues." );
 						WaterThermalTank( WaterThermalTankNum ).ShowSetPointWarning = false;
 					}
 
@@ -4678,8 +4672,8 @@ namespace WaterThermalTanks {
 					HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).SetPointTemp = WaterThermalTank( WaterThermalTankNum ).TankTempLimit - 1.0;
 
 					if ( HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).ShowSetPointWarning ) {
-						ShowSevereError( "Heat Pump Water Heater = " + trim( HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).Name ) + ":  Heat Pump water heater set point temperature is equal to or greater than the maximum tank temperature limit." );
-						ShowContinueErrorTimeStamp( " Heat Pump water heater tank set point temperature is reset to Tank Temperature" " Limit minus 1 C (" + trim( TrimSigDigits( HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).SetPointTemp, 2 ) ) + ") and simulation continues. " );
+						ShowSevereError( "Heat Pump Water Heater = " + HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).Name + ":  Heat Pump water heater set point temperature is equal to or greater than the maximum tank temperature limit." );
+						ShowContinueErrorTimeStamp( "Heat Pump water heater tank set point temperature is reset to Tank Temperature Limit minus 1 C (" + TrimSigDigits( HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).SetPointTemp, 2 ) + ") and simulation continues." );
 						HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).ShowSetPointWarning = false;
 					}
 
@@ -5314,11 +5308,11 @@ namespace WaterThermalTanks {
 
 				if ( ! WarmupFlag ) {
 					if ( WaterThermalTank( WaterThermalTankNum ).MaxCycleErrorIndex == 0 ) {
-						ShowWarningError( "WaterHeater:Mixed = " + trim( WaterThermalTank( WaterThermalTankNum ).Name ) + ":  Heater is cycling on and off more than once per second." );
+						ShowWarningError( "WaterHeater:Mixed = " + WaterThermalTank( WaterThermalTankNum ).Name + ":  Heater is cycling on and off more than once per second." );
 						ShowContinueError( "Try increasing Deadband Temperature Difference or Tank Volume" );
-						ShowContinueErrorTimeStamp( " " );
+						ShowContinueErrorTimeStamp( "" );
 					}
-					ShowRecurringWarningErrorAtEnd( "WaterHeater:Mixed = " + trim( WaterThermalTank( WaterThermalTankNum ).Name ) + " Heater is cycling on and off more than once per second:", WaterThermalTank( WaterThermalTankNum ).MaxCycleErrorIndex );
+					ShowRecurringWarningErrorAtEnd( "WaterHeater:Mixed = " + WaterThermalTank( WaterThermalTankNum ).Name + " Heater is cycling on and off more than once per second:", WaterThermalTank( WaterThermalTankNum ).MaxCycleErrorIndex );
 				}
 
 				break;
@@ -6305,7 +6299,7 @@ namespace WaterThermalTanks {
 		int SourceID; // Waste Heat Source ID number
 		FArray1D< Real64 > Par( 5 ); // Parameters passed to RegulaFalsi
 		static Real64 MinTemp( 0.0 ); // used for error messages, C
-		Fstring IterNum( 20 ); // Max number of iterations for warning message
+		std::string IterNum; // Max number of iterations for warning message
 
 		// FLOW:
 		DesuperheaterNum = WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum;
@@ -6355,7 +6349,7 @@ namespace WaterThermalTanks {
 				if ( HeatReclaimRefrigCondenser( SourceID ).AvailTemperature <= WaterThermalTank( WaterThermalTankNum ).SourceInletTemp ) {
 					WaterHeaterDesuperheater( DesuperheaterNum ).Mode = FloatMode;
 					CalcWaterThermalTankMixed( WaterThermalTankNum );
-					ShowRecurringWarningErrorAtEnd( "WaterHeating:Desuperheater " + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + " - Waste heat source temperature was too low to be useful.", WaterHeaterDesuperheater( DesuperheaterNum ).InsuffTemperatureWarn );
+					ShowRecurringWarningErrorAtEnd( "WaterHeating:Desuperheater " + WaterHeaterDesuperheater( DesuperheaterNum ).Name + " - Waste heat source temperature was too low to be useful.", WaterHeaterDesuperheater( DesuperheaterNum ).InsuffTemperatureWarn );
 					return;
 				} // Temp too low
 			} // desuperheater source is condenser_refrigeration
@@ -6370,10 +6364,10 @@ namespace WaterThermalTanks {
 				MinTemp = SetPointTemp - DeadBandTempDiff;
 				++WaterHeaterDesuperheater( DesuperheaterNum ).SetPointError;
 				if ( WaterHeaterDesuperheater( DesuperheaterNum ).SetPointError < 5 ) {
-					ShowWarningError( trim( WaterHeaterDesuperheater( DesuperheaterNum ).Type ) + " \"" + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + "\":  Water heater tank set point temperature is greater than or equal to the cut-in temperature" " of the desuperheater. Desuperheater will be disabled." );
-					ShowContinueErrorTimeStamp( " " "...Desuperheater cut-in temperature = " + trim( RoundSigDigits( MinTemp, 2 ) ) );
+					ShowWarningError( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\":  Water heater tank set point temperature is greater than or equal to the cut-in temperature" " of the desuperheater. Desuperheater will be disabled." );
+					ShowContinueErrorTimeStamp( " ...Desuperheater cut-in temperature = " + RoundSigDigits( MinTemp, 2 ) );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( WaterHeaterDesuperheater( DesuperheaterNum ).Type ) + " \"" + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + "\":  Water heater tank set point temperature is greater than or equal to the cut-in temperature" " of the desuperheater. Desuperheater will be disabled warning continues...", WaterHeaterDesuperheater( DesuperheaterNum ).SetPointErrIndex1, MinTemp, MinTemp );
+					ShowRecurringWarningErrorAtEnd( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\":  Water heater tank set point temperature is greater than or equal to the cut-in temperature" " of the desuperheater. Desuperheater will be disabled warning continues...", WaterHeaterDesuperheater( DesuperheaterNum ).SetPointErrIndex1, MinTemp, MinTemp );
 				}
 			}
 
@@ -6494,15 +6488,15 @@ namespace WaterThermalTanks {
 					SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadRatio, PLRResidualMixedTank, 0.0, WaterHeaterDesuperheater( DesuperheaterNum ).DXSysPLR, Par );
 					if ( SolFla == -1 ) {
 						gio::write( IterNum, "*" ) << MaxIte;
-						IterNum = adjustl( IterNum );
+						strip( IterNum );
 						if ( ! WarmupFlag ) {
 							++WaterHeaterDesuperheater( DesuperheaterNum ).IterLimitExceededNum1;
 							if ( WaterHeaterDesuperheater( DesuperheaterNum ).IterLimitExceededNum1 == 1 ) {
-								ShowWarningError( trim( WaterHeaterDesuperheater( DesuperheaterNum ).Type ) + " \"" + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + "\"" );
-								ShowContinueError( "Iteration limit exceeded calculating desuperheater unit part-load ratio, " "maximum iterations = " + trim( IterNum ) + ". Part-load ratio returned = " + trim( RoundSigDigits( PartLoadRatio, 3 ) ) );
+								ShowWarningError( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\"" );
+								ShowContinueError( "Iteration limit exceeded calculating desuperheater unit part-load ratio, " "maximum iterations = " + IterNum + ". Part-load ratio returned = " + RoundSigDigits( PartLoadRatio, 3 ) );
 								ShowContinueErrorTimeStamp( "This error occurred in heating mode." );
 							} else {
-								ShowRecurringWarningErrorAtEnd( trim( WaterHeaterDesuperheater( DesuperheaterNum ).Type ) + " \"" + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + "\":  Iteration limit exceeded in heating mode warning continues. Part-load ratio statistics follow.", WaterHeaterDesuperheater( DesuperheaterNum ).IterLimitErrIndex1, PartLoadRatio, PartLoadRatio );
+								ShowRecurringWarningErrorAtEnd( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\":  Iteration limit exceeded in heating mode warning continues. Part-load ratio statistics follow.", WaterHeaterDesuperheater( DesuperheaterNum ).IterLimitErrIndex1, PartLoadRatio, PartLoadRatio );
 							}
 						}
 					} else if ( SolFla == -2 ) {
@@ -6510,12 +6504,12 @@ namespace WaterThermalTanks {
 						if ( ! WarmupFlag ) {
 							++WaterHeaterDesuperheater( DesuperheaterNum ).RegulaFalsiFailedNum1;
 							if ( WaterHeaterDesuperheater( DesuperheaterNum ).RegulaFalsiFailedNum1 == 1 ) {
-								ShowWarningError( trim( WaterHeaterDesuperheater( DesuperheaterNum ).Type ) + " \"" + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + "\"" );
-								ShowContinueError( "Desuperheater unit part-load ratio calculation failed: PLR limits " "of 0 to 1 exceeded. Part-load ratio used = " + trim( RoundSigDigits( PartLoadRatio, 3 ) ) );
+								ShowWarningError( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\"" );
+								ShowContinueError( "Desuperheater unit part-load ratio calculation failed: PLR limits " "of 0 to 1 exceeded. Part-load ratio used = " + RoundSigDigits( PartLoadRatio, 3 ) );
 								ShowContinueError( "Please send this information to the EnergyPlus support group." );
 								ShowContinueErrorTimeStamp( "This error occured in heating mode." );
 							} else {
-								ShowRecurringWarningErrorAtEnd( trim( WaterHeaterDesuperheater( DesuperheaterNum ).Type ) + " \"" + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + "\":  Part-load ratio calculation failed in heating mode warning continues. Part-load ratio statistics follow.", WaterHeaterDesuperheater( DesuperheaterNum ).RegulaFalsiFailedIndex1, PartLoadRatio, PartLoadRatio );
+								ShowRecurringWarningErrorAtEnd( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\":  Part-load ratio calculation failed in heating mode warning continues. Part-load ratio statistics follow.", WaterHeaterDesuperheater( DesuperheaterNum ).RegulaFalsiFailedIndex1, PartLoadRatio, PartLoadRatio );
 							}
 						}
 					}
@@ -6574,15 +6568,15 @@ namespace WaterThermalTanks {
 						SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadRatio, PLRResidualMixedTank, 0.0, WaterHeaterDesuperheater( DesuperheaterNum ).DXSysPLR, Par );
 						if ( SolFla == -1 ) {
 							gio::write( IterNum, "*" ) << MaxIte;
-							IterNum = adjustl( IterNum );
+							strip( IterNum );
 							if ( ! WarmupFlag ) {
 								++WaterHeaterDesuperheater( DesuperheaterNum ).IterLimitExceededNum2;
 								if ( WaterHeaterDesuperheater( DesuperheaterNum ).IterLimitExceededNum2 == 1 ) {
-									ShowWarningError( trim( WaterHeaterDesuperheater( DesuperheaterNum ).Type ) + " \"" + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + "\"" );
-									ShowContinueError( "Iteration limit exceeded calculating desuperheater unit part-load ratio, " "maximum iterations = " + trim( IterNum ) + ". Part-load ratio returned = " + trim( RoundSigDigits( PartLoadRatio, 3 ) ) );
+									ShowWarningError( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\"" );
+									ShowContinueError( "Iteration limit exceeded calculating desuperheater unit part-load ratio, " "maximum iterations = " + IterNum + ". Part-load ratio returned = " + RoundSigDigits( PartLoadRatio, 3 ) );
 									ShowContinueErrorTimeStamp( "This error occurred in float mode." );
 								} else {
-									ShowRecurringWarningErrorAtEnd( trim( WaterHeaterDesuperheater( DesuperheaterNum ).Type ) + " \"" + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + "\":  Iteration limit exceeded in float mode warning continues. Part-load ratio statistics follow.", WaterHeaterDesuperheater( DesuperheaterNum ).IterLimitErrIndex2, PartLoadRatio, PartLoadRatio );
+									ShowRecurringWarningErrorAtEnd( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\":  Iteration limit exceeded in float mode warning continues. Part-load ratio statistics follow.", WaterHeaterDesuperheater( DesuperheaterNum ).IterLimitErrIndex2, PartLoadRatio, PartLoadRatio );
 								}
 							}
 						} else if ( SolFla == -2 ) {
@@ -6590,12 +6584,12 @@ namespace WaterThermalTanks {
 							if ( ! WarmupFlag ) {
 								++WaterHeaterDesuperheater( DesuperheaterNum ).RegulaFalsiFailedNum2;
 								if ( WaterHeaterDesuperheater( DesuperheaterNum ).RegulaFalsiFailedNum2 == 1 ) {
-									ShowWarningError( trim( WaterHeaterDesuperheater( DesuperheaterNum ).Type ) + " \"" + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + "\"" );
-									ShowContinueError( "Desuperheater unit part-load ratio calculation failed: PLR limits " "of 0 to 1 exceeded. Part-load ratio used = " + trim( RoundSigDigits( PartLoadRatio, 3 ) ) );
+									ShowWarningError( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\"" );
+									ShowContinueError( "Desuperheater unit part-load ratio calculation failed: PLR limits " "of 0 to 1 exceeded. Part-load ratio used = " + RoundSigDigits( PartLoadRatio, 3 ) );
 									ShowContinueError( "Please send this information to the EnergyPlus support group." );
 									ShowContinueErrorTimeStamp( "This error occured in float mode." );
 								} else {
-									ShowRecurringWarningErrorAtEnd( trim( WaterHeaterDesuperheater( DesuperheaterNum ).Type ) + " \"" + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + "\": Part-load ratio calculation failed in float mode warning continues. Part-load ratio statistics follow.", WaterHeaterDesuperheater( DesuperheaterNum ).RegulaFalsiFailedIndex2, PartLoadRatio, PartLoadRatio );
+									ShowRecurringWarningErrorAtEnd( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\": Part-load ratio calculation failed in float mode warning continues. Part-load ratio statistics follow.", WaterHeaterDesuperheater( DesuperheaterNum ).RegulaFalsiFailedIndex2, PartLoadRatio, PartLoadRatio );
 								}
 							}
 						}
@@ -6610,7 +6604,7 @@ namespace WaterThermalTanks {
 
 			//   should never get here, case is checked in GetWaterThermalTankInput
 		} else {
-			ShowFatalError( "Coil:WaterHeating:Desuperheater = " + trim( WaterHeaterDesuperheater( DesuperheaterNum ).Name ) + ":  invalid water heater tank type and name entered = " + trim( WaterHeaterDesuperheater( DesuperheaterNum ).TankType ) + ", " + trim( WaterHeaterDesuperheater( DesuperheaterNum ).TankName ) );
+			ShowFatalError( "Coil:WaterHeating:Desuperheater = " + WaterHeaterDesuperheater( DesuperheaterNum ).Name + ":  invalid water heater tank type and name entered = " + WaterHeaterDesuperheater( DesuperheaterNum ).TankType + ", " + WaterHeaterDesuperheater( DesuperheaterNum ).TankName );
 
 		}}
 
@@ -6724,8 +6718,8 @@ namespace WaterThermalTanks {
 		int SolFla; // Flag of RegulaFalsi solver
 		FArray1D< Real64 > Par( 5 ); // Parameters passed to RegulaFalsi
 		Real64 HPMinTemp; // used for error messages, C
-		Fstring HPMinTempChar( MaxNameLength ); // used for error messages
-		Fstring IterNum( 20 ); // Max number of iterations for warning message
+		std::string HPMinTempChar; // used for error messages
+		std::string IterNum; // Max number of iterations for warning message
 		int CompOp; // DX compressor operation; 1=on, 0=off
 		Real64 CondenserDeltaT; // HPWH condenser water temperature difference
 		Real64 HPWHCondInletNodeLast; // Water temp sent from WH on last iteration
@@ -6813,10 +6807,10 @@ namespace WaterThermalTanks {
 					++HPWaterHeater( HPNum ).HPSetPointError;
 					//!add logic for warmup, kickoffsimulation and doing sizing here
 					if ( HPWaterHeater( HPNum ).HPSetPointError == 1 ) {
-						ShowWarningError( trim( HPWaterHeater( HPNum ).Type ) + " \"" + trim( HPWaterHeater( HPNum ).Name ) + ":  Water heater tank set point temperature is greater than or equal to the cut-in temperature" " of the heat pump water heater. Heat Pump will be disabled and simulation continues." );
-						ShowContinueErrorTimeStamp( " " "...Heat Pump cut-in temperature=" + trim( HPMinTempChar ) );
+						ShowWarningError( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + ":  Water heater tank set point temperature is greater than or equal to the cut-in temperature" " of the heat pump water heater. Heat Pump will be disabled and simulation continues." );
+						ShowContinueErrorTimeStamp( " ...Heat Pump cut-in temperature=" + HPMinTempChar );
 					} else {
-						ShowRecurringWarningErrorAtEnd( trim( HPWaterHeater( HPNum ).Type ) + " \"" + trim( HPWaterHeater( HPNum ).Name ) + ":  Water heater tank set point temperature is greater than or equal to the cut-in temperature" " of the heat pump water heater. Heat Pump will be disabled error continues...", HPWaterHeater( HPNum ).HPSetPointErrIndex1, HPMinTemp, HPMinTemp );
+						ShowRecurringWarningErrorAtEnd( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + ":  Water heater tank set point temperature is greater than or equal to the cut-in temperature" " of the heat pump water heater. Heat Pump will be disabled error continues...", HPWaterHeater( HPNum ).HPSetPointErrIndex1, HPMinTemp, HPMinTemp );
 					}
 				}
 			}
@@ -6896,15 +6890,15 @@ namespace WaterThermalTanks {
 				}}
 				if ( SolFla == -1 ) {
 					gio::write( IterNum, "*" ) << MaxIte;
-					IterNum = adjustl( IterNum );
+					strip( IterNum );
 					if ( ! WarmupFlag ) {
 						++HPWaterHeater( HPNum ).IterLimitExceededNum1;
 						if ( HPWaterHeater( HPNum ).IterLimitExceededNum1 == 1 ) {
-							ShowWarningError( trim( HPWaterHeater( HPNum ).Type ) + " \"" + trim( HPWaterHeater( HPNum ).Name ) + "\"" );
-							ShowContinueError( "Iteration limit exceeded calculating heat pump water heater compressor" " part-load ratio, maximum iterations = " + trim( IterNum ) + ". Part-load ratio returned = " + trim( RoundSigDigits( HPPartLoadRatio, 3 ) ) );
+							ShowWarningError( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + "\"" );
+							ShowContinueError( "Iteration limit exceeded calculating heat pump water heater compressor" " part-load ratio, maximum iterations = " + IterNum + ". Part-load ratio returned = " + RoundSigDigits( HPPartLoadRatio, 3 ) );
 							ShowContinueErrorTimeStamp( "This error occurred in heating mode." );
 						} else {
-							ShowRecurringWarningErrorAtEnd( trim( HPWaterHeater( HPNum ).Type ) + " \"" + trim( HPWaterHeater( HPNum ).Name ) + "\":  Iteration limit exceeded in heating mode warning continues. Part-load ratio statistics follow.", HPWaterHeater( HPNum ).IterLimitErrIndex1, HPPartLoadRatio, HPPartLoadRatio );
+							ShowRecurringWarningErrorAtEnd( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + "\":  Iteration limit exceeded in heating mode warning continues. Part-load ratio statistics follow.", HPWaterHeater( HPNum ).IterLimitErrIndex1, HPPartLoadRatio, HPPartLoadRatio );
 						}
 					}
 				} else if ( SolFla == -2 ) {
@@ -6912,12 +6906,12 @@ namespace WaterThermalTanks {
 					if ( ! WarmupFlag ) {
 						++HPWaterHeater( HPNum ).RegulaFalsiFailedNum1;
 						if ( HPWaterHeater( HPNum ).RegulaFalsiFailedNum1 == 1 ) {
-							ShowWarningError( trim( HPWaterHeater( HPNum ).Type ) + " \"" + trim( HPWaterHeater( HPNum ).Name ) + "\"" );
-							ShowContinueError( "Heat pump water heater compressor part-load ratio calculation failed: PLR limits " "of 0 to 1 exceeded. Part-load ratio used = " + trim( RoundSigDigits( HPPartLoadRatio, 3 ) ) );
+							ShowWarningError( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + "\"" );
+							ShowContinueError( "Heat pump water heater compressor part-load ratio calculation failed: PLR limits " "of 0 to 1 exceeded. Part-load ratio used = " + RoundSigDigits( HPPartLoadRatio, 3 ) );
 							ShowContinueError( "Please send this information to the EnergyPlus support group." );
 							ShowContinueErrorTimeStamp( "This error occured in heating mode." );
 						} else {
-							ShowRecurringWarningErrorAtEnd( trim( HPWaterHeater( HPNum ).Type ) + " \"" + trim( HPWaterHeater( HPNum ).Name ) + "\":  Part-load ratio calculation failed in heating mode warning continues. Part-load ratio statistics follow.", HPWaterHeater( HPNum ).RegulaFalsiFailedIndex1, HPPartLoadRatio, HPPartLoadRatio );
+							ShowRecurringWarningErrorAtEnd( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + "\":  Part-load ratio calculation failed in heating mode warning continues. Part-load ratio statistics follow.", HPWaterHeater( HPNum ).RegulaFalsiFailedIndex1, HPPartLoadRatio, HPPartLoadRatio );
 						}
 					}
 				}
@@ -7037,15 +7031,15 @@ namespace WaterThermalTanks {
 					}}
 					if ( SolFla == -1 ) {
 						gio::write( IterNum, "*" ) << MaxIte;
-						IterNum = adjustl( IterNum );
+						strip( IterNum );
 						if ( ! WarmupFlag ) {
 							++HPWaterHeater( HPNum ).IterLimitExceededNum2;
 							if ( HPWaterHeater( HPNum ).IterLimitExceededNum2 == 1 ) {
-								ShowWarningError( trim( HPWaterHeater( HPNum ).Type ) + " \"" + trim( HPWaterHeater( HPNum ).Name ) + "\"" );
-								ShowContinueError( "Iteration limit exceeded calculating heat pump water heater compressor" " part-load ratio, maximum iterations = " + trim( IterNum ) + ". Part-load ratio returned = " + trim( RoundSigDigits( HPPartLoadRatio, 3 ) ) );
+								ShowWarningError( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + "\"" );
+								ShowContinueError( "Iteration limit exceeded calculating heat pump water heater compressor" " part-load ratio, maximum iterations = " + IterNum + ". Part-load ratio returned = " + RoundSigDigits( HPPartLoadRatio, 3 ) );
 								ShowContinueErrorTimeStamp( "This error occurred in float mode." );
 							} else {
-								ShowRecurringWarningErrorAtEnd( trim( HPWaterHeater( HPNum ).Type ) + " \"" + trim( HPWaterHeater( HPNum ).Name ) + "\":  Iteration limit exceeded in float mode warning continues. Part-load ratio statistics follow.", HPWaterHeater( HPNum ).IterLimitErrIndex2, HPPartLoadRatio, HPPartLoadRatio );
+								ShowRecurringWarningErrorAtEnd( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + "\":  Iteration limit exceeded in float mode warning continues. Part-load ratio statistics follow.", HPWaterHeater( HPNum ).IterLimitErrIndex2, HPPartLoadRatio, HPPartLoadRatio );
 							}
 						}
 					} else if ( SolFla == -2 ) {
@@ -7053,12 +7047,12 @@ namespace WaterThermalTanks {
 						if ( ! WarmupFlag ) {
 							++HPWaterHeater( HPNum ).RegulaFalsiFailedNum2;
 							if ( HPWaterHeater( HPNum ).RegulaFalsiFailedNum2 == 1 ) {
-								ShowWarningError( trim( HPWaterHeater( HPNum ).Type ) + " \"" + trim( HPWaterHeater( HPNum ).Name ) + "\"" );
-								ShowContinueError( "Heat pump water heater compressor part-load ratio calculation failed: PLR limits " "of 0 to 1 exceeded. Part-load ratio used = " + trim( RoundSigDigits( HPPartLoadRatio, 3 ) ) );
+								ShowWarningError( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + "\"" );
+								ShowContinueError( "Heat pump water heater compressor part-load ratio calculation failed: PLR limits " "of 0 to 1 exceeded. Part-load ratio used = " + RoundSigDigits( HPPartLoadRatio, 3 ) );
 								ShowContinueError( "Please send this information to the EnergyPlus support group." );
 								ShowContinueErrorTimeStamp( "This error occured in float mode." );
 							} else {
-								ShowRecurringWarningErrorAtEnd( trim( HPWaterHeater( HPNum ).Type ) + " \"" + trim( HPWaterHeater( HPNum ).Name ) + "\": Part-load ratio calculation failed in float mode warning continues. Part-load ratio statistics follow.", HPWaterHeater( HPNum ).RegulaFalsiFailedIndex2, HPPartLoadRatio, HPPartLoadRatio );
+								ShowRecurringWarningErrorAtEnd( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + "\": Part-load ratio calculation failed in float mode warning continues. Part-load ratio statistics follow.", HPWaterHeater( HPNum ).RegulaFalsiFailedIndex2, HPPartLoadRatio, HPPartLoadRatio );
 							}
 						}
 					}
@@ -7673,7 +7667,7 @@ namespace WaterThermalTanks {
 			LoopSideNum = WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopSide;
 
 			if ( ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantSizNum == 0 ) ) {
-				ShowSevereError( "Water heater = " + trim( WaterThermalTank( WaterThermalTankNum ).Name ) + " for autosizing Use side flow rate, did not find Sizing:Plant object " + trim( PlantLoop( PlantLoopNum ).Name ) );
+				ShowSevereError( "Water heater = " + WaterThermalTank( WaterThermalTankNum ).Name + " for autosizing Use side flow rate, did not find Sizing:Plant object " + PlantLoop( PlantLoopNum ).Name );
 				ErrorsFound = true;
 			}
 			//Is this wh Use side plumbed in series (default) or are there other branches in parallel?
@@ -7694,7 +7688,7 @@ namespace WaterThermalTanks {
 			LoopSideNum = WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopSide;
 			// was user's input correct for plant loop name?
 			if ( ( WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantSizNum == 0 ) && ( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum == 0 ) && ( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum == 0 ) ) {
-				ShowSevereError( "Water heater = " + trim( WaterThermalTank( WaterThermalTankNum ).Name ) + "for autosizing Source side flow rate, did not find Sizing:Plant object " + trim( PlantLoop( PlantLoopNum ).Name ) );
+				ShowSevereError( "Water heater = " + WaterThermalTank( WaterThermalTankNum ).Name + "for autosizing Source side flow rate, did not find Sizing:Plant object " + PlantLoop( PlantLoopNum ).Name );
 				ErrorsFound = true;
 			}
 			//Is this wh Source side plumbed in series (default) or are there other branches in parallel?
@@ -8281,7 +8275,7 @@ namespace WaterThermalTanks {
 					}
 					tmpMaxCapacity = ( WaterThermalTank( WaterThermalTankNum ).Volume * rho * Cp * ( Tfinish - Tstart ) ) / ( WaterThermalTank( WaterThermalTankNum ).Sizing.RecoveryTime * SecInHour ); // m3 | kg/m3 | J/Kg/K | K | seconds
 				} else {
-					ShowFatalError( "SizeTankForSupplySide: Tank=\"" + trim( WaterThermalTank( WaterThermalTankNum ).Name ) + "\", requested sizing for max capacity but entered Recovery Time is zero." );
+					ShowFatalError( "SizeTankForSupplySide: Tank=\"" + WaterThermalTank( WaterThermalTankNum ).Name + "\", requested sizing for max capacity but entered Recovery Time is zero." );
 				}
 			}
 
@@ -8429,11 +8423,11 @@ namespace WaterThermalTanks {
 							if ( ! WaterThermalTank( WaterThermalTankNum ).IsChilledWaterTank ) {
 								// plant sizing object design temperature is set too low throw warning.
 								ShowSevereError( "Autosizing of Use side water heater design flow rate requires " "Sizing:Plant object to have an exit temperature >= 58C" );
-								ShowContinueError( "Occurs for water heater object=" + trim( WaterThermalTank( WaterThermalTankNum ).Name ) );
+								ShowContinueError( "Occurs for water heater object=" + WaterThermalTank( WaterThermalTankNum ).Name );
 							} else {
 								// plant sizing object design temperature is set too hi throw warning.
 								ShowSevereError( "Autosizing of Use side chilled water tank design flow rate requires " "Sizing:Plant object to have an exit temperature <= 8C" );
-								ShowContinueError( "Occurs for chilled water storage tank object=" + trim( WaterThermalTank( WaterThermalTankNum ).Name ) );
+								ShowContinueError( "Occurs for chilled water storage tank object=" + WaterThermalTank( WaterThermalTankNum ).Name );
 
 							}
 							ErrorsFound = true;
@@ -8494,11 +8488,11 @@ namespace WaterThermalTanks {
 							if ( ! WaterThermalTank( WaterThermalTankNum ).IsChilledWaterTank ) {
 								// plant sizing object design temperature is set too low throw warning.
 								ShowSevereError( "Autosizing of Source side water heater design flow rate requires " "Sizing:Plant object to have an exit temperature >= 58C" );
-								ShowContinueError( "Occurs for WaterHeater:Mixed object=" + trim( WaterThermalTank( WaterThermalTankNum ).Name ) );
+								ShowContinueError( "Occurs for WaterHeater:Mixed object=" + WaterThermalTank( WaterThermalTankNum ).Name );
 							} else {
 								// plant sizing object design temperature is set too hi throw warning.
 								ShowSevereError( "Autosizing of Source side chilled water tank design flow rate requires " "Sizing:Plant object to have an exit temperature <= 8C" );
-								ShowContinueError( "Occurs for chilled water storage tank object=" + trim( WaterThermalTank( WaterThermalTankNum ).Name ) );
+								ShowContinueError( "Occurs for chilled water storage tank object=" + WaterThermalTank( WaterThermalTankNum ).Name );
 							}
 							ErrorsFound = true;
 						}
@@ -8628,7 +8622,7 @@ namespace WaterThermalTanks {
 
 						tmpMaxCapacity = ( WaterThermalTank( WaterThermalTankNum ).Volume * rho * Cp * ( Tfinish - Tstart ) ) / ( WaterThermalTank( WaterThermalTankNum ).Sizing.RecoveryTime * SecInHour ); // m3 | kg/m3 | J/Kg/K | K | seconds
 					} else {
-						ShowFatalError( "SizeStandAloneWaterHeater: Tank=\"" + trim( WaterThermalTank( WaterThermalTankNum ).Name ) + "\", requested sizing for max capacity but entered Recovery Time is zero." );
+						ShowFatalError( "SizeStandAloneWaterHeater: Tank=\"" + WaterThermalTank( WaterThermalTankNum ).Name + "\", requested sizing for max capacity but entered Recovery Time is zero." );
 					}
 					WaterThermalTank( WaterThermalTankNum ).MaxCapacity = tmpMaxCapacity;
 					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
@@ -9029,12 +9023,12 @@ namespace WaterThermalTanks {
 		Real64 AmbientHumRat; // used during HPWH rating procedure
 		Real64 RatedDXCoilTotalCapacity; // used during HPWH rating procedure
 		bool FirstTimeFlag; // used during HPWH rating procedure
-		Fstring equipName( MaxNameLength );
+		std::string equipName;
 		static bool MyOneTimeSetupFlag( true ); // one time setup flag
 
 		// Formats
-		std::string const Format_720( "('Water Heater Information',6(',',A))" );
-		std::string const Format_721( "('Heat Pump Water Heater Information',7(',',A))" );
+		static gio::Fmt const Format_720( "('Water Heater Information',6(',',A))" );
+		static gio::Fmt const Format_721( "('Heat Pump Water Heater Information',7(',',A))" );
 
 		if ( AlreadyRated( WaterThermalTankNum ) ) { // bail we already did this one
 			return;
@@ -9206,7 +9200,7 @@ namespace WaterThermalTanks {
 				RecoveryEfficiency = 0.0;
 				EnergyFactor = 0.0;
 
-				ShowWarningError( "Water heater = " + trim( WaterThermalTank( WaterThermalTankNum ).Name ) + ":  Recovery Efficiency and Energy Factor could not be calculated during the test for standard ratings" );
+				ShowWarningError( "Water heater = " + WaterThermalTank( WaterThermalTankNum ).Name + ":  Recovery Efficiency and Energy Factor could not be calculated during the test for standard ratings" );
 				ShowContinueError( "Setpoint was never recovered and/or heater never turned on" );
 			}
 
@@ -9251,9 +9245,9 @@ namespace WaterThermalTanks {
 				MaxCapacity = WaterThermalTank( WaterThermalTankNum ).MaxCapacity;
 			}
 
-			gio::write( OutputFileInits, Format_720 ) << trim( WaterThermalTank( WaterThermalTankNum ).Type ) << trim( WaterThermalTank( WaterThermalTankNum ).Name ) << trim( TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Volume, 4 ) ) << trim( TrimSigDigits( MaxCapacity, 1 ) ) << trim( TrimSigDigits( RecoveryEfficiency, 3 ) ) << trim( TrimSigDigits( EnergyFactor, 4 ) );
+			gio::write( OutputFileInits, Format_720 ) << WaterThermalTank( WaterThermalTankNum ).Type << WaterThermalTank( WaterThermalTankNum ).Name << TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Volume, 4 ) << TrimSigDigits( MaxCapacity, 1 ) << TrimSigDigits( RecoveryEfficiency, 3 ) << TrimSigDigits( EnergyFactor, 4 );
 		} else {
-			gio::write( OutputFileInits, Format_721 ) << trim( HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).Type ) << trim( HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).Name ) << trim( TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Volume, 4 ) ) << trim( TrimSigDigits( HPWHHeatingCapacity, 1 ) ) << trim( TrimSigDigits( RecoveryEfficiency, 3 ) ) << trim( TrimSigDigits( EnergyFactor, 4 ) ) << trim( TrimSigDigits( RatedDXCoilTotalCapacity, 0 ) );
+			gio::write( OutputFileInits, Format_721 ) << HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).Type << HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).Name << TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Volume, 4 ) << TrimSigDigits( HPWHHeatingCapacity, 1 ) << TrimSigDigits( RecoveryEfficiency, 3 ) << TrimSigDigits( EnergyFactor, 4 ) << TrimSigDigits( RatedDXCoilTotalCapacity, 0 );
 		}
 
 		AlreadyRated( WaterThermalTankNum ) = true;
@@ -9299,7 +9293,7 @@ namespace WaterThermalTanks {
 		static FArray1D_bool AlreadyReported; // control so we don't repeat again
 
 		// Formats
-		std::string const Format_728( "('Chilled Water Tank Information',5(',',A))" );
+		static gio::Fmt const Format_728( "('Chilled Water Tank Information',5(',',A))" );
 
 		if ( MyOneTimeSetupFlag ) {
 			AlreadyReported.allocate( NumWaterThermalTank );
@@ -9311,7 +9305,7 @@ namespace WaterThermalTanks {
 			return;
 		}
 
-		gio::write( OutputFileInits, Format_728 ) << trim( WaterThermalTank( WaterThermalTankNum ).Type ) << trim( WaterThermalTank( WaterThermalTankNum ).Name ) << trim( TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Volume, 4 ) ) << trim( TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate, 4 ) ) << trim( TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate, 4 ) );
+		gio::write( OutputFileInits, Format_728 ) << WaterThermalTank( WaterThermalTankNum ).Type << WaterThermalTank( WaterThermalTankNum ).Name << TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).Volume, 4 ) << TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate, 4 ) << TrimSigDigits( WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate, 4 );
 
 		AlreadyReported( WaterThermalTankNum ) = true;
 

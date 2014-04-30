@@ -112,3 +112,19 @@ TEST( ReadTest, ReadFloatPFromStream )
 		EXPECT_EQ( 1125.0f, f );
 	}
 }
+
+TEST( ReadTest, ReadStringFromString )
+{
+	{
+		std::string const icity( "Paris" );
+		std::string ocity;
+		Read( icity, "*" ) >> ocity;
+		EXPECT_EQ( icity, ocity );
+	}
+	{
+		std::string const icity( "Paris" );
+		std::string ocity;
+		Read( icity, "(A)" ) >> ocity;
+		EXPECT_EQ( icity, ocity );
+	}
+}

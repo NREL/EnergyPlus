@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -15,7 +14,6 @@ namespace EnergyPlus {
 namespace UserDefinedComponents {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 	using DataPlant::HowMet_Unknown;
 	using DataPlant::LoopFlowStatus_Unknown;
 
@@ -313,7 +311,7 @@ namespace UserDefinedComponents {
 	struct UserPlantComponentStruct
 	{
 		// Members
-		Fstring Name; // user identifier
+		std::string Name; // user identifier
 		int ErlSimProgramMngr; // EMS:ProgramManager to always run when this model is called
 		int NumPlantConnections; // count of how many plant loop connections there are
 		FArray1D< PlantConnectionStruct > Loop; // collect data for each plant loop connection
@@ -323,14 +321,13 @@ namespace UserDefinedComponents {
 
 		// Default Constructor
 		UserPlantComponentStruct() :
-			Name( MaxNameLength ),
 			ErlSimProgramMngr( 0 ),
 			NumPlantConnections( 0 )
 		{}
 
 		// Member Constructor
 		UserPlantComponentStruct(
-			Fstring const & Name, // user identifier
+			std::string const & Name, // user identifier
 			int const ErlSimProgramMngr, // EMS:ProgramManager to always run when this model is called
 			int const NumPlantConnections, // count of how many plant loop connections there are
 			FArray1< PlantConnectionStruct > const & Loop, // collect data for each plant loop connection
@@ -338,7 +335,7 @@ namespace UserDefinedComponents {
 			WaterUseTankConnectionStruct const & Water,
 			ZoneInternalGainsStruct const & Zone
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ErlSimProgramMngr( ErlSimProgramMngr ),
 			NumPlantConnections( NumPlantConnections ),
 			Loop( Loop ),
@@ -352,7 +349,7 @@ namespace UserDefinedComponents {
 	struct UserCoilComponentStruct
 	{
 		// Members
-		Fstring Name; // user identifier
+		std::string Name; // user identifier
 		int ErlSimProgramMngr; // EMS:ProgramManager to always run when this model is called
 		int ErlInitProgramMngr; // EMS:ProgramManager to  run when this model is initialized and setup
 		int NumAirConnections; // count of how many air connectiosn there are
@@ -364,7 +361,6 @@ namespace UserDefinedComponents {
 
 		// Default Constructor
 		UserCoilComponentStruct() :
-			Name( MaxNameLength ),
 			ErlSimProgramMngr( 0 ),
 			ErlInitProgramMngr( 0 ),
 			NumAirConnections( 0 ),
@@ -373,7 +369,7 @@ namespace UserDefinedComponents {
 
 		// Member Constructor
 		UserCoilComponentStruct(
-			Fstring const & Name, // user identifier
+			std::string const & Name, // user identifier
 			int const ErlSimProgramMngr, // EMS:ProgramManager to always run when this model is called
 			int const ErlInitProgramMngr, // EMS:ProgramManager to  run when this model is initialized and setup
 			int const NumAirConnections, // count of how many air connectiosn there are
@@ -383,7 +379,7 @@ namespace UserDefinedComponents {
 			WaterUseTankConnectionStruct const & Water,
 			ZoneInternalGainsStruct const & Zone
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ErlSimProgramMngr( ErlSimProgramMngr ),
 			ErlInitProgramMngr( ErlInitProgramMngr ),
 			NumAirConnections( NumAirConnections ),
@@ -399,7 +395,7 @@ namespace UserDefinedComponents {
 	struct UserZoneHVACForcedAirComponentStruct
 	{
 		// Members
-		Fstring Name; // user identifier
+		std::string Name; // user identifier
 		int ErlSimProgramMngr; // EMS:ProgramManager to always run when this model is called
 		int ErlInitProgramMngr; // EMS:ProgramManager to  run when this model is initialized and setup
 		AirConnectionStruct ZoneAir;
@@ -415,7 +411,6 @@ namespace UserDefinedComponents {
 
 		// Default Constructor
 		UserZoneHVACForcedAirComponentStruct() :
-			Name( MaxNameLength ),
 			ErlSimProgramMngr( 0 ),
 			ErlInitProgramMngr( 0 ),
 			NumPlantConnections( 0 ),
@@ -427,7 +422,7 @@ namespace UserDefinedComponents {
 
 		// Member Constructor
 		UserZoneHVACForcedAirComponentStruct(
-			Fstring const & Name, // user identifier
+			std::string const & Name, // user identifier
 			int const ErlSimProgramMngr, // EMS:ProgramManager to always run when this model is called
 			int const ErlInitProgramMngr, // EMS:ProgramManager to  run when this model is initialized and setup
 			AirConnectionStruct const & ZoneAir,
@@ -441,7 +436,7 @@ namespace UserDefinedComponents {
 			Real64 const RemainingOutputReqToHumidSP, // latent load remaining for device, to humidification setpoint [kg/s]
 			Real64 const RemainingOutputReqToDehumidSP // latent load remaining for device, Negative means dehumidify [kg/s]
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ErlSimProgramMngr( ErlSimProgramMngr ),
 			ErlInitProgramMngr( ErlInitProgramMngr ),
 			ZoneAir( ZoneAir ),
@@ -461,7 +456,7 @@ namespace UserDefinedComponents {
 	struct UserAirTerminalComponentStruct
 	{
 		// Members
-		Fstring Name; // user identifier
+		std::string Name; // user identifier
 		int ActualCtrlZoneNum;
 		int ErlSimProgramMngr; // EMS:ProgramManager to always run when this model is called
 		int ErlInitProgramMngr; // EMS:ProgramManager to  run when this model is initialized and setup
@@ -478,7 +473,6 @@ namespace UserDefinedComponents {
 
 		// Default Constructor
 		UserAirTerminalComponentStruct() :
-			Name( MaxNameLength ),
 			ActualCtrlZoneNum( 0 ),
 			ErlSimProgramMngr( 0 ),
 			ErlInitProgramMngr( 0 ),
@@ -491,7 +485,7 @@ namespace UserDefinedComponents {
 
 		// Member Constructor
 		UserAirTerminalComponentStruct(
-			Fstring const & Name, // user identifier
+			std::string const & Name, // user identifier
 			int const ActualCtrlZoneNum,
 			int const ErlSimProgramMngr, // EMS:ProgramManager to always run when this model is called
 			int const ErlInitProgramMngr, // EMS:ProgramManager to  run when this model is initialized and setup
@@ -506,7 +500,7 @@ namespace UserDefinedComponents {
 			Real64 const RemainingOutputReqToHumidSP, // latent load remaining for device, to humidification setpoint [kg/s]
 			Real64 const RemainingOutputReqToDehumidSP // latent load remaining for device, Negative means dehumidify [kg/s]
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ActualCtrlZoneNum( ActualCtrlZoneNum ),
 			ErlSimProgramMngr( ErlSimProgramMngr ),
 			ErlInitProgramMngr( ErlInitProgramMngr ),
@@ -536,8 +530,8 @@ namespace UserDefinedComponents {
 	SimUserDefinedPlantComponent(
 		int const LoopNum, // plant loop sim call originated from
 		int const LoopSideNum, // plant loop side sim call originated from
-		Fstring const & EquipType, // type of equipment, 'PlantComponent:UserDefined'
-		Fstring const & EquipName, // user name for component
+		std::string const & EquipType, // type of equipment, 'PlantComponent:UserDefined'
+		std::string const & EquipName, // user name for component
 		int & CompIndex,
 		bool & InitLoopEquip,
 		Real64 const MyLoad,
@@ -548,7 +542,7 @@ namespace UserDefinedComponents {
 
 	void
 	SimCoilUserDefined(
-		Fstring const & EquipName, // user name for component
+		std::string const & EquipName, // user name for component
 		int & CompIndex,
 		int const AirLoopNum,
 		bool & HeatingActive,
@@ -557,7 +551,7 @@ namespace UserDefinedComponents {
 
 	void
 	SimZoneAirUserDefined(
-		Fstring const & CompName, // name of the packaged terminal heat pump
+		std::string const & CompName, // name of the packaged terminal heat pump
 		int const ZoneNum, // number of zone being served
 		Real64 & SensibleOutputProvided, // sensible capacity delivered to zone
 		Real64 & LatentOutputProvided, // Latent add/removal  (kg/s), dehumid = negative
@@ -566,7 +560,7 @@ namespace UserDefinedComponents {
 
 	void
 	SimAirTerminalUserDefined(
-		Fstring const & CompName,
+		std::string const & CompName,
 		bool const FirstHVACIteration,
 		int const ZoneNum,
 		int const ZoneNodeNum,

@@ -153,7 +153,7 @@ namespace DXFEarClipping {
 		FArray1D< dTriangle > & outtriangles,
 		Real64 const surfazimuth, // surface azimuth angle (outward facing normal)
 		Real64 const surftilt, // surface tilt angle
-		Fstring const & surfname, // surface name (for error messages)
+		std::string const & surfname, // surface name (for error messages)
 		int const surfclass // surface class
 	)
 	{
@@ -235,7 +235,7 @@ namespace DXFEarClipping {
 		int ncverts;
 		//unused  double precision :: ang
 		//unused  double precision :: val
-		Fstring line( 200 );
+		std::string line;
 		static int errcount( 0 );
 
 		// Object Data
@@ -286,25 +286,25 @@ namespace DXFEarClipping {
 		while ( nvertcur > 3 ) {
 			generate_ears( nsides, vertex, ears, nears, r_angles, nrangles, c_vertices, ncverts, removed, earverts, rangles );
 			if ( ! any_gt( ears, 0 ) ) {
-				ShowWarningError( "DXFOut: Could not triangulate surface=\"" + trim( surfname ) + "\", type=\"" + trim( cSurfaceClass( surfclass ) ) + "\", check surface vertex order(entry)" );
+				ShowWarningError( "DXFOut: Could not triangulate surface=\"" + surfname + "\", type=\"" + cSurfaceClass( surfclass ) + "\", check surface vertex order(entry)" );
 				++errcount;
 				if ( errcount == 1 && ! DisplayExtraWarnings ) {
 					ShowContinueError( "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces." );
 				}
 				if ( DisplayExtraWarnings ) {
-					gio::write( line, "*" ) << "surface=" << trim( surfname ) << " class=" << trim( cSurfaceClass( surfclass ) );
-					ShowMessage( trim( line ) );
+					gio::write( line, "*" ) << "surface=" << surfname << " class=" << cSurfaceClass( surfclass );
+					ShowMessage( line );
 					for ( j = 1; j <= nsides; ++j ) {
 						//          write(line,"(' side=',i2,' (',2(f6.1,','),f6.1,')')") j,polygon(j)
-						line = " side=" + trim( RoundSigDigits( j ) ) + " (" + trim( RoundSigDigits( polygon( j ).x, 1 ) ) + "," + trim( RoundSigDigits( polygon( j ).y, 1 ) ) + "," + trim( RoundSigDigits( polygon( j ).z, 1 ) ) + ")";
-						ShowMessage( trim( line ) );
+						line = " side=" + RoundSigDigits( j ) + " (" + RoundSigDigits( polygon( j ).x, 1 ) + ',' + RoundSigDigits( polygon( j ).y, 1 ) + ',' + RoundSigDigits( polygon( j ).z, 1 ) + ')';
+						ShowMessage( line );
 					}
 					gio::write( line, "*" ) << "number of triangles found=" << ncount;
-					ShowMessage( trim( line ) );
+					ShowMessage( line );
 					for ( j = 1; j <= nrangles; ++j ) {
 						//          write(line,"(' r angle=',i2,' vert=',i2,' deg=',f6.1)") j,r_angles(j),rangles(j)*radtodeg
-						line = " r angle=" + trim( RoundSigDigits( j ) ) + " vert=" + trim( RoundSigDigits( r_angles( j ) ) ) + " deg=" + trim( RoundSigDigits( rangles( j ) * radtodeg, 1 ) );
-						ShowMessage( trim( line ) );
+						line = " r angle=" + RoundSigDigits( j ) + " vert=" + RoundSigDigits( r_angles( j ) ) + " deg=" + RoundSigDigits( rangles( j ) * radtodeg, 1 );
+						ShowMessage( line );
 					}
 				}
 				break; // while loop

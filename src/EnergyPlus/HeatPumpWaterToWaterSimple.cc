@@ -52,7 +52,6 @@ namespace HeatPumpWaterToWaterSimple {
 	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::BeginSimFlag;
 	using DataGlobals::InitConvTemp;
 	using DataGlobals::BeginEnvrnFlag;
@@ -70,10 +69,10 @@ namespace HeatPumpWaterToWaterSimple {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	Fstring const HPEqFitHeating( "HeatPump:WatertoWater:EquationFit:Heating" );
-	Fstring const HPEqFitHeatingUC( "HEATPUMP:WATERTOWATER:EQUATIONFIT:HEATING" );
-	Fstring const HPEqFitCooling( "HeatPump:WatertoWater:EquationFit:Cooling" );
-	Fstring const HPEqFitCoolingUC( "HEATPUMP:WATERTOWATER:EQUATIONFIT:COOLING" );
+	std::string const HPEqFitHeating( "HeatPump:WatertoWater:EquationFit:Heating" );
+	std::string const HPEqFitHeatingUC( "HEATPUMP:WATERTOWATER:EQUATIONFIT:HEATING" );
+	std::string const HPEqFitCooling( "HeatPump:WatertoWater:EquationFit:Cooling" );
+	std::string const HPEqFitCoolingUC( "HEATPUMP:WATERTOWATER:EQUATIONFIT:COOLING" );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -106,9 +105,9 @@ namespace HeatPumpWaterToWaterSimple {
 
 	void
 	SimHPWatertoWaterSimple(
-		Fstring const & GSHPType, // Type of GSHP
+		std::string const & GSHPType, // Type of GSHP
 		int const GSHPTypeNum, // Type of GSHP in Plant equipment
-		Fstring const & GSHPName, // User Specified Name of GSHP
+		std::string const & GSHPName, // User Specified Name of GSHP
 		int & GSHPNum, // Index of Equipment
 		bool const FirstHVACIteration,
 		bool & InitLoopEquip, // If not zero, calculate the max load for operating conditions
@@ -174,7 +173,7 @@ namespace HeatPumpWaterToWaterSimple {
 					MaxCap = GSHP( GSHPNum ).RatedCapHeat;
 					OptCap = GSHP( GSHPNum ).RatedCapHeat;
 				} else {
-					ShowFatalError( "SimHPWatertoWaterSimple: Module called with incorrect GSHPType=" + trim( GSHPType ) );
+					ShowFatalError( "SimHPWatertoWaterSimple: Module called with incorrect GSHPType=" + GSHPType );
 				}}
 				return;
 			}
@@ -193,10 +192,10 @@ namespace HeatPumpWaterToWaterSimple {
 				} else if ( LoopNum == GSHP( GSHPNum ).SourceLoopNum ) { // condenser loop
 					UpdateChillerComponentCondenserSide( GSHP( GSHPNum ).SourceLoopNum, GSHP( GSHPNum ).SourceLoopSideNum, TypeOf_HPWaterEFCooling, GSHP( GSHPNum ).SourceSideInletNodeNum, GSHP( GSHPNum ).SourceSideOutletNodeNum, GSHPReport( GSHPNum ).QSource, GSHPReport( GSHPNum ).SourceSideInletTemp, GSHPReport( GSHPNum ).SourceSideOutletTemp, GSHPReport( GSHPNum ).SourceSideMassFlowRate, FirstHVACIteration );
 				} else {
-					ShowFatalError( "SimHPWatertoWaterSimple:: Invalid loop connection " + HPEqFitCooling + ", Requested Unit=" + trim( GSHPName ) );
+					ShowFatalError( "SimHPWatertoWaterSimple:: Invalid loop connection " + HPEqFitCooling + ", Requested Unit=" + GSHPName );
 				}
 			} else {
-				ShowFatalError( "SimHPWatertoWaterSimple:: Invalid " + HPEqFitCooling + ", Requested Unit=" + trim( GSHPName ) );
+				ShowFatalError( "SimHPWatertoWaterSimple:: Invalid " + HPEqFitCooling + ", Requested Unit=" + GSHPName );
 			}
 		} else if ( SELECT_CASE_var == TypeOf_HPWaterEFHeating ) {
 			if ( GSHPNum != 0 ) {
@@ -208,13 +207,13 @@ namespace HeatPumpWaterToWaterSimple {
 				} else if ( LoopNum == GSHP( GSHPNum ).SourceLoopNum ) { // condenser loop
 					UpdateChillerComponentCondenserSide( GSHP( GSHPNum ).SourceLoopNum, GSHP( GSHPNum ).SourceLoopSideNum, TypeOf_HPWaterEFHeating, GSHP( GSHPNum ).SourceSideInletNodeNum, GSHP( GSHPNum ).SourceSideOutletNodeNum, - GSHPReport( GSHPNum ).QSource, GSHPReport( GSHPNum ).SourceSideInletTemp, GSHPReport( GSHPNum ).SourceSideOutletTemp, GSHPReport( GSHPNum ).SourceSideMassFlowRate, FirstHVACIteration );
 				} else {
-					ShowFatalError( "SimHPWatertoWaterSimple:: Invalid loop connection " + HPEqFitCooling + ", Requested Unit=" + trim( GSHPName ) );
+					ShowFatalError( "SimHPWatertoWaterSimple:: Invalid loop connection " + HPEqFitCooling + ", Requested Unit=" + GSHPName );
 				}
 			} else {
-				ShowFatalError( "SimHPWatertoWaterSimple:: Invalid " + HPEqFitHeating + ", Requested Unit=" + trim( GSHPName ) );
+				ShowFatalError( "SimHPWatertoWaterSimple:: Invalid " + HPEqFitHeating + ", Requested Unit=" + GSHPName );
 			}
 		} else {
-			ShowFatalError( "SimHPWatertoWaterSimple: Module called with incorrect GSHPType=" + trim( GSHPType ) );
+			ShowFatalError( "SimHPWatertoWaterSimple: Module called with incorrect GSHPType=" + GSHPType );
 		}} // TypeOfEquip
 
 	}
@@ -268,7 +267,7 @@ namespace HeatPumpWaterToWaterSimple {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_Fstring AlphArray( 5, sFstring( MaxNameLength ) ); // character string data
+		FArray1D_string AlphArray( 5 ); // character string data
 		FArray1D< Real64 > NumArray( 15 ); // numeric data
 
 		static bool ErrorsFound( false );
@@ -423,7 +422,7 @@ namespace HeatPumpWaterToWaterSimple {
 	void
 	InitWatertoWaterHP(
 		int const GSHPTypeNum, // Type of GSHP
-		Fstring const & GSHPName, // User Specified Name of GSHP
+		std::string const & GSHPName, // User Specified Name of GSHP
 		int const GSHPNum, // GSHP Number
 		bool const FirstHVACIteration,
 		Real64 const MyLoad // Demand Load
@@ -741,29 +740,29 @@ namespace HeatPumpWaterToWaterSimple {
 			if ( QLoad <= 0.0 ) {
 				if ( GSHP( GSHPNum ).CoolCapNegativeCounter < 1 ) {
 					++GSHP( GSHPNum ).CoolCapNegativeCounter;
-					ShowWarningError( trim( HPEqFitCooling ) + " \"" + trim( GSHP( GSHPNum ).Name ) + "\":" );
-					ShowContinueError( " Cooling capacity curve output is <= 0.0 (" + trim( TrimSigDigits( QLoad, 4 ) ) + ")." );
-					ShowContinueError( " Zero or negative value occurs with a load-side inlet temperature of " + trim( TrimSigDigits( LoadSideInletTemp, 2 ) ) + " C," );
-					ShowContinueError( " a source-side inlet temperature of " + trim( TrimSigDigits( SourceSideInletTemp, 2 ) ) + " C," );
-					ShowContinueError( " a load-side mass flow rate of " + trim( TrimSigDigits( LoadSideMassFlowRate, 3 ) ) + " kg/s," );
-					ShowContinueError( " and a source-side mass flow rate of " + trim( TrimSigDigits( SourceSideMassFlowRate, 3 ) ) + " kg/s." );
+					ShowWarningError( HPEqFitCooling + " \"" + GSHP( GSHPNum ).Name + "\":" );
+					ShowContinueError( " Cooling capacity curve output is <= 0.0 (" + TrimSigDigits( QLoad, 4 ) + ")." );
+					ShowContinueError( " Zero or negative value occurs with a load-side inlet temperature of " + TrimSigDigits( LoadSideInletTemp, 2 ) + " C," );
+					ShowContinueError( " a source-side inlet temperature of " + TrimSigDigits( SourceSideInletTemp, 2 ) + " C," );
+					ShowContinueError( " a load-side mass flow rate of " + TrimSigDigits( LoadSideMassFlowRate, 3 ) + " kg/s," );
+					ShowContinueError( " and a source-side mass flow rate of " + TrimSigDigits( SourceSideMassFlowRate, 3 ) + " kg/s." );
 					ShowContinueErrorTimeStamp( " The heat pump is turned off for this time step but simulation continues." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( HPEqFitCooling ) + " \"" + trim( GSHP( GSHPNum ).Name ) + "\":" " Cooling capacity curve output is <= 0.0 warning continues...", GSHP( GSHPNum ).CoolCapNegativeIndex, QLoad, QLoad );
+					ShowRecurringWarningErrorAtEnd( HPEqFitCooling + " \"" + GSHP( GSHPNum ).Name + "\": Cooling capacity curve output is <= 0.0 warning continues...", GSHP( GSHPNum ).CoolCapNegativeIndex, QLoad, QLoad );
 				}
 			}
 			if ( Power <= 0.0 ) {
 				if ( GSHP( GSHPNum ).CoolPowerNegativeCounter < 1 ) {
 					++GSHP( GSHPNum ).CoolPowerNegativeCounter;
-					ShowWarningError( trim( HPEqFitCooling ) + " \"" + trim( GSHP( GSHPNum ).Name ) + "\":" );
-					ShowContinueError( " Cooling compressor power curve output is <= 0.0 (" + trim( TrimSigDigits( Power, 4 ) ) + ")." );
-					ShowContinueError( " Zero or negative value occurs with a load-side inlet temperature of " + trim( TrimSigDigits( LoadSideInletTemp, 2 ) ) + " C," );
-					ShowContinueError( " a source-side inlet temperature of " + trim( TrimSigDigits( SourceSideInletTemp, 2 ) ) + " C," );
-					ShowContinueError( " a load-side mass flow rate of " + trim( TrimSigDigits( LoadSideMassFlowRate, 3 ) ) + " kg/s," );
-					ShowContinueError( " and a source-side mass flow rate of " + trim( TrimSigDigits( SourceSideMassFlowRate, 3 ) ) + " kg/s." );
+					ShowWarningError( HPEqFitCooling + " \"" + GSHP( GSHPNum ).Name + "\":" );
+					ShowContinueError( " Cooling compressor power curve output is <= 0.0 (" + TrimSigDigits( Power, 4 ) + ")." );
+					ShowContinueError( " Zero or negative value occurs with a load-side inlet temperature of " + TrimSigDigits( LoadSideInletTemp, 2 ) + " C," );
+					ShowContinueError( " a source-side inlet temperature of " + TrimSigDigits( SourceSideInletTemp, 2 ) + " C," );
+					ShowContinueError( " a load-side mass flow rate of " + TrimSigDigits( LoadSideMassFlowRate, 3 ) + " kg/s," );
+					ShowContinueError( " and a source-side mass flow rate of " + TrimSigDigits( SourceSideMassFlowRate, 3 ) + " kg/s." );
 					ShowContinueErrorTimeStamp( " The heat pump is turned off for this time step but simulation continues." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( HPEqFitCooling ) + " \"" + trim( GSHP( GSHPNum ).Name ) + "\":" " Cooling compressor power curve output is <= 0.0 warning continues...", GSHP( GSHPNum ).CoolPowerNegativeIndex, Power, Power );
+					ShowRecurringWarningErrorAtEnd( HPEqFitCooling + " \"" + GSHP( GSHPNum ).Name + "\": Cooling compressor power curve output is <= 0.0 warning continues...", GSHP( GSHPNum ).CoolPowerNegativeIndex, Power, Power );
 				}
 			}
 
@@ -920,29 +919,29 @@ namespace HeatPumpWaterToWaterSimple {
 			if ( QLoad <= 0.0 ) {
 				if ( GSHP( GSHPNum ).HeatCapNegativeCounter < 1 ) {
 					++GSHP( GSHPNum ).HeatCapNegativeCounter;
-					ShowWarningError( trim( HPEqFitHeating ) + " \"" + trim( GSHP( GSHPNum ).Name ) + "\":" );
-					ShowContinueError( " Heating capacity curve output is <= 0.0 (" + trim( TrimSigDigits( QLoad, 4 ) ) + ")." );
-					ShowContinueError( " Zero or negative value occurs with a load-side inlet temperature of " + trim( TrimSigDigits( LoadSideInletTemp, 2 ) ) + " C," );
-					ShowContinueError( " a source-side inlet temperature of " + trim( TrimSigDigits( SourceSideInletTemp, 2 ) ) + " C," );
-					ShowContinueError( " a load-side mass flow rate of " + trim( TrimSigDigits( LoadSideMassFlowRate, 3 ) ) + " kg/s," );
-					ShowContinueError( " and a source-side mass flow rate of " + trim( TrimSigDigits( SourceSideMassFlowRate, 3 ) ) + " kg/s." );
+					ShowWarningError( HPEqFitHeating + " \"" + GSHP( GSHPNum ).Name + "\":" );
+					ShowContinueError( " Heating capacity curve output is <= 0.0 (" + TrimSigDigits( QLoad, 4 ) + ")." );
+					ShowContinueError( " Zero or negative value occurs with a load-side inlet temperature of " + TrimSigDigits( LoadSideInletTemp, 2 ) + " C," );
+					ShowContinueError( " a source-side inlet temperature of " + TrimSigDigits( SourceSideInletTemp, 2 ) + " C," );
+					ShowContinueError( " a load-side mass flow rate of " + TrimSigDigits( LoadSideMassFlowRate, 3 ) + " kg/s," );
+					ShowContinueError( " and a source-side mass flow rate of " + TrimSigDigits( SourceSideMassFlowRate, 3 ) + " kg/s." );
 					ShowContinueErrorTimeStamp( " The heat pump is turned off for this time step but simulation continues." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( HPEqFitHeating ) + " \"" + trim( GSHP( GSHPNum ).Name ) + "\":" " Heating capacity curve output is <= 0.0 warning continues...", GSHP( GSHPNum ).HeatCapNegativeIndex, QLoad, QLoad );
+					ShowRecurringWarningErrorAtEnd( HPEqFitHeating + " \"" + GSHP( GSHPNum ).Name + "\": Heating capacity curve output is <= 0.0 warning continues...", GSHP( GSHPNum ).HeatCapNegativeIndex, QLoad, QLoad );
 				}
 			}
 			if ( Power <= 0.0 ) {
 				if ( GSHP( GSHPNum ).HeatPowerNegativeCounter < 1 ) {
 					++GSHP( GSHPNum ).HeatPowerNegativeCounter;
-					ShowWarningError( trim( HPEqFitHeating ) + " \"" + trim( GSHP( GSHPNum ).Name ) + "\":" );
-					ShowContinueError( " Heating compressor power curve output is <= 0.0 (" + trim( TrimSigDigits( Power, 4 ) ) + ")." );
-					ShowContinueError( " Zero or negative value occurs with a load-side inlet temperature of " + trim( TrimSigDigits( LoadSideInletTemp, 2 ) ) + " C," );
-					ShowContinueError( " a source-side inlet temperature of " + trim( TrimSigDigits( SourceSideInletTemp, 2 ) ) + " C," );
-					ShowContinueError( " a load-side mass flow rate of " + trim( TrimSigDigits( LoadSideMassFlowRate, 3 ) ) + " kg/s," );
-					ShowContinueError( " and a source-side mass flow rate of " + trim( TrimSigDigits( SourceSideMassFlowRate, 3 ) ) + " kg/s." );
+					ShowWarningError( HPEqFitHeating + " \"" + GSHP( GSHPNum ).Name + "\":" );
+					ShowContinueError( " Heating compressor power curve output is <= 0.0 (" + TrimSigDigits( Power, 4 ) + ")." );
+					ShowContinueError( " Zero or negative value occurs with a load-side inlet temperature of " + TrimSigDigits( LoadSideInletTemp, 2 ) + " C," );
+					ShowContinueError( " a source-side inlet temperature of " + TrimSigDigits( SourceSideInletTemp, 2 ) + " C," );
+					ShowContinueError( " a load-side mass flow rate of " + TrimSigDigits( LoadSideMassFlowRate, 3 ) + " kg/s," );
+					ShowContinueError( " and a source-side mass flow rate of " + TrimSigDigits( SourceSideMassFlowRate, 3 ) + " kg/s." );
 					ShowContinueErrorTimeStamp( " The heat pump is turned off for this time step but simulation continues." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( HPEqFitHeating ) + " \"" + trim( GSHP( GSHPNum ).Name ) + "\":" " Heating compressor power curve output is <= 0.0 warning continues...", GSHP( GSHPNum ).HeatPowerNegativeIndex, Power, Power );
+					ShowRecurringWarningErrorAtEnd( HPEqFitHeating + " \"" + GSHP( GSHPNum ).Name + "\": Heating compressor power curve output is <= 0.0 warning continues...", GSHP( GSHPNum ).HeatPowerNegativeIndex, Power, Power );
 				}
 			}
 

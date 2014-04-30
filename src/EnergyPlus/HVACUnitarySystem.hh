@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -17,7 +16,6 @@ namespace EnergyPlus {
 namespace HVACUnitarySystem {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 	using DataSizing::AutoSize;
 
 	// Data
@@ -59,7 +57,7 @@ namespace HVACUnitarySystem {
 	extern int const LoadBased; // control system based on zone load
 	extern int const SetPointBased; // control system based on coil set point manager
 
-	extern Fstring const Blank;
+	extern std::string const Blank;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -116,7 +114,7 @@ namespace HVACUnitarySystem {
 	struct DesignSpecMSHPData
 	{
 		// Members
-		Fstring Name; // Name of the design specification MSHP
+		std::string Name; // Name of the design specification MSHP
 		int NumOfSpeedCooling; // The number of speeds for cooling
 		int NumOfSpeedHeating; // The number of speeds for heating
 		FArray1D< Real64 > CoolingVolFlowRatio; // The ratio of flow to max for this speed
@@ -124,20 +122,19 @@ namespace HVACUnitarySystem {
 
 		// Default Constructor
 		DesignSpecMSHPData() :
-			Name( MaxNameLength ),
 			NumOfSpeedCooling( 0 ),
 			NumOfSpeedHeating( 0 )
 		{}
 
 		// Member Constructor
 		DesignSpecMSHPData(
-			Fstring const & Name, // Name of the design specification MSHP
+			std::string const & Name, // Name of the design specification MSHP
 			int const NumOfSpeedCooling, // The number of speeds for cooling
 			int const NumOfSpeedHeating, // The number of speeds for heating
 			FArray1< Real64 > const & CoolingVolFlowRatio, // The ratio of flow to max for this speed
 			FArray1< Real64 > const & HeatingVolFlowRatio // The ratio of flow to max for this speed
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NumOfSpeedCooling( NumOfSpeedCooling ),
 			NumOfSpeedHeating( NumOfSpeedHeating ),
 			CoolingVolFlowRatio( CoolingVolFlowRatio ),
@@ -150,9 +147,9 @@ namespace HVACUnitarySystem {
 	{
 		// Members
 		// HVAC system specific data
-		Fstring UnitarySystemType; // Type of Unitary System
+		std::string UnitarySystemType; // Type of Unitary System
 		int UnitarySystemType_Num; // integer type of Unitary System
-		Fstring Name; // Name of the Unitary System
+		std::string Name; // Name of the Unitary System
 		bool HeatPump; // TRUE if both cooling and heating coils are DX
 		int SysAvailSchedPtr; // System Availability schedule
 		int UnitarySystemInletNodeNum; // Parent inlet node number
@@ -181,10 +178,10 @@ namespace HVACUnitarySystem {
 		int LastMode; // last mode of operation, coolingmode or heatingmode
 		Real64 AncillaryOnPower; // Ancillary On-Cycle Electric Power [W]
 		Real64 AncillaryOffPower; // Ancillary Off-Cycle Electric Power [W]
-		Fstring DesignSpecMultispeedHPType; // Object type for specifying multispeed flow rates
-		Fstring DesignSpecMultispeedHPName; // Object name for specifying multispeed flow rates
+		std::string DesignSpecMultispeedHPType; // Object type for specifying multispeed flow rates
+		std::string DesignSpecMultispeedHPName; // Object name for specifying multispeed flow rates
 		// Cooling coil specific data
-		Fstring CoolingCoilName; // coil name (eliminate after blank is accepted in CALL)
+		std::string CoolingCoilName; // coil name (eliminate after blank is accepted in CALL)
 		int CoolingCoilType_Num; // numeric coil type
 		int CoolingCoilIndex; // index to specific cooling coil
 		Real64 DesignCoolingCapacity; // cooling coil capacity (W)
@@ -206,7 +203,7 @@ namespace HVACUnitarySystem {
 		bool CoolingCoilUpstream; // Set to true when coolign coil is upstream in the unitary system
 		Real64 CoolCompPartLoadRatio; // Unitary system compressor part load ratio in cooling
 		// Heating coil specific data
-		Fstring HeatingCoilName; // coil name (eliminate after blank is accepted in CALL)
+		std::string HeatingCoilName; // coil name (eliminate after blank is accepted in CALL)
 		int HeatingCoilType_Num; // numeric coil type
 		int HeatingCoilIndex; // index to specific heating coil
 		Real64 DesignHeatingCapacity; // heating coil capacity (W)
@@ -226,7 +223,7 @@ namespace HVACUnitarySystem {
 		Real64 MaxHeatCoilFluidFlow; // Maximum heating coil fluid flow for hot water or steam coil
 		Real64 HeatCompPartLoadRatio; // Unitary system compressor part load ratio in heating
 		// Supplemental heating coil specific data
-		Fstring SuppHeatCoilName; // coil name (eliminate after blank is accepted in CALL)
+		std::string SuppHeatCoilName; // coil name (eliminate after blank is accepted in CALL)
 		int SuppHeatCoilType_Num; // numeric coil type
 		int SuppHeatCoilIndex; // index to specific supplemental heating coil
 		Real64 DesignSuppHeatingCapacity; // supplemental heating coil capacity (W)
@@ -427,9 +424,7 @@ namespace HVACUnitarySystem {
 
 		// Default Constructor
 		UnitarySystemData() :
-			UnitarySystemType( MaxNameLength ),
 			UnitarySystemType_Num( 0 ),
-			Name( MaxNameLength ),
 			HeatPump( false ),
 			SysAvailSchedPtr( 0 ),
 			UnitarySystemInletNodeNum( 0 ),
@@ -457,9 +452,6 @@ namespace HVACUnitarySystem {
 			LastMode( 0 ),
 			AncillaryOnPower( 0.0 ),
 			AncillaryOffPower( 0.0 ),
-			DesignSpecMultispeedHPType( MaxNameLength ),
-			DesignSpecMultispeedHPName( MaxNameLength ),
-			CoolingCoilName( MaxNameLength ),
 			CoolingCoilType_Num( 0 ),
 			CoolingCoilIndex( 0 ),
 			DesignCoolingCapacity( 0.0 ),
@@ -480,7 +472,6 @@ namespace HVACUnitarySystem {
 			MaxCoolCoilFluidFlow( AutoSize ),
 			CoolingCoilUpstream( true ),
 			CoolCompPartLoadRatio( 0.0 ),
-			HeatingCoilName( MaxNameLength ),
 			HeatingCoilType_Num( 0 ),
 			HeatingCoilIndex( 0 ),
 			DesignHeatingCapacity( 0.0 ),
@@ -499,7 +490,6 @@ namespace HVACUnitarySystem {
 			HeatCoilFluidInletNode( 0 ),
 			MaxHeatCoilFluidFlow( AutoSize ),
 			HeatCompPartLoadRatio( 0.0 ),
-			SuppHeatCoilName( MaxNameLength ),
 			SuppHeatCoilType_Num( 0 ),
 			SuppHeatCoilIndex( 0 ),
 			DesignSuppHeatingCapacity( 0.0 ),
@@ -681,9 +671,9 @@ namespace HVACUnitarySystem {
 
 		// Member Constructor
 		UnitarySystemData(
-			Fstring const & UnitarySystemType, // Type of Unitary System
+			std::string const & UnitarySystemType, // Type of Unitary System
 			int const UnitarySystemType_Num, // integer type of Unitary System
-			Fstring const & Name, // Name of the Unitary System
+			std::string const & Name, // Name of the Unitary System
 			bool const HeatPump, // TRUE if both cooling and heating coils are DX
 			int const SysAvailSchedPtr, // System Availability schedule
 			int const UnitarySystemInletNodeNum, // Parent inlet node number
@@ -711,9 +701,9 @@ namespace HVACUnitarySystem {
 			int const LastMode, // last mode of operation, coolingmode or heatingmode
 			Real64 const AncillaryOnPower, // Ancillary On-Cycle Electric Power [W]
 			Real64 const AncillaryOffPower, // Ancillary Off-Cycle Electric Power [W]
-			Fstring const & DesignSpecMultispeedHPType, // Object type for specifying multispeed flow rates
-			Fstring const & DesignSpecMultispeedHPName, // Object name for specifying multispeed flow rates
-			Fstring const & CoolingCoilName, // coil name (eliminate after blank is accepted in CALL)
+			std::string const & DesignSpecMultispeedHPType, // Object type for specifying multispeed flow rates
+			std::string const & DesignSpecMultispeedHPName, // Object name for specifying multispeed flow rates
+			std::string const & CoolingCoilName, // coil name (eliminate after blank is accepted in CALL)
 			int const CoolingCoilType_Num, // numeric coil type
 			int const CoolingCoilIndex, // index to specific cooling coil
 			Real64 const DesignCoolingCapacity, // cooling coil capacity (W)
@@ -734,7 +724,7 @@ namespace HVACUnitarySystem {
 			Real64 const MaxCoolCoilFluidFlow, // Maximum cooling coil fluid flow for chilled water coil
 			bool const CoolingCoilUpstream, // Set to true when coolign coil is upstream in the unitary system
 			Real64 const CoolCompPartLoadRatio, // Unitary system compressor part load ratio in cooling
-			Fstring const & HeatingCoilName, // coil name (eliminate after blank is accepted in CALL)
+			std::string const & HeatingCoilName, // coil name (eliminate after blank is accepted in CALL)
 			int const HeatingCoilType_Num, // numeric coil type
 			int const HeatingCoilIndex, // index to specific heating coil
 			Real64 const DesignHeatingCapacity, // heating coil capacity (W)
@@ -753,7 +743,7 @@ namespace HVACUnitarySystem {
 			int const HeatCoilFluidInletNode, // Heating coil fluid inlet node
 			Real64 const MaxHeatCoilFluidFlow, // Maximum heating coil fluid flow for hot water or steam coil
 			Real64 const HeatCompPartLoadRatio, // Unitary system compressor part load ratio in heating
-			Fstring const & SuppHeatCoilName, // coil name (eliminate after blank is accepted in CALL)
+			std::string const & SuppHeatCoilName, // coil name (eliminate after blank is accepted in CALL)
 			int const SuppHeatCoilType_Num, // numeric coil type
 			int const SuppHeatCoilIndex, // index to specific supplemental heating coil
 			Real64 const DesignSuppHeatingCapacity, // supplemental heating coil capacity (W)
@@ -938,9 +928,9 @@ namespace HVACUnitarySystem {
 			int const HeatCountAvail, // Counter used to minimize the occurrence of output warnings
 			int const HeatIndexAvail // Index used to minimize the occurrence of output warnings
 		) :
-			UnitarySystemType( MaxNameLength, UnitarySystemType ),
+			UnitarySystemType( UnitarySystemType ),
 			UnitarySystemType_Num( UnitarySystemType_Num ),
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			HeatPump( HeatPump ),
 			SysAvailSchedPtr( SysAvailSchedPtr ),
 			UnitarySystemInletNodeNum( UnitarySystemInletNodeNum ),
@@ -968,9 +958,9 @@ namespace HVACUnitarySystem {
 			LastMode( LastMode ),
 			AncillaryOnPower( AncillaryOnPower ),
 			AncillaryOffPower( AncillaryOffPower ),
-			DesignSpecMultispeedHPType( MaxNameLength, DesignSpecMultispeedHPType ),
-			DesignSpecMultispeedHPName( MaxNameLength, DesignSpecMultispeedHPName ),
-			CoolingCoilName( MaxNameLength, CoolingCoilName ),
+			DesignSpecMultispeedHPType( DesignSpecMultispeedHPType ),
+			DesignSpecMultispeedHPName( DesignSpecMultispeedHPName ),
+			CoolingCoilName( CoolingCoilName ),
 			CoolingCoilType_Num( CoolingCoilType_Num ),
 			CoolingCoilIndex( CoolingCoilIndex ),
 			DesignCoolingCapacity( DesignCoolingCapacity ),
@@ -991,7 +981,7 @@ namespace HVACUnitarySystem {
 			MaxCoolCoilFluidFlow( MaxCoolCoilFluidFlow ),
 			CoolingCoilUpstream( CoolingCoilUpstream ),
 			CoolCompPartLoadRatio( CoolCompPartLoadRatio ),
-			HeatingCoilName( MaxNameLength, HeatingCoilName ),
+			HeatingCoilName( HeatingCoilName ),
 			HeatingCoilType_Num( HeatingCoilType_Num ),
 			HeatingCoilIndex( HeatingCoilIndex ),
 			DesignHeatingCapacity( DesignHeatingCapacity ),
@@ -1010,7 +1000,7 @@ namespace HVACUnitarySystem {
 			HeatCoilFluidInletNode( HeatCoilFluidInletNode ),
 			MaxHeatCoilFluidFlow( MaxHeatCoilFluidFlow ),
 			HeatCompPartLoadRatio( HeatCompPartLoadRatio ),
-			SuppHeatCoilName( MaxNameLength, SuppHeatCoilName ),
+			SuppHeatCoilName( SuppHeatCoilName ),
 			SuppHeatCoilType_Num( SuppHeatCoilType_Num ),
 			SuppHeatCoilIndex( SuppHeatCoilIndex ),
 			DesignSuppHeatingCapacity( DesignSuppHeatingCapacity ),
@@ -1206,7 +1196,7 @@ namespace HVACUnitarySystem {
 
 	void
 	SimUnitarySystem(
-		Fstring const & UnitarySystemName, // Name of Unitary System object
+		std::string const & UnitarySystemName, // Name of Unitary System object
 		bool const FirstHVACIteration, // True when first HVAC iteration
 		int const AirLoopNum, // Primary air loop number
 		int & CompIndex, // Index to Unitary System object
@@ -1595,17 +1585,17 @@ namespace HVACUnitarySystem {
 	);
 
 	void
-	CheckUnitarySysCoilInOASysExists( Fstring const & UnitarySysName );
+	CheckUnitarySysCoilInOASysExists( std::string const & UnitarySysName );
 
 	void
 	GetUnitarySystemOAHeatCoolCoil(
-		Fstring const & UnitarySystemName, // Name of Unitary System object
+		std::string const & UnitarySystemName, // Name of Unitary System object
 		Optional_bool OACoolingCoil = _, // Cooling coil in OA stream
 		Optional_bool OAHeatingCoil = _ // Heating coil in OA stream
 	);
 
 	int
-	GetUnitarySystemDXCoolingCoilIndex( Fstring const & UnitarySystemName ); // Name of Unitary System object
+	GetUnitarySystemDXCoolingCoilIndex( std::string const & UnitarySystemName ); // Name of Unitary System object
 
 } // HVACUnitarySystem
 

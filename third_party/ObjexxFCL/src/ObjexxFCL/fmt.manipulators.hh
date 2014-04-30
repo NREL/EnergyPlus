@@ -25,6 +25,24 @@
 namespace ObjexxFCL {
 namespace fmt {
 
+// Negate a Value if Signed Type
+template< typename T, typename std::enable_if< std::is_signed< T >::value, int >::type = 0 >
+inline
+static
+void
+negate_value( T & v )
+{
+	v = -v;
+}
+
+// Negate a Value if Signed Type
+template< typename T, typename std::enable_if< std::is_unsigned< T >::value, int >::type = 0 >
+inline
+static
+void
+negate_value( T & v )
+{}
+
 // Signed Discriminator Template
 template< bool s >
 struct Signed
@@ -245,7 +263,7 @@ private: // Static Methods
 	exponent_do_put( iter_type out, std::ios_base & str, char_type fill, T v ) const
 	{
 		bool const negative( Signed< std::is_signed< T >::value >::is_negative( v ) );
-		if ( negative ) v = -v;
+		if ( negative ) negate_value( v );
 		int vexp( 0 );
 		if ( v != T( 0 ) ) {
 			vexp = int( std::floor( std::log10( v ) ) ) + 1 - k_;
@@ -415,10 +433,10 @@ private: // Static Methods
 	engineering_do_put( iter_type out, std::ios_base & str, char_type fill, T v ) const
 	{
 		bool const negative( Signed< std::is_signed< T >::value >::is_negative( v ) );
-		if ( negative ) v = -v;
+		if ( negative ) negate_value( v );
 		int vexp( 0 );
 		if ( v != T( 0 ) ) {
-			int const vl10( std::floor( std::log10( v ) ) );
+			int const vl10( static_cast< int >( std::floor( std::log10( v ) ) ) );
 			vexp = ( vl10 >= 0 ? ( vl10 / 3 ) * 3 : ( ( -vl10 + 3 ) / 3 ) * ( -3 ) );
 			v *= std::pow( 10, -vexp );
 			std::ostringstream x;
@@ -557,10 +575,10 @@ private: // Static Methods
 	scientific_do_put( iter_type out, std::ios_base & str, char_type fill, T v ) const
 	{
 		bool const negative( Signed< std::is_signed< T >::value >::is_negative( v ) );
-		if ( negative ) v = -v;
+		if ( negative ) negate_value( v );
 		int vexp( 0 );
 		if ( v != T( 0 ) ) {
-			vexp = std::floor( std::log10( v ) );
+			vexp = static_cast< int >( std::floor( std::log10( v ) ) );
 			v *= std::pow( 10, -vexp );
 			std::ostringstream x;
 			x << std::fixed << v;

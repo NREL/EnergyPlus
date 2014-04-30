@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -16,7 +15,6 @@ namespace ICEngineElectricGenerator {
 
 	// Using/Aliasing
 	using DataGlobalConstants::iGeneratorICEngine;
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
@@ -37,10 +35,10 @@ namespace ICEngineElectricGenerator {
 	struct ICEngineGeneratorSpecs
 	{
 		// Members
-		Fstring Name; // user identifier
-		Fstring TypeOf; // Type of Generator
+		std::string Name; // user identifier
+		std::string TypeOf; // Type of Generator
 		int CompType_Num;
-		Fstring FuelType; // Type of Fuel - DIESEL, GASOLINE, GAS
+		std::string FuelType; // Type of Fuel - DIESEL, GASOLINE, GAS
 		Real64 RatedPowerOutput; // W - design nominal capacity of Generator
 		int ElectricCircuitNode; // Electric Circuit Node
 		Real64 MinPartLoadRat; // (IC ENGINE MIN) min allowed operating frac full load
@@ -96,10 +94,8 @@ namespace ICEngineElectricGenerator {
 
 		// Default Constructor
 		ICEngineGeneratorSpecs() :
-			Name( MaxNameLength ),
-			TypeOf( MaxNameLength, "Generator:InternalCombustionEngine" ),
+			TypeOf( "Generator:InternalCombustionEngine" ),
 			CompType_Num( iGeneratorICEngine ),
-			FuelType( MaxNameLength ),
 			RatedPowerOutput( 0.0 ),
 			ElectricCircuitNode( 0 ),
 			MinPartLoadRat( 0.0 ),
@@ -153,10 +149,10 @@ namespace ICEngineElectricGenerator {
 
 		// Member Constructor
 		ICEngineGeneratorSpecs(
-			Fstring const & Name, // user identifier
-			Fstring const & TypeOf, // Type of Generator
+			std::string const & Name, // user identifier
+			std::string const & TypeOf, // Type of Generator
 			int const CompType_Num,
-			Fstring const & FuelType, // Type of Fuel - DIESEL, GASOLINE, GAS
+			std::string const & FuelType, // Type of Fuel - DIESEL, GASOLINE, GAS
 			Real64 const RatedPowerOutput, // W - design nominal capacity of Generator
 			int const ElectricCircuitNode, // Electric Circuit Node
 			Real64 const MinPartLoadRat, // (IC ENGINE MIN) min allowed operating frac full load
@@ -207,10 +203,10 @@ namespace ICEngineElectricGenerator {
 			int const HRBranchNum, // cooling water plant loop branch index, for heat recovery
 			int const HRCompNum // cooling water plant loop component index, for heat recovery
 		) :
-			Name( MaxNameLength, Name ),
-			TypeOf( MaxNameLength, TypeOf ),
+			Name( Name ),
+			TypeOf( TypeOf ),
 			CompType_Num( CompType_Num ),
-			FuelType( MaxNameLength, FuelType ),
+			FuelType( FuelType ),
 			RatedPowerOutput( RatedPowerOutput ),
 			ElectricCircuitNode( ElectricCircuitNode ),
 			MinPartLoadRat( MinPartLoadRat ),
@@ -356,7 +352,7 @@ namespace ICEngineElectricGenerator {
 	void
 	SimICEngineGenerator(
 		int const GeneratorType, // type of Generator
-		Fstring const & GeneratorName, // user specified name of Generator
+		std::string const & GeneratorName, // user specified name of Generator
 		int & GeneratorIndex,
 		bool const RunFlag, // simulate Generator when TRUE
 		Real64 const MyLoad, // demand on electric generator
@@ -375,8 +371,8 @@ namespace ICEngineElectricGenerator {
 
 	void
 	SimICEPlantHeatRecovery(
-		Fstring const & CompType,
-		Fstring const & CompName,
+		std::string const & CompType,
+		std::string const & CompName,
 		int const CompTypeNum,
 		int & CompNum,
 		bool const RunFlag,

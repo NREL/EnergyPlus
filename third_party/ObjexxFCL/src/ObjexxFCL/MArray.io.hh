@@ -14,7 +14,6 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/char.constants.hh>
 #include <ObjexxFCL/fmt.hh>
 #include <ObjexxFCL/TypeTraits.hh>
 

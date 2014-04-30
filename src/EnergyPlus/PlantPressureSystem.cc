@@ -55,13 +55,12 @@ namespace PlantPressureSystem {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::Pi;
 	using namespace DataBranchAirLoopPlant;
 
 	// Data
 	// MODULE PARAMETER/ENUMERATIONS DEFINITIONS:
-	Fstring const Blank;
+	std::string const Blank;
 
 	// DERIVED TYPE DEFINITIONS:
 	//TYPE, PUBLIC:: PlantPressureCurveData
@@ -387,7 +386,7 @@ namespace PlantPressureSystem {
 			if ( PlantLoop( LoopNum ).CommonPipeType != CommonPipe_No ) {
 				//There is a common pipe!
 				if ( ! CommonPipeErrorEncountered ) {
-					ShowSevereError( "Invalid pressure simulation configuration for Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+					ShowSevereError( "Invalid pressure simulation configuration for Plant Loop=" + PlantLoop( LoopNum ).Name );
 					ShowContinueError( "Currently pressure simulations cannot be performed for loops with common pipes." );
 					ShowContinueError( "To repair, either remove the common pipe simulation, or remove the pressure simulation." );
 					ShowContinueError( "The simulation will continue, but the pump power is not updated with pressure drop data." );
@@ -438,8 +437,8 @@ namespace PlantPressureSystem {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "CalcPlantPressureSystem" );
-		static Fstring const DummyFluid;
+		static std::string const RoutineName( "CalcPlantPressureSystem" );
+		static std::string const DummyFluid;
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1313,9 +1312,9 @@ namespace PlantPressureSystem {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "ResolvedLoopMassFlowRate: " );
+		static std::string const RoutineName( "ResolvedLoopMassFlowRate: " );
 		int const MaxIters( 100 );
-		static Fstring const DummyFluidName;
+		static std::string const DummyFluidName;
 		Real64 const PressureConvergeCriteria( 0.1 ); // Pa
 		Real64 const ZeroTolerance( 0.0001 );
 

@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace ChillerGasAbsorption {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS:
@@ -40,8 +38,8 @@ namespace ChillerGasAbsorption {
 		bool InCoolingMode;
 		bool InHeatingMode;
 		// Part of Type that directly corresponds with IDD definition
-		Fstring Name; // user identifier
-		Fstring FuelType; // Type of Fuel - DIESEL, GASOLINE, GAS
+		std::string Name; // user identifier
+		std::string FuelType; // Type of Fuel - DIESEL, GASOLINE, GAS
 		Real64 NomCoolingCap; // W - design nominal capacity of Absorber
 		Real64 NomHeatCoolRatio; // ratio of heating to cooling capacity
 		Real64 FuelCoolRatio; // ratio of fuel input to cooling output
@@ -111,8 +109,6 @@ namespace ChillerGasAbsorption {
 			ON( false ),
 			InCoolingMode( false ),
 			InHeatingMode( false ),
-			Name( MaxNameLength ),
-			FuelType( MaxNameLength ),
 			NomCoolingCap( 0.0 ),
 			NomHeatCoolRatio( 0.0 ),
 			FuelCoolRatio( 0.0 ),
@@ -177,8 +173,8 @@ namespace ChillerGasAbsorption {
 			bool const ON, // simulate the machine at it's operating part load ratio
 			bool const InCoolingMode,
 			bool const InHeatingMode,
-			Fstring const & Name, // user identifier
-			Fstring const & FuelType, // Type of Fuel - DIESEL, GASOLINE, GAS
+			std::string const & Name, // user identifier
+			std::string const & FuelType, // Type of Fuel - DIESEL, GASOLINE, GAS
 			Real64 const NomCoolingCap, // W - design nominal capacity of Absorber
 			Real64 const NomHeatCoolRatio, // ratio of heating to cooling capacity
 			Real64 const FuelCoolRatio, // ratio of fuel input to cooling output
@@ -240,8 +236,8 @@ namespace ChillerGasAbsorption {
 			ON( ON ),
 			InCoolingMode( InCoolingMode ),
 			InHeatingMode( InHeatingMode ),
-			Name( MaxNameLength, Name ),
-			FuelType( MaxNameLength, FuelType ),
+			Name( Name ),
+			FuelType( FuelType ),
 			NomCoolingCap( NomCoolingCap ),
 			NomHeatCoolRatio( NomHeatCoolRatio ),
 			FuelCoolRatio( FuelCoolRatio ),
@@ -457,8 +453,8 @@ namespace ChillerGasAbsorption {
 
 	void
 	SimGasAbsorber(
-		Fstring const & AbsorberType, // type of Absorber
-		Fstring const & AbsorberName, // user specified name of Absorber
+		std::string const & AbsorberType, // type of Absorber
+		std::string const & AbsorberName, // user specified name of Absorber
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // Absorber number counter
 		bool const RunFlag, // simulate Absorber when TRUE

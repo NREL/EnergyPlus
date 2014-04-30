@@ -73,7 +73,6 @@ namespace PondGroundHeatExchanger {
 	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::KelvinConv;
 	using General::TrimSigDigits;
 	using DataPlant::PlantLoop;
@@ -125,7 +124,7 @@ namespace PondGroundHeatExchanger {
 
 	void
 	SimPondGroundHeatExchanger(
-		Fstring const & CompName, // name of the pond GHE
+		std::string const & CompName, // name of the pond GHE
 		int & CompIndex, // index in local derived types
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		bool const RunFlag, // TRUE if equipment turned on by loop operation scheme
@@ -187,17 +186,17 @@ namespace PondGroundHeatExchanger {
 		if ( CompIndex == 0 ) {
 			PondGHENum = FindItemInList( CompName, PondGHE.Name(), NumOfPondGHEs );
 			if ( PondGHENum == 0 ) {
-				ShowFatalError( "SimPondGroundHeatExchanger: Unit not found=" + trim( CompName ) );
+				ShowFatalError( "SimPondGroundHeatExchanger: Unit not found=" + CompName );
 			}
 			CompIndex = PondGHENum;
 		} else {
 			PondGHENum = CompIndex;
 			if ( PondGHENum > NumOfPondGHEs || PondGHENum < 1 ) {
-				ShowFatalError( "SimPondGroundHeatExchanger:  Invalid CompIndex passed=" + trim( TrimSigDigits( PondGHENum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumOfPondGHEs ) ) + ", Entered Unit name=" + trim( CompName ) );
+				ShowFatalError( "SimPondGroundHeatExchanger:  Invalid CompIndex passed=" + TrimSigDigits( PondGHENum ) + ", Number of Units=" + TrimSigDigits( NumOfPondGHEs ) + ", Entered Unit name=" + CompName );
 			}
 			if ( CheckEquipName( PondGHENum ) ) {
 				if ( CompName != PondGHE( PondGHENum ).Name ) {
-					ShowFatalError( "SimPondGroundHeatExchanger: Invalid CompIndex passed=" + trim( TrimSigDigits( PondGHENum ) ) + ", Unit name=" + trim( CompName ) + ", stored Unit Name for that index=" + trim( PondGHE( PondGHENum ).Name ) );
+					ShowFatalError( "SimPondGroundHeatExchanger: Invalid CompIndex passed=" + TrimSigDigits( PondGHENum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + PondGHE( PondGHENum ).Name );
 				}
 				CheckEquipName( PondGHENum ) = false;
 			}
@@ -248,7 +247,6 @@ namespace PondGroundHeatExchanger {
 		// USE STATEMENTS:
 
 		// Using/Aliasing
-		using DataGlobals::MaxNameLength;
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::FindItemInList;
@@ -267,7 +265,7 @@ namespace PondGroundHeatExchanger {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const Blank;
+		static std::string const Blank;
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -310,36 +308,36 @@ namespace PondGroundHeatExchanger {
 
 			//get inlet node data
 			PondGHE( Item ).InletNode = cAlphaArgs( 2 );
-			PondGHE( Item ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			PondGHE( Item ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 			if ( PondGHE( Item ).InletNodeNum == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
 			// get outlet node data
 			PondGHE( Item ).OutletNode = cAlphaArgs( 3 );
-			PondGHE( Item ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			PondGHE( Item ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 			if ( PondGHE( Item ).OutletNodeNum == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + "=" + trim( cAlphaArgs( 3 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Condenser Water Nodes" );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Condenser Water Nodes" );
 
 			// pond geometry data
 			PondGHE( Item ).Depth = rNumericArgs( 1 );
 			PondGHE( Item ).Area = rNumericArgs( 2 );
 			if ( rNumericArgs( 1 ) <= 0.0 ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 1 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 1 ), 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 1 ) + '=' + RoundSigDigits( rNumericArgs( 1 ), 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "Value must be greater than 0.0" );
 				ErrorsFound = true;
 			}
 			if ( rNumericArgs( 2 ) <= 0.0 ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 2 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 2 ), 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 2 ) + '=' + RoundSigDigits( rNumericArgs( 2 ), 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "Value must be greater than 0.0" );
 				ErrorsFound = true;
 			}
@@ -349,20 +347,20 @@ namespace PondGroundHeatExchanger {
 			PondGHE( Item ).TubeOutDiameter = rNumericArgs( 4 );
 
 			if ( rNumericArgs( 3 ) <= 0.0 ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 3 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 3 ), 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 3 ) + '=' + RoundSigDigits( rNumericArgs( 3 ), 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "Value must be greater than 0.0" );
 				ErrorsFound = true;
 			}
 			if ( rNumericArgs( 4 ) <= 0.0 ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 4 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 4 ), 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 4 ) + '=' + RoundSigDigits( rNumericArgs( 4 ), 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "Value must be greater than 0.0" );
 				ErrorsFound = true;
 			}
 			if ( rNumericArgs( 3 ) > rNumericArgs( 4 ) ) { // error
-				ShowSevereError( "For " + trim( cCurrentModuleObject ) + ": " + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 3 ) ) + " [" + trim( RoundSigDigits( rNumericArgs( 3 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 4 ) ) + " [" + trim( RoundSigDigits( rNumericArgs( 4 ), 2 ) ) + "]" );
+				ShowSevereError( "For " + cCurrentModuleObject + ": " + cAlphaArgs( 1 ) );
+				ShowContinueError( cNumericFieldNames( 3 ) + " [" + RoundSigDigits( rNumericArgs( 3 ), 2 ) + "] > " + cNumericFieldNames( 4 ) + " [" + RoundSigDigits( rNumericArgs( 4 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 
@@ -371,14 +369,14 @@ namespace PondGroundHeatExchanger {
 			PondGHE( Item ).GrndConductivity = rNumericArgs( 6 );
 
 			if ( rNumericArgs( 5 ) <= 0.0 ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 5 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 5 ), 4 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 5 ) + '=' + RoundSigDigits( rNumericArgs( 5 ), 4 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "Value must be greater than 0.0" );
 				ErrorsFound = true;
 			}
 			if ( rNumericArgs( 6 ) <= 0.0 ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 6 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 6 ), 4 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 6 ) + '=' + RoundSigDigits( rNumericArgs( 6 ), 4 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "Value must be greater than 0.0" );
 				ErrorsFound = true;
 			}
@@ -387,15 +385,15 @@ namespace PondGroundHeatExchanger {
 			PondGHE( Item ).NumCircuits = rNumericArgs( 7 );
 
 			if ( rNumericArgs( 7 ) <= 0 ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 7 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 7 ), 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 7 ) + '=' + RoundSigDigits( rNumericArgs( 7 ), 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "Value must be greater than 0.0" );
 				ErrorsFound = true;
 			}
 			PondGHE( Item ).CircuitLength = rNumericArgs( 8 );
 			if ( rNumericArgs( 8 ) <= 0 ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 8 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 8 ), 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 8 ) + '=' + RoundSigDigits( rNumericArgs( 8 ), 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "Value must be greater than 0.0" );
 				ErrorsFound = true;
 			}
@@ -404,7 +402,7 @@ namespace PondGroundHeatExchanger {
 
 		// final error check
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + trim( cCurrentModuleObject ) );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
 		}
 
 		// Set up the output variables
@@ -420,7 +418,7 @@ namespace PondGroundHeatExchanger {
 		if ( NoDeepGroundTempObjWarning ) {
 			if ( ! GroundTemp_DeepObjInput ) {
 				ShowWarningError( "GetPondGroundHeatExchanger:  No \"Site:GroundTemperature:Deep\" were input." );
-				ShowContinueError( "Defaults, constant throughout the year of (" + trim( RoundSigDigits( GroundTemp_Deep, 1 ) ) + ") will be used." );
+				ShowContinueError( "Defaults, constant throughout the year of (" + RoundSigDigits( GroundTemp_Deep, 1 ) + ") will be used." );
 			}
 			NoDeepGroundTempObjWarning = false;
 		}
@@ -967,7 +965,7 @@ namespace PondGroundHeatExchanger {
 		// FUNCTION PARAMETER DEFINITIONS:
 		Real64 const MaxLaminarRe( 2300. ); // Maximum Reynolds number for laminar flow
 		Real64 const GravConst( 9.81 ); // gravitational constant - should be fixed!
-		static Fstring const CalledFrom( "PondGroundHeatExchanger:CalcEffectiveness" );
+		static std::string const CalledFrom( "PondGroundHeatExchanger:CalcEffectiveness" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1064,12 +1062,12 @@ namespace PondGroundHeatExchanger {
 		if ( PondTemperature < 0.0 ) {
 			++PondGHE( PondGHENum ).ConsecutiveFrozen;
 			if ( PondGHE( PondGHENum ).FrozenErrIndex == 0 ) {
-				ShowWarningMessage( "GroundHeatExchanger:Pond=\"" + trim( PondGHE( PondGHENum ).Name ) + "\", is frozen; Pond model not valid. Calculated Pond Temperature=[" + trim( RoundSigDigits( PondTemperature, 2 ) ) + "] C" );
-				ShowContinueErrorTimeStamp( " " );
+				ShowWarningMessage( "GroundHeatExchanger:Pond=\"" + PondGHE( PondGHENum ).Name + "\", is frozen; Pond model not valid. Calculated Pond Temperature=[" + RoundSigDigits( PondTemperature, 2 ) + "] C" );
+				ShowContinueErrorTimeStamp( "" );
 			}
-			ShowRecurringWarningErrorAtEnd( "GroundHeatExchanger:Pond=\"" + trim( PondGHE( PondGHENum ).Name ) + "\", is frozen", PondGHE( PondGHENum ).FrozenErrIndex, PondTemperature, PondTemperature, _, "[C]", "[C]" );
+			ShowRecurringWarningErrorAtEnd( "GroundHeatExchanger:Pond=\"" + PondGHE( PondGHENum ).Name + "\", is frozen", PondGHE( PondGHENum ).FrozenErrIndex, PondTemperature, PondTemperature, _, "[C]", "[C]" );
 			if ( PondGHE( PondGHENum ).ConsecutiveFrozen >= NumOfTimeStepInHour * 30 ) {
-				ShowFatalError( "GroundHeatExchanger:Pond=\"" + trim( PondGHE( PondGHENum ).Name ) + "\" has been frozen for 30 consecutive hours.  Program terminates." );
+				ShowFatalError( "GroundHeatExchanger:Pond=\"" + PondGHE( PondGHENum ).Name + "\" has been frozen for 30 consecutive hours.  Program terminates." );
 			}
 		} else {
 			PondGHE( PondGHENum ).ConsecutiveFrozen = 0;

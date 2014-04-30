@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace PondGroundHeatExchanger {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
@@ -58,9 +56,9 @@ namespace PondGroundHeatExchanger {
 	{
 		// Members
 		// Input data
-		Fstring Name; // name of pond GHE
-		Fstring InletNode; // pond inlet fluid node
-		Fstring OutletNode; // pond outlet fluid node
+		std::string Name; // name of pond GHE
+		std::string InletNode; // pond inlet fluid node
+		std::string OutletNode; // pond outlet fluid node
 		Real64 DesignMassFlowRate; // design flow rate of circulating fluid
 		Real64 DesignCapacity; // design cooling capacity of pond at
 		Real64 Depth; // depth of pond
@@ -85,9 +83,6 @@ namespace PondGroundHeatExchanger {
 
 		// Default Constructor
 		PondGroundHeatExchangerData() :
-			Name( MaxNameLength ),
-			InletNode( MaxNameLength ),
-			OutletNode( MaxNameLength ),
 			DesignMassFlowRate( 0.0 ),
 			DesignCapacity( 0.0 ),
 			Depth( 0.0 ),
@@ -112,9 +107,9 @@ namespace PondGroundHeatExchanger {
 
 		// Member Constructor
 		PondGroundHeatExchangerData(
-			Fstring const & Name, // name of pond GHE
-			Fstring const & InletNode, // pond inlet fluid node
-			Fstring const & OutletNode, // pond outlet fluid node
+			std::string const & Name, // name of pond GHE
+			std::string const & InletNode, // pond inlet fluid node
+			std::string const & OutletNode, // pond outlet fluid node
 			Real64 const DesignMassFlowRate, // design flow rate of circulating fluid
 			Real64 const DesignCapacity, // design cooling capacity of pond at
 			Real64 const Depth, // depth of pond
@@ -136,9 +131,9 @@ namespace PondGroundHeatExchanger {
 			int const BranchNum,
 			int const CompNum
 		) :
-			Name( MaxNameLength, Name ),
-			InletNode( MaxNameLength, InletNode ),
-			OutletNode( MaxNameLength, OutletNode ),
+			Name( Name ),
+			InletNode( InletNode ),
+			OutletNode( OutletNode ),
 			DesignMassFlowRate( DesignMassFlowRate ),
 			DesignCapacity( DesignCapacity ),
 			Depth( Depth ),
@@ -205,7 +200,7 @@ namespace PondGroundHeatExchanger {
 
 	void
 	SimPondGroundHeatExchanger(
-		Fstring const & CompName, // name of the pond GHE
+		std::string const & CompName, // name of the pond GHE
 		int & CompIndex, // index in local derived types
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		bool const RunFlag, // TRUE if equipment turned on by loop operation scheme

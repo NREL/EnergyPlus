@@ -25,7 +25,7 @@
 	typedef  MA2S< int >  MA2S_int;
 	typedef  MA2Sc< double >  MA2Sc_double;
 	typedef  MA2S< double >  MA2S_double;
-	typedef  MA2Sc< Fstring >  MA2Sc_Fstring;
-	typedef  MA2S< Fstring >  MA2S_Fstring;
+	typedef  MA2Sc< std::string >  MA2Sc_string;
+	typedef  MA2S< std::string >  MA2S_string;
 
 #endif // ObjexxFCL_FArray2S_Project_MArray_hh_INCLUDED

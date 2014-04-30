@@ -15,7 +15,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.hh>
-#include <ObjexxFCL/char.constants.hh>
 #include <ObjexxFCL/fmt.hh>
 #include <ObjexxFCL/TypeTraits.hh>
 

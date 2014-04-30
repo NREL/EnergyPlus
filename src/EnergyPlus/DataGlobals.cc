@@ -55,20 +55,20 @@ namespace DataGlobals {
 
 	Real64 const MaxEXPArg( 709.78 ); // maximum exponent in EXP() function
 	Real64 const Pi( 3.141592653589793 ); // Pi 3.1415926535897932384626435
-	Real64 const PiOvr2( Pi / 2. ); // Pi/2
+	Real64 const PiOvr2( Pi / 2.0 ); // Pi/2
 	Real64 const GravityConstant( 9.807 );
-	Real64 const DegToRadians( Pi / 180. ); // Conversion for Degrees to Radians
+	Real64 const DegToRadians( Pi / 180.0 ); // Conversion for Degrees to Radians
 	Real64 const SecInHour( 3600.0 ); // Conversion for hours to seconds
 	Real64 const HoursInDay( 24.0 ); // Number of Hourse in Day
 	Real64 const SecsInDay( SecInHour * HoursInDay ); // Number of seconds in Day
 	Real64 const BigNumber( huge( 1.0 ) ); // Max Number real used for initializations
 	Real64 const rTinyValue( epsilon( 1.0 ) ); // Tiny value to replace use of TINY(x)
-	int const MaxNameLength( 100 ); // Maximum Name Length in Characters -- should be the same
+	std::string::size_type const MaxNameLength( 100 ); // Maximum Name Length in Characters -- should be the same
 	// as MaxAlphaArgLength in InputProcessor module
 
 	Real64 const KelvinConv( 273.15 ); // Conversion factor for C to K and K to C
 	Real64 const InitConvTemp( 5.05 ); // [deg C], standard init vol to mass flow conversion temp
-	Real64 const AutoCalculate( -99999. ); // automatically calculate some fields.
+	Real64 const AutoCalculate( -99999.0 ); // automatically calculate some fields.
 
 	Real64 const StefanBoltzmann( 5.6697E-8 ); // Stefan-Boltzmann constant in W/(m2*K4)
 	Real64 const UniversalGasConst( 8314.462175 ); // (J/mol*K)
@@ -110,7 +110,7 @@ namespace DataGlobals {
 	bool BeginFullSimFlag( false ); // True until full simulation has begun, False after first time step
 	bool BeginTimeStepFlag( false ); // True at the start of each time step, False after first subtime step of time step
 	int DayOfSim( 0 ); // Counter for days (during the simulation)
-	Fstring DayOfSimChr( 25, "0" ); // Counter for days (during the simulation) (character -- for reporting)
+	std::string DayOfSimChr( "0" ); // Counter for days (during the simulation) (character -- for reporting)
 	bool EndEnvrnFlag( false ); // True at the end of each environment (last time step of last hour of last day of environ)
 	bool EndDesignDayEnvrnsFlag( false ); // True at the end of the last design day environment
 	// (last time step of last hour of last day of environ which is a design day)

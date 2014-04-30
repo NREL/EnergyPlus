@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,13 +13,12 @@ namespace EnergyPlus {
 namespace OutdoorAirUnit {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
 
 	// component types addressed by this module
-	extern Fstring const cMO_OutdoorAirUnit;
+	extern std::string const cMO_OutdoorAirUnit;
 
 	extern int const WaterCoil_SimpleCool;
 	extern int const WaterCoil_Cooling;
@@ -46,7 +44,7 @@ namespace OutdoorAirUnit {
 	extern int const CoolingMode; // normal cooling coil operation
 	extern int const NeutralMode; // signal coil shouldn't run
 
-	extern FArray1D_Fstring const CurrentModuleObjects;
+	extern FArray1D_string const CurrentModuleObjects;
 
 	// Parameters below (CO - Current module Object.  used primarily in Get Inputs)
 	// Multiple Get Input routines in this module or these would be in individual routines.
@@ -75,8 +73,8 @@ namespace OutdoorAirUnit {
 	{
 		// Members
 		// Equipment List Data
-		Fstring ComponentName;
-		Fstring ComponentType;
+		std::string ComponentName;
+		std::string ComponentType;
 		int ComponentType_Num; // Parameterized Component Types this module can address
 		int ComponentIndex; // Which one in list -- updated by routines called from here
 		int CoilAirInletNode;
@@ -97,8 +95,6 @@ namespace OutdoorAirUnit {
 
 		// Default Constructor
 		OAEquipList() :
-			ComponentName( MaxNameLength ),
-			ComponentType( MaxNameLength ),
 			ComponentType_Num( 0 ),
 			ComponentIndex( 0 ),
 			CoilAirInletNode( 0 ),
@@ -119,8 +115,8 @@ namespace OutdoorAirUnit {
 
 		// Member Constructor
 		OAEquipList(
-			Fstring const & ComponentName,
-			Fstring const & ComponentType,
+			std::string const & ComponentName,
+			std::string const & ComponentType,
 			int const ComponentType_Num, // Parameterized Component Types this module can address
 			int const ComponentIndex, // Which one in list -- updated by routines called from here
 			int const CoilAirInletNode,
@@ -138,8 +134,8 @@ namespace OutdoorAirUnit {
 			Real64 const MinVolWaterFlow,
 			Real64 const MinWaterMassFlow
 		) :
-			ComponentName( MaxNameLength, ComponentName ),
-			ComponentType( MaxNameLength, ComponentType ),
+			ComponentName( ComponentName ),
+			ComponentType( ComponentType ),
 			ComponentType_Num( ComponentType_Num ),
 			ComponentIndex( ComponentIndex ),
 			CoilAirInletNode( CoilAirInletNode ),
@@ -164,18 +160,18 @@ namespace OutdoorAirUnit {
 	{
 		// Members
 		// Input data
-		Fstring Name; // name of unit
-		Fstring SchedName; // availability schedule
+		std::string Name; // name of unit
+		std::string SchedName; // availability schedule
 		int SchedPtr; // index to schedule
-		Fstring ZoneName; // Name of zone the system is serving
+		std::string ZoneName; // Name of zone the system is serving
 		int ZonePtr; // Point to this zone in the Zone derived type
 		int ZoneNodeNum; // index of zone air node in node structure
-		Fstring UnitControlType; // Control type for the system
+		std::string UnitControlType; // Control type for the system
 		// (Neutral and setpoint temperatrue)
 		int ControlType; // Unit Control type indicator
 		int AirInletNode; // inlet air node number
 		int AirOutletNode; // outlet air node number
-		Fstring SFanName; // name of supply fan
+		std::string SFanName; // name of supply fan
 		int SFan_Index; // index in fan structure
 		int SFanType; // type of fan in cFanTypes
 		int SFanAvailSchedPtr; // supply fan availability sched from fan object
@@ -183,24 +179,24 @@ namespace OutdoorAirUnit {
 		Real64 FanCorTemp; // correction temperature
 		bool FanEffect; // .TRUE. if unit has a fan type of draw through
 		int SFanOutletNode; // supply fan outlet node number
-		Fstring ExtFanName; // name of exhaust fan
+		std::string ExtFanName; // name of exhaust fan
 		int ExtFan_Index; // index in fan structure
 		int ExtFanType; // type of fan in cFanTypes
 		int ExtFanAvailSchedPtr; // exhaust fan availability sched from fan object
 		bool ExtFan; // true if there is an exhaust fan
-		Fstring OutAirSchedName; // schedule of fraction for outside air (all controls)
+		std::string OutAirSchedName; // schedule of fraction for outside air (all controls)
 		int OutAirSchedPtr; // index to schedule
 		int OutsideAirNode; // outside air node number
 		Real64 OutAirVolFlow; // m3/s
 		Real64 OutAirMassFlow; // kg/s
 		Real64 ExtAirVolFlow; // m3/s
 		Real64 ExtAirMassFlow; // kg/s
-		Fstring ExtAirSchedName; // schedule of fraction for exhaust air
+		std::string ExtAirSchedName; // schedule of fraction for exhaust air
 		int ExtOutAirSchedPtr; // index to schedule
 		Real64 MaxAirMassFlow; // kg/s
-		Fstring HiCtrlTempSched; // Schedule name for the High Control Air temperature
+		std::string HiCtrlTempSched; // Schedule name for the High Control Air temperature
 		int HiCtrlTempSchedPtr; // Schedule index for the High Control Air temperature
-		Fstring LoCtrlTempSched; // Schedule name for the Low Control Air temperature
+		std::string LoCtrlTempSched; // Schedule name for the Low Control Air temperature
 		int LoCtrlTempSchedPtr; // Schedule index for the Low Control Air temperature
 		int OperatingMode; // operating condition( NeutralMode, HeatingMode, CoolingMode)
 		int ControlCompTypeNum;
@@ -209,10 +205,10 @@ namespace OutdoorAirUnit {
 		int UnBalancedErrCount; // Counter for recurring warning message
 		int UnBalancedErrIndex; // Index to recurring warning message
 		int NumComponents;
-		Fstring ComponentListName;
+		std::string ComponentListName;
 		Real64 CompOutSetTemp; // component outlet setpoint temperature
 		int AvailStatus;
-		Fstring AvailManagerListName; // Name of an availability manager list object
+		std::string AvailManagerListName; // Name of an availability manager list object
 		FArray1D< OAEquipList > OAEquip;
 		// Report data
 		Real64 TotCoolingRate; // Rate of total cooling delivered to the zone [W]
@@ -232,17 +228,12 @@ namespace OutdoorAirUnit {
 
 		// Default Constructor
 		OAUnitData() :
-			Name( MaxNameLength ),
-			SchedName( MaxNameLength ),
 			SchedPtr( 0 ),
-			ZoneName( MaxNameLength ),
 			ZonePtr( 0 ),
 			ZoneNodeNum( 0 ),
-			UnitControlType( MaxNameLength ),
 			ControlType( 0 ),
 			AirInletNode( 0 ),
 			AirOutletNode( 0 ),
-			SFanName( MaxNameLength ),
 			SFan_Index( 0 ),
 			SFanType( 0 ),
 			SFanAvailSchedPtr( 0 ),
@@ -250,24 +241,19 @@ namespace OutdoorAirUnit {
 			FanCorTemp( 0.0 ),
 			FanEffect( false ),
 			SFanOutletNode( 0 ),
-			ExtFanName( MaxNameLength ),
 			ExtFan_Index( 0 ),
 			ExtFanType( 0 ),
 			ExtFanAvailSchedPtr( 0 ),
 			ExtFan( false ),
-			OutAirSchedName( MaxNameLength ),
 			OutAirSchedPtr( 0 ),
 			OutsideAirNode( 0 ),
 			OutAirVolFlow( 0.0 ),
 			OutAirMassFlow( 0.0 ),
 			ExtAirVolFlow( 0.0 ),
 			ExtAirMassFlow( 0.0 ),
-			ExtAirSchedName( MaxNameLength ),
 			ExtOutAirSchedPtr( 0 ),
 			MaxAirMassFlow( 0.0 ),
-			HiCtrlTempSched( MaxNameLength ),
 			HiCtrlTempSchedPtr( 0 ),
-			LoCtrlTempSched( MaxNameLength ),
 			LoCtrlTempSchedPtr( 0 ),
 			OperatingMode( 0 ),
 			ControlCompTypeNum( 0 ),
@@ -276,10 +262,8 @@ namespace OutdoorAirUnit {
 			UnBalancedErrCount( 0 ),
 			UnBalancedErrIndex( 0 ),
 			NumComponents( 0 ),
-			ComponentListName( MaxNameLength ),
 			CompOutSetTemp( 0.0 ),
 			AvailStatus( 0 ),
-			AvailManagerListName( MaxNameLength ),
 			TotCoolingRate( 0.0 ),
 			TotCoolingEnergy( 0.0 ),
 			SensCoolingRate( 0.0 ),
@@ -298,17 +282,17 @@ namespace OutdoorAirUnit {
 
 		// Member Constructor
 		OAUnitData(
-			Fstring const & Name, // name of unit
-			Fstring const & SchedName, // availability schedule
+			std::string const & Name, // name of unit
+			std::string const & SchedName, // availability schedule
 			int const SchedPtr, // index to schedule
-			Fstring const & ZoneName, // Name of zone the system is serving
+			std::string const & ZoneName, // Name of zone the system is serving
 			int const ZonePtr, // Point to this zone in the Zone derived type
 			int const ZoneNodeNum, // index of zone air node in node structure
-			Fstring const & UnitControlType, // Control type for the system
+			std::string const & UnitControlType, // Control type for the system
 			int const ControlType, // Unit Control type indicator
 			int const AirInletNode, // inlet air node number
 			int const AirOutletNode, // outlet air node number
-			Fstring const & SFanName, // name of supply fan
+			std::string const & SFanName, // name of supply fan
 			int const SFan_Index, // index in fan structure
 			int const SFanType, // type of fan in cFanTypes
 			int const SFanAvailSchedPtr, // supply fan availability sched from fan object
@@ -316,24 +300,24 @@ namespace OutdoorAirUnit {
 			Real64 const FanCorTemp, // correction temperature
 			bool const FanEffect, // .TRUE. if unit has a fan type of draw through
 			int const SFanOutletNode, // supply fan outlet node number
-			Fstring const & ExtFanName, // name of exhaust fan
+			std::string const & ExtFanName, // name of exhaust fan
 			int const ExtFan_Index, // index in fan structure
 			int const ExtFanType, // type of fan in cFanTypes
 			int const ExtFanAvailSchedPtr, // exhaust fan availability sched from fan object
 			bool const ExtFan, // true if there is an exhaust fan
-			Fstring const & OutAirSchedName, // schedule of fraction for outside air (all controls)
+			std::string const & OutAirSchedName, // schedule of fraction for outside air (all controls)
 			int const OutAirSchedPtr, // index to schedule
 			int const OutsideAirNode, // outside air node number
 			Real64 const OutAirVolFlow, // m3/s
 			Real64 const OutAirMassFlow, // kg/s
 			Real64 const ExtAirVolFlow, // m3/s
 			Real64 const ExtAirMassFlow, // kg/s
-			Fstring const & ExtAirSchedName, // schedule of fraction for exhaust air
+			std::string const & ExtAirSchedName, // schedule of fraction for exhaust air
 			int const ExtOutAirSchedPtr, // index to schedule
 			Real64 const MaxAirMassFlow, // kg/s
-			Fstring const & HiCtrlTempSched, // Schedule name for the High Control Air temperature
+			std::string const & HiCtrlTempSched, // Schedule name for the High Control Air temperature
 			int const HiCtrlTempSchedPtr, // Schedule index for the High Control Air temperature
-			Fstring const & LoCtrlTempSched, // Schedule name for the Low Control Air temperature
+			std::string const & LoCtrlTempSched, // Schedule name for the Low Control Air temperature
 			int const LoCtrlTempSchedPtr, // Schedule index for the Low Control Air temperature
 			int const OperatingMode, // operating condition( NeutralMode, HeatingMode, CoolingMode)
 			int const ControlCompTypeNum,
@@ -342,10 +326,10 @@ namespace OutdoorAirUnit {
 			int const UnBalancedErrCount, // Counter for recurring warning message
 			int const UnBalancedErrIndex, // Index to recurring warning message
 			int const NumComponents,
-			Fstring const & ComponentListName,
+			std::string const & ComponentListName,
 			Real64 const CompOutSetTemp, // component outlet setpoint temperature
 			int const AvailStatus,
-			Fstring const & AvailManagerListName, // Name of an availability manager list object
+			std::string const & AvailManagerListName, // Name of an availability manager list object
 			FArray1< OAEquipList > const & OAEquip,
 			Real64 const TotCoolingRate, // Rate of total cooling delivered to the zone [W]
 			Real64 const TotCoolingEnergy, // Total cooling energy delivered by the OAU supply air to the zone [J]
@@ -362,17 +346,17 @@ namespace OutdoorAirUnit {
 			Real64 const TotHeatingEnergy, // total heating energy delivered by the ERV supply air to the zone [J]
 			Real64 const TotHeatingRate // rate of total heating delivered to the zone [W]
 		) :
-			Name( MaxNameLength, Name ),
-			SchedName( MaxNameLength, SchedName ),
+			Name( Name ),
+			SchedName( SchedName ),
 			SchedPtr( SchedPtr ),
-			ZoneName( MaxNameLength, ZoneName ),
+			ZoneName( ZoneName ),
 			ZonePtr( ZonePtr ),
 			ZoneNodeNum( ZoneNodeNum ),
-			UnitControlType( MaxNameLength, UnitControlType ),
+			UnitControlType( UnitControlType ),
 			ControlType( ControlType ),
 			AirInletNode( AirInletNode ),
 			AirOutletNode( AirOutletNode ),
-			SFanName( MaxNameLength, SFanName ),
+			SFanName( SFanName ),
 			SFan_Index( SFan_Index ),
 			SFanType( SFanType ),
 			SFanAvailSchedPtr( SFanAvailSchedPtr ),
@@ -380,24 +364,24 @@ namespace OutdoorAirUnit {
 			FanCorTemp( FanCorTemp ),
 			FanEffect( FanEffect ),
 			SFanOutletNode( SFanOutletNode ),
-			ExtFanName( MaxNameLength, ExtFanName ),
+			ExtFanName( ExtFanName ),
 			ExtFan_Index( ExtFan_Index ),
 			ExtFanType( ExtFanType ),
 			ExtFanAvailSchedPtr( ExtFanAvailSchedPtr ),
 			ExtFan( ExtFan ),
-			OutAirSchedName( MaxNameLength, OutAirSchedName ),
+			OutAirSchedName( OutAirSchedName ),
 			OutAirSchedPtr( OutAirSchedPtr ),
 			OutsideAirNode( OutsideAirNode ),
 			OutAirVolFlow( OutAirVolFlow ),
 			OutAirMassFlow( OutAirMassFlow ),
 			ExtAirVolFlow( ExtAirVolFlow ),
 			ExtAirMassFlow( ExtAirMassFlow ),
-			ExtAirSchedName( MaxNameLength, ExtAirSchedName ),
+			ExtAirSchedName( ExtAirSchedName ),
 			ExtOutAirSchedPtr( ExtOutAirSchedPtr ),
 			MaxAirMassFlow( MaxAirMassFlow ),
-			HiCtrlTempSched( MaxNameLength, HiCtrlTempSched ),
+			HiCtrlTempSched( HiCtrlTempSched ),
 			HiCtrlTempSchedPtr( HiCtrlTempSchedPtr ),
-			LoCtrlTempSched( MaxNameLength, LoCtrlTempSched ),
+			LoCtrlTempSched( LoCtrlTempSched ),
 			LoCtrlTempSchedPtr( LoCtrlTempSchedPtr ),
 			OperatingMode( OperatingMode ),
 			ControlCompTypeNum( ControlCompTypeNum ),
@@ -406,10 +390,10 @@ namespace OutdoorAirUnit {
 			UnBalancedErrCount( UnBalancedErrCount ),
 			UnBalancedErrIndex( UnBalancedErrIndex ),
 			NumComponents( NumComponents ),
-			ComponentListName( MaxNameLength, ComponentListName ),
+			ComponentListName( ComponentListName ),
 			CompOutSetTemp( CompOutSetTemp ),
 			AvailStatus( AvailStatus ),
-			AvailManagerListName( MaxNameLength, AvailManagerListName ),
+			AvailManagerListName( AvailManagerListName ),
 			OAEquip( OAEquip ),
 			TotCoolingRate( TotCoolingRate ),
 			TotCoolingEnergy( TotCoolingEnergy ),
@@ -436,7 +420,7 @@ namespace OutdoorAirUnit {
 
 	void
 	SimOutdoorAirUnit(
-		Fstring const & CompName, // name of the outdoor air unit
+		std::string const & CompName, // name of the outdoor air unit
 		int const ZoneNum, // number of zone being served
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		Real64 & PowerMet, // Sensible power supplied (W)
@@ -475,8 +459,8 @@ namespace OutdoorAirUnit {
 	void
 	SimOutdoorAirEquipComps(
 		int const OAUnitNum, // actual outdoor air unit num
-		Fstring const & EquipType, // the component type
-		Fstring const & EquipName, // the component Name
+		std::string const & EquipType, // the component type
+		std::string const & EquipName, // the component Name
 		int const EquipNum,
 		int const CompTypeNum, // Component Type -- Integerized for this module
 		bool const FirstHVACIteration,

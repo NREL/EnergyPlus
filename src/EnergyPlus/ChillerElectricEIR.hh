@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace ChillerElectricEIR {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -63,9 +61,9 @@ namespace ChillerElectricEIR {
 	struct ElectricEIRChillerSpecs
 	{
 		// Members
-		Fstring Name; // User identifier
+		std::string Name; // User identifier
 		int TypeNum; // plant loop type identifier
-		Fstring EIRFPLRName; // EIRPLR curve name
+		std::string EIRFPLRName; // EIRPLR curve name
 		int CondenserType; // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
 		Real64 RefCap; // Reference capacity of chiller [W]
 		Real64 RefCOP; // Reference coefficient of performance [W/W]
@@ -136,8 +134,8 @@ namespace ChillerElectricEIR {
 		int HRCompNum; // heat recovery water plant loop component index
 		int BasinHeaterSchedulePtr; // Pointer to basin heater schedule
 		int CondMassFlowIndex;
-		Fstring MsgBuffer1; // - buffer to print warning messages on following time step
-		Fstring MsgBuffer2; // - buffer to print warning messages on following time step
+		std::string MsgBuffer1; // - buffer to print warning messages on following time step
+		std::string MsgBuffer2; // - buffer to print warning messages on following time step
 		Real64 MsgDataLast; // value of data when warning occurred (passed to Recurring Warn)
 		bool PrintMessage; // logical to determine if message is valid
 		int MsgErrorCount; // number of occurrences of warning
@@ -147,9 +145,7 @@ namespace ChillerElectricEIR {
 
 		// Default Constructor
 		ElectricEIRChillerSpecs() :
-			Name( MaxNameLength ),
 			TypeNum( 0 ),
-			EIRFPLRName( MaxNameLength ),
 			CondenserType( 0 ),
 			RefCap( 0.0 ),
 			RefCOP( 0.0 ),
@@ -213,8 +209,6 @@ namespace ChillerElectricEIR {
 			HRCompNum( 0 ),
 			BasinHeaterSchedulePtr( 0 ),
 			CondMassFlowIndex( 0 ),
-			MsgBuffer1( 220 ),
-			MsgBuffer2( 300 ),
 			MsgDataLast( 0.0 ),
 			PrintMessage( false ),
 			MsgErrorCount( 0 ),
@@ -225,9 +219,9 @@ namespace ChillerElectricEIR {
 
 		// Member Constructor
 		ElectricEIRChillerSpecs(
-			Fstring const & Name, // User identifier
+			std::string const & Name, // User identifier
 			int const TypeNum, // plant loop type identifier
-			Fstring const & EIRFPLRName, // EIRPLR curve name
+			std::string const & EIRFPLRName, // EIRPLR curve name
 			int const CondenserType, // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
 			Real64 const RefCap, // Reference capacity of chiller [W]
 			Real64 const RefCOP, // Reference coefficient of performance [W/W]
@@ -291,8 +285,8 @@ namespace ChillerElectricEIR {
 			int const HRCompNum, // heat recovery water plant loop component index
 			int const BasinHeaterSchedulePtr, // Pointer to basin heater schedule
 			int const CondMassFlowIndex,
-			Fstring const & MsgBuffer1, // - buffer to print warning messages on following time step
-			Fstring const & MsgBuffer2, // - buffer to print warning messages on following time step
+			std::string const & MsgBuffer1, // - buffer to print warning messages on following time step
+			std::string const & MsgBuffer2, // - buffer to print warning messages on following time step
 			Real64 const MsgDataLast, // value of data when warning occurred (passed to Recurring Warn)
 			bool const PrintMessage, // logical to determine if message is valid
 			int const MsgErrorCount, // number of occurrences of warning
@@ -300,9 +294,9 @@ namespace ChillerElectricEIR {
 			bool const PossibleSubcooling, // flag to indicate chiller is doing less cooling that requested
 			bool const IsThisSized // true if sizing is done
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			TypeNum( TypeNum ),
-			EIRFPLRName( MaxNameLength, EIRFPLRName ),
+			EIRFPLRName( EIRFPLRName ),
 			CondenserType( CondenserType ),
 			RefCap( RefCap ),
 			RefCOP( RefCOP ),
@@ -366,8 +360,8 @@ namespace ChillerElectricEIR {
 			HRCompNum( HRCompNum ),
 			BasinHeaterSchedulePtr( BasinHeaterSchedulePtr ),
 			CondMassFlowIndex( CondMassFlowIndex ),
-			MsgBuffer1( 220, MsgBuffer1 ),
-			MsgBuffer2( 300, MsgBuffer2 ),
+			MsgBuffer1( MsgBuffer1 ),
+			MsgBuffer2( MsgBuffer2 ),
 			MsgDataLast( MsgDataLast ),
 			PrintMessage( PrintMessage ),
 			MsgErrorCount( MsgErrorCount ),
@@ -521,8 +515,8 @@ namespace ChillerElectricEIR {
 
 	void
 	SimElectricEIRChiller(
-		Fstring const & EIRChillerType, // Type of chiller
-		Fstring const & EIRChillerName, // User specified name of chiller
+		std::string const & EIRChillerType, // Type of chiller
+		std::string const & EIRChillerName, // User specified name of chiller
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // Chiller number pointer
 		int const LoopNum, // plant loop index pointer

@@ -48,7 +48,6 @@ namespace PollutionModule {
 	// <use statements for data only modules>
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::HourOfDay;
 	using DataGlobals::TimeStep;
 	using DataGlobals::TimeStepZone;
@@ -178,7 +177,6 @@ namespace PollutionModule {
 		using namespace DataIPShortCuts;
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
-		using InputProcessor::MakeUPPERCase;
 		using ScheduleManager::GetScheduleIndex;
 
 		// Locals
@@ -278,7 +276,7 @@ namespace PollutionModule {
 			// Now find and load all of the user inputs and factors.
 			GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 		} else {
-			if ( PollutionReportSetup ) ShowWarningError( trim( cCurrentModuleObject ) + ": not entered.  Values will be defaulted." );
+			if ( PollutionReportSetup ) ShowWarningError( cCurrentModuleObject + ": not entered.  Values will be defaulted." );
 		}
 
 		Pollution.PurchHeatEffic = 0.3;
@@ -318,771 +316,771 @@ namespace PollutionModule {
 			// Now find and load all of the user inputs and factors.
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			FuelType.FuelTypeNames( Loop ) = trim( cAlphaArgs( 1 ) );
+			FuelType.FuelTypeNames( Loop ) = cAlphaArgs( 1 );
 
 			{ auto const SELECT_CASE_var( MakeUPPERCase( FuelType.FuelTypeNames( Loop ) ) );
 			if ( ( SELECT_CASE_var == "NATURALGAS" ) || ( SELECT_CASE_var == "NATURAL GAS" ) || ( SELECT_CASE_var == "GAS" ) ) {
 				if ( Pollution.NatGasCoef.FuelFactorUsed ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ": " + trim( FuelType.FuelTypeNames( Loop ) ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
 					continue;
 				}
 				Pollution.NatGasCoef.FuelFactorUsed = true;
 				//Natural Gas Coeffs
 				Pollution.NatGasCoef.Source = rNumericArgs( 2 );
 				if ( ! lAlphaFieldBlanks( 3 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Natural Gas", trim( cAlphaFieldNames( 3 ) ), trim( cAlphaArgs( 3 ) ), Pollution.NatGasCoef.SourceSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Natural Gas", cAlphaFieldNames( 3 ), cAlphaArgs( 3 ), Pollution.NatGasCoef.SourceSched, ErrorsFound );
 				}
 				Pollution.NatGasCoef.CO2 = rNumericArgs( 3 );
 				if ( ! lAlphaFieldBlanks( 4 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Natural Gas", trim( cAlphaFieldNames( 4 ) ), trim( cAlphaArgs( 4 ) ), Pollution.NatGasCoef.CO2Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Natural Gas", cAlphaFieldNames( 4 ), cAlphaArgs( 4 ), Pollution.NatGasCoef.CO2Sched, ErrorsFound );
 				}
 				Pollution.NatGasCoef.CO = rNumericArgs( 4 );
 				if ( ! lAlphaFieldBlanks( 5 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Natural Gas", trim( cAlphaFieldNames( 5 ) ), trim( cAlphaArgs( 5 ) ), Pollution.NatGasCoef.COSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Natural Gas", cAlphaFieldNames( 5 ), cAlphaArgs( 5 ), Pollution.NatGasCoef.COSched, ErrorsFound );
 				}
 				Pollution.NatGasCoef.CH4 = rNumericArgs( 5 );
 				if ( ! lAlphaFieldBlanks( 6 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Natural Gas", trim( cAlphaFieldNames( 6 ) ), trim( cAlphaArgs( 6 ) ), Pollution.NatGasCoef.CH4Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Natural Gas", cAlphaFieldNames( 6 ), cAlphaArgs( 6 ), Pollution.NatGasCoef.CH4Sched, ErrorsFound );
 				}
 				Pollution.NatGasCoef.NOx = rNumericArgs( 6 );
 				if ( ! lAlphaFieldBlanks( 7 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Natural Gas", trim( cAlphaFieldNames( 7 ) ), trim( cAlphaArgs( 7 ) ), Pollution.NatGasCoef.NOxSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Natural Gas", cAlphaFieldNames( 7 ), cAlphaArgs( 7 ), Pollution.NatGasCoef.NOxSched, ErrorsFound );
 				}
 				Pollution.NatGasCoef.N2O = rNumericArgs( 7 );
 				if ( ! lAlphaFieldBlanks( 8 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Natural Gas", trim( cAlphaFieldNames( 8 ) ), trim( cAlphaArgs( 8 ) ), Pollution.NatGasCoef.N2OSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Natural Gas", cAlphaFieldNames( 8 ), cAlphaArgs( 8 ), Pollution.NatGasCoef.N2OSched, ErrorsFound );
 				}
 				Pollution.NatGasCoef.SO2 = rNumericArgs( 8 );
 				if ( ! lAlphaFieldBlanks( 9 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Natural Gas", trim( cAlphaFieldNames( 9 ) ), trim( cAlphaArgs( 9 ) ), Pollution.NatGasCoef.SO2Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Natural Gas", cAlphaFieldNames( 9 ), cAlphaArgs( 9 ), Pollution.NatGasCoef.SO2Sched, ErrorsFound );
 				}
 				Pollution.NatGasCoef.PM = rNumericArgs( 9 );
 				if ( ! lAlphaFieldBlanks( 10 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Natural Gas", trim( cAlphaFieldNames( 10 ) ), trim( cAlphaArgs( 10 ) ), Pollution.NatGasCoef.PMSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Natural Gas", cAlphaFieldNames( 10 ), cAlphaArgs( 10 ), Pollution.NatGasCoef.PMSched, ErrorsFound );
 				}
 				Pollution.NatGasCoef.PM10 = rNumericArgs( 10 );
 				if ( ! lAlphaFieldBlanks( 11 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Natural Gas", trim( cAlphaFieldNames( 11 ) ), trim( cAlphaArgs( 11 ) ), Pollution.NatGasCoef.PM10Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Natural Gas", cAlphaFieldNames( 11 ), cAlphaArgs( 11 ), Pollution.NatGasCoef.PM10Sched, ErrorsFound );
 				}
 				Pollution.NatGasCoef.PM25 = rNumericArgs( 11 );
 				if ( ! lAlphaFieldBlanks( 12 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Natural Gas", trim( cAlphaFieldNames( 12 ) ), trim( cAlphaArgs( 12 ) ), Pollution.NatGasCoef.PM25Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Natural Gas", cAlphaFieldNames( 12 ), cAlphaArgs( 12 ), Pollution.NatGasCoef.PM25Sched, ErrorsFound );
 				}
 				Pollution.NatGasCoef.NH3 = rNumericArgs( 12 );
 				if ( ! lAlphaFieldBlanks( 13 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Natural Gas", trim( cAlphaFieldNames( 13 ) ), trim( cAlphaArgs( 13 ) ), Pollution.NatGasCoef.NH3Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Natural Gas", cAlphaFieldNames( 13 ), cAlphaArgs( 13 ), Pollution.NatGasCoef.NH3Sched, ErrorsFound );
 				}
 				Pollution.NatGasCoef.NMVOC = rNumericArgs( 13 );
 				if ( ! lAlphaFieldBlanks( 14 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Natural Gas", trim( cAlphaFieldNames( 14 ) ), trim( cAlphaArgs( 14 ) ), Pollution.NatGasCoef.NMVOCSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Natural Gas", cAlphaFieldNames( 14 ), cAlphaArgs( 14 ), Pollution.NatGasCoef.NMVOCSched, ErrorsFound );
 				}
 				Pollution.NatGasCoef.Hg = rNumericArgs( 14 );
 				if ( ! lAlphaFieldBlanks( 15 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Natural Gas", trim( cAlphaFieldNames( 15 ) ), trim( cAlphaArgs( 15 ) ), Pollution.NatGasCoef.HgSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Natural Gas", cAlphaFieldNames( 15 ), cAlphaArgs( 15 ), Pollution.NatGasCoef.HgSched, ErrorsFound );
 				}
 				Pollution.NatGasCoef.Pb = rNumericArgs( 15 );
 				if ( ! lAlphaFieldBlanks( 16 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Natural Gas", trim( cAlphaFieldNames( 16 ) ), trim( cAlphaArgs( 16 ) ), Pollution.NatGasCoef.PbSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Natural Gas", cAlphaFieldNames( 16 ), cAlphaArgs( 16 ), Pollution.NatGasCoef.PbSched, ErrorsFound );
 				}
 				Pollution.NatGasCoef.Water = rNumericArgs( 16 );
 				if ( ! lAlphaFieldBlanks( 17 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Natural Gas", trim( cAlphaFieldNames( 17 ) ), trim( cAlphaArgs( 17 ) ), Pollution.NatGasCoef.WaterSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Natural Gas", cAlphaFieldNames( 17 ), cAlphaArgs( 17 ), Pollution.NatGasCoef.WaterSched, ErrorsFound );
 				}
 				Pollution.NatGasCoef.NucHi = rNumericArgs( 17 );
 				if ( ! lAlphaFieldBlanks( 18 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Natural Gas", trim( cAlphaFieldNames( 18 ) ), trim( cAlphaArgs( 18 ) ), Pollution.NatGasCoef.NucHiSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Natural Gas", cAlphaFieldNames( 18 ), cAlphaArgs( 18 ), Pollution.NatGasCoef.NucHiSched, ErrorsFound );
 				}
 				Pollution.NatGasCoef.NucLo = rNumericArgs( 18 );
 				if ( ! lAlphaFieldBlanks( 19 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Natural Gas", trim( cAlphaFieldNames( 19 ) ), trim( cAlphaArgs( 19 ) ), Pollution.NatGasCoef.NucLoSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Natural Gas", cAlphaFieldNames( 19 ), cAlphaArgs( 19 ), Pollution.NatGasCoef.NucLoSched, ErrorsFound );
 				}
 
 			} else if ( ( SELECT_CASE_var == "RESIDUALOIL" ) || ( SELECT_CASE_var == "RESIDUAL OIL" ) || ( SELECT_CASE_var == "FUEL OIL #2" ) || ( SELECT_CASE_var == "FUELOIL#2" ) ) {
 				if ( Pollution.FuelOil2Coef.FuelFactorUsed ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ": " + trim( FuelType.FuelTypeNames( Loop ) ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
 					continue;
 				}
 				Pollution.FuelOil2Coef.FuelFactorUsed = true;
 				//FuelOil#2 Coeffs
 				Pollution.FuelOil2Coef.Source = rNumericArgs( 2 );
 				if ( ! lAlphaFieldBlanks( 3 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#2", trim( cAlphaFieldNames( 3 ) ), trim( cAlphaArgs( 3 ) ), Pollution.FuelOil2Coef.SourceSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames( 3 ), cAlphaArgs( 3 ), Pollution.FuelOil2Coef.SourceSched, ErrorsFound );
 				}
 				Pollution.FuelOil2Coef.CO2 = rNumericArgs( 3 );
 				if ( ! lAlphaFieldBlanks( 4 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#2", trim( cAlphaFieldNames( 4 ) ), trim( cAlphaArgs( 4 ) ), Pollution.FuelOil2Coef.CO2Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames( 4 ), cAlphaArgs( 4 ), Pollution.FuelOil2Coef.CO2Sched, ErrorsFound );
 				}
 				Pollution.FuelOil2Coef.CO = rNumericArgs( 4 );
 				if ( ! lAlphaFieldBlanks( 5 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#2", trim( cAlphaFieldNames( 5 ) ), trim( cAlphaArgs( 5 ) ), Pollution.FuelOil2Coef.COSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames( 5 ), cAlphaArgs( 5 ), Pollution.FuelOil2Coef.COSched, ErrorsFound );
 				}
 				Pollution.FuelOil2Coef.CH4 = rNumericArgs( 5 );
 				if ( ! lAlphaFieldBlanks( 6 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#2", trim( cAlphaFieldNames( 6 ) ), trim( cAlphaArgs( 6 ) ), Pollution.FuelOil2Coef.CH4Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames( 6 ), cAlphaArgs( 6 ), Pollution.FuelOil2Coef.CH4Sched, ErrorsFound );
 				}
 				Pollution.FuelOil2Coef.NOx = rNumericArgs( 6 );
 				if ( ! lAlphaFieldBlanks( 7 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#2", trim( cAlphaFieldNames( 7 ) ), trim( cAlphaArgs( 7 ) ), Pollution.FuelOil2Coef.NOxSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames( 7 ), cAlphaArgs( 7 ), Pollution.FuelOil2Coef.NOxSched, ErrorsFound );
 				}
 				Pollution.FuelOil2Coef.N2O = rNumericArgs( 7 );
 				if ( ! lAlphaFieldBlanks( 8 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#2", trim( cAlphaFieldNames( 8 ) ), trim( cAlphaArgs( 8 ) ), Pollution.FuelOil2Coef.N2OSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames( 8 ), cAlphaArgs( 8 ), Pollution.FuelOil2Coef.N2OSched, ErrorsFound );
 				}
 				Pollution.FuelOil2Coef.SO2 = rNumericArgs( 8 );
 				if ( ! lAlphaFieldBlanks( 9 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#2", trim( cAlphaFieldNames( 9 ) ), trim( cAlphaArgs( 9 ) ), Pollution.FuelOil2Coef.SO2Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames( 9 ), cAlphaArgs( 9 ), Pollution.FuelOil2Coef.SO2Sched, ErrorsFound );
 				}
 				Pollution.FuelOil2Coef.PM = rNumericArgs( 9 );
 				if ( ! lAlphaFieldBlanks( 10 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#2", trim( cAlphaFieldNames( 10 ) ), trim( cAlphaArgs( 10 ) ), Pollution.FuelOil2Coef.PMSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames( 10 ), cAlphaArgs( 10 ), Pollution.FuelOil2Coef.PMSched, ErrorsFound );
 				}
 				Pollution.FuelOil2Coef.PM10 = rNumericArgs( 10 );
 				if ( ! lAlphaFieldBlanks( 11 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#2", trim( cAlphaFieldNames( 11 ) ), trim( cAlphaArgs( 11 ) ), Pollution.FuelOil2Coef.PM10Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames( 11 ), cAlphaArgs( 11 ), Pollution.FuelOil2Coef.PM10Sched, ErrorsFound );
 				}
 				Pollution.FuelOil2Coef.PM25 = rNumericArgs( 11 );
 				if ( ! lAlphaFieldBlanks( 12 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#2", trim( cAlphaFieldNames( 12 ) ), trim( cAlphaArgs( 12 ) ), Pollution.FuelOil2Coef.PM25Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames( 12 ), cAlphaArgs( 12 ), Pollution.FuelOil2Coef.PM25Sched, ErrorsFound );
 				}
 				Pollution.FuelOil2Coef.NH3 = rNumericArgs( 12 );
 				if ( ! lAlphaFieldBlanks( 13 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#2", trim( cAlphaFieldNames( 13 ) ), trim( cAlphaArgs( 13 ) ), Pollution.FuelOil2Coef.NH3Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames( 13 ), cAlphaArgs( 13 ), Pollution.FuelOil2Coef.NH3Sched, ErrorsFound );
 				}
 				Pollution.FuelOil2Coef.NMVOC = rNumericArgs( 13 );
 				if ( ! lAlphaFieldBlanks( 14 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#2", trim( cAlphaFieldNames( 14 ) ), trim( cAlphaArgs( 14 ) ), Pollution.FuelOil2Coef.NMVOCSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames( 14 ), cAlphaArgs( 14 ), Pollution.FuelOil2Coef.NMVOCSched, ErrorsFound );
 				}
 				Pollution.FuelOil2Coef.Hg = rNumericArgs( 14 );
 				if ( ! lAlphaFieldBlanks( 15 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#2", trim( cAlphaFieldNames( 15 ) ), trim( cAlphaArgs( 15 ) ), Pollution.FuelOil2Coef.HgSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames( 15 ), cAlphaArgs( 15 ), Pollution.FuelOil2Coef.HgSched, ErrorsFound );
 				}
 				Pollution.FuelOil2Coef.Pb = rNumericArgs( 15 );
 				if ( ! lAlphaFieldBlanks( 16 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#2", trim( cAlphaFieldNames( 16 ) ), trim( cAlphaArgs( 16 ) ), Pollution.FuelOil2Coef.PbSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames( 16 ), cAlphaArgs( 16 ), Pollution.FuelOil2Coef.PbSched, ErrorsFound );
 				}
 				Pollution.FuelOil2Coef.Water = rNumericArgs( 16 );
 				if ( ! lAlphaFieldBlanks( 17 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#2", trim( cAlphaFieldNames( 17 ) ), trim( cAlphaArgs( 17 ) ), Pollution.FuelOil2Coef.WaterSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames( 17 ), cAlphaArgs( 17 ), Pollution.FuelOil2Coef.WaterSched, ErrorsFound );
 				}
 				Pollution.FuelOil2Coef.NucHi = rNumericArgs( 17 );
 				if ( ! lAlphaFieldBlanks( 18 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#2", trim( cAlphaFieldNames( 18 ) ), trim( cAlphaArgs( 18 ) ), Pollution.FuelOil2Coef.NucHiSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames( 18 ), cAlphaArgs( 18 ), Pollution.FuelOil2Coef.NucHiSched, ErrorsFound );
 				}
 				Pollution.FuelOil2Coef.NucLo = rNumericArgs( 18 );
 				if ( ! lAlphaFieldBlanks( 19 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#2", trim( cAlphaFieldNames( 19 ) ), trim( cAlphaArgs( 19 ) ), Pollution.FuelOil2Coef.NucLoSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames( 19 ), cAlphaArgs( 19 ), Pollution.FuelOil2Coef.NucLoSched, ErrorsFound );
 				}
 
 			} else if ( ( SELECT_CASE_var == "DISTILLATEOIL" ) || ( SELECT_CASE_var == "DISTILLATE OIL" ) || ( SELECT_CASE_var == "FUEL OIL #1" ) || ( SELECT_CASE_var == "FUELOIL#1" ) || ( SELECT_CASE_var == "FUEL OIL" ) ) {
 				if ( Pollution.FuelOil1Coef.FuelFactorUsed ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ": " + trim( FuelType.FuelTypeNames( Loop ) ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
 					continue;
 				}
 				Pollution.FuelOil1Coef.FuelFactorUsed = true;
 				//FuelOil#1 Coeffs
 				Pollution.FuelOil1Coef.Source = rNumericArgs( 2 );
 				if ( ! lAlphaFieldBlanks( 3 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#1", trim( cAlphaFieldNames( 3 ) ), trim( cAlphaArgs( 3 ) ), Pollution.FuelOil1Coef.SourceSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames( 3 ), cAlphaArgs( 3 ), Pollution.FuelOil1Coef.SourceSched, ErrorsFound );
 				}
 				Pollution.FuelOil1Coef.CO2 = rNumericArgs( 3 );
 				if ( ! lAlphaFieldBlanks( 4 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#1", trim( cAlphaFieldNames( 4 ) ), trim( cAlphaArgs( 4 ) ), Pollution.FuelOil1Coef.CO2Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames( 4 ), cAlphaArgs( 4 ), Pollution.FuelOil1Coef.CO2Sched, ErrorsFound );
 				}
 				Pollution.FuelOil1Coef.CO = rNumericArgs( 4 );
 				if ( ! lAlphaFieldBlanks( 5 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#1", trim( cAlphaFieldNames( 5 ) ), trim( cAlphaArgs( 5 ) ), Pollution.FuelOil1Coef.COSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames( 5 ), cAlphaArgs( 5 ), Pollution.FuelOil1Coef.COSched, ErrorsFound );
 				}
 				Pollution.FuelOil1Coef.CH4 = rNumericArgs( 5 );
 				if ( ! lAlphaFieldBlanks( 6 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#1", trim( cAlphaFieldNames( 6 ) ), trim( cAlphaArgs( 6 ) ), Pollution.FuelOil1Coef.CH4Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames( 6 ), cAlphaArgs( 6 ), Pollution.FuelOil1Coef.CH4Sched, ErrorsFound );
 				}
 				Pollution.FuelOil1Coef.NOx = rNumericArgs( 6 );
 				if ( ! lAlphaFieldBlanks( 7 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#1", trim( cAlphaFieldNames( 7 ) ), trim( cAlphaArgs( 7 ) ), Pollution.FuelOil1Coef.NOxSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames( 7 ), cAlphaArgs( 7 ), Pollution.FuelOil1Coef.NOxSched, ErrorsFound );
 				}
 				Pollution.FuelOil1Coef.N2O = rNumericArgs( 7 );
 				if ( ! lAlphaFieldBlanks( 8 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#1", trim( cAlphaFieldNames( 8 ) ), trim( cAlphaArgs( 8 ) ), Pollution.FuelOil1Coef.N2OSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames( 8 ), cAlphaArgs( 8 ), Pollution.FuelOil1Coef.N2OSched, ErrorsFound );
 				}
 				Pollution.FuelOil1Coef.SO2 = rNumericArgs( 8 );
 				if ( ! lAlphaFieldBlanks( 9 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#1", trim( cAlphaFieldNames( 9 ) ), trim( cAlphaArgs( 9 ) ), Pollution.FuelOil1Coef.SO2Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames( 9 ), cAlphaArgs( 9 ), Pollution.FuelOil1Coef.SO2Sched, ErrorsFound );
 				}
 				Pollution.FuelOil1Coef.PM = rNumericArgs( 9 );
 				if ( ! lAlphaFieldBlanks( 10 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#1", trim( cAlphaFieldNames( 10 ) ), trim( cAlphaArgs( 10 ) ), Pollution.FuelOil1Coef.PMSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames( 10 ), cAlphaArgs( 10 ), Pollution.FuelOil1Coef.PMSched, ErrorsFound );
 				}
 				Pollution.FuelOil1Coef.PM10 = rNumericArgs( 10 );
 				if ( ! lAlphaFieldBlanks( 11 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#1", trim( cAlphaFieldNames( 11 ) ), trim( cAlphaArgs( 11 ) ), Pollution.FuelOil1Coef.PM10Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames( 11 ), cAlphaArgs( 11 ), Pollution.FuelOil1Coef.PM10Sched, ErrorsFound );
 				}
 				Pollution.FuelOil1Coef.PM25 = rNumericArgs( 11 );
 				if ( ! lAlphaFieldBlanks( 12 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#1", trim( cAlphaFieldNames( 12 ) ), trim( cAlphaArgs( 12 ) ), Pollution.FuelOil1Coef.PM25Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames( 12 ), cAlphaArgs( 12 ), Pollution.FuelOil1Coef.PM25Sched, ErrorsFound );
 				}
 				Pollution.FuelOil1Coef.NH3 = rNumericArgs( 12 );
 				if ( ! lAlphaFieldBlanks( 13 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#1", trim( cAlphaFieldNames( 13 ) ), trim( cAlphaArgs( 13 ) ), Pollution.FuelOil1Coef.NH3Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames( 13 ), cAlphaArgs( 13 ), Pollution.FuelOil1Coef.NH3Sched, ErrorsFound );
 				}
 				Pollution.FuelOil1Coef.NMVOC = rNumericArgs( 13 );
 				if ( ! lAlphaFieldBlanks( 14 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#1", trim( cAlphaFieldNames( 14 ) ), trim( cAlphaArgs( 14 ) ), Pollution.FuelOil1Coef.NMVOCSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames( 14 ), cAlphaArgs( 14 ), Pollution.FuelOil1Coef.NMVOCSched, ErrorsFound );
 				}
 				Pollution.FuelOil1Coef.Hg = rNumericArgs( 14 );
 				if ( ! lAlphaFieldBlanks( 15 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#1", trim( cAlphaFieldNames( 15 ) ), trim( cAlphaArgs( 15 ) ), Pollution.FuelOil1Coef.HgSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames( 15 ), cAlphaArgs( 15 ), Pollution.FuelOil1Coef.HgSched, ErrorsFound );
 				}
 				Pollution.FuelOil1Coef.Pb = rNumericArgs( 15 );
 				if ( ! lAlphaFieldBlanks( 16 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#1", trim( cAlphaFieldNames( 16 ) ), trim( cAlphaArgs( 16 ) ), Pollution.FuelOil1Coef.PbSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames( 16 ), cAlphaArgs( 16 ), Pollution.FuelOil1Coef.PbSched, ErrorsFound );
 				}
 				Pollution.FuelOil1Coef.Water = rNumericArgs( 16 );
 				if ( ! lAlphaFieldBlanks( 17 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#1", trim( cAlphaFieldNames( 17 ) ), trim( cAlphaArgs( 17 ) ), Pollution.FuelOil1Coef.WaterSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames( 17 ), cAlphaArgs( 17 ), Pollution.FuelOil1Coef.WaterSched, ErrorsFound );
 				}
 				Pollution.FuelOil1Coef.NucHi = rNumericArgs( 17 );
 				if ( ! lAlphaFieldBlanks( 18 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#1", trim( cAlphaFieldNames( 18 ) ), trim( cAlphaArgs( 18 ) ), Pollution.FuelOil1Coef.NucHiSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames( 18 ), cAlphaArgs( 18 ), Pollution.FuelOil1Coef.NucHiSched, ErrorsFound );
 				}
 				Pollution.FuelOil1Coef.NucLo = rNumericArgs( 18 );
 				if ( ! lAlphaFieldBlanks( 19 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Fuel Oil#1", trim( cAlphaFieldNames( 19 ) ), trim( cAlphaArgs( 19 ) ), Pollution.FuelOil1Coef.NucLoSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames( 19 ), cAlphaArgs( 19 ), Pollution.FuelOil1Coef.NucLoSched, ErrorsFound );
 				}
 
 			} else if ( SELECT_CASE_var == "COAL" ) {
 				if ( Pollution.CoalCoef.FuelFactorUsed ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ": " + trim( FuelType.FuelTypeNames( Loop ) ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
 					continue;
 				}
 				Pollution.CoalCoef.FuelFactorUsed = true;
 				// Coal
 				Pollution.CoalCoef.Source = rNumericArgs( 2 );
 				if ( ! lAlphaFieldBlanks( 3 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Coal", trim( cAlphaFieldNames( 3 ) ), trim( cAlphaArgs( 3 ) ), Pollution.CoalCoef.SourceSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Coal", cAlphaFieldNames( 3 ), cAlphaArgs( 3 ), Pollution.CoalCoef.SourceSched, ErrorsFound );
 				}
 				Pollution.CoalCoef.CO2 = rNumericArgs( 3 );
 				if ( ! lAlphaFieldBlanks( 4 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Coal", trim( cAlphaFieldNames( 4 ) ), trim( cAlphaArgs( 4 ) ), Pollution.CoalCoef.CO2Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Coal", cAlphaFieldNames( 4 ), cAlphaArgs( 4 ), Pollution.CoalCoef.CO2Sched, ErrorsFound );
 				}
 				Pollution.CoalCoef.CO = rNumericArgs( 4 );
 				if ( ! lAlphaFieldBlanks( 5 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Coal", trim( cAlphaFieldNames( 5 ) ), trim( cAlphaArgs( 5 ) ), Pollution.CoalCoef.COSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Coal", cAlphaFieldNames( 5 ), cAlphaArgs( 5 ), Pollution.CoalCoef.COSched, ErrorsFound );
 				}
 				Pollution.CoalCoef.CH4 = rNumericArgs( 5 );
 				if ( ! lAlphaFieldBlanks( 6 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Coal", trim( cAlphaFieldNames( 6 ) ), trim( cAlphaArgs( 6 ) ), Pollution.CoalCoef.CH4Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Coal", cAlphaFieldNames( 6 ), cAlphaArgs( 6 ), Pollution.CoalCoef.CH4Sched, ErrorsFound );
 				}
 				Pollution.CoalCoef.NOx = rNumericArgs( 6 );
 				if ( ! lAlphaFieldBlanks( 7 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Coal", trim( cAlphaFieldNames( 7 ) ), trim( cAlphaArgs( 7 ) ), Pollution.CoalCoef.NOxSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Coal", cAlphaFieldNames( 7 ), cAlphaArgs( 7 ), Pollution.CoalCoef.NOxSched, ErrorsFound );
 				}
 				Pollution.CoalCoef.N2O = rNumericArgs( 7 );
 				if ( ! lAlphaFieldBlanks( 8 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Coal", trim( cAlphaFieldNames( 8 ) ), trim( cAlphaArgs( 8 ) ), Pollution.CoalCoef.N2OSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Coal", cAlphaFieldNames( 8 ), cAlphaArgs( 8 ), Pollution.CoalCoef.N2OSched, ErrorsFound );
 				}
 				Pollution.CoalCoef.SO2 = rNumericArgs( 8 );
 				if ( ! lAlphaFieldBlanks( 9 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Coal", trim( cAlphaFieldNames( 9 ) ), trim( cAlphaArgs( 9 ) ), Pollution.CoalCoef.SO2Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Coal", cAlphaFieldNames( 9 ), cAlphaArgs( 9 ), Pollution.CoalCoef.SO2Sched, ErrorsFound );
 				}
 				Pollution.CoalCoef.PM = rNumericArgs( 9 );
 				if ( ! lAlphaFieldBlanks( 10 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Coal", trim( cAlphaFieldNames( 10 ) ), trim( cAlphaArgs( 10 ) ), Pollution.CoalCoef.PMSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Coal", cAlphaFieldNames( 10 ), cAlphaArgs( 10 ), Pollution.CoalCoef.PMSched, ErrorsFound );
 				}
 				Pollution.CoalCoef.PM10 = rNumericArgs( 10 );
 				if ( ! lAlphaFieldBlanks( 11 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Coal", trim( cAlphaFieldNames( 11 ) ), trim( cAlphaArgs( 11 ) ), Pollution.CoalCoef.PM10Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Coal", cAlphaFieldNames( 11 ), cAlphaArgs( 11 ), Pollution.CoalCoef.PM10Sched, ErrorsFound );
 				}
 				Pollution.CoalCoef.PM25 = rNumericArgs( 11 );
 				if ( ! lAlphaFieldBlanks( 12 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Coal", trim( cAlphaFieldNames( 12 ) ), trim( cAlphaArgs( 12 ) ), Pollution.CoalCoef.PM25Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Coal", cAlphaFieldNames( 12 ), cAlphaArgs( 12 ), Pollution.CoalCoef.PM25Sched, ErrorsFound );
 				}
 				Pollution.CoalCoef.NH3 = rNumericArgs( 12 );
 				if ( ! lAlphaFieldBlanks( 13 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Coal", trim( cAlphaFieldNames( 13 ) ), trim( cAlphaArgs( 13 ) ), Pollution.CoalCoef.NH3Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Coal", cAlphaFieldNames( 13 ), cAlphaArgs( 13 ), Pollution.CoalCoef.NH3Sched, ErrorsFound );
 				}
 				Pollution.CoalCoef.NMVOC = rNumericArgs( 13 );
 				if ( ! lAlphaFieldBlanks( 14 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Coal", trim( cAlphaFieldNames( 14 ) ), trim( cAlphaArgs( 14 ) ), Pollution.CoalCoef.NMVOCSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Coal", cAlphaFieldNames( 14 ), cAlphaArgs( 14 ), Pollution.CoalCoef.NMVOCSched, ErrorsFound );
 				}
 				Pollution.CoalCoef.Hg = rNumericArgs( 14 );
 				if ( ! lAlphaFieldBlanks( 15 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Coal", trim( cAlphaFieldNames( 15 ) ), trim( cAlphaArgs( 15 ) ), Pollution.CoalCoef.HgSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Coal", cAlphaFieldNames( 15 ), cAlphaArgs( 15 ), Pollution.CoalCoef.HgSched, ErrorsFound );
 				}
 				Pollution.CoalCoef.Pb = rNumericArgs( 15 );
 				if ( ! lAlphaFieldBlanks( 16 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Coal", trim( cAlphaFieldNames( 16 ) ), trim( cAlphaArgs( 16 ) ), Pollution.CoalCoef.PbSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Coal", cAlphaFieldNames( 16 ), cAlphaArgs( 16 ), Pollution.CoalCoef.PbSched, ErrorsFound );
 				}
 				Pollution.CoalCoef.Water = rNumericArgs( 16 );
 				if ( ! lAlphaFieldBlanks( 17 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Coal", trim( cAlphaFieldNames( 17 ) ), trim( cAlphaArgs( 17 ) ), Pollution.CoalCoef.WaterSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Coal", cAlphaFieldNames( 17 ), cAlphaArgs( 17 ), Pollution.CoalCoef.WaterSched, ErrorsFound );
 				}
 				Pollution.CoalCoef.NucHi = rNumericArgs( 17 );
 				if ( ! lAlphaFieldBlanks( 18 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Coal", trim( cAlphaFieldNames( 18 ) ), trim( cAlphaArgs( 18 ) ), Pollution.CoalCoef.NucHiSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Coal", cAlphaFieldNames( 18 ), cAlphaArgs( 18 ), Pollution.CoalCoef.NucHiSched, ErrorsFound );
 				}
 				Pollution.CoalCoef.NucLo = rNumericArgs( 18 );
 				if ( ! lAlphaFieldBlanks( 19 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Coal", trim( cAlphaFieldNames( 19 ) ), trim( cAlphaArgs( 19 ) ), Pollution.CoalCoef.NucLoSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Coal", cAlphaFieldNames( 19 ), cAlphaArgs( 19 ), Pollution.CoalCoef.NucLoSched, ErrorsFound );
 				}
 
 			} else if ( ( SELECT_CASE_var == "ELECTRICITY" ) || ( SELECT_CASE_var == "ELECTRIC" ) || ( SELECT_CASE_var == "ELEC" ) ) {
 				if ( Pollution.ElecCoef.FuelFactorUsed ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ": " + trim( FuelType.FuelTypeNames( Loop ) ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
 					continue;
 				}
 				Pollution.ElecCoef.FuelFactorUsed = true;
 				//Electric Coeffs
 				Pollution.ElecCoef.Source = rNumericArgs( 2 );
 				if ( ! lAlphaFieldBlanks( 3 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Electricity", trim( cAlphaFieldNames( 3 ) ), trim( cAlphaArgs( 3 ) ), Pollution.ElecCoef.SourceSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Electricity", cAlphaFieldNames( 3 ), cAlphaArgs( 3 ), Pollution.ElecCoef.SourceSched, ErrorsFound );
 				}
 				Pollution.ElecCoef.CO2 = rNumericArgs( 3 );
 				if ( ! lAlphaFieldBlanks( 4 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Electricity", trim( cAlphaFieldNames( 4 ) ), trim( cAlphaArgs( 4 ) ), Pollution.ElecCoef.CO2Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Electricity", cAlphaFieldNames( 4 ), cAlphaArgs( 4 ), Pollution.ElecCoef.CO2Sched, ErrorsFound );
 				}
 				Pollution.ElecCoef.CO = rNumericArgs( 4 );
 				if ( ! lAlphaFieldBlanks( 5 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Electricity", trim( cAlphaFieldNames( 5 ) ), trim( cAlphaArgs( 5 ) ), Pollution.ElecCoef.COSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Electricity", cAlphaFieldNames( 5 ), cAlphaArgs( 5 ), Pollution.ElecCoef.COSched, ErrorsFound );
 				}
 				Pollution.ElecCoef.CH4 = rNumericArgs( 5 );
 				if ( ! lAlphaFieldBlanks( 6 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Electricity", trim( cAlphaFieldNames( 6 ) ), trim( cAlphaArgs( 6 ) ), Pollution.ElecCoef.CH4Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Electricity", cAlphaFieldNames( 6 ), cAlphaArgs( 6 ), Pollution.ElecCoef.CH4Sched, ErrorsFound );
 				}
 				Pollution.ElecCoef.NOx = rNumericArgs( 6 );
 				if ( ! lAlphaFieldBlanks( 7 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Electricity", trim( cAlphaFieldNames( 7 ) ), trim( cAlphaArgs( 7 ) ), Pollution.ElecCoef.NOxSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Electricity", cAlphaFieldNames( 7 ), cAlphaArgs( 7 ), Pollution.ElecCoef.NOxSched, ErrorsFound );
 				}
 				Pollution.ElecCoef.N2O = rNumericArgs( 7 );
 				if ( ! lAlphaFieldBlanks( 8 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Electricity", trim( cAlphaFieldNames( 8 ) ), trim( cAlphaArgs( 8 ) ), Pollution.ElecCoef.N2OSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Electricity", cAlphaFieldNames( 8 ), cAlphaArgs( 8 ), Pollution.ElecCoef.N2OSched, ErrorsFound );
 				}
 				Pollution.ElecCoef.SO2 = rNumericArgs( 8 );
 				if ( ! lAlphaFieldBlanks( 9 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Electricity", trim( cAlphaFieldNames( 9 ) ), trim( cAlphaArgs( 9 ) ), Pollution.ElecCoef.SO2Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Electricity", cAlphaFieldNames( 9 ), cAlphaArgs( 9 ), Pollution.ElecCoef.SO2Sched, ErrorsFound );
 				}
 				Pollution.ElecCoef.PM = rNumericArgs( 9 );
 				if ( ! lAlphaFieldBlanks( 10 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Electricity", trim( cAlphaFieldNames( 10 ) ), trim( cAlphaArgs( 10 ) ), Pollution.ElecCoef.PMSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Electricity", cAlphaFieldNames( 10 ), cAlphaArgs( 10 ), Pollution.ElecCoef.PMSched, ErrorsFound );
 				}
 				Pollution.ElecCoef.PM10 = rNumericArgs( 10 );
 				if ( ! lAlphaFieldBlanks( 11 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Electricity", trim( cAlphaFieldNames( 11 ) ), trim( cAlphaArgs( 11 ) ), Pollution.ElecCoef.PM10Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Electricity", cAlphaFieldNames( 11 ), cAlphaArgs( 11 ), Pollution.ElecCoef.PM10Sched, ErrorsFound );
 				}
 				Pollution.ElecCoef.PM25 = rNumericArgs( 11 );
 				if ( ! lAlphaFieldBlanks( 12 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Electricity", trim( cAlphaFieldNames( 12 ) ), trim( cAlphaArgs( 12 ) ), Pollution.ElecCoef.PM25Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Electricity", cAlphaFieldNames( 12 ), cAlphaArgs( 12 ), Pollution.ElecCoef.PM25Sched, ErrorsFound );
 				}
 				Pollution.ElecCoef.NH3 = rNumericArgs( 12 );
 				if ( ! lAlphaFieldBlanks( 13 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Electricity", trim( cAlphaFieldNames( 13 ) ), trim( cAlphaArgs( 13 ) ), Pollution.ElecCoef.NH3Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Electricity", cAlphaFieldNames( 13 ), cAlphaArgs( 13 ), Pollution.ElecCoef.NH3Sched, ErrorsFound );
 				}
 				Pollution.ElecCoef.NMVOC = rNumericArgs( 13 );
 				if ( ! lAlphaFieldBlanks( 14 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Electricity", trim( cAlphaFieldNames( 14 ) ), trim( cAlphaArgs( 14 ) ), Pollution.ElecCoef.NMVOCSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Electricity", cAlphaFieldNames( 14 ), cAlphaArgs( 14 ), Pollution.ElecCoef.NMVOCSched, ErrorsFound );
 				}
 				Pollution.ElecCoef.Hg = rNumericArgs( 14 );
 				if ( ! lAlphaFieldBlanks( 15 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Electricity", trim( cAlphaFieldNames( 15 ) ), trim( cAlphaArgs( 15 ) ), Pollution.ElecCoef.HgSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Electricity", cAlphaFieldNames( 15 ), cAlphaArgs( 15 ), Pollution.ElecCoef.HgSched, ErrorsFound );
 				}
 				Pollution.ElecCoef.Pb = rNumericArgs( 15 );
 				if ( ! lAlphaFieldBlanks( 16 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Electricity", trim( cAlphaFieldNames( 16 ) ), trim( cAlphaArgs( 16 ) ), Pollution.ElecCoef.PbSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Electricity", cAlphaFieldNames( 16 ), cAlphaArgs( 16 ), Pollution.ElecCoef.PbSched, ErrorsFound );
 				}
 				Pollution.ElecCoef.Water = rNumericArgs( 16 );
 				if ( ! lAlphaFieldBlanks( 17 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Electricity", trim( cAlphaFieldNames( 17 ) ), trim( cAlphaArgs( 17 ) ), Pollution.ElecCoef.WaterSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Electricity", cAlphaFieldNames( 17 ), cAlphaArgs( 17 ), Pollution.ElecCoef.WaterSched, ErrorsFound );
 				}
 				Pollution.ElecCoef.NucHi = rNumericArgs( 17 );
 				if ( ! lAlphaFieldBlanks( 18 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Electricity", trim( cAlphaFieldNames( 18 ) ), trim( cAlphaArgs( 18 ) ), Pollution.ElecCoef.NucHiSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Electricity", cAlphaFieldNames( 18 ), cAlphaArgs( 18 ), Pollution.ElecCoef.NucHiSched, ErrorsFound );
 				}
 				Pollution.ElecCoef.NucLo = rNumericArgs( 18 );
 				if ( ! lAlphaFieldBlanks( 19 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Electricity", trim( cAlphaFieldNames( 19 ) ), trim( cAlphaArgs( 19 ) ), Pollution.ElecCoef.NucLoSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Electricity", cAlphaFieldNames( 19 ), cAlphaArgs( 19 ), Pollution.ElecCoef.NucLoSched, ErrorsFound );
 				}
 
 			} else if ( SELECT_CASE_var == "GASOLINE" ) {
 				if ( Pollution.GasolineCoef.FuelFactorUsed ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ": " + trim( FuelType.FuelTypeNames( Loop ) ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
 					continue;
 				}
 				Pollution.GasolineCoef.FuelFactorUsed = true;
 				//Gasoline Coeffs
 				Pollution.GasolineCoef.Source = rNumericArgs( 2 );
 				if ( ! lAlphaFieldBlanks( 3 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Gasoline", trim( cAlphaFieldNames( 3 ) ), trim( cAlphaArgs( 3 ) ), Pollution.GasolineCoef.SourceSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Gasoline", cAlphaFieldNames( 3 ), cAlphaArgs( 3 ), Pollution.GasolineCoef.SourceSched, ErrorsFound );
 				}
 				Pollution.GasolineCoef.CO2 = rNumericArgs( 3 );
 				if ( ! lAlphaFieldBlanks( 4 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Gasoline", trim( cAlphaFieldNames( 4 ) ), trim( cAlphaArgs( 4 ) ), Pollution.GasolineCoef.CO2Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Gasoline", cAlphaFieldNames( 4 ), cAlphaArgs( 4 ), Pollution.GasolineCoef.CO2Sched, ErrorsFound );
 				}
 				Pollution.GasolineCoef.CO = rNumericArgs( 4 );
 				if ( ! lAlphaFieldBlanks( 5 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Gasoline", trim( cAlphaFieldNames( 5 ) ), trim( cAlphaArgs( 5 ) ), Pollution.GasolineCoef.COSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Gasoline", cAlphaFieldNames( 5 ), cAlphaArgs( 5 ), Pollution.GasolineCoef.COSched, ErrorsFound );
 				}
 				Pollution.GasolineCoef.CH4 = rNumericArgs( 5 );
 				if ( ! lAlphaFieldBlanks( 6 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Gasoline", trim( cAlphaFieldNames( 6 ) ), trim( cAlphaArgs( 6 ) ), Pollution.GasolineCoef.CH4Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Gasoline", cAlphaFieldNames( 6 ), cAlphaArgs( 6 ), Pollution.GasolineCoef.CH4Sched, ErrorsFound );
 				}
 				Pollution.GasolineCoef.NOx = rNumericArgs( 6 );
 				if ( ! lAlphaFieldBlanks( 7 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Gasoline", trim( cAlphaFieldNames( 7 ) ), trim( cAlphaArgs( 7 ) ), Pollution.GasolineCoef.NOxSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Gasoline", cAlphaFieldNames( 7 ), cAlphaArgs( 7 ), Pollution.GasolineCoef.NOxSched, ErrorsFound );
 				}
 				Pollution.GasolineCoef.N2O = rNumericArgs( 7 );
 				if ( ! lAlphaFieldBlanks( 8 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Gasoline", trim( cAlphaFieldNames( 8 ) ), trim( cAlphaArgs( 8 ) ), Pollution.GasolineCoef.N2OSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Gasoline", cAlphaFieldNames( 8 ), cAlphaArgs( 8 ), Pollution.GasolineCoef.N2OSched, ErrorsFound );
 				}
 				Pollution.GasolineCoef.SO2 = rNumericArgs( 8 );
 				if ( ! lAlphaFieldBlanks( 9 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Gasoline", trim( cAlphaFieldNames( 9 ) ), trim( cAlphaArgs( 9 ) ), Pollution.GasolineCoef.SO2Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Gasoline", cAlphaFieldNames( 9 ), cAlphaArgs( 9 ), Pollution.GasolineCoef.SO2Sched, ErrorsFound );
 				}
 				Pollution.GasolineCoef.PM = rNumericArgs( 9 );
 				if ( ! lAlphaFieldBlanks( 10 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Gasoline", trim( cAlphaFieldNames( 10 ) ), trim( cAlphaArgs( 10 ) ), Pollution.GasolineCoef.PMSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Gasoline", cAlphaFieldNames( 10 ), cAlphaArgs( 10 ), Pollution.GasolineCoef.PMSched, ErrorsFound );
 				}
 				Pollution.GasolineCoef.PM10 = rNumericArgs( 10 );
 				if ( ! lAlphaFieldBlanks( 11 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Gasoline", trim( cAlphaFieldNames( 11 ) ), trim( cAlphaArgs( 11 ) ), Pollution.GasolineCoef.PM10Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Gasoline", cAlphaFieldNames( 11 ), cAlphaArgs( 11 ), Pollution.GasolineCoef.PM10Sched, ErrorsFound );
 				}
 				Pollution.GasolineCoef.PM25 = rNumericArgs( 11 );
 				if ( ! lAlphaFieldBlanks( 12 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Gasoline", trim( cAlphaFieldNames( 12 ) ), trim( cAlphaArgs( 12 ) ), Pollution.GasolineCoef.PM25Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Gasoline", cAlphaFieldNames( 12 ), cAlphaArgs( 12 ), Pollution.GasolineCoef.PM25Sched, ErrorsFound );
 				}
 				Pollution.GasolineCoef.NH3 = rNumericArgs( 12 );
 				if ( ! lAlphaFieldBlanks( 13 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Gasoline", trim( cAlphaFieldNames( 13 ) ), trim( cAlphaArgs( 13 ) ), Pollution.GasolineCoef.NH3Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Gasoline", cAlphaFieldNames( 13 ), cAlphaArgs( 13 ), Pollution.GasolineCoef.NH3Sched, ErrorsFound );
 				}
 				Pollution.GasolineCoef.NMVOC = rNumericArgs( 13 );
 				if ( ! lAlphaFieldBlanks( 14 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Gasoline", trim( cAlphaFieldNames( 14 ) ), trim( cAlphaArgs( 14 ) ), Pollution.GasolineCoef.NMVOCSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Gasoline", cAlphaFieldNames( 14 ), cAlphaArgs( 14 ), Pollution.GasolineCoef.NMVOCSched, ErrorsFound );
 				}
 				Pollution.GasolineCoef.Hg = rNumericArgs( 14 );
 				if ( ! lAlphaFieldBlanks( 15 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Gasoline", trim( cAlphaFieldNames( 15 ) ), trim( cAlphaArgs( 15 ) ), Pollution.GasolineCoef.HgSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Gasoline", cAlphaFieldNames( 15 ), cAlphaArgs( 15 ), Pollution.GasolineCoef.HgSched, ErrorsFound );
 				}
 				Pollution.GasolineCoef.Pb = rNumericArgs( 15 );
 				if ( ! lAlphaFieldBlanks( 16 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Gasoline", trim( cAlphaFieldNames( 16 ) ), trim( cAlphaArgs( 16 ) ), Pollution.GasolineCoef.PbSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Gasoline", cAlphaFieldNames( 16 ), cAlphaArgs( 16 ), Pollution.GasolineCoef.PbSched, ErrorsFound );
 				}
 				Pollution.GasolineCoef.Water = rNumericArgs( 16 );
 				if ( ! lAlphaFieldBlanks( 17 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Gasoline", trim( cAlphaFieldNames( 17 ) ), trim( cAlphaArgs( 17 ) ), Pollution.GasolineCoef.WaterSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Gasoline", cAlphaFieldNames( 17 ), cAlphaArgs( 17 ), Pollution.GasolineCoef.WaterSched, ErrorsFound );
 				}
 				Pollution.GasolineCoef.NucHi = rNumericArgs( 17 );
 				if ( ! lAlphaFieldBlanks( 18 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Gasoline", trim( cAlphaFieldNames( 18 ) ), trim( cAlphaArgs( 18 ) ), Pollution.GasolineCoef.NucHiSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Gasoline", cAlphaFieldNames( 18 ), cAlphaArgs( 18 ), Pollution.GasolineCoef.NucHiSched, ErrorsFound );
 				}
 				Pollution.GasolineCoef.NucLo = rNumericArgs( 18 );
 				if ( ! lAlphaFieldBlanks( 19 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Gasoline", trim( cAlphaFieldNames( 19 ) ), trim( cAlphaArgs( 19 ) ), Pollution.GasolineCoef.NucLoSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Gasoline", cAlphaFieldNames( 19 ), cAlphaArgs( 19 ), Pollution.GasolineCoef.NucLoSched, ErrorsFound );
 				}
 
 			} else if ( ( SELECT_CASE_var == "PROPANE" ) || ( SELECT_CASE_var == "LPG" ) || ( SELECT_CASE_var == "PROPANEGAS" ) || ( SELECT_CASE_var == "PROPANE GAS" ) ) {
 				if ( Pollution.PropaneCoef.FuelFactorUsed ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ": " + trim( FuelType.FuelTypeNames( Loop ) ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
 					continue;
 				}
 				Pollution.PropaneCoef.FuelFactorUsed = true;
 				//Propane Coeffs
 				Pollution.PropaneCoef.Source = rNumericArgs( 2 );
 				if ( ! lAlphaFieldBlanks( 3 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Propane", trim( cAlphaFieldNames( 3 ) ), trim( cAlphaArgs( 3 ) ), Pollution.PropaneCoef.SourceSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Propane", cAlphaFieldNames( 3 ), cAlphaArgs( 3 ), Pollution.PropaneCoef.SourceSched, ErrorsFound );
 				}
 				Pollution.PropaneCoef.CO2 = rNumericArgs( 3 );
 				if ( ! lAlphaFieldBlanks( 4 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Propane", trim( cAlphaFieldNames( 4 ) ), trim( cAlphaArgs( 4 ) ), Pollution.PropaneCoef.CO2Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Propane", cAlphaFieldNames( 4 ), cAlphaArgs( 4 ), Pollution.PropaneCoef.CO2Sched, ErrorsFound );
 				}
 				Pollution.PropaneCoef.CO = rNumericArgs( 4 );
 				if ( ! lAlphaFieldBlanks( 5 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Propane", trim( cAlphaFieldNames( 5 ) ), trim( cAlphaArgs( 5 ) ), Pollution.PropaneCoef.COSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Propane", cAlphaFieldNames( 5 ), cAlphaArgs( 5 ), Pollution.PropaneCoef.COSched, ErrorsFound );
 				}
 				Pollution.PropaneCoef.CH4 = rNumericArgs( 5 );
 				if ( ! lAlphaFieldBlanks( 6 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Propane", trim( cAlphaFieldNames( 6 ) ), trim( cAlphaArgs( 6 ) ), Pollution.PropaneCoef.CH4Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Propane", cAlphaFieldNames( 6 ), cAlphaArgs( 6 ), Pollution.PropaneCoef.CH4Sched, ErrorsFound );
 				}
 				Pollution.PropaneCoef.NOx = rNumericArgs( 6 );
 				if ( ! lAlphaFieldBlanks( 7 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Propane", trim( cAlphaFieldNames( 7 ) ), trim( cAlphaArgs( 7 ) ), Pollution.PropaneCoef.NOxSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Propane", cAlphaFieldNames( 7 ), cAlphaArgs( 7 ), Pollution.PropaneCoef.NOxSched, ErrorsFound );
 				}
 				Pollution.PropaneCoef.N2O = rNumericArgs( 7 );
 				if ( ! lAlphaFieldBlanks( 8 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Propane", trim( cAlphaFieldNames( 8 ) ), trim( cAlphaArgs( 8 ) ), Pollution.PropaneCoef.N2OSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Propane", cAlphaFieldNames( 8 ), cAlphaArgs( 8 ), Pollution.PropaneCoef.N2OSched, ErrorsFound );
 				}
 				Pollution.PropaneCoef.SO2 = rNumericArgs( 8 );
 				if ( ! lAlphaFieldBlanks( 9 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Propane", trim( cAlphaFieldNames( 9 ) ), trim( cAlphaArgs( 9 ) ), Pollution.PropaneCoef.SO2Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Propane", cAlphaFieldNames( 9 ), cAlphaArgs( 9 ), Pollution.PropaneCoef.SO2Sched, ErrorsFound );
 				}
 				Pollution.PropaneCoef.PM = rNumericArgs( 9 );
 				if ( ! lAlphaFieldBlanks( 10 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Propane", trim( cAlphaFieldNames( 10 ) ), trim( cAlphaArgs( 10 ) ), Pollution.PropaneCoef.PMSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Propane", cAlphaFieldNames( 10 ), cAlphaArgs( 10 ), Pollution.PropaneCoef.PMSched, ErrorsFound );
 				}
 				Pollution.PropaneCoef.PM10 = rNumericArgs( 10 );
 				if ( ! lAlphaFieldBlanks( 11 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Propane", trim( cAlphaFieldNames( 11 ) ), trim( cAlphaArgs( 11 ) ), Pollution.PropaneCoef.PM10Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Propane", cAlphaFieldNames( 11 ), cAlphaArgs( 11 ), Pollution.PropaneCoef.PM10Sched, ErrorsFound );
 				}
 				Pollution.PropaneCoef.PM25 = rNumericArgs( 11 );
 				if ( ! lAlphaFieldBlanks( 12 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Propane", trim( cAlphaFieldNames( 12 ) ), trim( cAlphaArgs( 12 ) ), Pollution.PropaneCoef.PM25Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Propane", cAlphaFieldNames( 12 ), cAlphaArgs( 12 ), Pollution.PropaneCoef.PM25Sched, ErrorsFound );
 				}
 				Pollution.PropaneCoef.NH3 = rNumericArgs( 12 );
 				if ( ! lAlphaFieldBlanks( 13 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Propane", trim( cAlphaFieldNames( 13 ) ), trim( cAlphaArgs( 13 ) ), Pollution.PropaneCoef.NH3Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Propane", cAlphaFieldNames( 13 ), cAlphaArgs( 13 ), Pollution.PropaneCoef.NH3Sched, ErrorsFound );
 				}
 				Pollution.PropaneCoef.NMVOC = rNumericArgs( 13 );
 				if ( ! lAlphaFieldBlanks( 14 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Propane", trim( cAlphaFieldNames( 14 ) ), trim( cAlphaArgs( 14 ) ), Pollution.PropaneCoef.NMVOCSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Propane", cAlphaFieldNames( 14 ), cAlphaArgs( 14 ), Pollution.PropaneCoef.NMVOCSched, ErrorsFound );
 				}
 				Pollution.PropaneCoef.Hg = rNumericArgs( 14 );
 				if ( ! lAlphaFieldBlanks( 15 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Propane", trim( cAlphaFieldNames( 15 ) ), trim( cAlphaArgs( 15 ) ), Pollution.PropaneCoef.HgSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Propane", cAlphaFieldNames( 15 ), cAlphaArgs( 15 ), Pollution.PropaneCoef.HgSched, ErrorsFound );
 				}
 				Pollution.PropaneCoef.Pb = rNumericArgs( 15 );
 				if ( ! lAlphaFieldBlanks( 16 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Propane", trim( cAlphaFieldNames( 16 ) ), trim( cAlphaArgs( 16 ) ), Pollution.PropaneCoef.PbSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Propane", cAlphaFieldNames( 16 ), cAlphaArgs( 16 ), Pollution.PropaneCoef.PbSched, ErrorsFound );
 				}
 				Pollution.PropaneCoef.Water = rNumericArgs( 16 );
 				if ( ! lAlphaFieldBlanks( 17 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Propane", trim( cAlphaFieldNames( 17 ) ), trim( cAlphaArgs( 17 ) ), Pollution.PropaneCoef.WaterSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Propane", cAlphaFieldNames( 17 ), cAlphaArgs( 17 ), Pollution.PropaneCoef.WaterSched, ErrorsFound );
 				}
 				Pollution.PropaneCoef.NucHi = rNumericArgs( 17 );
 				if ( ! lAlphaFieldBlanks( 18 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Propane", trim( cAlphaFieldNames( 18 ) ), trim( cAlphaArgs( 18 ) ), Pollution.PropaneCoef.NucHiSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Propane", cAlphaFieldNames( 18 ), cAlphaArgs( 18 ), Pollution.PropaneCoef.NucHiSched, ErrorsFound );
 				}
 				Pollution.PropaneCoef.NucLo = rNumericArgs( 18 );
 				if ( ! lAlphaFieldBlanks( 19 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Propane", trim( cAlphaFieldNames( 19 ) ), trim( cAlphaArgs( 19 ) ), Pollution.PropaneCoef.NucLoSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Propane", cAlphaFieldNames( 19 ), cAlphaArgs( 19 ), Pollution.PropaneCoef.NucLoSched, ErrorsFound );
 				}
 
 			} else if ( SELECT_CASE_var == "DIESEL" ) {
 				if ( Pollution.DieselCoef.FuelFactorUsed ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ": " + trim( FuelType.FuelTypeNames( Loop ) ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
 					continue;
 				}
 				Pollution.DieselCoef.FuelFactorUsed = true;
 				//Diesel Coeffs
 				Pollution.DieselCoef.Source = rNumericArgs( 2 );
 				if ( ! lAlphaFieldBlanks( 3 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Diesel", trim( cAlphaFieldNames( 3 ) ), trim( cAlphaArgs( 3 ) ), Pollution.DieselCoef.SourceSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Diesel", cAlphaFieldNames( 3 ), cAlphaArgs( 3 ), Pollution.DieselCoef.SourceSched, ErrorsFound );
 				}
 				Pollution.DieselCoef.CO2 = rNumericArgs( 3 );
 				if ( ! lAlphaFieldBlanks( 4 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Diesel", trim( cAlphaFieldNames( 4 ) ), trim( cAlphaArgs( 4 ) ), Pollution.DieselCoef.CO2Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Diesel", cAlphaFieldNames( 4 ), cAlphaArgs( 4 ), Pollution.DieselCoef.CO2Sched, ErrorsFound );
 				}
 				Pollution.DieselCoef.CO = rNumericArgs( 4 );
 				if ( ! lAlphaFieldBlanks( 5 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Diesel", trim( cAlphaFieldNames( 5 ) ), trim( cAlphaArgs( 5 ) ), Pollution.DieselCoef.COSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Diesel", cAlphaFieldNames( 5 ), cAlphaArgs( 5 ), Pollution.DieselCoef.COSched, ErrorsFound );
 				}
 				Pollution.DieselCoef.CH4 = rNumericArgs( 5 );
 				if ( ! lAlphaFieldBlanks( 6 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Diesel", trim( cAlphaFieldNames( 6 ) ), trim( cAlphaArgs( 6 ) ), Pollution.DieselCoef.CH4Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Diesel", cAlphaFieldNames( 6 ), cAlphaArgs( 6 ), Pollution.DieselCoef.CH4Sched, ErrorsFound );
 				}
 				Pollution.DieselCoef.NOx = rNumericArgs( 6 );
 				if ( ! lAlphaFieldBlanks( 7 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Diesel", trim( cAlphaFieldNames( 7 ) ), trim( cAlphaArgs( 7 ) ), Pollution.DieselCoef.NOxSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Diesel", cAlphaFieldNames( 7 ), cAlphaArgs( 7 ), Pollution.DieselCoef.NOxSched, ErrorsFound );
 				}
 				Pollution.DieselCoef.N2O = rNumericArgs( 7 );
 				if ( ! lAlphaFieldBlanks( 8 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Diesel", trim( cAlphaFieldNames( 8 ) ), trim( cAlphaArgs( 8 ) ), Pollution.DieselCoef.N2OSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Diesel", cAlphaFieldNames( 8 ), cAlphaArgs( 8 ), Pollution.DieselCoef.N2OSched, ErrorsFound );
 				}
 				Pollution.DieselCoef.SO2 = rNumericArgs( 8 );
 				if ( ! lAlphaFieldBlanks( 9 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Diesel", trim( cAlphaFieldNames( 9 ) ), trim( cAlphaArgs( 9 ) ), Pollution.DieselCoef.SO2Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Diesel", cAlphaFieldNames( 9 ), cAlphaArgs( 9 ), Pollution.DieselCoef.SO2Sched, ErrorsFound );
 				}
 				Pollution.DieselCoef.PM = rNumericArgs( 9 );
 				if ( ! lAlphaFieldBlanks( 10 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Diesel", trim( cAlphaFieldNames( 10 ) ), trim( cAlphaArgs( 10 ) ), Pollution.DieselCoef.PMSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Diesel", cAlphaFieldNames( 10 ), cAlphaArgs( 10 ), Pollution.DieselCoef.PMSched, ErrorsFound );
 				}
 				Pollution.DieselCoef.PM10 = rNumericArgs( 10 );
 				if ( ! lAlphaFieldBlanks( 11 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Diesel", trim( cAlphaFieldNames( 11 ) ), trim( cAlphaArgs( 11 ) ), Pollution.DieselCoef.PM10Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Diesel", cAlphaFieldNames( 11 ), cAlphaArgs( 11 ), Pollution.DieselCoef.PM10Sched, ErrorsFound );
 				}
 				Pollution.DieselCoef.PM25 = rNumericArgs( 11 );
 				if ( ! lAlphaFieldBlanks( 12 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Diesel", trim( cAlphaFieldNames( 12 ) ), trim( cAlphaArgs( 12 ) ), Pollution.DieselCoef.PM25Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Diesel", cAlphaFieldNames( 12 ), cAlphaArgs( 12 ), Pollution.DieselCoef.PM25Sched, ErrorsFound );
 				}
 				Pollution.DieselCoef.NH3 = rNumericArgs( 12 );
 				if ( ! lAlphaFieldBlanks( 13 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Diesel", trim( cAlphaFieldNames( 13 ) ), trim( cAlphaArgs( 13 ) ), Pollution.DieselCoef.NH3Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Diesel", cAlphaFieldNames( 13 ), cAlphaArgs( 13 ), Pollution.DieselCoef.NH3Sched, ErrorsFound );
 				}
 				Pollution.DieselCoef.NMVOC = rNumericArgs( 13 );
 				if ( ! lAlphaFieldBlanks( 14 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Diesel", trim( cAlphaFieldNames( 14 ) ), trim( cAlphaArgs( 14 ) ), Pollution.DieselCoef.NMVOCSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Diesel", cAlphaFieldNames( 14 ), cAlphaArgs( 14 ), Pollution.DieselCoef.NMVOCSched, ErrorsFound );
 				}
 				Pollution.DieselCoef.Hg = rNumericArgs( 14 );
 				if ( ! lAlphaFieldBlanks( 15 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Diesel", trim( cAlphaFieldNames( 15 ) ), trim( cAlphaArgs( 15 ) ), Pollution.DieselCoef.HgSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Diesel", cAlphaFieldNames( 15 ), cAlphaArgs( 15 ), Pollution.DieselCoef.HgSched, ErrorsFound );
 				}
 				Pollution.DieselCoef.Pb = rNumericArgs( 15 );
 				if ( ! lAlphaFieldBlanks( 16 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Diesel", trim( cAlphaFieldNames( 16 ) ), trim( cAlphaArgs( 16 ) ), Pollution.DieselCoef.PbSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Diesel", cAlphaFieldNames( 16 ), cAlphaArgs( 16 ), Pollution.DieselCoef.PbSched, ErrorsFound );
 				}
 				Pollution.DieselCoef.Water = rNumericArgs( 16 );
 				if ( ! lAlphaFieldBlanks( 17 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Diesel", trim( cAlphaFieldNames( 17 ) ), trim( cAlphaArgs( 17 ) ), Pollution.DieselCoef.WaterSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Diesel", cAlphaFieldNames( 17 ), cAlphaArgs( 17 ), Pollution.DieselCoef.WaterSched, ErrorsFound );
 				}
 				Pollution.DieselCoef.NucHi = rNumericArgs( 17 );
 				if ( ! lAlphaFieldBlanks( 18 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Diesel", trim( cAlphaFieldNames( 18 ) ), trim( cAlphaArgs( 18 ) ), Pollution.DieselCoef.NucHiSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Diesel", cAlphaFieldNames( 18 ), cAlphaArgs( 18 ), Pollution.DieselCoef.NucHiSched, ErrorsFound );
 				}
 				Pollution.DieselCoef.NucLo = rNumericArgs( 18 );
 				if ( ! lAlphaFieldBlanks( 19 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "Diesel", trim( cAlphaFieldNames( 19 ) ), trim( cAlphaArgs( 19 ) ), Pollution.DieselCoef.NucLoSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "Diesel", cAlphaFieldNames( 19 ), cAlphaArgs( 19 ), Pollution.DieselCoef.NucLoSched, ErrorsFound );
 				}
 
 			} else if ( SELECT_CASE_var == "OTHERFUEL1" ) {
 				if ( Pollution.OtherFuel1Coef.FuelFactorUsed ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ": " + trim( FuelType.FuelTypeNames( Loop ) ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
 					continue;
 				}
 				Pollution.OtherFuel1Coef.FuelFactorUsed = true;
 				//OtherFuel1 Coeffs
 				Pollution.OtherFuel1Coef.Source = rNumericArgs( 2 );
 				if ( ! lAlphaFieldBlanks( 3 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel1", trim( cAlphaFieldNames( 3 ) ), trim( cAlphaArgs( 3 ) ), Pollution.OtherFuel1Coef.SourceSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames( 3 ), cAlphaArgs( 3 ), Pollution.OtherFuel1Coef.SourceSched, ErrorsFound );
 				}
 				Pollution.OtherFuel1Coef.CO2 = rNumericArgs( 3 );
 				if ( ! lAlphaFieldBlanks( 4 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel1", trim( cAlphaFieldNames( 4 ) ), trim( cAlphaArgs( 4 ) ), Pollution.OtherFuel1Coef.CO2Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames( 4 ), cAlphaArgs( 4 ), Pollution.OtherFuel1Coef.CO2Sched, ErrorsFound );
 				}
 				Pollution.OtherFuel1Coef.CO = rNumericArgs( 4 );
 				if ( ! lAlphaFieldBlanks( 5 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel1", trim( cAlphaFieldNames( 5 ) ), trim( cAlphaArgs( 5 ) ), Pollution.OtherFuel1Coef.COSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames( 5 ), cAlphaArgs( 5 ), Pollution.OtherFuel1Coef.COSched, ErrorsFound );
 				}
 				Pollution.OtherFuel1Coef.CH4 = rNumericArgs( 5 );
 				if ( ! lAlphaFieldBlanks( 6 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel1", trim( cAlphaFieldNames( 6 ) ), trim( cAlphaArgs( 6 ) ), Pollution.OtherFuel1Coef.CH4Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames( 6 ), cAlphaArgs( 6 ), Pollution.OtherFuel1Coef.CH4Sched, ErrorsFound );
 				}
 				Pollution.OtherFuel1Coef.NOx = rNumericArgs( 6 );
 				if ( ! lAlphaFieldBlanks( 7 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel1", trim( cAlphaFieldNames( 7 ) ), trim( cAlphaArgs( 7 ) ), Pollution.OtherFuel1Coef.NOxSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames( 7 ), cAlphaArgs( 7 ), Pollution.OtherFuel1Coef.NOxSched, ErrorsFound );
 				}
 				Pollution.OtherFuel1Coef.N2O = rNumericArgs( 7 );
 				if ( ! lAlphaFieldBlanks( 8 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel1", trim( cAlphaFieldNames( 8 ) ), trim( cAlphaArgs( 8 ) ), Pollution.OtherFuel1Coef.N2OSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames( 8 ), cAlphaArgs( 8 ), Pollution.OtherFuel1Coef.N2OSched, ErrorsFound );
 				}
 				Pollution.OtherFuel1Coef.SO2 = rNumericArgs( 8 );
 				if ( ! lAlphaFieldBlanks( 9 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel1", trim( cAlphaFieldNames( 9 ) ), trim( cAlphaArgs( 9 ) ), Pollution.OtherFuel1Coef.SO2Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames( 9 ), cAlphaArgs( 9 ), Pollution.OtherFuel1Coef.SO2Sched, ErrorsFound );
 				}
 				Pollution.OtherFuel1Coef.PM = rNumericArgs( 9 );
 				if ( ! lAlphaFieldBlanks( 10 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel1", trim( cAlphaFieldNames( 10 ) ), trim( cAlphaArgs( 10 ) ), Pollution.OtherFuel1Coef.PMSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames( 10 ), cAlphaArgs( 10 ), Pollution.OtherFuel1Coef.PMSched, ErrorsFound );
 				}
 				Pollution.OtherFuel1Coef.PM10 = rNumericArgs( 10 );
 				if ( ! lAlphaFieldBlanks( 11 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel1", trim( cAlphaFieldNames( 11 ) ), trim( cAlphaArgs( 11 ) ), Pollution.OtherFuel1Coef.PM10Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames( 11 ), cAlphaArgs( 11 ), Pollution.OtherFuel1Coef.PM10Sched, ErrorsFound );
 				}
 				Pollution.OtherFuel1Coef.PM25 = rNumericArgs( 11 );
 				if ( ! lAlphaFieldBlanks( 12 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel1", trim( cAlphaFieldNames( 12 ) ), trim( cAlphaArgs( 12 ) ), Pollution.OtherFuel1Coef.PM25Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames( 12 ), cAlphaArgs( 12 ), Pollution.OtherFuel1Coef.PM25Sched, ErrorsFound );
 				}
 				Pollution.OtherFuel1Coef.NH3 = rNumericArgs( 12 );
 				if ( ! lAlphaFieldBlanks( 13 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel1", trim( cAlphaFieldNames( 13 ) ), trim( cAlphaArgs( 13 ) ), Pollution.OtherFuel1Coef.NH3Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames( 13 ), cAlphaArgs( 13 ), Pollution.OtherFuel1Coef.NH3Sched, ErrorsFound );
 				}
 				Pollution.OtherFuel1Coef.NMVOC = rNumericArgs( 13 );
 				if ( ! lAlphaFieldBlanks( 14 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel1", trim( cAlphaFieldNames( 14 ) ), trim( cAlphaArgs( 14 ) ), Pollution.OtherFuel1Coef.NMVOCSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames( 14 ), cAlphaArgs( 14 ), Pollution.OtherFuel1Coef.NMVOCSched, ErrorsFound );
 				}
 				Pollution.OtherFuel1Coef.Hg = rNumericArgs( 14 );
 				if ( ! lAlphaFieldBlanks( 15 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel1", trim( cAlphaFieldNames( 15 ) ), trim( cAlphaArgs( 15 ) ), Pollution.OtherFuel1Coef.HgSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames( 15 ), cAlphaArgs( 15 ), Pollution.OtherFuel1Coef.HgSched, ErrorsFound );
 				}
 				Pollution.OtherFuel1Coef.Pb = rNumericArgs( 15 );
 				if ( ! lAlphaFieldBlanks( 16 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel1", trim( cAlphaFieldNames( 16 ) ), trim( cAlphaArgs( 16 ) ), Pollution.OtherFuel1Coef.PbSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames( 16 ), cAlphaArgs( 16 ), Pollution.OtherFuel1Coef.PbSched, ErrorsFound );
 				}
 				Pollution.OtherFuel1Coef.Water = rNumericArgs( 16 );
 				if ( ! lAlphaFieldBlanks( 17 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel1", trim( cAlphaFieldNames( 17 ) ), trim( cAlphaArgs( 17 ) ), Pollution.OtherFuel1Coef.WaterSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames( 17 ), cAlphaArgs( 17 ), Pollution.OtherFuel1Coef.WaterSched, ErrorsFound );
 				}
 				Pollution.OtherFuel1Coef.NucHi = rNumericArgs( 17 );
 				if ( ! lAlphaFieldBlanks( 18 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel1", trim( cAlphaFieldNames( 18 ) ), trim( cAlphaArgs( 18 ) ), Pollution.OtherFuel1Coef.NucHiSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames( 18 ), cAlphaArgs( 18 ), Pollution.OtherFuel1Coef.NucHiSched, ErrorsFound );
 				}
 				Pollution.OtherFuel1Coef.NucLo = rNumericArgs( 18 );
 				if ( ! lAlphaFieldBlanks( 19 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel1", trim( cAlphaFieldNames( 19 ) ), trim( cAlphaArgs( 19 ) ), Pollution.OtherFuel1Coef.NucLoSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames( 19 ), cAlphaArgs( 19 ), Pollution.OtherFuel1Coef.NucLoSched, ErrorsFound );
 				}
 
 			} else if ( SELECT_CASE_var == "OTHERFUEL2" ) {
 				if ( Pollution.OtherFuel2Coef.FuelFactorUsed ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ": " + trim( FuelType.FuelTypeNames( Loop ) ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
 					continue;
 				}
 				Pollution.OtherFuel2Coef.FuelFactorUsed = true;
 				//OtherFuel2 Coeffs
 				Pollution.OtherFuel2Coef.Source = rNumericArgs( 2 );
 				if ( ! lAlphaFieldBlanks( 3 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel2", trim( cAlphaFieldNames( 3 ) ), trim( cAlphaArgs( 3 ) ), Pollution.OtherFuel2Coef.SourceSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames( 3 ), cAlphaArgs( 3 ), Pollution.OtherFuel2Coef.SourceSched, ErrorsFound );
 				}
 				Pollution.OtherFuel2Coef.CO2 = rNumericArgs( 3 );
 				if ( ! lAlphaFieldBlanks( 4 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel2", trim( cAlphaFieldNames( 4 ) ), trim( cAlphaArgs( 4 ) ), Pollution.OtherFuel2Coef.CO2Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames( 4 ), cAlphaArgs( 4 ), Pollution.OtherFuel2Coef.CO2Sched, ErrorsFound );
 				}
 				Pollution.OtherFuel2Coef.CO = rNumericArgs( 4 );
 				if ( ! lAlphaFieldBlanks( 5 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel2", trim( cAlphaFieldNames( 5 ) ), trim( cAlphaArgs( 5 ) ), Pollution.OtherFuel2Coef.COSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames( 5 ), cAlphaArgs( 5 ), Pollution.OtherFuel2Coef.COSched, ErrorsFound );
 				}
 				Pollution.OtherFuel2Coef.CH4 = rNumericArgs( 5 );
 				if ( ! lAlphaFieldBlanks( 6 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel2", trim( cAlphaFieldNames( 6 ) ), trim( cAlphaArgs( 6 ) ), Pollution.OtherFuel2Coef.CH4Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames( 6 ), cAlphaArgs( 6 ), Pollution.OtherFuel2Coef.CH4Sched, ErrorsFound );
 				}
 				Pollution.OtherFuel2Coef.NOx = rNumericArgs( 6 );
 				if ( ! lAlphaFieldBlanks( 7 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel2", trim( cAlphaFieldNames( 7 ) ), trim( cAlphaArgs( 7 ) ), Pollution.OtherFuel2Coef.NOxSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames( 7 ), cAlphaArgs( 7 ), Pollution.OtherFuel2Coef.NOxSched, ErrorsFound );
 				}
 				Pollution.OtherFuel2Coef.N2O = rNumericArgs( 7 );
 				if ( ! lAlphaFieldBlanks( 8 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel2", trim( cAlphaFieldNames( 8 ) ), trim( cAlphaArgs( 8 ) ), Pollution.OtherFuel2Coef.N2OSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames( 8 ), cAlphaArgs( 8 ), Pollution.OtherFuel2Coef.N2OSched, ErrorsFound );
 				}
 				Pollution.OtherFuel2Coef.SO2 = rNumericArgs( 8 );
 				if ( ! lAlphaFieldBlanks( 9 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel2", trim( cAlphaFieldNames( 9 ) ), trim( cAlphaArgs( 9 ) ), Pollution.OtherFuel2Coef.SO2Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames( 9 ), cAlphaArgs( 9 ), Pollution.OtherFuel2Coef.SO2Sched, ErrorsFound );
 				}
 				Pollution.OtherFuel2Coef.PM = rNumericArgs( 9 );
 				if ( ! lAlphaFieldBlanks( 10 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel2", trim( cAlphaFieldNames( 10 ) ), trim( cAlphaArgs( 10 ) ), Pollution.OtherFuel2Coef.PMSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames( 10 ), cAlphaArgs( 10 ), Pollution.OtherFuel2Coef.PMSched, ErrorsFound );
 				}
 				Pollution.OtherFuel2Coef.PM10 = rNumericArgs( 10 );
 				if ( ! lAlphaFieldBlanks( 11 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel2", trim( cAlphaFieldNames( 11 ) ), trim( cAlphaArgs( 11 ) ), Pollution.OtherFuel2Coef.PM10Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames( 11 ), cAlphaArgs( 11 ), Pollution.OtherFuel2Coef.PM10Sched, ErrorsFound );
 				}
 				Pollution.OtherFuel2Coef.PM25 = rNumericArgs( 11 );
 				if ( ! lAlphaFieldBlanks( 12 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel2", trim( cAlphaFieldNames( 12 ) ), trim( cAlphaArgs( 12 ) ), Pollution.OtherFuel2Coef.PM25Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames( 12 ), cAlphaArgs( 12 ), Pollution.OtherFuel2Coef.PM25Sched, ErrorsFound );
 				}
 				Pollution.OtherFuel2Coef.NH3 = rNumericArgs( 12 );
 				if ( ! lAlphaFieldBlanks( 13 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel2", trim( cAlphaFieldNames( 13 ) ), trim( cAlphaArgs( 13 ) ), Pollution.OtherFuel2Coef.NH3Sched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames( 13 ), cAlphaArgs( 13 ), Pollution.OtherFuel2Coef.NH3Sched, ErrorsFound );
 				}
 				Pollution.OtherFuel2Coef.NMVOC = rNumericArgs( 13 );
 				if ( ! lAlphaFieldBlanks( 14 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel2", trim( cAlphaFieldNames( 14 ) ), trim( cAlphaArgs( 14 ) ), Pollution.OtherFuel2Coef.NMVOCSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames( 14 ), cAlphaArgs( 14 ), Pollution.OtherFuel2Coef.NMVOCSched, ErrorsFound );
 				}
 				Pollution.OtherFuel2Coef.Hg = rNumericArgs( 14 );
 				if ( ! lAlphaFieldBlanks( 15 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel2", trim( cAlphaFieldNames( 15 ) ), trim( cAlphaArgs( 15 ) ), Pollution.OtherFuel2Coef.HgSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames( 15 ), cAlphaArgs( 15 ), Pollution.OtherFuel2Coef.HgSched, ErrorsFound );
 				}
 				Pollution.OtherFuel2Coef.Pb = rNumericArgs( 15 );
 				if ( ! lAlphaFieldBlanks( 16 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel2", trim( cAlphaFieldNames( 16 ) ), trim( cAlphaArgs( 16 ) ), Pollution.OtherFuel2Coef.PbSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames( 16 ), cAlphaArgs( 16 ), Pollution.OtherFuel2Coef.PbSched, ErrorsFound );
 				}
 				Pollution.OtherFuel2Coef.Water = rNumericArgs( 16 );
 				if ( ! lAlphaFieldBlanks( 17 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel2", trim( cAlphaFieldNames( 17 ) ), trim( cAlphaArgs( 17 ) ), Pollution.OtherFuel2Coef.WaterSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames( 17 ), cAlphaArgs( 17 ), Pollution.OtherFuel2Coef.WaterSched, ErrorsFound );
 				}
 				Pollution.OtherFuel2Coef.NucHi = rNumericArgs( 17 );
 				if ( ! lAlphaFieldBlanks( 18 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel2", trim( cAlphaFieldNames( 18 ) ), trim( cAlphaArgs( 18 ) ), Pollution.OtherFuel2Coef.NucHiSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames( 18 ), cAlphaArgs( 18 ), Pollution.OtherFuel2Coef.NucHiSched, ErrorsFound );
 				}
 				Pollution.OtherFuel2Coef.NucLo = rNumericArgs( 18 );
 				if ( ! lAlphaFieldBlanks( 19 ) ) {
-					CheckFFSchedule( trim( cCurrentModuleObject ), "OtherFuel2", trim( cAlphaFieldNames( 19 ) ), trim( cAlphaArgs( 19 ) ), Pollution.OtherFuel2Coef.NucLoSched, ErrorsFound );
+					CheckFFSchedule( cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames( 19 ), cAlphaArgs( 19 ), Pollution.OtherFuel2Coef.NucLoSched, ErrorsFound );
 				}
 
 			} else {
-				ShowSevereError( "Illegal FuelType for Pollution Calc Entered=" + trim( FuelType.FuelTypeNames( Loop ) ) );
+				ShowSevereError( "Illegal FuelType for Pollution Calc Entered=" + FuelType.FuelTypeNames( Loop ) );
 				ErrorsFound = true;
 
 			}}
@@ -1110,52 +1108,52 @@ namespace PollutionModule {
 			//Need to go through all of the Fuel Types and make sure a Fuel Factor was found for each type of energy being simulated
 			// Check for Electricity
 			if ( ! Pollution.ElecCoef.FuelFactorUsed && ( ( FuelType.ElecFacilityIndex > 0 ) || ( FuelType.ElecProducedFacilityIndex > 0 ) || ( FuelType.PurchCoolFacilityIndex > 0 ) ) ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " Not Found or Fuel not specified For Pollution Calculation for ELECTRICITY" );
+				ShowSevereError( cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for ELECTRICITY" );
 				ErrorsFound = true;
 			}
 			// Check for Natural Gas
 			if ( ! Pollution.NatGasCoef.FuelFactorUsed && ( ( FuelType.NatGasFacilityIndex > 0 ) || ( FuelType.PurchHeatFacilityIndex > 0 ) || ( FuelType.SteamFacilityIndex > 0 ) ) ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " Not Found or Fuel not specified For Pollution Calculation for NATURAL GAS" );
+				ShowSevereError( cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for NATURAL GAS" );
 				ErrorsFound = true;
 			}
 			// Check for Residual Oil
 			if ( ! Pollution.FuelOil2Coef.FuelFactorUsed && ( FuelType.FuelOil2FacilityIndex > 0 ) ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " Not Found or Fuel not specified For Pollution Calculation for RESIDUAL/FUEL OIL #2" );
+				ShowSevereError( cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for RESIDUAL/FUEL OIL #2" );
 				ErrorsFound = true;
 			}
 			// Check for Distillate Oil
 			if ( ! Pollution.FuelOil1Coef.FuelFactorUsed && ( FuelType.FuelOil1FacilityIndex > 0 ) ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " Not Found or Fuel not specified For Pollution Calculation for DISTILLATE/FUEL OIL #1" );
+				ShowSevereError( cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for DISTILLATE/FUEL OIL #1" );
 				ErrorsFound = true;
 			}
 			// Check for Coal
 			if ( ! Pollution.CoalCoef.FuelFactorUsed && ( FuelType.CoalFacilityIndex > 0 ) ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " Not Found or Fuel not specified For Pollution Calculation for COAL" );
+				ShowSevereError( cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for COAL" );
 				ErrorsFound = true;
 			}
 			// Check for Gasoline
 			if ( ! Pollution.GasolineCoef.FuelFactorUsed && ( FuelType.GasolineFacilityIndex > 0 ) ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " Not Found or Fuel not specified For Pollution Calculation for GASOLINE" );
+				ShowSevereError( cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for GASOLINE" );
 				ErrorsFound = true;
 			}
 			// Check for Propane
 			if ( ! Pollution.PropaneCoef.FuelFactorUsed && ( FuelType.PropaneFacilityIndex > 0 ) ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " Not Found or Fuel not specified For Pollution Calculation for PROPANE" );
+				ShowSevereError( cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for PROPANE" );
 				ErrorsFound = true;
 			}
 			// Check for Diesel
 			if ( ! Pollution.DieselCoef.FuelFactorUsed && ( FuelType.DieselFacilityIndex > 0 ) ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " Not Found or Fuel not specified For Pollution Calculation for DIESEL" );
+				ShowSevereError( cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for DIESEL" );
 				ErrorsFound = true;
 			}
 			// Check for OtherFuel1
 			if ( ! Pollution.OtherFuel1Coef.FuelFactorUsed && ( FuelType.OtherFuel1FacilityIndex > 0 ) ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " Not Found or Fuel not specified For Pollution Calculation for OTHERFUEL1" );
+				ShowSevereError( cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for OTHERFUEL1" );
 				ErrorsFound = true;
 			}
 			// Check for OtherFuel2
 			if ( ! Pollution.OtherFuel2Coef.FuelFactorUsed && ( FuelType.OtherFuel2FacilityIndex > 0 ) ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " Not Found or Fuel not specified For Pollution Calculation for OTHERFUEL2" );
+				ShowSevereError( cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for OTHERFUEL2" );
 				ErrorsFound = true;
 			}
 		}
@@ -1193,7 +1191,7 @@ namespace PollutionModule {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const Blank;
+		static std::string const Blank;
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1474,10 +1472,10 @@ namespace PollutionModule {
 
 	void
 	CheckFFSchedule(
-		Fstring const & currentModuleObject, // the module Object
-		Fstring const & resourceType, // resource type (Natural Gas, etc)
-		Fstring const & fieldName, // Actual field name
-		Fstring const & ScheduleName, // Schedule Name as input
+		std::string const & currentModuleObject, // the module Object
+		std::string const & resourceType, // resource type (Natural Gas, etc)
+		std::string const & fieldName, // Actual field name
+		std::string const & ScheduleName, // Schedule Name as input
 		int & SchedulePtr, // Schedule Index
 		bool & ErrorsFound // true if errors found
 	)
@@ -3402,7 +3400,7 @@ namespace PollutionModule {
 
 	void
 	GetFuelFactorInfo(
-		Fstring const & fuelName, // input fuel name  (standard from Tabular reports)
+		std::string const & fuelName, // input fuel name  (standard from Tabular reports)
 		bool & fuelFactorUsed, // return value true if user has entered this fuel
 		Real64 & fuelSourceFactor, // if used, the source factor
 		bool & fuelFactorScheduleUsed, // if true, schedules for this fuel are used

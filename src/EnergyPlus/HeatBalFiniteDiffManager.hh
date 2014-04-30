@@ -5,7 +5,6 @@
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/FArray2A.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -16,7 +15,6 @@ namespace EnergyPlus {
 namespace HeatBalFiniteDiffManager {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -25,7 +23,7 @@ namespace HeatBalFiniteDiffManager {
 
 	extern int const CrankNicholsonSecondOrder; // original CondFD scheme.  semi implicit, second order in time
 	extern int const FullyImplicitFirstOrder; // fully implicit scheme, first order in time.
-	extern FArray1D_Fstring const cCondFDSchemeType;
+	extern FArray1D_string const cCondFDSchemeType;
 
 	extern Real64 const TempInitValue; // Initialization value for Temperature
 	extern Real64 const RhovInitValue; // Initialization value for Rhov
@@ -85,7 +83,7 @@ namespace HeatBalFiniteDiffManager {
 	struct ConstructionDataFD
 	{
 		// Members
-		FArray1D_Fstring Name; // Name of construction
+		FArray1D_string Name; // Name of construction
 		FArray1D< Real64 > DelX;
 		FArray1D< Real64 > TempStability;
 		FArray1D< Real64 > MoistStability;
@@ -98,14 +96,13 @@ namespace HeatBalFiniteDiffManager {
 
 		// Default Constructor
 		ConstructionDataFD() :
-			Name( sFstring( MaxNameLength ) ),
 			TotNodes( 0 ),
 			DeltaTime( 0 )
 		{}
 
 		// Member Constructor
 		ConstructionDataFD(
-			FArray1_Fstring const & Name, // Name of construction
+			FArray1_string const & Name, // Name of construction
 			FArray1< Real64 > const & DelX,
 			FArray1< Real64 > const & TempStability,
 			FArray1< Real64 > const & MoistStability,

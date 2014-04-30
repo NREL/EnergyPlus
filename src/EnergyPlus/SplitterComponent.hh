@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace SplitterComponent {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETERS:
@@ -48,7 +46,7 @@ namespace SplitterComponent {
 	struct SplitterConditions // public because USEd by SimAirServingZones and the Direct Air Unit
 	{
 		// Members
-		Fstring SplitterName; // Name of the Splitter
+		std::string SplitterName; // Name of the Splitter
 		Real64 InletTemp;
 		Real64 InletHumRat;
 		Real64 InletEnthalpy;
@@ -69,7 +67,6 @@ namespace SplitterComponent {
 
 		// Default Constructor
 		SplitterConditions() :
-			SplitterName( MaxNameLength ),
 			InletTemp( 0.0 ),
 			InletHumRat( 0.0 ),
 			InletEnthalpy( 0.0 ),
@@ -83,7 +80,7 @@ namespace SplitterComponent {
 
 		// Member Constructor
 		SplitterConditions(
-			Fstring const & SplitterName, // Name of the Splitter
+			std::string const & SplitterName, // Name of the Splitter
 			Real64 const InletTemp,
 			Real64 const InletHumRat,
 			Real64 const InletEnthalpy,
@@ -102,7 +99,7 @@ namespace SplitterComponent {
 			FArray1< Real64 > const & OutletEnthalpy,
 			FArray1< Real64 > const & OutletPressure
 		) :
-			SplitterName( MaxNameLength, SplitterName ),
+			SplitterName( SplitterName ),
 			InletTemp( InletTemp ),
 			InletHumRat( InletHumRat ),
 			InletEnthalpy( InletEnthalpy ),
@@ -131,7 +128,7 @@ namespace SplitterComponent {
 
 	void
 	SimAirLoopSplitter(
-		Fstring const & CompName,
+		std::string const & CompName,
 		bool const FirstHVACIteration,
 		bool const FirstCall,
 		bool & SplitterInletChanged,
@@ -195,14 +192,14 @@ namespace SplitterComponent {
 
 	int
 	GetSplitterOutletNumber(
-		Fstring const & SplitterName, // must match Splitter names for the Splitter type
+		std::string const & SplitterName, // must match Splitter names for the Splitter type
 		int const SplitterNum, // Index of Splitters
 		bool & ErrorsFound // set to true if problem
 	);
 
 	FArray1D_int
 	GetSplitterNodeNumbers(
-		Fstring const & SplitterName, // must match Splitter names for the Splitter type
+		std::string const & SplitterName, // must match Splitter names for the Splitter type
 		int const SplitterNum, // Index of Splitters
 		bool & ErrorsFound // set to true if problem
 	);

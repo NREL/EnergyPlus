@@ -4,7 +4,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
+#include <ObjexxFCL/gio_Fmt.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -17,19 +17,18 @@ namespace EnergyPlus {
 namespace ConvectionCoefficients {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 	using DataVectorTypes::Vector;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	extern Real64 const AdaptiveHcInsideLowLimit; // W/m2-K
 	extern Real64 const AdaptiveHcOutsideLowLimit; // W/m2-K
-	extern Fstring const fmtx;
-	extern Fstring const fmty;
+	extern gio::Fmt const fmtx;
+	extern gio::Fmt const fmty;
 
 	extern Real64 const MinFlow; // Minimum mass flow rate
 	extern Real64 const MaxACH; // Maximum ceiling diffuser correlation limit
-	extern Fstring const Blank;
+	extern std::string const Blank;
 
 	extern Real64 const OneThird; // 1/3 in highest precision
 	extern Real64 const OneFourth; // 1/4 in highest precision
@@ -148,7 +147,7 @@ namespace ConvectionCoefficients {
 	struct HcInsideFaceUserCurveStruct
 	{
 		// Members
-		Fstring Name; // user's name for object
+		std::string Name; // user's name for object
 		int ReferenceTempType;
 		int HcFnTempDiffCurveNum;
 		int HcFnTempDiffDivHeightCurveNum;
@@ -157,7 +156,6 @@ namespace ConvectionCoefficients {
 
 		// Default Constructor
 		HcInsideFaceUserCurveStruct() :
-			Name( MaxNameLength ),
 			ReferenceTempType( 0 ),
 			HcFnTempDiffCurveNum( 0 ),
 			HcFnTempDiffDivHeightCurveNum( 0 ),
@@ -167,14 +165,14 @@ namespace ConvectionCoefficients {
 
 		// Member Constructor
 		HcInsideFaceUserCurveStruct(
-			Fstring const & Name, // user's name for object
+			std::string const & Name, // user's name for object
 			int const ReferenceTempType,
 			int const HcFnTempDiffCurveNum,
 			int const HcFnTempDiffDivHeightCurveNum,
 			int const HcFnACHCurveNum,
 			int const HcFnACHDivPerimLengthCurveNum
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ReferenceTempType( ReferenceTempType ),
 			HcFnTempDiffCurveNum( HcFnTempDiffCurveNum ),
 			HcFnTempDiffDivHeightCurveNum( HcFnTempDiffDivHeightCurveNum ),
@@ -187,7 +185,7 @@ namespace ConvectionCoefficients {
 	struct HcOutsideFaceUserCurveStruct
 	{
 		// Members
-		Fstring Name;
+		std::string Name;
 		int ReferenceTempType;
 		bool SuppressRainChange;
 		int WindSpeedType;
@@ -197,7 +195,6 @@ namespace ConvectionCoefficients {
 
 		// Default Constructor
 		HcOutsideFaceUserCurveStruct() :
-			Name( MaxNameLength ),
 			ReferenceTempType( 0 ),
 			SuppressRainChange( false ),
 			WindSpeedType( 0 ),
@@ -208,7 +205,7 @@ namespace ConvectionCoefficients {
 
 		// Member Constructor
 		HcOutsideFaceUserCurveStruct(
-			Fstring const & Name,
+			std::string const & Name,
 			int const ReferenceTempType,
 			bool const SuppressRainChange,
 			int const WindSpeedType,
@@ -216,7 +213,7 @@ namespace ConvectionCoefficients {
 			int const HnFnTempDiffCurveNum,
 			int const HnFnTempDiffDivHeightCurveNum
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ReferenceTempType( ReferenceTempType ),
 			SuppressRainChange( SuppressRainChange ),
 			WindSpeedType( WindSpeedType ),
@@ -231,7 +228,7 @@ namespace ConvectionCoefficients {
 	{
 		// Members
 		bool EnteredByUser;
-		Fstring Name;
+		std::string Name;
 		int SimpleBouyVertWallEqNum; // InConvClass_A3_VertWalls
 		int SimpleBouyVertWallUserCurveNum;
 		int SimpleBouyStableHorizEqNum; // InConvClass_A3_StableHoriz
@@ -326,7 +323,6 @@ namespace ConvectionCoefficients {
 		// Default Constructor
 		InsideFaceAdaptiveConvAlgoStruct() :
 			EnteredByUser( false ),
-			Name( MaxNameLength ),
 			SimpleBouyVertWallEqNum( HcInt_FohannoPolidoriVerticalWall ),
 			SimpleBouyVertWallUserCurveNum( 0 ),
 			SimpleBouyStableHorizEqNum( HcInt_AlamdariHammondStableHorizontal ),
@@ -422,7 +418,7 @@ namespace ConvectionCoefficients {
 		// Member Constructor
 		InsideFaceAdaptiveConvAlgoStruct(
 			bool const EnteredByUser,
-			Fstring const & Name,
+			std::string const & Name,
 			int const SimpleBouyVertWallEqNum, // InConvClass_A3_VertWalls
 			int const SimpleBouyVertWallUserCurveNum,
 			int const SimpleBouyStableHorizEqNum, // InConvClass_A3_StableHoriz
@@ -515,7 +511,7 @@ namespace ConvectionCoefficients {
 			int const MixedWindowsUserCurveNum
 		) :
 			EnteredByUser( EnteredByUser ),
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			SimpleBouyVertWallEqNum( SimpleBouyVertWallEqNum ),
 			SimpleBouyVertWallUserCurveNum( SimpleBouyVertWallUserCurveNum ),
 			SimpleBouyStableHorizEqNum( SimpleBouyStableHorizEqNum ),
@@ -614,7 +610,7 @@ namespace ConvectionCoefficients {
 	{
 		// Members
 		bool EnteredByUser;
-		Fstring Name;
+		std::string Name;
 		bool SuppressRainChange;
 		int HWindWallWindwardEqNum;
 		int HWindWallWindwardUserCurveNum;
@@ -632,7 +628,6 @@ namespace ConvectionCoefficients {
 		// Default Constructor
 		OutsideFaceAdpativeConvAlgoStruct() :
 			EnteredByUser( false ),
-			Name( MaxNameLength ),
 			SuppressRainChange( false ),
 			HWindWallWindwardEqNum( HcExt_BlockenWindward ),
 			HWindWallWindwardUserCurveNum( 0 ),
@@ -651,7 +646,7 @@ namespace ConvectionCoefficients {
 		// Member Constructor
 		OutsideFaceAdpativeConvAlgoStruct(
 			bool const EnteredByUser,
-			Fstring const & Name,
+			std::string const & Name,
 			bool const SuppressRainChange,
 			int const HWindWallWindwardEqNum,
 			int const HWindWallWindwardUserCurveNum,
@@ -667,7 +662,7 @@ namespace ConvectionCoefficients {
 			int const HNatUstableHorizUserCurveNum
 		) :
 			EnteredByUser( EnteredByUser ),
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			SuppressRainChange( SuppressRainChange ),
 			HWindWallWindwardEqNum( HWindWallWindwardEqNum ),
 			HWindWallWindwardUserCurveNum( HWindWallWindwardUserCurveNum ),
@@ -825,8 +820,8 @@ namespace ConvectionCoefficients {
 
 	void
 	ApplyConvectionValue(
-		Fstring const & SurfaceTypes,
-		Fstring const & ConvectionType,
+		std::string const & SurfaceTypes,
+		std::string const & ConvectionType,
 		int const Value
 	);
 

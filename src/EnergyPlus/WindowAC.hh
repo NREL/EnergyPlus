@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,13 +13,12 @@ namespace EnergyPlus {
 namespace WindowAC {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
 	extern int const WindowAC_UnitType;
-	extern Fstring const cWindowAC_UnitType;
-	extern FArray1D_Fstring const cWindowAC_UnitTypes;
+	extern std::string const cWindowAC_UnitType;
+	extern FArray1D_string const cWindowAC_UnitTypes;
 
 	// Compressor operation
 	extern int const On; // normal compressor operation
@@ -45,10 +43,10 @@ namespace WindowAC {
 	{
 		// Members
 		// input data
-		Fstring Name; // name of unit
+		std::string Name; // name of unit
 		//  CHARACTER(len=MaxNameLength) :: UnitType         =' '  ! type of unit
 		int UnitType; // type of unit
-		Fstring Sched; // availability schedule
+		std::string Sched; // availability schedule
 		int SchedPtr; // index to schedule
 		int FanSchedPtr; // index to fan operating mode schedule
 		int FanAvailSchedPtr; // index to fan availability schedule
@@ -61,15 +59,15 @@ namespace WindowAC {
 		int OutsideAirNode; // outside air node number
 		int AirReliefNode; // relief air node number
 		int MixedAirNode; // Mixed Air Node number
-		Fstring OAMixName; // name of outdoor air mixer
-		Fstring OAMixType; // type of outdoor air mixer
+		std::string OAMixName; // name of outdoor air mixer
+		std::string OAMixType; // type of outdoor air mixer
 		int OAMixIndex;
-		Fstring FanName; // name of fan
-		Fstring FanType; // type of fan
+		std::string FanName; // name of fan
+		std::string FanType; // type of fan
 		int FanType_Num; // index to fan type
 		int FanIndex;
-		Fstring DXCoilName; // name of cooling coil
-		Fstring DXCoilType; // type of cooling coil,Coil:DX:CoolingBypassFactorEmpirical or
+		std::string DXCoilName; // name of cooling coil
+		std::string DXCoilType; // type of cooling coil,Coil:DX:CoolingBypassFactorEmpirical or
 		// 'CoilSystem:Cooling:DX:HeatExchangerAssisted'
 		int DXCoilType_Num; // Numeric Equivalent for DXCoil Type
 		int DXCoilIndex; // Index to DX cooling coil
@@ -95,14 +93,12 @@ namespace WindowAC {
 		Real64 ElecConsumption; // electricity consumed [J]
 		Real64 FanPartLoadRatio; // fan part-load ratio for time step
 		Real64 CompPartLoadRatio; // compressor part-load ratio for time step
-		Fstring AvailManagerListName; // Name of an availability manager list object
+		std::string AvailManagerListName; // Name of an availability manager list object
 		int AvailStatus;
 
 		// Default Constructor
 		WindACData() :
-			Name( MaxNameLength ),
 			UnitType( 0 ),
-			Sched( MaxNameLength ),
 			SchedPtr( 0 ),
 			FanSchedPtr( 0 ),
 			FanAvailSchedPtr( 0 ),
@@ -115,15 +111,9 @@ namespace WindowAC {
 			OutsideAirNode( 0 ),
 			AirReliefNode( 0 ),
 			MixedAirNode( 0 ),
-			OAMixName( MaxNameLength ),
-			OAMixType( MaxNameLength ),
 			OAMixIndex( 0 ),
-			FanName( MaxNameLength ),
-			FanType( MaxNameLength ),
 			FanType_Num( 0 ),
 			FanIndex( 0 ),
-			DXCoilName( MaxNameLength ),
-			DXCoilType( MaxNameLength ),
 			DXCoilType_Num( 0 ),
 			DXCoilIndex( 0 ),
 			CoilOutletNodeNum( 0 ),
@@ -145,15 +135,14 @@ namespace WindowAC {
 			ElecConsumption( 0.0 ),
 			FanPartLoadRatio( 0.0 ),
 			CompPartLoadRatio( 0.0 ),
-			AvailManagerListName( MaxNameLength ),
 			AvailStatus( 0 )
 		{}
 
 		// Member Constructor
 		WindACData(
-			Fstring const & Name, // name of unit
+			std::string const & Name, // name of unit
 			int const UnitType, // type of unit
-			Fstring const & Sched, // availability schedule
+			std::string const & Sched, // availability schedule
 			int const SchedPtr, // index to schedule
 			int const FanSchedPtr, // index to fan operating mode schedule
 			int const FanAvailSchedPtr, // index to fan availability schedule
@@ -166,15 +155,15 @@ namespace WindowAC {
 			int const OutsideAirNode, // outside air node number
 			int const AirReliefNode, // relief air node number
 			int const MixedAirNode, // Mixed Air Node number
-			Fstring const & OAMixName, // name of outdoor air mixer
-			Fstring const & OAMixType, // type of outdoor air mixer
+			std::string const & OAMixName, // name of outdoor air mixer
+			std::string const & OAMixType, // type of outdoor air mixer
 			int const OAMixIndex,
-			Fstring const & FanName, // name of fan
-			Fstring const & FanType, // type of fan
+			std::string const & FanName, // name of fan
+			std::string const & FanType, // type of fan
 			int const FanType_Num, // index to fan type
 			int const FanIndex,
-			Fstring const & DXCoilName, // name of cooling coil
-			Fstring const & DXCoilType, // type of cooling coil,Coil:DX:CoolingBypassFactorEmpirical or
+			std::string const & DXCoilName, // name of cooling coil
+			std::string const & DXCoilType, // type of cooling coil,Coil:DX:CoolingBypassFactorEmpirical or
 			int const DXCoilType_Num, // Numeric Equivalent for DXCoil Type
 			int const DXCoilIndex, // Index to DX cooling coil
 			int const CoilOutletNodeNum, // Outlet node number of DX cooling coil
@@ -196,12 +185,12 @@ namespace WindowAC {
 			Real64 const ElecConsumption, // electricity consumed [J]
 			Real64 const FanPartLoadRatio, // fan part-load ratio for time step
 			Real64 const CompPartLoadRatio, // compressor part-load ratio for time step
-			Fstring const & AvailManagerListName, // Name of an availability manager list object
+			std::string const & AvailManagerListName, // Name of an availability manager list object
 			int const AvailStatus
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			UnitType( UnitType ),
-			Sched( MaxNameLength, Sched ),
+			Sched( Sched ),
 			SchedPtr( SchedPtr ),
 			FanSchedPtr( FanSchedPtr ),
 			FanAvailSchedPtr( FanAvailSchedPtr ),
@@ -214,15 +203,15 @@ namespace WindowAC {
 			OutsideAirNode( OutsideAirNode ),
 			AirReliefNode( AirReliefNode ),
 			MixedAirNode( MixedAirNode ),
-			OAMixName( MaxNameLength, OAMixName ),
-			OAMixType( MaxNameLength, OAMixType ),
+			OAMixName( OAMixName ),
+			OAMixType( OAMixType ),
 			OAMixIndex( OAMixIndex ),
-			FanName( MaxNameLength, FanName ),
-			FanType( MaxNameLength, FanType ),
+			FanName( FanName ),
+			FanType( FanType ),
 			FanType_Num( FanType_Num ),
 			FanIndex( FanIndex ),
-			DXCoilName( MaxNameLength, DXCoilName ),
-			DXCoilType( MaxNameLength, DXCoilType ),
+			DXCoilName( DXCoilName ),
+			DXCoilType( DXCoilType ),
 			DXCoilType_Num( DXCoilType_Num ),
 			DXCoilIndex( DXCoilIndex ),
 			CoilOutletNodeNum( CoilOutletNodeNum ),
@@ -244,7 +233,7 @@ namespace WindowAC {
 			ElecConsumption( ElecConsumption ),
 			FanPartLoadRatio( FanPartLoadRatio ),
 			CompPartLoadRatio( CompPartLoadRatio ),
-			AvailManagerListName( MaxNameLength, AvailManagerListName ),
+			AvailManagerListName( AvailManagerListName ),
 			AvailStatus( AvailStatus )
 		{}
 
@@ -257,7 +246,7 @@ namespace WindowAC {
 
 	void
 	SimWindowAC(
-		Fstring const & CompName, // name of the window AC unit
+		std::string const & CompName, // name of the window AC unit
 		int const ZoneNum, // number of zone being served
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		Real64 & PowerMet, // Sensible power supplied by window AC (W)

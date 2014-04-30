@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -17,7 +16,6 @@ namespace EnergyPlus {
 namespace EvaporativeCoolers {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 	using DataZoneEquipment::ZoneEvaporativeCoolerUnit_Num;
 
 	// Data
@@ -51,11 +49,11 @@ namespace EvaporativeCoolers {
 	struct EvapConditions
 	{
 		// Members
-		Fstring EvapCoolerName; // Name of the EvapCooler
+		std::string EvapCoolerName; // Name of the EvapCooler
 		int EquipIndex;
 		int EvapCoolerType; // Type of the EvapCooler (parameters in DataGlobalConstants.f90
-		Fstring EvapControlType; // Type of Control for the EvapCooler
-		Fstring Schedule; // HeatingCoil Operation Schedule
+		std::string EvapControlType; // Type of Control for the EvapCooler
+		std::string Schedule; // HeatingCoil Operation Schedule
 		int SchedPtr; // Pointer to the correct schedule
 		Real64 VolFlowRate; // Volume Flow Rate in Evap Cooler needed for calculating SatEff
 		Real64 OutletTemp;
@@ -103,7 +101,7 @@ namespace EvaporativeCoolers {
 		Real64 EvapCoolerEnergy;
 		Real64 EvapCoolerPower;
 		int EvapWaterSupplyMode; // where does water come from
-		Fstring EvapWaterSupplyName; // name of water source e.g. water storage tank
+		std::string EvapWaterSupplyName; // name of water source e.g. water storage tank
 		int EvapWaterSupTankID;
 		int EvapWaterTankDemandARRID;
 		Real64 DriftFraction; // excess water from drift as fraction of Evap Water Consumption rate
@@ -123,11 +121,8 @@ namespace EvaporativeCoolers {
 
 		// Default Constructor
 		EvapConditions() :
-			EvapCoolerName( MaxNameLength ),
 			EquipIndex( 0 ),
 			EvapCoolerType( 0 ),
-			EvapControlType( MaxNameLength ),
-			Schedule( MaxNameLength ),
 			SchedPtr( 0 ),
 			VolFlowRate( 0.0 ),
 			OutletTemp( 0.0 ),
@@ -175,7 +170,6 @@ namespace EvaporativeCoolers {
 			EvapCoolerEnergy( 0.0 ),
 			EvapCoolerPower( 0.0 ),
 			EvapWaterSupplyMode( WaterSupplyFromMains ),
-			EvapWaterSupplyName( MaxNameLength ),
 			EvapWaterSupTankID( 0 ),
 			EvapWaterTankDemandARRID( 0 ),
 			DriftFraction( 0.0 ),
@@ -195,11 +189,11 @@ namespace EvaporativeCoolers {
 
 		// Member Constructor
 		EvapConditions(
-			Fstring const & EvapCoolerName, // Name of the EvapCooler
+			std::string const & EvapCoolerName, // Name of the EvapCooler
 			int const EquipIndex,
 			int const EvapCoolerType, // Type of the EvapCooler (parameters in DataGlobalConstants.f90
-			Fstring const & EvapControlType, // Type of Control for the EvapCooler
-			Fstring const & Schedule, // HeatingCoil Operation Schedule
+			std::string const & EvapControlType, // Type of Control for the EvapCooler
+			std::string const & Schedule, // HeatingCoil Operation Schedule
 			int const SchedPtr, // Pointer to the correct schedule
 			Real64 const VolFlowRate, // Volume Flow Rate in Evap Cooler needed for calculating SatEff
 			Real64 const OutletTemp,
@@ -247,7 +241,7 @@ namespace EvaporativeCoolers {
 			Real64 const EvapCoolerEnergy,
 			Real64 const EvapCoolerPower,
 			int const EvapWaterSupplyMode, // where does water come from
-			Fstring const & EvapWaterSupplyName, // name of water source e.g. water storage tank
+			std::string const & EvapWaterSupplyName, // name of water source e.g. water storage tank
 			int const EvapWaterSupTankID,
 			int const EvapWaterTankDemandARRID,
 			Real64 const DriftFraction, // excess water from drift as fraction of Evap Water Consumption rate
@@ -264,11 +258,11 @@ namespace EvaporativeCoolers {
 			Real64 const PartLoadFract, // reduces cooling performance and associated fan power
 			int const DewPointBoundFlag // report when indirect research special cooler is bound by dewpoint
 		) :
-			EvapCoolerName( MaxNameLength, EvapCoolerName ),
+			EvapCoolerName( EvapCoolerName ),
 			EquipIndex( EquipIndex ),
 			EvapCoolerType( EvapCoolerType ),
-			EvapControlType( MaxNameLength, EvapControlType ),
-			Schedule( MaxNameLength, Schedule ),
+			EvapControlType( EvapControlType ),
+			Schedule( Schedule ),
 			SchedPtr( SchedPtr ),
 			VolFlowRate( VolFlowRate ),
 			OutletTemp( OutletTemp ),
@@ -316,7 +310,7 @@ namespace EvaporativeCoolers {
 			EvapCoolerEnergy( EvapCoolerEnergy ),
 			EvapCoolerPower( EvapCoolerPower ),
 			EvapWaterSupplyMode( EvapWaterSupplyMode ),
-			EvapWaterSupplyName( MaxNameLength, EvapWaterSupplyName ),
+			EvapWaterSupplyName( EvapWaterSupplyName ),
 			EvapWaterSupTankID( EvapWaterSupTankID ),
 			EvapWaterTankDemandARRID( EvapWaterTankDemandARRID ),
 			DriftFraction( DriftFraction ),
@@ -339,19 +333,19 @@ namespace EvaporativeCoolers {
 	struct ZoneEvapCoolerUnitStruct
 	{
 		// Members
-		Fstring Name; // user identifier
+		std::string Name; // user identifier
 		int ZoneEquipType;
 		int ZoneNodeNum;
 		int AvailSchedIndex; // pointer to local availability schedule
-		Fstring AvailManagerListName; // Name of an availability manager list object
+		std::string AvailManagerListName; // Name of an availability manager list object
 		bool UnitIsAvailable;
 		int FanAvailStatus;
 		int OAInletNodeNum; // outdoor air inlet node index
 		int UnitOutletNodeNum; // Unit air outlet (to zone) node index
 		int UnitReliefNodeNum; // Unit relief air (from zone) node index (optional)
-		Fstring FanObjectClassName;
+		std::string FanObjectClassName;
 		int FanType_Num;
-		Fstring FanName;
+		std::string FanName;
 		int FanIndex;
 		Real64 ActualFanVolFlowRate;
 		int FanAvailSchedPtr;
@@ -368,13 +362,13 @@ namespace EvaporativeCoolers {
 		bool IsOnThisTimestep;
 		bool WasOnLastTimestep;
 		Real64 ThresholdCoolingLoad;
-		Fstring EvapCooler_1_ObjectClassName;
-		Fstring EvapCooler_1_Name;
+		std::string EvapCooler_1_ObjectClassName;
+		std::string EvapCooler_1_Name;
 		int EvapCooler_1_Type_Num;
 		int EvapCooler_1_Index;
 		bool EvapCooler_1_AvailStatus;
-		Fstring EvapCooler_2_ObjectClassName;
-		Fstring EvapCooler_2_Name;
+		std::string EvapCooler_2_ObjectClassName;
+		std::string EvapCooler_2_Name;
 		int EvapCooler_2_Type_Num;
 		int EvapCooler_2_Index;
 		bool EvapCooler_2_AvailStatus;
@@ -403,19 +397,15 @@ namespace EvaporativeCoolers {
 
 		// Default Constructor
 		ZoneEvapCoolerUnitStruct() :
-			Name( MaxNameLength ),
 			ZoneEquipType( ZoneEvaporativeCoolerUnit_Num ),
 			ZoneNodeNum( 0 ),
 			AvailSchedIndex( 0 ),
-			AvailManagerListName( MaxNameLength ),
 			UnitIsAvailable( false ),
 			FanAvailStatus( 0 ),
 			OAInletNodeNum( 0 ),
 			UnitOutletNodeNum( 0 ),
 			UnitReliefNodeNum( 0 ),
-			FanObjectClassName( MaxNameLength ),
 			FanType_Num( 0 ),
-			FanName( MaxNameLength ),
 			FanIndex( 0 ),
 			ActualFanVolFlowRate( 0.0 ),
 			FanAvailSchedPtr( 0 ),
@@ -432,13 +422,9 @@ namespace EvaporativeCoolers {
 			IsOnThisTimestep( false ),
 			WasOnLastTimestep( false ),
 			ThresholdCoolingLoad( 0.0 ),
-			EvapCooler_1_ObjectClassName( MaxNameLength ),
-			EvapCooler_1_Name( MaxNameLength ),
 			EvapCooler_1_Type_Num( 0 ),
 			EvapCooler_1_Index( 0 ),
 			EvapCooler_1_AvailStatus( false ),
-			EvapCooler_2_ObjectClassName( MaxNameLength ),
-			EvapCooler_2_Name( MaxNameLength ),
 			EvapCooler_2_Type_Num( 0 ),
 			EvapCooler_2_Index( 0 ),
 			EvapCooler_2_AvailStatus( false ),
@@ -468,19 +454,19 @@ namespace EvaporativeCoolers {
 
 		// Member Constructor
 		ZoneEvapCoolerUnitStruct(
-			Fstring const & Name, // user identifier
+			std::string const & Name, // user identifier
 			int const ZoneEquipType,
 			int const ZoneNodeNum,
 			int const AvailSchedIndex, // pointer to local availability schedule
-			Fstring const & AvailManagerListName, // Name of an availability manager list object
+			std::string const & AvailManagerListName, // Name of an availability manager list object
 			bool const UnitIsAvailable,
 			int const FanAvailStatus,
 			int const OAInletNodeNum, // outdoor air inlet node index
 			int const UnitOutletNodeNum, // Unit air outlet (to zone) node index
 			int const UnitReliefNodeNum, // Unit relief air (from zone) node index (optional)
-			Fstring const & FanObjectClassName,
+			std::string const & FanObjectClassName,
 			int const FanType_Num,
-			Fstring const & FanName,
+			std::string const & FanName,
 			int const FanIndex,
 			Real64 const ActualFanVolFlowRate,
 			int const FanAvailSchedPtr,
@@ -497,13 +483,13 @@ namespace EvaporativeCoolers {
 			bool const IsOnThisTimestep,
 			bool const WasOnLastTimestep,
 			Real64 const ThresholdCoolingLoad,
-			Fstring const & EvapCooler_1_ObjectClassName,
-			Fstring const & EvapCooler_1_Name,
+			std::string const & EvapCooler_1_ObjectClassName,
+			std::string const & EvapCooler_1_Name,
 			int const EvapCooler_1_Type_Num,
 			int const EvapCooler_1_Index,
 			bool const EvapCooler_1_AvailStatus,
-			Fstring const & EvapCooler_2_ObjectClassName,
-			Fstring const & EvapCooler_2_Name,
+			std::string const & EvapCooler_2_ObjectClassName,
+			std::string const & EvapCooler_2_Name,
 			int const EvapCooler_2_Type_Num,
 			int const EvapCooler_2_Index,
 			bool const EvapCooler_2_AvailStatus,
@@ -530,19 +516,19 @@ namespace EvaporativeCoolers {
 			int const UnitVSControlMaxIterErrorIndex, // regula falsi errors, fan speed iteration limits
 			int const UnitVSControlLimitsErrorIndex // regula falsi errors, limits exceeded.
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ZoneEquipType( ZoneEquipType ),
 			ZoneNodeNum( ZoneNodeNum ),
 			AvailSchedIndex( AvailSchedIndex ),
-			AvailManagerListName( MaxNameLength, AvailManagerListName ),
+			AvailManagerListName( AvailManagerListName ),
 			UnitIsAvailable( UnitIsAvailable ),
 			FanAvailStatus( FanAvailStatus ),
 			OAInletNodeNum( OAInletNodeNum ),
 			UnitOutletNodeNum( UnitOutletNodeNum ),
 			UnitReliefNodeNum( UnitReliefNodeNum ),
-			FanObjectClassName( MaxNameLength, FanObjectClassName ),
+			FanObjectClassName( FanObjectClassName ),
 			FanType_Num( FanType_Num ),
-			FanName( MaxNameLength, FanName ),
+			FanName( FanName ),
 			FanIndex( FanIndex ),
 			ActualFanVolFlowRate( ActualFanVolFlowRate ),
 			FanAvailSchedPtr( FanAvailSchedPtr ),
@@ -559,13 +545,13 @@ namespace EvaporativeCoolers {
 			IsOnThisTimestep( IsOnThisTimestep ),
 			WasOnLastTimestep( WasOnLastTimestep ),
 			ThresholdCoolingLoad( ThresholdCoolingLoad ),
-			EvapCooler_1_ObjectClassName( MaxNameLength, EvapCooler_1_ObjectClassName ),
-			EvapCooler_1_Name( MaxNameLength, EvapCooler_1_Name ),
+			EvapCooler_1_ObjectClassName( EvapCooler_1_ObjectClassName ),
+			EvapCooler_1_Name( EvapCooler_1_Name ),
 			EvapCooler_1_Type_Num( EvapCooler_1_Type_Num ),
 			EvapCooler_1_Index( EvapCooler_1_Index ),
 			EvapCooler_1_AvailStatus( EvapCooler_1_AvailStatus ),
-			EvapCooler_2_ObjectClassName( MaxNameLength, EvapCooler_2_ObjectClassName ),
-			EvapCooler_2_Name( MaxNameLength, EvapCooler_2_Name ),
+			EvapCooler_2_ObjectClassName( EvapCooler_2_ObjectClassName ),
+			EvapCooler_2_Name( EvapCooler_2_Name ),
 			EvapCooler_2_Type_Num( EvapCooler_2_Type_Num ),
 			EvapCooler_2_Index( EvapCooler_2_Index ),
 			EvapCooler_2_AvailStatus( EvapCooler_2_AvailStatus ),
@@ -603,7 +589,7 @@ namespace EvaporativeCoolers {
 
 	void
 	SimEvapCooler(
-		Fstring const & CompName,
+		std::string const & CompName,
 		int & CompIndex
 	);
 
@@ -674,7 +660,7 @@ namespace EvaporativeCoolers {
 
 	void
 	SimZoneEvaporativeCoolerUnit(
-		Fstring const & CompName, // name of the packaged terminal heat pump
+		std::string const & CompName, // name of the packaged terminal heat pump
 		int const ZoneNum, // number of zone being served
 		Real64 & SensibleOutputProvided, // sensible capacity delivered to zone
 		Real64 & LatentOutputProvided, // Latent add/removal  (kg/s), dehumid = negative

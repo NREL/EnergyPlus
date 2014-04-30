@@ -5,7 +5,6 @@
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <ZoneContaminantPredictorCorrector.hh>
@@ -218,7 +217,7 @@ namespace ZoneContaminantPredictorCorrector {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetSourcesAndSinks: " );
+		static std::string const RoutineName( "GetSourcesAndSinks: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -226,7 +225,7 @@ namespace ZoneContaminantPredictorCorrector {
 		// DERIVED TYPE DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_Fstring AlphaName( sFstring( MaxNameLength ) );
+		FArray1D_string AlphaName;
 		FArray1D< Real64 > IHGNumbers;
 		Real64 SchMin;
 		Real64 SchMax;
@@ -242,7 +241,7 @@ namespace ZoneContaminantPredictorCorrector {
 		bool IsBlank; // Flag for blank name
 		//  LOGICAL :: ValidScheduleType
 		FArray1D_bool RepVarSet;
-		Fstring CurrentModuleObject( MaxNameLength );
+		std::string CurrentModuleObject;
 
 		// FLOW:
 
@@ -282,20 +281,20 @@ namespace ZoneContaminantPredictorCorrector {
 		IHGNumbers.allocate( MaxNumber );
 		AlphaName.allocate( MaxAlpha );
 		IHGNumbers = 0.0;
-		AlphaName = " ";
+		AlphaName = "";
 
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:Constant";
 		TotGCGenConstant = GetNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericConstant.allocate( TotGCGenConstant );
 
 		for ( Loop = 1; Loop <= TotGCGenConstant; ++Loop ) {
-			AlphaName = "  ";
+			AlphaName = "";
 			IHGNumbers = 0.0;
 			GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericConstant.Name(), Loop - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( AlphaName( 1 ), ZoneContamGenericConstant.Name(), Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
@@ -305,16 +304,16 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericConstant( Loop ).ZoneName = AlphaName( 2 );
 			ZoneContamGenericConstant( Loop ).ActualZoneNum = FindItemInList( AlphaName( 2 ), Zone.Name(), NumOfZones );
 			if ( ZoneContamGenericConstant( Loop ).ActualZoneNum == 0 ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", invalid " + trim( cAlphaFieldNames( 2 ) ) + " entered=" + trim( AlphaName( 2 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
 			}
 
 			ZoneContamGenericConstant( Loop ).GCGenerateRateSchedPtr = GetScheduleIndex( AlphaName( 3 ) );
 			if ( ZoneContamGenericConstant( Loop ).GCGenerateRateSchedPtr == 0 ) {
 				if ( lAlphaFieldBlanks( 3 ) ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", " + trim( cAlphaFieldNames( 3 ) ) + " is required." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 3 ) + " is required." );
 				} else {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", invalid " + trim( cAlphaFieldNames( 3 ) ) + " entered=" + trim( AlphaName( 3 ) ) );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + " entered=" + AlphaName( 3 ) );
 				}
 				ErrorsFound = true;
 			} else { // check min/max on schedule
@@ -322,13 +321,13 @@ namespace ZoneContaminantPredictorCorrector {
 				SchMax = GetScheduleMaxValue( ZoneContamGenericConstant( Loop ).GCGenerateRateSchedPtr );
 				if ( SchMin < 0.0 || SchMax < 0.0 ) {
 					if ( SchMin < 0.0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", " + trim( cAlphaFieldNames( 3 ) ) + ", minimum is < 0.0" );
-						ShowContinueError( "Schedule=\"" + trim( AlphaName( 3 ) ) + "\". Minimum is [" + trim( RoundSigDigits( SchMin, 1 ) ) + "]. Values must be >= 0.0." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 3 ) + ", minimum is < 0.0" );
+						ShowContinueError( "Schedule=\"" + AlphaName( 3 ) + "\". Minimum is [" + RoundSigDigits( SchMin, 1 ) + "]. Values must be >= 0.0." );
 						ErrorsFound = true;
 					}
 					if ( SchMax < 0.0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", " + trim( cAlphaFieldNames( 3 ) ) + ", maximum is < 0.0" );
-						ShowContinueError( "Schedule=\"" + trim( AlphaName( 3 ) ) + "\". Maximum is [" + trim( RoundSigDigits( SchMax, 1 ) ) + "]. Values must be >= 0.0." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 3 ) + ", maximum is < 0.0" );
+						ShowContinueError( "Schedule=\"" + AlphaName( 3 ) + "\". Maximum is [" + RoundSigDigits( SchMax, 1 ) + "]. Values must be >= 0.0." );
 						ErrorsFound = true;
 					}
 				}
@@ -340,9 +339,9 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericConstant( Loop ).GCRemovalCoefSchedPtr = GetScheduleIndex( AlphaName( 4 ) );
 			if ( ZoneContamGenericConstant( Loop ).GCRemovalCoefSchedPtr == 0 ) {
 				if ( lAlphaFieldBlanks( 3 ) ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", " + trim( cAlphaFieldNames( 4 ) ) + " is required." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 4 ) + " is required." );
 				} else {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", invalid " + trim( cAlphaFieldNames( 4 ) ) + " entered=" + trim( AlphaName( 4 ) ) );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 4 ) + " entered=" + AlphaName( 4 ) );
 				}
 				ErrorsFound = true;
 			} else { // check min/max on schedule
@@ -350,13 +349,13 @@ namespace ZoneContaminantPredictorCorrector {
 				SchMax = GetScheduleMaxValue( ZoneContamGenericConstant( Loop ).GCRemovalCoefSchedPtr );
 				if ( SchMin < 0.0 || SchMax < 0.0 ) {
 					if ( SchMin < 0.0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", " + trim( cAlphaFieldNames( 4 ) ) + ", minimum is < 0.0" );
-						ShowContinueError( "Schedule=\"" + trim( AlphaName( 4 ) ) + "\". Minimum is [" + trim( RoundSigDigits( SchMin, 1 ) ) + "]. Values must be >= 0.0." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 4 ) + ", minimum is < 0.0" );
+						ShowContinueError( "Schedule=\"" + AlphaName( 4 ) + "\". Minimum is [" + RoundSigDigits( SchMin, 1 ) + "]. Values must be >= 0.0." );
 						ErrorsFound = true;
 					}
 					if ( SchMax < 0.0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", " + trim( cAlphaFieldNames( 4 ) ) + ", maximum is < 0.0" );
-						ShowContinueError( "Schedule=\"" + trim( AlphaName( 4 ) ) + "\". Maximum is [" + trim( RoundSigDigits( SchMax, 1 ) ) + "]. Values must be >= 0.0." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 4 ) + ", maximum is < 0.0" );
+						ShowContinueError( "Schedule=\"" + AlphaName( 4 ) + "\". Maximum is [" + RoundSigDigits( SchMax, 1 ) + "]. Values must be >= 0.0." );
 						ErrorsFound = true;
 					}
 				}
@@ -382,13 +381,13 @@ namespace ZoneContaminantPredictorCorrector {
 		ZoneContamGenericPDriven.allocate( TotGCGenPDriven );
 
 		for ( Loop = 1; Loop <= TotGCGenPDriven; ++Loop ) {
-			AlphaName = "  ";
+			AlphaName = "";
 			IHGNumbers = 0.0;
 			GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericPDriven.Name(), Loop - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( AlphaName( 1 ), ZoneContamGenericPDriven.Name(), Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
@@ -398,21 +397,21 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericPDriven( Loop ).SurfName = AlphaName( 2 );
 			ZoneContamGenericPDriven( Loop ).SurfNum = FindItemInList( AlphaName( 2 ), MultizoneSurfaceData.SurfName(), AirflowNetworkNumOfSurfaces );
 			if ( ZoneContamGenericPDriven( Loop ).SurfNum == 0 ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", invalid " + trim( cAlphaFieldNames( 2 ) ) + " entered=" + trim( AlphaName( 2 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
 			}
 			// Ensure external surface
 			if ( Surface( ZoneContamGenericPDriven( Loop ).SurfNum ).ExtBoundCond != ExternalEnvironment ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + ". The entered surface (" + trim( AlphaName( 2 ) ) + ") is not an exterior surface" );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + ". The entered surface (" + AlphaName( 2 ) + ") is not an exterior surface" );
 				ErrorsFound = true;
 			}
 
 			ZoneContamGenericPDriven( Loop ).GCGenRateCoefSchedPtr = GetScheduleIndex( AlphaName( 3 ) );
 			if ( ZoneContamGenericPDriven( Loop ).GCGenRateCoefSchedPtr == 0 ) {
 				if ( lAlphaFieldBlanks( 3 ) ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", " + trim( cAlphaFieldNames( 3 ) ) + " is required." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 3 ) + " is required." );
 				} else {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", invalid " + trim( cAlphaFieldNames( 3 ) ) + " entered=" + trim( AlphaName( 3 ) ) );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + " entered=" + AlphaName( 3 ) );
 				}
 				ErrorsFound = true;
 			} else { // check min/max on schedule
@@ -420,13 +419,13 @@ namespace ZoneContaminantPredictorCorrector {
 				SchMax = GetScheduleMaxValue( ZoneContamGenericPDriven( Loop ).GCGenRateCoefSchedPtr );
 				if ( SchMin < 0.0 || SchMax < 0.0 ) {
 					if ( SchMin < 0.0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", " + trim( cAlphaFieldNames( 3 ) ) + ", minimum is < 0.0" );
-						ShowContinueError( "Schedule=\"" + trim( AlphaName( 3 ) ) + "\". Minimum is [" + trim( RoundSigDigits( SchMin, 1 ) ) + "]. Values must be >= 0.0." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 3 ) + ", minimum is < 0.0" );
+						ShowContinueError( "Schedule=\"" + AlphaName( 3 ) + "\". Minimum is [" + RoundSigDigits( SchMin, 1 ) + "]. Values must be >= 0.0." );
 						ErrorsFound = true;
 					}
 					if ( SchMax < 0.0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", " + trim( cAlphaFieldNames( 3 ) ) + ", maximum is < 0.0" );
-						ShowContinueError( "Schedule=\"" + trim( AlphaName( 3 ) ) + "\". Maximum is [" + trim( RoundSigDigits( SchMax, 1 ) ) + "]. Values must be >= 0.0." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 3 ) + ", maximum is < 0.0" );
+						ShowContinueError( "Schedule=\"" + AlphaName( 3 ) + "\". Maximum is [" + RoundSigDigits( SchMax, 1 ) + "]. Values must be >= 0.0." );
 						ErrorsFound = true;
 					}
 				}
@@ -434,20 +433,20 @@ namespace ZoneContaminantPredictorCorrector {
 
 			ZoneContamGenericPDriven( Loop ).GCGenRateCoef = IHGNumbers( 1 );
 			if ( IHGNumbers( 1 ) < 0.0 ) {
-				ShowSevereError( RoutineName + "Negative values are not allowed for " + trim( cNumericFieldNames( 1 ) ) + " in " + trim( CurrentModuleObject ) + " = " + trim( AlphaName( 1 ) ) );
-				ShowContinueError( "The input value is " + trim( RoundSigDigits( IHGNumbers( 1 ), 2 ) ) );
+				ShowSevereError( RoutineName + "Negative values are not allowed for " + cNumericFieldNames( 1 ) + " in " + CurrentModuleObject + " = " + AlphaName( 1 ) );
+				ShowContinueError( "The input value is " + RoundSigDigits( IHGNumbers( 1 ), 2 ) );
 				ErrorsFound = true;
 			}
 
 			ZoneContamGenericPDriven( Loop ).GCExpo = IHGNumbers( 2 );
 			if ( IHGNumbers( 2 ) <= 0.0 ) {
-				ShowSevereError( RoutineName + "Negative or zero value is not allowed for " + trim( cNumericFieldNames( 2 ) ) + " in " + trim( CurrentModuleObject ) + " = " + trim( AlphaName( 1 ) ) );
-				ShowContinueError( "The input value is " + trim( RoundSigDigits( IHGNumbers( 2 ), 2 ) ) );
+				ShowSevereError( RoutineName + "Negative or zero value is not allowed for " + cNumericFieldNames( 2 ) + " in " + CurrentModuleObject + " = " + AlphaName( 1 ) );
+				ShowContinueError( "The input value is " + RoundSigDigits( IHGNumbers( 2 ), 2 ) );
 				ErrorsFound = true;
 			}
 			if ( IHGNumbers( 2 ) > 1.0 ) {
-				ShowSevereError( RoutineName + "The value greater than 1.0 is not allowed for " + trim( cNumericFieldNames( 2 ) ) + " in " + trim( CurrentModuleObject ) + " = " + trim( AlphaName( 1 ) ) );
-				ShowContinueError( "The input value is " + trim( RoundSigDigits( IHGNumbers( 2 ), 2 ) ) );
+				ShowSevereError( RoutineName + "The value greater than 1.0 is not allowed for " + cNumericFieldNames( 2 ) + " in " + CurrentModuleObject + " = " + AlphaName( 1 ) );
+				ShowContinueError( "The input value is " + RoundSigDigits( IHGNumbers( 2 ), 2 ) );
 				ErrorsFound = true;
 			}
 
@@ -468,13 +467,13 @@ namespace ZoneContaminantPredictorCorrector {
 		ZoneContamGenericCutoff.allocate( TotGCGenCutoff );
 
 		for ( Loop = 1; Loop <= TotGCGenCutoff; ++Loop ) {
-			AlphaName = "  ";
+			AlphaName = "";
 			IHGNumbers = 0.0;
 			GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericCutoff.Name(), Loop - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( AlphaName( 1 ), ZoneContamGenericCutoff.Name(), Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
@@ -484,16 +483,16 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericCutoff( Loop ).ZoneName = AlphaName( 2 );
 			ZoneContamGenericCutoff( Loop ).ActualZoneNum = FindItemInList( AlphaName( 2 ), Zone.Name(), NumOfZones );
 			if ( ZoneContamGenericCutoff( Loop ).ActualZoneNum == 0 ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", invalid " + trim( cAlphaFieldNames( 2 ) ) + " entered=" + trim( AlphaName( 2 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
 			}
 
 			ZoneContamGenericCutoff( Loop ).GCGenerateRateSchedPtr = GetScheduleIndex( AlphaName( 3 ) );
 			if ( ZoneContamGenericCutoff( Loop ).GCGenerateRateSchedPtr == 0 ) {
 				if ( lAlphaFieldBlanks( 3 ) ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", " + trim( cAlphaFieldNames( 3 ) ) + " is required." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 3 ) + " is required." );
 				} else {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", invalid " + trim( cAlphaFieldNames( 3 ) ) + " entered=" + trim( AlphaName( 3 ) ) );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + " entered=" + AlphaName( 3 ) );
 				}
 				ErrorsFound = true;
 			} else { // check min/max on schedule
@@ -501,13 +500,13 @@ namespace ZoneContaminantPredictorCorrector {
 				SchMax = GetScheduleMaxValue( ZoneContamGenericCutoff( Loop ).GCGenerateRateSchedPtr );
 				if ( SchMin < 0.0 || SchMax < 0.0 ) {
 					if ( SchMin < 0.0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", " + trim( cAlphaFieldNames( 3 ) ) + ", minimum is < 0.0" );
-						ShowContinueError( "Schedule=\"" + trim( AlphaName( 3 ) ) + "\". Minimum is [" + trim( RoundSigDigits( SchMin, 1 ) ) + "]. Values must be >= 0.0." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 3 ) + ", minimum is < 0.0" );
+						ShowContinueError( "Schedule=\"" + AlphaName( 3 ) + "\". Minimum is [" + RoundSigDigits( SchMin, 1 ) + "]. Values must be >= 0.0." );
 						ErrorsFound = true;
 					}
 					if ( SchMax < 0.0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", " + trim( cAlphaFieldNames( 3 ) ) + ", maximum is < 0.0" );
-						ShowContinueError( "Schedule=\"" + trim( AlphaName( 3 ) ) + "\". Maximum is [" + trim( RoundSigDigits( SchMax, 1 ) ) + "]. Values must be >= 0.0." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 3 ) + ", maximum is < 0.0" );
+						ShowContinueError( "Schedule=\"" + AlphaName( 3 ) + "\". Maximum is [" + RoundSigDigits( SchMax, 1 ) + "]. Values must be >= 0.0." );
 						ErrorsFound = true;
 					}
 				}
@@ -517,13 +516,13 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericCutoff( Loop ).GCCutoffValue = IHGNumbers( 2 );
 
 			if ( IHGNumbers( 1 ) < 0.0 ) {
-				ShowSevereError( RoutineName + "Negative values are not allowed for " + trim( cNumericFieldNames( 1 ) ) + " in " + trim( CurrentModuleObject ) + " = " + trim( AlphaName( 1 ) ) );
-				ShowContinueError( "The input value is " + trim( RoundSigDigits( IHGNumbers( 1 ), 2 ) ) );
+				ShowSevereError( RoutineName + "Negative values are not allowed for " + cNumericFieldNames( 1 ) + " in " + CurrentModuleObject + " = " + AlphaName( 1 ) );
+				ShowContinueError( "The input value is " + RoundSigDigits( IHGNumbers( 1 ), 2 ) );
 				ErrorsFound = true;
 			}
 			if ( IHGNumbers( 2 ) <= 0.0 ) {
-				ShowSevereError( RoutineName + "Negative values or zero are not allowed for " + trim( cNumericFieldNames( 2 ) ) + " in " + trim( CurrentModuleObject ) + " = " + trim( AlphaName( 1 ) ) );
-				ShowContinueError( "The input value is " + trim( RoundSigDigits( IHGNumbers( 2 ), 2 ) ) );
+				ShowSevereError( RoutineName + "Negative values or zero are not allowed for " + cNumericFieldNames( 2 ) + " in " + CurrentModuleObject + " = " + AlphaName( 1 ) );
+				ShowContinueError( "The input value is " + RoundSigDigits( IHGNumbers( 2 ), 2 ) );
 				ErrorsFound = true;
 			}
 
@@ -544,13 +543,13 @@ namespace ZoneContaminantPredictorCorrector {
 		ZoneContamGenericDecay.allocate( TotGCGenDecay );
 
 		for ( Loop = 1; Loop <= TotGCGenDecay; ++Loop ) {
-			AlphaName = "  ";
+			AlphaName = "";
 			IHGNumbers = 0.0;
 			GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericDecay.Name(), Loop - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( AlphaName( 1 ), ZoneContamGenericDecay.Name(), Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
@@ -560,16 +559,16 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericDecay( Loop ).ZoneName = AlphaName( 2 );
 			ZoneContamGenericDecay( Loop ).ActualZoneNum = FindItemInList( AlphaName( 2 ), Zone.Name(), NumOfZones );
 			if ( ZoneContamGenericDecay( Loop ).ActualZoneNum == 0 ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", invalid " + trim( cAlphaFieldNames( 2 ) ) + " entered=" + trim( AlphaName( 2 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
 			}
 
 			ZoneContamGenericDecay( Loop ).GCEmiRateSchedPtr = GetScheduleIndex( AlphaName( 3 ) );
 			if ( ZoneContamGenericDecay( Loop ).GCEmiRateSchedPtr == 0 ) {
 				if ( lAlphaFieldBlanks( 3 ) ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", " + trim( cAlphaFieldNames( 3 ) ) + " is required." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 3 ) + " is required." );
 				} else {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", invalid " + trim( cAlphaFieldNames( 3 ) ) + " entered=" + trim( AlphaName( 3 ) ) );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + " entered=" + AlphaName( 3 ) );
 				}
 				ErrorsFound = true;
 			} else { // check min/max on schedule
@@ -577,13 +576,13 @@ namespace ZoneContaminantPredictorCorrector {
 				SchMax = GetScheduleMaxValue( ZoneContamGenericDecay( Loop ).GCEmiRateSchedPtr );
 				if ( SchMin < 0.0 || SchMax < 0.0 ) {
 					if ( SchMin < 0.0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", " + trim( cAlphaFieldNames( 3 ) ) + ", minimum is < 0.0" );
-						ShowContinueError( "Schedule=\"" + trim( AlphaName( 3 ) ) + "\". Minimum is [" + trim( RoundSigDigits( SchMin, 1 ) ) + "]. Values must be >= 0.0." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 3 ) + ", minimum is < 0.0" );
+						ShowContinueError( "Schedule=\"" + AlphaName( 3 ) + "\". Minimum is [" + RoundSigDigits( SchMin, 1 ) + "]. Values must be >= 0.0." );
 						ErrorsFound = true;
 					}
 					if ( SchMax < 0.0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", " + trim( cAlphaFieldNames( 3 ) ) + ", maximum is < 0.0" );
-						ShowContinueError( "Schedule=\"" + trim( AlphaName( 3 ) ) + "\". Maximum is [" + trim( RoundSigDigits( SchMax, 1 ) ) + "]. Values must be >= 0.0." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 3 ) + ", maximum is < 0.0" );
+						ShowContinueError( "Schedule=\"" + AlphaName( 3 ) + "\". Maximum is [" + RoundSigDigits( SchMax, 1 ) + "]. Values must be >= 0.0." );
 						ErrorsFound = true;
 					}
 				}
@@ -593,13 +592,13 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericDecay( Loop ).GCDelayTime = IHGNumbers( 2 );
 
 			if ( IHGNumbers( 1 ) < 0.0 ) {
-				ShowSevereError( RoutineName + "Negative values are not allowed for " + trim( cNumericFieldNames( 1 ) ) + " in " + trim( CurrentModuleObject ) + " = " + trim( AlphaName( 1 ) ) );
-				ShowContinueError( "The input value is " + trim( RoundSigDigits( IHGNumbers( 1 ), 2 ) ) );
+				ShowSevereError( RoutineName + "Negative values are not allowed for " + cNumericFieldNames( 1 ) + " in " + CurrentModuleObject + " = " + AlphaName( 1 ) );
+				ShowContinueError( "The input value is " + RoundSigDigits( IHGNumbers( 1 ), 2 ) );
 				ErrorsFound = true;
 			}
 			if ( IHGNumbers( 2 ) <= 0.0 ) {
-				ShowSevereError( RoutineName + "Negative values or zero are not allowed for " + trim( cNumericFieldNames( 2 ) ) + " in " + trim( CurrentModuleObject ) + " = " + trim( AlphaName( 1 ) ) );
-				ShowContinueError( "The input value is " + trim( RoundSigDigits( IHGNumbers( 2 ), 2 ) ) );
+				ShowSevereError( RoutineName + "Negative values or zero are not allowed for " + cNumericFieldNames( 2 ) + " in " + CurrentModuleObject + " = " + AlphaName( 1 ) );
+				ShowContinueError( "The input value is " + RoundSigDigits( IHGNumbers( 2 ), 2 ) );
 				ErrorsFound = true;
 			}
 
@@ -621,13 +620,13 @@ namespace ZoneContaminantPredictorCorrector {
 		ZoneContamGenericBLDiff.allocate( TotGCBLDiff );
 
 		for ( Loop = 1; Loop <= TotGCBLDiff; ++Loop ) {
-			AlphaName = "  ";
+			AlphaName = "";
 			IHGNumbers = 0.0;
 			GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericBLDiff.Name(), Loop - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( AlphaName( 1 ), ZoneContamGenericBLDiff.Name(), Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
@@ -637,16 +636,16 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericBLDiff( Loop ).SurfName = AlphaName( 2 );
 			ZoneContamGenericBLDiff( Loop ).SurfNum = FindItemInList( AlphaName( 2 ), Surface.Name(), TotSurfaces );
 			if ( ZoneContamGenericBLDiff( Loop ).SurfNum == 0 ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", invalid " + trim( cAlphaFieldNames( 2 ) ) + " entered=" + trim( AlphaName( 2 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
 			}
 
 			ZoneContamGenericBLDiff( Loop ).GCTranCoefSchedPtr = GetScheduleIndex( AlphaName( 3 ) );
 			if ( ZoneContamGenericBLDiff( Loop ).GCTranCoefSchedPtr == 0 ) {
 				if ( lAlphaFieldBlanks( 3 ) ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", " + trim( cAlphaFieldNames( 3 ) ) + " is required." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 3 ) + " is required." );
 				} else {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", invalid " + trim( cAlphaFieldNames( 3 ) ) + " entered=" + trim( AlphaName( 3 ) ) );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + " entered=" + AlphaName( 3 ) );
 				}
 				ErrorsFound = true;
 			} else { // check min/max on schedule
@@ -654,13 +653,13 @@ namespace ZoneContaminantPredictorCorrector {
 				SchMax = GetScheduleMaxValue( ZoneContamGenericBLDiff( Loop ).GCTranCoefSchedPtr );
 				if ( SchMin < 0.0 || SchMax < 0.0 ) {
 					if ( SchMin < 0.0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", " + trim( cAlphaFieldNames( 3 ) ) + ", minimum is < 0.0" );
-						ShowContinueError( "Schedule=\"" + trim( AlphaName( 3 ) ) + "\". Minimum is [" + trim( RoundSigDigits( SchMin, 1 ) ) + "]. Values must be >= 0.0." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 3 ) + ", minimum is < 0.0" );
+						ShowContinueError( "Schedule=\"" + AlphaName( 3 ) + "\". Minimum is [" + RoundSigDigits( SchMin, 1 ) + "]. Values must be >= 0.0." );
 						ErrorsFound = true;
 					}
 					if ( SchMax < 0.0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", " + trim( cAlphaFieldNames( 3 ) ) + ", maximum is < 0.0" );
-						ShowContinueError( "Schedule=\"" + trim( AlphaName( 3 ) ) + "\". Maximum is [" + trim( RoundSigDigits( SchMax, 1 ) ) + "]. Values must be >= 0.0." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 3 ) + ", maximum is < 0.0" );
+						ShowContinueError( "Schedule=\"" + AlphaName( 3 ) + "\". Maximum is [" + RoundSigDigits( SchMax, 1 ) + "]. Values must be >= 0.0." );
 						ErrorsFound = true;
 					}
 				}
@@ -669,13 +668,13 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericBLDiff( Loop ).GCTranCoef = IHGNumbers( 1 );
 			ZoneContamGenericBLDiff( Loop ).GCHenryCoef = IHGNumbers( 2 );
 			if ( IHGNumbers( 1 ) < 0.0 ) {
-				ShowSevereError( RoutineName + "Negative values are not allowed for " + trim( cNumericFieldNames( 1 ) ) + " in " + trim( CurrentModuleObject ) + " = " + trim( AlphaName( 1 ) ) );
-				ShowContinueError( "The input value is " + trim( RoundSigDigits( IHGNumbers( 1 ), 2 ) ) );
+				ShowSevereError( RoutineName + "Negative values are not allowed for " + cNumericFieldNames( 1 ) + " in " + CurrentModuleObject + " = " + AlphaName( 1 ) );
+				ShowContinueError( "The input value is " + RoundSigDigits( IHGNumbers( 1 ), 2 ) );
 				ErrorsFound = true;
 			}
 			if ( IHGNumbers( 2 ) <= 0.0 ) {
-				ShowSevereError( RoutineName + "Negative values or zero are not allowed for " + trim( cNumericFieldNames( 2 ) ) + " in " + trim( CurrentModuleObject ) + " = " + trim( AlphaName( 1 ) ) );
-				ShowContinueError( "The input value is " + trim( RoundSigDigits( IHGNumbers( 2 ), 2 ) ) );
+				ShowSevereError( RoutineName + "Negative values or zero are not allowed for " + cNumericFieldNames( 2 ) + " in " + CurrentModuleObject + " = " + AlphaName( 1 ) );
+				ShowContinueError( "The input value is " + RoundSigDigits( IHGNumbers( 2 ), 2 ) );
 				ErrorsFound = true;
 			}
 
@@ -697,13 +696,13 @@ namespace ZoneContaminantPredictorCorrector {
 		ZoneContamGenericDVS.allocate( TotGCDVS );
 
 		for ( Loop = 1; Loop <= TotGCDVS; ++Loop ) {
-			AlphaName = "  ";
+			AlphaName = "";
 			IHGNumbers = 0.0;
 			GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericDVS.Name(), Loop - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( AlphaName( 1 ), ZoneContamGenericDVS.Name(), Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
@@ -713,16 +712,16 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericDVS( Loop ).SurfName = AlphaName( 2 );
 			ZoneContamGenericDVS( Loop ).SurfNum = FindItemInList( AlphaName( 2 ), Surface.Name(), TotSurfaces );
 			if ( ZoneContamGenericDVS( Loop ).SurfNum == 0 ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", invalid " + trim( cAlphaFieldNames( 2 ) ) + " entered=" + trim( AlphaName( 2 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
 			}
 
 			ZoneContamGenericDVS( Loop ).GCDepoVeloPtr = GetScheduleIndex( AlphaName( 3 ) );
 			if ( ZoneContamGenericDVS( Loop ).GCDepoVeloPtr == 0 ) {
 				if ( lAlphaFieldBlanks( 3 ) ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", " + trim( cAlphaFieldNames( 3 ) ) + " is required." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 3 ) + " is required." );
 				} else {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", invalid " + trim( cAlphaFieldNames( 3 ) ) + " entered=" + trim( AlphaName( 3 ) ) );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + " entered=" + AlphaName( 3 ) );
 				}
 				ErrorsFound = true;
 			} else { // check min/max on schedule
@@ -730,13 +729,13 @@ namespace ZoneContaminantPredictorCorrector {
 				SchMax = GetScheduleMaxValue( ZoneContamGenericDVS( Loop ).GCDepoVeloPtr );
 				if ( SchMin < 0.0 || SchMax < 0.0 ) {
 					if ( SchMin < 0.0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", " + trim( cAlphaFieldNames( 3 ) ) + ", minimum is < 0.0" );
-						ShowContinueError( "Schedule=\"" + trim( AlphaName( 3 ) ) + "\". Minimum is [" + trim( RoundSigDigits( SchMin, 1 ) ) + "]. Values must be >= 0.0." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 3 ) + ", minimum is < 0.0" );
+						ShowContinueError( "Schedule=\"" + AlphaName( 3 ) + "\". Minimum is [" + RoundSigDigits( SchMin, 1 ) + "]. Values must be >= 0.0." );
 						ErrorsFound = true;
 					}
 					if ( SchMax < 0.0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", " + trim( cAlphaFieldNames( 3 ) ) + ", maximum is < 0.0" );
-						ShowContinueError( "Schedule=\"" + trim( AlphaName( 3 ) ) + "\". Maximum is [" + trim( RoundSigDigits( SchMax, 1 ) ) + "]. Values must be >= 0.0." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 3 ) + ", maximum is < 0.0" );
+						ShowContinueError( "Schedule=\"" + AlphaName( 3 ) + "\". Maximum is [" + RoundSigDigits( SchMax, 1 ) + "]. Values must be >= 0.0." );
 						ErrorsFound = true;
 					}
 				}
@@ -744,8 +743,8 @@ namespace ZoneContaminantPredictorCorrector {
 
 			ZoneContamGenericDVS( Loop ).GCDepoVelo = IHGNumbers( 1 );
 			if ( IHGNumbers( 1 ) < 0.0 ) {
-				ShowSevereError( RoutineName + "Negative values are not allowed for " + trim( cNumericFieldNames( 1 ) ) + " in " + trim( CurrentModuleObject ) + " = " + trim( AlphaName( 1 ) ) );
-				ShowContinueError( "The input value is " + trim( RoundSigDigits( IHGNumbers( 1 ), 2 ) ) );
+				ShowSevereError( RoutineName + "Negative values are not allowed for " + cNumericFieldNames( 1 ) + " in " + CurrentModuleObject + " = " + AlphaName( 1 ) );
+				ShowContinueError( "The input value is " + RoundSigDigits( IHGNumbers( 1 ), 2 ) );
 				ErrorsFound = true;
 			}
 
@@ -766,13 +765,13 @@ namespace ZoneContaminantPredictorCorrector {
 		ZoneContamGenericDRS.allocate( TotGCDRS );
 
 		for ( Loop = 1; Loop <= TotGCDRS; ++Loop ) {
-			AlphaName = "  ";
+			AlphaName = "";
 			IHGNumbers = 0.0;
 			GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericDRS.Name(), Loop - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( AlphaName( 1 ), ZoneContamGenericDRS.Name(), Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
@@ -782,16 +781,16 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericDRS( Loop ).ZoneName = AlphaName( 2 );
 			ZoneContamGenericDRS( Loop ).ActualZoneNum = FindItemInList( AlphaName( 2 ), Zone.Name(), NumOfZones );
 			if ( ZoneContamGenericDRS( Loop ).ActualZoneNum == 0 ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", invalid " + trim( cAlphaFieldNames( 2 ) ) + " entered=" + trim( AlphaName( 2 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
 			}
 
 			ZoneContamGenericDRS( Loop ).GCDepoRatePtr = GetScheduleIndex( AlphaName( 3 ) );
 			if ( ZoneContamGenericDRS( Loop ).GCDepoRatePtr == 0 ) {
 				if ( lAlphaFieldBlanks( 3 ) ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", " + trim( cAlphaFieldNames( 3 ) ) + " is required." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 3 ) + " is required." );
 				} else {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", invalid " + trim( cAlphaFieldNames( 3 ) ) + " entered=" + trim( AlphaName( 3 ) ) );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + " entered=" + AlphaName( 3 ) );
 				}
 				ErrorsFound = true;
 			} else { // check min/max on schedule
@@ -799,13 +798,13 @@ namespace ZoneContaminantPredictorCorrector {
 				SchMax = GetScheduleMaxValue( ZoneContamGenericDRS( Loop ).GCDepoRatePtr );
 				if ( SchMin < 0.0 || SchMax < 0.0 ) {
 					if ( SchMin < 0.0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", " + trim( cAlphaFieldNames( 3 ) ) + ", minimum is < 0.0" );
-						ShowContinueError( "Schedule=\"" + trim( AlphaName( 3 ) ) + "\". Minimum is [" + trim( RoundSigDigits( SchMin, 1 ) ) + "]. Values must be >= 0.0." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 3 ) + ", minimum is < 0.0" );
+						ShowContinueError( "Schedule=\"" + AlphaName( 3 ) + "\". Minimum is [" + RoundSigDigits( SchMin, 1 ) + "]. Values must be >= 0.0." );
 						ErrorsFound = true;
 					}
 					if ( SchMax < 0.0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( AlphaName( 1 ) ) + "\", " + trim( cAlphaFieldNames( 3 ) ) + ", maximum is < 0.0" );
-						ShowContinueError( "Schedule=\"" + trim( AlphaName( 3 ) ) + "\". Maximum is [" + trim( RoundSigDigits( SchMax, 1 ) ) + "]. Values must be >= 0.0." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 3 ) + ", maximum is < 0.0" );
+						ShowContinueError( "Schedule=\"" + AlphaName( 3 ) + "\". Maximum is [" + RoundSigDigits( SchMax, 1 ) + "]. Values must be >= 0.0." );
 						ErrorsFound = true;
 					}
 				}
@@ -814,8 +813,8 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericDRS( Loop ).GCDepoRate = IHGNumbers( 1 );
 
 			if ( IHGNumbers( 1 ) < 0.0 ) {
-				ShowSevereError( RoutineName + "Negative values are not allowed for " + trim( cNumericFieldNames( 1 ) ) + " in " + trim( CurrentModuleObject ) + " = " + trim( AlphaName( 1 ) ) );
-				ShowContinueError( "The input value is " + trim( RoundSigDigits( IHGNumbers( 1 ), 2 ) ) );
+				ShowSevereError( RoutineName + "Negative values are not allowed for " + cNumericFieldNames( 1 ) + " in " + CurrentModuleObject + " = " + AlphaName( 1 ) );
+				ShowContinueError( "The input value is " + RoundSigDigits( IHGNumbers( 1 ), 2 ) );
 				ErrorsFound = true;
 			}
 
@@ -951,7 +950,7 @@ namespace ZoneContaminantPredictorCorrector {
 			GetObjectItem( cCurrentModuleObject, ContControlledZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ContaminantControlledZone.Name(), ContControlledZoneNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ContaminantControlledZone.Name(), ContControlledZoneNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -960,7 +959,7 @@ namespace ZoneContaminantPredictorCorrector {
 			ContaminantControlledZone( ContControlledZoneNum ).ZoneName = cAlphaArgs( 2 );
 			ContaminantControlledZone( ContControlledZoneNum ).ActualZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
 			if ( ContaminantControlledZone( ContControlledZoneNum ).ActualZoneNum == 0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" not found." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 				ErrorsFound = true;
 			} else {
 				//      Zone(ContaminantControlledZone(ContControlledZoneNum)%ActualZoneNum)%TempControlledZoneIndex = ContControlledZoneNum
@@ -972,13 +971,13 @@ namespace ZoneContaminantPredictorCorrector {
 			} else {
 				ContaminantControlledZone( ContControlledZoneNum ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
 				if ( ContaminantControlledZone( ContControlledZoneNum ).AvaiSchedPtr == 0 ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( cAlphaArgs( 3 ) ) + "\" not found." );
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\" not found." );
 					ErrorsFound = true;
 				} else {
 					// Check validity of control types.
 					ValidScheduleType = CheckScheduleValueMinMax( ContaminantControlledZone( ContControlledZoneNum ).AvaiSchedPtr, ">=", 0.0, "<=", 1.0 );
 					if ( ! ValidScheduleType ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid range " + trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( cAlphaArgs( 3 ) ) + "\"" );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid range " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"" );
 						ShowContinueError( "..contains values outside of range [0,1]." );
 						ErrorsFound = true;
 					} else {
@@ -990,13 +989,13 @@ namespace ZoneContaminantPredictorCorrector {
 			ContaminantControlledZone( ContControlledZoneNum ).SetPointSchedName = cAlphaArgs( 4 );
 			ContaminantControlledZone( ContControlledZoneNum ).SPSchedIndex = GetScheduleIndex( cAlphaArgs( 4 ) );
 			if ( ContaminantControlledZone( ContControlledZoneNum ).SPSchedIndex == 0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 4 ) ) + "=\"" + trim( cAlphaArgs( 4 ) ) + "\" not found." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" not found." );
 				ErrorsFound = true;
 			} else {
 				// Check validity of control types.
 				ValidScheduleType = CheckScheduleValueMinMax( ContaminantControlledZone( ContControlledZoneNum ).SPSchedIndex, ">=", 0.0, "<=", 2000.0 );
 				if ( ! ValidScheduleType ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid range " + trim( cAlphaFieldNames( 4 ) ) + "=\"" + trim( cAlphaArgs( 4 ) ) + "\"" );
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid range " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"" );
 					ShowContinueError( "..contains values outside of range [0,2000 ppm]." );
 					ErrorsFound = true;
 				}
@@ -1008,7 +1007,7 @@ namespace ZoneContaminantPredictorCorrector {
 				// Check validity of control types.
 				ValidScheduleType = CheckScheduleValueMinMax( ContaminantControlledZone( ContControlledZoneNum ).ZoneMinCO2SchedIndex, ">=", 0.0, "<=", 2000.0 );
 				if ( ! ValidScheduleType ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid range " + trim( cAlphaFieldNames( 5 ) ) + "=\"" + trim( cAlphaArgs( 5 ) ) + "\"" );
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid range " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"" );
 					ShowContinueError( "..contains values outside of range [0,2000 ppm]." );
 					ErrorsFound = true;
 				} else {
@@ -1023,26 +1022,26 @@ namespace ZoneContaminantPredictorCorrector {
 				} else {
 					ContaminantControlledZone( ContControlledZoneNum ).GCAvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 6 ) );
 					if ( ContaminantControlledZone( ContControlledZoneNum ).AvaiSchedPtr == 0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( cAlphaArgs( 6 ) ) + "\" not found." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 6 ) + "\" not found." );
 						ErrorsFound = true;
 					} else {
 						// Check validity of control types.
 						ValidScheduleType = CheckScheduleValueMinMax( ContaminantControlledZone( ContControlledZoneNum ).GCAvaiSchedPtr, ">=", 0.0, "<=", 1.0 );
 						if ( ! ValidScheduleType ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid range " + trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( cAlphaArgs( 6 ) ) + "\"" );
+							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid range " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 6 ) + "\"" );
 							ShowContinueError( "..contains values outside of range [0,1]." );
 							ErrorsFound = true;
 						}
 					}
 				}
 				if ( lAlphaFieldBlanks( 7 ) ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( cAlphaArgs( 7 ) ) + "\" is required, but blank." );
+					ShowSevereError( cCurrentModuleObject + " \"" + cAlphaArgs( 7 ) + "\" is required, but blank." );
 					ErrorsFound = true;
 				} else {
 					ContaminantControlledZone( ContControlledZoneNum ).GCSetPointSchedName = cAlphaArgs( 7 );
 					ContaminantControlledZone( ContControlledZoneNum ).GCSPSchedIndex = GetScheduleIndex( cAlphaArgs( 7 ) );
 					if ( ContaminantControlledZone( ContControlledZoneNum ).GCSPSchedIndex == 0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 7 ) ) + "=\"" + trim( cAlphaArgs( 7 ) ) + "\" not found." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" not found." );
 						ErrorsFound = true;
 					}
 				}
@@ -1352,7 +1351,7 @@ namespace ZoneContaminantPredictorCorrector {
 						}
 					}
 				} else {
-					ShowSevereError( "ZoneControl:ContaminantController: a corresponding AirLoopHVAC is not found for the " "controlled zone =" + trim( Zone( ZoneNum ).Name ) );
+					ShowSevereError( "ZoneControl:ContaminantController: a corresponding AirLoopHVAC is not found for the " "controlled zone =" + Zone( ZoneNum ).Name );
 					ErrorsFound = true;
 				}
 			}

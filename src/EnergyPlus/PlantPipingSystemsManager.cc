@@ -6,6 +6,7 @@
 #include <ObjexxFCL/floops.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <PlantPipingSystemsManager.hh>
@@ -57,17 +58,16 @@ namespace PlantPipingSystemsManager {
 	// na
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::OutputFileDebug;
 	using DataGlobals::Pi;
 	using namespace DataPlantPipingSystems;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
-	Fstring const ObjName_ug_GeneralDomain( "PipingSystem:Underground:Domain" );
-	Fstring const ObjName_Circuit( "PipingSystem:Underground:PipeCircuit" );
-	Fstring const ObjName_Segment( "PipingSystem:Underground:PipeSegment" );
-	Fstring const ObjName_HorizTrench( "GroundHeatExchanger:HorizontalTrench" );
+	std::string const ObjName_ug_GeneralDomain( "PipingSystem:Underground:Domain" );
+	std::string const ObjName_Circuit( "PipingSystem:Underground:PipeCircuit" );
+	std::string const ObjName_Segment( "PipingSystem:Underground:PipeSegment" );
+	std::string const ObjName_HorizTrench( "GroundHeatExchanger:HorizontalTrench" );
 
 	// MODULE INTERFACE DEFINITIONS:
 
@@ -118,7 +118,7 @@ namespace PlantPipingSystemsManager {
 
 	void
 	SimPipingSystemCircuit(
-		Fstring const & EquipName, // name of the Pipe Heat Transfer.
+		std::string const & EquipName, // name of the Pipe Heat Transfer.
 		int & EqNum, // index in local derived types for external calling
 		bool const FirstHVACIteration, // component number
 		bool const InitLoopEquip
@@ -148,7 +148,7 @@ namespace PlantPipingSystemsManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "SimPipingSystems" );
+		static std::string const RoutineName( "SimPipingSystems" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true ); // First time, input is "gotten"
@@ -171,17 +171,17 @@ namespace PlantPipingSystemsManager {
 			CircuitNum = FindItemInList( EquipName, PipingSystemCircuits.Name(), NumOfPipeCircuits );
 			if ( CircuitNum == 0 ) {
 				// Catch any bad names before crashing
-				ShowFatalError( RoutineName + ": Piping circuit requested not found=" + trim( EquipName ) );
+				ShowFatalError( RoutineName + ": Piping circuit requested not found=" + EquipName );
 			}
 			EqNum = CircuitNum;
 		} else {
 			CircuitNum = EqNum;
 			if ( CircuitNum > NumOfPipeCircuits || CircuitNum < 1 ) {
-				ShowFatalError( RoutineName + ":  Invalid component index passed=" + trim( TrimSigDigits( DomainNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumOfPipeCircuits ) ) + ", Entered Unit name=" + trim( EquipName ) ); //Autodesk:Uninit DomainNum was uninitialized
+				ShowFatalError( RoutineName + ":  Invalid component index passed=" + TrimSigDigits( DomainNum ) + ", Number of Units=" + TrimSigDigits( NumOfPipeCircuits ) + ", Entered Unit name=" + EquipName ); //Autodesk:Uninit DomainNum was uninitialized
 			}
 			if ( PipingSystemCircuits( CircuitNum ).CheckEquipName ) {
 				if ( EquipName != PipingSystemCircuits( CircuitNum ).Name ) {
-					ShowFatalError( RoutineName + ": Invalid component name passed=" + trim( TrimSigDigits( CircuitNum ) ) + ", Unit name=" + trim( EquipName ) + ", stored Unit Name for that index=" + trim( PipingSystemCircuits( CircuitNum ).Name ) );
+					ShowFatalError( RoutineName + ": Invalid component name passed=" + TrimSigDigits( CircuitNum ) + ", Unit name=" + EquipName + ", stored Unit Name for that index=" + PipingSystemCircuits( CircuitNum ).Name );
 				}
 				PipingSystemCircuits( CircuitNum ).CheckEquipName = false;
 			}
@@ -231,7 +231,6 @@ namespace PlantPipingSystemsManager {
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::FindItemInList;
 		using InputProcessor::SameString;
-		using DataGlobals::MaxNameLength;
 		using General::TrimSigDigits;
 
 		// Locals
@@ -239,7 +238,7 @@ namespace PlantPipingSystemsManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetPipingSystemsInput" );
+		static std::string const RoutineName( "GetPipingSystemsInput" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -264,7 +263,7 @@ namespace PlantPipingSystemsManager {
 		int TotalNumCircuits;
 		int TotalNumSegments;
 		int ThisCircuitPipeSegmentCounter;
-		Fstring ThisSegmentName( MaxNameLength );
+		std::string ThisSegmentName;
 		int InputPipeSegmentCounter;
 
 		//Read number of objects and allocate main data structures - first domains
@@ -308,8 +307,8 @@ namespace PlantPipingSystemsManager {
 					PipingSystemCircuits( CircuitCtr ).PipeSegmentIndeces( ThisCircuitPipeSegmentCounter ) = ThisSegmentIndex;
 					PipingSystemSegments( ThisSegmentIndex ).ParentCircuitIndex = CircuitCtr;
 				} else {
-					ShowSevereError( RoutineName + ": Could not match a pipe segment for: " + trim( ObjName_Circuit ) + "=" + trim( PipingSystemCircuits( CircuitCtr ).Name ) );
-					ShowContinueError( RoutineName + ": Looking for: " + trim( ObjName_Segment ) + "=" + trim( ThisSegmentName ) );
+					ShowSevereError( RoutineName + ": Could not match a pipe segment for: " + ObjName_Circuit + '=' + PipingSystemCircuits( CircuitCtr ).Name );
+					ShowContinueError( RoutineName + ": Looking for: " + ObjName_Segment + '=' + ThisSegmentName );
 					ErrorsFound = true;
 				}
 
@@ -362,8 +361,8 @@ namespace PlantPipingSystemsManager {
 					ThisSegmentIndex = PipingSystemCircuits( CircuitCtr ).PipeSegmentIndeces( PipeCtr );
 					if ( ( PipingSystemSegments( ThisSegmentIndex ).PipeLocation.X > PipingSystemDomains( DomainNum ).Extents.Xmax ) || ( PipingSystemSegments( ThisSegmentIndex ).PipeLocation.X < 0.0 ) || ( PipingSystemSegments( ThisSegmentIndex ).PipeLocation.Y > PipingSystemDomains( DomainNum ).Extents.Ymax ) || ( PipingSystemSegments( ThisSegmentIndex ).PipeLocation.Y < 0.0 ) ) {
 						ShowSevereError( "PipingSystems::" + RoutineName + ":A pipe was found to be outside of the domain extents" " after performing any corrections for basement or burial depth." );
-						ShowContinueError( "Pipe segment name:" + trim( PipingSystemSegments( ThisSegmentIndex ).Name ) );
-						ShowContinueError( "Corrected pipe location: (x,y)=(" + TrimSigDigits( PipingSystemSegments( ThisSegmentIndex ).PipeLocation.X, 2 ) + "," + TrimSigDigits( PipingSystemSegments( ThisSegmentIndex ).PipeLocation.Y, 2 ) + ")" );
+						ShowContinueError( "Pipe segment name:" + PipingSystemSegments( ThisSegmentIndex ).Name );
+						ShowContinueError( "Corrected pipe location: (x,y)=(" + TrimSigDigits( PipingSystemSegments( ThisSegmentIndex ).PipeLocation.X, 2 ) + ',' + TrimSigDigits( PipingSystemSegments( ThisSegmentIndex ).PipeLocation.Y, 2 ) + ')' );
 					}
 				} //segment loop
 
@@ -373,7 +372,7 @@ namespace PlantPipingSystemsManager {
 
 		//If we encountered any other errors that we couldn't handle separately than stop now
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + ":" + ObjName_ug_GeneralDomain + ": Errors found in input." );
+			ShowFatalError( RoutineName + ':' + ObjName_ug_GeneralDomain + ": Errors found in input." );
 		}
 
 	}
@@ -484,7 +483,7 @@ namespace PlantPipingSystemsManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "ReadGeneralDomainInputs" );
+		static std::string const RoutineName( "ReadGeneralDomainInputs" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DomainNum; // Item to be "gotten"
@@ -509,7 +508,7 @@ namespace PlantPipingSystemsManager {
 			PipingSystemDomains( DomainNum ).Name = cAlphaArgs( 1 );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PipingSystemDomains.Name(), DomainNum - 1, IsNotOK, IsBlank, trim( ObjName_ug_GeneralDomain ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), PipingSystemDomains.Name(), DomainNum - 1, IsNotOK, IsBlank, ObjName_ug_GeneralDomain + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				cAlphaArgs( 1 ) = "Duplicate name encountered";
@@ -532,7 +531,7 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainNum ).Mesh.X.MeshDistribution = MeshDistribution_SymmetricGeometric;
 				if ( mod( PipingSystemDomains( DomainNum ).Mesh.X.RegionMeshCount, 2 ) != 0 ) {
 					ShowWarningError( "PipingSystems:" + RoutineName + ": Invalid mesh type-count combination." );
-					ShowContinueError( "Instance:" + ObjName_ug_GeneralDomain + "=" + trim( PipingSystemDomains( DomainNum ).Name ) );
+					ShowContinueError( "Instance:" + ObjName_ug_GeneralDomain + '=' + PipingSystemDomains( DomainNum ).Name );
 					ShowContinueError( "An ODD-valued X mesh count was found in the input for symmetric geometric configuration." );
 					ShowContinueError( "This is invalid, mesh count incremented UP by one to next EVEN value." );
 					++PipingSystemDomains( DomainNum ).Mesh.X.RegionMeshCount;
@@ -546,14 +545,14 @@ namespace PlantPipingSystemsManager {
 
 			//Y direction mesh inputs, validated by IP
 			PipingSystemDomains( DomainNum ).Mesh.Y.RegionMeshCount = rNumericArgs( 6 );
-			{ auto const SELECT_CASE_var( trim( adjustl( cAlphaArgs( 3 ) ) ) );
+			{ auto const SELECT_CASE_var( stripped( cAlphaArgs( 3 ) ) );
 			if ( SELECT_CASE_var == "UNIFORM" ) {
 				PipingSystemDomains( DomainNum ).Mesh.Y.MeshDistribution = MeshDistribution_Uniform;
 			} else if ( SELECT_CASE_var == "SYMMETRICGEOMETRIC" ) {
 				PipingSystemDomains( DomainNum ).Mesh.Y.MeshDistribution = MeshDistribution_SymmetricGeometric;
 				if ( mod( PipingSystemDomains( DomainNum ).Mesh.Y.RegionMeshCount, 2 ) != 0 ) {
 					ShowWarningError( "PipingSystems:" + RoutineName + ": Invalid mesh type-count combination." );
-					ShowContinueError( "Instance:" + ObjName_ug_GeneralDomain + "=" + trim( PipingSystemDomains( DomainNum ).Name ) );
+					ShowContinueError( "Instance:" + ObjName_ug_GeneralDomain + '=' + PipingSystemDomains( DomainNum ).Name );
 					ShowContinueError( "An ODD-valued Y mesh count was found in the input for symmetric geometric configuration." );
 					ShowContinueError( "This is invalid, mesh count incremented UP by one to next EVEN value." );
 					++PipingSystemDomains( DomainNum ).Mesh.Y.RegionMeshCount;
@@ -567,14 +566,14 @@ namespace PlantPipingSystemsManager {
 
 			//Z direction mesh inputs, validated by IP
 			PipingSystemDomains( DomainNum ).Mesh.Z.RegionMeshCount = rNumericArgs( 8 );
-			{ auto const SELECT_CASE_var( trim( adjustl( cAlphaArgs( 4 ) ) ) );
+			{ auto const SELECT_CASE_var( stripped( cAlphaArgs( 4 ) ) );
 			if ( SELECT_CASE_var == "UNIFORM" ) {
 				PipingSystemDomains( DomainNum ).Mesh.Z.MeshDistribution = MeshDistribution_Uniform;
 			} else if ( SELECT_CASE_var == "SYMMETRICGEOMETRIC" ) {
 				PipingSystemDomains( DomainNum ).Mesh.Z.MeshDistribution = MeshDistribution_SymmetricGeometric;
 				if ( mod( PipingSystemDomains( DomainNum ).Mesh.Z.RegionMeshCount, 2 ) != 0 ) {
 					ShowWarningError( "PipingSystems:" + RoutineName + ": Invalid mesh type-count combination." );
-					ShowContinueError( "Instance:" + ObjName_ug_GeneralDomain + "=" + trim( PipingSystemDomains( DomainNum ).Name ) );
+					ShowContinueError( "Instance:" + ObjName_ug_GeneralDomain + '=' + PipingSystemDomains( DomainNum ).Name );
 					ShowContinueError( "An ODD-valued Z mesh count was found in the input for symmetric geometric configuration." );
 					ShowContinueError( "This is invalid, mesh count incremented UP by one to next EVEN value." );
 					++PipingSystemDomains( DomainNum ).Mesh.Z.RegionMeshCount;
@@ -618,7 +617,7 @@ namespace PlantPipingSystemsManager {
 				// check if there are blank inputs related to the basement,
 				// IP can't catch this because they are inherently optional if there ISN'T a basement
 				if ( lNumericFieldBlanks( 18 ) || lNumericFieldBlanks( 19 ) || lAlphaFieldBlanks( 6 ) || lAlphaFieldBlanks( 7 ) || lAlphaFieldBlanks( 8 ) ) {
-					ShowSevereError( "Erroneous basement inputs for " + trim( ObjName_ug_GeneralDomain ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Erroneous basement inputs for " + ObjName_ug_GeneralDomain + '=' + cAlphaArgs( 1 ) );
 					ShowContinueError( "Object specified to have a basement, while at least one basement input was left blank." );
 					ErrorsFound = true;
 				}
@@ -740,7 +739,7 @@ namespace PlantPipingSystemsManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "ReadPipeCircuitInputs" );
+		static std::string const RoutineName( "ReadPipeCircuitInputs" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumPipeSegments;
@@ -763,7 +762,7 @@ namespace PlantPipingSystemsManager {
 			PipingSystemCircuits( PipeCircuitCounter ).Name = cAlphaArgs( 1 );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PipingSystemCircuits.Name(), PipeCircuitCounter - 1, IsNotOK, IsBlank, trim( ObjName_Circuit ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), PipingSystemCircuits.Name(), PipeCircuitCounter - 1, IsNotOK, IsBlank, ObjName_Circuit + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				cAlphaArgs( 1 ) = "Duplicate name encountered";
@@ -790,18 +789,18 @@ namespace PlantPipingSystemsManager {
 
 			//Read inlet and outlet node names and validate them
 			PipingSystemCircuits( PipeCircuitCounter ).InletNodeName = cAlphaArgs( 2 );
-			PipingSystemCircuits( PipeCircuitCounter ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, trim( ObjName_Circuit ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			PipingSystemCircuits( PipeCircuitCounter ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, ObjName_Circuit, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 			if ( PipingSystemCircuits( PipeCircuitCounter ).InletNodeNum == 0 ) {
 				CurIndex = 2;
 				IssueSevereInputFieldError( RoutineName, ObjName_Circuit, cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), cAlphaArgs( CurIndex ), "Bad node name.", ErrorsFound );
 			}
 			PipingSystemCircuits( PipeCircuitCounter ).OutletNodeName = cAlphaArgs( 3 );
-			PipingSystemCircuits( PipeCircuitCounter ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( ObjName_Circuit ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			PipingSystemCircuits( PipeCircuitCounter ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, ObjName_Circuit, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 			if ( PipingSystemCircuits( PipeCircuitCounter ).OutletNodeNum == 0 ) {
 				CurIndex = 3;
 				IssueSevereInputFieldError( RoutineName, ObjName_Circuit, cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), cAlphaArgs( CurIndex ), "Bad node name.", ErrorsFound );
 			}
-			TestCompSet( trim( ObjName_Circuit ), cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Piping System Circuit Nodes" );
+			TestCompSet( ObjName_Circuit, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Piping System Circuit Nodes" );
 
 			//Convergence tolerance values, validated by IP
 			PipingSystemCircuits( PipeCircuitCounter ).Convergence_CurrentToPrevIteration = rNumericArgs( 7 );
@@ -866,7 +865,7 @@ namespace PlantPipingSystemsManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "ReadPipeSegmentInputs" );
+		static std::string const RoutineName( "ReadPipeSegmentInputs" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int SegmentCtr;
@@ -887,7 +886,7 @@ namespace PlantPipingSystemsManager {
 			PipingSystemSegments( SegmentCtr ).Name = cAlphaArgs( 1 );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PipingSystemSegments.Name(), SegmentCtr - 1, IsNotOK, IsBlank, trim( ObjName_Segment ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), PipingSystemSegments.Name(), SegmentCtr - 1, IsNotOK, IsBlank, ObjName_Segment + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				cAlphaArgs( 1 ) = "Duplicate name encountered";
@@ -903,7 +902,7 @@ namespace PlantPipingSystemsManager {
 			PipingSystemSegments( SegmentCtr ).PipeLocation = PointF( rNumericArgs( 1 ), rNumericArgs( 2 ) );
 
 			//Read in the flow direction
-			{ auto const SELECT_CASE_var( trim( adjustl( cAlphaArgs( 2 ) ) ) );
+			{ auto const SELECT_CASE_var( stripped( cAlphaArgs( 2 ) ) );
 			if ( SELECT_CASE_var == "INCREASINGZ" ) {
 				PipingSystemSegments( SegmentCtr ).FlowDirection = SegmentFlow_IncreasingZ;
 			} else if ( SELECT_CASE_var == "DECREASINGZ" ) {
@@ -961,7 +960,7 @@ namespace PlantPipingSystemsManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "ReadHorizontalTrenchInputs" );
+		static std::string const RoutineName( "ReadHorizontalTrenchInputs" );
 		int const MonthsInYear( 12 );
 		Real64 const LargeNumber( 10000.0 );
 		Real64 const AvgDaysInMonth( 365.0 / 12.0 );
@@ -986,9 +985,9 @@ namespace PlantPipingSystemsManager {
 		struct HorizontalTrenchData
 		{
 			// Members
-			Fstring ObjName;
-			Fstring InletNodeName;
-			Fstring OutletNodeName;
+			std::string ObjName;
+			std::string InletNodeName;
+			std::string OutletNodeName;
 			Real64 AxialLength;
 			Real64 PipeID;
 			Real64 PipeOD;
@@ -1014,9 +1013,6 @@ namespace PlantPipingSystemsManager {
 
 			// Default Constructor
 			HorizontalTrenchData() :
-				ObjName( MaxNameLength ),
-				InletNodeName( MaxNameLength ),
-				OutletNodeName( MaxNameLength ),
 				AxialLength( 0.0 ),
 				PipeID( 0.0 ),
 				PipeOD( 0.0 ),
@@ -1043,9 +1039,9 @@ namespace PlantPipingSystemsManager {
 
 			// Member Constructor
 			HorizontalTrenchData(
-				Fstring const & ObjName,
-				Fstring const & InletNodeName,
-				Fstring const & OutletNodeName,
+				std::string const & ObjName,
+				std::string const & InletNodeName,
+				std::string const & OutletNodeName,
 				Real64 const AxialLength,
 				Real64 const PipeID,
 				Real64 const PipeOD,
@@ -1069,9 +1065,9 @@ namespace PlantPipingSystemsManager {
 				Real64 const MinSurfTemp,
 				int const MonthOfMinSurfTemp
 			) :
-				ObjName( MaxNameLength, ObjName ),
-				InletNodeName( MaxNameLength, InletNodeName ),
-				OutletNodeName( MaxNameLength, OutletNodeName ),
+				ObjName( ObjName ),
+				InletNodeName( InletNodeName ),
+				OutletNodeName( OutletNodeName ),
 				AxialLength( AxialLength ),
 				PipeID( PipeID ),
 				PipeOD( PipeOD ),
@@ -1124,7 +1120,7 @@ namespace PlantPipingSystemsManager {
 			HGHX( HorizontalGHXCtr ).ObjName = cAlphaArgs( 1 );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), HGHX.ObjName(), HorizontalGHXCtr - 1, IsNotOK, IsBlank, trim( ObjName_HorizTrench ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), HGHX.ObjName(), HorizontalGHXCtr - 1, IsNotOK, IsBlank, ObjName_HorizTrench + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				cAlphaArgs( 1 ) = "Duplicate name encountered";
@@ -1192,7 +1188,7 @@ namespace PlantPipingSystemsManager {
 				// then we must get it from the surface ground temperatures
 
 				if ( ! PubGroundTempSurfFlag ) {
-					ShowSevereError( "Input problem for " + ObjName_HorizTrench + "=" + HGHX( HorizontalGHXCtr ).ObjName );
+					ShowSevereError( "Input problem for " + ObjName_HorizTrench + '=' + HGHX( HorizontalGHXCtr ).ObjName );
 					ShowContinueError( "No Site:GroundTemperature:Shallow object found in the input file" );
 					ShowContinueError( "This is required for the horizontal ground heat exchanger if farfield parameters are" );
 					ShowContinueError( " not directly entered into the input object." );
@@ -1263,20 +1259,20 @@ namespace PlantPipingSystemsManager {
 
 			//Read inlet and outlet node names and validate them
 			PipingSystemCircuits( CircuitCtr ).InletNodeName = HGHX( HorizontalGHXCtr ).InletNodeName;
-			PipingSystemCircuits( CircuitCtr ).InletNodeNum = GetOnlySingleNode( PipingSystemCircuits( CircuitCtr ).InletNodeName, ErrorsFound, trim( ObjName_HorizTrench ), HGHX( HorizontalGHXCtr ).ObjName, NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			PipingSystemCircuits( CircuitCtr ).InletNodeNum = GetOnlySingleNode( PipingSystemCircuits( CircuitCtr ).InletNodeName, ErrorsFound, ObjName_HorizTrench, HGHX( HorizontalGHXCtr ).ObjName, NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 			if ( PipingSystemCircuits( CircuitCtr ).InletNodeNum == 0 ) {
 				CurIndex = 2;
 				//CALL IssueSevereInputFieldError(RoutineName, ObjName_Circuit, cAlphaArgs(1), cAlphaFieldNames(CurIndex), &
 				//                                cAlphaArgs(CurIndex), 'Bad node name.', ErrorsFound)
 			}
 			PipingSystemCircuits( CircuitCtr ).OutletNodeName = HGHX( HorizontalGHXCtr ).OutletNodeName;
-			PipingSystemCircuits( CircuitCtr ).OutletNodeNum = GetOnlySingleNode( PipingSystemCircuits( CircuitCtr ).OutletNodeName, ErrorsFound, trim( ObjName_HorizTrench ), HGHX( HorizontalGHXCtr ).ObjName, NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			PipingSystemCircuits( CircuitCtr ).OutletNodeNum = GetOnlySingleNode( PipingSystemCircuits( CircuitCtr ).OutletNodeName, ErrorsFound, ObjName_HorizTrench, HGHX( HorizontalGHXCtr ).ObjName, NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 			if ( PipingSystemCircuits( CircuitCtr ).OutletNodeNum == 0 ) {
 				CurIndex = 3;
 				//CALL IssueSevereInputFieldError(RoutineName, ObjName_Circuit, cAlphaArgs(1), cAlphaFieldNames(CurIndex), &
 				//                                cAlphaArgs(CurIndex), 'Bad node name.', ErrorsFound)
 			}
-			TestCompSet( trim( ObjName_HorizTrench ), HGHX( HorizontalGHXCtr ).ObjName, PipingSystemCircuits( CircuitCtr ).InletNodeName, PipingSystemCircuits( CircuitCtr ).OutletNodeName, "Piping System Circuit Nodes" );
+			TestCompSet( ObjName_HorizTrench, HGHX( HorizontalGHXCtr ).ObjName, PipingSystemCircuits( CircuitCtr ).InletNodeName, PipingSystemCircuits( CircuitCtr ).OutletNodeName, "Piping System Circuit Nodes" );
 
 			//Convergence tolerance values, validated by IP
 			PipingSystemCircuits( CircuitCtr ).Convergence_CurrentToPrevIteration = 0.001;
@@ -1445,7 +1441,7 @@ namespace PlantPipingSystemsManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "InitPipingSystems" );
+		static std::string const RoutineName( "InitPipingSystems" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1608,12 +1604,12 @@ namespace PlantPipingSystemsManager {
 
 	void
 	IssueSevereInputFieldError(
-		Fstring const & RoutineName,
-		Fstring const & ObjectName,
-		Fstring const & InstanceName,
-		Fstring const & FieldName,
-		Fstring const & FieldEntry,
-		Fstring const & Condition,
+		std::string const & RoutineName,
+		std::string const & ObjectName,
+		std::string const & InstanceName,
+		std::string const & FieldName,
+		std::string const & FieldEntry,
+		std::string const & Condition,
 		bool & ErrorsFound
 	)
 	{
@@ -1638,7 +1634,7 @@ namespace PlantPipingSystemsManager {
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
-		ShowSevereError( trim( RoutineName ) + ":" + trim( ObjectName ) + "=\"" + trim( InstanceName ) + "\", invalid " + trim( FieldName ) + "=\"" + trim( FieldEntry ) + "\", Condition: " + trim( Condition ) );
+		ShowSevereError( RoutineName + ':' + ObjectName + "=\"" + InstanceName + "\", invalid " + FieldName + "=\"" + FieldEntry + "\", Condition: " + Condition );
 
 		ErrorsFound = true;
 
@@ -1650,12 +1646,12 @@ namespace PlantPipingSystemsManager {
 
 	void
 	IssueSevereInputFieldError(
-		Fstring const & RoutineName,
-		Fstring const & ObjectName,
-		Fstring const & InstanceName,
-		Fstring const & FieldName,
+		std::string const & RoutineName,
+		std::string const & ObjectName,
+		std::string const & InstanceName,
+		std::string const & FieldName,
 		Real64 const FieldEntry,
-		Fstring const & Condition,
+		std::string const & Condition,
 		bool & ErrorsFound
 	)
 	{
@@ -1681,7 +1677,7 @@ namespace PlantPipingSystemsManager {
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
-		ShowSevereError( trim( RoutineName ) + ":" + trim( ObjectName ) + "=\"" + trim( InstanceName ) + "\", invalid " + trim( FieldName ) + "=\"" + TrimSigDigits( FieldEntry, 3 ) + "\", Condition: " + trim( Condition ) );
+		ShowSevereError( RoutineName + ':' + ObjectName + "=\"" + InstanceName + "\", invalid " + FieldName + "=\"" + TrimSigDigits( FieldEntry, 3 ) + "\", Condition: " + Condition );
 
 		ErrorsFound = true;
 
@@ -3499,7 +3495,7 @@ namespace PlantPipingSystemsManager {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "CreatePartitionRegionList" );
+		static std::string const RoutineName( "CreatePartitionRegionList" );
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int Index;
@@ -3528,7 +3524,7 @@ namespace PlantPipingSystemsManager {
 			//check to make sure this location is valid
 			if ( CellLeft < 0.0 || CellRight > DirExtentMax ) {
 				ShowSevereError( "PlantPipingSystems::" + RoutineName + ": Invalid partition location in domain." );
-				ShowContinueError( "Occurs during mesh development for domain=" + trim( PipingSystemDomains( DomainNum ).Name ) );
+				ShowContinueError( "Occurs during mesh development for domain=" + PipingSystemDomains( DomainNum ).Name );
 				ShowContinueError( "A pipe or basement is located outside of the domain extents." );
 				ShowFatalError( "Preceding error causes program termination." );
 			}
@@ -3538,7 +3534,7 @@ namespace PlantPipingSystemsManager {
 				if ( IsInRange( CellLeft, ThesePartitionRegions( SubIndex ).Min, ThesePartitionRegions( SubIndex ).Max ) || IsInRange( CellRight, ThesePartitionRegions( SubIndex ).Min, ThesePartitionRegions( SubIndex ).Max ) ) {
 
 					ShowSevereError( "PlantPipingSystems::" + RoutineName + ": Invalid partition location in domain." );
-					ShowContinueError( "Occurs during mesh development for domain=" + trim( PipingSystemDomains( DomainNum ).Name ) );
+					ShowContinueError( "Occurs during mesh development for domain=" + PipingSystemDomains( DomainNum ).Name );
 					ShowContinueError( "A mesh conflict was encountered where partitions were overlapping." );
 					ShowContinueError( "Ensure that all pipes exactly line up or are separated to allow meshing in between them" );
 					ShowContinueError( "Also verify the pipe and basement dimensions to avoid conflicts there." );
@@ -7125,7 +7121,7 @@ namespace PlantPipingSystemsManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "DoEndOfIterationOperations" );
+		static std::string const RoutineName( "DoEndOfIterationOperations" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool OutOfRange;

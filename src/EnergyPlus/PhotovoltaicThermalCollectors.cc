@@ -116,7 +116,7 @@ namespace PhotovoltaicThermalCollectors {
 		int & PVTnum, // index to PVT array.
 		bool const FirstHVACIteration,
 		int const CalledFrom,
-		Optional_Fstring_const PVTName,
+		Optional_string_const PVTName,
 		Optional_bool_const InitLoopEquip
 	)
 	{
@@ -164,22 +164,22 @@ namespace PhotovoltaicThermalCollectors {
 			if ( PVTnum == 0 ) {
 				PVTnum = FindItemInList( PVTName, PVT.Name(), NumPVT );
 				if ( PVTnum == 0 ) {
-					ShowFatalError( "SimPVTcollectors: Unit not found=" + trim( PVTName ) );
+					ShowFatalError( "SimPVTcollectors: Unit not found=" + PVTName() );
 				}
 			} else {
 				if ( PVTnum > NumPVT || PVTnum < 1 ) {
-					ShowFatalError( "SimPVTcollectors: Invalid PVT index passed = " + trim( TrimSigDigits( PVTnum ) ) + ", Number of PVT units=" + trim( TrimSigDigits( NumPVT ) ) + ", Entered Unit name=" + trim( PVTName ) );
+					ShowFatalError( "SimPVTcollectors: Invalid PVT index passed = " + TrimSigDigits( PVTnum ) + ", Number of PVT units=" + TrimSigDigits( NumPVT ) + ", Entered Unit name=" + PVTName() );
 				}
 				if ( CheckEquipName( PVTnum ) ) {
 					if ( PVTName != PVT( PVTnum ).Name ) {
-						ShowFatalError( "SimPVTcollectors: Invalid PVT index passed = " + trim( TrimSigDigits( PVTnum ) ) + ", Unit name=" + trim( PVTName ) + ", stored name for that index=" + trim( PVT( PVTnum ).Name ) );
+						ShowFatalError( "SimPVTcollectors: Invalid PVT index passed = " + TrimSigDigits( PVTnum ) + ", Unit name=" + PVTName() + ", stored name for that index=" + PVT( PVTnum ).Name );
 					}
 					CheckEquipName( PVTnum ) = false;
 				}
 			}
 		} else {
 			if ( PVTnum > NumPVT || PVTnum < 1 ) {
-				ShowFatalError( "SimPVTcollectors: Invalid PVT index passed = " + trim( TrimSigDigits( PVTnum ) ) + ", Number of PVT units=" + trim( TrimSigDigits( NumPVT ) ) + ", Entered Unit name=" + trim( PVTName ) );
+				ShowFatalError( "SimPVTcollectors: Invalid PVT index passed = " + TrimSigDigits( PVTnum ) + ", Number of PVT units=" + TrimSigDigits( NumPVT ) + ", Entered Unit name=" + PVTName() );
 			}
 		} // compName present
 
@@ -247,7 +247,7 @@ namespace PhotovoltaicThermalCollectors {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const Blank;
+		static std::string const Blank;
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -278,22 +278,22 @@ namespace PhotovoltaicThermalCollectors {
 				GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), tmpSimplePVTperf.Name(), Item - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Names" );
+				VerifyName( cAlphaArgs( 1 ), tmpSimplePVTperf.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Names" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) {
-						ShowSevereError( "Invalid " + trim( cCurrentModuleObject ) + ", Name cannot be blank" );
+						ShowSevereError( "Invalid " + cCurrentModuleObject + ", Name cannot be blank" );
 					}
 					continue;
 				}
-				tmpSimplePVTperf( Item ).Name = trim( cAlphaArgs( 1 ) );
+				tmpSimplePVTperf( Item ).Name = cAlphaArgs( 1 );
 				if ( SameString( cAlphaArgs( 2 ), "Fixed" ) ) {
 					tmpSimplePVTperf( Item ).ThermEfficMode = FixedThermEffic;
 				} else if ( SameString( cAlphaArgs( 2 ), "Scheduled" ) ) {
 					tmpSimplePVTperf( Item ).ThermEfficMode = ScheduledThermEffic;
 				} else {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 				tmpSimplePVTperf( Item ).ThermalActiveFract = rNumericArgs( 1 );
@@ -301,8 +301,8 @@ namespace PhotovoltaicThermalCollectors {
 
 				tmpSimplePVTperf( Item ).ThermEffSchedNum = GetScheduleIndex( cAlphaArgs( 3 ) );
 				if ( ( tmpSimplePVTperf( Item ).ThermEffSchedNum == 0 ) && ( tmpSimplePVTperf( Item ).ThermEfficMode == ScheduledThermEffic ) ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + " = " + trim( cAlphaArgs( 3 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 				tmpSimplePVTperf( Item ).SurfEmissivity = rNumericArgs( 3 );
@@ -322,11 +322,11 @@ namespace PhotovoltaicThermalCollectors {
 			//check name
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PVT.Name(), Item - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) );
+			VerifyName( cAlphaArgs( 1 ), PVT.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) {
-					ShowSevereError( "Invalid " + trim( cCurrentModuleObject ) + ", Name cannot be blank" );
+					ShowSevereError( "Invalid " + cCurrentModuleObject + ", Name cannot be blank" );
 				}
 				continue;
 			}
@@ -337,12 +337,12 @@ namespace PhotovoltaicThermalCollectors {
 			// check surface
 			if ( PVT( Item ).SurfNum == 0 ) {
 				if ( lAlphaFieldBlanks( 2 ) ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ShowContinueError( "Surface name cannot be blank." );
 				} else {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ShowContinueError( "Surface was not found." );
 				}
 				ErrorsFound = true;
@@ -351,25 +351,25 @@ namespace PhotovoltaicThermalCollectors {
 				SurfNum = PVT( Item ).SurfNum;
 
 				if ( ! Surface( PVT( Item ).SurfNum ).ExtSolar ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ShowContinueError( "Surface must be exposed to solar." );
 					ErrorsFound = true;
 				}
 				// check surface orientation, warn if upside down
 				if ( ( Surface( SurfNum ).Tilt < -95.0 ) || ( Surface( SurfNum ).Tilt > 95.0 ) ) {
-					ShowWarningError( "Suspected input problem with " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					ShowWarningError( "Suspected input problem with " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ShowContinueError( "Surface used for solar collector faces down" );
-					ShowContinueError( "Surface tilt angle (degrees from ground outward normal) = " + trim( RoundSigDigits( Surface( SurfNum ).Tilt, 2 ) ) );
+					ShowContinueError( "Surface tilt angle (degrees from ground outward normal) = " + RoundSigDigits( Surface( SurfNum ).Tilt, 2 ) );
 				}
 
 			} // check surface
 
 			if ( lAlphaFieldBlanks( 3 ) ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + " = " + trim( cAlphaArgs( 3 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( trim( cAlphaFieldNames( 3 ) ) + ", name cannot be blank." );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+				ShowContinueError( cAlphaFieldNames( 3 ) + ", name cannot be blank." );
 				ErrorsFound = true;
 			} else {
 				PVT( Item ).PVTModelName = cAlphaArgs( 3 );
@@ -380,9 +380,9 @@ namespace PhotovoltaicThermalCollectors {
 					PVT( Item ).AreaCol = Surface( PVT( Item ).SurfNum ).Area * PVT( Item ).Simple.ThermalActiveFract;
 					PVT( Item ).PVTModelType = SimplePVTmodel;
 				} else {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + " = " + trim( cAlphaArgs( 3 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
-					ShowContinueError( trim( cAlphaFieldNames( 3 ) ) + ", was not found." );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+					ShowContinueError( cAlphaFieldNames( 3 ) + ", was not found." );
 					ErrorsFound = true;
 				}
 
@@ -391,15 +391,15 @@ namespace PhotovoltaicThermalCollectors {
 				PVT( Item ).PVnum = FindItemInList( cAlphaArgs( 4 ), PVarray.Name(), NumPVs );
 				// check PV
 				if ( PVT( Item ).PVnum == 0 ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 4 ) ) + " = " + trim( cAlphaArgs( 4 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + " = " + cAlphaArgs( 4 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				} else {
-					PVT( Item ).PVname = trim( cAlphaArgs( 4 ) );
+					PVT( Item ).PVname = cAlphaArgs( 4 );
 					PVT( Item ).PVfound = true;
 				}
 			} else { // no PV or not yet gotten.
-				PVT( Item ).PVname = trim( cAlphaArgs( 4 ) );
+				PVT( Item ).PVname = cAlphaArgs( 4 );
 				PVT( Item ).PVfound = false;
 			}
 
@@ -409,31 +409,31 @@ namespace PhotovoltaicThermalCollectors {
 				PVT( Item ).WorkingFluidType = AirWorkingFluid;
 			} else {
 				if ( lAlphaFieldBlanks( 5 ) ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 5 ) ) + " = " + trim( cAlphaArgs( 5 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
-					ShowContinueError( trim( cAlphaFieldNames( 5 ) ) + " field cannot be blank." );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 5 ) + " = " + cAlphaArgs( 5 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+					ShowContinueError( cAlphaFieldNames( 5 ) + " field cannot be blank." );
 				} else {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 5 ) ) + " = " + trim( cAlphaArgs( 5 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 5 ) + " = " + cAlphaArgs( 5 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				}
 				ErrorsFound = true;
 			}
 
 			if ( PVT( Item ).WorkingFluidType == LiquidWorkingFluid ) {
-				PVT( Item ).PlantInletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-				PVT( Item ).PlantOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+				PVT( Item ).PlantInletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+				PVT( Item ).PlantOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-				TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 6 ), cAlphaArgs( 7 ), "Water Nodes" );
+				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 6 ), cAlphaArgs( 7 ), "Water Nodes" );
 
 				PVT( Item ).WLoopSideNum = DemandSupply_No;
 
 			}
 
 			if ( PVT( Item ).WorkingFluidType == AirWorkingFluid ) {
-				PVT( Item ).HVACInletNodeNum = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-				PVT( Item ).HVACOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 9 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+				PVT( Item ).HVACInletNodeNum = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+				PVT( Item ).HVACOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 9 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-				TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 8 ), cAlphaArgs( 9 ), "Air Nodes" );
+				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 8 ), cAlphaArgs( 9 ), "Air Nodes" );
 
 			}
 
@@ -566,8 +566,8 @@ namespace PhotovoltaicThermalCollectors {
 			if ( allocated( PVarray ) ) {
 				PVT( PVTnum ).PVnum = FindItemInList( PVT( PVTnum ).PVname, PVarray.Name(), NumPVs );
 				if ( PVT( PVTnum ).PVnum == 0 ) {
-					ShowSevereError( "Invalid name for photovoltaic generator = " + trim( PVT( PVTnum ).PVname ) );
-					ShowContinueError( "Entered in flat plate photovoltaic-thermal collector = " + trim( PVT( PVTnum ).Name ) );
+					ShowSevereError( "Invalid name for photovoltaic generator = " + PVT( PVTnum ).PVname );
+					ShowContinueError( "Entered in flat plate photovoltaic-thermal collector = " + PVT( PVTnum ).Name );
 					ErrorsFound = true;
 				} else {
 					PVT( PVTnum ).PVfound = true;
@@ -575,7 +575,7 @@ namespace PhotovoltaicThermalCollectors {
 			} else {
 				if ( ( ! BeginEnvrnFlag ) && ( ! FirstHVACIteration ) ) {
 					ShowSevereError( "Photovoltaic generators are missing for Photovoltaic Thermal modeling" );
-					ShowContinueError( "Needed for flat plate photovoltaic-thermal collector = " + trim( PVT( PVTnum ).Name ) );
+					ShowContinueError( "Needed for flat plate photovoltaic-thermal collector = " + PVT( PVTnum ).Name );
 					ErrorsFound = true;
 				}
 			}
@@ -587,14 +587,14 @@ namespace PhotovoltaicThermalCollectors {
 					if ( Node( PVT( PVTindex ).HVACOutletNodeNum ).TempSetPoint == SensedNodeFlagValue ) {
 						if ( ! AnyEnergyManagementSystemInModel ) {
 							ShowSevereError( "Missing temperature setpoint for PVT outlet node  " );
-							ShowContinueError( "Add a setpoint manager to outlet node of PVT named " + trim( PVT( PVTindex ).Name ) );
+							ShowContinueError( "Add a setpoint manager to outlet node of PVT named " + PVT( PVTindex ).Name );
 							SetPointErrorFlag = true;
 						} else {
 							// need call to EMS to check node
 							CheckIfNodeSetPointManagedByEMS( PVT( PVTindex ).HVACOutletNodeNum, iTemperatureSetPoint, SetPointErrorFlag );
 							if ( SetPointErrorFlag ) {
 								ShowSevereError( "Missing temperature setpoint for PVT outlet node  " );
-								ShowContinueError( "Add a setpoint manager to outlet node of PVT named " + trim( PVT( PVTindex ).Name ) );
+								ShowContinueError( "Add a setpoint manager to outlet node of PVT named " + PVT( PVTindex ).Name );
 								ShowContinueError( "  or use an EMS actuator to establish a setpoint at the outlet node of PVT" );
 							}
 						}
@@ -784,7 +784,7 @@ namespace PhotovoltaicThermalCollectors {
 				} else {
 					if ( IsAutoSize ) {
 						ShowSevereError( "Autosizing of PVT solar collector design flow rate requires a Sizing:Plant object" );
-						ShowContinueError( "Occurs in PVT object=" + trim( PVT( PVTnum ).Name ) );
+						ShowContinueError( "Occurs in PVT object=" + PVT( PVTnum ).Name );
 						ErrorsFound = true;
 					} else { // Hardsized
 						if ( PVT( PVTnum ).DesignVolFlowRate > 0.0 ) {
@@ -806,9 +806,9 @@ namespace PhotovoltaicThermalCollectors {
 					ReportSizingOutput( "SolarCollector:FlatPlate:PhotovoltaicThermal", PVT( PVTnum ).Name, "Design Size Design Flow Rate [m3/s]", DesignVolFlowRateDes, "User-Specified Design Flow Rate [m3/s]", DesignVolFlowRateUser );
 					if ( DisplayExtraWarnings ) {
 						if ( ( std::abs( DesignVolFlowRateDes - DesignVolFlowRateUser ) / DesignVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-							ShowMessage( "SizeSolarCollector: Potential issue with equipment sizing for " + trim( PVT( PVTnum ).Name ) );
-							ShowContinueError( "User-Specified Design Flow Rate of " + trim( RoundSigDigits( DesignVolFlowRateUser, 5 ) ) + " [W]" );
-							ShowContinueError( "differs from Design Size Design Flow Rate of " + trim( RoundSigDigits( DesignVolFlowRateDes, 5 ) ) + " [W]" );
+							ShowMessage( "SizeSolarCollector: Potential issue with equipment sizing for " + PVT( PVTnum ).Name );
+							ShowContinueError( "User-Specified Design Flow Rate of " + RoundSigDigits( DesignVolFlowRateUser, 5 ) + " [W]" );
+							ShowContinueError( "differs from Design Size Design Flow Rate of " + RoundSigDigits( DesignVolFlowRateDes, 5 ) + " [W]" );
 							ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 							ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 						}
@@ -863,9 +863,9 @@ namespace PhotovoltaicThermalCollectors {
 							ReportSizingOutput( "SolarCollector:FlatPlate:PhotovoltaicThermal", PVT( PVTnum ).Name, "Design Size Design Flow Rate [m3/s]", DesignVolFlowRateDes, "User-Specified Design Flow Rate [m3/s]", DesignVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( DesignVolFlowRateDes - DesignVolFlowRateUser ) / DesignVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeSolarCollector: Potential issue with equipment sizing for " + trim( PVT( PVTnum ).Name ) );
-									ShowContinueError( "User-Specified Design Flow Rate of " + trim( RoundSigDigits( DesignVolFlowRateUser, 5 ) ) + " [W]" );
-									ShowContinueError( "differs from Design Size Design Flow Rate of " + trim( RoundSigDigits( DesignVolFlowRateDes, 5 ) ) + " [W]" );
+									ShowMessage( "SizeSolarCollector: Potential issue with equipment sizing for " + PVT( PVTnum ).Name );
+									ShowContinueError( "User-Specified Design Flow Rate of " + RoundSigDigits( DesignVolFlowRateUser, 5 ) + " [W]" );
+									ShowContinueError( "differs from Design Size Design Flow Rate of " + RoundSigDigits( DesignVolFlowRateDes, 5 ) + " [W]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}

@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace ChillerIndirectAbsorption {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -53,7 +51,7 @@ namespace ChillerIndirectAbsorption {
 	struct IndirectAbsorberSpecs
 	{
 		// Members
-		Fstring Name; // user identifier
+		std::string Name; // user identifier
 		Real64 NomCap; // W - design nominal capacity of Absorber
 		Real64 NomPumpPower; // W - design nominal capacity of Absorber
 		Real64 EvapVolFlowRate; // m3/s - design nominal water volumetric flow rate through the evaporator
@@ -116,7 +114,6 @@ namespace ChillerIndirectAbsorption {
 
 		// Default Constructor
 		IndirectAbsorberSpecs() :
-			Name( MaxNameLength ),
 			NomCap( 0.0 ),
 			NomPumpPower( 0.0 ),
 			EvapVolFlowRate( 0.0 ),
@@ -179,7 +176,7 @@ namespace ChillerIndirectAbsorption {
 
 		// Member Constructor
 		IndirectAbsorberSpecs(
-			Fstring const & Name, // user identifier
+			std::string const & Name, // user identifier
 			Real64 const NomCap, // W - design nominal capacity of Absorber
 			Real64 const NomPumpPower, // W - design nominal capacity of Absorber
 			Real64 const EvapVolFlowRate, // m3/s - design nominal water volumetric flow rate through the evaporator
@@ -239,7 +236,7 @@ namespace ChillerIndirectAbsorption {
 			bool const PossibleSubcooling, // flag to indicate chiller is doing less cooling that requested
 			bool const IsThisSized // TRUE if sizing is done
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NomCap( NomCap ),
 			NomPumpPower( NomPumpPower ),
 			EvapVolFlowRate( EvapVolFlowRate ),
@@ -405,8 +402,8 @@ namespace ChillerIndirectAbsorption {
 
 	void
 	SimIndirectAbsorber(
-		Fstring const & AbsorberType, // type of Absorber
-		Fstring const & AbsorberName, // user specified name of Absorber
+		std::string const & AbsorberType, // type of Absorber
+		std::string const & AbsorberName, // user specified name of Absorber
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int const LoopNum, // Plant loop index for where called from
 		int const LoopSide, // Plant loop side index for where called from

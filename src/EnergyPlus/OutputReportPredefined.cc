@@ -23,7 +23,6 @@ namespace OutputReportPredefined {
 	// OTHER NOTES:.
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// The following section initializes the predefined column heading variables
@@ -1418,7 +1417,7 @@ namespace OutputReportPredefined {
 	void
 	PreDefTableEntry(
 		int const columnIndex,
-		Fstring const & objName,
+		std::string const & objName,
 		Real64 const tableEntryReal,
 		Optional_int_const numSigDigits
 	)
@@ -1455,9 +1454,9 @@ namespace OutputReportPredefined {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int sigDigitCount;
-		Fstring digitString( 1 );
-		Fstring formatConvert( 7 );
-		Fstring stringEntry( 12 );
+		std::string digitString;
+		std::string formatConvert;
+		std::string stringEntry;
 		int IOS;
 
 		incrementTableEntry();
@@ -1475,9 +1474,9 @@ namespace OutputReportPredefined {
 		gio::write( digitString, "(I1)" ) << sigDigitCount;
 		// build up the format string
 		if ( tableEntryReal < 1e10 ) {
-			formatConvert = "(F12." + digitString + ")";
+			formatConvert = "(F12." + digitString + ')';
 		} else {
-			formatConvert = "(E12." + digitString + ")";
+			formatConvert = "(E12." + digitString + ')';
 		}
 		{ IOFlags flags; gio::write( stringEntry, formatConvert, flags ) << tableEntryReal; IOS = flags.ios(); }
 		if ( IOS != 0 ) stringEntry = "  Too Big";
@@ -1492,8 +1491,8 @@ namespace OutputReportPredefined {
 	void
 	PreDefTableEntry(
 		int const columnIndex,
-		Fstring const & objName,
-		Fstring const & tableEntryChar
+		std::string const & objName,
+		std::string const & tableEntryChar
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -1537,7 +1536,7 @@ namespace OutputReportPredefined {
 	void
 	PreDefTableEntry(
 		int const columnIndex,
-		Fstring const & objName,
+		std::string const & objName,
 		int const tableEntryInt
 	)
 	{
@@ -1572,7 +1571,7 @@ namespace OutputReportPredefined {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Fstring stringEntry( 12 );
+		std::string stringEntry;
 
 		incrementTableEntry();
 		// convert the integer to a string
@@ -1637,9 +1636,9 @@ namespace OutputReportPredefined {
 
 	void
 	AddCompSizeTableEntry(
-		Fstring const & FieldType,
-		Fstring const & FieldName,
-		Fstring const & FieldDescription,
+		std::string const & FieldType,
+		std::string const & FieldName,
+		std::string const & FieldDescription,
 		Real64 const FieldValue
 	)
 	{
@@ -1764,9 +1763,9 @@ namespace OutputReportPredefined {
 
 	int
 	newPreDefReport(
-		Fstring const & inReportName,
-		Fstring const & inReportAbrev,
-		Fstring const & inReportNamewithSpaces
+		std::string const & inReportName,
+		std::string const & inReportAbrev,
+		std::string const & inReportNamewithSpaces
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -1832,7 +1831,7 @@ namespace OutputReportPredefined {
 	int
 	newPreDefSubTable(
 		int const reportIndex,
-		Fstring const & subTableName
+		std::string const & subTableName
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -1896,7 +1895,7 @@ namespace OutputReportPredefined {
 	void
 	addFootNoteSubTable(
 		int const subTableIndex,
-		Fstring const & footnoteText
+		std::string const & footnoteText
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -1937,7 +1936,7 @@ namespace OutputReportPredefined {
 	int
 	newPreDefColumn(
 		int const subTableIndex,
-		Fstring const & columnHeading
+		std::string const & columnHeading
 	)
 	{
 		// SUBROUTINE INFORMATION:

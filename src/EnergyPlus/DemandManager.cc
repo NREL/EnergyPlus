@@ -42,7 +42,6 @@ namespace DemandManager {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::NumOfTimeStepInHour;
 	using DataGlobals::SecInHour;
 	using DataGlobals::ScheduleAlwaysOn;
@@ -341,7 +340,6 @@ namespace DemandManager {
 		// Standard EnergyPlus methodology.
 
 		// Using/Aliasing
-		using DataGlobals::MaxNameLength;
 		using DataGlobals::MinutesPerTimeStep;
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
@@ -354,7 +352,7 @@ namespace DemandManager {
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const Blank;
+		static std::string const Blank;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ListNum;
@@ -362,13 +360,13 @@ namespace DemandManager {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_Fstring AlphArray( sFstring( MaxNameLength ) ); // Character string data
+		FArray1D_string AlphArray; // Character string data
 		FArray1D< Real64 > NumArray; // Numeric data
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		Fstring Units( 5 ); // String for meter units
+		std::string Units; // String for meter units
 		static bool ErrorsFound( false );
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in renaming.
+		std::string CurrentModuleObject; // for ease in renaming.
 
 		// FLOW:
 		CurrentModuleObject = "DemandManagerAssignmentList";
@@ -390,7 +388,7 @@ namespace DemandManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), DemandManagerList.Name(), ListNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+				VerifyName( AlphArray( 1 ), DemandManagerList.Name(), ListNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -400,8 +398,8 @@ namespace DemandManager {
 				DemandManagerList( ListNum ).Meter = GetMeterIndex( AlphArray( 2 ) );
 
 				if ( DemandManagerList( ListNum ).Meter == 0 ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( AlphArray( 2 ) ) );
-					ShowContinueError( "Entered in " + trim( CurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + AlphArray( 2 ) );
+					ShowContinueError( "Entered in " + CurrentModuleObject + '=' + AlphArray( 1 ) );
 					ErrorsFound = true;
 
 				} else {
@@ -410,7 +408,7 @@ namespace DemandManager {
 						Units = "[W]"; // For setup of report variables
 
 					} else {
-						ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid value " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( AlphArray( 2 ) ) + "\"." );
+						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid value " + cAlphaFieldNames( 2 ) + "=\"" + AlphArray( 2 ) + "\"." );
 						ShowContinueError( "Only Electricity and ElectricityNet meters are currently allowed." );
 						ErrorsFound = true;
 					}}
@@ -422,7 +420,7 @@ namespace DemandManager {
 					DemandManagerList( ListNum ).LimitSchedule = GetScheduleIndex( AlphArray( 3 ) );
 
 					if ( DemandManagerList( ListNum ).LimitSchedule == 0 ) {
-						ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( AlphArray( 3 ) ) + "\" not found." );
+						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + "=\"" + AlphArray( 3 ) + "\" not found." );
 						ErrorsFound = true;
 					}
 				}
@@ -433,7 +431,7 @@ namespace DemandManager {
 					DemandManagerList( ListNum ).BillingSchedule = GetScheduleIndex( AlphArray( 4 ) );
 
 					if ( DemandManagerList( ListNum ).BillingSchedule == 0 ) {
-						ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 4 ) ) + "=\"" + trim( AlphArray( 4 ) ) + "\" not found." );
+						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + "=\"" + AlphArray( 4 ) + "\" not found." );
 						ErrorsFound = true;
 					}
 				}
@@ -442,7 +440,7 @@ namespace DemandManager {
 					DemandManagerList( ListNum ).PeakSchedule = GetScheduleIndex( AlphArray( 5 ) );
 
 					if ( DemandManagerList( ListNum ).PeakSchedule == 0 ) {
-						ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 5 ) ) + "=\"" + trim( AlphArray( 5 ) ) + "\" not found." );
+						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + "=\"" + AlphArray( 5 ) + "\" not found." );
 						ErrorsFound = true;
 					}
 				}
@@ -465,7 +463,7 @@ namespace DemandManager {
 					DemandManagerList( ListNum ).ManagerPriority = ManagerPriorityAll;
 
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid value " + trim( cAlphaFieldNames( 6 ) ) + "=\"" + trim( AlphArray( 6 ) ) + "\" not found." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid value " + cAlphaFieldNames( 6 ) + "=\"" + AlphArray( 6 ) + "\" not found." );
 					ErrorsFound = true;
 				}}
 
@@ -484,12 +482,12 @@ namespace DemandManager {
 							DemandManagerList( ListNum ).Manager( MgrNum ) = FindItemInList( AlphArray( MgrNum * 2 + 6 ), DemandMgr.Name(), NumDemandMgr );
 
 							if ( DemandManagerList( ListNum ).Manager( MgrNum ) == 0 ) {
-								ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( MgrNum * 2 + 6 ) ) + "=\"" + trim( AlphArray( MgrNum * 2 + 6 ) ) + "\" not found." );
+								ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( MgrNum * 2 + 6 ) + "=\"" + AlphArray( MgrNum * 2 + 6 ) + "\" not found." );
 								ErrorsFound = true;
 							}
 
 						} else {
-							ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid value " + trim( cAlphaFieldNames( MgrNum * 2 + 5 ) ) + "=\"" + trim( AlphArray( MgrNum * 2 + 5 ) ) + "\"." );
+							ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid value " + cAlphaFieldNames( MgrNum * 2 + 5 ) + "=\"" + AlphArray( MgrNum * 2 + 5 ) + "\"." );
 							ErrorsFound = true;
 						}}
 
@@ -514,7 +512,7 @@ namespace DemandManager {
 				SetupOutputVariable( "Demand Manager Over Limit Time [hr]", DemandManagerList( ListNum ).OverLimitDuration, "Zone", "Sum", DemandManagerList( ListNum ).Name );
 
 				if ( ErrorsFound ) {
-					ShowFatalError( "Errors found in processing input for " + trim( CurrentModuleObject ) );
+					ShowFatalError( "Errors found in processing input for " + CurrentModuleObject );
 				}
 
 			} // ListNum
@@ -550,7 +548,6 @@ namespace DemandManager {
 		// Standard EnergyPlus methodology.
 
 		// Using/Aliasing
-		using DataGlobals::MaxNameLength;
 		using DataGlobals::MinutesPerTimeStep;
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
@@ -577,7 +574,7 @@ namespace DemandManager {
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const Blank;
+		static std::string const Blank;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumDemandMgrExtLights;
@@ -595,12 +592,12 @@ namespace DemandManager {
 		int MaxNums; // Max number of elements in the numeric array
 		int NumParams; // Number of arguments total in an ObjectDef
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_Fstring AlphArray( sFstring( MaxNameLength ) ); // Character string data
+		FArray1D_string AlphArray; // Character string data
 		FArray1D< Real64 > NumArray; // Numeric data
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false );
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in renaming.
+		std::string CurrentModuleObject; // for ease in renaming.
 		int Item;
 		int Item1;
 
@@ -658,7 +655,7 @@ namespace DemandManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), DemandMgr.Name(), MgrNum - StartIndex, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+				VerifyName( AlphArray( 1 ), DemandMgr.Name(), MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -671,7 +668,7 @@ namespace DemandManager {
 					DemandMgr( MgrNum ).AvailSchedule = GetScheduleIndex( AlphArray( 2 ) );
 
 					if ( DemandMgr( MgrNum ).AvailSchedule == 0 ) {
-						ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( AlphArray( 2 ) ) + "\" not found." );
+						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + AlphArray( 2 ) + "\" not found." );
 						ErrorsFound = true;
 					}
 				} else {
@@ -690,7 +687,7 @@ namespace DemandManager {
 					DemandMgr( MgrNum ).LimitControl = ManagerLimitVariable;
 
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid value" + trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( AlphArray( 3 ) ) + "\"." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid value" + cAlphaFieldNames( 3 ) + "=\"" + AlphArray( 3 ) + "\"." );
 					ShowContinueError( "...value must be one of Off, Fixed, or Variable." );
 					ErrorsFound = true;
 				}}
@@ -711,7 +708,7 @@ namespace DemandManager {
 					DemandMgr( MgrNum ).SelectionControl = ManagerSelectionMany;
 
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid value" + trim( cAlphaFieldNames( 4 ) ) + "=\"" + trim( AlphArray( 4 ) ) + "\"." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid value" + cAlphaFieldNames( 4 ) + "=\"" + AlphArray( 4 ) + "\"." );
 					ShowContinueError( "...value must be one of All, RotateOne, or RotateMany." );
 					ErrorsFound = true;
 				}}
@@ -730,7 +727,7 @@ namespace DemandManager {
 							DemandMgr( MgrNum ).Load( LoadNum ) = LoadPtr;
 
 						} else {
-							ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( LoadNum + 4 ) ) + "=\"" + trim( AlphArray( LoadNum + 4 ) ) + "\" not found." );
+							ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( LoadNum + 4 ) + "=\"" + AlphArray( LoadNum + 4 ) + "\" not found." );
 							ErrorsFound = true;
 
 						}
@@ -751,7 +748,7 @@ namespace DemandManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), DemandMgr.Name(), MgrNum - StartIndex, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+				VerifyName( AlphArray( 1 ), DemandMgr.Name(), MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -764,7 +761,7 @@ namespace DemandManager {
 					DemandMgr( MgrNum ).AvailSchedule = GetScheduleIndex( AlphArray( 2 ) );
 
 					if ( DemandMgr( MgrNum ).AvailSchedule == 0 ) {
-						ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( AlphArray( 2 ) ) + "\" not found." );
+						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + AlphArray( 2 ) + "\" not found." );
 						ErrorsFound = true;
 					}
 				} else {
@@ -783,7 +780,7 @@ namespace DemandManager {
 					DemandMgr( MgrNum ).LimitControl = ManagerLimitVariable;
 
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid value" + trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( AlphArray( 3 ) ) + "\"." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid value" + cAlphaFieldNames( 3 ) + "=\"" + AlphArray( 3 ) + "\"." );
 					ShowContinueError( "...value must be one of Off, Fixed, or Variable." );
 					ErrorsFound = true;
 				}}
@@ -804,7 +801,7 @@ namespace DemandManager {
 					DemandMgr( MgrNum ).SelectionControl = ManagerSelectionMany;
 
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid value" + trim( cAlphaFieldNames( 4 ) ) + "=\"" + trim( AlphArray( 4 ) ) + "\"." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid value" + cAlphaFieldNames( 4 ) + "=\"" + AlphArray( 4 ) + "\"." );
 					ShowContinueError( "...value must be one of All, RotateOne, or RotateMany." );
 					ErrorsFound = true;
 				}}
@@ -822,7 +819,7 @@ namespace DemandManager {
 						if ( LoadPtr > 0 ) {
 							++DemandMgr( MgrNum ).NumOfLoads;
 						} else {
-							ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( LoadNum + 4 ) ) + "=\"" + trim( AlphArray( LoadNum + 4 ) ) + "\" not found." );
+							ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( LoadNum + 4 ) + "=\"" + AlphArray( LoadNum + 4 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					}
@@ -864,7 +861,7 @@ namespace DemandManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), DemandMgr.Name(), MgrNum - StartIndex, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+				VerifyName( AlphArray( 1 ), DemandMgr.Name(), MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -877,7 +874,7 @@ namespace DemandManager {
 					DemandMgr( MgrNum ).AvailSchedule = GetScheduleIndex( AlphArray( 2 ) );
 
 					if ( DemandMgr( MgrNum ).AvailSchedule == 0 ) {
-						ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( AlphArray( 2 ) ) + "\" not found." );
+						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + AlphArray( 2 ) + "\" not found." );
 						ErrorsFound = true;
 					}
 				} else {
@@ -896,7 +893,7 @@ namespace DemandManager {
 					DemandMgr( MgrNum ).LimitControl = ManagerLimitVariable;
 
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid value" + trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( AlphArray( 3 ) ) + "\"." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid value" + cAlphaFieldNames( 3 ) + "=\"" + AlphArray( 3 ) + "\"." );
 					ShowContinueError( "...value must be one of Off, Fixed, or Variable." );
 					ErrorsFound = true;
 				}}
@@ -917,7 +914,7 @@ namespace DemandManager {
 					DemandMgr( MgrNum ).SelectionControl = ManagerSelectionMany;
 
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid value" + trim( cAlphaFieldNames( 4 ) ) + "=\"" + trim( AlphArray( 4 ) ) + "\"." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid value" + cAlphaFieldNames( 4 ) + "=\"" + AlphArray( 4 ) + "\"." );
 					ShowContinueError( "...value must be one of All, RotateOne, or RotateMany." );
 					ErrorsFound = true;
 				}}
@@ -935,7 +932,7 @@ namespace DemandManager {
 						if ( LoadPtr > 0 ) {
 							++DemandMgr( MgrNum ).NumOfLoads;
 						} else {
-							ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( LoadNum + 4 ) ) + "=\"" + trim( AlphArray( LoadNum + 4 ) ) + "\" not found." );
+							ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( LoadNum + 4 ) + "=\"" + AlphArray( LoadNum + 4 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					}
@@ -977,7 +974,7 @@ namespace DemandManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), DemandMgr.Name(), MgrNum - StartIndex, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+				VerifyName( AlphArray( 1 ), DemandMgr.Name(), MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -990,7 +987,7 @@ namespace DemandManager {
 					DemandMgr( MgrNum ).AvailSchedule = GetScheduleIndex( AlphArray( 2 ) );
 
 					if ( DemandMgr( MgrNum ).AvailSchedule == 0 ) {
-						ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( AlphArray( 2 ) ) + "\" not found." );
+						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + AlphArray( 2 ) + "\" not found." );
 						ErrorsFound = true;
 					}
 				} else {
@@ -1009,7 +1006,7 @@ namespace DemandManager {
 					DemandMgr( MgrNum ).LimitControl = ManagerLimitVariable;
 
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid value" + trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( AlphArray( 3 ) ) + "\"." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid value" + cAlphaFieldNames( 3 ) + "=\"" + AlphArray( 3 ) + "\"." );
 					ShowContinueError( "...value must be one of Off, Fixed, or Variable." );
 					ErrorsFound = true;
 				}}
@@ -1020,9 +1017,9 @@ namespace DemandManager {
 				DemandMgr( MgrNum ).UpperLimit = NumArray( 3 );
 
 				if ( DemandMgr( MgrNum ).LowerLimit > DemandMgr( MgrNum ).UpperLimit ) {
-					ShowSevereError( "Invalid input for " + trim( CurrentModuleObject ) + " = " + trim( AlphArray( 1 ) ) );
-					ShowContinueError( trim( cNumericFieldNames( 2 ) ) + " [" + trim( RoundSigDigits( NumArray( 2 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 3 ) ) + " [" + trim( RoundSigDigits( NumArray( 3 ), 2 ) ) + "]" );
-					ShowContinueError( trim( cNumericFieldNames( 2 ) ) + " cannot be greater than " + trim( cNumericFieldNames( 3 ) ) );
+					ShowSevereError( "Invalid input for " + CurrentModuleObject + " = " + AlphArray( 1 ) );
+					ShowContinueError( cNumericFieldNames( 2 ) + " [" + RoundSigDigits( NumArray( 2 ), 2 ) + "] > " + cNumericFieldNames( 3 ) + " [" + RoundSigDigits( NumArray( 3 ), 2 ) + ']' );
+					ShowContinueError( cNumericFieldNames( 2 ) + " cannot be greater than " + cNumericFieldNames( 3 ) );
 					ErrorsFound = true;
 				}
 
@@ -1038,7 +1035,7 @@ namespace DemandManager {
 					DemandMgr( MgrNum ).SelectionControl = ManagerSelectionMany;
 
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid value" + trim( cAlphaFieldNames( 4 ) ) + "=\"" + trim( AlphArray( 4 ) ) + "\"." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid value" + cAlphaFieldNames( 4 ) + "=\"" + AlphArray( 4 ) + "\"." );
 					ShowContinueError( "...value must be one of All, RotateOne, or RotateMany." );
 					ErrorsFound = true;
 				}}
@@ -1056,7 +1053,7 @@ namespace DemandManager {
 						if ( LoadPtr > 0 ) {
 							++DemandMgr( MgrNum ).NumOfLoads;
 						} else {
-							ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( LoadNum + 4 ) ) + "=\"" + trim( AlphArray( LoadNum + 4 ) ) + "\" not found." );
+							ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( LoadNum + 4 ) + "=\"" + AlphArray( LoadNum + 4 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					}

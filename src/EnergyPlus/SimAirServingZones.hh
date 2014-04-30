@@ -1,8 +1,8 @@
 #ifndef SimAirServingZones_hh_INCLUDED
 #define SimAirServingZones_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Fstring.hh>
+// C++ Headers
+#include <string>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -137,7 +137,7 @@ namespace SimAirServingZones {
 
 	void
 	SimAirLoopComponent(
-		Fstring const & CompName, // the component Name
+		std::string const & CompName, // the component Name
 		int const CompType_Num, // numeric equivalent for component type
 		bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
 		int const AirLoopNum, // Primary air loop number

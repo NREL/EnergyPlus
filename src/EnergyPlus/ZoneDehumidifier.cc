@@ -67,7 +67,6 @@ namespace ZoneDehumidifier {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::SecInHour;
 	using DataGlobals::ScheduleAlwaysOn;
@@ -117,7 +116,7 @@ namespace ZoneDehumidifier {
 
 	void
 	SimZoneDehumidifier(
-		Fstring const & CompName, // Name of the zone dehumidifier
+		std::string const & CompName, // Name of the zone dehumidifier
 		int const ZoneNum, // Number of zone being served
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		Real64 & QSensOut, // Sensible capacity delivered to zone (W)
@@ -171,17 +170,17 @@ namespace ZoneDehumidifier {
 		if ( CompIndex == 0 ) {
 			ZoneDehumidNum = FindItemInList( CompName, ZoneDehumid.Name(), NumDehumidifiers );
 			if ( ZoneDehumidNum == 0 ) {
-				ShowFatalError( "SimZoneDehumidifier: Unit not found= " + trim( CompName ) );
+				ShowFatalError( "SimZoneDehumidifier: Unit not found= " + CompName );
 			}
 			CompIndex = ZoneDehumidNum;
 		} else {
 			ZoneDehumidNum = CompIndex;
 			if ( ZoneDehumidNum > NumDehumidifiers || ZoneDehumidNum < 1 ) {
-				ShowFatalError( "SimZoneDehumidifier:  Invalid CompIndex passed= " + trim( TrimSigDigits( ZoneDehumidNum ) ) + ", Number of Units= " + trim( TrimSigDigits( NumDehumidifiers ) ) + ", Entered Unit name= " + trim( CompName ) );
+				ShowFatalError( "SimZoneDehumidifier:  Invalid CompIndex passed= " + TrimSigDigits( ZoneDehumidNum ) + ", Number of Units= " + TrimSigDigits( NumDehumidifiers ) + ", Entered Unit name= " + CompName );
 			}
 			if ( CheckEquipName( ZoneDehumidNum ) ) {
 				if ( CompName != ZoneDehumid( ZoneDehumidNum ).Name ) {
-					ShowFatalError( "SimZoneDehumidifier: Invalid CompIndex passed=" + trim( TrimSigDigits( ZoneDehumidNum ) ) + ", Unit name= " + trim( CompName ) + ", stored Unit Name for that index= " + trim( ZoneDehumid( ZoneDehumidNum ).Name ) );
+					ShowFatalError( "SimZoneDehumidifier: Invalid CompIndex passed=" + TrimSigDigits( ZoneDehumidNum ) + ", Unit name= " + CompName + ", stored Unit Name for that index= " + ZoneDehumid( ZoneDehumidNum ).Name );
 				}
 				CheckEquipName( ZoneDehumidNum ) = false;
 			}
@@ -234,8 +233,8 @@ namespace ZoneDehumidifier {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetZoneDehumidifierInput" );
-		static Fstring const CurrentModuleObject( "ZoneHVAC:Dehumidifier:DX" );
+		static std::string const RoutineName( "GetZoneDehumidifierInput" );
+		static std::string const CurrentModuleObject( "ZoneHVAC:Dehumidifier:DX" );
 		// Curve Types
 		int const Quadratic( 1 );
 		int const BiQuadratic( 2 );
@@ -257,9 +256,9 @@ namespace ZoneDehumidifier {
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		FArray1D_Fstring Alphas( sFstring( MaxNameLength ) ); // Alpha input items for object
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) ); // Numeric field names
+		FArray1D_string Alphas; // Alpha input items for object
+		FArray1D_string cAlphaFields; // Alpha field names
+		FArray1D_string cNumericFields; // Numeric field names
 		FArray1D< Real64 > Numbers; // Numeric input items for object
 		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
@@ -275,11 +274,11 @@ namespace ZoneDehumidifier {
 		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
-		Alphas = " ";
+		Alphas = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = " ";
+		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = " ";
+		cNumericFields = "";
 		Numbers.allocate( NumNumbers );
 		Numbers = 0.0;
 		lAlphaBlanks.allocate( NumAlphas );
@@ -293,7 +292,7 @@ namespace ZoneDehumidifier {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), ZoneDehumid.Name(), ZoneDehumidIndex - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), ZoneDehumid.Name(), ZoneDehumidIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -310,42 +309,42 @@ namespace ZoneDehumidifier {
 			} else {
 				ZoneDehumid( ZoneDehumidIndex ).SchedPtr = GetScheduleIndex( Alphas( 2 ) ); // Convert schedule name to pointer
 				if ( ZoneDehumid( ZoneDehumidIndex ).SchedPtr == 0 ) {
-					ShowSevereError( trim( cAlphaFields( 2 ) ) + " not found = " + trim( Alphas( 2 ) ) );
-					ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( ZoneDehumid( ZoneDehumidIndex ).Name ) );
+					ShowSevereError( cAlphaFields( 2 ) + " not found = " + Alphas( 2 ) );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + ZoneDehumid( ZoneDehumidIndex ).Name );
 					ErrorsFound = true;
 				}
 			}
 
 			// A3 , \field Air Inlet Node Name
-			ZoneDehumid( ZoneDehumidIndex ).AirInletNodeNum = GetOnlySingleNode( Alphas( 3 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			ZoneDehumid( ZoneDehumidIndex ).AirInletNodeNum = GetOnlySingleNode( Alphas( 3 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
 			// A4 , \field Air Outlet Node Name
-			ZoneDehumid( ZoneDehumidIndex ).AirOutletNodeNum = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			ZoneDehumid( ZoneDehumidIndex ).AirOutletNodeNum = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 			// N1,  \field Rated Water Removal
 			ZoneDehumid( ZoneDehumidIndex ).RatedWaterRemoval = Numbers( 1 );
 			if ( ZoneDehumid( ZoneDehumidIndex ).RatedWaterRemoval <= 0.0 ) {
-				ShowSevereError( trim( cNumericFields( 1 ) ) + " must be greater than zero." );
-				ShowContinueError( "Value specified = " + trim( TrimSigDigits( Numbers( 1 ), 5 ) ) );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( ZoneDehumid( ZoneDehumidIndex ).Name ) );
+				ShowSevereError( cNumericFields( 1 ) + " must be greater than zero." );
+				ShowContinueError( "Value specified = " + TrimSigDigits( Numbers( 1 ), 5 ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + ZoneDehumid( ZoneDehumidIndex ).Name );
 				ErrorsFound = true;
 			}
 
 			// N2,  \field Rated Energy Factor
 			ZoneDehumid( ZoneDehumidIndex ).RatedEnergyFactor = Numbers( 2 );
 			if ( ZoneDehumid( ZoneDehumidIndex ).RatedEnergyFactor <= 0.0 ) {
-				ShowSevereError( trim( cNumericFields( 2 ) ) + " must be greater than zero." );
-				ShowContinueError( "Value specified = " + trim( TrimSigDigits( Numbers( 2 ), 5 ) ) );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( ZoneDehumid( ZoneDehumidIndex ).Name ) );
+				ShowSevereError( cNumericFields( 2 ) + " must be greater than zero." );
+				ShowContinueError( "Value specified = " + TrimSigDigits( Numbers( 2 ), 5 ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + ZoneDehumid( ZoneDehumidIndex ).Name );
 				ErrorsFound = true;
 			}
 
 			// N3,  \field Rated Air Flow Rate
 			ZoneDehumid( ZoneDehumidIndex ).RatedAirVolFlow = Numbers( 3 );
 			if ( ZoneDehumid( ZoneDehumidIndex ).RatedAirVolFlow <= 0.0 ) {
-				ShowSevereError( trim( cNumericFields( 3 ) ) + " must be greater than zero." );
-				ShowContinueError( "Value specified = " + trim( TrimSigDigits( Numbers( 3 ), 5 ) ) );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( ZoneDehumid( ZoneDehumidIndex ).Name ) );
+				ShowSevereError( cNumericFields( 3 ) + " must be greater than zero." );
+				ShowContinueError( "Value specified = " + TrimSigDigits( Numbers( 3 ), 5 ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + ZoneDehumid( ZoneDehumidIndex ).Name );
 				ErrorsFound = true;
 			}
 
@@ -353,10 +352,10 @@ namespace ZoneDehumidifier {
 			ZoneDehumid( ZoneDehumidIndex ).WaterRemovalCurveIndex = GetCurveIndex( Alphas( 5 ) ); // Convert curve name to index number
 			if ( ZoneDehumid( ZoneDehumidIndex ).WaterRemovalCurveIndex == 0 ) {
 				if ( lAlphaBlanks( 5 ) ) {
-					ShowSevereError( RoutineName + ":" + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaFields( 5 ) ) + "\" is required, missing for " + trim( cAlphaFields( 1 ) ) + " = " + trim( ZoneDehumid( ZoneDehumidIndex ).Name ) );
+					ShowSevereError( RoutineName + ':' + CurrentModuleObject + "=\"" + cAlphaFields( 5 ) + "\" is required, missing for " + cAlphaFields( 1 ) + " = " + ZoneDehumid( ZoneDehumidIndex ).Name );
 				} else {
-					ShowSevereError( trim( cAlphaFields( 5 ) ) + " not found = " + trim( Alphas( 5 ) ) );
-					ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( ZoneDehumid( ZoneDehumidIndex ).Name ) );
+					ShowSevereError( cAlphaFields( 5 ) + " not found = " + Alphas( 5 ) );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + ZoneDehumid( ZoneDehumidIndex ).Name );
 				}
 				ErrorsFound = true;
 			} else {
@@ -366,13 +365,13 @@ namespace ZoneDehumidifier {
 					ZoneDehumid( ZoneDehumidIndex ).WaterRemovalCurveType = BiQuadratic;
 					CurveVal = CurveValue( ZoneDehumid( ZoneDehumidIndex ).WaterRemovalCurveIndex, RatedInletAirTemp, RatedInletAirRH );
 					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( trim( cAlphaFields( 5 ) ) + " output is not equal to 1.0" );
-						ShowContinueError( "(+ or -10%) at rated conditions for " + trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
-						ShowContinueError( "Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+						ShowWarningError( cAlphaFields( 5 ) + " output is not equal to 1.0" );
+						ShowContinueError( "(+ or -10%) at rated conditions for " + CurrentModuleObject + " = " + Alphas( 1 ) );
+						ShowContinueError( "Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 					}
 
 				} else {
-					ShowSevereError( RoutineName + ":" + trim( CurrentModuleObject ) + "=\"" + trim( ZoneDehumid( ZoneDehumidIndex ).Name ) + "\" illegal " + trim( cAlphaFields( 5 ) ) + " type for this object = " + trim( GetCurveType( ZoneDehumid( ZoneDehumidIndex ).WaterRemovalCurveIndex ) ) );
+					ShowSevereError( RoutineName + ':' + CurrentModuleObject + "=\"" + ZoneDehumid( ZoneDehumidIndex ).Name + "\" illegal " + cAlphaFields( 5 ) + " type for this object = " + GetCurveType( ZoneDehumid( ZoneDehumidIndex ).WaterRemovalCurveIndex ) );
 					ShowContinueError( "Curve type must be BiQuadratic." );
 					ErrorsFound = true;
 				}}
@@ -382,10 +381,10 @@ namespace ZoneDehumidifier {
 			ZoneDehumid( ZoneDehumidIndex ).EnergyFactorCurveIndex = GetCurveIndex( Alphas( 6 ) ); // convert curve name to number
 			if ( ZoneDehumid( ZoneDehumidIndex ).EnergyFactorCurveIndex == 0 ) {
 				if ( lAlphaBlanks( 6 ) ) {
-					ShowSevereError( RoutineName + ":" + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaFields( 6 ) ) + "\" is required, missing for " + trim( cAlphaFields( 1 ) ) + " = " + trim( ZoneDehumid( ZoneDehumidIndex ).Name ) );
+					ShowSevereError( RoutineName + ':' + CurrentModuleObject + "=\"" + cAlphaFields( 6 ) + "\" is required, missing for " + cAlphaFields( 1 ) + " = " + ZoneDehumid( ZoneDehumidIndex ).Name );
 				} else {
-					ShowSevereError( trim( cAlphaFields( 6 ) ) + " not found = " + trim( Alphas( 6 ) ) );
-					ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( ZoneDehumid( ZoneDehumidIndex ).Name ) );
+					ShowSevereError( cAlphaFields( 6 ) + " not found = " + Alphas( 6 ) );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + ZoneDehumid( ZoneDehumidIndex ).Name );
 				}
 				ErrorsFound = true;
 			} else {
@@ -395,13 +394,13 @@ namespace ZoneDehumidifier {
 					ZoneDehumid( ZoneDehumidIndex ).EnergyFactorCurveType = BiQuadratic;
 					CurveVal = CurveValue( ZoneDehumid( ZoneDehumidIndex ).EnergyFactorCurveIndex, RatedInletAirTemp, RatedInletAirRH );
 					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( trim( cAlphaFields( 6 ) ) + " output is not equal to 1.0" );
-						ShowContinueError( "(+ or -10%) at rated conditions for " + trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
-						ShowContinueError( "Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+						ShowWarningError( cAlphaFields( 6 ) + " output is not equal to 1.0" );
+						ShowContinueError( "(+ or -10%) at rated conditions for " + CurrentModuleObject + " = " + Alphas( 1 ) );
+						ShowContinueError( "Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 					}
 
 				} else {
-					ShowSevereError( RoutineName + ":" + trim( CurrentModuleObject ) + "=\"" + trim( ZoneDehumid( ZoneDehumidIndex ).Name ) + "\" illegal " + trim( cAlphaFields( 6 ) ) + " type for this object = " + trim( GetCurveType( ZoneDehumid( ZoneDehumidIndex ).EnergyFactorCurveIndex ) ) );
+					ShowSevereError( RoutineName + ':' + CurrentModuleObject + "=\"" + ZoneDehumid( ZoneDehumidIndex ).Name + "\" illegal " + cAlphaFields( 6 ) + " type for this object = " + GetCurveType( ZoneDehumid( ZoneDehumidIndex ).EnergyFactorCurveIndex ) );
 					ShowContinueError( "Curve type must be BiQuadratic." );
 					ErrorsFound = true;
 				}}
@@ -411,10 +410,10 @@ namespace ZoneDehumidifier {
 			ZoneDehumid( ZoneDehumidIndex ).PartLoadCurveIndex = GetCurveIndex( Alphas( 7 ) ); // convert curve name to number
 			if ( ZoneDehumid( ZoneDehumidIndex ).PartLoadCurveIndex == 0 ) {
 				if ( lAlphaBlanks( 7 ) ) {
-					ShowSevereError( RoutineName + ":" + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaFields( 7 ) ) + "\" is required, missing for " + trim( cAlphaFields( 1 ) ) + " = " + trim( ZoneDehumid( ZoneDehumidIndex ).Name ) );
+					ShowSevereError( RoutineName + ':' + CurrentModuleObject + "=\"" + cAlphaFields( 7 ) + "\" is required, missing for " + cAlphaFields( 1 ) + " = " + ZoneDehumid( ZoneDehumidIndex ).Name );
 				} else {
-					ShowSevereError( trim( cAlphaFields( 7 ) ) + " not found = " + trim( Alphas( 7 ) ) );
-					ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( ZoneDehumid( ZoneDehumidIndex ).Name ) );
+					ShowSevereError( cAlphaFields( 7 ) + " not found = " + Alphas( 7 ) );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + ZoneDehumid( ZoneDehumidIndex ).Name );
 				}
 				ErrorsFound = true;
 			} else {
@@ -427,7 +426,7 @@ namespace ZoneDehumidifier {
 					ZoneDehumid( ZoneDehumidIndex ).PartLoadCurveType = Cubic;
 
 				} else {
-					ShowSevereError( RoutineName + ":" + trim( CurrentModuleObject ) + "=\"" + trim( ZoneDehumid( ZoneDehumidIndex ).Name ) + "\" illegal " + trim( cAlphaFields( 7 ) ) + " type for this object = " + trim( GetCurveType( ZoneDehumid( ZoneDehumidIndex ).PartLoadCurveIndex ) ) );
+					ShowSevereError( RoutineName + ':' + CurrentModuleObject + "=\"" + ZoneDehumid( ZoneDehumidIndex ).Name + "\" illegal " + cAlphaFields( 7 ) + " type for this object = " + GetCurveType( ZoneDehumid( ZoneDehumidIndex ).PartLoadCurveIndex ) );
 					ShowContinueError( "Curve type must be Quadratic or Cubic." );
 					ErrorsFound = true;
 				}}
@@ -439,10 +438,10 @@ namespace ZoneDehumidifier {
 			ZoneDehumid( ZoneDehumidIndex ).MaxInletAirTemp = Numbers( 5 );
 
 			if ( ZoneDehumid( ZoneDehumidIndex ).MinInletAirTemp >= ZoneDehumid( ZoneDehumidIndex ).MaxInletAirTemp ) {
-				ShowSevereError( trim( cNumericFields( 5 ) ) + " must be greater than " + trim( cNumericFields( 4 ) ) );
-				ShowContinueError( trim( cNumericFields( 5 ) ) + " specified = " + trim( TrimSigDigits( Numbers( 5 ), 1 ) ) );
-				ShowContinueError( trim( cNumericFields( 4 ) ) + " specified = " + trim( TrimSigDigits( Numbers( 4 ), 1 ) ) );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( ZoneDehumid( ZoneDehumidIndex ).Name ) );
+				ShowSevereError( cNumericFields( 5 ) + " must be greater than " + cNumericFields( 4 ) );
+				ShowContinueError( cNumericFields( 5 ) + " specified = " + TrimSigDigits( Numbers( 5 ), 1 ) );
+				ShowContinueError( cNumericFields( 4 ) + " specified = " + TrimSigDigits( Numbers( 4 ), 1 ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + ZoneDehumid( ZoneDehumidIndex ).Name );
 				ErrorsFound = true;
 			}
 
@@ -450,9 +449,9 @@ namespace ZoneDehumidifier {
 			ZoneDehumid( ZoneDehumidIndex ).OffCycleParasiticLoad = Numbers( 6 ); // Off Cycle Parasitic Load [W]
 
 			if ( ZoneDehumid( ZoneDehumidIndex ).OffCycleParasiticLoad < 0.0 ) {
-				ShowSevereError( trim( cNumericFields( 6 ) ) + " must be >= zero." );
-				ShowContinueError( "Value specified = " + trim( TrimSigDigits( Numbers( 6 ), 2 ) ) );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( ZoneDehumid( ZoneDehumidIndex ).Name ) );
+				ShowSevereError( cNumericFields( 6 ) + " must be >= zero." );
+				ShowContinueError( "Value specified = " + TrimSigDigits( Numbers( 6 ), 2 ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + ZoneDehumid( ZoneDehumidIndex ).Name );
 				ErrorsFound = true;
 			}
 
@@ -462,7 +461,7 @@ namespace ZoneDehumidifier {
 				ZoneDehumid( ZoneDehumidIndex ).CondensateCollectMode = CondensateDiscarded;
 			} else {
 				ZoneDehumid( ZoneDehumidIndex ).CondensateCollectMode = CondensateToTank;
-				SetupTankSupplyComponent( ZoneDehumid( ZoneDehumidIndex ).Name, trim( CurrentModuleObject ), ZoneDehumid( ZoneDehumidIndex ).CondensateCollectName, ErrorsFound, ZoneDehumid( ZoneDehumidIndex ).CondensateTankID, ZoneDehumid( ZoneDehumidIndex ).CondensateTankSupplyARRID );
+				SetupTankSupplyComponent( ZoneDehumid( ZoneDehumidIndex ).Name, CurrentModuleObject, ZoneDehumid( ZoneDehumidIndex ).CondensateCollectName, ErrorsFound, ZoneDehumid( ZoneDehumidIndex ).CondensateTankID, ZoneDehumid( ZoneDehumidIndex ).CondensateTankSupplyARRID );
 			}
 
 		} //   DO ZoneDehumidIndex=1,NumDehumidifiers
@@ -475,7 +474,7 @@ namespace ZoneDehumidifier {
 		lNumericBlanks.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + ":" + CurrentModuleObject + ": Errors found in input." );
+			ShowFatalError( RoutineName + ':' + CurrentModuleObject + ": Errors found in input." );
 		}
 
 		for ( ZoneDehumidIndex = 1; ZoneDehumidIndex <= NumDehumidifiers; ++ZoneDehumidIndex ) {
@@ -563,7 +562,7 @@ namespace ZoneDehumidifier {
 			ZoneEquipmentListChecked = true;
 			for ( LoopIndex = 1; LoopIndex <= NumDehumidifiers; ++LoopIndex ) {
 				if ( CheckZoneEquipmentList( ZoneDehumid( LoopIndex ).UnitType, ZoneDehumid( LoopIndex ).Name ) ) continue;
-				ShowSevereError( "InitZoneDehumidifier: Zone Dehumidifier=\"" + trim( ZoneDehumid( LoopIndex ).UnitType ) + "," + trim( ZoneDehumid( LoopIndex ).Name ) + "\" is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
+				ShowSevereError( "InitZoneDehumidifier: Zone Dehumidifier=\"" + ZoneDehumid( LoopIndex ).UnitType + ',' + ZoneDehumid( LoopIndex ).Name + "\" is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
 			}
 		}
 
@@ -746,12 +745,12 @@ namespace ZoneDehumidifier {
 			if ( WaterRemovalRateFactor <= 0.0 ) {
 				if ( ZoneDehumid( ZoneDehumNum ).WaterRemovalCurveErrorCount < 1 ) {
 					++ZoneDehumid( ZoneDehumNum ).WaterRemovalCurveErrorCount;
-					ShowWarningError( trim( ZoneDehumid( ZoneDehumNum ).UnitType ) + " \"" + trim( ZoneDehumid( ZoneDehumNum ).Name ) + "\":" );
-					ShowContinueError( " Water Removal Rate Curve output is <= 0.0 (" + trim( TrimSigDigits( WaterRemovalRateFactor, 5 ) ) + ")." );
-					ShowContinueError( " Negative value occurs using an inlet air dry-bulb temperature of " + trim( TrimSigDigits( InletAirTemp, 2 ) ) + " and an inlet air relative humidity of " + trim( TrimSigDigits( InletAirRH, 1 ) ) + "." );
+					ShowWarningError( ZoneDehumid( ZoneDehumNum ).UnitType + " \"" + ZoneDehumid( ZoneDehumNum ).Name + "\":" );
+					ShowContinueError( " Water Removal Rate Curve output is <= 0.0 (" + TrimSigDigits( WaterRemovalRateFactor, 5 ) + ")." );
+					ShowContinueError( " Negative value occurs using an inlet air dry-bulb temperature of " + TrimSigDigits( InletAirTemp, 2 ) + " and an inlet air relative humidity of " + TrimSigDigits( InletAirRH, 1 ) + '.' );
 					ShowContinueErrorTimeStamp( " Dehumidifier turned off for this time step but simulation continues." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( ZoneDehumid( ZoneDehumNum ).UnitType ) + " \"" + trim( ZoneDehumid( ZoneDehumNum ).Name ) + "\":" " Water Removal Rate Curve output is <= 0.0 warning continues...", ZoneDehumid( ZoneDehumNum ).WaterRemovalCurveErrorIndex, WaterRemovalRateFactor, WaterRemovalRateFactor );
+					ShowRecurringWarningErrorAtEnd( ZoneDehumid( ZoneDehumNum ).UnitType + " \"" + ZoneDehumid( ZoneDehumNum ).Name + "\": Water Removal Rate Curve output is <= 0.0 warning continues...", ZoneDehumid( ZoneDehumNum ).WaterRemovalCurveErrorIndex, WaterRemovalRateFactor, WaterRemovalRateFactor );
 				}
 				WaterRemovalRateFactor = 0.0;
 			}
@@ -773,12 +772,12 @@ namespace ZoneDehumidifier {
 			if ( EnergyFactorAdjFactor <= 0.0 ) {
 				if ( ZoneDehumid( ZoneDehumNum ).EnergyFactorCurveErrorCount < 1 ) {
 					++ZoneDehumid( ZoneDehumNum ).EnergyFactorCurveErrorCount;
-					ShowWarningError( trim( ZoneDehumid( ZoneDehumNum ).UnitType ) + " \"" + trim( ZoneDehumid( ZoneDehumNum ).Name ) + "\":" );
-					ShowContinueError( " Energy Factor Curve output is <= 0.0 (" + trim( TrimSigDigits( EnergyFactorAdjFactor, 5 ) ) + ")." );
-					ShowContinueError( " Negative value occurs using an inlet air dry-bulb temperature of " + trim( TrimSigDigits( InletAirTemp, 2 ) ) + " and an inlet air relative humidity of " + trim( TrimSigDigits( InletAirRH, 1 ) ) + "." );
+					ShowWarningError( ZoneDehumid( ZoneDehumNum ).UnitType + " \"" + ZoneDehumid( ZoneDehumNum ).Name + "\":" );
+					ShowContinueError( " Energy Factor Curve output is <= 0.0 (" + TrimSigDigits( EnergyFactorAdjFactor, 5 ) + ")." );
+					ShowContinueError( " Negative value occurs using an inlet air dry-bulb temperature of " + TrimSigDigits( InletAirTemp, 2 ) + " and an inlet air relative humidity of " + TrimSigDigits( InletAirRH, 1 ) + '.' );
 					ShowContinueErrorTimeStamp( " Dehumidifier turned off for this time step but simulation continues." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( ZoneDehumid( ZoneDehumNum ).UnitType ) + " \"" + trim( ZoneDehumid( ZoneDehumNum ).Name ) + "\":" " Energy Factor Curve output is <= 0.0 warning continues...", ZoneDehumid( ZoneDehumNum ).EnergyFactorCurveErrorIndex, EnergyFactorAdjFactor, EnergyFactorAdjFactor );
+					ShowRecurringWarningErrorAtEnd( ZoneDehumid( ZoneDehumNum ).UnitType + " \"" + ZoneDehumid( ZoneDehumNum ).Name + "\": Energy Factor Curve output is <= 0.0 warning continues...", ZoneDehumid( ZoneDehumNum ).EnergyFactorCurveErrorIndex, EnergyFactorAdjFactor, EnergyFactorAdjFactor );
 				}
 				ElectricPowerAvg = 0.0;
 				PLR = 0.0;
@@ -796,11 +795,11 @@ namespace ZoneDehumidifier {
 				if ( PLF < 0.7 ) {
 					if ( ZoneDehumid( ZoneDehumNum ).LowPLFErrorCount < 1 ) {
 						++ZoneDehumid( ZoneDehumNum ).LowPLFErrorCount;
-						ShowWarningError( trim( ZoneDehumid( ZoneDehumNum ).UnitType ) + " \"" + trim( ZoneDehumid( ZoneDehumNum ).Name ) + "\":" );
-						ShowContinueError( " The Part Load Fraction Correlation Curve output is (" + trim( TrimSigDigits( PLF, 2 ) ) + ") at a part-load ratio =" + trim( TrimSigDigits( PLR, 3 ) ) );
+						ShowWarningError( ZoneDehumid( ZoneDehumNum ).UnitType + " \"" + ZoneDehumid( ZoneDehumNum ).Name + "\":" );
+						ShowContinueError( " The Part Load Fraction Correlation Curve output is (" + TrimSigDigits( PLF, 2 ) + ") at a part-load ratio =" + TrimSigDigits( PLR, 3 ) );
 						ShowContinueErrorTimeStamp( " PLF curve values must be >= 0.7. " " PLF has been reset to 0.7 and simulation is continuing." );
 					} else {
-						ShowRecurringWarningErrorAtEnd( trim( ZoneDehumid( ZoneDehumNum ).UnitType ) + " \"" + trim( ZoneDehumid( ZoneDehumNum ).Name ) + "\":" " Part Load Fraction Correlation Curve output < 0.7 warning continues...", ZoneDehumid( ZoneDehumNum ).LowPLFErrorIndex, PLF, PLF );
+						ShowRecurringWarningErrorAtEnd( ZoneDehumid( ZoneDehumNum ).UnitType + " \"" + ZoneDehumid( ZoneDehumNum ).Name + "\": Part Load Fraction Correlation Curve output < 0.7 warning continues...", ZoneDehumid( ZoneDehumNum ).LowPLFErrorIndex, PLF, PLF );
 					}
 					PLF = 0.7;
 				}
@@ -808,11 +807,11 @@ namespace ZoneDehumidifier {
 				if ( PLF > 1.0 ) {
 					if ( ZoneDehumid( ZoneDehumNum ).HighPLFErrorCount < 1 ) {
 						++ZoneDehumid( ZoneDehumNum ).HighPLFErrorCount;
-						ShowWarningError( trim( ZoneDehumid( ZoneDehumNum ).UnitType ) + " \"" + trim( ZoneDehumid( ZoneDehumNum ).Name ) + "\":" );
-						ShowContinueError( " The Part Load Fraction Correlation Curve output is (" + trim( TrimSigDigits( PLF, 2 ) ) + ") at a part-load ratio =" + trim( TrimSigDigits( PLR, 3 ) ) );
+						ShowWarningError( ZoneDehumid( ZoneDehumNum ).UnitType + " \"" + ZoneDehumid( ZoneDehumNum ).Name + "\":" );
+						ShowContinueError( " The Part Load Fraction Correlation Curve output is (" + TrimSigDigits( PLF, 2 ) + ") at a part-load ratio =" + TrimSigDigits( PLR, 3 ) );
 						ShowContinueErrorTimeStamp( " PLF curve values must be < 1.0. " " PLF has been reset to 1.0 and simulation is continuing." );
 					} else {
-						ShowRecurringWarningErrorAtEnd( trim( ZoneDehumid( ZoneDehumNum ).UnitType ) + " \"" + trim( ZoneDehumid( ZoneDehumNum ).Name ) + "\":" " Part Load Fraction Correlation Curve output > 1.0 warning continues...", ZoneDehumid( ZoneDehumNum ).HighPLFErrorIndex, PLF, PLF );
+						ShowRecurringWarningErrorAtEnd( ZoneDehumid( ZoneDehumNum ).UnitType + " \"" + ZoneDehumid( ZoneDehumNum ).Name + "\": Part Load Fraction Correlation Curve output > 1.0 warning continues...", ZoneDehumid( ZoneDehumNum ).HighPLFErrorIndex, PLF, PLF );
 					}
 					PLF = 1.0;
 				}
@@ -822,12 +821,12 @@ namespace ZoneDehumidifier {
 				} else {
 					if ( ZoneDehumid( ZoneDehumNum ).PLFPLRErrorCount < 1 ) {
 						++ZoneDehumid( ZoneDehumNum ).PLFPLRErrorCount;
-						ShowWarningError( trim( ZoneDehumid( ZoneDehumNum ).UnitType ) + " \"" + trim( ZoneDehumid( ZoneDehumNum ).Name ) + "\":" );
-						ShowContinueError( "The part load fraction was less than the part load ratio calculated" " for this time step [PLR=" + trim( TrimSigDigits( PLR, 4 ) ) + ", PLF=" + trim( TrimSigDigits( PLF, 4 ) ) + "]." );
+						ShowWarningError( ZoneDehumid( ZoneDehumNum ).UnitType + " \"" + ZoneDehumid( ZoneDehumNum ).Name + "\":" );
+						ShowContinueError( "The part load fraction was less than the part load ratio calculated" " for this time step [PLR=" + TrimSigDigits( PLR, 4 ) + ", PLF=" + TrimSigDigits( PLF, 4 ) + "]." );
 						ShowContinueError( "Runtime fraction reset to 1 and the simulation will continue." );
-						ShowContinueErrorTimeStamp( " " );
+						ShowContinueErrorTimeStamp( "" );
 					} else {
-						ShowRecurringWarningErrorAtEnd( trim( ZoneDehumid( ZoneDehumNum ).UnitType ) + " \"" + trim( ZoneDehumid( ZoneDehumNum ).Name ) + "\":" " Part load fraction less than part load ratio warning continues...", ZoneDehumid( ZoneDehumNum ).PLFPLRErrorIndex );
+						ShowRecurringWarningErrorAtEnd( ZoneDehumid( ZoneDehumNum ).UnitType + " \"" + ZoneDehumid( ZoneDehumNum ).Name + "\": Part load fraction less than part load ratio warning continues...", ZoneDehumid( ZoneDehumNum ).PLFPLRErrorIndex );
 					}
 					RunTimeFraction = 1.0;
 				}
@@ -835,12 +834,12 @@ namespace ZoneDehumidifier {
 				if ( RunTimeFraction > 1.0 && std::abs( RunTimeFraction - 1.0 ) > 0.001 ) {
 					if ( ZoneDehumid( ZoneDehumNum ).HighRTFErrorCount < 1 ) {
 						++ZoneDehumid( ZoneDehumNum ).HighRTFErrorCount;
-						ShowWarningError( trim( ZoneDehumid( ZoneDehumNum ).UnitType ) + " \"" + trim( ZoneDehumid( ZoneDehumNum ).Name ) + "\":" );
-						ShowContinueError( "The runtime fraction for this zone dehumidifier" " exceeded 1.0 [" + trim( TrimSigDigits( RunTimeFraction, 4 ) ) + "]." );
+						ShowWarningError( ZoneDehumid( ZoneDehumNum ).UnitType + " \"" + ZoneDehumid( ZoneDehumNum ).Name + "\":" );
+						ShowContinueError( "The runtime fraction for this zone dehumidifier" " exceeded 1.0 [" + TrimSigDigits( RunTimeFraction, 4 ) + "]." );
 						ShowContinueError( "Runtime fraction reset to 1 and the simulation will continue." );
-						ShowContinueErrorTimeStamp( " " );
+						ShowContinueErrorTimeStamp( "" );
 					} else {
-						ShowRecurringWarningErrorAtEnd( trim( ZoneDehumid( ZoneDehumNum ).UnitType ) + " \"" + trim( ZoneDehumid( ZoneDehumNum ).Name ) + "\":" " Runtime fraction for zone dehumidifier exceeded 1.0 warning continues...", ZoneDehumid( ZoneDehumNum ).HighRTFErrorIndex, RunTimeFraction, RunTimeFraction );
+						ShowRecurringWarningErrorAtEnd( ZoneDehumid( ZoneDehumNum ).UnitType + " \"" + ZoneDehumid( ZoneDehumNum ).Name + "\": Runtime fraction for zone dehumidifier exceeded 1.0 warning continues...", ZoneDehumid( ZoneDehumNum ).HighRTFErrorIndex, RunTimeFraction, RunTimeFraction );
 					}
 					RunTimeFraction = 1.0;
 				}

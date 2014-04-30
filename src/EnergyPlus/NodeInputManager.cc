@@ -4,6 +4,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <NodeInputManager.hh>
@@ -42,7 +43,6 @@ namespace NodeInputManager {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::OutputFileBNDetails;
 	using DataGlobals::DisplayAdvancedReportVariables;
 	using InputProcessor::GetNumObjectsFound;
@@ -58,7 +58,7 @@ namespace NodeInputManager {
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
-	Fstring const Blank;
+	std::string const Blank;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -72,11 +72,11 @@ namespace NodeInputManager {
 	// The following is a module level flag because there are several possible "entries" into
 	// this module that may need to get the Node Inputs.
 	bool GetNodeInputFlag( true ); // Flag to Get Node Input(s)
-	FArray1D_Fstring TmpNodeID( sFstring( MaxNameLength ) ); // Used to "reallocate" name arrays
+	FArray1D_string TmpNodeID; // Used to "reallocate" name arrays
 	FArray1D_int NodeRef; // Number of times a Node is "referenced"
 	FArray1D_int TmpNodeRef; // used to reallocate
-	Fstring CurCheckContextName( MaxNameLength ); // Used in Uniqueness checks
-	FArray1D_Fstring UniqueNodeNames( sFstring( MaxNameLength ) ); // used in uniqueness checks
+	std::string CurCheckContextName; // Used in Uniqueness checks
+	FArray1D_string UniqueNodeNames; // used in uniqueness checks
 	int NumCheckNodes( 0 ); // Num of Unique nodes in check
 	int MaxCheckNodes( 0 ); // Current "max" unique nodes in check
 	bool NodeVarsSetup( false ); // Setup indicator of node vars for reporting (also that all nodes have been entered)
@@ -94,18 +94,18 @@ namespace NodeInputManager {
 
 	void
 	GetNodeNums(
-		Fstring const & Name, // Name for which to obtain information
+		std::string const & Name, // Name for which to obtain information
 		int & NumNodes, // Number of nodes accompanying this Name
 		FArray1S_int NodeNumbers, // Node Numbers accompanying this Name
 		bool & ErrorsFound, // True when errors are found...
 		int const NodeFluidType, // Fluidtype for checking/setting node FluidType
-		Fstring const & NodeObjectType, // Node Object Type (i.e. "Chiller:Electric")
-		Fstring const & NodeObjectName, // Node Object Name (i.e. "MyChiller")
+		std::string const & NodeObjectType, // Node Object Type (i.e. "Chiller:Electric")
+		std::string const & NodeObjectName, // Node Object Name (i.e. "MyChiller")
 		int const NodeConnectionType, // Node Connection Type (see DataLoopNode)
 		int const NodeFluidStream, // Which Fluid Stream (1,2,3,...)
 		bool const ObjectIsParent, // True/False
 		Optional_bool_const IncrementFluidStream, // True/False
-		Optional_Fstring_const InputFieldName // Input Field Name
+		Optional_string_const InputFieldName // Input Field Name
 	)
 	{
 
@@ -137,7 +137,7 @@ namespace NodeInputManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetNodeNums: " );
+		static std::string const RoutineName( "GetNodeNums: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -148,8 +148,8 @@ namespace NodeInputManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ThisOne; // Indicator for this Name
 		//  CHARACTER(len=20) :: CaseNodeFluidType
-		Fstring cNodeFluidType( 20 );
-		Fstring ConnectionType( 32 );
+		std::string cNodeFluidType;
+		std::string ConnectionType;
 		int Loop;
 		int FluidStreamNum; // Fluid stream number passed to RegisterNodeConnection
 
@@ -160,14 +160,14 @@ namespace NodeInputManager {
 
 		if ( NodeFluidType != NodeType_Air && NodeFluidType != NodeType_Water && NodeFluidType != NodeType_Electric && NodeFluidType != NodeType_Steam && NodeFluidType != NodeType_Unknown ) {
 			gio::write( cNodeFluidType, "*" ) << NodeFluidType;
-			cNodeFluidType = adjustl( cNodeFluidType );
-			ShowSevereError( RoutineName + trim( NodeObjectType ) + "=\"" + trim( NodeObjectName ) + "\", invalid fluid type." );
-			ShowContinueError( "..Invalid FluidType=" + trim( cNodeFluidType ) );
+			strip( cNodeFluidType );
+			ShowSevereError( RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid fluid type." );
+			ShowContinueError( "..Invalid FluidType=" + cNodeFluidType );
 			ErrorsFound = true;
 			ShowFatalError( "Preceding issue causes termination." );
 		}
 
-		if ( Name != "  " ) {
+		if ( not_blank( Name ) ) {
 			ThisOne = FindItemInList( Name, NodeLists.Name(), NumOfNodeLists );
 			if ( ThisOne != 0 ) {
 				NumNodes = NodeLists( ThisOne ).NumOfNodesInList;
@@ -175,10 +175,10 @@ namespace NodeInputManager {
 				for ( Loop = 1; Loop <= NumNodes; ++Loop ) {
 					if ( NodeFluidType != NodeType_Unknown && Node( NodeNumbers( Loop ) ).FluidType != NodeType_Unknown ) {
 						if ( Node( NodeNumbers( Loop ) ).FluidType != NodeFluidType ) {
-							ShowSevereError( RoutineName + trim( NodeObjectType ) + "=\"" + trim( NodeObjectName ) + "\", invalid data." );
-							if ( present( InputFieldName ) ) ShowContinueError( "...Ref field=" + trim( InputFieldName ) );
-							ShowContinueError( "Existing Fluid type for node, incorrect for request. Node=" + trim( NodeID( NodeNumbers( Loop ) ) ) );
-							ShowContinueError( "Existing Fluid type=" + trim( ValidNodeFluidTypes( Node( NodeNumbers( Loop ) ).FluidType ) ) + ", Requested Fluid Type=" + trim( ValidNodeFluidTypes( NodeFluidType ) ) );
+							ShowSevereError( RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid data." );
+							if ( present( InputFieldName ) ) ShowContinueError( "...Ref field=" + InputFieldName );
+							ShowContinueError( "Existing Fluid type for node, incorrect for request. Node=" + NodeID( NodeNumbers( Loop ) ) );
+							ShowContinueError( "Existing Fluid type=" + ValidNodeFluidTypes( Node( NodeNumbers( Loop ) ).FluidType ) + ", Requested Fluid Type=" + ValidNodeFluidTypes( NodeFluidType ) );
 							ErrorsFound = true;
 						}
 					}
@@ -203,7 +203,7 @@ namespace NodeInputManager {
 			if ( NodeConnectionType >= 1 && NodeConnectionType <= NumValidConnectionTypes ) {
 				ConnectionType = ValidConnectionTypes( NodeConnectionType );
 			} else {
-				ConnectionType = trim( TrimSigDigits( NodeConnectionType ) ) + "-unknown";
+				ConnectionType = TrimSigDigits( NodeConnectionType ) + "-unknown";
 			}
 			// If requested, assign NodeFluidStream to the first node and increment the fluid stream number
 			// for each remaining node in the list
@@ -217,17 +217,17 @@ namespace NodeInputManager {
 
 	void
 	GetNodeList(
-		Fstring const & Name, // Node List Name for which information is obtained
+		std::string const & Name, // Node List Name for which information is obtained
 		int & NumNodes, // Number of nodes accompanying this Name
 		FArray1S_int NodeNumbers, // NodeNumbers accompanying this Name
 		bool & errFlag, // Set to true when requested Node List not found
 		int const NodeFluidType, // Fluidtype for checking/setting node FluidType
-		Fstring const & NodeObjectType, // Node Object Type (i.e. "Chiller:Electric")
-		Fstring const & NodeObjectName, // Node Object Name (i.e. "MyChiller")
+		std::string const & NodeObjectType, // Node Object Type (i.e. "Chiller:Electric")
+		std::string const & NodeObjectName, // Node Object Name (i.e. "MyChiller")
 		int const NodeConnectionType, // Node Connection Type (see DataLoopNode)
 		int const NodeFluidStream, // Which Fluid Stream (1,2,3,...)
 		bool const ObjectIsParent, // True/False
-		Optional_Fstring_const InputFieldName // Input Field Name
+		Optional_string_const InputFieldName // Input Field Name
 	)
 	{
 
@@ -257,7 +257,7 @@ namespace NodeInputManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetNodeList: " );
+		static std::string const RoutineName( "GetNodeList: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -289,9 +289,9 @@ namespace NodeInputManager {
 		} else {
 			// only valid "error" here is when the Node List is blank
 			if ( Name != Blank ) {
-				ShowSevereError( RoutineName + trim( NodeObjectType ) + "=\"" + trim( NodeObjectName ) + "\", invalid data." );
-				if ( present( InputFieldName ) ) ShowContinueError( "...Ref field=" + trim( InputFieldName ) );
-				ShowContinueError( "NodeList not found=\"" + trim( Name ) + "\"." );
+				ShowSevereError( RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid data." );
+				if ( present( InputFieldName ) ) ShowContinueError( "...Ref field=" + InputFieldName );
+				ShowContinueError( "NodeList not found=\"" + Name + "\"." );
 				errFlag = true;
 			}
 		}
@@ -339,15 +339,15 @@ namespace NodeInputManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumNode; // Loop Variable
 		int Count0;
-		Fstring ChrOut( 20 );
-		Fstring ChrOut1( 20 );
-		Fstring ChrOut2( 20 );
+		std::string ChrOut;
+		std::string ChrOut1;
+		std::string ChrOut2;
 
 		// Formats
-		std::string const Format_700( "('! #Nodes,<Number of Unique Nodes>')" );
-		std::string const Format_701( "(A)" );
-		std::string const Format_702( "('! <Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>')" );
-		std::string const Format_703( "('! <Suspicious Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>')" );
+		static gio::Fmt const Format_700( "('! #Nodes,<Number of Unique Nodes>')" );
+		static gio::Fmt const Format_701( "(A)" );
+		static gio::Fmt const Format_702( "('! <Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>')" );
+		static gio::Fmt const Format_703( "('! <Suspicious Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>')" );
 
 		if ( ! NodeVarsSetup ) {
 			if ( ! AbortProcessing ) {
@@ -410,18 +410,18 @@ namespace NodeInputManager {
 			// Show the node names on the Branch-Node Details file
 			gio::write( OutputFileBNDetails, Format_700 );
 			gio::write( ChrOut, "*" ) << NumOfUniqueNodeNames;
-			gio::write( OutputFileBNDetails, Format_701 ) << " #Nodes," + adjustl( ChrOut );
+			gio::write( OutputFileBNDetails, Format_701 ) << " #Nodes," + stripped( ChrOut );
 			if ( NumOfUniqueNodeNames > 0 ) {
 				gio::write( OutputFileBNDetails, Format_702 );
 			}
 			Count0 = 0;
 			for ( NumNode = 1; NumNode <= NumOfUniqueNodeNames; ++NumNode ) {
 				gio::write( ChrOut, "*" ) << NumNode;
-				ChrOut = adjustl( ChrOut );
+				strip( ChrOut );
 				gio::write( ChrOut1, "*" ) << NodeRef( NumNode );
-				ChrOut1 = adjustl( ChrOut1 );
+				strip( ChrOut1 );
 				ChrOut2 = ValidNodeFluidTypes( Node( NumNode ).FluidType );
-				gio::write( OutputFileBNDetails, Format_701 ) << " Node," + trim( ChrOut ) + "," + trim( NodeID( NumNode ) ) + "," + trim( ChrOut2 ) + "," + trim( ChrOut1 );
+				gio::write( OutputFileBNDetails, Format_701 ) << " Node," + ChrOut + ',' + NodeID( NumNode ) + ',' + ChrOut2 + ',' + ChrOut1;
 				if ( NodeRef( NumNode ) == 0 ) ++Count0;
 			}
 			// Show suspicious node names on the Branch-Node Details file
@@ -433,11 +433,11 @@ namespace NodeInputManager {
 				for ( NumNode = 1; NumNode <= NumOfUniqueNodeNames; ++NumNode ) {
 					if ( NodeRef( NumNode ) > 0 ) continue;
 					gio::write( ChrOut, "*" ) << NumNode;
-					ChrOut = adjustl( ChrOut );
+					strip( ChrOut );
 					gio::write( ChrOut1, "*" ) << NodeRef( NumNode );
-					ChrOut1 = adjustl( ChrOut1 );
+					strip( ChrOut1 );
 					ChrOut2 = ValidNodeFluidTypes( Node( NumNode ).FluidType );
-					gio::write( OutputFileBNDetails, Format_701 ) << " Suspicious Node," + trim( ChrOut ) + "," + trim( NodeID( NumNode ) ) + "," + trim( ChrOut2 ) + "," + trim( ChrOut1 );
+					gio::write( OutputFileBNDetails, Format_701 ) << " Suspicious Node," + ChrOut + ',' + NodeID( NumNode ) + ',' + ChrOut2 + ',' + ChrOut1;
 				}
 			}
 		}
@@ -471,8 +471,8 @@ namespace NodeInputManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetNodeListsInput: " );
-		static Fstring const CurrentModuleObject( "NodeList" );
+		static std::string const RoutineName( "GetNodeListsInput: " );
+		static std::string const CurrentModuleObject( "NodeList" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -491,7 +491,7 @@ namespace NodeInputManager {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		bool flagError; // true when error node list name should be output
-		FArray1D_Fstring cAlphas( sFstring( MaxNameLength ) );
+		FArray1D_string cAlphas;
 		FArray1D< Real64 > rNumbers;
 
 		ErrorsFound = false;
@@ -501,7 +501,7 @@ namespace NodeInputManager {
 		NumOfNodeLists = GetNumObjectsFound( CurrentModuleObject );
 		NodeLists.allocate( NumOfNodeLists );
 		if ( NumOfNodeLists > 0 ) {
-			NodeLists( {1,NumOfNodeLists} ).Name() = " ";
+			NodeLists( {1,NumOfNodeLists} ).Name() = "";
 			NodeLists( {1,NumOfNodeLists} ).NumOfNodesInList() = 0;
 		}
 
@@ -518,13 +518,13 @@ namespace NodeInputManager {
 			++NCount;
 			NodeLists( NCount ).Name = cAlphas( 1 );
 			NodeLists( NCount ).NodeNames.allocate( NumAlphas - 1 );
-			NodeLists( NCount ).NodeNames = " ";
+			NodeLists( NCount ).NodeNames = "";
 			NodeLists( NCount ).NodeNumbers.allocate( NumAlphas - 1 );
 			NodeLists( NCount ).NodeNumbers = 0;
 			NodeLists( NCount ).NumOfNodesInList = NumAlphas - 1;
 			if ( NumAlphas <= 1 ) {
 				if ( NumAlphas == 1 ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + trim( cAlphas( 1 ) ) + "\" does not have any nodes." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphas( 1 ) + "\" does not have any nodes." );
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=<blank> does not have any nodes or nodelist name." );
 				}
@@ -535,10 +535,10 @@ namespace NodeInputManager {
 			for ( Loop1 = 1; Loop1 <= NumAlphas - 1; ++Loop1 ) {
 				NodeLists( NCount ).NodeNames( Loop1 ) = cAlphas( Loop1 + 1 );
 				if ( cAlphas( Loop1 + 1 ) == Blank ) {
-					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + trim( cAlphas( 1 ) ) + "\", blank node name in list." );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphas( 1 ) + "\", blank node name in list." );
 					--NodeLists( NCount ).NumOfNodesInList;
 					if ( NodeLists( NCount ).NumOfNodesInList <= 0 ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + trim( cAlphas( 1 ) ) + "\" does not have any nodes." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphas( 1 ) + "\" does not have any nodes." );
 						ErrorsFound = true;
 						break;
 					}
@@ -546,8 +546,8 @@ namespace NodeInputManager {
 				}
 				NodeLists( NCount ).NodeNumbers( Loop1 ) = AssignNodeNumber( NodeLists( NCount ).NodeNames( Loop1 ), NodeType_Unknown, ErrorsFound );
 				if ( SameString( NodeLists( NCount ).NodeNames( Loop1 ), NodeLists( NCount ).Name ) ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + trim( cAlphas( 1 ) ) + "\", invalid node name in list." );
-					ShowContinueError( "... Node " + trim( TrimSigDigits( Loop1 ) ) + " Name=\"" + trim( cAlphas( Loop1 + 1 ) ) + "\", duplicates NodeList Name." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphas( 1 ) + "\", invalid node name in list." );
+					ShowContinueError( "... Node " + TrimSigDigits( Loop1 ) + " Name=\"" + cAlphas( Loop1 + 1 ) + "\", duplicates NodeList Name." );
 					ErrorsFound = true;
 				}
 			}
@@ -557,10 +557,10 @@ namespace NodeInputManager {
 				for ( Loop2 = Loop1 + 1; Loop2 <= NodeLists( NCount ).NumOfNodesInList; ++Loop2 ) {
 					if ( NodeLists( NCount ).NodeNumbers( Loop1 ) != NodeLists( NCount ).NodeNumbers( Loop2 ) ) continue;
 					if ( flagError ) { // only list nodelist name once
-						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + trim( cAlphas( 1 ) ) + "\" has duplicate nodes:" );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphas( 1 ) + "\" has duplicate nodes:" );
 						flagError = false;
 					}
-					ShowContinueError( "...list item=" + trim( TrimSigDigits( Loop1 ) ) + ", \"" + trim( NodeID( NodeLists( NCount ).NodeNumbers( Loop1 ) ) ) + "\", duplicate list item=" + trim( TrimSigDigits( Loop2 ) ) + ", \"" + trim( NodeID( NodeLists( NCount ).NodeNumbers( Loop2 ) ) ) + "\"." );
+					ShowContinueError( "...list item=" + TrimSigDigits( Loop1 ) + ", \"" + NodeID( NodeLists( NCount ).NodeNumbers( Loop1 ) ) + "\", duplicate list item=" + TrimSigDigits( Loop2 ) + ", \"" + NodeID( NodeLists( NCount ).NodeNumbers( Loop2 ) ) + "\"." );
 					ErrorsFound = true;
 				}
 			}
@@ -571,9 +571,9 @@ namespace NodeInputManager {
 				for ( Loop1 = 1; Loop1 <= NumOfNodeLists; ++Loop1 ) {
 					if ( Loop == Loop1 ) continue; // within a nodelist have already checked to see if node name duplicates nodelist name
 					if ( ! SameString( NodeLists( Loop ).NodeNames( Loop2 ), NodeLists( Loop1 ).Name ) ) continue;
-					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + trim( NodeLists( Loop1 ).Name ) + "\", invalid node name in list." );
-					ShowContinueError( "... Node " + trim( TrimSigDigits( Loop2 ) ) + " Name=\"" + trim( NodeLists( Loop ).NodeNames( Loop2 ) ) + "\", duplicates NodeList Name." );
-					ShowContinueError( "... NodeList=\"" + trim( NodeLists( Loop1 ).Name ) + "\", is duplicated." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + NodeLists( Loop1 ).Name + "\", invalid node name in list." );
+					ShowContinueError( "... Node " + TrimSigDigits( Loop2 ) + " Name=\"" + NodeLists( Loop ).NodeNames( Loop2 ) + "\", duplicates NodeList Name." );
+					ShowContinueError( "... NodeList=\"" + NodeLists( Loop1 ).Name + "\", is duplicated." );
 					ShowContinueError( "... Items in NodeLists must not be the name of another NodeList." );
 					ErrorsFound = true;
 				}
@@ -591,7 +591,7 @@ namespace NodeInputManager {
 
 	int
 	AssignNodeNumber(
-		Fstring const & Name, // Name for assignment
+		std::string const & Name, // Name for assignment
 		int const NodeFluidType, // must be valid
 		bool & ErrorsFound
 	)
@@ -633,12 +633,12 @@ namespace NodeInputManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static int NumNode( 0 ); // Loop Variable
-		static Fstring cNodeFluidType( 25 );
+		static std::string cNodeFluidType;
 
 		if ( NodeFluidType != NodeType_Air && NodeFluidType != NodeType_Water && NodeFluidType != NodeType_Electric && NodeFluidType != NodeType_Steam && NodeFluidType != NodeType_Unknown ) {
 			gio::write( cNodeFluidType, "*" ) << NodeFluidType;
-			cNodeFluidType = adjustl( cNodeFluidType );
-			ShowSevereError( "AssignNodeNumber: Invalid FluidType=" + trim( cNodeFluidType ) );
+			strip( cNodeFluidType );
+			ShowSevereError( "AssignNodeNumber: Invalid FluidType=" + cNodeFluidType );
 			ErrorsFound = true;
 			ShowFatalError( "AssignNodeNumber: Preceding issue causes termination." );
 		}
@@ -651,8 +651,8 @@ namespace NodeInputManager {
 				++NodeRef( NumNode );
 				if ( NodeFluidType != NodeType_Unknown ) {
 					if ( Node( NumNode ).FluidType != NodeFluidType && Node( NumNode ).FluidType != NodeType_Unknown ) {
-						ShowSevereError( "Existing Fluid type for node, incorrect for request. Node=" + trim( NodeID( NumNode ) ) );
-						ShowContinueError( "Existing Fluid type=" + trim( ValidNodeFluidTypes( Node( NumNode ).FluidType ) ) + ", Requested Fluid Type=" + trim( ValidNodeFluidTypes( NodeFluidType ) ) );
+						ShowSevereError( "Existing Fluid type for node, incorrect for request. Node=" + NodeID( NumNode ) );
+						ShowContinueError( "Existing Fluid type=" + ValidNodeFluidTypes( Node( NumNode ).FluidType ) + ", Requested Fluid Type=" + ValidNodeFluidTypes( NodeFluidType ) );
 						ErrorsFound = true;
 					}
 				}
@@ -691,7 +691,7 @@ namespace NodeInputManager {
 				// Set new item in derived type Node to zero.
 				Node( NumOfNodes ).FluidType = NodeFluidType;
 				// Allocate takes care of defining
-				NodeID( NumOfNodes ) = " ";
+				NodeID( NumOfNodes ) = "";
 				NodeRef( NumOfNodes ) = 0;
 
 				NodeID( NumOfUniqueNodeNames ) = Name;
@@ -719,15 +719,15 @@ namespace NodeInputManager {
 
 	int
 	GetOnlySingleNode(
-		Fstring const & NodeName,
+		std::string const & NodeName,
 		bool & errFlag,
-		Fstring const & NodeObjectType, // Node Object Type (i.e. "Chiller:Electric")
-		Fstring const & NodeObjectName, // Node Object Name (i.e. "MyChiller")
+		std::string const & NodeObjectType, // Node Object Type (i.e. "Chiller:Electric")
+		std::string const & NodeObjectName, // Node Object Name (i.e. "MyChiller")
 		int const NodeFluidType, // Fluidtype for checking/setting node FluidType
 		int const NodeConnectionType, // Node Connection Type (see DataLoopNode)
 		int const NodeFluidStream, // Which Fluid Stream (1,2,3,...)
 		bool const ObjectIsParent, // True/False
-		Optional_Fstring_const InputFieldName // Input Field Name
+		Optional_string_const InputFieldName // Input Field Name
 	)
 	{
 
@@ -757,7 +757,7 @@ namespace NodeInputManager {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetOnlySingleNode: " );
+		static std::string const RoutineName( "GetOnlySingleNode: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -769,7 +769,7 @@ namespace NodeInputManager {
 		int NumNodes;
 		static FArray1D_int NodeNums;
 		int FluidType;
-		Fstring ConnectionType( 32 );
+		std::string ConnectionType;
 		static bool firstTime( true );
 		int NumParams;
 		int NumAlphas;
@@ -787,9 +787,9 @@ namespace NodeInputManager {
 		GetNodeNums( NodeName, NumNodes, NodeNums, errFlag, FluidType, NodeObjectType, NodeObjectName, NodeConnectionType, NodeFluidStream, ObjectIsParent, _, InputFieldName );
 
 		if ( NumNodes > 1 ) {
-			ShowSevereError( RoutineName + trim( NodeObjectType ) + "=\"" + trim( NodeObjectName ) + "\", invalid data." );
-			if ( present( InputFieldName ) ) ShowContinueError( "...Ref field=" + trim( InputFieldName ) );
-			ShowContinueError( "Only 1st Node used from NodeList=\"" + trim( NodeName ) + "\"." );
+			ShowSevereError( RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid data." );
+			if ( present( InputFieldName ) ) ShowContinueError( "...Ref field=" + InputFieldName );
+			ShowContinueError( "Only 1st Node used from NodeList=\"" + NodeName + "\"." );
 			ShowContinueError( "...a Nodelist may not be valid in this context." );
 			errFlag = true;
 		} else if ( NumNodes == 0 ) {
@@ -799,7 +799,7 @@ namespace NodeInputManager {
 			if ( NodeConnectionType >= 1 && NodeConnectionType <= NumValidConnectionTypes ) {
 				ConnectionType = ValidConnectionTypes( NodeConnectionType );
 			} else {
-				ConnectionType = trim( TrimSigDigits( NodeConnectionType ) ) + "-unknown";
+				ConnectionType = TrimSigDigits( NodeConnectionType ) + "-unknown";
 			}
 			//    CALL RegisterNodeConnection(NodeNums(1),NodeID(NodeNums(1)),NodeObjectType,NodeObjectName,  &
 			//                                  ConnectionType,NodeFluidStream,ObjectIsParent,errFlag)
@@ -812,7 +812,7 @@ namespace NodeInputManager {
 	}
 
 	void
-	InitUniqueNodeCheck( Fstring const & ContextName )
+	InitUniqueNodeCheck( std::string const & ContextName )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -857,7 +857,7 @@ namespace NodeInputManager {
 		}
 
 		if ( CurCheckContextName != Blank ) {
-			ShowFatalError( "Init Uniqueness called for \"" + trim( ContextName ) + ", but checks for \"" + trim( CurCheckContextName ) + "\" was already in progress." );
+			ShowFatalError( "Init Uniqueness called for \"" + ContextName + ", but checks for \"" + CurCheckContextName + "\" was already in progress." );
 		}
 		if ( ContextName == Blank ) {
 			ShowFatalError( "Init Uniqueness called with Blank Context Name" );
@@ -876,12 +876,12 @@ namespace NodeInputManager {
 
 	void
 	CheckUniqueNodes(
-		Fstring const & NodeTypes,
-		Fstring const & CheckType,
+		std::string const & NodeTypes,
+		std::string const & CheckType,
 		bool & ErrorsFound,
-		Optional_Fstring_const CheckName,
+		Optional_string_const CheckName,
 		Optional_int_const CheckNumber,
-		Optional_Fstring_const ObjectName
+		Optional_string_const ObjectName
 	)
 	{
 
@@ -935,8 +935,8 @@ namespace NodeInputManager {
 			if ( CheckName != Blank ) {
 				Found = FindItemInList( CheckName, UniqueNodeNames, NumCheckNodes );
 				if ( Found != 0 ) {
-					ShowSevereError( trim( CurCheckContextName ) + "=\"" + trim( ObjectName ) + "\", duplicate node names found." );
-					ShowContinueError( "...for Node Type(s)=" + trim( NodeTypes ) + ", duplicate node name=\"" + trim( CheckName ) + "\"." );
+					ShowSevereError( CurCheckContextName + "=\"" + ObjectName + "\", duplicate node names found." );
+					ShowContinueError( "...for Node Type(s)=" + NodeTypes + ", duplicate node name=\"" + CheckName + "\"." );
 					ShowContinueError( "...Nodes must be unique across instances of this object." );
 					//          CALL ShowSevereError('Node Types='//TRIM(NodeTypes)//', Non Unique Name found='//TRIM(CheckName))
 					//          CALL ShowContinueError('Context='//TRIM(CurCheckContextName))
@@ -964,8 +964,8 @@ namespace NodeInputManager {
 			if ( CheckNumber != 0 ) {
 				Found = FindItemInList( NodeID( CheckNumber ), UniqueNodeNames, NumCheckNodes );
 				if ( Found != 0 ) {
-					ShowSevereError( trim( CurCheckContextName ) + "=\"" + trim( ObjectName ) + "\", duplicate node names found." );
-					ShowContinueError( "...for Node Type(s)=" + trim( NodeTypes ) + ", duplicate node name=\"" + trim( CheckName ) + "\"." );
+					ShowSevereError( CurCheckContextName + "=\"" + ObjectName + "\", duplicate node names found." );
+					ShowContinueError( "...for Node Type(s)=" + NodeTypes + ", duplicate node name=\"" + CheckName + "\"." );
 					ShowContinueError( "...Nodes must be unique across instances of this object." );
 					//          CALL ShowSevereError('Node Types='//TRIM(NodeTypes)//', Non Unique Name found='//TRIM(NodeID(CheckNumber)))
 					//          CALL ShowContinueError('Context='//TRIM(CurCheckContextName))
@@ -987,7 +987,7 @@ namespace NodeInputManager {
 			}
 
 		} else {
-			ShowFatalError( "CheckUniqueNodes called with invalid Check Type=" + trim( CheckType ) );
+			ShowFatalError( "CheckUniqueNodes called with invalid Check Type=" + CheckType );
 			ErrorsFound = true;
 
 		}}
@@ -995,7 +995,7 @@ namespace NodeInputManager {
 	}
 
 	void
-	EndUniqueNodeCheck( Fstring const & ContextName )
+	EndUniqueNodeCheck( std::string const & ContextName )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1032,7 +1032,7 @@ namespace NodeInputManager {
 		// na
 
 		if ( CurCheckContextName != ContextName ) {
-			ShowFatalError( "End Uniqueness called for \"" + trim( ContextName ) + ", but checks for \"" + trim( CurCheckContextName ) + "\" was in progress." );
+			ShowFatalError( "End Uniqueness called for \"" + ContextName + ", but checks for \"" + CurCheckContextName + "\" was in progress." );
 		}
 		if ( ContextName == Blank ) {
 			ShowFatalError( "End Uniqueness called with Blank Context Name" );
@@ -1119,8 +1119,8 @@ namespace NodeInputManager {
 		Real64 RhoAirCurrent; // temporary value for current air density f(baro, db , W)
 		//  REAL(r64)     :: rRhoVapor
 		//  INTEGER,save :: Count=0
-		Fstring NodeReportingString( MaxNameLength + 18 );
-		Fstring FluidName( MaxNameLength + 18 );
+		std::string NodeReportingString;
+		std::string FluidName;
 		Real64 rho;
 		Real64 Cp;
 		Real64 rhoStd;
@@ -1281,9 +1281,9 @@ namespace NodeInputManager {
 	void
 	MarkNode(
 		int const NodeNumber, // Node Number to be marked
-		Fstring const & ObjectType,
-		Fstring const & ObjectName,
-		Fstring const & FieldName
+		std::string const & ObjectType,
+		std::string const & ObjectName,
+		std::string const & FieldName
 	)
 	{
 
@@ -1367,8 +1367,8 @@ namespace NodeInputManager {
 		for ( NodeNum = 1; NodeNum <= NumOfNodes; ++NodeNum ) {
 			if ( MarkedNode( NodeNum ).IsMarked ) {
 				if ( NodeRef( NodeNum ) == 0 ) {
-					ShowSevereError( "Node=\"" + trim( NodeID( NodeNum ) ) + "\" did not find reference by another object." );
-					ShowContinueError( "Object=\"" + trim( MarkedNode( NodeNum ).ObjectType ) + "\", Name=\"" + trim( MarkedNode( NodeNum ).ObjectName ) + "\", Field=[" + trim( MarkedNode( NodeNum ).FieldName ) + "]" );
+					ShowSevereError( "Node=\"" + NodeID( NodeNum ) + "\" did not find reference by another object." );
+					ShowContinueError( "Object=\"" + MarkedNode( NodeNum ).ObjectType + "\", Name=\"" + MarkedNode( NodeNum ).ObjectName + "\", Field=[" + MarkedNode( NodeNum ).FieldName + ']' );
 					ErrorsFound = true;
 				}
 			}

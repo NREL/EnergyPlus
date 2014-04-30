@@ -6,7 +6,6 @@
 #include <ObjexxFCL/FArrayS.functions.hh>
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray2D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/MArray.functions.hh>
 
 // EnergyPlus Headers
@@ -278,7 +277,7 @@ namespace RoomAirModelManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetUserDefinedPatternData: " );
+		static std::string const RoutineName( "GetUserDefinedPatternData: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -318,7 +317,7 @@ namespace RoomAirModelManager {
 		cCurrentModuleObject = cUserDefinedControlObject;
 		if ( numTempDistContrldZones == 0 ) {
 			if ( NumAirTempPatterns != 0 ) { // user may have missed control object
-				ShowWarningError( "Missing " + trim( cCurrentModuleObject ) + " object needed to use roomair temperature patterns" );
+				ShowWarningError( "Missing " + cCurrentModuleObject + " object needed to use roomair temperature patterns" );
 				// ErrorsFound = .TRUE.
 			}
 			return;
@@ -336,8 +335,8 @@ namespace RoomAirModelManager {
 			ZoneNum = 0;
 			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
 			if ( ZoneNum == 0 ) { //throw error
-				ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-				ShowContinueError( "Invalid-not found " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\"." );
+				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+				ShowContinueError( "Invalid-not found " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
 				return; // halt to avoid hard crash
 			}
@@ -351,8 +350,8 @@ namespace RoomAirModelManager {
 			} else {
 				AirPatternZoneInfo( ZoneNum ).AvailSchedID = GetScheduleIndex( cAlphaArgs( 3 ) );
 				if ( AirPatternZoneInfo( ZoneNum ).AvailSchedID == 0 ) {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-					ShowContinueError( "Invalid-not found " + trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( cAlphaArgs( 3 ) ) + "\"." );
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+					ShowContinueError( "Invalid-not found " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
 					ErrorsFound = true;
 				}
 			}
@@ -360,8 +359,8 @@ namespace RoomAirModelManager {
 			AirPatternZoneInfo( ZoneNum ).PatternCntrlSched = cAlphaArgs( 4 ); // Schedule Name for Leading Pattern Control for this Zone
 			AirPatternZoneInfo( ZoneNum ).PatternSchedID = GetScheduleIndex( cAlphaArgs( 4 ) );
 			if ( AirPatternZoneInfo( ZoneNum ).PatternSchedID == 0 ) {
-				ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-				ShowContinueError( "Invalid-not found " + trim( cAlphaFieldNames( 4 ) ) + "=\"" + trim( cAlphaArgs( 4 ) ) + "\"." );
+				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+				ShowContinueError( "Invalid-not found " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
 				ErrorsFound = true;
 			}
 
@@ -393,8 +392,8 @@ namespace RoomAirModelManager {
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 			if ( AirModel( ZoneNum ).AirModelType != RoomAirModel_UserDefined ) continue;
 			if ( AirPatternZoneInfo( ZoneNum ).IsUsed ) continue; // There is a Room Air Temperatures object for this zone
-			ShowSevereError( RoutineName + "AirModel for Zone=[" + trim( Zone( ZoneNum ).Name ) + "] is indicated as \"User Defined\"." );
-			ShowContinueError( "...but missing a " + trim( cCurrentModuleObject ) + " object for control." );
+			ShowSevereError( RoutineName + "AirModel for Zone=[" + Zone( ZoneNum ).Name + "] is indicated as \"User Defined\"." );
+			ShowContinueError( "...but missing a " + cCurrentModuleObject + " object for control." );
 			ErrorsFound = true;
 		}
 
@@ -443,8 +442,8 @@ namespace RoomAirModelManager {
 			} else if ( SameString( cAlphaArgs( 2 ), "SensibleHeatingLoad" ) ) {
 				RoomAirPattern( thisPattern ).TwoGradPatrn.InterpolationMode = SensibleHeatingMode;
 			} else {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
@@ -456,17 +455,17 @@ namespace RoomAirModelManager {
 
 			// now test the input some
 			if ( RoomAirPattern( thisPattern ).TwoGradPatrn.HiGradient == RoomAirPattern( thisPattern ).TwoGradPatrn.LowGradient ) {
-				ShowWarningError( "Upper and lower gradients equal, use " + trim( cTempPatternConstGradientObject ) + " instead " );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowWarningError( "Upper and lower gradients equal, use " + cTempPatternConstGradientObject + " instead " );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 			}
 			if ( ( RoomAirPattern( thisPattern ).TwoGradPatrn.UpperBoundTempScale == RoomAirPattern( thisPattern ).TwoGradPatrn.LowerBoundTempScale ) && ( ( RoomAirPattern( thisPattern ).TwoGradPatrn.InterpolationMode == OutdoorDryBulbMode ) || ( RoomAirPattern( thisPattern ).TwoGradPatrn.InterpolationMode == ZoneAirTempMode ) || ( RoomAirPattern( thisPattern ).TwoGradPatrn.InterpolationMode == DeltaOutdoorZone ) ) ) {
 				// throw error, will cause divide by zero when used for scaling
-				ShowSevereError( "Error in temperature scale in " + trim( cCurrentModuleObject ) + ": " + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Error in temperature scale in " + cCurrentModuleObject + ": " + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 			if ( ( RoomAirPattern( thisPattern ).TwoGradPatrn.HiGradient == RoomAirPattern( thisPattern ).TwoGradPatrn.LowGradient ) && ( ( RoomAirPattern( thisPattern ).TwoGradPatrn.InterpolationMode == SensibleCoolingMode ) || ( RoomAirPattern( thisPattern ).TwoGradPatrn.InterpolationMode == SensibleHeatingMode ) ) ) {
 				// throw error, will cause divide by zero when used for scaling
-				ShowSevereError( "Error in load scale in " + trim( cCurrentModuleObject ) + ": " + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Error in load scale in " + cCurrentModuleObject + ": " + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
@@ -505,7 +504,7 @@ namespace RoomAirModelManager {
 			//TODO  check order (TODO sort ? )
 			for ( i = 2; i <= NumPairs; ++i ) {
 				if ( RoomAirPattern( thisPattern ).VertPatrn.ZetaPatrn( i ) < RoomAirPattern( thisPattern ).VertPatrn.ZetaPatrn( i - 1 ) ) {
-					ShowSevereError( "Zeta values not in increasing order in " + trim( cCurrentModuleObject ) + ": " + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Zeta values not in increasing order in " + cCurrentModuleObject + ": " + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -526,7 +525,7 @@ namespace RoomAirModelManager {
 			NumPairs = NumNumbers - 4;
 
 			if ( NumPairs != ( NumAlphas - 1 ) ) {
-				ShowSevereError( "Error in number of entries in " + trim( cCurrentModuleObject ) + " object: " + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Error in number of entries in " + cCurrentModuleObject + " object: " + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 			RoomAirPattern( thisPattern ).MapPatrn.SurfName.allocate( NumPairs );
@@ -534,7 +533,7 @@ namespace RoomAirModelManager {
 			RoomAirPattern( thisPattern ).MapPatrn.SurfID.allocate( NumPairs );
 
 			// init just allocated
-			RoomAirPattern( thisPattern ).MapPatrn.SurfName = " ";
+			RoomAirPattern( thisPattern ).MapPatrn.SurfName = "";
 			RoomAirPattern( thisPattern ).MapPatrn.DeltaTai = 0.0;
 			RoomAirPattern( thisPattern ).MapPatrn.SurfID = 0;
 
@@ -545,7 +544,7 @@ namespace RoomAirModelManager {
 				if ( found != 0 ) {
 					RoomAirPattern( thisPattern ).MapPatrn.SurfID( i ) = found;
 				} else {
-					ShowSevereError( "Surface name not found in " + trim( cCurrentModuleObject ) + " object: " + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Surface name not found in " + cCurrentModuleObject + " object: " + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 
@@ -555,12 +554,12 @@ namespace RoomAirModelManager {
 		}
 
 		if ( TotalRoomAirPatternTooLow > 0 ) {
-			ShowWarningError( "GetUserDefinedPatternData: RoomAirModelUserTempPattern: " + trim( RoundSigDigits( TotalRoomAirPatternTooLow ) ) + " problem(s) in non-dimensional height calculations, " "too low surface height(s) in relation to floor height of zone(s)." );
+			ShowWarningError( "GetUserDefinedPatternData: RoomAirModelUserTempPattern: " + RoundSigDigits( TotalRoomAirPatternTooLow ) + " problem(s) in non-dimensional height calculations, " "too low surface height(s) in relation to floor height of zone(s)." );
 			ShowContinueError( "...Use OutputDiagnostics,DisplayExtraWarnings; to see details." );
 			TotalWarningErrors += TotalRoomAirPatternTooLow;
 		}
 		if ( TotalRoomAirPatternTooHigh > 0 ) {
-			ShowWarningError( "GetUserDefinedPatternData: RoomAirModelUserTempPattern: " + trim( RoundSigDigits( TotalRoomAirPatternTooHigh ) ) + " problem(s) in non-dimensional height calculations, " "too high surface height(s) in relation to ceiling height of zone(s)." );
+			ShowWarningError( "GetUserDefinedPatternData: RoomAirModelUserTempPattern: " + RoundSigDigits( TotalRoomAirPatternTooHigh ) + " problem(s) in non-dimensional height calculations, " "too high surface height(s) in relation to ceiling height of zone(s)." );
 			ShowContinueError( "...Use OutputDiagnostics,DisplayExtraWarnings; to see details." );
 			TotalWarningErrors += TotalRoomAirPatternTooHigh;
 		}
@@ -665,8 +664,8 @@ namespace RoomAirModelManager {
 
 		if ( TotNumOfAirNodes <= 0 ) {
 			// no air node object is found, terminate the program
-			ShowSevereError( "No " + trim( cCurrentModuleObject ) + " objects found in input." );
-			ShowContinueError( "The OneNodeDisplacementVentilation model requires " + trim( cCurrentModuleObject ) + " objects" );
+			ShowSevereError( "No " + cCurrentModuleObject + " objects found in input." );
+			ShowContinueError( "The OneNodeDisplacementVentilation model requires " + cCurrentModuleObject + " objects" );
 			ErrorsFound = true;
 			return;
 		} else {
@@ -680,7 +679,7 @@ namespace RoomAirModelManager {
 			GetObjectItem( cCurrentModuleObject, AirNodeNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), AirNode.Name(), AirNodeNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), AirNode.Name(), AirNodeNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -690,8 +689,8 @@ namespace RoomAirModelManager {
 			AirNode( AirNodeNum ).ZoneName = cAlphaArgs( 3 ); // Zone name
 			AirNode( AirNodeNum ).ZonePtr = FindItemInList( AirNode( AirNodeNum ).ZoneName, Zone.Name(), NumOfZones );
 			if ( AirNode( AirNodeNum ).ZonePtr == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + " = " + trim( cAlphaArgs( 3 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			} else {
 				ZoneNum = AirNode( AirNodeNum ).ZonePtr;
@@ -729,8 +728,8 @@ namespace RoomAirModelManager {
 				//            CASE ('REESROOM4')
 				//                AirNode(AirNodeNum)%ClassType   = RoomAirNode4
 			} else {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}}
 
@@ -746,8 +745,8 @@ namespace RoomAirModelManager {
 				{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );
 				if ( ( SELECT_CASE_var == "FLOOR" ) || ( SELECT_CASE_var == "CEILING" ) || ( SELECT_CASE_var == "MUNDTROOM" ) || ( SELECT_CASE_var == "PLUME4" ) || ( SELECT_CASE_var == "REESROOM1" ) || ( SELECT_CASE_var == "REESROOM2" ) || ( SELECT_CASE_var == "REESROOM3" ) || ( SELECT_CASE_var == "REESROOM4" ) ) {
 					// terminate the program due to a severe error in the specified input
-					ShowSevereError( "GetAirNodeData: " + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid air node specification." );
-					ShowContinueError( "Mundt Room Air Model: No surface names specified.  " "Air node=\"" + trim( AirNode( AirNodeNum ).Name ) + " requires name of surfaces associated with it." );
+					ShowSevereError( "GetAirNodeData: " + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid air node specification." );
+					ShowContinueError( "Mundt Room Air Model: No surface names specified.  " "Air node=\"" + AirNode( AirNodeNum ).Name + " requires name of surfaces associated with it." );
 					ErrorsFound = true;
 				} else {
 				}}
@@ -761,8 +760,8 @@ namespace RoomAirModelManager {
 				// and assign .FALSE. to 'SurfNeeded'
 				{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );
 				if ( ( SELECT_CASE_var == "INLET" ) || ( SELECT_CASE_var == "CONTROL" ) || ( SELECT_CASE_var == "RETURN" ) || ( SELECT_CASE_var == "PLUME1" ) || ( SELECT_CASE_var == "PLUME2" ) || ( SELECT_CASE_var == "PLUME3" ) ) {
-					ShowWarningError( "GetAirNodeData: " + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid linkage" );
-					ShowContinueError( "Mundt Room Air Model: No surface names needed.  " "Air node=\"" + trim( AirNode( AirNodeNum ).Name ) + " does not relate to any surfaces." );
+					ShowWarningError( "GetAirNodeData: " + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid linkage" );
+					ShowContinueError( "Mundt Room Air Model: No surface names needed.  " "Air node=\"" + AirNode( AirNodeNum ).Name + " does not relate to any surfaces." );
 					SurfNeeded = false;
 				} else {
 				}}
@@ -776,7 +775,7 @@ namespace RoomAirModelManager {
 
 					// terminate the program due to a severe error in the specified input
 					if ( ( NumSurfsInvolved ) > NumOfSurfs ) {
-						ShowFatalError( "GetAirNodeData: Mundt Room Air Model: Number of surfaces connected to " + trim( AirNode( AirNodeNum ).Name ) + " is greater than number of surfaces in " + trim( Zone( ZoneNum ).Name ) );
+						ShowFatalError( "GetAirNodeData: Mundt Room Air Model: Number of surfaces connected to " + AirNode( AirNodeNum ).Name + " is greater than number of surfaces in " + Zone( ZoneNum ).Name );
 						return;
 					}
 
@@ -794,7 +793,7 @@ namespace RoomAirModelManager {
 
 					// report warning error since surface names are specified correctly
 					if ( ( NumSurfsInvolved ) != SurfCount ) {
-						ShowWarningError( "GetAirNodeData: Mundt Room Air Model: Some surface names specified for " + trim( AirNode( AirNodeNum ).Name ) + " are not in " + trim( Zone( ZoneNum ).Name ) );
+						ShowWarningError( "GetAirNodeData: Mundt Room Air Model: Some surface names specified for " + AirNode( AirNodeNum ).Name + " are not in " + Zone( ZoneNum ).Name );
 					}
 
 				}
@@ -882,13 +881,13 @@ namespace RoomAirModelManager {
 		cCurrentModuleObject = "RoomAirSettings:OneNodeDisplacementVentilation";
 		NumOfMundtContrl = GetNumObjectsFound( cCurrentModuleObject );
 		if ( NumOfMundtContrl > NumOfZones ) {
-			ShowSevereError( "Too many " + trim( cCurrentModuleObject ) + " objects in input file" );
-			ShowContinueError( "There cannot be more " + trim( cCurrentModuleObject ) + " objects than number of zones." );
+			ShowSevereError( "Too many " + cCurrentModuleObject + " objects in input file" );
+			ShowContinueError( "There cannot be more " + cCurrentModuleObject + " objects than number of zones." );
 			ErrorsFound = true;
 		}
 
 		if ( NumOfMundtContrl == 0 ) {
-			ShowWarningError( "No " + trim( cCurrentModuleObject ) + " objects found, program assumes no convection " " or infiltration gains near floors" );
+			ShowWarningError( "No " + cCurrentModuleObject + " objects found, program assumes no convection " " or infiltration gains near floors" );
 			return;
 		}
 
@@ -898,15 +897,15 @@ namespace RoomAirModelManager {
 			GetObjectItem( cCurrentModuleObject, ControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
 			ZoneNum = FindItemInList( cAlphaArgs( 1 ), Zone.Name(), NumOfZones );
 			if ( ZoneNum == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 1 ) ) + " = " + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 1 ) + " = " + cAlphaArgs( 1 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				ShowContinueError( "Not a valid zone name." );
 				ErrorsFound = true;
 				continue;
 			}
 			if ( AirModel( ZoneNum ).AirModelType != RoomAirModel_Mundt ) {
-				ShowSevereError( "Zone specified=\"" + trim( cAlphaArgs( 1 ) ) + "\", Air Model type is not OneNodeDisplacementVentilation." );
-				ShowContinueError( "Air Model Type for zone=" + trim( ChAirModel( AirModel( ZoneNum ).AirModelType ) ) );
+				ShowSevereError( "Zone specified=\"" + cAlphaArgs( 1 ) + "\", Air Model type is not OneNodeDisplacementVentilation." );
+				ShowContinueError( "Air Model Type for zone=" + ChAirModel( AirModel( ZoneNum ).AirModelType ) );
 				ErrorsFound = true;
 				continue;
 			}
@@ -950,7 +949,7 @@ namespace RoomAirModelManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS
-		static Fstring const Blank;
+		static std::string const Blank;
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -979,8 +978,8 @@ namespace RoomAirModelManager {
 			ZoneUCSDDV( Loop ).ZoneName = cAlphaArgs( 1 );
 			ZoneUCSDDV( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone.Name(), NumOfZones );
 			if ( ZoneUCSDDV( Loop ).ZonePtr == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 1 ) ) + " = " + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 1 ) + " = " + cAlphaArgs( 1 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				ShowContinueError( "Zone Name not found." );
 				ErrorsFound = true;
 			} else {
@@ -991,13 +990,13 @@ namespace RoomAirModelManager {
 			ZoneUCSDDV( Loop ).SchedGainsPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 			if ( ZoneUCSDDV( Loop ).SchedGainsPtr == 0 ) {
 				if ( lAlphaFieldBlanks( 2 ) ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ShowContinueError( " Schedule name must be input." );
 					ErrorsFound = true;
 				} else {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ShowContinueError( "Schedule name was not found." );
 					ErrorsFound = true;
 				}
@@ -1086,8 +1085,8 @@ namespace RoomAirModelManager {
 			ZoneUCSDCV( Loop ).ZoneName = cAlphaArgs( 1 );
 			ZoneUCSDCV( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone.Name(), NumOfZones );
 			if ( ZoneUCSDCV( Loop ).ZonePtr == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 1 ) ) + " = " + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 1 ) + " = " + cAlphaArgs( 1 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				ShowContinueError( "Zone name was not found." );
 				ErrorsFound = true;
 			} else {
@@ -1098,13 +1097,13 @@ namespace RoomAirModelManager {
 			ZoneUCSDCV( Loop ).SchedGainsPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 			if ( ZoneUCSDCV( Loop ).SchedGainsPtr == 0 ) {
 				if ( lAlphaFieldBlanks( 2 ) ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ShowContinueError( "Schedule name field is blank." );
 					ErrorsFound = true;
 				} else {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ShowContinueError( "Schedule name was not found." );
 					ErrorsFound = true;
 				}
@@ -1124,15 +1123,15 @@ namespace RoomAirModelManager {
 				if ( People( Loop2 ).Fanger ) {
 					if ( ZoneUCSDCV( Loop ).VforComfort == VComfort_Invalid ) {
 						if ( lAlphaFieldBlanks( 3 ) ) {
-							ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + " = " + trim( cAlphaArgs( 3 ) ) );
-							ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
-							ShowContinueError( "Airflow region used for thermal comfort " "evaluation is required for Zone=" + trim( cAlphaArgs( 1 ) ) );
+							ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
+							ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+							ShowContinueError( "Airflow region used for thermal comfort " "evaluation is required for Zone=" + cAlphaArgs( 1 ) );
 							ShowContinueError( "Field is blank, please choose Jet or Recirculation." );
 							ErrorsFound = true;
 						} else {
-							ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + " = " + trim( cAlphaArgs( 3 ) ) );
-							ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
-							ShowContinueError( "Airflow region used for thermal comfort " "evaluation is required for Zone=" + trim( cAlphaArgs( 1 ) ) );
+							ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
+							ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+							ShowContinueError( "Airflow region used for thermal comfort " "evaluation is required for Zone=" + cAlphaArgs( 1 ) );
 							ShowContinueError( "Please choose Jet or Recirculation." );
 							ErrorsFound = true;
 						}
@@ -1147,7 +1146,7 @@ namespace RoomAirModelManager {
 
 			Loop2 = FindItemInList( Zone( ZoneUCSDCV( Loop ).ZonePtr ).Name, MultizoneZoneData.ZoneName(), AirflowNetworkNumOfZones );
 			if ( Loop2 == 0 ) {
-				ShowSevereError( "Problem with " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Problem with " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				ShowContinueError( "AirflowNetwork airflow model must be active in this zone" );
 				ErrorsFound = true;
 			}
@@ -1162,9 +1161,9 @@ namespace RoomAirModelManager {
 					if ( AirflowNetworkCompData( CompNum ).CompTypeNum == CompTypeNum_SCR ) {
 						if ( MultizoneSurfaceCrackData( TypeNum ).FlowExpo != 0.50 ) {
 							AirModel( ThisZone ).AirModelType = RoomAirModel_Mixing;
-							ShowWarningError( "Problem with " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
-							ShowWarningError( "Roomair model will not be applied for Zone=" + trim( cAlphaArgs( 1 ) ) + "." );
-							ShowContinueError( "AirflowNetwrok:Multizone:Surface crack object must have an air flow coefficient = 0.5, " "value was=" + trim( RoundSigDigits( MultizoneSurfaceCrackData( TypeNum ).FlowExpo, 2 ) ) );
+							ShowWarningError( "Problem with " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+							ShowWarningError( "Roomair model will not be applied for Zone=" + cAlphaArgs( 1 ) + '.' );
+							ShowContinueError( "AirflowNetwrok:Multizone:Surface crack object must have an air flow coefficient = 0.5, " "value was=" + RoundSigDigits( MultizoneSurfaceCrackData( TypeNum ).FlowExpo, 2 ) );
 						}
 					}
 				}
@@ -1244,8 +1243,8 @@ namespace RoomAirModelManager {
 			ZoneUCSDUI( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone.Name(), NumOfZones );
 			ZoneUFPtr( ZoneUCSDUI( Loop ).ZonePtr ) = Loop;
 			if ( ZoneUCSDUI( Loop ).ZonePtr == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 1 ) ) + " = " + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 1 ) + " = " + cAlphaArgs( 1 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				ShowContinueError( "Zone name was not found." );
 				ErrorsFound = true;
 			} else {
@@ -1263,8 +1262,8 @@ namespace RoomAirModelManager {
 			} else if ( SameString( cAlphaArgs( 2 ), "LinearBarGrille" ) ) {
 				ZoneUCSDUI( Loop ).DiffuserType = LinBarGrille;
 			} else {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 			// 1st number is Number of Diffusers per Zone
@@ -1303,8 +1302,8 @@ namespace RoomAirModelManager {
 			ZoneUCSDUE( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone.Name(), NumOfZones );
 			ZoneUFPtr( ZoneUCSDUE( Loop ).ZonePtr ) = Loop;
 			if ( ZoneUCSDUE( Loop ).ZonePtr == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 1 ) ) + " = " + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 1 ) + " = " + cAlphaArgs( 1 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				ShowContinueError( "Zone name was not found." );
 				ErrorsFound = true;
 			} else {
@@ -1322,8 +1321,8 @@ namespace RoomAirModelManager {
 			} else if ( SameString( cAlphaArgs( 2 ), "LinearBarGrille" ) ) {
 				ZoneUCSDUE( Loop ).DiffuserType = LinBarGrille;
 			} else {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 			// 1st number is Number of Diffusers per Zone
@@ -1382,7 +1381,6 @@ namespace RoomAirModelManager {
 		using namespace DataHeatBalFanSys;
 		using namespace DataSurfaces;
 		using DataGlobals::NumOfZones;
-		using DataGlobals::MaxNameLength;
 		using DataHeatBalance::Zone;
 		using namespace DataAirflowNetwork;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -1583,10 +1581,10 @@ namespace RoomAirModelManager {
 				ZoneCeilingHeight( ( ZNum - 1 ) * 2 + 2 ) = Z2Zone;
 
 				if ( std::abs( ( Z2Zone - Z1Zone ) - Zone( ZNum ).CeilingHeight ) > CeilingHeightDiffMax ) {
-					ShowWarningError( "RoomAirManager: Inconsistent ceiling heights in Zone: " + trim( Zone( ZNum ).Name ) );
-					ShowContinueError( "Lowest height=[" + trim( RoundSigDigits( Z1Zone, 3 ) ) + "]." );
-					ShowContinueError( "Highest height=[" + trim( RoundSigDigits( Z2Zone, 3 ) ) + "]." );
-					ShowContinueError( "Ceiling height=[" + trim( RoundSigDigits( Zone( ZNum ).CeilingHeight, 3 ) ) + "]." );
+					ShowWarningError( "RoomAirManager: Inconsistent ceiling heights in Zone: " + Zone( ZNum ).Name );
+					ShowContinueError( "Lowest height=[" + RoundSigDigits( Z1Zone, 3 ) + "]." );
+					ShowContinueError( "Highest height=[" + RoundSigDigits( Z2Zone, 3 ) + "]." );
+					ShowContinueError( "Ceiling height=[" + RoundSigDigits( Zone( ZNum ).CeilingHeight, 3 ) + "]." );
 				}
 			} // Zones
 
@@ -1965,8 +1963,8 @@ namespace RoomAirModelManager {
 					if ( ZoneEquipConfig( ZoneEquipConfigNum ).IsControlled ) {
 						IsZoneCV( Loop ) = false;
 						AirModel( Loop ).SimAirModel = false;
-						ShowSevereError( "Unmixed Flow: Cross Ventilation cannot be applied for Zone=" + trim( Zone( Loop ).Name ) );
-						ShowContinueError( "An HVAC system is present in the zone. Fully mixed airflow model will be used for Zone=" + trim( Zone( Loop ).Name ) );
+						ShowSevereError( "Unmixed Flow: Cross Ventilation cannot be applied for Zone=" + Zone( Loop ).Name );
+						ShowContinueError( "An HVAC system is present in the zone. Fully mixed airflow model will be used for Zone=" + Zone( Loop ).Name );
 						continue;
 					}
 					//CurrentModuleObject='RoomAirSettings:CrossVentilation'

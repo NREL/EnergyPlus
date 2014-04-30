@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace DataSurfaceLists {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// -only module should be available to other modules and routines.
@@ -41,28 +39,26 @@ namespace DataSurfaceLists {
 	struct SurfaceListData
 	{
 		// Members
-		Fstring Name; // Name of the surface list
+		std::string Name; // Name of the surface list
 		int NumOfSurfaces; // Number of surfaces in the list
-		FArray1D_Fstring SurfName; // Surfaces named in the list
+		FArray1D_string SurfName; // Surfaces named in the list
 		FArray1D_int SurfPtr; // Location of surfaces in Surface derived type
 		FArray1D< Real64 > SurfFlowFrac; // Fraction of mass flow/length for a surface
 
 		// Default Constructor
 		SurfaceListData() :
-			Name( MaxNameLength ),
-			NumOfSurfaces( 0 ),
-			SurfName( sFstring( MaxNameLength ) )
+			NumOfSurfaces( 0 )
 		{}
 
 		// Member Constructor
 		SurfaceListData(
-			Fstring const & Name, // Name of the surface list
+			std::string const & Name, // Name of the surface list
 			int const NumOfSurfaces, // Number of surfaces in the list
-			FArray1_Fstring const & SurfName, // Surfaces named in the list
+			FArray1_string const & SurfName, // Surfaces named in the list
 			FArray1_int const & SurfPtr, // Location of surfaces in Surface derived type
 			FArray1< Real64 > const & SurfFlowFrac // Fraction of mass flow/length for a surface
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NumOfSurfaces( NumOfSurfaces ),
 			SurfName( SurfName ),
 			SurfPtr( SurfPtr ),
@@ -74,43 +70,38 @@ namespace DataSurfaceLists {
 	struct SlabListData
 	{
 		// Members
-		Fstring Name; // Name of the surface list
+		std::string Name; // Name of the surface list
 		int NumOfSurfaces; // Number of surfaces in the list
-		FArray1D_Fstring SurfName; // Surfaces named in the list
+		FArray1D_string SurfName; // Surfaces named in the list
 		FArray1D_int SurfPtr; // Location of surfaces in Surface derived type
-		FArray1D_Fstring ZoneName; // Zone named in the list
+		FArray1D_string ZoneName; // Zone named in the list
 		FArray1D_int ZonePtr; // Location of Zone in Surface derived type
 		FArray1D< Real64 > CoreDiameter; // Fraction of mass flow/length for a surface
 		FArray1D< Real64 > CoreLength; // Fraction of mass flow/length for a surface
 		FArray1D< Real64 > CoreNumbers; // Fraction of mass flow/length for a surface
-		FArray1D_Fstring SlabInNodeName; // Zone named in the list
-		FArray1D_Fstring SlabOutNodeName; // Zone named in the list
+		FArray1D_string SlabInNodeName; // Zone named in the list
+		FArray1D_string SlabOutNodeName; // Zone named in the list
 
 		// Default Constructor
 		SlabListData() :
-			Name( MaxNameLength ),
-			NumOfSurfaces( 0 ),
-			SurfName( sFstring( MaxNameLength ) ),
-			ZoneName( sFstring( MaxNameLength ) ),
-			SlabInNodeName( sFstring( MaxNameLength ) ),
-			SlabOutNodeName( sFstring( MaxNameLength ) )
+			NumOfSurfaces( 0 )
 		{}
 
 		// Member Constructor
 		SlabListData(
-			Fstring const & Name, // Name of the surface list
+			std::string const & Name, // Name of the surface list
 			int const NumOfSurfaces, // Number of surfaces in the list
-			FArray1_Fstring const & SurfName, // Surfaces named in the list
+			FArray1_string const & SurfName, // Surfaces named in the list
 			FArray1_int const & SurfPtr, // Location of surfaces in Surface derived type
-			FArray1_Fstring const & ZoneName, // Zone named in the list
+			FArray1_string const & ZoneName, // Zone named in the list
 			FArray1_int const & ZonePtr, // Location of Zone in Surface derived type
 			FArray1< Real64 > const & CoreDiameter, // Fraction of mass flow/length for a surface
 			FArray1< Real64 > const & CoreLength, // Fraction of mass flow/length for a surface
 			FArray1< Real64 > const & CoreNumbers, // Fraction of mass flow/length for a surface
-			FArray1_Fstring const & SlabInNodeName, // Zone named in the list
-			FArray1_Fstring const & SlabOutNodeName // Zone named in the list
+			FArray1_string const & SlabInNodeName, // Zone named in the list
+			FArray1_string const & SlabOutNodeName // Zone named in the list
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NumOfSurfaces( NumOfSurfaces ),
 			SurfName( SurfName ),
 			SurfPtr( SurfPtr ),

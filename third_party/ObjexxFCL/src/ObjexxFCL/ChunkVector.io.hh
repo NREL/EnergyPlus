@@ -15,7 +15,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/ChunkVector.hh>
-#include <ObjexxFCL/char.constants.hh>
 #include <ObjexxFCL/TypeTraits.hh>
 
 // C++ Headers
@@ -47,7 +46,7 @@ operator <<( std::ostream & stream, ChunkVector< T > const & v )
 		size_type const e( v.size() - 1 );
 		int const w( Traits::width() );
 		for ( size_type i = 0; i < e; ++i ) {
-			stream << setw( w ) << v[ i ] << SPC;
+			stream << setw( w ) << v[ i ] << ' ';
 		} stream << setw( w ) << v[ e ];
 
 		// Restore previous stream state

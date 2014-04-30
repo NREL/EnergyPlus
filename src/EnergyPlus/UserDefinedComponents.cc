@@ -5,6 +5,7 @@
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <UserDefinedComponents.hh>
@@ -55,7 +56,6 @@ namespace UserDefinedComponents {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::emsCallFromUserDefinedComponentModel;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::NumOfZones;
@@ -97,8 +97,8 @@ namespace UserDefinedComponents {
 	SimUserDefinedPlantComponent(
 		int const LoopNum, // plant loop sim call originated from
 		int const LoopSideNum, // plant loop side sim call originated from
-		Fstring const & EquipType, // type of equipment, 'PlantComponent:UserDefined'
-		Fstring const & EquipName, // user name for component
+		std::string const & EquipType, // type of equipment, 'PlantComponent:UserDefined'
+		std::string const & EquipName, // user name for component
 		int & CompIndex,
 		bool & InitLoopEquip,
 		Real64 const MyLoad,
@@ -166,11 +166,11 @@ namespace UserDefinedComponents {
 		} else {
 			CompNum = CompIndex;
 			if ( CompNum < 1 || CompNum > NumUserPlantComps ) {
-				ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + trim( TrimSigDigits( CompNum ) ) + ", Number of units =" + trim( TrimSigDigits( NumUserPlantComps ) ) + ", Entered Unit name = " + trim( EquipName ) );
+				ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of units =" + TrimSigDigits( NumUserPlantComps ) + ", Entered Unit name = " + EquipName );
 			}
 			if ( CheckUserPlantCompName( CompNum ) ) {
 				if ( EquipName != UserPlantComp( CompNum ).Name ) {
-					ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + trim( TrimSigDigits( CompNum ) ) + ", Unit name=" + trim( EquipName ) + ", stored unit name for that index=" + trim( UserPlantComp( CompNum ).Name ) );
+					ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Unit name=" + EquipName + ", stored unit name for that index=" + UserPlantComp( CompNum ).Name );
 				}
 				CheckUserPlantCompName( CompNum ) = false;
 			}
@@ -200,7 +200,7 @@ namespace UserDefinedComponents {
 
 			} else {
 				// throw warning
-				ShowFatalError( "SimUserDefinedPlantComponent: did not find where called from" " loop number called from =" + trim( TrimSigDigits( LoopNum ) ) + " , loop side called from =" + trim( TrimSigDigits( LoopSideNum ) ) );
+				ShowFatalError( "SimUserDefinedPlantComponent: did not find where called from" " loop number called from =" + TrimSigDigits( LoopNum ) + " , loop side called from =" + TrimSigDigits( LoopSideNum ) );
 			}
 			return;
 		}
@@ -230,7 +230,7 @@ namespace UserDefinedComponents {
 
 	void
 	SimCoilUserDefined(
-		Fstring const & EquipName, // user name for component
+		std::string const & EquipName, // user name for component
 		int & CompIndex,
 		int const AirLoopNum,
 		bool & HeatingActive,
@@ -294,11 +294,11 @@ namespace UserDefinedComponents {
 		} else {
 			CompNum = CompIndex;
 			if ( CompNum < 1 || CompNum > NumUserCoils ) {
-				ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + trim( TrimSigDigits( CompNum ) ) + ", Number of units =" + trim( TrimSigDigits( NumUserCoils ) ) + ", Entered Unit name = " + trim( EquipName ) );
+				ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of units =" + TrimSigDigits( NumUserCoils ) + ", Entered Unit name = " + EquipName );
 			}
 			if ( CheckUserCoilName( CompNum ) ) {
 				if ( EquipName != UserCoil( CompNum ).Name ) {
-					ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + trim( TrimSigDigits( CompNum ) ) + ", Unit name=" + trim( EquipName ) + ", stored unit name for that index=" + trim( UserCoil( CompNum ).Name ) );
+					ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Unit name=" + EquipName + ", stored unit name for that index=" + UserCoil( CompNum ).Name );
 				}
 				CheckUserCoilName( CompNum ) = false;
 			}
@@ -347,7 +347,7 @@ namespace UserDefinedComponents {
 
 	void
 	SimZoneAirUserDefined(
-		Fstring const & CompName, // name of the packaged terminal heat pump
+		std::string const & CompName, // name of the packaged terminal heat pump
 		int const ZoneNum, // number of zone being served
 		Real64 & SensibleOutputProvided, // sensible capacity delivered to zone
 		Real64 & LatentOutputProvided, // Latent add/removal  (kg/s), dehumid = negative
@@ -413,11 +413,11 @@ namespace UserDefinedComponents {
 		} else {
 			CompNum = CompIndex;
 			if ( CompNum < 1 || CompNum > NumUserZoneAir ) {
-				ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + trim( TrimSigDigits( CompNum ) ) + ", Number of units =" + trim( TrimSigDigits( NumUserZoneAir ) ) + ", Entered Unit name = " + trim( CompName ) );
+				ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of units =" + TrimSigDigits( NumUserZoneAir ) + ", Entered Unit name = " + CompName );
 			}
 			if ( CheckUserZoneAirName( CompNum ) ) {
 				if ( CompName != UserZoneAirHVAC( CompNum ).Name ) {
-					ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + trim( TrimSigDigits( CompNum ) ) + ", Unit name=" + trim( CompName ) + ", stored unit name for that index=" + trim( UserZoneAirHVAC( CompNum ).Name ) );
+					ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Unit name=" + CompName + ", stored unit name for that index=" + UserZoneAirHVAC( CompNum ).Name );
 				}
 				CheckUserZoneAirName( CompNum ) = false;
 			}
@@ -463,7 +463,7 @@ namespace UserDefinedComponents {
 
 	void
 	SimAirTerminalUserDefined(
-		Fstring const & CompName,
+		std::string const & CompName,
 		bool const FirstHVACIteration,
 		int const ZoneNum,
 		int const ZoneNodeNum,
@@ -525,11 +525,11 @@ namespace UserDefinedComponents {
 		} else {
 			CompNum = CompIndex;
 			if ( CompNum < 1 || CompNum > NumUserAirTerminals ) {
-				ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + trim( TrimSigDigits( CompNum ) ) + ", Number of units =" + trim( TrimSigDigits( NumUserAirTerminals ) ) + ", Entered Unit name = " + trim( CompName ) );
+				ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of units =" + TrimSigDigits( NumUserAirTerminals ) + ", Entered Unit name = " + CompName );
 			}
 			if ( CheckUserAirTerminal( CompNum ) ) {
 				if ( CompName != UserAirTerminal( CompNum ).Name ) {
-					ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + trim( TrimSigDigits( CompNum ) ) + ", Unit name=" + trim( CompName ) + ", stored unit name for that index=" + trim( UserAirTerminal( CompNum ).Name ) );
+					ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Unit name=" + CompName + ", stored unit name for that index=" + UserAirTerminal( CompNum ).Name );
 				}
 				CheckUserAirTerminal( CompNum ) = false;
 			}
@@ -624,18 +624,18 @@ namespace UserDefinedComponents {
 		static int MaxNumAlphas( 0 ); // argument for call to GetObjectDefMaxArgs
 		static int MaxNumNumbers( 0 ); // argument for call to GetObjectDefMaxArgs
 		static int TotalArgs( 0 ); // argument for call to GetObjectDefMaxArgs
-		FArray1D_Fstring cAlphaFieldNames( sFstring( MaxNameLength + 40 ) );
-		FArray1D_Fstring cNumericFieldNames( sFstring( MaxNameLength + 40 ) );
+		FArray1D_string cAlphaFieldNames;
+		FArray1D_string cNumericFieldNames;
 		FArray1D_bool lNumericFieldBlanks;
 		FArray1D_bool lAlphaFieldBlanks;
-		FArray1D_Fstring cAlphaArgs( sFstring( MaxNameLength ) );
+		FArray1D_string cAlphaArgs;
 		FArray1D< Real64 > rNumericArgs;
-		Fstring cCurrentModuleObject( MaxNameLength );
+		std::string cCurrentModuleObject;
 		int CompLoop;
 		int ConnectionLoop;
 		int NumPlantConnections;
 		int NumAirConnections;
-		Fstring LoopStr( 20 );
+		std::string LoopStr;
 		int aArgCount;
 		int StackMngrNum;
 		bool lDummy;
@@ -652,13 +652,13 @@ namespace UserDefinedComponents {
 		MaxNumAlphas = NumAlphas;
 
 		cAlphaFieldNames.allocate( MaxNumAlphas );
-		cAlphaFieldNames = " ";
+		cAlphaFieldNames = "";
 		cAlphaArgs.allocate( MaxNumAlphas );
-		cAlphaArgs = " ";
+		cAlphaArgs = "";
 		lAlphaFieldBlanks.allocate( MaxNumAlphas );
 		lAlphaFieldBlanks = false;
 		cNumericFieldNames.allocate( MaxNumNumbers );
-		cNumericFieldNames = " ";
+		cNumericFieldNames = "";
 		rNumericArgs.allocate( MaxNumNumbers );
 		rNumericArgs = 0.0;
 		lNumericFieldBlanks.allocate( MaxNumNumbers );
@@ -676,7 +676,7 @@ namespace UserDefinedComponents {
 				GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), UserPlantComp.Name(), CompLoop - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+				VerifyName( cAlphaArgs( 1 ), UserPlantComp.Name(), CompLoop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -689,8 +689,8 @@ namespace UserDefinedComponents {
 					if ( StackMngrNum > 0 ) { // found it
 						UserPlantComp( CompLoop ).ErlSimProgramMngr = StackMngrNum;
 					} else {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ShowContinueError( "Program Manager Name not found." );
 						ErrorsFound = true;
 					}
@@ -704,12 +704,12 @@ namespace UserDefinedComponents {
 					for ( ConnectionLoop = 1; ConnectionLoop <= NumPlantConnections; ++ConnectionLoop ) {
 						LoopStr = RoundSigDigits( ConnectionLoop );
 						aArgCount = ( ConnectionLoop - 1 ) * 6 + 3;
-						UserPlantComp( CompLoop ).Loop( ConnectionLoop ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( aArgCount ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, ConnectionLoop, ObjectIsNotParent );
-						UserPlantComp( CompLoop ).Loop( ConnectionLoop ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( aArgCount + 1 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, ConnectionLoop, ObjectIsNotParent );
+						UserPlantComp( CompLoop ).Loop( ConnectionLoop ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( aArgCount ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, ConnectionLoop, ObjectIsNotParent );
+						UserPlantComp( CompLoop ).Loop( ConnectionLoop ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( aArgCount + 1 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, ConnectionLoop, ObjectIsNotParent );
 
-						TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( aArgCount ), cAlphaArgs( aArgCount + 1 ), "Plant Nodes " + LoopStr );
+						TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( aArgCount ), cAlphaArgs( aArgCount + 1 ), "Plant Nodes " + LoopStr );
 
-						{ auto const SELECT_CASE_var( trim( cAlphaArgs( aArgCount + 2 ) ) );
+						{ auto const SELECT_CASE_var( cAlphaArgs( aArgCount + 2 ) );
 						if ( SELECT_CASE_var == "DEMANDSLOAD" ) {
 							UserPlantComp( CompLoop ).Loop( ConnectionLoop ).HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == "MEETSLOADWITHPASSIVECAPACITY" ) {
@@ -719,14 +719,14 @@ namespace UserDefinedComponents {
 						} else if ( SELECT_CASE_var == "MEETSLOADWITHNOMINALCAPACITYLOWOUTLIMIT" ) {
 							UserPlantComp( CompLoop ).Loop( ConnectionLoop ).HowLoadServed = HowMet_ByNominalCapLowOutLimit;
 							// actuator for low out limit
-							SetupEMSActuator( "Plant Connection " + trim( LoopStr ), UserPlantComp( CompLoop ).Name, "Low Outlet Temperature Limit", "[C]", lDummy, UserPlantComp( CompLoop ).Loop( ConnectionLoop ).LowOutTempLimit );
+							SetupEMSActuator( "Plant Connection " + LoopStr, UserPlantComp( CompLoop ).Name, "Low Outlet Temperature Limit", "[C]", lDummy, UserPlantComp( CompLoop ).Loop( ConnectionLoop ).LowOutTempLimit );
 						} else if ( SELECT_CASE_var == "MEETSLOADWITHNOMINALCAPACITYHIOUTLIMIT" ) {
 							UserPlantComp( CompLoop ).Loop( ConnectionLoop ).HowLoadServed = HowMet_ByNominalCapHiOutLimit;
 							// actuator for hi out limit
-							SetupEMSActuator( "Plant Connection " + trim( LoopStr ), UserPlantComp( CompLoop ).Name, "High Outlet Temperature Limit", "[C]", lDummy, UserPlantComp( CompLoop ).Loop( ConnectionLoop ).HiOutTempLimit );
+							SetupEMSActuator( "Plant Connection " + LoopStr, UserPlantComp( CompLoop ).Name, "High Outlet Temperature Limit", "[C]", lDummy, UserPlantComp( CompLoop ).Loop( ConnectionLoop ).HiOutTempLimit );
 						}}
 
-						{ auto const SELECT_CASE_var( trim( cAlphaArgs( aArgCount + 3 ) ) );
+						{ auto const SELECT_CASE_var( cAlphaArgs( aArgCount + 3 ) );
 						if ( SELECT_CASE_var == "NEEDSFLOWIFLOOPON" ) {
 							UserPlantComp( CompLoop ).Loop( ConnectionLoop ).FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
 						} else if ( SELECT_CASE_var == "NEEDSFLOWANDTURNSLOOPON" ) {
@@ -741,8 +741,8 @@ namespace UserDefinedComponents {
 							if ( StackMngrNum > 0 ) { // found it
 								UserPlantComp( CompLoop ).Loop( ConnectionLoop ).ErlInitProgramMngr = StackMngrNum;
 							} else {
-								ShowSevereError( "Invalid " + trim( cAlphaFieldNames( aArgCount + 4 ) ) + "=" + trim( cAlphaArgs( aArgCount + 4 ) ) );
-								ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+								ShowSevereError( "Invalid " + cAlphaFieldNames( aArgCount + 4 ) + '=' + cAlphaArgs( aArgCount + 4 ) );
+								ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 								ShowContinueError( "Program Manager Name not found." );
 								ErrorsFound = true;
 							}
@@ -754,36 +754,36 @@ namespace UserDefinedComponents {
 							if ( StackMngrNum > 0 ) { // found it
 								UserPlantComp( CompLoop ).Loop( ConnectionLoop ).ErlSimProgramMngr = StackMngrNum;
 							} else {
-								ShowSevereError( "Invalid " + trim( cAlphaFieldNames( aArgCount + 4 ) ) + "=" + trim( cAlphaArgs( aArgCount + 4 ) ) );
-								ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+								ShowSevereError( "Invalid " + cAlphaFieldNames( aArgCount + 4 ) + '=' + cAlphaArgs( aArgCount + 4 ) );
+								ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 								ShowContinueError( "Program Manager Name not found." );
 								ErrorsFound = true;
 							}
 						}
 						//Setup Internal Variables
 						//model input related internal variables
-						SetupEMSInternalVariable( "Inlet Temperature for Plant Connection " + trim( LoopStr ), UserPlantComp( CompLoop ).Name, "[C]", UserPlantComp( CompLoop ).Loop( ConnectionLoop ).InletTemp );
-						SetupEMSInternalVariable( "Inlet Mass Flow Rate for Plant Connection " + trim( LoopStr ), UserPlantComp( CompLoop ).Name, "[kg/s]", UserPlantComp( CompLoop ).Loop( ConnectionLoop ).InletMassFlowRate );
+						SetupEMSInternalVariable( "Inlet Temperature for Plant Connection " + LoopStr, UserPlantComp( CompLoop ).Name, "[C]", UserPlantComp( CompLoop ).Loop( ConnectionLoop ).InletTemp );
+						SetupEMSInternalVariable( "Inlet Mass Flow Rate for Plant Connection " + LoopStr, UserPlantComp( CompLoop ).Name, "[kg/s]", UserPlantComp( CompLoop ).Loop( ConnectionLoop ).InletMassFlowRate );
 						if ( UserPlantComp( CompLoop ).Loop( ConnectionLoop ).HowLoadServed != HowMet_NoneDemand ) {
-							SetupEMSInternalVariable( "Load Request for Plant Connection " + trim( LoopStr ), UserPlantComp( CompLoop ).Name, "[W]", UserPlantComp( CompLoop ).Loop( ConnectionLoop ).MyLoad );
+							SetupEMSInternalVariable( "Load Request for Plant Connection " + LoopStr, UserPlantComp( CompLoop ).Name, "[W]", UserPlantComp( CompLoop ).Loop( ConnectionLoop ).MyLoad );
 						}
-						SetupEMSInternalVariable( "Inlet Density for Plant Connection " + trim( LoopStr ), UserPlantComp( CompLoop ).Name, "[kg/m3]", UserPlantComp( CompLoop ).Loop( ConnectionLoop ).InletRho );
-						SetupEMSInternalVariable( "Inlet Specific Heat for Plant Connection " + trim( LoopStr ), UserPlantComp( CompLoop ).Name, "[J/kg-C]", UserPlantComp( CompLoop ).Loop( ConnectionLoop ).InletCp );
+						SetupEMSInternalVariable( "Inlet Density for Plant Connection " + LoopStr, UserPlantComp( CompLoop ).Name, "[kg/m3]", UserPlantComp( CompLoop ).Loop( ConnectionLoop ).InletRho );
+						SetupEMSInternalVariable( "Inlet Specific Heat for Plant Connection " + LoopStr, UserPlantComp( CompLoop ).Name, "[J/kg-C]", UserPlantComp( CompLoop ).Loop( ConnectionLoop ).InletCp );
 						// model results related actuators
-						SetupEMSActuator( "Plant Connection " + trim( LoopStr ), UserPlantComp( CompLoop ).Name, "Outlet Temperature", "[C]", lDummy, UserPlantComp( CompLoop ).Loop( ConnectionLoop ).OutletTemp );
-						SetupEMSActuator( "Plant Connection " + trim( LoopStr ), UserPlantComp( CompLoop ).Name, "Mass Flow Rate", "[kg/s]", lDummy, UserPlantComp( CompLoop ).Loop( ConnectionLoop ).MassFlowRateRequest );
+						SetupEMSActuator( "Plant Connection " + LoopStr, UserPlantComp( CompLoop ).Name, "Outlet Temperature", "[C]", lDummy, UserPlantComp( CompLoop ).Loop( ConnectionLoop ).OutletTemp );
+						SetupEMSActuator( "Plant Connection " + LoopStr, UserPlantComp( CompLoop ).Name, "Mass Flow Rate", "[kg/s]", lDummy, UserPlantComp( CompLoop ).Loop( ConnectionLoop ).MassFlowRateRequest );
 						// model initialization and sizing related actuators
-						SetupEMSActuator( "Plant Connection " + trim( LoopStr ), UserPlantComp( CompLoop ).Name, "Minimum Mass Flow Rate", "[kg/s]", lDummy, UserPlantComp( CompLoop ).Loop( ConnectionLoop ).MassFlowRateMin );
-						SetupEMSActuator( "Plant Connection " + trim( LoopStr ), UserPlantComp( CompLoop ).Name, "Maximum Mass Flow Rate", "[kg/s]", lDummy, UserPlantComp( CompLoop ).Loop( ConnectionLoop ).MassFlowRateMax );
-						SetupEMSActuator( "Plant Connection " + trim( LoopStr ), UserPlantComp( CompLoop ).Name, "Design Volume Flow Rate", "[m3/s]", lDummy, UserPlantComp( CompLoop ).Loop( ConnectionLoop ).DesignVolumeFlowRate );
-						SetupEMSActuator( "Plant Connection " + trim( LoopStr ), UserPlantComp( CompLoop ).Name, "Minimum Loading Capacity", "[W]", lDummy, UserPlantComp( CompLoop ).Loop( ConnectionLoop ).MinLoad );
-						SetupEMSActuator( "Plant Connection " + trim( LoopStr ), UserPlantComp( CompLoop ).Name, "Maximum Loading Capacity", "[W]", lDummy, UserPlantComp( CompLoop ).Loop( ConnectionLoop ).MaxLoad );
-						SetupEMSActuator( "Plant Connection " + trim( LoopStr ), UserPlantComp( CompLoop ).Name, "Optimal Loading Capacity", "[W]", lDummy, UserPlantComp( CompLoop ).Loop( ConnectionLoop ).OptLoad );
+						SetupEMSActuator( "Plant Connection " + LoopStr, UserPlantComp( CompLoop ).Name, "Minimum Mass Flow Rate", "[kg/s]", lDummy, UserPlantComp( CompLoop ).Loop( ConnectionLoop ).MassFlowRateMin );
+						SetupEMSActuator( "Plant Connection " + LoopStr, UserPlantComp( CompLoop ).Name, "Maximum Mass Flow Rate", "[kg/s]", lDummy, UserPlantComp( CompLoop ).Loop( ConnectionLoop ).MassFlowRateMax );
+						SetupEMSActuator( "Plant Connection " + LoopStr, UserPlantComp( CompLoop ).Name, "Design Volume Flow Rate", "[m3/s]", lDummy, UserPlantComp( CompLoop ).Loop( ConnectionLoop ).DesignVolumeFlowRate );
+						SetupEMSActuator( "Plant Connection " + LoopStr, UserPlantComp( CompLoop ).Name, "Minimum Loading Capacity", "[W]", lDummy, UserPlantComp( CompLoop ).Loop( ConnectionLoop ).MinLoad );
+						SetupEMSActuator( "Plant Connection " + LoopStr, UserPlantComp( CompLoop ).Name, "Maximum Loading Capacity", "[W]", lDummy, UserPlantComp( CompLoop ).Loop( ConnectionLoop ).MaxLoad );
+						SetupEMSActuator( "Plant Connection " + LoopStr, UserPlantComp( CompLoop ).Name, "Optimal Loading Capacity", "[W]", lDummy, UserPlantComp( CompLoop ).Loop( ConnectionLoop ).OptLoad );
 					}
 				}
 
 				if ( ! lAlphaFieldBlanks( 27 ) ) {
-					UserPlantComp( CompLoop ).Air.InletNodeNum = GetOnlySingleNode( cAlphaArgs( 27 ), ErrorsFound, trim( cCurrentModuleObject ), UserPlantComp( CompLoop ).Name, NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
+					UserPlantComp( CompLoop ).Air.InletNodeNum = GetOnlySingleNode( cAlphaArgs( 27 ), ErrorsFound, cCurrentModuleObject, UserPlantComp( CompLoop ).Name, NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
 					//model input related internal variables
 					SetupEMSInternalVariable( "Inlet Temperature for Air Connection", UserPlantComp( CompLoop ).Name, "[C]", UserPlantComp( CompLoop ).Air.InletTemp );
 					SetupEMSInternalVariable( "Inlet Mass Flow Rate for Air Connection", UserPlantComp( CompLoop ).Name, "[kg/s]", UserPlantComp( CompLoop ).Air.InletMassFlowRate );
@@ -793,7 +793,7 @@ namespace UserDefinedComponents {
 				}
 
 				if ( ! lAlphaFieldBlanks( 28 ) ) {
-					UserPlantComp( CompLoop ).Air.OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 28 ), ErrorsFound, trim( cCurrentModuleObject ), UserPlantComp( CompLoop ).Name, NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsNotParent );
+					UserPlantComp( CompLoop ).Air.OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 28 ), ErrorsFound, cCurrentModuleObject, UserPlantComp( CompLoop ).Name, NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsNotParent );
 					//outlet air node results
 					SetupEMSActuator( "Air Connection", UserPlantComp( CompLoop ).Name, "Outlet Temperature", "[C]", lDummy, UserPlantComp( CompLoop ).Air.OutletTemp );
 					SetupEMSActuator( "Air Connection", UserPlantComp( CompLoop ).Name, "Outlet Humidity Ratio", "[kgWater/kgDryAir]", lDummy, UserPlantComp( CompLoop ).Air.OutletHumRat );
@@ -801,14 +801,14 @@ namespace UserDefinedComponents {
 				}
 
 				if ( ! lAlphaFieldBlanks( 29 ) ) {
-					SetupTankDemandComponent( cAlphaArgs( 1 ), trim( cCurrentModuleObject ), cAlphaArgs( 29 ), ErrorsFound, UserPlantComp( CompLoop ).Water.SupplyTankID, UserPlantComp( CompLoop ).Water.SupplyTankDemandARRID );
+					SetupTankDemandComponent( cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaArgs( 29 ), ErrorsFound, UserPlantComp( CompLoop ).Water.SupplyTankID, UserPlantComp( CompLoop ).Water.SupplyTankDemandARRID );
 
 					UserPlantComp( CompLoop ).Water.SuppliedByWaterSystem = true;
 					SetupEMSActuator( "Water System", UserPlantComp( CompLoop ).Name, "Supplied Volume Flow Rate", "[m3/s]", lDummy, UserPlantComp( CompLoop ).Water.SupplyVdotRequest );
 				}
 
 				if ( ! lAlphaFieldBlanks( 30 ) ) {
-					SetupTankSupplyComponent( cAlphaArgs( 1 ), trim( cCurrentModuleObject ), cAlphaArgs( 30 ), ErrorsFound, UserPlantComp( CompLoop ).Water.CollectionTankID, UserPlantComp( CompLoop ).Water.CollectionTankSupplyARRID );
+					SetupTankSupplyComponent( cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaArgs( 30 ), ErrorsFound, UserPlantComp( CompLoop ).Water.CollectionTankID, UserPlantComp( CompLoop ).Water.CollectionTankSupplyARRID );
 					UserPlantComp( CompLoop ).Water.CollectsToWaterSystem = true;
 					SetupEMSActuator( "Water System", UserPlantComp( CompLoop ).Name, "Collected Volume Flow Rate", "[m3/s]", lDummy, UserPlantComp( CompLoop ).Water.CollectedVdot );
 				}
@@ -817,11 +817,11 @@ namespace UserDefinedComponents {
 
 					UserPlantComp( CompLoop ).Zone.ZoneNum = FindItemInList( cAlphaArgs( 31 ), Zone.Name(), NumOfZones );
 					if ( UserPlantComp( CompLoop ).Zone.ZoneNum == 0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Ambient Zone Name not found = " + trim( cAlphaArgs( 31 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Ambient Zone Name not found = " + cAlphaArgs( 31 ) );
 						ErrorsFound = true;
 					} else {
 						UserPlantComp( CompLoop ).Zone.DeviceHasInternalGains = true;
-						SetupZoneInternalGain( UserPlantComp( CompLoop ).Zone.ZoneNum, trim( cCurrentModuleObject ), trim( cAlphaArgs( 1 ) ), IntGainTypeOf_PlantComponentUserDefined, UserPlantComp( CompLoop ).Zone.ConvectionGainRate, UserPlantComp( CompLoop ).Zone.ReturnAirConvectionGainRate, UserPlantComp( CompLoop ).Zone.ThermalRadiationGainRate, UserPlantComp( CompLoop ).Zone.LatentGainRate, UserPlantComp( CompLoop ).Zone.ReturnAirLatentGainRate, UserPlantComp( CompLoop ).Zone.CarbonDioxideGainRate, UserPlantComp( CompLoop ).Zone.GenericContamGainRate );
+						SetupZoneInternalGain( UserPlantComp( CompLoop ).Zone.ZoneNum, cCurrentModuleObject, cAlphaArgs( 1 ), IntGainTypeOf_PlantComponentUserDefined, UserPlantComp( CompLoop ).Zone.ConvectionGainRate, UserPlantComp( CompLoop ).Zone.ReturnAirConvectionGainRate, UserPlantComp( CompLoop ).Zone.ThermalRadiationGainRate, UserPlantComp( CompLoop ).Zone.LatentGainRate, UserPlantComp( CompLoop ).Zone.ReturnAirLatentGainRate, UserPlantComp( CompLoop ).Zone.CarbonDioxideGainRate, UserPlantComp( CompLoop ).Zone.GenericContamGainRate );
 
 						SetupEMSActuator( "Component Zone Internal Gain", UserPlantComp( CompLoop ).Name, "Sensible Heat Gain Rate", "[W]", lDummy, UserPlantComp( CompLoop ).Zone.ConvectionGainRate );
 						SetupEMSActuator( "Component Zone Internal Gain", UserPlantComp( CompLoop ).Name, "Return Air Heat Sensible Gain Rate", "[W]", lDummy, UserPlantComp( CompLoop ).Zone.ReturnAirConvectionGainRate );
@@ -841,7 +841,7 @@ namespace UserDefinedComponents {
 					if ( UserPlantComp( CompLoop ).Loop( ConnectionLoop ).ErlSimProgramMngr > 0 ) ++MgrCountTest;
 				}
 				if ( MgrCountTest == 0 ) {
-					ShowSevereError( "Invalid " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ShowContinueError( "At least one program calling manager is needed." );
 					ErrorsFound = true;
 				}
@@ -850,7 +850,7 @@ namespace UserDefinedComponents {
 		} //NumUserPlantComps > 0
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetUserDefinedComponents: Errors found in processing " + trim( cCurrentModuleObject ) + " input." );
+			ShowFatalError( "GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input." );
 		}
 
 		cCurrentModuleObject = "Coil:UserDefined";
@@ -863,12 +863,12 @@ namespace UserDefinedComponents {
 				GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), UserCoil.Name(), CompLoop - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+				VerifyName( cAlphaArgs( 1 ), UserCoil.Name(), CompLoop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 				}
-				VerifyUniqueCoilName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, trim( cCurrentModuleObject ) + " Name" );
+				VerifyUniqueCoilName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 				if ( errFlag ) {
 					ErrorsFound = true;
 				}
@@ -880,8 +880,8 @@ namespace UserDefinedComponents {
 					if ( StackMngrNum > 0 ) { // found it
 						UserCoil( CompLoop ).ErlSimProgramMngr = StackMngrNum;
 					} else {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ShowContinueError( "Program Manager Name not found." );
 						ErrorsFound = true;
 					}
@@ -893,8 +893,8 @@ namespace UserDefinedComponents {
 					if ( StackMngrNum > 0 ) { // found it
 						UserCoil( CompLoop ).ErlInitProgramMngr = StackMngrNum;
 					} else {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + "=" + trim( cAlphaArgs( 3 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ShowContinueError( "Program Manager Name not found." );
 						ErrorsFound = true;
 					}
@@ -906,22 +906,22 @@ namespace UserDefinedComponents {
 					UserCoil( CompLoop ).NumAirConnections = NumAirConnections;
 					for ( ConnectionLoop = 1; ConnectionLoop <= NumAirConnections; ++ConnectionLoop ) {
 						aArgCount = ( ConnectionLoop - 1 ) * 2 + 4;
-						UserCoil( CompLoop ).Air( ConnectionLoop ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( aArgCount ), ErrorsFound, trim( cCurrentModuleObject ), UserCoil( CompLoop ).Name, NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+						UserCoil( CompLoop ).Air( ConnectionLoop ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( aArgCount ), ErrorsFound, cCurrentModuleObject, UserCoil( CompLoop ).Name, NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
 						LoopStr = RoundSigDigits( ConnectionLoop );
 						//model input related internal variables
-						SetupEMSInternalVariable( "Inlet Temperature for Air Connection " + trim( LoopStr ), UserCoil( CompLoop ).Name, "[C]", UserCoil( CompLoop ).Air( ConnectionLoop ).InletTemp );
-						SetupEMSInternalVariable( "Inlet Mass Flow Rate for Air Connection " + trim( LoopStr ), UserCoil( CompLoop ).Name, "[kg/s]", UserCoil( CompLoop ).Air( ConnectionLoop ).InletMassFlowRate );
-						SetupEMSInternalVariable( "Inlet Humidity Ratio for Air Connection " + trim( LoopStr ), UserCoil( CompLoop ).Name, "[kgWater/kgDryAir]", UserCoil( CompLoop ).Air( ConnectionLoop ).InletHumRat );
-						SetupEMSInternalVariable( "Inlet Density for Air Connection " + trim( LoopStr ), UserCoil( CompLoop ).Name, "[kg/m3]", UserCoil( CompLoop ).Air( ConnectionLoop ).InletRho );
-						SetupEMSInternalVariable( "Inlet Specific Heat for Air Connection " + trim( LoopStr ), UserCoil( CompLoop ).Name, "[J/kg-C]", UserCoil( CompLoop ).Air( ConnectionLoop ).InletCp );
+						SetupEMSInternalVariable( "Inlet Temperature for Air Connection " + LoopStr, UserCoil( CompLoop ).Name, "[C]", UserCoil( CompLoop ).Air( ConnectionLoop ).InletTemp );
+						SetupEMSInternalVariable( "Inlet Mass Flow Rate for Air Connection " + LoopStr, UserCoil( CompLoop ).Name, "[kg/s]", UserCoil( CompLoop ).Air( ConnectionLoop ).InletMassFlowRate );
+						SetupEMSInternalVariable( "Inlet Humidity Ratio for Air Connection " + LoopStr, UserCoil( CompLoop ).Name, "[kgWater/kgDryAir]", UserCoil( CompLoop ).Air( ConnectionLoop ).InletHumRat );
+						SetupEMSInternalVariable( "Inlet Density for Air Connection " + LoopStr, UserCoil( CompLoop ).Name, "[kg/m3]", UserCoil( CompLoop ).Air( ConnectionLoop ).InletRho );
+						SetupEMSInternalVariable( "Inlet Specific Heat for Air Connection " + LoopStr, UserCoil( CompLoop ).Name, "[J/kg-C]", UserCoil( CompLoop ).Air( ConnectionLoop ).InletCp );
 
-						UserCoil( CompLoop ).Air( ConnectionLoop ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( aArgCount + 1 ), ErrorsFound, trim( cCurrentModuleObject ), UserCoil( CompLoop ).Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-						SetupEMSActuator( "Air Connection " + trim( LoopStr ), UserCoil( CompLoop ).Name, "Outlet Temperature", "[C]", lDummy, UserCoil( CompLoop ).Air( ConnectionLoop ).OutletTemp );
-						SetupEMSActuator( "Air Connection " + trim( LoopStr ), UserCoil( CompLoop ).Name, "Outlet Humidity Ratio", "[kgWater/kgDryAir]", lDummy, UserCoil( CompLoop ).Air( ConnectionLoop ).OutletHumRat );
-						SetupEMSActuator( "Air Connection " + trim( LoopStr ), UserCoil( CompLoop ).Name, "Mass Flow Rate", "[kg/s]", lDummy, UserCoil( CompLoop ).Air( ConnectionLoop ).OutletMassFlowRate );
+						UserCoil( CompLoop ).Air( ConnectionLoop ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( aArgCount + 1 ), ErrorsFound, cCurrentModuleObject, UserCoil( CompLoop ).Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+						SetupEMSActuator( "Air Connection " + LoopStr, UserCoil( CompLoop ).Name, "Outlet Temperature", "[C]", lDummy, UserCoil( CompLoop ).Air( ConnectionLoop ).OutletTemp );
+						SetupEMSActuator( "Air Connection " + LoopStr, UserCoil( CompLoop ).Name, "Outlet Humidity Ratio", "[kgWater/kgDryAir]", lDummy, UserCoil( CompLoop ).Air( ConnectionLoop ).OutletHumRat );
+						SetupEMSActuator( "Air Connection " + LoopStr, UserCoil( CompLoop ).Name, "Mass Flow Rate", "[kg/s]", lDummy, UserCoil( CompLoop ).Air( ConnectionLoop ).OutletMassFlowRate );
 
-						TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( aArgCount ), cAlphaArgs( aArgCount + 1 ), "Air Nodes " + LoopStr );
+						TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( aArgCount ), cAlphaArgs( aArgCount + 1 ), "Air Nodes " + LoopStr );
 
 					}
 
@@ -939,10 +939,10 @@ namespace UserDefinedComponents {
 					}
 
 					if ( UserCoil( CompLoop ).PlantIsConnected ) { // get input
-						UserCoil( CompLoop ).Loop.InletNodeNum = GetOnlySingleNode( cAlphaArgs( 9 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
-						UserCoil( CompLoop ).Loop.OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 10 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+						UserCoil( CompLoop ).Loop.InletNodeNum = GetOnlySingleNode( cAlphaArgs( 9 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+						UserCoil( CompLoop ).Loop.OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 10 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 
-						TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 9 ), cAlphaArgs( 10 ), "Plant Nodes" );
+						TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 9 ), cAlphaArgs( 10 ), "Plant Nodes" );
 
 						// this model is only for plant connections that are "Demand"
 						UserCoil( CompLoop ).Loop.HowLoadServed = HowMet_NoneDemand;
@@ -959,21 +959,21 @@ namespace UserDefinedComponents {
 						SetupEMSActuator( "Plant Connection", UserCoil( CompLoop ).Name, "Outlet Temperature", "[C]", lDummy, UserCoil( CompLoop ).Loop.OutletTemp );
 						SetupEMSActuator( "Plant Connection", UserCoil( CompLoop ).Name, "Mass Flow Rate", "[kg/s]", lDummy, UserCoil( CompLoop ).Loop.MassFlowRateRequest );
 						// model initialization and sizing related actuators
-						SetupEMSActuator( "Plant Connection ", UserCoil( CompLoop ).Name, "Design Volume Flow Rate", "[m3/s]", lDummy, UserCoil( CompLoop ).Loop.DesignVolumeFlowRate );
+						SetupEMSActuator( "Plant Connection", UserCoil( CompLoop ).Name, "Design Volume Flow Rate", "[m3/s]", lDummy, UserCoil( CompLoop ).Loop.DesignVolumeFlowRate );
 
 						SetupEMSActuator( "Plant Connection", UserCoil( CompLoop ).Name, "Minimum Mass Flow Rate", "[kg/s]", lDummy, UserCoil( CompLoop ).Loop.MassFlowRateMin );
 						SetupEMSActuator( "Plant Connection", UserCoil( CompLoop ).Name, "Maximum Mass Flow Rate", "[kg/s]", lDummy, UserCoil( CompLoop ).Loop.MassFlowRateMax );
 					}
 
 					if ( ! lAlphaFieldBlanks( 11 ) ) {
-						SetupTankDemandComponent( cAlphaArgs( 1 ), trim( cCurrentModuleObject ), cAlphaArgs( 11 ), ErrorsFound, UserCoil( CompLoop ).Water.SupplyTankID, UserCoil( CompLoop ).Water.SupplyTankDemandARRID );
+						SetupTankDemandComponent( cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaArgs( 11 ), ErrorsFound, UserCoil( CompLoop ).Water.SupplyTankID, UserCoil( CompLoop ).Water.SupplyTankDemandARRID );
 
 						UserCoil( CompLoop ).Water.SuppliedByWaterSystem = true;
 						SetupEMSActuator( "Water System", UserCoil( CompLoop ).Name, "Supplied Volume Flow Rate", "[m3/s]", lDummy, UserCoil( CompLoop ).Water.SupplyVdotRequest );
 					}
 
 					if ( ! lAlphaFieldBlanks( 12 ) ) {
-						SetupTankSupplyComponent( cAlphaArgs( 1 ), trim( cCurrentModuleObject ), cAlphaArgs( 12 ), ErrorsFound, UserCoil( CompLoop ).Water.CollectionTankID, UserCoil( CompLoop ).Water.CollectionTankSupplyARRID );
+						SetupTankSupplyComponent( cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaArgs( 12 ), ErrorsFound, UserCoil( CompLoop ).Water.CollectionTankID, UserCoil( CompLoop ).Water.CollectionTankSupplyARRID );
 						UserCoil( CompLoop ).Water.CollectsToWaterSystem = true;
 						SetupEMSActuator( "Water System", UserCoil( CompLoop ).Name, "Collected Volume Flow Rate", "[m3/s]", lDummy, UserCoil( CompLoop ).Water.CollectedVdot );
 					}
@@ -982,11 +982,11 @@ namespace UserDefinedComponents {
 
 						UserCoil( CompLoop ).Zone.ZoneNum = FindItemInList( cAlphaArgs( 13 ), Zone.Name(), NumOfZones );
 						if ( UserCoil( CompLoop ).Zone.ZoneNum == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Ambient Zone Name not found = " + trim( cAlphaArgs( 13 ) ) );
+							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Ambient Zone Name not found = " + cAlphaArgs( 13 ) );
 							ErrorsFound = true;
 						} else {
 							UserCoil( CompLoop ).Zone.DeviceHasInternalGains = true;
-							SetupZoneInternalGain( UserCoil( CompLoop ).Zone.ZoneNum, trim( cCurrentModuleObject ), trim( cAlphaArgs( 1 ) ), IntGainTypeOf_CoilUserDefined, UserCoil( CompLoop ).Zone.ConvectionGainRate, UserCoil( CompLoop ).Zone.ReturnAirConvectionGainRate, UserCoil( CompLoop ).Zone.ThermalRadiationGainRate, UserCoil( CompLoop ).Zone.LatentGainRate, UserCoil( CompLoop ).Zone.ReturnAirLatentGainRate, UserCoil( CompLoop ).Zone.CarbonDioxideGainRate, UserCoil( CompLoop ).Zone.GenericContamGainRate );
+							SetupZoneInternalGain( UserCoil( CompLoop ).Zone.ZoneNum, cCurrentModuleObject, cAlphaArgs( 1 ), IntGainTypeOf_CoilUserDefined, UserCoil( CompLoop ).Zone.ConvectionGainRate, UserCoil( CompLoop ).Zone.ReturnAirConvectionGainRate, UserCoil( CompLoop ).Zone.ThermalRadiationGainRate, UserCoil( CompLoop ).Zone.LatentGainRate, UserCoil( CompLoop ).Zone.ReturnAirLatentGainRate, UserCoil( CompLoop ).Zone.CarbonDioxideGainRate, UserCoil( CompLoop ).Zone.GenericContamGainRate );
 
 							SetupEMSActuator( "Component Zone Internal Gain", UserCoil( CompLoop ).Name, "Sensible Heat Gain Rate", "[W]", lDummy, UserCoil( CompLoop ).Zone.ConvectionGainRate );
 							SetupEMSActuator( "Component Zone Internal Gain", UserCoil( CompLoop ).Name, "Return Air Heat Sensible Gain Rate", "[W]", lDummy, UserCoil( CompLoop ).Zone.ReturnAirConvectionGainRate );
@@ -1004,7 +1004,7 @@ namespace UserDefinedComponents {
 		} //NumUserCoils > 0
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetUserDefinedComponents: Errors found in processing " + trim( cCurrentModuleObject ) + " input." );
+			ShowFatalError( "GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input." );
 		}
 
 		cCurrentModuleObject = "ZoneHVAC:ForcedAir:UserDefined";
@@ -1017,7 +1017,7 @@ namespace UserDefinedComponents {
 				GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), UserZoneAirHVAC.Name(), CompLoop - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+				VerifyName( cAlphaArgs( 1 ), UserZoneAirHVAC.Name(), CompLoop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1030,8 +1030,8 @@ namespace UserDefinedComponents {
 					if ( StackMngrNum > 0 ) { // found it
 						UserZoneAirHVAC( CompLoop ).ErlSimProgramMngr = StackMngrNum;
 					} else {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ShowContinueError( "Program Manager Name not found." );
 						ErrorsFound = true;
 					}
@@ -1043,14 +1043,14 @@ namespace UserDefinedComponents {
 					if ( StackMngrNum > 0 ) { // found it
 						UserZoneAirHVAC( CompLoop ).ErlInitProgramMngr = StackMngrNum;
 					} else {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + "=" + trim( cAlphaArgs( 3 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ShowContinueError( "Program Manager Name not found." );
 						ErrorsFound = true;
 					}
 				}
 
-				UserZoneAirHVAC( CompLoop ).ZoneAir.InletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), UserZoneAirHVAC( CompLoop ).Name, NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+				UserZoneAirHVAC( CompLoop ).ZoneAir.InletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, UserZoneAirHVAC( CompLoop ).Name, NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 				//model input related internal variables
 				SetupEMSInternalVariable( "Inlet Temperature for Primary Air Connection", UserZoneAirHVAC( CompLoop ).Name, "[C]", UserZoneAirHVAC( CompLoop ).ZoneAir.InletTemp );
 				SetupEMSInternalVariable( "Inlet Humidity Ratio for Primary Air Connection", UserZoneAirHVAC( CompLoop ).Name, "[kgWater/kgDryAir]", UserZoneAirHVAC( CompLoop ).ZoneAir.InletHumRat );
@@ -1063,13 +1063,13 @@ namespace UserDefinedComponents {
 				SetupEMSInternalVariable( "Remaining Latent Load to Dehumidifying Setpoint", UserZoneAirHVAC( CompLoop ).Name, "[kg/s]", UserZoneAirHVAC( CompLoop ).RemainingOutputReqToDehumidSP );
 
 				SetupEMSActuator( "Primary Air Connection", UserZoneAirHVAC( CompLoop ).Name, "Inlet Mass Flow Rate", "[kg/s]", lDummy, UserZoneAirHVAC( CompLoop ).ZoneAir.InletMassFlowRate );
-				UserZoneAirHVAC( CompLoop ).ZoneAir.OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), UserZoneAirHVAC( CompLoop ).Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+				UserZoneAirHVAC( CompLoop ).ZoneAir.OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, UserZoneAirHVAC( CompLoop ).Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 				SetupEMSActuator( "Primary Air Connection", UserZoneAirHVAC( CompLoop ).Name, "Outlet Temperature", "[C]", lDummy, UserZoneAirHVAC( CompLoop ).ZoneAir.OutletTemp );
 				SetupEMSActuator( "Primary Air Connection", UserZoneAirHVAC( CompLoop ).Name, "Outlet Humidity Ratio", "[kgWater/kgDryAir]", lDummy, UserZoneAirHVAC( CompLoop ).ZoneAir.OutletHumRat );
 				SetupEMSActuator( "Primary Air Connection", UserZoneAirHVAC( CompLoop ).Name, "Outlet Mass Flow Rate", "[kg/s]", lDummy, UserZoneAirHVAC( CompLoop ).ZoneAir.OutletMassFlowRate );
 
 				if ( ! lAlphaFieldBlanks( 6 ) ) {
-					UserZoneAirHVAC( CompLoop ).SourceAir.InletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, trim( cCurrentModuleObject ), UserZoneAirHVAC( CompLoop ).Name, NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+					UserZoneAirHVAC( CompLoop ).SourceAir.InletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, UserZoneAirHVAC( CompLoop ).Name, NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
 					//model input related internal variables
 					SetupEMSInternalVariable( "Inlet Temperature for Secondary Air Connection", UserZoneAirHVAC( CompLoop ).Name, "[C]", UserZoneAirHVAC( CompLoop ).SourceAir.InletTemp );
 
@@ -1080,7 +1080,7 @@ namespace UserDefinedComponents {
 				}
 
 				if ( ! lAlphaFieldBlanks( 7 ) ) {
-					UserZoneAirHVAC( CompLoop ).SourceAir.OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, trim( cCurrentModuleObject ), UserZoneAirHVAC( CompLoop ).Name, NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+					UserZoneAirHVAC( CompLoop ).SourceAir.OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, cCurrentModuleObject, UserZoneAirHVAC( CompLoop ).Name, NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 					SetupEMSActuator( "Secondary Air Connection", UserZoneAirHVAC( CompLoop ).Name, "Outlet Temperature", "[C]", lDummy, UserZoneAirHVAC( CompLoop ).SourceAir.OutletTemp );
 					SetupEMSActuator( "Secondary Air Connection", UserZoneAirHVAC( CompLoop ).Name, "Outlet Humidity Ratio", "[kgWater/kgDryAir]", lDummy, UserZoneAirHVAC( CompLoop ).SourceAir.OutletHumRat );
 					SetupEMSActuator( "Secondary Air Connection", UserZoneAirHVAC( CompLoop ).Name, "Mass Flow Rate", "[kg/s]", lDummy, UserZoneAirHVAC( CompLoop ).SourceAir.OutletMassFlowRate );
@@ -1096,39 +1096,39 @@ namespace UserDefinedComponents {
 					UserZoneAirHVAC( CompLoop ).Loop.allocate( NumPlantConnections );
 					for ( ConnectionLoop = 1; ConnectionLoop <= NumPlantConnections; ++ConnectionLoop ) {
 						aArgCount = ( ConnectionLoop - 1 ) * 2 + 8;
-						UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( aArgCount ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, ( ConnectionLoop + 2 ), ObjectIsNotParent );
-						UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( aArgCount + 1 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, ( ConnectionLoop + 2 ), ObjectIsNotParent );
-						TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( aArgCount ), cAlphaArgs( aArgCount + 1 ), "Plant Nodes" );
+						UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( aArgCount ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, ( ConnectionLoop + 2 ), ObjectIsNotParent );
+						UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( aArgCount + 1 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, ( ConnectionLoop + 2 ), ObjectIsNotParent );
+						TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( aArgCount ), cAlphaArgs( aArgCount + 1 ), "Plant Nodes" );
 						UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).HowLoadServed = HowMet_NoneDemand;
 						UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
 						//Setup Internal Variables
 						gio::write( LoopStr, "*" ) << ConnectionLoop;
-						LoopStr = adjustl( LoopStr );
+						strip( LoopStr );
 						//model input related internal variables
-						SetupEMSInternalVariable( "Inlet Temperature for Plant Connection " + trim( LoopStr ), UserZoneAirHVAC( CompLoop ).Name, "[C]", UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).InletTemp );
-						SetupEMSInternalVariable( "Inlet Mass Flow Rate for Plant Connection " + trim( LoopStr ), UserZoneAirHVAC( CompLoop ).Name, "[kg/s]", UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).InletMassFlowRate );
-						SetupEMSInternalVariable( "Inlet Density for Plant Connection " + trim( LoopStr ), UserZoneAirHVAC( CompLoop ).Name, "[kg/m3]", UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).InletRho );
-						SetupEMSInternalVariable( "Inlet Specific Heat for Plant Connection " + trim( LoopStr ), UserZoneAirHVAC( CompLoop ).Name, "[J/kg-C]", UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).InletCp );
+						SetupEMSInternalVariable( "Inlet Temperature for Plant Connection " + LoopStr, UserZoneAirHVAC( CompLoop ).Name, "[C]", UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).InletTemp );
+						SetupEMSInternalVariable( "Inlet Mass Flow Rate for Plant Connection " + LoopStr, UserZoneAirHVAC( CompLoop ).Name, "[kg/s]", UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).InletMassFlowRate );
+						SetupEMSInternalVariable( "Inlet Density for Plant Connection " + LoopStr, UserZoneAirHVAC( CompLoop ).Name, "[kg/m3]", UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).InletRho );
+						SetupEMSInternalVariable( "Inlet Specific Heat for Plant Connection " + LoopStr, UserZoneAirHVAC( CompLoop ).Name, "[J/kg-C]", UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).InletCp );
 						// model results related actuators
-						SetupEMSActuator( "Plant Connection " + trim( LoopStr ), UserZoneAirHVAC( CompLoop ).Name, "Outlet Temperature", "[C]", lDummy, UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).OutletTemp );
-						SetupEMSActuator( "Plant Connection " + trim( LoopStr ), UserZoneAirHVAC( CompLoop ).Name, "Mass Flow Rate", "[kg/s]", lDummy, UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).MassFlowRateRequest );
+						SetupEMSActuator( "Plant Connection " + LoopStr, UserZoneAirHVAC( CompLoop ).Name, "Outlet Temperature", "[C]", lDummy, UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).OutletTemp );
+						SetupEMSActuator( "Plant Connection " + LoopStr, UserZoneAirHVAC( CompLoop ).Name, "Mass Flow Rate", "[kg/s]", lDummy, UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).MassFlowRateRequest );
 						// model initialization and sizing related actuators
-						SetupEMSActuator( "Plant Connection " + trim( LoopStr ), UserZoneAirHVAC( CompLoop ).Name, "Minimum Mass Flow Rate", "[kg/s]", lDummy, UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).MassFlowRateMin );
-						SetupEMSActuator( "Plant Connection " + trim( LoopStr ), UserZoneAirHVAC( CompLoop ).Name, "Maximum Mass Flow Rate", "[kg/s]", lDummy, UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).MassFlowRateMax );
-						SetupEMSActuator( "Plant Connection " + trim( LoopStr ), UserZoneAirHVAC( CompLoop ).Name, "Design Volume Flow Rate", "[m3/s]", lDummy, UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).DesignVolumeFlowRate );
+						SetupEMSActuator( "Plant Connection " + LoopStr, UserZoneAirHVAC( CompLoop ).Name, "Minimum Mass Flow Rate", "[kg/s]", lDummy, UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).MassFlowRateMin );
+						SetupEMSActuator( "Plant Connection " + LoopStr, UserZoneAirHVAC( CompLoop ).Name, "Maximum Mass Flow Rate", "[kg/s]", lDummy, UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).MassFlowRateMax );
+						SetupEMSActuator( "Plant Connection " + LoopStr, UserZoneAirHVAC( CompLoop ).Name, "Design Volume Flow Rate", "[m3/s]", lDummy, UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).DesignVolumeFlowRate );
 
 					}
 				}
 
 				if ( ! lAlphaFieldBlanks( 14 ) ) {
-					SetupTankDemandComponent( cAlphaArgs( 1 ), trim( cCurrentModuleObject ), cAlphaArgs( 14 ), ErrorsFound, UserZoneAirHVAC( CompLoop ).Water.SupplyTankID, UserZoneAirHVAC( CompLoop ).Water.SupplyTankDemandARRID );
+					SetupTankDemandComponent( cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaArgs( 14 ), ErrorsFound, UserZoneAirHVAC( CompLoop ).Water.SupplyTankID, UserZoneAirHVAC( CompLoop ).Water.SupplyTankDemandARRID );
 
 					UserZoneAirHVAC( CompLoop ).Water.SuppliedByWaterSystem = true;
 					SetupEMSActuator( "Water System", UserZoneAirHVAC( CompLoop ).Name, "Supplied Volume Flow Rate", "[m3/s]", lDummy, UserZoneAirHVAC( CompLoop ).Water.SupplyVdotRequest );
 				}
 
 				if ( ! lAlphaFieldBlanks( 15 ) ) {
-					SetupTankSupplyComponent( cAlphaArgs( 1 ), trim( cCurrentModuleObject ), cAlphaArgs( 15 ), ErrorsFound, UserZoneAirHVAC( CompLoop ).Water.CollectionTankID, UserZoneAirHVAC( CompLoop ).Water.CollectionTankSupplyARRID );
+					SetupTankSupplyComponent( cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaArgs( 15 ), ErrorsFound, UserZoneAirHVAC( CompLoop ).Water.CollectionTankID, UserZoneAirHVAC( CompLoop ).Water.CollectionTankSupplyARRID );
 					UserZoneAirHVAC( CompLoop ).Water.CollectsToWaterSystem = true;
 					SetupEMSActuator( "Water System", UserZoneAirHVAC( CompLoop ).Name, "Collected Volume Flow Rate", "[m3/s]", lDummy, UserZoneAirHVAC( CompLoop ).Water.CollectedVdot );
 				}
@@ -1137,11 +1137,11 @@ namespace UserDefinedComponents {
 
 					UserZoneAirHVAC( CompLoop ).Zone.ZoneNum = FindItemInList( cAlphaArgs( 16 ), Zone.Name(), NumOfZones );
 					if ( UserZoneAirHVAC( CompLoop ).Zone.ZoneNum == 0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Ambient Zone Name not found = " + trim( cAlphaArgs( 16 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Ambient Zone Name not found = " + cAlphaArgs( 16 ) );
 						ErrorsFound = true;
 					} else {
 						UserZoneAirHVAC( CompLoop ).Zone.DeviceHasInternalGains = true;
-						SetupZoneInternalGain( UserZoneAirHVAC( CompLoop ).Zone.ZoneNum, trim( cCurrentModuleObject ), trim( cAlphaArgs( 1 ) ), IntGainTypeOf_ZoneHVACForcedAirUserDefined, UserZoneAirHVAC( CompLoop ).Zone.ConvectionGainRate, UserZoneAirHVAC( CompLoop ).Zone.ReturnAirConvectionGainRate, UserZoneAirHVAC( CompLoop ).Zone.ThermalRadiationGainRate, UserZoneAirHVAC( CompLoop ).Zone.LatentGainRate, UserZoneAirHVAC( CompLoop ).Zone.ReturnAirLatentGainRate, UserZoneAirHVAC( CompLoop ).Zone.CarbonDioxideGainRate, UserZoneAirHVAC( CompLoop ).Zone.GenericContamGainRate );
+						SetupZoneInternalGain( UserZoneAirHVAC( CompLoop ).Zone.ZoneNum, cCurrentModuleObject, cAlphaArgs( 1 ), IntGainTypeOf_ZoneHVACForcedAirUserDefined, UserZoneAirHVAC( CompLoop ).Zone.ConvectionGainRate, UserZoneAirHVAC( CompLoop ).Zone.ReturnAirConvectionGainRate, UserZoneAirHVAC( CompLoop ).Zone.ThermalRadiationGainRate, UserZoneAirHVAC( CompLoop ).Zone.LatentGainRate, UserZoneAirHVAC( CompLoop ).Zone.ReturnAirLatentGainRate, UserZoneAirHVAC( CompLoop ).Zone.CarbonDioxideGainRate, UserZoneAirHVAC( CompLoop ).Zone.GenericContamGainRate );
 
 						SetupEMSActuator( "Component Zone Internal Gain", UserZoneAirHVAC( CompLoop ).Name, "Sensible Heat Gain Rate", "[W]", lDummy, UserZoneAirHVAC( CompLoop ).Zone.ConvectionGainRate );
 						SetupEMSActuator( "Component Zone Internal Gain", UserZoneAirHVAC( CompLoop ).Name, "Return Air Heat Sensible Gain Rate", "[W]", lDummy, UserZoneAirHVAC( CompLoop ).Zone.ReturnAirConvectionGainRate );
@@ -1157,7 +1157,7 @@ namespace UserDefinedComponents {
 		} //NumUserZoneAir > 0
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetUserDefinedComponents: Errors found in processing " + trim( cCurrentModuleObject ) + " input." );
+			ShowFatalError( "GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input." );
 		}
 
 		cCurrentModuleObject = "AirTerminal:SingleDuct:UserDefined";
@@ -1170,7 +1170,7 @@ namespace UserDefinedComponents {
 				GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), UserAirTerminal.Name(), CompLoop - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+				VerifyName( cAlphaArgs( 1 ), UserAirTerminal.Name(), CompLoop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1183,8 +1183,8 @@ namespace UserDefinedComponents {
 					if ( StackMngrNum > 0 ) { // found it
 						UserAirTerminal( CompLoop ).ErlSimProgramMngr = StackMngrNum;
 					} else {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ShowContinueError( "Program Manager Name not found." );
 						ErrorsFound = true;
 					}
@@ -1196,14 +1196,14 @@ namespace UserDefinedComponents {
 					if ( StackMngrNum > 0 ) { // found it
 						UserAirTerminal( CompLoop ).ErlInitProgramMngr = StackMngrNum;
 					} else {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + "=" + trim( cAlphaArgs( 3 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ShowContinueError( "Program Manager Name not found." );
 						ErrorsFound = true;
 					}
 				}
 
-				UserAirTerminal( CompLoop ).AirLoop.InletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), UserAirTerminal( CompLoop ).Name, NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent, cAlphaFieldNames( 4 ) );
+				UserAirTerminal( CompLoop ).AirLoop.InletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, UserAirTerminal( CompLoop ).Name, NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent, cAlphaFieldNames( 4 ) );
 				//model input related internal variables
 				SetupEMSInternalVariable( "Inlet Temperature for Primary Air Connection", UserAirTerminal( CompLoop ).Name, "[C]", UserAirTerminal( CompLoop ).AirLoop.InletTemp );
 				SetupEMSInternalVariable( "Inlet Humidity Ratio for Primary Air Connection", UserAirTerminal( CompLoop ).Name, "[kgWater/kgDryAir]", UserAirTerminal( CompLoop ).AirLoop.InletHumRat );
@@ -1216,11 +1216,11 @@ namespace UserDefinedComponents {
 				SetupEMSInternalVariable( "Remaining Latent Load to Dehumidifying Setpoint", UserAirTerminal( CompLoop ).Name, "[kg/s]", UserAirTerminal( CompLoop ).RemainingOutputReqToDehumidSP );
 
 				SetupEMSActuator( "Primary Air Connection", UserAirTerminal( CompLoop ).Name, "Inlet Mass Flow Rate", "[kg/s]", lDummy, UserAirTerminal( CompLoop ).AirLoop.InletMassFlowRate );
-				UserAirTerminal( CompLoop ).AirLoop.OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), UserAirTerminal( CompLoop ).Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent, cAlphaFieldNames( 5 ) );
+				UserAirTerminal( CompLoop ).AirLoop.OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, UserAirTerminal( CompLoop ).Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent, cAlphaFieldNames( 5 ) );
 				SetupEMSActuator( "Primary Air Connection", UserAirTerminal( CompLoop ).Name, "Outlet Temperature", "[C]", lDummy, UserAirTerminal( CompLoop ).AirLoop.OutletTemp );
 				SetupEMSActuator( "Primary Air Connection", UserAirTerminal( CompLoop ).Name, "Outlet Humidity Ratio", "[kgWater/kgDryAir]", lDummy, UserAirTerminal( CompLoop ).AirLoop.OutletHumRat );
 				SetupEMSActuator( "Primary Air Connection", UserAirTerminal( CompLoop ).Name, "Outlet Mass Flow Rate", "[kg/s]", lDummy, UserAirTerminal( CompLoop ).AirLoop.OutletMassFlowRate );
-				TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 4 ), cAlphaArgs( 5 ), "Air Nodes" );
+				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 4 ), cAlphaArgs( 5 ), "Air Nodes" );
 
 				// Fill the Zone Equipment data with the inlet node number of this unit.
 				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
@@ -1229,8 +1229,8 @@ namespace UserDefinedComponents {
 						if ( UserAirTerminal( CompLoop ).AirLoop.OutletNodeNum == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
 							if ( ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode > 0 ) {
 								ShowSevereError( "Error in connecting a terminal unit to a zone" );
-								ShowContinueError( trim( NodeID( UserAirTerminal( CompLoop ).AirLoop.OutletNodeNum ) ) + " already connects to another zone" );
-								ShowContinueError( "Occurs for terminal unit " + trim( cCurrentModuleObject ) + " = " + trim( UserAirTerminal( CompLoop ).Name ) );
+								ShowContinueError( NodeID( UserAirTerminal( CompLoop ).AirLoop.OutletNodeNum ) + " already connects to another zone" );
+								ShowContinueError( "Occurs for terminal unit " + cCurrentModuleObject + " = " + UserAirTerminal( CompLoop ).Name );
 								ShowContinueError( "Check terminal unit node names for errors" );
 								ErrorsFound = true;
 							} else {
@@ -1245,7 +1245,7 @@ namespace UserDefinedComponents {
 				}
 
 				if ( ! lAlphaFieldBlanks( 6 ) ) {
-					UserAirTerminal( CompLoop ).SourceAir.InletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, trim( cCurrentModuleObject ), UserAirTerminal( CompLoop ).Name, NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent, cAlphaFieldNames( 6 ) );
+					UserAirTerminal( CompLoop ).SourceAir.InletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, UserAirTerminal( CompLoop ).Name, NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent, cAlphaFieldNames( 6 ) );
 					//model input related internal variables
 					SetupEMSInternalVariable( "Inlet Temperature for Secondary Air Connection", UserAirTerminal( CompLoop ).Name, "[C]", UserAirTerminal( CompLoop ).SourceAir.InletTemp );
 
@@ -1256,7 +1256,7 @@ namespace UserDefinedComponents {
 				}
 
 				if ( ! lAlphaFieldBlanks( 7 ) ) {
-					UserAirTerminal( CompLoop ).SourceAir.OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, trim( cCurrentModuleObject ), UserAirTerminal( CompLoop ).Name, NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent, cAlphaFieldNames( 7 ) );
+					UserAirTerminal( CompLoop ).SourceAir.OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, cCurrentModuleObject, UserAirTerminal( CompLoop ).Name, NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent, cAlphaFieldNames( 7 ) );
 					SetupEMSActuator( "Secondary Air Connection", UserAirTerminal( CompLoop ).Name, "Outlet Temperature", "[C]", lDummy, UserAirTerminal( CompLoop ).SourceAir.OutletTemp );
 					SetupEMSActuator( "Secondary Air Connection", UserAirTerminal( CompLoop ).Name, "Outlet Humidity Ratio", "[kgWater/kgDryAir]", lDummy, UserAirTerminal( CompLoop ).SourceAir.OutletHumRat );
 					SetupEMSActuator( "Secondary Air Connection", UserAirTerminal( CompLoop ).Name, "Mass Flow Rate", "[kg/s]", lDummy, UserAirTerminal( CompLoop ).SourceAir.OutletMassFlowRate );
@@ -1272,38 +1272,38 @@ namespace UserDefinedComponents {
 					UserAirTerminal( CompLoop ).Loop.allocate( NumPlantConnections );
 					for ( ConnectionLoop = 1; ConnectionLoop <= NumPlantConnections; ++ConnectionLoop ) {
 						aArgCount = ( ConnectionLoop - 1 ) * 2 + 8;
-						UserAirTerminal( CompLoop ).Loop( ConnectionLoop ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( aArgCount ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, ( ConnectionLoop + 2 ), ObjectIsNotParent, cAlphaFieldNames( aArgCount ) );
-						UserAirTerminal( CompLoop ).Loop( ConnectionLoop ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( aArgCount + 1 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, ( ConnectionLoop + 2 ), ObjectIsNotParent, cAlphaFieldNames( aArgCount + 1 ) );
-						TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( aArgCount ), cAlphaArgs( aArgCount + 1 ), "Plant Nodes" );
+						UserAirTerminal( CompLoop ).Loop( ConnectionLoop ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( aArgCount ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, ( ConnectionLoop + 2 ), ObjectIsNotParent, cAlphaFieldNames( aArgCount ) );
+						UserAirTerminal( CompLoop ).Loop( ConnectionLoop ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( aArgCount + 1 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, ( ConnectionLoop + 2 ), ObjectIsNotParent, cAlphaFieldNames( aArgCount + 1 ) );
+						TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( aArgCount ), cAlphaArgs( aArgCount + 1 ), "Plant Nodes" );
 						UserAirTerminal( CompLoop ).Loop( ConnectionLoop ).HowLoadServed = HowMet_NoneDemand;
 						UserAirTerminal( CompLoop ).Loop( ConnectionLoop ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
 						//Setup Internal Variables
 						LoopStr = RoundSigDigits( ConnectionLoop );
 						//model input related internal variables
-						SetupEMSInternalVariable( "Inlet Temperature for Plant Connection " + trim( LoopStr ), UserAirTerminal( CompLoop ).Name, "[C]", UserAirTerminal( CompLoop ).Loop( ConnectionLoop ).InletTemp );
-						SetupEMSInternalVariable( "Inlet Mass Flow Rate for Plant Connection " + trim( LoopStr ), UserAirTerminal( CompLoop ).Name, "[kg/s]", UserAirTerminal( CompLoop ).Loop( ConnectionLoop ).InletMassFlowRate );
-						SetupEMSInternalVariable( "Inlet Density for Plant Connection " + trim( LoopStr ), UserAirTerminal( CompLoop ).Name, "[kg/m3]", UserAirTerminal( CompLoop ).Loop( ConnectionLoop ).InletRho );
-						SetupEMSInternalVariable( "Inlet Specific Heat for Plant Connection " + trim( LoopStr ), UserAirTerminal( CompLoop ).Name, "[J/kg-C]", UserAirTerminal( CompLoop ).Loop( ConnectionLoop ).InletCp );
+						SetupEMSInternalVariable( "Inlet Temperature for Plant Connection " + LoopStr, UserAirTerminal( CompLoop ).Name, "[C]", UserAirTerminal( CompLoop ).Loop( ConnectionLoop ).InletTemp );
+						SetupEMSInternalVariable( "Inlet Mass Flow Rate for Plant Connection " + LoopStr, UserAirTerminal( CompLoop ).Name, "[kg/s]", UserAirTerminal( CompLoop ).Loop( ConnectionLoop ).InletMassFlowRate );
+						SetupEMSInternalVariable( "Inlet Density for Plant Connection " + LoopStr, UserAirTerminal( CompLoop ).Name, "[kg/m3]", UserAirTerminal( CompLoop ).Loop( ConnectionLoop ).InletRho );
+						SetupEMSInternalVariable( "Inlet Specific Heat for Plant Connection " + LoopStr, UserAirTerminal( CompLoop ).Name, "[J/kg-C]", UserAirTerminal( CompLoop ).Loop( ConnectionLoop ).InletCp );
 						// model results related actuators
-						SetupEMSActuator( "Plant Connection " + trim( LoopStr ), UserAirTerminal( CompLoop ).Name, "Outlet Temperature", "[C]", lDummy, UserAirTerminal( CompLoop ).Loop( ConnectionLoop ).OutletTemp );
-						SetupEMSActuator( "Plant Connection " + trim( LoopStr ), UserAirTerminal( CompLoop ).Name, "Mass Flow Rate", "[kg/s]", lDummy, UserAirTerminal( CompLoop ).Loop( ConnectionLoop ).MassFlowRateRequest );
+						SetupEMSActuator( "Plant Connection " + LoopStr, UserAirTerminal( CompLoop ).Name, "Outlet Temperature", "[C]", lDummy, UserAirTerminal( CompLoop ).Loop( ConnectionLoop ).OutletTemp );
+						SetupEMSActuator( "Plant Connection " + LoopStr, UserAirTerminal( CompLoop ).Name, "Mass Flow Rate", "[kg/s]", lDummy, UserAirTerminal( CompLoop ).Loop( ConnectionLoop ).MassFlowRateRequest );
 						// model initialization and sizing related actuators
-						SetupEMSActuator( "Plant Connection " + trim( LoopStr ), UserAirTerminal( CompLoop ).Name, "Minimum Mass Flow Rate", "[kg/s]", lDummy, UserAirTerminal( CompLoop ).Loop( ConnectionLoop ).MassFlowRateMin );
-						SetupEMSActuator( "Plant Connection " + trim( LoopStr ), UserAirTerminal( CompLoop ).Name, "Maximum Mass Flow Rate", "[kg/s]", lDummy, UserAirTerminal( CompLoop ).Loop( ConnectionLoop ).MassFlowRateMax );
-						SetupEMSActuator( "Plant Connection " + trim( LoopStr ), UserAirTerminal( CompLoop ).Name, "Design Volume Flow Rate", "[m3/s]", lDummy, UserAirTerminal( CompLoop ).Loop( ConnectionLoop ).DesignVolumeFlowRate );
+						SetupEMSActuator( "Plant Connection " + LoopStr, UserAirTerminal( CompLoop ).Name, "Minimum Mass Flow Rate", "[kg/s]", lDummy, UserAirTerminal( CompLoop ).Loop( ConnectionLoop ).MassFlowRateMin );
+						SetupEMSActuator( "Plant Connection " + LoopStr, UserAirTerminal( CompLoop ).Name, "Maximum Mass Flow Rate", "[kg/s]", lDummy, UserAirTerminal( CompLoop ).Loop( ConnectionLoop ).MassFlowRateMax );
+						SetupEMSActuator( "Plant Connection " + LoopStr, UserAirTerminal( CompLoop ).Name, "Design Volume Flow Rate", "[m3/s]", lDummy, UserAirTerminal( CompLoop ).Loop( ConnectionLoop ).DesignVolumeFlowRate );
 
 					}
 				}
 
 				if ( ! lAlphaFieldBlanks( 12 ) ) {
-					SetupTankDemandComponent( cAlphaArgs( 1 ), trim( cCurrentModuleObject ), cAlphaArgs( 12 ), ErrorsFound, UserAirTerminal( CompLoop ).Water.SupplyTankID, UserAirTerminal( CompLoop ).Water.SupplyTankDemandARRID );
+					SetupTankDemandComponent( cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaArgs( 12 ), ErrorsFound, UserAirTerminal( CompLoop ).Water.SupplyTankID, UserAirTerminal( CompLoop ).Water.SupplyTankDemandARRID );
 
 					UserAirTerminal( CompLoop ).Water.SuppliedByWaterSystem = true;
 					SetupEMSActuator( "Water System", UserAirTerminal( CompLoop ).Name, "Supplied Volume Flow Rate", "[m3/s]", lDummy, UserAirTerminal( CompLoop ).Water.SupplyVdotRequest );
 				}
 
 				if ( ! lAlphaFieldBlanks( 13 ) ) {
-					SetupTankSupplyComponent( cAlphaArgs( 1 ), trim( cCurrentModuleObject ), cAlphaArgs( 13 ), ErrorsFound, UserAirTerminal( CompLoop ).Water.CollectionTankID, UserAirTerminal( CompLoop ).Water.CollectionTankSupplyARRID );
+					SetupTankSupplyComponent( cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaArgs( 13 ), ErrorsFound, UserAirTerminal( CompLoop ).Water.CollectionTankID, UserAirTerminal( CompLoop ).Water.CollectionTankSupplyARRID );
 					UserAirTerminal( CompLoop ).Water.CollectsToWaterSystem = true;
 					SetupEMSActuator( "Water System", UserAirTerminal( CompLoop ).Name, "Collected Volume Flow Rate", "[m3/s]", lDummy, UserAirTerminal( CompLoop ).Water.CollectedVdot );
 				}
@@ -1312,11 +1312,11 @@ namespace UserDefinedComponents {
 
 					UserAirTerminal( CompLoop ).Zone.ZoneNum = FindItemInList( cAlphaArgs( 14 ), Zone.Name(), NumOfZones );
 					if ( UserZoneAirHVAC( CompLoop ).Zone.ZoneNum == 0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Ambient Zone Name not found = " + trim( cAlphaArgs( 16 ) ) );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Ambient Zone Name not found = " + cAlphaArgs( 16 ) );
 						ErrorsFound = true;
 					} else {
 						UserAirTerminal( CompLoop ).Zone.DeviceHasInternalGains = true;
-						SetupZoneInternalGain( UserAirTerminal( CompLoop ).Zone.ZoneNum, trim( cCurrentModuleObject ), trim( cAlphaArgs( 1 ) ), IntGainTypeOf_AirTerminalUserDefined, UserAirTerminal( CompLoop ).Zone.ConvectionGainRate, UserAirTerminal( CompLoop ).Zone.ReturnAirConvectionGainRate, UserAirTerminal( CompLoop ).Zone.ThermalRadiationGainRate, UserAirTerminal( CompLoop ).Zone.LatentGainRate, UserAirTerminal( CompLoop ).Zone.ReturnAirLatentGainRate, UserAirTerminal( CompLoop ).Zone.CarbonDioxideGainRate, UserAirTerminal( CompLoop ).Zone.GenericContamGainRate );
+						SetupZoneInternalGain( UserAirTerminal( CompLoop ).Zone.ZoneNum, cCurrentModuleObject, cAlphaArgs( 1 ), IntGainTypeOf_AirTerminalUserDefined, UserAirTerminal( CompLoop ).Zone.ConvectionGainRate, UserAirTerminal( CompLoop ).Zone.ReturnAirConvectionGainRate, UserAirTerminal( CompLoop ).Zone.ThermalRadiationGainRate, UserAirTerminal( CompLoop ).Zone.LatentGainRate, UserAirTerminal( CompLoop ).Zone.ReturnAirLatentGainRate, UserAirTerminal( CompLoop ).Zone.CarbonDioxideGainRate, UserAirTerminal( CompLoop ).Zone.GenericContamGainRate );
 
 						SetupEMSActuator( "Component Zone Internal Gain", UserAirTerminal( CompLoop ).Name, "Sensible Heat Gain Rate", "[W]", lDummy, UserAirTerminal( CompLoop ).Zone.ConvectionGainRate );
 						SetupEMSActuator( "Component Zone Internal Gain", UserAirTerminal( CompLoop ).Name, "Return Air Heat Sensible Gain Rate", "[W]", lDummy, UserZoneAirHVAC( CompLoop ).Zone.ReturnAirConvectionGainRate );
@@ -1332,7 +1332,7 @@ namespace UserDefinedComponents {
 		} //NumUserZoneAir > 0
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetUserDefinedComponents: Errors found in processing " + trim( cCurrentModuleObject ) + " input." );
+			ShowFatalError( "GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input." );
 		}
 
 	}
