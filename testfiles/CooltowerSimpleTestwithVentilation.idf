@@ -2237,6 +2237,8 @@
   Output:Variable,*,Zone Ventilation Fan Electric Energy,hourly;
 
   Output:Variable,*,Zone Ventilation Air Inlet Temperature,hourly;
+  
+  Output:Variable,*,Zone Ventilation Mass Flow Rate,hourly;
 
   Output:Variable,*,Zone Cooltower Sensible Heat Loss Energy,hourly;
 

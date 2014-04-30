@@ -17655,9 +17655,10 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     FrontStairsFlr1 Unit HeaterFan,  !- Supply Air Fan Name
     AUTOSIZE,                !- Maximum Supply Air Flow Rate {m3/s}
-    OnOff,                   !- Fan Control Type
     Coil:Heating:Electric,   !- Heating Coil Object Type
     FrontStairsFlr1 Unit Heater coil,  !- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    No,                      !- Supply Air Fan Operation During No Heating
     AUTOSIZE,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
@@ -17670,9 +17671,10 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     FrontStairsFlr2 Unit HeaterFan,  !- Supply Air Fan Name
     AUTOSIZE,                !- Maximum Supply Air Flow Rate {m3/s}
-    OnOff,                   !- Fan Control Type
     Coil:Heating:Electric,   !- Heating Coil Object Type
     FrontStairsFlr2 Unit Heater coil,  !- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    No,                      !- Supply Air Fan Operation During No Heating
     AUTOSIZE,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
@@ -17685,9 +17687,10 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     FrontStairsFlr3 Unit HeaterFan,  !- Supply Air Fan Name
     AUTOSIZE,                !- Maximum Supply Air Flow Rate {m3/s}
-    OnOff,                   !- Fan Control Type
     Coil:Heating:Electric,   !- Heating Coil Object Type
     FrontStairsFlr3 Unit Heater coil,  !- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    No,                      !- Supply Air Fan Operation During No Heating
     AUTOSIZE,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
@@ -17700,9 +17703,10 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     FrontStairsFlr4 Unit HeaterFan,  !- Supply Air Fan Name
     AUTOSIZE,                !- Maximum Supply Air Flow Rate {m3/s}
-    OnOff,                   !- Fan Control Type
     Coil:Heating:Electric,   !- Heating Coil Object Type
     FrontStairsFlr4 Unit Heater coil,  !- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    No,                      !- Supply Air Fan Operation During No Heating
     AUTOSIZE,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
@@ -17715,9 +17719,10 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     FrontStorageFlr1 Unit HeaterFan,  !- Supply Air Fan Name
     AUTOSIZE,                !- Maximum Supply Air Flow Rate {m3/s}
-    OnOff,                   !- Fan Control Type
     Coil:Heating:Electric,   !- Heating Coil Object Type
     FrontStorageFlr1 Unit Heater coil,  !- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    No,                      !- Supply Air Fan Operation During No Heating
     AUTOSIZE,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
@@ -17730,9 +17735,10 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     FrontStorageFlr2 Unit HeaterFan,  !- Supply Air Fan Name
     AUTOSIZE,                !- Maximum Supply Air Flow Rate {m3/s}
-    OnOff,                   !- Fan Control Type
     Coil:Heating:Electric,   !- Heating Coil Object Type
     FrontStorageFlr2 Unit Heater coil,  !- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    No,                      !- Supply Air Fan Operation During No Heating
     AUTOSIZE,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
@@ -17745,9 +17751,10 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     FrontStorageFlr3 Unit HeaterFan,  !- Supply Air Fan Name
     AUTOSIZE,                !- Maximum Supply Air Flow Rate {m3/s}
-    OnOff,                   !- Fan Control Type
     Coil:Heating:Electric,   !- Heating Coil Object Type
     FrontStorageFlr3 Unit Heater coil,  !- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    No,                      !- Supply Air Fan Operation During No Heating
     AUTOSIZE,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
@@ -17760,9 +17767,10 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     FrontStorageFlr4 Unit HeaterFan,  !- Supply Air Fan Name
     AUTOSIZE,                !- Maximum Supply Air Flow Rate {m3/s}
-    OnOff,                   !- Fan Control Type
     Coil:Heating:Electric,   !- Heating Coil Object Type
     FrontStorageFlr4 Unit Heater coil,  !- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    No,                      !- Supply Air Fan Operation During No Heating
     AUTOSIZE,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
@@ -17775,9 +17783,10 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     RearStairsFlr1 Unit HeaterFan,  !- Supply Air Fan Name
     AUTOSIZE,                !- Maximum Supply Air Flow Rate {m3/s}
-    OnOff,                   !- Fan Control Type
     Coil:Heating:Electric,   !- Heating Coil Object Type
     RearStairsFlr1 Unit Heater coil,  !- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    No,                      !- Supply Air Fan Operation During No Heating
     AUTOSIZE,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
@@ -17790,9 +17799,10 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     RearStairsFlr2 Unit HeaterFan,  !- Supply Air Fan Name
     AUTOSIZE,                !- Maximum Supply Air Flow Rate {m3/s}
-    OnOff,                   !- Fan Control Type
     Coil:Heating:Electric,   !- Heating Coil Object Type
     RearStairsFlr2 Unit Heater coil,  !- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    No,                      !- Supply Air Fan Operation During No Heating
     AUTOSIZE,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
@@ -17805,9 +17815,10 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     RearStairsFlr3 Unit HeaterFan,  !- Supply Air Fan Name
     AUTOSIZE,                !- Maximum Supply Air Flow Rate {m3/s}
-    OnOff,                   !- Fan Control Type
     Coil:Heating:Electric,   !- Heating Coil Object Type
     RearStairsFlr3 Unit Heater coil,  !- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    No,                      !- Supply Air Fan Operation During No Heating
     AUTOSIZE,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
@@ -17820,9 +17831,10 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     RearStairsFlr4 Unit HeaterFan,  !- Supply Air Fan Name
     AUTOSIZE,                !- Maximum Supply Air Flow Rate {m3/s}
-    OnOff,                   !- Fan Control Type
     Coil:Heating:Electric,   !- Heating Coil Object Type
     RearStairsFlr4 Unit Heater coil,  !- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    No,                      !- Supply Air Fan Operation During No Heating
     AUTOSIZE,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
@@ -17835,9 +17847,10 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     RearStorageFlr1 Unit HeaterFan,  !- Supply Air Fan Name
     AUTOSIZE,                !- Maximum Supply Air Flow Rate {m3/s}
-    OnOff,                   !- Fan Control Type
     Coil:Heating:Electric,   !- Heating Coil Object Type
     RearStorageFlr1 Unit Heater coil,  !- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    No,                      !- Supply Air Fan Operation During No Heating
     AUTOSIZE,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
@@ -17850,9 +17863,10 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     RearStorageFlr2 Unit HeaterFan,  !- Supply Air Fan Name
     AUTOSIZE,                !- Maximum Supply Air Flow Rate {m3/s}
-    OnOff,                   !- Fan Control Type
     Coil:Heating:Electric,   !- Heating Coil Object Type
     RearStorageFlr2 Unit Heater coil,  !- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    No,                      !- Supply Air Fan Operation During No Heating
     AUTOSIZE,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
@@ -17865,9 +17879,10 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     RearStorageFlr3 Unit HeaterFan,  !- Supply Air Fan Name
     AUTOSIZE,                !- Maximum Supply Air Flow Rate {m3/s}
-    OnOff,                   !- Fan Control Type
     Coil:Heating:Electric,   !- Heating Coil Object Type
     RearStorageFlr3 Unit Heater coil,  !- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    No,                      !- Supply Air Fan Operation During No Heating
     AUTOSIZE,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
@@ -17880,9 +17895,10 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     RearStorageFlr4 Unit HeaterFan,  !- Supply Air Fan Name
     AUTOSIZE,                !- Maximum Supply Air Flow Rate {m3/s}
-    OnOff,                   !- Fan Control Type
     Coil:Heating:Electric,   !- Heating Coil Object Type
     RearStorageFlr4 Unit Heater coil,  !- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    No,                      !- Supply Air Fan Operation During No Heating
     AUTOSIZE,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance

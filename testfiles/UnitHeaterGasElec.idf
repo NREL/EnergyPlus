@@ -958,9 +958,11 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     Zone1UnitHeatFan,        !- Supply Air Fan Name
     0.84,                    !- Maximum Supply Air Flow Rate {m3/s}
-    CONTINUOUS,              !- Fan Control Type
     Coil:Heating:Gas,        !- Heating Coil Object Type
-    Zone1UnitHeatHeatingCoil;!- Heating Coil Name
+    Zone1UnitHeatHeatingCoil,!- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    Yes;                     !- Supply Air Fan Operation During No Heating
+
 
   Fan:ConstantVolume,
     Zone1UnitHeatFan,        !- Name
@@ -1012,9 +1014,11 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     Zone2UnitHeatFan,        !- Supply Air Fan Name
     0.84,                    !- Maximum Supply Air Flow Rate {m3/s}
-    ONOFF,                   !- Fan Control Type
     Coil:Heating:Electric,   !- Heating Coil Object Type
-    Zone2UnitHeatHeatingCoil;!- Heating Coil Name
+    Zone2UnitHeatHeatingCoil,!- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    No;                      !- Supply Air Fan Operation During No Heating
+
 
   Fan:ConstantVolume,
     Zone2UnitHeatFan,        !- Name
@@ -1066,9 +1070,10 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     Zone3UnitHeatFan,        !- Supply Air Fan Name
     0.84,                    !- Maximum Supply Air Flow Rate {m3/s}
-    CONTINUOUS,              !- Fan Control Type
     Coil:Heating:Electric,   !- Heating Coil Object Type
-    Zone3UnitHeatHeatingCoil;!- Heating Coil Name
+    Zone3UnitHeatHeatingCoil,!- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    Yes;                     !- Supply Air Fan Operation During No Heating
 
   Fan:ConstantVolume,
     Zone3UnitHeatFan,        !- Name

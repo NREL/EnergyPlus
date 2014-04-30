@@ -1214,9 +1214,10 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     Zone1UnitHeatFan,        !- Supply Air Fan Name
     0.84,                    !- Maximum Supply Air Flow Rate {m3/s}
-    CONTINUOUS,              !- Fan Control Type
     Coil:Heating:Water,      !- Heating Coil Object Type
     Zone1UnitHeatHeatingCoil,!- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    Yes,                     !- Supply Air Fan Operation During No Heating
     0.0005,                  !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
@@ -1280,9 +1281,10 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     Zone2UnitHeatFan,        !- Supply Air Fan Name
     0.84,                    !- Maximum Supply Air Flow Rate {m3/s}
-    ONOFF,                   !- Fan Control Type
     Coil:Heating:Water,      !- Heating Coil Object Type
     Zone2UnitHeatHeatingCoil,!- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    No,                      !- Supply Air Fan Operation During No Heating
     0.0005,                  !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
@@ -1346,9 +1348,10 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     Zone3UnitHeatFan,        !- Supply Air Fan Name
     0.84,                    !- Maximum Supply Air Flow Rate {m3/s}
-    CONTINUOUS,              !- Fan Control Type
     Coil:Heating:Water,      !- Heating Coil Object Type
     Zone3UnitHeatHeatingCoil,!- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    Yes,                     !- Supply Air Fan Operation During No Heating
     0.0005,                  !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
