@@ -953,7 +953,7 @@ namespace InputProcessor {
 
 				//  For the moment dont care about descriptions on each object
 				if ( CurPos < static_cast< std::string::size_type >( InputLineLength ) ) {
-					CurPos += Pos;
+					CurPos += Pos + 1;
 					if ( CurPos < InputLine.length() ) {
 						Pos = scan( InputLine.substr( CurPos, InputLineLength - CurPos ), ",;" );
 					} else {
@@ -1473,7 +1473,7 @@ namespace InputProcessor {
 
 		SqueezedObject = MakeUPPERCase( stripped( ProposedObject ) );
 		if ( len( SqueezedObject ) > static_cast< std::string::size_type >( MaxObjectNameLength ) ) {
-			ShowWarningError( "IP: Object name length exceeds maximum, will be truncated=" + ProposedObject, EchoInputFile );
+			ShowWarningError( "IP: Object name length exceeds maximum, will be truncated=" + stripped( ProposedObject ), EchoInputFile );
 			ShowContinueError( "Will be processed as Object=" + SqueezedObject, EchoInputFile );
 		}
 		IDidntMeanIt = false;
@@ -2869,9 +2869,8 @@ namespace InputProcessor {
 							errFlag = true;
 							MinimumNumberOfFields = 0;
 						} else {
-							Slash += 11 + NSpace - 1;
+							Slash += 11 + NSpace;
 							NSpace = scan( UCInputLine.substr( Slash ), " !" );
-							if ( NSpace == std::string::npos ) NSpace = 0;
 							MinimumNumberOfFields = int( ProcessNumber( UCInputLine.substr( Slash, NSpace ), errFlag ) );
 							if ( errFlag ) {
 								ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal Number for \\Min-Fields", EchoInputFile );
@@ -2884,7 +2883,7 @@ namespace InputProcessor {
 							ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Need replacement object for \\Obsolete objects", EchoInputFile );
 							errFlag = true;
 						} else {
-							Slash += 9 + NSpace + 1;
+							Slash += 9 + NSpace + 2;
 							NSpace = scan( UCInputLine.substr( Slash ), '!' );
 							if ( NSpace == std::string::npos ) {
 								ReplacementName = InputLine.substr( Slash );
