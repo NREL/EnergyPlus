@@ -81,7 +81,7 @@ namespace SplitterComponent {
 
 	void
 	SimAirLoopSplitter(
-		Fstring const & CompName,
+		std::string const & CompName,
 		bool const FirstHVACIteration,
 		bool const FirstCall,
 		bool & SplitterInletChanged,
@@ -136,17 +136,17 @@ namespace SplitterComponent {
 		if ( CompIndex == 0 ) {
 			SplitterNum = FindItemInList( CompName, SplitterCond.SplitterName(), NumSplitters );
 			if ( SplitterNum == 0 ) {
-				ShowFatalError( "SimAirLoopSplitter: Splitter not found=" + trim( CompName ) );
+				ShowFatalError( "SimAirLoopSplitter: Splitter not found=" + CompName );
 			}
 			CompIndex = SplitterNum;
 		} else {
 			SplitterNum = CompIndex;
 			if ( SplitterNum > NumSplitters || SplitterNum < 1 ) {
-				ShowFatalError( "SimAirLoopSplitter: Invalid CompIndex passed=" + trim( TrimSigDigits( SplitterNum ) ) + ", Number of Splitters=" + trim( TrimSigDigits( NumSplitters ) ) + ", Splitter name=" + trim( CompName ) );
+				ShowFatalError( "SimAirLoopSplitter: Invalid CompIndex passed=" + TrimSigDigits( SplitterNum ) + ", Number of Splitters=" + TrimSigDigits( NumSplitters ) + ", Splitter name=" + CompName );
 			}
 			if ( CheckEquipName( SplitterNum ) ) {
 				if ( CompName != SplitterCond( SplitterNum ).SplitterName ) {
-					ShowFatalError( "SimAirLoopSplitter: Invalid CompIndex passed=" + trim( TrimSigDigits( SplitterNum ) ) + ", Splitter name=" + trim( CompName ) + ", stored Splitter Name for that index=" + trim( SplitterCond( SplitterNum ).SplitterName ) );
+					ShowFatalError( "SimAirLoopSplitter: Invalid CompIndex passed=" + TrimSigDigits( SplitterNum ) + ", Splitter name=" + CompName + ", stored Splitter Name for that index=" + SplitterCond( SplitterNum ).SplitterName );
 				}
 				CheckEquipName( SplitterNum ) = false;
 			}
@@ -203,7 +203,7 @@ namespace SplitterComponent {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetSplitterInput: " ); // include trailing blank space
+		static std::string const RoutineName( "GetSplitterInput: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -223,10 +223,10 @@ namespace SplitterComponent {
 		int NumParams;
 		int OutNodeNum1;
 		int OutNodeNum2;
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in getting objects
-		FArray1D_Fstring AlphArray( sFstring( MaxNameLength ) ); // Alpha input items for object
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) ); // Numeric field names
+		std::string CurrentModuleObject; // for ease in getting objects
+		FArray1D_string AlphArray; // Alpha input items for object
+		FArray1D_string cAlphaFields; // Alpha field names
+		FArray1D_string cNumericFields; // Numeric field names
 		FArray1D< Real64 > NumArray; // Numeric input items for object
 		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
@@ -244,13 +244,13 @@ namespace SplitterComponent {
 
 		GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
-		AlphArray = " ";
+		AlphArray = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = " ";
+		cAlphaFields = "";
 		lAlphaBlanks.allocate( NumAlphas );
 		lAlphaBlanks = true;
 		cNumericFields.allocate( NumNums );
-		cNumericFields = " ";
+		cNumericFields = "";
 		lNumericBlanks.allocate( NumNums );
 		lNumericBlanks = true;
 		NumArray.allocate( NumNums );
@@ -261,13 +261,13 @@ namespace SplitterComponent {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SplitterCond.SplitterName(), SplitterNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( AlphArray( 1 ), SplitterCond.SplitterName(), SplitterNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
 			}
 			SplitterCond( SplitterNum ).SplitterName = AlphArray( 1 );
-			SplitterCond( SplitterNum ).InletNode = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			SplitterCond( SplitterNum ).InletNode = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 			SplitterCond( SplitterNum ).NumOutletNodes = NumAlphas - 2;
 
 			SplitterCond( SplitterNum ).OutletNode.allocate( SplitterCond( SplitterNum ).NumOutletNodes );
@@ -285,9 +285,9 @@ namespace SplitterComponent {
 
 			for ( NodeNum = 1; NodeNum <= SplitterCond( SplitterNum ).NumOutletNodes; ++NodeNum ) {
 
-				SplitterCond( SplitterNum ).OutletNode( NodeNum ) = GetOnlySingleNode( AlphArray( 2 + NodeNum ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+				SplitterCond( SplitterNum ).OutletNode( NodeNum ) = GetOnlySingleNode( AlphArray( 2 + NodeNum ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 				if ( lAlphaBlanks( 2 + NodeNum ) ) {
-					ShowSevereError( trim( cAlphaFields( 2 + NodeNum ) ) + " is Blank, " + trim( CurrentModuleObject ) + " = " + trim( AlphArray( 1 ) ) );
+					ShowSevereError( cAlphaFields( 2 + NodeNum ) + " is Blank, " + CurrentModuleObject + " = " + AlphArray( 1 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -299,17 +299,17 @@ namespace SplitterComponent {
 			NodeNum = SplitterCond( SplitterNum ).InletNode;
 			for ( OutNodeNum1 = 1; OutNodeNum1 <= SplitterCond( SplitterNum ).NumOutletNodes; ++OutNodeNum1 ) {
 				if ( NodeNum != SplitterCond( SplitterNum ).OutletNode( OutNodeNum1 ) ) continue;
-				ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( SplitterCond( SplitterNum ).SplitterName ) + " specifies an outlet node name the same as the inlet node." );
-				ShowContinueError( ".." + trim( cAlphaFields( 2 ) ) + "=" + trim( NodeID( NodeNum ) ) );
-				ShowContinueError( "..Outlet Node #" + trim( TrimSigDigits( OutNodeNum1 ) ) + " is duplicate." );
+				ShowSevereError( CurrentModuleObject + " = " + SplitterCond( SplitterNum ).SplitterName + " specifies an outlet node name the same as the inlet node." );
+				ShowContinueError( ".." + cAlphaFields( 2 ) + '=' + NodeID( NodeNum ) );
+				ShowContinueError( "..Outlet Node #" + TrimSigDigits( OutNodeNum1 ) + " is duplicate." );
 				ErrorsFound = true;
 			}
 			for ( OutNodeNum1 = 1; OutNodeNum1 <= SplitterCond( SplitterNum ).NumOutletNodes; ++OutNodeNum1 ) {
 				for ( OutNodeNum2 = OutNodeNum1 + 1; OutNodeNum2 <= SplitterCond( SplitterNum ).NumOutletNodes; ++OutNodeNum2 ) {
 					if ( SplitterCond( SplitterNum ).OutletNode( OutNodeNum1 ) != SplitterCond( SplitterNum ).OutletNode( OutNodeNum2 ) ) continue;
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( SplitterCond( SplitterNum ).SplitterName ) + " specifies duplicate outlet nodes in its outlet node list." );
-					ShowContinueError( "..Outlet Node #" + trim( TrimSigDigits( OutNodeNum1 ) ) + " Name=" + trim( NodeID( OutNodeNum1 ) ) );
-					ShowContinueError( "..Outlet Node #" + trim( TrimSigDigits( OutNodeNum2 ) ) + " is duplicate." );
+					ShowSevereError( CurrentModuleObject + " = " + SplitterCond( SplitterNum ).SplitterName + " specifies duplicate outlet nodes in its outlet node list." );
+					ShowContinueError( "..Outlet Node #" + TrimSigDigits( OutNodeNum1 ) + " Name=" + NodeID( OutNodeNum1 ) );
+					ShowContinueError( "..Outlet Node #" + TrimSigDigits( OutNodeNum2 ) + " is duplicate." );
 					ErrorsFound = true;
 				}
 			}
@@ -714,7 +714,7 @@ namespace SplitterComponent {
 
 	int
 	GetSplitterOutletNumber(
-		Fstring const & SplitterName, // must match Splitter names for the Splitter type
+		std::string const & SplitterName, // must match Splitter names for the Splitter type
 		int const SplitterNum, // Index of Splitters
 		bool & ErrorsFound // set to true if problem
 	)
@@ -775,7 +775,7 @@ namespace SplitterComponent {
 		}
 
 		if ( WhichSplitter == 0 ) {
-			ShowSevereError( "GetSplitterOuletNumber: Could not find Splitter = \"" + trim( SplitterName ) + "\"" );
+			ShowSevereError( "GetSplitterOuletNumber: Could not find Splitter = \"" + SplitterName + "\"" );
 			ErrorsFound = true;
 			SplitterOutletNumber = 0;
 		}
@@ -786,7 +786,7 @@ namespace SplitterComponent {
 
 	FArray1D_int
 	GetSplitterNodeNumbers(
-		Fstring const & SplitterName, // must match Splitter names for the Splitter type
+		std::string const & SplitterName, // must match Splitter names for the Splitter type
 		int const SplitterNum, // Index of Splitters
 		bool & ErrorsFound // set to true if problem
 	)
@@ -853,7 +853,7 @@ namespace SplitterComponent {
 		}
 
 		if ( WhichSplitter == 0 ) {
-			ShowSevereError( "GetSplitterNodeNumbers: Could not find Splitter = \"" + trim( SplitterName ) + "\"" );
+			ShowSevereError( "GetSplitterNodeNumbers: Could not find Splitter = \"" + SplitterName + "\"" );
 			ErrorsFound = true;
 		}
 

@@ -1,6 +1,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <DisplayRoutines.hh>
@@ -10,7 +11,7 @@
 namespace EnergyPlus {
 
 void
-DisplayString( Fstring const & String ) // String to be displayed
+DisplayString( std::string const & String ) // String to be displayed
 {
 
 	// SUBROUTINE INFORMATION:
@@ -36,7 +37,7 @@ DisplayString( Fstring const & String ) // String to be displayed
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	Fstring const FmtA( "(1X,A)" );
+	static gio::Fmt const FmtA( "(1X,A)" );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 	// na
@@ -48,14 +49,14 @@ DisplayString( Fstring const & String ) // String to be displayed
 	// na
 
 	if ( KickOffSimulation && ! DeveloperFlag ) return;
-	gio::write( FmtA ) << trim( String );
+	gio::write( FmtA ) << String;
 
 }
 
 void
 DisplayNumberAndString(
 	int const Number, // number to be displayed
-	Fstring const & String // String to be displayed
+	std::string const & String // String to be displayed
 )
 {
 
@@ -83,7 +84,7 @@ DisplayNumberAndString(
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	Fstring const FmtA( "(1X,A)" );
+	static gio::Fmt const FmtA( "(1X,A)" );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 	// na
@@ -92,13 +93,13 @@ DisplayNumberAndString(
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	Fstring NumString( 25 );
+	std::string NumString;
 
 	if ( KickOffSimulation && ! DeveloperFlag ) return;
 	gio::write( NumString, "*" ) << Number;
-	NumString = adjustl( NumString );
+	strip( NumString );
 
-	gio::write( FmtA ) << trim( String ) + trim( NumString );
+	gio::write( FmtA ) << String + NumString;
 }
 
 void

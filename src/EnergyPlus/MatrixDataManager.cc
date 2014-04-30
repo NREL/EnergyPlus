@@ -41,14 +41,13 @@ namespace MatrixDataManager {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	//INTEGER, PARAMETER :: OneDimensional = 1
 	int const TwoDimensional( 2 );
 	//INTEGER, PARAMETER :: ThreeDimensional = 3
-	Fstring const Blank;
+	std::string const Blank;
 	// DERIVED TYPE DEFINITIONS:
 	// na
 
@@ -139,7 +138,7 @@ namespace MatrixDataManager {
 			++MatNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), MatData.Name(), MatNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), MatData.Name(), MatNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -151,13 +150,13 @@ namespace MatrixDataManager {
 
 			// test
 			if ( NumElements < 1 ) {
-				ShowSevereError( "GetMatrixInput: for " + trim( cCurrentModuleObject ) + ": " + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Check " + trim( cNumericFieldNames( 1 ) ) + " and " + trim( cNumericFieldNames( 2 ) ) + " total number of elements in matrix must be 1 or more" );
+				ShowSevereError( "GetMatrixInput: for " + cCurrentModuleObject + ": " + cAlphaArgs( 1 ) );
+				ShowContinueError( "Check " + cNumericFieldNames( 1 ) + " and " + cNumericFieldNames( 2 ) + " total number of elements in matrix must be 1 or more" );
 				ErrorsFound = true;
 			}
 			if ( ( NumNumbers - 2 ) < NumElements ) {
-				ShowSevereError( "GetMatrixInput: for " + trim( cCurrentModuleObject ) + ": " + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Check input, total number of elements does not agree with " + trim( cNumericFieldNames( 1 ) ) + " and " + trim( cNumericFieldNames( 2 ) ) );
+				ShowSevereError( "GetMatrixInput: for " + cCurrentModuleObject + ": " + cAlphaArgs( 1 ) );
+				ShowContinueError( "Check input, total number of elements does not agree with " + cNumericFieldNames( 1 ) + " and " + cNumericFieldNames( 2 ) );
 				ErrorsFound = true;
 			}
 			MatData( MatNum ).Mat2D.allocate( NumRows, NumCols ); // This is standard order for a NumRows X NumCols matrix
@@ -183,7 +182,7 @@ namespace MatrixDataManager {
 	}
 
 	int
-	MatrixIndex( Fstring const & MatrixName )
+	MatrixIndex( std::string const & MatrixName )
 	{
 
 		// FUNCTION INFORMATION:

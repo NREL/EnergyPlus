@@ -65,7 +65,6 @@ namespace ChillerGasAbsorption {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::BigNumber;
 	using DataGlobals::InitConvTemp;
 	using DataGlobals::SecInHour;
@@ -101,8 +100,8 @@ namespace ChillerGasAbsorption {
 
 	void
 	SimGasAbsorber(
-		Fstring const & AbsorberType, // type of Absorber
-		Fstring const & AbsorberName, // user specified name of Absorber
+		std::string const & AbsorberType, // type of Absorber
+		std::string const & AbsorberName, // user specified name of Absorber
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // Absorber number counter
 		bool const RunFlag, // simulate Absorber when TRUE
@@ -168,17 +167,17 @@ namespace ChillerGasAbsorption {
 		if ( CompIndex == 0 ) {
 			ChillNum = FindItemInList( AbsorberName, GasAbsorber.Name(), NumGasAbsorbers );
 			if ( ChillNum == 0 ) {
-				ShowFatalError( "SimGasAbsorber: Unit not found=" + trim( AbsorberName ) );
+				ShowFatalError( "SimGasAbsorber: Unit not found=" + AbsorberName );
 			}
 			CompIndex = ChillNum;
 		} else {
 			ChillNum = CompIndex;
 			if ( ChillNum > NumGasAbsorbers || ChillNum < 1 ) {
-				ShowFatalError( "SimGasAbsorber:  Invalid CompIndex passed=" + trim( TrimSigDigits( ChillNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumGasAbsorbers ) ) + ", Entered Unit name=" + trim( AbsorberName ) );
+				ShowFatalError( "SimGasAbsorber:  Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Number of Units=" + TrimSigDigits( NumGasAbsorbers ) + ", Entered Unit name=" + AbsorberName );
 			}
 			if ( CheckEquipName( ChillNum ) ) {
 				if ( AbsorberName != GasAbsorber( ChillNum ).Name ) {
-					ShowFatalError( "SimGasAbsorber: Invalid CompIndex passed=" + trim( TrimSigDigits( ChillNum ) ) + ", Unit name=" + trim( AbsorberName ) + ", stored Unit Name for that index=" + trim( GasAbsorber( ChillNum ).Name ) );
+					ShowFatalError( "SimGasAbsorber: Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Unit name=" + AbsorberName + ", stored Unit Name for that index=" + GasAbsorber( ChillNum ).Name );
 				}
 				CheckEquipName( ChillNum ) = false;
 			}
@@ -208,7 +207,7 @@ namespace ChillerGasAbsorption {
 				MaxCap = 0.0;
 				OptCap = 0.0;
 			} else { // Error, nodes do not match
-				ShowSevereError( "SimGasAbsorber: Invalid call to Gas Absorbtion Chiller-Heater " + trim( AbsorberName ) );
+				ShowSevereError( "SimGasAbsorber: Invalid call to Gas Absorbtion Chiller-Heater " + AbsorberName );
 				ShowContinueError( "Node connections in branch are not consistent with object nodes." );
 				ShowFatalError( "Preceding conditions cause termination." );
 			} // Operate as Chiller or Heater
@@ -245,7 +244,7 @@ namespace ChillerGasAbsorption {
 			UpdateChillerComponentCondenserSide( GasAbsorber( ChillNum ).CDLoopNum, GasAbsorber( ChillNum ).CDLoopSideNum, TypeOf_Chiller_DFAbsorption, GasAbsorber( ChillNum ).CondReturnNodeNum, GasAbsorber( ChillNum ).CondSupplyNodeNum, GasAbsorberReport( ChillNum ).TowerLoad, GasAbsorberReport( ChillNum ).CondReturnTemp, GasAbsorberReport( ChillNum ).CondSupplyTemp, GasAbsorberReport( ChillNum ).CondWaterFlowRate, FirstIteration );
 
 		} else { // Error, nodes do not match
-			ShowSevereError( "Invalid call to Gas Absorber Chiller " + trim( AbsorberName ) );
+			ShowSevereError( "Invalid call to Gas Absorber Chiller " + AbsorberName );
 			ShowContinueError( "Node connections in branch are not consistent with object nodes." );
 			ShowFatalError( "Preceding conditions cause termination." );
 		}
@@ -297,7 +296,7 @@ namespace ChillerGasAbsorption {
 		static bool ErrorsFound( false );
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		Fstring ChillerName( MaxNameLength );
+		std::string ChillerName;
 		bool errFlag;
 		bool Okay;
 
@@ -306,7 +305,7 @@ namespace ChillerGasAbsorption {
 		NumGasAbsorbers = GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumGasAbsorbers <= 0 ) {
-			ShowSevereError( "No " + trim( cCurrentModuleObject ) + " equipment found in input file" );
+			ShowSevereError( "No " + cCurrentModuleObject + " equipment found in input file" );
 			ErrorsFound = true;
 		}
 
@@ -326,17 +325,17 @@ namespace ChillerGasAbsorption {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), GasAbsorber.Name(), AbsorberNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), GasAbsorber.Name(), AbsorberNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
-			VerifyUniqueChillerName( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), errFlag, trim( cCurrentModuleObject ) + " Name" );
+			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
 			}
 			GasAbsorber( AbsorberNum ).Name = cAlphaArgs( 1 );
-			ChillerName = trim( cCurrentModuleObject ) + " Named " + trim( GasAbsorber( AbsorberNum ).Name );
+			ChillerName = cCurrentModuleObject + " Named " + GasAbsorber( AbsorberNum ).Name;
 
 			// Assign capacities
 			GasAbsorber( AbsorberNum ).NomCoolingCap = rNumericArgs( 1 );
@@ -348,15 +347,15 @@ namespace ChillerGasAbsorption {
 			GasAbsorber( AbsorberNum ).ElecHeatRatio = rNumericArgs( 6 );
 
 			// Assign Node Numbers to specified nodes
-			GasAbsorber( AbsorberNum ).ChillReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			GasAbsorber( AbsorberNum ).ChillSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Chilled Water Nodes" );
+			GasAbsorber( AbsorberNum ).ChillReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			GasAbsorber( AbsorberNum ).ChillSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Chilled Water Nodes" );
 			// Condenser node processing depends on condenser type, see below
-			GasAbsorber( AbsorberNum ).HeatReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
-			GasAbsorber( AbsorberNum ).HeatSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 3, ObjectIsNotParent );
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 6 ), cAlphaArgs( 7 ), "Hot Water Nodes" );
+			GasAbsorber( AbsorberNum ).HeatReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
+			GasAbsorber( AbsorberNum ).HeatSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 3, ObjectIsNotParent );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 6 ), cAlphaArgs( 7 ), "Hot Water Nodes" );
 			if ( ErrorsFound ) {
-				ShowFatalError( "Errors found in processing node input for " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowFatalError( "Errors found in processing node input for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = false;
 			}
 
@@ -383,7 +382,7 @@ namespace ChillerGasAbsorption {
 			GasAbsorber( AbsorberNum ).HeatCapFCoolCurve = GetCurveCheck( cAlphaArgs( 13 ), ErrorsFound, ChillerName );
 			GasAbsorber( AbsorberNum ).FuelHeatFHPLRCurve = GetCurveCheck( cAlphaArgs( 14 ), ErrorsFound, ChillerName );
 			if ( ErrorsFound ) {
-				ShowFatalError( "Errors found in processing curve input for " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowFatalError( "Errors found in processing curve input for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = false;
 			}
 			if ( SameString( cAlphaArgs( 15 ), "LeavingCondenser" ) ) {
@@ -392,8 +391,8 @@ namespace ChillerGasAbsorption {
 				GasAbsorber( AbsorberNum ).isEnterCondensTemp = true;
 			} else {
 				GasAbsorber( AbsorberNum ).isEnterCondensTemp = true;
-				ShowWarningError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid value" );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 15 ) ) + "=\"" + trim( cAlphaArgs( 15 ) ) + "\"" );
+				ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid value" );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 15 ) + "=\"" + cAlphaArgs( 15 ) + "\"" );
 				ShowContinueError( "resetting to EnteringCondenser, simulation continues" );
 			}
 			// Assign Other Paramters
@@ -403,21 +402,21 @@ namespace ChillerGasAbsorption {
 				GasAbsorber( AbsorberNum ).isWaterCooled = true;
 			} else {
 				GasAbsorber( AbsorberNum ).isWaterCooled = true;
-				ShowWarningError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid value" );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 16 ) ) + "=" + trim( cAlphaArgs( 16 ) ) );
+				ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid value" );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 16 ) + '=' + cAlphaArgs( 16 ) );
 				ShowContinueError( "resetting to WaterCooled, simulation continues" );
 			}
 			if ( GasAbsorber( AbsorberNum ).isWaterCooled ) {
-				GasAbsorber( AbsorberNum ).CondReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
-				GasAbsorber( AbsorberNum ).CondSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
-				TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 4 ), cAlphaArgs( 5 ), "Condenser Water Nodes" );
+				GasAbsorber( AbsorberNum ).CondReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+				GasAbsorber( AbsorberNum ).CondSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 4 ), cAlphaArgs( 5 ), "Condenser Water Nodes" );
 			} else {
-				GasAbsorber( AbsorberNum ).CondReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 2, ObjectIsNotParent );
-				GasAbsorber( AbsorberNum ).CondSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+				GasAbsorber( AbsorberNum ).CondReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 2, ObjectIsNotParent );
+				GasAbsorber( AbsorberNum ).CondSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 				// Connection not required for air or evap cooled condenser so no call to TestCompSet here
 				CheckAndAddAirNodeNumber( GasAbsorber( AbsorberNum ).CondReturnNodeNum, Okay );
 				if ( ! Okay ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ", Adding OutdoorAir:Node=" + trim( cAlphaArgs( 4 ) ) );
+					ShowWarningError( cCurrentModuleObject + ", Adding OutdoorAir:Node=" + cAlphaArgs( 4 ) );
 				}
 			}
 			GasAbsorber( AbsorberNum ).CHWLowLimitTemp = rNumericArgs( 15 );
@@ -451,8 +450,8 @@ namespace ChillerGasAbsorption {
 				GasAbsorber( AbsorberNum ).FuelType = "OtherFuel2";
 
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid value" );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 18 ) ) + "=" + trim( cAlphaArgs( 18 ) ) );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid value" );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 18 ) + '=' + cAlphaArgs( 18 ) );
 				ShowContinueError( "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil#1, FuelOil#2," "OtherFuel1 or OtherFuel2" );
 				ErrorsFound = true;
 			}}
@@ -460,7 +459,7 @@ namespace ChillerGasAbsorption {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + trim( cCurrentModuleObject ) );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
 		}
 
 		for ( AbsorberNum = 1; AbsorberNum <= NumGasAbsorbers; ++AbsorberNum ) {
@@ -475,17 +474,17 @@ namespace ChillerGasAbsorption {
 			SetupOutputVariable( "Chiller Heater Condenser Heat Transfer Rate [W]", GasAbsorberReport( AbsorberNum ).TowerLoad, "System", "Average", ChillerName );
 			SetupOutputVariable( "Chiller Heater Condenser Heat Transfer Energy [J]", GasAbsorberReport( AbsorberNum ).TowerEnergy, "System", "Sum", ChillerName, _, "ENERGYTRANSFER", "HEATREJECTION", _, "Plant" );
 
-			SetupOutputVariable( "Chiller Heater " + trim( GasAbsorber( AbsorberNum ).FuelType ) + " Rate [W]", GasAbsorberReport( AbsorberNum ).FuelUseRate, "System", "Average", ChillerName );
+			SetupOutputVariable( "Chiller Heater " + GasAbsorber( AbsorberNum ).FuelType + " Rate [W]", GasAbsorberReport( AbsorberNum ).FuelUseRate, "System", "Average", ChillerName );
 			// Do not include this on meters, this would duplicate the cool fuel and heat fuel
-			SetupOutputVariable( "Chiller Heater " + trim( GasAbsorber( AbsorberNum ).FuelType ) + " Energy [J]", GasAbsorberReport( AbsorberNum ).FuelEnergy, "System", "Sum", ChillerName );
+			SetupOutputVariable( "Chiller Heater " + GasAbsorber( AbsorberNum ).FuelType + " Energy [J]", GasAbsorberReport( AbsorberNum ).FuelEnergy, "System", "Sum", ChillerName );
 
-			SetupOutputVariable( "Chiller Heater Cooling " + trim( GasAbsorber( AbsorberNum ).FuelType ) + " Rate [W]", GasAbsorberReport( AbsorberNum ).CoolFuelUseRate, "System", "Average", ChillerName );
-			SetupOutputVariable( "Chiller Heater Cooling " + trim( GasAbsorber( AbsorberNum ).FuelType ) + " Energy [J]", GasAbsorberReport( AbsorberNum ).CoolFuelEnergy, "System", "Sum", ChillerName, _, GasAbsorber( AbsorberNum ).FuelType, "Cooling", _, "Plant" );
+			SetupOutputVariable( "Chiller Heater Cooling " + GasAbsorber( AbsorberNum ).FuelType + " Rate [W]", GasAbsorberReport( AbsorberNum ).CoolFuelUseRate, "System", "Average", ChillerName );
+			SetupOutputVariable( "Chiller Heater Cooling " + GasAbsorber( AbsorberNum ).FuelType + " Energy [J]", GasAbsorberReport( AbsorberNum ).CoolFuelEnergy, "System", "Sum", ChillerName, _, GasAbsorber( AbsorberNum ).FuelType, "Cooling", _, "Plant" );
 
 			SetupOutputVariable( "Chiller Heater Cooling COP [W/W]", GasAbsorberReport( AbsorberNum ).FuelCOP, "System", "Average", ChillerName );
 
-			SetupOutputVariable( "Chiller Heater Heating " + trim( GasAbsorber( AbsorberNum ).FuelType ) + " Rate [W]", GasAbsorberReport( AbsorberNum ).HeatFuelUseRate, "System", "Average", ChillerName );
-			SetupOutputVariable( "Chiller Heater Heating " + trim( GasAbsorber( AbsorberNum ).FuelType ) + " Energy [J]", GasAbsorberReport( AbsorberNum ).HeatFuelEnergy, "System", "Sum", ChillerName, _, GasAbsorber( AbsorberNum ).FuelType, "Heating", _, "Plant" );
+			SetupOutputVariable( "Chiller Heater Heating " + GasAbsorber( AbsorberNum ).FuelType + " Rate [W]", GasAbsorberReport( AbsorberNum ).HeatFuelUseRate, "System", "Average", ChillerName );
+			SetupOutputVariable( "Chiller Heater Heating " + GasAbsorber( AbsorberNum ).FuelType + " Energy [J]", GasAbsorberReport( AbsorberNum ).HeatFuelEnergy, "System", "Sum", ChillerName, _, GasAbsorber( AbsorberNum ).FuelType, "Heating", _, "Plant" );
 
 			SetupOutputVariable( "Chiller Heater Electric Power [W]", GasAbsorberReport( AbsorberNum ).ElectricPower, "System", "Average", ChillerName );
 			// Do not include this on meters, this would duplicate the cool electric and heat electric
@@ -631,8 +630,8 @@ namespace ChillerGasAbsorption {
 			if ( ( Node( GasAbsorber( ChillNum ).ChillSupplyNodeNum ).TempSetPoint == SensedNodeFlagValue ) && ( Node( GasAbsorber( ChillNum ).ChillSupplyNodeNum ).TempSetPointHi == SensedNodeFlagValue ) ) {
 				if ( ! AnyEnergyManagementSystemInModel ) {
 					if ( ! GasAbsorber( ChillNum ).ChillSetPointErrDone ) {
-						ShowWarningError( "Missing temperature setpoint on cool side for chiller heater named " + trim( GasAbsorber( ChillNum ).Name ) );
-						ShowContinueError( "  A temperature setpoint is needed at the outlet node of this chiller " ", use a SetpointManager" );
+						ShowWarningError( "Missing temperature setpoint on cool side for chiller heater named " + GasAbsorber( ChillNum ).Name );
+						ShowContinueError( "  A temperature setpoint is needed at the outlet node of this chiller, use a SetpointManager" );
 						ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );
 						GasAbsorber( ChillNum ).ChillSetPointErrDone = true;
 					}
@@ -642,7 +641,7 @@ namespace ChillerGasAbsorption {
 					CheckIfNodeSetPointManagedByEMS( GasAbsorber( ChillNum ).ChillSupplyNodeNum, iTemperatureSetPoint, errFlag );
 					if ( errFlag ) {
 						if ( ! GasAbsorber( ChillNum ).ChillSetPointErrDone ) {
-							ShowWarningError( "Missing temperature setpoint on cool side for chiller heater named " + trim( GasAbsorber( ChillNum ).Name ) );
+							ShowWarningError( "Missing temperature setpoint on cool side for chiller heater named " + GasAbsorber( ChillNum ).Name );
 							ShowContinueError( "  A temperature setpoint is needed at the outlet node of this chiller evaporator " );
 							ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node " );
 							ShowContinueError( "  or use an EMS actuator to establish a setpoint at the outlet node " );
@@ -661,8 +660,8 @@ namespace ChillerGasAbsorption {
 			if ( ( Node( GasAbsorber( ChillNum ).HeatSupplyNodeNum ).TempSetPoint == SensedNodeFlagValue ) && ( Node( GasAbsorber( ChillNum ).HeatSupplyNodeNum ).TempSetPointLo == SensedNodeFlagValue ) ) {
 				if ( ! AnyEnergyManagementSystemInModel ) {
 					if ( ! GasAbsorber( ChillNum ).HeatSetPointErrDone ) {
-						ShowWarningError( "Missing temperature setpoint on heat side for chiller heater named " + trim( GasAbsorber( ChillNum ).Name ) );
-						ShowContinueError( "  A temperature setpoint is needed at the outlet node of this chiller " ", use a SetpointManager" );
+						ShowWarningError( "Missing temperature setpoint on heat side for chiller heater named " + GasAbsorber( ChillNum ).Name );
+						ShowContinueError( "  A temperature setpoint is needed at the outlet node of this chiller, use a SetpointManager" );
 						ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );
 						GasAbsorber( ChillNum ).HeatSetPointErrDone = true;
 					}
@@ -672,7 +671,7 @@ namespace ChillerGasAbsorption {
 					CheckIfNodeSetPointManagedByEMS( GasAbsorber( ChillNum ).HeatSupplyNodeNum, iTemperatureSetPoint, errFlag );
 					if ( errFlag ) {
 						if ( ! GasAbsorber( ChillNum ).HeatSetPointErrDone ) {
-							ShowWarningError( "Missing temperature setpoint on heat side for chiller heater named " + trim( GasAbsorber( ChillNum ).Name ) );
+							ShowWarningError( "Missing temperature setpoint on heat side for chiller heater named " + GasAbsorber( ChillNum ).Name );
 							ShowContinueError( "  A temperature setpoint is needed at the outlet node of this chiller heater " );
 							ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the heater side outlet node " );
 							ShowContinueError( "  or use an EMS actuator to establish a setpoint at the outlet node " );
@@ -812,7 +811,7 @@ namespace ChillerGasAbsorption {
 
 		bool ErrorsFound; // If errors detected in input
 		//  LOGICAL             :: LoopErrorsFound
-		Fstring equipName( MaxNameLength );
+		std::string equipName;
 		Real64 Cp; // local fluid specific heat
 		Real64 rho; // local fluid density
 		Real64 tmpNomCap; // local nominal capacity cooling power
@@ -877,9 +876,9 @@ namespace ChillerGasAbsorption {
 							ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name, "Design Size Nominal Cooling Capacity [W]", tmpNomCap, "User-Specified Nominal Cooling Capacity [W]", NomCapUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpNomCap - NomCapUser ) / NomCapUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeChillerHeaterAbsorptionDirectFired: Potential issue with equipment sizing for " + trim( GasAbsorber( ChillNum ).Name ) );
-									ShowContinueError( "User-Specified Nominal Capacity of " + trim( RoundSigDigits( NomCapUser, 2 ) ) + " [W]" );
-									ShowContinueError( "differs from Design Size Nominal Capacity of " + trim( RoundSigDigits( tmpNomCap, 2 ) ) + " [W]" );
+									ShowMessage( "SizeChillerHeaterAbsorptionDirectFired: Potential issue with equipment sizing for " + GasAbsorber( ChillNum ).Name );
+									ShowContinueError( "User-Specified Nominal Capacity of " + RoundSigDigits( NomCapUser, 2 ) + " [W]" );
+									ShowContinueError( "differs from Design Size Nominal Capacity of " + RoundSigDigits( tmpNomCap, 2 ) + " [W]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -891,7 +890,7 @@ namespace ChillerGasAbsorption {
 			}
 		} else {
 			if ( IsAutoSize ) {
-				ShowSevereError( "SizeGasAbsorber: ChillerHeater:Absorption:DirectFired=\"" + trim( GasAbsorber( ChillNum ).Name ) + "\", autosize error." );
+				ShowSevereError( "SizeGasAbsorber: ChillerHeater:Absorption:DirectFired=\"" + GasAbsorber( ChillNum ).Name + "\", autosize error." );
 				ShowContinueError( "Autosizing of Direct Fired Absorption Chiller nominal cooling capacity requires" );
 				ShowContinueError( "a cooling loop Sizing:Plant object." );
 				ErrorsFound = true;
@@ -930,9 +929,9 @@ namespace ChillerGasAbsorption {
 							ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name, "Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate, "User-Specified Design Chilled Water Flow Rate [m3/s]", EvapVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpEvapVolFlowRate - EvapVolFlowRateUser ) / EvapVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeChillerAbsorptionDirectFired: Potential issue with equipment sizing for " + trim( GasAbsorber( ChillNum ).Name ) );
-									ShowContinueError( "User-Specified Design Chilled Water Flow Rate of " + trim( RoundSigDigits( EvapVolFlowRateUser, 5 ) ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Design Chilled Water Flow Rate of " + trim( RoundSigDigits( tmpEvapVolFlowRate, 5 ) ) + " [m3/s]" );
+									ShowMessage( "SizeChillerAbsorptionDirectFired: Potential issue with equipment sizing for " + GasAbsorber( ChillNum ).Name );
+									ShowContinueError( "User-Specified Design Chilled Water Flow Rate of " + RoundSigDigits( EvapVolFlowRateUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Design Chilled Water Flow Rate of " + RoundSigDigits( tmpEvapVolFlowRate, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -944,7 +943,7 @@ namespace ChillerGasAbsorption {
 			}
 		} else {
 			if ( IsAutoSize ) {
-				ShowSevereError( "SizeGasAbsorber: ChillerHeater:Absorption:DirectFired=\"" + trim( GasAbsorber( ChillNum ).Name ) + "\", autosize error." );
+				ShowSevereError( "SizeGasAbsorber: ChillerHeater:Absorption:DirectFired=\"" + GasAbsorber( ChillNum ).Name + "\", autosize error." );
 				ShowContinueError( "Autosizing of Direct Fired Absorption Chiller evap flow rate requires" );
 				ShowContinueError( "a cooling loop Sizing:Plant object." );
 				ErrorsFound = true;
@@ -985,9 +984,9 @@ namespace ChillerGasAbsorption {
 							ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name, "Design Size Design Hot Water Flow Rate [m3/s]", tmpHeatRecVolFlowRate, "User-Specified Design Hot Water Flow Rate [m3/s]", HeatRecVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpHeatRecVolFlowRate - HeatRecVolFlowRateUser ) / HeatRecVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeChillerHeaterAbsorptionDirectFired: Potential issue with equipment sizing for " + trim( GasAbsorber( ChillNum ).Name ) );
-									ShowContinueError( "User-Specified Design Hot Water Flow Rate of " + trim( RoundSigDigits( HeatRecVolFlowRateUser, 5 ) ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Design Hot Water Flow Rate of " + trim( RoundSigDigits( tmpHeatRecVolFlowRate, 5 ) ) + " [m3/s]" );
+									ShowMessage( "SizeChillerHeaterAbsorptionDirectFired: Potential issue with equipment sizing for " + GasAbsorber( ChillNum ).Name );
+									ShowContinueError( "User-Specified Design Hot Water Flow Rate of " + RoundSigDigits( HeatRecVolFlowRateUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Design Hot Water Flow Rate of " + RoundSigDigits( tmpHeatRecVolFlowRate, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -999,7 +998,7 @@ namespace ChillerGasAbsorption {
 			}
 		} else {
 			if ( IsAutoSize ) {
-				ShowSevereError( "SizeGasAbsorber: ChillerHeater:Absorption:DirectFired=\"" + trim( GasAbsorber( ChillNum ).Name ) + "\", autosize error." );
+				ShowSevereError( "SizeGasAbsorber: ChillerHeater:Absorption:DirectFired=\"" + GasAbsorber( ChillNum ).Name + "\", autosize error." );
 				ShowContinueError( "Autosizing of Direct Fired Absorption Chiller hot water flow rate requires" );
 				ShowContinueError( "a heating loop Sizing:Plant object." );
 				ErrorsFound = true;
@@ -1043,9 +1042,9 @@ namespace ChillerGasAbsorption {
 							ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name, "Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate, "User-Specified Design Condenser Water Flow Rate [m3/s]", CondVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpCondVolFlowRate - CondVolFlowRateUser ) / CondVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeChillerAbsorptionDirectFired: Potential issue with equipment sizing for " + trim( GasAbsorber( ChillNum ).Name ) );
-									ShowContinueError( "User-Specified Design Condenser Water Flow Rate of " + trim( RoundSigDigits( CondVolFlowRateUser, 5 ) ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Design Condenser Water Flow Rate of " + trim( RoundSigDigits( tmpCondVolFlowRate, 5 ) ) + " [m3/s]" );
+									ShowMessage( "SizeChillerAbsorptionDirectFired: Potential issue with equipment sizing for " + GasAbsorber( ChillNum ).Name );
+									ShowContinueError( "User-Specified Design Condenser Water Flow Rate of " + RoundSigDigits( CondVolFlowRateUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Design Condenser Water Flow Rate of " + RoundSigDigits( tmpCondVolFlowRate, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -1057,7 +1056,7 @@ namespace ChillerGasAbsorption {
 			}
 		} else {
 			if ( IsAutoSize ) {
-				ShowSevereError( "SizeGasAbsorber: ChillerHeater:Absorption:DirectFired=\"" + trim( GasAbsorber( ChillNum ).Name ) + "\", autosize error." );
+				ShowSevereError( "SizeGasAbsorber: ChillerHeater:Absorption:DirectFired=\"" + GasAbsorber( ChillNum ).Name + "\", autosize error." );
 				ShowContinueError( "Autosizing of Direct Fired Absorption Chiller condenser flow rate requires a condenser" );
 				ShowContinueError( "loop Sizing:Plant object." );
 				ErrorsFound = true;
@@ -1361,7 +1360,7 @@ namespace ChillerGasAbsorption {
 					lChillSupplyTemp = ChillSupplySetPointTemp;
 				} else {
 					lChillWaterMassFlowRate = 0.0;
-					ShowRecurringWarningErrorAtEnd( "GasAbsorberChillerModel:Cooling\"" + trim( GasAbsorber( ChillNum ).Name ) + "\", DeltaTemp = 0 in mass flow calculation", GasAbsorber( ChillNum ).DeltaTempCoolErrCount );
+					ShowRecurringWarningErrorAtEnd( "GasAbsorberChillerModel:Cooling\"" + GasAbsorber( ChillNum ).Name + "\", DeltaTemp = 0 in mass flow calculation", GasAbsorber( ChillNum ).DeltaTempCoolErrCount );
 				}
 				lChillSupplyTemp = ChillSupplySetPointTemp;
 			} else if ( SELECT_CASE_var == 1 ) { // mass flow rates may not be changed by loop components
@@ -1456,8 +1455,8 @@ namespace ChillerGasAbsorption {
 				if ( lCondWaterMassFlowRate > MassFlowTolerance ) {
 					lCondSupplyTemp = lCondReturnTemp + lTowerLoad / ( lCondWaterMassFlowRate * Cp_CD );
 				} else {
-					ShowSevereError( "CalcGasAbsorberChillerModel: Condenser flow = 0, for Gas Absorber Chiller=" + trim( GasAbsorber( ChillNum ).Name ) );
-					ShowContinueErrorTimeStamp( " " );
+					ShowSevereError( "CalcGasAbsorberChillerModel: Condenser flow = 0, for Gas Absorber Chiller=" + GasAbsorber( ChillNum ).Name );
+					ShowContinueErrorTimeStamp( "" );
 					ShowFatalError( "Program Terminates due to previous error condition." );
 				}
 			} else {
@@ -1476,7 +1475,7 @@ namespace ChillerGasAbsorption {
 				if ( revisedEstimateAvailCap > 0.0 ) {
 					errorAvailCap = std::abs( ( revisedEstimateAvailCap - lAvailableCoolingCapacity ) / revisedEstimateAvailCap );
 					if ( errorAvailCap > 0.05 ) { // if more than 5% error in estimate
-						ShowRecurringWarningErrorAtEnd( "GasAbsorberChillerModel:\"" + trim( GasAbsorber( ChillNum ).Name ) + "\", poor Condenser Supply Estimate", GasAbsorber( ChillNum ).CondErrCount, errorAvailCap, errorAvailCap );
+						ShowRecurringWarningErrorAtEnd( "GasAbsorberChillerModel:\"" + GasAbsorber( ChillNum ).Name + "\", poor Condenser Supply Estimate", GasAbsorber( ChillNum ).CondErrCount, errorAvailCap, errorAvailCap );
 					}
 				}
 			}
@@ -1694,7 +1693,7 @@ namespace ChillerGasAbsorption {
 
 				} else {
 					lHotWaterMassFlowRate = 0.0;
-					ShowRecurringWarningErrorAtEnd( "GasAbsorberChillerModel:Heating\"" + trim( GasAbsorber( ChillNum ).Name ) + "\", DeltaTemp = 0 in mass flow calculation", GasAbsorber( ChillNum ).DeltaTempHeatErrCount );
+					ShowRecurringWarningErrorAtEnd( "GasAbsorberChillerModel:Heating\"" + GasAbsorber( ChillNum ).Name + "\", DeltaTemp = 0 in mass flow calculation", GasAbsorber( ChillNum ).DeltaTempHeatErrCount );
 				}
 				lHotWaterSupplyTemp = HeatSupplySetPointTemp;
 			} else if ( SELECT_CASE_var == 1 ) { // mass flow rates may not be changed by loop components

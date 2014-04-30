@@ -1,5 +1,3 @@
-// ObjexxFCL Headers
-
 // EnergyPlus Headers
 #include <DElightManagerF.hh>
 #include <DataDElight.hh>
@@ -132,7 +130,7 @@ namespace DElightManagerF {
 	void
 	DElightElecLtgCtrl(
 		int const iNameLength,
-		Fstring const & cZoneName,
+		std::string const & cZoneName,
 		Real64 const dBldgLat,
 		Real64 const dHISKF,
 		Real64 const dHISUNF,
@@ -332,8 +330,8 @@ namespace DElightManagerF {
 
 	}
 
-	Fstring
-	ReplaceBlanksWithUnderscores( Fstring const & InputString ) // Input String
+	std::string
+	ReplaceBlanksWithUnderscores( std::string const & InputString ) // Input String
 	{
 
 		// FUNCTION INFORMATION:
@@ -353,7 +351,7 @@ namespace DElightManagerF {
 		using namespace DataGlobals;
 
 		// Return value
-		Fstring ResultString( MaxNameLength ); // Result String
+		std::string ResultString; // Result String
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -368,7 +366,7 @@ namespace DElightManagerF {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		ResultString = trim( InputString );
+		ResultString = InputString;
 
 		return ResultString;
 

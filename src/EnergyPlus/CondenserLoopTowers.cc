@@ -5,6 +5,7 @@
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <CondenserLoopTowers.hh>
@@ -64,7 +65,6 @@ namespace CondenserLoopTowers {
 	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::KelvinConv;
 	using DataGlobals::SecInHour;
 	using DataGlobals::WarmupFlag;
@@ -106,10 +106,10 @@ namespace CondenserLoopTowers {
 	int const BlowdownByConcentration( 90 );
 	int const BlowdownBySchedule( 91 );
 
-	Fstring const cCoolingTower_SingleSpeed( "CoolingTower:SingleSpeed" );
-	Fstring const cCoolingTower_TwoSpeed( "CoolingTower:TwoSpeed" );
-	Fstring const cCoolingTower_VariableSpeed( "CoolingTower:VariableSpeed" );
-	Fstring const cCoolingTower_VariableSpeedMerkel( "CoolingTower:VariableSpeed:Merkel" );
+	std::string const cCoolingTower_SingleSpeed( "CoolingTower:SingleSpeed" );
+	std::string const cCoolingTower_TwoSpeed( "CoolingTower:TwoSpeed" );
+	std::string const cCoolingTower_VariableSpeed( "CoolingTower:VariableSpeed" );
+	std::string const cCoolingTower_VariableSpeedMerkel( "CoolingTower:VariableSpeed:Merkel" );
 
 	int const PIM_NominalCapacity( 1 );
 	int const PIM_UFactor( 2 );
@@ -174,8 +174,8 @@ namespace CondenserLoopTowers {
 
 	void
 	SimTowers(
-		Fstring const & TowerType,
-		Fstring const & TowerName,
+		std::string const & TowerType,
+		std::string const & TowerName,
 		int & CompIndex,
 		bool & RunFlag,
 		bool const InitLoopEquip,
@@ -237,17 +237,17 @@ namespace CondenserLoopTowers {
 		if ( CompIndex == 0 ) {
 			TowerNum = FindItemInList( TowerName, SimpleTower.Name(), NumSimpleTowers );
 			if ( TowerNum == 0 ) {
-				ShowFatalError( "SimTowers: Unit not found=" + trim( TowerName ) );
+				ShowFatalError( "SimTowers: Unit not found=" + TowerName );
 			}
 			CompIndex = TowerNum;
 		} else {
 			TowerNum = CompIndex;
 			if ( TowerNum > NumSimpleTowers || TowerNum < 1 ) {
-				ShowFatalError( "SimTowers:  Invalid CompIndex passed=" + trim( TrimSigDigits( TowerNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumSimpleTowers ) ) + ", Entered Unit name=" + trim( TowerName ) );
+				ShowFatalError( "SimTowers:  Invalid CompIndex passed=" + TrimSigDigits( TowerNum ) + ", Number of Units=" + TrimSigDigits( NumSimpleTowers ) + ", Entered Unit name=" + TowerName );
 			}
 			if ( CheckEquipName( TowerNum ) ) {
 				if ( TowerName != SimpleTower( TowerNum ).Name ) {
-					ShowFatalError( "SimTowers: Invalid CompIndex passed=" + trim( TrimSigDigits( TowerNum ) ) + ", Unit name=" + trim( TowerName ) + ", stored Unit Name for that index=" + trim( SimpleTower( TowerNum ).Name ) );
+					ShowFatalError( "SimTowers: Invalid CompIndex passed=" + TrimSigDigits( TowerNum ) + ", Unit name=" + TowerName + ", stored Unit Name for that index=" + SimpleTower( TowerNum ).Name );
 				}
 				CheckEquipName( TowerNum ) = false;
 			}
@@ -336,7 +336,7 @@ namespace CondenserLoopTowers {
 			ReportTowers( RunFlag, TowerNum );
 
 		} else {
-			ShowFatalError( "SimTowers: Invalid Tower Type Requested=" + trim( TowerType ) );
+			ShowFatalError( "SimTowers: Invalid Tower Type Requested=" + TowerType );
 
 		}} // TypeOfEquip
 
@@ -392,8 +392,8 @@ namespace CondenserLoopTowers {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const OutputFormat( "(F5.2)" );
-		static Fstring const Blank;
+		static gio::Fmt const OutputFormat( "(F5.2)" );
+		static std::string const Blank;
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -423,13 +423,13 @@ namespace CondenserLoopTowers {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false ); // Logical flag set .TRUE. if errors found while getting input data
-		Fstring OutputChar( 6 ); // report variable for warning messages
-		Fstring OutputCharLo( 6 ); // report variable for warning messages
-		Fstring OutputCharHi( 6 ); // report variable for warning messages
+		std::string OutputChar; // report variable for warning messages
+		std::string OutputCharLo; // report variable for warning messages
+		std::string OutputCharHi; // report variable for warning messages
 		FArray1D< Real64 > NumArray( 29 ); // Numeric input data array
 		FArray1D< Real64 > NumArray2( 43 ); // Numeric input data array for VS tower coefficients
-		FArray1D_Fstring AlphArray( 15, sFstring( MaxNameLength ) ); // Character string input data array
-		FArray1D_Fstring AlphArray2( 1, sFstring( MaxNameLength ) ); // Character string input data array for VS tower coefficients
+		FArray1D_string AlphArray( 15 ); // Character string input data array
+		FArray1D_string AlphArray2( 1 ); // Character string input data array for VS tower coefficients
 
 		// Get number of all cooling towers specified in the input data file (idf)
 		NumSingleSpeedTowers = GetNumObjectsFound( cCoolingTower_SingleSpeed );
@@ -464,18 +464,18 @@ namespace CondenserLoopTowers {
 			GetObjectItem( cCurrentModuleObject, SingleSpeedTowerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SimpleTower.Name(), TowerNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( AlphArray( 1 ), SimpleTower.Name(), TowerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
 			}
 			SimpleTower( TowerNum ).Name = AlphArray( 1 );
-			SimpleTower( TowerNum ).TowerType = trim( cCurrentModuleObject );
+			SimpleTower( TowerNum ).TowerType = cCurrentModuleObject;
 			SimpleTower( TowerNum ).TowerType_Num = CoolingTower_SingleSpeed;
 			SimpleTower( TowerNum ).TowerMassFlowRateMultiplier = 2.5;
-			SimpleTower( TowerNum ).WaterInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, trim( cCurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			SimpleTower( TowerNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, trim( cCurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-			TestCompSet( trim( cCurrentModuleObject ), AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Chilled Water Nodes" );
+			SimpleTower( TowerNum ).WaterInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			SimpleTower( TowerNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			TestCompSet( cCurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Chilled Water Nodes" );
 			SimpleTower( TowerNum ).DesignWaterFlowRate = NumArray( 1 );
 			SimpleTower( TowerNum ).HighSpeedAirFlowRate = NumArray( 2 );
 			SimpleTower( TowerNum ).HighSpeedFanPower = NumArray( 3 );
@@ -494,8 +494,8 @@ namespace CondenserLoopTowers {
 				} else if ( SameString( AlphArray( 4 ), "NominalCapacity" ) ) {
 					SimpleTower( TowerNum ).PerformanceInputMethod_Num = PIM_NominalCapacity;
 				} else {
-					ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
-					ShowContinueError( "Invalid, " + trim( cAlphaFieldNames( 4 ) ) + " = " + trim( AlphArray( 4 ) ) );
+					ShowSevereError( cCurrentModuleObject + '=' + AlphArray( 1 ) );
+					ShowContinueError( "Invalid, " + cAlphaFieldNames( 4 ) + " = " + AlphArray( 4 ) );
 					ErrorsFound = true;
 				}
 			} else {
@@ -506,7 +506,7 @@ namespace CondenserLoopTowers {
 			//   Basin heater power as a function of temperature must be greater than or equal to 0
 			SimpleTower( TowerNum ).BasinHeaterPowerFTempDiff = NumArray( 13 );
 			if ( NumArray( 13 ) < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( SimpleTower( TowerNum ).Name ) + "\" basin heater power as a function of temperature difference must be >= 0" );
+				ShowSevereError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" basin heater power as a function of temperature difference must be >= 0" );
 				ErrorsFound = true;
 			}
 
@@ -517,14 +517,14 @@ namespace CondenserLoopTowers {
 					SimpleTower( TowerNum ).BasinHeaterSetPointTemp = 2.0;
 				}
 				if ( SimpleTower( TowerNum ).BasinHeaterSetPointTemp < 2.0 ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ":\"" + trim( SimpleTower( TowerNum ).Name ) + "\", " + trim( cNumericFieldNames( 14 ) ) + " is less than 2 deg C. Freezing could occur." );
+					ShowWarningError( cCurrentModuleObject + ":\"" + SimpleTower( TowerNum ).Name + "\", " + cNumericFieldNames( 14 ) + " is less than 2 deg C. Freezing could occur." );
 				}
 			}
 
 			if ( AlphArray( 5 ) != Blank ) {
 				SimpleTower( TowerNum ).BasinHeaterSchedulePtr = GetScheduleIndex( AlphArray( 5 ) );
 				if ( SimpleTower( TowerNum ).BasinHeaterSchedulePtr == 0 ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ", \"" + trim( SimpleTower( TowerNum ).Name ) + "\" basin heater schedule name \"" + trim( AlphArray( 5 ) ) + "\" was not found. Basin heater operation will not be modeled and the simulation continues" );
+					ShowWarningError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" basin heater schedule name \"" + AlphArray( 5 ) + "\" was not found. Basin heater operation will not be modeled and the simulation continues" );
 				}
 			}
 
@@ -536,8 +536,8 @@ namespace CondenserLoopTowers {
 			} else if ( AlphArray( 6 ) == Blank ) {
 				SimpleTower( TowerNum ).EvapLossMode = EvapLossByMoistTheory;
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
-				ShowContinueError( "Invalid, " + trim( cAlphaFieldNames( 6 ) ) + " = " + trim( AlphArray( 6 ) ) );
+				ShowSevereError( cCurrentModuleObject + '=' + AlphArray( 1 ) );
+				ShowContinueError( "Invalid, " + cAlphaFieldNames( 6 ) + " = " + AlphArray( 6 ) );
 				ErrorsFound = true;
 			}
 
@@ -564,21 +564,21 @@ namespace CondenserLoopTowers {
 					SimpleTower( TowerNum ).ConcentrationRatio = 3.0;
 				}
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
-				ShowContinueError( "Invalid, " + trim( cAlphaFieldNames( 7 ) ) + " = " + trim( AlphArray( 7 ) ) );
+				ShowSevereError( cCurrentModuleObject + '=' + AlphArray( 1 ) );
+				ShowContinueError( "Invalid, " + cAlphaFieldNames( 7 ) + " = " + AlphArray( 7 ) );
 				ErrorsFound = true;
 			}
 			SimpleTower( TowerNum ).SchedIDBlowdown = GetScheduleIndex( AlphArray( 8 ) );
 			if ( ( SimpleTower( TowerNum ).SchedIDBlowdown == 0 ) && ( SimpleTower( TowerNum ).BlowdownMode == BlowdownBySchedule ) ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
-				ShowContinueError( "Invalid, " + trim( cAlphaFieldNames( 8 ) ) + " = " + trim( AlphArray( 8 ) ) );
+				ShowSevereError( cCurrentModuleObject + '=' + AlphArray( 1 ) );
+				ShowContinueError( "Invalid, " + cAlphaFieldNames( 8 ) + " = " + AlphArray( 8 ) );
 				ErrorsFound = true;
 			}
 
 			if ( AlphArray( 9 ) == Blank ) {
 				SimpleTower( TowerNum ).SuppliedByWaterSystem = false;
 			} else { // water from storage tank
-				SetupTankDemandComponent( AlphArray( 1 ), trim( cCurrentModuleObject ), AlphArray( 9 ), ErrorsFound, SimpleTower( TowerNum ).WaterTankID, SimpleTower( TowerNum ).WaterTankDemandARRID );
+				SetupTankDemandComponent( AlphArray( 1 ), cCurrentModuleObject, AlphArray( 9 ), ErrorsFound, SimpleTower( TowerNum ).WaterTankID, SimpleTower( TowerNum ).WaterTankDemandARRID );
 				SimpleTower( TowerNum ).SuppliedByWaterSystem = true;
 			}
 
@@ -587,9 +587,9 @@ namespace CondenserLoopTowers {
 			if ( lAlphaFieldBlanks( 10 ) ) {
 				SimpleTower( TowerNum ).OutdoorAirInletNodeNum = 0;
 			} else {
-				SimpleTower( TowerNum ).OutdoorAirInletNodeNum = GetOnlySingleNode( AlphArray( 10 ), ErrorsFound, trim( cCurrentModuleObject ), SimpleTower( TowerNum ).Name, NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
+				SimpleTower( TowerNum ).OutdoorAirInletNodeNum = GetOnlySingleNode( AlphArray( 10 ), ErrorsFound, cCurrentModuleObject, SimpleTower( TowerNum ).Name, NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
 				if ( ! CheckOutAirNodeNumber( SimpleTower( TowerNum ).OutdoorAirInletNodeNum ) ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( SimpleTower( TowerNum ).Name ) + "\" Outdoor Air Inlet Node Name not valid Outdoor Air Node= " + trim( AlphArray( 10 ) ) );
+					ShowSevereError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" Outdoor Air Inlet Node Name not valid Outdoor Air Node= " + AlphArray( 10 ) );
 					ShowContinueError( "...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node." );
 					ErrorsFound = true;
 				}
@@ -606,7 +606,7 @@ namespace CondenserLoopTowers {
 					SimpleTower( TowerNum ).CapacityControl = CapacityControl_FluidBypass;
 				} else {
 					SimpleTower( TowerNum ).CapacityControl = CapacityControl_FanCycling;
-					ShowWarningError( trim( cCurrentModuleObject ) + ", \"" + trim( SimpleTower( TowerNum ).Name ) + "\" The Capacity Control is not specified correctly. The default Fan Cycling is used." );
+					ShowWarningError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" The Capacity Control is not specified correctly. The default Fan Cycling is used." );
 				}}
 			}
 
@@ -642,8 +642,8 @@ namespace CondenserLoopTowers {
 							SimpleTower( TowerNum ).CellCtrl = "MaximalCell";
 						}
 					} else {
-						ShowSevereError( "Illegal " + trim( cAlphaFieldNames( 12 ) ) + " = " + trim( AlphArray( 12 ) ) );
-						ShowContinueError( "Occurs in " + SimpleTower( TowerNum ).TowerType + "=" + trim( SimpleTower( TowerNum ).Name ) );
+						ShowSevereError( "Illegal " + cAlphaFieldNames( 12 ) + " = " + AlphArray( 12 ) );
+						ShowContinueError( "Occurs in " + SimpleTower( TowerNum ).TowerType + '=' + SimpleTower( TowerNum ).Name );
 						ErrorsFound = true;
 					}
 				}
@@ -656,67 +656,67 @@ namespace CondenserLoopTowers {
 			//   High speed air flow rate must be greater than free convection air flow rate.
 			//   Can't tell yet if autosized, check later in InitTower.
 			if ( SimpleTower( TowerNum ).HighSpeedAirFlowRate <= SimpleTower( TowerNum ).FreeConvAirFlowRate && SimpleTower( TowerNum ).HighSpeedAirFlowRate != AutoSize ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Free convection air flow rate must be less than the design air flow rate." );
+				ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Free convection air flow rate must be less than the design air flow rate." );
 				ErrorsFound = true;
 			}
 
 			//   Check various inputs if Performance Input Method = "UA and Design Water Flow Rate"
 			if ( SimpleTower( TowerNum ).PerformanceInputMethod_Num == PIM_UFactor ) {
 				if ( SimpleTower( TowerNum ).DesignWaterFlowRate == 0.0 ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Tower performance input method requires a design water flow rate greater than zero." );
+					ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Tower performance input method requires a design water flow rate greater than zero." );
 					ErrorsFound = true;
 				}
 				if ( SimpleTower( TowerNum ).HighSpeedTowerUA <= SimpleTower( TowerNum ).FreeConvTowerUA && SimpleTower( TowerNum ).HighSpeedTowerUA != AutoSize ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Free convection UA must be less than the design tower UA." );
+					ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Free convection UA must be less than the design tower UA." );
 					ErrorsFound = true;
 				}
 				if ( SimpleTower( TowerNum ).FreeConvTowerUA > 0.0 && SimpleTower( TowerNum ).FreeConvAirFlowRate == 0.0 ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Free convection air flow rate must be greater than zero when free convection UA is greater than zero." );
+					ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Free convection air flow rate must be greater than zero when free convection UA is greater than zero." );
 					ErrorsFound = true;
 				}
 			} else if ( SimpleTower( TowerNum ).PerformanceInputMethod_Num == PIM_NominalCapacity ) {
 				if ( SimpleTower( TowerNum ).TowerNominalCapacity == 0.0 ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Tower performance input method requires valid nominal capacity." );
+					ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Tower performance input method requires valid nominal capacity." );
 					ErrorsFound = true;
 				}
 				if ( SimpleTower( TowerNum ).DesignWaterFlowRate != 0.0 ) {
 					if ( SimpleTower( TowerNum ).DesignWaterFlowRate > 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Nominal capacity input method and design water flow rate have been specified." );
+						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and design water flow rate have been specified." );
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Nominal capacity input method has been specified and design water flow rate is being autosized." );
+						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method has been specified and design water flow rate is being autosized." );
 					}
 					ShowContinueError( "Design water flow rate must be left blank when nominal tower capacity input method is used." );
 					ErrorsFound = true;
 				}
 				if ( SimpleTower( TowerNum ).HighSpeedTowerUA != 0.0 ) {
 					if ( SimpleTower( TowerNum ).HighSpeedTowerUA > 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Nominal tower capacity and design tower UA have been specified." );
+						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal tower capacity and design tower UA have been specified." );
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Nominal tower capacity has been specified and design tower UA is being autosized." );
+						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal tower capacity has been specified and design tower UA is being autosized." );
 					}
 					ShowContinueError( "Design tower UA field must be left blank when nominal tower capacity input method is used." );
 					ErrorsFound = true;
 				}
 				if ( SimpleTower( TowerNum ).FreeConvTowerUA != 0.0 ) {
 					if ( SimpleTower( TowerNum ).FreeConvTowerUA > 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Nominal capacity input method and free convection UA have been specified." );
+						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and free convection UA have been specified." );
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Nominal capacity input method has been specified and free convection UA is being autosized." );
+						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method has been specified and free convection UA is being autosized." );
 					}
 					ShowContinueError( "Free convection UA should be left blank when nominal tower capacity input method is used." );
 					ErrorsFound = true;
 				}
 				if ( SimpleTower( TowerNum ).TowerFreeConvNomCap >= SimpleTower( TowerNum ).TowerNominalCapacity ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Free convection nominal capacity must be less than the nominal (design) tower capacity." );
+					ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Free convection nominal capacity must be less than the nominal (design) tower capacity." );
 					ErrorsFound = true;
 				}
 				if ( SimpleTower( TowerNum ).TowerFreeConvNomCap > 0.0 && SimpleTower( TowerNum ).FreeConvAirFlowRate == 0.0 ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Free convection air flow must be greater than zero when tower free convection capacity is specified." );
+					ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Free convection air flow must be greater than zero when tower free convection capacity is specified." );
 					ErrorsFound = true;
 				}
 			} else { // Tower performance input method is not specified as a valid "choice"
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Tower Performance Input Method must be \"UFactorTimesAreaAndDesignWaterFlowRate\" or \"NominalCapacity\"." );
-				ShowContinueError( "Tower Performanace Input Method currently specified as: " + trim( AlphArray( 4 ) ) );
+				ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Tower Performance Input Method must be \"UFactorTimesAreaAndDesignWaterFlowRate\" or \"NominalCapacity\"." );
+				ShowContinueError( "Tower Performanace Input Method currently specified as: " + AlphArray( 4 ) );
 				ErrorsFound = true;
 			}
 		} // End Single-Speed Tower Loop
@@ -728,18 +728,18 @@ namespace CondenserLoopTowers {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SimpleTower.Name(), TowerNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( AlphArray( 1 ), SimpleTower.Name(), TowerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
 			}
 			SimpleTower( TowerNum ).Name = AlphArray( 1 );
-			SimpleTower( TowerNum ).TowerType = trim( cCurrentModuleObject );
+			SimpleTower( TowerNum ).TowerType = cCurrentModuleObject;
 			SimpleTower( TowerNum ).TowerType_Num = CoolingTower_TwoSpeed;
 			SimpleTower( TowerNum ).TowerMassFlowRateMultiplier = 2.5;
-			SimpleTower( TowerNum ).WaterInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, trim( cCurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			SimpleTower( TowerNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, trim( cCurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-			TestCompSet( trim( cCurrentModuleObject ), AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Chilled Water Nodes" );
+			SimpleTower( TowerNum ).WaterInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			SimpleTower( TowerNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			TestCompSet( cCurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Chilled Water Nodes" );
 
 			if ( NumAlphas >= 4 ) {
 				if ( SameString( AlphArray( 4 ), "UFactorTimesAreaAndDesignWaterFlowRate" ) ) {
@@ -747,8 +747,8 @@ namespace CondenserLoopTowers {
 				} else if ( SameString( AlphArray( 4 ), "NominalCapacity" ) ) {
 					SimpleTower( TowerNum ).PerformanceInputMethod_Num = PIM_NominalCapacity;
 				} else {
-					ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
-					ShowContinueError( "Invalid, " + trim( cAlphaFieldNames( 4 ) ) + " = " + trim( AlphArray( 4 ) ) );
+					ShowSevereError( cCurrentModuleObject + '=' + AlphArray( 1 ) );
+					ShowContinueError( "Invalid, " + cAlphaFieldNames( 4 ) + " = " + AlphArray( 4 ) );
 					ErrorsFound = true;
 				}
 			} else {
@@ -779,7 +779,7 @@ namespace CondenserLoopTowers {
 			//   Basin heater power as a function of temperature must be greater than or equal to 0
 			SimpleTower( TowerNum ).BasinHeaterPowerFTempDiff = NumArray( 21 );
 			if ( NumArray( 21 ) < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( SimpleTower( TowerNum ).Name ) + "\" basin heater power as a function of temperature difference must be >= 0" );
+				ShowSevereError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" basin heater power as a function of temperature difference must be >= 0" );
 				ErrorsFound = true;
 			}
 
@@ -789,14 +789,14 @@ namespace CondenserLoopTowers {
 					SimpleTower( TowerNum ).BasinHeaterSetPointTemp = 2.0;
 				}
 				if ( SimpleTower( TowerNum ).BasinHeaterSetPointTemp < 2.0 ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ":\"" + trim( SimpleTower( TowerNum ).Name ) + "\", " + trim( cNumericFieldNames( 22 ) ) + " is less than 2 deg C. Freezing could occur." );
+					ShowWarningError( cCurrentModuleObject + ":\"" + SimpleTower( TowerNum ).Name + "\", " + cNumericFieldNames( 22 ) + " is less than 2 deg C. Freezing could occur." );
 				}
 			}
 
 			if ( AlphArray( 5 ) != Blank ) {
 				SimpleTower( TowerNum ).BasinHeaterSchedulePtr = GetScheduleIndex( AlphArray( 5 ) );
 				if ( SimpleTower( TowerNum ).BasinHeaterSchedulePtr == 0 ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ", \"" + trim( SimpleTower( TowerNum ).Name ) + "\" basin heater schedule name \"" + trim( AlphArray( 5 ) ) + "\" was not found. Basin heater operation will not be modeled and the simulation continues" );
+					ShowWarningError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" basin heater schedule name \"" + AlphArray( 5 ) + "\" was not found. Basin heater operation will not be modeled and the simulation continues" );
 				}
 			}
 
@@ -808,8 +808,8 @@ namespace CondenserLoopTowers {
 			} else if ( lAlphaFieldBlanks( 6 ) ) {
 				SimpleTower( TowerNum ).EvapLossMode = EvapLossByMoistTheory;
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 6 ) ) + "=" + trim( AlphArray( 6 ) ) );
+				ShowSevereError( cCurrentModuleObject + '=' + AlphArray( 1 ) );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 6 ) + '=' + AlphArray( 6 ) );
 				ErrorsFound = true;
 			}
 
@@ -835,14 +835,14 @@ namespace CondenserLoopTowers {
 					SimpleTower( TowerNum ).ConcentrationRatio = 3.0;
 				}
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( AlphArray( 7 ) ) );
+				ShowSevereError( cCurrentModuleObject + '=' + AlphArray( 1 ) );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + AlphArray( 7 ) );
 				ErrorsFound = true;
 			}
 			SimpleTower( TowerNum ).SchedIDBlowdown = GetScheduleIndex( AlphArray( 8 ) );
 			if ( ( SimpleTower( TowerNum ).SchedIDBlowdown == 0 ) && ( SimpleTower( TowerNum ).BlowdownMode == BlowdownBySchedule ) ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 8 ) ) + "=" + trim( AlphArray( 8 ) ) );
+				ShowSevereError( cCurrentModuleObject + '=' + AlphArray( 1 ) );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 8 ) + '=' + AlphArray( 8 ) );
 				ErrorsFound = true;
 			}
 
@@ -878,8 +878,8 @@ namespace CondenserLoopTowers {
 							SimpleTower( TowerNum ).CellCtrl = "MaximalCell";
 						}
 					} else {
-						ShowSevereError( "Illegal " + trim( cAlphaFieldNames( 12 ) ) + " = " + trim( AlphArray( 12 ) ) );
-						ShowContinueError( "Occurs in " + SimpleTower( TowerNum ).TowerType + "=" + trim( SimpleTower( TowerNum ).Name ) );
+						ShowSevereError( "Illegal " + cAlphaFieldNames( 12 ) + " = " + AlphArray( 12 ) );
+						ShowContinueError( "Occurs in " + SimpleTower( TowerNum ).TowerType + '=' + SimpleTower( TowerNum ).Name );
 						ErrorsFound = true;
 					}
 				}
@@ -892,7 +892,7 @@ namespace CondenserLoopTowers {
 			if ( lAlphaFieldBlanks( 9 ) ) {
 				SimpleTower( TowerNum ).SuppliedByWaterSystem = false;
 			} else { // water from storage tank
-				SetupTankDemandComponent( AlphArray( 1 ), trim( cCurrentModuleObject ), AlphArray( 9 ), ErrorsFound, SimpleTower( TowerNum ).WaterTankID, SimpleTower( TowerNum ).WaterTankDemandARRID );
+				SetupTankDemandComponent( AlphArray( 1 ), cCurrentModuleObject, AlphArray( 9 ), ErrorsFound, SimpleTower( TowerNum ).WaterTankID, SimpleTower( TowerNum ).WaterTankDemandARRID );
 				SimpleTower( TowerNum ).SuppliedByWaterSystem = true;
 			}
 
@@ -900,9 +900,9 @@ namespace CondenserLoopTowers {
 			if ( lAlphaFieldBlanks( 10 ) ) {
 				SimpleTower( TowerNum ).OutdoorAirInletNodeNum = 0;
 			} else {
-				SimpleTower( TowerNum ).OutdoorAirInletNodeNum = GetOnlySingleNode( AlphArray( 10 ), ErrorsFound, trim( cCurrentModuleObject ), SimpleTower( TowerNum ).Name, NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
+				SimpleTower( TowerNum ).OutdoorAirInletNodeNum = GetOnlySingleNode( AlphArray( 10 ), ErrorsFound, cCurrentModuleObject, SimpleTower( TowerNum ).Name, NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
 				if ( ! CheckOutAirNodeNumber( SimpleTower( TowerNum ).OutdoorAirInletNodeNum ) ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( SimpleTower( TowerNum ).Name ) + "\" Outdoor Air Inlet Node Name not valid Outdoor Air Node= " + trim( AlphArray( 10 ) ) );
+					ShowSevereError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" Outdoor Air Inlet Node Name not valid Outdoor Air Node= " + AlphArray( 10 ) );
 					ShowContinueError( "...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node." );
 					ErrorsFound = true;
 				}
@@ -911,94 +911,94 @@ namespace CondenserLoopTowers {
 			//   High speed air flow rate must be greater than low speed air flow rate.
 			//   Can't tell yet if autosized, check later in InitTower.
 			if ( SimpleTower( TowerNum ).HighSpeedAirFlowRate <= SimpleTower( TowerNum ).LowSpeedAirFlowRate && SimpleTower( TowerNum ).HighSpeedAirFlowRate != AutoSize ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Low speed air flow rate must be less than the high speed air flow rate." );
+				ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Low speed air flow rate must be less than the high speed air flow rate." );
 				ErrorsFound = true;
 			}
 			//   Low speed air flow rate must be greater than free convection air flow rate.
 			//   Can't tell yet if autosized, check later in InitTower.
 			if ( SimpleTower( TowerNum ).LowSpeedAirFlowRate <= SimpleTower( TowerNum ).FreeConvAirFlowRate && SimpleTower( TowerNum ).LowSpeedAirFlowRate != AutoSize ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Free convection air flow rate must be less than the low speed air flow rate." );
+				ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Free convection air flow rate must be less than the low speed air flow rate." );
 				ErrorsFound = true;
 			}
 
 			//   Check various inputs if Performance Input Method = "UA and Design Water Flow Rate"
 			if ( SimpleTower( TowerNum ).PerformanceInputMethod_Num == PIM_UFactor ) {
 				if ( SimpleTower( TowerNum ).DesignWaterFlowRate == 0.0 ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Tower performance input method requires a design water flow rate greater than zero." );
+					ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Tower performance input method requires a design water flow rate greater than zero." );
 					ErrorsFound = true;
 				}
 				if ( SimpleTower( TowerNum ).HighSpeedTowerUA <= SimpleTower( TowerNum ).LowSpeedTowerUA && SimpleTower( TowerNum ).HighSpeedTowerUA != AutoSize ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Tower UA at low fan speed must be less than the tower UA at high fan speed." );
+					ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Tower UA at low fan speed must be less than the tower UA at high fan speed." );
 					ErrorsFound = true;
 				}
 				if ( SimpleTower( TowerNum ).LowSpeedTowerUA <= SimpleTower( TowerNum ).FreeConvTowerUA && SimpleTower( TowerNum ).LowSpeedTowerUA != AutoSize ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Tower UA at free convection air flow rate must be less than the tower UA at low fan speed." );
+					ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Tower UA at free convection air flow rate must be less than the tower UA at low fan speed." );
 					ErrorsFound = true;
 				}
 				if ( SimpleTower( TowerNum ).FreeConvTowerUA > 0.0 && SimpleTower( TowerNum ).FreeConvAirFlowRate == 0.0 ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Free convection air flow rate must be greater than zero when free convection UA is greater than zero." );
+					ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Free convection air flow rate must be greater than zero when free convection UA is greater than zero." );
 					ErrorsFound = true;
 				}
 			} else if ( SimpleTower( TowerNum ).PerformanceInputMethod_Num == PIM_NominalCapacity ) {
 				if ( SimpleTower( TowerNum ).TowerNominalCapacity == 0.0 ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Tower performance input method requires valid high-speed nominal capacity." );
+					ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Tower performance input method requires valid high-speed nominal capacity." );
 					ErrorsFound = true;
 				}
 				if ( SimpleTower( TowerNum ).TowerLowSpeedNomCap == 0.0 ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Tower performance input method requires valid low-speed nominal capacity." );
+					ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Tower performance input method requires valid low-speed nominal capacity." );
 					ErrorsFound = true;
 				}
 				if ( SimpleTower( TowerNum ).DesignWaterFlowRate != 0.0 ) {
 					if ( SimpleTower( TowerNum ).DesignWaterFlowRate > 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Nominal capacity input method and design water flow rate have been specified." );
+						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and design water flow rate have been specified." );
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Nominal capacity input method has been specified and design water flow rate is being autosized." );
+						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method has been specified and design water flow rate is being autosized." );
 					}
 					ShowContinueError( "Design water flow rate must be left blank when nominal tower capacity input method is used." );
 					ErrorsFound = true;
 				}
 				if ( SimpleTower( TowerNum ).HighSpeedTowerUA != 0.0 ) {
 					if ( SimpleTower( TowerNum ).HighSpeedTowerUA > 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Nominal capacity input method and tower UA at high fan speed have been specified." );
+						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and tower UA at high fan speed have been specified." );
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Nominal capacity input method has been specified and tower UA at high fan speed is being autosized." );
+						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method has been specified and tower UA at high fan speed is being autosized." );
 					}
 					ShowContinueError( "Tower UA at high fan speed must be left blank when nominal tower capacity input method" " is used." );
 					ErrorsFound = true;
 				}
 				if ( SimpleTower( TowerNum ).LowSpeedTowerUA != 0.0 ) {
 					if ( SimpleTower( TowerNum ).LowSpeedTowerUA > 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Nominal capacity input method and tower UA at low fan speed have been specified." );
+						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and tower UA at low fan speed have been specified." );
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Nominal capacity input method has been specified and tower UA at low fan speed is being autosized." );
+						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method has been specified and tower UA at low fan speed is being autosized." );
 					}
 					ShowContinueError( "Tower UA at low fan speed must be left blank when nominal tower capacity input method" " is used." );
 					ErrorsFound = true;
 				}
 				if ( SimpleTower( TowerNum ).FreeConvTowerUA != 0.0 ) {
 					if ( SimpleTower( TowerNum ).FreeConvTowerUA > 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Nominal capacity input method and free convection UA have been specified." );
+						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and free convection UA have been specified." );
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Nominal capacity input method has been specified and free convection UA is being autosized." );
+						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method has been specified and free convection UA is being autosized." );
 					}
 					ShowContinueError( "Free convection UA should be left blank when nominal tower capacity input method is used." );
 					ErrorsFound = true;
 				}
 				if ( SimpleTower( TowerNum ).TowerLowSpeedNomCap >= SimpleTower( TowerNum ).TowerNominalCapacity ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Low-speed nominal capacity must be less than the high-speed nominal capacity." );
+					ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Low-speed nominal capacity must be less than the high-speed nominal capacity." );
 					ErrorsFound = true;
 				}
 				if ( SimpleTower( TowerNum ).TowerFreeConvNomCap >= SimpleTower( TowerNum ).TowerLowSpeedNomCap ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Free convection nominal capacity must be less than the low-speed nominal capacity." );
+					ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Free convection nominal capacity must be less than the low-speed nominal capacity." );
 					ErrorsFound = true;
 				}
 				if ( SimpleTower( TowerNum ).TowerFreeConvNomCap > 0.0 && SimpleTower( TowerNum ).FreeConvAirFlowRate == 0.0 ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Free convection air flow must be greater than zero when tower free convection capacity is specified." );
+					ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Free convection air flow must be greater than zero when tower free convection capacity is specified." );
 					ErrorsFound = true;
 				}
 			} else { // Tower performance input method is not specified as a valid "choice"
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Tower Performance Input Method must be \"UFactorTimesAreaAndDesignWaterFlowRate\" or \"NominalCapacity\"." );
-				ShowContinueError( "Tower Performanace Input Method currently specified as: " + trim( AlphArray( 4 ) ) );
+				ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Tower Performance Input Method must be \"UFactorTimesAreaAndDesignWaterFlowRate\" or \"NominalCapacity\"." );
+				ShowContinueError( "Tower Performanace Input Method currently specified as: " + AlphArray( 4 ) );
 				ErrorsFound = true;
 			}
 		} // End Two-Speed Tower Loop
@@ -1009,24 +1009,24 @@ namespace CondenserLoopTowers {
 			GetObjectItem( cCurrentModuleObject, VariableSpeedTowerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SimpleTower.Name(), TowerNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( AlphArray( 1 ), SimpleTower.Name(), TowerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
 			}
 			SimpleTower( TowerNum ).VSTower = VariableSpeedTowerNumber;
 			SimpleTower( TowerNum ).Name = AlphArray( 1 );
-			SimpleTower( TowerNum ).TowerType = trim( cCurrentModuleObject );
+			SimpleTower( TowerNum ).TowerType = cCurrentModuleObject;
 			SimpleTower( TowerNum ).TowerType_Num = CoolingTower_VariableSpeed;
-			SimpleTower( TowerNum ).WaterInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, trim( cCurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			SimpleTower( TowerNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, trim( cCurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-			TestCompSet( trim( cCurrentModuleObject ), AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Chilled Water Nodes" );
+			SimpleTower( TowerNum ).WaterInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			SimpleTower( TowerNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			TestCompSet( cCurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Chilled Water Nodes" );
 
 			if ( ( SameString( AlphArray( 4 ), "CoolToolsUserDefined" ) || SameString( AlphArray( 4 ), "YorkCalcUserDefined" ) ) && lAlphaFieldBlanks( 5 ) ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( SimpleTower( TowerNum ).Name ) + "\" a " + trim( cAlphaFieldNames( 5 ) ) + " must be specified when " + trim( cAlphaFieldNames( 4 ) ) + " is specified as CoolToolsUserDefined or YorkCalcUserDefined" );
+				ShowSevereError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" a " + cAlphaFieldNames( 5 ) + " must be specified when " + cAlphaFieldNames( 4 ) + " is specified as CoolToolsUserDefined or YorkCalcUserDefined" );
 				ErrorsFound = true;
 			} else if ( ( SameString( AlphArray( 4 ), "CoolToolsCrossFlow" ) || SameString( AlphArray( 4 ), "YorkCalc" ) ) && ! lAlphaFieldBlanks( 5 ) ) {
-				ShowWarningError( trim( cCurrentModuleObject ) + ", \"" + trim( SimpleTower( TowerNum ).Name ) + "\" a Tower Model Coefficient Name is specified and the Tower Model Type" " is not specified as CoolToolsUserDefined or YorkCalcUserDefined. The " "CoolingTowerPerformance:CoolTools (orCoolingTowerPerformance:YorkCalc) data object will not be used." );
+				ShowWarningError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" a Tower Model Coefficient Name is specified and the Tower Model Type" " is not specified as CoolToolsUserDefined or YorkCalcUserDefined. The " "CoolingTowerPerformance:CoolTools (orCoolingTowerPerformance:YorkCalc) data object will not be used." );
 			} else {
 				SimpleTower( TowerNum ).ModelCoeffObjectName = AlphArray( 5 );
 			}
@@ -1034,7 +1034,7 @@ namespace CondenserLoopTowers {
 			if ( ! lAlphaFieldBlanks( 6 ) ) {
 				SimpleTower( TowerNum ).FanPowerfAirFlowCurve = GetCurveIndex( AlphArray( 6 ) );
 				if ( SimpleTower( TowerNum ).FanPowerfAirFlowCurve == 0 ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ", \"" + trim( SimpleTower( TowerNum ).Name ) + "\" the Fan Power Ratio as a function of Air Flow Rate Ratio Curve Name specified as " + trim( AlphArray( 6 ) ) + " was not found. Fan Power as a function of Air Flow Rate Ratio will default to Fan Power = (Air" " Flow Rate Ratio)^3 and the simulation continues." );
+					ShowWarningError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" the Fan Power Ratio as a function of Air Flow Rate Ratio Curve Name specified as " + AlphArray( 6 ) + " was not found. Fan Power as a function of Air Flow Rate Ratio will default to Fan Power = (Air" " Flow Rate Ratio)^3 and the simulation continues." );
 				}
 			}
 
@@ -1297,7 +1297,7 @@ namespace CondenserLoopTowers {
 					VSTower( SimpleTower( TowerNum ).VSTower ).FoundModelCoeff = true;
 					// verify the correct number of coefficients for the CoolTools model
 					if ( NumNums2 != 43 ) {
-						ShowSevereError( "CoolingTower:VariableSpeed \"" + trim( SimpleTower( TowerNum ).Name ) + "\". The number of numeric inputs for object CoolingTowerPerformance:CoolTools \"" + trim( SimpleTower( TowerNum ).ModelCoeffObjectName ) + "\" must equal 43." );
+						ShowSevereError( "CoolingTower:VariableSpeed \"" + SimpleTower( TowerNum ).Name + "\". The number of numeric inputs for object CoolingTowerPerformance:CoolTools \"" + SimpleTower( TowerNum ).ModelCoeffObjectName + "\" must equal 43." );
 						ErrorsFound = true;
 					} else {
 
@@ -1317,7 +1317,7 @@ namespace CondenserLoopTowers {
 					break;
 				}
 				if ( ! VSTower( SimpleTower( TowerNum ).VSTower ).FoundModelCoeff ) {
-					ShowSevereError( "CoolingTower:VariableSpeed \"" + trim( SimpleTower( TowerNum ).Name ) + "\". User defined name for variable speed cooling tower model coefficients object not found = " + trim( SimpleTower( TowerNum ).ModelCoeffObjectName ) );
+					ShowSevereError( "CoolingTower:VariableSpeed \"" + SimpleTower( TowerNum ).Name + "\". User defined name for variable speed cooling tower model coefficients object not found = " + SimpleTower( TowerNum ).ModelCoeffObjectName );
 					ErrorsFound = true;
 				}
 			} else if ( SameString( AlphArray( 4 ), "YorkCalcUserDefined" ) ) {
@@ -1329,7 +1329,7 @@ namespace CondenserLoopTowers {
 					VSTower( SimpleTower( TowerNum ).VSTower ).FoundModelCoeff = true;
 					// verify the correct number of coefficients for the YorkCalc model
 					if ( NumNums2 != 36 ) {
-						ShowSevereError( "CoolingTower:VariableSpeed \"" + trim( SimpleTower( TowerNum ).Name ) + "\". The number of numeric inputs for object CoolingTowerPerformance:YorkCalc \"" + trim( SimpleTower( TowerNum ).ModelCoeffObjectName ) + "\" must equal 36." );
+						ShowSevereError( "CoolingTower:VariableSpeed \"" + SimpleTower( TowerNum ).Name + "\". The number of numeric inputs for object CoolingTowerPerformance:YorkCalc \"" + SimpleTower( TowerNum ).ModelCoeffObjectName + "\" must equal 36." );
 						ErrorsFound = true;
 					} else {
 
@@ -1351,11 +1351,11 @@ namespace CondenserLoopTowers {
 				}
 
 				if ( ! VSTower( SimpleTower( TowerNum ).VSTower ).FoundModelCoeff ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". User defined name for variable speed cooling tower model coefficients object not found = " + trim( SimpleTower( TowerNum ).ModelCoeffObjectName ) );
+					ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". User defined name for variable speed cooling tower model coefficients object not found = " + SimpleTower( TowerNum ).ModelCoeffObjectName );
 					ErrorsFound = true;
 				}
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Illegal Tower Model Type = " + trim( AlphArray( 5 ) ) );
+				ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Illegal Tower Model Type = " + AlphArray( 5 ) );
 				ShowContinueError( " Tower Model Type must be \"CoolToolsCrossFlow\", \"YorkCalc\"," " \"CoolToolsUserDefined\", or \"YorkCalcUserDefined." );
 				ErrorsFound = true;
 			}
@@ -1364,29 +1364,29 @@ namespace CondenserLoopTowers {
 
 			//   check user defined minimums to be greater than 0
 			if ( VSTower( SimpleTower( TowerNum ).VSTower ).MinApproachTemp < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". User defined minimum approach temperature must be > 0" );
+				ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". User defined minimum approach temperature must be > 0" );
 				ErrorsFound = true;
 			}
 			if ( VSTower( SimpleTower( TowerNum ).VSTower ).MinRangeTemp < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". User defined minimum range temperature must be > 0" );
+				ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". User defined minimum range temperature must be > 0" );
 				ErrorsFound = true;
 			}
 			if ( VSTower( SimpleTower( TowerNum ).VSTower ).MinWaterFlowRatio < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". User defined minimum water flow rate ratio must be > 0" );
+				ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". User defined minimum water flow rate ratio must be > 0" );
 				ErrorsFound = true;
 			}
 
 			//   check that the user defined maximums are greater than the minimums
 			if ( VSTower( SimpleTower( TowerNum ).VSTower ).MaxApproachTemp < VSTower( SimpleTower( TowerNum ).VSTower ).MinApproachTemp ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". User defined maximum approach temperature must be > the minimum approach temperature" );
+				ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". User defined maximum approach temperature must be > the minimum approach temperature" );
 				ErrorsFound = true;
 			}
 			if ( VSTower( SimpleTower( TowerNum ).VSTower ).MaxRangeTemp < VSTower( SimpleTower( TowerNum ).VSTower ).MinRangeTemp ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". User defined maximum range temperature must be > the minimum range temperature" );
+				ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". User defined maximum range temperature must be > the minimum range temperature" );
 				ErrorsFound = true;
 			}
 			if ( VSTower( SimpleTower( TowerNum ).VSTower ).MaxWaterFlowRatio < VSTower( SimpleTower( TowerNum ).VSTower ).MinWaterFlowRatio ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". User defined maximum water flow rate ratio must be > the minimum water flow rate ratio" );
+				ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". User defined maximum water flow rate ratio must be > the minimum water flow rate ratio" );
 				ErrorsFound = true;
 			}
 
@@ -1395,7 +1395,7 @@ namespace CondenserLoopTowers {
 				gio::write( OutputChar, OutputFormat ) << SimpleTower( TowerNum ).DesignInletWB;
 				gio::write( OutputCharLo, OutputFormat ) << VSTower( SimpleTower( TowerNum ).VSTower ).MinInletAirWBTemp;
 				gio::write( OutputCharHi, OutputFormat ) << VSTower( SimpleTower( TowerNum ).VSTower ).MaxInletAirWBTemp;
-				ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( SimpleTower( TowerNum ).Name ) + "\" the design inlet air wet-bulb temperature of " + trim( OutputChar ) + " must be within" " the model limits of " + trim( OutputCharLo ) + " and " + trim( OutputCharHi ) + " degrees C" );
+				ShowSevereError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" the design inlet air wet-bulb temperature of " + OutputChar + " must be within" " the model limits of " + OutputCharLo + " and " + OutputCharHi + " degrees C" );
 				ErrorsFound = true;
 			}
 
@@ -1404,7 +1404,7 @@ namespace CondenserLoopTowers {
 				gio::write( OutputChar, OutputFormat ) << SimpleTower( TowerNum ).DesignApproach;
 				gio::write( OutputCharLo, OutputFormat ) << VSTower( SimpleTower( TowerNum ).VSTower ).MinApproachTemp;
 				gio::write( OutputCharHi, OutputFormat ) << VSTower( SimpleTower( TowerNum ).VSTower ).MaxApproachTemp;
-				ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( SimpleTower( TowerNum ).Name ) + "\" the design approach temperature of " + trim( OutputChar ) + " must be within " " the model limits of " + trim( OutputCharLo ) + " and " + trim( OutputCharHi ) + " degrees C" );
+				ShowSevereError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" the design approach temperature of " + OutputChar + " must be within " " the model limits of " + OutputCharLo + " and " + OutputCharHi + " degrees C" );
 				ErrorsFound = true;
 			}
 
@@ -1413,25 +1413,25 @@ namespace CondenserLoopTowers {
 				gio::write( OutputChar, OutputFormat ) << SimpleTower( TowerNum ).DesignRange;
 				gio::write( OutputCharLo, OutputFormat ) << VSTower( SimpleTower( TowerNum ).VSTower ).MinRangeTemp;
 				gio::write( OutputCharHi, OutputFormat ) << VSTower( SimpleTower( TowerNum ).VSTower ).MaxRangeTemp;
-				ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( SimpleTower( TowerNum ).Name ) + "\" the design range temperature of " + trim( OutputChar ) + " must be within " " the model limits of " + trim( OutputCharLo ) + " and " + trim( OutputCharHi ) + " degrees C" );
+				ShowSevereError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" the design range temperature of " + OutputChar + " must be within " " the model limits of " + OutputCharLo + " and " + OutputCharHi + " degrees C" );
 				ErrorsFound = true;
 			}
 
 			SimpleTower( TowerNum ).DesignWaterFlowRate = NumArray( 4 );
 			if ( NumArray( 4 ) <= 0.0 && NumArray( 4 ) != AutoSize ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( SimpleTower( TowerNum ).Name ) + "\" design water flow rate must be > 0" );
+				ShowSevereError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" design water flow rate must be > 0" );
 				ErrorsFound = true;
 			}
 
 			SimpleTower( TowerNum ).HighSpeedAirFlowRate = NumArray( 5 );
 			if ( NumArray( 5 ) <= 0.0 && NumArray( 5 ) != AutoSize ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( SimpleTower( TowerNum ).Name ) + "\" design air flow rate must be > 0" );
+				ShowSevereError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" design air flow rate must be > 0" );
 				ErrorsFound = true;
 			}
 
 			SimpleTower( TowerNum ).HighSpeedFanPower = NumArray( 6 );
 			if ( NumArray( 6 ) <= 0.0 && NumArray( 6 ) != AutoSize ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( SimpleTower( TowerNum ).Name ) + "\" design fan power must be > 0" );
+				ShowSevereError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" design fan power must be > 0" );
 				ErrorsFound = true;
 			}
 
@@ -1439,21 +1439,21 @@ namespace CondenserLoopTowers {
 			SimpleTower( TowerNum ).MinimumVSAirFlowFrac = NumArray( 7 );
 			SimpleTower( TowerNum ).MinimumVSAirFlowFrac = NumArray( 7 );
 			if ( NumArray( 7 ) < 0.2 || NumArray( 7 ) > 0.5 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( SimpleTower( TowerNum ).Name ) + "\" minimum VS air flow rate ratio must be >= 0.2 and <= 0.5" );
+				ShowSevereError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" minimum VS air flow rate ratio must be >= 0.2 and <= 0.5" );
 				ErrorsFound = true;
 			}
 
 			//   fraction of tower capacity in free convection regime must be >= to 0 and <= 0.2
 			SimpleTower( TowerNum ).FreeConvectionCapacityFraction = NumArray( 8 );
 			if ( NumArray( 8 ) < 0.0 || NumArray( 8 ) > 0.2 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( SimpleTower( TowerNum ).Name ) + "\" fraction of tower capacity in free convection regime must be >= 0 and <= 0.2" );
+				ShowSevereError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" fraction of tower capacity in free convection regime must be >= 0 and <= 0.2" );
 				ErrorsFound = true;
 			}
 
 			//   Basin heater power as a function of temperature must be greater than or equal to 0
 			SimpleTower( TowerNum ).BasinHeaterPowerFTempDiff = NumArray( 9 );
 			if ( NumArray( 9 ) < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( SimpleTower( TowerNum ).Name ) + "\" basin heater power as a function of temperature difference must be >= 0" );
+				ShowSevereError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" basin heater power as a function of temperature difference must be >= 0" );
 				ErrorsFound = true;
 			}
 
@@ -1463,7 +1463,7 @@ namespace CondenserLoopTowers {
 					SimpleTower( TowerNum ).BasinHeaterSetPointTemp = 2.0;
 				}
 				if ( SimpleTower( TowerNum ).BasinHeaterSetPointTemp < 2.0 ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ":\"" + trim( SimpleTower( TowerNum ).Name ) + "\", " + trim( cNumericFieldNames( 10 ) ) + " is less than 2 deg C. Freezing could occur." );
+					ShowWarningError( cCurrentModuleObject + ":\"" + SimpleTower( TowerNum ).Name + "\", " + cNumericFieldNames( 10 ) + " is less than 2 deg C. Freezing could occur." );
 				}
 			}
 
@@ -1482,7 +1482,7 @@ namespace CondenserLoopTowers {
 			if ( AlphArray( 7 ) != Blank ) {
 				SimpleTower( TowerNum ).BasinHeaterSchedulePtr = GetScheduleIndex( AlphArray( 7 ) );
 				if ( SimpleTower( TowerNum ).BasinHeaterSchedulePtr == 0 ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ", \"" + trim( SimpleTower( TowerNum ).Name ) + "\" basin heater schedule name \"" + trim( AlphArray( 7 ) ) + "\" was not found. Basin heater operation will not be modeled and the simulation continues" );
+					ShowWarningError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" basin heater schedule name \"" + AlphArray( 7 ) + "\" was not found. Basin heater operation will not be modeled and the simulation continues" );
 				}
 			}
 
@@ -1503,8 +1503,8 @@ namespace CondenserLoopTowers {
 			} else if ( lAlphaFieldBlanks( 8 ) ) {
 				SimpleTower( TowerNum ).EvapLossMode = EvapLossByMoistTheory;
 			} else {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 8 ) ) + "=" + trim( AlphArray( 8 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 8 ) + '=' + AlphArray( 8 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
@@ -1521,14 +1521,14 @@ namespace CondenserLoopTowers {
 			} else if ( lAlphaFieldBlanks( 9 ) ) {
 				SimpleTower( TowerNum ).BlowdownMode = BlowdownByConcentration;
 			} else {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 9 ) ) + "=" + trim( AlphArray( 9 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 9 ) + '=' + AlphArray( 9 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 			SimpleTower( TowerNum ).SchedIDBlowdown = GetScheduleIndex( AlphArray( 10 ) );
 			if ( ( SimpleTower( TowerNum ).SchedIDBlowdown == 0 ) && ( SimpleTower( TowerNum ).BlowdownMode == BlowdownBySchedule ) ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 10 ) ) + "=" + trim( AlphArray( 10 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 10 ) + '=' + AlphArray( 10 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
@@ -1564,8 +1564,8 @@ namespace CondenserLoopTowers {
 							SimpleTower( TowerNum ).CellCtrl = "MaximalCell";
 						}
 					} else {
-						ShowSevereError( "Illegal " + trim( cAlphaFieldNames( 13 ) ) + " = " + trim( AlphArray( 13 ) ) );
-						ShowContinueError( "Occurs in " + SimpleTower( TowerNum ).TowerType + "=" + trim( SimpleTower( TowerNum ).Name ) );
+						ShowSevereError( "Illegal " + cAlphaFieldNames( 13 ) + " = " + AlphArray( 13 ) );
+						ShowContinueError( "Occurs in " + SimpleTower( TowerNum ).TowerType + '=' + SimpleTower( TowerNum ).Name );
 						ErrorsFound = true;
 					}
 				}
@@ -1578,7 +1578,7 @@ namespace CondenserLoopTowers {
 			if ( lAlphaFieldBlanks( 11 ) ) {
 				SimpleTower( TowerNum ).SuppliedByWaterSystem = false;
 			} else { // water from storage tank
-				SetupTankDemandComponent( AlphArray( 1 ), trim( cCurrentModuleObject ), AlphArray( 11 ), ErrorsFound, SimpleTower( TowerNum ).WaterTankID, SimpleTower( TowerNum ).WaterTankDemandARRID );
+				SetupTankDemandComponent( AlphArray( 1 ), cCurrentModuleObject, AlphArray( 11 ), ErrorsFound, SimpleTower( TowerNum ).WaterTankID, SimpleTower( TowerNum ).WaterTankDemandARRID );
 				SimpleTower( TowerNum ).SuppliedByWaterSystem = true;
 			}
 
@@ -1586,9 +1586,9 @@ namespace CondenserLoopTowers {
 			if ( lAlphaFieldBlanks( 12 ) ) {
 				SimpleTower( TowerNum ).OutdoorAirInletNodeNum = 0;
 			} else {
-				SimpleTower( TowerNum ).OutdoorAirInletNodeNum = GetOnlySingleNode( AlphArray( 12 ), ErrorsFound, trim( cCurrentModuleObject ), SimpleTower( TowerNum ).Name, NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
+				SimpleTower( TowerNum ).OutdoorAirInletNodeNum = GetOnlySingleNode( AlphArray( 12 ), ErrorsFound, cCurrentModuleObject, SimpleTower( TowerNum ).Name, NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
 				if ( ! CheckOutAirNodeNumber( SimpleTower( TowerNum ).OutdoorAirInletNodeNum ) ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( SimpleTower( TowerNum ).Name ) + "\" Outdoor Air Inlet Node Name not valid Outdoor Air Node= " + trim( AlphArray( 12 ) ) );
+					ShowSevereError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" Outdoor Air Inlet Node Name not valid Outdoor Air Node= " + AlphArray( 12 ) );
 					ShowContinueError( "...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node." );
 					ErrorsFound = true;
 				}
@@ -1602,32 +1602,32 @@ namespace CondenserLoopTowers {
 			GetObjectItem( cCurrentModuleObject, MerkelVSTowerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SimpleTower.Name(), TowerNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( AlphArray( 1 ), SimpleTower.Name(), TowerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
 			}
 			SimpleTower( TowerNum ).Name = AlphArray( 1 );
-			SimpleTower( TowerNum ).TowerType = trim( cCurrentModuleObject );
+			SimpleTower( TowerNum ).TowerType = cCurrentModuleObject;
 			SimpleTower( TowerNum ).TowerType_Num = CoolingTower_VariableSpeedMerkel;
-			SimpleTower( TowerNum ).WaterInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, trim( cCurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			SimpleTower( TowerNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, trim( cCurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-			TestCompSet( trim( cCurrentModuleObject ), AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Chilled Water Nodes" );
+			SimpleTower( TowerNum ).WaterInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			SimpleTower( TowerNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			TestCompSet( cCurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Chilled Water Nodes" );
 
 			if ( SameString( AlphArray( 4 ), "UFactorTimesAreaAndDesignWaterFlowRate" ) ) {
 				SimpleTower( TowerNum ).PerformanceInputMethod_Num = PIM_UFactor;
 			} else if ( SameString( AlphArray( 4 ), "NominalCapacity" ) ) {
 				SimpleTower( TowerNum ).PerformanceInputMethod_Num = PIM_NominalCapacity;
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
-				ShowContinueError( "Invalid, " + trim( cAlphaFieldNames( 4 ) ) + " = " + trim( AlphArray( 4 ) ) );
+				ShowSevereError( cCurrentModuleObject + '=' + AlphArray( 1 ) );
+				ShowContinueError( "Invalid, " + cAlphaFieldNames( 4 ) + " = " + AlphArray( 4 ) );
 				ErrorsFound = true;
 			}
 
 			SimpleTower( TowerNum ).FanPowerfAirFlowCurve = GetCurveIndex( AlphArray( 5 ) );
 			if ( SimpleTower( TowerNum ).FanPowerfAirFlowCurve == 0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 5 ) ) + "=" + trim( AlphArray( 5 ) ) );
+				ShowSevereError( cCurrentModuleObject + '=' + AlphArray( 1 ) );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 5 ) + '=' + AlphArray( 5 ) );
 				ShowContinueError( "Curve name not found." );
 				ErrorsFound = true;
 			}
@@ -1656,24 +1656,24 @@ namespace CondenserLoopTowers {
 
 			SimpleTower( TowerNum ).UAModFuncAirFlowRatioCurvePtr = GetCurveIndex( AlphArray( 6 ) );
 			if ( SimpleTower( TowerNum ).UAModFuncAirFlowRatioCurvePtr == 0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 6 ) ) + "=" + trim( AlphArray( 6 ) ) );
+				ShowSevereError( cCurrentModuleObject + '=' + AlphArray( 1 ) );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 6 ) + '=' + AlphArray( 6 ) );
 				ShowContinueError( "Curve name not found." );
 				ErrorsFound = true;
 			}
 
 			SimpleTower( TowerNum ).UAModFuncWetBulbDiffCurvePtr = GetCurveIndex( AlphArray( 7 ) );
 			if ( SimpleTower( TowerNum ).UAModFuncWetBulbDiffCurvePtr == 0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( AlphArray( 7 ) ) );
+				ShowSevereError( cCurrentModuleObject + '=' + AlphArray( 1 ) );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + AlphArray( 7 ) );
 				ShowContinueError( "Curve name not found." );
 				ErrorsFound = true;
 			}
 
 			SimpleTower( TowerNum ).UAModFuncWaterFlowRatioCurvePtr = GetCurveIndex( AlphArray( 8 ) );
 			if ( SimpleTower( TowerNum ).UAModFuncWaterFlowRatioCurvePtr == 0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 8 ) ) + "=" + trim( AlphArray( 8 ) ) );
+				ShowSevereError( cCurrentModuleObject + '=' + AlphArray( 1 ) );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 8 ) + '=' + AlphArray( 8 ) );
 				ShowContinueError( "Curve name not found." );
 				ErrorsFound = true;
 			}
@@ -1681,7 +1681,7 @@ namespace CondenserLoopTowers {
 			//   Basin heater power as a function of temperature must be greater than or equal to 0
 			SimpleTower( TowerNum ).BasinHeaterPowerFTempDiff = NumArray( 17 );
 			if ( NumArray( 17 ) < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( SimpleTower( TowerNum ).Name ) + "\" basin heater power as a function of temperature difference must be >= 0" );
+				ShowSevereError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" basin heater power as a function of temperature difference must be >= 0" );
 				ErrorsFound = true;
 			}
 
@@ -1691,14 +1691,14 @@ namespace CondenserLoopTowers {
 					SimpleTower( TowerNum ).BasinHeaterSetPointTemp = 2.0;
 				}
 				if ( SimpleTower( TowerNum ).BasinHeaterSetPointTemp < 2.0 ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ":\"" + trim( SimpleTower( TowerNum ).Name ) + "\", " + trim( cNumericFieldNames( 18 ) ) + " is less than 2 deg C. Freezing could occur." );
+					ShowWarningError( cCurrentModuleObject + ":\"" + SimpleTower( TowerNum ).Name + "\", " + cNumericFieldNames( 18 ) + " is less than 2 deg C. Freezing could occur." );
 				}
 			}
 
 			if ( AlphArray( 9 ) != Blank ) {
 				SimpleTower( TowerNum ).BasinHeaterSchedulePtr = GetScheduleIndex( AlphArray( 9 ) );
 				if ( SimpleTower( TowerNum ).BasinHeaterSchedulePtr == 0 ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ", \"" + trim( SimpleTower( TowerNum ).Name ) + "\" basin heater schedule name \"" + trim( AlphArray( 9 ) ) + "\" was not found. Basin heater operation will not be modeled and the simulation continues" );
+					ShowWarningError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" basin heater schedule name \"" + AlphArray( 9 ) + "\" was not found. Basin heater operation will not be modeled and the simulation continues" );
 				}
 			}
 
@@ -1710,8 +1710,8 @@ namespace CondenserLoopTowers {
 			} else if ( lAlphaFieldBlanks( 10 ) ) {
 				SimpleTower( TowerNum ).EvapLossMode = EvapLossByMoistTheory;
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 10 ) ) + "=" + trim( AlphArray( 10 ) ) );
+				ShowSevereError( cCurrentModuleObject + '=' + AlphArray( 1 ) );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 10 ) + '=' + AlphArray( 10 ) );
 				ErrorsFound = true;
 			}
 
@@ -1737,14 +1737,14 @@ namespace CondenserLoopTowers {
 					SimpleTower( TowerNum ).ConcentrationRatio = 3.0;
 				}
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 11 ) ) + "=" + trim( AlphArray( 11 ) ) );
+				ShowSevereError( cCurrentModuleObject + '=' + AlphArray( 1 ) );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 11 ) + '=' + AlphArray( 11 ) );
 				ErrorsFound = true;
 			}
 			SimpleTower( TowerNum ).SchedIDBlowdown = GetScheduleIndex( AlphArray( 12 ) );
 			if ( ( SimpleTower( TowerNum ).SchedIDBlowdown == 0 ) && ( SimpleTower( TowerNum ).BlowdownMode == BlowdownBySchedule ) ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 12 ) ) + "=" + trim( AlphArray( 12 ) ) );
+				ShowSevereError( cCurrentModuleObject + '=' + AlphArray( 1 ) );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 12 ) + '=' + AlphArray( 12 ) );
 				ErrorsFound = true;
 			}
 
@@ -1780,8 +1780,8 @@ namespace CondenserLoopTowers {
 							SimpleTower( TowerNum ).CellCtrl = "MaximalCell";
 						}
 					} else {
-						ShowSevereError( "Illegal " + trim( cAlphaFieldNames( 15 ) ) + " = " + trim( AlphArray( 15 ) ) );
-						ShowContinueError( "Occurs in " + SimpleTower( TowerNum ).TowerType + "=" + trim( SimpleTower( TowerNum ).Name ) );
+						ShowSevereError( "Illegal " + cAlphaFieldNames( 15 ) + " = " + AlphArray( 15 ) );
+						ShowContinueError( "Occurs in " + SimpleTower( TowerNum ).TowerType + '=' + SimpleTower( TowerNum ).Name );
 						ErrorsFound = true;
 					}
 				}
@@ -1794,7 +1794,7 @@ namespace CondenserLoopTowers {
 			if ( lAlphaFieldBlanks( 13 ) ) {
 				SimpleTower( TowerNum ).SuppliedByWaterSystem = false;
 			} else { // water from storage tank
-				SetupTankDemandComponent( AlphArray( 1 ), trim( cCurrentModuleObject ), AlphArray( 13 ), ErrorsFound, SimpleTower( TowerNum ).WaterTankID, SimpleTower( TowerNum ).WaterTankDemandARRID );
+				SetupTankDemandComponent( AlphArray( 1 ), cCurrentModuleObject, AlphArray( 13 ), ErrorsFound, SimpleTower( TowerNum ).WaterTankID, SimpleTower( TowerNum ).WaterTankDemandARRID );
 				SimpleTower( TowerNum ).SuppliedByWaterSystem = true;
 			}
 
@@ -1802,9 +1802,9 @@ namespace CondenserLoopTowers {
 			if ( lAlphaFieldBlanks( 14 ) ) {
 				SimpleTower( TowerNum ).OutdoorAirInletNodeNum = 0;
 			} else {
-				SimpleTower( TowerNum ).OutdoorAirInletNodeNum = GetOnlySingleNode( AlphArray( 14 ), ErrorsFound, trim( cCurrentModuleObject ), SimpleTower( TowerNum ).Name, NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
+				SimpleTower( TowerNum ).OutdoorAirInletNodeNum = GetOnlySingleNode( AlphArray( 14 ), ErrorsFound, cCurrentModuleObject, SimpleTower( TowerNum ).Name, NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
 				if ( ! CheckOutAirNodeNumber( SimpleTower( TowerNum ).OutdoorAirInletNodeNum ) ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( SimpleTower( TowerNum ).Name ) + "\" Outdoor Air Inlet Node Name not valid Outdoor Air Node= " + trim( AlphArray( 14 ) ) );
+					ShowSevereError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" Outdoor Air Inlet Node Name not valid Outdoor Air Node= " + AlphArray( 14 ) );
 					ShowContinueError( "...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node." );
 					ErrorsFound = true;
 				}
@@ -2178,8 +2178,8 @@ namespace CondenserLoopTowers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const OutputFormat( "(F6.2)" );
-		static Fstring const OutputFormat2( "(F9.6)" );
+		static gio::Fmt const OutputFormat( "(F6.2)" );
+		static gio::Fmt const OutputFormat2( "(F9.6)" );
 		int const MaxIte( 500 ); // Maximum number of iterations
 		Real64 const Acc( 0.0001 ); // Accuracy of result
 
@@ -2207,11 +2207,11 @@ namespace CondenserLoopTowers {
 		Real64 FlowRateRatioStep; // flow rate ratio to determine maximum water flow rate ratio during calibration
 		FArray1D< Real64 > Par( 6 ); // Parameter array need for RegulaFalsi routine
 		bool ModelCalibrated; // TRUE if water flow rate ratio is with the specified range
-		Fstring OutputChar( 6 ); // report variable for warning messages
-		Fstring OutputChar2( 9 ); // report variable for warning messages
-		Fstring OutputCharLo( 6 ); // report variable for warning messages
-		Fstring OutputCharHi( 6 ); // report variable for warning messages
-		Fstring equipName( MaxNameLength );
+		std::string OutputChar; // report variable for warning messages
+		std::string OutputChar2; // report variable for warning messages
+		std::string OutputCharLo; // report variable for warning messages
+		std::string OutputCharHi; // report variable for warning messages
+		std::string equipName;
 		Real64 Cp; // local specific heat for fluid
 		Real64 rho; // local density for fluid
 		Real64 tmpDesignWaterFlowRate; // local temporary for water volume flow rate
@@ -2262,7 +2262,7 @@ namespace CondenserLoopTowers {
 				}
 				if ( PlantSizesOkayToFinalize ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Design Water Flow Rate [m3/s]", SimpleTower( TowerNum ).DesignWaterFlowRate );
 			} else {
-				ShowSevereError( "Autosizing error for cooling tower object = " + trim( SimpleTower( TowerNum ).Name ) );
+				ShowSevereError( "Autosizing error for cooling tower object = " + SimpleTower( TowerNum ).Name );
 				ShowFatalError( "Autosizing of cooling tower condenser flow rate requires a loop Sizing:Plant object." );
 			}
 		}
@@ -2298,7 +2298,7 @@ namespace CondenserLoopTowers {
 					}
 				} else {
 					ShowSevereError( "Autosizing of cooling tower fan power requires a loop Sizing:Plant object." );
-					ShowFatalError( " Occurs in cooling tower object= " + trim( SimpleTower( TowerNum ).Name ) );
+					ShowFatalError( " Occurs in cooling tower object= " + SimpleTower( TowerNum ).Name );
 				}
 			}
 			if ( SimpleTower( TowerNum ).TowerType_Num == CoolingTower_SingleSpeed || SimpleTower( TowerNum ).TowerType_Num == CoolingTower_VariableSpeed ) {
@@ -2330,12 +2330,12 @@ namespace CondenserLoopTowers {
 					// This conditional statement is to trap when the user specified condenser/tower water design setpoint
 					//  temperature is less than design inlet air wet bulb temperature of 25.6 C
 					if ( PlantSizData( PltSizCondNum ).ExitTemp <= 25.6 ) {
-						ShowSevereError( "Error when autosizing the UA value for cooling tower = " + trim( SimpleTower( TowerNum ).Name ) + "." " Design Loop Exit Temperature must be greater than 25.6 C when autosizing the tower UA." );
-						ShowContinueError( "The Design Loop Exit Temperature specified in Sizing:Plant object = " + trim( PlantSizData( PltSizCondNum ).PlantLoopName ) );
+						ShowSevereError( "Error when autosizing the UA value for cooling tower = " + SimpleTower( TowerNum ).Name + ". Design Loop Exit Temperature must be greater than 25.6 C when autosizing the tower UA." );
+						ShowContinueError( "The Design Loop Exit Temperature specified in Sizing:Plant object = " + PlantSizData( PltSizCondNum ).PlantLoopName );
 						ShowContinueError( "is less than or equal to the design inlet air wet-bulb temperature of 25.6 C." );
 						ShowContinueError( "It is recommended that the Design Loop Exit Temperature = 25.6 C plus " "the cooling tower design approach temperature (e.g., 4 C)." );
 						ShowContinueError( "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field " "Condenser Water Design Setpoint must be > 25.6 C if autosizing the cooling tower." );
-						ShowFatalError( "Autosizing of cooling tower fails for tower = " + trim( SimpleTower( TowerNum ).Name ) + "." );
+						ShowFatalError( "Autosizing of cooling tower fails for tower = " + SimpleTower( TowerNum ).Name + '.' );
 					}
 					Par( 1 ) = DesTowerLoad;
 					Par( 2 ) = double( TowerNum );
@@ -2353,10 +2353,10 @@ namespace CondenserLoopTowers {
 					SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 					if ( SolFla == -1 ) {
 						ShowSevereError( "Iteration limit exceeded in calculating tower UA" );
-						ShowFatalError( "Autosizing of cooling tower UA failed for tower " + trim( SimpleTower( TowerNum ).Name ) );
+						ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
 					} else if ( SolFla == -2 ) {
 						ShowSevereError( "Bad starting values for UA" );
-						ShowFatalError( "Autosizing of cooling tower UA failed for tower " + trim( SimpleTower( TowerNum ).Name ) );
+						ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
 					}
 
 					if ( PlantSizesOkayToFinalize ) {
@@ -2378,7 +2378,7 @@ namespace CondenserLoopTowers {
 					if ( PlantSizesOkayToFinalize ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "U-Factor Times Area Value at High Fan Speed [W/C]", SimpleTower( TowerNum ).HighSpeedTowerUA );
 				}
 			} else {
-				ShowSevereError( "Autosizing error for cooling tower object= " + trim( SimpleTower( TowerNum ).Name ) );
+				ShowSevereError( "Autosizing error for cooling tower object= " + SimpleTower( TowerNum ).Name );
 				ShowFatalError( "Autosizing of cooling tower UA requires a loop Sizing:Plant object." );
 			}
 		}
@@ -2406,10 +2406,10 @@ namespace CondenserLoopTowers {
 				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating tower UA" );
-					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + trim( SimpleTower( TowerNum ).Name ) );
+					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
 				} else if ( SolFla == -2 ) {
 					ShowSevereError( "Bad starting values for UA" );
-					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + trim( SimpleTower( TowerNum ).Name ) );
+					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
 				}
 				SimpleTower( TowerNum ).HighSpeedTowerUA = UA;
 			} else {
@@ -2481,10 +2481,10 @@ namespace CondenserLoopTowers {
 				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating tower UA" );
-					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + trim( SimpleTower( TowerNum ).Name ) );
+					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
 				} else if ( SolFla == -2 ) {
 					ShowSevereError( "Bad starting values for UA" );
-					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + trim( SimpleTower( TowerNum ).Name ) );
+					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
 				}
 				SimpleTower( TowerNum ).LowSpeedTowerUA = UA;
 			} else {
@@ -2528,10 +2528,10 @@ namespace CondenserLoopTowers {
 				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating tower UA" );
-					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + trim( SimpleTower( TowerNum ).Name ) );
+					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
 				} else if ( SolFla == -2 ) {
 					ShowSevereError( "Bad starting values for UA" );
-					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + trim( SimpleTower( TowerNum ).Name ) );
+					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
 				}
 				SimpleTower( TowerNum ).FreeConvTowerUA = UA;
 			} else {
@@ -2581,19 +2581,19 @@ namespace CondenserLoopTowers {
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating tower water flow ratio during calibration" );
 					ShowContinueError( "Inlet air wet-bulb, range, and/or approach temperature does not allow calibration of" "water flow rate ratio for this variable-speed cooling tower." );
-					ShowFatalError( "Cooling tower calibration failed for tower " + trim( SimpleTower( TowerNum ).Name ) );
+					ShowFatalError( "Cooling tower calibration failed for tower " + SimpleTower( TowerNum ).Name );
 				} else if ( SolFla == -2 ) {
 					ShowSevereError( "Bad starting values for cooling tower water flow rate ratio calibration." );
 					ShowContinueError( "Inlet air wet-bulb, range, and/or approach temperature does not allow calibration of" "water flow rate ratio for this variable-speed cooling tower." );
-					ShowFatalError( "Cooling tower calibration failed for tower " + trim( SimpleTower( TowerNum ).Name ) + "." );
+					ShowFatalError( "Cooling tower calibration failed for tower " + SimpleTower( TowerNum ).Name + '.' );
 				}
 			} else {
 				gio::write( OutputChar2, OutputFormat2 ) << WaterFlowRateRatio;
 				gio::write( OutputChar, OutputFormat ) << Tapproach;
 				ShowSevereError( "Bad starting values for cooling tower water flow rate ratio calibration." );
 				ShowContinueError( "Design inlet air wet-bulb or range temperature must be modified to achieve the design approach" );
-				ShowContinueError( "A water flow rate ratio of " + trim( OutputChar2 ) + " was calculated to yield an " "approach temperature of " + trim( OutputChar ) + "." );
-				ShowFatalError( "Cooling tower calibration failed for tower " + trim( SimpleTower( TowerNum ).Name ) + "." );
+				ShowContinueError( "A water flow rate ratio of " + OutputChar2 + " was calculated to yield an " "approach temperature of " + OutputChar + '.' );
+				ShowFatalError( "Cooling tower calibration failed for tower " + SimpleTower( TowerNum ).Name + '.' );
 			}
 
 			SimpleTower( TowerNum ).CalibratedWaterFlowRate = SimpleTower( TowerNum ).DesignWaterFlowRate / WaterFlowRatio;
@@ -2602,7 +2602,7 @@ namespace CondenserLoopTowers {
 				gio::write( OutputChar2, OutputFormat2 ) << WaterFlowRatio;
 				gio::write( OutputCharLo, OutputFormat ) << VSTower( SimpleTower( TowerNum ).VSTower ).MinWaterFlowRatio;
 				gio::write( OutputCharHi, OutputFormat ) << VSTower( SimpleTower( TowerNum ).VSTower ).MaxWaterFlowRatio;
-				ShowWarningError( "CoolingTower:VariableSpeed, \"" + trim( SimpleTower( TowerNum ).Name ) + "\" the calibrated water flow rate ratio is determined to be " + trim( OutputChar2 ) + ". This is outside the valid range of " + trim( OutputCharLo ) + " to " + trim( OutputCharHi ) + "." );
+				ShowWarningError( "CoolingTower:VariableSpeed, \"" + SimpleTower( TowerNum ).Name + "\" the calibrated water flow rate ratio is determined to be " + OutputChar2 + ". This is outside the valid range of " + OutputCharLo + " to " + OutputCharHi + '.' );
 			}
 
 			rho = GetDensityGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, ( Twb + Ta + Tr ), PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, "SizeTower" );
@@ -2633,11 +2633,11 @@ namespace CondenserLoopTowers {
 			if ( SimpleTower( TowerNum ).TowerType_Num == CoolingTower_SingleSpeed ) {
 				if ( SimpleTower( TowerNum ).DesignWaterFlowRate > 0.0 ) {
 					if ( SimpleTower( TowerNum ).FreeConvAirFlowRate >= SimpleTower( TowerNum ).HighSpeedAirFlowRate ) {
-						ShowSevereError( cCoolingTower_SingleSpeed + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Free convection air flow rate must be less than the design air flow rate." );
+						ShowSevereError( cCoolingTower_SingleSpeed + " \"" + SimpleTower( TowerNum ).Name + "\". Free convection air flow rate must be less than the design air flow rate." );
 						ErrorsFound = true;
 					}
 					if ( SimpleTower( TowerNum ).FreeConvTowerUA >= SimpleTower( TowerNum ).HighSpeedTowerUA ) {
-						ShowSevereError( cCoolingTower_SingleSpeed + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Free convection UA must be less than the design tower UA." );
+						ShowSevereError( cCoolingTower_SingleSpeed + " \"" + SimpleTower( TowerNum ).Name + "\". Free convection UA must be less than the design tower UA." );
 						ErrorsFound = true;
 					}
 				}
@@ -2646,19 +2646,19 @@ namespace CondenserLoopTowers {
 			if ( SimpleTower( TowerNum ).TowerType_Num == CoolingTower_TwoSpeed ) {
 				if ( SimpleTower( TowerNum ).DesignWaterFlowRate > 0.0 ) {
 					if ( SimpleTower( TowerNum ).HighSpeedAirFlowRate <= SimpleTower( TowerNum ).LowSpeedAirFlowRate ) {
-						ShowSevereError( cCoolingTower_TwoSpeed + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Low speed air flow rate must be less than the high speed air flow rate." );
+						ShowSevereError( cCoolingTower_TwoSpeed + " \"" + SimpleTower( TowerNum ).Name + "\". Low speed air flow rate must be less than the high speed air flow rate." );
 						ErrorsFound = true;
 					}
 					if ( SimpleTower( TowerNum ).LowSpeedAirFlowRate <= SimpleTower( TowerNum ).FreeConvAirFlowRate ) {
-						ShowSevereError( cCoolingTower_TwoSpeed + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Free convection air flow rate must be less than the low speed air flow rate." );
+						ShowSevereError( cCoolingTower_TwoSpeed + " \"" + SimpleTower( TowerNum ).Name + "\". Free convection air flow rate must be less than the low speed air flow rate." );
 						ErrorsFound = true;
 					}
 					if ( SimpleTower( TowerNum ).HighSpeedTowerUA <= SimpleTower( TowerNum ).LowSpeedTowerUA ) {
-						ShowSevereError( cCoolingTower_TwoSpeed + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Tower UA at low fan speed must be less than the tower UA at high fan speed." );
+						ShowSevereError( cCoolingTower_TwoSpeed + " \"" + SimpleTower( TowerNum ).Name + "\". Tower UA at low fan speed must be less than the tower UA at high fan speed." );
 						ErrorsFound = true;
 					}
 					if ( SimpleTower( TowerNum ).LowSpeedTowerUA <= SimpleTower( TowerNum ).FreeConvTowerUA ) {
-						ShowSevereError( cCoolingTower_TwoSpeed + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\". Tower UA at free convection air flow rate must be less than the tower UA at low fan speed." );
+						ShowSevereError( cCoolingTower_TwoSpeed + " \"" + SimpleTower( TowerNum ).Name + "\". Tower UA at free convection air flow rate must be less than the tower UA at low fan speed." );
 						ErrorsFound = true;
 					}
 				}
@@ -2763,7 +2763,7 @@ namespace CondenserLoopTowers {
 					}
 
 				} else {
-					ShowSevereError( "Autosizing error for cooling tower object = " + trim( SimpleTower( TowerNum ).Name ) );
+					ShowSevereError( "Autosizing error for cooling tower object = " + SimpleTower( TowerNum ).Name );
 					ShowFatalError( "Autosizing of cooling tower nominal capacity requires a loop Sizing:Plant object." );
 				}
 
@@ -2835,10 +2835,10 @@ namespace CondenserLoopTowers {
 				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating tower UA" );
-					ShowFatalError( "calculating cooling tower UA failed for tower " + trim( SimpleTower( TowerNum ).Name ) );
+					ShowFatalError( "calculating cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
 				} else if ( SolFla == -2 ) {
 					ShowSevereError( "Bad starting values for UA" );
-					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + trim( SimpleTower( TowerNum ).Name ) );
+					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
 				}
 				SimpleTower( TowerNum ).HighSpeedTowerUA = UA;
 
@@ -2861,10 +2861,10 @@ namespace CondenserLoopTowers {
 				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating tower free convection UA" );
-					ShowFatalError( "calculating cooling tower UA failed for tower " + trim( SimpleTower( TowerNum ).Name ) );
+					ShowFatalError( "calculating cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
 				} else if ( SolFla == -2 ) {
 					ShowSevereError( "Bad starting values for UA" );
-					ShowFatalError( "Autosizing of cooling tower UA failed for free convection tower " + trim( SimpleTower( TowerNum ).Name ) );
+					ShowFatalError( "Autosizing of cooling tower UA failed for free convection tower " + SimpleTower( TowerNum ).Name );
 				}
 				SimpleTower( TowerNum ).FreeConvTowerUA = UA;
 				ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]", SimpleTower( TowerNum ).FreeConvTowerUA );
@@ -2889,7 +2889,7 @@ namespace CondenserLoopTowers {
 					}
 
 				} else {
-					ShowSevereError( "Autosizing error for cooling tower object = " + trim( SimpleTower( TowerNum ).Name ) );
+					ShowSevereError( "Autosizing error for cooling tower object = " + SimpleTower( TowerNum ).Name );
 					ShowFatalError( "Autosizing of cooling tower nominal capacity requires a loop Sizing:Plant object." );
 				}
 			}
@@ -2915,7 +2915,7 @@ namespace CondenserLoopTowers {
 						}
 					}
 				} else {
-					ShowSevereError( "Autosizing error for cooling tower object = " + trim( SimpleTower( TowerNum ).Name ) );
+					ShowSevereError( "Autosizing error for cooling tower object = " + SimpleTower( TowerNum ).Name );
 					ShowFatalError( "Autosizing of cooling tower nominal capacity requires a loop Sizing:Plant object." );
 				}
 				if ( SimpleTower( TowerNum ).TowerFreeConvNomCap == AutoSize ) {
@@ -2963,10 +2963,10 @@ namespace CondenserLoopTowers {
 					SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 					if ( SolFla == -1 ) {
 						ShowSevereError( "Iteration limit exceeded in calculating tower UA" );
-						ShowFatalError( "calculating cooling tower UA failed for tower " + trim( SimpleTower( TowerNum ).Name ) );
+						ShowFatalError( "calculating cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
 					} else if ( SolFla == -2 ) {
 						ShowSevereError( "Bad starting values for UA" );
-						ShowFatalError( "Autosizing of cooling tower UA failed for tower " + trim( SimpleTower( TowerNum ).Name ) );
+						ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
 					}
 					SimpleTower( TowerNum ).HighSpeedTowerUA = UA;
 					ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "U-Factor Times Area Value at Full Speed Air Flow Rate [W/C]", SimpleTower( TowerNum ).HighSpeedTowerUA );
@@ -2986,10 +2986,10 @@ namespace CondenserLoopTowers {
 					SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 					if ( SolFla == -1 ) {
 						ShowSevereError( "Iteration limit exceeded in calculating tower free convection UA" );
-						ShowFatalError( "calculating cooling tower UA failed for tower " + trim( SimpleTower( TowerNum ).Name ) );
+						ShowFatalError( "calculating cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
 					} else if ( SolFla == -2 ) {
 						ShowSevereError( "Bad starting values for UA" );
-						ShowFatalError( "Autosizing of cooling tower UA failed for free convection tower " + trim( SimpleTower( TowerNum ).Name ) );
+						ShowFatalError( "Autosizing of cooling tower UA failed for free convection tower " + SimpleTower( TowerNum ).Name );
 					}
 					SimpleTower( TowerNum ).LowSpeedTowerUA = UA;
 					ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]", SimpleTower( TowerNum ).FreeConvTowerUA );
@@ -3026,7 +3026,7 @@ namespace CondenserLoopTowers {
 						}
 
 					} else {
-						ShowSevereError( "Autosizing error for cooling tower object = " + trim( SimpleTower( TowerNum ).Name ) );
+						ShowSevereError( "Autosizing error for cooling tower object = " + SimpleTower( TowerNum ).Name );
 						ShowFatalError( "Autosizing of cooling tower nominal capacity requires a loop Sizing:Plant object." );
 					}
 
@@ -3171,7 +3171,7 @@ namespace CondenserLoopTowers {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIteration( 100 ); // Maximum fluid bypass iteration calculations
-		static Fstring const MaxItChar( "100" );
+		static std::string const MaxItChar( "100" );
 		Real64 const BypassFractionThreshold( 0.01 ); // Threshold to stop bypass iteration
 		Real64 const OWTLowerLimit( 0.0 ); // The limit of tower exit fluid temperature used in the fluid bypass
 		//  calculation to avoid fluid freezing. For water, it is 0 degreeC,
@@ -3395,7 +3395,7 @@ namespace CondenserLoopTowers {
 							BypassFraction = BypassFraction2;
 						}
 						if ( NumIteration > MaxIteration ) {
-							ShowWarningError( "Cooling tower fluid bypass iteration " "exceeds maximum limit of " + MaxItChar + " for " + trim( SimpleTower( TowerNum ).Name ) );
+							ShowWarningError( "Cooling tower fluid bypass iteration " "exceeds maximum limit of " + MaxItChar + " for " + SimpleTower( TowerNum ).Name );
 						}
 						SimpleTower( TowerNum ).BypassFraction = BypassFraction2;
 						// may not meet TempSetPoint due to limit of tower outlet temp to OWTLowerLimit
@@ -3881,23 +3881,23 @@ namespace CondenserLoopTowers {
 				if ( ! WarmupFlag ) {
 					if ( SimpleTower( TowerNum ).VSMerkelAFRErrorIter < 1 ) {
 						++SimpleTower( TowerNum ).VSMerkelAFRErrorIter;
-						ShowWarningError( trim( cCoolingTower_VariableSpeedMerkel ) + " - Iteration limit exceeded calculating variable speed fan ratio for unit = " + trim( SimpleTower( TowerNum ).Name ) );
+						ShowWarningError( cCoolingTower_VariableSpeedMerkel + " - Iteration limit exceeded calculating variable speed fan ratio for unit = " + SimpleTower( TowerNum ).Name );
 						ShowContinueError( "Estimated air flow ratio  = " + RoundSigDigits( ( std::abs( MyLoad ) - MinSpeedFanQdot ) / ( FullSpeedFanQdot - MinSpeedFanQdot ), 4 ) );
 						ShowContinueError( "Calculated air flow ratio = " + RoundSigDigits( AirFlowRateRatio, 4 ) );
-						ShowContinueErrorTimeStamp( "The calculated air flow ratio will be used and the simulation" " continues. Occurrence info: " );
+						ShowContinueErrorTimeStamp( "The calculated air flow ratio will be used and the simulation continues. Occurrence info:" );
 					}
-					ShowRecurringWarningErrorAtEnd( trim( cCoolingTower_VariableSpeedMerkel ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\" - Iteration limit exceeded calculating air flow ratio error continues." " air flow ratio statistics follow.", SimpleTower( TowerNum ).VSMerkelAFRErrorIter, AirFlowRateRatio, AirFlowRateRatio );
+					ShowRecurringWarningErrorAtEnd( cCoolingTower_VariableSpeedMerkel + " \"" + SimpleTower( TowerNum ).Name + "\" - Iteration limit exceeded calculating air flow ratio error continues." " air flow ratio statistics follow.", SimpleTower( TowerNum ).VSMerkelAFRErrorIter, AirFlowRateRatio, AirFlowRateRatio );
 				}
 			} else if ( SolFla == -2 ) {
 				AirFlowRateRatio = ( std::abs( MyLoad ) - MinSpeedFanQdot ) / ( FullSpeedFanQdot - MinSpeedFanQdot );
 				if ( ! WarmupFlag ) {
 					if ( SimpleTower( TowerNum ).VSMerkelAFRErrorFail < 1 ) {
 						++SimpleTower( TowerNum ).VSMerkelAFRErrorFail;
-						ShowWarningError( trim( cCoolingTower_VariableSpeedMerkel ) + " - solver failed calculating variable speed fan ratio for unit = " + trim( SimpleTower( TowerNum ).Name ) );
+						ShowWarningError( cCoolingTower_VariableSpeedMerkel + " - solver failed calculating variable speed fan ratio for unit = " + SimpleTower( TowerNum ).Name );
 						ShowContinueError( "Estimated air flow ratio  = " + RoundSigDigits( AirFlowRateRatio, 4 ) );
-						ShowContinueErrorTimeStamp( "The estimated air flow ratio will be used and the simulation" " continues. Occurrence info: " );
+						ShowContinueErrorTimeStamp( "The estimated air flow ratio will be used and the simulation continues. Occurrence info:" );
 					}
-					ShowRecurringWarningErrorAtEnd( trim( cCoolingTower_VariableSpeedMerkel ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\" - solver failed calculating air flow ratio error continues." " air flow ratio statistics follow.", SimpleTower( TowerNum ).VSMerkelAFRErrorFail, AirFlowRateRatio, AirFlowRateRatio );
+					ShowRecurringWarningErrorAtEnd( cCoolingTower_VariableSpeedMerkel + " \"" + SimpleTower( TowerNum ).Name + "\" - solver failed calculating air flow ratio error continues." " air flow ratio statistics follow.", SimpleTower( TowerNum ).VSMerkelAFRErrorFail, AirFlowRateRatio, AirFlowRateRatio );
 				}
 			}
 
@@ -4068,8 +4068,8 @@ namespace CondenserLoopTowers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const OutputFormat( "(F5.2)" );
-		static Fstring const OutputFormat2( "(F8.5)" );
+		static gio::Fmt const OutputFormat( "(F5.2)" );
+		static gio::Fmt const OutputFormat2( "(F8.5)" );
 		int const MaxIte( 500 ); // Maximum number of iterations
 		Real64 const Acc( 0.0001 ); // Accuracy of result
 
@@ -4102,11 +4102,11 @@ namespace CondenserLoopTowers {
 		Real64 WaterDensity; // density of inlet water
 		Real64 FreeConvectionCapFrac; // fraction of tower capacity in free convection
 		Real64 FlowFraction; // liquid to gas (L/G) ratio for cooling tower
-		Fstring OutputChar( 6 ); // character string used for warning messages
-		Fstring OutputChar2( 6 ); // character string used for warning messages
-		Fstring OutputChar3( 6 ); // character string used for warning messages
-		Fstring OutputChar4( 6 ); // character string used for warning messages
-		Fstring OutputChar5( 6 ); // character string used for warning messages
+		std::string OutputChar; // character string used for warning messages
+		std::string OutputChar2; // character string used for warning messages
+		std::string OutputChar3; // character string used for warning messages
+		std::string OutputChar4; // character string used for warning messages
+		std::string OutputChar5; // character string used for warning messages
 		static Real64 TimeStepSysLast( 0.0 ); // last system time step (used to check for downshifting)
 		Real64 CurrentEndTime; // end time of time step for current simulation time step
 		static Real64 CurrentEndTimeLast( 0.0 ); // end time of time step for last simulation time step
@@ -4267,7 +4267,7 @@ namespace CondenserLoopTowers {
 
 					SolveRegulaFalsi( Acc, MaxIte, SolFla, AirFlowRateRatio, SimpleTowerApproachResidual, SimpleTower( TowerNum ).MinimumVSAirFlowFrac, 1.0, Par );
 					if ( SolFla == -1 ) {
-						if ( ! WarmupFlag ) ShowWarningError( "Cooling tower iteration limit exceeded when calculating air flow " "rate ratio for tower " + trim( SimpleTower( TowerNum ).Name ) );
+						if ( ! WarmupFlag ) ShowWarningError( "Cooling tower iteration limit exceeded when calculating air flow " "rate ratio for tower " + SimpleTower( TowerNum ).Name );
 						//           IF RegulaFalsi cannot find a solution then provide detailed output for debugging
 					} else if ( SolFla == -2 ) {
 						if ( ! WarmupFlag ) {
@@ -4278,13 +4278,13 @@ namespace CondenserLoopTowers {
 							gio::write( OutputChar5, OutputFormat ) << SimpleTower( TowerNum ).MinimumVSAirFlowFrac;
 							if ( SimpleTower( TowerNum ).CoolingTowerAFRRFailedCount < 1 ) {
 								++SimpleTower( TowerNum ).CoolingTowerAFRRFailedCount;
-								ShowWarningError( "CoolingTower:VariableSpeed \"" + trim( SimpleTower( TowerNum ).Name ) + "\" - " "Cooling tower air flow rate ratio calculation failed " );
-								ShowContinueError( "...with conditions as Twb = " + trim( OutputChar ) + ", Trange = " + trim( OutputChar2 ) + ", Tapproach = " + trim( OutputChar3 ) + ", and water flow rate ratio = " + trim( OutputChar4 ) );
+								ShowWarningError( "CoolingTower:VariableSpeed \"" + SimpleTower( TowerNum ).Name + "\" - " "Cooling tower air flow rate ratio calculation failed " );
+								ShowContinueError( "...with conditions as Twb = " + OutputChar + ", Trange = " + OutputChar2 + ", Tapproach = " + OutputChar3 + ", and water flow rate ratio = " + OutputChar4 );
 								ShowContinueError( "...a solution could not be found within the valid range " "of air flow rate ratios" );
-								ShowContinueErrorTimeStamp( " " "...Valid air flow rate ratio range = " + trim( OutputChar5 ) + " to 1.0." );
+								ShowContinueErrorTimeStamp( " " "...Valid air flow rate ratio range = " + OutputChar5 + " to 1.0." );
 								ShowContinueError( "...Consider modifying the design approach or design range temperature for this tower." );
 							} else {
-								ShowRecurringWarningErrorAtEnd( "CoolingTower:VariableSpeed \"" + trim( SimpleTower( TowerNum ).Name ) + "\" - Cooling tower air flow rate ratio calculation failed " "error continues.", SimpleTower( TowerNum ).CoolingTowerAFRRFailedIndex );
+								ShowRecurringWarningErrorAtEnd( "CoolingTower:VariableSpeed \"" + SimpleTower( TowerNum ).Name + "\" - Cooling tower air flow rate ratio calculation failed " "error continues.", SimpleTower( TowerNum ).CoolingTowerAFRRFailedIndex );
 							}
 						}
 					}
@@ -4323,10 +4323,10 @@ namespace CondenserLoopTowers {
 				++VSTower( SimpleTower( TowerNum ).VSTower ).VSErrorCountFlowFrac;
 				//       Show single warning and pass additional info to ShowRecurringWarningErrorAtEnd
 				if ( VSTower( SimpleTower( TowerNum ).VSTower ).VSErrorCountFlowFrac < 2 ) {
-					ShowWarningError( trim( VSTower( SimpleTower( TowerNum ).VSTower ).LGBuffer1 ) );
-					ShowContinueError( trim( VSTower( SimpleTower( TowerNum ).VSTower ).LGBuffer2 ) );
+					ShowWarningError( VSTower( SimpleTower( TowerNum ).VSTower ).LGBuffer1 );
+					ShowContinueError( VSTower( SimpleTower( TowerNum ).VSTower ).LGBuffer2 );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( SimpleTower( TowerNum ).TowerType ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\" - Liquid to gas ratio is out of range error continues...", VSTower( SimpleTower( TowerNum ).VSTower ).ErrIndexLG, VSTower( SimpleTower( TowerNum ).VSTower ).LGLast, VSTower( SimpleTower( TowerNum ).VSTower ).LGLast );
+					ShowRecurringWarningErrorAtEnd( SimpleTower( TowerNum ).TowerType + " \"" + SimpleTower( TowerNum ).Name + "\" - Liquid to gas ratio is out of range error continues...", VSTower( SimpleTower( TowerNum ).VSTower ).ErrIndexLG, VSTower( SimpleTower( TowerNum ).VSTower ).LGLast, VSTower( SimpleTower( TowerNum ).VSTower ).LGLast );
 				}
 			}
 		}
@@ -4348,8 +4348,8 @@ namespace CondenserLoopTowers {
 						VSTower( SimpleTower( TowerNum ).VSTower ).PrintLGMessage = true;
 						gio::write( OutputChar, OutputFormat ) << FlowFraction;
 						gio::write( OutputChar2, OutputFormat ) << VSTower( SimpleTower( TowerNum ).VSTower ).MaxLiquidToGasRatio;
-						VSTower( SimpleTower( TowerNum ).VSTower ).LGBuffer1 = trim( SimpleTower( TowerNum ).TowerType ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\" - Liquid to gas ratio (L/G) is out of range at " + trim( OutputChar ) + ".";
-						VSTower( SimpleTower( TowerNum ).VSTower ).LGBuffer2 = " " "...Valid maximum ratio = " + trim( OutputChar2 ) + ". Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + " " + trim( CreateSysTimeIntervalString() );
+						VSTower( SimpleTower( TowerNum ).VSTower ).LGBuffer1 = SimpleTower( TowerNum ).TowerType + " \"" + SimpleTower( TowerNum ).Name + "\" - Liquid to gas ratio (L/G) is out of range at " + OutputChar + '.';
+						VSTower( SimpleTower( TowerNum ).VSTower ).LGBuffer2 = " ...Valid maximum ratio = " + OutputChar2 + ". Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 						VSTower( SimpleTower( TowerNum ).VSTower ).LGLast = FlowFraction;
 					}
 				}
@@ -4572,7 +4572,7 @@ namespace CondenserLoopTowers {
 		if ( SolFla == -1 ) {
 			ShowSevereError( "Iteration limit exceeded in calculating tower nominal capacity at minimum air flow ratio" );
 			ShowContinueError( "Design inlet air wet-bulb or approach temperature must be modified to achieve an acceptable" " range at the minimum air flow rate" );
-			ShowContinueError( "Cooling tower simulation failed to converge for tower " + trim( SimpleTower( TowerNum ).Name ) );
+			ShowContinueError( "Cooling tower simulation failed to converge for tower " + SimpleTower( TowerNum ).Name );
 			//    if SolFla = -2, Tr is returned as minimum value (0.001) and outlet temp = inlet temp - 0.001
 		} else if ( SolFla == -2 ) { // decide if should run at max flow
 			{ auto const SELECT_CASE_var( PlantLoop( SimpleTower( TowerNum ).LoopNum ).LoopDemandCalcScheme );
@@ -4723,10 +4723,10 @@ namespace CondenserLoopTowers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static Fstring OutputChar( 32 ); // character string for warning messages
-		static Fstring OutputCharLo( 32 ); // character string for warning messages
-		static Fstring OutputCharHi( 32 ); // character string for warning messages
-		static Fstring TrimValue( 32 ); // character string for warning messages
+		static std::string OutputChar; // character string for warning messages
+		static std::string OutputCharLo; // character string for warning messages
+		static std::string OutputCharHi; // character string for warning messages
+		static std::string TrimValue; // character string for warning messages
 		static Real64 TimeStepSysLast( 0.0 ); // last system time step (used to check for downshifting)
 		static Real64 CurrentEndTime( 0.0 ); // end time of time step for current simulation time step
 		static Real64 CurrentEndTimeLast( 0.0 ); // end time of time step for last simulation time step
@@ -4749,47 +4749,47 @@ namespace CondenserLoopTowers {
 			if ( VSTower( SimpleTower( TowerNum ).VSTower ).PrintTrMessage ) {
 				++VSTower( SimpleTower( TowerNum ).VSTower ).VSErrorCountTR;
 				if ( VSTower( SimpleTower( TowerNum ).VSTower ).VSErrorCountTR < 2 ) {
-					ShowWarningError( trim( VSTower( SimpleTower( TowerNum ).VSTower ).TrBuffer1 ) );
-					ShowContinueError( trim( VSTower( SimpleTower( TowerNum ).VSTower ).TrBuffer2 ) );
-					ShowContinueError( trim( VSTower( SimpleTower( TowerNum ).VSTower ).TrBuffer3 ) );
+					ShowWarningError( VSTower( SimpleTower( TowerNum ).VSTower ).TrBuffer1 );
+					ShowContinueError( VSTower( SimpleTower( TowerNum ).VSTower ).TrBuffer2 );
+					ShowContinueError( VSTower( SimpleTower( TowerNum ).VSTower ).TrBuffer3 );
 					ShowContinueError( " ...Range temperatures outside model boundaries may not " "adversely affect tower performance." );
 					ShowContinueError( " ...This is not an unexpected occurrence when simulating actual conditions." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( SimpleTower( TowerNum ).TowerType ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\" - Tower range temperature is out of range error continues...", VSTower( SimpleTower( TowerNum ).VSTower ).ErrIndexTR, VSTower( SimpleTower( TowerNum ).VSTower ).TrLast, VSTower( SimpleTower( TowerNum ).VSTower ).TrLast );
+					ShowRecurringWarningErrorAtEnd( SimpleTower( TowerNum ).TowerType + " \"" + SimpleTower( TowerNum ).Name + "\" - Tower range temperature is out of range error continues...", VSTower( SimpleTower( TowerNum ).VSTower ).ErrIndexTR, VSTower( SimpleTower( TowerNum ).VSTower ).TrLast, VSTower( SimpleTower( TowerNum ).VSTower ).TrLast );
 				}
 			}
 			if ( VSTower( SimpleTower( TowerNum ).VSTower ).PrintTwbMessage ) {
 				++VSTower( SimpleTower( TowerNum ).VSTower ).VSErrorCountIAWB;
 				if ( VSTower( SimpleTower( TowerNum ).VSTower ).VSErrorCountIAWB < 6 ) {
-					ShowWarningError( trim( VSTower( SimpleTower( TowerNum ).VSTower ).TwbBuffer1 ) );
-					ShowContinueError( trim( VSTower( SimpleTower( TowerNum ).VSTower ).TwbBuffer2 ) );
-					ShowContinueError( trim( VSTower( SimpleTower( TowerNum ).VSTower ).TwbBuffer3 ) );
+					ShowWarningError( VSTower( SimpleTower( TowerNum ).VSTower ).TwbBuffer1 );
+					ShowContinueError( VSTower( SimpleTower( TowerNum ).VSTower ).TwbBuffer2 );
+					ShowContinueError( VSTower( SimpleTower( TowerNum ).VSTower ).TwbBuffer3 );
 					ShowContinueError( " ...Wet-bulb temperatures outside model boundaries may not " "adversely affect tower performance." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( SimpleTower( TowerNum ).TowerType ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\" - Inlet air wet-bulb temperature is out of range error continues...", VSTower( SimpleTower( TowerNum ).VSTower ).ErrIndexIAWB, VSTower( SimpleTower( TowerNum ).VSTower ).TwbLast, VSTower( SimpleTower( TowerNum ).VSTower ).TwbLast );
+					ShowRecurringWarningErrorAtEnd( SimpleTower( TowerNum ).TowerType + " \"" + SimpleTower( TowerNum ).Name + "\" - Inlet air wet-bulb temperature is out of range error continues...", VSTower( SimpleTower( TowerNum ).VSTower ).ErrIndexIAWB, VSTower( SimpleTower( TowerNum ).VSTower ).TwbLast, VSTower( SimpleTower( TowerNum ).VSTower ).TwbLast );
 				}
 			}
 			if ( VSTower( SimpleTower( TowerNum ).VSTower ).PrintTaMessage ) {
 				++VSTower( SimpleTower( TowerNum ).VSTower ).VSErrorCountTA;
 				if ( VSTower( SimpleTower( TowerNum ).VSTower ).VSErrorCountTA < 2 ) {
-					ShowWarningError( trim( VSTower( SimpleTower( TowerNum ).VSTower ).TaBuffer1 ) );
-					ShowContinueError( trim( VSTower( SimpleTower( TowerNum ).VSTower ).TaBuffer2 ) );
-					ShowContinueError( trim( VSTower( SimpleTower( TowerNum ).VSTower ).TaBuffer3 ) );
+					ShowWarningError( VSTower( SimpleTower( TowerNum ).VSTower ).TaBuffer1 );
+					ShowContinueError( VSTower( SimpleTower( TowerNum ).VSTower ).TaBuffer2 );
+					ShowContinueError( VSTower( SimpleTower( TowerNum ).VSTower ).TaBuffer3 );
 					ShowContinueError( " ...Approach temperatures outside model boundaries may not " "adversely affect tower performance." );
 					ShowContinueError( " ...This is not an unexpected occurrence when simulating actual conditions." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( SimpleTower( TowerNum ).TowerType ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\" - Tower approach temperature is out of range error continues...", VSTower( SimpleTower( TowerNum ).VSTower ).ErrIndexTA, VSTower( SimpleTower( TowerNum ).VSTower ).TaLast, VSTower( SimpleTower( TowerNum ).VSTower ).TaLast );
+					ShowRecurringWarningErrorAtEnd( SimpleTower( TowerNum ).TowerType + " \"" + SimpleTower( TowerNum ).Name + "\" - Tower approach temperature is out of range error continues...", VSTower( SimpleTower( TowerNum ).VSTower ).ErrIndexTA, VSTower( SimpleTower( TowerNum ).VSTower ).TaLast, VSTower( SimpleTower( TowerNum ).VSTower ).TaLast );
 				}
 			}
 			if ( VSTower( SimpleTower( TowerNum ).VSTower ).PrintWFRRMessage ) {
 				++VSTower( SimpleTower( TowerNum ).VSTower ).VSErrorCountWFRR;
 				if ( VSTower( SimpleTower( TowerNum ).VSTower ).VSErrorCountWFRR < 6 ) {
-					ShowWarningError( trim( VSTower( SimpleTower( TowerNum ).VSTower ).WFRRBuffer1 ) );
-					ShowContinueError( trim( VSTower( SimpleTower( TowerNum ).VSTower ).WFRRBuffer2 ) );
-					ShowContinueError( trim( VSTower( SimpleTower( TowerNum ).VSTower ).WFRRBuffer3 ) );
+					ShowWarningError( VSTower( SimpleTower( TowerNum ).VSTower ).WFRRBuffer1 );
+					ShowContinueError( VSTower( SimpleTower( TowerNum ).VSTower ).WFRRBuffer2 );
+					ShowContinueError( VSTower( SimpleTower( TowerNum ).VSTower ).WFRRBuffer3 );
 					ShowContinueError( " ...Water flow rate ratios outside model boundaries may not " "adversely affect tower performance." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( SimpleTower( TowerNum ).TowerType ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\" - Water flow rate ratio is out of range error continues...", VSTower( SimpleTower( TowerNum ).VSTower ).ErrIndexWFRR, VSTower( SimpleTower( TowerNum ).VSTower ).WaterFlowRateRatioLast, VSTower( SimpleTower( TowerNum ).VSTower ).WaterFlowRateRatioLast );
+					ShowRecurringWarningErrorAtEnd( SimpleTower( TowerNum ).TowerType + " \"" + SimpleTower( TowerNum ).Name + "\" - Water flow rate ratio is out of range error continues...", VSTower( SimpleTower( TowerNum ).VSTower ).ErrIndexWFRR, VSTower( SimpleTower( TowerNum ).VSTower ).WaterFlowRateRatioLast, VSTower( SimpleTower( TowerNum ).VSTower ).WaterFlowRateRatioLast );
 				}
 			}
 		}
@@ -4811,10 +4811,10 @@ namespace CondenserLoopTowers {
 			}
 			if ( ! WarmupFlag ) {
 				VSTower( SimpleTower( TowerNum ).VSTower ).PrintTwbMessage = true;
-				VSTower( SimpleTower( TowerNum ).VSTower ).TwbBuffer1 = trim( SimpleTower( TowerNum ).TowerType ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\" - Inlet air wet-bulb temperature is outside model boundaries at " + trim( OutputChar ) + ".";
-				VSTower( SimpleTower( TowerNum ).VSTower ).TwbBuffer2 = " " "...Valid range = " + trim( OutputCharLo ) + " to " + trim( OutputCharHi ) + ". Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + " " + trim( CreateSysTimeIntervalString() );
+				VSTower( SimpleTower( TowerNum ).VSTower ).TwbBuffer1 = SimpleTower( TowerNum ).TowerType + " \"" + SimpleTower( TowerNum ).Name + "\" - Inlet air wet-bulb temperature is outside model boundaries at " + OutputChar + '.';
+				VSTower( SimpleTower( TowerNum ).VSTower ).TwbBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 				TrimValue = RoundSigDigits( TwbCapped, 6 );
-				VSTower( SimpleTower( TowerNum ).VSTower ).TwbBuffer3 = " ...Inlet air wet-bulb temperature passed to the model = " + trim( TrimValue );
+				VSTower( SimpleTower( TowerNum ).VSTower ).TwbBuffer3 = " ...Inlet air wet-bulb temperature passed to the model = " + TrimValue;
 				VSTower( SimpleTower( TowerNum ).VSTower ).TwbLast = Twb;
 			} else {
 				VSTower( SimpleTower( TowerNum ).VSTower ).PrintTwbMessage = false;
@@ -4835,10 +4835,10 @@ namespace CondenserLoopTowers {
 			}
 			if ( ! WarmupFlag ) {
 				VSTower( SimpleTower( TowerNum ).VSTower ).PrintTrMessage = true;
-				VSTower( SimpleTower( TowerNum ).VSTower ).TrBuffer1 = trim( SimpleTower( TowerNum ).TowerType ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\" - Tower range temperature is outside model boundaries at " + trim( OutputChar ) + ".";
-				VSTower( SimpleTower( TowerNum ).VSTower ).TrBuffer2 = " " "...Valid range = " + trim( OutputCharLo ) + " to " + trim( OutputCharHi ) + ". Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + " " + trim( CreateSysTimeIntervalString() );
+				VSTower( SimpleTower( TowerNum ).VSTower ).TrBuffer1 = SimpleTower( TowerNum ).TowerType + " \"" + SimpleTower( TowerNum ).Name + "\" - Tower range temperature is outside model boundaries at " + OutputChar + '.';
+				VSTower( SimpleTower( TowerNum ).VSTower ).TrBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 				TrimValue = RoundSigDigits( Tr, 5 );
-				VSTower( SimpleTower( TowerNum ).VSTower ).TrBuffer3 = " ...Tower range temperature passed to the model = " + trim( TrimValue );
+				VSTower( SimpleTower( TowerNum ).VSTower ).TrBuffer3 = " ...Tower range temperature passed to the model = " + TrimValue;
 				VSTower( SimpleTower( TowerNum ).VSTower ).TrLast = Tr;
 			} else {
 				VSTower( SimpleTower( TowerNum ).VSTower ).PrintTrMessage = false;
@@ -4859,10 +4859,10 @@ namespace CondenserLoopTowers {
 			}
 			if ( ! WarmupFlag ) {
 				VSTower( SimpleTower( TowerNum ).VSTower ).PrintTaMessage = true;
-				VSTower( SimpleTower( TowerNum ).VSTower ).TaBuffer1 = trim( SimpleTower( TowerNum ).TowerType ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\" - Tower approach temperature is outside model boundaries at " + trim( OutputChar ) + ".";
-				VSTower( SimpleTower( TowerNum ).VSTower ).TaBuffer2 = " " "...Valid range = " + trim( OutputCharLo ) + " to " + trim( OutputCharHi ) + ". Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + " " + trim( CreateSysTimeIntervalString() );
+				VSTower( SimpleTower( TowerNum ).VSTower ).TaBuffer1 = SimpleTower( TowerNum ).TowerType + " \"" + SimpleTower( TowerNum ).Name + "\" - Tower approach temperature is outside model boundaries at " + OutputChar + '.';
+				VSTower( SimpleTower( TowerNum ).VSTower ).TaBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 				TrimValue = RoundSigDigits( Ta, 5 );
-				VSTower( SimpleTower( TowerNum ).VSTower ).TaBuffer3 = " ...Tower approach temperature passed to the model = " + trim( TrimValue );
+				VSTower( SimpleTower( TowerNum ).VSTower ).TaBuffer3 = " ...Tower approach temperature passed to the model = " + TrimValue;
 				VSTower( SimpleTower( TowerNum ).VSTower ).TaLast = Ta;
 			} else {
 				VSTower( SimpleTower( TowerNum ).VSTower ).PrintTaMessage = false;
@@ -4888,10 +4888,10 @@ namespace CondenserLoopTowers {
 				}
 				if ( ! WarmupFlag ) {
 					VSTower( SimpleTower( TowerNum ).VSTower ).PrintWFRRMessage = true;
-					VSTower( SimpleTower( TowerNum ).VSTower ).WFRRBuffer1 = trim( SimpleTower( TowerNum ).TowerType ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\" - Water flow rate ratio is outside model boundaries at " + trim( OutputChar ) + ".";
-					VSTower( SimpleTower( TowerNum ).VSTower ).WFRRBuffer2 = " " "...Valid range = " + trim( OutputCharLo ) + " to " + trim( OutputCharHi ) + ". Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + " " + trim( CreateSysTimeIntervalString() );
+					VSTower( SimpleTower( TowerNum ).VSTower ).WFRRBuffer1 = SimpleTower( TowerNum ).TowerType + " \"" + SimpleTower( TowerNum ).Name + "\" - Water flow rate ratio is outside model boundaries at " + OutputChar + '.';
+					VSTower( SimpleTower( TowerNum ).VSTower ).WFRRBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 					TrimValue = RoundSigDigits( WaterFlowRateRatioCapped, 5 );
-					VSTower( SimpleTower( TowerNum ).VSTower ).WFRRBuffer3 = " ...Water flow rate ratio passed to the model = " + trim( TrimValue );
+					VSTower( SimpleTower( TowerNum ).VSTower ).WFRRBuffer3 = " ...Water flow rate ratio passed to the model = " + TrimValue;
 					VSTower( SimpleTower( TowerNum ).VSTower ).WaterFlowRateRatioLast = WaterFlowRateRatio;
 				} else {
 					VSTower( SimpleTower( TowerNum ).VSTower ).PrintWFRRMessage = false;
@@ -5312,7 +5312,7 @@ namespace CondenserLoopTowers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const LowTempFmt( "(' ',F6.2)" );
+		static gio::Fmt const LowTempFmt( "(' ',F6.2)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -5321,8 +5321,8 @@ namespace CondenserLoopTowers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Fstring CharErrOut( 25 );
-		Fstring CharLowOutletTemp( 25 );
+		std::string CharErrOut;
+		std::string CharLowOutletTemp;
 		int LoopNum;
 		int LoopSideNum;
 		Real64 LoopMinTemp;
@@ -5338,13 +5338,13 @@ namespace CondenserLoopTowers {
 		if ( Node( WaterOutletNode ).MassFlowRate > SimpleTower( TowerNum ).DesWaterMassFlowRate * SimpleTower( TowerNum ).TowerMassFlowRateMultiplier ) {
 			++SimpleTower( TowerNum ).HighMassFlowErrorCount;
 			if ( SimpleTower( TowerNum ).HighMassFlowErrorCount < 2 ) {
-				ShowWarningError( trim( SimpleTower( TowerNum ).TowerType ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\"" );
+				ShowWarningError( SimpleTower( TowerNum ).TowerType + " \"" + SimpleTower( TowerNum ).Name + "\"" );
 				ShowContinueError( " Condenser Loop Mass Flow Rate is much greater than the towers design mass flow rate." );
 				ShowContinueError( " Condenser Loop Mass Flow Rate = " + TrimSigDigits( Node( WaterOutletNode ).MassFlowRate, 6 ) );
 				ShowContinueError( " Tower Design Mass Flow Rate   = " + TrimSigDigits( SimpleTower( TowerNum ).DesWaterMassFlowRate, 6 ) );
-				ShowContinueErrorTimeStamp( " " );
+				ShowContinueErrorTimeStamp( "" );
 			} else {
-				ShowRecurringWarningErrorAtEnd( trim( SimpleTower( TowerNum ).TowerType ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\"  Condenser Loop Mass Flow Rate is much greater than the towers design mass flow rate error continues...", SimpleTower( TowerNum ).HighMassFlowErrorIndex, Node( WaterOutletNode ).MassFlowRate, Node( WaterOutletNode ).MassFlowRate );
+				ShowRecurringWarningErrorAtEnd( SimpleTower( TowerNum ).TowerType + " \"" + SimpleTower( TowerNum ).Name + "\"  Condenser Loop Mass Flow Rate is much greater than the towers design mass flow rate error continues...", SimpleTower( TowerNum ).HighMassFlowErrorIndex, Node( WaterOutletNode ).MassFlowRate, Node( WaterOutletNode ).MassFlowRate );
 			}
 		}
 
@@ -5354,13 +5354,13 @@ namespace CondenserLoopTowers {
 			++SimpleTower( TowerNum ).OutletWaterTempErrorCount;
 			gio::write( CharLowOutletTemp, LowTempFmt ) << LoopMinTemp;
 			gio::write( CharErrOut, LowTempFmt ) << OutletWaterTemp;
-			CharErrOut = adjustl( CharErrOut );
+			strip( CharErrOut );
 			if ( SimpleTower( TowerNum ).OutletWaterTempErrorCount < 2 ) {
-				ShowWarningError( trim( SimpleTower( TowerNum ).TowerType ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\"" );
-				ShowContinueError( "Cooling tower water outlet temperature (" + trim( CharErrOut ) + " C) is " "below the specified minimum condenser loop temp of " + trim( adjustl( CharLowOutletTemp ) ) + " C" );
-				ShowContinueErrorTimeStamp( " " );
+				ShowWarningError( SimpleTower( TowerNum ).TowerType + " \"" + SimpleTower( TowerNum ).Name + "\"" );
+				ShowContinueError( "Cooling tower water outlet temperature (" + CharErrOut + " C) is " "below the specified minimum condenser loop temp of " + stripped( CharLowOutletTemp ) + " C" );
+				ShowContinueErrorTimeStamp( "" );
 			} else {
-				ShowRecurringWarningErrorAtEnd( trim( SimpleTower( TowerNum ).TowerType ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\" Cooling tower water outlet temperature is below the specified minimum condenser loop temp error continues...", SimpleTower( TowerNum ).OutletWaterTempErrorIndex, OutletWaterTemp, OutletWaterTemp );
+				ShowRecurringWarningErrorAtEnd( SimpleTower( TowerNum ).TowerType + " \"" + SimpleTower( TowerNum ).Name + "\" Cooling tower water outlet temperature is below the specified minimum condenser loop temp error continues...", SimpleTower( TowerNum ).OutletWaterTempErrorIndex, OutletWaterTemp, OutletWaterTemp );
 			}
 		}
 
@@ -5368,12 +5368,12 @@ namespace CondenserLoopTowers {
 		if ( WaterMassFlowRate > 0.0 && WaterMassFlowRate <= MassFlowTolerance ) {
 			++SimpleTower( TowerNum ).SmallWaterMassFlowErrorCount;
 			if ( SimpleTower( TowerNum ).SmallWaterMassFlowErrorCount < 2 ) {
-				ShowWarningError( trim( SimpleTower( TowerNum ).TowerType ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\"" );
+				ShowWarningError( SimpleTower( TowerNum ).TowerType + " \"" + SimpleTower( TowerNum ).Name + "\"" );
 				ShowContinueError( "Cooling tower water mass flow rate near zero." );
-				ShowContinueErrorTimeStamp( " " );
-				ShowContinueError( "Actual Mass flow = " + trim( TrimSigDigits( WaterMassFlowRate, 2 ) ) );
+				ShowContinueErrorTimeStamp( "" );
+				ShowContinueError( "Actual Mass flow = " + TrimSigDigits( WaterMassFlowRate, 2 ) );
 			} else {
-				ShowRecurringWarningErrorAtEnd( trim( SimpleTower( TowerNum ).TowerType ) + " \"" + trim( SimpleTower( TowerNum ).Name ) + "\"  Cooling tower water mass flow rate near zero error continues...", SimpleTower( TowerNum ).SmallWaterMassFlowErrorIndex, WaterMassFlowRate, WaterMassFlowRate );
+				ShowRecurringWarningErrorAtEnd( SimpleTower( TowerNum ).TowerType + " \"" + SimpleTower( TowerNum ).Name + "\"  Cooling tower water mass flow rate near zero error continues...", SimpleTower( TowerNum ).SmallWaterMassFlowErrorIndex, WaterMassFlowRate, WaterMassFlowRate );
 			}
 		}
 

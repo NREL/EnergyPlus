@@ -68,7 +68,7 @@ namespace ElectricBaseboardRadiator {
 	// Data
 	//MODULE PARAMETER DEFINITIONS
 	int const BaseboardRadiator_Electric( 1 );
-	Fstring const cCMO_BBRadiator_Electric( "ZoneHVAC:Baseboard:RadiantConvective:Electric" );
+	std::string const cCMO_BBRadiator_Electric( "ZoneHVAC:Baseboard:RadiantConvective:Electric" );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -92,7 +92,7 @@ namespace ElectricBaseboardRadiator {
 
 	void
 	SimElecBaseboard(
-		Fstring const & EquipName,
+		std::string const & EquipName,
 		int const ActualZoneNum,
 		int const ControlledZoneNum,
 		bool const FirstHVACIteration,
@@ -145,17 +145,17 @@ namespace ElectricBaseboardRadiator {
 		if ( CompIndex == 0 ) {
 			BaseboardNum = FindItemInList( EquipName, ElecBaseboard.EquipName(), NumElecBaseboards );
 			if ( BaseboardNum == 0 ) {
-				ShowFatalError( "SimElectricBaseboard: Unit not found=" + trim( EquipName ) );
+				ShowFatalError( "SimElectricBaseboard: Unit not found=" + EquipName );
 			}
 			CompIndex = BaseboardNum;
 		} else {
 			BaseboardNum = CompIndex;
 			if ( BaseboardNum > NumElecBaseboards || BaseboardNum < 1 ) {
-				ShowFatalError( "SimElectricBaseboard:  Invalid CompIndex passed=" + trim( TrimSigDigits( BaseboardNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumElecBaseboards ) ) + ", Entered Unit name=" + trim( EquipName ) );
+				ShowFatalError( "SimElectricBaseboard:  Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Number of Units=" + TrimSigDigits( NumElecBaseboards ) + ", Entered Unit name=" + EquipName );
 			}
 			if ( CheckEquipName( BaseboardNum ) ) {
 				if ( EquipName != ElecBaseboard( BaseboardNum ).EquipName ) {
-					ShowFatalError( "SimElectricBaseboard: Invalid CompIndex passed=" + trim( TrimSigDigits( BaseboardNum ) ) + ", Unit name=" + trim( EquipName ) + ", stored Unit Name for that index=" + trim( ElecBaseboard( BaseboardNum ).EquipName ) );
+					ShowFatalError( "SimElectricBaseboard: Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Unit name=" + EquipName + ", stored Unit Name for that index=" + ElecBaseboard( BaseboardNum ).EquipName );
 				}
 				CheckEquipName( BaseboardNum ) = false;
 			}
@@ -170,7 +170,7 @@ namespace ElectricBaseboardRadiator {
 			CalcElectricBaseboard( BaseboardNum, ControlledZoneNum );
 
 		} else {
-			ShowSevereError( "SimElecBaseboard: Errors in Baseboard=" + trim( ElecBaseboard( BaseboardNum ).EquipName ) );
+			ShowSevereError( "SimElecBaseboard: Errors in Baseboard=" + ElecBaseboard( BaseboardNum ).EquipName );
 			ShowContinueError( "Invalid or unimplemented equipment type=" + cCMO_BBRadiator_Electric );
 			ShowFatalError( "Preceding condition causes termination." );
 
@@ -207,7 +207,6 @@ namespace ElectricBaseboardRadiator {
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::VerifyName;
 		using InputProcessor::FindItemInList;
-		using InputProcessor::MakeUPPERCase;
 		using DataSurfaces::Surface;
 		using DataSurfaces::TotSurfaces;
 		using GlobalNames::VerifyUniqueBaseboardName;
@@ -220,7 +219,7 @@ namespace ElectricBaseboardRadiator {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetBaseboardInput: " ); // include trailing blank space
+		static std::string const RoutineName( "GetBaseboardInput: " ); // include trailing blank space
 		Real64 const MaxFraction( 1.0 ); // Maximum limit of fractional values
 		Real64 const MinFraction( 0.0 ); // Minimum limit of fractional values
 		//    INTEGER,PARAMETER :: MaxDistribSurfaces   = 20      ! Maximum number of surfaces that a baseboard heater can radiate to
@@ -260,12 +259,12 @@ namespace ElectricBaseboardRadiator {
 			GetObjectItem( cCurrentModuleObject, BaseboardNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ElecBaseboard.EquipName(), BaseboardNum, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ElecBaseboard.EquipName(), BaseboardNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				continue;
 			}
-			VerifyUniqueBaseboardName( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), errFlag, trim( cCurrentModuleObject ) + " Name" );
+			VerifyUniqueBaseboardName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
 			}
@@ -278,7 +277,7 @@ namespace ElectricBaseboardRadiator {
 			} else {
 				ElecBaseboard( BaseboardNum ).SchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 				if ( ElecBaseboard( BaseboardNum ).SchedPtr == 0 ) {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 2 ) ) + " entered =" + trim( cAlphaArgs( 2 ) ) + " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) + " entered =" + cAlphaArgs( 2 ) + " for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -288,20 +287,20 @@ namespace ElectricBaseboardRadiator {
 
 			ElecBaseboard( BaseboardNum ).FracRadiant = rNumericArgs( 3 );
 			if ( ElecBaseboard( BaseboardNum ).FracRadiant < MinFraction ) {
-				ShowWarningError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", " + trim( cNumericFieldNames( 3 ) ) + " was lower than the allowable minimum." );
-				ShowContinueError( "...reset to minimum value=[" + trim( RoundSigDigits( MinFraction, 2 ) ) + "]." );
+				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 3 ) + " was lower than the allowable minimum." );
+				ShowContinueError( "...reset to minimum value=[" + RoundSigDigits( MinFraction, 2 ) + "]." );
 				ElecBaseboard( BaseboardNum ).FracRadiant = MinFraction;
 			}
 			if ( ElecBaseboard( BaseboardNum ).FracRadiant > MaxFraction ) {
-				ShowWarningError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", " + trim( cNumericFieldNames( 3 ) ) + " was higher than the allowable maximum." );
-				ShowContinueError( "...reset to maximum value=[" + trim( RoundSigDigits( MaxFraction, 2 ) ) + "]." );
+				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 3 ) + " was higher than the allowable maximum." );
+				ShowContinueError( "...reset to maximum value=[" + RoundSigDigits( MaxFraction, 2 ) + "]." );
 				ElecBaseboard( BaseboardNum ).FracRadiant = MaxFraction;
 			}
 
 			// Remaining fraction is added to the zone as convective heat transfer
 			AllFracsSummed = ElecBaseboard( BaseboardNum ).FracRadiant;
 			if ( AllFracsSummed > MaxFraction ) {
-				ShowWarningError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", Fraction Radiant was higher than the allowable maximum." );
+				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", Fraction Radiant was higher than the allowable maximum." );
 				ElecBaseboard( BaseboardNum ).FracRadiant = MaxFraction;
 				ElecBaseboard( BaseboardNum ).FracConvect = 0.0;
 			} else {
@@ -310,13 +309,13 @@ namespace ElectricBaseboardRadiator {
 
 			ElecBaseboard( BaseboardNum ).FracDistribPerson = rNumericArgs( 4 );
 			if ( ElecBaseboard( BaseboardNum ).FracDistribPerson < MinFraction ) {
-				ShowWarningError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", " + trim( cNumericFieldNames( 4 ) ) + " was lower than the allowable minimum." );
-				ShowContinueError( "...reset to minimum value=[" + trim( RoundSigDigits( MinFraction, 2 ) ) + "]." );
+				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 4 ) + " was lower than the allowable minimum." );
+				ShowContinueError( "...reset to minimum value=[" + RoundSigDigits( MinFraction, 2 ) + "]." );
 				ElecBaseboard( BaseboardNum ).FracDistribPerson = MinFraction;
 			}
 			if ( ElecBaseboard( BaseboardNum ).FracDistribPerson > MaxFraction ) {
-				ShowWarningError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", " + trim( cNumericFieldNames( 4 ) ) + " was higher than the allowable maximum." );
-				ShowContinueError( "...reset to maximum value=[" + trim( RoundSigDigits( MaxFraction, 2 ) ) + "]." );
+				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 4 ) + " was higher than the allowable maximum." );
+				ShowContinueError( "...reset to maximum value=[" + RoundSigDigits( MaxFraction, 2 ) + "]." );
 				ElecBaseboard( BaseboardNum ).FracDistribPerson = MaxFraction;
 			}
 
@@ -329,14 +328,14 @@ namespace ElectricBaseboardRadiator {
 			//        ElecBaseboard(BaseboardNum)%TotSurfToDistrib = MaxDistribSurfaces
 			//      END IF
 			if ( ( ElecBaseboard( BaseboardNum ).TotSurfToDistrib < MinDistribSurfaces ) && ( ElecBaseboard( BaseboardNum ).FracRadiant > MinFraction ) ) {
-				ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", the number of surface/radiant fraction groups entered was less than the allowable minimum." );
-				ShowContinueError( "...the minimum that must be entered=[" + trim( RoundSigDigits( MinDistribSurfaces ) ) + "]." );
+				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", the number of surface/radiant fraction groups entered was less than the allowable minimum." );
+				ShowContinueError( "...the minimum that must be entered=[" + RoundSigDigits( MinDistribSurfaces ) + "]." );
 				ErrorsFound = true;
 				ElecBaseboard( BaseboardNum ).TotSurfToDistrib = 0; // error
 			}
 
 			ElecBaseboard( BaseboardNum ).SurfaceName.allocate( ElecBaseboard( BaseboardNum ).TotSurfToDistrib );
-			ElecBaseboard( BaseboardNum ).SurfaceName = " ";
+			ElecBaseboard( BaseboardNum ).SurfaceName = "";
 			ElecBaseboard( BaseboardNum ).SurfacePtr.allocate( ElecBaseboard( BaseboardNum ).TotSurfToDistrib );
 			ElecBaseboard( BaseboardNum ).SurfacePtr = 0;
 			ElecBaseboard( BaseboardNum ).FracDistribToSurf.allocate( ElecBaseboard( BaseboardNum ).TotSurfToDistrib );
@@ -348,17 +347,17 @@ namespace ElectricBaseboardRadiator {
 				ElecBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 2 ), Surface.Name(), TotSurfaces );
 				ElecBaseboard( BaseboardNum ).FracDistribToSurf( SurfNum ) = rNumericArgs( SurfNum + 4 );
 				if ( ElecBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) == 0 ) {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", " + trim( cAlphaFieldNames( SurfNum + 2 ) ) + "=\"" + trim( cAlphaArgs( SurfNum + 2 ) ) + "\" invalid - not found." );
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cAlphaFieldNames( SurfNum + 2 ) + "=\"" + cAlphaArgs( SurfNum + 2 ) + "\" invalid - not found." );
 					ErrorsFound = true;
 				}
 				if ( ElecBaseboard( BaseboardNum ).FracDistribToSurf( SurfNum ) > MaxFraction ) {
-					ShowWarningError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", " + trim( cNumericFieldNames( SurfNum + 4 ) ) + "was greater than the allowable maximum." );
-					ShowContinueError( "...reset to maximum value=[" + trim( RoundSigDigits( MaxFraction, 2 ) ) + "]." );
+					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( SurfNum + 4 ) + "was greater than the allowable maximum." );
+					ShowContinueError( "...reset to maximum value=[" + RoundSigDigits( MaxFraction, 2 ) + "]." );
 					ElecBaseboard( BaseboardNum ).TotSurfToDistrib = MaxFraction;
 				}
 				if ( ElecBaseboard( BaseboardNum ).FracDistribToSurf( SurfNum ) < MinFraction ) {
-					ShowWarningError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", " + trim( cNumericFieldNames( SurfNum + 4 ) ) + "was less than the allowable minimum." );
-					ShowContinueError( "...reset to maximum value=[" + trim( RoundSigDigits( MinFraction, 2 ) ) + "]." );
+					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( SurfNum + 4 ) + "was less than the allowable minimum." );
+					ShowContinueError( "...reset to maximum value=[" + RoundSigDigits( MinFraction, 2 ) + "]." );
 					ElecBaseboard( BaseboardNum ).TotSurfToDistrib = MinFraction;
 				}
 				if ( ElecBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) != 0 ) {
@@ -369,17 +368,17 @@ namespace ElectricBaseboardRadiator {
 			} // Surfaces
 
 			if ( AllFracsSummed > ( MaxFraction + 0.01 ) ) {
-				ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", Summed radiant fractions for people + surface groups > 1.0" );
+				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", Summed radiant fractions for people + surface groups > 1.0" );
 				ErrorsFound = true;
 			}
 			if ( ( AllFracsSummed < ( MaxFraction - 0.01 ) ) && ( ElecBaseboard( BaseboardNum ).FracRadiant > MinFraction ) ) { // User didn't distribute all of the | radiation warn that some will be lost
-				ShowWarningError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", Summed radiant fractions for people + surface groups < 1.0" );
+				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", Summed radiant fractions for people + surface groups < 1.0" );
 				ShowContinueError( "The rest of the radiant energy delivered by the baseboard heater will be lost" );
 			}
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + trim( cCurrentModuleObject ) + "Errors found getting input. Program terminates." );
+			ShowFatalError( RoutineName + cCurrentModuleObject + "Errors found getting input. Program terminates." );
 		}
 
 		for ( BaseboardNum = 1; BaseboardNum <= NumElecBaseboards; ++BaseboardNum ) {
@@ -487,7 +486,7 @@ namespace ElectricBaseboardRadiator {
 			ZoneEquipmentListChecked = true;
 			for ( Loop = 1; Loop <= NumElecBaseboards; ++Loop ) {
 				if ( CheckZoneEquipmentList( cCMO_BBRadiator_Electric, ElecBaseboard( Loop ).EquipName ) ) continue;
-				ShowSevereError( "InitBaseboard: Unit=[" + cCMO_BBRadiator_Electric + "," + trim( ElecBaseboard( Loop ).EquipName ) + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
+				ShowSevereError( "InitBaseboard: Unit=[" + cCMO_BBRadiator_Electric + ',' + ElecBaseboard( Loop ).EquipName + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
 			}
 		}
 
@@ -610,9 +609,9 @@ namespace ElectricBaseboardRadiator {
 						ReportSizingOutput( cCMO_BBRadiator_Electric, ElecBaseboard( BaseboardNum ).EquipName, "Design Size Nominal Capacity [W]", NominalCapacityDes, "User-Specified Nominal Capacity [W]", NominalCapacityUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( NominalCapacityDes - NominalCapacityUser ) / NominalCapacityUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeElecBaseboard: Potential issue with equipment sizing for " "ZoneHVAC:Baseboard:RadiantConvective:Electric=\"" + trim( ElecBaseboard( BaseboardNum ).EquipName ) + "\"." );
-								ShowContinueError( "User-Specified Nominal Capacity of " + trim( RoundSigDigits( NominalCapacityUser, 2 ) ) + " [W]" );
-								ShowContinueError( "differs from Design Size Nominal Capacity of " + trim( RoundSigDigits( NominalCapacityDes, 2 ) ) + " [W]" );
+								ShowMessage( "SizeElecBaseboard: Potential issue with equipment sizing for " "ZoneHVAC:Baseboard:RadiantConvective:Electric=\"" + ElecBaseboard( BaseboardNum ).EquipName + "\"." );
+								ShowContinueError( "User-Specified Nominal Capacity of " + RoundSigDigits( NominalCapacityUser, 2 ) + " [W]" );
+								ShowContinueError( "differs from Design Size Nominal Capacity of " + RoundSigDigits( NominalCapacityDes, 2 ) + " [W]" );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
@@ -958,18 +957,18 @@ namespace ElectricBaseboardRadiator {
 					QElecBaseboardSurf( SurfNum ) += ThisSurfIntensity;
 					if ( ThisSurfIntensity > MaxRadHeatFlux ) {
 						ShowSevereError( "DistributeBBElecRadGains:  excessive thermal radiation heat flux intensity detected" );
-						ShowContinueError( "Surface = " + trim( Surface( SurfNum ).Name ) );
-						ShowContinueError( "Surface area = " + trim( RoundSigDigits( Surface( SurfNum ).Area, 3 ) ) + " [m2]" );
-						ShowContinueError( "Occurs in " + cCMO_BBRadiator_Electric + " = " + trim( ElecBaseboard( BaseboardNum ).EquipName ) );
-						ShowContinueError( "Radiation intensity = " + trim( RoundSigDigits( ThisSurfIntensity, 2 ) ) + " [W/m2]" );
+						ShowContinueError( "Surface = " + Surface( SurfNum ).Name );
+						ShowContinueError( "Surface area = " + RoundSigDigits( Surface( SurfNum ).Area, 3 ) + " [m2]" );
+						ShowContinueError( "Occurs in " + cCMO_BBRadiator_Electric + " = " + ElecBaseboard( BaseboardNum ).EquipName );
+						ShowContinueError( "Radiation intensity = " + RoundSigDigits( ThisSurfIntensity, 2 ) + " [W/m2]" );
 						ShowContinueError( "Assign a larger surface area or more surfaces in " + cCMO_BBRadiator_Electric );
 						ShowFatalError( "DistributeBBElecRadGains:  excessive thermal radiation heat flux intensity detected" );
 					}
 				} else {
 					ShowSevereError( "DistributeBBElecRadGains:  surface not large enough to receive thermal radiation heat flux" );
-					ShowContinueError( "Surface = " + trim( Surface( SurfNum ).Name ) );
-					ShowContinueError( "Surface area = " + trim( RoundSigDigits( Surface( SurfNum ).Area, 3 ) ) + " [m2]" );
-					ShowContinueError( "Occurs in " + cCMO_BBRadiator_Electric + " = " + trim( ElecBaseboard( BaseboardNum ).EquipName ) );
+					ShowContinueError( "Surface = " + Surface( SurfNum ).Name );
+					ShowContinueError( "Surface area = " + RoundSigDigits( Surface( SurfNum ).Area, 3 ) + " [m2]" );
+					ShowContinueError( "Occurs in " + cCMO_BBRadiator_Electric + " = " + ElecBaseboard( BaseboardNum ).EquipName );
 					ShowContinueError( "Assign a larger surface area or more surfaces in " + cCMO_BBRadiator_Electric );
 					ShowFatalError( "DistributeBBElecRadGains:  surface not large enough to receive thermal radiation heat flux" );
 				}

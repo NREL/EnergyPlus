@@ -52,7 +52,7 @@ namespace BaseboardElectric {
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
-	Fstring const cCMO_BBRadiator_Electric( "ZoneHVAC:Baseboard:Convective:Electric" );
+	std::string const cCMO_BBRadiator_Electric( "ZoneHVAC:Baseboard:Convective:Electric" );
 	Real64 const SimpConvAirFlowSpeed( 0.5 ); // m/s
 
 	// DERIVED TYPE DEFINITIONS
@@ -71,7 +71,7 @@ namespace BaseboardElectric {
 
 	void
 	SimElectricBaseboard(
-		Fstring const & EquipName,
+		std::string const & EquipName,
 		int const ActualZoneNum,
 		int const ControlledZoneNum,
 		Real64 & PowerMet,
@@ -127,17 +127,17 @@ namespace BaseboardElectric {
 		if ( CompIndex == 0 ) {
 			BaseboardNum = FindItemInList( EquipName, Baseboard.EquipName(), NumBaseboards );
 			if ( BaseboardNum == 0 ) {
-				ShowFatalError( "SimElectricBaseboard: Unit not found=" + trim( EquipName ) );
+				ShowFatalError( "SimElectricBaseboard: Unit not found=" + EquipName );
 			}
 			CompIndex = BaseboardNum;
 		} else {
 			BaseboardNum = CompIndex;
 			if ( BaseboardNum > NumBaseboards || BaseboardNum < 1 ) {
-				ShowFatalError( "SimElectricBaseboard:  Invalid CompIndex passed=" + trim( TrimSigDigits( BaseboardNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumBaseboards ) ) + ", Entered Unit name=" + trim( EquipName ) );
+				ShowFatalError( "SimElectricBaseboard:  Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Number of Units=" + TrimSigDigits( NumBaseboards ) + ", Entered Unit name=" + EquipName );
 			}
 			if ( CheckEquipName( BaseboardNum ) ) {
 				if ( EquipName != Baseboard( BaseboardNum ).EquipName ) {
-					ShowFatalError( "SimElectricBaseboard: Invalid CompIndex passed=" + trim( TrimSigDigits( BaseboardNum ) ) + ", Unit name=" + trim( EquipName ) + ", stored Unit Name for that index=" + trim( Baseboard( BaseboardNum ).EquipName ) );
+					ShowFatalError( "SimElectricBaseboard: Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Unit name=" + EquipName + ", stored Unit Name for that index=" + Baseboard( BaseboardNum ).EquipName );
 				}
 				CheckEquipName( BaseboardNum ) = false;
 			}
@@ -189,7 +189,7 @@ namespace BaseboardElectric {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetBaseboardInput: " ); // include trailing blank space
+		static std::string const RoutineName( "GetBaseboardInput: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -242,12 +242,12 @@ namespace BaseboardElectric {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Baseboard.EquipName(), BaseboardNum, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+				VerifyName( cAlphaArgs( 1 ), Baseboard.EquipName(), BaseboardNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					continue;
 				}
-				VerifyUniqueBaseboardName( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), errFlag, trim( cCurrentModuleObject ) + " Name" );
+				VerifyUniqueBaseboardName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 				if ( errFlag ) {
 					ErrorsFound = true;
 				}
@@ -260,7 +260,7 @@ namespace BaseboardElectric {
 				} else {
 					Baseboard( BaseboardNum ).SchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 					if ( Baseboard( BaseboardNum ).SchedPtr == 0 ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 2 ) ) + " entered =" + trim( cAlphaArgs( 2 ) ) + " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) + " entered =" + cAlphaArgs( 2 ) + " for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					}
 				}
@@ -354,7 +354,7 @@ namespace BaseboardElectric {
 			ZoneEquipmentListChecked = true;
 			for ( Loop = 1; Loop <= NumBaseboards; ++Loop ) {
 				if ( CheckZoneEquipmentList( Baseboard( Loop ).EquipType, Baseboard( Loop ).EquipName ) ) continue;
-				ShowSevereError( "InitBaseboard: Unit=[" + trim( Baseboard( Loop ).EquipType ) + "," + trim( Baseboard( Loop ).EquipName ) + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
+				ShowSevereError( "InitBaseboard: Unit=[" + Baseboard( Loop ).EquipType + ',' + Baseboard( Loop ).EquipName + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
 			}
 		}
 
@@ -446,9 +446,9 @@ namespace BaseboardElectric {
 						ReportSizingOutput( cCMO_BBRadiator_Electric, Baseboard( BaseboardNum ).EquipName, "Design Size Nominal Capacity [W]", NominalCapacityDes, "User-Specified Nominal Capacity [W]", NominalCapacityUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( NominalCapacityDes - NominalCapacityUser ) / NominalCapacityUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeBaseboard: Potential issue with equipment sizing for ZoneHVAC:Baseboard:Convective:Electric=\"" + trim( Baseboard( BaseboardNum ).EquipName ) + "\"." );
-								ShowContinueError( "User-Specified Nominal Capacity of " + trim( RoundSigDigits( NominalCapacityUser, 2 ) ) + " [W]" );
-								ShowContinueError( "differs from Design Size Nominal Capacity of " + trim( RoundSigDigits( NominalCapacityDes, 2 ) ) + " [W]" );
+								ShowMessage( "SizeBaseboard: Potential issue with equipment sizing for ZoneHVAC:Baseboard:Convective:Electric=\"" + Baseboard( BaseboardNum ).EquipName + "\"." );
+								ShowContinueError( "User-Specified Nominal Capacity of " + RoundSigDigits( NominalCapacityUser, 2 ) + " [W]" );
+								ShowContinueError( "differs from Design Size Nominal Capacity of " + RoundSigDigits( NominalCapacityDes, 2 ) + " [W]" );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}

@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1A.hh>
 #include <ObjexxFCL/FArray2A.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -79,7 +78,7 @@ namespace TARCOGMain {
 		FArray1A< Real64 > hrgas, // Radiative part of gap effective conductivity (including in and out)
 		Real64 & shgc, // Solar heat gain coefficient – per ISO 15099
 		int & nperr, // Error code
-		Fstring & ErrorMessage, // To store error message from tarcog execution
+		std::string & ErrorMessage, // To store error message from tarcog execution
 		Real64 & shgct, // Solar heat gain coefficient – per old procedure
 		Real64 & tamb, // Outdoor environmental temperature [K]
 		Real64 & troom, // Indoor environmental temperature [K]
@@ -112,8 +111,8 @@ namespace TARCOGMain {
 		int const standard, // Calculation standard switch:
 		int const ThermalMod, // Thermal model:
 		int const Debug_mode, // Switch for debug output files:
-		Fstring const & Debug_dir, // Target directory for debug files
-		Fstring const & Debug_file, // File name template for debug files
+		std::string const & Debug_dir, // Target directory for debug files
+		std::string const & Debug_file, // File name template for debug files
 		int const win_ID, // ID of window (passed by W6)
 		int const igu_ID, // ID of the IGU (passed by W6)
 		Real64 & ShadeEmisRatioOut, // Ratio of modified to glass emissivity at the outermost glazing surface

@@ -38,7 +38,7 @@ namespace DataReportingFlags {
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumOfWarmupDays( 0 ); // reinitialized for each environment.
-	Fstring cWarmupDay( 15 );
+	std::string cWarmupDay;
 	bool DisplayPerfSimulationFlag( false ); // True when "Performing Simulation" should be displayed
 	bool DoWeatherInitReporting( false ); // Init reporting -- items that go onto OutputFileInits
 	bool PrintEndDataDictionary( false ); // Flag for printing "End of Data Dictionary" on output files

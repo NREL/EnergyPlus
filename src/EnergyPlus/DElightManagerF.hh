@@ -1,8 +1,8 @@
 #ifndef DElightManagerF_hh_INCLUDED
 #define DElightManagerF_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Fstring.hh>
+// C++ Headers
+#include <string>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -28,7 +28,7 @@ namespace DElightManagerF {
 	void
 	DElightElecLtgCtrl(
 		int const iNameLength,
-		Fstring const & cZoneName,
+		std::string const & cZoneName,
 		Real64 const dBldgLat,
 		Real64 const dHISKF,
 		Real64 const dHISUNF,
@@ -52,8 +52,8 @@ namespace DElightManagerF {
 	void
 	SetupDElightOutput4EPlus();
 
-	Fstring
-	ReplaceBlanksWithUnderscores( Fstring const & InputString ); // Input String
+	std::string
+	ReplaceBlanksWithUnderscores( std::string const & InputString ); // Input String
 
 	//     NOTICE
 

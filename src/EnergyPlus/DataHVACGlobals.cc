@@ -21,7 +21,6 @@ namespace DataHVACGlobals {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// -only module should be available to other modules and routines.
@@ -30,13 +29,13 @@ namespace DataHVACGlobals {
 	// MODULE PARAMETER DEFINITIONS:
 
 	Real64 const SmallTempDiff( 1.0E-5 );
-	Real64 const SmallMassFlow( .001 );
+	Real64 const SmallMassFlow( 0.001 );
 	Real64 const VerySmallMassFlow( 1.0E-30 );
 	Real64 const SmallLoad( 1.0 );
 	Real64 const TempControlTol( 0.1 ); // temperature control tolerance for packaged equip. [deg C]
 	Real64 const SmallAirVolFlow( 0.001 );
-	Real64 const SmallWaterVolFlow( 1.e-9 );
-	Real64 const BlankNumeric( -99999. ); // indicates numeric input field was blank
+	Real64 const SmallWaterVolFlow( 1.0E-9 );
+	Real64 const BlankNumeric( -99999.0 ); // indicates numeric input field was blank
 	Real64 const RetTempMax( 60.0 ); // maximum return air temperature [deg C]
 	Real64 const RetTempMin( -30.0 ); // minimum return air temperature [deg C]
 
@@ -94,7 +93,7 @@ namespace DataHVACGlobals {
 	int const BypassWhenWithinEconomizerLimits( 0 ); // heat recovery controlled by economizer limits
 	int const BypassWhenOAFlowGreaterThanMinimum( 1 ); // heat recovery ON at minimum OA in economizer mode
 
-	FArray1D_Fstring const cFanTypes( NumAllFanTypes, sFstring( 24 ), { "Fan:ConstantVolume      ", "Fan:VariableVolume      ", "Fan:OnOff               ", "Fan:ZoneExhaust         ", "Fan:ComponentModel      " } ); // cpw22Aug2010 | cpw22Aug2010 (new)
+	FArray1D_string const cFanTypes( NumAllFanTypes, { "Fan:ConstantVolume", "Fan:VariableVolume", "Fan:OnOff", "Fan:ZoneExhaust", "Fan:ComponentModel" } ); // cpw22Aug2010 | cpw22Aug2010 (new)
 
 	// parameters describing unitary systems
 	int const NumUnitarySystemTypes( 7 );
@@ -106,7 +105,7 @@ namespace DataHVACGlobals {
 	int const UnitarySys_HeatPump_AirToAir( 5 );
 	int const UnitarySys_HeatPump_WaterToAir( 6 );
 	int const UnitarySystem_AnyCoilType( 7 );
-	FArray1D_Fstring const cFurnaceTypes( NumUnitarySystemTypes, sFstring( 38 ), { "AirLoopHVAC:Unitary:Furnace:HeatOnly  ", "AirLoopHVAC:Unitary:Furnace:HeatCool  ", "AirLoopHVAC:UnitaryHeatOnly           ", "AirLoopHVAC:UnitaryHeatCool           ", "AirLoopHVAC:UnitaryHeatPump:AirToAir  ", "AirLoopHVAC:UnitaryHeatPump:WaterToAir", "AirLoopHVAC:UnitarySystem             " } );
+	FArray1D_string const cFurnaceTypes( NumUnitarySystemTypes, { "AirLoopHVAC:Unitary:Furnace:HeatOnly", "AirLoopHVAC:Unitary:Furnace:HeatCool", "AirLoopHVAC:UnitaryHeatOnly", "AirLoopHVAC:UnitaryHeatCool", "AirLoopHVAC:UnitaryHeatPump:AirToAir", "AirLoopHVAC:UnitaryHeatPump:WaterToAir", "AirLoopHVAC:UnitarySystem" } );
 
 	// parameters describing coil types
 	int const NumAllCoilTypes( 29 );
@@ -157,30 +156,30 @@ namespace DataHVACGlobals {
 	int const WaterConstant( 2 ); // water flow is constant
 	int const WaterConstantOnDemand( 3 ); // water flow is constant whenever the coil is operational - this is the only method used in EP V7.2 and earlier
 
-	FArray1D_Fstring const cAllCoilTypes( NumAllCoilTypes, sFstring( 56 ), { "Coil:Cooling:DX:SingleSpeed                             ", "Coil:Heating:DX:SingleSpeed                             ", "Coil:Cooling:DX:TwoSpeed                                ", "CoilSystem:Cooling:DX:HeatExchangerAssisted             ", "Coil:Cooling:DX:TwoStageWithHumidityControlMode         ", "Coil:WaterHeating:AirToWaterHeatPump                    ", "Coil:Cooling:DX:MultiSpeed                              ", "Coil:Heating:DX:MultiSpeed                              ", "Coil:Heating:Gas                                        ", "Coil:Heating:Gas:MultiStage                             ", "Coil:Heating:Electric                                   ", "Coil:Heating:Electric:MultiStage                        ", "Coil:Heating:Desuperheater                              ", "Coil:Cooling:Water                                      ", "Coil:Cooling:Water:DetailedGeometry                     ", "Coil:Heating:Water                                      ", "Coil:Heating:Steam                                      ", "CoilSystem:Cooling:Water:HeatExchangerAssisted          ", "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation     ", "Coil:Heating:WaterToAirHeatPump:ParameterEstimation     ", "Coil:Cooling:WaterToAirHeatPump:EquationFit             ", "Coil:Heating:WaterToAirHeatPump:EquationFit             ", "Coil:Cooling:DX:VariableRefrigerantFlow                 ", "Coil:Heating:DX:VariableRefrigerantFlow                 ", "Coil:Cooling:DX:SingleSpeed:ThermalStorage              ", "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Cooling:DX:VariableSpeed                           ", "Coil:Heating:DX:VariableSpeed                           " } );
+	FArray1D_string const cAllCoilTypes( NumAllCoilTypes, { "Coil:Cooling:DX:SingleSpeed", "Coil:Heating:DX:SingleSpeed", "Coil:Cooling:DX:TwoSpeed", "CoilSystem:Cooling:DX:HeatExchangerAssisted", "Coil:Cooling:DX:TwoStageWithHumidityControlMode", "Coil:WaterHeating:AirToWaterHeatPump", "Coil:Cooling:DX:MultiSpeed", "Coil:Heating:DX:MultiSpeed", "Coil:Heating:Gas", "Coil:Heating:Gas:MultiStage", "Coil:Heating:Electric", "Coil:Heating:Electric:MultiStage", "Coil:Heating:Desuperheater", "Coil:Cooling:Water", "Coil:Cooling:Water:DetailedGeometry", "Coil:Heating:Water", "Coil:Heating:Steam", "CoilSystem:Cooling:Water:HeatExchangerAssisted", "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation", "Coil:Heating:WaterToAirHeatPump:ParameterEstimation", "Coil:Cooling:WaterToAirHeatPump:EquationFit", "Coil:Heating:WaterToAirHeatPump:EquationFit", "Coil:Cooling:DX:VariableRefrigerantFlow", "Coil:Heating:DX:VariableRefrigerantFlow", "Coil:Cooling:DX:SingleSpeed:ThermalStorage", "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Cooling:DX:VariableSpeed", "Coil:Heating:DX:VariableSpeed" } );
 
 	// parameters describing coil performance types
 	int const CoilPerfDX_CoolBypassEmpirical( 100 );
 
 	// Airflow per total capacity range (Regular DX coils)
-	Real64 const MaxRatedVolFlowPerRatedTotCap1(0.00006041); // m3/s per watt = 450 cfm/ton
-	Real64 const MinRatedVolFlowPerRatedTotCap1(0.00004027); // m3/s per watt = 300 cfm/ton
-	Real64 const MaxHeatVolFlowPerRatedTotCap1(0.00008056); // m3/s per watt = 600 cfm/ton
-	Real64 const MaxCoolVolFlowPerRatedTotCap1(0.00006713); // m3/s per watt = 500 cfm/ton
-	Real64 const MinOperVolFlowPerRatedTotCap1(0.00002684); // m3/s per watt = 200 cfm/ton
+	Real64 const MaxRatedVolFlowPerRatedTotCap1( 0.00006041 ); // m3/s per watt = 450 cfm/ton
+	Real64 const MinRatedVolFlowPerRatedTotCap1( 0.00004027 ); // m3/s per watt = 300 cfm/ton
+	Real64 const MaxHeatVolFlowPerRatedTotCap1( 0.00008056 ); // m3/s per watt = 600 cfm/ton
+	Real64 const MaxCoolVolFlowPerRatedTotCap1( 0.00006713 ); // m3/s per watt = 500 cfm/ton
+	Real64 const MinOperVolFlowPerRatedTotCap1( 0.00002684 ); // m3/s per watt = 200 cfm/ton
 
 	// 100% DOAS DX coils Airflow per total capacity ratio
-	Real64 const MaxRatedVolFlowPerRatedTotCap2(0.00003355); // m3/s per watt = 250 cfm/ton
-	Real64 const MinRatedVolFlowPerRatedTotCap2(0.00001677); // m3/s per watt = 125 cfm/ton
-	Real64 const MaxHeatVolFlowPerRatedTotCap2(0.00004026); // m3/s per watt = 300 cfm/ton
-	Real64 const MaxCoolVolFlowPerRatedTotCap2(0.00004026); // m3/s per watt = 300 cfm/ton
-	Real64 const MinOperVolFlowPerRatedTotCap2(0.00001342); // m3/s per watt = 100 cfm/ton
+	Real64 const MaxRatedVolFlowPerRatedTotCap2( 0.00003355 ); // m3/s per watt = 250 cfm/ton
+	Real64 const MinRatedVolFlowPerRatedTotCap2( 0.00001677 ); // m3/s per watt = 125 cfm/ton
+	Real64 const MaxHeatVolFlowPerRatedTotCap2( 0.00004026 ); // m3/s per watt = 300 cfm/ton
+	Real64 const MaxCoolVolFlowPerRatedTotCap2( 0.00004026 ); // m3/s per watt = 300 cfm/ton
+	Real64 const MinOperVolFlowPerRatedTotCap2( 0.00001342 ); // m3/s per watt = 100 cfm/ton
 
-	FArray1D< Real64 > MaxRatedVolFlowPerRatedTotCap(2, { MaxRatedVolFlowPerRatedTotCap1, MaxRatedVolFlowPerRatedTotCap2 });
-	FArray1D< Real64 > MinRatedVolFlowPerRatedTotCap(2, { MinRatedVolFlowPerRatedTotCap1, MinRatedVolFlowPerRatedTotCap2 });
-	FArray1D< Real64 > MaxHeatVolFlowPerRatedTotCap(2, { MaxHeatVolFlowPerRatedTotCap1, MaxHeatVolFlowPerRatedTotCap2 });
-	FArray1D< Real64 > MaxCoolVolFlowPerRatedTotCap(2, { MaxCoolVolFlowPerRatedTotCap1, MaxCoolVolFlowPerRatedTotCap2 });
-	FArray1D< Real64 > MinOperVolFlowPerRatedTotCap(2, { MinOperVolFlowPerRatedTotCap1, MinOperVolFlowPerRatedTotCap2 });
+	FArray1D< Real64 > MaxRatedVolFlowPerRatedTotCap( 2, { MaxRatedVolFlowPerRatedTotCap1, MaxRatedVolFlowPerRatedTotCap2 } );
+	FArray1D< Real64 > MinRatedVolFlowPerRatedTotCap( 2, { MinRatedVolFlowPerRatedTotCap1, MinRatedVolFlowPerRatedTotCap2 } );
+	FArray1D< Real64 > MaxHeatVolFlowPerRatedTotCap( 2, { MaxHeatVolFlowPerRatedTotCap1, MaxHeatVolFlowPerRatedTotCap2 } );
+	FArray1D< Real64 > MaxCoolVolFlowPerRatedTotCap( 2, { MaxCoolVolFlowPerRatedTotCap1, MaxCoolVolFlowPerRatedTotCap2 } );
+	FArray1D< Real64 > MinOperVolFlowPerRatedTotCap( 2, { MinOperVolFlowPerRatedTotCap1, MinOperVolFlowPerRatedTotCap2 } );
 
 	// dx coil type (DXCT)
 	int const RegularDXCoil(1); // Regular DX coils or mixed air dx coils
@@ -194,7 +193,7 @@ namespace DataHVACGlobals {
 	int const HX_AIRTOAIR_GENERIC( 2 );
 	int const HX_DESICCANT_BALANCED( 3 );
 
-	FArray1D_Fstring const cHXTypes( NumHXTypes, sFstring( 43 ), { "HeatExchanger:AirToAir:FlatPlate           ", "HeatExchanger:AirToAir:SensibleAndLatent   ", "HeatExchanger:Desiccant:BalancedFlow       " } );
+	FArray1D_string const cHXTypes( NumHXTypes, { "HeatExchanger:AirToAir:FlatPlate", "HeatExchanger:AirToAir:SensibleAndLatent", "HeatExchanger:Desiccant:BalancedFlow" } );
 
 	// Parameters describing air terminal mixers
 	int const NumATMixerTypes( 2 );
@@ -203,7 +202,7 @@ namespace DataHVACGlobals {
 	int const ATMixer_InletSide( 1 );
 	int const ATMixer_SupplySide( 2 );
 
-	FArray1D_Fstring const cATMixerTypes( NumATMixerTypes, sFstring( 48 ), { "AirTerminal:SingleDuct:InletSideMixer           ", "AirTerminal:SingleDuct:SupplySideMixer          " } );
+	FArray1D_string const cATMixerTypes( NumATMixerTypes, { "AirTerminal:SingleDuct:InletSideMixer", "AirTerminal:SingleDuct:SupplySideMixer" } );
 	bool const ATMixerExists( true );
 
 	// Parameters describing variable refrigerant flow terminal unit types
@@ -211,14 +210,14 @@ namespace DataHVACGlobals {
 
 	int const VRFTUType_ConstVolume( 1 );
 
-	FArray1D_Fstring const cVRFTUTypes( NumVRFTUTypes, sFstring( 45 ), "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow" );
+	FArray1D_string const cVRFTUTypes( NumVRFTUTypes, std::string( "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow" ) );
 
 	// VRF Heating Performance Curve Temperature Type
 	int const NumVRFHeatingPerformanceOATTypes( 2 );
 	int const WetBulbIndicator( 1 );
 	int const DryBulbIndicator( 2 );
 
-	FArray1D_Fstring const cVRFHeatingPerformanceOATTypes( NumVRFHeatingPerformanceOATTypes, sFstring( 18 ), { "WetBulbTemperature", "DryBulbTemperature" } );
+	FArray1D_string const cVRFHeatingPerformanceOATTypes( NumVRFHeatingPerformanceOATTypes, { "WetBulbTemperature", "DryBulbTemperature" } );
 
 	// parameter concerning the amount of change in zone temperature is needed
 	// for oscillation of zone temperature to be detected.

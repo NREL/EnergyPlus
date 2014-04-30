@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -16,12 +15,11 @@ namespace EnergyPlus {
 namespace FluidCoolers {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
-	extern Fstring const cFluidCooler_SingleSpeed;
-	extern Fstring const cFluidCooler_TwoSpeed;
+	extern std::string const cFluidCooler_SingleSpeed;
+	extern std::string const cFluidCooler_TwoSpeed;
 
 	extern int const PIM_NominalCapacity;
 	extern int const PIM_UFactor;
@@ -68,8 +66,8 @@ namespace FluidCoolers {
 	struct FluidCoolerspecs
 	{
 		// Members
-		Fstring Name; // User identifier
-		Fstring FluidCoolerType; // Type of fluid cooler
+		std::string Name; // User identifier
+		std::string FluidCoolerType; // Type of fluid cooler
 		int FluidCoolerType_Num;
 		int PerformanceInputMethod_Num;
 		bool Available; // need an array of logicals--load identifiers of available equipment
@@ -114,8 +112,6 @@ namespace FluidCoolers {
 
 		// Default Constructor
 		FluidCoolerspecs() :
-			Name( MaxNameLength ),
-			FluidCoolerType( MaxNameLength ),
 			FluidCoolerType_Num( 0 ),
 			PerformanceInputMethod_Num( 0 ),
 			Available( true ),
@@ -160,8 +156,8 @@ namespace FluidCoolers {
 
 		// Member Constructor
 		FluidCoolerspecs(
-			Fstring const & Name, // User identifier
-			Fstring const & FluidCoolerType, // Type of fluid cooler
+			std::string const & Name, // User identifier
+			std::string const & FluidCoolerType, // Type of fluid cooler
 			int const FluidCoolerType_Num,
 			int const PerformanceInputMethod_Num,
 			bool const Available, // need an array of logicals--load identifiers of available equipment
@@ -203,8 +199,8 @@ namespace FluidCoolers {
 			int const BranchNum,
 			int const CompNum
 		) :
-			Name( MaxNameLength, Name ),
-			FluidCoolerType( MaxNameLength, FluidCoolerType ),
+			Name( Name ),
+			FluidCoolerType( FluidCoolerType ),
 			FluidCoolerType_Num( FluidCoolerType_Num ),
 			PerformanceInputMethod_Num( PerformanceInputMethod_Num ),
 			Available( Available ),
@@ -332,8 +328,8 @@ namespace FluidCoolers {
 
 	void
 	SimFluidCoolers(
-		Fstring & FluidCoolerType,
-		Fstring & FluidCoolerName,
+		std::string & FluidCoolerType,
+		std::string & FluidCoolerName,
 		int & CompIndex,
 		bool & RunFlag,
 		bool const InitLoopEquip,

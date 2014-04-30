@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -15,7 +14,6 @@ namespace EnergyPlus {
 namespace TranspiredCollector {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 	using DataVectorTypes::Vector;
 
 	// Data
@@ -40,8 +38,8 @@ namespace TranspiredCollector {
 	{
 		// Members
 		// from input data
-		Fstring Name;
-		Fstring OSCMName; // OtherSideConditionsModel
+		std::string Name;
+		std::string OSCMName; // OtherSideConditionsModel
 		int OSCMPtr; // OtherSideConditionsModel index
 		int SchedPtr; // Availablity schedule
 		FArray1D_int InletNode; // Air system node "pointer", should be set to outdoor air
@@ -109,8 +107,6 @@ namespace TranspiredCollector {
 
 		// Default Constructor
 		UTSCDataStruct() :
-			Name( MaxNameLength ),
-			OSCMName( MaxNameLength ),
 			OSCMPtr( 0 ),
 			SchedPtr( 0 ),
 			Layout( 0 ),
@@ -172,8 +168,8 @@ namespace TranspiredCollector {
 
 		// Member Constructor
 		UTSCDataStruct(
-			Fstring const & Name,
-			Fstring const & OSCMName, // OtherSideConditionsModel
+			std::string const & Name,
+			std::string const & OSCMName, // OtherSideConditionsModel
 			int const OSCMPtr, // OtherSideConditionsModel index
 			int const SchedPtr, // Availablity schedule
 			FArray1_int const & InletNode, // Air system node "pointer", should be set to outdoor air
@@ -237,8 +233,8 @@ namespace TranspiredCollector {
 			Real64 const UTSCEfficiency, // Total Efficiency (with wall) SensHeatingRate/IncidentRadiation[--]
 			Real64 const UTSCCollEff // Collector-only Efficiency [--]
 		) :
-			Name( MaxNameLength, Name ),
-			OSCMName( MaxNameLength, OSCMName ),
+			Name( Name ),
+			OSCMName( OSCMName ),
 			OSCMPtr( OSCMPtr ),
 			SchedPtr( SchedPtr ),
 			InletNode( InletNode ),
@@ -312,7 +308,7 @@ namespace TranspiredCollector {
 
 	void
 	SimTranspiredCollector(
-		Fstring const & CompName, // component name
+		std::string const & CompName, // component name
 		int & CompIndex // component index (to reduce string compares during simulation)
 	);
 

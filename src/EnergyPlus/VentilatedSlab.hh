@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,13 +13,12 @@ namespace EnergyPlus {
 namespace VentilatedSlab {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
 
 	// Module Object
-	extern Fstring const cMO_VentilatedSlab;
+	extern std::string const cMO_VentilatedSlab;
 
 	// Parameters for outside air control types:
 	extern int const Heating_ElectricCoilType;
@@ -88,24 +86,24 @@ namespace VentilatedSlab {
 	{
 		// Members
 		// Input data
-		Fstring Name; // name of system
-		Fstring SchedName; // availability schedule
+		std::string Name; // name of system
+		std::string SchedName; // availability schedule
 		int SchedPtr; // index to schedule
-		Fstring ZoneName; // Name of zone the system is serving
+		std::string ZoneName; // Name of zone the system is serving
 		int ZonePtr; // Point to this zone in the Zone derived type
 		// Variables for Delivery Config.
-		FArray1D_Fstring ZName; // Name of zone the system is serving
+		FArray1D_string ZName; // Name of zone the system is serving
 		FArray1D_int ZPtr; // Point to this zone in the Zone derived type
-		Fstring SurfListName; // Name of surface/surface list that is the radiant system
+		std::string SurfListName; // Name of surface/surface list that is the radiant system
 		int NumOfSurfaces; // Number of surfaces included in this system (coordinated control)
 		FArray1D_int SurfacePtr; // Pointer to the slabs in the Surface derived type
-		FArray1D_Fstring SurfaceName; // Name of surfaces that are the radiant system (can be one or more)
+		FArray1D_string SurfaceName; // Name of surfaces that are the radiant system (can be one or more)
 		FArray1D< Real64 > SurfaceFlowFrac; // Fraction of flow/pipe length for a particular surface
 		FArray1D< Real64 > CDiameter; // Number of core diameter
 		FArray1D< Real64 > CLength; // Number of core length
 		FArray1D< Real64 > CNumbers; // Number of core numbers
-		FArray1D_Fstring SlabIn; // Name of node that is slab inlet node
-		FArray1D_Fstring SlabOut; // Name of node that is slab outlet node
+		FArray1D_string SlabIn; // Name of node that is slab inlet node
+		FArray1D_string SlabOut; // Name of node that is slab outlet node
 		Real64 TotalSurfaceArea; // Total surface area for all surfaces that are part of this system
 		Real64 CoreDiameter; // tube diameter for embedded tubing
 		Real64 CoreLength; // tube length embedded in radiant surface
@@ -119,18 +117,18 @@ namespace VentilatedSlab {
 		// (assumes fan is upstream of heating coil)
 		int MSlabInNode;
 		int MSlabOutNode;
-		Fstring FanName; // name of fan
+		std::string FanName; // name of fan
 		int Fan_Index;
 		int ControlCompTypeNum;
 		int CompErrIndex;
 		Real64 MaxAirVolFlow; // m3/s
 		Real64 MaxAirMassFlow; // kg/s
 		int OAControlType; // type of control; options are VARIABLE PERCENT and FIXED TEMPERATURE
-		Fstring MinOASchedName; // schedule of fraction for minimum outside air (all controls)
+		std::string MinOASchedName; // schedule of fraction for minimum outside air (all controls)
 		int MinOASchedPtr; // index to schedule
-		Fstring MaxOASchedName; // schedule of percentages for maximum outside air fraction (variable %)
+		std::string MaxOASchedName; // schedule of percentages for maximum outside air fraction (variable %)
 		int MaxOASchedPtr; // index to schedule
-		Fstring TempSchedName; // schedule of temperatures for desired "mixed air"
+		std::string TempSchedName; // schedule of temperatures for desired "mixed air"
 		// temperature (fixed temp.)
 		int TempSchedPtr; // index to schedule
 		int OutsideAirNode; // outside air node number
@@ -144,12 +142,12 @@ namespace VentilatedSlab {
 		int CoilOption; // type of coil option; options are BOTH, HEATING, COOLING, AND NONE
 		bool HCoilPresent; // .TRUE. if ventilated slab has a heating coil
 		int HCoilType; // type of heating coil (water, gas, electric, etc.)
-		Fstring HCoilName; // name of heating coil
-		Fstring HCoilTypeCh; // type of heating coil (character string)
+		std::string HCoilName; // name of heating coil
+		std::string HCoilTypeCh; // type of heating coil (character string)
 		int HCoil_Index;
 		int HCoil_PlantTypeNum;
 		int HCoil_FluidIndex;
-		Fstring HCoilSchedName; // availability schedule for the heating coil
+		std::string HCoilSchedName; // availability schedule for the heating coil
 		int HCoilSchedPtr; // index to schedule
 		Real64 HCoilSchedValue;
 		Real64 MaxVolHotWaterFlow; // m3/s
@@ -167,29 +165,29 @@ namespace VentilatedSlab {
 		int HWLoopSide; // index for plant loop side for hot water coil
 		int HWBranchNum; // index for plant branch for hot water coil
 		int HWCompNum; // index for plant component for hot water coil
-		Fstring HotAirHiTempSched; // Schedule name for the highest Air temperature
+		std::string HotAirHiTempSched; // Schedule name for the highest Air temperature
 		int HotAirHiTempSchedPtr; // Schedule index for the highest Air temperature
-		Fstring HotAirLoTempSched; // Schedule name for the lowest Air temperature
+		std::string HotAirLoTempSched; // Schedule name for the lowest Air temperature
 		int HotAirLoTempSchedPtr; // Schedule index for the lowest Air temperature
-		Fstring HotCtrlHiTempSched; // Schedule name for the highest control temperature
+		std::string HotCtrlHiTempSched; // Schedule name for the highest control temperature
 		// (where the lowest Air temperature is requested)
 		int HotCtrlHiTempSchedPtr; // Schedule index for the highest control temperature
 		// (where the lowest Air temperature is requested)
-		Fstring HotCtrlLoTempSched; // Schedule name for the lowest control temperature
+		std::string HotCtrlLoTempSched; // Schedule name for the lowest control temperature
 		// (where the highest Air temperature is requested)
 		int HotCtrlLoTempSchedPtr; // Schedule index for the lowest control temperature
 		// (where the highest Air temperature is requested)
 		bool CCoilPresent; // .TRUE. if ventilated slab has a cooling coil
-		Fstring CCoilName; // name of cooling coil
-		Fstring CCoilTypeCh; // type of cooling coil (character string)
+		std::string CCoilName; // name of cooling coil
+		std::string CCoilTypeCh; // type of cooling coil (character string)
 		int CCoil_Index;
-		Fstring CCoilPlantName; // name of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
-		Fstring CCoilPlantType; // type of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
+		std::string CCoilPlantName; // name of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
+		std::string CCoilPlantType; // type of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
 		int CCoil_PlantTypeNum;
 		int CCoilType; // type of cooling coil:
 		// 'Coil:Cooling:Water:DetailedGeometry' or
 		// 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
-		Fstring CCoilSchedName; // availability schedule for the cooling coil
+		std::string CCoilSchedName; // availability schedule for the cooling coil
 		int CCoilSchedPtr; // index to schedule
 		Real64 CCoilSchedValue;
 		Real64 MaxVolColdWaterFlow; // m3/s
@@ -203,15 +201,15 @@ namespace VentilatedSlab {
 		int CWLoopSide; // index for plant loop side for chilled water coil
 		int CWBranchNum; // index for plant branch for chilled water coil
 		int CWCompNum; // index for plant component for chilled water coil
-		Fstring ColdAirHiTempSched; // Schedule name for the highest air temperature
+		std::string ColdAirHiTempSched; // Schedule name for the highest air temperature
 		int ColdAirHiTempSchedPtr; // Schedule index for the highest Air temperature
-		Fstring ColdAirLoTempSched; // Schedule name for the lowest Air temperature
+		std::string ColdAirLoTempSched; // Schedule name for the lowest Air temperature
 		int ColdAirLoTempSchedPtr; // Schedule index for the lowest Air temperature
-		Fstring ColdCtrlHiTempSched; // Schedule name for the highest control temperature
+		std::string ColdCtrlHiTempSched; // Schedule name for the highest control temperature
 		// (where the lowest Air temperature is requested)
 		int ColdCtrlHiTempSchedPtr; // Schedule index for the highest control temperature
 		// (where the lowest Air temperature is requested)
-		Fstring ColdCtrlLoTempSched; // Schedule name for the lowest control temperature
+		std::string ColdCtrlLoTempSched; // Schedule name for the lowest control temperature
 		// (where the highest Air temperature is requested)
 		int ColdCtrlLoTempSchedPtr; // Schedule index for the lowest control temperature
 		// (where the highest Air temperature is requested)
@@ -220,8 +218,8 @@ namespace VentilatedSlab {
 		int RadSurfNum; // Radiant Surface Number
 		int MSlabIn; // Internal Slab Inlet Node Number
 		int MSlabOut; // INternal Slab Outlet Node Number
-		Fstring DSSlabInNodeName;
-		Fstring DSSlabOutNodeName;
+		std::string DSSlabInNodeName;
+		std::string DSSlabOutNodeName;
 		// Report data
 		Real64 DirectHeatLossPower; // system direct heat loss in W
 		Real64 DirectHeatLossEnergy; // system direct heat loss in J
@@ -249,22 +247,14 @@ namespace VentilatedSlab {
 		Real64 ReturnAirTemp;
 		Real64 FanOutletTemp; // FanOutlet temp in degree C
 		Real64 ZoneInletTemp; // supply air temp
-		Fstring AvailManagerListName; // Name of an availability manager list object
+		std::string AvailManagerListName; // Name of an availability manager list object
 		int AvailStatus;
 
 		// Default Constructor
 		VentilatedSlabData() :
-			Name( MaxNameLength ),
-			SchedName( MaxNameLength ),
 			SchedPtr( 0 ),
-			ZoneName( MaxNameLength ),
 			ZonePtr( 0 ),
-			ZName( sFstring( MaxNameLength ) ),
-			SurfListName( MaxNameLength ),
 			NumOfSurfaces( 0 ),
-			SurfaceName( sFstring( MaxNameLength ) ),
-			SlabIn( sFstring( MaxNameLength ) ),
-			SlabOut( sFstring( MaxNameLength ) ),
 			TotalSurfaceArea( 0.0 ),
 			CoreDiameter( 0.0 ),
 			CoreLength( 0.0 ),
@@ -276,18 +266,14 @@ namespace VentilatedSlab {
 			FanOutletNode( 0 ),
 			MSlabInNode( 0 ),
 			MSlabOutNode( 0 ),
-			FanName( MaxNameLength ),
 			Fan_Index( 0 ),
 			ControlCompTypeNum( 0 ),
 			CompErrIndex( 0 ),
 			MaxAirVolFlow( 0.0 ),
 			MaxAirMassFlow( 0.0 ),
 			OAControlType( 0 ),
-			MinOASchedName( MaxNameLength ),
 			MinOASchedPtr( 0 ),
-			MaxOASchedName( MaxNameLength ),
 			MaxOASchedPtr( 0 ),
-			TempSchedName( MaxNameLength ),
 			TempSchedPtr( 0 ),
 			OutsideAirNode( 0 ),
 			AirReliefNode( 0 ),
@@ -300,12 +286,9 @@ namespace VentilatedSlab {
 			CoilOption( 0 ),
 			HCoilPresent( false ),
 			HCoilType( 0 ),
-			HCoilName( MaxNameLength ),
-			HCoilTypeCh( MaxNameLength ),
 			HCoil_Index( 0 ),
 			HCoil_PlantTypeNum( 0 ),
 			HCoil_FluidIndex( 0 ),
-			HCoilSchedName( MaxNameLength ),
 			HCoilSchedPtr( 0 ),
 			HCoilSchedValue( 0.0 ),
 			MaxVolHotWaterFlow( 0.0 ),
@@ -323,23 +306,14 @@ namespace VentilatedSlab {
 			HWLoopSide( 0 ),
 			HWBranchNum( 0 ),
 			HWCompNum( 0 ),
-			HotAirHiTempSched( MaxNameLength ),
 			HotAirHiTempSchedPtr( 0 ),
-			HotAirLoTempSched( MaxNameLength ),
 			HotAirLoTempSchedPtr( 0 ),
-			HotCtrlHiTempSched( MaxNameLength ),
 			HotCtrlHiTempSchedPtr( 0 ),
-			HotCtrlLoTempSched( MaxNameLength ),
 			HotCtrlLoTempSchedPtr( 0 ),
 			CCoilPresent( false ),
-			CCoilName( MaxNameLength ),
-			CCoilTypeCh( MaxNameLength ),
 			CCoil_Index( 0 ),
-			CCoilPlantName( MaxNameLength ),
-			CCoilPlantType( MaxNameLength ),
 			CCoil_PlantTypeNum( 0 ),
 			CCoilType( 0 ),
-			CCoilSchedName( MaxNameLength ),
 			CCoilSchedPtr( 0 ),
 			CCoilSchedValue( 0.0 ),
 			MaxVolColdWaterFlow( 0.0 ),
@@ -353,21 +327,15 @@ namespace VentilatedSlab {
 			CWLoopSide( 0 ),
 			CWBranchNum( 0 ),
 			CWCompNum( 0 ),
-			ColdAirHiTempSched( MaxNameLength ),
 			ColdAirHiTempSchedPtr( 0 ),
-			ColdAirLoTempSched( MaxNameLength ),
 			ColdAirLoTempSchedPtr( 0 ),
-			ColdCtrlHiTempSched( MaxNameLength ),
 			ColdCtrlHiTempSchedPtr( 0 ),
-			ColdCtrlLoTempSched( MaxNameLength ),
 			ColdCtrlLoTempSchedPtr( 0 ),
 			CondErrIndex( 0 ),
 			EnrgyImbalErrIndex( 0 ),
 			RadSurfNum( 0 ),
 			MSlabIn( 0 ),
 			MSlabOut( 0 ),
-			DSSlabInNodeName( MaxNameLength ),
-			DSSlabOutNodeName( MaxNameLength ),
 			DirectHeatLossPower( 0.0 ),
 			DirectHeatLossEnergy( 0.0 ),
 			DirectHeatGainPower( 0.0 ),
@@ -394,29 +362,28 @@ namespace VentilatedSlab {
 			ReturnAirTemp( 0.0 ),
 			FanOutletTemp( 0.0 ),
 			ZoneInletTemp( 0.0 ),
-			AvailManagerListName( MaxNameLength ),
 			AvailStatus( 0 )
 		{}
 
 		// Member Constructor
 		VentilatedSlabData(
-			Fstring const & Name, // name of system
-			Fstring const & SchedName, // availability schedule
+			std::string const & Name, // name of system
+			std::string const & SchedName, // availability schedule
 			int const SchedPtr, // index to schedule
-			Fstring const & ZoneName, // Name of zone the system is serving
+			std::string const & ZoneName, // Name of zone the system is serving
 			int const ZonePtr, // Point to this zone in the Zone derived type
-			FArray1_Fstring const & ZName, // Name of zone the system is serving
+			FArray1_string const & ZName, // Name of zone the system is serving
 			FArray1_int const & ZPtr, // Point to this zone in the Zone derived type
-			Fstring const & SurfListName, // Name of surface/surface list that is the radiant system
+			std::string const & SurfListName, // Name of surface/surface list that is the radiant system
 			int const NumOfSurfaces, // Number of surfaces included in this system (coordinated control)
 			FArray1_int const & SurfacePtr, // Pointer to the slabs in the Surface derived type
-			FArray1_Fstring const & SurfaceName, // Name of surfaces that are the radiant system (can be one or more)
+			FArray1_string const & SurfaceName, // Name of surfaces that are the radiant system (can be one or more)
 			FArray1< Real64 > const & SurfaceFlowFrac, // Fraction of flow/pipe length for a particular surface
 			FArray1< Real64 > const & CDiameter, // Number of core diameter
 			FArray1< Real64 > const & CLength, // Number of core length
 			FArray1< Real64 > const & CNumbers, // Number of core numbers
-			FArray1_Fstring const & SlabIn, // Name of node that is slab inlet node
-			FArray1_Fstring const & SlabOut, // Name of node that is slab outlet node
+			FArray1_string const & SlabIn, // Name of node that is slab inlet node
+			FArray1_string const & SlabOut, // Name of node that is slab outlet node
 			Real64 const TotalSurfaceArea, // Total surface area for all surfaces that are part of this system
 			Real64 const CoreDiameter, // tube diameter for embedded tubing
 			Real64 const CoreLength, // tube length embedded in radiant surface
@@ -428,18 +395,18 @@ namespace VentilatedSlab {
 			int const FanOutletNode, // outlet node number for fan exit
 			int const MSlabInNode,
 			int const MSlabOutNode,
-			Fstring const & FanName, // name of fan
+			std::string const & FanName, // name of fan
 			int const Fan_Index,
 			int const ControlCompTypeNum,
 			int const CompErrIndex,
 			Real64 const MaxAirVolFlow, // m3/s
 			Real64 const MaxAirMassFlow, // kg/s
 			int const OAControlType, // type of control; options are VARIABLE PERCENT and FIXED TEMPERATURE
-			Fstring const & MinOASchedName, // schedule of fraction for minimum outside air (all controls)
+			std::string const & MinOASchedName, // schedule of fraction for minimum outside air (all controls)
 			int const MinOASchedPtr, // index to schedule
-			Fstring const & MaxOASchedName, // schedule of percentages for maximum outside air fraction (variable %)
+			std::string const & MaxOASchedName, // schedule of percentages for maximum outside air fraction (variable %)
 			int const MaxOASchedPtr, // index to schedule
-			Fstring const & TempSchedName, // schedule of temperatures for desired "mixed air"
+			std::string const & TempSchedName, // schedule of temperatures for desired "mixed air"
 			int const TempSchedPtr, // index to schedule
 			int const OutsideAirNode, // outside air node number
 			int const AirReliefNode, // relief air node number
@@ -452,12 +419,12 @@ namespace VentilatedSlab {
 			int const CoilOption, // type of coil option; options are BOTH, HEATING, COOLING, AND NONE
 			bool const HCoilPresent, // .TRUE. if ventilated slab has a heating coil
 			int const HCoilType, // type of heating coil (water, gas, electric, etc.)
-			Fstring const & HCoilName, // name of heating coil
-			Fstring const & HCoilTypeCh, // type of heating coil (character string)
+			std::string const & HCoilName, // name of heating coil
+			std::string const & HCoilTypeCh, // type of heating coil (character string)
 			int const HCoil_Index,
 			int const HCoil_PlantTypeNum,
 			int const HCoil_FluidIndex,
-			Fstring const & HCoilSchedName, // availability schedule for the heating coil
+			std::string const & HCoilSchedName, // availability schedule for the heating coil
 			int const HCoilSchedPtr, // index to schedule
 			Real64 const HCoilSchedValue,
 			Real64 const MaxVolHotWaterFlow, // m3/s
@@ -475,23 +442,23 @@ namespace VentilatedSlab {
 			int const HWLoopSide, // index for plant loop side for hot water coil
 			int const HWBranchNum, // index for plant branch for hot water coil
 			int const HWCompNum, // index for plant component for hot water coil
-			Fstring const & HotAirHiTempSched, // Schedule name for the highest Air temperature
+			std::string const & HotAirHiTempSched, // Schedule name for the highest Air temperature
 			int const HotAirHiTempSchedPtr, // Schedule index for the highest Air temperature
-			Fstring const & HotAirLoTempSched, // Schedule name for the lowest Air temperature
+			std::string const & HotAirLoTempSched, // Schedule name for the lowest Air temperature
 			int const HotAirLoTempSchedPtr, // Schedule index for the lowest Air temperature
-			Fstring const & HotCtrlHiTempSched, // Schedule name for the highest control temperature
+			std::string const & HotCtrlHiTempSched, // Schedule name for the highest control temperature
 			int const HotCtrlHiTempSchedPtr, // Schedule index for the highest control temperature
-			Fstring const & HotCtrlLoTempSched, // Schedule name for the lowest control temperature
+			std::string const & HotCtrlLoTempSched, // Schedule name for the lowest control temperature
 			int const HotCtrlLoTempSchedPtr, // Schedule index for the lowest control temperature
 			bool const CCoilPresent, // .TRUE. if ventilated slab has a cooling coil
-			Fstring const & CCoilName, // name of cooling coil
-			Fstring const & CCoilTypeCh, // type of cooling coil (character string)
+			std::string const & CCoilName, // name of cooling coil
+			std::string const & CCoilTypeCh, // type of cooling coil (character string)
 			int const CCoil_Index,
-			Fstring const & CCoilPlantName, // name of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
-			Fstring const & CCoilPlantType, // type of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
+			std::string const & CCoilPlantName, // name of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
+			std::string const & CCoilPlantType, // type of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
 			int const CCoil_PlantTypeNum,
 			int const CCoilType, // type of cooling coil:
-			Fstring const & CCoilSchedName, // availability schedule for the cooling coil
+			std::string const & CCoilSchedName, // availability schedule for the cooling coil
 			int const CCoilSchedPtr, // index to schedule
 			Real64 const CCoilSchedValue,
 			Real64 const MaxVolColdWaterFlow, // m3/s
@@ -505,21 +472,21 @@ namespace VentilatedSlab {
 			int const CWLoopSide, // index for plant loop side for chilled water coil
 			int const CWBranchNum, // index for plant branch for chilled water coil
 			int const CWCompNum, // index for plant component for chilled water coil
-			Fstring const & ColdAirHiTempSched, // Schedule name for the highest air temperature
+			std::string const & ColdAirHiTempSched, // Schedule name for the highest air temperature
 			int const ColdAirHiTempSchedPtr, // Schedule index for the highest Air temperature
-			Fstring const & ColdAirLoTempSched, // Schedule name for the lowest Air temperature
+			std::string const & ColdAirLoTempSched, // Schedule name for the lowest Air temperature
 			int const ColdAirLoTempSchedPtr, // Schedule index for the lowest Air temperature
-			Fstring const & ColdCtrlHiTempSched, // Schedule name for the highest control temperature
+			std::string const & ColdCtrlHiTempSched, // Schedule name for the highest control temperature
 			int const ColdCtrlHiTempSchedPtr, // Schedule index for the highest control temperature
-			Fstring const & ColdCtrlLoTempSched, // Schedule name for the lowest control temperature
+			std::string const & ColdCtrlLoTempSched, // Schedule name for the lowest control temperature
 			int const ColdCtrlLoTempSchedPtr, // Schedule index for the lowest control temperature
 			int const CondErrIndex, // Error index for recurring warning messages
 			int const EnrgyImbalErrIndex, // Error index for recurring warning messages
 			int const RadSurfNum, // Radiant Surface Number
 			int const MSlabIn, // Internal Slab Inlet Node Number
 			int const MSlabOut, // INternal Slab Outlet Node Number
-			Fstring const & DSSlabInNodeName,
-			Fstring const & DSSlabOutNodeName,
+			std::string const & DSSlabInNodeName,
+			std::string const & DSSlabOutNodeName,
 			Real64 const DirectHeatLossPower, // system direct heat loss in W
 			Real64 const DirectHeatLossEnergy, // system direct heat loss in J
 			Real64 const DirectHeatGainPower, // system direct heat gain in W
@@ -546,17 +513,17 @@ namespace VentilatedSlab {
 			Real64 const ReturnAirTemp,
 			Real64 const FanOutletTemp, // FanOutlet temp in degree C
 			Real64 const ZoneInletTemp, // supply air temp
-			Fstring const & AvailManagerListName, // Name of an availability manager list object
+			std::string const & AvailManagerListName, // Name of an availability manager list object
 			int const AvailStatus
 		) :
-			Name( MaxNameLength, Name ),
-			SchedName( MaxNameLength, SchedName ),
+			Name( Name ),
+			SchedName( SchedName ),
 			SchedPtr( SchedPtr ),
-			ZoneName( MaxNameLength, ZoneName ),
+			ZoneName( ZoneName ),
 			ZonePtr( ZonePtr ),
 			ZName( ZName ),
 			ZPtr( ZPtr ),
-			SurfListName( MaxNameLength, SurfListName ),
+			SurfListName( SurfListName ),
 			NumOfSurfaces( NumOfSurfaces ),
 			SurfacePtr( SurfacePtr ),
 			SurfaceName( SurfaceName ),
@@ -577,18 +544,18 @@ namespace VentilatedSlab {
 			FanOutletNode( FanOutletNode ),
 			MSlabInNode( MSlabInNode ),
 			MSlabOutNode( MSlabOutNode ),
-			FanName( MaxNameLength, FanName ),
+			FanName( FanName ),
 			Fan_Index( Fan_Index ),
 			ControlCompTypeNum( ControlCompTypeNum ),
 			CompErrIndex( CompErrIndex ),
 			MaxAirVolFlow( MaxAirVolFlow ),
 			MaxAirMassFlow( MaxAirMassFlow ),
 			OAControlType( OAControlType ),
-			MinOASchedName( MaxNameLength, MinOASchedName ),
+			MinOASchedName( MinOASchedName ),
 			MinOASchedPtr( MinOASchedPtr ),
-			MaxOASchedName( MaxNameLength, MaxOASchedName ),
+			MaxOASchedName( MaxOASchedName ),
 			MaxOASchedPtr( MaxOASchedPtr ),
-			TempSchedName( MaxNameLength, TempSchedName ),
+			TempSchedName( TempSchedName ),
 			TempSchedPtr( TempSchedPtr ),
 			OutsideAirNode( OutsideAirNode ),
 			AirReliefNode( AirReliefNode ),
@@ -601,12 +568,12 @@ namespace VentilatedSlab {
 			CoilOption( CoilOption ),
 			HCoilPresent( HCoilPresent ),
 			HCoilType( HCoilType ),
-			HCoilName( MaxNameLength, HCoilName ),
-			HCoilTypeCh( MaxNameLength, HCoilTypeCh ),
+			HCoilName( HCoilName ),
+			HCoilTypeCh( HCoilTypeCh ),
 			HCoil_Index( HCoil_Index ),
 			HCoil_PlantTypeNum( HCoil_PlantTypeNum ),
 			HCoil_FluidIndex( HCoil_FluidIndex ),
-			HCoilSchedName( MaxNameLength, HCoilSchedName ),
+			HCoilSchedName( HCoilSchedName ),
 			HCoilSchedPtr( HCoilSchedPtr ),
 			HCoilSchedValue( HCoilSchedValue ),
 			MaxVolHotWaterFlow( MaxVolHotWaterFlow ),
@@ -624,23 +591,23 @@ namespace VentilatedSlab {
 			HWLoopSide( HWLoopSide ),
 			HWBranchNum( HWBranchNum ),
 			HWCompNum( HWCompNum ),
-			HotAirHiTempSched( MaxNameLength, HotAirHiTempSched ),
+			HotAirHiTempSched( HotAirHiTempSched ),
 			HotAirHiTempSchedPtr( HotAirHiTempSchedPtr ),
-			HotAirLoTempSched( MaxNameLength, HotAirLoTempSched ),
+			HotAirLoTempSched( HotAirLoTempSched ),
 			HotAirLoTempSchedPtr( HotAirLoTempSchedPtr ),
-			HotCtrlHiTempSched( MaxNameLength, HotCtrlHiTempSched ),
+			HotCtrlHiTempSched( HotCtrlHiTempSched ),
 			HotCtrlHiTempSchedPtr( HotCtrlHiTempSchedPtr ),
-			HotCtrlLoTempSched( MaxNameLength, HotCtrlLoTempSched ),
+			HotCtrlLoTempSched( HotCtrlLoTempSched ),
 			HotCtrlLoTempSchedPtr( HotCtrlLoTempSchedPtr ),
 			CCoilPresent( CCoilPresent ),
-			CCoilName( MaxNameLength, CCoilName ),
-			CCoilTypeCh( MaxNameLength, CCoilTypeCh ),
+			CCoilName( CCoilName ),
+			CCoilTypeCh( CCoilTypeCh ),
 			CCoil_Index( CCoil_Index ),
-			CCoilPlantName( MaxNameLength, CCoilPlantName ),
-			CCoilPlantType( MaxNameLength, CCoilPlantType ),
+			CCoilPlantName( CCoilPlantName ),
+			CCoilPlantType( CCoilPlantType ),
 			CCoil_PlantTypeNum( CCoil_PlantTypeNum ),
 			CCoilType( CCoilType ),
-			CCoilSchedName( MaxNameLength, CCoilSchedName ),
+			CCoilSchedName( CCoilSchedName ),
 			CCoilSchedPtr( CCoilSchedPtr ),
 			CCoilSchedValue( CCoilSchedValue ),
 			MaxVolColdWaterFlow( MaxVolColdWaterFlow ),
@@ -654,21 +621,21 @@ namespace VentilatedSlab {
 			CWLoopSide( CWLoopSide ),
 			CWBranchNum( CWBranchNum ),
 			CWCompNum( CWCompNum ),
-			ColdAirHiTempSched( MaxNameLength, ColdAirHiTempSched ),
+			ColdAirHiTempSched( ColdAirHiTempSched ),
 			ColdAirHiTempSchedPtr( ColdAirHiTempSchedPtr ),
-			ColdAirLoTempSched( MaxNameLength, ColdAirLoTempSched ),
+			ColdAirLoTempSched( ColdAirLoTempSched ),
 			ColdAirLoTempSchedPtr( ColdAirLoTempSchedPtr ),
-			ColdCtrlHiTempSched( MaxNameLength, ColdCtrlHiTempSched ),
+			ColdCtrlHiTempSched( ColdCtrlHiTempSched ),
 			ColdCtrlHiTempSchedPtr( ColdCtrlHiTempSchedPtr ),
-			ColdCtrlLoTempSched( MaxNameLength, ColdCtrlLoTempSched ),
+			ColdCtrlLoTempSched( ColdCtrlLoTempSched ),
 			ColdCtrlLoTempSchedPtr( ColdCtrlLoTempSchedPtr ),
 			CondErrIndex( CondErrIndex ),
 			EnrgyImbalErrIndex( EnrgyImbalErrIndex ),
 			RadSurfNum( RadSurfNum ),
 			MSlabIn( MSlabIn ),
 			MSlabOut( MSlabOut ),
-			DSSlabInNodeName( MaxNameLength, DSSlabInNodeName ),
-			DSSlabOutNodeName( MaxNameLength, DSSlabOutNodeName ),
+			DSSlabInNodeName( DSSlabInNodeName ),
+			DSSlabOutNodeName( DSSlabOutNodeName ),
 			DirectHeatLossPower( DirectHeatLossPower ),
 			DirectHeatLossEnergy( DirectHeatLossEnergy ),
 			DirectHeatGainPower( DirectHeatGainPower ),
@@ -695,7 +662,7 @@ namespace VentilatedSlab {
 			ReturnAirTemp( ReturnAirTemp ),
 			FanOutletTemp( FanOutletTemp ),
 			ZoneInletTemp( ZoneInletTemp ),
-			AvailManagerListName( MaxNameLength, AvailManagerListName ),
+			AvailManagerListName( AvailManagerListName ),
 			AvailStatus( AvailStatus )
 		{}
 
@@ -708,7 +675,7 @@ namespace VentilatedSlab {
 
 	void
 	SimVentilatedSlab(
-		Fstring const & CompName, // name of the fan coil unit
+		std::string const & CompName, // name of the fan coil unit
 		int const ZoneNum, // number of zone being served
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		Real64 & PowerMet, // Sensible power supplied (W)

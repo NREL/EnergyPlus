@@ -3,10 +3,12 @@
 #include <iostream>
 
 // ObjexxFCL Headers
+#include <ObjexxFCL/char.functions.hh>
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <UtilityRoutines.hh>
@@ -84,8 +86,8 @@ AbortEnergyPlus(
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	static Fstring const OutFmt( "('Press ENTER to continue after reading above message>')" );
-	static Fstring const ETimeFmt( "(I2.2,'hr ',I2.2,'min ',F5.2,'sec')" );
+	static gio::Fmt const OutFmt( "('Press ENTER to continue after reading above message>')" );
+	static gio::Fmt const ETimeFmt( "(I2.2,'hr ',I2.2,'min ',F5.2,'sec')" );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 
@@ -94,13 +96,13 @@ AbortEnergyPlus(
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int tempfl;
-	Fstring NumWarnings( 32 );
-	Fstring NumSevere( 32 );
-	Fstring NumWarningsDuringWarmup( 32 );
-	Fstring NumSevereDuringWarmup( 32 );
-	Fstring NumWarningsDuringSizing( 32 );
-	Fstring NumSevereDuringSizing( 32 );
-	Fstring Elapsed( 32 );
+	std::string NumWarnings;
+	std::string NumSevere;
+	std::string NumWarningsDuringWarmup;
+	std::string NumSevereDuringWarmup;
+	std::string NumWarningsDuringSizing;
+	std::string NumSevereDuringSizing;
+	std::string Elapsed;
 	int Hours; // Elapsed Time Hour Reporting
 	int Minutes; // Elapsed Time Minute Reporting
 	Real64 Seconds; // Elapsed Time Second Reporting
@@ -152,17 +154,17 @@ AbortEnergyPlus(
 	SummarizeErrors();
 	CloseMiscOpenFiles();
 	NumWarnings = RoundSigDigits( TotalWarningErrors );
-	NumWarnings = adjustl( NumWarnings );
+	strip( NumWarnings );
 	NumSevere = RoundSigDigits( TotalSevereErrors );
-	NumSevere = adjustl( NumSevere );
+	strip( NumSevere );
 	NumWarningsDuringWarmup = RoundSigDigits( TotalWarningErrorsDuringWarmup );
-	NumWarningsDuringWarmup = adjustl( NumWarningsDuringWarmup );
+	strip( NumWarningsDuringWarmup );
 	NumSevereDuringWarmup = RoundSigDigits( TotalSevereErrorsDuringWarmup );
-	NumSevereDuringWarmup = adjustl( NumSevereDuringWarmup );
+	strip( NumSevereDuringWarmup );
 	NumWarningsDuringSizing = RoundSigDigits( TotalWarningErrorsDuringSizing );
-	NumWarningsDuringSizing = adjustl( NumWarningsDuringSizing );
+	strip( NumWarningsDuringSizing );
 	NumSevereDuringSizing = RoundSigDigits( TotalSevereErrorsDuringSizing );
-	NumSevereDuringSizing = adjustl( NumSevereDuringSizing );
+	strip( NumSevereDuringSizing );
 
 	if ( NoIDD ) {
 		DisplayString( "No EnergyPlus Data Dictionary (Energy+.idd) was found.  It is possible " );
@@ -205,16 +207,16 @@ AbortEnergyPlus(
 	if ( Seconds < 0.0 ) Seconds = 0.0;
 	gio::write( Elapsed, ETimeFmt ) << Hours << Minutes << Seconds;
 
-	ShowMessage( "EnergyPlus Warmup Error Summary. During Warmup: " + trim( NumWarningsDuringWarmup ) + " Warning; " + trim( NumSevereDuringWarmup ) + " Severe Errors." );
-	ShowMessage( "EnergyPlus Sizing Error Summary. During Sizing: " + trim( NumWarningsDuringSizing ) + " Warning; " + trim( NumSevereDuringSizing ) + " Severe Errors." );
-	ShowMessage( "EnergyPlus Terminated--Fatal Error Detected. " + trim( NumWarnings ) + " Warning; " + trim( NumSevere ) + " Severe Errors;" " Elapsed Time=" + trim( Elapsed ) );
-	DisplayString( "EnergyPlus Run Time=" + trim( Elapsed ) );
+	ShowMessage( "EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup + " Severe Errors." );
+	ShowMessage( "EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing + " Severe Errors." );
+	ShowMessage( "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors;" " Elapsed Time=" + Elapsed );
+	DisplayString( "EnergyPlus Run Time=" + Elapsed );
 	tempfl = GetNewUnitNumber();
 	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, "eplusout.end", flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
 		DisplayString( "AbortEnergyPlus: Could not open file \"eplusout.end\" for output (write)." );
 	}
-	gio::write( tempfl, "*" ) << "EnergyPlus Terminated--Fatal Error Detected. " + trim( NumWarnings ) + " Warning; " + trim( NumSevere ) + " Severe Errors;" " Elapsed Time=" + trim( Elapsed );
+	gio::write( tempfl, "*" ) << "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors;" " Elapsed Time=" + Elapsed;
 
 	gio::close( tempfl );
 #ifdef EP_Detailed_Timings
@@ -268,7 +270,7 @@ CloseMiscOpenFiles()
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	Fstring DebugPosition( 20 );
+	std::string DebugPosition;
 
 	//      LOGICAL :: exists, opened
 	//      INTEGER :: UnitNumber
@@ -282,7 +284,7 @@ CloseMiscOpenFiles()
 	//  So, will want to keep....
 
 	{ IOFlags flags; gio::inquire( OutputFileDebug, flags ); DebugPosition = flags.POSITION(); }
-	if ( trim( DebugPosition ) != "ASIS" ) {
+	if ( DebugPosition != "ASIS" ) {
 		DebugOutput = true;
 	}
 	if ( DebugOutput ) {
@@ -382,7 +384,7 @@ EndEnergyPlus()
 	// na
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	static Fstring const ETimeFmt( "(I2.2,'hr ',I2.2,'min ',F5.2,'sec')" );
+	static gio::Fmt const ETimeFmt( "(I2.2,'hr ',I2.2,'min ',F5.2,'sec')" );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 
@@ -391,13 +393,13 @@ EndEnergyPlus()
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int tempfl;
-	Fstring NumWarnings( 32 );
-	Fstring NumSevere( 32 );
-	Fstring NumWarningsDuringWarmup( 32 );
-	Fstring NumSevereDuringWarmup( 32 );
-	Fstring NumWarningsDuringSizing( 32 );
-	Fstring NumSevereDuringSizing( 32 );
-	Fstring Elapsed( 32 );
+	std::string NumWarnings;
+	std::string NumSevere;
+	std::string NumWarningsDuringWarmup;
+	std::string NumSevereDuringWarmup;
+	std::string NumWarningsDuringSizing;
+	std::string NumSevereDuringSizing;
+	std::string Elapsed;
 	int Hours; // Elapsed Time Hour Reporting
 	int Minutes; // Elapsed Time Minute Reporting
 	Real64 Seconds; // Elapsed Time Second Reporting
@@ -412,17 +414,17 @@ EndEnergyPlus()
 	SummarizeErrors();
 	CloseMiscOpenFiles();
 	NumWarnings = RoundSigDigits( TotalWarningErrors );
-	NumWarnings = adjustl( NumWarnings );
+	strip( NumWarnings );
 	NumSevere = RoundSigDigits( TotalSevereErrors );
-	NumSevere = adjustl( NumSevere );
+	strip( NumSevere );
 	NumWarningsDuringWarmup = RoundSigDigits( TotalWarningErrorsDuringWarmup );
-	NumWarningsDuringWarmup = adjustl( NumWarningsDuringWarmup );
+	strip( NumWarningsDuringWarmup );
 	NumSevereDuringWarmup = RoundSigDigits( TotalSevereErrorsDuringWarmup );
-	NumSevereDuringWarmup = adjustl( NumSevereDuringWarmup );
+	strip( NumSevereDuringWarmup );
 	NumWarningsDuringSizing = RoundSigDigits( TotalWarningErrorsDuringSizing );
-	NumWarningsDuringSizing = adjustl( NumWarningsDuringSizing );
+	strip( NumWarningsDuringSizing );
 	NumSevereDuringSizing = RoundSigDigits( TotalSevereErrorsDuringSizing );
-	NumSevereDuringSizing = adjustl( NumSevereDuringSizing );
+	strip( NumSevereDuringSizing );
 
 	Time_Finish = epElapsedTime();
 	if ( Time_Finish < Time_Start ) Time_Finish += 24.0 * 3600.0;
@@ -438,16 +440,16 @@ EndEnergyPlus()
 	if ( Seconds < 0.0 ) Seconds = 0.0;
 	gio::write( Elapsed, ETimeFmt ) << Hours << Minutes << Seconds;
 
-	ShowMessage( "EnergyPlus Warmup Error Summary. During Warmup: " + trim( NumWarningsDuringWarmup ) + " Warning; " + trim( NumSevereDuringWarmup ) + " Severe Errors." );
-	ShowMessage( "EnergyPlus Sizing Error Summary. During Sizing: " + trim( NumWarningsDuringSizing ) + " Warning; " + trim( NumSevereDuringSizing ) + " Severe Errors." );
-	ShowMessage( "EnergyPlus Completed Successfully-- " + trim( NumWarnings ) + " Warning; " + trim( NumSevere ) + " Severe Errors;" " Elapsed Time=" + trim( Elapsed ) );
-	DisplayString( "EnergyPlus Run Time=" + trim( Elapsed ) );
+	ShowMessage( "EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup + " Severe Errors." );
+	ShowMessage( "EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing + " Severe Errors." );
+	ShowMessage( "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors;" " Elapsed Time=" + Elapsed );
+	DisplayString( "EnergyPlus Run Time=" + Elapsed );
 	tempfl = GetNewUnitNumber();
 	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, "eplusout.end", flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
 		DisplayString( "EndEnergyPlus: Could not open file \"eplusout.end\" for output (write)." );
 	}
-	gio::write( tempfl, "(A)" ) << "EnergyPlus Completed Successfully-- " + trim( NumWarnings ) + " Warning; " + trim( NumSevere ) + " Severe Errors;" " Elapsed Time=" + trim( Elapsed );
+	gio::write( tempfl, "(A)" ) << "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors;" " Elapsed Time=" + Elapsed;
 	gio::close( tempfl );
 #ifdef EP_Detailed_Timings
 	epSummaryTimes( Time_Finish - Time_Start );
@@ -540,7 +542,7 @@ GetNewUnitNumber()
 }
 
 int
-FindUnitNumber( Fstring const & FileName ) // File name to be searched.
+FindUnitNumber( std::string const & FileName ) // File name to be searched.
 {
 
 	// FUNCTION INFORMATION:
@@ -583,12 +585,9 @@ FindUnitNumber( Fstring const & FileName ) // File name to be searched.
 	// na
 
 	// FUNCTION LOCAL VARIABLE DECLARATIONS:
-	Fstring TestFileName( 255 ); // File name returned from opened file
-	int TestFileLength; // Length from INQUIRE intrinsic
+	std::string TestFileName; // File name returned from opened file
 	bool exists; // True if file already exists
 	bool opened; // True if file is open
-	int Pos; // Position pointer
-	int FileNameLength; // Length of requested file
 	int ios; // Status indicator from INQUIRE intrinsic
 
 	{ IOFlags flags; gio::inquire( FileName, flags ); exists = flags.exists(); opened = flags.open(); ios = flags.ios(); }
@@ -596,19 +595,21 @@ FindUnitNumber( Fstring const & FileName ) // File name to be searched.
 		UnitNumber = GetNewUnitNumber();
 		{ IOFlags flags; flags.POSITION( "APPEND" ); gio::open( UnitNumber, FileName, flags ); ios = flags.ios(); }
 		if ( ios != 0 ) {
-			DisplayString( "FindUnitNumber: Could not open file \"" + trim( FileName ) + "\" for append." );
+			DisplayString( "FindUnitNumber: Could not open file \"" + FileName + "\" for append." );
 		}
 	} else {
-		FileNameLength = len_trim( FileName );
+		std::string::size_type const FileNameLength = len( FileName );
+		std::string::size_type TestFileLength;
+		std::string::size_type Pos; // Position pointer
 		for ( UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber ) {
 			{ IOFlags flags; gio::inquire( UnitNumber, flags ); TestFileName = flags.name(); opened = flags.open(); }
 			//  Powerstation returns just file name
 			//  DVF (Digital Fortran) returns whole path
-			TestFileLength = len_trim( TestFileName );
+			TestFileLength = len( TestFileName );
 			Pos = index( TestFileName, FileName );
-			if ( Pos != 0 ) {
+			if ( Pos != std::string::npos ) {
 				//  Must be the last part of the file
-				if ( Pos + FileNameLength - 1 == TestFileLength ) break;
+				if ( Pos + FileNameLength == TestFileLength ) break;
 			}
 		}
 	}
@@ -619,8 +620,8 @@ FindUnitNumber( Fstring const & FileName ) // File name to be searched.
 
 void
 ConvertCaseToUpper(
-	Fstring const & InputString, // Input string
-	Fstring & OutputString // Output string (in UpperCase)
+	std::string const & InputString, // Input string
+	std::string & OutputString // Output string (in UpperCase)
 )
 {
 
@@ -658,17 +659,13 @@ ConvertCaseToUpper(
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	int A;
-	int B;
 
-	OutputString = " ";
+	OutputString = InputString;
 
-	for ( A = 1; A <= len_trim( InputString ); ++A ) {
-		B = index( LowerCase, InputString( A, A ) );
-		if ( B != 0 ) {
-			OutputString( A, A ) = UpperCase( {B,B} );
-		} else {
-			OutputString( A, A ) = InputString( A, A );
+	for ( std::string::size_type A = 0; A < len( InputString ); ++A ) {
+		std::string::size_type const B = index( LowerCase, InputString[ A ] );
+		if ( B != std::string::npos ) {
+			OutputString[ A ] = UpperCase[ B ];
 		}
 	}
 
@@ -676,8 +673,8 @@ ConvertCaseToUpper(
 
 void
 ConvertCaseToLower(
-	Fstring const & InputString, // Input string
-	Fstring & OutputString // Output string (in LowerCase)
+	std::string const & InputString, // Input string
+	std::string & OutputString // Output string (in LowerCase)
 )
 {
 
@@ -715,24 +712,19 @@ ConvertCaseToLower(
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	int A;
-	int B;
+	OutputString = InputString;
 
-	OutputString = " ";
-
-	for ( A = 1; A <= len_trim( InputString ); ++A ) {
-		B = index( UpperCase, InputString( A, A ) );
-		if ( B != 0 ) {
-			OutputString( A, A ) = LowerCase( {B,B} );
-		} else {
-			OutputString( A, A ) = InputString( A, A );
+	for ( std::string::size_type A = 0; A < len( InputString ); ++A ) {
+		std::string::size_type const B = index( UpperCase, InputString[ A ] );
+		if ( B != std::string::npos ) {
+			OutputString[ A ] = LowerCase[ B ];
 		}
 	}
 
 }
 
-int
-FindNonSpace( Fstring const & String ) // String to be scanned
+std::string::size_type
+FindNonSpace( std::string const & String ) // String to be scanned
 {
 
 	// FUNCTION INFORMATION:
@@ -755,7 +747,6 @@ FindNonSpace( Fstring const & String ) // String to be scanned
 	// na
 
 	// Return value
-	int FindNonSpace;
 
 	// Locals
 	// FUNCTION ARGUMENT DEFINITIONS:
@@ -770,25 +761,30 @@ FindNonSpace( Fstring const & String ) // String to be scanned
 	// na
 
 	// FUNCTION LOCAL VARIABLE DECLARATIONS:
-	int I;
-	int ILEN;
 
-	FindNonSpace = 0;
-	ILEN = len_trim( String );
-	for ( I = 1; I <= ILEN; ++I ) {
-		if ( String( I, I ) != " " ) {
-			FindNonSpace = I;
-			break;
-		}
-	}
+	return String.find_first_not_of( ' ' );
 
-	return FindNonSpace;
+}
 
+bool
+env_var_on( std::string const & env_var_str )
+{
+
+	// FUNCTION INFORMATION:
+	//       AUTHOR         Stuart G. Mentzer
+	//       DATE WRITTEN   April 2014
+	//       MODIFIED       na
+	//       RE-ENGINEERED  na
+
+	// PURPOSE OF THIS FUNCTION:
+	// Test if a boolean environment variable value is "on" (has value starting with Y or T)
+
+	return ( ( ! env_var_str.empty() ) && is_any_of( env_var_str[ 0 ], "YyTt" ) );
 }
 
 void
 ShowFatalError(
-	Fstring const & ErrorMessage,
+	std::string const & ErrorMessage,
 	Optional_int OutUnit1,
 	Optional_int OutUnit2
 )
@@ -835,12 +831,12 @@ ShowFatalError(
 	static bool NoIDD( false );
 
 	ShowErrorMessage( " **  Fatal  ** " + ErrorMessage, OutUnit1, OutUnit2 );
-	DisplayString( "**FATAL:" + trim( ErrorMessage ) );
-	if ( index( ErrorMessage, "in.idf missing" ) > 0 ) NoIdf = true;
-	if ( index( ErrorMessage, "Energy+.idd missing" ) > 0 ) NoIDD = true;
+	DisplayString( "**FATAL:" + ErrorMessage );
+	if ( has( ErrorMessage, "in.idf missing" ) ) NoIdf = true;
+	if ( has( ErrorMessage, "Energy+.idd missing" ) ) NoIDD = true;
 	ShowErrorMessage( " ...Summary of Errors that led to program termination:", OutUnit1, OutUnit2 );
-	ShowErrorMessage( " ..... Reference severe error count=" + trim( RoundSigDigits( TotalSevereErrors ) ), OutUnit1, OutUnit2 );
-	ShowErrorMessage( " ..... Last severe error=" + trim( LastSevereError ), OutUnit1, OutUnit2 );
+	ShowErrorMessage( " ..... Reference severe error count=" + RoundSigDigits( TotalSevereErrors ), OutUnit1, OutUnit2 );
+	ShowErrorMessage( " ..... Last severe error=" + LastSevereError, OutUnit1, OutUnit2 );
 	if ( WriteOutputToSQLite ) {
 		CreateSQLiteErrorRecord( 1, 2, ErrorMessage, 1 );
 	}
@@ -850,7 +846,7 @@ ShowFatalError(
 
 void
 ShowSevereError(
-	Fstring const & ErrorMessage,
+	std::string const & ErrorMessage,
 	Optional_int OutUnit1,
 	Optional_int OutUnit2
 )
@@ -896,7 +892,7 @@ ShowSevereError(
 	int Loop;
 
 	for ( Loop = 1; Loop <= SearchCounts; ++Loop ) {
-		if ( index( ErrorMessage, trim( MessageSearch( Loop ) ) ) > 0 ) ++MatchCounts( Loop );
+		if ( has( ErrorMessage, MessageSearch( Loop ) ) ) ++MatchCounts( Loop );
 	}
 
 	++TotalSevereErrors;
@@ -915,7 +911,7 @@ ShowSevereError(
 
 void
 ShowSevereMessage(
-	Fstring const & ErrorMessage,
+	std::string const & ErrorMessage,
 	Optional_int OutUnit1,
 	Optional_int OutUnit2
 )
@@ -960,7 +956,7 @@ ShowSevereMessage(
 	int Loop;
 
 	for ( Loop = 1; Loop <= SearchCounts; ++Loop ) {
-		if ( index( ErrorMessage, trim( MessageSearch( Loop ) ) ) > 0 ) ++MatchCounts( Loop );
+		if ( has( ErrorMessage, MessageSearch( Loop ) ) ) ++MatchCounts( Loop );
 	}
 
 	ShowErrorMessage( " ** Severe  ** " + ErrorMessage, OutUnit1, OutUnit2 );
@@ -976,7 +972,7 @@ ShowSevereMessage(
 
 void
 ShowContinueError(
-	Fstring const & Message,
+	std::string const & Message,
 	Optional_int OutUnit1,
 	Optional_int OutUnit2
 )
@@ -1024,7 +1020,7 @@ ShowContinueError(
 
 void
 ShowContinueErrorTimeStamp(
-	Fstring const & Message,
+	std::string const & Message,
 	Optional_int OutUnit1,
 	Optional_int OutUnit2
 )
@@ -1066,7 +1062,7 @@ ShowContinueErrorTimeStamp(
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	Fstring cEnvHeader( 100 );
+	std::string cEnvHeader;
 
 	if ( WarmupFlag ) {
 		if ( ! DoingSizing ) {
@@ -1082,17 +1078,16 @@ ShowContinueErrorTimeStamp(
 		}
 	}
 
-	if ( len_trim( Message ) < 50 ) {
-		ShowErrorMessage( " **   ~~~   ** " + trim( Message ) + trim( cEnvHeader ) + trim( EnvironmentName ) + ", at Simulation time=" + trim( CurMnDy ) + " " + trim( CreateSysTimeIntervalString() ), OutUnit1, OutUnit2 );
+	if ( len( Message ) < 50 ) {
+		ShowErrorMessage( " **   ~~~   ** " + Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString(), OutUnit1, OutUnit2 );
 		if ( WriteOutputToSQLite ) {
-			UpdateSQLiteErrorRecord( trim( Message ) + trim( cEnvHeader ) + trim( EnvironmentName ) + ", at Simulation time=" + trim( CurMnDy ) + " " + trim( CreateSysTimeIntervalString() ) );
+			UpdateSQLiteErrorRecord( Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString() );
 		}
-
 	} else {
-		ShowErrorMessage( " **   ~~~   ** " + trim( Message ) );
-		ShowErrorMessage( " **   ~~~   ** " + trim( cEnvHeader ) + trim( EnvironmentName ) + ", at Simulation time=" + trim( CurMnDy ) + " " + trim( CreateSysTimeIntervalString() ), OutUnit1, OutUnit2 );
+		ShowErrorMessage( " **   ~~~   ** " + Message );
+		ShowErrorMessage( " **   ~~~   ** " + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString(), OutUnit1, OutUnit2 );
 		if ( WriteOutputToSQLite ) {
-			UpdateSQLiteErrorRecord( trim( Message ) + trim( cEnvHeader ) + trim( EnvironmentName ) + ", at Simulation time=" + trim( CurMnDy ) + " " + trim( CreateSysTimeIntervalString() ) );
+			UpdateSQLiteErrorRecord( Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString() );
 		}
 	}
 
@@ -1100,7 +1095,7 @@ ShowContinueErrorTimeStamp(
 
 void
 ShowMessage(
-	Fstring const & Message,
+	std::string const & Message,
 	Optional_int OutUnit1,
 	Optional_int OutUnit2
 )
@@ -1137,13 +1132,17 @@ ShowMessage(
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	// na
 
-	ShowErrorMessage( " ************* " + Message, OutUnit1, OutUnit2 );
+	if ( Message.empty() ) {
+		ShowErrorMessage( " *************", OutUnit1, OutUnit2 );
+	} else {
+		ShowErrorMessage( " ************* " + Message, OutUnit1, OutUnit2 );
+	}
 
 }
 
 void
 ShowWarningError(
-	Fstring const & ErrorMessage,
+	std::string const & ErrorMessage,
 	Optional_int OutUnit1,
 	Optional_int OutUnit2
 )
@@ -1189,7 +1188,7 @@ ShowWarningError(
 	int Loop;
 
 	for ( Loop = 1; Loop <= SearchCounts; ++Loop ) {
-		if ( index( ErrorMessage, trim( MessageSearch( Loop ) ) ) > 0 ) ++MatchCounts( Loop );
+		if ( has( ErrorMessage, MessageSearch( Loop ) ) ) ++MatchCounts( Loop );
 	}
 
 	++TotalWarningErrors;
@@ -1205,7 +1204,7 @@ ShowWarningError(
 
 void
 ShowWarningMessage(
-	Fstring const & ErrorMessage,
+	std::string const & ErrorMessage,
 	Optional_int OutUnit1,
 	Optional_int OutUnit2
 )
@@ -1250,7 +1249,7 @@ ShowWarningMessage(
 	int Loop;
 
 	for ( Loop = 1; Loop <= SearchCounts; ++Loop ) {
-		if ( index( ErrorMessage, trim( MessageSearch( Loop ) ) ) > 0 ) ++MatchCounts( Loop );
+		if ( has( ErrorMessage, MessageSearch( Loop ) ) ) ++MatchCounts( Loop );
 	}
 
 	ShowErrorMessage( " ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2 );
@@ -1262,14 +1261,14 @@ ShowWarningMessage(
 
 void
 ShowRecurringSevereErrorAtEnd(
-	Fstring const & Message, // Message automatically written to "error file" at end of simulation
+	std::string const & Message, // Message automatically written to "error file" at end of simulation
 	int & MsgIndex, // Recurring message index, if zero, next available index is assigned
 	Optional< Real64 const > ReportMaxOf, // Track and report the max of the values passed to this argument
 	Optional< Real64 const > ReportMinOf, // Track and report the min of the values passed to this argument
 	Optional< Real64 const > ReportSumOf, // Track and report the sum of the values passed to this argument
-	Optional_Fstring_const ReportMaxUnits, // optional char string (<=15 length) of units for max value
-	Optional_Fstring_const ReportMinUnits, // optional char string (<=15 length) of units for min value
-	Optional_Fstring_const ReportSumUnits // optional char string (<=15 length) of units for sum value
+	Optional_string_const ReportMaxUnits, // optional char string (<=15 length) of units for max value
+	Optional_string_const ReportMinUnits, // optional char string (<=15 length) of units for min value
+	Optional_string_const ReportSumUnits // optional char string (<=15 length) of units for sum value
 )
 {
 
@@ -1312,7 +1311,7 @@ ShowRecurringSevereErrorAtEnd(
 	int Loop;
 
 	for ( Loop = 1; Loop <= SearchCounts; ++Loop ) {
-		if ( index( Message, trim( MessageSearch( Loop ) ) ) > 0 ) ++MatchCounts( Loop );
+		if ( has( Message, MessageSearch( Loop ) ) ) ++MatchCounts( Loop );
 	}
 
 	++TotalSevereErrors;
@@ -1322,14 +1321,14 @@ ShowRecurringSevereErrorAtEnd(
 
 void
 ShowRecurringWarningErrorAtEnd(
-	Fstring const & Message, // Message automatically written to "error file" at end of simulation
+	std::string const & Message, // Message automatically written to "error file" at end of simulation
 	int & MsgIndex, // Recurring message index, if zero, next available index is assigned
 	Optional< Real64 const > ReportMaxOf, // Track and report the max of the values passed to this argument
 	Optional< Real64 const > ReportMinOf, // Track and report the min of the values passed to this argument
 	Optional< Real64 const > ReportSumOf, // Track and report the sum of the values passed to this argument
-	Optional_Fstring_const ReportMaxUnits, // optional char string (<=15 length) of units for max value
-	Optional_Fstring_const ReportMinUnits, // optional char string (<=15 length) of units for min value
-	Optional_Fstring_const ReportSumUnits // optional char string (<=15 length) of units for sum value
+	Optional_string_const ReportMaxUnits, // optional char string (<=15 length) of units for max value
+	Optional_string_const ReportMinUnits, // optional char string (<=15 length) of units for min value
+	Optional_string_const ReportSumUnits // optional char string (<=15 length) of units for sum value
 )
 {
 
@@ -1372,7 +1371,7 @@ ShowRecurringWarningErrorAtEnd(
 	int Loop;
 
 	for ( Loop = 1; Loop <= SearchCounts; ++Loop ) {
-		if ( index( Message, trim( MessageSearch( Loop ) ) ) > 0 ) ++MatchCounts( Loop );
+		if ( has( Message, MessageSearch( Loop ) ) ) ++MatchCounts( Loop );
 	}
 
 	++TotalWarningErrors;
@@ -1382,14 +1381,14 @@ ShowRecurringWarningErrorAtEnd(
 
 void
 ShowRecurringContinueErrorAtEnd(
-	Fstring const & Message, // Message automatically written to "error file" at end of simulation
+	std::string const & Message, // Message automatically written to "error file" at end of simulation
 	int & MsgIndex, // Recurring message index, if zero, next available index is assigned
 	Optional< Real64 const > ReportMaxOf, // Track and report the max of the values passed to this argument
 	Optional< Real64 const > ReportMinOf, // Track and report the min of the values passed to this argument
 	Optional< Real64 const > ReportSumOf, // Track and report the sum of the values passed to this argument
-	Optional_Fstring_const ReportMaxUnits, // optional char string (<=15 length) of units for max value
-	Optional_Fstring_const ReportMinUnits, // optional char string (<=15 length) of units for min value
-	Optional_Fstring_const ReportSumUnits // optional char string (<=15 length) of units for sum value
+	Optional_string_const ReportMaxUnits, // optional char string (<=15 length) of units for max value
+	Optional_string_const ReportMinUnits, // optional char string (<=15 length) of units for min value
+	Optional_string_const ReportSumUnits // optional char string (<=15 length) of units for sum value
 )
 {
 
@@ -1432,7 +1431,7 @@ ShowRecurringContinueErrorAtEnd(
 	int Loop;
 
 	for ( Loop = 1; Loop <= SearchCounts; ++Loop ) {
-		if ( index( Message, trim( MessageSearch( Loop ) ) ) > 0 ) ++MatchCounts( Loop );
+		if ( has( Message, MessageSearch( Loop ) ) ) ++MatchCounts( Loop );
 	}
 
 	StoreRecurringErrorMessage( " **   ~~~   ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits );
@@ -1441,14 +1440,14 @@ ShowRecurringContinueErrorAtEnd(
 
 void
 StoreRecurringErrorMessage(
-	Fstring const & ErrorMessage, // Message automatically written to "error file" at end of simulation
+	std::string const & ErrorMessage, // Message automatically written to "error file" at end of simulation
 	int & ErrorMsgIndex, // Recurring message index, if zero, next available index is assigned
 	Optional< Real64 const > ErrorReportMaxOf, // Track and report the max of the values passed to this argument
 	Optional< Real64 const > ErrorReportMinOf, // Track and report the min of the values passed to this argument
 	Optional< Real64 const > ErrorReportSumOf, // Track and report the sum of the values passed to this argument
-	Optional_Fstring_const ErrorReportMaxUnits, // Units for "max" reporting
-	Optional_Fstring_const ErrorReportMinUnits, // Units for "min" reporting
-	Optional_Fstring_const ErrorReportSumUnits // Units for "sum" reporting
+	Optional_string_const ErrorReportMaxUnits, // Units for "max" reporting
+	Optional_string_const ErrorReportMinUnits, // Units for "min" reporting
+	Optional_string_const ErrorReportSumUnits // Units for "sum" reporting
 )
 {
 
@@ -1508,7 +1507,7 @@ StoreRecurringErrorMessage(
 			TempRecurringErrors.deallocate();
 		}
 		// The message string only needs to be stored once when a new recurring message is created
-		RecurringErrors( ErrorMsgIndex ).Message = trim( ErrorMessage );
+		RecurringErrors( ErrorMsgIndex ).Message = ErrorMessage;
 		RecurringErrors( ErrorMsgIndex ).Count = 1;
 		if ( WarmupFlag ) RecurringErrors( ErrorMsgIndex ).WarmupCount = 1;
 		if ( DoingSizing ) RecurringErrors( ErrorMsgIndex ).SizingCount = 1;
@@ -1562,7 +1561,7 @@ StoreRecurringErrorMessage(
 
 void
 ShowErrorMessage(
-	Fstring const & ErrorMessage,
+	std::string const & ErrorMessage,
 	Optional_int OutUnit1,
 	Optional_int OutUnit2
 )
@@ -1596,8 +1595,8 @@ ShowErrorMessage(
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	static Fstring const ErrorFormat( "(2X,A)" );
-	static Fstring const fmtA( "(A)" );
+	static gio::Fmt const ErrorFormat( "(2X,A)" );
+	static gio::Fmt const fmtA( "(A)" );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 	// na
@@ -1615,24 +1614,24 @@ ShowErrorMessage(
 		StandardErrorOutput = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "write" ); gio::open( StandardErrorOutput, "eplusout.err", flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			DisplayString( "Trying to display error: \"" + trim( ErrorMessage ) + "\"" );
+			DisplayString( "Trying to display error: \"" + ErrorMessage + "\"" );
 			ShowFatalError( "ShowErrorMessage: Could not open file \"eplusout.err\" for output (write)." );
 		}
-		gio::write( StandardErrorOutput, "(A)" ) << "Program Version," + trim( VerString ) + "," + trim( IDDVerString );
+		gio::write( StandardErrorOutput, "(A)" ) << "Program Version," + VerString + ',' + IDDVerString;
 		ErrFileOpened = true;
 	}
 
 	if ( ! DoingInputProcessing ) {
 		++TotalErrors;
-		gio::write( StandardErrorOutput, ErrorFormat ) << trim( ErrorMessage );
+		gio::write( StandardErrorOutput, ErrorFormat ) << ErrorMessage;
 	} else {
-		gio::write( CacheIPErrorFile, fmtA ) << trim( ErrorMessage );
+		gio::write( CacheIPErrorFile, fmtA ) << ErrorMessage;
 	}
 	if ( present( OutUnit1 ) ) {
-		gio::write( OutUnit1, ErrorFormat ) << trim( ErrorMessage );
+		gio::write( OutUnit1, ErrorFormat ) << ErrorMessage;
 	}
 	if ( present( OutUnit2 ) ) {
-		gio::write( OutUnit2, ErrorFormat ) << trim( ErrorMessage );
+		gio::write( OutUnit2, ErrorFormat ) << ErrorMessage;
 	}
 
 }
@@ -1674,31 +1673,30 @@ SummarizeErrors()
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	int Loop;
-	int StartC;
-	int EndC;
+	std::string::size_type StartC;
+	std::string::size_type EndC;
 
 	if ( any_gt( MatchCounts, 0 ) ) {
-		ShowMessage( " " );
+		ShowMessage( "" );
 		ShowMessage( "===== Final Error Summary =====" );
 		ShowMessage( "The following error categories occurred.  Consider correcting or noting." );
-		for ( Loop = 1; Loop <= SearchCounts; ++Loop ) {
+		for ( int Loop = 1; Loop <= SearchCounts; ++Loop ) {
 			if ( MatchCounts( Loop ) > 0 ) {
-				ShowMessage( trim( Summaries( Loop ) ) );
-				if ( MoreDetails( Loop ) != " " ) {
-					StartC = 1;
-					EndC = len_trim( MoreDetails( Loop ) );
-					while ( EndC > 0 ) {
-						EndC = index( MoreDetails( Loop )( {StartC,_} ), "<CR" );
-						ShowMessage( ".." + MoreDetails( Loop )( {StartC,StartC + EndC - 2} ) );
-						if ( MoreDetails( Loop )( {StartC + EndC - 1,StartC + EndC + 3} ) == "<CRE>" ) break;
-						StartC += EndC + 3;
-						EndC = len_trim( MoreDetails( Loop )( {StartC,_} ) );
+				ShowMessage( Summaries( Loop ) );
+				if ( MoreDetails( Loop ) != "" ) {
+					StartC = 0;
+					EndC = len( MoreDetails( Loop ) ) - 1;
+					while ( EndC != std::string::npos ) {
+						EndC = index( MoreDetails( Loop ).substr( StartC ), "<CR" );
+						ShowMessage( ".." + MoreDetails( Loop ).substr( StartC, EndC ) );
+						if ( MoreDetails( Loop ).substr( StartC + EndC, 5 ) == "<CRE>" ) break;
+						StartC += EndC + 4;
+						EndC = len( MoreDetails( Loop ).substr( StartC ) ) - 1;
 					}
 				}
 			}
 		}
-		ShowMessage( " " );
+		ShowMessage( "" );
 	}
 
 }
@@ -1736,7 +1734,7 @@ ShowRecurringErrors()
 	// na
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	static Fstring const StatMessageStart( " **   ~~~   ** " );
+	static std::string const StatMessageStart( " **   ~~~   ** " );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 	// na
@@ -1746,57 +1744,61 @@ ShowRecurringErrors()
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int Loop;
-	Fstring StatMessage( MaxRecurringErrorMsgLength );
-	Fstring MaxOut( MaxRecurringErrorMsgLength );
-	Fstring MinOut( MaxRecurringErrorMsgLength );
-	Fstring SumOut( MaxRecurringErrorMsgLength );
+	std::string StatMessage;
+	std::string MaxOut;
+	std::string MinOut;
+	std::string SumOut;
 
 	if ( NumRecurringErrors > 0 ) {
-		ShowMessage( " " );
+		ShowMessage( "" );
 		ShowMessage( "===== Recurring Error Summary =====" );
 		ShowMessage( "The following recurring error messages occurred." );
 		for ( Loop = 1; Loop <= NumRecurringErrors; ++Loop ) {
+			auto const & error( RecurringErrors( Loop ) );
 			// Suppress reporting the count if it is a continue error
-			if ( RecurringErrors( Loop ).Message( 1, 15 ) == " **   ~~~   ** " ) {
-				ShowMessage( trim( RecurringErrors( Loop ).Message ) );
+			if ( has_prefix( error.Message, " **   ~~~   ** " ) ) {
+				ShowMessage( error.Message );
 				if ( WriteOutputToSQLite ) {
-					UpdateSQLiteErrorRecord( trim( RecurringErrors( Loop ).Message ) );
+					UpdateSQLiteErrorRecord( error.Message );
 				}
 			} else {
-				ShowMessage( " " );
-				ShowMessage( trim( RecurringErrors( Loop ).Message ) );
-				ShowMessage( StatMessageStart + "  This error occurred " + trim( RoundSigDigits( RecurringErrors( Loop ).Count ) ) + " total times;" );
-				ShowMessage( StatMessageStart + "  during Warmup " + trim( RoundSigDigits( RecurringErrors( Loop ).WarmupCount ) ) + " times;" );
-				ShowMessage( StatMessageStart + "  during Sizing " + trim( RoundSigDigits( RecurringErrors( Loop ).SizingCount ) ) + " times." );
+				ShowMessage( "" );
+				ShowMessage( error.Message );
+				ShowMessage( StatMessageStart + "  This error occurred " + RoundSigDigits( error.Count ) + " total times;" );
+				ShowMessage( StatMessageStart + "  during Warmup " + RoundSigDigits( error.WarmupCount ) + " times;" );
+				ShowMessage( StatMessageStart + "  during Sizing " + RoundSigDigits( error.SizingCount ) + " times." );
 				if ( WriteOutputToSQLite ) {
-					if ( RecurringErrors( Loop ).Message( {1,15} ) == " ** Warning ** " ) {
-						CreateSQLiteErrorRecord( 1, 0, trim( RecurringErrors( Loop ).Message( 16 ) ), RecurringErrors( Loop ).Count );
-					} else if ( RecurringErrors( Loop ).Message( {1,15} ) == " ** Severe  ** " ) {
-						CreateSQLiteErrorRecord( 1, 1, trim( RecurringErrors( Loop ).Message( 16 ) ), RecurringErrors( Loop ).Count );
+					if ( has_prefix( error.Message, " ** Warning ** " ) ) {
+						CreateSQLiteErrorRecord( 1, 0, error.Message.substr( 15 ), error.Count );
+					} else if ( has_prefix( error.Message, " ** Severe  ** " ) ) {
+						CreateSQLiteErrorRecord( 1, 1, error.Message.substr( 15 ), error.Count );
 					}
 				}
 			}
-			StatMessage = " ";
-			if ( RecurringErrors( Loop ).ReportMax ) {
-				MaxOut = RoundSigDigits( RecurringErrors( Loop ).MaxValue, 6 );
+			StatMessage = "";
+			if ( error.ReportMax ) {
+				MaxOut = RoundSigDigits( error.MaxValue, 6 );
 				MaxOut = RemoveTrailingZeros( MaxOut );
-				StatMessage = trim( StatMessage ) + "  Max=" + trim( MaxOut ) + " " + trim( RecurringErrors( Loop ).MaxUnits );
+				StatMessage += "  Max=" + MaxOut;
+				if ( ! error.MaxUnits.empty() ) StatMessage += ' ' + error.MaxUnits;
 			}
-			if ( RecurringErrors( Loop ).ReportMin ) {
-				MinOut = RoundSigDigits( RecurringErrors( Loop ).MinValue, 6 );
+			if ( error.ReportMin ) {
+				MinOut = RoundSigDigits( error.MinValue, 6 );
 				MinOut = RemoveTrailingZeros( MinOut );
-				StatMessage = trim( StatMessage ) + "  Min=" + trim( MinOut ) + " " + trim( RecurringErrors( Loop ).MinUnits );
+				StatMessage += "  Min=" + MinOut;
+				if ( ! error.MinUnits.empty() ) StatMessage += ' ' + error.MinUnits;
 			}
-			if ( RecurringErrors( Loop ).ReportSum ) {
-				SumOut = RoundSigDigits( RecurringErrors( Loop ).SumValue, 6 );
+			if ( error.ReportSum ) {
+				SumOut = RoundSigDigits( error.SumValue, 6 );
 				SumOut = RemoveTrailingZeros( SumOut );
-				StatMessage = trim( StatMessage ) + "  Sum=" + trim( SumOut ) + " " + trim( RecurringErrors( Loop ).SumUnits );
+				StatMessage += "  Sum=" + SumOut;
+				if ( ! error.SumUnits.empty() ) StatMessage += ' ' + error.SumUnits;
 			}
-			if ( RecurringErrors( Loop ).ReportMax || RecurringErrors( Loop ).ReportMin || RecurringErrors( Loop ).ReportSum ) {
-				ShowMessage( StatMessageStart + trim( StatMessage ) );
+			if ( error.ReportMax || error.ReportMin || error.ReportSum ) {
+				ShowMessage( StatMessageStart + StatMessage );
 			}
 		}
-		ShowMessage( " " );
+		ShowMessage( "" );
 	}
 
 }

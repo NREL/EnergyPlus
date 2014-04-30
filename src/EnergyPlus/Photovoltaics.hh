@@ -6,7 +6,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -39,7 +38,7 @@ namespace Photovoltaics {
 	void
 	SimPVGenerator(
 		int const GeneratorType, // type of Generator !unused1208
-		Fstring const & GeneratorName, // user specified name of Generator
+		std::string const & GeneratorName, // user specified name of Generator
 		int & GeneratorIndex,
 		bool const RunFlag, // is PV ON or OFF as determined by schedules in ElecLoadCenter
 		Real64 const PVLoad // electrical load on the PV (not really used... PV models assume "full on" !unused1208

@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,17 +13,16 @@ namespace EnergyPlus {
 namespace DataPhotovoltaics {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// -only module should be available to other modules and routines.
 	// Thus, all variables in this module must be PUBLIC.
 
 	// MODULE PARAMETER DEFINITIONS:
-	extern Fstring const cPVGeneratorObjectName;
-	extern Fstring const cPVSimplePerfObjectName;
-	extern Fstring const cPVEquiv1DiodePerfObjectName;
-	extern Fstring const cPVSandiaPerfObjectName;
+	extern std::string const cPVGeneratorObjectName;
+	extern std::string const cPVSimplePerfObjectName;
+	extern std::string const cPVEquiv1DiodePerfObjectName;
+	extern std::string const cPVSandiaPerfObjectName;
 
 	extern int const iNotYetSetPVModel;
 	extern int const iSimplePVModel;
@@ -64,7 +62,7 @@ namespace DataPhotovoltaics {
 	struct SimplePVParamsStruct
 	{
 		// Members
-		Fstring Name; // name as identified in Sandia database
+		std::string Name; // name as identified in Sandia database
 		Real64 AreaCol; // effective area of solar collection
 		Real64 ActiveFraction; // fraction of parent surface that has active solar cells
 		int EfficencyInputMode; // to schedule or not
@@ -73,7 +71,6 @@ namespace DataPhotovoltaics {
 
 		// Default Constructor
 		SimplePVParamsStruct() :
-			Name( MaxNameLength ),
 			AreaCol( 0.0 ),
 			ActiveFraction( 0.0 ),
 			EfficencyInputMode( 0 ),
@@ -83,14 +80,14 @@ namespace DataPhotovoltaics {
 
 		// Member Constructor
 		SimplePVParamsStruct(
-			Fstring const & Name, // name as identified in Sandia database
+			std::string const & Name, // name as identified in Sandia database
 			Real64 const AreaCol, // effective area of solar collection
 			Real64 const ActiveFraction, // fraction of parent surface that has active solar cells
 			int const EfficencyInputMode, // to schedule or not
 			int const EffSchedPtr, // index pointer for efficiency schedule
 			Real64 const PVEfficiency // fixed or current PV efficiency
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			AreaCol( AreaCol ),
 			ActiveFraction( ActiveFraction ),
 			EfficencyInputMode( EfficencyInputMode ),
@@ -103,7 +100,7 @@ namespace DataPhotovoltaics {
 	struct TRNSYSPVModuleParamsStruct // for  GENERATOR:PV:Equivalent One-Diode Model
 	{
 		// Members
-		Fstring Name;
+		std::string Name;
 		int CellsInSeries; // cells in series [-]
 		int CellType; // type of PV cell (crystalline, amorphous )
 		Real64 Area; // module area [m2]
@@ -126,7 +123,6 @@ namespace DataPhotovoltaics {
 
 		// Default Constructor
 		TRNSYSPVModuleParamsStruct() :
-			Name( MaxNameLength ),
 			CellsInSeries( 0 ),
 			CellType( 0 ),
 			Area( 0.0 ),
@@ -150,7 +146,7 @@ namespace DataPhotovoltaics {
 
 		// Member Constructor
 		TRNSYSPVModuleParamsStruct(
-			Fstring const & Name,
+			std::string const & Name,
 			int const CellsInSeries, // cells in series [-]
 			int const CellType, // type of PV cell (crystalline, amorphous )
 			Real64 const Area, // module area [m2]
@@ -171,7 +167,7 @@ namespace DataPhotovoltaics {
 			Real64 const HeatLossCoef, // heat loss coefficient [W/m2.K]
 			Real64 const HeatCapacity // total heat capacity (only used in TC mode 1)
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			CellsInSeries( CellsInSeries ),
 			CellType( CellType ),
 			Area( Area ),
@@ -257,7 +253,7 @@ namespace DataPhotovoltaics {
 	struct SNLModuleParamsStuct // for PV MODULE:SANDIA PARAMETERS
 	{
 		// Members
-		Fstring name; // name as identified in Sandia database
+		std::string name; // name as identified in Sandia database
 		Real64 Acoll; // Active collector area (m2, single module)
 		Real64 NcellSer; // Number of cells in series in a module's cell-string (unitless)
 		Real64 NparSerCells; // Number of cell-strings in parallel in module (unitless)
@@ -311,7 +307,6 @@ namespace DataPhotovoltaics {
 
 		// Default Constructor
 		SNLModuleParamsStuct() :
-			name( MaxNameLength ),
 			Acoll( 0.0 ),
 			NcellSer( 0.0 ),
 			NparSerCells( 0.0 ),
@@ -355,7 +350,7 @@ namespace DataPhotovoltaics {
 
 		// Member Constructor
 		SNLModuleParamsStuct(
-			Fstring const & name, // name as identified in Sandia database
+			std::string const & name, // name as identified in Sandia database
 			Real64 const Acoll, // Active collector area (m2, single module)
 			Real64 const NcellSer, // Number of cells in series in a module's cell-string (unitless)
 			Real64 const NparSerCells, // Number of cell-strings in parallel in module (unitless)
@@ -396,7 +391,7 @@ namespace DataPhotovoltaics {
 			Real64 const c_6, // Empirical coefficients relating Ixx to Ee (unitless)
 			Real64 const c_7 // Empirical coefficients relating Ixx to Ee (unitless)
 		) :
-			name( MaxNameLength, name ),
+			name( name ),
 			Acoll( Acoll ),
 			NcellSer( NcellSer ),
 			NparSerCells( NparSerCells ),
@@ -612,9 +607,9 @@ namespace DataPhotovoltaics {
 	struct PVArrayStruct
 	{
 		// Members
-		Fstring Name;
-		Fstring SurfaceName; // named surface in heat balance domain
-		Fstring PerfObjName;
+		std::string Name;
+		std::string SurfaceName; // named surface in heat balance domain
+		std::string PerfObjName;
 		int SurfacePtr; // index for named surface
 		int PVModelType; // type of performance modeling, Simple, TRNSYS or Equivalent 1-diode, or Sandia/King model
 		int CellIntegrationMode; // how are PV cells integrated with other E+ modeling
@@ -636,9 +631,6 @@ namespace DataPhotovoltaics {
 
 		// Default Constructor
 		PVArrayStruct() :
-			Name( MaxNameLength ),
-			SurfaceName( MaxNameLength ),
-			PerfObjName( MaxNameLength ),
 			SurfacePtr( 0 ),
 			PVModelType( 0 ),
 			CellIntegrationMode( 0 ),
@@ -652,9 +644,9 @@ namespace DataPhotovoltaics {
 
 		// Member Constructor
 		PVArrayStruct(
-			Fstring const & Name,
-			Fstring const & SurfaceName, // named surface in heat balance domain
-			Fstring const & PerfObjName,
+			std::string const & Name,
+			std::string const & SurfaceName, // named surface in heat balance domain
+			std::string const & PerfObjName,
 			int const SurfacePtr, // index for named surface
 			int const PVModelType, // type of performance modeling, Simple, TRNSYS or Equivalent 1-diode, or Sandia/King model
 			int const CellIntegrationMode, // how are PV cells integrated with other E+ modeling
@@ -672,9 +664,9 @@ namespace DataPhotovoltaics {
 			SNLPVInputStruct const & SNLPVinto, // model input from elsewhere in EnergyPlus
 			SNLPVCalcStruct const & SNLPVCalc // calc'd data for GENERATOR:PV:Sandia model
 		) :
-			Name( MaxNameLength, Name ),
-			SurfaceName( MaxNameLength, SurfaceName ),
-			PerfObjName( MaxNameLength, PerfObjName ),
+			Name( Name ),
+			SurfaceName( SurfaceName ),
+			PerfObjName( PerfObjName ),
 			SurfacePtr( SurfacePtr ),
 			PVModelType( PVModelType ),
 			CellIntegrationMode( CellIntegrationMode ),

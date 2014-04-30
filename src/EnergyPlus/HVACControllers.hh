@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -19,7 +18,6 @@ namespace HVACControllers {
 
 	// Using/Aliasing
 	using DataAirSystems::DefinePrimaryAirSystem;
-	using DataGlobals::MaxNameLength;
 	using DataHVACControllers::ControllerSimple_Type;
 	using DataHVACControllers::iFirstMode;
 	using DataHVACControllers::iLastMode;
@@ -43,7 +41,7 @@ namespace HVACControllers {
 	extern int const CoilType_Cooling;
 	extern int const CoilType_Heating;
 
-	extern FArray1D_Fstring const ControlVariableTypes;
+	extern FArray1D_string const ControlVariableTypes;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -118,8 +116,8 @@ namespace HVACControllers {
 	struct ControllerPropsType
 	{
 		// Members
-		Fstring ControllerName; // Name of the Controller
-		Fstring ControllerType; // Type of Controller
+		std::string ControllerName; // Name of the Controller
+		std::string ControllerType; // Type of Controller
 		int ControllerType_Num;
 		int ControlVar; // The type of control variable being sensed
 		int ActuatorVar; // The variable that the controller will act on ie. flow
@@ -185,7 +183,7 @@ namespace HVACControllers {
 		// --------------------
 		// Other controller inputs, not yet used
 		// --------------------
-		Fstring LimitType; // Limit type as in HIGH or LOW
+		std::string LimitType; // Limit type as in HIGH or LOW
 		Real64 Range; // The range or hysteresis of the control limit
 		Real64 Limit; // The Limit value for a Limit Controller
 		// --------------------
@@ -198,8 +196,6 @@ namespace HVACControllers {
 
 		// Default Constructor
 		ControllerPropsType() :
-			ControllerName( MaxNameLength ),
-			ControllerType( MaxNameLength ),
 			ControllerType_Num( ControllerSimple_Type ),
 			ControlVar( iNoControlVariable ),
 			ActuatorVar( 0 ),
@@ -232,7 +228,6 @@ namespace HVACControllers {
 			DeltaSensed( 0.0 ),
 			Offset( 0.0 ),
 			HumRatCntrlType( 0 ),
-			LimitType( MaxNameLength ),
 			Range( 0.0 ),
 			Limit( 0.0 ),
 			TraceFileUnit( 0 ),
@@ -243,8 +238,8 @@ namespace HVACControllers {
 
 		// Member Constructor
 		ControllerPropsType(
-			Fstring const & ControllerName, // Name of the Controller
-			Fstring const & ControllerType, // Type of Controller
+			std::string const & ControllerName, // Name of the Controller
+			std::string const & ControllerType, // Type of Controller
 			int const ControllerType_Num,
 			int const ControlVar, // The type of control variable being sensed
 			int const ActuatorVar, // The variable that the controller will act on ie. flow
@@ -277,7 +272,7 @@ namespace HVACControllers {
 			Real64 const DeltaSensed, // Difference of sensed to setpoint value for calculating proportional gain
 			Real64 const Offset, // This is the tolerance or droop from the error
 			int const HumRatCntrlType, // iCtrlVarType_HumRat=4,iCtrlVarType_MaxHumRat=5,iCtrlVarType_MinHumRat=6
-			Fstring const & LimitType, // Limit type as in HIGH or LOW
+			std::string const & LimitType, // Limit type as in HIGH or LOW
 			Real64 const Range, // The range or hysteresis of the control limit
 			Real64 const Limit, // The Limit value for a Limit Controller
 			int const TraceFileUnit, // File unit for individual controller trace file to use if > 0
@@ -285,8 +280,8 @@ namespace HVACControllers {
 			int const BadActionErrCount, // Counts number of incorrect action errors
 			int const BadActionErrIndex // index to recurring error structure for bad action error
 		) :
-			ControllerName( MaxNameLength, ControllerName ),
-			ControllerType( MaxNameLength, ControllerType ),
+			ControllerName( ControllerName ),
+			ControllerType( ControllerType ),
 			ControllerType_Num( ControllerType_Num ),
 			ControlVar( ControlVar ),
 			ActuatorVar( ActuatorVar ),
@@ -319,7 +314,7 @@ namespace HVACControllers {
 			DeltaSensed( DeltaSensed ),
 			Offset( Offset ),
 			HumRatCntrlType( HumRatCntrlType ),
-			LimitType( MaxNameLength, LimitType ),
+			LimitType( LimitType ),
 			Range( Range ),
 			Limit( Limit ),
 			TraceFileUnit( TraceFileUnit ),
@@ -421,7 +416,7 @@ namespace HVACControllers {
 
 	void
 	ManageControllers(
-		Fstring const & ControllerName,
+		std::string const & ControllerName,
 		int & ControllerIndex,
 		bool const FirstHVACIteration,
 		int const AirLoopNum, // unused1208
@@ -474,7 +469,7 @@ namespace HVACControllers {
 		bool const FirstHVACIteration,
 		bool & IsConvergedFlag,
 		bool & IsUpToDateFlag,
-		Fstring const & ControllerName // used when errors occur
+		std::string const & ControllerName // used when errors occur
 	);
 
 	void
@@ -483,7 +478,7 @@ namespace HVACControllers {
 		bool const FirstHVACIteration,
 		bool & IsConvergedFlag,
 		bool & IsUpToDateFlag,
-		Fstring const & ControllerName // used when errors occur
+		std::string const & ControllerName // used when errors occur
 	);
 
 	void
@@ -611,13 +606,13 @@ namespace HVACControllers {
 		bool const IsConvergedFlag
 	);
 
-	Fstring
+	std::string
 	CreateHVACTimeString();
 
-	Fstring
+	std::string
 	CreateHVACStepFullString();
 
-	Fstring
+	std::string
 	MakeHVACTimeIntervalString();
 
 	//        End of Tracing subroutines for the Controller Module
@@ -633,7 +628,7 @@ namespace HVACControllers {
 
 	void
 	GetControllerActuatorNodeNum(
-		Fstring const & ControllerName, // name of coil controller
+		std::string const & ControllerName, // name of coil controller
 		int & WaterInletNodeNum, // input actuator node number
 		bool & NodeNotFound // true if matching actuator node not found
 	);

@@ -6,7 +6,7 @@
 #include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/FArray2A.hh>
 #include <ObjexxFCL/FArray2S.hh>
-#include <ObjexxFCL/Fstring.hh>
+#include <ObjexxFCL/gio_Fmt.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -20,8 +20,8 @@ namespace HeatBalanceIntRadExchange {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	extern Fstring const fmtx;
-	extern Fstring const fmty;
+	extern gio::Fmt const fmtx;
+	extern gio::Fmt const fmty;
 
 	// DERIVED TYPE DEFINITIONS
 	// na
@@ -39,7 +39,7 @@ namespace HeatBalanceIntRadExchange {
 		int const SurfIterations, // Number of iterations in calling subroutine
 		FArray1S< Real64 > NetLWRadToSurf, // Net long wavelength radiant exchange from other surfaces
 		Optional_int_const ZoneToResimulate = _, // if passed in, then only calculate for this zone
-		Optional_Fstring CalledFrom = _
+		Optional_string CalledFrom = _
 	);
 
 	void
@@ -47,7 +47,7 @@ namespace HeatBalanceIntRadExchange {
 
 	void
 	GetInputViewFactors(
-		Fstring const & ZoneName, // Needed to check for user input view factors.
+		std::string const & ZoneName, // Needed to check for user input view factors.
 		int const N, // NUMBER OF SURFACES
 		FArray2A< Real64 > F, // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
 		FArray1A_int const SPtr, // pointer to actual surface number
@@ -57,7 +57,7 @@ namespace HeatBalanceIntRadExchange {
 
 	void
 	GetInputViewFactorsbyName(
-		Fstring const & ZoneName, // Needed to check for user input view factors.
+		std::string const & ZoneName, // Needed to check for user input view factors.
 		int const N, // NUMBER OF SURFACES
 		FArray2A< Real64 > F, // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
 		FArray1A_int const SPtr, // pointer to actual surface number

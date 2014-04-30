@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace FaultsManager {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
@@ -54,7 +52,7 @@ namespace FaultsManager {
 	//  10. Meter: air flow, water flow
 	//  11. CO2 sensor
 	//  12. more
-	extern FArray1D_Fstring const cFaults;
+	extern FArray1D_string const cFaults;
 	//      'FaultModel:PressureSensorOffset:OutdoorAir   ', &
 	//      'FaultModel:TemperatureSensorOffset:SupplyAir ', &
 	//      'FaultModel:TemperatureSensorOffset:ZoneAir   ', &
@@ -79,20 +77,20 @@ namespace FaultsManager {
 	struct FaultProperties // Derived type for operational faults
 	{
 		// Members
-		Fstring Name;
-		Fstring FaultType; // Fault type
-		Fstring AvaiSchedule; // Availability schedule
-		Fstring SeveritySchedule; // Severity schedule, multipliers to the Offset
-		Fstring ControllerType; // Controller type
+		std::string Name;
+		std::string FaultType; // Fault type
+		std::string AvaiSchedule; // Availability schedule
+		std::string SeveritySchedule; // Severity schedule, multipliers to the Offset
+		std::string ControllerType; // Controller type
 		int ControllerTypeEnum;
-		Fstring ControllerName; // Controller name
+		std::string ControllerName; // Controller name
 		int ControllerID; // Point to a controller associated with the fault
 		Real64 Offset; // offset, + means sensor reading is higher than actual value
 		bool Status; // for future use
 		int AvaiSchedPtr;
 		int SeveritySchedPtr;
 		int FaultTypeEnum;
-		Fstring FouledCoilName; // The fouled coil name
+		std::string FouledCoilName; // The fouled coil name
 		int FouledCoilID; // Point to a fouling coil
 		int FoulingInputMethod; // Coil fouling input method
 		Real64 UAFouled; // Fouling coil UA under rating conditions
@@ -103,20 +101,13 @@ namespace FaultsManager {
 
 		// Default Constructor
 		FaultProperties() :
-			Name( MaxNameLength ),
-			FaultType( MaxNameLength ),
-			AvaiSchedule( MaxNameLength ),
-			SeveritySchedule( MaxNameLength ),
-			ControllerType( MaxNameLength ),
 			ControllerTypeEnum( 0 ),
-			ControllerName( MaxNameLength ),
 			ControllerID( 0 ),
 			Offset( 0.0 ),
 			Status( false ),
 			AvaiSchedPtr( 0 ),
 			SeveritySchedPtr( 0 ),
 			FaultTypeEnum( 0 ),
-			FouledCoilName( MaxNameLength ),
 			FouledCoilID( 0 ),
 			FoulingInputMethod( 0 ),
 			UAFouled( 0.0 ),
@@ -128,20 +119,20 @@ namespace FaultsManager {
 
 		// Member Constructor
 		FaultProperties(
-			Fstring const & Name,
-			Fstring const & FaultType, // Fault type
-			Fstring const & AvaiSchedule, // Availability schedule
-			Fstring const & SeveritySchedule, // Severity schedule, multipliers to the Offset
-			Fstring const & ControllerType, // Controller type
+			std::string const & Name,
+			std::string const & FaultType, // Fault type
+			std::string const & AvaiSchedule, // Availability schedule
+			std::string const & SeveritySchedule, // Severity schedule, multipliers to the Offset
+			std::string const & ControllerType, // Controller type
 			int const ControllerTypeEnum,
-			Fstring const & ControllerName, // Controller name
+			std::string const & ControllerName, // Controller name
 			int const ControllerID, // Point to a controller associated with the fault
 			Real64 const Offset, // offset, + means sensor reading is higher than actual value
 			bool const Status, // for future use
 			int const AvaiSchedPtr,
 			int const SeveritySchedPtr,
 			int const FaultTypeEnum,
-			Fstring const & FouledCoilName, // The fouled coil name
+			std::string const & FouledCoilName, // The fouled coil name
 			int const FouledCoilID, // Point to a fouling coil
 			int const FoulingInputMethod, // Coil fouling input method
 			Real64 const UAFouled, // Fouling coil UA under rating conditions
@@ -150,20 +141,20 @@ namespace FaultsManager {
 			Real64 const Aout, // Coil outside surface area
 			Real64 const Aratio // Inside to outside surface area ratio
 		) :
-			Name( MaxNameLength, Name ),
-			FaultType( MaxNameLength, FaultType ),
-			AvaiSchedule( MaxNameLength, AvaiSchedule ),
-			SeveritySchedule( MaxNameLength, SeveritySchedule ),
-			ControllerType( MaxNameLength, ControllerType ),
+			Name( Name ),
+			FaultType( FaultType ),
+			AvaiSchedule( AvaiSchedule ),
+			SeveritySchedule( SeveritySchedule ),
+			ControllerType( ControllerType ),
 			ControllerTypeEnum( ControllerTypeEnum ),
-			ControllerName( MaxNameLength, ControllerName ),
+			ControllerName( ControllerName ),
 			ControllerID( ControllerID ),
 			Offset( Offset ),
 			Status( Status ),
 			AvaiSchedPtr( AvaiSchedPtr ),
 			SeveritySchedPtr( SeveritySchedPtr ),
 			FaultTypeEnum( FaultTypeEnum ),
-			FouledCoilName( MaxNameLength, FouledCoilName ),
+			FouledCoilName( FouledCoilName ),
 			FouledCoilID( FouledCoilID ),
 			FoulingInputMethod( FoulingInputMethod ),
 			UAFouled( UAFouled ),

@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -32,7 +31,7 @@ namespace FuelCellElectricGenerator {
 	void
 	SimFuelCellGenerator(
 		int const GeneratorType, // type of Generator
-		Fstring const & GeneratorName, // user specified name of Generator
+		std::string const & GeneratorName, // user specified name of Generator
 		int & GeneratorIndex,
 		bool const RunFlag, // simulate Generator when TRUE
 		Real64 const MyLoad, // demand on electric generator
@@ -189,8 +188,8 @@ namespace FuelCellElectricGenerator {
 
 	void
 	SimFuelCellPlantHeatRecovery(
-		Fstring const & CompType,
-		Fstring const & CompName,
+		std::string const & CompType,
+		std::string const & CompName,
 		int const CompTypeNum,
 		int & CompNum,
 		bool const RunFlag,

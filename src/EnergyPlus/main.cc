@@ -1,5 +1,4 @@
 // C++ Headers
-#include <string>
 #ifndef NDEBUG
 #ifdef __unix__
 #include <cfenv>
@@ -10,6 +9,7 @@
 #include <ObjexxFCL/environment.hh>
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/Time_Date.hh>
 
 // EnergyPlus Headers
@@ -224,8 +224,8 @@ main()
 	// PROGRAM PARAMETER DEFINITIONS:
 	// Note: General Parameters for the entire EnergyPlus program are contained
 	// in "DataGlobals.f90"
-	Fstring const EPlusiniFormat( "(/,'[',A,']',/,'dir=',A)" );
-	Fstring const Blank;
+	gio::Fmt const EPlusiniFormat( "(/,'[',A,']',/,'dir=',A)" );
+	std::string const Blank;
 
 	// INTERFACE BLOCK SPECIFICATIONS
 	// na
@@ -236,8 +236,8 @@ main()
 	// PROGRAM LOCAL VARIABLE DECLARATIONS:
 	int LFN; // Unit Number for reads
 	bool EPlusINI;
-	int TempIndx;
-	static Fstring cEnvValue( 10 );
+	std::string::size_type TempIndx;
+	static std::string cEnvValue;
 	int iostatus;
 	bool FileExists;
 
@@ -247,26 +247,18 @@ main()
 	epStartTime( "EntireRun=" );
 #endif
 	CreateCurrentDateTimeString( CurrentDateTime );
-	VerString = trim( VerString ) + "," + trim( CurrentDateTime );
-	cEnvValue = " ";
+	VerString += "," + CurrentDateTime;
 	get_environment_variable( DDOnlyEnvVar, cEnvValue );
-	cEnvValue = MakeUPPERCase( cEnvValue );
-	DDOnly = ( cEnvValue( 1, 1 ) == "Y" || cEnvValue( 1, 1 ) == "T" ); // Yes or True
+	DDOnly = env_var_on( cEnvValue ); // Yes or True
 
-	cEnvValue = " ";
 	get_environment_variable( ReverseDDEnvVar, cEnvValue );
-	cEnvValue = MakeUPPERCase( cEnvValue );
-	ReverseDD = ( cEnvValue( 1, 1 ) == "Y" || cEnvValue( 1, 1 ) == "T" ); // Yes or True
+	ReverseDD = env_var_on( cEnvValue ); // Yes or True
 
-	cEnvValue = " ";
 	get_environment_variable( FullAnnualSimulation, cEnvValue );
-	cEnvValue = MakeUPPERCase( cEnvValue );
-	FullAnnualRun = ( cEnvValue( 1, 1 ) == "Y" || cEnvValue( 1, 1 ) == "T" ); // Yes or True
+	FullAnnualRun = env_var_on( cEnvValue ); // Yes or True
 
-	cEnvValue = " ";
 	get_environment_variable( cDisplayAllWarnings, cEnvValue );
-	cEnvValue = MakeUPPERCase( cEnvValue );
-	DisplayAllWarnings = ( cEnvValue( 1, 1 ) == "Y" || cEnvValue( 1, 1 ) == "T" ); // Yes or True
+	DisplayAllWarnings = env_var_on( cEnvValue ); // Yes or True
 	if ( DisplayAllWarnings ) {
 		DisplayAllWarnings = true;
 		DisplayExtraWarnings = true;
@@ -274,101 +266,63 @@ main()
 		DisplayUnusedObjects = true;
 	}
 
-	cEnvValue = " ";
 	get_environment_variable( cDisplayExtraWarnings, cEnvValue );
-	cEnvValue = MakeUPPERCase( cEnvValue );
-	if ( cEnvValue != Blank ) DisplayExtraWarnings = ( cEnvValue( 1, 1 ) == "Y" || cEnvValue( 1, 1 ) == "T" ); // Yes or True
+	if ( cEnvValue != Blank ) DisplayExtraWarnings = env_var_on( cEnvValue ); // Yes or True
 
-	cEnvValue = " ";
 	get_environment_variable( cDisplayUnusedObjects, cEnvValue );
-	cEnvValue = MakeUPPERCase( cEnvValue );
-	if ( cEnvValue != Blank ) DisplayUnusedObjects = ( cEnvValue( 1, 1 ) == "Y" || cEnvValue( 1, 1 ) == "T" ); // Yes or True
+	if ( cEnvValue != Blank ) DisplayUnusedObjects = env_var_on( cEnvValue ); // Yes or True
 
-	cEnvValue = " ";
 	get_environment_variable( cDisplayUnusedSchedules, cEnvValue );
-	cEnvValue = MakeUPPERCase( cEnvValue );
-	if ( cEnvValue != Blank ) DisplayUnusedSchedules = ( cEnvValue( 1, 1 ) == "Y" || cEnvValue( 1, 1 ) == "T" ); // Yes or True
+	if ( cEnvValue != Blank ) DisplayUnusedSchedules = env_var_on( cEnvValue ); // Yes or True
 
-	cEnvValue = " ";
 	get_environment_variable( cDisplayZoneAirHeatBalanceOffBalance, cEnvValue );
-	cEnvValue = MakeUPPERCase( cEnvValue );
-	if ( cEnvValue != Blank ) DisplayZoneAirHeatBalanceOffBalance = ( cEnvValue( 1, 1 ) == "Y" || cEnvValue( 1, 1 ) == "T" ); // Yes or True
+	if ( cEnvValue != Blank ) DisplayZoneAirHeatBalanceOffBalance = env_var_on( cEnvValue ); // Yes or True
 
-	cEnvValue = " ";
 	get_environment_variable( cDisplayAdvancedReportVariables, cEnvValue );
-	cEnvValue = MakeUPPERCase( cEnvValue );
-	if ( cEnvValue != Blank ) DisplayAdvancedReportVariables = ( cEnvValue( 1, 1 ) == "Y" || cEnvValue( 1, 1 ) == "T" ); // Yes or True
+	if ( cEnvValue != Blank ) DisplayAdvancedReportVariables = env_var_on( cEnvValue ); // Yes or True
 
-	cEnvValue = " ";
 	get_environment_variable( cReportDuringWarmup, cEnvValue );
-	cEnvValue = MakeUPPERCase( cEnvValue );
-	if ( cEnvValue != Blank ) ReportDuringWarmup = ( cEnvValue( 1, 1 ) == "Y" || cEnvValue( 1, 1 ) == "T" ); // Yes or True
+	if ( cEnvValue != Blank ) ReportDuringWarmup = env_var_on( cEnvValue ); // Yes or True
 
-	cEnvValue = " ";
 	get_environment_variable( cIgnoreSolarRadiation, cEnvValue );
-	cEnvValue = MakeUPPERCase( cEnvValue );
-	if ( cEnvValue != Blank ) IgnoreSolarRadiation = ( cEnvValue( 1, 1 ) == "Y" || cEnvValue( 1, 1 ) == "T" ); // Yes or True
+	if ( cEnvValue != Blank ) IgnoreSolarRadiation = env_var_on( cEnvValue ); // Yes or True
 
-	cEnvValue = " ";
 	get_environment_variable( cMinimalSurfaceVariables, cEnvValue );
-	cEnvValue = MakeUPPERCase( cEnvValue );
-	if ( cEnvValue != Blank ) CreateMinimalSurfaceVariables = ( cEnvValue( 1, 1 ) == "Y" || cEnvValue( 1, 1 ) == "T" ); // Yes or True
+	if ( cEnvValue != Blank ) CreateMinimalSurfaceVariables = env_var_on( cEnvValue ); // Yes or True
 
-	cEnvValue = " ";
 	get_environment_variable( cSortIDD, cEnvValue );
-	cEnvValue = MakeUPPERCase( cEnvValue );
-	if ( cEnvValue != Blank ) SortedIDD = ( cEnvValue( 1, 1 ) == "Y" || cEnvValue( 1, 1 ) == "T" ); // Yes or True
+	if ( cEnvValue != Blank ) SortedIDD = env_var_on( cEnvValue ); // Yes or True
 
-	cEnvValue = " ";
 	get_environment_variable( MinReportFrequencyEnvVar, cEnvValue );
-	cEnvValue = MakeUPPERCase( cEnvValue );
 	if ( cEnvValue != Blank ) cMinReportFrequency = cEnvValue; // turned into value later
 
-	cEnvValue = " ";
 	get_environment_variable( cDeveloperFlag, cEnvValue );
-	cEnvValue = MakeUPPERCase( cEnvValue );
-	if ( cEnvValue != Blank ) DeveloperFlag = ( cEnvValue( 1, 1 ) == "Y" || cEnvValue( 1, 1 ) == "T" ); // Yes or True
+	if ( cEnvValue != Blank ) DeveloperFlag = env_var_on( cEnvValue ); // Yes or True
 
-	cEnvValue = " ";
 	get_environment_variable( cIgnoreBeamRadiation, cEnvValue );
-	cEnvValue = MakeUPPERCase( cEnvValue );
-	if ( cEnvValue != Blank ) IgnoreBeamRadiation = ( cEnvValue( 1, 1 ) == "Y" || cEnvValue( 1, 1 ) == "T" ); // Yes or True
+	if ( cEnvValue != Blank ) IgnoreBeamRadiation = env_var_on( cEnvValue ); // Yes or True
 
-	cEnvValue = " ";
 	get_environment_variable( cIgnoreDiffuseRadiation, cEnvValue );
-	cEnvValue = MakeUPPERCase( cEnvValue );
-	if ( cEnvValue != Blank ) IgnoreDiffuseRadiation = ( cEnvValue( 1, 1 ) == "Y" || cEnvValue( 1, 1 ) == "T" ); // Yes or True
+	if ( cEnvValue != Blank ) IgnoreDiffuseRadiation = env_var_on( cEnvValue ); // Yes or True
 
-	cEnvValue = " ";
 	get_environment_variable( cSutherlandHodgman, cEnvValue );
-	cEnvValue = MakeUPPERCase( cEnvValue );
-	if ( cEnvValue != Blank ) SutherlandHodgman = ( cEnvValue( 1, 1 ) == "Y" || cEnvValue( 1, 1 ) == "T" ); // Yes or True
+	if ( cEnvValue != Blank ) SutherlandHodgman = env_var_on( cEnvValue ); // Yes or True
 
-	cEnvValue = " ";
 	get_environment_variable( cMinimalShadowing, cEnvValue );
-	cEnvValue = MakeUPPERCase( cEnvValue );
-	if ( cEnvValue != Blank ) lMinimalShadowing = ( cEnvValue( 1, 1 ) == "Y" || cEnvValue( 1, 1 ) == "T" ); // Yes or True
+	if ( cEnvValue != Blank ) lMinimalShadowing = env_var_on( cEnvValue ); // Yes or True
 
-	cEnvValue = " ";
 	get_environment_variable( cTimingFlag, cEnvValue );
-	cEnvValue = MakeUPPERCase( cEnvValue );
-	if ( cEnvValue != Blank ) TimingFlag = ( cEnvValue( 1, 1 ) == "Y" || cEnvValue( 1, 1 ) == "T" ); // Yes or True
+	if ( cEnvValue != Blank ) TimingFlag = env_var_on( cEnvValue ); // Yes or True
 
 	// Initialize env flags for air loop simulation debugging
-	cEnvValue = " ";
 	get_environment_variable( TrackAirLoopEnvVar, cEnvValue );
-	cEnvValue = MakeUPPERCase( cEnvValue );
-	if ( cEnvValue != Blank ) TrackAirLoopEnvFlag = ( cEnvValue( 1, 1 ) == "Y" || cEnvValue( 1, 1 ) == "T" ); // Yes or True
+	if ( cEnvValue != Blank ) TrackAirLoopEnvFlag = env_var_on( cEnvValue ); // Yes or True
 
-	cEnvValue = " ";
 	get_environment_variable( TraceAirLoopEnvVar, cEnvValue );
-	cEnvValue = MakeUPPERCase( cEnvValue );
-	if ( cEnvValue != Blank ) TraceAirLoopEnvFlag = ( cEnvValue( 1, 1 ) == "Y" || cEnvValue( 1, 1 ) == "T" ); // Yes or True
+	if ( cEnvValue != Blank ) TraceAirLoopEnvFlag = env_var_on( cEnvValue ); // Yes or True
 
-	cEnvValue = " ";
 	get_environment_variable( TraceHVACControllerEnvVar, cEnvValue );
-	cEnvValue = MakeUPPERCase( cEnvValue );
-	if ( cEnvValue != Blank ) TraceHVACControllerEnvFlag = ( cEnvValue( 1, 1 ) == "Y" || cEnvValue( 1, 1 ) == "T" ); // Yes or True
+	if ( cEnvValue != Blank ) TraceHVACControllerEnvFlag = env_var_on( cEnvValue ); // Yes or True
 
 	{ IOFlags flags; gio::inquire( "eplusout.end", flags ); FileExists = flags.exists(); }
 	if ( FileExists ) {
@@ -390,10 +344,10 @@ main()
 		{ IOFlags flags; gio::inquire( LFN, flags ); CurrentWorkingFolder = flags.name(); }
 		// Relying on compiler to supply full path name here
 		TempIndx = index( CurrentWorkingFolder, pathChar, true );
-		if ( TempIndx == 0 ) {
-			CurrentWorkingFolder = " ";
+		if ( TempIndx == std::string::npos ) {
+			CurrentWorkingFolder = "";
 		} else {
-			CurrentWorkingFolder = CurrentWorkingFolder( {1,TempIndx} );
+			CurrentWorkingFolder.erase( TempIndx + 1 );
 		}
 		//       Get directories from ini file
 		ReadINIFile( LFN, "program", "dir", ProgramPath );
@@ -401,7 +355,7 @@ main()
 		gio::close( LFN );
 	} else {
 		DisplayString( "Missing Energy+.ini" );
-		ProgramPath = "  ";
+		ProgramPath = "";
 		LFN = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "write" ); gio::open( LFN, "Energy+.ini", flags ); iostatus = flags.ios(); }
 		if ( iostatus != 0 ) {
@@ -410,10 +364,10 @@ main()
 		// Relying on compiler to supply full path name here
 		{ IOFlags flags; gio::inquire( LFN, flags ); CurrentWorkingFolder = flags.name(); }
 		TempIndx = index( CurrentWorkingFolder, pathChar, true );
-		if ( TempIndx == 0 ) {
-			CurrentWorkingFolder = " ";
+		if ( TempIndx == std::string::npos ) {
+			CurrentWorkingFolder = "";
 		} else {
-			CurrentWorkingFolder = CurrentWorkingFolder( {1,TempIndx} );
+			CurrentWorkingFolder.erase( TempIndx + 1 );
 		}
 		gio::write( LFN, EPlusiniFormat ) << "program" << ProgramPath;
 		gio::close( LFN );
@@ -450,7 +404,7 @@ main()
 }
 
 void
-CreateCurrentDateTimeString( Fstring & CurrentDateTimeString )
+CreateCurrentDateTimeString( std::string & CurrentDateTimeString )
 {
 
 	// SUBROUTINE INFORMATION:
@@ -486,8 +440,8 @@ CreateCurrentDateTimeString( Fstring & CurrentDateTimeString )
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	FArray1D_int value( 8 );
-	Fstring datestring( 15 ); // supposedly returns blank when no date available.
-	Fstring const Blank;
+	std::string datestring; // supposedly returns blank when no date available.
+	std::string const Blank;
 	//value(1)   Current year
 	//value(2)   Current month
 	//value(3)   Current day
@@ -497,7 +451,7 @@ CreateCurrentDateTimeString( Fstring & CurrentDateTimeString )
 	//value(7)   Seconds (0-59)
 	//value(8)   Milliseconds (0-999)
 
-	date_and_time( datestring, _, _, value );
+	date_and_time_string( datestring, _, _, value );
 	if ( datestring != Blank ) {
 		gio::write( CurrentDateTimeString, "(1X,'YMD=',I4,'.',I2.2,'.',I2.2,1X,I2.2,':',I2.2)" ) << value( 1 ) << value( 2 ) << value( 3 ) << value( 5 ) << value( 6 );
 	} else {
@@ -509,9 +463,9 @@ CreateCurrentDateTimeString( Fstring & CurrentDateTimeString )
 void
 ReadINIFile(
 	int const UnitNumber, // Unit number of the opened INI file
-	Fstring const & Heading, // Heading for the parameters ('[heading]')
-	Fstring const & KindofParameter, // Kind of parameter to be found (String)
-	Fstring & DataOut // Output from the retrieval
+	std::string const & Heading, // Heading for the parameters ('[heading]')
+	std::string const & KindofParameter, // Kind of parameter to be found (String)
+	std::string & DataOut // Output from the retrieval
 )
 {
 
@@ -541,7 +495,6 @@ ReadINIFile(
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	int const LineLength( PathLimit + 10 );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 	// na
@@ -550,31 +503,30 @@ ReadINIFile(
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	static Fstring LINE( LineLength );
-	static Fstring LINEOut( LineLength );
-	Fstring Param( 20 );
-	int IHEAD;
-	int ILB;
-	int IRB;
-	int IEQ;
-	int IPAR;
-	int IPOS;
-	int ILEN;
+	static std::string LINE;
+	static std::string LINEOut;
+	std::string Param;
+	std::string::size_type ILB;
+	std::string::size_type IRB;
+	std::string::size_type IEQ;
+	std::string::size_type IPAR;
+	std::string::size_type IPOS;
+	std::string::size_type ILEN;
 	int ReadStat;
 	bool EndofFile;
 	bool Found;
 	bool NewHeading;
 
 	// Formats
-	std::string const Format_700( "(A)" );
+	static gio::Fmt const Format_700( "(A)" );
 
 	DataOut = "           ";
 
 	// I tried ADJUSTL(TRIM(KindofParameter)) and got an internal compiler error
 
-	Param = trim( KindofParameter );
-	Param = adjustl( Param );
-	ILEN = len_trim( Param );
+	Param = KindofParameter;
+	strip( Param );
+	ILEN = len( Param );
 	gio::rewind( UnitNumber );
 	EndofFile = false;
 	Found = false;
@@ -587,21 +539,18 @@ ReadINIFile(
 			break;
 		}
 
-		if ( len_trim( LINE ) == 0 ) continue; // Ignore Blank Lines
+		if ( len( LINE ) == 0 ) continue; // Ignore Blank Lines
 
 		ConvertCaseToLower( LINE, LINEOut ); // Turn line into lower case
 		//        LINE=LINEOut
 
-		IHEAD = index( LINEOut, Heading );
-		if ( IHEAD == 0 ) continue;
+		if ( ! has( LINEOut, Heading ) ) continue;
 
 		//                                  See if [ and ] are on line
-		ILB = index( LINEOut, "[" );
-		IRB = index( LINEOut, "]" );
-		if ( ILB == 0 && IRB == 0 ) continue;
-		if ( index( LINEOut, "[" + trim( Heading ) + "]" ) == 0 ) continue; // Must be really correct heading line
-		ILB = 0;
-		IRB = 0;
+		ILB = index( LINEOut, '[' );
+		IRB = index( LINEOut, ']' );
+		if ( ILB == std::string::npos && IRB == std::string::npos ) continue;
+		if ( ! has( LINEOut, '[' + Heading + ']' ) ) continue; // Must be really correct heading line
 
 		//                                  Heading line found, now looking for Kind
 		while ( ! EndofFile && ! NewHeading ) {
@@ -610,25 +559,25 @@ ReadINIFile(
 				EndofFile = true;
 				break;
 			}
-			LINE = adjustl( LINE );
+			strip( LINE );
 
-			if ( len_trim( LINE ) == 0 ) continue; // Ignore Blank Lines
+			if ( len( LINE ) == 0 ) continue; // Ignore Blank Lines
 
 			ConvertCaseToLower( LINE, LINEOut ); // Turn line into lower case
 			//         LINE=LINEOut
 
-			ILB = index( LINEOut, "[" );
-			IRB = index( LINEOut, "]" );
-			NewHeading = ( ILB != 0 && IRB != 0 );
+			ILB = index( LINEOut, '[' );
+			IRB = index( LINEOut, ']' );
+			NewHeading = ( ILB != std::string::npos && IRB != std::string::npos );
 
 			//                                  Should be a parameter line
 			//                                  KindofParameter = string
-			IEQ = index( LINEOut, "=" );
-			IPAR = index( LINEOut, trim( Param ) );
-			if ( IEQ == 0 ) continue;
-			if ( IPAR == 0 ) continue;
-			if ( IPAR != 1 ) continue;
-			if ( index( LINEOut, trim( Param ) + "=" ) == 0 ) continue; // needs to be param=
+			IEQ = index( LINEOut, '=' );
+			IPAR = index( LINEOut, Param );
+			if ( IEQ == std::string::npos ) continue;
+			if ( IPAR == std::string::npos ) continue;
+			if ( IPAR != 0 ) continue;
+			if ( ! has( LINEOut, Param + '=' ) ) continue; // needs to be param=
 
 			//                                  = found and parameter found.
 			if ( IPAR > IEQ ) continue;
@@ -636,7 +585,7 @@ ReadINIFile(
 			//                                  parameter = found
 			//                                  Set output string to start with non-blank character
 
-			DataOut = adjustl( LINE( IEQ + 1 ) );
+			DataOut = stripped( LINE.substr( IEQ + 1 ) );
 			Found = true;
 			break;
 
@@ -644,20 +593,17 @@ ReadINIFile(
 
 	}
 
-	{ auto const SELECT_CASE_var( Param );
-
-	if ( SELECT_CASE_var == "dir" ) {
-		IPOS = len_trim( DataOut );
+	if ( Param == "dir" ) {
+		IPOS = len( DataOut );
 		if ( IPOS != 0 ) {
 			// Non-blank make sure last position is valid path character
 			//  (Set in DataStringGlobals)
 
-			if ( DataOut( IPOS, IPOS ) != pathChar ) {
-				DataOut( IPOS + 1, IPOS + 1 ) = pathChar;
+			if ( DataOut[ IPOS - 1 ] != pathChar ) {
+				DataOut += pathChar;
 			}
 
 		}
-
-	}}
+	}
 
 }

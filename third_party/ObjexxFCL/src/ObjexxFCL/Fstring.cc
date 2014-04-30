@@ -12,7 +12,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fstring.hh>
-#include <ObjexxFCL/string.constants.hh>
 
 // C++ Headers
 #include <iostream>
@@ -96,7 +95,7 @@ namespace ObjexxFCL {
 		c_str_( nullptr ),
 		sub_( false )
 	{
-		std::memset( str_, SPC, len_ );
+		std::memset( str_, ' ', len_ );
 	}
 
 	// Length Constructor
@@ -106,7 +105,7 @@ namespace ObjexxFCL {
 		c_str_( nullptr ),
 		sub_( false )
 	{
-		std::memset( str_, SPC, len_ );
+		std::memset( str_, ' ', len_ );
 	}
 
 	// Length Constructor
@@ -116,7 +115,7 @@ namespace ObjexxFCL {
 		c_str_( nullptr ),
 		sub_( false )
 	{
-		std::memset( str_, SPC, len_ );
+		std::memset( str_, ' ', len_ );
 	}
 
 	// Length Constructor
@@ -126,7 +125,7 @@ namespace ObjexxFCL {
 		c_str_( nullptr ),
 		sub_( false )
 	{
-		std::memset( str_, SPC, len_ );
+		std::memset( str_, ' ', len_ );
 	}
 
 	// Length Constructor
@@ -136,7 +135,7 @@ namespace ObjexxFCL {
 		c_str_( nullptr ),
 		sub_( false )
 	{
-		std::memset( str_, SPC, len_ );
+		std::memset( str_, ' ', len_ );
 	}
 
 	// Length Constructor
@@ -146,7 +145,7 @@ namespace ObjexxFCL {
 		c_str_( nullptr ),
 		sub_( false )
 	{
-		std::memset( str_, SPC, len_ );
+		std::memset( str_, ' ', len_ );
 	}
 
 	// Length Constructor
@@ -156,7 +155,7 @@ namespace ObjexxFCL {
 		c_str_( nullptr ),
 		sub_( false )
 	{
-		std::memset( str_, SPC, len_ );
+		std::memset( str_, ' ', len_ );
 	}
 
 	// Length Constructor
@@ -166,7 +165,7 @@ namespace ObjexxFCL {
 		c_str_( nullptr ),
 		sub_( false )
 	{
-		std::memset( str_, SPC, len_ );
+		std::memset( str_, ' ', len_ );
 	}
 
 	// Length + Fstring Constructor
@@ -178,7 +177,7 @@ namespace ObjexxFCL {
 	{
 		if ( len_ > s.len_ ) {
 			if ( s.len_ > 0u ) std::memcpy( str_, s.str_, s.len_ );
-			std::memset( str_ + s.len_, SPC, len_ - s.len_ ); // Space pad
+			std::memset( str_ + s.len_, ' ', len_ - s.len_ ); // Space pad
 		} else if ( len_ > 0u ) {
 			std::memcpy( str_, s.str_, len_ );
 		}
@@ -194,7 +193,7 @@ namespace ObjexxFCL {
 		size_type const s_len( s.length() );
 		if ( len_ > s_len ) {
 			if ( s_len > 0u ) s.copy( str_, s_len );
-			std::memset( str_ + s_len, SPC, len_ - s_len ); // Space pad
+			std::memset( str_ + s_len, ' ', len_ - s_len ); // Space pad
 		} else if ( len_ > 0u ) {
 			s.copy( str_, len_ );
 		}
@@ -210,7 +209,7 @@ namespace ObjexxFCL {
 		size_type const s_len( std::strlen( s ) );
 		if ( len_ > s_len ) {
 			if ( s_len > 0u ) std::memcpy( str_, s, s_len );
-			std::memset( str_ + s_len, SPC, len_ - s_len ); // Space pad
+			std::memset( str_ + s_len, ' ', len_ - s_len ); // Space pad
 		} else if ( len_ > 0u ) {
 			std::memcpy( str_, s, len_ );
 		}
@@ -233,7 +232,7 @@ namespace ObjexxFCL {
 		c_str_( nullptr ),
 		sub_( false )
 	{
-		std::memset( str_, SPC, len_ );
+		std::memset( str_, ' ', len_ );
 		init( *this );
 	}
 
@@ -244,7 +243,7 @@ namespace ObjexxFCL {
 		if ( this != &s ) {
 			if ( len_ > s.len_ ) {
 				if ( s.len_ > 0u ) std::memmove( str_, s.str_, s.len_ );
-				std::memset( str_ + s.len_, SPC, len_ - s.len_ ); // Space pad
+				std::memset( str_ + s.len_, ' ', len_ - s.len_ ); // Space pad
 			} else if ( len_ > 0u ) {
 				std::memmove( str_, s.str_, len_ );
 			}
@@ -259,7 +258,7 @@ namespace ObjexxFCL {
 		size_type const s_len( s.length() );
 		if ( len_ > s_len ) {
 			if ( s_len > 0u ) s.copy( str_, s_len );
-			std::memset( str_ + s_len, SPC, len_ - s_len ); // Space pad
+			std::memset( str_ + s_len, ' ', len_ - s_len ); // Space pad
 		} else if ( len_ > 0u ) {
 			s.copy( str_, len_ );
 		}
@@ -273,7 +272,7 @@ namespace ObjexxFCL {
 		size_type const s_len( std::strlen( s ) );
 		if ( len_ > s_len ) {
 			if ( s_len > 0u ) std::memmove( str_, s, s_len );
-			std::memset( str_ + s_len, SPC, len_ - s_len ); // Space pad
+			std::memset( str_ + s_len, ' ', len_ - s_len ); // Space pad
 		} else if ( len_ > 0u ) {
 			std::memmove( str_, s, len_ );
 		}
@@ -286,7 +285,7 @@ namespace ObjexxFCL {
 	{
 		if ( len_ > 0u ) {
 			str_[ 0 ] = c;
-			if ( len_ > 1u ) std::memset( str_ + 1, SPC, len_ - 1u ); // Space pad
+			if ( len_ > 1u ) std::memset( str_ + 1, ' ', len_ - 1u ); // Space pad
 		}
 		return *this;
 	}
@@ -307,46 +306,6 @@ namespace ObjexxFCL {
 				std::memcpy( str_, s.str_, len_ );
 			}
 		}
-	}
-
-	// Has an Fstring?
-	bool
-	Fstring::has( Fstring const & s ) const
-	{
-		for ( size_type i = 1; i <= len_; ++i ) {
-			if ( (*this)( i ) == s ) return true;
-		}
-		return false; // No matches
-	}
-
-	// Has a string?
-	bool
-	Fstring::has( std::string const & s ) const
-	{
-		for ( size_type i = 1; i <= len_; ++i ) {
-			if ( (*this)( i ) == s ) return true;
-		}
-		return false; // No matches
-	}
-
-	// Has a cstring?
-	bool
-	Fstring::has( c_cstring const s ) const
-	{
-		for ( size_type i = 1; i <= len_; ++i ) {
-			if ( (*this)( i ) == s ) return true;
-		}
-		return false; // No matches
-	}
-
-	// Has a Character?
-	bool
-	Fstring::has( char const c ) const
-	{
-		for ( size_type i = 0; i < len_; ++i ) {
-			if ( str_[ i ] == c ) return true;
-		}
-		return false; // No matches
 	}
 
 	// Has any Character of an Fstring?
@@ -450,36 +409,36 @@ namespace ObjexxFCL {
 #ifdef OBJEXXFCL_NO_UNROLL
 		if ( len_ == 0u ) return 0;
 		for ( size_type i = len_ - 1u; i > 0u; --i ) {
-			if ( str_[ i ] != SPC ) return i + 1;
+			if ( str_[ i ] != ' ' ) return i + 1;
 		}
-		return ( str_[ 0 ] != SPC ? 1 : 0 );
+		return ( str_[ 0 ] != ' ' ? 1 : 0 );
 #else
 		if ( len_ == 0u ) return 0;
 		size_type i( len_ );
 		while ( i >= 8u ) {
-			if ( str_[ --i ] != SPC ) return i + 1;
-			if ( str_[ --i ] != SPC ) return i + 1;
-			if ( str_[ --i ] != SPC ) return i + 1;
-			if ( str_[ --i ] != SPC ) return i + 1;
-			if ( str_[ --i ] != SPC ) return i + 1;
-			if ( str_[ --i ] != SPC ) return i + 1;
-			if ( str_[ --i ] != SPC ) return i + 1;
-			if ( str_[ --i ] != SPC ) return i + 1;
+			if ( str_[ --i ] != ' ' ) return i + 1;
+			if ( str_[ --i ] != ' ' ) return i + 1;
+			if ( str_[ --i ] != ' ' ) return i + 1;
+			if ( str_[ --i ] != ' ' ) return i + 1;
+			if ( str_[ --i ] != ' ' ) return i + 1;
+			if ( str_[ --i ] != ' ' ) return i + 1;
+			if ( str_[ --i ] != ' ' ) return i + 1;
+			if ( str_[ --i ] != ' ' ) return i + 1;
 		}
 		if ( i > 0u ) {
-			if ( str_[ --i ] != SPC ) return i + 1;
+			if ( str_[ --i ] != ' ' ) return i + 1;
 			if ( i > 0u ) {
-				if ( str_[ --i ] != SPC ) return i + 1;
+				if ( str_[ --i ] != ' ' ) return i + 1;
 				if ( i > 0u ) {
-					if ( str_[ --i ] != SPC ) return i + 1;
+					if ( str_[ --i ] != ' ' ) return i + 1;
 					if ( i > 0u ) {
-						if ( str_[ --i ] != SPC ) return i + 1;
+						if ( str_[ --i ] != ' ' ) return i + 1;
 						if ( i > 0u ) {
-							if ( str_[ --i ] != SPC ) return i + 1;
+							if ( str_[ --i ] != ' ' ) return i + 1;
 							if ( i > 0u ) {
-								if ( str_[ --i ] != SPC ) return i + 1;
+								if ( str_[ --i ] != ' ' ) return i + 1;
 								if ( i > 0u ) {
-									if ( str_[ --i ] != SPC ) return i + 1;
+									if ( str_[ --i ] != ' ' ) return i + 1;
 								}
 							}
 						}
@@ -498,10 +457,10 @@ namespace ObjexxFCL {
 		if ( len_ == 0u ) return 0;
 		for ( size_type i = len_ - 1u; i > 0u; --i ) {
 			char const c( str_[ i ] );
-			if ( ( c != SPC ) && ( c != TAB ) && ( c != NUL ) ) return i + 1;
+			if ( ( c != ' ' ) && ( c != '\t' ) && ( c != '\0' ) ) return i + 1;
 		}
 		char const c( str_[ 0 ] );
-		return ( ( c != SPC ) && ( c != TAB ) && ( c != NUL ) ? 1 : 0 );
+		return ( ( c != ' ' ) && ( c != '\t' ) && ( c != '\0' ) ? 1 : 0 );
 	}
 
 	// Find First Occurrence of a Whitespace Character
@@ -511,7 +470,7 @@ namespace ObjexxFCL {
 		if ( len_ == 0u ) return 0;
 		for ( size_type i = 0; i < len_; ++i ) {
 			char const c( str_[ i ] );
-			if ( ( c == SPC ) || ( c == TAB ) || ( c == NUL ) ) return i + 1;
+			if ( ( c == ' ' ) || ( c == '\t' ) || ( c == '\0' ) ) return i + 1;
 		}
 		return 0; // All are non-whitespace
 	}
@@ -523,7 +482,7 @@ namespace ObjexxFCL {
 		if ( len_ == 0u ) return 0;
 		for ( size_type i = 0; i < len_; ++i ) {
 			char const c( str_[ i ] );
-			if ( ( c != SPC ) && ( c != TAB ) && ( c != NUL ) ) return i + 1;
+			if ( ( c != ' ' ) && ( c != '\t' ) && ( c != '\0' ) ) return i + 1;
 		}
 		return 0; // All are whitespace
 	}
@@ -535,10 +494,10 @@ namespace ObjexxFCL {
 		if ( len_ == 0u ) return 0;
 		for ( size_type i = len_ - 1u; i > 0u; --i ) {
 			char const c( str_[ i ] );
-			if ( ( c == SPC ) || ( c == TAB ) || ( c == NUL ) ) return i + 1;
+			if ( ( c == ' ' ) || ( c == '\t' ) || ( c == '\0' ) ) return i + 1;
 		}
 		char const c( str_[ 0 ] );
-		return ( ( c == SPC ) || ( c == TAB ) || ( c == NUL ) ? 1 : 0 );
+		return ( ( c == ' ' ) || ( c == '\t' ) || ( c == '\0' ) ? 1 : 0 );
 	}
 
 	// Find Last Occurrence of a Non-Whitespace Character
@@ -548,10 +507,10 @@ namespace ObjexxFCL {
 		if ( len_ == 0u ) return 0;
 		for ( size_type i = len_ - 1u; i > 0u; --i ) {
 			char const c( str_[ i ] );
-			if ( ( c != SPC ) && ( c != TAB ) && ( c != NUL ) ) return i + 1;
+			if ( ( c != ' ' ) && ( c != '\t' ) && ( c != '\0' ) ) return i + 1;
 		}
 		char const c( str_[ 0 ] );
-		return ( ( c != SPC ) && ( c != TAB ) && ( c != NUL ) ? 1 : 0 );
+		return ( ( c != ' ' ) && ( c != '\t' ) && ( c != '\0' ) ? 1 : 0 );
 	}
 
 	// Get Range of Whitespace-Trimmed Portion and Return its Length
@@ -561,94 +520,6 @@ namespace ObjexxFCL {
 		b = std::max( find_non_whitespace(), static_cast< size_type >( 1 ) );
 		e = len_trim_whitespace();
 		return e - b + 1;
-	}
-
-	// Find First Occurrence of an Fstring
-	Fstring::size_type
-	Fstring::find( Fstring const & s ) const
-	{
-		size_type const s_len( s.length() );
-		if ( ( s_len > 0u ) && ( s_len <= len_ ) ) {
-			for ( size_type i = 1, e = len_ - s_len + 1; i <= e; ++i ) {
-				if ( (*this)( i, i + s_len - 1 ) == s ) return i;
-			}
-		}
-		return 0; // No matches
-	}
-
-	// Find First Occurrence of a string
-	Fstring::size_type
-	Fstring::find( std::string const & s ) const
-	{
-		std::string::size_type const s_len( s.length() );
-		if ( ( s_len > 0u ) && ( s_len <= len_ ) ) {
-			for ( size_type i = 1, e = len_ - s_len + 1; i <= e; ++i ) {
-				if ( (*this)( i, i + s_len - 1 ) == s ) return i;
-			}
-		}
-		return 0; // No matches
-	}
-
-	// Find First Occurrence of a cstring
-	Fstring::size_type
-	Fstring::find( c_cstring const s ) const
-	{
-		size_type const s_len( std::strlen( s ) );
-		if ( ( s_len > 0u ) && ( s_len <= len_ ) ) {
-			for ( size_type i = 1, e = len_ - s_len + 1; i <= e; ++i ) {
-				if ( (*this)( i, i + s_len - 1 ) == s ) return i;
-			}
-		}
-		return 0; // No matches
-	}
-
-	// Find First Occurrence of a Character
-	Fstring::size_type
-	Fstring::find( char const c ) const
-	{
-		for ( size_type i = 1; i <= len_; ++i ) {
-			if ( str_[ i - 1 ] == c ) return i;
-		}
-		return 0; // No matches
-	}
-
-	// Find Last Occurrence of an Fstring
-	Fstring::size_type
-	Fstring::find_last( Fstring const & s ) const
-	{
-		size_type const s_len( s.length() );
-		if ( ( s_len > 0u ) && ( s_len <= len_ ) ) {
-			for ( size_type i = len_ - s_len + 1; i > 0u; --i ) {
-				if ( (*this)( i, i + s_len - 1 ) == s ) return i;
-			}
-		}
-		return 0; // No matches
-	}
-
-	// Find Last Occurrence of a string
-	Fstring::size_type
-	Fstring::find_last( std::string const & s ) const
-	{
-		std::string::size_type const s_len( s.length() );
-		if ( ( s_len > 0u ) && ( s_len <= len_ ) ) {
-			for ( size_type i = len_ - s_len + 1; i > 0u; --i ) {
-				if ( (*this)( i, i + s_len - 1 ) == s ) return i;
-			}
-		}
-		return 0; // No matches
-	}
-
-	// Find Last Occurrence of a cstring
-	Fstring::size_type
-	Fstring::find_last( c_cstring const s ) const
-	{
-		size_type const s_len( std::strlen( s ) );
-		if ( ( s_len > 0u ) && ( s_len <= len_ ) ) {
-			for ( size_type i = len_ - s_len + 1; i > 0u; --i ) {
-				if ( (*this)( i, i + s_len - 1 ) == s ) return i;
-			}
-		}
-		return 0; // No matches
 	}
 
 	// Find Last Occurrence of a Character
@@ -908,10 +779,10 @@ namespace ObjexxFCL {
 	Fstring::left_justify()
 	{
 		for ( size_type i = 0; i < len_; ++i ) {
-			if ( str_[ i ] != SPC ) {
+			if ( str_[ i ] != ' ' ) {
 				if ( i > 0u ) {
 					std::memmove( str_, str_ + i, len_ - i );
-					std::memset( str_ + len_ - i, SPC, i );
+					std::memset( str_ + len_ - i, ' ', i );
 				}
 				return *this;
 			}
@@ -924,10 +795,10 @@ namespace ObjexxFCL {
 	Fstring::right_justify()
 	{
 		for ( size_type i = len_; i > 0u; --i ) {
-			if ( str_[ i - 1 ] != SPC ) {
+			if ( str_[ i - 1 ] != ' ' ) {
 				if ( i < len_ ) {
 					std::memmove( str_ + len_ - i, str_, i );
-					std::memset( str_, SPC, len_ - i );
+					std::memset( str_, ' ', len_ - i );
 				}
 				return *this;
 			}
@@ -944,7 +815,7 @@ namespace ObjexxFCL {
 		size_type const pad( ( len_ - len_t ) / 2 );
 		if ( pad > 0u ) {
 			std::memmove( str_ + pad, str_, len_t );
-			std::memset( str_, SPC, pad );
+			std::memset( str_, ' ', pad );
 		}
 		return *this;
 	}
@@ -956,9 +827,9 @@ namespace ObjexxFCL {
 		size_type j( 0 );
 		for ( size_type i = 0; i < len_; ++i ) {
 			char const c( str_[ i ] );
-			if ( ( c != SPC ) && ( c != TAB ) && ( c != NUL ) ) str_[ j++ ] = c;
+			if ( ( c != ' ' ) && ( c != '\t' ) && ( c != '\0' ) ) str_[ j++ ] = c;
 		}
-		if ( j < len_ ) std::memset( str_ + j, SPC, len_ - j );
+		if ( j < len_ ) std::memset( str_ + j, ' ', len_ - j );
 		return *this;
 	}
 
@@ -969,7 +840,7 @@ namespace ObjexxFCL {
 		if ( len_ > 0u ) {
 			size_type const ie( len_trim_whitespace() );
 			if ( ie < len_ ) {
-				std::memset( str_ + ie, SPC, len_ - ie ); // Space pad
+				std::memset( str_ + ie, ' ', len_ - ie ); // Space pad
 			}
 		}
 		return *this;
@@ -989,7 +860,7 @@ namespace ObjexxFCL {
 				size_type const len_sub( ie - ib + 1 );
 				if ( len_sub < len_ ) {
 					if ( ib > 1 ) std::memmove( str_, str_ + ib - 1, len_sub );
-					std::memset( str_ + len_sub, SPC, len_ - len_sub ); // Space pad
+					std::memset( str_ + len_sub, ' ', len_ - len_sub ); // Space pad
 				}
 			}
 		}
@@ -1008,7 +879,7 @@ namespace ObjexxFCL {
 				size_type const len_sub( len_ - ib + 1 );
 				if ( len_sub < len_ ) {
 					if ( ib > 1 ) std::memmove( str_, str_ + ib - 1, len_sub );
-					std::memset( str_ + len_sub, SPC, len_ - len_sub ); // Space pad
+					std::memset( str_ + len_sub, ' ', len_ - len_sub ); // Space pad
 				}
 			}
 		}
@@ -1024,7 +895,7 @@ namespace ObjexxFCL {
 			if ( ie == 0 ) {
 				clear();
 			} else if ( ie < len_ ) {
-				std::memset( str_ + ie, SPC, len_ - ie ); // Space pad
+				std::memset( str_ + ie, ' ', len_ - ie ); // Space pad
 			}
 		}
 		return *this;
@@ -1035,16 +906,16 @@ namespace ObjexxFCL {
 	Fstring::strip()
 	{
 		if ( len_ > 0u ) {
-			size_type const ib( find_first_not_of( SPC ) );
+			size_type const ib( find_first_not_of( ' ' ) );
 			if ( ib == 0 ) {
 				clear();
 			} else {
-				size_type const ie( find_last_not_of( SPC ) );
+				size_type const ie( find_last_not_of( ' ' ) );
 				assert( ie >= ib );
 				size_type const len_sub( ie - ib + 1 );
 				if ( len_sub < len_ ) {
 					if ( ib > 1 ) std::memmove( str_, str_ + ib - 1, len_sub );
-					std::memset( str_ + len_sub, SPC, len_ - len_sub ); // Space pad
+					std::memset( str_ + len_sub, ' ', len_ - len_sub ); // Space pad
 				}
 			}
 		}
@@ -1056,14 +927,14 @@ namespace ObjexxFCL {
 	Fstring::lstrip()
 	{
 		if ( len_ > 0u ) {
-			size_type const ib( find_first_not_of( SPC ) );
+			size_type const ib( find_first_not_of( ' ' ) );
 			if ( ib == 0 ) {
 				clear();
 			} else {
 				size_type const len_sub( len_ - ib + 1 );
 				if ( len_sub < len_ ) {
 					if ( ib > 1 ) std::memmove( str_, str_ + ib - 1, len_sub );
-					std::memset( str_ + len_sub, SPC, len_ - len_sub ); // Space pad
+					std::memset( str_ + len_sub, ' ', len_ - len_sub ); // Space pad
 				}
 			}
 		}
@@ -1075,11 +946,11 @@ namespace ObjexxFCL {
 	Fstring::rstrip()
 	{
 		if ( len_ > 0u ) {
-			size_type const ie( find_last_not_of( SPC ) );
+			size_type const ie( find_last_not_of( ' ' ) );
 			if ( ie == 0 ) {
 				clear();
 			} else if ( ie < len_ ) {
-				std::memset( str_ + ie, SPC, len_ - ie ); // Space pad
+				std::memset( str_ + ie, ' ', len_ - ie ); // Space pad
 			}
 		}
 		return *this;
@@ -1089,17 +960,18 @@ namespace ObjexxFCL {
 	Fstring &
 	Fstring::strip_whitespace()
 	{
+		static std::string const WHITE( " \t\0", 3 );
 		if ( len_ > 0u ) {
-			size_type const ib( find_first_not_of( WHITESPACE ) );
+			size_type const ib( find_first_not_of( WHITE ) );
 			if ( ib == 0 ) {
 				clear();
 			} else {
-				size_type const ie( find_last_not_of( WHITESPACE ) );
+				size_type const ie( find_last_not_of( WHITE ) );
 				assert( ie >= ib );
 				size_type const len_sub( ie - ib + 1 );
 				if ( len_sub < len_ ) {
 					if ( ib > 1 ) std::memmove( str_, str_ + ib - 1, len_sub );
-					std::memset( str_ + len_sub, SPC, len_ - len_sub ); // Space pad
+					std::memset( str_ + len_sub, ' ', len_ - len_sub ); // Space pad
 				}
 			}
 		}
@@ -1110,15 +982,16 @@ namespace ObjexxFCL {
 	Fstring &
 	Fstring::lstrip_whitespace()
 	{
+		static std::string const WHITE( " \t\0", 3 );
 		if ( len_ > 0u ) {
-			size_type const ib( find_first_not_of( WHITESPACE ) );
+			size_type const ib( find_first_not_of( WHITE ) );
 			if ( ib == 0 ) {
 				clear();
 			} else {
 				size_type const len_sub( len_ - ib + 1 );
 				if ( len_sub < len_ ) {
 					if ( ib > 1 ) std::memmove( str_, str_ + ib - 1, len_sub );
-					std::memset( str_ + len_sub, SPC, len_ - len_sub ); // Space pad
+					std::memset( str_ + len_sub, ' ', len_ - len_sub ); // Space pad
 				}
 			}
 		}
@@ -1129,12 +1002,13 @@ namespace ObjexxFCL {
 	Fstring &
 	Fstring::rstrip_whitespace()
 	{
+		static std::string const WHITE( " \t\0", 3 );
 		if ( len_ > 0u ) {
-			size_type const ie( find_last_not_of( WHITESPACE ) );
+			size_type const ie( find_last_not_of( WHITE ) );
 			if ( ie == 0 ) {
 				clear();
 			} else if ( ie < len_ ) {
-				std::memset( str_ + ie, SPC, len_ - ie ); // Space pad
+				std::memset( str_ + ie, ' ', len_ - ie ); // Space pad
 			}
 		}
 		return *this;
@@ -1146,7 +1020,7 @@ namespace ObjexxFCL {
 	{
 		delete[] c_str_; c_str_ = new char[ len_ + 1 ];
 		if ( len_ > 0u ) std::memmove( c_str_, str_, len_ ); // Copy the string data
-		c_str_[ len_ ] = NUL; // Null-terminate
+		c_str_[ len_ ] = '\0'; // Null-terminate
 		return c_str_;
 	}
 
@@ -1158,7 +1032,7 @@ namespace ObjexxFCL {
 		size_type const len_trim_whitespace_( len_trim_whitespace() );
 		delete[] c_str_; c_str_ = new char[ len_trim_whitespace_ + 1 ];
 		if ( len_trim_whitespace_ > 0u ) std::memmove( c_str_, str_, len_trim_whitespace_ ); // Copy the string data
-		c_str_[ len_trim_whitespace_ ] = NUL; // Null-terminate
+		c_str_[ len_trim_whitespace_ ] = '\0'; // Null-terminate
 		return c_str_;
 	}
 
@@ -1244,11 +1118,11 @@ operator ==( Fstring const & s, Fstring const & t )
 	}
 	if ( s.len_ < t.len_ ) {
 		for ( Fstring::size_type i = s.len_, e = t.len_; i < e; ++i ) {
-			if ( t.str_[ i ] != SPC ) return false;
+			if ( t.str_[ i ] != ' ' ) return false;
 		}
 	} else if ( s.len_ > t.len_ ) {
 		for ( Fstring::size_type i = t.len_, e = s.len_; i < e; ++i ) {
-			if ( s.str_[ i ] != SPC ) return false;
+			if ( s.str_[ i ] != ' ' ) return false;
 		}
 	}
 	return true;
@@ -1265,11 +1139,11 @@ operator ==( Fstring const & s, std::string const & t )
 	}
 	if ( s.len_ < t_len ) {
 		for ( Fstring::size_type i = s.len_; i < t_len; ++i ) {
-			if ( t[ i ] != SPC ) return false;
+			if ( t[ i ] != ' ' ) return false;
 		}
 	} else if ( s.len_ > t_len ) {
 		for ( Fstring::size_type i = t_len, e = s.len_; i < e; ++i ) {
-			if ( s.str_[ i ] != SPC ) return false;
+			if ( s.str_[ i ] != ' ' ) return false;
 		}
 	}
 	return true;
@@ -1286,11 +1160,11 @@ operator ==( Fstring const & s, c_cstring const t )
 	}
 	if ( s.len_ < t_len ) {
 		for ( Fstring::size_type i = s.len_; i < t_len; ++i ) {
-			if ( t[ i ] != SPC ) return false;
+			if ( t[ i ] != ' ' ) return false;
 		}
 	} else if ( s.len_ > t_len ) {
 		for ( Fstring::size_type i = t_len, e = s.len_; i < e; ++i ) {
-			if ( s.str_[ i ] != SPC ) return false;
+			if ( s.str_[ i ] != ' ' ) return false;
 		}
 	}
 	return true;
@@ -1319,11 +1193,11 @@ equali( Fstring const & s, Fstring const & t )
 	}
 	if ( s.len_ < t.len_ ) {
 		for ( Fstring::size_type i = s.len_, e = t.len_; i < e; ++i ) {
-			if ( t.str_[ i ] != SPC ) return false;
+			if ( t.str_[ i ] != ' ' ) return false;
 		}
 	} else if ( s.len_ > t.len_ ) {
 		for ( Fstring::size_type i = t.len_, e = s.len_; i < e; ++i ) {
-			if ( s.str_[ i ] != SPC ) return false;
+			if ( s.str_[ i ] != ' ' ) return false;
 		}
 	}
 	return true;
@@ -1340,11 +1214,11 @@ equali( Fstring const & s, std::string const & t )
 	}
 	if ( s.len_ < t_len ) {
 		for ( Fstring::size_type i = s.len_; i < t_len; ++i ) {
-			if ( t[ i ] != SPC ) return false;
+			if ( t[ i ] != ' ' ) return false;
 		}
 	} else if ( s.len_ > t_len ) {
 		for ( Fstring::size_type i = t_len, e = s.len_; i < e; ++i ) {
-			if ( s.str_[ i ] != SPC ) return false;
+			if ( s.str_[ i ] != ' ' ) return false;
 		}
 	}
 	return true;
@@ -1361,11 +1235,11 @@ equali( Fstring const & s, c_cstring const t )
 	}
 	if ( s.len_ < t_len ) {
 		for ( Fstring::size_type i = s.len_; i < t_len; ++i ) {
-			if ( t[ i ] != SPC ) return false;
+			if ( t[ i ] != ' ' ) return false;
 		}
 	} else if ( s.len_ > t_len ) {
 		for ( Fstring::size_type i = t_len, e = s.len_; i < e; ++i ) {
-			if ( s.str_[ i ] != SPC ) return false;
+			if ( s.str_[ i ] != ' ' ) return false;
 		}
 	}
 	return true;
@@ -1401,18 +1275,18 @@ operator <=( Fstring const & s, Fstring const & t )
 	if ( s.len_ < t.len_ ) {
 		for ( Fstring::size_type i = s.len_, e = t.len_; i < e; ++i ) {
 			unsigned char const t_i( t.str_[ i ] );
-			if ( SPC < t_i ) {
+			if ( ' ' < t_i ) {
 				return true;
-			} else if ( SPC > t_i ) {
+			} else if ( ' ' > t_i ) {
 				return false;
 			}
 		}
 	} else if ( s.len_ > t.len_ ) {
 		for ( Fstring::size_type i = t.len_, e = s.len_; i < e; ++i ) {
 			unsigned char const s_i( s.str_[ i ] );
-			if ( s_i < SPC ) {
+			if ( s_i < ' ' ) {
 				return true;
-			} else if ( s_i > SPC ) {
+			} else if ( s_i > ' ' ) {
 				return false;
 			}
 		}
@@ -1437,18 +1311,18 @@ operator <( Fstring const & s, Fstring const & t )
 	if ( s.len_ < t.len_ ) {
 		for ( Fstring::size_type i = s.len_, e = t.len_; i < e; ++i ) {
 			unsigned char const t_i( t.str_[ i ] );
-			if ( SPC < t_i ) {
+			if ( ' ' < t_i ) {
 				return true;
-			} else if ( SPC > t_i ) {
+			} else if ( ' ' > t_i ) {
 				return false;
 			}
 		}
 	} else if ( s.len_ > t.len_ ) {
 		for ( Fstring::size_type i = t.len_, e = s.len_; i < e; ++i ) {
 			unsigned char const s_i( s.str_[ i ] );
-			if ( s_i < SPC ) {
+			if ( s_i < ' ' ) {
 				return true;
-			} else if ( s_i > SPC ) {
+			} else if ( s_i > ' ' ) {
 				return false;
 			}
 		}
@@ -1474,18 +1348,18 @@ operator <=( Fstring const & s, std::string const & t )
 	if ( s.len_ < t_len ) {
 		for ( Fstring::size_type i = s.len_; i < t_len; ++i ) {
 			unsigned char const t_i( t[ i ] );
-			if ( SPC < t_i ) {
+			if ( ' ' < t_i ) {
 				return true;
-			} else if ( SPC > t_i ) {
+			} else if ( ' ' > t_i ) {
 				return false;
 			}
 		}
 	} else if ( s.len_ > t_len ) {
 		for ( Fstring::size_type i = t_len, e = s.len_; i < e; ++i ) {
 			unsigned char const s_i( s.str_[ i ] );
-			if ( s_i < SPC ) {
+			if ( s_i < ' ' ) {
 				return true;
-			} else if ( s_i > SPC ) {
+			} else if ( s_i > ' ' ) {
 				return false;
 			}
 		}
@@ -1511,18 +1385,18 @@ operator <( Fstring const & s, std::string const & t )
 	if ( s.len_ < t_len ) {
 		for ( Fstring::size_type i = s.len_; i < t_len; ++i ) {
 			unsigned char const t_i( t[ i ] );
-			if ( SPC < t_i ) {
+			if ( ' ' < t_i ) {
 				return true;
-			} else if ( SPC > t_i ) {
+			} else if ( ' ' > t_i ) {
 				return false;
 			}
 		}
 	} else if ( s.len_ > t_len ) {
 		for ( Fstring::size_type i = t_len, e = s.len_; i < e; ++i ) {
 			unsigned char const s_i( s.str_[ i ] );
-			if ( s_i < SPC ) {
+			if ( s_i < ' ' ) {
 				return true;
-			} else if ( s_i > SPC ) {
+			} else if ( s_i > ' ' ) {
 				return false;
 			}
 		}
@@ -1548,18 +1422,18 @@ operator <=( Fstring const & s, c_cstring const t )
 	if ( s.len_ < t_len ) {
 		for ( Fstring::size_type i = s.len_; i < t_len; ++i ) {
 			unsigned char const t_i( t[ i ] );
-			if ( SPC < t_i ) {
+			if ( ' ' < t_i ) {
 				return true;
-			} else if ( SPC > t_i ) {
+			} else if ( ' ' > t_i ) {
 				return false;
 			}
 		}
 	} else if ( s.len_ > t_len ) {
 		for ( Fstring::size_type i = t_len, e = s.len_; i < e; ++i ) {
 			unsigned char const s_i( s.str_[ i ] );
-			if ( s_i < SPC ) {
+			if ( s_i < ' ' ) {
 				return true;
-			} else if ( s_i > SPC ) {
+			} else if ( s_i > ' ' ) {
 				return false;
 			}
 		}
@@ -1585,18 +1459,18 @@ operator <( Fstring const & s, c_cstring const t )
 	if ( s.len_ < t_len ) {
 		for ( Fstring::size_type i = s.len_; i < t_len; ++i ) {
 			unsigned char const t_i( t[ i ] );
-			if ( SPC < t_i ) {
+			if ( ' ' < t_i ) {
 				return true;
-			} else if ( SPC > t_i ) {
+			} else if ( ' ' > t_i ) {
 				return false;
 			}
 		}
 	} else if ( s.len_ > t_len ) {
 		for ( Fstring::size_type i = t_len, e = s.len_; i < e; ++i ) {
 			unsigned char const s_i( s.str_[ i ] );
-			if ( s_i < SPC ) {
+			if ( s_i < ' ' ) {
 				return true;
-			} else if ( s_i > SPC ) {
+			} else if ( s_i > ' ' ) {
 				return false;
 			}
 		}
@@ -1623,7 +1497,7 @@ get( std::istream & stream, Fstring & s )
 		stream.get( buff, s.len_ + 1 ); // get adds null-terminator
 		std::size_t const lb( std::strlen( buff ) );
 		std::memcpy( s.str_, buff, lb );
-		std::memset( s.str_ + lb, SPC, s.len_ - lb );
+		std::memset( s.str_ + lb, ' ', s.len_ - lb );
 		delete[] buff;
 	}
 	return stream;

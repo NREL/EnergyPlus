@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -28,19 +27,19 @@ namespace SortAndStringUtilities {
 
 	void
 	SetupAndSort(
-		FArray1S_Fstring Alphas, // Alphas to be sorted
+		FArray1S_string Alphas, // Alphas to be sorted
 		FArray1S_int iAlphas // Pointers -- this is the array that is actually sorted
 	);
 
 	void
 	QsortC(
-		FArray1S_Fstring Alphas, // Alphas to be sorted
+		FArray1S_string Alphas, // Alphas to be sorted
 		FArray1S_int iAlphas // Pointers -- this is the array that is actually sorted
 	);
 
 	void
 	QsortPartition(
-		FArray1S_Fstring Alphas, // Alphas to be sorted
+		FArray1S_string Alphas, // Alphas to be sorted
 		FArray1S_int iAlphas, // Pointers -- this is the array that is actually sorted
 		int & marker
 	);

@@ -45,7 +45,6 @@ namespace WaterUse {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::WarmupFlag;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::InitConvTemp;
 	using DataGlobals::NumOfZones;
@@ -174,10 +173,10 @@ namespace WaterUse {
 				} else if ( NumIteration > MaxIterations ) {
 					if ( ! WarmupFlag ) {
 						if ( WaterConnections( WaterConnNum ).MaxIterationsErrorIndex == 0 ) {
-							ShowWarningError( "WaterUse:Connections = " + trim( WaterConnections( WaterConnNum ).Name ) + ":  Heat recovery temperature did not converge" );
-							ShowContinueErrorTimeStamp( " " );
+							ShowWarningError( "WaterUse:Connections = " + WaterConnections( WaterConnNum ).Name + ":  Heat recovery temperature did not converge" );
+							ShowContinueErrorTimeStamp( "" );
 						}
-						ShowRecurringWarningErrorAtEnd( "WaterUse:Connections = " + trim( WaterConnections( WaterConnNum ).Name ) + ":  Heat recovery temperature did not converge", WaterConnections( WaterConnNum ).MaxIterationsErrorIndex );
+						ShowRecurringWarningErrorAtEnd( "WaterUse:Connections = " + WaterConnections( WaterConnNum ).Name + ":  Heat recovery temperature did not converge", WaterConnections( WaterConnNum ).MaxIterationsErrorIndex );
 					}
 					break;
 				}
@@ -195,7 +194,7 @@ namespace WaterUse {
 	void
 	SimulateWaterUseConnection(
 		int const EquipTypeNum,
-		Fstring const & CompName,
+		std::string const & CompName,
 		int & CompIndex,
 		bool const InitLoopEquip,
 		bool const FirstHVACIteration
@@ -242,17 +241,17 @@ namespace WaterUse {
 		if ( CompIndex == 0 ) {
 			WaterConnNum = FindItemInList( CompName, WaterConnections.Name(), NumWaterConnections );
 			if ( WaterConnNum == 0 ) {
-				ShowFatalError( "SimulateWaterUseConnection: Unit not found=" + trim( CompName ) );
+				ShowFatalError( "SimulateWaterUseConnection: Unit not found=" + CompName );
 			}
 			CompIndex = WaterConnNum;
 		} else {
 			WaterConnNum = CompIndex;
 			if ( WaterConnNum > NumWaterConnections || WaterConnNum < 1 ) {
-				ShowFatalError( "SimulateWaterUseConnection: Invalid CompIndex passed=" + trim( TrimSigDigits( WaterConnNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumWaterConnections ) ) + ", Entered Unit name=" + trim( CompName ) );
+				ShowFatalError( "SimulateWaterUseConnection: Invalid CompIndex passed=" + TrimSigDigits( WaterConnNum ) + ", Number of Units=" + TrimSigDigits( NumWaterConnections ) + ", Entered Unit name=" + CompName );
 			}
 			if ( CheckEquipName( WaterConnNum ) ) {
 				if ( CompName != WaterConnections( WaterConnNum ).Name ) {
-					ShowFatalError( "SimulateWaterUseConnection: Invalid CompIndex passed=" + trim( TrimSigDigits( WaterConnNum ) ) + ", Unit name=" + trim( CompName ) + ", stored Unit Name for that index=" + trim( WaterConnections( WaterConnNum ).Name ) );
+					ShowFatalError( "SimulateWaterUseConnection: Invalid CompIndex passed=" + TrimSigDigits( WaterConnNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + WaterConnections( WaterConnNum ).Name );
 				}
 				CheckEquipName( WaterConnNum ) = false;
 			}
@@ -299,10 +298,10 @@ namespace WaterUse {
 			} else if ( NumIteration > MaxIterations ) {
 				if ( ! WarmupFlag ) {
 					if ( WaterConnections( WaterConnNum ).MaxIterationsErrorIndex == 0 ) {
-						ShowWarningError( "WaterUse:Connections = " + trim( WaterConnections( WaterConnNum ).Name ) + ":  Heat recovery temperature did not converge" );
-						ShowContinueErrorTimeStamp( " " );
+						ShowWarningError( "WaterUse:Connections = " + WaterConnections( WaterConnNum ).Name + ":  Heat recovery temperature did not converge" );
+						ShowContinueErrorTimeStamp( "" );
 					}
-					ShowRecurringWarningErrorAtEnd( "WaterUse:Connections = " + trim( WaterConnections( WaterConnNum ).Name ) + ":  Heat recovery temperature did not converge", WaterConnections( WaterConnNum ).MaxIterationsErrorIndex );
+					ShowRecurringWarningErrorAtEnd( "WaterUse:Connections = " + WaterConnections( WaterConnNum ).Name + ":  Heat recovery temperature did not converge", WaterConnections( WaterConnNum ).MaxIterationsErrorIndex );
 				}
 				break;
 			}
@@ -349,7 +348,7 @@ namespace WaterUse {
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const Blank;
+		static std::string const Blank;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
@@ -377,7 +376,7 @@ namespace WaterUse {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), WaterEquipment.Name(), WaterEquipNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+				VerifyName( cAlphaArgs( 1 ), WaterEquipment.Name(), WaterEquipNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -393,8 +392,8 @@ namespace WaterUse {
 					// If no FlowRateFracSchedule, fraction defaults to 1.0
 
 					if ( WaterEquipment( WaterEquipNum ).FlowRateFracSchedule == 0 ) {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + "=" + trim( cAlphaArgs( 3 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					}
 				}
@@ -403,8 +402,8 @@ namespace WaterUse {
 					WaterEquipment( WaterEquipNum ).TargetTempSchedule = GetScheduleIndex( cAlphaArgs( 4 ) );
 
 					if ( WaterEquipment( WaterEquipNum ).TargetTempSchedule == 0 ) {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 4 ) ) + "=" + trim( cAlphaArgs( 4 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					}
 				}
@@ -415,8 +414,8 @@ namespace WaterUse {
 					// HotTempSchedule is ignored if connected to a plant loop via WATER USE CONNECTIONS
 
 					if ( WaterEquipment( WaterEquipNum ).HotTempSchedule == 0 ) {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 5 ) ) + "=" + trim( cAlphaArgs( 5 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 5 ) + '=' + cAlphaArgs( 5 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					}
 				}
@@ -426,8 +425,8 @@ namespace WaterUse {
 					// If no ColdTempSchedule, temperatures will be calculated by WATER MAINS TEMPERATURES object
 
 					if ( WaterEquipment( WaterEquipNum ).ColdTempSchedule == 0 ) {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 6 ) ) + "=" + trim( cAlphaArgs( 6 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + '=' + cAlphaArgs( 6 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					}
 				}
@@ -436,8 +435,8 @@ namespace WaterUse {
 					WaterEquipment( WaterEquipNum ).Zone = FindItemInList( cAlphaArgs( 7 ), Zone.Name(), NumOfZones );
 
 					if ( WaterEquipment( WaterEquipNum ).Zone == 0 ) {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( cAlphaArgs( 7 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					}
 				}
@@ -446,8 +445,8 @@ namespace WaterUse {
 					WaterEquipment( WaterEquipNum ).SensibleFracSchedule = GetScheduleIndex( cAlphaArgs( 8 ) );
 
 					if ( WaterEquipment( WaterEquipNum ).SensibleFracSchedule == 0 ) {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 8 ) ) + "=" + trim( cAlphaArgs( 8 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 8 ) + '=' + cAlphaArgs( 8 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					}
 				}
@@ -456,15 +455,15 @@ namespace WaterUse {
 					WaterEquipment( WaterEquipNum ).LatentFracSchedule = GetScheduleIndex( cAlphaArgs( 9 ) );
 
 					if ( WaterEquipment( WaterEquipNum ).LatentFracSchedule == 0 ) {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 9 ) ) + "=" + trim( cAlphaArgs( 9 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 9 ) + '=' + cAlphaArgs( 9 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					}
 				}
 
 			} // WaterEquipNum
 
-			if ( ErrorsFound ) ShowFatalError( "Errors found in processing input for " + trim( cCurrentModuleObject ) );
+			if ( ErrorsFound ) ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
 
 		}
 
@@ -479,7 +478,7 @@ namespace WaterUse {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), WaterConnections.Name(), WaterConnNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+				VerifyName( cAlphaArgs( 1 ), WaterConnections.Name(), WaterConnNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -487,22 +486,22 @@ namespace WaterUse {
 				WaterConnections( WaterConnNum ).Name = cAlphaArgs( 1 );
 
 				if ( ( ! lAlphaFieldBlanks( 2 ) ) || ( ! lAlphaFieldBlanks( 3 ) ) ) {
-					WaterConnections( WaterConnNum ).InletNode = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-					WaterConnections( WaterConnNum ).OutletNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+					WaterConnections( WaterConnNum ).InletNode = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+					WaterConnections( WaterConnNum ).OutletNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 					// Check plant connections
-					TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "DHW Nodes" );
+					TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "DHW Nodes" );
 				} else {
 					// If no plant nodes are connected, simulate in stand-alone mode.
 					WaterConnections( WaterConnNum ).StandAlone = true;
 				}
 
 				if ( ! lAlphaFieldBlanks( 4 ) ) {
-					SetupTankDemandComponent( WaterConnections( WaterConnNum ).Name, trim( cCurrentModuleObject ), cAlphaArgs( 4 ), ErrorsFound, WaterConnections( WaterConnNum ).SupplyTankNum, WaterConnections( WaterConnNum ).TankDemandID );
+					SetupTankDemandComponent( WaterConnections( WaterConnNum ).Name, cCurrentModuleObject, cAlphaArgs( 4 ), ErrorsFound, WaterConnections( WaterConnNum ).SupplyTankNum, WaterConnections( WaterConnNum ).TankDemandID );
 				}
 
 				if ( ! lAlphaFieldBlanks( 5 ) ) {
-					SetupTankSupplyComponent( WaterConnections( WaterConnNum ).Name, trim( cCurrentModuleObject ), cAlphaArgs( 5 ), ErrorsFound, WaterConnections( WaterConnNum ).RecoveryTankNum, WaterConnections( WaterConnNum ).TankSupplyID );
+					SetupTankSupplyComponent( WaterConnections( WaterConnNum ).Name, cCurrentModuleObject, cAlphaArgs( 5 ), ErrorsFound, WaterConnections( WaterConnNum ).RecoveryTankNum, WaterConnections( WaterConnNum ).TankSupplyID );
 				}
 
 				if ( ! lAlphaFieldBlanks( 6 ) ) {
@@ -511,8 +510,8 @@ namespace WaterUse {
 					// HotTempSchedule is ignored if connected to a plant loop via WATER USE CONNECTIONS
 
 					if ( WaterConnections( WaterConnNum ).HotTempSchedule == 0 ) {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 6 ) ) + "=" + trim( cAlphaArgs( 6 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + '=' + cAlphaArgs( 6 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					}
 				}
@@ -522,8 +521,8 @@ namespace WaterUse {
 					// If no ColdTempSchedule, temperatures will be calculated by WATER MAINS TEMPERATURES object
 
 					if ( WaterConnections( WaterConnNum ).ColdTempSchedule == 0 ) {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( cAlphaArgs( 7 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					}
 				}
@@ -539,8 +538,8 @@ namespace WaterUse {
 					} else if ( SELECT_CASE_var == "CROSSFLOW" ) {
 						WaterConnections( WaterConnNum ).HeatRecoveryHX = HeatRecoveryHXCrossFlow;
 					} else {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 8 ) ) + "=" + trim( cAlphaArgs( 8 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 8 ) + '=' + cAlphaArgs( 8 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					}}
 
@@ -552,8 +551,8 @@ namespace WaterUse {
 					} else if ( SELECT_CASE_var == "PLANTANDEQUIPMENT" ) {
 						WaterConnections( WaterConnNum ).HeatRecoveryConfig = HeatRecoveryConfigPlantAndEquip;
 					} else {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 9 ) ) + "=" + trim( cAlphaArgs( 9 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 9 ) + '=' + cAlphaArgs( 9 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					}}
 				}
@@ -566,12 +565,12 @@ namespace WaterUse {
 					WaterEquipNum = FindItemInList( cAlphaArgs( AlphaNum ), WaterEquipment.Name(), NumWaterEquipment );
 
 					if ( WaterEquipNum == 0 ) {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( AlphaNum ) ) + "=" + trim( cAlphaArgs( AlphaNum ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( AlphaNum ) + '=' + cAlphaArgs( AlphaNum ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					} else {
 						if ( WaterEquipment( WaterEquipNum ).Connections > 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  WaterUse:Equipment = " + trim( cAlphaArgs( AlphaNum ) ) + " is already referenced by another object." );
+							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  WaterUse:Equipment = " + cAlphaArgs( AlphaNum ) + " is already referenced by another object." );
 							ErrorsFound = true;
 						} else {
 							WaterEquipment( WaterEquipNum ).Connections = WaterConnNum;
@@ -586,7 +585,7 @@ namespace WaterUse {
 
 			} // WaterConnNum
 
-			if ( ErrorsFound ) ShowFatalError( "Errors found in processing input for " + trim( cCurrentModuleObject ) );
+			if ( ErrorsFound ) ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
 
 			if ( NumWaterConnections > 0 ) {
 				CheckEquipName.allocate( NumWaterConnections );

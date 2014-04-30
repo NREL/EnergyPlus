@@ -85,7 +85,6 @@ namespace WindowEquivalentLayer {
 	using DataGlobals::GravityConstant;
 	using DataGlobals::CurrentTime;
 	using DataGlobals::WarmupFlag;
-	using DataGlobals::MaxNameLength;
 	using DataEnvironment::Month;
 	using DataEnvironment::DayOfMonth;
 	using General::TrimSigDigits;
@@ -257,7 +256,7 @@ namespace WindowEquivalentLayer {
 			} else {
 				// Solid (Glazing or Shade) Layer
 				++sLayer;
-				CFS( EQLNum ).L( sLayer ).Name = trim( Material( MaterNum ).Name );
+				CFS( EQLNum ).L( sLayer ).Name = Material( MaterNum ).Name;
 				// longwave property input
 				CFS( EQLNum ).L( sLayer ).LWP_MAT.EPSLF = Material( MaterNum ).EmissThermalFront;
 				CFS( EQLNum ).L( sLayer ).LWP_MAT.EPSLB = Material( MaterNum ).EmissThermalBack;
@@ -338,10 +337,10 @@ namespace WindowEquivalentLayer {
 				CFS( EQLNum ).L( sLayer ).W = Material( MaterNum ).ScreenWireDiameter;
 			} else if ( Material( MaterNum ).Group == GapEquivalentLayer ) {
 				// This layer is a gap.  Fill in the parameters
-				CFS( EQLNum ).G( gLayer ).Name = trim( Material( MaterNum ).Name );
+				CFS( EQLNum ).G( gLayer ).Name = Material( MaterNum ).Name;
 				CFS( EQLNum ).G( gLayer ).GTYPE = Material( MaterNum ).GapVentType;
 				CFS( EQLNum ).G( gLayer ).TAS = Material( MaterNum ).Thickness;
-				CFS( EQLNum ).G( gLayer ).FG.Name = trim( Material( MaterNum ).GasName );
+				CFS( EQLNum ).G( gLayer ).FG.Name = Material( MaterNum ).GasName;
 				CFS( EQLNum ).G( gLayer ).FG.AK = Material( MaterNum ).GasCon( 1, 1 );
 				CFS( EQLNum ).G( gLayer ).FG.BK = Material( MaterNum ).GasCon( 1, 2 );
 				CFS( EQLNum ).G( gLayer ).FG.CK = Material( MaterNum ).GasCon( 1, 3 );
@@ -429,7 +428,7 @@ namespace WindowEquivalentLayer {
 		Real64 const Height( 1.0 ); // window height, m
 		Real64 const TOUT( -18.0 ); // outdoor air temperature, C
 		Real64 const TIN( 21.0 ); // indoor air temperature, C
-		static Fstring const RoutineName( "CalcEQLWindowUvalue: " );
+		static std::string const RoutineName( "CalcEQLWindowUvalue: " );
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
 
@@ -490,8 +489,8 @@ namespace WindowEquivalentLayer {
 			}
 		}
 		if ( ! CFSURated ) {
-			ShowWarningMessage( RoutineName + "Fenestration U-Value calculation failed for " + trim( FS.Name ) );
-			ShowContinueError( "...Calculated U-value = " + trim( TrimSigDigits( U, 4 ) ) );
+			ShowWarningMessage( RoutineName + "Fenestration U-Value calculation failed for " + FS.Name );
+			ShowContinueError( "...Calculated U-value = " + TrimSigDigits( U, 4 ) );
 			ShowContinueError( "...Check consistency of inputs" );
 		}
 		UNFRC = U;
@@ -535,7 +534,7 @@ namespace WindowEquivalentLayer {
 		Real64 const TIN( 297.15 );
 		Real64 const TOUT( 305.15 );
 		Real64 const BeamSolarInc( 783.0 );
-		static Fstring const RoutineName( "CalcEQLWindowSHGCAndTransNormal: " );
+		static std::string const RoutineName( "CalcEQLWindowSHGCAndTransNormal: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -606,8 +605,8 @@ namespace WindowEquivalentLayer {
 
 		if ( ! CFSSHGC ) {
 			ShowWarningMessage( RoutineName + "Solar heat gain coefficient calculation failed for " + FS.Name );
-			ShowContinueError( "...Calculated SHGC = " + trim( TrimSigDigits( SHGC, 4 ) ) );
-			ShowContinueError( "...Calculated U-Value = " + trim( TrimSigDigits( UCG, 4 ) ) );
+			ShowContinueError( "...Calculated SHGC = " + TrimSigDigits( SHGC, 4 ) );
+			ShowContinueError( "...Calculated U-Value = " + TrimSigDigits( UCG, 4 ) );
 			ShowContinueError( "...Check consistency of inputs." );
 			return;
 		}
@@ -1032,7 +1031,7 @@ namespace WindowEquivalentLayer {
 	Real64
 	P01(
 		Real64 const P, // property
-		Fstring const & WHAT // identifier for err msg
+		std::string const & WHAT // identifier for err msg
 	)
 	{
 		//       AUTHOR         ASHRAE 1311-RP
@@ -1057,7 +1056,7 @@ namespace WindowEquivalentLayer {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "P01: " );
+		static std::string const RoutineName( "P01: " );
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
 
@@ -1071,7 +1070,7 @@ namespace WindowEquivalentLayer {
 
 		if ( P < -0.05 || P > 1.05 ) {
 			ShowWarningMessage( RoutineName + "property value should have been between 0 and 1" );
-			ShowContinueError( WHAT + "=: " " property value is =" + trim( TrimSigDigits( P, 4 ) ) );
+			ShowContinueError( WHAT + "=:  property value is =" + TrimSigDigits( P, 4 ) );
 			if ( P < 0.0 ) {
 				ShowContinueError( "property value is reset to 0.0" );
 			} else if ( P > 1.0 ) {
@@ -1212,7 +1211,7 @@ namespace WindowEquivalentLayer {
 		//   TAUFF_BT0 = TAUFF_BB0 + TAUFF_BD0
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "RB_DIFF: " );
+		static std::string const RoutineName( "RB_DIFF: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1234,9 +1233,9 @@ namespace WindowEquivalentLayer {
 		if ( RHO_DD + TAU_DD > 1.0 ) {
 			SumRefAndTran = RHO_DD + TAU_DD;
 			ShowWarningMessage( RoutineName + "Roller blind diffuse-diffuse properties are inconsistent" );
-			ShowContinueError( "...The diffuse-diffuse reflectance = " + trim( TrimSigDigits( RHO_DD, 4 ) ) );
-			ShowContinueError( "...The diffuse-diffuse tansmittance = " + trim( TrimSigDigits( TAU_DD, 4 ) ) );
-			ShowContinueError( "...Sum of diffuse reflectance and tansmittance = " + trim( TrimSigDigits( SumRefAndTran, 4 ) ) );
+			ShowContinueError( "...The diffuse-diffuse reflectance = " + TrimSigDigits( RHO_DD, 4 ) );
+			ShowContinueError( "...The diffuse-diffuse tansmittance = " + TrimSigDigits( TAU_DD, 4 ) );
+			ShowContinueError( "...Sum of diffuse reflectance and tansmittance = " + TrimSigDigits( SumRefAndTran, 4 ) );
 			ShowContinueError( "...This sum cannot be > 1.0. Transmittance will be reset to 1 minus reflectance" );
 			TAU_DD = 1.0 - RHO_DD;
 		}
@@ -1405,7 +1404,7 @@ namespace WindowEquivalentLayer {
 		//   TAU_BT0 = TAU_BB0 + TAU_BD0
 		FArray1D< Real64 > P( hipDIM );
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "IS_DIFF: " );
+		static std::string const RoutineName( "IS_DIFF: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1427,9 +1426,9 @@ namespace WindowEquivalentLayer {
 		if ( RHO_DD + TAU_DD > 1.0 ) {
 			SumRefAndTran = RHO_DD + TAU_DD;
 			ShowWarningMessage( RoutineName + "Calculated insect screen diffuse-diffuse properties are inconsistent" );
-			ShowContinueError( "...The diffuse-diffuse reflectance = " + trim( TrimSigDigits( RHO_DD, 4 ) ) );
-			ShowContinueError( "...The diffuse-diffuse tansmittance = " + trim( TrimSigDigits( TAU_DD, 4 ) ) );
-			ShowContinueError( "...Sum of diffuse reflectance and tansmittance = " + trim( TrimSigDigits( SumRefAndTran, 4 ) ) );
+			ShowContinueError( "...The diffuse-diffuse reflectance = " + TrimSigDigits( RHO_DD, 4 ) );
+			ShowContinueError( "...The diffuse-diffuse tansmittance = " + TrimSigDigits( TAU_DD, 4 ) );
+			ShowContinueError( "...Sum of diffuse reflectance and tansmittance = " + TrimSigDigits( SumRefAndTran, 4 ) );
 			ShowContinueError( "...This sum cannot be > 1.0. Transmittance will be reset to 1 minus reflectance" );
 			TAU_DD = 1.0 - RHO_DD;
 		}
@@ -1694,7 +1693,7 @@ namespace WindowEquivalentLayer {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		//   (TAU_BT0 = TAU_BB0 + TAU_BD0)
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "FM_DIFF: " );
+		static std::string const RoutineName( "FM_DIFF: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1720,9 +1719,9 @@ namespace WindowEquivalentLayer {
 		if ( RHO_DD + TAU_DD > 1.0 ) {
 			SumRefAndTran = RHO_DD + TAU_DD;
 			ShowWarningMessage( RoutineName + "Calculated drape fabric diffuse-diffuse properties are inconsistent" );
-			ShowContinueError( "...The diffuse-diffuse reflectance = " + trim( TrimSigDigits( RHO_DD, 4 ) ) );
-			ShowContinueError( "...The diffuse-diffuse tansmittance = " + trim( TrimSigDigits( TAU_DD, 4 ) ) );
-			ShowContinueError( "...Sum of diffuse reflectance and tansmittance = " + trim( TrimSigDigits( SumRefAndTran, 4 ) ) );
+			ShowContinueError( "...The diffuse-diffuse reflectance = " + TrimSigDigits( RHO_DD, 4 ) );
+			ShowContinueError( "...The diffuse-diffuse tansmittance = " + TrimSigDigits( TAU_DD, 4 ) );
+			ShowContinueError( "...Sum of diffuse reflectance and tansmittance = " + TrimSigDigits( SumRefAndTran, 4 ) );
 			ShowContinueError( "...This sum cannot be > 1.0. Transmittance will be reset to 1 minus reflectance" );
 			TAU_DD = 1.0 - RHO_DD;
 		}
@@ -4903,7 +4902,7 @@ namespace WindowEquivalentLayer {
 
 		// FUNCTION PARAMETER DEFINITIONS:
 		Real64 const Height( 1.0 ); // Window height (m) for standard ratings calculation
-		static Fstring const RoutineName( MaxNameLength, "ASHWAT_Thermal: " );
+		static std::string const RoutineName( "ASHWAT_Thermal: " );
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
 
@@ -5282,9 +5281,9 @@ namespace WindowEquivalentLayer {
 		} // main iteration
 
 		if ( CONVRG == 0 ) {
-			ShowSevereError( RoutineName + "Net radiation analysis did not converge for " + trim( FS.Name ) );
-			ShowContinueError( "...Maximum error is = " + trim( TrimSigDigits( MAXERR, 6 ) ) );
-			ShowContinueError( "...Convergence tolerance is = " + trim( TrimSigDigits( TOL, 6 ) ) );
+			ShowSevereError( RoutineName + "Net radiation analysis did not converge for " + FS.Name );
+			ShowContinueError( "...Maximum error is = " + TrimSigDigits( MAXERR, 6 ) );
+			ShowContinueError( "...Convergence tolerance is = " + TrimSigDigits( TOL, 6 ) );
 		}
 
 		//  NOTE:  HC_SA, HC_GA and HC_SG are only available if there is
@@ -8551,7 +8550,7 @@ namespace WindowEquivalentLayer {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Real64 GapThickMin( 0.0001 ); // Minimum gap thickness allowed, m
-		static Fstring const RoutineName( "BuildGap: " );
+		static std::string const RoutineName( "BuildGap: " );
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
 
@@ -8564,7 +8563,7 @@ namespace WindowEquivalentLayer {
 		// Flow
 
 		if ( TAS < GapThickMin ) {
-			ShowSevereError( RoutineName + trim( G.Name ) );
+			ShowSevereError( RoutineName + G.Name );
 			ShowContinueError( "...specified gap thickness is < 0.0001 m.  Reset to 0.00001 m" );
 			TAS = GapThickMin;
 		}
@@ -8829,7 +8828,7 @@ namespace WindowEquivalentLayer {
 
 		// Locals
 		// may be within L
-		static Fstring const RoutineName( "FillDefaultsSWP: " );
+		static std::string const RoutineName( "FillDefaultsSWP: " );
 		bool OK;
 		bool ErrorsFound;
 		// Flow
@@ -8866,7 +8865,7 @@ namespace WindowEquivalentLayer {
 		} else if ( L.LTYPE == ltyNONE || L.LTYPE == ltyROOM ) {
 			// none or room: do nothing
 		} else {
-			ShowSevereError( RoutineName + trim( L.Name ) + "." );
+			ShowSevereError( RoutineName + L.Name + '.' );
 			ShowContinueError( "...invalid layer type specified." );
 
 		}
@@ -8897,7 +8896,7 @@ namespace WindowEquivalentLayer {
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "FinalizeCFS: " ); // include trailing blank space
+		static std::string const RoutineName( "FinalizeCFS: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -8909,7 +8908,7 @@ namespace WindowEquivalentLayer {
 		int iL;
 		int gType;
 		bool LVBPREV;
-		Fstring CurrentModuleObject( MaxNameLength );
+		std::string CurrentModuleObject;
 		bool ErrorsFound;
 		// Flow
 
@@ -8922,7 +8921,7 @@ namespace WindowEquivalentLayer {
 			if ( ! IsVBLayer( FS.L( iL ) ) ) {
 				LVBPREV = false;
 			} else if ( LVBPREV ) {
-				ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( FS.Name ) + "\", illegal." );
+				ShowSevereError( CurrentModuleObject + "=\"" + FS.Name + "\", illegal." );
 				ShowContinueError( "...adjacent VB layers are specified." );
 				ErrorsFound = true;
 			} else {
@@ -8933,13 +8932,13 @@ namespace WindowEquivalentLayer {
 			if ( iL < FS.NL ) {
 				gType = FS.G( iL ).GTYPE;
 				if ( gType == gtyOPENout && iL != 1 ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( FS.Name ) );
-					ShowContinueError( "...invalid EquivalentLayer window gap type specified =" + trim( FS.G( iL ).Name ) + "." );
+					ShowSevereError( CurrentModuleObject + "=\"" + FS.Name );
+					ShowContinueError( "...invalid EquivalentLayer window gap type specified =" + FS.G( iL ).Name + '.' );
 					ShowContinueError( "...VentedOutDoor gap is not outermost." );
 				}
 				if ( gType == gtyOPENin && iL != FS.NL - 1 ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( FS.Name ) );
-					ShowContinueError( "...invalid EquivalentLayer window gap type specified =" + trim( FS.G( iL ).Name ) + "." );
+					ShowSevereError( CurrentModuleObject + "=\"" + FS.Name );
+					ShowContinueError( "...invalid EquivalentLayer window gap type specified =" + FS.G( iL ).Name + '.' );
 					ShowContinueError( "...VentedIndoor gap is not innermost." );
 				}
 			}

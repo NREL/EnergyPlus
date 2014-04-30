@@ -109,9 +109,13 @@ TEST( stringFunctionsTest, PrefixSuffix )
 {
 	string const s( "Fish Tank" );
 	EXPECT_TRUE( has_prefix( s, "Fi" ) );
+	EXPECT_TRUE( has_prefixi( s, "FIsh" ) );
 	EXPECT_FALSE( has_prefix( s, "Fin" ) );
+	EXPECT_FALSE( has_prefixi( s, "Fin" ) );
 	EXPECT_TRUE( has_suffix( s, "Tank" ) );
+	EXPECT_TRUE( has_suffixi( s, "TANK" ) );
 	EXPECT_FALSE( has_suffix( s, "Face" ) );
+	EXPECT_FALSE( has_suffixi( s, "Dunk" ) );
 	string const t( "A cat is a cat" );
 	EXPECT_TRUE( has_suffix( t, "cat" ) ); // Find last instance
 }
@@ -138,4 +142,22 @@ TEST( stringFunctionsTest, Replace )
 	string const slash_dquote( "\\\"" );
 	string const dquote( "\"" );
 	EXPECT_EQ( t2, replaced( replaced( t, dslash, slash ), slash_dquote, dquote ) );
+}
+
+TEST( stringFunctionsTest, Pad )
+{
+	string s( "Fish Tank" );
+	EXPECT_EQ( "Fish Tank", padded( s, 5 ) );
+	EXPECT_EQ( "Fish Tank   ", padded( s, 12 ) );
+	EXPECT_EQ( "Fish Tank", pad( s, 5 ) );
+	EXPECT_EQ( "Fish Tank   ", pad( s, 12 ) );
+}
+
+TEST( stringFunctionsTest, Pare )
+{
+	string s( "Fish Tank" );
+	EXPECT_EQ( "Fish Tank", pared( s, 12 ) );
+	EXPECT_EQ( "Fish", pared( s, 4 ) );
+	EXPECT_EQ( "Fish Tank", pare( s, 12 ) );
+	EXPECT_EQ( "Fish", pare( s, 4 ) );
 }

@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <Vectors.hh>
@@ -286,8 +285,6 @@ namespace Vectors {
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		static Fstring const fmt3( "(A,3(1x,f18.13))" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//  TYPE(Vector) :: x3,y3,z3,v12

@@ -67,12 +67,12 @@ namespace ConvectionCoefficients {
 	// MODULE PARAMETER DEFINITIONS:
 	Real64 const AdaptiveHcInsideLowLimit( 0.5 ); // W/m2-K
 	Real64 const AdaptiveHcOutsideLowLimit( 1.0 ); // W/m2-K
-	Fstring const fmtx( "(A,I4,1x,A,1x,6f16.8)" );
-	Fstring const fmty( "(A,1x,6f16.8)" );
+	gio::Fmt const fmtx( "(A,I4,1x,A,1x,6f16.8)" );
+	gio::Fmt const fmty( "(A,1x,6f16.8)" );
 
 	Real64 const MinFlow( 0.01 ); // Minimum mass flow rate
 	Real64 const MaxACH( 100.0 ); // Maximum ceiling diffuser correlation limit
-	Fstring const Blank;
+	std::string const Blank;
 
 	Real64 const OneThird( ( 1.0 / 3. ) ); // 1/3 in highest precision
 	Real64 const OneFourth( ( 1.0 / 4. ) ); // 1/4 in highest precision
@@ -275,8 +275,8 @@ namespace ConvectionCoefficients {
 				for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 					if ( Zone( ZoneNum ).InsideConvectionAlgo != CeilingDiffuser ) continue;
 					if ( Zone( ZoneNum ).SystemZoneNodeNumber != 0 ) continue;
-					ShowSevereError( "InitInteriorConvectionCoeffs: Inside Convection=CeilingDiffuser, " "but no system inlet node defined, Zone=" + trim( Zone( ZoneNum ).Name ) );
-					ShowContinueError( "Defaulting inside convection to TARP. Check ZoneHVAC:EquipmentConnections for Zone=" + trim( Zone( ZoneNum ).Name ) );
+					ShowSevereError( "InitInteriorConvectionCoeffs: Inside Convection=CeilingDiffuser, " "but no system inlet node defined, Zone=" + Zone( ZoneNum ).Name );
+					ShowContinueError( "Defaulting inside convection to TARP. Check ZoneHVAC:EquipmentConnections for Zone=" + Zone( ZoneNum ).Name );
 					Zone( ZoneNum ).InsideConvectionAlgo = ASHRAETARP;
 				}
 				//insert one-time setup for adpative inside face
@@ -604,7 +604,7 @@ namespace ConvectionCoefficients {
 				ManageOutsideAdaptiveConvectionAlgo( SurfNum, HExt );
 
 			} else {
-				ShowFatalError( "InitExtConvection Coefficients: invalid parameter -- outside convection type, Surface=" + trim( Surface( SurfNum ).Name ) );
+				ShowFatalError( "InitExtConvection Coefficients: invalid parameter -- outside convection type, Surface=" + Surface( SurfNum ).Name );
 
 			}} // choice of algorithm type
 
@@ -714,7 +714,7 @@ namespace ConvectionCoefficients {
 				ManageOutsideAdaptiveConvectionAlgo( SurfNum, HExt );
 
 			} else {
-				ShowFatalError( "InitExtConvection Coefficients: invalid parameter -- outside convection type, Surface=" + trim( Surface( SurfNum ).Name ) );
+				ShowFatalError( "InitExtConvection Coefficients: invalid parameter -- outside convection type, Surface=" + Surface( SurfNum ).Name );
 
 			}} // choice of algorithm type
 
@@ -1088,26 +1088,26 @@ namespace ConvectionCoefficients {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetUserConvectionCoefficients" );
+		static std::string const RoutineName( "GetUserConvectionCoefficients" );
 		int const NumValidSurfaceTypes( 11 );
-		static FArray1D_Fstring const ValidSurfaceTypes( 11, sFstring( 19 ), { "ALLEXTERIORSURFACES", "ALLEXTERIORWINDOWS ", "ALLEXTERIORWALLS   ", "ALLEXTERIORROOFS   ", "ALLEXTERIORFLOORS  ", "ALLINTERIORSURFACES", "ALLINTERIORWINDOWS ", "ALLINTERIORWALLS   ", "ALLINTERIORROOFS   ", "ALLINTERIORCEILINGS", "ALLINTERIORFLOORS  " } );
+		static FArray1D_string const ValidSurfaceTypes( 11, { "ALLEXTERIORSURFACES", "ALLEXTERIORWINDOWS", "ALLEXTERIORWALLS", "ALLEXTERIORROOFS", "ALLEXTERIORFLOORS", "ALLINTERIORSURFACES", "ALLINTERIORWINDOWS", "ALLINTERIORWALLS", "ALLINTERIORROOFS", "ALLINTERIORCEILINGS", "ALLINTERIORFLOORS" } );
 
 		int const NumValidExtConvectionValueTypes( 22 );
-		static FArray1D_Fstring const ValidExtConvectionValueTypes( 22, sFstring( 33 ), { "VALUE                            ", "SCHEDULE                         ", "SIMPLECOMBINED                   ", "TARP                             ", "MOWITT                           ", "DOE-2                            ", "ADAPTIVECONVECTIONALGORITHM      ", "USERCURVE                        ", "ASHRAEVERTICALWALL               ", "WALTONUNSTABLEHORIZONTALORTILT   ", "WALTONSTABLEHORIZONTALORTILT     ", "NUSSELTJURGES                    ", "MCADAMS                          ", "MITCHELL                         ", "CLEARROOF                        ", "EMMELVERTICAL                    ", "EMMELROOF                        ", "ALAMDARIHAMMONDVERTICALWALL      ", "FOHANNOPOLIDORIVERTICALWALL      ", "ISO15099WINDOWS                  ", "ALAMDARIHAMMONDSTABLEHORIZONTAL  ", "ALAMDARIHAMMONDUNSTABLEHORIZONTAL" } );
+		static FArray1D_string const ValidExtConvectionValueTypes( 22, { "VALUE", "SCHEDULE", "SIMPLECOMBINED", "TARP", "MOWITT", "DOE-2", "ADAPTIVECONVECTIONALGORITHM", "USERCURVE", "ASHRAEVERTICALWALL", "WALTONUNSTABLEHORIZONTALORTILT", "WALTONSTABLEHORIZONTALORTILT", "NUSSELTJURGES", "MCADAMS", "MITCHELL", "CLEARROOF", "EMMELVERTICAL", "EMMELROOF", "ALAMDARIHAMMONDVERTICALWALL", "FOHANNOPOLIDORIVERTICALWALL", "ISO15099WINDOWS", "ALAMDARIHAMMONDSTABLEHORIZONTAL", "ALAMDARIHAMMONDUNSTABLEHORIZONTAL" } );
 
 		static FArray1D_int const ExtConvectionValue( 22, { -999, -999, ASHRAESimple, TarpHcOutside, MoWiTTHcOutside, DOE2HcOutside, AdaptiveConvectionAlgorithm, HcExt_UserCurve, HcExt_NaturalASHRAEVerticalWall, HcExt_NaturalWaltonUnstableHorizontalOrTilt, HcExt_NaturalWaltonStableHorizontalOrTilt, HcExt_NusseltJurges, HcExt_McAdams, HcExt_Mitchell, HcExt_ClearRoof, HcExt_EmmelVertical, HcExt_EmmelRoof, HcExt_AlamdariHammondVerticalWall, HcExt_FohannoPolidoriVerticalWall, HcExt_ISO15099Windows, HcExt_AlamdariHammondStableHorizontal, HcExt_AlamdariHammondUnstableHorizontal } );
 
 		int const NumValidSpecificExtWindConvValueTypes( 15 );
-		static FArray1D_Fstring const ValidSpecificExtWindConvValueTypes( 15, sFstring( 23 ), { "SIMPLECOMBINED         ", "TARPWINDWARD           ", "TARPLEEWARD            ", "MOWITTWINDWARD         ", "MOWITTLEEWARD          ", "DOE2WINDWARD           ", "DOE2LEEWARD            ", "NUSSELTJURGES          ", "MCADAMS                ", "MITCHELL               ", "EMMELVERTICAL          ", "EMMELROOF              ", "BLOCKENWINDWARD        ", "CLEARROOF              ", "USERCURVE              " } );
+		static FArray1D_string const ValidSpecificExtWindConvValueTypes( 15, { "SIMPLECOMBINED", "TARPWINDWARD", "TARPLEEWARD", "MOWITTWINDWARD", "MOWITTLEEWARD", "DOE2WINDWARD", "DOE2LEEWARD", "NUSSELTJURGES", "MCADAMS", "MITCHELL", "EMMELVERTICAL", "EMMELROOF", "BLOCKENWINDWARD", "CLEARROOF", "USERCURVE" } );
 		static FArray1D_int const MoreSpecificExtWindConvectionValue( 15, { HcExt_ASHRAESimpleCombined, HcExt_SparrowWindward, HcExt_SparrowLeeward, HcExt_MoWiTTWindward, HcExt_DOE2Windward, HcExt_MoWiTTLeeward, HcExt_DOE2Leeward, HcExt_NusseltJurges, HcExt_McAdams, HcExt_Mitchell, HcExt_EmmelVertical, HcExt_EmmelRoof, HcExt_BlockenWindward, HcExt_ClearRoof, HcExt_UserCurve } );
 
 		int const NumValidSpecificExtNatConvectValueTypes( 10 );
-		static FArray1D_Fstring const ValidSpecificExtNatConvectValueTypes( 10, sFstring( 34 ), { "ASHRAEVERTICALWALL                ", "ALAMDARIHAMMONDVERTICALWALL       ", "FOHANNOPOLIDORIVERTICALWALL       ", "WALTONUNSTABLEHORIZONTALORTILT    ", "WALTONSTABLEHORIZONTALORTILT      ", "ALAMDARIHAMMONDSTABLEHORIZONTAL   ", "ALAMDARIHAMMONDUNSTABLEHORIZONTAL ", "ISO15099WINDOWS                   ", "USERCURVE                         ", "NONE                              " } );
+		static FArray1D_string const ValidSpecificExtNatConvectValueTypes( 10, { "ASHRAEVERTICALWALL", "ALAMDARIHAMMONDVERTICALWALL", "FOHANNOPOLIDORIVERTICALWALL", "WALTONUNSTABLEHORIZONTALORTILT", "WALTONSTABLEHORIZONTALORTILT", "ALAMDARIHAMMONDSTABLEHORIZONTAL", "ALAMDARIHAMMONDUNSTABLEHORIZONTAL", "ISO15099WINDOWS", "USERCURVE", "NONE" } );
 		static FArray1D_int const SpecificExtNatConvectionValue( 10, { HcExt_NaturalASHRAEVerticalWall, HcExt_AlamdariHammondVerticalWall, HcExt_FohannoPolidoriVerticalWall, HcExt_NaturalWaltonUnstableHorizontalOrTilt, HcExt_NaturalWaltonStableHorizontalOrTilt, HcExt_AlamdariHammondStableHorizontal, HcExt_AlamdariHammondUnstableHorizontal, HcExt_ISO15099Windows, HcExt_UserCurve, HcExt_None } );
 
 		// CeilingDiffuser and TrombeWall Interior types are only Zone Level settings.
 		int const NumValidIntConvectionValueTypes( 34 );
-		static FArray1D_Fstring const ValidIntConvectionValueTypes( 34, sFstring( 39 ), { "VALUE                                  ", "SCHEDULE                               ", "SIMPLE                                 ", "TARP                                   ", "ADAPTIVECONVECTIONALGORITHM            ", "USERCURVE                              ", "ASHRAEVERTICALWALL                     ", "WALTONUNSTABLEHORIZONTALORTILT         ", "WALTONSTABLEHORIZONTALORTILT           ", "FISHERPEDERSENCEILINGDIFFUSERWALLS     ", "FISHERPEDERSENCEILINGDIFFUSERCEILING   ", "FISHERPEDERSENCEILINGDIFFUSERFLOOR     ", "ALAMDARIHAMMONDSTABLEHORIZONTAL        ", "ALAMDARIHAMMONDUNSTABLEHORIZONTAL      ", "ALAMDARIHAMMONDVERTICALWALL            ", "KHALIFAEQ3WALLAWAYFROMHEAT             ", "KHALIFAEQ4CEILINGAWAYFROMHEAT          ", "KHALIFAEQ5WALLNEARHEAT                 ", "KHALIFAEQ6NONHEATEDWALLS               ", "KHALIFAEQ7CEILING                      ", "AWBIHATTONHEATEDFLOOR                  ", "AWBIHATTONHEATEDWALL                   ", "BEAUSOLEILMORRISONMIXEDASSISTEDWALL    ", "BEAUSOLEILMORRISONMIXEDOPPOSINGWALL    ", "BEAUSOLEILMORRISONMIXEDSTABLEFLOOR     ", "BEAUSOLEILMORRISONMIXEDUNSTABLEFLOOR   ", "BEAUSOLEILMORRISONMIXEDSTABLECEILING   ", "BEAUSOLEILMORRISONMIXEDUNSTABLECEILING ", "FOHANNOPOLIDORIVERTICALWALL            ", "KARADAGCHILLEDCEILING                  ", "ISO15099WINDOWS                        ", "GOLDSTEINNOVOSELACCEILINGDIFFUSERWINDOW", "GOLDSTEINNOVOSELACCEILINGDIFFUSERWALLS ", "GOLDSTEINNOVOSELACCEILINGDIFFUSERFLOOR " } );
+		static FArray1D_string const ValidIntConvectionValueTypes( 34, { "VALUE", "SCHEDULE", "SIMPLE", "TARP", "ADAPTIVECONVECTIONALGORITHM", "USERCURVE", "ASHRAEVERTICALWALL", "WALTONUNSTABLEHORIZONTALORTILT", "WALTONSTABLEHORIZONTALORTILT", "FISHERPEDERSENCEILINGDIFFUSERWALLS", "FISHERPEDERSENCEILINGDIFFUSERCEILING", "FISHERPEDERSENCEILINGDIFFUSERFLOOR", "ALAMDARIHAMMONDSTABLEHORIZONTAL", "ALAMDARIHAMMONDUNSTABLEHORIZONTAL", "ALAMDARIHAMMONDVERTICALWALL", "KHALIFAEQ3WALLAWAYFROMHEAT", "KHALIFAEQ4CEILINGAWAYFROMHEAT", "KHALIFAEQ5WALLNEARHEAT", "KHALIFAEQ6NONHEATEDWALLS", "KHALIFAEQ7CEILING", "AWBIHATTONHEATEDFLOOR", "AWBIHATTONHEATEDWALL", "BEAUSOLEILMORRISONMIXEDASSISTEDWALL", "BEAUSOLEILMORRISONMIXEDOPPOSINGWALL", "BEAUSOLEILMORRISONMIXEDSTABLEFLOOR", "BEAUSOLEILMORRISONMIXEDUNSTABLEFLOOR", "BEAUSOLEILMORRISONMIXEDSTABLECEILING", "BEAUSOLEILMORRISONMIXEDUNSTABLECEILING", "FOHANNOPOLIDORIVERTICALWALL", "KARADAGCHILLEDCEILING", "ISO15099WINDOWS", "GOLDSTEINNOVOSELACCEILINGDIFFUSERWINDOW", "GOLDSTEINNOVOSELACCEILINGDIFFUSERWALLS", "GOLDSTEINNOVOSELACCEILINGDIFFUSERFLOOR" } );
 		static FArray1D_int const IntConvectionValue( 34, { -999, -999, ASHRAESimple, ASHRAETARP, AdaptiveConvectionAlgorithm, HcInt_UserCurve, HcInt_ASHRAEVerticalWall, HcInt_WaltonUnstableHorizontalOrTilt, HcInt_WaltonStableHorizontalOrTilt, HcInt_FisherPedersenCeilDiffuserWalls, HcInt_FisherPedersenCeilDiffuserCeiling, HcInt_FisherPedersenCeilDiffuserFloor, HcInt_AlamdariHammondStableHorizontal, HcInt_AlamdariHammondUnstableHorizontal, HcInt_AlamdariHammondVerticalWall, HcInt_KhalifaEq3WallAwayFromHeat, HcInt_KhalifaEq4CeilingAwayFromHeat, HcInt_KhalifaEq5WallNearHeat, HcInt_KhalifaEq6NonHeatedWalls, HcInt_KhalifaEq7Ceiling, HcInt_AwbiHattonHeatedFloor, HcInt_AwbiHattonHeatedWall, HcInt_BeausoleilMorrisonMixedAssistingWall, HcInt_BeausoleilMorrisonMixedOppossingWall, HcInt_BeausoleilMorrisonMixedStableFloor, HcInt_BeausoleilMorrisonMixedUnstableFloor, HcInt_BeausoleilMorrisonMixedStableCeiling, HcInt_BeausoleilMorrisonMixedUnstableCeiling, HcInt_FohannoPolidoriVerticalWall, HcInt_KaradagChilledCeiling, HcInt_ISO15099Windows, HcInt_GoldsteinNovoselacCeilingDiffuserWindow, HcInt_GoldsteinNovoselacCeilingDiffuserWalls, HcInt_GoldsteinNovoselacCeilingDiffuserFloor } );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -1117,7 +1117,7 @@ namespace ConvectionCoefficients {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_Fstring Alphas( 9, sFstring( MaxNameLength ) );
+		FArray1D_string Alphas( 9 );
 		FArray1D< Real64 > Numbers( 2 );
 		int NumAlphas;
 		int NumNumbers;
@@ -1134,9 +1134,9 @@ namespace ConvectionCoefficients {
 		int Ptr;
 		int Pass;
 		int FieldNo;
-		Fstring CFieldNo( 25 );
+		std::string CFieldNo;
 		int NumField;
-		Fstring CurrentModuleObject( MaxNameLength );
+		std::string CurrentModuleObject;
 		int PotentialAssignedValue;
 		int ZoneNum;
 		int SurfNum;
@@ -1156,14 +1156,14 @@ namespace ConvectionCoefficients {
 			} else if ( SELECT_CASE_var == "SUPPLYAIRTEMPERATURE" ) {
 				HcInsideUserCurve( Loop ).ReferenceTempType = RefTempSupplyAirTemp;
 			} else {
-				ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + trim( CurrentModuleObject ) + ": " "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
+				ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Key choice Entered, for " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
 				ErrorsFound = true;
 			}}
 
 			if ( ! lAlphaFieldBlanks( 3 ) ) {
 				HcInsideUserCurve( Loop ).HcFnTempDiffCurveNum = GetCurveIndex( cAlphaArgs( 3 ) );
 				if ( HcInsideUserCurve( Loop ).HcFnTempDiffCurveNum == 0 ) {
-					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + trim( CurrentModuleObject ) + ": " "Invalid Name Entered, for " + trim( cAlphaFieldNames( 3 ) ) + "=" + trim( cAlphaArgs( 3 ) ) );
+					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Name Entered, for " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) );
 					ErrorsFound = true;
 				} else { // check type
 					{ auto const SELECT_CASE_var( GetCurveType( HcInsideUserCurve( Loop ).HcFnTempDiffCurveNum ) );
@@ -1171,8 +1171,8 @@ namespace ConvectionCoefficients {
 					if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) || ( SELECT_CASE_var == "EXPONENT" ) || ( SELECT_CASE_var == "QUARTIC" ) ) {
 						//okay do nothing, have the right type of curve (single independent variable)
 					} else {
-						ShowSevereError( trim( CurrentModuleObject ) + " \"" + trim( cAlphaArgs( 1 ) ) + "\"" );
-						ShowContinueError( "...illegal " + trim( cAlphaFieldNames( 3 ) ) + " type for this object = " + trim( GetCurveType( GetCurveIndex( cAlphaArgs( 3 ) ) ) ) );
+						ShowSevereError( CurrentModuleObject + " \"" + cAlphaArgs( 1 ) + "\"" );
+						ShowContinueError( "...illegal " + cAlphaFieldNames( 3 ) + " type for this object = " + GetCurveType( GetCurveIndex( cAlphaArgs( 3 ) ) ) );
 						ErrorsFound = true;
 					}}
 
@@ -1184,7 +1184,7 @@ namespace ConvectionCoefficients {
 			if ( ! lAlphaFieldBlanks( 4 ) ) {
 				HcInsideUserCurve( Loop ).HcFnTempDiffDivHeightCurveNum = GetCurveIndex( cAlphaArgs( 4 ) );
 				if ( HcInsideUserCurve( Loop ).HcFnTempDiffDivHeightCurveNum == 0 ) {
-					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + trim( CurrentModuleObject ) + ": " "Invalid Name Entered, for " + trim( cAlphaFieldNames( 4 ) ) + "=" + trim( cAlphaArgs( 4 ) ) );
+					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Name Entered, for " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
 					ErrorsFound = true;
 				} else { // check type
 					{ auto const SELECT_CASE_var( GetCurveType( HcInsideUserCurve( Loop ).HcFnTempDiffDivHeightCurveNum ) );
@@ -1192,8 +1192,8 @@ namespace ConvectionCoefficients {
 					if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) || ( SELECT_CASE_var == "EXPONENT" ) || ( SELECT_CASE_var == "QUARTIC" ) ) {
 						//okay do nothing, have the right type of curve (single independent variable)
 					} else {
-						ShowSevereError( trim( CurrentModuleObject ) + " \"" + trim( cAlphaArgs( 1 ) ) + "\"" );
-						ShowContinueError( "...illegal " + trim( cAlphaFieldNames( 4 ) ) + " type for this object = " + trim( GetCurveType( GetCurveIndex( cAlphaArgs( 4 ) ) ) ) );
+						ShowSevereError( CurrentModuleObject + " \"" + cAlphaArgs( 1 ) + "\"" );
+						ShowContinueError( "...illegal " + cAlphaFieldNames( 4 ) + " type for this object = " + GetCurveType( GetCurveIndex( cAlphaArgs( 4 ) ) ) );
 						ErrorsFound = true;
 					}}
 				}
@@ -1204,7 +1204,7 @@ namespace ConvectionCoefficients {
 			if ( ! lAlphaFieldBlanks( 5 ) ) {
 				HcInsideUserCurve( Loop ).HcFnACHCurveNum = GetCurveIndex( cAlphaArgs( 5 ) );
 				if ( HcInsideUserCurve( Loop ).HcFnACHCurveNum == 0 ) {
-					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + trim( CurrentModuleObject ) + ": " "Invalid Name Entered, for " + trim( cAlphaFieldNames( 5 ) ) + "=" + trim( cAlphaArgs( 5 ) ) );
+					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Name Entered, for " + cAlphaFieldNames( 5 ) + '=' + cAlphaArgs( 5 ) );
 					ErrorsFound = true;
 				} else { // check type
 					{ auto const SELECT_CASE_var( GetCurveType( HcInsideUserCurve( Loop ).HcFnACHCurveNum ) );
@@ -1212,8 +1212,8 @@ namespace ConvectionCoefficients {
 					if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) || ( SELECT_CASE_var == "EXPONENT" ) || ( SELECT_CASE_var == "QUARTIC" ) ) {
 						//okay do nothing, have the right type of curve (single independent variable)
 					} else {
-						ShowSevereError( trim( CurrentModuleObject ) + " \"" + trim( cAlphaArgs( 1 ) ) + "\"" );
-						ShowContinueError( "...illegal " + trim( cAlphaFieldNames( 5 ) ) + " type for this object = " + trim( GetCurveType( GetCurveIndex( cAlphaArgs( 5 ) ) ) ) );
+						ShowSevereError( CurrentModuleObject + " \"" + cAlphaArgs( 1 ) + "\"" );
+						ShowContinueError( "...illegal " + cAlphaFieldNames( 5 ) + " type for this object = " + GetCurveType( GetCurveIndex( cAlphaArgs( 5 ) ) ) );
 						ErrorsFound = true;
 					}}
 				}
@@ -1224,7 +1224,7 @@ namespace ConvectionCoefficients {
 			if ( ! lAlphaFieldBlanks( 6 ) ) {
 				HcInsideUserCurve( Loop ).HcFnACHDivPerimLengthCurveNum = GetCurveIndex( cAlphaArgs( 6 ) );
 				if ( HcInsideUserCurve( Loop ).HcFnACHDivPerimLengthCurveNum == 0 ) {
-					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + trim( CurrentModuleObject ) + ": " "Invalid Name Entered, for " + trim( cAlphaFieldNames( 6 ) ) + "=" + trim( cAlphaArgs( 6 ) ) );
+					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Name Entered, for " + cAlphaFieldNames( 6 ) + '=' + cAlphaArgs( 6 ) );
 					ErrorsFound = true;
 				} else { // check type
 					{ auto const SELECT_CASE_var( GetCurveType( HcInsideUserCurve( Loop ).HcFnACHDivPerimLengthCurveNum ) );
@@ -1232,8 +1232,8 @@ namespace ConvectionCoefficients {
 					if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) || ( SELECT_CASE_var == "EXPONENT" ) || ( SELECT_CASE_var == "QUARTIC" ) ) {
 						//okay do nothing, have the right type of curve (single independent variable)
 					} else {
-						ShowSevereError( trim( CurrentModuleObject ) + " \"" + trim( cAlphaArgs( 1 ) ) + "\"" );
-						ShowContinueError( "...illegal " + trim( cAlphaFieldNames( 6 ) ) + " type for this object = " + trim( GetCurveType( GetCurveIndex( cAlphaArgs( 6 ) ) ) ) );
+						ShowSevereError( CurrentModuleObject + " \"" + cAlphaArgs( 1 ) + "\"" );
+						ShowContinueError( "...illegal " + cAlphaFieldNames( 6 ) + " type for this object = " + GetCurveType( GetCurveIndex( cAlphaArgs( 6 ) ) ) );
 						ErrorsFound = true;
 					}}
 				}
@@ -1261,7 +1261,7 @@ namespace ConvectionCoefficients {
 			} else if ( SELECT_CASE_var == "PARALLELCOMPONENTHEIGHTADJUST" ) {
 				HcOutsideUserCurve( Loop ).WindSpeedType = RefWindParallCompAtZ;
 			} else {
-				ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + trim( CurrentModuleObject ) + ": " "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
+				ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Key choice Entered, for " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
 				ErrorsFound = true;
 			}}
 
@@ -1269,7 +1269,7 @@ namespace ConvectionCoefficients {
 			if ( ! lAlphaFieldBlanks( 3 ) ) {
 				HcOutsideUserCurve( Loop ).HfFnWindSpeedCurveNum = GetCurveIndex( cAlphaArgs( 3 ) );
 				if ( HcOutsideUserCurve( Loop ).HfFnWindSpeedCurveNum == 0 ) {
-					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + trim( CurrentModuleObject ) + ": " "Invalid Name Entered, for " + trim( cAlphaFieldNames( 3 ) ) + "=" + trim( cAlphaArgs( 3 ) ) );
+					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Name Entered, for " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) );
 					ErrorsFound = true;
 				} else { // check type
 					{ auto const SELECT_CASE_var( GetCurveType( HcOutsideUserCurve( Loop ).HfFnWindSpeedCurveNum ) );
@@ -1277,8 +1277,8 @@ namespace ConvectionCoefficients {
 					if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) || ( SELECT_CASE_var == "EXPONENT" ) || ( SELECT_CASE_var == "QUARTIC" ) ) {
 						//okay do nothing, have the right type of curve (single independent variable)
 					} else {
-						ShowSevereError( trim( CurrentModuleObject ) + " \"" + trim( cAlphaArgs( 1 ) ) + "\"" );
-						ShowContinueError( "...illegal " + trim( cAlphaFieldNames( 3 ) ) + " type for this object = " + trim( GetCurveType( GetCurveIndex( cAlphaArgs( 3 ) ) ) ) );
+						ShowSevereError( CurrentModuleObject + " \"" + cAlphaArgs( 1 ) + "\"" );
+						ShowContinueError( "...illegal " + cAlphaFieldNames( 3 ) + " type for this object = " + GetCurveType( GetCurveIndex( cAlphaArgs( 3 ) ) ) );
 						ErrorsFound = true;
 					}}
 				}
@@ -1290,7 +1290,7 @@ namespace ConvectionCoefficients {
 			if ( ! lAlphaFieldBlanks( 4 ) ) {
 				HcOutsideUserCurve( Loop ).HnFnTempDiffCurveNum = GetCurveIndex( cAlphaArgs( 4 ) );
 				if ( HcOutsideUserCurve( Loop ).HnFnTempDiffCurveNum == 0 ) {
-					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + trim( CurrentModuleObject ) + ": " "Invalid Name Entered, for " + trim( cAlphaFieldNames( 4 ) ) + "=" + trim( cAlphaArgs( 4 ) ) );
+					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Name Entered, for " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
 					ErrorsFound = true;
 				} else { // check type
 					{ auto const SELECT_CASE_var( GetCurveType( HcOutsideUserCurve( Loop ).HnFnTempDiffCurveNum ) );
@@ -1298,8 +1298,8 @@ namespace ConvectionCoefficients {
 					if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) || ( SELECT_CASE_var == "EXPONENT" ) || ( SELECT_CASE_var == "QUARTIC" ) ) {
 						//okay do nothing, have the right type of curve (single independent variable)
 					} else {
-						ShowSevereError( trim( CurrentModuleObject ) + " \"" + trim( cAlphaArgs( 1 ) ) + "\"" );
-						ShowContinueError( "...illegal " + trim( cAlphaFieldNames( 4 ) ) + " type for this object = " + trim( GetCurveType( GetCurveIndex( cAlphaArgs( 4 ) ) ) ) );
+						ShowSevereError( CurrentModuleObject + " \"" + cAlphaArgs( 1 ) + "\"" );
+						ShowContinueError( "...illegal " + cAlphaFieldNames( 4 ) + " type for this object = " + GetCurveType( GetCurveIndex( cAlphaArgs( 4 ) ) ) );
 						ErrorsFound = true;
 					}}
 				}
@@ -1311,7 +1311,7 @@ namespace ConvectionCoefficients {
 			if ( ! lAlphaFieldBlanks( 5 ) ) {
 				HcOutsideUserCurve( Loop ).HnFnTempDiffDivHeightCurveNum = GetCurveIndex( cAlphaArgs( 5 ) );
 				if ( HcOutsideUserCurve( Loop ).HnFnTempDiffDivHeightCurveNum == 0 ) {
-					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + trim( CurrentModuleObject ) + ": " "Invalid Name Entered, for " + trim( cAlphaFieldNames( 5 ) ) + "=" + trim( cAlphaArgs( 5 ) ) );
+					ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Name Entered, for " + cAlphaFieldNames( 5 ) + '=' + cAlphaArgs( 5 ) );
 					ErrorsFound = true;
 				} else { // check type
 					{ auto const SELECT_CASE_var( GetCurveType( HcOutsideUserCurve( Loop ).HnFnTempDiffDivHeightCurveNum ) );
@@ -1319,8 +1319,8 @@ namespace ConvectionCoefficients {
 					if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) || ( SELECT_CASE_var == "EXPONENT" ) || ( SELECT_CASE_var == "QUARTIC" ) ) {
 						//okay do nothing, have the right type of curve (single independent variable)
 					} else {
-						ShowSevereError( trim( CurrentModuleObject ) + " \"" + trim( cAlphaArgs( 1 ) ) + "\"" );
-						ShowContinueError( "...illegal " + trim( cAlphaFieldNames( 5 ) ) + " type for this object = " + trim( GetCurveType( GetCurveIndex( cAlphaArgs( 5 ) ) ) ) );
+						ShowSevereError( CurrentModuleObject + " \"" + cAlphaArgs( 1 ) + "\"" );
+						ShowContinueError( "...illegal " + cAlphaFieldNames( 5 ) + " type for this object = " + GetCurveType( GetCurveIndex( cAlphaArgs( 5 ) ) ) );
 						ErrorsFound = true;
 					}}
 				}
@@ -1350,12 +1350,12 @@ namespace ConvectionCoefficients {
 				++TotExtConvCoeff;
 			}
 			if ( NumAlphas >= 2 && lAlphaFieldBlanks( 2 ) ) {
-				ShowWarningError( "GetUserConvectionCoefficients: " + trim( CurrentModuleObject ) + ", " " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cAlphaFieldNames( 2 ) ) + " is blank and rest of fields will not be processed." );
+				ShowWarningError( "GetUserConvectionCoefficients: " + CurrentModuleObject + ", " " for " + cAlphaFieldNames( 1 ) + '=' + Alphas( 1 ) );
+				ShowContinueError( cAlphaFieldNames( 2 ) + " is blank and rest of fields will not be processed." );
 			}
 			if ( NumAlphas >= 6 && lAlphaFieldBlanks( 6 ) ) {
-				ShowWarningError( "GetUserConvectionCoefficients: " + trim( CurrentModuleObject ) + ", " " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cAlphaFieldNames( 6 ) ) + " is blank and rest of fields will not be processed." );
+				ShowWarningError( "GetUserConvectionCoefficients: " + CurrentModuleObject + ", " " for " + cAlphaFieldNames( 1 ) + '=' + Alphas( 1 ) );
+				ShowContinueError( cAlphaFieldNames( 6 ) + " is blank and rest of fields will not be processed." );
 			}
 		}
 		CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients";
@@ -1375,12 +1375,12 @@ namespace ConvectionCoefficients {
 				++TotExtConvCoeff;
 			}
 			if ( NumAlphas >= 2 && lAlphaFieldBlanks( 2 ) ) {
-				ShowWarningError( "GetUserConvectionCoefficients: " + trim( CurrentModuleObject ) + ", " " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cAlphaFieldNames( 2 ) ) + " is blank and rest of fields will not be processed." );
+				ShowWarningError( "GetUserConvectionCoefficients: " + CurrentModuleObject + ", " " for " + cAlphaFieldNames( 1 ) + '=' + Alphas( 1 ) );
+				ShowContinueError( cAlphaFieldNames( 2 ) + " is blank and rest of fields will not be processed." );
 			}
 			if ( NumAlphas >= 6 && lAlphaFieldBlanks( 6 ) ) {
-				ShowWarningError( "GetUserConvectionCoefficients: " + trim( CurrentModuleObject ) + ", " " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cAlphaFieldNames( 6 ) ) + " is blank and rest of fields will not be processed." );
+				ShowWarningError( "GetUserConvectionCoefficients: " + CurrentModuleObject + ", " " for " + cAlphaFieldNames( 1 ) + '=' + Alphas( 1 ) );
+				ShowContinueError( cAlphaFieldNames( 6 ) + " is blank and rest of fields will not be processed." );
 			}
 		}
 
@@ -1397,7 +1397,7 @@ namespace ConvectionCoefficients {
 			GetObjectItem( CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			Found = FindItemInList( Alphas( 1 ), Surface.Name(), TotSurfaces );
 			if ( Found == 0 ) {
-				ShowSevereError( "GetUserConvectionCoefficients: " + trim( CurrentModuleObject ) + ", " "illegal value for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( Alphas( 1 ) ) );
+				ShowSevereError( "GetUserConvectionCoefficients: " + CurrentModuleObject + ", " "illegal value for " + cAlphaFieldNames( 1 ) + '=' + Alphas( 1 ) );
 				ErrorsFound = true;
 				continue;
 			}
@@ -1410,7 +1410,7 @@ namespace ConvectionCoefficients {
 				{ auto const SELECT_CASE_var( Alphas( Ptr ) );
 				if ( SELECT_CASE_var == "OUTSIDE" ) {
 					if ( Surface( Found ).OSCPtr > 0 ) {
-						ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + trim( CurrentModuleObject ) + ", " "OUTSIDE " + trim( CurrentModuleObject ) + " cannot be specified for OtherSideCoefficient Surface=" + trim( Alphas( 1 ) ) );
+						ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ", " "OUTSIDE " + CurrentModuleObject + " cannot be specified for OtherSideCoefficient Surface=" + Alphas( 1 ) );
 						ErrorsFound = true;
 					}
 					IsValidType = false;
@@ -1430,9 +1430,9 @@ namespace ConvectionCoefficients {
 						UserExtConvectionCoeffs( TotExtConvCoeff ).SurfaceName = Alphas( 1 );
 						UserExtConvectionCoeffs( TotExtConvCoeff ).WhichSurface = Found;
 						if ( Numbers( NumField ) < LowHConvLimit || Numbers( NumField ) > HighHConvLimit ) {
-							ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", out of range value" );
-							ShowContinueError( trim( cAlphaFieldNames( Ptr ) ) + "=" + trim( Alphas( Ptr ) ) + ", " + trim( cNumericFieldNames( NumField ) ) + "=[" + trim( RoundSigDigits( Numbers( NumField ), 5 ) ) + "]." );
-							ShowContinueError( "Out-of-range from low/high limits=[>=" + trim( RoundSigDigits( LowHConvLimit, 9 ) ) + ", " "<=" + trim( RoundSigDigits( HighHConvLimit, 1 ) ) + "]." );
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", out of range value" );
+							ShowContinueError( cAlphaFieldNames( Ptr ) + '=' + Alphas( Ptr ) + ", " + cNumericFieldNames( NumField ) + "=[" + RoundSigDigits( Numbers( NumField ), 5 ) + "]." );
+							ShowContinueError( "Out-of-range from low/high limits=[>=" + RoundSigDigits( LowHConvLimit, 9 ) + ", " "<=" + RoundSigDigits( HighHConvLimit, 1 ) + "]." );
 							//            CALL RangeCheck(errFlag,'"'//TRIM(cAlphaFieldNames(FieldNo+1))//'"','object',  &
 							//                       'SEVERE','>='//TRIM(RoundSigDigits(LowHConvLimit,9)),(Numbers(NumField)>=LowHConvLimit),&
 							//                       '<='//TRIM(RoundSigDigits(HighHConvLimit,1)),(Numbers(NumField)<=HighHConvLimit))
@@ -1443,8 +1443,8 @@ namespace ConvectionCoefficients {
 						UserExtConvectionCoeffs( TotExtConvCoeff ).OverrideType = ConvCoefValue;
 						UserExtConvectionCoeffs( TotExtConvCoeff ).OverrideValue = Numbers( NumField );
 						if ( ! lAlphaFieldBlanks( Ptr + 2 ) ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", duplicate value" );
-							ShowContinueError( "Since VALUE is used for \"" + trim( cAlphaFieldNames( FieldNo + 2 ) ) + "\", " + trim( cAlphaFieldNames( Ptr + 2 ) ) + "=" + trim( Alphas( Ptr + 2 ) ) + " is ignored." );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", duplicate value" );
+							ShowContinueError( "Since VALUE is used for \"" + cAlphaFieldNames( FieldNo + 2 ) + "\", " + cAlphaFieldNames( Ptr + 2 ) + '=' + Alphas( Ptr + 2 ) + " is ignored." );
 						}
 						PotentialAssignedValue = TotExtConvCoeff;
 					} else if ( IsValidType && Loop1 == 2 ) { // Schedule
@@ -1454,8 +1454,8 @@ namespace ConvectionCoefficients {
 						UserExtConvectionCoeffs( TotExtConvCoeff ).OverrideType = ConvCoefSchedule;
 						UserExtConvectionCoeffs( TotExtConvCoeff ).ScheduleIndex = GetScheduleIndex( Alphas( Ptr + 2 ) );
 						if ( UserExtConvectionCoeffs( TotExtConvCoeff ).ScheduleIndex == 0 ) {
-							ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", invalid value" );
-							ShowContinueError( " Invalid " + trim( cAlphaFieldNames( Ptr + 2 ) ) + " entered=" + trim( Alphas( Ptr + 2 ) ) );
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", invalid value" );
+							ShowContinueError( " Invalid " + cAlphaFieldNames( Ptr + 2 ) + " entered=" + Alphas( Ptr + 2 ) );
 							ErrorsFound = true;
 						} else {
 							UserExtConvectionCoeffs( TotExtConvCoeff ).ScheduleName = Alphas( Ptr + 2 );
@@ -1469,8 +1469,8 @@ namespace ConvectionCoefficients {
 						UserExtConvectionCoeffs( TotExtConvCoeff ).OverrideType = ConvCoefUserCurve;
 						UserExtConvectionCoeffs( TotExtConvCoeff ).UserCurveIndex = FindItemInList( Alphas( Ptr + 3 ), HcOutsideUserCurve.Name(), TotOutsideHcUserCurves );
 						if ( UserExtConvectionCoeffs( TotExtConvCoeff ).UserCurveIndex == 0 ) {
-							ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", invalid value" );
-							ShowContinueError( " Invalid " + trim( cAlphaFieldNames( Ptr + 3 ) ) + " entered=" + trim( Alphas( Ptr + 3 ) ) );
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", invalid value" );
+							ShowContinueError( " Invalid " + cAlphaFieldNames( Ptr + 3 ) + " entered=" + Alphas( Ptr + 3 ) );
 							ErrorsFound = true;
 						}
 						PotentialAssignedValue = TotExtConvCoeff;
@@ -1484,12 +1484,12 @@ namespace ConvectionCoefficients {
 						PotentialAssignedValue = TotExtConvCoeff;
 
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", check input" );
-						ShowContinueError( "Check Input Entered :" + trim( Alphas( Ptr + 1 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", check input" );
+						ShowContinueError( "Check Input Entered :" + Alphas( Ptr + 1 ) );
 						ErrorsFound = true;
 					}
 					if ( Surface( Found ).ExtConvCoeff != 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", invalid value" );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", invalid value" );
 						ShowContinueError( "Duplicate (Outside) assignment attempt" );
 						ErrorsFound = true;
 					} else {
@@ -1514,9 +1514,9 @@ namespace ConvectionCoefficients {
 						UserIntConvectionCoeffs( TotIntConvCoeff ).SurfaceName = Alphas( 1 );
 						UserIntConvectionCoeffs( TotIntConvCoeff ).WhichSurface = Found;
 						if ( Numbers( NumField ) < LowHConvLimit || Numbers( NumField ) > HighHConvLimit ) {
-							ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", out of range value" );
-							ShowContinueError( trim( cAlphaFieldNames( Ptr ) ) + "=" + trim( Alphas( Ptr ) ) + ", " + trim( cNumericFieldNames( NumField ) ) + "=[" + trim( RoundSigDigits( Numbers( NumField ), 5 ) ) + "]." );
-							ShowContinueError( "Out-of-range from low/high limits=[>=" + trim( RoundSigDigits( LowHConvLimit, 9 ) ) + ", " "<=" + trim( RoundSigDigits( HighHConvLimit, 1 ) ) + "]." );
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", out of range value" );
+							ShowContinueError( cAlphaFieldNames( Ptr ) + '=' + Alphas( Ptr ) + ", " + cNumericFieldNames( NumField ) + "=[" + RoundSigDigits( Numbers( NumField ), 5 ) + "]." );
+							ShowContinueError( "Out-of-range from low/high limits=[>=" + RoundSigDigits( LowHConvLimit, 9 ) + ", " "<=" + RoundSigDigits( HighHConvLimit, 1 ) + "]." );
 							//            CALL RangeCheck(errFlag,'"'//TRIM(cAlphaFieldNames(FieldNo+1))//'"','object',  &
 							//                       'SEVERE','>='//TRIM(RoundSigDigits(LowHConvLimit,9)),(Numbers(NumField)>=LowHConvLimit),&
 							//                       '<='//TRIM(RoundSigDigits(HighHConvLimit,1)),(Numbers(NumField)<=HighHConvLimit))
@@ -1527,8 +1527,8 @@ namespace ConvectionCoefficients {
 						UserIntConvectionCoeffs( TotIntConvCoeff ).OverrideType = ConvCoefValue;
 						UserIntConvectionCoeffs( TotIntConvCoeff ).OverrideValue = Numbers( NumField );
 						if ( ! lAlphaFieldBlanks( Ptr + 2 ) ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", duplicate value" );
-							ShowContinueError( "Since VALUE is used for \"" + trim( cAlphaFieldNames( FieldNo + 1 ) ) + "\", " + trim( cAlphaFieldNames( Ptr + 2 ) ) + "=" + trim( Alphas( Ptr + 2 ) ) + " is ignored." );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", duplicate value" );
+							ShowContinueError( "Since VALUE is used for \"" + cAlphaFieldNames( FieldNo + 1 ) + "\", " + cAlphaFieldNames( Ptr + 2 ) + '=' + Alphas( Ptr + 2 ) + " is ignored." );
 						}
 						PotentialAssignedValue = TotIntConvCoeff;
 					} else if ( IsValidType && Loop1 == 2 ) { // Schedule
@@ -1538,8 +1538,8 @@ namespace ConvectionCoefficients {
 						UserIntConvectionCoeffs( TotIntConvCoeff ).OverrideType = ConvCoefSchedule;
 						UserIntConvectionCoeffs( TotIntConvCoeff ).ScheduleIndex = GetScheduleIndex( Alphas( Ptr + 2 ) );
 						if ( UserIntConvectionCoeffs( TotIntConvCoeff ).ScheduleIndex == 0 ) {
-							ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", invalid value" );
-							ShowContinueError( " Invalid " + trim( cAlphaFieldNames( Ptr + 2 ) ) + " entered=" + trim( Alphas( Ptr + 2 ) ) );
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", invalid value" );
+							ShowContinueError( " Invalid " + cAlphaFieldNames( Ptr + 2 ) + " entered=" + Alphas( Ptr + 2 ) );
 							ErrorsFound = true;
 						} else {
 							UserIntConvectionCoeffs( TotIntConvCoeff ).ScheduleName = Alphas( Ptr + 2 );
@@ -1552,8 +1552,8 @@ namespace ConvectionCoefficients {
 						UserIntConvectionCoeffs( TotIntConvCoeff ).OverrideType = ConvCoefUserCurve;
 						UserIntConvectionCoeffs( TotIntConvCoeff ).UserCurveIndex = FindItemInList( Alphas( Ptr + 3 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 						if ( UserIntConvectionCoeffs( TotIntConvCoeff ).UserCurveIndex == 0 ) {
-							ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", invalid value" );
-							ShowContinueError( " Invalid " + trim( cAlphaFieldNames( Ptr + 3 ) ) + " entered=" + trim( Alphas( Ptr + 3 ) ) );
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", invalid value" );
+							ShowContinueError( " Invalid " + cAlphaFieldNames( Ptr + 3 ) + " entered=" + Alphas( Ptr + 3 ) );
 							ErrorsFound = true;
 						}
 						PotentialAssignedValue = TotIntConvCoeff;
@@ -1569,30 +1569,30 @@ namespace ConvectionCoefficients {
 					} else {
 						// treat CeilingDiffuser and TrombeWall special
 						if ( SameString( Alphas( Ptr + 1 ), "CEILINGDIFFUSER" ) || SameString( Alphas( Ptr + 1 ), "TROMBEWALL" ) ) {
-							ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", invalid value" );
-							ShowContinueError( "Invalid Value Entered, for " + trim( cAlphaFieldNames( Ptr ) ) + "=" + trim( Alphas( Ptr ) ) );
-							ShowContinueError( "invalid value in " + trim( cAlphaFieldNames( Ptr + 1 ) ) + "=" + trim( Alphas( Ptr + 1 ) ) + "\". This type is only applicable at a Zone level." );
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", invalid value" );
+							ShowContinueError( "Invalid Value Entered, for " + cAlphaFieldNames( Ptr ) + '=' + Alphas( Ptr ) );
+							ShowContinueError( "invalid value in " + cAlphaFieldNames( Ptr + 1 ) + '=' + Alphas( Ptr + 1 ) + "\". This type is only applicable at a Zone level." );
 							ErrorsFound = true;
 						} else { // really invalid
-							ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", invalid value" );
-							ShowContinueError( "Invalid Value Entered, for " + trim( cAlphaFieldNames( Ptr ) ) + "=" + trim( Alphas( Ptr ) ) );
-							ShowContinueError( "invalid value in " + trim( cAlphaFieldNames( Ptr + 1 ) ) + "=" + trim( Alphas( Ptr + 1 ) ) );
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", invalid value" );
+							ShowContinueError( "Invalid Value Entered, for " + cAlphaFieldNames( Ptr ) + '=' + Alphas( Ptr ) );
+							ShowContinueError( "invalid value in " + cAlphaFieldNames( Ptr + 1 ) + '=' + Alphas( Ptr + 1 ) );
 							ErrorsFound = true;
 						}
 					}
 					if ( Surface( Found ).IntConvCoeff != 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", duplicate (inside)" );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", duplicate (inside)" );
 						ShowContinueError( "Duplicate (Inside) assignment attempt." );
 						ErrorsFound = true;
 					} else {
 						Surface( Found ).IntConvCoeff = PotentialAssignedValue;
 					}
 
-				} else if ( SELECT_CASE_var == " " ) { // Blank
+				} else if ( SELECT_CASE_var == "" ) { // Blank
 
 				} else {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", invalid value" );
-					ShowContinueError( "Invalid Value Entered, for " + trim( cAlphaFieldNames( Ptr ) ) + "=" + trim( Alphas( Ptr ) ) );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", invalid value" );
+					ShowContinueError( "Invalid Value Entered, for " + cAlphaFieldNames( Ptr ) + '=' + Alphas( Ptr ) );
 					ErrorsFound = true;
 				}}
 
@@ -1614,8 +1614,8 @@ namespace ConvectionCoefficients {
 				break;
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", invalid value" );
-				ShowContinueError( "illegal value for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( Alphas( 1 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", invalid value" );
+				ShowContinueError( "illegal value for " + cAlphaFieldNames( 1 ) + '=' + Alphas( 1 ) );
 				ErrorsFound = true;
 				continue;
 			}
@@ -1642,9 +1642,9 @@ namespace ConvectionCoefficients {
 						UserExtConvectionCoeffs( TotExtConvCoeff ).SurfaceName = Alphas( Ptr );
 						UserExtConvectionCoeffs( TotExtConvCoeff ).WhichSurface = -999;
 						if ( Numbers( NumField ) < LowHConvLimit || Numbers( NumField ) > HighHConvLimit ) {
-							ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", out of range value" );
-							ShowContinueError( trim( cAlphaFieldNames( Ptr ) ) + "=" + trim( Alphas( Ptr ) ) + ", " + trim( cNumericFieldNames( NumField ) ) + "=[" + trim( RoundSigDigits( Numbers( NumField ), 5 ) ) + "]." );
-							ShowContinueError( "Out-of-range from low/high limits=[>=" + trim( RoundSigDigits( LowHConvLimit, 9 ) ) + ", " "<=" + trim( RoundSigDigits( HighHConvLimit, 1 ) ) + "]." );
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", out of range value" );
+							ShowContinueError( cAlphaFieldNames( Ptr ) + '=' + Alphas( Ptr ) + ", " + cNumericFieldNames( NumField ) + "=[" + RoundSigDigits( Numbers( NumField ), 5 ) + "]." );
+							ShowContinueError( "Out-of-range from low/high limits=[>=" + RoundSigDigits( LowHConvLimit, 9 ) + ", " "<=" + RoundSigDigits( HighHConvLimit, 1 ) + "]." );
 							//            CALL RangeCheck(errFlag,'"'//TRIM(cAlphaFieldNames(FieldNo+1))//'"','object',  &
 							//                       'SEVERE','>='//TRIM(RoundSigDigits(LowHConvLimit,9)),(Numbers(NumField)>=LowHConvLimit),&
 							//                       '<='//TRIM(RoundSigDigits(HighHConvLimit,1)),(Numbers(NumField)<=HighHConvLimit))
@@ -1655,8 +1655,8 @@ namespace ConvectionCoefficients {
 						UserExtConvectionCoeffs( TotExtConvCoeff ).OverrideType = ConvCoefValue;
 						UserExtConvectionCoeffs( TotExtConvCoeff ).OverrideValue = Numbers( NumField );
 						if ( ! lAlphaFieldBlanks( Ptr + 2 ) ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", duplicate value" );
-							ShowContinueError( "Since VALUE is used for \"" + trim( cAlphaFieldNames( FieldNo + 2 ) ) + "\", " + trim( cAlphaFieldNames( Ptr + 2 ) ) + "=" + trim( Alphas( Ptr + 2 ) ) + " is ignored." );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", duplicate value" );
+							ShowContinueError( "Since VALUE is used for \"" + cAlphaFieldNames( FieldNo + 2 ) + "\", " + cAlphaFieldNames( Ptr + 2 ) + '=' + Alphas( Ptr + 2 ) + " is ignored." );
 						}
 						ApplyConvectionValue( Alphas( 1 ), "OUTSIDE", TotExtConvCoeff );
 					} else if ( IsValidType && Loop1 == 2 ) { // Schedule
@@ -1666,8 +1666,8 @@ namespace ConvectionCoefficients {
 						UserExtConvectionCoeffs( TotExtConvCoeff ).OverrideType = ConvCoefSchedule;
 						UserExtConvectionCoeffs( TotExtConvCoeff ).ScheduleIndex = GetScheduleIndex( Alphas( Ptr + 2 ) );
 						if ( UserExtConvectionCoeffs( TotExtConvCoeff ).ScheduleIndex == 0 ) {
-							ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", invalid value" );
-							ShowContinueError( " Invalid " + trim( cAlphaFieldNames( Ptr + 2 ) ) + " entered=" + trim( Alphas( Ptr + 2 ) ) );
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", invalid value" );
+							ShowContinueError( " Invalid " + cAlphaFieldNames( Ptr + 2 ) + " entered=" + Alphas( Ptr + 2 ) );
 							ErrorsFound = true;
 						} else {
 							UserExtConvectionCoeffs( TotExtConvCoeff ).ScheduleName = Alphas( Ptr + 2 );
@@ -1680,8 +1680,8 @@ namespace ConvectionCoefficients {
 						UserExtConvectionCoeffs( TotExtConvCoeff ).OverrideType = ConvCoefUserCurve;
 						UserExtConvectionCoeffs( TotExtConvCoeff ).UserCurveIndex = FindItemInList( Alphas( Ptr + 3 ), HcOutsideUserCurve.Name(), TotOutsideHcUserCurves );
 						if ( UserExtConvectionCoeffs( TotExtConvCoeff ).UserCurveIndex == 0 ) {
-							ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", invalid value" );
-							ShowContinueError( " Invalid " + trim( cAlphaFieldNames( Ptr + 3 ) ) + " entered=" + trim( Alphas( Ptr + 3 ) ) );
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", invalid value" );
+							ShowContinueError( " Invalid " + cAlphaFieldNames( Ptr + 3 ) + " entered=" + Alphas( Ptr + 3 ) );
 							ErrorsFound = true;
 						}
 						PotentialAssignedValue = TotExtConvCoeff;
@@ -1697,8 +1697,8 @@ namespace ConvectionCoefficients {
 						PotentialAssignedValue = TotExtConvCoeff;
 						ApplyConvectionValue( Alphas( 1 ), "OUTSIDE", TotExtConvCoeff );
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", check input" );
-						ShowContinueError( "Check Input Entered :" + trim( Alphas( Ptr + 1 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", check input" );
+						ShowContinueError( "Check Input Entered :" + Alphas( Ptr + 1 ) );
 						ErrorsFound = true;
 					}
 
@@ -1719,9 +1719,9 @@ namespace ConvectionCoefficients {
 						UserIntConvectionCoeffs( TotIntConvCoeff ).SurfaceName = Alphas( Ptr );
 						UserIntConvectionCoeffs( TotIntConvCoeff ).WhichSurface = -999;
 						if ( Numbers( NumField ) < LowHConvLimit || Numbers( NumField ) > HighHConvLimit ) {
-							ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", out of range value" );
-							ShowContinueError( trim( cAlphaFieldNames( Ptr ) ) + "=" + trim( Alphas( Ptr ) ) + ", " + trim( cNumericFieldNames( NumField ) ) + "=[" + trim( RoundSigDigits( Numbers( NumField ), 5 ) ) + "]." );
-							ShowContinueError( "Out-of-range from low/high limits=[>=" + trim( RoundSigDigits( LowHConvLimit, 9 ) ) + ", " "<=" + trim( RoundSigDigits( HighHConvLimit, 1 ) ) + "]." );
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", out of range value" );
+							ShowContinueError( cAlphaFieldNames( Ptr ) + '=' + Alphas( Ptr ) + ", " + cNumericFieldNames( NumField ) + "=[" + RoundSigDigits( Numbers( NumField ), 5 ) + "]." );
+							ShowContinueError( "Out-of-range from low/high limits=[>=" + RoundSigDigits( LowHConvLimit, 9 ) + ", " "<=" + RoundSigDigits( HighHConvLimit, 1 ) + "]." );
 							//            CALL RangeCheck(errFlag,'"'//TRIM(cAlphaFieldNames(FieldNo+1))//'"','object',  &
 							//                       'SEVERE','>='//TRIM(RoundSigDigits(LowHConvLimit,9)),(Numbers(NumField)>=LowHConvLimit),&
 							//                       '<='//TRIM(RoundSigDigits(HighHConvLimit,1)),(Numbers(NumField)<=HighHConvLimit))
@@ -1732,8 +1732,8 @@ namespace ConvectionCoefficients {
 						UserIntConvectionCoeffs( TotIntConvCoeff ).OverrideType = ConvCoefValue;
 						UserIntConvectionCoeffs( TotIntConvCoeff ).OverrideValue = Numbers( NumField );
 						if ( ! lAlphaFieldBlanks( Ptr + 2 ) ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", duplicate value" );
-							ShowContinueError( "Since VALUE is used for \"" + trim( cAlphaFieldNames( FieldNo + 2 ) ) + "\", " + trim( cAlphaFieldNames( Ptr + 2 ) ) + "=" + trim( Alphas( Ptr + 2 ) ) + " is ignored." );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", duplicate value" );
+							ShowContinueError( "Since VALUE is used for \"" + cAlphaFieldNames( FieldNo + 2 ) + "\", " + cAlphaFieldNames( Ptr + 2 ) + '=' + Alphas( Ptr + 2 ) + " is ignored." );
 						}
 						ApplyConvectionValue( Alphas( 1 ), "INSIDE", TotIntConvCoeff );
 					} else if ( IsValidType && Loop1 == 2 ) { // Schedule
@@ -1743,8 +1743,8 @@ namespace ConvectionCoefficients {
 						UserIntConvectionCoeffs( TotIntConvCoeff ).OverrideType = ConvCoefSchedule;
 						UserIntConvectionCoeffs( TotIntConvCoeff ).ScheduleIndex = GetScheduleIndex( Alphas( Ptr + 2 ) );
 						if ( UserIntConvectionCoeffs( TotIntConvCoeff ).ScheduleIndex == 0 ) {
-							ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", invalid value" );
-							ShowContinueError( " Invalid " + trim( cAlphaFieldNames( Ptr + 2 ) ) + " entered=" + trim( Alphas( Ptr + 2 ) ) );
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", invalid value" );
+							ShowContinueError( " Invalid " + cAlphaFieldNames( Ptr + 2 ) + " entered=" + Alphas( Ptr + 2 ) );
 							ErrorsFound = true;
 						} else {
 							UserIntConvectionCoeffs( TotIntConvCoeff ).ScheduleName = Alphas( Ptr + 2 );
@@ -1758,8 +1758,8 @@ namespace ConvectionCoefficients {
 						UserIntConvectionCoeffs( TotIntConvCoeff ).UserCurveIndex = FindItemInList( Alphas( Ptr + 3 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 						if ( UserIntConvectionCoeffs( TotIntConvCoeff ).UserCurveIndex == 0 ) {
 
-							ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", invalid value" );
-							ShowContinueError( " Invalid " + trim( cAlphaFieldNames( Ptr + 3 ) ) + " entered=" + trim( Alphas( Ptr + 3 ) ) );
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", invalid value" );
+							ShowContinueError( " Invalid " + cAlphaFieldNames( Ptr + 3 ) + " entered=" + Alphas( Ptr + 3 ) );
 							ErrorsFound = true;
 						}
 						PotentialAssignedValue = TotIntConvCoeff;
@@ -1777,22 +1777,22 @@ namespace ConvectionCoefficients {
 					} else {
 						// treat CeilingDiffuser and TrombeWall special
 						if ( SameString( Alphas( Ptr + 1 ), "CEILINGDIFFUSER" ) || SameString( Alphas( Ptr + 1 ), "TROMBEWALL" ) ) {
-							ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", invalid value" );
-							ShowContinueError( " Invalid " + trim( cAlphaFieldNames( Ptr ) ) + " entered=" + trim( Alphas( Ptr ) ) );
-							ShowContinueError( "invalid value in " + trim( cAlphaFieldNames( Ptr + 1 ) ) + "=" + trim( Alphas( Ptr + 1 ) ) + "\". This type is only applicable at a Zone level." );
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", invalid value" );
+							ShowContinueError( " Invalid " + cAlphaFieldNames( Ptr ) + " entered=" + Alphas( Ptr ) );
+							ShowContinueError( "invalid value in " + cAlphaFieldNames( Ptr + 1 ) + '=' + Alphas( Ptr + 1 ) + "\". This type is only applicable at a Zone level." );
 							ErrorsFound = true;
 						} else { // really invalid
-							ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", invalid value" );
-							ShowContinueError( " Invalid " + trim( cAlphaFieldNames( Ptr + 1 ) ) + " entered=" + trim( Alphas( Ptr + 1 ) ) );
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", invalid value" );
+							ShowContinueError( " Invalid " + cAlphaFieldNames( Ptr + 1 ) + " entered=" + Alphas( Ptr + 1 ) );
 							ErrorsFound = true;
 						}
 					}
 
-				} else if ( SELECT_CASE_var == " " ) { // Blank
+				} else if ( SELECT_CASE_var == "" ) { // Blank
 
 				} else { // Error Case
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", invalid value" );
-					ShowContinueError( " Invalid " + trim( cAlphaFieldNames( Ptr ) ) + " entered=" + trim( Alphas( Ptr ) ) );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", invalid value" );
+					ShowContinueError( " Invalid " + cAlphaFieldNames( Ptr ) + " entered=" + Alphas( Ptr ) );
 					ErrorsFound = true;
 				}}
 
@@ -1806,9 +1806,9 @@ namespace ConvectionCoefficients {
 			if ( UserIntConvectionCoeffs( Loop ).OverrideType != ConvCoefSchedule ) continue;
 			if ( UserIntConvectionCoeffs( Loop ).ScheduleIndex == 0 ) continue;
 			if ( CheckScheduleValueMinMax( UserIntConvectionCoeffs( Loop ).ScheduleIndex, ">=", LowHConvLimit, "<=", HighHConvLimit ) ) continue;
-			ShowSevereError( RoutineName + "Surface=\"" + trim( UserIntConvectionCoeffs( Loop ).SurfaceName ) + "\", out-of-range convection coefficient:" );
-			ShowContinueError( "Out-of-range value found in schedule=" + trim( UserIntConvectionCoeffs( Loop ).ScheduleName ) );
-			ShowContinueError( "User supplied convection coefficients must be in range [>=" + trim( RoundSigDigits( LowHConvLimit, 9 ) ) + ", <=" + trim( RoundSigDigits( HighHConvLimit, 1 ) ) + "]" );
+			ShowSevereError( RoutineName + "Surface=\"" + UserIntConvectionCoeffs( Loop ).SurfaceName + "\", out-of-range convection coefficient:" );
+			ShowContinueError( "Out-of-range value found in schedule=" + UserIntConvectionCoeffs( Loop ).ScheduleName );
+			ShowContinueError( "User supplied convection coefficients must be in range [>=" + RoundSigDigits( LowHConvLimit, 9 ) + ", <=" + RoundSigDigits( HighHConvLimit, 1 ) + ']' );
 			ShowContinueError( "Limits are set (or default) in HeatBalanceAlgorithm object." );
 			ErrorsFound = true;
 		}
@@ -1817,9 +1817,9 @@ namespace ConvectionCoefficients {
 			if ( UserExtConvectionCoeffs( Loop ).OverrideType != ConvCoefSchedule ) continue;
 			if ( UserExtConvectionCoeffs( Loop ).ScheduleIndex == 0 ) continue;
 			if ( CheckScheduleValueMinMax( UserExtConvectionCoeffs( Loop ).ScheduleIndex, ">=", LowHConvLimit, "<=", HighHConvLimit ) ) continue;
-			ShowSevereError( RoutineName + "Surface=\"" + trim( UserExtConvectionCoeffs( Loop ).SurfaceName ) + "\", out-of-range convection coefficient:" );
-			ShowContinueError( "Out-of-range value found in schedule=" + trim( UserExtConvectionCoeffs( Loop ).ScheduleName ) );
-			ShowContinueError( "User supplied convection coefficients must be in range [>=" + trim( RoundSigDigits( LowHConvLimit, 9 ) ) + ", <=" + trim( RoundSigDigits( HighHConvLimit, 1 ) ) + "]" );
+			ShowSevereError( RoutineName + "Surface=\"" + UserExtConvectionCoeffs( Loop ).SurfaceName + "\", out-of-range convection coefficient:" );
+			ShowContinueError( "Out-of-range value found in schedule=" + UserExtConvectionCoeffs( Loop ).ScheduleName );
+			ShowContinueError( "User supplied convection coefficients must be in range [>=" + RoundSigDigits( LowHConvLimit, 9 ) + ", <=" + RoundSigDigits( HighHConvLimit, 1 ) + ']' );
 			ShowContinueError( "Limits are set (or default) in HeatBalanceAlgorithm object." );
 			ErrorsFound = true;
 		}
@@ -1834,13 +1834,13 @@ namespace ConvectionCoefficients {
 				if ( Zone( Surface( SurfNum ).Zone ).OutsideConvectionAlgo == ASHRAESimple && ( UserExtConvectionCoeffs( Loop ).OverrideType == ConvCoefSpecifiedModel && UserExtConvectionCoeffs( Loop ).HcModelEq != ASHRAESimple ) || UserExtConvectionCoeffs( Loop ).OverrideType != ConvCoefSpecifiedModel ) { //Autodesk Parens don't match actual logic
 					++Count;
 					if ( DisplayExtraWarnings ) {
-						ShowSevereError( RoutineName + "Surface=\"" + trim( UserExtConvectionCoeffs( Loop ).SurfaceName ) + "\", mixed algorithms." );
+						ShowSevereError( RoutineName + "Surface=\"" + UserExtConvectionCoeffs( Loop ).SurfaceName + "\", mixed algorithms." );
 						ShowContinueError( "Zone Outside Convection Algorithm specifies \"SimpleCombined\". " "SimpleCombined will be used for this surface." );
 					}
 				}
 			}
 			if ( Count > 0 ) {
-				ShowSevereMessage( RoutineName + trim( RoundSigDigits( Count ) ) + " surfaces had different outside convection algorithms specified when" );
+				ShowSevereMessage( RoutineName + RoundSigDigits( Count ) + " surfaces had different outside convection algorithms specified when" );
 				ShowContinueError( "the Zone Outside Convection Algorithm specifies \"SimpleCombined\"." "SimpleCombined will be used for these surfaces." );
 				if ( ! DisplayExtraWarnings ) {
 					ShowContinueError( "Use OutputDiagnostics,DisplayExtraWarnings; to see specific instances." );
@@ -1862,383 +1862,383 @@ namespace ConvectionCoefficients {
 			// A2 , \field Simple Bouyancy Vertical Wall Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 2 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 2 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallEqNum == HcInt_UserCurve ) {
 					// A3 , \field Simple Bouyancy Vertical Wall User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallUserCurveNum = FindItemInList( cAlphaArgs( 3 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", invalid value" );
-						ShowContinueError( " Invalid " + trim( cAlphaFieldNames( 3 ) ) + " entered=" + trim( cAlphaArgs( 3 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", invalid value" );
+						ShowContinueError( " Invalid " + cAlphaFieldNames( 3 ) + " entered=" + cAlphaArgs( 3 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
 				ErrorsFound = true;
 			}
 
 			// A4 , \field Simple Bouyancy Stable Horizontal Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 4 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 4 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizEqNum == HcInt_UserCurve ) {
 					// A5 , \field Simple Bouyancy Stable Horizontal Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizUserCurveNum = FindItemInList( cAlphaArgs( 5 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 5 ) ) + "=" + trim( cAlphaArgs( 5 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 5 ) + '=' + cAlphaArgs( 5 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 4 ) ) + "=" + trim( cAlphaArgs( 4 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
 				ErrorsFound = true;
 			}
 
 			// A6 , \field Simple Bouyancy Unstable Horizontal Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 6 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 6 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableHorizEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableHorizEqNum == HcInt_UserCurve ) {
 					// A7 , \field Simple Bouyancy Unstable Horizontal Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableHorizUserCurveNum = FindItemInList( cAlphaArgs( 7 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableHorizUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( cAlphaArgs( 7 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 6 ) ) + "=" + trim( cAlphaArgs( 6 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 6 ) + '=' + cAlphaArgs( 6 ) );
 				ErrorsFound = true;
 			}
 
 			// A8 , \field Simple Bouyancy Stable Tilted Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 8 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 8 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableTiltedEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableTiltedEqNum == HcInt_UserCurve ) {
 					// A9 , \field Simple Bouyancy Stable Tilted Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableTiltedUserCurveNum = FindItemInList( cAlphaArgs( 9 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableTiltedUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 9 ) ) + "=" + trim( cAlphaArgs( 9 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 9 ) + '=' + cAlphaArgs( 9 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 8 ) ) + "=" + trim( cAlphaArgs( 8 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 8 ) + '=' + cAlphaArgs( 8 ) );
 				ErrorsFound = true;
 			}
 
 			// A10 , \field Simple Bouyancy Unstable Tilted Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 10 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 10 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableTiltedEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableTiltedEqNum == HcInt_UserCurve ) {
 					// A11, \field Simple Bouyancy Unstable Tilted Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableTiltedUserCurveNum = FindItemInList( cAlphaArgs( 11 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableTiltedUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 11 ) ) + "=" + trim( cAlphaArgs( 11 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 11 ) + '=' + cAlphaArgs( 11 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 10 ) ) + "=" + trim( cAlphaArgs( 10 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 10 ) + '=' + cAlphaArgs( 10 ) );
 				ErrorsFound = true;
 			}
 
 			// A12, \field Simple Bouyancy Windows Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 12 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 12 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.SimpleBouyWindowsEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.SimpleBouyWindowsEqNum == HcInt_UserCurve ) {
 					// A13, \field Simple Bouyancy Windows Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.SimpleBouyWindowsUserCurveNum = FindItemInList( cAlphaArgs( 13 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.SimpleBouyWindowsUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 13 ) ) + "=" + trim( cAlphaArgs( 13 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 13 ) + '=' + cAlphaArgs( 13 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 12 ) ) + "=" + trim( cAlphaArgs( 12 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 12 ) + '=' + cAlphaArgs( 12 ) );
 				ErrorsFound = true;
 			}
 
 			// A14, \field Floor Heat Ceiling Cool Vertical Wall Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 14 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 14 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolVertWallEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolVertWallEqNum == HcInt_UserCurve ) {
 					//  A15, \field Floor Heat Ceiling Cool Vertical Wall Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolVertWallUserCurveNum = FindItemInList( cAlphaArgs( 15 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolVertWallUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 15 ) ) + "=" + trim( cAlphaArgs( 15 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 15 ) + '=' + cAlphaArgs( 15 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 14 ) ) + "=" + trim( cAlphaArgs( 14 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 14 ) + '=' + cAlphaArgs( 14 ) );
 				ErrorsFound = true;
 			}
 
 			// A16, \field Floor Heat Ceiling Cool Stable Horizontal Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 16 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 16 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableHorizEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableHorizEqNum == HcInt_UserCurve ) {
 					//  A17, \field Floor Heat Ceiling Cool Stable Horizontal Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableHorizUserCurveNum = FindItemInList( cAlphaArgs( 17 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableHorizUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 17 ) ) + "=" + trim( cAlphaArgs( 17 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 17 ) + '=' + cAlphaArgs( 17 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 16 ) ) + "=" + trim( cAlphaArgs( 16 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 16 ) + '=' + cAlphaArgs( 16 ) );
 				ErrorsFound = true;
 			}
 
 			// A18, \field Floor Heat Ceiling Cool Unstable Horizontal Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 18 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 18 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableHorizEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableHorizEqNum == HcInt_UserCurve ) {
 					// A19, \field Floor Heat Ceiling Cool Unstable Horizontal Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableHorizUserCurveNum = FindItemInList( cAlphaArgs( 19 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableHorizUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 19 ) ) + "=" + trim( cAlphaArgs( 19 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 19 ) + '=' + cAlphaArgs( 19 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 18 ) ) + "=" + trim( cAlphaArgs( 18 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 18 ) + '=' + cAlphaArgs( 18 ) );
 				ErrorsFound = true;
 			}
 
 			// A20, \field Floor Heat Ceiling Cool Heated Floor Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 20 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 20 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolHeatedFloorEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolHeatedFloorEqNum == HcInt_UserCurve ) {
 					// A21, \field Floor Heat Ceiling Cool Heated Floor Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolHeatedFloorUserCurveNum = FindItemInList( cAlphaArgs( 21 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolHeatedFloorUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 21 ) ) + "=" + trim( cAlphaArgs( 21 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 21 ) + '=' + cAlphaArgs( 21 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 20 ) ) + "=" + trim( cAlphaArgs( 20 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 20 ) + '=' + cAlphaArgs( 20 ) );
 				ErrorsFound = true;
 			}
 
 			// A22, \field Floor Heat Ceiling Cool Chilled Ceiling Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 22 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 22 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolChilledCeilingEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolChilledCeilingEqNum == HcInt_UserCurve ) {
 					// A23, \field Floor Heat Ceiling Cool Chilled Ceiling Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolChilledCeilingUserCurveNum = FindItemInList( cAlphaArgs( 23 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolChilledCeilingUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 23 ) ) + "=" + trim( cAlphaArgs( 23 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 23 ) + '=' + cAlphaArgs( 23 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 22 ) ) + "=" + trim( cAlphaArgs( 22 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 22 ) + '=' + cAlphaArgs( 22 ) );
 				ErrorsFound = true;
 			}
 
 			// A24, \field Floor Heat Ceiling Cool Stable Tilted Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 24 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 24 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableTiltedEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableTiltedEqNum == HcInt_UserCurve ) {
 					//   A25, \field Floor Heat Ceiling Cool Stable Tilted Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableTiltedUserCurveNum = FindItemInList( cAlphaArgs( 25 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableTiltedUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 25 ) ) + "=" + trim( cAlphaArgs( 25 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 25 ) + '=' + cAlphaArgs( 25 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 24 ) ) + "=" + trim( cAlphaArgs( 24 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 24 ) + '=' + cAlphaArgs( 24 ) );
 				ErrorsFound = true;
 			}
 
 			// A26, \field Floor Heat Ceiling Cool Unstable Tilted Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 26 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 26 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableTiltedEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableTiltedEqNum == HcInt_UserCurve ) {
 					//   A27, \field Floor Heat Ceiling Cool Unstable Tilted Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableTiltedUserCurveNum = FindItemInList( cAlphaArgs( 27 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableTiltedUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 27 ) ) + "=" + trim( cAlphaArgs( 27 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 27 ) + '=' + cAlphaArgs( 27 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 26 ) ) + "=" + trim( cAlphaArgs( 26 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 26 ) + '=' + cAlphaArgs( 26 ) );
 				ErrorsFound = true;
 			}
 
 			// A28, \field Floor Heat Ceiling Cool Window Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 28 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 28 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolWindowsEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolWindowsEqNum == HcInt_UserCurve ) {
 					//    A29, \field Floor Heat Ceiling Cool Window Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolWindowsUserCurveNum = FindItemInList( cAlphaArgs( 29 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolWindowsUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 29 ) ) + "=" + trim( cAlphaArgs( 29 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 29 ) + '=' + cAlphaArgs( 29 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 28 ) ) + "=" + trim( cAlphaArgs( 28 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 28 ) + '=' + cAlphaArgs( 28 ) );
 				ErrorsFound = true;
 			}
 
 			// A30, \field Wall Panel Heating Vertical Wall Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 30 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 30 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.WallPanelHeatVertWallEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.WallPanelHeatVertWallEqNum == HcInt_UserCurve ) {
 					//    A31, \field Wall Panel Heating Vertical Wall Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.WallPanelHeatVertWallUserCurveNum = FindItemInList( cAlphaArgs( 31 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.WallPanelHeatVertWallUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 31 ) ) + "=" + trim( cAlphaArgs( 31 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 31 ) + '=' + cAlphaArgs( 31 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 30 ) ) + "=" + trim( cAlphaArgs( 30 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 30 ) + '=' + cAlphaArgs( 30 ) );
 				ErrorsFound = true;
 			}
 
 			//  A32, \field Wall Panel Heating Heated Wall Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 32 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 32 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.WallPanelHeatHeatedWallEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.WallPanelHeatHeatedWallEqNum == HcInt_UserCurve ) {
 					//   A33, \field Wall Panel Heating Heated Wall Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.WallPanelHeatHeatedWallUserCurveNum = FindItemInList( cAlphaArgs( 33 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.WallPanelHeatHeatedWallUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 33 ) ) + "=" + trim( cAlphaArgs( 33 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 33 ) + '=' + cAlphaArgs( 33 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 32 ) ) + "=" + trim( cAlphaArgs( 32 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 32 ) + '=' + cAlphaArgs( 32 ) );
 				ErrorsFound = true;
 			}
 
 			//  A34, \field Wall Panel Heating Stable Horizontal Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 34 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 34 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableHorizEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableHorizEqNum == HcInt_UserCurve ) {
 					//   A35, \field Wall Panel Heating Stable Horizontal Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableHorizUserCurveNum = FindItemInList( cAlphaArgs( 35 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableHorizUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 35 ) ) + "=" + trim( cAlphaArgs( 35 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 35 ) + '=' + cAlphaArgs( 35 ) );
 						ErrorsFound = true;
 
 					}
@@ -2246,368 +2246,368 @@ namespace ConvectionCoefficients {
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 34 ) ) + "=" + trim( cAlphaArgs( 34 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 34 ) + '=' + cAlphaArgs( 34 ) );
 				ErrorsFound = true;
 			}
 
 			// A36, \field Wall Panel Heating Unstable Horizontal Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 36 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 36 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableHorizEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableHorizEqNum == HcInt_UserCurve ) {
 					//  A37, \field Wall Panel Heating Unstable Horizontal Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableHorizUserCurveNum = FindItemInList( cAlphaArgs( 37 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableHorizUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 37 ) ) + "=" + trim( cAlphaArgs( 37 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 37 ) + '=' + cAlphaArgs( 37 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 36 ) ) + "=" + trim( cAlphaArgs( 36 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 36 ) + '=' + cAlphaArgs( 36 ) );
 				ErrorsFound = true;
 			}
 
 			// A38, \field Wall Panel Heating Stable Tilted Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 38 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 38 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableTiltedEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableTiltedEqNum == HcInt_UserCurve ) {
 					//  A39, \field Wall Panel Heating Stable Tilted Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableTiltedUserCurveNum = FindItemInList( cAlphaArgs( 39 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableTiltedUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 39 ) ) + "=" + trim( cAlphaArgs( 39 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 39 ) + '=' + cAlphaArgs( 39 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 38 ) ) + "=" + trim( cAlphaArgs( 38 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 38 ) + '=' + cAlphaArgs( 38 ) );
 				ErrorsFound = true;
 			}
 
 			//   A40, \field Wall Panel Heating Unstable Tilted Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 40 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 40 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableTiltedEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableTiltedEqNum == HcInt_UserCurve ) {
 					//  A41, \field Wall Panel Heating Unstable Tilted Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableTiltedUserCurveNum = FindItemInList( cAlphaArgs( 41 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableTiltedUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 41 ) ) + "=" + trim( cAlphaArgs( 41 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 41 ) + '=' + cAlphaArgs( 41 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 40 ) ) + "=" + trim( cAlphaArgs( 40 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 40 ) + '=' + cAlphaArgs( 40 ) );
 				ErrorsFound = true;
 			}
 
 			//  A42, \field Wall Panel Heating Window Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 42 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 42 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.WallPanelHeatWindowsEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.WallPanelHeatWindowsEqNum == HcInt_UserCurve ) {
 					//  A43, \field Wall Panel Heating Window Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.WallPanelHeatWindowsUserCurveNum = FindItemInList( cAlphaArgs( 43 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.WallPanelHeatWindowsUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 43 ) ) + "=" + trim( cAlphaArgs( 43 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 43 ) + '=' + cAlphaArgs( 43 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 42 ) ) + "=" + trim( cAlphaArgs( 42 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 42 ) + '=' + cAlphaArgs( 42 ) );
 				ErrorsFound = true;
 			}
 
 			//  A44, \field Convective Zone Heater Vertical Wall Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 44 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 44 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallEqNum == HcInt_UserCurve ) {
 					// A45, \field Convective Zone Heater Vertical Wall Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallUserCurveNum = FindItemInList( cAlphaArgs( 45 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 45 ) ) + "=" + trim( cAlphaArgs( 45 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 45 ) + '=' + cAlphaArgs( 45 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 44 ) ) + "=" + trim( cAlphaArgs( 44 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 44 ) + '=' + cAlphaArgs( 44 ) );
 				ErrorsFound = true;
 			}
 
 			//  A46, \field Convective Zone Heater Vertical Walls Near Heater Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 46 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 46 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallNearHeaterEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallNearHeaterEqNum == HcInt_UserCurve ) {
 					// A47, \field Convective Zone Heater Vertical Walls Near Heater Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallNearHeaterUserCurveNum = FindItemInList( cAlphaArgs( 47 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallNearHeaterUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 47 ) ) + "=" + trim( cAlphaArgs( 47 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 47 ) + '=' + cAlphaArgs( 47 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 46 ) ) + "=" + trim( cAlphaArgs( 46 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 46 ) + '=' + cAlphaArgs( 46 ) );
 				ErrorsFound = true;
 			}
 
 			//  A48, \field Convective Zone Heater Stable Horizontal Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 48 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 48 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableHorizEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableHorizEqNum == HcInt_UserCurve ) {
 					// A49, \field Convective Zone Heater Stable Horizontal Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableHorizUserCurveNum = FindItemInList( cAlphaArgs( 49 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableHorizUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 49 ) ) + "=" + trim( cAlphaArgs( 49 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 49 ) + '=' + cAlphaArgs( 49 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 48 ) ) + "=" + trim( cAlphaArgs( 48 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 48 ) + '=' + cAlphaArgs( 48 ) );
 				ErrorsFound = true;
 			}
 
 			//  A50, \field Convective Zone Heater Unstable Horizontal Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 50 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 50 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableHorizEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableHorizEqNum == HcInt_UserCurve ) {
 					//  A51, \field Convective Zone Heater Unstable Horizontal Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableHorizUserCurveNum = FindItemInList( cAlphaArgs( 51 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableHorizUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 51 ) ) + "=" + trim( cAlphaArgs( 51 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 51 ) + '=' + cAlphaArgs( 51 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 50 ) ) + "=" + trim( cAlphaArgs( 50 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 50 ) + '=' + cAlphaArgs( 50 ) );
 				ErrorsFound = true;
 			}
 
 			//  A52, \field Convective Zone Heater Stable Tilted Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 52 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 52 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableTiltedEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableTiltedEqNum == HcInt_UserCurve ) {
 					//  A53, \field Convective Zone Heater Stable Tilted Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableTiltedUserCurveNum = FindItemInList( cAlphaArgs( 53 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableTiltedUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 53 ) ) + "=" + trim( cAlphaArgs( 53 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 53 ) + '=' + cAlphaArgs( 53 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 52 ) ) + "=" + trim( cAlphaArgs( 52 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 52 ) + '=' + cAlphaArgs( 52 ) );
 				ErrorsFound = true;
 			}
 
 			//  A54, \field Convective Zone Heater Unstable Tilted Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 54 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 54 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableTiltedEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableTiltedEqNum == HcInt_UserCurve ) {
 					//  A55, \field Convective Zone Heater Unstable Tilted Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableTiltedUserCurveNum = FindItemInList( cAlphaArgs( 55 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableTiltedUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 55 ) ) + "=" + trim( cAlphaArgs( 55 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 55 ) + '=' + cAlphaArgs( 55 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 54 ) ) + "=" + trim( cAlphaArgs( 54 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 54 ) + '=' + cAlphaArgs( 54 ) );
 				ErrorsFound = true;
 			}
 
 			//  A56, \field Convective Zone Heater Windows Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 56 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 56 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatWindowsEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatWindowsEqNum == HcInt_UserCurve ) {
 					//   A57, \field Convective Zone Heater Windows Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatWindowsUserCurveNum = FindItemInList( cAlphaArgs( 57 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatWindowsUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 57 ) ) + "=" + trim( cAlphaArgs( 57 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 57 ) + '=' + cAlphaArgs( 57 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 56 ) ) + "=" + trim( cAlphaArgs( 56 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 56 ) + '=' + cAlphaArgs( 56 ) );
 				ErrorsFound = true;
 			}
 
 			//  A58, \field Central Air Diffuser Wall Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 58 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 58 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.CentralAirWallEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.CentralAirWallEqNum == HcInt_UserCurve ) {
 					//   A59, \field Central Air Diffuser Wall Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.CentralAirWallUserCurveNum = FindItemInList( cAlphaArgs( 59 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.CentralAirWallUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 59 ) ) + "=" + trim( cAlphaArgs( 59 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 59 ) + '=' + cAlphaArgs( 59 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 58 ) ) + "=" + trim( cAlphaArgs( 58 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 58 ) + '=' + cAlphaArgs( 58 ) );
 				ErrorsFound = true;
 			}
 
 			//   A60, \field Central Air Diffuser Ceiling Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 60 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 60 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.CentralAirCeilingEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.CentralAirCeilingEqNum == HcInt_UserCurve ) {
 					//   A61, \field Central Air Diffuser Ceiling Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.CentralAirCeilingUserCurveNum = FindItemInList( cAlphaArgs( 61 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.CentralAirCeilingUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 61 ) ) + "=" + trim( cAlphaArgs( 61 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 61 ) + '=' + cAlphaArgs( 61 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 60 ) ) + "=" + trim( cAlphaArgs( 60 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 60 ) + '=' + cAlphaArgs( 60 ) );
 				ErrorsFound = true;
 			}
 
 			//  A62, \field Central Air Diffuser Floor Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 62 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 62 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.CentralAirFloorEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.CentralAirFloorEqNum == HcInt_UserCurve ) {
 					//  A63, \field Central Air Diffuser Floor Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.CentralAirFloorUserCurveNum = FindItemInList( cAlphaArgs( 63 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.CentralAirFloorUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 63 ) ) + "=" + trim( cAlphaArgs( 63 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 63 ) + '=' + cAlphaArgs( 63 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 62 ) ) + "=" + trim( cAlphaArgs( 62 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 62 ) + '=' + cAlphaArgs( 62 ) );
 				ErrorsFound = true;
 			}
 
 			//  A64, \field Central Air Diffuser Window Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 64 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 64 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.CentralAirWindowsEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.CentralAirWindowsEqNum == HcInt_UserCurve ) {
 					//   A65, \field Central Air Diffuser Window Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.CentralAirWindowsUserCurveNum = FindItemInList( cAlphaArgs( 65 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.CentralAirWindowsUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 65 ) ) + "=" + trim( cAlphaArgs( 65 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 65 ) + '=' + cAlphaArgs( 65 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 64 ) ) + "=" + trim( cAlphaArgs( 64 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 64 ) + '=' + cAlphaArgs( 64 ) );
 				ErrorsFound = true;
 			}
 
 			// A66, \field Mechanical Zone Fan Circulation Vertical Wall Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 66 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 66 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.ZoneFanCircVertWallEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.ZoneFanCircVertWallEqNum == HcInt_UserCurve ) {
 					//   A67, \field Mechanical Zone Fan Circulation Vertical Wall Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.ZoneFanCircVertWallUserCurveNum = FindItemInList( cAlphaArgs( 67 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.ZoneFanCircVertWallUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 67 ) ) + "=" + trim( cAlphaArgs( 67 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 67 ) + '=' + cAlphaArgs( 67 ) );
 						ErrorsFound = true;
 
 					}
@@ -2615,284 +2615,284 @@ namespace ConvectionCoefficients {
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 66 ) ) + "=" + trim( cAlphaArgs( 66 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 66 ) + '=' + cAlphaArgs( 66 ) );
 				ErrorsFound = true;
 			}
 
 			// A68, \field Mechanical Zone Fan Circulation Stable Horizontal Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 68 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 68 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableHorizEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableHorizEqNum == HcInt_UserCurve ) {
 					//   A69, \field Mechanical Zone Fan Circulation Stable Horizontal Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableHorizUserCurveNum = FindItemInList( cAlphaArgs( 69 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableHorizUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 69 ) ) + "=" + trim( cAlphaArgs( 69 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 69 ) + '=' + cAlphaArgs( 69 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 68 ) ) + "=" + trim( cAlphaArgs( 68 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 68 ) + '=' + cAlphaArgs( 68 ) );
 				ErrorsFound = true;
 			}
 
 			// A70, \field Mechanical Zone Fan Circulation Unstable Horizontal Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 70 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 70 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableHorizEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableHorizEqNum == HcInt_UserCurve ) {
 					//   A71, \field Mechanical Zone Fan Circulation Unstable Horizontal Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableHorizUserCurveNum = FindItemInList( cAlphaArgs( 71 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableHorizUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 71 ) ) + "=" + trim( cAlphaArgs( 71 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 71 ) + '=' + cAlphaArgs( 71 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 70 ) ) + "=" + trim( cAlphaArgs( 70 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 70 ) + '=' + cAlphaArgs( 70 ) );
 				ErrorsFound = true;
 			}
 
 			// A72, \field Mechanical Zone Fan Circulation Stable Tilted Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 72 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 72 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableTiltedEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableTiltedEqNum == HcInt_UserCurve ) {
 					//  A73, \field Mechanical Zone Fan Circulation Stable Tilted Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableTiltedUserCurveNum = FindItemInList( cAlphaArgs( 73 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableTiltedUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 73 ) ) + "=" + trim( cAlphaArgs( 73 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 73 ) + '=' + cAlphaArgs( 73 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 72 ) ) + "=" + trim( cAlphaArgs( 72 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 72 ) + '=' + cAlphaArgs( 72 ) );
 				ErrorsFound = true;
 			}
 
 			// A74, \field Mechanical Zone Fan Circulation Unstable Tilted Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 74 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 74 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableTiltedEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableTiltedEqNum == HcInt_UserCurve ) {
 					//  A75, \field Mechanical Zone Fan Circulation Unstable Tilted Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableTiltedUserCurveNum = FindItemInList( cAlphaArgs( 75 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableTiltedUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 75 ) ) + "=" + trim( cAlphaArgs( 75 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 75 ) + '=' + cAlphaArgs( 75 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 74 ) ) + "=" + trim( cAlphaArgs( 74 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 74 ) + '=' + cAlphaArgs( 74 ) );
 				ErrorsFound = true;
 			}
 
 			// A76, \field Mechanical Zone Fan Circulation Window Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 76 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 76 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.ZoneFanCircWindowsEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.ZoneFanCircWindowsEqNum == HcInt_UserCurve ) {
 					//  A77, \field Mechanical Zone Fan Circulation Window Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.ZoneFanCircWindowsUserCurveNum = FindItemInList( cAlphaArgs( 77 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.ZoneFanCircWindowsUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 77 ) ) + "=" + trim( cAlphaArgs( 77 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 77 ) + '=' + cAlphaArgs( 77 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 76 ) ) + "=" + trim( cAlphaArgs( 76 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 76 ) + '=' + cAlphaArgs( 76 ) );
 				ErrorsFound = true;
 			}
 
 			// A78, \field Mixed Regime Bouyancy Assisting Flow on Walls Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 78 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 78 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.MixedBouyAssistingFlowWallEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.MixedBouyAssistingFlowWallEqNum == HcInt_UserCurve ) {
 					//  A79, \field Mixed Regime Bouyancy Assisting Flow on Walls Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.MixedBouyAssistingFlowWallUserCurveNum = FindItemInList( cAlphaArgs( 79 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.MixedBouyAssistingFlowWallUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 79 ) ) + "=" + trim( cAlphaArgs( 79 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 79 ) + '=' + cAlphaArgs( 79 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 78 ) ) + "=" + trim( cAlphaArgs( 78 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 78 ) + '=' + cAlphaArgs( 78 ) );
 				ErrorsFound = true;
 			}
 
 			// A80, \field Mixed Regime Bouyancy Oppossing Flow on Walls Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 80 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 80 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.MixedBouyOppossingFlowWallEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.MixedBouyOppossingFlowWallEqNum == HcInt_UserCurve ) {
 					//  A81, \field Mixed Regime Bouyancy Oppossing Flow on Walls Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.MixedBouyOppossingFlowWallUserCurveNum = FindItemInList( cAlphaArgs( 81 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.MixedBouyOppossingFlowWallUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 81 ) ) + "=" + trim( cAlphaArgs( 81 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 81 ) + '=' + cAlphaArgs( 81 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 80 ) ) + "=" + trim( cAlphaArgs( 80 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 80 ) + '=' + cAlphaArgs( 80 ) );
 				ErrorsFound = true;
 			}
 
 			// A82, \field Mixed Regime Stable Floor Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 82 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 82 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.MixedStableFloorEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.MixedStableFloorEqNum == HcInt_UserCurve ) {
 					//  A83, \field Mixed Regime Stable Floor Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.MixedStableFloorUserCurveNum = FindItemInList( cAlphaArgs( 83 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.MixedStableFloorUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 83 ) ) + "=" + trim( cAlphaArgs( 83 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 83 ) + '=' + cAlphaArgs( 83 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 82 ) ) + "=" + trim( cAlphaArgs( 82 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 82 ) + '=' + cAlphaArgs( 82 ) );
 				ErrorsFound = true;
 			}
 
 			// A84, \field Mixed Regime Unstable Floor Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 84 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 84 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.MixedUnstableFloorEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.MixedUnstableFloorEqNum == HcInt_UserCurve ) {
 					//  A85, \field Mixed Regime Unstable Floor Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.MixedUnstableFloorUserCurveNum = FindItemInList( cAlphaArgs( 85 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.MixedUnstableFloorUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 85 ) ) + "=" + trim( cAlphaArgs( 85 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 85 ) + '=' + cAlphaArgs( 85 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 84 ) ) + "=" + trim( cAlphaArgs( 84 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 84 ) + '=' + cAlphaArgs( 84 ) );
 				ErrorsFound = true;
 			}
 
 			// A86, \field Mixed Regime Stable Ceiling Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 86 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 86 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.MixedStableCeilingEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.MixedStableCeilingEqNum == HcInt_UserCurve ) {
 					//  A87, \field Mixed Regime Stable Ceiling Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.MixedStableCeilingUserCurveNum = FindItemInList( cAlphaArgs( 87 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.MixedStableCeilingUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 87 ) ) + "=" + trim( cAlphaArgs( 87 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 87 ) + '=' + cAlphaArgs( 87 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 86 ) ) + "=" + trim( cAlphaArgs( 86 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 86 ) + '=' + cAlphaArgs( 86 ) );
 				ErrorsFound = true;
 			}
 
 			// A88, \field Mixed Regime Unstable Ceiling Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 88 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 88 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.MixedUnstableCeilingEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.MixedUnstableCeilingEqNum == HcInt_UserCurve ) {
 					//  A89, \field Mixed Regime Unstable Ceiling Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.MixedUnstableCeilingUserCurveNum = FindItemInList( cAlphaArgs( 89 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.MixedUnstableCeilingUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 89 ) ) + "=" + trim( cAlphaArgs( 89 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 89 ) + '=' + cAlphaArgs( 89 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 88 ) ) + "=" + trim( cAlphaArgs( 88 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 88 ) + '=' + cAlphaArgs( 88 ) );
 				ErrorsFound = true;
 			}
 
 			// A90, \field Mixed Regime Window Equation Source
 			IsValidType = false;
 			for ( Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1 ) { //skipping first 5 whole-model types
-				if ( trim( cAlphaArgs( 90 ) ) != trim( ValidIntConvectionValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 90 ) != ValidIntConvectionValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				InsideFaceAdaptiveConvectionAlgo.MixedWindowsEqNum = IntConvectionValue( Loop1 );
 				if ( InsideFaceAdaptiveConvectionAlgo.MixedWindowsEqNum == HcInt_UserCurve ) {
 					//   A91; \field Mixed Regime Window Equation User Curve Name
 					InsideFaceAdaptiveConvectionAlgo.MixedWindowsUserCurveNum = FindItemInList( cAlphaArgs( 91 ), HcInsideUserCurve.Name(), TotInsideHcUserCurves );
 					if ( InsideFaceAdaptiveConvectionAlgo.MixedWindowsUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 91 ) ) + "=" + trim( cAlphaArgs( 91 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 91 ) + '=' + cAlphaArgs( 91 ) );
 						ErrorsFound = true;
 					}
 				}
 				break; //found it
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 90 ) ) + "=" + trim( cAlphaArgs( 90 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 90 ) + '=' + cAlphaArgs( 90 ) );
 				ErrorsFound = true;
 			}
 
@@ -2909,138 +2909,138 @@ namespace ConvectionCoefficients {
 			// A2 , \field Wind Convection Windward Vertical Wall Equation Source
 			IsValidType = false;
 			for ( Loop1 = 2; Loop1 <= NumValidSpecificExtWindConvValueTypes; ++Loop1 ) {
-				if ( trim( cAlphaArgs( 2 ) ) != trim( ValidSpecificExtWindConvValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 2 ) != ValidSpecificExtWindConvValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				OutsideFaceAdaptiveConvectionAlgo.HWindWallWindwardEqNum = MoreSpecificExtWindConvectionValue( Loop1 );
 				if ( OutsideFaceAdaptiveConvectionAlgo.HWindWallWindwardEqNum == HcExt_UserCurve ) {
 					//  A3 , \field Wind Convection Windward Equation Vertical Wall User Curve Name
 					OutsideFaceAdaptiveConvectionAlgo.HWindWallWindwardUserCurveNum = FindItemInList( cAlphaArgs( 3 ), HcOutsideUserCurve.Name(), TotOutsideHcUserCurves );
 					if ( OutsideFaceAdaptiveConvectionAlgo.HWindWallWindwardUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 3 ) ) + "=" + trim( cAlphaArgs( 3 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) );
 						ErrorsFound = true;
 					}
 				}
 				break;
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
 				ErrorsFound = true;
 			}
 
 			// A4 , \field Wind Convection Leeward Vertical Wall Equation Source
 			IsValidType = false;
 			for ( Loop1 = 2; Loop1 <= NumValidSpecificExtWindConvValueTypes; ++Loop1 ) {
-				if ( trim( cAlphaArgs( 4 ) ) != trim( ValidSpecificExtWindConvValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 4 ) != ValidSpecificExtWindConvValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				OutsideFaceAdaptiveConvectionAlgo.HWindWallLeewardEqNum = MoreSpecificExtWindConvectionValue( Loop1 );
 				if ( OutsideFaceAdaptiveConvectionAlgo.HWindWallLeewardEqNum == HcExt_UserCurve ) {
 					// A5 , \field Wind Convection Leeward Vertical Wall Equation User Curve Name
 					OutsideFaceAdaptiveConvectionAlgo.HWindWallLeewardUserCurveNum = FindItemInList( cAlphaArgs( 5 ), HcOutsideUserCurve.Name(), TotOutsideHcUserCurves );
 					if ( OutsideFaceAdaptiveConvectionAlgo.HWindWallLeewardUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 5 ) ) + "=" + trim( cAlphaArgs( 5 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 5 ) + '=' + cAlphaArgs( 5 ) );
 						ErrorsFound = true;
 					}
 				}
 				break;
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 4 ) ) + "=" + trim( cAlphaArgs( 4 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
 				ErrorsFound = true;
 			}
 
 			// A6 , \field Wind Convection Horizontal Roof Equation Source
 			IsValidType = false;
 			for ( Loop1 = 1; Loop1 <= NumValidSpecificExtWindConvValueTypes; ++Loop1 ) {
-				if ( trim( cAlphaArgs( 6 ) ) != trim( ValidSpecificExtWindConvValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 6 ) != ValidSpecificExtWindConvValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				OutsideFaceAdaptiveConvectionAlgo.HWindHorizRoofEqNum = MoreSpecificExtWindConvectionValue( Loop1 );
 				if ( OutsideFaceAdaptiveConvectionAlgo.HWindHorizRoofEqNum == HcExt_UserCurve ) {
 					//  A7 , \field Wind Convection Horizontal Roof User Curve Name
 					OutsideFaceAdaptiveConvectionAlgo.HWindHorizRoofUserCurveNum = FindItemInList( cAlphaArgs( 7 ), HcOutsideUserCurve.Name(), TotOutsideHcUserCurves );
 					if ( OutsideFaceAdaptiveConvectionAlgo.HWindHorizRoofUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( cAlphaArgs( 7 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
 						ErrorsFound = true;
 					}
 				}
 				break;
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 6 ) ) + "=" + trim( cAlphaArgs( 6 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 6 ) + '=' + cAlphaArgs( 6 ) );
 				ErrorsFound = true;
 			}
 
 			//  A8 , \field Natural Convection Vertical Wall Equation Source
 			IsValidType = false;
 			for ( Loop1 = 1; Loop1 <= NumValidSpecificExtNatConvectValueTypes; ++Loop1 ) {
-				if ( trim( cAlphaArgs( 8 ) ) != trim( ValidSpecificExtNatConvectValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 8 ) != ValidSpecificExtNatConvectValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				OutsideFaceAdaptiveConvectionAlgo.HNatVertWallEqNum = SpecificExtNatConvectionValue( Loop1 );
 				if ( OutsideFaceAdaptiveConvectionAlgo.HNatVertWallEqNum == HcExt_UserCurve ) {
 					//  A9 , \field Natural Convection Vertical Wall Equation User Curve Name
 					OutsideFaceAdaptiveConvectionAlgo.HNatVertWallUserCurveNum = FindItemInList( cAlphaArgs( 9 ), HcOutsideUserCurve.Name(), TotOutsideHcUserCurves );
 					if ( OutsideFaceAdaptiveConvectionAlgo.HNatVertWallUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 9 ) ) + "=" + trim( cAlphaArgs( 9 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 9 ) + '=' + cAlphaArgs( 9 ) );
 						ErrorsFound = true;
 					}
 				}
 				break;
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 8 ) ) + "=" + trim( cAlphaArgs( 8 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 8 ) + '=' + cAlphaArgs( 8 ) );
 				ErrorsFound = true;
 			}
 
 			//  A10, \field Natural Convection Stable Horizontal Equation Source
 			IsValidType = false;
 			for ( Loop1 = 1; Loop1 <= NumValidSpecificExtNatConvectValueTypes; ++Loop1 ) {
-				if ( trim( cAlphaArgs( 10 ) ) != trim( ValidSpecificExtNatConvectValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 10 ) != ValidSpecificExtNatConvectValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				OutsideFaceAdaptiveConvectionAlgo.HNatStableHorizEqNum = SpecificExtNatConvectionValue( Loop1 );
 				if ( OutsideFaceAdaptiveConvectionAlgo.HNatStableHorizEqNum == HcExt_UserCurve ) {
 					//  A11, \field Natural Convection Stable Horizontal Equation User Curve Name
 					OutsideFaceAdaptiveConvectionAlgo.HNatStableHorizUserCurveNum = FindItemInList( cAlphaArgs( 11 ), HcOutsideUserCurve.Name(), TotOutsideHcUserCurves );
 					if ( OutsideFaceAdaptiveConvectionAlgo.HNatStableHorizUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 11 ) ) + "=" + trim( cAlphaArgs( 11 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 11 ) + '=' + cAlphaArgs( 11 ) );
 						ErrorsFound = true;
 					}
 				}
 				break;
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 10 ) ) + "=" + trim( cAlphaArgs( 10 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 10 ) + '=' + cAlphaArgs( 10 ) );
 				ErrorsFound = true;
 			}
 
 			//   A12, \field Natural Convection Unstable Horizontal Equation Source
 			IsValidType = false;
 			for ( Loop1 = 1; Loop1 <= NumValidSpecificExtNatConvectValueTypes; ++Loop1 ) {
-				if ( trim( cAlphaArgs( 12 ) ) != trim( ValidSpecificExtNatConvectValueTypes( Loop1 ) ) ) continue;
+				if ( cAlphaArgs( 12 ) != ValidSpecificExtNatConvectValueTypes( Loop1 ) ) continue;
 				IsValidType = true;
 				OutsideFaceAdaptiveConvectionAlgo.HNatStableHorizEqNum = SpecificExtNatConvectionValue( Loop1 );
 				if ( OutsideFaceAdaptiveConvectionAlgo.HNatStableHorizEqNum == HcExt_UserCurve ) {
 					// A13; \field Natural Convection Unstable Horizontal Equation User Curve Name
 					OutsideFaceAdaptiveConvectionAlgo.HNatStableHorizUserCurveNum = FindItemInList( cAlphaArgs( 13 ), HcOutsideUserCurve.Name(), TotOutsideHcUserCurves );
 					if ( OutsideFaceAdaptiveConvectionAlgo.HNatStableHorizUserCurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-						ShowContinueError( "Invalid Name choice Entered, for " + trim( cAlphaFieldNames( 13 ) ) + "=" + trim( cAlphaArgs( 13 ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+						ShowContinueError( "Invalid Name choice Entered, for " + cAlphaFieldNames( 13 ) + '=' + cAlphaArgs( 13 ) );
 						ErrorsFound = true;
 					}
 				}
 				break;
 			}
 			if ( ! IsValidType ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + ", invalid value" );
-				ShowContinueError( "Invalid Key choice Entered, for " + trim( cAlphaFieldNames( 12 ) ) + "=" + trim( cAlphaArgs( 12 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", invalid value" );
+				ShowContinueError( "Invalid Key choice Entered, for " + cAlphaFieldNames( 12 ) + '=' + cAlphaArgs( 12 ) );
 				ErrorsFound = true;
 			}
 
@@ -3056,8 +3056,8 @@ namespace ConvectionCoefficients {
 
 	void
 	ApplyConvectionValue(
-		Fstring const & SurfaceTypes,
-		Fstring const & ConvectionType,
+		std::string const & SurfaceTypes,
+		std::string const & ConvectionType,
 		int const Value
 	)
 	{
@@ -3099,7 +3099,7 @@ namespace ConvectionCoefficients {
 		bool SurfacesOfType;
 		int SurfaceCountOutside;
 		int SurfaceCountInside;
-		Fstring OverwriteMessage( 52 );
+		std::string OverwriteMessage;
 
 		{ auto const SELECT_CASE_var( SurfaceTypes );
 
@@ -3115,7 +3115,7 @@ namespace ConvectionCoefficients {
 					if ( Surface( SurfNum ).OSCPtr > 0 ) continue;
 					if ( Surface( SurfNum ).ExtConvCoeff != 0 ) {
 						if ( DisplayExtraWarnings ) {
-							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned value for (Outside) in Surface=" + trim( Surface( SurfNum ).Name ) );
+							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned value for (Outside) in Surface=" + Surface( SurfNum ).Name );
 						} else {
 							++SurfaceCountOutside;
 						}
@@ -3125,7 +3125,7 @@ namespace ConvectionCoefficients {
 				} else {
 					if ( Surface( SurfNum ).IntConvCoeff != 0 ) {
 						if ( DisplayExtraWarnings ) {
-							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned value for (Inside) in Surface=" + trim( Surface( SurfNum ).Name ) );
+							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned value for (Inside) in Surface=" + Surface( SurfNum ).Name );
 						} else {
 							++SurfaceCountInside;
 						}
@@ -3136,12 +3136,12 @@ namespace ConvectionCoefficients {
 			}
 			if ( ! DisplayExtraWarnings && ( SurfaceCountOutside > 0 || SurfaceCountInside > 0 ) ) {
 				if ( SurfaceCountOutside > 0 ) {
-					OverwriteMessage = trim( TrimSigDigits( SurfaceCountOutside ) ) + " Outside";
+					OverwriteMessage = TrimSigDigits( SurfaceCountOutside ) + " Outside";
 				}
 				if ( SurfaceCountInside > 0 ) {
-					OverwriteMessage = trim( TrimSigDigits( SurfaceCountInside ) ) + " Inside";
+					OverwriteMessage = TrimSigDigits( SurfaceCountInside ) + " Inside";
 				}
-				ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned values for " + trim( OverwriteMessage ) + " assignments." );
+				ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned values for " + OverwriteMessage + " assignments." );
 			}
 
 		} else if ( SELECT_CASE_var == "ALLEXTERIORWINDOWS" ) {
@@ -3157,7 +3157,7 @@ namespace ConvectionCoefficients {
 					if ( Surface( SurfNum ).OSCPtr > 0 ) continue;
 					if ( Surface( SurfNum ).ExtConvCoeff != 0 ) {
 						if ( DisplayExtraWarnings ) {
-							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned value for (Outside) in Surface=" + trim( Surface( SurfNum ).Name ) );
+							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned value for (Outside) in Surface=" + Surface( SurfNum ).Name );
 						} else {
 							++SurfaceCountOutside;
 						}
@@ -3167,7 +3167,7 @@ namespace ConvectionCoefficients {
 				} else {
 					if ( Surface( SurfNum ).IntConvCoeff != 0 ) {
 						if ( DisplayExtraWarnings ) {
-							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned value for (Inside) in Surface=" + trim( Surface( SurfNum ).Name ) );
+							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned value for (Inside) in Surface=" + Surface( SurfNum ).Name );
 						} else {
 							++SurfaceCountInside;
 						}
@@ -3178,12 +3178,12 @@ namespace ConvectionCoefficients {
 			}
 			if ( ! DisplayExtraWarnings && ( SurfaceCountOutside > 0 || SurfaceCountInside > 0 ) ) {
 				if ( SurfaceCountOutside > 0 ) {
-					OverwriteMessage = trim( TrimSigDigits( SurfaceCountOutside ) ) + " Outside";
+					OverwriteMessage = TrimSigDigits( SurfaceCountOutside ) + " Outside";
 				}
 				if ( SurfaceCountInside > 0 ) {
-					OverwriteMessage = trim( TrimSigDigits( SurfaceCountInside ) ) + " Inside";
+					OverwriteMessage = TrimSigDigits( SurfaceCountInside ) + " Inside";
 				}
-				ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned values for " + trim( OverwriteMessage ) + " assignments." );
+				ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned values for " + OverwriteMessage + " assignments." );
 			}
 
 		} else if ( SELECT_CASE_var == "ALLEXTERIORWALLS" ) {
@@ -3199,7 +3199,7 @@ namespace ConvectionCoefficients {
 					if ( Surface( SurfNum ).OSCPtr > 0 ) continue;
 					if ( Surface( SurfNum ).ExtConvCoeff != 0 ) {
 						if ( DisplayExtraWarnings ) {
-							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned value for (Outside) in Surface=" + trim( Surface( SurfNum ).Name ) );
+							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned value for (Outside) in Surface=" + Surface( SurfNum ).Name );
 						} else {
 							++SurfaceCountOutside;
 						}
@@ -3209,7 +3209,7 @@ namespace ConvectionCoefficients {
 				} else {
 					if ( Surface( SurfNum ).IntConvCoeff != 0 ) {
 						if ( DisplayExtraWarnings ) {
-							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned value for (Inside) in Surface=" + trim( Surface( SurfNum ).Name ) );
+							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned value for (Inside) in Surface=" + Surface( SurfNum ).Name );
 						} else {
 							++SurfaceCountInside;
 						}
@@ -3220,12 +3220,12 @@ namespace ConvectionCoefficients {
 			}
 			if ( ! DisplayExtraWarnings && ( SurfaceCountOutside > 0 || SurfaceCountInside > 0 ) ) {
 				if ( SurfaceCountOutside > 0 ) {
-					OverwriteMessage = trim( TrimSigDigits( SurfaceCountOutside ) ) + " Outside";
+					OverwriteMessage = TrimSigDigits( SurfaceCountOutside ) + " Outside";
 				}
 				if ( SurfaceCountInside > 0 ) {
-					OverwriteMessage = trim( TrimSigDigits( SurfaceCountInside ) ) + " Inside";
+					OverwriteMessage = TrimSigDigits( SurfaceCountInside ) + " Inside";
 				}
-				ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned values for " + trim( OverwriteMessage ) + " assignments." );
+				ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned values for " + OverwriteMessage + " assignments." );
 			}
 
 		} else if ( SELECT_CASE_var == "ALLEXTERIORROOFS" ) {
@@ -3241,7 +3241,7 @@ namespace ConvectionCoefficients {
 					if ( Surface( SurfNum ).OSCPtr > 0 ) continue;
 					if ( Surface( SurfNum ).ExtConvCoeff != 0 ) {
 						if ( DisplayExtraWarnings ) {
-							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned value for (Outside) in Surface=" + trim( Surface( SurfNum ).Name ) );
+							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned value for (Outside) in Surface=" + Surface( SurfNum ).Name );
 						} else {
 							++SurfaceCountOutside;
 						}
@@ -3251,7 +3251,7 @@ namespace ConvectionCoefficients {
 				} else {
 					if ( Surface( SurfNum ).IntConvCoeff != 0 ) {
 						if ( DisplayExtraWarnings ) {
-							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned value for (Inside) in Surface=" + trim( Surface( SurfNum ).Name ) );
+							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned value for (Inside) in Surface=" + Surface( SurfNum ).Name );
 						} else {
 							++SurfaceCountInside;
 						}
@@ -3262,12 +3262,12 @@ namespace ConvectionCoefficients {
 			}
 			if ( ! DisplayExtraWarnings && ( SurfaceCountOutside > 0 || SurfaceCountInside > 0 ) ) {
 				if ( SurfaceCountOutside > 0 ) {
-					OverwriteMessage = trim( TrimSigDigits( SurfaceCountOutside ) ) + " Outside";
+					OverwriteMessage = TrimSigDigits( SurfaceCountOutside ) + " Outside";
 				}
 				if ( SurfaceCountInside > 0 ) {
-					OverwriteMessage = trim( TrimSigDigits( SurfaceCountInside ) ) + " Inside";
+					OverwriteMessage = TrimSigDigits( SurfaceCountInside ) + " Inside";
 				}
-				ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned values for " + trim( OverwriteMessage ) + " assignments." );
+				ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned values for " + OverwriteMessage + " assignments." );
 			}
 
 		} else if ( SELECT_CASE_var == "ALLEXTERIORFLOORS" ) {
@@ -3283,7 +3283,7 @@ namespace ConvectionCoefficients {
 					if ( Surface( SurfNum ).OSCPtr > 0 ) continue;
 					if ( Surface( SurfNum ).ExtConvCoeff != 0 ) {
 						if ( DisplayExtraWarnings ) {
-							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned value for (Outside) in Surface=" + trim( Surface( SurfNum ).Name ) );
+							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned value for (Outside) in Surface=" + Surface( SurfNum ).Name );
 						} else {
 							++SurfaceCountOutside;
 						}
@@ -3293,7 +3293,7 @@ namespace ConvectionCoefficients {
 				} else {
 					if ( Surface( SurfNum ).IntConvCoeff != 0 ) {
 						if ( DisplayExtraWarnings ) {
-							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned value for (Inside) in Surface=" + trim( Surface( SurfNum ).Name ) );
+							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned value for (Inside) in Surface=" + Surface( SurfNum ).Name );
 						} else {
 							++SurfaceCountInside;
 						}
@@ -3304,12 +3304,12 @@ namespace ConvectionCoefficients {
 			}
 			if ( ! DisplayExtraWarnings && ( SurfaceCountOutside > 0 || SurfaceCountInside > 0 ) ) {
 				if ( SurfaceCountOutside > 0 ) {
-					OverwriteMessage = trim( TrimSigDigits( SurfaceCountOutside ) ) + " Outside";
+					OverwriteMessage = TrimSigDigits( SurfaceCountOutside ) + " Outside";
 				}
 				if ( SurfaceCountInside > 0 ) {
-					OverwriteMessage = trim( TrimSigDigits( SurfaceCountInside ) ) + " Inside";
+					OverwriteMessage = TrimSigDigits( SurfaceCountInside ) + " Inside";
 				}
-				ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned values for " + trim( OverwriteMessage ) + " assignments." );
+				ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned values for " + OverwriteMessage + " assignments." );
 			}
 
 		} else if ( SELECT_CASE_var == "ALLINTERIORSURFACES" ) {
@@ -3324,7 +3324,7 @@ namespace ConvectionCoefficients {
 					if ( Surface( SurfNum ).OSCPtr > 0 ) continue;
 					if ( Surface( SurfNum ).ExtConvCoeff != 0 ) {
 						if ( DisplayExtraWarnings ) {
-							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned value for (Outside) in Surface=" + trim( Surface( SurfNum ).Name ) );
+							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned value for (Outside) in Surface=" + Surface( SurfNum ).Name );
 						} else {
 							++SurfaceCountOutside;
 						}
@@ -3334,7 +3334,7 @@ namespace ConvectionCoefficients {
 				} else {
 					if ( Surface( SurfNum ).IntConvCoeff != 0 ) {
 						if ( DisplayExtraWarnings ) {
-							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned value for (Inside) in Surface=" + trim( Surface( SurfNum ).Name ) );
+							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned value for (Inside) in Surface=" + Surface( SurfNum ).Name );
 						} else {
 							++SurfaceCountInside;
 						}
@@ -3345,12 +3345,12 @@ namespace ConvectionCoefficients {
 			}
 			if ( ! DisplayExtraWarnings && ( SurfaceCountOutside > 0 || SurfaceCountInside > 0 ) ) {
 				if ( SurfaceCountOutside > 0 ) {
-					OverwriteMessage = trim( TrimSigDigits( SurfaceCountOutside ) ) + " Outside";
+					OverwriteMessage = TrimSigDigits( SurfaceCountOutside ) + " Outside";
 				}
 				if ( SurfaceCountInside > 0 ) {
-					OverwriteMessage = trim( TrimSigDigits( SurfaceCountInside ) ) + " Inside";
+					OverwriteMessage = TrimSigDigits( SurfaceCountInside ) + " Inside";
 				}
-				ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned values for " + trim( OverwriteMessage ) + " assignments." );
+				ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned values for " + OverwriteMessage + " assignments." );
 			}
 
 		} else if ( SELECT_CASE_var == "ALLINTERIORWINDOWS" ) {
@@ -3366,7 +3366,7 @@ namespace ConvectionCoefficients {
 					if ( Surface( SurfNum ).OSCPtr > 0 ) continue;
 					if ( Surface( SurfNum ).ExtConvCoeff != 0 ) {
 						if ( DisplayExtraWarnings ) {
-							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned value for (Outside) in Surface=" + trim( Surface( SurfNum ).Name ) );
+							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned value for (Outside) in Surface=" + Surface( SurfNum ).Name );
 						} else {
 							++SurfaceCountOutside;
 						}
@@ -3376,7 +3376,7 @@ namespace ConvectionCoefficients {
 				} else {
 					if ( Surface( SurfNum ).IntConvCoeff != 0 ) {
 						if ( DisplayExtraWarnings ) {
-							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned value for (Inside) in Surface=" + trim( Surface( SurfNum ).Name ) );
+							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned value for (Inside) in Surface=" + Surface( SurfNum ).Name );
 						} else {
 							++SurfaceCountInside;
 						}
@@ -3387,12 +3387,12 @@ namespace ConvectionCoefficients {
 			}
 			if ( ! DisplayExtraWarnings && ( SurfaceCountOutside > 0 || SurfaceCountInside > 0 ) ) {
 				if ( SurfaceCountOutside > 0 ) {
-					OverwriteMessage = trim( TrimSigDigits( SurfaceCountOutside ) ) + " Outside";
+					OverwriteMessage = TrimSigDigits( SurfaceCountOutside ) + " Outside";
 				}
 				if ( SurfaceCountInside > 0 ) {
-					OverwriteMessage = trim( TrimSigDigits( SurfaceCountInside ) ) + " Inside";
+					OverwriteMessage = TrimSigDigits( SurfaceCountInside ) + " Inside";
 				}
-				ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned values for " + trim( OverwriteMessage ) + " assignments." );
+				ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned values for " + OverwriteMessage + " assignments." );
 			}
 
 		} else if ( SELECT_CASE_var == "ALLINTERIORWALLS" ) {
@@ -3408,7 +3408,7 @@ namespace ConvectionCoefficients {
 					if ( Surface( SurfNum ).OSCPtr > 0 ) continue;
 					if ( Surface( SurfNum ).ExtConvCoeff != 0 ) {
 						if ( DisplayExtraWarnings ) {
-							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned value for (Outside) in Surface=" + trim( Surface( SurfNum ).Name ) );
+							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned value for (Outside) in Surface=" + Surface( SurfNum ).Name );
 						} else {
 							++SurfaceCountOutside;
 						}
@@ -3418,7 +3418,7 @@ namespace ConvectionCoefficients {
 				} else {
 					if ( Surface( SurfNum ).IntConvCoeff != 0 ) {
 						if ( DisplayExtraWarnings ) {
-							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned value for (Inside) in Surface=" + trim( Surface( SurfNum ).Name ) );
+							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned value for (Inside) in Surface=" + Surface( SurfNum ).Name );
 						} else {
 							++SurfaceCountInside;
 						}
@@ -3429,12 +3429,12 @@ namespace ConvectionCoefficients {
 			}
 			if ( ! DisplayExtraWarnings && ( SurfaceCountOutside > 0 || SurfaceCountInside > 0 ) ) {
 				if ( SurfaceCountOutside > 0 ) {
-					OverwriteMessage = trim( TrimSigDigits( SurfaceCountOutside ) ) + " Outside";
+					OverwriteMessage = TrimSigDigits( SurfaceCountOutside ) + " Outside";
 				}
 				if ( SurfaceCountInside > 0 ) {
-					OverwriteMessage = trim( TrimSigDigits( SurfaceCountInside ) ) + " Inside";
+					OverwriteMessage = TrimSigDigits( SurfaceCountInside ) + " Inside";
 				}
-				ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned values for " + trim( OverwriteMessage ) + " assignments." );
+				ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned values for " + OverwriteMessage + " assignments." );
 			}
 
 		} else if ( ( SELECT_CASE_var == "ALLINTERIORROOFS" ) || ( SELECT_CASE_var == "ALLINTERIORCEILINGS" ) ) {
@@ -3450,7 +3450,7 @@ namespace ConvectionCoefficients {
 					if ( Surface( SurfNum ).OSCPtr > 0 ) continue;
 					if ( Surface( SurfNum ).ExtConvCoeff != 0 ) {
 						if ( DisplayExtraWarnings ) {
-							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned value for (Outside) in Surface=" + trim( Surface( SurfNum ).Name ) );
+							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned value for (Outside) in Surface=" + Surface( SurfNum ).Name );
 						} else {
 							++SurfaceCountOutside;
 						}
@@ -3460,7 +3460,7 @@ namespace ConvectionCoefficients {
 				} else {
 					if ( Surface( SurfNum ).IntConvCoeff != 0 ) {
 						if ( DisplayExtraWarnings ) {
-							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned value for (Inside) in Surface=" + trim( Surface( SurfNum ).Name ) );
+							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned value for (Inside) in Surface=" + Surface( SurfNum ).Name );
 						} else {
 							++SurfaceCountInside;
 						}
@@ -3471,12 +3471,12 @@ namespace ConvectionCoefficients {
 			}
 			if ( ! DisplayExtraWarnings && ( SurfaceCountOutside > 0 || SurfaceCountInside > 0 ) ) {
 				if ( SurfaceCountOutside > 0 ) {
-					OverwriteMessage = trim( TrimSigDigits( SurfaceCountOutside ) ) + " Outside";
+					OverwriteMessage = TrimSigDigits( SurfaceCountOutside ) + " Outside";
 				}
 				if ( SurfaceCountInside > 0 ) {
-					OverwriteMessage = trim( TrimSigDigits( SurfaceCountInside ) ) + " Inside";
+					OverwriteMessage = TrimSigDigits( SurfaceCountInside ) + " Inside";
 				}
-				ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned values for " + trim( OverwriteMessage ) + " assignments." );
+				ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned values for " + OverwriteMessage + " assignments." );
 			}
 
 		} else if ( SELECT_CASE_var == "ALLINTERIORFLOORS" ) {
@@ -3492,7 +3492,7 @@ namespace ConvectionCoefficients {
 					if ( Surface( SurfNum ).OSCPtr > 0 ) continue;
 					if ( Surface( SurfNum ).ExtConvCoeff != 0 ) {
 						if ( DisplayExtraWarnings ) {
-							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned value for (Outside) in Surface=" + trim( Surface( SurfNum ).Name ) );
+							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned value for (Outside) in Surface=" + Surface( SurfNum ).Name );
 						} else {
 							++SurfaceCountOutside;
 						}
@@ -3502,7 +3502,7 @@ namespace ConvectionCoefficients {
 				} else {
 					if ( Surface( SurfNum ).IntConvCoeff != 0 ) {
 						if ( DisplayExtraWarnings ) {
-							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned value for (Inside) in Surface=" + trim( Surface( SurfNum ).Name ) );
+							ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned value for (Inside) in Surface=" + Surface( SurfNum ).Name );
 						} else {
 							++SurfaceCountInside;
 						}
@@ -3513,12 +3513,12 @@ namespace ConvectionCoefficients {
 			}
 			if ( ! DisplayExtraWarnings && ( SurfaceCountOutside > 0 || SurfaceCountInside > 0 ) ) {
 				if ( SurfaceCountOutside > 0 ) {
-					OverwriteMessage = trim( TrimSigDigits( SurfaceCountOutside ) ) + " Outside";
+					OverwriteMessage = TrimSigDigits( SurfaceCountOutside ) + " Outside";
 				}
 				if ( SurfaceCountInside > 0 ) {
-					OverwriteMessage = trim( TrimSigDigits( SurfaceCountInside ) ) + " Inside";
+					OverwriteMessage = TrimSigDigits( SurfaceCountInside ) + " Inside";
 				}
-				ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", not overwriting already assigned values for " + trim( OverwriteMessage ) + " assignments." );
+				ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", not overwriting already assigned values for " + OverwriteMessage + " assignments." );
 			}
 
 		} else {
@@ -3527,7 +3527,7 @@ namespace ConvectionCoefficients {
 		}}
 
 		if ( ! SurfacesOfType ) {
-			ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + trim( SurfaceTypes ) + "\", there were no surfaces of that type found for " + trim( ConvectionType ) + " assignment." );
+			ShowWarningError( "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes + "\", there were no surfaces of that type found for " + ConvectionType + " assignment." );
 		}
 
 	}
@@ -4697,8 +4697,8 @@ namespace ConvectionCoefficients {
 		Real64 SideBLength;
 		Real64 SideCLength;
 		Real64 SideDLength;
-		Fstring YesNo1( 3 );
-		Fstring YesNo2( 3 );
+		std::string YesNo1;
+		std::string YesNo2;
 
 		struct FacadeGeoCharactisticsStruct
 		{
@@ -4764,28 +4764,28 @@ namespace ConvectionCoefficients {
 		static FacadeGeoCharactisticsStruct NorthWestFacade( 287.5, 332.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 );
 
 		// Formats
-		std::string const Format_900( "('! <Surface Convection Parameters>, Surface Name, Outside Model Assignment, Outside Area [m2], ','Outside Perimeter [m], Outside Height [m], Inside Model Assignment, ','Inside Height [cm], Inside Perimeter Envelope [m], Inside Hydraulic Diameter [m], Window Wall Ratio [ ], ','Window Location [ ], Near Radiant [Yes/No], Has Active HVAC [Yes/No]')" );
-		std::string const Format_901( "('Surface Convection Parameters,',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
-		std::string const Format_8000( "('! <Building Convection Parameters:North Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
-		std::string const Format_8001( "('Building Convection Parameters:North Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
-		std::string const Format_8100( "('! <Building Convection Parameters:Northeast Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
-		std::string const Format_8101( "('Building Convection Parameters:Northeast Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
-		std::string const Format_8200( "('! <Building Convection Parameters:East Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
-		std::string const Format_8201( "('Building Convection Parameters:East Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
-		std::string const Format_8300( "('! <Building Convection Parameters:Southeast Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
-		std::string const Format_8301( "('Building Convection Parameters:Southeast Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
-		std::string const Format_8400( "('! <Building Convection Parameters:South Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
-		std::string const Format_8401( "('Building Convection Parameters:South Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
-		std::string const Format_8500( "('! <Building Convection Parameters:Southwest Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
-		std::string const Format_8501( "('Building Convection Parameters:Southwest Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
-		std::string const Format_8600( "('! <Building Convection Parameters:West Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
-		std::string const Format_8601( "('Building Convection Parameters:West Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
-		std::string const Format_8700( "('! <Building Convection Parameters:Northwest Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
-		std::string const Format_8701( "('Building Convection Parameters:NorthwWest Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
-		std::string const Format_8800( "('! <Building Convection Parameters:Roof>, Area [m2], Perimeter [m], Height [m], ','XdYdZd:X, XdYdZd:Y, XdYdZd:Z',',XdYdZu:X, XdYdZu:Y, XdYdZu:Z',',XdYuZd:X, XdYuZd:Y, XdYuZd:Z',',XdYuZu:X, XdYuZu:Y, XdYuZu:Z',',XuYdZd:X, XuYdZd:Y, XuYdZd:Z',',XuYuZd:X, XuYuZd:Y, XuYuZd:Z',',XuYdZu:X, XuYdZu:Y, XuYdZu:Z',',XuYuZu:X, XuYuZu:Y, XuYuZu:Z')" );
-		std::string const Format_8801( "('Building Convection Parameters:Roof,',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',')" );
-		std::string const Format_88012( "(A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',')" );
-		std::string const Format_88013( "(A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt const Format_900( "('! <Surface Convection Parameters>, Surface Name, Outside Model Assignment, Outside Area [m2], ','Outside Perimeter [m], Outside Height [m], Inside Model Assignment, ','Inside Height [cm], Inside Perimeter Envelope [m], Inside Hydraulic Diameter [m], Window Wall Ratio [ ], ','Window Location [ ], Near Radiant [Yes/No], Has Active HVAC [Yes/No]')" );
+		static gio::Fmt const Format_901( "('Surface Convection Parameters,',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt const Format_8000( "('! <Building Convection Parameters:North Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
+		static gio::Fmt const Format_8001( "('Building Convection Parameters:North Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt const Format_8100( "('! <Building Convection Parameters:Northeast Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
+		static gio::Fmt const Format_8101( "('Building Convection Parameters:Northeast Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt const Format_8200( "('! <Building Convection Parameters:East Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
+		static gio::Fmt const Format_8201( "('Building Convection Parameters:East Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt const Format_8300( "('! <Building Convection Parameters:Southeast Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
+		static gio::Fmt const Format_8301( "('Building Convection Parameters:Southeast Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt const Format_8400( "('! <Building Convection Parameters:South Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
+		static gio::Fmt const Format_8401( "('Building Convection Parameters:South Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt const Format_8500( "('! <Building Convection Parameters:Southwest Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
+		static gio::Fmt const Format_8501( "('Building Convection Parameters:Southwest Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt const Format_8600( "('! <Building Convection Parameters:West Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
+		static gio::Fmt const Format_8601( "('Building Convection Parameters:West Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt const Format_8700( "('! <Building Convection Parameters:Northwest Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
+		static gio::Fmt const Format_8701( "('Building Convection Parameters:NorthwWest Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt const Format_8800( "('! <Building Convection Parameters:Roof>, Area [m2], Perimeter [m], Height [m], ','XdYdZd:X, XdYdZd:Y, XdYdZd:Z',',XdYdZu:X, XdYdZu:Y, XdYdZu:Z',',XdYuZd:X, XdYuZd:Y, XdYuZd:Z',',XdYuZu:X, XdYuZu:Y, XdYuZu:Z',',XuYdZd:X, XuYdZd:Y, XuYdZd:Z',',XuYuZd:X, XuYuZd:Y, XuYuZd:Z',',XuYdZu:X, XuYdZu:Y, XuYdZu:Z',',XuYuZu:X, XuYuZu:Y, XuYuZu:Z')" );
+		static gio::Fmt const Format_8801( "('Building Convection Parameters:Roof,',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',')" );
+		static gio::Fmt const Format_88012( "(A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',')" );
+		static gio::Fmt const Format_88013( "(A,',',A,',',A,',',A,',',A,',',A,',',A)" );
 
 		BldgVolumeSum = 0.0;
 		RoofBoundZvals = 0.0;
@@ -5228,34 +5228,34 @@ namespace ConvectionCoefficients {
 				} else {
 					YesNo2 = "No";
 				}
-				gio::write( OutputFileInits, Format_901 ) << trim( Surface( SurfLoop ).Name ) << trim( RoundSigDigits( Surface( SurfLoop ).ExtConvCoeff ) ) << trim( RoundSigDigits( Surface( SurfLoop ).OutConvFaceArea, 2 ) ) << trim( RoundSigDigits( Surface( SurfLoop ).OutConvFacePerimeter, 2 ) ) << trim( RoundSigDigits( Surface( SurfLoop ).OutConvFaceHeight, 2 ) ) << trim( RoundSigDigits( Surface( SurfLoop ).IntConvCoeff ) ) << trim( RoundSigDigits( Surface( SurfLoop ).IntConvZoneWallHeight, 2 ) ) << trim( RoundSigDigits( Surface( SurfLoop ).IntConvZonePerimLength, 2 ) ) << trim( RoundSigDigits( Surface( SurfLoop ).IntConvZoneHorizHydrDiam, 2 ) ) << trim( RoundSigDigits( Surface( SurfLoop ).IntConvWindowWallRatio, 2 ) ) << trim( RoundSigDigits( Surface( SurfLoop ).IntConvWindowLocation ) ) << trim( YesNo1 ) << trim( YesNo2 ); // [m] length of perimeter zone's exterior wall | [m] hydraulic diameter, usually 4 times the zone floor area div by perimeter | [-] area of windows over area of exterior wall for zone | relative location of window in zone for interior Hc models
+				gio::write( OutputFileInits, Format_901 ) << Surface( SurfLoop ).Name << RoundSigDigits( Surface( SurfLoop ).ExtConvCoeff ) << RoundSigDigits( Surface( SurfLoop ).OutConvFaceArea, 2 ) << RoundSigDigits( Surface( SurfLoop ).OutConvFacePerimeter, 2 ) << RoundSigDigits( Surface( SurfLoop ).OutConvFaceHeight, 2 ) << RoundSigDigits( Surface( SurfLoop ).IntConvCoeff ) << RoundSigDigits( Surface( SurfLoop ).IntConvZoneWallHeight, 2 ) << RoundSigDigits( Surface( SurfLoop ).IntConvZonePerimLength, 2 ) << RoundSigDigits( Surface( SurfLoop ).IntConvZoneHorizHydrDiam, 2 ) << RoundSigDigits( Surface( SurfLoop ).IntConvWindowWallRatio, 2 ) << RoundSigDigits( Surface( SurfLoop ).IntConvWindowLocation ) << YesNo1 << YesNo2; // [m] length of perimeter zone's exterior wall | [m] hydraulic diameter, usually 4 times the zone floor area div by perimeter | [-] area of windows over area of exterior wall for zone | relative location of window in zone for interior Hc models
 
 			}
 
 			//if display advanced reports also dump meta group data used for convection geometry
 			if ( DisplayAdvancedReportVariables ) {
 				gio::write( OutputFileInits, Format_8000 ); //header for north facade
-				gio::write( OutputFileInits, Format_8001 ) << trim( RoundSigDigits( NorthFacade.Perimeter, 2 ) ) << trim( RoundSigDigits( NorthFacade.Height, 2 ) ) << trim( RoundSigDigits( NorthFacade.Xmin, 2 ) ) << trim( RoundSigDigits( NorthFacade.Xmax, 2 ) ) << trim( RoundSigDigits( NorthFacade.Ymin, 2 ) ) << trim( RoundSigDigits( NorthFacade.Ymax, 2 ) ) << trim( RoundSigDigits( NorthFacade.Zmin, 2 ) ) << trim( RoundSigDigits( NorthFacade.Zmax, 2 ) );
+				gio::write( OutputFileInits, Format_8001 ) << RoundSigDigits( NorthFacade.Perimeter, 2 ) << RoundSigDigits( NorthFacade.Height, 2 ) << RoundSigDigits( NorthFacade.Xmin, 2 ) << RoundSigDigits( NorthFacade.Xmax, 2 ) << RoundSigDigits( NorthFacade.Ymin, 2 ) << RoundSigDigits( NorthFacade.Ymax, 2 ) << RoundSigDigits( NorthFacade.Zmin, 2 ) << RoundSigDigits( NorthFacade.Zmax, 2 );
 				gio::write( OutputFileInits, Format_8100 ); //header for northeast facade
-				gio::write( OutputFileInits, Format_8101 ) << trim( RoundSigDigits( NorthEastFacade.Perimeter, 2 ) ) << trim( RoundSigDigits( NorthEastFacade.Height, 2 ) ) << trim( RoundSigDigits( NorthEastFacade.Xmin, 2 ) ) << trim( RoundSigDigits( NorthEastFacade.Xmax, 2 ) ) << trim( RoundSigDigits( NorthEastFacade.Ymin, 2 ) ) << trim( RoundSigDigits( NorthEastFacade.Ymax, 2 ) ) << trim( RoundSigDigits( NorthEastFacade.Zmin, 2 ) ) << trim( RoundSigDigits( NorthEastFacade.Zmax, 2 ) );
+				gio::write( OutputFileInits, Format_8101 ) << RoundSigDigits( NorthEastFacade.Perimeter, 2 ) << RoundSigDigits( NorthEastFacade.Height, 2 ) << RoundSigDigits( NorthEastFacade.Xmin, 2 ) << RoundSigDigits( NorthEastFacade.Xmax, 2 ) << RoundSigDigits( NorthEastFacade.Ymin, 2 ) << RoundSigDigits( NorthEastFacade.Ymax, 2 ) << RoundSigDigits( NorthEastFacade.Zmin, 2 ) << RoundSigDigits( NorthEastFacade.Zmax, 2 );
 				gio::write( OutputFileInits, Format_8200 ); //header for east facade
-				gio::write( OutputFileInits, Format_8201 ) << trim( RoundSigDigits( EastFacade.Perimeter, 2 ) ) << trim( RoundSigDigits( EastFacade.Height, 2 ) ) << trim( RoundSigDigits( EastFacade.Xmin, 2 ) ) << trim( RoundSigDigits( EastFacade.Xmax, 2 ) ) << trim( RoundSigDigits( EastFacade.Ymin, 2 ) ) << trim( RoundSigDigits( EastFacade.Ymax, 2 ) ) << trim( RoundSigDigits( EastFacade.Zmin, 2 ) ) << trim( RoundSigDigits( EastFacade.Zmax, 2 ) );
+				gio::write( OutputFileInits, Format_8201 ) << RoundSigDigits( EastFacade.Perimeter, 2 ) << RoundSigDigits( EastFacade.Height, 2 ) << RoundSigDigits( EastFacade.Xmin, 2 ) << RoundSigDigits( EastFacade.Xmax, 2 ) << RoundSigDigits( EastFacade.Ymin, 2 ) << RoundSigDigits( EastFacade.Ymax, 2 ) << RoundSigDigits( EastFacade.Zmin, 2 ) << RoundSigDigits( EastFacade.Zmax, 2 );
 
 				gio::write( OutputFileInits, Format_8300 ); //header for southeast facade
-				gio::write( OutputFileInits, Format_8301 ) << trim( RoundSigDigits( SouthEastFacade.Perimeter, 2 ) ) << trim( RoundSigDigits( SouthEastFacade.Height, 2 ) ) << trim( RoundSigDigits( SouthEastFacade.Xmin, 2 ) ) << trim( RoundSigDigits( SouthEastFacade.Xmax, 2 ) ) << trim( RoundSigDigits( SouthEastFacade.Ymin, 2 ) ) << trim( RoundSigDigits( SouthEastFacade.Ymax, 2 ) ) << trim( RoundSigDigits( SouthEastFacade.Zmin, 2 ) ) << trim( RoundSigDigits( SouthEastFacade.Zmax, 2 ) );
+				gio::write( OutputFileInits, Format_8301 ) << RoundSigDigits( SouthEastFacade.Perimeter, 2 ) << RoundSigDigits( SouthEastFacade.Height, 2 ) << RoundSigDigits( SouthEastFacade.Xmin, 2 ) << RoundSigDigits( SouthEastFacade.Xmax, 2 ) << RoundSigDigits( SouthEastFacade.Ymin, 2 ) << RoundSigDigits( SouthEastFacade.Ymax, 2 ) << RoundSigDigits( SouthEastFacade.Zmin, 2 ) << RoundSigDigits( SouthEastFacade.Zmax, 2 );
 
 				gio::write( OutputFileInits, Format_8400 ); //header for south facade
-				gio::write( OutputFileInits, Format_8401 ) << trim( RoundSigDigits( SouthFacade.Perimeter, 2 ) ) << trim( RoundSigDigits( SouthFacade.Height, 2 ) ) << trim( RoundSigDigits( SouthFacade.Xmin, 2 ) ) << trim( RoundSigDigits( SouthFacade.Xmax, 2 ) ) << trim( RoundSigDigits( SouthFacade.Ymin, 2 ) ) << trim( RoundSigDigits( SouthFacade.Ymax, 2 ) ) << trim( RoundSigDigits( SouthFacade.Zmin, 2 ) ) << trim( RoundSigDigits( SouthFacade.Zmax, 2 ) );
+				gio::write( OutputFileInits, Format_8401 ) << RoundSigDigits( SouthFacade.Perimeter, 2 ) << RoundSigDigits( SouthFacade.Height, 2 ) << RoundSigDigits( SouthFacade.Xmin, 2 ) << RoundSigDigits( SouthFacade.Xmax, 2 ) << RoundSigDigits( SouthFacade.Ymin, 2 ) << RoundSigDigits( SouthFacade.Ymax, 2 ) << RoundSigDigits( SouthFacade.Zmin, 2 ) << RoundSigDigits( SouthFacade.Zmax, 2 );
 				gio::write( OutputFileInits, Format_8500 ); //header for southwest facade
-				gio::write( OutputFileInits, Format_8501 ) << trim( RoundSigDigits( SouthWestFacade.Perimeter, 2 ) ) << trim( RoundSigDigits( SouthWestFacade.Height, 2 ) ) << trim( RoundSigDigits( SouthWestFacade.Xmin, 2 ) ) << trim( RoundSigDigits( SouthWestFacade.Xmax, 2 ) ) << trim( RoundSigDigits( SouthWestFacade.Ymin, 2 ) ) << trim( RoundSigDigits( SouthWestFacade.Ymax, 2 ) ) << trim( RoundSigDigits( SouthWestFacade.Zmin, 2 ) ) << trim( RoundSigDigits( SouthWestFacade.Zmax, 2 ) );
+				gio::write( OutputFileInits, Format_8501 ) << RoundSigDigits( SouthWestFacade.Perimeter, 2 ) << RoundSigDigits( SouthWestFacade.Height, 2 ) << RoundSigDigits( SouthWestFacade.Xmin, 2 ) << RoundSigDigits( SouthWestFacade.Xmax, 2 ) << RoundSigDigits( SouthWestFacade.Ymin, 2 ) << RoundSigDigits( SouthWestFacade.Ymax, 2 ) << RoundSigDigits( SouthWestFacade.Zmin, 2 ) << RoundSigDigits( SouthWestFacade.Zmax, 2 );
 				gio::write( OutputFileInits, Format_8600 ); //header for west facade
-				gio::write( OutputFileInits, Format_8601 ) << trim( RoundSigDigits( WestFacade.Perimeter, 2 ) ) << trim( RoundSigDigits( WestFacade.Height, 2 ) ) << trim( RoundSigDigits( WestFacade.Xmin, 2 ) ) << trim( RoundSigDigits( WestFacade.Xmax, 2 ) ) << trim( RoundSigDigits( WestFacade.Ymin, 2 ) ) << trim( RoundSigDigits( WestFacade.Ymax, 2 ) ) << trim( RoundSigDigits( WestFacade.Zmin, 2 ) ) << trim( RoundSigDigits( WestFacade.Zmax, 2 ) );
+				gio::write( OutputFileInits, Format_8601 ) << RoundSigDigits( WestFacade.Perimeter, 2 ) << RoundSigDigits( WestFacade.Height, 2 ) << RoundSigDigits( WestFacade.Xmin, 2 ) << RoundSigDigits( WestFacade.Xmax, 2 ) << RoundSigDigits( WestFacade.Ymin, 2 ) << RoundSigDigits( WestFacade.Ymax, 2 ) << RoundSigDigits( WestFacade.Zmin, 2 ) << RoundSigDigits( WestFacade.Zmax, 2 );
 				gio::write( OutputFileInits, Format_8700 ); //header for northwest facade
-				gio::write( OutputFileInits, Format_8701 ) << trim( RoundSigDigits( NorthWestFacade.Perimeter, 2 ) ) << trim( RoundSigDigits( NorthWestFacade.Height, 2 ) ) << trim( RoundSigDigits( NorthWestFacade.Xmin, 2 ) ) << trim( RoundSigDigits( NorthWestFacade.Xmax, 2 ) ) << trim( RoundSigDigits( NorthWestFacade.Ymin, 2 ) ) << trim( RoundSigDigits( NorthWestFacade.Ymax, 2 ) ) << trim( RoundSigDigits( NorthWestFacade.Zmin, 2 ) ) << trim( RoundSigDigits( NorthWestFacade.Zmax, 2 ) );
+				gio::write( OutputFileInits, Format_8701 ) << RoundSigDigits( NorthWestFacade.Perimeter, 2 ) << RoundSigDigits( NorthWestFacade.Height, 2 ) << RoundSigDigits( NorthWestFacade.Xmin, 2 ) << RoundSigDigits( NorthWestFacade.Xmax, 2 ) << RoundSigDigits( NorthWestFacade.Ymin, 2 ) << RoundSigDigits( NorthWestFacade.Ymax, 2 ) << RoundSigDigits( NorthWestFacade.Zmin, 2 ) << RoundSigDigits( NorthWestFacade.Zmax, 2 );
 				gio::write( OutputFileInits, Format_8800 ); // header for roof
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, Format_8801, flags ) << trim( RoundSigDigits( RoofGeo.Area, 2 ) ) << trim( RoundSigDigits( RoofGeo.Perimeter, 2 ) ) << trim( RoundSigDigits( RoofGeo.Height, 2 ) ) << trim( RoundSigDigits( RoofGeo.XdYdZd.Vertex.x, 3 ) ) << trim( RoundSigDigits( RoofGeo.XdYdZd.Vertex.y, 3 ) ) << trim( RoundSigDigits( RoofGeo.XdYdZd.Vertex.z, 3 ) ) << trim( RoundSigDigits( RoofGeo.XdYdZu.Vertex.x, 3 ) ) << trim( RoundSigDigits( RoofGeo.XdYdZu.Vertex.y, 3 ) ) << trim( RoundSigDigits( RoofGeo.XdYdZu.Vertex.z, 3 ) ) << trim( RoundSigDigits( RoofGeo.XdYuZd.Vertex.x, 3 ) ); }
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, Format_88012, flags ) << trim( RoundSigDigits( RoofGeo.XdYuZd.Vertex.y, 3 ) ) << trim( RoundSigDigits( RoofGeo.XdYuZd.Vertex.z, 3 ) ) << trim( RoundSigDigits( RoofGeo.XdYuZu.Vertex.x, 3 ) ) << trim( RoundSigDigits( RoofGeo.XdYuZu.Vertex.y, 3 ) ) << trim( RoundSigDigits( RoofGeo.XdYuZu.Vertex.z, 3 ) ) << trim( RoundSigDigits( RoofGeo.XuYdZd.Vertex.x, 3 ) ) << trim( RoundSigDigits( RoofGeo.XuYdZd.Vertex.y, 3 ) ) << trim( RoundSigDigits( RoofGeo.XuYdZd.Vertex.z, 3 ) ) << trim( RoundSigDigits( RoofGeo.XuYuZd.Vertex.x, 3 ) ) << trim( RoundSigDigits( RoofGeo.XuYuZd.Vertex.y, 3 ) ); }
-				gio::write( OutputFileInits, Format_88013 ) << trim( RoundSigDigits( RoofGeo.XuYuZd.Vertex.z, 3 ) ) << trim( RoundSigDigits( RoofGeo.XuYdZu.Vertex.x, 3 ) ) << trim( RoundSigDigits( RoofGeo.XuYdZu.Vertex.y, 3 ) ) << trim( RoundSigDigits( RoofGeo.XuYdZu.Vertex.z, 3 ) ) << trim( RoundSigDigits( RoofGeo.XuYuZu.Vertex.x, 3 ) ) << trim( RoundSigDigits( RoofGeo.XuYuZu.Vertex.y, 3 ) ) << trim( RoundSigDigits( RoofGeo.XuYuZu.Vertex.z, 3 ) );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, Format_8801, flags ) << RoundSigDigits( RoofGeo.Area, 2 ) << RoundSigDigits( RoofGeo.Perimeter, 2 ) << RoundSigDigits( RoofGeo.Height, 2 ) << RoundSigDigits( RoofGeo.XdYdZd.Vertex.x, 3 ) << RoundSigDigits( RoofGeo.XdYdZd.Vertex.y, 3 ) << RoundSigDigits( RoofGeo.XdYdZd.Vertex.z, 3 ) << RoundSigDigits( RoofGeo.XdYdZu.Vertex.x, 3 ) << RoundSigDigits( RoofGeo.XdYdZu.Vertex.y, 3 ) << RoundSigDigits( RoofGeo.XdYdZu.Vertex.z, 3 ) << RoundSigDigits( RoofGeo.XdYuZd.Vertex.x, 3 ); }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, Format_88012, flags ) << RoundSigDigits( RoofGeo.XdYuZd.Vertex.y, 3 ) << RoundSigDigits( RoofGeo.XdYuZd.Vertex.z, 3 ) << RoundSigDigits( RoofGeo.XdYuZu.Vertex.x, 3 ) << RoundSigDigits( RoofGeo.XdYuZu.Vertex.y, 3 ) << RoundSigDigits( RoofGeo.XdYuZu.Vertex.z, 3 ) << RoundSigDigits( RoofGeo.XuYdZd.Vertex.x, 3 ) << RoundSigDigits( RoofGeo.XuYdZd.Vertex.y, 3 ) << RoundSigDigits( RoofGeo.XuYdZd.Vertex.z, 3 ) << RoundSigDigits( RoofGeo.XuYuZd.Vertex.x, 3 ) << RoundSigDigits( RoofGeo.XuYuZd.Vertex.y, 3 ); }
+				gio::write( OutputFileInits, Format_88013 ) << RoundSigDigits( RoofGeo.XuYuZd.Vertex.z, 3 ) << RoundSigDigits( RoofGeo.XuYdZu.Vertex.x, 3 ) << RoundSigDigits( RoofGeo.XuYdZu.Vertex.y, 3 ) << RoundSigDigits( RoofGeo.XuYdZu.Vertex.z, 3 ) << RoundSigDigits( RoofGeo.XuYuZu.Vertex.x, 3 ) << RoundSigDigits( RoofGeo.XuYuZu.Vertex.y, 3 ) << RoundSigDigits( RoofGeo.XuYuZu.Vertex.z, 3 );
 
 			}
 
@@ -6208,7 +6208,7 @@ namespace ConvectionCoefficients {
 				Surface( SurfNum ).OutConvHfUserCurveIndex = OutsideFaceAdaptiveConvectionAlgo.HNatUstableHorizUserCurveNum;
 			}
 		} else {
-			ShowSevereError( "MapExtConvClassificationToHcModels: caught unknown outdoor surfce classification:" + trim( RoundSigDigits( Surface( SurfNum ).OutConvClassification ) ) );
+			ShowSevereError( "MapExtConvClassificationToHcModels: caught unknown outdoor surfce classification:" + RoundSigDigits( Surface( SurfNum ).OutConvClassification ) );
 		}}
 
 	}
@@ -6544,7 +6544,7 @@ namespace ConvectionCoefficients {
 			}
 
 			if ( Surface( SurfNum ).IntConvClassification == 0 ) {
-				ShowSevereError( "DynamicIntConvSurfaceClassification: failed to resolve Hc model for A1 surface named" + trim( Surface( SurfNum ).Name ) );
+				ShowSevereError( "DynamicIntConvSurfaceClassification: failed to resolve Hc model for A1 surface named" + Surface( SurfNum ).Name );
 			}
 
 		} else if ( SELECT_CASE_var == InConvFlowRegime_A2 ) {
@@ -6618,7 +6618,7 @@ namespace ConvectionCoefficients {
 			}
 
 			if ( Surface( SurfNum ).IntConvClassification == 0 ) {
-				ShowSevereError( "DynamicIntConvSurfaceClassification: failed to resolve Hc model for A2 surface named" + trim( Surface( SurfNum ).Name ) );
+				ShowSevereError( "DynamicIntConvSurfaceClassification: failed to resolve Hc model for A2 surface named" + Surface( SurfNum ).Name );
 			}
 		} else if ( SELECT_CASE_var == InConvFlowRegime_A3 ) {
 			DeltaTemp = TH( SurfNum, 1, 2 ) - MAT( ZoneNum );
@@ -6689,7 +6689,7 @@ namespace ConvectionCoefficients {
 			}
 
 			if ( Surface( SurfNum ).IntConvClassification == 0 ) {
-				ShowSevereError( "DynamicIntConvSurfaceClassification: failed to resolve Hc model for A3 surface named" + trim( Surface( SurfNum ).Name ) );
+				ShowSevereError( "DynamicIntConvSurfaceClassification: failed to resolve Hc model for A3 surface named" + Surface( SurfNum ).Name );
 			}
 		} else if ( SELECT_CASE_var == InConvFlowRegime_B ) {
 			DeltaTemp = TH( SurfNum, 1, 2 ) - MAT( ZoneNum );
@@ -6769,7 +6769,7 @@ namespace ConvectionCoefficients {
 			}
 
 			if ( Surface( SurfNum ).IntConvClassification == 0 ) {
-				ShowSevereError( "DynamicIntConvSurfaceClassification: failed to resolve Hc model for B surface named" + trim( Surface( SurfNum ).Name ) );
+				ShowSevereError( "DynamicIntConvSurfaceClassification: failed to resolve Hc model for B surface named" + Surface( SurfNum ).Name );
 			}
 		} else if ( SELECT_CASE_var == InConvFlowRegime_C ) {
 			if ( Surface( SurfNum ).Class == SurfaceClass_Wall || Surface( SurfNum ).Class == SurfaceClass_Door ) {
@@ -6784,7 +6784,7 @@ namespace ConvectionCoefficients {
 				Surface( SurfNum ).IntConvClassification = InConvClass_C_Floor;
 			}
 			if ( Surface( SurfNum ).IntConvClassification == 0 ) {
-				ShowSevereError( "DynamicIntConvSurfaceClassification: failed to resolve Hc model for C surface named" + trim( Surface( SurfNum ).Name ) );
+				ShowSevereError( "DynamicIntConvSurfaceClassification: failed to resolve Hc model for C surface named" + Surface( SurfNum ).Name );
 			}
 
 		} else if ( SELECT_CASE_var == InConvFlowRegime_D ) {
@@ -6861,7 +6861,7 @@ namespace ConvectionCoefficients {
 			}
 
 			if ( Surface( SurfNum ).IntConvClassification == 0 ) {
-				ShowSevereError( "DynamicIntConvSurfaceClassification: failed to resolve Hc model for D surface named" + trim( Surface( SurfNum ).Name ) );
+				ShowSevereError( "DynamicIntConvSurfaceClassification: failed to resolve Hc model for D surface named" + Surface( SurfNum ).Name );
 			}
 
 		} else if ( SELECT_CASE_var == InConvFlowRegime_E ) {
@@ -6910,10 +6910,10 @@ namespace ConvectionCoefficients {
 				}
 			}
 			if ( Surface( SurfNum ).IntConvClassification == 0 ) {
-				ShowSevereError( "DynamicIntConvSurfaceClassification: failed to resolve Hc model for D surface named " + trim( Surface( SurfNum ).Name ) );
+				ShowSevereError( "DynamicIntConvSurfaceClassification: failed to resolve Hc model for D surface named " + Surface( SurfNum ).Name );
 			}
 		} else {
-			ShowSevereError( "DynamicIntConvSurfaceClassification: failed to deterime zone flow regime for surface named " + trim( Surface( SurfNum ).Name ) );
+			ShowSevereError( "DynamicIntConvSurfaceClassification: failed to deterime zone flow regime for surface named " + Surface( SurfNum ).Name );
 
 		}}
 
@@ -7728,7 +7728,7 @@ namespace ConvectionCoefficients {
 			Hn = 9.999;
 			if ( ErrorIndex == 0 ) {
 				ShowSevereMessage( "CalcAlamdariHammondUnstableHorizontal: Convection model not evaluated (would divide by zero)" );
-				ShowContinueError( "Effective hydraulic diameter is zero, convection model not applicable for surface =" + trim( Surface( SurfNum ).Name ) );
+				ShowContinueError( "Effective hydraulic diameter is zero, convection model not applicable for surface =" + Surface( SurfNum ).Name );
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 
 			}
@@ -7792,7 +7792,7 @@ namespace ConvectionCoefficients {
 			Hn = 9.999;
 			if ( ErrorIndex == 0 ) {
 				ShowSevereMessage( "CalcAlamdariHammondStableHorizontal: Convection model not evaluated (would divide by zero)" );
-				ShowContinueError( "Effective hydraulic diameter is zero, convection model not applicable for surface =" + trim( Surface( SurfNum ).Name ) );
+				ShowContinueError( "Effective hydraulic diameter is zero, convection model not applicable for surface =" + Surface( SurfNum ).Name );
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 			}
 			ShowRecurringSevereErrorAtEnd( "CalcAlamdariHammondStableHorizontal: Convection model not evaluated because zero" " hydraulic diameter and set to 9.999 [W/m2-K]", ErrorIndex );
@@ -7855,7 +7855,7 @@ namespace ConvectionCoefficients {
 			Hn = 9.999;
 			if ( ErrorIndex == 0 ) {
 				ShowSevereMessage( "CalcAlamdariHammondVerticalWall: Convection model not evaluated (would divide by zero)" );
-				ShowContinueError( "Effective hydraulic diameter is zero, convection model not applicable for surface =" + trim( Surface( SurfNum ).Name ) );
+				ShowContinueError( "Effective hydraulic diameter is zero, convection model not applicable for surface =" + Surface( SurfNum ).Name );
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 			}
 			ShowRecurringSevereErrorAtEnd( "CalcAlamdariHammondVerticalWall: Convection model not evaluated because zero" " hydraulic diameter and set to 9.999 [W/m2-K]", ErrorIndex );
@@ -8278,14 +8278,14 @@ namespace ConvectionCoefficients {
 			Hc = 9.999;
 			if ( Height == 0.0 ) {
 				ShowWarningMessage( "CalcBeausoleilMorrisonMixedAssistedWall: Convection model not evaluated (would divide by zero)" );
-				ShowContinueError( "Effective height is zero, convection model not applicable for zone named =" + trim( Zone( ZoneNum ).Name ) );
+				ShowContinueError( "Effective height is zero, convection model not applicable for zone named =" + Zone( ZoneNum ).Name );
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 			}
 			if ( DeltaTemp == 0.0 && ! WarmupFlag ) {
 				if ( ErrorIndex == 0 ) {
 					ShowWarningMessage( "CalcBeausoleilMorrisonMixedAssistedWall: Convection model not evaluated (would divide by zero)" );
 					ShowContinueError( "The temperature difference between surface and air is zero" );
-					ShowContinueError( "Occurs for zone named = " + trim( Zone( ZoneNum ).Name ) );
+					ShowContinueError( "Occurs for zone named = " + Zone( ZoneNum ).Name );
 					ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 				}
 
@@ -8362,7 +8362,7 @@ namespace ConvectionCoefficients {
 				HcTmp2 = 9.999;
 				if ( ErrorIndex2 == 0 ) {
 					ShowSevereMessage( "CalcBeausoleilMorrisonMixedOpposingWall: Convection model not evaluated (would divide by zero)" );
-					ShowContinueError( "Effective height is zero, convection model not applicable for zone named =" + trim( Zone( ZoneNum ).Name ) );
+					ShowContinueError( "Effective height is zero, convection model not applicable for zone named =" + Zone( ZoneNum ).Name );
 					ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 
 				}
@@ -8379,7 +8379,7 @@ namespace ConvectionCoefficients {
 				if ( ErrorIndex == 0 ) {
 					ShowSevereMessage( "CalcBeausoleilMorrisonMixedOpposingWall: Convection model not evaluated (would divide by zero)" );
 					ShowContinueError( "The temperature difference between surface and air is zero" );
-					ShowContinueError( "Occurs for zone named = " + trim( Zone( ZoneNum ).Name ) );
+					ShowContinueError( "Occurs for zone named = " + Zone( ZoneNum ).Name );
 					ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 				}
 				ShowRecurringSevereErrorAtEnd( "CalcBeausoleilMorrisonMixedOpposingWall: Convection model not evaluated because " "of zero temperature difference and set to 9.999 [W/m2-K]", ErrorIndex );
@@ -8446,14 +8446,14 @@ namespace ConvectionCoefficients {
 			Hc = 9.999;
 			if ( HydraulicDiameter == 0.0 ) {
 				ShowWarningMessage( "CalcBeausoleilMorrisonMixedStableFloor: Convection model not evaluated (would divide by zero)" );
-				ShowContinueError( "Effective hydraulic diameter is zero, convection model not applicable for zone named =" + trim( Zone( ZoneNum ).Name ) );
+				ShowContinueError( "Effective hydraulic diameter is zero, convection model not applicable for zone named =" + Zone( ZoneNum ).Name );
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 			}
 			if ( DeltaTemp == 0.0 && ! WarmupFlag ) {
 				if ( ErrorIndex == 0 ) {
 					ShowWarningMessage( "CalcBeausoleilMorrisonMixedStableFloor: Convection model not evaluated (would divide by zero)" );
 					ShowContinueError( "The temperature difference between surface and air is zero" );
-					ShowContinueError( "Occurs for zone named = " + trim( Zone( ZoneNum ).Name ) );
+					ShowContinueError( "Occurs for zone named = " + Zone( ZoneNum ).Name );
 					ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 				}
 
@@ -8521,14 +8521,14 @@ namespace ConvectionCoefficients {
 			Hc = 9.999;
 			if ( HydraulicDiameter == 0.0 ) {
 				ShowWarningMessage( "CalcBeausoleilMorrisonMixedUnstableFloor: Convection model not evaluated (would divide by zero)" );
-				ShowContinueError( "Effective hydraulic diameter is zero, convection model not applicable for zone named =" + trim( Zone( ZoneNum ).Name ) );
+				ShowContinueError( "Effective hydraulic diameter is zero, convection model not applicable for zone named =" + Zone( ZoneNum ).Name );
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 			}
 			if ( DeltaTemp == 0.0 && ! WarmupFlag ) {
 				if ( ErrorIndex == 0 ) {
 					ShowWarningMessage( "CalcBeausoleilMorrisonMixedUnstableFloor: Convection model not evaluated (would divide by zero)" );
 					ShowContinueError( "The temperature difference between surface and air is zero" );
-					ShowContinueError( "Occurs for zone named = " + trim( Zone( ZoneNum ).Name ) );
+					ShowContinueError( "Occurs for zone named = " + Zone( ZoneNum ).Name );
 					ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 				}
 
@@ -8597,14 +8597,14 @@ namespace ConvectionCoefficients {
 			Hc = 9.999;
 			if ( HydraulicDiameter == 0.0 ) {
 				ShowWarningMessage( "CalcBeausoleilMorrisonMixedStableCeiling: Convection model not evaluated (would divide by zero)" );
-				ShowContinueError( "Effective hydraulic diameter is zero, convection model not applicable for zone named =" + trim( Zone( ZoneNum ).Name ) );
+				ShowContinueError( "Effective hydraulic diameter is zero, convection model not applicable for zone named =" + Zone( ZoneNum ).Name );
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 			}
 			if ( DeltaTemp == 0.0 && ! WarmupFlag ) {
 				if ( ErrorIndex == 0 ) {
 					ShowWarningMessage( "CalcBeausoleilMorrisonMixedStableCeiling: Convection model not evaluated (would divide by zero)" );
 					ShowContinueError( "The temperature difference between surface and air is zero" );
-					ShowContinueError( "Occurs for zone named = " + trim( Zone( ZoneNum ).Name ) );
+					ShowContinueError( "Occurs for zone named = " + Zone( ZoneNum ).Name );
 					ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 				}
 
@@ -8672,14 +8672,14 @@ namespace ConvectionCoefficients {
 			Hc = 9.999;
 			if ( HydraulicDiameter == 0.0 ) {
 				ShowWarningMessage( "CalcBeausoleilMorrisonMixedUnstableCeiling: Convection model not evaluated (would divide by zero)" );
-				ShowContinueError( "Effective hydraulic diameter is zero, convection model not applicable for zone named =" + trim( Zone( ZoneNum ).Name ) );
+				ShowContinueError( "Effective hydraulic diameter is zero, convection model not applicable for zone named =" + Zone( ZoneNum ).Name );
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 			}
 			if ( DeltaTemp == 0.0 && ! WarmupFlag ) {
 				if ( ErrorIndex == 0 ) {
 					ShowWarningMessage( "CalcBeausoleilMorrisonMixedUnstableCeiling: Convection model not evaluated (would divide by zero)" );
 					ShowContinueError( "The temperature difference between surface and air is zero" );
-					ShowContinueError( "Occurs for zone named = " + trim( Zone( ZoneNum ).Name ) );
+					ShowContinueError( "Occurs for zone named = " + Zone( ZoneNum ).Name );
 					ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 				}
 
@@ -8755,7 +8755,7 @@ namespace ConvectionCoefficients {
 			Hn = 9.999;
 			if ( ErrorIndex == 0 ) {
 				ShowSevereMessage( "CalcFohannoPolidoriVerticalWall: Convection model not evaluated (would divide by zero)" );
-				ShowContinueError( "Effective surface height is zero, convection model not applicable for surface =" + trim( Surface( SurfNum ).Name ) );
+				ShowContinueError( "Effective surface height is zero, convection model not applicable for surface =" + Surface( SurfNum ).Name );
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 
 			}
@@ -8877,8 +8877,8 @@ namespace ConvectionCoefficients {
 					Hc = 9.999;
 					if ( ErrorIndex == 0 ) {
 						ShowSevereMessage( "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated " "( bad relative window location)" );
-						ShowContinueError( "Value for window location = " + trim( RoundSigDigits( WindowLocationType ) ) );
-						ShowContinueError( "Occurs for zone named = " + trim( Zone( ZoneNum ).Name ) );
+						ShowContinueError( "Value for window location = " + RoundSigDigits( WindowLocationType ) );
+						ShowContinueError( "Occurs for zone named = " + Zone( ZoneNum ).Name );
 						ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 					}
 					ShowRecurringSevereErrorAtEnd( "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated because " "bad window location and set to 9.999 [W/m2-K]", ErrorIndex );
@@ -8890,8 +8890,8 @@ namespace ConvectionCoefficients {
 			Hc = 9.999;
 			if ( ErrorIndex2 == 0 ) {
 				ShowSevereMessage( "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated " "(zero zone exterior perimeter length)" );
-				ShowContinueError( "Value for zone exterior perimeter length = " + trim( RoundSigDigits( ZoneExtPerimLength, 5 ) ) );
-				ShowContinueError( "Occurs for zone named = " + trim( Zone( ZoneNum ).Name ) );
+				ShowContinueError( "Value for zone exterior perimeter length = " + RoundSigDigits( ZoneExtPerimLength, 5 ) );
+				ShowContinueError( "Occurs for zone named = " + Zone( ZoneNum ).Name );
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 			}
 			ShowRecurringSevereErrorAtEnd( "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated because " " bad perimeter length and set to 9.999 [W/m2-K]", ErrorIndex2 );
@@ -8958,8 +8958,8 @@ namespace ConvectionCoefficients {
 				Hc = 9.999;
 				if ( ErrorIndex == 0 ) {
 					ShowSevereMessage( "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated " "( bad relative window location)" );
-					ShowContinueError( "Value for window location = " + trim( RoundSigDigits( WindowLocationType ) ) );
-					ShowContinueError( "Occurs for zone named = " + trim( Zone( ZoneNum ).Name ) );
+					ShowContinueError( "Value for window location = " + RoundSigDigits( WindowLocationType ) );
+					ShowContinueError( "Occurs for zone named = " + Zone( ZoneNum ).Name );
 					ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 				}
 				ShowRecurringSevereErrorAtEnd( "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated because " "bad window location and set to 9.999 [W/m2-K]", ErrorIndex );
@@ -8969,8 +8969,8 @@ namespace ConvectionCoefficients {
 			Hc = 9.999;
 			if ( ErrorIndex2 == 0 ) {
 				ShowSevereMessage( "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated " "(zero zone exterior perimeter length)" );
-				ShowContinueError( "Value for zone exterior perimeter length = " + trim( RoundSigDigits( ZoneExtPerimLength, 5 ) ) );
-				ShowContinueError( "Occurs for zone named = " + trim( Zone( ZoneNum ).Name ) );
+				ShowContinueError( "Value for zone exterior perimeter length = " + RoundSigDigits( ZoneExtPerimLength, 5 ) );
+				ShowContinueError( "Occurs for zone named = " + Zone( ZoneNum ).Name );
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 			}
 			ShowRecurringSevereErrorAtEnd( "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated because " " bad perimeter length and set to 9.999 [W/m2-K]", ErrorIndex2 );
@@ -9030,8 +9030,8 @@ namespace ConvectionCoefficients {
 		} else {
 			if ( ErrorIndex == 0 ) {
 				ShowSevereMessage( "CalcGoldsteinNovoselacCeilingDiffuserFloor: Convection model not evaluated " "(zero zone exterior perimeter length)" );
-				ShowContinueError( "Value for zone exterior perimeter length = " + trim( RoundSigDigits( ZoneExtPerimLength, 5 ) ) );
-				ShowContinueError( "Occurs for zone named = " + trim( Zone( ZoneNum ).Name ) );
+				ShowContinueError( "Value for zone exterior perimeter length = " + RoundSigDigits( ZoneExtPerimLength, 5 ) );
+				ShowContinueError( "Occurs for zone named = " + Zone( ZoneNum ).Name );
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 			}
 			ShowRecurringSevereErrorAtEnd( "CalcGoldsteinNovoselacCeilingDiffuserFloor: Convection model not evaluated because " " bad perimeter length and set to 9.999 [W/m2-K]", ErrorIndex );
@@ -9102,8 +9102,8 @@ namespace ConvectionCoefficients {
 		} else {
 			if ( ErrorIndex == 0 ) {
 				ShowSevereMessage( "CalcSparrowWindward: Convection model not evaluated (bad face area)" );
-				ShowContinueError( "Value for effective face area = " + trim( RoundSigDigits( FaceArea, 5 ) ) );
-				ShowContinueError( "Occurs for surface named = " + trim( Surface( SurfNum ).Name ) );
+				ShowContinueError( "Value for effective face area = " + RoundSigDigits( FaceArea, 5 ) );
+				ShowContinueError( "Occurs for surface named = " + Surface( SurfNum ).Name );
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 			}
 			ShowRecurringSevereErrorAtEnd( "CalcSparrowWindward: Convection model not evaluated because " "bad face area and set to 9.999 [W/m2-k]", ErrorIndex );
@@ -9172,8 +9172,8 @@ namespace ConvectionCoefficients {
 		} else {
 			if ( ErrorIndex == 0 ) {
 				ShowSevereMessage( "CalcSparrowLeeward: Convection model not evaluated (bad face area)" );
-				ShowContinueError( "Value for effective face area = " + trim( RoundSigDigits( FaceArea, 5 ) ) );
-				ShowContinueError( "Occurs for surface named = " + trim( Surface( SurfNum ).Name ) );
+				ShowContinueError( "Value for effective face area = " + RoundSigDigits( FaceArea, 5 ) );
+				ShowContinueError( "Occurs for surface named = " + Surface( SurfNum ).Name );
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 			}
 			ShowRecurringSevereErrorAtEnd( "CalcSparrowLeeward: Convection model not evaluated because " "bad face area and set to 9.999 [W/m2-k]", ErrorIndex );
@@ -9562,8 +9562,8 @@ namespace ConvectionCoefficients {
 		} else {
 			if ( ErrorIndex == 0 ) {
 				ShowSevereMessage( "CalcMitchell: Convection model not evaluated (bad length scale)" );
-				ShowContinueError( "Value for effective length scale = " + trim( RoundSigDigits( LengthScale, 5 ) ) );
-				ShowContinueError( "Occurs for surface named = " + trim( Surface( SurfNum ).Name ) );
+				ShowContinueError( "Value for effective length scale = " + RoundSigDigits( LengthScale, 5 ) );
+				ShowContinueError( "Occurs for surface named = " + Surface( SurfNum ).Name );
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 			}
 			ShowRecurringSevereErrorAtEnd( "CalcMitchell: Convection model not evaluated because " "bad length scale and set to 9.999 [W/m2-k]", ErrorIndex );
@@ -9705,8 +9705,8 @@ namespace ConvectionCoefficients {
 		} else {
 			if ( ErrorIndex == 0 ) {
 				ShowSevereMessage( "CalcEmmelVertical: Convection model wind angle calculation suspect" "(developer issue)" );
-				ShowContinueError( "Value for theta angle = " + trim( RoundSigDigits( Theta, 5 ) ) );
-				ShowContinueError( "Occurs for surface named = " + trim( Surface( SurfNum ).Name ) );
+				ShowContinueError( "Value for theta angle = " + RoundSigDigits( Theta, 5 ) );
+				ShowContinueError( "Occurs for surface named = " + Surface( SurfNum ).Name );
 				ShowContinueError( "Convection model uses high theta correlation and the simulation continues" );
 			}
 			ShowRecurringSevereErrorAtEnd( "CalcEmmelVertical: Convection model wind angle calculation suspect" " and high theta correlation", ErrorIndex );
@@ -9782,8 +9782,8 @@ namespace ConvectionCoefficients {
 		} else {
 			if ( ErrorIndex == 0 ) {
 				ShowSevereMessage( "CalcEmmelRoof: Convection model wind angle calculation suspect" "(developer issue)" );
-				ShowContinueError( "Value for theta angle = " + trim( RoundSigDigits( Theta, 5 ) ) );
-				ShowContinueError( "Occurs for surface named = " + trim( Surface( SurfNum ).Name ) );
+				ShowContinueError( "Value for theta angle = " + RoundSigDigits( Theta, 5 ) );
+				ShowContinueError( "Occurs for surface named = " + Surface( SurfNum ).Name );
 				ShowContinueError( "Convection model uses high theta correlation and the simulation continues" );
 			}
 			ShowRecurringSevereErrorAtEnd( "CalcEmmelRoof: Convection model wind angle calculation suspect" " and high theta correlation", ErrorIndex );
@@ -9889,8 +9889,8 @@ namespace ConvectionCoefficients {
 		} else {
 			if ( ErrorIndex == 0 ) {
 				ShowSevereMessage( "CalcClearRoof: Convection model not evaluated (bad value for distance to roof edge)" );
-				ShowContinueError( "Value for distance to roof edge =" + trim( RoundSigDigits( x, 3 ) ) );
-				ShowContinueError( "Occurs for surface named = " + trim( Surface( SurfNum ).Name ) );
+				ShowContinueError( "Value for distance to roof edge =" + RoundSigDigits( x, 3 ) );
+				ShowContinueError( "Occurs for surface named = " + Surface( SurfNum ).Name );
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 			}
 			ShowRecurringSevereErrorAtEnd( "CalcClearRoof: Convection model not evaluated because " "bad value for distance to roof edge and set to 9.999 [W/m2-k]", ErrorIndex );

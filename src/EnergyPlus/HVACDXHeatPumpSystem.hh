@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -16,7 +15,6 @@ namespace EnergyPlus {
 namespace HVACDXHeatPumpSystem {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
@@ -46,12 +44,12 @@ namespace HVACDXHeatPumpSystem {
 	struct DXHeatPumpSystemStruct
 	{
 		// Members
-		Fstring DXHeatPumpSystemType; // Type of DXHeatingSystem
-		Fstring Name; // Name of the DXHeatingSystem
+		std::string DXHeatPumpSystemType; // Type of DXHeatingSystem
+		std::string Name; // Name of the DXHeatingSystem
 		int SchedPtr;
-		Fstring HeatPumpCoilType;
+		std::string HeatPumpCoilType;
 		int HeatPumpCoilType_Num;
-		Fstring HeatPumpCoilName;
+		std::string HeatPumpCoilName;
 		int HeatPumpCoilIndex;
 		int DXHeatPumpCoilInletNodeNum;
 		int DXHeatPumpCoilOutletNodeNum;
@@ -74,12 +72,8 @@ namespace HVACDXHeatPumpSystem {
 
 		// Default Constructor
 		DXHeatPumpSystemStruct() :
-			DXHeatPumpSystemType( MaxNameLength ),
-			Name( MaxNameLength ),
 			SchedPtr( 0 ),
-			HeatPumpCoilType( MaxNameLength ),
 			HeatPumpCoilType_Num( 0 ),
-			HeatPumpCoilName( MaxNameLength ),
 			HeatPumpCoilIndex( 0 ),
 			DXHeatPumpCoilInletNodeNum( 0 ),
 			DXHeatPumpCoilOutletNodeNum( 0 ),
@@ -99,12 +93,12 @@ namespace HVACDXHeatPumpSystem {
 
 		// Member Constructor
 		DXHeatPumpSystemStruct(
-			Fstring const & DXHeatPumpSystemType, // Type of DXHeatingSystem
-			Fstring const & Name, // Name of the DXHeatingSystem
+			std::string const & DXHeatPumpSystemType, // Type of DXHeatingSystem
+			std::string const & Name, // Name of the DXHeatingSystem
 			int const SchedPtr,
-			Fstring const & HeatPumpCoilType,
+			std::string const & HeatPumpCoilType,
 			int const HeatPumpCoilType_Num,
-			Fstring const & HeatPumpCoilName,
+			std::string const & HeatPumpCoilName,
 			int const HeatPumpCoilIndex,
 			int const DXHeatPumpCoilInletNodeNum,
 			int const DXHeatPumpCoilOutletNodeNum,
@@ -121,12 +115,12 @@ namespace HVACDXHeatPumpSystem {
 			Real64 const OAUnitSetTemp, // set
 			int const SpeedNum // select speed number for variable-speed coil
 		) :
-			DXHeatPumpSystemType( MaxNameLength, DXHeatPumpSystemType ),
-			Name( MaxNameLength, Name ),
+			DXHeatPumpSystemType( DXHeatPumpSystemType ),
+			Name( Name ),
 			SchedPtr( SchedPtr ),
-			HeatPumpCoilType( MaxNameLength, HeatPumpCoilType ),
+			HeatPumpCoilType( HeatPumpCoilType ),
 			HeatPumpCoilType_Num( HeatPumpCoilType_Num ),
-			HeatPumpCoilName( MaxNameLength, HeatPumpCoilName ),
+			HeatPumpCoilName( HeatPumpCoilName ),
 			HeatPumpCoilIndex( HeatPumpCoilIndex ),
 			DXHeatPumpCoilInletNodeNum( DXHeatPumpCoilInletNodeNum ),
 			DXHeatPumpCoilOutletNodeNum( DXHeatPumpCoilOutletNodeNum ),
@@ -153,7 +147,7 @@ namespace HVACDXHeatPumpSystem {
 
 	void
 	SimDXHeatPumpSystem(
-		Fstring const & DXHeatPumpSystemName, // Name of DXSystem:Airloop object
+		std::string const & DXHeatPumpSystemName, // Name of DXSystem:Airloop object
 		bool const FirstHVACIteration, // True when first HVAC iteration
 		int const AirLoopNum, // Primary air loop number
 		int & CompIndex, // Index to CoilSystem:Heating:DX object

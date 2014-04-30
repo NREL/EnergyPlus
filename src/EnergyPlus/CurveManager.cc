@@ -7,6 +7,7 @@
 #include <ObjexxFCL/FArray3D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <CurveManager.hh>
@@ -72,7 +73,6 @@ namespace CurveManager {
 	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::AnyEnergyManagementSystemInModel;
 	using namespace DataBranchAirLoopPlant;
 
@@ -80,7 +80,7 @@ namespace CurveManager {
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
-	Fstring const Blank;
+	std::string const Blank;
 
 	// Curve Type parameters, these can differ from object types (e.g. a CurveType_TableOneIV can be linear, quadratic, etc)
 	int const Linear( 1 );
@@ -142,7 +142,7 @@ namespace CurveManager {
 	int const CurveType_DoubleExponentialDecay( 20 );
 	int const CurveType_QuadLinear( 21 );
 
-	FArray1D_Fstring const cCurveTypes( NumAllCurveTypes, sFstring( 30 ), { "Curve:Linear                  ", "Curve:Quadratic               ", "Curve:Cubic                   ", "Curve:Quartic                 ", "Curve:Exponent                ", "Curve:BiCubic                 ", "Curve:BiQuadratic             ", "Curve:QuadraitcLinear         ", "Curve:TriQuadratic            ", "Curve:Functional:PressureDrop ", "Table:OneIndependentVariable  ", "Table:TwoIndependentVariables ", "Table:MultiVariableLookup     ", "Curve:FanPressureRise         ", "Curve:ExponentialSkewNormal   ", "Curve:Sigmoid                 ", "Curve:RectangularHyperbola1   ", "Curve:RectangularHyperbola2   ", "Curve:ExponentialDecay        ", "Curve:DoubleExponentialDecay  ", "Curve:QuadLinear              " } );
+	FArray1D_string const cCurveTypes( NumAllCurveTypes, { "Curve:Linear", "Curve:Quadratic", "Curve:Cubic", "Curve:Quartic", "Curve:Exponent", "Curve:BiCubic", "Curve:BiQuadratic", "Curve:QuadraitcLinear", "Curve:TriQuadratic", "Curve:Functional:PressureDrop", "Table:OneIndependentVariable", "Table:TwoIndependentVariables", "Table:MultiVariableLookup", "Curve:FanPressureRise", "Curve:ExponentialSkewNormal", "Curve:Sigmoid", "Curve:RectangularHyperbola1", "Curve:RectangularHyperbola2", "Curve:ExponentialDecay", "Curve:DoubleExponentialDecay", "Curve:QuadLinear" } );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -330,7 +330,6 @@ namespace CurveManager {
 		using InputProcessor::VerifyName;
 		using InputProcessor::GetObjectDefMaxArgs;
 		using InputProcessor::FindItemInList;
-		using InputProcessor::MakeUPPERCase;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using General::RoundSigDigits;
 		//  USE DataGlobals, ONLY: DisplayExtraWarnings, OutputFileInits
@@ -373,7 +372,7 @@ namespace CurveManager {
 		int NumTables; // Total tables in the input file
 		int CurveIndex; // do loop index
 		int CurveNum; // current curve number
-		FArray1D_Fstring Alphas( 13, sFstring( MaxNameLength ) ); // Alpha items for object
+		FArray1D_string Alphas( 13 ); // Alpha items for object
 		FArray1D< Real64 > Numbers( 10000 ); // Numeric items for object
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
@@ -381,7 +380,7 @@ namespace CurveManager {
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in renaming.
+		std::string CurrentModuleObject; // for ease in renaming.
 		static int MaxTableNums( 0 ); // Maximum number of numeric input fields in Tables
 		static int MaxTableData( 0 ); // Maximum number of numeric input field pairs in Tables
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
@@ -404,7 +403,7 @@ namespace CurveManager {
 		FArray1D< Real64 > TempArray2;
 		FArray1D< Real64 > TempArray3;
 
-		Fstring FileName( MaxNameLength ); // name of external table data file
+		std::string FileName; // name of external table data file
 		bool ReadFromFile; // True if external data file exists
 		int CurveFound;
 
@@ -466,7 +465,7 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -475,7 +474,7 @@ namespace CurveManager {
 			if ( NumPressureCurves > 0 ) {
 				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
 				if ( CurveFound != 0 ) {
-					ShowSevereError( "GetCurveInput: " + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", duplicate curve name." );
+					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
 					ErrorsFound = true;
 				}
@@ -505,28 +504,28 @@ namespace CurveManager {
 			}
 
 			if ( Numbers( 7 ) > Numbers( 8 ) ) { // error
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 7 ) ) + " [" + trim( RoundSigDigits( Numbers( 7 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 8 ) ) + " [" + trim( RoundSigDigits( Numbers( 8 ), 2 ) ) + "]" );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 7 ) + " [" + RoundSigDigits( Numbers( 7 ), 2 ) + "] > " + cNumericFieldNames( 8 ) + " [" + RoundSigDigits( Numbers( 8 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 			if ( Numbers( 9 ) > Numbers( 10 ) ) { // error
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 9 ) ) + " [" + trim( RoundSigDigits( Numbers( 9 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 10 ) ) + " [" + trim( RoundSigDigits( Numbers( 10 ), 2 ) ) + "]" );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 9 ) + " [" + RoundSigDigits( Numbers( 9 ), 2 ) + "] > " + cNumericFieldNames( 10 ) + " [" + RoundSigDigits( Numbers( 10 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 			if ( NumAlphas >= 2 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 2 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Input Unit Type for X is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for X is invalid." );
 				}
 			}
 			if ( NumAlphas >= 3 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 3 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Input Unit Type for Y is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for Y is invalid." );
 				}
 			}
 			if ( NumAlphas >= 4 ) {
 				if ( ! IsCurveOutputTypeValid( Alphas( 4 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Output Unit Type is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Output Unit Type is invalid." );
 				}
 			}
 
@@ -539,7 +538,7 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -548,7 +547,7 @@ namespace CurveManager {
 			if ( NumPressureCurves > 0 ) {
 				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
 				if ( CurveFound != 0 ) {
-					ShowSevereError( "GetCurveInput: " + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", duplicate curve name." );
+					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
 					ErrorsFound = true;
 				}
@@ -573,18 +572,18 @@ namespace CurveManager {
 			}
 
 			if ( Numbers( 5 ) > Numbers( 6 ) ) { // error
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 5 ) ) + "[" + trim( RoundSigDigits( Numbers( 5 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 6 ) ) + " [" + trim( RoundSigDigits( Numbers( 6 ), 2 ) ) + "]" );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 5 ) + '[' + RoundSigDigits( Numbers( 5 ), 2 ) + "] > " + cNumericFieldNames( 6 ) + " [" + RoundSigDigits( Numbers( 6 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 			if ( NumAlphas >= 2 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 2 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Input Unit Type for X is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for X is invalid." );
 				}
 			}
 			if ( NumAlphas >= 3 ) {
 				if ( ! IsCurveOutputTypeValid( Alphas( 3 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Output Unit Type is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Output Unit Type is invalid." );
 				}
 			}
 
@@ -597,7 +596,7 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -606,7 +605,7 @@ namespace CurveManager {
 			if ( NumPressureCurves > 0 ) {
 				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
 				if ( CurveFound != 0 ) {
-					ShowSevereError( "GetCurveInput: " + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", duplicate curve name." );
+					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
 					ErrorsFound = true;
 				}
@@ -632,18 +631,18 @@ namespace CurveManager {
 			}
 
 			if ( Numbers( 6 ) > Numbers( 7 ) ) { // error
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 6 ) ) + "[" + trim( RoundSigDigits( Numbers( 6 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 7 ) ) + " [" + trim( RoundSigDigits( Numbers( 7 ), 2 ) ) + "]" );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 6 ) + '[' + RoundSigDigits( Numbers( 6 ), 2 ) + "] > " + cNumericFieldNames( 7 ) + " [" + RoundSigDigits( Numbers( 7 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 			if ( NumAlphas >= 2 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 2 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Input Unit Type for X is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for X is invalid." );
 				}
 			}
 			if ( NumAlphas >= 3 ) {
 				if ( ! IsCurveOutputTypeValid( Alphas( 3 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Output Unit Type is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Output Unit Type is invalid." );
 				}
 			}
 
@@ -656,7 +655,7 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -665,7 +664,7 @@ namespace CurveManager {
 			if ( NumPressureCurves > 0 ) {
 				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
 				if ( CurveFound != 0 ) {
-					ShowSevereError( "GetCurveInput: " + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", duplicate curve name." );
+					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
 					ErrorsFound = true;
 				}
@@ -689,18 +688,18 @@ namespace CurveManager {
 			}
 
 			if ( Numbers( 4 ) > Numbers( 5 ) ) { // error
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 4 ) ) + " [" + trim( RoundSigDigits( Numbers( 4 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 5 ) ) + " [" + trim( RoundSigDigits( Numbers( 5 ), 2 ) ) + "]" );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 4 ) + " [" + RoundSigDigits( Numbers( 4 ), 2 ) + "] > " + cNumericFieldNames( 5 ) + " [" + RoundSigDigits( Numbers( 5 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 			if ( NumAlphas >= 2 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 2 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Input Unit Type for X is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for X is invalid." );
 				}
 			}
 			if ( NumAlphas >= 3 ) {
 				if ( ! IsCurveOutputTypeValid( Alphas( 3 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Output Unit Type is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Output Unit Type is invalid." );
 				}
 			}
 
@@ -713,7 +712,7 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -722,7 +721,7 @@ namespace CurveManager {
 			if ( NumPressureCurves > 0 ) {
 				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
 				if ( CurveFound != 0 ) {
-					ShowSevereError( "GetCurveInput: " + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", duplicate curve name." );
+					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
 					ErrorsFound = true;
 				}
@@ -751,28 +750,28 @@ namespace CurveManager {
 			}
 
 			if ( Numbers( 7 ) > Numbers( 8 ) ) { // error
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 7 ) ) + " [" + trim( RoundSigDigits( Numbers( 7 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 8 ) ) + " [" + trim( RoundSigDigits( Numbers( 8 ), 2 ) ) + "]" );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 7 ) + " [" + RoundSigDigits( Numbers( 7 ), 2 ) + "] > " + cNumericFieldNames( 8 ) + " [" + RoundSigDigits( Numbers( 8 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 			if ( Numbers( 9 ) > Numbers( 10 ) ) { // error
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 9 ) ) + " [" + trim( RoundSigDigits( Numbers( 9 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 10 ) ) + " [" + trim( RoundSigDigits( Numbers( 10 ), 2 ) ) + "]" );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 9 ) + " [" + RoundSigDigits( Numbers( 9 ), 2 ) + "] > " + cNumericFieldNames( 10 ) + " [" + RoundSigDigits( Numbers( 10 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 			if ( NumAlphas >= 2 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 2 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Input Unit Type for X is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for X is invalid." );
 				}
 			}
 			if ( NumAlphas >= 3 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 3 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Input Unit Type for Y is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for Y is invalid." );
 				}
 			}
 			if ( NumAlphas >= 4 ) {
 				if ( ! IsCurveOutputTypeValid( Alphas( 4 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Output Unit Type is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Output Unit Type is invalid." );
 				}
 			}
 		}
@@ -784,7 +783,7 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -793,7 +792,7 @@ namespace CurveManager {
 			if ( NumPressureCurves > 0 ) {
 				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
 				if ( CurveFound != 0 ) {
-					ShowSevereError( "GetCurveInput: " + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", duplicate curve name." );
+					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
 					ErrorsFound = true;
 				}
@@ -816,18 +815,18 @@ namespace CurveManager {
 			}
 
 			if ( Numbers( 3 ) > Numbers( 4 ) ) { // error
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 3 ) ) + " [" + trim( RoundSigDigits( Numbers( 3 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 4 ) ) + " [" + trim( RoundSigDigits( Numbers( 4 ), 2 ) ) + "]" );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 3 ) + " [" + RoundSigDigits( Numbers( 3 ), 2 ) + "] > " + cNumericFieldNames( 4 ) + " [" + RoundSigDigits( Numbers( 4 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 			if ( NumAlphas >= 2 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 2 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Input Unit Type for X is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for X is invalid." );
 				}
 			}
 			if ( NumAlphas >= 3 ) {
 				if ( ! IsCurveOutputTypeValid( Alphas( 3 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Output Unit Type is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Output Unit Type is invalid." );
 				}
 			}
 		}
@@ -839,7 +838,7 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -848,7 +847,7 @@ namespace CurveManager {
 			if ( NumPressureCurves > 0 ) {
 				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
 				if ( CurveFound != 0 ) {
-					ShowSevereError( "GetCurveInput: " + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", duplicate curve name." );
+					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
 					ErrorsFound = true;
 				}
@@ -881,28 +880,28 @@ namespace CurveManager {
 			}
 
 			if ( Numbers( 11 ) > Numbers( 12 ) ) { // error
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 11 ) ) + " [" + trim( RoundSigDigits( Numbers( 11 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 12 ) ) + " [" + trim( RoundSigDigits( Numbers( 12 ), 2 ) ) + "]" );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 11 ) + " [" + RoundSigDigits( Numbers( 11 ), 2 ) + "] > " + cNumericFieldNames( 12 ) + " [" + RoundSigDigits( Numbers( 12 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 			if ( Numbers( 13 ) > Numbers( 14 ) ) { // error
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 13 ) ) + " [" + trim( RoundSigDigits( Numbers( 13 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 14 ) ) + " [" + trim( RoundSigDigits( Numbers( 14 ), 2 ) ) + "]" );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 13 ) + " [" + RoundSigDigits( Numbers( 13 ), 2 ) + "] > " + cNumericFieldNames( 14 ) + " [" + RoundSigDigits( Numbers( 14 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 			if ( NumAlphas >= 2 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 2 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Input Unit Type for X is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for X is invalid." );
 				}
 			}
 			if ( NumAlphas >= 3 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 3 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Input Unit Type for Y is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for Y is invalid." );
 				}
 			}
 			if ( NumAlphas >= 4 ) {
 				if ( ! IsCurveOutputTypeValid( Alphas( 4 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Output Unit Type is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Output Unit Type is invalid." );
 				}
 			}
 		}
@@ -914,7 +913,7 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -923,7 +922,7 @@ namespace CurveManager {
 			if ( NumPressureCurves > 0 ) {
 				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
 				if ( CurveFound != 0 ) {
-					ShowSevereError( "GetCurveInput: " + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", duplicate curve name." );
+					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
 					ErrorsFound = true;
 				}
@@ -976,38 +975,38 @@ namespace CurveManager {
 			}
 
 			if ( Numbers( 28 ) > Numbers( 29 ) ) { // error
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 28 ) ) + " [" + trim( RoundSigDigits( Numbers( 28 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 29 ) ) + " [" + trim( RoundSigDigits( Numbers( 29 ), 2 ) ) + "]" );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 28 ) + " [" + RoundSigDigits( Numbers( 28 ), 2 ) + "] > " + cNumericFieldNames( 29 ) + " [" + RoundSigDigits( Numbers( 29 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 			if ( Numbers( 30 ) > Numbers( 31 ) ) { // error
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 30 ) ) + " [" + trim( RoundSigDigits( Numbers( 30 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 31 ) ) + " [" + trim( RoundSigDigits( Numbers( 31 ), 2 ) ) + "]" );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 30 ) + " [" + RoundSigDigits( Numbers( 30 ), 2 ) + "] > " + cNumericFieldNames( 31 ) + " [" + RoundSigDigits( Numbers( 31 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 			if ( Numbers( 32 ) > Numbers( 33 ) ) { // error
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 32 ) ) + " [" + trim( RoundSigDigits( Numbers( 32 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 33 ) ) + " [" + trim( RoundSigDigits( Numbers( 33 ), 2 ) ) + "]" );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 32 ) + " [" + RoundSigDigits( Numbers( 32 ), 2 ) + "] > " + cNumericFieldNames( 33 ) + " [" + RoundSigDigits( Numbers( 33 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 			if ( NumAlphas >= 2 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 2 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Input Unit Type for X is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for X is invalid." );
 				}
 			}
 			if ( NumAlphas >= 3 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 3 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Input Unit Type for Y is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for Y is invalid." );
 				}
 			}
 			if ( NumAlphas >= 4 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 4 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Input Unit Type for Z is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for Z is invalid." );
 				}
 			}
 			if ( NumAlphas >= 5 ) {
 				if ( ! IsCurveOutputTypeValid( Alphas( 5 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Output Unit Type is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Output Unit Type is invalid." );
 				}
 			}
 
@@ -1020,7 +1019,7 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1029,7 +1028,7 @@ namespace CurveManager {
 			if ( NumPressureCurves > 0 ) {
 				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
 				if ( CurveFound != 0 ) {
-					ShowSevereError( "GetCurveInput: " + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", duplicate curve name." );
+					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
 					ErrorsFound = true;
 				}
@@ -1062,49 +1061,49 @@ namespace CurveManager {
 			}
 
 			if ( Numbers( 6 ) > Numbers( 7 ) ) { // error
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 6 ) ) + " [" + trim( RoundSigDigits( Numbers( 6 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 7 ) ) + " [" + trim( RoundSigDigits( Numbers( 7 ), 2 ) ) + "]" );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 6 ) + " [" + RoundSigDigits( Numbers( 6 ), 2 ) + "] > " + cNumericFieldNames( 7 ) + " [" + RoundSigDigits( Numbers( 7 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 			if ( Numbers( 8 ) > Numbers( 9 ) ) { // error
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 8 ) ) + " [" + trim( RoundSigDigits( Numbers( 8 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 9 ) ) + " [" + trim( RoundSigDigits( Numbers( 9 ), 2 ) ) + "]" );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 8 ) + " [" + RoundSigDigits( Numbers( 8 ), 2 ) + "] > " + cNumericFieldNames( 9 ) + " [" + RoundSigDigits( Numbers( 9 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 			if ( Numbers( 10 ) > Numbers( 11 ) ) { // error
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 10 ) ) + " [" + trim( RoundSigDigits( Numbers( 10 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 11 ) ) + " [" + trim( RoundSigDigits( Numbers( 11 ), 2 ) ) + "]" );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 10 ) + " [" + RoundSigDigits( Numbers( 10 ), 2 ) + "] > " + cNumericFieldNames( 11 ) + " [" + RoundSigDigits( Numbers( 11 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 			if ( Numbers( 12 ) > Numbers( 13 ) ) { // error
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 12 ) ) + " [" + trim( RoundSigDigits( Numbers( 12 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 13 ) ) + " [" + trim( RoundSigDigits( Numbers( 13 ), 2 ) ) + "]" );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 12 ) + " [" + RoundSigDigits( Numbers( 12 ), 2 ) + "] > " + cNumericFieldNames( 13 ) + " [" + RoundSigDigits( Numbers( 13 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 
 			if ( NumAlphas >= 2 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 2 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Input Unit Type for W is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for W is invalid." );
 				}
 			}
 			if ( NumAlphas >= 3 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 3 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Input Unit Type for X is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for X is invalid." );
 				}
 			}
 			if ( NumAlphas >= 4 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 4 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Input Unit Type for Y is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for Y is invalid." );
 				}
 			}
 			if ( NumAlphas >= 5 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 5 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Input Unit Type for Z is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for Z is invalid." );
 				}
 			}
 			if ( NumAlphas >= 6 ) {
 				if ( ! IsCurveOutputTypeValid( Alphas( 6 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Output Unit Type is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Output Unit Type is invalid." );
 				}
 			}
 
@@ -1116,7 +1115,7 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1125,7 +1124,7 @@ namespace CurveManager {
 			if ( NumPressureCurves > 0 ) {
 				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
 				if ( CurveFound != 0 ) {
-					ShowSevereError( "GetCurveInput: " + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", duplicate curve name." );
+					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
 					ErrorsFound = true;
 				}
@@ -1149,12 +1148,12 @@ namespace CurveManager {
 			}
 			if ( NumAlphas >= 2 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 2 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Input Unit Type for X is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for X is invalid." );
 				}
 			}
 			if ( NumAlphas >= 3 ) {
 				if ( ! IsCurveOutputTypeValid( Alphas( 3 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Output Unit Type is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Output Unit Type is invalid." );
 				}
 			}
 
@@ -1167,7 +1166,7 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1176,7 +1175,7 @@ namespace CurveManager {
 			if ( NumPressureCurves > 0 ) {
 				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
 				if ( CurveFound != 0 ) {
-					ShowSevereError( "GetCurveInput: " + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", duplicate curve name." );
+					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
 					ErrorsFound = true;
 				}
@@ -1204,13 +1203,13 @@ namespace CurveManager {
 			}
 
 			if ( Numbers( 5 ) > Numbers( 6 ) ) { // error
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 5 ) ) + "[" + trim( RoundSigDigits( Numbers( 5 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 6 ) ) + " [" + trim( RoundSigDigits( Numbers( 6 ), 2 ) ) + "]" );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 5 ) + '[' + RoundSigDigits( Numbers( 5 ), 2 ) + "] > " + cNumericFieldNames( 6 ) + " [" + RoundSigDigits( Numbers( 6 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 			if ( Numbers( 7 ) > Numbers( 8 ) ) { // error
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 7 ) ) + "[" + trim( RoundSigDigits( Numbers( 7 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 8 ) ) + " [" + trim( RoundSigDigits( Numbers( 8 ), 2 ) ) + "]" );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 7 ) + '[' + RoundSigDigits( Numbers( 7 ), 2 ) + "] > " + cNumericFieldNames( 8 ) + " [" + RoundSigDigits( Numbers( 8 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 
@@ -1223,7 +1222,7 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1232,7 +1231,7 @@ namespace CurveManager {
 			if ( NumPressureCurves > 0 ) {
 				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
 				if ( CurveFound != 0 ) {
-					ShowSevereError( "GetCurveInput: " + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", duplicate curve name." );
+					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
 					ErrorsFound = true;
 				}
@@ -1258,19 +1257,19 @@ namespace CurveManager {
 			}
 
 			if ( Numbers( 5 ) > Numbers( 6 ) ) { // error
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 5 ) ) + "[" + trim( RoundSigDigits( Numbers( 5 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 6 ) ) + " [" + trim( RoundSigDigits( Numbers( 6 ), 2 ) ) + "]" );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 5 ) + '[' + RoundSigDigits( Numbers( 5 ), 2 ) + "] > " + cNumericFieldNames( 6 ) + " [" + RoundSigDigits( Numbers( 6 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 
 			if ( NumAlphas >= 2 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 2 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Input Unit Type for X is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for X is invalid." );
 				}
 			}
 			if ( NumAlphas >= 3 ) {
 				if ( ! IsCurveOutputTypeValid( Alphas( 3 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Output Unit Type is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Output Unit Type is invalid." );
 				}
 			}
 		} //Exponential Skew Normal
@@ -1282,7 +1281,7 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1291,7 +1290,7 @@ namespace CurveManager {
 			if ( NumPressureCurves > 0 ) {
 				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
 				if ( CurveFound != 0 ) {
-					ShowSevereError( "GetCurveInput: " + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", duplicate curve name." );
+					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
 					ErrorsFound = true;
 				}
@@ -1318,19 +1317,19 @@ namespace CurveManager {
 			}
 
 			if ( Numbers( 6 ) > Numbers( 7 ) ) { // error
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 6 ) ) + "[" + trim( RoundSigDigits( Numbers( 6 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 7 ) ) + " [" + trim( RoundSigDigits( Numbers( 7 ), 2 ) ) + "]" );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 6 ) + '[' + RoundSigDigits( Numbers( 6 ), 2 ) + "] > " + cNumericFieldNames( 7 ) + " [" + RoundSigDigits( Numbers( 7 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 
 			if ( NumAlphas >= 2 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 2 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Input Unit Type for X is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for X is invalid." );
 				}
 			}
 			if ( NumAlphas >= 3 ) {
 				if ( ! IsCurveOutputTypeValid( Alphas( 3 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Output Unit Type is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Output Unit Type is invalid." );
 				}
 			}
 		} //Sigmoid
@@ -1342,7 +1341,7 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1351,7 +1350,7 @@ namespace CurveManager {
 			if ( NumPressureCurves > 0 ) {
 				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
 				if ( CurveFound != 0 ) {
-					ShowSevereError( "GetCurveInput: " + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", duplicate curve name." );
+					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
 					ErrorsFound = true;
 				}
@@ -1376,19 +1375,19 @@ namespace CurveManager {
 			}
 
 			if ( Numbers( 4 ) > Numbers( 5 ) ) { // error
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 4 ) ) + "[" + trim( RoundSigDigits( Numbers( 4 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 5 ) ) + " [" + trim( RoundSigDigits( Numbers( 5 ), 2 ) ) + "]" );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 4 ) + '[' + RoundSigDigits( Numbers( 4 ), 2 ) + "] > " + cNumericFieldNames( 5 ) + " [" + RoundSigDigits( Numbers( 5 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 
 			if ( NumAlphas >= 2 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 2 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Input Unit Type for X is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for X is invalid." );
 				}
 			}
 			if ( NumAlphas >= 3 ) {
 				if ( ! IsCurveOutputTypeValid( Alphas( 3 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Output Unit Type is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Output Unit Type is invalid." );
 				}
 			}
 		} //Rectangular Hyperbola Type 1
@@ -1400,7 +1399,7 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1409,7 +1408,7 @@ namespace CurveManager {
 			if ( NumPressureCurves > 0 ) {
 				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
 				if ( CurveFound != 0 ) {
-					ShowSevereError( "GetCurveInput: " + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", duplicate curve name." );
+					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
 					ErrorsFound = true;
 				}
@@ -1434,19 +1433,19 @@ namespace CurveManager {
 			}
 
 			if ( Numbers( 4 ) > Numbers( 5 ) ) { // error
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 4 ) ) + "[" + trim( RoundSigDigits( Numbers( 4 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 5 ) ) + " [" + trim( RoundSigDigits( Numbers( 5 ), 2 ) ) + "]" );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 4 ) + '[' + RoundSigDigits( Numbers( 4 ), 2 ) + "] > " + cNumericFieldNames( 5 ) + " [" + RoundSigDigits( Numbers( 5 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 
 			if ( NumAlphas >= 2 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 2 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Input Unit Type for X is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for X is invalid." );
 				}
 			}
 			if ( NumAlphas >= 3 ) {
 				if ( ! IsCurveOutputTypeValid( Alphas( 3 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Output Unit Type is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Output Unit Type is invalid." );
 				}
 			}
 		} //Rectangular Hyperbola Type 2
@@ -1458,7 +1457,7 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1467,7 +1466,7 @@ namespace CurveManager {
 			if ( NumPressureCurves > 0 ) {
 				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
 				if ( CurveFound != 0 ) {
-					ShowSevereError( "GetCurveInput: " + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", duplicate curve name." );
+					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
 					ErrorsFound = true;
 				}
@@ -1492,19 +1491,19 @@ namespace CurveManager {
 			}
 
 			if ( Numbers( 4 ) > Numbers( 5 ) ) { // error
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 4 ) ) + "[" + trim( RoundSigDigits( Numbers( 4 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 5 ) ) + " [" + trim( RoundSigDigits( Numbers( 5 ), 2 ) ) + "]" );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 4 ) + '[' + RoundSigDigits( Numbers( 4 ), 2 ) + "] > " + cNumericFieldNames( 5 ) + " [" + RoundSigDigits( Numbers( 5 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 
 			if ( NumAlphas >= 2 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 2 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Input Unit Type for X is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for X is invalid." );
 				}
 			}
 			if ( NumAlphas >= 3 ) {
 				if ( ! IsCurveOutputTypeValid( Alphas( 3 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Output Unit Type is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Output Unit Type is invalid." );
 				}
 			}
 		} //Exponential Decay
@@ -1516,7 +1515,7 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1525,7 +1524,7 @@ namespace CurveManager {
 			if ( NumPressureCurves > 0 ) {
 				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
 				if ( CurveFound != 0 ) {
-					ShowSevereError( "GetCurveInput: " + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", duplicate curve name." );
+					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
 					ErrorsFound = true;
 				}
@@ -1560,12 +1559,12 @@ namespace CurveManager {
 
 			if ( NumAlphas >= 2 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 2 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Input Unit Type for X is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for X is invalid." );
 				}
 			}
 			if ( NumAlphas >= 3 ) {
 				if ( ! IsCurveOutputTypeValid( Alphas( 3 ) ) ) {
-					ShowWarningError( "In " + trim( CurrentModuleObject ) + " named " + trim( Alphas( 1 ) ) + " the Output Unit Type is invalid." );
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Output Unit Type is invalid." );
 				}
 			}
 		} //Exponential Decay
@@ -1582,7 +1581,7 @@ namespace CurveManager {
 			TableData( TableNum ).Y.allocate( NumTableEntries );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1591,7 +1590,7 @@ namespace CurveManager {
 			if ( NumPressureCurves > 0 ) {
 				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
 				if ( CurveFound != 0 ) {
-					ShowSevereError( "GetCurveInput: " + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", duplicate curve name." );
+					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
 					ErrorsFound = true;
 				}
@@ -1616,8 +1615,8 @@ namespace CurveManager {
 				PerfCurve( CurveNum ).CurveType = Exponent;
 				TableLookup( TableNum ).InterpolationOrder = 4;
 			} else {
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cAlphaFieldNames( 2 ) ) + " [" + trim( Alphas( 2 ) ) + "] is not a valid choice. " );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cAlphaFieldNames( 2 ) + " [" + Alphas( 2 ) + "] is not a valid choice. " );
 				ErrorsFound = true;
 			}}
 
@@ -1629,8 +1628,8 @@ namespace CurveManager {
 			} else if ( SELECT_CASE_var == "EVALUATECURVETOLIMITS" ) {
 				PerfCurve( CurveNum ).InterpolationType = EvaluateCurveToLimits;
 			} else {
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cAlphaFieldNames( 2 ) ) + " [" + trim( Alphas( 2 ) ) + "] is not a valid choice. " );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cAlphaFieldNames( 2 ) + " [" + Alphas( 2 ) + "] is not a valid choice. " );
 				ErrorsFound = true;
 			}}
 
@@ -1647,21 +1646,21 @@ namespace CurveManager {
 
 			if ( ! lNumericFieldBlanks( 1 ) && ! lNumericFieldBlanks( 2 ) ) {
 				if ( Numbers( 1 ) > Numbers( 2 ) ) { // error
-					ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-					ShowContinueError( trim( cNumericFieldNames( 1 ) ) + " [" + trim( RoundSigDigits( Numbers( 1 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 2 ) ) + " [" + trim( RoundSigDigits( Numbers( 2 ), 2 ) ) + "]" );
+					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+					ShowContinueError( cNumericFieldNames( 1 ) + " [" + RoundSigDigits( Numbers( 1 ), 2 ) + "] > " + cNumericFieldNames( 2 ) + " [" + RoundSigDigits( Numbers( 2 ), 2 ) + ']' );
 					ErrorsFound = true;
 				}
 			}
 			if ( NumAlphas >= 4 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 4 ) ) ) {
-					ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-					ShowContinueError( trim( cAlphaFieldNames( 4 ) ) + " [" + trim( Alphas( 4 ) ) + "] is invalid" );
+					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+					ShowContinueError( cAlphaFieldNames( 4 ) + " [" + Alphas( 4 ) + "] is invalid" );
 				}
 			}
 			if ( NumAlphas >= 5 ) {
 				if ( ! IsCurveOutputTypeValid( Alphas( 5 ) ) ) {
-					ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-					ShowContinueError( trim( cAlphaFieldNames( 5 ) ) + " [" + trim( Alphas( 5 ) ) + "] is invlaid" );
+					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+					ShowContinueError( cAlphaFieldNames( 5 ) + " [" + Alphas( 5 ) + "] is invlaid" );
 				}
 			}
 
@@ -1669,8 +1668,8 @@ namespace CurveManager {
 			if ( ! lNumericFieldBlanks( 5 ) ) {
 				TableData( TableNum ).NormalPoint = Numbers( 5 );
 				if ( Numbers( 5 ) == 0.0 ) {
-					ShowSevereError( "GetTableInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-					ShowContinueError( "..." + trim( cNumericFieldNames( 5 ) ) + " [" + trim( RoundSigDigits( Numbers( 5 ), 6 ) ) + "] is not a valid choice." );
+					ShowSevereError( "GetTableInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+					ShowContinueError( "..." + cNumericFieldNames( 5 ) + " [" + RoundSigDigits( Numbers( 5 ), 6 ) + "] is not a valid choice." );
 					ShowContinueError( "...Setting Normalization Reference to 1 and the simulation continues." );
 					TableData( TableNum ).NormalPoint = 1.0;
 				}
@@ -1689,8 +1688,8 @@ namespace CurveManager {
 
 			MaxTableNums = ( NumNumbers - 5 ) / 2;
 			if ( mod( ( NumNumbers - 5 ), 2 ) != 0 ) {
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( "The number of data entries must be evenly divisable by 2. Number of data entries = " + trim( RoundSigDigits( NumNumbers - 5 ) ) );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( "The number of data entries must be evenly divisable by 2. Number of data entries = " + RoundSigDigits( NumNumbers - 5 ) );
 				ErrorsFound = true;
 			} else {
 				for ( TableDataIndex = 1; TableDataIndex <= MaxTableNums; ++TableDataIndex ) {
@@ -1743,7 +1742,7 @@ namespace CurveManager {
 					TempArray1.deallocate();
 					TempArray2.deallocate();
 				} else {
-					ShowWarningError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
+					ShowWarningError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 					ShowContinueError( "The requested regression analysis is not available at this time. Curve type = " + Alphas( 2 ) );
 					PerfCurve( CurveIndex ).InterpolationType = LinearInterpolationOfTable;
 				}}
@@ -1769,7 +1768,7 @@ namespace CurveManager {
 			TableData( TableNum ).Y.allocate( NumTableEntries );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1778,7 +1777,7 @@ namespace CurveManager {
 			if ( NumPressureCurves > 0 ) {
 				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
 				if ( CurveFound != 0 ) {
-					ShowSevereError( "GetCurveInput: " + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", duplicate curve name." );
+					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
 					ErrorsFound = true;
 				}
@@ -1800,8 +1799,8 @@ namespace CurveManager {
 				PerfCurve( CurveNum ).CurveType = TriQuadratic;
 				TableLookup( TableNum ).InterpolationOrder = 3;
 			} else {
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cAlphaFieldNames( 2 ) ) + " [" + trim( Alphas( 2 ) ) + "] is not a valid choice. " );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cAlphaFieldNames( 2 ) + " [" + Alphas( 2 ) + "] is not a valid choice. " );
 				ErrorsFound = true;
 			}}
 			{ auto const SELECT_CASE_var( Alphas( 3 ) );
@@ -1812,8 +1811,8 @@ namespace CurveManager {
 			} else if ( SELECT_CASE_var == "EVALUATECURVETOLIMITS" ) {
 				PerfCurve( CurveNum ).InterpolationType = EvaluateCurveToLimits;
 			} else {
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cAlphaFieldNames( 2 ) ) + " [" + trim( Alphas( 2 ) ) + "] is not a valid choice. " );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cAlphaFieldNames( 2 ) + " [" + Alphas( 2 ) + "] is not a valid choice. " );
 				ErrorsFound = true;
 			}}
 
@@ -1823,39 +1822,39 @@ namespace CurveManager {
 			PerfCurve( CurveNum ).Var2Max = Numbers( 4 );
 
 			if ( Numbers( 1 ) > Numbers( 2 ) ) { // error
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 1 ) ) + " [" + trim( RoundSigDigits( Numbers( 1 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 2 ) ) + " [" + trim( RoundSigDigits( Numbers( 2 ), 2 ) ) + "]" );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 1 ) + " [" + RoundSigDigits( Numbers( 1 ), 2 ) + "] > " + cNumericFieldNames( 2 ) + " [" + RoundSigDigits( Numbers( 2 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 			if ( Numbers( 3 ) > Numbers( 4 ) ) { // error
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 3 ) ) + " [" + trim( RoundSigDigits( Numbers( 3 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 4 ) ) + " [" + trim( RoundSigDigits( Numbers( 4 ), 2 ) ) + "]" );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 3 ) + " [" + RoundSigDigits( Numbers( 3 ), 2 ) + "] > " + cNumericFieldNames( 4 ) + " [" + RoundSigDigits( Numbers( 4 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 			if ( NumAlphas >= 4 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 4 ) ) ) {
-					ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-					ShowContinueError( trim( cAlphaFieldNames( 4 ) ) + " [" + trim( Alphas( 4 ) ) + "] is invlaid" );
+					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+					ShowContinueError( cAlphaFieldNames( 4 ) + " [" + Alphas( 4 ) + "] is invlaid" );
 				}
 			}
 			if ( NumAlphas >= 5 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 5 ) ) ) {
-					ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-					ShowContinueError( trim( cAlphaFieldNames( 5 ) ) + " [" + trim( Alphas( 5 ) ) + "] is invlaid" );
+					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+					ShowContinueError( cAlphaFieldNames( 5 ) + " [" + Alphas( 5 ) + "] is invlaid" );
 				}
 			}
 			if ( NumAlphas >= 6 ) {
 				if ( ! IsCurveOutputTypeValid( Alphas( 6 ) ) ) {
-					ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-					ShowContinueError( trim( cAlphaFieldNames( 6 ) ) + " [" + trim( Alphas( 6 ) ) + "] is invlaid" );
+					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+					ShowContinueError( cAlphaFieldNames( 6 ) + " [" + Alphas( 6 ) + "] is invlaid" );
 				}
 			}
 
 			if ( ! lNumericFieldBlanks( 7 ) ) {
 				TableData( TableNum ).NormalPoint = Numbers( 7 );
 				if ( Numbers( 7 ) == 0.0 ) {
-					ShowSevereError( "GetTableInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-					ShowContinueError( "..." + trim( cNumericFieldNames( 7 ) ) + " [" + trim( RoundSigDigits( Numbers( 7 ), 6 ) ) + "] is not a valid choice." );
+					ShowSevereError( "GetTableInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+					ShowContinueError( "..." + cNumericFieldNames( 7 ) + " [" + RoundSigDigits( Numbers( 7 ), 6 ) + "] is not a valid choice." );
 					ShowContinueError( "...Setting Normalization Reference to 1 and the simulation continues." );
 					TableData( TableNum ).NormalPoint = 1.0;
 				}
@@ -1874,8 +1873,8 @@ namespace CurveManager {
 
 			MaxTableNums = ( NumNumbers - 7 ) / 3;
 			if ( mod( ( NumNumbers - 7 ), 3 ) != 0 ) {
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( "The number of data entries must be evenly divisable by 3. Number of data entries = " + trim( RoundSigDigits( NumNumbers - 7 ) ) );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( "The number of data entries must be evenly divisable by 3. Number of data entries = " + RoundSigDigits( NumNumbers - 7 ) );
 				ErrorsFound = true;
 			} else {
 				for ( TableDataIndex = 1; TableDataIndex <= MaxTableNums; ++TableDataIndex ) {
@@ -1992,7 +1991,7 @@ namespace CurveManager {
 					TempArray2.deallocate();
 					TempArray3.deallocate();
 				} else {
-					ShowWarningError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
+					ShowWarningError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 					ShowContinueError( "The requested regression analysis is not available at this time. Curve type = " + Alphas( 2 ) );
 					PerfCurve( CurveIndex ).InterpolationType = LinearInterpolationOfTable;
 				}}
@@ -2020,7 +2019,7 @@ namespace CurveManager {
 			++TableNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -2029,7 +2028,7 @@ namespace CurveManager {
 			if ( NumPressureCurves > 0 ) {
 				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
 				if ( CurveFound != 0 ) {
-					ShowSevereError( "GetCurveInput: " + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", duplicate curve name." );
+					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
 					ErrorsFound = true;
 				}
@@ -2045,8 +2044,8 @@ namespace CurveManager {
 			} else if ( SELECT_CASE_var == "EVALUATECURVETOLIMITS" ) {
 				PerfCurve( CurveNum ).InterpolationType = EvaluateCurveToLimits;
 			} else {
-				ShowSevereError( "GetTableInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cAlphaFieldNames( 2 ) ) + " [" + trim( Alphas( 2 ) ) + "] is not a valid choice. " );
+				ShowSevereError( "GetTableInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cAlphaFieldNames( 2 ) + " [" + Alphas( 2 ) + "] is not a valid choice. " );
 				ErrorsFound = true;
 			}}
 
@@ -2070,8 +2069,8 @@ namespace CurveManager {
 			} else if ( SELECT_CASE_var == "TRIQUADRATIC" ) {
 				PerfCurve( CurveNum ).CurveType = TriQuadratic;
 			} else {
-				ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cAlphaFieldNames( 3 ) ) + " [" + trim( Alphas( 3 ) ) + "] is not a valid choice. " );
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cAlphaFieldNames( 3 ) + " [" + Alphas( 3 ) + "] is not a valid choice. " );
 				ErrorsFound = true;
 			}}
 
@@ -2079,8 +2078,8 @@ namespace CurveManager {
 			if ( SELECT_CASE_var == "SINGLELINEINDEPENDENTVARIABLEWITHMATRIX" ) {
 				PerfCurve( CurveNum ).DataFormat = SINGLELINEINDEPENDENTVARIABLEWITHMATRIX;
 			} else {
-				ShowSevereError( "GetTableInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cAlphaFieldNames( 4 ) ) + " [" + trim( Alphas( 4 ) ) + "] is not a valid choice. " );
+				ShowSevereError( "GetTableInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cAlphaFieldNames( 4 ) + " [" + Alphas( 4 ) + "] is not a valid choice. " );
 				ErrorsFound = true;
 			}}
 
@@ -2089,8 +2088,8 @@ namespace CurveManager {
 			if ( ! lNumericFieldBlanks( 2 ) ) {
 				TableData( TableNum ).NormalPoint = Numbers( 2 );
 				if ( Numbers( 2 ) == 0.0 ) {
-					ShowSevereError( "GetTableInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-					ShowContinueError( "..." + trim( cNumericFieldNames( 2 ) ) + " [" + trim( RoundSigDigits( Numbers( 2 ), 6 ) ) + "] is not a valid choice." );
+					ShowSevereError( "GetTableInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+					ShowContinueError( "..." + cNumericFieldNames( 2 ) + " [" + RoundSigDigits( Numbers( 2 ), 6 ) + "] is not a valid choice." );
 					ShowContinueError( "...Setting Normalization Reference to 1 and the simulation continues." );
 					TableData( TableNum ).NormalPoint = 1.0;
 				}
@@ -2109,64 +2108,64 @@ namespace CurveManager {
 			PerfCurve( CurveNum ).Var5Max = Numbers( 12 );
 
 			if ( Numbers( 3 ) > Numbers( 4 ) ) { // error
-				ShowSevereError( "GetTableInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 3 ) ) + " [" + trim( RoundSigDigits( Numbers( 3 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 4 ) ) + " [" + trim( RoundSigDigits( Numbers( 4 ), 2 ) ) + "]" );
+				ShowSevereError( "GetTableInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 3 ) + " [" + RoundSigDigits( Numbers( 3 ), 2 ) + "] > " + cNumericFieldNames( 4 ) + " [" + RoundSigDigits( Numbers( 4 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 			if ( Numbers( 5 ) > Numbers( 6 ) ) { // error
-				ShowSevereError( "GetTableInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 5 ) ) + " [" + trim( RoundSigDigits( Numbers( 5 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 6 ) ) + " [" + trim( RoundSigDigits( Numbers( 6 ), 2 ) ) + "]" );
+				ShowSevereError( "GetTableInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 5 ) + " [" + RoundSigDigits( Numbers( 5 ), 2 ) + "] > " + cNumericFieldNames( 6 ) + " [" + RoundSigDigits( Numbers( 6 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 			if ( Numbers( 7 ) > Numbers( 8 ) ) { // error
-				ShowSevereError( "GetTableInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 7 ) ) + " [" + trim( RoundSigDigits( Numbers( 7 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 8 ) ) + " [" + trim( RoundSigDigits( Numbers( 8 ), 2 ) ) + "]" );
+				ShowSevereError( "GetTableInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 7 ) + " [" + RoundSigDigits( Numbers( 7 ), 2 ) + "] > " + cNumericFieldNames( 8 ) + " [" + RoundSigDigits( Numbers( 8 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 			if ( Numbers( 9 ) > Numbers( 10 ) ) { // error
-				ShowSevereError( "GetTableInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 9 ) ) + " [" + trim( RoundSigDigits( Numbers( 9 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 10 ) ) + " [" + trim( RoundSigDigits( Numbers( 10 ), 2 ) ) + "]" );
+				ShowSevereError( "GetTableInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 9 ) + " [" + RoundSigDigits( Numbers( 9 ), 2 ) + "] > " + cNumericFieldNames( 10 ) + " [" + RoundSigDigits( Numbers( 10 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 			if ( Numbers( 11 ) > Numbers( 12 ) ) { // error
-				ShowSevereError( "GetTableInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 11 ) ) + " [" + trim( RoundSigDigits( Numbers( 11 ), 2 ) ) + "] > " + trim( cNumericFieldNames( 12 ) ) + " [" + trim( RoundSigDigits( Numbers( 12 ), 2 ) ) + "]" );
+				ShowSevereError( "GetTableInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 11 ) + " [" + RoundSigDigits( Numbers( 11 ), 2 ) + "] > " + cNumericFieldNames( 12 ) + " [" + RoundSigDigits( Numbers( 12 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
 			if ( NumAlphas >= 8 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 8 ) ) ) {
-					ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-					ShowContinueError( trim( cAlphaFieldNames( 8 ) ) + " [" + trim( Alphas( 8 ) ) + "] is invlaid" );
+					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+					ShowContinueError( cAlphaFieldNames( 8 ) + " [" + Alphas( 8 ) + "] is invlaid" );
 				}
 			}
 			if ( NumAlphas >= 9 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 9 ) ) ) {
-					ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-					ShowContinueError( trim( cAlphaFieldNames( 9 ) ) + " [" + trim( Alphas( 9 ) ) + "] is invlaid" );
+					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+					ShowContinueError( cAlphaFieldNames( 9 ) + " [" + Alphas( 9 ) + "] is invlaid" );
 				}
 			}
 			if ( NumAlphas >= 10 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 10 ) ) ) {
-					ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-					ShowContinueError( trim( cAlphaFieldNames( 10 ) ) + " [" + trim( Alphas( 10 ) ) + "] is invlaid" );
+					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+					ShowContinueError( cAlphaFieldNames( 10 ) + " [" + Alphas( 10 ) + "] is invlaid" );
 				}
 			}
 			if ( NumAlphas >= 11 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 11 ) ) ) {
-					ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-					ShowContinueError( trim( cAlphaFieldNames( 11 ) ) + " [" + trim( Alphas( 11 ) ) + "] is invlaid" );
+					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+					ShowContinueError( cAlphaFieldNames( 11 ) + " [" + Alphas( 11 ) + "] is invlaid" );
 				}
 			}
 			if ( NumAlphas >= 12 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 12 ) ) ) {
-					ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-					ShowContinueError( trim( cAlphaFieldNames( 12 ) ) + " [" + trim( Alphas( 12 ) ) + "] is invlaid" );
+					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+					ShowContinueError( cAlphaFieldNames( 12 ) + " [" + Alphas( 12 ) + "] is invlaid" );
 				}
 			}
 			if ( NumAlphas >= 13 ) {
 				if ( ! IsCurveOutputTypeValid( Alphas( 13 ) ) ) {
-					ShowSevereError( "GetCurveInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-					ShowContinueError( trim( cAlphaFieldNames( 13 ) ) + " [" + trim( Alphas( 13 ) ) + "] is invlaid" );
+					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+					ShowContinueError( cAlphaFieldNames( 13 ) + " [" + Alphas( 13 ) + "] is invlaid" );
 				}
 			}
 
@@ -2184,8 +2183,8 @@ namespace CurveManager {
 			} else if ( Alphas( 6 ) == "DESCENDING" ) {
 				PerfCurve( CurveNum ).X1SortOrder = DESCENDING;
 			} else {
-				ShowSevereError( "GetTableInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( "...Invalid " + trim( cAlphaFieldNames( 6 ) ) + " = " + trim( Alphas( 6 ) ) );
+				ShowSevereError( "GetTableInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( "...Invalid " + cAlphaFieldNames( 6 ) + " = " + Alphas( 6 ) );
 				ErrorsFound = true;
 			}
 			if ( Alphas( 7 ) == "ASCENDING" ) {
@@ -2193,8 +2192,8 @@ namespace CurveManager {
 			} else if ( Alphas( 7 ) == "DESCENDING" ) {
 				PerfCurve( CurveNum ).X2SortOrder = DESCENDING;
 			} else {
-				ShowSevereError( "GetTableInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( "...Invalid " + trim( cAlphaFieldNames( 7 ) ) + " = " + trim( Alphas( 7 ) ) );
+				ShowSevereError( "GetTableInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( "...Invalid " + cAlphaFieldNames( 7 ) + " = " + Alphas( 7 ) );
 				ErrorsFound = true;
 			}
 
@@ -2203,7 +2202,7 @@ namespace CurveManager {
 				FileName = Alphas( 5 );
 			} else {
 				ReadFromFile = false;
-				FileName = " ";
+				FileName = "";
 			}
 
 			ReadTableData( CurveNum, CurrentModuleObject, ReadFromFile, FileName, Alphas, Numbers, NumNumbers, ErrorsFound );
@@ -2250,8 +2249,8 @@ namespace CurveManager {
 					PerfCurveTableData( TableNum ).X2 = TableLookup( TableNum ).X2Var;
 					PerfCurveTableData( TableNum ).Y( _, _ ) = TableLookup( TableNum ).TableLookupZData( _, _, 1, 1, 1 );
 				} else {
-					ShowSevereError( "GetTableInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-					ShowContinueError( "...Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( Alphas( 2 ) ) );
+					ShowSevereError( "GetTableInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+					ShowContinueError( "...Invalid " + cAlphaFieldNames( 2 ) + " = " + Alphas( 2 ) );
 					ShowContinueError( "...Choice not allowed with more than 2 indpendent variables." );
 					ErrorsFound = true;
 				}}
@@ -2276,8 +2275,8 @@ namespace CurveManager {
 				} else {
 					// if linear interpolation of table is selected, fatal if more than 2 independent variables
 					if ( PerfCurve( CurveNum ).InterpolationType == LinearInterpolationOfTable ) {
-						ShowSevereError( "GetTableInput: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-						ShowContinueError( "...Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( Alphas( 2 ) ) );
+						ShowSevereError( "GetTableInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+						ShowContinueError( "...Invalid " + cAlphaFieldNames( 2 ) + " = " + Alphas( 2 ) );
 						ShowContinueError( "...Choice not allowed with more than 2 indpendent variables." );
 						ErrorsFound = true;
 					}
@@ -2413,10 +2412,10 @@ namespace CurveManager {
 	void
 	ReadTableData(
 		int const CurveNum,
-		Fstring & CurrentModuleObject,
+		std::string & CurrentModuleObject,
 		bool const ReadFromFile,
-		Fstring & FileName,
-		FArray1S_Fstring Alphas,
+		std::string & FileName,
+		FArray1S_string Alphas,
 		FArray1S< Real64 > Numbers,
 		int const NumNumbers,
 		bool & ErrorsFound
@@ -2456,7 +2455,7 @@ namespace CurveManager {
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const fmtA( "(A)" );
+		static gio::Fmt const fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2468,8 +2467,8 @@ namespace CurveManager {
 		int FileNum( 0 );
 		int endcol;
 		int TableNum;
-		Fstring NextLine( 400 ); // Line of data
-		int DataSetCount; // counter for number of lines read (used in some error messages)
+		std::string NextLine; // Line of data
+		int DataSetCount( 0 ); // counter for number of lines read (used in some error messages)
 		int ReadStat; // File read status
 		bool EOFonFile; // True if EOF during file read
 		int I; // Do loop indexes and data set counter
@@ -2486,18 +2485,18 @@ namespace CurveManager {
 		int NumbersOffset;
 		int BaseOffset;
 		static bool WriteHeaderOnce( true ); // eio header file write flag
-		Fstring CharTableData( 1000 ); // used to echo each line of table data read in to eio file
+		std::string CharTableData; // used to echo each line of table data read in to eio file
 		bool EchoTableDataToEio; // logical set equal to global and used to report to eio file
 		bool FileExists;
 		IOFlags non_adv; non_adv.na_on(); // For non-advancing list-directed output
 
 		// Formats
-		std::string const Format_140( "('! Reading external file tabular data for ',A,' \"',A,'\"')" );
-		std::string const Format_150( "('! Reading tabular data for ',A,' \"',A,'\"')" );
-		std::string const Format_110( "('! <READING LOOKUP TABLE DATA>')" );
-		std::string const Format_130( "('READING LOOKUP TABLE DATA')" );
-		std::string const Format_131( "('END READING LOOKUP TABLE DATA')" );
-		std::string const Format_160( "(1X,10(I2,2X))" );
+		static gio::Fmt const Format_140( "('! Reading external file tabular data for ',A,' \"',A,'\"')" );
+		static gio::Fmt const Format_150( "('! Reading tabular data for ',A,' \"',A,'\"')" );
+		static gio::Fmt const Format_110( "('! <READING LOOKUP TABLE DATA>')" );
+		static gio::Fmt const Format_130( "('READING LOOKUP TABLE DATA')" );
+		static gio::Fmt const Format_131( "('END READING LOOKUP TABLE DATA')" );
+		static gio::Fmt const Format_160( "(1X,10(I2,:,2X))" );
 
 		//Autodesk:Uninit Initialize variables used uninitialized
 		TotalDataSets = 0; //Autodesk:Uninit Force default initialization
@@ -2511,25 +2510,25 @@ namespace CurveManager {
 			if ( ! FileExists ) goto Label999;
 			FileNum = GetNewUnitNumber();
 			{ IOFlags flags; flags.ACTION( "read" ); gio::open( FileNum, TempFullFileName, flags ); if ( flags.err() ) goto Label999; }
-			gio::read( FileNum, fmtA ) >> NextLine;
-			endcol = len_trim( NextLine );
+			gio::read( FileNum, fmtA ) >> NextLine; trim( NextLine );
+			endcol = len( NextLine );
 			if ( endcol == 0 ) {
-				ShowWarningError( "ReadTableData: Blank line found in external file = " + trim( FileName ) );
+				ShowWarningError( "ReadTableData: Blank line found in external file = " + FileName );
 				ShowContinueError( "...Blank lines are not allowed. Will try to read next line." );
-				gio::read( FileNum, fmtA ) >> NextLine;
-				endcol = len_trim( NextLine );
+				gio::read( FileNum, fmtA ) >> NextLine; trim( NextLine );
+				endcol = len( NextLine );
 				if ( endcol == 0 ) {
-					ShowWarningError( "ReadTableData: Data not found on second line in external file = " + trim( FileName ) );
+					ShowWarningError( "ReadTableData: Data not found on second line in external file = " + FileName );
 					ShowContinueError( "...Check that file is ASCII text and that file is not locked by other applications." );
 					ShowFatalError( "External table data not found. Simulation will terminate." );
 				} else {
-					ShowWarningError( "Second read attempt found data in external file = " + trim( FileName ) );
+					ShowWarningError( "Second read attempt found data in external file = " + FileName );
 					ShowFatalError( "...Blank lines are not allowed. Simulation will terminate." );
 				}
 			}
 			if ( endcol > 0 ) {
-				if ( ichar( NextLine( endcol, endcol ) ) == iUnicode_end ) {
-					ShowSevereError( "ReadTableData: For Table:MultiVariableLookup \"" + trim( PerfCurve( CurveNum ).Name ) + "\" " " external file, appears to be a Unicode or binary file." );
+				if ( int( NextLine[ endcol - 1 ] ) == iUnicode_end ) {
+					ShowSevereError( "ReadTableData: For Table:MultiVariableLookup \"" + PerfCurve( CurveNum ).Name + "\" " " external file, appears to be a Unicode or binary file." );
 					ShowContinueError( "...This file cannot be read by this program. Please save as PC or Unix file and try again" );
 					ShowFatalError( "Program terminates due to previous condition." );
 				}
@@ -2539,8 +2538,8 @@ namespace CurveManager {
 
 			{ IOFlags flags; gio::read( FileNum, "*", flags ) >> NumIVars; ReadStat = flags.ios(); }
 			if ( NumIVars > 5 || NumIVars < 1 ) {
-				ShowSevereError( "ReadTableData: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
-				ShowContinueError( "...Invalid number of independent variables found in external file = " + trim( FileName ) );
+				ShowSevereError( "ReadTableData: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( "...Invalid number of independent variables found in external file = " + FileName );
 				ShowFatalError( "...Only 1 to 5 independent variables are allowed." );
 			}
 
@@ -2562,7 +2561,7 @@ namespace CurveManager {
 					WriteHeaderOnce = false;
 				}
 				gio::write( OutputFileInits, Format_130 );
-				gio::write( OutputFileInits, Format_140 ) << trim( CurrentModuleObject ) << trim( Alphas( 1 ) );
+				gio::write( OutputFileInits, Format_140 ) << CurrentModuleObject << Alphas( 1 );
 			}
 		} else {
 			if ( EchoTableDataToEio ) {
@@ -2571,11 +2570,11 @@ namespace CurveManager {
 					WriteHeaderOnce = false;
 				}
 				gio::write( OutputFileInits, Format_130 );
-				gio::write( OutputFileInits, Format_150 ) << trim( CurrentModuleObject ) << trim( Alphas( 1 ) );
+				gio::write( OutputFileInits, Format_150 ) << CurrentModuleObject << Alphas( 1 );
 			}
 			NumIVars = Numbers( 15 );
 			if ( NumIVars > 5 || NumIVars < 1 ) {
-				ShowSevereError( "ReadTableData: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
+				ShowSevereError( "ReadTableData: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 				ShowContinueError( "...Invalid number of independent variables." );
 				ShowFatalError( "...Only 1 to 5 independent variables are allowed." );
 			}
@@ -2644,7 +2643,7 @@ namespace CurveManager {
 					}
 
 				} else {
-					ShowSevereError( "ReadTableData: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
+					ShowSevereError( "ReadTableData: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 					ShowContinueError( "...The number of numeric inputs is less than expected." );
 					ErrorsFound = true;
 				}
@@ -2654,7 +2653,7 @@ namespace CurveManager {
 			for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
 				if ( I == 1 ) continue;
 				if ( TableLookup( TableNum ).X1Var( I ) <= TableLookup( TableNum ).X1Var( I - 1 ) ) {
-					ShowSevereError( "ReadTableData: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
+					ShowSevereError( "ReadTableData: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 					ShowContinueError( "...The values for the independent variable X1 must be in increasing (ascending) order." );
 					ErrorsFound = true;
 					break;
@@ -2692,7 +2691,7 @@ namespace CurveManager {
 						}
 
 					} else {
-						ShowSevereError( "ReadTableData: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
+						ShowSevereError( "ReadTableData: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 						ShowContinueError( "...The number of numeric inputs is less than expected." );
 						ErrorsFound = true;
 					}
@@ -2702,7 +2701,7 @@ namespace CurveManager {
 				for ( I = 1; I <= TableLookup( TableNum ).NumX2Vars; ++I ) {
 					if ( I == 1 ) continue;
 					if ( TableLookup( TableNum ).X2Var( I ) <= TableLookup( TableNum ).X2Var( I - 1 ) ) {
-						ShowSevereError( "ReadTableData: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
+						ShowSevereError( "ReadTableData: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 						ShowContinueError( "...The values for the independent variable X2 must be in increasing (ascending) order." );
 						ErrorsFound = true;
 						break;
@@ -2741,17 +2740,17 @@ namespace CurveManager {
 							}
 
 						} else {
-							ShowSevereError( "ReadTableData: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
+							ShowSevereError( "ReadTableData: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 							ShowContinueError( "...The number of numeric inputs is less than expected." );
 							ErrorsFound = true;
 						}
 					}
 
-					// check to make sure XVars are in increaseing (ascending) order
+					// check to make sure XVars are in increasing (ascending) order
 					for ( I = 1; I <= TableLookup( TableNum ).NumX3Vars; ++I ) {
 						if ( I == 1 ) continue;
 						if ( TableLookup( TableNum ).X3Var( I ) <= TableLookup( TableNum ).X3Var( I - 1 ) ) {
-							ShowSevereError( "ReadTableData: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
+							ShowSevereError( "ReadTableData: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 							ShowContinueError( "...The values for the independent variable X3 must be in increasing (ascending) order." );
 							ErrorsFound = true;
 							break;
@@ -2793,7 +2792,7 @@ namespace CurveManager {
 								}
 
 							} else {
-								ShowSevereError( "ReadTableData: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
+								ShowSevereError( "ReadTableData: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 								ShowContinueError( "...The number of numeric inputs is less than expected." );
 								ErrorsFound = true;
 							}
@@ -2803,7 +2802,7 @@ namespace CurveManager {
 						for ( I = 1; I <= TableLookup( TableNum ).NumX4Vars; ++I ) {
 							if ( I == 1 ) continue;
 							if ( TableLookup( TableNum ).X4Var( I ) <= TableLookup( TableNum ).X4Var( I - 1 ) ) {
-								ShowSevereError( "ReadTableData: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
+								ShowSevereError( "ReadTableData: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 								ShowContinueError( "...The values for the independent variable X4 must be in increasing (ascending) order." );
 								ErrorsFound = true;
 								break;
@@ -2843,7 +2842,7 @@ namespace CurveManager {
 									}
 
 								} else {
-									ShowSevereError( "ReadTableData: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
+									ShowSevereError( "ReadTableData: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 									ShowContinueError( "...The number of numeric inputs is less than expected." );
 									ErrorsFound = true;
 								}
@@ -2852,7 +2851,7 @@ namespace CurveManager {
 							for ( I = 1; I <= TableLookup( TableNum ).NumX5Vars; ++I ) {
 								if ( I == 1 ) continue;
 								if ( TableLookup( TableNum ).X5Var( I ) <= TableLookup( TableNum ).X5Var( I - 1 ) ) {
-									ShowSevereError( "ReadTableData: For " + trim( CurrentModuleObject ) + ": " + trim( Alphas( 1 ) ) );
+									ShowSevereError( "ReadTableData: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 									ShowContinueError( "...The values for the independent variable X5 must be in increasing (ascending) order." );
 									ErrorsFound = true;
 									break;
@@ -2967,20 +2966,20 @@ namespace CurveManager {
 					break;
 				}
 				if ( Var3Index == 0 ) {
-					ShowSevereError( "GetTableDataFile: For Table:MultiVariableLookup \"" + trim( PerfCurve( CurveNum ).Name ) + "\" " );
-					ShowContinueError( "...The value of the 3rd independent variable (" + trim( RoundSigDigits( Var3, 9 ) ) + ")" " does not match the values listed as valid entries for this independent variable." );
+					ShowSevereError( "GetTableDataFile: For Table:MultiVariableLookup \"" + PerfCurve( CurveNum ).Name + "\" " );
+					ShowContinueError( "...The value of the 3rd independent variable (" + RoundSigDigits( Var3, 9 ) + ") does not match the values listed as valid entries for this independent variable." );
 					ShowContinueError( "...Valid entries are: " );
-					if ( TableLookup( TableNum ).NumX3Vars >= 1 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X3Var( 1 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX3Vars >= 2 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X3Var( 2 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX3Vars >= 3 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X3Var( 3 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX3Vars >= 4 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X3Var( 4 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX3Vars >= 5 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X3Var( 5 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX3Vars >= 6 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X3Var( 6 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX3Vars >= 7 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X3Var( 7 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX3Vars >= 8 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X3Var( 8 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX3Vars >= 9 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X3Var( 9 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX3Vars >= 10 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X3Var( 10 ), 9 ) ) );
-					ShowContinueError( "...This occurs for data set = " + trim( RoundSigDigits( DataSetCount + 1 ) ) + " in data file = " + trim( FileName ) );
+					if ( TableLookup( TableNum ).NumX3Vars >= 1 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X3Var( 1 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX3Vars >= 2 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X3Var( 2 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX3Vars >= 3 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X3Var( 3 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX3Vars >= 4 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X3Var( 4 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX3Vars >= 5 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X3Var( 5 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX3Vars >= 6 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X3Var( 6 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX3Vars >= 7 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X3Var( 7 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX3Vars >= 8 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X3Var( 8 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX3Vars >= 9 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X3Var( 9 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX3Vars >= 10 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X3Var( 10 ), 9 ) );
+					ShowContinueError( "...This occurs for data set = " + RoundSigDigits( DataSetCount + 1 ) + " in data file = " + FileName );
 					ErrorsFound = true;
 					Var3Index = 1;
 				}
@@ -2997,20 +2996,20 @@ namespace CurveManager {
 					break;
 				}
 				if ( Var4Index == 0 ) {
-					ShowSevereError( "GetTableDataFile: For Table:MultiVariableLookup \"" + trim( PerfCurve( CurveNum ).Name ) + "\" " );
-					ShowContinueError( "...The value of the 4th independent variable (" + trim( RoundSigDigits( Var4, 9 ) ) + ")" " does not match the values listed as valid entries for this independent variable." );
+					ShowSevereError( "GetTableDataFile: For Table:MultiVariableLookup \"" + PerfCurve( CurveNum ).Name + "\" " );
+					ShowContinueError( "...The value of the 4th independent variable (" + RoundSigDigits( Var4, 9 ) + ") does not match the values listed as valid entries for this independent variable." );
 					ShowContinueError( "...Valid entries are: " );
-					if ( TableLookup( TableNum ).NumX4Vars >= 1 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X4Var( 1 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX4Vars >= 2 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X4Var( 2 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX4Vars >= 3 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X4Var( 3 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX4Vars >= 4 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X4Var( 4 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX4Vars >= 5 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X4Var( 5 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX4Vars >= 6 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X4Var( 6 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX4Vars >= 7 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X4Var( 7 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX4Vars >= 8 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X4Var( 8 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX4Vars >= 9 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X4Var( 9 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX4Vars >= 10 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X4Var( 10 ), 9 ) ) );
-					ShowContinueError( "...This occurs for data set = " + trim( RoundSigDigits( DataSetCount + 1 ) ) + " in data file = " + trim( FileName ) );
+					if ( TableLookup( TableNum ).NumX4Vars >= 1 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X4Var( 1 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX4Vars >= 2 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X4Var( 2 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX4Vars >= 3 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X4Var( 3 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX4Vars >= 4 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X4Var( 4 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX4Vars >= 5 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X4Var( 5 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX4Vars >= 6 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X4Var( 6 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX4Vars >= 7 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X4Var( 7 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX4Vars >= 8 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X4Var( 8 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX4Vars >= 9 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X4Var( 9 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX4Vars >= 10 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X4Var( 10 ), 9 ) );
+					ShowContinueError( "...This occurs for data set = " + RoundSigDigits( DataSetCount + 1 ) + " in data file = " + FileName );
 					ErrorsFound = true;
 					Var4Index = 1;
 				}
@@ -3027,20 +3026,20 @@ namespace CurveManager {
 					break;
 				}
 				if ( Var5Index == 0 && NumIVars > 4 ) {
-					ShowSevereError( "GetTableDataFile: For Table:MultiVariableLookup \"" + trim( PerfCurve( CurveNum ).Name ) + "\" " );
-					ShowContinueError( "...The value of the 5th independent variable (" + trim( RoundSigDigits( Var5, 9 ) ) + ")" " does not match the values listed as valid entries for this independent variable." );
+					ShowSevereError( "GetTableDataFile: For Table:MultiVariableLookup \"" + PerfCurve( CurveNum ).Name + "\" " );
+					ShowContinueError( "...The value of the 5th independent variable (" + RoundSigDigits( Var5, 9 ) + ") does not match the values listed as valid entries for this independent variable." );
 					ShowContinueError( "...Valid entries are: " );
-					if ( TableLookup( TableNum ).NumX5Vars >= 1 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X5Var( 1 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX5Vars >= 2 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X5Var( 2 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX5Vars >= 3 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X5Var( 3 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX5Vars >= 4 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X5Var( 4 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX5Vars >= 5 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X5Var( 5 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX5Vars >= 6 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X5Var( 6 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX5Vars >= 7 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X5Var( 7 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX5Vars >= 8 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X5Var( 8 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX5Vars >= 9 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X5Var( 9 ), 9 ) ) );
-					if ( TableLookup( TableNum ).NumX5Vars >= 10 ) ShowContinueError( "..." + trim( RoundSigDigits( TableLookup( TableNum ).X5Var( 10 ), 9 ) ) );
-					ShowContinueError( "...This occurs for data set = " + trim( RoundSigDigits( DataSetCount + 1 ) ) + " in data file = " + trim( FileName ) );
+					if ( TableLookup( TableNum ).NumX5Vars >= 1 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X5Var( 1 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX5Vars >= 2 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X5Var( 2 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX5Vars >= 3 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X5Var( 3 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX5Vars >= 4 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X5Var( 4 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX5Vars >= 5 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X5Var( 5 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX5Vars >= 6 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X5Var( 6 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX5Vars >= 7 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X5Var( 7 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX5Vars >= 8 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X5Var( 8 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX5Vars >= 9 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X5Var( 9 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX5Vars >= 10 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X5Var( 10 ), 9 ) );
+					ShowContinueError( "...This occurs for data set = " + RoundSigDigits( DataSetCount + 1 ) + " in data file = " + FileName );
 					ErrorsFound = true;
 					Var5Index = 1;
 				}
@@ -3181,14 +3180,14 @@ Label1000: ;
 		if ( ReadFromFile ) gio::close( FileNum );
 
 		if ( TotalDataSets < DataSetCount ) {
-			ShowSevereError( "GetTableDataFile: For Table:MultiVariableLookup \"" + trim( PerfCurve( CurveNum ).Name ) + "\" " );
-			ShowContinueError( "...The required number of data sets (" + trim( RoundSigDigits( TotalDataSets ) ) + ") is less than the number determined by the number and count of independent variables (" + trim( RoundSigDigits( DataSetCount ) ) + ")." );
+			ShowSevereError( "GetTableDataFile: For Table:MultiVariableLookup \"" + PerfCurve( CurveNum ).Name + "\" " );
+			ShowContinueError( "...The required number of data sets (" + RoundSigDigits( TotalDataSets ) + ") is less than the number determined by the number and count of independent variables (" + RoundSigDigits( DataSetCount ) + ")." );
 		}
 
 		return;
 
 Label999: ;
-		ShowSevereError( "CurveManager: SearchTableDataFile: " "Could not open Table Data File, expecting it as file name = " + trim( FileName ) );
+		ShowSevereError( "CurveManager: SearchTableDataFile: " "Could not open Table Data File, expecting it as file name = " + FileName );
 		ShowContinueError( "Certain run environments require a full path to be included with the file name in the input field." );
 		ShowContinueError( "Try again with putting full path and file name in the field." );
 		ShowFatalError( "Program terminates due to these conditions." );
@@ -3680,7 +3679,7 @@ Label999: ;
 
 		} else {
 			TableValue = 0.0;
-			ShowSevereError( "Errors found in table output calculation for " + trim( PerfCurve( CurveIndex ).Name ) );
+			ShowSevereError( "Errors found in table output calculation for " + PerfCurve( CurveIndex ).Name );
 			ShowContinueError( "...Possible causes are selection of Interpolation Method or Type or Number" " of Independent Variables or Points." );
 			ShowFatalError( "PerformanceTableObject: Previous error causes program termination." );
 		}}
@@ -3784,18 +3783,18 @@ Label999: ;
 			V2 = max( min( Var2, PerfCurve( CurveIndex ).Var2Max ), PerfCurve( CurveIndex ).Var2Min );
 			if ( TableLookup( TableIndex ).NumIndependentVars < 2 ) {
 				if ( PerfCurve( CurveIndex ).NumIVHighErrorIndex == 0 ) {
-					ShowSevereError( "TableLookupObject: " + trim( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) ) + "\" " + trim( PerfCurve( CurveIndex ).Name ) + "\"" );
+					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\" " + PerfCurve( CurveIndex ).Name + "\"" );
 					ShowContinueError( "...Excess number of independent variables (2) passed to subroutine " "when only 1 is required." );
 				}
-				ShowRecurringWarningErrorAtEnd( trim( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) ) + " \"" + trim( PerfCurve( CurveIndex ).Name ) + "\":" " Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 2.0, 2.0 );
+				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 2.0, 2.0 );
 			}
 		} else {
 			if ( TableLookup( TableIndex ).NumIndependentVars > 1 ) {
 				if ( PerfCurve( CurveIndex ).NumIVLowErrorIndex == 0 ) {
-					ShowSevereError( "TableLookupObject: " + trim( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) ) + "\" " + trim( PerfCurve( CurveIndex ).Name ) + "\"" );
+					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\" " + PerfCurve( CurveIndex ).Name + "\"" );
 					ShowContinueError( "...Insufficient number of independent variables (1) passed to subroutine " "when at least 2 are required." );
 				}
-				ShowRecurringWarningErrorAtEnd( trim( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) ) + " \"" + trim( PerfCurve( CurveIndex ).Name ) + "\":" " Insufficient number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVLowErrorIndex, 1.0, 1.0 );
+				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Insufficient number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVLowErrorIndex, 1.0, 1.0 );
 			}
 			V2 = 0.0;
 		}
@@ -3804,18 +3803,18 @@ Label999: ;
 			V3 = max( min( Var3, PerfCurve( CurveIndex ).Var3Max ), PerfCurve( CurveIndex ).Var3Min );
 			if ( TableLookup( TableIndex ).NumIndependentVars < 3 ) {
 				if ( PerfCurve( CurveIndex ).NumIVHighErrorIndex == 0 ) {
-					ShowSevereError( "TableLookupObject: " + trim( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) ) + "\" " + trim( PerfCurve( CurveIndex ).Name ) + "\"" );
+					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\" " + PerfCurve( CurveIndex ).Name + "\"" );
 					ShowContinueError( "...Excess number of independent variables (3) passed to subroutine " "when 2 or less are required." );
 				}
-				ShowRecurringWarningErrorAtEnd( trim( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) ) + " \"" + trim( PerfCurve( CurveIndex ).Name ) + "\":" " Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 3.0, 3.0 );
+				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 3.0, 3.0 );
 			}
 		} else {
 			if ( TableLookup( TableIndex ).NumIndependentVars > 2 ) {
 				if ( PerfCurve( CurveIndex ).NumIVLowErrorIndex == 0 ) {
-					ShowSevereError( "TableLookupObject: " + trim( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) ) + "\" " + trim( PerfCurve( CurveIndex ).Name ) + "\"" );
+					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\" " + PerfCurve( CurveIndex ).Name + "\"" );
 					ShowContinueError( "...Insufficient number of independent variables (2) passed to subroutine " "when at least 3 are required." );
 				}
-				ShowRecurringWarningErrorAtEnd( trim( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) ) + " \"" + trim( PerfCurve( CurveIndex ).Name ) + "\":" " Insufficient number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVLowErrorIndex, 2.0, 2.0 );
+				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Insufficient number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVLowErrorIndex, 2.0, 2.0 );
 			}
 			V3 = 0.0;
 		}
@@ -3824,18 +3823,18 @@ Label999: ;
 			V4 = max( min( Var4, PerfCurve( CurveIndex ).Var4Max ), PerfCurve( CurveIndex ).Var4Min );
 			if ( TableLookup( TableIndex ).NumIndependentVars < 4 ) {
 				if ( PerfCurve( CurveIndex ).NumIVHighErrorIndex == 0 ) {
-					ShowSevereError( "TableLookupObject: " + trim( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) ) + "\" " + trim( PerfCurve( CurveIndex ).Name ) + "\"" );
+					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\" " + PerfCurve( CurveIndex ).Name + "\"" );
 					ShowContinueError( "...Excess number of independent variables (4) passed to subroutine " "when 3 or less are required." );
 				}
-				ShowRecurringWarningErrorAtEnd( trim( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) ) + " \"" + trim( PerfCurve( CurveIndex ).Name ) + "\":" " Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 4.0, 4.0 );
+				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 4.0, 4.0 );
 			}
 		} else {
 			if ( TableLookup( TableIndex ).NumIndependentVars > 3 ) {
 				if ( PerfCurve( CurveIndex ).NumIVLowErrorIndex == 0 ) {
-					ShowSevereError( "TableLookupObject: " + trim( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) ) + "\" " + trim( PerfCurve( CurveIndex ).Name ) + "\"" );
+					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\" " + PerfCurve( CurveIndex ).Name + "\"" );
 					ShowContinueError( "...Insufficient number of independent variables (3) passed to subroutine " "when at least 4 are required." );
 				}
-				ShowRecurringWarningErrorAtEnd( trim( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) ) + " \"" + trim( PerfCurve( CurveIndex ).Name ) + "\":" " Insufficient number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVLowErrorIndex, 3.0, 3.0 );
+				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Insufficient number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVLowErrorIndex, 3.0, 3.0 );
 			}
 			V4 = 0.0;
 		}
@@ -3844,18 +3843,18 @@ Label999: ;
 			V5 = max( min( Var5, PerfCurve( CurveIndex ).Var5Max ), PerfCurve( CurveIndex ).Var5Min );
 			if ( TableLookup( TableIndex ).NumIndependentVars < 5 ) {
 				if ( PerfCurve( CurveIndex ).NumIVHighErrorIndex == 0 ) {
-					ShowSevereError( "TableLookupObject: " + trim( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) ) + "\" " + trim( PerfCurve( CurveIndex ).Name ) + "\"" );
+					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\" " + PerfCurve( CurveIndex ).Name + "\"" );
 					ShowContinueError( "...Excess number of independent variables (5) passed to subroutine " "when 4 or less are required." );
 				}
-				ShowRecurringWarningErrorAtEnd( trim( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) ) + " \"" + trim( PerfCurve( CurveIndex ).Name ) + "\":" " Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 5.0, 5.0 );
+				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 5.0, 5.0 );
 			}
 		} else {
 			if ( TableLookup( TableIndex ).NumIndependentVars > 4 ) {
 				if ( PerfCurve( CurveIndex ).NumIVLowErrorIndex == 0 ) {
-					ShowSevereError( "TableLookupObject: " + trim( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) ) + "\" " + trim( PerfCurve( CurveIndex ).Name ) + "\"" );
+					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\" " + PerfCurve( CurveIndex ).Name + "\"" );
 					ShowContinueError( "...Insufficient number of independent variables (4) passed to subroutine " "when at least 5 are required." );
 				}
-				ShowRecurringWarningErrorAtEnd( trim( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) ) + " \"" + trim( PerfCurve( CurveIndex ).Name ) + "\":" " Insufficient number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVLowErrorIndex, 4.0, 4.0 );
+				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Insufficient number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVLowErrorIndex, 4.0, 4.0 );
 			}
 			V5 = 0.0;
 		}
@@ -3976,7 +3975,7 @@ Label999: ;
 			VALSV5.deallocate();
 		} else {
 			TableValue = 0.0;
-			ShowSevereError( "Errors found in table output calculation for " + trim( PerfCurve( CurveIndex ).Name ) );
+			ShowSevereError( "Errors found in table output calculation for " + PerfCurve( CurveIndex ).Name );
 			ShowContinueError( "...Possible causes are selection of Interpolation Method or Type or Number" " of Independent Variables or Points." );
 			ShowFatalError( "PerformanceTableObject: Previous error causes program termination." );
 		}}
@@ -3991,8 +3990,8 @@ Label999: ;
 	void
 	SolveRegression(
 		int & CurveNum, // index to performance curve
-		Fstring & TableType, // tabular data object type
-		Fstring & CurveName, // performance curve name
+		std::string & TableType, // tabular data object type
+		std::string & CurveName, // performance curve name
 		FArray1S< Real64 > RawDataX, // table data X values (1st independent variable)
 		FArray1S< Real64 > RawDataY, // table data Y values (dependent variables)
 		Optional< FArray1S< Real64 > > RawDataX2 // table data X2 values (2nd independent variable)
@@ -4109,36 +4108,36 @@ Label999: ;
 		Real64 Est( 0.0 );
 		FArray1D< Real64 > Results; // performance curve coefficients
 		FArray2D< Real64 > A; // linear algebra matrix
-		Fstring StrCurve( MaxNameLength ); // string representation of curve type
+		std::string StrCurve; // string representation of curve type
 		static bool WriteHeaderOnce( true );
 		bool EchoTableDataToEio; // logical set equal to global and used to report to eio file
 
 		// Formats
-		std::string const Format_110( "('! <CREATING NEW CURVE OBJECT>')" );
-		std::string const Format_130( "('CREATING NEW CURVE OBJECT')" );
-		std::string const Format_140( "('! Input as ',A,' \"',A,'\"')" );
-		std::string const Format_150( "('! RSquared       = ',A)" );
-		std::string const Format_160( "('! Standard Error = ',A)" );
-		std::string const Format_170( "('! Sample Size    = ',A)" );
-		std::string const Format_180( "('Curve:',A,',')" );
-		std::string const Format_190( "('FromTable_',A,',  !- Name')" );
-		std::string const Format_200( "('  ',A,',  !- Coefficient1 Constant')" );
-		std::string const Format_210( "('  ',A,',  !- Coefficient2 x')" );
-		std::string const Format_300( "('  ',A,',  !- Minimum Value of x')" );
-		std::string const Format_310( "('  ',A,',  !- Maximum Value of x')" );
-		std::string const Format_340( "('  ',A,',  !- Minimum Curve Output')" );
-		std::string const Format_350( "('  ',A,';  !- Maximum Curve Output')" );
-		std::string const Format_360( "('END CREATING NEW CURVE OBJECT')" );
-		std::string const Format_220( "('  ',A,',  !- Coefficient3 x**2')" );
-		std::string const Format_230( "('  ',A,',  !- !- Coefficient4 x**3')" );
-		std::string const Format_240( "('  ',A,',  !- Coefficient4 y')" );
-		std::string const Format_250( "('  ',A,',  !- !- Coefficient5 x**4')" );
-		std::string const Format_260( "('  ',A,',  !- Coefficient5 y**2')" );
-		std::string const Format_270( "('  ',A,',  !- Coefficient5 xy')" );
-		std::string const Format_280( "('  ',A,',  !- Coefficient6 x*y')" );
-		std::string const Format_290( "('  ',A,',  !- Coefficient6 x**2y')" );
-		std::string const Format_320( "('  ',A,',  !- Minimum Value of y')" );
-		std::string const Format_330( "('  ',A,',  !- Maximum Value of y')" );
+		static gio::Fmt const Format_110( "('! <CREATING NEW CURVE OBJECT>')" );
+		static gio::Fmt const Format_130( "('CREATING NEW CURVE OBJECT')" );
+		static gio::Fmt const Format_140( "('! Input as ',A,' \"',A,'\"')" );
+		static gio::Fmt const Format_150( "('! RSquared       = ',A)" );
+		static gio::Fmt const Format_160( "('! Standard Error = ',A)" );
+		static gio::Fmt const Format_170( "('! Sample Size    = ',A)" );
+		static gio::Fmt const Format_180( "('Curve:',A,',')" );
+		static gio::Fmt const Format_190( "('FromTable_',A,',  !- Name')" );
+		static gio::Fmt const Format_200( "('  ',A,',  !- Coefficient1 Constant')" );
+		static gio::Fmt const Format_210( "('  ',A,',  !- Coefficient2 x')" );
+		static gio::Fmt const Format_300( "('  ',A,',  !- Minimum Value of x')" );
+		static gio::Fmt const Format_310( "('  ',A,',  !- Maximum Value of x')" );
+		static gio::Fmt const Format_340( "('  ',A,',  !- Minimum Curve Output')" );
+		static gio::Fmt const Format_350( "('  ',A,';  !- Maximum Curve Output')" );
+		static gio::Fmt const Format_360( "('END CREATING NEW CURVE OBJECT')" );
+		static gio::Fmt const Format_220( "('  ',A,',  !- Coefficient3 x**2')" );
+		static gio::Fmt const Format_230( "('  ',A,',  !- !- Coefficient4 x**3')" );
+		static gio::Fmt const Format_240( "('  ',A,',  !- Coefficient4 y')" );
+		static gio::Fmt const Format_250( "('  ',A,',  !- !- Coefficient5 x**4')" );
+		static gio::Fmt const Format_260( "('  ',A,',  !- Coefficient5 y**2')" );
+		static gio::Fmt const Format_270( "('  ',A,',  !- Coefficient5 xy')" );
+		static gio::Fmt const Format_280( "('  ',A,',  !- Coefficient6 x*y')" );
+		static gio::Fmt const Format_290( "('  ',A,',  !- Coefficient6 x**2y')" );
+		static gio::Fmt const Format_320( "('  ',A,',  !- Minimum Value of y')" );
+		static gio::Fmt const Format_330( "('  ',A,',  !- Maximum Value of y')" );
 
 		EchoTableDataToEio = DisplayAdvancedReportVariables;
 
@@ -4168,17 +4167,17 @@ Label999: ;
 		if ( isize( RawDataX ) < MatrixSize ) {
 			{ auto const SELECT_CASE_var( PerfCurve( CurveNum ).ObjectType );
 			if ( SELECT_CASE_var == CurveType_TableOneIV ) {
-				ShowSevereError( "TABLE:ONEINDEPENDENTVARIABLE: \"" + trim( PerfCurve( CurveNum ).Name ) + "\"" );
+				ShowSevereError( "TABLE:ONEINDEPENDENTVARIABLE: \"" + PerfCurve( CurveNum ).Name + "\"" );
 			} else if ( SELECT_CASE_var == CurveType_TableTwoIV ) {
-				ShowSevereError( "TABLE:TWOINDEPENDENTVARIABLES: \"" + trim( PerfCurve( CurveNum ).Name ) + "\"" );
+				ShowSevereError( "TABLE:TWOINDEPENDENTVARIABLES: \"" + PerfCurve( CurveNum ).Name + "\"" );
 			} else if ( SELECT_CASE_var == CurveType_TableMultiIV ) {
-				ShowSevereError( "TABLE:MULTIVARIABLELOOKUP: \"" + trim( PerfCurve( CurveNum ).Name ) + "\"" );
+				ShowSevereError( "TABLE:MULTIVARIABLELOOKUP: \"" + PerfCurve( CurveNum ).Name + "\"" );
 			} else {
-				ShowSevereError( "SOLVEREGRESSION: Incorrect object type with name = " + trim( PerfCurve( CurveNum ).Name ) + "\"" );
+				ShowSevereError( "SOLVEREGRESSION: Incorrect object type with name = " + PerfCurve( CurveNum ).Name + "\"" );
 			}}
 			ShowContinueError( "Insufficient data to calculate regression coefficients." );
-			ShowContinueError( "Required data pairs = " + trim( RoundSigDigits( MatrixSize ) ) );
-			ShowContinueError( "Entered data pairs  = " + trim( RoundSigDigits( size( RawDataX ) ) ) );
+			ShowContinueError( "Required data pairs = " + RoundSigDigits( MatrixSize ) );
+			ShowContinueError( "Entered data pairs  = " + RoundSigDigits( size( RawDataX ) ) );
 			ShowContinueError( "Setting interpolation type equal to LinearInterpolationOfTable and simulation continues." );
 			PerfCurve( CurveNum ).InterpolationType = LinearInterpolationOfTable;
 			return;
@@ -4478,57 +4477,57 @@ Label999: ;
 			}
 
 			gio::write( OutputFileInits, Format_130 );
-			gio::write( OutputFileInits, Format_140 ) << trim( TableType ) << trim( CurveName );
-			gio::write( OutputFileInits, Format_150 ) << trim( RoundSigDigits( RSquared, 10 ) );
-			gio::write( OutputFileInits, Format_160 ) << trim( RoundSigDigits( StandardError, 10 ) );
-			gio::write( OutputFileInits, Format_170 ) << trim( TrimSigDigits( N ) );
-			gio::write( OutputFileInits, Format_180 ) << trim( StrCurve );
-			gio::write( OutputFileInits, Format_190 ) << trim( CurveName );
-			gio::write( OutputFileInits, Format_200 ) << trim( RoundSigDigits( Results( 1 ), 10 ) );
+			gio::write( OutputFileInits, Format_140 ) << TableType << CurveName;
+			gio::write( OutputFileInits, Format_150 ) << RoundSigDigits( RSquared, 10 );
+			gio::write( OutputFileInits, Format_160 ) << RoundSigDigits( StandardError, 10 );
+			gio::write( OutputFileInits, Format_170 ) << TrimSigDigits( N );
+			gio::write( OutputFileInits, Format_180 ) << StrCurve;
+			gio::write( OutputFileInits, Format_190 ) << CurveName;
+			gio::write( OutputFileInits, Format_200 ) << RoundSigDigits( Results( 1 ), 10 );
 			{ auto const SELECT_CASE_var( PerfCurve( CurveNum ).CurveType );
 			if ( ( SELECT_CASE_var == Linear ) || ( SELECT_CASE_var == Quadratic ) || ( SELECT_CASE_var == Cubic ) || ( SELECT_CASE_var == Quartic ) || ( SELECT_CASE_var == BiQuadratic ) || ( SELECT_CASE_var == QuadraticLinear ) ) {
-				gio::write( OutputFileInits, Format_210 ) << trim( RoundSigDigits( Results( 2 ), 10 ) );
+				gio::write( OutputFileInits, Format_210 ) << RoundSigDigits( Results( 2 ), 10 );
 			} else {
 			}}
 			{ auto const SELECT_CASE_var( PerfCurve( CurveNum ).CurveType );
 			if ( ( SELECT_CASE_var == Quadratic ) || ( SELECT_CASE_var == Cubic ) || ( SELECT_CASE_var == Quartic ) || ( SELECT_CASE_var == BiQuadratic ) || ( SELECT_CASE_var == QuadraticLinear ) ) {
-				gio::write( OutputFileInits, Format_220 ) << trim( RoundSigDigits( Results( 3 ), 10 ) );
+				gio::write( OutputFileInits, Format_220 ) << RoundSigDigits( Results( 3 ), 10 );
 			} else {
 			}}
 			{ auto const SELECT_CASE_var( PerfCurve( CurveNum ).CurveType );
 			if ( ( SELECT_CASE_var == Cubic ) || ( SELECT_CASE_var == Quartic ) ) {
-				gio::write( OutputFileInits, Format_230 ) << trim( RoundSigDigits( Results( 4 ), 10 ) );
+				gio::write( OutputFileInits, Format_230 ) << RoundSigDigits( Results( 4 ), 10 );
 			} else if ( ( SELECT_CASE_var == BiQuadratic ) || ( SELECT_CASE_var == QuadraticLinear ) ) {
-				gio::write( OutputFileInits, Format_240 ) << trim( RoundSigDigits( Results( 4 ), 10 ) );
+				gio::write( OutputFileInits, Format_240 ) << RoundSigDigits( Results( 4 ), 10 );
 			} else {
 			}}
 			{ auto const SELECT_CASE_var( PerfCurve( CurveNum ).CurveType );
 			if ( SELECT_CASE_var == Quartic ) {
-				gio::write( OutputFileInits, Format_250 ) << trim( RoundSigDigits( Results( 5 ), 10 ) );
+				gio::write( OutputFileInits, Format_250 ) << RoundSigDigits( Results( 5 ), 10 );
 			} else if ( SELECT_CASE_var == BiQuadratic ) {
-				gio::write( OutputFileInits, Format_260 ) << trim( RoundSigDigits( Results( 5 ), 10 ) );
+				gio::write( OutputFileInits, Format_260 ) << RoundSigDigits( Results( 5 ), 10 );
 			} else if ( SELECT_CASE_var == QuadraticLinear ) {
-				gio::write( OutputFileInits, Format_270 ) << trim( RoundSigDigits( Results( 5 ), 10 ) );
+				gio::write( OutputFileInits, Format_270 ) << RoundSigDigits( Results( 5 ), 10 );
 			} else {
 			}}
 			{ auto const SELECT_CASE_var( PerfCurve( CurveNum ).CurveType );
 			if ( SELECT_CASE_var == BiQuadratic ) {
-				gio::write( OutputFileInits, Format_280 ) << trim( RoundSigDigits( Results( 6 ), 10 ) );
+				gio::write( OutputFileInits, Format_280 ) << RoundSigDigits( Results( 6 ), 10 );
 			} else if ( SELECT_CASE_var == QuadraticLinear ) {
-				gio::write( OutputFileInits, Format_290 ) << trim( RoundSigDigits( Results( 6 ), 10 ) );
+				gio::write( OutputFileInits, Format_290 ) << RoundSigDigits( Results( 6 ), 10 );
 			} else {
 			}}
-			gio::write( OutputFileInits, Format_300 ) << trim( RoundSigDigits( MinX, 10 ) );
-			gio::write( OutputFileInits, Format_310 ) << trim( RoundSigDigits( MaxX, 10 ) );
+			gio::write( OutputFileInits, Format_300 ) << RoundSigDigits( MinX, 10 );
+			gio::write( OutputFileInits, Format_310 ) << RoundSigDigits( MaxX, 10 );
 			{ auto const SELECT_CASE_var( PerfCurve( CurveNum ).CurveType );
 			if ( SELECT_CASE_var == Quartic ) {
 			} else if ( ( SELECT_CASE_var == BiQuadratic ) || ( SELECT_CASE_var == QuadraticLinear ) ) {
-				gio::write( OutputFileInits, Format_320 ) << trim( RoundSigDigits( MinX2, 10 ) );
-				gio::write( OutputFileInits, Format_330 ) << trim( RoundSigDigits( MaxX2, 10 ) );
+				gio::write( OutputFileInits, Format_320 ) << RoundSigDigits( MinX2, 10 );
+				gio::write( OutputFileInits, Format_330 ) << RoundSigDigits( MaxX2, 10 );
 			} else {
 			}}
-			gio::write( OutputFileInits, Format_340 ) << trim( RoundSigDigits( MinY, 10 ) );
-			gio::write( OutputFileInits, Format_350 ) << trim( RoundSigDigits( MaxY, 10 ) );
+			gio::write( OutputFileInits, Format_340 ) << RoundSigDigits( MinY, 10 );
+			gio::write( OutputFileInits, Format_350 ) << RoundSigDigits( MaxY, 10 );
 			gio::write( OutputFileInits, Format_360 );
 		}
 
@@ -4639,7 +4638,7 @@ Label999: ;
 	}
 
 	bool
-	IsCurveInputTypeValid( Fstring const & InInputType ) // index of curve in curve array
+	IsCurveInputTypeValid( std::string const & InInputType ) // index of curve in curve array
 	{
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Jason Glazer
@@ -4676,7 +4675,7 @@ Label999: ;
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
-		if ( len_trim( InInputType ) > 0 ) {
+		if ( len( InInputType ) > 0 ) {
 			if ( SameString( InInputType, "DIMENSIONLESS" ) ) {
 				IsCurveInputTypeValid = true;
 			} else if ( SameString( InInputType, "TEMPERATURE" ) ) {
@@ -4704,7 +4703,7 @@ Label999: ;
 	}
 
 	bool
-	IsCurveOutputTypeValid( Fstring const & InOutputType ) // index of curve in curve array
+	IsCurveOutputTypeValid( std::string const & InOutputType ) // index of curve in curve array
 	{
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Jason Glazer
@@ -4758,7 +4757,7 @@ Label999: ;
 		return IsCurveOutputTypeValid;
 	}
 
-	Fstring
+	std::string
 	GetCurveType( int const CurveIndex ) // index of curve in curve array
 	{
 
@@ -4781,7 +4780,7 @@ Label999: ;
 		// na
 
 		// Return value
-		Fstring GetCurveType( 32 );
+		std::string GetCurveType;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -4839,12 +4838,12 @@ Label999: ;
 
 			}}
 		} else {
-			GetCurveType = " ";
+			GetCurveType = "";
 		}
 		return GetCurveType;
 	}
 
-	Fstring
+	std::string
 	GetCurveName( int const CurveIndex ) // index of curve in curve array
 	{
 
@@ -4867,7 +4866,7 @@ Label999: ;
 		// na
 
 		// Return value
-		Fstring GetCurveName( MaxNameLength );
+		std::string GetCurveName;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -4887,13 +4886,13 @@ Label999: ;
 		if ( CurveIndex > 0 ) {
 			GetCurveName = PerfCurve( CurveIndex ).Name;
 		} else {
-			GetCurveName = " ";
+			GetCurveName = "";
 		}
 		return GetCurveName;
 	}
 
 	int
-	GetCurveIndex( Fstring const & CurveName ) // name of the curve
+	GetCurveIndex( std::string const & CurveName ) // name of the curve
 	{
 
 		// FUNCTION INFORMATION:
@@ -4954,9 +4953,9 @@ Label999: ;
 
 	int
 	GetCurveCheck(
-		Fstring const & alph, // curve name
+		std::string const & alph, // curve name
 		bool & errFlag,
-		Fstring const & ObjName // parent object of curve
+		std::string const & ObjName // parent object of curve
 	)
 	{
 
@@ -4999,7 +4998,7 @@ Label999: ;
 
 		GetCurveCheckOut = GetCurveIndex( alph ); // convert curve name to pointer
 		if ( GetCurveCheckOut == 0 ) {
-			ShowSevereError( "Curve Not Found for Object=\"" + trim( ObjName ) + "\" :: " + trim( alph ) );
+			ShowSevereError( "Curve Not Found for Object=\"" + ObjName + "\" :: " + alph );
 			errFlag = true;
 		}
 		return GetCurveCheckOut;
@@ -5114,7 +5113,7 @@ Label999: ;
 
 		} else {
 
-			ShowSevereError( "SetCurveOutputMinMaxValues: CurveIndex=[" + trim( TrimSigDigits( CurveIndex ) ) + "] not in range of curves=[1:" + trim( TrimSigDigits( NumCurves ) ) + "]." );
+			ShowSevereError( "SetCurveOutputMinMaxValues: CurveIndex=[" + TrimSigDigits( CurveIndex ) + "] not in range of curves=[1:" + TrimSigDigits( NumCurves ) + "]." );
 			ErrorsFound = true;
 
 		}
@@ -5153,7 +5152,7 @@ Label999: ;
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const CurveObjectName( MaxNameLength, "Curve:Functional:PressureDrop" );
+		static std::string const CurveObjectName( "Curve:Functional:PressureDrop" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -5163,7 +5162,7 @@ Label999: ;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumPressure;
-		FArray1D_Fstring Alphas( 1, sFstring( MaxNameLength ) ); // Alpha items for object
+		FArray1D_string Alphas( 1 ); // Alpha items for object
 		FArray1D< Real64 > Numbers( 5 ); // Numeric items for object
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
@@ -5180,7 +5179,7 @@ Label999: ;
 			GetObjectItem( CurveObjectName, CurveNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PressureCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, trim( CurveObjectName ) + " Name" );
+			VerifyName( Alphas( 1 ), PressureCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurveObjectName + " Name" );
 			if ( IsNotOK ) {
 				ErrsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -5189,7 +5188,7 @@ Label999: ;
 			if ( NumCurves > 0 ) {
 				CurveFound = FindItemInList( Alphas( 1 ), PerfCurve.Name(), NumCurves );
 				if ( CurveFound != 0 ) {
-					ShowSevereError( "GetPressureCurveInput: " + trim( CurveObjectName ) + "=\"" + trim( Alphas( 1 ) ) + "\", duplicate curve name." );
+					ShowSevereError( "GetPressureCurveInput: " + CurveObjectName + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Performance Curves. Names must be unique across all curves." );
 					ErrsFound = true;
 				}
@@ -5217,7 +5216,7 @@ Label999: ;
 
 	void
 	GetPressureCurveTypeAndIndex(
-		Fstring const & PressureCurveName, // name of the curve
+		std::string const & PressureCurveName, // name of the curve
 		int & PressureCurveType,
 		int & PressureCurveIndex
 	)
@@ -5266,7 +5265,7 @@ Label999: ;
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int TempCurveIndex;
 		bool FoundCurve;
-		Fstring GenericCurveType( 32 );
+		std::string GenericCurveType;
 
 		//If input is not gotten, go ahead and get it now
 		if ( GetCurvesInputFlag ) {
@@ -5320,7 +5319,7 @@ Label999: ;
 		//If we made it here, we didn't find either type of match
 
 		//Last check, see if it is blank:
-		if ( PressureCurveName == " " ) {
+		if ( PressureCurveName == "" ) {
 			PressureCurveType = PressureCurve_None;
 			return;
 		}
@@ -5476,8 +5475,8 @@ Label999: ;
 		Real64 Term1;
 		Real64 Term2;
 		Real64 Term3;
-		Fstring RR( MaxNameLength );
-		Fstring Re( MaxNameLength );
+		std::string RR;
+		std::string Re;
 		static bool FrictionFactorErrorHasOccurred( false );
 
 		//Check for no flow before calculating values
@@ -5503,7 +5502,7 @@ Label999: ;
 				RR = RoundSigDigits( RoughnessRatio, 7 );
 				Re = RoundSigDigits( ReynoldsNumber, 1 );
 				ShowSevereError( "Plant Pressure System: Error in moody friction factor calculation" );
-				ShowContinueError( "Current Conditions: Roughness Ratio=" + trim( RR ) + "; Reynolds Number=" + trim( Re ) );
+				ShowContinueError( "Current Conditions: Roughness Ratio=" + RR + "; Reynolds Number=" + Re );
 				ShowContinueError( "These conditions resulted in an unhandled numeric issue." );
 				ShowContinueError( "Please contact EnergyPlus support/development team to raise an alert about this issue" );
 				ShowContinueError( "This issue will occur only one time.  The friction factor has been reset to 0.04 for calculations" );

@@ -3,7 +3,6 @@
 #include <ObjexxFCL/FArrayS.functions.hh>
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/MArray.functions.hh>
 
 // EnergyPlus Headers
@@ -59,7 +58,6 @@ namespace RoomAirModelUserTempPattern {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::DisplayExtraWarnings;
 	using namespace DataRoomAirModel;
 
@@ -342,7 +340,7 @@ namespace RoomAirModelUserTempPattern {
 
 			if ( CurPatrnID == 0 ) {
 				// throw error here ? way to test schedules before getting to this point?
-				ShowFatalError( "User defined room air pattern index not found: " + trim( IntToStr( CurntPatternKey ) ) );
+				ShowFatalError( "User defined room air pattern index not found: " + IntToStr( CurntPatternKey ) );
 				return;
 			}
 
@@ -887,9 +885,9 @@ namespace RoomAirModelUserTempPattern {
 		if ( SurfMinZ < ( ZoneZorig - TolValue ) ) {
 			if ( DisplayExtraWarnings ) {
 				ShowWarningError( "RoomAirModelUserTempPattern: Problem in non-dimensional height calculation" );
-				ShowContinueError( "too low surface: " + trim( Surface( thisHBsurf ).Name ) + " in zone: " + trim( Zone( thisZone ).Name ) );
-				ShowContinueError( "**** Average floor height of zone is: " + trim( RoundSigDigits( ZoneZorig, 3 ) ) );
-				ShowContinueError( "**** Surface minimum height is: " + trim( RoundSigDigits( SurfMinZ, 3 ) ) );
+				ShowContinueError( "too low surface: " + Surface( thisHBsurf ).Name + " in zone: " + Zone( thisZone ).Name );
+				ShowContinueError( "**** Average floor height of zone is: " + RoundSigDigits( ZoneZorig, 3 ) );
+				ShowContinueError( "**** Surface minimum height is: " + RoundSigDigits( SurfMinZ, 3 ) );
 			} else {
 				++TotalRoomAirPatternTooLow;
 			}
@@ -898,9 +896,9 @@ namespace RoomAirModelUserTempPattern {
 		if ( SurfMaxZ > ( ZoneZorig + ZoneCeilHeight + TolValue ) ) {
 			if ( DisplayExtraWarnings ) {
 				ShowWarningError( "RoomAirModelUserTempPattern: Problem in non-dimensional height calculation" );
-				ShowContinueError( " too high surface: " + trim( Surface( thisHBsurf ).Name ) + " in zone: " + trim( Zone( thisZone ).Name ) );
-				ShowContinueError( "**** Average Ceiling height of zone is: " + trim( RoundSigDigits( ( ZoneZorig + ZoneCeilHeight ), 3 ) ) );
-				ShowContinueError( "**** Surface Maximum height is: " + trim( RoundSigDigits( SurfMaxZ, 3 ) ) );
+				ShowContinueError( " too high surface: " + Surface( thisHBsurf ).Name + " in zone: " + Zone( thisZone ).Name );
+				ShowContinueError( "**** Average Ceiling height of zone is: " + RoundSigDigits( ( ZoneZorig + ZoneCeilHeight ), 3 ) );
+				ShowContinueError( "**** Surface Maximum height is: " + RoundSigDigits( SurfMaxZ, 3 ) );
 			} else {
 				++TotalRoomAirPatternTooHigh;
 			}

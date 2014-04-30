@@ -6,7 +6,6 @@
 #include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/FArray2D.hh>
 #include <ObjexxFCL/FArray3D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -18,7 +17,6 @@ namespace EnergyPlus {
 namespace WeatherManager {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -65,8 +63,8 @@ namespace WeatherManager {
 	extern Real64 const Sigma; // Stefan-Boltzmann constant
 	extern Real64 const TKelvin; // conversion from Kelvin to Celsius
 
-	extern Fstring const Blank;
-	extern FArray1D_Fstring const DaysOfWeek;
+	extern std::string const Blank;
+	extern FArray1D_string const DaysOfWeek;
 
 	extern bool Debugout;
 
@@ -80,12 +78,12 @@ namespace WeatherManager {
 	extern int YearofSim; // The Present year of Simulation.
 	extern int const NumDaysInYear;
 	extern int EnvironmentReportNbr; // Report number for the environment stamp
-	extern Fstring EnvironmentReportChr; // Report number for the environment stamp (character -- for printing)
+	extern std::string EnvironmentReportChr; // Report number for the environment stamp (character -- for printing)
 	extern int TimeStampReportNbr; // Report number for the time stamp
-	extern Fstring TimeStampReportChr; // Report number for the time stamp (character -- for printing)
+	extern std::string TimeStampReportChr; // Report number for the time stamp (character -- for printing)
 	extern int WeatherDataReport; // Report number for the weather data
 	extern bool WeatherFileExists; // Set to true if a weather file exists
-	extern Fstring LocationTitle; // Location Title from input File
+	extern std::string LocationTitle; // Location Title from input File
 	extern bool LocationGathered; // flag to show if Location exists on Input File (we assume one is there and
 	// correct on weather file)
 
@@ -195,7 +193,7 @@ namespace WeatherManager {
 	extern FArray1D< Real64 > SPSiteDiffuseSolarScheduleValue; // reporting Diffuse Solar Schedule Value
 	extern FArray1D< Real64 > SPSiteSkyTemperatureScheduleValue; // reporting SkyTemperature Modifier Schedule Value
 	extern FArray1D_int SPSiteScheduleNamePtr; // SP Site Schedule Name Ptrs
-	extern FArray1D_Fstring SPSiteScheduleUnits; // SP Site Schedule Units
+	extern FArray1D_string SPSiteScheduleUnits; // SP Site Schedule Units
 	extern int NumSPSiteScheduleNamePtrs; // Number of SP Site Schedules (DesignDay only)
 	extern int NumMissing; // Number of hours of missing data
 	extern bool StripCR; // If true, strip last character (<cr> off each EPW line)
@@ -218,8 +216,8 @@ namespace WeatherManager {
 	struct EnvironmentData
 	{
 		// Members
-		Fstring Title; // Environment name
-		Fstring cKindOfEnvrn; // kind of environment
+		std::string Title; // Environment name
+		std::string cKindOfEnvrn; // kind of environment
 		int KindOfEnvrn; // Type of environment (see Parameters for KindOfSim in DataGlobals)
 		int TotalDays; // Number of days in environment
 		int StartJDay; // Day of year of first day of environment
@@ -253,8 +251,8 @@ namespace WeatherManager {
 
 		// Default Constructor
 		EnvironmentData() :
-			Title( 100, Blank ),
-			cKindOfEnvrn( 100, Blank ),
+			Title( Blank ),
+			cKindOfEnvrn( Blank ),
 			KindOfEnvrn( 0 ),
 			TotalDays( 0 ),
 			StartJDay( 0 ),
@@ -289,8 +287,8 @@ namespace WeatherManager {
 
 		// Member Constructor
 		EnvironmentData(
-			Fstring const & Title, // Environment name
-			Fstring const & cKindOfEnvrn, // kind of environment
+			std::string const & Title, // Environment name
+			std::string const & cKindOfEnvrn, // kind of environment
 			int const KindOfEnvrn, // Type of environment (see Parameters for KindOfSim in DataGlobals)
 			int const TotalDays, // Number of days in environment
 			int const StartJDay, // Day of year of first day of environment
@@ -322,8 +320,8 @@ namespace WeatherManager {
 			bool const ActualWeather, // true when using actual weather data
 			int const RawSimDays // number of basic sim days.
 		) :
-			Title( 100, Title ),
-			cKindOfEnvrn( 100, cKindOfEnvrn ),
+			Title( Title ),
+			cKindOfEnvrn( cKindOfEnvrn ),
 			KindOfEnvrn( KindOfEnvrn ),
 			TotalDays( TotalDays ),
 			StartJDay( StartJDay ),
@@ -361,7 +359,7 @@ namespace WeatherManager {
 	struct DesignDayData
 	{
 		// Members
-		Fstring Title; // Environment name
+		std::string Title; // Environment name
 		Real64 MaxDryBulb; // Maximum Dry-Bulb Temperature (C)
 		Real64 DailyDBRange; // Daily Temperature Range (deltaC)
 		Real64 HumIndValue; // Humidity Indicating Value at Max Dry-bulb Temperature
@@ -391,7 +389,6 @@ namespace WeatherManager {
 
 		// Default Constructor
 		DesignDayData() :
-			Title( MaxNameLength, Blank ),
 			MaxDryBulb( 0.0 ),
 			DailyDBRange( 0.0 ),
 			HumIndValue( 0.0 ),
@@ -421,7 +418,7 @@ namespace WeatherManager {
 
 		// Member Constructor
 		DesignDayData(
-			Fstring const & Title, // Environment name
+			std::string const & Title, // Environment name
 			Real64 const MaxDryBulb, // Maximum Dry-Bulb Temperature (C)
 			Real64 const DailyDBRange, // Daily Temperature Range (deltaC)
 			Real64 const HumIndValue, // Humidity Indicating Value at Max Dry-bulb Temperature
@@ -448,7 +445,7 @@ namespace WeatherManager {
 			bool const PressureEntered, // true if a pressure was entered in design day data
 			bool const DewPointNeedsSet // true if the Dewpoint humidicating value needs to be set (after location determined)
 		) :
-			Title( MaxNameLength, Title ),
+			Title( Title ),
 			MaxDryBulb( MaxDryBulb ),
 			DailyDBRange( DailyDBRange ),
 			HumIndValue( HumIndValue ),
@@ -481,8 +478,8 @@ namespace WeatherManager {
 	struct RunPeriodData
 	{
 		// Members
-		Fstring Title;
-		Fstring PeriodType;
+		std::string Title;
+		std::string PeriodType;
 		int TotalDays; // total number of days in requested period
 		int StartMonth;
 		int StartDay;
@@ -508,8 +505,6 @@ namespace WeatherManager {
 
 		// Default Constructor
 		RunPeriodData() :
-			Title( MaxNameLength, Blank ),
-			PeriodType( MaxNameLength, Blank ),
 			TotalDays( 0 ),
 			StartMonth( 1 ),
 			StartDay( 1 ),
@@ -536,8 +531,8 @@ namespace WeatherManager {
 
 		// Member Constructor
 		RunPeriodData(
-			Fstring const & Title,
-			Fstring const & PeriodType,
+			std::string const & Title,
+			std::string const & PeriodType,
 			int const TotalDays, // total number of days in requested period
 			int const StartMonth,
 			int const StartDay,
@@ -561,8 +556,8 @@ namespace WeatherManager {
 			bool const TreatYearsAsConsecutive, // When year rolls over, increment year and recalculate Leap Year
 			bool const ActualWeather // true when using actual weather data
 		) :
-			Title( MaxNameLength, Title ),
-			PeriodType( MaxNameLength, PeriodType ),
+			Title( Title ),
+			PeriodType( PeriodType ),
 			TotalDays( TotalDays ),
 			StartMonth( StartMonth ),
 			StartDay( StartDay ),
@@ -647,7 +642,7 @@ namespace WeatherManager {
 	struct SpecialDayData
 	{
 		// Members
-		Fstring Name; // Name
+		std::string Name; // Name
 		int DateType; // Date type as read in from IDF
 		int Month; // Start Month
 		int Day; // Start Day of month or Count for DateTypes=NthDayOfMonth
@@ -662,7 +657,6 @@ namespace WeatherManager {
 
 		// Default Constructor
 		SpecialDayData() :
-			Name( MaxNameLength, Blank ),
 			DateType( 0 ),
 			Month( 0 ),
 			Day( 0 ),
@@ -678,7 +672,7 @@ namespace WeatherManager {
 
 		// Member Constructor
 		SpecialDayData(
-			Fstring const & Name, // Name
+			std::string const & Name, // Name
 			int const DateType, // Date type as read in from IDF
 			int const Month, // Start Month
 			int const Day, // Start Day of month or Count for DateTypes=NthDayOfMonth
@@ -691,7 +685,7 @@ namespace WeatherManager {
 			int const ActStDay,
 			bool const Used // Set to true in a run period after use (NthDayOfMonth and LastDayOfMonth only)
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			DateType( DateType ),
 			Month( Month ),
 			Day( Day ),
@@ -710,8 +704,8 @@ namespace WeatherManager {
 	struct DataPeriodData
 	{
 		// Members
-		Fstring Name; // DataPeriod Title
-		Fstring DayOfWeek; // Start Day of Week for DataPeriod
+		std::string Name; // DataPeriod Title
+		std::string DayOfWeek; // Start Day of Week for DataPeriod
 		int NumYearsData; // Number of years for which data is present in EPW.
 		int WeekDay;
 		int StMon;
@@ -728,8 +722,6 @@ namespace WeatherManager {
 
 		// Default Constructor
 		DataPeriodData() :
-			Name( MaxNameLength, Blank ),
-			DayOfWeek( 10, Blank ),
 			NumYearsData( 1 ),
 			WeekDay( 0 ),
 			StMon( 0 ),
@@ -747,8 +739,8 @@ namespace WeatherManager {
 
 		// Member Constructor
 		DataPeriodData(
-			Fstring const & Name, // DataPeriod Title
-			Fstring const & DayOfWeek, // Start Day of Week for DataPeriod
+			std::string const & Name, // DataPeriod Title
+			std::string const & DayOfWeek, // Start Day of Week for DataPeriod
 			int const NumYearsData, // Number of years for which data is present in EPW.
 			int const WeekDay,
 			int const StMon,
@@ -763,8 +755,8 @@ namespace WeatherManager {
 			int const DataEnJDay,
 			bool const HasYearData
 		) :
-			Name( MaxNameLength, Name ),
-			DayOfWeek( 10, DayOfWeek ),
+			Name( Name ),
+			DayOfWeek( DayOfWeek ),
 			NumYearsData( NumYearsData ),
 			WeekDay( WeekDay ),
 			StMon( StMon ),
@@ -1059,12 +1051,12 @@ namespace WeatherManager {
 	struct TypicalExtremeData
 	{
 		// Members
-		Fstring Title; // Environment name
-		Fstring ShortTitle; // Environment name
-		Fstring MatchValue; // String to be matched for input/running these periods for design.
-		Fstring MatchValue1; // String to be also matched (synonym)
-		Fstring MatchValue2; // String to be also matched (synonym)
-		Fstring TEType; // Typical or Extreme
+		std::string Title; // Environment name
+		std::string ShortTitle; // Environment name
+		std::string MatchValue; // String to be matched for input/running these periods for design.
+		std::string MatchValue1; // String to be also matched (synonym)
+		std::string MatchValue2; // String to be also matched (synonym)
+		std::string TEType; // Typical or Extreme
 		int TotalDays; // Number of days in environment
 		int StartJDay; // Day of year of first day of environment
 		int StartMonth;
@@ -1075,12 +1067,6 @@ namespace WeatherManager {
 
 		// Default Constructor
 		TypicalExtremeData() :
-			Title( MaxNameLength, Blank ),
-			ShortTitle( 20, Blank ),
-			MatchValue( 20, Blank ),
-			MatchValue1( 20, Blank ),
-			MatchValue2( 20, Blank ),
-			TEType( 20, Blank ),
 			TotalDays( 0 ),
 			StartJDay( 0 ),
 			StartMonth( 0 ),
@@ -1092,12 +1078,12 @@ namespace WeatherManager {
 
 		// Member Constructor
 		TypicalExtremeData(
-			Fstring const & Title, // Environment name
-			Fstring const & ShortTitle, // Environment name
-			Fstring const & MatchValue, // String to be matched for input/running these periods for design.
-			Fstring const & MatchValue1, // String to be also matched (synonym)
-			Fstring const & MatchValue2, // String to be also matched (synonym)
-			Fstring const & TEType, // Typical or Extreme
+			std::string const & Title, // Environment name
+			std::string const & ShortTitle, // Environment name
+			std::string const & MatchValue, // String to be matched for input/running these periods for design.
+			std::string const & MatchValue1, // String to be also matched (synonym)
+			std::string const & MatchValue2, // String to be also matched (synonym)
+			std::string const & TEType, // Typical or Extreme
 			int const TotalDays, // Number of days in environment
 			int const StartJDay, // Day of year of first day of environment
 			int const StartMonth,
@@ -1106,12 +1092,12 @@ namespace WeatherManager {
 			int const EndDay,
 			int const EndJDay
 		) :
-			Title( MaxNameLength, Title ),
-			ShortTitle( 20, ShortTitle ),
-			MatchValue( 20, MatchValue ),
-			MatchValue1( 20, MatchValue1 ),
-			MatchValue2( 20, MatchValue2 ),
-			TEType( 20, TEType ),
+			Title( Title ),
+			ShortTitle( ShortTitle ),
+			MatchValue( MatchValue ),
+			MatchValue1( MatchValue1 ),
+			MatchValue2( MatchValue2 ),
+			TEType( TEType ),
 			TotalDays( TotalDays ),
 			StartJDay( StartJDay ),
 			StartMonth( StartMonth ),
@@ -1126,8 +1112,8 @@ namespace WeatherManager {
 	struct WeatherProperties
 	{
 		// Members
-		Fstring Name; // Reference Name
-		Fstring ScheduleName; // Schedule Name or Algorithm Name
+		std::string Name; // Reference Name
+		std::string ScheduleName; // Schedule Name or Algorithm Name
 		bool IsSchedule; // Default is using Schedule
 		int CalculationType;
 		int SchedulePtr; // pointer to schedule when used
@@ -1135,8 +1121,6 @@ namespace WeatherManager {
 
 		// Default Constructor
 		WeatherProperties() :
-			Name( MaxNameLength, Blank ),
-			ScheduleName( MaxNameLength, Blank ),
 			IsSchedule( true ),
 			CalculationType( 0 ),
 			SchedulePtr( 0 ),
@@ -1145,15 +1129,15 @@ namespace WeatherManager {
 
 		// Member Constructor
 		WeatherProperties(
-			Fstring const & Name, // Reference Name
-			Fstring const & ScheduleName, // Schedule Name or Algorithm Name
+			std::string const & Name, // Reference Name
+			std::string const & ScheduleName, // Schedule Name or Algorithm Name
 			bool const IsSchedule, // Default is using Schedule
 			int const CalculationType,
 			int const SchedulePtr, // pointer to schedule when used
 			bool const UsedForEnvrn
 		) :
-			Name( MaxNameLength, Name ),
-			ScheduleName( MaxNameLength, ScheduleName ),
+			Name( Name ),
+			ScheduleName( ScheduleName ),
 			IsSchedule( IsSchedule ),
 			CalculationType( CalculationType ),
 			SchedulePtr( SchedulePtr ),
@@ -1260,7 +1244,7 @@ namespace WeatherManager {
 
 	void
 	InterpretWeatherDataLine(
-		Fstring & Line,
+		std::string & Line,
 		bool & ErrorFound,
 		int & WYear,
 		int & WMonth,
@@ -1437,8 +1421,8 @@ namespace WeatherManager {
 
 	void
 	ProcessEPWHeader(
-		Fstring const & HeaderString,
-		Fstring & Line,
+		std::string const & HeaderString,
+		std::string & Line,
 		bool & ErrorsFound
 	);
 

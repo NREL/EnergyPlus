@@ -7,7 +7,6 @@
 #include <ObjexxFCL/FArray3D.hh>
 #include <ObjexxFCL/FArray4D.hh>
 #include <ObjexxFCL/FArray5D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -18,7 +17,6 @@ namespace EnergyPlus {
 namespace DataDaylighting {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// -only module should be available to other modules and routines.
@@ -42,7 +40,7 @@ namespace DataDaylighting {
 	extern int const NoDaylighting;
 	extern int const DetailedDaylighting;
 	extern int const DElightDaylighting;
-	extern FArray1D_Fstring const DaylightTypes;
+	extern FArray1D_string const DaylightTypes;
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -54,7 +52,7 @@ namespace DataDaylighting {
 	extern int TotIllumMaps;
 	extern bool mapResultsToReport; // used when only partial hour has "sun up"
 	extern bool mapResultsReported; // when no map results are ever reported this will still be false
-	extern Fstring MapColSep; // Character for separating map columns (tab, space, comma)
+	extern std::string MapColSep; // Character for separating map columns (tab, space, comma)
 
 	extern bool DFSReportSizingDays;
 	extern bool DFSReportAllShadowCalculationDays;
@@ -311,7 +309,7 @@ namespace DataDaylighting {
 	struct IllumMapData
 	{
 		// Members
-		Fstring Name; // Map name
+		std::string Name; // Map name
 		int Zone; // Pointer to zone being mapped
 		Real64 Z; // Elevation or height
 		Real64 Xmin; // Minimum X value
@@ -328,7 +326,6 @@ namespace DataDaylighting {
 
 		// Default Constructor
 		IllumMapData() :
-			Name( MaxNameLength ),
 			Zone( 0 ),
 			Z( 0.0 ),
 			Xmin( 0.0 ),
@@ -346,7 +343,7 @@ namespace DataDaylighting {
 
 		// Member Constructor
 		IllumMapData(
-			Fstring const & Name, // Map name
+			std::string const & Name, // Map name
 			int const Zone, // Pointer to zone being mapped
 			Real64 const Z, // Elevation or height
 			Real64 const Xmin, // Minimum X value
@@ -361,7 +358,7 @@ namespace DataDaylighting {
 			bool const HeaderXLineLengthNeeded, // X header will likely be the longest line in the file
 			int const HeaderXLineLength // actual length of this X header line
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			Zone( Zone ),
 			Z( Z ),
 			Xmin( Xmin ),

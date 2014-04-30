@@ -30,14 +30,14 @@ protected: // Creation
 	// Default Constructor
 	inline
 	ObserverSingle() :
-		observer_p_( 0 )
+		observer_p_( nullptr )
 	{}
 
 	// Copy Constructor
 	inline
 	ObserverSingle( ObserverSingle const & ) :
 		Observer(),
-		observer_p_( 0 )
+		observer_p_( nullptr )
 	{}
 
 public: // Creation
@@ -75,7 +75,7 @@ public: // Subject Inspector
 	void
 	remove_observer( Observer & observer ) const
 	{
-		if ( observer_p_ == &observer ) observer_p_ = 0;
+		if ( observer_p_ == &observer ) observer_p_ = nullptr;
 	}
 
 	// Has At Least One Observer?
@@ -83,7 +83,7 @@ public: // Subject Inspector
 	bool
 	has_observer() const
 	{
-		return observer_p_;
+		return ( observer_p_ != nullptr );
 	}
 
 	// Notify Observers that this Subject is Being Destructed

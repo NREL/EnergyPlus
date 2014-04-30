@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace PlantValves {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -34,7 +32,7 @@ namespace PlantValves {
 	{
 		// Members
 		// user input data
-		Fstring Name; // User identifier
+		std::string Name; // User identifier
 		int PltInletNodeNum; // Node number on the inlet side of the plant
 		int PltOutletNodeNum; // Node number on the outlet side of the plant
 		int PltStream2NodeNum; // Node number on the outlet side of the second stream
@@ -56,7 +54,6 @@ namespace PlantValves {
 
 		// Default Constructor
 		TemperValveData() :
-			Name( MaxNameLength ),
 			PltInletNodeNum( 0 ),
 			PltOutletNodeNum( 0 ),
 			PltStream2NodeNum( 0 ),
@@ -77,7 +74,7 @@ namespace PlantValves {
 
 		// Member Constructor
 		TemperValveData(
-			Fstring const & Name, // User identifier
+			std::string const & Name, // User identifier
 			int const PltInletNodeNum, // Node number on the inlet side of the plant
 			int const PltOutletNodeNum, // Node number on the outlet side of the plant
 			int const PltStream2NodeNum, // Node number on the outlet side of the second stream
@@ -95,7 +92,7 @@ namespace PlantValves {
 			int const BranchNum,
 			int const CompNum
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			PltInletNodeNum( PltInletNodeNum ),
 			PltOutletNodeNum( PltOutletNodeNum ),
 			PltStream2NodeNum( PltStream2NodeNum ),
@@ -124,7 +121,7 @@ namespace PlantValves {
 	void
 	SimPlantValves(
 		int const CompTypeNum,
-		Fstring const & CompName,
+		std::string const & CompName,
 		int & CompNum,
 		bool const RunFlag, // unused1208
 		bool & InitLoopEquip,

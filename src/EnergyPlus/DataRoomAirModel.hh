@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray2D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -15,18 +14,17 @@ namespace EnergyPlus {
 namespace DataRoomAirModel {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// module should be available to other modules and routines.  Thus,
 	// all variables in this module must be PUBLIC.
 
 	// MODULE PARAMETER DEFINITIONS
-	extern Fstring const cUserDefinedControlObject;
-	extern Fstring const cTempPatternConstGradientObject;
-	extern Fstring const cTempPatternTwoGradientObject;
-	extern Fstring const cTempPatternNDHeightObject;
-	extern Fstring const cTempPatternSurfMapObject;
+	extern std::string const cUserDefinedControlObject;
+	extern std::string const cTempPatternConstGradientObject;
+	extern std::string const cTempPatternTwoGradientObject;
+	extern std::string const cTempPatternNDHeightObject;
+	extern std::string const cTempPatternSurfMapObject;
 
 	// Parameters to indicate room air model selected
 	extern int const RoomAirModel_UserDefined; // user defined patterns
@@ -36,7 +34,7 @@ namespace DataRoomAirModel {
 	extern int const RoomAirModel_UCSDCV; // UCSD-CV
 	extern int const RoomAirModel_UCSDUFI; // UCSD UFAD interior zone model
 	extern int const RoomAirModel_UCSDUFE; // UCSD UFAD interior zone model
-	extern FArray1D_Fstring const ChAirModel;
+	extern FArray1D_string const ChAirModel;
 
 	// Parameters to indicate air temperature coupling scheme
 	extern int const DirectCoupling; // direct coupling scheme
@@ -234,8 +232,8 @@ namespace DataRoomAirModel {
 	struct AirModelData
 	{
 		// Members
-		Fstring AirModelName;
-		Fstring ZoneName;
+		std::string AirModelName;
+		std::string ZoneName;
 		int ZonePtr; // Pointer to the zone number for this statement
 		int AirModelType; // 1 = Mixing, 2 = Mundt, 3 = Rees and Haves,
 		// 4 = UCSDDV, 5 = UCSDCV, -1 = user defined
@@ -247,8 +245,6 @@ namespace DataRoomAirModel {
 
 		// Default Constructor
 		AirModelData() :
-			AirModelName( MaxNameLength ),
-			ZoneName( MaxNameLength ),
 			ZonePtr( 0 ),
 			AirModelType( RoomAirModel_Mixing ),
 			TempCoupleScheme( DirectCoupling ),
@@ -257,15 +253,15 @@ namespace DataRoomAirModel {
 
 		// Member Constructor
 		AirModelData(
-			Fstring const & AirModelName,
-			Fstring const & ZoneName,
+			std::string const & AirModelName,
+			std::string const & ZoneName,
 			int const ZonePtr, // Pointer to the zone number for this statement
 			int const AirModelType, // 1 = Mixing, 2 = Mundt, 3 = Rees and Haves,
 			int const TempCoupleScheme, // 1 = absolute (direct),
 			bool const SimAirModel // FALSE if Mixing air model is currently used and
 		) :
-			AirModelName( MaxNameLength, AirModelName ),
-			ZoneName( MaxNameLength, ZoneName ),
+			AirModelName( AirModelName ),
+			ZoneName( ZoneName ),
 			ZonePtr( ZonePtr ),
 			AirModelType( AirModelType ),
 			TempCoupleScheme( TempCoupleScheme ),
@@ -277,8 +273,8 @@ namespace DataRoomAirModel {
 	struct AirNodeData
 	{
 		// Members
-		Fstring Name; // name
-		Fstring ZoneName;
+		std::string Name; // name
+		std::string ZoneName;
 		int ZonePtr; // Pointer to the zone number for this statement
 		int ClassType; // depending on type of model
 		Real64 Height; // height
@@ -286,8 +282,6 @@ namespace DataRoomAirModel {
 
 		// Default Constructor
 		AirNodeData() :
-			Name( MaxNameLength ),
-			ZoneName( MaxNameLength ),
 			ZonePtr( 0 ),
 			ClassType( 0 ),
 			Height( 0.0 )
@@ -295,15 +289,15 @@ namespace DataRoomAirModel {
 
 		// Member Constructor
 		AirNodeData(
-			Fstring const & Name, // name
-			Fstring const & ZoneName,
+			std::string const & Name, // name
+			std::string const & ZoneName,
 			int const ZonePtr, // Pointer to the zone number for this statement
 			int const ClassType, // depending on type of model
 			Real64 const Height, // height
 			FArray1_bool const & SurfMask // limit of 60 surfaces at current sizing
 		) :
-			Name( MaxNameLength, Name ),
-			ZoneName( MaxNameLength, ZoneName ),
+			Name( Name ),
+			ZoneName( ZoneName ),
 			ZonePtr( ZonePtr ),
 			ClassType( ClassType ),
 			Height( Height ),
@@ -315,10 +309,10 @@ namespace DataRoomAirModel {
 	struct DVData
 	{
 		// Members
-		Fstring ZoneName; // Name of zone
+		std::string ZoneName; // Name of zone
 		int ZonePtr; // Pointer to the zone number for this statement
 		int SchedGainsPtr; // Schedule for internal gain fraction to occupied zone
-		Fstring SchedGainsName; // Gains Schedule name
+		std::string SchedGainsName; // Gains Schedule name
 		Real64 NumPlumesPerOcc; // Effective number of plumes per occupant
 		Real64 ThermostatHeight; // Height of thermostat/ temperature control sensor
 		Real64 ComfortHeight; // Height at which air temperature is measured for comfort purposes
@@ -326,10 +320,8 @@ namespace DataRoomAirModel {
 
 		// Default Constructor
 		DVData() :
-			ZoneName( MaxNameLength ),
 			ZonePtr( 0 ),
 			SchedGainsPtr( -1 ),
-			SchedGainsName( MaxNameLength ),
 			NumPlumesPerOcc( 1.0 ),
 			ThermostatHeight( 0.0 ),
 			ComfortHeight( 0.0 ),
@@ -338,19 +330,19 @@ namespace DataRoomAirModel {
 
 		// Member Constructor
 		DVData(
-			Fstring const & ZoneName, // Name of zone
+			std::string const & ZoneName, // Name of zone
 			int const ZonePtr, // Pointer to the zone number for this statement
 			int const SchedGainsPtr, // Schedule for internal gain fraction to occupied zone
-			Fstring const & SchedGainsName, // Gains Schedule name
+			std::string const & SchedGainsName, // Gains Schedule name
 			Real64 const NumPlumesPerOcc, // Effective number of plumes per occupant
 			Real64 const ThermostatHeight, // Height of thermostat/ temperature control sensor
 			Real64 const ComfortHeight, // Height at which air temperature is measured for comfort purposes
 			Real64 const TempTrigger // Minimum temperature difference between TOC TMX for stratification
 		) :
-			ZoneName( MaxNameLength, ZoneName ),
+			ZoneName( ZoneName ),
 			ZonePtr( ZonePtr ),
 			SchedGainsPtr( SchedGainsPtr ),
-			SchedGainsName( MaxNameLength, SchedGainsName ),
+			SchedGainsName( SchedGainsName ),
 			NumPlumesPerOcc( NumPlumesPerOcc ),
 			ThermostatHeight( ThermostatHeight ),
 			ComfortHeight( ComfortHeight ),
@@ -362,34 +354,32 @@ namespace DataRoomAirModel {
 	struct CVData
 	{
 		// Members
-		Fstring ZoneName; // Name of zone
+		std::string ZoneName; // Name of zone
 		int ZonePtr; // Pointer to the zone number for this statement
 		int SchedGainsPtr; // Schedule for internal gain fraction to occupied zone
-		Fstring SchedGainsName; // Gains Schedule name
+		std::string SchedGainsName; // Gains Schedule name
 		int VforComfort; // Use Recirculation or Jet velocity and temperatures
 		// for comfort models
 
 		// Default Constructor
 		CVData() :
-			ZoneName( MaxNameLength ),
 			ZonePtr( -1 ),
 			SchedGainsPtr( -1 ),
-			SchedGainsName( MaxNameLength ),
 			VforComfort( VComfort_Invalid )
 		{}
 
 		// Member Constructor
 		CVData(
-			Fstring const & ZoneName, // Name of zone
+			std::string const & ZoneName, // Name of zone
 			int const ZonePtr, // Pointer to the zone number for this statement
 			int const SchedGainsPtr, // Schedule for internal gain fraction to occupied zone
-			Fstring const & SchedGainsName, // Gains Schedule name
+			std::string const & SchedGainsName, // Gains Schedule name
 			int const VforComfort // Use Recirculation or Jet velocity and temperatures
 		) :
-			ZoneName( MaxNameLength, ZoneName ),
+			ZoneName( ZoneName ),
 			ZonePtr( ZonePtr ),
 			SchedGainsPtr( SchedGainsPtr ),
-			SchedGainsName( MaxNameLength, SchedGainsName ),
+			SchedGainsName( SchedGainsName ),
 			VforComfort( VforComfort )
 		{}
 
@@ -496,7 +486,7 @@ namespace DataRoomAirModel {
 	struct UFIData
 	{
 		// Members
-		Fstring ZoneName; // Name of zone
+		std::string ZoneName; // Name of zone
 		int ZonePtr; // Pointer to the zone number for this statement
 		int ZoneEquipPtr; // Pointer to zone equip for this UFAD zone
 		Real64 DiffusersPerZone; // Number of diffusers in this zone
@@ -520,7 +510,6 @@ namespace DataRoomAirModel {
 
 		// Default Constructor
 		UFIData() :
-			ZoneName( MaxNameLength ),
 			ZonePtr( 0 ),
 			ZoneEquipPtr( 0 ),
 			DiffusersPerZone( 0.0 ),
@@ -543,7 +532,7 @@ namespace DataRoomAirModel {
 
 		// Member Constructor
 		UFIData(
-			Fstring const & ZoneName, // Name of zone
+			std::string const & ZoneName, // Name of zone
 			int const ZonePtr, // Pointer to the zone number for this statement
 			int const ZoneEquipPtr, // Pointer to zone equip for this UFAD zone
 			Real64 const DiffusersPerZone, // Number of diffusers in this zone
@@ -563,7 +552,7 @@ namespace DataRoomAirModel {
 			Real64 const D_Kc, // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
 			Real64 const E_Kc // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
 		) :
-			ZoneName( MaxNameLength, ZoneName ),
+			ZoneName( ZoneName ),
 			ZonePtr( ZonePtr ),
 			ZoneEquipPtr( ZoneEquipPtr ),
 			DiffusersPerZone( DiffusersPerZone ),
@@ -589,7 +578,7 @@ namespace DataRoomAirModel {
 	struct UFEData
 	{
 		// Members
-		Fstring ZoneName; // Name of zone
+		std::string ZoneName; // Name of zone
 		int ZonePtr; // Pointer to the zone number for this statement
 		int ZoneEquipPtr; // Pointer to zone equip for this UFAD zone
 		Real64 DiffusersPerZone; // Number of diffusers in this zone
@@ -616,7 +605,6 @@ namespace DataRoomAirModel {
 
 		// Default Constructor
 		UFEData() :
-			ZoneName( MaxNameLength ),
 			ZonePtr( 0 ),
 			ZoneEquipPtr( 0 ),
 			DiffusersPerZone( 0.0 ),
@@ -642,7 +630,7 @@ namespace DataRoomAirModel {
 
 		// Member Constructor
 		UFEData(
-			Fstring const & ZoneName, // Name of zone
+			std::string const & ZoneName, // Name of zone
 			int const ZonePtr, // Pointer to the zone number for this statement
 			int const ZoneEquipPtr, // Pointer to zone equip for this UFAD zone
 			Real64 const DiffusersPerZone, // Number of diffusers in this zone
@@ -665,7 +653,7 @@ namespace DataRoomAirModel {
 			Real64 const NumExtWin, // number of exterior windows in the zone
 			bool const ShadeDown // signals shade up or down
 		) :
-			ZoneName( MaxNameLength, ZoneName ),
+			ZoneName( ZoneName ),
 			ZonePtr( ZonePtr ),
 			ZoneEquipPtr( ZoneEquipPtr ),
 			DiffusersPerZone( DiffusersPerZone ),
@@ -695,7 +683,7 @@ namespace DataRoomAirModel {
 	{
 		// Members
 		// user variables
-		FArray1D_Fstring SurfName; // user defined name
+		FArray1D_string SurfName; // user defined name
 		FArray1D< Real64 > DeltaTai; // (Tai - MAT ) offset from mean air temp
 		int NumSurfs; // number of surfaces in this pattern
 		//calculated and from elsewhere
@@ -703,13 +691,12 @@ namespace DataRoomAirModel {
 
 		// Default Constructor
 		SurfMapPattern() :
-			SurfName( sFstring( MaxNameLength ) ),
 			NumSurfs( 0 )
 		{}
 
 		// Member Constructor
 		SurfMapPattern(
-			FArray1_Fstring const & SurfName, // user defined name
+			FArray1_string const & SurfName, // user defined name
 			FArray1< Real64 > const & DeltaTai, // (Tai - MAT ) offset from mean air temp
 			int const NumSurfs, // number of surfaces in this pattern
 			FArray1_int const & SurfID // index in HB surface structure array
@@ -726,21 +713,20 @@ namespace DataRoomAirModel {
 	{
 		// Members
 		//user variables
-		Fstring Name; // name
+		std::string Name; // name
 		Real64 Gradient; // value of vertical gradient [C/m]
 
 		// Default Constructor
 		ConstGradPattern() :
-			Name( MaxNameLength ),
 			Gradient( 0.0 )
 		{}
 
 		// Member Constructor
 		ConstGradPattern(
-			Fstring const & Name, // name
+			std::string const & Name, // name
 			Real64 const Gradient // value of vertical gradient [C/m]
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			Gradient( Gradient )
 		{}
 
@@ -750,7 +736,7 @@ namespace DataRoomAirModel {
 	{
 		// Members
 		//user variables
-		Fstring Name; // name
+		std::string Name; // name
 		Real64 TstatHeight; // Height of thermostat/ temperature control sensor
 		Real64 TleavingHeight; // height of return air node where leaving zone
 		Real64 TexhaustHeight; // height of exhaust air node where leaving zone
@@ -764,7 +750,6 @@ namespace DataRoomAirModel {
 
 		// Default Constructor
 		TwoVertGradInterpolPattern() :
-			Name( MaxNameLength ),
 			TstatHeight( 0.0 ),
 			TleavingHeight( 0.0 ),
 			TexhaustHeight( 0.0 ),
@@ -779,7 +764,7 @@ namespace DataRoomAirModel {
 
 		// Member Constructor
 		TwoVertGradInterpolPattern(
-			Fstring const & Name, // name
+			std::string const & Name, // name
 			Real64 const TstatHeight, // Height of thermostat/ temperature control sensor
 			Real64 const TleavingHeight, // height of return air node where leaving zone
 			Real64 const TexhaustHeight, // height of exhaust air node where leaving zone
@@ -791,7 +776,7 @@ namespace DataRoomAirModel {
 			Real64 const UpperBoundHeatRateScale, // load value for HiGradient
 			Real64 const LowerBoundHeatRateScale // load value for lowGradient
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			TstatHeight( TstatHeight ),
 			TleavingHeight( TleavingHeight ),
 			TexhaustHeight( TexhaustHeight ),
@@ -830,7 +815,7 @@ namespace DataRoomAirModel {
 	struct TemperaturePatternStruct // RoomAirPattern
 	{
 		// Members
-		Fstring Name; // unique identifier
+		std::string Name; // unique identifier
 		int PatrnID; // control ID for referencing in Schedules
 		int PatternMode; // Control for what type of calcs in this pattern
 		ConstGradPattern GradPatrn; // Constant gradient pattern
@@ -843,7 +828,6 @@ namespace DataRoomAirModel {
 
 		// Default Constructor
 		TemperaturePatternStruct() :
-			Name( MaxNameLength ),
 			PatrnID( 0 ),
 			PatternMode( 0 ),
 			DeltaTstat( 0.0 ),
@@ -853,7 +837,7 @@ namespace DataRoomAirModel {
 
 		// Member Constructor
 		TemperaturePatternStruct(
-			Fstring const & Name, // unique identifier
+			std::string const & Name, // unique identifier
 			int const PatrnID, // control ID for referencing in Schedules
 			int const PatternMode, // Control for what type of calcs in this pattern
 			ConstGradPattern const & GradPatrn, // Constant gradient pattern
@@ -864,7 +848,7 @@ namespace DataRoomAirModel {
 			Real64 const DeltaTleaving, // (Tleaving - MAT) deg C
 			Real64 const DeltaTexhaust // (Texhaust - MAT) deg C
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			PatrnID( PatrnID ),
 			PatternMode( PatternMode ),
 			GradPatrn( GradPatrn ),
@@ -881,14 +865,13 @@ namespace DataRoomAirModel {
 	struct SurfaceAssocNestedStruct
 	{
 		// Members
-		Fstring Name; // unique identifier
+		std::string Name; // unique identifier
 		int SurfID; // id in HB surface structs
 		Real64 TadjacentAir; // place to put resulting temperature value
 		Real64 Zeta; // non-dimensional height in zone ot
 
 		// Default Constructor
 		SurfaceAssocNestedStruct() :
-			Name( MaxNameLength ),
 			SurfID( 0 ),
 			TadjacentAir( 23.0 ),
 			Zeta( 0.0 )
@@ -896,12 +879,12 @@ namespace DataRoomAirModel {
 
 		// Member Constructor
 		SurfaceAssocNestedStruct(
-			Fstring const & Name, // unique identifier
+			std::string const & Name, // unique identifier
 			int const SurfID, // id in HB surface structs
 			Real64 const TadjacentAir, // place to put resulting temperature value
 			Real64 const Zeta // non-dimensional height in zone ot
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			SurfID( SurfID ),
 			TadjacentAir( TadjacentAir ),
 			Zeta( Zeta )
@@ -914,12 +897,12 @@ namespace DataRoomAirModel {
 		// Members
 		// user variables
 		bool IsUsed; // .TRUE. if user-defined patterns used in zone
-		Fstring Name; // Name
-		Fstring ZoneName; // Zone name in building
+		std::string Name; // Name
+		std::string ZoneName; // Zone name in building
 		int ZoneID; // Index of Zone in Heat Balance
-		Fstring AvailSched; // Name of availability schedule
+		std::string AvailSched; // Name of availability schedule
 		int AvailSchedID; // index of availability schedule
-		Fstring PatternCntrlSched; // name of schedule that selects pattern
+		std::string PatternCntrlSched; // name of schedule that selects pattern
 		int PatternSchedID; // index of pattern selecting schedule
 		//calculated and from elsewhere
 		Real64 ZoneHeight; // in meters, from Zone%CeilingHeight
@@ -939,12 +922,8 @@ namespace DataRoomAirModel {
 		// Default Constructor
 		AirPatternInfobyZoneStruct() :
 			IsUsed( false ),
-			Name( MaxNameLength ),
-			ZoneName( MaxNameLength ),
 			ZoneID( 0 ),
-			AvailSched( MaxNameLength ),
 			AvailSchedID( 0 ),
-			PatternCntrlSched( MaxNameLength ),
 			PatternSchedID( 0 ),
 			ZoneHeight( 0.0 ),
 			ReturnAirNodeID( 0 ),
@@ -961,12 +940,12 @@ namespace DataRoomAirModel {
 		// Member Constructor
 		AirPatternInfobyZoneStruct(
 			bool const IsUsed, // .TRUE. if user-defined patterns used in zone
-			Fstring const & Name, // Name
-			Fstring const & ZoneName, // Zone name in building
+			std::string const & Name, // Name
+			std::string const & ZoneName, // Zone name in building
 			int const ZoneID, // Index of Zone in Heat Balance
-			Fstring const & AvailSched, // Name of availability schedule
+			std::string const & AvailSched, // Name of availability schedule
 			int const AvailSchedID, // index of availability schedule
-			Fstring const & PatternCntrlSched, // name of schedule that selects pattern
+			std::string const & PatternCntrlSched, // name of schedule that selects pattern
 			int const PatternSchedID, // index of pattern selecting schedule
 			Real64 const ZoneHeight, // in meters, from Zone%CeilingHeight
 			int const ReturnAirNodeID, // index in Node array
@@ -982,12 +961,12 @@ namespace DataRoomAirModel {
 			Real64 const Gradient // result for modeled gradient if using two-gradient interpolation
 		) :
 			IsUsed( IsUsed ),
-			Name( MaxNameLength, Name ),
-			ZoneName( MaxNameLength, ZoneName ),
+			Name( Name ),
+			ZoneName( ZoneName ),
 			ZoneID( ZoneID ),
-			AvailSched( MaxNameLength, AvailSched ),
+			AvailSched( AvailSched ),
 			AvailSchedID( AvailSchedID ),
-			PatternCntrlSched( MaxNameLength, PatternCntrlSched ),
+			PatternCntrlSched( PatternCntrlSched ),
 			PatternSchedID( PatternSchedID ),
 			ZoneHeight( ZoneHeight ),
 			ReturnAirNodeID( ReturnAirNodeID ),

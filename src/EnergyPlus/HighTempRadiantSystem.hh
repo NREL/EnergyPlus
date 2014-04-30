@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,22 +13,21 @@ namespace EnergyPlus {
 namespace HighTempRadiantSystem {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
-	extern Fstring const cGas;
-	extern Fstring const cNaturalGas;
-	extern Fstring const cElectric;
-	extern Fstring const cElectricity;
+	extern std::string const cGas;
+	extern std::string const cNaturalGas;
+	extern std::string const cElectric;
+	extern std::string const cElectricity;
 	extern int const Gas;
 	extern int const Electric;
-	extern Fstring const cMATControl; // Control for using mean air temperature
-	extern Fstring const cMRTControl; // Control for using mean radiant temperature
-	extern Fstring const cOperativeControl; // Control for using operative temperature
-	extern Fstring const cMATSPControl; // Control for to MAT setpoint
-	extern Fstring const cMRTSPControl; // Control for to MRT setpoint
-	extern Fstring const cOperativeSPControl; // Control for operative temperature setpoint
+	extern std::string const cMATControl; // Control for using mean air temperature
+	extern std::string const cMRTControl; // Control for using mean radiant temperature
+	extern std::string const cOperativeControl; // Control for using operative temperature
+	extern std::string const cMATSPControl; // Control for to MAT setpoint
+	extern std::string const cMRTSPControl; // Control for to MRT setpoint
+	extern std::string const cOperativeSPControl; // Control for operative temperature setpoint
 	extern int const MATControl;
 	extern int const MRTControl;
 	extern int const OperativeControl;
@@ -60,10 +58,10 @@ namespace HighTempRadiantSystem {
 	{
 		// Members
 		// Input data
-		Fstring Name; // name of hydronic radiant system
-		Fstring SchedName; // availability schedule
+		std::string Name; // name of hydronic radiant system
+		std::string SchedName; // availability schedule
 		int SchedPtr; // index to schedule
-		Fstring ZoneName; // Name of zone the system is serving
+		std::string ZoneName; // Name of zone the system is serving
 		int ZonePtr; // Point to this zone in the Zone derived type
 		int HeaterType; // Type of heater (gas or electric)
 		Real64 MaxPowerCapac; // Maximum capacity of the radiant heater in Watts
@@ -75,11 +73,11 @@ namespace HighTempRadiantSystem {
 		// (by definition this is 1 minus the sum of all other fractions)
 		int ControlType; // Control type for the system (MAT, MRT, or op temp)
 		Real64 ThrottlRange; // Throttling range for heating [C]
-		Fstring SetptSched; // Schedule name for the zone setpoint temperature
+		std::string SetptSched; // Schedule name for the zone setpoint temperature
 		int SetptSchedPtr; // Schedule index for the zone setpoint temperature
 		Real64 FracDistribPerson; // Fraction of fraction radiant incident on a "person" in the space
 		int TotSurfToDistrib; // Total number of surfaces the heater sends radiation to
-		FArray1D_Fstring SurfaceName; // Surface name in the list of surfaces heater sends radiation to
+		FArray1D_string SurfaceName; // Surface name in the list of surfaces heater sends radiation to
 		FArray1D_int SurfacePtr; // Surface number in the list of surfaces heater sends radiation to
 		FArray1D< Real64 > FracDistribToSurf; // Fraction of fraction radiant incident on the surface
 		// Other parameters
@@ -93,10 +91,7 @@ namespace HighTempRadiantSystem {
 
 		// Default Constructor
 		HighTempRadiantSystemData() :
-			Name( MaxNameLength ),
-			SchedName( MaxNameLength ),
 			SchedPtr( 0 ),
-			ZoneName( MaxNameLength ),
 			ZonePtr( 0 ),
 			HeaterType( 0 ),
 			MaxPowerCapac( 0.0 ),
@@ -107,11 +102,9 @@ namespace HighTempRadiantSystem {
 			FracConvect( 0.0 ),
 			ControlType( 0 ),
 			ThrottlRange( 0.0 ),
-			SetptSched( MaxNameLength ),
 			SetptSchedPtr( 0 ),
 			FracDistribPerson( 0.0 ),
 			TotSurfToDistrib( 0 ),
-			SurfaceName( sFstring( MaxNameLength ) ),
 			ElecPower( 0.0 ),
 			ElecEnergy( 0.0 ),
 			GasPower( 0.0 ),
@@ -122,10 +115,10 @@ namespace HighTempRadiantSystem {
 
 		// Member Constructor
 		HighTempRadiantSystemData(
-			Fstring const & Name, // name of hydronic radiant system
-			Fstring const & SchedName, // availability schedule
+			std::string const & Name, // name of hydronic radiant system
+			std::string const & SchedName, // availability schedule
 			int const SchedPtr, // index to schedule
-			Fstring const & ZoneName, // Name of zone the system is serving
+			std::string const & ZoneName, // Name of zone the system is serving
 			int const ZonePtr, // Point to this zone in the Zone derived type
 			int const HeaterType, // Type of heater (gas or electric)
 			Real64 const MaxPowerCapac, // Maximum capacity of the radiant heater in Watts
@@ -136,11 +129,11 @@ namespace HighTempRadiantSystem {
 			Real64 const FracConvect, // Fraction of heater power that is given off as convective heat
 			int const ControlType, // Control type for the system (MAT, MRT, or op temp)
 			Real64 const ThrottlRange, // Throttling range for heating [C]
-			Fstring const & SetptSched, // Schedule name for the zone setpoint temperature
+			std::string const & SetptSched, // Schedule name for the zone setpoint temperature
 			int const SetptSchedPtr, // Schedule index for the zone setpoint temperature
 			Real64 const FracDistribPerson, // Fraction of fraction radiant incident on a "person" in the space
 			int const TotSurfToDistrib, // Total number of surfaces the heater sends radiation to
-			FArray1_Fstring const & SurfaceName, // Surface name in the list of surfaces heater sends radiation to
+			FArray1_string const & SurfaceName, // Surface name in the list of surfaces heater sends radiation to
 			FArray1_int const & SurfacePtr, // Surface number in the list of surfaces heater sends radiation to
 			FArray1< Real64 > const & FracDistribToSurf, // Fraction of fraction radiant incident on the surface
 			Real64 const ElecPower, // system electric consumption in Watts
@@ -150,10 +143,10 @@ namespace HighTempRadiantSystem {
 			Real64 const HeatPower, // actual heating sent to zone (convective and radiative) in Watts
 			Real64 const HeatEnergy // actual heating sent to zone (convective and radiative) in Joules
 		) :
-			Name( MaxNameLength, Name ),
-			SchedName( MaxNameLength, SchedName ),
+			Name( Name ),
+			SchedName( SchedName ),
 			SchedPtr( SchedPtr ),
-			ZoneName( MaxNameLength, ZoneName ),
+			ZoneName( ZoneName ),
 			ZonePtr( ZonePtr ),
 			HeaterType( HeaterType ),
 			MaxPowerCapac( MaxPowerCapac ),
@@ -164,7 +157,7 @@ namespace HighTempRadiantSystem {
 			FracConvect( FracConvect ),
 			ControlType( ControlType ),
 			ThrottlRange( ThrottlRange ),
-			SetptSched( MaxNameLength, SetptSched ),
+			SetptSched( SetptSched ),
 			SetptSchedPtr( SetptSchedPtr ),
 			FracDistribPerson( FracDistribPerson ),
 			TotSurfToDistrib( TotSurfToDistrib ),
@@ -188,7 +181,7 @@ namespace HighTempRadiantSystem {
 
 	void
 	SimHighTempRadiantSystem(
-		Fstring const & CompName, // name of the low temperature radiant system
+		std::string const & CompName, // name of the low temperature radiant system
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		Real64 & LoadMet, // load met by the radiant system, in Watts
 		int & CompIndex

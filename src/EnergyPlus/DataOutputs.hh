@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,12 +13,11 @@ namespace EnergyPlus {
 namespace DataOutputs {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	extern int const NumMonthlyReports;
-	extern FArray1D_Fstring const MonthlyNamedReports;
+	extern FArray1D_string const MonthlyNamedReports;
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -39,28 +37,26 @@ namespace DataOutputs {
 	struct OutputReportingVariables // Linked list of variables and keys
 	{
 		// Members
-		Fstring Key; // could be a key or "*"  (upper case)
-		Fstring VarName; // variable name (upper case)
+		std::string Key; // could be a key or "*"  (upper case)
+		std::string VarName; // variable name (upper case)
 		int Previous; // Pointer to Previous of same variable name
 		int Next; // Pointer to Next of same variable name
 
 		// Default Constructor
 		OutputReportingVariables() :
-			Key( MaxNameLength ),
-			VarName( MaxNameLength ),
 			Previous( 0 ),
 			Next( 0 )
 		{}
 
 		// Member Constructor
 		OutputReportingVariables(
-			Fstring const & Key, // could be a key or "*"  (upper case)
-			Fstring const & VarName, // variable name (upper case)
+			std::string const & Key, // could be a key or "*"  (upper case)
+			std::string const & VarName, // variable name (upper case)
 			int const Previous, // Pointer to Previous of same variable name
 			int const Next // Pointer to Next of same variable name
 		) :
-			Key( MaxNameLength, Key ),
-			VarName( MaxNameLength, VarName ),
+			Key( Key ),
+			VarName( VarName ),
 			Previous( Previous ),
 			Next( Next )
 		{}
@@ -75,18 +71,9 @@ namespace DataOutputs {
 
 	bool
 	FindItemInVariableList(
-		Fstring const & KeyedValue,
-		Fstring const & VariableName
+		std::string const & KeyedValue,
+		std::string const & VariableName
 	);
-
-	bool
-	DOSameString(
-		Fstring const & TestString1, // First String to Test
-		Fstring const & TestString2 // Second String to Test
-	);
-
-	Fstring
-	DOMakeUPPERCase( Fstring const & InputString ); // Input String
 
 	//     NOTICE
 

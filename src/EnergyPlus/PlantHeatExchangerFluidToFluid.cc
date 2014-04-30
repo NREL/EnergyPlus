@@ -55,7 +55,6 @@ namespace PlantHeatExchangerFluidToFluid {
 	using namespace DataPrecisionGlobals;
 	using namespace DataPlant;
 	using namespace DataLoopNode;
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -90,7 +89,7 @@ namespace PlantHeatExchangerFluidToFluid {
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
-	Fstring ComponentClassName( "HeatExchanger:FluidToFluid" );
+	std::string ComponentClassName( "HeatExchanger:FluidToFluid" );
 	int NumberOfPlantFluidHXs( 0 );
 	bool GetInput( true );
 	FArray1D_bool CheckFluidHXs;
@@ -106,8 +105,8 @@ namespace PlantHeatExchangerFluidToFluid {
 	SimFluidHeatExchanger(
 		int const LoopNum, // plant loop sim call originated from
 		int const LoopSideNum, // plant loop side sim call originated from
-		Fstring const & EquipType, // type of equipment, 'PlantComponent:UserDefined'
-		Fstring const & EquipName, // user name for component
+		std::string const & EquipType, // type of equipment, 'PlantComponent:UserDefined'
+		std::string const & EquipName, // user name for component
 		int & CompIndex,
 		bool & InitLoopEquip,
 		Real64 const MyLoad,
@@ -166,11 +165,11 @@ namespace PlantHeatExchangerFluidToFluid {
 		} else {
 			CompNum = CompIndex;
 			if ( CompNum < 1 || CompNum > NumberOfPlantFluidHXs ) {
-				ShowFatalError( "SimFluidHeatExchanger: Invalid CompIndex passed=" + trim( TrimSigDigits( CompNum ) ) + ", Number of heat exchangers =" + trim( TrimSigDigits( NumberOfPlantFluidHXs ) ) + ", Entered heat exchanger name = " + trim( EquipName ) );
+				ShowFatalError( "SimFluidHeatExchanger: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of heat exchangers =" + TrimSigDigits( NumberOfPlantFluidHXs ) + ", Entered heat exchanger name = " + EquipName );
 			}
 			if ( CheckFluidHXs( CompNum ) ) {
 				if ( EquipName != FluidHX( CompNum ).Name ) {
-					ShowFatalError( "SimFluidHeatExchanger: Invalid CompIndex passed=" + trim( TrimSigDigits( CompNum ) ) + ", heat exchanger name=" + trim( EquipName ) + ", stored name for that index=" + trim( FluidHX( CompNum ).Name ) );
+					ShowFatalError( "SimFluidHeatExchanger: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", heat exchanger name=" + EquipName + ", stored name for that index=" + FluidHX( CompNum ).Name );
 				}
 				CheckFluidHXs( CompNum ) = false;
 			}
@@ -252,7 +251,7 @@ namespace PlantHeatExchangerFluidToFluid {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetFluidHeatExchangerInput: " );
+		static std::string const RoutineName( "GetFluidHeatExchangerInput: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -270,13 +269,13 @@ namespace PlantHeatExchangerFluidToFluid {
 		static int MaxNumAlphas( 0 ); // argument for call to GetObjectDefMaxArgs
 		static int MaxNumNumbers( 0 ); // argument for call to GetObjectDefMaxArgs
 		static int TotalArgs( 0 ); // argument for call to GetObjectDefMaxArgs
-		FArray1D_Fstring cAlphaFieldNames( sFstring( MaxNameLength + 40 ) );
-		FArray1D_Fstring cNumericFieldNames( sFstring( MaxNameLength + 40 ) );
+		FArray1D_string cAlphaFieldNames;
+		FArray1D_string cNumericFieldNames;
 		FArray1D_bool lNumericFieldBlanks;
 		FArray1D_bool lAlphaFieldBlanks;
-		FArray1D_Fstring cAlphaArgs( sFstring( MaxNameLength ) );
+		FArray1D_string cAlphaArgs;
 		FArray1D< Real64 > rNumericArgs;
-		Fstring cCurrentModuleObject( MaxNameLength );
+		std::string cCurrentModuleObject;
 		int CompLoop;
 		bool NodeEMSSetPointMissing;
 
@@ -290,13 +289,13 @@ namespace PlantHeatExchangerFluidToFluid {
 		MaxNumAlphas = NumAlphas;
 
 		cAlphaFieldNames.allocate( MaxNumAlphas );
-		cAlphaFieldNames = " ";
+		cAlphaFieldNames = "";
 		cAlphaArgs.allocate( MaxNumAlphas );
-		cAlphaArgs = " ";
+		cAlphaArgs = "";
 		lAlphaFieldBlanks.allocate( MaxNumAlphas );
 		lAlphaFieldBlanks = false;
 		cNumericFieldNames.allocate( MaxNumNumbers );
-		cNumericFieldNames = " ";
+		cNumericFieldNames = "";
 		rNumericArgs.allocate( MaxNumNumbers );
 		rNumericArgs = 0.0;
 		lNumericFieldBlanks.allocate( MaxNumNumbers );
@@ -310,7 +309,7 @@ namespace PlantHeatExchangerFluidToFluid {
 				GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), FluidHX.Name(), CompLoop - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+				VerifyName( cAlphaArgs( 1 ), FluidHX.Name(), CompLoop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -322,21 +321,21 @@ namespace PlantHeatExchangerFluidToFluid {
 				} else {
 					FluidHX( CompLoop ).AvailSchedNum = GetScheduleIndex( cAlphaArgs( 2 ) );
 					if ( FluidHX( CompLoop ).AvailSchedNum <= 0 ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-						ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
 						ShowContinueError( "Schedule was not found " );
 						ErrorsFound = true;
 					}
 				}
 
-				FluidHX( CompLoop ).DemandSideLoop.InletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-				FluidHX( CompLoop ).DemandSideLoop.OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-				TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Loop Demand Side Plant Nodes" );
+				FluidHX( CompLoop ).DemandSideLoop.InletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+				FluidHX( CompLoop ).DemandSideLoop.OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Loop Demand Side Plant Nodes" );
 				FluidHX( CompLoop ).DemandSideLoop.DesignVolumeFlowRate = rNumericArgs( 1 );
 
-				FluidHX( CompLoop ).SupplySideLoop.InletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
-				FluidHX( CompLoop ).SupplySideLoop.OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
-				TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 5 ), cAlphaArgs( 6 ), "Loop Supply Side Plant Nodes" );
+				FluidHX( CompLoop ).SupplySideLoop.InletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+				FluidHX( CompLoop ).SupplySideLoop.OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 5 ), cAlphaArgs( 6 ), "Loop Supply Side Plant Nodes" );
 				FluidHX( CompLoop ).SupplySideLoop.DesignVolumeFlowRate = rNumericArgs( 2 );
 
 				if ( SameString( cAlphaArgs( 7 ), "CrossFlowBothUnMixed" ) ) {
@@ -354,8 +353,8 @@ namespace PlantHeatExchangerFluidToFluid {
 				} else if ( SameString( cAlphaArgs( 7 ), "Ideal" ) ) {
 					FluidHX( CompLoop ).HeatExchangeModelType = Ideal;
 				} else {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-					ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + " = " + trim( cAlphaArgs( 7 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+					ShowContinueError( "Invalid " + cAlphaFieldNames( 7 ) + " = " + cAlphaArgs( 7 ) );
 					ErrorsFound = true;
 				}
 
@@ -363,8 +362,8 @@ namespace PlantHeatExchangerFluidToFluid {
 					FluidHX( CompLoop ).UA = rNumericArgs( 3 );
 				} else {
 					if ( FluidHX( CompLoop ).HeatExchangeModelType != Ideal ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-						ShowContinueError( "Missing entry for " + trim( cNumericFieldNames( 3 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+						ShowContinueError( "Missing entry for " + cNumericFieldNames( 3 ) );
 						ErrorsFound = true;
 					}
 				}
@@ -394,19 +393,19 @@ namespace PlantHeatExchangerFluidToFluid {
 				} else if ( SameString( cAlphaArgs( 8 ), "TrackComponentOnOff" ) ) {
 					FluidHX( CompLoop ).ControlMode = TrackComponentOnOff;
 				} else {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-					ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 8 ) ) + " = " + trim( cAlphaArgs( 8 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+					ShowContinueError( "Invalid " + cAlphaFieldNames( 8 ) + " = " + cAlphaArgs( 8 ) );
 					ErrorsFound = true;
 				}
 
 				if ( ! lAlphaFieldBlanks( 9 ) ) {
-					FluidHX( CompLoop ).SetPointNodeNum = GetOnlySingleNode( cAlphaArgs( 9 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+					FluidHX( CompLoop ).SetPointNodeNum = GetOnlySingleNode( cAlphaArgs( 9 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
 					// check that node actually has setpoints on it
 					if ( ( FluidHX( CompLoop ).ControlMode == HeatingSetPointModulated ) || ( FluidHX( CompLoop ).ControlMode == HeatingSetPointOnOff ) || ( FluidHX( CompLoop ).ControlMode == CoolingSetPointModulated ) || ( FluidHX( CompLoop ).ControlMode == CoolingSetPointOnOff ) || ( FluidHX( CompLoop ).ControlMode == CoolingSetPointOnOffWithComponentOverride ) ) {
 						if ( Node( FluidHX( CompLoop ).SetPointNodeNum ).TempSetPoint == SensedNodeFlagValue ) {
 							if ( ! AnyEnergyManagementSystemInModel ) {
-								ShowSevereError( RoutineName + " Missing temperature setpoint for node = " + trim( cAlphaArgs( 9 ) ) );
-								ShowContinueError( "Occurs for " + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) );
+								ShowSevereError( RoutineName + " Missing temperature setpoint for node = " + cAlphaArgs( 9 ) );
+								ShowContinueError( "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) );
 								ShowContinueError( " Use a setpoint manager to place a single temperature setpoint on the node" );
 								ErrorsFound = true;
 							} else {
@@ -414,8 +413,8 @@ namespace PlantHeatExchangerFluidToFluid {
 								NodeEMSSetPointMissing = false;
 								CheckIfNodeSetPointManagedByEMS( FluidHX( CompLoop ).SetPointNodeNum, iTemperatureSetPoint, NodeEMSSetPointMissing );
 								if ( NodeEMSSetPointMissing ) {
-									ShowSevereError( RoutineName + " Missing temperature setpoint for node = " + trim( cAlphaArgs( 9 ) ) );
-									ShowContinueError( "Occurs for " + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) );
+									ShowSevereError( RoutineName + " Missing temperature setpoint for node = " + cAlphaArgs( 9 ) );
+									ShowContinueError( "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) );
 									ShowContinueError( "Use a setpoint manager or EMS actuator to place a single temperature setpoint on the node" );
 									ErrorsFound = true;
 								}
@@ -424,8 +423,8 @@ namespace PlantHeatExchangerFluidToFluid {
 					} else if ( ( FluidHX( CompLoop ).ControlMode == DualDeadBandSetPointModulated ) || ( FluidHX( CompLoop ).ControlMode == DualDeadBandSetPointOnOff ) ) {
 						if ( ( Node( FluidHX( CompLoop ).SetPointNodeNum ).TempSetPointHi == SensedNodeFlagValue ) || ( Node( FluidHX( CompLoop ).SetPointNodeNum ).TempSetPointLo == SensedNodeFlagValue ) ) {
 							if ( ! AnyEnergyManagementSystemInModel ) {
-								ShowSevereError( RoutineName + " Missing dual temperature setpoints for node = " + trim( cAlphaArgs( 9 ) ) );
-								ShowContinueError( "Occurs for " + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) );
+								ShowSevereError( RoutineName + " Missing dual temperature setpoints for node = " + cAlphaArgs( 9 ) );
+								ShowContinueError( "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) );
 								ShowContinueError( " Use a setpoint manager to place a dual temperature setpoint on the node" );
 								ErrorsFound = true;
 							} else {
@@ -434,8 +433,8 @@ namespace PlantHeatExchangerFluidToFluid {
 								CheckIfNodeSetPointManagedByEMS( FluidHX( CompLoop ).SetPointNodeNum, iTemperatureMinSetPoint, NodeEMSSetPointMissing );
 								CheckIfNodeSetPointManagedByEMS( FluidHX( CompLoop ).SetPointNodeNum, iTemperatureMaxSetPoint, NodeEMSSetPointMissing );
 								if ( NodeEMSSetPointMissing ) {
-									ShowSevereError( RoutineName + " Missing temperature setpoint for node = " + trim( cAlphaArgs( 9 ) ) );
-									ShowContinueError( "Occurs for " + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) );
+									ShowSevereError( RoutineName + " Missing temperature setpoint for node = " + cAlphaArgs( 9 ) );
+									ShowContinueError( "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) );
 									ShowContinueError( "Use a setpoint manager or EMS actuators to place a dual temperature setpoints on the node" );
 									ErrorsFound = true;
 								}
@@ -446,8 +445,8 @@ namespace PlantHeatExchangerFluidToFluid {
 				} else {
 					// need to name a setpoint node if using a setpoint type control mode
 					if ( ( FluidHX( CompLoop ).ControlMode == HeatingSetPointModulated ) || ( FluidHX( CompLoop ).ControlMode == HeatingSetPointOnOff ) || ( FluidHX( CompLoop ).ControlMode == CoolingSetPointModulated ) || ( FluidHX( CompLoop ).ControlMode == CoolingSetPointOnOff ) || ( FluidHX( CompLoop ).ControlMode == DualDeadBandSetPointModulated ) || ( FluidHX( CompLoop ).ControlMode == DualDeadBandSetPointOnOff ) || ( FluidHX( CompLoop ).ControlMode == CoolingSetPointOnOffWithComponentOverride ) ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-						ShowContinueError( "Missing entry for " + trim( cAlphaFieldNames( 9 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+						ShowContinueError( "Missing entry for " + cAlphaFieldNames( 9 ) );
 						ErrorsFound = true;
 					}
 				}
@@ -461,21 +460,21 @@ namespace PlantHeatExchangerFluidToFluid {
 				FluidHX( CompLoop ).HeatTransferMeteringEndUse = cAlphaArgs( 10 );
 
 				if ( ! lAlphaFieldBlanks( 11 ) ) {
-					FluidHX( CompLoop ).OtherCompSupplySideLoop.InletNodeNum = GetOnlySingleNode( cAlphaArgs( 11 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Actuator, 1, ObjectIsNotParent );
+					FluidHX( CompLoop ).OtherCompSupplySideLoop.InletNodeNum = GetOnlySingleNode( cAlphaArgs( 11 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Actuator, 1, ObjectIsNotParent );
 				} else {
 					if ( FluidHX( CompLoop ).ControlMode == CoolingSetPointOnOffWithComponentOverride ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-						ShowContinueError( "Missing entry for " + trim( cAlphaFieldNames( 11 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+						ShowContinueError( "Missing entry for " + cAlphaFieldNames( 11 ) );
 						ErrorsFound = true;
 					}
 				}
 
 				if ( ! lAlphaFieldBlanks( 12 ) ) {
-					FluidHX( CompLoop ).OtherCompDemandSideLoop.InletNodeNum = GetOnlySingleNode( cAlphaArgs( 12 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Actuator, 1, ObjectIsNotParent );
+					FluidHX( CompLoop ).OtherCompDemandSideLoop.InletNodeNum = GetOnlySingleNode( cAlphaArgs( 12 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Actuator, 1, ObjectIsNotParent );
 				} else {
 					if ( FluidHX( CompLoop ).ControlMode == CoolingSetPointOnOffWithComponentOverride ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-						ShowContinueError( "Missing entry for " + trim( cAlphaFieldNames( 12 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+						ShowContinueError( "Missing entry for " + cAlphaFieldNames( 12 ) );
 						ErrorsFound = true;
 					}
 				}
@@ -490,8 +489,8 @@ namespace PlantHeatExchangerFluidToFluid {
 					}
 				} else {
 					if ( FluidHX( CompLoop ).ControlMode == CoolingSetPointOnOffWithComponentOverride ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-						ShowContinueError( "Missing entry for " + trim( cAlphaFieldNames( 13 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+						ShowContinueError( "Missing entry for " + cAlphaFieldNames( 13 ) );
 						ErrorsFound = true;
 					}
 
@@ -519,14 +518,14 @@ namespace PlantHeatExchangerFluidToFluid {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in processing " + trim( cCurrentModuleObject ) + " input." );
+			ShowFatalError( RoutineName + "Errors found in processing " + cCurrentModuleObject + " input." );
 		}
 
 		for ( CompLoop = 1; CompLoop <= NumberOfPlantFluidHXs; ++CompLoop ) {
 
 			SetupOutputVariable( "Fluid Heat Exchanger Heat Transfer Rate [W]", FluidHX( CompLoop ).HeatTransferRate, "System", "Average", FluidHX( CompLoop ).Name );
 
-			SetupOutputVariable( "Fluid Heat Exchanger Heat Transfer Energy [J]", FluidHX( CompLoop ).HeatTransferEnergy, "System", "Sum", FluidHX( CompLoop ).Name, _, "ENERGYTRANSFER", trim( FluidHX( CompLoop ).HeatTransferMeteringEndUse ), _, "Plant" );
+			SetupOutputVariable( "Fluid Heat Exchanger Heat Transfer Energy [J]", FluidHX( CompLoop ).HeatTransferEnergy, "System", "Sum", FluidHX( CompLoop ).Name, _, "ENERGYTRANSFER", FluidHX( CompLoop ).HeatTransferMeteringEndUse, _, "Plant" );
 
 			SetupOutputVariable( "Fluid Heat Exchanger Loop Supply Side Mass Flow Rate [kg/s]", FluidHX( CompLoop ).SupplySideLoop.InletMassFlowRate, "System", "Average", FluidHX( CompLoop ).Name );
 			SetupOutputVariable( "Fluid Heat Exchanger Loop Supply Side Inlet Temperature [C]", FluidHX( CompLoop ).SupplySideLoop.InletTemp, "System", "Average", FluidHX( CompLoop ).Name );
@@ -587,7 +586,7 @@ namespace PlantHeatExchangerFluidToFluid {
 		static FArray1D_bool MyEnvrnFlag; // environment flag
 		static FArray1D_bool MyFlag;
 		bool errFlag;
-		static Fstring RoutineName( MaxNameLength, "InitFluidHeatExchanger: " );
+		static std::string RoutineName( "InitFluidHeatExchanger: " );
 		Real64 rho;
 		int LoopNum2;
 		int LoopSideNum;
@@ -608,7 +607,7 @@ namespace PlantHeatExchangerFluidToFluid {
 			ScanPlantLoopsForObject( FluidHX( CompNum ).Name, TypeOf_FluidToFluidPlantHtExchg, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum, _, _, _, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, _, errFlag );
 
 			if ( FluidHX( CompNum ).DemandSideLoop.LoopSideNum != DemandSide ) { // throw error
-				ShowSevereError( trim( RoutineName ) + " Invalid connections for " + trim( ccSimPlantEquipTypes( TypeOf_FluidToFluidPlantHtExchg ) ) + " name = \"" + trim( FluidHX( CompNum ).Name ) + "\"" );
+				ShowSevereError( RoutineName + " Invalid connections for " + ccSimPlantEquipTypes( TypeOf_FluidToFluidPlantHtExchg ) + " name = \"" + FluidHX( CompNum ).Name + "\"" );
 				ShowContinueError( "The \"Loop Demand Side\" connections are not on the Demand Side of a plant loop" );
 				errFlag = true;
 			}
@@ -616,14 +615,14 @@ namespace PlantHeatExchangerFluidToFluid {
 			ScanPlantLoopsForObject( FluidHX( CompNum ).Name, TypeOf_FluidToFluidPlantHtExchg, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum, _, _, _, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, _, errFlag );
 
 			if ( FluidHX( CompNum ).SupplySideLoop.LoopSideNum != SupplySide ) { // throw error
-				ShowSevereError( trim( RoutineName ) + " Invalid connections for " + trim( ccSimPlantEquipTypes( TypeOf_FluidToFluidPlantHtExchg ) ) + " name = \"" + trim( FluidHX( CompNum ).Name ) + "\"" );
+				ShowSevereError( RoutineName + " Invalid connections for " + ccSimPlantEquipTypes( TypeOf_FluidToFluidPlantHtExchg ) + " name = \"" + FluidHX( CompNum ).Name + "\"" );
 				ShowContinueError( "The \"Loop Supply Side\" connections are not on the Supply Side of a plant loop" );
 				errFlag = true;
 			}
 
 			// make sure it is not the same loop on both sides.
 			if ( FluidHX( CompNum ).SupplySideLoop.LoopNum == FluidHX( CompNum ).DemandSideLoop.LoopNum ) { // user is being too tricky, don't allow
-				ShowSevereError( trim( RoutineName ) + " Invalid connections for " + trim( ccSimPlantEquipTypes( TypeOf_FluidToFluidPlantHtExchg ) ) + " name = \"" + trim( FluidHX( CompNum ).Name ) + "\"" );
+				ShowSevereError( RoutineName + " Invalid connections for " + ccSimPlantEquipTypes( TypeOf_FluidToFluidPlantHtExchg ) + " name = \"" + FluidHX( CompNum ).Name + "\"" );
 				ShowContinueError( "The \"Loop Supply Side\" and \"Loop Demand Side\" need to be on different loops." );
 				errFlag = true;
 			} else {
@@ -673,7 +672,7 @@ namespace PlantHeatExchangerFluidToFluid {
 			}
 
 			if ( errFlag ) {
-				ShowFatalError( trim( RoutineName ) + "Program terminated due to previous condition(s)." );
+				ShowFatalError( RoutineName + "Program terminated due to previous condition(s)." );
 			}
 			MyFlag( CompNum ) = false;
 		} // plant setup
@@ -786,7 +785,7 @@ namespace PlantHeatExchangerFluidToFluid {
 				if ( PlantSizesOkayToFinalize ) ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name, "Loop Supply Side Design Fluid Flow Rate [m3/s]", FluidHX( CompNum ).SupplySideLoop.DesignVolumeFlowRate );
 			} else {
 				ShowSevereError( "SizeFluidHeatExchanger: Autosizing of requires a loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in heat exchanger object=" + trim( FluidHX( CompNum ).Name ) );
+				ShowContinueError( "Occurs in heat exchanger object=" + FluidHX( CompNum ).Name );
 				ErrorsFound = true;
 			}
 		}
@@ -845,7 +844,7 @@ namespace PlantHeatExchangerFluidToFluid {
 				}
 			} else {
 				ShowSevereError( "SizeFluidHeatExchanger: Autosizing of heat " "Exchanger UA requires a loop Sizing:Plant objects for both loops" );
-				ShowContinueError( "Occurs in heat exchanger object=" + trim( FluidHX( CompNum ).Name ) );
+				ShowContinueError( "Occurs in heat exchanger object=" + FluidHX( CompNum ).Name );
 				ErrorsFound = true;
 			}
 
@@ -1638,20 +1637,20 @@ namespace PlantHeatExchangerFluidToFluid {
 					if ( ! WarmupFlag ) {
 						if ( FluidHX( CompNum ).DmdSideModulatSolvNoConvergeErrorCount < 1 ) {
 							++FluidHX( CompNum ).DmdSideModulatSolvNoConvergeErrorCount;
-							ShowWarningError( ComponentClassName + " named " + trim( FluidHX( CompNum ).Name ) + " - Iteration Limit exceeded calculating demand side loop flow rate" );
+							ShowWarningError( ComponentClassName + " named " + FluidHX( CompNum ).Name + " - Iteration Limit exceeded calculating demand side loop flow rate" );
 							ShowContinueError( "Simulation continues with calculated demand side mass flow rate = " + RoundSigDigits( DmdSideMdot, 7 ) );
 						}
-						ShowRecurringWarningErrorAtEnd( ComponentClassName + " named " + trim( FluidHX( CompNum ).Name ) + " - Iteration Limit exceeded calculating demand side loop flow rate continues.", FluidHX( CompNum ).DmdSideModulatSolvNoConvergeErrorIndex, DmdSideMdot, DmdSideMdot );
+						ShowRecurringWarningErrorAtEnd( ComponentClassName + " named " + FluidHX( CompNum ).Name + " - Iteration Limit exceeded calculating demand side loop flow rate continues.", FluidHX( CompNum ).DmdSideModulatSolvNoConvergeErrorIndex, DmdSideMdot, DmdSideMdot );
 					}
 				} else if ( SolFla == -2 ) { //f(x0) and f(x1) have the same sign
 					DmdSideMdot = FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax * ( LeavingTempFullFlow - TargetSupplySideLoopLeavingTemp ) / ( LeavingTempFullFlow - LeavingTempMinFlow );
 					if ( ! WarmupFlag ) {
 						if ( FluidHX( CompNum ).DmdSideModulatSolvFailErrorCount < 1 ) {
 							++FluidHX( CompNum ).DmdSideModulatSolvFailErrorCount;
-							ShowWarningError( ComponentClassName + " named " + trim( FluidHX( CompNum ).Name ) + " - Solver failed to calculate demand side loop flow rate" );
+							ShowWarningError( ComponentClassName + " named " + FluidHX( CompNum ).Name + " - Solver failed to calculate demand side loop flow rate" );
 							ShowContinueError( "Simulation continues with estimated demand side mass flow rate = " + RoundSigDigits( DmdSideMdot, 7 ) );
 						}
-						ShowRecurringWarningErrorAtEnd( ComponentClassName + " named " + trim( FluidHX( CompNum ).Name ) + " - Solver failed to calculate demand side loop flow rate continues.", FluidHX( CompNum ).DmdSideModulatSolvFailErrorIndex, DmdSideMdot, DmdSideMdot );
+						ShowRecurringWarningErrorAtEnd( ComponentClassName + " named " + FluidHX( CompNum ).Name + " - Solver failed to calculate demand side loop flow rate continues.", FluidHX( CompNum ).DmdSideModulatSolvFailErrorIndex, DmdSideMdot, DmdSideMdot );
 					}
 				}
 				SetComponentFlowRate( DmdSideMdot, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum );
@@ -1679,20 +1678,20 @@ namespace PlantHeatExchangerFluidToFluid {
 					if ( ! WarmupFlag ) {
 						if ( FluidHX( CompNum ).DmdSideModulatSolvNoConvergeErrorCount < 1 ) {
 							++FluidHX( CompNum ).DmdSideModulatSolvNoConvergeErrorCount;
-							ShowWarningError( ComponentClassName + " named " + trim( FluidHX( CompNum ).Name ) + " - Iteration Limit exceeded calculating demand side loop flow rate" );
+							ShowWarningError( ComponentClassName + " named " + FluidHX( CompNum ).Name + " - Iteration Limit exceeded calculating demand side loop flow rate" );
 							ShowContinueError( "Simulation continues with calculated demand side mass flow rate = " + RoundSigDigits( DmdSideMdot, 7 ) );
 						}
-						ShowRecurringWarningErrorAtEnd( ComponentClassName + " named " + trim( FluidHX( CompNum ).Name ) + " - Iteration Limit exceeded calculating demand side loop flow rate continues.", FluidHX( CompNum ).DmdSideModulatSolvNoConvergeErrorIndex, DmdSideMdot, DmdSideMdot );
+						ShowRecurringWarningErrorAtEnd( ComponentClassName + " named " + FluidHX( CompNum ).Name + " - Iteration Limit exceeded calculating demand side loop flow rate continues.", FluidHX( CompNum ).DmdSideModulatSolvNoConvergeErrorIndex, DmdSideMdot, DmdSideMdot );
 					}
 				} else if ( SolFla == -2 ) { //f(x0) and f(x1) have the same sign
 					DmdSideMdot = FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax * ( LeavingTempFullFlow - TargetSupplySideLoopLeavingTemp ) / ( LeavingTempFullFlow - LeavingTempMinFlow );
 					if ( ! WarmupFlag ) {
 						if ( FluidHX( CompNum ).DmdSideModulatSolvFailErrorCount < 1 ) {
 							++FluidHX( CompNum ).DmdSideModulatSolvFailErrorCount;
-							ShowWarningError( ComponentClassName + " named " + trim( FluidHX( CompNum ).Name ) + " - Solver failed to calculate demand side loop flow rate" );
+							ShowWarningError( ComponentClassName + " named " + FluidHX( CompNum ).Name + " - Solver failed to calculate demand side loop flow rate" );
 							ShowContinueError( "Simulation continues with estimated demand side mass flow rate = " + RoundSigDigits( DmdSideMdot, 7 ) );
 						}
-						ShowRecurringWarningErrorAtEnd( ComponentClassName + " named " + trim( FluidHX( CompNum ).Name ) + " - Solver failed to calculate demand side loop flow rate continues.", FluidHX( CompNum ).DmdSideModulatSolvFailErrorIndex, DmdSideMdot, DmdSideMdot );
+						ShowRecurringWarningErrorAtEnd( ComponentClassName + " named " + FluidHX( CompNum ).Name + " - Solver failed to calculate demand side loop flow rate continues.", FluidHX( CompNum ).DmdSideModulatSolvFailErrorIndex, DmdSideMdot, DmdSideMdot );
 					}
 				}
 				SetComponentFlowRate( DmdSideMdot, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum );

@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -16,7 +15,6 @@ namespace CTElectricGenerator {
 
 	// Using/Aliasing
 	using DataGlobalConstants::iGeneratorCombTurbine;
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -37,10 +35,10 @@ namespace CTElectricGenerator {
 	struct CTGeneratorSpecs
 	{
 		// Members
-		Fstring Name; // user identifier
-		Fstring TypeOf; // Type of Generator
+		std::string Name; // user identifier
+		std::string TypeOf; // Type of Generator
 		int CompType_Num;
-		Fstring FuelType; // Type of Fuel - DIESEL, GASOLINE, GAS
+		std::string FuelType; // Type of Fuel - DIESEL, GASOLINE, GAS
 		Real64 RatedPowerOutput; // W - design nominal capacity of Generator
 		int ElectricCircuitNode; // Electric Circuit Node
 		Real64 MinPartLoadRat; // (CT MIN) min allowed operating frac full load
@@ -93,10 +91,8 @@ namespace CTElectricGenerator {
 
 		// Default Constructor
 		CTGeneratorSpecs() :
-			Name( MaxNameLength ),
-			TypeOf( MaxNameLength, "Generator:CombustionTurbine" ),
+			TypeOf( "Generator:CombustionTurbine" ),
 			CompType_Num( iGeneratorCombTurbine ),
-			FuelType( MaxNameLength ),
 			RatedPowerOutput( 0.0 ),
 			ElectricCircuitNode( 0 ),
 			MinPartLoadRat( 0.0 ),
@@ -146,10 +142,10 @@ namespace CTElectricGenerator {
 
 		// Member Constructor
 		CTGeneratorSpecs(
-			Fstring const & Name, // user identifier
-			Fstring const & TypeOf, // Type of Generator
+			std::string const & Name, // user identifier
+			std::string const & TypeOf, // Type of Generator
 			int const CompType_Num,
-			Fstring const & FuelType, // Type of Fuel - DIESEL, GASOLINE, GAS
+			std::string const & FuelType, // Type of Fuel - DIESEL, GASOLINE, GAS
 			Real64 const RatedPowerOutput, // W - design nominal capacity of Generator
 			int const ElectricCircuitNode, // Electric Circuit Node
 			Real64 const MinPartLoadRat, // (CT MIN) min allowed operating frac full load
@@ -196,10 +192,10 @@ namespace CTElectricGenerator {
 			Real64 const HeatRecMaxTemp, // Max Temp that can be produced in heat recovery
 			int const OAInletNode // optional inlet node index pointer for outdoor air for compustion
 		) :
-			Name( MaxNameLength, Name ),
-			TypeOf( MaxNameLength, TypeOf ),
+			Name( Name ),
+			TypeOf( TypeOf ),
 			CompType_Num( CompType_Num ),
-			FuelType( MaxNameLength, FuelType ),
+			FuelType( FuelType ),
 			RatedPowerOutput( RatedPowerOutput ),
 			ElectricCircuitNode( ElectricCircuitNode ),
 			MinPartLoadRat( MinPartLoadRat ),
@@ -333,7 +329,7 @@ namespace CTElectricGenerator {
 	void
 	SimCTGenerator(
 		int const GeneratorType, // type of Generator
-		Fstring const & GeneratorName, // user specified name of Generator
+		std::string const & GeneratorName, // user specified name of Generator
 		int & GeneratorIndex,
 		bool const RunFlag, // simulate Generator when TRUE
 		Real64 const MyLoad, // generator demand
@@ -342,8 +338,8 @@ namespace CTElectricGenerator {
 
 	void
 	SimCTPlantHeatRecovery(
-		Fstring const & CompType, // unused1208
-		Fstring const & CompName,
+		std::string const & CompType, // unused1208
+		std::string const & CompName,
 		int const CompTypeNum, // unused1208
 		int & CompNum,
 		bool const RunFlag,

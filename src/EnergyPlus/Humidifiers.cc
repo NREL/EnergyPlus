@@ -55,7 +55,6 @@ namespace Humidifiers {
 	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
@@ -73,7 +72,7 @@ namespace Humidifiers {
 	// MODULE PARAMETER DEFINITIONS
 	int const Humidifier_Steam_Electric( 1 );
 
-	FArray1D_Fstring const HumidifierType( 1, sFstring( 25 ), "Humidifier:Steam:Electric" );
+	FArray1D_string const HumidifierType( 1, std::string( "Humidifier:Steam:Electric" ) );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -91,7 +90,7 @@ namespace Humidifiers {
 
 	void
 	SimHumidifier(
-		Fstring const & CompName, // name of the humidifier unit
+		std::string const & CompName, // name of the humidifier unit
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		int & CompIndex // Pointer to Humidifier Unit
 	)
@@ -114,7 +113,6 @@ namespace Humidifiers {
 
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
-		using InputProcessor::MakeUPPERCase;
 		using General::TrimSigDigits;
 
 		// Locals
@@ -143,23 +141,23 @@ namespace Humidifiers {
 		if ( CompIndex == 0 ) {
 			HumNum = FindItemInList( CompName, Humidifier.Name(), NumHumidifiers );
 			if ( HumNum == 0 ) {
-				ShowFatalError( "SimHumidifier: Unit not found=" + trim( CompName ) );
+				ShowFatalError( "SimHumidifier: Unit not found=" + CompName );
 			}
 			CompIndex = HumNum;
 		} else {
 			HumNum = CompIndex;
 			if ( HumNum > NumHumidifiers || HumNum < 1 ) {
-				ShowFatalError( "SimHumidifier:  Invalid CompIndex passed=" + trim( TrimSigDigits( HumNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumHumidifiers ) ) + ", Entered Unit name=" + trim( CompName ) );
+				ShowFatalError( "SimHumidifier:  Invalid CompIndex passed=" + TrimSigDigits( HumNum ) + ", Number of Units=" + TrimSigDigits( NumHumidifiers ) + ", Entered Unit name=" + CompName );
 			}
 			if ( CheckEquipName( HumNum ) ) {
 				if ( CompName != Humidifier( HumNum ).Name ) {
-					ShowFatalError( "SimHumidifier: Invalid CompIndex passed=" + trim( TrimSigDigits( HumNum ) ) + ", Unit name=" + trim( CompName ) + ", stored Unit Name for that index=" + trim( Humidifier( HumNum ).Name ) );
+					ShowFatalError( "SimHumidifier: Invalid CompIndex passed=" + TrimSigDigits( HumNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + Humidifier( HumNum ).Name );
 				}
 				CheckEquipName( HumNum ) = false;
 			}
 		}
 		if ( HumNum <= 0 ) {
-			ShowFatalError( "SimHumidifier: Unit not found=" + trim( CompName ) );
+			ShowFatalError( "SimHumidifier: Unit not found=" + CompName );
 		}
 
 		InitHumidifier( HumNum );
@@ -174,8 +172,8 @@ namespace Humidifiers {
 			CalcElecSteamHumidifier( HumNum, WaterAddNeeded );
 
 		} else {
-			ShowSevereError( "SimHumidifier: Invalid Humidifier Type Code=" + trim( TrimSigDigits( Humidifier( HumNum ).HumType_Code ) ) );
-			ShowContinueError( "...Component Name=[" + trim( CompName ) + "]." );
+			ShowSevereError( "SimHumidifier: Invalid Humidifier Type Code=" + TrimSigDigits( Humidifier( HumNum ).HumType_Code ) );
+			ShowContinueError( "...Component Name=[" + CompName + "]." );
 			ShowFatalError( "Preceding Condition causes termination." );
 
 		}}
@@ -222,7 +220,7 @@ namespace Humidifiers {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetHumidifierInputs: " ); // include trailing blank space
+		static std::string const RoutineName( "GetHumidifierInputs: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -239,10 +237,10 @@ namespace Humidifiers {
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in getting objects
-		FArray1D_Fstring Alphas( sFstring( MaxNameLength ) ); // Alpha input items for object
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) ); // Numeric field names
+		std::string CurrentModuleObject; // for ease in getting objects
+		FArray1D_string Alphas; // Alpha input items for object
+		FArray1D_string cAlphaFields; // Alpha field names
+		FArray1D_string cNumericFields; // Numeric field names
 		FArray1D< Real64 > Numbers; // Numeric input items for object
 		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
@@ -259,11 +257,11 @@ namespace Humidifiers {
 
 		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 		Alphas.allocate( NumAlphas );
-		Alphas = " ";
+		Alphas = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = " ";
+		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = " ";
+		cNumericFields = "";
 		Numbers.allocate( NumNumbers );
 		Numbers = 0.0;
 		lAlphaBlanks.allocate( NumAlphas );
@@ -277,7 +275,7 @@ namespace Humidifiers {
 			HumNum = HumidifierIndex;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Humidifier.Name(), HumNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), Humidifier.Name(), HumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -291,7 +289,7 @@ namespace Humidifiers {
 			} else {
 				Humidifier( HumNum ).SchedPtr = GetScheduleIndex( Alphas( 2 ) ); // convert schedule name to pointer
 				if ( Humidifier( HumNum ).SchedPtr == 0 ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + ": invalid " + trim( cAlphaFields( 2 ) ) + " entered =" + trim( Alphas( 2 ) ) + " for " + trim( cAlphaFields( 1 ) ) + "=" + trim( Alphas( 1 ) ) );
+					ShowSevereError( RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields( 2 ) + " entered =" + Alphas( 2 ) + " for " + cAlphaFields( 1 ) + '=' + Alphas( 1 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -299,15 +297,15 @@ namespace Humidifiers {
 			Humidifier( HumNum ).NomPower = Numbers( 2 );
 			Humidifier( HumNum ).FanPower = Numbers( 3 );
 			Humidifier( HumNum ).StandbyPower = Numbers( 4 );
-			Humidifier( HumNum ).AirInNode = GetOnlySingleNode( Alphas( 3 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			Humidifier( HumNum ).AirOutNode = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-			TestCompSet( trim( CurrentModuleObject ), Alphas( 1 ), Alphas( 3 ), Alphas( 4 ), "Air Nodes" );
+			Humidifier( HumNum ).AirInNode = GetOnlySingleNode( Alphas( 3 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			Humidifier( HumNum ).AirOutNode = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 3 ), Alphas( 4 ), "Air Nodes" );
 
 			//  A5; \field Name of Water Storage Tank
 			if ( lAlphaBlanks( 5 ) ) {
 				Humidifier( HumNum ).SuppliedByWaterSystem = false;
 			} else { // water from storage tank
-				SetupTankDemandComponent( Alphas( 1 ), trim( CurrentModuleObject ), Alphas( 5 ), ErrorsFound, Humidifier( HumNum ).WaterTankID, Humidifier( HumNum ).WaterTankDemandARRID );
+				SetupTankDemandComponent( Alphas( 1 ), CurrentModuleObject, Alphas( 5 ), ErrorsFound, Humidifier( HumNum ).WaterTankID, Humidifier( HumNum ).WaterTankDemandARRID );
 				Humidifier( HumNum ).SuppliedByWaterSystem = true;
 			}
 
@@ -384,7 +382,7 @@ namespace Humidifiers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const CalledFrom( "Humidifier:InitHumidifier" );
+		static std::string const CalledFrom( "Humidifier:InitHumidifier" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -433,16 +431,16 @@ namespace Humidifiers {
 				if ( OutNode > 0 ) {
 					if ( Node( OutNode ).HumRatMin == SensedNodeFlagValue ) {
 						if ( ! AnyEnergyManagementSystemInModel ) {
-							ShowSevereError( "Humidifiers: Missing humidity setpoint for " + trim( HumidifierType( Humidifier( NumHum ).HumType_Code ) ) + " = " + trim( Humidifier( HumNum ).Name ) );
+							ShowSevereError( "Humidifiers: Missing humidity setpoint for " + HumidifierType( Humidifier( NumHum ).HumType_Code ) + " = " + Humidifier( HumNum ).Name );
 							ShowContinueError( "  use a Setpoint Manager with Control Variable = \"MinimumHumidityRatio\" to establish" "a setpoint at the humidifier outlet node." );
-							ShowContinueError( "  expecting it on Node=\"" + trim( NodeID( OutNode ) ) + "\"." );
+							ShowContinueError( "  expecting it on Node=\"" + NodeID( OutNode ) + "\"." );
 							SetPointErrorFlag = true;
 						} else {
 							CheckIfNodeSetPointManagedByEMS( OutNode, iHumidityRatioMinSetPoint, SetPointErrorFlag );
 							if ( SetPointErrorFlag ) {
-								ShowSevereError( "Humidifiers: Missing humidity setpoint for " + trim( HumidifierType( Humidifier( NumHum ).HumType_Code ) ) + " = " + trim( Humidifier( HumNum ).Name ) );
+								ShowSevereError( "Humidifiers: Missing humidity setpoint for " + HumidifierType( Humidifier( NumHum ).HumType_Code ) + " = " + Humidifier( HumNum ).Name );
 								ShowContinueError( "  use a Setpoint Manager with Control Variable = \"MinimumHumidityRatio\" to establish" "a setpoint at the humidifier outlet node." );
-								ShowContinueError( "  expecting it on Node=\"" + trim( NodeID( OutNode ) ) + "\"." );
+								ShowContinueError( "  expecting it on Node=\"" + NodeID( OutNode ) + "\"." );
 								ShowContinueError( "  or use an EMS actuator to control minimum humidity ratio to establish" "a setpoint at the humidifier outlet node." );
 							}
 						}
@@ -508,7 +506,7 @@ namespace Humidifiers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const CalledFrom( "Humidifier:SizeHumidifier" );
+		static std::string const CalledFrom( "Humidifier:SizeHumidifier" );
 		Real64 const Tref( 20.0 ); // Reference temp of water for rated capacity calac [C]
 		Real64 const TSteam( 100.0 ); // saturated steam temperatur generated by Humidifier [C]
 
@@ -543,12 +541,12 @@ namespace Humidifiers {
 				ReportSizingOutput( "Humidifier:Steam:Electric", Humidifier( HumNum ).Name, "Rated Power [W]", Humidifier( HumNum ).NomPower );
 			} else if ( Humidifier( HumNum ).NomPower >= 0.0 && Humidifier( HumNum ).NomCap > 0.0 ) {
 				if ( Humidifier( HumNum ).NomPower < NominalPower ) {
-					ShowWarningError( "Humidifier:Steam:Electric: specified Rated Power is less than nominal Rated " " Power for electric steam humidifier = " + trim( Humidifier( HumNum ).Name ) + ". " );
-					ShowContinueError( " specified Rated Power = " + trim( RoundSigDigits( Humidifier( HumNum ).NomPower, 2 ) ) );
-					ShowContinueError( " while expecting a minimum Rated Power = " + trim( RoundSigDigits( NominalPower, 2 ) ) );
+					ShowWarningError( "Humidifier:Steam:Electric: specified Rated Power is less than nominal Rated " " Power for electric steam humidifier = " + Humidifier( HumNum ).Name + ". " );
+					ShowContinueError( " specified Rated Power = " + RoundSigDigits( Humidifier( HumNum ).NomPower, 2 ) );
+					ShowContinueError( " while expecting a minimum Rated Power = " + RoundSigDigits( NominalPower, 2 ) );
 				}
 			} else {
-				ShowWarningError( "Humidifier:Steam:Electric: specified nominal capacity is zero " " for electric steam humidifier = " + trim( Humidifier( HumNum ).Name ) + ". " );
+				ShowWarningError( "Humidifier:Steam:Electric: specified nominal capacity is zero " " for electric steam humidifier = " + Humidifier( HumNum ).Name + ". " );
 				ShowContinueError( " For zero rated capacity humidifier the rated power is zero." );
 			}
 		}

@@ -92,7 +92,6 @@ namespace ZoneEquipmentManager {
 	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::NumOfTimeStepInHour;
 	using DataGlobals::NumOfZones;
 	using DataGlobals::BeginEnvrnFlag;
@@ -736,26 +735,26 @@ namespace ZoneEquipmentManager {
 		int DSOAPtr; // index to DesignSpecification:OutdoorAir object
 
 		// Formats
-		std::string const Format_890( "('! <Load Timesteps in Zone Design Calculation Averaging Window>, Value')" );
-		std::string const Format_891( "(' Load Timesteps in Zone Design Calculation Averaging Window, ',I4)" );
-		std::string const Format_990( "('! <Heating Sizing Factor Information>, Sizing Factor ID, Value')" );
-		std::string const Format_991( "(' Heating Sizing Factor Information, Global, ',G12.5)" );
-		std::string const Format_992( "(' Heating Sizing Factor Information, Zone ',A,', ',G12.5)" );
-		std::string const Format_993( "('! <Cooling Sizing Factor Information>, Sizing Factor ID, Value')" );
-		std::string const Format_994( "(' Cooling Sizing Factor Information, Global, ',G12.5)" );
-		std::string const Format_995( "(' Cooling Sizing Factor Information, Zone ',A,', ',G12.5)" );
+		static gio::Fmt const Format_890( "('! <Load Timesteps in Zone Design Calculation Averaging Window>, Value')" );
+		static gio::Fmt const Format_891( "(' Load Timesteps in Zone Design Calculation Averaging Window, ',I4)" );
+		static gio::Fmt const Format_990( "('! <Heating Sizing Factor Information>, Sizing Factor ID, Value')" );
+		static gio::Fmt const Format_991( "(' Heating Sizing Factor Information, Global, ',G12.5)" );
+		static gio::Fmt const Format_992( "(' Heating Sizing Factor Information, Zone ',A,', ',G12.5)" );
+		static gio::Fmt const Format_993( "('! <Cooling Sizing Factor Information>, Sizing Factor ID, Value')" );
+		static gio::Fmt const Format_994( "(' Cooling Sizing Factor Information, Global, ',G12.5)" );
+		static gio::Fmt const Format_995( "(' Cooling Sizing Factor Information, Zone ',A,', ',G12.5)" );
 
 		for ( ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSizingInput; ++ZoneSizIndex ) {
 			ZoneIndex = FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneName, Zone.Name(), NumOfZones );
 			if ( ZoneIndex == 0 ) {
-				ShowSevereError( "SetUpZoneSizingArrays: Sizing:Zone=\"" + trim( ZoneSizingInput( ZoneSizIndex ).ZoneName ) + "\" references unknown zone" );
+				ShowSevereError( "SetUpZoneSizingArrays: Sizing:Zone=\"" + ZoneSizingInput( ZoneSizIndex ).ZoneName + "\" references unknown zone" );
 				ErrorsFound = true;
 			}
 			if ( any( ZoneEquipConfig.IsControlled() ) ) {
 				ZoneIndex = FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneName, ZoneEquipConfig.ZoneName(), NumOfZones );
 				if ( ZoneIndex == 0 ) {
 					if ( ! isPulseZoneSizing ) {
-						ShowWarningError( "SetUpZoneSizingArrays: Requested Sizing for Zone=\"" + trim( ZoneSizingInput( ZoneSizIndex ).ZoneName ) + "\", Zone is not found in the Controlled Zones List" );
+						ShowWarningError( "SetUpZoneSizingArrays: Requested Sizing for Zone=\"" + ZoneSizingInput( ZoneSizIndex ).ZoneName + "\", Zone is not found in the Controlled Zones List" );
 					}
 				} else {
 					ZoneSizingInput( ZoneSizIndex ).ZoneNum = ZoneIndex;
@@ -763,7 +762,7 @@ namespace ZoneEquipmentManager {
 				if ( ZoneSizingInput( ZoneSizIndex ).CoolAirDesMethod == FromDDCalc || ZoneSizingInput( ZoneSizIndex ).HeatAirDesMethod == FromDDCalc ) {
 					if ( ! VerifyThermostatInZone( ZoneSizingInput( ZoneSizIndex ).ZoneName ) ) {
 						if ( ! isPulseZoneSizing ) {
-							ShowWarningError( "SetUpZoneSizingArrays: Requested Sizing for Zone=\"" + trim( ZoneSizingInput( ZoneSizIndex ).ZoneName ) + "\", Zone has no thermostat (ref: ZoneControl:Thermostat, et al)" );
+							ShowWarningError( "SetUpZoneSizingArrays: Requested Sizing for Zone=\"" + ZoneSizingInput( ZoneSizIndex ).ZoneName + "\", Zone has no thermostat (ref: ZoneControl:Thermostat, et al)" );
 						}
 					}
 				}
@@ -789,8 +788,8 @@ namespace ZoneEquipmentManager {
 		ZoneSizThermSetPtHi.allocate( NumOfZones );
 		ZoneSizThermSetPtLo.allocate( NumOfZones );
 
-		CoolPeakDateHrMin = " ";
-		HeatPeakDateHrMin = " ";
+		CoolPeakDateHrMin = "";
+		HeatPeakDateHrMin = "";
 
 		ZoneSizThermSetPtHi = 0.0;
 		ZoneSizThermSetPtLo = 1000.;
@@ -872,7 +871,7 @@ namespace ZoneEquipmentManager {
 					//LKL I think this is sufficient for warning -- no need for array
 					if ( DesDayNum == 1 ) {
 						if ( ! isPulseZoneSizing ) {
-							ShowWarningError( "SetUpZoneSizingArrays: Sizing for Zone=\"" + trim( ZoneEquipConfig( CtrlZoneNum ).ZoneName ) + "\" will use Sizing:Zone specifications listed for Zone=\"" + trim( ZoneSizingInput( 1 ).ZoneName ) + "\"." );
+							ShowWarningError( "SetUpZoneSizingArrays: Sizing for Zone=\"" + ZoneEquipConfig( CtrlZoneNum ).ZoneName + "\" will use Sizing:Zone specifications listed for Zone=\"" + ZoneSizingInput( 1 ).ZoneName + "\"." );
 						}
 						// Following needs to be implemented first:
 						//          CALL ShowContinueError('  A better option would be to set up global ZoneList objects for Sizing:Zone objects.')
@@ -1316,7 +1315,7 @@ namespace ZoneEquipmentManager {
 		for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 			if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 			if ( FinalZoneSizing( CtrlZoneNum ).HeatSizingFactor != 1.0 ) {
-				gio::write( OutputFileInits, Format_992 ) << trim( FinalZoneSizing( CtrlZoneNum ).ZoneName ) << FinalZoneSizing( CtrlZoneNum ).HeatSizingFactor;
+				gio::write( OutputFileInits, Format_992 ) << FinalZoneSizing( CtrlZoneNum ).ZoneName << FinalZoneSizing( CtrlZoneNum ).HeatSizingFactor;
 			}
 		}
 		gio::write( OutputFileInits, Format_993 );
@@ -1324,7 +1323,7 @@ namespace ZoneEquipmentManager {
 		for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 			if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 			if ( FinalZoneSizing( CtrlZoneNum ).CoolSizingFactor != 1.0 ) {
-				gio::write( OutputFileInits, Format_995 ) << trim( FinalZoneSizing( CtrlZoneNum ).ZoneName ) << FinalZoneSizing( CtrlZoneNum ).CoolSizingFactor;
+				gio::write( OutputFileInits, Format_995 ) << FinalZoneSizing( CtrlZoneNum ).ZoneName << FinalZoneSizing( CtrlZoneNum ).CoolSizingFactor;
 			}
 		}
 
@@ -1419,8 +1418,8 @@ namespace ZoneEquipmentManager {
 						CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolOutHumRatSeq( TimeStepIndex ) = 0.0;
 					}
 				}
-				ZoneSizing( CtrlZoneNum, DesDayNum ).CoolDesDay = " "; // name of a cooling design day
-				ZoneSizing( CtrlZoneNum, DesDayNum ).HeatDesDay = " "; // name of a heating design day
+				ZoneSizing( CtrlZoneNum, DesDayNum ).CoolDesDay = ""; // name of a cooling design day
+				ZoneSizing( CtrlZoneNum, DesDayNum ).HeatDesDay = ""; // name of a heating design day
 
 				ZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatMassFlow = 0.0; // zone design heating air mass flow rate [kg/s]
 				ZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolMassFlow = 0.0; // zone design cooling air mass flow rate [kg/s]
@@ -1470,11 +1469,11 @@ namespace ZoneEquipmentManager {
 				ZoneSizing( CtrlZoneNum, DesDayNum ).TimeStepNumAtCoolMax = 0; // time step number (in day) at cooling peak
 				ZoneSizing( CtrlZoneNum, DesDayNum ).HeatDDNum = 0; // design day index of design day causing heating peak
 				ZoneSizing( CtrlZoneNum, DesDayNum ).CoolDDNum = 0; // design day index of design day causing heating peak
-				ZoneSizing( CtrlZoneNum, DesDayNum ).cHeatDDDate = " "; // date of design day causing heating peak
-				ZoneSizing( CtrlZoneNum, DesDayNum ).cCoolDDDate = " "; // date of design day causing cooling peak
+				ZoneSizing( CtrlZoneNum, DesDayNum ).cHeatDDDate = ""; // date of design day causing heating peak
+				ZoneSizing( CtrlZoneNum, DesDayNum ).cCoolDDDate = ""; // date of design day causing cooling peak
 
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolDesDay = " "; // name of a cooling design day
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatDesDay = " "; // name of a heating design day
+				CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolDesDay = ""; // name of a cooling design day
+				CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatDesDay = ""; // name of a heating design day
 
 				CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatMassFlow = 0.0; // zone design heating air mass flow rate [kg/s]
 				CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolMassFlow = 0.0; // zone design cooling air mass flow rate [kg/s]
@@ -1524,8 +1523,8 @@ namespace ZoneEquipmentManager {
 				CalcZoneSizing( CtrlZoneNum, DesDayNum ).TimeStepNumAtCoolMax = 0; // time step number (in day) at cooling peak
 				CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatDDNum = 0; // design day index of design day causing heating peak
 				CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolDDNum = 0; // design day index of design day causing heating peak
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).cHeatDDDate = " "; // date of design day causing heating peak
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).cCoolDDDate = " "; // date of design day causing cooling peak
+				CalcZoneSizing( CtrlZoneNum, DesDayNum ).cHeatDDDate = ""; // date of design day causing heating peak
+				CalcZoneSizing( CtrlZoneNum, DesDayNum ).cCoolDDDate = ""; // date of design day causing cooling peak
 			}
 		}
 		for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
@@ -1571,8 +1570,8 @@ namespace ZoneEquipmentManager {
 					CalcFinalZoneSizing( CtrlZoneNum ).CoolOutHumRatSeq( TimeStepIndex ) = 0.0;
 				}
 			}
-			FinalZoneSizing( CtrlZoneNum ).CoolDesDay = " "; // name of a cooling design day
-			FinalZoneSizing( CtrlZoneNum ).HeatDesDay = " "; // name of a heating design day
+			FinalZoneSizing( CtrlZoneNum ).CoolDesDay = ""; // name of a cooling design day
+			FinalZoneSizing( CtrlZoneNum ).HeatDesDay = ""; // name of a heating design day
 
 			FinalZoneSizing( CtrlZoneNum ).DesHeatMassFlow = 0.0; // zone design heating air mass flow rate [kg/s]
 			FinalZoneSizing( CtrlZoneNum ).DesCoolMassFlow = 0.0; // zone design cooling air mass flow rate [kg/s]
@@ -1622,11 +1621,11 @@ namespace ZoneEquipmentManager {
 			FinalZoneSizing( CtrlZoneNum ).TimeStepNumAtCoolMax = 0; // time step number (in day) at cooling peak
 			FinalZoneSizing( CtrlZoneNum ).HeatDDNum = 0; // design day index of design day causing heating peak
 			FinalZoneSizing( CtrlZoneNum ).CoolDDNum = 0; // design day index of design day causing heating peak
-			FinalZoneSizing( CtrlZoneNum ).cHeatDDDate = " "; // date of design day causing heating peak
-			FinalZoneSizing( CtrlZoneNum ).cCoolDDDate = " "; // date of design day causing cooling peak
+			FinalZoneSizing( CtrlZoneNum ).cHeatDDDate = ""; // date of design day causing heating peak
+			FinalZoneSizing( CtrlZoneNum ).cCoolDDDate = ""; // date of design day causing cooling peak
 
-			CalcFinalZoneSizing( CtrlZoneNum ).CoolDesDay = " "; // name of a cooling design day
-			CalcFinalZoneSizing( CtrlZoneNum ).HeatDesDay = " "; // name of a heating design day
+			CalcFinalZoneSizing( CtrlZoneNum ).CoolDesDay = ""; // name of a cooling design day
+			CalcFinalZoneSizing( CtrlZoneNum ).HeatDesDay = ""; // name of a heating design day
 
 			CalcFinalZoneSizing( CtrlZoneNum ).DesHeatMassFlow = 0.0; // zone design heating air mass flow rate [kg/s]
 			CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMassFlow = 0.0; // zone design cooling air mass flow rate [kg/s]
@@ -1676,8 +1675,8 @@ namespace ZoneEquipmentManager {
 			CalcFinalZoneSizing( CtrlZoneNum ).TimeStepNumAtCoolMax = 0; // time step number (in day) at cooling peak
 			CalcFinalZoneSizing( CtrlZoneNum ).HeatDDNum = 0; // design day index of design day causing heating peak
 			CalcFinalZoneSizing( CtrlZoneNum ).CoolDDNum = 0; // design day index of design day causing heating peak
-			CalcFinalZoneSizing( CtrlZoneNum ).cHeatDDDate = " "; // date of design day causing heating peak
-			CalcFinalZoneSizing( CtrlZoneNum ).cCoolDDDate = " "; // date of design day causing cooling peak
+			CalcFinalZoneSizing( CtrlZoneNum ).cHeatDDDate = ""; // date of design day causing heating peak
+			CalcFinalZoneSizing( CtrlZoneNum ).cCoolDDDate = ""; // date of design day causing cooling peak
 		}
 	}
 
@@ -1735,15 +1734,15 @@ namespace ZoneEquipmentManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const fmta( "(A)" );
-		static Fstring const ZSizeFmt10( "('Time')" );
-		static Fstring const ZSizeFmt11( "(A1,A,':',A,A,A1,A,':',A,A,A1,A,':',A,A,A1,A,':',A,A )" );
-		static Fstring const ZSizeFmt20( "(I2.2,':',I2.2,':00')" );
-		static Fstring const ZSizeFmt21( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6 )" );
-		static Fstring const ZSizeFmt30( "('Peak')" );
-		static Fstring const ZSizeFmt31( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)" );
-		static Fstring const ZSizeFmt40( "(/'Peak Vol Flow (m3/s)')" );
-		static Fstring const ZSizeFmt41( "(A1,A1,A1,ES12.6,A1,ES12.6)" );
+		static gio::Fmt const fmta( "(A)" );
+		static gio::Fmt const ZSizeFmt10( "('Time')" );
+		static gio::Fmt const ZSizeFmt11( "(A1,A,':',A,A,A1,A,':',A,A,A1,A,':',A,A,A1,A,':',A,A )" );
+		static gio::Fmt const ZSizeFmt20( "(I2.2,':',I2.2,':00')" );
+		static gio::Fmt const ZSizeFmt21( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6 )" );
+		static gio::Fmt const ZSizeFmt30( "('Peak')" );
+		static gio::Fmt const ZSizeFmt31( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)" );
+		static gio::Fmt const ZSizeFmt40( "(/'Peak Vol Flow (m3/s)')" );
+		static gio::Fmt const ZSizeFmt41( "(A1,A1,A1,ES12.6,A1,ES12.6)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1773,7 +1772,7 @@ namespace ZoneEquipmentManager {
 		Real64 MaxOfMinCoolVolFlow; // max of the user specified design cooling minimum flows and min OA flow [m3/s]
 		Real64 MaxOfMinCoolMassFlow; // max of the user specified design cooling minimum flows and min OA flow [kg/s]
 		Real64 MaxHeatVolFlow; // max of user specified design heating max flow [m3/s]
-		Fstring HrMinString( 8 ); // store hour/minute string before assigning to peak string array
+		std::string HrMinString; // store hour/minute string before assigning to peak string array
 		Real64 SupplyTemp; // supply air temperature [C]
 		Real64 DeltaTemp; // supply air delta temperature [deltaC]
 
@@ -2007,11 +2006,11 @@ namespace ZoneEquipmentManager {
 				for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 					if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 					if ( std::abs( CalcFinalZoneSizing( CtrlZoneNum ).DesCoolLoad ) <= 1.e-8 ) {
-						ShowWarningError( "Calculated design cooling load for zone=" + trim( CalcFinalZoneSizing( CtrlZoneNum ).ZoneName ) + " is zero." );
+						ShowWarningError( "Calculated design cooling load for zone=" + CalcFinalZoneSizing( CtrlZoneNum ).ZoneName + " is zero." );
 						ShowContinueError( "Check Sizing:Zone and ZoneControl:Thermostat inputs." );
 					}
 					if ( std::abs( CalcFinalZoneSizing( CtrlZoneNum ).DesHeatLoad ) <= 1.e-8 ) {
-						ShowWarningError( "Calculated design heating load for zone=" + trim( CalcFinalZoneSizing( CtrlZoneNum ).ZoneName ) + " is zero." );
+						ShowWarningError( "Calculated design heating load for zone=" + CalcFinalZoneSizing( CtrlZoneNum ).ZoneName + " is zero." );
 						ShowContinueError( "Check Sizing:Zone and ZoneControl:Thermostat inputs." );
 					}
 				}
@@ -2019,7 +2018,7 @@ namespace ZoneEquipmentManager {
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileZoneSizing, ZSizeFmt10, flags ); }
 				for ( I = 1; I <= NumOfZones; ++I ) {
 					if ( ! ZoneEquipConfig( I ).IsControlled ) continue;
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileZoneSizing, ZSizeFmt11, flags ) << SizingFileColSep << trim( CalcFinalZoneSizing( I ).ZoneName ) << trim( CalcFinalZoneSizing( I ).HeatDesDay ) << ":Des Heat Load [W]" << SizingFileColSep << trim( CalcFinalZoneSizing( I ).ZoneName ) << trim( CalcFinalZoneSizing( I ).CoolDesDay ) << ":Des Sens Cool Load [W]" << SizingFileColSep << trim( CalcFinalZoneSizing( I ).ZoneName ) << trim( CalcFinalZoneSizing( I ).HeatDesDay ) << ":Des Heat Mass Flow [kg/s]" << SizingFileColSep << trim( CalcFinalZoneSizing( I ).ZoneName ) << trim( CalcFinalZoneSizing( I ).CoolDesDay ) << ":Des Cool Mass Flow [kg/s]"; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileZoneSizing, ZSizeFmt11, flags ) << SizingFileColSep << CalcFinalZoneSizing( I ).ZoneName << CalcFinalZoneSizing( I ).HeatDesDay << ":Des Heat Load [W]" << SizingFileColSep << CalcFinalZoneSizing( I ).ZoneName << CalcFinalZoneSizing( I ).CoolDesDay << ":Des Sens Cool Load [W]" << SizingFileColSep << CalcFinalZoneSizing( I ).ZoneName << CalcFinalZoneSizing( I ).HeatDesDay << ":Des Heat Mass Flow [kg/s]" << SizingFileColSep << CalcFinalZoneSizing( I ).ZoneName << CalcFinalZoneSizing( I ).CoolDesDay << ":Des Cool Mass Flow [kg/s]"; }
 
 					// Should this be done only if there is a cooling load? Or would this message help dermine why there was no load?
 					if ( std::abs( CalcFinalZoneSizing( I ).DesCoolLoad ) > 1.e-8 ) {
@@ -2040,20 +2039,20 @@ namespace ZoneEquipmentManager {
 								ShowSevereError( "UpdateZoneSizing: Cooling supply air temperature (calculated) within 2C of" " zone temperature" );
 							}
 							ShowContinueError( "...check zone thermostat set point and design supply air temperatures" );
-							ShowContinueError( "...zone name = " + trim( CalcFinalZoneSizing( I ).ZoneName ) );
-							ShowContinueError( "...design sensible cooling load = " + trim( RoundSigDigits( CalcFinalZoneSizing( I ).DesCoolLoad, 2 ) ) + " W" );
-							ShowContinueError( "...thermostat set point temp    = " + trim( RoundSigDigits( CalcFinalZoneSizing( I ).CoolTstatTemp, 3 ) ) + " C" );
-							ShowContinueError( "...zone temperature             = " + trim( RoundSigDigits( CalcFinalZoneSizing( I ).ZoneTempAtCoolPeak, 3 ) ) + " C" );
-							ShowContinueError( "...supply air temperature       = " + trim( RoundSigDigits( SupplyTemp, 3 ) ) + " C" );
-							ShowContinueError( "...temperature difference       = " + trim( RoundSigDigits( DeltaTemp, 5 ) ) + " C" );
-							ShowContinueError( "...calculated volume flow rate  = " + trim( RoundSigDigits( ( CalcFinalZoneSizing( I ).DesCoolVolFlow ), 5 ) ) + " m3/s" );
-							ShowContinueError( "...calculated mass flow rate    = " + trim( RoundSigDigits( ( CalcFinalZoneSizing( I ).DesCoolMassFlow ), 5 ) ) + " kg/s" );
+							ShowContinueError( "...zone name = " + CalcFinalZoneSizing( I ).ZoneName );
+							ShowContinueError( "...design sensible cooling load = " + RoundSigDigits( CalcFinalZoneSizing( I ).DesCoolLoad, 2 ) + " W" );
+							ShowContinueError( "...thermostat set point temp    = " + RoundSigDigits( CalcFinalZoneSizing( I ).CoolTstatTemp, 3 ) + " C" );
+							ShowContinueError( "...zone temperature             = " + RoundSigDigits( CalcFinalZoneSizing( I ).ZoneTempAtCoolPeak, 3 ) + " C" );
+							ShowContinueError( "...supply air temperature       = " + RoundSigDigits( SupplyTemp, 3 ) + " C" );
+							ShowContinueError( "...temperature difference       = " + RoundSigDigits( DeltaTemp, 5 ) + " C" );
+							ShowContinueError( "...calculated volume flow rate  = " + RoundSigDigits( ( CalcFinalZoneSizing( I ).DesCoolVolFlow ), 5 ) + " m3/s" );
+							ShowContinueError( "...calculated mass flow rate    = " + RoundSigDigits( ( CalcFinalZoneSizing( I ).DesCoolMassFlow ), 5 ) + " kg/s" );
 							if ( SupplyTemp > CalcFinalZoneSizing( I ).ZoneTempAtCoolPeak ) ShowContinueError( "...Note: supply air temperature should be less than zone" " temperature during cooling air flow calculations" );
 						} else if ( std::abs( DeltaTemp ) > SmallTempDiff && SupplyTemp > CalcFinalZoneSizing( I ).ZoneTempAtCoolPeak ) {
 							ShowSevereError( "UpdateZoneSizing: Supply air temperature is greater than zone" " temperature during cooling air flow calculations" );
-							ShowContinueError( "...zone temperature            = " + trim( RoundSigDigits( CalcFinalZoneSizing( I ).ZoneTempAtCoolPeak, 3 ) ) + " C" );
-							ShowContinueError( "...supply air temperature      = " + trim( RoundSigDigits( SupplyTemp, 3 ) ) + " C" );
-							ShowContinueError( "...occurs in zone              = " + trim( CalcFinalZoneSizing( I ).ZoneName ) );
+							ShowContinueError( "...zone temperature            = " + RoundSigDigits( CalcFinalZoneSizing( I ).ZoneTempAtCoolPeak, 3 ) + " C" );
+							ShowContinueError( "...supply air temperature      = " + RoundSigDigits( SupplyTemp, 3 ) + " C" );
+							ShowContinueError( "...occurs in zone              = " + CalcFinalZoneSizing( I ).ZoneName );
 						}
 					}
 					// Should this be done only if there is a heating load? Or would this message help dermine why there was no load?
@@ -2074,26 +2073,26 @@ namespace ZoneEquipmentManager {
 								ShowSevereError( "UpdateZoneSizing: Heating supply air temperature (calculated) within 2C of" " zone temperature" );
 							}
 							ShowContinueError( "...check zone thermostat set point and design supply air temperatures" );
-							ShowContinueError( "...zone name = " + trim( CalcFinalZoneSizing( I ).ZoneName ) );
-							ShowContinueError( "...design heating load         = " + trim( RoundSigDigits( CalcFinalZoneSizing( I ).DesCoolLoad, 2 ) ) + " W" );
-							ShowContinueError( "...thermostat set piont temp   = " + trim( RoundSigDigits( CalcFinalZoneSizing( I ).HeatTstatTemp, 3 ) ) + " C" );
-							ShowContinueError( "...zone temperature            = " + trim( RoundSigDigits( CalcFinalZoneSizing( I ).ZoneTempAtHeatPeak, 3 ) ) + " C" );
-							ShowContinueError( "...supply air temperature      = " + trim( RoundSigDigits( SupplyTemp, 3 ) ) + " C" );
-							ShowContinueError( "...temperature difference      = " + trim( RoundSigDigits( DeltaTemp, 5 ) ) + " C" );
-							ShowContinueError( "...calculated volume flow rate = " + trim( RoundSigDigits( ( CalcFinalZoneSizing( I ).DesHeatVolFlow ), 5 ) ) + " m3/s" );
-							ShowContinueError( "...calculated mass flow rate   = " + trim( RoundSigDigits( ( CalcFinalZoneSizing( I ).DesHeatMassFlow ), 5 ) ) + " kg/s" );
+							ShowContinueError( "...zone name = " + CalcFinalZoneSizing( I ).ZoneName );
+							ShowContinueError( "...design heating load         = " + RoundSigDigits( CalcFinalZoneSizing( I ).DesCoolLoad, 2 ) + " W" );
+							ShowContinueError( "...thermostat set piont temp   = " + RoundSigDigits( CalcFinalZoneSizing( I ).HeatTstatTemp, 3 ) + " C" );
+							ShowContinueError( "...zone temperature            = " + RoundSigDigits( CalcFinalZoneSizing( I ).ZoneTempAtHeatPeak, 3 ) + " C" );
+							ShowContinueError( "...supply air temperature      = " + RoundSigDigits( SupplyTemp, 3 ) + " C" );
+							ShowContinueError( "...temperature difference      = " + RoundSigDigits( DeltaTemp, 5 ) + " C" );
+							ShowContinueError( "...calculated volume flow rate = " + RoundSigDigits( ( CalcFinalZoneSizing( I ).DesHeatVolFlow ), 5 ) + " m3/s" );
+							ShowContinueError( "...calculated mass flow rate   = " + RoundSigDigits( ( CalcFinalZoneSizing( I ).DesHeatMassFlow ), 5 ) + " kg/s" );
 							if ( SupplyTemp < CalcFinalZoneSizing( I ).ZoneTempAtHeatPeak ) ShowContinueError( "...Note: supply air temperature should be greater than zone" " temperature during heating air flow calculations" );
 						} else if ( std::abs( DeltaTemp ) > SmallTempDiff && SupplyTemp < CalcFinalZoneSizing( I ).ZoneTempAtHeatPeak ) {
 							ShowSevereError( "UpdateZoneSizing: Supply air temperature is less than zone" " temperature during heating air flow calculations" );
-							ShowContinueError( "...zone temperature            = " + trim( RoundSigDigits( CalcFinalZoneSizing( I ).ZoneTempAtHeatPeak, 3 ) ) + " C" );
-							ShowContinueError( "...supply air temperature      = " + trim( RoundSigDigits( SupplyTemp, 3 ) ) + " C" );
-							ShowContinueError( "...occurs in zone              = " + trim( CalcFinalZoneSizing( I ).ZoneName ) );
+							ShowContinueError( "...zone temperature            = " + RoundSigDigits( CalcFinalZoneSizing( I ).ZoneTempAtHeatPeak, 3 ) + " C" );
+							ShowContinueError( "...supply air temperature      = " + RoundSigDigits( SupplyTemp, 3 ) + " C" );
+							ShowContinueError( "...occurs in zone              = " + CalcFinalZoneSizing( I ).ZoneName );
 						}
 					}
 
 				}
 
-				gio::write( OutputFileZoneSizing, fmta ) << " ";
+				gio::write( OutputFileZoneSizing );
 				//      HourFrac = 0.0
 				Minutes = 0;
 				TimeStepIndex = 0;
@@ -2111,11 +2110,11 @@ namespace ZoneEquipmentManager {
 							if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 							if ( TimeStepIndex == CalcFinalZoneSizing( CtrlZoneNum ).TimeStepNumAtHeatMax ) {
 								gio::write( HrMinString, PeakHrMinFmt ) << HourPrint << Minutes;
-								HeatPeakDateHrMin( CtrlZoneNum ) = trim( CalcFinalZoneSizing( CtrlZoneNum ).cHeatDDDate ) + " " + trim( HrMinString );
+								HeatPeakDateHrMin( CtrlZoneNum ) = CalcFinalZoneSizing( CtrlZoneNum ).cHeatDDDate + ' ' + HrMinString;
 							}
 							if ( TimeStepIndex == CalcFinalZoneSizing( CtrlZoneNum ).TimeStepNumAtCoolMax ) {
 								gio::write( HrMinString, PeakHrMinFmt ) << HourPrint << Minutes;
-								CoolPeakDateHrMin( CtrlZoneNum ) = trim( CalcFinalZoneSizing( CtrlZoneNum ).cCoolDDDate ) + " " + trim( HrMinString );
+								CoolPeakDateHrMin( CtrlZoneNum ) = CalcFinalZoneSizing( CtrlZoneNum ).cCoolDDDate + ' ' + HrMinString;
 							}
 						}
 						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileZoneSizing, ZSizeFmt20, flags ) << HourPrint << Minutes; }
@@ -2123,7 +2122,7 @@ namespace ZoneEquipmentManager {
 							if ( ! ZoneEquipConfig( I ).IsControlled ) continue;
 							{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileZoneSizing, ZSizeFmt21, flags ) << SizingFileColSep << CalcFinalZoneSizing( I ).HeatLoadSeq( TimeStepIndex ) << SizingFileColSep << CalcFinalZoneSizing( I ).CoolLoadSeq( TimeStepIndex ) << SizingFileColSep << CalcFinalZoneSizing( I ).HeatFlowSeq( TimeStepIndex ) << SizingFileColSep << CalcFinalZoneSizing( I ).CoolFlowSeq( TimeStepIndex ); }
 						}
-						gio::write( OutputFileZoneSizing, fmta ) << " ";
+						gio::write( OutputFileZoneSizing );
 					}
 				}
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileZoneSizing, ZSizeFmt30, flags ); }
@@ -2131,13 +2130,13 @@ namespace ZoneEquipmentManager {
 					if ( ! ZoneEquipConfig( I ).IsControlled ) continue;
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileZoneSizing, ZSizeFmt31, flags ) << SizingFileColSep << CalcFinalZoneSizing( I ).DesHeatLoad << SizingFileColSep << CalcFinalZoneSizing( I ).DesCoolLoad << SizingFileColSep << CalcFinalZoneSizing( I ).DesHeatMassFlow << SizingFileColSep << CalcFinalZoneSizing( I ).DesCoolMassFlow; }
 				}
-				gio::write( OutputFileZoneSizing, fmta ) << " ";
+				gio::write( OutputFileZoneSizing );
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileZoneSizing, ZSizeFmt40, flags ); }
 				for ( I = 1; I <= NumOfZones; ++I ) {
 					if ( ! ZoneEquipConfig( I ).IsControlled ) continue;
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileZoneSizing, ZSizeFmt41, flags ) << SizingFileColSep << SizingFileColSep << SizingFileColSep << CalcFinalZoneSizing( I ).DesHeatVolFlow << SizingFileColSep << CalcFinalZoneSizing( I ).DesCoolVolFlow; }
 				}
-				gio::write( OutputFileZoneSizing, fmta ) << " ";
+				gio::write( OutputFileZoneSizing );
 				gio::close( OutputFileZoneSizing );
 			}
 
@@ -2651,8 +2650,8 @@ namespace ZoneEquipmentManager {
 					SimAirZonePlenum( SupplyAirPath( SupplyAirPathNum ).ComponentName( CompNum ), ZoneSupplyPlenum_Type, SupplyAirPath( SupplyAirPathNum ).ComponentIndex( CompNum ), FirstHVACIteration, FirstCall, SupPathInletChanged );
 
 				} else {
-					ShowSevereError( "Error found in Supply Air Path=" + trim( SupplyAirPath( SupplyAirPathNum ).Name ) );
-					ShowContinueError( "Invalid Supply Air Path Component=" + trim( SupplyAirPath( SupplyAirPathNum ).ComponentType( CompNum ) ) );
+					ShowSevereError( "Error found in Supply Air Path=" + SupplyAirPath( SupplyAirPathNum ).Name );
+					ShowContinueError( "Invalid Supply Air Path Component=" + SupplyAirPath( SupplyAirPathNum ).ComponentType( CompNum ) );
 					ShowFatalError( "Preceding condition causes termination." );
 
 				}}
@@ -2885,7 +2884,7 @@ namespace ZoneEquipmentManager {
 				if ( ZoneHasAirLoopHVACTerminal && ZoneHasAirLoopHVACDirectAir ) {
 					// zone has both AirTerminal:SingleDuct:Uncontrolled and another kind of Air terminal unit which is not supported
 					if ( ! DirectAirAndAirTerminalWarningIssued( ActualZoneNum ) ) {
-						ShowSevereError( "In zone \"" + trim( ZoneEquipConfig( ControlledZoneNum ).ZoneName ) + "\" there are too many air terminals served by AirLoopHVAC systems." );
+						ShowSevereError( "In zone \"" + ZoneEquipConfig( ControlledZoneNum ).ZoneName + "\" there are too many air terminals served by AirLoopHVAC systems." );
 						ShowContinueError( "A single zone cannot have both an AirTerminal:SingleDuct:Uncontrolled " "and also a second AirTerminal:* object." );
 
 						DirectAirAndAirTerminalWarningIssued( ActualZoneNum ) = true;
@@ -2900,8 +2899,8 @@ namespace ZoneEquipmentManager {
 					if ( ! PrimaryAirSystem( AirLoopNum ).OASysExists ) {
 						if ( ZoneEquipConfig( ControlledZoneNum ).ZoneExh > 0.0 && ! ZoneEquipConfig( ControlledZoneNum ).FlowError && AirLoopsSimOnce ) {
 							if ( ! isPulseZoneSizing ) {
-								ShowWarningError( "In zone " + trim( ZoneEquipConfig( ControlledZoneNum ).ZoneName ) + " there is unbalanced exhaust air flow." );
-								ShowContinueErrorTimeStamp( " " );
+								ShowWarningError( "In zone " + ZoneEquipConfig( ControlledZoneNum ).ZoneName + " there is unbalanced exhaust air flow." );
+								ShowContinueErrorTimeStamp( "" );
 								ShowContinueError( "  Unless there is balancing infiltration / ventilation air flow, this will result in" );
 								ShowContinueError( "  load due to induced outdoor air being neglected in the simulation." );
 								ZoneEquipConfig( ControlledZoneNum ).FlowError = true;
@@ -2912,8 +2911,8 @@ namespace ZoneEquipmentManager {
 				} else {
 					if ( ZoneEquipConfig( ControlledZoneNum ).ZoneExh > 0.0 && ! ZoneEquipConfig( ControlledZoneNum ).FlowError && AirLoopsSimOnce ) {
 						if ( ! isPulseZoneSizing ) {
-							ShowWarningError( "In zone " + trim( ZoneEquipConfig( ControlledZoneNum ).ZoneName ) + " there is unbalanced exhaust air flow." );
-							ShowContinueErrorTimeStamp( " " );
+							ShowWarningError( "In zone " + ZoneEquipConfig( ControlledZoneNum ).ZoneName + " there is unbalanced exhaust air flow." );
+							ShowContinueErrorTimeStamp( "" );
 							ShowContinueError( "  Unless there is balancing infiltration / ventilation air flow, this will result in" );
 							ShowContinueError( "  load due to induced outdoor air being neglected in the simulation." );
 							ZoneEquipConfig( ControlledZoneNum ).FlowError = true;
@@ -2947,8 +2946,8 @@ namespace ZoneEquipmentManager {
 					SimAirZonePlenum( SupplyAirPath( SupplyAirPathNum ).ComponentName( CompNum ), ZoneSupplyPlenum_Type, SupplyAirPath( SupplyAirPathNum ).ComponentIndex( CompNum ), FirstHVACIteration, FirstCall, SupPathInletChanged );
 
 				} else {
-					ShowSevereError( "Error found in Supply Air Path=" + trim( SupplyAirPath( SupplyAirPathNum ).Name ) );
-					ShowContinueError( "Invalid Supply Air Path Component=" + trim( SupplyAirPath( SupplyAirPathNum ).ComponentType( CompNum ) ) );
+					ShowSevereError( "Error found in Supply Air Path=" + SupplyAirPath( SupplyAirPathNum ).Name );
+					ShowContinueError( "Invalid Supply Air Path Component=" + SupplyAirPath( SupplyAirPathNum ).ComponentType( CompNum ) );
 					ShowFatalError( "Preceding condition causes termination." );
 
 				}}
@@ -2971,7 +2970,7 @@ namespace ZoneEquipmentManager {
 			for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 				if ( ! ZoneEquipConfig( ControlledZoneNum ).IsControlled ) continue;
 				if ( ZoneEquipConfig( ControlledZoneNum ).SupLeakToRetPlen && ZoneEquipConfig( ControlledZoneNum ).ReturnZonePlenumCondNum == 0 ) {
-					ShowSevereError( "No return plenum for simple duct leakage model for Zone " + trim( ZoneEquipConfig( ControlledZoneNum ).ZoneName ) );
+					ShowSevereError( "No return plenum for simple duct leakage model for Zone " + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
 					ShowContinueError( "  The simple duct leakage model requires plenum return for all zone with leaks" );
 					ErrorFlag = true;
 				}
@@ -3023,8 +3022,8 @@ namespace ZoneEquipmentManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Fstring EquipTypeTemp( MaxNameLength );
-		Fstring EquipNameTemp( MaxNameLength );
+		std::string EquipTypeTemp;
+		std::string EquipNameTemp;
 		int EquipTypeNum;
 		int EquipPtrTemp;
 		int ComparedEquipTypeNum;
@@ -3034,9 +3033,9 @@ namespace ZoneEquipmentManager {
 		int NumOfEquipTypes; // For improved readability
 
 		NumOfEquipTypes = ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes;
-		PrioritySimOrder.EquipType() = " ";
+		PrioritySimOrder.EquipType() = "";
 		PrioritySimOrder.EquipType_Num() = 0;
-		PrioritySimOrder.EquipName() = " ";
+		PrioritySimOrder.EquipName() = "";
 		PrioritySimOrder.EquipPtr() = 0;
 
 		PrioritySimOrder( {1,NumOfEquipTypes} ).EquipType() = ZoneEquipList( ControlledZoneNum ).EquipType( {1,NumOfEquipTypes} );
@@ -3387,8 +3386,8 @@ namespace ZoneEquipmentManager {
 		for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
 			if ( ( AirLoopFlow( AirLoopNum ).ZoneExhaust > ( AirLoopFlow( AirLoopNum ).SupFlow + AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced ) || AirLoopFlow( AirLoopNum ).ZoneExhaust > ( AirLoopFlow( AirLoopNum ).MaxOutAir + AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced ) ) && ! AirLoopFlow( AirLoopNum ).FlowError && AirLoopsSimOnce ) {
 				if ( ! isPulseZoneSizing ) {
-					ShowWarningError( "In AirLoopHVAC " + trim( PrimaryAirSystem( AirLoopNum ).Name ) + " there is unbalanced exhaust air flow." );
-					ShowContinueErrorTimeStamp( " " );
+					ShowWarningError( "In AirLoopHVAC " + PrimaryAirSystem( AirLoopNum ).Name + " there is unbalanced exhaust air flow." );
+					ShowContinueErrorTimeStamp( "" );
 					ShowContinueError( "  Unless there is balancing infiltration / ventilation air flow, this will result in" );
 					ShowContinueError( "  load due to induced outdoor air being neglected in the simulation." );
 					AirLoopFlow( AirLoopNum ).FlowError = true;

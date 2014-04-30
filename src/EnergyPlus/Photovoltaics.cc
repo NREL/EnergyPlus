@@ -70,7 +70,6 @@ namespace Photovoltaics {
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::BeginDayFlag;
 	using DataGlobals::EndEnvrnFlag;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::SecInHour;
 	using DataGlobals::KelvinConv;
 	using DataHVACGlobals::TimeStepSys;
@@ -101,7 +100,7 @@ namespace Photovoltaics {
 	void
 	SimPVGenerator(
 		int const GeneratorType, // type of Generator !unused1208
-		Fstring const & GeneratorName, // user specified name of Generator
+		std::string const & GeneratorName, // user specified name of Generator
 		int & GeneratorIndex,
 		bool const RunFlag, // is PV ON or OFF as determined by schedules in ElecLoadCenter
 		Real64 const PVLoad // electrical load on the PV (not really used... PV models assume "full on" !unused1208
@@ -156,17 +155,17 @@ namespace Photovoltaics {
 		if ( GeneratorIndex == 0 ) {
 			PVnum = FindItemInList( GeneratorName, PVarray.Name(), NumPVs );
 			if ( PVnum == 0 ) {
-				ShowFatalError( "SimPhotovoltaicGenerator: Specified PV not one of valid Photovoltaic Generators " + trim( GeneratorName ) );
+				ShowFatalError( "SimPhotovoltaicGenerator: Specified PV not one of valid Photovoltaic Generators " + GeneratorName );
 			}
 			GeneratorIndex = PVnum;
 		} else {
 			PVnum = GeneratorIndex;
 			if ( PVnum > NumPVs || PVnum < 1 ) {
-				ShowFatalError( "SimPhotovoltaicGenerator: Invalid GeneratorIndex passed=" + trim( TrimSigDigits( PVnum ) ) + ", Number of PVs=" + trim( TrimSigDigits( NumPVs ) ) + ", Generator name=" + trim( GeneratorName ) );
+				ShowFatalError( "SimPhotovoltaicGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( PVnum ) + ", Number of PVs=" + TrimSigDigits( NumPVs ) + ", Generator name=" + GeneratorName );
 			}
 			if ( CheckEquipName( PVnum ) ) {
 				if ( GeneratorName != PVarray( PVnum ).Name ) {
-					ShowFatalError( "SimPhotovoltaicGenerator: Invalid GeneratorIndex passed=" + trim( TrimSigDigits( PVnum ) ) + ", Generator name=" + trim( GeneratorName ) + ", stored PV Name for that index=" + trim( PVarray( PVnum ).Name ) );
+					ShowFatalError( "SimPhotovoltaicGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( PVnum ) + ", Generator name=" + GeneratorName + ", stored PV Name for that index=" + PVarray( PVnum ).Name );
 				}
 				CheckEquipName( PVnum ) = false;
 			}
@@ -192,7 +191,7 @@ namespace Photovoltaics {
 
 		} else {
 
-			ShowFatalError( "Specified generator model type not found for PV generator = " + trim( GeneratorName ) );
+			ShowFatalError( "Specified generator model type not found for PV generator = " + GeneratorName );
 
 		}}
 
@@ -339,7 +338,7 @@ namespace Photovoltaics {
 		NumSNLPVModuleTypes = GetNumObjectsFound( cPVSandiaPerfObjectName );
 
 		if ( NumPVs <= 0 ) {
-			ShowSevereError( "Did not find any " + trim( cPVGeneratorObjectName ) );
+			ShowSevereError( "Did not find any " + cPVGeneratorObjectName );
 			return;
 		}
 
@@ -352,7 +351,7 @@ namespace Photovoltaics {
 			GetObjectItem( cCurrentModuleObject, PVnum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PVarray.Name(), PVnum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), PVarray.Name(), PVnum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -363,14 +362,14 @@ namespace Photovoltaics {
 			PVarray( PVnum ).SurfacePtr = FindItemInList( cAlphaArgs( 2 ), Surface.Name(), TotSurfaces );
 			// required-surface
 			if ( lAlphaFieldBlanks( 2 ) ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				ShowContinueError( "Surface name cannot be blank" );
 				ErrorsFound = true;
 			}
 			if ( PVarray( PVnum ).SurfacePtr == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			} else {
 				// Found one -- make sure has right parameters for PV
@@ -378,17 +377,17 @@ namespace Photovoltaics {
 				Surface( SurfNum ).IsPV = true;
 
 				if ( ! Surface( SurfNum ).ExtSolar ) {
-					ShowWarningError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					ShowWarningError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ShowContinueError( "Surface is not exposed to solar, check surface bounday condition" );
 				}
 
 				// check surface orientation, warn if upside down
 				if ( ( Surface( SurfNum ).Tilt < -95.0 ) || ( Surface( SurfNum ).Tilt > 95.0 ) ) {
-					ShowWarningError( "Suspected input problem with " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					ShowWarningError( "Suspected input problem with " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ShowContinueError( "Surface used for solar collector faces down" );
-					ShowContinueError( "Surface tilt angle (degrees from ground outward normal) = " + trim( RoundSigDigits( Surface( SurfNum ).Tilt, 2 ) ) );
+					ShowContinueError( "Surface tilt angle (degrees from ground outward normal) = " + RoundSigDigits( Surface( SurfNum ).Tilt, 2 ) );
 				}
 			}
 
@@ -401,13 +400,13 @@ namespace Photovoltaics {
 				PVarray( PVnum ).PVModelType = iSandiaPVModel;
 			} else { // throw error, did not find module performance type
 				if ( lAlphaFieldBlanks( 3 ) ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + " = " + trim( cAlphaArgs( 3 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ShowContinueError( "Field cannot be blank" );
 					ErrorsFound = true;
 				} else {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + " = " + trim( cAlphaArgs( 3 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ShowContinueError( "Did not recognize entry" );
 					ErrorsFound = true;
 				}
@@ -429,13 +428,13 @@ namespace Photovoltaics {
 				PVarray( PVnum ).CellIntegrationMode = iPVTSolarCollectorCellIntegration;
 			} else {
 				if ( lAlphaFieldBlanks( 5 ) ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 5 ) ) + " = " + trim( cAlphaArgs( 5 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 5 ) + " = " + cAlphaArgs( 5 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ShowContinueError( "Field cannot be blank" );
 					ErrorsFound = true;
 				} else {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 5 ) ) + " = " + trim( cAlphaArgs( 5 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 5 ) + " = " + cAlphaArgs( 5 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ShowContinueError( "Did not recognize entry" );
 					ErrorsFound = true;
 				}
@@ -456,19 +455,19 @@ namespace Photovoltaics {
 				if ( dupPtr != 0 ) dupPtr += PVnum; // to correct for shortened array in find item
 				if ( dupPtr != 0 ) {
 					if ( PVarray( dupPtr ).CellIntegrationMode == iSurfaceOutsideFaceCellIntegration ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + ": problem detected with multiple PV arrays." );
+						ShowSevereError( cCurrentModuleObject + ": problem detected with multiple PV arrays." );
 						ShowContinueError( "When using IntegratedSurfaceOutsideFace heat transfer mode, only one PV array can be coupled" );
-						ShowContinueError( "Both " + trim( PVarray( PVnum ).Name ) + " and " + trim( PVarray( dupPtr ).Name ) + " are using surface " + trim( PVarray( PVnum ).SurfaceName ) );
+						ShowContinueError( "Both " + PVarray( PVnum ).Name + " and " + PVarray( dupPtr ).Name + " are using surface " + PVarray( PVnum ).SurfaceName );
 						ErrorsFound = true;
 					} else if ( PVarray( dupPtr ).CellIntegrationMode == iTranspiredCollectorCellIntegration ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + ": problem detected with multiple PV arrays." );
+						ShowSevereError( cCurrentModuleObject + ": problem detected with multiple PV arrays." );
 						ShowContinueError( "When using IntegratedTranspiredCollector heat transfer mode, only one PV array can be coupled" );
-						ShowContinueError( "Both " + trim( PVarray( PVnum ).Name ) + " and " + trim( PVarray( dupPtr ).Name ) + " are using UTSC " "surface = " + trim( PVarray( PVnum ).SurfaceName ) );
+						ShowContinueError( "Both " + PVarray( PVnum ).Name + " and " + PVarray( dupPtr ).Name + " are using UTSC " "surface = " + PVarray( PVnum ).SurfaceName );
 						ErrorsFound = true;
 					} else if ( PVarray( dupPtr ).CellIntegrationMode == iExteriorVentedCavityCellIntegration ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + ": problem detected with multiple PV arrays." );
+						ShowSevereError( cCurrentModuleObject + ": problem detected with multiple PV arrays." );
 						ShowContinueError( "When using IntegratedExteriorVentedCavity heat transfer mode, only one PV array can be coupled" );
-						ShowContinueError( "Both " + trim( PVarray( PVnum ).Name ) + " and " + trim( PVarray( dupPtr ).Name ) + " are using exterior " "vented surface = " + trim( PVarray( PVnum ).SurfaceName ) );
+						ShowContinueError( "Both " + PVarray( PVnum ).Name + " and " + PVarray( dupPtr ).Name + " are using exterior " "vented surface = " + PVarray( PVnum ).SurfaceName );
 						ErrorsFound = true;
 					}
 				}
@@ -482,7 +481,7 @@ namespace Photovoltaics {
 				GetObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), tmpSimpleModuleParams.Name(), ModNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+				VerifyName( cAlphaArgs( 1 ), tmpSimpleModuleParams.Name(), ModNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) { //repeat or blank name so don't add
 					ErrorsFound = true;
 					continue;
@@ -496,13 +495,13 @@ namespace Photovoltaics {
 					tmpSimpleModuleParams( ModNum ).EfficencyInputMode = ScheduledEfficiency;
 				} else {
 					if ( lAlphaFieldBlanks( 2 ) ) {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 						ShowContinueError( "Field cannot be blank" );
 						ErrorsFound = true;
 					} else {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 						ShowContinueError( "Did not recognize entry" );
 						ErrorsFound = true;
 					}
@@ -511,8 +510,8 @@ namespace Photovoltaics {
 
 				tmpSimpleModuleParams( ModNum ).EffSchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
 				if ( ( tmpSimpleModuleParams( ModNum ).EffSchedPtr == 0 ) && ( tmpSimpleModuleParams( ModNum ).EfficencyInputMode == ScheduledEfficiency ) ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + " = " + trim( cAlphaArgs( 3 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ShowContinueError( "Did not find schedule" );
 					ErrorsFound = true;
 				}
@@ -527,7 +526,7 @@ namespace Photovoltaics {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), tmpTNRSYSModuleParams.Name(), ModNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+				VerifyName( cAlphaArgs( 1 ), tmpTNRSYSModuleParams.Name(), ModNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) { //repeat or blank name so don't add
 					ErrorsFound = true;
 					continue;
@@ -539,13 +538,13 @@ namespace Photovoltaics {
 					tmpTNRSYSModuleParams( ModNum ).CellType = AmorphousSiPVCells;
 				} else {
 					if ( lAlphaFieldBlanks( 2 ) ) {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 						ShowContinueError( "Field cannot be blank" );
 						ErrorsFound = true;
 					} else {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 						ShowContinueError( "Did not recognize entry" );
 						ErrorsFound = true;
 					}
@@ -582,7 +581,7 @@ namespace Photovoltaics {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), tmpSNLModuleParams.name(), ModNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+				VerifyName( cAlphaArgs( 1 ), tmpSNLModuleParams.name(), ModNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) { //repeat or blank name so don't add
 					ErrorsFound = true;
 					continue;
@@ -646,8 +645,8 @@ namespace Photovoltaics {
 					// do one-time setups on input data
 					PVarray( PVnum ).SimplePVModule.AreaCol = Surface( PVarray( PVnum ).SurfacePtr ).Area * PVarray( PVnum ).SimplePVModule.ActiveFraction;
 				} else {
-					ShowSevereError( "Invalid PV performance object name of " + trim( PVarray( PVnum ).PerfObjName ) );
-					ShowContinueError( "Entered in " + trim( cPVGeneratorObjectName ) + " = " + trim( PVarray( PVnum ).Name ) );
+					ShowSevereError( "Invalid PV performance object name of " + PVarray( PVnum ).PerfObjName );
+					ShowContinueError( "Entered in " + cPVGeneratorObjectName + " = " + PVarray( PVnum ).Name );
 					ErrorsFound = true;
 				}
 
@@ -657,8 +656,8 @@ namespace Photovoltaics {
 				if ( ThisParamObj > 0 ) {
 					PVarray( PVnum ).TRNSYSPVModule = tmpTNRSYSModuleParams( ThisParamObj ); //entire structure assignment
 				} else {
-					ShowSevereError( "Invalid PV performance object name of " + trim( PVarray( PVnum ).PerfObjName ) );
-					ShowContinueError( "Entered in " + trim( cPVGeneratorObjectName ) + " = " + trim( PVarray( PVnum ).Name ) );
+					ShowSevereError( "Invalid PV performance object name of " + PVarray( PVnum ).PerfObjName );
+					ShowContinueError( "Entered in " + cPVGeneratorObjectName + " = " + PVarray( PVnum ).Name );
 					ErrorsFound = true;
 				}
 
@@ -668,8 +667,8 @@ namespace Photovoltaics {
 				if ( ThisParamObj > 0 ) {
 					PVarray( PVnum ).SNLPVModule = tmpSNLModuleParams( ThisParamObj ); //entire structure assignment
 				} else {
-					ShowSevereError( "Invalid PV performance object name of " + trim( PVarray( PVnum ).PerfObjName ) );
-					ShowContinueError( "Entered in " + trim( cPVGeneratorObjectName ) + " = " + trim( PVarray( PVnum ).Name ) );
+					ShowSevereError( "Invalid PV performance object name of " + PVarray( PVnum ).PerfObjName );
+					ShowContinueError( "Entered in " + cPVGeneratorObjectName + " = " + PVarray( PVnum ).Name );
 					ErrorsFound = true;
 				}
 			}}
@@ -690,10 +689,10 @@ namespace Photovoltaics {
 			if ( PVarray( PVnum ).PVModelType == iSurfaceOutsideFaceCellIntegration ) {
 				//check that surface is HeatTransfer and a Construction with Internal Source was used
 				if ( ! Surface( PVarray( PVnum ).SurfacePtr ).HeatTransSurf ) {
-					ShowSevereError( "Must use a surface with heat transfer for IntegratedSurfaceOutsideFace mode in " + trim( PVarray( PVnum ).Name ) );
+					ShowSevereError( "Must use a surface with heat transfer for IntegratedSurfaceOutsideFace mode in " + PVarray( PVnum ).Name );
 					ErrorsFound = true;
 				} else if ( ! Construct( Surface( PVarray( PVnum ).SurfacePtr ).Construction ).SourceSinkPresent ) {
-					ShowSevereError( "Must use a surface with internal source construction for IntegratedSurfaceOutsideFace mode in " + trim( PVarray( PVnum ).Name ) );
+					ShowSevereError( "Must use a surface with internal source construction for IntegratedSurfaceOutsideFace mode in " + PVarray( PVnum ).Name );
 					ErrorsFound = true;
 				}
 			}
@@ -981,7 +980,7 @@ namespace Photovoltaics {
 				// add calls to PVT models here
 
 			} else {
-				ShowSevereError( "Sandia PV Simulation Temperature Modeling Mode Error in " + trim( PVarray( PVnum ).Name ) );
+				ShowSevereError( "Sandia PV Simulation Temperature Modeling Mode Error in " + PVarray( PVnum ).Name );
 
 			}}
 
@@ -1676,8 +1675,8 @@ namespace Photovoltaics {
 			ShowSevereError( "EquivalentOneDiode Photovoltaic model failed to find maximum power point" );
 			ShowContinueError( "Numerical solver failed trying to take exponential of too large a number" );
 			ShowContinueError( "Check input data in " + cPVEquiv1DiodePerfObjectName );
-			ShowContinueError( "VV (voltage) = " + trim( RoundSigDigits( VV, 5 ) ) );
-			ShowContinueError( "II (current) = " + trim( RoundSigDigits( II, 5 ) ) );
+			ShowContinueError( "VV (voltage) = " + RoundSigDigits( VV, 5 ) );
+			ShowContinueError( "II (current) = " + RoundSigDigits( II, 5 ) );
 			ShowFatalError( "FUN: EnergyPlus terminates because of numerical problem in EquivalentOne-Diode PV model" );
 		}
 
@@ -1736,8 +1735,8 @@ namespace Photovoltaics {
 			ShowSevereError( "EquivalentOneDiode Photovoltaic model failed to find maximum power point" );
 			ShowContinueError( "Numerical solver failed trying to take exponential of too large a number" );
 			ShowContinueError( "Check input data in " + cPVEquiv1DiodePerfObjectName );
-			ShowContinueError( "VV (voltage) = " + trim( RoundSigDigits( VV, 5 ) ) );
-			ShowContinueError( "II (current) = " + trim( RoundSigDigits( II, 5 ) ) );
+			ShowContinueError( "VV (voltage) = " + RoundSigDigits( VV, 5 ) );
+			ShowContinueError( "II (current) = " + RoundSigDigits( II, 5 ) );
 			ShowFatalError( "FI: EnergyPlus terminates because of numerical problem in EquivalentOne-Diode PV model" );
 		}
 
@@ -1797,8 +1796,8 @@ namespace Photovoltaics {
 			ShowSevereError( "EquivalentOneDiode Photovoltaic model failed to find maximum power point" );
 			ShowContinueError( "Numerical solver failed trying to take exponential of too large a number" );
 			ShowContinueError( "Check input data in " + cPVEquiv1DiodePerfObjectName );
-			ShowContinueError( "VV (voltage) = " + trim( RoundSigDigits( VV, 5 ) ) );
-			ShowContinueError( "II (current) = " + trim( RoundSigDigits( II, 5 ) ) );
+			ShowContinueError( "VV (voltage) = " + RoundSigDigits( VV, 5 ) );
+			ShowContinueError( "II (current) = " + RoundSigDigits( II, 5 ) );
 			ShowFatalError( "FI: EnergyPlus terminates because of numerical problem in EquivalentOne-Diode PV model" );
 		}
 
@@ -2692,7 +2691,7 @@ namespace Photovoltaics {
 		}
 
 		if ( ! Found ) {
-			ShowFatalError( "Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, " "Surface name = " + trim( Surface( SurfacePtr ).Name ) );
+			ShowFatalError( "Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, " "Surface name = " + Surface( SurfacePtr ).Name );
 		} else {
 
 			VentCavIndex = CavNum;

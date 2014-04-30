@@ -35,7 +35,6 @@ namespace DataBSDFWindow {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataVectorTypes;
-	using DataGlobals::MaxNameLength;
 
 	// <use statements for access to subroutines in other modules>
 

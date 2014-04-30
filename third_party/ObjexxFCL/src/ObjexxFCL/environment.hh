@@ -17,6 +17,9 @@
 #include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
+// C++ Headers
+#include <string>
+
 namespace ObjexxFCL {
 
 // Get Environment Variable
@@ -30,6 +33,18 @@ getenvqq( Fstring const & name, Fstring & value );
 // Set Environment Variable Value
 bool
 setenvqq( Fstring const & name_eq_value );
+
+// Get Environment Variable
+void
+get_environment_variable( std::string const & name, Optional< std::string > value = _, Optional< int > length = _, Optional< int > status = _, Optional< bool const > trim_name = _ );
+
+// Get Environment Variable Value
+std::string::size_type
+getenvqq( std::string const & name, std::string & value );
+
+// Set Environment Variable Value
+bool
+setenvqq( std::string const & name_eq_value );
 
 } // ObjexxFCL
 

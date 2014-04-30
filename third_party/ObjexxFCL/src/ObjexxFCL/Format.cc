@@ -63,7 +63,7 @@ typedef  std::vector< Format * >  Formats;
 		if ( reverted() ) { // Reverted: Line feed before reverted output
 			reverted() = false;
 			spacer() = is_spacer;
-			return std::string( 1, NL );
+			return std::string( 1, '\n' );
 		} else { // Not reverted: Add space and set spacing state
 			bool const add_space( is_spacer && ( ! spacer() ) ); // Add space if previous item was non-spacer and this item is spacer
 			spacer() = is_spacer;
@@ -75,21 +75,24 @@ typedef  std::vector< Format * >  Formats;
 	void
 	Format::skip( std::istream & stream, Size const w )
 	{
+		static std::string const STOPPERS( '\n' + std::string( 1, std::istream::traits_type::eof() ) );
 		char c;
 		Size i( 0 );
-		while ( ( i < w ) && stream && not_any_of( stream.peek(), READ_STOPPERS ) ) {
+		while ( ( i < w ) && stream && not_any_of( stream.peek(), STOPPERS ) ) {
 			stream.get( c );
 			++i;
 		}
+		// Don't clear eof bit since specified width read
 	}
 
 	// Read List-Directed Entry from a Stream
 	EntryFormatLD
 	Format::read_ld( std::istream & stream, bool const numeric, char const mode )
 	{
+		static char const eof( std::istream::traits_type::eof() );
+		static std::string const STOPPERS( '\n' + std::string( 1, eof ) );
 		std::string s;
-		char c( NUL ), q( NUL ), peek( stream.peek() );
-		char const eof( std::char_traits< char >::eof() );
+		char c( '\0' ), q( '\0' ), peek( stream.peek() );
 		bool in_body( false );
 		bool in_quote( false );
 		bool has_repeat( false );
@@ -111,14 +114,14 @@ typedef  std::vector< Format * >  Formats;
 						stream.get( c );
 						peek = stream.peek();
 						s += c; // Add the quote without escaping
-					} else if ( c == NL ) {
+					} else if ( c == '\n' ) {
 						// Discard and keep going until quote is closed
 					} else { // Add to entry
 						s += c;
 					}
-				} else if ( is_space_ld( c ) || ( c == NL ) ) { // Separator: Skip over if no entry characters read yet
+				} else if ( is_space_ld( c ) || ( c == '\n' ) ) { // Separator: Skip over if no entry characters read yet
 					if ( in_body ) break; // End of entry
-				} else if ( c == CMA ) { // End of entry
+				} else if ( c == ',' ) { // End of entry
 					clear_eof( stream );
 					return EntryFormatLD( s, in_body, repeat );
 				} else if ( c == '/' ) { // Terminate i/o operation
@@ -145,19 +148,19 @@ typedef  std::vector< Format * >  Formats;
 					s += c;
 					in_body = true;
 				}
-				if ( ( ! in_quote ) && ( peek == NL ) ) break; // Entry stops at newline unless in quote
+				if ( ( ! in_quote ) && ( peek == '\n' ) ) break; // Entry stops at newline unless in quote
 				if ( has_repeat && ( peek == eof ) ) break; // Don't put stream into eof yet
 			}
 		}
 		if ( stream && ( c != eof ) ) { // Remove trailing separators before next item
-			while ( stream && not_any_of( peek, READ_STOPPERS ) ) {
+			while ( stream && not_any_of( peek, STOPPERS ) ) {
 				peek = stream.peek();
 				if ( is_space_ld( peek ) ) { // Separator
 					stream.ignore(); // Skip over separator
-				} else if ( peek == CMA ) { // Closing comma separator
+				} else if ( peek == ',' ) { // Closing comma separator
 					stream.ignore(); // Skip over separator/newline
 					break; // Stop: We only want to take one closing separator
-				} else if ( peek == NL ) { // End of content
+				} else if ( peek == '\n' ) { // End of content
 					break;
 				} else if ( peek == eof ) { // End of content
 					break;
@@ -176,10 +179,10 @@ typedef  std::vector< Format * >  Formats;
 	{
 		std::string o( s );
 		if ( blank_null() ) {
-			o.erase( std::remove( o.begin(), o.end(), SPC ), o.end() );
+			o.erase( std::remove( o.begin(), o.end(), ' ' ), o.end() );
 		} else {
 			assert( blank_zero() );
-			std::replace( o.begin(), o.end(), SPC, '0' );
+			std::replace( o.begin(), o.end(), ' ', '0' );
 		}
 		return o;
 	}
@@ -188,14 +191,16 @@ typedef  std::vector< Format * >  Formats;
 	std::string
 	Format::read( std::istream & stream, Size const w )
 	{
+		static std::string const STOPPERS( '\n' + std::string( 1, std::istream::traits_type::eof() ) );
 		std::string s;
 		char c;
 		Size i( 0 );
-		while ( ( ( w == NOSIZE ) || ( i < w ) ) && stream && not_any_of( stream.peek(), READ_STOPPERS ) ) {
+		while ( ( ( w == NOSIZE ) || ( i < w ) ) && stream && not_any_of( stream.peek(), STOPPERS ) ) {
 			stream.get( c );
 			if ( stream ) s += c;
 			++i;
 		}
+		if ( w == NOSIZE ) clear_eof( stream );
 		return s;
 	}
 
@@ -203,11 +208,13 @@ typedef  std::vector< Format * >  Formats;
 	std::string
 	Format::read_float( std::istream & stream, Size const w )
 	{
+		static std::string const STOPPERS( '\n' + std::string( 1, std::istream::traits_type::eof() ) );
+		static std::string const WHITE( " \t\0", 3 );
 		std::string s;
 		char c;
 		bool in_num( false ), in_E( false );
 		Size i( 0 );
-		while ( ( ( w == NOSIZE ) || ( i < w ) ) && stream && not_any_of( stream.peek(), READ_STOPPERS ) ) {
+		while ( ( ( w == NOSIZE ) || ( i < w ) ) && stream && not_any_of( stream.peek(), STOPPERS ) ) {
 			stream.get( c );
 			if ( c == 'D' ) {
 				c = 'E';
@@ -216,7 +223,7 @@ typedef  std::vector< Format * >  Formats;
 			} else if ( in_num && ( ! in_E ) && ( ( c == '+' ) || ( c == '-' ) ) ) {
 				s += 'E'; // Add omitted E before exponent: Fortran can read strings like 1.25+3 as 1.25E+3
 			}
-			if ( not_any_of( c, WHITESPACE ) ) {
+			if ( not_any_of( c, WHITE ) ) {
 				in_num = true;
 			} else if ( ( c == 'E' ) || ( c == 'e' ) ) {
 				in_E = true;
@@ -224,6 +231,7 @@ typedef  std::vector< Format * >  Formats;
 			if ( stream ) s += c;
 			++i;
 		}
+		if ( w == NOSIZE ) clear_eof( stream );
 		return s;
 	}
 
@@ -345,7 +353,7 @@ typedef  std::vector< Format * >  Formats;
 		if ( lb >= 1 ) { // Take rightmost character read
 			c = b.back();
 		} else { // No characters read: Set to space
-			c = SPC;
+			c = ' ';
 		}
 	}
 
@@ -368,7 +376,7 @@ typedef  std::vector< Format * >  Formats;
 	FormatA::out( std::ostream & stream, Fstring const & s )
 	{
 		std::string::size_type const l( s.length() );
-		stream << spc() + std::string( ( has_w() && ( w_ > l ) ? w_ - l : 0ul ), SPC ) + s.str();
+		stream << spc() + std::string( ( has_w() && ( w_ > l ) ? w_ - l : 0ul ), ' ' ) + s.str();
 	}
 
 	// Input
@@ -709,7 +717,7 @@ typedef  std::vector< Format * >  Formats;
 		if ( lb >= 1 ) { // Take rightmost character read
 			c = b.back();
 		} else { // No characters read: Set to space
-			c = SPC;
+			c = ' ';
 		}
 	}
 
@@ -1069,6 +1077,7 @@ inline
 Tokens
 tokenize1( Token const & s )
 {
+	static std::string const WHITE( " \t\0", 3 );
 	Tokens tokens;
 	Token token;
 	char c;
@@ -1084,7 +1093,7 @@ tokenize1( Token const & s )
 		} else if ( is_any_of( c, "XRTALBIOZPFGEDS./" ) ) { // Break out token
 			add_token( token, tokens );
 			add_token( c, tokens );
-		} else if ( is_any_of( c, WHITESPACE ) ) { // # Whitespace isn't significant outside of string literals
+		} else if ( is_any_of( c, WHITE ) ) { // # Whitespace isn't significant outside of string literals
 			// Discard
 		} else { // Add to token
 			token += c;
@@ -1120,7 +1129,7 @@ alpha_token( Tokens const & tokens )
 		int in_paren( 0 );
 		bool in_dq( false ); // In double-quoted literal?
 		bool in_sq( false ); // In single-quoted literal?
-		char c( NUL );
+		char c( '\0' );
 		int n_bs( 0 ); // Backslash sequence length mod 2
 		std::string s_;
 		if ( not_blank( s ) ) {
@@ -1189,7 +1198,7 @@ alpha_token( Tokens const & tokens )
 				add_token( token, tokens );
 				token = c;
 				in_sq = true;
-			} else if ( c == CMA ) { // Comma separator
+			} else if ( c == ',' ) { // Comma separator
 				add_token( token, tokens ); // Add current token but not the comma
 			} else if ( is_any_of( c, "/:$\\" ) ) { // One character operator
 				if ( ( c == '/' ) && is_ulong( token ) ) { // Line feed with repeat count
@@ -1727,10 +1736,10 @@ alpha_token( Tokens const & tokens )
 
 // Static Data Member Definitions
 
-//#ifndef _MSC_VER // Microsoft Visual C++ extensions doesn't need or like these: Enable #ifndef block if not using /Za
+#ifndef MSC_EXTENSIONS // Define when compiling with Visual C++ extensions (not using /Za)
 
 	Format::Size const Format::NOSIZE;
 
-//#endif // _MSC_VER
+#endif
 
 } // ObjexxFCL
