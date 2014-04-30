@@ -1,4 +1,4 @@
-!IDD_Version 8.1.0.009
+!IDD_Version 8.2.0.001
 ! **************************************************************************
 ! This file is the Input Data Dictionary (IDD) for EnergyPlus.
 ! The IDD defines the syntax and data model for each type of input "Object."
@@ -21743,7 +21743,7 @@ AirflowNetwork:MultiZone:Zone,
       \default 300000.0
       \note Applicable only if Ventilation Control Mode = Enthalpy.
       \note This value must be greater than the corresponding lower value (previous field).
-  A4; \field Venting Availability Schedule Name
+  A4, \field Venting Availability Schedule Name
       \type object-list
       \object-list ScheduleNames
       \note Non-zero Schedule value means venting is allowed if other venting control conditions are
@@ -21752,6 +21752,21 @@ AirflowNetwork:MultiZone:Zone,
       \note circumstances. If this Schedule is not specified then venting is allowed if
       \note other venting control conditions are satisfied.
       \note Not used if Ventilation Control Mode = NoVent.
+  A5, \field Single Sided Wind Pressure Coefficient Algorithm
+      \type choice
+	    \key Advanced
+	    \key Standard
+	    \default Standard
+	    \note Selecting Advanced results in EnergyPlus calculating modified Wind Pressure Coefficients
+	    \note to account for wind direction and turbulence effects on single sided ventilation rates.
+	    \note Model is only valid for zones with 2 openings, both of which are on a single facade.
+  N6; \field Facade Width
+      \type real
+	    \units m
+	    \minimum 0.0
+	    \default 10.0
+	    \note This is the whole building width along the direction of the facade of this zone.
+	  
 
 AirflowNetwork:MultiZone:Surface,
       \min-fields 4
@@ -38856,6 +38871,7 @@ Coil:Cooling:Water,
        \reference CoolingCoilsWater
        \reference CoolingCoilsWaterNoHX
        \reference AFNCoilNames
+       \reference SimpleCoils
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -41247,6 +41263,7 @@ Coil:Heating:Water,
        \reference HeatingCoilName
        \reference HeatingCoilsWater
        \reference AFNCoilNames
+       \reference SimpleCoils
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -72695,6 +72712,56 @@ FaultModel:EnthalpySensorOffset:ReturnAir,
        \maximum< 20000
        \default 0.0
        \units J/kg
+	   
+FaultModel:Fouling:Coil,
+   \memo This object describes fouling water heating or cooling coils
+   A1, \field Name
+       \required-field
+       \type alpha
+   A2, \field Coil Name
+       \required-field
+       \type object-list
+       \object-list SimpleCoils
+   A3, \field Availability Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A4, \field Severity Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A5, \field Fouling Input Method
+       \type choice
+       \key FouledUARated
+       \key FoulingFactor
+       \default FouledUARated
+   N1, \field UAFouled
+       \note Fouling coil UA value under rating conditions
+	     \note For Fouling Input Method: FouledUARated
+       \units W/K
+       \type real       
+       \minimum> 0.0
+   N2, \field Water Side Fouling Factor       
+	     \note For Fouling Input Method: FoulingFactor
+       \units m2-K/W  
+       \type real	   
+       \minimum 0.0
+       \default 0.0
+   N3, \field Air Side Fouling Factor       
+	     \note For Fouling Input Method: FoulingFactor
+       \units m2-K/W 
+       \type real
+       \minimum 0.0	   
+       \default 0.0
+   N4, \field Outside Coil Surface Area       
+	     \note For Fouling Input Method: FoulingFactor
+       \units m2 
+       \type real	   
+       \minimum> 0.0	   
+   N5; \field Inside to Outside Coil Surface Area Ratio      
+	     \note For Fouling Input Method: FoulingFactor
+       \units dimensionless
+       \type real       
+	     \minimum> 0.0
+       \default 0.07
 
 \group General Data Entry
 
