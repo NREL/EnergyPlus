@@ -25,8 +25,8 @@
 	typedef  MA2< int >  MA2_int;
 	typedef  MA2c< double >  MA2c_double;
 	typedef  MA2< double >  MA2_double;
-	typedef  MA2c< Fstring >  MA2c_Fstring;
-	typedef  MA2< Fstring >  MA2_Fstring;
+	typedef  MA2c< std::string >  MA2c_string;
+	typedef  MA2< std::string >  MA2_string;
 
 	// int const Members
 	inline MA2c_int ClassType() const { return ma( &T::ClassType ); }
@@ -104,17 +104,17 @@
 	inline MA2_double ZoneTempAtCoolPeak() { return ma( &T::ZoneTempAtCoolPeak ); }
 	inline MA2_double ZoneTempAtHeatPeak() { return ma( &T::ZoneTempAtHeatPeak ); }
 
-	// Fstring const Members
-	inline MA2c_Fstring AirNodeName() const { return ma( &T::AirNodeName ); }
-	inline MA2c_Fstring CoolDesDay() const { return ma( &T::CoolDesDay ); }
-	inline MA2c_Fstring HeatDesDay() const { return ma( &T::HeatDesDay ); }
+	// string const Members
+	inline MA2c_string AirNodeName() const { return ma( &T::AirNodeName ); }
+	inline MA2c_string CoolDesDay() const { return ma( &T::CoolDesDay ); }
+	inline MA2c_string HeatDesDay() const { return ma( &T::HeatDesDay ); }
 
-	// Fstring Members
-	inline MA2_Fstring AirNodeName() { return ma( &T::AirNodeName ); }
-	inline MA2_Fstring CoolDesDay() { return ma( &T::CoolDesDay ); }
-	inline MA2_Fstring HeatDesDay() { return ma( &T::HeatDesDay ); }
+	// string Members
+	inline MA2_string AirNodeName() { return ma( &T::AirNodeName ); }
+	inline MA2_string CoolDesDay() { return ma( &T::CoolDesDay ); }
+	inline MA2_string HeatDesDay() { return ma( &T::HeatDesDay ); }
 
-	// FArra1D< double >
+	// FArray1D< double >
 	inline MA2c< FArray1D< double > > hrly() const { return ma( &T::hrly ); }
 	inline MA2< FArray1D< double > > hrly() { return ma( &T::hrly ); }
 	inline MA2c< FArray1D< double > > mnth() const { return ma( &T::mnth ); }

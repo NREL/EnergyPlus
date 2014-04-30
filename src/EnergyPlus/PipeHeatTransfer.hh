@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray4D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -16,11 +15,10 @@ namespace EnergyPlus {
 namespace PipeHeatTransfer {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	extern Fstring const Blank;
+	extern std::string const Blank;
 
 	extern int const None;
 	extern int const ZoneEnv;
@@ -62,17 +60,17 @@ namespace PipeHeatTransfer {
 	{
 		// Members
 		// Input data
-		Fstring Name; // name of the component
-		Fstring Construction; // construction object name
-		Fstring Environment; // keyword:  'Schedule', 'OutdoorAir', 'Zone'
-		Fstring EnvrSchedule; // temperature schedule for environmental temp
-		Fstring EnvrVelSchedule; // temperature schedule for environmental temp
-		Fstring EnvrZone; // zone providing environmental temp
-		Fstring EnvrAirNode; // outside air node providing environmental temp
+		std::string Name; // name of the component
+		std::string Construction; // construction object name
+		std::string Environment; // keyword:  'Schedule', 'OutdoorAir', 'Zone'
+		std::string EnvrSchedule; // temperature schedule for environmental temp
+		std::string EnvrVelSchedule; // temperature schedule for environmental temp
+		std::string EnvrZone; // zone providing environmental temp
+		std::string EnvrAirNode; // outside air node providing environmental temp
 		Real64 Length; // total pipe length [m]
 		Real64 PipeID; // pipe inside diameter [m]
-		Fstring InletNode; // inlet node name
-		Fstring OutletNode; // outlet node name
+		std::string InletNode; // inlet node name
+		std::string OutletNode; // outlet node name
 		int InletNodeNum; // inlet node number
 		int OutletNodeNum; // outlet node number
 		int TypeOf; // Type of pipe
@@ -117,7 +115,7 @@ namespace PipeHeatTransfer {
 		Real64 DomainDepth; // soil grid depth [m]
 		Real64 dSregular; // grid spacing in cartesian domain [m]
 		Real64 OutdoorConvCoef; // soil to air convection coefficient [W/m2.K]
-		Fstring SoilMaterial; // name of soil material:regular object
+		std::string SoilMaterial; // name of soil material:regular object
 		int SoilMaterialNum; // soil material index in material data structure
 		int MonthOfMinSurfTemp; // month of minimum ground surface temperature
 		Real64 AvgGroundTemp; // annual average ground temperature [C]
@@ -155,17 +153,8 @@ namespace PipeHeatTransfer {
 
 		// Default Constructor
 		PipeHTData() :
-			Name( MaxNameLength, Blank ),
-			Construction( MaxNameLength, Blank ),
-			Environment( MaxNameLength, Blank ),
-			EnvrSchedule( MaxNameLength, Blank ),
-			EnvrVelSchedule( MaxNameLength, Blank ),
-			EnvrZone( MaxNameLength, Blank ),
-			EnvrAirNode( MaxNameLength, Blank ),
 			Length( 0.0 ),
 			PipeID( 0.0 ),
-			InletNode( MaxNameLength, Blank ),
-			OutletNode( MaxNameLength, Blank ),
 			InletNodeNum( 0 ),
 			OutletNodeNum( 0 ),
 			TypeOf( 0 ),
@@ -203,7 +192,6 @@ namespace PipeHeatTransfer {
 			DomainDepth( 0.0 ),
 			dSregular( 0.0 ),
 			OutdoorConvCoef( 0.0 ),
-			SoilMaterial( MaxNameLength, Blank ),
 			SoilMaterialNum( 0 ),
 			MonthOfMinSurfTemp( 0 ),
 			AvgGroundTemp( 0.0 ),
@@ -241,17 +229,17 @@ namespace PipeHeatTransfer {
 
 		// Member Constructor
 		PipeHTData(
-			Fstring const & Name, // name of the component
-			Fstring const & Construction, // construction object name
-			Fstring const & Environment, // keyword:  'Schedule', 'OutdoorAir', 'Zone'
-			Fstring const & EnvrSchedule, // temperature schedule for environmental temp
-			Fstring const & EnvrVelSchedule, // temperature schedule for environmental temp
-			Fstring const & EnvrZone, // zone providing environmental temp
-			Fstring const & EnvrAirNode, // outside air node providing environmental temp
+			std::string const & Name, // name of the component
+			std::string const & Construction, // construction object name
+			std::string const & Environment, // keyword:  'Schedule', 'OutdoorAir', 'Zone'
+			std::string const & EnvrSchedule, // temperature schedule for environmental temp
+			std::string const & EnvrVelSchedule, // temperature schedule for environmental temp
+			std::string const & EnvrZone, // zone providing environmental temp
+			std::string const & EnvrAirNode, // outside air node providing environmental temp
 			Real64 const Length, // total pipe length [m]
 			Real64 const PipeID, // pipe inside diameter [m]
-			Fstring const & InletNode, // inlet node name
-			Fstring const & OutletNode, // outlet node name
+			std::string const & InletNode, // inlet node name
+			std::string const & OutletNode, // outlet node name
 			int const InletNodeNum, // inlet node number
 			int const OutletNodeNum, // outlet node number
 			int const TypeOf, // Type of pipe
@@ -295,7 +283,7 @@ namespace PipeHeatTransfer {
 			Real64 const DomainDepth, // soil grid depth [m]
 			Real64 const dSregular, // grid spacing in cartesian domain [m]
 			Real64 const OutdoorConvCoef, // soil to air convection coefficient [W/m2.K]
-			Fstring const & SoilMaterial, // name of soil material:regular object
+			std::string const & SoilMaterial, // name of soil material:regular object
 			int const SoilMaterialNum, // soil material index in material data structure
 			int const MonthOfMinSurfTemp, // month of minimum ground surface temperature
 			Real64 const AvgGroundTemp, // annual average ground temperature [C]
@@ -331,17 +319,17 @@ namespace PipeHeatTransfer {
 			int const CompNum, // ..Branch%Comp index where this pipe lies
 			bool const CheckEquipName
 		) :
-			Name( MaxNameLength, Name ),
-			Construction( MaxNameLength, Construction ),
-			Environment( MaxNameLength, Environment ),
-			EnvrSchedule( MaxNameLength, EnvrSchedule ),
-			EnvrVelSchedule( MaxNameLength, EnvrVelSchedule ),
-			EnvrZone( MaxNameLength, EnvrZone ),
-			EnvrAirNode( MaxNameLength, EnvrAirNode ),
+			Name( Name ),
+			Construction( Construction ),
+			Environment( Environment ),
+			EnvrSchedule( EnvrSchedule ),
+			EnvrVelSchedule( EnvrVelSchedule ),
+			EnvrZone( EnvrZone ),
+			EnvrAirNode( EnvrAirNode ),
 			Length( Length ),
 			PipeID( PipeID ),
-			InletNode( MaxNameLength, InletNode ),
-			OutletNode( MaxNameLength, OutletNode ),
+			InletNode( InletNode ),
+			OutletNode( OutletNode ),
 			InletNodeNum( InletNodeNum ),
 			OutletNodeNum( OutletNodeNum ),
 			TypeOf( TypeOf ),
@@ -385,7 +373,7 @@ namespace PipeHeatTransfer {
 			DomainDepth( DomainDepth ),
 			dSregular( dSregular ),
 			OutdoorConvCoef( OutdoorConvCoef ),
-			SoilMaterial( MaxNameLength, SoilMaterial ),
+			SoilMaterial( SoilMaterial ),
 			SoilMaterialNum( SoilMaterialNum ),
 			MonthOfMinSurfTemp( MonthOfMinSurfTemp ),
 			AvgGroundTemp( AvgGroundTemp ),
@@ -489,7 +477,7 @@ namespace PipeHeatTransfer {
 	void
 	SimPipesHeatTransfer(
 		int const EquipType,
-		Fstring const & EquipName, // name of the Pipe Heat Transfer.
+		std::string const & EquipName, // name of the Pipe Heat Transfer.
 		int & EqNum, // index in local derived types for external calling
 		bool const InitLoopEquip,
 		bool const FirstHVACIteration // component number
@@ -505,9 +493,9 @@ namespace PipeHeatTransfer {
 
 	void
 	ValidatePipeConstruction(
-		Fstring const & PipeType, // module object of pipe (error messages)
-		Fstring const & ConstructionName, // construction name of pipe (error messages)
-		Fstring const & FieldName, // fieldname of pipe (error messages)
+		std::string const & PipeType, // module object of pipe (error messages)
+		std::string const & ConstructionName, // construction name of pipe (error messages)
+		std::string const & FieldName, // fieldname of pipe (error messages)
 		int const ConstructionNum, // pointer into construction data
 		int const PipeNum, // pointer into pipe data
 		bool & ErrorsFound // set to true if errors found here
@@ -527,7 +515,7 @@ namespace PipeHeatTransfer {
 	void
 	InitializeHeatTransferPipes(
 		int const PipeType, // Type of Pipe
-		Fstring const & PipeName, // Name of Pipe
+		std::string const & PipeName, // Name of Pipe
 		int & PipeNum // Index into pipe structure for name
 	);
 

@@ -47,7 +47,6 @@ namespace HVACDuct {
 	// <use statements for data only modules>
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::BeginEnvrnFlag;
 	using namespace DataHVACGlobals;
 	using namespace DataLoopNode;
@@ -75,7 +74,7 @@ namespace HVACDuct {
 
 	void
 	SimDuct(
-		Fstring const & CompName, // name of the duct component
+		std::string const & CompName, // name of the duct component
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep !unused1208
 		int & CompIndex // index of duct component
 	)
@@ -125,17 +124,17 @@ namespace HVACDuct {
 		if ( CompIndex == 0 ) {
 			DuctNum = FindItemInList( CompName, Duct.Name(), NumDucts );
 			if ( DuctNum == 0 ) {
-				ShowFatalError( "SimDuct: Component not found=" + trim( CompName ) );
+				ShowFatalError( "SimDuct: Component not found=" + CompName );
 			}
 			CompIndex = DuctNum;
 		} else {
 			DuctNum = CompIndex;
 			if ( DuctNum > NumDucts || DuctNum < 1 ) {
-				ShowFatalError( "SimDuct:  Invalid CompIndex passed=" + trim( TrimSigDigits( DuctNum ) ) + ", Number of Components=" + trim( TrimSigDigits( NumDucts ) ) + ", Entered Component name=" + trim( CompName ) );
+				ShowFatalError( "SimDuct:  Invalid CompIndex passed=" + TrimSigDigits( DuctNum ) + ", Number of Components=" + TrimSigDigits( NumDucts ) + ", Entered Component name=" + CompName );
 			}
 			if ( CheckEquipName( DuctNum ) ) {
 				if ( CompName != Duct( DuctNum ).Name ) {
-					ShowFatalError( "SimDuct: Invalid CompIndex passed=" + trim( TrimSigDigits( DuctNum ) ) + ", Component name=" + trim( CompName ) + ", stored Component Name for that index=" + trim( Duct( DuctNum ).Name ) );
+					ShowFatalError( "SimDuct: Invalid CompIndex passed=" + TrimSigDigits( DuctNum ) + ", Component name=" + CompName + ", stored Component Name for that index=" + Duct( DuctNum ).Name );
 				}
 				CheckEquipName( DuctNum ) = false;
 			}
@@ -193,7 +192,7 @@ namespace HVACDuct {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DuctNum; // duct index
-		static Fstring const RoutineName( "GetDuctInput:" );
+		static std::string const RoutineName( "GetDuctInput:" );
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
@@ -211,15 +210,15 @@ namespace HVACDuct {
 			GetObjectItem( cCurrentModuleObject, DuctNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Duct.Name(), DuctNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Duct.Name(), DuctNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 			Duct( DuctNum ).Name = cAlphaArgs( 1 );
-			Duct( DuctNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			Duct( DuctNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Air Nodes" );
+			Duct( DuctNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			Duct( DuctNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Air Nodes" );
 		}
 
 		// No output variables

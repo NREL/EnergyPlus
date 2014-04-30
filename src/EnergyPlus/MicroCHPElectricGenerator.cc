@@ -70,7 +70,6 @@ namespace MicroCHPElectricGenerator {
 	using namespace DataPrecisionGlobals;
 	using namespace DataGenerators;
 	using namespace DataLoopNode;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::NumOfTimeStepInHour;
 	using DataGlobals::NumOfZones;
 	using DataGlobals::KelvinConv;
@@ -100,7 +99,7 @@ namespace MicroCHPElectricGenerator {
 	void
 	SimMicroCHPGenerator(
 		int const GeneratorType, // type of Generator
-		Fstring const & GeneratorName, // user specified name of Generator
+		std::string const & GeneratorName, // user specified name of Generator
 		int & GeneratorIndex,
 		bool const RunFlagElectCenter, // simulate Generator when TRUE
 		bool const RunFlagPlant, // simulate generator when true.
@@ -154,16 +153,16 @@ namespace MicroCHPElectricGenerator {
 
 		if ( GeneratorIndex == 0 ) {
 			GenNum = FindItemInList( GeneratorName, MicroCHP.Name(), NumMicroCHPs );
-			if ( GenNum == 0 ) ShowFatalError( "SimMicroCHPGenerator: Specified Generator not one of Valid Micro CHP Generators " + trim( GeneratorName ) );
+			if ( GenNum == 0 ) ShowFatalError( "SimMicroCHPGenerator: Specified Generator not one of Valid Micro CHP Generators " + GeneratorName );
 			GeneratorIndex = GenNum;
 		} else {
 			GenNum = GeneratorIndex;
 			if ( GenNum > NumMicroCHPs || GenNum < 1 ) {
-				ShowFatalError( "SimMicroCHPGenerator: Invalid GeneratorIndex passed=" + trim( TrimSigDigits( GenNum ) ) + ", Number of Micro CHP Generators=" + trim( TrimSigDigits( NumMicroCHPs ) ) + ", Generator name=" + trim( GeneratorName ) );
+				ShowFatalError( "SimMicroCHPGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( GenNum ) + ", Number of Micro CHP Generators=" + TrimSigDigits( NumMicroCHPs ) + ", Generator name=" + GeneratorName );
 			}
 			if ( CheckEquipName( GenNum ) ) {
 				if ( GeneratorName != MicroCHP( GenNum ).Name ) {
-					ShowFatalError( "SimMicroCHPNoNormalizeGenerator: Invalid GeneratorIndex passed=" + trim( TrimSigDigits( GenNum ) ) + ", Generator name=" + trim( GeneratorName ) + ", stored Generator Name for that index=" + trim( MicroCHP( GenNum ).Name ) );
+					ShowFatalError( "SimMicroCHPNoNormalizeGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( GenNum ) + ", Generator name=" + GeneratorName + ", stored Generator Name for that index=" + MicroCHP( GenNum ).Name );
 				}
 				CheckEquipName( GenNum ) = false;
 			}
@@ -229,7 +228,7 @@ namespace MicroCHPElectricGenerator {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_Fstring AlphArray( 25, sFstring( MaxNameLength ) ); // character string data
+		FArray1D_string AlphArray( 25 ); // character string data
 		FArray1D< Real64 > NumArray( 200 ); // numeric data TODO deal with allocatable for extensible
 		static bool ErrorsFound( false ); // error flag
 		bool IsNotOK; // Flag to verify name
@@ -239,7 +238,7 @@ namespace MicroCHPElectricGenerator {
 		//  INTEGER       :: I   ! loop counter
 		static bool MyOneTimeFlag( true );
 		int CHPParamNum; // loop count and temporary index
-		Fstring ObjMSGName( 100 ); // string for error messages
+		std::string ObjMSGName; // string for error messages
 		int thisParamID;
 
 		// execution
@@ -253,7 +252,7 @@ namespace MicroCHPElectricGenerator {
 			NumMicroCHPParams = GetNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumMicroCHPParams <= 0 ) {
-				ShowSevereError( "No " + trim( cCurrentModuleObject ) + " equipment specified in input file" );
+				ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
 				ErrorsFound = true;
 			}
 
@@ -273,7 +272,7 @@ namespace MicroCHPElectricGenerator {
 				//      IF (IsBlank) AlphArray(1)='xxxxx'
 				//    ENDIF
 
-				ObjMSGName = trim( cCurrentModuleObject ) + " Named " + trim( AlphArray( 1 ) );
+				ObjMSGName = cCurrentModuleObject + " Named " + AlphArray( 1 );
 
 				MicroCHPParamInput( CHPParamNum ).Name = AlphArray( 1 ); //A1 name
 				MicroCHPParamInput( CHPParamNum ).MaxElecPower = NumArray( 1 ); //N1 Maximum Electric Power [W]
@@ -288,8 +287,8 @@ namespace MicroCHPElectricGenerator {
 					MicroCHPParamInput( CHPParamNum ).PlantFlowControl = false;
 				}
 				if ( ( ! ( SameString( AlphArray( 4 ), "InternalControl" ) ) ) && ( ! ( SameString( AlphArray( 4 ), "PlantControl" ) ) ) ) {
-					ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 4 ) ) + " = " + trim( AlphArray( 4 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+					ShowSevereError( "Invalid, " + cAlphaFieldNames( 4 ) + " = " + AlphArray( 4 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 					ErrorsFound = true;
 				}
 				if ( MicroCHPParamInput( CHPParamNum ).InternalFlowControl ) { // get the curve
@@ -305,15 +304,15 @@ namespace MicroCHPElectricGenerator {
 				MicroCHPParamInput( CHPParamNum ).RadiativeFraction = NumArray( 9 ); //N9 radiative fraction for skin losses
 				MicroCHPParamInput( CHPParamNum ).MCeng = NumArray( 10 ); // N10 Aggregated Thermal Mass of Generator MC_eng
 				if ( MicroCHPParamInput( CHPParamNum ).MCeng <= 0.0 ) {
-					ShowSevereError( "Invalid, " + trim( cNumericFieldNames( 10 ) ) + " = " + trim( RoundSigDigits( NumArray( 10 ), 5 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+					ShowSevereError( "Invalid, " + cNumericFieldNames( 10 ) + " = " + RoundSigDigits( NumArray( 10 ), 5 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 					ShowContinueError( "Thermal mass must be greater than zero" );
 					ErrorsFound = true;
 				}
 				MicroCHPParamInput( CHPParamNum ).MCcw = NumArray( 11 ); // Aggregated Thermal Mass of Heat Recovery MC_cw
 				if ( MicroCHPParamInput( CHPParamNum ).MCcw <= 0.0 ) {
-					ShowSevereError( "Invalid, " + trim( cNumericFieldNames( 11 ) ) + " = " + trim( RoundSigDigits( NumArray( 11 ), 5 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+					ShowSevereError( "Invalid, " + cNumericFieldNames( 11 ) + " = " + RoundSigDigits( NumArray( 11 ), 5 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 					ShowContinueError( "Thermal mass must be greater than zero" );
 					ErrorsFound = true;
 				}
@@ -324,8 +323,8 @@ namespace MicroCHPElectricGenerator {
 					MicroCHPParamInput( CHPParamNum ).WarmUpByEngineTemp = false;
 				}
 				if ( ( ! ( SameString( AlphArray( 7 ), "NominalEngineTemperature" ) ) ) && ( ! ( SameString( AlphArray( 7 ), "TimeDelay" ) ) ) ) {
-					ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 7 ) ) + " = " + trim( AlphArray( 7 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+					ShowSevereError( "Invalid, " + cAlphaFieldNames( 7 ) + " = " + AlphArray( 7 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 					ErrorsFound = true;
 				}
 				MicroCHPParamInput( CHPParamNum ).kf = NumArray( 13 ); // N13 Warmup Fuel Flow Rate Coefficient k_f
@@ -343,8 +342,8 @@ namespace MicroCHPElectricGenerator {
 					MicroCHPParamInput( CHPParamNum ).WarmRestartOkay = false;
 				}
 				if ( ( ! ( SameString( AlphArray( 8 ), "MandatoryCoolDown" ) ) ) && ( ! ( SameString( AlphArray( 8 ), "OptionalCoolDown" ) ) ) ) {
-					ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 8 ) ) + " = " + trim( AlphArray( 8 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+					ShowSevereError( "Invalid, " + cAlphaFieldNames( 8 ) + " = " + AlphArray( 8 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -354,7 +353,7 @@ namespace MicroCHPElectricGenerator {
 
 			if ( NumMicroCHPs <= 0 ) {
 				// shouldn't ever come here?
-				ShowSevereError( "No " + trim( cCurrentModuleObject ) + " equipment specified in input file" );
+				ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
 				ErrorsFound = true;
 			}
 
@@ -370,22 +369,22 @@ namespace MicroCHPElectricGenerator {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), MicroCHP.Name(), GeneratorNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+				VerifyName( AlphArray( 1 ), MicroCHP.Name(), GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
 				}
 				//GENERATOR:MICRO CHP,
 				MicroCHP( GeneratorNum ).Name = AlphArray( 1 ); //  A1 Generator name
-				ObjMSGName = trim( cCurrentModuleObject ) + " Named " + trim( AlphArray( 1 ) );
+				ObjMSGName = cCurrentModuleObject + " Named " + AlphArray( 1 );
 				MicroCHP( GeneratorNum ).ParamObjName = AlphArray( 2 ); //  A2 Micro CHP Parameter Object Name
 				//find input structure
 				thisParamID = FindItemInList( AlphArray( 2 ), MicroCHPParamInput.Name(), NumMicroCHPParams );
 				if ( thisParamID != 0 ) {
 					MicroCHP( GeneratorNum ).A42Model = MicroCHPParamInput( thisParamID ); // entire structure of input data assigned here!
 				} else {
-					ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( AlphArray( 2 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+					ShowSevereError( "Invalid, " + cAlphaFieldNames( 2 ) + " = " + AlphArray( 2 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 					ErrorsFound = true;
 				}
 
@@ -393,8 +392,8 @@ namespace MicroCHPElectricGenerator {
 					MicroCHP( GeneratorNum ).ZoneName = AlphArray( 3 ); //  A3 Zone Name
 					MicroCHP( GeneratorNum ).ZoneID = FindItemInList( MicroCHP( GeneratorNum ).ZoneName, Zone.Name(), NumOfZones );
 					if ( MicroCHP( GeneratorNum ).ZoneID == 0 ) {
-						ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 3 ) ) + " = " + trim( AlphArray( 3 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+						ShowSevereError( "Invalid, " + cAlphaFieldNames( 3 ) + " = " + AlphArray( 3 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 						ErrorsFound = true;
 					}
 				} else {
@@ -403,21 +402,21 @@ namespace MicroCHPElectricGenerator {
 				MicroCHP( GeneratorNum ).PlantInletNodeName = AlphArray( 4 ); //  A4 Cooling Water Inlet Node Name
 				MicroCHP( GeneratorNum ).PlantOutletNodeName = AlphArray( 5 ); //  A5 Cooling Water Outlet Node Name
 				//find node ids for water path
-				MicroCHP( GeneratorNum ).PlantInletNodeID = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, trim( cCurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-				MicroCHP( GeneratorNum ).PlantOutletNodeID = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, trim( cCurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-				TestCompSet( trim( cCurrentModuleObject ), AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Heat Recovery Nodes" );
+				MicroCHP( GeneratorNum ).PlantInletNodeID = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+				MicroCHP( GeneratorNum ).PlantOutletNodeID = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+				TestCompSet( cCurrentModuleObject, AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Heat Recovery Nodes" );
 
 				MicroCHP( GeneratorNum ).AirInletNodeName = AlphArray( 6 ); //  A6 Air Inlet Node Name
 				// check the node connections
-				MicroCHP( GeneratorNum ).AirInletNodeID = GetOnlySingleNode( AlphArray( 6 ), ErrorsFound, trim( cCurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+				MicroCHP( GeneratorNum ).AirInletNodeID = GetOnlySingleNode( AlphArray( 6 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
 
 				MicroCHP( GeneratorNum ).AirOutletNodeName = AlphArray( 7 ); //  A7 Air Outlet Node Name
-				MicroCHP( GeneratorNum ).AirOutletNodeID = GetOnlySingleNode( AlphArray( 7 ), ErrorsFound, trim( cCurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+				MicroCHP( GeneratorNum ).AirOutletNodeID = GetOnlySingleNode( AlphArray( 7 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 
 				MicroCHP( GeneratorNum ).FuelSupplyID = FindItemInList( AlphArray( 8 ), FuelSupply.Name(), NumGeneratorFuelSups ); // Fuel Supply ID
 				if ( MicroCHP( GeneratorNum ).FuelSupplyID == 0 ) {
-					ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 8 ) ) + " = " + trim( AlphArray( 8 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+					ShowSevereError( "Invalid, " + cAlphaFieldNames( 8 ) + " = " + AlphArray( 8 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 					ErrorsFound = true;
 				}
 
@@ -426,8 +425,8 @@ namespace MicroCHPElectricGenerator {
 				} else {
 					MicroCHP( GeneratorNum ).AvailabilitySchedID = GetScheduleIndex( AlphArray( 9 ) );
 					if ( MicroCHP( GeneratorNum ).AvailabilitySchedID == 0 ) {
-						ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 9 ) ) + " = " + trim( AlphArray( 9 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+						ShowSevereError( "Invalid, " + cAlphaFieldNames( 9 ) + " = " + AlphArray( 9 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 						ErrorsFound = true;
 					}
 				}
@@ -437,7 +436,7 @@ namespace MicroCHPElectricGenerator {
 			}
 
 			if ( ErrorsFound ) {
-				ShowFatalError( "Errors found in processing input for " + trim( cCurrentModuleObject ) );
+				ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
 			}
 
 			//setup report variables
@@ -1451,8 +1450,8 @@ namespace MicroCHPElectricGenerator {
 
 	void
 	SimMicroCHPPlantHeatRecovery(
-		Fstring const & CompType,
-		Fstring const & CompName,
+		std::string const & CompType,
+		std::string const & CompName,
 		int & CompNum,
 		bool const RunFlag,
 		bool & InitLoopEquip,
@@ -1514,7 +1513,7 @@ namespace MicroCHPElectricGenerator {
 		if ( InitLoopEquip ) {
 			CompNum = FindItemInList( CompName, MicroCHP.Name(), NumMicroCHPs );
 			if ( CompNum == 0 ) {
-				ShowFatalError( "SimMicroCHPPlantHeatRecovery: MicroCHP Generator Unit not found=" + trim( CompName ) );
+				ShowFatalError( "SimMicroCHPPlantHeatRecovery: MicroCHP Generator Unit not found=" + CompName );
 				return;
 			}
 			InitMicroCHPNoNormalizeGenerators( CompNum, FirstHVACIteration );

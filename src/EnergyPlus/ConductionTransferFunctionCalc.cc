@@ -6,7 +6,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
@@ -327,13 +326,13 @@ namespace ConductionTransferFunctionCalc {
 							DeltaTimestep = TimeStepZone * SecInHour;
 							ThicknessThreshold = std::sqrt( Alpha * DeltaTimestep * 3. );
 							if ( Material( CurrentLayer ).Thickness < ThicknessThreshold ) {
-								ShowSevereError( "InitConductionTransferFunctions: Found Material that is too thin and/or too " "highly conductive, material name = " + trim( Material( CurrentLayer ).Name ) );
-								ShowContinueError( "High conductivity Material layers are not well supported for internal source " "constructions, material conductivity = " + trim( RoundSigDigits( Material( CurrentLayer ).Conductivity, 3 ) ) + " [W/m-K]" );
-								ShowContinueError( "Material thermal diffusivity = " + trim( RoundSigDigits( Alpha, 3 ) ) + " [m2/s]" );
-								ShowContinueError( "Material with this thermal diffusivity should have thickness > " + trim( RoundSigDigits( ThicknessThreshold, 5 ) ) + " [m]" );
+								ShowSevereError( "InitConductionTransferFunctions: Found Material that is too thin and/or too " "highly conductive, material name = " + Material( CurrentLayer ).Name );
+								ShowContinueError( "High conductivity Material layers are not well supported for internal source " "constructions, material conductivity = " + RoundSigDigits( Material( CurrentLayer ).Conductivity, 3 ) + " [W/m-K]" );
+								ShowContinueError( "Material thermal diffusivity = " + RoundSigDigits( Alpha, 3 ) + " [m2/s]" );
+								ShowContinueError( "Material with this thermal diffusivity should have thickness > " + RoundSigDigits( ThicknessThreshold, 5 ) + " [m]" );
 								if ( Material( CurrentLayer ).Thickness < ThinMaterialLayerThreshold ) {
-									ShowContinueError( "Material may be too thin to be modeled well, thickness = " + trim( RoundSigDigits( Material( CurrentLayer ).Thickness, 5 ) ) + " [m]" );
-									ShowContinueError( "Material with this thermal diffusivity should have thickness > " + trim( RoundSigDigits( ThinMaterialLayerThreshold, 5 ) ) + " [m]" );
+									ShowContinueError( "Material may be too thin to be modeled well, thickness = " + RoundSigDigits( Material( CurrentLayer ).Thickness, 5 ) + " [m]" );
+									ShowContinueError( "Material with this thermal diffusivity should have thickness > " + RoundSigDigits( ThinMaterialLayerThreshold, 5 ) + " [m]" );
 								}
 								Material( CurrentLayer ).WarnedForHighDiffusivity = true;
 							}
@@ -373,8 +372,8 @@ namespace ConductionTransferFunctionCalc {
 						// parameters to calculate CTFs for a building element
 						// containing this layer.
 
-						ShowSevereError( "InitConductionTransferFunctions: Material=" + trim( Material( CurrentLayer ).Name ) + "R Value below lowest allowed value" );
-						ShowContinueError( "Lowest allowed value=[" + trim( RoundSigDigits( RValueLowLimit, 3 ) ) + "], Material R Value=[" + trim( RoundSigDigits( lr( Layer ), 3 ) ) + "]." );
+						ShowSevereError( "InitConductionTransferFunctions: Material=" + Material( CurrentLayer ).Name + "R Value below lowest allowed value" );
+						ShowContinueError( "Lowest allowed value=[" + RoundSigDigits( RValueLowLimit, 3 ) + "], Material R Value=[" + RoundSigDigits( lr( Layer ), 3 ) + "]." );
 						ErrorsFound = true;
 
 					} else { // A valid user defined R-value is available.
@@ -458,7 +457,7 @@ namespace ConductionTransferFunctionCalc {
 							--Construct( ConstrNum ).TempAfterLayer;
 						}
 					} else { // These are not adjacent layers and there is a logic flaw here (should not happen)
-						ShowFatalError( "Combining resistance layers failed for " + trim( Construct( ConstrNum ).Name ) );
+						ShowFatalError( "Combining resistance layers failed for " + Construct( ConstrNum ).Name );
 						ShowContinueError( "This should never happen.  Contact EnergyPlus Support for further assistance." );
 					}
 				}
@@ -972,7 +971,7 @@ namespace ConductionTransferFunctionCalc {
 						// determine the CTFs.  The Gammas are an intermediate
 						// calculations which are necessary before the CTFs can
 						// be computed in TransFuncCoeffs.
-						DisplayNumberAndString( ConstrNum, "Calculating CTFs for \"" + trim( Construct( ConstrNum ).Name ) + "\", Construction #" );
+						DisplayNumberAndString( ConstrNum, "Calculating CTFs for \"" + Construct( ConstrNum ).Name + "\", Construction #" );
 
 						//          CALL DisplayNumberAndString(ConstrNum,'Matrix exponential for Construction #')
 						CalculateExponentialMatrix( Construct( ConstrNum ).CTFTimeStep ); // Compute exponential of AMat
@@ -1029,7 +1028,7 @@ namespace ConductionTransferFunctionCalc {
 									CTFConvrg = false;
 								}
 							} else { // Something terribly wrong--the surface has no CTFs, not even an R-value
-								ShowFatalError( "Illegal construction definition, no CTFs calculated for " + trim( Construct( ConstrNum ).Name ) );
+								ShowFatalError( "Illegal construction definition, no CTFs calculated for " + Construct( ConstrNum ).Name );
 							}
 						}
 
@@ -1039,14 +1038,14 @@ namespace ConductionTransferFunctionCalc {
 						// Thus, if the time step reaches a certain point, error out and let the
 						// user know that something needs to be checked in the input file.
 						if ( Construct( ConstrNum ).CTFTimeStep >= MaxAllowedTimeStep ) {
-							ShowSevereError( "CTF calculation convergence problem for Construction=\"" + trim( Construct( ConstrNum ).Name ) + "\"." );
+							ShowSevereError( "CTF calculation convergence problem for Construction=\"" + Construct( ConstrNum ).Name + "\"." );
 							ShowContinueError( "...with Materials (outside layer to inside)" );
-							ShowContinueError( "(outside)=\"" + trim( Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Name ) + "\"" );
+							ShowContinueError( "(outside)=\"" + Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Name + "\"" );
 							for ( Layer = 2; Layer <= Construct( ConstrNum ).TotLayers; ++Layer ) {
 								if ( Layer != Construct( ConstrNum ).TotLayers ) {
-									ShowContinueError( "(next)=\"" + trim( Material( Construct( ConstrNum ).LayerPoint( Layer ) ).Name ) + "\"" );
+									ShowContinueError( "(next)=\"" + Material( Construct( ConstrNum ).LayerPoint( Layer ) ).Name + "\"" );
 								} else {
-									ShowContinueError( "(inside)=\"" + trim( Material( Construct( ConstrNum ).LayerPoint( Layer ) ).Name ) + "\"" );
+									ShowContinueError( "(inside)=\"" + Material( Construct( ConstrNum ).LayerPoint( Layer ) ).Name + "\"" );
 								}
 							}
 							ShowContinueError( "The Construction report will be produced. This will show more " "details on Constructions and their materials." );
@@ -2115,14 +2114,14 @@ namespace ConductionTransferFunctionCalc {
 		int I;
 
 		// Formats
-		std::string const Format_700( "(' Construction CTF,',A,3(',',I4),',',F8.3,',',G15.4,4(',',F8.3),',',A)" );
-		std::string const Format_701( "(' Material CTF Summary,',A,',',F8.4,',',F14.3,',',F11.3,',',F13.3,',',G12.4)" );
-		std::string const Format_702( "(' Material:Air,',A,',',G12.4)" );
-		std::string const Format_703( "(' CTF,',I4,4(',',G20.8))" );
-		std::string const Format_704( "(' CTF,',I4,3(',',G20.8))" );
-		std::string const Format_705( "(' QTF,',I4,2(',',G20.8))" );
-		std::string const Format_706( "(' Source/Sink Loc Internal Temp QTF,',I4,3(',',G20.8))" );
-		std::string const Format_707( "(' User Loc Internal Temp QTF,',I4,3(',',G20.8))" );
+		static gio::Fmt const Format_700( "(' Construction CTF,',A,3(',',I4),',',F8.3,',',G15.4,4(',',F8.3),',',A)" );
+		static gio::Fmt const Format_701( "(' Material CTF Summary,',A,',',F8.4,',',F14.3,',',F11.3,',',F13.3,',',G12.4)" );
+		static gio::Fmt const Format_702( "(' Material:Air,',A,',',G12.4)" );
+		static gio::Fmt const Format_703( "(' CTF,',I4,4(',',G20.8))" );
+		static gio::Fmt const Format_704( "(' CTF,',I4,3(',',G20.8))" );
+		static gio::Fmt const Format_705( "(' QTF,',I4,2(',',G20.8))" );
+		static gio::Fmt const Format_706( "(' Source/Sink Loc Internal Temp QTF,',I4,3(',',G20.8))" );
+		static gio::Fmt const Format_707( "(' User Loc Internal Temp QTF,',I4,3(',',G20.8))" );
 
 		ScanForReports( "Constructions", DoReport, "Constructions" );
 
@@ -2137,15 +2136,15 @@ namespace ConductionTransferFunctionCalc {
 
 				if ( Construct( ThisNum ).TypeIsWindow ) continue;
 
-				gio::write( OutputFileInits, Format_700 ) << trim( Construct( ThisNum ).Name ) << ThisNum << Construct( ThisNum ).TotLayers << Construct( ThisNum ).NumCTFTerms << Construct( ThisNum ).CTFTimeStep << Construct( ThisNum ).UValue << Construct( ThisNum ).OutsideAbsorpThermal << Construct( ThisNum ).InsideAbsorpThermal << Construct( ThisNum ).OutsideAbsorpSolar << Construct( ThisNum ).InsideAbsorpSolar << trim( DisplayMaterialRoughness( Construct( ThisNum ).OutsideRoughness ) );
+				gio::write( OutputFileInits, Format_700 ) << Construct( ThisNum ).Name << ThisNum << Construct( ThisNum ).TotLayers << Construct( ThisNum ).NumCTFTerms << Construct( ThisNum ).CTFTimeStep << Construct( ThisNum ).UValue << Construct( ThisNum ).OutsideAbsorpThermal << Construct( ThisNum ).InsideAbsorpThermal << Construct( ThisNum ).OutsideAbsorpSolar << Construct( ThisNum ).InsideAbsorpSolar << DisplayMaterialRoughness( Construct( ThisNum ).OutsideRoughness );
 
 				for ( I = 1; I <= Construct( ThisNum ).TotLayers; ++I ) {
 					Layer = Construct( ThisNum ).LayerPoint( I );
 					{ auto const SELECT_CASE_var( Material( Layer ).Group );
 					if ( SELECT_CASE_var == Air ) {
-						gio::write( OutputFileInits, Format_702 ) << trim( Material( Layer ).Name ) << Material( Layer ).Resistance;
+						gio::write( OutputFileInits, Format_702 ) << Material( Layer ).Name << Material( Layer ).Resistance;
 					} else {
-						gio::write( OutputFileInits, Format_701 ) << trim( Material( Layer ).Name ) << Material( Layer ).Thickness << Material( Layer ).Conductivity << Material( Layer ).Density << Material( Layer ).SpecHeat << Material( Layer ).Resistance;
+						gio::write( OutputFileInits, Format_701 ) << Material( Layer ).Name << Material( Layer ).Thickness << Material( Layer ).Conductivity << Material( Layer ).Density << Material( Layer ).SpecHeat << Material( Layer ).Resistance;
 					}}
 				}
 

@@ -7,6 +7,7 @@
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/MArray.functions.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <ThermalComfort.hh>
@@ -332,7 +333,7 @@ namespace ThermalComfort {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Loop; // DO loop counter
-		Fstring CurrentGroupName( MaxNameLength );
+		std::string CurrentGroupName;
 
 		// FLOW:
 
@@ -552,10 +553,10 @@ namespace ThermalComfort {
 					CloUnit = ThermalComfortData( PeopleNum ).ClothingValue;
 				} else {
 					CloUnit = GetCurrentScheduleValue( People( PeopleNum ).ClothingPtr );
-					ShowWarningError( "PEOPLE=\"" + trim( People( PeopleNum ).Name ) + "\", Scheduled clothing value will be used rather than clothing calculation method." );
+					ShowWarningError( "PEOPLE=\"" + People( PeopleNum ).Name + "\", Scheduled clothing value will be used rather than clothing calculation method." );
 				}
 			} else {
-				ShowSevereError( "PEOPLE=\"" + trim( People( PeopleNum ).Name ) + "\", Incorrect Clothing Type" );
+				ShowSevereError( "PEOPLE=\"" + People( PeopleNum ).Name + "\", Incorrect Clothing Type" );
 			}}
 
 			if ( IsZoneCV( ZoneNum ) ) {
@@ -571,10 +572,10 @@ namespace ThermalComfort {
 				// Ensure air velocity within the reasonable range. Otherwise reccusive warnings is provided
 				if ( present( PNum ) && ( AirVel < 0.1 || AirVel > 0.5 ) ) {
 					if ( People( PeopleNum ).AirVelErrIndex == 0 ) {
-						ShowWarningMessage( "PEOPLE=\"" + trim( People( PeopleNum ).Name ) + "\", Air velocity is beyond the reasonable range (0.1,0.5) for thermal comfort control." );
-						ShowContinueErrorTimeStamp( " " );
+						ShowWarningMessage( "PEOPLE=\"" + People( PeopleNum ).Name + "\", Air velocity is beyond the reasonable range (0.1,0.5) for thermal comfort control." );
+						ShowContinueErrorTimeStamp( "" );
 					}
-					ShowRecurringWarningErrorAtEnd( "PEOPLE=\"" + trim( People( PeopleNum ).Name ) + "\",Air velocity is still beyond the reasonable range (0.1,0.5)", People( PeopleNum ).AirVelErrIndex, AirVel, AirVel, _, "[m/s]", "[m/s]" );
+					ShowRecurringWarningErrorAtEnd( "PEOPLE=\"" + People( PeopleNum ).Name + "\",Air velocity is still beyond the reasonable range (0.1,0.5)", People( PeopleNum ).AirVelErrIndex, AirVel, AirVel, _, "[m/s]", "[m/s]" );
 				}
 
 			}
@@ -1252,10 +1253,10 @@ namespace ThermalComfort {
 					CloUnit = ThermalComfortData( PeopleNum ).ClothingValue;
 				} else {
 					CloUnit = GetCurrentScheduleValue( People( PeopleNum ).ClothingPtr );
-					ShowWarningError( "PEOPLE=\"" + trim( People( PeopleNum ).Name ) + "\", Scheduled clothing value will be used rather than clothing calculation method." );
+					ShowWarningError( "PEOPLE=\"" + People( PeopleNum ).Name + "\", Scheduled clothing value will be used rather than clothing calculation method." );
 				}
 			} else {
-				ShowSevereError( "PEOPLE=\"" + trim( People( PeopleNum ).Name ) + "\", Incorrect Clothing Type" );
+				ShowSevereError( "PEOPLE=\"" + People( PeopleNum ).Name + "\", Incorrect Clothing Type" );
 			}}
 
 			AirVel = GetCurrentScheduleValue( People( PeopleNum ).AirVelocityPtr );
@@ -1683,7 +1684,7 @@ namespace ThermalComfort {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const AngleFacLimit( 0.01 ); // To set the limit of sum of angle factors
-		static Fstring const Blank;
+		static std::string const Blank;
 		int const MaxSurfaces( 20 ); // Maximum number of surfaces in each AngleFactor List
 
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -1709,8 +1710,8 @@ namespace ThermalComfort {
 		cCurrentModuleObject = "ComfortViewFactorAngles";
 		NumOfAngleFactorLists = GetNumObjectsFound( cCurrentModuleObject );
 		AngleFactorList.allocate( NumOfAngleFactorLists );
-		AngleFactorList.Name() = Blank;
-		AngleFactorList.ZoneName() = Blank;
+		AngleFactorList.Name() = "";
+		AngleFactorList.ZoneName() = "";
 		AngleFactorList.ZonePtr() = 0;
 
 		for ( Item = 1; Item <= NumOfAngleFactorLists; ++Item ) {
@@ -1723,14 +1724,14 @@ namespace ThermalComfort {
 			AngleFactorList( Item ).ZoneName = cAlphaArgs( 2 );
 			AngleFactorList( Item ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
 			if ( AngleFactorList( Item ).ZonePtr == 0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", " "invalid - not found" );
-				ShowContinueError( "...invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\"." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " "invalid - not found" );
+				ShowContinueError( "...invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
 			}
 
 			AngleFactorList( Item ).TotAngleFacSurfaces = NumNumbers;
 			if ( AngleFactorList( Item ).TotAngleFacSurfaces > MaxSurfaces ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ": Too many surfaces specified in " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( cCurrentModuleObject + ": Too many surfaces specified in " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
@@ -1744,14 +1745,14 @@ namespace ThermalComfort {
 				AngleFactorList( Item ).AngleFactor( SurfNum ) = rNumericArgs( SurfNum );
 				// Error trap for surfaces that do not exist or surfaces not in the zone
 				if ( AngleFactorList( Item ).SurfacePtr( SurfNum ) == 0 ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( SurfNum + 2 ) ) + ", entered value=" + trim( cAlphaArgs( SurfNum + 2 ) ) );
-					ShowContinueError( "ref " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) + " not found in " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
+					ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( SurfNum + 2 ) + ", entered value=" + cAlphaArgs( SurfNum + 2 ) );
+					ShowContinueError( "ref " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) + " not found in " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
 					ErrorsFound = true;
 				} else if ( AngleFactorList( Item ).ZonePtr != 0 ) { // don't look at invalid zones
 					// Found Surface, is it in same zone tagged for Angle Factor List?
 					if ( AngleFactorList( Item ).ZonePtr != Surface( AngleFactorList( Item ).SurfacePtr( SurfNum ) ).Zone ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid - mismatch " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\"" );
-						ShowContinueError( "... does not match " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( Zone( Surface( AngleFactorList( Item ).SurfacePtr( SurfNum ) ).Zone ).Name ) + "\" for " + trim( cAlphaFieldNames( SurfNum + 2 ) ) + "=\"" + trim( cAlphaArgs( SurfNum + 2 ) ) + "\"." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid - mismatch " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"" );
+						ShowContinueError( "... does not match " + cAlphaFieldNames( 2 ) + "=\"" + Zone( Surface( AngleFactorList( Item ).SurfacePtr( SurfNum ) ).Zone ).Name + "\" for " + cAlphaFieldNames( SurfNum + 2 ) + "=\"" + cAlphaArgs( SurfNum + 2 ) + "\"." );
 						ErrorsFound = true;
 					}
 				}
@@ -1761,8 +1762,8 @@ namespace ThermalComfort {
 			}
 
 			if ( std::abs( AllAngleFacSummed - 1.0 ) > AngleFacLimit ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid - Sum[AngleFactors]" );
-				ShowContinueError( "...Sum of Angle Factors [" + trim( RoundSigDigits( AllAngleFacSummed, 3 ) ) + "] exceed expected sum [1.0] by more than limit [" + trim( RoundSigDigits( AngleFacLimit, 3 ) ) + "]." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid - Sum[AngleFactors]" );
+				ShowContinueError( "...Sum of Angle Factors [" + RoundSigDigits( AllAngleFacSummed, 3 ) + "] exceed expected sum [1.0] by more than limit [" + RoundSigDigits( AngleFacLimit, 3 ) + "]." );
 				ErrorsFound = true;
 			}
 
@@ -1777,12 +1778,12 @@ namespace ThermalComfort {
 			People( Item ).AngleFactorListPtr = FindItemInList( People( Item ).AngleFactorListName, AngleFactorList.Name(), NumOfAngleFactorLists );
 			WhichAFList = People( Item ).AngleFactorListPtr;
 			if ( WhichAFList == 0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( People( Item ).AngleFactorListName ) + "\", invalid" );
-				ShowSevereError( "... Angle Factor List Name not found for PEOPLE= " + trim( People( Item ).Name ) );
+				ShowSevereError( cCurrentModuleObject + "=\"" + People( Item ).AngleFactorListName + "\", invalid" );
+				ShowSevereError( "... Angle Factor List Name not found for PEOPLE= " + People( Item ).Name );
 				ErrorsFound = true;
 			} else if ( People( Item ).ZonePtr != AngleFactorList( WhichAFList ).ZonePtr ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( AngleFactorList( WhichAFList ).Name ) + " mismatch Zone Name" );
-				ShowContinueError( "...Zone=\"" + trim( AngleFactorList( WhichAFList ).ZoneName ) + " does not match Zone=\"" + trim( Zone( People( Item ).ZonePtr ).Name ) + "\" in PEOPLE=\"" + trim( People( Item ).Name ) + "\"." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + AngleFactorList( WhichAFList ).Name + " mismatch Zone Name" );
+				ShowContinueError( "...Zone=\"" + AngleFactorList( WhichAFList ).ZoneName + " does not match Zone=\"" + Zone( People( Item ).ZonePtr ).Name + "\" in PEOPLE=\"" + People( Item ).Name + "\"." );
 				ErrorsFound = true;
 			}
 		}
@@ -2148,17 +2149,17 @@ namespace ThermalComfort {
 			}
 			//if any zones should be warning print it out
 			if ( showWarning ) {
-				ShowWarningError( "More than 4% of time (" + trim( RoundSigDigits( allowedHours, 1 ) ) + " hours) uncomfortable in one or more zones " );
+				ShowWarningError( "More than 4% of time (" + RoundSigDigits( allowedHours, 1 ) + " hours) uncomfortable in one or more zones " );
 				ShowContinueError( "Based on ASHRAE 55-2004 graph (Section 5.2.1.1)" );
 				if ( RunPeriodEnvironment ) {
-					ShowContinueError( "During Environment [" + trim( EnvironmentStartEnd ) + "]: " + trim( EnvironmentName ) );
+					ShowContinueError( "During Environment [" + EnvironmentStartEnd + "]: " + EnvironmentName );
 				} else {
-					ShowContinueError( "During SizingPeriod Environment [" + trim( EnvironmentStartEnd ) + "]: " + trim( EnvironmentName ) );
+					ShowContinueError( "During SizingPeriod Environment [" + EnvironmentStartEnd + "]: " + EnvironmentName );
 				}
 				for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
 					if ( ThermalComfortInASH55( iZone ).Enable55Warning ) {
 						if ( ThermalComfortInASH55( iZone ).totalTimeNotEither > allowedHours ) {
-							ShowContinueError( trim( RoundSigDigits( ThermalComfortInASH55( iZone ).totalTimeNotEither, 1 ) ) + " hours were uncomfortable in zone: " + trim( Zone( iZone ).Name ) );
+							ShowContinueError( RoundSigDigits( ThermalComfortInASH55( iZone ).totalTimeNotEither, 1 ) + " hours were uncomfortable in zone: " + Zone( iZone ).Name );
 						}
 					}
 				}
@@ -2415,10 +2416,10 @@ namespace ThermalComfort {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		Fstring lineIn( 200 );
-		Fstring lineAvg( 200 );
-		Fstring epwLine( 200 );
-		Fstring ioerrmsg( 52 );
+		std::string lineIn;
+		std::string lineAvg;
+		std::string epwLine;
+		std::string ioerrmsg;
 		static Real64 avgDryBulbASH( 0.0 );
 		Real64 dryBulb;
 		static Real64 runningAverageASH( 0.0 );
@@ -2427,7 +2428,6 @@ namespace ThermalComfort {
 		Real64 numOccupants;
 		int statFile;
 		int epwFile;
-		int lnPtr;
 		int pMonth;
 		int pDay;
 		bool statFileExists;
@@ -2440,7 +2440,7 @@ namespace ThermalComfort {
 		int calcStartHr;
 		int calcEndDay;
 		int calcEndHr;
-		int pos;
+		std::string::size_type pos;
 		int ind;
 		int i;
 		int j;
@@ -2470,8 +2470,7 @@ namespace ThermalComfort {
 				}
 				while ( readStat == 0 ) {
 					{ IOFlags flags; gio::read( statFile, "(A)", flags ) >> lineIn; readStat = flags.ios(); }
-					lnPtr = index( lineIn, "Monthly Statistics for Dry Bulb temperatures" );
-					if ( lnPtr > 0 ) {
+					if ( has( lineIn, "Monthly Statistics for Dry Bulb temperatures" ) ) {
 						for ( i = 1; i <= 7; ++i ) {
 							{ IOFlags flags; gio::read( statFile, "(A)", flags ); readStat = flags.ios(); }
 						}
@@ -2505,11 +2504,11 @@ namespace ThermalComfort {
 						for ( j = 1; j <= 24; ++j ) {
 							{ IOFlags flags; gio::read( epwFile, "(A)", flags ) >> epwLine; readStat = flags.ios(); }
 							for ( ind = 1; ind <= 6; ++ind ) {
-								pos = index( epwLine,"," );
-								epwLine = epwLine( pos + 1 );
+								pos = index( epwLine, ',' );
+								epwLine.erase( 0, pos + 1 );
 							}
-							pos = index( epwLine,"," );
-							dryBulb = StrToReal( epwLine( 1, pos - 1 ) );
+							pos = index( epwLine, ',' );
+							dryBulb = StrToReal( epwLine.substr( 0, pos ) );
 							avgDryBulbASH += ( dryBulb / 24.0 );
 						}
 						runningAverageASH = ( 29.0 * runningAverageASH + avgDryBulbASH ) / 30.0;
@@ -2524,11 +2523,11 @@ namespace ThermalComfort {
 						for ( j = 1; j <= 24; ++j ) {
 							{ IOFlags flags; gio::read( epwFile, "(A)", flags ) >> epwLine; readStat = flags.ios(); }
 							for ( ind = 1; ind <= 6; ++ind ) {
-								pos = index( epwLine,"," );
-								epwLine = epwLine( pos + 1 );
+								pos = index( epwLine, ',' );
+								epwLine.erase( 0, pos + 1 );
 							}
-							pos = index( epwLine,"," );
-							dryBulb = StrToReal( epwLine( 1, pos - 1 ) );
+							pos = index( epwLine, ',' );
+							dryBulb = StrToReal( epwLine.substr( 0, pos ) );
 							avgDryBulbASH += ( dryBulb / 24.0 );
 						}
 						runningAverageASH = ( 29.0 * runningAverageASH + avgDryBulbASH ) / 30.0;
@@ -2541,11 +2540,11 @@ namespace ThermalComfort {
 						for ( j = 1; j <= 24; ++j ) {
 							{ IOFlags flags; gio::read( epwFile, "(A)", flags ) >> epwLine; readStat = flags.ios(); }
 							for ( ind = 1; ind <= 6; ++ind ) {
-								pos = index( epwLine,"," );
-								epwLine = epwLine( pos + 1 );
+								pos = index( epwLine, ',' );
+								epwLine.erase( 0, pos + 1 );
 							}
-							pos = index( epwLine,"," );
-							dryBulb = StrToReal( epwLine( 1, pos - 1 ) );
+							pos = index( epwLine, ',' );
+							dryBulb = StrToReal( epwLine.substr( 0, pos ) );
 							avgDryBulbASH += ( dryBulb / 24.0 );
 						}
 						runningAverageASH = ( 29.0 * runningAverageASH + avgDryBulbASH ) / 30.0;
@@ -2675,7 +2674,7 @@ namespace ThermalComfort {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		Fstring epwLine( 200 );
+		std::string epwLine;
 		static Real64 avgDryBulbCEN( 0.0 );
 		Real64 dryBulb;
 		Real64 tComf;
@@ -2734,11 +2733,11 @@ namespace ThermalComfort {
 						for ( j = 1; j <= 24; ++j ) {
 							{ IOFlags flags; gio::read( epwFile, "(A)", flags ) >> epwLine; readStat = flags.ios(); }
 							for ( ind = 1; ind <= 6; ++ind ) {
-								pos = index( epwLine,"," );
-								epwLine = epwLine( pos + 1 );
+								pos = index( epwLine, ',' );
+								epwLine.erase( 0, pos + 1 );
 							}
-							pos = index( epwLine,"," );
-							dryBulb = StrToReal( epwLine( 1, pos - 1 ) );
+							pos = index( epwLine, ',' );
+							dryBulb = StrToReal( epwLine.substr( 0, pos ) );
 							avgDryBulbCEN += ( dryBulb / 24.0 );
 						}
 						runningAverageCEN += std::pow( alpha, ( 7 - i ) ) * avgDryBulbCEN;
@@ -2753,11 +2752,11 @@ namespace ThermalComfort {
 						for ( j = 1; j <= 24; ++j ) {
 							{ IOFlags flags; gio::read( epwFile, "(A)", flags ) >> epwLine; readStat = flags.ios(); }
 							for ( ind = 1; ind <= 6; ++ind ) {
-								pos = index( epwLine,"," );
-								epwLine = epwLine( pos + 1 );
+								pos = index( epwLine, ',' );
+								epwLine.erase( 0, pos + 1 );
 							}
-							pos = index( epwLine,"," );
-							dryBulb = StrToReal( epwLine( 1, pos - 1 ) );
+							pos = index( epwLine, ',' );
+							dryBulb = StrToReal( epwLine.substr( 0, pos ) );
 							avgDryBulbCEN += ( dryBulb / 24.0 );
 						}
 						runningAverageCEN += std::pow( alpha, ( calcEndDay - i ) ) * avgDryBulbCEN;
@@ -2770,11 +2769,11 @@ namespace ThermalComfort {
 						for ( j = 1; j <= 24; ++j ) {
 							{ IOFlags flags; gio::read( epwFile, "(A)", flags ) >> epwLine; readStat = flags.ios(); }
 							for ( ind = 1; ind <= 6; ++ind ) {
-								pos = index( epwLine,"," );
-								epwLine = epwLine( pos + 1 );
+								pos = index( epwLine, ',' );
+								epwLine.erase( 0, pos + 1 );
 							}
-							pos = index( epwLine,"," );
-							dryBulb = StrToReal( epwLine( 1, pos - 1 ) );
+							pos = index( epwLine, ',' );
+							dryBulb = StrToReal( epwLine.substr( 0, pos ) );
 							avgDryBulbCEN += ( dryBulb / 24.0 );
 						}
 						runningAverageCEN += std::pow( alpha, ( 7 - i ) ) * avgDryBulbCEN;

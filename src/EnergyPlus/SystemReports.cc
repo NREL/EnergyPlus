@@ -6,6 +6,7 @@
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <SystemReports.hh>
@@ -279,8 +280,8 @@ namespace SystemReports {
 		int FirstIndex;
 		int LastIndex;
 		int LoopCount;
-		Fstring CompType( MaxNameLength );
-		Fstring CompName( MaxNameLength );
+		std::string CompType;
+		std::string CompName;
 		bool MatchFound;
 		static bool OneTimeFlag( true ); // Flag set to make sure you initialize reports one time
 		bool Duplicate;
@@ -2369,8 +2370,8 @@ namespace SystemReports {
 		int VarNum;
 		int VarNum1;
 		int CtrlZoneNum;
-		Fstring TypeOfComp( MaxNameLength );
-		Fstring NameOfComp( MaxNameLength );
+		std::string TypeOfComp;
+		std::string NameOfComp;
 		bool ErrorsFound;
 		bool ModeFlagOn;
 		int NumInlets;
@@ -2378,12 +2379,12 @@ namespace SystemReports {
 		int PlantLoopNum;
 
 		//Dimension GetChildrenData arrays
-		FArray1D_Fstring SubCompTypes( sFstring( MaxNameLength ) );
-		FArray1D_Fstring SubCompNames( sFstring( MaxNameLength ) );
-		FArray1D_Fstring InletNodeNames( sFstring( MaxNameLength ) );
+		FArray1D_string SubCompTypes;
+		FArray1D_string SubCompNames;
+		FArray1D_string InletNodeNames;
 		FArray1D_int InletNodeNumbers;
 		FArray1D_int InletFluidStreams;
-		FArray1D_Fstring OutletNodeNames( sFstring( MaxNameLength ) );
+		FArray1D_string OutletNodeNames;
 		FArray1D_int OutletNodeNumbers;
 		FArray1D_int OutletFluidStreams;
 		int NumChildren;
@@ -2394,11 +2395,11 @@ namespace SystemReports {
 		FArray1D_int VarIndexes; // Variable Numbers
 		FArray1D_int VarTypes; // Variable Types (1=integer, 2=real, 3=meter)
 		FArray1D_int IndexTypes; // Variable Idx Types (1=Zone,2=HVAC)
-		FArray1D_Fstring UnitsStrings( sFstring( MaxNameLength ) ); // UnitsStrings for each variable
+		FArray1D_string UnitsStrings; // UnitsStrings for each variable
 		FArray1D_int ResourceTypes; // ResourceTypes for each variable
-		FArray1D_Fstring EndUses( sFstring( MaxNameLength ) ); // EndUses for each variable
-		FArray1D_Fstring Groups( sFstring( MaxNameLength ) ); // Groups for each variable
-		FArray1D_Fstring Names( sFstring( MaxNameLength ) ); // Variable Names for each variable
+		FArray1D_string EndUses; // EndUses for each variable
+		FArray1D_string Groups; // Groups for each variable
+		FArray1D_string Names; // Variable Names for each variable
 		int NumFound; // Number Found
 		int NumVariables;
 		int NumLeft; // Counter for deeper components
@@ -2478,7 +2479,7 @@ namespace SystemReports {
 								PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).NodeNumOut = OutletNodeNumbers( SubSubCompNum );
 								NumLeft = GetNumChildren( SubCompTypes( SubSubCompNum ), SubCompNames( SubSubCompNum ) );
 								if ( NumLeft > 0 ) {
-									ShowSevereError( "Hanging Children for component=" + trim( SubCompTypes( SubSubCompNum ) ) + ":" + trim( SubCompNames( SubSubCompNum ) ) );
+									ShowSevereError( "Hanging Children for component=" + SubCompTypes( SubSubCompNum ) + ':' + SubCompNames( SubSubCompNum ) );
 								}
 							}
 
@@ -3218,8 +3219,8 @@ namespace SystemReports {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Fstring CompType( MaxNameLength );
-		Fstring CompName( MaxNameLength );
+		std::string CompType;
+		std::string CompName;
 		int Idx; // loop counter
 		int nodes; // loop counter
 		int CtrlZoneNum; // ZONE counter
@@ -3499,7 +3500,7 @@ namespace SystemReports {
 	CalcSystemEnergyUse(
 		bool const CompLoadFlag,
 		int const AirLoopNum,
-		Fstring const & CompType,
+		std::string const & CompType,
 		int const EnergyType,
 		Real64 const CompLoad,
 		Real64 const CompEnergy
@@ -3545,21 +3546,20 @@ namespace SystemReports {
 		struct CompTypeError
 		{
 			// Members
-			Fstring CompType;
+			std::string CompType;
 			int CompErrIndex;
 
 			// Default Constructor
 			CompTypeError() :
-				CompType( MaxNameLength ),
 				CompErrIndex( 0 )
 			{}
 
 			// Member Constructor
 			CompTypeError(
-				Fstring const & CompType,
+				std::string const & CompType,
 				int const CompErrIndex
 			) :
-				CompType( MaxNameLength, CompType ),
+				CompType( CompType ),
 				CompErrIndex( CompErrIndex )
 			{}
 
@@ -3792,7 +3792,7 @@ namespace SystemReports {
 				CompTypeErrors( NumCompTypes ).CompType = CompType;
 				found = NumCompTypes;
 			}
-			ShowRecurringSevereErrorAtEnd( "CalcSystemEnergyUse: Component Type=" + trim( CompType ) + " not logged as one of allowable Component Types.", CompTypeErrors( found ).CompErrIndex );
+			ShowRecurringSevereErrorAtEnd( "CalcSystemEnergyUse: Component Type=" + CompType + " not logged as one of allowable Component Types.", CompTypeErrors( found ).CompErrIndex );
 
 		}}
 
@@ -4248,8 +4248,8 @@ namespace SystemReports {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Fstring CompType( MaxNameLength );
-		Fstring CompName( MaxNameLength );
+		std::string CompType;
+		std::string CompName;
 		int CompNum; // counter for components on air loop branch connected to air distribution unit
 		int VarNum;
 		int SubCompNum; // counter for components on air loop branch connected to air distribution unit
@@ -4310,8 +4310,8 @@ namespace SystemReports {
 
 	void
 	FindDemandSideMatch(
-		Fstring const & CompType, // Inlet node of the component to find the match of
-		Fstring const & CompName, // Outlet node of the component to find the match of
+		std::string const & CompType, // Inlet node of the component to find the match of
+		std::string const & CompName, // Outlet node of the component to find the match of
 		bool & MatchFound, // Set to .TRUE. when a match is found
 		int & MatchLoopType, // Loop number of the match
 		int & MatchLoop, // Loop number of the match
@@ -4439,7 +4439,7 @@ namespace SystemReports {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const errstring( "**error**" );
+		static std::string const errstring( "**error**" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -4452,28 +4452,28 @@ namespace SystemReports {
 		int Count1;
 		int CtrldZoneNum;
 		int ZoneNum;
-		Fstring ChrOut( 20 );
-		Fstring ChrOut2( 20 );
-		Fstring ChrOut3( 20 );
-		Fstring ChrOut4( 20 );
-		Fstring ChrOut5( 20 );
+		std::string ChrOut;
+		std::string ChrOut2;
+		std::string ChrOut3;
+		std::string ChrOut4;
+		std::string ChrOut5;
 
 		// Formats
-		std::string const Format_701( "(A)" );
-		std::string const Format_706( "('! <#AirLoopHVACs>,<Number of AirLoopHVACs>')" );
-		std::string const Format_707( "(1X,A)" );
-		std::string const Format_708( "('! <AirLoopHVAC>,<Air Loop Name>,<# Return Nodes>,<# Supply Nodes>,','<# Zones Cooled>,<# Zones Heated>,<Outdoor Air Used>')" );
-		std::string const Format_709( "('! <AirLoop Return Connections>,<Connection Count>,<AirLoopHVAC Name>,','<Zn Eqp Return Node #>,<Zn Eqp Return Node Name>,','<AirLoop Return Node #>,<Air Loop Return Node Name>')" );
-		std::string const Format_710( "('! <AirLoop Supply Connections>,<Connection Count>,<AirLoopHVAC Name>,','<Zn Eqp Supply Node #>,<Zn Eqp Supply Node Name>,','<AirLoop Supply Node #>,<Air Loop Supply Node Name>')" );
-		std::string const Format_711( "('! <Cooled Zone Info>,<Cooled Zone Count>,<Cooled Zone Name>,','<Cooled Zone Inlet Node #>,<Cooled Zone Inlet Node Name>,<AirLoopHVAC Name>')" );
-		std::string const Format_712( "('! <Heated Zone Info>,<Heated Zone Count>,<Heated Zone Name>,','<Heated Zone Inlet Node #>,<Heated Zone Inlet Node Name>,<AirLoopHVAC Name>')" );
-		std::string const Format_714( "('! <Outdoor Air Connections>,<OA Inlet Node #>,<OA Return Air Inlet Node Name>,','<OA Outlet Node #>,<OA Mixed Air Outlet Node Name>,<AirLoopHVAC Name>'s)" );
-		std::string const Format_713( "(A)" );
+		static gio::Fmt const Format_701( "(A)" );
+		static gio::Fmt const Format_706( "('! <#AirLoopHVACs>,<Number of AirLoopHVACs>')" );
+		static gio::Fmt const Format_707( "(1X,A)" );
+		static gio::Fmt const Format_708( "('! <AirLoopHVAC>,<Air Loop Name>,<# Return Nodes>,<# Supply Nodes>,','<# Zones Cooled>,<# Zones Heated>,<Outdoor Air Used>')" );
+		static gio::Fmt const Format_709( "('! <AirLoop Return Connections>,<Connection Count>,<AirLoopHVAC Name>,','<Zn Eqp Return Node #>,<Zn Eqp Return Node Name>,','<AirLoop Return Node #>,<Air Loop Return Node Name>')" );
+		static gio::Fmt const Format_710( "('! <AirLoop Supply Connections>,<Connection Count>,<AirLoopHVAC Name>,','<Zn Eqp Supply Node #>,<Zn Eqp Supply Node Name>,','<AirLoop Supply Node #>,<Air Loop Supply Node Name>')" );
+		static gio::Fmt const Format_711( "('! <Cooled Zone Info>,<Cooled Zone Count>,<Cooled Zone Name>,','<Cooled Zone Inlet Node #>,<Cooled Zone Inlet Node Name>,<AirLoopHVAC Name>')" );
+		static gio::Fmt const Format_712( "('! <Heated Zone Info>,<Heated Zone Count>,<Heated Zone Name>,','<Heated Zone Inlet Node #>,<Heated Zone Inlet Node Name>,<AirLoopHVAC Name>')" );
+		static gio::Fmt const Format_714( "('! <Outdoor Air Connections>,<OA Inlet Node #>,<OA Return Air Inlet Node Name>,','<OA Outlet Node #>,<OA Mixed Air Outlet Node Name>,<AirLoopHVAC Name>'s)" );
+		static gio::Fmt const Format_713( "(A)" );
 
 		gio::write( OutputFileBNDetails, Format_701 ) << "! ===============================================================";
 		gio::write( OutputFileBNDetails, Format_706 );
 		gio::write( ChrOut, "*" ) << NumPrimaryAirSys;
-		gio::write( OutputFileBNDetails, Format_707 ) << "#AirLoopHVACs," + trim( adjustl( ChrOut ) );
+		gio::write( OutputFileBNDetails, Format_707 ) << "#AirLoopHVACs," + stripped( ChrOut );
 		gio::write( OutputFileBNDetails, Format_708 );
 		gio::write( OutputFileBNDetails, Format_709 );
 		gio::write( OutputFileBNDetails, Format_710 );
@@ -4488,16 +4488,16 @@ namespace SystemReports {
 			gio::write( ChrOut2, "*" ) << AirToZoneNodeInfo( Count ).NumSupplyNodes;
 			gio::write( ChrOut3, "*" ) << AirToZoneNodeInfo( Count ).NumZonesCooled;
 			gio::write( ChrOut4, "*" ) << AirToZoneNodeInfo( Count ).NumZonesHeated;
-			ChrOut = adjustl( ChrOut );
-			ChrOut2 = adjustl( ChrOut2 );
-			ChrOut3 = adjustl( ChrOut3 );
-			ChrOut4 = adjustl( ChrOut4 );
+			strip( ChrOut );
+			strip( ChrOut2 );
+			strip( ChrOut3 );
+			strip( ChrOut4 );
 			if ( AirToOANodeInfo( Count ).OASysExists ) {
 				ChrOut5 = "Yes";
 			} else {
 				ChrOut5 = "No";
 			}
-			gio::write( OutputFileBNDetails, Format_701 ) << " AirLoopHVAC," + trim( AirToZoneNodeInfo( Count ).AirLoopName ) + "," + trim( ChrOut ) + "," + trim( ChrOut2 ) + "," + trim( ChrOut3 ) + "," + trim( ChrOut4 ) + "," + trim( ChrOut5 );
+			gio::write( OutputFileBNDetails, Format_701 ) << " AirLoopHVAC," + AirToZoneNodeInfo( Count ).AirLoopName + ',' + ChrOut + ',' + ChrOut2 + ',' + ChrOut3 + ',' + ChrOut4 + ',' + ChrOut5;
 			for ( Count1 = 1; Count1 <= AirToZoneNodeInfo( Count ).NumReturnNodes; ++Count1 ) {
 				gio::write( ChrOut, "*" ) << Count1;
 				if ( AirToZoneNodeInfo( Count ).ZoneEquipReturnNodeNum( Count1 ) > 0 ) {
@@ -4510,19 +4510,19 @@ namespace SystemReports {
 				} else {
 					ChrOut3 = errstring;
 				}
-				ChrOut = adjustl( ChrOut );
-				ChrOut2 = adjustl( ChrOut2 );
-				ChrOut3 = adjustl( ChrOut3 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_707, flags ) << "  AirLoop Return Connections," + trim( ChrOut ) + "," + trim( AirToZoneNodeInfo( Count ).AirLoopName ) + ","; }
+				strip( ChrOut );
+				strip( ChrOut2 );
+				strip( ChrOut3 );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_707, flags ) << "  AirLoop Return Connections," + ChrOut + ',' + AirToZoneNodeInfo( Count ).AirLoopName + ','; }
 				if ( ChrOut2 != errstring ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_701, flags ) << trim( ChrOut2 ) + "," + trim( NodeID( AirToZoneNodeInfo( Count ).ZoneEquipReturnNodeNum( Count1 ) ) ) + ","; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_701, flags ) << ChrOut2 + ',' + NodeID( AirToZoneNodeInfo( Count ).ZoneEquipReturnNodeNum( Count1 ) ) + ','; }
 				} else {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_701, flags ) << trim( errstring ) + "," + trim( errstring ) + ","; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_701, flags ) << errstring + ',' + errstring + ','; }
 				}
 				if ( ChrOut3 != errstring ) {
-					gio::write( OutputFileBNDetails, Format_701 ) << trim( ChrOut3 ) + "," + trim( NodeID( AirToZoneNodeInfo( Count ).AirLoopReturnNodeNum( Count1 ) ) );
+					gio::write( OutputFileBNDetails, Format_701 ) << ChrOut3 + ',' + NodeID( AirToZoneNodeInfo( Count ).AirLoopReturnNodeNum( Count1 ) );
 				} else {
-					gio::write( OutputFileBNDetails, Format_701 ) << trim( errstring ) + "," + trim( errstring );
+					gio::write( OutputFileBNDetails, Format_701 ) << errstring + ',' + errstring;
 				}
 			}
 			for ( Count1 = 1; Count1 <= AirToZoneNodeInfo( Count ).NumSupplyNodes; ++Count1 ) {
@@ -4537,19 +4537,19 @@ namespace SystemReports {
 				} else {
 					ChrOut3 = errstring;
 				}
-				ChrOut = adjustl( ChrOut );
-				ChrOut2 = adjustl( ChrOut2 );
-				ChrOut3 = adjustl( ChrOut3 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_707, flags ) << "  AirLoop Supply Connections," + trim( ChrOut ) + "," + trim( AirToZoneNodeInfo( Count ).AirLoopName ) + ","; }
+				strip( ChrOut );
+				strip( ChrOut2 );
+				strip( ChrOut3 );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_707, flags ) << "  AirLoop Supply Connections," + ChrOut + ',' + AirToZoneNodeInfo( Count ).AirLoopName + ','; }
 				if ( ChrOut2 != errstring ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_701, flags ) << trim( ChrOut2 ) + "," + trim( NodeID( AirToZoneNodeInfo( Count ).ZoneEquipSupplyNodeNum( Count1 ) ) ) + ","; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_701, flags ) << ChrOut2 + ',' + NodeID( AirToZoneNodeInfo( Count ).ZoneEquipSupplyNodeNum( Count1 ) ) + ','; }
 				} else {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_701, flags ) << trim( errstring ) + "," + trim( errstring ) + ","; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_701, flags ) << errstring + ',' + errstring + ','; }
 				}
 				if ( ChrOut3 != errstring ) {
-					gio::write( OutputFileBNDetails, Format_701 ) << trim( ChrOut3 ) + "," + trim( NodeID( AirToZoneNodeInfo( Count ).AirLoopSupplyNodeNum( Count1 ) ) );
+					gio::write( OutputFileBNDetails, Format_701 ) << ChrOut3 + ',' + NodeID( AirToZoneNodeInfo( Count ).AirLoopSupplyNodeNum( Count1 ) );
 				} else {
-					gio::write( OutputFileBNDetails, Format_701 ) << trim( errstring ) + "," + trim( errstring );
+					gio::write( OutputFileBNDetails, Format_701 ) << errstring + ',' + errstring;
 				}
 			}
 
@@ -4560,15 +4560,15 @@ namespace SystemReports {
 				} else {
 					ChrOut2 = errstring;
 				}
-				ChrOut = adjustl( ChrOut );
-				ChrOut2 = adjustl( ChrOut2 );
+				strip( ChrOut );
+				strip( ChrOut2 );
 				CtrldZoneNum = AirToZoneNodeInfo( Count ).CoolCtrlZoneNums( Count1 );
 				ZoneNum = ZoneEquipConfig( CtrldZoneNum ).ActualZoneNum;
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_707, flags ) << "  Cooled Zone Info," + trim( ChrOut ) + "," + trim( Zone( ZoneNum ).Name ) + ","; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_707, flags ) << "  Cooled Zone Info," + ChrOut + ',' + Zone( ZoneNum ).Name + ','; }
 				if ( ChrOut2 != errstring ) {
-					gio::write( OutputFileBNDetails, Format_701 ) << trim( ChrOut2 ) + "," + trim( NodeID( AirToZoneNodeInfo( Count ).CoolZoneInletNodes( Count1 ) ) ) + "," + trim( AirToZoneNodeInfo( Count ).AirLoopName );
+					gio::write( OutputFileBNDetails, Format_701 ) << ChrOut2 + ',' + NodeID( AirToZoneNodeInfo( Count ).CoolZoneInletNodes( Count1 ) ) + ',' + AirToZoneNodeInfo( Count ).AirLoopName;
 				} else {
-					gio::write( OutputFileBNDetails, Format_701 ) << trim( errstring ) + "," + trim( errstring ) + "," + trim( AirToZoneNodeInfo( Count ).AirLoopName );
+					gio::write( OutputFileBNDetails, Format_701 ) << errstring + ',' + errstring + ',' + AirToZoneNodeInfo( Count ).AirLoopName;
 				}
 			}
 			for ( Count1 = 1; Count1 <= AirToZoneNodeInfo( Count ).NumZonesHeated; ++Count1 ) {
@@ -4578,15 +4578,15 @@ namespace SystemReports {
 				} else {
 					ChrOut2 = errstring;
 				}
-				ChrOut = adjustl( ChrOut );
-				ChrOut2 = adjustl( ChrOut2 );
+				strip( ChrOut );
+				strip( ChrOut2 );
 				CtrldZoneNum = AirToZoneNodeInfo( Count ).HeatCtrlZoneNums( Count1 );
 				ZoneNum = ZoneEquipConfig( CtrldZoneNum ).ActualZoneNum;
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_707, flags ) << "  Heated Zone Info," + trim( ChrOut ) + "," + trim( Zone( ZoneNum ).Name ) + ","; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_707, flags ) << "  Heated Zone Info," + ChrOut + ',' + Zone( ZoneNum ).Name + ','; }
 				if ( ChrOut2 != errstring ) {
-					gio::write( OutputFileBNDetails, Format_701 ) << trim( ChrOut2 ) + "," + trim( NodeID( AirToZoneNodeInfo( Count ).HeatZoneInletNodes( Count1 ) ) ) + "," + trim( AirToZoneNodeInfo( Count ).AirLoopName );
+					gio::write( OutputFileBNDetails, Format_701 ) << ChrOut2 + ',' + NodeID( AirToZoneNodeInfo( Count ).HeatZoneInletNodes( Count1 ) ) + ',' + AirToZoneNodeInfo( Count ).AirLoopName;
 				} else {
-					gio::write( OutputFileBNDetails, Format_701 ) << trim( errstring ) + "," + trim( errstring ) + "," + trim( AirToZoneNodeInfo( Count ).AirLoopName );
+					gio::write( OutputFileBNDetails, Format_701 ) << errstring + ',' + errstring + ',' + AirToZoneNodeInfo( Count ).AirLoopName;
 				}
 			}
 			if ( AirToOANodeInfo( Count ).OASysExists ) {
@@ -4600,24 +4600,24 @@ namespace SystemReports {
 				} else {
 					ChrOut2 = errstring;
 				}
-				ChrOut = adjustl( ChrOut );
-				ChrOut2 = adjustl( ChrOut2 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_707, flags ) << "  Outdoor Air Connections," + trim( ChrOut ) + ","; }
+				strip( ChrOut );
+				strip( ChrOut2 );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_707, flags ) << "  Outdoor Air Connections," + ChrOut + ','; }
 				if ( ChrOut != errstring ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_701, flags ) << trim( NodeID( AirToOANodeInfo( Count ).OASysInletNodeNum ) ) + ","; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_701, flags ) << NodeID( AirToOANodeInfo( Count ).OASysInletNodeNum ) + ','; }
 				} else {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_701, flags ) << trim( errstring ) + ","; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_701, flags ) << errstring + ','; }
 				}
 				if ( ChrOut2 != errstring ) {
-					gio::write( OutputFileBNDetails, Format_701 ) << trim( ChrOut2 ) + "," + trim( NodeID( AirToOANodeInfo( Count ).OASysOutletNodeNum ) ) + "," + trim( AirToZoneNodeInfo( Count ).AirLoopName );
+					gio::write( OutputFileBNDetails, Format_701 ) << ChrOut2 + ',' + NodeID( AirToOANodeInfo( Count ).OASysOutletNodeNum ) + ',' + AirToZoneNodeInfo( Count ).AirLoopName;
 				} else {
-					gio::write( OutputFileBNDetails, Format_701 ) << trim( errstring ) + "," + trim( errstring ) + "," + trim( AirToZoneNodeInfo( Count ).AirLoopName );
+					gio::write( OutputFileBNDetails, Format_701 ) << errstring + ',' + errstring + ',' + AirToZoneNodeInfo( Count ).AirLoopName;
 				}
 			}
 			//  Report HVAC Air Loop Splitter to BND file
 			if ( PrimaryAirSystem( Count ).Splitter.Exists ) {
 				gio::write( ChrOut, "*" ) << PrimaryAirSystem( Count ).Splitter.TotalOutletNodes;
-				gio::write( OutputFileBNDetails, Format_701 ) << "   AirLoopHVAC Connector,Splitter," + trim( PrimaryAirSystem( Count ).Splitter.Name ) + "," + trim( PrimaryAirSystem( Count ).Name ) + ",Air," + trim( adjustl( ChrOut ) );
+				gio::write( OutputFileBNDetails, Format_701 ) << "   AirLoopHVAC Connector,Splitter," + PrimaryAirSystem( Count ).Splitter.Name + ',' + PrimaryAirSystem( Count ).Name + ",Air," + stripped( ChrOut );
 				for ( Count1 = 1; Count1 <= PrimaryAirSystem( Count ).Splitter.TotalOutletNodes; ++Count1 ) {
 					gio::write( ChrOut, "*" ) << Count1;
 					if ( PrimaryAirSystem( Count ).Splitter.BranchNumIn <= 0 ) {
@@ -4626,18 +4626,18 @@ namespace SystemReports {
 					if ( PrimaryAirSystem( Count ).Splitter.BranchNumOut( Count1 ) <= 0 ) {
 						ChrOut3 = errstring;
 					}
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_701, flags ) << "     AirLoopHVAC Connector Branches," + trim( adjustl( ChrOut ) ) + ",Splitter," + trim( PrimaryAirSystem( Count ).Splitter.Name ) + ","; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_701, flags ) << "     AirLoopHVAC Connector Branches," + stripped( ChrOut ) + ",Splitter," + PrimaryAirSystem( Count ).Splitter.Name + ','; }
 					if ( ChrOut2 != errstring ) {
-						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_701, flags ) << trim( PrimaryAirSystem( Count ).Branch( PrimaryAirSystem( Count ).Splitter.BranchNumIn ).Name ) + ","; }
+						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_701, flags ) << PrimaryAirSystem( Count ).Branch( PrimaryAirSystem( Count ).Splitter.BranchNumIn ).Name + ','; }
 					} else {
-						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_701, flags ) << trim( ChrOut2 ) + ","; }
+						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileBNDetails, Format_701, flags ) << ChrOut2 + ','; }
 					}
 					if ( ChrOut3 != errstring ) {
-						gio::write( OutputFileBNDetails, Format_701 ) << trim( PrimaryAirSystem( Count ).Branch( PrimaryAirSystem( Count ).Splitter.BranchNumOut( Count1 ) ).Name ) + "," + trim( PrimaryAirSystem( Count ).Name ) + ",Air";
+						gio::write( OutputFileBNDetails, Format_701 ) << PrimaryAirSystem( Count ).Branch( PrimaryAirSystem( Count ).Splitter.BranchNumOut( Count1 ) ).Name + ',' + PrimaryAirSystem( Count ).Name + ",Air";
 					} else {
-						gio::write( OutputFileBNDetails, Format_701 ) << trim( ChrOut3 ) + "," + trim( PrimaryAirSystem( Count ).Name ) + ",Air";
+						gio::write( OutputFileBNDetails, Format_701 ) << ChrOut3 + ',' + PrimaryAirSystem( Count ).Name + ",Air";
 					}
-					gio::write( OutputFileBNDetails, Format_701 ) << "     AirLoopHVAC Connector Nodes,   " + trim( adjustl( ChrOut ) ) + ",Splitter," + trim( PrimaryAirSystem( Count ).Splitter.Name ) + "," + trim( PrimaryAirSystem( Count ).Splitter.NodeNameIn ) + "," + trim( PrimaryAirSystem( Count ).Splitter.NodeNameOut( Count1 ) ) + "," + trim( PrimaryAirSystem( Count ).Name ) + ",Air";
+					gio::write( OutputFileBNDetails, Format_701 ) << "     AirLoopHVAC Connector Nodes,   " + stripped( ChrOut ) + ",Splitter," + PrimaryAirSystem( Count ).Splitter.Name + ',' + PrimaryAirSystem( Count ).Splitter.NodeNameIn + ',' + PrimaryAirSystem( Count ).Splitter.NodeNameOut( Count1 ) + ',' + PrimaryAirSystem( Count ).Name + ",Air";
 				}
 			}
 		}

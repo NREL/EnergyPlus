@@ -86,7 +86,7 @@ namespace SteamBaseboardRadiator {
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
-	Fstring const cCMO_BBRadiator_Steam( "ZoneHVAC:Baseboard:RadiantConvective:Steam" );
+	std::string const cCMO_BBRadiator_Steam( "ZoneHVAC:Baseboard:RadiantConvective:Steam" );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -116,7 +116,7 @@ namespace SteamBaseboardRadiator {
 
 	void
 	SimSteamBaseboard(
-		Fstring const & EquipName,
+		std::string const & EquipName,
 		int const ActualZoneNum,
 		int const ControlledZoneNum,
 		bool const FirstHVACIteration,
@@ -142,7 +142,6 @@ namespace SteamBaseboardRadiator {
 
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
-		using InputProcessor::MakeUPPERCase;
 		using General::TrimSigDigits;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
@@ -177,17 +176,17 @@ namespace SteamBaseboardRadiator {
 		if ( CompIndex == 0 ) {
 			BaseboardNum = FindItemInList( EquipName, SteamBaseboard.EquipID(), NumSteamBaseboards );
 			if ( BaseboardNum == 0 ) {
-				ShowFatalError( "SimSteamBaseboard: Unit not found=" + trim( EquipName ) );
+				ShowFatalError( "SimSteamBaseboard: Unit not found=" + EquipName );
 			}
 			CompIndex = BaseboardNum;
 		} else {
 			BaseboardNum = CompIndex;
 			if ( BaseboardNum > NumSteamBaseboards || BaseboardNum < 1 ) {
-				ShowFatalError( "SimSteamBaseboard:  Invalid CompIndex passed=" + trim( TrimSigDigits( BaseboardNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumSteamBaseboards ) ) + ", Entered Unit name=" + trim( EquipName ) );
+				ShowFatalError( "SimSteamBaseboard:  Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Number of Units=" + TrimSigDigits( NumSteamBaseboards ) + ", Entered Unit name=" + EquipName );
 			}
 			if ( CheckEquipName( BaseboardNum ) ) {
 				if ( EquipName != SteamBaseboard( BaseboardNum ).EquipID ) {
-					ShowFatalError( "SimSteamBaseboard: Invalid CompIndex passed=" + trim( TrimSigDigits( BaseboardNum ) ) + ", Unit name=" + trim( EquipName ) + ", stored Unit Name for that index=" + trim( SteamBaseboard( BaseboardNum ).EquipID ) );
+					ShowFatalError( "SimSteamBaseboard: Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Unit name=" + EquipName + ", stored Unit Name for that index=" + SteamBaseboard( BaseboardNum ).EquipID );
 				}
 				CheckEquipName( BaseboardNum ) = false;
 			}
@@ -216,8 +215,8 @@ namespace SteamBaseboardRadiator {
 				if ( SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Steam ) { // 'ZoneHVAC:Baseboard:RadiantConvective:Steam'
 					ControlCompOutput( SteamBaseboard( BaseboardNum ).EquipID, cCMO_BBRadiator_Steam, BaseboardNum, FirstHVACIteration, QZnReq, SteamBaseboard( BaseboardNum ).SteamInletNode, MaxSteamFlow, MinSteamFlow, SteamBaseboard( BaseboardNum ).Offset, SteamBaseboard( BaseboardNum ).ControlCompTypeNum, SteamBaseboard( BaseboardNum ).CompErrIndex, _, _, _, _, _, SteamBaseboard( BaseboardNum ).LoopNum, SteamBaseboard( BaseboardNum ).LoopSideNum, SteamBaseboard( BaseboardNum ).BranchNum );
 				} else {
-					ShowSevereError( "SimSteamBaseboard: Errors in Baseboard=" + trim( SteamBaseboard( BaseboardNum ).EquipID ) );
-					ShowContinueError( "Invalid or unimplemented equipment type=" + trim( TrimSigDigits( SteamBaseboard( BaseboardNum ).EquipType ) ) );
+					ShowSevereError( "SimSteamBaseboard: Errors in Baseboard=" + SteamBaseboard( BaseboardNum ).EquipID );
+					ShowContinueError( "Invalid or unimplemented equipment type=" + TrimSigDigits( SteamBaseboard( BaseboardNum ).EquipType ) );
 					ShowFatalError( "Preceding condition causes termination." );
 
 				}}
@@ -236,7 +235,7 @@ namespace SteamBaseboardRadiator {
 			ReportSteamBaseboard( BaseboardNum );
 
 		} else {
-			ShowFatalError( "SimSteamBaseboard: Unit not found=" + trim( EquipName ) );
+			ShowFatalError( "SimSteamBaseboard: Unit not found=" + EquipName );
 		}
 
 	}
@@ -284,7 +283,7 @@ namespace SteamBaseboardRadiator {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetSteamBaseboardInput:" );
+		static std::string const RoutineName( "GetSteamBaseboardInput:" );
 		Real64 const MaxFraction( 1.0 ); // Maximum limit of fractional values
 		Real64 const MinFraction( 0.0 ); // Minimum limit of fractional values
 		Real64 const MaxSteamFlowRate( 10.0 ); // Maximum limit of steam volume flow rate in m3/s
@@ -345,7 +344,7 @@ namespace SteamBaseboardRadiator {
 			} else {
 				SteamBaseboard( BaseboardNum ).SchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 				if ( SteamBaseboard( BaseboardNum ).SchedPtr == 0 ) {
-					ShowSevereError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" not found." );
+					ShowSevereError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs( 1 ) + "\", " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 					ErrorsFound = true;
 				}
 			}
@@ -362,12 +361,12 @@ namespace SteamBaseboardRadiator {
 			// Maximum steam flow rate
 			SteamBaseboard( BaseboardNum ).SteamVolFlowRateMax = rNumericArgs( 2 );
 			if ( SteamBaseboard( BaseboardNum ).SteamVolFlowRateMax >= MaxSteamFlowRate ) {
-				ShowWarningError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", " + trim( cNumericFieldNames( 2 ) ) + " was higher than the allowable maximum." );
-				ShowContinueError( "...reset to maximum value=[" + trim( RoundSigDigits( MaxSteamFlowRate, 2 ) ) + "]." );
+				ShowWarningError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 2 ) + " was higher than the allowable maximum." );
+				ShowContinueError( "...reset to maximum value=[" + RoundSigDigits( MaxSteamFlowRate, 2 ) + "]." );
 				SteamBaseboard( BaseboardNum ).SteamVolFlowRateMax = MaxSteamFlowRate;
 			} else if ( SteamBaseboard( BaseboardNum ).SteamVolFlowRateMax <= MinSteamFlowRate && SteamBaseboard( BaseboardNum ).SteamVolFlowRateMax != AutoSize ) {
-				ShowWarningError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", " + trim( cNumericFieldNames( 2 ) ) + " was less than the allowable minimum." );
-				ShowContinueError( "...reset to minimum value=[" + trim( RoundSigDigits( MinSteamFlowRate, 2 ) ) + "]." );
+				ShowWarningError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 2 ) + " was less than the allowable minimum." );
+				ShowContinueError( "...reset to minimum value=[" + RoundSigDigits( MinSteamFlowRate, 2 ) + "]." );
 				SteamBaseboard( BaseboardNum ).SteamVolFlowRateMax = MinSteamFlowRate;
 			}
 
@@ -375,25 +374,25 @@ namespace SteamBaseboardRadiator {
 			// Set default convergence tolerance
 			if ( SteamBaseboard( BaseboardNum ).Offset <= 0.0 ) {
 				SteamBaseboard( BaseboardNum ).Offset = 0.001;
-				ShowWarningError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", " + trim( cNumericFieldNames( 6 ) ) + " was less than the allowable minimum." );
+				ShowWarningError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 6 ) + " was less than the allowable minimum." );
 				ShowContinueError( "...reset to default value=[0.001]." );
 			}
 			// Fraction of radiant heat out of the total heating rate of the unit
 			SteamBaseboard( BaseboardNum ).FracRadiant = rNumericArgs( 4 );
 			if ( SteamBaseboard( BaseboardNum ).FracRadiant < MinFraction ) {
-				ShowWarningError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", " + trim( cNumericFieldNames( 7 ) ) + " was lower than the allowable minimum." );
-				ShowContinueError( "...reset to minimum value=[" + trim( RoundSigDigits( MinFraction, 3 ) ) + "]." );
+				ShowWarningError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 7 ) + " was lower than the allowable minimum." );
+				ShowContinueError( "...reset to minimum value=[" + RoundSigDigits( MinFraction, 3 ) + "]." );
 				SteamBaseboard( BaseboardNum ).FracRadiant = MinFraction;
 			} else if ( SteamBaseboard( BaseboardNum ).FracRadiant > MaxFraction ) {
-				ShowWarningError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", " + trim( cNumericFieldNames( 7 ) ) + " was higher than the allowable maximum." );
-				ShowContinueError( "...reset to maximum value=[" + trim( RoundSigDigits( MaxFraction, 3 ) ) + "]." );
+				ShowWarningError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 7 ) + " was higher than the allowable maximum." );
+				ShowContinueError( "...reset to maximum value=[" + RoundSigDigits( MaxFraction, 3 ) + "]." );
 				SteamBaseboard( BaseboardNum ).FracRadiant = MaxFraction;
 			}
 
 			// Remaining fraction is added to the zone as convective heat transfer
 			AllFracsSummed = SteamBaseboard( BaseboardNum ).FracRadiant;
 			if ( AllFracsSummed > MaxFraction ) {
-				ShowWarningError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", Fraction Radiant was higher than the allowable maximum." );
+				ShowWarningError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs( 1 ) + "\", Fraction Radiant was higher than the allowable maximum." );
 				SteamBaseboard( BaseboardNum ).FracRadiant = MaxFraction;
 				SteamBaseboard( BaseboardNum ).FracConvect = 0.0;
 			} else {
@@ -402,13 +401,13 @@ namespace SteamBaseboardRadiator {
 			// Fraction of radiant heat addition to the people within the radiant heating capacity specified by the user
 			SteamBaseboard( BaseboardNum ).FracDistribPerson = rNumericArgs( 5 );
 			if ( SteamBaseboard( BaseboardNum ).FracDistribPerson < MinFraction ) {
-				ShowWarningError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", " + trim( cNumericFieldNames( 8 ) ) + " was lower than the allowable minimum." );
-				ShowContinueError( "...reset to minimum value=[" + trim( RoundSigDigits( MinFraction, 3 ) ) + "]." );
+				ShowWarningError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 8 ) + " was lower than the allowable minimum." );
+				ShowContinueError( "...reset to minimum value=[" + RoundSigDigits( MinFraction, 3 ) + "]." );
 				SteamBaseboard( BaseboardNum ).FracDistribPerson = MinFraction;
 			}
 			if ( SteamBaseboard( BaseboardNum ).FracDistribPerson > MaxFraction ) {
-				ShowWarningError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", " + trim( cNumericFieldNames( 8 ) ) + " was higher than the allowable maximum." );
-				ShowContinueError( "...reset to maximum value=[" + trim( RoundSigDigits( MaxFraction, 3 ) ) + "]." );
+				ShowWarningError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 8 ) + " was higher than the allowable maximum." );
+				ShowContinueError( "...reset to maximum value=[" + RoundSigDigits( MaxFraction, 3 ) + "]." );
 				SteamBaseboard( BaseboardNum ).FracDistribPerson = MaxFraction;
 			}
 			SteamBaseboard( BaseboardNum ).TotSurfToDistrib = NumNumbers - 5;
@@ -420,14 +419,14 @@ namespace SteamBaseboardRadiator {
 			//        SteamBaseboard(BaseboardNum)%TotSurfToDistrib = MaxDistribSurfaces
 			//      END IF
 			if ( ( SteamBaseboard( BaseboardNum ).TotSurfToDistrib < MinDistribSurfaces ) && ( SteamBaseboard( BaseboardNum ).FracRadiant > MinFraction ) ) {
-				ShowSevereError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", the number of surface/radiant fraction groups entered was less than the allowable minimum." );
-				ShowContinueError( "...the minimum that must be entered=[" + trim( RoundSigDigits( MinDistribSurfaces ) ) + "]." );
+				ShowSevereError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs( 1 ) + "\", the number of surface/radiant fraction groups entered was less than the allowable minimum." );
+				ShowContinueError( "...the minimum that must be entered=[" + RoundSigDigits( MinDistribSurfaces ) + "]." );
 				ErrorsFound = true;
 				SteamBaseboard( BaseboardNum ).TotSurfToDistrib = 0;
 			}
 			// Allocate the surfaces and fractions
 			SteamBaseboard( BaseboardNum ).SurfaceName.allocate( SteamBaseboard( BaseboardNum ).TotSurfToDistrib );
-			SteamBaseboard( BaseboardNum ).SurfaceName = " ";
+			SteamBaseboard( BaseboardNum ).SurfaceName = "";
 			SteamBaseboard( BaseboardNum ).SurfacePtr.allocate( SteamBaseboard( BaseboardNum ).TotSurfToDistrib );
 			SteamBaseboard( BaseboardNum ).SurfacePtr = 0;
 			SteamBaseboard( BaseboardNum ).FracDistribToSurf.allocate( SteamBaseboard( BaseboardNum ).TotSurfToDistrib );
@@ -439,17 +438,17 @@ namespace SteamBaseboardRadiator {
 				SteamBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 4 ), Surface.Name(), TotSurfaces );
 				SteamBaseboard( BaseboardNum ).FracDistribToSurf( SurfNum ) = rNumericArgs( SurfNum + 5 );
 				if ( SteamBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) == 0 ) {
-					ShowSevereError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", " + trim( cAlphaFieldNames( SurfNum + 4 ) ) + "=\"" + trim( cAlphaArgs( SurfNum + 4 ) ) + "\" invalid - not found." );
+					ShowSevereError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs( 1 ) + "\", " + cAlphaFieldNames( SurfNum + 4 ) + "=\"" + cAlphaArgs( SurfNum + 4 ) + "\" invalid - not found." );
 					ErrorsFound = true;
 				}
 				if ( SteamBaseboard( BaseboardNum ).FracDistribToSurf( SurfNum ) > MaxFraction ) {
-					ShowWarningError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", " + trim( cNumericFieldNames( SurfNum + 6 ) ) + "was greater than the allowable maximum." );
-					ShowContinueError( "...reset to maximum value=[" + trim( RoundSigDigits( MaxFraction, 1 ) ) + "]." );
+					ShowWarningError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( SurfNum + 6 ) + "was greater than the allowable maximum." );
+					ShowContinueError( "...reset to maximum value=[" + RoundSigDigits( MaxFraction, 1 ) + "]." );
 					SteamBaseboard( BaseboardNum ).TotSurfToDistrib = MaxFraction;
 				}
 				if ( SteamBaseboard( BaseboardNum ).FracDistribToSurf( SurfNum ) < MinFraction ) {
-					ShowWarningError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", " + trim( cNumericFieldNames( SurfNum + 6 ) ) + "was less than the allowable minimum." );
-					ShowContinueError( "...reset to maximum value=[" + trim( RoundSigDigits( MinFraction, 1 ) ) + "]." );
+					ShowWarningError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( SurfNum + 6 ) + "was less than the allowable minimum." );
+					ShowContinueError( "...reset to maximum value=[" + RoundSigDigits( MinFraction, 1 ) + "]." );
 					SteamBaseboard( BaseboardNum ).TotSurfToDistrib = MinFraction;
 				}
 				if ( SteamBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) != 0 ) {
@@ -460,19 +459,19 @@ namespace SteamBaseboardRadiator {
 			} // surfaces
 
 			if ( AllFracsSummed > ( MaxFraction + 0.01 ) ) {
-				ShowSevereError( "Fraction of radiation distributed to surfaces sums up to greater than 1 for " + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Occurs in Baseboard Heater=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Fraction of radiation distributed to surfaces sums up to greater than 1 for " + cAlphaArgs( 1 ) );
+				ShowContinueError( "Occurs in Baseboard Heater=" + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 			if ( ( AllFracsSummed < ( MaxFraction - 0.01 ) ) && ( SteamBaseboard( BaseboardNum ).FracRadiant > MinFraction ) ) { // User didn't distribute all of the | radiation warn that some will be lost
-				ShowWarningError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", Summed radiant fractions for people + surface groups < 1.0" );
+				ShowWarningError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs( 1 ) + "\", Summed radiant fractions for people + surface groups < 1.0" );
 				ShowContinueError( "The rest of the radiant energy delivered by the baseboard heater will be lost" );
 			}
 
 			if ( SteamIndex == 0 && BaseboardNum == 1 ) {
 				SteamIndex = FindRefrigerant( "Steam" );
 				if ( SteamIndex == 0 ) {
-					ShowSevereError( RoutineName + "Steam Properties for " + trim( cAlphaArgs( 1 ) ) + " not found." );
+					ShowSevereError( RoutineName + "Steam Properties for " + cAlphaArgs( 1 ) + " not found." );
 					if ( SteamMessageNeeded ) ShowContinueError( "Steam Fluid Properties should have been included in the input file." );
 					ErrorsFound = true;
 					SteamMessageNeeded = false;
@@ -595,7 +594,7 @@ namespace SteamBaseboardRadiator {
 			ZoneEquipmentListChecked = true;
 			for ( Loop = 1; Loop <= NumSteamBaseboards; ++Loop ) {
 				if ( CheckZoneEquipmentList( cCMO_BBRadiator_Steam, SteamBaseboard( Loop ).EquipID ) ) continue;
-				ShowSevereError( "InitBaseboard: Unit=[" + trim( cCMO_BBRadiator_Steam ) + "," + trim( SteamBaseboard( Loop ).EquipID ) + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
+				ShowSevereError( "InitBaseboard: Unit=[" + cCMO_BBRadiator_Steam + ',' + SteamBaseboard( Loop ).EquipID + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
 			}
 		}
 
@@ -780,9 +779,9 @@ namespace SteamBaseboardRadiator {
 							if ( DisplayExtraWarnings ) {
 								// Report difference between design size and user-specified values
 								if ( ( std::abs( SteamVolFlowRateMaxDes - SteamVolFlowRateMaxUser ) / SteamVolFlowRateMaxUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeSteamBaseboard: Potential issue with equipment sizing for " "ZoneHVAC:Baseboard:RadiantConvective:Steam=\"" + trim( SteamBaseboard( BaseboardNum ).EquipID ) + "\"." );
-									ShowContinueError( "User-Specified Maximum Steam Flow Rate of " + trim( RoundSigDigits( SteamVolFlowRateMaxUser, 5 ) ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Maximum Steam Flow Rate of " + trim( RoundSigDigits( SteamVolFlowRateMaxDes, 5 ) ) + " [m3/s]" );
+									ShowMessage( "SizeSteamBaseboard: Potential issue with equipment sizing for " "ZoneHVAC:Baseboard:RadiantConvective:Steam=\"" + SteamBaseboard( BaseboardNum ).EquipID + "\"." );
+									ShowContinueError( "User-Specified Maximum Steam Flow Rate of " + RoundSigDigits( SteamVolFlowRateMaxUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Maximum Steam Flow Rate of " + RoundSigDigits( SteamVolFlowRateMaxDes, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -796,7 +795,7 @@ namespace SteamBaseboardRadiator {
 				// if there is no heating Sizing:Plant object and autosizng was requested, issue an error message
 				// first error will be issued by MyPlantSizingIndex
 				ShowSevereError( "Autosizing of steam baseboard requires a heating loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in Baseboard Heater=" + trim( SteamBaseboard( BaseboardNum ).EquipID ) );
+				ShowContinueError( "Occurs in Baseboard Heater=" + SteamBaseboard( BaseboardNum ).EquipID );
 				ErrorsFound = true;
 			}
 		}
@@ -1136,18 +1135,18 @@ namespace SteamBaseboardRadiator {
 
 					if ( ThisSurfIntensity > MaxRadHeatFlux ) { // CR 8074, trap for excessive intensity (throws off surface balance )
 						ShowSevereError( "DistributeBBSteamRadGains:  excessive thermal radiation heat flux intensity detected" );
-						ShowContinueError( "Surface = " + trim( Surface( SurfNum ).Name ) );
-						ShowContinueError( "Surface area = " + trim( RoundSigDigits( Surface( SurfNum ).Area, 3 ) ) + " [m2]" );
-						ShowContinueError( "Occurs in " + cCMO_BBRadiator_Steam + " = " + trim( SteamBaseboard( BaseboardNum ).EquipID ) );
-						ShowContinueError( "Radiation intensity = " + trim( RoundSigDigits( ThisSurfIntensity, 2 ) ) + " [W/m2]" );
+						ShowContinueError( "Surface = " + Surface( SurfNum ).Name );
+						ShowContinueError( "Surface area = " + RoundSigDigits( Surface( SurfNum ).Area, 3 ) + " [m2]" );
+						ShowContinueError( "Occurs in " + cCMO_BBRadiator_Steam + " = " + SteamBaseboard( BaseboardNum ).EquipID );
+						ShowContinueError( "Radiation intensity = " + RoundSigDigits( ThisSurfIntensity, 2 ) + " [W/m2]" );
 						ShowContinueError( "Assign a larger surface area or more surfaces in " + cCMO_BBRadiator_Steam );
 						ShowFatalError( "DistributeBBSteamRadGains:  excessive thermal radiation heat flux intensity detected" );
 					}
 				} else { // small surface
 					ShowSevereError( "DistributeBBSteamRadGains:  surface not large enough to receive thermal radiation heat flux" );
-					ShowContinueError( "Surface = " + trim( Surface( SurfNum ).Name ) );
-					ShowContinueError( "Surface area = " + trim( RoundSigDigits( Surface( SurfNum ).Area, 3 ) ) + " [m2]" );
-					ShowContinueError( "Occurs in " + cCMO_BBRadiator_Steam + " = " + trim( SteamBaseboard( BaseboardNum ).EquipID ) );
+					ShowContinueError( "Surface = " + Surface( SurfNum ).Name );
+					ShowContinueError( "Surface area = " + RoundSigDigits( Surface( SurfNum ).Area, 3 ) + " [m2]" );
+					ShowContinueError( "Occurs in " + cCMO_BBRadiator_Steam + " = " + SteamBaseboard( BaseboardNum ).EquipID );
 					ShowContinueError( "Assign a larger surface area or more surfaces in " + cCMO_BBRadiator_Steam );
 					ShowFatalError( "DistributeBBSteamRadGains:  surface not large enough to receive thermal radiation heat flux" );
 
@@ -1271,7 +1270,7 @@ namespace SteamBaseboardRadiator {
 	void
 	UpdateSteamBaseboardPlantConnection(
 		int const BaseboardTypeNum, // type index
-		Fstring const & BaseboardName, // component name
+		std::string const & BaseboardName, // component name
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int const LoopNum, // Plant loop index for where called from
 		int const LoopSide, // Plant loop side index for where called from
@@ -1330,20 +1329,20 @@ namespace SteamBaseboardRadiator {
 		if ( CompIndex == 0 ) {
 			BaseboardNum = FindItemInList( BaseboardName, SteamBaseboard.EquipID(), NumSteamBaseboards );
 			if ( BaseboardNum == 0 ) {
-				ShowFatalError( "UpdateSteamBaseboardPlantConnection: Specified baseboard not valid =" + trim( BaseboardName ) );
+				ShowFatalError( "UpdateSteamBaseboardPlantConnection: Specified baseboard not valid =" + BaseboardName );
 			}
 			CompIndex = BaseboardNum;
 		} else {
 			BaseboardNum = CompIndex;
 			if ( BaseboardNum > NumSteamBaseboards || BaseboardNum < 1 ) {
-				ShowFatalError( "UpdateSteamBaseboardPlantConnection:  Invalid CompIndex passed=" + trim( TrimSigDigits( BaseboardNum ) ) + ", Number of baseboards=" + trim( TrimSigDigits( NumSteamBaseboards ) ) + ", Entered baseboard name=" + trim( BaseboardName ) );
+				ShowFatalError( "UpdateSteamBaseboardPlantConnection:  Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Number of baseboards=" + TrimSigDigits( NumSteamBaseboards ) + ", Entered baseboard name=" + BaseboardName );
 			}
 			if ( KickOffSimulation ) {
 				if ( BaseboardName != SteamBaseboard( BaseboardNum ).EquipID ) {
-					ShowFatalError( "UpdateSteamBaseboardPlantConnection: Invalid CompIndex passed=" + trim( TrimSigDigits( BaseboardNum ) ) + ", baseboard name=" + trim( BaseboardName ) + ", stored baseboard Name for that index=" + trim( SteamBaseboard( BaseboardNum ).EquipID ) );
+					ShowFatalError( "UpdateSteamBaseboardPlantConnection: Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", baseboard name=" + BaseboardName + ", stored baseboard Name for that index=" + SteamBaseboard( BaseboardNum ).EquipID );
 				}
 				if ( BaseboardTypeNum != TypeOf_Baseboard_Rad_Conv_Steam ) {
-					ShowFatalError( "UpdateSteamBaseboardPlantConnection: Invalid CompIndex passed=" + trim( TrimSigDigits( BaseboardNum ) ) + ", baseboard name=" + trim( BaseboardName ) + ", stored baseboard Name for that index=" + trim( ccSimPlantEquipTypes( BaseboardTypeNum ) ) );
+					ShowFatalError( "UpdateSteamBaseboardPlantConnection: Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", baseboard name=" + BaseboardName + ", stored baseboard Name for that index=" + ccSimPlantEquipTypes( BaseboardTypeNum ) );
 				}
 			}
 		}

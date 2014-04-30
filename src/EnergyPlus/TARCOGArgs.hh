@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1A.hh>
 #include <ObjexxFCL/FArray2A.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -86,7 +85,7 @@ namespace TARCOGArgs {
 		int const standard,
 		int const ThermalMod,
 		Real64 const SDScalar,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	);
 
 	void
@@ -139,7 +138,7 @@ namespace TARCOGArgs {
 		FArray1A< Real64 > rir,
 		FArray1A< Real64 > vfreevent,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	);
 
 	bool

@@ -46,7 +46,6 @@ namespace PlantValves {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
-	using DataGlobals::MaxNameLength;
 	using General::TrimSigDigits;
 
 	// <use statements for access to subroutines in other modules>
@@ -71,7 +70,7 @@ namespace PlantValves {
 	void
 	SimPlantValves(
 		int const CompTypeNum,
-		Fstring const & CompName,
+		std::string const & CompName,
 		int & CompNum,
 		bool const RunFlag, // unused1208
 		bool & InitLoopEquip,
@@ -127,17 +126,17 @@ namespace PlantValves {
 		if ( CompNum == 0 ) {
 			EqNum = FindItemInList( CompName, TemperValve.Name(), NumTemperingValves );
 			if ( EqNum == 0 ) {
-				ShowFatalError( "SimPlantValves: Unit not found=" + trim( CompName ) );
+				ShowFatalError( "SimPlantValves: Unit not found=" + CompName );
 			}
 			CompNum = EqNum;
 		} else {
 			EqNum = CompNum;
 			if ( EqNum > NumTemperingValves || EqNum < 1 ) {
-				ShowFatalError( "SimPlantValves:  Invalid CompNum passed=" + trim( TrimSigDigits( EqNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumTemperingValves ) ) + ", Entered Unit name=" + trim( CompName ) );
+				ShowFatalError( "SimPlantValves:  Invalid CompNum passed=" + TrimSigDigits( EqNum ) + ", Number of Units=" + TrimSigDigits( NumTemperingValves ) + ", Entered Unit name=" + CompName );
 			}
 			if ( CheckEquipName( EqNum ) ) {
 				if ( CompName != TemperValve( EqNum ).Name ) {
-					ShowFatalError( "SimPlantValves: Invalid CompNum passed=" + trim( TrimSigDigits( EqNum ) ) + ", Unit name=" + trim( CompName ) + ", stored Unit Name for that index=" + trim( TemperValve( EqNum ).Name ) );
+					ShowFatalError( "SimPlantValves: Invalid CompNum passed=" + TrimSigDigits( EqNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + TemperValve( EqNum ).Name );
 				}
 				CheckEquipName( EqNum ) = false;
 			}
@@ -201,13 +200,13 @@ namespace PlantValves {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Item; // Item to be "gotten"
-		FArray1D_Fstring Alphas( 6, sFstring( MaxNameLength ) ); // Alpha items for object
+		FArray1D_string Alphas( 6 ); // Alpha items for object
 		FArray1D< Real64 > Numbers( 1 ); // Numeric items for object
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in renaming.
+		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "TemperingValve";
 		NumTemperingValves = GetNumObjectsFound( CurrentModuleObject );
@@ -222,21 +221,21 @@ namespace PlantValves {
 			//  <process, noting errors>
 			TemperValve( Item ).Name = Alphas( 1 );
 			// Get Plant Inlet Node
-			TemperValve( Item ).PltInletNodeNum = GetOnlySingleNode( Alphas( 2 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			TemperValve( Item ).PltInletNodeNum = GetOnlySingleNode( Alphas( 2 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 			// Get Plant Outlet Node
-			TemperValve( Item ).PltOutletNodeNum = GetOnlySingleNode( Alphas( 3 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			TemperValve( Item ).PltOutletNodeNum = GetOnlySingleNode( Alphas( 3 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 			// Get Stream 2 Source Node
-			TemperValve( Item ).PltStream2NodeNum = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+			TemperValve( Item ).PltStream2NodeNum = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
 			// Get Mixed water Setpoint
-			TemperValve( Item ).PltSetPointNodeNum = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Water, NodeConnectionType_SetPoint, 1, ObjectIsNotParent );
+			TemperValve( Item ).PltSetPointNodeNum = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_SetPoint, 1, ObjectIsNotParent );
 
 			// Get Pump outlet
-			TemperValve( Item ).PltPumpOutletNodeNum = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+			TemperValve( Item ).PltPumpOutletNodeNum = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
 
 			// Note most checks on user input are made in second pass thru init routine
 
-			TestCompSet( trim( CurrentModuleObject ), Alphas( 1 ), Alphas( 2 ), Alphas( 3 ), "Supply Side Water Nodes" );
+			TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 2 ), Alphas( 3 ), "Supply Side Water Nodes" );
 
 		}
 
@@ -246,7 +245,7 @@ namespace PlantValves {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetPlantValvesInput: " + trim( CurrentModuleObject ) + " Errors found in input" );
+			ShowFatalError( "GetPlantValvesInput: " + CurrentModuleObject + " Errors found in input" );
 		}
 
 	}
@@ -464,7 +463,7 @@ namespace PlantValves {
 						ErrorsFound = true;
 					}
 					if ( ErrorsFound ) {
-						ShowFatalError( "Errors found in input, TemperingValve object " + trim( TemperValve( CompNum ).Name ) );
+						ShowFatalError( "Errors found in input, TemperingValve object " + TemperValve( CompNum ).Name );
 					}
 					MyTwoTimeFlag( CompNum ) = false;
 				} // my two time flag for input checking

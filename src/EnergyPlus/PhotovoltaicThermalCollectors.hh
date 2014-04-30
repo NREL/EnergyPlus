@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -15,7 +14,6 @@ namespace EnergyPlus {
 namespace PhotovoltaicThermalCollectors {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -53,7 +51,7 @@ namespace PhotovoltaicThermalCollectors {
 	struct SimplePVTModelStruct
 	{
 		// Members
-		Fstring Name;
+		std::string Name;
 		Real64 ThermalActiveFract; // fraction of surface area with active thermal collection
 		int ThermEfficMode; // setting for how therm effic is determined
 		Real64 ThermEffic; // fixed or current Therm efficiency
@@ -64,7 +62,6 @@ namespace PhotovoltaicThermalCollectors {
 
 		// Default Constructor
 		SimplePVTModelStruct() :
-			Name( MaxNameLength ),
 			ThermalActiveFract( 0.0 ),
 			ThermEfficMode( 0 ),
 			ThermEffic( 0.0 ),
@@ -76,7 +73,7 @@ namespace PhotovoltaicThermalCollectors {
 
 		// Member Constructor
 		SimplePVTModelStruct(
-			Fstring const & Name,
+			std::string const & Name,
 			Real64 const ThermalActiveFract, // fraction of surface area with active thermal collection
 			int const ThermEfficMode, // setting for how therm effic is determined
 			Real64 const ThermEffic, // fixed or current Therm efficiency
@@ -85,7 +82,7 @@ namespace PhotovoltaicThermalCollectors {
 			Real64 const LastCollectorTemp, // store previous temperature
 			Real64 const CollectorTemp // average solar collector temp.
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ThermalActiveFract( ThermalActiveFract ),
 			ThermEfficMode( ThermEfficMode ),
 			ThermEffic( ThermEffic ),
@@ -152,7 +149,7 @@ namespace PhotovoltaicThermalCollectors {
 	{
 		// Members
 		// input
-		Fstring Name; // Name of PVT collector
+		std::string Name; // Name of PVT collector
 		int TypeNum; // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant  !DSU
 		int WLoopNum; // Water plant loop index number                      !DSU
 		int WLoopSideNum; // Water plant loop side index                        !DSU
@@ -160,10 +157,10 @@ namespace PhotovoltaicThermalCollectors {
 		int WLoopCompNum; // Water plant loop component index                   !DSU
 		bool EnvrnInit; // manage begin environmen inits
 		bool SizingInit; // manage when sizing is complete
-		Fstring PVTModelName; // Name of PVT performance object
+		std::string PVTModelName; // Name of PVT performance object
 		int PVTModelType; // model type indicator, only simple avail now
 		int SurfNum; // surface index
-		Fstring PVname; // named Generator:Photovoltaic object
+		std::string PVname; // named Generator:Photovoltaic object
 		int PVnum; // PV index
 		bool PVfound; // init, need to delay get input until PV gotten
 		// INTEGER                      :: PlantLoopNum       = 0  ! needed for sizing and control
@@ -185,17 +182,14 @@ namespace PhotovoltaicThermalCollectors {
 
 		// Default Constructor
 		PVTCollectorStruct() :
-			Name( MaxNameLength ),
 			WLoopNum( 0 ),
 			WLoopSideNum( 0 ),
 			WLoopBranchNum( 0 ),
 			WLoopCompNum( 0 ),
 			EnvrnInit( true ),
 			SizingInit( true ),
-			PVTModelName( MaxNameLength ),
 			PVTModelType( 0 ),
 			SurfNum( 0 ),
-			PVname( MaxNameLength ),
 			PVnum( 0 ),
 			PVfound( false ),
 			WorkingFluidType( 0 ),
@@ -214,7 +208,7 @@ namespace PhotovoltaicThermalCollectors {
 
 		// Member Constructor
 		PVTCollectorStruct(
-			Fstring const & Name, // Name of PVT collector
+			std::string const & Name, // Name of PVT collector
 			int const TypeNum, // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant  !DSU
 			int const WLoopNum, // Water plant loop index number                      !DSU
 			int const WLoopSideNum, // Water plant loop side index                        !DSU
@@ -222,10 +216,10 @@ namespace PhotovoltaicThermalCollectors {
 			int const WLoopCompNum, // Water plant loop component index                   !DSU
 			bool const EnvrnInit, // manage begin environmen inits
 			bool const SizingInit, // manage when sizing is complete
-			Fstring const & PVTModelName, // Name of PVT performance object
+			std::string const & PVTModelName, // Name of PVT performance object
 			int const PVTModelType, // model type indicator, only simple avail now
 			int const SurfNum, // surface index
-			Fstring const & PVname, // named Generator:Photovoltaic object
+			std::string const & PVname, // named Generator:Photovoltaic object
 			int const PVnum, // PV index
 			bool const PVfound, // init, need to delay get input until PV gotten
 			SimplePVTModelStruct const & Simple, // performance data structure.
@@ -243,7 +237,7 @@ namespace PhotovoltaicThermalCollectors {
 			bool const HeatingUseful,
 			PVTReportStruct const & Report
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			TypeNum( TypeNum ),
 			WLoopNum( WLoopNum ),
 			WLoopSideNum( WLoopSideNum ),
@@ -251,10 +245,10 @@ namespace PhotovoltaicThermalCollectors {
 			WLoopCompNum( WLoopCompNum ),
 			EnvrnInit( EnvrnInit ),
 			SizingInit( SizingInit ),
-			PVTModelName( MaxNameLength, PVTModelName ),
+			PVTModelName( PVTModelName ),
 			PVTModelType( PVTModelType ),
 			SurfNum( SurfNum ),
-			PVname( MaxNameLength, PVname ),
+			PVname( PVname ),
 			PVnum( PVnum ),
 			PVfound( PVfound ),
 			Simple( Simple ),
@@ -285,7 +279,7 @@ namespace PhotovoltaicThermalCollectors {
 		int & PVTnum, // index to PVT array.
 		bool const FirstHVACIteration,
 		int const CalledFrom,
-		Optional_Fstring_const PVTName = _,
+		Optional_string_const PVTName = _,
 		Optional_bool_const InitLoopEquip = _
 	);
 

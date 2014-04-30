@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1A.hh>
 #include <ObjexxFCL/FArray2A.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -58,7 +57,7 @@ namespace TARCOGCommon {
 		FArray1A< Real64 > b,
 		int const n,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	);
 
 	void
@@ -68,7 +67,7 @@ namespace TARCOGCommon {
 		FArray1A_int indx,
 		Real64 & d,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	);
 
 	void

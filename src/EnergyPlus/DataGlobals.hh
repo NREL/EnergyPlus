@@ -1,8 +1,8 @@
 #ifndef DataGlobals_hh_INCLUDED
 #define DataGlobals_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Fstring.hh>
+// C++ Headers
+#include <string>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -40,7 +40,7 @@ namespace DataGlobals {
 	extern Real64 const SecsInDay; // Number of seconds in Day
 	extern Real64 const BigNumber; // Max Number real used for initializations
 	extern Real64 const rTinyValue; // Tiny value to replace use of TINY(x)
-	extern int const MaxNameLength; // Maximum Name Length in Characters -- should be the same
+	extern std::string::size_type const MaxNameLength; // Maximum Name Length in Characters -- should be the same
 	// as MaxAlphaArgLength in InputProcessor module
 
 	extern Real64 const KelvinConv; // Conversion factor for C to K and K to C
@@ -87,7 +87,7 @@ namespace DataGlobals {
 	extern bool BeginFullSimFlag; // True until full simulation has begun, False after first time step
 	extern bool BeginTimeStepFlag; // True at the start of each time step, False after first subtime step of time step
 	extern int DayOfSim; // Counter for days (during the simulation)
-	extern Fstring DayOfSimChr; // Counter for days (during the simulation) (character -- for reporting)
+	extern std::string DayOfSimChr; // Counter for days (during the simulation) (character -- for reporting)
 	extern bool EndEnvrnFlag; // True at the end of each environment (last time step of last hour of last day of environ)
 	extern bool EndDesignDayEnvrnsFlag; // True at the end of the last design day environment
 	// (last time step of last hour of last day of environ which is a design day)

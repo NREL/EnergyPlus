@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -34,7 +33,7 @@ namespace DataSurfaceColors {
 
 	extern FArray1D_int const defaultcolorno; // text | wall | window | glassdoor | door | floor | roof | detached building shade (moves with building) | detached building fixed | attached building shading | PV | TDD:Dome | TDD:Diffuser | Daylight Sensor 1 | Daylight Sensor 2
 
-	extern FArray1D_Fstring const colorkeys;
+	extern FArray1D_string const colorkeys;
 
 	extern FArray1D_int const colorkeyptr;
 
@@ -50,15 +49,15 @@ namespace DataSurfaceColors {
 
 	bool
 	MatchAndSetColorTextString(
-		Fstring const & String, // string to be matched
+		std::string const & String, // string to be matched
 		int const SetValue, // value to be used for the color
-		Optional_Fstring_const ColorType = _ // for now, must be DXF
+		Optional_string_const ColorType = _ // for now, must be DXF
 	);
 
 	void
 	SetUpSchemeColors(
-		Fstring const & SchemeName,
-		Optional_Fstring_const ColorType = _
+		std::string const & SchemeName,
+		Optional_string_const ColorType = _
 	);
 
 	//     NOTICE

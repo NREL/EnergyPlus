@@ -70,7 +70,6 @@ namespace EvaporativeCoolers {
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::SecInHour;
 	using DataGlobals::ScheduleAlwaysOn;
-	using DataGlobals::MaxNameLength;
 	using namespace DataLoopNode;
 	using DataEnvironment::OutBaroPress;
 	using namespace ScheduleManager;
@@ -119,7 +118,7 @@ namespace EvaporativeCoolers {
 
 	void
 	SimEvapCooler(
-		Fstring const & CompName,
+		std::string const & CompName,
 		int & CompIndex
 	)
 	{
@@ -172,17 +171,17 @@ namespace EvaporativeCoolers {
 		if ( CompIndex == 0 ) {
 			EvapCoolNum = FindItemInList( CompName, EvapCond.EvapCoolerName(), NumEvapCool );
 			if ( EvapCoolNum == 0 ) {
-				ShowFatalError( "SimEvapCooler: Unit not found=" + trim( CompName ) );
+				ShowFatalError( "SimEvapCooler: Unit not found=" + CompName );
 			}
 			CompIndex = EvapCoolNum;
 		} else {
 			EvapCoolNum = CompIndex;
 			if ( EvapCoolNum > NumEvapCool || EvapCoolNum < 1 ) {
-				ShowFatalError( "SimEvapCooler:  Invalid CompIndex passed=" + trim( TrimSigDigits( EvapCoolNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumEvapCool ) ) + ", Entered Unit name=" + trim( CompName ) );
+				ShowFatalError( "SimEvapCooler:  Invalid CompIndex passed=" + TrimSigDigits( EvapCoolNum ) + ", Number of Units=" + TrimSigDigits( NumEvapCool ) + ", Entered Unit name=" + CompName );
 			}
 			if ( CheckEquipName( EvapCoolNum ) ) {
 				if ( CompName != EvapCond( EvapCoolNum ).EvapCoolerName ) {
-					ShowFatalError( "SimEvapCooler: Invalid CompIndex passed=" + trim( TrimSigDigits( EvapCoolNum ) ) + ", Unit name=" + trim( CompName ) + ", stored Unit Name for that index=" + trim( EvapCond( EvapCoolNum ).EvapCoolerName ) );
+					ShowFatalError( "SimEvapCooler: Invalid CompIndex passed=" + TrimSigDigits( EvapCoolNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + EvapCond( EvapCoolNum ).EvapCoolerName );
 				}
 				CheckEquipName( EvapCoolNum ) = false;
 			}
@@ -251,7 +250,7 @@ namespace EvaporativeCoolers {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const Blank;
+		static std::string const Blank;
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -296,12 +295,12 @@ namespace EvaporativeCoolers {
 			GetObjectItem( cCurrentModuleObject, EvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), EvapCond.EvapCoolerName(), EvapCoolNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), EvapCond.EvapCoolerName(), EvapCoolNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
-			EvapCond( EvapCoolNum ).EvapCoolerName = trim( cAlphaArgs( 1 ) );
+			EvapCond( EvapCoolNum ).EvapCoolerName = cAlphaArgs( 1 );
 			EvapCond( EvapCoolNum ).EvapCoolerType = iEvapCoolerDirectCELDEKPAD;
 
 			EvapCond( EvapCoolNum ).Schedule = cAlphaArgs( 2 );
@@ -310,19 +309,19 @@ namespace EvaporativeCoolers {
 			} else {
 				EvapCond( EvapCoolNum ).SchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 				if ( EvapCond( EvapCoolNum ).SchedPtr == 0 ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 			}
 
-			EvapCond( EvapCoolNum ).InletNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			EvapCond( EvapCoolNum ).InletNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
-			EvapCond( EvapCoolNum ).OutletNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			EvapCond( EvapCoolNum ).OutletNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Evap Air Nodes" );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Evap Air Nodes" );
 
-			EvapCond( EvapCoolNum ).EvapControlType = trim( cAlphaArgs( 5 ) );
+			EvapCond( EvapCoolNum ).EvapControlType = cAlphaArgs( 5 );
 
 			//input the numerical data
 			EvapCond( EvapCoolNum ).PadArea = rNumericArgs( 1 );
@@ -337,7 +336,7 @@ namespace EvaporativeCoolers {
 				EvapCond( EvapCoolNum ).EvapWaterSupplyMode = WaterSupplyFromMains;
 			} else {
 				EvapCond( EvapCoolNum ).EvapWaterSupplyMode = WaterSupplyFromTank;
-				SetupTankDemandComponent( EvapCond( EvapCoolNum ).EvapCoolerName, trim( cCurrentModuleObject ), EvapCond( EvapCoolNum ).EvapWaterSupplyName, ErrorsFound, EvapCond( EvapCoolNum ).EvapWaterSupTankID, EvapCond( EvapCoolNum ).EvapWaterTankDemandARRID );
+				SetupTankDemandComponent( EvapCond( EvapCoolNum ).EvapCoolerName, cCurrentModuleObject, EvapCond( EvapCoolNum ).EvapWaterSupplyName, ErrorsFound, EvapCond( EvapCoolNum ).EvapWaterSupTankID, EvapCond( EvapCoolNum ).EvapWaterTankDemandARRID );
 
 			}
 
@@ -353,12 +352,12 @@ namespace EvaporativeCoolers {
 			GetObjectItem( cCurrentModuleObject, IndEvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), EvapCond.EvapCoolerName(), EvapCoolNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), EvapCond.EvapCoolerName(), EvapCoolNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
-			EvapCond( EvapCoolNum ).EvapCoolerName = trim( cAlphaArgs( 1 ) );
+			EvapCond( EvapCoolNum ).EvapCoolerName = cAlphaArgs( 1 );
 			EvapCond( EvapCoolNum ).EvapCoolerType = iEvapCoolerInDirectCELDEKPAD; //'EvaporativeCooler:Indirect:CelDekPad'
 
 			EvapCond( EvapCoolNum ).Schedule = cAlphaArgs( 2 );
@@ -367,19 +366,19 @@ namespace EvaporativeCoolers {
 			} else {
 				EvapCond( EvapCoolNum ).SchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 				if ( EvapCond( EvapCoolNum ).SchedPtr == 0 ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 			}
 
-			EvapCond( EvapCoolNum ).InletNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			EvapCond( EvapCoolNum ).InletNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
-			EvapCond( EvapCoolNum ).OutletNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			EvapCond( EvapCoolNum ).OutletNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Evap Air Nodes" );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Evap Air Nodes" );
 
-			EvapCond( EvapCoolNum ).EvapControlType = trim( cAlphaArgs( 5 ) );
+			EvapCond( EvapCoolNum ).EvapControlType = cAlphaArgs( 5 );
 
 			//input the numerical data
 			EvapCond( EvapCoolNum ).IndirectPadArea = rNumericArgs( 1 );
@@ -399,7 +398,7 @@ namespace EvaporativeCoolers {
 				EvapCond( EvapCoolNum ).EvapWaterSupplyMode = WaterSupplyFromMains;
 			} else {
 				EvapCond( EvapCoolNum ).EvapWaterSupplyMode = WaterSupplyFromTank;
-				SetupTankDemandComponent( EvapCond( EvapCoolNum ).EvapCoolerName, trim( cCurrentModuleObject ), EvapCond( EvapCoolNum ).EvapWaterSupplyName, ErrorsFound, EvapCond( EvapCoolNum ).EvapWaterSupTankID, EvapCond( EvapCoolNum ).EvapWaterTankDemandARRID );
+				SetupTankDemandComponent( EvapCond( EvapCoolNum ).EvapCoolerName, cCurrentModuleObject, EvapCond( EvapCoolNum ).EvapWaterSupplyName, ErrorsFound, EvapCond( EvapCoolNum ).EvapWaterSupTankID, EvapCond( EvapCoolNum ).EvapWaterTankDemandARRID );
 
 			}
 
@@ -407,10 +406,10 @@ namespace EvaporativeCoolers {
 			if ( lAlphaFieldBlanks( 7 ) ) {
 				EvapCond( EvapCoolNum ).SecondaryInletNode = 0;
 			} else {
-				EvapCond( EvapCoolNum ).SecondaryInletNode = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
+				EvapCond( EvapCoolNum ).SecondaryInletNode = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
 				if ( ! CheckOutAirNodeNumber( EvapCond( EvapCoolNum ).SecondaryInletNode ) ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( cAlphaArgs( 7 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					//TODO rename point
 					ShowContinueError( "Node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node." );
 					ErrorsFound = true;
@@ -429,12 +428,12 @@ namespace EvaporativeCoolers {
 			GetObjectItem( cCurrentModuleObject, IndEvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), EvapCond.EvapCoolerName(), EvapCoolNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), EvapCond.EvapCoolerName(), EvapCoolNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
-			EvapCond( EvapCoolNum ).EvapCoolerName = trim( cAlphaArgs( 1 ) );
+			EvapCond( EvapCoolNum ).EvapCoolerName = cAlphaArgs( 1 );
 			EvapCond( EvapCoolNum ).EvapCoolerType = iEvapCoolerInDirectWETCOIL; //'EvaporativeCooler:Indirect:WetCoil'
 
 			EvapCond( EvapCoolNum ).Schedule = cAlphaArgs( 2 );
@@ -443,19 +442,19 @@ namespace EvaporativeCoolers {
 			} else {
 				EvapCond( EvapCoolNum ).SchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 				if ( EvapCond( EvapCoolNum ).SchedPtr == 0 ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 			}
 
-			EvapCond( EvapCoolNum ).InletNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			EvapCond( EvapCoolNum ).InletNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
-			EvapCond( EvapCoolNum ).OutletNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			EvapCond( EvapCoolNum ).OutletNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Evap Air Nodes" );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Evap Air Nodes" );
 
-			EvapCond( EvapCoolNum ).EvapControlType = trim( cAlphaArgs( 5 ) );
+			EvapCond( EvapCoolNum ).EvapControlType = cAlphaArgs( 5 );
 
 			//input the numerical data
 			EvapCond( EvapCoolNum ).WetCoilMaxEfficiency = rNumericArgs( 1 );
@@ -473,7 +472,7 @@ namespace EvaporativeCoolers {
 				EvapCond( EvapCoolNum ).EvapWaterSupplyMode = WaterSupplyFromMains;
 			} else {
 				EvapCond( EvapCoolNum ).EvapWaterSupplyMode = WaterSupplyFromTank;
-				SetupTankDemandComponent( EvapCond( EvapCoolNum ).EvapCoolerName, trim( cCurrentModuleObject ), EvapCond( EvapCoolNum ).EvapWaterSupplyName, ErrorsFound, EvapCond( EvapCoolNum ).EvapWaterSupTankID, EvapCond( EvapCoolNum ).EvapWaterTankDemandARRID );
+				SetupTankDemandComponent( EvapCond( EvapCoolNum ).EvapCoolerName, cCurrentModuleObject, EvapCond( EvapCoolNum ).EvapWaterSupplyName, ErrorsFound, EvapCond( EvapCoolNum ).EvapWaterSupTankID, EvapCond( EvapCoolNum ).EvapWaterTankDemandARRID );
 
 			}
 
@@ -481,10 +480,10 @@ namespace EvaporativeCoolers {
 			if ( lAlphaFieldBlanks( 7 ) ) {
 				EvapCond( EvapCoolNum ).SecondaryInletNode = 0;
 			} else {
-				EvapCond( EvapCoolNum ).SecondaryInletNode = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
+				EvapCond( EvapCoolNum ).SecondaryInletNode = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
 				if ( ! CheckOutAirNodeNumber( EvapCond( EvapCoolNum ).SecondaryInletNode ) ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( cAlphaArgs( 7 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					//TODO rename point
 					ShowContinueError( "Node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node." );
 					ErrorsFound = true;
@@ -501,12 +500,12 @@ namespace EvaporativeCoolers {
 			GetObjectItem( cCurrentModuleObject, IndEvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), EvapCond.EvapCoolerName(), EvapCoolNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), EvapCond.EvapCoolerName(), EvapCoolNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
-			EvapCond( EvapCoolNum ).EvapCoolerName = trim( cAlphaArgs( 1 ) );
+			EvapCond( EvapCoolNum ).EvapCoolerName = cAlphaArgs( 1 );
 			EvapCond( EvapCoolNum ).EvapCoolerType = iEvapCoolerInDirectRDDSpecial; //'EvaporativeCooler:Indirect:ResearchSpecial'
 
 			EvapCond( EvapCoolNum ).Schedule = cAlphaArgs( 2 );
@@ -515,37 +514,37 @@ namespace EvaporativeCoolers {
 			} else {
 				EvapCond( EvapCoolNum ).SchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 				if ( EvapCond( EvapCoolNum ).SchedPtr == 0 ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 			}
 
-			EvapCond( EvapCoolNum ).InletNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			EvapCond( EvapCoolNum ).InletNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
-			EvapCond( EvapCoolNum ).OutletNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			EvapCond( EvapCoolNum ).OutletNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Evap Air Nodes" );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Evap Air Nodes" );
 
-			EvapCond( EvapCoolNum ).EvapControlType = trim( cAlphaArgs( 5 ) );
+			EvapCond( EvapCoolNum ).EvapControlType = cAlphaArgs( 5 );
 
 			// A6 ; \field Secondary Air Inlet Node Name
 			if ( lAlphaFieldBlanks( 6 ) ) {
 				EvapCond( EvapCoolNum ).SecondaryInletNode = 0;
 			} else {
-				EvapCond( EvapCoolNum ).SecondaryInletNode = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+				EvapCond( EvapCoolNum ).SecondaryInletNode = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
 			}
 
-			EvapCond( EvapCoolNum ).EvapControlNodeNum = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+			EvapCond( EvapCoolNum ).EvapControlNodeNum = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
 
-			EvapCond( EvapCoolNum ).TertiaryInletNode = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
+			EvapCond( EvapCoolNum ).TertiaryInletNode = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
 
 			EvapCond( EvapCoolNum ).EvapWaterSupplyName = cAlphaArgs( 9 );
 			if ( lAlphaFieldBlanks( 9 ) ) {
 				EvapCond( EvapCoolNum ).EvapWaterSupplyMode = WaterSupplyFromMains;
 			} else {
 				EvapCond( EvapCoolNum ).EvapWaterSupplyMode = WaterSupplyFromTank;
-				SetupTankDemandComponent( EvapCond( EvapCoolNum ).EvapCoolerName, trim( cCurrentModuleObject ), EvapCond( EvapCoolNum ).EvapWaterSupplyName, ErrorsFound, EvapCond( EvapCoolNum ).EvapWaterSupTankID, EvapCond( EvapCoolNum ).EvapWaterTankDemandARRID );
+				SetupTankDemandComponent( EvapCond( EvapCoolNum ).EvapCoolerName, cCurrentModuleObject, EvapCond( EvapCoolNum ).EvapWaterSupplyName, ErrorsFound, EvapCond( EvapCoolNum ).EvapWaterSupTankID, EvapCond( EvapCoolNum ).EvapWaterTankDemandARRID );
 
 			}
 
@@ -582,12 +581,12 @@ namespace EvaporativeCoolers {
 			GetObjectItem( cCurrentModuleObject, DirectEvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), EvapCond.EvapCoolerName(), EvapCoolNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), EvapCond.EvapCoolerName(), EvapCoolNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
-			EvapCond( EvapCoolNum ).EvapCoolerName = trim( cAlphaArgs( 1 ) );
+			EvapCond( EvapCoolNum ).EvapCoolerName = cAlphaArgs( 1 );
 			EvapCond( EvapCoolNum ).EvapCoolerType = iEvapCoolerDirectResearchSpecial;
 
 			EvapCond( EvapCoolNum ).Schedule = cAlphaArgs( 2 );
@@ -596,19 +595,19 @@ namespace EvaporativeCoolers {
 			} else {
 				EvapCond( EvapCoolNum ).SchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 				if ( EvapCond( EvapCoolNum ).SchedPtr == 0 ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 			}
 
-			EvapCond( EvapCoolNum ).InletNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			EvapCond( EvapCoolNum ).InletNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
-			EvapCond( EvapCoolNum ).OutletNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			EvapCond( EvapCoolNum ).OutletNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Evap Air Nodes" );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Evap Air Nodes" );
 
-			EvapCond( EvapCoolNum ).EvapControlNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+			EvapCond( EvapCoolNum ).EvapControlNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
 
 			EvapCond( EvapCoolNum ).EvapWaterSupplyName = cAlphaArgs( 6 );
 
@@ -616,7 +615,7 @@ namespace EvaporativeCoolers {
 				EvapCond( EvapCoolNum ).EvapWaterSupplyMode = WaterSupplyFromMains;
 			} else {
 				EvapCond( EvapCoolNum ).EvapWaterSupplyMode = WaterSupplyFromTank;
-				SetupTankDemandComponent( EvapCond( EvapCoolNum ).EvapCoolerName, trim( cCurrentModuleObject ), EvapCond( EvapCoolNum ).EvapWaterSupplyName, ErrorsFound, EvapCond( EvapCoolNum ).EvapWaterSupTankID, EvapCond( EvapCoolNum ).EvapWaterTankDemandARRID );
+				SetupTankDemandComponent( EvapCond( EvapCoolNum ).EvapCoolerName, cCurrentModuleObject, EvapCond( EvapCoolNum ).EvapWaterSupplyName, ErrorsFound, EvapCond( EvapCoolNum ).EvapWaterSupTankID, EvapCond( EvapCoolNum ).EvapWaterTankDemandARRID );
 			}
 			EvapCond( EvapCoolNum ).DirectEffectiveness = rNumericArgs( 1 );
 			EvapCond( EvapCoolNum ).RecircPumpPower = rNumericArgs( 2 );
@@ -735,13 +734,13 @@ namespace EvaporativeCoolers {
 				if ( ControlNode > 0 ) {
 					if ( Node( ControlNode ).TempSetPoint == SensedNodeFlagValue ) {
 						if ( ! AnyEnergyManagementSystemInModel ) {
-							ShowSevereError( "Missing temperature setpoint for Evap Cooler unit " + trim( EvapCond( EvapCoolNum ).EvapCoolerName ) );
+							ShowSevereError( "Missing temperature setpoint for Evap Cooler unit " + EvapCond( EvapCoolNum ).EvapCoolerName );
 							ShowContinueError( " use a Setpoint Manager to establish a setpoint at the unit control node." );
 						} else {
 							localSetPointCheck = false;
 							CheckIfNodeSetPointManagedByEMS( ControlNode, iTemperatureSetPoint, localSetPointCheck );
 							if ( localSetPointCheck ) {
-								ShowSevereError( "Missing temperature setpoint for Evap Cooler unit " + trim( EvapCond( EvapCoolNum ).EvapCoolerName ) );
+								ShowSevereError( "Missing temperature setpoint for Evap Cooler unit " + EvapCond( EvapCoolNum ).EvapCoolerName );
 								ShowContinueError( " use a Setpoint Manager to establish a setpoint at the unit control node." );
 								ShowContinueError( " or use an EMS actuator to establish a setpoint at the unit control node." );
 							}
@@ -993,10 +992,10 @@ namespace EvaporativeCoolers {
 
 			if ( SatEff >= 1.0 ) SatEff = 1.0;
 			if ( SatEff < 0.0 ) { // we have a serious problem.  Pad Area and/or depth not suitable for system air flow rates
-				ShowSevereError( "EVAPCOOLER:DIRECT:CELDEKPAD: " + trim( EvapCond( EvapCoolNum ).EvapCoolerName ) + " has a problem" );
+				ShowSevereError( "EVAPCOOLER:DIRECT:CELDEKPAD: " + EvapCond( EvapCoolNum ).EvapCoolerName + " has a problem" );
 				ShowContinueError( "Check size of Pad Area and/or Pad Depth in input" );
-				ShowContinueError( "Cooler Effectiveness calculated as: " + trim( RoundSigDigits( SatEff, 2 ) ) );
-				ShowContinueError( "Air velocity (m/s) through pads calculated as: " + trim( RoundSigDigits( AirVel, 2 ) ) );
+				ShowContinueError( "Cooler Effectiveness calculated as: " + RoundSigDigits( SatEff, 2 ) );
+				ShowContinueError( "Air velocity (m/s) through pads calculated as: " + RoundSigDigits( AirVel, 2 ) );
 				ShowFatalError( "Program Terminates due to previous error condition" );
 
 			}
@@ -1381,7 +1380,7 @@ namespace EvaporativeCoolers {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		Fstring CompName( MaxNameLength );
+		std::string CompName;
 		Real64 FullOutput;
 		Real64 ReqOutput;
 		int InletNode;
@@ -1963,7 +1962,7 @@ namespace EvaporativeCoolers {
 
 	void
 	SimZoneEvaporativeCoolerUnit(
-		Fstring const & CompName, // name of the packaged terminal heat pump
+		std::string const & CompName, // name of the packaged terminal heat pump
 		int const ZoneNum, // number of zone being served
 		Real64 & SensibleOutputProvided, // sensible capacity delivered to zone
 		Real64 & LatentOutputProvided, // Latent add/removal  (kg/s), dehumid = negative
@@ -2020,11 +2019,11 @@ namespace EvaporativeCoolers {
 		} else {
 			CompNum = CompIndex;
 			if ( CompNum < 1 || CompNum > NumZoneEvapUnits ) {
-				ShowFatalError( "SimZoneEvaporativeCoolerUnit: Invalid CompIndex passed=" + trim( TrimSigDigits( CompNum ) ) + ", Number of units =" + trim( TrimSigDigits( NumZoneEvapUnits ) ) + ", Entered Unit name = " + trim( CompName ) );
+				ShowFatalError( "SimZoneEvaporativeCoolerUnit: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of units =" + TrimSigDigits( NumZoneEvapUnits ) + ", Entered Unit name = " + CompName );
 			}
 			if ( CheckZoneEvapUnitName( CompNum ) ) {
 				if ( CompName != ZoneEvapUnit( CompNum ).Name ) {
-					ShowFatalError( "SimZoneEvaporativeCoolerUnit: Invalid CompIndex passed=" + trim( TrimSigDigits( CompNum ) ) + ", Unit name=" + trim( CompName ) + ", stored unit name for that index=" + trim( ZoneEvapUnit( CompNum ).Name ) );
+					ShowFatalError( "SimZoneEvaporativeCoolerUnit: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Unit name=" + CompName + ", stored unit name for that index=" + ZoneEvapUnit( CompNum ).Name );
 				}
 				CheckZoneEvapUnitName( CompNum ) = false;
 			}
@@ -2082,7 +2081,7 @@ namespace EvaporativeCoolers {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetInputZoneEvaporativeCoolerUnit: " );
+		static std::string const RoutineName( "GetInputZoneEvaporativeCoolerUnit: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2091,11 +2090,11 @@ namespace EvaporativeCoolers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Fstring CurrentModuleObject( MaxNameLength ); // Object type for getting and error messages
-		FArray1D_Fstring Alphas( sFstring( MaxNameLength ) ); // Alpha items for object
+		std::string CurrentModuleObject; // Object type for getting and error messages
+		FArray1D_string Alphas; // Alpha items for object
 		FArray1D< Real64 > Numbers; // Numeric items for object
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) ); // Numeric field names
+		FArray1D_string cAlphaFields; // Alpha field names
+		FArray1D_string cNumericFields; // Numeric field names
 		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
@@ -2125,13 +2124,13 @@ namespace EvaporativeCoolers {
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		Alphas.allocate( MaxAlphas );
-		Alphas = " ";
+		Alphas = "";
 		Numbers.allocate( MaxNumbers );
 		Numbers = 0.0;
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = " ";
+		cAlphaFields = "";
 		cNumericFields.allocate( MaxNumbers );
-		cNumericFields = " ";
+		cNumericFields = "";
 		lAlphaBlanks.allocate( MaxAlphas );
 		lAlphaBlanks = true;
 		lNumericBlanks.allocate( MaxNumbers );
@@ -2146,7 +2145,7 @@ namespace EvaporativeCoolers {
 				GetObjectItem( CurrentModuleObject, UnitLoop, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), ZoneEvapUnit.Name(), UnitLoop - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+				VerifyName( Alphas( 1 ), ZoneEvapUnit.Name(), UnitLoop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -2157,8 +2156,8 @@ namespace EvaporativeCoolers {
 				} else {
 					ZoneEvapUnit( UnitLoop ).AvailSchedIndex = GetScheduleIndex( Alphas( 2 ) ); // convert schedule name to pointer (index number)
 					if ( ZoneEvapUnit( UnitLoop ).AvailSchedIndex == 0 ) {
-						ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( ZoneEvapUnit( UnitLoop ).Name ) + "\" invalid data." );
-						ShowContinueError( "invalid-not found " + trim( cAlphaFields( 2 ) ) + "=\"" + trim( Alphas( 2 ) ) + "\"." );
+						ShowSevereError( CurrentModuleObject + "=\"" + ZoneEvapUnit( UnitLoop ).Name + "\" invalid data." );
+						ShowContinueError( "invalid-not found " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\"." );
 						ErrorsFound = true;
 					}
 				}
@@ -2168,12 +2167,12 @@ namespace EvaporativeCoolers {
 					ZoneComp( ZoneEvaporativeCoolerUnit_Num ).ZoneCompAvailMgrs( UnitLoop ).AvailManagerListName = Alphas( 3 );
 				}
 
-				ZoneEvapUnit( UnitLoop ).OAInletNodeNum = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Air, NodeConnectionType_OutsideAir, 1, ObjectIsParent );
+				ZoneEvapUnit( UnitLoop ).OAInletNodeNum = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_OutsideAir, 1, ObjectIsParent );
 
-				ZoneEvapUnit( UnitLoop ).UnitOutletNodeNum = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
+				ZoneEvapUnit( UnitLoop ).UnitOutletNodeNum = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 
 				if ( ! lAlphaBlanks( 6 ) ) {
-					ZoneEvapUnit( UnitLoop ).UnitReliefNodeNum = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
+					ZoneEvapUnit( UnitLoop ).UnitReliefNodeNum = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
 				}
 
 				ZoneEvapUnit( UnitLoop ).FanObjectClassName = Alphas( 7 );
@@ -2182,7 +2181,7 @@ namespace EvaporativeCoolers {
 				GetFanType( ZoneEvapUnit( UnitLoop ).FanName, ZoneEvapUnit( UnitLoop ).FanType_Num, errFlag, CurrentModuleObject, ZoneEvapUnit( UnitLoop ).Name );
 				FanVolFlow = 0.0;
 				if ( errFlag ) {
-					ShowContinueError( "specified in " + trim( CurrentModuleObject ) + " = " + trim( ZoneEvapUnit( UnitLoop ).Name ) );
+					ShowContinueError( "specified in " + CurrentModuleObject + " = " + ZoneEvapUnit( UnitLoop ).Name );
 					ErrorsFound = true;
 				} else {
 					GetFanIndex( ZoneEvapUnit( UnitLoop ).FanName, ZoneEvapUnit( UnitLoop ).FanIndex, errFlag, CurrentModuleObject );
@@ -2193,25 +2192,25 @@ namespace EvaporativeCoolers {
 					// Get the fan's availability schedule
 					ZoneEvapUnit( UnitLoop ).FanAvailSchedPtr = GetFanAvailSchPtr( ZoneEvapUnit( UnitLoop ).FanObjectClassName, ZoneEvapUnit( UnitLoop ).FanName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "...specified in " + trim( CurrentModuleObject ) + " = " + trim( ZoneEvapUnit( UnitLoop ).Name ) );
+						ShowContinueError( "...specified in " + CurrentModuleObject + " = " + ZoneEvapUnit( UnitLoop ).Name );
 						ErrorsFound = true;
 					}
 				}
 
 				ZoneEvapUnit( UnitLoop ).DesignAirVolumeFlowRate = Numbers( 1 );
 
-				{ auto const SELECT_CASE_var( trim( Alphas( 9 ) ) );
+				{ auto const SELECT_CASE_var( Alphas( 9 ) );
 				if ( SELECT_CASE_var == "BLOWTHROUGH" ) {
 					ZoneEvapUnit( UnitLoop ).FanLocation = BlowThruFan;
 				} else if ( SELECT_CASE_var == "DRAWTHROUGH" ) {
 					ZoneEvapUnit( UnitLoop ).FanLocation = DrawThruFan;
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( ZoneEvapUnit( UnitLoop ).Name ) + "\" invalid data." );
-					ShowContinueError( "invalid choice found " + trim( cAlphaFields( 9 ) ) + "=\"" + trim( Alphas( 9 ) ) + "\"." );
+					ShowSevereError( CurrentModuleObject + "=\"" + ZoneEvapUnit( UnitLoop ).Name + "\" invalid data." );
+					ShowContinueError( "invalid choice found " + cAlphaFields( 9 ) + "=\"" + Alphas( 9 ) + "\"." );
 					ErrorsFound = true;
 				}}
 
-				{ auto const SELECT_CASE_var( trim( Alphas( 10 ) ) );
+				{ auto const SELECT_CASE_var( Alphas( 10 ) );
 				if ( SELECT_CASE_var == "ZONETEMPERATUREDEADBANDONOFFCYCLING" ) {
 					ZoneEvapUnit( UnitLoop ).ControlSchemeType = ZoneTemperatureDeadBandOnOffCycling;
 				} else if ( SELECT_CASE_var == "ZONECOOLINGLOADONOFFCYCLING" ) {
@@ -2219,15 +2218,15 @@ namespace EvaporativeCoolers {
 				} else if ( SELECT_CASE_var == "ZONECOOLINGLOADVARIABLESPEEDFAN" ) {
 					ZoneEvapUnit( UnitLoop ).ControlSchemeType = ZoneCoolingLoadVariableSpeedFan;
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( ZoneEvapUnit( UnitLoop ).Name ) + "\" invalid data." );
-					ShowContinueError( "invalid choice found " + trim( cAlphaFields( 10 ) ) + "=\"" + trim( Alphas( 10 ) ) + "\"." );
+					ShowSevereError( CurrentModuleObject + "=\"" + ZoneEvapUnit( UnitLoop ).Name + "\" invalid data." );
+					ShowContinueError( "invalid choice found " + cAlphaFields( 10 ) + "=\"" + Alphas( 10 ) + "\"." );
 					ErrorsFound = true;
 				}}
 
 				ZoneEvapUnit( UnitLoop ).ThrottlingRange = Numbers( 2 );
 				ZoneEvapUnit( UnitLoop ).ThresholdCoolingLoad = Numbers( 3 );
 
-				{ auto const SELECT_CASE_var( trim( Alphas( 11 ) ) );
+				{ auto const SELECT_CASE_var( Alphas( 11 ) );
 
 				if ( SELECT_CASE_var == "EVAPORATIVECOOLER:DIRECT:CELDEKPAD" ) {
 					ZoneEvapUnit( UnitLoop ).EvapCooler_1_ObjectClassName = "EvaporativeCooler:Direct:CelDekPad";
@@ -2245,21 +2244,21 @@ namespace EvaporativeCoolers {
 					ZoneEvapUnit( UnitLoop ).EvapCooler_1_ObjectClassName = "EvaporativeCooler:Indirect:ResearchSpecial";
 					ZoneEvapUnit( UnitLoop ).EvapCooler_1_Type_Num = iEvapCoolerInDirectRDDSpecial;
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( ZoneEvapUnit( UnitLoop ).Name ) + "\" invalid data." );
-					ShowContinueError( "invalid choice found " + trim( cAlphaFields( 11 ) ) + "=\"" + trim( Alphas( 11 ) ) + "\"." );
+					ShowSevereError( CurrentModuleObject + "=\"" + ZoneEvapUnit( UnitLoop ).Name + "\" invalid data." );
+					ShowContinueError( "invalid choice found " + cAlphaFields( 11 ) + "=\"" + Alphas( 11 ) + "\"." );
 					ErrorsFound = true;
 				}}
 
 				ZoneEvapUnit( UnitLoop ).EvapCooler_1_Name = Alphas( 12 );
 				ZoneEvapUnit( UnitLoop ).EvapCooler_1_Index = FindItemInList( Alphas( 12 ), EvapCond.EvapCoolerName(), NumEvapCool );
 				if ( ZoneEvapUnit( UnitLoop ).EvapCooler_1_Index == 0 ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( ZoneEvapUnit( UnitLoop ).Name ) + "\" invalid data." );
-					ShowContinueError( "invalid, not found " + trim( cAlphaFields( 12 ) ) + "=\"" + trim( Alphas( 12 ) ) + "\"." );
+					ShowSevereError( CurrentModuleObject + "=\"" + ZoneEvapUnit( UnitLoop ).Name + "\" invalid data." );
+					ShowContinueError( "invalid, not found " + cAlphaFields( 12 ) + "=\"" + Alphas( 12 ) + "\"." );
 					ErrorsFound = true;
 				}
 
 				if ( ! lAlphaBlanks( 13 ) ) {
-					{ auto const SELECT_CASE_var( trim( Alphas( 13 ) ) );
+					{ auto const SELECT_CASE_var( Alphas( 13 ) );
 
 					if ( SELECT_CASE_var == "EVAPORATIVECOOLER:DIRECT:CELDEKPAD" ) {
 						ZoneEvapUnit( UnitLoop ).EvapCooler_2_ObjectClassName = "EvaporativeCooler:Direct:CelDekPad";
@@ -2277,21 +2276,21 @@ namespace EvaporativeCoolers {
 						ZoneEvapUnit( UnitLoop ).EvapCooler_2_ObjectClassName = "EvaporativeCooler:Indirect:ResearchSpecial";
 						ZoneEvapUnit( UnitLoop ).EvapCooler_2_Type_Num = iEvapCoolerInDirectRDDSpecial;
 					} else {
-						ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( ZoneEvapUnit( UnitLoop ).Name ) + "\" invalid data." );
-						ShowContinueError( "invalid choice found " + trim( cAlphaFields( 13 ) ) + "=\"" + trim( Alphas( 13 ) ) + "\"." );
+						ShowSevereError( CurrentModuleObject + "=\"" + ZoneEvapUnit( UnitLoop ).Name + "\" invalid data." );
+						ShowContinueError( "invalid choice found " + cAlphaFields( 13 ) + "=\"" + Alphas( 13 ) + "\"." );
 						ErrorsFound = true;
 					}}
 					if ( ! lAlphaBlanks( 14 ) ) {
 						ZoneEvapUnit( UnitLoop ).EvapCooler_2_Name = Alphas( 14 );
 						ZoneEvapUnit( UnitLoop ).EvapCooler_2_Index = FindItemInList( Alphas( 14 ), EvapCond.EvapCoolerName(), NumEvapCool );
 						if ( ZoneEvapUnit( UnitLoop ).EvapCooler_2_Index == 0 ) {
-							ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( ZoneEvapUnit( UnitLoop ).Name ) + "\" invalid data." );
-							ShowContinueError( "invalid, not found " + trim( cAlphaFields( 14 ) ) + "=\"" + trim( Alphas( 14 ) ) + "\"." );
+							ShowSevereError( CurrentModuleObject + "=\"" + ZoneEvapUnit( UnitLoop ).Name + "\" invalid data." );
+							ShowContinueError( "invalid, not found " + cAlphaFields( 14 ) + "=\"" + Alphas( 14 ) + "\"." );
 							ErrorsFound = true;
 						}
 					} else {
-						ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( ZoneEvapUnit( UnitLoop ).Name ) + "\" invalid data." );
-						ShowContinueError( "missing input for " + trim( cAlphaFields( 14 ) ) );
+						ShowSevereError( CurrentModuleObject + "=\"" + ZoneEvapUnit( UnitLoop ).Name + "\" invalid data." );
+						ShowContinueError( "missing input for " + cAlphaFields( 14 ) );
 						ErrorsFound = true;
 					}
 				}
@@ -2311,12 +2310,12 @@ namespace EvaporativeCoolers {
 				// check that fan type is consistent with control method
 				if ( ZoneEvapUnit( UnitLoop ).ControlSchemeType == ZoneCoolingLoadVariableSpeedFan ) { // must have a VS fan type
 					if ( ZoneEvapUnit( UnitLoop ).FanType_Num == FanType_SimpleConstVolume ) {
-						ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( ZoneEvapUnit( UnitLoop ).Name ) + "\" invalid data." );
+						ShowSevereError( CurrentModuleObject + "=\"" + ZoneEvapUnit( UnitLoop ).Name + "\" invalid data." );
 						ShowContinueError( "Fan:ConstantVolume is not consistent with control method ZoneCoolingLoadVariableSpeedFan." );
 						ShowContinueError( "Change to a variable speed fan object type" );
 						ErrorsFound = true;
 					} else if ( ZoneEvapUnit( UnitLoop ).FanType_Num == FanType_SimpleOnOff ) {
-						ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( ZoneEvapUnit( UnitLoop ).Name ) + "\" invalid data." );
+						ShowSevereError( CurrentModuleObject + "=\"" + ZoneEvapUnit( UnitLoop ).Name + "\" invalid data." );
 						ShowContinueError( "Fan:OnOff is not consistent with control method ZoneCoolingLoadVariableSpeedFan." );
 						ShowContinueError( "Change to a variable speed fan object type" );
 						ErrorsFound = true;
@@ -2439,7 +2438,7 @@ namespace EvaporativeCoolers {
 				if ( CheckZoneEquipmentList( "ZoneHVAC:EvaporativeCoolerUnit", ZoneEvapUnit( Loop ).Name ) ) {
 					ZoneEvapUnit( Loop ).ZoneNodeNum = ZoneEquipConfig( ZoneNum ).ZoneNode;
 				} else {
-					ShowSevereError( "InitZoneEvaporativeCoolerUnit: ZoneHVAC:EvaporativeCoolerUnit = " + trim( ZoneEvapUnit( Loop ).Name ) + ", is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
+					ShowSevereError( "InitZoneEvaporativeCoolerUnit: ZoneHVAC:EvaporativeCoolerUnit = " + ZoneEvapUnit( Loop ).Name + ", is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
 				}
 			}
 		}
@@ -2996,21 +2995,21 @@ namespace EvaporativeCoolers {
 			SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, FanSpeedRatio, VSEvapUnitLoadResidual, 0.0, 1.0, Par );
 			if ( SolFla == -1 ) {
 				if ( ZoneEvapUnit( UnitNum ).UnitVSControlMaxIterErrorIndex == 0 ) {
-					ShowWarningError( "Iteration limit exceeded calculating variable speed evap unit fan speed ratio, for unit=" + trim( ZoneEvapUnit( UnitNum ).Name ) );
-					ShowContinueErrorTimeStamp( " " );
+					ShowWarningError( "Iteration limit exceeded calculating variable speed evap unit fan speed ratio, for unit=" + ZoneEvapUnit( UnitNum ).Name );
+					ShowContinueErrorTimeStamp( "" );
 					ShowContinueError( "Fan speed ratio returned=" + RoundSigDigits( FanSpeedRatio, 2 ) );
 					ShowContinueError( "Check input for Fan Placement." );
 				}
-				ShowRecurringWarningErrorAtEnd( "Zone Evaporative Cooler unit control failed (iteration limit [" + trim( RoundSigDigits( MaxIte ) ) + "]) for ZoneHVAC:EvaporativeCoolerUnit =\"" + trim( ZoneEvapUnit( UnitNum ).Name ), ZoneEvapUnit( UnitNum ).UnitVSControlMaxIterErrorIndex );
+				ShowRecurringWarningErrorAtEnd( "Zone Evaporative Cooler unit control failed (iteration limit [" + RoundSigDigits( MaxIte ) + "]) for ZoneHVAC:EvaporativeCoolerUnit =\"" + ZoneEvapUnit( UnitNum ).Name, ZoneEvapUnit( UnitNum ).UnitVSControlMaxIterErrorIndex );
 
 			} else if ( SolFla == -2 ) {
 				if ( ZoneEvapUnit( UnitNum ).UnitVSControlLimitsErrorIndex == 0 ) {
-					ShowWarningError( "Variable speed evaporative cooler unit calculation failed: fan speed ratio limits exceeded," " for unit = " + trim( ZoneEvapUnit( UnitNum ).Name ) );
+					ShowWarningError( "Variable speed evaporative cooler unit calculation failed: fan speed ratio limits exceeded," " for unit = " + ZoneEvapUnit( UnitNum ).Name );
 					ShowContinueError( "Check input for Fan Placement." );
-					ShowContinueErrorTimeStamp( " " );
+					ShowContinueErrorTimeStamp( "" );
 					if ( WarmupFlag ) ShowContinueError( "Error occurred during warmup days." );
 				}
-				ShowRecurringWarningErrorAtEnd( "Zone Evaporative Cooler unit control failed (limits exceeded) " "for ZoneHVAC:EvaporativeCoolerUnit =\"" + trim( ZoneEvapUnit( UnitNum ).Name ), ZoneEvapUnit( UnitNum ).UnitVSControlLimitsErrorIndex );
+				ShowRecurringWarningErrorAtEnd( "Zone Evaporative Cooler unit control failed (limits exceeded) " "for ZoneHVAC:EvaporativeCoolerUnit =\"" + ZoneEvapUnit( UnitNum ).Name, ZoneEvapUnit( UnitNum ).UnitVSControlLimitsErrorIndex );
 			}
 			ZoneEvapUnit( UnitNum ).FanSpeedRatio = FanSpeedRatio;
 		}

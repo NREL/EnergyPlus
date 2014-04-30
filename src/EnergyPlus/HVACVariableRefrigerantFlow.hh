@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -16,7 +15,6 @@ namespace EnergyPlus {
 namespace HVACVariableRefrigerantFlow {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
@@ -56,10 +54,10 @@ namespace HVACVariableRefrigerantFlow {
 	// VRF System Types (strings used in integer conversions)
 	extern int const NumVRFSystemTypes;
 	extern int const VRF_HeatPump;
-	extern FArray1D_Fstring const cVRFTypes;
+	extern FArray1D_string const cVRFTypes;
 
 	extern int const NumValidFuelTypes;
-	extern FArray1D_Fstring const cValidFuelTypes;
+	extern FArray1D_string const cValidFuelTypes;
 
 	// Fuel Types
 	extern int const FuelTypeElectric; // Fuel type for electricity
@@ -127,7 +125,7 @@ namespace HVACVariableRefrigerantFlow {
 	struct VRFCondenserEquipment
 	{
 		// Members
-		Fstring Name; // Name of the VRF Terminal Unit
+		std::string Name; // Name of the VRF Terminal Unit
 		int VRFSystemTypeNum; // integer equivalent of system type
 		int VRFPlantTypeOfNum; // integer equivalent of index to DataPlant type
 		int SourceLoopNum; // plant data for water-coole only
@@ -276,10 +274,10 @@ namespace HVACVariableRefrigerantFlow {
 		// end variables used for heat recovery mode
 		// begin variables for Water System interactions
 		int EvapWaterSupplyMode; // where does water come from
-		Fstring EvapWaterSupplyName; // name of water source e.g. water storage tank
+		std::string EvapWaterSupplyName; // name of water source e.g. water storage tank
 		int EvapWaterSupTankID;
 		int EvapWaterTankDemandARRID;
-		Fstring CondensateCollectName; // name of water source e.g. water storage tank
+		std::string CondensateCollectName; // name of water source e.g. water storage tank
 		int CondensateTankID;
 		int CondensateTankSupplyARRID;
 		Real64 CondensateVdot; // rate of water condensation from air stream [m3/s]
@@ -298,7 +296,6 @@ namespace HVACVariableRefrigerantFlow {
 
 		// Default Constructor
 		VRFCondenserEquipment() :
-			Name( MaxNameLength ),
 			VRFSystemTypeNum( 0 ),
 			VRFPlantTypeOfNum( 0 ),
 			SourceLoopNum( 0 ),
@@ -444,10 +441,8 @@ namespace HVACVariableRefrigerantFlow {
 			EIRFTempHeatErrorIndex( 0 ),
 			DefrostHeatErrorIndex( 0 ),
 			EvapWaterSupplyMode( WaterSupplyFromMains ),
-			EvapWaterSupplyName( MaxNameLength ),
 			EvapWaterSupTankID( 0 ),
 			EvapWaterTankDemandARRID( 0 ),
-			CondensateCollectName( MaxNameLength ),
 			CondensateTankID( 0 ),
 			CondensateTankSupplyARRID( 0 ),
 			CondensateVdot( 0.0 ),
@@ -464,7 +459,7 @@ namespace HVACVariableRefrigerantFlow {
 
 		// Member Constructor
 		VRFCondenserEquipment(
-			Fstring const & Name, // Name of the VRF Terminal Unit
+			std::string const & Name, // Name of the VRF Terminal Unit
 			int const VRFSystemTypeNum, // integer equivalent of system type
 			int const VRFPlantTypeOfNum, // integer equivalent of index to DataPlant type
 			int const SourceLoopNum, // plant data for water-coole only
@@ -610,10 +605,10 @@ namespace HVACVariableRefrigerantFlow {
 			int const EIRFTempHeatErrorIndex, // warning message index for recurring warnings
 			int const DefrostHeatErrorIndex, // warning message index for recurring warnings
 			int const EvapWaterSupplyMode, // where does water come from
-			Fstring const & EvapWaterSupplyName, // name of water source e.g. water storage tank
+			std::string const & EvapWaterSupplyName, // name of water source e.g. water storage tank
 			int const EvapWaterSupTankID,
 			int const EvapWaterTankDemandARRID,
-			Fstring const & CondensateCollectName, // name of water source e.g. water storage tank
+			std::string const & CondensateCollectName, // name of water source e.g. water storage tank
 			int const CondensateTankID,
 			int const CondensateTankSupplyARRID,
 			Real64 const CondensateVdot, // rate of water condensation from air stream [m3/s]
@@ -627,7 +622,7 @@ namespace HVACVariableRefrigerantFlow {
 			Real64 const EMSValueForHPOperatingMode,
 			int const HPOperatingModeErrorIndex
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			VRFSystemTypeNum( VRFSystemTypeNum ),
 			VRFPlantTypeOfNum( VRFPlantTypeOfNum ),
 			SourceLoopNum( SourceLoopNum ),
@@ -773,10 +768,10 @@ namespace HVACVariableRefrigerantFlow {
 			EIRFTempHeatErrorIndex( EIRFTempHeatErrorIndex ),
 			DefrostHeatErrorIndex( DefrostHeatErrorIndex ),
 			EvapWaterSupplyMode( EvapWaterSupplyMode ),
-			EvapWaterSupplyName( MaxNameLength, EvapWaterSupplyName ),
+			EvapWaterSupplyName( EvapWaterSupplyName ),
 			EvapWaterSupTankID( EvapWaterSupTankID ),
 			EvapWaterTankDemandARRID( EvapWaterTankDemandARRID ),
-			CondensateCollectName( MaxNameLength, CondensateCollectName ),
+			CondensateCollectName( CondensateCollectName ),
 			CondensateTankID( CondensateTankID ),
 			CondensateTankSupplyARRID( CondensateTankSupplyARRID ),
 			CondensateVdot( CondensateVdot ),
@@ -796,10 +791,10 @@ namespace HVACVariableRefrigerantFlow {
 	struct TerminalUnitListData
 	{
 		// Members
-		Fstring Name; // Name of the VRF Terminal Unit List
+		std::string Name; // Name of the VRF Terminal Unit List
 		int NumTUInList; // Number of VRF Terminal Units in List
 		FArray1D_int ZoneTUPtr; // index to VRF Terminal Unit
-		FArray1D_Fstring ZoneTUName; // Name of the VRF Terminal Unit
+		FArray1D_string ZoneTUName; // Name of the VRF Terminal Unit
 		FArray1D_bool IsSimulated; // TRUE if TU has been simulated
 		FArray1D< Real64 > TotalCoolLoad; // Total zone cooling coil load met by TU
 		FArray1D< Real64 > TotalHeatLoad; // Total zone heating coil load met by TU
@@ -815,17 +810,15 @@ namespace HVACVariableRefrigerantFlow {
 
 		// Default Constructor
 		TerminalUnitListData() :
-			Name( MaxNameLength ),
-			NumTUInList( 0 ),
-			ZoneTUName( sFstring( MaxNameLength ) )
+			NumTUInList( 0 )
 		{}
 
 		// Member Constructor
 		TerminalUnitListData(
-			Fstring const & Name, // Name of the VRF Terminal Unit List
+			std::string const & Name, // Name of the VRF Terminal Unit List
 			int const NumTUInList, // Number of VRF Terminal Units in List
 			FArray1_int const & ZoneTUPtr, // index to VRF Terminal Unit
-			FArray1_Fstring const & ZoneTUName, // Name of the VRF Terminal Unit
+			FArray1_string const & ZoneTUName, // Name of the VRF Terminal Unit
 			FArray1_bool const & IsSimulated, // TRUE if TU has been simulated
 			FArray1< Real64 > const & TotalCoolLoad, // Total zone cooling coil load met by TU
 			FArray1< Real64 > const & TotalHeatLoad, // Total zone heating coil load met by TU
@@ -839,7 +832,7 @@ namespace HVACVariableRefrigerantFlow {
 			FArray1_int const & CoolingCoilAvailSchPtr, // cooilng coil availability schedule index
 			FArray1_int const & HeatingCoilAvailSchPtr // heating coil availability schedule index
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NumTUInList( NumTUInList ),
 			ZoneTUPtr( ZoneTUPtr ),
 			ZoneTUName( ZoneTUName ),
@@ -862,7 +855,7 @@ namespace HVACVariableRefrigerantFlow {
 	struct VRFTerminalUnitEquipment
 	{
 		// Members
-		Fstring Name; // Name of the VRF Terminal Unit
+		std::string Name; // Name of the VRF Terminal Unit
 		int VRFTUType_Num; // DataHVACGlobals VRF Terminal Unit type
 		int SchedPtr; // Pointer to the correct schedule
 		int VRFSysNum; // index to VRF Condenser
@@ -895,7 +888,7 @@ namespace HVACVariableRefrigerantFlow {
 		int OpMode; // operation mode: 1 = cycling fan, cycling coil 2 = constant fan, cycling coil
 		int FanPlace; // fan placement; 1=blow through, 2=draw through
 		Real64 ActualFanVolFlowRate; // volumetric flow rate from fan object
-		Fstring OAMixerName; // name of outside air mixer
+		std::string OAMixerName; // name of outside air mixer
 		int OAMixerIndex; // index to outside air mixer
 		bool OAMixerUsed; // true if OA Mixer object is used
 		int CoolCoilIndex; // index to terminal unit cooling coil
@@ -913,7 +906,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 ParasiticElecHeatConsumption; // Terminal unit parasitic electric consumption in heating [J]
 		bool CoolingCoilPresent; // FALSE if coil not present
 		bool HeatingCoilPresent; // FALSE if coil not present
-		Fstring AvailManagerListName; // Name of an availability manager list object
+		std::string AvailManagerListName; // Name of an availability manager list object
 		int AvailStatus;
 		Real64 TerminalUnitSensibleRate; // sensible cooling/heating rate of VRF terminal unit (W)
 		Real64 TerminalUnitLatentRate; // latent dehumidificatino/humidification rate of VRF terminal unit (W)
@@ -936,7 +929,6 @@ namespace HVACVariableRefrigerantFlow {
 
 		// Default Constructor
 		VRFTerminalUnitEquipment() :
-			Name( MaxNameLength ),
 			VRFTUType_Num( 0 ),
 			SchedPtr( -1 ),
 			VRFSysNum( 0 ),
@@ -969,7 +961,6 @@ namespace HVACVariableRefrigerantFlow {
 			OpMode( 0 ),
 			FanPlace( 0 ),
 			ActualFanVolFlowRate( 0.0 ),
-			OAMixerName( MaxNameLength ),
 			OAMixerIndex( 0 ),
 			OAMixerUsed( false ),
 			CoolCoilIndex( 0 ),
@@ -987,7 +978,6 @@ namespace HVACVariableRefrigerantFlow {
 			ParasiticElecHeatConsumption( 0.0 ),
 			CoolingCoilPresent( true ),
 			HeatingCoilPresent( true ),
-			AvailManagerListName( MaxNameLength ),
 			AvailStatus( 0 ),
 			TerminalUnitSensibleRate( 0.0 ),
 			TerminalUnitLatentRate( 0.0 ),
@@ -1011,7 +1001,7 @@ namespace HVACVariableRefrigerantFlow {
 
 		// Member Constructor
 		VRFTerminalUnitEquipment(
-			Fstring const & Name, // Name of the VRF Terminal Unit
+			std::string const & Name, // Name of the VRF Terminal Unit
 			int const VRFTUType_Num, // DataHVACGlobals VRF Terminal Unit type
 			int const SchedPtr, // Pointer to the correct schedule
 			int const VRFSysNum, // index to VRF Condenser
@@ -1044,7 +1034,7 @@ namespace HVACVariableRefrigerantFlow {
 			int const OpMode, // operation mode: 1 = cycling fan, cycling coil 2 = constant fan, cycling coil
 			int const FanPlace, // fan placement; 1=blow through, 2=draw through
 			Real64 const ActualFanVolFlowRate, // volumetric flow rate from fan object
-			Fstring const & OAMixerName, // name of outside air mixer
+			std::string const & OAMixerName, // name of outside air mixer
 			int const OAMixerIndex, // index to outside air mixer
 			bool const OAMixerUsed, // true if OA Mixer object is used
 			int const CoolCoilIndex, // index to terminal unit cooling coil
@@ -1062,7 +1052,7 @@ namespace HVACVariableRefrigerantFlow {
 			Real64 const ParasiticElecHeatConsumption, // Terminal unit parasitic electric consumption in heating [J]
 			bool const CoolingCoilPresent, // FALSE if coil not present
 			bool const HeatingCoilPresent, // FALSE if coil not present
-			Fstring const & AvailManagerListName, // Name of an availability manager list object
+			std::string const & AvailManagerListName, // Name of an availability manager list object
 			int const AvailStatus,
 			Real64 const TerminalUnitSensibleRate, // sensible cooling/heating rate of VRF terminal unit (W)
 			Real64 const TerminalUnitLatentRate, // latent dehumidificatino/humidification rate of VRF terminal unit (W)
@@ -1083,7 +1073,7 @@ namespace HVACVariableRefrigerantFlow {
 			int const IterLimitExceeded, // index used for warning messages
 			int const FirstIterfailed // index used for warning messages
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			VRFTUType_Num( VRFTUType_Num ),
 			SchedPtr( SchedPtr ),
 			VRFSysNum( VRFSysNum ),
@@ -1116,7 +1106,7 @@ namespace HVACVariableRefrigerantFlow {
 			OpMode( OpMode ),
 			FanPlace( FanPlace ),
 			ActualFanVolFlowRate( ActualFanVolFlowRate ),
-			OAMixerName( MaxNameLength, OAMixerName ),
+			OAMixerName( OAMixerName ),
 			OAMixerIndex( OAMixerIndex ),
 			OAMixerUsed( OAMixerUsed ),
 			CoolCoilIndex( CoolCoilIndex ),
@@ -1134,7 +1124,7 @@ namespace HVACVariableRefrigerantFlow {
 			ParasiticElecHeatConsumption( ParasiticElecHeatConsumption ),
 			CoolingCoilPresent( CoolingCoilPresent ),
 			HeatingCoilPresent( HeatingCoilPresent ),
-			AvailManagerListName( MaxNameLength, AvailManagerListName ),
+			AvailManagerListName( AvailManagerListName ),
 			AvailStatus( AvailStatus ),
 			TerminalUnitSensibleRate( TerminalUnitSensibleRate ),
 			TerminalUnitLatentRate( TerminalUnitLatentRate ),
@@ -1167,7 +1157,7 @@ namespace HVACVariableRefrigerantFlow {
 
 	void
 	SimulateVRF(
-		Fstring const & CompName,
+		std::string const & CompName,
 		int const ZoneNum,
 		bool const FirstHVACIteration,
 		Real64 & SysOutputProvided,
@@ -1177,9 +1167,9 @@ namespace HVACVariableRefrigerantFlow {
 
 	void
 	SimVRFCondenserPlant(
-		Fstring const & VRFType, // Type of VRF
+		std::string const & VRFType, // Type of VRF
 		int const VRFTypeNum, // Type of VRF in Plant equipment
-		Fstring const & VRFName, // User Specified Name of VRF
+		std::string const & VRFName, // User Specified Name of VRF
 		int & VRFNum, // Index of Equipment
 		bool const FirstHVACIteration, // Flag for first time through HVAC simulation
 		bool & InitLoopEquip, // If not zero, calculate the max load for operating conditions

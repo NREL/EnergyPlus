@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -26,13 +25,13 @@ namespace DataIPShortCuts {
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern FArray1D_Fstring cAlphaFieldNames;
-	extern FArray1D_Fstring cNumericFieldNames;
+	extern FArray1D_string cAlphaFieldNames;
+	extern FArray1D_string cNumericFieldNames;
 	extern FArray1D_bool lNumericFieldBlanks;
 	extern FArray1D_bool lAlphaFieldBlanks;
-	extern FArray1D_Fstring cAlphaArgs;
+	extern FArray1D_string cAlphaArgs;
 	extern FArray1D< Real64 > rNumericArgs;
-	extern Fstring cCurrentModuleObject;
+	extern std::string cCurrentModuleObject;
 
 } // DataIPShortCuts
 

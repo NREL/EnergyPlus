@@ -1,6 +1,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/environment.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <DataSystemVariables.hh>
@@ -45,43 +46,43 @@ namespace DataSystemVariables {
 	// MODULE PARAMETER DEFINITIONS:
 	int const iASCII_CR( 13 ); // endline value when just CR instead of CR/LF
 	int const iUnicode_end( 0 ); // endline value when Unicode file
-	Fstring const tabchar( 1, CHAR( 9 ) );
+	char const tabchar( '\t' );
 	int const GoodIOStatValue( 0 ); // good value for IOStat during reads/writes
 	int const MaxTimingStringLength( 250 ); // string length for timing string array
 
-	Fstring const DDOnlyEnvVar( "DDONLY" ); // Only run design days
-	Fstring const ReverseDDEnvVar( "REVERSEDD" ); // Reverse DD during run
-	Fstring const FullAnnualSimulation( "FULLANNUALRUN" ); // Generate annual run
-	Fstring const cDeveloperFlag( "DeveloperFlag" );
-	Fstring const cDisplayAllWarnings( "DisplayAllWarnings" );
-	Fstring const cDisplayExtraWarnings( "DisplayExtraWarnings" );
-	Fstring const cDisplayAdvancedReportVariables( "DisplayAdvancedReportVariables" );
-	Fstring const cDisplayUnusedObjects( "DisplayUnusedObjects" );
-	Fstring const cDisplayUnusedSchedules( "DisplayUnusedSchedules" );
-	Fstring const cDisplayZoneAirHeatBalanceOffBalance( "DisplayZoneAirHeatBalanceOffBalance" );
-	Fstring const cSortIDD( "SortIDD" );
-	Fstring const cReportDuringWarmup( "ReportDuringWarmup" );
-	Fstring const cIgnoreSolarRadiation( "IgnoreSolarRadiation" );
-	Fstring const cIgnoreBeamRadiation( "IgnoreBeamRadiation" );
-	Fstring const cIgnoreDiffuseRadiation( "IgnoreDiffuseRadiation" );
-	Fstring const cSutherlandHodgman( "SutherlandHodgman" );
-	Fstring const cMinimalSurfaceVariables( "CreateMinimalSurfaceVariables" );
-	Fstring const cMinimalShadowing( "MinimalShadowing" );
-	Fstring const cNumThreads( "OMP_NUM_THREADS" );
-	Fstring const cepNumThreads( "EP_OMP_NUM_THREADS" );
-	Fstring const cNumActiveSims( "cntActv" );
-	Fstring const cInputPath1( "epin" ); // EP-Launch setting.  Full path + project name
-	Fstring const cInputPath2( "input_path" ); // RunEplus.bat setting.  Full path
-	Fstring const cProgramPath( "program_path" );
-	Fstring const cTimingFlag( "TimingFlag" );
-	Fstring const TrackAirLoopEnvVar( "TRACK_AIRLOOP" ); // To generate a file with runtime statistics
+	std::string const DDOnlyEnvVar( "DDONLY" ); // Only run design days
+	std::string const ReverseDDEnvVar( "REVERSEDD" ); // Reverse DD during run
+	std::string const FullAnnualSimulation( "FULLANNUALRUN" ); // Generate annual run
+	std::string const cDeveloperFlag( "DeveloperFlag" );
+	std::string const cDisplayAllWarnings( "DisplayAllWarnings" );
+	std::string const cDisplayExtraWarnings( "DisplayExtraWarnings" );
+	std::string const cDisplayAdvancedReportVariables( "DisplayAdvancedReportVariables" );
+	std::string const cDisplayUnusedObjects( "DisplayUnusedObjects" );
+	std::string const cDisplayUnusedSchedules( "DisplayUnusedSchedules" );
+	std::string const cDisplayZoneAirHeatBalanceOffBalance( "DisplayZoneAirHeatBalanceOffBalance" );
+	std::string const cSortIDD( "SortIDD" );
+	std::string const cReportDuringWarmup( "ReportDuringWarmup" );
+	std::string const cIgnoreSolarRadiation( "IgnoreSolarRadiation" );
+	std::string const cIgnoreBeamRadiation( "IgnoreBeamRadiation" );
+	std::string const cIgnoreDiffuseRadiation( "IgnoreDiffuseRadiation" );
+	std::string const cSutherlandHodgman( "SutherlandHodgman" );
+	std::string const cMinimalSurfaceVariables( "CreateMinimalSurfaceVariables" );
+	std::string const cMinimalShadowing( "MinimalShadowing" );
+	std::string const cNumThreads( "OMP_NUM_THREADS" );
+	std::string const cepNumThreads( "EP_OMP_NUM_THREADS" );
+	std::string const cNumActiveSims( "cntActv" );
+	std::string const cInputPath1( "epin" ); // EP-Launch setting.  Full path + project name
+	std::string const cInputPath2( "input_path" ); // RunEplus.bat setting.  Full path
+	std::string const cProgramPath( "program_path" );
+	std::string const cTimingFlag( "TimingFlag" );
+	std::string const TrackAirLoopEnvVar( "TRACK_AIRLOOP" ); // To generate a file with runtime statistics
 	// for each controller on each air loop
-	Fstring const TraceAirLoopEnvVar( "TRACE_AIRLOOP" ); // To generate a trace file with the converged
+	std::string const TraceAirLoopEnvVar( "TRACE_AIRLOOP" ); // To generate a trace file with the converged
 	// solutions of all controllers on each air loop at each call to SimAirLoop()
-	Fstring const TraceHVACControllerEnvVar( "TRACE_HVACCONTROLLER" ); // To generate a trace file for
+	std::string const TraceHVACControllerEnvVar( "TRACE_HVACCONTROLLER" ); // To generate a trace file for
 	//  each individual HVAC controller with all controller iterations
 
-	Fstring const MinReportFrequencyEnvVar( "MINREPORTFREQUENCY" ); // environment var for reporting frequency.
+	std::string const MinReportFrequencyEnvVar( "MINREPORTFREQUENCY" ); // environment var for reporting frequency.
 
 	// DERIVED TYPE DEFINITIONS
 	// na
@@ -111,14 +112,14 @@ namespace DataSystemVariables {
 	Real64 Elapsed_Time( 0.0 ); // For showing elapsed time at end of run
 	Real64 Time_Start( 0.0 ); // Call to CPU_Time for start time of simulation
 	Real64 Time_Finish( 0.0 ); // Call to CPU_Time for end time of simulation
-	Fstring cMinReportFrequency( 15 ); // String for minimum reporting frequency
+	std::string cMinReportFrequency; // String for minimum reporting frequency
 	int MinReportFrequency( -2 ); // Frequency var turned into integer during get report var input.
 	bool SortedIDD( true ); // after processing, use sorted IDD to obtain Defs, etc.
 	bool lMinimalShadowing( false ); // TRUE if MinimalShadowing is to override Solar Distribution flag
-	Fstring TempFullFileName( 500 );
-	Fstring envinputpath1( 255 );
-	Fstring envinputpath2( 255 );
-	Fstring envprogrampath( 255 );
+	std::string TempFullFileName;
+	std::string envinputpath1;
+	std::string envinputpath2;
+	std::string envprogrampath;
 	bool TestAllPaths( false );
 	int iEnvSetThreads( 0 );
 	bool lEnvSetThreadsInput( false );
@@ -137,9 +138,9 @@ namespace DataSystemVariables {
 
 	void
 	CheckForActualFileName(
-		Fstring const & originalInputFileName, // name as input for object
+		std::string const & originalInputFileName, // name as input for object
 		bool & FileFound, // Set to true if file found and is in CheckedFileName
-		Fstring & CheckedFileName // Blank if not found.
+		std::string & CheckedFileName // Blank if not found.
 	)
 	{
 
@@ -167,7 +168,7 @@ namespace DataSystemVariables {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const blank;
+		static std::string const blank;
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -179,20 +180,17 @@ namespace DataSystemVariables {
 		bool FileExist;
 		static int EchoInputFile; // found unit number for "eplusout.audit"
 		static bool firstTime( true );
-		Fstring InputFileName( len( originalInputFileName ) ); // save for changing out path characters
-		int pos;
+		std::string InputFileName; // save for changing out path characters
+		std::string::size_type pos;
 
 		if ( firstTime ) {
 			EchoInputFile = FindUnitNumber( "eplusout.audit" );
-			envinputpath1 = blank;
 			get_environment_variable( cInputPath1, envinputpath1 );
 			if ( envinputpath1 != blank ) {
 				pos = index( envinputpath1, pathChar, true ); // look backwards for pathChar
-				if ( pos != 0 ) envinputpath1 = envinputpath1( 1, pos );
+				if ( pos != std::string::npos ) envinputpath1.erase( pos + 1 );
 			}
-			envinputpath2 = blank;
 			get_environment_variable( cInputPath2, envinputpath2 );
-			ProgramPath = blank;
 			get_environment_variable( cProgramPath, ProgramPath );
 			firstTime = false;
 		}
@@ -200,76 +198,76 @@ namespace DataSystemVariables {
 		CheckedFileName = blank;
 		InputFileName = originalInputFileName;
 		pos = index( InputFileName, altpathChar );
-		while ( pos > 0 ) {
-			InputFileName( pos, pos ) = pathChar;
+		while ( pos != std::string::npos ) {
+			InputFileName[ pos ] = pathChar;
 			pos = index( InputFileName, altpathChar );
 		}
 
-		{ IOFlags flags; gio::inquire( trim( InputFileName ), flags ); FileExist = flags.exists(); }
+		{ IOFlags flags; gio::inquire( InputFileName, flags ); FileExist = flags.exists(); }
 		if ( FileExist ) {
 			FileFound = true;
 			CheckedFileName = InputFileName;
-			gio::write( EchoInputFile, "(A)" ) << "found (user input)=" + trim( InputFileName );
+			gio::write( EchoInputFile, "(A)" ) << "found (user input)=" + InputFileName;
 			return;
 		} else {
-			gio::write( EchoInputFile, "(A)" ) << "not found (user input)=" + trim( InputFileName );
+			gio::write( EchoInputFile, "(A)" ) << "not found (user input)=" + InputFileName;
 		}
 
 		// Look relative to input path
-		{ IOFlags flags; gio::inquire( trim( envinputpath1 ) + trim( InputFileName ), flags ); FileExist = flags.exists(); }
+		{ IOFlags flags; gio::inquire( envinputpath1 + InputFileName, flags ); FileExist = flags.exists(); }
 		if ( FileExist ) {
 			FileFound = true;
-			CheckedFileName = trim( envinputpath1 ) + trim( InputFileName );
-			gio::write( EchoInputFile, "(A)" ) << "found (epin)=" + trim( CheckedFileName );
+			CheckedFileName = envinputpath1 + InputFileName;
+			gio::write( EchoInputFile, "(A)" ) << "found (epin)=" + CheckedFileName;
 			return;
 		} else {
-			gio::write( EchoInputFile, "(A)" ) << "not found (epin)=" + trim( envinputpath1 ) + trim( InputFileName );
+			gio::write( EchoInputFile, "(A)" ) << "not found (epin)=" + envinputpath1 + InputFileName;
 		}
 
 		// Look relative to input path
-		{ IOFlags flags; gio::inquire( trim( envinputpath2 ) + trim( InputFileName ), flags ); FileExist = flags.exists(); }
+		{ IOFlags flags; gio::inquire( envinputpath2 + InputFileName, flags ); FileExist = flags.exists(); }
 		if ( FileExist ) {
 			FileFound = true;
-			CheckedFileName = trim( envinputpath2 ) + trim( InputFileName );
-			gio::write( EchoInputFile, "(A)" ) << "found (input_path)=" + trim( CheckedFileName );
+			CheckedFileName = envinputpath2 + InputFileName;
+			gio::write( EchoInputFile, "(A)" ) << "found (input_path)=" + CheckedFileName;
 			return;
 		} else {
-			gio::write( EchoInputFile, "(A)" ) << "not found (input_path)=" + trim( envinputpath2 ) + trim( InputFileName );
+			gio::write( EchoInputFile, "(A)" ) << "not found (input_path)=" + envinputpath2 + InputFileName;
 		}
 
 		// Look relative to program path
-		{ IOFlags flags; gio::inquire( trim( envprogrampath ) + trim( InputFileName ), flags ); FileExist = flags.exists(); }
+		{ IOFlags flags; gio::inquire( envprogrampath + InputFileName, flags ); FileExist = flags.exists(); }
 		if ( FileExist ) {
 			FileFound = true;
-			CheckedFileName = trim( envprogrampath ) + trim( InputFileName );
-			gio::write( EchoInputFile, "(A)" ) << "found (program_path)=" + trim( CheckedFileName );
+			CheckedFileName = envprogrampath + InputFileName;
+			gio::write( EchoInputFile, "(A)" ) << "found (program_path)=" + CheckedFileName;
 			return;
 		} else {
-			gio::write( EchoInputFile, "(A)" ) << "not found (program_path)=" + trim( envprogrampath ) + trim( InputFileName );
+			gio::write( EchoInputFile, "(A)" ) << "not found (program_path)=" + envprogrampath + InputFileName;
 		}
 
 		if ( ! TestAllPaths ) return;
 
 		// Look relative to current working folder
-		{ IOFlags flags; gio::inquire( trim( CurrentWorkingFolder ) + trim( InputFileName ), flags ); FileExist = flags.exists(); }
+		{ IOFlags flags; gio::inquire( CurrentWorkingFolder + InputFileName, flags ); FileExist = flags.exists(); }
 		if ( FileExist ) {
 			FileFound = true;
-			CheckedFileName = trim( CurrentWorkingFolder ) + trim( InputFileName );
-			gio::write( EchoInputFile, "(A)" ) << "found (CWF)=" + trim( CheckedFileName );
+			CheckedFileName = CurrentWorkingFolder + InputFileName;
+			gio::write( EchoInputFile, "(A)" ) << "found (CWF)=" + CheckedFileName;
 			return;
 		} else {
-			gio::write( EchoInputFile, "(A)" ) << "not found (CWF)=" + trim( CurrentWorkingFolder ) + trim( InputFileName );
+			gio::write( EchoInputFile, "(A)" ) << "not found (CWF)=" + CurrentWorkingFolder + InputFileName;
 		}
 
 		// Look relative to program path
-		{ IOFlags flags; gio::inquire( trim( ProgramPath ) + trim( InputFileName ), flags ); FileExist = flags.exists(); }
+		{ IOFlags flags; gio::inquire( ProgramPath + InputFileName, flags ); FileExist = flags.exists(); }
 		if ( FileExist ) {
 			FileFound = true;
-			CheckedFileName = trim( ProgramPath ) + trim( InputFileName );
-			gio::write( EchoInputFile, "(A)" ) << "found (program path - ini)=" + trim( CheckedFileName );
+			CheckedFileName = ProgramPath + InputFileName;
+			gio::write( EchoInputFile, "(A)" ) << "found (program path - ini)=" + CheckedFileName;
 			return;
 		} else {
-			gio::write( EchoInputFile, "(A)" ) << "not found (program path - ini)=" + trim( ProgramPath ) + trim( InputFileName );
+			gio::write( EchoInputFile, "(A)" ) << "not found (program path - ini)=" + ProgramPath + InputFileName;
 		}
 
 	}

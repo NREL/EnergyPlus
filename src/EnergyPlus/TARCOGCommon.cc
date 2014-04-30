@@ -247,7 +247,7 @@ namespace TARCOGCommon {
 		FArray1A< Real64 > b,
 		int const n,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	)
 	{
 		//***********************************************************************
@@ -288,7 +288,7 @@ namespace TARCOGCommon {
 		FArray1A_int indx,
 		Real64 & d,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	)
 	{
 

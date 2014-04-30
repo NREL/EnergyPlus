@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,12 +13,11 @@ namespace EnergyPlus {
 namespace HWBaseboardRadiator {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
 
-	extern Fstring const cCMO_BBRadiator_Water;
+	extern std::string const cCMO_BBRadiator_Water;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -44,10 +42,10 @@ namespace HWBaseboardRadiator {
 	struct HWBaseboardParams
 	{
 		// Members
-		Fstring EquipID;
+		std::string EquipID;
 		int EquipType;
-		Fstring Schedule;
-		FArray1D_Fstring SurfaceName;
+		std::string Schedule;
+		FArray1D_string SurfaceName;
 		FArray1D_int SurfacePtr;
 		int ZonePtr;
 		int SchedPtr;
@@ -99,10 +97,7 @@ namespace HWBaseboardRadiator {
 
 		// Default Constructor
 		HWBaseboardParams() :
-			EquipID( MaxNameLength ),
 			EquipType( 0 ),
-			Schedule( MaxNameLength ),
-			SurfaceName( sFstring( MaxNameLength ) ),
 			ZonePtr( 0 ),
 			SchedPtr( 0 ),
 			WaterInletNode( 0 ),
@@ -153,10 +148,10 @@ namespace HWBaseboardRadiator {
 
 		// Member Constructor
 		HWBaseboardParams(
-			Fstring const & EquipID,
+			std::string const & EquipID,
 			int const EquipType,
-			Fstring const & Schedule,
-			FArray1_Fstring const & SurfaceName,
+			std::string const & Schedule,
+			FArray1_string const & SurfaceName,
 			FArray1_int const & SurfacePtr,
 			int const ZonePtr,
 			int const SchedPtr,
@@ -206,9 +201,9 @@ namespace HWBaseboardRadiator {
 			int const BBMassFlowReSimIndex,
 			int const BBInletTempFlowReSimIndex
 		) :
-			EquipID( MaxNameLength, EquipID ),
+			EquipID( EquipID ),
 			EquipType( EquipType ),
-			Schedule( MaxNameLength, Schedule ),
+			Schedule( Schedule ),
 			SurfaceName( SurfaceName ),
 			SurfacePtr( SurfacePtr ),
 			ZonePtr( ZonePtr ),
@@ -269,7 +264,7 @@ namespace HWBaseboardRadiator {
 
 	void
 	SimHWBaseboard(
-		Fstring const & EquipName,
+		std::string const & EquipName,
 		int const ActualZoneNum,
 		int const ControlledZoneNum,
 		bool const FirstHVACIteration,
@@ -314,7 +309,7 @@ namespace HWBaseboardRadiator {
 	void
 	UpdateHWBaseboardPlantConnection(
 		int const BaseboardTypeNum, // type index
-		Fstring const & BaseboardName, // component name
+		std::string const & BaseboardName, // component name
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int const LoopNum, // Plant loop index for where called from
 		int const LoopSide, // Plant loop side index for where called from

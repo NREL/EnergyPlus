@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -16,7 +15,6 @@ namespace EnergyPlus {
 namespace DesiccantDehumidifiers {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
@@ -53,12 +51,12 @@ namespace DesiccantDehumidifiers {
 	{
 		// Members
 		// User Input data
-		Fstring Name; // unique name of component
-		Fstring Sched; // name of availability schedule
-		Fstring RegenCoilType; // type of regen coil
-		Fstring RegenCoilName; // name of regen coil
-		Fstring RegenFanType; // type of regen fan
-		Fstring RegenFanName; // name of regen fan
+		std::string Name; // unique name of component
+		std::string Sched; // name of availability schedule
+		std::string RegenCoilType; // type of regen coil
+		std::string RegenCoilName; // name of regen coil
+		std::string RegenFanType; // type of regen fan
+		std::string RegenFanName; // name of regen fan
 		int PerformanceModel_Num; // type of performance model, default or user curves
 		int ProcAirInNode; // process air inlet node of dehumidifier
 		int ProcAirOutNode; // process air outlet node of dehumidifier
@@ -104,7 +102,7 @@ namespace DesiccantDehumidifiers {
 		Real64 RegenAirInEnthalpy; // regen inlet air specific enthalpy [J/kg]
 		Real64 RegenAirInMassFlowRate; // regen inlet air mass flow rate [kg/s]
 		Real64 RegenAirVel; // regen air velocity [m/s]
-		Fstring DehumType; // Type of desiccant dehumidifier
+		std::string DehumType; // Type of desiccant dehumidifier
 		int DehumTypeCode; // Type of desiccant dehumidifier, integer code
 		Real64 WaterRemove; // water removed [kg]
 		Real64 WaterRemoveRate; // water removal rate [kg/s]
@@ -123,12 +121,12 @@ namespace DesiccantDehumidifiers {
 		int RegenFanErrorIndex3; // recurring error message index for incorrect regen fan flow
 		int RegenFanErrorIndex4; // recurring error message index for incorrect regen fan flow
 		// structure elements unique to generic desiccant dehumidifier
-		Fstring HXType; // type of desiccant heat exchanger
-		Fstring HXName; // name of desiccant heat exchanger
+		std::string HXType; // type of desiccant heat exchanger
+		std::string HXName; // name of desiccant heat exchanger
 		int HXTypeNum; // parameter number of desiccant heat exchanger
-		Fstring ExhaustFanCurveObject; // exhaust fan curve object
-		Fstring CoolingCoilType; // type of cooling coil used with desiccant heat exchanger
-		Fstring CoolingCoilName; // name of cooling coil used with desiccant heat exchanger
+		std::string ExhaustFanCurveObject; // exhaust fan curve object
+		std::string CoolingCoilType; // type of cooling coil used with desiccant heat exchanger
+		std::string CoolingCoilName; // name of cooling coil used with desiccant heat exchanger
 		int Preheat; // determine condenser waste heat usage for pre heating regen air
 		Real64 RegenSetPointTemp; // heating set-point for regeneration air [C]
 		Real64 ExhaustFanMaxVolFlowRate; // exhaust fan maximum allowable air flow rate [m3/s]
@@ -169,12 +167,6 @@ namespace DesiccantDehumidifiers {
 
 		// Default Constructor
 		DesiccantDehumidifierData() :
-			Name( MaxNameLength ),
-			Sched( MaxNameLength ),
-			RegenCoilType( MaxNameLength ),
-			RegenCoilName( MaxNameLength ),
-			RegenFanType( MaxNameLength ),
-			RegenFanName( MaxNameLength ),
 			PerformanceModel_Num( 0 ),
 			ProcAirInNode( 0 ),
 			ProcAirOutNode( 0 ),
@@ -217,7 +209,6 @@ namespace DesiccantDehumidifiers {
 			RegenAirInEnthalpy( 0.0 ),
 			RegenAirInMassFlowRate( 0.0 ),
 			RegenAirVel( 0.0 ),
-			DehumType( MaxNameLength ),
 			DehumTypeCode( 0 ),
 			WaterRemove( 0.0 ),
 			WaterRemoveRate( 0.0 ),
@@ -235,12 +226,7 @@ namespace DesiccantDehumidifiers {
 			RegenFanErrorIndex2( 0 ),
 			RegenFanErrorIndex3( 0 ),
 			RegenFanErrorIndex4( 0 ),
-			HXType( MaxNameLength ),
-			HXName( MaxNameLength ),
 			HXTypeNum( 0 ),
-			ExhaustFanCurveObject( MaxNameLength ),
-			CoolingCoilType( MaxNameLength ),
-			CoolingCoilName( MaxNameLength ),
 			Preheat( 0 ),
 			RegenSetPointTemp( 0.0 ),
 			ExhaustFanMaxVolFlowRate( 0.0 ),
@@ -282,12 +268,12 @@ namespace DesiccantDehumidifiers {
 
 		// Member Constructor
 		DesiccantDehumidifierData(
-			Fstring const & Name, // unique name of component
-			Fstring const & Sched, // name of availability schedule
-			Fstring const & RegenCoilType, // type of regen coil
-			Fstring const & RegenCoilName, // name of regen coil
-			Fstring const & RegenFanType, // type of regen fan
-			Fstring const & RegenFanName, // name of regen fan
+			std::string const & Name, // unique name of component
+			std::string const & Sched, // name of availability schedule
+			std::string const & RegenCoilType, // type of regen coil
+			std::string const & RegenCoilName, // name of regen coil
+			std::string const & RegenFanType, // type of regen fan
+			std::string const & RegenFanName, // name of regen fan
 			int const PerformanceModel_Num, // type of performance model, default or user curves
 			int const ProcAirInNode, // process air inlet node of dehumidifier
 			int const ProcAirOutNode, // process air outlet node of dehumidifier
@@ -330,7 +316,7 @@ namespace DesiccantDehumidifiers {
 			Real64 const RegenAirInEnthalpy, // regen inlet air specific enthalpy [J/kg]
 			Real64 const RegenAirInMassFlowRate, // regen inlet air mass flow rate [kg/s]
 			Real64 const RegenAirVel, // regen air velocity [m/s]
-			Fstring const & DehumType, // Type of desiccant dehumidifier
+			std::string const & DehumType, // Type of desiccant dehumidifier
 			int const DehumTypeCode, // Type of desiccant dehumidifier, integer code
 			Real64 const WaterRemove, // water removed [kg]
 			Real64 const WaterRemoveRate, // water removal rate [kg/s]
@@ -348,12 +334,12 @@ namespace DesiccantDehumidifiers {
 			int const RegenFanErrorIndex2, // recurring error message index for incorrect regen fan flow
 			int const RegenFanErrorIndex3, // recurring error message index for incorrect regen fan flow
 			int const RegenFanErrorIndex4, // recurring error message index for incorrect regen fan flow
-			Fstring const & HXType, // type of desiccant heat exchanger
-			Fstring const & HXName, // name of desiccant heat exchanger
+			std::string const & HXType, // type of desiccant heat exchanger
+			std::string const & HXName, // name of desiccant heat exchanger
 			int const HXTypeNum, // parameter number of desiccant heat exchanger
-			Fstring const & ExhaustFanCurveObject, // exhaust fan curve object
-			Fstring const & CoolingCoilType, // type of cooling coil used with desiccant heat exchanger
-			Fstring const & CoolingCoilName, // name of cooling coil used with desiccant heat exchanger
+			std::string const & ExhaustFanCurveObject, // exhaust fan curve object
+			std::string const & CoolingCoilType, // type of cooling coil used with desiccant heat exchanger
+			std::string const & CoolingCoilName, // name of cooling coil used with desiccant heat exchanger
 			int const Preheat, // determine condenser waste heat usage for pre heating regen air
 			Real64 const RegenSetPointTemp, // heating set-point for regeneration air [C]
 			Real64 const ExhaustFanMaxVolFlowRate, // exhaust fan maximum allowable air flow rate [m3/s]
@@ -392,12 +378,12 @@ namespace DesiccantDehumidifiers {
 			Real64 const MaxCoilFluidFlow, // hot water or steam mass flow rate regen. heating coil [kg/s]
 			Real64 const RegenCoilCapacity // hot water or steam coil operating capacity [W]
 		) :
-			Name( MaxNameLength, Name ),
-			Sched( MaxNameLength, Sched ),
-			RegenCoilType( MaxNameLength, RegenCoilType ),
-			RegenCoilName( MaxNameLength, RegenCoilName ),
-			RegenFanType( MaxNameLength, RegenFanType ),
-			RegenFanName( MaxNameLength, RegenFanName ),
+			Name( Name ),
+			Sched( Sched ),
+			RegenCoilType( RegenCoilType ),
+			RegenCoilName( RegenCoilName ),
+			RegenFanType( RegenFanType ),
+			RegenFanName( RegenFanName ),
 			PerformanceModel_Num( PerformanceModel_Num ),
 			ProcAirInNode( ProcAirInNode ),
 			ProcAirOutNode( ProcAirOutNode ),
@@ -440,7 +426,7 @@ namespace DesiccantDehumidifiers {
 			RegenAirInEnthalpy( RegenAirInEnthalpy ),
 			RegenAirInMassFlowRate( RegenAirInMassFlowRate ),
 			RegenAirVel( RegenAirVel ),
-			DehumType( MaxNameLength, DehumType ),
+			DehumType( DehumType ),
 			DehumTypeCode( DehumTypeCode ),
 			WaterRemove( WaterRemove ),
 			WaterRemoveRate( WaterRemoveRate ),
@@ -458,12 +444,12 @@ namespace DesiccantDehumidifiers {
 			RegenFanErrorIndex2( RegenFanErrorIndex2 ),
 			RegenFanErrorIndex3( RegenFanErrorIndex3 ),
 			RegenFanErrorIndex4( RegenFanErrorIndex4 ),
-			HXType( MaxNameLength, HXType ),
-			HXName( MaxNameLength, HXName ),
+			HXType( HXType ),
+			HXName( HXName ),
 			HXTypeNum( HXTypeNum ),
-			ExhaustFanCurveObject( MaxNameLength, ExhaustFanCurveObject ),
-			CoolingCoilType( MaxNameLength, CoolingCoilType ),
-			CoolingCoilName( MaxNameLength, CoolingCoilName ),
+			ExhaustFanCurveObject( ExhaustFanCurveObject ),
+			CoolingCoilType( CoolingCoilType ),
+			CoolingCoilName( CoolingCoilName ),
 			Preheat( Preheat ),
 			RegenSetPointTemp( RegenSetPointTemp ),
 			ExhaustFanMaxVolFlowRate( ExhaustFanMaxVolFlowRate ),
@@ -512,7 +498,7 @@ namespace DesiccantDehumidifiers {
 
 	void
 	SimDesiccantDehumidifier(
-		Fstring const & CompName, // name of the dehumidifier unit
+		std::string const & CompName, // name of the dehumidifier unit
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		int & CompIndex
 	);

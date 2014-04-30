@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace DemandManager {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -58,7 +56,7 @@ namespace DemandManager {
 	struct DemandManagerListData
 	{
 		// Members
-		Fstring Name; // Name of DEMAND MANAGER LIST
+		std::string Name; // Name of DEMAND MANAGER LIST
 		int Meter; // Index to meter to demand limit
 		int LimitSchedule; // Schedule index for demand limit
 		Real64 SafetyFraction; // Multiplier applied to demand limit schedule
@@ -81,7 +79,6 @@ namespace DemandManager {
 
 		// Default Constructor
 		DemandManagerListData() :
-			Name( MaxNameLength ),
 			Meter( 0 ),
 			LimitSchedule( 0 ),
 			SafetyFraction( 1.0 ),
@@ -102,7 +99,7 @@ namespace DemandManager {
 
 		// Member Constructor
 		DemandManagerListData(
-			Fstring const & Name, // Name of DEMAND MANAGER LIST
+			std::string const & Name, // Name of DEMAND MANAGER LIST
 			int const Meter, // Index to meter to demand limit
 			int const LimitSchedule, // Schedule index for demand limit
 			Real64 const SafetyFraction, // Multiplier applied to demand limit schedule
@@ -123,7 +120,7 @@ namespace DemandManager {
 			Real64 const OverLimit, // Amount that demand limit is exceeded
 			Real64 const OverLimitDuration // Number of hours that demand limit is exceeded
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			Meter( Meter ),
 			LimitSchedule( LimitSchedule ),
 			SafetyFraction( SafetyFraction ),
@@ -150,7 +147,7 @@ namespace DemandManager {
 	struct DemandManagerData
 	{
 		// Members
-		Fstring Name; // Name of DEMAND MANAGER
+		std::string Name; // Name of DEMAND MANAGER
 		int Type; // Type of DEMAND MANAGER (:LIGHTS, :ELECTRICEQUIPMENT, etc.)
 		int DemandManagerList; // Reference to parent DEMAND MANAGER LIST for error checking
 		bool CanReduceDemand; // Flag to indicate whether manager can reduce demand
@@ -174,7 +171,6 @@ namespace DemandManager {
 
 		// Default Constructor
 		DemandManagerData() :
-			Name( MaxNameLength ),
 			Type( 0 ),
 			DemandManagerList( 0 ),
 			CanReduceDemand( false ),
@@ -196,7 +192,7 @@ namespace DemandManager {
 
 		// Member Constructor
 		DemandManagerData(
-			Fstring const & Name, // Name of DEMAND MANAGER
+			std::string const & Name, // Name of DEMAND MANAGER
 			int const Type, // Type of DEMAND MANAGER (:LIGHTS, :ELECTRICEQUIPMENT, etc.)
 			int const DemandManagerList, // Reference to parent DEMAND MANAGER LIST for error checking
 			bool const CanReduceDemand, // Flag to indicate whether manager can reduce demand
@@ -216,7 +212,7 @@ namespace DemandManager {
 			int const NumOfLoads, // Number of load objects
 			FArray1_int const & Load // Pointers to load objects
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			Type( Type ),
 			DemandManagerList( DemandManagerList ),
 			CanReduceDemand( CanReduceDemand ),

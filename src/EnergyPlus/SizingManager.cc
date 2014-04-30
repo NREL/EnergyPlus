@@ -5,6 +5,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <SizingManager.hh>
@@ -133,7 +134,7 @@ namespace SizingManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "ManageSizing: " );
+		static std::string const RoutineName( "ManageSizing: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS: none
 
@@ -156,7 +157,7 @@ namespace SizingManager {
 		static int AirLoopNum( 0 ); // air loop index
 		//  EXTERNAL            ReportZoneSizing
 		//  EXTERNAL            ReportSysSizing
-		Fstring curName( MaxNameLength );
+		std::string curName;
 		int NumSizingPeriodsPerformed;
 		int write_stat;
 		int numZoneSizeIter; // number of times to repeat zone sizing calcs. 1 normal, 2 load component reporting
@@ -286,7 +287,7 @@ namespace SizingManager {
 						}
 
 						gio::write( DayOfSimChr, "*" ) << DayOfSim;
-						DayOfSimChr = adjustl( DayOfSimChr );
+						strip( DayOfSimChr );
 						BeginDayFlag = true;
 						EndDayFlag = false;
 
@@ -296,10 +297,10 @@ namespace SizingManager {
 							if ( DayOfSim == 1 ) {
 								if ( ! isPulseZoneSizing ) {
 									DisplayString( "Performing Zone Sizing Simulation" );
-									DisplayString( "...for Sizing Period: #" + trim( RoundSigDigits( NumSizingPeriodsPerformed ) ) + " " + trim( EnvironmentName ) );
+									DisplayString( "...for Sizing Period: #" + RoundSigDigits( NumSizingPeriodsPerformed ) + ' ' + EnvironmentName );
 								} else {
 									DisplayString( "Performing Zone Sizing Simulation for Load Component Report" );
-									DisplayString( "...for Sizing Period: #" + trim( RoundSigDigits( NumSizingPeriodsPerformed ) ) + " " + trim( EnvironmentName ) );
+									DisplayString( "...for Sizing Period: #" + RoundSigDigits( NumSizingPeriodsPerformed ) + ' ' + EnvironmentName );
 								}
 							}
 							UpdateZoneSizing( BeginDay );
@@ -350,7 +351,7 @@ namespace SizingManager {
 								if ( ! WarmupFlag ) {
 									TimeStepInDay = ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
 									if ( HourOfDay == 1 && TimeStep == 1 ) {
-										DesDayWeath( CurOverallSimDay ).DateString = trim( TrimSigDigits( Month ) ) + "/" + trim( TrimSigDigits( DayOfMonth ) );
+										DesDayWeath( CurOverallSimDay ).DateString = TrimSigDigits( Month ) + '/' + TrimSigDigits( DayOfMonth );
 									}
 									DesDayWeath( CurOverallSimDay ).Temp( TimeStepInDay ) = OutDryBulbTemp;
 									DesDayWeath( CurOverallSimDay ).HumRat( TimeStepInDay ) = OutHumRat;
@@ -487,7 +488,7 @@ namespace SizingManager {
 						++CurEnvirNumSimDay;
 					}
 					gio::write( DayOfSimChr, "*" ) << DayOfSim;
-					DayOfSimChr = adjustl( DayOfSimChr );
+					strip( DayOfSimChr );
 					BeginDayFlag = true;
 					EndDayFlag = false;
 
@@ -496,7 +497,7 @@ namespace SizingManager {
 					} else { // (.NOT.WarmupFlag)
 						if ( DayOfSim == 1 ) {
 							DisplayString( "Calculating System sizing" );
-							DisplayString( "...for Sizing Period: #" + trim( RoundSigDigits( NumSizingPeriodsPerformed ) ) + " " + trim( EnvironmentName ) );
+							DisplayString( "...for Sizing Period: #" + RoundSigDigits( NumSizingPeriodsPerformed ) + ' ' + EnvironmentName );
 						}
 						UpdateSysSizing( BeginDay );
 					}
@@ -629,7 +630,7 @@ namespace SizingManager {
 				ReportSysSizing( curName, "Calculated Cooling Design Air Flow Rate [m3/s]", CalcSysSizing( AirLoopNum ).DesCoolVolFlow );
 				PreDefTableEntry( pdchSysSizCalcClAir, curName, CalcSysSizing( AirLoopNum ).DesCoolVolFlow );
 				if ( std::abs( CalcSysSizing( AirLoopNum ).DesCoolVolFlow ) <= 1.e-8 ) {
-					ShowWarningError( RoutineName + "Calculated Cooling Design Air Flow Rate for System=" + trim( FinalSysSizing( AirLoopNum ).AirPriLoopName ) + " is zero." );
+					ShowWarningError( RoutineName + "Calculated Cooling Design Air Flow Rate for System=" + FinalSysSizing( AirLoopNum ).AirPriLoopName + " is zero." );
 					ShowContinueError( "Check Sizing:Zone and ZoneControl:Thermostat inputs." );
 				}
 				ReportSysSizing( curName, "User Cooling Design Air Flow Rate [m3/s]", FinalSysSizing( AirLoopNum ).DesCoolVolFlow );
@@ -637,7 +638,7 @@ namespace SizingManager {
 				ReportSysSizing( curName, "Calculated Heating Design Air Flow Rate [m3/s]", CalcSysSizing( AirLoopNum ).DesHeatVolFlow );
 				PreDefTableEntry( pdchSysSizCalcHtAir, curName, CalcSysSizing( AirLoopNum ).DesHeatVolFlow );
 				if ( std::abs( CalcSysSizing( AirLoopNum ).DesHeatVolFlow ) <= 1.e-8 ) {
-					ShowWarningError( RoutineName + "Calculated Heating Design Air Flow Rate for System=" + trim( FinalSysSizing( AirLoopNum ).AirPriLoopName ) + " is zero." );
+					ShowWarningError( RoutineName + "Calculated Heating Design Air Flow Rate for System=" + FinalSysSizing( AirLoopNum ).AirPriLoopName + " is zero." );
 					ShowContinueError( "Check Sizing:Zone and ZoneControl:Thermostat inputs." );
 				}
 				ReportSysSizing( curName, "User Heating Design Air Flow Rate [m3/s]", FinalSysSizing( AirLoopNum ).DesHeatVolFlow );
@@ -703,7 +704,7 @@ namespace SizingManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetOARequirements: " ); // include trailing blank space
+		static std::string const RoutineName( "GetOARequirements: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -722,10 +723,10 @@ namespace SizingManager {
 		bool IsBlank; // Flag for blank name
 		//  REAL(r64) :: CalcAmt
 
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in getting objects
-		FArray1D_Fstring Alphas( sFstring( MaxNameLength ) ); // Alpha input items for object
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) ); // Numeric field names
+		std::string CurrentModuleObject; // for ease in getting objects
+		FArray1D_string Alphas; // Alpha input items for object
+		FArray1D_string cAlphaFields; // Alpha field names
+		FArray1D_string cNumericFields; // Numeric field names
 		FArray1D< Real64 > Numbers; // Numeric input items for object
 		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
@@ -735,11 +736,11 @@ namespace SizingManager {
 		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
-		Alphas = " ";
+		Alphas = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = " ";
+		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = " ";
+		cNumericFields = "";
 		Numbers.allocate( NumNumbers );
 		Numbers = 0.0;
 		lAlphaBlanks.allocate( NumAlphas );
@@ -755,7 +756,7 @@ namespace SizingManager {
 
 				GetObjectItem( CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-				VerifyName( Alphas( 1 ), OARequirements.Name(), OAIndex - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+				VerifyName( Alphas( 1 ), OARequirements.Name(), OAIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -777,8 +778,8 @@ namespace SizingManager {
 					} else if ( SameString( Alphas( 2 ), "Maximum" ) ) {
 						OARequirements( OAIndex ).OAFlowMethod = OAFlowMax;
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( OARequirements( OAIndex ).Name ) + "\"," );
-						ShowContinueError( "...Invalid " + trim( cAlphaFields( 2 ) ) + "=\"" + trim( Alphas( 2 ) ) + "\"," );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OARequirements( OAIndex ).Name + "\"," );
+						ShowContinueError( "...Invalid " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\"," );
 						ShowContinueError( "...Valid choices are Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, Maximum." );
 						ErrorsFound = true;
 					}
@@ -807,16 +808,16 @@ namespace SizingManager {
 						OARequirements( OAIndex ).OAFlowFracSchPtr = GetScheduleIndex( Alphas( 3 ) );
 						if ( OARequirements( OAIndex ).OAFlowFracSchPtr > 0 ) {
 							if ( ! CheckScheduleValueMinMax( OARequirements( OAIndex ).OAFlowFracSchPtr, ">=", 0.0, "<=", 1.0 ) ) {
-								ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( OARequirements( OAIndex ).Name ) + "\"," );
-								ShowContinueError( "Error found in " + trim( cAlphaFields( 3 ) ) + " = " + trim( Alphas( 3 ) ) );
+								ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OARequirements( OAIndex ).Name + "\"," );
+								ShowContinueError( "Error found in " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
 								ShowContinueError( "Schedule values must be (>=0., <=1.)" );
 								ErrorsFound = true;
 							} else {
 								OARequirements( OAIndex ).MaxOAFractionSchValue = GetScheduleMaxValue( OARequirements( OAIndex ).OAFlowFracSchPtr );
 							}
 						} else {
-							ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( OARequirements( OAIndex ).Name ) + "\"," );
-							ShowContinueError( "...Not Found " + trim( cAlphaFields( 3 ) ) + "=\"" + trim( Alphas( 3 ) ) + "\"." );
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OARequirements( OAIndex ).Name + "\"," );
+							ShowContinueError( "...Not Found " + cAlphaFields( 3 ) + "=\"" + Alphas( 3 ) + "\"." );
 							ErrorsFound = true;
 						}
 					}
@@ -876,7 +877,7 @@ namespace SizingManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetZoneAirDistribution: " ); // include trailing blank space
+		static std::string const RoutineName( "GetZoneAirDistribution: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -894,10 +895,10 @@ namespace SizingManager {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in getting objects
-		FArray1D_Fstring Alphas( sFstring( MaxNameLength ) ); // Alpha input items for object
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) ); // Numeric field names
+		std::string CurrentModuleObject; // for ease in getting objects
+		FArray1D_string Alphas; // Alpha input items for object
+		FArray1D_string cAlphaFields; // Alpha field names
+		FArray1D_string cNumericFields; // Numeric field names
 		FArray1D< Real64 > Numbers; // Numeric input items for object
 		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
@@ -907,11 +908,11 @@ namespace SizingManager {
 		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
-		Alphas = " ";
+		Alphas = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = " ";
+		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = " ";
+		cNumericFields = "";
 		Numbers.allocate( NumNumbers );
 		Numbers = 0.0;
 		lAlphaBlanks.allocate( NumAlphas );
@@ -927,7 +928,7 @@ namespace SizingManager {
 
 				GetObjectItem( CurrentModuleObject, ZADIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-				VerifyName( Alphas( 1 ), ZoneAirDistribution.Name(), ZADIndex - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+				VerifyName( Alphas( 1 ), ZoneAirDistribution.Name(), ZADIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -965,14 +966,14 @@ namespace SizingManager {
 						ZoneAirDistribution( ZADIndex ).ZoneADEffSchPtr = GetScheduleIndex( Alphas( 2 ) );
 						if ( ZoneAirDistribution( ZADIndex ).ZoneADEffSchPtr > 0 ) {
 							if ( ! CheckScheduleValueMinMax( ZoneAirDistribution( ZADIndex ).ZoneADEffSchPtr, ">", 0.0 ) ) {
-								ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( ZoneAirDistribution( ZADIndex ).Name ) + "\"," );
-								ShowContinueError( "Error found in " + trim( cAlphaFields( 2 ) ) + " = " + trim( Alphas( 2 ) ) );
+								ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + ZoneAirDistribution( ZADIndex ).Name + "\"," );
+								ShowContinueError( "Error found in " + cAlphaFields( 2 ) + " = " + Alphas( 2 ) );
 								ShowContinueError( "Schedule values must be >0.0)" );
 								ErrorsFound = true;
 							}
 						} else {
-							ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( ZoneAirDistribution( ZADIndex ).Name ) + "\"," );
-							ShowContinueError( "...Not Found " + trim( cAlphaFields( 2 ) ) + "=\"" + trim( Alphas( 2 ) ) + "\"." );
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + ZoneAirDistribution( ZADIndex ).Name + "\"," );
+							ShowContinueError( "...Not Found " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\"." );
 							ErrorsFound = true;
 						}
 					}
@@ -1067,11 +1068,11 @@ namespace SizingManager {
 			GlobalCoolSizingFactor = 1.0;
 			NumTimeStepsInAvg = NumOfTimeStepInHour;
 		} else {
-			ShowFatalError( trim( cCurrentModuleObject ) + ": More than 1 occurence of this object; only 1 allowed" );
+			ShowFatalError( cCurrentModuleObject + ": More than 1 occurence of this object; only 1 allowed" );
 		}
 
 		if ( NumTimeStepsInAvg < NumOfTimeStepInHour ) {
-			ShowWarningError( trim( cCurrentModuleObject ) + ": note " + trim( cNumericFieldNames( 3 ) ) + " entered value=[" + trim( RoundSigDigits( NumTimeStepsInAvg ) ) + "] is less than 1 hour (i.e., " + trim( RoundSigDigits( NumOfTimeStepInHour ) ) + " timesteps)." );
+			ShowWarningError( cCurrentModuleObject + ": note " + cNumericFieldNames( 3 ) + " entered value=[" + RoundSigDigits( NumTimeStepsInAvg ) + "] is less than 1 hour (i.e., " + RoundSigDigits( NumOfTimeStepInHour ) + " timesteps)." );
 		}
 
 		cCurrentModuleObject = "OutputControl:Sizing:Style";
@@ -1093,11 +1094,11 @@ namespace SizingManager {
 				cAlphaArgs( 1 ) = "Space";
 			} else {
 				SizingFileColSep = CharComma; //comma
-				ShowWarningError( trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 1 ) ) + " entered value=\"" + trim( cAlphaArgs( 1 ) ) + "\", Commas will be used to separate fields." );
+				ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + " entered value=\"" + cAlphaArgs( 1 ) + "\", Commas will be used to separate fields." );
 				cAlphaArgs( 1 ) = "Comma";
 			}
 			gio::write( OutputFileInits, "(A)" ) << "! <Sizing Output Files>,Style";
-			gio::write( OutputFileInits, "('Sizing Output Files,',A)" ) << trim( cAlphaArgs( 1 ) );
+			gio::write( OutputFileInits, "('Sizing Output Files,',A)" ) << cAlphaArgs( 1 );
 		}
 
 	}
@@ -1156,7 +1157,7 @@ namespace SizingManager {
 		int Item1;
 		int ZLItem;
 		bool errFlag;
-		FArray1D_Fstring ZoneNames( sFstring( MaxNameLength ) );
+		FArray1D_string ZoneNames;
 		int NumZones;
 		int NumZoneLists;
 		int OAIndex; // Index of design specification object
@@ -1165,7 +1166,7 @@ namespace SizingManager {
 		struct GlobalMiscObject
 		{
 			// Members
-			Fstring Name;
+			std::string Name;
 			int ZoneOrZoneListPtr;
 			int NumOfZones;
 			int StartPtr;
@@ -1173,7 +1174,6 @@ namespace SizingManager {
 
 			// Default Constructor
 			GlobalMiscObject() :
-				Name( MaxNameLength ),
 				ZoneOrZoneListPtr( 0 ),
 				NumOfZones( 0 ),
 				StartPtr( 0 ),
@@ -1182,13 +1182,13 @@ namespace SizingManager {
 
 			// Member Constructor
 			GlobalMiscObject(
-				Fstring const & Name,
+				std::string const & Name,
 				int const ZoneOrZoneListPtr,
 				int const NumOfZones,
 				int const StartPtr,
 				bool const ZoneListActive
 			) :
-				Name( MaxNameLength, Name ),
+				Name( Name ),
 				ZoneOrZoneListPtr( ZoneOrZoneListPtr ),
 				NumOfZones( NumOfZones ),
 				StartPtr( StartPtr ),
@@ -1217,7 +1217,7 @@ namespace SizingManager {
 			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SizingZoneObjects.Name(), Item - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SizingZoneObjects.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				errFlag = true;
@@ -1241,14 +1241,14 @@ namespace SizingManager {
 				SizingZoneObjects( Item ).ZoneListActive = true;
 				SizingZoneObjects( Item ).ZoneOrZoneListPtr = ZLItem;
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 1 ) ) + " not found." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 1 ) + " not found." );
 				ErrorsFound = true;
 				errFlag = true;
 			}
 		}
 
 		if ( errFlag ) {
-			ShowSevereError( "GetZoneSizingInput: Errors with invalid names in " + trim( cCurrentModuleObject ) + " objects." );
+			ShowSevereError( "GetZoneSizingInput: Errors with invalid names in " + cCurrentModuleObject + " objects." );
 			ShowContinueError( "...These will not be read in.  Other errors may occur." );
 			NumZoneSizingInput = 0;
 		}
@@ -1285,7 +1285,7 @@ namespace SizingManager {
 					}
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( ZoneSizingInput( ZoneSizIndex ).ZoneName, ZoneSizingInput.ZoneName(), ZoneSizIndex - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+					VerifyName( ZoneSizingInput( ZoneSizIndex ).ZoneName, ZoneSizingInput.ZoneName(), ZoneSizIndex - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1300,14 +1300,14 @@ namespace SizingManager {
 					//      \key SupplyAirTemperature
 					//      \key TemperatureDifference
 					//      \default SupplyAirTemperature
-					{ auto const SELECT_CASE_var( trim( cAlphaArgs( 2 ) ) );
+					{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );
 					if ( SELECT_CASE_var == "SUPPLYAIRTEMPERATURE" ) {
 						ZoneSizingInput( ZoneSizIndex ).ZnCoolDgnSAMethod = SupplyAirTemperature;
 					} else if ( SELECT_CASE_var == "TEMPERATUREDIFFERENCE" ) {
 						ZoneSizingInput( ZoneSizIndex ).ZnCoolDgnSAMethod = TemperatureDifference;
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-						ShowContinueError( "... incorrect " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\"" );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+						ShowContinueError( "... incorrect " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"" );
 						ShowContinueError( "... valid values are SupplyAirTemperature or TemperatureDifference." );
 						ErrorsFound = true;
 					}}
@@ -1319,8 +1319,8 @@ namespace SizingManager {
 					if ( lNumericFieldBlanks( 1 ) ) {
 						ZoneSizingInput( ZoneSizIndex ).CoolDesTemp = 0.0;
 					} else if ( rNumericArgs( 1 ) < 0.0 && ZoneSizingInput( ZoneSizIndex ).ZnCoolDgnSAMethod == SupplyAirTemperature ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-						ShowContinueError( "... incorrect " + trim( cNumericFieldNames( 1 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 1 ), 2 ) ) + "],  value should not be negative." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+						ShowContinueError( "... incorrect " + cNumericFieldNames( 1 ) + "=[" + RoundSigDigits( rNumericArgs( 1 ), 2 ) + "],  value should not be negative." );
 						ErrorsFound = true;
 					} else if ( rNumericArgs( 1 ) >= 0.0 && ZoneSizingInput( ZoneSizIndex ).ZnCoolDgnSAMethod == SupplyAirTemperature ) {
 						ZoneSizingInput( ZoneSizIndex ).CoolDesTemp = rNumericArgs( 1 );
@@ -1347,14 +1347,14 @@ namespace SizingManager {
 					//      \key SupplyAirTemperature
 					//      \key TemperatureDifference
 					//      \default SupplyAirTemperature
-					{ auto const SELECT_CASE_var( trim( cAlphaArgs( 3 ) ) );
+					{ auto const SELECT_CASE_var( cAlphaArgs( 3 ) );
 					if ( SELECT_CASE_var == "SUPPLYAIRTEMPERATURE" ) {
 						ZoneSizingInput( ZoneSizIndex ).ZnHeatDgnSAMethod = SupplyAirTemperature;
 					} else if ( SELECT_CASE_var == "TEMPERATUREDIFFERENCE" ) {
 						ZoneSizingInput( ZoneSizIndex ).ZnHeatDgnSAMethod = TemperatureDifference;
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-						ShowContinueError( "... incorrect " + trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( cAlphaArgs( 3 ) ) + "\"" );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+						ShowContinueError( "... incorrect " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"" );
 						ShowContinueError( "... valid values are SupplyAirTemperature or TemperatureDifference." );
 						ErrorsFound = true;
 					}}
@@ -1366,8 +1366,8 @@ namespace SizingManager {
 					if ( lNumericFieldBlanks( 3 ) ) {
 						ZoneSizingInput( ZoneSizIndex ).HeatDesTemp = 0.0;
 					} else if ( rNumericArgs( 3 ) < 0.0 && ZoneSizingInput( ZoneSizIndex ).ZnHeatDgnSAMethod == SupplyAirTemperature ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-						ShowContinueError( "... incorrect " + trim( cNumericFieldNames( 3 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 3 ), 2 ) ) + "],  value should not be negative." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+						ShowContinueError( "... incorrect " + cNumericFieldNames( 3 ) + "=[" + RoundSigDigits( rNumericArgs( 3 ), 2 ) + "],  value should not be negative." );
 						ErrorsFound = true;
 					} else if ( rNumericArgs( 3 ) >= 0.0 && ZoneSizingInput( ZoneSizIndex ).ZnHeatDgnSAMethod == SupplyAirTemperature ) {
 						ZoneSizingInput( ZoneSizIndex ).HeatDesTemp = rNumericArgs( 3 );
@@ -1396,8 +1396,8 @@ namespace SizingManager {
 					if ( lNumericFieldBlanks( 5 ) ) {
 						ZoneSizingInput( ZoneSizIndex ).CoolDesHumRat = 0.0;
 					} else if ( rNumericArgs( 5 ) < 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + ": incorrect " + trim( cNumericFieldNames( 5 ) ) + ": " + trim( RoundSigDigits( rNumericArgs( 5 ), 2 ) ) );
-						ShowContinueError( ".. value should not be negative. Occurs in Sizing Object=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( cCurrentModuleObject + ": incorrect " + cNumericFieldNames( 5 ) + ": " + RoundSigDigits( rNumericArgs( 5 ), 2 ) );
+						ShowContinueError( ".. value should not be negative. Occurs in Sizing Object=" + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).CoolDesHumRat = rNumericArgs( 5 );
@@ -1410,8 +1410,8 @@ namespace SizingManager {
 					if ( lNumericFieldBlanks( 6 ) ) {
 						ZoneSizingInput( ZoneSizIndex ).HeatDesHumRat = 0.0;
 					} else if ( rNumericArgs( 6 ) < 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + ": incorrect " + trim( cNumericFieldNames( 6 ) ) + ": " + trim( RoundSigDigits( rNumericArgs( 6 ), 2 ) ) );
-						ShowContinueError( ".. value should not be negative. Occurs in Sizing Object=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( cCurrentModuleObject + ": incorrect " + cNumericFieldNames( 6 ) + ": " + RoundSigDigits( rNumericArgs( 6 ), 2 ) );
+						ShowContinueError( ".. value should not be negative. Occurs in Sizing Object=" + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).HeatDesHumRat = rNumericArgs( 6 );
@@ -1431,8 +1431,8 @@ namespace SizingManager {
 							ZoneSizingInput( ZoneSizIndex ).DesOAFlow = OARequirements( OAIndex ).OAFlowPerZone;
 							ZoneSizingInput( ZoneSizIndex ).ZoneDesignSpecOAIndex = OAIndex;
 						} else {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-							ShowContinueError( "... incorrect " + trim( cAlphaFieldNames( 4 ) ) + "=\"" + trim( cAlphaArgs( 4 ) ) + "\"." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+							ShowContinueError( "... incorrect " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
 							ErrorsFound = true;
 						}
 					} else { // If no design spec object specified, i.e. no OA, then set OA method to None as default but flows to 0
@@ -1448,8 +1448,8 @@ namespace SizingManager {
 					if ( lNumericFieldBlanks( 7 ) || rNumericArgs( 7 ) == 0.0 ) {
 						ZoneSizingInput( ZoneSizIndex ).HeatSizingFactor = GlobalHeatSizingFactor;
 					} else if ( rNumericArgs( 7 ) < 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-						ShowContinueError( "... incorrect " + trim( cNumericFieldNames( 7 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 7 ), 2 ) ) + "],  value should not be negative." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+						ShowContinueError( "... incorrect " + cNumericFieldNames( 7 ) + "=[" + RoundSigDigits( rNumericArgs( 7 ), 2 ) + "],  value should not be negative." );
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).HeatSizingFactor = rNumericArgs( 7 );
@@ -1460,8 +1460,8 @@ namespace SizingManager {
 					if ( lNumericFieldBlanks( 8 ) || rNumericArgs( 8 ) == 0.0 ) {
 						ZoneSizingInput( ZoneSizIndex ).CoolSizingFactor = GlobalCoolSizingFactor;
 					} else if ( rNumericArgs( 8 ) < 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-						ShowContinueError( "... incorrect " + trim( cNumericFieldNames( 8 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 8 ), 2 ) ) + "],  value should not be negative." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+						ShowContinueError( "... incorrect " + cNumericFieldNames( 8 ) + "=[" + RoundSigDigits( rNumericArgs( 8 ), 2 ) + "],  value should not be negative." );
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).CoolSizingFactor = rNumericArgs( 8 );
@@ -1477,8 +1477,8 @@ namespace SizingManager {
 					if ( lNumericFieldBlanks( 9 ) ) {
 						ZoneSizingInput( ZoneSizIndex ).DesCoolAirFlow = 0.0;
 					} else if ( rNumericArgs( 9 ) < 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-						ShowContinueError( "... incorrect " + trim( cNumericFieldNames( 9 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 9 ), 2 ) ) + "],  value should not be negative." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+						ShowContinueError( "... incorrect " + cNumericFieldNames( 9 ) + "=[" + RoundSigDigits( rNumericArgs( 9 ), 2 ) + "],  value should not be negative." );
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).DesCoolAirFlow = rNumericArgs( 9 );
@@ -1497,8 +1497,8 @@ namespace SizingManager {
 							ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlowPerArea = rNumericArgs( 10 );
 						}
 					} else if ( rNumericArgs( 10 ) < 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-						ShowContinueError( "... incorrect " + trim( cNumericFieldNames( 108 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 10 ), 2 ) ) + "],  value should not be negative." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+						ShowContinueError( "... incorrect " + cNumericFieldNames( 108 ) + "=[" + RoundSigDigits( rNumericArgs( 10 ), 2 ) + "],  value should not be negative." );
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlowPerArea = rNumericArgs( 10 );
@@ -1512,8 +1512,8 @@ namespace SizingManager {
 					if ( lNumericFieldBlanks( 11 ) ) {
 						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlow = 0.0;
 					} else if ( rNumericArgs( 11 ) < 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-						ShowContinueError( "... incorrect " + trim( cNumericFieldNames( 11 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 11 ), 2 ) ) + "],  value should not be negative." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+						ShowContinueError( "... incorrect " + cNumericFieldNames( 11 ) + "=[" + RoundSigDigits( rNumericArgs( 11 ), 2 ) + "],  value should not be negative." );
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlow = rNumericArgs( 11 );
@@ -1528,8 +1528,8 @@ namespace SizingManager {
 					if ( lNumericFieldBlanks( 12 ) ) {
 						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlowFrac = 0.0;
 					} else if ( rNumericArgs( 12 ) < 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-						ShowContinueError( "... incorrect " + trim( cNumericFieldNames( 12 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 12 ), 2 ) ) + "],  value should not be negative." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+						ShowContinueError( "... incorrect " + cNumericFieldNames( 12 ) + "=[" + RoundSigDigits( rNumericArgs( 12 ), 2 ) + "],  value should not be negative." );
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlowFrac = rNumericArgs( 12 );
@@ -1545,8 +1545,8 @@ namespace SizingManager {
 					if ( lNumericFieldBlanks( 13 ) ) {
 						ZoneSizingInput( ZoneSizIndex ).DesHeatAirFlow = 0.0;
 					} else if ( rNumericArgs( 13 ) < 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-						ShowContinueError( "... incorrect " + trim( cNumericFieldNames( 13 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 13 ), 2 ) ) + "],  value should not be negative." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+						ShowContinueError( "... incorrect " + cNumericFieldNames( 13 ) + "=[" + RoundSigDigits( rNumericArgs( 13 ), 2 ) + "],  value should not be negative." );
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).DesHeatAirFlow = rNumericArgs( 13 );
@@ -1565,8 +1565,8 @@ namespace SizingManager {
 							ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlowPerArea = rNumericArgs( 14 );
 						}
 					} else if ( rNumericArgs( 14 ) < 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-						ShowContinueError( "... incorrect " + trim( cNumericFieldNames( 14 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 14 ), 2 ) ) + "],  value should not be negative." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+						ShowContinueError( "... incorrect " + cNumericFieldNames( 14 ) + "=[" + RoundSigDigits( rNumericArgs( 14 ), 2 ) + "],  value should not be negative." );
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlowPerArea = rNumericArgs( 14 );
@@ -1585,8 +1585,8 @@ namespace SizingManager {
 							ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlow = rNumericArgs( 15 );
 						}
 					} else if ( rNumericArgs( 15 ) < 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-						ShowContinueError( "... incorrect " + trim( cNumericFieldNames( 15 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 15 ), 2 ) ) + "],  value should not be negative." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+						ShowContinueError( "... incorrect " + cNumericFieldNames( 15 ) + "=[" + RoundSigDigits( rNumericArgs( 15 ), 2 ) + "],  value should not be negative." );
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlow = rNumericArgs( 15 );
@@ -1604,8 +1604,8 @@ namespace SizingManager {
 							ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlowFrac = rNumericArgs( 16 );
 						}
 					} else if ( rNumericArgs( 16 ) < 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-						ShowContinueError( "... incorrect " + trim( cNumericFieldNames( 16 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 16 ), 2 ) ) + "],  value should not be negative." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+						ShowContinueError( "... incorrect " + cNumericFieldNames( 16 ) + "=[" + RoundSigDigits( rNumericArgs( 16 ), 2 ) + "],  value should not be negative." );
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlowFrac = rNumericArgs( 16 );
@@ -1622,8 +1622,8 @@ namespace SizingManager {
 							ZoneSizingInput( ZoneSizIndex ).ZoneAirDistributionIndex = ObjIndex;
 						} else {
 							// generate a warning message
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-							ShowContinueError( "... not found " + trim( cAlphaFieldNames( 7 ) ) + "=\"" + trim( cAlphaArgs( 7 ) ) + "\"." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+							ShowContinueError( "... not found " + cAlphaFieldNames( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\"." );
 							ErrorsFound = true;
 						}
 					} else {
@@ -1633,7 +1633,7 @@ namespace SizingManager {
 						ZoneSizingInput( ZoneSizIndex ).ZoneSecondaryRecirculation = 0.0;
 					}
 
-					{ auto const SELECT_CASE_var( trim( cAlphaArgs( 5 ) ) );
+					{ auto const SELECT_CASE_var( cAlphaArgs( 5 ) );
 					if ( SELECT_CASE_var == "DESIGNDAY" ) {
 						ZoneSizingInput( ZoneSizIndex ).CoolAirDesMethod = FromDDCalc;
 					} else if ( SELECT_CASE_var == "FLOW/ZONE" ) {
@@ -1641,12 +1641,12 @@ namespace SizingManager {
 					} else if ( SELECT_CASE_var == "DESIGNDAYWITHLIMIT" ) {
 						ZoneSizingInput( ZoneSizIndex ).CoolAirDesMethod = DesAirFlowWithLim;
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-						ShowContinueError( "... incorrect " + trim( cAlphaFieldNames( 5 ) ) + "=\"" + trim( cAlphaArgs( 5 ) ) + "\"." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+						ShowContinueError( "... incorrect " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
 						ShowContinueError( "... valid values are DesignDay, Flow/Zone or DesignDayWithLimit." );
 						ErrorsFound = true;
 					}}
-					{ auto const SELECT_CASE_var( trim( cAlphaArgs( 6 ) ) );
+					{ auto const SELECT_CASE_var( cAlphaArgs( 6 ) );
 					if ( SELECT_CASE_var == "DESIGNDAY" ) {
 						ZoneSizingInput( ZoneSizIndex ).HeatAirDesMethod = FromDDCalc;
 					} else if ( SELECT_CASE_var == "FLOW/ZONE" ) {
@@ -1654,8 +1654,8 @@ namespace SizingManager {
 					} else if ( SELECT_CASE_var == "DESIGNDAYWITHLIMIT" ) {
 						ZoneSizingInput( ZoneSizIndex ).HeatAirDesMethod = DesAirFlowWithLim;
 					} else {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-						ShowContinueError( "... incorrect " + trim( cAlphaFieldNames( 6 ) ) + "=\"" + trim( cAlphaArgs( 6 ) ) + "\"." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+						ShowContinueError( "... incorrect " + cAlphaFieldNames( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\"." );
 						ShowContinueError( "... valid values are DesignDay, Flow/Zone or DesignDayWithLimit." );
 						ErrorsFound = true;
 					}}
@@ -1664,7 +1664,7 @@ namespace SizingManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( trim( cCurrentModuleObject ) + ": Errors found in getting input. Program terminates." );
+			ShowFatalError( cCurrentModuleObject + ": Errors found in getting input. Program terminates." );
 		}
 
 	}
@@ -1673,7 +1673,7 @@ namespace SizingManager {
 	GetZoneAndZoneListNames(
 		bool & ErrorsFound,
 		int & NumZones,
-		FArray1D_Fstring & ZoneNames,
+		FArray1D_string & ZoneNames,
 		int & NumZoneLists,
 		FArray1D< ZoneListData > & ZoneListNames
 	)
@@ -1832,14 +1832,14 @@ namespace SizingManager {
 			GetObjectItem( cCurrentModuleObject, SysSizIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SysSizInput.AirPriLoopName(), SysSizIndex - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SysSizInput.AirPriLoopName(), SysSizIndex - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 
 			SysSizInput( SysSizIndex ).AirPriLoopName = cAlphaArgs( 1 );
-			{ auto const SELECT_CASE_var( trim( cAlphaArgs( 2 ) ) );
+			{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );
 			if ( SELECT_CASE_var == "SENSIBLE" ) {
 				SysSizInput( SysSizIndex ).LoadSizeType = Sensible;
 			} else if ( SELECT_CASE_var == "LATENT" ) {
@@ -1849,41 +1849,41 @@ namespace SizingManager {
 			} else if ( SELECT_CASE_var == "VENTILATIONREQUIREMENT" ) {
 				SysSizInput( SysSizIndex ).LoadSizeType = Ventilation;
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-				ShowContinueError( "... incorrect " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\"." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+				ShowContinueError( "... incorrect " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ShowContinueError( "... valid values are Sensible, Latent, Total, or VentilationRequirement." );
 				ErrorsFound = true;
 			}}
-			{ auto const SELECT_CASE_var( trim( cAlphaArgs( 3 ) ) );
+			{ auto const SELECT_CASE_var( cAlphaArgs( 3 ) );
 			if ( SELECT_CASE_var == "COINCIDENT" ) {
 				SysSizInput( SysSizIndex ).SizingOption = Coincident;
 			} else if ( SELECT_CASE_var == "NONCOINCIDENT" ) {
 				SysSizInput( SysSizIndex ).SizingOption = NonCoincident;
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-				ShowContinueError( "... incorrect " + trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( cAlphaArgs( 3 ) ) + "\"." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+				ShowContinueError( "... incorrect " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
 				ShowContinueError( "... valid values are Coincident or NonCoincident." );
 				ErrorsFound = true;
 			}}
-			{ auto const SELECT_CASE_var( trim( cAlphaArgs( 4 ) ) );
+			{ auto const SELECT_CASE_var( cAlphaArgs( 4 ) );
 			if ( SELECT_CASE_var == "YES" ) {
 				SysSizInput( SysSizIndex ).CoolOAOption = 1;
 			} else if ( SELECT_CASE_var == "NO" ) {
 				SysSizInput( SysSizIndex ).CoolOAOption = 2;
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-				ShowContinueError( "... incorrect " + trim( cAlphaFieldNames( 4 ) ) + "=\"" + trim( cAlphaArgs( 4 ) ) + "\"." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+				ShowContinueError( "... incorrect " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
 				ShowContinueError( "... valid values are Yes or No." );
 				ErrorsFound = true;
 			}}
-			{ auto const SELECT_CASE_var( trim( cAlphaArgs( 5 ) ) );
+			{ auto const SELECT_CASE_var( cAlphaArgs( 5 ) );
 			if ( SELECT_CASE_var == "YES" ) {
 				SysSizInput( SysSizIndex ).HeatOAOption = 1;
 			} else if ( SELECT_CASE_var == "NO" ) {
 				SysSizInput( SysSizIndex ).HeatOAOption = 2;
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-				ShowContinueError( "... incorrect " + trim( cAlphaFieldNames( 5 ) ) + "=\"" + trim( cAlphaArgs( 5 ) ) + "\"." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+				ShowContinueError( "... incorrect " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
 				ShowContinueError( "... valid values are Yes or No." );
 				ErrorsFound = true;
 			}}
@@ -1895,8 +1895,8 @@ namespace SizingManager {
 			if ( lNumericFieldBlanks( 1 ) ) {
 				SysSizInput( SysSizIndex ).DesOutAirVolFlow = AutoSize;
 			} else if ( rNumericArgs( 1 ) < 0.0 && rNumericArgs( 1 ) != AutoSize ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-				ShowContinueError( "... incorrect " + trim( cNumericFieldNames( 1 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 1 ), 2 ) ) + "],  value should not be negative." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+				ShowContinueError( "... incorrect " + cNumericFieldNames( 1 ) + "=[" + RoundSigDigits( rNumericArgs( 1 ), 2 ) + "],  value should not be negative." );
 				ErrorsFound = true;
 			} else {
 				SysSizInput( SysSizIndex ).DesOutAirVolFlow = rNumericArgs( 1 );
@@ -1913,8 +1913,8 @@ namespace SizingManager {
 			if ( lNumericFieldBlanks( 2 ) ) {
 				SysSizInput( SysSizIndex ).SysAirMinFlowRat = 0.0;
 			} else if ( rNumericArgs( 2 ) < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-				ShowContinueError( "... incorrect " + trim( cNumericFieldNames( 2 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 2 ), 2 ) ) + "],  value should not be negative." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+				ShowContinueError( "... incorrect " + cNumericFieldNames( 2 ) + "=[" + RoundSigDigits( rNumericArgs( 2 ), 2 ) + "],  value should not be negative." );
 				ErrorsFound = true;
 			} else {
 				SysSizInput( SysSizIndex ).SysAirMinFlowRat = rNumericArgs( 2 );
@@ -1938,8 +1938,8 @@ namespace SizingManager {
 			if ( lNumericFieldBlanks( 11 ) ) {
 				SysSizInput( SysSizIndex ).DesCoolAirFlow = 0.0;
 			} else if ( rNumericArgs( 11 ) < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-				ShowContinueError( "... incorrect " + trim( cNumericFieldNames( 11 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 11 ), 2 ) ) + "],  value should not be negative." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+				ShowContinueError( "... incorrect " + cNumericFieldNames( 11 ) + "=[" + RoundSigDigits( rNumericArgs( 11 ), 2 ) + "],  value should not be negative." );
 				ErrorsFound = true;
 			} else {
 				SysSizInput( SysSizIndex ).DesCoolAirFlow = rNumericArgs( 11 );
@@ -1955,8 +1955,8 @@ namespace SizingManager {
 			if ( lNumericFieldBlanks( 12 ) ) {
 				SysSizInput( SysSizIndex ).DesHeatAirFlow = 0.0;
 			} else if ( rNumericArgs( 12 ) < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-				ShowContinueError( "... incorrect " + trim( cNumericFieldNames( 12 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 12 ), 2 ) ) + "],  value should not be negative." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+				ShowContinueError( "... incorrect " + cNumericFieldNames( 12 ) + "=[" + RoundSigDigits( rNumericArgs( 12 ), 2 ) + "],  value should not be negative." );
 				ErrorsFound = true;
 			} else {
 				SysSizInput( SysSizIndex ).DesHeatAirFlow = rNumericArgs( 12 );
@@ -1969,53 +1969,53 @@ namespace SizingManager {
 			if ( lNumericFieldBlanks( 13 ) ) {
 				SysSizInput( SysSizIndex ).MaxZoneOAFraction = 0.0;
 			} else if ( rNumericArgs( 13 ) < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-				ShowContinueError( "... incorrect " + trim( cNumericFieldNames( 13 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 13 ), 2 ) ) + "],  value should not be negative." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+				ShowContinueError( "... incorrect " + cNumericFieldNames( 13 ) + "=[" + RoundSigDigits( rNumericArgs( 13 ), 2 ) + "],  value should not be negative." );
 				ErrorsFound = true;
 			} else {
 				SysSizInput( SysSizIndex ).MaxZoneOAFraction = rNumericArgs( 13 );
 			}
-			{ auto const SELECT_CASE_var( trim( cAlphaArgs( 6 ) ) );
+			{ auto const SELECT_CASE_var( cAlphaArgs( 6 ) );
 			if ( SELECT_CASE_var == "DESIGNDAY" ) {
 				SysSizInput( SysSizIndex ).CoolAirDesMethod = FromDDCalc;
 			} else if ( SELECT_CASE_var == "FLOW/SYSTEM" ) {
 				SysSizInput( SysSizIndex ).CoolAirDesMethod = InpDesAirFlow;
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-				ShowContinueError( "... incorrect " + trim( cAlphaFieldNames( 6 ) ) + "=\"" + trim( cAlphaArgs( 6 ) ) + "\"." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+				ShowContinueError( "... incorrect " + cAlphaFieldNames( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\"." );
 				ShowContinueError( "... valid values are DesignDay or Flow/System." );
 				ErrorsFound = true;
 			}}
-			{ auto const SELECT_CASE_var( trim( cAlphaArgs( 7 ) ) );
+			{ auto const SELECT_CASE_var( cAlphaArgs( 7 ) );
 			if ( SELECT_CASE_var == "DESIGNDAY" ) {
 				SysSizInput( SysSizIndex ).HeatAirDesMethod = FromDDCalc;
 			} else if ( SELECT_CASE_var == "FLOW/SYSTEM" ) {
 				SysSizInput( SysSizIndex ).HeatAirDesMethod = InpDesAirFlow;
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-				ShowContinueError( "... incorrect " + trim( cAlphaFieldNames( 7 ) ) + "=\"" + trim( cAlphaArgs( 7 ) ) + "\"." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+				ShowContinueError( "... incorrect " + cAlphaFieldNames( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\"." );
 				ShowContinueError( "... valid values are DesignDay or Flow/System." );
 				ErrorsFound = true;
 			}}
-			{ auto const SELECT_CASE_var( trim( cAlphaArgs( 8 ) ) );
+			{ auto const SELECT_CASE_var( cAlphaArgs( 8 ) );
 			if ( SELECT_CASE_var == "ZONESUM" ) {
 				SysSizInput( SysSizIndex ).SystemOAMethod = SOAM_ZoneSum;
 			} else if ( SELECT_CASE_var == "VENTILATIONRATEPROCEDURE" ) {
 				SysSizInput( SysSizIndex ).SystemOAMethod = SOAM_VRP;
 				if ( SysSizInput( SysSizIndex ).DesOutAirVolFlow > 0 ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-					ShowContinueError( "SystemOAMethod is set to VRP and " + trim( cNumericFieldNames( 1 ) ) + " > 0, " " user entry will be ignored." );
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+					ShowContinueError( "SystemOAMethod is set to VRP and " + cNumericFieldNames( 1 ) + " > 0, " " user entry will be ignored." );
 				}
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-				ShowContinueError( "... incorrect " + trim( cAlphaFieldNames( 8 ) ) + "=\"" + trim( cAlphaArgs( 8 ) ) + "\"." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+				ShowContinueError( "... incorrect " + cAlphaFieldNames( 8 ) + "=\"" + cAlphaArgs( 8 ) + "\"." );
 				ShowContinueError( "... valid values are ZoneSum or VentilationRateProcedure." );
 				ErrorsFound = true;
 			}}
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( trim( cCurrentModuleObject ) + ": Errors found in getting input. Program terminates." );
+			ShowFatalError( cCurrentModuleObject + ": Errors found in getting input. Program terminates." );
 		}
 
 	}
@@ -2079,7 +2079,7 @@ namespace SizingManager {
 				ErrorsFound = true;
 			}
 			PlantSizData.allocate( NumPltSizInput );
-			PlantSizData.PlantLoopName() = " ";
+			PlantSizData.PlantLoopName() = "";
 			PlantSizData.ExitTemp() = 0.0;
 			PlantSizData.DeltaT() = 0.0;
 			PlantSizData.LoopType() = 0;
@@ -2090,7 +2090,7 @@ namespace SizingManager {
 			GetObjectItem( cCurrentModuleObject, PltSizIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PlantSizData.PlantLoopName(), PltSizIndex - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), PlantSizData.PlantLoopName(), PltSizIndex - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2098,7 +2098,7 @@ namespace SizingManager {
 			PlantSizData( PltSizIndex ).PlantLoopName = cAlphaArgs( 1 );
 			PlantSizData( PltSizIndex ).ExitTemp = rNumericArgs( 1 );
 			PlantSizData( PltSizIndex ).DeltaT = rNumericArgs( 2 );
-			{ auto const SELECT_CASE_var( trim( cAlphaArgs( 2 ) ) );
+			{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );
 			if ( SELECT_CASE_var == "HEATING" ) {
 				PlantSizData( PltSizIndex ).LoopType = HeatingLoop;
 			} else if ( SELECT_CASE_var == "COOLING" ) {
@@ -2108,8 +2108,8 @@ namespace SizingManager {
 			} else if ( SELECT_CASE_var == "STEAM" ) {
 				PlantSizData( PltSizIndex ).LoopType = SteamLoop;
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid data." );
-				ShowContinueError( "...incorrect " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\"." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+				ShowContinueError( "...incorrect " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ShowContinueError( "...Valid values are \"Heating\", \"Cooling\", \"Condenser\" or \"Steam\"." );
 				ErrorsFound = true;
 			}}
@@ -2118,7 +2118,7 @@ namespace SizingManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( trim( cCurrentModuleObject ) + ": Errors found in getting input. Program terminates." );
+			ShowFatalError( cCurrentModuleObject + ": Errors found in getting input. Program terminates." );
 		}
 
 	}
@@ -2235,14 +2235,14 @@ namespace SizingManager {
 
 	void
 	ReportZoneSizing(
-		Fstring const & ZoneName, // the name of the zone
-		Fstring const & LoadType, // the description of the input variable
+		std::string const & ZoneName, // the name of the zone
+		std::string const & LoadType, // the description of the input variable
 		Real64 const CalcDesLoad, // the value from the sizing calculation [W]
 		Real64 const UserDesLoad, // the value from the sizing calculation modified by user input [W]
 		Real64 const CalcDesFlow, // calculated design air flow rate [m3/s]
 		Real64 const UserDesFlow, // user input or modified design air flow rate [m3/s]
-		Fstring const & DesDayName, // the name of the design day that produced the peak
-		Fstring const & PeakHrMin, // time stamp of the peak
+		std::string const & DesDayName, // the name of the design day that produced the peak
+		std::string const & PeakHrMin, // time stamp of the peak
 		Real64 const PeakTemp, // temperature at peak [C]
 		Real64 const PeakHumRat, // humidity ratio at peak [kg water/kg dry air]
 		Real64 const FloorArea, // zone floor area [m2]
@@ -2291,15 +2291,15 @@ namespace SizingManager {
 		static bool MyOneTimeFlag( true );
 
 		// Formats
-		std::string const Format_990( "('! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, ','Calc Des Air Flow Rate {m3/s}, ','User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, ','Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}')" );
-		std::string const Format_991( "(' Zone Sizing Information',13(', ',A))" );
+		static gio::Fmt const Format_990( "('! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, ','Calc Des Air Flow Rate {m3/s}, ','User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, ','Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}')" );
+		static gio::Fmt const Format_991( "(' Zone Sizing Information',13(', ',A))" );
 
 		if ( MyOneTimeFlag ) {
 			gio::write( OutputFileInits, Format_990 );
 			MyOneTimeFlag = false;
 		}
 
-		gio::write( OutputFileInits, Format_991 ) << trim( ZoneName ) << trim( LoadType ) << trim( RoundSigDigits( CalcDesLoad, 5 ) ) << trim( RoundSigDigits( UserDesLoad, 5 ) ) << trim( RoundSigDigits( CalcDesFlow, 5 ) ) << trim( RoundSigDigits( UserDesFlow, 5 ) ) << trim( DesDayName ) << trim( PeakHrMin ) << trim( RoundSigDigits( PeakTemp, 5 ) ) << trim( RoundSigDigits( PeakHumRat, 5 ) ) << trim( RoundSigDigits( FloorArea, 5 ) ) << trim( RoundSigDigits( TotOccs, 5 ) ) << trim( RoundSigDigits( MinOAVolFlow, 5 ) );
+		gio::write( OutputFileInits, Format_991 ) << ZoneName << LoadType << RoundSigDigits( CalcDesLoad, 5 ) << RoundSigDigits( UserDesLoad, 5 ) << RoundSigDigits( CalcDesFlow, 5 ) << RoundSigDigits( UserDesFlow, 5 ) << DesDayName << PeakHrMin << RoundSigDigits( PeakTemp, 5 ) << RoundSigDigits( PeakHumRat, 5 ) << RoundSigDigits( FloorArea, 5 ) << RoundSigDigits( TotOccs, 5 ) << RoundSigDigits( MinOAVolFlow, 5 );
 
 		// BSLLC Start
 		if ( WriteOutputToSQLite ) {
@@ -2311,8 +2311,8 @@ namespace SizingManager {
 
 	void
 	ReportSysSizing(
-		Fstring const & SysName, // the name of the zone
-		Fstring const & VarDesc, // the description of the input variable
+		std::string const & SysName, // the name of the zone
+		std::string const & VarDesc, // the description of the input variable
 		Real64 const VarValue // the value from the sizing calculation
 	)
 	{
@@ -2357,15 +2357,15 @@ namespace SizingManager {
 		static bool MyOneTimeFlag( true );
 
 		// Formats
-		std::string const Format_990( "('! <System Sizing Information>, System Name, ','Field Description, Value')" );
-		std::string const Format_991( "(' System Sizing Information',3(', ',A))" );
+		static gio::Fmt const Format_990( "('! <System Sizing Information>, System Name, ','Field Description, Value')" );
+		static gio::Fmt const Format_991( "(' System Sizing Information',3(', ',A))" );
 
 		if ( MyOneTimeFlag ) {
 			gio::write( OutputFileInits, Format_990 );
 			MyOneTimeFlag = false;
 		}
 
-		gio::write( OutputFileInits, Format_991 ) << trim( SysName ) << trim( VarDesc ) << trim( RoundSigDigits( VarValue, 5 ) );
+		gio::write( OutputFileInits, Format_991 ) << SysName << VarDesc << RoundSigDigits( VarValue, 5 );
 
 		// BSLLC Start
 		if ( WriteOutputToSQLite ) AddSQLiteSystemSizingRecord( SysName, VarDesc, VarValue );

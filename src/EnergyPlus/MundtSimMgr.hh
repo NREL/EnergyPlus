@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray2D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -15,7 +14,6 @@ namespace EnergyPlus {
 namespace MundtSimMgr {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -63,7 +61,7 @@ namespace MundtSimMgr {
 	struct DefineLinearModelNode
 	{
 		// Members
-		Fstring AirNodeName; // Name of air nodes
+		std::string AirNodeName; // Name of air nodes
 		int ClassType; // Type of air nodes
 		Real64 Height; // Z coordinates [m] node's Control Vol. center
 		Real64 Temp; // Surface temperature BC
@@ -71,7 +69,6 @@ namespace MundtSimMgr {
 
 		// Default Constructor
 		DefineLinearModelNode() :
-			AirNodeName( MaxNameLength ),
 			ClassType( 0 ),
 			Height( 0.0 ),
 			Temp( 0.0 )
@@ -79,13 +76,13 @@ namespace MundtSimMgr {
 
 		// Member Constructor
 		DefineLinearModelNode(
-			Fstring const & AirNodeName, // Name of air nodes
+			std::string const & AirNodeName, // Name of air nodes
 			int const ClassType, // Type of air nodes
 			Real64 const Height, // Z coordinates [m] node's Control Vol. center
 			Real64 const Temp, // Surface temperature BC
 			FArray1_bool const & SurfMask // Limit of 60 surfaces at current sizing
 		) :
-			AirNodeName( MaxNameLength, AirNodeName ),
+			AirNodeName( AirNodeName ),
 			ClassType( ClassType ),
 			Height( Height ),
 			Temp( Temp ),

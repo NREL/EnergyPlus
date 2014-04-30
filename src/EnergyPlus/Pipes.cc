@@ -42,7 +42,6 @@ namespace Pipes {
 	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using namespace DataHVACGlobals;
 	using namespace DataLoopNode;
 	using DataPlant::TypeOf_Pipe;
@@ -76,7 +75,7 @@ namespace Pipes {
 	void
 	SimPipes(
 		int const CompType,
-		Fstring & PipeName,
+		std::string & PipeName,
 		int & CompIndex,
 		Real64 const MaxVolFlowRate,
 		bool const InitLoopEquip,
@@ -134,17 +133,17 @@ namespace Pipes {
 		if ( CompIndex == 0 ) {
 			PipeNum = FindItemInList( PipeName, LocalPipe.Name(), NumLocalPipes );
 			if ( PipeNum == 0 ) {
-				ShowFatalError( "SimPipes: Pipe requested not found =" + trim( PipeName ) ); // Catch any bad names before crashing
+				ShowFatalError( "SimPipes: Pipe requested not found =" + PipeName ); // Catch any bad names before crashing
 			}
 			CompIndex = PipeNum;
 		} else {
 			PipeNum = CompIndex;
 			if ( PipeNum > NumLocalPipes || PipeNum < 1 ) {
-				ShowFatalError( "SimPipes: Invalid CompIndex passed=" + trim( TrimSigDigits( PipeNum ) ) + ", Number of Pipes=" + trim( TrimSigDigits( NumLocalPipes ) ) + ", Pipe name=" + trim( PipeName ) );
+				ShowFatalError( "SimPipes: Invalid CompIndex passed=" + TrimSigDigits( PipeNum ) + ", Number of Pipes=" + TrimSigDigits( NumLocalPipes ) + ", Pipe name=" + PipeName );
 			}
 			if ( LocalPipe( PipeNum ).CheckEquipName ) {
 				if ( PipeName != LocalPipe( PipeNum ).Name ) {
-					ShowFatalError( "SimPipes: Invalid CompIndex passed=" + trim( TrimSigDigits( PipeNum ) ) + ", Pipe name=" + trim( PipeName ) + ", stored Pipe Name for that index=" + trim( LocalPipe( PipeNum ).Name ) );
+					ShowFatalError( "SimPipes: Invalid CompIndex passed=" + TrimSigDigits( PipeNum ) + ", Pipe name=" + PipeName + ", stored Pipe Name for that index=" + LocalPipe( PipeNum ).Name );
 				}
 				LocalPipe( PipeNum ).CheckEquipName = false;
 			}
@@ -155,7 +154,7 @@ namespace Pipes {
 			errFlag = false;
 			ScanPlantLoopsForObject( LocalPipe( PipeNum ).Name, CompType, LocalPipe( PipeNum ).LoopNum, LocalPipe( PipeNum ).LoopSide, LocalPipe( PipeNum ).BranchIndex, LocalPipe( PipeNum ).CompIndex, _, _, FoundOnLoop, _, _, errFlag );
 			if ( FoundOnLoop == 0 ) {
-				ShowFatalError( "SimPipes: Pipe=\"" + trim( PipeName ) + "\" not found on a Plant Loop." );
+				ShowFatalError( "SimPipes: Pipe=\"" + PipeName + "\" not found on a Plant Loop." );
 			}
 			if ( errFlag ) {
 				ShowFatalError( "SimPipes: Program terminated due to previous condition(s)." );
@@ -264,7 +263,7 @@ namespace Pipes {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), LocalPipe.Name(), PipeNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), LocalPipe.Name(), PipeNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -272,9 +271,9 @@ namespace Pipes {
 			LocalPipe( PipeNum ).Name = cAlphaArgs( 1 );
 			LocalPipe( PipeNum ).TypeOf = TypeOf_Pipe;
 
-			LocalPipe( PipeNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			LocalPipe( PipeNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Pipe Nodes" );
+			LocalPipe( PipeNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			LocalPipe( PipeNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Pipe Nodes" );
 		}
 
 		PipeNum = NumWaterPipes;
@@ -286,16 +285,16 @@ namespace Pipes {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), LocalPipe.Name(), PipeNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), LocalPipe.Name(), PipeNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 			LocalPipe( PipeNum ).Name = cAlphaArgs( 1 );
 			LocalPipe( PipeNum ).TypeOf = TypeOf_PipeSteam;
-			LocalPipe( PipeNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Steam, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			LocalPipe( PipeNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Steam, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Pipe Nodes" );
+			LocalPipe( PipeNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Steam, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			LocalPipe( PipeNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Steam, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Pipe Nodes" );
 		}
 
 		if ( ErrorsFound ) {
@@ -313,7 +312,7 @@ namespace Pipes {
 	void
 	InitializePipes(
 		int const PipeType, // Type of Pipe
-		Fstring const & PipeName, // Name of Pipe
+		std::string const & PipeName, // Name of Pipe
 		int & PipeNum, // Index into pipe structure for name
 		Real64 const MaxVolFlowRate // unused at present time
 	)
@@ -361,15 +360,15 @@ namespace Pipes {
 		if ( PipeNum == 0 ) {
 			PipeNum = FindItemInList( PipeName, LocalPipe.Name(), NumLocalPipes );
 			if ( PipeNum == 0 ) {
-				ShowFatalError( "SimPipes: Pipe requested not found =" + trim( PipeName ) ); // Catch any bad names before crashing
+				ShowFatalError( "SimPipes: Pipe requested not found =" + PipeName ); // Catch any bad names before crashing
 			}
 		} else {
 			if ( PipeNum > NumLocalPipes || PipeNum < 1 ) {
-				ShowFatalError( "InitializePipe: Invalid PipeNum passed=" + trim( TrimSigDigits( PipeNum ) ) + ", Number of Pipes=" + trim( TrimSigDigits( NumLocalPipes ) ) + ", Pipe name=" + trim( PipeName ) );
+				ShowFatalError( "InitializePipe: Invalid PipeNum passed=" + TrimSigDigits( PipeNum ) + ", Number of Pipes=" + TrimSigDigits( NumLocalPipes ) + ", Pipe name=" + PipeName );
 			}
 			if ( LocalPipe( PipeNum ).CheckEquipName ) {
 				if ( PipeName != LocalPipe( PipeNum ).Name ) {
-					ShowFatalError( "InitializePipe: Invalid PipeNum passed=" + trim( TrimSigDigits( PipeNum ) ) + ", Pipe name=" + trim( PipeName ) + ", stored Pipe Name for that index=" + trim( LocalPipe( PipeNum ).Name ) );
+					ShowFatalError( "InitializePipe: Invalid PipeNum passed=" + TrimSigDigits( PipeNum ) + ", Pipe name=" + PipeName + ", stored Pipe Name for that index=" + LocalPipe( PipeNum ).Name );
 				}
 				LocalPipe( PipeNum ).CheckEquipName = false;
 			}

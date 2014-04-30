@@ -77,7 +77,7 @@ public: // Creation
 				if ( format_->non_advancing() ) { // Non-advancing
 					format_->output_pos( stream_, pos_ ); // Move to virtual position
 				} else { // Advancing
-					stream_ << NL; // Add newline
+					stream_ << '\n'; // Add newline
 				}
 			}
 			delete format_;
@@ -165,7 +165,7 @@ public: // Operators
 	operator <<( FArray1S< T > const & t )
 	{
 		if ( stream_ && format_ ) {
-			for ( int i = 1, e = t.u(); i < e; ++i ) {
+			for ( int i = 1, e = t.u(); i <= e; ++i ) {
 				*this << t( i );
 				if ( ! stream_ ) break;
 			}
@@ -291,7 +291,7 @@ public: // Operators
 	operator <<( MArray1< A, T > const & t )
 	{
 		if ( stream_ && format_ ) {
-			for ( int i = 1, e = t.u(); i < e; ++i ) {
+			for ( int i = 1, e = t.u(); i <= e; ++i ) {
 				*this << t( i );
 				if ( ! stream_ ) break;
 			}

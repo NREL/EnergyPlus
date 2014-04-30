@@ -32,7 +32,6 @@ namespace DataSurfaces {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using namespace DataVectorTypes;
 	using namespace DataBSDFWindow;
 
@@ -68,7 +67,7 @@ namespace DataSurfaces {
 	int const OtherSideCondModeledExt( -4 );
 	int const GroundFCfactorMethod( -5 );
 
-	FArray1D_Fstring const cExtBoundCondition( {-5,0}, sFstring( 19 ), { "FCGround           ", "OSCM               ", "OSC                ", "OSC                ", "Ground             ", "ExternalEnvironment" } );
+	FArray1D_string const cExtBoundCondition( {-5,0}, { "FCGround", "OSCM", "OSC", "OSC", "Ground", "ExternalEnvironment" } );
 
 	// Parameters to indicate the first "corner" of a surface
 	// Currently, these are used only during input of surfaces
@@ -439,7 +438,7 @@ namespace DataSurfaces {
 
 	// Functions
 
-	Fstring
+	std::string
 	cSurfaceClass( int const ClassNo )
 	{
 
@@ -462,7 +461,7 @@ namespace DataSurfaces {
 		// na
 
 		// Return value
-		Fstring ClassName( 25 );
+		std::string ClassName;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:

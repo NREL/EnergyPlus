@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -15,7 +14,6 @@ namespace EnergyPlus {
 namespace SetPointManager {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS:
@@ -42,7 +40,7 @@ namespace SetPointManager {
 	extern int const iCtrlVarType_MinMassFlow; // control Type 'MinimumMassFlowRate'
 
 	extern int const NumValidCtrlTypes;
-	extern FArray1D_Fstring const cValidCtrlTypes;
+	extern FArray1D_string const cValidCtrlTypes;
 
 	// following are used to reduce string comparisons related to CtrlVarType
 	extern int const iSPMType_Scheduled;
@@ -74,7 +72,7 @@ namespace SetPointManager {
 	extern int const iSPMType_SZOneStageHeating;
 
 	extern int const NumValidSPMTypes;
-	extern FArray1D_Fstring const cValidSPMTypes;
+	extern FArray1D_string const cValidSPMTypes;
 
 	//Type declarations in SetPointManager module
 
@@ -130,41 +128,39 @@ namespace SetPointManager {
 	struct DataSetPointManager // Derived type for all Setpoint Managers
 	{
 		// Members
-		Fstring Name; // name of setpoint manager
+		std::string Name; // name of setpoint manager
 		int SPMType; // integer representing type of setpoint manager
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
 		int NumCtrlNodes; // number of control nodes
 		FArray1D_int CtrlNodes; // index to control node
 		int AirLoopNum; // index to air loop
-		Fstring AirLoopName; // name of air loop
+		std::string AirLoopName; // name of air loop
 
 		// Default Constructor
 		DataSetPointManager() :
-			Name( MaxNameLength ),
 			SPMType( 0 ),
 			CtrlTypeMode( 0 ),
 			NumCtrlNodes( 0 ),
-			AirLoopNum( 0 ),
-			AirLoopName( MaxNameLength )
+			AirLoopNum( 0 )
 		{}
 
 		// Member Constructor
 		DataSetPointManager(
-			Fstring const & Name, // name of setpoint manager
+			std::string const & Name, // name of setpoint manager
 			int const SPMType, // integer representing type of setpoint manager
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
 			int const NumCtrlNodes, // number of control nodes
 			FArray1_int const & CtrlNodes, // index to control node
 			int const AirLoopNum, // index to air loop
-			Fstring const & AirLoopName // name of air loop
+			std::string const & AirLoopName // name of air loop
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			SPMType( SPMType ),
 			CtrlTypeMode( CtrlTypeMode ),
 			NumCtrlNodes( NumCtrlNodes ),
 			CtrlNodes( CtrlNodes ),
 			AirLoopNum( AirLoopNum ),
-			AirLoopName( MaxNameLength, AirLoopName )
+			AirLoopName( AirLoopName )
 		{}
 
 	};
@@ -172,47 +168,43 @@ namespace SetPointManager {
 	struct DefineScheduledSetPointManager // Derived type for Scheduled Setpoint Manager data
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType;
+		std::string Name;
+		std::string CtrlVarType;
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
-		Fstring Sched;
+		std::string Sched;
 		int SchedPtr;
 		int NumCtrlNodes;
-		Fstring CtrlNodeListName;
+		std::string CtrlNodeListName;
 		FArray1D_int CtrlNodes;
 		Real64 SetPt;
 
 		// Default Constructor
 		DefineScheduledSetPointManager() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
-			Sched( MaxNameLength ),
 			SchedPtr( 0 ),
 			NumCtrlNodes( 0 ),
-			CtrlNodeListName( MaxNameLength ),
 			SetPt( 0.0 )
 		{}
 
 		// Member Constructor
 		DefineScheduledSetPointManager(
-			Fstring const & Name,
-			Fstring const & CtrlVarType,
+			std::string const & Name,
+			std::string const & CtrlVarType,
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			Fstring const & Sched,
+			std::string const & Sched,
 			int const SchedPtr,
 			int const NumCtrlNodes,
-			Fstring const & CtrlNodeListName,
+			std::string const & CtrlNodeListName,
 			FArray1_int const & CtrlNodes,
 			Real64 const SetPt
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
-			Sched( MaxNameLength, Sched ),
+			Sched( Sched ),
 			SchedPtr( SchedPtr ),
 			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodeListName( MaxNameLength, CtrlNodeListName ),
+			CtrlNodeListName( CtrlNodeListName ),
 			CtrlNodes( CtrlNodes ),
 			SetPt( SetPt )
 		{}
@@ -222,58 +214,53 @@ namespace SetPointManager {
 	struct DefineSchedDualSetPointManager // Derived type for Scheduled Dual Setpoint Manager
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType;
+		std::string Name;
+		std::string CtrlVarType;
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
-		Fstring SchedHi;
-		Fstring SchedLo;
+		std::string SchedHi;
+		std::string SchedLo;
 		int SchedPtrHi;
 		int SchedPtrLo;
 		int NumCtrlNodes;
-		Fstring CtrlNodeListName;
+		std::string CtrlNodeListName;
 		FArray1D_int CtrlNodes;
 		Real64 SetPtHi;
 		Real64 SetPtLo;
 
 		// Default Constructor
 		DefineSchedDualSetPointManager() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
-			SchedHi( MaxNameLength ),
-			SchedLo( MaxNameLength ),
 			SchedPtrHi( 0 ),
 			SchedPtrLo( 0 ),
 			NumCtrlNodes( 0 ),
-			CtrlNodeListName( MaxNameLength ),
 			SetPtHi( 0.0 ),
 			SetPtLo( 0.0 )
 		{}
 
 		// Member Constructor
 		DefineSchedDualSetPointManager(
-			Fstring const & Name,
-			Fstring const & CtrlVarType,
+			std::string const & Name,
+			std::string const & CtrlVarType,
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			Fstring const & SchedHi,
-			Fstring const & SchedLo,
+			std::string const & SchedHi,
+			std::string const & SchedLo,
 			int const SchedPtrHi,
 			int const SchedPtrLo,
 			int const NumCtrlNodes,
-			Fstring const & CtrlNodeListName,
+			std::string const & CtrlNodeListName,
 			FArray1_int const & CtrlNodes,
 			Real64 const SetPtHi,
 			Real64 const SetPtLo
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
-			SchedHi( MaxNameLength, SchedHi ),
-			SchedLo( MaxNameLength, SchedLo ),
+			SchedHi( SchedHi ),
+			SchedLo( SchedLo ),
 			SchedPtrHi( SchedPtrHi ),
 			SchedPtrLo( SchedPtrLo ),
 			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodeListName( MaxNameLength, CtrlNodeListName ),
+			CtrlNodeListName( CtrlNodeListName ),
 			CtrlNodes( CtrlNodes ),
 			SetPtHi( SetPtHi ),
 			SetPtLo( SetPtLo )
@@ -284,79 +271,75 @@ namespace SetPointManager {
 	struct DefineOutsideAirSetPointManager // Derived type for Outside Air Setpoint Manager Data
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType; // type of variable to be set
+		std::string Name;
+		std::string CtrlVarType; // type of variable to be set
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
 		Real64 OutLowSetPt1; // 1st setpoint at outside low
 		Real64 OutLow1; // 1st Outside low
 		Real64 OutHighSetPt1; // 1st setpoint at outside high
 		Real64 OutHigh1; // 1st Outside high
-		Fstring Sched; // Optional schedule
+		std::string Sched; // Optional schedule
 		int SchedPtr; // Schedule index
 		Real64 OutLowSetPt2; // 2nd setpoint at outside low (optional)
 		Real64 OutLow2; // 2nd Outside low (optional)
 		Real64 OutHighSetPt2; // 2nd setpoint at outside high (optional)
 		Real64 OutHigh2; // 2nd Outside high (optional)
 		int NumCtrlNodes;
-		Fstring CtrlNodeListName;
+		std::string CtrlNodeListName;
 		FArray1D_int CtrlNodes;
 		Real64 SetPt;
 
 		// Default Constructor
 		DefineOutsideAirSetPointManager() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
 			OutLowSetPt1( 0.0 ),
 			OutLow1( 0.0 ),
 			OutHighSetPt1( 0.0 ),
 			OutHigh1( 0.0 ),
-			Sched( MaxNameLength ),
 			SchedPtr( 0 ),
 			OutLowSetPt2( 0.0 ),
 			OutLow2( 0.0 ),
 			OutHighSetPt2( 0.0 ),
 			OutHigh2( 0.0 ),
 			NumCtrlNodes( 0 ),
-			CtrlNodeListName( MaxNameLength ),
 			SetPt( 0.0 )
 		{}
 
 		// Member Constructor
 		DefineOutsideAirSetPointManager(
-			Fstring const & Name,
-			Fstring const & CtrlVarType, // type of variable to be set
+			std::string const & Name,
+			std::string const & CtrlVarType, // type of variable to be set
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
 			Real64 const OutLowSetPt1, // 1st setpoint at outside low
 			Real64 const OutLow1, // 1st Outside low
 			Real64 const OutHighSetPt1, // 1st setpoint at outside high
 			Real64 const OutHigh1, // 1st Outside high
-			Fstring const & Sched, // Optional schedule
+			std::string const & Sched, // Optional schedule
 			int const SchedPtr, // Schedule index
 			Real64 const OutLowSetPt2, // 2nd setpoint at outside low (optional)
 			Real64 const OutLow2, // 2nd Outside low (optional)
 			Real64 const OutHighSetPt2, // 2nd setpoint at outside high (optional)
 			Real64 const OutHigh2, // 2nd Outside high (optional)
 			int const NumCtrlNodes,
-			Fstring const & CtrlNodeListName,
+			std::string const & CtrlNodeListName,
 			FArray1_int const & CtrlNodes,
 			Real64 const SetPt
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
 			OutLowSetPt1( OutLowSetPt1 ),
 			OutLow1( OutLow1 ),
 			OutHighSetPt1( OutHighSetPt1 ),
 			OutHigh1( OutHigh1 ),
-			Sched( MaxNameLength, Sched ),
+			Sched( Sched ),
 			SchedPtr( SchedPtr ),
 			OutLowSetPt2( OutLowSetPt2 ),
 			OutLow2( OutLow2 ),
 			OutHighSetPt2( OutHighSetPt2 ),
 			OutHigh2( OutHigh2 ),
 			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodeListName( MaxNameLength, CtrlNodeListName ),
+			CtrlNodeListName( CtrlNodeListName ),
 			CtrlNodes( CtrlNodes ),
 			SetPt( SetPt )
 		{}
@@ -366,10 +349,10 @@ namespace SetPointManager {
 	struct DefineSZReheatSetPointManager // Derived type for the Single Zone Reheat Setpoint Manager data
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType; // type of variable to be set
+		std::string Name;
+		std::string CtrlVarType; // type of variable to be set
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
-		Fstring ControlZoneName; // name of the control zone (zone with main thermostat)
+		std::string ControlZoneName; // name of the control zone (zone with main thermostat)
 		int ControlZoneNum; // number (index into Zone array) of control zone
 		int ZoneNodeNum; // zone node number
 		int ZoneInletNodeNum; // inlet node number for the SZRH air
@@ -388,10 +371,7 @@ namespace SetPointManager {
 
 		// Default Constructor
 		DefineSZReheatSetPointManager() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
-			ControlZoneName( MaxNameLength ),
 			ControlZoneNum( 0 ),
 			ZoneNodeNum( 0 ),
 			ZoneInletNodeNum( 0 ),
@@ -410,10 +390,10 @@ namespace SetPointManager {
 
 		// Member Constructor
 		DefineSZReheatSetPointManager(
-			Fstring const & Name,
-			Fstring const & CtrlVarType, // type of variable to be set
+			std::string const & Name,
+			std::string const & CtrlVarType, // type of variable to be set
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			Fstring const & ControlZoneName, // name of the control zone (zone with main thermostat)
+			std::string const & ControlZoneName, // name of the control zone (zone with main thermostat)
 			int const ControlZoneNum, // number (index into Zone array) of control zone
 			int const ZoneNodeNum, // zone node number
 			int const ZoneInletNodeNum, // inlet node number for the SZRH air
@@ -430,10 +410,10 @@ namespace SetPointManager {
 			FArray1_int const & CtrlNodes, // node numbers of nodes where setpoint is to be set
 			Real64 const SetPt // the setpoint
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
-			ControlZoneName( MaxNameLength, ControlZoneName ),
+			ControlZoneName( ControlZoneName ),
 			ControlZoneNum( ControlZoneNum ),
 			ZoneNodeNum( ZoneNodeNum ),
 			ZoneInletNodeNum( ZoneInletNodeNum ),
@@ -456,10 +436,10 @@ namespace SetPointManager {
 	struct DefineSZHeatingSetPointManager // Derived type for the Single Zone Heating Setpoint Manager data
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType; // type of variable to be set
+		std::string Name;
+		std::string CtrlVarType; // type of variable to be set
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
-		Fstring ControlZoneName; // name of the control zone (zone with main thermostat)
+		std::string ControlZoneName; // name of the control zone (zone with main thermostat)
 		int ControlZoneNum; // number (index into Zone array) of control zone
 		int ZoneNodeNum; // zone node number
 		int ZoneInletNodeNum; // inlet node number for the supply air
@@ -471,10 +451,7 @@ namespace SetPointManager {
 
 		// Default Constructor
 		DefineSZHeatingSetPointManager() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
-			ControlZoneName( MaxNameLength ),
 			ControlZoneNum( 0 ),
 			ZoneNodeNum( 0 ),
 			ZoneInletNodeNum( 0 ),
@@ -486,10 +463,10 @@ namespace SetPointManager {
 
 		// Member Constructor
 		DefineSZHeatingSetPointManager(
-			Fstring const & Name,
-			Fstring const & CtrlVarType, // type of variable to be set
+			std::string const & Name,
+			std::string const & CtrlVarType, // type of variable to be set
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			Fstring const & ControlZoneName, // name of the control zone (zone with main thermostat)
+			std::string const & ControlZoneName, // name of the control zone (zone with main thermostat)
 			int const ControlZoneNum, // number (index into Zone array) of control zone
 			int const ZoneNodeNum, // zone node number
 			int const ZoneInletNodeNum, // inlet node number for the supply air
@@ -499,10 +476,10 @@ namespace SetPointManager {
 			FArray1_int const & CtrlNodes, // node numbers of nodes where setpoint is to be set
 			Real64 const SetPt // the setpoint
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
-			ControlZoneName( MaxNameLength, ControlZoneName ),
+			ControlZoneName( ControlZoneName ),
 			ControlZoneNum( ControlZoneNum ),
 			ZoneNodeNum( ZoneNodeNum ),
 			ZoneInletNodeNum( ZoneInletNodeNum ),
@@ -518,10 +495,10 @@ namespace SetPointManager {
 	struct DefineSZCoolingSetPointManager // Derived type for the Single Zone Cooling Setpoint Manager data
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType; // type of variable to be set
+		std::string Name;
+		std::string CtrlVarType; // type of variable to be set
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
-		Fstring ControlZoneName; // name of the control zone (zone with main thermostat)
+		std::string ControlZoneName; // name of the control zone (zone with main thermostat)
 		int ControlZoneNum; // number (index into Zone array) of control zone
 		int ZoneNodeNum; // zone node number
 		int ZoneInletNodeNum; // inlet node number for the supply air
@@ -533,10 +510,7 @@ namespace SetPointManager {
 
 		// Default Constructor
 		DefineSZCoolingSetPointManager() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
-			ControlZoneName( MaxNameLength ),
 			ControlZoneNum( 0 ),
 			ZoneNodeNum( 0 ),
 			ZoneInletNodeNum( 0 ),
@@ -548,10 +522,10 @@ namespace SetPointManager {
 
 		// Member Constructor
 		DefineSZCoolingSetPointManager(
-			Fstring const & Name,
-			Fstring const & CtrlVarType, // type of variable to be set
+			std::string const & Name,
+			std::string const & CtrlVarType, // type of variable to be set
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			Fstring const & ControlZoneName, // name of the control zone (zone with main thermostat)
+			std::string const & ControlZoneName, // name of the control zone (zone with main thermostat)
 			int const ControlZoneNum, // number (index into Zone array) of control zone
 			int const ZoneNodeNum, // zone node number
 			int const ZoneInletNodeNum, // inlet node number for the supply air
@@ -561,10 +535,10 @@ namespace SetPointManager {
 			FArray1_int const & CtrlNodes, // node numbers of nodes where setpoint is to be set
 			Real64 const SetPt // the setpoint
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
-			ControlZoneName( MaxNameLength, ControlZoneName ),
+			ControlZoneName( ControlZoneName ),
 			ControlZoneNum( ControlZoneNum ),
 			ZoneNodeNum( ZoneNodeNum ),
 			ZoneInletNodeNum( ZoneInletNodeNum ),
@@ -580,8 +554,8 @@ namespace SetPointManager {
 	struct DefineSZMinHumSetPointManager // Derived Type for Single Zone Minimum Humidity Setpoint Manager data
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType; // type of variable to be set
+		std::string Name;
+		std::string CtrlVarType; // type of variable to be set
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
 		int NumZones; // number of zones whose humidity is being controlled
 		int NumCtrlNodes; // number of nodes whose humidity ratio is being set
@@ -593,8 +567,6 @@ namespace SetPointManager {
 
 		// Default Constructor
 		DefineSZMinHumSetPointManager() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
 			NumZones( 0 ),
 			NumCtrlNodes( 0 ),
@@ -603,8 +575,8 @@ namespace SetPointManager {
 
 		// Member Constructor
 		DefineSZMinHumSetPointManager(
-			Fstring const & Name,
-			Fstring const & CtrlVarType, // type of variable to be set
+			std::string const & Name,
+			std::string const & CtrlVarType, // type of variable to be set
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
 			int const NumZones, // number of zones whose humidity is being controlled
 			int const NumCtrlNodes, // number of nodes whose humidity ratio is being set
@@ -614,8 +586,8 @@ namespace SetPointManager {
 			FArray1_int const & CtrlNodes, // nodes where humidity ratio is being set
 			Real64 const SetPt // the setpoint
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
 			NumZones( NumZones ),
 			NumCtrlNodes( NumCtrlNodes ),
@@ -631,8 +603,8 @@ namespace SetPointManager {
 	struct DefineSZMaxHumSetPointManager // Derived Type for Single Zone Maximum Humidity Setpoint Manager data
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType; // type of variable to be set
+		std::string Name;
+		std::string CtrlVarType; // type of variable to be set
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
 		int NumZones; // number of zones whose humidity is being controlled
 		int NumCtrlNodes; // number of nodes whose humidity ratio is being set
@@ -644,8 +616,6 @@ namespace SetPointManager {
 
 		// Default Constructor
 		DefineSZMaxHumSetPointManager() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
 			NumZones( 0 ),
 			NumCtrlNodes( 0 ),
@@ -654,8 +624,8 @@ namespace SetPointManager {
 
 		// Member Constructor
 		DefineSZMaxHumSetPointManager(
-			Fstring const & Name,
-			Fstring const & CtrlVarType, // type of variable to be set
+			std::string const & Name,
+			std::string const & CtrlVarType, // type of variable to be set
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
 			int const NumZones, // number of zones whose humidity is being controlled
 			int const NumCtrlNodes, // number of nodes whose humidity ratio is being set
@@ -665,8 +635,8 @@ namespace SetPointManager {
 			FArray1_int const & CtrlNodes, // nodes where humidity ratio is being set
 			Real64 const SetPt // the setpoint
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
 			NumZones( NumZones ),
 			NumCtrlNodes( NumCtrlNodes ),
@@ -682,8 +652,8 @@ namespace SetPointManager {
 	struct DefineMixedAirSetPointManager
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType; // type of variable to be set
+		std::string Name;
+		std::string CtrlVarType; // type of variable to be set
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
 		int RefNode; // reference node number
 		int FanInNode; // supply fan inlet node number
@@ -695,8 +665,6 @@ namespace SetPointManager {
 
 		// Default Constructor
 		DefineMixedAirSetPointManager() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
 			RefNode( 0 ),
 			FanInNode( 0 ),
@@ -708,8 +676,8 @@ namespace SetPointManager {
 
 		// Member Constructor
 		DefineMixedAirSetPointManager(
-			Fstring const & Name,
-			Fstring const & CtrlVarType, // type of variable to be set
+			std::string const & Name,
+			std::string const & CtrlVarType, // type of variable to be set
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
 			int const RefNode, // reference node number
 			int const FanInNode, // supply fan inlet node number
@@ -719,8 +687,8 @@ namespace SetPointManager {
 			Real64 const SetPt, // the setpoint
 			bool const MySetPointCheckFlag // used for mixed air SPM test for missing SP
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
 			RefNode( RefNode ),
 			FanInNode( FanInNode ),
@@ -736,8 +704,8 @@ namespace SetPointManager {
 	struct DefineOAPretreatSetPointManager
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType; // type of variable to be set
+		std::string Name;
+		std::string CtrlVarType; // type of variable to be set
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
 		int RefNode; // reference node number
 		int MixedOutNode; // mixed air outlet node number
@@ -754,8 +722,6 @@ namespace SetPointManager {
 
 		// Default Constructor
 		DefineOAPretreatSetPointManager() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
 			RefNode( 0 ),
 			MixedOutNode( 0 ),
@@ -772,8 +738,8 @@ namespace SetPointManager {
 
 		// Member Constructor
 		DefineOAPretreatSetPointManager(
-			Fstring const & Name,
-			Fstring const & CtrlVarType, // type of variable to be set
+			std::string const & Name,
+			std::string const & CtrlVarType, // type of variable to be set
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
 			int const RefNode, // reference node number
 			int const MixedOutNode, // mixed air outlet node number
@@ -788,8 +754,8 @@ namespace SetPointManager {
 			Real64 const SetPt, // the setpoint
 			bool const MySetPointCheckFlag // used for DOAS SPM test for missing SP
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
 			RefNode( RefNode ),
 			MixedOutNode( MixedOutNode ),
@@ -810,10 +776,10 @@ namespace SetPointManager {
 	struct DefineWarmestSetPointManager
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType; // type of variable to be set
+		std::string Name;
+		std::string CtrlVarType; // type of variable to be set
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
-		Fstring AirLoopName; // name of air loop that will use "warmest zone" strategy
+		std::string AirLoopName; // name of air loop that will use "warmest zone" strategy
 		int AirLoopNum; // index of named air loop
 		Real64 MinSetTemp; // minimum supply air setpoint temperature
 		Real64 MaxSetTemp; // maximum supply air setpoint temperature
@@ -825,10 +791,7 @@ namespace SetPointManager {
 
 		// Default Constructor
 		DefineWarmestSetPointManager() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
-			AirLoopName( MaxNameLength ),
 			AirLoopNum( 0 ),
 			MinSetTemp( 0.0 ),
 			MaxSetTemp( 0.0 ),
@@ -839,10 +802,10 @@ namespace SetPointManager {
 
 		// Member Constructor
 		DefineWarmestSetPointManager(
-			Fstring const & Name,
-			Fstring const & CtrlVarType, // type of variable to be set
+			std::string const & Name,
+			std::string const & CtrlVarType, // type of variable to be set
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			Fstring const & AirLoopName, // name of air loop that will use "warmest zone" strategy
+			std::string const & AirLoopName, // name of air loop that will use "warmest zone" strategy
 			int const AirLoopNum, // index of named air loop
 			Real64 const MinSetTemp, // minimum supply air setpoint temperature
 			Real64 const MaxSetTemp, // maximum supply air setpoint temperature
@@ -851,10 +814,10 @@ namespace SetPointManager {
 			FArray1_int const & CtrlNodes, // nodes where temperature is being set
 			Real64 const SetPt // the setpoint
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
-			AirLoopName( MaxNameLength, AirLoopName ),
+			AirLoopName( AirLoopName ),
 			AirLoopNum( AirLoopNum ),
 			MinSetTemp( MinSetTemp ),
 			MaxSetTemp( MaxSetTemp ),
@@ -869,10 +832,10 @@ namespace SetPointManager {
 	struct DefineColdestSetPointManager
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType; // type of variable to be set
+		std::string Name;
+		std::string CtrlVarType; // type of variable to be set
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
-		Fstring AirLoopName; // name of air loop that will use "coldest zone" strategy
+		std::string AirLoopName; // name of air loop that will use "coldest zone" strategy
 		int AirLoopNum; // index of named air loop
 		Real64 MinSetTemp; // minimum supply air setpoint temperature
 		Real64 MaxSetTemp; // maximum supply air setpoint temperature
@@ -884,10 +847,7 @@ namespace SetPointManager {
 
 		// Default Constructor
 		DefineColdestSetPointManager() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
-			AirLoopName( MaxNameLength ),
 			AirLoopNum( 0 ),
 			MinSetTemp( 0.0 ),
 			MaxSetTemp( 0.0 ),
@@ -898,10 +858,10 @@ namespace SetPointManager {
 
 		// Member Constructor
 		DefineColdestSetPointManager(
-			Fstring const & Name,
-			Fstring const & CtrlVarType, // type of variable to be set
+			std::string const & Name,
+			std::string const & CtrlVarType, // type of variable to be set
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			Fstring const & AirLoopName, // name of air loop that will use "coldest zone" strategy
+			std::string const & AirLoopName, // name of air loop that will use "coldest zone" strategy
 			int const AirLoopNum, // index of named air loop
 			Real64 const MinSetTemp, // minimum supply air setpoint temperature
 			Real64 const MaxSetTemp, // maximum supply air setpoint temperature
@@ -910,10 +870,10 @@ namespace SetPointManager {
 			FArray1_int const & CtrlNodes, // nodes where temperature is being set
 			Real64 const SetPt // the setpoint
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
-			AirLoopName( MaxNameLength, AirLoopName ),
+			AirLoopName( AirLoopName ),
 			AirLoopNum( AirLoopNum ),
 			MinSetTemp( MinSetTemp ),
 			MaxSetTemp( MaxSetTemp ),
@@ -928,10 +888,10 @@ namespace SetPointManager {
 	struct DefWarmestSetPtManagerTempFlow
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType; // type of variable to be set
+		std::string Name;
+		std::string CtrlVarType; // type of variable to be set
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
-		Fstring AirLoopName; // name of air loop that will use "warmest zone" strategy
+		std::string AirLoopName; // name of air loop that will use "warmest zone" strategy
 		int AirLoopNum; // index of named air loop
 		Real64 MinSetTemp; // minimum supply air setpoint temperature
 		Real64 MaxSetTemp; // maximum supply air setpoint temperature
@@ -947,10 +907,7 @@ namespace SetPointManager {
 
 		// Default Constructor
 		DefWarmestSetPtManagerTempFlow() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
-			AirLoopName( MaxNameLength ),
 			AirLoopNum( 0 ),
 			MinSetTemp( 0.0 ),
 			MaxSetTemp( 0.0 ),
@@ -965,10 +922,10 @@ namespace SetPointManager {
 
 		// Member Constructor
 		DefWarmestSetPtManagerTempFlow(
-			Fstring const & Name,
-			Fstring const & CtrlVarType, // type of variable to be set
+			std::string const & Name,
+			std::string const & CtrlVarType, // type of variable to be set
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			Fstring const & AirLoopName, // name of air loop that will use "warmest zone" strategy
+			std::string const & AirLoopName, // name of air loop that will use "warmest zone" strategy
 			int const AirLoopNum, // index of named air loop
 			Real64 const MinSetTemp, // minimum supply air setpoint temperature
 			Real64 const MaxSetTemp, // maximum supply air setpoint temperature
@@ -981,10 +938,10 @@ namespace SetPointManager {
 			int const CritZoneNum,
 			bool const SimReady
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
-			AirLoopName( MaxNameLength, AirLoopName ),
+			AirLoopName( AirLoopName ),
 			AirLoopNum( AirLoopNum ),
 			MinSetTemp( MinSetTemp ),
 			MaxSetTemp( MaxSetTemp ),
@@ -1003,14 +960,14 @@ namespace SetPointManager {
 	struct DefRABFlowSetPointManager
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType; // type of variable to be set
+		std::string Name;
+		std::string CtrlVarType; // type of variable to be set
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
 		int NumCtrlNodes; // number of nodes whose temperature is being set
 		FArray1D_int CtrlNodes; // nodes where temperature is being set
-		Fstring AirLoopName; // name of air loop that will use "warmest zone" strategy
+		std::string AirLoopName; // name of air loop that will use "warmest zone" strategy
 		int AirLoopNum; // index of named air loop
-		Fstring Sched; // name of a schedule of supply air setpoint temperatures
+		std::string Sched; // name of a schedule of supply air setpoint temperatures
 		int SchedPtr; // index of the above schedule
 		Real64 FlowSetPt; // mass flow rate setpoint (kg/s)
 		int RABMixInNode;
@@ -1022,13 +979,9 @@ namespace SetPointManager {
 
 		// Default Constructor
 		DefRABFlowSetPointManager() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
 			NumCtrlNodes( 0 ),
-			AirLoopName( MaxNameLength ),
 			AirLoopNum( 0 ),
-			Sched( MaxNameLength ),
 			SchedPtr( 0 ),
 			FlowSetPt( 0.0 ),
 			RABMixInNode( 0 ),
@@ -1041,14 +994,14 @@ namespace SetPointManager {
 
 		// Member Constructor
 		DefRABFlowSetPointManager(
-			Fstring const & Name,
-			Fstring const & CtrlVarType, // type of variable to be set
+			std::string const & Name,
+			std::string const & CtrlVarType, // type of variable to be set
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
 			int const NumCtrlNodes, // number of nodes whose temperature is being set
 			FArray1_int const & CtrlNodes, // nodes where temperature is being set
-			Fstring const & AirLoopName, // name of air loop that will use "warmest zone" strategy
+			std::string const & AirLoopName, // name of air loop that will use "warmest zone" strategy
 			int const AirLoopNum, // index of named air loop
-			Fstring const & Sched, // name of a schedule of supply air setpoint temperatures
+			std::string const & Sched, // name of a schedule of supply air setpoint temperatures
 			int const SchedPtr, // index of the above schedule
 			Real64 const FlowSetPt, // mass flow rate setpoint (kg/s)
 			int const RABMixInNode,
@@ -1058,14 +1011,14 @@ namespace SetPointManager {
 			int const SysOutNode,
 			int const AllSetPtMgrIndex // index of RAB SP manager in AllSetPtMgr structure
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
 			NumCtrlNodes( NumCtrlNodes ),
 			CtrlNodes( CtrlNodes ),
-			AirLoopName( MaxNameLength, AirLoopName ),
+			AirLoopName( AirLoopName ),
 			AirLoopNum( AirLoopNum ),
-			Sched( MaxNameLength, Sched ),
+			Sched( Sched ),
 			SchedPtr( SchedPtr ),
 			FlowSetPt( FlowSetPt ),
 			RABMixInNode( RABMixInNode ),
@@ -1081,10 +1034,10 @@ namespace SetPointManager {
 	struct DefMultiZoneAverageCoolingSetPointManager // derived type for SetpointManager:Multizone:Cooling:Average data
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType; // type of variable to be set
+		std::string Name;
+		std::string CtrlVarType; // type of variable to be set
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
-		Fstring AirLoopName; // name of air loop that will use "MultiZone:Cooling:Average" strategy
+		std::string AirLoopName; // name of air loop that will use "MultiZone:Cooling:Average" strategy
 		int AirLoopNum; // index of named air loop
 		Real64 MinSetTemp; // minimum supply air setpoint temperature [C]
 		Real64 MaxSetTemp; // maximum supply air setpoint temperature [C]
@@ -1094,10 +1047,7 @@ namespace SetPointManager {
 
 		// Default Constructor
 		DefMultiZoneAverageCoolingSetPointManager() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
-			AirLoopName( MaxNameLength ),
 			AirLoopNum( 0 ),
 			MinSetTemp( 0.0 ),
 			MaxSetTemp( 0.0 ),
@@ -1107,10 +1057,10 @@ namespace SetPointManager {
 
 		// Member Constructor
 		DefMultiZoneAverageCoolingSetPointManager(
-			Fstring const & Name,
-			Fstring const & CtrlVarType, // type of variable to be set
+			std::string const & Name,
+			std::string const & CtrlVarType, // type of variable to be set
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			Fstring const & AirLoopName, // name of air loop that will use "MultiZone:Cooling:Average" strategy
+			std::string const & AirLoopName, // name of air loop that will use "MultiZone:Cooling:Average" strategy
 			int const AirLoopNum, // index of named air loop
 			Real64 const MinSetTemp, // minimum supply air setpoint temperature [C]
 			Real64 const MaxSetTemp, // maximum supply air setpoint temperature [C]
@@ -1118,10 +1068,10 @@ namespace SetPointManager {
 			FArray1_int const & CtrlNodes, // nodes where temperature is being set
 			Real64 const SetPt // the temperature setpoint [C]
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
-			AirLoopName( MaxNameLength, AirLoopName ),
+			AirLoopName( AirLoopName ),
 			AirLoopNum( AirLoopNum ),
 			MinSetTemp( MinSetTemp ),
 			MaxSetTemp( MaxSetTemp ),
@@ -1135,10 +1085,10 @@ namespace SetPointManager {
 	struct DefMultiZoneAverageHeatingSetPointManager // derived type for SetpointManager:Multizone:Heating:Average data
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType; // type of variable to be set
+		std::string Name;
+		std::string CtrlVarType; // type of variable to be set
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
-		Fstring AirLoopName; // name of air loop that will use "MultiZone:Heating:Average" strategy
+		std::string AirLoopName; // name of air loop that will use "MultiZone:Heating:Average" strategy
 		int AirLoopNum; // index of named air loop
 		Real64 MinSetTemp; // minimum supply air setpoint temperature [C]
 		Real64 MaxSetTemp; // maximum supply air setpoint temperature [C]
@@ -1148,10 +1098,7 @@ namespace SetPointManager {
 
 		// Default Constructor
 		DefMultiZoneAverageHeatingSetPointManager() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
-			AirLoopName( MaxNameLength ),
 			AirLoopNum( 0 ),
 			MinSetTemp( 0.0 ),
 			MaxSetTemp( 0.0 ),
@@ -1161,10 +1108,10 @@ namespace SetPointManager {
 
 		// Member Constructor
 		DefMultiZoneAverageHeatingSetPointManager(
-			Fstring const & Name,
-			Fstring const & CtrlVarType, // type of variable to be set
+			std::string const & Name,
+			std::string const & CtrlVarType, // type of variable to be set
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			Fstring const & AirLoopName, // name of air loop that will use "MultiZone:Heating:Average" strategy
+			std::string const & AirLoopName, // name of air loop that will use "MultiZone:Heating:Average" strategy
 			int const AirLoopNum, // index of named air loop
 			Real64 const MinSetTemp, // minimum supply air setpoint temperature [C]
 			Real64 const MaxSetTemp, // maximum supply air setpoint temperature [C]
@@ -1172,10 +1119,10 @@ namespace SetPointManager {
 			FArray1_int const & CtrlNodes, // nodes where temperature is being set
 			Real64 const SetPt // the temperature setpoint [C]
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
-			AirLoopName( MaxNameLength, AirLoopName ),
+			AirLoopName( AirLoopName ),
 			AirLoopNum( AirLoopNum ),
 			MinSetTemp( MinSetTemp ),
 			MaxSetTemp( MaxSetTemp ),
@@ -1189,10 +1136,10 @@ namespace SetPointManager {
 	struct DefMultiZoneAverageMinHumSetPointManager // derived type for SetpointManager:MultiZone:MinimumHumidity:Average data
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType; // type of variable to be set
+		std::string Name;
+		std::string CtrlVarType; // type of variable to be set
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
-		Fstring AirLoopName; // name of air loop using MultiZone:MinimumHumidity:Average strategy
+		std::string AirLoopName; // name of air loop using MultiZone:MinimumHumidity:Average strategy
 		int AirLoopNum; // index of named air loop
 		Real64 MinSetHum; // minimum supply air humidity ratio [kg/kg]
 		Real64 MaxSetHum; // maximum supply air humidity ratio [kg/kg]
@@ -1202,10 +1149,7 @@ namespace SetPointManager {
 
 		// Default Constructor
 		DefMultiZoneAverageMinHumSetPointManager() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
-			AirLoopName( MaxNameLength ),
 			AirLoopNum( 0 ),
 			MinSetHum( 0.0 ),
 			MaxSetHum( 0.0 ),
@@ -1215,10 +1159,10 @@ namespace SetPointManager {
 
 		// Member Constructor
 		DefMultiZoneAverageMinHumSetPointManager(
-			Fstring const & Name,
-			Fstring const & CtrlVarType, // type of variable to be set
+			std::string const & Name,
+			std::string const & CtrlVarType, // type of variable to be set
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			Fstring const & AirLoopName, // name of air loop using MultiZone:MinimumHumidity:Average strategy
+			std::string const & AirLoopName, // name of air loop using MultiZone:MinimumHumidity:Average strategy
 			int const AirLoopNum, // index of named air loop
 			Real64 const MinSetHum, // minimum supply air humidity ratio [kg/kg]
 			Real64 const MaxSetHum, // maximum supply air humidity ratio [kg/kg]
@@ -1226,10 +1170,10 @@ namespace SetPointManager {
 			FArray1_int const & CtrlNodes, // nodes where humidity ratio is being set
 			Real64 const SetPt // the humidity ratio setpoint [kg/kg]
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
-			AirLoopName( MaxNameLength, AirLoopName ),
+			AirLoopName( AirLoopName ),
 			AirLoopNum( AirLoopNum ),
 			MinSetHum( MinSetHum ),
 			MaxSetHum( MaxSetHum ),
@@ -1243,10 +1187,10 @@ namespace SetPointManager {
 	struct DefMultiZoneAverageMaxHumSetPointManager // derived type for SetpointManager:MultiZone:MaximumHumidity:Average data
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType; // type of variable to be set
+		std::string Name;
+		std::string CtrlVarType; // type of variable to be set
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
-		Fstring AirLoopName; // name of air loop using MultiZone:MaximumHumidity:Average strategy
+		std::string AirLoopName; // name of air loop using MultiZone:MaximumHumidity:Average strategy
 		int AirLoopNum; // index of named air loop
 		Real64 MinSetHum; // minimum supply air humidity ratio [kg/kg]
 		Real64 MaxSetHum; // maximum supply air humidity ratio [kg/kg]
@@ -1256,10 +1200,7 @@ namespace SetPointManager {
 
 		// Default Constructor
 		DefMultiZoneAverageMaxHumSetPointManager() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
-			AirLoopName( MaxNameLength ),
 			AirLoopNum( 0 ),
 			MinSetHum( 0.0 ),
 			MaxSetHum( 0.0 ),
@@ -1269,10 +1210,10 @@ namespace SetPointManager {
 
 		// Member Constructor
 		DefMultiZoneAverageMaxHumSetPointManager(
-			Fstring const & Name,
-			Fstring const & CtrlVarType, // type of variable to be set
+			std::string const & Name,
+			std::string const & CtrlVarType, // type of variable to be set
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			Fstring const & AirLoopName, // name of air loop using MultiZone:MaximumHumidity:Average strategy
+			std::string const & AirLoopName, // name of air loop using MultiZone:MaximumHumidity:Average strategy
 			int const AirLoopNum, // index of named air loop
 			Real64 const MinSetHum, // minimum supply air humidity ratio [kg/kg]
 			Real64 const MaxSetHum, // maximum supply air humidity ratio [kg/kg]
@@ -1280,10 +1221,10 @@ namespace SetPointManager {
 			FArray1_int const & CtrlNodes, // nodes where humidity ratio is being set
 			Real64 const SetPt // the humidity ratio setpoint [kg/kg]
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
-			AirLoopName( MaxNameLength, AirLoopName ),
+			AirLoopName( AirLoopName ),
 			AirLoopNum( AirLoopNum ),
 			MinSetHum( MinSetHum ),
 			MaxSetHum( MaxSetHum ),
@@ -1297,10 +1238,10 @@ namespace SetPointManager {
 	struct DefMultiZoneMinHumSetPointManager // derived type for SetpointManager:MultiZone:Humidity:Minimum data
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType; // type of variable to be set
+		std::string Name;
+		std::string CtrlVarType; // type of variable to be set
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
-		Fstring AirLoopName; // name of air loop using SetpointManager:MultiZone:Humidity:Minimum
+		std::string AirLoopName; // name of air loop using SetpointManager:MultiZone:Humidity:Minimum
 		int AirLoopNum; // index of named air loop
 		Real64 MinSetHum; // minimum supply air humidity ratio [kg/kg]
 		Real64 MaxSetHum; // maximum supply air humidity ratio [kg/kg]
@@ -1310,10 +1251,7 @@ namespace SetPointManager {
 
 		// Default Constructor
 		DefMultiZoneMinHumSetPointManager() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
-			AirLoopName( MaxNameLength ),
 			AirLoopNum( 0 ),
 			MinSetHum( 0.0 ),
 			MaxSetHum( 0.0 ),
@@ -1323,10 +1261,10 @@ namespace SetPointManager {
 
 		// Member Constructor
 		DefMultiZoneMinHumSetPointManager(
-			Fstring const & Name,
-			Fstring const & CtrlVarType, // type of variable to be set
+			std::string const & Name,
+			std::string const & CtrlVarType, // type of variable to be set
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			Fstring const & AirLoopName, // name of air loop using SetpointManager:MultiZone:Humidity:Minimum
+			std::string const & AirLoopName, // name of air loop using SetpointManager:MultiZone:Humidity:Minimum
 			int const AirLoopNum, // index of named air loop
 			Real64 const MinSetHum, // minimum supply air humidity ratio [kg/kg]
 			Real64 const MaxSetHum, // maximum supply air humidity ratio [kg/kg]
@@ -1334,10 +1272,10 @@ namespace SetPointManager {
 			FArray1_int const & CtrlNodes, // nodes where humidity ratio is being set
 			Real64 const SetPt // the humidity ratio setpoint [kg/kg]
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
-			AirLoopName( MaxNameLength, AirLoopName ),
+			AirLoopName( AirLoopName ),
 			AirLoopNum( AirLoopNum ),
 			MinSetHum( MinSetHum ),
 			MaxSetHum( MaxSetHum ),
@@ -1351,10 +1289,10 @@ namespace SetPointManager {
 	struct DefMultiZoneMaxHumSetPointManager // derived type for SetpointManager:MultiZone:Humidity:Maximum data
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType; // type of variable to be set
+		std::string Name;
+		std::string CtrlVarType; // type of variable to be set
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
-		Fstring AirLoopName; // name of air loop using SetpointManager:MultiZone:Humidity:Maximum
+		std::string AirLoopName; // name of air loop using SetpointManager:MultiZone:Humidity:Maximum
 		int AirLoopNum; // index of named air loop
 		Real64 MinSetHum; // minimum supply air humidity ratio [kg/kg]
 		Real64 MaxSetHum; // maximum supply air humidity ratio [kg/kg]
@@ -1364,10 +1302,7 @@ namespace SetPointManager {
 
 		// Default Constructor
 		DefMultiZoneMaxHumSetPointManager() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
-			AirLoopName( MaxNameLength ),
 			AirLoopNum( 0 ),
 			MinSetHum( 0.0 ),
 			MaxSetHum( 0.0 ),
@@ -1377,10 +1312,10 @@ namespace SetPointManager {
 
 		// Member Constructor
 		DefMultiZoneMaxHumSetPointManager(
-			Fstring const & Name,
-			Fstring const & CtrlVarType, // type of variable to be set
+			std::string const & Name,
+			std::string const & CtrlVarType, // type of variable to be set
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			Fstring const & AirLoopName, // name of air loop using SetpointManager:MultiZone:Humidity:Maximum
+			std::string const & AirLoopName, // name of air loop using SetpointManager:MultiZone:Humidity:Maximum
 			int const AirLoopNum, // index of named air loop
 			Real64 const MinSetHum, // minimum supply air humidity ratio [kg/kg]
 			Real64 const MaxSetHum, // maximum supply air humidity ratio [kg/kg]
@@ -1388,10 +1323,10 @@ namespace SetPointManager {
 			FArray1_int const & CtrlNodes, // nodes where humidity ratio is being set
 			Real64 const SetPt // the humidity ratio setpoint [kg/kg]
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
-			AirLoopName( MaxNameLength, AirLoopName ),
+			AirLoopName( AirLoopName ),
 			AirLoopNum( AirLoopNum ),
 			MinSetHum( MinSetHum ),
 			MaxSetHum( MaxSetHum ),
@@ -1405,10 +1340,10 @@ namespace SetPointManager {
 	struct DefineFollowOATempSetPointManager
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType; // type of variable to be set
+		std::string Name;
+		std::string CtrlVarType; // type of variable to be set
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
-		Fstring RefTempType; // Reference Temperature type (choice OutdoorAirWetBulb/OutdoorAirDryBulb)
+		std::string RefTempType; // Reference Temperature type (choice OutdoorAirWetBulb/OutdoorAirDryBulb)
 		int RefTypeMode; // set to iRefTempType_WetBulb or iRefTempType_DryBulb
 		Real64 Offset; // Offset temperature difference
 		Real64 MinSetTemp; // Minimum supply air setpoint temperature
@@ -1419,10 +1354,7 @@ namespace SetPointManager {
 
 		// Default Constructor
 		DefineFollowOATempSetPointManager() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
-			RefTempType( MaxNameLength ),
 			RefTypeMode( 0 ),
 			Offset( 0.0 ),
 			MinSetTemp( 0.0 ),
@@ -1433,10 +1365,10 @@ namespace SetPointManager {
 
 		// Member Constructor
 		DefineFollowOATempSetPointManager(
-			Fstring const & Name,
-			Fstring const & CtrlVarType, // type of variable to be set
+			std::string const & Name,
+			std::string const & CtrlVarType, // type of variable to be set
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			Fstring const & RefTempType, // Reference Temperature type (choice OutdoorAirWetBulb/OutdoorAirDryBulb)
+			std::string const & RefTempType, // Reference Temperature type (choice OutdoorAirWetBulb/OutdoorAirDryBulb)
 			int const RefTypeMode, // set to iRefTempType_WetBulb or iRefTempType_DryBulb
 			Real64 const Offset, // Offset temperature difference
 			Real64 const MinSetTemp, // Minimum supply air setpoint temperature
@@ -1445,10 +1377,10 @@ namespace SetPointManager {
 			FArray1_int const & CtrlNodes, // nodes where temperature is being set
 			Real64 const SetPt // the setpoint
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
-			RefTempType( MaxNameLength, RefTempType ),
+			RefTempType( RefTempType ),
 			RefTypeMode( RefTypeMode ),
 			Offset( Offset ),
 			MinSetTemp( MinSetTemp ),
@@ -1463,11 +1395,11 @@ namespace SetPointManager {
 	struct DefineFollowSysNodeTempSetPointManager
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType; // type of variable to be set
+		std::string Name;
+		std::string CtrlVarType; // type of variable to be set
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
 		int RefNodeNum; // reference node number
-		Fstring RefTempType; // Reference Temperature type (choice OutdoorAirWetBulb/OutdoorAirDryBulb)
+		std::string RefTempType; // Reference Temperature type (choice OutdoorAirWetBulb/OutdoorAirDryBulb)
 		int RefTypeMode; // set to iRefTempType_WetBulb or iRefTempType_DryBulb
 		Real64 Offset; // Offset temperature difference
 		Real64 MinSetTemp; // Minimum supply air setpoint temperature
@@ -1478,11 +1410,8 @@ namespace SetPointManager {
 
 		// Default Constructor
 		DefineFollowSysNodeTempSetPointManager() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
 			RefNodeNum( 0 ),
-			RefTempType( MaxNameLength ),
 			RefTypeMode( 0 ),
 			Offset( 0.0 ),
 			MinSetTemp( 0.0 ),
@@ -1493,11 +1422,11 @@ namespace SetPointManager {
 
 		// Member Constructor
 		DefineFollowSysNodeTempSetPointManager(
-			Fstring const & Name,
-			Fstring const & CtrlVarType, // type of variable to be set
+			std::string const & Name,
+			std::string const & CtrlVarType, // type of variable to be set
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
 			int const RefNodeNum, // reference node number
-			Fstring const & RefTempType, // Reference Temperature type (choice OutdoorAirWetBulb/OutdoorAirDryBulb)
+			std::string const & RefTempType, // Reference Temperature type (choice OutdoorAirWetBulb/OutdoorAirDryBulb)
 			int const RefTypeMode, // set to iRefTempType_WetBulb or iRefTempType_DryBulb
 			Real64 const Offset, // Offset temperature difference
 			Real64 const MinSetTemp, // Minimum supply air setpoint temperature
@@ -1506,11 +1435,11 @@ namespace SetPointManager {
 			FArray1_int const & CtrlNodes, // nodes where temperature is being set
 			Real64 const SetPt // the setpoint
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
 			RefNodeNum( RefNodeNum ),
-			RefTempType( MaxNameLength, RefTempType ),
+			RefTempType( RefTempType ),
 			RefTypeMode( RefTypeMode ),
 			Offset( Offset ),
 			MinSetTemp( MinSetTemp ),
@@ -1525,10 +1454,10 @@ namespace SetPointManager {
 	struct DefineGroundTempSetPointManager
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType; // type of variable to be set
+		std::string Name;
+		std::string CtrlVarType; // type of variable to be set
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
-		Fstring RefGroundTempObjType; // Reference Temperature type (Available choices are listed below)
+		std::string RefGroundTempObjType; // Reference Temperature type (Available choices are listed below)
 		// Site:GroundTemperature:BuildingSurface
 		// Site:GroundTemperature:Shallow
 		// Site:GroundTemperature:Deep
@@ -1543,10 +1472,7 @@ namespace SetPointManager {
 
 		// Default Constructor
 		DefineGroundTempSetPointManager() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
-			RefGroundTempObjType( MaxNameLength ),
 			RefTypeMode( 0 ),
 			Offset( 0.0 ),
 			MinSetTemp( 0.0 ),
@@ -1557,10 +1483,10 @@ namespace SetPointManager {
 
 		// Member Constructor
 		DefineGroundTempSetPointManager(
-			Fstring const & Name,
-			Fstring const & CtrlVarType, // type of variable to be set
+			std::string const & Name,
+			std::string const & CtrlVarType, // type of variable to be set
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			Fstring const & RefGroundTempObjType, // Reference Temperature type (Available choices are listed below)
+			std::string const & RefGroundTempObjType, // Reference Temperature type (Available choices are listed below)
 			int const RefTypeMode, // set to iRefGroundTempObjType_xxxx based on RefGroundTempObjType
 			Real64 const Offset, // Offset temperature difference
 			Real64 const MinSetTemp, // Minimum supply air setpoint temperature
@@ -1569,10 +1495,10 @@ namespace SetPointManager {
 			FArray1_int const & CtrlNodes, // nodes where temperature is being set
 			Real64 const SetPt // the setpoint
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
-			RefGroundTempObjType( MaxNameLength, RefGroundTempObjType ),
+			RefGroundTempObjType( RefGroundTempObjType ),
 			RefTypeMode( RefTypeMode ),
 			Offset( Offset ),
 			MinSetTemp( MinSetTemp ),
@@ -1587,10 +1513,10 @@ namespace SetPointManager {
 	struct DefineCondEntSetPointManager // derived type for SetpointManager:CondenserEnteringReset data
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType; // type of variable to be set
+		std::string Name;
+		std::string CtrlVarType; // type of variable to be set
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
-		Fstring CondEntTempSched; // Optional schedule
+		std::string CondEntTempSched; // Optional schedule
 		int CondEntTempSchedPtr; // default condenser entering water temperature schedule Index
 		Real64 TowerDsnInletAirWetBulb; // cooling tower design inlet air wetbulb temperature
 		int MinTwrWbCurve; // minimum design wetbulb temperature curve name
@@ -1599,7 +1525,7 @@ namespace SetPointManager {
 		Real64 MinimumLiftTD; // minimum lift
 		Real64 MaxCondEntTemp; // maximum condenser entering water temp
 		int NumCtrlNodes; // number of nodes whose temperature is being set
-		Fstring CtrlNodeListName;
+		std::string CtrlNodeListName;
 		FArray1D_int CtrlNodes; // nodes where temperature is being set
 		Real64 SetPt; // the temperature set point [C]
 		int ChillerIndexPlantSide; // plant side chiller index
@@ -1612,10 +1538,7 @@ namespace SetPointManager {
 
 		// Default Constructor
 		DefineCondEntSetPointManager() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
-			CondEntTempSched( MaxNameLength ),
 			CondEntTempSchedPtr( 0 ),
 			TowerDsnInletAirWetBulb( 0.0 ),
 			MinTwrWbCurve( 0 ),
@@ -1624,7 +1547,6 @@ namespace SetPointManager {
 			MinimumLiftTD( 0.0 ),
 			MaxCondEntTemp( 0.0 ),
 			NumCtrlNodes( 0 ),
-			CtrlNodeListName( MaxNameLength ),
 			SetPt( 0.0 ),
 			ChillerIndexPlantSide( 0 ),
 			ChillerIndexDemandSide( 0 ),
@@ -1637,10 +1559,10 @@ namespace SetPointManager {
 
 		// Member Constructor
 		DefineCondEntSetPointManager(
-			Fstring const & Name,
-			Fstring const & CtrlVarType, // type of variable to be set
+			std::string const & Name,
+			std::string const & CtrlVarType, // type of variable to be set
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			Fstring const & CondEntTempSched, // Optional schedule
+			std::string const & CondEntTempSched, // Optional schedule
 			int const CondEntTempSchedPtr, // default condenser entering water temperature schedule Index
 			Real64 const TowerDsnInletAirWetBulb, // cooling tower design inlet air wetbulb temperature
 			int const MinTwrWbCurve, // minimum design wetbulb temperature curve name
@@ -1649,7 +1571,7 @@ namespace SetPointManager {
 			Real64 const MinimumLiftTD, // minimum lift
 			Real64 const MaxCondEntTemp, // maximum condenser entering water temp
 			int const NumCtrlNodes, // number of nodes whose temperature is being set
-			Fstring const & CtrlNodeListName,
+			std::string const & CtrlNodeListName,
 			FArray1_int const & CtrlNodes, // nodes where temperature is being set
 			Real64 const SetPt, // the temperature set point [C]
 			int const ChillerIndexPlantSide, // plant side chiller index
@@ -1660,10 +1582,10 @@ namespace SetPointManager {
 			int const LoopIndexDemandSide, // deand side loop index
 			int const TypeNum // chiller type number
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
-			CondEntTempSched( MaxNameLength, CondEntTempSched ),
+			CondEntTempSched( CondEntTempSched ),
 			CondEntTempSchedPtr( CondEntTempSchedPtr ),
 			TowerDsnInletAirWetBulb( TowerDsnInletAirWetBulb ),
 			MinTwrWbCurve( MinTwrWbCurve ),
@@ -1672,7 +1594,7 @@ namespace SetPointManager {
 			MinimumLiftTD( MinimumLiftTD ),
 			MaxCondEntTemp( MaxCondEntTemp ),
 			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodeListName( MaxNameLength, CtrlNodeListName ),
+			CtrlNodeListName( CtrlNodeListName ),
 			CtrlNodes( CtrlNodes ),
 			SetPt( SetPt ),
 			ChillerIndexPlantSide( ChillerIndexPlantSide ),
@@ -1689,13 +1611,13 @@ namespace SetPointManager {
 	struct DefineIdealCondEntSetPointManager // derived type for SetpointManager:CondenserEnteringReset:Ideal data
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType; // type of variable to be set
+		std::string Name;
+		std::string CtrlVarType; // type of variable to be set
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
 		Real64 MinimumLiftTD; // minimum lift
 		Real64 MaxCondEntTemp; // maximum condenser entering water temp
 		int NumCtrlNodes; // number of nodes whose temperature is being set
-		Fstring CtrlNodeListName;
+		std::string CtrlNodeListName;
 		FArray1D_int CtrlNodes; // nodes where temperature is being set
 		Real64 SetPt; // the temperature set point [C]
 		int ChillerIndexPlantSide; // plant side chiller index
@@ -1720,13 +1642,10 @@ namespace SetPointManager {
 
 		// Default Constructor
 		DefineIdealCondEntSetPointManager() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
 			MinimumLiftTD( 0.0 ),
 			MaxCondEntTemp( 0.0 ),
 			NumCtrlNodes( 0 ),
-			CtrlNodeListName( MaxNameLength ),
 			SetPt( 0.0 ),
 			ChillerIndexPlantSide( 0 ),
 			BranchIndexPlantSide( 0 ),
@@ -1751,13 +1670,13 @@ namespace SetPointManager {
 
 		// Member Constructor
 		DefineIdealCondEntSetPointManager(
-			Fstring const & Name,
-			Fstring const & CtrlVarType, // type of variable to be set
+			std::string const & Name,
+			std::string const & CtrlVarType, // type of variable to be set
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
 			Real64 const MinimumLiftTD, // minimum lift
 			Real64 const MaxCondEntTemp, // maximum condenser entering water temp
 			int const NumCtrlNodes, // number of nodes whose temperature is being set
-			Fstring const & CtrlNodeListName,
+			std::string const & CtrlNodeListName,
 			FArray1_int const & CtrlNodes, // nodes where temperature is being set
 			Real64 const SetPt, // the temperature set point [C]
 			int const ChillerIndexPlantSide, // plant side chiller index
@@ -1780,13 +1699,13 @@ namespace SetPointManager {
 			int const ChilledPumpNum, // chilled water pump number
 			int const ChilledPumpBranchNum // chilled water branch number for pump
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
 			MinimumLiftTD( MinimumLiftTD ),
 			MaxCondEntTemp( MaxCondEntTemp ),
 			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodeListName( MaxNameLength, CtrlNodeListName ),
+			CtrlNodeListName( CtrlNodeListName ),
 			CtrlNodes( CtrlNodes ),
 			SetPt( SetPt ),
 			ChillerIndexPlantSide( ChillerIndexPlantSide ),
@@ -1815,10 +1734,10 @@ namespace SetPointManager {
 	struct DefineSZOneStageCoolinggSetPointManager // Derived type for the Single Zone One Stage Cooling Setpoint Manager data
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType; // type of variable to be set
+		std::string Name;
+		std::string CtrlVarType; // type of variable to be set
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
-		Fstring ControlZoneName; // name of the control zone (zone with main thermostat)
+		std::string ControlZoneName; // name of the control zone (zone with main thermostat)
 		int ControlZoneNum; // number (index into Zone array) of control zone
 		int ZoneNodeNum; // zone node number
 		Real64 CoolingOnTemp; // minimum supply air setpoint temperature
@@ -1829,10 +1748,7 @@ namespace SetPointManager {
 
 		// Default Constructor
 		DefineSZOneStageCoolinggSetPointManager() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
-			ControlZoneName( MaxNameLength ),
 			ControlZoneNum( 0 ),
 			ZoneNodeNum( 0 ),
 			CoolingOnTemp( 0.0 ),
@@ -1843,10 +1759,10 @@ namespace SetPointManager {
 
 		// Member Constructor
 		DefineSZOneStageCoolinggSetPointManager(
-			Fstring const & Name,
-			Fstring const & CtrlVarType, // type of variable to be set
+			std::string const & Name,
+			std::string const & CtrlVarType, // type of variable to be set
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			Fstring const & ControlZoneName, // name of the control zone (zone with main thermostat)
+			std::string const & ControlZoneName, // name of the control zone (zone with main thermostat)
 			int const ControlZoneNum, // number (index into Zone array) of control zone
 			int const ZoneNodeNum, // zone node number
 			Real64 const CoolingOnTemp, // minimum supply air setpoint temperature
@@ -1855,10 +1771,10 @@ namespace SetPointManager {
 			FArray1_int const & CtrlNodes, // node numbers of nodes where setpoint is to be set
 			Real64 const SetPt // the setpoint
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
-			ControlZoneName( MaxNameLength, ControlZoneName ),
+			ControlZoneName( ControlZoneName ),
 			ControlZoneNum( ControlZoneNum ),
 			ZoneNodeNum( ZoneNodeNum ),
 			CoolingOnTemp( CoolingOnTemp ),
@@ -1873,10 +1789,10 @@ namespace SetPointManager {
 	struct DefineSZOneStageHeatingSetPointManager // Derived type for the Single Zone One Stage Heating Setpoint Manager data
 	{
 		// Members
-		Fstring Name;
-		Fstring CtrlVarType; // type of variable to be set
+		std::string Name;
+		std::string CtrlVarType; // type of variable to be set
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
-		Fstring ControlZoneName; // name of the control zone (zone with main thermostat)
+		std::string ControlZoneName; // name of the control zone (zone with main thermostat)
 		int ControlZoneNum; // number (index into Zone array) of control zone
 		int ZoneNodeNum; // zone node number
 		Real64 HeatingOnTemp; // minimum supply air setpoint temperature
@@ -1887,10 +1803,7 @@ namespace SetPointManager {
 
 		// Default Constructor
 		DefineSZOneStageHeatingSetPointManager() :
-			Name( MaxNameLength ),
-			CtrlVarType( MaxNameLength ),
 			CtrlTypeMode( 0 ),
-			ControlZoneName( MaxNameLength ),
 			ControlZoneNum( 0 ),
 			ZoneNodeNum( 0 ),
 			HeatingOnTemp( 0.0 ),
@@ -1901,10 +1814,10 @@ namespace SetPointManager {
 
 		// Member Constructor
 		DefineSZOneStageHeatingSetPointManager(
-			Fstring const & Name,
-			Fstring const & CtrlVarType, // type of variable to be set
+			std::string const & Name,
+			std::string const & CtrlVarType, // type of variable to be set
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			Fstring const & ControlZoneName, // name of the control zone (zone with main thermostat)
+			std::string const & ControlZoneName, // name of the control zone (zone with main thermostat)
 			int const ControlZoneNum, // number (index into Zone array) of control zone
 			int const ZoneNodeNum, // zone node number
 			Real64 const HeatingOnTemp, // minimum supply air setpoint temperature
@@ -1913,10 +1826,10 @@ namespace SetPointManager {
 			FArray1_int const & CtrlNodes, // node numbers of nodes where setpoint is to be set
 			Real64 const SetPt // the setpoint
 		) :
-			Name( MaxNameLength, Name ),
-			CtrlVarType( MaxNameLength, CtrlVarType ),
+			Name( Name ),
+			CtrlVarType( CtrlVarType ),
 			CtrlTypeMode( CtrlTypeMode ),
-			ControlZoneName( MaxNameLength, ControlZoneName ),
+			ControlZoneName( ControlZoneName ),
 			ControlZoneNum( ControlZoneNum ),
 			ZoneNodeNum( ZoneNodeNum ),
 			HeatingOnTemp( HeatingOnTemp ),

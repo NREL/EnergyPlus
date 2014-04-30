@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1A.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -89,7 +88,7 @@ namespace StandardRatings {
 
 	void
 	CalcChillerIPLV(
-		Fstring const & ChillerName, // Name of Chiller for which IPLV is calculated
+		std::string const & ChillerName, // Name of Chiller for which IPLV is calculated
 		int const ChillerType, // Type of Chiller - EIR or Reformulated EIR
 		Real64 const RefCap, // Reference capacity of chiller [W]
 		Real64 const RefCOP, // Reference coefficient of performance [W/W]
@@ -111,7 +110,7 @@ namespace StandardRatings {
 
 	void
 	ReportChillerIPLV(
-		Fstring const & ChillerName, // Name of Chiller for which IPLV is calculated
+		std::string const & ChillerName, // Name of Chiller for which IPLV is calculated
 		int const ChillerType, // Type of Chiller - EIR or Reformulated EIR
 		Real64 const IPLVValueSI, // IPLV value in SI units {W/W}
 		Real64 const IPLVValueIP // IPLV value in IP units {Btu/W-h}
@@ -119,7 +118,7 @@ namespace StandardRatings {
 
 	void
 	CheckCurveLimitsForIPLV(
-		Fstring const & ChillerName, // Name of Chiller
+		std::string const & ChillerName, // Name of Chiller
 		int const ChillerType, // Type of Chiller - EIR or ReformulatedEIR
 		int const CondenserType, // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
 		int const CapFTempCurveIndex, // Index for the total cooling capacity modifier curve
@@ -128,8 +127,8 @@ namespace StandardRatings {
 
 	void
 	CalcDXCoilStandardRating(
-		Fstring const & DXCoilName, // Name of DX coil for which HSPF is calculated
-		Fstring const & DXCoilType, // Type of DX coil for which HSPF is calculated
+		std::string const & DXCoilName, // Name of DX coil for which HSPF is calculated
+		std::string const & DXCoilType, // Type of DX coil for which HSPF is calculated
 		int const DXCoilType_Num, // Integer Type of DX coil - heating or cooling
 		int const ns, // Number of compressor speeds
 		FArray1A< Real64 > const RatedTotalCapacity, // Reference capacity of DX coil [W]
@@ -170,8 +169,8 @@ namespace StandardRatings {
 
 	void
 	SingelSpeedDXCoolingCoilStandardRatings(
-		Fstring const & DXCoilName, // Name of DX coil for which HSPF is calculated
-		Fstring const & DXCoilType, // Type of DX coil - heating or cooling
+		std::string const & DXCoilName, // Name of DX coil for which HSPF is calculated
+		std::string const & DXCoilType, // Type of DX coil - heating or cooling
 		int const CapFTempCurveIndex, // Index for the capacity as a function of temperature modifier curve
 		int const CapFFlowCurveIndex, // Index for the capacity as a function of flow fraction modifier curve
 		int const EIRFTempCurveIndex, // Index for the EIR as a function of temperature modifier curve
@@ -189,8 +188,8 @@ namespace StandardRatings {
 
 	void
 	MultiSpeedDXCoolingCoilStandardRatings(
-		Fstring const & DXCoilName, // Name of DX coil for which HSPF is calculated
-		Fstring const & DXCoilType, // Type of DX coil for which HSPF is calculated
+		std::string const & DXCoilName, // Name of DX coil for which HSPF is calculated
+		std::string const & DXCoilType, // Type of DX coil for which HSPF is calculated
 		FArray1A_int const CapFTempCurveIndex, // Index for the capacity as a function of temperature modifier curve
 		FArray1A_int const CapFFlowCurveIndex, // Index for the capacity as a function of flow fraction modifier curve
 		FArray1A_int const EIRFTempCurveIndex, // Index for the EIR as a function of temperature modifier curve
@@ -207,8 +206,8 @@ namespace StandardRatings {
 
 	void
 	MultiSpeedDXHeatingCoilStandardRatings(
-		Fstring const & DXCoilName, // Name of DX coil for which HSPF is calculated
-		Fstring const & DXCoilType, // Type of DX coil for which HSPF is calculated
+		std::string const & DXCoilName, // Name of DX coil for which HSPF is calculated
+		std::string const & DXCoilType, // Type of DX coil for which HSPF is calculated
 		FArray1A_int const CapFTempCurveIndex, // Index for the capacity as a function of temperature modifier curve
 		FArray1A_int const CapFFlowCurveIndex, // Index for the capacity as a function of flow fraction modifier curve
 		FArray1A_int const EIRFTempCurveIndex, // Index for the EIR as a function of temperature modifier curve
@@ -231,8 +230,8 @@ namespace StandardRatings {
 
 	void
 	ReportDXCoilRating(
-		Fstring const & CompType, // Type of component
-		Fstring const & CompName, // Name of component
+		std::string const & CompType, // Type of component
+		std::string const & CompName, // Name of component
 		int const CompTypeNum, // TypeNum of component
 		Real64 const CoolCapVal, // Standard total (net) cooling capacity for AHRI Std. 210/240 {W}
 		Real64 const SEERValueIP, // SEER value in IP units {Btu/W-h}
@@ -247,8 +246,8 @@ namespace StandardRatings {
 
 	void
 	CheckCurveLimitsForStandardRatings(
-		Fstring const & DXCoilName, // Name of DX coil for which HSPF is calculated
-		Fstring const & DXCoilType, // Type of DX coil - heating or cooling
+		std::string const & DXCoilName, // Name of DX coil for which HSPF is calculated
+		std::string const & DXCoilType, // Type of DX coil - heating or cooling
 		int const DXCoilTypeNum, // Integer type of DX coil - heating or cooling
 		int const CapFTempCurveIndex, // Index for the capacity as a function of temperature modifier curve
 		int const CapFFlowCurveIndex, // Index for the capacity as a function of flow fraction modifier curve

@@ -1,8 +1,8 @@
 #ifndef DataSystemVariables_hh_INCLUDED
 #define DataSystemVariables_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Fstring.hh>
+// C++ Headers
+#include <string>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -18,43 +18,43 @@ namespace DataSystemVariables {
 	// MODULE PARAMETER DEFINITIONS:
 	extern int const iASCII_CR; // endline value when just CR instead of CR/LF
 	extern int const iUnicode_end; // endline value when Unicode file
-	extern Fstring const tabchar;
+	extern char const tabchar;
 	extern int const GoodIOStatValue; // good value for IOStat during reads/writes
 	extern int const MaxTimingStringLength; // string length for timing string array
 
-	extern Fstring const DDOnlyEnvVar; // Only run design days
-	extern Fstring const ReverseDDEnvVar; // Reverse DD during run
-	extern Fstring const FullAnnualSimulation; // Generate annual run
-	extern Fstring const cDeveloperFlag;
-	extern Fstring const cDisplayAllWarnings;
-	extern Fstring const cDisplayExtraWarnings;
-	extern Fstring const cDisplayAdvancedReportVariables;
-	extern Fstring const cDisplayUnusedObjects;
-	extern Fstring const cDisplayUnusedSchedules;
-	extern Fstring const cDisplayZoneAirHeatBalanceOffBalance;
-	extern Fstring const cSortIDD;
-	extern Fstring const cReportDuringWarmup;
-	extern Fstring const cIgnoreSolarRadiation;
-	extern Fstring const cIgnoreBeamRadiation;
-	extern Fstring const cIgnoreDiffuseRadiation;
-	extern Fstring const cSutherlandHodgman;
-	extern Fstring const cMinimalSurfaceVariables;
-	extern Fstring const cMinimalShadowing;
-	extern Fstring const cNumThreads;
-	extern Fstring const cepNumThreads;
-	extern Fstring const cNumActiveSims;
-	extern Fstring const cInputPath1; // EP-Launch setting.  Full path + project name
-	extern Fstring const cInputPath2; // RunEplus.bat setting.  Full path
-	extern Fstring const cProgramPath;
-	extern Fstring const cTimingFlag;
-	extern Fstring const TrackAirLoopEnvVar; // To generate a file with runtime statistics
+	extern std::string const DDOnlyEnvVar; // Only run design days
+	extern std::string const ReverseDDEnvVar; // Reverse DD during run
+	extern std::string const FullAnnualSimulation; // Generate annual run
+	extern std::string const cDeveloperFlag;
+	extern std::string const cDisplayAllWarnings;
+	extern std::string const cDisplayExtraWarnings;
+	extern std::string const cDisplayAdvancedReportVariables;
+	extern std::string const cDisplayUnusedObjects;
+	extern std::string const cDisplayUnusedSchedules;
+	extern std::string const cDisplayZoneAirHeatBalanceOffBalance;
+	extern std::string const cSortIDD;
+	extern std::string const cReportDuringWarmup;
+	extern std::string const cIgnoreSolarRadiation;
+	extern std::string const cIgnoreBeamRadiation;
+	extern std::string const cIgnoreDiffuseRadiation;
+	extern std::string const cSutherlandHodgman;
+	extern std::string const cMinimalSurfaceVariables;
+	extern std::string const cMinimalShadowing;
+	extern std::string const cNumThreads;
+	extern std::string const cepNumThreads;
+	extern std::string const cNumActiveSims;
+	extern std::string const cInputPath1; // EP-Launch setting.  Full path + project name
+	extern std::string const cInputPath2; // RunEplus.bat setting.  Full path
+	extern std::string const cProgramPath;
+	extern std::string const cTimingFlag;
+	extern std::string const TrackAirLoopEnvVar; // To generate a file with runtime statistics
 	// for each controller on each air loop
-	extern Fstring const TraceAirLoopEnvVar; // To generate a trace file with the converged
+	extern std::string const TraceAirLoopEnvVar; // To generate a trace file with the converged
 	// solutions of all controllers on each air loop at each call to SimAirLoop()
-	extern Fstring const TraceHVACControllerEnvVar; // To generate a trace file for
+	extern std::string const TraceHVACControllerEnvVar; // To generate a trace file for
 	//  each individual HVAC controller with all controller iterations
 
-	extern Fstring const MinReportFrequencyEnvVar; // environment var for reporting frequency.
+	extern std::string const MinReportFrequencyEnvVar; // environment var for reporting frequency.
 
 	// DERIVED TYPE DEFINITIONS
 	// na
@@ -84,14 +84,14 @@ namespace DataSystemVariables {
 	extern Real64 Elapsed_Time; // For showing elapsed time at end of run
 	extern Real64 Time_Start; // Call to CPU_Time for start time of simulation
 	extern Real64 Time_Finish; // Call to CPU_Time for end time of simulation
-	extern Fstring cMinReportFrequency; // String for minimum reporting frequency
+	extern std::string cMinReportFrequency; // String for minimum reporting frequency
 	extern int MinReportFrequency; // Frequency var turned into integer during get report var input.
 	extern bool SortedIDD; // after processing, use sorted IDD to obtain Defs, etc.
 	extern bool lMinimalShadowing; // TRUE if MinimalShadowing is to override Solar Distribution flag
-	extern Fstring TempFullFileName;
-	extern Fstring envinputpath1;
-	extern Fstring envinputpath2;
-	extern Fstring envprogrampath;
+	extern std::string TempFullFileName;
+	extern std::string envinputpath1;
+	extern std::string envinputpath2;
+	extern std::string envprogrampath;
 	extern bool TestAllPaths;
 	extern int iEnvSetThreads;
 	extern bool lEnvSetThreadsInput;
@@ -110,9 +110,9 @@ namespace DataSystemVariables {
 
 	void
 	CheckForActualFileName(
-		Fstring const & originalInputFileName, // name as input for object
+		std::string const & originalInputFileName, // name as input for object
 		bool & FileFound, // Set to true if file found and is in CheckedFileName
-		Fstring & CheckedFileName // Blank if not found.
+		std::string & CheckedFileName // Blank if not found.
 	);
 
 	//     NOTICE

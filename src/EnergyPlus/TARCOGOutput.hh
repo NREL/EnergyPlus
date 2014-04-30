@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1A.hh>
 #include <ObjexxFCL/FArray2A.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -17,9 +16,9 @@ namespace TARCOGOutput {
 	// variables:
 	//bi...Debug files handles:
 	//character(len=1000) :: DebugDir
-	extern Fstring DBGD;
-	extern Fstring FileMode;
-	extern Fstring FilePosition;
+	extern std::string DBGD;
+	extern std::string FileMode;
+	extern std::string FilePosition;
 	extern bool WriteDebugOutput;
 	extern int DebugMode;
 	extern int winID;
@@ -33,17 +32,17 @@ namespace TARCOGOutput {
 	extern int IterationCSVFileNumber;
 	extern int TarcogIterationsFileNumber;
 
-	extern Fstring IterationCSVName;
+	extern std::string IterationCSVName;
 
 	//integer, parameter :: IterationHHAT = 102
 	//character(len=1000)    :: IterationHHATName = 'IterationHHAT.csv'
 
-	extern Fstring WinCogFileName;
+	extern std::string WinCogFileName;
 	//character(len=1000)    :: SHGCFileName = 'test.w7'
-	extern Fstring DebugOutputFileName;
+	extern std::string DebugOutputFileName;
 
-	extern Fstring const VersionNumber;
-	extern Fstring const VersionCompileDateCC;
+	extern std::string const VersionNumber;
+	extern std::string const VersionCompileDateCC;
 
 	// Functions
 
@@ -112,7 +111,7 @@ namespace TARCOGOutput {
 	void
 	WriteModifiedArguments(
 		int const InArgumentsFile,
-		Fstring const & DBGD,
+		std::string const & DBGD,
 		Real64 const esky,
 		Real64 const trmout,
 		Real64 const trmin,
@@ -136,7 +135,7 @@ namespace TARCOGOutput {
 	void
 	WriteOutputArguments(
 		int & OutArgumentsFile,
-		Fstring const & DBGD,
+		std::string const & DBGD,
 		int const nlayer,
 		Real64 const tamb,
 		FArray1A< Real64 > const q,
@@ -184,7 +183,7 @@ namespace TARCOGOutput {
 	void
 	WriteOutputEN673(
 		int & OutArgumentsFile,
-		Fstring const & DBGD,
+		std::string const & DBGD,
 		int const nlayer,
 		Real64 const ufactor,
 		Real64 const hout,
@@ -199,7 +198,7 @@ namespace TARCOGOutput {
 
 	void
 	WriteTARCOGInputFile(
-		Fstring const & VerNum,
+		std::string const & VerNum,
 		Real64 const tout,
 		Real64 const tind,
 		Real64 const trmin,
@@ -273,8 +272,8 @@ namespace TARCOGOutput {
 
 	void
 	PrepDebugFilesAndVariables(
-		Fstring const & Debug_dir,
-		Fstring const & Debug_file,
+		std::string const & Debug_dir,
+		std::string const & Debug_file,
 		int const Debug_mode,
 		int const win_ID,
 		int const igu_ID,

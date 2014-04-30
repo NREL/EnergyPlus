@@ -50,8 +50,8 @@ public: // Creation
 	// Default Constructor
 	inline
 	DynamicIndexRange() :
-		l_dim_p_( 0 ),
-		u_dim_p_( 0 )
+		l_dim_p_( nullptr ),
+		u_dim_p_( nullptr )
 	{}
 
 	// Copy Constructor
@@ -81,8 +81,8 @@ public: // Creation
 	inline
 	DynamicIndexRange( int const u ) :
 		Super( u ),
-		l_dim_p_( 0 ),
-		u_dim_p_( 0 )
+		l_dim_p_( nullptr ),
+		u_dim_p_( nullptr )
 	{
 		assert( legal_static() );
 	}
@@ -91,15 +91,15 @@ public: // Creation
 	inline
 	DynamicIndexRange( Star const s ) :
 		Super( s ),
-		l_dim_p_( 0 ),
-		u_dim_p_( 0 )
+		l_dim_p_( nullptr ),
+		u_dim_p_( nullptr )
 	{}
 
 	// Upper Dimension Constructor
 	inline
 	DynamicIndexRange( Dimension const & u_dim ) :
 		Super( u_dim.zvalue() ),
-		l_dim_p_( 0 ),
+		l_dim_p_( nullptr ),
 		u_dim_p_( u_dim.reference_copy() )
 	{
 		assert( legal_dynamic() );
@@ -111,7 +111,7 @@ public: // Creation
 	inline
 	DynamicIndexRange( Expression const & u_exp ) :
 		Super( u_exp.zvalue() ),
-		l_dim_p_( 0 ),
+		l_dim_p_( nullptr ),
 		u_dim_p_( new Dimension( u_exp ) )
 	{
 		assert( legal_dynamic() );
@@ -123,8 +123,8 @@ public: // Creation
 	inline
 	DynamicIndexRange( int const l, int const u ) :
 		Super( l, u ),
-		l_dim_p_( 0 ),
-		u_dim_p_( 0 )
+		l_dim_p_( nullptr ),
+		u_dim_p_( nullptr )
 	{
 		assert( legal_static() );
 	}
@@ -133,8 +133,8 @@ public: // Creation
 	inline
 	DynamicIndexRange( int const l, Star const s ) :
 		Super( l, s ),
-		l_dim_p_( 0 ),
-		u_dim_p_( 0 )
+		l_dim_p_( nullptr ),
+		u_dim_p_( nullptr )
 	{
 		assert( legal_static() );
 	}
@@ -143,8 +143,8 @@ public: // Creation
 	inline
 	DynamicIndexRange( Star const s, int const u ) :
 		Super( s, u ),
-		l_dim_p_( 0 ),
-		u_dim_p_( 0 )
+		l_dim_p_( nullptr ),
+		u_dim_p_( nullptr )
 	{
 		assert( legal_static() );
 	}
@@ -154,8 +154,8 @@ public: // Creation
 	inline
 	DynamicIndexRange( std::initializer_list< U > const lu, typename std::enable_if< std::is_constructible< int, U >::value >::type * = 0 ) :
 		Super( lu ),
-		l_dim_p_( 0 ),
-		u_dim_p_( 0 )
+		l_dim_p_( nullptr ),
+		u_dim_p_( nullptr )
 	{
 		assert( legal_static() );
 	}
@@ -164,8 +164,8 @@ public: // Creation
 	inline
 	DynamicIndexRange( std::initializer_list< Index > const lu ) :
 		Super( lu ),
-		l_dim_p_( 0 ),
-		u_dim_p_( 0 )
+		l_dim_p_( nullptr ),
+		u_dim_p_( nullptr )
 	{
 		assert( legal_static() );
 	}
@@ -174,8 +174,8 @@ public: // Creation
 	inline
 	DynamicIndexRange( Omit const o ) :
 		Super( o ),
-		l_dim_p_( 0 ),
-		u_dim_p_( 0 )
+		l_dim_p_( nullptr ),
+		u_dim_p_( nullptr )
 	{
 		assert( legal_static() );
 	}
@@ -184,8 +184,8 @@ public: // Creation
 	inline
 	DynamicIndexRange( int const l, Omit const o ) :
 		Super( l, o ),
-		l_dim_p_( 0 ),
-		u_dim_p_( 0 )
+		l_dim_p_( nullptr ),
+		u_dim_p_( nullptr )
 	{
 		assert( legal_static() );
 	}
@@ -194,8 +194,8 @@ public: // Creation
 	inline
 	DynamicIndexRange( Omit const o, int const u ) :
 		Super( o, u ),
-		l_dim_p_( 0 ),
-		u_dim_p_( 0 )
+		l_dim_p_( nullptr ),
+		u_dim_p_( nullptr )
 	{
 		assert( legal_static() );
 	}
@@ -204,8 +204,8 @@ public: // Creation
 	inline
 	DynamicIndexRange( Omit const ol, Omit const ou ) :
 		Super( ol, ou ),
-		l_dim_p_( 0 ),
-		u_dim_p_( 0 )
+		l_dim_p_( nullptr ),
+		u_dim_p_( nullptr )
 	{
 		assert( legal_static() );
 	}
@@ -238,7 +238,7 @@ public: // Creation
 	inline
 	DynamicIndexRange( int const l, Dimension const & u_dim ) :
 		Super( l, u_dim.zvalue() ),
-		l_dim_p_( 0 ),
+		l_dim_p_( nullptr ),
 		u_dim_p_( u_dim.reference_copy() )
 	{
 		assert( legal_dynamic() );
@@ -251,7 +251,7 @@ public: // Creation
 	DynamicIndexRange( Dimension const & l_dim, int const u ) :
 		Super( l_dim.zvalue(), u ),
 		l_dim_p_( l_dim.reference_copy() ),
-		u_dim_p_( 0 )
+		u_dim_p_( nullptr )
 	{
 		assert( legal_dynamic() );
 		size_dynamic();
@@ -262,7 +262,7 @@ public: // Creation
 	inline
 	DynamicIndexRange( int const l, Expression const & u_exp ) :
 		Super( l, u_exp.zvalue() ),
-		l_dim_p_( 0 ),
+		l_dim_p_( nullptr ),
 		u_dim_p_( new Dimension( u_exp ) )
 	{
 		assert( legal_dynamic() );
@@ -275,7 +275,7 @@ public: // Creation
 	DynamicIndexRange( Expression const & l_exp, int const u ) :
 		Super( l_exp.zvalue(), u ),
 		l_dim_p_( new Dimension( l_exp ) ),
-		u_dim_p_( 0 )
+		u_dim_p_( nullptr )
 	{
 		assert( legal_dynamic() );
 		size_dynamic();
@@ -358,8 +358,8 @@ public: // Assignment
 	DynamicIndexRange &
 	operator =( int const u )
 	{
-		delete l_dim_p_; l_dim_p_ = 0;
-		delete u_dim_p_; u_dim_p_ = 0;
+		delete l_dim_p_; l_dim_p_ = nullptr;
+		delete u_dim_p_; u_dim_p_ = nullptr;
 		Super::operator =( u );
 		assert( legal_static() );
 		notify();
@@ -371,8 +371,8 @@ public: // Assignment
 	DynamicIndexRange &
 	operator =( Star const s )
 	{
-		delete l_dim_p_; l_dim_p_ = 0;
-		delete u_dim_p_; u_dim_p_ = 0;
+		delete l_dim_p_; l_dim_p_ = nullptr;
+		delete u_dim_p_; u_dim_p_ = nullptr;
 		Super::operator =( s );
 		notify();
 		return *this;
@@ -383,7 +383,7 @@ public: // Assignment
 	DynamicIndexRange &
 	operator =( Dimension const & u_dim )
 	{
-		delete l_dim_p_; l_dim_p_ = 0;
+		delete l_dim_p_; l_dim_p_ = nullptr;
 		delete u_dim_p_; u_dim_p_ = u_dim.reference_copy(); u_insert_as_observer();
 		Super::operator =( u_dim.zvalue() );
 		assert( legal_dynamic() );
@@ -397,7 +397,7 @@ public: // Assignment
 	DynamicIndexRange &
 	operator =( Expression const & u_exp )
 	{
-		delete l_dim_p_; l_dim_p_ = 0;
+		delete l_dim_p_; l_dim_p_ = nullptr;
 		delete u_dim_p_; u_dim_p_ = new Dimension( u_exp ); u_insert_as_observer();
 		Super::operator =( u_dim_p_->zvalue() );
 		assert( legal_dynamic() );
@@ -462,8 +462,8 @@ public: // Assignment
 	DynamicIndexRange &
 	assign( int const u )
 	{
-		delete l_dim_p_; l_dim_p_ = 0;
-		delete u_dim_p_; u_dim_p_ = 0;
+		delete l_dim_p_; l_dim_p_ = nullptr;
+		delete u_dim_p_; u_dim_p_ = nullptr;
 		Super::operator =( u );
 		assert( legal_static() );
 		notify();
@@ -475,8 +475,8 @@ public: // Assignment
 	DynamicIndexRange &
 	assign( Star const s )
 	{
-		delete l_dim_p_; l_dim_p_ = 0;
-		delete u_dim_p_; u_dim_p_ = 0;
+		delete l_dim_p_; l_dim_p_ = nullptr;
+		delete u_dim_p_; u_dim_p_ = nullptr;
 		Super::operator =( s );
 		notify();
 		return *this;
@@ -487,7 +487,7 @@ public: // Assignment
 	DynamicIndexRange &
 	assign( Dimension const & u_dim )
 	{
-		delete l_dim_p_; l_dim_p_ = 0;
+		delete l_dim_p_; l_dim_p_ = nullptr;
 		delete u_dim_p_; u_dim_p_ = u_dim.reference_copy(); u_insert_as_observer();
 		Super::operator =( u_dim.zvalue() );
 		assert( legal_dynamic() );
@@ -501,7 +501,7 @@ public: // Assignment
 	DynamicIndexRange &
 	assign( Expression const & u_exp )
 	{
-		delete l_dim_p_; l_dim_p_ = 0;
+		delete l_dim_p_; l_dim_p_ = nullptr;
 		delete u_dim_p_; u_dim_p_ = new Dimension( u_exp ); u_insert_as_observer();
 		Super::operator =( u_dim_p_->zvalue() );
 		assert( legal_dynamic() );
@@ -515,8 +515,8 @@ public: // Assignment
 	DynamicIndexRange &
 	assign( int const l, int const u )
 	{
-		delete l_dim_p_; l_dim_p_ = 0;
-		delete u_dim_p_; u_dim_p_ = 0;
+		delete l_dim_p_; l_dim_p_ = nullptr;
+		delete u_dim_p_; u_dim_p_ = nullptr;
 		Super::assign( l, u );
 		assert( legal_static() );
 		notify();
@@ -556,7 +556,7 @@ public: // Assignment
 	DynamicIndexRange &
 	assign( int const l, Dimension const & u_dim )
 	{
-		delete l_dim_p_; l_dim_p_ = 0;
+		delete l_dim_p_; l_dim_p_ = nullptr;
 		delete u_dim_p_; u_dim_p_ = u_dim.reference_copy(); u_insert_as_observer();
 		Super::assign( l, u_dim.zvalue() );
 		assert( legal_dynamic() );
@@ -571,7 +571,7 @@ public: // Assignment
 	assign( Dimension const & l_dim, int const u )
 	{
 		delete l_dim_p_; l_dim_p_ = l_dim.reference_copy(); l_insert_as_observer();
-		delete u_dim_p_; u_dim_p_ = 0;
+		delete u_dim_p_; u_dim_p_ = nullptr;
 		Super::assign( l_dim.zvalue(), u );
 		assert( legal_dynamic() );
 		size_dynamic();
@@ -584,7 +584,7 @@ public: // Assignment
 	DynamicIndexRange &
 	assign( int const l, Expression const & u_exp )
 	{
-		delete l_dim_p_; l_dim_p_ = 0;
+		delete l_dim_p_; l_dim_p_ = nullptr;
 		delete u_dim_p_; u_dim_p_ = new Dimension( u_exp ); u_insert_as_observer();
 		Super::assign( l, u_dim_p_->zvalue() );
 		assert( legal_dynamic() );
@@ -599,7 +599,7 @@ public: // Assignment
 	assign( Expression const & l_exp, int const u )
 	{
 		delete l_dim_p_; l_dim_p_ = new Dimension( l_exp ); l_insert_as_observer();
-		delete u_dim_p_; u_dim_p_ = 0;
+		delete u_dim_p_; u_dim_p_ = nullptr;
 		Super::assign( l_dim_p_->zvalue(), u );
 		assert( legal_dynamic() );
 		size_dynamic();
@@ -640,8 +640,8 @@ public: // Assignment
 	DynamicIndexRange &
 	assign( int const l, Star const s )
 	{
-		delete l_dim_p_; l_dim_p_ = 0;
-		delete u_dim_p_; u_dim_p_ = 0;
+		delete l_dim_p_; l_dim_p_ = nullptr;
+		delete u_dim_p_; u_dim_p_ = nullptr;
 		Super::assign( l, s );
 		assert( legal_static() );
 		notify();
@@ -689,8 +689,8 @@ public: // Assignment
 	DynamicIndexRange &
 	assign_no_notify( int const l, Star const s )
 	{
-		delete l_dim_p_; l_dim_p_ = 0;
-		delete u_dim_p_; u_dim_p_ = 0;
+		delete l_dim_p_; l_dim_p_ = nullptr;
+		delete u_dim_p_; u_dim_p_ = nullptr;
 		Super::assign( l, s );
 		assert( legal_static() );
 		return *this;
@@ -794,7 +794,7 @@ public: // Modifier
 	DynamicIndexRange &
 	l( int const l )
 	{
-		delete l_dim_p_; l_dim_p_ = 0;
+		delete l_dim_p_; l_dim_p_ = nullptr;
 		Super::l( l );
 		assert( legal_dynamic() );
 		size_dynamic();
@@ -833,7 +833,7 @@ public: // Modifier
 	DynamicIndexRange &
 	l_no_notify( int const l )
 	{
-		delete l_dim_p_; l_dim_p_ = 0;
+		delete l_dim_p_; l_dim_p_ = nullptr;
 		Super::l( l );
 		assert( legal_dynamic() );
 		size_dynamic();
@@ -869,7 +869,7 @@ public: // Modifier
 	DynamicIndexRange &
 	u( int const u )
 	{
-		delete u_dim_p_; u_dim_p_ = 0;
+		delete u_dim_p_; u_dim_p_ = nullptr;
 		Super::u( u );
 		assert( legal_dynamic() );
 		size_dynamic();
@@ -912,7 +912,7 @@ public: // Modifier
 	DynamicIndexRange &
 	u_no_notify( int const u )
 	{
-		delete u_dim_p_; u_dim_p_ = 0;
+		delete u_dim_p_; u_dim_p_ = nullptr;
 		Super::u( u );
 		assert( legal_dynamic() );
 		size_dynamic();
@@ -977,8 +977,8 @@ public: // Modifier
 	clear()
 	{
 		Super::clear();
-		delete l_dim_p_; l_dim_p_ = 0;
-		delete u_dim_p_; u_dim_p_ = 0;
+		delete l_dim_p_; l_dim_p_ = nullptr;
+		delete u_dim_p_; u_dim_p_ = nullptr;
 		notify();
 		return *this;
 	}
@@ -989,8 +989,8 @@ public: // Modifier
 	clear_no_notify()
 	{
 		Super::clear();
-		delete l_dim_p_; l_dim_p_ = 0;
-		delete u_dim_p_; u_dim_p_ = 0;
+		delete l_dim_p_; l_dim_p_ = nullptr;
+		delete u_dim_p_; u_dim_p_ = nullptr;
 		return *this;
 	}
 
@@ -1074,7 +1074,7 @@ private: // Functions
 	Dimension *
 	l_dim_clone() const
 	{
-		return ( l_dim_p_ ? l_dim_p_->clone() : static_cast< Dimension * >( 0 ) );
+		return ( l_dim_p_ ? l_dim_p_->clone() : static_cast< Dimension * >( nullptr ) );
 	}
 
 	// Upper Dimension Clone
@@ -1082,7 +1082,7 @@ private: // Functions
 	Dimension *
 	u_dim_clone() const
 	{
-		return ( u_dim_p_ ? u_dim_p_->clone() : static_cast< Dimension * >( 0 ) );
+		return ( u_dim_p_ ? u_dim_p_->clone() : static_cast< Dimension * >( nullptr ) );
 	}
 
 	// Insert as Observer of the Dimensions

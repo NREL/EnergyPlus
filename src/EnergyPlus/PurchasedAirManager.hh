@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace PurchasedAirManager {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS:
@@ -24,7 +22,7 @@ namespace PurchasedAirManager {
 	extern int const LimitFlowRate;
 	extern int const LimitCapacity;
 	extern int const LimitFlowRateAndCapacity;
-	extern FArray1D_Fstring const cLimitType;
+	extern FArray1D_string const cLimitType;
 	// Dehumidification and Humidification control type parameters
 	extern int const None;
 	extern int const ConstantSensibleHeatRatio;
@@ -65,9 +63,9 @@ namespace PurchasedAirManager {
 	struct ZonePurchasedAir
 	{
 		// Members
-		Fstring cObjectName; // Name of the object from IDD
-		Fstring Name; // Name or identifier of this piece of equipment
-		Fstring AvailSched; // System availablity schedule
+		std::string cObjectName; // Name of the object from IDD
+		std::string Name; // Name or identifier of this piece of equipment
+		std::string AvailSched; // System availablity schedule
 		int AvailSchedPtr; // Index to system availability schedule
 		int ZoneSupplyAirNodeNum; // Node number of zone supply air node for purchased air
 		int ZoneExhaustAirNodeNum; // Node number of zone exhaust air node for purchased air
@@ -85,9 +83,9 @@ namespace PurchasedAirManager {
 		//       or LimitFlowRateAndCapacity
 		Real64 MaxCoolVolFlowRate; // Maximum cooling supply air flow [m3/s]
 		Real64 MaxCoolTotCap; // Maximum cooling total capacity [W]
-		Fstring HeatSched; // Heating availablity schedule
+		std::string HeatSched; // Heating availablity schedule
 		int HeatSchedPtr; // Index to heating availability schedule
-		Fstring CoolSched; // Cooling availability schedule
+		std::string CoolSched; // Cooling availability schedule
 		int CoolSchedPtr; // Index to the cooling availability schedule
 		int DehumidCtrlType; // Dehumidification control type - ConstantSensibleHeatRatio,
 		//      Humidistat, or ConstantSupplyHumidityRatio
@@ -191,9 +189,6 @@ namespace PurchasedAirManager {
 
 		// Default Constructor
 		ZonePurchasedAir() :
-			cObjectName( MaxNameLength ),
-			Name( MaxNameLength ),
-			AvailSched( MaxNameLength ),
 			AvailSchedPtr( 0 ),
 			ZoneSupplyAirNodeNum( 0 ),
 			ZoneExhaustAirNodeNum( 0 ),
@@ -208,9 +203,7 @@ namespace PurchasedAirManager {
 			CoolingLimit( 0 ),
 			MaxCoolVolFlowRate( 0.0 ),
 			MaxCoolTotCap( 0.0 ),
-			HeatSched( MaxNameLength ),
 			HeatSchedPtr( 0 ),
-			CoolSched( MaxNameLength ),
 			CoolSchedPtr( 0 ),
 			DehumidCtrlType( 0 ),
 			CoolSHR( 0.0 ),
@@ -309,9 +302,9 @@ namespace PurchasedAirManager {
 
 		// Member Constructor
 		ZonePurchasedAir(
-			Fstring const & cObjectName, // Name of the object from IDD
-			Fstring const & Name, // Name or identifier of this piece of equipment
-			Fstring const & AvailSched, // System availablity schedule
+			std::string const & cObjectName, // Name of the object from IDD
+			std::string const & Name, // Name or identifier of this piece of equipment
+			std::string const & AvailSched, // System availablity schedule
 			int const AvailSchedPtr, // Index to system availability schedule
 			int const ZoneSupplyAirNodeNum, // Node number of zone supply air node for purchased air
 			int const ZoneExhaustAirNodeNum, // Node number of zone exhaust air node for purchased air
@@ -326,9 +319,9 @@ namespace PurchasedAirManager {
 			int const CoolingLimit, // Cooling capacity limit type - NoLimit, LimitFlowRate, LimitCapacity,
 			Real64 const MaxCoolVolFlowRate, // Maximum cooling supply air flow [m3/s]
 			Real64 const MaxCoolTotCap, // Maximum cooling total capacity [W]
-			Fstring const & HeatSched, // Heating availablity schedule
+			std::string const & HeatSched, // Heating availablity schedule
 			int const HeatSchedPtr, // Index to heating availability schedule
-			Fstring const & CoolSched, // Cooling availability schedule
+			std::string const & CoolSched, // Cooling availability schedule
 			int const CoolSchedPtr, // Index to the cooling availability schedule
 			int const DehumidCtrlType, // Dehumidification control type - ConstantSensibleHeatRatio,
 			Real64 const CoolSHR, // Cooling sensible heat ratio
@@ -424,9 +417,9 @@ namespace PurchasedAirManager {
 			Real64 const TimeEconoActive, // Time economizer is active [hrs]
 			Real64 const TimeHtRecActive // Time heat reocovery is active [hrs]
 		) :
-			cObjectName( MaxNameLength, cObjectName ),
-			Name( MaxNameLength, Name ),
-			AvailSched( MaxNameLength, AvailSched ),
+			cObjectName( cObjectName ),
+			Name( Name ),
+			AvailSched( AvailSched ),
 			AvailSchedPtr( AvailSchedPtr ),
 			ZoneSupplyAirNodeNum( ZoneSupplyAirNodeNum ),
 			ZoneExhaustAirNodeNum( ZoneExhaustAirNodeNum ),
@@ -441,9 +434,9 @@ namespace PurchasedAirManager {
 			CoolingLimit( CoolingLimit ),
 			MaxCoolVolFlowRate( MaxCoolVolFlowRate ),
 			MaxCoolTotCap( MaxCoolTotCap ),
-			HeatSched( MaxNameLength, HeatSched ),
+			HeatSched( HeatSched ),
 			HeatSchedPtr( HeatSchedPtr ),
-			CoolSched( MaxNameLength, CoolSched ),
+			CoolSched( CoolSched ),
 			CoolSchedPtr( CoolSchedPtr ),
 			DehumidCtrlType( DehumidCtrlType ),
 			CoolSHR( CoolSHR ),
@@ -549,7 +542,7 @@ namespace PurchasedAirManager {
 
 	void
 	SimPurchasedAir(
-		Fstring const & PurchAirName,
+		std::string const & PurchAirName,
 		Real64 & SysOutputProvided,
 		Real64 & MoistOutputProvided, // Moisture output provided (kg/s), dehumidification = negative
 		bool const FirstHVACIteration,

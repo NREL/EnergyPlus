@@ -14,7 +14,6 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/char.constants.hh>
 #include <ObjexxFCL/fmt.manipulators.hh>
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/TraitsB.hh>
@@ -104,7 +103,7 @@ inline
 std::istream &
 skip( std::istream & stream )
 {
-	return stream.ignore( std::numeric_limits< std::streamsize >::max(), NL );
+	return stream.ignore( std::numeric_limits< std::streamsize >::max(), '\n' );
 }
 
 // Output /////
@@ -114,7 +113,7 @@ inline
 std::string
 X( Size const w = 1ul )
 {
-	return std::string( w, SPC );
+	return std::string( w, ' ' );
 }
 
 // Spaces
@@ -122,7 +121,7 @@ inline
 std::string
 space( Size const w = 1ul )
 {
-	return std::string( w, SPC );
+	return std::string( w, ' ' );
 }
 
 // char
@@ -130,7 +129,7 @@ inline
 std::string
 A( char const c, Size const w = 1ul )
 {
-	return ( w > 0ul ? std::string( w-1, SPC ) + c : std::string() );
+	return ( w > 0ul ? std::string( w-1, ' ' ) + c : std::string() );
 }
 
 // string
@@ -155,7 +154,7 @@ inline
 std::string
 L( T const & t, Size const w = 1ul )
 {
-	return ( w <= 1 ? std::string() : std::string( w-1, SPC ) ) + std::string( 1, ( bool( t ) ? 'T' : 'F' ) );
+	return ( w <= 1 ? std::string() : std::string( w-1, ' ' ) ) + std::string( 1, ( bool( t ) ? 'T' : 'F' ) );
 }
 
 // Integer
@@ -363,13 +362,13 @@ G( T const & t, Size w = TraitsG< T >::w(), Size const d = TraitsG< T >::d(), Si
 		T const m( std::abs( t ) );
 		if ( m == T( 0.0 ) ) {
 			Size const n( std::min( e + 2, w ) );
-			return F( t, w - n, d - 1 ) + std::string( n, SPC );
+			return F( t, w - n, d - 1 ) + std::string( n, ' ' );
 		} else {
-			int const p( std::floor( std::log10( m ) + 1 ) ); // Fortran 2003 rounding modes are not supported
-//			int const p( std::log10( m / ( T( 1.0 ) - ( T( 0.5 ) * std::pow( T( 10.0 ), -d ) ) ) ) + T( 1.0 ) ); // "Compatible" rounding mode: r = 0.5
+			int const p( static_cast< int >( std::floor( std::log10( m ) + T( 1 ) ) ) ); // Fortran 2003 rounding modes are not supported
+//			int const p( static_cast< int >( std::log10( m / ( T( 1.0 ) - ( T( 0.5 ) * std::pow( T( 10.0 ), -d ) ) ) ) + T( 1.0 ) ) ); // "Compatible" rounding mode: r = 0.5
 			if ( ( 0 <= p ) && ( p <= int( d ) + 2 ) ) { // Use F editing
 				Size const n( std::min( e + 2, w ) );
-				return F( t, w - n, d - std::min( Size( p ), d ) ) + std::string( n, SPC );
+				return F( t, w - n, d - std::min( Size( p ), d ) ) + std::string( n, ' ' );
 			} else { // Use E editing
 				if ( w == 0 ) { // Choose width
 					Size const e_( TraitsG< T >::e() ); // G0.dEe form not allowed in Fortran: Set exponent width based on type

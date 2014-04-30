@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -70,14 +69,13 @@ namespace DataTimings {
 	struct timings
 	{
 		// Members
-		Fstring Element;
+		std::string Element;
 		Real64 rstartTime;
 		Real64 currentTimeSum;
 		int calls;
 
 		// Default Constructor
 		timings() :
-			Element( MaxTimingStringLength ),
 			rstartTime( 0.0 ),
 			currentTimeSum( 0.0 ),
 			calls( 0 )
@@ -85,12 +83,12 @@ namespace DataTimings {
 
 		// Member Constructor
 		timings(
-			Fstring const & Element,
+			std::string const & Element,
 			Real64 const rstartTime,
 			Real64 const currentTimeSum,
 			int const calls
 		) :
-			Element( MaxTimingStringLength, Element ),
+			Element( Element ),
 			rstartTime( rstartTime ),
 			currentTimeSum( currentTimeSum ),
 			calls( calls )
@@ -104,23 +102,23 @@ namespace DataTimings {
 	// Functions
 
 	void
-	epStartTime( Fstring const & ctimingElementstring );
+	epStartTime( std::string const & ctimingElementstring );
 
 	void
 	epStopTime(
-		Fstring const & ctimingElementstring,
+		std::string const & ctimingElementstring,
 		Optional_bool_const printit = _, // true if it should be printed here.
-		Optional_Fstring_const wprint = _ // only needed (and assumed, if printit is true)
+		Optional_string_const wprint = _ // only needed (and assumed, if printit is true)
 	);
 
 	void
 	epSummaryTimes( Real64 & TimeUsed_CPUTime );
 
 	Real64
-	epGetTimeUsed( Fstring const & ctimingElementstring );
+	epGetTimeUsed( std::string const & ctimingElementstring );
 
 	Real64
-	epGetTimeUsedperCall( Fstring const & ctimingElementstring );
+	epGetTimeUsedperCall( std::string const & ctimingElementstring );
 
 	Real64
 	eptime();

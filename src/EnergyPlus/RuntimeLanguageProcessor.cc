@@ -1,13 +1,16 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
+#include <ObjexxFCL/char.functions.hh>
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/FArrayS.functions.hh>
 #include <ObjexxFCL/FArray2D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/random.hh>
+#include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/Time_Date.hh>
 
 // EnergyPlus Headers
@@ -40,7 +43,6 @@ namespace RuntimeLanguageProcessor {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::OutputFileDebug;
 	using namespace DataRuntimeLanguage;
 
@@ -171,7 +173,7 @@ namespace RuntimeLanguageProcessor {
 		//value(7)   Seconds (0-59)
 		//value(8)   Milliseconds (0-999)
 
-		Fstring datestring( 15 ); // supposedly returns blank when no date available.
+		std::string datestring; // supposedly returns blank when no date available.
 
 		// FLOW:
 		if ( InitializeOnce ) {
@@ -210,8 +212,8 @@ namespace RuntimeLanguageProcessor {
 
 			GetRuntimeLanguageUserInput(); // Load and parse all runtime language objects
 
-			date_and_time( datestring, _, _, datevalues );
-			if ( datestring != " " ) {
+			date_and_time_string( datestring, _, _, datevalues );
+			if ( datestring != "" ) {
 				ErlVariable( ActualDateAndTimeNum ).Value = SetErlValueNumber( double( sum( datevalues ) ) );
 				//datevalues(1)+datevalues(2)+datevalues(3)+  &
 				//datevalues(5)+datevalues(6)+datevalues(7)+datevalues(8)
@@ -397,19 +399,19 @@ namespace RuntimeLanguageProcessor {
 		int const IfDepthAllowed( 5 ); // depth of IF block nesting
 		int const ELSEIFLengthAllowed( 200 ); // number of ELSEIFs allowed
 		int const WhileDepthAllowed( 1 ); // depth of While block nesting
-		static Fstring const fmta( "(A)" );
+		static gio::Fmt const fmta( "(A)" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int LineNum;
 		int StackNum2;
-		int Pos;
+		std::string::size_type Pos;
 		int ExpressionNum;
 		int VariableNum;
-		Fstring Line( MaxNameLength ); // local copy of a single line of Erl program code
-		Fstring Keyword( MaxNameLength ); // local copy of statement keyword parsed from line (Run, Set, If, etc)
-		Fstring Remainder( MaxNameLength ); // local copy of what is left for text in the line after keyword
-		Fstring Expression( MaxNameLength );
-		Fstring Variable( MaxNameLength );
+		std::string Line; // local copy of a single line of Erl program code
+		std::string Keyword; // local copy of statement keyword parsed from line (Run, Set, If, etc)
+		std::string Remainder; // local copy of what is left for text in the line after keyword
+		std::string Expression;
+		std::string Variable;
 		int NestedIfDepth; // indicates depth into If statement,
 		int NestedWhileDepth; // indicates depth into While statement
 		int InstructionNum;
@@ -441,23 +443,27 @@ namespace RuntimeLanguageProcessor {
 
 		while ( LineNum <= ErlStack( StackNum ).NumLines ) {
 
-			Line = adjustl( ErlStack( StackNum ).Line( LineNum ) );
-			if ( len_trim( Line ) == 0 ) {
+			Line = stripped( ErlStack( StackNum ).Line( LineNum ) );
+			if ( len( Line ) == 0 ) {
 				++LineNum;
 				continue; // Blank lines can be skipped
 			}
 
-			Pos = SCAN( trim( Line ), " " );
-			if ( Pos == 0 ) Pos = len_trim( Line ) + 1;
+			Pos = scan( Line, ' ' );
+			if ( Pos == std::string::npos ) {
+				Pos = len( Line );
+				Remainder.clear();
+			} else {
+				Remainder = stripped( Line.substr( Pos + 1 ) );
+			}
 			//    Keyword = MakeUPPERCase(Line(1:Pos-1))
-			Keyword = Line( 1, Pos - 1 );
-			Remainder = adjustl( Line( Pos + 1 ) );
+			Keyword = Line.substr( 0, Pos );
 
 			{ auto const SELECT_CASE_var( Keyword );
 
 			if ( SELECT_CASE_var == "RETURN" ) {
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "RETURN \"" + trim( Line ) + "\"";
-				if ( len_trim( Remainder ) == 0 ) {
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "RETURN \"" + Line + "\"";
+				if ( Remainder.empty() ) {
 					InstructionNum = AddInstruction( StackNum, LineNum, KeywordReturn );
 				} else {
 					ParseExpression( Remainder, StackNum, ExpressionNum, Line );
@@ -465,19 +471,23 @@ namespace RuntimeLanguageProcessor {
 				}
 
 			} else if ( SELECT_CASE_var == "SET" ) {
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "SET \"" + trim( Line ) + "\"";
-				Pos = SCAN( Remainder, "=" );
-				if ( Pos == 0 ) {
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "SET \"" + Line + "\"";
+				Pos = scan( Remainder, '=' );
+				if ( Pos == std::string::npos ) {
 					AddError( StackNum, LineNum, "Equal sign missing for the SET instruction." );
-				} else if ( Pos == 1 ) {
+				} else if ( Pos == 0 ) {
 					AddError( StackNum, LineNum, "Variable name missing for the SET instruction." );
 				} else {
-					Variable = adjustl( Remainder( 1, Pos - 1 ) ); // VariableName would be more expressive
+					Variable = stripped( Remainder.substr( 0, Pos ) ); // VariableName would be more expressive
 					VariableNum = NewEMSVariable( Variable, StackNum );
 					// Check for invalid variable name
 
-					Expression = adjustl( Remainder( Pos + 1 ) );
-					if ( len_trim( Expression ) == 0 ) {
+					if ( Pos + 1 < Remainder.length() ) {
+						Expression = stripped( Remainder.substr( Pos + 1 ) );
+					} else {
+						Expression.clear();
+					}
+					if ( Expression.empty() ) {
 						AddError( StackNum, LineNum, "Expression missing for the SET instruction." );
 					} else {
 						ParseExpression( Expression, StackNum, ExpressionNum, Line );
@@ -486,28 +496,29 @@ namespace RuntimeLanguageProcessor {
 				}
 
 			} else if ( SELECT_CASE_var == "RUN" ) {
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "RUN \"" + trim( Line ) + "\"";
-				if ( len_trim( Remainder ) == 0 ) {
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "RUN \"" + Line + "\"";
+				if ( Remainder.empty() ) {
 					AddError( StackNum, LineNum, "Program or Subroutine name missing for the RUN instruction." );
 				} else {
-					Pos = SCAN( Remainder, " " );
-					Variable = MakeUPPERCase( adjustl( Remainder( 1, Pos - 1 ) ) ); // really the subroutine, or reference to instruction set
+					Pos = scan( Remainder, ' ' );
+					if ( Pos == std::string::npos ) Pos = Remainder.length();
+					Variable = MakeUPPERCase( stripped( Remainder.substr( 0, Pos ) ) ); // really the subroutine, or reference to instruction set
 					StackNum2 = FindItemInList( Variable, ErlStack.Name(), NumErlStacks );
 					if ( StackNum2 == 0 ) {
-						AddError( StackNum, LineNum, "Program or Subroutine name [" + trim( Variable ) + "] not found for the RUN instruction." );
+						AddError( StackNum, LineNum, "Program or Subroutine name [" + Variable + "] not found for the RUN instruction." );
 					} else {
 						InstructionNum = AddInstruction( StackNum, LineNum, KeywordRun, StackNum2 );
 					}
 				}
 
 			} else if ( SELECT_CASE_var == "IF" ) {
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "IF \"" + trim( Line ) + "\"";
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "IF \"" + Line + "\"";
 				if ( DeveloperFlag ) gio::write( OutputFileDebug, "*" ) << "NestedIf=" << NestedIfDepth;
-				if ( len_trim( Remainder ) == 0 ) {
+				if ( Remainder.empty() ) {
 					AddError( StackNum, LineNum, "Expression missing for the IF instruction." );
 					ExpressionNum = 0;
 				} else {
-					Expression = adjustl( Remainder );
+					Expression = stripped( Remainder );
 					ParseExpression( Expression, StackNum, ExpressionNum, Line );
 				}
 
@@ -523,7 +534,7 @@ namespace RuntimeLanguageProcessor {
 				}
 
 			} else if ( SELECT_CASE_var == "ELSEIF" ) {
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "ELSEIF \"" + trim( Line ) + "\"";
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "ELSEIF \"" + Line + "\"";
 				if ( DeveloperFlag ) gio::write( OutputFileDebug, "*" ) << "NestedIf=" << NestedIfDepth;
 				if ( NestedIfDepth == 0 ) {
 					AddError( StackNum, LineNum, "Starting IF instruction missing for the ELSEIF instruction." );
@@ -540,11 +551,11 @@ namespace RuntimeLanguageProcessor {
 					SavedGotoInstructionNum( NestedIfDepth, NumGotos( NestedIfDepth ) ) = InstructionNum;
 				}
 
-				if ( len_trim( Remainder ) == 0 ) {
+				if ( Remainder.empty() ) {
 					AddError( StackNum, LineNum, "Expression missing for the ELSEIF instruction." );
 					ExpressionNum = 0;
 				} else {
-					Expression = adjustl( Remainder );
+					Expression = stripped( Remainder );
 					ParseExpression( Expression, StackNum, ExpressionNum, Line );
 				}
 
@@ -553,14 +564,14 @@ namespace RuntimeLanguageProcessor {
 				SavedIfInstructionNum( NestedIfDepth ) = InstructionNum;
 
 			} else if ( SELECT_CASE_var == "ELSE" ) {
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "ELSE \"" + trim( Line ) + "\"";
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "ELSE \"" + Line + "\"";
 				if ( DeveloperFlag ) gio::write( OutputFileDebug, "*" ) << "NestedIf=" << NestedIfDepth;
 				if ( NestedIfDepth == 0 ) {
 					AddError( StackNum, LineNum, "Starting IF instruction missing for the ELSE instruction." );
 					break; // Getting strange error on DEALLOCATE for the next instruction that I try to add, so doing EXIT here
 				}
 				if ( ! ReadyForElse( NestedIfDepth ) ) {
-					AddError( StackNum, LineNum, "ELSE statement without corresponding IF stetement." );
+					AddError( StackNum, LineNum, "ELSE statement without corresponding IF statement." );
 				}
 				ReadyForElse( NestedIfDepth ) = false;
 
@@ -574,7 +585,7 @@ namespace RuntimeLanguageProcessor {
 					SavedGotoInstructionNum( NestedIfDepth, NumGotos( NestedIfDepth ) ) = InstructionNum;
 				}
 
-				if ( len_trim( Remainder ) > 0 ) {
+				if ( ! Remainder.empty() ) {
 					AddError( StackNum, LineNum, "Nothing is allowed to follow the ELSE instruction." );
 				}
 
@@ -583,7 +594,7 @@ namespace RuntimeLanguageProcessor {
 				SavedIfInstructionNum( NestedIfDepth ) = InstructionNum;
 
 			} else if ( SELECT_CASE_var == "ENDIF" ) {
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "ENDIF \"" + trim( Line ) + "\"";
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "ENDIF \"" + Line + "\"";
 				if ( DeveloperFlag ) gio::write( OutputFileDebug, "*" ) << "NestedIf=" << NestedIfDepth;
 				if ( NestedIfDepth == 0 ) {
 					AddError( StackNum, LineNum, "Starting IF instruction missing for the ENDIF instruction." );
@@ -596,7 +607,7 @@ namespace RuntimeLanguageProcessor {
 				ReadyForEndif( NestedIfDepth ) = false;
 				ReadyForElse( NestedIfDepth ) = false;
 
-				if ( len_trim( Remainder ) > 0 ) {
+				if ( ! Remainder.empty() ) {
 					AddError( StackNum, LineNum, "Nothing is allowed to follow the ENDIF instruction." );
 				}
 
@@ -615,12 +626,12 @@ namespace RuntimeLanguageProcessor {
 				--NestedIfDepth;
 
 			} else if ( SELECT_CASE_var == "WHILE" ) {
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "WHILE \"" + trim( Line ) + "\"";
-				if ( len_trim( Remainder ) == 0 ) {
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "WHILE \"" + Line + "\"";
+				if ( Remainder.empty() ) {
 					AddError( StackNum, LineNum, "Expression missing for the WHILE instruction." );
 					ExpressionNum = 0;
 				} else {
-					Expression = adjustl( Remainder );
+					Expression = stripped( Remainder );
 					ParseExpression( Expression, StackNum, ExpressionNum, Line );
 				}
 
@@ -635,12 +646,12 @@ namespace RuntimeLanguageProcessor {
 				}
 
 			} else if ( SELECT_CASE_var == "ENDWHILE" ) {
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "ENDWHILE \"" + trim( Line ) + "\"";
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "ENDWHILE \"" + Line + "\"";
 				if ( NestedWhileDepth == 0 ) {
 					AddError( StackNum, LineNum, "Starting WHILE instruction missing for the ENDWHILE instruction." );
 					break;
 				}
-				if ( len_trim( Remainder ) > 0 ) {
+				if ( ! Remainder.empty() ) {
 					AddError( StackNum, LineNum, "Nothing is allowed to follow the ENDWHILE instruction." );
 				}
 
@@ -654,8 +665,8 @@ namespace RuntimeLanguageProcessor {
 				SavedWhileExpressionNum = 0;
 
 			} else {
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "ERROR \"" + trim( Line ) + "\"";
-				AddError( StackNum, LineNum, "Unknown keyword [" + trim( Keyword ) + "]." );
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "ERROR \"" + Line + "\"";
+				AddError( StackNum, LineNum, "Unknown keyword [" + Keyword + "]." );
 
 			}}
 
@@ -665,7 +676,7 @@ namespace RuntimeLanguageProcessor {
 		if ( NestedIfDepth == 1 ) {
 			AddError( StackNum, 0, "Missing an ENDIF instruction needed to terminate an earlier IF instruction." );
 		} else if ( NestedIfDepth > 1 ) {
-			AddError( StackNum, 0, "Missing " + trim( IntegerToString( NestedIfDepth ) ) + " ENDIF instructions needed to terminate earlier IF instructions." );
+			AddError( StackNum, 0, "Missing " + IntegerToString( NestedIfDepth ) + " ENDIF instructions needed to terminate earlier IF instructions." );
 		}
 
 		//  ALLOCATE(DummyError(ErlStack(StackNum)%NumErrors))
@@ -732,7 +743,7 @@ namespace RuntimeLanguageProcessor {
 	AddError(
 		int const StackNum, // index pointer to location in ErlStack structure
 		int const LineNum, // Erl program line number
-		Fstring const & Error // error message to be added to ErlStack
+		std::string const & Error // error message to be added to ErlStack
 	)
 	{
 
@@ -770,7 +781,7 @@ namespace RuntimeLanguageProcessor {
 
 		ErrorNum = ErlStack( StackNum ).NumErrors;
 		if ( LineNum > 0 ) {
-			ErlStack( StackNum ).Error( ErrorNum ) = "Line " + trim( IntegerToString( LineNum ) ) + ":  " + Error + " \"" + trim( ErlStack( StackNum ).Line( LineNum ) ) + "\"";
+			ErlStack( StackNum ).Error( ErrorNum ) = "Line " + IntegerToString( LineNum ) + ":  " + Error + " \"" + ErlStack( StackNum ).Line( LineNum ) + "\"";
 		} else {
 			ErlStack( StackNum ).Error( ErrorNum ) = Error;
 		}
@@ -924,7 +935,7 @@ namespace RuntimeLanguageProcessor {
 			++InstructionNum;
 		} // InstructionNum
 
-		ReturnValueActual = ( 4.91 + 632. ) / ( 32. * ( 4. - 10.2 ) ); // must have extra periods
+		ReturnValueActual = ( 4.91 + 632.0 ) / ( 32.0 * ( 4.0 - 10.2 ) ); // must have extra periods
 
 		return ReturnValue;
 
@@ -961,14 +972,14 @@ namespace RuntimeLanguageProcessor {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Fstring NameString( 2 * MaxNameLength );
-		Fstring LineNumString( 2 * MaxNameLength );
-		Fstring LineString( 2 * MaxNameLength );
-		Fstring cValueString( 2 * MaxNameLength );
-		Fstring TimeString( 2 * MaxNameLength );
-		int LineNum;
-		Fstring DuringWarmup( 45 );
 		static bool MyOneTimeFlag( false );
+		int LineNum;
+		std::string NameString;
+		std::string LineNumString;
+		std::string LineString;
+		std::string cValueString;
+		std::string TimeString;
+		std::string DuringWarmup;
 
 		// FLOW:
 		if ( ( ! OutputFullEMSTrace ) && ( ! OutputEMSErrors ) ) return;
@@ -1006,9 +1017,9 @@ namespace RuntimeLanguageProcessor {
 				DuringWarmup = " During Sizing, Occurrence info=";
 			}
 		}
-		TimeString = trim( DuringWarmup ) + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + " " + trim( CreateSysTimeIntervalString() );
+		TimeString = DuringWarmup + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 
-		gio::write( OutputEMSFileUnitNum, "(A)" ) << trim( NameString ) + ",Line " + trim( LineNumString ) + "," + trim( LineString ) + "," + trim( cValueString ) + "," + trim( TimeString );
+		gio::write( OutputEMSFileUnitNum, "(A)" ) << NameString + ",Line " + LineNumString + ',' + LineString + ',' + cValueString + ',' + TimeString;
 
 	}
 
@@ -1020,10 +1031,10 @@ namespace RuntimeLanguageProcessor {
 
 	void
 	ParseExpression(
-		Fstring const & InString, // String of expression text written in the Runtime Language
+		std::string const & InString, // String of expression text written in the Runtime Language
 		int const StackNum, // Parent StackNum??
 		int & ExpressionNum, // index of expression in structure
-		Fstring const & Line // Actual line from string
+		std::string const & Line // Actual line from string
 	)
 	{
 
@@ -1039,7 +1050,6 @@ namespace RuntimeLanguageProcessor {
 		// METHODOLOGY EMPLOYED:
 
 		// Using/Aliasing
-		using InputProcessor::MakeUPPERCase;
 		using InputProcessor::ProcessNumber;
 		using InputProcessor::SameString;
 		using DataSystemVariables::DeveloperFlag;
@@ -1047,19 +1057,17 @@ namespace RuntimeLanguageProcessor {
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxDoLoopCounts( 500 );
-		static Fstring const fmta( "(A)" );
+		static gio::Fmt const fmta( "(A)" );
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//  CHARACTER(len=120), DIMENSION(MaxErrors) :: Error  ! Errors should be stored with the stack
 		int NumErrors;
-		int Pos;
-		int LastPos;
+		std::string::size_type Pos;
 		int NumTokens;
-		Fstring StringToken( MaxNameLength ); // MaxNameLength won't do here
-		Fstring String( MaxNameLength + 10 );
-		Fstring NextChar( 1 );
+		std::string StringToken;
+		char NextChar;
 		bool PeriodFound;
 		bool MinusFound;
 		bool PlusFound;
@@ -1085,30 +1093,31 @@ namespace RuntimeLanguageProcessor {
 			firstTime = false;
 		}
 		NumTokens = 0;
-		String = InString;
+		std::string String( InString );
 
 		// Following is a workaround to parse unitary operators as first value in the expression.
 		// i.e. Set X = -1
 		// this creates Set X = 0-1
 		// and seems to work.
 
-		if ( String( 1, 1 ) == "-" ) {
-			String = "0" + trim( String );
-		} else if ( String( 1, 1 ) == "+" ) {
-			String = "0" + trim( String );
+		assert( ! String.empty() );
+		if ( String[ 0 ] == '-' ) {
+			String = "0" + String;
+		} else if ( String[ 0 ] == '+' ) {
+			String = "0" + String;
 		}
-		LastPos = len_trim( String );
-		Pos = 1;
-		while ( Pos <= LastPos ) {
+		std::string::size_type const LastPos( String.length() );
+		Pos = 0;
+		while ( Pos < LastPos ) {
 			++CountDoLooping;
 			if ( CountDoLooping > MaxDoLoopCounts ) {
-				ShowSevereError( "EMS ParseExpression: Entity=" + trim( ErlStack( StackNum ).Name ) );
-				ShowContinueError( "...Line=" + trim( Line ) );
-				ShowContinueError( "...Failed to process String=\"" + trim( String ) + "\"." );
+				ShowSevereError( "EMS ParseExpression: Entity=" + ErlStack( StackNum ).Name );
+				ShowContinueError( "...Line=" + Line );
+				ShowContinueError( "...Failed to process String=\"" + String + "\"." );
 				ShowFatalError( "...program terminates due to preceding condition." );
 			}
-			NextChar = String( Pos, Pos );
-			if ( SCAN( NextChar, " " ) != 0 ) {
+			NextChar = String[ Pos ];
+			if ( NextChar == ' ' ) {
 				++Pos;
 				continue;
 			}
@@ -1151,22 +1160,22 @@ namespace RuntimeLanguageProcessor {
 			OperatorProcessing = false; // true when an operator is found until terminated by non-operator
 			ErrorFlag = false;
 			LastED = false;
-			if ( SCAN( NextChar, "0123456789." ) != 0 ) {
+			if ( is_any_of( NextChar, "0123456789." ) ) {
 				// Parse a number literal token
 				++Pos;
-				StringToken = trim( StringToken ) + NextChar;
-				if ( SCAN( NextChar, "." ) != 0 ) PeriodFound = true;
+				StringToken += NextChar;
+				if ( NextChar == '.' ) PeriodFound = true;
 
-				while ( len_trim( String ) > 0 ) {
-					NextChar = String( Pos, Pos );
-					if ( SCAN( NextChar, "0123456789.eEdD" ) != 0 ) {
+				while ( Pos < LastPos ) {
+					NextChar = String[ Pos ];
+					if ( is_any_of( NextChar, "0123456789.eEdD" ) ) {
 						++Pos;
-						if ( SCAN( NextChar, "." ) != 0 ) {
+						if ( NextChar == '.' ) {
 							if ( PeriodFound ) {
 								// ERROR:  two periods appearing in a number literal!
-								ShowSevereError( "EMS Parse Expression, for \"" + trim( ErlStack( StackNum ).Name ) + "\"." );
-								ShowContinueError( "...Line=\"" + trim( Line ) + "\"." );
-								ShowContinueError( "...Bad String=\"" + trim( String ) + "\"." );
+								ShowSevereError( "EMS Parse Expression, for \"" + ErlStack( StackNum ).Name + "\"." );
+								ShowContinueError( "...Line=\"" + Line + "\"." );
+								ShowContinueError( "...Bad String=\"" + String + "\"." );
 								ShowContinueError( "...Two decimal points detected in String." );
 								++NumErrors;
 								ErrorFlag = true;
@@ -1175,12 +1184,12 @@ namespace RuntimeLanguageProcessor {
 								PeriodFound = true;
 							}
 						}
-						if ( SCAN( NextChar, "eEdD" ) != 0 ) {
-							StringToken = trim( StringToken ) + NextChar;
+						if ( is_any_of( NextChar, "eEdD" ) ) {
+							StringToken += NextChar;
 							if ( LastED ) {
-								ShowSevereError( "EMS Parse Expression, for \"" + trim( ErlStack( StackNum ).Name ) + "\"." );
-								ShowContinueError( "...Line=\"" + trim( Line ) + "\"." );
-								ShowContinueError( "...Bad String=\"" + trim( String ) + "\"." );
+								ShowSevereError( "EMS Parse Expression, for \"" + ErlStack( StackNum ).Name + "\"." );
+								ShowContinueError( "...Line=\"" + Line + "\"." );
+								ShowContinueError( "...Bad String=\"" + String + "\"." );
 								ShowContinueError( "...Two D/E in numeric String." );
 								++NumErrors;
 								ErrorFlag = true;
@@ -1190,21 +1199,21 @@ namespace RuntimeLanguageProcessor {
 								LastED = true;
 							}
 						} else {
-							StringToken = trim( StringToken ) + NextChar;
+							StringToken += NextChar;
 						}
-					} else if ( SCAN( NextChar, "+-" ) != 0 ) { // +/- following an ED is okay.
+					} else if ( is_any_of( NextChar, "+-" ) ) { // +/- following an ED is okay.
 						if ( LastED ) {
-							StringToken = trim( StringToken ) + NextChar;
+							StringToken += NextChar;
 							++Pos;
 							LastED = false;
 						} else {
 							break;
 						}
-					} else if ( SCAN( NextChar, " +-*/^=<>)" ) != 0 ) { // Any binary operator is okay
+					} else if ( is_any_of( NextChar, " +-*/^=<>)" ) ) { // Any binary operator is okay
 						break; // End of token
 					} else {
 						// Error: strange sequence of characters:  return TokenString//NextChar   e.g.,  234.44a or 234.44%
-						StringToken = trim( StringToken ) + NextChar;
+						StringToken += NextChar;
 						break;
 					}
 				}
@@ -1213,32 +1222,32 @@ namespace RuntimeLanguageProcessor {
 				if ( ! ErrorFlag ) {
 					Token( NumTokens ).Type = TokenNumber;
 					Token( NumTokens ).String = StringToken;
-					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "Number=\"" + trim( StringToken ) + "\"";
+					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "Number=\"" + StringToken + "\"";
 					Token( NumTokens ).Number = ProcessNumber( StringToken, ErrorFlag );
 					if ( DeveloperFlag && ErrorFlag ) gio::write( OutputFileDebug, fmta ) << "Numeric error flagged";
 					if ( MinusFound ) Token( NumTokens ).Number = -Token( NumTokens ).Number;
 					if ( ErrorFlag ) {
 						// Error: something wrong with this number!
-						ShowSevereError( "EMS Parse Expression, for \"" + trim( ErlStack( StackNum ).Name ) + "\"." );
-						ShowContinueError( "...Line=\"" + trim( Line ) + "\"." );
-						ShowContinueError( "...Bad String=\"" + trim( String ) + "\"." );
-						ShowContinueError( "Invalid numeric=\"" + trim( StringToken ) + "\"." );
+						ShowSevereError( "EMS Parse Expression, for \"" + ErlStack( StackNum ).Name + "\"." );
+						ShowContinueError( "...Line=\"" + Line + "\"." );
+						ShowContinueError( "...Bad String=\"" + String + "\"." );
+						ShowContinueError( "Invalid numeric=\"" + StringToken + "\"." );
 						++NumErrors;
 					}
 				}
 
-			} else if ( SCAN( NextChar, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" ) != 0 ) {
+			} else if ( is_any_of( NextChar, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" ) ) {
 				// Parse an undetermined string token (could be a variable, subroutine, or named operator)
 				++Pos;
-				StringToken = trim( StringToken ) + NextChar;
+				StringToken += NextChar;
 				OperatorProcessing = false;
 
-				while ( len_trim( String ) > 0 ) {
-					NextChar = String( Pos, Pos );
-					if ( SCAN( NextChar, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789" ) != 0 ) {
+				while ( Pos < LastPos ) {
+					NextChar = String[ Pos ];
+					if ( is_any_of( NextChar, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789" ) ) {
 						++Pos;
-						StringToken = trim( StringToken ) + NextChar;
-					} else if ( SCAN( NextChar, " +-*/^=<>()" ) != 0 ) {
+						StringToken += NextChar;
+					} else if ( is_any_of( NextChar, " +-*/^=<>()" ) ) {
 						break; // End of token
 					} else {
 						// Error: bad syntax:  return TokenString//NextChar   e.g.,  var1$ or b%
@@ -1249,326 +1258,325 @@ namespace RuntimeLanguageProcessor {
 				// Save the variable token
 				Token( NumTokens ).Type = TokenVariable;
 				Token( NumTokens ).String = StringToken;
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "Variable=\"" + trim( StringToken ) + "\"";
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "Variable=\"" + StringToken + "\"";
 				Token( NumTokens ).Variable = NewEMSVariable( StringToken, StackNum );
 
-			} else if ( SCAN( NextChar, "+-*/^=<>@|&" ) != 0 ) {
+			} else if ( is_any_of( NextChar, "+-*/^=<>@|&" ) ) {
 				// Parse an operator token
 				StringToken = NextChar;
 
 				Token( NumTokens ).Type = TokenOperator;
 
 				// First check for two character operators:  == <> <= >=
-				if ( String( Pos, Pos + 1 ) == "==" ) {
-					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + trim( String( {Pos,Pos + 1} ) ) + "\"";
+				std::string const cc( String.substr( Pos, 2 ) );
+				if ( cc == "==" ) {
+					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatorEqual;
-					Token( NumTokens ).String = String( Pos, Pos + 1 );
+					Token( NumTokens ).String = String.substr( Pos, 2 );
 					++Pos;
-				} else if ( String( Pos, Pos + 1 ) == "<>" ) {
-					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + trim( String( {Pos,Pos + 1} ) ) + "\"";
+				} else if ( cc == "<>" ) {
+					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatorNotEqual;
-					Token( NumTokens ).String = String( Pos, Pos + 1 );
+					Token( NumTokens ).String = String.substr( Pos, 2 );
 					++Pos;
-				} else if ( String( Pos, Pos + 1 ) == "<=" ) {
-					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + trim( String( {Pos,Pos + 1} ) ) + "\"";
+				} else if ( cc == "<=" ) {
+					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatorLessOrEqual;
-					Token( NumTokens ).String = String( Pos, Pos + 1 );
+					Token( NumTokens ).String = String.substr( Pos, 2 );
 					++Pos;
-				} else if ( String( Pos, Pos + 1 ) == ">=" ) {
-					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + trim( String( {Pos,Pos + 1} ) ) + "\"";
+				} else if ( cc == ">=" ) {
+					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatorGreaterOrEqual;
-					Token( NumTokens ).String = String( Pos, Pos + 1 );
+					Token( NumTokens ).String = String.substr( Pos, 2 );
 					++Pos;
-				} else if ( String( Pos, Pos + 1 ) == "||" ) {
-					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + trim( String( {Pos,Pos + 1} ) ) + "\"";
+				} else if ( cc == "||" ) {
+					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatiorLogicalOR;
-					Token( NumTokens ).String = String( Pos, Pos + 1 );
+					Token( NumTokens ).String = String.substr( Pos, 2 );
 					++Pos;
-				} else if ( String( Pos, Pos + 1 ) == "&&" ) {
-					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + trim( String( {Pos,Pos + 1} ) ) + "\"";
+				} else if ( cc == "&&" ) {
+					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatorLogicalAND;
-					Token( NumTokens ).String = String( Pos, Pos + 1 );
+					Token( NumTokens ).String = String.substr( Pos, 2 );
 					++Pos;
 					// next check for builtin functions signaled by "@"
-				} else if ( String( Pos, Pos ) == "@" ) {
+				} else if ( String[ Pos ] == '@' ) {
 
-					if ( SameString( String( Pos, Pos + 5 ), "@Round" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + trim( String( {Pos,Pos + 5} ) ) + "\"";
+					if ( SameString( String.substr( Pos, 6 ), "@Round" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 6 ) + "\"";
 						Token( NumTokens ).Operator = FuncRound;
-						Token( NumTokens ).String = String( Pos, Pos + 5 );
+						Token( NumTokens ).String = String.substr( Pos, 6 );
 						Pos += 5;
-					} else if ( SameString( String( Pos, Pos + 3 ), "@Mod" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + trim( String( {Pos,Pos + 3} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 4 ), "@Mod" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
 						Token( NumTokens ).Operator = FuncMod;
-						Token( NumTokens ).String = String( Pos, Pos + 3 );
+						Token( NumTokens ).String = String.substr( Pos, 4 );
 						Pos += 3;
-					} else if ( SameString( String( Pos, Pos + 3 ), "@Sin" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + trim( String( {Pos,Pos + 3} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 4 ), "@Sin" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
 						Token( NumTokens ).Operator = FuncSin;
-						Token( NumTokens ).String = String( Pos, Pos + 3 );
+						Token( NumTokens ).String = String.substr( Pos, 4 );
 						Pos += 3;
-					} else if ( SameString( String( Pos, Pos + 3 ), "@Cos" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + trim( String( {Pos,Pos + 3} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 4 ), "@Cos" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
 						Token( NumTokens ).Operator = FuncCos;
-						Token( NumTokens ).String = String( Pos, Pos + 3 );
+						Token( NumTokens ).String = String.substr( Pos, 4 );
 						Pos += 3;
-					} else if ( SameString( String( Pos, Pos + 6 ), "@ArcCos" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + trim( String( {Pos,Pos + 6} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 7 ), "@ArcCos" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 7 ) + "\"";
 						Token( NumTokens ).Operator = FuncArcCos;
-						Token( NumTokens ).String = String( Pos, Pos + 6 );
+						Token( NumTokens ).String = String.substr( Pos, 7 );
 						Pos += 6;
-					} else if ( SameString( String( Pos, Pos + 6 ), "@ArcSin" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + trim( String( {Pos,Pos + 6} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 7 ), "@ArcSin" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 7 ) + "\"";
 						Token( NumTokens ).Operator = FuncArcSin;
-						Token( NumTokens ).String = String( Pos, Pos + 6 );
+						Token( NumTokens ).String = String.substr( Pos, 7 );
 						Pos += 6;
-					} else if ( SameString( String( Pos, Pos + 8 ), "@DegToRad" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + trim( String( {Pos,Pos + 8} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 9 ), "@DegToRad" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 9 ) + "\"";
 						Token( NumTokens ).Operator = FuncDegToRad;
-						Token( NumTokens ).String = String( Pos, Pos + 8 );
+						Token( NumTokens ).String = String.substr( Pos, 9 );
 						Pos += 8;
-					} else if ( SameString( String( Pos, Pos + 8 ), "@RadToDeg" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + trim( String( {Pos,Pos + 8} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 9 ), "@RadToDeg" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 9 ) + "\"";
 						Token( NumTokens ).Operator = FuncRadToDeg;
-						Token( NumTokens ).String = String( Pos, Pos + 8 );
+						Token( NumTokens ).String = String.substr( Pos, 9 );
 						Pos += 8;
-					} else if ( SameString( String( Pos, Pos + 3 ), "@Exp" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + trim( String( {Pos,Pos + 3} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 4 ), "@Exp" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
 						Token( NumTokens ).Operator = FuncExp;
-						Token( NumTokens ).String = String( Pos, Pos + 3 );
+						Token( NumTokens ).String = String.substr( Pos, 4 );
 						Pos += 3;
-					} else if ( SameString( String( Pos, Pos + 2 ), "@Ln" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + trim( String( {Pos,Pos + 2} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 3 ), "@Ln" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 3 ) + "\"";
 						Token( NumTokens ).Operator = FuncLn;
-						Token( NumTokens ).String = String( Pos, Pos + 2 );
+						Token( NumTokens ).String = String.substr( Pos, 3 );
 						Pos += 2;
-					} else if ( SameString( String( Pos, Pos + 3 ), "@Max" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + trim( String( {Pos,Pos + 3} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 4 ), "@Max" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
 						Token( NumTokens ).Operator = FuncMax;
-						Token( NumTokens ).String = String( Pos, Pos + 3 );
+						Token( NumTokens ).String = String.substr( Pos, 4 );
 						Pos += 3;
-					} else if ( SameString( String( Pos, Pos + 3 ), "@Min" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + trim( String( {Pos,Pos + 3} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 4 ), "@Min" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
 						Token( NumTokens ).Operator = FuncMin;
-						Token( NumTokens ).String = String( Pos, Pos + 3 );
+						Token( NumTokens ).String = String.substr( Pos, 4 );
 						Pos += 3;
-					} else if ( SameString( String( Pos, Pos + 3 ), "@Abs" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + trim( String( {Pos,Pos + 3} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 4 ), "@Abs" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
 						Token( NumTokens ).Operator = FuncABS;
-						Token( NumTokens ).String = String( Pos, Pos + 3 );
+						Token( NumTokens ).String = String.substr( Pos, 4 );
 						Pos += 3;
-					} else if ( SameString( String( Pos, Pos + 13 ), "@RANDOMUNIFORM" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + trim( String( {Pos,Pos + 13} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 14 ), "@RANDOMUNIFORM" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 14 ) + "\"";
 						Token( NumTokens ).Operator = FuncRandU;
-						Token( NumTokens ).String = String( Pos, Pos + 13 );
+						Token( NumTokens ).String = String.substr( Pos, 14 );
 						Pos += 13;
-					} else if ( SameString( String( Pos, Pos + 12 ), "@RANDOMNORMAL" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + trim( String( {Pos,Pos + 12} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 13 ), "@RANDOMNORMAL" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 13 ) + "\"";
 						Token( NumTokens ).Operator = FuncRandG;
-						Token( NumTokens ).String = String( Pos, Pos + 12 );
+						Token( NumTokens ).String = String.substr( Pos, 13 );
 						Pos += 12;
-					} else if ( SameString( String( Pos, Pos + 10 ), "@SEEDRANDOM" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + trim( String( {Pos,Pos + 10} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 11 ), "@SEEDRANDOM" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 11 ) + "\"";
 						Token( NumTokens ).Operator = FuncRandSeed;
-						Token( NumTokens ).String = String( Pos, Pos + 10 );
+						Token( NumTokens ).String = String.substr( Pos, 11 );
 						Pos += 10;
-					} else if ( SameString( String( Pos, Pos + 14 ), "@RhoAirFnPbTdbW" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 14} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 15 ), "@RhoAirFnPbTdbW" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 15 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhoAirFnPbTdbW;
-						Token( NumTokens ).String = String( Pos, Pos + 14 );
+						Token( NumTokens ).String = String.substr( Pos, 15 );
 						Pos += 14;
-					} else if ( SameString( String( Pos, Pos + 11 ), "@CpAirFnWTdb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 11} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 12 ), "@CpAirFnWTdb" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
 						Token( NumTokens ).Operator = FuncCpAirFnWTdb;
-						Token( NumTokens ).String = String( Pos, Pos + 11 );
+						Token( NumTokens ).String = String.substr( Pos, 12 );
 						Pos += 11;
-					} else if ( SameString( String( Pos, Pos + 12 ), "@HfgAirFnWTdb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 12} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 13 ), "@HfgAirFnWTdb" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 13 ) + "\"";
 						Token( NumTokens ).Operator = FuncHfgAirFnWTdb;
-						Token( NumTokens ).String = String( Pos, Pos + 12 );
+						Token( NumTokens ).String = String.substr( Pos, 13 );
 						Pos += 12;
-					} else if ( SameString( String( Pos, Pos + 11 ), "@HgAirFnWTdb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 11} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 12 ), "@HgAirFnWTdb" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
 						Token( NumTokens ).Operator = FuncHgAirFnWTdb;
-						Token( NumTokens ).String = String( Pos, Pos + 11 );
+						Token( NumTokens ).String = String.substr( Pos, 12 );
 						Pos += 11;
-					} else if ( SameString( String( Pos, Pos + 13 ), "@TdpFnTdbTwbPb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 13} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 14 ), "@TdpFnTdbTwbPb" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 14 ) + "\"";
 						Token( NumTokens ).Operator = FuncTdpFnTdbTwbPb;
-						Token( NumTokens ).String = String( Pos, Pos + 13 );
+						Token( NumTokens ).String = String.substr( Pos, 14 );
 						Pos += 13;
-					} else if ( SameString( String( Pos, Pos + 8 ), "@TdpFnWPb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 8} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 9 ), "@TdpFnWPb" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 9 ) + "\"";
 						Token( NumTokens ).Operator = FuncTdpFnWPb;
-						Token( NumTokens ).String = String( Pos, Pos + 8 );
+						Token( NumTokens ).String = String.substr( Pos, 9 );
 						Pos += 8;
-					} else if ( SameString( String( Pos, Pos + 7 ), "@HFnTdbW" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 7} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 8 ), "@HFnTdbW" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 8 ) + "\"";
 						Token( NumTokens ).Operator = FuncHFnTdbW;
-						Token( NumTokens ).String = String( Pos, Pos + 7 );
+						Token( NumTokens ).String = String.substr( Pos, 8 );
 						Pos += 7;
-					} else if ( SameString( String( Pos, Pos + 10 ), "@HFnTdbRhPb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 10} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 11 ), "@HFnTdbRhPb" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 11 ) + "\"";
 						Token( NumTokens ).Operator = FuncHFnTdbRhPb;
-						Token( NumTokens ).String = String( Pos, Pos + 10 );
+						Token( NumTokens ).String = String.substr( Pos, 11 );
 						Pos += 10;
-					} else if ( SameString( String( Pos, Pos + 7 ), "@TdbFnHW" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 7} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 8 ), "@TdbFnHW" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 8 ) + "\"";
 						Token( NumTokens ).Operator = FuncTdbFnHW;
-						Token( NumTokens ).String = String( Pos, Pos + 7 );
+						Token( NumTokens ).String = String.substr( Pos, 8 );
 						Pos += 7;
-					} else if ( SameString( String( Pos, Pos + 11 ), "@RhovFnTdbRh" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 11} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 12 ), "@RhovFnTdbRh" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhovFnTdbRh;
-						Token( NumTokens ).String = String( Pos, Pos + 11 );
+						Token( NumTokens ).String = String.substr( Pos, 12 );
 						Pos += 11;
-					} else if ( SameString( String( Pos, Pos + 17 ), "@RhovFnTdbRhLBnd0C" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 17} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 18 ), "@RhovFnTdbRhLBnd0C" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 18 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhovFnTdbRhLBnd0C;
-						Token( NumTokens ).String = String( Pos, Pos + 17 );
+						Token( NumTokens ).String = String.substr( Pos, 18 );
 						Pos += 17;
-					} else if ( SameString( String( Pos, Pos + 12 ), "@RhovFnTdbWPb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 12} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 13 ), "@RhovFnTdbWPb" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 13 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhovFnTdbWPb;
-						Token( NumTokens ).String = String( Pos, Pos + 12 );
+						Token( NumTokens ).String = String.substr( Pos, 13 );
 						Pos += 12;
-					} else if ( SameString( String( Pos, Pos + 11 ), "@RhFnTdbRhov" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 11} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 12 ), "@RhFnTdbRhov" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhFnTdbRhov;
-						Token( NumTokens ).String = String( Pos, Pos + 11 );
+						Token( NumTokens ).String = String.substr( Pos, 12 );
 						Pos += 11;
-					} else if ( SameString( String( Pos, Pos + 17 ), "@RhFnTdbRhovLBnd0C" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 17} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 18 ), "@RhFnTdbRhovLBnd0C" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 18 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhFnTdbRhovLBnd0C;
-						Token( NumTokens ).String = String( Pos, Pos + 17 );
+						Token( NumTokens ).String = String.substr( Pos, 18 );
 						Pos += 17;
-					} else if ( SameString( String( Pos, Pos + 10 ), "@RhFnTdbWPb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 10} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 11 ), "@RhFnTdbWPb" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 11 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhFnTdbWPb;
-						Token( NumTokens ).String = String( Pos, Pos + 10 );
+						Token( NumTokens ).String = String.substr( Pos, 11 );
 						Pos += 10;
-					} else if ( SameString( String( Pos, Pos + 11 ), "@TwbFnTdbWPb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 11} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 12 ), "@TwbFnTdbWPb" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
 						Token( NumTokens ).Operator = FuncTwbFnTdbWPb;
-						Token( NumTokens ).String = String( Pos, Pos + 11 );
+						Token( NumTokens ).String = String.substr( Pos, 12 );
 						Pos += 11;
-					} else if ( SameString( String( Pos, Pos + 9 ), "@VFnTdbWPb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 9} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 10 ), "@VFnTdbWPb" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 10 ) + "\"";
 						Token( NumTokens ).Operator = FuncVFnTdbWPb;
-						Token( NumTokens ).String = String( Pos, Pos + 9 );
+						Token( NumTokens ).String = String.substr( Pos, 10 );
 						Pos += 9;
-					} else if ( SameString( String( Pos, Pos + 8 ), "@WFnTdpPb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 8} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 9 ), "@WFnTdpPb" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 9 ) + "\"";
 						Token( NumTokens ).Operator = FuncWFnTdpPb;
-						Token( NumTokens ).String = String( Pos, Pos + 8 );
+						Token( NumTokens ).String = String.substr( Pos, 9 );
 						Pos += 8;
-					} else if ( SameString( String( Pos, Pos + 7 ), "@WFnTdbH" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 7} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 8 ), "@WFnTdbH" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 8 ) + "\"";
 						Token( NumTokens ).Operator = FuncWFnTdbH;
-						Token( NumTokens ).String = String( Pos, Pos + 7 );
+						Token( NumTokens ).String = String.substr( Pos, 8 );
 						Pos += 7;
-					} else if ( SameString( String( Pos, Pos + 11 ), "@WFnTdbTwbPb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 11} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 12 ), "@WFnTdbTwbPb" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
 						Token( NumTokens ).Operator = FuncWFnTdbTwbPb;
-						Token( NumTokens ).String = String( Pos, Pos + 11 );
+						Token( NumTokens ).String = String.substr( Pos, 12 );
 						Pos += 11;
-					} else if ( SameString( String( Pos, Pos + 10 ), "@WFnTdbRhPb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 10} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 11 ), "@WFnTdbRhPb" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 11 ) + "\"";
 						Token( NumTokens ).Operator = FuncWFnTdbRhPb;
-						Token( NumTokens ).String = String( Pos, Pos + 10 );
+						Token( NumTokens ).String = String.substr( Pos, 11 );
 						Pos += 10;
-					} else if ( SameString( String( Pos, Pos + 10 ), "@PsatFnTemp" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 10} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 11 ), "@PsatFnTemp" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 11 ) + "\"";
 						Token( NumTokens ).Operator = FuncPsatFnTemp;
-						Token( NumTokens ).String = String( Pos, Pos + 10 );
+						Token( NumTokens ).String = String.substr( Pos, 11 );
 						Pos += 10;
-					} else if ( SameString( String( Pos, Pos + 9 ), "@TsatFnHPb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 9} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 10 ), "@TsatFnHPb" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 10 ) + "\"";
 						Token( NumTokens ).Operator = FuncTsatFnHPb;
-						Token( NumTokens ).String = String( Pos, Pos + 9 );
+						Token( NumTokens ).String = String.substr( Pos, 10 );
 						Pos += 9;
-					} else if ( SameString( String( Pos, Pos + 8 ), "@TsatFnPb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 8} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 9 ), "@TsatFnPb" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 9 ) + "\"";
 						Token( NumTokens ).Operator = FuncTsatFnPb;
-						Token( NumTokens ).String = String( Pos, Pos + 8 );
+						Token( NumTokens ).String = String.substr( Pos, 9 );
 						Pos += 8;
-					} else if ( SameString( String( Pos, Pos + 4 ), "@CpCW" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 4} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 5 ), "@CpCW" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 5 ) + "\"";
 						Token( NumTokens ).Operator = FuncCpCW;
-						Token( NumTokens ).String = String( Pos, Pos + 4 );
+						Token( NumTokens ).String = String.substr( Pos, 5 );
 						Pos += 4;
-					} else if ( SameString( String( Pos, Pos + 4 ), "@CpHW" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 4} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 5 ), "@CpHW" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 5 ) + "\"";
 						Token( NumTokens ).Operator = FuncCpHW;
-						Token( NumTokens ).String = String( Pos, Pos + 4 );
+						Token( NumTokens ).String = String.substr( Pos, 5 );
 						Pos += 4;
-					} else if ( SameString( String( Pos, Pos + 6 ), "@RhoH2O" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 6} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 7 ), "@RhoH2O" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 7 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhoH2O;
-						Token( NumTokens ).String = String( Pos, Pos + 6 );
+						Token( NumTokens ).String = String.substr( Pos, 7 );
 						Pos += 6;
-					} else if ( SameString( String( Pos, Pos + 11 ), "@FATALHALTEP" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 11} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 12 ), "@FATALHALTEP" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
 						Token( NumTokens ).Operator = FuncFatalHaltEp;
-						Token( NumTokens ).String = String( Pos, Pos + 11 );
+						Token( NumTokens ).String = String.substr( Pos, 12 );
 						Pos += 11;
-					} else if ( SameString( String( Pos, Pos + 12 ), "@SEVEREWARNEP" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 12} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 13 ), "@SEVEREWARNEP" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 13 ) + "\"";
 						Token( NumTokens ).Operator = FuncSevereWarnEp;
-						Token( NumTokens ).String = String( Pos, Pos + 12 );
+						Token( NumTokens ).String = String.substr( Pos, 13 );
 						Pos += 12;
-					} else if ( SameString( String( Pos, Pos + 6 ), "@WARNEP" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 6} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 7 ), "@WARNEP" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 7 ) + "\"";
 						Token( NumTokens ).Operator = FuncWarnEp;
-						Token( NumTokens ).String = String( Pos, Pos + 6 );
+						Token( NumTokens ).String = String.substr( Pos, 7 );
 						Pos += 6;
-					} else if ( SameString( String( Pos, Pos + 10 ), "@TRENDVALUE" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 10} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 11 ), "@TRENDVALUE" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 11 ) + "\"";
 						Token( NumTokens ).Operator = FuncTrendValue;
-						Token( NumTokens ).String = String( Pos, Pos + 10 );
+						Token( NumTokens ).String = String.substr( Pos, 11 );
 						Pos += 10;
-					} else if ( SameString( String( Pos, Pos + 12 ), "@TRENDAVERAGE" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 12} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 13 ), "@TRENDAVERAGE" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 13 ) + "\"";
 						Token( NumTokens ).Operator = FuncTrendAverage;
-						Token( NumTokens ).String = String( Pos, Pos + 12 );
+						Token( NumTokens ).String = String.substr( Pos, 13 );
 						Pos += 12;
-					} else if ( SameString( String( Pos, Pos + 8 ), "@TRENDMAX" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 8} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 9 ), "@TRENDMAX" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 9 ) + "\"";
 						Token( NumTokens ).Operator = FuncTrendMax;
-						Token( NumTokens ).String = String( Pos, Pos + 8 );
+						Token( NumTokens ).String = String.substr( Pos, 9 );
 						Pos += 8;
-					} else if ( SameString( String( Pos, Pos + 8 ), "@TRENDMIN" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 8} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 9 ), "@TRENDMIN" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 9 ) + "\"";
 						Token( NumTokens ).Operator = FuncTrendMin;
-						Token( NumTokens ).String = String( Pos, Pos + 8 );
+						Token( NumTokens ).String = String.substr( Pos, 9 );
 						Pos += 8;
-					} else if ( SameString( String( Pos, Pos + 14 ), "@TRENDDIRECTION" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 14} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 15 ), "@TRENDDIRECTION" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 15 ) + "\"";
 						Token( NumTokens ).Operator = FuncTrendDirection;
-						Token( NumTokens ).String = String( Pos, Pos + 14 );
+						Token( NumTokens ).String = String.substr( Pos, 15 );
 						Pos += 14;
-					} else if ( SameString( String( Pos, Pos + 8 ), "@TRENDSUM" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 8} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 9 ), "@TRENDSUM" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 9 ) + "\"";
 						Token( NumTokens ).Operator = FuncTrendSum;
-						Token( NumTokens ).String = String( Pos, Pos + 8 );
+						Token( NumTokens ).String = String.substr( Pos, 9 );
 						Pos += 8;
-					} else if ( SameString( String( Pos, Pos + 10 ), "@CURVEVALUE" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + trim( String( {Pos,Pos + 10} ) ) + "\"";
+					} else if ( SameString( String.substr( Pos, 11 ), "@CURVEVALUE" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 11 ) + "\"";
 						Token( NumTokens ).Operator = FuncCurveValue;
-						Token( NumTokens ).String = String( Pos, Pos + 10 );
+						Token( NumTokens ).String = String.substr( Pos, 11 );
 						Pos += 10;
 					} else { // throw error
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "ERROR \"" + trim( String ) + "\"";
-						ShowFatalError( "EMS Runtime Language: did not find valid input for built-in function =" + trim( String ) );
-
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "ERROR \"" + String + "\"";
+						ShowFatalError( "EMS Runtime Language: did not find valid input for built-in function =" + String );
 					}
 				} else {
 					// Check for remaining single character operators
 					Token( NumTokens ).String = StringToken;
-					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + trim( StringToken ) + "\"";
+					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + StringToken + "\"";
 
-					{ auto const SELECT_CASE_var( StringToken );
-					if ( SELECT_CASE_var == "+" ) {
+					if ( StringToken == "+" ) {
 						if ( ! OperatorProcessing ) {
 							Token( NumTokens ).Operator = OperatorAdd;
 							OperatorProcessing = true;
@@ -1576,7 +1584,7 @@ namespace RuntimeLanguageProcessor {
 							PlusFound = true;
 							OperatorProcessing = false;
 						}
-					} else if ( SELECT_CASE_var == "-" ) {
+					} else if ( StringToken == "-" ) {
 						if ( ! OperatorProcessing ) {
 							Token( NumTokens ).Operator = OperatorSubtract;
 							OperatorProcessing = true;
@@ -1584,42 +1592,42 @@ namespace RuntimeLanguageProcessor {
 							MinusFound = true;
 							OperatorProcessing = false;
 						}
-					} else if ( SELECT_CASE_var == "*" ) {
+					} else if ( StringToken == "*" ) {
 						Token( NumTokens ).Operator = OperatorMultiply;
 						OperatorProcessing = true;
-					} else if ( SELECT_CASE_var == "/" ) {
+					} else if ( StringToken == "/" ) {
 						Token( NumTokens ).Operator = OperatorDivide;
 						OperatorProcessing = true;
-					} else if ( SELECT_CASE_var == "<" ) {
+					} else if ( StringToken == "<" ) {
 						Token( NumTokens ).Operator = OperatorLessThan;
 						OperatorProcessing = true;
-					} else if ( SELECT_CASE_var == ">" ) {
+					} else if ( StringToken == ">" ) {
 						Token( NumTokens ).Operator = OperatorGreaterThan;
 						OperatorProcessing = true;
-					} else if ( SELECT_CASE_var == "^" ) {
+					} else if ( StringToken == "^" ) {
 						Token( NumTokens ).Operator = OperatorRaiseToPower;
 						OperatorProcessing = true;
 					} else {
 						// Uh OH, this should never happen! throw error
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "ERROR \"" + trim( StringToken ) + "\"";
-						ShowFatalError( "EMS, caught unexpected token = \"" + trim( StringToken ) + "\" ; while parsing string=" + trim( String ) );
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "ERROR \"" + StringToken + "\"";
+						ShowFatalError( "EMS, caught unexpected token = \"" + StringToken + "\" ; while parsing string=" + String );
 
-					}}
+					}
 				}
 
 				++Pos;
 
-			} else if ( SCAN( NextChar, "()" ) != 0 ) {
+			} else if ( is_any_of( NextChar, "()" ) ) {
 				// Parse a parenthesis token
 				++Pos;
 				StringToken = NextChar;
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "PAREN \"" + trim( StringToken ) + "\"";
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "PAREN \"" + StringToken + "\"";
 				Token( NumTokens ).Type = TokenParenthesis;
 				Token( NumTokens ).String = StringToken;
-				if ( NextChar == "(" ) Token( NumTokens ).Parenthesis = ParenthesisLeft;
-				if ( NextChar == ")" ) Token( NumTokens ).Parenthesis = ParenthesisRight;
+				if ( NextChar == '(' ) Token( NumTokens ).Parenthesis = ParenthesisLeft;
+				if ( NextChar == ')' ) Token( NumTokens ).Parenthesis = ParenthesisRight;
 
-			} else if ( SCAN( NextChar, "\"" ) != 0 ) {
+			} else if ( is_any_of( NextChar, "\"" ) ) {
 				// Parse a string literal token
 				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "LITERAL STRING";
 				++Pos;
@@ -1644,7 +1652,7 @@ namespace RuntimeLanguageProcessor {
 		FArray1S< TokenType > const TokenIN,
 		int const NumTokensIN,
 		int const StackNum,
-		Fstring const & ParsingString
+		std::string const & ParsingString
 	)
 	{
 
@@ -1661,7 +1669,6 @@ namespace RuntimeLanguageProcessor {
 		// Uses recursion to handle tokens with compound expressions
 
 		// Using/Aliasing
-		using InputProcessor::MakeUPPERCase;
 		using InputProcessor::ProcessNumber;
 
 		// Return value
@@ -1776,7 +1783,7 @@ namespace RuntimeLanguageProcessor {
 
 		if ( ParenthWhileCounter == 50 ) { // symptom of mismatched parenthesis
 			ShowSevereError( "EMS error parsing parentheses, check that parentheses are balanced" );
-			ShowContinueError( "String being parsed=\"" + trim( ParsingString ) + "\"." );
+			ShowContinueError( "String being parsed=\"" + ParsingString + "\"." );
 			ShowFatalError( "Program terminates due to preceding error." );
 		}
 
@@ -1851,13 +1858,13 @@ namespace RuntimeLanguageProcessor {
 						}
 						break;
 					} else {
-						ShowSevereError( "The operator \"" + trim( PossibleOperators( OperatorNum ).Symbol ) + "\" is missing the left-hand operand!" );
-						ShowContinueError( "String being parsed=\"" + trim( ParsingString ) + "\"." );
+						ShowSevereError( "The operator \"" + PossibleOperators( OperatorNum ).Symbol + "\" is missing the left-hand operand!" );
+						ShowContinueError( "String being parsed=\"" + ParsingString + "\"." );
 						break;
 					}
 				} else if ( Pos == NumTokens ) {
-					ShowSevereError( "The operator \"" + trim( PossibleOperators( OperatorNum ).Symbol ) + "\" is missing the right-hand operand!" );
-					ShowContinueError( "String being parsed=\"" + trim( ParsingString ) + "\"." );
+					ShowSevereError( "The operator \"" + PossibleOperators( OperatorNum ).Symbol + "\" is missing the right-hand operand!" );
+					ShowContinueError( "String being parsed=\"" + ParsingString + "\"." );
 					break;
 				} else {
 
@@ -2022,10 +2029,8 @@ namespace RuntimeLanguageProcessor {
 		Real64 thisMax; // local temporary
 		Real64 thisMin; // local temporary
 		int OperandNum;
-		Fstring SeedElementChar( 1 );
 		int SeedElementInt;
 		int SeedN; // number of digits in the number used to seed the generator
-		Fstring SeedChar( MaxNameLength ); // local temporary for random seed
 		FArray1D_int SeedIntARR; // local temporary for random seed
 		int Pos; // local temporary for string position.
 		Real64 tmpRANDU1; // local temporary for uniform random number
@@ -2148,7 +2153,7 @@ namespace RuntimeLanguageProcessor {
 					if ( std::isnan( TestValue ) ) { // Use IEEE_IS_NAN when GFortran supports it
 						// throw Error
 						ReturnValue.Type = ValueError;
-						ReturnValue.Error = "Attempted to raise to power with incompatible numbers: " + trim( TrimSigDigits( Operand( 1 ).Number, 6 ) ) + " raised to " + trim( TrimSigDigits( Operand( 2 ).Number, 6 ) );
+						ReturnValue.Error = "Attempted to raise to power with incompatible numbers: " + TrimSigDigits( Operand( 1 ).Number, 6 ) + " raised to " + TrimSigDigits( Operand( 2 ).Number, 6 );
 					} else {
 						ReturnValue = SetErlValueNumber( TestValue );
 					}
@@ -2192,7 +2197,7 @@ namespace RuntimeLanguageProcessor {
 				} else {
 					// throw Error
 					ReturnValue.Type = ValueError;
-					ReturnValue.Error = "Attempted to calculate exponential value of too large a number: " + trim( TrimSigDigits( Operand( 1 ).Number, 4 ) );
+					ReturnValue.Error = "Attempted to calculate exponential value of too large a number: " + TrimSigDigits( Operand( 1 ).Number, 4 );
 				}
 			} else if ( SELECT_CASE_var == FuncLn ) {
 				if ( Operand( 1 ).Number > 0.0 ) {
@@ -2219,7 +2224,7 @@ namespace RuntimeLanguageProcessor {
 					RANDOM_NUMBER( tmpRANDU2 );
 					tmpRANDU1 = 2. * tmpRANDU1 - 1.0;
 					tmpRANDU2 = 2. * tmpRANDU2 - 1.0;
-					UnitCircleTest = std::pow( tmpRANDU1, 2 ) + std::pow( tmpRANDU2, 2 );
+					UnitCircleTest = square( tmpRANDU1 ) + square( tmpRANDU2 );
 					if ( UnitCircleTest > 0.0 && UnitCircleTest < 1.0 ) break;
 				}
 				tmpRANDG = std::sqrt( -2.0 * std::log( UnitCircleTest ) / UnitCircleTest );
@@ -2304,18 +2309,18 @@ namespace RuntimeLanguageProcessor {
 			} else if ( SELECT_CASE_var == FuncFatalHaltEp ) {
 
 				ShowSevereError( "EMS user program found serious problem and is halting simulation" );
-				ShowContinueErrorTimeStamp( " " );
-				ShowFatalError( "EMS user program halted simulation with error code = " + trim( TrimSigDigits( Operand( 1 ).Number, 2 ) ) );
+				ShowContinueErrorTimeStamp( "" );
+				ShowFatalError( "EMS user program halted simulation with error code = " + TrimSigDigits( Operand( 1 ).Number, 2 ) );
 				ReturnValue = SetErlValueNumber( Operand( 1 ).Number ); // returns back the error code
 			} else if ( SELECT_CASE_var == FuncSevereWarnEp ) {
 
-				ShowSevereError( "EMS user program issued severe warning with error code = " + trim( TrimSigDigits( Operand( 1 ).Number, 2 ) ) );
-				ShowContinueErrorTimeStamp( " " );
+				ShowSevereError( "EMS user program issued severe warning with error code = " + TrimSigDigits( Operand( 1 ).Number, 2 ) );
+				ShowContinueErrorTimeStamp( "" );
 				ReturnValue = SetErlValueNumber( Operand( 1 ).Number ); // returns back the error code
 			} else if ( SELECT_CASE_var == FuncWarnEp ) {
 
-				ShowWarningError( "EMS user program issued warning with error code = " + trim( TrimSigDigits( Operand( 1 ).Number, 2 ) ) );
-				ShowContinueErrorTimeStamp( " " );
+				ShowWarningError( "EMS user program issued warning with error code = " + TrimSigDigits( Operand( 1 ).Number, 2 ) );
+				ShowContinueErrorTimeStamp( "" );
 				ReturnValue = SetErlValueNumber( Operand( 1 ).Number ); // returns back the error code
 			} else if ( SELECT_CASE_var == FuncTrendValue ) {
 				// find TrendVariable , first operand is ErlVariable
@@ -2503,7 +2508,6 @@ namespace RuntimeLanguageProcessor {
 		// once all the object names are known.
 
 		// Using/Aliasing
-		using DataGlobals::MaxNameLength;
 		using DataGlobals::TimeStepZone;
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
@@ -2521,8 +2525,8 @@ namespace RuntimeLanguageProcessor {
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const Blank;
-		static Fstring const RoutineName( "GetRuntimeLanguageUserInput: " );
+		static std::string const Blank;
+		static std::string const RoutineName( "GetRuntimeLanguageUserInput: " );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int GlobalNum;
@@ -2541,12 +2545,12 @@ namespace RuntimeLanguageProcessor {
 		//unused0909  INTEGER    :: Pos
 		//unused0909  CHARACTER(len=MaxNameLength) :: VariableName
 		bool Found;
-		static Fstring FreqString( MaxNameLength ); // temporary
-		static Fstring VarTypeString( MaxNameLength ); // temporary
-		static Fstring ResourceTypeString( MaxNameLength );
-		static Fstring GroupTypeString( MaxNameLength );
-		static Fstring EndUseTypeString( MaxNameLength );
-		static Fstring EndUseSubCatString( MaxNameLength );
+		static std::string FreqString; // temporary
+		static std::string VarTypeString; // temporary
+		static std::string ResourceTypeString;
+		static std::string GroupTypeString;
+		static std::string EndUseTypeString;
+		static std::string EndUseSubCatString;
 
 		int TrendNum;
 		int NumTrendSteps;
@@ -2556,19 +2560,19 @@ namespace RuntimeLanguageProcessor {
 		static int MaxNumAlphas( 0 ); // argument for call to GetObjectDefMaxArgs
 		static int MaxNumNumbers( 0 ); // argument for call to GetObjectDefMaxArgs
 		static int TotalArgs( 0 ); // argument for call to GetObjectDefMaxArgs
-		FArray1D_Fstring cAlphaFieldNames( sFstring( MaxNameLength + 40 ) );
-		FArray1D_Fstring cNumericFieldNames( sFstring( MaxNameLength + 40 ) );
+		FArray1D_string cAlphaFieldNames;
+		FArray1D_string cNumericFieldNames;
 		FArray1D_bool lNumericFieldBlanks;
 		FArray1D_bool lAlphaFieldBlanks;
-		FArray1D_Fstring cAlphaArgs( sFstring( MaxNameLength ) );
+		FArray1D_string cAlphaArgs;
 		FArray1D< Real64 > rNumericArgs;
-		Fstring cCurrentModuleObject( MaxNameLength );
+		std::string cCurrentModuleObject;
 		int ConstructNum;
 		bool errFlag;
-		int lbracket;
-		Fstring UnitsA( UnitsStringLength );
-		Fstring UnitsB( UnitsStringLength );
-		int ptr;
+		std::string::size_type lbracket;
+		std::string UnitsA;
+		std::string UnitsB;
+		std::string::size_type ptr;
 
 		// FLOW:
 		if ( GetInput ) { // GetInput check is redundant with the InitializeRuntimeLanguage routine
@@ -2624,13 +2628,13 @@ namespace RuntimeLanguageProcessor {
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 			cAlphaFieldNames.allocate( MaxNumAlphas );
-			cAlphaFieldNames = " ";
+			cAlphaFieldNames = "";
 			cAlphaArgs.allocate( MaxNumAlphas );
-			cAlphaArgs = " ";
+			cAlphaArgs = "";
 			lAlphaFieldBlanks.allocate( MaxNumAlphas );
 			lAlphaFieldBlanks = false;
 			cNumericFieldNames.allocate( MaxNumNumbers );
-			cNumericFieldNames = " ";
+			cNumericFieldNames = "";
 			rNumericArgs.allocate( MaxNumNumbers );
 			rNumericArgs = 0.0;
 			lNumericFieldBlanks.allocate( MaxNumNumbers );
@@ -2654,16 +2658,16 @@ namespace RuntimeLanguageProcessor {
 					for ( ErlVarLoop = 1; ErlVarLoop <= NumAlphas; ++ErlVarLoop ) {
 						ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( ErlVarLoop ), cAlphaFieldNames( ErlVarLoop ), errFlag, ErrorsFound );
 						if ( lAlphaFieldBlanks( ErlVarLoop ) ) {
-							ShowWarningError( RoutineName + trim( cCurrentModuleObject ) );
-							ShowContinueError( "Blank " + trim( cAlphaFieldNames( 1 ) ) );
+							ShowWarningError( RoutineName + cCurrentModuleObject );
+							ShowContinueError( "Blank " + cAlphaFieldNames( 1 ) );
 							ShowContinueError( "Blank entry will be skipped, and the simulation continues" );
 						} else if ( ! errFlag ) {
 							VariableNum = FindEMSVariable( cAlphaArgs( ErlVarLoop ), 0 );
 							// Still need to check for conflicts with program and function names too
 
 							if ( VariableNum > 0 ) {
-								ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ", invalid entry." );
-								ShowContinueError( "Invalid " + trim( cAlphaFieldNames( ErlVarLoop ) ) + "=" + trim( cAlphaArgs( ErlVarLoop ) ) );
+								ShowSevereError( RoutineName + cCurrentModuleObject + ", invalid entry." );
+								ShowContinueError( "Invalid " + cAlphaFieldNames( ErlVarLoop ) + '=' + cAlphaArgs( ErlVarLoop ) );
 								ShowContinueError( "Name conflicts with an existing global variable name" );
 								ErrorsFound = true;
 							} else {
@@ -2691,15 +2695,15 @@ namespace RuntimeLanguageProcessor {
 					// check if variable name is unique and well formed
 					ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
 					if ( lAlphaFieldBlanks( 1 ) ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) );
-						ShowContinueError( "Blank " + trim( cAlphaFieldNames( 1 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject );
+						ShowContinueError( "Blank " + cAlphaFieldNames( 1 ) );
 						ShowContinueError( "Blank entry for Erl variable name is not allowed" );
 						ErrorsFound = true;
 					} else if ( ! errFlag ) {
 						VariableNum = FindEMSVariable( cAlphaArgs( 1 ), 0 );
 						if ( VariableNum > 0 ) {
-							ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid field." );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 1 ) ) );
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid field." );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( 1 ) );
 							ShowContinueError( "Name conflicts with an existing variable name" );
 							ErrorsFound = true;
 						} else {
@@ -2713,12 +2717,12 @@ namespace RuntimeLanguageProcessor {
 					CurveIndexNum = GetCurveIndex( cAlphaArgs( 2 ) ); // curve name
 					if ( CurveIndexNum == 0 ) {
 						if ( lAlphaFieldBlanks( 2 ) ) {
-							ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " blank field." );
-							ShowContinueError( "Blank " + trim( cAlphaFieldNames( 2 ) ) );
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " blank field." );
+							ShowContinueError( "Blank " + cAlphaFieldNames( 2 ) );
 							ShowContinueError( "Blank entry for curve or table name is not allowed" );
 						} else {
-							ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid field." );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid field." );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
 							ShowContinueError( "Curve or table was not found." );
 						}
 						ErrorsFound = true;
@@ -2741,15 +2745,15 @@ namespace RuntimeLanguageProcessor {
 					// check if variable name is unique and well formed
 					ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
 					if ( lAlphaFieldBlanks( 1 ) ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) );
-						ShowContinueError( "Blank " + trim( cAlphaFieldNames( 1 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject );
+						ShowContinueError( "Blank " + cAlphaFieldNames( 1 ) );
 						ShowContinueError( "Blank entry for Erl variable name is not allowed" );
 						ErrorsFound = true;
 					} else if ( ! errFlag ) {
 						VariableNum = FindEMSVariable( cAlphaArgs( 1 ), 0 );
 						if ( VariableNum > 0 ) {
-							ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid field." );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 1 ) ) );
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid field." );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( 1 ) );
 							ShowContinueError( "Name conflicts with an existing variable name" );
 							ErrorsFound = true;
 						} else {
@@ -2766,12 +2770,12 @@ namespace RuntimeLanguageProcessor {
 
 					if ( ConstructNum == 0 ) {
 						if ( lAlphaFieldBlanks( 2 ) ) {
-							ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " blank field." );
-							ShowContinueError( "Blank " + trim( cAlphaFieldNames( 2 ) ) );
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " blank field." );
+							ShowContinueError( "Blank " + cAlphaFieldNames( 2 ) );
 							ShowContinueError( "Blank entry for construction name is not allowed" );
 						} else {
-							ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid field." );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid field." );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
 							ShowContinueError( "Construction was not found." );
 						}
 						ErrorsFound = true;
@@ -2792,7 +2796,7 @@ namespace RuntimeLanguageProcessor {
 					GetObjectItem( cCurrentModuleObject, StackNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), ErlStack.Name(), StackNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+					VerifyName( cAlphaArgs( 1 ), ErlStack.Name(), StackNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2819,7 +2823,7 @@ namespace RuntimeLanguageProcessor {
 
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), ErlStack.Name(), StackNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+					VerifyName( cAlphaArgs( 1 ), ErlStack.Name(), StackNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2847,7 +2851,7 @@ namespace RuntimeLanguageProcessor {
 					GetObjectItem( cCurrentModuleObject, TrendNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), TrendVariable.Name(), TrendNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+					VerifyName( cAlphaArgs( 1 ), TrendVariable.Name(), TrendNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2861,8 +2865,8 @@ namespace RuntimeLanguageProcessor {
 					VariableNum = FindEMSVariable( cAlphaArgs( 2 ), 0 );
 					// Still need to check for conflicts with program and function names too
 					if ( VariableNum == 0 ) { //did not find it
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid field." );
-						ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid field." );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
 						ShowContinueError( "Did not find a match with an EMS variable name" );
 						ErrorsFound = true;
 					} else { // found it.
@@ -2894,8 +2898,8 @@ namespace RuntimeLanguageProcessor {
 							}
 						}
 					} else {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid field." );
-						ShowContinueError( "Invalid " + trim( cNumericFieldNames( 1 ) ) + "=" + trim( TrimSigDigits( rNumericArgs( 1 ), 2 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid field." );
+						ShowContinueError( "Invalid " + cNumericFieldNames( 1 ) + '=' + TrimSigDigits( rNumericArgs( 1 ), 2 ) );
 						ShowContinueError( "must be greater than zero" );
 						ErrorsFound = true;
 					}
@@ -2912,7 +2916,7 @@ namespace RuntimeLanguageProcessor {
 				ParseStack( StackNum );
 
 				if ( ErlStack( StackNum ).NumErrors > 0 ) {
-					ShowSevereError( "Errors found parsing EMS Runtime Language program or subroutine = " + trim( ErlStack( StackNum ).Name ) );
+					ShowSevereError( "Errors found parsing EMS Runtime Language program or subroutine = " + ErlStack( StackNum ).Name );
 					for ( ErrorNum = 1; ErrorNum <= ErlStack( StackNum ).NumErrors; ++ErrorNum ) {
 						ShowContinueError( ErlStack( StackNum ).Error( ErrorNum ) );
 					}
@@ -2935,61 +2939,61 @@ namespace RuntimeLanguageProcessor {
 
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), RuntimeReportVar.Name(), RuntimeReportVarNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+					VerifyName( cAlphaArgs( 1 ), RuntimeReportVar.Name(), RuntimeReportVarNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 					}
 
-					lbracket = index( cAlphaArgs( 1 ), "[" );
-					if ( lbracket == 0 ) {
-						UnitsA = " ";
+					lbracket = index( cAlphaArgs( 1 ), '[' );
+					if ( lbracket == std::string::npos ) {
+						UnitsA = "";
 						//          if (lAlphaFieldBlanks(6)) then
 						//            CALL ShowWarningError(RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//' no units indicated.')
 						//            CALL ShowContinueError('...no units indicated for this variable. [] is assumed.')
 						//            cAlphaArgs(1)=TRIM(cAlphaArgs(1))//' []'
 						//          endif
 						UnitsB = cAlphaArgs( 6 );
-						lbracket = index( UnitsB, "[" );
-						ptr = index( UnitsB, "]" );
-						if ( lbracket != 0 ) {
-							UnitsB( lbracket, lbracket ) = " ";
-							if ( ptr != 0 ) {
-								UnitsB( ptr, ptr ) = " ";
+						lbracket = index( UnitsB, '[' );
+						ptr = index( UnitsB, ']' );
+						if ( lbracket != std::string::npos ) {
+							UnitsB[ lbracket ] = ' ';
+							if ( ptr != std::string::npos ) {
+								UnitsB[ ptr ] = ' ';
 							}
-							UnitsB = adjustl( UnitsB );
+							strip( UnitsB );
 						}
 					} else { // units shown on Name field (7.2 and pre versions)
-						ptr = index( cAlphaArgs( 1 ), "]" );
-						if ( ptr != 0 ) {
-							UnitsA = cAlphaArgs( 1 )( lbracket + 1, ptr - 1 );
+						ptr = index( cAlphaArgs( 1 ), ']' );
+						if ( ptr != std::string::npos ) {
+							UnitsA = cAlphaArgs( 1 ).substr( lbracket + 1, ptr - lbracket - 1 );
 						} else {
-							UnitsA = cAlphaArgs( 1 )( lbracket + 1 );
+							UnitsA = cAlphaArgs( 1 ).substr( lbracket + 1 );
 						}
-						cAlphaArgs( 1 )( lbracket - 1 ) = " ";
+						cAlphaArgs( 1 ).erase( lbracket - 1 );
 						UnitsB = cAlphaArgs( 6 );
-						lbracket = index( UnitsB, "[" );
-						ptr = index( UnitsB, "]" );
-						if ( lbracket != 0 ) {
-							UnitsB( lbracket, lbracket ) = " ";
-							if ( ptr != 0 ) {
-								UnitsB( ptr, ptr ) = " ";
+						lbracket = index( UnitsB, '[' );
+						ptr = index( UnitsB, ']' );
+						if ( lbracket != std::string::npos ) {
+							UnitsB[ lbracket ] = ' ';
+							if ( ptr != std::string::npos ) {
+								UnitsB[ ptr ] = ' ';
 							}
-							UnitsB = adjustl( UnitsB );
+							strip( UnitsB );
 						}
-						if ( UnitsA != " " && UnitsB != " " ) {
+						if ( UnitsA != "" && UnitsB != "" ) {
 							if ( UnitsA != UnitsB ) {
-								ShowWarningError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " mismatched units." );
-								ShowContinueError( "...Units entered in " + trim( cAlphaFieldNames( 1 ) ) + " (deprecated use)=\"" + trim( UnitsA ) + "\"" );
-								ShowContinueError( "..." + trim( cAlphaFieldNames( 6 ) ) + "=\"" + trim( UnitsB ) + "\" (will be used)" );
+								ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " mismatched units." );
+								ShowContinueError( "...Units entered in " + cAlphaFieldNames( 1 ) + " (deprecated use)=\"" + UnitsA + "\"" );
+								ShowContinueError( "..." + cAlphaFieldNames( 6 ) + "=\"" + UnitsB + "\" (will be used)" );
 							}
-						} else if ( UnitsB == " " && UnitsA != " " ) {
+						} else if ( UnitsB == "" && UnitsA != "" ) {
 							UnitsB = UnitsA;
-							ShowWarningError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " using deprecated units designation." );
-							ShowContinueError( "...Units entered in " + trim( cAlphaFieldNames( 1 ) ) + " (deprecated use)=\"" + trim( UnitsA ) + "\"" );
+							ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " using deprecated units designation." );
+							ShowContinueError( "...Units entered in " + cAlphaFieldNames( 1 ) + " (deprecated use)=\"" + UnitsA + "\"" );
 						}
 					}
-					cAlphaArgs( 1 ) = trim( cAlphaArgs( 1 ) ) + " [" + trim( UnitsB ) + "]";
+					cAlphaArgs( 1 ) += " [" + UnitsB + ']';
 
 					RuntimeReportVar( RuntimeReportVarNum ).Name = cAlphaArgs( 1 );
 
@@ -3004,8 +3008,8 @@ namespace RuntimeLanguageProcessor {
 						}
 						if ( ! Found ) {
 							StackNum = 0;
-							ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid field." );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 5 ) ) + "=" + trim( cAlphaArgs( 5 ) ) );
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid field." );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( 5 ) + '=' + cAlphaArgs( 5 ) );
 							ShowContinueError( "EMS program or subroutine not found." );
 							ErrorsFound = true;
 						}
@@ -3017,13 +3021,13 @@ namespace RuntimeLanguageProcessor {
 
 					if ( VariableNum == 0 ) {
 						if ( lAlphaFieldBlanks( 5 ) ) {
-							ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid field." );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid field." );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
 							ShowContinueError( "EMS variable not found among global variables." );
 						} else if ( StackNum != 0 ) {
-							ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid field." );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
-							ShowContinueError( "EMS variable not found among local variables in " + trim( cAlphaArgs( 5 ) ) );
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid field." );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
+							ShowContinueError( "EMS variable not found among local variables in " + cAlphaArgs( 5 ) );
 						}
 						ErrorsFound = true;
 						//        ELSEIF (INDEX('0123456789',cAlphaArgs(2)(1:1)) > 0) THEN
@@ -3035,33 +3039,33 @@ namespace RuntimeLanguageProcessor {
 						RuntimeReportVar( RuntimeReportVarNum ).VariableNum = VariableNum;
 					}
 
-					{ auto const SELECT_CASE_var( trim( cAlphaArgs( 3 ) ) );
+					{ auto const SELECT_CASE_var( cAlphaArgs( 3 ) );
 
 					if ( SELECT_CASE_var == "AVERAGED" ) {
 						VarTypeString = "Average";
 					} else if ( SELECT_CASE_var == "SUMMED" ) {
 						VarTypeString = "Sum";
 					} else {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid field." );
-						ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + "=" + trim( cAlphaArgs( 3 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid field." );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) );
 						ShowContinueError( "...valid values are Averaged or Summed." );
 						ErrorsFound = true;
 					}}
 
-					{ auto const SELECT_CASE_var( trim( cAlphaArgs( 4 ) ) );
+					{ auto const SELECT_CASE_var( cAlphaArgs( 4 ) );
 
 					if ( SELECT_CASE_var == "ZONETIMESTEP" ) {
 						FreqString = "Zone";
 					} else if ( SELECT_CASE_var == "SYSTEMTIMESTEP" ) {
 						FreqString = "System";
 					} else {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid field." );
-						ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 4 ) ) + "=" + trim( cAlphaArgs( 4 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid field." );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
 						ShowContinueError( "...valid values are ZoneTimestep or SystemTimestep." );
 						ErrorsFound = true;
 					}}
 
-					SetupOutputVariable( trim( cAlphaArgs( 1 ) ), RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS" );
+					SetupOutputVariable( cAlphaArgs( 1 ), RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS" );
 					// Last field is index key, no indexing here so mimic weather output data
 
 				} // RuntimeReportVarNum
@@ -3075,61 +3079,61 @@ namespace RuntimeLanguageProcessor {
 
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), RuntimeReportVar.Name(), RuntimeReportVarNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+					VerifyName( cAlphaArgs( 1 ), RuntimeReportVar.Name(), RuntimeReportVarNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 					}
 
-					lbracket = index( cAlphaArgs( 1 ), "[" );
-					if ( lbracket == 0 ) {
-						UnitsA = " ";
+					lbracket = index( cAlphaArgs( 1 ), '[' );
+					if ( lbracket == std::string::npos ) {
+						UnitsA = "";
 						//          if (lAlphaFieldBlanks(9)) then
 						//            CALL ShowWarningError(RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//' no units indicated.')
 						//            CALL ShowContinueError('...no units indicated for this variable. [] is assumed.')
 						//            cAlphaArgs(1)=TRIM(cAlphaArgs(1))//' []'
 						//          endif
 						UnitsB = cAlphaArgs( 9 );
-						lbracket = index( UnitsB, "[" );
-						ptr = index( UnitsB, "]" );
-						if ( lbracket != 0 ) {
-							UnitsB( lbracket, lbracket ) = " ";
-							if ( ptr != 0 ) {
-								UnitsB( ptr, ptr ) = " ";
+						lbracket = index( UnitsB, '[' );
+						ptr = index( UnitsB, ']' );
+						if ( lbracket != std::string::npos ) {
+							UnitsB[ lbracket ] = ' ';
+							if ( ptr != std::string::npos ) {
+								UnitsB[ ptr ] = ' ';
 							}
-							UnitsB = adjustl( UnitsB );
+							strip( UnitsB );
 						}
 					} else { // units shown on Name field (7.2 and pre versions)
-						ptr = index( cAlphaArgs( 1 ), "]" );
-						if ( ptr != 0 ) {
-							UnitsA = cAlphaArgs( 1 )( lbracket + 1, ptr - 1 );
+						ptr = index( cAlphaArgs( 1 ), ']' );
+						if ( ptr != std::string::npos ) {
+							UnitsA = cAlphaArgs( 1 ).substr( lbracket + 1, ptr - lbracket - 1 );
 						} else {
-							UnitsA = cAlphaArgs( 1 )( lbracket + 1 );
+							UnitsA = cAlphaArgs( 1 ).substr( lbracket + 1 );
 						}
-						cAlphaArgs( 1 )( lbracket - 1 ) = " ";
+						cAlphaArgs( 1 ).erase( lbracket - 1 );
 						UnitsB = cAlphaArgs( 9 );
-						lbracket = index( UnitsB, "[" );
-						ptr = index( UnitsB, "]" );
-						if ( lbracket != 0 ) {
-							UnitsB( lbracket, lbracket ) = " ";
-							if ( ptr != 0 ) {
-								UnitsB( ptr, ptr ) = " ";
+						lbracket = index( UnitsB, '[' );
+						ptr = index( UnitsB, ']' );
+						if ( lbracket != std::string::npos ) {
+							UnitsB[ lbracket ] = ' ';
+							if ( ptr != std::string::npos ) {
+								UnitsB[ ptr ] = ' ';
 							}
-							UnitsB = adjustl( UnitsB );
+							strip( UnitsB );
 						}
-						if ( UnitsA != " " && UnitsB != " " ) {
+						if ( UnitsA != "" && UnitsB != "" ) {
 							if ( UnitsA != UnitsB ) {
-								ShowWarningError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " mismatched units." );
-								ShowContinueError( "...Units entered in " + trim( cAlphaFieldNames( 1 ) ) + " (deprecated use)=\"" + trim( UnitsA ) + "\"" );
-								ShowContinueError( "..." + trim( cAlphaFieldNames( 9 ) ) + "=\"" + trim( UnitsB ) + "\" (will be used)" );
+								ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " mismatched units." );
+								ShowContinueError( "...Units entered in " + cAlphaFieldNames( 1 ) + " (deprecated use)=\"" + UnitsA + "\"" );
+								ShowContinueError( "..." + cAlphaFieldNames( 9 ) + "=\"" + UnitsB + "\" (will be used)" );
 							}
-						} else if ( UnitsB == " " && UnitsA != " " ) {
+						} else if ( UnitsB == "" && UnitsA != "" ) {
 							UnitsB = UnitsA;
-							ShowWarningError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " using deprecated units designation." );
-							ShowContinueError( "...Units entered in " + trim( cAlphaFieldNames( 1 ) ) + " (deprecated use)=\"" + trim( UnitsA ) + "\"" );
+							ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " using deprecated units designation." );
+							ShowContinueError( "...Units entered in " + cAlphaFieldNames( 1 ) + " (deprecated use)=\"" + UnitsA + "\"" );
 						}
 					}
-					cAlphaArgs( 1 ) = trim( cAlphaArgs( 1 ) ) + " [" + trim( UnitsB ) + "]";
+					cAlphaArgs( 1 ) += " [" + UnitsB + ']';
 
 					RuntimeReportVar( RuntimeReportVarNum ).Name = cAlphaArgs( 1 );
 
@@ -3144,8 +3148,8 @@ namespace RuntimeLanguageProcessor {
 						}
 						if ( ! Found ) {
 							StackNum = 0;
-							ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid field." );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 4 ) ) + "=" + trim( cAlphaArgs( 4 ) ) );
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid field." );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
 							ShowContinueError( "EMS program or subroutine not found." );
 							ErrorsFound = true;
 						}
@@ -3156,13 +3160,13 @@ namespace RuntimeLanguageProcessor {
 					VariableNum = FindEMSVariable( cAlphaArgs( 2 ), StackNum );
 					if ( VariableNum == 0 ) {
 						if ( lAlphaFieldBlanks( 4 ) ) {
-							ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid field." );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid field." );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
 							ShowContinueError( "EMS variable not found among global variables." );
 						} else if ( StackNum != 0 ) {
-							ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid field." );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
-							ShowContinueError( "EMS variable not found among local variables in " + trim( cAlphaArgs( 5 ) ) );
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid field." );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
+							ShowContinueError( "EMS variable not found among local variables in " + cAlphaArgs( 5 ) );
 						}
 						ErrorsFound = true;
 						//        ELSEIF (INDEX('0123456789',cAlphaArgs(2)(1:1)) > 0) THEN
@@ -3176,20 +3180,20 @@ namespace RuntimeLanguageProcessor {
 
 					VarTypeString = "Sum"; // all metered vars are sum type
 
-					{ auto const SELECT_CASE_var( trim( cAlphaArgs( 3 ) ) );
+					{ auto const SELECT_CASE_var( cAlphaArgs( 3 ) );
 
 					if ( SELECT_CASE_var == "ZONETIMESTEP" ) {
 						FreqString = "Zone";
 					} else if ( SELECT_CASE_var == "SYSTEMTIMESTEP" ) {
 						FreqString = "System";
 					} else {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid field." );
-						ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 4 ) ) + "=" + trim( cAlphaArgs( 4 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid field." );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
 						ShowContinueError( "...valid values are ZoneTimestep or SystemTimestep." );
 						ErrorsFound = true;
 					}}
 
-					{ auto const SELECT_CASE_var( trim( cAlphaArgs( 5 ) ) );
+					{ auto const SELECT_CASE_var( cAlphaArgs( 5 ) );
 
 					if ( SELECT_CASE_var == "ELECTRICITY" ) {
 						ResourceTypeString = "Electricity";
@@ -3238,12 +3242,12 @@ namespace RuntimeLanguageProcessor {
 					} else if ( SELECT_CASE_var == "SOLARAIRHEATING" ) {
 						ResourceTypeString = "SolarAir";
 					} else {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid field." );
-						ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 5 ) ) + "=" + trim( cAlphaArgs( 5 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid field." );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 5 ) + '=' + cAlphaArgs( 5 ) );
 						ErrorsFound = true;
 					}}
 
-					{ auto const SELECT_CASE_var( trim( cAlphaArgs( 6 ) ) );
+					{ auto const SELECT_CASE_var( cAlphaArgs( 6 ) );
 
 					if ( SELECT_CASE_var == "BUILDING" ) {
 						GroupTypeString = "Building";
@@ -3252,12 +3256,12 @@ namespace RuntimeLanguageProcessor {
 					} else if ( SELECT_CASE_var == "PLANT" ) {
 						GroupTypeString = "Plant";
 					} else {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid field." );
-						ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 6 ) ) + "=" + trim( cAlphaArgs( 6 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid field." );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 6 ) + '=' + cAlphaArgs( 6 ) );
 						ErrorsFound = true;
 					}}
 
-					{ auto const SELECT_CASE_var( trim( cAlphaArgs( 7 ) ) );
+					{ auto const SELECT_CASE_var( cAlphaArgs( 7 ) );
 
 					if ( SELECT_CASE_var == "HEATING" ) {
 						EndUseTypeString = "Heating";
@@ -3288,17 +3292,17 @@ namespace RuntimeLanguageProcessor {
 					} else if ( SELECT_CASE_var == "ONSITEGENERATION" ) {
 						EndUseTypeString = "Cogeneration";
 					} else {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid field." );
-						ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( cAlphaArgs( 7 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid field." );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
 						ErrorsFound = true;
 					}}
 
 					if ( ! lAlphaFieldBlanks( 8 ) ) {
-						EndUseSubCatString = trim( cAlphaArgs( 8 ) );
+						EndUseSubCatString = cAlphaArgs( 8 );
 
-						SetupOutputVariable( trim( cAlphaArgs( 1 ) ), RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS", _, ResourceTypeString, EndUseTypeString, EndUseSubCatString, GroupTypeString );
+						SetupOutputVariable( cAlphaArgs( 1 ), RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS", _, ResourceTypeString, EndUseTypeString, EndUseSubCatString, GroupTypeString );
 					} else { // no subcat
-						SetupOutputVariable( trim( cAlphaArgs( 1 ) ), RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS", _, ResourceTypeString, EndUseTypeString, _, GroupTypeString );
+						SetupOutputVariable( cAlphaArgs( 1 ), RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS", _, ResourceTypeString, EndUseTypeString, _, GroupTypeString );
 					}
 
 				}
@@ -3352,7 +3356,7 @@ namespace RuntimeLanguageProcessor {
 
 	}
 
-	Fstring
+	std::string
 	IntegerToString( int const Number )
 	{
 		// FUNCTION INFORMATION:
@@ -3374,7 +3378,7 @@ namespace RuntimeLanguageProcessor {
 		// na
 
 		// Return value
-		Fstring String( 25 );
+		std::string String;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -3391,7 +3395,7 @@ namespace RuntimeLanguageProcessor {
 		// na
 
 		gio::write( String, "*" ) << Number; // Could add formatting here
-		String = adjustl( String );
+		strip( String );
 
 		return String;
 
@@ -3454,7 +3458,7 @@ namespace RuntimeLanguageProcessor {
 	}
 
 	ErlValueType
-	StringValue( Fstring const & String )
+	StringValue( std::string const & String )
 	{
 		// FUNCTION INFORMATION:
 		//       AUTHOR         P. Ellis
@@ -3500,7 +3504,7 @@ namespace RuntimeLanguageProcessor {
 		return Value;
 	}
 
-	Fstring
+	std::string
 	ValueToString( ErlValueType const & Value )
 	{
 		// FUNCTION INFORMATION:
@@ -3522,7 +3526,7 @@ namespace RuntimeLanguageProcessor {
 		using General::TrimSigDigits;
 
 		// Return value
-		Fstring String( 200 );
+		std::string String;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -3545,7 +3549,7 @@ namespace RuntimeLanguageProcessor {
 			// TBD
 
 		} else if ( SELECT_CASE_var == ValueError ) {
-			String = " *** Error: " + trim( Value.Error ) + " *** ";
+			String = " *** Error: " + Value.Error + " *** ";
 
 		}}
 
@@ -3554,7 +3558,7 @@ namespace RuntimeLanguageProcessor {
 
 	int
 	FindEMSVariable(
-		Fstring const & VariableName, // variable name in Erl
+		std::string const & VariableName, // variable name in Erl
 		int const StackNum
 	)
 	{
@@ -3580,12 +3584,11 @@ namespace RuntimeLanguageProcessor {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		bool Found;
-		Fstring UppercaseName( MaxNameLength );
 		int TrendVarNum;
 
 		// FLOW:
 		Found = false;
-		UppercaseName = MakeUPPERCase( VariableName );
+		std::string const UppercaseName = MakeUPPERCase( VariableName );
 
 		// check in ErlVariables
 		for ( VariableNum = 1; VariableNum <= NumErlVariables; ++VariableNum ) {
@@ -3615,7 +3618,7 @@ namespace RuntimeLanguageProcessor {
 
 	int
 	NewEMSVariable(
-		Fstring const & VariableName,
+		std::string const & VariableName,
 		int const StackNum,
 		Optional< ErlValueType const > Value
 	)

@@ -65,11 +65,11 @@ operator <<( std::ostream & stream, FArray6S< T > const & a )
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 					for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-						for ( int i5 = 1, e5 = a.u5(); i5 < e5; ++i5 ) {
+						for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
 							for ( int i6 = 1, e6 = a.u6(); i6 < e6; ++i6 ) {
-								stream << setw( w ) << a( i1, i2, i3, i4, i5, i6 ) << SPC;
+								stream << setw( w ) << a( i1, i2, i3, i4, i5, i6 ) << ' ';
 								if ( ! stream ) break;
-							} stream << setw( w ) << a( i1, i2, i3, i4, i5, a.u6() ) << NL;
+							} stream << setw( w ) << a( i1, i2, i3, i4, i5, a.u6() ) << '\n';
 						} if ( ! stream ) break;
 					} if ( ! stream ) break;
 				} if ( ! stream ) break;
@@ -159,7 +159,7 @@ LD( FArray6S< T > const & a )
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 					for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-						for ( int i5 = 1, e5 = a.u5(); i5 < e5; ++i5 ) {
+						for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
 							for ( int i6 = 1, e6 = a.u6(); i6 <= e6; ++i6 ) {
 								s.append( fmt::LD( a( i1, i2, i3, i4, i5, i6 ) ) );
 							}

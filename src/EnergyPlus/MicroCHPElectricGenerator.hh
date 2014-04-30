@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -27,7 +26,7 @@ namespace MicroCHPElectricGenerator {
 	void
 	SimMicroCHPGenerator(
 		int const GeneratorType, // type of Generator
-		Fstring const & GeneratorName, // user specified name of Generator
+		std::string const & GeneratorName, // user specified name of Generator
 		int & GeneratorIndex,
 		bool const RunFlagElectCenter, // simulate Generator when TRUE
 		bool const RunFlagPlant, // simulate generator when true.
@@ -112,8 +111,8 @@ namespace MicroCHPElectricGenerator {
 
 	void
 	SimMicroCHPPlantHeatRecovery(
-		Fstring const & CompType,
-		Fstring const & CompName,
+		std::string const & CompType,
+		std::string const & CompName,
 		int & CompNum,
 		bool const RunFlag,
 		bool & InitLoopEquip,

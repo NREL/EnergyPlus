@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -16,7 +15,6 @@ namespace EnergyPlus {
 namespace Fans {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 	using DataHVACGlobals::MinFrac;
 
 	// Data
@@ -59,9 +57,9 @@ namespace Fans {
 	struct FanEquipConditions
 	{
 		// Members
-		Fstring FanName; // Name of the fan
-		Fstring FanType; // Type of Fan ie. Simple, Vane axial, Centrifugal, etc.
-		Fstring AvailSchedName; // Fan Operation Schedule
+		std::string FanName; // Name of the fan
+		std::string FanType; // Type of Fan ie. Simple, Vane axial, Centrifugal, etc.
+		std::string AvailSchedName; // Fan Operation Schedule
 		int FanType_Num; // DataHVACGlobals fan type
 		int AvailSchedPtrNum; // Pointer to the availability schedule
 		Real64 InletAirMassFlowRate; // MassFlow through the Fan being Simulated [kg/Sec]
@@ -108,7 +106,7 @@ namespace Fans {
 		int NVPerfNum;
 		int FanPowerRatAtSpeedRatCurveIndex;
 		int FanEffRatioCurveIndex;
-		Fstring EndUseSubcategoryName;
+		std::string EndUseSubcategoryName;
 		bool OneTimePowerRatioCheck; // one time flag used for error message
 		bool OneTimeEffRatioCheck; // one time flag used for error message
 		//cpw22Aug2010 Following added to support Fan Component Model input
@@ -126,7 +124,7 @@ namespace Fans {
 		Real64 MotorMaxSpd; // Motor maximum speed [rpm]
 		Real64 MotorMaxOutPwr; // Motor maximum output power [W]
 		Real64 MotorSizingFactor; // Motor sizing factor [-]
-		Fstring VFDEffType; // VFD efficiency type [Speed or Power]
+		std::string VFDEffType; // VFD efficiency type [Speed or Power]
 		Real64 VFDMaxOutPwr; // VFD maximum output power [W]
 		Real64 VFDSizingFactor; // VFD sizing factor [-] cpw31Aug2010
 		int PressRiseCurveIndex; // Fan pressure rise curve index
@@ -167,9 +165,6 @@ namespace Fans {
 
 		// Default Constructor
 		FanEquipConditions() :
-			FanName( MaxNameLength ),
-			FanType( MaxNameLength ),
-			AvailSchedName( MaxNameLength ),
 			FanType_Num( 0 ),
 			AvailSchedPtrNum( 0 ),
 			InletAirMassFlowRate( 0.0 ),
@@ -213,7 +208,6 @@ namespace Fans {
 			NVPerfNum( 0 ),
 			FanPowerRatAtSpeedRatCurveIndex( 0 ),
 			FanEffRatioCurveIndex( 0 ),
-			EndUseSubcategoryName( MaxNameLength ),
 			OneTimePowerRatioCheck( true ),
 			OneTimeEffRatioCheck( true ),
 			FanWheelDia( 0.0 ),
@@ -230,7 +224,6 @@ namespace Fans {
 			MotorMaxSpd( 0.0 ),
 			MotorMaxOutPwr( 0.0 ),
 			MotorSizingFactor( 0.0 ),
-			VFDEffType( MaxNameLength ),
 			VFDMaxOutPwr( 0.0 ),
 			VFDSizingFactor( 0.0 ),
 			PressRiseCurveIndex( 0 ),
@@ -270,9 +263,9 @@ namespace Fans {
 
 		// Member Constructor
 		FanEquipConditions(
-			Fstring const & FanName, // Name of the fan
-			Fstring const & FanType, // Type of Fan ie. Simple, Vane axial, Centrifugal, etc.
-			Fstring const & AvailSchedName, // Fan Operation Schedule
+			std::string const & FanName, // Name of the fan
+			std::string const & FanType, // Type of Fan ie. Simple, Vane axial, Centrifugal, etc.
+			std::string const & AvailSchedName, // Fan Operation Schedule
 			int const FanType_Num, // DataHVACGlobals fan type
 			int const AvailSchedPtrNum, // Pointer to the availability schedule
 			Real64 const InletAirMassFlowRate, // MassFlow through the Fan being Simulated [kg/Sec]
@@ -316,7 +309,7 @@ namespace Fans {
 			int const NVPerfNum,
 			int const FanPowerRatAtSpeedRatCurveIndex,
 			int const FanEffRatioCurveIndex,
-			Fstring const & EndUseSubcategoryName,
+			std::string const & EndUseSubcategoryName,
 			bool const OneTimePowerRatioCheck, // one time flag used for error message
 			bool const OneTimeEffRatioCheck, // one time flag used for error message
 			Real64 const FanWheelDia, // Fan wheel outer diameter [m]
@@ -333,7 +326,7 @@ namespace Fans {
 			Real64 const MotorMaxSpd, // Motor maximum speed [rpm]
 			Real64 const MotorMaxOutPwr, // Motor maximum output power [W]
 			Real64 const MotorSizingFactor, // Motor sizing factor [-]
-			Fstring const & VFDEffType, // VFD efficiency type [Speed or Power]
+			std::string const & VFDEffType, // VFD efficiency type [Speed or Power]
 			Real64 const VFDMaxOutPwr, // VFD maximum output power [W]
 			Real64 const VFDSizingFactor, // VFD sizing factor [-] cpw31Aug2010
 			int const PressRiseCurveIndex, // Fan pressure rise curve index
@@ -370,9 +363,9 @@ namespace Fans {
 			Real64 const UnbalancedOutletMassFlowRate,
 			Real64 const BalancedOutletMassFlowRate
 		) :
-			FanName( MaxNameLength, FanName ),
-			FanType( MaxNameLength, FanType ),
-			AvailSchedName( MaxNameLength, AvailSchedName ),
+			FanName( FanName ),
+			FanType( FanType ),
+			AvailSchedName( AvailSchedName ),
 			FanType_Num( FanType_Num ),
 			AvailSchedPtrNum( AvailSchedPtrNum ),
 			InletAirMassFlowRate( InletAirMassFlowRate ),
@@ -416,7 +409,7 @@ namespace Fans {
 			NVPerfNum( NVPerfNum ),
 			FanPowerRatAtSpeedRatCurveIndex( FanPowerRatAtSpeedRatCurveIndex ),
 			FanEffRatioCurveIndex( FanEffRatioCurveIndex ),
-			EndUseSubcategoryName( MaxNameLength, EndUseSubcategoryName ),
+			EndUseSubcategoryName( EndUseSubcategoryName ),
 			OneTimePowerRatioCheck( OneTimePowerRatioCheck ),
 			OneTimeEffRatioCheck( OneTimeEffRatioCheck ),
 			FanWheelDia( FanWheelDia ),
@@ -433,7 +426,7 @@ namespace Fans {
 			MotorMaxSpd( MotorMaxSpd ),
 			MotorMaxOutPwr( MotorMaxOutPwr ),
 			MotorSizingFactor( MotorSizingFactor ),
-			VFDEffType( MaxNameLength, VFDEffType ),
+			VFDEffType( VFDEffType ),
 			VFDMaxOutPwr( VFDMaxOutPwr ),
 			VFDSizingFactor( VFDSizingFactor ),
 			PressRiseCurveIndex( PressRiseCurveIndex ),
@@ -476,7 +469,7 @@ namespace Fans {
 	struct NightVentPerfData
 	{
 		// Members
-		Fstring FanName; // Name of the fan that will use this data
+		std::string FanName; // Name of the fan that will use this data
 		Real64 FanEff; // Fan total efficiency; motor and mechanical
 		Real64 DeltaPress; // Delta Pressure Across the Fan [N/m2]
 		Real64 MaxAirFlowRate; // Max Specified Volume Flow Rate of Fan [m3/s]
@@ -486,7 +479,6 @@ namespace Fans {
 
 		// Default Constructor
 		NightVentPerfData() :
-			FanName( MaxNameLength ),
 			FanEff( 0.0 ),
 			DeltaPress( 0.0 ),
 			MaxAirFlowRate( 0.0 ),
@@ -497,7 +489,7 @@ namespace Fans {
 
 		// Member Constructor
 		NightVentPerfData(
-			Fstring const & FanName, // Name of the fan that will use this data
+			std::string const & FanName, // Name of the fan that will use this data
 			Real64 const FanEff, // Fan total efficiency; motor and mechanical
 			Real64 const DeltaPress, // Delta Pressure Across the Fan [N/m2]
 			Real64 const MaxAirFlowRate, // Max Specified Volume Flow Rate of Fan [m3/s]
@@ -505,7 +497,7 @@ namespace Fans {
 			Real64 const MotEff, // Fan motor efficiency
 			Real64 const MotInAirFrac // Fraction of motor heat entering air stream
 		) :
-			FanName( MaxNameLength, FanName ),
+			FanName( FanName ),
 			FanEff( FanEff ),
 			DeltaPress( DeltaPress ),
 			MaxAirFlowRate( MaxAirFlowRate ),
@@ -524,7 +516,7 @@ namespace Fans {
 
 	void
 	SimulateFanComponents(
-		Fstring const & CompName,
+		std::string const & CompName,
 		bool const FirstHVACIteration,
 		int & CompIndex,
 		Optional< Real64 const > SpeedRatio = _,
@@ -609,10 +601,10 @@ namespace Fans {
 
 	void
 	GetFanIndex(
-		Fstring const & FanName,
+		std::string const & FanName,
 		int & FanIndex,
 		bool & ErrorsFound,
-		Optional_Fstring_const ThisObjectType = _
+		Optional_string_const ThisObjectType = _
 	);
 
 	void
@@ -629,46 +621,46 @@ namespace Fans {
 
 	void
 	GetFanType(
-		Fstring const & FanName, // Fan name
+		std::string const & FanName, // Fan name
 		int & FanType, // returned fantype number
 		bool & ErrorsFound, // error indicator
-		Optional_Fstring_const ThisObjectType = _, // parent object type (for error message)
-		Optional_Fstring_const ThisObjectName = _ // parent object name (for error message)
+		Optional_string_const ThisObjectType = _, // parent object type (for error message)
+		Optional_string_const ThisObjectName = _ // parent object name (for error message)
 	);
 
 	Real64
 	GetFanDesignVolumeFlowRate(
-		Fstring const & FanType, // must match fan types in this module
-		Fstring const & FanName, // must match fan names for the fan type
+		std::string const & FanType, // must match fan types in this module
+		std::string const & FanName, // must match fan names for the fan type
 		bool & ErrorsFound, // set to true if problem
 		Optional_int_const FanIndex = _ // index to fan
 	);
 
 	int
 	GetFanInletNode(
-		Fstring const & FanType, // must match fan types in this module
-		Fstring const & FanName, // must match fan names for the fan type
+		std::string const & FanType, // must match fan types in this module
+		std::string const & FanName, // must match fan names for the fan type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetFanOutletNode(
-		Fstring const & FanType, // must match fan types in this module
-		Fstring const & FanName, // must match fan names for the fan type
+		std::string const & FanType, // must match fan types in this module
+		std::string const & FanName, // must match fan names for the fan type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetFanAvailSchPtr(
-		Fstring const & FanType, // must match fan types in this module
-		Fstring const & FanName, // must match fan names for the fan type
+		std::string const & FanType, // must match fan types in this module
+		std::string const & FanName, // must match fan names for the fan type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetFanSpeedRatioCurveIndex(
-		Fstring & FanType, // must match fan types in this module (set if nonzero index passed)
-		Fstring & FanName, // must match fan names for the fan type (set if nonzero index passed)
+		std::string & FanType, // must match fan types in this module (set if nonzero index passed)
+		std::string & FanName, // must match fan names for the fan type (set if nonzero index passed)
 		Optional_int IndexIn = _ // optional fan index if fan type and name are unknown or index needs setting
 	);
 
@@ -676,7 +668,7 @@ namespace Fans {
 	SetFanData(
 		int const FanNum, // Index of fan
 		bool & ErrorsFound, // Set to true if certain errors found
-		Fstring const & FanName, // Name of fan
+		std::string const & FanName, // Name of fan
 		Optional< Real64 const > MaxAirVolFlow = _, // Fan air volumetric flow rate    [m3/s]
 		Optional< Real64 const > MinAirVolFlow = _ // Fan air volumetric flow rate    [m3/s]
 	);

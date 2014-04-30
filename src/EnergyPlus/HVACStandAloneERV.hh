@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,12 +13,11 @@ namespace EnergyPlus {
 namespace HVACStandAloneERV {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
 
-	extern Fstring const Blank;
+	extern std::string const Blank;
 
 	extern int const ControllerSimple;
 	extern int const ControllerOutsideAir;
@@ -55,27 +53,27 @@ namespace HVACStandAloneERV {
 	{
 		// Members
 		// input data
-		Fstring Name; // name of the stand alone ERV unit
-		Fstring UnitType; // ZoneHVAC:EnergyRecoveryVentilator
+		std::string Name; // name of the stand alone ERV unit
+		std::string UnitType; // ZoneHVAC:EnergyRecoveryVentilator
 		int SchedPtr; // pointer to availability schedule
-		Fstring HeatExchangerName; // name of the heat exchanger within the ERV unit
+		std::string HeatExchangerName; // name of the heat exchanger within the ERV unit
 		int HeatExchangerIndex; // Pointer to heat exchanger
 		int HeatExchangerTypeNum; // Parameter equivalent of HX object type
 		int SupplyAirInletNode; // supply air inlet node for the stand alone ERV
 		int SupplyAirOutletNode; // supply air outlet node for the stand alone ERV
-		Fstring SupplyAirFanName; // fan name in the supply air stream of the ERV
+		std::string SupplyAirFanName; // fan name in the supply air stream of the ERV
 		int SupplyAirFanIndex; // index to supply air fan
 		int SupplyAirFanSchPtr; // index to supply air fan schedule
 		int SupplyAirFanType_Num; // parameter equivalent of fan type
 		int ExhaustAirInletNode; // exhaust air inlet node for the stand alone ERV
 		int ExhaustAirOutletNode; // exhaust air outlet node for the stand alone ERV
-		Fstring ExhaustAirFanName; // fan name in exhaust air stream of the ERV
+		std::string ExhaustAirFanName; // fan name in exhaust air stream of the ERV
 		int ExhaustAirFanIndex; // index to exhaust air fan
 		int ExhaustAirFanSchPtr; // index to exhaust air fan schedule
 		int ExhaustAirFanType_Num; // paramter equivalent of fan type
 		Real64 SupplyAirVolFlow; // volumetric flow rate through the supply side of the ERV
 		Real64 ExhaustAirVolFlow; // volumetric flow rate through the exhaust side of the ERV
-		Fstring ControllerName; // name of the controller for the stand alone ERV
+		std::string ControllerName; // name of the controller for the stand alone ERV
 		bool ControllerNameDefined; // controller for the stand alone ERV is defined
 		int ControlledZoneNum; // index to controlled zone for stand alone ERV
 		int ControllerIndex; // Pointer for updates by routines this module calls.
@@ -91,7 +89,7 @@ namespace HVACStandAloneERV {
 		int EconomizerOASchedPtr; // schedule to modify outdoor air
 		bool FlowError; // used for one-time warning message for flow imbalance (Init)
 		int AvailStatus;
-		Fstring AvailManagerListName; // Name of an availability manager list object
+		std::string AvailManagerListName; // Name of an availability manager list object
 		// report variables
 		Real64 ElecUseRate; // total electric use rate (power) for supply/exhaust fans & generic HX parasitics [W]
 		Real64 ElecUseEnergy; // electric energy use for supply fan, exhaust fan, and generic HX parasitics [J]
@@ -110,27 +108,21 @@ namespace HVACStandAloneERV {
 
 		// Default Constructor
 		StandAloneERVData() :
-			Name( MaxNameLength ),
-			UnitType( MaxNameLength ),
 			SchedPtr( 0 ),
-			HeatExchangerName( MaxNameLength ),
 			HeatExchangerIndex( 0 ),
 			HeatExchangerTypeNum( 0 ),
 			SupplyAirInletNode( 0 ),
 			SupplyAirOutletNode( 0 ),
-			SupplyAirFanName( MaxNameLength ),
 			SupplyAirFanIndex( 0 ),
 			SupplyAirFanSchPtr( 0 ),
 			SupplyAirFanType_Num( 0 ),
 			ExhaustAirInletNode( 0 ),
 			ExhaustAirOutletNode( 0 ),
-			ExhaustAirFanName( MaxNameLength ),
 			ExhaustAirFanIndex( 0 ),
 			ExhaustAirFanSchPtr( 0 ),
 			ExhaustAirFanType_Num( 0 ),
 			SupplyAirVolFlow( 0.0 ),
 			ExhaustAirVolFlow( 0.0 ),
-			ControllerName( MaxNameLength ),
 			ControllerNameDefined( true ),
 			ControlledZoneNum( 0 ),
 			ControllerIndex( 0 ),
@@ -146,7 +138,6 @@ namespace HVACStandAloneERV {
 			EconomizerOASchedPtr( 0 ),
 			FlowError( true ),
 			AvailStatus( 0 ),
-			AvailManagerListName( MaxNameLength ),
 			ElecUseRate( 0.0 ),
 			ElecUseEnergy( 0.0 ),
 			SensCoolingEnergy( 0.0 ),
@@ -165,27 +156,27 @@ namespace HVACStandAloneERV {
 
 		// Member Constructor
 		StandAloneERVData(
-			Fstring const & Name, // name of the stand alone ERV unit
-			Fstring const & UnitType, // ZoneHVAC:EnergyRecoveryVentilator
+			std::string const & Name, // name of the stand alone ERV unit
+			std::string const & UnitType, // ZoneHVAC:EnergyRecoveryVentilator
 			int const SchedPtr, // pointer to availability schedule
-			Fstring const & HeatExchangerName, // name of the heat exchanger within the ERV unit
+			std::string const & HeatExchangerName, // name of the heat exchanger within the ERV unit
 			int const HeatExchangerIndex, // Pointer to heat exchanger
 			int const HeatExchangerTypeNum, // Parameter equivalent of HX object type
 			int const SupplyAirInletNode, // supply air inlet node for the stand alone ERV
 			int const SupplyAirOutletNode, // supply air outlet node for the stand alone ERV
-			Fstring const & SupplyAirFanName, // fan name in the supply air stream of the ERV
+			std::string const & SupplyAirFanName, // fan name in the supply air stream of the ERV
 			int const SupplyAirFanIndex, // index to supply air fan
 			int const SupplyAirFanSchPtr, // index to supply air fan schedule
 			int const SupplyAirFanType_Num, // parameter equivalent of fan type
 			int const ExhaustAirInletNode, // exhaust air inlet node for the stand alone ERV
 			int const ExhaustAirOutletNode, // exhaust air outlet node for the stand alone ERV
-			Fstring const & ExhaustAirFanName, // fan name in exhaust air stream of the ERV
+			std::string const & ExhaustAirFanName, // fan name in exhaust air stream of the ERV
 			int const ExhaustAirFanIndex, // index to exhaust air fan
 			int const ExhaustAirFanSchPtr, // index to exhaust air fan schedule
 			int const ExhaustAirFanType_Num, // paramter equivalent of fan type
 			Real64 const SupplyAirVolFlow, // volumetric flow rate through the supply side of the ERV
 			Real64 const ExhaustAirVolFlow, // volumetric flow rate through the exhaust side of the ERV
-			Fstring const & ControllerName, // name of the controller for the stand alone ERV
+			std::string const & ControllerName, // name of the controller for the stand alone ERV
 			bool const ControllerNameDefined, // controller for the stand alone ERV is defined
 			int const ControlledZoneNum, // index to controlled zone for stand alone ERV
 			int const ControllerIndex, // Pointer for updates by routines this module calls.
@@ -201,7 +192,7 @@ namespace HVACStandAloneERV {
 			int const EconomizerOASchedPtr, // schedule to modify outdoor air
 			bool const FlowError, // used for one-time warning message for flow imbalance (Init)
 			int const AvailStatus,
-			Fstring const & AvailManagerListName, // Name of an availability manager list object
+			std::string const & AvailManagerListName, // Name of an availability manager list object
 			Real64 const ElecUseRate, // total electric use rate (power) for supply/exhaust fans & generic HX parasitics [W]
 			Real64 const ElecUseEnergy, // electric energy use for supply fan, exhaust fan, and generic HX parasitics [J]
 			Real64 const SensCoolingEnergy, // sensible cooling energy delivered by the ERV supply air to the zone [J]
@@ -217,27 +208,27 @@ namespace HVACStandAloneERV {
 			Real64 const TotHeatingEnergy, // total heating energy delivered by the ERV supply air to the zone [J]
 			Real64 const TotHeatingRate // rate of total heating delivered to the zone [W]
 		) :
-			Name( MaxNameLength, Name ),
-			UnitType( MaxNameLength, UnitType ),
+			Name( Name ),
+			UnitType( UnitType ),
 			SchedPtr( SchedPtr ),
-			HeatExchangerName( MaxNameLength, HeatExchangerName ),
+			HeatExchangerName( HeatExchangerName ),
 			HeatExchangerIndex( HeatExchangerIndex ),
 			HeatExchangerTypeNum( HeatExchangerTypeNum ),
 			SupplyAirInletNode( SupplyAirInletNode ),
 			SupplyAirOutletNode( SupplyAirOutletNode ),
-			SupplyAirFanName( MaxNameLength, SupplyAirFanName ),
+			SupplyAirFanName( SupplyAirFanName ),
 			SupplyAirFanIndex( SupplyAirFanIndex ),
 			SupplyAirFanSchPtr( SupplyAirFanSchPtr ),
 			SupplyAirFanType_Num( SupplyAirFanType_Num ),
 			ExhaustAirInletNode( ExhaustAirInletNode ),
 			ExhaustAirOutletNode( ExhaustAirOutletNode ),
-			ExhaustAirFanName( MaxNameLength, ExhaustAirFanName ),
+			ExhaustAirFanName( ExhaustAirFanName ),
 			ExhaustAirFanIndex( ExhaustAirFanIndex ),
 			ExhaustAirFanSchPtr( ExhaustAirFanSchPtr ),
 			ExhaustAirFanType_Num( ExhaustAirFanType_Num ),
 			SupplyAirVolFlow( SupplyAirVolFlow ),
 			ExhaustAirVolFlow( ExhaustAirVolFlow ),
-			ControllerName( MaxNameLength, ControllerName ),
+			ControllerName( ControllerName ),
 			ControllerNameDefined( ControllerNameDefined ),
 			ControlledZoneNum( ControlledZoneNum ),
 			ControllerIndex( ControllerIndex ),
@@ -253,7 +244,7 @@ namespace HVACStandAloneERV {
 			EconomizerOASchedPtr( EconomizerOASchedPtr ),
 			FlowError( FlowError ),
 			AvailStatus( AvailStatus ),
-			AvailManagerListName( MaxNameLength, AvailManagerListName ),
+			AvailManagerListName( AvailManagerListName ),
 			ElecUseRate( ElecUseRate ),
 			ElecUseEnergy( ElecUseEnergy ),
 			SensCoolingEnergy( SensCoolingEnergy ),
@@ -279,7 +270,7 @@ namespace HVACStandAloneERV {
 
 	void
 	SimStandAloneERV(
-		Fstring const & CompName, // name of the Stand Alone ERV unit
+		std::string const & CompName, // name of the Stand Alone ERV unit
 		int const ZoneNum, // number of zone being served unused1208
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		Real64 & SensLoadMet, // net sensible load supplied by the ERV unit to the zone (W)
@@ -317,22 +308,22 @@ namespace HVACStandAloneERV {
 
 	Real64
 	GetSupplyAirFlowRate(
-		Fstring const & ERVType, // must be "ZoneHVAC:EnergyRecoveryVentilator"
-		Fstring const & ERVCtrlName, // must match a controller name in the ERV data structure
+		std::string const & ERVType, // must be "ZoneHVAC:EnergyRecoveryVentilator"
+		std::string const & ERVCtrlName, // must match a controller name in the ERV data structure
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetSupplyAirInletNode(
-		Fstring const & ERVType, // must be "ZoneHVAC:EnergyRecoveryVentilator"
-		Fstring const & ERVCtrlName, // must match a controller name in the ERV data structure
+		std::string const & ERVType, // must be "ZoneHVAC:EnergyRecoveryVentilator"
+		std::string const & ERVCtrlName, // must match a controller name in the ERV data structure
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetExhaustAirInletNode(
-		Fstring const & ERVType, // must be "ZoneHVAC:EnergyRecoveryVentilator"
-		Fstring const & ERVCtrlName, // must match a controller name in the ERV data structure
+		std::string const & ERVType, // must be "ZoneHVAC:EnergyRecoveryVentilator"
+		std::string const & ERVCtrlName, // must match a controller name in the ERV data structure
 		bool & ErrorsFound // set to true if problem
 	);
 

@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace Boilers {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
@@ -60,7 +58,7 @@ namespace Boilers {
 	struct BoilerSpecs
 	{
 		// Members
-		Fstring Name; // user identifier
+		std::string Name; // user identifier
 		int FuelType; // resource type assignment
 		int TypeNum; // plant loop type identifier
 		int LoopNum; // plant loop connection
@@ -98,7 +96,6 @@ namespace Boilers {
 
 		// Default Constructor
 		BoilerSpecs() :
-			Name( MaxNameLength ),
 			FuelType( 0 ),
 			TypeNum( 0 ),
 			LoopNum( 0 ),
@@ -137,7 +134,7 @@ namespace Boilers {
 
 		// Member Constructor
 		BoilerSpecs(
-			Fstring const & Name, // user identifier
+			std::string const & Name, // user identifier
 			int const FuelType, // resource type assignment
 			int const TypeNum, // plant loop type identifier
 			int const LoopNum, // plant loop connection
@@ -173,7 +170,7 @@ namespace Boilers {
 			int const CalculatedEffIndex, // calculated efficiency >1.1 recurring warning error message index
 			bool const IsThisSized // TRUE if sizing is done
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			FuelType( FuelType ),
 			TypeNum( TypeNum ),
 			LoopNum( LoopNum ),
@@ -275,8 +272,8 @@ namespace Boilers {
 
 	void
 	SimBoiler(
-		Fstring const & BoilerType, // boiler type (used in CASE statement)
-		Fstring const & BoilerName, // boiler identifier
+		std::string const & BoilerType, // boiler type (used in CASE statement)
+		std::string const & BoilerName, // boiler identifier
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // boiler counter/identifier
 		bool const RunFlag, // if TRUE run boiler simulation--boiler is ON

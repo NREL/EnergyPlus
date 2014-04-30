@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -15,7 +14,6 @@ namespace EnergyPlus {
 namespace DataZoneEquipment {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::NumOfZones;
 
 	// Data
@@ -70,7 +68,7 @@ namespace DataZoneEquipment {
 	// End zone equip objects
 
 	extern int const NumValidSysAvailZoneComponents;
-	extern FArray1D_Fstring const cValidSysAvailManagerCompTypes;
+	extern FArray1D_string const cValidSysAvailManagerCompTypes;
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -89,12 +87,12 @@ namespace DataZoneEquipment {
 	struct EquipMeterData
 	{
 		// Members
-		Fstring ReportVarName;
-		Fstring ReportVarUnits;
+		std::string ReportVarName;
+		std::string ReportVarUnits;
 		int ResourceType;
-		Fstring EndUse;
+		std::string EndUse;
 		int EndUse_CompMode;
-		Fstring Group;
+		std::string Group;
 		int ReportVarIndex;
 		int ReportVarIndexType;
 		int ReportVarType;
@@ -102,12 +100,8 @@ namespace DataZoneEquipment {
 
 		// Default Constructor
 		EquipMeterData() :
-			ReportVarName( MaxNameLength ),
-			ReportVarUnits( MaxNameLength ),
 			ResourceType( 0 ),
-			EndUse( MaxNameLength ),
 			EndUse_CompMode( 0 ),
-			Group( MaxNameLength ),
 			ReportVarIndex( 0 ),
 			ReportVarIndexType( 0 ),
 			ReportVarType( 0 ),
@@ -116,23 +110,23 @@ namespace DataZoneEquipment {
 
 		// Member Constructor
 		EquipMeterData(
-			Fstring const & ReportVarName,
-			Fstring const & ReportVarUnits,
+			std::string const & ReportVarName,
+			std::string const & ReportVarUnits,
 			int const ResourceType,
-			Fstring const & EndUse,
+			std::string const & EndUse,
 			int const EndUse_CompMode,
-			Fstring const & Group,
+			std::string const & Group,
 			int const ReportVarIndex,
 			int const ReportVarIndexType,
 			int const ReportVarType,
 			Real64 const CurMeterReading
 		) :
-			ReportVarName( MaxNameLength, ReportVarName ),
-			ReportVarUnits( MaxNameLength, ReportVarUnits ),
+			ReportVarName( ReportVarName ),
+			ReportVarUnits( ReportVarUnits ),
 			ResourceType( ResourceType ),
-			EndUse( MaxNameLength, EndUse ),
+			EndUse( EndUse ),
 			EndUse_CompMode( EndUse_CompMode ),
-			Group( MaxNameLength, Group ),
+			Group( Group ),
 			ReportVarIndex( ReportVarIndex ),
 			ReportVarIndexType( ReportVarIndexType ),
 			ReportVarType( ReportVarType ),
@@ -144,8 +138,8 @@ namespace DataZoneEquipment {
 	struct SubSubEquipmentData // data for an individual component
 	{
 		// Members
-		Fstring TypeOf; // The 'keyWord' identifying  component type
-		Fstring Name; // Component name
+		std::string TypeOf; // The 'keyWord' identifying  component type
+		std::string Name; // Component name
 		int EquipIndex; // Component Index for routines
 		bool ON; // When true, the designated component or operation scheme is available
 		int InletNodeNum;
@@ -172,8 +166,6 @@ namespace DataZoneEquipment {
 
 		// Default Constructor
 		SubSubEquipmentData() :
-			TypeOf( MaxNameLength ),
-			Name( MaxNameLength ),
 			EquipIndex( 0 ),
 			ON( true ),
 			InletNodeNum( 0 ),
@@ -200,8 +192,8 @@ namespace DataZoneEquipment {
 
 		// Member Constructor
 		SubSubEquipmentData(
-			Fstring const & TypeOf, // The 'keyWord' identifying  component type
-			Fstring const & Name, // Component name
+			std::string const & TypeOf, // The 'keyWord' identifying  component type
+			std::string const & Name, // Component name
 			int const EquipIndex, // Component Index for routines
 			bool const ON, // When true, the designated component or operation scheme is available
 			int const InletNodeNum,
@@ -226,8 +218,8 @@ namespace DataZoneEquipment {
 			Real64 const PlantSupplyOtherEff,
 			Real64 const PeakPlantSupplyOtherEff
 		) :
-			TypeOf( MaxNameLength, TypeOf ),
-			Name( MaxNameLength, Name ),
+			TypeOf( TypeOf ),
+			Name( Name ),
 			EquipIndex( EquipIndex ),
 			ON( ON ),
 			InletNodeNum( InletNodeNum ),
@@ -260,8 +252,8 @@ namespace DataZoneEquipment {
 		// Members
 		bool Parent; // When true, the designated component is made up of sub-components
 		int NumSubSubEquip;
-		Fstring TypeOf; // The 'keyWord' identifying  component type
-		Fstring Name; // Component name
+		std::string TypeOf; // The 'keyWord' identifying  component type
+		std::string Name; // Component name
 		int EquipIndex; // Component Index for routines
 		bool ON; // When true, the designated component or operation scheme is available
 		int InletNodeNum;
@@ -291,8 +283,6 @@ namespace DataZoneEquipment {
 		SubEquipmentData() :
 			Parent( false ),
 			NumSubSubEquip( 0 ),
-			TypeOf( MaxNameLength ),
-			Name( MaxNameLength ),
 			EquipIndex( 0 ),
 			ON( true ),
 			InletNodeNum( 0 ),
@@ -321,8 +311,8 @@ namespace DataZoneEquipment {
 		SubEquipmentData(
 			bool const Parent, // When true, the designated component is made up of sub-components
 			int const NumSubSubEquip,
-			Fstring const & TypeOf, // The 'keyWord' identifying  component type
-			Fstring const & Name, // Component name
+			std::string const & TypeOf, // The 'keyWord' identifying  component type
+			std::string const & Name, // Component name
 			int const EquipIndex, // Component Index for routines
 			bool const ON, // When true, the designated component or operation scheme is available
 			int const InletNodeNum,
@@ -350,8 +340,8 @@ namespace DataZoneEquipment {
 		) :
 			Parent( Parent ),
 			NumSubSubEquip( NumSubSubEquip ),
-			TypeOf( MaxNameLength, TypeOf ),
-			Name( MaxNameLength, Name ),
+			TypeOf( TypeOf ),
+			Name( Name ),
 			EquipIndex( EquipIndex ),
 			ON( ON ),
 			InletNodeNum( InletNodeNum ),
@@ -433,11 +423,11 @@ namespace DataZoneEquipment {
 	struct EquipConfiguration
 	{
 		// Members
-		Fstring ZoneName;
+		std::string ZoneName;
 		int ActualZoneNum; // index into the Zone data
-		Fstring EquipListName;
+		std::string EquipListName;
 		int EquipListIndex;
-		Fstring ControlListName;
+		std::string ControlListName;
 		int ZoneNode;
 		int ReturnAirNode;
 		int NumInletNodes;
@@ -473,11 +463,9 @@ namespace DataZoneEquipment {
 
 		// Default Constructor
 		EquipConfiguration() :
-			ZoneName( MaxNameLength, "Uncontrolled Zone" ),
+			ZoneName( "Uncontrolled Zone" ),
 			ActualZoneNum( 0 ),
-			EquipListName( MaxNameLength ),
 			EquipListIndex( 0 ),
-			ControlListName( MaxNameLength ),
 			ZoneNode( 0 ),
 			ReturnAirNode( 0 ),
 			NumInletNodes( 0 ),
@@ -499,11 +487,11 @@ namespace DataZoneEquipment {
 
 		// Member Constructor
 		EquipConfiguration(
-			Fstring const & ZoneName,
+			std::string const & ZoneName,
 			int const ActualZoneNum, // index into the Zone data
-			Fstring const & EquipListName,
+			std::string const & EquipListName,
 			int const EquipListIndex,
-			Fstring const & ControlListName,
+			std::string const & ControlListName,
 			int const ZoneNode,
 			int const ReturnAirNode,
 			int const NumInletNodes,
@@ -526,11 +514,11 @@ namespace DataZoneEquipment {
 			bool const InWallActiveElement, // Convection adapation, true if zone has in-wall HVAC
 			bool const InCeilingActiveElement // Convection adapation,
 		) :
-			ZoneName( MaxNameLength, ZoneName ),
+			ZoneName( ZoneName ),
 			ActualZoneNum( ActualZoneNum ),
-			EquipListName( MaxNameLength, EquipListName ),
+			EquipListName( EquipListName ),
 			EquipListIndex( EquipListIndex ),
-			ControlListName( MaxNameLength, ControlListName ),
+			ControlListName( ControlListName ),
 			ZoneNode( ZoneNode ),
 			ReturnAirNode( ReturnAirNode ),
 			NumInletNodes( NumInletNodes ),
@@ -561,8 +549,8 @@ namespace DataZoneEquipment {
 		// Members
 		bool Parent; // When true, the designated component is made up of sub-components
 		int NumSubEquip;
-		Fstring TypeOf; // The 'keyWord' identifying  component type
-		Fstring Name; // Component name
+		std::string TypeOf; // The 'keyWord' identifying  component type
+		std::string Name; // Component name
 		bool ON; // When true, the designated component or operation scheme is available
 		int NumInlets;
 		int NumOutlets;
@@ -592,8 +580,6 @@ namespace DataZoneEquipment {
 		EquipmentData() :
 			Parent( false ),
 			NumSubEquip( 0 ),
-			TypeOf( MaxNameLength ),
-			Name( MaxNameLength ),
 			ON( true ),
 			NumInlets( 0 ),
 			NumOutlets( 0 ),
@@ -620,8 +606,8 @@ namespace DataZoneEquipment {
 		EquipmentData(
 			bool const Parent, // When true, the designated component is made up of sub-components
 			int const NumSubEquip,
-			Fstring const & TypeOf, // The 'keyWord' identifying  component type
-			Fstring const & Name, // Component name
+			std::string const & TypeOf, // The 'keyWord' identifying  component type
+			std::string const & Name, // Component name
 			bool const ON, // When true, the designated component or operation scheme is available
 			int const NumInlets,
 			int const NumOutlets,
@@ -649,8 +635,8 @@ namespace DataZoneEquipment {
 		) :
 			Parent( Parent ),
 			NumSubEquip( NumSubEquip ),
-			TypeOf( MaxNameLength, TypeOf ),
-			Name( MaxNameLength, Name ),
+			TypeOf( TypeOf ),
+			Name( Name ),
 			ON( ON ),
 			NumInlets( NumInlets ),
 			NumOutlets( NumOutlets ),
@@ -682,11 +668,11 @@ namespace DataZoneEquipment {
 	struct EquipList
 	{
 		// Members
-		Fstring Name; // Name of the equipment list
+		std::string Name; // Name of the equipment list
 		int NumOfEquipTypes; // Number of items on this list
-		FArray1D_Fstring EquipType;
+		FArray1D_string EquipType;
 		FArray1D_int EquipType_Num;
-		FArray1D_Fstring EquipName;
+		FArray1D_string EquipName;
 		FArray1D_int EquipIndex;
 		FArray1D_int CoolingPriority;
 		FArray1D_int HeatingPriority;
@@ -694,25 +680,22 @@ namespace DataZoneEquipment {
 
 		// Default Constructor
 		EquipList() :
-			Name( MaxNameLength ),
-			NumOfEquipTypes( 0 ),
-			EquipType( sFstring( MaxNameLength ) ),
-			EquipName( sFstring( MaxNameLength ) )
+			NumOfEquipTypes( 0 )
 		{}
 
 		// Member Constructor
 		EquipList(
-			Fstring const & Name, // Name of the equipment list
+			std::string const & Name, // Name of the equipment list
 			int const NumOfEquipTypes, // Number of items on this list
-			FArray1_Fstring const & EquipType,
+			FArray1_string const & EquipType,
 			FArray1_int const & EquipType_Num,
-			FArray1_Fstring const & EquipName,
+			FArray1_string const & EquipName,
 			FArray1_int const & EquipIndex,
 			FArray1_int const & CoolingPriority,
 			FArray1_int const & HeatingPriority,
 			FArray1< EquipmentData > const & EquipData // Index of energy output report data
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NumOfEquipTypes( NumOfEquipTypes ),
 			EquipType( EquipType ),
 			EquipType_Num( EquipType_Num ),
@@ -728,27 +711,24 @@ namespace DataZoneEquipment {
 	struct ControlList
 	{
 		// Members
-		Fstring Name;
+		std::string Name;
 		int NumOfControls;
-		FArray1D_Fstring ControlType;
-		FArray1D_Fstring ControlName;
+		FArray1D_string ControlType;
+		FArray1D_string ControlName;
 
 		// Default Constructor
 		ControlList() :
-			Name( MaxNameLength ),
-			NumOfControls( 0 ),
-			ControlType( sFstring( MaxNameLength ) ),
-			ControlName( sFstring( MaxNameLength ) )
+			NumOfControls( 0 )
 		{}
 
 		// Member Constructor
 		ControlList(
-			Fstring const & Name,
+			std::string const & Name,
 			int const NumOfControls,
-			FArray1_Fstring const & ControlType,
-			FArray1_Fstring const & ControlName
+			FArray1_string const & ControlType,
+			FArray1_string const & ControlName
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NumOfControls( NumOfControls ),
 			ControlType( ControlType ),
 			ControlName( ControlName )
@@ -759,12 +739,12 @@ namespace DataZoneEquipment {
 	struct SupplyAir
 	{
 		// Members
-		Fstring Name;
+		std::string Name;
 		int NumOfComponents;
 		int InletNodeNum;
-		FArray1D_Fstring ComponentType;
+		FArray1D_string ComponentType;
 		FArray1D_int ComponentType_Num;
-		FArray1D_Fstring ComponentName;
+		FArray1D_string ComponentName;
 		FArray1D_int ComponentIndex;
 		FArray1D_int SplitterIndex;
 		FArray1D_int PlenumIndex;
@@ -776,23 +756,20 @@ namespace DataZoneEquipment {
 
 		// Default Constructor
 		SupplyAir() :
-			Name( MaxNameLength ),
 			NumOfComponents( 0 ),
 			InletNodeNum( 0 ),
-			ComponentType( sFstring( MaxNameLength ) ),
-			ComponentName( sFstring( MaxNameLength ) ),
 			NumOutletNodes( 0 ),
 			NumNodes( 0 )
 		{}
 
 		// Member Constructor
 		SupplyAir(
-			Fstring const & Name,
+			std::string const & Name,
 			int const NumOfComponents,
 			int const InletNodeNum,
-			FArray1_Fstring const & ComponentType,
+			FArray1_string const & ComponentType,
 			FArray1_int const & ComponentType_Num,
-			FArray1_Fstring const & ComponentName,
+			FArray1_string const & ComponentName,
 			FArray1_int const & ComponentIndex,
 			FArray1_int const & SplitterIndex,
 			FArray1_int const & PlenumIndex,
@@ -802,7 +779,7 @@ namespace DataZoneEquipment {
 			FArray1_int const & Node,
 			FArray1_int const & NodeType
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NumOfComponents( NumOfComponents ),
 			InletNodeNum( InletNodeNum ),
 			ComponentType( ComponentType ),
@@ -823,34 +800,31 @@ namespace DataZoneEquipment {
 	struct ReturnAir
 	{
 		// Members
-		Fstring Name;
+		std::string Name;
 		int NumOfComponents;
 		int OutletNodeNum;
-		FArray1D_Fstring ComponentType;
+		FArray1D_string ComponentType;
 		FArray1D_int ComponentType_Num;
-		FArray1D_Fstring ComponentName;
+		FArray1D_string ComponentName;
 		FArray1D_int ComponentIndex;
 
 		// Default Constructor
 		ReturnAir() :
-			Name( MaxNameLength ),
 			NumOfComponents( 0 ),
-			OutletNodeNum( 0 ),
-			ComponentType( sFstring( MaxNameLength ) ),
-			ComponentName( sFstring( MaxNameLength ) )
+			OutletNodeNum( 0 )
 		{}
 
 		// Member Constructor
 		ReturnAir(
-			Fstring const & Name,
+			std::string const & Name,
 			int const NumOfComponents,
 			int const OutletNodeNum,
-			FArray1_Fstring const & ComponentType,
+			FArray1_string const & ComponentType,
 			FArray1_int const & ComponentType_Num,
-			FArray1_Fstring const & ComponentName,
+			FArray1_string const & ComponentName,
 			FArray1_int const & ComponentIndex
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NumOfComponents( NumOfComponents ),
 			OutletNodeNum( OutletNodeNum ),
 			ComponentType( ComponentType ),
@@ -882,22 +856,22 @@ namespace DataZoneEquipment {
 
 	bool
 	CheckZoneEquipmentList(
-		Fstring const & ComponentType, // Type of component
-		Fstring const & ComponentName, // Name of component
+		std::string const & ComponentType, // Type of component
+		std::string const & ComponentName, // Name of component
 		Optional_int CtrlZoneNum = _
 	);
 
 	int
-	GetControlledZoneIndex( Fstring const & ZoneName ); // Zone name to match into Controlled Zone structure
+	GetControlledZoneIndex( std::string const & ZoneName ); // Zone name to match into Controlled Zone structure
 
 	int
 	FindControlledZoneIndexFromSystemNodeNumberForZone( int const TrialZoneNodeNum ); // Node number to match into Controlled Zone structure
 
 	int
-	GetSystemNodeNumberForZone( Fstring const & ZoneName ); // Zone name to match into Controlled Zone structure
+	GetSystemNodeNumberForZone( std::string const & ZoneName ); // Zone name to match into Controlled Zone structure
 
 	int
-	GetReturnAirNodeForZone( Fstring const & ZoneName ); // Zone name to match into Controlled Zone structure
+	GetReturnAirNodeForZone( std::string const & ZoneName ); // Zone name to match into Controlled Zone structure
 
 	Real64
 	CalcDesignSpecificationOutdoorAir(

@@ -1,8 +1,8 @@
 #ifndef GeneratorDynamicsManager_hh_INCLUDED
 #define GeneratorDynamicsManager_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Fstring.hh>
+// C++ Headers
+#include <string>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -31,7 +31,7 @@ namespace GeneratorDynamicsManager {
 	void
 	ManageGeneratorControlState(
 		int const GeneratorType, // type of Generator
-		Fstring const & GeneratorName, // user specified name of Generator
+		std::string const & GeneratorName, // user specified name of Generator
 		int const GeneratorNum, // Generator number
 		bool const RunFlagElectCenter, // TRUE when Generator operating per electric load center request
 		bool const RunFlagPlant, // TRUE when generator operating per Plant request (always false)
@@ -47,7 +47,7 @@ namespace GeneratorDynamicsManager {
 	void
 	ManageGeneratorFuelFlow(
 		int const GeneratorType, // type of Generator
-		Fstring const & GeneratorName, // user specified name of Generator
+		std::string const & GeneratorName, // user specified name of Generator
 		int const GeneratorNum, // Generator number
 		bool const RunFlag, // TRUE when Generator operating
 		Real64 const FuelFlowRequest, // Generator demand mdot kg/ s

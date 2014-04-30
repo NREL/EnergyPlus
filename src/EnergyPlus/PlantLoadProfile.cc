@@ -43,7 +43,6 @@ namespace PlantLoadProfile {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::InitConvTemp;
 	using DataPlant::PlantLoop;
@@ -71,8 +70,8 @@ namespace PlantLoadProfile {
 
 	void
 	SimulatePlantProfile(
-		Fstring const & EquipTypeName, // description of model (not used until different types of profiles)
-		Fstring const & EquipName, // the user-defined name
+		std::string const & EquipTypeName, // description of model (not used until different types of profiles)
+		std::string const & EquipName, // the user-defined name
 		int const EquipTypeNum, // the plant parameter ID for equipment model
 		int & ProfileNum, // the index for specific load profile
 		bool const FirstHVACIteration,
@@ -142,7 +141,7 @@ namespace PlantLoadProfile {
 			ReportPlantProfile( ProfileNum );
 
 		} else {
-			ShowFatalError( "SimulatePlantProfile: plant load profile not found =" + trim( EquipName ) );
+			ShowFatalError( "SimulatePlantProfile: plant load profile not found =" + EquipName );
 
 		}
 
@@ -201,7 +200,7 @@ namespace PlantLoadProfile {
 				// PlantProfile name
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), PlantProfile.Name(), ProfileNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) );
+				VerifyName( cAlphaArgs( 1 ), PlantProfile.Name(), ProfileNum - 1, IsNotOK, IsBlank, cCurrentModuleObject );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -209,13 +208,13 @@ namespace PlantLoadProfile {
 				PlantProfile( ProfileNum ).Name = cAlphaArgs( 1 );
 				PlantProfile( ProfileNum ).TypeNum = TypeOf_PlantLoadProfile; // parameter assigned in DataPlant !DSU
 
-				PlantProfile( ProfileNum ).InletNode = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-				PlantProfile( ProfileNum ).OutletNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+				PlantProfile( ProfileNum ).InletNode = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+				PlantProfile( ProfileNum ).OutletNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 				PlantProfile( ProfileNum ).LoadSchedule = GetScheduleIndex( cAlphaArgs( 4 ) );
 
 				if ( PlantProfile( ProfileNum ).LoadSchedule == 0 ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"  The Schedule for " + trim( cAlphaFieldNames( 4 ) ) + " called " + trim( cAlphaArgs( 4 ) ) + " was not found." );
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"  The Schedule for " + cAlphaFieldNames( 4 ) + " called " + cAlphaArgs( 4 ) + " was not found." );
 					ErrorsFound = true;
 				}
 
@@ -224,13 +223,13 @@ namespace PlantLoadProfile {
 				PlantProfile( ProfileNum ).FlowRateFracSchedule = GetScheduleIndex( cAlphaArgs( 5 ) );
 
 				if ( PlantProfile( ProfileNum ).FlowRateFracSchedule == 0 ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"  The Schedule for " + trim( cAlphaFieldNames( 5 ) ) + " called " + trim( cAlphaArgs( 5 ) ) + " was not found." );
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"  The Schedule for " + cAlphaFieldNames( 5 ) + " called " + cAlphaArgs( 5 ) + " was not found." );
 
 					ErrorsFound = true;
 				}
 
 				// Check plant connections
-				TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), trim( cCurrentModuleObject ) + " Nodes" );
+				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), cCurrentModuleObject + " Nodes" );
 
 				// Setup report variables
 				SetupOutputVariable( "Plant Load Profile Mass Flow Rate [kg/s]", PlantProfile( ProfileNum ).MassFlowRate, "System", "Average", PlantProfile( ProfileNum ).Name );
@@ -248,7 +247,7 @@ namespace PlantLoadProfile {
 					SetupEMSActuator( "Plant Load Profile", PlantProfile( ProfileNum ).Name, "Power", "[W]", PlantProfile( ProfileNum ).EMSOverridePower, PlantProfile( ProfileNum ).EMSPowerValue );
 				}
 
-				if ( ErrorsFound ) ShowFatalError( "Errors in " + trim( cCurrentModuleObject ) + " input." );
+				if ( ErrorsFound ) ShowFatalError( "Errors in " + cCurrentModuleObject + " input." );
 
 			} // ProfileNum
 		}

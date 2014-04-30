@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/FArray2S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -14,8 +13,8 @@ namespace EnergyPlus {
 
 void
 ControlCompOutput(
-	Fstring const & CompName, // the component Name
-	Fstring const & CompType, // Type of component
+	std::string const & CompName, // the component Name
+	std::string const & CompType, // Type of component
 	int & CompNum, // Index of component in component array
 	bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
 	Real64 const QZnReq, // zone load to be met
@@ -38,8 +37,8 @@ ControlCompOutput(
 
 void
 CheckSysSizing(
-	Fstring const & CompType, // Component Type (e.g. Chiller:Electric)
-	Fstring const & CompName // Component Name (e.g. Big Chiller)
+	std::string const & CompType, // Component Type (e.g. Chiller:Electric)
+	std::string const & CompName // Component Name (e.g. Big Chiller)
 );
 
 void
@@ -50,8 +49,8 @@ CheckThisAirSystemForSizing(
 
 void
 CheckZoneSizing(
-	Fstring const & CompType, // Component Type (e.g. Chiller:Electric)
-	Fstring const & CompName // Component Name (e.g. Big Chiller)
+	std::string const & CompType, // Component Type (e.g. Chiller:Electric)
+	std::string const & CompName // Component Name (e.g. Big Chiller)
 );
 
 void
@@ -62,10 +61,10 @@ CheckThisZoneForSizing(
 
 void
 ValidateComponent(
-	Fstring const & CompType, // Component Type (e.g. Chiller:Electric)
-	Fstring const & CompName, // Component Name (e.g. Big Chiller)
+	std::string const & CompType, // Component Type (e.g. Chiller:Electric)
+	std::string const & CompName, // Component Name (e.g. Big Chiller)
 	bool & IsNotOK, // .TRUE. if this component pair is invalid
-	Fstring const & CallString // Context of this pair -- for error message
+	std::string const & CallString // Context of this pair -- for error message
 );
 
 void

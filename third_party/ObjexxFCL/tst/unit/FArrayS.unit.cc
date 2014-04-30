@@ -15,7 +15,10 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArrayS.all.hh>
+#include <ObjexxFCL/FArrayS.all.io.hh>
 #include <ObjexxFCL/FArray1A.hh>
+#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/FArray3D.hh>
 
 using namespace ObjexxFCL;
 
@@ -257,4 +260,23 @@ TEST( FArraySTest, CountOp2D )
 	EXPECT_EQ( 1u, count_ge( S, 9 ) );
 	EXPECT_EQ( 9u, count_lt( S, 11 ) );
 	EXPECT_EQ( 3u, count_gt( S, 3 ) );
+}
+
+TEST( FArraySTest, StreamOut )
+{
+	FArray1D_int const A( 3, { 1, 2, 3 } );
+	FArray1S_int S( A );
+	std::ostringstream stream;
+	stream << S;
+	EXPECT_EQ( "           1            2            3", stream.str() );
+}
+
+TEST( FArraySTest, StreamIn )
+{
+	FArray1D_int const A( 3, { 1, 2, 3 } );
+	FArray1S_int S( A );
+	std::string const text( "1  2  3" );
+	std::istringstream stream( text );
+	stream >> S;
+	EXPECT_TRUE( eq( A, S ) );
 }

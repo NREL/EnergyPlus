@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -15,7 +14,6 @@ namespace EnergyPlus {
 namespace OutputReportPredefined {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// The following section initializes the predefined column heading variables
@@ -627,29 +625,26 @@ namespace OutputReportPredefined {
 	struct reportNameType
 	{
 		// Members
-		Fstring name;
-		Fstring namewithspaces; // a "prettier version" than the key value
-		Fstring abrev;
+		std::string name;
+		std::string namewithspaces; // a "prettier version" than the key value
+		std::string abrev;
 		bool show;
 
 		// Default Constructor
 		reportNameType() :
-			name( MaxNameLength ),
-			namewithspaces( MaxNameLength ),
-			abrev( MaxNameLength ),
 			show( false )
 		{}
 
 		// Member Constructor
 		reportNameType(
-			Fstring const & name,
-			Fstring const & namewithspaces, // a "prettier version" than the key value
-			Fstring const & abrev,
+			std::string const & name,
+			std::string const & namewithspaces, // a "prettier version" than the key value
+			std::string const & abrev,
 			bool const show
 		) :
-			name( MaxNameLength, name ),
-			namewithspaces( MaxNameLength, namewithspaces ),
-			abrev( MaxNameLength, abrev ),
+			name( name ),
+			namewithspaces( namewithspaces ),
+			abrev( abrev ),
 			show( show )
 		{}
 
@@ -658,26 +653,24 @@ namespace OutputReportPredefined {
 	struct SubTableType
 	{
 		// Members
-		Fstring name;
+		std::string name;
 		int indexReportName;
-		Fstring footnote;
+		std::string footnote;
 
 		// Default Constructor
 		SubTableType() :
-			name( MaxNameLength ),
-			indexReportName( 0 ),
-			footnote( 2 * MaxNameLength )
+			indexReportName( 0 )
 		{}
 
 		// Member Constructor
 		SubTableType(
-			Fstring const & name,
+			std::string const & name,
 			int const indexReportName,
-			Fstring const & footnote
+			std::string const & footnote
 		) :
-			name( MaxNameLength, name ),
+			name( name ),
 			indexReportName( indexReportName ),
-			footnote( 2 * MaxNameLength, footnote )
+			footnote( footnote )
 		{}
 
 	};
@@ -685,21 +678,20 @@ namespace OutputReportPredefined {
 	struct ColumnTagType
 	{
 		// Members
-		Fstring heading;
+		std::string heading;
 		int indexSubTable;
 
 		// Default Constructor
 		ColumnTagType() :
-			heading( MaxNameLength ),
 			indexSubTable( 0 )
 		{}
 
 		// Member Constructor
 		ColumnTagType(
-			Fstring const & heading,
+			std::string const & heading,
 			int const indexSubTable
 		) :
-			heading( MaxNameLength, heading ),
+			heading( heading ),
 			indexSubTable( indexSubTable )
 		{}
 
@@ -708,8 +700,8 @@ namespace OutputReportPredefined {
 	struct TableEntryType
 	{
 		// Members
-		Fstring charEntry;
-		Fstring objectName;
+		std::string charEntry;
+		std::string objectName;
 		int indexColumn;
 		int subTableIndex;
 		int uniqueObjName;
@@ -719,8 +711,6 @@ namespace OutputReportPredefined {
 
 		// Default Constructor
 		TableEntryType() :
-			charEntry( MaxNameLength ),
-			objectName( MaxNameLength ),
 			indexColumn( 0 ),
 			subTableIndex( 0 ),
 			uniqueObjName( 0 ),
@@ -731,8 +721,8 @@ namespace OutputReportPredefined {
 
 		// Member Constructor
 		TableEntryType(
-			Fstring const & charEntry,
-			Fstring const & objectName,
+			std::string const & charEntry,
+			std::string const & objectName,
 			int const indexColumn,
 			int const subTableIndex,
 			int const uniqueObjName,
@@ -740,8 +730,8 @@ namespace OutputReportPredefined {
 			int const significantDigits,
 			bool const origEntryIsReal
 		) :
-			charEntry( MaxNameLength, charEntry ),
-			objectName( MaxNameLength, objectName ),
+			charEntry( charEntry ),
+			objectName( objectName ),
 			indexColumn( indexColumn ),
 			subTableIndex( subTableIndex ),
 			uniqueObjName( uniqueObjName ),
@@ -755,18 +745,15 @@ namespace OutputReportPredefined {
 	struct CompSizeTableEntryType
 	{
 		// Members
-		Fstring typeField;
-		Fstring nameField;
-		Fstring description;
+		std::string typeField;
+		std::string nameField;
+		std::string description;
 		Real64 valField;
 		bool active;
 		bool written;
 
 		// Default Constructor
 		CompSizeTableEntryType() :
-			typeField( MaxNameLength ),
-			nameField( MaxNameLength ),
-			description( MaxNameLength ),
 			valField( 0.0 ),
 			active( false ),
 			written( false )
@@ -774,16 +761,16 @@ namespace OutputReportPredefined {
 
 		// Member Constructor
 		CompSizeTableEntryType(
-			Fstring const & typeField,
-			Fstring const & nameField,
-			Fstring const & description,
+			std::string const & typeField,
+			std::string const & nameField,
+			std::string const & description,
 			Real64 const valField,
 			bool const active,
 			bool const written
 		) :
-			typeField( MaxNameLength, typeField ),
-			nameField( MaxNameLength, nameField ),
-			description( MaxNameLength, description ),
+			typeField( typeField ),
+			nameField( nameField ),
+			description( description ),
 			valField( valField ),
 			active( active ),
 			written( written )
@@ -842,7 +829,7 @@ namespace OutputReportPredefined {
 	void
 	PreDefTableEntry(
 		int const columnIndex,
-		Fstring const & objName,
+		std::string const & objName,
 		Real64 const tableEntryReal,
 		Optional_int_const numSigDigits = _
 	);
@@ -850,14 +837,14 @@ namespace OutputReportPredefined {
 	void
 	PreDefTableEntry(
 		int const columnIndex,
-		Fstring const & objName,
-		Fstring const & tableEntryChar
+		std::string const & objName,
+		std::string const & tableEntryChar
 	);
 
 	void
 	PreDefTableEntry(
 		int const columnIndex,
-		Fstring const & objName,
+		std::string const & objName,
 		int const tableEntryInt
 	);
 
@@ -866,9 +853,9 @@ namespace OutputReportPredefined {
 
 	void
 	AddCompSizeTableEntry(
-		Fstring const & FieldType,
-		Fstring const & FieldName,
-		Fstring const & FieldDescription,
+		std::string const & FieldType,
+		std::string const & FieldName,
+		std::string const & FieldDescription,
 		Real64 const FieldValue
 	);
 
@@ -881,27 +868,27 @@ namespace OutputReportPredefined {
 
 	int
 	newPreDefReport(
-		Fstring const & inReportName,
-		Fstring const & inReportAbrev,
-		Fstring const & inReportNamewithSpaces
+		std::string const & inReportName,
+		std::string const & inReportAbrev,
+		std::string const & inReportNamewithSpaces
 	);
 
 	int
 	newPreDefSubTable(
 		int const reportIndex,
-		Fstring const & subTableName
+		std::string const & subTableName
 	);
 
 	void
 	addFootNoteSubTable(
 		int const subTableIndex,
-		Fstring const & footnoteText
+		std::string const & footnoteText
 	);
 
 	int
 	newPreDefColumn(
 		int const subTableIndex,
-		Fstring const & columnHeading
+		std::string const & columnHeading
 	);
 
 	//     NOTICE

@@ -13,9 +13,6 @@
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/char.constants.hh>
-
 // C++ Headers
 #include <algorithm>
 #include <cassert>
@@ -57,7 +54,7 @@ public: // Creation
 	Cstring() :
 		str_( new char[ 1 ] )
 	{
-		str_[ 0 ] = NUL;
+		str_[ 0 ] = '\0';
 	}
 
 	// Copy Constructor
@@ -84,7 +81,7 @@ public: // Creation
 	{
 		size_type const len( s.length() );
 		s.copy( str_, len );
-		str_[ len ] = NUL;
+		str_[ len ] = '\0';
 	}
 
 	// Cstring + Length Constructor
@@ -97,7 +94,7 @@ public: // Creation
 	{
 		assert( len <= s.length() );
 		std::memcpy( str_, s.str_, len );
-		str_[ len ] = NUL;
+		str_[ len ] = '\0';
 	}
 
 	// C string + Length Constructor
@@ -110,7 +107,7 @@ public: // Creation
 	{
 		assert( len <= std::strlen( s ) );
 		std::memcpy( str_, s, len );
-		str_[ len ] = NUL;
+		str_[ len ] = '\0';
 	}
 
 	// std::string + Length Constructor
@@ -123,7 +120,7 @@ public: // Creation
 	{
 		assert( len <= s.length() );
 		s.copy( str_, len );
-		str_[ len ] = NUL;
+		str_[ len ] = '\0';
 	}
 
 	// char Constructor
@@ -133,7 +130,7 @@ public: // Creation
 		str_( new char[ 2 ] )
 	{
 		str_[ 0 ] = c;
-		str_[ 1 ] = NUL;
+		str_[ 1 ] = '\0';
 	}
 
 	// Length Constructor
@@ -142,8 +139,8 @@ public: // Creation
 	Cstring( size_type const len ) :
 		str_( new char[ len + 1 ] )
 	{
-		std::memset( str_, SPC, len );
-		str_[ len ] = NUL;
+		std::memset( str_, ' ', len );
+		str_[ len ] = '\0';
 	}
 
 	// Length Constructor
@@ -152,8 +149,8 @@ public: // Creation
 	Cstring( int const len ) :
 		str_( new char[ len + 1 ] )
 	{
-		std::memset( str_, SPC, len );
-		str_[ len ] = NUL;
+		std::memset( str_, ' ', len );
+		str_[ len ] = '\0';
 	}
 
 	// Destructor
@@ -214,7 +211,7 @@ public: // Assignment
 		size_type const len( s.length() );
 		delete[] str_; str_ = new char[ len + 1 ];
 		s.copy( str_, len );
-		str_[ len ] = NUL;
+		str_[ len ] = '\0';
 		return *this;
 	}
 
@@ -225,7 +222,7 @@ public: // Assignment
 	{
 		delete[] str_; str_ = new char[ 2 ];
 		str_[ 0 ] = c;
-		str_[ 1 ] = NUL;
+		str_[ 1 ] = '\0';
 		return *this;
 	}
 
@@ -376,7 +373,7 @@ public: // Modifier
 	Cstring &
 	trim()
 	{
-		str_[ len_trim() ] = NUL;
+		str_[ len_trim() ] = '\0';
 		return *this;
 	}
 
@@ -385,7 +382,7 @@ public: // Modifier
 	Cstring &
 	trim_whitespace()
 	{
-		str_[ len_trim_whitespace() ] = NUL;
+		str_[ len_trim_whitespace() ] = '\0';
 		return *this;
 	}
 

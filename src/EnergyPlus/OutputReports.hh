@@ -1,8 +1,8 @@
 #ifndef OutputReports_hh_INCLUDED
 #define OutputReports_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Fstring.hh>
+// C++ Headers
+#include <string>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -13,19 +13,19 @@ void
 ReportSurfaces();
 
 void
-LinesOut( Fstring const & option );
+LinesOut( std::string const & option );
 
 void
 DXFOut(
-	Fstring & PolygonAction,
-	Fstring & ColorScheme // Name from user for color scheme or blank
+	std::string & PolygonAction,
+	std::string & ColorScheme // Name from user for color scheme or blank
 );
 
 void
-DXFOutLines( Fstring const & ColorScheme );
+DXFOutLines( std::string const & ColorScheme );
 
 void
-DXFOutWireFrame( Fstring const & ColorScheme );
+DXFOutWireFrame( std::string const & ColorScheme );
 
 void
 DetailsForSurfaces( int const RptType ); // (1=Vertices only, 10=Details only, 11=Details with vertices)
@@ -35,8 +35,8 @@ CostInfoOut();
 
 void
 VRMLOut(
-	Fstring & PolygonAction,
-	Fstring & ColorScheme
+	std::string & PolygonAction,
+	std::string & ColorScheme
 );
 
 //     NOTICE

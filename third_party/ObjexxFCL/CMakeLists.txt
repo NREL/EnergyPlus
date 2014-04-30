@@ -267,7 +267,6 @@ set(src
   src/ObjexxFCL/StaticIndexRange.hh
   src/ObjexxFCL/Sticky.fwd.hh
   src/ObjexxFCL/Sticky.hh
-  src/ObjexxFCL/Stream.cc
   src/ObjexxFCL/Stream.fwd.hh
   src/ObjexxFCL/Stream.hh
   src/ObjexxFCL/string.constants.cc

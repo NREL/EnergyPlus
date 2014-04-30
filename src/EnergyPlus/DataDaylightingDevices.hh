@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace DataDaylightingDevices {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// -only module should be available to other modules and routines.
@@ -45,7 +43,7 @@ namespace DataDaylightingDevices {
 	{
 		// Members
 		// Input variables
-		Fstring Name; // Name of TDD pipe
+		std::string Name; // Name of TDD pipe
 		int Dome; // Pointer to the dome object
 		int Diffuser; // Pointer to the diffuser object
 		int Construction; // Pointer to the construction object
@@ -77,7 +75,6 @@ namespace DataDaylightingDevices {
 
 		// Default Constructor
 		TDDPipeData() :
-			Name( MaxNameLength ),
 			Dome( 0 ),
 			Diffuser( 0 ),
 			Construction( 0 ),
@@ -105,7 +102,7 @@ namespace DataDaylightingDevices {
 
 		// Member Constructor
 		TDDPipeData(
-			Fstring const & Name, // Name of TDD pipe
+			std::string const & Name, // Name of TDD pipe
 			int const Dome, // Pointer to the dome object
 			int const Diffuser, // Pointer to the diffuser object
 			int const Construction, // Pointer to the construction object
@@ -133,7 +130,7 @@ namespace DataDaylightingDevices {
 			Real64 const TransVisDiff, // TDD diffuse visible transmittance
 			Real64 const TransSolDiff // TDD diffuse solar transmittance
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			Dome( Dome ),
 			Diffuser( Diffuser ),
 			Construction( Construction ),
@@ -168,7 +165,7 @@ namespace DataDaylightingDevices {
 	{
 		// Members
 		// Input variables
-		Fstring Name; // Name of daylighting shelf
+		std::string Name; // Name of daylighting shelf
 		int Window; // Pointer to the window object
 		int InSurf; // Pointer to the inside shelf heat transfer surface
 		int OutSurf; // Pointer to the outside shelf attached shading surface
@@ -181,7 +178,6 @@ namespace DataDaylightingDevices {
 
 		// Default Constructor
 		ShelfData() :
-			Name( MaxNameLength ),
 			Window( 0 ),
 			InSurf( 0 ),
 			OutSurf( 0 ),
@@ -193,7 +189,7 @@ namespace DataDaylightingDevices {
 
 		// Member Constructor
 		ShelfData(
-			Fstring const & Name, // Name of daylighting shelf
+			std::string const & Name, // Name of daylighting shelf
 			int const Window, // Pointer to the window object
 			int const InSurf, // Pointer to the inside shelf heat transfer surface
 			int const OutSurf, // Pointer to the outside shelf attached shading surface
@@ -202,7 +198,7 @@ namespace DataDaylightingDevices {
 			Real64 const OutReflectSol, // Outside shelf solar reflectance
 			Real64 const ViewFactor // Outside shelf view factor to window
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			Window( Window ),
 			InSurf( InSurf ),
 			OutSurf( OutSurf ),

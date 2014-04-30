@@ -126,7 +126,7 @@ public: // Assignment
 	operator =( U const & val )
 	{
 		assert( ptr_ );
-		*ptr_ = val;
+		*ptr_ = static_cast< Value >( val );
 		return *this;
 	}
 
@@ -196,7 +196,7 @@ public: // Properties
 	bool
 	present() const
 	{
-		return ptr_;
+		return ( ptr_ != nullptr );
 	}
 
 	// Own?
@@ -430,7 +430,7 @@ public: // Properties
 	bool
 	present() const
 	{
-		return ptr_;
+		return ( ptr_ != nullptr );
 	}
 
 public: // Modifiers

@@ -55,7 +55,6 @@ namespace GroundHeatExchangers {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::BeginSimFlag;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::BeginTimeStepFlag;
@@ -118,8 +117,8 @@ namespace GroundHeatExchangers {
 
 	void
 	SimGroundHeatExchangers(
-		Fstring const & GlheType,
-		Fstring const & GlheName,
+		std::string const & GlheType,
+		std::string const & GlheName,
 		int & CompIndex,
 		bool const RunFlag,
 		bool const FirstIteration,
@@ -176,17 +175,17 @@ namespace GroundHeatExchangers {
 		if ( CompIndex == 0 ) {
 			GlheNum = FindItemInList( GlheName, VerticalGlhe.Name(), NumVerticalGlhes );
 			if ( GlheNum == 0 ) {
-				ShowFatalError( "SimGroundHeatExchangers: Unit not found=" + trim( GlheName ) );
+				ShowFatalError( "SimGroundHeatExchangers: Unit not found=" + GlheName );
 			}
 			CompIndex = GlheNum;
 		} else {
 			GlheNum = CompIndex;
 			if ( GlheNum > NumVerticalGlhes || GlheNum < 1 ) {
-				ShowFatalError( "SimGroundHeatExchangers:  Invalid CompIndex passed=" + trim( TrimSigDigits( GlheNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumVerticalGlhes ) ) + ", Entered Unit name=" + trim( GlheName ) );
+				ShowFatalError( "SimGroundHeatExchangers:  Invalid CompIndex passed=" + TrimSigDigits( GlheNum ) + ", Number of Units=" + TrimSigDigits( NumVerticalGlhes ) + ", Entered Unit name=" + GlheName );
 			}
 			if ( CheckEquipName( GlheNum ) ) {
 				if ( GlheName != VerticalGlhe( GlheNum ).Name ) {
-					ShowFatalError( "SimGroundHeatExchangers: Invalid CompIndex passed=" + trim( TrimSigDigits( NumVerticalGlhes ) ) + ", Unit name=" + trim( GlheName ) + ", stored Unit Name for that index=" + trim( VerticalGlhe( GlheNum ).Name ) );
+					ShowFatalError( "SimGroundHeatExchangers: Invalid CompIndex passed=" + TrimSigDigits( NumVerticalGlhes ) + ", Unit name=" + GlheName + ", stored Unit Name for that index=" + VerticalGlhe( GlheNum ).Name );
 				}
 				CheckEquipName( GlheNum ) = false;
 			}
@@ -719,7 +718,7 @@ namespace GroundHeatExchangers {
 		Allocated = false;
 
 		if ( NumVerticalGlhes <= 0 ) {
-			ShowSevereError( "No " + trim( cCurrentModuleObject ) + " equipment found in input file" );
+			ShowSevereError( "No " + cCurrentModuleObject + " equipment found in input file" );
 			ErrorsFound = true;
 		}
 
@@ -736,7 +735,7 @@ namespace GroundHeatExchangers {
 			IsBlank = false;
 
 			//get object name
-			VerifyName( cAlphaArgs( 1 ), VerticalGlhe.Name(), GlheNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), VerticalGlhe.Name(), GlheNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -744,14 +743,14 @@ namespace GroundHeatExchangers {
 			VerticalGlhe( GlheNum ).Name = cAlphaArgs( 1 );
 
 			//get inlet node num
-			VerticalGlhe( GlheNum ).GlheInletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			VerticalGlhe( GlheNum ).GlheInletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
 			//get outlet node num
-			VerticalGlhe( GlheNum ).GlheOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			VerticalGlhe( GlheNum ).GlheOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 			VerticalGlhe( GlheNum ).Available = true;
 			VerticalGlhe( GlheNum ).ON = true;
 
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Condenser Water Nodes" );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Condenser Water Nodes" );
 
 			//load borehole data
 			VerticalGlhe( GlheNum ).DesignFlow = rNumericArgs( 1 );
@@ -774,17 +773,17 @@ namespace GroundHeatExchangers {
 
 			//   Not many checks
 			if ( VerticalGlhe( GlheNum ).PipeThick >= VerticalGlhe( GlheNum ).PipeOutDia / 2.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( VerticalGlhe( GlheNum ).Name ) + "\", invalid value in field." );
-				ShowContinueError( "..." + trim( cNumericFieldNames( 13 ) ) + "=[" + trim( RoundSigDigits( VerticalGlhe( GlheNum ).PipeThick, 3 ) ) + "]." );
-				ShowContinueError( "..." + trim( cNumericFieldNames( 11 ) ) + "=[" + trim( RoundSigDigits( VerticalGlhe( GlheNum ).PipeOutDia, 3 ) ) + "]." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + VerticalGlhe( GlheNum ).Name + "\", invalid value in field." );
+				ShowContinueError( "..." + cNumericFieldNames( 13 ) + "=[" + RoundSigDigits( VerticalGlhe( GlheNum ).PipeThick, 3 ) + "]." );
+				ShowContinueError( "..." + cNumericFieldNames( 11 ) + "=[" + RoundSigDigits( VerticalGlhe( GlheNum ).PipeOutDia, 3 ) + "]." );
 				ShowContinueError( "...Radius will be <=0." );
 				ErrorsFound = true;
 			}
 
 			if ( VerticalGlhe( GlheNum ).MaxSimYears < MaxNumberSimYears ) {
-				ShowWarningError( trim( cCurrentModuleObject ) + "=\"" + trim( VerticalGlhe( GlheNum ).Name ) + "\", invalid value in field." );
-				ShowContinueError( "..." + trim( cNumericFieldNames( 14 ) ) + " less than RunPeriod Request" );
-				ShowContinueError( "Requested input=" + trim( TrimSigDigits( VerticalGlhe( GlheNum ).MaxSimYears ) ) + " will be set to " + trim( TrimSigDigits( MaxNumberSimYears ) ) );
+				ShowWarningError( cCurrentModuleObject + "=\"" + VerticalGlhe( GlheNum ).Name + "\", invalid value in field." );
+				ShowContinueError( "..." + cNumericFieldNames( 14 ) + " less than RunPeriod Request" );
+				ShowContinueError( "Requested input=" + TrimSigDigits( VerticalGlhe( GlheNum ).MaxSimYears ) + " will be set to " + TrimSigDigits( MaxNumberSimYears ) );
 				VerticalGlhe( GlheNum ).MaxSimYears = MaxNumberSimYears;
 			}
 
@@ -821,7 +820,7 @@ namespace GroundHeatExchangers {
 			}
 			//Check for Errors
 			if ( ErrorsFound ) {
-				ShowFatalError( "Errors found in processing input for " + trim( cCurrentModuleObject ) );
+				ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
 			}
 		}
 
@@ -1292,10 +1291,10 @@ namespace GroundHeatExchangers {
 			FluidDensity = GetDensityGlycol( PlantLoop( VerticalGlhe( Num ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( Num ).LoopNum ).FluidIndex, "UpdateVerticalGroundHeatExchanger" );
 			DesignMassFlow = VerticalGlhe( Num ).DesignFlow * FluidDensity;
 			ShowWarningError( "Check GLHE design inputs & g-functions for consistency" );
-			ShowContinueError( "For GroundHeatExchanger:Vertical " + trim( VerticalGlhe( Num ).Name ) + "GLHE delta Temp > 100C." );
+			ShowContinueError( "For GroundHeatExchanger:Vertical " + VerticalGlhe( Num ).Name + "GLHE delta Temp > 100C." );
 			ShowContinueError( "This can be encountered in cases where the GLHE mass flow rate is either significantly" );
 			ShowContinueError( " lower than the design value, or cases where the mass flow rate rapidly changes." );
-			ShowContinueError( "Glhe Current Flow Rate=" + trim( TrimSigDigits( GlheMassFlowRate, 3 ) ) + "; Glhe Design Flow Rate=" + trim( TrimSigDigits( DesignMassFlow, 3 ) ) );
+			ShowContinueError( "Glhe Current Flow Rate=" + TrimSigDigits( GlheMassFlowRate, 3 ) + "; Glhe Design Flow Rate=" + TrimSigDigits( DesignMassFlow, 3 ) );
 			++NumErrorCalls;
 		}
 

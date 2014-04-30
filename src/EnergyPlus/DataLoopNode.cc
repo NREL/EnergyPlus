@@ -27,7 +27,6 @@ namespace DataLoopNode {
 	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS:
@@ -37,11 +36,11 @@ namespace DataLoopNode {
 	int const NodeType_Water( 2 ); // 'Water'
 	int const NodeType_Steam( 3 ); // 'Steam'
 	int const NodeType_Electric( 4 ); // 'Electric'
-	FArray1D_Fstring const ValidNodeFluidTypes( {0,4}, sFstring( 8 ), { "blank   ", "Air     ", "Water   ", "Steam   ", "Electric" } );
+	FArray1D_string const ValidNodeFluidTypes( {0,4}, { "blank", "Air", "Water", "Steam", "Electric" } );
 	int const NumValidNodeFluidTypes( 4 );
 
 	// Valid Connection Types for Nodes
-	FArray1D_Fstring const ValidConnectionTypes( 15, sFstring( 19 ), { "Inlet              ", "Outlet             ", "Internal           ", "ZoneNode           ", "Sensor             ", "Actuator           ", "OutdoorAir         ", "ReliefAir          ", "ZoneInlet          ", "ZoneReturn         ", "ZoneExhaust        ", "Setpoint           ", "Electric           ", "OutsideAirReference", "InducedAir         " } );
+	FArray1D_string const ValidConnectionTypes( 15, { "Inlet", "Outlet", "Internal", "ZoneNode", "Sensor", "Actuator", "OutdoorAir", "ReliefAir", "ZoneInlet", "ZoneReturn", "ZoneExhaust", "Setpoint", "Electric", "OutsideAirReference", "InducedAir" } );
 
 	int const NumValidConnectionTypes( 15 );
 
@@ -81,7 +80,7 @@ namespace DataLoopNode {
 	// the following assignments:  Node(somenodenumber)=Node(someothernodenumber) to
 	// set/update Node conditions.  If the Node derived type would include the name
 	// then the name would get changed and bad things would result...
-	FArray1D_Fstring NodeID( sFstring( MaxNameLength ) );
+	FArray1D_string NodeID;
 
 	// Object Data
 	FArray1D< NodeData > Node; // dim to num nodes in SimHVAC

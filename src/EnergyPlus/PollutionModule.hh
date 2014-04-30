@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace PollutionModule {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -436,7 +434,7 @@ namespace PollutionModule {
 	{
 		// Members
 		//FuelType Names
-		FArray1D_Fstring FuelTypeNames;
+		FArray1D_string FuelTypeNames;
 		//Fuel Types used with the Pollution Factors
 		Real64 Elec;
 		Real64 NatGas;
@@ -487,7 +485,7 @@ namespace PollutionModule {
 
 		// Default Constructor
 		FuelTypeProps() :
-			FuelTypeNames( {1,PollFactorNumTypes}, sFstring( MaxNameLength ) ),
+			FuelTypeNames( {1,PollFactorNumTypes} ),
 			Elec( 0.0 ),
 			NatGas( 0.0 ),
 			FuelOil1( 0.0 ),
@@ -536,7 +534,7 @@ namespace PollutionModule {
 
 		// Member Constructor
 		FuelTypeProps(
-			FArray1_Fstring const & FuelTypeNames,
+			FArray1_string const & FuelTypeNames,
 			Real64 const Elec,
 			Real64 const NatGas,
 			Real64 const FuelOil1,
@@ -582,7 +580,7 @@ namespace PollutionModule {
 			Real64 const ElecPurchasedFacility,
 			Real64 const ElecSurplusSoldFacility
 		) :
-			FuelTypeNames( {1,PollFactorNumTypes}, sFstring( MaxNameLength ), FuelTypeNames ),
+			FuelTypeNames( {1,PollFactorNumTypes}, FuelTypeNames ),
 			Elec( Elec ),
 			NatGas( NatGas ),
 			FuelOil1( FuelOil1 ),
@@ -657,10 +655,10 @@ namespace PollutionModule {
 
 	void
 	CheckFFSchedule(
-		Fstring const & currentModuleObject, // the module Object
-		Fstring const & resourceType, // resource type (Natural Gas, etc)
-		Fstring const & fieldName, // Actual field name
-		Fstring const & ScheduleName, // Schedule Name as input
+		std::string const & currentModuleObject, // the module Object
+		std::string const & resourceType, // resource type (Natural Gas, etc)
+		std::string const & fieldName, // Actual field name
+		std::string const & ScheduleName, // Schedule Name as input
 		int & SchedulePtr, // Schedule Index
 		bool & ErrorsFound // true if errors found
 	);
@@ -680,7 +678,7 @@ namespace PollutionModule {
 
 	void
 	GetFuelFactorInfo(
-		Fstring const & fuelName, // input fuel name  (standard from Tabular reports)
+		std::string const & fuelName, // input fuel name  (standard from Tabular reports)
 		bool & fuelFactorUsed, // return value true if user has entered this fuel
 		Real64 & fuelSourceFactor, // if used, the source factor
 		bool & fuelFactorScheduleUsed, // if true, schedules for this fuel are used

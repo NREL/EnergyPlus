@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -16,7 +15,6 @@ namespace EnergyPlus {
 namespace HVACUnitaryBypassVAV {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
@@ -77,9 +75,9 @@ namespace HVACUnitaryBypassVAV {
 	{
 		// Members
 		// input data
-		Fstring Name; // Name of unit
-		Fstring UnitType; // Type of unit
-		Fstring Sched; // Availability schedule name
+		std::string Name; // Name of unit
+		std::string UnitType; // Type of unit
+		std::string Sched; // Availability schedule name
 		int SchedPtr; // Index number to availability schedule
 		Real64 MaxCoolAirVolFlow; // System air volumetric flow rate during cooling operation [m3/s]
 		Real64 MaxHeatAirVolFlow; // System air volumetric flow rate during heating operation [m3/s]
@@ -102,11 +100,11 @@ namespace HVACUnitaryBypassVAV {
 		int MixerReliefAirNode; // Relief air node number for OA mixer
 		int MixerInletAirNode; // Return air node number for OA mixer
 		int SplitterOutletAirNode; // Air node number for splitter (last component outlet node)
-		Fstring OAMixType; // type of outside air mixer
-		Fstring OAMixName; // Name of OA mixer
+		std::string OAMixType; // type of outside air mixer
+		std::string OAMixName; // Name of OA mixer
 		int OAMixIndex; // Index to OA mixer
-		Fstring FanName; // Name of fan
-		Fstring FanType; // Type of fan
+		std::string FanName; // Name of fan
+		std::string FanType; // Type of fan
 		int FanPlace; // Fan placement is either blowthru (1) or drawthru (2)
 		int FanType_Num; // Fan type number (see DataHVACGlobals)
 		int FanIndex; // Index number to fan
@@ -116,15 +114,15 @@ namespace HVACUnitaryBypassVAV {
 		Real64 CoolingSpeedRatio; // Fan speed ratio in cooling mode
 		Real64 NoHeatCoolSpeedRatio; // Fan speed ratio when no cooling or heating
 		bool CheckFanFlow; // Check fan volumetric flow versus system flow in init routine.
-		Fstring DXCoolCoilName; // Name of DX cooling coil
-		Fstring DXCoolCoilType; // Type of DX cooling coil,Coil:DX:CoolingBypassFactorEmpirical or
+		std::string DXCoolCoilName; // Name of DX cooling coil
+		std::string DXCoolCoilType; // Type of DX cooling coil,Coil:DX:CoolingBypassFactorEmpirical or
 		//               CoilSystem:Cooling:DX:HeatExchangerAssisted
 		int DXCoolCoilType_Num; // Numeric equivalent for DX cooling coil type
 		int CoolCoilCompIndex; // cooling coil component index number
 		int DXCoolCoilIndexNum; // actual DX cooling coil index number
 		int DXHeatCoilIndexNum; // actual DX heating coil index number
-		Fstring HeatCoilName; // Name of heating coil
-		Fstring HeatCoilType; // Type of heating coil,Coil:DX:HeatingEmpirical
+		std::string HeatCoilName; // Name of heating coil
+		std::string HeatCoilType; // Type of heating coil,Coil:DX:HeatingEmpirical
 		// Coil:Heater:Gas, Coil:Heater:Electric, Coil:Heater:Water
 		// Coil:Heater:Steam
 		int HeatCoilType_Num; // Numeric equivalent for DX heating coil type
@@ -213,9 +211,6 @@ namespace HVACUnitaryBypassVAV {
 
 		// Default Constructor
 		CBVAVData() :
-			Name( MaxNameLength ),
-			UnitType( MaxNameLength ),
-			Sched( MaxNameLength ),
 			SchedPtr( 0 ),
 			MaxCoolAirVolFlow( 0.0 ),
 			MaxHeatAirVolFlow( 0.0 ),
@@ -238,11 +233,7 @@ namespace HVACUnitaryBypassVAV {
 			MixerReliefAirNode( 0 ),
 			MixerInletAirNode( 0 ),
 			SplitterOutletAirNode( 0 ),
-			OAMixType( MaxNameLength ),
-			OAMixName( MaxNameLength ),
 			OAMixIndex( 0 ),
-			FanName( MaxNameLength ),
-			FanType( MaxNameLength ),
 			FanPlace( 0 ),
 			FanType_Num( 0 ),
 			FanIndex( 0 ),
@@ -252,14 +243,10 @@ namespace HVACUnitaryBypassVAV {
 			CoolingSpeedRatio( 1.0 ),
 			NoHeatCoolSpeedRatio( 1.0 ),
 			CheckFanFlow( true ),
-			DXCoolCoilName( MaxNameLength ),
-			DXCoolCoilType( MaxNameLength ),
 			DXCoolCoilType_Num( 0 ),
 			CoolCoilCompIndex( 0 ),
 			DXCoolCoilIndexNum( 0 ),
 			DXHeatCoilIndexNum( 0 ),
-			HeatCoilName( MaxNameLength ),
-			HeatCoilType( MaxNameLength ),
 			HeatCoilType_Num( 0 ),
 			HeatCoilIndex( 0 ),
 			OpMode( 0 ),
@@ -339,9 +326,9 @@ namespace HVACUnitaryBypassVAV {
 
 		// Member Constructor
 		CBVAVData(
-			Fstring const & Name, // Name of unit
-			Fstring const & UnitType, // Type of unit
-			Fstring const & Sched, // Availability schedule name
+			std::string const & Name, // Name of unit
+			std::string const & UnitType, // Type of unit
+			std::string const & Sched, // Availability schedule name
 			int const SchedPtr, // Index number to availability schedule
 			Real64 const MaxCoolAirVolFlow, // System air volumetric flow rate during cooling operation [m3/s]
 			Real64 const MaxHeatAirVolFlow, // System air volumetric flow rate during heating operation [m3/s]
@@ -364,11 +351,11 @@ namespace HVACUnitaryBypassVAV {
 			int const MixerReliefAirNode, // Relief air node number for OA mixer
 			int const MixerInletAirNode, // Return air node number for OA mixer
 			int const SplitterOutletAirNode, // Air node number for splitter (last component outlet node)
-			Fstring const & OAMixType, // type of outside air mixer
-			Fstring const & OAMixName, // Name of OA mixer
+			std::string const & OAMixType, // type of outside air mixer
+			std::string const & OAMixName, // Name of OA mixer
 			int const OAMixIndex, // Index to OA mixer
-			Fstring const & FanName, // Name of fan
-			Fstring const & FanType, // Type of fan
+			std::string const & FanName, // Name of fan
+			std::string const & FanType, // Type of fan
 			int const FanPlace, // Fan placement is either blowthru (1) or drawthru (2)
 			int const FanType_Num, // Fan type number (see DataHVACGlobals)
 			int const FanIndex, // Index number to fan
@@ -378,14 +365,14 @@ namespace HVACUnitaryBypassVAV {
 			Real64 const CoolingSpeedRatio, // Fan speed ratio in cooling mode
 			Real64 const NoHeatCoolSpeedRatio, // Fan speed ratio when no cooling or heating
 			bool const CheckFanFlow, // Check fan volumetric flow versus system flow in init routine.
-			Fstring const & DXCoolCoilName, // Name of DX cooling coil
-			Fstring const & DXCoolCoilType, // Type of DX cooling coil,Coil:DX:CoolingBypassFactorEmpirical or
+			std::string const & DXCoolCoilName, // Name of DX cooling coil
+			std::string const & DXCoolCoilType, // Type of DX cooling coil,Coil:DX:CoolingBypassFactorEmpirical or
 			int const DXCoolCoilType_Num, // Numeric equivalent for DX cooling coil type
 			int const CoolCoilCompIndex, // cooling coil component index number
 			int const DXCoolCoilIndexNum, // actual DX cooling coil index number
 			int const DXHeatCoilIndexNum, // actual DX heating coil index number
-			Fstring const & HeatCoilName, // Name of heating coil
-			Fstring const & HeatCoilType, // Type of heating coil,Coil:DX:HeatingEmpirical
+			std::string const & HeatCoilName, // Name of heating coil
+			std::string const & HeatCoilType, // Type of heating coil,Coil:DX:HeatingEmpirical
 			int const HeatCoilType_Num, // Numeric equivalent for DX heating coil type
 			int const HeatCoilIndex, // DX heating coil index number
 			int const OpMode, // mode of operation; 1=cycling fan, cycling compressor
@@ -468,9 +455,9 @@ namespace HVACUnitaryBypassVAV {
 			int const CRDXIterationFailed, // Counter for cool reheat multimode DX coil messages
 			int const CRDXIterationFailedIndex // Counter for cool reheat multimode DX coil messages
 		) :
-			Name( MaxNameLength, Name ),
-			UnitType( MaxNameLength, UnitType ),
-			Sched( MaxNameLength, Sched ),
+			Name( Name ),
+			UnitType( UnitType ),
+			Sched( Sched ),
 			SchedPtr( SchedPtr ),
 			MaxCoolAirVolFlow( MaxCoolAirVolFlow ),
 			MaxHeatAirVolFlow( MaxHeatAirVolFlow ),
@@ -493,11 +480,11 @@ namespace HVACUnitaryBypassVAV {
 			MixerReliefAirNode( MixerReliefAirNode ),
 			MixerInletAirNode( MixerInletAirNode ),
 			SplitterOutletAirNode( SplitterOutletAirNode ),
-			OAMixType( MaxNameLength, OAMixType ),
-			OAMixName( MaxNameLength, OAMixName ),
+			OAMixType( OAMixType ),
+			OAMixName( OAMixName ),
 			OAMixIndex( OAMixIndex ),
-			FanName( MaxNameLength, FanName ),
-			FanType( MaxNameLength, FanType ),
+			FanName( FanName ),
+			FanType( FanType ),
 			FanPlace( FanPlace ),
 			FanType_Num( FanType_Num ),
 			FanIndex( FanIndex ),
@@ -507,14 +494,14 @@ namespace HVACUnitaryBypassVAV {
 			CoolingSpeedRatio( CoolingSpeedRatio ),
 			NoHeatCoolSpeedRatio( NoHeatCoolSpeedRatio ),
 			CheckFanFlow( CheckFanFlow ),
-			DXCoolCoilName( MaxNameLength, DXCoolCoilName ),
-			DXCoolCoilType( MaxNameLength, DXCoolCoilType ),
+			DXCoolCoilName( DXCoolCoilName ),
+			DXCoolCoilType( DXCoolCoilType ),
 			DXCoolCoilType_Num( DXCoolCoilType_Num ),
 			CoolCoilCompIndex( CoolCoilCompIndex ),
 			DXCoolCoilIndexNum( DXCoolCoilIndexNum ),
 			DXHeatCoilIndexNum( DXHeatCoilIndexNum ),
-			HeatCoilName( MaxNameLength, HeatCoilName ),
-			HeatCoilType( MaxNameLength, HeatCoilType ),
+			HeatCoilName( HeatCoilName ),
+			HeatCoilType( HeatCoilType ),
 			HeatCoilType_Num( HeatCoilType_Num ),
 			HeatCoilIndex( HeatCoilIndex ),
 			OpMode( OpMode ),
@@ -607,7 +594,7 @@ namespace HVACUnitaryBypassVAV {
 
 	void
 	SimUnitaryBypassVAV(
-		Fstring const & CompName, // Name of the CBVAV system
+		std::string const & CompName, // Name of the CBVAV system
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system time step
 		int const AirLoopNum, // air loop index
 		int & CompIndex // Index to changeover-bypass VAV system

@@ -21,9 +21,6 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
-class Fstring;
-
 // MArray1: 1D Member Array Proxy
 template< class A, typename T >
 class MArray1 : public MArrayR< A, T, 1 >

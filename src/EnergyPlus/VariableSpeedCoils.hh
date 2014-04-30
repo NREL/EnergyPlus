@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -18,7 +17,6 @@ namespace EnergyPlus {
 namespace VariableSpeedCoils {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 	using namespace DataHVACGlobals;
 	using DataSizing::AutoSize;
 
@@ -113,8 +111,8 @@ namespace VariableSpeedCoils {
 	struct VariableSpeedCoilData // variable speed coil
 	{
 		// Members
-		Fstring Name; // Name of the  Coil
-		Fstring VarSpeedCoilType; // type of coil
+		std::string Name; // Name of the  Coil
+		std::string VarSpeedCoilType; // type of coil
 		int NumOfSpeeds; // Number of speeds
 		int NormSpedLevel; // Nominal speed level
 		Real64 RatedWaterVolFlowRate; // Rated/Ref Water Volumetric Flow Rate [m3/s]
@@ -130,7 +128,7 @@ namespace VariableSpeedCoils {
 		int HOTGASREHEATFLG; // whether to use hot gas reheat
 		Real64 HPTimeConstant; // Heat pump time constant [s]
 		int PLFFPLR; // index of part load curve as a function of part load ratio
-		Fstring CoolHeatType; // Type of WatertoAirHP ie. Heating or Cooling
+		std::string CoolHeatType; // Type of WatertoAirHP ie. Heating or Cooling
 		int VSCoilTypeOfNum; // type of component in plant
 		bool SimFlag; // Heat Pump Simulation Flag
 		Real64 DesignWaterMassFlowRate; // design water mass flow rate [kg/s]
@@ -274,11 +272,11 @@ namespace VariableSpeedCoils {
 		FArray1D< Real64 > MSRatedEvapCondVolFlowPerRatedTotCap; // evap condenser air flow ratio to capacity
 		//begin variables for Water System interactions
 		int EvapWaterSupplyMode; // where does water come from
-		Fstring EvapWaterSupplyName; // name of water source e.g. water storage tank
+		std::string EvapWaterSupplyName; // name of water source e.g. water storage tank
 		int EvapWaterSupTankID;
 		int EvapWaterTankDemandARRID;
 		int CondensateCollectMode; // where does water come from
-		Fstring CondensateCollectName; // name of water source e.g. water storage tank
+		std::string CondensateCollectName; // name of water source e.g. water storage tank
 		int CondensateTankID;
 		int CondensateTankSupplyARRID;
 		Real64 CondensateVdot; // rate of water condensation from air stream [m3/s]
@@ -291,8 +289,6 @@ namespace VariableSpeedCoils {
 
 		// Default Constructor
 		VariableSpeedCoilData() :
-			Name( MaxNameLength ),
-			VarSpeedCoilType( MaxNameLength ),
 			NumOfSpeeds( 2 ),
 			NormSpedLevel( MaxSpedLevels ),
 			RatedWaterVolFlowRate( AutoSize ),
@@ -306,7 +302,6 @@ namespace VariableSpeedCoils {
 			HOTGASREHEATFLG( 0 ),
 			HPTimeConstant( 0.0 ),
 			PLFFPLR( 0 ),
-			CoolHeatType( MaxNameLength ),
 			VSCoilTypeOfNum( 0 ),
 			SimFlag( false ),
 			DesignWaterMassFlowRate( 0.0 ),
@@ -418,11 +413,9 @@ namespace VariableSpeedCoils {
 			EvapCondEffect( MaxSpedLevels, 0.0 ),
 			MSRatedEvapCondVolFlowPerRatedTotCap( MaxSpedLevels, 0.0 ),
 			EvapWaterSupplyMode( WaterSupplyFromMains ),
-			EvapWaterSupplyName( MaxNameLength ),
 			EvapWaterSupTankID( 0 ),
 			EvapWaterTankDemandARRID( 0 ),
 			CondensateCollectMode( CondensateDiscarded ),
-			CondensateCollectName( MaxNameLength ),
 			CondensateTankID( 0 ),
 			CondensateTankSupplyARRID( 0 ),
 			CondensateVdot( 0.0 ),
@@ -435,8 +428,8 @@ namespace VariableSpeedCoils {
 
 		// Member Constructor
 		VariableSpeedCoilData(
-			Fstring const & Name, // Name of the  Coil
-			Fstring const & VarSpeedCoilType, // type of coil
+			std::string const & Name, // Name of the  Coil
+			std::string const & VarSpeedCoilType, // type of coil
 			int const NumOfSpeeds, // Number of speeds
 			int const NormSpedLevel, // Nominal speed level
 			Real64 const RatedWaterVolFlowRate, // Rated/Ref Water Volumetric Flow Rate [m3/s]
@@ -450,7 +443,7 @@ namespace VariableSpeedCoils {
 			int const HOTGASREHEATFLG, // whether to use hot gas reheat
 			Real64 const HPTimeConstant, // Heat pump time constant [s]
 			int const PLFFPLR, // index of part load curve as a function of part load ratio
-			Fstring const & CoolHeatType, // Type of WatertoAirHP ie. Heating or Cooling
+			std::string const & CoolHeatType, // Type of WatertoAirHP ie. Heating or Cooling
 			int const VSCoilTypeOfNum, // type of component in plant
 			bool const SimFlag, // Heat Pump Simulation Flag
 			Real64 const DesignWaterMassFlowRate, // design water mass flow rate [kg/s]
@@ -562,11 +555,11 @@ namespace VariableSpeedCoils {
 			FArray1< Real64 > const & EvapCondEffect, // effectiveness of the evaporatively cooled condenser
 			FArray1< Real64 > const & MSRatedEvapCondVolFlowPerRatedTotCap, // evap condenser air flow ratio to capacity
 			int const EvapWaterSupplyMode, // where does water come from
-			Fstring const & EvapWaterSupplyName, // name of water source e.g. water storage tank
+			std::string const & EvapWaterSupplyName, // name of water source e.g. water storage tank
 			int const EvapWaterSupTankID,
 			int const EvapWaterTankDemandARRID,
 			int const CondensateCollectMode, // where does water come from
-			Fstring const & CondensateCollectName, // name of water source e.g. water storage tank
+			std::string const & CondensateCollectName, // name of water source e.g. water storage tank
 			int const CondensateTankID,
 			int const CondensateTankSupplyARRID,
 			Real64 const CondensateVdot, // rate of water condensation from air stream [m3/s]
@@ -576,8 +569,8 @@ namespace VariableSpeedCoils {
 			Real64 const InletSourceAirTemp, // source air temperature entering the outdoor coil [C]
 			Real64 const InletSourceAirEnthalpy // source air enthalpy entering the outdoor coil [J/kg]
 		) :
-			Name( MaxNameLength, Name ),
-			VarSpeedCoilType( MaxNameLength, VarSpeedCoilType ),
+			Name( Name ),
+			VarSpeedCoilType( VarSpeedCoilType ),
 			NumOfSpeeds( NumOfSpeeds ),
 			NormSpedLevel( NormSpedLevel ),
 			RatedWaterVolFlowRate( RatedWaterVolFlowRate ),
@@ -591,7 +584,7 @@ namespace VariableSpeedCoils {
 			HOTGASREHEATFLG( HOTGASREHEATFLG ),
 			HPTimeConstant( HPTimeConstant ),
 			PLFFPLR( PLFFPLR ),
-			CoolHeatType( MaxNameLength, CoolHeatType ),
+			CoolHeatType( CoolHeatType ),
 			VSCoilTypeOfNum( VSCoilTypeOfNum ),
 			SimFlag( SimFlag ),
 			DesignWaterMassFlowRate( DesignWaterMassFlowRate ),
@@ -703,11 +696,11 @@ namespace VariableSpeedCoils {
 			EvapCondEffect( MaxSpedLevels, EvapCondEffect ),
 			MSRatedEvapCondVolFlowPerRatedTotCap( MaxSpedLevels, MSRatedEvapCondVolFlowPerRatedTotCap ),
 			EvapWaterSupplyMode( EvapWaterSupplyMode ),
-			EvapWaterSupplyName( MaxNameLength, EvapWaterSupplyName ),
+			EvapWaterSupplyName( EvapWaterSupplyName ),
 			EvapWaterSupTankID( EvapWaterSupTankID ),
 			EvapWaterTankDemandARRID( EvapWaterTankDemandARRID ),
 			CondensateCollectMode( CondensateCollectMode ),
-			CondensateCollectName( MaxNameLength, CondensateCollectName ),
+			CondensateCollectName( CondensateCollectName ),
 			CondensateTankID( CondensateTankID ),
 			CondensateTankSupplyARRID( CondensateTankSupplyARRID ),
 			CondensateVdot( CondensateVdot ),
@@ -727,7 +720,7 @@ namespace VariableSpeedCoils {
 
 	void
 	SimVariableSpeedCoils(
-		Fstring const & CompName, // Coil Name
+		std::string const & CompName, // Coil Name
 		int & CompIndex, // Index for Component name
 		int const CyclingScheme, // Continuous fan OR cycling compressor
 		Real64 & MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
@@ -794,54 +787,54 @@ namespace VariableSpeedCoils {
 
 	Real64
 	GetCoilCapacityVariableSpeed(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetCoilIndexVariableSpeed(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	Real64
 	GetCoilAirFlowRateVariableSpeed(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetCoilInletNodeVariableSpeed(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetCoilOutletNodeVariableSpeed(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetVSCoilCondenserInletNode(
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	Real64
 	GetVSCoilMinOATCompressor(
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetVSCoilNumOfSpeeds(
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
@@ -905,8 +898,8 @@ namespace VariableSpeedCoils {
 
 	Real64
 	CalcCBF(
-		Fstring const & UnitType,
-		Fstring const & UnitName,
+		std::string const & UnitType,
+		std::string const & UnitName,
 		Real64 const InletAirTemp, // inlet air temperature [C]
 		Real64 const InletAirHumRat, // inlet air humidity ratio [kg water / kg dry air]
 		Real64 const TotCap, // total cooling  capacity [Watts]
