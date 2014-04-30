@@ -8,6 +8,7 @@ set( CMAKE_VERSION_PATCH 0 )
 
 option( BUILD_PACKAGE "Build package" OFF )
 option( BUILD_TESTING "Build testing targets" OFF )
+option( BUILD_FORTRAN "Build Fortran stuff" OFF )
 
 # Not yet released by CMake, but is being developed
 # This will help us set the proper options for c++11 across various configurations
@@ -37,3 +38,9 @@ ADD_SUBDIRECTORY(third_party/gtest)
 ADD_SUBDIRECTORY(third_party/ObjexxFCL)
 ADD_SUBDIRECTORY(src/EnergyPlus)
 
+if ( BUILD_FORTRAN )
+    ENABLE_LANGUAGE(Fortran)
+    ADD_SUBDIRECTORY(src/EPMacro)
+    ADD_SUBDIRECTORY(src/ExpandObjects)
+    ADD_SUBDIRECTORY(src/ReadVars)
+endif()

@@ -1,0 +1,3 @@
+SET(SRC ReadVarsESO.f90) 
+
+ADD_EXECUTABLE( ReadVarsESO ${SRC} )
