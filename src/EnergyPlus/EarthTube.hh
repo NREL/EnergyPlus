@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace EarthTube {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// DERIVED TYPE DEFINITIONS
@@ -42,7 +40,7 @@ namespace EarthTube {
 		// Members
 		int ZonePtr;
 		int SchedPtr;
-		Fstring SchedName;
+		std::string SchedName;
 		Real64 DesignLevel;
 		Real64 MinTemperature;
 		Real64 MaxTemperature;
@@ -74,7 +72,6 @@ namespace EarthTube {
 		EarthTubeData() :
 			ZonePtr( 0 ),
 			SchedPtr( 0 ),
-			SchedName( MaxNameLength ),
 			DesignLevel( 0.0 ),
 			MinTemperature( 0.0 ),
 			MaxTemperature( 0.0 ),
@@ -104,7 +101,7 @@ namespace EarthTube {
 		EarthTubeData(
 			int const ZonePtr,
 			int const SchedPtr,
-			Fstring const & SchedName,
+			std::string const & SchedName,
 			Real64 const DesignLevel,
 			Real64 const MinTemperature,
 			Real64 const MaxTemperature,
@@ -134,7 +131,7 @@ namespace EarthTube {
 		) :
 			ZonePtr( ZonePtr ),
 			SchedPtr( SchedPtr ),
-			SchedName( MaxNameLength, SchedName ),
+			SchedName( SchedName ),
 			DesignLevel( DesignLevel ),
 			MinTemperature( MinTemperature ),
 			MaxTemperature( MaxTemperature ),

@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,12 +13,11 @@ namespace EnergyPlus {
 namespace IceThermalStorage {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	extern Fstring const cIceStorageSimple;
-	extern Fstring const cIceStorageDetailed;
+	extern std::string const cIceStorageSimple;
+	extern std::string const cIceStorageDetailed;
 
 	extern int const IceStorageType_Simple;
 	extern int const IceStorageType_Detailed;
@@ -106,28 +104,26 @@ namespace IceThermalStorage {
 	{
 		// Members
 		// Input data
-		Fstring Name; // User identifier
-		Fstring StorageType;
+		std::string Name; // User identifier
+		std::string StorageType;
 		int StorageType_Num;
 		int LocalEqNum;
 
 		// Default Constructor
 		IceStorageMapping() :
-			Name( MaxNameLength ),
-			StorageType( MaxNameLength ),
 			StorageType_Num( 0 ),
 			LocalEqNum( 0 )
 		{}
 
 		// Member Constructor
 		IceStorageMapping(
-			Fstring const & Name, // User identifier
-			Fstring const & StorageType,
+			std::string const & Name, // User identifier
+			std::string const & StorageType,
 			int const StorageType_Num,
 			int const LocalEqNum
 		) :
-			Name( MaxNameLength, Name ),
-			StorageType( MaxNameLength, StorageType ),
+			Name( Name ),
+			StorageType( StorageType ),
 			StorageType_Num( StorageType_Num ),
 			LocalEqNum( LocalEqNum )
 		{}
@@ -138,8 +134,8 @@ namespace IceThermalStorage {
 	{
 		// Members
 		// Input data
-		Fstring Name; // User identifier
-		Fstring ITSType; // Ice Thermal Storage Type
+		std::string Name; // User identifier
+		std::string ITSType; // Ice Thermal Storage Type
 		int ITSType_Num; // Storage Type as number (IceOnCoilInternal,IceOnCoilExternal)
 		int MapNum; // Number to Map structure
 		int UratePtr; // Charging/Discharging SchedulePtr: u value schedule
@@ -155,8 +151,6 @@ namespace IceThermalStorage {
 
 		// Default Constructor
 		IceStorageSpecs() :
-			Name( MaxNameLength ),
-			ITSType( MaxNameLength ),
 			ITSType_Num( 0 ),
 			MapNum( 0 ),
 			UratePtr( 0 ),
@@ -172,8 +166,8 @@ namespace IceThermalStorage {
 
 		// Member Constructor
 		IceStorageSpecs(
-			Fstring const & Name, // User identifier
-			Fstring const & ITSType, // Ice Thermal Storage Type
+			std::string const & Name, // User identifier
+			std::string const & ITSType, // Ice Thermal Storage Type
 			int const ITSType_Num, // Storage Type as number (IceOnCoilInternal,IceOnCoilExternal)
 			int const MapNum, // Number to Map structure
 			int const UratePtr, // Charging/Discharging SchedulePtr: u value schedule
@@ -186,8 +180,8 @@ namespace IceThermalStorage {
 			int const CompNum,
 			Real64 const DesignMassFlowRate
 		) :
-			Name( MaxNameLength, Name ),
-			ITSType( MaxNameLength, ITSType ),
+			Name( Name ),
+			ITSType( ITSType ),
 			ITSType_Num( ITSType_Num ),
 			MapNum( MapNum ),
 			UratePtr( UratePtr ),
@@ -207,8 +201,8 @@ namespace IceThermalStorage {
 	{
 		// Members
 		// Input data
-		Fstring Name; // User identifier
-		Fstring ScheduleName; // User identifier
+		std::string Name; // User identifier
+		std::string ScheduleName; // User identifier
 		int ScheduleIndex; // Plant inlet node number for ice storage unit
 		Real64 NomCapacity; // Design storage capacity of Ice Thermal Storage system [W-hr]
 		// (User input for this parameter in GJ--need to convert to W-hr)
@@ -220,11 +214,11 @@ namespace IceThermalStorage {
 		int PlantCompNum;
 		Real64 DesignMassFlowRate;
 		int MapNum; // Number to Map structure
-		Fstring DischargeCurveType; // Type of discharging equation entered by user (QuadraticLinear)
-		Fstring DischargeCurveName; // Curve name for discharging (used to find the curve index)
+		std::string DischargeCurveType; // Type of discharging equation entered by user (QuadraticLinear)
+		std::string DischargeCurveName; // Curve name for discharging (used to find the curve index)
 		int DischargeCurveNum; // Curve index for discharging
-		Fstring ChargeCurveType; // Type of charging equation entered by user (QuadraticLinear)
-		Fstring ChargeCurveName; // Curve name for charging (used to find the curve index)
+		std::string ChargeCurveType; // Type of charging equation entered by user (QuadraticLinear)
+		std::string ChargeCurveName; // Curve name for charging (used to find the curve index)
 		int ChargeCurveNum; // Curve index for charging
 		Real64 CurveFitTimeStep; // Time step used to generate performance data [hours]
 		Real64 DischargeParaElecLoad; // Parasitic electric load duing discharging [dimensionless]
@@ -237,7 +231,7 @@ namespace IceThermalStorage {
 		Real64 CompLoad; // load requested by plant [W]
 		Real64 IceFracChange; // Change in fraction of ice stored during the time step [fraction]
 		Real64 IceFracRemaining; // Fraction of ice remaining in storage [fraction]
-		Fstring ThawProcessIndicator; // User input determining whether system is inside or outside melt
+		std::string ThawProcessIndicator; // User input determining whether system is inside or outside melt
 		int ThawProcessIndex; // Conversion of thaw process indicator to integer index
 		Real64 IceFracOnCoil; // Fraction of ice on the coil (affects charging) [fraction]
 		Real64 DischargingRate; // Rate at which energy is being added (thawing) to ice unit [W]
@@ -259,8 +253,6 @@ namespace IceThermalStorage {
 
 		// Default Constructor
 		DetailedIceStorageData() :
-			Name( MaxNameLength ),
-			ScheduleName( MaxNameLength ),
 			ScheduleIndex( 0 ),
 			NomCapacity( 0.0 ),
 			PlantInNodeNum( 0 ),
@@ -271,11 +263,7 @@ namespace IceThermalStorage {
 			PlantCompNum( 0 ),
 			DesignMassFlowRate( 0.0 ),
 			MapNum( 0 ),
-			DischargeCurveType( MaxNameLength ),
-			DischargeCurveName( MaxNameLength ),
 			DischargeCurveNum( 0 ),
-			ChargeCurveType( MaxNameLength ),
-			ChargeCurveName( MaxNameLength ),
 			ChargeCurveNum( 0 ),
 			CurveFitTimeStep( 1.0 ),
 			DischargeParaElecLoad( 0.0 ),
@@ -285,7 +273,6 @@ namespace IceThermalStorage {
 			CompLoad( 0.0 ),
 			IceFracChange( 0.0 ),
 			IceFracRemaining( 1.0 ),
-			ThawProcessIndicator( MaxNameLength ),
 			ThawProcessIndex( 0 ),
 			IceFracOnCoil( 1.0 ),
 			DischargingRate( 0.0 ),
@@ -308,8 +295,8 @@ namespace IceThermalStorage {
 
 		// Member Constructor
 		DetailedIceStorageData(
-			Fstring const & Name, // User identifier
-			Fstring const & ScheduleName, // User identifier
+			std::string const & Name, // User identifier
+			std::string const & ScheduleName, // User identifier
 			int const ScheduleIndex, // Plant inlet node number for ice storage unit
 			Real64 const NomCapacity, // Design storage capacity of Ice Thermal Storage system [W-hr]
 			int const PlantInNodeNum, // Plant inlet node number for ice storage unit
@@ -320,11 +307,11 @@ namespace IceThermalStorage {
 			int const PlantCompNum,
 			Real64 const DesignMassFlowRate,
 			int const MapNum, // Number to Map structure
-			Fstring const & DischargeCurveType, // Type of discharging equation entered by user (QuadraticLinear)
-			Fstring const & DischargeCurveName, // Curve name for discharging (used to find the curve index)
+			std::string const & DischargeCurveType, // Type of discharging equation entered by user (QuadraticLinear)
+			std::string const & DischargeCurveName, // Curve name for discharging (used to find the curve index)
 			int const DischargeCurveNum, // Curve index for discharging
-			Fstring const & ChargeCurveType, // Type of charging equation entered by user (QuadraticLinear)
-			Fstring const & ChargeCurveName, // Curve name for charging (used to find the curve index)
+			std::string const & ChargeCurveType, // Type of charging equation entered by user (QuadraticLinear)
+			std::string const & ChargeCurveName, // Curve name for charging (used to find the curve index)
 			int const ChargeCurveNum, // Curve index for charging
 			Real64 const CurveFitTimeStep, // Time step used to generate performance data [hours]
 			Real64 const DischargeParaElecLoad, // Parasitic electric load duing discharging [dimensionless]
@@ -334,7 +321,7 @@ namespace IceThermalStorage {
 			Real64 const CompLoad, // load requested by plant [W]
 			Real64 const IceFracChange, // Change in fraction of ice stored during the time step [fraction]
 			Real64 const IceFracRemaining, // Fraction of ice remaining in storage [fraction]
-			Fstring const & ThawProcessIndicator, // User input determining whether system is inside or outside melt
+			std::string const & ThawProcessIndicator, // User input determining whether system is inside or outside melt
 			int const ThawProcessIndex, // Conversion of thaw process indicator to integer index
 			Real64 const IceFracOnCoil, // Fraction of ice on the coil (affects charging) [fraction]
 			Real64 const DischargingRate, // Rate at which energy is being added (thawing) to ice unit [W]
@@ -354,8 +341,8 @@ namespace IceThermalStorage {
 			int const ChargeIterErrors, // Number of max iterations exceeded errors during charging
 			int const ChargeErrorCount // Index for error counting routine
 		) :
-			Name( MaxNameLength, Name ),
-			ScheduleName( MaxNameLength, ScheduleName ),
+			Name( Name ),
+			ScheduleName( ScheduleName ),
 			ScheduleIndex( ScheduleIndex ),
 			NomCapacity( NomCapacity ),
 			PlantInNodeNum( PlantInNodeNum ),
@@ -366,11 +353,11 @@ namespace IceThermalStorage {
 			PlantCompNum( PlantCompNum ),
 			DesignMassFlowRate( DesignMassFlowRate ),
 			MapNum( MapNum ),
-			DischargeCurveType( MaxNameLength, DischargeCurveType ),
-			DischargeCurveName( MaxNameLength, DischargeCurveName ),
+			DischargeCurveType( DischargeCurveType ),
+			DischargeCurveName( DischargeCurveName ),
 			DischargeCurveNum( DischargeCurveNum ),
-			ChargeCurveType( MaxNameLength, ChargeCurveType ),
-			ChargeCurveName( MaxNameLength, ChargeCurveName ),
+			ChargeCurveType( ChargeCurveType ),
+			ChargeCurveName( ChargeCurveName ),
 			ChargeCurveNum( ChargeCurveNum ),
 			CurveFitTimeStep( CurveFitTimeStep ),
 			DischargeParaElecLoad( DischargeParaElecLoad ),
@@ -380,7 +367,7 @@ namespace IceThermalStorage {
 			CompLoad( CompLoad ),
 			IceFracChange( IceFracChange ),
 			IceFracRemaining( IceFracRemaining ),
-			ThawProcessIndicator( MaxNameLength, ThawProcessIndicator ),
+			ThawProcessIndicator( ThawProcessIndicator ),
 			ThawProcessIndex( ThawProcessIndex ),
 			IceFracOnCoil( IceFracOnCoil ),
 			DischargingRate( DischargingRate ),
@@ -472,8 +459,8 @@ namespace IceThermalStorage {
 
 	void
 	SimIceStorage(
-		Fstring const & IceStorageType,
-		Fstring const & IceStorageName,
+		std::string const & IceStorageType,
+		std::string const & IceStorageName,
 		int & CompIndex,
 		bool const RunFlag,
 		bool const FirstIteration,

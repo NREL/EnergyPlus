@@ -22,18 +22,17 @@ namespace DataRoomAirModel {
 	// USE STATEMENTS:                       ! UCSD
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// module should be available to other modules and routines.  Thus,
 	// all variables in this module must be PUBLIC.
 
 	// MODULE PARAMETER DEFINITIONS
-	Fstring const cUserDefinedControlObject( MaxNameLength, "RoomAir:TemperaturePattern:UserDefined" );
-	Fstring const cTempPatternConstGradientObject( MaxNameLength, "RoomAir:TemperaturePattern:ConstantGradient" );
-	Fstring const cTempPatternTwoGradientObject( MaxNameLength, "RoomAir:TemperaturePattern:TwoGradient" );
-	Fstring const cTempPatternNDHeightObject( MaxNameLength, "RoomAir:TemperaturePattern:NondimensionalHeight" );
-	Fstring const cTempPatternSurfMapObject( MaxNameLength, "RoomAir:TemperaturePattern:SurfaceMapping" );
+	std::string const cUserDefinedControlObject( "RoomAir:TemperaturePattern:UserDefined" );
+	std::string const cTempPatternConstGradientObject( "RoomAir:TemperaturePattern:ConstantGradient" );
+	std::string const cTempPatternTwoGradientObject( "RoomAir:TemperaturePattern:TwoGradient" );
+	std::string const cTempPatternNDHeightObject( "RoomAir:TemperaturePattern:NondimensionalHeight" );
+	std::string const cTempPatternSurfMapObject( "RoomAir:TemperaturePattern:SurfaceMapping" );
 
 	// Parameters to indicate room air model selected
 	int const RoomAirModel_UserDefined( 1 ); // user defined patterns
@@ -43,7 +42,7 @@ namespace DataRoomAirModel {
 	int const RoomAirModel_UCSDCV( 5 ); // UCSD-CV
 	int const RoomAirModel_UCSDUFI( 6 ); // UCSD UFAD interior zone model
 	int const RoomAirModel_UCSDUFE( 7 ); // UCSD UFAD interior zone model
-	FArray1D_Fstring const ChAirModel( {0,7}, sFstring( 11 ), { "*Invalid*  ", "UserDefined", "Mixing     ", "Mundt      ", "UCSD_DV    ", "UCSD_CV    ", "UCSD_UFI   ", "UCSD_UFE   " } );
+	FArray1D_string const ChAirModel( {0,7}, { "*Invalid*", "UserDefined", "Mixing", "Mundt", "UCSD_DV", "UCSD_CV", "UCSD_UFI", "UCSD_UFE" } );
 
 	// Parameters to indicate air temperature coupling scheme
 	int const DirectCoupling( 1 ); // direct coupling scheme

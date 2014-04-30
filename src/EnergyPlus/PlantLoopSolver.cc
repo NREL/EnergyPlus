@@ -46,7 +46,6 @@ namespace PlantLoopSolver {
 	// The procedural flow depends on the pump(s), loop side, and operation scheme at the time (and current flow lock?)
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// DERIVED TYPE DEFINITIONS
@@ -421,9 +420,8 @@ namespace PlantLoopSolver {
 
 			} else if ( SELECT_CASE_var == UnknownStatusOpSchemeType ) { //~ Uninitialized, this should be a sufficient place to catch for this on branch 1
 				//throw fatal
-				ShowSevereError( "ValidateFlowControlPaths: Uninitialized operation scheme type for component Name: " + trim( this_component.Name ) );
+				ShowSevereError( "ValidateFlowControlPaths: Uninitialized operation scheme type for component Name: " + this_component.Name );
 				ShowFatalError( "ValidateFlowControlPaths: developer notice, Inlet path validation loop" );
-
 			} else { //~ Other control type
 				if ( EncounteredLRB ) {
 					EncounteredNonLRBAfterLRB = true;
@@ -484,9 +482,8 @@ namespace PlantLoopSolver {
 
 					} else if ( SELECT_CASE_var == UnknownStatusOpSchemeType ) { //~ Uninitialized, this should be sufficient place to catch for this on other branches
 						//throw fatal error
-						ShowSevereError( "ValidateFlowControlPaths: Uninitialized operation scheme type for component Name: " + trim( this_component.Name ) );
+						ShowSevereError( "ValidateFlowControlPaths: Uninitialized operation scheme type for component Name: " + this_component.Name );
 						ShowFatalError( "ValidateFlowControlPaths: developer notice, problem in Parallel path validation loop" );
-
 					} else { //~ Other control type
 						if ( EncounteredLRB ) {
 							EncounteredNonLRBAfterLRB = true;
@@ -889,7 +886,7 @@ namespace PlantLoopSolver {
 		}
 		if ( ThisLoopHasCommonPipe && ! ThisSideHasPumps ) {
 			ShowSevereError( "SetupLoopFlowRequest: Common Pipe must have pumps on both sides of loop" );
-			ShowContinueError( "Occurs on plant loop name =\"" + trim( PlantLoop( LoopNum ).Name ) + "\"" );
+			ShowContinueError( "Occurs on plant loop name =\"" + PlantLoop( LoopNum ).Name + "\"" );
 			if ( ThisSide == DemandSide ) {
 				ShowContinueError( "Add a pump to the demand side of the plant loop" );
 			} else if ( ThisSide == SupplySide ) {
@@ -899,7 +896,7 @@ namespace PlantLoopSolver {
 
 		} else if ( ! ThisSideHasPumps && ! OtherSideHasPumps ) {
 			ShowSevereError( "SetupLoopFlowRequest: Problem in plant topology, no pumps specified on the loop" );
-			ShowContinueError( "Occurs on plant loop name =\"" + trim( PlantLoop( LoopNum ).Name ) + "\"" );
+			ShowContinueError( "Occurs on plant loop name =\"" + PlantLoop( LoopNum ).Name + "\"" );
 			ShowContinueError( "All plant loops require at least one pump" );
 			ShowFatalError( "Program terminates due to preceding conditions." );
 		}
@@ -1084,7 +1081,7 @@ namespace PlantLoopSolver {
 		bool LoadDistributionWasPerformed;
 		bool DummyInit;
 		bool const DoNotGetCompSizFac( false );
-		static FArray1D_Fstring const LoopSideNames( 2, sFstring( 6 ), { "Demand", "Supply" } );
+		static FArray1D_string const LoopSideNames( 2, { "Demand", "Supply" } );
 
 		//~ General variables
 		static FArray1D_int LastComponentSimulated;
@@ -1620,10 +1617,10 @@ namespace PlantLoopSolver {
 					if ( LoadToHeatingSetPoint > LoadToCoolingSetPoint ) {
 						ShowSevereError( "Plant Loop: the Plant Loop Demand Calculation Scheme is set to DualSetPointDeadBand, " "but the heating-related low setpoint appears to be above the cooling-related high setpoint." );
 						ShowContinueError( "For example, if using SetpointManager:Scheduled:DualSetpoint, then check that the" " low setpoint is below the high setpoint." );
-						ShowContinueError( "Occurs in PlantLoop=" + trim( PlantLoop( LoopNum ).Name ) );
-						ShowContinueError( "LoadToHeatingSetPoint=" + trim( RoundSigDigits( LoadToHeatingSetPoint, 3 ) ) + ", LoadToCoolingSetPoint=" + trim( RoundSigDigits( LoadToCoolingSetPoint, 3 ) ) );
-						ShowContinueError( "Loop Heating Low Setpoint=" + trim( RoundSigDigits( LoopSetPointTemperatureLo, 2 ) ) );
-						ShowContinueError( "Loop Cooling High Setpoint=" + trim( RoundSigDigits( LoopSetPointTemperatureHi, 2 ) ) );
+						ShowContinueError( "Occurs in PlantLoop=" + PlantLoop( LoopNum ).Name );
+						ShowContinueError( "LoadToHeatingSetPoint=" + RoundSigDigits( LoadToHeatingSetPoint, 3 ) + ", LoadToCoolingSetPoint=" + RoundSigDigits( LoadToCoolingSetPoint, 3 ) );
+						ShowContinueError( "Loop Heating Low Setpoint=" + RoundSigDigits( LoopSetPointTemperatureLo, 2 ) );
+						ShowContinueError( "Loop Cooling High Setpoint=" + RoundSigDigits( LoopSetPointTemperatureHi, 2 ) );
 
 						ShowFatalError( "Program terminates due to above conditions." );
 					}
@@ -1635,10 +1632,10 @@ namespace PlantLoopSolver {
 						LoadToLoopSetPoint = 0.0;
 					} else {
 						ShowSevereError( "DualSetPointWithDeadBand: Unanticipated combination of heating and cooling loads - " "report to EnergyPlus Development Team" );
-						ShowContinueError( "occurs in PlantLoop=" + trim( PlantLoop( LoopNum ).Name ) );
-						ShowContinueError( "LoadToHeatingSetPoint=" + trim( RoundSigDigits( LoadToHeatingSetPoint, 3 ) ) + ", LoadToCoolingSetPoint=" + trim( RoundSigDigits( LoadToCoolingSetPoint, 3 ) ) );
-						ShowContinueError( "Loop Heating Setpoint=" + trim( RoundSigDigits( LoopSetPointTemperatureLo, 2 ) ) );
-						ShowContinueError( "Loop Cooling Setpoint=" + trim( RoundSigDigits( LoopSetPointTemperatureHi, 2 ) ) );
+						ShowContinueError( "occurs in PlantLoop=" + PlantLoop( LoopNum ).Name );
+						ShowContinueError( "LoadToHeatingSetPoint=" + RoundSigDigits( LoadToHeatingSetPoint, 3 ) + ", LoadToCoolingSetPoint=" + RoundSigDigits( LoadToCoolingSetPoint, 3 ) );
+						ShowContinueError( "Loop Heating Setpoint=" + RoundSigDigits( LoopSetPointTemperatureLo, 2 ) );
+						ShowContinueError( "Loop Cooling Setpoint=" + RoundSigDigits( LoopSetPointTemperatureHi, 2 ) );
 						ShowFatalError( "Program terminates due to above conditions." );
 					}
 				} else {
@@ -1866,7 +1863,7 @@ namespace PlantLoopSolver {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_Fstring const LoopSideName( 2, sFstring( 6 ), { "Demand", "Supply" } );
+		static FArray1D_string const LoopSideName( 2, { "Demand", "Supply" } );
 		int const SplitNum( 1 ); // Only one splitter/mixer combination is allowed
 		int const LoopSideSingleBranch( 1 ); // For readability
 
@@ -2200,10 +2197,10 @@ namespace PlantLoopSolver {
 				if ( FlowRemaining > MassFlowTolerance ) {
 					//Call fatal diagnostic error. !The math should work out!
 					ShowSevereError( "ResolveParallelFlows: Dev note, failed to redistribute restricted flow" );
-					ShowContinueErrorTimeStamp( " " );
-					ShowContinueError( "Loop side flow = " + trim( RoundSigDigits( ThisLoopSideFlow, 8 ) ) + " (kg/s)" );
-					ShowContinueError( "Flow Remaining = " + trim( RoundSigDigits( FlowRemaining, 8 ) ) + " (kg/s)" );
-					ShowContinueError( "Parallel Branch requests  = " + trim( RoundSigDigits( TotParallelBranchFlowReq, 8 ) ) + " (kg/s)" );
+					ShowContinueErrorTimeStamp( "" );
+					ShowContinueError( "Loop side flow = " + RoundSigDigits( ThisLoopSideFlow, 8 ) + " (kg/s)" );
+					ShowContinueError( "Flow Remaining = " + RoundSigDigits( FlowRemaining, 8 ) + " (kg/s)" );
+					ShowContinueError( "Parallel Branch requests  = " + RoundSigDigits( TotParallelBranchFlowReq, 8 ) + " (kg/s)" );
 				}
 
 				// 2)  ! Reset the flow on the Mixer outlet branch
@@ -2802,13 +2799,13 @@ namespace PlantLoopSolver {
 		if ( ! FirstHVACIteration && ! WarmupFlag ) {
 			if ( std::abs( Node( LoopOutlet ).MassFlowRate - Node( LoopInlet ).MassFlowRate ) > MassFlowTolerance ) {
 				if ( PlantLoop( LoopNum ).MFErrIndex == 0 ) {
-					ShowWarningError( "PlantSupplySide: PlantLoop=\"" + trim( PlantLoop( LoopNum ).Name ) + "\", Error (CheckLoopExitNode) -- Mass Flow Rate Calculation. " "Outlet and Inlet differ by more than tolerance." );
-					ShowContinueErrorTimeStamp( " " );
-					ShowContinueError( "Loop inlet node=" + trim( NodeID( LoopInlet ) ) + ", flowrate=" + trim( RoundSigDigits( Node( LoopInlet ).MassFlowRate, 4 ) ) + " kg/s" );
-					ShowContinueError( "Loop outlet node=" + trim( NodeID( LoopOutlet ) ) + ", flowrate=" + trim( RoundSigDigits( Node( LoopOutlet ).MassFlowRate, 4 ) ) + " kg/s" );
+					ShowWarningError( "PlantSupplySide: PlantLoop=\"" + PlantLoop( LoopNum ).Name + "\", Error (CheckLoopExitNode) -- Mass Flow Rate Calculation. " "Outlet and Inlet differ by more than tolerance." );
+					ShowContinueErrorTimeStamp( "" );
+					ShowContinueError( "Loop inlet node=" + NodeID( LoopInlet ) + ", flowrate=" + RoundSigDigits( Node( LoopInlet ).MassFlowRate, 4 ) + " kg/s" );
+					ShowContinueError( "Loop outlet node=" + NodeID( LoopOutlet ) + ", flowrate=" + RoundSigDigits( Node( LoopOutlet ).MassFlowRate, 4 ) + " kg/s" );
 					ShowContinueError( "This loop might be helped by a bypass." );
 				}
-				ShowRecurringWarningErrorAtEnd( "PlantSupplySide: PlantLoop=\"" + trim( PlantLoop( LoopNum ).Name ) + "\", Error -- Mass Flow Rate Calculation -- continues ** ", PlantLoop( LoopNum ).MFErrIndex );
+				ShowRecurringWarningErrorAtEnd( "PlantSupplySide: PlantLoop=\"" + PlantLoop( LoopNum ).Name + "\", Error -- Mass Flow Rate Calculation -- continues ** ", PlantLoop( LoopNum ).MFErrIndex );
 			}
 		}
 		//Reset Max loop flow rate based on pump performance

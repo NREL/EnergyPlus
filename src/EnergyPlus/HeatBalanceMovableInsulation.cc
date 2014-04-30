@@ -1,6 +1,5 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <HeatBalanceMovableInsulation.hh>
@@ -114,7 +113,7 @@ namespace HeatBalanceMovableInsulation {
 				if ( ( Material( Surface( SurfNum ).MaterialMovInsulExt ).Conductivity ) > 0.0 ) {
 					Material( Surface( SurfNum ).MaterialMovInsulExt ).Resistance = Material( Surface( SurfNum ).MaterialMovInsulExt ).Thickness / Material( Surface( SurfNum ).MaterialMovInsulExt ).Conductivity;
 				} else {
-					ShowFatalError( "EvalOutsideMovableInsulation: No resistance or conductivity found for material " + trim( Material( Surface( SurfNum ).MaterialMovInsulExt ).Name ) );
+					ShowFatalError( "EvalOutsideMovableInsulation: No resistance or conductivity found for material " + Material( Surface( SurfNum ).MaterialMovInsulExt ).Name );
 				}
 			}
 
@@ -183,7 +182,7 @@ namespace HeatBalanceMovableInsulation {
 				if ( Material( Surface( SurfNum ).MaterialMovInsulInt ).Conductivity > 0.0 && Material( Surface( SurfNum ).MaterialMovInsulInt ).Thickness > 0.0 ) {
 					Material( Surface( SurfNum ).MaterialMovInsulInt ).Resistance = Material( Surface( SurfNum ).MaterialMovInsulInt ).Thickness / Material( Surface( SurfNum ).MaterialMovInsulExt ).Conductivity;
 				} else {
-					ShowFatalError( "EvalInsideMovableInsulation: No resistance found for material " + trim( Material( Surface( SurfNum ).MaterialMovInsulInt ).Name ) );
+					ShowFatalError( "EvalInsideMovableInsulation: No resistance found for material " + Material( Surface( SurfNum ).MaterialMovInsulInt ).Name );
 				}
 			}
 

@@ -185,7 +185,7 @@ namespace HVACUnitarySystem {
 	int const LoadBased( 1 ); // control system based on zone load
 	int const SetPointBased( 2 ); // control system based on coil set point manager
 
-	Fstring const Blank;
+	std::string const Blank;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -248,7 +248,7 @@ namespace HVACUnitarySystem {
 
 	void
 	SimUnitarySystem(
-		Fstring const & UnitarySystemName, // Name of Unitary System object
+		std::string const & UnitarySystemName, // Name of Unitary System object
 		bool const FirstHVACIteration, // True when first HVAC iteration
 		int const AirLoopNum, // Primary air loop number
 		int & CompIndex, // Index to Unitary System object
@@ -310,17 +310,17 @@ namespace HVACUnitarySystem {
 		if ( CompIndex == 0 ) {
 			UnitarySysNum = FindItemInList( UnitarySystemName, UnitarySystem.Name(), NumUnitarySystem );
 			if ( UnitarySysNum == 0 ) {
-				ShowFatalError( "SimDXCoolingSystem: DXUnit not found=" + trim( UnitarySystemName ) );
+				ShowFatalError( "SimDXCoolingSystem: DXUnit not found=" + UnitarySystemName );
 			}
 			CompIndex = UnitarySysNum;
 		} else {
 			UnitarySysNum = CompIndex;
 			if ( UnitarySysNum > NumUnitarySystem || UnitarySysNum < 1 ) {
-				ShowFatalError( "SimUnitarySystem:  Invalid CompIndex passed=" + trim( TrimSigDigits( UnitarySysNum ) ) + ", Number of Unit Systems=" + trim( TrimSigDigits( NumUnitarySystem ) ) + ", Unitary System name=" + trim( UnitarySystemName ) );
+				ShowFatalError( "SimUnitarySystem:  Invalid CompIndex passed=" + TrimSigDigits( UnitarySysNum ) + ", Number of Unit Systems=" + TrimSigDigits( NumUnitarySystem ) + ", Unitary System name=" + UnitarySystemName );
 			}
 			if ( CheckEquipName( UnitarySysNum ) ) {
 				if ( UnitarySystemName != UnitarySystem( UnitarySysNum ).Name ) {
-					ShowFatalError( "SimUnitarySystem: Invalid CompIndex passed=" + trim( TrimSigDigits( UnitarySysNum ) ) + ", Unitary System name=" + trim( UnitarySystemName ) + ", stored Unit Name for that index=" + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowFatalError( "SimUnitarySystem: Invalid CompIndex passed=" + TrimSigDigits( UnitarySysNum ) + ", Unitary System name=" + UnitarySystemName + ", stored Unit Name for that index=" + UnitarySystem( UnitarySysNum ).Name );
 				}
 				CheckEquipName( UnitarySysNum ) = false;
 			}
@@ -469,9 +469,9 @@ namespace HVACUnitarySystem {
 		static FArray1D_bool MySetPointCheckFlag; // tests for set point
 		static FArray1D_bool MySizingCheckFlag; // tests for sizing
 		static bool MyOneTimeFlag( true ); // one time flag
-		static Fstring CoolingCoilType( MaxNameLength ); // Coil:Cooling:Water or Coil:Cooling:Water:DetailedGeometry
-		static Fstring CoolingCoilName( MaxNameLength ); // Coil:Cooling:Water or Coil:Cooling:Water:DetailedGeometry
-		static Fstring HeatingCoilType( MaxNameLength ); // Coil:Heating:Water or Coil:Heating:Steam
+		static std::string CoolingCoilType; // Coil:Cooling:Water or Coil:Cooling:Water:DetailedGeometry
+		static std::string CoolingCoilName; // Coil:Cooling:Water or Coil:Cooling:Water:DetailedGeometry
+		static std::string HeatingCoilType; // Coil:Heating:Water or Coil:Heating:Steam
 		static bool errFlag( false ); // error flag for mining functions
 		static bool ErrorsFound( false ); // error flag for mining functions
 		int ControlNode; // control node number
@@ -552,7 +552,7 @@ namespace HVACUnitarySystem {
 					CoolingCoilName = GetHXDXCoilName( cAllCoilTypes( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num ), UnitarySystem( UnitarySysNum ).CoolingCoilName, errFlag );
 				}
 				errFlag = false;
-				ScanPlantLoopsForObject( trim( CoolingCoilName ), TypeOfCoilWaterCooling, UnitarySystem( UnitarySysNum ).CoolCoilLoopNum, UnitarySystem( UnitarySysNum ).CoolCoilLoopSide, UnitarySystem( UnitarySysNum ).CoolCoilBranchNum, UnitarySystem( UnitarySysNum ).CoolCoilCompNum, _, _, _, _, _, errFlag );
+				ScanPlantLoopsForObject( CoolingCoilName, TypeOfCoilWaterCooling, UnitarySystem( UnitarySysNum ).CoolCoilLoopNum, UnitarySystem( UnitarySysNum ).CoolCoilLoopSide, UnitarySystem( UnitarySysNum ).CoolCoilBranchNum, UnitarySystem( UnitarySysNum ).CoolCoilCompNum, _, _, _, _, _, errFlag );
 				if ( errFlag ) {
 					ShowFatalError( "InitUnitarySystem: Program terminated for previous conditions." );
 				}
@@ -930,13 +930,13 @@ namespace HVACUnitarySystem {
 
 			if ( Node( ControlNode ).TempSetPoint == SensedNodeFlagValue && UnitarySystem( UnitarySysNum ).ControlType == SetPointBased ) {
 				if ( ! AnyEnergyManagementSystemInModel ) {
-					ShowSevereError( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + ": Missing temperature setpoint for unitary system = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowSevereError( UnitarySystem( UnitarySysNum ).UnitarySystemType + ": Missing temperature setpoint for unitary system = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the coil control node." );
 					SetPointErrorFlag = true;
 				} else {
 					CheckIfNodeSetPointManagedByEMS( ControlNode, iTemperatureSetPoint, SetPointErrorFlag );
 					if ( SetPointErrorFlag ) {
-						ShowSevereError( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + ": Missing temperature setpoint for unitary system = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowSevereError( UnitarySystem( UnitarySysNum ).UnitarySystemType + ": Missing temperature setpoint for unitary system = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the coil control node." );
 						ShowContinueError( "  or use an EMS actuator to establish a temperature setpoint at the coil control node." );
 					}
@@ -944,13 +944,13 @@ namespace HVACUnitarySystem {
 			}
 			if ( ( UnitarySystem( UnitarySysNum ).DehumidControlType_Num != DehumidControl_None ) && ( Node( ControlNode ).HumRatMax == SensedNodeFlagValue ) && UnitarySystem( UnitarySysNum ).ControlType == SetPointBased && CoilType == CoolingCoil ) {
 				if ( ! AnyEnergyManagementSystemInModel ) {
-					ShowSevereError( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + ": Missing humidity ratio setpoint (HUMRATMAX) for unitary system = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowSevereError( UnitarySystem( UnitarySysNum ).UnitarySystemType + ": Missing humidity ratio setpoint (HUMRATMAX) for unitary system = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the coil control node." );
 					SetPointErrorFlag = true;
 				} else {
 					CheckIfNodeSetPointManagedByEMS( ControlNode, iHumidityRatioMaxSetPoint, SetPointErrorFlag );
 					if ( SetPointErrorFlag ) {
-						ShowSevereError( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + ": Missing maximum humidity ratio setpoint (HUMRATMAX) for unitary system = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowSevereError( UnitarySystem( UnitarySysNum ).UnitarySystemType + ": Missing maximum humidity ratio setpoint (HUMRATMAX) for unitary system = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the coil control node." );
 						ShowContinueError( "  or use an EMS actuator to establish a maximum humidity ratio setpoint." );
 					}
@@ -1020,7 +1020,7 @@ namespace HVACUnitarySystem {
 		{ auto const SELECT_CASE_var( ControlType );
 		if ( SELECT_CASE_var == LoadBased ) {
 			if ( AirLoopNum == -1 ) { // This IF-THEN routine is just for ZoneHVAC:OutdoorAirUnit
-				ShowWarningError( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " \"" + trim( UnitarySystem( UnitarySysNum ).Name ) + "\"" );
+				ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\"" );
 				ShowFatalError( "...Load based control is not allowed when used with ZoneHVAC:OutdoorAirUnit" );
 			}
 
@@ -1195,8 +1195,8 @@ namespace HVACUnitarySystem {
 		static bool MyOneTimeFlag( true ); // one time allocation flag
 		static bool MyAirLoopPass( true ); // one time allocation flag
 		static int AirLoopPass( 0 ); // Number of air loop pass
-		Fstring FanType( MaxNameLength ); // used in warning messages
-		Fstring FanName( MaxNameLength ); // used in warning messages
+		std::string FanType; // used in warning messages
+		std::string FanName; // used in warning messages
 		bool errFlag; // error flag for mining functions
 		bool ErrorsFound; // error flag for mining functions
 		int ZoneInNode; // Zone inlet node number in the controlled zone
@@ -1312,15 +1312,15 @@ namespace HVACUnitarySystem {
 					if ( UnitarySystem( UnitarySysNum ).FanExists ) {
 						if ( GetFanSpeedRatioCurveIndex( FanType, FanName, UnitarySystem( UnitarySysNum ).FanIndex ) > 0 ) {
 							if ( UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate == UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow && UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate == UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow && UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate == UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow ) {
-								ShowWarningError( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " \"" + trim( UnitarySystem( UnitarySysNum ).Name ) + "\"" );
-								ShowContinueError( "...For fan type and name = " + trim( FanType ) + " \"" + trim( FanName ) + "\"" );
+								ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\"" );
+								ShowContinueError( "...For fan type and name = " + FanType + " \"" + FanName + "\"" );
 								ShowContinueError( "...Fan power ratio function of speed ratio curve has no impact IF fan volumetric " "flow rate is the same as the unitary system volumetric flow rate." );
-								ShowContinueError( "...Fan volumetric flow rate            = " + trim( RoundSigDigits( UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate, 5 ) ) + " m3/s." );
-								ShowContinueError( "...Unitary system volumetric flow rate = " + trim( RoundSigDigits( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow, 5 ) ) + " m3/s." );
+								ShowContinueError( "...Fan volumetric flow rate            = " + RoundSigDigits( UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate, 5 ) + " m3/s." );
+								ShowContinueError( "...Unitary system volumetric flow rate = " + RoundSigDigits( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow, 5 ) + " m3/s." );
 							}
 						}
 					} else {
-						CheckSystemBranchFlow( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ), UnitarySystem( UnitarySysNum ).Name, UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate, 0.0, errFlag );
+						CheckSystemBranchFlow( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate, 0.0, errFlag );
 					}
 				}
 				MyFanFlag( UnitarySysNum ) = false;
@@ -1328,7 +1328,7 @@ namespace HVACUnitarySystem {
 				if ( UnitarySystem( UnitarySysNum ).FanExists ) {
 					UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate = GetFanDesignVolumeFlowRate( Blank, Blank, errFlag, UnitarySystem( UnitarySysNum ).FanIndex );
 				} else {
-					CheckSystemBranchFlow( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ), UnitarySystem( UnitarySysNum ).Name, UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate, 0.0, errFlag );
+					CheckSystemBranchFlow( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate, 0.0, errFlag );
 				}
 			}
 		}
@@ -1366,8 +1366,8 @@ namespace HVACUnitarySystem {
 			}
 			MyCheckFlag( UnitarySysNum ) = false;
 			if ( UnitarySystem( UnitarySysNum ).ZoneInletNode == 0 ) {
-				ShowSevereError( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " \"" + trim( UnitarySystem( UnitarySysNum ).Name ) + "\": The zone inlet node in the controlled zone (" + trim( Zone( UnitarySystem( UnitarySysNum ).ControlZoneNum ).Name ) + ") is not found." );
-				ShowFatalError( "Subroutine InitLoadBasedControl: " "Errors found in getting " + trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " input.  " "Preceding condition(s) causes termination." );
+				ShowSevereError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\": The zone inlet node in the controlled zone (" + Zone( UnitarySystem( UnitarySysNum ).ControlZoneNum ).Name + ") is not found." );
+				ShowFatalError( "Subroutine InitLoadBasedControl: " "Errors found in getting " + UnitarySystem( UnitarySysNum ).UnitarySystemType + " input.  " "Preceding condition(s) causes termination." );
 			}
 		}
 
@@ -1409,7 +1409,7 @@ namespace HVACUnitarySystem {
 						if ( CntrlZoneTerminalUnitMassFlowRateMax >= SmallAirVolFlow ) {
 							UnitarySystem( UnitarySysNum ).ControlZoneMassFlowFrac = CntrlZoneTerminalUnitMassFlowRateMax / SumOfMassFlowRateMax;
 						} else {
-							ShowSevereError( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowSevereError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ShowContinueError( " The Fraction of Supply Air Flow That Goes Through the Controlling Zone is set to 1." );
 						}
 						ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Fraction of Supply Air Flow That Goes Through the Controlling Zone", UnitarySystem( UnitarySysNum ).ControlZoneMassFlowFrac );
@@ -1609,7 +1609,7 @@ namespace HVACUnitarySystem {
 			} else {
 				if ( MyStagedFlag( UnitarySysNum ) ) {
 					ShowWarningError( "ZoneControl:Thermostat:StagedDualSetpoint is found, but is not applied to " "this AirLoopHVAC:UnitarySystem object with UnitarySystemPerformance:HeatPump:Multispeed type = " );
-					ShowContinueError( trim( UnitarySystem( UnitarySysNum ).Name ) + ". Please make correction. Simulation continues..." );
+					ShowContinueError( UnitarySystem( UnitarySysNum ).Name + ". Please make correction. Simulation continues..." );
 					MyStagedFlag( UnitarySysNum ) = false;
 				}
 			}
@@ -1734,7 +1734,7 @@ namespace HVACUnitarySystem {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "SizeUnitarySystem" );
+		static std::string const RoutineName( "SizeUnitarySystem" );
 		Real64 const MaxRatedVolFlowPerRatedTotCap1( 0.00006041 ); // m3/s per watt = 450 cfm/ton
 		Real64 const MinRatedVolFlowPerRatedTotCap1( 0.00004027 ); // m3/s per watt = 300 cfm/ton
 
@@ -1754,14 +1754,14 @@ namespace HVACUnitarySystem {
 		Real64 BranchFlow; // branch flow rate [m3/s]
 		Real64 BranchFanFlow; // branch fan flow rate [m3/s]
 		bool ErrFound; // logical error flag
-		Fstring FanType( MaxNameLength ); // fan type
-		Fstring FanName( MaxNameLength ); // fan name
+		std::string FanType; // fan type
+		std::string FanName; // fan name
 		int DXHeatCoilBranch; // branch where DX heating coil is located
 		int DXHeatCoilCompNum; // comp number of DX heating coil on branch
 		int CoolUnitarySystemNum; // index to unitary system with DX cooling coil
 		int CoolCoilIndex; // index to DX cooling coil
 		int CoolCoilType; // type of DX cooling coil
-		Fstring CoolCoilName( MaxNameLength ); // name of DX cooling coil
+		std::string CoolCoilName; // name of DX cooling coil
 		Real64 rhoair; // air density [kg/m3]
 		Real64 CpAirStd; // air specific heat [J/kg-k]
 		Real64 MixTemp; // mixed air temp used for sizing [C]
@@ -1780,7 +1780,7 @@ namespace HVACUnitarySystem {
 		int DDNum; // design day index at peak
 		Real64 TotCapTempModFac; // capacity modifier used for sizing
 		Real64 RatedVolFlowPerRatedTotCap; // Rated Air Volume Flow Rate divided by Rated Total Capacity[m3/s-W)
-		Fstring SystemType( MaxNameLength ); // type of air loop equipment
+		std::string SystemType; // type of air loop equipment
 		Real64 OnOffAirFlowRatio; // used to pass to cooling coil for sizing
 		Real64 PartLoadRatio; // used to pass to cooling coil for sizing
 		int CapFTCurve; // index to DX coil Capacity as a function of Temperature curve
@@ -1788,7 +1788,7 @@ namespace HVACUnitarySystem {
 		bool TempHeatingLoad; // save actual load
 		Real64 SysCoolingFlow; // individually sized cooling flow rate [m3/s]
 		Real64 SysHeatingFlow; // individually sized heating flow rate [m3/s]
-		Fstring HXCoilName( MaxNameLength ); // cooling coil name in HXAssisted parent
+		std::string HXCoilName; // cooling coil name in HXAssisted parent
 		int ActualCoolCoilType; // cooling coil type in HXAssisted parent
 
 		ManageEMS( emsCallFromUnitarySystemSizing ); // calling point
@@ -3036,8 +3036,8 @@ namespace HVACUnitarySystem {
 		if ( UnitarySystem( UnitarySysNum ).CoolCoilExists && UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow < 0.0 ) {
 			if ( ! SysSizingRunDone ) {
 				BranchNum = GetAirBranchIndex( "AirloopHVAC:UnitarySystem", UnitarySystem( UnitarySysNum ).Name );
-				FanType = " ";
-				FanName = " ";
+				FanType = "";
+				FanName = "";
 				BranchFanFlow = 0.0;
 				if ( BranchNum > 0.0 ) GetBranchFanTypeName( BranchNum, FanType, FanName, ErrFound );
 				if ( ! ErrFound && BranchNum > 0 ) BranchFanFlow = GetFanDesignVolumeFlowRate( FanType, FanName, ErrFound );
@@ -3133,7 +3133,7 @@ namespace HVACUnitarySystem {
 							} else if ( SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "CoilSystem:Cooling:DX" ) ) {
 								CoolCoilType = 0;
 								CoolCoilIndex = 0;
-								CoolCoilName = " ";
+								CoolCoilName = "";
 								GetCoolingCoilTypeNameAndIndex( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).Name, CoolCoilType, CoolCoilIndex, CoolCoilName, ErrFound );
 								{ auto const SELECT_CASE_var( CoolCoilType );
 								if ( ( SELECT_CASE_var == CoilDX_CoolingSingleSpeed ) || ( SELECT_CASE_var == CoilDX_CoolingTwoSpeed ) || ( SELECT_CASE_var == CoilDX_CoolingTwoStageWHumControl ) ) {
@@ -3482,8 +3482,8 @@ namespace HVACUnitarySystem {
 			SystemType = cFurnaceTypes( UnitarySystem( UnitarySysNum ).UnitarySystemType_Num );
 			ErrFound = false;
 			// check branch flow rate vs system flow rate. Branch must match system of OA system is present
-			CheckSystemBranchFlow( trim( SystemType ), UnitarySystem( UnitarySysNum ).Name, BranchFlow, UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate, ErrFound );
-			if ( ErrFound ) ShowContinueError( "...occurs in " + trim( SystemType ) + " \"" + trim( UnitarySystem( UnitarySysNum ).Name ) );
+			CheckSystemBranchFlow( SystemType, UnitarySystem( UnitarySysNum ).Name, BranchFlow, UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate, ErrFound );
+			if ( ErrFound ) ShowContinueError( "...occurs in " + SystemType + " \"" + UnitarySystem( UnitarySysNum ).Name );
 			if ( UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate <= 0.0 ) {
 				if ( BranchFlow != AutoSize ) {
 					UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = BranchFlow;
@@ -3615,7 +3615,7 @@ namespace HVACUnitarySystem {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetUnitarySystemInput: " ); // include trailing blank space
+		static std::string const RoutineName( "GetUnitarySystemInput: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3624,19 +3624,19 @@ namespace HVACUnitarySystem {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_Fstring Alphas( sFstring( MaxNameLength ) ); // Alpha input items for object
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) ); // Numeric field names
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in getting objects
-		Fstring CoolingCoilType( MaxNameLength ); // Used in mining function calls
-		Fstring CoolingCoilName( MaxNameLength ); // Used in mining function calls
-		Fstring HeatingCoilType( MaxNameLength ); // Used in mining function calls
-		Fstring HeatingCoilName( MaxNameLength ); // Used in mining function calls
+		FArray1D_string Alphas; // Alpha input items for object
+		FArray1D_string cAlphaFields; // Alpha field names
+		FArray1D_string cNumericFields; // Numeric field names
+		std::string CurrentModuleObject; // for ease in getting objects
+		std::string CoolingCoilType; // Used in mining function calls
+		std::string CoolingCoilName; // Used in mining function calls
+		std::string HeatingCoilType; // Used in mining function calls
+		std::string HeatingCoilName; // Used in mining function calls
 		Real64 HeatingSizingRatio; // Used to size DX heating coil wrt DX cooling coil
-		Fstring SuppHeatCoilType( MaxNameLength ); // Used in mining function calls
-		Fstring SuppHeatCoilName( MaxNameLength ); // Used in mining function calls
-		Fstring FanType( MaxNameLength ); // Used in mining function calls
-		Fstring FanName( MaxNameLength ); // Used in mining function calls
+		std::string SuppHeatCoilType; // Used in mining function calls
+		std::string SuppHeatCoilName; // Used in mining function calls
+		std::string FanType; // Used in mining function calls
+		std::string FanName; // Used in mining function calls
 		int FanIndex; // Used in mining function calls
 		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
@@ -3693,7 +3693,7 @@ namespace HVACUnitarySystem {
 		int MaxSpeedNum; // maximum number of numeric inputs in design specification object
 		int OASysNum; // loop counter index to outside air system
 		int AirLoopNum; // loop counter index to primary air system
-		Fstring HXCoilName( MaxNameLength ); // Cooling coil name within HX assembly
+		std::string HXCoilName; // Cooling coil name within HX assembly
 
 		// local integer representation of input field numbers (i.e., alpha=A1 or numeric=N1)
 		int iNameAlphaNum; // get input index to unitary system name
@@ -3751,7 +3751,7 @@ namespace HVACUnitarySystem {
 		int iHRWaterOutletNodeAlphaNum; // get input index to unitary system HR water outlet node
 
 		CurrentModuleObject = "AirloopHVAC:UnitarySystem";
-		NumUnitarySystem = GetNumObjectsFound( trim( CurrentModuleObject ) );
+		NumUnitarySystem = GetNumObjectsFound( CurrentModuleObject );
 
 		UnitarySystem.allocate( NumUnitarySystem );
 		CheckEquipName.allocate( NumUnitarySystem );
@@ -3761,23 +3761,23 @@ namespace HVACUnitarySystem {
 		MultiOrVarSpeedHeatCoil = false;
 		MultiOrVarSpeedCoolCoil = false;
 
-		GetObjectDefMaxArgs( trim( CurrentModuleObject ), TotalArgs, NumAlphas, NumNumbers );
+		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 		TempAlphas = NumAlphas;
 		TempNumbers = NumNumbers;
 
 		CurrentModuleObject = "UnitarySystemPerformance:HeatPump:Multispeed";
-		NumDesignSpecMultiSpeedHP = GetNumObjectsFound( trim( CurrentModuleObject ) );
-		GetObjectDefMaxArgs( trim( CurrentModuleObject ), TotalArgs, NumAlphas, NumNumbers );
+		NumDesignSpecMultiSpeedHP = GetNumObjectsFound( CurrentModuleObject );
+		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		NumAlphas = max( TempAlphas, NumAlphas );
 		NumNumbers = max( TempNumbers, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
-		Alphas = " ";
+		Alphas = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = " ";
+		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = " ";
+		cNumericFields = "";
 		Numbers.allocate( NumNumbers );
 		Numbers = 0.0;
 		lAlphaBlanks.allocate( NumAlphas );
@@ -3791,11 +3791,11 @@ namespace HVACUnitarySystem {
 
 		for ( DesignSpecNum = 1; DesignSpecNum <= NumDesignSpecMultiSpeedHP; ++DesignSpecNum ) {
 
-			GetObjectItem( trim( CurrentModuleObject ), DesignSpecNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			GetObjectItem( CurrentModuleObject, DesignSpecNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DesignSpecMSHP.Name(), DesignSpecNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), DesignSpecMSHP.Name(), DesignSpecNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -3814,20 +3814,20 @@ namespace HVACUnitarySystem {
 
 			if ( mod( double( NumNumbers - 2 ), 2.0 ) > 0.0 ) {
 				// check that the number of numeric speed input fields match the number of speeds
-				ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( DesignSpecMSHP( DesignSpecNum ).Name ) );
+				ShowSevereError( CurrentModuleObject + " = " + DesignSpecMSHP( DesignSpecNum ).Name );
 				ShowContinueError( "Illegal number of entries in Supply Air Flow Rate fields." );
-				ShowContinueError( "..number of required Supply Air Flow Rate fields = " + trim( TrimSigDigits( 2 * max( NumOfSpeedCooling, NumOfSpeedHeating ) ) ) );
-				ShowContinueError( "..number of actual Supply Air Flow Rate fields   = " + trim( TrimSigDigits( NumNumbers - 2 ) ) );
+				ShowContinueError( "..number of required Supply Air Flow Rate fields = " + TrimSigDigits( 2 * max( NumOfSpeedCooling, NumOfSpeedHeating ) ) );
+				ShowContinueError( "..number of actual Supply Air Flow Rate fields   = " + TrimSigDigits( NumNumbers - 2 ) );
 				ErrorsFound = true;
 			} else {
 				MaxSpeedNum = ( NumNumbers - 2 ) / 2; // Extensible fields included (>4) for cooling and heating
 			}
 
 			if ( MaxSpeedNum < max( NumOfSpeedHeating, NumOfSpeedCooling ) ) {
-				ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( DesignSpecMSHP( DesignSpecNum ).Name ) );
+				ShowSevereError( CurrentModuleObject + " = " + DesignSpecMSHP( DesignSpecNum ).Name );
 				ShowContinueError( "Illegal number of entries in Supply Air Flow Rate fields." );
-				ShowContinueError( "..number of required Supply Air Flow Rate fields = " + trim( TrimSigDigits( 2 * max( NumOfSpeedCooling, NumOfSpeedHeating ) ) ) );
-				ShowContinueError( "..number of actual Supply Air Flow Rate fields   = " + trim( TrimSigDigits( NumNumbers - 2 ) ) );
+				ShowContinueError( "..number of required Supply Air Flow Rate fields = " + TrimSigDigits( 2 * max( NumOfSpeedCooling, NumOfSpeedHeating ) ) );
+				ShowContinueError( "..number of actual Supply Air Flow Rate fields   = " + TrimSigDigits( NumNumbers - 2 ) );
 				ErrorsFound = true;
 			}
 
@@ -3923,11 +3923,11 @@ namespace HVACUnitarySystem {
 			UnitarySystem( UnitarySysNum ).UnitarySystemType = CurrentModuleObject;
 			UnitarySystem( UnitarySysNum ).UnitarySystemType_Num = UnitarySystem_AnyCoilType;
 
-			GetObjectItem( trim( CurrentModuleObject ), UnitarySysNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			GetObjectItem( CurrentModuleObject, UnitarySysNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( iNameAlphaNum ), UnitarySystem.Name(), UnitarySysNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( iNameAlphaNum ), UnitarySystem.Name(), UnitarySysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( iNameAlphaNum ) = "xxxxx";
@@ -3940,8 +3940,8 @@ namespace HVACUnitarySystem {
 			} else if ( SameString( Alphas( iControlTypeAlphaNum ), "SetPoint" ) ) {
 				UnitarySystem( UnitarySysNum ).ControlType = SetPointBased;
 			} else {
-				ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-				ShowContinueError( "Illegal " + trim( cAlphaFields( iControlTypeAlphaNum ) ) + " = " + trim( Alphas( iControlTypeAlphaNum ) ) );
+				ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+				ShowContinueError( "Illegal " + cAlphaFields( iControlTypeAlphaNum ) + " = " + Alphas( iControlTypeAlphaNum ) );
 				ErrorsFound = true;
 			}
 
@@ -3971,15 +3971,15 @@ namespace HVACUnitarySystem {
 							AirNodeFound = true;
 						}
 						if ( ! AirNodeFound ) {
-							ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ShowContinueError( "Did not find Air Node (Zone with Humidistat)." );
-							ShowContinueError( "specified " + trim( cAlphaFields( iControlZoneAlphaNum ) ) + " = " + trim( Alphas( iControlZoneAlphaNum ) ) );
+							ShowContinueError( "specified " + cAlphaFields( iControlZoneAlphaNum ) + " = " + Alphas( iControlZoneAlphaNum ) );
 							ErrorsFound = true;
 						}
 					}
 				} else { // invalid input
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "Illegal " + trim( cAlphaFields( iDehumidControlAlphaNum ) ) + " = " + trim( Alphas( iDehumidControlAlphaNum ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "Illegal " + cAlphaFields( iDehumidControlAlphaNum ) + " = " + Alphas( iDehumidControlAlphaNum ) );
 					UnitarySystem( UnitarySysNum ).Humidistat = false;
 					ErrorsFound = true;
 				}
@@ -3990,8 +3990,8 @@ namespace HVACUnitarySystem {
 			} else {
 				UnitarySystem( UnitarySysNum ).SysAvailSchedPtr = GetScheduleIndex( Alphas( iSysAvailSchedAlphaNum ) );
 				if ( UnitarySystem( UnitarySysNum ).SysAvailSchedPtr == 0 ) {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "Illegal " + trim( cAlphaFields( iSysAvailSchedAlphaNum ) ) + " = " + trim( Alphas( iSysAvailSchedAlphaNum ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "Illegal " + cAlphaFields( iSysAvailSchedAlphaNum ) + " = " + Alphas( iSysAvailSchedAlphaNum ) );
 					ErrorsFound = true;
 				}
 			}
@@ -4014,9 +4014,9 @@ namespace HVACUnitarySystem {
 
 			if ( UnitarySystem( UnitarySysNum ).FanType_Num == FanType_SimpleOnOff || UnitarySystem( UnitarySysNum ).FanType_Num == FanType_SimpleConstVolume || UnitarySystem( UnitarySysNum ).FanType_Num == FanType_SimpleVAV ) {
 				IsNotOK = false;
-				ValidateComponent( FanType, FanName, IsNotOK, trim( CurrentModuleObject ) );
+				ValidateComponent( FanType, FanName, IsNotOK, CurrentModuleObject );
 				if ( IsNotOK ) {
-					ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 					ErrorsFound = true;
 
 				} else { // mine data from fan object
@@ -4025,7 +4025,7 @@ namespace HVACUnitarySystem {
 					errFlag = false;
 					GetFanIndex( FanName, UnitarySystem( UnitarySysNum ).FanIndex, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 					}
 
@@ -4036,7 +4036,7 @@ namespace HVACUnitarySystem {
 					UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate = FanVolFlowRate;
 					UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = FanVolFlowRate;
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 					}
 
@@ -4044,7 +4044,7 @@ namespace HVACUnitarySystem {
 					errFlag = false;
 					FanInletNode = GetFanInletNode( FanType, FanName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 					}
 
@@ -4052,7 +4052,7 @@ namespace HVACUnitarySystem {
 					errFlag = false;
 					FanOutletNode = GetFanOutletNode( FanType, FanName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 					}
 
@@ -4060,15 +4060,15 @@ namespace HVACUnitarySystem {
 					errFlag = false;
 					UnitarySystem( UnitarySysNum ).FanAvailSchedPtr = GetFanAvailSchPtr( FanType, FanName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 					}
 
 				} // IF (IsNotOK) THEN
 
 			} else if ( UnitarySystem( UnitarySysNum ).FanExists ) {
-				ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-				ShowContinueError( "Illegal " + trim( cAlphaFields( iFanTypeAlphaNum ) ) + " = " + trim( Alphas( iFanTypeAlphaNum ) ) );
+				ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+				ShowContinueError( "Illegal " + cAlphaFields( iFanTypeAlphaNum ) + " = " + Alphas( iFanTypeAlphaNum ) );
 				ErrorsFound = true;
 			} // IF (UnitarySystem(UnitarySysNum)%FanType_Num...
 
@@ -4078,15 +4078,15 @@ namespace HVACUnitarySystem {
 			if ( SameString( Alphas( iFanPlaceAlphaNum ), "BlowThrough" ) ) UnitarySystem( UnitarySysNum ).FanPlace = BlowThru;
 			if ( SameString( Alphas( iFanPlaceAlphaNum ), "DrawThrough" ) ) UnitarySystem( UnitarySysNum ).FanPlace = DrawThru;
 			if ( UnitarySystem( UnitarySysNum ).FanPlace == 0 && UnitarySystem( UnitarySysNum ).FanExists ) {
-				ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-				ShowContinueError( "Illegal " + trim( cAlphaFields( iFanPlaceAlphaNum ) ) + " = " + trim( Alphas( iFanPlaceAlphaNum ) ) );
+				ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+				ShowContinueError( "Illegal " + cAlphaFields( iFanPlaceAlphaNum ) + " = " + Alphas( iFanPlaceAlphaNum ) );
 				ErrorsFound = true;
 			}
 
 			UnitarySystem( UnitarySysNum ).FanOpModeSchedPtr = GetScheduleIndex( Alphas( iFanSchedAlphaNum ) );
 			if ( ! lAlphaBlanks( iFanSchedAlphaNum ) && UnitarySystem( UnitarySysNum ).FanOpModeSchedPtr == 0 ) {
-				ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-				ShowContinueError( "Illegal " + trim( cAlphaFields( iFanSchedAlphaNum ) ) + " = " + trim( Alphas( iFanSchedAlphaNum ) ) );
+				ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+				ShowContinueError( "Illegal " + cAlphaFields( iFanSchedAlphaNum ) + " = " + Alphas( iFanSchedAlphaNum ) );
 				ErrorsFound = true;
 			} else if ( lAlphaBlanks( iFanSchedAlphaNum ) ) {
 				if ( UnitarySystem( UnitarySysNum ).ControlType == SetPointBased ) {
@@ -4096,18 +4096,18 @@ namespace HVACUnitarySystem {
 				} else {
 					UnitarySystem( UnitarySysNum ).FanOpMode = CycFanCycCoil;
 					if ( UnitarySystem( UnitarySysNum ).FanType_Num != FanType_SimpleOnOff ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( trim( cAlphaFields( iFanTypeAlphaNum ) ) + " = " + trim( Alphas( iFanTypeAlphaNum ) ) );
-						ShowContinueError( "Fan type must be Fan:OnOff when " + trim( cAlphaFields( iFanSchedAlphaNum ) ) + " = Blank." );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( cAlphaFields( iFanTypeAlphaNum ) + " = " + Alphas( iFanTypeAlphaNum ) );
+						ShowContinueError( "Fan type must be Fan:OnOff when " + cAlphaFields( iFanSchedAlphaNum ) + " = Blank." );
 						ErrorsFound = true;
 					}
 				}
 			} else if ( ! lAlphaBlanks( iFanSchedAlphaNum ) && UnitarySystem( UnitarySysNum ).FanOpModeSchedPtr > 0 && UnitarySystem( UnitarySysNum ).ControlType == SetPointBased ) {
 				if ( ! CheckScheduleValueMinMax( UnitarySystem( UnitarySysNum ).FanOpModeSchedPtr, ">", 0.0, "<=", 1.0 ) ) {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "For " + trim( cAlphaFields( iFanTypeAlphaNum ) ) + " = " + trim( Alphas( iFanTypeAlphaNum ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "For " + cAlphaFields( iFanTypeAlphaNum ) + " = " + Alphas( iFanTypeAlphaNum ) );
 					ShowContinueError( "Fan operating mode must be continuous (fan operating mode schedule values > 0)." );
-					ShowContinueError( "Error found in " + trim( cAlphaFields( iFanSchedAlphaNum ) ) + " = " + trim( Alphas( iFanSchedAlphaNum ) ) );
+					ShowContinueError( "Error found in " + cAlphaFields( iFanSchedAlphaNum ) + " = " + Alphas( iFanSchedAlphaNum ) );
 					ShowContinueError( "...schedule values must be (>0., <=1.)" );
 					ErrorsFound = true;
 				}
@@ -4116,10 +4116,10 @@ namespace HVACUnitarySystem {
 			// Check fan's schedule for cycling fan operation IF constant volume fan is used
 			if ( UnitarySystem( UnitarySysNum ).FanOpModeSchedPtr > 0 && UnitarySystem( UnitarySysNum ).FanType_Num == FanType_SimpleConstVolume ) {
 				if ( ! CheckScheduleValueMinMax( UnitarySystem( UnitarySysNum ).FanOpModeSchedPtr, ">", 0.0, "<=", 1.0 ) ) {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "For " + trim( cAlphaFields( iFanTypeAlphaNum ) ) + " = " + trim( Alphas( iFanTypeAlphaNum ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "For " + cAlphaFields( iFanTypeAlphaNum ) + " = " + Alphas( iFanTypeAlphaNum ) );
 					ShowContinueError( "Fan operating mode must be continuous (fan operating mode schedule values > 0)." );
-					ShowContinueError( "Error found in " + trim( cAlphaFields( iFanSchedAlphaNum ) ) + " = " + trim( Alphas( iFanSchedAlphaNum ) ) );
+					ShowContinueError( "Error found in " + cAlphaFields( iFanSchedAlphaNum ) + " = " + Alphas( iFanSchedAlphaNum ) );
 					ShowContinueError( "...schedule values must be (>0., <=1.)" );
 					ErrorsFound = true;
 				}
@@ -4170,9 +4170,9 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).DXHeatingCoil = true;
 				errFlag = false;
 
-				ValidateComponent( HeatingCoilType, HeatingCoilName, IsNotOK, trim( CurrentModuleObject ) );
+				ValidateComponent( HeatingCoilType, HeatingCoilName, IsNotOK, CurrentModuleObject );
 				if ( IsNotOK ) {
-					ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 					ErrorsFound = true;
 
 				} else { // mine data from DX heating coil
@@ -4180,14 +4180,14 @@ namespace HVACUnitarySystem {
 					// Get DX heating coil index
 					GetDXCoilIndex( HeatingCoilName, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 						errFlag = false;
 					}
 
 					UnitarySystem( UnitarySysNum ).HeatingCoilAvailSchPtr = GetDXCoilAvailSchPtr( HeatingCoilType, HeatingCoilName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 						errFlag = false;
 					}
@@ -4196,7 +4196,7 @@ namespace HVACUnitarySystem {
 					UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = GetDXCoilCapacity( HeatingCoilType, HeatingCoilName, errFlag );
 					if ( UnitarySystem( UnitarySysNum ).DesignHeatingCapacity == AutoSize ) UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 						errFlag = false;
 					}
@@ -4208,7 +4208,7 @@ namespace HVACUnitarySystem {
 					HeatingCoilInletNode = GetDXCoilInletNode( HeatingCoilType, HeatingCoilName, errFlag );
 					HeatingCoilOutletNode = GetDXCoilOutletNode( HeatingCoilType, HeatingCoilName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 						errFlag = false;
 					}
@@ -4220,15 +4220,15 @@ namespace HVACUnitarySystem {
 
 				UnitarySystem( UnitarySysNum ).DXHeatingCoil = true;
 
-				ValidateComponent( HeatingCoilType, HeatingCoilName, IsNotOK, trim( CurrentModuleObject ) );
+				ValidateComponent( HeatingCoilType, HeatingCoilName, IsNotOK, CurrentModuleObject );
 				if ( IsNotOK ) {
-					ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 					ErrorsFound = true;
 				} else {
 
 					UnitarySystem( UnitarySysNum ).HeatingCoilIndex = GetCoilIndexVariableSpeed( HeatingCoilType, HeatingCoilName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 						errFlag = false;
 					}
@@ -4239,14 +4239,14 @@ namespace HVACUnitarySystem {
 
 					HeatingCoilInletNode = GetCoilInletNodeVariableSpeed( HeatingCoilType, HeatingCoilName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 						errFlag = false;
 					}
 
 					HeatingCoilOutletNode = GetCoilOutletNodeVariableSpeed( HeatingCoilType, HeatingCoilName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 						errFlag = false;
 					}
@@ -4255,9 +4255,9 @@ namespace HVACUnitarySystem {
 			} else if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating ) {
 				UnitarySystem( UnitarySysNum ).DXHeatingCoil = true;
 				errFlag = false;
-				GetDXCoilIndex( HeatingCoilName, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, errFlag, trim( HeatingCoilType ) );
+				GetDXCoilIndex( HeatingCoilName, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, errFlag, HeatingCoilType );
 				if ( errFlag ) {
-					ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 					ErrorsFound = true;
 					errFlag = false;
 				}
@@ -4266,13 +4266,13 @@ namespace HVACUnitarySystem {
 
 				HeatingCoilInletNode = GetDXCoilInletNode( HeatingCoilType, HeatingCoilName, errFlag );
 				if ( errFlag ) {
-					ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 					ErrorsFound = true;
 					errFlag = false;
 				}
 				HeatingCoilOutletNode = GetDXCoilOutletNode( HeatingCoilType, HeatingCoilName, errFlag );
 				if ( errFlag ) {
-					ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 					ErrorsFound = true;
 					errFlag = false;
 				}
@@ -4287,19 +4287,19 @@ namespace HVACUnitarySystem {
 				errFlag = false;
 				GetHeatingCoilIndex( HeatingCoilName, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, errFlag );
 				if ( errFlag ) {
-					ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 					ErrorsFound = true;
 					errFlag = false;
 				}
 				HeatingCoilInletNode = GetHeatingCoilInletNode( HeatingCoilType, HeatingCoilName, errFlag );
 				if ( errFlag ) {
-					ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 					ErrorsFound = true;
 					errFlag = false;
 				}
 				HeatingCoilOutletNode = GetHeatingCoilOutletNode( HeatingCoilType, HeatingCoilName, errFlag );
 				if ( errFlag ) {
-					ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 					ErrorsFound = true;
 					errFlag = false;
 				}
@@ -4313,14 +4313,14 @@ namespace HVACUnitarySystem {
 			} else if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingGas || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingElectric || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingDesuperheater ) {
 				errFlag = false;
 				if ( errFlag ) {
-					ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 					ErrorsFound = true;
 					errFlag = false;
 				} else {
 
-					ValidateComponent( HeatingCoilType, HeatingCoilName, IsNotOK, trim( CurrentModuleObject ) );
+					ValidateComponent( HeatingCoilType, HeatingCoilName, IsNotOK, CurrentModuleObject );
 					if ( IsNotOK ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 
 					} else { // mine data from heating coil
@@ -4329,7 +4329,7 @@ namespace HVACUnitarySystem {
 						errFlag = false;
 						GetHeatingCoilIndex( HeatingCoilName, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 							errFlag = false;
 						}
@@ -4338,7 +4338,7 @@ namespace HVACUnitarySystem {
 						UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = GetHeatingCoilCapacity( HeatingCoilType, HeatingCoilName, errFlag );
 						if ( UnitarySystem( UnitarySysNum ).DesignHeatingCapacity == AutoSize ) UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 							errFlag = false;
 						}
@@ -4348,7 +4348,7 @@ namespace HVACUnitarySystem {
 						// Get the Heating Coil Inlet Node
 						HeatingCoilInletNode = GetHeatingCoilInletNode( HeatingCoilType, HeatingCoilName, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 							errFlag = false;
 						}
@@ -4356,7 +4356,7 @@ namespace HVACUnitarySystem {
 						// Get the Heating Coil Outlet Node
 						HeatingCoilOutletNode = GetHeatingCoilOutletNode( HeatingCoilType, HeatingCoilName, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 							errFlag = false;
 						}
@@ -4364,7 +4364,7 @@ namespace HVACUnitarySystem {
 						// Get the Heating Coil PLF Curve Index
 						HeatingCoilPLFCurveIndex = GetHeatingCoilPLFCurveIndex( HeatingCoilType, HeatingCoilName, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 							errFlag = false;
 						}
@@ -4378,24 +4378,24 @@ namespace HVACUnitarySystem {
 				}
 
 			} else if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWater ) {
-				ValidateComponent( HeatingCoilType, HeatingCoilName, IsNotOK, trim( CurrentModuleObject ) );
+				ValidateComponent( HeatingCoilType, HeatingCoilName, IsNotOK, CurrentModuleObject );
 				if ( IsNotOK ) {
-					ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 					ErrorsFound = true;
 				} else { // mine data from heating coil object
 
 					errFlag = false;
 					UnitarySystem( UnitarySysNum ).HeatingCoilAvailSchPtr = GetWaterCoilAvailScheduleIndex( HeatingCoilType, HeatingCoilName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 						errFlag = false;
 					}
 
 					UnitarySystem( UnitarySysNum ).HeatingCoilIndex = GetWaterCoilIndex( "COIL:HEATING:WATER", HeatingCoilName, errFlag );
 					if ( UnitarySystem( UnitarySysNum ).HeatingCoilIndex == 0 ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Illegal " + trim( cAlphaFields( iHeatingCoilNameAlphaNum ) ) + " = " + trim( HeatingCoilName ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Illegal " + cAlphaFields( iHeatingCoilNameAlphaNum ) + " = " + HeatingCoilName );
 						ErrorsFound = true;
 						errFlag = false;
 					}
@@ -4403,7 +4403,7 @@ namespace HVACUnitarySystem {
 					// Get the Heating Coil water Inlet or control Node number
 					UnitarySystem( UnitarySysNum ).HeatCoilFluidInletNode = GetCoilWaterInletNode( "Coil:Heating:Water", HeatingCoilName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 						errFlag = false;
 					}
@@ -4413,7 +4413,7 @@ namespace HVACUnitarySystem {
 					if ( UnitarySystem( UnitarySysNum ).MaxHeatCoilFluidFlow == AutoSize ) UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 						errFlag = false;
 					}
@@ -4421,7 +4421,7 @@ namespace HVACUnitarySystem {
 					// Get the Heating Coil Inlet Node
 					HeatingCoilInletNode = GetWaterCoilInletNode( "Coil:Heating:Water", HeatingCoilName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 						errFlag = false;
 					}
@@ -4429,7 +4429,7 @@ namespace HVACUnitarySystem {
 					// Get the Heating Coil Outlet Node
 					HeatingCoilOutletNode = GetWaterCoilOutletNode( "Coil:Heating:Water", HeatingCoilName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 						errFlag = false;
 					}
@@ -4437,24 +4437,24 @@ namespace HVACUnitarySystem {
 				}
 
 			} else if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingSteam ) {
-				ValidateComponent( HeatingCoilType, HeatingCoilName, IsNotOK, trim( CurrentModuleObject ) );
+				ValidateComponent( HeatingCoilType, HeatingCoilName, IsNotOK, CurrentModuleObject );
 				if ( IsNotOK ) {
-					ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 					ErrorsFound = true;
 				} else { // mine data from heating coil object
 
 					errFlag = false;
 					UnitarySystem( UnitarySysNum ).HeatingCoilAvailSchPtr = GetSteamCoilAvailScheduleIndex( HeatingCoilType, HeatingCoilName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 						errFlag = false;
 					}
 
 					UnitarySystem( UnitarySysNum ).HeatingCoilIndex = GetSteamCoilIndex( "COIL:HEATING:STEAM", HeatingCoilName, errFlag );
 					if ( UnitarySystem( UnitarySysNum ).HeatingCoilIndex == 0 ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Illegal " + trim( cAlphaFields( iHeatingCoilNameAlphaNum ) ) + " = " + trim( HeatingCoilName ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Illegal " + cAlphaFields( iHeatingCoilNameAlphaNum ) + " = " + HeatingCoilName );
 						ErrorsFound = true;
 						errFlag = false;
 					}
@@ -4463,7 +4463,7 @@ namespace HVACUnitarySystem {
 					errFlag = false;
 					UnitarySystem( UnitarySysNum ).HeatCoilFluidInletNode = GetCoilSteamInletNode( "Coil:Heating:Steam", HeatingCoilName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 						errFlag = false;
 					}
@@ -4483,7 +4483,7 @@ namespace HVACUnitarySystem {
 					errFlag = false;
 					HeatingCoilInletNode = GetSteamCoilAirInletNode( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, HeatingCoilName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 						errFlag = false;
 					}
@@ -4491,7 +4491,7 @@ namespace HVACUnitarySystem {
 					// Get the Heating Coil Outlet Node
 					HeatingCoilOutletNode = GetCoilAirOutletNode( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, HeatingCoilName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 						errFlag = false;
 					}
@@ -4505,24 +4505,24 @@ namespace HVACUnitarySystem {
 
 			} else if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHPSimple ) {
 				UnitarySystem( UnitarySysNum ).DXHeatingCoil = true;
-				ValidateComponent( HeatingCoilType, HeatingCoilName, IsNotOK, trim( CurrentModuleObject ) );
+				ValidateComponent( HeatingCoilType, HeatingCoilName, IsNotOK, CurrentModuleObject );
 				if ( IsNotOK ) {
-					ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 					ErrorsFound = true;
 				} else { // mine data from heating coil object
 
 					errFlag = false;
 					UnitarySystem( UnitarySysNum ).HeatingCoilAvailSchPtr = ScheduleAlwaysOn;
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 						errFlag = false;
 					}
 
 					UnitarySystem( UnitarySysNum ).HeatingCoilIndex = GetWtoAHPSimpleCoilIndex( HeatingCoilType, HeatingCoilName, errFlag );
 					if ( UnitarySystem( UnitarySysNum ).HeatingCoilIndex == 0 ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Illegal " + trim( cAlphaFields( iHeatingCoilNameAlphaNum ) ) + " = " + trim( HeatingCoilName ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Illegal " + cAlphaFields( iHeatingCoilNameAlphaNum ) + " = " + HeatingCoilName );
 						ErrorsFound = true;
 						errFlag = false;
 					}
@@ -4531,7 +4531,7 @@ namespace HVACUnitarySystem {
 					errFlag = false;
 					HeatingCoilInletNode = GetWtoAHPSimpleCoilInletNode( HeatingCoilType, HeatingCoilName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 						errFlag = false;
 					}
@@ -4539,7 +4539,7 @@ namespace HVACUnitarySystem {
 					// Get the Heating Coil Outlet Node
 					HeatingCoilOutletNode = GetWtoAHPSimpleCoilOutletNode( HeatingCoilType, HeatingCoilName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 						errFlag = false;
 					}
@@ -4554,24 +4554,24 @@ namespace HVACUnitarySystem {
 
 			} else if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHP ) {
 				UnitarySystem( UnitarySysNum ).DXHeatingCoil = true;
-				ValidateComponent( HeatingCoilType, HeatingCoilName, IsNotOK, trim( CurrentModuleObject ) );
+				ValidateComponent( HeatingCoilType, HeatingCoilName, IsNotOK, CurrentModuleObject );
 				if ( IsNotOK ) {
-					ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 					ErrorsFound = true;
 				} else { // mine data from heating coil object
 
 					errFlag = false;
 					UnitarySystem( UnitarySysNum ).HeatingCoilAvailSchPtr = ScheduleAlwaysOn;
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 						errFlag = false;
 					}
 
 					UnitarySystem( UnitarySysNum ).HeatingCoilIndex = GetWtoAHPCoilIndex( HeatingCoilType, HeatingCoilName, errFlag );
 					if ( UnitarySystem( UnitarySysNum ).HeatingCoilIndex == 0 ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Illegal " + trim( cAlphaFields( iHeatingCoilNameAlphaNum ) ) + " = " + trim( HeatingCoilName ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Illegal " + cAlphaFields( iHeatingCoilNameAlphaNum ) + " = " + HeatingCoilName );
 						ErrorsFound = true;
 						errFlag = false;
 					}
@@ -4580,7 +4580,7 @@ namespace HVACUnitarySystem {
 					errFlag = false;
 					HeatingCoilInletNode = GetWtoAHPCoilInletNode( HeatingCoilType, HeatingCoilName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 						errFlag = false;
 					}
@@ -4588,7 +4588,7 @@ namespace HVACUnitarySystem {
 					// Get the Heating Coil Outlet Node
 					HeatingCoilOutletNode = GetWtoAHPCoilOutletNode( HeatingCoilType, HeatingCoilName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 						errFlag = false;
 					}
@@ -4603,8 +4603,8 @@ namespace HVACUnitarySystem {
 				}
 
 			} else if ( UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
-				ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-				ShowContinueError( "Illegal " + trim( cAlphaFields( iHeatingCoilTypeAlphaNum ) ) + " = " + trim( Alphas( iHeatingCoilTypeAlphaNum ) ) );
+				ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+				ShowContinueError( "Illegal " + cAlphaFields( iHeatingCoilTypeAlphaNum ) + " = " + Alphas( iHeatingCoilTypeAlphaNum ) );
 				ErrorsFound = true;
 			} // IF (UnitarySystem(UnitarySysNum)%HeatingCoilType_Num == Coil_HeatingGas .OR. &, etc.
 
@@ -4664,14 +4664,14 @@ namespace HVACUnitarySystem {
 				} else if ( SameString( CoolingCoilType, "Coil:Cooling:DX:TwoSpeed" ) ) {
 					UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = GetDXCoilTypeNum( CoolingCoilType, CoolingCoilName, errFlag, PrintMessage );
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "Illegal " + trim( cAlphaFields( iCoolingCoilTypeAlphaNum ) ) + " = " + trim( Alphas( iCoolingCoilTypeAlphaNum ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "Illegal " + cAlphaFields( iCoolingCoilTypeAlphaNum ) + " = " + Alphas( iCoolingCoilTypeAlphaNum ) );
 				}
 
 				if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed ) {
-					ValidateComponent( CoolingCoilType, CoolingCoilName, IsNotOK, trim( CurrentModuleObject ) );
+					ValidateComponent( CoolingCoilType, CoolingCoilName, IsNotOK, CurrentModuleObject );
 					if ( IsNotOK ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 
 					} else { // mine data from DX cooling coil
@@ -4681,7 +4681,7 @@ namespace HVACUnitarySystem {
 						// Get DX cooling coil index
 						GetDXCoilIndex( CoolingCoilName, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, IsNotOK );
 						if ( IsNotOK ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 						}
 
@@ -4692,7 +4692,7 @@ namespace HVACUnitarySystem {
 						UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = GetDXCoilCapacity( CoolingCoilType, CoolingCoilName, errFlag );
 						if ( UnitarySystem( UnitarySysNum ).DesignCoolingCapacity == AutoSize ) UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 						}
 
@@ -4705,7 +4705,7 @@ namespace HVACUnitarySystem {
 						CoolingCoilInletNode = GetDXCoilInletNode( CoolingCoilType, CoolingCoilName, errFlag );
 						CoolingCoilOutletNode = GetDXCoilOutletNode( CoolingCoilType, CoolingCoilName, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 						}
 
@@ -4713,7 +4713,7 @@ namespace HVACUnitarySystem {
 						errFlag = false;
 						UnitarySystem( UnitarySysNum ).CondenserNodeNum = GetDXCoilCondenserInletNode( CoolingCoilType, CoolingCoilName, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 						}
 
@@ -4723,7 +4723,7 @@ namespace HVACUnitarySystem {
 							SetDXCoolingCoilData( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, FanName );
 							SetDXCoolingCoilData( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, FanIndex );
 							if ( errFlag ) {
-								ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+								ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 								ErrorsFound = true;
 							}
 						}
@@ -4741,9 +4741,9 @@ namespace HVACUnitarySystem {
 					}
 
 				} else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
-					ValidateComponent( CoolingCoilType, CoolingCoilName, IsNotOK, trim( CurrentModuleObject ) );
+					ValidateComponent( CoolingCoilType, CoolingCoilName, IsNotOK, CurrentModuleObject );
 					if ( IsNotOK ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 
 					} else { // mine data from DX cooling coil
@@ -4751,7 +4751,7 @@ namespace HVACUnitarySystem {
 						// Get DX cooling coil index
 						GetDXCoilIndex( CoolingCoilName, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, IsNotOK );
 						if ( IsNotOK ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 						}
 
@@ -4762,7 +4762,7 @@ namespace HVACUnitarySystem {
 						UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = GetDXCoilCapacity( CoolingCoilType, CoolingCoilName, errFlag );
 						if ( UnitarySystem( UnitarySysNum ).DesignCoolingCapacity == AutoSize ) UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 						}
 
@@ -4775,7 +4775,7 @@ namespace HVACUnitarySystem {
 						CoolingCoilInletNode = GetDXCoilInletNode( CoolingCoilType, CoolingCoilName, errFlag );
 						CoolingCoilOutletNode = GetDXCoilOutletNode( CoolingCoilType, CoolingCoilName, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 						}
 
@@ -4783,7 +4783,7 @@ namespace HVACUnitarySystem {
 						errFlag = false;
 						UnitarySystem( UnitarySysNum ).CondenserNodeNum = GetDXCoilCondenserInletNode( CoolingCoilType, CoolingCoilName, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 						}
 
@@ -4801,9 +4801,9 @@ namespace HVACUnitarySystem {
 					}
 
 				} else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingHXAssisted ) {
-					ValidateComponent( CoolingCoilType, CoolingCoilName, IsNotOK, trim( CurrentModuleObject ) );
+					ValidateComponent( CoolingCoilType, CoolingCoilName, IsNotOK, CurrentModuleObject );
 					if ( IsNotOK ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 
 					} else { // mine data from heat exchanger assisted cooling coil
@@ -4811,7 +4811,7 @@ namespace HVACUnitarySystem {
 						// Get DX heat exchanger assisted cooling coil index
 						GetHXDXCoilIndex( CoolingCoilName, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, IsNotOK );
 						if ( IsNotOK ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 						}
 
@@ -4822,7 +4822,7 @@ namespace HVACUnitarySystem {
 						UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = GetDXHXAsstdCoilCapacity( CoolingCoilType, CoolingCoilName, errFlag );
 						if ( UnitarySystem( UnitarySysNum ).DesignCoolingCapacity == AutoSize ) UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 						}
 
@@ -4831,7 +4831,7 @@ namespace HVACUnitarySystem {
 						CoolingCoilInletNode = GetDXHXAsstdCoilInletNode( CoolingCoilType, CoolingCoilName, errFlag );
 						CoolingCoilOutletNode = GetDXHXAsstdCoilOutletNode( CoolingCoilType, CoolingCoilName, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 						}
 
@@ -4840,7 +4840,7 @@ namespace HVACUnitarySystem {
 						UnitarySystem( UnitarySysNum ).CondenserNodeNum = GetDXCoilCondenserInletNode( "COIL:COOLING:DX:SINGLESPEED", GetHXDXCoilName( CoolingCoilType, CoolingCoilName, errFlag ), errFlag );
 
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 						}
 
@@ -4860,9 +4860,9 @@ namespace HVACUnitarySystem {
 
 					} // IF (IsNotOK) THEN
 				} else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilWater_CoolingHXAssisted ) {
-					ValidateComponent( CoolingCoilType, CoolingCoilName, IsNotOK, trim( CurrentModuleObject ) );
+					ValidateComponent( CoolingCoilType, CoolingCoilName, IsNotOK, CurrentModuleObject );
 					if ( IsNotOK ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 
 					} else { // mine data from heat exchanger assisted cooling coil
@@ -4872,7 +4872,7 @@ namespace HVACUnitarySystem {
 						HXCoilName = GetHXDXCoilName( CoolingCoilType, CoolingCoilName, errFlag );
 
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 						}
 
@@ -4880,7 +4880,7 @@ namespace HVACUnitarySystem {
 						errFlag = false;
 						GetHXDXCoilIndex( CoolingCoilName, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 						}
 
@@ -4892,7 +4892,7 @@ namespace HVACUnitarySystem {
 						//            UnitarySystem(UnitarySysNum)%CoolCoilFluidOutletNodeNum = &
 						//              GetCoilWaterOutletNode(cAllCoilTypes(ActualCoolCoilType),HXCoilName,ErrFlag)
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 						}
 
@@ -4907,7 +4907,7 @@ namespace HVACUnitarySystem {
 						CoolingCoilInletNode = GetDXHXAsstdCoilInletNode( CoolingCoilType, CoolingCoilName, errFlag );
 						CoolingCoilOutletNode = GetDXHXAsstdCoilOutletNode( CoolingCoilType, CoolingCoilName, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 						}
 
@@ -4916,7 +4916,7 @@ namespace HVACUnitarySystem {
 
 						UnitarySystem( UnitarySysNum ).CondenserNodeNum = 0;
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 						}
 
@@ -4936,36 +4936,36 @@ namespace HVACUnitarySystem {
 
 					} // IF (IsNotOK) THEN
 				} else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWaterToAirHPVSEquationFit ) {
-					ValidateComponent( CoolingCoilType, CoolingCoilName, IsNotOK, trim( CurrentModuleObject ) );
+					ValidateComponent( CoolingCoilType, CoolingCoilName, IsNotOK, CurrentModuleObject );
 					if ( IsNotOK ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 					} else {
 						errFlag = false;
 						UnitarySystem( UnitarySysNum ).CoolingCoilIndex = GetCoilIndexVariableSpeed( CoolingCoilType, CoolingCoilName, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 							errFlag = false;
 						}
 
 						CoolingCoilInletNode = GetCoilInletNodeVariableSpeed( CoolingCoilType, CoolingCoilName, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 							errFlag = false;
 						}
 
 						CoolingCoilOutletNode = GetCoilOutletNodeVariableSpeed( CoolingCoilType, CoolingCoilName, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 							errFlag = false;
 						}
 
 						UnitarySystem( UnitarySysNum ).CondenserNodeNum = GetVSCoilCondenserInletNode( CoolingCoilName, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 							errFlag = false;
 						}
@@ -4974,7 +4974,7 @@ namespace HVACUnitarySystem {
 
 						UnitarySystem( UnitarySysNum ).NumOfSpeedCooling = GetVSCoilNumOfSpeeds( CoolingCoilName, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 							errFlag = false;
 						}
@@ -4983,7 +4983,7 @@ namespace HVACUnitarySystem {
 						UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = GetCoilCapacityVariableSpeed( CoolingCoilType, CoolingCoilName, errFlag );
 						if ( UnitarySystem( UnitarySysNum ).DesignCoolingCapacity == AutoSize ) UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 						}
 					}
@@ -4995,7 +4995,7 @@ namespace HVACUnitarySystem {
 						if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 						}
 
@@ -5021,9 +5021,9 @@ namespace HVACUnitarySystem {
 
 				} else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling ) {
 					errFlag = false;
-					GetDXCoilIndex( CoolingCoilName, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, errFlag, trim( CoolingCoilType ) );
+					GetDXCoilIndex( CoolingCoilName, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, errFlag, CoolingCoilType );
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 						errFlag = false;
 					}
@@ -5032,13 +5032,13 @@ namespace HVACUnitarySystem {
 
 					CoolingCoilInletNode = GetDXCoilInletNode( CoolingCoilType, CoolingCoilName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 						errFlag = false;
 					}
 					CoolingCoilOutletNode = GetDXCoilOutletNode( CoolingCoilType, CoolingCoilName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 						errFlag = false;
 					}
@@ -5054,24 +5054,24 @@ namespace HVACUnitarySystem {
 
 				} else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWater || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWaterDetailed ) {
 
-					ValidateComponent( CoolingCoilType, CoolingCoilName, IsNotOK, trim( CurrentModuleObject ) );
+					ValidateComponent( CoolingCoilType, CoolingCoilName, IsNotOK, CurrentModuleObject );
 					if ( IsNotOK ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 					} else { // mine data from Cooling coil object
 
 						errFlag = false;
 						UnitarySystem( UnitarySysNum ).CoolingCoilAvailSchPtr = GetWaterCoilAvailScheduleIndex( CoolingCoilType, CoolingCoilName, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 							errFlag = false;
 						}
 
 						UnitarySystem( UnitarySysNum ).CoolingCoilIndex = GetWaterCoilIndex( CoolingCoilType, CoolingCoilName, errFlag );
 						if ( UnitarySystem( UnitarySysNum ).CoolingCoilIndex == 0 ) {
-							ShowSevereError( trim( CurrentModuleObject ) + " illegal " + trim( cAlphaFields( iCoolingCoilNameAlphaNum ) ) + " = " + trim( HeatingCoilName ) );
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowSevereError( CurrentModuleObject + " illegal " + cAlphaFields( iCoolingCoilNameAlphaNum ) + " = " + HeatingCoilName );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 							errFlag = false;
 						}
@@ -5079,7 +5079,7 @@ namespace HVACUnitarySystem {
 						// Get the Cooling Coil water Inlet Node number
 						UnitarySystem( UnitarySysNum ).CoolCoilFluidInletNode = GetCoilWaterInletNode( CoolingCoilType, CoolingCoilName, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 							errFlag = false;
 						}
@@ -5087,9 +5087,9 @@ namespace HVACUnitarySystem {
 						InletNodeNotControlled = true;
 						//  CALL CheckCoilWaterInletNode(UnitarySystem(UnitarySysNum)%CoolCoilFluidInletNode,InletNodeNotControlled)
 						if ( ! InletNodeNotControlled ) {
-							ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-							ShowContinueError( trim( ControllerTypes( ControllerSimple_Type ) ) + " found for " + trim( CoolingCoilType ) + " = \"" + trim( CoolingCoilName ) + ".\"" );
-							ShowContinueError( "...water coil controllers are not used with " + trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) );
+							ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+							ShowContinueError( ControllerTypes( ControllerSimple_Type ) + " found for " + CoolingCoilType + " = \"" + CoolingCoilName + ".\"" );
+							ShowContinueError( "...water coil controllers are not used with " + UnitarySystem( UnitarySysNum ).UnitarySystemType );
 							ErrorsFound = true;
 						}
 
@@ -5098,7 +5098,7 @@ namespace HVACUnitarySystem {
 						UnitarySystem( UnitarySysNum ).MaxCoolCoilFluidFlow = GetCoilMaxWaterFlowRate( CoolingCoilType, CoolingCoilName, errFlag );
 						if ( UnitarySystem( UnitarySysNum ).MaxCoolCoilFluidFlow == AutoSize ) UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 							errFlag = false;
 						}
@@ -5106,7 +5106,7 @@ namespace HVACUnitarySystem {
 						// Get the Cooling Coil Inlet Node
 						CoolingCoilInletNode = GetWaterCoilInletNode( CoolingCoilType, CoolingCoilName, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 							errFlag = false;
 						}
@@ -5114,30 +5114,30 @@ namespace HVACUnitarySystem {
 						// Get the Cooling Coil Outlet Node
 						CoolingCoilOutletNode = GetWaterCoilOutletNode( CoolingCoilType, CoolingCoilName, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 							errFlag = false;
 						}
 					}
 				} else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWaterToAirHPSimple ) {
-					ValidateComponent( CoolingCoilType, CoolingCoilName, IsNotOK, trim( CurrentModuleObject ) );
+					ValidateComponent( CoolingCoilType, CoolingCoilName, IsNotOK, CurrentModuleObject );
 					if ( IsNotOK ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 					} else { // mine data from Cooling coil object
 
 						errFlag = false;
 						UnitarySystem( UnitarySysNum ).CoolingCoilAvailSchPtr = ScheduleAlwaysOn;
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 							errFlag = false;
 						}
 
 						UnitarySystem( UnitarySysNum ).CoolingCoilIndex = GetWtoAHPSimpleCoilIndex( CoolingCoilType, CoolingCoilName, errFlag );
 						if ( UnitarySystem( UnitarySysNum ).CoolingCoilIndex == 0 ) {
-							ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-							ShowContinueError( "Illegal " + trim( cAlphaFields( iCoolingCoilNameAlphaNum ) ) + " = " + trim( CoolingCoilName ) );
+							ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+							ShowContinueError( "Illegal " + cAlphaFields( iCoolingCoilNameAlphaNum ) + " = " + CoolingCoilName );
 							ErrorsFound = true;
 							errFlag = false;
 						}
@@ -5146,7 +5146,7 @@ namespace HVACUnitarySystem {
 						errFlag = false;
 						CoolingCoilInletNode = GetWtoAHPSimpleCoilInletNode( CoolingCoilType, CoolingCoilName, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 							errFlag = false;
 						}
@@ -5154,7 +5154,7 @@ namespace HVACUnitarySystem {
 						// Get the Cooling Coil Outlet Node
 						CoolingCoilOutletNode = GetWtoAHPSimpleCoilOutletNode( CoolingCoilType, CoolingCoilName, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 							errFlag = false;
 						}
@@ -5171,24 +5171,24 @@ namespace HVACUnitarySystem {
 					}
 
 				} else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWaterToAirHP ) {
-					ValidateComponent( CoolingCoilType, CoolingCoilName, IsNotOK, trim( CurrentModuleObject ) );
+					ValidateComponent( CoolingCoilType, CoolingCoilName, IsNotOK, CurrentModuleObject );
 					if ( IsNotOK ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 					} else { // mine data from Cooling coil object
 
 						errFlag = false;
 						UnitarySystem( UnitarySysNum ).CoolingCoilAvailSchPtr = ScheduleAlwaysOn;
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 							errFlag = false;
 						}
 
 						UnitarySystem( UnitarySysNum ).CoolingCoilIndex = GetWtoAHPCoilIndex( CoolingCoilType, CoolingCoilName, errFlag );
 						if ( UnitarySystem( UnitarySysNum ).CoolingCoilIndex == 0 ) {
-							ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-							ShowContinueError( "Illegal " + trim( cAlphaFields( iCoolingCoilNameAlphaNum ) ) + " = " + trim( CoolingCoilName ) );
+							ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+							ShowContinueError( "Illegal " + cAlphaFields( iCoolingCoilNameAlphaNum ) + " = " + CoolingCoilName );
 							ErrorsFound = true;
 							errFlag = false;
 						}
@@ -5197,7 +5197,7 @@ namespace HVACUnitarySystem {
 						errFlag = false;
 						CoolingCoilInletNode = GetWtoAHPCoilInletNode( CoolingCoilType, CoolingCoilName, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 							errFlag = false;
 						}
@@ -5205,7 +5205,7 @@ namespace HVACUnitarySystem {
 						// Get the Cooling Coil Outlet Node
 						CoolingCoilOutletNode = GetWtoAHPCoilOutletNode( CoolingCoilType, CoolingCoilName, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 							errFlag = false;
 						}
@@ -5222,8 +5222,8 @@ namespace HVACUnitarySystem {
 					}
 
 				} else { // IF(.NOT. lAlphaBlanks(16))THEN
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "Illegal " + trim( cAlphaFields( iCoolingCoilTypeAlphaNum ) ) + " = " + trim( Alphas( iCoolingCoilTypeAlphaNum ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "Illegal " + cAlphaFields( iCoolingCoilTypeAlphaNum ) + " = " + Alphas( iCoolingCoilTypeAlphaNum ) );
 					ErrorsFound = true;
 				}
 
@@ -5265,13 +5265,13 @@ namespace HVACUnitarySystem {
 			} else {
 				if ( SameString( Alphas( iDOASDXCoilAlphaNum ), "Yes" ) ) {
 					UnitarySystem( UnitarySysNum ).ISHundredPercentDOASDXCoil = true;
-				} else if ( SameString( Alphas( iDOASDXCoilAlphaNum ), " " ) ) {
+				} else if ( SameString( Alphas( iDOASDXCoilAlphaNum ), "" ) ) {
 					UnitarySystem( UnitarySysNum ).ISHundredPercentDOASDXCoil = false;
 				} else if ( SameString( Alphas( iDOASDXCoilAlphaNum ), "No" ) ) {
 					UnitarySystem( UnitarySysNum ).ISHundredPercentDOASDXCoil = false;
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "Invalid entry for " + trim( cAlphaFields( iDOASDXCoilAlphaNum ) ) + " :" + trim( Alphas( iDOASDXCoilAlphaNum ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "Invalid entry for " + cAlphaFields( iDOASDXCoilAlphaNum ) + " :" + Alphas( iDOASDXCoilAlphaNum ) );
 					ShowContinueError( "Must be Yes or No." );
 				}
 			}
@@ -5304,8 +5304,8 @@ namespace HVACUnitarySystem {
 					UnitarySystem( UnitarySysNum ).RunOnLatentLoad = true;
 					UnitarySystem( UnitarySysNum ).RunOnLatentOnlyWithSensible = true;
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "Invalid entry for " + trim( cAlphaFields( iRunOnLatentLoadAlphaNum ) ) + " :" + trim( Alphas( iRunOnLatentLoadAlphaNum ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "Invalid entry for " + cAlphaFields( iRunOnLatentLoadAlphaNum ) + " :" + Alphas( iRunOnLatentLoadAlphaNum ) );
 					ShowContinueError( "Must be SensibleOnlyLoadControl, LatentOnlyLoadControl," " LatentOrSensibleLoadControl, or LatentWithSensibleLoadControl." );
 				}
 			}
@@ -5331,13 +5331,13 @@ namespace HVACUnitarySystem {
 
 					UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num = GetHeatingCoilTypeNum( SuppHeatCoilType, SuppHeatCoilName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 					} else {
 
-						ValidateComponent( SuppHeatCoilType, SuppHeatCoilName, IsNotOK, trim( CurrentModuleObject ) );
+						ValidateComponent( SuppHeatCoilType, SuppHeatCoilName, IsNotOK, CurrentModuleObject );
 						if ( IsNotOK ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 
 						} else { // mine data from reheat coil
@@ -5345,7 +5345,7 @@ namespace HVACUnitarySystem {
 							// Get the heating coil index
 							GetHeatingCoilIndex( SuppHeatCoilName, UnitarySystem( UnitarySysNum ).SuppHeatCoilIndex, IsNotOK );
 							if ( IsNotOK ) {
-								ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+								ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 								ErrorsFound = true;
 							}
 
@@ -5355,7 +5355,7 @@ namespace HVACUnitarySystem {
 							if ( UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity == AutoSize ) UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 
 							if ( errFlag ) {
-								ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+								ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 								ErrorsFound = true;
 							}
 
@@ -5363,7 +5363,7 @@ namespace HVACUnitarySystem {
 							errFlag = false;
 							SupHeatCoilInletNode = GetHeatingCoilInletNode( SuppHeatCoilType, SuppHeatCoilName, errFlag );
 							if ( errFlag ) {
-								ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+								ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 								ErrorsFound = true;
 							}
 
@@ -5371,7 +5371,7 @@ namespace HVACUnitarySystem {
 							errFlag = false;
 							SupHeatCoilOutletNode = GetHeatingCoilOutletNode( SuppHeatCoilType, SuppHeatCoilName, errFlag );
 							if ( errFlag ) {
-								ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+								ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 								ErrorsFound = true;
 							}
 
@@ -5383,9 +5383,9 @@ namespace HVACUnitarySystem {
 
 				} else if ( UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num == Coil_HeatingWater ) {
 
-					ValidateComponent( SuppHeatCoilType, SuppHeatCoilName, IsNotOK, trim( CurrentModuleObject ) );
+					ValidateComponent( SuppHeatCoilType, SuppHeatCoilName, IsNotOK, CurrentModuleObject );
 					if ( IsNotOK ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 					} else { // mine data from heating coil object
 
@@ -5393,7 +5393,7 @@ namespace HVACUnitarySystem {
 						errFlag = false;
 						UnitarySystem( UnitarySysNum ).SuppCoilFluidInletNode = GetCoilWaterInletNode( "Coil:Heating:Water", SuppHeatCoilName, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 						}
 
@@ -5403,7 +5403,7 @@ namespace HVACUnitarySystem {
 						if ( UnitarySystem( UnitarySysNum ).MaxSuppCoilFluidFlow == AutoSize ) UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 						}
 
@@ -5412,7 +5412,7 @@ namespace HVACUnitarySystem {
 						SupHeatCoilInletNode = GetWaterCoilInletNode( "Coil:Heating:Water", SuppHeatCoilName, errFlag );
 						UnitarySystem( UnitarySysNum ).SuppCoilAirInletNode = SupHeatCoilInletNode;
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 						}
 
@@ -5421,7 +5421,7 @@ namespace HVACUnitarySystem {
 						SupHeatCoilOutletNode = GetWaterCoilOutletNode( "Coil:Heating:Water", SuppHeatCoilName, errFlag );
 						UnitarySystem( UnitarySysNum ).SuppCoilAirOutletNode = SupHeatCoilOutletNode;
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 						}
 
@@ -5434,17 +5434,17 @@ namespace HVACUnitarySystem {
 
 				} else if ( UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num == Coil_HeatingSteam ) {
 
-					ValidateComponent( SuppHeatCoilType, SuppHeatCoilName, IsNotOK, trim( CurrentModuleObject ) );
+					ValidateComponent( SuppHeatCoilType, SuppHeatCoilName, IsNotOK, CurrentModuleObject );
 					if ( IsNotOK ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 					} else { // mine data from heating coil object
 
 						errFlag = false;
 						UnitarySystem( UnitarySysNum ).SuppHeatCoilIndex = GetSteamCoilIndex( "COIL:HEATING:STEAM", SuppHeatCoilName, errFlag );
 						if ( UnitarySystem( UnitarySysNum ).SuppHeatCoilIndex == 0 ) {
-							ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-							ShowSevereError( "Illegal " + trim( cAlphaFields( iSuppHeatCoilNameAlphaNum ) ) + " = " + trim( SuppHeatCoilName ) );
+							ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+							ShowSevereError( "Illegal " + cAlphaFields( iSuppHeatCoilNameAlphaNum ) + " = " + SuppHeatCoilName );
 							ErrorsFound = true;
 						}
 
@@ -5452,7 +5452,7 @@ namespace HVACUnitarySystem {
 						errFlag = false;
 						UnitarySystem( UnitarySysNum ).SuppCoilFluidInletNode = GetCoilSteamInletNode( "Coil:Heating:Steam", SuppHeatCoilName, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 						}
 
@@ -5471,7 +5471,7 @@ namespace HVACUnitarySystem {
 						SupHeatCoilInletNode = GetSteamCoilAirInletNode( UnitarySystem( UnitarySysNum ).SuppHeatCoilIndex, SuppHeatCoilName, errFlag );
 						UnitarySystem( UnitarySysNum ).SuppCoilAirInletNode = SupHeatCoilInletNode;
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 						}
 
@@ -5480,7 +5480,7 @@ namespace HVACUnitarySystem {
 						SupHeatCoilOutletNode = GetCoilAirOutletNode( UnitarySystem( UnitarySysNum ).SuppHeatCoilIndex, SuppHeatCoilName, errFlag );
 						UnitarySystem( UnitarySysNum ).SuppCoilAirOutletNode = SupHeatCoilOutletNode;
 						if ( errFlag ) {
-							ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 						}
 
@@ -5490,8 +5490,8 @@ namespace HVACUnitarySystem {
 					}
 
 				} else { // Illegal reheating coil type
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "Illegal " + trim( cAlphaFields( iSuppHeatCoilTypeAlphaNum ) ) + " = " + trim( Alphas( iSuppHeatCoilTypeAlphaNum ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "Illegal " + cAlphaFields( iSuppHeatCoilTypeAlphaNum ) + " = " + Alphas( iSuppHeatCoilTypeAlphaNum ) );
 					ErrorsFound = true;
 				} // IF (UnitarySystem(UnitarySysNum)%SuppHeatCoilType_Num == Coil_HeatingGas .OR. &, etc.
 
@@ -5632,8 +5632,8 @@ namespace HVACUnitarySystem {
 			}
 
 			if ( UnitarySystem( UnitarySysNum ).ControlZoneNum == 0 && UnitarySystem( UnitarySysNum ).ControlType == LoadBased ) {
-				ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-				ShowContinueError( "Illegal " + trim( cAlphaFields( iControlZoneAlphaNum ) ) + " = " + trim( Alphas( iControlZoneAlphaNum ) ) );
+				ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+				ShowContinueError( "Illegal " + cAlphaFields( iControlZoneAlphaNum ) + " = " + Alphas( iControlZoneAlphaNum ) );
 				ErrorsFound = true;
 			}
 
@@ -5645,9 +5645,9 @@ namespace HVACUnitarySystem {
 						for ( ZoneExhNum = 1; ZoneExhNum <= ZoneEquipConfig( ControlledZoneNum ).NumExhaustNodes; ++ZoneExhNum ) {
 							if ( ZoneEquipConfig( ControlledZoneNum ).ExhaustNode( ZoneExhNum ) != UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ) continue;
 							if ( UnitarySystem( UnitarySysNum ).ControlZoneNum != ControlledZoneNum ) {
-								ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+								ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 								ShowContinueError( "Did not find Air Node (Zone with Thermostat)." );
-								ShowContinueError( "specified " + trim( cAlphaFields( iControlZoneAlphaNum ) ) + " = " + trim( Alphas( iControlZoneAlphaNum ) ) );
+								ShowContinueError( "specified " + cAlphaFields( iControlZoneAlphaNum ) + " = " + Alphas( iControlZoneAlphaNum ) );
 								ErrorsFound = true;
 							}
 							if ( UnitarySystem( UnitarySysNum ).ControlZoneNum == ControlledZoneNum ) {
@@ -5659,19 +5659,19 @@ namespace HVACUnitarySystem {
 					}
 				}
 				if ( AirLoopNumber == 0 && ! ZoneEquipmentFound && UnitarySystem( UnitarySysNum ).ControlType == LoadBased ) {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + Alphas( 1 ) );
 					ShowContinueError( "Did not find an AirLoopHVAC." );
-					ShowContinueError( "specified " + trim( cAlphaFields( iControlZoneAlphaNum ) ) + " = " + trim( Alphas( iControlZoneAlphaNum ) ) );
+					ShowContinueError( "specified " + cAlphaFields( iControlZoneAlphaNum ) + " = " + Alphas( iControlZoneAlphaNum ) );
 					if ( ! AirNodeFound && ! ZoneEquipmentFound && UnitarySystem( UnitarySysNum ).ControlType == LoadBased ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+						ShowSevereError( CurrentModuleObject + " = " + Alphas( 1 ) );
 						ShowContinueError( "Did not find air node (zone with thermostat)." );
-						ShowContinueError( "specified " + trim( cAlphaFields( iControlZoneAlphaNum ) ) + " = " + trim( Alphas( iControlZoneAlphaNum ) ) );
+						ShowContinueError( "specified " + cAlphaFields( iControlZoneAlphaNum ) + " = " + Alphas( iControlZoneAlphaNum ) );
 						ShowContinueError( "Both a ZoneHVAC:EquipmentConnections object and a ZoneControl:Thermostat object" " must be specified for this zone." );
 					}
 					if ( ! AirLoopFound && ! ZoneEquipmentFound && UnitarySystem( UnitarySysNum ).ControlType == LoadBased ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+						ShowSevereError( CurrentModuleObject + " = " + Alphas( 1 ) );
 						ShowSevereError( "Did not find correct AirLoopHVAC." );
-						ShowContinueError( "specified " + trim( cAlphaFields( iControlZoneAlphaNum ) ) + " = " + trim( Alphas( iControlZoneAlphaNum ) ) );
+						ShowContinueError( "specified " + cAlphaFields( iControlZoneAlphaNum ) + " = " + Alphas( iControlZoneAlphaNum ) );
 					}
 					if ( UnitarySystem( UnitarySysNum ).ControlType == LoadBased ) ErrorsFound = true;
 				}
@@ -5688,14 +5688,14 @@ namespace HVACUnitarySystem {
 					if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 
 					if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow <= 0.0 && UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow != AutoSize ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Illegal " + trim( cNumericFields( iMaxCoolAirVolFlowNumericNum ) ) + " = " + trim( TrimSigDigits( Numbers( iMaxCoolAirVolFlowNumericNum ), 7 ) ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Illegal " + cNumericFields( iMaxCoolAirVolFlowNumericNum ) + " = " + TrimSigDigits( Numbers( iMaxCoolAirVolFlowNumericNum ), 7 ) );
 						ErrorsFound = true;
 					}
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "Input for " + trim( cAlphaFields( iCoolSAFMAlphaNum ) ) + " = " + trim( Alphas( iCoolSAFMAlphaNum ) ) );
-					ShowContinueError( "Blank field not allowed for " + trim( cNumericFields( iMaxCoolAirVolFlowNumericNum ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "Input for " + cAlphaFields( iCoolSAFMAlphaNum ) + " = " + Alphas( iCoolSAFMAlphaNum ) );
+					ShowContinueError( "Blank field not allowed for " + cNumericFields( iMaxCoolAirVolFlowNumericNum ) );
 					ErrorsFound = true;
 				}
 			} else if ( SameString( Alphas( iCoolSAFMAlphaNum ), "FlowPerFloorArea" ) ) {
@@ -5704,24 +5704,24 @@ namespace HVACUnitarySystem {
 				if ( ! lNumericBlanks( iCoolFlowPerFloorAreaNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = Numbers( iCoolFlowPerFloorAreaNumericNum );
 					if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow <= 0.0 && UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow != AutoSize ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Input for " + trim( cAlphaFields( iCoolSAFMAlphaNum ) ) + " = " + trim( Alphas( iCoolSAFMAlphaNum ) ) );
-						ShowContinueError( "Illegal " + trim( cNumericFields( iCoolFlowPerFloorAreaNumericNum ) ) + " = " + trim( TrimSigDigits( Numbers( iCoolFlowPerFloorAreaNumericNum ), 7 ) ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( iCoolSAFMAlphaNum ) + " = " + Alphas( iCoolSAFMAlphaNum ) );
+						ShowContinueError( "Illegal " + cNumericFields( iCoolFlowPerFloorAreaNumericNum ) + " = " + TrimSigDigits( Numbers( iCoolFlowPerFloorAreaNumericNum ), 7 ) );
 						ErrorsFound = true;
 						// Autosized input is not allowed
 					} else if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Input for " + trim( cAlphaFields( iCoolSAFMAlphaNum ) ) + " = " + trim( Alphas( iCoolSAFMAlphaNum ) ) );
-						ShowContinueError( "Illegal " + trim( cNumericFields( iCoolFlowPerFloorAreaNumericNum ) ) + " = Autosize" );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( iCoolSAFMAlphaNum ) + " = " + Alphas( iCoolSAFMAlphaNum ) );
+						ShowContinueError( "Illegal " + cNumericFields( iCoolFlowPerFloorAreaNumericNum ) + " = Autosize" );
 						ErrorsFound = true;
 					} else {
 						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow *= TotalFloorAreaOnAirLoop;
 						UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 					}
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "Input for " + trim( cAlphaFields( iCoolSAFMAlphaNum ) ) + " = " + trim( Alphas( iCoolSAFMAlphaNum ) ) );
-					ShowContinueError( "Blank field not allowed for " + trim( cNumericFields( iCoolFlowPerFloorAreaNumericNum ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "Input for " + cAlphaFields( iCoolSAFMAlphaNum ) + " = " + Alphas( iCoolSAFMAlphaNum ) );
+					ShowContinueError( "Blank field not allowed for " + cNumericFields( iCoolFlowPerFloorAreaNumericNum ) );
 					ErrorsFound = true;
 				}
 			} else if ( SameString( Alphas( iCoolSAFMAlphaNum ), "FractionOfAutosizedCoolingValue" ) ) {
@@ -5730,23 +5730,23 @@ namespace HVACUnitarySystem {
 				if ( ! lNumericBlanks( iCoolFlowPerFracCoolNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = Numbers( iCoolFlowPerFracCoolNumericNum );
 					if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow <= 0.0 && UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow != AutoSize ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Input for " + trim( cAlphaFields( iCoolSAFMAlphaNum ) ) + " = " + trim( Alphas( iCoolSAFMAlphaNum ) ) );
-						ShowContinueError( "Illegal " + trim( cNumericFields( iCoolFlowPerFracCoolNumericNum ) ) + " = " + trim( TrimSigDigits( Numbers( iCoolFlowPerFracCoolNumericNum ), 7 ) ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( iCoolSAFMAlphaNum ) + " = " + Alphas( iCoolSAFMAlphaNum ) );
+						ShowContinueError( "Illegal " + cNumericFields( iCoolFlowPerFracCoolNumericNum ) + " = " + TrimSigDigits( Numbers( iCoolFlowPerFracCoolNumericNum ), 7 ) );
 						ErrorsFound = true;
 						// Autosized input is not allowed
 					} else if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Input for " + trim( cAlphaFields( iCoolSAFMAlphaNum ) ) + " = " + trim( Alphas( iCoolSAFMAlphaNum ) ) );
-						ShowContinueError( "Illegal " + trim( cNumericFields( iCoolFlowPerFracCoolNumericNum ) ) + " = Autosize" );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( iCoolSAFMAlphaNum ) + " = " + Alphas( iCoolSAFMAlphaNum ) );
+						ShowContinueError( "Illegal " + cNumericFields( iCoolFlowPerFracCoolNumericNum ) + " = Autosize" );
 						ErrorsFound = true;
 					} else {
 						UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 					}
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "Input for " + trim( cAlphaFields( iCoolSAFMAlphaNum ) ) + " = " + trim( Alphas( iCoolSAFMAlphaNum ) ) );
-					ShowContinueError( "Blank field not allowed for " + trim( cNumericFields( iCoolFlowPerFracCoolNumericNum ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "Input for " + cAlphaFields( iCoolSAFMAlphaNum ) + " = " + Alphas( iCoolSAFMAlphaNum ) );
+					ShowContinueError( "Blank field not allowed for " + cNumericFields( iCoolFlowPerFracCoolNumericNum ) );
 					ErrorsFound = true;
 				}
 			} else if ( SameString( Alphas( iCoolSAFMAlphaNum ), "FlowPerCoolingCapacity" ) ) {
@@ -5755,31 +5755,31 @@ namespace HVACUnitarySystem {
 				if ( ! lNumericBlanks( iCoolFlowPerCoolCapNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = Numbers( iCoolFlowPerCoolCapNumericNum );
 					if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow <= 0.0 && UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow != AutoSize ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Input for " + trim( cAlphaFields( iCoolSAFMAlphaNum ) ) + " = " + trim( Alphas( iCoolSAFMAlphaNum ) ) );
-						ShowContinueError( "Illegal " + trim( cNumericFields( iCoolFlowPerCoolCapNumericNum ) ) + " = " + trim( TrimSigDigits( Numbers( iCoolFlowPerCoolCapNumericNum ), 7 ) ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( iCoolSAFMAlphaNum ) + " = " + Alphas( iCoolSAFMAlphaNum ) );
+						ShowContinueError( "Illegal " + cNumericFields( iCoolFlowPerCoolCapNumericNum ) + " = " + TrimSigDigits( Numbers( iCoolFlowPerCoolCapNumericNum ), 7 ) );
 						ErrorsFound = true;
 						// Autosized input is not allowed
 					} else if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Input for " + trim( cAlphaFields( iCoolSAFMAlphaNum ) ) + " = " + trim( Alphas( iCoolSAFMAlphaNum ) ) );
-						ShowContinueError( "Illegal " + trim( cNumericFields( iCoolFlowPerCoolCapNumericNum ) ) + " = Autosize" );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( iCoolSAFMAlphaNum ) + " = " + Alphas( iCoolSAFMAlphaNum ) );
+						ShowContinueError( "Illegal " + cNumericFields( iCoolFlowPerCoolCapNumericNum ) + " = Autosize" );
 						ErrorsFound = true;
 					} else {
 						UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 					}
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "Input for " + trim( cAlphaFields( iCoolSAFMAlphaNum ) ) + " = " + trim( Alphas( iCoolSAFMAlphaNum ) ) );
-					ShowContinueError( "Blank field not allowed for " + trim( cNumericFields( iCoolFlowPerCoolCapNumericNum ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "Input for " + cAlphaFields( iCoolSAFMAlphaNum ) + " = " + Alphas( iCoolSAFMAlphaNum ) );
+					ShowContinueError( "Blank field not allowed for " + cNumericFields( iCoolFlowPerCoolCapNumericNum ) );
 					ErrorsFound = true;
 				}
 			} else if ( SameString( Alphas( iCoolSAFMAlphaNum ), "None" ) || lAlphaBlanks( iCoolSAFMAlphaNum ) ) {
 				UnitarySystem( UnitarySysNum ).CoolingSAFMethod = None;
 				//          UnitarySystem(UnitarySysNum)%RequestAutosize = .TRUE. ! ??
 			} else {
-				ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-				ShowContinueError( "Illegal " + trim( cAlphaFields( iCoolSAFMAlphaNum ) ) + " = " + trim( Alphas( iCoolSAFMAlphaNum ) ) );
+				ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+				ShowContinueError( "Illegal " + cAlphaFields( iCoolSAFMAlphaNum ) + " = " + Alphas( iCoolSAFMAlphaNum ) );
 				ErrorsFound = true;
 			}
 
@@ -5791,14 +5791,14 @@ namespace HVACUnitarySystem {
 					if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 
 					if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow <= 0.0 && UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow != AutoSize ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Illegal " + trim( cNumericFields( iMaxHeatAirVolFlowNumericNum ) ) + " = " + trim( TrimSigDigits( Numbers( iMaxHeatAirVolFlowNumericNum ), 7 ) ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Illegal " + cNumericFields( iMaxHeatAirVolFlowNumericNum ) + " = " + TrimSigDigits( Numbers( iMaxHeatAirVolFlowNumericNum ), 7 ) );
 						ErrorsFound = true;
 					}
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "Input for " + trim( cAlphaFields( iHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iHeatSAFMAlphaNum ) ) );
-					ShowContinueError( "Blank field not allowed for " + trim( cNumericFields( iMaxHeatAirVolFlowNumericNum ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "Input for " + cAlphaFields( iHeatSAFMAlphaNum ) + " = " + Alphas( iHeatSAFMAlphaNum ) );
+					ShowContinueError( "Blank field not allowed for " + cNumericFields( iMaxHeatAirVolFlowNumericNum ) );
 					ErrorsFound = true;
 				}
 			} else if ( SameString( Alphas( iHeatSAFMAlphaNum ), "FlowPerFloorArea" ) ) {
@@ -5806,24 +5806,24 @@ namespace HVACUnitarySystem {
 				if ( ! lNumericBlanks( iHeatFlowPerFloorAreaNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = Numbers( iHeatFlowPerFloorAreaNumericNum );
 					if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow <= 0.0 && UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow != AutoSize ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Input for " + trim( cAlphaFields( iHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iHeatSAFMAlphaNum ) ) );
-						ShowContinueError( "Illegal " + trim( cNumericFields( iHeatFlowPerFloorAreaNumericNum ) ) + " = " + trim( TrimSigDigits( Numbers( iHeatFlowPerFloorAreaNumericNum ), 7 ) ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( iHeatSAFMAlphaNum ) + " = " + Alphas( iHeatSAFMAlphaNum ) );
+						ShowContinueError( "Illegal " + cNumericFields( iHeatFlowPerFloorAreaNumericNum ) + " = " + TrimSigDigits( Numbers( iHeatFlowPerFloorAreaNumericNum ), 7 ) );
 						ErrorsFound = true;
 						// Autosized input is not allowed
 					} else if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Input for " + trim( cAlphaFields( iHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iHeatSAFMAlphaNum ) ) );
-						ShowContinueError( "Illegal " + trim( cNumericFields( iHeatFlowPerFloorAreaNumericNum ) ) + " = Autosize" );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( iHeatSAFMAlphaNum ) + " = " + Alphas( iHeatSAFMAlphaNum ) );
+						ShowContinueError( "Illegal " + cNumericFields( iHeatFlowPerFloorAreaNumericNum ) + " = Autosize" );
 						ErrorsFound = true;
 					} else {
 						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow *= TotalFloorAreaOnAirLoop;
 						UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 					}
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "Input for " + trim( cAlphaFields( iHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iHeatSAFMAlphaNum ) ) );
-					ShowContinueError( "Blank field not allowed for " + trim( cNumericFields( iHeatFlowPerFloorAreaNumericNum ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "Input for " + cAlphaFields( iHeatSAFMAlphaNum ) + " = " + Alphas( iHeatSAFMAlphaNum ) );
+					ShowContinueError( "Blank field not allowed for " + cNumericFields( iHeatFlowPerFloorAreaNumericNum ) );
 					ErrorsFound = true;
 				}
 			} else if ( SameString( Alphas( iHeatSAFMAlphaNum ), "FractionOfAutosizedHeatingValue" ) ) {
@@ -5831,23 +5831,23 @@ namespace HVACUnitarySystem {
 				if ( ! lNumericBlanks( iHeatFlowPerFracCoolNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = Numbers( iHeatFlowPerFracCoolNumericNum );
 					if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow <= 0.0 && UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow != AutoSize ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Input for " + trim( cAlphaFields( iHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iHeatSAFMAlphaNum ) ) );
-						ShowContinueError( "Illegal " + trim( cNumericFields( iHeatFlowPerFracCoolNumericNum ) ) + " = " + trim( TrimSigDigits( Numbers( iHeatFlowPerFracCoolNumericNum ), 7 ) ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( iHeatSAFMAlphaNum ) + " = " + Alphas( iHeatSAFMAlphaNum ) );
+						ShowContinueError( "Illegal " + cNumericFields( iHeatFlowPerFracCoolNumericNum ) + " = " + TrimSigDigits( Numbers( iHeatFlowPerFracCoolNumericNum ), 7 ) );
 						ErrorsFound = true;
 						// Autosized input is not allowed
 					} else if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Input for " + trim( cAlphaFields( iHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iHeatSAFMAlphaNum ) ) );
-						ShowContinueError( "Illegal " + trim( cNumericFields( iHeatFlowPerFracCoolNumericNum ) ) + " = Autosize" );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( iHeatSAFMAlphaNum ) + " = " + Alphas( iHeatSAFMAlphaNum ) );
+						ShowContinueError( "Illegal " + cNumericFields( iHeatFlowPerFracCoolNumericNum ) + " = Autosize" );
 						ErrorsFound = true;
 					} else {
 						UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 					}
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "Input for " + trim( cAlphaFields( iHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iHeatSAFMAlphaNum ) ) );
-					ShowContinueError( "Blank field not allowed for " + trim( cNumericFields( iHeatFlowPerFracCoolNumericNum ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "Input for " + cAlphaFields( iHeatSAFMAlphaNum ) + " = " + Alphas( iHeatSAFMAlphaNum ) );
+					ShowContinueError( "Blank field not allowed for " + cNumericFields( iHeatFlowPerFracCoolNumericNum ) );
 					ErrorsFound = true;
 				}
 			} else if ( SameString( Alphas( iHeatSAFMAlphaNum ), "FlowPerHeatingCapacity" ) ) {
@@ -5855,31 +5855,31 @@ namespace HVACUnitarySystem {
 				if ( ! lNumericBlanks( iHeatFlowPerHeatCapNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = Numbers( iHeatFlowPerHeatCapNumericNum );
 					if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow <= 0.0 && UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow != AutoSize ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Input for " + trim( cAlphaFields( iHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iHeatSAFMAlphaNum ) ) );
-						ShowContinueError( "Illegal " + trim( cNumericFields( iHeatFlowPerHeatCapNumericNum ) ) + " = " + trim( TrimSigDigits( Numbers( iHeatFlowPerHeatCapNumericNum ), 7 ) ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( iHeatSAFMAlphaNum ) + " = " + Alphas( iHeatSAFMAlphaNum ) );
+						ShowContinueError( "Illegal " + cNumericFields( iHeatFlowPerHeatCapNumericNum ) + " = " + TrimSigDigits( Numbers( iHeatFlowPerHeatCapNumericNum ), 7 ) );
 						ErrorsFound = true;
 						// Autosized input is not allowed
 					} else if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Input for " + trim( cAlphaFields( iHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iHeatSAFMAlphaNum ) ) );
-						ShowContinueError( "Illegal " + trim( cNumericFields( iHeatFlowPerHeatCapNumericNum ) ) + " = Autosize" );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( iHeatSAFMAlphaNum ) + " = " + Alphas( iHeatSAFMAlphaNum ) );
+						ShowContinueError( "Illegal " + cNumericFields( iHeatFlowPerHeatCapNumericNum ) + " = Autosize" );
 						ErrorsFound = true;
 					} else {
 						UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 					}
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "Input for " + trim( cAlphaFields( iHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iHeatSAFMAlphaNum ) ) );
-					ShowContinueError( "Blank field not allowed for " + trim( cNumericFields( iHeatFlowPerHeatCapNumericNum ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "Input for " + cAlphaFields( iHeatSAFMAlphaNum ) + " = " + Alphas( iHeatSAFMAlphaNum ) );
+					ShowContinueError( "Blank field not allowed for " + cNumericFields( iHeatFlowPerHeatCapNumericNum ) );
 					ErrorsFound = true;
 				}
 			} else if ( SameString( Alphas( iHeatSAFMAlphaNum ), "None" ) || lAlphaBlanks( iHeatSAFMAlphaNum ) ) {
 				UnitarySystem( UnitarySysNum ).HeatingSAFMethod = None;
 				//          UnitarySystem(UnitarySysNum)%RequestAutosize = .TRUE. ! ??
 			} else {
-				ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-				ShowContinueError( "Illegal " + trim( cAlphaFields( iHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iHeatSAFMAlphaNum ) ) );
+				ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+				ShowContinueError( "Illegal " + cAlphaFields( iHeatSAFMAlphaNum ) + " = " + Alphas( iHeatSAFMAlphaNum ) );
 				ErrorsFound = true;
 			}
 
@@ -5891,14 +5891,14 @@ namespace HVACUnitarySystem {
 					if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow == AutoSize ) UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 
 					if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow < 0.0 && UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow != AutoSize ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Illegal " + trim( cNumericFields( iMaxNoCoolHeatAirVolFlowNumericNum ) ) + " = " + trim( TrimSigDigits( Numbers( iMaxNoCoolHeatAirVolFlowNumericNum ), 7 ) ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Illegal " + cNumericFields( iMaxNoCoolHeatAirVolFlowNumericNum ) + " = " + TrimSigDigits( Numbers( iMaxNoCoolHeatAirVolFlowNumericNum ), 7 ) );
 						ErrorsFound = true;
 					}
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "Input for " + trim( cAlphaFields( iNoCoolHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iNoCoolHeatSAFMAlphaNum ) ) );
-					ShowContinueError( "Blank field not allowed for " + trim( cNumericFields( iMaxNoCoolHeatAirVolFlowNumericNum ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "Input for " + cAlphaFields( iNoCoolHeatSAFMAlphaNum ) + " = " + Alphas( iNoCoolHeatSAFMAlphaNum ) );
+					ShowContinueError( "Blank field not allowed for " + cNumericFields( iMaxNoCoolHeatAirVolFlowNumericNum ) );
 					ErrorsFound = true;
 				}
 			} else if ( SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "FlowPerFloorArea" ) ) {
@@ -5906,24 +5906,24 @@ namespace HVACUnitarySystem {
 				if ( ! lNumericBlanks( iNoCoolHeatFlowPerFloorAreaNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = Numbers( iNoCoolHeatFlowPerFloorAreaNumericNum );
 					if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow < 0.0 && UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow != AutoSize ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Input for " + trim( cAlphaFields( iNoCoolHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iNoCoolHeatSAFMAlphaNum ) ) );
-						ShowContinueError( "Illegal " + trim( cNumericFields( iNoCoolHeatFlowPerFloorAreaNumericNum ) ) + " = " + trim( TrimSigDigits( Numbers( iNoCoolHeatFlowPerFloorAreaNumericNum ), 7 ) ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( iNoCoolHeatSAFMAlphaNum ) + " = " + Alphas( iNoCoolHeatSAFMAlphaNum ) );
+						ShowContinueError( "Illegal " + cNumericFields( iNoCoolHeatFlowPerFloorAreaNumericNum ) + " = " + TrimSigDigits( Numbers( iNoCoolHeatFlowPerFloorAreaNumericNum ), 7 ) );
 						ErrorsFound = true;
 						// Autosized input is not allowed
 					} else if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow == AutoSize ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Input for " + trim( cAlphaFields( iNoCoolHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iNoCoolHeatSAFMAlphaNum ) ) );
-						ShowContinueError( "Illegal " + trim( cNumericFields( iNoCoolHeatFlowPerFloorAreaNumericNum ) ) + " = Autosize" );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( iNoCoolHeatSAFMAlphaNum ) + " = " + Alphas( iNoCoolHeatSAFMAlphaNum ) );
+						ShowContinueError( "Illegal " + cNumericFields( iNoCoolHeatFlowPerFloorAreaNumericNum ) + " = Autosize" );
 						ErrorsFound = true;
 					} else {
 						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow *= TotalFloorAreaOnAirLoop;
 						UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 					}
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "Input for " + trim( cAlphaFields( iNoCoolHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iNoCoolHeatSAFMAlphaNum ) ) );
-					ShowContinueError( "Blank field not allowed for " + trim( cNumericFields( iNoCoolHeatFlowPerFloorAreaNumericNum ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "Input for " + cAlphaFields( iNoCoolHeatSAFMAlphaNum ) + " = " + Alphas( iNoCoolHeatSAFMAlphaNum ) );
+					ShowContinueError( "Blank field not allowed for " + cNumericFields( iNoCoolHeatFlowPerFloorAreaNumericNum ) );
 					ErrorsFound = true;
 				}
 			} else if ( SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "FractionOfAutosizedCoolingValue" ) ) {
@@ -5931,23 +5931,23 @@ namespace HVACUnitarySystem {
 				if ( ! lNumericBlanks( iNoCoolHeatFlowPerFracCoolNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = Numbers( iNoCoolHeatFlowPerFracCoolNumericNum );
 					if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow < 0.0 && UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow != AutoSize ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Input for " + trim( cAlphaFields( iNoCoolHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iNoCoolHeatSAFMAlphaNum ) ) );
-						ShowContinueError( "Illegal " + trim( cNumericFields( iNoCoolHeatFlowPerFracCoolNumericNum ) ) + " = " + trim( TrimSigDigits( Numbers( iNoCoolHeatFlowPerFracCoolNumericNum ), 7 ) ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( iNoCoolHeatSAFMAlphaNum ) + " = " + Alphas( iNoCoolHeatSAFMAlphaNum ) );
+						ShowContinueError( "Illegal " + cNumericFields( iNoCoolHeatFlowPerFracCoolNumericNum ) + " = " + TrimSigDigits( Numbers( iNoCoolHeatFlowPerFracCoolNumericNum ), 7 ) );
 						ErrorsFound = true;
 						// Autosized input is not allowed
 					} else if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow == AutoSize ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Input for " + trim( cAlphaFields( iNoCoolHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iNoCoolHeatSAFMAlphaNum ) ) );
-						ShowContinueError( "Illegal " + trim( cNumericFields( iNoCoolHeatFlowPerFracCoolNumericNum ) ) + " = Autosize" );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( iNoCoolHeatSAFMAlphaNum ) + " = " + Alphas( iNoCoolHeatSAFMAlphaNum ) );
+						ShowContinueError( "Illegal " + cNumericFields( iNoCoolHeatFlowPerFracCoolNumericNum ) + " = Autosize" );
 						ErrorsFound = true;
 					} else {
 						UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 					}
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "Input for " + trim( cAlphaFields( iNoCoolHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iNoCoolHeatSAFMAlphaNum ) ) );
-					ShowContinueError( "Blank field not allowed for " + trim( cNumericFields( iNoCoolHeatFlowPerFracCoolNumericNum ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "Input for " + cAlphaFields( iNoCoolHeatSAFMAlphaNum ) + " = " + Alphas( iNoCoolHeatSAFMAlphaNum ) );
+					ShowContinueError( "Blank field not allowed for " + cNumericFields( iNoCoolHeatFlowPerFracCoolNumericNum ) );
 					ErrorsFound = true;
 				}
 			} else if ( SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "FractionOfAutosizedHeatingValue" ) ) {
@@ -5955,23 +5955,23 @@ namespace HVACUnitarySystem {
 				if ( ! lNumericBlanks( iNoCoolHeatFlowPerFracHeatNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = Numbers( iNoCoolHeatFlowPerFracHeatNumericNum );
 					if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow < 0.0 && UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow != AutoSize ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Input for " + trim( cAlphaFields( iNoCoolHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iNoCoolHeatSAFMAlphaNum ) ) );
-						ShowContinueError( "Illegal " + trim( cNumericFields( iNoCoolHeatFlowPerFracHeatNumericNum ) ) + " = " + trim( TrimSigDigits( Numbers( iNoCoolHeatFlowPerFracHeatNumericNum ), 7 ) ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( iNoCoolHeatSAFMAlphaNum ) + " = " + Alphas( iNoCoolHeatSAFMAlphaNum ) );
+						ShowContinueError( "Illegal " + cNumericFields( iNoCoolHeatFlowPerFracHeatNumericNum ) + " = " + TrimSigDigits( Numbers( iNoCoolHeatFlowPerFracHeatNumericNum ), 7 ) );
 						ErrorsFound = true;
 						// Autosized input is not allowed
 					} else if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow == AutoSize ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Input for " + trim( cAlphaFields( iNoCoolHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iNoCoolHeatSAFMAlphaNum ) ) );
-						ShowContinueError( "Illegal " + trim( cNumericFields( iNoCoolHeatFlowPerFracHeatNumericNum ) ) + " = Autosize" );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( iNoCoolHeatSAFMAlphaNum ) + " = " + Alphas( iNoCoolHeatSAFMAlphaNum ) );
+						ShowContinueError( "Illegal " + cNumericFields( iNoCoolHeatFlowPerFracHeatNumericNum ) + " = Autosize" );
 						ErrorsFound = true;
 					} else {
 						UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 					}
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "Input for " + trim( cAlphaFields( iNoCoolHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iNoCoolHeatSAFMAlphaNum ) ) );
-					ShowContinueError( "Blank field not allowed for " + trim( cNumericFields( iNoCoolHeatFlowPerFracHeatNumericNum ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "Input for " + cAlphaFields( iNoCoolHeatSAFMAlphaNum ) + " = " + Alphas( iNoCoolHeatSAFMAlphaNum ) );
+					ShowContinueError( "Blank field not allowed for " + cNumericFields( iNoCoolHeatFlowPerFracHeatNumericNum ) );
 					ErrorsFound = true;
 				}
 			} else if ( SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "FlowPerCoolingCapacity" ) ) {
@@ -5979,23 +5979,23 @@ namespace HVACUnitarySystem {
 				if ( ! lNumericBlanks( iNoCoolHeatFlowPerCoolCapNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = Numbers( iNoCoolHeatFlowPerCoolCapNumericNum );
 					if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow < 0.0 && UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow != AutoSize ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Input for " + trim( cAlphaFields( iNoCoolHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iNoCoolHeatSAFMAlphaNum ) ) );
-						ShowContinueError( "Illegal " + trim( cNumericFields( iNoCoolHeatFlowPerCoolCapNumericNum ) ) + " = " + trim( TrimSigDigits( Numbers( iNoCoolHeatFlowPerCoolCapNumericNum ), 7 ) ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( iNoCoolHeatSAFMAlphaNum ) + " = " + Alphas( iNoCoolHeatSAFMAlphaNum ) );
+						ShowContinueError( "Illegal " + cNumericFields( iNoCoolHeatFlowPerCoolCapNumericNum ) + " = " + TrimSigDigits( Numbers( iNoCoolHeatFlowPerCoolCapNumericNum ), 7 ) );
 						ErrorsFound = true;
 						// Autosized input is not allowed
 					} else if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow == AutoSize ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Input for " + trim( cAlphaFields( iNoCoolHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iNoCoolHeatSAFMAlphaNum ) ) );
-						ShowContinueError( "Illegal " + trim( cNumericFields( iNoCoolHeatFlowPerCoolCapNumericNum ) ) + " = Autosize" );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( iNoCoolHeatSAFMAlphaNum ) + " = " + Alphas( iNoCoolHeatSAFMAlphaNum ) );
+						ShowContinueError( "Illegal " + cNumericFields( iNoCoolHeatFlowPerCoolCapNumericNum ) + " = Autosize" );
 						ErrorsFound = true;
 					} else {
 						UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 					}
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "Input for " + trim( cAlphaFields( iNoCoolHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iNoCoolHeatSAFMAlphaNum ) ) );
-					ShowContinueError( "Blank field not allowed for " + trim( cNumericFields( iNoCoolHeatFlowPerCoolCapNumericNum ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "Input for " + cAlphaFields( iNoCoolHeatSAFMAlphaNum ) + " = " + Alphas( iNoCoolHeatSAFMAlphaNum ) );
+					ShowContinueError( "Blank field not allowed for " + cNumericFields( iNoCoolHeatFlowPerCoolCapNumericNum ) );
 					ErrorsFound = true;
 				}
 			} else if ( SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "FlowPerHeatingCapacity" ) ) {
@@ -6003,31 +6003,31 @@ namespace HVACUnitarySystem {
 				if ( ! lNumericBlanks( iNoCoolHeatFlowPerHeatCapNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = Numbers( iNoCoolHeatFlowPerHeatCapNumericNum );
 					if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow < 0.0 && UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow != AutoSize ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Input for " + trim( cAlphaFields( iNoCoolHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iNoCoolHeatSAFMAlphaNum ) ) );
-						ShowContinueError( "Illegal " + trim( cNumericFields( iNoCoolHeatFlowPerHeatCapNumericNum ) ) + " = " + trim( TrimSigDigits( Numbers( iNoCoolHeatFlowPerHeatCapNumericNum ), 7 ) ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( iNoCoolHeatSAFMAlphaNum ) + " = " + Alphas( iNoCoolHeatSAFMAlphaNum ) );
+						ShowContinueError( "Illegal " + cNumericFields( iNoCoolHeatFlowPerHeatCapNumericNum ) + " = " + TrimSigDigits( Numbers( iNoCoolHeatFlowPerHeatCapNumericNum ), 7 ) );
 						ErrorsFound = true;
 						// Autosized input is not allowed
 					} else if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow == AutoSize ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-						ShowContinueError( "Input for " + trim( cAlphaFields( iNoCoolHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iNoCoolHeatSAFMAlphaNum ) ) );
-						ShowContinueError( "Illegal " + trim( cNumericFields( iNoCoolHeatFlowPerHeatCapNumericNum ) ) + " = Autosize" );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( iNoCoolHeatSAFMAlphaNum ) + " = " + Alphas( iNoCoolHeatSAFMAlphaNum ) );
+						ShowContinueError( "Illegal " + cNumericFields( iNoCoolHeatFlowPerHeatCapNumericNum ) + " = Autosize" );
 						ErrorsFound = true;
 					} else {
 						UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 					}
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "Input for " + trim( cAlphaFields( iNoCoolHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iNoCoolHeatSAFMAlphaNum ) ) );
-					ShowContinueError( "Blank field not allowed for " + trim( cNumericFields( iNoCoolHeatFlowPerHeatCapNumericNum ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "Input for " + cAlphaFields( iNoCoolHeatSAFMAlphaNum ) + " = " + Alphas( iNoCoolHeatSAFMAlphaNum ) );
+					ShowContinueError( "Blank field not allowed for " + cNumericFields( iNoCoolHeatFlowPerHeatCapNumericNum ) );
 					ErrorsFound = true;
 				}
 			} else if ( SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "None" ) || lAlphaBlanks( iNoCoolHeatSAFMAlphaNum ) ) {
 				UnitarySystem( UnitarySysNum ).NoCoolHeatSAFMethod = None;
 				//          UnitarySystem(UnitarySysNum)%RequestAutosize = .TRUE. ! ??
 			} else {
-				ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-				ShowContinueError( "Illegal " + trim( cAlphaFields( iNoCoolHeatSAFMAlphaNum ) ) + " = " + trim( Alphas( iNoCoolHeatSAFMAlphaNum ) ) );
+				ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+				ShowContinueError( "Illegal " + cAlphaFields( iNoCoolHeatSAFMAlphaNum ) + " = " + Alphas( iNoCoolHeatSAFMAlphaNum ) );
 				ErrorsFound = true;
 			}
 
@@ -6063,8 +6063,8 @@ namespace HVACUnitarySystem {
 			}
 
 			if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num != CoilDX_CoolingHXAssisted && UnitarySystem( UnitarySysNum ).CoolingCoilType_Num != CoilDX_CoolingTwoStageWHumControl && UnitarySystem( UnitarySysNum ).DehumidControlType_Num == DehumidControl_Multimode ) {
-				ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-				ShowContinueError( "Illegal " + trim( cAlphaFields( iDehumidControlAlphaNum ) ) + " = " + trim( Alphas( iDehumidControlAlphaNum ) ) );
+				ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+				ShowContinueError( "Illegal " + cAlphaFields( iDehumidControlAlphaNum ) + " = " + Alphas( iDehumidControlAlphaNum ) );
 				ShowContinueError( "Multimode control must be used with a Heat Exchanger Assisted or Multimode Cooling Coil." );
 				if ( lAlphaBlanks( iSuppHeatCoilNameAlphaNum ) ) {
 				} else {
@@ -6095,65 +6095,65 @@ namespace HVACUnitarySystem {
 			if ( UnitarySystem( UnitarySysNum ).FanPlace == BlowThru ) {
 
 				if ( FanInletNode != UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ) {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "When a blow through fan is specified, the fan inlet node name must be " "the same as the unitary system inlet node name." );
-					ShowContinueError( "...Fan inlet node name           = " + trim( NodeID( FanInletNode ) ) );
-					ShowContinueError( "...UnitarySystem inlet node name = " + trim( NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ) ) );
+					ShowContinueError( "...Fan inlet node name           = " + NodeID( FanInletNode ) );
+					ShowContinueError( "...UnitarySystem inlet node name = " + NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ) );
 					ErrorsFound = true;
 				}
 				if ( UnitarySystem( UnitarySysNum ).CoolingCoilUpstream ) {
 					if ( FanOutletNode != CoolingCoilInletNode && UnitarySystem( UnitarySysNum ).CoolCoilExists && UnitarySystem( UnitarySysNum ).FanExists ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "When a blow through fan is specified, the fan outlet node name must be " "the same as the cooling coil inlet node name." );
-						ShowContinueError( "...Fan outlet node name         = " + trim( NodeID( FanOutletNode ) ) );
-						ShowContinueError( "...Cooling coil inlet node name = " + trim( NodeID( CoolingCoilInletNode ) ) );
+						ShowContinueError( "...Fan outlet node name         = " + NodeID( FanOutletNode ) );
+						ShowContinueError( "...Cooling coil inlet node name = " + NodeID( CoolingCoilInletNode ) );
 						ErrorsFound = true;
 					}
 					if ( CoolingCoilOutletNode != HeatingCoilInletNode && UnitarySystem( UnitarySysNum ).CoolCoilExists && UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "The cooling coil outlet node name must be " "the same as the heating coil inlet node name." );
-						ShowContinueError( "...Cooling coil outlet node name = " + trim( NodeID( CoolingCoilOutletNode ) ) );
-						ShowContinueError( "...Heating coil inlet node name  = " + trim( NodeID( HeatingCoilInletNode ) ) );
+						ShowContinueError( "...Cooling coil outlet node name = " + NodeID( CoolingCoilOutletNode ) );
+						ShowContinueError( "...Heating coil inlet node name  = " + NodeID( HeatingCoilInletNode ) );
 						ErrorsFound = true;
 					}
 					if ( UnitarySystem( UnitarySysNum ).SuppCoilExists ) {
 						if ( SupHeatCoilOutletNode != UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) {
-							ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ShowContinueError( "The reheat coil outlet node name must be " "the same as the unitary system outlet node name." );
-							ShowContinueError( "...Reheat coil outlet node name   = " + trim( NodeID( SupHeatCoilOutletNode ) ) );
-							ShowContinueError( "...UnitarySystem outlet node name = " + trim( NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) ) );
+							ShowContinueError( "...Reheat coil outlet node name   = " + NodeID( SupHeatCoilOutletNode ) );
+							ShowContinueError( "...UnitarySystem outlet node name = " + NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) );
 							//                ErrorsFound=.TRUE.
 						}
 					} else { // IF((UnitarySystem(UnitarySysNum)%Humidistat ...
 						// Heating coil outlet node name must be the same as the Unitary system outlet node name
 						if ( UnitarySystem( UnitarySysNum ).HeatCoilExists && HeatingCoilOutletNode != UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) {
-							ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ShowContinueError( "When a blow through fan is specified, " "the heating coil outlet node name must be the same as the unitary system outlet node name." );
-							ShowContinueError( "...Heating coil outlet node name  = " + trim( NodeID( HeatingCoilOutletNode ) ) );
-							ShowContinueError( "...Unitary system outlet node name = " + trim( NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) ) );
+							ShowContinueError( "...Heating coil outlet node name  = " + NodeID( HeatingCoilOutletNode ) );
+							ShowContinueError( "...Unitary system outlet node name = " + NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) );
 							ErrorsFound = true;
 						}
 					}
 				} else { // IF(UnitarySystem(UnitarySysNum)%CoolingCoilUpstream)THEN
 					if ( FanOutletNode != HeatingCoilInletNode && UnitarySystem( UnitarySysNum ).FanExists && UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "When a blow through fan is specified, the fan outlet node name must be " "the same as the heating coil inlet node name." );
-						ShowContinueError( "...Fan outlet node name         = " + trim( NodeID( FanOutletNode ) ) );
-						ShowContinueError( "...Heating coil inlet node name = " + trim( NodeID( HeatingCoilInletNode ) ) );
+						ShowContinueError( "...Fan outlet node name         = " + NodeID( FanOutletNode ) );
+						ShowContinueError( "...Heating coil inlet node name = " + NodeID( HeatingCoilInletNode ) );
 						ErrorsFound = true;
 					}
 					if ( HeatingCoilOutletNode != CoolingCoilInletNode && UnitarySystem( UnitarySysNum ).CoolCoilExists && UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "The heating coil outlet node name must be " "the same as the cooling coil inlet node name." );
-						ShowContinueError( "...Heating coil outlet node name = " + trim( NodeID( HeatingCoilOutletNode ) ) );
-						ShowContinueError( "...Cooling coil inlet node name  = " + trim( NodeID( CoolingCoilInletNode ) ) );
+						ShowContinueError( "...Heating coil outlet node name = " + NodeID( HeatingCoilOutletNode ) );
+						ShowContinueError( "...Cooling coil inlet node name  = " + NodeID( CoolingCoilInletNode ) );
 						ErrorsFound = true;
 					}
 					if ( CoolingCoilOutletNode != UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum && UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "When a blow through fan is specified, the cooling coil outlet node name must be " "the same as the unitary system outlet node name." );
-						ShowContinueError( "...Cooling coil outlet node name   = " + trim( NodeID( CoolingCoilOutletNode ) ) );
-						ShowContinueError( "...UnitarySystem outlet node name  = " + trim( NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) ) );
+						ShowContinueError( "...Cooling coil outlet node name   = " + NodeID( CoolingCoilOutletNode ) );
+						ShowContinueError( "...UnitarySystem outlet node name  = " + NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) );
 						ErrorsFound = true;
 					}
 				}
@@ -6162,76 +6162,76 @@ namespace HVACUnitarySystem {
 
 				if ( UnitarySystem( UnitarySysNum ).CoolingCoilUpstream ) {
 					if ( CoolingCoilInletNode != UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum && CoolingCoilInletNode != 0 && UnitarySystem( UnitarySysNum ).FanExists ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "When a draw through fan is specified, the cooling coil inlet node name must be " "the same as the unitary system inlet node name." );
-						ShowContinueError( "...Cooling coil inlet node name  = " + trim( NodeID( CoolingCoilInletNode ) ) );
-						ShowContinueError( "...UnitarySystem inlet node name = " + trim( NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ) ) );
+						ShowContinueError( "...Cooling coil inlet node name  = " + NodeID( CoolingCoilInletNode ) );
+						ShowContinueError( "...UnitarySystem inlet node name = " + NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ) );
 						ErrorsFound = true;
 					}
 					if ( CoolingCoilOutletNode != HeatingCoilInletNode && UnitarySystem( UnitarySysNum ).CoolCoilExists && UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "The cooling coil outlet node name must be " "the same as the heating coil inlet node name." );
-						ShowContinueError( "...Cooling coil outlet node name = " + trim( NodeID( CoolingCoilOutletNode ) ) );
-						ShowContinueError( "...Heating coil inlet node name  = " + trim( NodeID( HeatingCoilInletNode ) ) );
+						ShowContinueError( "...Cooling coil outlet node name = " + NodeID( CoolingCoilOutletNode ) );
+						ShowContinueError( "...Heating coil inlet node name  = " + NodeID( HeatingCoilInletNode ) );
 						ErrorsFound = true;
 					}
 					if ( HeatingCoilOutletNode != FanInletNode && UnitarySystem( UnitarySysNum ).HeatCoilExists && UnitarySystem( UnitarySysNum ).FanExists ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "When a draw through fan is specified, the heating coil outlet node name must be " "the same as the fan inlet node name." );
-						ShowContinueError( "...Heating coil outlet node name = " + trim( NodeID( HeatingCoilOutletNode ) ) );
-						ShowContinueError( "...Fan inlet node name           = " + trim( NodeID( FanInletNode ) ) );
+						ShowContinueError( "...Heating coil outlet node name = " + NodeID( HeatingCoilOutletNode ) );
+						ShowContinueError( "...Fan inlet node name           = " + NodeID( FanInletNode ) );
 						ErrorsFound = true;
 					}
 					if ( UnitarySystem( UnitarySysNum ).SuppCoilExists ) {
 						if ( FanOutletNode != SupHeatCoilInletNode && UnitarySystem( UnitarySysNum ).FanExists ) {
-							ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ShowContinueError( "When a draw through fan is specified, the fan outlet node name must be " "the same as the reheat coil inlet node name." );
-							ShowContinueError( "...Fan outlet node name        = " + trim( NodeID( FanOutletNode ) ) );
-							ShowContinueError( "...Reheat coil inlet node name = " + trim( NodeID( SupHeatCoilInletNode ) ) );
+							ShowContinueError( "...Fan outlet node name        = " + NodeID( FanOutletNode ) );
+							ShowContinueError( "...Reheat coil inlet node name = " + NodeID( SupHeatCoilInletNode ) );
 							//                ErrorsFound=.TRUE.
 						}
 						if ( SupHeatCoilOutletNode != UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) {
-							ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ShowContinueError( "The reheat coil outlet node name must be " "the same as the unitary system outlet node name." );
-							ShowContinueError( "...Reheat coil outlet node name   = " + trim( NodeID( SupHeatCoilOutletNode ) ) );
-							ShowContinueError( "...UnitarySystem outlet node name = " + trim( NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) ) );
+							ShowContinueError( "...Reheat coil outlet node name   = " + NodeID( SupHeatCoilOutletNode ) );
+							ShowContinueError( "...UnitarySystem outlet node name = " + NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) );
 						}
 					} else {
 						if ( FanOutletNode != UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum && UnitarySystem( UnitarySysNum ).FanExists ) {
-							ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ShowContinueError( "When a draw through fan is specified, the fan outlet node name must be " "the same as the unitary system outlet node name." );
-							ShowContinueError( "...Fan outlet node name        = " + trim( NodeID( FanOutletNode ) ) );
-							ShowContinueError( "...Unitary system outlet node name = " + trim( NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) ) );
+							ShowContinueError( "...Fan outlet node name        = " + NodeID( FanOutletNode ) );
+							ShowContinueError( "...Unitary system outlet node name = " + NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) );
 							ErrorsFound = true;
 						}
 					}
 				} else { // IF(UnitarySystem(UnitarySysNum)%CoolingCoilUpstream)THEN
 					if ( HeatingCoilInletNode != UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum && HeatingCoilInletNode != 0 && UnitarySystem( UnitarySysNum ).FanExists ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "When a draw through fan is specified, the heating coil inlet node name must be " "the same as the unitary system inlet node name." );
-						ShowContinueError( "...Heating coil inlet node name  = " + trim( NodeID( HeatingCoilInletNode ) ) );
-						ShowContinueError( "...UnitarySystem inlet node name = " + trim( NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ) ) );
+						ShowContinueError( "...Heating coil inlet node name  = " + NodeID( HeatingCoilInletNode ) );
+						ShowContinueError( "...UnitarySystem inlet node name = " + NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ) );
 						ErrorsFound = true;
 					}
 					if ( HeatingCoilOutletNode != CoolingCoilInletNode && UnitarySystem( UnitarySysNum ).HeatCoilExists && UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "The heating coil outlet node name must be " "the same as the cooling coil inlet node name." );
-						ShowContinueError( "...Heating coil outlet node name = " + trim( NodeID( HeatingCoilOutletNode ) ) );
-						ShowContinueError( "...Cooling coil inlet node name  = " + trim( NodeID( CoolingCoilInletNode ) ) );
+						ShowContinueError( "...Heating coil outlet node name = " + NodeID( HeatingCoilOutletNode ) );
+						ShowContinueError( "...Cooling coil inlet node name  = " + NodeID( CoolingCoilInletNode ) );
 						ErrorsFound = true;
 					}
 					if ( CoolingCoilOutletNode != FanInletNode && UnitarySystem( UnitarySysNum ).CoolCoilExists && UnitarySystem( UnitarySysNum ).FanExists ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "When a draw through fan is specified, the cooling coil outlet node name must be " "the same as the fan inlet node name." );
-						ShowContinueError( "...Cooling coil outlet node name = " + trim( NodeID( CoolingCoilOutletNode ) ) );
-						ShowContinueError( "...Fan inlet node name           = " + trim( NodeID( FanInletNode ) ) );
+						ShowContinueError( "...Cooling coil outlet node name = " + NodeID( CoolingCoilOutletNode ) );
+						ShowContinueError( "...Fan inlet node name           = " + NodeID( FanInletNode ) );
 						ErrorsFound = true;
 					}
 					if ( FanOutletNode != UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum && UnitarySystem( UnitarySysNum ).FanExists ) {
-						ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "When a draw through fan is specified, the fan outlet node name must be " "the same as the unitary system outlet node name." );
-						ShowContinueError( "...Fan outlet node name           = " + trim( NodeID( FanOutletNode ) ) );
-						ShowContinueError( "...UnitarySystem outlet node name = " + trim( NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) ) );
+						ShowContinueError( "...Fan outlet node name           = " + NodeID( FanOutletNode ) );
+						ShowContinueError( "...UnitarySystem outlet node name = " + NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) );
 						ErrorsFound = true;
 					}
 				}
@@ -6278,29 +6278,29 @@ namespace HVACUnitarySystem {
 						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
 					} else {
 						if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num != CoilDX_HeatingEmpirical && UnitarySystem( UnitarySysNum ).HeatingCoilType_Num != CoilDX_MultiSpeedHeating && UnitarySystem( UnitarySysNum ).HeatingCoilType_Num != Coil_HeatingAirToAirVariableSpeed ) {
-							ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-							ShowContinueError( "When non-DX heating coils are specified, the heating air flow rate must be " "entered in " + trim( cAlphaFields( iHeatSAFMAlphaNum ) ) );
+							ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+							ShowContinueError( "When non-DX heating coils are specified, the heating air flow rate must be " "entered in " + cAlphaFields( iHeatSAFMAlphaNum ) );
 							ErrorsFound = true;
 						}
 					}
 				} else if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == 0.0 && ! UnitarySystem( UnitarySysNum ).FanExists && ! UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "When non-DX heating coils are specified, the heating air flow rate must be " "entered in " + trim( cAlphaFields( iHeatSAFMAlphaNum ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "When non-DX heating coils are specified, the heating air flow rate must be " "entered in " + cAlphaFields( iHeatSAFMAlphaNum ) );
 				}
 			}
 
 			if ( FanVolFlowRate != AutoSize && UnitarySystem( UnitarySysNum ).FanExists ) {
 				if ( FanVolFlowRate < UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow && UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow != AutoSize && UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "... air flow rate = " + trim( TrimSigDigits( FanVolFlowRate, 7 ) ) + " in fan object " + trim( FanName ) + " is less than the maximum HVAC system air flow rate in cooling mode." );
-					ShowContinueError( " The " + trim( cNumericFields( iMaxCoolAirVolFlowNumericNum ) ) + " is reset to the" " fan flow rate and the simulation continues." );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "... air flow rate = " + TrimSigDigits( FanVolFlowRate, 7 ) + " in fan object " + FanName + " is less than the maximum HVAC system air flow rate in cooling mode." );
+					ShowContinueError( " The " + cNumericFields( iMaxCoolAirVolFlowNumericNum ) + " is reset to the" " fan flow rate and the simulation continues." );
 					UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = FanVolFlowRate;
 					UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = FanVolFlowRate;
 				}
 				if ( FanVolFlowRate < UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow && UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow != AutoSize && UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "... air flow rate = " + trim( TrimSigDigits( FanVolFlowRate, 7 ) ) + " in fan object " + trim( FanName ) + " is less than the maximum HVAC system air flow rate in heating mode." );
-					ShowContinueError( " The " + trim( cNumericFields( 3 ) ) + " is reset to the" " fan flow rate and the simulation continues." );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "... air flow rate = " + TrimSigDigits( FanVolFlowRate, 7 ) + " in fan object " + FanName + " is less than the maximum HVAC system air flow rate in heating mode." );
+					ShowContinueError( " The " + cNumericFields( 3 ) + " is reset to the" " fan flow rate and the simulation continues." );
 					UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = FanVolFlowRate;
 					UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = FanVolFlowRate;
 				}
@@ -6332,7 +6332,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).MinOATCompressor = -1000.0;
 			}
 			if ( errFlag ) {
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 				ErrorsFound = true;
 			}
 
@@ -6352,7 +6352,7 @@ namespace HVACUnitarySystem {
 				}
 			}
 			if ( errFlag ) {
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 				ErrorsFound = true;
 			}
 
@@ -6396,15 +6396,15 @@ namespace HVACUnitarySystem {
 					TestCompSet( CurrentModuleObject, Alphas( iNameAlphaNum ), Alphas( iHRWaterInletNodeAlphaNum ), Alphas( iHRWaterOutletNodeAlphaNum ), "Unitary System Heat receovery Nodes" );
 
 					if ( errFlag ) {
-						ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 					}
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
-					ShowContinueError( "Illegal " + trim( cAlphaFields( iHRWaterInletNodeAlphaNum ) ) + " = " + trim( Alphas( iHRWaterInletNodeAlphaNum ) ) );
-					ShowContinueError( "Illegal " + trim( cAlphaFields( iHRWaterOutletNodeAlphaNum ) ) + " = " + trim( Alphas( iHRWaterOutletNodeAlphaNum ) ) );
-					ShowContinueError( "... heat recovery nodes must be specified when " + trim( cNumericFields( iDesignHRWaterVolFlowNumericNum ) ) + " is greater than 0." );
-					ShowContinueError( "... " + trim( cNumericFields( iDesignHRWaterVolFlowNumericNum ) ) + " = " + trim( TrimSigDigits( UnitarySystem( UnitarySysNum ).DesignHRWaterVolumeFlow, 7 ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "Illegal " + cAlphaFields( iHRWaterInletNodeAlphaNum ) + " = " + Alphas( iHRWaterInletNodeAlphaNum ) );
+					ShowContinueError( "Illegal " + cAlphaFields( iHRWaterOutletNodeAlphaNum ) + " = " + Alphas( iHRWaterOutletNodeAlphaNum ) );
+					ShowContinueError( "... heat recovery nodes must be specified when " + cNumericFields( iDesignHRWaterVolFlowNumericNum ) + " is greater than 0." );
+					ShowContinueError( "... " + cNumericFields( iDesignHRWaterVolFlowNumericNum ) + " = " + TrimSigDigits( UnitarySystem( UnitarySysNum ).DesignHRWaterVolumeFlow, 7 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -6434,17 +6434,17 @@ namespace HVACUnitarySystem {
 						UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio = 1.0;
 					}
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "... one or both of the following inputs are invalid." );
-					ShowContinueError( "Field " + trim( cAlphaFields( iDesignSpecMSHPTypeAlphaNum ) ) + " = " + trim( Alphas( iDesignSpecMSHPTypeAlphaNum ) ) );
-					ShowContinueError( "Field " + trim( cAlphaFields( iDesignSpecMSHPNameAlphaNum ) ) + " = " + trim( Alphas( iDesignSpecMSHPNameAlphaNum ) ) );
+					ShowContinueError( "Field " + cAlphaFields( iDesignSpecMSHPTypeAlphaNum ) + " = " + Alphas( iDesignSpecMSHPTypeAlphaNum ) );
+					ShowContinueError( "Field " + cAlphaFields( iDesignSpecMSHPNameAlphaNum ) + " = " + Alphas( iDesignSpecMSHPNameAlphaNum ) );
 					ErrorsFound = true;
 				}
 			} else if ( ( lAlphaBlanks( iDesignSpecMSHPTypeAlphaNum ) && ! lAlphaBlanks( iDesignSpecMSHPNameAlphaNum ) ) || ( ! lAlphaBlanks( iDesignSpecMSHPTypeAlphaNum ) && lAlphaBlanks( iDesignSpecMSHPNameAlphaNum ) ) ) {
-				ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+				ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 				ShowContinueError( "... one or both of the following inputs are invalid." );
-				ShowContinueError( "Field " + trim( cAlphaFields( iDesignSpecMSHPTypeAlphaNum ) ) + " = " + trim( Alphas( iDesignSpecMSHPTypeAlphaNum ) ) );
-				ShowContinueError( "Field " + trim( cAlphaFields( iDesignSpecMSHPNameAlphaNum ) ) + " = " + trim( Alphas( iDesignSpecMSHPNameAlphaNum ) ) );
+				ShowContinueError( "Field " + cAlphaFields( iDesignSpecMSHPTypeAlphaNum ) + " = " + Alphas( iDesignSpecMSHPTypeAlphaNum ) );
+				ShowContinueError( "Field " + cAlphaFields( iDesignSpecMSHPNameAlphaNum ) + " = " + Alphas( iDesignSpecMSHPNameAlphaNum ) );
 				ErrorsFound = true;
 			} else if ( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating > 0 ) {
 				NumOfSpeedHeating = UnitarySystem( UnitarySysNum ).NumOfSpeedHeating;
@@ -6470,7 +6470,7 @@ namespace HVACUnitarySystem {
 				if ( Index > 0 ) UnitarySystem( UnitarySysNum ).NumOfSpeedCooling = DesignSpecMSHP( Index ).NumOfSpeedCooling;
 
 				if ( UnitarySystem( UnitarySysNum ).NumOfSpeedCooling == 0 ) {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "... Cooling coil object type requires valid number of speeds for cooling to be specified" );
 					ErrorsFound = true;
 				}
@@ -6481,7 +6481,7 @@ namespace HVACUnitarySystem {
 				if ( Index > 0 ) UnitarySystem( UnitarySysNum ).NumOfSpeedHeating = DesignSpecMSHP( Index ).NumOfSpeedHeating;
 
 				if ( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating == 0 ) {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "... Heating coil object type requires valid number of speeds for heating to be specified" );
 					ErrorsFound = true;
 				}
@@ -6916,7 +6916,7 @@ namespace HVACUnitarySystem {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Fstring CompName( MaxNameLength ); // Name of Unitary System object
+		std::string CompName; // Name of Unitary System object
 		int InletNode; // DX System inlet node number
 		int OutletNode; // DX System outlet node number
 		int OpMode; // fan operating mode (cycling or constant)
@@ -7386,27 +7386,27 @@ namespace HVACUnitarySystem {
 					if ( SolFlag == -1 ) {
 						if ( std::abs( ZoneLoad - TempSensOutput ) > SmallLoad ) {
 							if ( UnitarySystem( UnitarySysNum ).MaxIterIndex == 0 ) {
-								ShowWarningMessage( "Coil control failed to converge for " + trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + ":" + trim( UnitarySystem( UnitarySysNum ).Name ) );
+								ShowWarningMessage( "Coil control failed to converge for " + UnitarySystem( UnitarySysNum ).UnitarySystemType + ':' + UnitarySystem( UnitarySysNum ).Name );
 								ShowContinueError( "  Iteration limit exceeded in calculating system sensible part-load ratio." );
-								ShowContinueErrorTimeStamp( "Sensible load to be met = " + trim( TrimSigDigits( ZoneLoad, 2 ) ) + " (watts), sensible output = " + trim( TrimSigDigits( TempSensOutput, 2 ) ) + " (watts), and the simulation continues." );
+								ShowContinueErrorTimeStamp( "Sensible load to be met = " + TrimSigDigits( ZoneLoad, 2 ) + " (watts), sensible output = " + TrimSigDigits( TempSensOutput, 2 ) + " (watts), and the simulation continues." );
 							}
-							ShowRecurringWarningErrorAtEnd( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " \"" + trim( UnitarySystem( UnitarySysNum ).Name ) + "\" - Iteration limit exceeded in calculating" " sensible part-load ratio error continues. Sensible load statistics:", UnitarySystem( UnitarySysNum ).MaxIterIndex, ZoneLoad, ZoneLoad );
+							ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Iteration limit exceeded in calculating" " sensible part-load ratio error continues. Sensible load statistics:", UnitarySystem( UnitarySysNum ).MaxIterIndex, ZoneLoad, ZoneLoad );
 						}
 					} else if ( SolFlag == -2 ) {
 						if ( UnitarySystem( UnitarySysNum ).RegulaFalsIFailedIndex == 0 ) {
-							ShowWarningMessage( "Coil control failed for " + trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + ":" + trim( UnitarySystem( UnitarySysNum ).Name ) );
+							ShowWarningMessage( "Coil control failed for " + UnitarySystem( UnitarySysNum ).UnitarySystemType + ':' + UnitarySystem( UnitarySysNum ).Name );
 							ShowContinueError( "  sensible part-load ratio determined to be outside the range of 0-1." );
-							ShowContinueErrorTimeStamp( "Sensible load to be met = " + trim( TrimSigDigits( ZoneLoad, 2 ) ) + " (watts), and the simulation continues." );
+							ShowContinueErrorTimeStamp( "Sensible load to be met = " + TrimSigDigits( ZoneLoad, 2 ) + " (watts), and the simulation continues." );
 						}
-						ShowRecurringWarningErrorAtEnd( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " \"" + trim( UnitarySystem( UnitarySysNum ).Name ) + "\" - " " sensible part-load ratio out of range error continues. Sensible load statistics:", UnitarySystem( UnitarySysNum ).RegulaFalsIFailedIndex, ZoneLoad, ZoneLoad );
+						ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - " " sensible part-load ratio out of range error continues. Sensible load statistics:", UnitarySystem( UnitarySysNum ).RegulaFalsIFailedIndex, ZoneLoad, ZoneLoad );
 					}
 				} else if ( SolFlag == -2 ) {
 					if ( UnitarySystem( UnitarySysNum ).RegulaFalsIFailedIndex == 0 ) {
-						ShowWarningMessage( "Coil control failed for " + trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + ":" + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowWarningMessage( "Coil control failed for " + UnitarySystem( UnitarySysNum ).UnitarySystemType + ':' + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "  sensible part-load ratio determined to be outside the range of 0-1." );
-						ShowContinueErrorTimeStamp( "Sensible load to be met = " + trim( TrimSigDigits( ZoneLoad, 2 ) ) + " (watts), and the simulation continues." );
+						ShowContinueErrorTimeStamp( "Sensible load to be met = " + TrimSigDigits( ZoneLoad, 2 ) + " (watts), and the simulation continues." );
 					}
-					ShowRecurringWarningErrorAtEnd( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " \"" + trim( UnitarySystem( UnitarySysNum ).Name ) + "\" - " " sensible part-load ratio out of range error continues. Sensible load statistics:", UnitarySystem( UnitarySysNum ).RegulaFalsIFailedIndex, ZoneLoad, ZoneLoad );
+					ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - " " sensible part-load ratio out of range error continues. Sensible load statistics:", UnitarySystem( UnitarySysNum ).RegulaFalsIFailedIndex, ZoneLoad, ZoneLoad );
 				} // IF (SolFlag == -1) THEN
 			} else { // load is not bounded by capacity. Leave PLR=1 or turn off unit?
 				UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac = 0.0;
@@ -7568,27 +7568,27 @@ namespace HVACUnitarySystem {
 			if ( SolFlagLat == -1 ) {
 				if ( std::abs( MoistureLoad - TempLatOutput ) > SmallLoad ) {
 					if ( UnitarySystem( UnitarySysNum ).LatMaxIterIndex == 0 ) {
-						ShowWarningMessage( "Coil control failed to converge for " + trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + ":" + trim( UnitarySystem( UnitarySysNum ).Name ) );
+						ShowWarningMessage( "Coil control failed to converge for " + UnitarySystem( UnitarySysNum ).UnitarySystemType + ':' + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "  Iteration limit exceeded in calculating system Latent part-load ratio." );
-						ShowContinueErrorTimeStamp( "Latent load to be met = " + trim( TrimSigDigits( MoistureLoad, 2 ) ) + " (watts), Latent output = " + trim( TrimSigDigits( TempLatOutput, 2 ) ) + " (watts), and the simulation continues." );
+						ShowContinueErrorTimeStamp( "Latent load to be met = " + TrimSigDigits( MoistureLoad, 2 ) + " (watts), Latent output = " + TrimSigDigits( TempLatOutput, 2 ) + " (watts), and the simulation continues." );
 					}
-					ShowRecurringWarningErrorAtEnd( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " \"" + trim( UnitarySystem( UnitarySysNum ).Name ) + "\" - Iteration limit exceeded in calculating" " Latent part-load ratio error continues. Latent load statistics:", UnitarySystem( UnitarySysNum ).LatMaxIterIndex, MoistureLoad, MoistureLoad );
+					ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Iteration limit exceeded in calculating" " Latent part-load ratio error continues. Latent load statistics:", UnitarySystem( UnitarySysNum ).LatMaxIterIndex, MoistureLoad, MoistureLoad );
 				}
 			} else if ( SolFlagLat == -2 ) {
 				if ( UnitarySystem( UnitarySysNum ).LatRegulaFalsIFailedIndex == 0 ) {
-					ShowWarningMessage( "Coil control failed for " + trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + ":" + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowWarningMessage( "Coil control failed for " + UnitarySystem( UnitarySysNum ).UnitarySystemType + ':' + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "  Latent part-load ratio determined to be outside the range of 0-1." );
-					ShowContinueErrorTimeStamp( "Latent load to be met = " + trim( TrimSigDigits( MoistureLoad, 2 ) ) + " (watts), and the simulation continues." );
+					ShowContinueErrorTimeStamp( "Latent load to be met = " + TrimSigDigits( MoistureLoad, 2 ) + " (watts), and the simulation continues." );
 				}
-				ShowRecurringWarningErrorAtEnd( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " \"" + trim( UnitarySystem( UnitarySysNum ).Name ) + "\" - " " Latent part-load ratio out of range error continues. Latent load statistics:", UnitarySystem( UnitarySysNum ).LatRegulaFalsIFailedIndex, MoistureLoad, MoistureLoad );
+				ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - " " Latent part-load ratio out of range error continues. Latent load statistics:", UnitarySystem( UnitarySysNum ).LatRegulaFalsIFailedIndex, MoistureLoad, MoistureLoad );
 			}
 		} else if ( SolFlagLat == -2 ) {
 			if ( UnitarySystem( UnitarySysNum ).LatRegulaFalsIFailedIndex == 0 ) {
-				ShowWarningMessage( "Coil control failed for " + trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + ":" + trim( UnitarySystem( UnitarySysNum ).Name ) );
+				ShowWarningMessage( "Coil control failed for " + UnitarySystem( UnitarySysNum ).UnitarySystemType + ':' + UnitarySystem( UnitarySysNum ).Name );
 				ShowContinueError( "  Latent part-load ratio determined to be outside the range of 0-1." );
-				ShowContinueErrorTimeStamp( "Latent load to be met = " + trim( TrimSigDigits( MoistureLoad, 2 ) ) + " (watts), and the simulation continues." );
+				ShowContinueErrorTimeStamp( "Latent load to be met = " + TrimSigDigits( MoistureLoad, 2 ) + " (watts), and the simulation continues." );
 			}
-			ShowRecurringWarningErrorAtEnd( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " \"" + trim( UnitarySystem( UnitarySysNum ).Name ) + "\" - " " Latent part-load ratio out of range error continues. Latent load statistics:", UnitarySystem( UnitarySysNum ).LatRegulaFalsIFailedIndex, MoistureLoad, MoistureLoad );
+			ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - " " Latent part-load ratio out of range error continues. Latent load statistics:", UnitarySystem( UnitarySysNum ).LatRegulaFalsIFailedIndex, MoistureLoad, MoistureLoad );
 		}
 
 		FullSensibleOutput = TempSensOutput;
@@ -8105,7 +8105,7 @@ namespace HVACUnitarySystem {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Fstring CompName( MaxNameLength ); // Name of Unitary System object
+		std::string CompName; // Name of Unitary System object
 		int CompIndex; // index to cooling coil
 		Real64 OutsideDryBulbTemp; // outdoor temperature (C)
 		Real64 mdot; // water side flow rate (kg/s)
@@ -8267,7 +8267,7 @@ namespace HVACUnitarySystem {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Fstring CompName( MaxNameLength ); // Name of Unitary System object
+		std::string CompName; // Name of Unitary System object
 		Real64 OutsideDryBulbTemp; // outdoor temperature (C)
 		Real64 mdot; // water side flow rate (kg/s)
 		Real64 QActual; // actual output of coil (W)
@@ -8370,7 +8370,7 @@ namespace HVACUnitarySystem {
 			UnitarySystem( UnitarySysNum ).HeatCompPartLoadRatio = PartLoadRatio * double( CompOn );
 
 		} else {
-			ShowFatalError( "CalcUnitaryHeatingSystem: Invalid Unitary System coil type = " + trim( cAllCoilTypes( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num ) ) );
+			ShowFatalError( "CalcUnitaryHeatingSystem: Invalid Unitary System coil type = " + cAllCoilTypes( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num ) );
 
 		}}
 
@@ -8422,7 +8422,7 @@ namespace HVACUnitarySystem {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Fstring CompName( MaxNameLength ); // Name of Unitary System object
+		std::string CompName; // Name of Unitary System object
 		Real64 SuppHeatCoilLoad; // load passed to supplemental heating coil (W)
 		Real64 QActual; // actual coil output (W)
 		Real64 mdot; // water coil water mass flow rate (kg/s)
@@ -8538,7 +8538,7 @@ namespace HVACUnitarySystem {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Fstring CompName( MaxNameLength ); // Name of Unitary System object
+		std::string CompName; // Name of Unitary System object
 		Real64 QActual;
 
 		CompName = UnitarySystem( UnitarySysNum ).SuppHeatCoilName;
@@ -8622,7 +8622,7 @@ namespace HVACUnitarySystem {
 		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Fstring CompName( MaxNameLength ); // Name of the DX cooling coil
+		std::string CompName; // Name of the DX cooling coil
 		//  REAL(r64)           :: NoOutput            ! Sensible capacity (outlet - inlet) when the compressor is off
 		Real64 FullOutput; // Sensible capacity (outlet - inlet) when the compressor is on
 		Real64 ReqOutput; // Sensible capacity (outlet - inlet) required to meet load or setpoint temperature
@@ -8897,23 +8897,23 @@ namespace HVACUnitarySystem {
 									if ( ! WarmupFlag ) {
 										if ( UnitarySystem( UnitarySysNum ).HXAssistedSensPLRIter < 1 ) {
 											++UnitarySystem( UnitarySysNum ).HXAssistedSensPLRIter;
-											ShowWarningError( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " - Iteration limit" " exceeded calculating DX unit sensible part-load ratio for unit = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+											ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - Iteration limit" " exceeded calculating DX unit sensible part-load ratio for unit = " + UnitarySystem( UnitarySysNum ).Name );
 											ShowContinueError( "Estimated part-load ratio   = " + RoundSigDigits( ( ReqOutput / FullOutput ), 3 ) );
 											ShowContinueError( "Calculated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
-											ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation" " continues. Occurrence info: " );
+											ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation continues. Occurrence info:" );
 										}
-										ShowRecurringWarningErrorAtEnd( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " \"" + trim( UnitarySystem( UnitarySysNum ).Name ) + "\" - Iteration limit exceeded calculating" " sensible part-load ratio error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).HXAssistedSensPLRIterIndex, PartLoadFrac, PartLoadFrac );
+										ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Iteration limit exceeded calculating" " sensible part-load ratio error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).HXAssistedSensPLRIterIndex, PartLoadFrac, PartLoadFrac );
 									}
 								} else if ( SolFla == -2 ) {
 									PartLoadFrac = ReqOutput / FullOutput;
 									if ( ! WarmupFlag ) {
 										if ( UnitarySystem( UnitarySysNum ).HXAssistedSensPLRFail < 1 ) {
 											++UnitarySystem( UnitarySysNum ).HXAssistedSensPLRFail;
-											ShowWarningError( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " - DX unit sensible part-load ratio calculation unexpectedly failed: part-load " "ratio limits exceeded, for unit = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+											ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - DX unit sensible part-load ratio calculation unexpectedly failed: part-load " "ratio limits exceeded, for unit = " + UnitarySystem( UnitarySysNum ).Name );
 											ShowContinueError( "Estimated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
-											ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation" " continues. Occurrence info: " );
+											ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation continues. Occurrence info:" );
 										}
-										ShowRecurringWarningErrorAtEnd( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " \"" + trim( UnitarySystem( UnitarySysNum ).Name ) + "\" - DX unit sensible part-load ratio calculation" " unexpectedly failed error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).HXAssistedSensPLRFailIndex, PartLoadFrac, PartLoadFrac );
+										ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - DX unit sensible part-load ratio calculation" " unexpectedly failed error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).HXAssistedSensPLRFailIndex, PartLoadFrac, PartLoadFrac );
 									}
 								}
 							} else if ( SolFla == -2 ) {
@@ -8921,11 +8921,11 @@ namespace HVACUnitarySystem {
 								if ( ! WarmupFlag ) {
 									if ( UnitarySystem( UnitarySysNum ).HXAssistedSensPLRFail2 < 1 ) {
 										++UnitarySystem( UnitarySysNum ).HXAssistedSensPLRFail2;
-										ShowWarningError( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " - DX unit sensible part-load ratio calculation failed: part-load " "ratio limits exceeded, for unit = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+										ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - DX unit sensible part-load ratio calculation failed: part-load " "ratio limits exceeded, for unit = " + UnitarySystem( UnitarySysNum ).Name );
 										ShowContinueError( "Estimated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
-										ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation" " continues. Occurrence info: " );
+										ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation continues. Occurrence info:" );
 									}
-									ShowRecurringWarningErrorAtEnd( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " \"" + trim( UnitarySystem( UnitarySysNum ).Name ) + "\" - DX unit sensible part-load ratio calculation" " failed error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).HXAssistedSensPLRFailIndex2, PartLoadFrac, PartLoadFrac );
+									ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - DX unit sensible part-load ratio calculation" " failed error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).HXAssistedSensPLRFailIndex2, PartLoadFrac, PartLoadFrac );
 								}
 							}
 							if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingHXAssisted ) UnitarySystem( UnitarySysNum ).CompPartLoadRatio = PartLoadFrac;
@@ -9007,8 +9007,8 @@ namespace HVACUnitarySystem {
 							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, CoolWatertoAirHPTempResidual, 0.0, 1.0, Par );
 
 						} else {
-							ShowMessage( " For :" + trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + "=\"" + trim( UnitarySystem( UnitarySysNum ).Name ) + "\"" );
-							ShowFatalError( "ControlCoolingSystem: Invalid cooling coil type = " + trim( cAllCoilTypes( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num ) ) );
+							ShowMessage( " For :" + UnitarySystem( UnitarySysNum ).UnitarySystemType + "=\"" + UnitarySystem( UnitarySysNum ).Name + "\"" );
+							ShowFatalError( "ControlCoolingSystem: Invalid cooling coil type = " + cAllCoilTypes( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num ) );
 
 						}}
 
@@ -9203,12 +9203,12 @@ namespace HVACUnitarySystem {
 										if ( ! WarmupFlag ) {
 											if ( UnitarySystem( UnitarySysNum ).HXAssistedCRLatPLRIter < 1 ) {
 												++UnitarySystem( UnitarySysNum ).HXAssistedCRLatPLRIter;
-												ShowWarningError( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " - Iteration limit exceeded calculating DX unit latent" " part-load ratio for unit = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+												ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - Iteration limit exceeded calculating DX unit latent" " part-load ratio for unit = " + UnitarySystem( UnitarySysNum ).Name );
 												ShowContinueError( "Estimated latent part-load ratio  = " + RoundSigDigits( ( ReqOutput / FullOutput ), 3 ) );
 												ShowContinueError( "Calculated latent part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
-												ShowContinueErrorTimeStamp( "The calculated latent part-load ratio will be used and the" " simulation continues. Occurrence info: " );
+												ShowContinueErrorTimeStamp( "The calculated latent part-load ratio will be used and the" " simulation continues. Occurrence info:" );
 											}
-											ShowRecurringWarningErrorAtEnd( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " \"" + trim( UnitarySystem( UnitarySysNum ).Name ) + "\" - Iteration limit exceeded calculating" " latent part-load ratio error continues. Latent PLR statistics follow.", UnitarySystem( UnitarySysNum ).HXAssistedCRLatPLRIterIndex, PartLoadFrac, PartLoadFrac );
+											ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Iteration limit exceeded calculating" " latent part-load ratio error continues. Latent PLR statistics follow.", UnitarySystem( UnitarySysNum ).HXAssistedCRLatPLRIterIndex, PartLoadFrac, PartLoadFrac );
 										}
 
 									} else if ( SolFla == -2 ) {
@@ -9217,11 +9217,11 @@ namespace HVACUnitarySystem {
 										if ( ! WarmupFlag ) {
 											if ( UnitarySystem( UnitarySysNum ).HXAssistedCRLatPLRFail < 1 ) {
 												++UnitarySystem( UnitarySysNum ).HXAssistedCRLatPLRFail;
-												ShowWarningError( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " - DX unit latent part-load ratio calculation failed unexpectedly:" " part-load ratio limits exceeded, for unit = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+												ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - DX unit latent part-load ratio calculation failed unexpectedly:" " part-load ratio limits exceeded, for unit = " + UnitarySystem( UnitarySysNum ).Name );
 												ShowContinueError( "Estimated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
-												ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation" " continues. Occurrence info: " );
+												ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation continues. Occurrence info:" );
 											}
-											ShowRecurringWarningErrorAtEnd( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " \"" + trim( UnitarySystem( UnitarySysNum ).Name ) + "\" - DX unit latent part-load ratio calculation" " failed unexpectedly error continues. Latent PLR statistics follow.", UnitarySystem( UnitarySysNum ).HXAssistedCRLatPLRFailIndex, PartLoadFrac, PartLoadFrac );
+											ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - DX unit latent part-load ratio calculation" " failed unexpectedly error continues. Latent PLR statistics follow.", UnitarySystem( UnitarySysNum ).HXAssistedCRLatPLRFailIndex, PartLoadFrac, PartLoadFrac );
 										}
 									}
 								} else if ( SolFla == -2 ) {
@@ -9229,11 +9229,11 @@ namespace HVACUnitarySystem {
 									if ( ! WarmupFlag ) {
 										if ( UnitarySystem( UnitarySysNum ).HXAssistedCRLatPLRFail2 < 1 ) {
 											++UnitarySystem( UnitarySysNum ).HXAssistedCRLatPLRFail2;
-											ShowWarningError( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " - DX unit latent part-load ratio calculation failed: part-load " "ratio limits exceeded, for unit = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+											ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - DX unit latent part-load ratio calculation failed: part-load " "ratio limits exceeded, for unit = " + UnitarySystem( UnitarySysNum ).Name );
 											ShowContinueError( "Estimated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
-											ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation" " continues. Occurrence info: " );
+											ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation continues. Occurrence info:" );
 										}
-										ShowRecurringWarningErrorAtEnd( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " \"" + trim( UnitarySystem( UnitarySysNum ).Name ) + "\" - DX unit latent part-load ratio calculation" " failed error continues. Latent PLR statistics follow.", UnitarySystem( UnitarySysNum ).HXAssistedCRLatPLRFailIndex2, PartLoadFrac, PartLoadFrac );
+										ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - DX unit latent part-load ratio calculation" " failed error continues. Latent PLR statistics follow.", UnitarySystem( UnitarySysNum ).HXAssistedCRLatPLRFailIndex2, PartLoadFrac, PartLoadFrac );
 									}
 								}
 							}
@@ -9373,12 +9373,12 @@ namespace HVACUnitarySystem {
 			if ( ! WarmupFlag ) {
 				if ( UnitarySystem( UnitarySysNum ).SensPLRIter < 1 ) {
 					++UnitarySystem( UnitarySysNum ).SensPLRIter;
-					ShowWarningError( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " - Iteration limit exceeded calculating " "part-load ratio for unit = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - Iteration limit exceeded calculating " "part-load ratio for unit = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "Estimated part-load ratio  = " + RoundSigDigits( ( ReqOutput / FullOutput ), 3 ) );
 					ShowContinueError( "Calculated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
-					ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation" " continues. Occurrence info: " );
+					ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation continues. Occurrence info:" );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " \"" + trim( UnitarySystem( UnitarySysNum ).Name ) + "\" - Iteration limit exceeded calculating" " sensible part-load ratio error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).SensPLRIterIndex, PartLoadFrac, PartLoadFrac );
+					ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Iteration limit exceeded calculating" " sensible part-load ratio error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).SensPLRIterIndex, PartLoadFrac, PartLoadFrac );
 				}
 			}
 		} else if ( SolFla == -2 ) {
@@ -9386,11 +9386,11 @@ namespace HVACUnitarySystem {
 			if ( ! WarmupFlag ) {
 				if ( UnitarySystem( UnitarySysNum ).SensPLRFail < 1 ) {
 					++UnitarySystem( UnitarySysNum ).SensPLRFail;
-					ShowWarningError( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " - sensible part-" "load ratio calculation failed: part-load ratio limits exceeded, for unit = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - sensible part-" "load ratio calculation failed: part-load ratio limits exceeded, for unit = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "Estimated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
-					ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation" " continues. Occurrence info: " );
+					ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation continues. Occurrence info:" );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " \"" + trim( UnitarySystem( UnitarySysNum ).Name ) + "\" - sensible part-load ratio calculation" " failed error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).SensPLRFailIndex, PartLoadFrac, PartLoadFrac );
+					ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - sensible part-load ratio calculation" " failed error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).SensPLRFailIndex, PartLoadFrac, PartLoadFrac );
 				}
 			}
 		}
@@ -9399,12 +9399,12 @@ namespace HVACUnitarySystem {
 			if ( ! WarmupFlag ) {
 				if ( UnitarySystem( UnitarySysNum ).LatPLRIter < 1 ) {
 					++UnitarySystem( UnitarySysNum ).LatPLRIter;
-					ShowWarningError( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " - Iteration limit exceeded calculating latent part-load" " ratio for unit = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - Iteration limit exceeded calculating latent part-load" " ratio for unit = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "Estimated part-load ratio   = " + RoundSigDigits( ( ReqOutput / FullOutput ), 3 ) );
 					ShowContinueError( "Calculated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
-					ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation" " continues. Occurrence info: " );
+					ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation continues. Occurrence info:" );
 				}
-				ShowRecurringWarningErrorAtEnd( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " \"" + trim( UnitarySystem( UnitarySysNum ).Name ) + "\" - Iteration limit exceeded calculating" " latent part-load ratio error continues. Latent PLR statistics follow.", UnitarySystem( UnitarySysNum ).LatPLRIterIndex, PartLoadFrac, PartLoadFrac );
+				ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Iteration limit exceeded calculating" " latent part-load ratio error continues. Latent PLR statistics follow.", UnitarySystem( UnitarySysNum ).LatPLRIterIndex, PartLoadFrac, PartLoadFrac );
 			}
 		} else if ( SolFlaLat == -2 && SolFla != -2 ) {
 			//               RegulaFalsi returns PLR = minPLR when a solution cannot be found, recalculate PartLoadFrac.
@@ -9416,11 +9416,11 @@ namespace HVACUnitarySystem {
 			if ( ! WarmupFlag ) {
 				if ( UnitarySystem( UnitarySysNum ).LatPLRFail < 1 ) {
 					++UnitarySystem( UnitarySysNum ).LatPLRFail;
-					ShowWarningError( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " - latent part-" "load ratio calculation failed: part-load ratio limits exceeded, for unit = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - latent part-" "load ratio calculation failed: part-load ratio limits exceeded, for unit = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "Estimated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
-					ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation" " continues. Occurrence info: " );
+					ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation continues. Occurrence info:" );
 				}
-				ShowRecurringWarningErrorAtEnd( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " \"" + trim( UnitarySystem( UnitarySysNum ).Name ) + "\" - latent part-load ratio calculation" " failed error continues. Latent PLR statistics follow.", UnitarySystem( UnitarySysNum ).LatPLRFailIndex, PartLoadFrac, PartLoadFrac );
+				ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - latent part-load ratio calculation" " failed error continues. Latent PLR statistics follow.", UnitarySystem( UnitarySysNum ).LatPLRFailIndex, PartLoadFrac, PartLoadFrac );
 			}
 		}
 		//Set the final results
@@ -9497,7 +9497,7 @@ namespace HVACUnitarySystem {
 		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Fstring CompName( MaxNameLength ); // Name of the heating coil
+		std::string CompName; // Name of the heating coil
 		int CompIndex; // Index to the heating coil
 		//  REAL(r64)           :: NoOutput            ! Sensible capacity (outlet - inlet) when the compressor is off
 		Real64 FullOutput; // Sensible capacity (outlet - inlet) when the compressor is on
@@ -9805,8 +9805,8 @@ namespace HVACUnitarySystem {
 							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, HeatWatertoAirHPTempResidual, 0.0, 1.0, Par );
 
 						} else {
-							ShowMessage( " For :" + trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + "=\"" + trim( UnitarySystem( UnitarySysNum ).Name ) + "\"" );
-							ShowFatalError( "ControlHeatingSystem: Invalid heating coil type = " + trim( cAllCoilTypes( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num ) ) );
+							ShowMessage( " For :" + UnitarySystem( UnitarySysNum ).UnitarySystemType + "=\"" + UnitarySystem( UnitarySysNum ).Name + "\"" );
+							ShowFatalError( "ControlHeatingSystem: Invalid heating coil type = " + cAllCoilTypes( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num ) );
 
 						}}
 					}
@@ -9824,12 +9824,12 @@ namespace HVACUnitarySystem {
 			if ( ! WarmupFlag ) {
 				if ( UnitarySystem( UnitarySysNum ).HeatCoilSensPLRIter < 1 ) {
 					++UnitarySystem( UnitarySysNum ).HeatCoilSensPLRIter;
-					ShowWarningError( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " - Iteration limit exceeded calculating sensible " "part-load ratio for unit = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - Iteration limit exceeded calculating sensible " "part-load ratio for unit = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "Estimated part-load ratio  = " + RoundSigDigits( ( ReqOutput / FullOutput ), 3 ) );
 					ShowContinueError( "Calculated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
-					ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation" " continues. Occurrence info: " );
+					ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation continues. Occurrence info:" );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " \"" + trim( UnitarySystem( UnitarySysNum ).Name ) + "\" - Iteration limit exceeded calculating" " sensible part-load ratio error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).HeatCoilSensPLRIterIndex, PartLoadFrac, PartLoadFrac );
+					ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Iteration limit exceeded calculating" " sensible part-load ratio error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).HeatCoilSensPLRIterIndex, PartLoadFrac, PartLoadFrac );
 				}
 			}
 		} else if ( SolFla == -2 ) {
@@ -9837,11 +9837,11 @@ namespace HVACUnitarySystem {
 			if ( ! WarmupFlag ) {
 				if ( UnitarySystem( UnitarySysNum ).HeatCoilSensPLRFail < 1 ) {
 					++UnitarySystem( UnitarySysNum ).HeatCoilSensPLRFail;
-					ShowWarningError( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " - sensible part-" "load ratio calculation failed: part-load ratio limits exceeded, for unit = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - sensible part-" "load ratio calculation failed: part-load ratio limits exceeded, for unit = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "Estimated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
-					ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation" " continues. Occurrence info: " );
+					ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation continues. Occurrence info:" );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " \"" + trim( UnitarySystem( UnitarySysNum ).Name ) + "\" - sensible part-load ratio calculation" " failed error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).HeatCoilSensPLRFailIndex, PartLoadFrac, PartLoadFrac );
+					ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - sensible part-load ratio calculation" " failed error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).HeatCoilSensPLRFailIndex, PartLoadFrac, PartLoadFrac );
 				}
 			}
 		}
@@ -9906,7 +9906,7 @@ namespace HVACUnitarySystem {
 		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Fstring CompName( MaxNameLength ); // Name of the heating coil
+		std::string CompName; // Name of the heating coil
 		int CompIndex; // Index to the heating coil
 		//  REAL(r64)           :: NoOutput            ! Sensible capacity (outlet - inlet) when the compressor is off
 		Real64 FullOutput; // Sensible capacity (outlet - inlet) when the compressor is on
@@ -10099,12 +10099,12 @@ namespace HVACUnitarySystem {
 			if ( ! WarmupFlag ) {
 				if ( UnitarySystem( UnitarySysNum ).SuppHeatCoilSensPLRIter < 1 ) {
 					++UnitarySystem( UnitarySysNum ).SuppHeatCoilSensPLRIter;
-					ShowWarningError( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " - Iteration limit exceeded calculating sensible " "part-load ratio for unit = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - Iteration limit exceeded calculating sensible " "part-load ratio for unit = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "Estimated part-load ratio  = " + RoundSigDigits( ( ReqOutput / FullOutput ), 3 ) );
 					ShowContinueError( "Calculated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
-					ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation" " continues. Occurrence info: " );
+					ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation continues. Occurrence info:" );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " \"" + trim( UnitarySystem( UnitarySysNum ).Name ) + "\" - Iteration limit exceeded calculating" " sensible part-load ratio error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).SuppHeatCoilSensPLRIterIndex, PartLoadFrac, PartLoadFrac );
+					ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Iteration limit exceeded calculating" " sensible part-load ratio error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).SuppHeatCoilSensPLRIterIndex, PartLoadFrac, PartLoadFrac );
 				}
 			} // IF(.NOT. WarmupFlag)THEN
 		} else if ( SolFla == -2 ) {
@@ -10112,11 +10112,11 @@ namespace HVACUnitarySystem {
 			if ( ! WarmupFlag ) {
 				if ( UnitarySystem( UnitarySysNum ).SuppHeatCoilSensPLRFail < 1 ) {
 					++UnitarySystem( UnitarySysNum ).SuppHeatCoilSensPLRFail;
-					ShowWarningError( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " - sensible part-" "load ratio calculation failed: part-load ratio limits exceeded, for unit = " + trim( UnitarySystem( UnitarySysNum ).Name ) );
+					ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - sensible part-" "load ratio calculation failed: part-load ratio limits exceeded, for unit = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "Estimated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
-					ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation" " continues. Occurrence info: " );
+					ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation continues. Occurrence info:" );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( UnitarySystem( UnitarySysNum ).UnitarySystemType ) + " \"" + trim( UnitarySystem( UnitarySysNum ).Name ) + "\" - sensible part-load ratio calculation" " failed error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).SuppHeatCoilSensPLRFailIndex, PartLoadFrac, PartLoadFrac );
+					ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - sensible part-load ratio calculation" " failed error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).SuppHeatCoilSensPLRFailIndex, PartLoadFrac, PartLoadFrac );
 				}
 			} // IF(.NOT. WarmupFlag)THEN
 		} // IF (SolFla == -1) THEN
@@ -10167,7 +10167,7 @@ namespace HVACUnitarySystem {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Fstring CompName( MaxNameLength ); // Name of Unitary System object
+		std::string CompName; // Name of Unitary System object
 		Real64 mdot;
 
 		if ( CoilType == CoolingCoil ) {
@@ -10236,7 +10236,7 @@ namespace HVACUnitarySystem {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Fstring CompName( MaxNameLength ); // Name of Unitary System object
+		std::string CompName; // Name of Unitary System object
 		Real64 mdot;
 
 		if ( CoilType == HeatingCoil ) {
@@ -10307,7 +10307,7 @@ namespace HVACUnitarySystem {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Fstring CompName( MaxNameLength ); // Name of Unitary System object
+		std::string CompName; // Name of Unitary System object
 		Real64 dummy;
 		Real64 SensLoad;
 		Real64 LatLoad;
@@ -13212,7 +13212,7 @@ namespace HVACUnitarySystem {
 	}
 
 	void
-	CheckUnitarySysCoilInOASysExists( Fstring const & UnitarySysName )
+	CheckUnitarySysCoilInOASysExists( std::string const & UnitarySysName )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -13235,7 +13235,7 @@ namespace HVACUnitarySystem {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "CheckUnitarySysCoilInOASysExists: " ); // include trailing blank space
+		static std::string const RoutineName( "CheckUnitarySysCoilInOASysExists: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -13259,17 +13259,17 @@ namespace HVACUnitarySystem {
 					SetDXCoilTypeData( UnitarySystem( UnitarySysNum ).CoolingCoilName );
 				}
 			} else {
-				ShowSevereError( trim( RoutineName ) + "System not found = AirloopHVAC:UnitarySystem \"" + trim( UnitarySysName ) + "\"" );
+				ShowSevereError( RoutineName + "System not found = AirloopHVAC:UnitarySystem \"" + UnitarySysName + "\"" );
 			}
 		} else {
-			ShowSevereError( trim( RoutineName ) + "System not found = AirloopHVAC:UnitarySystem \"" + trim( UnitarySysName ) + "\"" );
+			ShowSevereError( RoutineName + "System not found = AirloopHVAC:UnitarySystem \"" + UnitarySysName + "\"" );
 		}
 
 	}
 
 	void
 	GetUnitarySystemOAHeatCoolCoil(
-		Fstring const & UnitarySystemName, // Name of Unitary System object
+		std::string const & UnitarySystemName, // Name of Unitary System object
 		Optional_bool OACoolingCoil, // Cooling coil in OA stream
 		Optional_bool OAHeatingCoil // Heating coil in OA stream
 	)
@@ -13327,7 +13327,7 @@ namespace HVACUnitarySystem {
 	}
 
 	int
-	GetUnitarySystemDXCoolingCoilIndex( Fstring const & UnitarySystemName ) // Name of Unitary System object
+	GetUnitarySystemDXCoolingCoilIndex( std::string const & UnitarySystemName ) // Name of Unitary System object
 	{
 
 		// FUNCTION INFORMATION:

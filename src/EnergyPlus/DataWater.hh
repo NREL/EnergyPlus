@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace DataWater {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// -only module should be available to other modules and routines.
@@ -67,19 +65,19 @@ namespace DataWater {
 	{
 		// Members
 		// user input data
-		Fstring Name; // name of this Storage Tank
-		Fstring QualitySubCategoryName; // name of water subcategory
+		std::string Name; // name of this Storage Tank
+		std::string QualitySubCategoryName; // name of water subcategory
 		//   INTEGER                      :: QualitySubCategory = 0 !
 		Real64 MaxCapacity; // tank capacity Limit [m3]
 		int OverflowMode;
-		Fstring OverflowTankName;
+		std::string OverflowTankName;
 		int OverflowTankID;
 		int OverflowTankSupplyARRID;
 		Real64 ValveOnCapacity; // tank capacity at lower control range [m3]
 		Real64 ValveOffCapacity; // tank capacity at upper control range [m3]
 		int ControlSupplyType; // mode for tank controlled resupply
 		int GroundWellID; // index "pointer" to well if present
-		Fstring SupplyTankName;
+		std::string SupplyTankName;
 		int SupplyTankID;
 		int SupplyTankDemandARRID;
 		Real64 BackupMainsCapacity;
@@ -95,7 +93,7 @@ namespace DataWater {
 		Real64 UValue; // U-value for tank [W/m2-k]
 		Real64 SurfArea; // surface are of tank on Zone side... [m2]
 		int InternalMassID; // index "pointer" to internal mass object for thermal coupling
-		Fstring SurfMaterialName; // surface properties
+		std::string SurfMaterialName; // surface properties
 		// calculated data and from elsewhere
 		Real64 ThisTimeStepVolume;
 		Real64 LastTimeStepVolume;
@@ -103,13 +101,13 @@ namespace DataWater {
 		int NumWaterSupplies;
 		FArray1D< Real64 > VdotAvailSupply; // Each supply component has its own term
 		FArray1D< Real64 > TwaterSupply; // Each supply component has its own term
-		FArray1D_Fstring SupplyCompNames;
-		FArray1D_Fstring SupplyCompTypes;
+		FArray1D_string SupplyCompNames;
+		FArray1D_string SupplyCompTypes;
 		int NumWaterDemands;
 		FArray1D< Real64 > VdotRequestDemand; // each demand componennt has a slot
 		FArray1D< Real64 > VdotAvailDemand; // each demand componennt has a slot
-		FArray1D_Fstring DemandCompNames;
-		FArray1D_Fstring DemandCompTypes;
+		FArray1D_string DemandCompNames;
+		FArray1D_string DemandCompTypes;
 		Real64 VdotFromTank;
 		Real64 VdotToTank;
 		Real64 VdotOverflow;
@@ -128,18 +126,14 @@ namespace DataWater {
 
 		// Default Constructor
 		StorageTankDataStruct() :
-			Name( MaxNameLength ),
-			QualitySubCategoryName( MaxNameLength ),
 			MaxCapacity( 0.0 ),
 			OverflowMode( 0 ),
-			OverflowTankName( MaxNameLength ),
 			OverflowTankID( 0 ),
 			OverflowTankSupplyARRID( 0 ),
 			ValveOnCapacity( 0.0 ),
 			ValveOffCapacity( 0.0 ),
 			ControlSupplyType( 0 ),
 			GroundWellID( 0 ),
-			SupplyTankName( MaxNameLength ),
 			SupplyTankID( 0 ),
 			SupplyTankDemandARRID( 0 ),
 			BackupMainsCapacity( 0.0 ),
@@ -155,16 +149,11 @@ namespace DataWater {
 			UValue( 0.0 ),
 			SurfArea( 0.0 ),
 			InternalMassID( 0 ),
-			SurfMaterialName( MaxNameLength ),
 			ThisTimeStepVolume( 0.0 ),
 			LastTimeStepVolume( 0.0 ),
 			LastTimeStepTemp( 0.0 ),
 			NumWaterSupplies( 0 ),
-			SupplyCompNames( sFstring( MaxNameLength ) ),
-			SupplyCompTypes( sFstring( MaxNameLength ) ),
 			NumWaterDemands( 0 ),
-			DemandCompNames( sFstring( MaxNameLength ) ),
-			DemandCompTypes( sFstring( MaxNameLength ) ),
 			VdotFromTank( 0.0 ),
 			VdotToTank( 0.0 ),
 			VdotOverflow( 0.0 ),
@@ -183,18 +172,18 @@ namespace DataWater {
 
 		// Member Constructor
 		StorageTankDataStruct(
-			Fstring const & Name, // name of this Storage Tank
-			Fstring const & QualitySubCategoryName, // name of water subcategory
+			std::string const & Name, // name of this Storage Tank
+			std::string const & QualitySubCategoryName, // name of water subcategory
 			Real64 const MaxCapacity, // tank capacity Limit [m3]
 			int const OverflowMode,
-			Fstring const & OverflowTankName,
+			std::string const & OverflowTankName,
 			int const OverflowTankID,
 			int const OverflowTankSupplyARRID,
 			Real64 const ValveOnCapacity, // tank capacity at lower control range [m3]
 			Real64 const ValveOffCapacity, // tank capacity at upper control range [m3]
 			int const ControlSupplyType, // mode for tank controlled resupply
 			int const GroundWellID, // index "pointer" to well if present
-			Fstring const & SupplyTankName,
+			std::string const & SupplyTankName,
 			int const SupplyTankID,
 			int const SupplyTankDemandARRID,
 			Real64 const BackupMainsCapacity,
@@ -210,20 +199,20 @@ namespace DataWater {
 			Real64 const UValue, // U-value for tank [W/m2-k]
 			Real64 const SurfArea, // surface are of tank on Zone side... [m2]
 			int const InternalMassID, // index "pointer" to internal mass object for thermal coupling
-			Fstring const & SurfMaterialName, // surface properties
+			std::string const & SurfMaterialName, // surface properties
 			Real64 const ThisTimeStepVolume,
 			Real64 const LastTimeStepVolume,
 			Real64 const LastTimeStepTemp, // previous temperature of tank water
 			int const NumWaterSupplies,
 			FArray1< Real64 > const & VdotAvailSupply, // Each supply component has its own term
 			FArray1< Real64 > const & TwaterSupply, // Each supply component has its own term
-			FArray1_Fstring const & SupplyCompNames,
-			FArray1_Fstring const & SupplyCompTypes,
+			FArray1_string const & SupplyCompNames,
+			FArray1_string const & SupplyCompTypes,
 			int const NumWaterDemands,
 			FArray1< Real64 > const & VdotRequestDemand, // each demand componennt has a slot
 			FArray1< Real64 > const & VdotAvailDemand, // each demand componennt has a slot
-			FArray1_Fstring const & DemandCompNames,
-			FArray1_Fstring const & DemandCompTypes,
+			FArray1_string const & DemandCompNames,
+			FArray1_string const & DemandCompTypes,
 			Real64 const VdotFromTank,
 			Real64 const VdotToTank,
 			Real64 const VdotOverflow,
@@ -239,18 +228,18 @@ namespace DataWater {
 			Real64 const SkinLossConvect, // convective heat loss to zone [W]
 			Real64 const SkinLossRadiat // radiative heat loss to zone [W}
 		) :
-			Name( MaxNameLength, Name ),
-			QualitySubCategoryName( MaxNameLength, QualitySubCategoryName ),
+			Name( Name ),
+			QualitySubCategoryName( QualitySubCategoryName ),
 			MaxCapacity( MaxCapacity ),
 			OverflowMode( OverflowMode ),
-			OverflowTankName( MaxNameLength, OverflowTankName ),
+			OverflowTankName( OverflowTankName ),
 			OverflowTankID( OverflowTankID ),
 			OverflowTankSupplyARRID( OverflowTankSupplyARRID ),
 			ValveOnCapacity( ValveOnCapacity ),
 			ValveOffCapacity( ValveOffCapacity ),
 			ControlSupplyType( ControlSupplyType ),
 			GroundWellID( GroundWellID ),
-			SupplyTankName( MaxNameLength, SupplyTankName ),
+			SupplyTankName( SupplyTankName ),
 			SupplyTankID( SupplyTankID ),
 			SupplyTankDemandARRID( SupplyTankDemandARRID ),
 			BackupMainsCapacity( BackupMainsCapacity ),
@@ -266,7 +255,7 @@ namespace DataWater {
 			UValue( UValue ),
 			SurfArea( SurfArea ),
 			InternalMassID( InternalMassID ),
-			SurfMaterialName( MaxNameLength, SurfMaterialName ),
+			SurfMaterialName( SurfMaterialName ),
 			ThisTimeStepVolume( ThisTimeStepVolume ),
 			LastTimeStepVolume( LastTimeStepVolume ),
 			LastTimeStepTemp( LastTimeStepTemp ),
@@ -302,8 +291,8 @@ namespace DataWater {
 	{
 		// Members
 		// user input data
-		Fstring Name; // name of this rain collector
-		Fstring StorageTankName;
+		std::string Name; // name of this rain collector
+		std::string StorageTankName;
 		int StorageTankID; // index "pointer" to storage tank array
 		int StorageTankSupplyARRID;
 		int LossFactorMode; // control how loss factor(s) are entered
@@ -311,7 +300,7 @@ namespace DataWater {
 		int LossFactorSchedID; // index "pointer" to schedule
 		Real64 MaxCollectRate;
 		int NumCollectSurfs; // number of surfaces used in the collector
-		FArray1D_Fstring SurfName;
+		FArray1D_string SurfName;
 		FArray1D_int SurfID;
 		//calculated and from elsewhere
 		Real64 HorizArea; // area of surfaces in the vertical normal direction
@@ -321,8 +310,6 @@ namespace DataWater {
 
 		// Default Constructor
 		RainfallCollectorDataStruct() :
-			Name( MaxNameLength ),
-			StorageTankName( MaxNameLength ),
 			StorageTankID( 0 ),
 			StorageTankSupplyARRID( 0 ),
 			LossFactorMode( 0 ),
@@ -330,7 +317,6 @@ namespace DataWater {
 			LossFactorSchedID( 0 ),
 			MaxCollectRate( 0.0 ),
 			NumCollectSurfs( 0 ),
-			SurfName( sFstring( MaxNameLength ) ),
 			HorizArea( 0.0 ),
 			VdotAvail( 0.0 ),
 			VolCollected( 0.0 ),
@@ -339,8 +325,8 @@ namespace DataWater {
 
 		// Member Constructor
 		RainfallCollectorDataStruct(
-			Fstring const & Name, // name of this rain collector
-			Fstring const & StorageTankName,
+			std::string const & Name, // name of this rain collector
+			std::string const & StorageTankName,
 			int const StorageTankID, // index "pointer" to storage tank array
 			int const StorageTankSupplyARRID,
 			int const LossFactorMode, // control how loss factor(s) are entered
@@ -348,15 +334,15 @@ namespace DataWater {
 			int const LossFactorSchedID, // index "pointer" to schedule
 			Real64 const MaxCollectRate,
 			int const NumCollectSurfs, // number of surfaces used in the collector
-			FArray1_Fstring const & SurfName,
+			FArray1_string const & SurfName,
 			FArray1_int const & SurfID,
 			Real64 const HorizArea, // area of surfaces in the vertical normal direction
 			Real64 const VdotAvail,
 			Real64 const VolCollected,
 			Real64 const MeanHeight
 		) :
-			Name( MaxNameLength, Name ),
-			StorageTankName( MaxNameLength, StorageTankName ),
+			Name( Name ),
+			StorageTankName( StorageTankName ),
 			StorageTankID( StorageTankID ),
 			StorageTankSupplyARRID( StorageTankSupplyARRID ),
 			LossFactorMode( LossFactorMode ),
@@ -378,8 +364,8 @@ namespace DataWater {
 	{
 		// Members
 		// user input data
-		Fstring Name; // name of this
-		Fstring StorageTankName;
+		std::string Name; // name of this
+		std::string StorageTankName;
 		int StorageTankID; // index "pointer" to water storage tank
 		int StorageTankSupplyARRID; // index "pointer" to storage supply arrays
 		Real64 PumpDepth; // depth of pump  [m]
@@ -401,8 +387,6 @@ namespace DataWater {
 
 		// Default Constructor
 		GroundwaterWellDataStruct() :
-			Name( MaxNameLength ),
-			StorageTankName( MaxNameLength ),
 			StorageTankID( 0 ),
 			StorageTankSupplyARRID( 0 ),
 			PumpDepth( 0.0 ),
@@ -424,8 +408,8 @@ namespace DataWater {
 
 		// Member Constructor
 		GroundwaterWellDataStruct(
-			Fstring const & Name, // name of this
-			Fstring const & StorageTankName,
+			std::string const & Name, // name of this
+			std::string const & StorageTankName,
 			int const StorageTankID, // index "pointer" to water storage tank
 			int const StorageTankSupplyARRID, // index "pointer" to storage supply arrays
 			Real64 const PumpDepth, // depth of pump  [m]
@@ -444,8 +428,8 @@ namespace DataWater {
 			Real64 const PumpPower,
 			Real64 const PumpEnergy
 		) :
-			Name( MaxNameLength, Name ),
-			StorageTankName( MaxNameLength, StorageTankName ),
+			Name( Name ),
+			StorageTankName( StorageTankName ),
 			StorageTankID( StorageTankID ),
 			StorageTankSupplyARRID( StorageTankSupplyARRID ),
 			PumpDepth( PumpDepth ),

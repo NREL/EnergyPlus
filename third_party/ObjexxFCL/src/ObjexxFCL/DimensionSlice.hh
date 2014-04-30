@@ -54,7 +54,7 @@ public: // Creation
 	DimensionSlice( IndexSlice const & slice, std::int64_t const multiplier = 1 ) :
 		m_( slice.s() * multiplier ),
 		k_( slice.l() * multiplier - m_ ),
-		u_( slice.size() )
+		u_( static_cast< int >( slice.size() ) )
 	{
 		assert( slice.initialized() );
 		assert( multiplier <= std::numeric_limits< std::int64_t >::max() / std::abs( slice.s() ) );
@@ -65,7 +65,7 @@ public: // Creation
 	DimensionSlice( IndexSlice const & slice, size_type const multiplier ) :
 		m_( slice.s() * multiplier ),
 		k_( slice.l() * multiplier - m_ ),
-		u_( slice.size() )
+		u_( static_cast< int >( slice.size() ) )
 	{
 		assert( slice.initialized() );
 		assert( multiplier <= size_type( std::numeric_limits< std::int64_t >::max() / std::abs( slice.s() ) ) );
@@ -77,7 +77,7 @@ public: // Creation
 	DimensionSlice( IndexSlice const & slice, M const multiplier ) :
 		m_( slice.s() * multiplier ),
 		k_( slice.l() * multiplier - m_ ),
-		u_( slice.size() )
+		u_( static_cast< int >( slice.size() ) )
 	{
 		assert( slice.initialized() );
 		assert( multiplier <= std::numeric_limits< std::int64_t >::max() / std::abs( slice.s() ) );
@@ -94,7 +94,7 @@ public: // Creation
 		assert( multiplier <= std::numeric_limits< std::int64_t >::max() / std::abs( slice.s() ) );
 		m_ = slice.s() * multiplier;
 		k_ = ( slice.l() * multiplier ) - m_;
-		u_ = slice.size();
+		u_ = static_cast< int >( slice.size() );
 	}
 
 	// Index Range + Index Slice + Multiplier Constructor
@@ -108,7 +108,7 @@ public: // Creation
 		assert( multiplier <= size_type( std::numeric_limits< std::int64_t >::max() / std::abs( slice.s() ) ) );
 		m_ = slice.s() * multiplier;
 		k_ = ( slice.l() * multiplier ) - m_;
-		u_ = slice.size();
+		u_ = static_cast< int >( slice.size() );
 	}
 
 	// Index Range + Index Slice + Multiplier Constructor
@@ -123,7 +123,7 @@ public: // Creation
 		assert( multiplier <= std::numeric_limits< std::int64_t >::max() / std::abs( slice.s() ) );
 		m_ = slice.s() * multiplier;
 		k_ = ( slice.l() * multiplier ) - m_;
-		u_ = slice.size();
+		u_ = static_cast< int >( slice.size() );
 	}
 
 	// Upper Index + Index Slice + Multiplier Constructor
@@ -137,7 +137,7 @@ public: // Creation
 		assert( multiplier <= std::numeric_limits< std::int64_t >::max() / std::abs( slice.s() ) );
 		m_ = slice.s() * multiplier;
 		k_ = ( slice.l() * multiplier ) - m_;
-		u_ = slice.size();
+		u_ = static_cast< int >( slice.size() );
 	}
 
 	// Upper Index + Index Slice + Multiplier Constructor
@@ -151,7 +151,7 @@ public: // Creation
 		assert( multiplier <= size_type( std::numeric_limits< std::int64_t >::max() / std::abs( slice.s() ) ) );
 		m_ = slice.s() * multiplier;
 		k_ = ( slice.l() * multiplier ) - m_;
-		u_ = slice.size();
+		u_ = static_cast< int >( slice.size() );
 	}
 
 	// Upper Index + Index Slice + Multiplier Constructor
@@ -166,7 +166,7 @@ public: // Creation
 		assert( multiplier <= std::numeric_limits< std::int64_t >::max() / std::abs( slice.s() ) );
 		m_ = slice.s() * multiplier;
 		k_ = ( slice.l() * multiplier ) - m_;
-		u_ = slice.size();
+		u_ = static_cast< int >( slice.size() );
 	}
 
 	// Index Range + Multiplier Full Range Constructor
@@ -177,7 +177,7 @@ public: // Creation
 		assert( multiplier <= size_type( std::numeric_limits< std::int64_t >::max() ) );
 		m_ = multiplier;
 		k_ = ( range.l() - 1 ) * multiplier;
-		u_ = range.size();
+		u_ = static_cast< int >( range.size() );
 	}
 
 	// Destructor

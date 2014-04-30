@@ -55,163 +55,162 @@ namespace DataGlobalConstants {
 	int const endUseCogeneration( 14 );
 
 	// Resource Types
-	int const istrLeng( 60 );
-	Fstring const cRT_None( istrLeng, "None" );
-	Fstring const cRT_NoneUC( istrLeng, "NONE" );
+	std::string const cRT_None( "None" );
+	std::string const cRT_NoneUC( "NONE" );
 	int const iRT_None( 1000 );
-	Fstring const cRT_Electricity( istrLeng, "Electricity" );
-	Fstring const cRT_ElectricityUC( istrLeng, "ELECTRICITY" );
+	std::string const cRT_Electricity( "Electricity" );
+	std::string const cRT_ElectricityUC( "ELECTRICITY" );
 	int const iRT_Electricity( 1001 );
-	Fstring const cRT_Natural_Gas( istrLeng, "NaturalGas" );
-	Fstring const cRT_Natural_GasUC( istrLeng, "NATURALGAS" );
+	std::string const cRT_Natural_Gas( "NaturalGas" );
+	std::string const cRT_Natural_GasUC( "NATURALGAS" );
 	int const iRT_Natural_Gas( 1002 );
-	Fstring const cRT_Gas( istrLeng, "Gas" );
-	Fstring const cRT_GasUC( istrLeng, "GAS" );
+	std::string const cRT_Gas( "Gas" );
+	std::string const cRT_GasUC( "GAS" );
 	int const iRT_Gas( 1002 );
-	Fstring const cRT_Gasoline( istrLeng, "Gasoline" );
-	Fstring const cRT_GasolineUC( istrLeng, "GASOLINE" );
+	std::string const cRT_Gasoline( "Gasoline" );
+	std::string const cRT_GasolineUC( "GASOLINE" );
 	int const iRT_Gasoline( 1003 );
-	Fstring const cRT_Diesel( istrLeng, "Diesel" );
-	Fstring const cRT_DieselUC( istrLeng, "DIESEL" );
+	std::string const cRT_Diesel( "Diesel" );
+	std::string const cRT_DieselUC( "DIESEL" );
 	int const iRT_Diesel( 1004 );
-	Fstring const cRT_Coal( istrLeng, "Coal" );
-	Fstring const cRT_CoalUC( istrLeng, "COAL" );
+	std::string const cRT_Coal( "Coal" );
+	std::string const cRT_CoalUC( "COAL" );
 	int const iRT_Coal( 1005 );
-	Fstring const cRT_FuelOil_1( istrLeng, "FuelOil#1" );
-	Fstring const cRT_FuelOil_1UC( istrLeng, "FUELOIL#1" );
+	std::string const cRT_FuelOil_1( "FuelOil#1" );
+	std::string const cRT_FuelOil_1UC( "FUELOIL#1" );
 	int const iRT_FuelOil_1( 1006 );
-	Fstring const cRT_DistillateOil( istrLeng, "DistillateOil" );
-	Fstring const cRT_DistillateOilUC( istrLeng, "DISTILLATEOIL" );
+	std::string const cRT_DistillateOil( "DistillateOil" );
+	std::string const cRT_DistillateOilUC( "DISTILLATEOIL" );
 	int const iRT_DistillateOil( 1006 );
-	Fstring const cRT_FuelOil_2( istrLeng, "FuelOil#2" );
-	Fstring const cRT_FuelOil_2UC( istrLeng, "FUELOIL#2" );
+	std::string const cRT_FuelOil_2( "FuelOil#2" );
+	std::string const cRT_FuelOil_2UC( "FUELOIL#2" );
 	int const iRT_FuelOil_2( 1007 );
-	Fstring const cRT_ResidualOil( istrLeng, "ResidualOil" );
-	Fstring const cRT_ResidualOilUC( istrLeng, "RESIDUALOIL" );
+	std::string const cRT_ResidualOil( "ResidualOil" );
+	std::string const cRT_ResidualOilUC( "RESIDUALOIL" );
 	int const iRT_ResidualOil( 1007 );
-	Fstring const cRT_Propane( istrLeng, "Propane" );
-	Fstring const cRT_PropaneUC( istrLeng, "PROPANE" );
+	std::string const cRT_Propane( "Propane" );
+	std::string const cRT_PropaneUC( "PROPANE" );
 	int const iRT_Propane( 1008 );
-	Fstring const cRT_LPG( istrLeng, "LPG" );
-	Fstring const cRT_LPGUC( istrLeng, "LPG" );
+	std::string const cRT_LPG( "LPG" );
+	std::string const cRT_LPGUC( "LPG" );
 	int const iRT_LPG( 1008 );
-	Fstring const cRT_Water( istrLeng, "Water" );
-	Fstring const cRT_WaterUC( istrLeng, "WATER" );
+	std::string const cRT_Water( "Water" );
+	std::string const cRT_WaterUC( "WATER" );
 	int const iRT_Water( 1009 );
-	Fstring const cRT_EnergyTransfer( istrLeng, "EnergyTransfer" );
-	Fstring const cRT_EnergyTransferUC( istrLeng, "ENERGYTRANSFER" );
+	std::string const cRT_EnergyTransfer( "EnergyTransfer" );
+	std::string const cRT_EnergyTransferUC( "ENERGYTRANSFER" );
 	int const iRT_EnergyTransfer( 1010 );
-	Fstring const cRT_Steam( istrLeng, "Steam" );
-	Fstring const cRT_SteamUC( istrLeng, "STEAM" );
+	std::string const cRT_Steam( "Steam" );
+	std::string const cRT_SteamUC( "STEAM" );
 	int const iRT_Steam( 1011 );
-	Fstring const cRT_DistrictCooling( istrLeng, "DistrictCooling" );
-	Fstring const cRT_DistrictCoolingUC( istrLeng, "DISTRICTCOOLING" );
+	std::string const cRT_DistrictCooling( "DistrictCooling" );
+	std::string const cRT_DistrictCoolingUC( "DISTRICTCOOLING" );
 	int const iRT_DistrictCooling( 1012 );
-	Fstring const cRT_DistrictHeating( istrLeng, "DistrictHeating" );
-	Fstring const cRT_DistrictHeatingUC( istrLeng, "DISTRICTHEATING" );
+	std::string const cRT_DistrictHeating( "DistrictHeating" );
+	std::string const cRT_DistrictHeatingUC( "DISTRICTHEATING" );
 	int const iRT_DistrictHeating( 1013 );
-	Fstring const cRT_ElectricityProduced( istrLeng, "ElectricityProduced" );
-	Fstring const cRT_ElectricityProducedUC( istrLeng, "ELECTRICITYPRODUCED" );
+	std::string const cRT_ElectricityProduced( "ElectricityProduced" );
+	std::string const cRT_ElectricityProducedUC( "ELECTRICITYPRODUCED" );
 	int const iRT_ElectricityProduced( 1014 );
-	Fstring const cRT_ElectricityPurchased( istrLeng, "ElectricityPurchased" );
-	Fstring const cRT_ElectricityPurchasedUC( istrLeng, "ELECTRICITYPURCHASED" );
+	std::string const cRT_ElectricityPurchased( "ElectricityPurchased" );
+	std::string const cRT_ElectricityPurchasedUC( "ELECTRICITYPURCHASED" );
 	int const iRT_ElectricityPurchased( 1015 );
-	Fstring const cRT_ElectricitySurplusSold( istrLeng, "ElectricitySurplusSold" );
-	Fstring const cRT_ElectricitySurplusSoldUC( istrLeng, "ELECTRICITYSURPLUSSOLD" );
+	std::string const cRT_ElectricitySurplusSold( "ElectricitySurplusSold" );
+	std::string const cRT_ElectricitySurplusSoldUC( "ELECTRICITYSURPLUSSOLD" );
 	int const iRT_ElectricitySurplusSold( 1016 );
-	Fstring const cRT_ElectricityNet( istrLeng, "ElectricityNet" );
-	Fstring const cRT_ElectricityNetUC( istrLeng, "ELECTRICITYNET" );
+	std::string const cRT_ElectricityNet( "ElectricityNet" );
+	std::string const cRT_ElectricityNetUC( "ELECTRICITYNET" );
 	int const iRT_ElectricityNet( 1017 );
-	Fstring const cRT_SolarWater( istrLeng, "SolarWater" );
-	Fstring const cRT_SolarWaterUC( istrLeng, "SOLARWATER" );
+	std::string const cRT_SolarWater( "SolarWater" );
+	std::string const cRT_SolarWaterUC( "SOLARWATER" );
 	int const iRT_SolarWater( 1018 );
-	Fstring const cRT_SolarAir( istrLeng, "SolarAir" );
-	Fstring const cRT_SolarAirUC( istrLeng, "SOLARAIR" );
+	std::string const cRT_SolarAir( "SolarAir" );
+	std::string const cRT_SolarAirUC( "SOLARAIR" );
 	int const iRT_SolarAir( 1019 );
-	Fstring const cRT_SO2( istrLeng, "SO2" );
-	Fstring const cRT_SO2UC( istrLeng, "SO2" );
+	std::string const cRT_SO2( "SO2" );
+	std::string const cRT_SO2UC( "SO2" );
 	int const iRT_SO2( 1020 );
-	Fstring const cRT_NOx( istrLeng, "NOx" );
-	Fstring const cRT_NOxUC( istrLeng, "NOX" );
+	std::string const cRT_NOx( "NOx" );
+	std::string const cRT_NOxUC( "NOX" );
 	int const iRT_NOx( 1021 );
-	Fstring const cRT_N2O( istrLeng, "N2O" );
-	Fstring const cRT_N2OUC( istrLeng, "N2O" );
+	std::string const cRT_N2O( "N2O" );
+	std::string const cRT_N2OUC( "N2O" );
 	int const iRT_N2O( 1022 );
-	Fstring const cRT_PM( istrLeng, "PM" );
-	Fstring const cRT_PMUC( istrLeng, "PM" );
+	std::string const cRT_PM( "PM" );
+	std::string const cRT_PMUC( "PM" );
 	int const iRT_PM( 1023 );
-	Fstring const cRT_PM2_5( istrLeng, "PM2.5" );
-	Fstring const cRT_PM2_5UC( istrLeng, "PM2.5" );
+	std::string const cRT_PM2_5( "PM2.5" );
+	std::string const cRT_PM2_5UC( "PM2.5" );
 	int const iRT_PM2_5( 1024 );
-	Fstring const cRT_PM10( istrLeng, "PM10" );
-	Fstring const cRT_PM10UC( istrLeng, "PM10" );
+	std::string const cRT_PM10( "PM10" );
+	std::string const cRT_PM10UC( "PM10" );
 	int const iRT_PM10( 1025 );
-	Fstring const cRT_CO( istrLeng, "CO" );
-	Fstring const cRT_COUC( istrLeng, "CO" );
+	std::string const cRT_CO( "CO" );
+	std::string const cRT_COUC( "CO" );
 	int const iRT_CO( 1026 );
-	Fstring const cRT_CO2( istrLeng, "CO2" );
-	Fstring const cRT_CO2UC( istrLeng, "CO2" );
+	std::string const cRT_CO2( "CO2" );
+	std::string const cRT_CO2UC( "CO2" );
 	int const iRT_CO2( 1027 );
-	Fstring const cRT_CH4( istrLeng, "CH4" );
-	Fstring const cRT_CH4UC( istrLeng, "CH4" );
+	std::string const cRT_CH4( "CH4" );
+	std::string const cRT_CH4UC( "CH4" );
 	int const iRT_CH4( 1028 );
-	Fstring const cRT_NH3( istrLeng, "NH3" );
-	Fstring const cRT_NH3UC( istrLeng, "NH3" );
+	std::string const cRT_NH3( "NH3" );
+	std::string const cRT_NH3UC( "NH3" );
 	int const iRT_NH3( 1029 );
-	Fstring const cRT_NMVOC( istrLeng, "NMVOC" );
-	Fstring const cRT_NMVOCUC( istrLeng, "NMVOC" );
+	std::string const cRT_NMVOC( "NMVOC" );
+	std::string const cRT_NMVOCUC( "NMVOC" );
 	int const iRT_NMVOC( 1030 );
-	Fstring const cRT_Hg( istrLeng, "Hg" );
-	Fstring const cRT_HgUC( istrLeng, "HG" );
+	std::string const cRT_Hg( "Hg" );
+	std::string const cRT_HgUC( "HG" );
 	int const iRT_Hg( 1031 );
-	Fstring const cRT_Pb( istrLeng, "Pb" );
-	Fstring const cRT_PbUC( istrLeng, "PB" );
+	std::string const cRT_Pb( "Pb" );
+	std::string const cRT_PbUC( "PB" );
 	int const iRT_Pb( 1032 );
-	Fstring const cRT_NuclearHigh( istrLeng, "NuclearHigh" );
-	Fstring const cRT_NuclearHighUC( istrLeng, "NUCLEARHIGH" );
+	std::string const cRT_NuclearHigh( "NuclearHigh" );
+	std::string const cRT_NuclearHighUC( "NUCLEARHIGH" );
 	int const iRT_NuclearHigh( 1033 );
-	Fstring const cRT_NuclearLow( istrLeng, "NuclearLow" );
-	Fstring const cRT_NuclearLowUC( istrLeng, "NUCLEARLOW" );
+	std::string const cRT_NuclearLow( "NuclearLow" );
+	std::string const cRT_NuclearLowUC( "NUCLEARLOW" );
 	int const iRT_NuclearLow( 1034 );
-	Fstring const cRT_WaterEnvironmentalFactors( istrLeng, "WaterEnvironmentalFactors" );
-	Fstring const cRT_WaterEnvironmentalFactorsUC( istrLeng, "WATERENVIRONMENTALFACTORS" );
+	std::string const cRT_WaterEnvironmentalFactors( "WaterEnvironmentalFactors" );
+	std::string const cRT_WaterEnvironmentalFactorsUC( "WATERENVIRONMENTALFACTORS" );
 	int const iRT_WaterEnvironmentalFactors( 1035 );
-	Fstring const cRT_CarbonEquivalent( istrLeng, "Carbon Equivalent" );
-	Fstring const cRT_CarbonEquivalentUC( istrLeng, "CARBON EQUIVALENT" );
+	std::string const cRT_CarbonEquivalent( "Carbon Equivalent" );
+	std::string const cRT_CarbonEquivalentUC( "CARBON EQUIVALENT" );
 	int const iRT_CarbonEquivalent( 1036 );
-	Fstring const cRT_Source( istrLeng, "Source" );
-	Fstring const cRT_SourceUC( istrLeng, "SOURCE" );
+	std::string const cRT_Source( "Source" );
+	std::string const cRT_SourceUC( "SOURCE" );
 	int const iRT_Source( 1037 );
-	Fstring const cRT_PlantLoopHeatingDemand( istrLeng, "PlantLoopHeatingDemand" );
-	Fstring const cRT_PlantLoopHeatingDemandUC( istrLeng, "PLANTLOOPHEATINGDEMAND" );
+	std::string const cRT_PlantLoopHeatingDemand( "PlantLoopHeatingDemand" );
+	std::string const cRT_PlantLoopHeatingDemandUC( "PLANTLOOPHEATINGDEMAND" );
 	int const iRT_PlantLoopHeatingDemand( 1038 );
-	Fstring const cRT_PlantLoopCoolingDemand( istrLeng, "PlantLoopCoolingDemand" );
-	Fstring const cRT_PlantLoopCoolingDemandUC( istrLeng, "PLANTLOOPCOOLINGDEMAND" );
+	std::string const cRT_PlantLoopCoolingDemand( "PlantLoopCoolingDemand" );
+	std::string const cRT_PlantLoopCoolingDemandUC( "PLANTLOOPCOOLINGDEMAND" );
 	int const iRT_PlantLoopCoolingDemand( 1039 );
-	Fstring const cRT_OnSiteWater( istrLeng, "OnSiteWater" );
-	Fstring const cRT_OnSiteWaterUC( istrLeng, "ONSITEWATER" );
+	std::string const cRT_OnSiteWater( "OnSiteWater" );
+	std::string const cRT_OnSiteWaterUC( "ONSITEWATER" );
 	int const iRT_OnSiteWater( 1040 );
-	Fstring const cRT_MainsWater( istrLeng, "MainsWater" );
-	Fstring const cRT_MainsWaterUC( istrLeng, "MAINSWATER" );
+	std::string const cRT_MainsWater( "MainsWater" );
+	std::string const cRT_MainsWaterUC( "MAINSWATER" );
 	int const iRT_MainsWater( 1041 );
-	Fstring const cRT_RainWater( istrLeng, "RainWater" );
-	Fstring const cRT_RainWaterUC( istrLeng, "RAINWATER" );
+	std::string const cRT_RainWater( "RainWater" );
+	std::string const cRT_RainWaterUC( "RAINWATER" );
 	int const iRT_RainWater( 1042 );
-	Fstring const cRT_WellWater( istrLeng, "WellWater" );
-	Fstring const cRT_WellWaterUC( istrLeng, "WellWATER" );
+	std::string const cRT_WellWater( "WellWater" );
+	std::string const cRT_WellWaterUC( "WellWATER" );
 	int const iRT_WellWater( 1043 );
-	Fstring const cRT_Condensate( istrLeng, "Condensate" );
-	Fstring const cRT_CondensateUC( istrLeng, "CONDENSATE" );
+	std::string const cRT_Condensate( "Condensate" );
+	std::string const cRT_CondensateUC( "CONDENSATE" );
 	int const iRT_Condensate( 1044 );
-	Fstring const cRT_OtherFuel1( istrLeng, "OtherFuel1" );
-	Fstring const cRT_OtherFuel1UC( istrLeng, "OTHERFUEL1" );
+	std::string const cRT_OtherFuel1( "OtherFuel1" );
+	std::string const cRT_OtherFuel1UC( "OTHERFUEL1" );
 	int const iRT_OtherFuel1( 1045 );
-	Fstring const cRT_OtherFuel2( istrLeng, "OtherFuel2" );
-	Fstring const cRT_OtherFuel2UC( istrLeng, "OTHERFUEL2" );
+	std::string const cRT_OtherFuel2( "OtherFuel2" );
+	std::string const cRT_OtherFuel2UC( "OTHERFUEL2" );
 	int const iRT_OtherFuel2( 1046 );
 	int const NumOfResourceTypes( 46 );
 	int const ResourceTypeInitialOffset( 1000 ); // to reach "ValidTypes"
-	FArray1D_Fstring const cRT_ValidTypes( {0,NumOfResourceTypes}, sFstring( istrLeng ), { cRT_None, cRT_Electricity, cRT_Gas, cRT_Gasoline, cRT_Diesel, cRT_Coal, cRT_FuelOil_1, cRT_FuelOil_2, cRT_Propane, cRT_Water, cRT_EnergyTransfer, cRT_Steam, cRT_DistrictCooling, cRT_DistrictHeating, cRT_ElectricityProduced, cRT_ElectricityPurchased, cRT_ElectricitySurplusSold, cRT_ElectricityNet, cRT_SolarWater, cRT_SolarAir, cRT_SO2, cRT_NOx, cRT_N2O, cRT_PM, cRT_PM2_5, cRT_PM10, cRT_CO, cRT_CO2, cRT_CH4, cRT_NH3, cRT_NMVOC, cRT_Hg, cRT_Pb, cRT_NuclearHigh, cRT_NuclearLow, cRT_WaterEnvironmentalFactors, cRT_CarbonEquivalent, cRT_Source, cRT_PlantLoopHeatingDemand, cRT_PlantLoopCoolingDemand, cRT_OnSiteWater, cRT_MainsWater, cRT_RainWater, cRT_WellWater, cRT_Condensate, cRT_OtherFuel1, cRT_OtherFuel2 } );
+	FArray1D_string const cRT_ValidTypes( {0,NumOfResourceTypes}, { cRT_None, cRT_Electricity, cRT_Gas, cRT_Gasoline, cRT_Diesel, cRT_Coal, cRT_FuelOil_1, cRT_FuelOil_2, cRT_Propane, cRT_Water, cRT_EnergyTransfer, cRT_Steam, cRT_DistrictCooling, cRT_DistrictHeating, cRT_ElectricityProduced, cRT_ElectricityPurchased, cRT_ElectricitySurplusSold, cRT_ElectricityNet, cRT_SolarWater, cRT_SolarAir, cRT_SO2, cRT_NOx, cRT_N2O, cRT_PM, cRT_PM2_5, cRT_PM10, cRT_CO, cRT_CO2, cRT_CH4, cRT_NH3, cRT_NMVOC, cRT_Hg, cRT_Pb, cRT_NuclearHigh, cRT_NuclearLow, cRT_WaterEnvironmentalFactors, cRT_CarbonEquivalent, cRT_Source, cRT_PlantLoopHeatingDemand, cRT_PlantLoopCoolingDemand, cRT_OnSiteWater, cRT_MainsWater, cRT_RainWater, cRT_WellWater, cRT_Condensate, cRT_OtherFuel1, cRT_OtherFuel2 } );
 
 	int const iGeneratorICEngine( 1 );
 	int const iGeneratorCombTurbine( 2 );
@@ -238,7 +237,7 @@ namespace DataGlobalConstants {
 	// Functions
 
 	int
-	AssignResourceTypeNum( Fstring const & ResourceTypeChar )
+	AssignResourceTypeNum( std::string const & ResourceTypeChar )
 	{
 
 		// FUNCTION INFORMATION:
@@ -428,7 +427,7 @@ namespace DataGlobalConstants {
 
 	}
 
-	Fstring
+	std::string
 	GetResourceTypeChar( int const ResourceTypeNum )
 	{
 
@@ -448,10 +447,9 @@ namespace DataGlobalConstants {
 		// na
 
 		// Using/Aliasing
-		using DataGlobals::MaxNameLength;
 
 		// Return value
-		Fstring ResourceTypeChar( MaxNameLength );
+		std::string ResourceTypeChar;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:

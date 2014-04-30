@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,13 +13,12 @@ namespace EnergyPlus {
 namespace Humidifiers {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
 	extern int const Humidifier_Steam_Electric;
 
-	extern FArray1D_Fstring const HumidifierType;
+	extern FArray1D_string const HumidifierType;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -36,11 +34,11 @@ namespace Humidifiers {
 	struct HumidifierData
 	{
 		// Members
-		Fstring Name; // unique name of component
+		std::string Name; // unique name of component
 		//    CHARACTER(len=MaxNameLength) :: HumType           =' ' ! Type of humidifier
 		int HumType_Code; // Pointer to Humidifier in list of humidifiers
 		int EquipIndex; // Pointer to Humidifier in list of humidifiers
-		Fstring Sched; // name of availability schedule
+		std::string Sched; // name of availability schedule
 		int SchedPtr; // index of availability schedule
 		Real64 NomCapVol; // nominal capacity [m3/s of water]
 		Real64 NomCap; // nominal capacity [kg/s of water]
@@ -73,10 +71,8 @@ namespace Humidifiers {
 
 		// Default Constructor
 		HumidifierData() :
-			Name( MaxNameLength ),
 			HumType_Code( 0 ),
 			EquipIndex( 0 ),
-			Sched( MaxNameLength ),
 			SchedPtr( 0 ),
 			NomCapVol( 0.0 ),
 			NomCap( 0.0 ),
@@ -110,10 +106,10 @@ namespace Humidifiers {
 
 		// Member Constructor
 		HumidifierData(
-			Fstring const & Name, // unique name of component
+			std::string const & Name, // unique name of component
 			int const HumType_Code, // Pointer to Humidifier in list of humidifiers
 			int const EquipIndex, // Pointer to Humidifier in list of humidifiers
-			Fstring const & Sched, // name of availability schedule
+			std::string const & Sched, // name of availability schedule
 			int const SchedPtr, // index of availability schedule
 			Real64 const NomCapVol, // nominal capacity [m3/s of water]
 			Real64 const NomCap, // nominal capacity [kg/s of water]
@@ -144,10 +140,10 @@ namespace Humidifiers {
 			Real64 const StarvedSupplyVdot,
 			Real64 const StarvedSupplyVol
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			HumType_Code( HumType_Code ),
 			EquipIndex( EquipIndex ),
-			Sched( MaxNameLength, Sched ),
+			Sched( Sched ),
 			SchedPtr( SchedPtr ),
 			NomCapVol( NomCapVol ),
 			NomCap( NomCap ),
@@ -188,7 +184,7 @@ namespace Humidifiers {
 
 	void
 	SimHumidifier(
-		Fstring const & CompName, // name of the humidifier unit
+		std::string const & CompName, // name of the humidifier unit
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		int & CompIndex // Pointer to Humidifier Unit
 	);

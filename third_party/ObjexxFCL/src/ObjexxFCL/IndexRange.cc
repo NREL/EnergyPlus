@@ -154,7 +154,7 @@ namespace ObjexxFCL {
 
 // Static Data Member Definitions
 
-//#ifndef _MSC_VER // Microsoft Visual C++ extensions doesn't need or like these: Enable #ifndef block if not using /Za
+#ifndef MSC_EXTENSIONS // Define when compiling with Visual C++ extensions (not using /Za)
 
 	IndexRange::size_type const IndexRange::npos; // Unbounded "size"
 
@@ -162,6 +162,6 @@ namespace ObjexxFCL {
 
 	int const IndexRange::u_max; // Max upper index
 
-//#endif // _MSC_VER
+#endif
 
 } // ObjexxFCL

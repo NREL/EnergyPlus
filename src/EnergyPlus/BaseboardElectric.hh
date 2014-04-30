@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,11 +13,10 @@ namespace EnergyPlus {
 namespace BaseboardElectric {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
-	extern Fstring const cCMO_BBRadiator_Electric;
+	extern std::string const cCMO_BBRadiator_Electric;
 	extern Real64 const SimpConvAirFlowSpeed; // m/s
 
 	// DERIVED TYPE DEFINITIONS
@@ -35,9 +33,9 @@ namespace BaseboardElectric {
 	struct BaseboardParams
 	{
 		// Members
-		Fstring EquipName;
-		Fstring EquipType;
-		Fstring Schedule;
+		std::string EquipName;
+		std::string EquipType;
+		std::string Schedule;
 		int SchedPtr;
 		Real64 NominalCapacity;
 		Real64 BaseboardEfficiency;
@@ -51,9 +49,6 @@ namespace BaseboardElectric {
 
 		// Default Constructor
 		BaseboardParams() :
-			EquipName( MaxNameLength ),
-			EquipType( MaxNameLength ),
-			Schedule( MaxNameLength ),
 			SchedPtr( 0 ),
 			NominalCapacity( 0.0 ),
 			BaseboardEfficiency( 0.0 ),
@@ -68,9 +63,9 @@ namespace BaseboardElectric {
 
 		// Member Constructor
 		BaseboardParams(
-			Fstring const & EquipName,
-			Fstring const & EquipType,
-			Fstring const & Schedule,
+			std::string const & EquipName,
+			std::string const & EquipType,
+			std::string const & Schedule,
 			int const SchedPtr,
 			Real64 const NominalCapacity,
 			Real64 const BaseboardEfficiency,
@@ -82,9 +77,9 @@ namespace BaseboardElectric {
 			Real64 const ElecUseLoad,
 			Real64 const ElecUseRate
 		) :
-			EquipName( MaxNameLength, EquipName ),
-			EquipType( MaxNameLength, EquipType ),
-			Schedule( MaxNameLength, Schedule ),
+			EquipName( EquipName ),
+			EquipType( EquipType ),
+			Schedule( Schedule ),
 			SchedPtr( SchedPtr ),
 			NominalCapacity( NominalCapacity ),
 			BaseboardEfficiency( BaseboardEfficiency ),
@@ -106,7 +101,7 @@ namespace BaseboardElectric {
 
 	void
 	SimElectricBaseboard(
-		Fstring const & EquipName,
+		std::string const & EquipName,
 		int const ActualZoneNum,
 		int const ControlledZoneNum,
 		Real64 & PowerMet,

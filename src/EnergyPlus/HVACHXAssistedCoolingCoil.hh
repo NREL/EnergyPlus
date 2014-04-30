@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -15,7 +14,6 @@ namespace EnergyPlus {
 namespace HVACHXAssistedCoolingCoil {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
@@ -57,19 +55,19 @@ namespace HVACHXAssistedCoolingCoil {
 	struct HXAssistedCoilParameters
 	{
 		// Members
-		Fstring HXAssistedCoilType; // Type of HXAssistedCoolingCoil
+		std::string HXAssistedCoilType; // Type of HXAssistedCoolingCoil
 		int HXAssistedCoilType_Num; // Numeric equivalent for hx assisted coil
-		Fstring Name; // Name of the HXAssistedCoolingCoil
-		Fstring CoolingCoilType; // Cooling coil type must be DetailedFlatCooling
+		std::string Name; // Name of the HXAssistedCoolingCoil
+		std::string CoolingCoilType; // Cooling coil type must be DetailedFlatCooling
 		//  or Coil:DX:CoolingBypassFactorEmpirical
 		int CoolingCoilType_Num; // Numeric Equivalent for cooling coil
-		Fstring CoolingCoilName; // Cooling coil name
+		std::string CoolingCoilName; // Cooling coil name
 		int CoolingCoilIndex;
-		Fstring HeatExchangerType; // Heat Exchanger type must be HeatExchanger:AirToAir:FlatPlate,
+		std::string HeatExchangerType; // Heat Exchanger type must be HeatExchanger:AirToAir:FlatPlate,
 		// HeatExchanger:AirToAir:SensibleAndLatent or
 		// HeatExchanger:Desiccant:BalancedFlow
 		int HeatExchangerType_Num; // Numeric Equivalent for heat exchanger
-		Fstring HeatExchangerName; // Heat Exchanger name
+		std::string HeatExchangerName; // Heat Exchanger name
 		int HeatExchangerIndex; // Heat Exchanger index
 		int HXAssistedCoilInletNodeNum; // Inlet node to HXAssistedCoolingCoil compound object
 		int HXAssistedCoilOutletNodeNum; // Outlet node to HXAssistedCoolingCoil compound object
@@ -80,16 +78,10 @@ namespace HVACHXAssistedCoolingCoil {
 
 		// Default Constructor
 		HXAssistedCoilParameters() :
-			HXAssistedCoilType( MaxNameLength ),
 			HXAssistedCoilType_Num( 0 ),
-			Name( MaxNameLength ),
-			CoolingCoilType( MaxNameLength ),
 			CoolingCoilType_Num( 0 ),
-			CoolingCoilName( MaxNameLength ),
 			CoolingCoilIndex( 0 ),
-			HeatExchangerType( MaxNameLength ),
 			HeatExchangerType_Num( 0 ),
-			HeatExchangerName( MaxNameLength ),
 			HeatExchangerIndex( 0 ),
 			HXAssistedCoilInletNodeNum( 0 ),
 			HXAssistedCoilOutletNodeNum( 0 ),
@@ -101,16 +93,16 @@ namespace HVACHXAssistedCoolingCoil {
 
 		// Member Constructor
 		HXAssistedCoilParameters(
-			Fstring const & HXAssistedCoilType, // Type of HXAssistedCoolingCoil
+			std::string const & HXAssistedCoilType, // Type of HXAssistedCoolingCoil
 			int const HXAssistedCoilType_Num, // Numeric equivalent for hx assisted coil
-			Fstring const & Name, // Name of the HXAssistedCoolingCoil
-			Fstring const & CoolingCoilType, // Cooling coil type must be DetailedFlatCooling
+			std::string const & Name, // Name of the HXAssistedCoolingCoil
+			std::string const & CoolingCoilType, // Cooling coil type must be DetailedFlatCooling
 			int const CoolingCoilType_Num, // Numeric Equivalent for cooling coil
-			Fstring const & CoolingCoilName, // Cooling coil name
+			std::string const & CoolingCoilName, // Cooling coil name
 			int const CoolingCoilIndex,
-			Fstring const & HeatExchangerType, // Heat Exchanger type must be HeatExchanger:AirToAir:FlatPlate,
+			std::string const & HeatExchangerType, // Heat Exchanger type must be HeatExchanger:AirToAir:FlatPlate,
 			int const HeatExchangerType_Num, // Numeric Equivalent for heat exchanger
-			Fstring const & HeatExchangerName, // Heat Exchanger name
+			std::string const & HeatExchangerName, // Heat Exchanger name
 			int const HeatExchangerIndex, // Heat Exchanger index
 			int const HXAssistedCoilInletNodeNum, // Inlet node to HXAssistedCoolingCoil compound object
 			int const HXAssistedCoilOutletNodeNum, // Outlet node to HXAssistedCoolingCoil compound object
@@ -119,16 +111,16 @@ namespace HVACHXAssistedCoolingCoil {
 			int const MaxIterCounter, // used in warning messages
 			int const MaxIterIndex // used in warning messages
 		) :
-			HXAssistedCoilType( MaxNameLength, HXAssistedCoilType ),
+			HXAssistedCoilType( HXAssistedCoilType ),
 			HXAssistedCoilType_Num( HXAssistedCoilType_Num ),
-			Name( MaxNameLength, Name ),
-			CoolingCoilType( MaxNameLength, CoolingCoilType ),
+			Name( Name ),
+			CoolingCoilType( CoolingCoilType ),
 			CoolingCoilType_Num( CoolingCoilType_Num ),
-			CoolingCoilName( MaxNameLength, CoolingCoilName ),
+			CoolingCoilName( CoolingCoilName ),
 			CoolingCoilIndex( CoolingCoilIndex ),
-			HeatExchangerType( MaxNameLength, HeatExchangerType ),
+			HeatExchangerType( HeatExchangerType ),
 			HeatExchangerType_Num( HeatExchangerType_Num ),
-			HeatExchangerName( MaxNameLength, HeatExchangerName ),
+			HeatExchangerName( HeatExchangerName ),
 			HeatExchangerIndex( HeatExchangerIndex ),
 			HXAssistedCoilInletNodeNum( HXAssistedCoilInletNodeNum ),
 			HXAssistedCoilOutletNodeNum( HXAssistedCoilOutletNodeNum ),
@@ -147,7 +139,7 @@ namespace HVACHXAssistedCoolingCoil {
 
 	void
 	SimHXAssistedCoolingCoil(
-		Fstring const & HXAssistedCoilName, // Name of HXAssistedCoolingCoil
+		std::string const & HXAssistedCoilName, // Name of HXAssistedCoolingCoil
 		bool const FirstHVACIteration, // FirstHVACIteration flag
 		int const CompOp, // compressor operation; 1=on, 0=off
 		Real64 const PartLoadRatio, // Part load ratio of Coil:DX:CoolingBypassFactorEmpirical
@@ -194,112 +186,112 @@ namespace HVACHXAssistedCoolingCoil {
 
 	void
 	GetHXDXCoilIndex(
-		Fstring const & HXDXCoilName,
+		std::string const & HXDXCoilName,
 		int & HXDXCoilIndex,
 		bool & ErrorsFound,
-		Optional_Fstring_const CurrentModuleObject = _
+		Optional_string_const CurrentModuleObject = _
 	);
 
 	void
 	CheckHXAssistedCoolingCoilSchedule(
-		Fstring const & CompType, // unused1208
-		Fstring const & CompName,
+		std::string const & CompType, // unused1208
+		std::string const & CompName,
 		Real64 & Value,
 		int & CompIndex
 	);
 
 	Real64
 	GetCoilCapacity(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetCoilGroupTypeNum(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound, // set to true if problem
 		Optional_bool_const PrintWarning = _ // prints warning message if true
 	);
 
 	int
 	GetCoilObjectTypeNum(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound, // set to true if problem
 		Optional_bool_const PrintWarning = _ // prints warning message if true
 	);
 
 	int
 	GetCoilInletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetCoilWaterInletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetCoilOutletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
-	Fstring
+	std::string
 	GetHXDXCoilName(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetActualDXCoilIndex(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
-	Fstring
+	std::string
 	GetHXCoilType(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	void
 	GetHXCoilTypeAndName(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound, // set to true if problem
-		Fstring & CoolingCoilType, // returned type of cooling coil
-		Fstring & CoolingCoilName // returned name of cooling coil
+		std::string & CoolingCoilType, // returned type of cooling coil
+		std::string & CoolingCoilName // returned name of cooling coil
 	);
 
 	Real64
 	GetCoilMaxWaterFlowRate(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	Real64
 	GetHXCoilAirFlowRate(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	bool
 	VerifyHeatExchangerParent(
-		Fstring const & HXType, // must match coil types in this module
-		Fstring const & HXName // must match coil names for the coil type
+		std::string const & HXType, // must match coil types in this module
+		std::string const & HXName // must match coil names for the coil type
 	);
 
 	//        End of Utility subroutines for the HXAssistedCoil Module

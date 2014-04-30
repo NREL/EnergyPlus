@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,12 +13,11 @@ namespace EnergyPlus {
 namespace HeatPumpWaterToWaterCOOLING {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	extern Fstring const ModuleCompName;
-	extern Fstring const ModuleCompNameUC;
+	extern std::string const ModuleCompName;
+	extern std::string const ModuleCompNameUC;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -30,7 +28,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 	// MODULE VARIABLE DECLARATIONS:
 	extern FArray1D_bool CheckEquipName;
 
-	extern Fstring GSHPRefrigerant; // refrigerent name and index
+	extern std::string GSHPRefrigerant; // refrigerent name and index
 	extern int GSHPRefrigIndex;
 
 	extern int NumGSHPs; // number of Gshps specified in input
@@ -53,7 +51,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 	struct GshpSpecs // Needs Some Modifications talk with Dr.Fisher and decide....
 	{
 		// Members
-		Fstring Name; // user identifier
+		std::string Name; // user identifier
 		int WWHPPlantTypeOfNum;
 		bool Available; // need an array of logicals--load identifiers of available equipment
 		bool ON; // simulate the machine at it's operating part load ratio
@@ -97,7 +95,6 @@ namespace HeatPumpWaterToWaterCOOLING {
 
 		// Default Constructor
 		GshpSpecs() :
-			Name( MaxNameLength ),
 			Available( false ),
 			ON( false ),
 			COP( 0.0 ),
@@ -137,7 +134,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 
 		// Member Constructor
 		GshpSpecs(
-			Fstring const & Name, // user identifier
+			std::string const & Name, // user identifier
 			int const WWHPPlantTypeOfNum,
 			bool const Available, // need an array of logicals--load identifiers of available equipment
 			bool const ON, // simulate the machine at it's operating part load ratio
@@ -175,7 +172,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 			int const LoadBranchNum, // load side plant loop branch index
 			int const LoadCompNum // load side plant loop component index
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			WWHPPlantTypeOfNum( WWHPPlantTypeOfNum ),
 			Available( Available ),
 			ON( ON ),
@@ -291,8 +288,8 @@ namespace HeatPumpWaterToWaterCOOLING {
 
 	void
 	SimHPWatertoWaterCOOLING(
-		Fstring const & GSHPType, // type ofGSHP
-		Fstring const & GSHPName, // user specified name ofGSHP
+		std::string const & GSHPType, // type ofGSHP
+		std::string const & GSHPName, // user specified name ofGSHP
 		int & CompIndex,
 		bool const FirstHVACIteration,
 		bool & InitLoopEquip, // If not zero, calculate the max load for operating conditions
@@ -311,8 +308,8 @@ namespace HeatPumpWaterToWaterCOOLING {
 
 	void
 	CalcGshpModel(
-		Fstring const & GSHPType, // type ofGSHP
-		Fstring const & GSHPName, // user specified name ofGSHP
+		std::string const & GSHPType, // type ofGSHP
+		std::string const & GSHPName, // user specified name ofGSHP
 		int const GSHPNum, // GSHP Number
 		Real64 & MyLoad, // Operating Load
 		bool const FirstHVACIteration

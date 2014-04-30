@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray2D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -15,7 +14,6 @@ namespace EnergyPlus {
 namespace EconomicLifeCycleCost {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -76,7 +74,7 @@ namespace EconomicLifeCycleCost {
 
 	// related to LifeCycleCost:Parameters
 	extern bool LCCparamPresent; // If a LifeCycleCost:Parameters object is present
-	extern Fstring LCCname; // Name
+	extern std::string LCCname; // Name
 	extern int discountConvension; // Discounting Convention
 	extern int inflationApproach; // Inflation Approach
 	extern Real64 realDiscountRate; // Real Discount Rate
@@ -123,7 +121,7 @@ namespace EconomicLifeCycleCost {
 	extern FArray1D< Real64 > AfterTaxCashFlow;
 	extern FArray1D< Real64 > AfterTaxPresentValue;
 
-	extern FArray1D_Fstring const MonthNames;
+	extern FArray1D_string const MonthNames;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
@@ -132,8 +130,8 @@ namespace EconomicLifeCycleCost {
 	struct RecurringCostsType
 	{
 		// Members
-		Fstring name; // Name
-		Fstring lineItem; // Line Item
+		std::string name; // Name
+		std::string lineItem; // Line Item
 		int category; // Category
 		Real64 cost; // Cost
 		int startOfCosts; // Start of Costs
@@ -147,8 +145,6 @@ namespace EconomicLifeCycleCost {
 
 		// Default Constructor
 		RecurringCostsType() :
-			name( MaxNameLength ),
-			lineItem( MaxNameLength ),
 			category( costCatMaintenance ),
 			startOfCosts( startServicePeriod ),
 			yearsFromStart( 0 ),
@@ -162,8 +158,8 @@ namespace EconomicLifeCycleCost {
 
 		// Member Constructor
 		RecurringCostsType(
-			Fstring const & name, // Name
-			Fstring const & lineItem, // Line Item
+			std::string const & name, // Name
+			std::string const & lineItem, // Line Item
 			int const category, // Category
 			Real64 const cost, // Cost
 			int const startOfCosts, // Start of Costs
@@ -175,8 +171,8 @@ namespace EconomicLifeCycleCost {
 			int const totalRepeatPeriodMonths, // Total months (12 x years) + months
 			Real64 const annualEscalationRate // Annual escalation rate
 		) :
-			name( MaxNameLength, name ),
-			lineItem( MaxNameLength, lineItem ),
+			name( name ),
+			lineItem( lineItem ),
 			category( category ),
 			cost( cost ),
 			startOfCosts( startOfCosts ),
@@ -194,8 +190,8 @@ namespace EconomicLifeCycleCost {
 	struct NonrecurringCostType
 	{
 		// Members
-		Fstring name; // Name
-		Fstring lineItem; // Line Item
+		std::string name; // Name
+		std::string lineItem; // Line Item
 		int category; // Category
 		Real64 cost; // Cost
 		int startOfCosts; // Start of Costs
@@ -205,8 +201,6 @@ namespace EconomicLifeCycleCost {
 
 		// Default Constructor
 		NonrecurringCostType() :
-			name( MaxNameLength ),
-			lineItem( MaxNameLength ),
 			category( costCatConstruction ),
 			startOfCosts( startServicePeriod ),
 			yearsFromStart( 0 ),
@@ -216,8 +210,8 @@ namespace EconomicLifeCycleCost {
 
 		// Member Constructor
 		NonrecurringCostType(
-			Fstring const & name, // Name
-			Fstring const & lineItem, // Line Item
+			std::string const & name, // Name
+			std::string const & lineItem, // Line Item
 			int const category, // Category
 			Real64 const cost, // Cost
 			int const startOfCosts, // Start of Costs
@@ -225,8 +219,8 @@ namespace EconomicLifeCycleCost {
 			int const monthsFromStart, // Months from Start 0 - 11
 			int const totalMonthsFromStart // Total months (12 x years) + months
 		) :
-			name( MaxNameLength, name ),
-			lineItem( MaxNameLength, lineItem ),
+			name( name ),
+			lineItem( lineItem ),
 			category( category ),
 			cost( cost ),
 			startOfCosts( startOfCosts ),
@@ -240,7 +234,7 @@ namespace EconomicLifeCycleCost {
 	struct UsePriceEscalationType
 	{
 		// Members
-		Fstring name; // Name
+		std::string name; // Name
 		int resource; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
 		int escalationStartYear; // Escalation Start Year 1900-2100
 		int escalationStartMonth; // Escalation Start Month 1 to 12
@@ -249,20 +243,19 @@ namespace EconomicLifeCycleCost {
 
 		// Default Constructor
 		UsePriceEscalationType() :
-			name( MaxNameLength ),
 			escalationStartYear( 0 ),
 			escalationStartMonth( 0 )
 		{}
 
 		// Member Constructor
 		UsePriceEscalationType(
-			Fstring const & name, // Name
+			std::string const & name, // Name
 			int const resource, // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
 			int const escalationStartYear, // Escalation Start Year 1900-2100
 			int const escalationStartMonth, // Escalation Start Month 1 to 12
 			FArray1< Real64 > const & Escalation // Escalation by year, first year is baseDateYear
 		) :
-			name( MaxNameLength, name ),
+			name( name ),
 			resource( resource ),
 			escalationStartYear( escalationStartYear ),
 			escalationStartMonth( escalationStartMonth ),
@@ -274,23 +267,22 @@ namespace EconomicLifeCycleCost {
 	struct UseAdjustmentType
 	{
 		// Members
-		Fstring name; // Name
+		std::string name; // Name
 		int resource; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
 		FArray1D< Real64 > Adjustment; // Adjustment by year, first year is baseDateYear
 		// last year is baseDateYear + lengthStudyYears - 1
 
 		// Default Constructor
-		UseAdjustmentType() :
-			name( MaxNameLength )
+		UseAdjustmentType()
 		{}
 
 		// Member Constructor
 		UseAdjustmentType(
-			Fstring const & name, // Name
+			std::string const & name, // Name
 			int const resource, // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
 			FArray1< Real64 > const & Adjustment // Adjustment by year, first year is baseDateYear
 		) :
-			name( MaxNameLength, name ),
+			name( name ),
 			resource( resource ),
 			Adjustment( Adjustment )
 		{}
@@ -300,7 +292,7 @@ namespace EconomicLifeCycleCost {
 	struct CashFlowType
 	{
 		// Members
-		Fstring name; // Name - just for labeling output - use Category for aggregation
+		std::string name; // Name - just for labeling output - use Category for aggregation
 		int SourceKind; // 1=recurring, 2=nonrecurring, 3=resource
 		int Resource; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
 		int Category; // uses "costCat" constants above
@@ -314,13 +306,12 @@ namespace EconomicLifeCycleCost {
 
 		// Default Constructor
 		CashFlowType() :
-			name( MaxNameLength ),
 			pvKind( 0 )
 		{}
 
 		// Member Constructor
 		CashFlowType(
-			Fstring const & name, // Name - just for labeling output - use Category for aggregation
+			std::string const & name, // Name - just for labeling output - use Category for aggregation
 			int const SourceKind, // 1=recurring, 2=nonrecurring, 3=resource
 			int const Resource, // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
 			int const Category, // uses "costCat" constants above
@@ -331,7 +322,7 @@ namespace EconomicLifeCycleCost {
 			Real64 const orginalCost, // original cost from recurring, non-recurring or energy cost
 			FArray1< Real64 > const & yrPresVal // present value by year, first year is baseDateYear
 		) :
-			name( MaxNameLength, name ),
+			name( name ),
 			SourceKind( SourceKind ),
 			Resource( Resource ),
 			Category( Category ),
@@ -385,7 +376,7 @@ namespace EconomicLifeCycleCost {
 
 	int
 	MonthToMonthNumber(
-		Fstring const & inMonthString,
+		std::string const & inMonthString,
 		int const inDefaultMonth
 	);
 

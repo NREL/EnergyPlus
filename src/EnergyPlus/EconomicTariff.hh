@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1A.hh>
 #include <ObjexxFCL/FArray2D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -15,7 +14,6 @@ namespace EnergyPlus {
 namespace EconomicTariff {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//ECONOMCIS:TARIFF enumerated lists
@@ -41,8 +39,8 @@ namespace EconomicTariff {
 	extern int const conversionMCF; // thousand cubic feet
 	extern int const conversionCCF; // hundred cubic feet
 
-	extern FArray1D_Fstring const convEneStrings;
-	extern FArray1D_Fstring const convDemStrings;
+	extern FArray1D_string const convEneStrings;
+	extern FArray1D_string const convDemStrings;
 
 	extern int const demandWindowQuarter;
 	extern int const demandWindowHalf;
@@ -50,7 +48,7 @@ namespace EconomicTariff {
 	extern int const demandWindowDay;
 	extern int const demandWindowWeek;
 
-	extern FArray1D_Fstring const demWindowStrings;
+	extern FArray1D_string const demWindowStrings;
 
 	extern int const buyFromUtility;
 	extern int const sellToUtility;
@@ -222,7 +220,7 @@ namespace EconomicTariff {
 	struct EconVarType
 	{
 		// Members
-		Fstring name; // name of the economics object or variable
+		std::string name; // name of the economics object or variable
 		int tariffIndx; // index of the tariff name in the tariff array
 		int kindOfObj; // enumerated list for the kind of economics object
 		int index; // pointer to item in specific array
@@ -245,7 +243,6 @@ namespace EconomicTariff {
 
 		// Default Constructor
 		EconVarType() :
-			name( MaxNameLength ),
 			tariffIndx( 0 ),
 			kindOfObj( 0 ),
 			index( 0 ),
@@ -265,7 +262,7 @@ namespace EconomicTariff {
 
 		// Member Constructor
 		EconVarType(
-			Fstring const & name, // name of the economics object or variable
+			std::string const & name, // name of the economics object or variable
 			int const tariffIndx, // index of the tariff name in the tariff array
 			int const kindOfObj, // enumerated list for the kind of economics object
 			int const index, // pointer to item in specific array
@@ -282,7 +279,7 @@ namespace EconomicTariff {
 			bool const isReported, // flag if the econVar has been reported in the output file
 			int const varUnitType // variable unit type: energy, demand, dimensionless, currency
 		) :
-			name( MaxNameLength, name ),
+			name( name ),
 			tariffIndx( tariffIndx ),
 			kindOfObj( kindOfObj ),
 			index( index ),
@@ -305,19 +302,19 @@ namespace EconomicTariff {
 	struct TariffType
 	{
 		// Members
-		Fstring tariffName; // name of the tariff
-		Fstring reportMeter; // name of the report meter
+		std::string tariffName; // name of the tariff
+		std::string reportMeter; // name of the report meter
 		int reportMeterIndx; // index of the report meter
 		int kindElectricMtr; // kind of electric meter - see enumerated list above, 0 is not electric
 		int resourceNum; // based on list of DataGlobalConstants
 		int convChoice; // enumerated choice index of the conversion factor
 		Real64 energyConv; // energy conversion factor
 		Real64 demandConv; // demand conversion factor
-		Fstring periodSchedule; // name of the period schedule (time of day)
+		std::string periodSchedule; // name of the period schedule (time of day)
 		int periodSchIndex; // index to the period schedule
-		Fstring seasonSchedule; // name of the season schedule (winter/summer)
+		std::string seasonSchedule; // name of the season schedule (winter/summer)
 		int seasonSchIndex; // index to the season schedule
-		Fstring monthSchedule; // name of month schedule (when months end)
+		std::string monthSchedule; // name of month schedule (when months end)
 		int monthSchIndex; // index to the month schedule
 		int demandWindow; // enumerated list of the kind of demand window
 		Real64 demWinTime; // length of time for the demand window
@@ -327,12 +324,12 @@ namespace EconomicTariff {
 		Real64 minMonthChgVal; // minimum monthly charge value
 		int minMonthChgPt; // pointer to a variable that contains the minimum monthly charge
 		//if 0 then use minMonthChgVal
-		Fstring chargeSchedule; // name of the charge schedule (for real time pricing)
+		std::string chargeSchedule; // name of the charge schedule (for real time pricing)
 		int chargeSchIndex; // index to the charge schedule
-		Fstring baseUseSchedule; // name of the baseline use schedule (for real time pricing)
+		std::string baseUseSchedule; // name of the baseline use schedule (for real time pricing)
 		int baseUseSchIndex; // index to the baseline use schedule
-		Fstring groupName; // name of the group
-		Fstring monetaryUnit; // text string representing monetary unit, usually $
+		std::string groupName; // name of the group
+		std::string monetaryUnit; // text string representing monetary unit, usually $
 		int buyOrSell; // enumerated choice index of the buy or sell options
 		// index to the first and last category variables
 		int firstCategory; // first category referenced
@@ -412,19 +409,14 @@ namespace EconomicTariff {
 
 		// Default Constructor
 		TariffType() :
-			tariffName( MaxNameLength ),
-			reportMeter( MaxNameLength ),
 			reportMeterIndx( 0 ),
 			kindElectricMtr( 0 ),
 			resourceNum( 0 ),
 			convChoice( 0 ),
 			energyConv( 0.0 ),
 			demandConv( 0.0 ),
-			periodSchedule( MaxNameLength ),
 			periodSchIndex( 0 ),
-			seasonSchedule( MaxNameLength ),
 			seasonSchIndex( 0 ),
-			monthSchedule( MaxNameLength ),
 			monthSchIndex( 0 ),
 			demandWindow( 0 ),
 			demWinTime( 0.0 ),
@@ -432,12 +424,8 @@ namespace EconomicTariff {
 			monthChgPt( 0 ),
 			minMonthChgVal( 0.0 ),
 			minMonthChgPt( 0 ),
-			chargeSchedule( MaxNameLength ),
 			chargeSchIndex( 0 ),
-			baseUseSchedule( MaxNameLength ),
 			baseUseSchIndex( 0 ),
-			groupName( MaxNameLength ),
-			monetaryUnit( MaxNameLength ),
 			buyOrSell( 0 ),
 			firstCategory( 0 ),
 			lastCategory( 0 ),
@@ -509,19 +497,19 @@ namespace EconomicTariff {
 
 		// Member Constructor
 		TariffType(
-			Fstring const & tariffName, // name of the tariff
-			Fstring const & reportMeter, // name of the report meter
+			std::string const & tariffName, // name of the tariff
+			std::string const & reportMeter, // name of the report meter
 			int const reportMeterIndx, // index of the report meter
 			int const kindElectricMtr, // kind of electric meter - see enumerated list above, 0 is not electric
 			int const resourceNum, // based on list of DataGlobalConstants
 			int const convChoice, // enumerated choice index of the conversion factor
 			Real64 const energyConv, // energy conversion factor
 			Real64 const demandConv, // demand conversion factor
-			Fstring const & periodSchedule, // name of the period schedule (time of day)
+			std::string const & periodSchedule, // name of the period schedule (time of day)
 			int const periodSchIndex, // index to the period schedule
-			Fstring const & seasonSchedule, // name of the season schedule (winter/summer)
+			std::string const & seasonSchedule, // name of the season schedule (winter/summer)
 			int const seasonSchIndex, // index to the season schedule
-			Fstring const & monthSchedule, // name of month schedule (when months end)
+			std::string const & monthSchedule, // name of month schedule (when months end)
 			int const monthSchIndex, // index to the month schedule
 			int const demandWindow, // enumerated list of the kind of demand window
 			Real64 const demWinTime, // length of time for the demand window
@@ -529,12 +517,12 @@ namespace EconomicTariff {
 			int const monthChgPt, // pointer to a variable that contains the monthly charge
 			Real64 const minMonthChgVal, // minimum monthly charge value
 			int const minMonthChgPt, // pointer to a variable that contains the minimum monthly charge
-			Fstring const & chargeSchedule, // name of the charge schedule (for real time pricing)
+			std::string const & chargeSchedule, // name of the charge schedule (for real time pricing)
 			int const chargeSchIndex, // index to the charge schedule
-			Fstring const & baseUseSchedule, // name of the baseline use schedule (for real time pricing)
+			std::string const & baseUseSchedule, // name of the baseline use schedule (for real time pricing)
 			int const baseUseSchIndex, // index to the baseline use schedule
-			Fstring const & groupName, // name of the group
-			Fstring const & monetaryUnit, // text string representing monetary unit, usually $
+			std::string const & groupName, // name of the group
+			std::string const & monetaryUnit, // text string representing monetary unit, usually $
 			int const buyOrSell, // enumerated choice index of the buy or sell options
 			int const firstCategory, // first category referenced
 			int const lastCategory, // last category referenced
@@ -603,19 +591,19 @@ namespace EconomicTariff {
 			Real64 const totalAnnualCost,
 			Real64 const totalAnnualEnergy
 		) :
-			tariffName( MaxNameLength, tariffName ),
-			reportMeter( MaxNameLength, reportMeter ),
+			tariffName( tariffName ),
+			reportMeter( reportMeter ),
 			reportMeterIndx( reportMeterIndx ),
 			kindElectricMtr( kindElectricMtr ),
 			resourceNum( resourceNum ),
 			convChoice( convChoice ),
 			energyConv( energyConv ),
 			demandConv( demandConv ),
-			periodSchedule( MaxNameLength, periodSchedule ),
+			periodSchedule( periodSchedule ),
 			periodSchIndex( periodSchIndex ),
-			seasonSchedule( MaxNameLength, seasonSchedule ),
+			seasonSchedule( seasonSchedule ),
 			seasonSchIndex( seasonSchIndex ),
-			monthSchedule( MaxNameLength, monthSchedule ),
+			monthSchedule( monthSchedule ),
 			monthSchIndex( monthSchIndex ),
 			demandWindow( demandWindow ),
 			demWinTime( demWinTime ),
@@ -623,12 +611,12 @@ namespace EconomicTariff {
 			monthChgPt( monthChgPt ),
 			minMonthChgVal( minMonthChgVal ),
 			minMonthChgPt( minMonthChgPt ),
-			chargeSchedule( MaxNameLength, chargeSchedule ),
+			chargeSchedule( chargeSchedule ),
 			chargeSchIndex( chargeSchIndex ),
-			baseUseSchedule( MaxNameLength, baseUseSchedule ),
+			baseUseSchedule( baseUseSchedule ),
 			baseUseSchIndex( baseUseSchIndex ),
-			groupName( MaxNameLength, groupName ),
-			monetaryUnit( MaxNameLength, monetaryUnit ),
+			groupName( groupName ),
+			monetaryUnit( monetaryUnit ),
 			buyOrSell( buyOrSell ),
 			firstCategory( firstCategory ),
 			lastCategory( lastCategory ),
@@ -919,14 +907,13 @@ namespace EconomicTariff {
 	struct ComputationType
 	{
 		// Members
-		Fstring computeName; // name of the compute
+		std::string computeName; // name of the compute
 		int firstStep; // index to steps array for the first step in this compute steps
 		int lastStep; // index to steps array for the last step in this compute steps
 		bool isUserDef; // if the computation steps were user defined
 
 		// Default Constructor
 		ComputationType() :
-			computeName( MaxNameLength ),
 			firstStep( 0 ),
 			lastStep( 0 ),
 			isUserDef( false )
@@ -934,12 +921,12 @@ namespace EconomicTariff {
 
 		// Member Constructor
 		ComputationType(
-			Fstring const & computeName, // name of the compute
+			std::string const & computeName, // name of the compute
 			int const firstStep, // index to steps array for the first step in this compute steps
 			int const lastStep, // index to steps array for the last step in this compute steps
 			bool const isUserDef // if the computation steps were user defined
 		) :
-			computeName( MaxNameLength, computeName ),
+			computeName( computeName ),
 			firstStep( firstStep ),
 			lastStep( lastStep ),
 			isUserDef( isUserDef )
@@ -1021,15 +1008,15 @@ namespace EconomicTariff {
 
 	void
 	parseComputeLine(
-		Fstring const & lineOfCompute,
+		std::string const & lineOfCompute,
 		int const fromTariff
 	);
 
 	void
 	GetLastWord(
-		Fstring const & lineOfText,
-		int & endOfScan,
-		Fstring & aWord
+		std::string const & lineOfText,
+		std::string::size_type & endOfScan,
+		std::string & aWord
 	);
 
 	void
@@ -1037,29 +1024,29 @@ namespace EconomicTariff {
 
 	int
 	LookUpSeason(
-		Fstring const & nameOfSeason,
-		Fstring const & nameOfReferingObj
+		std::string const & nameOfSeason,
+		std::string const & nameOfReferingObj
 	);
 
 	int
 	FindTariffIndex(
-		Fstring const & nameOfTariff,
-		Fstring const & nameOfReferingObj,
+		std::string const & nameOfTariff,
+		std::string const & nameOfReferingObj,
 		bool & ErrorsFound,
-		Fstring const & nameOfCurObj
+		std::string const & nameOfCurObj
 	);
 
 	void
 	warnIfNativeVarname(
-		Fstring const & objName,
+		std::string const & objName,
 		int const curTariffIndex,
 		bool & ErrorsFound,
-		Fstring const & curobjName
+		std::string const & curobjName
 	);
 
 	int
 	AssignVariablePt(
-		Fstring const & stringIn,
+		std::string const & stringIn,
 		bool const flagIfNotNumeric,
 		int const useOfVar,
 		int const varSpecific,
@@ -1074,14 +1061,14 @@ namespace EconomicTariff {
 	void
 	incrementSteps();
 
-	Fstring
-	RemoveSpaces( Fstring const & StringIn );
+	std::string
+	RemoveSpaces( std::string const & StringIn );
 
 	void
 	CreateCategoryNativeVariables();
 
 	int
-	lookupOperator( Fstring const & opString );
+	lookupOperator( std::string const & opString );
 
 	//======================================================================================================================
 	//======================================================================================================================
@@ -1186,10 +1173,10 @@ namespace EconomicTariff {
 
 	void
 	ReportEconomicVariable(
-		Fstring const & titleString,
+		std::string const & titleString,
 		bool const includeCategory,
 		bool const showCurrencySymbol,
-		Fstring const & forString
+		std::string const & forString
 	);
 
 	void

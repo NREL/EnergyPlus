@@ -4,7 +4,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1A.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
+#include <ObjexxFCL/gio_Fmt.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -21,9 +21,9 @@ namespace SurfaceGeometry {
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
-	extern Fstring const Blank;
-	extern FArray1D_Fstring const BaseSurfCls;
-	extern FArray1D_Fstring const SubSurfCls;
+	extern std::string const Blank;
+	extern FArray1D_string const BaseSurfCls;
+	extern FArray1D_string const SubSurfCls;
 	extern FArray1D_int const BaseSurfIDs;
 
 	extern FArray1D_int const SubSurfIDs;
@@ -33,7 +33,7 @@ namespace SurfaceGeometry {
 	extern int const UnreconciledZoneSurface; // interim value between entering surfaces ("Surface") and reconciling
 	// surface names in other zones
 
-	extern Fstring const fmt3;
+	extern gio::Fmt const fmt3;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -99,7 +99,7 @@ namespace SurfaceGeometry {
 		int const TotDetailedWalls, // Number of Wall:Detailed items to obtain
 		int const TotDetailedRoofs, // Number of RoofCeiling:Detailed items to obtain
 		int const TotDetailedFloors, // Number of Floor:Detailed items to obtain
-		FArray1S_Fstring const BaseSurfCls, // Valid Classes for Base Surfaces
+		FArray1S_string const BaseSurfCls, // Valid Classes for Base Surfaces
 		FArray1S_int const BaseSurfIDs,
 		int & NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
 	);
@@ -138,7 +138,7 @@ namespace SurfaceGeometry {
 		bool & ErrorsFound, // Error flag indicator (true if errors found)
 		int & SurfNum, // Count of Current SurfaceNumber
 		int const TotHTSubs, // Number of Heat Transfer SubSurfaces to obtain
-		FArray1S_Fstring const SubSurfCls, // Valid Classes for Sub Surfaces
+		FArray1S_string const SubSurfCls, // Valid Classes for Sub Surfaces
 		FArray1S_int const SubSurfIDs, // ID Assignments for valid sub surface classes
 		int & AddedSubSurfaces, // Subsurfaces added when windows reference Window5
 		int & NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
@@ -161,7 +161,7 @@ namespace SurfaceGeometry {
 
 	void
 	CheckWindowShadingControlFrameDivider(
-		Fstring const & cRoutineName, // routine name calling this one (for error messages)
+		std::string const & cRoutineName, // routine name calling this one (for error messages)
 		bool & ErrorsFound, // true if errors have been found or are found here
 		int const SurfNum, // current surface number
 		int const FrameField // field number for frame/divider
@@ -169,11 +169,11 @@ namespace SurfaceGeometry {
 
 	void
 	CheckSubSurfaceMiscellaneous(
-		Fstring const & cRoutineName, // routine name calling this one (for error messages)
+		std::string const & cRoutineName, // routine name calling this one (for error messages)
 		bool & ErrorsFound, // true if errors have been found or are found here
 		int const SurfNum, // current surface number
-		Fstring const & SubSurfaceName, // name of the surface
-		Fstring const & SubSurfaceConstruction, // name of the construction
+		std::string const & SubSurfaceName, // name of the surface
+		std::string const & SubSurfaceConstruction, // name of the construction
 		int & AddedSubSurfaces
 	);
 

@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -32,7 +31,7 @@ namespace TARCOGDeflection {
 		FArray1A< Real64 > const PoissonsRat,
 		FArray1A< Real64 > LayerDeflection,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	);
 
 	void
@@ -50,7 +49,7 @@ namespace TARCOGDeflection {
 		FArray1A< Real64 > DCoeff,
 		FArray1A< Real64 > LayerDeflection,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	);
 
 	void

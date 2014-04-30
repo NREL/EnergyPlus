@@ -4,7 +4,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray2D.hh>
-#include <ObjexxFCL/Fstring.hh>
+#include <ObjexxFCL/gio_Fmt.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -15,7 +15,6 @@ namespace EnergyPlus {
 namespace DataSizing {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// -only module should be available to other modules and routines.
@@ -34,7 +33,7 @@ namespace DataSizing {
 	extern int const OAFlowSum;
 	extern int const OAFlowMax;
 
-	extern FArray1D_Fstring const cOAFlowMethodTypes;
+	extern FArray1D_string const cOAFlowMethodTypes;
 
 	// parameters for outside air
 	extern int const AllOA;
@@ -69,7 +68,7 @@ namespace DataSizing {
 	extern Real64 const AutoSize;
 
 	// parameter for (time-of-peak) sizing format
-	extern Fstring const PeakHrMinFmt;
+	extern gio::Fmt const PeakHrMinFmt;
 
 	//Zone Outdoor Air Method
 	extern int const ZOAM_FlowPerPerson; // set the outdoor air flow rate based on number of people in the zone
@@ -149,16 +148,16 @@ namespace DataSizing {
 	extern Real64 GlobalCoolSizingFactor; // the global cooling sizing ratio
 	extern FArray1D< Real64 > ZoneSizThermSetPtHi; // highest zone thermostat setpoint during zone sizing calcs
 	extern FArray1D< Real64 > ZoneSizThermSetPtLo; // lowest zone thermostat setpoint during zone sizing calcs
-	extern FArray1D_Fstring CoolPeakDateHrMin;
-	extern FArray1D_Fstring HeatPeakDateHrMin;
-	extern Fstring SizingFileColSep; // Character to separate columns in sizing outputs
+	extern FArray1D_string CoolPeakDateHrMin;
+	extern FArray1D_string HeatPeakDateHrMin;
+	extern char SizingFileColSep; // Character to separate columns in sizing outputs
 
 	// Types
 
 	struct ZoneSizingInputData
 	{
 		// Members
-		Fstring ZoneName; // name of a zone
+		std::string ZoneName; // name of a zone
 		int ZoneNum; // index of the zone
 		int ZnCoolDgnSAMethod; // choice of how to get zone cooling design air temperature;
 		//  1 = specify supply air temperature,
@@ -172,7 +171,7 @@ namespace DataSizing {
 		Real64 HeatDesTempDiff; // zone design heating supply air temperature difference [deltaC]
 		Real64 CoolDesHumRat; // zone design cooling supply air humidity ratio [kg-H2O/kg-air]
 		Real64 HeatDesHumRat; // zone design heating supply air humidity ratio [kg-H2O/kg-air]
-		Fstring DesignSpecOAObjName; // name of the design specification outdoor air object
+		std::string DesignSpecOAObjName; // name of the design specification outdoor air object
 		int OADesMethod; // choice of how to calculate minimum outside air;
 		//  1 = m3/s per person; 2 = m3/s per zone; 3 = m3/s per zone area;
 		//  4 = sum of flow from 3 OA input fields;
@@ -200,14 +199,13 @@ namespace DataSizing {
 		Real64 CoolSizingFactor; // the zone cooling sizing ratio
 		Real64 ZoneADEffCooling;
 		Real64 ZoneADEffHeating;
-		Fstring ZoneAirDistEffObjName; // name of the zone air distribution effectiveness object name
+		std::string ZoneAirDistEffObjName; // name of the zone air distribution effectiveness object name
 		int ZoneAirDistributionIndex; // index to the zone air distribution object
 		int ZoneDesignSpecOAIndex; // index to the zone design spec OA object
 		Real64 ZoneSecondaryRecirculation; // the zone secondary air recirculation fraction
 
 		// Default Constructor
 		ZoneSizingInputData() :
-			ZoneName( MaxNameLength ),
 			ZoneNum( 0 ),
 			ZnCoolDgnSAMethod( 0 ),
 			ZnHeatDgnSAMethod( 0 ),
@@ -217,7 +215,6 @@ namespace DataSizing {
 			HeatDesTempDiff( 0.0 ),
 			CoolDesHumRat( 0.0 ),
 			HeatDesHumRat( 0.0 ),
-			DesignSpecOAObjName( MaxNameLength ),
 			OADesMethod( 0 ),
 			DesOAFlowPPer( 0.0 ),
 			DesOAFlowPerArea( 0.0 ),
@@ -236,7 +233,6 @@ namespace DataSizing {
 			CoolSizingFactor( 0.0 ),
 			ZoneADEffCooling( 1.0 ),
 			ZoneADEffHeating( 1.0 ),
-			ZoneAirDistEffObjName( MaxNameLength ),
 			ZoneAirDistributionIndex( 0 ),
 			ZoneDesignSpecOAIndex( 0 ),
 			ZoneSecondaryRecirculation( 0.0 )
@@ -244,7 +240,7 @@ namespace DataSizing {
 
 		// Member Constructor
 		ZoneSizingInputData(
-			Fstring const & ZoneName, // name of a zone
+			std::string const & ZoneName, // name of a zone
 			int const ZoneNum, // index of the zone
 			int const ZnCoolDgnSAMethod, // choice of how to get zone cooling design air temperature;
 			int const ZnHeatDgnSAMethod, // choice of how to get zone heating design air temperature;
@@ -254,7 +250,7 @@ namespace DataSizing {
 			Real64 const HeatDesTempDiff, // zone design heating supply air temperature difference [deltaC]
 			Real64 const CoolDesHumRat, // zone design cooling supply air humidity ratio [kg-H2O/kg-air]
 			Real64 const HeatDesHumRat, // zone design heating supply air humidity ratio [kg-H2O/kg-air]
-			Fstring const & DesignSpecOAObjName, // name of the design specification outdoor air object
+			std::string const & DesignSpecOAObjName, // name of the design specification outdoor air object
 			int const OADesMethod, // choice of how to calculate minimum outside air;
 			Real64 const DesOAFlowPPer, // design outside air flow per person in zone [m3/s]
 			Real64 const DesOAFlowPerArea, // design outside air flow per zone area [m3/s / m2]
@@ -273,12 +269,12 @@ namespace DataSizing {
 			Real64 const CoolSizingFactor, // the zone cooling sizing ratio
 			Real64 const ZoneADEffCooling,
 			Real64 const ZoneADEffHeating,
-			Fstring const & ZoneAirDistEffObjName, // name of the zone air distribution effectiveness object name
+			std::string const & ZoneAirDistEffObjName, // name of the zone air distribution effectiveness object name
 			int const ZoneAirDistributionIndex, // index to the zone air distribution object
 			int const ZoneDesignSpecOAIndex, // index to the zone design spec OA object
 			Real64 const ZoneSecondaryRecirculation // the zone secondary air recirculation fraction
 		) :
-			ZoneName( MaxNameLength, ZoneName ),
+			ZoneName( ZoneName ),
 			ZoneNum( ZoneNum ),
 			ZnCoolDgnSAMethod( ZnCoolDgnSAMethod ),
 			ZnHeatDgnSAMethod( ZnHeatDgnSAMethod ),
@@ -288,7 +284,7 @@ namespace DataSizing {
 			HeatDesTempDiff( HeatDesTempDiff ),
 			CoolDesHumRat( CoolDesHumRat ),
 			HeatDesHumRat( HeatDesHumRat ),
-			DesignSpecOAObjName( MaxNameLength, DesignSpecOAObjName ),
+			DesignSpecOAObjName( DesignSpecOAObjName ),
 			OADesMethod( OADesMethod ),
 			DesOAFlowPPer( DesOAFlowPPer ),
 			DesOAFlowPerArea( DesOAFlowPerArea ),
@@ -307,7 +303,7 @@ namespace DataSizing {
 			CoolSizingFactor( CoolSizingFactor ),
 			ZoneADEffCooling( ZoneADEffCooling ),
 			ZoneADEffHeating( ZoneADEffHeating ),
-			ZoneAirDistEffObjName( MaxNameLength, ZoneAirDistEffObjName ),
+			ZoneAirDistEffObjName( ZoneAirDistEffObjName ),
 			ZoneAirDistributionIndex( ZoneAirDistributionIndex ),
 			ZoneDesignSpecOAIndex( ZoneDesignSpecOAIndex ),
 			ZoneSecondaryRecirculation( ZoneSecondaryRecirculation )
@@ -318,9 +314,9 @@ namespace DataSizing {
 	struct ZoneSizingData
 	{
 		// Members
-		Fstring ZoneName; // name of a zone
-		Fstring CoolDesDay; // name of a cooling design day
-		Fstring HeatDesDay; // name of a heating design day
+		std::string ZoneName; // name of a zone
+		std::string CoolDesDay; // name of a cooling design day
+		std::string HeatDesDay; // name of a heating design day
 		int ZnCoolDgnSAMethod; // choice of how to get zone cooling design air temperature;
 		//  1 = specify supply air temperature,
 		//  2 = calculate from the temperature difference
@@ -423,8 +419,8 @@ namespace DataSizing {
 		int TimeStepNumAtCoolMax; // time step number (in day) at cooling peak
 		int HeatDDNum; // design day index of design day causing heating peak
 		int CoolDDNum; // design day index of design day causing heating peak
-		Fstring cHeatDDDate; // date of design day causing heating peak
-		Fstring cCoolDDDate; // date of design day causing cooling peak
+		std::string cHeatDDDate; // date of design day causing heating peak
+		std::string cCoolDDDate; // date of design day causing cooling peak
 		Real64 MinOA; // design minimum outside air in m3/s
 		Real64 DesCoolMinAirFlow2; // design cooling minimum air flow rate [m3/s] derived from
 		//  DesCoolMinAirFlowPerArea
@@ -472,9 +468,6 @@ namespace DataSizing {
 
 		// Default Constructor
 		ZoneSizingData() :
-			ZoneName( MaxNameLength ),
-			CoolDesDay( MaxNameLength ),
-			HeatDesDay( MaxNameLength ),
 			ZnCoolDgnSAMethod( 0 ),
 			ZnHeatDgnSAMethod( 0 ),
 			CoolDesTemp( 0.0 ),
@@ -562,8 +555,6 @@ namespace DataSizing {
 			TimeStepNumAtCoolMax( 0 ),
 			HeatDDNum( 0 ),
 			CoolDDNum( 0 ),
-			cHeatDDDate( 8 ),
-			cCoolDDDate( 8 ),
 			MinOA( 0.0 ),
 			DesCoolMinAirFlow2( 0.0 ),
 			DesHeatMaxAirFlow2( 0.0 ),
@@ -588,9 +579,9 @@ namespace DataSizing {
 
 		// Member Constructor
 		ZoneSizingData(
-			Fstring const & ZoneName, // name of a zone
-			Fstring const & CoolDesDay, // name of a cooling design day
-			Fstring const & HeatDesDay, // name of a heating design day
+			std::string const & ZoneName, // name of a zone
+			std::string const & CoolDesDay, // name of a cooling design day
+			std::string const & HeatDesDay, // name of a heating design day
 			int const ZnCoolDgnSAMethod, // choice of how to get zone cooling design air temperature;
 			int const ZnHeatDgnSAMethod, // choice of how to get zone heating design air temperature;
 			Real64 const CoolDesTemp, // zone design cooling supply air temperature [C]
@@ -678,8 +669,8 @@ namespace DataSizing {
 			int const TimeStepNumAtCoolMax, // time step number (in day) at cooling peak
 			int const HeatDDNum, // design day index of design day causing heating peak
 			int const CoolDDNum, // design day index of design day causing heating peak
-			Fstring const & cHeatDDDate, // date of design day causing heating peak
-			Fstring const & cCoolDDDate, // date of design day causing cooling peak
+			std::string const & cHeatDDDate, // date of design day causing heating peak
+			std::string const & cCoolDDDate, // date of design day causing cooling peak
 			Real64 const MinOA, // design minimum outside air in m3/s
 			Real64 const DesCoolMinAirFlow2, // design cooling minimum air flow rate [m3/s] derived from
 			Real64 const DesHeatMaxAirFlow2, // design heating maximum air flow rate [m3/s] derived from
@@ -719,9 +710,9 @@ namespace DataSizing {
 			Real64 const VozClgByZone, // value of required cooling vent to zone, used in 62.1 tabular report
 			Real64 const VozHtgByZone // value of required heating vent to zone, used in 62.1 tabular report
 		) :
-			ZoneName( MaxNameLength, ZoneName ),
-			CoolDesDay( MaxNameLength, CoolDesDay ),
-			HeatDesDay( MaxNameLength, HeatDesDay ),
+			ZoneName( ZoneName ),
+			CoolDesDay( CoolDesDay ),
+			HeatDesDay( HeatDesDay ),
 			ZnCoolDgnSAMethod( ZnCoolDgnSAMethod ),
 			ZnHeatDgnSAMethod( ZnHeatDgnSAMethod ),
 			CoolDesTemp( CoolDesTemp ),
@@ -809,8 +800,8 @@ namespace DataSizing {
 			TimeStepNumAtCoolMax( TimeStepNumAtCoolMax ),
 			HeatDDNum( HeatDDNum ),
 			CoolDDNum( CoolDDNum ),
-			cHeatDDDate( 8, cHeatDDDate ),
-			cCoolDDDate( 8, cCoolDDDate ),
+			cHeatDDDate( cHeatDDDate ),
+			cCoolDDDate( cCoolDDDate ),
 			MinOA( MinOA ),
 			DesCoolMinAirFlow2( DesCoolMinAirFlow2 ),
 			DesHeatMaxAirFlow2( DesHeatMaxAirFlow2 ),
@@ -962,7 +953,7 @@ namespace DataSizing {
 	struct SystemSizingInputData
 	{
 		// Members
-		Fstring AirPriLoopName; // name of an AirLoopHVAC object
+		std::string AirPriLoopName; // name of an AirLoopHVAC object
 		int AirLoopNum; // index number of air loop
 		int LoadSizeType; // type of load to size on;
 		// 0=sensible, 1=latent, 2=total, 3=ventilation
@@ -992,7 +983,6 @@ namespace DataSizing {
 
 		// Default Constructor
 		SystemSizingInputData() :
-			AirPriLoopName( MaxNameLength ),
 			AirLoopNum( 0 ),
 			LoadSizeType( 0 ),
 			SizingOption( 0 ),
@@ -1019,7 +1009,7 @@ namespace DataSizing {
 
 		// Member Constructor
 		SystemSizingInputData(
-			Fstring const & AirPriLoopName, // name of an AirLoopHVAC object
+			std::string const & AirPriLoopName, // name of an AirLoopHVAC object
 			int const AirLoopNum, // index number of air loop
 			int const LoadSizeType, // type of load to size on;
 			int const SizingOption, // 1 = noncoincident, 2 = coincident
@@ -1043,7 +1033,7 @@ namespace DataSizing {
 			Real64 const MaxZoneOAFraction, // maximum value of min OA for zones served by system
 			bool const OAAutoSized // Set to true if design OA vol flow is set to 'autosize'
 		) :
-			AirPriLoopName( MaxNameLength, AirPriLoopName ),
+			AirPriLoopName( AirPriLoopName ),
 			AirLoopNum( AirLoopNum ),
 			LoadSizeType( LoadSizeType ),
 			SizingOption( SizingOption ),
@@ -1073,9 +1063,9 @@ namespace DataSizing {
 	struct SystemSizingData // Contains data for system sizing
 	{
 		// Members
-		Fstring AirPriLoopName; // name of an AirLoopHVAC object
-		Fstring CoolDesDay; // name of a cooling design day
-		Fstring HeatDesDay; // name of a heating design day
+		std::string AirPriLoopName; // name of an AirLoopHVAC object
+		std::string CoolDesDay; // name of a cooling design day
+		std::string HeatDesDay; // name of a heating design day
 		int LoadSizeType; // type of load to size on;
 		// 0=sensible, 1=latent, 2=total, 3=ventilation
 		int SizingOption; // 1 = noncoincident, 2 = coincident.
@@ -1167,9 +1157,6 @@ namespace DataSizing {
 
 		// Default Constructor
 		SystemSizingData() :
-			AirPriLoopName( MaxNameLength ),
-			CoolDesDay( MaxNameLength ),
-			HeatDesDay( MaxNameLength ),
 			LoadSizeType( 0 ),
 			SizingOption( 0 ),
 			CoolOAOption( 0 ),
@@ -1233,9 +1220,9 @@ namespace DataSizing {
 
 		// Member Constructor
 		SystemSizingData(
-			Fstring const & AirPriLoopName, // name of an AirLoopHVAC object
-			Fstring const & CoolDesDay, // name of a cooling design day
-			Fstring const & HeatDesDay, // name of a heating design day
+			std::string const & AirPriLoopName, // name of an AirLoopHVAC object
+			std::string const & CoolDesDay, // name of a cooling design day
+			std::string const & HeatDesDay, // name of a heating design day
 			int const LoadSizeType, // type of load to size on;
 			int const SizingOption, // 1 = noncoincident, 2 = coincident.
 			int const CoolOAOption, // 1 = use 100% outside air; 2 = use min OA; for cooling sizing
@@ -1309,9 +1296,9 @@ namespace DataSizing {
 			Real64 const SysUncOA, // uncorrected system outdoor air flow based on zone people and
 			bool const OAAutoSized // Set to true if design OA vol flow is set to 'autosize'
 		) :
-			AirPriLoopName( MaxNameLength, AirPriLoopName ),
-			CoolDesDay( MaxNameLength, CoolDesDay ),
-			HeatDesDay( MaxNameLength, HeatDesDay ),
+			AirPriLoopName( AirPriLoopName ),
+			CoolDesDay( CoolDesDay ),
+			HeatDesDay( HeatDesDay ),
 			LoadSizeType( LoadSizeType ),
 			SizingOption( SizingOption ),
 			CoolOAOption( CoolOAOption ),
@@ -1391,7 +1378,7 @@ namespace DataSizing {
 	struct PlantSizingData
 	{
 		// Members
-		Fstring PlantLoopName; // name of PLANT LOOP or CONDENSER LOOP object
+		std::string PlantLoopName; // name of PLANT LOOP or CONDENSER LOOP object
 		int LoopType; // type of loop: 1=heating, 2=cooling, 3=condenser
 		Real64 ExitTemp; // loop design exit (supply) temperature [C]
 		Real64 DeltaT; // loop design temperature drop (or rise) [DelK]
@@ -1401,7 +1388,6 @@ namespace DataSizing {
 
 		// Default Constructor
 		PlantSizingData() :
-			PlantLoopName( MaxNameLength ),
 			LoopType( 0 ),
 			ExitTemp( 0.0 ),
 			DeltaT( 0.0 ),
@@ -1411,14 +1397,14 @@ namespace DataSizing {
 
 		// Member Constructor
 		PlantSizingData(
-			Fstring const & PlantLoopName, // name of PLANT LOOP or CONDENSER LOOP object
+			std::string const & PlantLoopName, // name of PLANT LOOP or CONDENSER LOOP object
 			int const LoopType, // type of loop: 1=heating, 2=cooling, 3=condenser
 			Real64 const ExitTemp, // loop design exit (supply) temperature [C]
 			Real64 const DeltaT, // loop design temperature drop (or rise) [DelK]
 			Real64 const DesVolFlowRate, // loop design flow rate in m3/s
 			bool const VolFlowSizingDone // flag to indicate when this loop has finished sizing flow rate
 		) :
-			PlantLoopName( MaxNameLength, PlantLoopName ),
+			PlantLoopName( PlantLoopName ),
 			LoopType( LoopType ),
 			ExitTemp( ExitTemp ),
 			DeltaT( DeltaT ),
@@ -1431,24 +1417,23 @@ namespace DataSizing {
 	struct DesDayWeathData
 	{
 		// Members
-		Fstring DateString; // date of design day weather values
+		std::string DateString; // date of design day weather values
 		FArray1D< Real64 > Temp; // design day temperatures at the major time step
 		FArray1D< Real64 > HumRat; // design day humidity ratios at the major time step
 		FArray1D< Real64 > Press; // design day braometric pressure at the major time step
 
 		// Default Constructor
-		DesDayWeathData() :
-			DateString( 8 )
+		DesDayWeathData()
 		{}
 
 		// Member Constructor
 		DesDayWeathData(
-			Fstring const & DateString, // date of design day weather values
+			std::string const & DateString, // date of design day weather values
 			FArray1< Real64 > const & Temp, // design day temperatures at the major time step
 			FArray1< Real64 > const & HumRat, // design day humidity ratios at the major time step
 			FArray1< Real64 > const & Press // design day braometric pressure at the major time step
 		) :
-			DateString( 8, DateString ),
+			DateString( DateString ),
 			Temp( Temp ),
 			HumRat( HumRat ),
 			Press( Press )
@@ -1483,7 +1468,7 @@ namespace DataSizing {
 	struct OARequirementsData
 	{
 		// Members
-		Fstring Name;
+		std::string Name;
 		int OAFlowMethod; // - Method for OA flow calculation
 		//- (Flow/Person, Flow/Zone, Flow/Area, FlowACH, Sum, Maximum)
 		Real64 OAFlowPerPerson; // - OA requirement per person
@@ -1495,7 +1480,6 @@ namespace DataSizing {
 
 		// Default Constructor
 		OARequirementsData() :
-			Name( MaxNameLength ),
 			OAFlowMethod( 0 ),
 			OAFlowPerPerson( 0.0 ),
 			OAFlowPerArea( 0.0 ),
@@ -1507,7 +1491,7 @@ namespace DataSizing {
 
 		// Member Constructor
 		OARequirementsData(
-			Fstring const & Name,
+			std::string const & Name,
 			int const OAFlowMethod, // - Method for OA flow calculation
 			Real64 const OAFlowPerPerson, // - OA requirement per person
 			Real64 const OAFlowPerArea, // - OA requirement per zone area
@@ -1516,7 +1500,7 @@ namespace DataSizing {
 			int const OAFlowFracSchPtr, // - Fraction schedule applied to total OA requirement
 			Real64 const MaxOAFractionSchValue // - Maximum value from OAFlow fraction schedule (used for sizing)
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			OAFlowMethod( OAFlowMethod ),
 			OAFlowPerPerson( OAFlowPerPerson ),
 			OAFlowPerArea( OAFlowPerArea ),
@@ -1531,8 +1515,8 @@ namespace DataSizing {
 	struct ZoneAirDistributionData
 	{
 		// Members
-		Fstring Name;
-		Fstring ZoneADEffSchName; // - Zone air distribution effectiveness schedule name
+		std::string Name;
+		std::string ZoneADEffSchName; // - Zone air distribution effectiveness schedule name
 		Real64 ZoneADEffCooling; // - Zone air distribution effectiveness in cooling mode
 		Real64 ZoneADEffHeating; // - Zone air distribution effectiveness in heating mode
 		Real64 ZoneSecondaryRecirculation; // - Zone air secondary recirculation ratio
@@ -1540,8 +1524,6 @@ namespace DataSizing {
 
 		// Default Constructor
 		ZoneAirDistributionData() :
-			Name( MaxNameLength ),
-			ZoneADEffSchName( MaxNameLength ),
 			ZoneADEffCooling( 1.0 ),
 			ZoneADEffHeating( 1.0 ),
 			ZoneSecondaryRecirculation( 0.0 ),
@@ -1550,15 +1532,15 @@ namespace DataSizing {
 
 		// Member Constructor
 		ZoneAirDistributionData(
-			Fstring const & Name,
-			Fstring const & ZoneADEffSchName, // - Zone air distribution effectiveness schedule name
+			std::string const & Name,
+			std::string const & ZoneADEffSchName, // - Zone air distribution effectiveness schedule name
 			Real64 const ZoneADEffCooling, // - Zone air distribution effectiveness in cooling mode
 			Real64 const ZoneADEffHeating, // - Zone air distribution effectiveness in heating mode
 			Real64 const ZoneSecondaryRecirculation, // - Zone air secondary recirculation ratio
 			int const ZoneADEffSchPtr // - Zone air distribution effectiveness schedule index
 		) :
-			Name( MaxNameLength, Name ),
-			ZoneADEffSchName( MaxNameLength, ZoneADEffSchName ),
+			Name( Name ),
+			ZoneADEffSchName( ZoneADEffSchName ),
 			ZoneADEffCooling( ZoneADEffCooling ),
 			ZoneADEffHeating( ZoneADEffHeating ),
 			ZoneSecondaryRecirculation( ZoneSecondaryRecirculation ),

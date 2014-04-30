@@ -2,8 +2,6 @@
 #include <cmath>
 #include <string>
 
-// ObjexxFCL Headers
-
 // EnergyPlus Headers
 #include <TarcogShading.hh>
 #include <DataGlobals.hh>
@@ -78,7 +76,7 @@ namespace TarcogShading {
 		FArray1A< Real64 > Tgaps,
 		FArray1A< Real64 > qv,
 		int & nperr,
-		Fstring & ErrorMessage,
+		std::string & ErrorMessage,
 		FArray1A< Real64 > vfreevent
 	)
 	{
@@ -340,7 +338,7 @@ namespace TarcogShading {
 		Real64 & hcv,
 		Real64 & qv,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	)
 	{
 		//**************************************************************************************************************
@@ -429,7 +427,7 @@ namespace TarcogShading {
 		Real64 & qv1,
 		Real64 & qv2,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	)
 	{
 		//**************************************************************************************************************
@@ -530,9 +528,6 @@ namespace TarcogShading {
 		Real64 Temp1;
 		Real64 Temp2;
 		bool converged;
-
-		// Formats
-		std::string const Format_987( "(' V = ',F8.6)" );
 
 		TGapOld1 = 0.0;
 		TGapOld2 = 0.0;
@@ -727,7 +722,7 @@ namespace TarcogShading {
 		Real64 & hcv,
 		Real64 & qv,
 		int & nperr,
-		Fstring & ErrorMessage,
+		std::string & ErrorMessage,
 		Real64 & speed
 	)
 	{

@@ -16,7 +16,6 @@
 #include <ObjexxFCL/ubyte.hh>
 #include <ObjexxFCL/char.functions.hh>
 #include <ObjexxFCL/Fstring.hh>
-#include <ObjexxFCL/string.constants.hh>
 
 namespace ObjexxFCL {
 namespace fmt {
@@ -27,12 +26,14 @@ namespace fmt {
 std::istream &
 operator >>( std::istream & stream, Skip const & skip )
 {
+	static std::string const STOPPERS( '\n' + std::string( 1, std::istream::traits_type::eof() ) );
 	char c;
 	Size i( 0 );
-	while ( ( i < skip.w_ ) && stream && not_any_of( stream.peek(), READ_STOPPERS ) ) {
+	while ( ( i < skip.w_ ) && stream && not_any_of( stream.peek(), STOPPERS ) ) {
 		stream.get( c );
 		++i;
 	}
+	// Don't clear eof bit since specified width read
 	return stream;
 }
 
@@ -50,7 +51,7 @@ A( std::string const & s, Size const w )
 	} else if ( l == w ) {
 		return s;
 	} else { // l < w: Pad
-		return std::string( w - l, SPC ) + s;
+		return std::string( w - l, ' ' ) + s;
 	}
 }
 
@@ -66,7 +67,7 @@ A( Fstring const & s, Size const w )
 	} else if ( l == w ) {
 		return s;
 	} else { // l < w: Pad
-		return std::string( w - l, SPC ) + s;
+		return std::string( w - l, ' ' ) + s;
 	}
 }
 

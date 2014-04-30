@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -22,7 +21,6 @@ namespace EnergyPlus {
 namespace HVACDXSystem {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
@@ -65,12 +63,12 @@ namespace HVACDXSystem {
 	struct DXCoolingConditions
 	{
 		// Members
-		Fstring DXCoolingSystemType; // Type of DXCoolingSystem
-		Fstring Name; // Name of the DXCoolingSystem
+		std::string DXCoolingSystemType; // Type of DXCoolingSystem
+		std::string Name; // Name of the DXCoolingSystem
 		int SchedPtr;
-		Fstring CoolingCoilType;
+		std::string CoolingCoilType;
 		int CoolingCoilType_Num;
-		Fstring CoolingCoilName;
+		std::string CoolingCoilName;
 		int CoolingCoilIndex;
 		int DXCoolingCoilInletNodeNum;
 		int DXCoolingCoilOutletNodeNum;
@@ -143,12 +141,8 @@ namespace HVACDXSystem {
 
 		// Default Constructor
 		DXCoolingConditions() :
-			DXCoolingSystemType( MaxNameLength ),
-			Name( MaxNameLength ),
 			SchedPtr( 0 ),
-			CoolingCoilType( MaxNameLength ),
 			CoolingCoilType_Num( 0 ),
-			CoolingCoilName( MaxNameLength ),
 			CoolingCoilIndex( 0 ),
 			DXCoolingCoilInletNodeNum( 0 ),
 			DXCoolingCoilOutletNodeNum( 0 ),
@@ -211,12 +205,12 @@ namespace HVACDXSystem {
 
 		// Member Constructor
 		DXCoolingConditions(
-			Fstring const & DXCoolingSystemType, // Type of DXCoolingSystem
-			Fstring const & Name, // Name of the DXCoolingSystem
+			std::string const & DXCoolingSystemType, // Type of DXCoolingSystem
+			std::string const & Name, // Name of the DXCoolingSystem
 			int const SchedPtr,
-			Fstring const & CoolingCoilType,
+			std::string const & CoolingCoilType,
 			int const CoolingCoilType_Num,
-			Fstring const & CoolingCoilName,
+			std::string const & CoolingCoilName,
 			int const CoolingCoilIndex,
 			int const DXCoolingCoilInletNodeNum,
 			int const DXCoolingCoilOutletNodeNum,
@@ -276,12 +270,12 @@ namespace HVACDXSystem {
 			int const SpeedNum, // select speed number for variable-speed coil
 			int const TESOpMode
 		) :
-			DXCoolingSystemType( MaxNameLength, DXCoolingSystemType ),
-			Name( MaxNameLength, Name ),
+			DXCoolingSystemType( DXCoolingSystemType ),
+			Name( Name ),
 			SchedPtr( SchedPtr ),
-			CoolingCoilType( MaxNameLength, CoolingCoilType ),
+			CoolingCoilType( CoolingCoilType ),
 			CoolingCoilType_Num( CoolingCoilType_Num ),
-			CoolingCoilName( MaxNameLength, CoolingCoilName ),
+			CoolingCoilName( CoolingCoilName ),
 			CoolingCoilIndex( CoolingCoilIndex ),
 			DXCoolingCoilInletNodeNum( DXCoolingCoilInletNodeNum ),
 			DXCoolingCoilOutletNodeNum( DXCoolingCoilOutletNodeNum ),
@@ -351,7 +345,7 @@ namespace HVACDXSystem {
 
 	void
 	SimDXCoolingSystem(
-		Fstring const & DXCoolingSystemName, // Name of DXSystem:Airloop object
+		std::string const & DXCoolingSystemName, // Name of DXSystem:Airloop object
 		bool const FirstHVACIteration, // True when first HVAC iteration
 		int const AirLoopNum, // Primary air loop number
 		int & CompIndex, // Index to DXSystem:Airloop object
@@ -476,14 +470,14 @@ namespace HVACDXSystem {
 	);
 
 	void
-	CheckDXCoolingCoilInOASysExists( Fstring const & DXCoilSysName );
+	CheckDXCoolingCoilInOASysExists( std::string const & DXCoilSysName );
 
 	void
 	GetCoolingCoilTypeNameAndIndex(
-		Fstring const & DXCoilSysName,
+		std::string const & DXCoilSysName,
 		int & CoolCoilType,
 		int & CoolCoilIndex,
-		Fstring & CoolCoilName,
+		std::string & CoolCoilName,
 		bool & ErrFound
 	);
 

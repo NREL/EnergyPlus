@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -16,7 +15,6 @@ namespace EnergyPlus {
 namespace PlantHeatExchangerFluidToFluid {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -51,7 +49,7 @@ namespace PlantHeatExchangerFluidToFluid {
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern Fstring ComponentClassName;
+	extern std::string ComponentClassName;
 	extern int NumberOfPlantFluidHXs;
 	extern bool GetInput;
 	extern FArray1D_bool CheckFluidHXs;
@@ -177,7 +175,7 @@ namespace PlantHeatExchangerFluidToFluid {
 	struct HeatExchangerStruct
 	{
 		// Members
-		Fstring Name;
+		std::string Name;
 		int AvailSchedNum;
 		int HeatExchangeModelType;
 		Real64 UA;
@@ -189,9 +187,9 @@ namespace PlantHeatExchangerFluidToFluid {
 		Real64 MaxOperationTemp;
 		PlantConnectionStruct DemandSideLoop; // plant connections and data for the side of HX connected to demand side
 		PlantConnectionStruct SupplySideLoop;
-		Fstring HeatTransferMeteringEndUse;
-		Fstring ComponentUserName; // user name for control-associated  component
-		Fstring ComponentClassName; // object class name for control-associated component
+		std::string HeatTransferMeteringEndUse;
+		std::string ComponentUserName; // user name for control-associated  component
+		std::string ComponentClassName; // object class name for control-associated component
 		int ComponentTypeOfNum;
 		PlantLocatorStruct OtherCompSupplySideLoop;
 		PlantLocatorStruct OtherCompDemandSideLoop;
@@ -207,7 +205,6 @@ namespace PlantHeatExchangerFluidToFluid {
 
 		// Default Constructor
 		HeatExchangerStruct() :
-			Name( MaxNameLength ),
 			AvailSchedNum( 0 ),
 			HeatExchangeModelType( 0 ),
 			UA( 0.0 ),
@@ -217,9 +214,6 @@ namespace PlantHeatExchangerFluidToFluid {
 			ControlSignalTemp( 0 ),
 			MinOperationTemp( -99999. ),
 			MaxOperationTemp( 99999. ),
-			HeatTransferMeteringEndUse( MaxNameLength ),
-			ComponentUserName( MaxNameLength ),
-			ComponentClassName( MaxNameLength ),
 			ComponentTypeOfNum( 0 ),
 			SizingFactor( 1.0 ),
 			HeatTransferRate( 0.0 ),
@@ -234,7 +228,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
 		// Member Constructor
 		HeatExchangerStruct(
-			Fstring const & Name,
+			std::string const & Name,
 			int const AvailSchedNum,
 			int const HeatExchangeModelType,
 			Real64 const UA,
@@ -246,9 +240,9 @@ namespace PlantHeatExchangerFluidToFluid {
 			Real64 const MaxOperationTemp,
 			PlantConnectionStruct const & DemandSideLoop, // plant connections and data for the side of HX connected to demand side
 			PlantConnectionStruct const & SupplySideLoop,
-			Fstring const & HeatTransferMeteringEndUse,
-			Fstring const & ComponentUserName, // user name for control-associated  component
-			Fstring const & ComponentClassName, // object class name for control-associated component
+			std::string const & HeatTransferMeteringEndUse,
+			std::string const & ComponentUserName, // user name for control-associated  component
+			std::string const & ComponentClassName, // object class name for control-associated component
 			int const ComponentTypeOfNum,
 			PlantLocatorStruct const & OtherCompSupplySideLoop,
 			PlantLocatorStruct const & OtherCompDemandSideLoop,
@@ -262,7 +256,7 @@ namespace PlantHeatExchangerFluidToFluid {
 			int const DmdSideModulatSolvFailErrorCount,
 			int const DmdSideModulatSolvFailErrorIndex
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			AvailSchedNum( AvailSchedNum ),
 			HeatExchangeModelType( HeatExchangeModelType ),
 			UA( UA ),
@@ -274,9 +268,9 @@ namespace PlantHeatExchangerFluidToFluid {
 			MaxOperationTemp( MaxOperationTemp ),
 			DemandSideLoop( DemandSideLoop ),
 			SupplySideLoop( SupplySideLoop ),
-			HeatTransferMeteringEndUse( MaxNameLength, HeatTransferMeteringEndUse ),
-			ComponentUserName( MaxNameLength, ComponentUserName ),
-			ComponentClassName( MaxNameLength, ComponentClassName ),
+			HeatTransferMeteringEndUse( HeatTransferMeteringEndUse ),
+			ComponentUserName( ComponentUserName ),
+			ComponentClassName( ComponentClassName ),
 			ComponentTypeOfNum( ComponentTypeOfNum ),
 			OtherCompSupplySideLoop( OtherCompSupplySideLoop ),
 			OtherCompDemandSideLoop( OtherCompDemandSideLoop ),
@@ -302,8 +296,8 @@ namespace PlantHeatExchangerFluidToFluid {
 	SimFluidHeatExchanger(
 		int const LoopNum, // plant loop sim call originated from
 		int const LoopSideNum, // plant loop side sim call originated from
-		Fstring const & EquipType, // type of equipment, 'PlantComponent:UserDefined'
-		Fstring const & EquipName, // user name for component
+		std::string const & EquipType, // type of equipment, 'PlantComponent:UserDefined'
+		std::string const & EquipName, // user name for component
 		int & CompIndex,
 		bool & InitLoopEquip,
 		Real64 const MyLoad,

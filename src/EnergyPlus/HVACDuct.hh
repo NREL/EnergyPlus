@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace HVACDuct {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -35,24 +33,23 @@ namespace HVACDuct {
 	struct DuctData
 	{
 		// Members
-		Fstring Name; // duct unique name
+		std::string Name; // duct unique name
 		int InletNodeNum; // inlet node number
 		int OutletNodeNum; // outlet node number
 
 		// Default Constructor
 		DuctData() :
-			Name( MaxNameLength ),
 			InletNodeNum( 0 ),
 			OutletNodeNum( 0 )
 		{}
 
 		// Member Constructor
 		DuctData(
-			Fstring const & Name, // duct unique name
+			std::string const & Name, // duct unique name
 			int const InletNodeNum, // inlet node number
 			int const OutletNodeNum // outlet node number
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			InletNodeNum( InletNodeNum ),
 			OutletNodeNum( OutletNodeNum )
 		{}
@@ -66,7 +63,7 @@ namespace HVACDuct {
 
 	void
 	SimDuct(
-		Fstring const & CompName, // name of the duct component
+		std::string const & CompName, // name of the duct component
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep !unused1208
 		int & CompIndex // index of duct component
 	);

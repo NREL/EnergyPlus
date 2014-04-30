@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -16,7 +15,6 @@ namespace EnergyPlus {
 namespace WaterToAirHeatPumpSimple {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 	using DataHVACGlobals::WaterCycling;
 
 	// Data
@@ -71,8 +69,8 @@ namespace WaterToAirHeatPumpSimple {
 	struct SimpleWatertoAirHPConditions
 	{
 		// Members
-		Fstring Name; // Name of the Water to Air Heat pump
-		Fstring WatertoAirHPType; // Type of WatertoAirHP ie. Heating or Cooling
+		std::string Name; // Name of the Water to Air Heat pump
+		std::string WatertoAirHPType; // Type of WatertoAirHP ie. Heating or Cooling
 		int WAHPPlantTypeOfNum; // type of component in plant
 		bool SimFlag; // Heat Pump Simulation Flag
 		Real64 AirVolFlowRate; // Air Volumetric Flow Rate[m3/s]
@@ -167,8 +165,6 @@ namespace WaterToAirHeatPumpSimple {
 
 		// Default Constructor
 		SimpleWatertoAirHPConditions() :
-			Name( MaxNameLength ),
-			WatertoAirHPType( MaxNameLength ),
 			WAHPPlantTypeOfNum( 0 ),
 			SimFlag( false ),
 			AirVolFlowRate( 0.0 ),
@@ -256,8 +252,8 @@ namespace WaterToAirHeatPumpSimple {
 
 		// Member Constructor
 		SimpleWatertoAirHPConditions(
-			Fstring const & Name, // Name of the Water to Air Heat pump
-			Fstring const & WatertoAirHPType, // Type of WatertoAirHP ie. Heating or Cooling
+			std::string const & Name, // Name of the Water to Air Heat pump
+			std::string const & WatertoAirHPType, // Type of WatertoAirHP ie. Heating or Cooling
 			int const WAHPPlantTypeOfNum, // type of component in plant
 			bool const SimFlag, // Heat Pump Simulation Flag
 			Real64 const AirVolFlowRate, // Air Volumetric Flow Rate[m3/s]
@@ -342,8 +338,8 @@ namespace WaterToAirHeatPumpSimple {
 			Real64 const HPTimeConstant, // Heat pump time constant [s]
 			Real64 const FanDelayTime // Fan delay time, time delay for the HP's fan to
 		) :
-			Name( MaxNameLength, Name ),
-			WatertoAirHPType( MaxNameLength, WatertoAirHPType ),
+			Name( Name ),
+			WatertoAirHPType( WatertoAirHPType ),
 			WAHPPlantTypeOfNum( WAHPPlantTypeOfNum ),
 			SimFlag( SimFlag ),
 			AirVolFlowRate( AirVolFlowRate ),
@@ -438,7 +434,7 @@ namespace WaterToAirHeatPumpSimple {
 
 	void
 	SimWatertoAirHPSimple(
-		Fstring const & CompName, // Coil Name
+		std::string const & CompName, // Coil Name
 		int & CompIndex, // Index for Component name
 		Real64 const SensLoad, // Sensible demand load [W]
 		Real64 const LatentLoad, // Latent demand load [W]
@@ -524,36 +520,36 @@ namespace WaterToAirHeatPumpSimple {
 
 	int
 	GetCoilIndex(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	Real64
 	GetCoilCapacity(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	Real64
 	GetCoilAirFlowRate(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetCoilInletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetCoilOutletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 

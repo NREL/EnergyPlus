@@ -6,7 +6,6 @@
 #include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/FArray2D.hh>
 #include <ObjexxFCL/FArray2S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -18,24 +17,23 @@ namespace EnergyPlus {
 namespace FluidProperties {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	extern Fstring const Refrig;
-	extern Fstring const Glycol;
-	extern Fstring const Pressure;
-	extern Fstring const Enthalpy;
-	extern Fstring const Density;
-	extern Fstring const SpecificHeat;
-	extern Fstring const Conductivity;
-	extern Fstring const Viscosity;
-	extern Fstring const Fluid;
-	extern Fstring const GasFluid;
-	extern Fstring const Water;
-	extern Fstring const Steam;
-	extern Fstring const EthyleneGlycol;
-	extern Fstring const PropyleneGlycol;
+	extern std::string const Refrig;
+	extern std::string const Glycol;
+	extern std::string const Pressure;
+	extern std::string const Enthalpy;
+	extern std::string const Density;
+	extern std::string const SpecificHeat;
+	extern std::string const Conductivity;
+	extern std::string const Viscosity;
+	extern std::string const Fluid;
+	extern std::string const GasFluid;
+	extern std::string const Water;
+	extern std::string const Steam;
+	extern std::string const EthyleneGlycol;
+	extern std::string const PropyleneGlycol;
 	extern int const EthyleneGlycolIndex;
 	extern int const PropyleneGlycolIndex;
 	extern int const iRefrig;
@@ -67,7 +65,7 @@ namespace FluidProperties {
 	struct FluidPropsRefrigerantData
 	{
 		// Members
-		Fstring Name; // Name of the refrigerant
+		std::string Name; // Name of the refrigerant
 		int NumPsPoints; // Number of saturation pressure
 		Real64 PsLowTempValue; // Low Temperature Value for Ps (>0.0)
 		Real64 PsHighTempValue; // High Temperature Value for Ps (max in tables)
@@ -124,7 +122,6 @@ namespace FluidProperties {
 
 		// Default Constructor
 		FluidPropsRefrigerantData() :
-			Name( MaxNameLength ),
 			NumPsPoints( 0 ),
 			PsLowTempValue( 0.0 ),
 			PsHighTempValue( 0.0 ),
@@ -167,7 +164,7 @@ namespace FluidProperties {
 
 		// Member Constructor
 		FluidPropsRefrigerantData(
-			Fstring const & Name, // Name of the refrigerant
+			std::string const & Name, // Name of the refrigerant
 			int const NumPsPoints, // Number of saturation pressure
 			Real64 const PsLowTempValue, // Low Temperature Value for Ps (>0.0)
 			Real64 const PsHighTempValue, // High Temperature Value for Ps (max in tables)
@@ -222,7 +219,7 @@ namespace FluidProperties {
 			FArray2< Real64 > const & HshValues, // Enthalpy of superheated gas at HshTemps, HshPress
 			FArray2< Real64 > const & RhoshValues // Density of superheated gas at HshTemps, HshPress
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NumPsPoints( NumPsPoints ),
 			PsLowTempValue( PsLowTempValue ),
 			PsHighTempValue( PsHighTempValue ),
@@ -283,7 +280,7 @@ namespace FluidProperties {
 	struct FluidPropsGlycolRawData
 	{
 		// Members
-		Fstring Name; // Name of the glycol
+		std::string Name; // Name of the glycol
 		bool CpDataPresent; // Flag set when specific heat data is available
 		int NumCpTempPts; // Number of temperature points for specific heat
 		int NumCpConcPts; // Number of concentration points for specific heat
@@ -311,7 +308,6 @@ namespace FluidProperties {
 
 		// Default Constructor
 		FluidPropsGlycolRawData() :
-			Name( MaxNameLength ),
 			CpDataPresent( false ),
 			NumCpTempPts( 0 ),
 			NumCpConcPts( 0 ),
@@ -328,7 +324,7 @@ namespace FluidProperties {
 
 		// Member Constructor
 		FluidPropsGlycolRawData(
-			Fstring const & Name, // Name of the glycol
+			std::string const & Name, // Name of the glycol
 			bool const CpDataPresent, // Flag set when specific heat data is available
 			int const NumCpTempPts, // Number of temperature points for specific heat
 			int const NumCpConcPts, // Number of concentration points for specific heat
@@ -354,7 +350,7 @@ namespace FluidProperties {
 			FArray1< Real64 > const & ViscConcs, // Concentration for viscosity of glycol
 			FArray2< Real64 > const & ViscValues // viscosity values
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			CpDataPresent( CpDataPresent ),
 			NumCpTempPts( NumCpTempPts ),
 			NumCpConcPts( NumCpConcPts ),
@@ -386,8 +382,8 @@ namespace FluidProperties {
 	struct FluidPropsGlycolData
 	{
 		// Members
-		Fstring Name; // Name of the glycol mixture (used by other parts of code)
-		Fstring GlycolName; // Name of non-water fluid that is part of this mixture
+		std::string Name; // Name of the glycol mixture (used by other parts of code)
+		std::string GlycolName; // Name of non-water fluid that is part of this mixture
 		// (refers to ethylene glycol, propylene glycol, or user fluid)
 		int GlycolIndex; // Index in user defined glycol data (>0 = index in raw data,
 		// -1=propylene glycol, -2=ethylene glycol)
@@ -427,8 +423,6 @@ namespace FluidProperties {
 
 		// Default Constructor
 		FluidPropsGlycolData() :
-			Name( MaxNameLength ),
-			GlycolName( MaxNameLength ),
 			GlycolIndex( 0 ),
 			Concentration( 1.0 ),
 			CpDataPresent( false ),
@@ -459,8 +453,8 @@ namespace FluidProperties {
 
 		// Member Constructor
 		FluidPropsGlycolData(
-			Fstring const & Name, // Name of the glycol mixture (used by other parts of code)
-			Fstring const & GlycolName, // Name of non-water fluid that is part of this mixture
+			std::string const & Name, // Name of the glycol mixture (used by other parts of code)
+			std::string const & GlycolName, // Name of non-water fluid that is part of this mixture
 			int const GlycolIndex, // Index in user defined glycol data (>0 = index in raw data,
 			Real64 const Concentration, // Concentration (if applicable)
 			bool const CpDataPresent, // Flag set when specific heat data is available
@@ -496,8 +490,8 @@ namespace FluidProperties {
 			FArray1< Real64 > const & ViscTemps, // Temperatures for viscosity of glycol
 			FArray1< Real64 > const & ViscValues // viscosity values (mPa-s)
 		) :
-			Name( MaxNameLength, Name ),
-			GlycolName( MaxNameLength, GlycolName ),
+			Name( Name ),
+			GlycolName( GlycolName ),
 			GlycolIndex( GlycolIndex ),
 			Concentration( Concentration ),
 			CpDataPresent( CpDataPresent ),
@@ -539,7 +533,7 @@ namespace FluidProperties {
 	struct FluidPropsRefrigErrors
 	{
 		// Members
-		Fstring Name;
+		std::string Name;
 		int SatTempErrIndex; // Index for Sat Temperature Error (Recurring errors)
 		int SatTempErrCount; // Count for Sat Temperature Error (Recurring errors)
 		int SatPressErrIndex; // Index for Sat Pressure Error (Recurring errors)
@@ -567,7 +561,6 @@ namespace FluidProperties {
 
 		// Default Constructor
 		FluidPropsRefrigErrors() :
-			Name( MaxNameLength ),
 			SatTempErrIndex( 0 ),
 			SatTempErrCount( 0 ),
 			SatPressErrIndex( 0 ),
@@ -596,7 +589,7 @@ namespace FluidProperties {
 
 		// Member Constructor
 		FluidPropsRefrigErrors(
-			Fstring const & Name,
+			std::string const & Name,
 			int const SatTempErrIndex, // Index for Sat Temperature Error (Recurring errors)
 			int const SatTempErrCount, // Count for Sat Temperature Error (Recurring errors)
 			int const SatPressErrIndex, // Index for Sat Pressure Error (Recurring errors)
@@ -622,7 +615,7 @@ namespace FluidProperties {
 			int const SatSupDensityPresErrIndex, // Index for Sat Temperature (Density) Error (Recurring errors)
 			int const SatSupDensityPresErrCount // Count for Sat Temperature (Density) Error (Recurring errors)
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			SatTempErrIndex( SatTempErrIndex ),
 			SatTempErrCount( SatTempErrCount ),
 			SatPressErrIndex( SatPressErrIndex ),
@@ -654,7 +647,7 @@ namespace FluidProperties {
 	struct FluidPropsGlycolErrors
 	{
 		// Members
-		Fstring Name; // Which glycol this error structure is for
+		std::string Name; // Which glycol this error structure is for
 		int SpecHeatLowErrIndex; // Index for Specific Heat Low Error (Recurring errors)
 		int SpecHeatHighErrIndex; // Index for Specific Heat High Error (Recurring errors)
 		int SpecHeatLowErrCount; // Count for Specific Heat Low Error (Recurring errors)
@@ -674,7 +667,6 @@ namespace FluidProperties {
 
 		// Default Constructor
 		FluidPropsGlycolErrors() :
-			Name( MaxNameLength ),
 			SpecHeatLowErrIndex( 0 ),
 			SpecHeatHighErrIndex( 0 ),
 			SpecHeatLowErrCount( 0 ),
@@ -695,7 +687,7 @@ namespace FluidProperties {
 
 		// Member Constructor
 		FluidPropsGlycolErrors(
-			Fstring const & Name, // Which glycol this error structure is for
+			std::string const & Name, // Which glycol this error structure is for
 			int const SpecHeatLowErrIndex, // Index for Specific Heat Low Error (Recurring errors)
 			int const SpecHeatHighErrIndex, // Index for Specific Heat High Error (Recurring errors)
 			int const SpecHeatLowErrCount, // Count for Specific Heat Low Error (Recurring errors)
@@ -713,7 +705,7 @@ namespace FluidProperties {
 			int const ViscosityLowErrCount, // Count for Viscosity Low Error (Recurring errors)
 			int const ViscosityHighErrCount // Count for Viscosity High Error (Recurring errors)
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			SpecHeatLowErrIndex( SpecHeatLowErrIndex ),
 			SpecHeatHighErrIndex( SpecHeatHighErrIndex ),
 			SpecHeatLowErrCount( SpecHeatLowErrCount ),
@@ -794,126 +786,126 @@ namespace FluidProperties {
 
 	Real64
 	GetSatPressureRefrig(
-		Fstring const & Refrigerant, // carries in substance name
+		std::string const & Refrigerant, // carries in substance name
 		Real64 const Temperature, // actual temperature given as input
 		int & RefrigIndex, // Index to Refrigerant Properties
-		Fstring const & CalledFrom // routine this function was called from (error messages)
+		std::string const & CalledFrom // routine this function was called from (error messages)
 	);
 
 	//*****************************************************************************
 
 	Real64
 	GetSatTemperatureRefrig(
-		Fstring const & Refrigerant, // carries in substance name
+		std::string const & Refrigerant, // carries in substance name
 		Real64 const Pressure, // actual temperature given as input
 		int & RefrigIndex, // Index to Refrigerant Properties
-		Fstring const & CalledFrom // routine this function was called from (error messages)
+		std::string const & CalledFrom // routine this function was called from (error messages)
 	);
 
 	//*****************************************************************************
 
 	Real64
 	GetSatEnthalpyRefrig(
-		Fstring const & Refrigerant, // carries in substance name
+		std::string const & Refrigerant, // carries in substance name
 		Real64 const Temperature, // actual temperature given as input
 		Real64 const Quality, // actual quality given as input
 		int & RefrigIndex, // Index to Refrigerant Properties
-		Fstring const & CalledFrom // routine this function was called from (error messages)
+		std::string const & CalledFrom // routine this function was called from (error messages)
 	);
 
 	//*****************************************************************************
 
 	Real64
 	GetSatDensityRefrig(
-		Fstring const & Refrigerant, // carries in substance name
+		std::string const & Refrigerant, // carries in substance name
 		Real64 const Temperature, // actual temperature given as input
 		Real64 const Quality, // actual quality given as input
 		int & RefrigIndex, // Index to Refrigerant Properties
-		Fstring const & CalledFrom // routine this function was called from (error messages)
+		std::string const & CalledFrom // routine this function was called from (error messages)
 	);
 
 	//*****************************************************************************
 
 	Real64
 	GetSatSpecificHeatRefrig(
-		Fstring const & Refrigerant, // carries in substance name
+		std::string const & Refrigerant, // carries in substance name
 		Real64 const Temperature, // actual temperature given as input
 		Real64 const Quality, // actual quality given as input
 		int & RefrigIndex, // Index to Refrigerant Properties
-		Fstring const & CalledFrom // routine this function was called from (error messages)
+		std::string const & CalledFrom // routine this function was called from (error messages)
 	);
 
 	//*****************************************************************************
 
 	Real64
 	GetSupHeatEnthalpyRefrig(
-		Fstring const & Refrigerant, // carries in substance name
+		std::string const & Refrigerant, // carries in substance name
 		Real64 const Temperature, // actual temperature given as input
 		Real64 const Pressure, // actual pressure given as input
 		int & RefrigIndex, // Index to Refrigerant Properties
-		Fstring const & CalledFrom // routine this function was called from (error messages)
+		std::string const & CalledFrom // routine this function was called from (error messages)
 	);
 
 	//*****************************************************************************
 
 	Real64
 	GetSupHeatPressureRefrig(
-		Fstring const & Refrigerant, // carries in substance name
+		std::string const & Refrigerant, // carries in substance name
 		Real64 const Temperature, // actual temperature given as input
 		Real64 const Enthalpy, // actual enthalpy given as input
 		int & RefrigIndex, // Index to Refrigerant Properties
-		Fstring const & CalledFrom // routine this function was called from (error messages)
+		std::string const & CalledFrom // routine this function was called from (error messages)
 	);
 
 	//*****************************************************************************
 
 	Real64
 	GetSupHeatDensityRefrig(
-		Fstring const & Refrigerant, // carries in substance name
+		std::string const & Refrigerant, // carries in substance name
 		Real64 const Temperature, // actual temperature given as input
 		Real64 const Pressure, // actual pressure given as input
 		int & RefrigIndex, // Index to Refrigerant Properties
-		Fstring const & CalledFrom // routine this function was called from (error messages)
+		std::string const & CalledFrom // routine this function was called from (error messages)
 	);
 
 	//*****************************************************************************
 
 	Real64
 	GetSpecificHeatGlycol(
-		Fstring const & Glycol, // carries in substance name
+		std::string const & Glycol, // carries in substance name
 		Real64 const Temperature, // actual temperature given as input
 		int & GlycolIndex, // Index to Glycol Properties
-		Fstring const & CalledFrom // routine this function was called from (error messages)
+		std::string const & CalledFrom // routine this function was called from (error messages)
 	);
 
 	//*****************************************************************************
 
 	Real64
 	GetDensityGlycol(
-		Fstring const & Glycol, // carries in substance name
+		std::string const & Glycol, // carries in substance name
 		Real64 const Temperature, // actual temperature given as input
 		int & GlycolIndex, // Index to Glycol Properties
-		Fstring const & CalledFrom // routine this function was called from (error messages)
+		std::string const & CalledFrom // routine this function was called from (error messages)
 	);
 
 	//*****************************************************************************
 
 	Real64
 	GetConductivityGlycol(
-		Fstring const & Glycol, // carries in substance name
+		std::string const & Glycol, // carries in substance name
 		Real64 const Temperature, // actual temperature given as input
 		int & GlycolIndex, // Index to Glycol Properties
-		Fstring const & CalledFrom // routine this function was called from (error messages)
+		std::string const & CalledFrom // routine this function was called from (error messages)
 	);
 
 	//*****************************************************************************
 
 	Real64
 	GetViscosityGlycol(
-		Fstring const & Glycol, // carries in substance name
+		std::string const & Glycol, // carries in substance name
 		Real64 const Temperature, // actual temperature given as input
 		int & GlycolIndex, // Index to Glycol Properties
-		Fstring const & CalledFrom // routine this function was called from (error messages)
+		std::string const & CalledFrom // routine this function was called from (error messages)
 	);
 
 	//*****************************************************************************
@@ -931,26 +923,26 @@ namespace FluidProperties {
 
 	Real64
 	GetQualityRefrig(
-		Fstring const & Refrigerant, // carries in substance name
+		std::string const & Refrigerant, // carries in substance name
 		Real64 const Temperature, // actual temperature given as input
 		Real64 const Enthalpy, // actual enthalpy given as input
 		int & RefrigIndex, // Index to Refrigerant Properties
-		Fstring const & CalledFrom // routine this function was called from (error messages)
+		std::string const & CalledFrom // routine this function was called from (error messages)
 	);
 
 	//*****************************************************************************
 
 	int
-	FindRefrigerant( Fstring const & Refrigerant ); // carries in substance name
+	FindRefrigerant( std::string const & Refrigerant ); // carries in substance name
 
 	//*****************************************************************************
 
 	int
-	FindGlycol( Fstring const & Glycol ); // carries in substance name
+	FindGlycol( std::string const & Glycol ); // carries in substance name
 
 	//*****************************************************************************
 
-	Fstring
+	std::string
 	GetGlycolNameByIndex( int const Idx ); // carries in substance index
 
 	//*****************************************************************************
@@ -978,7 +970,7 @@ namespace FluidProperties {
 		FArray1< Real64 > const & LiqProp, // Array of saturated liquid properties
 		FArray1< Real64 > const & VapProp, // Array of saturatedvapour properties
 		Real64 const Quality, // Quality
-		Fstring const & CalledFrom, // routine this function was called from (error messages)
+		std::string const & CalledFrom, // routine this function was called from (error messages)
 		int const LowBound, // Valid values lower bound (set by calling program)
 		int const UpperBound // Valid values upper bound (set by calling program)
 	);
@@ -986,7 +978,7 @@ namespace FluidProperties {
 	//*****************************************************************************
 
 	int
-	CheckFluidPropertyName( Fstring const & NameToCheck ); // Name from input(?) to be checked against valid FluidPropertyNames
+	CheckFluidPropertyName( std::string const & NameToCheck ); // Name from input(?) to be checked against valid FluidPropertyNames
 
 	void
 	ReportOrphanFluids();
@@ -996,10 +988,10 @@ namespace FluidProperties {
 		int const NumGlycols, // Number of Glycols in input/data
 		int const GlycolNum, // Glycol Index
 		bool const DataPresent, // data is present for this fluid.
-		Fstring const & GlycolName, // Name being reported
-		Fstring const & RoutineName, // Routine name to show
-		Fstring const & Property, // Property being requested
-		Fstring const & CalledFrom // original called from (external to fluid properties)
+		std::string const & GlycolName, // Name being reported
+		std::string const & RoutineName, // Routine name to show
+		std::string const & Property, // Property being requested
+		std::string const & CalledFrom // original called from (external to fluid properties)
 	);
 
 	void
@@ -1007,10 +999,10 @@ namespace FluidProperties {
 		int const NumRefrigerants, // Number of Refrigerants in input/data
 		int const RefrigerantNum, // Refrigerant Index
 		bool const DataPresent, // data is present for this fluid.
-		Fstring const & RefrigerantName, // Name being reported
-		Fstring const & RoutineName, // Routine name to show
-		Fstring const & Property, // Property being requested
-		Fstring const & CalledFrom // original called from (external to fluid properties)
+		std::string const & RefrigerantName, // Name being reported
+		std::string const & RoutineName, // Routine name to show
+		std::string const & Property, // Property being requested
+		std::string const & CalledFrom // original called from (external to fluid properties)
 	);
 
 	void

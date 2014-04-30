@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -16,13 +15,12 @@ namespace EnergyPlus {
 namespace EvaporativeFluidCoolers {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
 
-	extern Fstring const cEvapFluidCooler_SingleSpeed;
-	extern Fstring const cEvapFluidCooler_TwoSpeed;
+	extern std::string const cEvapFluidCooler_SingleSpeed;
+	extern std::string const cEvapFluidCooler_TwoSpeed;
 
 	extern int const EvapLossByUserFactor;
 	extern int const EvapLossByMoistTheory;
@@ -36,8 +34,6 @@ namespace EvaporativeFluidCoolers {
 
 	extern int const EvapFluidCooler_SingleSpeed;
 	extern int const EvapFluidCooler_TwoSpeed;
-
-	extern Fstring const DummyString;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -81,8 +77,8 @@ namespace EvaporativeFluidCoolers {
 	struct EvapFluidCoolerspecs
 	{
 		// Members
-		Fstring Name; // User identifier
-		Fstring EvapFluidCoolerType; // Type of evaporative fluid cooler
+		std::string Name; // User identifier
+		std::string EvapFluidCoolerType; // Type of evaporative fluid cooler
 		int EvapFluidCoolerType_Num;
 		int PerformanceInputMethod_Num;
 		bool Available; // need an array of logicals--load identifiers of available equipment
@@ -164,8 +160,6 @@ namespace EvaporativeFluidCoolers {
 
 		// Default Constructor
 		EvapFluidCoolerspecs() :
-			Name( MaxNameLength ),
-			EvapFluidCoolerType( MaxNameLength ),
 			EvapFluidCoolerType_Num( 0 ),
 			PerformanceInputMethod_Num( 0 ),
 			Available( true ),
@@ -231,8 +225,8 @@ namespace EvaporativeFluidCoolers {
 
 		// Member Constructor
 		EvapFluidCoolerspecs(
-			Fstring const & Name, // User identifier
-			Fstring const & EvapFluidCoolerType, // Type of evaporative fluid cooler
+			std::string const & Name, // User identifier
+			std::string const & EvapFluidCoolerType, // Type of evaporative fluid cooler
 			int const EvapFluidCoolerType_Num,
 			int const PerformanceInputMethod_Num,
 			bool const Available, // need an array of logicals--load identifiers of available equipment
@@ -295,8 +289,8 @@ namespace EvaporativeFluidCoolers {
 			int const BranchNum,
 			int const CompNum
 		) :
-			Name( MaxNameLength, Name ),
-			EvapFluidCoolerType( MaxNameLength, EvapFluidCoolerType ),
+			Name( Name ),
+			EvapFluidCoolerType( EvapFluidCoolerType ),
 			EvapFluidCoolerType_Num( EvapFluidCoolerType_Num ),
 			PerformanceInputMethod_Num( PerformanceInputMethod_Num ),
 			Available( Available ),
@@ -505,8 +499,8 @@ namespace EvaporativeFluidCoolers {
 
 	void
 	SimEvapFluidCoolers(
-		Fstring const & EvapFluidCoolerType,
-		Fstring const & EvapFluidCoolerName,
+		std::string const & EvapFluidCoolerType,
+		std::string const & EvapFluidCoolerName,
 		int & CompIndex,
 		bool & RunFlag,
 		bool const InitLoopEquip,

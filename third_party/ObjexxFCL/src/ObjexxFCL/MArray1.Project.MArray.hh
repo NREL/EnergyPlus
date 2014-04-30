@@ -25,8 +25,8 @@
 	typedef  MMA1< int >  MMA1_int;
 	typedef  MMA1c< double >  MMA1c_double;
 	typedef  MMA1< double >  MMA1_double;
-	typedef  MMA1c< Fstring >  MMA1c_Fstring;
-	typedef  MMA1< Fstring >  MMA1_Fstring;
+	typedef  MMA1c< std::string >  MMA1c_string;
+	typedef  MMA1< std::string >  MMA1_string;
 
 	// double const Members
 	inline MMA1c_double QdotSkin() const { return ma( &T::QdotSkin ); }
@@ -44,10 +44,10 @@
 	inline MMA1_double y() { return ma( &T::y ); }
 	inline MMA1_double z() { return ma( &T::z ); }
 
-	// Fstring const Members
-	inline MMA1c_Fstring Name() const { return ma( &T::Name ); }
+	// string const Members
+	inline MMA1c_string Name() const { return ma( &T::Name ); }
 
-	// Fstring Members
-	inline MMA1_Fstring Name() { return ma( &T::Name ); }
+	// string Members
+	inline MMA1_string Name() { return ma( &T::Name ); }
 
 #endif // ObjexxFCL_MArray1_Project_MArray_hh_INCLUDED

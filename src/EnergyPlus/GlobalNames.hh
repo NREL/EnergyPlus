@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace GlobalNames {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -39,22 +37,20 @@ namespace GlobalNames {
 	struct ComponentNameData
 	{
 		// Members
-		Fstring CompType; // Component Type
-		Fstring CompName; // Component Name (user supplied)
+		std::string CompType; // Component Type
+		std::string CompName; // Component Name (user supplied)
 
 		// Default Constructor
-		ComponentNameData() :
-			CompType( MaxNameLength ),
-			CompName( MaxNameLength )
+		ComponentNameData()
 		{}
 
 		// Member Constructor
 		ComponentNameData(
-			Fstring const & CompType, // Component Type
-			Fstring const & CompName // Component Name (user supplied)
+			std::string const & CompType, // Component Type
+			std::string const & CompName // Component Name (user supplied)
 		) :
-			CompType( MaxNameLength, CompType ),
-			CompName( MaxNameLength, CompName )
+			CompType( CompType ),
+			CompName( CompName )
 		{}
 
 	};
@@ -69,34 +65,34 @@ namespace GlobalNames {
 
 	void
 	VerifyUniqueChillerName(
-		Fstring const & TypeToVerify,
-		Fstring const & NameToVerify,
+		std::string const & TypeToVerify,
+		std::string const & NameToVerify,
 		bool & ErrorFound,
-		Fstring const & StringToDisplay
+		std::string const & StringToDisplay
 	);
 
 	void
 	VerifyUniqueBaseboardName(
-		Fstring const & TypeToVerify,
-		Fstring const & NameToVerify,
+		std::string const & TypeToVerify,
+		std::string const & NameToVerify,
 		bool & ErrorFound,
-		Fstring const & StringToDisplay
+		std::string const & StringToDisplay
 	);
 
 	void
 	VerifyUniqueBoilerName(
-		Fstring const & TypeToVerify,
-		Fstring const & NameToVerify,
+		std::string const & TypeToVerify,
+		std::string const & NameToVerify,
 		bool & ErrorFound,
-		Fstring const & StringToDisplay
+		std::string const & StringToDisplay
 	);
 
 	void
 	VerifyUniqueCoilName(
-		Fstring const & TypeToVerify,
-		Fstring const & NameToVerify,
+		std::string const & TypeToVerify,
+		std::string const & NameToVerify,
 		bool & ErrorFound,
-		Fstring const & StringToDisplay
+		std::string const & StringToDisplay
 	);
 
 	//     NOTICE

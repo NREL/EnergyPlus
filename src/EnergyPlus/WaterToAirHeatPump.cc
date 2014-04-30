@@ -104,7 +104,7 @@ namespace WaterToAirHeatPump {
 
 	void
 	SimWatertoAirHP(
-		Fstring const & CompName, // component name
+		std::string const & CompName, // component name
 		int & CompIndex, // Index for Component name
 		Real64 const DesignAirflow, // design air flow rate
 		int const CyclingScheme, // cycling scheme--either continuous fan/cycling compressor or
@@ -148,7 +148,7 @@ namespace WaterToAirHeatPump {
 		//cycling fan/cycling compressor
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const Blank;
+		static std::string const Blank;
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -171,17 +171,17 @@ namespace WaterToAirHeatPump {
 		if ( CompIndex == 0 ) {
 			HPNum = FindItemInList( CompName, WatertoAirHP.Name(), NumWatertoAirHPs );
 			if ( HPNum == 0 ) {
-				ShowFatalError( "WaterToAir HP not found=" + trim( CompName ) );
+				ShowFatalError( "WaterToAir HP not found=" + CompName );
 			}
 			CompIndex = HPNum;
 		} else {
 			HPNum = CompIndex;
 			if ( HPNum > NumWatertoAirHPs || HPNum < 1 ) {
-				ShowFatalError( "SimWatertoAirHP: Invalid CompIndex passed=" + trim( TrimSigDigits( HPNum ) ) + ", Number of Water to Air HPs=" + trim( TrimSigDigits( NumWatertoAirHPs ) ) + ", WaterToAir HP name=" + trim( CompName ) );
+				ShowFatalError( "SimWatertoAirHP: Invalid CompIndex passed=" + TrimSigDigits( HPNum ) + ", Number of Water to Air HPs=" + TrimSigDigits( NumWatertoAirHPs ) + ", WaterToAir HP name=" + CompName );
 			}
 			if ( CheckEquipName( HPNum ) ) {
 				if ( CompName != Blank && CompName != WatertoAirHP( HPNum ).Name ) {
-					ShowFatalError( "SimWatertoAirHP: Invalid CompIndex passed=" + trim( TrimSigDigits( HPNum ) ) + ", WaterToAir HP name=" + trim( CompName ) + ", stored WaterToAir HP Name for that index=" + trim( WatertoAirHP( HPNum ).Name ) );
+					ShowFatalError( "SimWatertoAirHP: Invalid CompIndex passed=" + TrimSigDigits( HPNum ) + ", WaterToAir HP name=" + CompName + ", stored WaterToAir HP Name for that index=" + WatertoAirHP( HPNum ).Name );
 				}
 				CheckEquipName( HPNum ) = false;
 			}
@@ -243,7 +243,7 @@ namespace WaterToAirHeatPump {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetWatertoAirHPInput: " ); // include trailing blank space
+		static std::string const RoutineName( "GetWatertoAirHPInput: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -267,10 +267,10 @@ namespace WaterToAirHeatPump {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		bool errFlag;
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in getting objects
-		FArray1D_Fstring AlphArray( sFstring( MaxNameLength ) ); // Alpha input items for object
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) ); // Numeric field names
+		std::string CurrentModuleObject; // for ease in getting objects
+		FArray1D_string AlphArray; // Alpha input items for object
+		FArray1D_string cAlphaFields; // Alpha field names
+		FArray1D_string cNumericFields; // Numeric field names
 		FArray1D< Real64 > NumArray; // Numeric input items for object
 		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
@@ -301,13 +301,13 @@ namespace WaterToAirHeatPump {
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		AlphArray.allocate( MaxAlphas );
-		AlphArray = " ";
+		AlphArray = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = " ";
+		cAlphaFields = "";
 		lAlphaBlanks.allocate( MaxAlphas );
 		lAlphaBlanks = true;
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = " ";
+		cNumericFields = "";
 		lNumericBlanks.allocate( MaxNums );
 		lNumericBlanks = true;
 		NumArray.allocate( MaxNums );
@@ -325,20 +325,20 @@ namespace WaterToAirHeatPump {
 			IsNotOK = false;
 			IsBlank = false;
 
-			VerifyName( AlphArray( 1 ), WatertoAirHP.Name(), HPNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( AlphArray( 1 ), WatertoAirHP.Name(), HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
 			}
-			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, trim( CurrentModuleObject ) + " Name" );
+			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
 			}
 
-			WatertoAirHP( HPNum ).Name = trim( AlphArray( 1 ) );
+			WatertoAirHP( HPNum ).Name = AlphArray( 1 );
 			WatertoAirHP( HPNum ).WatertoAirHPType = "COOLING";
 			WatertoAirHP( HPNum ).WAHPPlantTypeOfNum = TypeOf_CoilWAHPCoolingParamEst;
-			WatertoAirHP( HPNum ).Refrigerant = trim( AlphArray( 3 ) );
+			WatertoAirHP( HPNum ).Refrigerant = AlphArray( 3 );
 			WatertoAirHP( HPNum ).DesignWaterVolFlowRate = NumArray( 1 );
 			WatertoAirHP( HPNum ).CoolingCapacity = NumArray( 2 );
 			WatertoAirHP( HPNum ).Twet_Rated = NumArray( 3 );
@@ -347,17 +347,17 @@ namespace WaterToAirHeatPump {
 			WatertoAirHP( HPNum ).HighPressCutoff = NumArray( 5 );
 			WatertoAirHP( HPNum ).LowPressCutoff = NumArray( 6 );
 
-			WatertoAirHP( HPNum ).WaterInletNodeNum = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
-			WatertoAirHP( HPNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
-			WatertoAirHP( HPNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 6 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			WatertoAirHP( HPNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 7 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			WatertoAirHP( HPNum ).WaterInletNodeNum = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+			WatertoAirHP( HPNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+			WatertoAirHP( HPNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 6 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			WatertoAirHP( HPNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 7 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 			//2010-01-13 ESL: Jason Glazer noted that these were out of order previously, but they are good now
 			WatertoAirHP( HPNum ).LoadSideTotalUACoeff = NumArray( 7 );
 			WatertoAirHP( HPNum ).LoadSideOutsideUACoeff = NumArray( 8 );
 
 			if ( ( WatertoAirHP( HPNum ).LoadSideOutsideUACoeff < rTinyValue ) || ( WatertoAirHP( HPNum ).LoadSideTotalUACoeff < rTinyValue ) ) {
-				ShowSevereError( "Input problem for " + trim( CurrentModuleObject ) + "=" + trim( WatertoAirHP( HPNum ).Name ) );
+				ShowSevereError( "Input problem for " + CurrentModuleObject + '=' + WatertoAirHP( HPNum ).Name );
 				ShowContinueError( " One or both load side UA values entered are below tolerance, likely zero or blank." );
 				ShowContinueError( " Verify inputs, as the parameter syntax for this object went through a change with" );
 				ShowContinueError( "  the release of EnergyPlus version 5." );
@@ -388,7 +388,7 @@ namespace WaterToAirHeatPump {
 				WatertoAirHP( HPNum ).LeakRateCoeff = NumArray( 17 );
 
 			} else {
-				ShowSevereError( RoutineName + "Invalid " + trim( cAlphaFields( 2 ) ) + " (" + trim( AlphArray( 2 ) ) + ") entered." + trim( CurrentModuleObject ) + "=" + trim( WatertoAirHP( HPNum ).Name ) );
+				ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 2 ) + " (" + AlphArray( 2 ) + ") entered." + CurrentModuleObject + '=' + WatertoAirHP( HPNum ).Name );
 				ErrorsFound = true;
 
 			}}
@@ -397,8 +397,8 @@ namespace WaterToAirHeatPump {
 			WatertoAirHP( HPNum ).SourceSideHTR1 = NumArray( 19 );
 			WatertoAirHP( HPNum ).SourceSideHTR2 = NumArray( 20 );
 
-			TestCompSet( trim( CurrentModuleObject ), AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Water Nodes" );
-			TestCompSet( trim( CurrentModuleObject ), AlphArray( 1 ), AlphArray( 6 ), AlphArray( 7 ), "Air Nodes" );
+			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Water Nodes" );
+			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 6 ), AlphArray( 7 ), "Air Nodes" );
 
 			SetupOutputVariable( "Cooling Coil Electric Energy [J]", WatertoAirHP( HPNum ).Energy, "System", "Summed", WatertoAirHP( HPNum ).Name, _, "Electric", "Cooling", _, "System" );
 
@@ -434,34 +434,34 @@ namespace WaterToAirHeatPump {
 			IsNotOK = false;
 			IsBlank = false;
 
-			VerifyName( AlphArray( 1 ), WatertoAirHP.Name(), HPNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( AlphArray( 1 ), WatertoAirHP.Name(), HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
 			}
-			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, trim( CurrentModuleObject ) + " Name" );
+			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
 			}
 
-			WatertoAirHP( HPNum ).Name = trim( AlphArray( 1 ) );
+			WatertoAirHP( HPNum ).Name = AlphArray( 1 );
 			WatertoAirHP( HPNum ).WatertoAirHPType = "HEATING";
 			WatertoAirHP( HPNum ).WAHPPlantTypeOfNum = TypeOf_CoilWAHPHeatingParamEst;
-			WatertoAirHP( HPNum ).Refrigerant = trim( AlphArray( 3 ) );
+			WatertoAirHP( HPNum ).Refrigerant = AlphArray( 3 );
 			WatertoAirHP( HPNum ).DesignWaterVolFlowRate = NumArray( 1 );
 			WatertoAirHP( HPNum ).HeatingCapacity = NumArray( 2 );
 
 			WatertoAirHP( HPNum ).HighPressCutoff = NumArray( 3 );
 			WatertoAirHP( HPNum ).LowPressCutoff = NumArray( 4 );
 
-			WatertoAirHP( HPNum ).WaterInletNodeNum = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
-			WatertoAirHP( HPNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
-			WatertoAirHP( HPNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 6 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			WatertoAirHP( HPNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 7 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			WatertoAirHP( HPNum ).WaterInletNodeNum = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+			WatertoAirHP( HPNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+			WatertoAirHP( HPNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 6 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			WatertoAirHP( HPNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 7 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 			WatertoAirHP( HPNum ).LoadSideTotalUACoeff = NumArray( 5 );
 			if ( WatertoAirHP( HPNum ).LoadSideTotalUACoeff < rTinyValue ) {
-				ShowSevereError( "Input problem for " + trim( CurrentModuleObject ) + "=" + trim( WatertoAirHP( HPNum ).Name ) );
+				ShowSevereError( "Input problem for " + CurrentModuleObject + '=' + WatertoAirHP( HPNum ).Name );
 				ShowContinueError( " Load side UA value is less than tolerance, likely zero or blank." );
 				ShowContinueError( " Verify inputs, as the parameter syntax for this object went through a change with" );
 				ShowContinueError( "  the release of EnergyPlus version 5." );
@@ -492,7 +492,7 @@ namespace WaterToAirHeatPump {
 				WatertoAirHP( HPNum ).LeakRateCoeff = NumArray( 14 );
 
 			} else {
-				ShowSevereError( RoutineName + "Invalid " + trim( cAlphaFields( 2 ) ) + " (" + trim( AlphArray( 2 ) ) + ") entered." + trim( CurrentModuleObject ) + "=" + trim( WatertoAirHP( HPNum ).Name ) );
+				ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 2 ) + " (" + AlphArray( 2 ) + ") entered." + CurrentModuleObject + '=' + WatertoAirHP( HPNum ).Name );
 				ErrorsFound = true;
 
 			}}
@@ -501,8 +501,8 @@ namespace WaterToAirHeatPump {
 			WatertoAirHP( HPNum ).SourceSideHTR1 = NumArray( 16 );
 			WatertoAirHP( HPNum ).SourceSideHTR2 = NumArray( 17 );
 
-			TestCompSet( trim( CurrentModuleObject ), AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Water Nodes" );
-			TestCompSet( trim( CurrentModuleObject ), AlphArray( 1 ), AlphArray( 6 ), AlphArray( 7 ), "Air Nodes" );
+			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Water Nodes" );
+			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 6 ), AlphArray( 7 ), "Air Nodes" );
 
 			SetupOutputVariable( "Heating Coil Electric Energy [J]", WatertoAirHP( HPNum ).Energy, "System", "Summed", WatertoAirHP( HPNum ).Name, _, "Electric", "Heating", _, "System" );
 
@@ -675,7 +675,7 @@ namespace WaterToAirHeatPump {
 
 			if ( PlantLoop( WatertoAirHP( HPNum ).LoopNum ).FluidName == "WATER" ) {
 				if ( WatertoAirHP( HPNum ).SourceSideUACoeff < rTinyValue ) {
-					ShowSevereError( "Input problem for water to air heat pump, \"" + trim( WatertoAirHP( HPNum ).Name ) + "\"." );
+					ShowSevereError( "Input problem for water to air heat pump, \"" + WatertoAirHP( HPNum ).Name + "\"." );
 					ShowContinueError( " Source side UA value is less than tolerance, likely zero or blank." );
 					ShowContinueError( " Verify inputs, as the parameter syntax for this object went through a change with" );
 					ShowContinueError( "  the release of EnergyPlus version 5." );
@@ -683,7 +683,7 @@ namespace WaterToAirHeatPump {
 				}
 			} else {
 				if ( ( WatertoAirHP( HPNum ).SourceSideHTR1 < rTinyValue ) || ( WatertoAirHP( HPNum ).SourceSideHTR2 < rTinyValue ) ) {
-					ShowSevereError( "Input problem for water to air heat pump, \"" + trim( WatertoAirHP( HPNum ).Name ) + "\"." );
+					ShowSevereError( "Input problem for water to air heat pump, \"" + WatertoAirHP( HPNum ).Name + "\"." );
 					ShowContinueError( " A source side heat transfer resistance value is less than tolerance, likely zero or blank." );
 					ShowContinueError( " Verify inputs, as the parameter syntax for this object went through a change with" );
 					ShowContinueError( "  the release of EnergyPlus version 5." );
@@ -912,8 +912,8 @@ namespace WaterToAirHeatPump {
 		int SourceSideFluidIndex; // Source Side Fluid Index
 
 		int CompressorType; // Type of Compressor ie. Reciprocating,Rotary or Scroll
-		Fstring SourceSideFluidName( MaxNameLength ); // Name of source side fluid
-		Fstring Refrigerant( MaxNameLength ); // Name of refrigerant
+		std::string SourceSideFluidName; // Name of source side fluid
+		std::string Refrigerant; // Name of refrigerant
 		//      CHARACTER(len=25) :: CErrCount
 		Real64 NominalCoolingCapacity; // Nominal Cooling Capacity (W)
 		Real64 LoadSideTotalUA; // Load Side Total Heat Transfer coefficient [W/C]
@@ -1227,7 +1227,7 @@ namespace WaterToAirHeatPump {
 
 					if ( LoadSidePressure < LowPressCutoff && ! FirstHVACIteration ) {
 						if ( ! WarmupFlag ) {
-							ShowRecurringWarningErrorAtEnd( "WaterToAir Heat pump:cooling [" + trim( WatertoAirHP( HPNum ).Name ) + "] shut off on low pressure < " + trim( RoundSigDigits( LowPressCutoff, 0 ) ), WatertoAirHP( HPNum ).LowPressClgError, LoadSidePressure, LoadSidePressure, _, "[Pa]", "[Pa]" );
+							ShowRecurringWarningErrorAtEnd( "WaterToAir Heat pump:cooling [" + WatertoAirHP( HPNum ).Name + "] shut off on low pressure < " + RoundSigDigits( LowPressCutoff, 0 ), WatertoAirHP( HPNum ).LowPressClgError, LoadSidePressure, LoadSidePressure, _, "[Pa]", "[Pa]" );
 						}
 						WatertoAirHP( HPNum ).SimFlag = false;
 						return;
@@ -1235,7 +1235,7 @@ namespace WaterToAirHeatPump {
 
 					if ( SourceSidePressure > HighPressCutoff && ! FirstHVACIteration ) {
 						if ( ! WarmupFlag ) {
-							ShowRecurringWarningErrorAtEnd( "WaterToAir Heat pump:cooling [" + trim( WatertoAirHP( HPNum ).Name ) + "] shut off on high pressure > " + trim( RoundSigDigits( HighPressCutoff, 0 ) ), WatertoAirHP( HPNum ).HighPressClgError, SourceSideInletTemp, SourceSideInletTemp, _, "SourceSideInletTemp[C]", "SourceSideInletTemp[C]" );
+							ShowRecurringWarningErrorAtEnd( "WaterToAir Heat pump:cooling [" + WatertoAirHP( HPNum ).Name + "] shut off on high pressure > " + RoundSigDigits( HighPressCutoff, 0 ), WatertoAirHP( HPNum ).HighPressClgError, SourceSideInletTemp, SourceSideInletTemp, _, "SourceSideInletTemp[C]", "SourceSideInletTemp[C]" );
 						}
 						WatertoAirHP( HPNum ).SimFlag = false;
 						return;
@@ -1488,7 +1488,7 @@ namespace WaterToAirHeatPump {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Fstring Refrigerant( MaxNameLength ); // Name of refrigerant
+		std::string Refrigerant; // Name of refrigerant
 		Real64 SuctionPr;
 		Real64 CompSuctionEnth;
 		Real64 SuperHeatEnth;
@@ -1571,8 +1571,8 @@ namespace WaterToAirHeatPump {
 		int SourceSideFluidIndex; // Source Side Fluid Index
 
 		int CompressorType; // Type of Compressor ie. Reciprocating,Rotary or Scroll
-		Fstring SourceSideFluidName( MaxNameLength ); // Name of source side fluid
-		Fstring Refrigerant( MaxNameLength ); // Name of refrigerant
+		std::string SourceSideFluidName; // Name of source side fluid
+		std::string Refrigerant; // Name of refrigerant
 		//      CHARACTER(len=25) :: CErrCount
 		Real64 NominalHeatingCapacity; // Nominal Heating Capacity(W)
 		Real64 LoadSideUA; // Load Side Heat Transfer coefficient [W/C]
@@ -1748,7 +1748,7 @@ namespace WaterToAirHeatPump {
 				LoadSidePressure = GetSatPressureRefrig( Refrigerant, LoadSideTemp, RefrigIndex, "CalcWatertoAirHPHeating:LoadSideTemp" );
 				if ( SourceSidePressure < LowPressCutoff && ! FirstHVACIteration ) {
 					if ( ! WarmupFlag ) {
-						ShowRecurringWarningErrorAtEnd( "WaterToAir Heat pump:heating [" + trim( WatertoAirHP( HPNum ).Name ) + "] shut off on low pressure < " + trim( RoundSigDigits( LowPressCutoff, 0 ) ), WatertoAirHP( HPNum ).LowPressHtgError, SourceSidePressure, SourceSidePressure, _, "[Pa]", "[Pa]" );
+						ShowRecurringWarningErrorAtEnd( "WaterToAir Heat pump:heating [" + WatertoAirHP( HPNum ).Name + "] shut off on low pressure < " + RoundSigDigits( LowPressCutoff, 0 ), WatertoAirHP( HPNum ).LowPressHtgError, SourceSidePressure, SourceSidePressure, _, "[Pa]", "[Pa]" );
 					}
 					WatertoAirHP( HPNum ).SimFlag = false;
 					return;
@@ -1756,7 +1756,7 @@ namespace WaterToAirHeatPump {
 
 				if ( LoadSidePressure > HighPressCutoff && ! FirstHVACIteration ) {
 					if ( ! WarmupFlag ) {
-						ShowRecurringWarningErrorAtEnd( "WaterToAir Heat pump:heating [" + trim( WatertoAirHP( HPNum ).Name ) + "] shut off on high pressure > " + trim( RoundSigDigits( HighPressCutoff, 0 ) ), WatertoAirHP( HPNum ).HighPressHtgError, SourceSideInletTemp, SourceSideInletTemp, _, "SourceSideInletTemp[C]", "SourceSideInletTemp[C]" );
+						ShowRecurringWarningErrorAtEnd( "WaterToAir Heat pump:heating [" + WatertoAirHP( HPNum ).Name + "] shut off on high pressure > " + RoundSigDigits( HighPressCutoff, 0 ), WatertoAirHP( HPNum ).HighPressHtgError, SourceSideInletTemp, SourceSideInletTemp, _, "SourceSideInletTemp[C]", "SourceSideInletTemp[C]" );
 					}
 					//         CALL ShowWarningError('Heat pump:heating shut off on high pressure')
 					//         WRITE(CErrCount,*) SourceSideInletTemp
@@ -2216,7 +2216,7 @@ namespace WaterToAirHeatPump {
 
 	Real64
 	DegradF(
-		Fstring & FluidName, // Name of glycol used in source side
+		std::string & FluidName, // Name of glycol used in source side
 		Real64 & Temp, // Temperature of the fluid
 		int & FluidIndex // Index number for the fluid
 	)
@@ -2247,7 +2247,7 @@ namespace WaterToAirHeatPump {
 
 		// Locals
 		// FUNCTION PARAMETER DEFINITIONS:
-		static Fstring const CalledFrom( "HVACWaterToAir:DegradF" );
+		static std::string const CalledFrom( "HVACWaterToAir:DegradF" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2281,8 +2281,8 @@ namespace WaterToAirHeatPump {
 
 	int
 	GetCoilIndex(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -2336,7 +2336,7 @@ namespace WaterToAirHeatPump {
 		IndexNum = FindItemInList( CoilName, WatertoAirHP.Name(), NumWatertoAirHPs );
 
 		if ( IndexNum == 0 ) {
-			ShowSevereError( "Could not find CoilType=\"" + trim( CoilType ) + "\" with Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 		}
 
@@ -2346,8 +2346,8 @@ namespace WaterToAirHeatPump {
 
 	Real64
 	GetCoilCapacity(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -2413,7 +2413,7 @@ namespace WaterToAirHeatPump {
 		}
 
 		if ( WhichCoil == 0 ) {
-			ShowSevereError( "Could not find CoilType=\"" + trim( CoilType ) + "\" with Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			CoilCapacity = -1000.0;
 		}
@@ -2424,8 +2424,8 @@ namespace WaterToAirHeatPump {
 
 	int
 	GetCoilInletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -2482,7 +2482,7 @@ namespace WaterToAirHeatPump {
 		}
 
 		if ( WhichCoil == 0 ) {
-			ShowSevereError( "Could not find CoilType=\"" + trim( CoilType ) + "\" with Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		}
@@ -2493,8 +2493,8 @@ namespace WaterToAirHeatPump {
 
 	int
 	GetCoilOutletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -2551,7 +2551,7 @@ namespace WaterToAirHeatPump {
 		}
 
 		if ( WhichCoil == 0 ) {
-			ShowSevereError( "Could not find CoilType=\"" + trim( CoilType ) + "\" with Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		}

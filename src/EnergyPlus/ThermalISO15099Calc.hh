@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1A.hh>
 #include <ObjexxFCL/FArray2A.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -84,7 +83,7 @@ namespace ThermalISO15099Calc {
 		FArray1A< Real64 > hrgas,
 		Real64 & shgc,
 		int & nperr,
-		Fstring & ErrorMessage,
+		std::string & ErrorMessage,
 		Real64 & shgct,
 		Real64 & tamb,
 		Real64 & troom,
@@ -178,7 +177,7 @@ namespace ThermalISO15099Calc {
 		FArray1A< Real64 > hrgas,
 		Real64 & ufactor,
 		int & nperr,
-		Fstring & ErrorMessage,
+		std::string & ErrorMessage,
 		Real64 & tamb,
 		Real64 & troom,
 		FArray1A_int const ibc,
@@ -231,7 +230,7 @@ namespace ThermalISO15099Calc {
 		FArray1A< Real64 > const Ebb,
 		int const nlayer,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	);
 
 	void
@@ -311,7 +310,7 @@ namespace ThermalISO15099Calc {
 		int const index,
 		FArray1A_int const ibc,
 		int & nperr,
-		Fstring & ErrorMessage,
+		std::string & ErrorMessage,
 		Real64 & hrin,
 		Real64 & hrout,
 		FArray1A< Real64 > Ra,
@@ -337,7 +336,7 @@ namespace ThermalISO15099Calc {
 		Real64 & hcin,
 		int const ibc,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	);
 
 	void
@@ -362,7 +361,7 @@ namespace ThermalISO15099Calc {
 		FArray1A< Real64 > Rayleigh,
 		FArray1A< Real64 > Nu,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	);
 
 	void
@@ -376,7 +375,7 @@ namespace ThermalISO15099Calc {
 		FArray1A< Real64 > hcgas,
 		Real64 const VacuumMaxGapThickness,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	);
 
 	void
@@ -386,7 +385,7 @@ namespace ThermalISO15099Calc {
 		Real64 const asp,
 		Real64 & gnu,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	);
 
 	//  subroutine picard(nlayer, alpha, Ebb, Ebf, Rf, Rb, Ebbold, Ebfold, Rfold, Rbold)
@@ -443,7 +442,7 @@ namespace ThermalISO15099Calc {
 		FArray1A< Real64 > hgas,
 		FArray1A< Real64 > hhat,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	);
 
 	void

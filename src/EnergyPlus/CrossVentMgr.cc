@@ -5,7 +5,6 @@
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/MArray.functions.hh>
 
 // EnergyPlus Headers
@@ -524,7 +523,7 @@ namespace CrossVentMgr {
 				CVJetRecFlows( ZoneNum, Ctd ).Area = SurfParametersCVDV( Ctd ).Width * SurfParametersCVDV( Ctd ).Height;
 			} else {
 				ShowSevereError( "RoomAirModelCrossVent:EvolveParaUCSDCV: Illegal leakage component referenced " "in the cross ventilation room air model" );
-				ShowContinueError( "Surface " + trim( AirflowNetworkLinkageData( Ctd ).Name ) + " in zone " + trim( Zone( ZoneNum ).Name ) + " uses leakage component " + trim( AirflowNetworkLinkageData( Ctd ).CompName ) );
+				ShowContinueError( "Surface " + AirflowNetworkLinkageData( Ctd ).Name + " in zone " + Zone( ZoneNum ).Name + " uses leakage component " + AirflowNetworkLinkageData( Ctd ).CompName );
 				ShowContinueError( "Only leakage component types AirflowNetwork:MultiZone:Component:DetailedOpening and " );
 				ShowContinueError( "AirflowNetwork:MultiZone:Surface:Crack can be used with the cross ventilation room air model" );
 				ShowFatalError( "Previous severe error causes program termination" );

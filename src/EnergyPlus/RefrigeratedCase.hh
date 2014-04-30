@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -15,7 +14,6 @@ namespace EnergyPlus {
 namespace RefrigeratedCase {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -262,9 +260,9 @@ namespace RefrigeratedCase {
 	struct RefrigCaseData
 	{
 		// Members
-		Fstring Name; // Name of refrigerated display case
+		std::string Name; // Name of refrigerated display case
 		// CHARACTER(len=MaxNameLength) :: Schedule=' '               ! Display case availability schedule name
-		Fstring ZoneName; // Zone or Location of Display Case
+		std::string ZoneName; // Zone or Location of Display Case
 		int NumSysAttach; // Number of systems attached to case, error if /=1
 		int SchedPtr; // Index to the correct availability schedule
 		int ZoneNodeNum; // Index to Zone Node
@@ -365,8 +363,6 @@ namespace RefrigeratedCase {
 
 		// Default Constructor
 		RefrigCaseData() :
-			Name( MaxNameLength ),
-			ZoneName( MaxNameLength ),
 			NumSysAttach( 0 ),
 			SchedPtr( 0 ),
 			ZoneNodeNum( 0 ),
@@ -460,8 +456,8 @@ namespace RefrigeratedCase {
 
 		// Member Constructor
 		RefrigCaseData(
-			Fstring const & Name, // Name of refrigerated display case
-			Fstring const & ZoneName, // Zone or Location of Display Case
+			std::string const & Name, // Name of refrigerated display case
+			std::string const & ZoneName, // Zone or Location of Display Case
 			int const NumSysAttach, // Number of systems attached to case, error if /=1
 			int const SchedPtr, // Index to the correct availability schedule
 			int const ZoneNodeNum, // Index to Zone Node
@@ -552,8 +548,8 @@ namespace RefrigeratedCase {
 			Real64 const HotDefrostCondCredit, // Used to credit condenser when heat reclaim used for hot gas/brine defrost (W)
 			Real64 const DeltaDefrostEnergy // Used to reverse accumulation if the zone/load time step is repeated (J)
 		) :
-			Name( MaxNameLength, Name ),
-			ZoneName( MaxNameLength, ZoneName ),
+			Name( Name ),
+			ZoneName( ZoneName ),
 			NumSysAttach( NumSysAttach ),
 			SchedPtr( SchedPtr ),
 			ZoneNodeNum( ZoneNodeNum ),
@@ -651,9 +647,9 @@ namespace RefrigeratedCase {
 	{
 		// Members
 		bool CoilFlag; // Flag to show if coil type load on rack
-		Fstring Name; // Name of Refrigeration Compressor rack
-		Fstring SupplyTankName; // Evap water supply tank name
-		Fstring EndUseSubcategory; // Rack end-use subcategory
+		std::string Name; // Name of Refrigeration Compressor rack
+		std::string SupplyTankName; // Evap water supply tank name
+		std::string EndUseSubcategory; // Rack end-use subcategory
 		// Index of refrigerated case (1 to NumCases) connected to rack #X
 		FArray1D_int CaseNum;
 		FArray1D_int CoilNum;
@@ -733,9 +729,7 @@ namespace RefrigeratedCase {
 		// Default Constructor
 		RefrigRackData() :
 			CoilFlag( false ),
-			Name( MaxNameLength ),
-			SupplyTankName( MaxNameLength ),
-			EndUseSubcategory( MaxNameLength, "General" ),
+			EndUseSubcategory( "General" ),
 			HeatRejectionLocation( 0 ),
 			CondenserType( 0 ),
 			EvapEffect( 0.9 ),
@@ -807,9 +801,9 @@ namespace RefrigeratedCase {
 		// Member Constructor
 		RefrigRackData(
 			bool const CoilFlag, // Flag to show if coil type load on rack
-			Fstring const & Name, // Name of Refrigeration Compressor rack
-			Fstring const & SupplyTankName, // Evap water supply tank name
-			Fstring const & EndUseSubcategory, // Rack end-use subcategory
+			std::string const & Name, // Name of Refrigeration Compressor rack
+			std::string const & SupplyTankName, // Evap water supply tank name
+			std::string const & EndUseSubcategory, // Rack end-use subcategory
 			FArray1_int const & CaseNum,
 			FArray1_int const & CoilNum,
 			FArray1_int const & WalkInNum,
@@ -883,9 +877,9 @@ namespace RefrigeratedCase {
 			Real64 const TotalCoolingLoad
 		) :
 			CoilFlag( CoilFlag ),
-			Name( MaxNameLength, Name ),
-			SupplyTankName( MaxNameLength, SupplyTankName ),
-			EndUseSubcategory( MaxNameLength, EndUseSubcategory ),
+			Name( Name ),
+			SupplyTankName( SupplyTankName ),
+			EndUseSubcategory( EndUseSubcategory ),
 			CaseNum( CaseNum ),
 			CoilNum( CoilNum ),
 			WalkInNum( WalkInNum ),
@@ -964,10 +958,10 @@ namespace RefrigeratedCase {
 	struct RefrigSystemData
 	{
 		// Members
-		Fstring Name; // Name of refrigeration system
-		Fstring RefrigerantName; // Name of refrigerant, must match name in FluidName
+		std::string Name; // Name of refrigeration system
+		std::string RefrigerantName; // Name of refrigerant, must match name in FluidName
 		//    (see fluidpropertiesrefdata.idf)
-		Fstring EndUseSubcategory; // Used for reporting purposes
+		std::string EndUseSubcategory; // Used for reporting purposes
 		bool SystemRejectHeatToZone; // Flag to show air-cooled condenser located inside zone
 		bool CoilFlag; // Flag to show if coil type load on system (even if below in a secondary)
 		FArray1D_int CascadeLoadNum; // absolute index  of condensers placing load (allocated NumCondensers)
@@ -1079,9 +1073,6 @@ namespace RefrigeratedCase {
 
 		// Default Constructor
 		RefrigSystemData() :
-			Name( MaxNameLength ),
-			RefrigerantName( MaxNameLength ),
-			EndUseSubcategory( MaxNameLength ),
 			SystemRejectHeatToZone( false ),
 			CoilFlag( false ),
 			CompSuctControl( 2 ),
@@ -1167,9 +1158,9 @@ namespace RefrigeratedCase {
 
 		// Member Constructor
 		RefrigSystemData(
-			Fstring const & Name, // Name of refrigeration system
-			Fstring const & RefrigerantName, // Name of refrigerant, must match name in FluidName
-			Fstring const & EndUseSubcategory, // Used for reporting purposes
+			std::string const & Name, // Name of refrigeration system
+			std::string const & RefrigerantName, // Name of refrigerant, must match name in FluidName
+			std::string const & EndUseSubcategory, // Used for reporting purposes
 			bool const SystemRejectHeatToZone, // Flag to show air-cooled condenser located inside zone
 			bool const CoilFlag, // Flag to show if coil type load on system (even if below in a secondary)
 			FArray1_int const & CascadeLoadNum, // absolute index  of condensers placing load (allocated NumCondensers)
@@ -1263,9 +1254,9 @@ namespace RefrigeratedCase {
 			Real64 const UnmetHiStageEnergy, // Accumulative loads unmet by total high-stage compressors (two-stage systems only) on this system (J)
 			Real64 const UnmetEnergySaved // Accumulative loads unmet by total compressors (for single-stage systems) on this system (J)
 		) :
-			Name( MaxNameLength, Name ),
-			RefrigerantName( MaxNameLength, RefrigerantName ),
-			EndUseSubcategory( MaxNameLength, EndUseSubcategory ),
+			Name( Name ),
+			RefrigerantName( RefrigerantName ),
+			EndUseSubcategory( EndUseSubcategory ),
 			SystemRejectHeatToZone( SystemRejectHeatToZone ),
 			CoilFlag( CoilFlag ),
 			CascadeLoadNum( CascadeLoadNum ),
@@ -1365,10 +1356,10 @@ namespace RefrigeratedCase {
 	struct TransRefrigSystemData
 	{
 		// Members
-		Fstring Name; // Name of transcritical CO2 refrigeration system
-		Fstring RefrigerantName; // Name of refrigerant, must match name in FluidName
+		std::string Name; // Name of transcritical CO2 refrigeration system
+		std::string RefrigerantName; // Name of refrigerant, must match name in FluidName
 		//    (see fluidpropertiesrefdata.idf)
-		Fstring EndUseSubcategory; // Used for reporting purposes
+		std::string EndUseSubcategory; // Used for reporting purposes
 		bool SystemRejectHeatToZone; // Flag to show air-cooled gas cooler located inside zone
 		FArray1D_int CaseNumMT; // absolute Index of medium temperature cases (allocated NumCasesMT)
 		FArray1D_int CaseNumLT; // absolute Index of low temperature cases (allocated NumCasesLT)
@@ -1468,9 +1459,6 @@ namespace RefrigeratedCase {
 
 		// Default Constructor
 		TransRefrigSystemData() :
-			Name( MaxNameLength ),
-			RefrigerantName( MaxNameLength ),
-			EndUseSubcategory( MaxNameLength ),
 			SystemRejectHeatToZone( false ),
 			NumCasesLT( 0 ),
 			NumCasesMT( 0 ),
@@ -1563,9 +1551,9 @@ namespace RefrigeratedCase {
 
 		// Member Constructor
 		TransRefrigSystemData(
-			Fstring const & Name, // Name of transcritical CO2 refrigeration system
-			Fstring const & RefrigerantName, // Name of refrigerant, must match name in FluidName
-			Fstring const & EndUseSubcategory, // Used for reporting purposes
+			std::string const & Name, // Name of transcritical CO2 refrigeration system
+			std::string const & RefrigerantName, // Name of refrigerant, must match name in FluidName
+			std::string const & EndUseSubcategory, // Used for reporting purposes
 			bool const SystemRejectHeatToZone, // Flag to show air-cooled gas cooler located inside zone
 			FArray1_int const & CaseNumMT, // absolute Index of medium temperature cases (allocated NumCasesMT)
 			FArray1_int const & CaseNumLT, // absolute Index of low temperature cases (allocated NumCasesLT)
@@ -1662,9 +1650,9 @@ namespace RefrigeratedCase {
 			Real64 const UnmetEnergySavedMT, // Accumulative loads unmet by total HP compressors on this system (J)
 			Real64 const UnmetEnergySavedLT // Accumulative loads unmet by total LP compressors on this system (J)
 		) :
-			Name( MaxNameLength, Name ),
-			RefrigerantName( MaxNameLength, RefrigerantName ),
-			EndUseSubcategory( MaxNameLength, EndUseSubcategory ),
+			Name( Name ),
+			RefrigerantName( RefrigerantName ),
+			EndUseSubcategory( EndUseSubcategory ),
 			SystemRejectHeatToZone( SystemRejectHeatToZone ),
 			CaseNumMT( CaseNumMT ),
 			CaseNumLT( CaseNumLT ),
@@ -1767,7 +1755,7 @@ namespace RefrigeratedCase {
 	struct CaseAndWalkInListDef // Derived Type for CaseAndWalkIn Lists
 	{
 		// Members
-		Fstring Name; // Name of this CaseAndWalkIn List
+		std::string Name; // Name of this CaseAndWalkIn List
 		int NumCases; // Number of Cases in this CaseAndWalkIn List
 		int NumCoils; // Number of Coils in this CaseAndWalkIn List
 		int NumWalkIns; // Number of WalkIns in this CaseAndWalkIn List
@@ -1777,7 +1765,6 @@ namespace RefrigeratedCase {
 
 		// Default Constructor
 		CaseAndWalkInListDef() :
-			Name( MaxNameLength ),
 			NumCases( 0 ),
 			NumCoils( 0 ),
 			NumWalkIns( 0 )
@@ -1785,7 +1772,7 @@ namespace RefrigeratedCase {
 
 		// Member Constructor
 		CaseAndWalkInListDef(
-			Fstring const & Name, // Name of this CaseAndWalkIn List
+			std::string const & Name, // Name of this CaseAndWalkIn List
 			int const NumCases, // Number of Cases in this CaseAndWalkIn List
 			int const NumCoils, // Number of Coils in this CaseAndWalkIn List
 			int const NumWalkIns, // Number of WalkIns in this CaseAndWalkIn List
@@ -1793,7 +1780,7 @@ namespace RefrigeratedCase {
 			FArray1_int const & CoilItemNum, // List of Item numbers that correspond to each Coil
 			FArray1_int const & WalkInItemNum // List of Item numbers that correspond to each WalkIn
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NumCases( NumCases ),
 			NumCoils( NumCoils ),
 			NumWalkIns( NumWalkIns ),
@@ -1807,23 +1794,22 @@ namespace RefrigeratedCase {
 	struct CompressorListDef // Derived Type for Compressor Lists
 	{
 		// Members
-		Fstring Name; // Name of this Compressor List
+		std::string Name; // Name of this Compressor List
 		int NumCompressors; // Number of Compressors in this Node List
 		FArray1D_int CompItemNum; // List of Item numbers that correspond to the compressors
 
 		// Default Constructor
 		CompressorListDef() :
-			Name( MaxNameLength ),
 			NumCompressors( 0 )
 		{}
 
 		// Member Constructor
 		CompressorListDef(
-			Fstring const & Name, // Name of this Compressor List
+			std::string const & Name, // Name of this Compressor List
 			int const NumCompressors, // Number of Compressors in this Node List
 			FArray1_int const & CompItemNum // List of Item numbers that correspond to the compressors
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NumCompressors( NumCompressors ),
 			CompItemNum( CompItemNum )
 		{}
@@ -1833,9 +1819,9 @@ namespace RefrigeratedCase {
 	struct RefrigCondenserData
 	{
 		// Members
-		Fstring Name; // Name of condenser
-		Fstring SupplyTankName; // Evap water supply tank name
-		Fstring EndUseSubcategory; // Rack end-use subcategory
+		std::string Name; // Name of condenser
+		std::string SupplyTankName; // Evap water supply tank name
+		std::string EndUseSubcategory; // Rack end-use subcategory
 		bool CondenserRejectHeatToZone; // Flag to show air-cooled condenser located inside zone
 		bool CoilFlag; // Flag to show if coil type load on system served by condenser
 		FArray1D_int SysNum; // absolute Index of system placing load (allocated NumRefrigSystems)
@@ -1935,9 +1921,7 @@ namespace RefrigeratedCase {
 
 		// Default Constructor
 		RefrigCondenserData() :
-			Name( MaxNameLength ),
-			SupplyTankName( MaxNameLength ),
-			EndUseSubcategory( MaxNameLength, "General" ),
+			EndUseSubcategory( "General" ),
 			CondenserRejectHeatToZone( false ),
 			CoilFlag( false ),
 			NumSysAttach( 0 ),
@@ -2032,9 +2016,9 @@ namespace RefrigeratedCase {
 
 		// Member Constructor
 		RefrigCondenserData(
-			Fstring const & Name, // Name of condenser
-			Fstring const & SupplyTankName, // Evap water supply tank name
-			Fstring const & EndUseSubcategory, // Rack end-use subcategory
+			std::string const & Name, // Name of condenser
+			std::string const & SupplyTankName, // Evap water supply tank name
+			std::string const & EndUseSubcategory, // Rack end-use subcategory
 			bool const CondenserRejectHeatToZone, // Flag to show air-cooled condenser located inside zone
 			bool const CoilFlag, // Flag to show if coil type load on system served by condenser
 			FArray1_int const & SysNum, // absolute Index of system placing load (allocated NumRefrigSystems)
@@ -2127,9 +2111,9 @@ namespace RefrigeratedCase {
 			Real64 const LaggedUsedWaterHeater, // Heat reclaim used to heat water in previous zone/load time step(W)
 			Real64 const LaggedUsedHVACCoil // Heat reclaim used to heat HVAC coil in previous zone/load time step(W)
 		) :
-			Name( MaxNameLength, Name ),
-			SupplyTankName( MaxNameLength, SupplyTankName ),
-			EndUseSubcategory( MaxNameLength, EndUseSubcategory ),
+			Name( Name ),
+			SupplyTankName( SupplyTankName ),
+			EndUseSubcategory( EndUseSubcategory ),
 			CondenserRejectHeatToZone( CondenserRejectHeatToZone ),
 			CoilFlag( CoilFlag ),
 			SysNum( SysNum ),
@@ -2228,8 +2212,8 @@ namespace RefrigeratedCase {
 	struct RefrigGasCoolerData
 	{
 		// Members
-		Fstring Name; // Name of gas cooler
-		Fstring EndUseSubcategory; // Gas cooler end-use subcategory
+		std::string Name; // Name of gas cooler
+		std::string EndUseSubcategory; // Gas cooler end-use subcategory
 		bool GasCoolerRejectHeatToZone; // Flag to show gas cooler located inside zone
 		bool TransOpFlag; // Flag to show transcritical (vs subcritical) operation of the refrigeration system
 		FArray1D_int SysNum; // absolute Index of system placing load (allocated NumRefrigSystems)
@@ -2273,8 +2257,7 @@ namespace RefrigeratedCase {
 
 		// Default Constructor
 		RefrigGasCoolerData() :
-			Name( MaxNameLength ),
-			EndUseSubcategory( MaxNameLength, "General" ),
+			EndUseSubcategory( "General" ),
 			GasCoolerRejectHeatToZone( false ),
 			TransOpFlag( false ),
 			CapCurvePtr( 0 ),
@@ -2314,8 +2297,8 @@ namespace RefrigeratedCase {
 
 		// Member Constructor
 		RefrigGasCoolerData(
-			Fstring const & Name, // Name of gas cooler
-			Fstring const & EndUseSubcategory, // Gas cooler end-use subcategory
+			std::string const & Name, // Name of gas cooler
+			std::string const & EndUseSubcategory, // Gas cooler end-use subcategory
 			bool const GasCoolerRejectHeatToZone, // Flag to show gas cooler located inside zone
 			bool const TransOpFlag, // Flag to show transcritical (vs subcritical) operation of the refrigeration system
 			FArray1_int const & SysNum, // absolute Index of system placing load (allocated NumRefrigSystems)
@@ -2353,8 +2336,8 @@ namespace RefrigeratedCase {
 			Real64 const TotalHeatRecoveredLoad, // All recovered heat for defrost purposes [W]
 			Real64 const TransitionTemperature // Transition temperature between subcritical and transcritical operation (C)
 		) :
-			Name( MaxNameLength, Name ),
-			EndUseSubcategory( MaxNameLength, EndUseSubcategory ),
+			Name( Name ),
+			EndUseSubcategory( EndUseSubcategory ),
 			GasCoolerRejectHeatToZone( GasCoolerRejectHeatToZone ),
 			TransOpFlag( TransOpFlag ),
 			SysNum( SysNum ),
@@ -2399,7 +2382,7 @@ namespace RefrigeratedCase {
 	{
 		// Members
 		bool CoilFlag; // Flag to show if coil type load on system served by compressor
-		Fstring Name; // Name of compressor
+		std::string Name; // Name of compressor
 		int CapacityCurvePtr; // Index to the capacity curve object
 		int ElecPowerCurvePtr; // Index to the electrical power curve object
 		int MassFlowCurvePtr; // Index to the mass flow curve object
@@ -2418,13 +2401,12 @@ namespace RefrigeratedCase {
 		Real64 Power; // Compressor power (W)
 		Real64 RatedSuperheat; // Rated Superheat at compressor suction (C)
 		Real64 RatedSubcool; // Rated Subcooling, note may not match condenser rating (C)
-		Fstring EndUseSubcategory; // Compressor end-use subcategory
+		std::string EndUseSubcategory; // Compressor end-use subcategory
 		bool TransFlag; // Flag to indicate if compressor can operate in transcritical region
 
 		// Default Constructor
 		RefrigCompressorData() :
 			CoilFlag( false ),
-			Name( MaxNameLength ),
 			CapacityCurvePtr( 0 ),
 			ElecPowerCurvePtr( 0 ),
 			MassFlowCurvePtr( 0 ),
@@ -2443,14 +2425,14 @@ namespace RefrigeratedCase {
 			Power( 0.0 ),
 			RatedSuperheat( 0.0 ),
 			RatedSubcool( 0.0 ),
-			EndUseSubcategory( MaxNameLength, "General" ),
+			EndUseSubcategory( "General" ),
 			TransFlag( false )
 		{}
 
 		// Member Constructor
 		RefrigCompressorData(
 			bool const CoilFlag, // Flag to show if coil type load on system served by compressor
-			Fstring const & Name, // Name of compressor
+			std::string const & Name, // Name of compressor
 			int const CapacityCurvePtr, // Index to the capacity curve object
 			int const ElecPowerCurvePtr, // Index to the electrical power curve object
 			int const MassFlowCurvePtr, // Index to the mass flow curve object
@@ -2469,11 +2451,11 @@ namespace RefrigeratedCase {
 			Real64 const Power, // Compressor power (W)
 			Real64 const RatedSuperheat, // Rated Superheat at compressor suction (C)
 			Real64 const RatedSubcool, // Rated Subcooling, note may not match condenser rating (C)
-			Fstring const & EndUseSubcategory, // Compressor end-use subcategory
+			std::string const & EndUseSubcategory, // Compressor end-use subcategory
 			bool const TransFlag // Flag to indicate if compressor can operate in transcritical region
 		) :
 			CoilFlag( CoilFlag ),
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			CapacityCurvePtr( CapacityCurvePtr ),
 			ElecPowerCurvePtr( ElecPowerCurvePtr ),
 			MassFlowCurvePtr( MassFlowCurvePtr ),
@@ -2492,7 +2474,7 @@ namespace RefrigeratedCase {
 			Power( Power ),
 			RatedSuperheat( RatedSuperheat ),
 			RatedSubcool( RatedSubcool ),
-			EndUseSubcategory( MaxNameLength, EndUseSubcategory ),
+			EndUseSubcategory( EndUseSubcategory ),
 			TransFlag( TransFlag )
 		{}
 
@@ -2502,21 +2484,20 @@ namespace RefrigeratedCase {
 	{
 		// Members
 		Real64 TotalCaseRAFraction; // Sum case return air fraction for error checking
-		Fstring ZoneName; // Zone or Location of Refrigerated Case
+		std::string ZoneName; // Zone or Location of Refrigerated Case
 
 		// Default Constructor
 		CaseRAFractionData() :
-			TotalCaseRAFraction( 0.0 ),
-			ZoneName( MaxNameLength )
+			TotalCaseRAFraction( 0.0 )
 		{}
 
 		// Member Constructor
 		CaseRAFractionData(
 			Real64 const TotalCaseRAFraction, // Sum case return air fraction for error checking
-			Fstring const & ZoneName // Zone or Location of Refrigerated Case
+			std::string const & ZoneName // Zone or Location of Refrigerated Case
 		) :
 			TotalCaseRAFraction( TotalCaseRAFraction ),
-			ZoneName( MaxNameLength, ZoneName )
+			ZoneName( ZoneName )
 		{}
 
 	};
@@ -2525,8 +2506,8 @@ namespace RefrigeratedCase {
 	{
 		// Members
 		bool CoilFlag; // Flag to show if coil type load on system served by subcooler
-		Fstring Name; // Name of Subcooler
-		Fstring MechSourceSys; // Name of refrigeration system providing
+		std::string Name; // Name of Subcooler
+		std::string MechSourceSys; // Name of refrigeration system providing
 		// cool liquid to mechanical, needed for character comparison after systems read
 		int SubcoolerType; // Specifies subcooler type(0=liquid suction heat exchanger,1=mechanical)
 		int MechSourceSysID; // ID number of refrigeration system providing cool liquid to mechanical
@@ -2540,8 +2521,6 @@ namespace RefrigeratedCase {
 		// Default Constructor
 		SubcoolerData() :
 			CoilFlag( false ),
-			Name( MaxNameLength ),
-			MechSourceSys( MaxNameLength ),
 			SubcoolerType( 0 ),
 			MechSourceSysID( 0 ),
 			MechSCTransLoad( 0.0 ),
@@ -2555,8 +2534,8 @@ namespace RefrigeratedCase {
 		// Member Constructor
 		SubcoolerData(
 			bool const CoilFlag, // Flag to show if coil type load on system served by subcooler
-			Fstring const & Name, // Name of Subcooler
-			Fstring const & MechSourceSys, // Name of refrigeration system providing
+			std::string const & Name, // Name of Subcooler
+			std::string const & MechSourceSys, // Name of refrigeration system providing
 			int const SubcoolerType, // Specifies subcooler type(0=liquid suction heat exchanger,1=mechanical)
 			int const MechSourceSysID, // ID number of refrigeration system providing cool liquid to mechanical
 			Real64 const MechSCTransLoad, // Mechanical subcooler load transferred between suction groups, W
@@ -2567,8 +2546,8 @@ namespace RefrigeratedCase {
 			Real64 const MechControlTliqOut // Mechanical subcooler design outlet temperature subcooled liquid, C
 		) :
 			CoilFlag( CoilFlag ),
-			Name( MaxNameLength, Name ),
-			MechSourceSys( MaxNameLength, MechSourceSys ),
+			Name( Name ),
+			MechSourceSys( MechSourceSys ),
 			SubcoolerType( SubcoolerType ),
 			MechSourceSysID( MechSourceSysID ),
 			MechSCTransLoad( MechSCTransLoad ),
@@ -2585,9 +2564,9 @@ namespace RefrigeratedCase {
 	{
 		// Members
 		bool CoilFlag; // Flag to show if coil type load on secondary system
-		Fstring Name; // Name of refrigeration system
-		Fstring FluidName; // Name of circulating fluid
-		Fstring EndUseSubcategory; // Used for reporting purposes
+		std::string Name; // Name of refrigeration system
+		std::string FluidName; // Name of circulating fluid
+		std::string EndUseSubcategory; // Used for reporting purposes
 		FArray1D_int CaseNum; // Absolute Index of cases (dimensioned 1 to NumCases)
 		FArray1D_int CoilNum; // Absolute Index of coils (dimensioned 1 to NumCoils)
 		FArray1D_int WalkInNum; // Absolute Index of walk-ins (dimensioned 1 to NumWalkIns)
@@ -2658,9 +2637,6 @@ namespace RefrigeratedCase {
 		// Default Constructor
 		SecondaryLoopData() :
 			CoilFlag( false ),
-			Name( MaxNameLength ),
-			FluidName( MaxNameLength ),
-			EndUseSubcategory( MaxNameLength ),
 			DistPipeZoneNum( 0 ),
 			DistPipeZoneNodeNum( 0 ),
 			DistPipeZoneHeatGain( 0.0 ),
@@ -2718,9 +2694,9 @@ namespace RefrigeratedCase {
 		// Member Constructor
 		SecondaryLoopData(
 			bool const CoilFlag, // Flag to show if coil type load on secondary system
-			Fstring const & Name, // Name of refrigeration system
-			Fstring const & FluidName, // Name of circulating fluid
-			Fstring const & EndUseSubcategory, // Used for reporting purposes
+			std::string const & Name, // Name of refrigeration system
+			std::string const & FluidName, // Name of circulating fluid
+			std::string const & EndUseSubcategory, // Used for reporting purposes
 			FArray1_int const & CaseNum, // Absolute Index of cases (dimensioned 1 to NumCases)
 			FArray1_int const & CoilNum, // Absolute Index of coils (dimensioned 1 to NumCoils)
 			FArray1_int const & WalkInNum, // Absolute Index of walk-ins (dimensioned 1 to NumWalkIns)
@@ -2778,9 +2754,9 @@ namespace RefrigeratedCase {
 			Real64 const UnmetEnergySaved // Load that is greater than capacity of loop heat exchanger, accumulates (J)
 		) :
 			CoilFlag( CoilFlag ),
-			Name( MaxNameLength, Name ),
-			FluidName( MaxNameLength, FluidName ),
-			EndUseSubcategory( MaxNameLength, EndUseSubcategory ),
+			Name( Name ),
+			FluidName( FluidName ),
+			EndUseSubcategory( EndUseSubcategory ),
 			CaseNum( CaseNum ),
 			CoilNum( CoilNum ),
 			WalkInNum( WalkInNum ),
@@ -2843,7 +2819,7 @@ namespace RefrigeratedCase {
 	struct TransferLoadListDef // Derived Type for Transfer Load (Secondary and Cascade) Lists
 	{
 		// Members
-		Fstring Name; // Name of this TransferLoad List
+		std::string Name; // Name of this TransferLoad List
 		int NumSecondarys; // Number of Secondary Loops in this TransferLoad List
 		int NumCascadeLoads; // Number of Cascade condenser loads in this TransferLoad List
 		FArray1D_int CascadeLoadItemNum; // List of Item numbers that correspond to the Cascade Condenser
@@ -2851,20 +2827,19 @@ namespace RefrigeratedCase {
 
 		// Default Constructor
 		TransferLoadListDef() :
-			Name( MaxNameLength ),
 			NumSecondarys( 0 ),
 			NumCascadeLoads( 0 )
 		{}
 
 		// Member Constructor
 		TransferLoadListDef(
-			Fstring const & Name, // Name of this TransferLoad List
+			std::string const & Name, // Name of this TransferLoad List
 			int const NumSecondarys, // Number of Secondary Loops in this TransferLoad List
 			int const NumCascadeLoads, // Number of Cascade condenser loads in this TransferLoad List
 			FArray1_int const & CascadeLoadItemNum, // List of Item numbers that correspond to the Cascade Condenser
 			FArray1_int const & SecondaryItemNum // List of Item numbers that correspond to the Secondary
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NumSecondarys( NumSecondarys ),
 			NumCascadeLoads( NumCascadeLoads ),
 			CascadeLoadItemNum( CascadeLoadItemNum ),
@@ -2876,8 +2851,8 @@ namespace RefrigeratedCase {
 	struct WalkInData
 	{
 		// Members
-		Fstring Name; // Name of walk in cooler
-		FArray1D_Fstring ZoneName;
+		std::string Name; // Name of walk in cooler
+		FArray1D_string ZoneName;
 		// Names of zones exchanging energy with cooler
 		int CircFanSchedPtr; // Index to the correct availability schedule
 		int DefrostDripDownSchedPtr; // Index to the correct fail-safe schedule
@@ -2955,8 +2930,6 @@ namespace RefrigeratedCase {
 
 		// Default Constructor
 		WalkInData() :
-			Name( MaxNameLength ),
-			ZoneName( sFstring( MaxNameLength ) ),
 			CircFanSchedPtr( 0 ),
 			DefrostDripDownSchedPtr( 0 ),
 			DefrostSchedPtr( 0 ),
@@ -3010,8 +2983,8 @@ namespace RefrigeratedCase {
 
 		// Member Constructor
 		WalkInData(
-			Fstring const & Name, // Name of walk in cooler
-			FArray1_Fstring const & ZoneName,
+			std::string const & Name, // Name of walk in cooler
+			FArray1_string const & ZoneName,
 			int const CircFanSchedPtr, // Index to the correct availability schedule
 			int const DefrostDripDownSchedPtr, // Index to the correct fail-safe schedule
 			int const DefrostSchedPtr, // Index to the correct defrost schedule
@@ -3083,7 +3056,7 @@ namespace RefrigeratedCase {
 			FArray1< Real64 > const & SensZoneCreditHeatRate, // Amount of sensible heat provided to the zone (W)
 			FArray1< Real64 > const & SensZoneCreditHeat // Amount of sensible heat provided to the zone (J)
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ZoneName( ZoneName ),
 			CircFanSchedPtr( CircFanSchedPtr ),
 			DefrostDripDownSchedPtr( DefrostDripDownSchedPtr ),
@@ -3221,8 +3194,8 @@ namespace RefrigeratedCase {
 	struct WarehouseCoilData
 	{
 		// Members
-		Fstring Name; // Name of Warehouse Coil
-		Fstring ZoneName; // Names of zone cooled by coil
+		std::string Name; // Name of Warehouse Coil
+		std::string ZoneName; // Names of zone cooled by coil
 		bool SecStatusFirst; // Flag to show if this is the first coil on a particular secondary
 		bool SecStatusLast; // Flag to show if this is the last coil on a particular secondary
 		bool SysStatusFirst; // Flag to show if this is the first coil on a particular primary
@@ -3305,8 +3278,6 @@ namespace RefrigeratedCase {
 
 		// Default Constructor
 		WarehouseCoilData() :
-			Name( MaxNameLength ),
-			ZoneName( MaxNameLength ),
 			SecStatusFirst( false ),
 			SecStatusLast( false ),
 			SysStatusFirst( false ),
@@ -3383,8 +3354,8 @@ namespace RefrigeratedCase {
 
 		// Member Constructor
 		WarehouseCoilData(
-			Fstring const & Name, // Name of Warehouse Coil
-			Fstring const & ZoneName, // Names of zone cooled by coil
+			std::string const & Name, // Name of Warehouse Coil
+			std::string const & ZoneName, // Names of zone cooled by coil
 			bool const SecStatusFirst, // Flag to show if this is the first coil on a particular secondary
 			bool const SecStatusLast, // Flag to show if this is the last coil on a particular secondary
 			bool const SysStatusFirst, // Flag to show if this is the first coil on a particular primary
@@ -3460,8 +3431,8 @@ namespace RefrigeratedCase {
 			Real64 const TotalElecPower, // Coil total electric
 			Real64 const TotalElecConsumption // Coil total electric energy (J)
 		) :
-			Name( MaxNameLength, Name ),
-			ZoneName( MaxNameLength, ZoneName ),
+			Name( Name ),
+			ZoneName( ZoneName ),
 			SecStatusFirst( SecStatusFirst ),
 			SecStatusLast( SecStatusLast ),
 			SysStatusFirst( SysStatusFirst ),
@@ -3543,9 +3514,9 @@ namespace RefrigeratedCase {
 	struct AirChillerSetData
 	{
 		// Members
-		Fstring Name; // Name of Chiller Set
+		std::string Name; // Name of Chiller Set
 		//CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:)  :: CoilName   ! Name of Individual Chiller in set
-		Fstring ZoneName; // Name of zone where chiller set is located
+		std::string ZoneName; // Name of zone where chiller set is located
 		FArray1D_int CoilNum; // ID number of Individual Chiller in set
 		int ChillerSetID; // ID number for this set of chillers (all serving one zone,
 		//                       but can be chilled by mult systems)
@@ -3559,8 +3530,6 @@ namespace RefrigeratedCase {
 
 		// Default Constructor
 		AirChillerSetData() :
-			Name( MaxNameLength ),
-			ZoneName( MaxNameLength ),
 			ChillerSetID( 0 ),
 			SchedPtr( 0 ),
 			NodeNumInlet( 0 ),
@@ -3573,8 +3542,8 @@ namespace RefrigeratedCase {
 
 		// Member Constructor
 		AirChillerSetData(
-			Fstring const & Name, // Name of Chiller Set
-			Fstring const & ZoneName, // Name of zone where chiller set is located
+			std::string const & Name, // Name of Chiller Set
+			std::string const & ZoneName, // Name of zone where chiller set is located
 			FArray1_int const & CoilNum, // ID number of Individual Chiller in set
 			int const ChillerSetID, // ID number for this set of chillers (all serving one zone,
 			int const SchedPtr, // Schedule to take whole set off-line if needed
@@ -3585,8 +3554,8 @@ namespace RefrigeratedCase {
 			int const ZoneNodeNum, // ID number of zone node giving mixed conditions of zone where chiller set is located
 			Real64 const QZnReqSens // Sensible heat needed by the zone to reach setpoint [W]
 		) :
-			Name( MaxNameLength, Name ),
-			ZoneName( MaxNameLength, ZoneName ),
+			Name( Name ),
+			ZoneName( ZoneName ),
 			CoilNum( CoilNum ),
 			ChillerSetID( ChillerSetID ),
 			SchedPtr( SchedPtr ),
@@ -3738,7 +3707,7 @@ namespace RefrigeratedCase {
 	void
 	SimRefrigCondenser(
 		int const SysType,
-		Fstring const & CompName,
+		std::string const & CompName,
 		int & CompIndex,
 		bool const FirstHVACIteration,
 		bool const InitLoopEquip
@@ -3813,11 +3782,11 @@ namespace RefrigeratedCase {
 
 	void
 	GetRefrigeratedRackIndex(
-		Fstring const & Name,
+		std::string const & Name,
 		int & IndexPtr,
 		int const SysType,
 		bool & ErrorsFound,
-		Optional_Fstring_const ThisObjectType = _,
+		Optional_string_const ThisObjectType = _,
 		Optional_bool_const SuppressWarning = _
 	);
 
@@ -3847,7 +3816,7 @@ namespace RefrigeratedCase {
 
 	void
 	SimAirChillerSet(
-		Fstring const & AirChillerSetName,
+		std::string const & AirChillerSetName,
 		int const ZoneNum,
 		bool const FirstHVACIteration,
 		Real64 & SysOutputProvided,

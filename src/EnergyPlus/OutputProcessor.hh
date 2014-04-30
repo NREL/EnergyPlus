@@ -5,9 +5,9 @@
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/FArray2D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 #include <ObjexxFCL/Reference.hh>
+#include <ObjexxFCL/gio_Fmt.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -18,7 +18,6 @@ namespace EnergyPlus {
 namespace OutputProcessor {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// in this file should obey a USE OutputProcessor, ONLY: rule.
@@ -57,13 +56,13 @@ namespace OutputProcessor {
 	extern int const MeterType_CustomDec; // Type value for custom meters that decrement another meter
 	extern int const MeterType_CustomDiff; // Type value for custom meters that difference another meter
 
-	extern Fstring const TimeStampFormat;
-	extern Fstring const DailyStampFormat;
-	extern Fstring const MonthlyStampFormat;
-	extern Fstring const RunPeriodStampFormat;
-	extern Fstring const fmta;
-	extern FArray1D_Fstring const DayTypes;
-	extern Fstring const BlankString;
+	extern gio::Fmt const TimeStampFormat;
+	extern gio::Fmt const DailyStampFormat;
+	extern gio::Fmt const MonthlyStampFormat;
+	extern gio::Fmt const RunPeriodStampFormat;
+	extern gio::Fmt const fmta;
+	extern FArray1D_string const DayTypes;
+	extern std::string const BlankString;
 	extern int const UnitsStringLength;
 
 	extern int const RVarAllocInc;
@@ -119,7 +118,7 @@ namespace OutputProcessor {
 	extern FArray1D_int ReportList;
 	extern int NumReportList;
 	extern int NumExtraVars;
-	extern FArray2D_Fstring FreqNotice; // =(/'! Each Call','! TimeStep',' !Hourly',',Daily',',Monthly',',Environment'/)
+	extern FArray2D_string FreqNotice; // =(/'! Each Call','! TimeStep',' !Hourly',',Daily',',Monthly',',Environment'/)
 
 	extern int NumOfReqVariables; // Current number of Requested Report Variables
 
@@ -129,16 +128,16 @@ namespace OutputProcessor {
 	extern FArray1D< Real64 > MeterValue; // This holds the current timestep value for each meter.
 
 	extern int TimeStepStampReportNbr; // TimeStep and Hourly Report number
-	extern Fstring TimeStepStampReportChr; // TimeStep and Hourly Report number (character -- for printing)
+	extern std::string TimeStepStampReportChr; // TimeStep and Hourly Report number (character -- for printing)
 	extern bool TrackingHourlyVariables; // Requested Hourly Report Variables
 	extern int DailyStampReportNbr; // Daily Report number
-	extern Fstring DailyStampReportChr; // Daily Report number (character -- for printing)
+	extern std::string DailyStampReportChr; // Daily Report number (character -- for printing)
 	extern bool TrackingDailyVariables; // Requested Daily Report Variables
 	extern int MonthlyStampReportNbr; // Monthly Report number
-	extern Fstring MonthlyStampReportChr; // Monthly Report number (character -- for printing)
+	extern std::string MonthlyStampReportChr; // Monthly Report number (character -- for printing)
 	extern bool TrackingMonthlyVariables; // Requested Monthly Report Variables
 	extern int RunPeriodStampReportNbr; // RunPeriod Report number
-	extern Fstring RunPeriodStampReportChr; // RunPeriod Report number (character -- for printing)
+	extern std::string RunPeriodStampReportChr; // RunPeriod Report number (character -- for printing)
 	extern bool TrackingRunPeriodVariables; // Requested RunPeriod Report Variables
 	extern Real64 SecondsPerTimeStep; // Seconds from NumTimeStepInHour
 	extern bool ErrorsLogged;
@@ -194,7 +193,7 @@ namespace OutputProcessor {
 		Real64 MinValue; // Minimum reporting (only for Averaged variables, and those greater than Time Step)
 		int minValueDate; // Date stamp of minimum
 		int ReportID; // Report variable ID number
-		Fstring ReportIDChr; // Report variable ID number (character -- for printing)
+		std::string ReportIDChr; // Report variable ID number (character -- for printing)
 		int SchedPtr; // If scheduled, this points to the schedule
 		int MeterArrayPtr; // If metered, this points to an array of applicable meters
 		int ZoneMult; // If metered, Zone Multiplier is applied
@@ -219,7 +218,6 @@ namespace OutputProcessor {
 			MinValue( 9999. ),
 			minValueDate( 0 ),
 			ReportID( 0 ),
-			ReportIDChr( 16, BlankString ),
 			SchedPtr( 0 ),
 			MeterArrayPtr( 0 ),
 			ZoneMult( 1 ),
@@ -246,7 +244,7 @@ namespace OutputProcessor {
 			Real64 const MinValue, // Minimum reporting (only for Averaged variables, and those greater than Time Step)
 			int const minValueDate, // Date stamp of minimum
 			int const ReportID, // Report variable ID number
-			Fstring const & ReportIDChr, // Report variable ID number (character -- for printing)
+			std::string const & ReportIDChr, // Report variable ID number (character -- for printing)
 			int const SchedPtr, // If scheduled, this points to the schedule
 			int const MeterArrayPtr, // If metered, this points to an array of applicable meters
 			int const ZoneMult, // If metered, Zone Multiplier is applied
@@ -270,7 +268,7 @@ namespace OutputProcessor {
 			MinValue( MinValue ),
 			minValueDate( minValueDate ),
 			ReportID( ReportID ),
-			ReportIDChr( 16, ReportIDChr ),
+			ReportIDChr( ReportIDChr ),
 			SchedPtr( SchedPtr ),
 			MeterArrayPtr( MeterArrayPtr ),
 			ZoneMult( ZoneMult ),
@@ -300,7 +298,7 @@ namespace OutputProcessor {
 		int MinValue; // Minimum reporting (only for Averaged variables, and those greater than Time Step)
 		int minValueDate; // Date stamp of minimum
 		int ReportID; // Report variable ID number
-		Fstring ReportIDChr; // Report variable ID number (character -- for printing)
+		std::string ReportIDChr; // Report variable ID number (character -- for printing)
 		int SchedPtr; // If scheduled, this points to the schedule
 
 		// Default Constructor
@@ -322,7 +320,6 @@ namespace OutputProcessor {
 			MinValue( 9999 ),
 			minValueDate( 0 ),
 			ReportID( 0 ),
-			ReportIDChr( 16, BlankString ),
 			SchedPtr( 0 )
 		{}
 
@@ -346,7 +343,7 @@ namespace OutputProcessor {
 			int const MinValue, // Minimum reporting (only for Averaged variables, and those greater than Time Step)
 			int const minValueDate, // Date stamp of minimum
 			int const ReportID, // Report variable ID number
-			Fstring const & ReportIDChr, // Report variable ID number (character -- for printing)
+			std::string const & ReportIDChr, // Report variable ID number (character -- for printing)
 			int const SchedPtr // If scheduled, this points to the schedule
 		) :
 			Which( Which ),
@@ -367,7 +364,6 @@ namespace OutputProcessor {
 			MinValue( MinValue ),
 			minValueDate( minValueDate ),
 			ReportID( ReportID ),
-			ReportIDChr( 16, ReportIDChr ),
 			SchedPtr( SchedPtr )
 		{}
 
@@ -381,8 +377,8 @@ namespace OutputProcessor {
 		int VariableType; // Integer, Real.
 		int Next; // Next variable of same name (different units)
 		bool ReportedOnDDFile; // true after written to .rdd/.mdd file
-		Fstring VarNameOnly; // Name of Variable
-		Fstring UnitsString; // Units for Variable (no brackets)
+		std::string VarNameOnly; // Name of Variable
+		std::string UnitsString; // Units for Variable (no brackets)
 
 		// Default Constructor
 		VariableTypeForDDOutput() :
@@ -390,9 +386,7 @@ namespace OutputProcessor {
 			StoreType( 0 ),
 			VariableType( VarType_NotFound ),
 			Next( 0 ),
-			ReportedOnDDFile( false ),
-			VarNameOnly( MaxNameLength, BlankString ),
-			UnitsString( UnitsStringLength, BlankString )
+			ReportedOnDDFile( false )
 		{}
 
 		// Member Constructor
@@ -402,16 +396,16 @@ namespace OutputProcessor {
 			int const VariableType, // Integer, Real.
 			int const Next, // Next variable of same name (different units)
 			bool const ReportedOnDDFile, // true after written to .rdd/.mdd file
-			Fstring const & VarNameOnly, // Name of Variable
-			Fstring const & UnitsString // Units for Variable (no brackets)
+			std::string const & VarNameOnly, // Name of Variable
+			std::string const & UnitsString // Units for Variable (no brackets)
 		) :
 			IndexType( IndexType ),
 			StoreType( StoreType ),
 			VariableType( VariableType ),
 			Next( Next ),
 			ReportedOnDDFile( ReportedOnDDFile ),
-			VarNameOnly( MaxNameLength, VarNameOnly ),
-			UnitsString( UnitsStringLength, UnitsString )
+			VarNameOnly( VarNameOnly ),
+			UnitsString( UnitsString )
 		{}
 
 	};
@@ -422,25 +416,19 @@ namespace OutputProcessor {
 		int IndexType; // Type whether Zone or HVAC
 		int StoreType; // Variable Type (Summed/Non-Static or Average/Static)
 		int ReportID; // Report variable ID number
-		Fstring VarName; // Name of Variable key:variable
-		Fstring VarNameUC; // Name of Variable (Uppercase)
-		Fstring VarNameOnly; // Name of Variable
-		Fstring VarNameOnlyUC; // Name of Variable with out key in uppercase
-		Fstring KeyNameOnlyUC; // Name of key only witht out variable in uppercase
-		Fstring UnitsString; // Units for Variable (no brackets)
+		std::string VarName; // Name of Variable key:variable
+		std::string VarNameUC; // Name of Variable (Uppercase)
+		std::string VarNameOnly; // Name of Variable
+		std::string VarNameOnlyUC; // Name of Variable with out key in uppercase
+		std::string KeyNameOnlyUC; // Name of key only witht out variable in uppercase
+		std::string UnitsString; // Units for Variable (no brackets)
 		Reference< RealVariables > VarPtr; // Pointer used to real Variables structure
 
 		// Default Constructor
 		RealVariableType() :
 			IndexType( 0 ),
 			StoreType( 0 ),
-			ReportID( 0 ),
-			VarName( MaxNameLength * 2 + 1, BlankString ),
-			VarNameUC( MaxNameLength * 2 + 1, BlankString ),
-			VarNameOnly( MaxNameLength, BlankString ),
-			VarNameOnlyUC( MaxNameLength, BlankString ),
-			KeyNameOnlyUC( MaxNameLength, BlankString ),
-			UnitsString( UnitsStringLength, BlankString )
+			ReportID( 0 )
 		{}
 
 		// Member Constructor
@@ -448,23 +436,23 @@ namespace OutputProcessor {
 			int const IndexType, // Type whether Zone or HVAC
 			int const StoreType, // Variable Type (Summed/Non-Static or Average/Static)
 			int const ReportID, // Report variable ID number
-			Fstring const & VarName, // Name of Variable key:variable
-			Fstring const & VarNameUC, // Name of Variable (Uppercase)
-			Fstring const & VarNameOnly, // Name of Variable
-			Fstring const & VarNameOnlyUC, // Name of Variable with out key in uppercase
-			Fstring const & KeyNameOnlyUC, // Name of key only witht out variable in uppercase
-			Fstring const & UnitsString, // Units for Variable (no brackets)
+			std::string const & VarName, // Name of Variable key:variable
+			std::string const & VarNameUC, // Name of Variable (Uppercase)
+			std::string const & VarNameOnly, // Name of Variable
+			std::string const & VarNameOnlyUC, // Name of Variable with out key in uppercase
+			std::string const & KeyNameOnlyUC, // Name of key only witht out variable in uppercase
+			std::string const & UnitsString, // Units for Variable (no brackets)
 			Reference< RealVariables > const VarPtr // Pointer used to real Variables structure
 		) :
 			IndexType( IndexType ),
 			StoreType( StoreType ),
 			ReportID( ReportID ),
-			VarName( MaxNameLength * 2 + 1, VarName ),
-			VarNameUC( MaxNameLength * 2 + 1, VarNameUC ),
-			VarNameOnly( MaxNameLength, VarNameOnly ),
-			VarNameOnlyUC( MaxNameLength, VarNameOnlyUC ),
-			KeyNameOnlyUC( MaxNameLength, KeyNameOnlyUC ),
-			UnitsString( UnitsStringLength, UnitsString ),
+			VarName( VarName ),
+			VarNameUC( VarNameUC ),
+			VarNameOnly( VarNameOnly ),
+			VarNameOnlyUC( VarNameOnlyUC ),
+			KeyNameOnlyUC( KeyNameOnlyUC ),
+			UnitsString( UnitsString ),
 			VarPtr( VarPtr )
 		{}
 
@@ -476,21 +464,17 @@ namespace OutputProcessor {
 		int IndexType; // Type whether Zone or HVAC
 		int StoreType; // Variable Type (Summed/Non-Static or Average/Static)
 		int ReportID; // Report variable ID number
-		Fstring VarName; // Name of Variable
-		Fstring VarNameUC; // Name of Variable
-		Fstring VarNameOnly; // Name of Variable
-		Fstring UnitsString; // Units for Variable (no brackets)
+		std::string VarName; // Name of Variable
+		std::string VarNameUC; // Name of Variable
+		std::string VarNameOnly; // Name of Variable
+		std::string UnitsString; // Units for Variable (no brackets)
 		Reference< IntegerVariables > VarPtr; // Pointer used to integer Variables structure
 
 		// Default Constructor
 		IntegerVariableType() :
 			IndexType( 0 ),
 			StoreType( 0 ),
-			ReportID( 0 ),
-			VarName( MaxNameLength * 2 + 1, BlankString ),
-			VarNameUC( MaxNameLength * 2 + 1, BlankString ),
-			VarNameOnly( MaxNameLength, BlankString ),
-			UnitsString( UnitsStringLength, BlankString )
+			ReportID( 0 )
 		{}
 
 		// Member Constructor
@@ -498,19 +482,19 @@ namespace OutputProcessor {
 			int const IndexType, // Type whether Zone or HVAC
 			int const StoreType, // Variable Type (Summed/Non-Static or Average/Static)
 			int const ReportID, // Report variable ID number
-			Fstring const & VarName, // Name of Variable
-			Fstring const & VarNameUC, // Name of Variable
-			Fstring const & VarNameOnly, // Name of Variable
-			Fstring const & UnitsString, // Units for Variable (no brackets)
+			std::string const & VarName, // Name of Variable
+			std::string const & VarNameUC, // Name of Variable
+			std::string const & VarNameOnly, // Name of Variable
+			std::string const & UnitsString, // Units for Variable (no brackets)
 			Reference< IntegerVariables > const VarPtr // Pointer used to integer Variables structure
 		) :
 			IndexType( IndexType ),
 			StoreType( StoreType ),
 			ReportID( ReportID ),
-			VarName( MaxNameLength * 2 + 1, VarName ),
-			VarNameUC( MaxNameLength * 2 + 1, VarNameUC ),
-			VarNameOnly( MaxNameLength, VarNameOnly ),
-			UnitsString( UnitsStringLength, UnitsString ),
+			VarName( VarName ),
+			VarNameUC( VarNameUC ),
+			VarNameOnly( VarNameOnly ),
+			UnitsString( UnitsString ),
 			VarPtr( VarPtr )
 		{}
 
@@ -519,37 +503,34 @@ namespace OutputProcessor {
 	struct ReqReportVariables // Structure for requested Report Variables
 	{
 		// Members
-		Fstring Key; // Could be blank or "*"
-		Fstring VarName; // Name of Variable
+		std::string Key; // Could be blank or "*"
+		std::string VarName; // Name of Variable
 		int ReportFreq; // Reporting Frequency
 		int SchedPtr; // Index of the Schedule
-		Fstring SchedName; // Schedule Name
+		std::string SchedName; // Schedule Name
 		bool Used; // True when this combination (key, varname, frequency) has been set
 
 		// Default Constructor
 		ReqReportVariables() :
-			Key( MaxNameLength, BlankString ),
-			VarName( MaxNameLength, BlankString ),
 			ReportFreq( 0 ),
 			SchedPtr( 0 ),
-			SchedName( MaxNameLength, BlankString ),
 			Used( false )
 		{}
 
 		// Member Constructor
 		ReqReportVariables(
-			Fstring const & Key, // Could be blank or "*"
-			Fstring const & VarName, // Name of Variable
+			std::string const & Key, // Could be blank or "*"
+			std::string const & VarName, // Name of Variable
 			int const ReportFreq, // Reporting Frequency
 			int const SchedPtr, // Index of the Schedule
-			Fstring const & SchedName, // Schedule Name
+			std::string const & SchedName, // Schedule Name
 			bool const Used // True when this combination (key, varname, frequency) has been set
 		) :
-			Key( MaxNameLength, Key ),
-			VarName( MaxNameLength, VarName ),
+			Key( Key ),
+			VarName( VarName ),
 			ReportFreq( ReportFreq ),
 			SchedPtr( SchedPtr ),
-			SchedName( MaxNameLength, SchedName ),
+			SchedName( SchedName ),
 			Used( Used )
 		{}
 
@@ -592,12 +573,12 @@ namespace OutputProcessor {
 	struct MeterType
 	{
 		// Members
-		Fstring Name; // Name of the meter
-		Fstring ResourceType; // Resource Type of the meter
-		Fstring EndUse; // End Use of the meter
-		Fstring EndUseSub; // End Use subcategory of the meter
-		Fstring Group; // Group of the meter
-		Fstring Units; // Units for the Meter
+		std::string Name; // Name of the meter
+		std::string ResourceType; // Resource Type of the meter
+		std::string EndUse; // End Use of the meter
+		std::string EndUseSub; // End Use subcategory of the meter
+		std::string Group; // Group of the meter
+		std::string Units; // Units for the Meter
 		int RT_forIPUnits; // Resource type number for IP Units (tabular) reporting
 		int TypeOfMeter; // type of meter
 		int SourceMeter; // for custom decrement meters, this is the meter number for the subtraction
@@ -606,7 +587,7 @@ namespace OutputProcessor {
 		bool RptTS; // Report at End of TimeStep (Zone)
 		bool RptTSFO; // Report at End of TimeStep (Zone) -- meter file only
 		int TSRptNum; // Report Number for TS Values
-		Fstring TSRptNumChr; // Report Number for TS Values (character -- for printing)
+		std::string TSRptNumChr; // Report Number for TS Values (character -- for printing)
 		Real64 HRValue; // Hourly Value
 		bool RptHR; // Report at End of Hour
 		bool RptHRFO; // Report at End of Hour -- meter file only
@@ -615,7 +596,7 @@ namespace OutputProcessor {
 		Real64 HRMinVal; // Minimum Value (Hour)
 		int HRMinValDate; // Date stamp of minimum
 		int HRRptNum; // Report Number for HR Values
-		Fstring HRRptNumChr; // Report Number for HR Values (character -- for printing)
+		std::string HRRptNumChr; // Report Number for HR Values (character -- for printing)
 		Real64 DYValue; // Daily Value
 		bool RptDY; // Report at End of Day
 		bool RptDYFO; // Report at End of Day -- meter file only
@@ -624,7 +605,7 @@ namespace OutputProcessor {
 		Real64 DYMinVal; // Minimum Value (Day)
 		int DYMinValDate; // Date stamp of minimum
 		int DYRptNum; // Report Number for DY Values
-		Fstring DYRptNumChr; // Report Number for DY Values (character -- for printing)
+		std::string DYRptNumChr; // Report Number for DY Values (character -- for printing)
 		Real64 MNValue; // Monthly Value
 		bool RptMN; // Report at End of Month
 		bool RptMNFO; // Report at End of Month -- meter file only
@@ -633,7 +614,7 @@ namespace OutputProcessor {
 		Real64 MNMinVal; // Minimum Value (Month)
 		int MNMinValDate; // Date stamp of minimum
 		int MNRptNum; // Report Number for MN Values
-		Fstring MNRptNumChr; // Report Number for MN Values (character -- for printing)
+		std::string MNRptNumChr; // Report Number for MN Values (character -- for printing)
 		Real64 SMValue; // Simulation Value
 		bool RptSM; // Report at End of Environment/Simulation
 		bool RptSMFO; // Report at End of Environment/Simulation -- meter file only
@@ -642,7 +623,7 @@ namespace OutputProcessor {
 		Real64 SMMinVal; // Minimum Value (Sim)
 		int SMMinValDate; // Date stamp of minimum
 		int SMRptNum; // Report Number for SM Values
-		Fstring SMRptNumChr; // Report Number for SM Values (character -- for printing)
+		std::string SMRptNumChr; // Report Number for SM Values (character -- for printing)
 		Real64 LastSMValue; // Simulation Value
 		Real64 LastSMMaxVal; // Maximum Value (Sim)
 		int LastSMMaxValDate; // Date stamp of maximum
@@ -668,12 +649,6 @@ namespace OutputProcessor {
 
 		// Default Constructor
 		MeterType() :
-			Name( MaxNameLength * 2, BlankString ),
-			ResourceType( MaxNameLength, BlankString ),
-			EndUse( MaxNameLength, BlankString ),
-			EndUseSub( MaxNameLength, BlankString ),
-			Group( MaxNameLength, BlankString ),
-			Units( UnitsStringLength, BlankString ),
 			RT_forIPUnits( 0 ),
 			TypeOfMeter( MeterType_Normal ),
 			SourceMeter( 0 ),
@@ -682,7 +657,6 @@ namespace OutputProcessor {
 			RptTS( false ),
 			RptTSFO( false ),
 			TSRptNum( 0 ),
-			TSRptNumChr( 16, BlankString ),
 			HRValue( 0.0 ),
 			RptHR( false ),
 			RptHRFO( false ),
@@ -691,7 +665,6 @@ namespace OutputProcessor {
 			HRMinVal( 99999. ),
 			HRMinValDate( 0 ),
 			HRRptNum( 0 ),
-			HRRptNumChr( 16, BlankString ),
 			DYValue( 0.0 ),
 			RptDY( false ),
 			RptDYFO( false ),
@@ -700,7 +673,6 @@ namespace OutputProcessor {
 			DYMinVal( 99999. ),
 			DYMinValDate( 0 ),
 			DYRptNum( 0 ),
-			DYRptNumChr( 16, BlankString ),
 			MNValue( 0.0 ),
 			RptMN( false ),
 			RptMNFO( false ),
@@ -709,7 +681,6 @@ namespace OutputProcessor {
 			MNMinVal( 99999. ),
 			MNMinValDate( 0 ),
 			MNRptNum( 0 ),
-			MNRptNumChr( 16, BlankString ),
 			SMValue( 0.0 ),
 			RptSM( false ),
 			RptSMFO( false ),
@@ -718,7 +689,6 @@ namespace OutputProcessor {
 			SMMinVal( 99999. ),
 			SMMinValDate( 0 ),
 			SMRptNum( 0 ),
-			SMRptNumChr( 16, BlankString ),
 			LastSMValue( 0.0 ),
 			LastSMMaxVal( -99999. ),
 			LastSMMaxValDate( 0 ),
@@ -745,12 +715,12 @@ namespace OutputProcessor {
 
 		// Member Constructor
 		MeterType(
-			Fstring const & Name, // Name of the meter
-			Fstring const & ResourceType, // Resource Type of the meter
-			Fstring const & EndUse, // End Use of the meter
-			Fstring const & EndUseSub, // End Use subcategory of the meter
-			Fstring const & Group, // Group of the meter
-			Fstring const & Units, // Units for the Meter
+			std::string const & Name, // Name of the meter
+			std::string const & ResourceType, // Resource Type of the meter
+			std::string const & EndUse, // End Use of the meter
+			std::string const & EndUseSub, // End Use subcategory of the meter
+			std::string const & Group, // Group of the meter
+			std::string const & Units, // Units for the Meter
 			int const RT_forIPUnits, // Resource type number for IP Units (tabular) reporting
 			int const TypeOfMeter, // type of meter
 			int const SourceMeter, // for custom decrement meters, this is the meter number for the subtraction
@@ -759,7 +729,7 @@ namespace OutputProcessor {
 			bool const RptTS, // Report at End of TimeStep (Zone)
 			bool const RptTSFO, // Report at End of TimeStep (Zone) -- meter file only
 			int const TSRptNum, // Report Number for TS Values
-			Fstring const & TSRptNumChr, // Report Number for TS Values (character -- for printing)
+			std::string const & TSRptNumChr, // Report Number for TS Values (character -- for printing)
 			Real64 const HRValue, // Hourly Value
 			bool const RptHR, // Report at End of Hour
 			bool const RptHRFO, // Report at End of Hour -- meter file only
@@ -768,7 +738,7 @@ namespace OutputProcessor {
 			Real64 const HRMinVal, // Minimum Value (Hour)
 			int const HRMinValDate, // Date stamp of minimum
 			int const HRRptNum, // Report Number for HR Values
-			Fstring const & HRRptNumChr, // Report Number for HR Values (character -- for printing)
+			std::string const & HRRptNumChr, // Report Number for HR Values (character -- for printing)
 			Real64 const DYValue, // Daily Value
 			bool const RptDY, // Report at End of Day
 			bool const RptDYFO, // Report at End of Day -- meter file only
@@ -777,7 +747,7 @@ namespace OutputProcessor {
 			Real64 const DYMinVal, // Minimum Value (Day)
 			int const DYMinValDate, // Date stamp of minimum
 			int const DYRptNum, // Report Number for DY Values
-			Fstring const & DYRptNumChr, // Report Number for DY Values (character -- for printing)
+			std::string const & DYRptNumChr, // Report Number for DY Values (character -- for printing)
 			Real64 const MNValue, // Monthly Value
 			bool const RptMN, // Report at End of Month
 			bool const RptMNFO, // Report at End of Month -- meter file only
@@ -786,7 +756,7 @@ namespace OutputProcessor {
 			Real64 const MNMinVal, // Minimum Value (Month)
 			int const MNMinValDate, // Date stamp of minimum
 			int const MNRptNum, // Report Number for MN Values
-			Fstring const & MNRptNumChr, // Report Number for MN Values (character -- for printing)
+			std::string const & MNRptNumChr, // Report Number for MN Values (character -- for printing)
 			Real64 const SMValue, // Simulation Value
 			bool const RptSM, // Report at End of Environment/Simulation
 			bool const RptSMFO, // Report at End of Environment/Simulation -- meter file only
@@ -795,7 +765,7 @@ namespace OutputProcessor {
 			Real64 const SMMinVal, // Minimum Value (Sim)
 			int const SMMinValDate, // Date stamp of minimum
 			int const SMRptNum, // Report Number for SM Values
-			Fstring const & SMRptNumChr, // Report Number for SM Values (character -- for printing)
+			std::string const & SMRptNumChr, // Report Number for SM Values (character -- for printing)
 			Real64 const LastSMValue, // Simulation Value
 			Real64 const LastSMMaxVal, // Maximum Value (Sim)
 			int const LastSMMaxValDate, // Date stamp of maximum
@@ -819,12 +789,12 @@ namespace OutputProcessor {
 			int const InstMeterCacheStart, // index of the beginning of the instant meter cache
 			int const InstMeterCacheEnd // index of the end of the instant meter cache
 		) :
-			Name( MaxNameLength * 2, Name ),
-			ResourceType( MaxNameLength, ResourceType ),
-			EndUse( MaxNameLength, EndUse ),
-			EndUseSub( MaxNameLength, EndUseSub ),
-			Group( MaxNameLength, Group ),
-			Units( UnitsStringLength, Units ),
+			Name( Name ),
+			ResourceType( ResourceType ),
+			EndUse( EndUse ),
+			EndUseSub( EndUseSub ),
+			Group( Group ),
+			Units( Units ),
 			RT_forIPUnits( RT_forIPUnits ),
 			TypeOfMeter( TypeOfMeter ),
 			SourceMeter( SourceMeter ),
@@ -833,7 +803,7 @@ namespace OutputProcessor {
 			RptTS( RptTS ),
 			RptTSFO( RptTSFO ),
 			TSRptNum( TSRptNum ),
-			TSRptNumChr( 16, TSRptNumChr ),
+			TSRptNumChr( TSRptNumChr ),
 			HRValue( HRValue ),
 			RptHR( RptHR ),
 			RptHRFO( RptHRFO ),
@@ -842,7 +812,7 @@ namespace OutputProcessor {
 			HRMinVal( HRMinVal ),
 			HRMinValDate( HRMinValDate ),
 			HRRptNum( HRRptNum ),
-			HRRptNumChr( 16, HRRptNumChr ),
+			HRRptNumChr( HRRptNumChr ),
 			DYValue( DYValue ),
 			RptDY( RptDY ),
 			RptDYFO( RptDYFO ),
@@ -851,7 +821,7 @@ namespace OutputProcessor {
 			DYMinVal( DYMinVal ),
 			DYMinValDate( DYMinValDate ),
 			DYRptNum( DYRptNum ),
-			DYRptNumChr( 16, DYRptNumChr ),
+			DYRptNumChr( DYRptNumChr ),
 			MNValue( MNValue ),
 			RptMN( RptMN ),
 			RptMNFO( RptMNFO ),
@@ -860,7 +830,7 @@ namespace OutputProcessor {
 			MNMinVal( MNMinVal ),
 			MNMinValDate( MNMinValDate ),
 			MNRptNum( MNRptNum ),
-			MNRptNumChr( 16, MNRptNumChr ),
+			MNRptNumChr( MNRptNumChr ),
 			SMValue( SMValue ),
 			RptSM( RptSM ),
 			RptSMFO( RptSMFO ),
@@ -869,7 +839,7 @@ namespace OutputProcessor {
 			SMMinVal( SMMinVal ),
 			SMMinValDate( SMMinValDate ),
 			SMRptNum( SMRptNum ),
-			SMRptNumChr( 16, SMRptNumChr ),
+			SMRptNumChr( SMRptNumChr ),
 			LastSMValue( LastSMValue ),
 			LastSMMaxVal( LastSMMaxVal ),
 			LastSMMaxValDate( LastSMMaxValDate ),
@@ -899,28 +869,25 @@ namespace OutputProcessor {
 	struct EndUseCategoryType
 	{
 		// Members
-		Fstring Name; // End use category name
-		Fstring DisplayName; // Display name for output table
+		std::string Name; // End use category name
+		std::string DisplayName; // Display name for output table
 		int NumSubcategories;
-		FArray1D_Fstring SubcategoryName; // Array of subcategory names
+		FArray1D_string SubcategoryName; // Array of subcategory names
 
 		// Default Constructor
 		EndUseCategoryType() :
-			Name( MaxNameLength, BlankString ),
-			DisplayName( MaxNameLength, BlankString ),
-			NumSubcategories( 0 ),
-			SubcategoryName( sFstring( MaxNameLength ) )
+			NumSubcategories( 0 )
 		{}
 
 		// Member Constructor
 		EndUseCategoryType(
-			Fstring const & Name, // End use category name
-			Fstring const & DisplayName, // Display name for output table
+			std::string const & Name, // End use category name
+			std::string const & DisplayName, // Display name for output table
 			int const NumSubcategories,
-			FArray1_Fstring const & SubcategoryName // Array of subcategory names
+			FArray1_string const & SubcategoryName // Array of subcategory names
 		) :
-			Name( MaxNameLength, Name ),
-			DisplayName( MaxNameLength, DisplayName ),
+			Name( Name ),
+			DisplayName( DisplayName ),
 			NumSubcategories( NumSubcategories ),
 			SubcategoryName( SubcategoryName )
 		{}
@@ -948,27 +915,27 @@ namespace OutputProcessor {
 
 	void
 	SetupTimePointers(
-		Fstring const & IndexKey, // Which timestep is being set up, 'Zone'=1, 'HVAC'=2
+		std::string const & IndexKey, // Which timestep is being set up, 'Zone'=1, 'HVAC'=2
 		Real64 & TimeStep // The timestep variable.  Used to get the address
 	);
 
 	void
 	CheckReportVariable(
-		Fstring const & KeyedValue, // Associated Key for this variable
-		Fstring const & VarName // String Name of variable (without units)
+		std::string const & KeyedValue, // Associated Key for this variable
+		std::string const & VarName // String Name of variable (without units)
 	);
 
 	void
 	BuildKeyVarList(
-		Fstring const & KeyedValue, // Associated Key for this variable
-		Fstring const & VariableName, // String Name of variable
+		std::string const & KeyedValue, // Associated Key for this variable
+		std::string const & VariableName, // String Name of variable
 		int const MinIndx, // Min number (from previous routine) for this variable
 		int const MaxIndx // Max number (from previous routine) for this variable
 	);
 
 	void
 	AddBlankKeys(
-		Fstring const & VariableName, // String Name of variable
+		std::string const & VariableName, // String Name of variable
 		int const MinIndx, // Min number (from previous routine) for this variable
 		int const MaxIndx // Max number (from previous routine) for this variable
 	);
@@ -978,20 +945,20 @@ namespace OutputProcessor {
 
 	void
 	DetermineFrequency(
-		Fstring const & FreqString,
+		std::string const & FreqString,
 		int & ReportFreq
 	);
 
 	void
 	ProduceMinMaxString(
-		Fstring & String, // Current value
+		std::string & String, // Current value
 		int const DateValue, // Date of min/max
 		int const ReportFreq // Reporting Frequency
 	);
 
 	void
 	ProduceMinMaxStringWStartMinute(
-		Fstring & String, // Current value
+		std::string & String, // Current value
 		int const DateValue, // Date of min/max
 		int const ReportFreq // Reporting Frequency
 	);
@@ -1011,21 +978,21 @@ namespace OutputProcessor {
 
 	int
 	ValidateIndexType(
-		Fstring const & IndexTypeKey, // Index type (Zone, HVAC) for variables
-		Fstring const & CalledFrom // Routine called from (for error messages)
+		std::string const & IndexTypeKey, // Index type (Zone, HVAC) for variables
+		std::string const & CalledFrom // Routine called from (for error messages)
 	);
 
-	Fstring
+	std::string
 	StandardIndexTypeKey( int const IndexType );
 
 	int
-	ValidateVariableType( Fstring const & VariableTypeKey );
+	ValidateVariableType( std::string const & VariableTypeKey );
 
-	Fstring
+	std::string
 	StandardVariableTypeKey( int const VariableType );
 
-	Fstring
-	GetVariableUnitsString( Fstring const & VariableName );
+	std::string
+	GetVariableUnitsString( std::string const & VariableName );
 
 	// *****************************************************************************
 	// The following routines implement Energy Meters in EnergyPlus.
@@ -1039,29 +1006,29 @@ namespace OutputProcessor {
 
 	void
 	GetStandardMeterResourceType(
-		Fstring & OutResourceType,
-		Fstring const & UserInputResourceType,
+		std::string & OutResourceType,
+		std::string const & UserInputResourceType,
 		bool & ErrorsFound
 	);
 
 	void
 	AddMeter(
-		Fstring const & Name, // Name for the meter
-		Fstring const & MtrUnits, // Units for the meter
-		Fstring const & ResourceType, // ResourceType for the meter
-		Fstring const & EndUse, // EndUse for the meter
-		Fstring const & EndUseSub, // EndUse subcategory for the meter
-		Fstring const & Group // Group for the meter
+		std::string const & Name, // Name for the meter
+		std::string const & MtrUnits, // Units for the meter
+		std::string const & ResourceType, // ResourceType for the meter
+		std::string const & EndUse, // EndUse for the meter
+		std::string const & EndUseSub, // EndUse subcategory for the meter
+		std::string const & Group // Group for the meter
 	);
 
 	void
 	AttachMeters(
-		Fstring const & MtrUnits, // Units for this meter
-		Fstring & ResourceType, // Electricity, Gas, etc.
-		Fstring & EndUse, // End-use category (Lights, Heating, etc.)
-		Fstring & EndUseSub, // End-use subcategory (user-defined, e.g., General Lights, Task Lights, etc.)
-		Fstring & Group, // Group key (Facility, Zone, Building, etc.)
-		Fstring const & ZoneName, // Zone key only applicable for Building group
+		std::string const & MtrUnits, // Units for this meter
+		std::string & ResourceType, // Electricity, Gas, etc.
+		std::string & EndUse, // End-use category (Lights, Heating, etc.)
+		std::string & EndUseSub, // End-use subcategory (user-defined, e.g., General Lights, Task Lights, etc.)
+		std::string & Group, // Group key (Facility, Zone, Building, etc.)
+		std::string const & ZoneName, // Zone key only applicable for Building group
 		int const RepVarNum, // Number of this report variable
 		int & MeterArrayPtr, // Output set of Pointers to Meters
 		bool & ErrorsFound // True if errors in this call
@@ -1069,7 +1036,7 @@ namespace OutputProcessor {
 
 	void
 	AttachCustomMeters(
-		Fstring const & MtrUnits, // Units for this meter
+		std::string const & MtrUnits, // Units for this meter
 		int const RepVarNum, // Number of this report variable
 		int & MeterArrayPtr, // Input/Output set of Pointers to Meters
 		int const MeterIndex, // Which meter this is
@@ -1078,20 +1045,20 @@ namespace OutputProcessor {
 
 	void
 	ValidateNStandardizeMeterTitles(
-		Fstring const & MtrUnits, // Units for the meter
-		Fstring & ResourceType, // Electricity, Gas, etc.
-		Fstring & EndUse, // End Use Type (Lights, Heating, etc.)
-		Fstring & EndUseSub, // End Use Sub Type (General Lights, Task Lights, etc.)
-		Fstring & Group, // Group key (Facility, Zone, Building, etc.)
+		std::string const & MtrUnits, // Units for the meter
+		std::string & ResourceType, // Electricity, Gas, etc.
+		std::string & EndUse, // End Use Type (Lights, Heating, etc.)
+		std::string & EndUseSub, // End Use Sub Type (General Lights, Task Lights, etc.)
+		std::string & Group, // Group key (Facility, Zone, Building, etc.)
 		bool & ErrorsFound, // True if errors in this call
-		Optional_Fstring_const ZoneName = _ // ZoneName when Group=Building
+		Optional_string_const ZoneName = _ // ZoneName when Group=Building
 	);
 
 	void
 	DetermineMeterIPUnits(
 		int & CodeForIPUnits, // Output Code for IP Units
-		Fstring const & ResourceType, // Resource Type
-		Fstring const & MtrUnits, // Meter units
+		std::string const & ResourceType, // Resource Type
+		std::string const & MtrUnits, // Meter units
 		bool & ErrorsFound // true if errors found during subroutine
 	);
 
@@ -1139,7 +1106,7 @@ namespace OutputProcessor {
 	void
 	ReportForTabularReports();
 
-	Fstring
+	std::string
 	DateToStringWithMonth( int const codedDate ); // word containing encoded month, day, hour, minute
 
 	void
@@ -1151,9 +1118,9 @@ namespace OutputProcessor {
 
 	void
 	AddEndUseSubcategory(
-		Fstring const & ResourceName,
-		Fstring const & EndUseName,
-		Fstring const & EndUseSubName
+		std::string const & ResourceName,
+		std::string const & EndUseName,
+		std::string const & EndUseSubName
 	);
 
 	int
@@ -1161,16 +1128,16 @@ namespace OutputProcessor {
 		int const unitNumber, // the Fortran output unit number
 		int const reportingInterval, // See Module Parameter Definitons for ReportEach, ReportTimeStep, ReportHourly, etc.
 		int const reportID, // The ID of the time stamp
-		Fstring const & reportIDString, // The ID of the time stamp
+		std::string const & reportIDString, // The ID of the time stamp
 		int const DayOfSim, // the number of days simulated so far
-		Fstring const & DayOfSimChr, // the number of days simulated so far
+		std::string const & DayOfSimChr, // the number of days simulated so far
 		Optional_int_const Month = _, // the month of the reporting interval
 		Optional_int_const DayOfMonth = _, // The day of the reporting interval
 		Optional_int_const Hour = _, // The hour of the reporting interval
 		Optional< Real64 const > EndMinute = _, // The last minute in the reporting interval
 		Optional< Real64 const > StartMinute = _, // The starting minute of the reporting interval
 		Optional_int_const DST = _, // A flag indicating whether daylight savings time is observed
-		Optional_Fstring_const DayType = _ // The day tied for the data (e.g., Monday)
+		Optional_string_const DayType = _ // The day tied for the data (e.g., Monday)
 	);
 
 	void
@@ -1179,13 +1146,13 @@ namespace OutputProcessor {
 		int const storeType,
 		int const reportID, // The reporting ID for the data
 		int const indexGroupKey, // The reporting group (e.g., Zone, Plant Loop, etc.)
-		Fstring const & indexGroup, // The reporting group (e.g., Zone, Plant Loop, etc.)
-		Fstring const & reportIDChr, // The reporting ID for the data
-		Fstring const & keyedValue, // The key name for the data
-		Fstring const & variableName, // The variable's actual name
+		std::string const & indexGroup, // The reporting group (e.g., Zone, Plant Loop, etc.)
+		std::string const & reportIDChr, // The reporting ID for the data
+		std::string const & keyedValue, // The key name for the data
+		std::string const & variableName, // The variable's actual name
 		int const indexType,
-		Fstring const & UnitsString, // The variables units
-		Optional_Fstring_const ScheduleName = _
+		std::string const & UnitsString, // The variables units
+		Optional_string_const ScheduleName = _
 	);
 
 	void
@@ -1194,10 +1161,10 @@ namespace OutputProcessor {
 		int const storeType,
 		int const reportID, // The reporting ID in for the variable
 		int const indexGroupKey, // The reporting group for the variable
-		Fstring const & indexGroup, // The reporting group for the variable
-		Fstring const & reportIDChr, // The reporting ID in for the variable
-		Fstring const & meterName, // The variable's meter name
-		Fstring const & UnitsString, // The variables units
+		std::string const & indexGroup, // The reporting group for the variable
+		std::string const & reportIDChr, // The reporting ID in for the variable
+		std::string const & meterName, // The variable's meter name
+		std::string const & UnitsString, // The variables units
 		bool const cumulativeMeterFlag, // A flag indicating cumulative data
 		bool const meterFileOnlyFlag // A flag indicating whether the data is to be written to standard output
 	);
@@ -1211,7 +1178,7 @@ namespace OutputProcessor {
 	void
 	WriteReportRealData(
 		int const reportID, // The variable's report ID
-		Fstring const & creportID, // variable ID in characters
+		std::string const & creportID, // variable ID in characters
 		int const timeIndex, // An index that points to the timestamp
 		Real64 const repValue, // The variable's value
 		int const storeType, // Averaged or Sum
@@ -1226,7 +1193,7 @@ namespace OutputProcessor {
 	void
 	WriteCumulativeReportMeterData(
 		int const reportID, // The variable's report ID
-		Fstring const & creportID, // variable ID in characters
+		std::string const & creportID, // variable ID in characters
 		int const timeIndex, // An index that points to the timestamp
 		Real64 const repValue, // The variable's value
 		bool const meterOnlyFlag // A flag that indicates if the data should be written to standard output
@@ -1235,7 +1202,7 @@ namespace OutputProcessor {
 	void
 	WriteReportMeterData(
 		int const reportID, // The variable's report ID
-		Fstring const & creportID, // variable ID in characters
+		std::string const & creportID, // variable ID in characters
 		int const timeIndex, // An index that points to the timestamp
 		Real64 const repValue, // The variable's value
 		int const reportingInterval, // The variable's reporting interval (e.g., hourly)
@@ -1249,7 +1216,7 @@ namespace OutputProcessor {
 	void
 	WriteRealData(
 		int const reportID, // The variable's reporting ID
-		Fstring const & creportID, // variable ID in characters
+		std::string const & creportID, // variable ID in characters
 		int const timeIndex, // An index that points to the timestamp for the variable
 		Real64 const repValue // The variable's value
 	);
@@ -1263,7 +1230,7 @@ namespace OutputProcessor {
 	void
 	WriteReportIntegerData(
 		int const reportID, // The variable's reporting ID
-		Fstring const & reportIDString, // The variable's reporting ID (character)
+		std::string const & reportIDString, // The variable's reporting ID (character)
 		int const timeIndex, // An index that points to this timestamp for this data
 		Real64 const repValue, // The variable's value
 		int const storeType, // Type of item (averaged or summed)
@@ -1278,16 +1245,16 @@ namespace OutputProcessor {
 	void
 	WriteIntegerData(
 		int const reportID, // the reporting ID of the data
-		Fstring const & reportIDString, // the reporting ID of the data (character)
+		std::string const & reportIDString, // the reporting ID of the data (character)
 		int const timeIndex, // an index that points to the data's timestamp
 		Optional_int_const IntegerValue = _, // the value of the data
 		Optional< Real64 const > RealValue = _ // the value of the data
 	);
 
 	int
-	DetermineIndexGroupKeyFromMeterName( Fstring const & meterName ); // the meter name
+	DetermineIndexGroupKeyFromMeterName( std::string const & meterName ); // the meter name
 
-	Fstring
+	std::string
 	DetermineIndexGroupFromMeterGroup( MeterType const & meter ); // the meter
 
 	void
@@ -1310,17 +1277,17 @@ namespace OutputProcessor {
 
 void
 SetupOutputVariable(
-	Fstring const & VariableName, // String Name of variable (with units)
+	std::string const & VariableName, // String Name of variable (with units)
 	Real64 & ActualVariable, // Actual Variable, used to set up pointer
-	Fstring const & IndexTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
-	Fstring const & VariableTypeKey, // State, Average=1, NonState, Sum=2
-	Fstring const & KeyedValue, // Associated Key for this variable
-	Optional_Fstring_const ReportFreq = _, // Internal use -- causes reporting at this freqency
-	Optional_Fstring_const ResourceTypeKey = _, // Meter Resource Type (Electricity, Gas, etc)
-	Optional_Fstring_const EndUseKey = _, // Meter End Use Key (Lights, Heating, Cooling, etc)
-	Optional_Fstring_const EndUseSubKey = _, // Meter End Use Sub Key (General Lights, Task Lights, etc)
-	Optional_Fstring_const GroupKey = _, // Meter Super Group Key (Building, System, Plant)
-	Optional_Fstring_const ZoneKey = _, // Meter Zone Key (zone name)
+	std::string const & IndexTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+	std::string const & VariableTypeKey, // State, Average=1, NonState, Sum=2
+	std::string const & KeyedValue, // Associated Key for this variable
+	Optional_string_const ReportFreq = _, // Internal use -- causes reporting at this freqency
+	Optional_string_const ResourceTypeKey = _, // Meter Resource Type (Electricity, Gas, etc)
+	Optional_string_const EndUseKey = _, // Meter End Use Key (Lights, Heating, Cooling, etc)
+	Optional_string_const EndUseSubKey = _, // Meter End Use Sub Key (General Lights, Task Lights, etc)
+	Optional_string_const GroupKey = _, // Meter Super Group Key (Building, System, Plant)
+	Optional_string_const ZoneKey = _, // Meter Zone Key (zone name)
 	Optional_int_const ZoneMult = _, // Zone Multiplier, defaults to 1
 	Optional_int_const ZoneListMult = _, // Zone List Multiplier, defaults to 1
 	Optional_int_const indexGroupKey = _ // Group identifier for SQL output
@@ -1328,28 +1295,28 @@ SetupOutputVariable(
 
 void
 SetupOutputVariable(
-	Fstring const & VariableName, // String Name of variable
+	std::string const & VariableName, // String Name of variable
 	int & ActualVariable, // Actual Variable, used to set up pointer
-	Fstring const & IndexTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
-	Fstring const & VariableTypeKey, // State, Average=1, NonState, Sum=2
-	Fstring const & KeyedValue, // Associated Key for this variable
-	Optional_Fstring_const ReportFreq = _, // Internal use -- causes reporting at this freqency
+	std::string const & IndexTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+	std::string const & VariableTypeKey, // State, Average=1, NonState, Sum=2
+	std::string const & KeyedValue, // Associated Key for this variable
+	Optional_string_const ReportFreq = _, // Internal use -- causes reporting at this freqency
 	Optional_int_const indexGroupKey = _ // Group identifier for SQL output
 );
 
 void
 SetupOutputVariable(
-	Fstring const & VariableName, // String Name of variable
+	std::string const & VariableName, // String Name of variable
 	Real64 & ActualVariable, // Actual Variable, used to set up pointer
-	Fstring const & IndexTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
-	Fstring const & VariableTypeKey, // State, Average=1, NonState, Sum=2
+	std::string const & IndexTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+	std::string const & VariableTypeKey, // State, Average=1, NonState, Sum=2
 	int const KeyedValue, // Associated Key for this variable
-	Optional_Fstring_const ReportFreq = _, // Internal use -- causes reporting at this freqency
-	Optional_Fstring_const ResourceTypeKey = _, // Meter Resource Type (Electricity, Gas, etc)
-	Optional_Fstring_const EndUseKey = _, // Meter End Use Key (Lights, Heating, Cooling, etc)
-	Optional_Fstring_const EndUseSubKey = _, // Meter End Use Sub Key (General Lights, Task Lights, etc)
-	Optional_Fstring_const GroupKey = _, // Meter Super Group Key (Building, System, Plant)
-	Optional_Fstring_const ZoneKey = _, // Meter Zone Key (zone name)
+	Optional_string_const ReportFreq = _, // Internal use -- causes reporting at this freqency
+	Optional_string_const ResourceTypeKey = _, // Meter Resource Type (Electricity, Gas, etc)
+	Optional_string_const EndUseKey = _, // Meter End Use Key (Lights, Heating, Cooling, etc)
+	Optional_string_const EndUseSubKey = _, // Meter End Use Sub Key (General Lights, Task Lights, etc)
+	Optional_string_const GroupKey = _, // Meter Super Group Key (Building, System, Plant)
+	Optional_string_const ZoneKey = _, // Meter Zone Key (zone name)
 	Optional_int_const ZoneMult = _, // Zone Multiplier, defaults to 1
 	Optional_int_const ZoneListMult = _, // Zone List Multiplier, defaults to 1
 	Optional_int_const indexGroupKey = _ // Group identifier for SQL output
@@ -1376,9 +1343,9 @@ SetInitialMeterReportingAndOutputNames(
 );
 
 int
-GetMeterIndex( Fstring const & MeterName );
+GetMeterIndex( std::string const & MeterName );
 
-Fstring
+std::string
 GetMeterResourceType( int const MeterNumber ); // Which Meter Number (from GetMeterIndex)
 
 Real64
@@ -1407,60 +1374,60 @@ GetInternalVariableValueExternalInterface(
 
 int
 GetNumMeteredVariables(
-	Fstring const & ComponentType, // Given Component Type
-	Fstring const & ComponentName // Given Component Name (user defined)
+	std::string const & ComponentType, // Given Component Type
+	std::string const & ComponentName // Given Component Name (user defined)
 );
 
 void
 GetMeteredVariables(
-	Fstring const & ComponentType, // Given Component Type
-	Fstring const & ComponentName, // Given Component Name (user defined)
+	std::string const & ComponentType, // Given Component Type
+	std::string const & ComponentName, // Given Component Name (user defined)
 	FArray1S_int VarIndexes, // Variable Numbers
 	FArray1S_int VarTypes, // Variable Types (1=integer, 2=real, 3=meter)
 	FArray1S_int IndexTypes, // Variable Index Types (1=Zone,2=HVAC)
-	FArray1S_Fstring UnitsStrings, // UnitsStrings for each variable
+	FArray1S_string UnitsStrings, // UnitsStrings for each variable
 	FArray1S_int ResourceTypes, // ResourceTypes for each variable
-	Optional< FArray1S_Fstring > EndUses = _, // EndUses for each variable
-	Optional< FArray1S_Fstring > Groups = _, // Groups for each variable
-	Optional< FArray1S_Fstring > Names = _, // Variable Names for each variable
+	Optional< FArray1S_string > EndUses = _, // EndUses for each variable
+	Optional< FArray1S_string > Groups = _, // Groups for each variable
+	Optional< FArray1S_string > Names = _, // Variable Names for each variable
 	Optional_int NumFound = _, // Number Found
 	Optional< FArray1S_int > VarIDs = _ // Variable Report Numbers
 );
 
 void
 GetVariableKeyCountandType(
-	Fstring const & varName, // Standard variable name
+	std::string const & varName, // Standard variable name
 	int & numKeys, // Number of keys found
 	int & varType, // 0=not found, 1=integer, 2=real, 3=meter
 	int & varAvgSum, // Variable  is Averaged=1 or Summed=2
 	int & varStepType, // Variable time step is Zone=1 or HVAC=2
-	Fstring & varUnits // Units sting, may be blank
+	std::string & varUnits // Units sting, may be blank
 );
 
 void
 GetVariableKeys(
-	Fstring const & varName, // Standard variable name
+	std::string const & varName, // Standard variable name
 	int const varType, // 1=integer, 2=real, 3=meter
-	FArray1S_Fstring keyNames, // Specific key name
+	FArray1S_string keyNames, // Specific key name
 	FArray1S_int keyVarIndexes // Array index for
 );
 
 bool
-ReportingThisVariable( Fstring const & RepVarName );
+ReportingThisVariable( std::string const & RepVarName );
 
 void
-InitPollutionMeterReporting( Fstring const & ReportFreqName );
+InitPollutionMeterReporting( std::string const & ReportFreqName );
 
 void
 ProduceRDDMDD();
 
 void
 AddToOutputVariableList(
-	Fstring const & VarName, // Variable Name
+	std::string const & VarName, // Variable Name
 	int const IndexType,
 	int const StateType,
 	int const VariableType,
-	Fstring const & UnitsString
+	std::string const & UnitsString
 );
 
 //     NOTICE

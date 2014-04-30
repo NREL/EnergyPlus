@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace DataDefineEquip {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// -only module should be available to other modules and routines.
@@ -52,13 +50,13 @@ namespace DataDefineEquip {
 	struct ZoneAirEquip
 	{
 		// Members
-		Fstring Name; // Name or identifier of this piece of equipment
+		std::string Name; // Name or identifier of this piece of equipment
 		int OutletNodeNum; // index of outlet node
 		int NumComponents; // number of subcomponents (=1)
 		int NumControls; // number of controls (not used; =0)
-		FArray1D_Fstring EquipType; // Pointer indentifying type of subcomponent
+		FArray1D_string EquipType; // Pointer indentifying type of subcomponent
 		FArray1D_int EquipType_Num;
-		FArray1D_Fstring EquipName; // name of subcomponent
+		FArray1D_string EquipName; // name of subcomponent
 		FArray1D_int EquipIndex;
 		Real64 UpStreamLeakFrac; // upstream nominal leakage fraction
 		Real64 DownStreamLeakFrac; // downstream constant leakage fraction
@@ -77,13 +75,12 @@ namespace DataDefineEquip {
 
 		// Default Constructor
 		ZoneAirEquip() :
-			Name( MaxNameLength ),
 			OutletNodeNum( 0 ),
 			NumComponents( 0 ),
 			NumControls( 0 ),
-			EquipType( MaxZoneAirComponents, sFstring( MaxNameLength ) ),
+			EquipType( MaxZoneAirComponents ),
 			EquipType_Num( MaxZoneAirComponents, 0 ),
-			EquipName( MaxZoneAirComponents, sFstring( MaxNameLength ) ),
+			EquipName( MaxZoneAirComponents ),
 			EquipIndex( MaxZoneAirComponents, 0 ),
 			UpStreamLeakFrac( 0.0 ),
 			DownStreamLeakFrac( 0.0 ),
@@ -103,13 +100,13 @@ namespace DataDefineEquip {
 
 		// Member Constructor
 		ZoneAirEquip(
-			Fstring const & Name, // Name or identifier of this piece of equipment
+			std::string const & Name, // Name or identifier of this piece of equipment
 			int const OutletNodeNum, // index of outlet node
 			int const NumComponents, // number of subcomponents (=1)
 			int const NumControls, // number of controls (not used; =0)
-			FArray1_Fstring const & EquipType, // Pointer indentifying type of subcomponent
+			FArray1_string const & EquipType, // Pointer indentifying type of subcomponent
 			FArray1_int const & EquipType_Num,
-			FArray1_Fstring const & EquipName, // name of subcomponent
+			FArray1_string const & EquipName, // name of subcomponent
 			FArray1_int const & EquipIndex,
 			Real64 const UpStreamLeakFrac, // upstream nominal leakage fraction
 			Real64 const DownStreamLeakFrac, // downstream constant leakage fraction
@@ -126,13 +123,13 @@ namespace DataDefineEquip {
 			bool const UpStreamLeak, // if true, there is an upstream leak
 			bool const DownStreamLeak // if true, there is an downstream leak
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			OutletNodeNum( OutletNodeNum ),
 			NumComponents( NumComponents ),
 			NumControls( NumControls ),
-			EquipType( MaxZoneAirComponents, sFstring( MaxNameLength ), EquipType ),
+			EquipType( MaxZoneAirComponents, EquipType ),
 			EquipType_Num( MaxZoneAirComponents, EquipType_Num ),
-			EquipName( MaxZoneAirComponents, sFstring( MaxNameLength ), EquipName ),
+			EquipName( MaxZoneAirComponents, EquipName ),
 			EquipIndex( MaxZoneAirComponents, EquipIndex ),
 			UpStreamLeakFrac( UpStreamLeakFrac ),
 			DownStreamLeakFrac( DownStreamLeakFrac ),

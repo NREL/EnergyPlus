@@ -49,7 +49,6 @@ namespace PlantComponentTemperatureSources {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::InitConvTemp;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallWaterVolFlow;
@@ -78,7 +77,7 @@ namespace PlantComponentTemperatureSources {
 
 	void
 	SimWaterSource(
-		Fstring const & SourceName, // user-specified name for this component
+		std::string const & SourceName, // user-specified name for this component
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // HX number pointer
 		bool const RunFlag, // simulate HX when TRUE
@@ -135,17 +134,17 @@ namespace PlantComponentTemperatureSources {
 		if ( CompIndex == 0 ) {
 			SourceNum = FindItemInList( SourceName, WaterSource.Name(), NumSources );
 			if ( SourceNum == 0 ) {
-				ShowFatalError( "SimWaterSource: Specified heat exchanger not one of Valid heat exchangers=" + trim( SourceName ) );
+				ShowFatalError( "SimWaterSource: Specified heat exchanger not one of Valid heat exchangers=" + SourceName );
 			}
 			CompIndex = SourceNum;
 		} else {
 			SourceNum = CompIndex;
 			if ( SourceNum > NumSources || SourceNum < 1 ) {
-				ShowFatalError( "SimWaterSource:  Invalid CompIndex passed=" + trim( TrimSigDigits( SourceNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumSources ) ) + ", Entered Unit name=" + trim( SourceName ) );
+				ShowFatalError( "SimWaterSource:  Invalid CompIndex passed=" + TrimSigDigits( SourceNum ) + ", Number of Units=" + TrimSigDigits( NumSources ) + ", Entered Unit name=" + SourceName );
 			}
 			if ( WaterSource( SourceNum ).CheckEquipName ) {
 				if ( SourceName != WaterSource( SourceNum ).Name ) {
-					ShowFatalError( "SimWaterSource: Invalid CompIndex passed=" + trim( TrimSigDigits( SourceNum ) ) + ", Unit name=" + trim( SourceName ) + ", stored Unit Name for that index=" + trim( WaterSource( SourceNum ).Name ) );
+					ShowFatalError( "SimWaterSource: Invalid CompIndex passed=" + TrimSigDigits( SourceNum ) + ", Unit name=" + SourceName + ", stored Unit Name for that index=" + WaterSource( SourceNum ).Name );
 				}
 				WaterSource( SourceNum ).CheckEquipName = false;
 			}
@@ -229,7 +228,7 @@ namespace PlantComponentTemperatureSources {
 		NumSources = GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumSources <= 0 ) {
-			ShowSevereError( "No " + trim( cCurrentModuleObject ) + " equipment specified in input file" );
+			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
 			ErrorsFound = true;
 		}
 
@@ -243,16 +242,16 @@ namespace PlantComponentTemperatureSources {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), WaterSource.Name(), SourceNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), WaterSource.Name(), SourceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 			WaterSource( SourceNum ).Name = cAlphaArgs( 1 );
 
-			WaterSource( SourceNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			WaterSource( SourceNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Chilled Water Nodes" );
+			WaterSource( SourceNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			WaterSource( SourceNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Chilled Water Nodes" );
 
 			WaterSource( SourceNum ).DesVolFlowRate = rNumericArgs( 1 );
 
@@ -264,20 +263,20 @@ namespace PlantComponentTemperatureSources {
 				WaterSource( SourceNum ).TempSpecScheduleName = cAlphaArgs( 5 );
 				WaterSource( SourceNum ).TempSpecScheduleNum = GetScheduleIndex( cAlphaArgs( 5 ) );
 				if ( WaterSource( SourceNum ).TempSpecScheduleNum == 0 ) {
-					ShowSevereError( "Input error for " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
-					ShowContinueError( "Invalid schedule name in field " + trim( cAlphaFieldNames( 5 ) ) + "=" + cAlphaArgs( 5 ) );
+					ShowSevereError( "Input error for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
+					ShowContinueError( "Invalid schedule name in field " + cAlphaFieldNames( 5 ) + '=' + cAlphaArgs( 5 ) );
 					ErrorsFound = true;
 				}
 			} else {
-				ShowSevereError( "Input error for " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Invalid temperature specification type.  Expected either \"Constant\" or \"Scheduled\". Encountered \"" + trim( cAlphaArgs( 4 ) ) + "\"" );
+				ShowSevereError( "Input error for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
+				ShowContinueError( "Invalid temperature specification type.  Expected either \"Constant\" or \"Scheduled\". Encountered \"" + cAlphaArgs( 4 ) + "\"" );
 				ErrorsFound = true;
 			}
 
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + trim( cCurrentModuleObject ) );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
 		}
 
 		for ( SourceNum = 1; SourceNum <= NumSources; ++SourceNum ) {
@@ -335,7 +334,7 @@ namespace PlantComponentTemperatureSources {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "InitWaterSource" );
+		static std::string const RoutineName( "InitWaterSource" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -494,9 +493,9 @@ namespace PlantComponentTemperatureSources {
 							ReportSizingOutput( "PlantComponent:TemperatureSource", WaterSource( SourceNum ).Name, "Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate, "User-Specified Design Fluid Flow Rate [m3/s]", DesVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpVolFlowRate - DesVolFlowRateUser ) / DesVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizePlantComponentTemperatureSource: Potential issue with equipment sizing for " + trim( WaterSource( SourceNum ).Name ) );
-									ShowContinueError( "User-Specified Design Fluid Flow Rate of " + trim( RoundSigDigits( DesVolFlowRateUser, 5 ) ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Design Fluid Flow Rate of " + trim( RoundSigDigits( tmpVolFlowRate, 5 ) ) + " [m3/s]" );
+									ShowMessage( "SizePlantComponentTemperatureSource: Potential issue with equipment sizing for " + WaterSource( SourceNum ).Name );
+									ShowContinueError( "User-Specified Design Fluid Flow Rate of " + RoundSigDigits( DesVolFlowRateUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Design Fluid Flow Rate of " + RoundSigDigits( tmpVolFlowRate, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -509,7 +508,7 @@ namespace PlantComponentTemperatureSources {
 		} else {
 			if ( IsAutoSize ) {
 				ShowSevereError( "Autosizing of plant component temperature source flow rate requires a loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in PlantComponent:TemperatureSource object=" + trim( WaterSource( SourceNum ).Name ) );
+				ShowContinueError( "Occurs in PlantComponent:TemperatureSource object=" + WaterSource( SourceNum ).Name );
 				ErrorsFound = true;
 			} else {
 				if ( ! WaterSource( SourceNum ).IsThisSized ) {
@@ -559,7 +558,7 @@ namespace PlantComponentTemperatureSources {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "CalcWaterSource" );
+		static std::string const RoutineName( "CalcWaterSource" );
 
 		// DERIVED TYPE DEFINITIONS
 		// na

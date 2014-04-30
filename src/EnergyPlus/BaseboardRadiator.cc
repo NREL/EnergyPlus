@@ -76,7 +76,7 @@ namespace BaseboardRadiator {
 	// Data
 	//MODULE PARAMETER DEFINITIONS
 	Real64 const SimpConvAirFlowSpeed( 0.5 ); // m/s
-	Fstring const cCMO_BBRadiator_Water( "ZoneHVAC:Baseboard:Convective:Water" );
+	std::string const cCMO_BBRadiator_Water( "ZoneHVAC:Baseboard:Convective:Water" );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -95,7 +95,7 @@ namespace BaseboardRadiator {
 
 	void
 	SimBaseboard(
-		Fstring const & EquipName,
+		std::string const & EquipName,
 		int const ActualZoneNum,
 		int const ControlledZoneNum,
 		bool const FirstHVACIteration,
@@ -155,17 +155,17 @@ namespace BaseboardRadiator {
 		if ( CompIndex == 0 ) {
 			BaseboardNum = FindItemInList( EquipName, Baseboard.EquipID(), NumBaseboards );
 			if ( BaseboardNum == 0 ) {
-				ShowFatalError( "SimBaseboard: Unit not found=" + trim( EquipName ) );
+				ShowFatalError( "SimBaseboard: Unit not found=" + EquipName );
 			}
 			CompIndex = BaseboardNum;
 		} else {
 			BaseboardNum = CompIndex;
 			if ( BaseboardNum > NumBaseboards || BaseboardNum < 1 ) {
-				ShowFatalError( "SimBaseboard:  Invalid CompIndex passed=" + trim( TrimSigDigits( BaseboardNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumBaseboards ) ) + ", Entered Unit name=" + trim( EquipName ) );
+				ShowFatalError( "SimBaseboard:  Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Number of Units=" + TrimSigDigits( NumBaseboards ) + ", Entered Unit name=" + EquipName );
 			}
 			if ( CheckEquipName( BaseboardNum ) ) {
 				if ( EquipName != Baseboard( BaseboardNum ).EquipID ) {
-					ShowFatalError( "SimBaseboard: Invalid CompIndex passed=" + trim( TrimSigDigits( BaseboardNum ) ) + ", Unit name=" + trim( EquipName ) + ", stored Unit Name for that index=" + trim( Baseboard( BaseboardNum ).EquipID ) );
+					ShowFatalError( "SimBaseboard: Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Unit name=" + EquipName + ", stored Unit Name for that index=" + Baseboard( BaseboardNum ).EquipID );
 				}
 				CheckEquipName( BaseboardNum ) = false;
 			}
@@ -237,7 +237,6 @@ namespace BaseboardRadiator {
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::VerifyName;
-		using InputProcessor::MakeUPPERCase;
 		using InputProcessor::SameString;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -250,7 +249,7 @@ namespace BaseboardRadiator {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetBaseboardInput: " ); // include trailing blank space
+		static std::string const RoutineName( "GetBaseboardInput: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -289,12 +288,12 @@ namespace BaseboardRadiator {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Baseboard.EquipID(), BaseboardNum, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+				VerifyName( cAlphaArgs( 1 ), Baseboard.EquipID(), BaseboardNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					continue;
 				}
-				VerifyUniqueBaseboardName( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), errFlag, trim( cCurrentModuleObject ) + " Name" );
+				VerifyUniqueBaseboardName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 				if ( errFlag ) {
 					ErrorsFound = true;
 				}
@@ -307,14 +306,14 @@ namespace BaseboardRadiator {
 				} else {
 					Baseboard( BaseboardNum ).SchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 					if ( Baseboard( BaseboardNum ).SchedPtr == 0 ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 2 ) ) + " entered =" + trim( cAlphaArgs( 2 ) ) + " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) + " entered =" + cAlphaArgs( 2 ) + " for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					}
 				}
 				// get inlet node number
-				Baseboard( BaseboardNum ).WaterInletNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+				Baseboard( BaseboardNum ).WaterInletNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 				// get outlet node number
-				Baseboard( BaseboardNum ).WaterOutletNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+				Baseboard( BaseboardNum ).WaterOutletNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 				TestCompSet( cCMO_BBRadiator_Water, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Hot Water Nodes" );
 
@@ -437,7 +436,7 @@ namespace BaseboardRadiator {
 			ZoneEquipmentListChecked = true;
 			for ( Loop = 1; Loop <= NumBaseboards; ++Loop ) {
 				if ( CheckZoneEquipmentList( cCMO_BBRadiator_Water, Baseboard( Loop ).EquipID ) ) continue;
-				ShowSevereError( "InitBaseboard: Unit=[" + trim( cCMO_BBRadiator_Water ) + "," + trim( Baseboard( Loop ).EquipID ) + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
+				ShowSevereError( "InitBaseboard: Unit=[" + cCMO_BBRadiator_Water + ',' + Baseboard( Loop ).EquipID + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
 			}
 		}
 
@@ -592,9 +591,9 @@ namespace BaseboardRadiator {
 							// Report a warning to note difference between the two
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( WaterVolFlowRateMaxDes - WaterVolFlowRateMaxUser ) / WaterVolFlowRateMaxUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeBaseboard: Potential issue with equipment sizing for ZoneHVAC:Baseboard:Convective:Water=\"" + trim( Baseboard( BaseboardNum ).EquipID ) + "\"." );
-									ShowContinueError( "User-Specified Maximum Water Flow Rate of " + trim( RoundSigDigits( WaterVolFlowRateMaxUser, 5 ) ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Maximum Water Flow Rate of " + trim( RoundSigDigits( WaterVolFlowRateMaxDes, 5 ) ) + " [m3/s]" );
+									ShowMessage( "SizeBaseboard: Potential issue with equipment sizing for ZoneHVAC:Baseboard:Convective:Water=\"" + Baseboard( BaseboardNum ).EquipID + "\"." );
+									ShowContinueError( "User-Specified Maximum Water Flow Rate of " + RoundSigDigits( WaterVolFlowRateMaxUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Maximum Water Flow Rate of " + RoundSigDigits( WaterVolFlowRateMaxDes, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -637,7 +636,7 @@ namespace BaseboardRadiator {
 						SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, HWBaseboardUAResidual, UA0, UA1, Par );
 						// if the numerical inversion failed, issue error messages.
 						if ( SolFla == -1 ) {
-							ShowSevereError( "SizeBaseboard: Autosizing of HW baseboard UA failed for " + cCMO_BBRadiator_Water + "=\"" + trim( Baseboard( BaseboardNum ).EquipID ) + "\"" );
+							ShowSevereError( "SizeBaseboard: Autosizing of HW baseboard UA failed for " + cCMO_BBRadiator_Water + "=\"" + Baseboard( BaseboardNum ).EquipID + "\"" );
 							ShowContinueError( "Iteration limit exceeded in calculating coil UA" );
 							if ( UAAutoSize ) {
 								ErrorsFound = true;
@@ -646,7 +645,7 @@ namespace BaseboardRadiator {
 								UA = 0.0;
 							}
 						} else if ( SolFla == -2 ) {
-							ShowSevereError( "SizeBaseboard: Autosizing of HW baseboard UA failed for " + cCMO_BBRadiator_Water + "=\"" + trim( Baseboard( BaseboardNum ).EquipID ) + "\"" );
+							ShowSevereError( "SizeBaseboard: Autosizing of HW baseboard UA failed for " + cCMO_BBRadiator_Water + "=\"" + Baseboard( BaseboardNum ).EquipID + "\"" );
 							ShowContinueError( "Bad starting values for UA" );
 							if ( UAAutoSize ) {
 								ErrorsFound = true;
@@ -670,9 +669,9 @@ namespace BaseboardRadiator {
 							// Report difference between design size and hard-sized values
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( UADes - UAUser ) / UAUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeBaseboard: Potential issue with equipment sizing for ZoneHVAC:Baseboard:Convective:Water=\"" + trim( Baseboard( BaseboardNum ).EquipID ) + "\"." );
-									ShowContinueError( "User-Specified U-Factor Times Area Value of " + trim( RoundSigDigits( UAUser, 2 ) ) + " [W/K]" );
-									ShowContinueError( "differs from Design Size U-Factor Times Area Value of " + trim( RoundSigDigits( UADes, 2 ) ) + " [W/K]" );
+									ShowMessage( "SizeBaseboard: Potential issue with equipment sizing for ZoneHVAC:Baseboard:Convective:Water=\"" + Baseboard( BaseboardNum ).EquipID + "\"." );
+									ShowContinueError( "User-Specified U-Factor Times Area Value of " + RoundSigDigits( UAUser, 2 ) + " [W/K]" );
+									ShowContinueError( "differs from Design Size U-Factor Times Area Value of " + RoundSigDigits( UADes, 2 ) + " [W/K]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -684,7 +683,7 @@ namespace BaseboardRadiator {
 		} else {
 			// if there is no heating Sizing:Plant object and autosizng was requested, issue an error message
 			if ( FlowAutoSize || UAAutoSize ) {
-				ShowSevereError( "SizeBaseboard: " + cCMO_BBRadiator_Water + "=\"" + trim( Baseboard( BaseboardNum ).EquipID ) + "\"" );
+				ShowSevereError( "SizeBaseboard: " + cCMO_BBRadiator_Water + "=\"" + Baseboard( BaseboardNum ).EquipID + "\"" );
 				ShowContinueError( "...Autosizing of hot water baseboard requires a heating loop Sizing:Plant object" );
 				ErrorsFound = true;
 			}
@@ -999,7 +998,7 @@ namespace BaseboardRadiator {
 	void
 	UpdateBaseboardPlantConnection(
 		int const BaseboardTypeNum, // type index
-		Fstring const & BaseboardName, // component name
+		std::string const & BaseboardName, // component name
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int const LoopNum, // Plant loop index for where called from
 		int const LoopSide, // Plant loop side index for where called from
@@ -1058,20 +1057,20 @@ namespace BaseboardRadiator {
 		if ( CompIndex == 0 ) {
 			BaseboardNum = FindItemInList( BaseboardName, Baseboard.EquipID(), NumBaseboards );
 			if ( BaseboardNum == 0 ) {
-				ShowFatalError( "UpdateBaseboardPlantConnection: Invalid Unit Specified " + cCMO_BBRadiator_Water + "=\"" + trim( BaseboardName ) + "\"" );
+				ShowFatalError( "UpdateBaseboardPlantConnection: Invalid Unit Specified " + cCMO_BBRadiator_Water + "=\"" + BaseboardName + "\"" );
 			}
 			CompIndex = BaseboardNum;
 		} else {
 			BaseboardNum = CompIndex;
 			if ( BaseboardNum > NumBaseboards || BaseboardNum < 1 ) {
-				ShowFatalError( "UpdateBaseboardPlantConnection:  Invalid CompIndex passed=" + trim( TrimSigDigits( BaseboardNum ) ) + ", Number of baseboards=" + trim( TrimSigDigits( NumBaseboards ) ) + ", Entered baseboard name=" + trim( BaseboardName ) );
+				ShowFatalError( "UpdateBaseboardPlantConnection:  Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Number of baseboards=" + TrimSigDigits( NumBaseboards ) + ", Entered baseboard name=" + BaseboardName );
 			}
 			if ( KickOffSimulation ) {
 				if ( BaseboardName != Baseboard( BaseboardNum ).EquipID ) {
-					ShowFatalError( "UpdateBaseboardPlantConnection: Invalid CompIndex passed=" + trim( TrimSigDigits( BaseboardNum ) ) + ", baseboard name=" + trim( BaseboardName ) + ", stored baseboard Name for that index=" + trim( Baseboard( BaseboardNum ).EquipID ) );
+					ShowFatalError( "UpdateBaseboardPlantConnection: Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", baseboard name=" + BaseboardName + ", stored baseboard Name for that index=" + Baseboard( BaseboardNum ).EquipID );
 				}
 				if ( BaseboardTypeNum != TypeOf_Baseboard_Conv_Water ) {
-					ShowFatalError( "UpdateBaseboardPlantConnection: Invalid CompIndex passed=" + trim( TrimSigDigits( BaseboardNum ) ) + ", baseboard name=" + trim( BaseboardName ) + ", stored baseboard Name for that index=" + trim( ccSimPlantEquipTypes( BaseboardTypeNum ) ) );
+					ShowFatalError( "UpdateBaseboardPlantConnection: Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", baseboard name=" + BaseboardName + ", stored baseboard Name for that index=" + ccSimPlantEquipTypes( BaseboardTypeNum ) );
 				}
 			}
 		}

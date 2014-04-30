@@ -47,7 +47,6 @@ namespace SolarCollectors {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataSurfaces::Surface;
 	using DataSurfaces::TotSurfaces;
@@ -101,7 +100,7 @@ namespace SolarCollectors {
 	void
 	SimSolarCollector(
 		int const EquipTypeNum,
-		Fstring const & CompName,
+		std::string const & CompName,
 		int & CompIndex,
 		bool const InitLoopEquip,
 		bool const FirstHVACIteration
@@ -143,17 +142,17 @@ namespace SolarCollectors {
 		if ( CompIndex == 0 ) {
 			CollectorNum = FindItemInList( CompName, Collector.Name(), NumOfCollectors );
 			if ( CollectorNum == 0 ) {
-				ShowFatalError( "SimSolarCollector: Specified solar collector not Valid =" + trim( CompName ) );
+				ShowFatalError( "SimSolarCollector: Specified solar collector not Valid =" + CompName );
 			}
 			CompIndex = CollectorNum;
 		} else {
 			CollectorNum = CompIndex;
 			if ( CollectorNum > NumOfCollectors || CollectorNum < 1 ) {
-				ShowFatalError( "SimSolarCollector: Invalid CompIndex passed=" + trim( TrimSigDigits( CollectorNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumOfCollectors ) ) + ", Entered Unit name=" + trim( CompName ) );
+				ShowFatalError( "SimSolarCollector: Invalid CompIndex passed=" + TrimSigDigits( CollectorNum ) + ", Number of Units=" + TrimSigDigits( NumOfCollectors ) + ", Entered Unit name=" + CompName );
 			}
 			if ( CheckEquipName( CollectorNum ) ) {
 				if ( CompName != Collector( CollectorNum ).Name ) {
-					ShowFatalError( "SimSolarCollector: Invalid CompIndex passed=" + trim( TrimSigDigits( CollectorNum ) ) + ", Unit name=" + trim( CompName ) + ", stored Unit Name for that index=" + trim( Collector( CollectorNum ).Name ) );
+					ShowFatalError( "SimSolarCollector: Invalid CompIndex passed=" + TrimSigDigits( CollectorNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + Collector( CollectorNum ).Name );
 
 				}
 				CheckEquipName( CollectorNum ) = false;
@@ -234,8 +233,8 @@ namespace SolarCollectors {
 		int CollectorNum2; // Second solar collector object number for looping
 		int ParametersNum; // Solar collector parameters object number
 		int SurfNum; // Collector surface object number
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in renaming.
-		Fstring CurrentModuleParamObject( MaxNameLength ); // for ease in renaming.
+		std::string CurrentModuleObject; // for ease in renaming.
+		std::string CurrentModuleParamObject; // for ease in renaming.
 
 		int NumFields; // Total number of fields in object
 		int MaxAlphas; // Maximum number of alpha fields in all objects
@@ -255,9 +254,9 @@ namespace SolarCollectors {
 		Real64 Perimeter; // perimeter of the absorber or collector
 
 		FArray1D< Real64 > Numbers; // Numeric data
-		FArray1D_Fstring Alphas( sFstring( MaxNameLength ) ); // Alpha data
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) ); // Numeric field names
+		FArray1D_string Alphas; // Alpha data
+		FArray1D_string cAlphaFields; // Alpha field names
+		FArray1D_string cNumericFields; // Numeric field names
 		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
@@ -267,7 +266,7 @@ namespace SolarCollectors {
 
 		CurrentModuleParamObject = "SolarCollectorPerformance:FlatPlate";
 		NumOfFlatPlateParam = GetNumObjectsFound( CurrentModuleParamObject );
-		GetObjectDefMaxArgs( trim( CurrentModuleParamObject ), NumFields, NumAlphas, NumNumbers );
+		GetObjectDefMaxArgs( CurrentModuleParamObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -279,7 +278,7 @@ namespace SolarCollectors {
 
 		CurrentModuleParamObject = "SolarCollectorPerformance:IntegralCollectorStorage";
 		NumOfICSParam = GetNumObjectsFound( CurrentModuleParamObject );
-		GetObjectDefMaxArgs( trim( CurrentModuleParamObject ), NumFields, NumAlphas, NumNumbers );
+		GetObjectDefMaxArgs( CurrentModuleParamObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -290,13 +289,13 @@ namespace SolarCollectors {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		Alphas.allocate( MaxAlphas );
-		Alphas = " ";
+		Alphas = "";
 		Numbers.allocate( MaxNumbers );
 		Numbers = 0.0;
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = " ";
+		cAlphaFields = "";
 		cNumericFields.allocate( MaxNumbers );
-		cNumericFields = " ";
+		cNumericFields = "";
 		lAlphaBlanks.allocate( MaxAlphas );
 		lAlphaBlanks = true;
 		lNumericBlanks.allocate( MaxNumbers );
@@ -318,7 +317,7 @@ namespace SolarCollectors {
 				// Collector module parameters name
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Parameters.Name(), ParametersNum - 1, IsNotOK, IsBlank, trim( CurrentModuleParamObject ) );
+				VerifyName( cAlphaArgs( 1 ), Parameters.Name(), ParametersNum - 1, IsNotOK, IsBlank, CurrentModuleParamObject );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -328,24 +327,24 @@ namespace SolarCollectors {
 				// NOTE:  This values serves mainly as a reference.  The area of the associated surface object is used in all calculations.
 				Parameters( ParametersNum ).Area = rNumericArgs( 1 );
 
-				{ auto const SELECT_CASE_var( trim( cAlphaArgs( 2 ) ) );
+				{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );
 				if ( SELECT_CASE_var == "WATER" ) {
 					Parameters( ParametersNum ).TestFluid = WATER;
 					//CASE('AIR')
 					//  Parameters(ParametersNum)%TestFluid = AIR
 				} else {
-					ShowSevereError( trim( CurrentModuleParamObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  " + trim( cAlphaArgs( 2 ) ) + " is an unsupported Test Fluid for " + trim( cAlphaFieldNames( 2 ) ) );
+					ShowSevereError( CurrentModuleParamObject + " = " + cAlphaArgs( 1 ) + ":  " + cAlphaArgs( 2 ) + " is an unsupported Test Fluid for " + cAlphaFieldNames( 2 ) );
 					ErrorsFound = true;
 				}}
 
 				if ( rNumericArgs( 2 ) > 0.0 ) {
 					Parameters( ParametersNum ).TestMassFlowRate = rNumericArgs( 2 ) * RhoH2O( InitConvTemp );
 				} else {
-					ShowSevereError( trim( CurrentModuleParamObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  flow rate must be greater than zero for " + trim( cNumericFieldNames( 2 ) ) );
+					ShowSevereError( CurrentModuleParamObject + " = " + cAlphaArgs( 1 ) + ":  flow rate must be greater than zero for " + cNumericFieldNames( 2 ) );
 					ErrorsFound = true;
 				}
 
-				{ auto const SELECT_CASE_var( trim( cAlphaArgs( 3 ) ) );
+				{ auto const SELECT_CASE_var( cAlphaArgs( 3 ) );
 				if ( SELECT_CASE_var == "INLET" ) {
 					Parameters( ParametersNum ).TestType = INLET;
 				} else if ( SELECT_CASE_var == "AVERAGE" ) {
@@ -353,7 +352,7 @@ namespace SolarCollectors {
 				} else if ( SELECT_CASE_var == "OUTLET" ) {
 					Parameters( ParametersNum ).TestType = OUTLET;
 				} else {
-					ShowSevereError( trim( CurrentModuleParamObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  " + trim( cAlphaArgs( 3 ) ) + " is  not supported for " + trim( cAlphaFieldNames( 3 ) ) );
+					ShowSevereError( CurrentModuleParamObject + " = " + cAlphaArgs( 1 ) + ":  " + cAlphaArgs( 3 ) + " is  not supported for " + cAlphaFieldNames( 3 ) );
 					ErrorsFound = true;
 				}}
 
@@ -381,7 +380,7 @@ namespace SolarCollectors {
 				}
 			} // ParametersNum
 
-			if ( ErrorsFound ) ShowFatalError( "Errors in " + trim( CurrentModuleParamObject ) + " input." );
+			if ( ErrorsFound ) ShowFatalError( "Errors in " + CurrentModuleParamObject + " input." );
 		}
 
 		if ( NumOfCollectors > 0 ) {
@@ -398,7 +397,7 @@ namespace SolarCollectors {
 				// Collector name
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Collector.Name(), CollectorNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) );
+				VerifyName( cAlphaArgs( 1 ), Collector.Name(), CollectorNum - 1, IsNotOK, IsBlank, CurrentModuleObject );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -410,7 +409,7 @@ namespace SolarCollectors {
 				ParametersNum = FindItemInList( cAlphaArgs( 2 ), Parameters.Name(), NumOfParameters );
 
 				if ( ParametersNum == 0 ) {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ": " + trim( CurrentModuleParamObject ) + " object called " + trim( cAlphaArgs( 2 ) ) + " not found." );
+					ShowSevereError( CurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": " + CurrentModuleParamObject + " object called " + cAlphaArgs( 2 ) + " not found." );
 					ErrorsFound = true;
 				} else {
 					Collector( CollectorNum ).Parameters = ParametersNum;
@@ -420,28 +419,28 @@ namespace SolarCollectors {
 				SurfNum = FindItemInList( cAlphaArgs( 3 ), Surface.Name(), TotSurfaces );
 
 				if ( SurfNum == 0 ) {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Surface " + trim( cAlphaArgs( 3 ) ) + " not found." );
+					ShowSevereError( CurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Surface " + cAlphaArgs( 3 ) + " not found." );
 					ErrorsFound = true;
 					continue; // avoid hard crash
 				} else {
 
 					if ( ! Surface( SurfNum ).ExtSolar ) {
-						ShowWarningError( trim( CurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Surface " + trim( cAlphaArgs( 3 ) ) + " is not exposed to exterior radiation." );
+						ShowWarningError( CurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Surface " + cAlphaArgs( 3 ) + " is not exposed to exterior radiation." );
 					}
 
 					// check surface orientation, warn if upside down
 					if ( ( Surface( SurfNum ).Tilt < -95.0 ) || ( Surface( SurfNum ).Tilt > 95.0 ) ) {
-						ShowWarningError( "Suspected input problem with " + trim( cAlphaFieldNames( 3 ) ) + " = " + trim( cAlphaArgs( 3 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+						ShowWarningError( "Suspected input problem with " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 						ShowContinueError( "Surface used for solar collector faces down" );
-						ShowContinueError( "Surface tilt angle (degrees from ground outward normal) = " + trim( RoundSigDigits( Surface( SurfNum ).Tilt, 2 ) ) );
+						ShowContinueError( "Surface tilt angle (degrees from ground outward normal) = " + RoundSigDigits( Surface( SurfNum ).Tilt, 2 ) );
 					}
 
 					// Check to make sure other solar collectors are not using the same surface
 					// NOTE:  Must search over all solar collector types
 					for ( CollectorNum2 = 1; CollectorNum2 <= NumFlatPlateUnits; ++CollectorNum2 ) {
 						if ( Collector( CollectorNum2 ).Surface == SurfNum ) {
-							ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Surface " + trim( cAlphaArgs( 3 ) ) + " is referenced by more than one " + trim( CurrentModuleObject ) );
+							ShowSevereError( CurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Surface " + cAlphaArgs( 3 ) + " is referenced by more than one " + CurrentModuleObject );
 							ErrorsFound = true;
 							break;
 						}
@@ -453,12 +452,12 @@ namespace SolarCollectors {
 				// Give warning if surface area and gross area do not match within tolerance
 				if ( SurfNum > 0 && ParametersNum > 0 && Parameters( ParametersNum ).Area > 0.0 && std::abs( Parameters( ParametersNum ).Area - Surface( SurfNum ).Area ) / Surface( SurfNum ).Area > 0.01 ) {
 
-					ShowWarningError( trim( CurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Gross Area of solar collector parameters and surface object differ by more than 1%." );
+					ShowWarningError( CurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Gross Area of solar collector parameters and surface object differ by more than 1%." );
 					ShowContinueError( "Area of surface object will be used in all calculations." );
 				}
 
-				Collector( CollectorNum ).InletNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( CurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-				Collector( CollectorNum ).OutletNode = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( CurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+				Collector( CollectorNum ).InletNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+				Collector( CollectorNum ).OutletNode = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 				if ( NumNumbers > 0 ) {
 					Collector( CollectorNum ).VolFlowRateMax = rNumericArgs( 1 ); // Max volumetric flow rate used for plant sizing calculation
@@ -480,7 +479,7 @@ namespace SolarCollectors {
 
 				SetupOutputVariable( "Solar Collector Heat Transfer Energy [J]", Collector( CollectorNum ).Energy, "System", "Sum", Collector( FlatPlateUnitsNum ).Name, _, "SolarWater", "HeatProduced", _, "Plant" );
 
-				TestCompSet( trim( CurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 4 ), cAlphaArgs( 5 ), "Water Nodes" );
+				TestCompSet( CurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 4 ), cAlphaArgs( 5 ), "Water Nodes" );
 
 			} // FlatPlateUnitsNum
 
@@ -496,7 +495,7 @@ namespace SolarCollectors {
 				// Collector module parameters name
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Parameters.Name(), ParametersNum - 1, IsNotOK, IsBlank, trim( CurrentModuleParamObject ) );
+				VerifyName( cAlphaArgs( 1 ), Parameters.Name(), ParametersNum - 1, IsNotOK, IsBlank, CurrentModuleParamObject );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -507,21 +506,21 @@ namespace SolarCollectors {
 				if ( SameString( cAlphaArgs( 2 ), "RectangularTank" ) ) {
 					Parameters( ParametersNum ).ICSType_Num = ICSRectangularTank;
 				} else {
-					ShowSevereError( trim( cAlphaFieldNames( 2 ) ) + " not found=" + trim( cAlphaArgs( 2 ) ) + " in " + trim( CurrentModuleParamObject ) + " =" + trim( Parameters( ParametersNum ).Name ) );
+					ShowSevereError( cAlphaFieldNames( 2 ) + " not found=" + cAlphaArgs( 2 ) + " in " + CurrentModuleParamObject + " =" + Parameters( ParametersNum ).Name );
 					ErrorsFound = true;
 				}
 				// NOTE:  This collector gross area is used in all the calculations.
 				Parameters( ParametersNum ).Area = rNumericArgs( 1 );
 				if ( rNumericArgs( 1 ) <= 0.0 ) {
-					ShowSevereError( trim( CurrentModuleParamObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
-					ShowContinueError( "Illegal " + trim( cNumericFieldNames( 1 ) ) + " = " + trim( RoundSigDigits( rNumericArgs( 1 ), 2 ) ) );
+					ShowSevereError( CurrentModuleParamObject + " = " + cAlphaArgs( 1 ) );
+					ShowContinueError( "Illegal " + cNumericFieldNames( 1 ) + " = " + RoundSigDigits( rNumericArgs( 1 ), 2 ) );
 					ShowContinueError( " Collector gross area must be always gretaer than zero." );
 					ErrorsFound = true;
 				}
 				Parameters( ParametersNum ).Volume = rNumericArgs( 2 );
 				if ( rNumericArgs( 2 ) <= 0.0 ) {
-					ShowSevereError( trim( CurrentModuleParamObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
-					ShowContinueError( "Illegal " + trim( cNumericFieldNames( 2 ) ) + " = " + trim( RoundSigDigits( rNumericArgs( 2 ), 2 ) ) );
+					ShowSevereError( CurrentModuleParamObject + " = " + cAlphaArgs( 1 ) );
+					ShowContinueError( "Illegal " + cNumericFieldNames( 2 ) + " = " + RoundSigDigits( rNumericArgs( 2 ), 2 ) );
 					ShowContinueError( " Collector water volume must be always gretaer than zero." );
 					ErrorsFound = true;
 				}
@@ -548,7 +547,7 @@ namespace SolarCollectors {
 						Parameters( ParametersNum ).ExtCoefTimesThickness( 2 ) = rNumericArgs( 14 );
 						Parameters( ParametersNum ).EmissOfCover( 2 ) = rNumericArgs( 15 );
 					} else {
-						ShowSevereError( trim( CurrentModuleParamObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( CurrentModuleParamObject + " = " + cAlphaArgs( 1 ) );
 						ShowContinueError( "Illegal input for one of the three inputs of the inner cover optical properties" );
 						ErrorsFound = true;
 					}
@@ -560,8 +559,8 @@ namespace SolarCollectors {
 					// Outer cover emissivity
 					Parameters( ParametersNum ).EmissOfCover( 1 ) = rNumericArgs( 12 );
 				} else {
-					ShowSevereError( trim( CurrentModuleParamObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
-					ShowContinueError( "Illegal " + trim( cNumericFieldNames( 8 ) ) + " = " + trim( RoundSigDigits( rNumericArgs( 8 ), 2 ) ) );
+					ShowSevereError( CurrentModuleParamObject + " = " + cAlphaArgs( 1 ) );
+					ShowContinueError( "Illegal " + cNumericFieldNames( 8 ) + " = " + RoundSigDigits( rNumericArgs( 8 ), 2 ) );
 					ErrorsFound = true;
 				}
 				// Solar absorptance of the absorber plate
@@ -571,7 +570,7 @@ namespace SolarCollectors {
 
 			} // end of ParametersNum
 
-			if ( ErrorsFound ) ShowFatalError( "Errors in " + trim( CurrentModuleParamObject ) + " input." );
+			if ( ErrorsFound ) ShowFatalError( "Errors in " + CurrentModuleParamObject + " input." );
 
 			CurrentModuleObject = "SolarCollector:IntegralCollectorStorage";
 
@@ -584,7 +583,7 @@ namespace SolarCollectors {
 				// Collector name
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Collector.Name(), CollectorNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) );
+				VerifyName( cAlphaArgs( 1 ), Collector.Name(), CollectorNum - 1, IsNotOK, IsBlank, CurrentModuleObject );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -598,7 +597,7 @@ namespace SolarCollectors {
 				ParametersNum = FindItemInList( cAlphaArgs( 2 ), Parameters.Name(), NumOfParameters );
 
 				if ( ParametersNum == 0 ) {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ": " + trim( CurrentModuleParamObject ) + " object called " + trim( cAlphaArgs( 2 ) ) + " not found." );
+					ShowSevereError( CurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": " + CurrentModuleParamObject + " object called " + cAlphaArgs( 2 ) + " not found." );
 					ErrorsFound = true;
 				} else {
 					Collector( CollectorNum ).Parameters = ParametersNum;
@@ -620,28 +619,28 @@ namespace SolarCollectors {
 				SurfNum = FindItemInList( cAlphaArgs( 3 ), Surface.Name(), TotSurfaces );
 
 				if ( SurfNum == 0 ) {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Surface " + trim( cAlphaArgs( 3 ) ) + " not found." );
+					ShowSevereError( CurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Surface " + cAlphaArgs( 3 ) + " not found." );
 					ErrorsFound = true;
 					continue; // avoid hard crash
 				} else {
 
 					if ( ! Surface( SurfNum ).ExtSolar ) {
-						ShowWarningError( trim( CurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Surface " + trim( cAlphaArgs( 3 ) ) + " is not exposed to exterior radiation." );
+						ShowWarningError( CurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Surface " + cAlphaArgs( 3 ) + " is not exposed to exterior radiation." );
 					}
 
 					// check surface orientation, warn if upside down
 					if ( ( Surface( SurfNum ).Tilt < -95.0 ) || ( Surface( SurfNum ).Tilt > 95.0 ) ) {
-						ShowWarningError( "Suspected input problem with " + trim( cAlphaFieldNames( 3 ) ) + " = " + trim( cAlphaArgs( 3 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+						ShowWarningError( "Suspected input problem with " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 						ShowContinueError( "Surface used for solar collector faces down" );
-						ShowContinueError( "Surface tilt angle (degrees from ground outward normal) = " + trim( RoundSigDigits( Surface( SurfNum ).Tilt, 2 ) ) );
+						ShowContinueError( "Surface tilt angle (degrees from ground outward normal) = " + RoundSigDigits( Surface( SurfNum ).Tilt, 2 ) );
 					}
 
 					// Check to make sure other solar collectors are not using the same surface
 					// NOTE:  Must search over all solar collector types
 					for ( CollectorNum2 = 1; CollectorNum2 <= NumOfCollectors; ++CollectorNum2 ) {
 						if ( Collector( CollectorNum2 ).Surface == SurfNum ) {
-							ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ":  Surface " + trim( cAlphaArgs( 3 ) ) + " is referenced by more than one " + trim( CurrentModuleObject ) );
+							ShowSevereError( CurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Surface " + cAlphaArgs( 3 ) + " is referenced by more than one " + CurrentModuleObject );
 							ErrorsFound = true;
 							break;
 						}
@@ -653,7 +652,7 @@ namespace SolarCollectors {
 				// Give warning if surface area and gross area do not match within tolerance
 				if ( SurfNum > 0 && ParametersNum > 0 && Parameters( ParametersNum ).Area > 0.0 && std::abs( Parameters( ParametersNum ).Area - Surface( SurfNum ).Area ) / Surface( SurfNum ).Area > 0.01 ) {
 
-					ShowWarningError( trim( CurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) + ": " );
+					ShowWarningError( CurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": " );
 					ShowContinueError( "Gross area of solar collector parameters and surface object differ by more than 1%." );
 					ShowContinueError( "Gross collector area is always used in the calculation.  Modify the surface " );
 					ShowContinueError( "coordinates to match its area with collector gross area. Otherwise, the underlying " );
@@ -662,19 +661,19 @@ namespace SolarCollectors {
 
 				Collector( CollectorNum ).BCType = cAlphaArgs( 4 );
 				if ( SameString( cAlphaArgs( 4 ), "AmbientAir" ) ) {
-					Collector( CollectorNum ).OSCMName = " ";
+					Collector( CollectorNum ).OSCMName = "";
 				} else if ( SameString( cAlphaArgs( 4 ), "OtherSideConditionsModel" ) ) {
 					Collector( CollectorNum ).OSCMName = cAlphaArgs( 5 );
 					Collector( CollectorNum ).OSCM_ON = true;
 					Found = FindItemInList( Collector( CollectorNum ).OSCMName, OSCM.Name(), TotOSCM );
 					if ( Found == 0 ) {
-						ShowSevereError( trim( cAlphaFieldNames( 5 ) ) + " not found=" + trim( Collector( CollectorNum ).OSCMName ) + " in " + trim( CurrentModuleObject ) + " =" + trim( Collector( CollectorNum ).Name ) );
+						ShowSevereError( cAlphaFieldNames( 5 ) + " not found=" + Collector( CollectorNum ).OSCMName + " in " + CurrentModuleObject + " =" + Collector( CollectorNum ).Name );
 						ErrorsFound = true;
 					}
 					//Collector(CollectorNum)%OSCMPtr = Found
 					//Surface(SurfNum)%IsICS = .TRUE.
 				} else {
-					ShowSevereError( trim( cAlphaFieldNames( 5 ) ) + " not found=" + trim( Collector( CollectorNum ).BCType ) + " in " + trim( CurrentModuleObject ) + " =" + trim( Collector( CollectorNum ).Name ) );
+					ShowSevereError( cAlphaFieldNames( 5 ) + " not found=" + Collector( CollectorNum ).BCType + " in " + CurrentModuleObject + " =" + Collector( CollectorNum ).Name );
 					ErrorsFound = true;
 				}
 
@@ -684,8 +683,8 @@ namespace SolarCollectors {
 					Collector( CollectorNum ).VentCavIndex = VentCavIndex;
 				}
 
-				Collector( CollectorNum ).InletNode = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, trim( CurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-				Collector( CollectorNum ).OutletNode = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, trim( CurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+				Collector( CollectorNum ).InletNode = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+				Collector( CollectorNum ).OutletNode = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 				if ( NumNumbers > 0 ) {
 					Collector( CollectorNum ).VolFlowRateMax = rNumericArgs( 1 ); // Max volumetric flow rate used for plant sizing calculation
@@ -707,11 +706,11 @@ namespace SolarCollectors {
 				SetupOutputVariable( "Solar Collector Heat Transfer Rate [W]", Collector( CollectorNum ).HeatRate, "System", "Average", Collector( CollectorNum ).Name );
 				SetupOutputVariable( "Solar Collector Heat Transfer Energy [J]", Collector( CollectorNum ).HeatEnergy, "System", "Sum", Collector( CollectorNum ).Name, _, "SolarWater", "HeatProduced", _, "Plant" );
 
-				TestCompSet( trim( CurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 6 ), cAlphaArgs( 7 ), "Water Nodes" );
+				TestCompSet( CurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 6 ), cAlphaArgs( 7 ), "Water Nodes" );
 
 			} // ICSNum
 
-			if ( ErrorsFound ) ShowFatalError( "Errors in " + trim( CurrentModuleObject ) + " input." );
+			if ( ErrorsFound ) ShowFatalError( "Errors in " + CurrentModuleObject + " input." );
 
 			if ( NumOfCollectors > 0 ) {
 				CheckEquipName.allocate( NumOfCollectors );
@@ -1112,11 +1111,11 @@ namespace SolarCollectors {
 				qEquation = ( std::pow( B, 2 ) - 4.0 * A * C );
 				if ( qEquation < 0.0 ) {
 					if ( Collector( CollectorNum ).ErrIndex == 0 ) {
-						ShowSevereMessage( "CalcSolarCollector: " + trim( ccSimPlantEquipTypes( Collector( CollectorNum ).TypeNum ) ) + "=\"" + trim( Collector( CollectorNum ).Name ) + "\", possible bad input coefficients." );
+						ShowSevereMessage( "CalcSolarCollector: " + ccSimPlantEquipTypes( Collector( CollectorNum ).TypeNum ) + "=\"" + Collector( CollectorNum ).Name + "\", possible bad input coefficients." );
 						ShowContinueError( "...coefficients cause negative quadratic equation part in " "calculating temperature of stagnant fluid." );
 						ShowContinueError( "...examine input coefficients for accuracy. Calculation will be treated as linear." );
 					}
-					ShowRecurringSevereErrorAtEnd( "CalcSolarCollector: " + trim( ccSimPlantEquipTypes( Collector( CollectorNum ).TypeNum ) ) + "=\"" + trim( Collector( CollectorNum ).Name ) + "\", coefficient error continues.", Collector( CollectorNum ).ErrIndex, qEquation, qEquation );
+					ShowRecurringSevereErrorAtEnd( "CalcSolarCollector: " + ccSimPlantEquipTypes( Collector( CollectorNum ).TypeNum ) + "=\"" + Collector( CollectorNum ).Name + "\", coefficient error continues.", Collector( CollectorNum ).ErrIndex, qEquation, qEquation );
 				}
 				if ( FRULT == 0.0 || qEquation < 0.0 ) { // Linear, 1st order solution
 					OutletTemp = Surface( SurfNum ).OutDryBulbTemp - FRTAN * IncidentAngleModifier * QRadSWOutIncident( SurfNum ) / FRUL;
@@ -1129,9 +1128,9 @@ namespace SolarCollectors {
 
 			if ( Iteration > 100 ) {
 				if ( Collector( CollectorNum ).IterErrIndex == 0 ) {
-					ShowWarningMessage( "CalcSolarCollector: " + trim( ccSimPlantEquipTypes( Collector( CollectorNum ).TypeNum ) ) + "=\"" + trim( Collector( CollectorNum ).Name ) + "\":  Solution did not converge." );
+					ShowWarningMessage( "CalcSolarCollector: " + ccSimPlantEquipTypes( Collector( CollectorNum ).TypeNum ) + "=\"" + Collector( CollectorNum ).Name + "\":  Solution did not converge." );
 				}
-				ShowRecurringWarningErrorAtEnd( "CalcSolarCollector: " + trim( ccSimPlantEquipTypes( Collector( CollectorNum ).TypeNum ) ) + "=\"" + trim( Collector( CollectorNum ).Name ) + "\", solution not converge error continues.", Collector( CollectorNum ).IterErrIndex );
+				ShowRecurringWarningErrorAtEnd( "CalcSolarCollector: " + ccSimPlantEquipTypes( Collector( CollectorNum ).TypeNum ) + "=\"" + Collector( CollectorNum ).Name + "\", solution not converge error continues.", Collector( CollectorNum ).IterErrIndex );
 				break;
 			} else {
 				++Iteration;
@@ -1185,7 +1184,7 @@ namespace SolarCollectors {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 s; // Intermediate variable
-		Fstring String( MaxNameLength ); // Dummy string for converting numbers to strings
+		std::string String; // Dummy string for converting numbers to strings
 		Real64 CutoffAngle;
 		// FLOW:
 
@@ -1202,13 +1201,13 @@ namespace SolarCollectors {
 			IAM = max( IAM, 0.0 ); // Never allow to be less than zero, but greater than one is a possibility
 
 			if ( IAM > 10.0 ) { // Greater than 10 is probably not a possibility
-				ShowSevereError( "IAM Function: SolarCollectorPerformance:FlatPlate = " + trim( Parameters( ParamNum ).Name ) + ":  Incident Angle Modifier is out of bounds due to bad coefficients." );
+				ShowSevereError( "IAM Function: SolarCollectorPerformance:FlatPlate = " + Parameters( ParamNum ).Name + ":  Incident Angle Modifier is out of bounds due to bad coefficients." );
 				gio::write( String, "*" ) << Parameters( ParamNum ).iam1;
-				ShowContinueError( "Coefficient 2 of Incident Angle Modifier =" + trim( String ) );
+				ShowContinueError( "Coefficient 2 of Incident Angle Modifier =" + String );
 				gio::write( String, "*" ) << Parameters( ParamNum ).iam2;
-				ShowContinueError( "Coefficient 3 of Incident Angle Modifier =" + trim( String ) );
+				ShowContinueError( "Coefficient 3 of Incident Angle Modifier =" + String );
 				gio::write( String, "*" ) << IAM;
-				ShowContinueError( "Calculated Incident Angle Modifier =" + trim( String ) );
+				ShowContinueError( "Calculated Incident Angle Modifier =" + String );
 				ShowContinueError( "Expected Incident Angle Modifier should be approximately 1.5 or less." );
 				ShowFatalError( "Errors in SolarCollectorPerformance:FlatPlate input." );
 			}
@@ -2048,7 +2047,7 @@ namespace SolarCollectors {
 
 		// FUNCTION PARAMETER DEFINITIONS:
 		Real64 const gravity( 9.806 ); // gravitational constant [m/s^2]
-		static Fstring const CalledFrom( "SolarCollectors:CalcConvCoeffAbsPlateAndWater" );
+		static std::string const CalledFrom( "SolarCollectors:CalcConvCoeffAbsPlateAndWater" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2266,7 +2265,7 @@ namespace SolarCollectors {
 		}
 
 		if ( ! Found ) {
-			ShowFatalError( "Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, " "Surface name = " + trim( Surface( SurfacePtr ).Name ) );
+			ShowFatalError( "Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, " "Surface name = " + Surface( SurfacePtr ).Name );
 		} else {
 
 			VentCavIndex = CavNum;

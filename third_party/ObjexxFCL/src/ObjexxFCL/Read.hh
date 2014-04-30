@@ -159,7 +159,7 @@ public: // Operators
 			bool const ld( format()->is_list_directed() );
 			bool bad( false );
 			if ( ld ) {
-				while ( stream() && ( stream().peek() == SPC ) ) stream().ignore();
+				while ( stream() && ( stream().peek() == ' ' ) ) stream().ignore();
 				if ( stream() && stream().peek() == '(' ) {
 					stream().ignore();
 				} else {
@@ -173,7 +173,7 @@ public: // Operators
 			} else {
 				*this >> imag; // Fortran uses separate format descriptors for real and imag
 				if ( ld && stream() ) {
-					while ( stream() && ( stream().peek() == SPC ) ) stream().ignore();
+					while ( stream() && ( stream().peek() == ' ' ) ) stream().ignore();
 					if ( stream() && stream().peek() == ')' ) {
 						stream().ignore();
 					} else {
@@ -215,7 +215,7 @@ public: // Operators
 	operator >>( FArray1S< T > & t )
 	{
 		if ( stream() && format() ) {
-			for ( int i = 1, e = t.u(); i < e; ++i ) {
+			for ( int i = 1, e = t.u(); i <= e; ++i ) {
 				*this >> t( i );
 				if ( ! stream() ) break;
 			}
@@ -341,7 +341,7 @@ public: // Operators
 	operator >>( FArray1S< T > && t )
 	{
 		if ( stream() && format() ) {
-			for ( int i = 1, e = t.u(); i < e; ++i ) {
+			for ( int i = 1, e = t.u(); i <= e; ++i ) {
 				*this >> t( i );
 				if ( ! stream() ) break;
 			}
@@ -467,7 +467,7 @@ public: // Operators
 	operator >>( MArray1< A, T > & t )
 	{
 		if ( stream() && format() ) {
-			for ( int i = 1, e = t.u(); i < e; ++i ) {
+			for ( int i = 1, e = t.u(); i <= e; ++i ) {
 				*this >> t( i );
 				if ( ! stream() ) break;
 			}
@@ -593,7 +593,7 @@ public: // Operators
 	operator >>( MArray1< A, T > && t )
 	{
 		if ( stream() && format() ) {
-			for ( int i = 1, e = t.u(); i < e; ++i ) {
+			for ( int i = 1, e = t.u(); i <= e; ++i ) {
 				*this >> t( i );
 				if ( ! stream() ) break;
 			}

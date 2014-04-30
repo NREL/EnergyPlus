@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -17,7 +16,6 @@ namespace EnergyPlus {
 namespace DXCoils {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 	using DataHVACGlobals::AirCooled;
 	using DataHVACGlobals::DryBulbIndicator;
 
@@ -63,7 +61,7 @@ namespace DXCoils {
 	extern int const WaterSupplyFromTank;
 
 	extern int const NumValidOutputFuelTypes;
-	extern FArray1D_Fstring const cValidOutputFuelTypes;
+	extern FArray1D_string const cValidOutputFuelTypes;
 
 	// Fuel Types
 	extern int const FuelTypeElectricity; // Fuel type for electricity
@@ -129,10 +127,10 @@ namespace DXCoils {
 		// Members
 		//          Some variables in this type are arrays (dimension=MaxModes) to support coil type
 		//          COIL:DX:MultiMode:CoolingEmpirical.  Other coil types only use the first element.
-		Fstring Name; // Name of the DX Coil
-		Fstring DXCoilType; // type of coil
+		std::string Name; // Name of the DX Coil
+		std::string DXCoilType; // type of coil
 		int DXCoilType_Num; // Integer equivalent to DXCoilType
-		Fstring Schedule; // WaterCoil Operation Schedule
+		std::string Schedule; // WaterCoil Operation Schedule
 		int SchedPtr; // Pointer to the correct schedule
 		//          RatedCoolCap, RatedSHR and RatedCOP do not include the thermal or electrical
 		//          effects due to the supply air fan
@@ -187,8 +185,8 @@ namespace DXCoils {
 		Real64 FullLoadOutAirTempLast; // used for low outlet temperature warnings
 		Real64 FullLoadInletAirTempLast; // used for low outlet temperature warnings
 		bool PrintLowOutTempMessage; // used to print warning message for low outlet air dry-bulb conditions
-		Fstring LowOutTempBuffer1; // holds warning message until next iteration (only prints 1 message/iteration)
-		Fstring LowOutTempBuffer2; // holds warning message until next iteration (only prints 1 message/iteration)
+		std::string LowOutTempBuffer1; // holds warning message until next iteration (only prints 1 message/iteration)
+		std::string LowOutTempBuffer2; // holds warning message until next iteration (only prints 1 message/iteration)
 		int HeatingCoilPLFCurvePTR; // PLF curve index to gas or electric heating coil (used in latent degradation model)
 		int BasinHeaterSchedulePtr; // Pointer to basin heater schedule
 		// start of multi-speed compressor variables
@@ -207,8 +205,8 @@ namespace DXCoils {
 		Real64 InternalStaticPressureDrop; // for rating VAV system
 		bool RateWithInternalStaticAndFanObject;
 		int SupplyFanIndex;
-		Fstring SupplyFanName;
-		Fstring CoilSystemName;
+		std::string SupplyFanName;
+		std::string CoilSystemName;
 		// end of multi-speed compressor variables
 		FArray1D< Real64 > RatedEIR; // rated energy input ratio (inverse of COP)
 		Real64 InletAirMassFlowRate;
@@ -294,9 +292,9 @@ namespace DXCoils {
 		// always 1 for other coils
 		int NumDehumidModes; // number of enhanced dehumidification modes, up to MaxDehumidModes for Multimode DX coil,
 		// always 0 for other coils)
-		FArray1D_Fstring CoilPerformanceType; // Coil Performance object type
+		FArray1D_string CoilPerformanceType; // Coil Performance object type
 		FArray1D_int CoilPerformanceType_Num; // Coil Performance object type number
-		FArray1D_Fstring CoilPerformanceName; // Coil Performance object names
+		FArray1D_string CoilPerformanceName; // Coil Performance object names
 		Real64 CoolingCoilStg2RuntimeFrac; // Run time fraction of stage 2
 		int DehumidificationMode; // Dehumidification mode for multimode coil,
 		// 0=normal, 1+=enhanced dehumidification mode
@@ -347,18 +345,18 @@ namespace DXCoils {
 		int PLFErrIndex; // index/pointer to recurring error structure for PLF <> 1 at speed 1 for a multiple speed coil
 		int PLRErrIndex; // index/pointer to recurring error structure for PLR < .7
 		bool PrintLowAmbMessage; // used to print warning message for low ambient conditions
-		Fstring LowAmbBuffer1; // holds warning message until next iteration (only prints 1 message/iteration)
-		Fstring LowAmbBuffer2; // holds warning message until next iteration (only prints 1 message/iteration)
+		std::string LowAmbBuffer1; // holds warning message until next iteration (only prints 1 message/iteration)
+		std::string LowAmbBuffer2; // holds warning message until next iteration (only prints 1 message/iteration)
 		bool PrintHighAmbMessage; // used to print warning message for high ambient conditions
-		Fstring HighAmbBuffer1; // holds warning message until next iteration (only prints 1 message/iteration)
-		Fstring HighAmbBuffer2; // holds warning message until next iteration (only prints 1 message/iteration)
+		std::string HighAmbBuffer1; // holds warning message until next iteration (only prints 1 message/iteration)
+		std::string HighAmbBuffer2; // holds warning message until next iteration (only prints 1 message/iteration)
 		//begin variables for Water System interactions
 		int EvapWaterSupplyMode; // where does water come from
-		Fstring EvapWaterSupplyName; // name of water source e.g. water storage tank
+		std::string EvapWaterSupplyName; // name of water source e.g. water storage tank
 		int EvapWaterSupTankID;
 		int EvapWaterTankDemandARRID;
 		int CondensateCollectMode; // where does water come from
-		Fstring CondensateCollectName; // name of water source e.g. water storage tank
+		std::string CondensateCollectName; // name of water source e.g. water storage tank
 		int CondensateTankID;
 		int CondensateTankSupplyARRID;
 		Real64 CondensateVdot; // rate of water condensation from air stream [m3/s]
@@ -422,10 +420,7 @@ namespace DXCoils {
 
 		// Default Constructor
 		DXCoilData() :
-			Name( MaxNameLength ),
-			DXCoilType( MaxNameLength ),
 			DXCoilType_Num( 0 ),
-			Schedule( MaxNameLength ),
 			SchedPtr( 0 ),
 			RatedTotCap( MaxModes, 0.0 ),
 			HeatSizeRatio( 1.0 ),
@@ -469,8 +464,6 @@ namespace DXCoils {
 			FullLoadOutAirTempLast( 0.0 ),
 			FullLoadInletAirTempLast( 0.0 ),
 			PrintLowOutTempMessage( false ),
-			LowOutTempBuffer1( 300 ),
-			LowOutTempBuffer2( 300 ),
 			HeatingCoilPLFCurvePTR( 0 ),
 			BasinHeaterSchedulePtr( 0 ),
 			RatedTotCap2( 0.0 ),
@@ -485,8 +478,6 @@ namespace DXCoils {
 			InternalStaticPressureDrop( 0.0 ),
 			RateWithInternalStaticAndFanObject( false ),
 			SupplyFanIndex( 0 ),
-			SupplyFanName( MaxNameLength ),
-			CoilSystemName( MaxNameLength ),
 			RatedEIR( MaxModes, 0.0 ),
 			InletAirMassFlowRate( 0.0 ),
 			InletAirMassFlowRateMax( 0.0 ),
@@ -551,9 +542,9 @@ namespace DXCoils {
 			BasinHeaterConsumption( 0.0 ),
 			NumCapacityStages( 1 ),
 			NumDehumidModes( 0 ),
-			CoilPerformanceType( MaxModes, sFstring( MaxNameLength ) ),
+			CoilPerformanceType( MaxModes ),
 			CoilPerformanceType_Num( MaxModes, 0 ),
-			CoilPerformanceName( MaxModes, sFstring( MaxNameLength ) ),
+			CoilPerformanceName( MaxModes ),
 			CoolingCoilStg2RuntimeFrac( 0.0 ),
 			DehumidificationMode( 0 ),
 			WaterInNode( 0 ),
@@ -597,17 +588,11 @@ namespace DXCoils {
 			PLFErrIndex( 0 ),
 			PLRErrIndex( 0 ),
 			PrintLowAmbMessage( false ),
-			LowAmbBuffer1( 300 ),
-			LowAmbBuffer2( 300 ),
 			PrintHighAmbMessage( false ),
-			HighAmbBuffer1( 300 ),
-			HighAmbBuffer2( 300 ),
 			EvapWaterSupplyMode( WaterSupplyFromMains ),
-			EvapWaterSupplyName( MaxNameLength ),
 			EvapWaterSupTankID( 0 ),
 			EvapWaterTankDemandARRID( 0 ),
 			CondensateCollectMode( CondensateDiscarded ),
-			CondensateCollectName( MaxNameLength ),
 			CondensateTankID( 0 ),
 			CondensateTankSupplyARRID( 0 ),
 			CondensateVdot( 0.0 ),
@@ -634,10 +619,10 @@ namespace DXCoils {
 
 		// Member Constructor
 		DXCoilData(
-			Fstring const & Name, // Name of the DX Coil
-			Fstring const & DXCoilType, // type of coil
+			std::string const & Name, // Name of the DX Coil
+			std::string const & DXCoilType, // type of coil
 			int const DXCoilType_Num, // Integer equivalent to DXCoilType
-			Fstring const & Schedule, // WaterCoil Operation Schedule
+			std::string const & Schedule, // WaterCoil Operation Schedule
 			int const SchedPtr, // Pointer to the correct schedule
 			FArray1< Real64 > const & RatedTotCap, // Gross total cooling capacity at rated conditions [watts]
 			Real64 const HeatSizeRatio, // heat pump heating to cooling sizing ratio when autosized
@@ -681,8 +666,8 @@ namespace DXCoils {
 			Real64 const FullLoadOutAirTempLast, // used for low outlet temperature warnings
 			Real64 const FullLoadInletAirTempLast, // used for low outlet temperature warnings
 			bool const PrintLowOutTempMessage, // used to print warning message for low outlet air dry-bulb conditions
-			Fstring const & LowOutTempBuffer1, // holds warning message until next iteration (only prints 1 message/iteration)
-			Fstring const & LowOutTempBuffer2, // holds warning message until next iteration (only prints 1 message/iteration)
+			std::string const & LowOutTempBuffer1, // holds warning message until next iteration (only prints 1 message/iteration)
+			std::string const & LowOutTempBuffer2, // holds warning message until next iteration (only prints 1 message/iteration)
 			int const HeatingCoilPLFCurvePTR, // PLF curve index to gas or electric heating coil (used in latent degradation model)
 			int const BasinHeaterSchedulePtr, // Pointer to basin heater schedule
 			Real64 const RatedTotCap2, // Gross total cooling capacity at rated conditions, low speed [watts]
@@ -697,8 +682,8 @@ namespace DXCoils {
 			Real64 const InternalStaticPressureDrop, // for rating VAV system
 			bool const RateWithInternalStaticAndFanObject,
 			int const SupplyFanIndex,
-			Fstring const & SupplyFanName,
-			Fstring const & CoilSystemName,
+			std::string const & SupplyFanName,
+			std::string const & CoilSystemName,
 			FArray1< Real64 > const & RatedEIR, // rated energy input ratio (inverse of COP)
 			Real64 const InletAirMassFlowRate,
 			Real64 const InletAirMassFlowRateMax,
@@ -763,9 +748,9 @@ namespace DXCoils {
 			Real64 const BasinHeaterConsumption, // Basin heater energy consumption (J)
 			int const NumCapacityStages, // number of capacity stages, up to MaxCapacityStages for Multimode DX coil,
 			int const NumDehumidModes, // number of enhanced dehumidification modes, up to MaxDehumidModes for Multimode DX coil,
-			FArray1_Fstring const & CoilPerformanceType, // Coil Performance object type
+			FArray1_string const & CoilPerformanceType, // Coil Performance object type
 			FArray1_int const & CoilPerformanceType_Num, // Coil Performance object type number
-			FArray1_Fstring const & CoilPerformanceName, // Coil Performance object names
+			FArray1_string const & CoilPerformanceName, // Coil Performance object names
 			Real64 const CoolingCoilStg2RuntimeFrac, // Run time fraction of stage 2
 			int const DehumidificationMode, // Dehumidification mode for multimode coil,
 			int const WaterInNode, // Condenser water inlet node number for HPWH DX coil
@@ -809,17 +794,17 @@ namespace DXCoils {
 			int const PLFErrIndex, // index/pointer to recurring error structure for PLF <> 1 at speed 1 for a multiple speed coil
 			int const PLRErrIndex, // index/pointer to recurring error structure for PLR < .7
 			bool const PrintLowAmbMessage, // used to print warning message for low ambient conditions
-			Fstring const & LowAmbBuffer1, // holds warning message until next iteration (only prints 1 message/iteration)
-			Fstring const & LowAmbBuffer2, // holds warning message until next iteration (only prints 1 message/iteration)
+			std::string const & LowAmbBuffer1, // holds warning message until next iteration (only prints 1 message/iteration)
+			std::string const & LowAmbBuffer2, // holds warning message until next iteration (only prints 1 message/iteration)
 			bool const PrintHighAmbMessage, // used to print warning message for high ambient conditions
-			Fstring const & HighAmbBuffer1, // holds warning message until next iteration (only prints 1 message/iteration)
-			Fstring const & HighAmbBuffer2, // holds warning message until next iteration (only prints 1 message/iteration)
+			std::string const & HighAmbBuffer1, // holds warning message until next iteration (only prints 1 message/iteration)
+			std::string const & HighAmbBuffer2, // holds warning message until next iteration (only prints 1 message/iteration)
 			int const EvapWaterSupplyMode, // where does water come from
-			Fstring const & EvapWaterSupplyName, // name of water source e.g. water storage tank
+			std::string const & EvapWaterSupplyName, // name of water source e.g. water storage tank
 			int const EvapWaterSupTankID,
 			int const EvapWaterTankDemandARRID,
 			int const CondensateCollectMode, // where does water come from
-			Fstring const & CondensateCollectName, // name of water source e.g. water storage tank
+			std::string const & CondensateCollectName, // name of water source e.g. water storage tank
 			int const CondensateTankID,
 			int const CondensateTankSupplyARRID,
 			Real64 const CondensateVdot, // rate of water condensation from air stream [m3/s]
@@ -869,10 +854,10 @@ namespace DXCoils {
 			int const SHRFTempCurveType2, // type of curve for SHRFTemp (cubic,quadratic,bi-quadratic)
 			bool const UserSHRCurveExists // TRUE if user specified SHR modifier curve exists
 		) :
-			Name( MaxNameLength, Name ),
-			DXCoilType( MaxNameLength, DXCoilType ),
+			Name( Name ),
+			DXCoilType( DXCoilType ),
 			DXCoilType_Num( DXCoilType_Num ),
-			Schedule( MaxNameLength, Schedule ),
+			Schedule( Schedule ),
 			SchedPtr( SchedPtr ),
 			RatedTotCap( MaxModes, RatedTotCap ),
 			HeatSizeRatio( HeatSizeRatio ),
@@ -916,8 +901,8 @@ namespace DXCoils {
 			FullLoadOutAirTempLast( FullLoadOutAirTempLast ),
 			FullLoadInletAirTempLast( FullLoadInletAirTempLast ),
 			PrintLowOutTempMessage( PrintLowOutTempMessage ),
-			LowOutTempBuffer1( 300, LowOutTempBuffer1 ),
-			LowOutTempBuffer2( 300, LowOutTempBuffer2 ),
+			LowOutTempBuffer1( LowOutTempBuffer1 ),
+			LowOutTempBuffer2( LowOutTempBuffer2 ),
 			HeatingCoilPLFCurvePTR( HeatingCoilPLFCurvePTR ),
 			BasinHeaterSchedulePtr( BasinHeaterSchedulePtr ),
 			RatedTotCap2( RatedTotCap2 ),
@@ -932,8 +917,8 @@ namespace DXCoils {
 			InternalStaticPressureDrop( InternalStaticPressureDrop ),
 			RateWithInternalStaticAndFanObject( RateWithInternalStaticAndFanObject ),
 			SupplyFanIndex( SupplyFanIndex ),
-			SupplyFanName( MaxNameLength, SupplyFanName ),
-			CoilSystemName( MaxNameLength, CoilSystemName ),
+			SupplyFanName( SupplyFanName ),
+			CoilSystemName( CoilSystemName ),
 			RatedEIR( MaxModes, RatedEIR ),
 			InletAirMassFlowRate( InletAirMassFlowRate ),
 			InletAirMassFlowRateMax( InletAirMassFlowRateMax ),
@@ -998,9 +983,9 @@ namespace DXCoils {
 			BasinHeaterConsumption( BasinHeaterConsumption ),
 			NumCapacityStages( NumCapacityStages ),
 			NumDehumidModes( NumDehumidModes ),
-			CoilPerformanceType( MaxModes, sFstring( MaxNameLength ), CoilPerformanceType ),
+			CoilPerformanceType( MaxModes, CoilPerformanceType ),
 			CoilPerformanceType_Num( MaxModes, CoilPerformanceType_Num ),
-			CoilPerformanceName( MaxModes, sFstring( MaxNameLength ), CoilPerformanceName ),
+			CoilPerformanceName( MaxModes, CoilPerformanceName ),
 			CoolingCoilStg2RuntimeFrac( CoolingCoilStg2RuntimeFrac ),
 			DehumidificationMode( DehumidificationMode ),
 			WaterInNode( WaterInNode ),
@@ -1044,17 +1029,17 @@ namespace DXCoils {
 			PLFErrIndex( PLFErrIndex ),
 			PLRErrIndex( PLRErrIndex ),
 			PrintLowAmbMessage( PrintLowAmbMessage ),
-			LowAmbBuffer1( 300, LowAmbBuffer1 ),
-			LowAmbBuffer2( 300, LowAmbBuffer2 ),
+			LowAmbBuffer1( LowAmbBuffer1 ),
+			LowAmbBuffer2( LowAmbBuffer2 ),
 			PrintHighAmbMessage( PrintHighAmbMessage ),
-			HighAmbBuffer1( 300, HighAmbBuffer1 ),
-			HighAmbBuffer2( 300, HighAmbBuffer2 ),
+			HighAmbBuffer1( HighAmbBuffer1 ),
+			HighAmbBuffer2( HighAmbBuffer2 ),
 			EvapWaterSupplyMode( EvapWaterSupplyMode ),
-			EvapWaterSupplyName( MaxNameLength, EvapWaterSupplyName ),
+			EvapWaterSupplyName( EvapWaterSupplyName ),
 			EvapWaterSupTankID( EvapWaterSupTankID ),
 			EvapWaterTankDemandARRID( EvapWaterTankDemandARRID ),
 			CondensateCollectMode( CondensateCollectMode ),
-			CondensateCollectName( MaxNameLength, CondensateCollectName ),
+			CondensateCollectName( CondensateCollectName ),
 			CondensateTankID( CondensateTankID ),
 			CondensateTankSupplyARRID( CondensateTankSupplyARRID ),
 			CondensateVdot( CondensateVdot ),
@@ -1114,7 +1099,7 @@ namespace DXCoils {
 
 	void
 	SimDXCoil(
-		Fstring const & CompName, // name of the fan coil unit
+		std::string const & CompName, // name of the fan coil unit
 		int const CompOp, // compressor operation; 1=on, 0=off
 		bool const FirstHVACIteration, // True when first HVAC iteration
 		int & CompIndex,
@@ -1128,7 +1113,7 @@ namespace DXCoils {
 
 	void
 	SimDXCoilMultiSpeed(
-		Fstring const & CompName, // name of the fan coil unit
+		std::string const & CompName, // name of the fan coil unit
 		Real64 const SpeedRatio, // = (CompressorSpeed - CompressorSpeedMin) /
 		Real64 const CycRatio, // cycling part load ratio for variable speed
 		int & CompIndex,
@@ -1139,7 +1124,7 @@ namespace DXCoils {
 
 	void
 	SimDXCoilMultiMode(
-		Fstring const & CompName, // name of the fan coil unit
+		std::string const & CompName, // name of the fan coil unit
 		int const CompOp, // compressor operation; 1=on, 0=off !unused1208
 		bool const FirstHVACIteration, // true if first hvac iteration
 		Real64 const PartLoadRatio, // part load ratio
@@ -1220,8 +1205,8 @@ namespace DXCoils {
 
 	Real64
 	CalcCBF(
-		Fstring const & UnitType,
-		Fstring const & UnitName,
+		std::string const & UnitType,
+		std::string const & UnitName,
 		Real64 const InletAirTemp, // inlet air temperature [C]
 		Real64 const InletAirHumRat, // inlet air humidity ratio [kg water / kg dry air]
 		Real64 const TotCap, // total cooling  capacity [Watts]
@@ -1292,7 +1277,7 @@ namespace DXCoils {
 	GetFanIndexForTwoSpeedCoil(
 		int const CoolingCoilIndex,
 		int & SupplyFanIndex,
-		Fstring & SupplyFanName
+		std::string & SupplyFanName
 	);
 
 	Real64
@@ -1305,17 +1290,17 @@ namespace DXCoils {
 
 	void
 	GetDXCoilIndex(
-		Fstring const & DXCoilName,
+		std::string const & DXCoilName,
 		int & DXCoilIndex,
 		bool & ErrorsFound,
-		Optional_Fstring_const ThisObjectType = _,
+		Optional_string_const ThisObjectType = _,
 		Optional_bool_const SuppressWarning = _
 	);
 
 	Real64
 	GetCoilCapacity(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
@@ -1328,73 +1313,73 @@ namespace DXCoils {
 
 	int
 	GetCoilTypeNum(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound, // set to true if problem
 		Optional_bool_const PrintWarning = _ // prints warning when true
 	);
 
 	Real64
 	GetMinOATCompressor(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetCoilInletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetCoilOutletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetCoilCondenserInletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	Real64
 	GetDXCoilBypassedFlowFrac(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetHPCoolingCoilIndex(
-		Fstring const & HeatingCoilType, // Type of DX heating coil used in HP
-		Fstring const & HeatingCoilName, // Name of DX heating coil used in HP
+		std::string const & HeatingCoilType, // Type of DX heating coil used in HP
+		std::string const & HeatingCoilName, // Name of DX heating coil used in HP
 		int const HeatingCoilIndex // Index of DX heating coil used in HP
 	);
 
 	int
 	GetDXCoilNumberOfSpeeds(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetDXCoilAvailSchPtr(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound, // set to true if problem
 		Optional_int_const CoilIndex = _ // Coil index number
 	);
 
 	Real64
 	GetDXCoilAirFlow(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	);
 
@@ -1428,19 +1413,19 @@ namespace DXCoils {
 		Optional< Real64 > HeatSizeRatio = _,
 		Optional< Real64 > TotCap = _,
 		Optional_int SupplyFanIndex = _,
-		Optional_Fstring SupplyFanName = _
+		Optional_string SupplyFanName = _
 	);
 
 	void
 	SetCoilSystemHeatingDXFlag(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName // must match coil names for the coil type
 	);
 
 	void
 	SetCoilSystemCoolingData(
-		Fstring const & CoilName, // must match coil names for the coil type
-		Fstring const & CoilSystemName
+		std::string const & CoilName, // must match coil names for the coil type
+		std::string const & CoilSystemName
 	);
 
 	Real64
@@ -1454,7 +1439,7 @@ namespace DXCoils {
 	);
 
 	void
-	SetDXCoilTypeData( Fstring const & CoilName ); // must match coil names for the coil type
+	SetDXCoilTypeData( std::string const & CoilName ); // must match coil names for the coil type
 
 	//     NOTICE
 

@@ -61,7 +61,7 @@ namespace TARCOGDeflection {
 		FArray1A< Real64 > const PoissonsRat,
 		FArray1A< Real64 > LayerDeflection,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	)
 	{
 		//***********************************************************************
@@ -122,7 +122,7 @@ namespace TARCOGDeflection {
 		FArray1A< Real64 > DCoeff,
 		FArray1A< Real64 > LayerDeflection,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	)
 	{
 		//***********************************************************************************************************

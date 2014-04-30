@@ -16,7 +16,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/byte.hh>
 #include <ObjexxFCL/ubyte.hh>
-#include <ObjexxFCL/char.constants.hh>
 
 // C++ Headers
 #include <complex>
@@ -175,7 +174,7 @@ struct TypeTraits< char >
 	traits_type
 	initial_value()
 	{
-		return SPC;
+		return ' ';
 	}
 
 	// Debug Value
@@ -233,7 +232,7 @@ struct TypeTraits< signed char >
 	traits_type
 	initial_value()
 	{
-		return SPC;
+		return ' ';
 	}
 
 	// Debug Value
@@ -291,7 +290,7 @@ struct TypeTraits< unsigned char >
 	traits_type
 	initial_value()
 	{
-		return SPC;
+		return ' ';
 	}
 
 	// Debug Value

@@ -39,7 +39,6 @@ namespace DataEnvironment {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::KelvinConv;
 
 	// Data
@@ -133,10 +132,10 @@ namespace DataEnvironment {
 	Real64 StdRhoAir; // Standard "rho air" set in WeatherManager - based on StdBaroPress
 	Real64 TimeZoneNumber; // Time Zone Number of building location
 	Real64 TimeZoneMeridian; // Standard Meridian of TimeZone
-	Fstring EnvironmentName( MaxNameLength * 2 ); // Current environment name (longer for weather file names)
-	Fstring WeatherFileLocationTitle( MaxNameLength * 2 ); // Location Title from Weather File
-	Fstring CurMnDyHr( 20 ); // Current Month/Day/Hour timestamp info
-	Fstring CurMnDy( 5 ); // Current Month/Day timestamp info
+	std::string EnvironmentName; // Current environment name (longer for weather file names)
+	std::string WeatherFileLocationTitle; // Location Title from Weather File
+	std::string CurMnDyHr; // Current Month/Day/Hour timestamp info
+	std::string CurMnDy; // Current Month/Day timestamp info
 	int CurEnvirNum; // current environment number
 	int TotDesDays( 0 ); // Total number of Design days to Setup
 	int TotRunDesPersDays( 0 ); // Total number of Run Design Periods [Days] (Weather data) to Setup
@@ -172,7 +171,7 @@ namespace DataEnvironment {
 	bool PrintEnvrnStampWarmupPrinted( false );
 
 	bool RunPeriodEnvironment( false ); // True if Run Period, False if DesignDay
-	Fstring EnvironmentStartEnd( 20 ); // Start/End dates for Environment
+	std::string EnvironmentStartEnd; // Start/End dates for Environment
 	bool CurrentYearIsLeapYear( false ); // true when current year is leap year (convoluted logic dealing with
 	// whether weather file allows leap years, runperiod inputs.
 
@@ -225,7 +224,7 @@ namespace DataEnvironment {
 
 		if ( LocalOutDryBulbTemp < -100.0 ) {
 			ShowSevereError( "OutDryBulbTempAt: outdoor drybulb temperature < -100 C" );
-			ShowContinueError( "...check heights, this height=[" + trim( RoundSigDigits( Z, 0 ) ) + "]." );
+			ShowContinueError( "...check heights, this height=[" + RoundSigDigits( Z, 0 ) + "]." );
 			ShowFatalError( "Program terminates due to preceding condition(s)." );
 		}
 
@@ -276,7 +275,7 @@ namespace DataEnvironment {
 
 		if ( LocalOutWetBulbTemp < -100.0 ) {
 			ShowSevereError( "OutWetBulbTempAt: outdoor wetbulb temperature < -100 C" );
-			ShowContinueError( "...check heights, this height=[" + trim( RoundSigDigits( Z, 0 ) ) + "]." );
+			ShowContinueError( "...check heights, this height=[" + RoundSigDigits( Z, 0 ) + "]." );
 			ShowFatalError( "Program terminates due to preceding condition(s)." );
 		}
 
@@ -328,7 +327,7 @@ namespace DataEnvironment {
 
 		if ( LocalOutDewPointTemp < -100.0 ) {
 			ShowSevereError( "OutDewPointTempAt: outdoor dewpoint temperature < -100 C" );
-			ShowContinueError( "...check heights, this height=[" + trim( RoundSigDigits( Z, 0 ) ) + "]." );
+			ShowContinueError( "...check heights, this height=[" + RoundSigDigits( Z, 0 ) + "]." );
 			ShowFatalError( "Program terminates due to preceding condition(s)." );
 		}
 
@@ -432,7 +431,7 @@ namespace DataEnvironment {
 		FArray1S< Real64 > const Heights,
 		FArray1S< Real64 > DryBulb,
 		FArray1S< Real64 > WetBulb,
-		Fstring const & Settings
+		std::string const & Settings
 	)
 	{
 
@@ -500,15 +499,15 @@ namespace DataEnvironment {
 
 	void
 	SetOutBulbTempAt_error(
-		Fstring const & Settings,
+		std::string const & Settings,
 		Real64 const max_height
 	)
 	{
 		// Using/Aliasing
 		using General::RoundSigDigits;
 
-		ShowSevereError( "SetOutBulbTempAt: " + trim( Settings ) + " Outdoor Temperatures < -100 C" );
-		ShowContinueError( "...check " + trim( Settings ) + " Heights - Maximum " + trim( Settings ) + " Height=[" + trim( RoundSigDigits( max_height, 0 ) ) + "]." );
+		ShowSevereError( "SetOutBulbTempAt: " + Settings + " Outdoor Temperatures < -100 C" );
+		ShowContinueError( "...check " + Settings + " Heights - Maximum " + Settings + " Height=[" + RoundSigDigits( max_height, 0 ) + "]." );
 		if ( max_height >= 20000.0 ) {
 			ShowContinueError( "...according to your maximum Z height, your building is somewhere in the Stratosphere." );
 		}
@@ -520,7 +519,7 @@ namespace DataEnvironment {
 		int const NumItems,
 		FArray1S< Real64 > const Heights,
 		FArray1S< Real64 > LocalWindSpeed,
-		Fstring const & Settings
+		std::string const & Settings
 	)
 	{
 

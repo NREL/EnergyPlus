@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray2D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Reference.hh>
 
 // EnergyPlus Headers
@@ -18,7 +17,6 @@ namespace EnergyPlus {
 namespace DataRuntimeLanguage {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// module should be available to other modules and routines.
@@ -188,9 +186,9 @@ namespace DataRuntimeLanguage {
 	struct OutputVarSensorType
 	{
 		// Members
-		Fstring Name; // name of associated Erl Variable
-		Fstring UniqueKeyName; // unique key name associated with output variable
-		Fstring OutputVarName; // name of output variable
+		std::string Name; // name of associated Erl Variable
+		std::string UniqueKeyName; // unique key name associated with output variable
+		std::string OutputVarName; // name of output variable
 		bool CheckedOkay; // set to true once checked out okay
 		int Type; // type of output var, 1=integer, 2=real, 3=meter
 		int Index; // ref index in output processor, points to variable
@@ -200,9 +198,6 @@ namespace DataRuntimeLanguage {
 
 		// Default Constructor
 		OutputVarSensorType() :
-			Name( MaxNameLength ),
-			UniqueKeyName( MaxNameLength ),
-			OutputVarName( MaxNameLength ),
 			CheckedOkay( false ),
 			Type( 0 ),
 			Index( 0 ),
@@ -212,18 +207,18 @@ namespace DataRuntimeLanguage {
 
 		// Member Constructor
 		OutputVarSensorType(
-			Fstring const & Name, // name of associated Erl Variable
-			Fstring const & UniqueKeyName, // unique key name associated with output variable
-			Fstring const & OutputVarName, // name of output variable
+			std::string const & Name, // name of associated Erl Variable
+			std::string const & UniqueKeyName, // unique key name associated with output variable
+			std::string const & OutputVarName, // name of output variable
 			bool const CheckedOkay, // set to true once checked out okay
 			int const Type, // type of output var, 1=integer, 2=real, 3=meter
 			int const Index, // ref index in output processor, points to variable
 			int const VariableNum, // ref to global variable in runtime language
 			int const SchedNum // ref index ptr to schedule service (filled if Schedule Value)
 		) :
-			Name( MaxNameLength, Name ),
-			UniqueKeyName( MaxNameLength, UniqueKeyName ),
-			OutputVarName( MaxNameLength, OutputVarName ),
+			Name( Name ),
+			UniqueKeyName( UniqueKeyName ),
+			OutputVarName( OutputVarName ),
 			CheckedOkay( CheckedOkay ),
 			Type( Type ),
 			Index( Index ),
@@ -237,33 +232,30 @@ namespace DataRuntimeLanguage {
 	{
 		// Members
 		// structure for internal data available for use in Erl that are not sourced by output variables
-		Fstring DataTypeName; // general internal variable name registered, All uppercase
-		Fstring UniqueIDName; // unique id for internal var, All uppercase
-		Fstring Units; // registered units, used for reporting and checks.
+		std::string DataTypeName; // general internal variable name registered, All uppercase
+		std::string UniqueIDName; // unique id for internal var, All uppercase
+		std::string Units; // registered units, used for reporting and checks.
 		int PntrVarTypeUsed; // data type used: integer (PntrInteger) or real (PntrReal)
 		Reference< Real64 > RealValue; // fortran POINTER to the REAL value that is being accessed
 		Reference_int IntValue; // fortran POINTER to the Integer value that is being accessed
 
 		// Default Constructor
 		InternalVarsAvailableType() :
-			DataTypeName( MaxNameLength ),
-			UniqueIDName( MaxNameLength ),
-			Units( MaxNameLength ),
 			PntrVarTypeUsed( 0 )
 		{}
 
 		// Member Constructor
 		InternalVarsAvailableType(
-			Fstring const & DataTypeName, // general internal variable name registered, All uppercase
-			Fstring const & UniqueIDName, // unique id for internal var, All uppercase
-			Fstring const & Units, // registered units, used for reporting and checks.
+			std::string const & DataTypeName, // general internal variable name registered, All uppercase
+			std::string const & UniqueIDName, // unique id for internal var, All uppercase
+			std::string const & Units, // registered units, used for reporting and checks.
 			int const PntrVarTypeUsed, // data type used: integer (PntrInteger) or real (PntrReal)
 			Reference< Real64 > const RealValue, // fortran POINTER to the REAL value that is being accessed
 			Reference_int const IntValue // fortran POINTER to the Integer value that is being accessed
 		) :
-			DataTypeName( MaxNameLength, DataTypeName ),
-			UniqueIDName( MaxNameLength, UniqueIDName ),
-			Units( MaxNameLength, Units ),
+			DataTypeName( DataTypeName ),
+			UniqueIDName( UniqueIDName ),
+			Units( Units ),
 			PntrVarTypeUsed( PntrVarTypeUsed ),
 			RealValue( RealValue ),
 			IntValue( IntValue )
@@ -275,18 +267,15 @@ namespace DataRuntimeLanguage {
 	{
 		// Members
 		// structure for internal data that user has selected to use in Erl.
-		Fstring Name; // Erl variable name
-		Fstring InternalDataTypeName; // general internal variable name, All uppercase
-		Fstring UniqueIDName; // unique id for internal var, All uppercase
+		std::string Name; // Erl variable name
+		std::string InternalDataTypeName; // general internal variable name, All uppercase
+		std::string UniqueIDName; // unique id for internal var, All uppercase
 		bool CheckedOkay; // set to true once matched to available internal var
 		int ErlVariableNum; // points to global Erl variable, matches Name
 		int InternVarNum; // points to index match in EMSInternalVarsAvailable structure
 
 		// Default Constructor
 		InternalVarsUsedType() :
-			Name( MaxNameLength ),
-			InternalDataTypeName( MaxNameLength ),
-			UniqueIDName( MaxNameLength ),
 			CheckedOkay( false ),
 			ErlVariableNum( 0 ),
 			InternVarNum( 0 )
@@ -294,16 +283,16 @@ namespace DataRuntimeLanguage {
 
 		// Member Constructor
 		InternalVarsUsedType(
-			Fstring const & Name, // Erl variable name
-			Fstring const & InternalDataTypeName, // general internal variable name, All uppercase
-			Fstring const & UniqueIDName, // unique id for internal var, All uppercase
+			std::string const & Name, // Erl variable name
+			std::string const & InternalDataTypeName, // general internal variable name, All uppercase
+			std::string const & UniqueIDName, // unique id for internal var, All uppercase
 			bool const CheckedOkay, // set to true once matched to available internal var
 			int const ErlVariableNum, // points to global Erl variable, matches Name
 			int const InternVarNum // points to index match in EMSInternalVarsAvailable structure
 		) :
-			Name( MaxNameLength, Name ),
-			InternalDataTypeName( MaxNameLength, InternalDataTypeName ),
-			UniqueIDName( MaxNameLength, UniqueIDName ),
+			Name( Name ),
+			InternalDataTypeName( InternalDataTypeName ),
+			UniqueIDName( UniqueIDName ),
 			CheckedOkay( CheckedOkay ),
 			ErlVariableNum( ErlVariableNum ),
 			InternVarNum( InternVarNum )
@@ -315,10 +304,10 @@ namespace DataRuntimeLanguage {
 	{
 		// Members
 		// structure for all the actuators available for use in Erl
-		Fstring ComponentTypeName; // general actuator name registered, All uppercase
-		Fstring UniqueIDName; // unique id for actuator, All uppercase
-		Fstring ControlTypeName; // control type id for actuator, All uppercase
-		Fstring Units; // control value units, used for reporting and checks.
+		std::string ComponentTypeName; // general actuator name registered, All uppercase
+		std::string UniqueIDName; // unique id for actuator, All uppercase
+		std::string ControlTypeName; // control type id for actuator, All uppercase
+		std::string Units; // control value units, used for reporting and checks.
 		int PntrVarTypeUsed; // data type used: integer (PntrInteger), real (PntrReal)
 		// or logical (PntrLogical)
 		Reference_bool Actuated; // fortran POINTER to the logical value that signals EMS is actuating
@@ -328,29 +317,25 @@ namespace DataRuntimeLanguage {
 
 		// Default Constructor
 		EMSActuatorAvailableType() :
-			ComponentTypeName( MaxNameLength ),
-			UniqueIDName( MaxNameLength ),
-			ControlTypeName( MaxNameLength ),
-			Units( MaxNameLength ),
 			PntrVarTypeUsed( 0 )
 		{}
 
 		// Member Constructor
 		EMSActuatorAvailableType(
-			Fstring const & ComponentTypeName, // general actuator name registered, All uppercase
-			Fstring const & UniqueIDName, // unique id for actuator, All uppercase
-			Fstring const & ControlTypeName, // control type id for actuator, All uppercase
-			Fstring const & Units, // control value units, used for reporting and checks.
+			std::string const & ComponentTypeName, // general actuator name registered, All uppercase
+			std::string const & UniqueIDName, // unique id for actuator, All uppercase
+			std::string const & ControlTypeName, // control type id for actuator, All uppercase
+			std::string const & Units, // control value units, used for reporting and checks.
 			int const PntrVarTypeUsed, // data type used: integer (PntrInteger), real (PntrReal)
 			Reference_bool const Actuated, // fortran POINTER to the logical value that signals EMS is actuating
 			Reference< Real64 > const RealValue, // fortran POINTER to the REAL value that is being actuated
 			Reference_int const IntValue, // fortran POINTER to the Integer value that is being actuated
 			Reference_bool const LogValue // fortran POINTER to the Logical value that is being actuated
 		) :
-			ComponentTypeName( MaxNameLength, ComponentTypeName ),
-			UniqueIDName( MaxNameLength, UniqueIDName ),
-			ControlTypeName( MaxNameLength, ControlTypeName ),
-			Units( MaxNameLength, Units ),
+			ComponentTypeName( ComponentTypeName ),
+			UniqueIDName( UniqueIDName ),
+			ControlTypeName( ControlTypeName ),
+			Units( Units ),
 			PntrVarTypeUsed( PntrVarTypeUsed ),
 			Actuated( Actuated ),
 			RealValue( RealValue ),
@@ -364,20 +349,16 @@ namespace DataRuntimeLanguage {
 	{
 		// Members
 		// structure for actuators user selected to use in Erl
-		Fstring Name; // Erl variable name
-		Fstring ComponentTypeName; // general actuator name, All uppercase
-		Fstring UniqueIDName; // unique id for actuator, All uppercase
-		Fstring ControlTypeName; // control type id for actuator, All uppercase
+		std::string Name; // Erl variable name
+		std::string ComponentTypeName; // general actuator name, All uppercase
+		std::string UniqueIDName; // unique id for actuator, All uppercase
+		std::string ControlTypeName; // control type id for actuator, All uppercase
 		bool CheckedOkay; // set to true once matched to available actuator
 		int ErlVariableNum; // points to global Erl variable, matches Name
 		int ActuatorVariableNum; // points to index match in EMSActuatorAvailable structure
 
 		// Default Constructor
 		ActuatorUsedType() :
-			Name( MaxNameLength ),
-			ComponentTypeName( MaxNameLength ),
-			UniqueIDName( MaxNameLength ),
-			ControlTypeName( MaxNameLength ),
 			CheckedOkay( false ),
 			ErlVariableNum( 0 ),
 			ActuatorVariableNum( 0 )
@@ -385,18 +366,18 @@ namespace DataRuntimeLanguage {
 
 		// Member Constructor
 		ActuatorUsedType(
-			Fstring const & Name, // Erl variable name
-			Fstring const & ComponentTypeName, // general actuator name, All uppercase
-			Fstring const & UniqueIDName, // unique id for actuator, All uppercase
-			Fstring const & ControlTypeName, // control type id for actuator, All uppercase
+			std::string const & Name, // Erl variable name
+			std::string const & ComponentTypeName, // general actuator name, All uppercase
+			std::string const & UniqueIDName, // unique id for actuator, All uppercase
+			std::string const & ControlTypeName, // control type id for actuator, All uppercase
 			bool const CheckedOkay, // set to true once matched to available actuator
 			int const ErlVariableNum, // points to global Erl variable, matches Name
 			int const ActuatorVariableNum // points to index match in EMSActuatorAvailable structure
 		) :
-			Name( MaxNameLength, Name ),
-			ComponentTypeName( MaxNameLength, ComponentTypeName ),
-			UniqueIDName( MaxNameLength, UniqueIDName ),
-			ControlTypeName( MaxNameLength, ControlTypeName ),
+			Name( Name ),
+			ComponentTypeName( ComponentTypeName ),
+			UniqueIDName( UniqueIDName ),
+			ControlTypeName( ControlTypeName ),
 			CheckedOkay( CheckedOkay ),
 			ErlVariableNum( ErlVariableNum ),
 			ActuatorVariableNum( ActuatorVariableNum )
@@ -408,26 +389,25 @@ namespace DataRuntimeLanguage {
 	{
 		// Members
 		// structure for Erl program calling managers
-		Fstring Name; // user defined name for calling manager
+		std::string Name; // user defined name for calling manager
 		int CallingPoint; // EMS Calling point for this manager, see parameters emsCallFrom*
 		int NumErlPrograms; // count of total number of Erl programs called by this manager
 		FArray1D_int ErlProgramARR; // list of integer pointers to Erl programs used by this manager
 
 		// Default Constructor
 		EMSProgramCallManagementType() :
-			Name( MaxNameLength ),
 			CallingPoint( 0 ),
 			NumErlPrograms( 0 )
 		{}
 
 		// Member Constructor
 		EMSProgramCallManagementType(
-			Fstring const & Name, // user defined name for calling manager
+			std::string const & Name, // user defined name for calling manager
 			int const CallingPoint, // EMS Calling point for this manager, see parameters emsCallFrom*
 			int const NumErlPrograms, // count of total number of Erl programs called by this manager
 			FArray1_int const & ErlProgramARR // list of integer pointers to Erl programs used by this manager
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			CallingPoint( CallingPoint ),
 			NumErlPrograms( NumErlPrograms ),
 			ErlProgramARR( ErlProgramARR )
@@ -441,45 +421,43 @@ namespace DataRuntimeLanguage {
 		// instance data structure for the values taken by Erl variables, nested structure in ErlVariable
 		int Type; // value type, eg. ValueNumber,
 		Real64 Number; // numeric value instance for Erl variable
-		Fstring String; // string data types in Erl (not used yet)
+		std::string String; // string data types in Erl (not used yet)
 		int Variable; // Pointer to another Erl variable
 		//  Might be good to change names to VariableNum and ExpressionNum just to be clear
 		int Expression; // Pointer to another Erl expression (e.g. compound operators)
 		bool TrendVariable; // true if Erl variable is really a trend variable
 		int TrendVarPointer; // index to match in TrendVariable structure
-		Fstring Error; // holds error message string for reporting
+		std::string Error; // holds error message string for reporting
 
 		// Default Constructor
 		ErlValueType() :
 			Type( 0 ),
 			Number( 0.0 ),
-			String( 2 * MaxNameLength ),
 			Variable( 0 ),
 			Expression( 0 ),
 			TrendVariable( false ),
-			TrendVarPointer( 0 ),
-			Error( 2 * MaxNameLength )
+			TrendVarPointer( 0 )
 		{}
 
 		// Member Constructor
 		ErlValueType(
 			int const Type, // value type, eg. ValueNumber,
 			Real64 const Number, // numeric value instance for Erl variable
-			Fstring const & String, // string data types in Erl (not used yet)
+			std::string const & String, // string data types in Erl (not used yet)
 			int const Variable, // Pointer to another Erl variable
 			int const Expression, // Pointer to another Erl expression (e.g. compound operators)
 			bool const TrendVariable, // true if Erl variable is really a trend variable
 			int const TrendVarPointer, // index to match in TrendVariable structure
-			Fstring const & Error // holds error message string for reporting
+			std::string const & Error // holds error message string for reporting
 		) :
 			Type( Type ),
 			Number( Number ),
-			String( 2 * MaxNameLength, String ),
+			String( String ),
 			Variable( Variable ),
 			Expression( Expression ),
 			TrendVariable( TrendVariable ),
 			TrendVarPointer( TrendVarPointer ),
-			Error( 2 * MaxNameLength, Error )
+			Error( Error )
 		{}
 
 	};
@@ -488,7 +466,7 @@ namespace DataRuntimeLanguage {
 	{
 		// Members
 		// structure for Erl variables
-		Fstring Name; // Erl Variable Name
+		std::string Name; // Erl Variable Name
 		int StackNum; // 0 for global Erl variables, index in ErlStack structure if local
 		ErlValueType Value; // values taken by Erl variables
 		bool ReadOnly; // true if Erl variable is read-only
@@ -496,7 +474,6 @@ namespace DataRuntimeLanguage {
 
 		// Default Constructor
 		ErlVariableType() :
-			Name( MaxNameLength ),
 			StackNum( 0 ),
 			ReadOnly( false ),
 			SetByExternalInterface( false )
@@ -504,13 +481,13 @@ namespace DataRuntimeLanguage {
 
 		// Member Constructor
 		ErlVariableType(
-			Fstring const & Name, // Erl Variable Name
+			std::string const & Name, // Erl Variable Name
 			int const StackNum, // 0 for global Erl variables, index in ErlStack structure if local
 			ErlValueType const & Value, // values taken by Erl variables
 			bool const ReadOnly, // true if Erl variable is read-only
 			bool const SetByExternalInterface // set to true if value is set by ExternalInterface
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			StackNum( StackNum ),
 			Value( Value ),
 			ReadOnly( ReadOnly ),
@@ -554,35 +531,32 @@ namespace DataRuntimeLanguage {
 	struct ErlStackType // Stores Erl programs in a stack of statements/instructions
 	{
 		// Members
-		Fstring Name; // Erl program or subroutine name, user defined
+		std::string Name; // Erl program or subroutine name, user defined
 		int NumLines; // count of lines in Erl program or subroutine
-		FArray1D_Fstring Line; // string array holding lines of Erl code (for processing)
+		FArray1D_string Line; // string array holding lines of Erl code (for processing)
 		int NumInstructions; // count of program instructions in stack
 		FArray1D< InstructionType > Instruction; // structure array of program instructions
 		int NumErrors; // count of errors during stack parsing
-		FArray1D_Fstring Error; // array of error messages from stack parsing
+		FArray1D_string Error; // array of error messages from stack parsing
 
 		// Default Constructor
 		ErlStackType() :
-			Name( MaxNameLength ),
 			NumLines( 0 ),
-			Line( sFstring( 2 * MaxNameLength ) ),
 			NumInstructions( 0 ),
-			NumErrors( 0 ),
-			Error( sFstring( 2 * MaxNameLength ) )
+			NumErrors( 0 )
 		{}
 
 		// Member Constructor
 		ErlStackType(
-			Fstring const & Name, // Erl program or subroutine name, user defined
+			std::string const & Name, // Erl program or subroutine name, user defined
 			int const NumLines, // count of lines in Erl program or subroutine
-			FArray1_Fstring const & Line, // string array holding lines of Erl code (for processing)
+			FArray1_string const & Line, // string array holding lines of Erl code (for processing)
 			int const NumInstructions, // count of program instructions in stack
 			FArray1< InstructionType > const & Instruction, // structure array of program instructions
 			int const NumErrors, // count of errors during stack parsing
-			FArray1_Fstring const & Error // array of error messages from stack parsing
+			FArray1_string const & Error // array of error messages from stack parsing
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NumLines( NumLines ),
 			Line( Line ),
 			NumInstructions( NumInstructions ),
@@ -623,24 +597,23 @@ namespace DataRuntimeLanguage {
 	{
 		// Members
 		// structure for operators and functions, used to look up information about each operator or function
-		Fstring Symbol; // string representation of operator or function (for reporting)
+		std::string Symbol; // string representation of operator or function (for reporting)
 		int Code; // integer code 1..64, identifies operator or function
 		int NumOperands; // count of operands or function arguments.
 
 		// Default Constructor
 		OperatorType() :
-			Symbol( 20 ),
 			Code( 0 ),
 			NumOperands( 0 )
 		{}
 
 		// Member Constructor
 		OperatorType(
-			Fstring const & Symbol, // string representation of operator or function (for reporting)
+			std::string const & Symbol, // string representation of operator or function (for reporting)
 			int const Code, // integer code 1..64, identifies operator or function
 			int const NumOperands // count of operands or function arguments.
 		) :
-			Symbol( 20, Symbol ),
+			Symbol( Symbol ),
 			Code( Code ),
 			NumOperands( NumOperands )
 		{}
@@ -650,7 +623,7 @@ namespace DataRuntimeLanguage {
 	struct TrendVariableType
 	{
 		// Members
-		Fstring Name;
+		std::string Name;
 		int ErlVariablePointer; // the Erl variable being logged in trend
 		int LogDepth; // number of timesteps back
 		FArray1D< Real64 > TrendValARR; // the main storage of trend data
@@ -659,21 +632,20 @@ namespace DataRuntimeLanguage {
 
 		// Default Constructor
 		TrendVariableType() :
-			Name( MaxNameLength ),
 			ErlVariablePointer( 0 ),
 			LogDepth( 0 )
 		{}
 
 		// Member Constructor
 		TrendVariableType(
-			Fstring const & Name,
+			std::string const & Name,
 			int const ErlVariablePointer, // the Erl variable being logged in trend
 			int const LogDepth, // number of timesteps back
 			FArray1< Real64 > const & TrendValARR, // the main storage of trend data
 			FArray1< Real64 > const & tempTrendARR, // temporary holder during push
 			FArray1< Real64 > const & TimeARR // hours back in time for trend points
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ErlVariablePointer( ErlVariablePointer ),
 			LogDepth( LogDepth ),
 			TrendValARR( TrendValARR ),
@@ -703,19 +675,19 @@ namespace DataRuntimeLanguage {
 
 	void
 	ValidateEMSVariableName(
-		Fstring const & cModuleObject, // the current object name
-		Fstring const & cFieldValue, // the field value
-		Fstring const & cFieldName, // the current field name
+		std::string const & cModuleObject, // the current object name
+		std::string const & cFieldValue, // the field value
+		std::string const & cFieldName, // the current field name
 		bool & errFlag, // true if errors found in this routine.
 		bool & ErrorsFound // true if errors found in this routine.
 	);
 
 	void
 	ValidateEMSProgramName(
-		Fstring const & cModuleObject, // the current object name
-		Fstring const & cFieldValue, // the field value
-		Fstring const & cFieldName, // the current field name
-		Fstring const & cSubType, // sub type = Program or Subroutine
+		std::string const & cModuleObject, // the current object name
+		std::string const & cFieldValue, // the field value
+		std::string const & cFieldName, // the current field name
+		std::string const & cSubType, // sub type = Program or Subroutine
 		bool & errFlag, // true if errors found in this routine.
 		bool & ErrorsFound // true if errors found in this routine.
 	);

@@ -172,7 +172,7 @@ namespace WaterCoils {
 
 	void
 	SimulateWaterCoilComponents(
-		Fstring const & CompName,
+		std::string const & CompName,
 		bool const FirstHVACIteration,
 		int & CompIndex,
 		Optional< Real64 > QActual,
@@ -229,17 +229,17 @@ namespace WaterCoils {
 		if ( CompIndex == 0 ) {
 			CoilNum = FindItemInList( CompName, WaterCoil.Name(), NumWaterCoils );
 			if ( CoilNum == 0 ) {
-				ShowFatalError( "SimulateWaterCoilComponents: Coil not found=" + trim( CompName ) );
+				ShowFatalError( "SimulateWaterCoilComponents: Coil not found=" + CompName );
 			}
 			CompIndex = CoilNum;
 		} else {
 			CoilNum = CompIndex;
 			if ( CoilNum > NumWaterCoils || CoilNum < 1 ) {
-				ShowFatalError( "SimulateWaterCoilComponents: Invalid CompIndex passed=" + trim( TrimSigDigits( CoilNum ) ) + ", Number of Water Coils=" + trim( TrimSigDigits( NumWaterCoils ) ) + ", Coil name=" + trim( CompName ) );
+				ShowFatalError( "SimulateWaterCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Number of Water Coils=" + TrimSigDigits( NumWaterCoils ) + ", Coil name=" + CompName );
 			}
 			if ( CheckEquipName( CoilNum ) ) {
 				if ( CompName != WaterCoil( CoilNum ).Name ) {
-					ShowFatalError( "SimulateWaterCoilComponents: Invalid CompIndex passed=" + trim( TrimSigDigits( CoilNum ) ) + ", Coil name=" + trim( CompName ) + ", stored Coil Name for that index=" + trim( WaterCoil( CoilNum ).Name ) );
+					ShowFatalError( "SimulateWaterCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + WaterCoil( CoilNum ).Name );
 				}
 				CheckEquipName( CoilNum ) = false;
 			}
@@ -322,7 +322,7 @@ namespace WaterCoils {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetWaterCoilInput: " ); // include trailing blank space
+		static std::string const RoutineName( "GetWaterCoilInput: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -341,10 +341,10 @@ namespace WaterCoils {
 		int NumAlphas;
 		int NumNums;
 		int IOStat;
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in getting objects
-		FArray1D_Fstring AlphArray( sFstring( MaxNameLength ) ); // Alpha input items for object
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) ); // Numeric field names
+		std::string CurrentModuleObject; // for ease in getting objects
+		FArray1D_string AlphArray; // Alpha input items for object
+		FArray1D_string cAlphaFields; // Alpha field names
+		FArray1D_string cNumericFields; // Numeric field names
 		FArray1D< Real64 > NumArray; // Numeric input items for object
 		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
@@ -385,11 +385,11 @@ namespace WaterCoils {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		AlphArray.allocate( MaxAlphas );
-		AlphArray = " ";
+		AlphArray = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = " ";
+		cAlphaFields = "";
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = " ";
+		cNumericFields = "";
 		NumArray.allocate( MaxNums );
 		NumArray = 0.0;
 		lAlphaBlanks.allocate( MaxAlphas );
@@ -407,12 +407,12 @@ namespace WaterCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), WaterCoil.Name(), CoilNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( AlphArray( 1 ), WaterCoil.Name(), CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
 			}
-			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, trim( CurrentModuleObject ) + " Name" );
+			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
 			}
@@ -423,7 +423,7 @@ namespace WaterCoils {
 			} else {
 				WaterCoil( CoilNum ).SchedPtr = GetScheduleIndex( AlphArray( 2 ) );
 				if ( WaterCoil( CoilNum ).SchedPtr == 0 ) {
-					ShowSevereError( trim( CurrentModuleObject ) + ": invalid " + trim( cAlphaFields( 2 ) ) + " entered =" + trim( AlphArray( 2 ) ) + " for " + trim( cAlphaFields( 1 ) ) + "=" + trim( AlphArray( 1 ) ) );
+					ShowSevereError( CurrentModuleObject + ": invalid " + cAlphaFields( 2 ) + " entered =" + AlphArray( 2 ) + " for " + cAlphaFields( 1 ) + '=' + AlphArray( 1 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -437,10 +437,10 @@ namespace WaterCoils {
 			WaterCoil( CoilNum ).UACoil = NumArray( 1 );
 			WaterCoil( CoilNum ).UACoilVariable = WaterCoil( CoilNum ).UACoil;
 			WaterCoil( CoilNum ).MaxWaterVolFlowRate = NumArray( 2 );
-			WaterCoil( CoilNum ).WaterInletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
-			WaterCoil( CoilNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
-			WaterCoil( CoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			WaterCoil( CoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 6 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			WaterCoil( CoilNum ).WaterInletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+			WaterCoil( CoilNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+			WaterCoil( CoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			WaterCoil( CoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 6 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 			{ auto const SELECT_CASE_var( AlphArray( 7 ) );
 			if ( SELECT_CASE_var == "UFACTORTIMESAREAANDDESIGNWATERFLOWRATE" ) {
@@ -467,23 +467,23 @@ namespace WaterCoils {
 			WaterCoil( CoilNum ).RatioAirSideToWaterSideConvect = NumArray( 8 );
 
 			if ( WaterCoil( CoilNum ).DesInletWaterTemp <= WaterCoil( CoilNum ).DesOutletWaterTemp ) {
-				ShowSevereError( "For " + trim( CurrentModuleObject ) + ", " + trim( AlphArray( 1 ) ) );
-				ShowContinueError( "  the " + trim( cNumericFields( 4 ) ) + " must be greater than the " + trim( cNumericFields( 6 ) ) + "." );
+				ShowSevereError( "For " + CurrentModuleObject + ", " + AlphArray( 1 ) );
+				ShowContinueError( "  the " + cNumericFields( 4 ) + " must be greater than the " + cNumericFields( 6 ) + '.' );
 				ErrorsFound = true;
 			}
 			if ( WaterCoil( CoilNum ).DesInletAirTemp >= WaterCoil( CoilNum ).DesOutletAirTemp ) {
-				ShowSevereError( "For " + trim( CurrentModuleObject ) + ", " + trim( AlphArray( 1 ) ) );
-				ShowContinueError( "  the " + trim( cNumericFields( 5 ) ) + " must be less than the " + trim( cNumericFields( 7 ) ) + "." );
+				ShowSevereError( "For " + CurrentModuleObject + ", " + AlphArray( 1 ) );
+				ShowContinueError( "  the " + cNumericFields( 5 ) + " must be less than the " + cNumericFields( 7 ) + '.' );
 				ErrorsFound = true;
 			}
 			if ( WaterCoil( CoilNum ).DesInletAirTemp >= WaterCoil( CoilNum ).DesInletWaterTemp ) {
-				ShowSevereError( "For " + trim( CurrentModuleObject ) + ", " + trim( AlphArray( 1 ) ) );
-				ShowContinueError( "  the " + trim( cNumericFields( 5 ) ) + " must be less than the " + trim( cNumericFields( 4 ) ) + "." );
+				ShowSevereError( "For " + CurrentModuleObject + ", " + AlphArray( 1 ) );
+				ShowContinueError( "  the " + cNumericFields( 5 ) + " must be less than the " + cNumericFields( 4 ) + '.' );
 				ErrorsFound = true;
 			}
 
-			TestCompSet( trim( CurrentModuleObject ), AlphArray( 1 ), AlphArray( 3 ), AlphArray( 4 ), "Water Nodes" );
-			TestCompSet( trim( CurrentModuleObject ), AlphArray( 1 ), AlphArray( 5 ), AlphArray( 6 ), "Air Nodes" );
+			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 3 ), AlphArray( 4 ), "Water Nodes" );
+			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 5 ), AlphArray( 6 ), "Air Nodes" );
 
 			//Setup the Simple Heating Coil reporting variables
 			SetupOutputVariable( "Heating Coil Heating Energy [J]", WaterCoil( CoilNum ).TotWaterHeatingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
@@ -503,12 +503,12 @@ namespace WaterCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), WaterCoil.Name(), CoilNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( AlphArray( 1 ), WaterCoil.Name(), CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
 			}
-			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, trim( CurrentModuleObject ) + " Name" );
+			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
 			}
@@ -519,7 +519,7 @@ namespace WaterCoils {
 			} else {
 				WaterCoil( CoilNum ).SchedPtr = GetScheduleIndex( AlphArray( 2 ) );
 				if ( WaterCoil( CoilNum ).SchedPtr == 0 ) {
-					ShowSevereError( trim( CurrentModuleObject ) + ": invalid " + trim( cAlphaFields( 2 ) ) + " entered =" + trim( AlphArray( 2 ) ) + " for " + trim( cAlphaFields( 1 ) ) + "=" + trim( AlphArray( 1 ) ) );
+					ShowSevereError( CurrentModuleObject + ": invalid " + cAlphaFields( 2 ) + " entered =" + AlphArray( 2 ) + " for " + cAlphaFields( 1 ) + '=' + AlphArray( 1 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -546,19 +546,19 @@ namespace WaterCoils {
 			if ( WaterCoil( CoilNum ).FinDiam == AutoSize ) WaterCoil( CoilNum ).RequestingAutoSize = true;
 			WaterCoil( CoilNum ).FinThickness = NumArray( 8 );
 			if ( WaterCoil( CoilNum ).FinThickness <= 0.0 ) {
-				ShowSevereError( trim( CurrentModuleObject ) + ": " + trim( cNumericFields( 8 ) ) + " must be > 0.0, for " + trim( cAlphaFields( 1 ) ) + " = " + trim( WaterCoil( CoilNum ).Name ) );
+				ShowSevereError( CurrentModuleObject + ": " + cNumericFields( 8 ) + " must be > 0.0, for " + cAlphaFields( 1 ) + " = " + WaterCoil( CoilNum ).Name );
 				ErrorsFound = true;
 			}
 			WaterCoil( CoilNum ).TubeInsideDiam = NumArray( 9 );
 			WaterCoil( CoilNum ).TubeOutsideDiam = NumArray( 10 );
 			WaterCoil( CoilNum ).TubeThermConductivity = NumArray( 11 );
 			if ( WaterCoil( CoilNum ).TubeThermConductivity <= 0.0 ) {
-				ShowSevereError( trim( CurrentModuleObject ) + ": " + trim( cNumericFields( 11 ) ) + " must be > 0.0, for " + trim( cAlphaFields( 1 ) ) + " = " + trim( WaterCoil( CoilNum ).Name ) );
+				ShowSevereError( CurrentModuleObject + ": " + cNumericFields( 11 ) + " must be > 0.0, for " + cAlphaFields( 1 ) + " = " + WaterCoil( CoilNum ).Name );
 				ErrorsFound = true;
 			}
 			WaterCoil( CoilNum ).FinThermConductivity = NumArray( 12 );
 			if ( WaterCoil( CoilNum ).FinThermConductivity <= 0.0 ) {
-				ShowSevereError( trim( CurrentModuleObject ) + ": " + trim( cNumericFields( 12 ) ) + " must be > 0.0, for " + trim( cAlphaFields( 1 ) ) + " = " + trim( WaterCoil( CoilNum ).Name ) );
+				ShowSevereError( CurrentModuleObject + ": " + cNumericFields( 12 ) + " must be > 0.0, for " + cAlphaFields( 1 ) + " = " + WaterCoil( CoilNum ).Name );
 				ErrorsFound = true;
 			}
 			WaterCoil( CoilNum ).FinSpacing = NumArray( 13 );
@@ -566,10 +566,10 @@ namespace WaterCoils {
 			WaterCoil( CoilNum ).NumOfTubeRows = NumArray( 15 );
 			WaterCoil( CoilNum ).NumOfTubesPerRow = NumArray( 16 );
 			if ( WaterCoil( CoilNum ).NumOfTubesPerRow == AutoSize ) WaterCoil( CoilNum ).RequestingAutoSize = true;
-			WaterCoil( CoilNum ).WaterInletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
-			WaterCoil( CoilNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
-			WaterCoil( CoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			WaterCoil( CoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 6 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			WaterCoil( CoilNum ).WaterInletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+			WaterCoil( CoilNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+			WaterCoil( CoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			WaterCoil( CoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 6 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 			// A7 ; \field Name of Water Storage Tank for Condensate Collection
 			WaterCoil( CoilNum ).CondensateCollectName = AlphArray( 7 );
@@ -577,11 +577,11 @@ namespace WaterCoils {
 				WaterCoil( CoilNum ).CondensateCollectMode = CondensateDiscarded;
 			} else {
 				WaterCoil( CoilNum ).CondensateCollectMode = CondensateToTank;
-				SetupTankSupplyComponent( WaterCoil( CoilNum ).Name, trim( CurrentModuleObject ), WaterCoil( CoilNum ).CondensateCollectName, ErrorsFound, WaterCoil( CoilNum ).CondensateTankID, WaterCoil( CoilNum ).CondensateTankSupplyARRID );
+				SetupTankSupplyComponent( WaterCoil( CoilNum ).Name, CurrentModuleObject, WaterCoil( CoilNum ).CondensateCollectName, ErrorsFound, WaterCoil( CoilNum ).CondensateTankID, WaterCoil( CoilNum ).CondensateTankSupplyARRID );
 			}
 
-			TestCompSet( trim( CurrentModuleObject ), AlphArray( 1 ), AlphArray( 3 ), AlphArray( 4 ), "Water Nodes" );
-			TestCompSet( trim( CurrentModuleObject ), AlphArray( 1 ), AlphArray( 5 ), AlphArray( 6 ), "Air Nodes" );
+			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 3 ), AlphArray( 4 ), "Water Nodes" );
+			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 5 ), AlphArray( 6 ), "Air Nodes" );
 
 			// Setup Report variables for the Detailed Flat Fin Cooling Coils
 			SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", WaterCoil( CoilNum ).TotWaterCoolingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
@@ -608,12 +608,12 @@ namespace WaterCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), WaterCoil.Name(), CoilNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( AlphArray( 1 ), WaterCoil.Name(), CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
 			}
-			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, trim( CurrentModuleObject ) + " Name" );
+			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
 			}
@@ -624,7 +624,7 @@ namespace WaterCoils {
 			} else {
 				WaterCoil( CoilNum ).SchedPtr = GetScheduleIndex( AlphArray( 2 ) );
 				if ( WaterCoil( CoilNum ).SchedPtr == 0 ) {
-					ShowSevereError( trim( CurrentModuleObject ) + ": invalid " + trim( cAlphaFields( 2 ) ) + " entered =" + trim( AlphArray( 2 ) ) + " for " + trim( cAlphaFields( 1 ) ) + "=" + trim( AlphArray( 1 ) ) );
+					ShowSevereError( CurrentModuleObject + ": invalid " + cAlphaFields( 2 ) + " entered =" + AlphArray( 2 ) + " for " + cAlphaFields( 1 ) + '=' + AlphArray( 1 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -650,10 +650,10 @@ namespace WaterCoils {
 			WaterCoil( CoilNum ).DesOutletAirHumRat = NumArray( 7 ); //Leaving air humidity ratio  at Design
 			if ( WaterCoil( CoilNum ).DesOutletAirHumRat == AutoSize ) WaterCoil( CoilNum ).RequestingAutoSize = true;
 
-			WaterCoil( CoilNum ).WaterInletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
-			WaterCoil( CoilNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
-			WaterCoil( CoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			WaterCoil( CoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 6 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			WaterCoil( CoilNum ).WaterInletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+			WaterCoil( CoilNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+			WaterCoil( CoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			WaterCoil( CoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 6 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 			{ auto const SELECT_CASE_var( AlphArray( 7 ) );
 			//The default is SimpleAnalysis = 2.  and DetailedAnalysis   =1
@@ -685,11 +685,11 @@ namespace WaterCoils {
 				WaterCoil( CoilNum ).CondensateCollectMode = CondensateDiscarded;
 			} else {
 				WaterCoil( CoilNum ).CondensateCollectMode = CondensateToTank;
-				SetupTankSupplyComponent( WaterCoil( CoilNum ).Name, trim( CurrentModuleObject ), WaterCoil( CoilNum ).CondensateCollectName, ErrorsFound, WaterCoil( CoilNum ).CondensateTankID, WaterCoil( CoilNum ).CondensateTankSupplyARRID );
+				SetupTankSupplyComponent( WaterCoil( CoilNum ).Name, CurrentModuleObject, WaterCoil( CoilNum ).CondensateCollectName, ErrorsFound, WaterCoil( CoilNum ).CondensateTankID, WaterCoil( CoilNum ).CondensateTankSupplyARRID );
 			}
 
-			TestCompSet( trim( CurrentModuleObject ), AlphArray( 1 ), AlphArray( 3 ), AlphArray( 4 ), "Water Nodes" );
-			TestCompSet( trim( CurrentModuleObject ), AlphArray( 1 ), AlphArray( 5 ), AlphArray( 6 ), "Air Nodes" );
+			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 3 ), AlphArray( 4 ), "Water Nodes" );
+			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 5 ), AlphArray( 6 ), "Air Nodes" );
 
 			// Setup Report variables for the Design input Cooling Coils
 			SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", WaterCoil( CoilNum ).TotWaterCoolingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
@@ -986,11 +986,11 @@ namespace WaterCoils {
 							SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleHeatingCoilUAResidual, UA0, UA1, Par );
 							// if the numerical inversion failed, issue error messages.
 							if ( SolFla == -1 ) {
-								ShowSevereError( "Calculation of heating coil UA failed for coil " + trim( WaterCoil( CoilNum ).Name ) );
+								ShowSevereError( "Calculation of heating coil UA failed for coil " + WaterCoil( CoilNum ).Name );
 								ShowContinueError( "  Iteration limit exceeded in calculating coil UA" );
 								ShowFatalError( "Preceding error causes program termination" );
 							} else if ( SolFla == -2 ) {
-								ShowSevereError( "Calculation of heating coil UA failed for coil " + trim( WaterCoil( CoilNum ).Name ) );
+								ShowSevereError( "Calculation of heating coil UA failed for coil " + WaterCoil( CoilNum ).Name );
 								ShowContinueError( "  Bad starting values for UA" );
 								ShowFatalError( "Preceding error causes program termination" );
 							}
@@ -1028,15 +1028,15 @@ namespace WaterCoils {
 				//   be less than 1
 				TubeToFinDiamRatio = WaterCoil( CoilNum ).TubeOutsideDiam / WaterCoil( CoilNum ).EffectiveFinDiam;
 				if ( TubeToFinDiamRatio > 1.0 ) {
-					ShowWarningError( "InitWaterCoil: Detailed Flat Fin Coil, TubetoFinDiamRatio > 1.0, [" + trim( RoundSigDigits( TubeToFinDiamRatio, 4 ) ) + "]" );
+					ShowWarningError( "InitWaterCoil: Detailed Flat Fin Coil, TubetoFinDiamRatio > 1.0, [" + RoundSigDigits( TubeToFinDiamRatio, 4 ) + ']' );
 					// reset tube depth spacing and recalc dependent parameters
 					WaterCoil( CoilNum ).TubeDepthSpacing *= ( std::pow( TubeToFinDiamRatio, 2 ) + 0.1 );
 					WaterCoil( CoilNum ).CoilDepth = WaterCoil( CoilNum ).TubeDepthSpacing * WaterCoil( CoilNum ).NumOfTubeRows;
 					WaterCoil( CoilNum ).EffectiveFinDiam = std::sqrt( 4. * WaterCoil( CoilNum ).FinDiam * WaterCoil( CoilNum ).CoilDepth / ( Pi * WaterCoil( CoilNum ).NumOfTubeRows * WaterCoil( CoilNum ).NumOfTubesPerRow ) );
 					WaterCoil( CoilNum ).CoilEffectiveInsideDiam = 4. * WaterCoil( CoilNum ).MinAirFlowArea * WaterCoil( CoilNum ).CoilDepth / WaterCoil( CoilNum ).TotCoilOutsideSurfArea;
 					TubeToFinDiamRatio = WaterCoil( CoilNum ).TubeOutsideDiam / WaterCoil( CoilNum ).EffectiveFinDiam;
-					ShowContinueError( "  Resetting tube depth spacing to " + trim( RoundSigDigits( WaterCoil( CoilNum ).TubeDepthSpacing, 4 ) ) + " meters" );
-					ShowContinueError( "  Resetting coil depth to " + trim( RoundSigDigits( WaterCoil( CoilNum ).CoilDepth, 4 ) ) + " meters" );
+					ShowContinueError( "  Resetting tube depth spacing to " + RoundSigDigits( WaterCoil( CoilNum ).TubeDepthSpacing, 4 ) + " meters" );
+					ShowContinueError( "  Resetting coil depth to " + RoundSigDigits( WaterCoil( CoilNum ).CoilDepth, 4 ) + " meters" );
 				}
 
 				CalcDryFinEffCoef( TubeToFinDiamRatio, CoefSeries );
@@ -1086,13 +1086,13 @@ namespace WaterCoils {
 					DesSatEnthAtWaterInTemp = PsyHFnTdbW( WaterCoil( CoilNum ).DesInletWaterTemp, WaterCoil( CoilNum ).DesOutletAirHumRat ) - 0.0001;
 				}
 				if ( DesOutletAirEnth >= DesInletAirEnth || WaterCoil( CoilNum ).DesInletWaterTemp >= WaterCoil( CoilNum ).DesInletAirTemp ) {
-					ShowWarningError( "The design cooling capacity is zero for Coil:Cooling:Water " + trim( WaterCoil( CoilNum ).Name ) );
+					ShowWarningError( "The design cooling capacity is zero for Coil:Cooling:Water " + WaterCoil( CoilNum ).Name );
 					ShowContinueError( "  The maximum water flow rate for this coil will be set to zero and the coil will do no cooling." );
-					ShowContinueError( "  Check the following coil design inputs for problems: Tair,in = " + trim( RoundSigDigits( WaterCoil( CoilNum ).DesInletAirTemp, 4 ) ) );
-					ShowContinueError( "                                                       Wair,in = " + trim( RoundSigDigits( WaterCoil( CoilNum ).DesInletAirHumRat, 6 ) ) );
-					ShowContinueError( "                                                       Twater,in = " + trim( RoundSigDigits( WaterCoil( CoilNum ).DesInletWaterTemp, 4 ) ) );
-					ShowContinueError( "                                                       Tair,out = " + trim( RoundSigDigits( WaterCoil( CoilNum ).DesOutletAirTemp, 4 ) ) );
-					ShowContinueError( "                                                       Wair,out = " + trim( RoundSigDigits( WaterCoil( CoilNum ).DesOutletAirHumRat, 6 ) ) );
+					ShowContinueError( "  Check the following coil design inputs for problems: Tair,in = " + RoundSigDigits( WaterCoil( CoilNum ).DesInletAirTemp, 4 ) );
+					ShowContinueError( "                                                       Wair,in = " + RoundSigDigits( WaterCoil( CoilNum ).DesInletAirHumRat, 6 ) );
+					ShowContinueError( "                                                       Twater,in = " + RoundSigDigits( WaterCoil( CoilNum ).DesInletWaterTemp, 4 ) );
+					ShowContinueError( "                                                       Tair,out = " + RoundSigDigits( WaterCoil( CoilNum ).DesOutletAirTemp, 4 ) );
+					ShowContinueError( "                                                       Wair,out = " + RoundSigDigits( WaterCoil( CoilNum ).DesOutletAirHumRat, 6 ) );
 					WaterCoil( CoilNum ).MaxWaterVolFlowRate = 0.0;
 					WaterCoil( CoilNum ).MaxWaterMassFlowRate = 0.0;
 				}
@@ -1110,7 +1110,7 @@ namespace WaterCoils {
 						if ( ! NoSatCurveIntersect && ! BelowInletWaterTemp && ! CBFTooLarge ) {
 							goto Inlet_Conditions_Loop_exit; // coil UA calcs OK
 						} else {
-							ShowWarningError( "In calculating the design coil UA for Coil:Cooling:Water " + trim( WaterCoil( CoilNum ).Name ) );
+							ShowWarningError( "In calculating the design coil UA for Coil:Cooling:Water " + WaterCoil( CoilNum ).Name );
 							if ( NoSatCurveIntersect ) {
 								ShowContinueError( "no apparatus dew-point can be found for the initial entering and leaving conditions;" );
 							}
@@ -1123,14 +1123,14 @@ namespace WaterCoils {
 							if ( ! NoExitCondReset ) {
 								ShowContinueError( "the coil outlet design conditions will be changed to correct the problem." );
 							}
-							ShowContinueError( "The initial design conditions are: Tair,in = " + trim( RoundSigDigits( WaterCoil( CoilNum ).DesInletAirTemp, 4 ) ) );
-							ShowContinueError( "                                   Wair,in = " + trim( RoundSigDigits( WaterCoil( CoilNum ).DesInletAirHumRat, 6 ) ) );
-							ShowContinueError( "                                   Twater,in = " + trim( RoundSigDigits( WaterCoil( CoilNum ).DesInletWaterTemp, 4 ) ) );
-							ShowContinueError( "                                   Tair,out = " + trim( RoundSigDigits( WaterCoil( CoilNum ).DesOutletAirTemp, 4 ) ) );
-							ShowContinueError( "                                   Wair,out = " + trim( RoundSigDigits( WaterCoil( CoilNum ).DesOutletAirHumRat, 6 ) ) );
+							ShowContinueError( "The initial design conditions are: Tair,in = " + RoundSigDigits( WaterCoil( CoilNum ).DesInletAirTemp, 4 ) );
+							ShowContinueError( "                                   Wair,in = " + RoundSigDigits( WaterCoil( CoilNum ).DesInletAirHumRat, 6 ) );
+							ShowContinueError( "                                   Twater,in = " + RoundSigDigits( WaterCoil( CoilNum ).DesInletWaterTemp, 4 ) );
+							ShowContinueError( "                                   Tair,out = " + RoundSigDigits( WaterCoil( CoilNum ).DesOutletAirTemp, 4 ) );
+							ShowContinueError( "                                   Wair,out = " + RoundSigDigits( WaterCoil( CoilNum ).DesOutletAirHumRat, 6 ) );
 							if ( ! NoExitCondReset ) {
-								ShowContinueError( "The revised design conditions are: Tair,out = " + trim( RoundSigDigits( TOutNew, 4 ) ) );
-								ShowContinueError( "                                   Wair,out = " + trim( RoundSigDigits( WOutNew, 6 ) ) );
+								ShowContinueError( "The revised design conditions are: Tair,out = " + RoundSigDigits( TOutNew, 4 ) );
+								ShowContinueError( "                                   Wair,out = " + RoundSigDigits( WOutNew, 6 ) );
 								WaterCoil( CoilNum ).DesOutletAirHumRat = WOutNew;
 								WaterCoil( CoilNum ).DesOutletAirTemp = TOutNew;
 							}
@@ -1219,12 +1219,12 @@ namespace WaterCoils {
 						}
 
 						if ( DesEnthWaterOut > DesInletAirEnth ) {
-							ShowWarningError( "In calculating the design coil UA for Coil:Cooling:Water " + trim( WaterCoil( CoilNum ).Name ) );
+							ShowWarningError( "In calculating the design coil UA for Coil:Cooling:Water " + WaterCoil( CoilNum ).Name );
 							ShowContinueError( "the outlet chilled water design enthalpy is greater than the inlet air design enthalpy." );
-							ShowContinueError( "To correct this condition the design chilled water flow rate will be increased from " + trim( RoundSigDigits( WaterCoil( CoilNum ).MaxWaterVolFlowRate, 5 ) ) );
+							ShowContinueError( "To correct this condition the design chilled water flow rate will be increased from " + RoundSigDigits( WaterCoil( CoilNum ).MaxWaterVolFlowRate, 5 ) );
 							EnthCorrFrac = ( DesEnthWaterOut - DesInletAirEnth ) / ( DesEnthWaterOut - DesSatEnthAtWaterInTemp );
 							WaterCoil( CoilNum ).MaxWaterVolFlowRate *= ( 1.0 + 2.0 * EnthCorrFrac );
-							ShowContinueError( "to " + trim( RoundSigDigits( WaterCoil( CoilNum ).MaxWaterVolFlowRate, 5 ) ) + " m3/s" );
+							ShowContinueError( "to " + RoundSigDigits( WaterCoil( CoilNum ).MaxWaterVolFlowRate, 5 ) + " m3/s" );
 							WaterCoil( CoilNum ).MaxWaterMassFlowRate = rho * WaterCoil( CoilNum ).MaxWaterVolFlowRate;
 							DesOutletWaterTemp = WaterCoil( CoilNum ).DesInletWaterTemp + WaterCoil( CoilNum ).DesTotWaterCoilLoad / ( WaterCoil( CoilNum ).MaxWaterMassFlowRate * Cp );
 							DesSatEnthAtWaterOutTemp = PsyHFnTdbW( DesOutletWaterTemp, PsyWFnTdpPb( DesOutletWaterTemp, StdBaroPress ) );
@@ -1260,12 +1260,12 @@ namespace WaterCoils {
 					} else { // dry coil
 
 						if ( DesOutletWaterTemp > WaterCoil( CoilNum ).DesInletAirTemp ) {
-							ShowWarningError( "In calculating the design coil UA for Coil:Cooling:Water " + trim( WaterCoil( CoilNum ).Name ) );
+							ShowWarningError( "In calculating the design coil UA for Coil:Cooling:Water " + WaterCoil( CoilNum ).Name );
 							ShowContinueError( "the outlet chilled water design temperature is greater than the inlet air design temperature." );
-							ShowContinueError( "To correct this condition the design chilled water flow rate will be increased from " + trim( RoundSigDigits( WaterCoil( CoilNum ).MaxWaterVolFlowRate, 5 ) ) );
+							ShowContinueError( "To correct this condition the design chilled water flow rate will be increased from " + RoundSigDigits( WaterCoil( CoilNum ).MaxWaterVolFlowRate, 5 ) );
 							TempCorrFrac = ( DesOutletWaterTemp - WaterCoil( CoilNum ).DesInletAirTemp ) / ( DesOutletWaterTemp - WaterCoil( CoilNum ).DesInletWaterTemp );
 							WaterCoil( CoilNum ).MaxWaterVolFlowRate *= ( 1.0 + 2.0 * TempCorrFrac );
-							ShowContinueError( "to " + trim( RoundSigDigits( WaterCoil( CoilNum ).MaxWaterVolFlowRate, 5 ) ) + " m3/s" );
+							ShowContinueError( "to " + RoundSigDigits( WaterCoil( CoilNum ).MaxWaterVolFlowRate, 5 ) + " m3/s" );
 							WaterCoil( CoilNum ).MaxWaterMassFlowRate = rho * WaterCoil( CoilNum ).MaxWaterVolFlowRate;
 							DesOutletWaterTemp = WaterCoil( CoilNum ).DesInletWaterTemp + WaterCoil( CoilNum ).DesTotWaterCoilLoad / ( WaterCoil( CoilNum ).MaxWaterMassFlowRate * Cp );
 						}
@@ -1314,7 +1314,7 @@ namespace WaterCoils {
 				SolveRegulaFalsi( 0.001, MaxIte, SolFla, UA, SimpleCoolingCoilUAResidual, UA0, UA1, Par );
 				// if the numerical inversion failed, issue error messages.
 				if ( SolFla == -1 ) {
-					ShowSevereError( "Calculation of cooling coil design UA failed for coil " + trim( WaterCoil( CoilNum ).Name ) );
+					ShowSevereError( "Calculation of cooling coil design UA failed for coil " + WaterCoil( CoilNum ).Name );
 					ShowContinueError( "  Iteration limit exceeded in calculating coil UA" );
 					// CALL ShowFatalError('Preceeding error causes program termination')
 					WaterCoil( CoilNum ).UACoilExternal = UA0 * 10.0;
@@ -1324,9 +1324,9 @@ namespace WaterCoils {
 					WaterCoil( CoilNum ).UACoilInternalPerUnitArea = WaterCoil( CoilNum ).UACoilInternal / WaterCoil( CoilNum ).TotCoilOutsideSurfArea;
 					WaterCoil( CoilNum ).UAWetExtPerUnitArea = WaterCoil( CoilNum ).UACoilExternal / WaterCoil( CoilNum ).TotCoilOutsideSurfArea;
 					WaterCoil( CoilNum ).UADryExtPerUnitArea = WaterCoil( CoilNum ).UAWetExtPerUnitArea;
-					ShowContinueError( " Coil design UA set to " + trim( RoundSigDigits( WaterCoil( CoilNum ).UACoilTotal, 6 ) ) + " [W/C]" );
+					ShowContinueError( " Coil design UA set to " + RoundSigDigits( WaterCoil( CoilNum ).UACoilTotal, 6 ) + " [W/C]" );
 				} else if ( SolFla == -2 ) {
-					ShowSevereError( "Calculation of cooling coil design UA failed for coil " + trim( WaterCoil( CoilNum ).Name ) );
+					ShowSevereError( "Calculation of cooling coil design UA failed for coil " + WaterCoil( CoilNum ).Name );
 					ShowContinueError( "  Bad starting values for UA" );
 					// CALL ShowFatalError('Preceeding error causes program termination')
 					WaterCoil( CoilNum ).UACoilExternal = UA0 * 10.0;
@@ -1336,7 +1336,7 @@ namespace WaterCoils {
 					WaterCoil( CoilNum ).UACoilInternalPerUnitArea = WaterCoil( CoilNum ).UACoilInternal / WaterCoil( CoilNum ).TotCoilOutsideSurfArea;
 					WaterCoil( CoilNum ).UAWetExtPerUnitArea = WaterCoil( CoilNum ).UACoilExternal / WaterCoil( CoilNum ).TotCoilOutsideSurfArea;
 					WaterCoil( CoilNum ).UADryExtPerUnitArea = WaterCoil( CoilNum ).UAWetExtPerUnitArea;
-					ShowContinueError( " Coil design UA set to " + trim( RoundSigDigits( WaterCoil( CoilNum ).UACoilTotal, 6 ) ) + " [W/C]" );
+					ShowContinueError( " Coil design UA set to " + RoundSigDigits( WaterCoil( CoilNum ).UACoilTotal, 6 ) + " [W/C]" );
 				}
 
 				// cooling coil surface area
@@ -1418,7 +1418,7 @@ namespace WaterCoils {
 					PreDefTableEntry( pdchHeatCoilNomCap, WaterCoil( CoilNum ).Name, WaterCoil( CoilNum ).TotWaterHeatingCoilRate );
 					PreDefTableEntry( pdchHeatCoilNomEff, WaterCoil( CoilNum ).Name, "-" );
 					addFootNoteSubTable( pdstHeatCoil, "Nominal values are gross at rated conditions, i.e., the supply air fan" " heat and electric power NOT accounted for." );
-					gio::write( OutputFileInits, "(A)" ) << "Water Heating Coil Capacity Information,Coil:Heating:Water," + trim( WaterCoil( CoilNum ).Name ) + "," + trim( RoundSigDigits( WaterCoil( CoilNum ).TotWaterHeatingCoilRate, 2 ) );
+					gio::write( OutputFileInits, "(A)" ) << "Water Heating Coil Capacity Information,Coil:Heating:Water," + WaterCoil( CoilNum ).Name + ',' + RoundSigDigits( WaterCoil( CoilNum ).TotWaterHeatingCoilRate, 2 );
 				} else if ( SELECT_CASE_var == WaterCoil_DetFlatFinCooling ) {
 					if ( RptCoilHeaderFlag( 2 ) ) {
 						gio::write( OutputFileInits, "(A)" ) << "! <Water Cooling Coil Capacity Information>,Component Type,Name," "Nominal Total Capacity {W},Nominal Sensible Capacity {W},Nominal Latent Capacity {W}," "Nominal Sensible Heat Ratio";
@@ -1434,7 +1434,7 @@ namespace WaterCoils {
 					PreDefTableEntry( pdchCoolCoilSHR, WaterCoil( CoilNum ).Name, RatedSHR );
 					PreDefTableEntry( pdchCoolCoilNomEff, WaterCoil( CoilNum ).Name, "-" );
 					addFootNoteSubTable( pdstCoolCoil, "Nominal values are gross at rated conditions, i.e., the supply air fan" " heat and electric power NOT accounted for." );
-					gio::write( OutputFileInits, "(A)" ) << "Water Cooling Coil Capacity Information,Coil:Cooling:Water:DetailedGeometry," + trim( WaterCoil( CoilNum ).Name ) + "," + trim( RoundSigDigits( WaterCoil( CoilNum ).TotWaterCoolingCoilRate, 2 ) ) + "," + trim( RoundSigDigits( WaterCoil( CoilNum ).SenWaterCoolingCoilRate, 2 ) ) + "," + trim( RoundSigDigits( RatedLatentCapacity, 2 ) ) + "," + trim( RoundSigDigits( RatedSHR, 2 ) );
+					gio::write( OutputFileInits, "(A)" ) << "Water Cooling Coil Capacity Information,Coil:Cooling:Water:DetailedGeometry," + WaterCoil( CoilNum ).Name + ',' + RoundSigDigits( WaterCoil( CoilNum ).TotWaterCoolingCoilRate, 2 ) + ',' + RoundSigDigits( WaterCoil( CoilNum ).SenWaterCoolingCoilRate, 2 ) + ',' + RoundSigDigits( RatedLatentCapacity, 2 ) + ',' + RoundSigDigits( RatedSHR, 2 );
 				} else if ( SELECT_CASE_var == WaterCoil_Cooling ) {
 					if ( RptCoilHeaderFlag( 2 ) ) {
 						gio::write( OutputFileInits, "(A)" ) << "! <Water Cooling Coil Capacity Information>,Component Type,Name," "Nominal Total Capacity {W},Nominal Sensible Capacity {W},Nominal Latent Capacity {W}," "Nominal Sensible Heat Ratio, Nominal Coil UA Value {W/C}, Nominal Coil Surface Area {m2}";
@@ -1452,7 +1452,7 @@ namespace WaterCoils {
 					PreDefTableEntry( pdchCoolCoilUATotal, WaterCoil( CoilNum ).Name, WaterCoil( CoilNum ).UACoilTotal );
 					PreDefTableEntry( pdchCoolCoilArea, WaterCoil( CoilNum ).Name, WaterCoil( CoilNum ).TotCoilOutsideSurfArea );
 					addFootNoteSubTable( pdstCoolCoil, "Nominal values are gross at rated conditions, i.e., the supply air fan" " heat and electric power NOT accounted for." );
-					gio::write( OutputFileInits, "(A)" ) << "Water Cooling Coil Capacity Information,Coil:Cooling:Water," + trim( WaterCoil( CoilNum ).Name ) + "," + trim( RoundSigDigits( WaterCoil( CoilNum ).TotWaterCoolingCoilRate, 2 ) ) + "," + trim( RoundSigDigits( WaterCoil( CoilNum ).SenWaterCoolingCoilRate, 2 ) ) + "," + trim( RoundSigDigits( RatedLatentCapacity, 2 ) ) + "," + trim( RoundSigDigits( RatedSHR, 2 ) ) + "," + trim( RoundSigDigits( UATotal, 2 ) ) + "," + trim( RoundSigDigits( SurfaceArea, 2 ) );
+					gio::write( OutputFileInits, "(A)" ) << "Water Cooling Coil Capacity Information,Coil:Cooling:Water," + WaterCoil( CoilNum ).Name + ',' + RoundSigDigits( WaterCoil( CoilNum ).TotWaterCoolingCoilRate, 2 ) + ',' + RoundSigDigits( WaterCoil( CoilNum ).SenWaterCoolingCoilRate, 2 ) + ',' + RoundSigDigits( RatedLatentCapacity, 2 ) + ',' + RoundSigDigits( RatedSHR, 2 ) + ',' + RoundSigDigits( UATotal, 2 ) + ',' + RoundSigDigits( SurfaceArea, 2 );
 				}}
 				if ( WaterCoil( CoilNum ).DesWaterCoolingCoilRate <= 0.0 ) WaterCoil( CoilNum ).DesWaterCoolingCoilRate = WaterCoil( CoilNum ).TotWaterCoolingCoilRate;
 				if ( WaterCoil( CoilNum ).DesWaterHeatingCoilRate <= 0.0 ) WaterCoil( CoilNum ).DesWaterHeatingCoilRate = WaterCoil( CoilNum ).TotWaterHeatingCoilRate;
@@ -1878,16 +1878,16 @@ namespace WaterCoils {
 						}
 						// None of these IF tests for ".and. WaterCoil(CoilNum)%WaterCoilModel==CoilModel_Cooling" are needed inside the outermost IF block
 						if ( ( CoilOutHumRat > CoilInHumRat ) && ( WaterCoil( CoilNum ).WaterCoilModel == CoilModel_Cooling ) ) {
-							ShowWarningError( "SizeWaterCoil: Coil=\"" + trim( WaterCoil( CoilNum ).Name ) + "\", Cooling Coil has leaving humidity ratio > entering humidity ratio." );
-							ShowContinueError( "    Wair,in =  " + trim( RoundSigDigits( CoilInHumRat, 6 ) ) );
-							ShowContinueError( "    Wair,out = " + trim( RoundSigDigits( CoilOutHumRat, 6 ) ) );
+							ShowWarningError( "SizeWaterCoil: Coil=\"" + WaterCoil( CoilNum ).Name + "\", Cooling Coil has leaving humidity ratio > entering humidity ratio." );
+							ShowContinueError( "    Wair,in =  " + RoundSigDigits( CoilInHumRat, 6 ) );
+							ShowContinueError( "    Wair,out = " + RoundSigDigits( CoilOutHumRat, 6 ) );
 							if ( CoilInHumRat > 0.016 ) {
 								CoilOutHumRat = 0.5 * CoilInHumRat;
 							} else {
 								CoilOutHumRat = CoilInHumRat;
 							}
 							ShowContinueError( "....coil chilled water flow rate will be sized using:" );
-							ShowContinueError( "    Wair,out = " + trim( RoundSigDigits( CoilOutHumRat, 6 ) ) );
+							ShowContinueError( "    Wair,out = " + RoundSigDigits( CoilOutHumRat, 6 ) );
 						}
 						DesCoilLoad = WaterCoil( CoilNum ).InletAirMassFlowRate * ( PsyHFnTdbW( CoilInTemp, CoilInHumRat ) - PsyHFnTdbW( CoilOutTemp, CoilOutHumRat ) );
 						if ( CurOASysNum > 0 ) {
@@ -1900,7 +1900,7 @@ namespace WaterCoils {
 							MaxWaterVolFlowRateDes = DesCoilLoad / ( CoilDesWaterDeltaT * Cp * rho );
 						} else {
 							MaxWaterVolFlowRateDes = 0.0;
-							ShowWarningError( "The design coil load is zero for Coil:Cooling:Water " + trim( WaterCoil( CoilNum ).Name ) );
+							ShowWarningError( "The design coil load is zero for Coil:Cooling:Water " + WaterCoil( CoilNum ).Name );
 							ShowContinueError( "The autosize value for max water flow rate is zero" );
 						}
 						WaterCoil( CoilNum ).DesWaterCoolingCoilRate = DesCoilLoad;
@@ -1923,9 +1923,9 @@ namespace WaterCoils {
 									ReportSizingOutput( "Coil:Cooling:Water:DetailedGeometry", WaterCoil( CoilNum ).Name, "Design Size Maximum Water Flow Rate [m3/s]", MaxWaterVolFlowRateDes, "User-Specified Maximum Water Flow Rate [m3/s]", MaxWaterVolFlowRateUser );
 									if ( DisplayExtraWarnings ) {
 										if ( ( std::abs( MaxWaterVolFlowRateDes - MaxWaterVolFlowRateUser ) / MaxWaterVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-											ShowContinueError( "User-Specified Maximum Water Flow Rate of " + trim( RoundSigDigits( MaxWaterVolFlowRateUser, 5 ) ) + " [m3/s]" );
-											ShowContinueError( "differs from Design Size Maximum Water Flow Rate of " + trim( RoundSigDigits( MaxWaterVolFlowRateDes, 5 ) ) + " [m3/s]" );
+											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+											ShowContinueError( "User-Specified Maximum Water Flow Rate of " + RoundSigDigits( MaxWaterVolFlowRateUser, 5 ) + " [m3/s]" );
+											ShowContinueError( "differs from Design Size Maximum Water Flow Rate of " + RoundSigDigits( MaxWaterVolFlowRateDes, 5 ) + " [m3/s]" );
 											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 										}
@@ -1934,9 +1934,9 @@ namespace WaterCoils {
 									ReportSizingOutput( "Coil:Cooling:Water", WaterCoil( CoilNum ).Name, "Design Size Design Water Flow Rate [m3/s]", MaxWaterVolFlowRateDes, "User-Specified Design Water Flow Rate [m3/s]", MaxWaterVolFlowRateUser );
 									if ( DisplayExtraWarnings ) {
 										if ( ( std::abs( MaxWaterVolFlowRateDes - MaxWaterVolFlowRateUser ) / MaxWaterVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-											ShowContinueError( "User-Specified Design Water Flow Rate of " + trim( RoundSigDigits( MaxWaterVolFlowRateUser, 5 ) ) + " [m3/s]" );
-											ShowContinueError( "differs from Design Size Design Water Flow Rate of " + trim( RoundSigDigits( MaxWaterVolFlowRateDes, 5 ) ) + " [m3/s]" );
+											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+											ShowContinueError( "User-Specified Design Water Flow Rate of " + RoundSigDigits( MaxWaterVolFlowRateUser, 5 ) + " [m3/s]" );
+											ShowContinueError( "differs from Design Size Design Water Flow Rate of " + RoundSigDigits( MaxWaterVolFlowRateDes, 5 ) + " [m3/s]" );
 											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 										}
@@ -1970,7 +1970,7 @@ namespace WaterCoils {
 							}
 							if ( DesAirVolFlowRateDes <= 0.0 ) {
 								DesAirVolFlowRateDes = 0.0;
-								ShowWarningError( "The design air flow rate is zero for Coil:Cooling:Water " + trim( WaterCoil( CoilNum ).Name ) );
+								ShowWarningError( "The design air flow rate is zero for Coil:Cooling:Water " + WaterCoil( CoilNum ).Name );
 								ShowContinueError( "The autosize value for max air volume flow rate is zero" );
 							}
 							if ( IsAutoSize ) {
@@ -1985,9 +1985,9 @@ namespace WaterCoils {
 										ReportSizingOutput( "Coil:Cooling:Water", WaterCoil( CoilNum ).Name, "Design Size Design Air Flow Rate [m3/s]", DesAirVolFlowRateDes, "User-Specified Design Air Flow Rate [m3/s]", DesAirVolFlowRateUser );
 										if ( DisplayExtraWarnings ) {
 											if ( ( std::abs( DesAirVolFlowRateDes - DesAirVolFlowRateUser ) / DesAirVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-												ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-												ShowContinueError( "User-Specified Design Air Flow Rate of " + trim( RoundSigDigits( DesAirVolFlowRateUser, 5 ) ) + " [m3/s]" );
-												ShowContinueError( "differs from Design Size Design Air Flow Rate of " + trim( RoundSigDigits( DesAirVolFlowRateDes, 5 ) ) + " [m3/s]" );
+												ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+												ShowContinueError( "User-Specified Design Air Flow Rate of " + RoundSigDigits( DesAirVolFlowRateUser, 5 ) + " [m3/s]" );
+												ShowContinueError( "differs from Design Size Design Air Flow Rate of " + RoundSigDigits( DesAirVolFlowRateDes, 5 ) + " [m3/s]" );
 												ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 												ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 											}
@@ -2024,9 +2024,9 @@ namespace WaterCoils {
 									ReportSizingOutput( "Coil:Cooling:Water", WaterCoil( CoilNum ).Name, "Design Size Design Inlet Air Temperature [C]", DesInletAirtempDes, "User-Specified Design Inlet Air Temperature [C]", DesInletAirtempUser );
 									if ( DisplayExtraWarnings ) {
 										if ( std::abs( DesInletAirtempDes - DesInletAirtempUser ) > AutoVsHardSizingDeltaTempThreshold ) {
-											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-											ShowContinueError( "User-Specified Design Inlet Air Temperature of " + trim( RoundSigDigits( DesInletAirtempUser, 2 ) ) + " [C]" );
-											ShowContinueError( "differs from Design Size Design Inlet Air Temperature of " + trim( RoundSigDigits( DesInletAirtempDes, 2 ) ) + " [C]" );
+											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+											ShowContinueError( "User-Specified Design Inlet Air Temperature of " + RoundSigDigits( DesInletAirtempUser, 2 ) + " [C]" );
+											ShowContinueError( "differs from Design Size Design Inlet Air Temperature of " + RoundSigDigits( DesInletAirtempDes, 2 ) + " [C]" );
 											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 										}
@@ -2048,9 +2048,9 @@ namespace WaterCoils {
 									ReportSizingOutput( "Coil:Cooling:Water", WaterCoil( CoilNum ).Name, "Design Size Design Inlet Water Temperature [C]", DesInletWaterTempDes, "User-Specified Design Inlet Water Temperature [C]", DesInletWaterTempUser );
 									if ( DisplayExtraWarnings ) {
 										if ( std::abs( DesInletWaterTempDes - DesInletWaterTempUser ) > AutoVsHardSizingDeltaTempThreshold ) {
-											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-											ShowContinueError( "User-Specified Design Inlet Water Temperature of " + trim( RoundSigDigits( DesInletWaterTempUser, 2 ) ) + " [C]" );
-											ShowContinueError( "differs from Design Size Design Inlet Water Temperature of " + trim( RoundSigDigits( DesInletWaterTempDes, 2 ) ) + " [C]" );
+											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+											ShowContinueError( "User-Specified Design Inlet Water Temperature of " + RoundSigDigits( DesInletWaterTempUser, 2 ) + " [C]" );
+											ShowContinueError( "differs from Design Size Design Inlet Water Temperature of " + RoundSigDigits( DesInletWaterTempDes, 2 ) + " [C]" );
 											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 										}
@@ -2068,12 +2068,12 @@ namespace WaterCoils {
 								DesOutletAirTempDes = FinalSysSizing( CurSysNum ).CoolSupTemp;
 							}
 							if ( DesOutletAirTempDes < WaterCoil( CoilNum ).DesInletWaterTemp && WaterCoil( CoilNum ).MaxWaterVolFlowRate > 0.0 ) {
-								ShowWarningError( "SizeWaterCoil: Coil=\"" + trim( WaterCoil( CoilNum ).Name ) + "\", Cooling Coil has leaving air temperature > entering water temperature." );
-								ShowContinueError( "    Tair,out  =  " + trim( RoundSigDigits( DesOutletAirTempDes, 3 ) ) );
-								ShowContinueError( "    Twater,in = " + trim( RoundSigDigits( WaterCoil( CoilNum ).DesInletWaterTemp, 3 ) ) );
+								ShowWarningError( "SizeWaterCoil: Coil=\"" + WaterCoil( CoilNum ).Name + "\", Cooling Coil has leaving air temperature > entering water temperature." );
+								ShowContinueError( "    Tair,out  =  " + RoundSigDigits( DesOutletAirTempDes, 3 ) );
+								ShowContinueError( "    Twater,in = " + RoundSigDigits( WaterCoil( CoilNum ).DesInletWaterTemp, 3 ) );
 								DesOutletAirTempDes = WaterCoil( CoilNum ).DesInletWaterTemp + 0.5;
 								ShowContinueError( "....coil leaving air temperature will be reset to:" );
-								ShowContinueError( "    Tair,out = " + trim( RoundSigDigits( DesOutletAirTempDes, 3 ) ) );
+								ShowContinueError( "    Tair,out = " + RoundSigDigits( DesOutletAirTempDes, 3 ) );
 							}
 							if ( IsAutoSize ) {
 								WaterCoil( CoilNum ).DesOutletAirTemp = DesOutletAirTempDes;
@@ -2084,9 +2084,9 @@ namespace WaterCoils {
 									ReportSizingOutput( "Coil:Cooling:Water", WaterCoil( CoilNum ).Name, "Design Size Design Outlet Air Temperature [C]", DesOutletAirTempDes, "User-Specified Design Outlet Air Temperature [C]", DesOutletAirTempUser );
 									if ( DisplayExtraWarnings ) {
 										if ( std::abs( DesOutletAirTempDes - DesOutletAirTempUser ) > AutoVsHardSizingDeltaTempThreshold ) {
-											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-											ShowContinueError( "User-Specified Design Outlet Air Temperature of " + trim( RoundSigDigits( DesOutletAirTempUser, 2 ) ) + " [C]" );
-											ShowContinueError( "differs from Design Size Design Outlet Air Temperature of " + trim( RoundSigDigits( DesOutletAirTempDes, 2 ) ) + " [C]" );
+											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+											ShowContinueError( "User-Specified Design Outlet Air Temperature of " + RoundSigDigits( DesOutletAirTempUser, 2 ) + " [C]" );
+											ShowContinueError( "differs from Design Size Design Outlet Air Temperature of " + RoundSigDigits( DesOutletAirTempDes, 2 ) + " [C]" );
 											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 										}
@@ -2122,9 +2122,9 @@ namespace WaterCoils {
 									ReportSizingOutput( "Coil:Cooling:Water", WaterCoil( CoilNum ).Name, "Design Size Design Inlet Air Humidity Ratio", DesInletAirHumRatDes, "User-Specified Design Inlet Air Humidity Ratio", DesInletAirHumRatUser );
 									if ( DisplayExtraWarnings ) {
 										if ( ( std::abs( DesInletAirHumRatDes - DesInletAirHumRatUser ) / DesInletAirHumRatUser ) > AutoVsHardSizingThreshold ) {
-											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-											ShowContinueError( "User-Specified Design Inlet Air Humidity Ratio of " + trim( RoundSigDigits( DesInletAirHumRatUser, 6 ) ) );
-											ShowContinueError( "differs from Design Size Design Inlet Air Humidity Ratio of " + trim( RoundSigDigits( DesInletAirHumRatDes, 6 ) ) );
+											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+											ShowContinueError( "User-Specified Design Inlet Air Humidity Ratio of " + RoundSigDigits( DesInletAirHumRatUser, 6 ) );
+											ShowContinueError( "differs from Design Size Design Inlet Air Humidity Ratio of " + RoundSigDigits( DesInletAirHumRatDes, 6 ) );
 											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 										}
@@ -2142,16 +2142,16 @@ namespace WaterCoils {
 								DesOutletAirHumRatDes = FinalSysSizing( CurSysNum ).CoolSupHumRat;
 							}
 							if ( DesOutletAirHumRatDes > WaterCoil( CoilNum ).DesInletAirHumRat && WaterCoil( CoilNum ).MaxWaterVolFlowRate > 0.0 ) {
-								ShowWarningError( "SizeWaterCoil: Coil=\"" + trim( WaterCoil( CoilNum ).Name ) + "\", Cooling Coil has leaving humidity ratio > entering humidity ratio." );
-								ShowContinueError( "    Wair,in =  " + trim( RoundSigDigits( WaterCoil( CoilNum ).DesInletAirHumRat, 6 ) ) );
-								ShowContinueError( "    Wair,out = " + trim( RoundSigDigits( DesOutletAirHumRatDes, 6 ) ) );
+								ShowWarningError( "SizeWaterCoil: Coil=\"" + WaterCoil( CoilNum ).Name + "\", Cooling Coil has leaving humidity ratio > entering humidity ratio." );
+								ShowContinueError( "    Wair,in =  " + RoundSigDigits( WaterCoil( CoilNum ).DesInletAirHumRat, 6 ) );
+								ShowContinueError( "    Wair,out = " + RoundSigDigits( DesOutletAirHumRatDes, 6 ) );
 								if ( WaterCoil( CoilNum ).DesInletAirHumRat > .016 ) {
 									DesOutletAirHumRatDes = 0.5 * WaterCoil( CoilNum ).DesInletAirHumRat;
 								} else {
 									DesOutletAirHumRatDes = WaterCoil( CoilNum ).DesInletAirHumRat;
 								}
 								ShowContinueError( "....coil leaving humidity ratio will be reset to:" );
-								ShowContinueError( "    Wair,out = " + trim( RoundSigDigits( DesOutletAirHumRatDes, 6 ) ) );
+								ShowContinueError( "    Wair,out = " + RoundSigDigits( DesOutletAirHumRatDes, 6 ) );
 							}
 
 							// check for dry coil and reset outlet humrat if needed
@@ -2159,12 +2159,12 @@ namespace WaterCoils {
 							DesHumRatAtWaterInTemp = PsyWFnTdbH( WaterCoil( CoilNum ).DesInletWaterTemp, DesSatEnthAtWaterInTemp, "InitWaterCoil" );
 							if ( DesOutletAirHumRatDes < WaterCoil( CoilNum ).DesInletAirHumRat && DesHumRatAtWaterInTemp > WaterCoil( CoilNum ).DesInletAirHumRat && WaterCoil( CoilNum ).MaxWaterVolFlowRate > 0.0 ) {
 								if ( WaterCoil( CoilNum ).DesInletAirHumRat > DesOutletAirHumRatDes ) {
-									ShowWarningError( "SizeWaterCoil: Coil=\"" + trim( WaterCoil( CoilNum ).Name ) + "\", Cooling Coil is dry and has air leaving humidity ratio < entering humidity ratio." );
-									ShowContinueError( "    Wair,in =  " + trim( RoundSigDigits( WaterCoil( CoilNum ).DesInletAirHumRat, 6 ) ) );
-									ShowContinueError( "    Wair,out = " + trim( RoundSigDigits( DesOutletAirHumRatDes, 6 ) ) );
+									ShowWarningError( "SizeWaterCoil: Coil=\"" + WaterCoil( CoilNum ).Name + "\", Cooling Coil is dry and has air leaving humidity ratio < entering humidity ratio." );
+									ShowContinueError( "    Wair,in =  " + RoundSigDigits( WaterCoil( CoilNum ).DesInletAirHumRat, 6 ) );
+									ShowContinueError( "    Wair,out = " + RoundSigDigits( DesOutletAirHumRatDes, 6 ) );
 									DesOutletAirHumRatDes = WaterCoil( CoilNum ).DesInletAirHumRat;
 									ShowContinueError( "....coil leaving humidity ratio will be reset to:" );
-									ShowContinueError( "    Wair,out = " + trim( RoundSigDigits( DesOutletAirHumRatDes, 6 ) ) );
+									ShowContinueError( "    Wair,out = " + RoundSigDigits( DesOutletAirHumRatDes, 6 ) );
 								}
 							}
 							if ( IsAutoSize ) {
@@ -2176,9 +2176,9 @@ namespace WaterCoils {
 									ReportSizingOutput( "Coil:Cooling:Water", WaterCoil( CoilNum ).Name, "Design Size Design Outlet Air Humidity Ratio", DesOutletAirHumRatDes, "User-Specified Design Outlet Air Humidity Ratio", DesOutletAirHumRatUser );
 									if ( DisplayExtraWarnings ) {
 										if ( ( std::abs( DesOutletAirHumRatDes - DesOutletAirHumRatUser ) / DesOutletAirHumRatUser ) > AutoVsHardSizingThreshold ) {
-											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-											ShowContinueError( "User-Specified Design Outlet Air Humidity Ratio of " + trim( RoundSigDigits( DesOutletAirHumRatUser, 6 ) ) );
-											ShowContinueError( "differs from Design Size Design Outlet Air Humidity Ratio of " + trim( RoundSigDigits( DesOutletAirHumRatDes, 6 ) ) );
+											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+											ShowContinueError( "User-Specified Design Outlet Air Humidity Ratio of " + RoundSigDigits( DesOutletAirHumRatUser, 6 ) );
+											ShowContinueError( "differs from Design Size Design Outlet Air Humidity Ratio of " + RoundSigDigits( DesOutletAirHumRatDes, 6 ) );
 											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 										}
@@ -2202,9 +2202,9 @@ namespace WaterCoils {
 								ReportSizingOutput( "Coil:Cooling:Water:DetailedGeometry", WaterCoil( CoilNum ).Name, "Design Size Number of Tubes per Row", NumofTubesperRowDes, "User-Specified Number of Tubes per Row", NumofTubesperRowUser );
 								if ( DisplayExtraWarnings ) {
 									if ( ( std::abs( NumofTubesperRowDes - NumofTubesperRowUser ) / NumofTubesperRowUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-										ShowContinueError( "User-Specified Number of Tubes per Row of " + trim( RoundSigDigits( NumofTubesperRowUser, 1 ) ) );
-										ShowContinueError( "differs from Design Size Number of Tubes per Row of " + trim( RoundSigDigits( NumofTubesperRowDes, 1 ) ) );
+										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+										ShowContinueError( "User-Specified Number of Tubes per Row of " + RoundSigDigits( NumofTubesperRowUser, 1 ) );
+										ShowContinueError( "differs from Design Size Number of Tubes per Row of " + RoundSigDigits( NumofTubesperRowDes, 1 ) );
 										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 									}
@@ -2242,9 +2242,9 @@ namespace WaterCoils {
 								ReportSizingOutput( "Coil:Cooling:Water:DetailedGeometry", WaterCoil( CoilNum ).Name, "Design Size Fin Diameter [m]", FinDiamDes, "User-Specified Fin Diameter [m]", FinDiamUser );
 								if ( DisplayExtraWarnings ) {
 									if ( ( std::abs( FinDiamDes - FinDiamUser ) / FinDiamUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-										ShowContinueError( "User-Specified Fin Diameter of " + trim( RoundSigDigits( FinDiamUser, 6 ) ) + " [m]" );
-										ShowContinueError( "differs from Design Size Fin Diameter of " + trim( RoundSigDigits( FinDiamUser, 6 ) ) + " [m]" );
+										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+										ShowContinueError( "User-Specified Fin Diameter of " + RoundSigDigits( FinDiamUser, 6 ) + " [m]" );
+										ShowContinueError( "differs from Design Size Fin Diameter of " + RoundSigDigits( FinDiamUser, 6 ) + " [m]" );
 										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 									}
@@ -2282,9 +2282,9 @@ namespace WaterCoils {
 								ReportSizingOutput( "Coil:Cooling:Water:DetailedGeometry", WaterCoil( CoilNum ).Name, "Design Size Minimum Airflow Area [m2]", MinAirFlowAreaDes, "User-Specified Minimum Airflow Area [m2]", MinAirFlowAreaUser );
 								if ( DisplayExtraWarnings ) {
 									if ( ( std::abs( MinAirFlowAreaDes - MinAirFlowAreaUser ) / MinAirFlowAreaUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-										ShowContinueError( "User-Specified Minimum Airflow Area of " + trim( RoundSigDigits( MinAirFlowAreaUser, 6 ) ) + " [m2]" );
-										ShowContinueError( "differs from Design Size Minimum Airflow Area of " + trim( RoundSigDigits( MinAirFlowAreaDes, 6 ) ) + " [m2]" );
+										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+										ShowContinueError( "User-Specified Minimum Airflow Area of " + RoundSigDigits( MinAirFlowAreaUser, 6 ) + " [m2]" );
+										ShowContinueError( "differs from Design Size Minimum Airflow Area of " + RoundSigDigits( MinAirFlowAreaDes, 6 ) + " [m2]" );
 										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 									}
@@ -2293,8 +2293,8 @@ namespace WaterCoils {
 						}
 
 						if ( MinAirFlowAreaDes <= 0.0 && WaterCoil( CoilNum ).WaterCoilModel == CoilModel_Detailed ) {
-							ShowSevereError( "Coil:Cooling:Water:DetailedGeometry: \"" + trim( WaterCoil( CoilNum ).Name ) + "\"" );
-							ShowContinueError( "Coil Minimum Airflow Area must be greater than 0. Coil area = " + trim( TrimSigDigits( MinAirFlowAreaDes, 6 ) ) );
+							ShowSevereError( "Coil:Cooling:Water:DetailedGeometry: \"" + WaterCoil( CoilNum ).Name + "\"" );
+							ShowContinueError( "Coil Minimum Airflow Area must be greater than 0. Coil area = " + TrimSigDigits( MinAirFlowAreaDes, 6 ) );
 							ErrorsFound = true;
 						}
 
@@ -2328,9 +2328,9 @@ namespace WaterCoils {
 								ReportSizingOutput( "Coil:Cooling:Water:DetailedGeometry", WaterCoil( CoilNum ).Name, "Design Size Fin Surface Area [m2]", FinSurfAreaDes, "User-Specified Fin Surface Area [m2]", FinSurfAreaUser );
 								if ( DisplayExtraWarnings ) {
 									if ( ( std::abs( FinSurfAreaDes - FinSurfAreaUser ) / FinSurfAreaUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-										ShowContinueError( "User-Specified Fin Surface Area of " + trim( RoundSigDigits( FinSurfAreaUser, 6 ) ) + " [m2]" );
-										ShowContinueError( "differs from Design Size Fin Surface Area of " + trim( RoundSigDigits( FinSurfAreaDes, 6 ) ) + " [m2]" );
+										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+										ShowContinueError( "User-Specified Fin Surface Area of " + RoundSigDigits( FinSurfAreaUser, 6 ) + " [m2]" );
+										ShowContinueError( "differs from Design Size Fin Surface Area of " + RoundSigDigits( FinSurfAreaDes, 6 ) + " [m2]" );
 										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 									}
@@ -2352,9 +2352,9 @@ namespace WaterCoils {
 								ReportSizingOutput( "Coil:Cooling:Water:DetailedGeometry", WaterCoil( CoilNum ).Name, "Design Size Total Tube Inside Area [m2]", TotTubeInsideAreaDes, "User-Specified Total Tube Inside Area [m2]", TotTubeInsideAreaUser );
 								if ( DisplayExtraWarnings ) {
 									if ( ( std::abs( TotTubeInsideAreaDes - TotTubeInsideAreaUser ) / TotTubeInsideAreaUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-										ShowContinueError( "User-Specified Total Tube Inside Area of " + trim( RoundSigDigits( TotTubeInsideAreaUser, 6 ) ) + " [m2]" );
-										ShowContinueError( "differs from Design Size Total Tube Inside Area of " + trim( RoundSigDigits( TotTubeInsideAreaDes, 6 ) ) + " [m2]" );
+										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+										ShowContinueError( "User-Specified Total Tube Inside Area of " + RoundSigDigits( TotTubeInsideAreaUser, 6 ) + " [m2]" );
+										ShowContinueError( "differs from Design Size Total Tube Inside Area of " + RoundSigDigits( TotTubeInsideAreaDes, 6 ) + " [m2]" );
 										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 									}
@@ -2376,9 +2376,9 @@ namespace WaterCoils {
 								ReportSizingOutput( "Coil:Cooling:Water:DetailedGeometry", WaterCoil( CoilNum ).Name, "Design Size Tube Outside Surface Area [m2]", TubeOutsideSurfAreaDes, "User-Specified Tube Outside Surface Area [m2]", TubeOutsideSurfAreaUser );
 								if ( DisplayExtraWarnings ) {
 									if ( ( std::abs( TubeOutsideSurfAreaDes - TubeOutsideSurfAreaUser ) / TubeOutsideSurfAreaUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-										ShowContinueError( "User-Specified Tube Outside Surface Area of " + trim( RoundSigDigits( TubeOutsideSurfAreaUser, 6 ) ) + " [m2]" );
-										ShowContinueError( "differs from Design Size Tube Outside Surface Area of " + trim( RoundSigDigits( TubeOutsideSurfAreaDes, 6 ) ) + " [m2]" );
+										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+										ShowContinueError( "User-Specified Tube Outside Surface Area of " + RoundSigDigits( TubeOutsideSurfAreaUser, 6 ) + " [m2]" );
+										ShowContinueError( "differs from Design Size Tube Outside Surface Area of " + RoundSigDigits( TubeOutsideSurfAreaDes, 6 ) + " [m2]" );
 										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 									}
@@ -2387,8 +2387,8 @@ namespace WaterCoils {
 						}
 						if ( IsAutoSize ) {
 							if ( ( WaterCoil( CoilNum ).FinSurfArea + WaterCoil( CoilNum ).TubeOutsideSurfArea ) <= 0.0 && WaterCoil( CoilNum ).WaterCoilModel == CoilModel_Detailed ) {
-								ShowSevereError( "Coil:Cooling:Water:DetailedGeometry: \"" + trim( WaterCoil( CoilNum ).Name ) + "\"" );
-								ShowContinueError( "Coil Fin Surface Area plus Coil Tube Outside Surface Area must be greater than 0." " Total surface area = " + trim( TrimSigDigits( ( WaterCoil( CoilNum ).FinSurfArea + WaterCoil( CoilNum ).TubeOutsideSurfArea ), 6 ) ) );
+								ShowSevereError( "Coil:Cooling:Water:DetailedGeometry: \"" + WaterCoil( CoilNum ).Name + "\"" );
+								ShowContinueError( "Coil Fin Surface Area plus Coil Tube Outside Surface Area must be greater than 0." " Total surface area = " + TrimSigDigits( ( WaterCoil( CoilNum ).FinSurfArea + WaterCoil( CoilNum ).TubeOutsideSurfArea ), 6 ) );
 								ErrorsFound = true;
 							}
 						}
@@ -2406,9 +2406,9 @@ namespace WaterCoils {
 								ReportSizingOutput( "Coil:Cooling:Water:DetailedGeometry", WaterCoil( CoilNum ).Name, "Design Size Coil Depth [m]", CoilDepthDes, "User-Specified Coil Depth [m]", CoilDepthUser );
 								if ( DisplayExtraWarnings ) {
 									if ( ( std::abs( CoilDepthDes - CoilDepthUser ) / CoilDepthUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-										ShowContinueError( "User-Specified Coil Depth of " + trim( RoundSigDigits( CoilDepthUser, 6 ) ) + " [m]" );
-										ShowContinueError( "differs from Design Size Coil Depth of " + trim( RoundSigDigits( CoilDepthDes, 6 ) ) + " [m]" );
+										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+										ShowContinueError( "User-Specified Coil Depth of " + RoundSigDigits( CoilDepthUser, 6 ) + " [m]" );
+										ShowContinueError( "differs from Design Size Coil Depth of " + RoundSigDigits( CoilDepthDes, 6 ) + " [m]" );
 										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 									}
@@ -2507,7 +2507,7 @@ namespace WaterCoils {
 						}
 						WaterCoil( CoilNum ).DesWaterHeatingCoilRate = DesCoilLoad;
 						if ( MaxWaterVolFlowRateDes == 0.0 ) {
-							ShowWarningError( "The design coil load is zero for Coil:Cooling:Water " + trim( WaterCoil( CoilNum ).Name ) );
+							ShowWarningError( "The design coil load is zero for Coil:Cooling:Water " + WaterCoil( CoilNum ).Name );
 							ShowContinueError( "The autosize value for max water flow rate is zero" );
 						}
 						if ( IsAutoSize ) {
@@ -2522,9 +2522,9 @@ namespace WaterCoils {
 									ReportSizingOutput( "Coil:Cooling:Water", WaterCoil( CoilNum ).Name, "Design Size Design Water Flow Rate [m3/s]", MaxWaterVolFlowRateDes, "User-Specified Design Water Flow Rate [m3/s]", MaxWaterVolFlowRateUser );
 									if ( DisplayExtraWarnings ) {
 										if ( ( std::abs( MaxWaterVolFlowRateDes - MaxWaterVolFlowRateUser ) / MaxWaterVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-											ShowContinueError( "User-Specified Design Water Flow Rate of " + trim( RoundSigDigits( MaxWaterVolFlowRateUser, 5 ) ) + " [m3/s]" );
-											ShowContinueError( "differs from Design Size Design Water Flow Rate of " + trim( RoundSigDigits( MaxWaterVolFlowRateDes, 5 ) ) + " [m3/s]" );
+											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+											ShowContinueError( "User-Specified Design Water Flow Rate of " + RoundSigDigits( MaxWaterVolFlowRateUser, 5 ) + " [m3/s]" );
+											ShowContinueError( "differs from Design Size Design Water Flow Rate of " + RoundSigDigits( MaxWaterVolFlowRateDes, 5 ) + " [m3/s]" );
 											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 										}
@@ -2551,7 +2551,7 @@ namespace WaterCoils {
 								DesAirVolFlowRateDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow ) / RhoAirStd;
 							}
 							if ( DesAirVolFlowRateDes <= 0.0 ) {
-								ShowWarningError( "The design air volume flow rate is zero for Coil:Cooling:Water " + trim( WaterCoil( CoilNum ).Name ) );
+								ShowWarningError( "The design air volume flow rate is zero for Coil:Cooling:Water " + WaterCoil( CoilNum ).Name );
 								ShowContinueError( "The autosize value for max air volume flow rate is zero" );
 							}
 							if ( IsAutoSize ) {
@@ -2563,9 +2563,9 @@ namespace WaterCoils {
 									ReportSizingOutput( "Coil:Cooling:Water", WaterCoil( CoilNum ).Name, "Design Size Design Air Flow Rate [m3/s]", DesAirVolFlowRateDes, "User-Specified Design Air Flow Rate [m3/s]", DesAirVolFlowRateUser );
 									if ( DisplayExtraWarnings ) {
 										if ( ( std::abs( DesAirVolFlowRateDes - DesAirVolFlowRateUser ) / DesAirVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-											ShowContinueError( "User-Specified Design Air Flow Rate of " + trim( RoundSigDigits( DesAirVolFlowRateUser, 5 ) ) + " [m3/s]" );
-											ShowContinueError( "differs from Design Size Design Air Flow Rate of " + trim( RoundSigDigits( DesAirVolFlowRateDes, 5 ) ) + " [ m3/s]" );
+											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+											ShowContinueError( "User-Specified Design Air Flow Rate of " + RoundSigDigits( DesAirVolFlowRateUser, 5 ) + " [m3/s]" );
+											ShowContinueError( "differs from Design Size Design Air Flow Rate of " + RoundSigDigits( DesAirVolFlowRateDes, 5 ) + " [ m3/s]" );
 											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 										}
@@ -2599,9 +2599,9 @@ namespace WaterCoils {
 									ReportSizingOutput( "Coil:Cooling:Water", WaterCoil( CoilNum ).Name, "Design Size Design Inlet Air Temperature [C]", DesInletAirtempDes, "User-Specified Design Inlet Air Temperature [C]", DesInletAirtempUser );
 									if ( DisplayExtraWarnings ) {
 										if ( std::abs( DesInletAirtempDes - DesInletAirtempUser ) > AutoVsHardSizingDeltaTempThreshold ) {
-											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-											ShowContinueError( "User-Specified Design Inlet Air Temperature of " + trim( RoundSigDigits( DesInletAirtempUser, 2 ) ) + " [C]" );
-											ShowContinueError( "differs from Design Size Design Inlet Air Temperature of " + trim( RoundSigDigits( DesInletAirtempDes, 2 ) ) + " [C]" );
+											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+											ShowContinueError( "User-Specified Design Inlet Air Temperature of " + RoundSigDigits( DesInletAirtempUser, 2 ) + " [C]" );
+											ShowContinueError( "differs from Design Size Design Inlet Air Temperature of " + RoundSigDigits( DesInletAirtempDes, 2 ) + " [C]" );
 											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 										}
@@ -2624,9 +2624,9 @@ namespace WaterCoils {
 									ReportSizingOutput( "Coil:Cooling:Water", WaterCoil( CoilNum ).Name, "Design Size Design Inlet Water Temperature [C]", DesInletWaterTempDes, "User-Specified Design Inlet Water Temperature [C]", DesInletWaterTempUser );
 									if ( DisplayExtraWarnings ) {
 										if ( std::abs( DesInletWaterTempDes - DesInletWaterTempUser ) > AutoVsHardSizingDeltaTempThreshold ) {
-											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-											ShowContinueError( "User-Specified Design Inlet Water Temperature of " + trim( RoundSigDigits( DesInletWaterTempUser, 2 ) ) + " [C]" );
-											ShowContinueError( "differs from Design Size Design Inlet Water Temperature of " + trim( RoundSigDigits( DesInletWaterTempDes, 2 ) ) + " [C]" );
+											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+											ShowContinueError( "User-Specified Design Inlet Water Temperature of " + RoundSigDigits( DesInletWaterTempUser, 2 ) + " [C]" );
+											ShowContinueError( "differs from Design Size Design Inlet Water Temperature of " + RoundSigDigits( DesInletWaterTempDes, 2 ) + " [C]" );
 											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 										}
@@ -2660,9 +2660,9 @@ namespace WaterCoils {
 									ReportSizingOutput( "Coil:Cooling:Water", WaterCoil( CoilNum ).Name, "Design Size Design Inlet Air Humidity Ratio", DesInletAirHumRatDes, "User-Specified Design Inlet Air Humidity Ratio", DesInletAirHumRatUser );
 									if ( DisplayExtraWarnings ) {
 										if ( ( std::abs( DesInletAirHumRatDes - DesInletAirHumRatUser ) / DesInletAirHumRatUser ) > AutoVsHardSizingThreshold ) {
-											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-											ShowContinueError( "User-Specified Design Inlet Air Humidity Ratio of " + trim( RoundSigDigits( DesInletAirHumRatUser, 6 ) ) );
-											ShowContinueError( "differs from Design Size Design Inlet Air Humidity Ratio of " + trim( RoundSigDigits( DesInletAirHumRatDes, 6 ) ) );
+											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+											ShowContinueError( "User-Specified Design Inlet Air Humidity Ratio of " + RoundSigDigits( DesInletAirHumRatUser, 6 ) );
+											ShowContinueError( "differs from Design Size Design Inlet Air Humidity Ratio of " + RoundSigDigits( DesInletAirHumRatDes, 6 ) );
 											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 										}
@@ -2689,12 +2689,12 @@ namespace WaterCoils {
 							}
 
 							if ( DesOutletAirTempDes < WaterCoil( CoilNum ).DesInletWaterTemp && WaterCoil( CoilNum ).MaxWaterVolFlowRate > 0.0 ) {
-								ShowWarningError( "SizeWaterCoil: Coil=\"" + trim( WaterCoil( CoilNum ).Name ) + "\", Cooling Coil has leaving air temperature > entering water temperature." );
-								ShowContinueError( "    Tair,out  =  " + trim( RoundSigDigits( DesOutletAirTempDes, 3 ) ) );
-								ShowContinueError( "    Twater,in = " + trim( RoundSigDigits( WaterCoil( CoilNum ).DesInletWaterTemp, 3 ) ) );
+								ShowWarningError( "SizeWaterCoil: Coil=\"" + WaterCoil( CoilNum ).Name + "\", Cooling Coil has leaving air temperature > entering water temperature." );
+								ShowContinueError( "    Tair,out  =  " + RoundSigDigits( DesOutletAirTempDes, 3 ) );
+								ShowContinueError( "    Twater,in = " + RoundSigDigits( WaterCoil( CoilNum ).DesInletWaterTemp, 3 ) );
 								DesOutletAirTempDes = WaterCoil( CoilNum ).DesInletWaterTemp + 0.5;
 								ShowContinueError( "....coil leaving air temperature will be reset to:" );
-								ShowContinueError( "    Tair,out = " + trim( RoundSigDigits( DesOutletAirTempDes, 3 ) ) );
+								ShowContinueError( "    Tair,out = " + RoundSigDigits( DesOutletAirTempDes, 3 ) );
 							}
 							if ( IsAutoSize ) {
 								WaterCoil( CoilNum ).DesOutletAirTemp = DesOutletAirTempDes;
@@ -2705,9 +2705,9 @@ namespace WaterCoils {
 									ReportSizingOutput( "Coil:Cooling:Water", WaterCoil( CoilNum ).Name, "Design Size Design Outlet Air Temperature [C]", DesOutletAirTempDes, "User-Specified Design Outlet Air Temperature [C]", DesOutletAirTempUser );
 									if ( DisplayExtraWarnings ) {
 										if ( std::abs( DesOutletAirTempDes - DesOutletAirTempUser ) > AutoVsHardSizingDeltaTempThreshold ) {
-											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-											ShowContinueError( "User-Specified Design Outlet Air Temperature of " + trim( RoundSigDigits( DesOutletAirTempUser, 2 ) ) + " [C]" );
-											ShowContinueError( "differs from Design Size Design Outlet Air Temperature of " + trim( RoundSigDigits( DesOutletAirTempDes, 2 ) ) + " [C]" );
+											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+											ShowContinueError( "User-Specified Design Outlet Air Temperature of " + RoundSigDigits( DesOutletAirTempUser, 2 ) + " [C]" );
+											ShowContinueError( "differs from Design Size Design Outlet Air Temperature of " + RoundSigDigits( DesOutletAirTempDes, 2 ) + " [C]" );
 											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 										}
@@ -2731,27 +2731,27 @@ namespace WaterCoils {
 							}
 
 							if ( DesOutletAirHumRatDes > WaterCoil( CoilNum ).DesInletAirHumRat && WaterCoil( CoilNum ).MaxWaterVolFlowRate > 0.0 ) {
-								ShowWarningError( "SizeWaterCoil: Coil=\"" + trim( WaterCoil( CoilNum ).Name ) + "\", Cooling Coil has leaving humidity ratio > entering humidity ratio." );
-								ShowContinueError( "    Wair,in =  " + trim( RoundSigDigits( WaterCoil( CoilNum ).DesInletAirHumRat, 6 ) ) );
-								ShowContinueError( "    Wair,out = " + trim( RoundSigDigits( DesOutletAirHumRatDes, 6 ) ) );
+								ShowWarningError( "SizeWaterCoil: Coil=\"" + WaterCoil( CoilNum ).Name + "\", Cooling Coil has leaving humidity ratio > entering humidity ratio." );
+								ShowContinueError( "    Wair,in =  " + RoundSigDigits( WaterCoil( CoilNum ).DesInletAirHumRat, 6 ) );
+								ShowContinueError( "    Wair,out = " + RoundSigDigits( DesOutletAirHumRatDes, 6 ) );
 								if ( DesInletAirHumRatDes > .016 ) {
 									DesOutletAirHumRatDes = 0.5 * WaterCoil( CoilNum ).DesInletAirHumRat;
 								} else {
 									DesOutletAirHumRatDes = WaterCoil( CoilNum ).DesInletAirHumRat;
 								}
 								ShowContinueError( "....coil leaving humidity ratio will be reset to:" );
-								ShowContinueError( "    Wair,out = " + trim( RoundSigDigits( DesOutletAirHumRatDes, 6 ) ) );
+								ShowContinueError( "    Wair,out = " + RoundSigDigits( DesOutletAirHumRatDes, 6 ) );
 							}
 							// check for dry coil and reset outlet humrat if needed
 							DesSatEnthAtWaterInTemp = PsyHFnTdbW( WaterCoil( CoilNum ).DesInletWaterTemp, PsyWFnTdpPb( WaterCoil( CoilNum ).DesInletWaterTemp, StdBaroPress ) );
 							DesHumRatAtWaterInTemp = PsyWFnTdbH( WaterCoil( CoilNum ).DesInletWaterTemp, DesSatEnthAtWaterInTemp, "InitWaterCoil" );
 							if ( DesOutletAirHumRatDes < WaterCoil( CoilNum ).DesInletAirHumRat && DesHumRatAtWaterInTemp > WaterCoil( CoilNum ).DesInletAirHumRat && WaterCoil( CoilNum ).MaxWaterVolFlowRate > 0.0 ) {
-								ShowWarningError( "SizeWaterCoil: Coil=\"" + trim( WaterCoil( CoilNum ).Name ) + "\", Cooling Coil is dry and has air leaving humidity ratio < entering humidity ratio." );
-								ShowContinueError( "    Wair,in =  " + trim( RoundSigDigits( WaterCoil( CoilNum ).DesInletAirHumRat, 6 ) ) );
-								ShowContinueError( "    Wair,out = " + trim( RoundSigDigits( DesOutletAirHumRatDes, 6 ) ) );
+								ShowWarningError( "SizeWaterCoil: Coil=\"" + WaterCoil( CoilNum ).Name + "\", Cooling Coil is dry and has air leaving humidity ratio < entering humidity ratio." );
+								ShowContinueError( "    Wair,in =  " + RoundSigDigits( WaterCoil( CoilNum ).DesInletAirHumRat, 6 ) );
+								ShowContinueError( "    Wair,out = " + RoundSigDigits( DesOutletAirHumRatDes, 6 ) );
 								DesOutletAirHumRatDes = WaterCoil( CoilNum ).DesInletAirHumRat;
 								ShowContinueError( "....coil leaving humidity ratio will be reset to:" );
-								ShowContinueError( "    Wair,out = " + trim( RoundSigDigits( DesOutletAirHumRatDes, 6 ) ) );
+								ShowContinueError( "    Wair,out = " + RoundSigDigits( DesOutletAirHumRatDes, 6 ) );
 							}
 							if ( IsAutoSize ) {
 								WaterCoil( CoilNum ).DesOutletAirHumRat = DesOutletAirHumRatDes;
@@ -2762,9 +2762,9 @@ namespace WaterCoils {
 									ReportSizingOutput( "Coil:Cooling:Water", WaterCoil( CoilNum ).Name, "Design Size Design Outlet Air Humidity Ratio", DesOutletAirHumRatDes, "User-Specified Design Outlet Air Humidity Ratio", DesOutletAirHumRatUser );
 									if ( DisplayExtraWarnings ) {
 										if ( ( std::abs( DesOutletAirHumRatDes - DesOutletAirHumRatUser ) / DesOutletAirHumRatUser ) > AutoVsHardSizingThreshold ) {
-											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-											ShowContinueError( "User-Specified Design Outlet Air Humidity Ratio of " + trim( RoundSigDigits( DesOutletAirHumRatUser, 2 ) ) );
-											ShowContinueError( "differs from Design Size Design Outlet Air Humidity Ratio of " + trim( RoundSigDigits( DesOutletAirHumRatDes, 2 ) ) );
+											ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+											ShowContinueError( "User-Specified Design Outlet Air Humidity Ratio of " + RoundSigDigits( DesOutletAirHumRatUser, 2 ) );
+											ShowContinueError( "differs from Design Size Design Outlet Air Humidity Ratio of " + RoundSigDigits( DesOutletAirHumRatDes, 2 ) );
 											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 										}
@@ -2788,9 +2788,9 @@ namespace WaterCoils {
 								ReportSizingOutput( "Coil:Cooling:Water:DetailedGeometry", WaterCoil( CoilNum ).Name, "Design Size Number of Tubes per Row", NumofTubesperRowDes, "User-Specified Number of Tubes per Row", NumofTubesperRowUser );
 								if ( DisplayExtraWarnings ) {
 									if ( ( std::abs( NumofTubesperRowDes - NumofTubesperRowUser ) / NumofTubesperRowUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-										ShowContinueError( "User-Specified Number of Tubes per Row of " + trim( RoundSigDigits( NumofTubesperRowUser, 0 ) ) );
-										ShowContinueError( "differs from Design Size Number of Tubes per Row of " + trim( RoundSigDigits( NumofTubesperRowDes, 0 ) ) );
+										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+										ShowContinueError( "User-Specified Number of Tubes per Row of " + RoundSigDigits( NumofTubesperRowUser, 0 ) );
+										ShowContinueError( "differs from Design Size Number of Tubes per Row of " + RoundSigDigits( NumofTubesperRowDes, 0 ) );
 										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 									}
@@ -2817,9 +2817,9 @@ namespace WaterCoils {
 								ReportSizingOutput( "Coil:Cooling:Water:DetailedGeometry", WaterCoil( CoilNum ).Name, "Design Size Fin Diameter [m]", FinDiamDes, "User-Specified Fin Diameter [m]", FinDiamUser );
 								if ( DisplayExtraWarnings ) {
 									if ( ( std::abs( FinDiamDes - FinDiamUser ) / FinDiamUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-										ShowContinueError( "User-Specified Fin Diameter of " + trim( RoundSigDigits( FinDiamUser, 6 ) ) + " [m]" );
-										ShowContinueError( "differs from Design Size Fin Diameter of " + trim( RoundSigDigits( FinDiamDes, 6 ) ) + " [m]" );
+										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+										ShowContinueError( "User-Specified Fin Diameter of " + RoundSigDigits( FinDiamUser, 6 ) + " [m]" );
+										ShowContinueError( "differs from Design Size Fin Diameter of " + RoundSigDigits( FinDiamDes, 6 ) + " [m]" );
 										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 									}
@@ -2846,9 +2846,9 @@ namespace WaterCoils {
 								ReportSizingOutput( "Coil:Cooling:Water:DetailedGeometry", WaterCoil( CoilNum ).Name, "Design Size Minimum Airflow Area [m2]", MinAirFlowAreaDes, "User-Specified Minimum Airflow Area [m2]", MinAirFlowAreaUser );
 								if ( DisplayExtraWarnings ) {
 									if ( ( std::abs( MinAirFlowAreaDes - MinAirFlowAreaUser ) / MinAirFlowAreaUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-										ShowContinueError( "User-Specified Minimum Airflow Area of " + trim( RoundSigDigits( MinAirFlowAreaUser, 6 ) ) + " [m2]" );
-										ShowContinueError( "differs from Design Size Minimum Airflow Area of " + trim( RoundSigDigits( MinAirFlowAreaDes, 6 ) ) + " [m2]" );
+										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+										ShowContinueError( "User-Specified Minimum Airflow Area of " + RoundSigDigits( MinAirFlowAreaUser, 6 ) + " [m2]" );
+										ShowContinueError( "differs from Design Size Minimum Airflow Area of " + RoundSigDigits( MinAirFlowAreaDes, 6 ) + " [m2]" );
 										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 									}
@@ -2875,9 +2875,9 @@ namespace WaterCoils {
 								ReportSizingOutput( "Coil:Cooling:Water:DetailedGeometry", WaterCoil( CoilNum ).Name, "Design Size Fin Surface Area [m2]", FinSurfAreaDes, "User-Specified Fin Surface Area [m2]", FinSurfAreaUser );
 								if ( DisplayExtraWarnings ) {
 									if ( ( std::abs( FinSurfAreaDes - FinSurfAreaUser ) / FinSurfAreaUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-										ShowContinueError( "User-Specified Fin Surface Area of " + trim( RoundSigDigits( FinSurfAreaUser, 6 ) ) + " [m2]" );
-										ShowContinueError( "differs from Design Size Fin Surface Area of " + trim( RoundSigDigits( FinSurfAreaDes, 6 ) ) + " [m2]" );
+										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+										ShowContinueError( "User-Specified Fin Surface Area of " + RoundSigDigits( FinSurfAreaUser, 6 ) + " [m2]" );
+										ShowContinueError( "differs from Design Size Fin Surface Area of " + RoundSigDigits( FinSurfAreaDes, 6 ) + " [m2]" );
 										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 									}
@@ -2899,9 +2899,9 @@ namespace WaterCoils {
 								ReportSizingOutput( "Coil:Cooling:Water:DetailedGeometry", WaterCoil( CoilNum ).Name, "Design Size Total Tube Inside Area [m2]", TotTubeInsideAreaDes, "User-Specified Total Tube Inside Area [m2]", TotTubeInsideAreaUser );
 								if ( DisplayExtraWarnings ) {
 									if ( ( std::abs( TotTubeInsideAreaDes - TotTubeInsideAreaUser ) / TotTubeInsideAreaUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-										ShowContinueError( "User-Specified Total Tube Inside Area of " + trim( RoundSigDigits( TotTubeInsideAreaUser, 6 ) ) + " [m2]" );
-										ShowContinueError( "differs from Design Size Total Tube Inside Area of " + trim( RoundSigDigits( TotTubeInsideAreaDes, 6 ) ) + " [m2]" );
+										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+										ShowContinueError( "User-Specified Total Tube Inside Area of " + RoundSigDigits( TotTubeInsideAreaUser, 6 ) + " [m2]" );
+										ShowContinueError( "differs from Design Size Total Tube Inside Area of " + RoundSigDigits( TotTubeInsideAreaDes, 6 ) + " [m2]" );
 										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 									}
@@ -2923,9 +2923,9 @@ namespace WaterCoils {
 								ReportSizingOutput( "Coil:Cooling:Water:DetailedGeometry", WaterCoil( CoilNum ).Name, "Design Size Tube Outside Surface Area [m2]", TubeOutsideSurfAreaDes, "User-Specified Tube Outside Surface Area [m2]", TubeOutsideSurfAreaUser );
 								if ( DisplayExtraWarnings ) {
 									if ( ( std::abs( TubeOutsideSurfAreaDes - TubeOutsideSurfAreaUser ) / TubeOutsideSurfAreaUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-										ShowContinueError( "User-Specified Tube Outside Surface Area of " + trim( RoundSigDigits( TubeOutsideSurfAreaUser, 6 ) ) + " [m2]" );
-										ShowContinueError( "differs from Design Size Tube Outside Surface Area of " + trim( RoundSigDigits( TubeOutsideSurfAreaDes, 6 ) ) + " [m2]" );
+										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+										ShowContinueError( "User-Specified Tube Outside Surface Area of " + RoundSigDigits( TubeOutsideSurfAreaUser, 6 ) + " [m2]" );
+										ShowContinueError( "differs from Design Size Tube Outside Surface Area of " + RoundSigDigits( TubeOutsideSurfAreaDes, 6 ) + " [m2]" );
 										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 									}
@@ -2947,9 +2947,9 @@ namespace WaterCoils {
 								ReportSizingOutput( "Coil:Cooling:Water:DetailedGeometry", WaterCoil( CoilNum ).Name, "Design Size Coil Depth [m]", CoilDepthDes, "User-Specified Coil Depth [m]", CoilDepthUser );
 								if ( DisplayExtraWarnings ) {
 									if ( ( std::abs( CoilDepthDes - CoilDepthUser ) / CoilDepthUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-										ShowContinueError( "User-Specified Coil Depth of " + trim( RoundSigDigits( CoilDepthUser, 6 ) ) + " [m]" );
-										ShowContinueError( "differs from Design Size Coil Depth of " + trim( RoundSigDigits( CoilDepthDes, 6 ) ) + " [m]" );
+										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+										ShowContinueError( "User-Specified Coil Depth of " + RoundSigDigits( CoilDepthUser, 6 ) + " [m]" );
+										ShowContinueError( "differs from Design Size Coil Depth of " + RoundSigDigits( CoilDepthDes, 6 ) + " [m]" );
 										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 									}
@@ -2962,7 +2962,7 @@ namespace WaterCoils {
 				// If there is no cooling Plant Sizing object and autosizing was requested, issue fatal error message
 				if ( WaterCoil( CoilNum ).RequestingAutoSize ) {
 					ShowSevereError( "Autosizing of water coil requires a cooling loop Sizing:Plant object" );
-					ShowContinueError( "Occurs in water coil object= " + trim( WaterCoil( CoilNum ).Name ) );
+					ShowContinueError( "Occurs in water coil object= " + WaterCoil( CoilNum ).Name );
 					ErrorsFound = true;
 				}
 			} // end of cooling Plant Sizing existence IF - ELSE
@@ -3053,7 +3053,7 @@ namespace WaterCoils {
 							MaxWaterVolFlowRateDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 						} else {
 							MaxWaterVolFlowRateDes = 0.0;
-							ShowWarningError( "The design coil load is zero for Coil:Heating:Water " + trim( WaterCoil( CoilNum ).Name ) );
+							ShowWarningError( "The design coil load is zero for Coil:Heating:Water " + WaterCoil( CoilNum ).Name );
 							ShowContinueError( "The autosize value for maximum water flow rate is zero" );
 							ShowContinueError( "To change this, input a value for UA, change the heating design day, or lower" );
 							ShowContinueError( "  the system heating design supply air temperature" );
@@ -3072,9 +3072,9 @@ namespace WaterCoils {
 								ReportSizingOutput( "Coil:Heating:Water", WaterCoil( CoilNum ).Name, "Design Size Maximum Water Flow Rate [m3/s]", MaxWaterVolFlowRateDes, "User-Specified Maximum Water Flow Rate [m3/s]", MaxWaterVolFlowRateUser );
 								if ( DisplayExtraWarnings ) {
 									if ( ( std::abs( MaxWaterVolFlowRateDes - MaxWaterVolFlowRateUser ) / MaxWaterVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-										ShowContinueError( "User-Specified Maximum Water Flow Rate of " + trim( RoundSigDigits( MaxWaterVolFlowRateUser, 5 ) ) + " [m3/s]" );
-										ShowContinueError( "differs from Design Size Maximum Water Flow Rate of " + trim( RoundSigDigits( MaxWaterVolFlowRateDes, 5 ) ) + " [m3/s]" );
+										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+										ShowContinueError( "User-Specified Maximum Water Flow Rate of " + RoundSigDigits( MaxWaterVolFlowRateUser, 5 ) + " [m3/s]" );
+										ShowContinueError( "differs from Design Size Maximum Water Flow Rate of " + RoundSigDigits( MaxWaterVolFlowRateDes, 5 ) + " [m3/s]" );
 										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 									}
@@ -3084,9 +3084,9 @@ namespace WaterCoils {
 								ReportSizingOutput( "Coil:Heating:Water", WaterCoil( CoilNum ).Name, "Design Size Design Coil Load [W]", DesWaterHeatingCoilRateDes, "User-Specified Design Coil Load [W]", DesWaterHeatingCoilRateUser );
 								if ( DisplayExtraWarnings ) {
 									if ( ( std::abs( DesWaterHeatingCoilRateDes - DesWaterHeatingCoilRateUser ) / DesWaterHeatingCoilRateUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-										ShowContinueError( "User-Specified Design Coil Load of " + trim( RoundSigDigits( DesWaterHeatingCoilRateUser, 2 ) ) + " [W]" );
-										ShowContinueError( "differs from Design Size Design Coil Load of " + trim( RoundSigDigits( DesWaterHeatingCoilRateDes, 2 ) ) + " [W]" );
+										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+										ShowContinueError( "User-Specified Design Coil Load of " + RoundSigDigits( DesWaterHeatingCoilRateUser, 2 ) + " [W]" );
+										ShowContinueError( "differs from Design Size Design Coil Load of " + RoundSigDigits( DesWaterHeatingCoilRateDes, 2 ) + " [W]" );
 										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 									}
@@ -3170,35 +3170,35 @@ namespace WaterCoils {
 							SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleHeatingCoilUAResidual, UA0, UA1, Par );
 							// if the numerical inversion failed, issue error messages.
 							if ( SolFla == -1 ) {
-								ShowSevereError( "Autosizing of heating coil UA failed for Coil:Heating:Water \"" + trim( WaterCoil( CoilNum ).Name ) + "\"" );
+								ShowSevereError( "Autosizing of heating coil UA failed for Coil:Heating:Water \"" + WaterCoil( CoilNum ).Name + "\"" );
 								ShowContinueError( "  Iteration limit exceeded in calculating coil UA" );
-								ShowContinueError( "  Lower UA estimate = " + trim( TrimSigDigits( UA0, 6 ) ) + " W/m2-K (1% of Design Coil Load)" );
-								ShowContinueError( "  Upper UA estimate = " + trim( TrimSigDigits( UA1, 6 ) ) + " W/m2-K (100% of Design Coil Load)" );
-								ShowContinueError( "  Final UA estimate when iterations exceeded limit = " + trim( TrimSigDigits( UA, 6 ) ) + " W/m2-K" );
-								ShowContinueError( "  AirloopHVAC \"" + trim( FinalSysSizing( CurSysNum ).AirPriLoopName ) + "\" coil sizing conditions (may be different than Sizing inputs):" );
-								ShowContinueError( "  Coil inlet air temperature     = " + trim( TrimSigDigits( CoilInTemp, 3 ) ) + " C" );
-								ShowContinueError( "  Coil inlet air humidity ratio  = " + trim( TrimSigDigits( CoilInHumRat, 3 ) ) + " kgWater/kgDryAir" );
-								ShowContinueError( "  Coil inlet air mass flow rate  = " + trim( TrimSigDigits( DesMassFlow, 6 ) ) + " kg/s" );
-								ShowContinueError( "  Design Coil Capacity           = " + trim( TrimSigDigits( WaterCoil( CoilNum ).TotWaterHeatingCoilRate, 3 ) ) + " W" );
-								ShowContinueError( "  Design Coil Load               = " + trim( TrimSigDigits( DesCoilLoad, 3 ) ) + " W" );
+								ShowContinueError( "  Lower UA estimate = " + TrimSigDigits( UA0, 6 ) + " W/m2-K (1% of Design Coil Load)" );
+								ShowContinueError( "  Upper UA estimate = " + TrimSigDigits( UA1, 6 ) + " W/m2-K (100% of Design Coil Load)" );
+								ShowContinueError( "  Final UA estimate when iterations exceeded limit = " + TrimSigDigits( UA, 6 ) + " W/m2-K" );
+								ShowContinueError( "  AirloopHVAC \"" + FinalSysSizing( CurSysNum ).AirPriLoopName + "\" coil sizing conditions (may be different than Sizing inputs):" );
+								ShowContinueError( "  Coil inlet air temperature     = " + TrimSigDigits( CoilInTemp, 3 ) + " C" );
+								ShowContinueError( "  Coil inlet air humidity ratio  = " + TrimSigDigits( CoilInHumRat, 3 ) + " kgWater/kgDryAir" );
+								ShowContinueError( "  Coil inlet air mass flow rate  = " + TrimSigDigits( DesMassFlow, 6 ) + " kg/s" );
+								ShowContinueError( "  Design Coil Capacity           = " + TrimSigDigits( WaterCoil( CoilNum ).TotWaterHeatingCoilRate, 3 ) + " W" );
+								ShowContinueError( "  Design Coil Load               = " + TrimSigDigits( DesCoilLoad, 3 ) + " W" );
 								ErrorsFound = true;
 							} else if ( SolFla == -2 ) {
-								ShowSevereError( "Autosizing of heating coil UA failed for Coil:Heating:Water \"" + trim( WaterCoil( CoilNum ).Name ) + "\"" );
+								ShowSevereError( "Autosizing of heating coil UA failed for Coil:Heating:Water \"" + WaterCoil( CoilNum ).Name + "\"" );
 								ShowContinueError( "  Bad starting values for UA" );
-								ShowContinueError( "  Lower UA estimate = " + trim( TrimSigDigits( UA0, 6 ) ) + " W/m2-K (1% of Design Coil Load)" );
-								ShowContinueError( "  Upper UA estimate = " + trim( TrimSigDigits( UA1, 6 ) ) + " W/m2-K (100% of Design Coil Load)" );
-								ShowContinueError( "  AirloopHVAC \"" + trim( FinalSysSizing( CurSysNum ).AirPriLoopName ) + "\" coil sizing conditions (may be different than Sizing inputs):" );
-								ShowContinueError( "  Coil inlet air temperature     = " + trim( TrimSigDigits( CoilInTemp, 3 ) ) + " C" );
-								ShowContinueError( "  Coil inlet air humidity ratio  = " + trim( TrimSigDigits( CoilInHumRat, 3 ) ) + " kgWater/kgDryAir" );
-								ShowContinueError( "  Coil inlet air mass flow rate  = " + trim( TrimSigDigits( DesMassFlow, 6 ) ) + " kg/s" );
-								ShowContinueError( "  Design Coil Capacity           = " + trim( TrimSigDigits( WaterCoil( CoilNum ).TotWaterHeatingCoilRate, 3 ) ) + " W" );
-								ShowContinueError( "  Design Coil Load               = " + trim( TrimSigDigits( DesCoilLoad, 3 ) ) + " W" );
+								ShowContinueError( "  Lower UA estimate = " + TrimSigDigits( UA0, 6 ) + " W/m2-K (1% of Design Coil Load)" );
+								ShowContinueError( "  Upper UA estimate = " + TrimSigDigits( UA1, 6 ) + " W/m2-K (100% of Design Coil Load)" );
+								ShowContinueError( "  AirloopHVAC \"" + FinalSysSizing( CurSysNum ).AirPriLoopName + "\" coil sizing conditions (may be different than Sizing inputs):" );
+								ShowContinueError( "  Coil inlet air temperature     = " + TrimSigDigits( CoilInTemp, 3 ) + " C" );
+								ShowContinueError( "  Coil inlet air humidity ratio  = " + TrimSigDigits( CoilInHumRat, 3 ) + " kgWater/kgDryAir" );
+								ShowContinueError( "  Coil inlet air mass flow rate  = " + TrimSigDigits( DesMassFlow, 6 ) + " kg/s" );
+								ShowContinueError( "  Design Coil Capacity           = " + TrimSigDigits( WaterCoil( CoilNum ).TotWaterHeatingCoilRate, 3 ) + " W" );
+								ShowContinueError( "  Design Coil Load               = " + TrimSigDigits( DesCoilLoad, 3 ) + " W" );
 								if ( WaterCoil( CoilNum ).TotWaterHeatingCoilRate < DesCoilLoad ) {
 									ShowContinueError( "  Inadequate water side capacity: in Plant Sizing for this hot water loop" );
 									ShowContinueError( "  increase design loop exit temperature and/or decrease design loop delta T" );
-									ShowContinueError( "  Plant Sizing object = " + trim( PlantSizData( PltSizHeatNum ).PlantLoopName ) );
-									ShowContinueError( "  Plant design loop exit temperature = " + trim( TrimSigDigits( PlantSizData( PltSizHeatNum ).ExitTemp, 3 ) ) + " C" );
-									ShowContinueError( "  Plant design loop delta T          = " + trim( TrimSigDigits( PlantSizData( PltSizHeatNum ).DeltaT, 3 ) ) + " C" );
+									ShowContinueError( "  Plant Sizing object = " + PlantSizData( PltSizHeatNum ).PlantLoopName );
+									ShowContinueError( "  Plant design loop exit temperature = " + TrimSigDigits( PlantSizData( PltSizHeatNum ).ExitTemp, 3 ) + " C" );
+									ShowContinueError( "  Plant design loop delta T          = " + TrimSigDigits( PlantSizData( PltSizHeatNum ).DeltaT, 3 ) + " C" );
 								}
 								ErrorsFound = true;
 							}
@@ -3207,7 +3207,7 @@ namespace WaterCoils {
 							UACoilDes = 1.0;
 							if ( WaterCoil( CoilNum ).MaxWaterVolFlowRate > 0.0 ) {
 								ErrorsFound = true;
-								ShowSevereError( "The design coil load is zero for Coil:Heating:Water " + trim( WaterCoil( CoilNum ).Name ) );
+								ShowSevereError( "The design coil load is zero for Coil:Heating:Water " + WaterCoil( CoilNum ).Name );
 								ShowContinueError( "An autosize value for UA cannot be calculated" );
 								ShowContinueError( "Input a value for UA, change the heating design day, or raise" );
 								ShowContinueError( "  the system heating design supply air temperature" );
@@ -3223,9 +3223,9 @@ namespace WaterCoils {
 								ReportSizingOutput( "Coil:Heating:Water", WaterCoil( CoilNum ).Name, "Design Size U-Factor Times Area Value [W/K]", UACoilDes, "User-Specified U-Factor Times Area Value [W/K]", UACoilUser );
 								if ( DisplayExtraWarnings ) {
 									if ( ( std::abs( UACoilDes - UACoilUser ) / UACoilUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-										ShowContinueError( "User-Specified U-Factor Times Area Value of " + trim( RoundSigDigits( UACoilUser, 5 ) ) + " [W/K]" );
-										ShowContinueError( "differs from Design Size U-Factor Times Area Value of " + trim( RoundSigDigits( UACoilDes, 5 ) ) + " [W/K]" );
+										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+										ShowContinueError( "User-Specified U-Factor Times Area Value of " + RoundSigDigits( UACoilUser, 5 ) + " [W/K]" );
+										ShowContinueError( "differs from Design Size U-Factor Times Area Value of " + RoundSigDigits( UACoilDes, 5 ) + " [W/K]" );
 										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 									}
@@ -3293,7 +3293,7 @@ namespace WaterCoils {
 						}
 						// issue warning if hw coil has zero flow
 						if ( MaxWaterVolFlowRateDes == 0.0 ) {
-							ShowWarningError( "The design coil load is zero for Coil:Heating:Water " + trim( WaterCoil( CoilNum ).Name ) );
+							ShowWarningError( "The design coil load is zero for Coil:Heating:Water " + WaterCoil( CoilNum ).Name );
 							ShowContinueError( "The autosize value for maximum water flow rate is zero" );
 							ShowContinueError( "To change this, input a value for UA, change the heating design day, or lower" );
 							ShowContinueError( "  the system heating design supply air temperature" );
@@ -3310,9 +3310,9 @@ namespace WaterCoils {
 								ReportSizingOutput( "Coil:Heating:Water", WaterCoil( CoilNum ).Name, "Design Size Maximum Water Flow Rate [m3/s]", MaxWaterVolFlowRateDes, "User-Specified Maximum Water Flow Rate [m3/s]", MaxWaterVolFlowRateUser );
 								if ( DisplayExtraWarnings ) {
 									if ( ( std::abs( MaxWaterVolFlowRateDes - MaxWaterVolFlowRateUser ) / MaxWaterVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-										ShowContinueError( "User-Specified Maximum Water Flow Rate of " + trim( RoundSigDigits( MaxWaterVolFlowRateUser, 5 ) ) + " [m3/s]" );
-										ShowContinueError( "differs from Design Size Maximum Water Flow Rate of " + trim( RoundSigDigits( MaxWaterVolFlowRateDes, 5 ) ) + " [m3/s]" );
+										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+										ShowContinueError( "User-Specified Maximum Water Flow Rate of " + RoundSigDigits( MaxWaterVolFlowRateUser, 5 ) + " [m3/s]" );
+										ShowContinueError( "differs from Design Size Maximum Water Flow Rate of " + RoundSigDigits( MaxWaterVolFlowRateDes, 5 ) + " [m3/s]" );
 										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 									}
@@ -3322,9 +3322,9 @@ namespace WaterCoils {
 								ReportSizingOutput( "Coil:Heating:Water", WaterCoil( CoilNum ).Name, "Design Size Design Coil Load [W]", DesWaterHeatingCoilRateDes, "User-Specified Design Coil Load [W]", DesWaterHeatingCoilRateUser );
 								if ( DisplayExtraWarnings ) {
 									if ( ( std::abs( DesWaterHeatingCoilRateDes - DesWaterHeatingCoilRateUser ) / DesWaterHeatingCoilRateUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-										ShowContinueError( "User-Specified Design Coil Load of " + trim( RoundSigDigits( DesWaterHeatingCoilRateUser, 2 ) ) + " [W]" );
-										ShowContinueError( "differs from Design Size Design Coil Load of " + trim( RoundSigDigits( DesWaterHeatingCoilRateDes, 2 ) ) + " [W]" );
+										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+										ShowContinueError( "User-Specified Design Coil Load of " + RoundSigDigits( DesWaterHeatingCoilRateUser, 2 ) + " [W]" );
+										ShowContinueError( "differs from Design Size Design Coil Load of " + RoundSigDigits( DesWaterHeatingCoilRateDes, 2 ) + " [W]" );
 										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 									}
@@ -3409,49 +3409,49 @@ namespace WaterCoils {
 							SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleHeatingCoilUAResidual, UA0, UA1, Par );
 							// if the numerical inversion failed, issue error messages.
 							if ( SolFla == -1 ) {
-								ShowSevereError( "Autosizing of heating coil UA failed for Coil:Heating:Water \"" + trim( WaterCoil( CoilNum ).Name ) + "\"" );
+								ShowSevereError( "Autosizing of heating coil UA failed for Coil:Heating:Water \"" + WaterCoil( CoilNum ).Name + "\"" );
 								ShowContinueError( "  Iteration limit exceeded in calculating coil UA" );
-								ShowContinueError( "  Lower UA estimate = " + trim( TrimSigDigits( UA0, 6 ) ) + " W/m2-K (0.1% of Design Coil Load)" );
-								ShowContinueError( "  Upper UA estimate = " + trim( TrimSigDigits( UA1, 6 ) ) + " W/m2-K (100% of Design Coil Load)" );
-								ShowContinueError( "  Final UA estimate when iterations exceeded limit = " + trim( TrimSigDigits( UA, 6 ) ) + " W/m2-K" );
-								ShowContinueError( "  Zone \"" + trim( FinalZoneSizing( CurZoneEqNum ).ZoneName ) + "\" coil sizing conditions (may be different than Sizing inputs):" );
-								ShowContinueError( "  Coil inlet air temperature     = " + trim( TrimSigDigits( CoilInTemp, 3 ) ) + " C" );
-								ShowContinueError( "  Coil inlet air humidity ratio  = " + trim( TrimSigDigits( CoilInHumRat, 3 ) ) + " kgWater/kgDryAir" );
-								ShowContinueError( "  Coil inlet air mass flow rate  = " + trim( TrimSigDigits( DesMassFlow, 6 ) ) + " kg/s" );
+								ShowContinueError( "  Lower UA estimate = " + TrimSigDigits( UA0, 6 ) + " W/m2-K (0.1% of Design Coil Load)" );
+								ShowContinueError( "  Upper UA estimate = " + TrimSigDigits( UA1, 6 ) + " W/m2-K (100% of Design Coil Load)" );
+								ShowContinueError( "  Final UA estimate when iterations exceeded limit = " + TrimSigDigits( UA, 6 ) + " W/m2-K" );
+								ShowContinueError( "  Zone \"" + FinalZoneSizing( CurZoneEqNum ).ZoneName + "\" coil sizing conditions (may be different than Sizing inputs):" );
+								ShowContinueError( "  Coil inlet air temperature     = " + TrimSigDigits( CoilInTemp, 3 ) + " C" );
+								ShowContinueError( "  Coil inlet air humidity ratio  = " + TrimSigDigits( CoilInHumRat, 3 ) + " kgWater/kgDryAir" );
+								ShowContinueError( "  Coil inlet air mass flow rate  = " + TrimSigDigits( DesMassFlow, 6 ) + " kg/s" );
 								// TotWaterHeatingCoilRate is set in CALL to CalcSimpleHeatingCoil
-								ShowContinueError( "  Design Coil Capacity           = " + trim( TrimSigDigits( WaterCoil( CoilNum ).TotWaterHeatingCoilRate, 3 ) ) + " W" );
+								ShowContinueError( "  Design Coil Capacity           = " + TrimSigDigits( WaterCoil( CoilNum ).TotWaterHeatingCoilRate, 3 ) + " W" );
 								if ( TermUnitSingDuct || TermUnitPIU || TermUnitIU || ZoneEqFanCoil ) {
-									ShowContinueError( "  Design Coil Load               = " + trim( TrimSigDigits( DesCoilLoad, 3 ) ) + " W" );
+									ShowContinueError( "  Design Coil Load               = " + TrimSigDigits( DesCoilLoad, 3 ) + " W" );
 								} else {
-									ShowContinueError( "  Design Coil Load               = " + trim( TrimSigDigits( DesCoilLoad, 3 ) ) + " W" );
-									ShowContinueError( "  Coil outlet air temperature    = " + trim( TrimSigDigits( CoilOutTemp, 3 ) ) + " C" );
-									ShowContinueError( "  Coil outlet air humidity ratio = " + trim( TrimSigDigits( CoilOutHumRat, 3 ) ) + " kgWater/kgDryAir" );
+									ShowContinueError( "  Design Coil Load               = " + TrimSigDigits( DesCoilLoad, 3 ) + " W" );
+									ShowContinueError( "  Coil outlet air temperature    = " + TrimSigDigits( CoilOutTemp, 3 ) + " C" );
+									ShowContinueError( "  Coil outlet air humidity ratio = " + TrimSigDigits( CoilOutHumRat, 3 ) + " kgWater/kgDryAir" );
 								}
 								ErrorsFound = true;
 							} else if ( SolFla == -2 ) {
-								ShowSevereError( "Autosizing of heating coil UA failed for Coil:Heating:Water \"" + trim( WaterCoil( CoilNum ).Name ) + "\"" );
+								ShowSevereError( "Autosizing of heating coil UA failed for Coil:Heating:Water \"" + WaterCoil( CoilNum ).Name + "\"" );
 								ShowContinueError( "  Bad starting values for UA" );
-								ShowContinueError( "  Lower UA estimate = " + trim( TrimSigDigits( UA0, 6 ) ) + " W/m2-K (0.1% of Design Coil Load)" );
-								ShowContinueError( "  Upper UA estimate = " + trim( TrimSigDigits( UA1, 6 ) ) + " W/m2-K (100% of Design Coil Load)" );
-								ShowContinueError( "  Zone \"" + trim( FinalZoneSizing( CurZoneEqNum ).ZoneName ) + "\" coil sizing conditions (may be different than Sizing inputs):" );
-								ShowContinueError( "  Coil inlet air temperature     = " + trim( TrimSigDigits( CoilInTemp, 3 ) ) + " C" );
-								ShowContinueError( "  Coil inlet air humidity ratio  = " + trim( TrimSigDigits( CoilInHumRat, 3 ) ) + " kgWater/kgDryAir" );
-								ShowContinueError( "  Coil inlet air mass flow rate  = " + trim( TrimSigDigits( DesMassFlow, 6 ) ) + " kg/s" );
-								ShowContinueError( "  Design Coil Capacity           = " + trim( TrimSigDigits( WaterCoil( CoilNum ).TotWaterHeatingCoilRate, 3 ) ) + " W" );
+								ShowContinueError( "  Lower UA estimate = " + TrimSigDigits( UA0, 6 ) + " W/m2-K (0.1% of Design Coil Load)" );
+								ShowContinueError( "  Upper UA estimate = " + TrimSigDigits( UA1, 6 ) + " W/m2-K (100% of Design Coil Load)" );
+								ShowContinueError( "  Zone \"" + FinalZoneSizing( CurZoneEqNum ).ZoneName + "\" coil sizing conditions (may be different than Sizing inputs):" );
+								ShowContinueError( "  Coil inlet air temperature     = " + TrimSigDigits( CoilInTemp, 3 ) + " C" );
+								ShowContinueError( "  Coil inlet air humidity ratio  = " + TrimSigDigits( CoilInHumRat, 3 ) + " kgWater/kgDryAir" );
+								ShowContinueError( "  Coil inlet air mass flow rate  = " + TrimSigDigits( DesMassFlow, 6 ) + " kg/s" );
+								ShowContinueError( "  Design Coil Capacity           = " + TrimSigDigits( WaterCoil( CoilNum ).TotWaterHeatingCoilRate, 3 ) + " W" );
 								if ( TermUnitSingDuct || TermUnitPIU || TermUnitIU || ZoneEqFanCoil ) {
-									ShowContinueError( "  Design Coil Load               = " + trim( TrimSigDigits( DesCoilLoad, 3 ) ) + " W" );
+									ShowContinueError( "  Design Coil Load               = " + TrimSigDigits( DesCoilLoad, 3 ) + " W" );
 								} else {
-									ShowContinueError( "  Design Coil Load               = " + trim( TrimSigDigits( DesCoilLoad, 3 ) ) + " W" );
-									ShowContinueError( "  Coil outlet air temperature    = " + trim( TrimSigDigits( CoilOutTemp, 3 ) ) + " C" );
-									ShowContinueError( "  Coil outlet air humidity ratio = " + trim( TrimSigDigits( CoilOutHumRat, 3 ) ) + " kgWater/kgDryAir" );
+									ShowContinueError( "  Design Coil Load               = " + TrimSigDigits( DesCoilLoad, 3 ) + " W" );
+									ShowContinueError( "  Coil outlet air temperature    = " + TrimSigDigits( CoilOutTemp, 3 ) + " C" );
+									ShowContinueError( "  Coil outlet air humidity ratio = " + TrimSigDigits( CoilOutHumRat, 3 ) + " kgWater/kgDryAir" );
 								}
 								// TotWaterHeatingCoilRate is set in CALL to CalcSimpleHeatingCoil
 								if ( WaterCoil( CoilNum ).TotWaterHeatingCoilRate < DesCoilLoad ) {
 									ShowContinueError( "  Inadequate water side capacity: in Plant Sizing for this hot water loop" );
 									ShowContinueError( "  increase design loop exit temperature and/or decrease design loop delta T" );
-									ShowContinueError( "  Plant Sizing object = " + trim( PlantSizData( PltSizHeatNum ).PlantLoopName ) );
-									ShowContinueError( "  Plant design loop exit temperature = " + trim( TrimSigDigits( PlantSizData( PltSizHeatNum ).ExitTemp, 3 ) ) + " C" );
-									ShowContinueError( "  Plant design loop delta T          = " + trim( TrimSigDigits( PlantSizData( PltSizHeatNum ).DeltaT, 3 ) ) + " C" );
+									ShowContinueError( "  Plant Sizing object = " + PlantSizData( PltSizHeatNum ).PlantLoopName );
+									ShowContinueError( "  Plant design loop exit temperature = " + TrimSigDigits( PlantSizData( PltSizHeatNum ).ExitTemp, 3 ) + " C" );
+									ShowContinueError( "  Plant design loop delta T          = " + TrimSigDigits( PlantSizData( PltSizHeatNum ).DeltaT, 3 ) + " C" );
 								}
 								ErrorsFound = true;
 							}
@@ -3460,7 +3460,7 @@ namespace WaterCoils {
 							UACoilDes = 1.0;
 							if ( WaterCoil( CoilNum ).MaxWaterVolFlowRate > 0.0 ) {
 								ErrorsFound = true;
-								ShowSevereError( "The design coil load is zero for Coil:Heating:Water " + trim( WaterCoil( CoilNum ).Name ) );
+								ShowSevereError( "The design coil load is zero for Coil:Heating:Water " + WaterCoil( CoilNum ).Name );
 								ShowContinueError( "An autosize value for UA cannot be calculated" );
 								ShowContinueError( "Input a value for UA, change the heating design day, or raise" );
 								ShowContinueError( "  the zone heating design supply air temperature" );
@@ -3476,9 +3476,9 @@ namespace WaterCoils {
 								ReportSizingOutput( "Coil:Heating:Water", WaterCoil( CoilNum ).Name, "Design Size U-Factor Times Area Value [W/K]", UACoilDes, "User-Specified U-Factor Times Area Value [W/K]", UACoilUser );
 								if ( DisplayExtraWarnings ) {
 									if ( ( std::abs( UACoilDes - UACoilUser ) / UACoilUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + trim( WaterCoil( CoilNum ).Name ) );
-										ShowContinueError( "User-Specified U-Factor Times Area Value of " + trim( RoundSigDigits( UACoilUser, 2 ) ) + " [W/K]" );
-										ShowContinueError( "differs from Design Size U-Factor Times Area Value of " + trim( RoundSigDigits( UACoilDes, 2 ) ) + " [W/K]" );
+										ShowMessage( "SizeWaterCoil: Potential issue with equipment sizing for Coil = " + WaterCoil( CoilNum ).Name );
+										ShowContinueError( "User-Specified U-Factor Times Area Value of " + RoundSigDigits( UACoilUser, 2 ) + " [W/K]" );
+										ShowContinueError( "differs from Design Size U-Factor Times Area Value of " + RoundSigDigits( UACoilDes, 2 ) + " [W/K]" );
 										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 									}
@@ -3491,7 +3491,7 @@ namespace WaterCoils {
 				// if there is no heating Plant Sizing object and autosizng was requested, issue an error message
 				if ( WaterCoil( CoilNum ).RequestingAutoSize ) {
 					ShowSevereError( "Autosizing of water coil requires a heating loop Sizing:Plant object" );
-					ShowContinueError( "Occurs in water coil object= " + trim( WaterCoil( CoilNum ).Name ) );
+					ShowContinueError( "Occurs in water coil object= " + WaterCoil( CoilNum ).Name );
 					ErrorsFound = true;
 				}
 			} // end of heating Plant Sizing existence IF - ELSE
@@ -3619,7 +3619,7 @@ namespace WaterCoils {
 		if ( ( ( CapacitanceAir > 0.0 ) && ( CapacitanceWater > 0.0 ) ) && ( GetCurrentScheduleValue( WaterCoil( CoilNum ).SchedPtr ) > 0.0 || MySizeFlag( CoilNum ) || MyUAAndFlowCalcFlag( CoilNum ) || CalcMode == DesignCalc ) ) {
 
 			if ( UA <= 0.0 ) {
-				ShowFatalError( "UA is zero for COIL:Heating:Water " + trim( WaterCoil( CoilNum ).Name ) );
+				ShowFatalError( "UA is zero for COIL:Heating:Water " + WaterCoil( CoilNum ).Name );
 			}
 			NTU = UA / CapacitanceMin;
 			ETA = std::pow( NTU, 0.22 );
@@ -3852,21 +3852,21 @@ namespace WaterCoils {
 		//Warning and error messages for large flow rates for the given user input geometry
 		AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, TempAirIn, InletAirHumRat, "CalcDetailFlatFinCoolingCoil" );
 		if ( AirMassFlow > ( 5.0 * WaterCoil( CoilNum ).MinAirFlowArea / AirDensity ) && CoilWarningOnceFlag( CoilNum ) ) {
-			ShowWarningError( "Coil:Cooling:Water:DetailedGeometry in Coil =" + trim( WaterCoil( CoilNum ).Name ) );
+			ShowWarningError( "Coil:Cooling:Water:DetailedGeometry in Coil =" + WaterCoil( CoilNum ).Name );
 			ShowContinueError( "Air Flow Rate Velocity has greatly exceeded upper design guidelines of ~2.5 m/s" );
-			ShowContinueError( "Air MassFlowRate[kg/s]=" + trim( TrimSigDigits( AirMassFlow, 6 ) ) );
+			ShowContinueError( "Air MassFlowRate[kg/s]=" + TrimSigDigits( AirMassFlow, 6 ) );
 			AirVelocity = AirMassFlow * AirDensity / WaterCoil( CoilNum ).MinAirFlowArea;
-			ShowContinueError( "Air Face Velocity[m/s]=" + trim( TrimSigDigits( AirVelocity, 6 ) ) );
-			ShowContinueError( "Approximate MassFlowRate limit for Face Area[kg/s]=" + trim( TrimSigDigits( 2.5 * WaterCoil( CoilNum ).MinAirFlowArea / AirDensity, 6 ) ) );
+			ShowContinueError( "Air Face Velocity[m/s]=" + TrimSigDigits( AirVelocity, 6 ) );
+			ShowContinueError( "Approximate MassFlowRate limit for Face Area[kg/s]=" + TrimSigDigits( 2.5 * WaterCoil( CoilNum ).MinAirFlowArea / AirDensity, 6 ) );
 			ShowContinueError( "Coil:Cooling:Water:DetailedGeometry could be resized/autosized to handle capacity" );
 			CoilWarningOnceFlag( CoilNum ) = false;
 		} else if ( AirMassFlow > ( 44.7 * WaterCoil( CoilNum ).MinAirFlowArea / AirDensity ) ) {
-			ShowSevereError( "Coil:Cooling:Water:DetailedGeometry in Coil =" + trim( WaterCoil( CoilNum ).Name ) );
+			ShowSevereError( "Coil:Cooling:Water:DetailedGeometry in Coil =" + WaterCoil( CoilNum ).Name );
 			ShowContinueError( "Air Flow Rate Velocity is > 100MPH (44.7m/s) and simulation cannot continue" );
-			ShowContinueError( "Air Mass Flow Rate[kg/s]=" + trim( TrimSigDigits( AirMassFlow, 6 ) ) );
+			ShowContinueError( "Air Mass Flow Rate[kg/s]=" + TrimSigDigits( AirMassFlow, 6 ) );
 			AirVelocity = AirMassFlow * AirDensity / WaterCoil( CoilNum ).MinAirFlowArea;
-			ShowContinueError( "Air Face Velocity[m/s]=" + trim( TrimSigDigits( AirVelocity, 6 ) ) );
-			ShowContinueError( "Approximate MassFlowRate limit for Face Area[kg/s]=" + trim( TrimSigDigits( 2.5 * WaterCoil( CoilNum ).MinAirFlowArea / AirDensity, 6 ) ) );
+			ShowContinueError( "Air Face Velocity[m/s]=" + TrimSigDigits( AirVelocity, 6 ) );
+			ShowContinueError( "Approximate MassFlowRate limit for Face Area[kg/s]=" + TrimSigDigits( 2.5 * WaterCoil( CoilNum ).MinAirFlowArea / AirDensity, 6 ) );
 			ShowFatalError( "Coil:Cooling:Water:DetailedGeometry needs to be resized/autosized to handle capacity" );
 		}
 
@@ -4021,7 +4021,7 @@ namespace WaterCoils {
 			//      the dew point coil is apparently all wet but a solution
 			//      cannot be obtained
 			if ( ! WaterTempConvg && ! WarmupFlag && ( OutCoilSurfTemp < EnterAirDewPoint ) ) {
-				ShowRecurringWarningErrorAtEnd( trim( WaterCoil( CoilNum ).Name ) + " not converged (8 iterations) due to \"Wet Convergence\" conditions.", WaterTempCoolCoilErrs( CoilNum ), std::abs( MeanWaterTemp - WetSideEffctvWaterTemp ), std::abs( MeanWaterTemp - WetSideEffctvWaterTemp ) );
+				ShowRecurringWarningErrorAtEnd( WaterCoil( CoilNum ).Name + " not converged (8 iterations) due to \"Wet Convergence\" conditions.", WaterTempCoolCoilErrs( CoilNum ), std::abs( MeanWaterTemp - WetSideEffctvWaterTemp ), std::abs( MeanWaterTemp - WetSideEffctvWaterTemp ) );
 				//       CoolCoilErrs = CoolCoilErrs + 1
 				//       IF (CoolCoilErrs .LE. MaxCoolCoilErrs) THEN
 				//          CALL ShowWarningError('tp12c0:  not converged in 8 CoolCoilErrs')
@@ -4185,7 +4185,7 @@ namespace WaterCoils {
 			}
 			//      error checking to see if convergence has been achieved
 			if ( ! CoilPartWetConvg && ! WarmupFlag ) {
-				ShowRecurringWarningErrorAtEnd( trim( WaterCoil( CoilNum ).Name ) + " not converged (40 iterations) due to \"Partial Wet Convergence\" conditions.", PartWetCoolCoilErrs( CoilNum ) );
+				ShowRecurringWarningErrorAtEnd( WaterCoil( CoilNum ).Name + " not converged (40 iterations) due to \"Partial Wet Convergence\" conditions.", PartWetCoolCoilErrs( CoilNum ) );
 				//      CoolCoilErrs = CoolCoilErrs + 1
 				//      IF (CoolCoilErrs .LE. MaxCoolCoilErrs) THEN
 				//        CALL ShowWarningError('tp12c0:  not converged in 20 CoolCoilErrs')
@@ -4840,7 +4840,7 @@ Label999: ;
 			// Wet Dry Interface temperature not converged after maximum specified iterations.
 			// Print error message, set return error flag
 			if ( ( itT > itmax ) && ( ! WarmupFlag ) ) {
-				ShowWarningError( "For Coil:Cooling:Water " + trim( WaterCoil( CoilNum ).Name ) );
+				ShowWarningError( "For Coil:Cooling:Water " + WaterCoil( CoilNum ).Name );
 				ShowContinueError( "CoilPartWetPartDry: Maximum iterations exceeded for Liq Temp, at Interface" );
 			}
 
@@ -4956,7 +4956,7 @@ Label999: ;
 
 		// Error Message
 		if ( ( std::abs( DesTotalHeatTransfer ) - MaxHeatTransfer ) / max( MaxHeatTransfer, SmallNo ) > SmallNo ) {
-			ShowWarningError( "For Coil:Cooling:Water " + trim( WaterCoil( CoilNum ).Name ) );
+			ShowWarningError( "For Coil:Cooling:Water " + WaterCoil( CoilNum ).Name );
 			ShowContinueError( "CalcCoilUAbyEffectNTU:Given Q impossible for given inlet states, " "proceeding with MaxHeat Transfer" );
 			ShowContinueError( "Check the Sizing:System and Sizing:Zone cooling design supply air temperature and " );
 			ShowContinueError( "the Sizing:Plant design Loop exit temperature.  There must be sufficient difference between " "these two temperatures." );
@@ -5000,7 +5000,7 @@ Label999: ;
 
 		// If not converged after itmax iterations, return error code
 		if ( ( iter > itmax ) && ( ! WarmupFlag ) ) {
-			ShowWarningError( "For Coil:Cooling:Water " + trim( WaterCoil( CoilNum ).Name ) );
+			ShowWarningError( "For Coil:Cooling:Water " + WaterCoil( CoilNum ).Name );
 			ShowContinueError( "CalcCoilUAbyEffectNTU: Maximum iterations exceeded:Coil UA calculation" );
 			CalcCoilUAbyEffectNTU = 0.0; //Autodesk:Return Line added to set return value: Using non-converged CoilUA value may be preferred but that was not happening
 		} else {
@@ -6214,8 +6214,8 @@ Label10: ;
 
 	void
 	CheckWaterCoilSchedule(
-		Fstring const & CompType, // unused1208
-		Fstring const & CompName,
+		std::string const & CompType, // unused1208
+		std::string const & CompName,
 		Real64 & Value,
 		int & CompIndex
 	)
@@ -6265,17 +6265,17 @@ Label10: ;
 		if ( CompIndex == 0 ) {
 			CoilNum = FindItemInList( CompName, WaterCoil.Name(), NumWaterCoils );
 			if ( CoilNum == 0 ) {
-				ShowFatalError( "CheckWaterCoilSchedule: Coil not found=" + trim( CompName ) );
+				ShowFatalError( "CheckWaterCoilSchedule: Coil not found=" + CompName );
 			}
 			CompIndex = CoilNum;
 			Value = GetCurrentScheduleValue( WaterCoil( CoilNum ).SchedPtr ); // not scheduled?
 		} else {
 			CoilNum = CompIndex;
 			if ( CoilNum > NumWaterCoils || CoilNum < 1 ) {
-				ShowFatalError( "CheckWaterCoilSchedule: Invalid CompIndex passed=" + trim( TrimSigDigits( CoilNum ) ) + ", Number of Heating Coils=" + trim( TrimSigDigits( NumWaterCoils ) ) + ", Coil name=" + trim( CompName ) );
+				ShowFatalError( "CheckWaterCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Number of Heating Coils=" + TrimSigDigits( NumWaterCoils ) + ", Coil name=" + CompName );
 			}
 			if ( CompName != WaterCoil( CoilNum ).Name ) {
-				ShowFatalError( "CheckWaterCoilSchedule: Invalid CompIndex passed=" + trim( TrimSigDigits( CoilNum ) ) + ", Coil name=" + trim( CompName ) + ", stored Coil Name for that index=" + trim( WaterCoil( CoilNum ).Name ) );
+				ShowFatalError( "CheckWaterCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + WaterCoil( CoilNum ).Name );
 			}
 			Value = GetCurrentScheduleValue( WaterCoil( CoilNum ).SchedPtr ); // not scheduled?
 		}
@@ -6284,8 +6284,8 @@ Label10: ;
 
 	Real64
 	GetCoilMaxWaterFlowRate(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -6347,7 +6347,7 @@ Label10: ;
 		}
 
 		if ( WhichCoil == 0 ) {
-			ShowSevereError( "GetCoilMaxWaterFlowRate: Could not find Coil, Type=\"" + trim( CoilType ) + "\" Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "GetCoilMaxWaterFlowRate: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 			ShowContinueError( "... Max Water Flow rate returned as -1000." );
 			ErrorsFound = true;
 			MaxWaterFlowRate = -1000.;
@@ -6359,8 +6359,8 @@ Label10: ;
 
 	int
 	GetCoilInletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -6422,7 +6422,7 @@ Label10: ;
 		}
 
 		if ( WhichCoil == 0 ) {
-			ShowSevereError( "GetCoilInletNode: Could not find Coil, Type=\"" + trim( CoilType ) + "\" Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "GetCoilInletNode: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		}
@@ -6433,8 +6433,8 @@ Label10: ;
 
 	int
 	GetCoilOutletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -6496,7 +6496,7 @@ Label10: ;
 		}
 
 		if ( WhichCoil == 0 ) {
-			ShowSevereError( "GetCoilOutletNode: Could not find Coil, Type=\"" + trim( CoilType ) + "\" Name=\"" + trim( CoilName ) + "\" when accessing coil outlet node number." );
+			ShowSevereError( "GetCoilOutletNode: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\" when accessing coil outlet node number." );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		}
@@ -6507,8 +6507,8 @@ Label10: ;
 
 	int
 	GetCoilWaterInletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -6570,7 +6570,7 @@ Label10: ;
 		}
 
 		if ( WhichCoil == 0 ) {
-			ShowSevereError( "GetCoilWaterInletNode: Could not find Coil, Type=\"" + trim( CoilType ) + "\" Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "GetCoilWaterInletNode: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		}
@@ -6581,8 +6581,8 @@ Label10: ;
 
 	int
 	GetCoilWaterOutletNode(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -6644,7 +6644,7 @@ Label10: ;
 		}
 
 		if ( WhichCoil == 0 ) {
-			ShowSevereError( "GetCoilWaterOutletNode: Could not find Coil, Type=\"" + trim( CoilType ) + "\" Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "GetCoilWaterOutletNode: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		}
@@ -6655,8 +6655,8 @@ Label10: ;
 
 	void
 	SetCoilDesFlow(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		Real64 const CoilDesFlow, // coil volumetric air flow rate [m3/s]
 		bool & ErrorsFound // set to true if problem
 	)
@@ -6712,7 +6712,7 @@ Label10: ;
 					WaterCoil( WhichCoil ).DesAirVolFlowRate = CoilDesFlow;
 				}
 			} else {
-				ShowSevereError( "GetCoilMaxWaterFlowRate: Could not find Coil, Type=\"" + trim( CoilType ) + "\" Name=\"" + trim( CoilName ) + "\"" );
+				ShowSevereError( "GetCoilMaxWaterFlowRate: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 				ErrorsFound = true;
 			}
 		}
@@ -6819,7 +6819,7 @@ Label10: ;
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "CheckForSensorAndSetpointNode: " );
+		static std::string const RoutineName( "CheckForSensorAndSetpointNode: " );
 		int const iTemperature( 1 );
 		int const iHumidityRatio( 2 );
 		int const iTemperatureAndHumidityRatio( 3 );
@@ -6833,7 +6833,7 @@ Label10: ;
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil; // water coil index
 		int CoilNum; // counter
-		Fstring WaterCoilType( 40 ); // water coil type
+		std::string WaterCoilType; // water coil type
 		bool EMSSetPointErrorFlag; // flag true is EMS is used to set node setpoints
 
 		// Obtains and Allocates DXCoils
@@ -6868,7 +6868,7 @@ Label10: ;
 					CheckIfNodeSetPointManagedByEMS( SensorNodeNum, iTemperatureSetPoint, EMSSetPointErrorFlag );
 					if ( EMSSetPointErrorFlag ) {
 						if ( ! NodeHasSPMCtrlVarType( SensorNodeNum, iCtrlVarType_Temp ) ) {
-							ShowWarningError( RoutineName + trim( WaterCoilType ) + "=\"" + trim( WaterCoil( WhichCoil ).Name ) + "\". " );
+							ShowWarningError( RoutineName + WaterCoilType + "=\"" + WaterCoil( WhichCoil ).Name + "\". " );
 							ShowContinueError( " ..Temperature setpoint not found on coil air outlet node." );
 							ShowContinueError( " ..The setpoint may have been placed on a node downstream of the coil" " or on an airloop outlet node." );
 							ShowContinueError( " ..Specify the setpoint and the sensor on the coil air outlet node when possible." );
@@ -6878,7 +6878,7 @@ Label10: ;
 					CheckIfNodeSetPointManagedByEMS( SensorNodeNum, iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag );
 					if ( EMSSetPointErrorFlag ) {
 						if ( ! NodeHasSPMCtrlVarType( SensorNodeNum, iCtrlVarType_MaxHumRat ) ) {
-							ShowWarningError( RoutineName + trim( WaterCoilType ) + "=\"" + trim( WaterCoil( WhichCoil ).Name ) + "\". " );
+							ShowWarningError( RoutineName + WaterCoilType + "=\"" + WaterCoil( WhichCoil ).Name + "\". " );
 							ShowContinueError( " ..Humidity ratio setpoint not found on coil air outlet node." );
 							ShowContinueError( " ..The setpoint may have been placed on a node downstream of the coil" " or on an airloop outlet node." );
 							ShowContinueError( " ..Specify the setpoint and the sensor on the coil air outlet node when possible." );
@@ -6888,7 +6888,7 @@ Label10: ;
 					CheckIfNodeSetPointManagedByEMS( SensorNodeNum, iTemperatureSetPoint, EMSSetPointErrorFlag );
 					if ( EMSSetPointErrorFlag ) {
 						if ( ! NodeHasSPMCtrlVarType( SensorNodeNum, iCtrlVarType_Temp ) ) {
-							ShowWarningError( RoutineName + trim( WaterCoilType ) + "=\"" + trim( WaterCoil( WhichCoil ).Name ) + "\". " );
+							ShowWarningError( RoutineName + WaterCoilType + "=\"" + WaterCoil( WhichCoil ).Name + "\". " );
 							ShowContinueError( " ..Temperature setpoint not found on coil air outlet node." );
 							ShowContinueError( " ..The setpoint may have been placed on a node downstream of the coil" " or on an airloop outlet node." );
 							ShowContinueError( " ..Specify the setpoint and the sensor on the coil air outlet node when possible." );
@@ -6898,7 +6898,7 @@ Label10: ;
 					CheckIfNodeSetPointManagedByEMS( SensorNodeNum, iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag );
 					if ( EMSSetPointErrorFlag ) {
 						if ( ! NodeHasSPMCtrlVarType( SensorNodeNum, iCtrlVarType_MaxHumRat ) ) {
-							ShowWarningError( RoutineName + trim( WaterCoilType ) + "=\"" + trim( WaterCoil( WhichCoil ).Name ) + "\". " );
+							ShowWarningError( RoutineName + WaterCoilType + "=\"" + WaterCoil( WhichCoil ).Name + "\". " );
 							ShowContinueError( " ..Humidity ratio setpoint not found on coil air outlet node." );
 							ShowContinueError( " ..The setpoint may have been placed on a node downstream of the coil" " or on an airloop outlet node." );
 							ShowContinueError( " ..Specify the setpoint and the sensor on the coil air outlet node when possible." );
@@ -6975,11 +6975,11 @@ Label10: ;
 		if ( SolFla == -1 ) {
 			ShowSevereError( "Calculation of drybulb temperature failed in TdbFnHRhPb(H,RH,PB)" );
 			ShowContinueError( "   Iteration limit exceeded" );
-			ShowContinueError( "   H=[" + trim( RoundSigDigits( H, 6 ) ) + "], RH=[" + trim( RoundSigDigits( RH, 4 ) ) + "], PB=[" + trim( RoundSigDigits( PB, 5 ) ) + "]." );
+			ShowContinueError( "   H=[" + RoundSigDigits( H, 6 ) + "], RH=[" + RoundSigDigits( RH, 4 ) + "], PB=[" + RoundSigDigits( PB, 5 ) + "]." );
 		} else if ( SolFla == -2 ) {
 			ShowSevereError( "Calculation of drybulb temperature failed in TdbFnHRhPb(H,RH,PB)" );
 			ShowContinueError( "  Bad starting values for Tdb" );
-			ShowContinueError( "   H=[" + trim( RoundSigDigits( H, 6 ) ) + "], RH=[" + trim( RoundSigDigits( RH, 4 ) ) + "], PB=[" + trim( RoundSigDigits( PB, 5 ) ) + "]." );
+			ShowContinueError( "   H=[" + RoundSigDigits( H, 6 ) + "], RH=[" + RoundSigDigits( RH, 4 ) + "], PB=[" + RoundSigDigits( PB, 5 ) + "]." );
 		}
 		if ( SolFla < 0 ) {
 			T = 0.0;
@@ -7118,8 +7118,8 @@ Label10: ;
 
 	int
 	GetWaterCoilIndex(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -7180,7 +7180,7 @@ Label10: ;
 		}
 
 		if ( IndexNum == 0 ) {
-			ShowSevereError( "GetWaterCoilIndex: Could not find CoilType=\"" + trim( CoilType ) + "\" with Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "GetWaterCoilIndex: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 		}
 
@@ -7190,8 +7190,8 @@ Label10: ;
 
 	Real64
 	GetWaterCoilCapacity(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -7256,7 +7256,7 @@ Label10: ;
 		}
 
 		if ( IndexNum == 0 ) {
-			ShowSevereError( "GetWaterCoilCapacity: Could not find CoilType=\"" + trim( CoilType ) + "\" with Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "GetWaterCoilCapacity: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 		}
 
@@ -7266,7 +7266,7 @@ Label10: ;
 	void
 	UpdateWaterToAirCoilPlantConnection(
 		int const CoilTypeNum,
-		Fstring const & CoilName,
+		std::string const & CoilName,
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int const LoopNum, // Plant loop index for where called from
 		int const LoopSide, // Plant loop side index for where called from
@@ -7324,20 +7324,20 @@ Label10: ;
 		if ( CompIndex == 0 ) {
 			CoilNum = FindItemInList( CoilName, WaterCoil.Name(), NumWaterCoils );
 			if ( CoilNum == 0 ) {
-				ShowFatalError( "UpdateWaterToAirCoilPlantConnection: Specified Coil not one of Valid water coils=" + trim( CoilName ) );
+				ShowFatalError( "UpdateWaterToAirCoilPlantConnection: Specified Coil not one of Valid water coils=" + CoilName );
 			}
 			CompIndex = CoilNum;
 		} else {
 			CoilNum = CompIndex;
 			if ( CoilNum > NumWaterCoils || CoilNum < 1 ) {
-				ShowFatalError( "UpdateWaterToAirCoilPlantConnection:  Invalid CompIndex passed=" + trim( TrimSigDigits( CoilNum ) ) + ", Number of Coils=" + trim( TrimSigDigits( NumWaterCoils ) ) + ", Entered Coil name=" + trim( CoilName ) );
+				ShowFatalError( "UpdateWaterToAirCoilPlantConnection:  Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Number of Coils=" + TrimSigDigits( NumWaterCoils ) + ", Entered Coil name=" + CoilName );
 			}
 			if ( KickOffSimulation ) {
 				if ( CoilName != WaterCoil( CoilNum ).Name ) {
-					ShowFatalError( "UpdateWaterToAirCoilPlantConnection: Invalid CompIndex passed=" + trim( TrimSigDigits( CoilNum ) ) + ", Coil name=" + trim( CoilName ) + ", stored Coil Name for that index=" + trim( WaterCoil( CoilNum ).Name ) );
+					ShowFatalError( "UpdateWaterToAirCoilPlantConnection: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Coil name=" + CoilName + ", stored Coil Name for that index=" + WaterCoil( CoilNum ).Name );
 				}
 				if ( CoilTypeNum != WaterCoil( CoilNum ).WaterCoilType_Num ) {
-					ShowFatalError( "UpdateWaterToAirCoilPlantConnection: Invalid CompIndex passed=" + trim( TrimSigDigits( CoilNum ) ) + ", Coil name=" + trim( CoilName ) + ", stored Coil Name for that index=" + trim( ccSimPlantEquipTypes( CoilTypeNum ) ) );
+					ShowFatalError( "UpdateWaterToAirCoilPlantConnection: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Coil name=" + CoilName + ", stored Coil Name for that index=" + ccSimPlantEquipTypes( CoilTypeNum ) );
 				}
 			}
 		}
@@ -7377,8 +7377,8 @@ Label10: ;
 
 	int
 	GetWaterCoilAvailScheduleIndex(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -7442,7 +7442,7 @@ Label10: ;
 		}
 
 		if ( WhichCoil == 0 ) {
-			ShowSevereError( "GetCoilAvailScheduleIndex: Could not find Coil, Type=\"" + trim( CoilType ) + "\" Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "GetCoilAvailScheduleIndex: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			AvailSchIndex = 0;
 		}

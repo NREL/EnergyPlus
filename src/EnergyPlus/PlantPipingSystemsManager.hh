@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -34,10 +33,10 @@ namespace PlantPipingSystemsManager {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
-	extern Fstring const ObjName_ug_GeneralDomain;
-	extern Fstring const ObjName_Circuit;
-	extern Fstring const ObjName_Segment;
-	extern Fstring const ObjName_HorizTrench;
+	extern std::string const ObjName_ug_GeneralDomain;
+	extern std::string const ObjName_Circuit;
+	extern std::string const ObjName_Segment;
+	extern std::string const ObjName_HorizTrench;
 
 	// MODULE INTERFACE DEFINITIONS:
 
@@ -84,7 +83,7 @@ namespace PlantPipingSystemsManager {
 
 	void
 	SimPipingSystemCircuit(
-		Fstring const & EquipName, // name of the Pipe Heat Transfer.
+		std::string const & EquipName, // name of the Pipe Heat Transfer.
 		int & EqNum, // index in local derived types for external calling
 		bool const FirstHVACIteration, // component number
 		bool const InitLoopEquip
@@ -182,12 +181,12 @@ namespace PlantPipingSystemsManager {
 
 	void
 	IssueSevereInputFieldError(
-		Fstring const & RoutineName,
-		Fstring const & ObjectName,
-		Fstring const & InstanceName,
-		Fstring const & FieldName,
-		Fstring const & FieldEntry,
-		Fstring const & Condition,
+		std::string const & RoutineName,
+		std::string const & ObjectName,
+		std::string const & InstanceName,
+		std::string const & FieldName,
+		std::string const & FieldEntry,
+		std::string const & Condition,
 		bool & ErrorsFound
 	);
 
@@ -197,12 +196,12 @@ namespace PlantPipingSystemsManager {
 
 	void
 	IssueSevereInputFieldError(
-		Fstring const & RoutineName,
-		Fstring const & ObjectName,
-		Fstring const & InstanceName,
-		Fstring const & FieldName,
+		std::string const & RoutineName,
+		std::string const & ObjectName,
+		std::string const & InstanceName,
+		std::string const & FieldName,
 		Real64 const FieldEntry,
-		Fstring const & Condition,
+		std::string const & Condition,
 		bool & ErrorsFound
 	);
 

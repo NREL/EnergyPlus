@@ -75,7 +75,6 @@ namespace Fans {
 	using DataHVACGlobals::MinFrac;
 	using DataHVACGlobals::FixedMin;
 	using DataGlobals::BeginEnvrnFlag;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::WarmupFlag;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::emsCallFromComponentGetInput;
@@ -135,7 +134,7 @@ namespace Fans {
 
 	void
 	SimulateFanComponents(
-		Fstring const & CompName,
+		std::string const & CompName,
 		bool const FirstHVACIteration,
 		int & CompIndex,
 		Optional< Real64 const > SpeedRatio,
@@ -168,7 +167,7 @@ namespace Fans {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const Blank;
+		static std::string const Blank;
 
 		// INTERFACE BLOCK SPECIFICATIONS
 
@@ -189,17 +188,17 @@ namespace Fans {
 		if ( CompIndex == 0 ) {
 			FanNum = FindItemInList( CompName, Fan.FanName(), NumFans );
 			if ( FanNum == 0 ) {
-				ShowFatalError( "SimulateFanComponents: Fan not found=" + trim( CompName ) );
+				ShowFatalError( "SimulateFanComponents: Fan not found=" + CompName );
 			}
 			CompIndex = FanNum;
 		} else {
 			FanNum = CompIndex;
 			if ( FanNum > NumFans || FanNum < 1 ) {
-				ShowFatalError( "SimulateFanComponents: Invalid CompIndex passed=" + trim( TrimSigDigits( FanNum ) ) + ", Number of Fans=" + trim( TrimSigDigits( NumFans ) ) + ", Fan name=" + trim( CompName ) );
+				ShowFatalError( "SimulateFanComponents: Invalid CompIndex passed=" + TrimSigDigits( FanNum ) + ", Number of Fans=" + TrimSigDigits( NumFans ) + ", Fan name=" + CompName );
 			}
 			if ( CheckEquipName( FanNum ) ) {
 				if ( CompName != Blank && CompName != Fan( FanNum ).FanName ) {
-					ShowFatalError( "SimulateFanComponents: Invalid CompIndex passed=" + trim( TrimSigDigits( FanNum ) ) + ", Fan name=" + trim( CompName ) + ", stored Fan Name for that index=" + trim( Fan( FanNum ).FanName ) );
+					ShowFatalError( "SimulateFanComponents: Invalid CompIndex passed=" + TrimSigDigits( FanNum ) + ", Fan name=" + CompName + ", stored Fan Name for that index=" + Fan( FanNum ).FanName );
 				}
 				CheckEquipName( FanNum ) = false;
 			}
@@ -314,14 +313,14 @@ namespace Fans {
 		static bool ErrorsFound( false ); // If errors detected in input
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		static Fstring const RoutineName( "GetFanInput: " ); // include trailing blank space
-		FArray1D_Fstring cAlphaFieldNames( sFstring( MaxNameLength + 40 ) );
-		FArray1D_Fstring cNumericFieldNames( sFstring( MaxNameLength + 40 ) );
+		static std::string const RoutineName( "GetFanInput: " ); // include trailing blank space
+		FArray1D_string cAlphaFieldNames;
+		FArray1D_string cNumericFieldNames;
 		FArray1D_bool lNumericFieldBlanks;
 		FArray1D_bool lAlphaFieldBlanks;
-		FArray1D_Fstring cAlphaArgs( sFstring( MaxNameLength ) );
+		FArray1D_string cAlphaArgs;
 		FArray1D< Real64 > rNumericArgs;
-		Fstring cCurrentModuleObject( MaxNameLength );
+		std::string cCurrentModuleObject;
 		int NumParams;
 		int MaxAlphas;
 		int MaxNumbers;
@@ -369,13 +368,13 @@ namespace Fans {
 		}
 
 		cAlphaArgs.allocate( MaxAlphas );
-		cAlphaArgs = " ";
+		cAlphaArgs = "";
 		cAlphaFieldNames.allocate( MaxAlphas );
-		cAlphaFieldNames = " ";
+		cAlphaFieldNames = "";
 		lAlphaFieldBlanks.allocate( MaxAlphas );
 		lAlphaFieldBlanks = false;
 		cNumericFieldNames.allocate( MaxNumbers );
-		cNumericFieldNames = " ";
+		cNumericFieldNames = "";
 		lNumericFieldBlanks.allocate( MaxNumbers );
 		lNumericFieldBlanks = false;
 		rNumericArgs.allocate( MaxNumbers );
@@ -394,7 +393,7 @@ namespace Fans {
 			GetObjectItem( cCurrentModuleObject, SimpFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Fan.FanName(), FanNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Fan.FanName(), FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -407,7 +406,7 @@ namespace Fans {
 			} else {
 				Fan( FanNum ).AvailSchedPtrNum = GetScheduleIndex( cAlphaArgs( 2 ) );
 				if ( Fan( FanNum ).AvailSchedPtrNum == 0 ) {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 2 ) ) + " entered =" + trim( cAlphaArgs( 2 ) ) + " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) + " entered =" + cAlphaArgs( 2 ) + " for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -417,15 +416,15 @@ namespace Fans {
 			Fan( FanNum ).DeltaPress = rNumericArgs( 2 );
 			Fan( FanNum ).MaxAirFlowRate = rNumericArgs( 3 );
 			if ( Fan( FanNum ).MaxAirFlowRate == 0.0 ) {
-				ShowWarningError( trim( cCurrentModuleObject ) + "=\"" + trim( Fan( FanNum ).FanName ) + "\" has specified 0.0 max air flow rate. It will not be used in the simulation." );
+				ShowWarningError( cCurrentModuleObject + "=\"" + Fan( FanNum ).FanName + "\" has specified 0.0 max air flow rate. It will not be used in the simulation." );
 			}
 			Fan( FanNum ).MaxAirFlowRateIsAutosizable = true;
 			Fan( FanNum ).MotEff = rNumericArgs( 4 );
 			Fan( FanNum ).MotInAirFrac = rNumericArgs( 5 );
 			Fan( FanNum ).MinAirFlowRate = 0.0;
 
-			Fan( FanNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			Fan( FanNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			Fan( FanNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			Fan( FanNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 			if ( NumAlphas > 4 ) {
 				Fan( FanNum ).EndUseSubcategoryName = cAlphaArgs( 5 );
@@ -433,7 +432,7 @@ namespace Fans {
 				Fan( FanNum ).EndUseSubcategoryName = "General";
 			}
 
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Air Nodes" );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Air Nodes" );
 
 		} // end Number of Simple FAN Loop
 
@@ -443,7 +442,7 @@ namespace Fans {
 			GetObjectItem( cCurrentModuleObject, VarVolFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Fan.FanName(), FanNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Fan.FanName(), FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -456,7 +455,7 @@ namespace Fans {
 			} else {
 				Fan( FanNum ).AvailSchedPtrNum = GetScheduleIndex( cAlphaArgs( 2 ) );
 				if ( Fan( FanNum ).AvailSchedPtrNum == 0 ) {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 2 ) ) + " entered =" + trim( cAlphaArgs( 2 ) ) + " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) + " entered =" + cAlphaArgs( 2 ) + " for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -466,7 +465,7 @@ namespace Fans {
 			Fan( FanNum ).DeltaPress = rNumericArgs( 2 );
 			Fan( FanNum ).MaxAirFlowRate = rNumericArgs( 3 );
 			if ( Fan( FanNum ).MaxAirFlowRate == 0.0 ) {
-				ShowWarningError( trim( cCurrentModuleObject ) + "=\"" + trim( Fan( FanNum ).FanName ) + "\" has specified 0.0 max air flow rate. It will not be used in the simulation." );
+				ShowWarningError( cCurrentModuleObject + "=\"" + Fan( FanNum ).FanName + "\" has specified 0.0 max air flow rate. It will not be used in the simulation." );
 			}
 			Fan( FanNum ).MaxAirFlowRateIsAutosizable = true;
 			if ( SameString( cAlphaArgs( 3 ), "Fraction" ) ) {
@@ -474,8 +473,8 @@ namespace Fans {
 			} else if ( SameString( cAlphaArgs( 3 ), "FixedFlowRate" ) ) {
 				Fan( FanNum ).FanMinAirFracMethod = FixedMin;
 			} else {
-				ShowSevereError( trim( cAlphaFieldNames( 3 ) ) + " should be either Fraction or FixedFlowRate." );
-				ShowContinueError( "Occurs in " + trim( Fan( FanNum ).FanName ) + " object." );
+				ShowSevereError( cAlphaFieldNames( 3 ) + " should be either Fraction or FixedFlowRate." );
+				ShowContinueError( "Occurs in " + Fan( FanNum ).FanName + " object." );
 				ErrorsFound = true;
 			}
 			//        Fan(FanNum)%MinAirFlowRate= rNumericArgs(4)
@@ -490,10 +489,10 @@ namespace Fans {
 			Fan( FanNum ).FanCoeff( 5 ) = rNumericArgs( 12 );
 			if ( Fan( FanNum ).FanCoeff( 1 ) == 0.0 && Fan( FanNum ).FanCoeff( 2 ) == 0.0 && Fan( FanNum ).FanCoeff( 3 ) == 0.0 && Fan( FanNum ).FanCoeff( 4 ) == 0.0 && Fan( FanNum ).FanCoeff( 5 ) == 0.0 ) {
 				ShowWarningError( "Fan Coefficients are all zero.  No Fan power will be reported." );
-				ShowContinueError( "For " + trim( cCurrentModuleObject ) + ", Fan=" + trim( cAlphaArgs( 1 ) ) );
+				ShowContinueError( "For " + cCurrentModuleObject + ", Fan=" + cAlphaArgs( 1 ) );
 			}
-			Fan( FanNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			Fan( FanNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			Fan( FanNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			Fan( FanNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 			if ( NumAlphas > 5 ) {
 				Fan( FanNum ).EndUseSubcategoryName = cAlphaArgs( 6 );
@@ -501,7 +500,7 @@ namespace Fans {
 				Fan( FanNum ).EndUseSubcategoryName = "General";
 			}
 
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 4 ), cAlphaArgs( 5 ), "Air Nodes" );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 4 ), cAlphaArgs( 5 ), "Air Nodes" );
 
 		} // end Number of Variable Volume FAN Loop
 
@@ -511,7 +510,7 @@ namespace Fans {
 			GetObjectItem( cCurrentModuleObject, ExhFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Fan.FanName(), FanNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Fan.FanName(), FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -524,11 +523,11 @@ namespace Fans {
 			} else {
 				Fan( FanNum ).AvailSchedPtrNum = GetScheduleIndex( cAlphaArgs( 2 ) );
 				if ( Fan( FanNum ).AvailSchedPtrNum == 0 ) {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 2 ) ) + " entered =" + trim( cAlphaArgs( 2 ) ) + " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) + " entered =" + cAlphaArgs( 2 ) + " for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				} else {
 					if ( HasFractionalScheduleValue( Fan( FanNum ).AvailSchedPtrNum ) ) {
-						ShowWarningError( trim( cCurrentModuleObject ) + "=\"" + trim( Fan( FanNum ).FanName ) + "\" has fractional values in Schedule=" + trim( cAlphaArgs( 2 ) ) + ". Only 0.0 in the schedule value turns the fan off." );
+						ShowWarningError( cCurrentModuleObject + "=\"" + Fan( FanNum ).FanName + "\" has fractional values in Schedule=" + cAlphaArgs( 2 ) + ". Only 0.0 in the schedule value turns the fan off." );
 					}
 				}
 			}
@@ -545,11 +544,11 @@ namespace Fans {
 			Fan( FanNum ).MaxAirMassFlowRate = Fan( FanNum ).MaxAirFlowRate * Fan( FanNum ).RhoAirStdInit;
 
 			if ( Fan( FanNum ).MaxAirFlowRate == 0.0 ) {
-				ShowWarningError( trim( cCurrentModuleObject ) + "=\"" + trim( Fan( FanNum ).FanName ) + "\" has specified 0.0 max air flow rate. It will not be used in the simulation." );
+				ShowWarningError( cCurrentModuleObject + "=\"" + Fan( FanNum ).FanName + "\" has specified 0.0 max air flow rate. It will not be used in the simulation." );
 			}
 
-			Fan( FanNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			Fan( FanNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			Fan( FanNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			Fan( FanNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 			if ( NumAlphas > 4 && ! lAlphaFieldBlanks( 5 ) ) {
 				Fan( FanNum ).EndUseSubcategoryName = cAlphaArgs( 5 );
@@ -560,12 +559,12 @@ namespace Fans {
 			if ( NumAlphas > 5 && ! lAlphaFieldBlanks( 6 ) ) {
 				Fan( FanNum ).FlowFractSchedNum = GetScheduleIndex( cAlphaArgs( 6 ) );
 				if ( Fan( FanNum ).FlowFractSchedNum == 0 ) {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 6 ) ) + " entered =" + trim( cAlphaArgs( 6 ) ) + " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 6 ) + " entered =" + cAlphaArgs( 6 ) + " for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				} else if ( Fan( FanNum ).FlowFractSchedNum > 0 ) {
 					if ( ! CheckScheduleValueMinMax( Fan( FanNum ).FlowFractSchedNum, ">=", 0.0, "<=", 1.0 ) ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 6 ) ) + " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
-						ShowContinueError( "Error found in " + trim( cAlphaFieldNames( 6 ) ) + " = " + trim( cAlphaArgs( 6 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 6 ) + " for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
+						ShowContinueError( "Error found in " + cAlphaFieldNames( 6 ) + " = " + cAlphaArgs( 6 ) );
 						ShowContinueError( "Schedule values must be (>=0., <=1.)" );
 						ErrorsFound = true;
 					}
@@ -575,13 +574,13 @@ namespace Fans {
 			}
 
 			if ( NumAlphas > 6 && ! lAlphaFieldBlanks( 7 ) ) {
-				{ auto const SELECT_CASE_var( trim( cAlphaArgs( 7 ) ) );
+				{ auto const SELECT_CASE_var( cAlphaArgs( 7 ) );
 				if ( SELECT_CASE_var == "COUPLED" ) {
 					Fan( FanNum ).AvailManagerMode = ExhaustFanCoupledToAvailManagers;
 				} else if ( SELECT_CASE_var == "DECOUPLED" ) {
 					Fan( FanNum ).AvailManagerMode = ExhaustFanDecoupledFromAvailManagers;
 				} else {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 7 ) ) + " entered =" + trim( cAlphaArgs( 7 ) ) + " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 7 ) + " entered =" + cAlphaArgs( 7 ) + " for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}}
 			} else {
@@ -591,7 +590,7 @@ namespace Fans {
 			if ( NumAlphas > 7 && ! lAlphaFieldBlanks( 8 ) ) {
 				Fan( FanNum ).MinTempLimitSchedNum = GetScheduleIndex( cAlphaArgs( 8 ) );
 				if ( Fan( FanNum ).MinTempLimitSchedNum == 0 ) {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 8 ) ) + " entered =" + trim( cAlphaArgs( 8 ) ) + " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 8 ) + " entered =" + cAlphaArgs( 8 ) + " for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 			} else {
@@ -601,12 +600,12 @@ namespace Fans {
 			if ( NumAlphas > 8 && ! lAlphaFieldBlanks( 9 ) ) {
 				Fan( FanNum ).BalancedFractSchedNum = GetScheduleIndex( cAlphaArgs( 9 ) );
 				if ( Fan( FanNum ).BalancedFractSchedNum == 0 ) {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 9 ) ) + " entered =" + trim( cAlphaArgs( 9 ) ) + " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 9 ) + " entered =" + cAlphaArgs( 9 ) + " for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				} else if ( Fan( FanNum ).BalancedFractSchedNum > 0 ) {
 					if ( ! CheckScheduleValueMinMax( Fan( FanNum ).BalancedFractSchedNum, ">=", 0.0, "<=", 1.0 ) ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 9 ) ) + " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
-						ShowContinueError( "Error found in " + trim( cAlphaFieldNames( 9 ) ) + " = " + trim( cAlphaArgs( 9 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 9 ) + " for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
+						ShowContinueError( "Error found in " + cAlphaFieldNames( 9 ) + " = " + cAlphaArgs( 9 ) );
 						ShowContinueError( "Schedule values must be (>=0., <=1.)" );
 						ErrorsFound = true;
 					}
@@ -626,7 +625,7 @@ namespace Fans {
 			GetObjectItem( cCurrentModuleObject, OnOffFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Fan.FanName(), FanNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Fan.FanName(), FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -639,7 +638,7 @@ namespace Fans {
 			} else {
 				Fan( FanNum ).AvailSchedPtrNum = GetScheduleIndex( cAlphaArgs( 2 ) );
 				if ( Fan( FanNum ).AvailSchedPtrNum == 0 ) {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 2 ) ) + " entered =" + trim( cAlphaArgs( 2 ) ) + " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) + " entered =" + cAlphaArgs( 2 ) + " for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -649,7 +648,7 @@ namespace Fans {
 			Fan( FanNum ).DeltaPress = rNumericArgs( 2 );
 			Fan( FanNum ).MaxAirFlowRate = rNumericArgs( 3 );
 			if ( Fan( FanNum ).MaxAirFlowRate == 0.0 ) {
-				ShowWarningError( trim( cCurrentModuleObject ) + "=\"" + trim( Fan( FanNum ).FanName ) + "\" has specified 0.0 max air flow rate. It will not be used in the simulation." );
+				ShowWarningError( cCurrentModuleObject + "=\"" + Fan( FanNum ).FanName + "\" has specified 0.0 max air flow rate. It will not be used in the simulation." );
 			}
 			Fan( FanNum ).MaxAirFlowRateIsAutosizable = true;
 			//       the following two structure variables are set here, as well as in InitFan, for the Heat Pump:Water Heater object
@@ -661,8 +660,8 @@ namespace Fans {
 			Fan( FanNum ).MotInAirFrac = rNumericArgs( 5 );
 			Fan( FanNum ).MinAirFlowRate = 0.0;
 
-			Fan( FanNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			Fan( FanNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			Fan( FanNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			Fan( FanNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 			if ( NumAlphas > 4 && ! lAlphaFieldBlanks( 5 ) ) {
 				Fan( FanNum ).FanPowerRatAtSpeedRatCurveIndex = GetCurveIndex( cAlphaArgs( 5 ) );
@@ -678,7 +677,7 @@ namespace Fans {
 				Fan( FanNum ).EndUseSubcategoryName = "General";
 			}
 
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Air Nodes" );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Air Nodes" );
 
 		} // end Number of Simple  ON-OFF FAN Loop
 
@@ -687,7 +686,7 @@ namespace Fans {
 
 		if ( NumNightVentPerf > 0 ) {
 			NightVentPerf.allocate( NumNightVentPerf );
-			NightVentPerf.FanName() = " ";
+			NightVentPerf.FanName() = "";
 			NightVentPerf.FanEff() = 0.0;
 			NightVentPerf.DeltaPress() = 0.0;
 			NightVentPerf.MaxAirFlowRate() = 0.0;
@@ -700,7 +699,7 @@ namespace Fans {
 			GetObjectItem( cCurrentModuleObject, NVPerfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), NightVentPerf.FanName(), NVPerfNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), NightVentPerf.FanName(), NVPerfNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -721,7 +720,7 @@ namespace Fans {
 				}
 			}
 			if ( ! NVPerfFanFound ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ", fan name not found=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( cCurrentModuleObject + ", fan name not found=" + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
@@ -735,7 +734,7 @@ namespace Fans {
 			GetObjectItem( cCurrentModuleObject, CompModelFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Fan.FanName(), FanNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Fan.FanName(), FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -743,10 +742,10 @@ namespace Fans {
 			Fan( FanNum ).FanName = cAlphaArgs( 1 ); // Fan name
 			Fan( FanNum ).FanType = cCurrentModuleObject;
 
-			Fan( FanNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent ); // Air inlet node name
-			Fan( FanNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent ); // Air outlet node name
+			Fan( FanNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent ); // Air inlet node name
+			Fan( FanNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent ); // Air outlet node name
 
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Air Nodes" );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Air Nodes" );
 
 			Fan( FanNum ).AvailSchedName = cAlphaArgs( 4 ); // Availability schedule name
 			if ( lAlphaFieldBlanks( 4 ) ) {
@@ -754,7 +753,7 @@ namespace Fans {
 			} else {
 				Fan( FanNum ).AvailSchedPtrNum = GetScheduleIndex( cAlphaArgs( 4 ) );
 				if ( Fan( FanNum ).AvailSchedPtrNum == 0 ) {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 4 ) ) + " entered =" + trim( cAlphaArgs( 4 ) ) + " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 4 ) + " entered =" + cAlphaArgs( 4 ) + " for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -763,7 +762,7 @@ namespace Fans {
 
 			Fan( FanNum ).MaxAirFlowRate = rNumericArgs( 1 );
 			if ( Fan( FanNum ).MaxAirFlowRate == 0.0 ) {
-				ShowWarningError( trim( cCurrentModuleObject ) + "=\"" + trim( Fan( FanNum ).FanName ) + "\" has specified 0.0 max air flow rate. It will not be used in the simulation." );
+				ShowWarningError( cCurrentModuleObject + "=\"" + Fan( FanNum ).FanName + "\" has specified 0.0 max air flow rate. It will not be used in the simulation." );
 			}
 			Fan( FanNum ).MaxAirFlowRateIsAutosizable = true;
 			Fan( FanNum ).MinAirFlowRate = rNumericArgs( 2 );
@@ -820,14 +819,14 @@ namespace Fans {
 				if ( Fan( FanNum ).InletNodeNum == Fan( checkNum ).InletNodeNum ) {
 					ErrorsFound = true;
 					ShowSevereError( "GetFanInput, duplicate fan inlet node names, must be unique for fans." );
-					ShowContinueError( "Fan=" + trim( Fan( FanNum ).FanType ) + ":" + trim( Fan( FanNum ).FanName ) + " and Fan=" + trim( Fan( checkNum ).FanType ) + ":" + trim( Fan( checkNum ).FanName ) + "." );
-					ShowContinueError( "Inlet Node Name=\"" + trim( NodeID( Fan( FanNum ).InletNodeNum ) ) + "\"." );
+					ShowContinueError( "Fan=" + Fan( FanNum ).FanType + ':' + Fan( FanNum ).FanName + " and Fan=" + Fan( checkNum ).FanType + ':' + Fan( checkNum ).FanName + '.' );
+					ShowContinueError( "Inlet Node Name=\"" + NodeID( Fan( FanNum ).InletNodeNum ) + "\"." );
 				}
 				if ( Fan( FanNum ).OutletNodeNum == Fan( checkNum ).OutletNodeNum ) {
 					ErrorsFound = true;
 					ShowSevereError( "GetFanInput, duplicate fan outlet node names, must be unique for fans." );
-					ShowContinueError( "Fan=" + trim( Fan( FanNum ).FanType ) + ":" + trim( Fan( FanNum ).FanName ) + " and Fan=" + trim( Fan( checkNum ).FanType ) + ":" + trim( Fan( checkNum ).FanName ) + "." );
-					ShowContinueError( "Outlet Node Name=\"" + trim( NodeID( Fan( FanNum ).OutletNodeNum ) ) + "\"." );
+					ShowContinueError( "Fan=" + Fan( FanNum ).FanType + ':' + Fan( FanNum ).FanName + " and Fan=" + Fan( checkNum ).FanType + ':' + Fan( checkNum ).FanName + '.' );
+					ShowContinueError( "Outlet Node Name=\"" + NodeID( Fan( FanNum ).OutletNodeNum ) + "\"." );
 				}
 			}
 		}
@@ -946,7 +945,7 @@ namespace Fans {
 			for ( Loop = 1; Loop <= NumFans; ++Loop ) {
 				if ( ! SameString( Fan( Loop ).FanType, "Fan:ZoneExhaust" ) ) continue;
 				if ( CheckZoneEquipmentList( Fan( Loop ).FanType, Fan( Loop ).FanName ) ) continue;
-				ShowSevereError( "InitFans: Fan=[" + trim( Fan( Loop ).FanType ) + "," + trim( Fan( Loop ).FanName ) + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
+				ShowSevereError( "InitFans: Fan=[" + Fan( Loop ).FanType + ',' + Fan( Loop ).FanName + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
 			}
 		}
 
@@ -1087,7 +1086,7 @@ namespace Fans {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 FanMinAirFlowRate; // minimum air flow rate [m3/s]
 		int NVPerfNum; // Index to night ventialation performance object
-		Fstring equipName( MaxNameLength ); // Equipment name
+		std::string equipName; // Equipment name
 		Real64 RatedPower; // Rated fan power [W]
 		Real64 RhoAir; // Air density [kg/m3]
 		Real64 FanVolFlow; // Fan volumetric airflow [m3/s]
@@ -1158,7 +1157,7 @@ namespace Fans {
 				if ( CurOASysNum > 0 ) OASysFlag = OASysEqSizing( CurOASysNum ).AirFlow;
 				if ( CurSysNum > 0 ) AirLoopSysFlag = UnitarySysEqSizing( CurSysNum ).AirFlow;
 
-				CheckSysSizing( trim( Fan( FanNum ).FanType ), Fan( FanNum ).FanName );
+				CheckSysSizing( Fan( FanNum ).FanType, Fan( FanNum ).FanName );
 
 				if ( OASysFlag ) {
 					MaxAirFlowRateDes = OASysEqSizing( CurOASysNum ).AirVolFlow;
@@ -1190,7 +1189,7 @@ namespace Fans {
 					ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "User-Specified Maximum Flow Rate [m3/s]", Fan( FanNum ).MaxAirFlowRate );
 				}
 			} else { // AutoSize or hardsize with sizing run
-				CheckZoneSizing( trim( Fan( FanNum ).FanType ), Fan( FanNum ).FanName );
+				CheckZoneSizing( Fan( FanNum ).FanType, Fan( FanNum ).FanName );
 				if ( ZoneEqSizing( CurZoneEqNum ).AirFlow ) {
 					MaxAirFlowRateDes = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 				} else {
@@ -1223,9 +1222,9 @@ namespace Fans {
 					ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design Size Maximum Flow Rate [m3/s]", MaxAirFlowRateDes, "User-Specified Maximum Flow Rate [m3/s]", MaxAirFlowRateUser );
 					if ( DisplayExtraWarnings ) {
 						if ( ( std::abs( MaxAirFlowRateDes - MaxAirFlowRateUser ) / MaxAirFlowRateUser ) > AutoVsHardSizingThreshold ) {
-							ShowMessage( "SizeHVACFans: Potential issue with equipment sizing for " + trim( Fan( FanNum ).FanType ) + " = \"" + trim( Fan( FanNum ).FanName ) + "\"." );
-							ShowContinueError( "User-Specified Maximum Flow Rate of " + trim( RoundSigDigits( MaxAirFlowRateUser, 5 ) ) + " [m3/s]" );
-							ShowContinueError( "differs from Design Size Maximum Flow Rate of " + trim( RoundSigDigits( MaxAirFlowRateDes, 5 ) ) + " [m3/s]" );
+							ShowMessage( "SizeHVACFans: Potential issue with equipment sizing for " + Fan( FanNum ).FanType + " = \"" + Fan( FanNum ).FanName + "\"." );
+							ShowContinueError( "User-Specified Maximum Flow Rate of " + RoundSigDigits( MaxAirFlowRateUser, 5 ) + " [m3/s]" );
+							ShowContinueError( "differs from Design Size Maximum Flow Rate of " + RoundSigDigits( MaxAirFlowRateDes, 5 ) + " [m3/s]" );
 							ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 							ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 						}
@@ -1297,8 +1296,8 @@ namespace Fans {
 
 			// Check for inconsistent drive ratio and motor speed, and report design fan speed with warning cpw14Sep2010
 			if ( MotorSpeed > ( Fan( FanNum ).MotorMaxSpd + 1.e-5 ) ) {
-				ShowWarningError( "Drive ratio for " + trim( Fan( FanNum ).FanType ) + ": " + trim( Fan( FanNum ).FanName ) + " is too low at design conditions -- check motor speed and drive ratio inputs" );
-				ShowContinueError( "...Design fan speed [rev/min]: " + trim( RoundSigDigits( Fan( FanNum ).FanSpd, 2 ) ) );
+				ShowWarningError( "Drive ratio for " + Fan( FanNum ).FanType + ": " + Fan( FanNum ).FanName + " is too low at design conditions -- check motor speed and drive ratio inputs" );
+				ShowContinueError( "...Design fan speed [rev/min]: " + RoundSigDigits( Fan( FanNum ).FanSpd, 2 ) );
 			}
 
 			Fan( FanNum ).FanTrq = Fan( FanNum ).FanShaftPower / FanSpdRadS; //[N-m]
@@ -1312,8 +1311,8 @@ namespace Fans {
 
 			// Check for undersized belt and report design size with warning cpw14Sep2010
 			if ( Fan( FanNum ).FanTrq > ( Fan( FanNum ).BeltMaxTorque + 1.e-5 ) ) {
-				ShowWarningError( "Belt for " + trim( Fan( FanNum ).FanType ) + ": " + trim( Fan( FanNum ).FanName ) + " is undersized at design conditions -- check belt inputs" );
-				ShowContinueError( "...Design belt output torque (without oversizing) [Nm]: " + trim( RoundSigDigits( Fan( FanNum ).FanTrq, 2 ) ) );
+				ShowWarningError( "Belt for " + Fan( FanNum ).FanType + ": " + Fan( FanNum ).FanName + " is undersized at design conditions -- check belt inputs" );
+				ShowContinueError( "...Design belt output torque (without oversizing) [Nm]: " + RoundSigDigits( Fan( FanNum ).FanTrq, 2 ) );
 			}
 
 			// Calculate belt max efficiency using correlations and coefficients based on AMCA data
@@ -1353,8 +1352,8 @@ namespace Fans {
 
 			// Check for undersized motor and report design size with warning cpw14Sep2010
 			if ( Fan( FanNum ).BeltInputPower > ( Fan( FanNum ).MotorMaxOutPwr + 1.e-5 ) ) {
-				ShowWarningError( "Motor for " + trim( Fan( FanNum ).FanType ) + ": " + trim( Fan( FanNum ).FanName ) + " is undersized at design conditions -- check motor inputs" );
-				ShowContinueError( "...Design motor output power (without oversizing) [W]: " + trim( RoundSigDigits( Fan( FanNum ).BeltInputPower, 2 ) ) );
+				ShowWarningError( "Motor for " + Fan( FanNum ).FanType + ": " + Fan( FanNum ).FanName + " is undersized at design conditions -- check motor inputs" );
+				ShowContinueError( "...Design motor output power (without oversizing) [W]: " + RoundSigDigits( Fan( FanNum ).BeltInputPower, 2 ) );
 			}
 
 			// Calculate motor max efficiency using correlations and coefficients based on MotorMaster+ data
@@ -1379,11 +1378,11 @@ namespace Fans {
 			Fan( FanNum ).MotorInputPower = Fan( FanNum ).BeltInputPower / Fan( FanNum ).MotEff; //[W]
 
 			// Calculate max VFD efficiency and input power using correlations and coefficients based on VFD type
-			if ( ( trim( Fan( FanNum ).VFDEffType ) == "SPEED" ) && ( Fan( FanNum ).VFDEffCurveIndex != 0 ) ) {
+			if ( ( Fan( FanNum ).VFDEffType == "SPEED" ) && ( Fan( FanNum ).VFDEffCurveIndex != 0 ) ) {
 				VFDSpdRatio = MotorSpeed / Fan( FanNum ).MotorMaxSpd; //[-]
 				Fan( FanNum ).VFDEff = CurveValue( Fan( FanNum ).VFDEffCurveIndex, VFDSpdRatio ); //[-]
 			} else {
-				if ( ( trim( Fan( FanNum ).VFDEffType ) == "POWER" ) && ( Fan( FanNum ).VFDEffCurveIndex != 0 ) ) {
+				if ( ( Fan( FanNum ).VFDEffType == "POWER" ) && ( Fan( FanNum ).VFDEffCurveIndex != 0 ) ) {
 					if ( Fan( FanNum ).VFDMaxOutPwr == AutoSize ) {
 						//WRITE(*,*) 'Autosizing fan VFD'
 						Fan( FanNum ).VFDMaxOutPwr = Fan( FanNum ).MotorInputPower;
@@ -1393,8 +1392,8 @@ namespace Fans {
 
 					// Check for undersized VFD and report design size with warning cpw14Sep2010
 					if ( Fan( FanNum ).MotorInputPower > ( Fan( FanNum ).VFDMaxOutPwr + 1.e-5 ) ) {
-						ShowWarningError( "VFD for " + trim( Fan( FanNum ).FanType ) + ": " + trim( Fan( FanNum ).FanName ) + " is undersized at design conditions -- check VFD inputs" );
-						ShowContinueError( "...Design VFD output power (without oversizing) [W]: " + trim( RoundSigDigits( Fan( FanNum ).MotorInputPower, 2 ) ) );
+						ShowWarningError( "VFD for " + Fan( FanNum ).FanType + ": " + Fan( FanNum ).FanName + " is undersized at design conditions -- check VFD inputs" );
+						ShowContinueError( "...Design VFD output power (without oversizing) [W]: " + RoundSigDigits( Fan( FanNum ).MotorInputPower, 2 ) );
 					}
 
 					VFDOutPwrRatio = Fan( FanNum ).MotorInputPower / Fan( FanNum ).VFDMaxOutPwr; //[-]
@@ -1415,21 +1414,21 @@ namespace Fans {
 			Fan( FanNum ).FanEff = Fan( FanNum ).FanWheelEff * Fan( FanNum ).BeltEff * Fan( FanNum ).MotEff * Fan( FanNum ).VFDEff;
 
 			// Report fan, belt, motor, and VFD characteristics at design condition to .eio file cpw14Sep2010
-			ReportSizingOutput( trim( Fan( FanNum ).FanType ), Fan( FanNum ).FanName, "Design Fan Airflow [m3/s]", FanVolFlow );
-			ReportSizingOutput( trim( Fan( FanNum ).FanType ), Fan( FanNum ).FanName, "Design Fan Static Pressure Rise [Pa]", Fan( FanNum ).DeltaPress );
-			ReportSizingOutput( trim( Fan( FanNum ).FanType ), Fan( FanNum ).FanName, "Design Fan Shaft Power [W]", Fan( FanNum ).FanShaftPower );
-			ReportSizingOutput( trim( Fan( FanNum ).FanType ), Fan( FanNum ).FanName, "Design Motor Output Power [W]", Fan( FanNum ).MotorMaxOutPwr );
-			ReportSizingOutput( trim( Fan( FanNum ).FanType ), Fan( FanNum ).FanName, "Design VFD Output Power [W]", Fan( FanNum ).VFDMaxOutPwr );
-			ReportSizingOutput( trim( Fan( FanNum ).FanType ), Fan( FanNum ).FanName, "Rated Power [W]", RatedPower );
-			ReportSizingOutput( trim( Fan( FanNum ).FanType ), Fan( FanNum ).FanName, "Drive Ratio [-]", Fan( FanNum ).PulleyDiaRatio );
-			ReportSizingOutput( trim( Fan( FanNum ).FanType ), Fan( FanNum ).FanName, "Design Belt Output Torque [Nm]", Fan( FanNum ).BeltMaxTorque );
-			ReportSizingOutput( trim( Fan( FanNum ).FanType ), Fan( FanNum ).FanName, "Design Fan Efficiency  [-]", Fan( FanNum ).FanWheelEff );
-			ReportSizingOutput( trim( Fan( FanNum ).FanType ), Fan( FanNum ).FanName, "Maximum Belt Efficiency [-]", Fan( FanNum ).BeltMaxEff );
-			ReportSizingOutput( trim( Fan( FanNum ).FanType ), Fan( FanNum ).FanName, "Design Belt Efficiency [-]", Fan( FanNum ).BeltEff );
-			ReportSizingOutput( trim( Fan( FanNum ).FanType ), Fan( FanNum ).FanName, "Maximum Motor Efficiency [-]", Fan( FanNum ).MotorMaxEff );
-			ReportSizingOutput( trim( Fan( FanNum ).FanType ), Fan( FanNum ).FanName, "Design Motor Efficiency [-]", Fan( FanNum ).MotEff );
-			ReportSizingOutput( trim( Fan( FanNum ).FanType ), Fan( FanNum ).FanName, "Design VFD Efficiency [-]", Fan( FanNum ).VFDEff );
-			ReportSizingOutput( trim( Fan( FanNum ).FanType ), Fan( FanNum ).FanName, "Design Combined Efficiency [-]", Fan( FanNum ).FanEff );
+			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design Fan Airflow [m3/s]", FanVolFlow );
+			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design Fan Static Pressure Rise [Pa]", Fan( FanNum ).DeltaPress );
+			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design Fan Shaft Power [W]", Fan( FanNum ).FanShaftPower );
+			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design Motor Output Power [W]", Fan( FanNum ).MotorMaxOutPwr );
+			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design VFD Output Power [W]", Fan( FanNum ).VFDMaxOutPwr );
+			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Rated Power [W]", RatedPower );
+			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Drive Ratio [-]", Fan( FanNum ).PulleyDiaRatio );
+			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design Belt Output Torque [Nm]", Fan( FanNum ).BeltMaxTorque );
+			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design Fan Efficiency  [-]", Fan( FanNum ).FanWheelEff );
+			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Maximum Belt Efficiency [-]", Fan( FanNum ).BeltMaxEff );
+			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design Belt Efficiency [-]", Fan( FanNum ).BeltEff );
+			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Maximum Motor Efficiency [-]", Fan( FanNum ).MotorMaxEff );
+			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design Motor Efficiency [-]", Fan( FanNum ).MotEff );
+			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design VFD Efficiency [-]", Fan( FanNum ).VFDEff );
+			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design Combined Efficiency [-]", Fan( FanNum ).FanEff );
 
 			//cpw31Aug2010 Temporary code for debugging fan component model
 			//    WRITE(300,*) TRIM(RoundSigDigits(RhoAir,4))//','//TRIM(RoundSigDigits(FanVolFlow,4)) &
@@ -1880,12 +1879,12 @@ namespace Fans {
 					SpeedRaisedToPower = CurveValue( Fan( FanNum ).FanPowerRatAtSpeedRatCurveIndex, SpeedRatio );
 					if ( SpeedRaisedToPower < 0.0 ) {
 						if ( Fan( FanNum ).OneTimePowerRatioCheck && ! WarmupFlag ) {
-							ShowSevereError( trim( cFanTypes( Fan( FanNum ).FanType_Num ) ) + " = " + trim( Fan( FanNum ).FanName ) + "\"" );
+							ShowSevereError( cFanTypes( Fan( FanNum ).FanType_Num ) + " = " + Fan( FanNum ).FanName + "\"" );
 							ShowContinueError( "Error in Fan Power Ratio curve. Curve output less than 0.0." );
-							ShowContinueError( "Curve output = " + trim( TrimSigDigits( SpeedRaisedToPower, 5 ) ) + ", fan speed ratio = " + trim( TrimSigDigits( SpeedRatio, 5 ) ) );
+							ShowContinueError( "Curve output = " + TrimSigDigits( SpeedRaisedToPower, 5 ) + ", fan speed ratio = " + TrimSigDigits( SpeedRatio, 5 ) );
 							ShowContinueError( "Check curve coefficients to ensure proper power ratio as a function of fan speed ratio." );
 							ShowContinueError( "Resetting Fan Power Ratio curve output to 0.0 and the simulation continues." );
-							ShowContinueErrorTimeStamp( " Occurrence info: " );
+							ShowContinueErrorTimeStamp( "Occurrence info:" );
 							Fan( FanNum ).OneTimePowerRatioCheck = false;
 						}
 						SpeedRaisedToPower = 0.0;
@@ -1894,12 +1893,12 @@ namespace Fans {
 						EffRatioAtSpeedRatio = CurveValue( Fan( FanNum ).FanEffRatioCurveIndex, SpeedRatio );
 						if ( EffRatioAtSpeedRatio < 0.01 ) {
 							if ( Fan( FanNum ).OneTimeEffRatioCheck && ! WarmupFlag ) {
-								ShowSevereError( trim( cFanTypes( Fan( FanNum ).FanType_Num ) ) + " = " + trim( Fan( FanNum ).FanName ) + "\"" );
+								ShowSevereError( cFanTypes( Fan( FanNum ).FanType_Num ) + " = " + Fan( FanNum ).FanName + "\"" );
 								ShowContinueError( "Error in Fan Efficiency Ratio curve. Curve output less than 0.01." );
-								ShowContinueError( "Curve output = " + trim( TrimSigDigits( EffRatioAtSpeedRatio, 5 ) ) + ", fan speed ratio = " + trim( TrimSigDigits( SpeedRatio, 5 ) ) );
+								ShowContinueError( "Curve output = " + TrimSigDigits( EffRatioAtSpeedRatio, 5 ) + ", fan speed ratio = " + TrimSigDigits( SpeedRatio, 5 ) );
 								ShowContinueError( "Check curve coefficients to ensure proper efficiency ratio as a function of fan speed ratio." );
 								ShowContinueError( "Resetting Fan Efficiency Ratio curve output to 0.01 and the simulation continues." );
-								ShowContinueErrorTimeStamp( " Occurrence info: " );
+								ShowContinueErrorTimeStamp( "Occurrence info:" );
 								Fan( FanNum ).OneTimeEffRatioCheck = false;
 							}
 							EffRatioAtSpeedRatio = 0.01;
@@ -2270,11 +2269,11 @@ namespace Fans {
 			Fan( FanNum ).MotorInputPower = Fan( FanNum ).BeltInputPower / Fan( FanNum ).MotEff; //[W]
 
 			// Calculate VFD efficiency using correlations and coefficients based on VFD type
-			if ( ( trim( Fan( FanNum ).VFDEffType ) == "SPEED" ) && ( Fan( FanNum ).VFDEffCurveIndex != 0 ) ) {
+			if ( ( Fan( FanNum ).VFDEffType == "SPEED" ) && ( Fan( FanNum ).VFDEffCurveIndex != 0 ) ) {
 				VFDSpdRatio = MotorSpeed / Fan( FanNum ).MotorMaxSpd; //[-]
 				Fan( FanNum ).VFDEff = CurveValue( Fan( FanNum ).VFDEffCurveIndex, VFDSpdRatio ); //[-]
 			} else {
-				if ( ( trim( Fan( FanNum ).VFDEffType ) == "POWER" ) && ( Fan( FanNum ).VFDEffCurveIndex != 0 ) ) {
+				if ( ( Fan( FanNum ).VFDEffType == "POWER" ) && ( Fan( FanNum ).VFDEffCurveIndex != 0 ) ) {
 					VFDOutPwrRatio = Fan( FanNum ).MotorInputPower / Fan( FanNum ).VFDMaxOutPwr; //[-]
 					Fan( FanNum ).VFDEff = CurveValue( Fan( FanNum ).VFDEffCurveIndex, VFDOutPwrRatio ); //[-]
 				} else {
@@ -2506,10 +2505,10 @@ namespace Fans {
 
 	void
 	GetFanIndex(
-		Fstring const & FanName,
+		std::string const & FanName,
 		int & FanIndex,
 		bool & ErrorsFound,
-		Optional_Fstring_const ThisObjectType
+		Optional_string_const ThisObjectType
 	)
 	{
 
@@ -2554,9 +2553,9 @@ namespace Fans {
 		FanIndex = FindItemInList( FanName, Fan.FanName(), NumFans );
 		if ( FanIndex == 0 ) {
 			if ( present( ThisObjectType ) ) {
-				ShowSevereError( trim( ThisObjectType ) + ", GetFanIndex: Fan not found=" + trim( FanName ) );
+				ShowSevereError( ThisObjectType() + ", GetFanIndex: Fan not found=" + FanName );
 			} else {
-				ShowSevereError( "GetFanIndex: Fan not found=" + trim( FanName ) );
+				ShowSevereError( "GetFanIndex: Fan not found=" + FanName );
 			}
 			ErrorsFound = true;
 		}
@@ -2662,11 +2661,11 @@ namespace Fans {
 
 	void
 	GetFanType(
-		Fstring const & FanName, // Fan name
+		std::string const & FanName, // Fan name
 		int & FanType, // returned fantype number
 		bool & ErrorsFound, // error indicator
-		Optional_Fstring_const ThisObjectType, // parent object type (for error message)
-		Optional_Fstring_const ThisObjectName // parent object name (for error message)
+		Optional_string_const ThisObjectType, // parent object type (for error message)
+		Optional_string_const ThisObjectName // parent object name (for error message)
 	)
 	{
 
@@ -2712,11 +2711,11 @@ namespace Fans {
 		FanIndex = FindItemInList( FanName, Fan.FanName(), NumFans );
 		if ( FanIndex == 0 ) {
 			if ( present( ThisObjectType ) && present( ThisObjectName ) ) {
-				ShowSevereError( "GetFanType: " + trim( ThisObjectType ) + "=\"" + trim( ThisObjectName ) + "\"," " invalid Fan specified=\"" + trim( FanName ) + "\"." );
+				ShowSevereError( "GetFanType: " + ThisObjectType() + "=\"" + ThisObjectName() + "\"," " invalid Fan specified=\"" + FanName + "\"." );
 			} else if ( present( ThisObjectType ) ) {
-				ShowSevereError( trim( ThisObjectType ) + ", GetFanType: Fan not found=" + trim( FanName ) );
+				ShowSevereError( ThisObjectType() + ", GetFanType: Fan not found=" + FanName );
 			} else {
-				ShowSevereError( "GetFanType: Fan not found=" + trim( FanName ) );
+				ShowSevereError( "GetFanType: Fan not found=" + FanName );
 			}
 			FanType = 0;
 			ErrorsFound = true;
@@ -2728,8 +2727,8 @@ namespace Fans {
 
 	Real64
 	GetFanDesignVolumeFlowRate(
-		Fstring const & FanType, // must match fan types in this module
-		Fstring const & FanName, // must match fan names for the fan type
+		std::string const & FanType, // must match fan types in this module
+		std::string const & FanName, // must match fan names for the fan type
 		bool & ErrorsFound, // set to true if problem
 		Optional_int_const FanIndex // index to fan
 	)
@@ -2786,10 +2785,10 @@ namespace Fans {
 			if ( WhichFan != 0 ) {
 				DesignVolumeFlowRate = Fan( WhichFan ).MaxAirFlowRate;
 			} else {
-				ShowSevereError( "GetFanDesignVolumeFlowRate: Could not find Fan, Type=\"" + trim( FanType ) + "\" Name=\"" + trim( FanName ) + "\"" );
+				ShowSevereError( "GetFanDesignVolumeFlowRate: Could not find Fan, Type=\"" + FanType + "\" Name=\"" + FanName + "\"" );
 				ShowContinueError( "... Design Volume Flow rate returned as -1000." );
 				ErrorsFound = true;
-				DesignVolumeFlowRate = -1000.;
+				DesignVolumeFlowRate = -1000.0;
 			}
 		}
 
@@ -2799,8 +2798,8 @@ namespace Fans {
 
 	int
 	GetFanInletNode(
-		Fstring const & FanType, // must match fan types in this module
-		Fstring const & FanName, // must match fan names for the fan type
+		std::string const & FanType, // must match fan types in this module
+		std::string const & FanName, // must match fan names for the fan type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -2853,7 +2852,7 @@ namespace Fans {
 		if ( WhichFan != 0 ) {
 			NodeNumber = Fan( WhichFan ).InletNodeNum;
 		} else {
-			ShowSevereError( "GetFanInletNode: Could not find Fan, Type=\"" + trim( FanType ) + "\" Name=\"" + trim( FanName ) + "\"" );
+			ShowSevereError( "GetFanInletNode: Could not find Fan, Type=\"" + FanType + "\" Name=\"" + FanName + "\"" );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		}
@@ -2864,8 +2863,8 @@ namespace Fans {
 
 	int
 	GetFanOutletNode(
-		Fstring const & FanType, // must match fan types in this module
-		Fstring const & FanName, // must match fan names for the fan type
+		std::string const & FanType, // must match fan types in this module
+		std::string const & FanName, // must match fan names for the fan type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -2918,7 +2917,7 @@ namespace Fans {
 		if ( WhichFan != 0 ) {
 			NodeNumber = Fan( WhichFan ).OutletNodeNum;
 		} else {
-			ShowSevereError( "GetFanOutletNode: Could not find Fan, Type=\"" + trim( FanType ) + "\" Name=\"" + trim( FanName ) + "\"" );
+			ShowSevereError( "GetFanOutletNode: Could not find Fan, Type=\"" + FanType + "\" Name=\"" + FanName + "\"" );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		}
@@ -2929,8 +2928,8 @@ namespace Fans {
 
 	int
 	GetFanAvailSchPtr(
-		Fstring const & FanType, // must match fan types in this module
-		Fstring const & FanName, // must match fan names for the fan type
+		std::string const & FanType, // must match fan types in this module
+		std::string const & FanName, // must match fan names for the fan type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -2983,7 +2982,7 @@ namespace Fans {
 		if ( WhichFan != 0 ) {
 			FanAvailSchPtr = Fan( WhichFan ).AvailSchedPtrNum;
 		} else {
-			ShowSevereError( "GetFanAvailSchPtr: Could not find Fan, Type=\"" + trim( FanType ) + "\" Name=\"" + trim( FanName ) + "\"" );
+			ShowSevereError( "GetFanAvailSchPtr: Could not find Fan, Type=\"" + FanType + "\" Name=\"" + FanName + "\"" );
 			ErrorsFound = true;
 			FanAvailSchPtr = 0;
 		}
@@ -2994,8 +2993,8 @@ namespace Fans {
 
 	int
 	GetFanSpeedRatioCurveIndex(
-		Fstring & FanType, // must match fan types in this module (set if nonzero index passed)
-		Fstring & FanName, // must match fan names for the fan type (set if nonzero index passed)
+		std::string & FanType, // must match fan types in this module (set if nonzero index passed)
+		std::string & FanName, // must match fan names for the fan type (set if nonzero index passed)
 		Optional_int IndexIn // optional fan index if fan type and name are unknown or index needs setting
 	)
 	{
@@ -3060,7 +3059,7 @@ namespace Fans {
 		if ( WhichFan != 0 ) {
 			FanSpeedRatioCurveIndex = Fan( WhichFan ).FanPowerRatAtSpeedRatCurveIndex;
 		} else {
-			ShowSevereError( "GetFanSpeedRatioCurveIndex: Could not find Fan, Type=\"" + trim( FanType ) + "\" Name=\"" + trim( FanName ) + "\"" );
+			ShowSevereError( "GetFanSpeedRatioCurveIndex: Could not find Fan, Type=\"" + FanType + "\" Name=\"" + FanName + "\"" );
 			FanSpeedRatioCurveIndex = 0;
 		}
 
@@ -3072,7 +3071,7 @@ namespace Fans {
 	SetFanData(
 		int const FanNum, // Index of fan
 		bool & ErrorsFound, // Set to true if certain errors found
-		Fstring const & FanName, // Name of fan
+		std::string const & FanName, // Name of fan
 		Optional< Real64 const > MaxAirVolFlow, // Fan air volumetric flow rate    [m3/s]
 		Optional< Real64 const > MinAirVolFlow // Fan air volumetric flow rate    [m3/s]
 	)
@@ -3127,7 +3126,7 @@ namespace Fans {
 		}
 
 		if ( WhichFan <= 0 || WhichFan > NumFans ) {
-			ShowSevereError( "SetFanData: Could not find fan = \"" + trim( FanName ) + "\"" );
+			ShowSevereError( "SetFanData: Could not find fan = \"" + FanName + "\"" );
 			ErrorsFound = true;
 			return;
 		}

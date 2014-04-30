@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -16,7 +15,6 @@ namespace EnergyPlus {
 namespace HeatRecovery {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -77,10 +75,10 @@ namespace HeatRecovery {
 	struct HeatExchCond
 	{
 		// Members
-		Fstring Name; // name of component
+		std::string Name; // name of component
 		int ExchTypeNum; // Integer equivalent to ExchType
 		int HeatExchPerfTypeNum; // Desiccant balanced heat exchanger performance data type num
-		Fstring HeatExchPerfName; // Desiccant balanced heat exchanger performance data name
+		std::string HeatExchPerfName; // Desiccant balanced heat exchanger performance data name
 		int SchedPtr; // index of schedule
 		int FlowArr; // flow Arrangement:
 		// 1: COUNTER_FLOW
@@ -131,7 +129,7 @@ namespace HeatRecovery {
 		// 1 = None, 2 = Bypass, 3 = Stop Rotary HX Rotation
 		int ExchConfigNum; // parameter equivalent of HX configuration, plate or rotary
 		// frost control parameters
-		Fstring FrostControlType; // type of frost control used if any
+		std::string FrostControlType; // type of frost control used if any
 		Real64 ThresholdTemperature; // threshold temperature for frost control
 		Real64 InitialDefrostTime; // initial defrost time
 		Real64 RateofDefrostTimeIncrease; // rate of change of defrost time
@@ -172,10 +170,8 @@ namespace HeatRecovery {
 
 		// Default Constructor
 		HeatExchCond() :
-			Name( MaxNameLength ),
 			ExchTypeNum( 0 ),
 			HeatExchPerfTypeNum( 0 ),
-			HeatExchPerfName( MaxNameLength ),
 			SchedPtr( 0 ),
 			FlowArr( 0 ),
 			EconoLockOut( 0 ),
@@ -216,7 +212,6 @@ namespace HeatRecovery {
 			CoolEffectLatent75( 0.0 ),
 			HeatExchEconoMode( 0 ),
 			ExchConfigNum( 0 ),
-			FrostControlType( MaxNameLength ),
 			ThresholdTemperature( 0.0 ),
 			InitialDefrostTime( 0.0 ),
 			RateofDefrostTimeIncrease( 0.0 ),
@@ -256,10 +251,10 @@ namespace HeatRecovery {
 
 		// Member Constructor
 		HeatExchCond(
-			Fstring const & Name, // name of component
+			std::string const & Name, // name of component
 			int const ExchTypeNum, // Integer equivalent to ExchType
 			int const HeatExchPerfTypeNum, // Desiccant balanced heat exchanger performance data type num
-			Fstring const & HeatExchPerfName, // Desiccant balanced heat exchanger performance data name
+			std::string const & HeatExchPerfName, // Desiccant balanced heat exchanger performance data name
 			int const SchedPtr, // index of schedule
 			int const FlowArr, // flow Arrangement:
 			int const EconoLockOut, // 1: Yes;  0: No
@@ -300,7 +295,7 @@ namespace HeatRecovery {
 			Real64 const CoolEffectLatent75, // cooling latent effectiveness at 75% rated air flow
 			int const HeatExchEconoMode, // generic heat exchanger economize mode option
 			int const ExchConfigNum, // parameter equivalent of HX configuration, plate or rotary
-			Fstring const & FrostControlType, // type of frost control used if any
+			std::string const & FrostControlType, // type of frost control used if any
 			Real64 const ThresholdTemperature, // threshold temperature for frost control
 			Real64 const InitialDefrostTime, // initial defrost time
 			Real64 const RateofDefrostTimeIncrease, // rate of change of defrost time
@@ -337,10 +332,10 @@ namespace HeatRecovery {
 			int const UnBalancedErrCount, // Counter for recurring warning message
 			int const UnBalancedErrIndex // Index to recurring warning message
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ExchTypeNum( ExchTypeNum ),
 			HeatExchPerfTypeNum( HeatExchPerfTypeNum ),
-			HeatExchPerfName( MaxNameLength, HeatExchPerfName ),
+			HeatExchPerfName( HeatExchPerfName ),
 			SchedPtr( SchedPtr ),
 			FlowArr( FlowArr ),
 			EconoLockOut( EconoLockOut ),
@@ -381,7 +376,7 @@ namespace HeatRecovery {
 			CoolEffectLatent75( CoolEffectLatent75 ),
 			HeatExchEconoMode( HeatExchEconoMode ),
 			ExchConfigNum( ExchConfigNum ),
-			FrostControlType( MaxNameLength, FrostControlType ),
+			FrostControlType( FrostControlType ),
 			ThresholdTemperature( ThresholdTemperature ),
 			InitialDefrostTime( InitialDefrostTime ),
 			RateofDefrostTimeIncrease( RateofDefrostTimeIncrease ),
@@ -425,8 +420,8 @@ namespace HeatRecovery {
 	{
 		// Members
 		// User Input data
-		Fstring Name; // unique name of balanced desiccant performance data type object
-		Fstring PerfType; // Type of performance data set
+		std::string Name; // unique name of balanced desiccant performance data type object
+		std::string PerfType; // Type of performance data set
 		Real64 NomSupAirVolFlow; // nominal supply air volumetric flow rate m^3/s
 		Real64 NomProcAirFaceVel; // nominal process air face velocity m/s
 		Real64 NomElecPower; // nominal electric power consumption [W]
@@ -485,33 +480,33 @@ namespace HeatRecovery {
 		bool PrintRegenInRelHumTempMess; // - flag to print regen in RH error message for temp eq
 		int RegenInRelHumTempErrIndex; // - index to recurring error struc for regen outlet hum rat
 		int RegenInRelHumTempErrorCount; // - counter if regen outlet temp limits are exceeded
-		Fstring RegenInRelHumTempBuffer1; // - buffer for RegenOutHumRat warn mess on following timstep
-		Fstring RegenInRelHumTempBuffer2; // - buffer for RegenOutHumRat warn mess on following timstep
-		Fstring RegenInRelHumTempBuffer3; // - buffer for RegenOutHumRat warn mess on following timstep
+		std::string RegenInRelHumTempBuffer1; // - buffer for RegenOutHumRat warn mess on following timstep
+		std::string RegenInRelHumTempBuffer2; // - buffer for RegenOutHumRat warn mess on following timstep
+		std::string RegenInRelHumTempBuffer3; // - buffer for RegenOutHumRat warn mess on following timstep
 		Real64 RegenInRelHumTempLast; // - last value of regen outlet humidity ratio
 		// process inlet relative humidity for temperature equation
 		bool PrintProcInRelHumTempMess; // - flag to print regen in RH error message for temp eq
 		int ProcInRelHumTempErrIndex; // - index to recurring error struc for regen outlet hum rat
 		int ProcInRelHumTempErrorCount; // - counter if regen outlet temp limits are exceeded
-		Fstring ProcInRelHumTempBuffer1; // - buffer for RegenOutHumRat warn mess on following timstep
-		Fstring ProcInRelHumTempBuffer2; // - buffer for RegenOutHumRat warn mess on following timstep
-		Fstring ProcInRelHumTempBuffer3; // - buffer for RegenOutHumRat warn mess on following timstep
+		std::string ProcInRelHumTempBuffer1; // - buffer for RegenOutHumRat warn mess on following timstep
+		std::string ProcInRelHumTempBuffer2; // - buffer for RegenOutHumRat warn mess on following timstep
+		std::string ProcInRelHumTempBuffer3; // - buffer for RegenOutHumRat warn mess on following timstep
 		Real64 ProcInRelHumTempLast; // - last value of regen outlet humidity ratio
 		// regen inlet relative humidity for humidity ratio equation
 		bool PrintRegenInRelHumHumRatMess; // - flag to print regen in RH error message for temp eq
 		int RegenInRelHumHumRatErrIndex; // - index to recurring error struc for regen outlet hum rat
 		int RegenInRelHumHumRatErrorCount; // - counter if regen outlet temp limits are exceeded
-		Fstring RegenInRelHumHumRatBuffer1; // - buffer for RegenOutHumRat warn mess on following timstep
-		Fstring RegenInRelHumHumRatBuffer2; // - buffer for RegenOutHumRat warn mess on following timstep
-		Fstring RegenInRelHumHumRatBuffer3; // - buffer for RegenOutHumRat warn mess on following timstep
+		std::string RegenInRelHumHumRatBuffer1; // - buffer for RegenOutHumRat warn mess on following timstep
+		std::string RegenInRelHumHumRatBuffer2; // - buffer for RegenOutHumRat warn mess on following timstep
+		std::string RegenInRelHumHumRatBuffer3; // - buffer for RegenOutHumRat warn mess on following timstep
 		Real64 RegenInRelHumHumRatLast; // - last value of regen outlet humidity ratio
 		// process inlet relative humidity for humidity ratio equation
 		bool PrintProcInRelHumHumRatMess; // - flag to print regen in RH error message for temp eq
 		int ProcInRelHumHumRatErrIndex; // - index to recurring error struc for regen outlet hum rat
 		int ProcInRelHumHumRatErrorCount; // - counter if regen outlet temp limits are exceeded
-		Fstring ProcInRelHumHumRatBuffer1; // - buffer for RegenOutHumRat warn mess on following timstep
-		Fstring ProcInRelHumHumRatBuffer2; // - buffer for RegenOutHumRat warn mess on following timstep
-		Fstring ProcInRelHumHumRatBuffer3; // - buffer for RegenOutHumRat warn mess on following timstep
+		std::string ProcInRelHumHumRatBuffer1; // - buffer for RegenOutHumRat warn mess on following timstep
+		std::string ProcInRelHumHumRatBuffer2; // - buffer for RegenOutHumRat warn mess on following timstep
+		std::string ProcInRelHumHumRatBuffer3; // - buffer for RegenOutHumRat warn mess on following timstep
 		Real64 ProcInRelHumHumRatLast; // - last value of regen outlet humidity ratio
 		// regen outlet temp variables
 		bool PrintT_RegenInTempMessage; // - flag to print regen in temp error message for temp eq
@@ -533,17 +528,17 @@ namespace HeatRecovery {
 		bool PrintRegenOutHumRatFailedMess; // - flag for regen outlet hum rat error message
 		int RegenOutHumRatFailedErrIndex; // - index to recurring error struc for regen outlet hum rat
 		int RegenOutHumRatFailedErrorCount; // - counter if regen outlet temp limits are exceeded
-		Fstring RegenOutHumRatFailedBuffer1; // - buffer for RegenOutHumRat warn mess on following timstep
-		Fstring RegenOutHumRatFailedBuffer2; // - buffer for RegenOutHumRat warn mess on following timstep
-		Fstring RegenOutHumRatFailedBuffer3; // - buffer for RegenOutHumRat warn mess on following timstep
+		std::string RegenOutHumRatFailedBuffer1; // - buffer for RegenOutHumRat warn mess on following timstep
+		std::string RegenOutHumRatFailedBuffer2; // - buffer for RegenOutHumRat warn mess on following timstep
+		std::string RegenOutHumRatFailedBuffer3; // - buffer for RegenOutHumRat warn mess on following timstep
 		Real64 RegenOutHumRatFailedLast; // - last value of regen outlet humidity ratio
 		// used when regen and process mass flow rates are not equal to within 2%
 		bool PrintImbalancedMassFlowMess; // - flag for imbalanced regen and process mass flow rate
 		int ImbalancedFlowErrIndex; // - index to recurring error struc for imbalanced flow
 		int ImbalancedMassFlowErrorCount; // - counter for imbalanced regen and process mass flow rate
-		Fstring ImbalancedMassFlowBuffer1; // - buffer for imbalanced regen and process mass flow rate
-		Fstring ImbalancedMassFlowBuffer2; // - buffer for imbalanced regen and process mass flow rate
-		Fstring ImbalancedMassFlowBuffer3; // - buffer for imbalanced regen and process mass flow rate
+		std::string ImbalancedMassFlowBuffer1; // - buffer for imbalanced regen and process mass flow rate
+		std::string ImbalancedMassFlowBuffer2; // - buffer for imbalanced regen and process mass flow rate
+		std::string ImbalancedMassFlowBuffer3; // - buffer for imbalanced regen and process mass flow rate
 		Real64 ABSImbalancedFlow; // - last value of heat exchanger mass flow rate imbalance
 		// regen outlet temp eqn
 		int T_RegenInTempErrorCount; // - counter if regen inlet temp limits are exceeded
@@ -561,9 +556,9 @@ namespace HeatRecovery {
 		// used when regen outlet temperature is above regen inlet temperature, verify coefficients warning issued
 		int RegenOutTempFailedErrorCount; // - counter if regen outlet temp limits are exceeded
 		int RegenOutTempFailedErrIndex; // - index to recurring error structure for regen outlet temp
-		Fstring RegenOutTempFailedBuffer1; // - buffer for RegenOutTemp warn messages on following timestep
-		Fstring RegenOutTempFailedBuffer2; // - buffer for RegenOutTemp warn messages on following timestep
-		Fstring RegenOutTempFailedBuffer3; // - buffer for RegenOutTemp warn messages on following timestep
+		std::string RegenOutTempFailedBuffer1; // - buffer for RegenOutTemp warn messages on following timestep
+		std::string RegenOutTempFailedBuffer2; // - buffer for RegenOutTemp warn messages on following timestep
+		std::string RegenOutTempFailedBuffer3; // - buffer for RegenOutTemp warn messages on following timestep
 		Real64 RegenOutTempFailedLast; // - last value of regen outlet temp
 		// regen outlet hum rat eqn
 		int H_RegenInTempErrorCount; // - counter if regen inlet temp limits are exceeded
@@ -581,70 +576,68 @@ namespace HeatRecovery {
 		int RegenInHumRatErrorCount; // - counter if regen outlet temp limits are exceeded
 		int RegenInHumRatErrIndex; // - index to recurring error struc for regen outlet hum rat
 		// regen outlet temp variables                                   !- T_RegenInTemp = Regen inlet temperature
-		Fstring T_RegenInTempBuffer1; // - buffer for T_RegenInTemp warn message on following timestep
-		Fstring T_RegenInTempBuffer2; // - buffer for T_RegenInTemp warn message on following timestep
-		Fstring T_RegenInTempBuffer3; // - buffer for T_RegenInTemp warn message on following timestep
+		std::string T_RegenInTempBuffer1; // - buffer for T_RegenInTemp warn message on following timestep
+		std::string T_RegenInTempBuffer2; // - buffer for T_RegenInTemp warn message on following timestep
+		std::string T_RegenInTempBuffer3; // - buffer for T_RegenInTemp warn message on following timestep
 		Real64 T_RegenInTempLast; // - last value of regen inlet temp
 		//- T_RegenInHumRat = Regen inlet humidity ratio
-		Fstring T_RegenInHumRatBuffer1; // - buffer for T_RegenInHumRat warn messag on following timestep
-		Fstring T_RegenInHumRatBuffer2; // - buffer for T_RegenInHumRat warn messag on following timestep
-		Fstring T_RegenInHumRatBuffer3; // - buffer for T_RegenInHumRat warn messag on following timestep
+		std::string T_RegenInHumRatBuffer1; // - buffer for T_RegenInHumRat warn messag on following timestep
+		std::string T_RegenInHumRatBuffer2; // - buffer for T_RegenInHumRat warn messag on following timestep
+		std::string T_RegenInHumRatBuffer3; // - buffer for T_RegenInHumRat warn messag on following timestep
 		Real64 T_RegenInHumRatLast; // - last value of regen inlet humidity ratio
 		//- T_ProcInTemp = Process inlet temperature
-		Fstring T_ProcInTempBuffer1; // - buffer for T_ProcInTemp warning messag on following timestep
-		Fstring T_ProcInTempBuffer2; // - buffer for T_ProcInTemp warning messag on following timestep
-		Fstring T_ProcInTempBuffer3; // - buffer for T_ProcInTemp warning messag on following timestep
+		std::string T_ProcInTempBuffer1; // - buffer for T_ProcInTemp warning messag on following timestep
+		std::string T_ProcInTempBuffer2; // - buffer for T_ProcInTemp warning messag on following timestep
+		std::string T_ProcInTempBuffer3; // - buffer for T_ProcInTemp warning messag on following timestep
 		Real64 T_ProcInTempLast; // - last value of process inlet temp
 		//- T_ProcInHumRat = Process inlet humidity ratio
-		Fstring T_ProcInHumRatBuffer1; // - buffer for T_ProcInHumRat warn message on following timestep
-		Fstring T_ProcInHumRatBuffer2; // - buffer for T_ProcInHumRat warn message on following timestep
-		Fstring T_ProcInHumRatBuffer3; // - buffer for T_ProcInHumRat warn message on following timestep
+		std::string T_ProcInHumRatBuffer1; // - buffer for T_ProcInHumRat warn message on following timestep
+		std::string T_ProcInHumRatBuffer2; // - buffer for T_ProcInHumRat warn message on following timestep
+		std::string T_ProcInHumRatBuffer3; // - buffer for T_ProcInHumRat warn message on following timestep
 		Real64 T_ProcInHumRatLast; // - last value of process inlet humidity ratio
 		//- T_FaceVel = Process and regen face velocity
-		Fstring T_FaceVelBuffer1; // - buffer for T_FaceVel warning messages on following time step
-		Fstring T_FaceVelBuffer2; // - buffer for T_FaceVel warning messages on following time step
-		Fstring T_FaceVelBuffer3; // - buffer for T_FaceVel warning messages on following time step
+		std::string T_FaceVelBuffer1; // - buffer for T_FaceVel warning messages on following time step
+		std::string T_FaceVelBuffer2; // - buffer for T_FaceVel warning messages on following time step
+		std::string T_FaceVelBuffer3; // - buffer for T_FaceVel warning messages on following time step
 		Real64 T_FaceVelLast; // - last value of process and regen face velocity
 		//- T_RegenOutTemp = Regen outlet temperature
-		Fstring RegenOutTempBuffer1; // - buffer for RegenOutTemp warn messages on following timestep
-		Fstring RegenOutTempBuffer2; // - buffer for RegenOutTemp warn messages on following timestep
-		Fstring RegenOutTempBuffer3; // - buffer for RegenOutTemp warn messages on following timestep
+		std::string RegenOutTempBuffer1; // - buffer for RegenOutTemp warn messages on following timestep
+		std::string RegenOutTempBuffer2; // - buffer for RegenOutTemp warn messages on following timestep
+		std::string RegenOutTempBuffer3; // - buffer for RegenOutTemp warn messages on following timestep
 		Real64 RegenOutTempLast; // - last value of regen outlet temp
 		// regen outlet humidity ratio variables                         !- H_RegenInTemp = Regen inlet temperature
-		Fstring H_RegenInTempBuffer1; // - buffer for H_RegenInTemp warn message on following time step
-		Fstring H_RegenInTempBuffer2; // - buffer for H_RegenInTemp warn message on following time step
-		Fstring H_RegenInTempBuffer3; // - buffer for H_RegenInTemp warn message on following time step
+		std::string H_RegenInTempBuffer1; // - buffer for H_RegenInTemp warn message on following time step
+		std::string H_RegenInTempBuffer2; // - buffer for H_RegenInTemp warn message on following time step
+		std::string H_RegenInTempBuffer3; // - buffer for H_RegenInTemp warn message on following time step
 		Real64 H_RegenInTempLast; // - last value of regen inlet temp
 		//- H_RegenInHumRat = Regen inlet humidity ratio
-		Fstring H_RegenInHumRatBuffer1; // - buffer for H_RegenInHumRat warn messag on following timestep
-		Fstring H_RegenInHumRatBuffer2; // - buffer for H_RegenInHumRat warn messag on following timestep
-		Fstring H_RegenInHumRatBuffer3; // - buffer for H_RegenInHumRat warn messag on following timestep
+		std::string H_RegenInHumRatBuffer1; // - buffer for H_RegenInHumRat warn messag on following timestep
+		std::string H_RegenInHumRatBuffer2; // - buffer for H_RegenInHumRat warn messag on following timestep
+		std::string H_RegenInHumRatBuffer3; // - buffer for H_RegenInHumRat warn messag on following timestep
 		Real64 H_RegenInHumRatLast; // - last value of regen inlet humidity ratio
 		//- H_ProcInTemp = Process inlet temperature
-		Fstring H_ProcInTempBuffer1; // - buffer for H_ProcInTemp warn messages on following time step
-		Fstring H_ProcInTempBuffer2; // - buffer for H_ProcInTemp warn messages on following time step
-		Fstring H_ProcInTempBuffer3; // - buffer for H_ProcInTemp warn messages on following time step
+		std::string H_ProcInTempBuffer1; // - buffer for H_ProcInTemp warn messages on following time step
+		std::string H_ProcInTempBuffer2; // - buffer for H_ProcInTemp warn messages on following time step
+		std::string H_ProcInTempBuffer3; // - buffer for H_ProcInTemp warn messages on following time step
 		Real64 H_ProcInTempLast; // - last value of process inlet temp
 		//- H_ProcInHumRat = Process inlet humidity ratio
-		Fstring H_ProcInHumRatBuffer1; // - buffer for H_ProcInHumRat warn message on following timestep
-		Fstring H_ProcInHumRatBuffer2; // - buffer for H_ProcInHumRat warn message on following timestep
-		Fstring H_ProcInHumRatBuffer3; // - buffer for H_ProcInHumRat warn message on following timestep
+		std::string H_ProcInHumRatBuffer1; // - buffer for H_ProcInHumRat warn message on following timestep
+		std::string H_ProcInHumRatBuffer2; // - buffer for H_ProcInHumRat warn message on following timestep
+		std::string H_ProcInHumRatBuffer3; // - buffer for H_ProcInHumRat warn message on following timestep
 		Real64 H_ProcInHumRatLast; // - last value of process inlet humidity ratio
 		//- H_FaceVel = Process and regen face velocity
-		Fstring H_FaceVelBuffer1; // - buffer for H_FaceVel warning messages on following time step
-		Fstring H_FaceVelBuffer2; // - buffer for H_FaceVel warning messages on following time step
-		Fstring H_FaceVelBuffer3; // - buffer for H_FaceVel warning messages on following time step
+		std::string H_FaceVelBuffer1; // - buffer for H_FaceVel warning messages on following time step
+		std::string H_FaceVelBuffer2; // - buffer for H_FaceVel warning messages on following time step
+		std::string H_FaceVelBuffer3; // - buffer for H_FaceVel warning messages on following time step
 		Real64 H_FaceVelLast; // - last value of process and regen face velocity
 		//- H_RegenOutTemp = Regen outlet temperature
-		Fstring RegenOutHumRatBuffer1; // - buffer for RegenOutHumRat warn message on following timestep
-		Fstring RegenOutHumRatBuffer2; // - buffer for RegenOutHumRat warn message on following timestep
-		Fstring RegenOutHumRatBuffer3; // - buffer for RegenOutHumRat warn message on following timestep
+		std::string RegenOutHumRatBuffer1; // - buffer for RegenOutHumRat warn message on following timestep
+		std::string RegenOutHumRatBuffer2; // - buffer for RegenOutHumRat warn message on following timestep
+		std::string RegenOutHumRatBuffer3; // - buffer for RegenOutHumRat warn message on following timestep
 		Real64 RegenOutHumRatLast; // - last value of regen outlet humidity ratio
 
 		// Default Constructor
 		BalancedDesDehumPerfData() :
-			Name( MaxNameLength ),
-			PerfType( MaxNameLength ),
 			NomSupAirVolFlow( 0.0 ),
 			NomProcAirFaceVel( 0.0 ),
 			NomElecPower( 0.0 ),
@@ -699,30 +692,18 @@ namespace HeatRecovery {
 			PrintRegenInRelHumTempMess( false ),
 			RegenInRelHumTempErrIndex( 0 ),
 			RegenInRelHumTempErrorCount( 0 ),
-			RegenInRelHumTempBuffer1( 400 ),
-			RegenInRelHumTempBuffer2( 400 ),
-			RegenInRelHumTempBuffer3( 400 ),
 			RegenInRelHumTempLast( 0.0 ),
 			PrintProcInRelHumTempMess( false ),
 			ProcInRelHumTempErrIndex( 0 ),
 			ProcInRelHumTempErrorCount( 0 ),
-			ProcInRelHumTempBuffer1( 400 ),
-			ProcInRelHumTempBuffer2( 400 ),
-			ProcInRelHumTempBuffer3( 400 ),
 			ProcInRelHumTempLast( 0.0 ),
 			PrintRegenInRelHumHumRatMess( false ),
 			RegenInRelHumHumRatErrIndex( 0 ),
 			RegenInRelHumHumRatErrorCount( 0 ),
-			RegenInRelHumHumRatBuffer1( 400 ),
-			RegenInRelHumHumRatBuffer2( 400 ),
-			RegenInRelHumHumRatBuffer3( 400 ),
 			RegenInRelHumHumRatLast( 0.0 ),
 			PrintProcInRelHumHumRatMess( false ),
 			ProcInRelHumHumRatErrIndex( 0 ),
 			ProcInRelHumHumRatErrorCount( 0 ),
-			ProcInRelHumHumRatBuffer1( 400 ),
-			ProcInRelHumHumRatBuffer2( 400 ),
-			ProcInRelHumHumRatBuffer3( 400 ),
 			ProcInRelHumHumRatLast( 0.0 ),
 			PrintT_RegenInTempMessage( false ),
 			PrintT_RegenInHumRatMessage( false ),
@@ -741,16 +722,10 @@ namespace HeatRecovery {
 			PrintRegenOutHumRatFailedMess( false ),
 			RegenOutHumRatFailedErrIndex( 0 ),
 			RegenOutHumRatFailedErrorCount( 0 ),
-			RegenOutHumRatFailedBuffer1( 400 ),
-			RegenOutHumRatFailedBuffer2( 400 ),
-			RegenOutHumRatFailedBuffer3( 400 ),
 			RegenOutHumRatFailedLast( 0.0 ),
 			PrintImbalancedMassFlowMess( false ),
 			ImbalancedFlowErrIndex( 0 ),
 			ImbalancedMassFlowErrorCount( 0 ),
-			ImbalancedMassFlowBuffer1( 400 ),
-			ImbalancedMassFlowBuffer2( 400 ),
-			ImbalancedMassFlowBuffer3( 400 ),
 			ABSImbalancedFlow( 0.0 ),
 			T_RegenInTempErrorCount( 0 ),
 			T_RegenInHumRatErrorCount( 0 ),
@@ -766,9 +741,6 @@ namespace HeatRecovery {
 			RegenOutTempErrIndex( 0 ),
 			RegenOutTempFailedErrorCount( 0 ),
 			RegenOutTempFailedErrIndex( 0 ),
-			RegenOutTempFailedBuffer1( 400 ),
-			RegenOutTempFailedBuffer2( 400 ),
-			RegenOutTempFailedBuffer3( 400 ),
 			RegenOutTempFailedLast( 0.0 ),
 			H_RegenInTempErrorCount( 0 ),
 			H_RegenInHumRatErrorCount( 0 ),
@@ -784,60 +756,24 @@ namespace HeatRecovery {
 			RegenOutHumRatErrIndex( 0 ),
 			RegenInHumRatErrorCount( 0 ),
 			RegenInHumRatErrIndex( 0 ),
-			T_RegenInTempBuffer1( 400 ),
-			T_RegenInTempBuffer2( 400 ),
-			T_RegenInTempBuffer3( 400 ),
 			T_RegenInTempLast( 0.0 ),
-			T_RegenInHumRatBuffer1( 400 ),
-			T_RegenInHumRatBuffer2( 400 ),
-			T_RegenInHumRatBuffer3( 400 ),
 			T_RegenInHumRatLast( 0.0 ),
-			T_ProcInTempBuffer1( 400 ),
-			T_ProcInTempBuffer2( 400 ),
-			T_ProcInTempBuffer3( 400 ),
 			T_ProcInTempLast( 0.0 ),
-			T_ProcInHumRatBuffer1( 400 ),
-			T_ProcInHumRatBuffer2( 400 ),
-			T_ProcInHumRatBuffer3( 400 ),
 			T_ProcInHumRatLast( 0.0 ),
-			T_FaceVelBuffer1( 400 ),
-			T_FaceVelBuffer2( 400 ),
-			T_FaceVelBuffer3( 400 ),
 			T_FaceVelLast( 0.0 ),
-			RegenOutTempBuffer1( 400 ),
-			RegenOutTempBuffer2( 400 ),
-			RegenOutTempBuffer3( 400 ),
 			RegenOutTempLast( 0.0 ),
-			H_RegenInTempBuffer1( 400 ),
-			H_RegenInTempBuffer2( 400 ),
-			H_RegenInTempBuffer3( 400 ),
 			H_RegenInTempLast( 0.0 ),
-			H_RegenInHumRatBuffer1( 400 ),
-			H_RegenInHumRatBuffer2( 400 ),
-			H_RegenInHumRatBuffer3( 400 ),
 			H_RegenInHumRatLast( 0.0 ),
-			H_ProcInTempBuffer1( 400 ),
-			H_ProcInTempBuffer2( 400 ),
-			H_ProcInTempBuffer3( 400 ),
 			H_ProcInTempLast( 0.0 ),
-			H_ProcInHumRatBuffer1( 400 ),
-			H_ProcInHumRatBuffer2( 400 ),
-			H_ProcInHumRatBuffer3( 400 ),
 			H_ProcInHumRatLast( 0.0 ),
-			H_FaceVelBuffer1( 400 ),
-			H_FaceVelBuffer2( 400 ),
-			H_FaceVelBuffer3( 400 ),
 			H_FaceVelLast( 0.0 ),
-			RegenOutHumRatBuffer1( 400 ),
-			RegenOutHumRatBuffer2( 400 ),
-			RegenOutHumRatBuffer3( 400 ),
 			RegenOutHumRatLast( 0.0 )
 		{}
 
 		// Member Constructor
 		BalancedDesDehumPerfData(
-			Fstring const & Name, // unique name of balanced desiccant performance data type object
-			Fstring const & PerfType, // Type of performance data set
+			std::string const & Name, // unique name of balanced desiccant performance data type object
+			std::string const & PerfType, // Type of performance data set
 			Real64 const NomSupAirVolFlow, // nominal supply air volumetric flow rate m^3/s
 			Real64 const NomProcAirFaceVel, // nominal process air face velocity m/s
 			Real64 const NomElecPower, // nominal electric power consumption [W]
@@ -892,30 +828,30 @@ namespace HeatRecovery {
 			bool const PrintRegenInRelHumTempMess, // - flag to print regen in RH error message for temp eq
 			int const RegenInRelHumTempErrIndex, // - index to recurring error struc for regen outlet hum rat
 			int const RegenInRelHumTempErrorCount, // - counter if regen outlet temp limits are exceeded
-			Fstring const & RegenInRelHumTempBuffer1, // - buffer for RegenOutHumRat warn mess on following timstep
-			Fstring const & RegenInRelHumTempBuffer2, // - buffer for RegenOutHumRat warn mess on following timstep
-			Fstring const & RegenInRelHumTempBuffer3, // - buffer for RegenOutHumRat warn mess on following timstep
+			std::string const & RegenInRelHumTempBuffer1, // - buffer for RegenOutHumRat warn mess on following timstep
+			std::string const & RegenInRelHumTempBuffer2, // - buffer for RegenOutHumRat warn mess on following timstep
+			std::string const & RegenInRelHumTempBuffer3, // - buffer for RegenOutHumRat warn mess on following timstep
 			Real64 const RegenInRelHumTempLast, // - last value of regen outlet humidity ratio
 			bool const PrintProcInRelHumTempMess, // - flag to print regen in RH error message for temp eq
 			int const ProcInRelHumTempErrIndex, // - index to recurring error struc for regen outlet hum rat
 			int const ProcInRelHumTempErrorCount, // - counter if regen outlet temp limits are exceeded
-			Fstring const & ProcInRelHumTempBuffer1, // - buffer for RegenOutHumRat warn mess on following timstep
-			Fstring const & ProcInRelHumTempBuffer2, // - buffer for RegenOutHumRat warn mess on following timstep
-			Fstring const & ProcInRelHumTempBuffer3, // - buffer for RegenOutHumRat warn mess on following timstep
+			std::string const & ProcInRelHumTempBuffer1, // - buffer for RegenOutHumRat warn mess on following timstep
+			std::string const & ProcInRelHumTempBuffer2, // - buffer for RegenOutHumRat warn mess on following timstep
+			std::string const & ProcInRelHumTempBuffer3, // - buffer for RegenOutHumRat warn mess on following timstep
 			Real64 const ProcInRelHumTempLast, // - last value of regen outlet humidity ratio
 			bool const PrintRegenInRelHumHumRatMess, // - flag to print regen in RH error message for temp eq
 			int const RegenInRelHumHumRatErrIndex, // - index to recurring error struc for regen outlet hum rat
 			int const RegenInRelHumHumRatErrorCount, // - counter if regen outlet temp limits are exceeded
-			Fstring const & RegenInRelHumHumRatBuffer1, // - buffer for RegenOutHumRat warn mess on following timstep
-			Fstring const & RegenInRelHumHumRatBuffer2, // - buffer for RegenOutHumRat warn mess on following timstep
-			Fstring const & RegenInRelHumHumRatBuffer3, // - buffer for RegenOutHumRat warn mess on following timstep
+			std::string const & RegenInRelHumHumRatBuffer1, // - buffer for RegenOutHumRat warn mess on following timstep
+			std::string const & RegenInRelHumHumRatBuffer2, // - buffer for RegenOutHumRat warn mess on following timstep
+			std::string const & RegenInRelHumHumRatBuffer3, // - buffer for RegenOutHumRat warn mess on following timstep
 			Real64 const RegenInRelHumHumRatLast, // - last value of regen outlet humidity ratio
 			bool const PrintProcInRelHumHumRatMess, // - flag to print regen in RH error message for temp eq
 			int const ProcInRelHumHumRatErrIndex, // - index to recurring error struc for regen outlet hum rat
 			int const ProcInRelHumHumRatErrorCount, // - counter if regen outlet temp limits are exceeded
-			Fstring const & ProcInRelHumHumRatBuffer1, // - buffer for RegenOutHumRat warn mess on following timstep
-			Fstring const & ProcInRelHumHumRatBuffer2, // - buffer for RegenOutHumRat warn mess on following timstep
-			Fstring const & ProcInRelHumHumRatBuffer3, // - buffer for RegenOutHumRat warn mess on following timstep
+			std::string const & ProcInRelHumHumRatBuffer1, // - buffer for RegenOutHumRat warn mess on following timstep
+			std::string const & ProcInRelHumHumRatBuffer2, // - buffer for RegenOutHumRat warn mess on following timstep
+			std::string const & ProcInRelHumHumRatBuffer3, // - buffer for RegenOutHumRat warn mess on following timstep
 			Real64 const ProcInRelHumHumRatLast, // - last value of regen outlet humidity ratio
 			bool const PrintT_RegenInTempMessage, // - flag to print regen in temp error message for temp eq
 			bool const PrintT_RegenInHumRatMessage, // - flag to print regen in humrat err message for temp eq
@@ -934,16 +870,16 @@ namespace HeatRecovery {
 			bool const PrintRegenOutHumRatFailedMess, // - flag for regen outlet hum rat error message
 			int const RegenOutHumRatFailedErrIndex, // - index to recurring error struc for regen outlet hum rat
 			int const RegenOutHumRatFailedErrorCount, // - counter if regen outlet temp limits are exceeded
-			Fstring const & RegenOutHumRatFailedBuffer1, // - buffer for RegenOutHumRat warn mess on following timstep
-			Fstring const & RegenOutHumRatFailedBuffer2, // - buffer for RegenOutHumRat warn mess on following timstep
-			Fstring const & RegenOutHumRatFailedBuffer3, // - buffer for RegenOutHumRat warn mess on following timstep
+			std::string const & RegenOutHumRatFailedBuffer1, // - buffer for RegenOutHumRat warn mess on following timstep
+			std::string const & RegenOutHumRatFailedBuffer2, // - buffer for RegenOutHumRat warn mess on following timstep
+			std::string const & RegenOutHumRatFailedBuffer3, // - buffer for RegenOutHumRat warn mess on following timstep
 			Real64 const RegenOutHumRatFailedLast, // - last value of regen outlet humidity ratio
 			bool const PrintImbalancedMassFlowMess, // - flag for imbalanced regen and process mass flow rate
 			int const ImbalancedFlowErrIndex, // - index to recurring error struc for imbalanced flow
 			int const ImbalancedMassFlowErrorCount, // - counter for imbalanced regen and process mass flow rate
-			Fstring const & ImbalancedMassFlowBuffer1, // - buffer for imbalanced regen and process mass flow rate
-			Fstring const & ImbalancedMassFlowBuffer2, // - buffer for imbalanced regen and process mass flow rate
-			Fstring const & ImbalancedMassFlowBuffer3, // - buffer for imbalanced regen and process mass flow rate
+			std::string const & ImbalancedMassFlowBuffer1, // - buffer for imbalanced regen and process mass flow rate
+			std::string const & ImbalancedMassFlowBuffer2, // - buffer for imbalanced regen and process mass flow rate
+			std::string const & ImbalancedMassFlowBuffer3, // - buffer for imbalanced regen and process mass flow rate
 			Real64 const ABSImbalancedFlow, // - last value of heat exchanger mass flow rate imbalance
 			int const T_RegenInTempErrorCount, // - counter if regen inlet temp limits are exceeded
 			int const T_RegenInHumRatErrorCount, // - counter if regen inlet hum rat limits are exceeded
@@ -959,9 +895,9 @@ namespace HeatRecovery {
 			int const RegenOutTempErrIndex, // - index to recurring error structure for regen outlet temp
 			int const RegenOutTempFailedErrorCount, // - counter if regen outlet temp limits are exceeded
 			int const RegenOutTempFailedErrIndex, // - index to recurring error structure for regen outlet temp
-			Fstring const & RegenOutTempFailedBuffer1, // - buffer for RegenOutTemp warn messages on following timestep
-			Fstring const & RegenOutTempFailedBuffer2, // - buffer for RegenOutTemp warn messages on following timestep
-			Fstring const & RegenOutTempFailedBuffer3, // - buffer for RegenOutTemp warn messages on following timestep
+			std::string const & RegenOutTempFailedBuffer1, // - buffer for RegenOutTemp warn messages on following timestep
+			std::string const & RegenOutTempFailedBuffer2, // - buffer for RegenOutTemp warn messages on following timestep
+			std::string const & RegenOutTempFailedBuffer3, // - buffer for RegenOutTemp warn messages on following timestep
 			Real64 const RegenOutTempFailedLast, // - last value of regen outlet temp
 			int const H_RegenInTempErrorCount, // - counter if regen inlet temp limits are exceeded
 			int const H_RegenInHumRatErrorCount, // - counter if regen inlet hum rat limits are exceeded
@@ -977,57 +913,57 @@ namespace HeatRecovery {
 			int const RegenOutHumRatErrIndex, // - index to recurring error struc for regen outlet hum rat
 			int const RegenInHumRatErrorCount, // - counter if regen outlet temp limits are exceeded
 			int const RegenInHumRatErrIndex, // - index to recurring error struc for regen outlet hum rat
-			Fstring const & T_RegenInTempBuffer1, // - buffer for T_RegenInTemp warn message on following timestep
-			Fstring const & T_RegenInTempBuffer2, // - buffer for T_RegenInTemp warn message on following timestep
-			Fstring const & T_RegenInTempBuffer3, // - buffer for T_RegenInTemp warn message on following timestep
+			std::string const & T_RegenInTempBuffer1, // - buffer for T_RegenInTemp warn message on following timestep
+			std::string const & T_RegenInTempBuffer2, // - buffer for T_RegenInTemp warn message on following timestep
+			std::string const & T_RegenInTempBuffer3, // - buffer for T_RegenInTemp warn message on following timestep
 			Real64 const T_RegenInTempLast, // - last value of regen inlet temp
-			Fstring const & T_RegenInHumRatBuffer1, // - buffer for T_RegenInHumRat warn messag on following timestep
-			Fstring const & T_RegenInHumRatBuffer2, // - buffer for T_RegenInHumRat warn messag on following timestep
-			Fstring const & T_RegenInHumRatBuffer3, // - buffer for T_RegenInHumRat warn messag on following timestep
+			std::string const & T_RegenInHumRatBuffer1, // - buffer for T_RegenInHumRat warn messag on following timestep
+			std::string const & T_RegenInHumRatBuffer2, // - buffer for T_RegenInHumRat warn messag on following timestep
+			std::string const & T_RegenInHumRatBuffer3, // - buffer for T_RegenInHumRat warn messag on following timestep
 			Real64 const T_RegenInHumRatLast, // - last value of regen inlet humidity ratio
-			Fstring const & T_ProcInTempBuffer1, // - buffer for T_ProcInTemp warning messag on following timestep
-			Fstring const & T_ProcInTempBuffer2, // - buffer for T_ProcInTemp warning messag on following timestep
-			Fstring const & T_ProcInTempBuffer3, // - buffer for T_ProcInTemp warning messag on following timestep
+			std::string const & T_ProcInTempBuffer1, // - buffer for T_ProcInTemp warning messag on following timestep
+			std::string const & T_ProcInTempBuffer2, // - buffer for T_ProcInTemp warning messag on following timestep
+			std::string const & T_ProcInTempBuffer3, // - buffer for T_ProcInTemp warning messag on following timestep
 			Real64 const T_ProcInTempLast, // - last value of process inlet temp
-			Fstring const & T_ProcInHumRatBuffer1, // - buffer for T_ProcInHumRat warn message on following timestep
-			Fstring const & T_ProcInHumRatBuffer2, // - buffer for T_ProcInHumRat warn message on following timestep
-			Fstring const & T_ProcInHumRatBuffer3, // - buffer for T_ProcInHumRat warn message on following timestep
+			std::string const & T_ProcInHumRatBuffer1, // - buffer for T_ProcInHumRat warn message on following timestep
+			std::string const & T_ProcInHumRatBuffer2, // - buffer for T_ProcInHumRat warn message on following timestep
+			std::string const & T_ProcInHumRatBuffer3, // - buffer for T_ProcInHumRat warn message on following timestep
 			Real64 const T_ProcInHumRatLast, // - last value of process inlet humidity ratio
-			Fstring const & T_FaceVelBuffer1, // - buffer for T_FaceVel warning messages on following time step
-			Fstring const & T_FaceVelBuffer2, // - buffer for T_FaceVel warning messages on following time step
-			Fstring const & T_FaceVelBuffer3, // - buffer for T_FaceVel warning messages on following time step
+			std::string const & T_FaceVelBuffer1, // - buffer for T_FaceVel warning messages on following time step
+			std::string const & T_FaceVelBuffer2, // - buffer for T_FaceVel warning messages on following time step
+			std::string const & T_FaceVelBuffer3, // - buffer for T_FaceVel warning messages on following time step
 			Real64 const T_FaceVelLast, // - last value of process and regen face velocity
-			Fstring const & RegenOutTempBuffer1, // - buffer for RegenOutTemp warn messages on following timestep
-			Fstring const & RegenOutTempBuffer2, // - buffer for RegenOutTemp warn messages on following timestep
-			Fstring const & RegenOutTempBuffer3, // - buffer for RegenOutTemp warn messages on following timestep
+			std::string const & RegenOutTempBuffer1, // - buffer for RegenOutTemp warn messages on following timestep
+			std::string const & RegenOutTempBuffer2, // - buffer for RegenOutTemp warn messages on following timestep
+			std::string const & RegenOutTempBuffer3, // - buffer for RegenOutTemp warn messages on following timestep
 			Real64 const RegenOutTempLast, // - last value of regen outlet temp
-			Fstring const & H_RegenInTempBuffer1, // - buffer for H_RegenInTemp warn message on following time step
-			Fstring const & H_RegenInTempBuffer2, // - buffer for H_RegenInTemp warn message on following time step
-			Fstring const & H_RegenInTempBuffer3, // - buffer for H_RegenInTemp warn message on following time step
+			std::string const & H_RegenInTempBuffer1, // - buffer for H_RegenInTemp warn message on following time step
+			std::string const & H_RegenInTempBuffer2, // - buffer for H_RegenInTemp warn message on following time step
+			std::string const & H_RegenInTempBuffer3, // - buffer for H_RegenInTemp warn message on following time step
 			Real64 const H_RegenInTempLast, // - last value of regen inlet temp
-			Fstring const & H_RegenInHumRatBuffer1, // - buffer for H_RegenInHumRat warn messag on following timestep
-			Fstring const & H_RegenInHumRatBuffer2, // - buffer for H_RegenInHumRat warn messag on following timestep
-			Fstring const & H_RegenInHumRatBuffer3, // - buffer for H_RegenInHumRat warn messag on following timestep
+			std::string const & H_RegenInHumRatBuffer1, // - buffer for H_RegenInHumRat warn messag on following timestep
+			std::string const & H_RegenInHumRatBuffer2, // - buffer for H_RegenInHumRat warn messag on following timestep
+			std::string const & H_RegenInHumRatBuffer3, // - buffer for H_RegenInHumRat warn messag on following timestep
 			Real64 const H_RegenInHumRatLast, // - last value of regen inlet humidity ratio
-			Fstring const & H_ProcInTempBuffer1, // - buffer for H_ProcInTemp warn messages on following time step
-			Fstring const & H_ProcInTempBuffer2, // - buffer for H_ProcInTemp warn messages on following time step
-			Fstring const & H_ProcInTempBuffer3, // - buffer for H_ProcInTemp warn messages on following time step
+			std::string const & H_ProcInTempBuffer1, // - buffer for H_ProcInTemp warn messages on following time step
+			std::string const & H_ProcInTempBuffer2, // - buffer for H_ProcInTemp warn messages on following time step
+			std::string const & H_ProcInTempBuffer3, // - buffer for H_ProcInTemp warn messages on following time step
 			Real64 const H_ProcInTempLast, // - last value of process inlet temp
-			Fstring const & H_ProcInHumRatBuffer1, // - buffer for H_ProcInHumRat warn message on following timestep
-			Fstring const & H_ProcInHumRatBuffer2, // - buffer for H_ProcInHumRat warn message on following timestep
-			Fstring const & H_ProcInHumRatBuffer3, // - buffer for H_ProcInHumRat warn message on following timestep
+			std::string const & H_ProcInHumRatBuffer1, // - buffer for H_ProcInHumRat warn message on following timestep
+			std::string const & H_ProcInHumRatBuffer2, // - buffer for H_ProcInHumRat warn message on following timestep
+			std::string const & H_ProcInHumRatBuffer3, // - buffer for H_ProcInHumRat warn message on following timestep
 			Real64 const H_ProcInHumRatLast, // - last value of process inlet humidity ratio
-			Fstring const & H_FaceVelBuffer1, // - buffer for H_FaceVel warning messages on following time step
-			Fstring const & H_FaceVelBuffer2, // - buffer for H_FaceVel warning messages on following time step
-			Fstring const & H_FaceVelBuffer3, // - buffer for H_FaceVel warning messages on following time step
+			std::string const & H_FaceVelBuffer1, // - buffer for H_FaceVel warning messages on following time step
+			std::string const & H_FaceVelBuffer2, // - buffer for H_FaceVel warning messages on following time step
+			std::string const & H_FaceVelBuffer3, // - buffer for H_FaceVel warning messages on following time step
 			Real64 const H_FaceVelLast, // - last value of process and regen face velocity
-			Fstring const & RegenOutHumRatBuffer1, // - buffer for RegenOutHumRat warn message on following timestep
-			Fstring const & RegenOutHumRatBuffer2, // - buffer for RegenOutHumRat warn message on following timestep
-			Fstring const & RegenOutHumRatBuffer3, // - buffer for RegenOutHumRat warn message on following timestep
+			std::string const & RegenOutHumRatBuffer1, // - buffer for RegenOutHumRat warn message on following timestep
+			std::string const & RegenOutHumRatBuffer2, // - buffer for RegenOutHumRat warn message on following timestep
+			std::string const & RegenOutHumRatBuffer3, // - buffer for RegenOutHumRat warn message on following timestep
 			Real64 const RegenOutHumRatLast // - last value of regen outlet humidity ratio
 		) :
-			Name( MaxNameLength, Name ),
-			PerfType( MaxNameLength, PerfType ),
+			Name( Name ),
+			PerfType( PerfType ),
 			NomSupAirVolFlow( NomSupAirVolFlow ),
 			NomProcAirFaceVel( NomProcAirFaceVel ),
 			NomElecPower( NomElecPower ),
@@ -1082,30 +1018,30 @@ namespace HeatRecovery {
 			PrintRegenInRelHumTempMess( PrintRegenInRelHumTempMess ),
 			RegenInRelHumTempErrIndex( RegenInRelHumTempErrIndex ),
 			RegenInRelHumTempErrorCount( RegenInRelHumTempErrorCount ),
-			RegenInRelHumTempBuffer1( 400, RegenInRelHumTempBuffer1 ),
-			RegenInRelHumTempBuffer2( 400, RegenInRelHumTempBuffer2 ),
-			RegenInRelHumTempBuffer3( 400, RegenInRelHumTempBuffer3 ),
+			RegenInRelHumTempBuffer1( RegenInRelHumTempBuffer1 ),
+			RegenInRelHumTempBuffer2( RegenInRelHumTempBuffer2 ),
+			RegenInRelHumTempBuffer3( RegenInRelHumTempBuffer3 ),
 			RegenInRelHumTempLast( RegenInRelHumTempLast ),
 			PrintProcInRelHumTempMess( PrintProcInRelHumTempMess ),
 			ProcInRelHumTempErrIndex( ProcInRelHumTempErrIndex ),
 			ProcInRelHumTempErrorCount( ProcInRelHumTempErrorCount ),
-			ProcInRelHumTempBuffer1( 400, ProcInRelHumTempBuffer1 ),
-			ProcInRelHumTempBuffer2( 400, ProcInRelHumTempBuffer2 ),
-			ProcInRelHumTempBuffer3( 400, ProcInRelHumTempBuffer3 ),
+			ProcInRelHumTempBuffer1( ProcInRelHumTempBuffer1 ),
+			ProcInRelHumTempBuffer2( ProcInRelHumTempBuffer2 ),
+			ProcInRelHumTempBuffer3( ProcInRelHumTempBuffer3 ),
 			ProcInRelHumTempLast( ProcInRelHumTempLast ),
 			PrintRegenInRelHumHumRatMess( PrintRegenInRelHumHumRatMess ),
 			RegenInRelHumHumRatErrIndex( RegenInRelHumHumRatErrIndex ),
 			RegenInRelHumHumRatErrorCount( RegenInRelHumHumRatErrorCount ),
-			RegenInRelHumHumRatBuffer1( 400, RegenInRelHumHumRatBuffer1 ),
-			RegenInRelHumHumRatBuffer2( 400, RegenInRelHumHumRatBuffer2 ),
-			RegenInRelHumHumRatBuffer3( 400, RegenInRelHumHumRatBuffer3 ),
+			RegenInRelHumHumRatBuffer1( RegenInRelHumHumRatBuffer1 ),
+			RegenInRelHumHumRatBuffer2( RegenInRelHumHumRatBuffer2 ),
+			RegenInRelHumHumRatBuffer3( RegenInRelHumHumRatBuffer3 ),
 			RegenInRelHumHumRatLast( RegenInRelHumHumRatLast ),
 			PrintProcInRelHumHumRatMess( PrintProcInRelHumHumRatMess ),
 			ProcInRelHumHumRatErrIndex( ProcInRelHumHumRatErrIndex ),
 			ProcInRelHumHumRatErrorCount( ProcInRelHumHumRatErrorCount ),
-			ProcInRelHumHumRatBuffer1( 400, ProcInRelHumHumRatBuffer1 ),
-			ProcInRelHumHumRatBuffer2( 400, ProcInRelHumHumRatBuffer2 ),
-			ProcInRelHumHumRatBuffer3( 400, ProcInRelHumHumRatBuffer3 ),
+			ProcInRelHumHumRatBuffer1( ProcInRelHumHumRatBuffer1 ),
+			ProcInRelHumHumRatBuffer2( ProcInRelHumHumRatBuffer2 ),
+			ProcInRelHumHumRatBuffer3( ProcInRelHumHumRatBuffer3 ),
 			ProcInRelHumHumRatLast( ProcInRelHumHumRatLast ),
 			PrintT_RegenInTempMessage( PrintT_RegenInTempMessage ),
 			PrintT_RegenInHumRatMessage( PrintT_RegenInHumRatMessage ),
@@ -1124,16 +1060,16 @@ namespace HeatRecovery {
 			PrintRegenOutHumRatFailedMess( PrintRegenOutHumRatFailedMess ),
 			RegenOutHumRatFailedErrIndex( RegenOutHumRatFailedErrIndex ),
 			RegenOutHumRatFailedErrorCount( RegenOutHumRatFailedErrorCount ),
-			RegenOutHumRatFailedBuffer1( 400, RegenOutHumRatFailedBuffer1 ),
-			RegenOutHumRatFailedBuffer2( 400, RegenOutHumRatFailedBuffer2 ),
-			RegenOutHumRatFailedBuffer3( 400, RegenOutHumRatFailedBuffer3 ),
+			RegenOutHumRatFailedBuffer1( RegenOutHumRatFailedBuffer1 ),
+			RegenOutHumRatFailedBuffer2( RegenOutHumRatFailedBuffer2 ),
+			RegenOutHumRatFailedBuffer3( RegenOutHumRatFailedBuffer3 ),
 			RegenOutHumRatFailedLast( RegenOutHumRatFailedLast ),
 			PrintImbalancedMassFlowMess( PrintImbalancedMassFlowMess ),
 			ImbalancedFlowErrIndex( ImbalancedFlowErrIndex ),
 			ImbalancedMassFlowErrorCount( ImbalancedMassFlowErrorCount ),
-			ImbalancedMassFlowBuffer1( 400, ImbalancedMassFlowBuffer1 ),
-			ImbalancedMassFlowBuffer2( 400, ImbalancedMassFlowBuffer2 ),
-			ImbalancedMassFlowBuffer3( 400, ImbalancedMassFlowBuffer3 ),
+			ImbalancedMassFlowBuffer1( ImbalancedMassFlowBuffer1 ),
+			ImbalancedMassFlowBuffer2( ImbalancedMassFlowBuffer2 ),
+			ImbalancedMassFlowBuffer3( ImbalancedMassFlowBuffer3 ),
 			ABSImbalancedFlow( ABSImbalancedFlow ),
 			T_RegenInTempErrorCount( T_RegenInTempErrorCount ),
 			T_RegenInHumRatErrorCount( T_RegenInHumRatErrorCount ),
@@ -1149,9 +1085,9 @@ namespace HeatRecovery {
 			RegenOutTempErrIndex( RegenOutTempErrIndex ),
 			RegenOutTempFailedErrorCount( RegenOutTempFailedErrorCount ),
 			RegenOutTempFailedErrIndex( RegenOutTempFailedErrIndex ),
-			RegenOutTempFailedBuffer1( 400, RegenOutTempFailedBuffer1 ),
-			RegenOutTempFailedBuffer2( 400, RegenOutTempFailedBuffer2 ),
-			RegenOutTempFailedBuffer3( 400, RegenOutTempFailedBuffer3 ),
+			RegenOutTempFailedBuffer1( RegenOutTempFailedBuffer1 ),
+			RegenOutTempFailedBuffer2( RegenOutTempFailedBuffer2 ),
+			RegenOutTempFailedBuffer3( RegenOutTempFailedBuffer3 ),
 			RegenOutTempFailedLast( RegenOutTempFailedLast ),
 			H_RegenInTempErrorCount( H_RegenInTempErrorCount ),
 			H_RegenInHumRatErrorCount( H_RegenInHumRatErrorCount ),
@@ -1167,53 +1103,53 @@ namespace HeatRecovery {
 			RegenOutHumRatErrIndex( RegenOutHumRatErrIndex ),
 			RegenInHumRatErrorCount( RegenInHumRatErrorCount ),
 			RegenInHumRatErrIndex( RegenInHumRatErrIndex ),
-			T_RegenInTempBuffer1( 400, T_RegenInTempBuffer1 ),
-			T_RegenInTempBuffer2( 400, T_RegenInTempBuffer2 ),
-			T_RegenInTempBuffer3( 400, T_RegenInTempBuffer3 ),
+			T_RegenInTempBuffer1( T_RegenInTempBuffer1 ),
+			T_RegenInTempBuffer2( T_RegenInTempBuffer2 ),
+			T_RegenInTempBuffer3( T_RegenInTempBuffer3 ),
 			T_RegenInTempLast( T_RegenInTempLast ),
-			T_RegenInHumRatBuffer1( 400, T_RegenInHumRatBuffer1 ),
-			T_RegenInHumRatBuffer2( 400, T_RegenInHumRatBuffer2 ),
-			T_RegenInHumRatBuffer3( 400, T_RegenInHumRatBuffer3 ),
+			T_RegenInHumRatBuffer1( T_RegenInHumRatBuffer1 ),
+			T_RegenInHumRatBuffer2( T_RegenInHumRatBuffer2 ),
+			T_RegenInHumRatBuffer3( T_RegenInHumRatBuffer3 ),
 			T_RegenInHumRatLast( T_RegenInHumRatLast ),
-			T_ProcInTempBuffer1( 400, T_ProcInTempBuffer1 ),
-			T_ProcInTempBuffer2( 400, T_ProcInTempBuffer2 ),
-			T_ProcInTempBuffer3( 400, T_ProcInTempBuffer3 ),
+			T_ProcInTempBuffer1( T_ProcInTempBuffer1 ),
+			T_ProcInTempBuffer2( T_ProcInTempBuffer2 ),
+			T_ProcInTempBuffer3( T_ProcInTempBuffer3 ),
 			T_ProcInTempLast( T_ProcInTempLast ),
-			T_ProcInHumRatBuffer1( 400, T_ProcInHumRatBuffer1 ),
-			T_ProcInHumRatBuffer2( 400, T_ProcInHumRatBuffer2 ),
-			T_ProcInHumRatBuffer3( 400, T_ProcInHumRatBuffer3 ),
+			T_ProcInHumRatBuffer1( T_ProcInHumRatBuffer1 ),
+			T_ProcInHumRatBuffer2( T_ProcInHumRatBuffer2 ),
+			T_ProcInHumRatBuffer3( T_ProcInHumRatBuffer3 ),
 			T_ProcInHumRatLast( T_ProcInHumRatLast ),
-			T_FaceVelBuffer1( 400, T_FaceVelBuffer1 ),
-			T_FaceVelBuffer2( 400, T_FaceVelBuffer2 ),
-			T_FaceVelBuffer3( 400, T_FaceVelBuffer3 ),
+			T_FaceVelBuffer1( T_FaceVelBuffer1 ),
+			T_FaceVelBuffer2( T_FaceVelBuffer2 ),
+			T_FaceVelBuffer3( T_FaceVelBuffer3 ),
 			T_FaceVelLast( T_FaceVelLast ),
-			RegenOutTempBuffer1( 400, RegenOutTempBuffer1 ),
-			RegenOutTempBuffer2( 400, RegenOutTempBuffer2 ),
-			RegenOutTempBuffer3( 400, RegenOutTempBuffer3 ),
+			RegenOutTempBuffer1( RegenOutTempBuffer1 ),
+			RegenOutTempBuffer2( RegenOutTempBuffer2 ),
+			RegenOutTempBuffer3( RegenOutTempBuffer3 ),
 			RegenOutTempLast( RegenOutTempLast ),
-			H_RegenInTempBuffer1( 400, H_RegenInTempBuffer1 ),
-			H_RegenInTempBuffer2( 400, H_RegenInTempBuffer2 ),
-			H_RegenInTempBuffer3( 400, H_RegenInTempBuffer3 ),
+			H_RegenInTempBuffer1( H_RegenInTempBuffer1 ),
+			H_RegenInTempBuffer2( H_RegenInTempBuffer2 ),
+			H_RegenInTempBuffer3( H_RegenInTempBuffer3 ),
 			H_RegenInTempLast( H_RegenInTempLast ),
-			H_RegenInHumRatBuffer1( 400, H_RegenInHumRatBuffer1 ),
-			H_RegenInHumRatBuffer2( 400, H_RegenInHumRatBuffer2 ),
-			H_RegenInHumRatBuffer3( 400, H_RegenInHumRatBuffer3 ),
+			H_RegenInHumRatBuffer1( H_RegenInHumRatBuffer1 ),
+			H_RegenInHumRatBuffer2( H_RegenInHumRatBuffer2 ),
+			H_RegenInHumRatBuffer3( H_RegenInHumRatBuffer3 ),
 			H_RegenInHumRatLast( H_RegenInHumRatLast ),
-			H_ProcInTempBuffer1( 400, H_ProcInTempBuffer1 ),
-			H_ProcInTempBuffer2( 400, H_ProcInTempBuffer2 ),
-			H_ProcInTempBuffer3( 400, H_ProcInTempBuffer3 ),
+			H_ProcInTempBuffer1( H_ProcInTempBuffer1 ),
+			H_ProcInTempBuffer2( H_ProcInTempBuffer2 ),
+			H_ProcInTempBuffer3( H_ProcInTempBuffer3 ),
 			H_ProcInTempLast( H_ProcInTempLast ),
-			H_ProcInHumRatBuffer1( 400, H_ProcInHumRatBuffer1 ),
-			H_ProcInHumRatBuffer2( 400, H_ProcInHumRatBuffer2 ),
-			H_ProcInHumRatBuffer3( 400, H_ProcInHumRatBuffer3 ),
+			H_ProcInHumRatBuffer1( H_ProcInHumRatBuffer1 ),
+			H_ProcInHumRatBuffer2( H_ProcInHumRatBuffer2 ),
+			H_ProcInHumRatBuffer3( H_ProcInHumRatBuffer3 ),
 			H_ProcInHumRatLast( H_ProcInHumRatLast ),
-			H_FaceVelBuffer1( 400, H_FaceVelBuffer1 ),
-			H_FaceVelBuffer2( 400, H_FaceVelBuffer2 ),
-			H_FaceVelBuffer3( 400, H_FaceVelBuffer3 ),
+			H_FaceVelBuffer1( H_FaceVelBuffer1 ),
+			H_FaceVelBuffer2( H_FaceVelBuffer2 ),
+			H_FaceVelBuffer3( H_FaceVelBuffer3 ),
 			H_FaceVelLast( H_FaceVelLast ),
-			RegenOutHumRatBuffer1( 400, RegenOutHumRatBuffer1 ),
-			RegenOutHumRatBuffer2( 400, RegenOutHumRatBuffer2 ),
-			RegenOutHumRatBuffer3( 400, RegenOutHumRatBuffer3 ),
+			RegenOutHumRatBuffer1( RegenOutHumRatBuffer1 ),
+			RegenOutHumRatBuffer2( RegenOutHumRatBuffer2 ),
+			RegenOutHumRatBuffer3( RegenOutHumRatBuffer3 ),
 			RegenOutHumRatLast( RegenOutHumRatLast )
 		{}
 
@@ -1227,7 +1163,7 @@ namespace HeatRecovery {
 
 	void
 	SimHeatRecovery(
-		Fstring const & CompName, // name of the heat exchanger unit
+		std::string const & CompName, // name of the heat exchanger unit
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		int & CompIndex, // Pointer to Component
 		int const FanOpMode, // Supply air fan operating mode
@@ -1393,37 +1329,37 @@ namespace HeatRecovery {
 
 	int
 	GetSupplyInletNode(
-		Fstring const & HXName, // must match HX names for the ExchCond type
+		std::string const & HXName, // must match HX names for the ExchCond type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetSupplyOutletNode(
-		Fstring const & HXName, // must match HX names for the ExchCond type
+		std::string const & HXName, // must match HX names for the ExchCond type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetSecondaryInletNode(
-		Fstring const & HXName, // must match HX names for the ExchCond type
+		std::string const & HXName, // must match HX names for the ExchCond type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetSecondaryOutletNode(
-		Fstring const & HXName, // must match HX names for the ExchCond type
+		std::string const & HXName, // must match HX names for the ExchCond type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	Real64
 	GetSupplyAirFlowRate(
-		Fstring const & HXName, // must match HX names for the ExchCond type
+		std::string const & HXName, // must match HX names for the ExchCond type
 		bool & ErrorsFound // set to true if problem
 	);
 
 	int
 	GetHeatExchangerObjectTypeNum(
-		Fstring const & HXName, // must match HX names for the ExchCond type
+		std::string const & HXName, // must match HX names for the ExchCond type
 		bool & ErrorsFound // set to true if problem
 	);
 
@@ -1431,7 +1367,7 @@ namespace HeatRecovery {
 	SetHeatExchangerData(
 		int const HXNum, // Index of HX
 		bool & ErrorsFound, // Set to true if certain errors found
-		Fstring const & HXName, // Name of HX
+		std::string const & HXName, // Name of HX
 		Optional< Real64 > SupplyAirVolFlow = _, // HX supply air flow rate    [m3/s]
 		Optional< Real64 > SecondaryAirVolFlow = _ // HX secondary air flow rate [m3/s]
 	);

@@ -27,7 +27,6 @@ namespace DataDaylighting {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// -only module should be available to other modules and routines.
@@ -51,7 +50,7 @@ namespace DataDaylighting {
 	int const NoDaylighting( 0 );
 	int const DetailedDaylighting( 1 );
 	int const DElightDaylighting( 2 );
-	FArray1D_Fstring const DaylightTypes( 2, sFstring( 28 ), { "Daylighting:Controls        ", "Daylighting:DELight:Controls" } );
+	FArray1D_string const DaylightTypes( 2, { "Daylighting:Controls", "Daylighting:DELight:Controls" } );
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -63,7 +62,7 @@ namespace DataDaylighting {
 	int TotIllumMaps( 0 );
 	bool mapResultsToReport( false ); // used when only partial hour has "sun up"
 	bool mapResultsReported( false ); // when no map results are ever reported this will still be false
-	Fstring MapColSep( 1 ); // Character for separating map columns (tab, space, comma)
+	std::string MapColSep; // Character for separating map columns (tab, space, comma)
 
 	bool DFSReportSizingDays( false );
 	bool DFSReportAllShadowCalculationDays( false );

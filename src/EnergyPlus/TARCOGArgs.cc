@@ -120,7 +120,7 @@ namespace TARCOGArgs {
 		int const standard,
 		int const ThermalMod,
 		Real64 const SDScalar,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	)
 	{
 
@@ -192,7 +192,7 @@ namespace TARCOGArgs {
 		//// INPUTS/OUTPUTS:
 
 		int i;
-		Fstring a( 3 );
+		std::string a;
 
 		//bi...Write debug output files - if debug flag = 1:
 
@@ -242,7 +242,7 @@ namespace TARCOGArgs {
 			if ( gap( i ) <= 0.0 ) {
 				ArgCheck = 20;
 				gio::write( a, "(i3)" ) << i;
-				ErrorMessage = "Gap width is less than (or equal to) zero. Gap #" + trim( a );
+				ErrorMessage = "Gap width is less than (or equal to) zero. Gap #" + a;
 				return ArgCheck;
 			}
 		}
@@ -251,7 +251,7 @@ namespace TARCOGArgs {
 			if ( thick( i ) <= 0.0 ) {
 				ArgCheck = 21;
 				gio::write( a, "(i3)" ) << i;
-				ErrorMessage = "Layer width is less than (or equal to) zero. Layer #" + trim( a );
+				ErrorMessage = "Layer width is less than (or equal to) zero. Layer #" + a;
 				return ArgCheck;
 			}
 			if ( ( i < nlayer ) && ( LayerType( i ) == VENETBLIND ) && ( LayerType( i + 1 ) == VENETBLIND ) ) {
@@ -312,14 +312,14 @@ namespace TARCOGArgs {
 			if ( scon( i ) <= 0.0 ) {
 				ArgCheck = 26;
 				gio::write( a, "(i3)" ) << i;
-				ErrorMessage = "Layer " + trim( a ) + " has conductivity whcih is less or equal to zero.";
+				ErrorMessage = "Layer " + a + " has conductivity whcih is less or equal to zero.";
 				return ArgCheck;
 			}
 
 			if ( ( LayerType( i ) < MinLayType ) || ( LayerType( i ) > MaxLayType ) ) {
 				ArgCheck = 22;
 				gio::write( a, "(i3)" ) << i;
-				ErrorMessage = "Incorrect layer type for layer #" + trim( a ) + ".  Layer type can either be 0 (glazing layer)," "1 (Venetian blind), 2 (woven shade), 3 (perforated), 4 (diffuse shade) or 5 (bsdf).";
+				ErrorMessage = "Incorrect layer type for layer #" + a + ".  Layer type can either be 0 (glazing layer)," "1 (Venetian blind), 2 (woven shade), 3 (perforated), 4 (diffuse shade) or 5 (bsdf).";
 				return ArgCheck;
 			}
 
@@ -339,37 +339,37 @@ namespace TARCOGArgs {
 				if ( SlatThick( i ) <= 0 ) {
 					ArgCheck = 31;
 					gio::write( a, "(i3)" ) << i;
-					ErrorMessage = "Invalid slat thickness (must be >0). Layer #" + trim( a );
+					ErrorMessage = "Invalid slat thickness (must be >0). Layer #" + a;
 					return ArgCheck;
 				}
 				if ( SlatWidth( i ) <= 0.0 ) {
 					ArgCheck = 32;
 					gio::write( a, "(i3)" ) << i;
-					ErrorMessage = "Invalid slat width (must be >0). Layer #" + trim( a );
+					ErrorMessage = "Invalid slat width (must be >0). Layer #" + a;
 					return ArgCheck;
 				}
 				if ( ( SlatAngle( i ) < -90.0 ) || ( SlatAngle( i ) > 90.0 ) ) {
 					ArgCheck = 33;
 					gio::write( a, "(i3)" ) << i;
-					ErrorMessage = "Invalid slat angle (must be between -90 and 90). Layer #" + trim( a );
+					ErrorMessage = "Invalid slat angle (must be between -90 and 90). Layer #" + a;
 					return ArgCheck;
 				}
 				if ( SlatCond( i ) <= 0.0 ) {
 					ArgCheck = 34;
 					gio::write( a, "(i3)" ) << i;
-					ErrorMessage = "Invalid conductivity of slat material (must be >0). Layer #" + trim( a );
+					ErrorMessage = "Invalid conductivity of slat material (must be >0). Layer #" + a;
 					return ArgCheck;
 				}
 				if ( SlatSpacing( i ) <= 0.0 ) {
 					ArgCheck = 35;
 					gio::write( a, "(i3)" ) << i;
-					ErrorMessage = "Invalid slat spacing (must be >0). Layer #" + trim( a );
+					ErrorMessage = "Invalid slat spacing (must be >0). Layer #" + a;
 					return ArgCheck;
 				}
 				if ( ( SlatCurve( i ) != 0.0 ) && ( std::abs( SlatCurve( i ) ) <= ( SlatWidth( i ) / 2.0 ) ) ) {
 					ArgCheck = 36;
 					gio::write( a, "(i3)" ) << i;
-					ErrorMessage = "Invalid curvature radius (absolute value must be >SlatWidth/2, or 0 for flat slats). Layer #" + trim( a );
+					ErrorMessage = "Invalid curvature radius (absolute value must be >SlatWidth/2, or 0 for flat slats). Layer #" + a;
 					return ArgCheck;
 				}
 
@@ -384,7 +384,7 @@ namespace TARCOGArgs {
 				if ( ( i == 1 ) || ( i == ( nlayer + 1 ) ) ) {
 					ErrorMessage = "One of enviroments (inside or outside) has pressure which is less than zero.";
 				} else {
-					ErrorMessage = "One of gaps has pressure which is less than zero. Gap #" + trim( a );
+					ErrorMessage = "One of gaps has pressure which is less than zero. Gap #" + a;
 				}
 				return ArgCheck;
 			}
@@ -452,7 +452,7 @@ namespace TARCOGArgs {
 		FArray1A< Real64 > rir,
 		FArray1A< Real64 > vfreevent,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	)
 	{
 
@@ -495,7 +495,7 @@ namespace TARCOGArgs {
 		Real64 Fsky;
 		Real64 Fground;
 		Real64 e0;
-		Fstring a( 3 );
+		std::string a;
 
 		//! Initialize variables:
 
@@ -603,19 +603,19 @@ namespace TARCOGArgs {
 			if ( ( tir( k1 ) < 0.0 ) || ( tir( k1 ) > 1.0 ) || ( tir( k1 + 1 ) < 0.0 ) || ( tir( k1 + 1 ) > 1.0 ) ) {
 				nperr = 4;
 				gio::write( a, "(i3)" ) << k;
-				ErrorMessage = "Layer transmissivity is our of range (<0 or >1). Layer #" + trim( a );
+				ErrorMessage = "Layer transmissivity is our of range (<0 or >1). Layer #" + a;
 				return;
 			}
 			if ( ( emis( k1 ) < 0.0 ) || ( emis( k1 ) > 1.0 ) || ( emis( k1 + 1 ) < 0.0 ) || ( emis( k1 + 1 ) > 1.0 ) ) {
 				nperr = 14;
 				gio::write( a, "(i3)" ) << k;
-				ErrorMessage = "Layer emissivity is our of range (<0 or >1). Layer #" + trim( a );
+				ErrorMessage = "Layer emissivity is our of range (<0 or >1). Layer #" + a;
 				return;
 			}
 			if ( ( rir( k1 ) < 0.0 ) || ( rir( k1 ) > 1.0 ) || ( rir( k1 + 1 ) < 0.0 ) || ( rir( k1 + 1 ) > 1.0 ) ) {
 				nperr = 3;
 				gio::write( a, "(i3)" ) << k;
-				ErrorMessage = "Layer reflectivity is our of range (<0 or >1). Layer #" + trim( a );
+				ErrorMessage = "Layer reflectivity is our of range (<0 or >1). Layer #" + a;
 				return;
 			}
 		}

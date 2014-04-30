@@ -20,7 +20,6 @@ namespace DataAirflowNetwork {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// module should be available to other modules and routines.  Thus,
@@ -155,7 +154,7 @@ namespace DataAirflowNetwork {
 	FArray1D< AirflowNetworkLinkReportData > AirflowNetworkLinkReport;
 	FArray1D< AirflowNetworkNodeReportData > AirflowNetworkNodeReport;
 	FArray1D< AirflowNetworkLinkReportData > AirflowNetworkLinkReport1;
-	AirflowNetworkSimuProp AirflowNetworkSimu( " ", "NoMultizoneOrDistribution", "Input", 0, " ", " ", " ", 500, 0, 1.0e-5, 1.0e-5, -0.5, 500.0, 0.0, 1.0, 0, 1.0e-4, 0, 0, 0, 0, "ZeroNodePressures" ); // unique object name | AirflowNetwork control | Wind pressure coefficient input control | Integer equivalent for WPCCntr field | CP Array name at WPCCntr = "INPUT" | Building type | Height Selection | Maximum number of iteration | Initialization flag | Relative airflow convergence | Absolute airflow convergence | Convergence acceleration limit | Maximum pressure change in an element [Pa] | Azimuth Angle of Long Axis of Building | Ratio of Building Width Along Short Axis to Width Along Long Axis | Number of wind directions | Minimum pressure difference | Exterior large opening error count during HVAC system operation | Exterior large opening error index during HVAC system operation | Large opening error count at Open factor > 1.0 | Large opening error error index at Open factor > 1.0 | Initialization flag type
+	AirflowNetworkSimuProp AirflowNetworkSimu( "", "NoMultizoneOrDistribution", "Input", 0, "", "", "", 500, 0, 1.0e-5, 1.0e-5, -0.5, 500.0, 0.0, 1.0, 0, 1.0e-4, 0, 0, 0, 0, "ZeroNodePressures" ); // unique object name | AirflowNetwork control | Wind pressure coefficient input control | Integer equivalent for WPCCntr field | CP Array name at WPCCntr = "INPUT" | Building type | Height Selection | Maximum number of iteration | Initialization flag | Relative airflow convergence | Absolute airflow convergence | Convergence acceleration limit | Maximum pressure change in an element [Pa] | Azimuth Angle of Long Axis of Building | Ratio of Building Width Along Short Axis to Width Along Long Axis | Number of wind directions | Minimum pressure difference | Exterior large opening error count during HVAC system operation | Exterior large opening error index during HVAC system operation | Large opening error count at Open factor > 1.0 | Large opening error error index at Open factor > 1.0 | Initialization flag type
 	FArray1D< AirflowNetworkNodeProp > AirflowNetworkNodeData;
 	FArray1D< AirflowNetworkCompProp > AirflowNetworkCompData;
 	FArray1D< AirflowNetworkLinkageProp > AirflowNetworkLinkageData;

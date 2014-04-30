@@ -162,9 +162,9 @@ TEST( GioTest, EndOfFile )
 	read( unit1, "(A)", flags ) >> line;
 	EXPECT_EQ( "Line 2", line );
 	EXPECT_EQ( 0, flags.ios() );
-	read( unit1, "(A)", flags ) >> line;
+	read( unit1, "(A8)", flags ) >> line; // Try to read more characters than present
 	EXPECT_EQ( "", line );
-	EXPECT_EQ( -1, flags.ios() );
+	EXPECT_EQ( -1, flags.ios() ); // Hit eof since we couldn't read specified number of characters
 	EXPECT_TRUE( flags.end() );
 
 	flags.clear().del_on(); // Enable deletion

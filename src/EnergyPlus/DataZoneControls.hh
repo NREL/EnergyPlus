@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace DataZoneControls {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -42,14 +40,14 @@ namespace DataZoneControls {
 	struct ZoneTempControls
 	{
 		// Members
-		Fstring Name; // Name of the thermostat
-		Fstring ZoneName; // Name of the zone
+		std::string Name; // Name of the thermostat
+		std::string ZoneName; // Name of the zone
 		int ActualZoneNum;
-		Fstring ControlTypeSchedName; // Name of the schedule which determines the zone temp setpoint
+		std::string ControlTypeSchedName; // Name of the schedule which determines the zone temp setpoint
 		int CTSchedIndex; // Index for this schedule
 		int NumControlTypes;
-		FArray1D_Fstring ControlType;
-		FArray1D_Fstring ControlTypeName;
+		FArray1D_string ControlType;
+		FArray1D_string ControlTypeName;
 		FArray1D_int ControlTypeSchIndx;
 		int SchIndx_SingleHeatSetPoint;
 		int SchIndx_SingleCoolSetPoint;
@@ -75,19 +73,14 @@ namespace DataZoneControls {
 		int ZoneOvercoolRangeSchedIndex; // Index for Overcool Range Schedule
 		Real64 ZoneOvercoolControlRatio; // Zone relative humidity shift per dry-bulb temperature overcooling
 		//      below the original cooling setpoint, %RH/deltaC
-		Fstring DehumidifyingSched; // Name of the schedule to determine the zone dehumidifying setpoint
+		std::string DehumidifyingSched; // Name of the schedule to determine the zone dehumidifying setpoint
 		int DehumidifyingSchedIndex; // Index for dehumidifying schedule
 
 		// Default Constructor
 		ZoneTempControls() :
-			Name( MaxNameLength ),
-			ZoneName( MaxNameLength ),
 			ActualZoneNum( 0 ),
-			ControlTypeSchedName( MaxNameLength ),
 			CTSchedIndex( 0 ),
 			NumControlTypes( 0 ),
-			ControlType( sFstring( MaxNameLength ) ),
-			ControlTypeName( sFstring( MaxNameLength ) ),
 			SchIndx_SingleHeatSetPoint( 0 ),
 			SchIndx_SingleCoolSetPoint( 0 ),
 			SchIndx_SingleHeatCoolSetPoint( 0 ),
@@ -109,20 +102,19 @@ namespace DataZoneControls {
 			ZoneOvercoolConstRange( 0.0 ),
 			ZoneOvercoolRangeSchedIndex( 0 ),
 			ZoneOvercoolControlRatio( 0.0 ),
-			DehumidifyingSched( MaxNameLength ),
 			DehumidifyingSchedIndex( 0 )
 		{}
 
 		// Member Constructor
 		ZoneTempControls(
-			Fstring const & Name, // Name of the thermostat
-			Fstring const & ZoneName, // Name of the zone
+			std::string const & Name, // Name of the thermostat
+			std::string const & ZoneName, // Name of the zone
 			int const ActualZoneNum,
-			Fstring const & ControlTypeSchedName, // Name of the schedule which determines the zone temp setpoint
+			std::string const & ControlTypeSchedName, // Name of the schedule which determines the zone temp setpoint
 			int const CTSchedIndex, // Index for this schedule
 			int const NumControlTypes,
-			FArray1_Fstring const & ControlType,
-			FArray1_Fstring const & ControlTypeName,
+			FArray1_string const & ControlType,
+			FArray1_string const & ControlTypeName,
 			FArray1_int const & ControlTypeSchIndx,
 			int const SchIndx_SingleHeatSetPoint,
 			int const SchIndx_SingleCoolSetPoint,
@@ -145,13 +137,13 @@ namespace DataZoneControls {
 			Real64 const ZoneOvercoolConstRange, // Overcool Range for Zone Air Setpoint Temperature [deltaC]
 			int const ZoneOvercoolRangeSchedIndex, // Index for Overcool Range Schedule
 			Real64 const ZoneOvercoolControlRatio, // Zone relative humidity shift per dry-bulb temperature overcooling
-			Fstring const & DehumidifyingSched, // Name of the schedule to determine the zone dehumidifying setpoint
+			std::string const & DehumidifyingSched, // Name of the schedule to determine the zone dehumidifying setpoint
 			int const DehumidifyingSchedIndex // Index for dehumidifying schedule
 		) :
-			Name( MaxNameLength, Name ),
-			ZoneName( MaxNameLength, ZoneName ),
+			Name( Name ),
+			ZoneName( ZoneName ),
 			ActualZoneNum( ActualZoneNum ),
-			ControlTypeSchedName( MaxNameLength, ControlTypeSchedName ),
+			ControlTypeSchedName( ControlTypeSchedName ),
 			CTSchedIndex( CTSchedIndex ),
 			NumControlTypes( NumControlTypes ),
 			ControlType( ControlType ),
@@ -178,7 +170,7 @@ namespace DataZoneControls {
 			ZoneOvercoolConstRange( ZoneOvercoolConstRange ),
 			ZoneOvercoolRangeSchedIndex( ZoneOvercoolRangeSchedIndex ),
 			ZoneOvercoolControlRatio( ZoneOvercoolControlRatio ),
-			DehumidifyingSched( MaxNameLength, DehumidifyingSched ),
+			DehumidifyingSched( DehumidifyingSched ),
 			DehumidifyingSchedIndex( DehumidifyingSchedIndex )
 		{}
 
@@ -187,10 +179,10 @@ namespace DataZoneControls {
 	struct ZoneHumidityControls
 	{
 		// Members
-		Fstring ControlName; // Name of this humidity controller
-		Fstring ZoneName; // Name of the zone
-		Fstring HumidifyingSched; // Name of the schedule to determine the zone humidifying setpoint
-		Fstring DehumidifyingSched; // Name of the schedule to determine the zone dehumidifying setpoint
+		std::string ControlName; // Name of this humidity controller
+		std::string ZoneName; // Name of the zone
+		std::string HumidifyingSched; // Name of the schedule to determine the zone humidifying setpoint
+		std::string DehumidifyingSched; // Name of the schedule to determine the zone dehumidifying setpoint
 		int ActualZoneNum;
 		int HumidifyingSchedIndex; // Index for humidifying schedule
 		int DehumidifyingSchedIndex; // Index for dehumidifying schedule
@@ -202,10 +194,6 @@ namespace DataZoneControls {
 
 		// Default Constructor
 		ZoneHumidityControls() :
-			ControlName( MaxNameLength ),
-			ZoneName( MaxNameLength ),
-			HumidifyingSched( MaxNameLength ),
-			DehumidifyingSched( MaxNameLength ),
 			ActualZoneNum( 0 ),
 			HumidifyingSchedIndex( 0 ),
 			DehumidifyingSchedIndex( 0 ),
@@ -218,10 +206,10 @@ namespace DataZoneControls {
 
 		// Member Constructor
 		ZoneHumidityControls(
-			Fstring const & ControlName, // Name of this humidity controller
-			Fstring const & ZoneName, // Name of the zone
-			Fstring const & HumidifyingSched, // Name of the schedule to determine the zone humidifying setpoint
-			Fstring const & DehumidifyingSched, // Name of the schedule to determine the zone dehumidifying setpoint
+			std::string const & ControlName, // Name of this humidity controller
+			std::string const & ZoneName, // Name of the zone
+			std::string const & HumidifyingSched, // Name of the schedule to determine the zone humidifying setpoint
+			std::string const & DehumidifyingSched, // Name of the schedule to determine the zone dehumidifying setpoint
 			int const ActualZoneNum,
 			int const HumidifyingSchedIndex, // Index for humidifying schedule
 			int const DehumidifyingSchedIndex, // Index for dehumidifying schedule
@@ -231,10 +219,10 @@ namespace DataZoneControls {
 			bool const EMSOverrideDehumidifySetPointOn, // EMS is calling to override dehumidifying setpoint
 			Real64 const EMSOverrideDehumidifySetPointValue // value EMS is directing to use for dehumidifying setpoint
 		) :
-			ControlName( MaxNameLength, ControlName ),
-			ZoneName( MaxNameLength, ZoneName ),
-			HumidifyingSched( MaxNameLength, HumidifyingSched ),
-			DehumidifyingSched( MaxNameLength, DehumidifyingSched ),
+			ControlName( ControlName ),
+			ZoneName( ZoneName ),
+			HumidifyingSched( HumidifyingSched ),
+			DehumidifyingSched( DehumidifyingSched ),
 			ActualZoneNum( ActualZoneNum ),
 			HumidifyingSchedIndex( HumidifyingSchedIndex ),
 			DehumidifyingSchedIndex( DehumidifyingSchedIndex ),
@@ -250,14 +238,14 @@ namespace DataZoneControls {
 	struct ZoneComfortControls
 	{
 		// Members
-		Fstring Name; // Name of the thermostat
-		Fstring ZoneName; // Name of the zone
+		std::string Name; // Name of the thermostat
+		std::string ZoneName; // Name of the zone
 		int ActualZoneNum; // Index number of zone
-		Fstring ControlTypeSchedName; // Name of the schedule which determines the zone temp setpoint
+		std::string ControlTypeSchedName; // Name of the schedule which determines the zone temp setpoint
 		int ComfortSchedIndex; // Index for this schedule
 		int NumControlTypes; // Number of control types in ZoneControl:ThermalComfort object
-		FArray1D_Fstring ControlType; // Type of control
-		FArray1D_Fstring ControlTypeName; // Name of control type
+		FArray1D_string ControlType; // Type of control
+		FArray1D_string ControlTypeName; // Name of control type
 		FArray1D_int ControlTypeSchIndx; // Index to control type schedule
 		int SchIndx_SglHeatSetPointFanger; // Index to fanger single heating setpoint schedule
 		int SchIndx_SglCoolSetPointFanger; // Index to fanger single cooling setpoint schedule
@@ -280,8 +268,8 @@ namespace DataZoneControls {
 		Real64 EMSOverrideCoolingSetPointValue; // value EMS is directing to use for cooling setpoint
 		Real64 TdbMaxSetPoint; // Maximum dry-bulb temperature setpoint [C]
 		Real64 TdbMinSetPoint; // Minimum dry-bulb temperature setpoint [C]
-		Fstring AverageMethodName; // Averaging Method for Zones with Multiple People Objects
-		Fstring AverageObjectName; // Object Name for Specific Object Average
+		std::string AverageMethodName; // Averaging Method for Zones with Multiple People Objects
+		std::string AverageObjectName; // Object Name for Specific Object Average
 		int AverageMethodNum; // Numerical value for averaging method
 		int SpecificObjectNum; // People Object number used for Specific people object choice
 		int PeopleAverageErrIndex; // People average error index
@@ -293,14 +281,9 @@ namespace DataZoneControls {
 
 		// Default Constructor
 		ZoneComfortControls() :
-			Name( MaxNameLength ),
-			ZoneName( MaxNameLength ),
 			ActualZoneNum( 0 ),
-			ControlTypeSchedName( MaxNameLength ),
 			ComfortSchedIndex( 0 ),
 			NumControlTypes( 0 ),
-			ControlType( sFstring( MaxNameLength ) ),
-			ControlTypeName( sFstring( MaxNameLength ) ),
 			SchIndx_SglHeatSetPointFanger( 0 ),
 			SchIndx_SglCoolSetPointFanger( 0 ),
 			SchIndx_SglHCSetPointFanger( 0 ),
@@ -322,8 +305,7 @@ namespace DataZoneControls {
 			EMSOverrideCoolingSetPointValue( 0.0 ),
 			TdbMaxSetPoint( 50.0 ),
 			TdbMinSetPoint( 0.0 ),
-			AverageMethodName( MaxNameLength, "PEOPLE AVERGAE" ),
-			AverageObjectName( MaxNameLength ),
+			AverageMethodName( "PEOPLE AVERGAE" ),
 			AverageMethodNum( 0 ),
 			SpecificObjectNum( 0 ),
 			PeopleAverageErrIndex( 0 ),
@@ -336,14 +318,14 @@ namespace DataZoneControls {
 
 		// Member Constructor
 		ZoneComfortControls(
-			Fstring const & Name, // Name of the thermostat
-			Fstring const & ZoneName, // Name of the zone
+			std::string const & Name, // Name of the thermostat
+			std::string const & ZoneName, // Name of the zone
 			int const ActualZoneNum, // Index number of zone
-			Fstring const & ControlTypeSchedName, // Name of the schedule which determines the zone temp setpoint
+			std::string const & ControlTypeSchedName, // Name of the schedule which determines the zone temp setpoint
 			int const ComfortSchedIndex, // Index for this schedule
 			int const NumControlTypes, // Number of control types in ZoneControl:ThermalComfort object
-			FArray1_Fstring const & ControlType, // Type of control
-			FArray1_Fstring const & ControlTypeName, // Name of control type
+			FArray1_string const & ControlType, // Type of control
+			FArray1_string const & ControlTypeName, // Name of control type
 			FArray1_int const & ControlTypeSchIndx, // Index to control type schedule
 			int const SchIndx_SglHeatSetPointFanger, // Index to fanger single heating setpoint schedule
 			int const SchIndx_SglCoolSetPointFanger, // Index to fanger single cooling setpoint schedule
@@ -366,8 +348,8 @@ namespace DataZoneControls {
 			Real64 const EMSOverrideCoolingSetPointValue, // value EMS is directing to use for cooling setpoint
 			Real64 const TdbMaxSetPoint, // Maximum dry-bulb temperature setpoint [C]
 			Real64 const TdbMinSetPoint, // Minimum dry-bulb temperature setpoint [C]
-			Fstring const & AverageMethodName, // Averaging Method for Zones with Multiple People Objects
-			Fstring const & AverageObjectName, // Object Name for Specific Object Average
+			std::string const & AverageMethodName, // Averaging Method for Zones with Multiple People Objects
+			std::string const & AverageObjectName, // Object Name for Specific Object Average
 			int const AverageMethodNum, // Numerical value for averaging method
 			int const SpecificObjectNum, // People Object number used for Specific people object choice
 			int const PeopleAverageErrIndex, // People average error index
@@ -377,10 +359,10 @@ namespace DataZoneControls {
 			int const TdbDualMaxErrIndex, // Dual cooling setpoint error index
 			int const TdbDualMinErrIndex // Dual heating setpoint error index
 		) :
-			Name( MaxNameLength, Name ),
-			ZoneName( MaxNameLength, ZoneName ),
+			Name( Name ),
+			ZoneName( ZoneName ),
 			ActualZoneNum( ActualZoneNum ),
-			ControlTypeSchedName( MaxNameLength, ControlTypeSchedName ),
+			ControlTypeSchedName( ControlTypeSchedName ),
 			ComfortSchedIndex( ComfortSchedIndex ),
 			NumControlTypes( NumControlTypes ),
 			ControlType( ControlType ),
@@ -407,8 +389,8 @@ namespace DataZoneControls {
 			EMSOverrideCoolingSetPointValue( EMSOverrideCoolingSetPointValue ),
 			TdbMaxSetPoint( TdbMaxSetPoint ),
 			TdbMinSetPoint( TdbMinSetPoint ),
-			AverageMethodName( MaxNameLength, AverageMethodName ),
-			AverageObjectName( MaxNameLength, AverageObjectName ),
+			AverageMethodName( AverageMethodName ),
+			AverageObjectName( AverageObjectName ),
 			AverageMethodNum( AverageMethodNum ),
 			SpecificObjectNum( SpecificObjectNum ),
 			PeopleAverageErrIndex( PeopleAverageErrIndex ),
@@ -424,12 +406,12 @@ namespace DataZoneControls {
 	struct ZoneStagedControls
 	{
 		// Members
-		Fstring Name; // Name of the thermostat
-		Fstring ZoneName; // Name of the zone
+		std::string Name; // Name of the thermostat
+		std::string ZoneName; // Name of the zone
 		int ActualZoneNum; // Index number of zone
-		Fstring HeatSetBaseSchedName; // Name of the schedule which provides zone heating setpoint base
+		std::string HeatSetBaseSchedName; // Name of the schedule which provides zone heating setpoint base
 		int HSBchedIndex; // Index for this schedule
-		Fstring CoolSetBaseSchedName; // Name of the schedule which provides zone cooling setpoint base
+		std::string CoolSetBaseSchedName; // Name of the schedule which provides zone cooling setpoint base
 		int CSBchedIndex; // Index for this schedule
 		int NumOfHeatStages; // Number of heating stages
 		int NumOfCoolStages; // Number of cooling stages
@@ -444,12 +426,8 @@ namespace DataZoneControls {
 
 		// Default Constructor
 		ZoneStagedControls() :
-			Name( MaxNameLength ),
-			ZoneName( MaxNameLength ),
 			ActualZoneNum( 0 ),
-			HeatSetBaseSchedName( MaxNameLength ),
 			HSBchedIndex( 0 ),
-			CoolSetBaseSchedName( MaxNameLength ),
 			CSBchedIndex( 0 ),
 			NumOfHeatStages( 0 ),
 			NumOfCoolStages( 0 ),
@@ -463,12 +441,12 @@ namespace DataZoneControls {
 
 		// Member Constructor
 		ZoneStagedControls(
-			Fstring const & Name, // Name of the thermostat
-			Fstring const & ZoneName, // Name of the zone
+			std::string const & Name, // Name of the thermostat
+			std::string const & ZoneName, // Name of the zone
 			int const ActualZoneNum, // Index number of zone
-			Fstring const & HeatSetBaseSchedName, // Name of the schedule which provides zone heating setpoint base
+			std::string const & HeatSetBaseSchedName, // Name of the schedule which provides zone heating setpoint base
 			int const HSBchedIndex, // Index for this schedule
-			Fstring const & CoolSetBaseSchedName, // Name of the schedule which provides zone cooling setpoint base
+			std::string const & CoolSetBaseSchedName, // Name of the schedule which provides zone cooling setpoint base
 			int const CSBchedIndex, // Index for this schedule
 			int const NumOfHeatStages, // Number of heating stages
 			int const NumOfCoolStages, // Number of cooling stages
@@ -481,12 +459,12 @@ namespace DataZoneControls {
 			int const StageErrCount, // Staged setpoint erro count
 			int const StageErrIndex // Staged setpoint erro index
 		) :
-			Name( MaxNameLength, Name ),
-			ZoneName( MaxNameLength, ZoneName ),
+			Name( Name ),
+			ZoneName( ZoneName ),
 			ActualZoneNum( ActualZoneNum ),
-			HeatSetBaseSchedName( MaxNameLength, HeatSetBaseSchedName ),
+			HeatSetBaseSchedName( HeatSetBaseSchedName ),
 			HSBchedIndex( HSBchedIndex ),
-			CoolSetBaseSchedName( MaxNameLength, CoolSetBaseSchedName ),
+			CoolSetBaseSchedName( CoolSetBaseSchedName ),
 			CSBchedIndex( CSBchedIndex ),
 			NumOfHeatStages( NumOfHeatStages ),
 			NumOfCoolStages( NumOfCoolStages ),
@@ -505,7 +483,7 @@ namespace DataZoneControls {
 	struct TStatObject
 	{
 		// Members
-		Fstring Name;
+		std::string Name;
 		int ZoneOrZoneListPtr;
 		int NumOfZones;
 		int TempControlledZoneStartPtr;
@@ -515,7 +493,6 @@ namespace DataZoneControls {
 
 		// Default Constructor
 		TStatObject() :
-			Name( MaxNameLength ),
 			ZoneOrZoneListPtr( 0 ),
 			NumOfZones( 0 ),
 			TempControlledZoneStartPtr( 0 ),
@@ -526,7 +503,7 @@ namespace DataZoneControls {
 
 		// Member Constructor
 		TStatObject(
-			Fstring const & Name,
+			std::string const & Name,
 			int const ZoneOrZoneListPtr,
 			int const NumOfZones,
 			int const TempControlledZoneStartPtr,
@@ -534,7 +511,7 @@ namespace DataZoneControls {
 			int const StageControlledZoneStartPtr,
 			bool const ZoneListActive
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ZoneOrZoneListPtr( ZoneOrZoneListPtr ),
 			NumOfZones( NumOfZones ),
 			TempControlledZoneStartPtr( TempControlledZoneStartPtr ),

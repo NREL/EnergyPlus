@@ -15,7 +15,6 @@ namespace DataComplexFenestration {
 	// This module contains data necessary for complex fenestration calculations
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 	using namespace DataPrecisionGlobals;
 
 	// Data

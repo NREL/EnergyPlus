@@ -2179,7 +2179,7 @@ protected: // Methods
 	// Shift Setup
 	inline
 	void
-	shift_set( int const shift )
+	shift_set( difference_type const shift )
 	{
 		shift_ = shift;
 		sdata_ = data_ - shift_;
@@ -2670,7 +2670,7 @@ protected: // Data
 	bool const_proxy_; // Proxy for const data array?
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
-	int shift_; // Array shift
+	difference_type shift_; // Array shift
 
 	T * sdata_; // Shifted pointer to data array
 

@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EcoRoofManager.hh>
@@ -734,11 +733,11 @@ namespace EcoRoofManager {
 			//The equation is minimum timestep in seconds=161240*((number of layers)**(-2.3))*(Total thickness of the soil)**2.07
 			if ( Material( Construct( ConstrNum ).LayerPoint( 1 ) ).EcoRoofCalculationMethod == 2 ) {
 				for ( index1 = 1; index1 <= 20; ++index1 ) {
-					if ( ( double( MinutesPerTimeStep / index1 ) ) <= ( 161240. * std::pow( 2., ( -2.3 ) ) * std::pow( ( TopDepth + RootDepth ), ( 2.07 ) ) ) / 60. ) break; //Autodesk RootDepth was used uninitialized here
+					if ( ( double( MinutesPerTimeStep / index1 ) ) <= ( 161240.0 * std::pow( 2., ( -2.3 ) ) * std::pow( ( TopDepth + RootDepth ), ( 2.07 ) ) ) / 60.0 ) break; //Autodesk RootDepth was used uninitialized here
 				}
 				if ( index1 > 1 ) {
 					ShowSevereError( "CalcEcoRoof: Too few time steps per hour for stability." );
-					ShowContinueError( "...Entered Timesteps per hour=[" + trim( RoundSigDigits( NumOfTimeStepInHour ) ) + "], Change to some value greater than [" + trim( RoundSigDigits( 60 * index1 / MinutesPerTimeStep ) ) + "]" " for assured stability." );
+					ShowContinueError( "...Entered Timesteps per hour=[" + RoundSigDigits( NumOfTimeStepInHour ) + "], Change to some value greater than [" + RoundSigDigits( 60 * index1 / MinutesPerTimeStep ) + "] for assured stability." );
 					//      CALL ShowFatalError('Program terminates due to previous condition.')
 				}
 			}
@@ -873,7 +872,7 @@ namespace EcoRoofManager {
 			RelativeSoilSaturationTop = ( Moisture - MoistureResidual ) / ( MoistureMax - MoistureResidual );
 			if ( RelativeSoilSaturationTop < 0.0001 ) {
 				if ( ErrIndex == 0 ) {
-					ShowWarningMessage( "EcoRoof: UpdateSoilProps: Relative Soil Saturation Top Moisture <= 0.0001, Value=[" + trim( RoundSigDigits( RelativeSoilSaturationTop, 5 ) ) + "]." );
+					ShowWarningMessage( "EcoRoof: UpdateSoilProps: Relative Soil Saturation Top Moisture <= 0.0001, Value=[" + RoundSigDigits( RelativeSoilSaturationTop, 5 ) + "]." );
 					ShowContinueError( "Value is set to 0.0001 and simulation continues." );
 					ShowContinueError( "You may wish to increase the number of timesteps to attempt to alleviate the problem." );
 				}

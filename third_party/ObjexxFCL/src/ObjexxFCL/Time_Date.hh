@@ -20,6 +20,7 @@
 
 // C++ Headers
 #include <cstdint>
+#include <string>
 
 namespace ObjexxFCL {
 
@@ -90,6 +91,10 @@ getdat( std::int32_t & year, std::int32_t & month, std::int32_t & day );
 void
 date( Fstring & day );
 
+// Current Date String: DD-MMM-YY (Not Y2K Compliant)
+void
+date( std::string & day );
+
 // Current Date String: YYDDD (Not Y2K Compliant)
 Fstring
 jdate();
@@ -97,6 +102,10 @@ jdate();
 // Current Date and Time
 void
 date_and_time( Optional< Fstring > date = _, Optional< Fstring > time = _, Optional< Fstring > zone = _, Optional< FArray1D< int > > values = _ );
+
+// Current Date and Time
+void
+date_and_time_string( Optional< std::string > date = _, Optional< std::string > time = _, Optional< std::string > zone = _, Optional< FArray1D< int > > values = _ );
 
 } // ObjexxFCL
 

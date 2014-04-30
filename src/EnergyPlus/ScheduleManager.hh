@@ -6,7 +6,6 @@
 #include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/FArray2A.hh>
 #include <ObjexxFCL/FArray2S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -18,16 +17,15 @@ namespace EnergyPlus {
 namespace ScheduleManager {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
 	extern int const MaxDayTypes;
-	extern Fstring const Blank;
-	extern FArray1D_Fstring const ValidDayTypes;
+	extern std::string const Blank;
+	extern FArray1D_string const ValidDayTypes;
 
 	extern int const NumScheduleTypeLimitUnitTypes;
-	extern FArray1D_Fstring const ScheduleTypeLimitUnitTypes;
+	extern FArray1D_string const ScheduleTypeLimitUnitTypes;
 
 	extern int const ScheduleInput_year;
 	extern int const ScheduleInput_compact;
@@ -58,7 +56,7 @@ namespace ScheduleManager {
 	struct ScheduleTypeData
 	{
 		// Members
-		Fstring Name; // Schedule Type Name
+		std::string Name; // Schedule Type Name
 		bool Limited; // True if this Schedule Type has limits
 		Real64 Minimum; // Minimum for limited schedule
 		Real64 Maximum; // Maximum for limited schedule
@@ -67,7 +65,6 @@ namespace ScheduleManager {
 
 		// Default Constructor
 		ScheduleTypeData() :
-			Name( MaxNameLength, Blank ),
 			Limited( false ),
 			Minimum( 0.0 ),
 			Maximum( 0.0 ),
@@ -77,14 +74,14 @@ namespace ScheduleManager {
 
 		// Member Constructor
 		ScheduleTypeData(
-			Fstring const & Name, // Schedule Type Name
+			std::string const & Name, // Schedule Type Name
 			bool const Limited, // True if this Schedule Type has limits
 			Real64 const Minimum, // Minimum for limited schedule
 			Real64 const Maximum, // Maximum for limited schedule
 			bool const IsReal, // True if this is a "real" schedule, false if integer
 			int const UnitType // reference ScheduleTypeLimit table
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			Limited( Limited ),
 			Minimum( Minimum ),
 			Maximum( Maximum ),
@@ -97,7 +94,7 @@ namespace ScheduleManager {
 	struct DayScheduleData
 	{
 		// Members
-		Fstring Name; // Day Schedule Name
+		std::string Name; // Day Schedule Name
 		int ScheduleTypePtr; // Index of Schedule Type
 		bool IntervalInterpolated; // Indicator for interval interpolation. If not "interpolated", False.  Else True
 		bool Used; // Indicator for this schedule being "used".
@@ -107,7 +104,6 @@ namespace ScheduleManager {
 
 		// Default Constructor
 		DayScheduleData() :
-			Name( MaxNameLength, Blank ),
 			ScheduleTypePtr( 0 ),
 			IntervalInterpolated( false ),
 			Used( false ),
@@ -117,7 +113,7 @@ namespace ScheduleManager {
 
 		// Member Constructor
 		DayScheduleData(
-			Fstring const & Name, // Day Schedule Name
+			std::string const & Name, // Day Schedule Name
 			int const ScheduleTypePtr, // Index of Schedule Type
 			bool const IntervalInterpolated, // Indicator for interval interpolation. If not "interpolated", False.  Else True
 			bool const Used, // Indicator for this schedule being "used".
@@ -125,7 +121,7 @@ namespace ScheduleManager {
 			Real64 const TSValMax, // maximum of all TSValue's
 			Real64 const TSValMin // minimum of all TSValue's
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ScheduleTypePtr( ScheduleTypePtr ),
 			IntervalInterpolated( IntervalInterpolated ),
 			Used( Used ),
@@ -139,24 +135,23 @@ namespace ScheduleManager {
 	struct WeekScheduleData
 	{
 		// Members
-		Fstring Name; // Week Schedule Name
+		std::string Name; // Week Schedule Name
 		bool Used; // Indicator for this schedule being "used".
 		FArray1D_int DaySchedulePointer; // Index of Day Schedule
 
 		// Default Constructor
 		WeekScheduleData() :
-			Name( MaxNameLength, Blank ),
 			Used( false ),
 			DaySchedulePointer( MaxDayTypes, 0 )
 		{}
 
 		// Member Constructor
 		WeekScheduleData(
-			Fstring const & Name, // Week Schedule Name
+			std::string const & Name, // Week Schedule Name
 			bool const Used, // Indicator for this schedule being "used".
 			FArray1_int const & DaySchedulePointer // Index of Day Schedule
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			Used( Used ),
 			DaySchedulePointer( MaxDayTypes, DaySchedulePointer )
 		{}
@@ -166,7 +161,7 @@ namespace ScheduleManager {
 	struct ScheduleData
 	{
 		// Members
-		Fstring Name; // Schedule Name
+		std::string Name; // Schedule Name
 		int ScheduleTypePtr; // Index of Schedule Type
 		FArray1D_int WeekSchedulePointer; // one created for each day of possible simulation
 		int SchType; // what kind of object has been input.
@@ -180,7 +175,6 @@ namespace ScheduleManager {
 
 		// Default Constructor
 		ScheduleData() :
-			Name( MaxNameLength, Blank ),
 			ScheduleTypePtr( 0 ),
 			WeekSchedulePointer( 366, 0 ),
 			SchType( 0 ),
@@ -195,7 +189,7 @@ namespace ScheduleManager {
 
 		// Member Constructor
 		ScheduleData(
-			Fstring const & Name, // Schedule Name
+			std::string const & Name, // Schedule Name
 			int const ScheduleTypePtr, // Index of Schedule Type
 			FArray1_int const & WeekSchedulePointer, // one created for each day of possible simulation
 			int const SchType, // what kind of object has been input.
@@ -207,7 +201,7 @@ namespace ScheduleManager {
 			bool const EMSActuatedOn, // indicates if EMS computed
 			Real64 const EMSValue
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ScheduleTypePtr( ScheduleTypePtr ),
 			WeekSchedulePointer( 366, WeekSchedulePointer ),
 			SchType( SchType ),
@@ -251,13 +245,13 @@ namespace ScheduleManager {
 	);
 
 	int
-	GetScheduleIndex( Fstring const & ScheduleName );
+	GetScheduleIndex( std::string const & ScheduleName );
 
-	Fstring
+	std::string
 	GetScheduleType( int const ScheduleIndex );
 
 	int
-	GetDayScheduleIndex( Fstring & ScheduleName );
+	GetDayScheduleIndex( std::string & ScheduleName );
 
 	void
 	GetScheduleValuesForDay(
@@ -281,30 +275,30 @@ namespace ScheduleManager {
 
 	void
 	ProcessIntervalFields(
-		FArray1S_Fstring const Untils,
+		FArray1S_string const Untils,
 		FArray1S< Real64 > const Numbers,
 		int const NumUntils,
 		int const NumNumbers,
 		FArray2A< Real64 > MinuteValue,
 		FArray2A_bool SetMinuteValue,
 		bool & ErrorsFound,
-		Fstring const & DayScheduleName, // Name (used for errors)
-		Fstring const & ErrContext // Context (used for errors)
+		std::string const & DayScheduleName, // Name (used for errors)
+		std::string const & ErrContext // Context (used for errors)
 	);
 
 	void
 	DecodeHHMMField(
-		Fstring const & FieldValue, // Input field value
+		std::string const & FieldValue, // Input field value
 		int & RetHH, // Returned "hour"
 		int & RetMM, // Returned "minute"
 		bool & ErrorsFound, // True if errors found in this field
-		Fstring const & DayScheduleName, // originating day schedule name
-		Fstring const & FullFieldValue // Full Input field value
+		std::string const & DayScheduleName, // originating day schedule name
+		std::string const & FullFieldValue // Full Input field value
 	);
 
 	void
 	ProcessForDayTypes(
-		Fstring const & ForDayField, // Field containing the "FOR:..."
+		std::string const & ForDayField, // Field containing the "FOR:..."
 		FArray1A_bool TheseDays, // Array to contain returned "true" days
 		FArray1A_bool AlReady, // Array of days already done
 		bool & ErrorsFound // Will be true if error found.
@@ -313,32 +307,32 @@ namespace ScheduleManager {
 	bool
 	CheckScheduleValueMinMax(
 		int const ScheduleIndex, // Which Schedule being tested
-		Fstring const & MinString, // Minimum indicator ('>', '>=')
+		std::string const & MinString, // Minimum indicator ('>', '>=')
 		Real64 const Minimum // Minimum desired value
 	);
 
 	bool
 	CheckScheduleValueMinMax(
 		int const ScheduleIndex, // Which Schedule being tested
-		Fstring const & MinString, // Minimum indicator ('>', '>=')
+		std::string const & MinString, // Minimum indicator ('>', '>=')
 		Real64 const Minimum, // Minimum desired value
-		Fstring const & MaxString, // Maximum indicator ('<', ',=')
+		std::string const & MaxString, // Maximum indicator ('<', ',=')
 		Real64 const Maximum // Maximum desired value
 	);
 
 	bool
 	CheckScheduleValueMinMax(
 		int const ScheduleIndex, // Which Schedule being tested
-		Fstring const & MinString, // Minimum indicator ('>', '>=')
+		std::string const & MinString, // Minimum indicator ('>', '>=')
 		Real32 const Minimum // Minimum desired value
 	);
 
 	bool
 	CheckScheduleValueMinMax(
 		int const ScheduleIndex, // Which Schedule being tested
-		Fstring const & MinString, // Minimum indicator ('>', '>=')
+		std::string const & MinString, // Minimum indicator ('>', '>=')
 		Real32 const Minimum, // Minimum desired value
-		Fstring const & MaxString, // Maximum indicator ('<', ',=')
+		std::string const & MaxString, // Maximum indicator ('<', ',=')
 		Real32 const Maximum // Maximum desired value
 	);
 
@@ -358,18 +352,18 @@ namespace ScheduleManager {
 	CheckDayScheduleValueMinMax(
 		int const ScheduleIndex, // Which Day Schedule being tested
 		Real64 const Minimum, // Minimum desired value
-		Fstring const & MinString, // Minimum indicator ('>', '>=')
+		std::string const & MinString, // Minimum indicator ('>', '>=')
 		Optional< Real64 const > Maximum = _, // Maximum desired value
-		Optional_Fstring_const MaxString = _ // Maximum indicator ('<', ',=')
+		Optional_string_const MaxString = _ // Maximum indicator ('<', ',=')
 	);
 
 	bool
 	CheckDayScheduleValueMinMax(
 		int const ScheduleIndex, // Which Day Schedule being tested
 		Real32 const Minimum, // Minimum desired value
-		Fstring const & MinString, // Minimum indicator ('>', '>=')
+		std::string const & MinString, // Minimum indicator ('>', '>=')
 		Optional< Real32 const > Maximum = _, // Maximum desired value
-		Optional_Fstring_const MaxString = _ // Maximum indicator ('<', ',=')
+		Optional_string_const MaxString = _ // Maximum indicator ('<', ',=')
 	);
 
 	bool
@@ -381,7 +375,7 @@ namespace ScheduleManager {
 	Real64
 	GetScheduleMaxValue( int const ScheduleIndex ); // Which Schedule being tested
 
-	Fstring
+	std::string
 	GetScheduleName( int const ScheduleIndex );
 
 	void

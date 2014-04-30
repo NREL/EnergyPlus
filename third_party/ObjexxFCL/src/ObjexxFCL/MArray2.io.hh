@@ -55,9 +55,9 @@ operator <<( std::ostream & stream, MArray2< A, T > const & a )
 		int const w( Traits::width() );
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 			for ( int i2 = 1, e2 = a.u2(); i2 < e2; ++i2 ) {
-				stream << setw( w ) << a( i1, i2 ) << SPC;
+				stream << setw( w ) << a( i1, i2 ) << ' ';
 				if ( ! stream ) break;
-			} stream << setw( w ) << a( i1, a.u2() ) << NL;
+			} stream << setw( w ) << a( i1, a.u2() ) << '\n';
 		}
 
 		// Restore previous stream state

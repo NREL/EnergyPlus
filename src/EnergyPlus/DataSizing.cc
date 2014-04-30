@@ -26,7 +26,6 @@ namespace DataSizing {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// -only module should be available to other modules and routines.
@@ -45,7 +44,7 @@ namespace DataSizing {
 	int const OAFlowSum( 5 );
 	int const OAFlowMax( 6 );
 
-	FArray1D_Fstring const cOAFlowMethodTypes( NumOAFlowMethods, sFstring( 15 ), { "Flow/Person    ", "Flow/Zone      ", "Flow/Area      ", "AirChanges/Hour", "Sum            ", "Maximum        " } );
+	FArray1D_string const cOAFlowMethodTypes( NumOAFlowMethods, { "Flow/Person", "Flow/Zone", "Flow/Area", "AirChanges/Hour", "Sum", "Maximum" } );
 
 	// parameters for outside air
 	int const AllOA( 1 );
@@ -80,7 +79,7 @@ namespace DataSizing {
 	Real64 const AutoSize( -99999.0 );
 
 	// parameter for (time-of-peak) sizing format
-	Fstring const PeakHrMinFmt( "(I2.2,':',I2.2,':00')" );
+	gio::Fmt const PeakHrMinFmt( "(I2.2,':',I2.2,':00')" );
 
 	//Zone Outdoor Air Method
 	int const ZOAM_FlowPerPerson( 1 ); // set the outdoor air flow rate based on number of people in the zone
@@ -134,13 +133,13 @@ namespace DataSizing {
 	int CurOverallSimDay( 0 );
 	int NumTimeStepsInAvg( 0 ); // number of time steps in the averaging window for the design flow and load sequences
 	int SaveNumPlantComps( 0 ); // Number of components using water as an energy source or sink (e.g. water coils)
-	int DataDXCT(1); // 1 if regular DX coil, 2 if 100% DOAS DX coil
+	int DataDXCT( 1 ); // 1 if regular DX coil, 2 if 100% DOAS DX coil
 	bool DataCoilIsSuppHeater( false ); // TRUE if heating coil used as supplemental heater
 	bool DataIsDXCoil( false ); // TRUE if direct-expansion coil
 	bool DataAutosizable( true ); // TRUE if component is autosizable
 	bool DataEMSOverride( false ); // TRUE if EMS overrides component sizing
 	bool SysSizingRunDone( false ); // True if a system sizing run is successfully completed.
-	bool TermUnitSingDuct(false); // TRUE if a non-induction single duct terminal unit
+	bool TermUnitSingDuct( false ); // TRUE if a non-induction single duct terminal unit
 	bool TermUnitPIU( false ); // TRUE if a powered induction terminal unit
 	bool TermUnitIU( false ); // TRUE if an unpowered induction terminal unit
 	bool ZoneEqFanCoil( false ); // TRUE if a 4 pipe fan coil unit is being simulated
@@ -160,9 +159,9 @@ namespace DataSizing {
 	Real64 UnitaryHeatCap( 0.0 ); // the heating capacity of a unitary system
 	FArray1D< Real64 > ZoneSizThermSetPtHi; // highest zone thermostat setpoint during zone sizing calcs
 	FArray1D< Real64 > ZoneSizThermSetPtLo; // lowest zone thermostat setpoint during zone sizing calcs
-	FArray1D_Fstring CoolPeakDateHrMin( sFstring( 15 ) );
-	FArray1D_Fstring HeatPeakDateHrMin( sFstring( 15 ) );
-	Fstring SizingFileColSep( 1 ); // Character to separate columns in sizing outputs
+	FArray1D_string CoolPeakDateHrMin;
+	FArray1D_string HeatPeakDateHrMin;
+	char SizingFileColSep; // Character to separate columns in sizing outputs
 
 	// Object Data
 	FArray1D< OARequirementsData > OARequirements;

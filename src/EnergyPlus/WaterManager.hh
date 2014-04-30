@@ -1,8 +1,8 @@
 #ifndef WaterManager_hh_INCLUDED
 #define WaterManager_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Fstring.hh>
+// C++ Headers
+#include <string>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -50,9 +50,9 @@ namespace WaterManager {
 
 	void
 	SetupTankSupplyComponent(
-		Fstring const & CompName,
-		Fstring const & CompType,
-		Fstring const & TankName,
+		std::string const & CompName,
+		std::string const & CompType,
+		std::string const & TankName,
 		bool & ErrorsFound,
 		int & TankIndex,
 		int & WaterSupplyIndex
@@ -60,9 +60,9 @@ namespace WaterManager {
 
 	void
 	InternalSetupTankSupplyComponent(
-		Fstring const & CompName,
-		Fstring const & CompType,
-		Fstring const & TankName,
+		std::string const & CompName,
+		std::string const & CompType,
+		std::string const & TankName,
 		bool & ErrorsFound,
 		int & TankIndex,
 		int & WaterSupplyIndex
@@ -70,9 +70,9 @@ namespace WaterManager {
 
 	void
 	SetupTankDemandComponent(
-		Fstring const & CompName,
-		Fstring const & CompType,
-		Fstring const & TankName,
+		std::string const & CompName,
+		std::string const & CompType,
+		std::string const & TankName,
 		bool & ErrorsFound,
 		int & TankIndex,
 		int & WaterDemandIndex
@@ -80,9 +80,9 @@ namespace WaterManager {
 
 	void
 	InternalSetupTankDemandComponent(
-		Fstring const & CompName,
-		Fstring const & CompType,
-		Fstring const & TankName,
+		std::string const & CompName,
+		std::string const & CompType,
+		std::string const & TankName,
 		bool & ErrorsFound,
 		int & TankIndex,
 		int & WaterDemandIndex

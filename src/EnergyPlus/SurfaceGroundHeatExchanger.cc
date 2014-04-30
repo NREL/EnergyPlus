@@ -69,7 +69,6 @@ namespace SurfaceGroundHeatExchanger {
 	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::BeginTimeStepFlag;
 	using DataGlobals::KelvinConv;
 	using namespace DataLoopNode;
@@ -82,7 +81,7 @@ namespace SurfaceGroundHeatExchanger {
 	Real64 const SmallNum( 1.0e-30 ); // Very small number to avoid div0 errors
 	Real64 const StefBoltzmann( 5.6697e-08 ); // Stefan-Boltzmann constant
 	Real64 const SurfaceHXHeight( 0.0 ); // Surface Height above ground -- used in height dependent calcs.
-	Fstring const Blank;
+	std::string const Blank;
 
 	int const SurfCond_Ground( 1 );
 	int const SurfCond_Exposed( 2 );
@@ -150,7 +149,7 @@ namespace SurfaceGroundHeatExchanger {
 
 	void
 	SimSurfaceGroundHeatExchanger(
-		Fstring const & CompName, // name of the surface GHE
+		std::string const & CompName, // name of the surface GHE
 		int & CompIndex,
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		bool const RunFlag, // TRUE if equipment is operating
@@ -211,15 +210,15 @@ namespace SurfaceGroundHeatExchanger {
 
 		// Find the correct Surface Ground Heat Exchanger
 		if ( CompIndex <= 0 ) {
-			ShowFatalError( "SimSurfaceGroundHeatExchanger: Unit not found=" + trim( CompName ) );
+			ShowFatalError( "SimSurfaceGroundHeatExchanger: Unit not found=" + CompName );
 		} else {
 			SurfaceGHENum = CompIndex;
 			if ( SurfaceGHENum > NumOfSurfaceGHEs || SurfaceGHENum < 1 ) {
-				ShowFatalError( "SimSurfaceGroundHeatExchanger:  Invalid CompIndex passed=" + trim( TrimSigDigits( SurfaceGHENum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumOfSurfaceGHEs ) ) + ", Entered Unit name=" + trim( CompName ) );
+				ShowFatalError( "SimSurfaceGroundHeatExchanger:  Invalid CompIndex passed=" + TrimSigDigits( SurfaceGHENum ) + ", Number of Units=" + TrimSigDigits( NumOfSurfaceGHEs ) + ", Entered Unit name=" + CompName );
 			}
 			if ( CheckEquipName( SurfaceGHENum ) ) {
 				if ( CompName != SurfaceGHE( SurfaceGHENum ).Name ) {
-					ShowFatalError( "SimSurfaceGroundHeatExchanger: Invalid CompIndex passed=" + trim( TrimSigDigits( SurfaceGHENum ) ) + ", Unit name=" + trim( CompName ) + ", stored Unit Name for that index=" + trim( SurfaceGHE( SurfaceGHENum ).Name ) );
+					ShowFatalError( "SimSurfaceGroundHeatExchanger: Invalid CompIndex passed=" + TrimSigDigits( SurfaceGHENum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + SurfaceGHE( SurfaceGHENum ).Name );
 				}
 				CheckEquipName( SurfaceGHENum ) = false;
 			}
@@ -327,38 +326,38 @@ namespace SurfaceGroundHeatExchanger {
 			SurfaceGHE( Item ).ConstructionNum = FindItemInList( cAlphaArgs( 2 ), Construct.Name(), TotConstructs );
 
 			if ( SurfaceGHE( Item ).ConstructionNum == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
 			// Error checking for surfaces, zones, and construction information
 			if ( ! Construct( SurfaceGHE( Item ).ConstructionNum ).SourceSinkPresent ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "Construction must have internal source/sink and use Construction:InternalSource object" );
 				ErrorsFound = true;
 			}
 
 			//get inlet node data
 			SurfaceGHE( Item ).InletNode = cAlphaArgs( 3 );
-			SurfaceGHE( Item ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			SurfaceGHE( Item ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 			if ( SurfaceGHE( Item ).InletNodeNum == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + "=" + trim( cAlphaArgs( 3 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
 			// get outlet node data
 			SurfaceGHE( Item ).OutletNode = cAlphaArgs( 4 );
-			SurfaceGHE( Item ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			SurfaceGHE( Item ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 			if ( SurfaceGHE( Item ).OutletNodeNum == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 4 ) ) + "=" + trim( cAlphaArgs( 4 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Condenser Water Nodes" );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Condenser Water Nodes" );
 
 			// tube data
 			SurfaceGHE( Item ).TubeDiameter = rNumericArgs( 1 );
@@ -366,14 +365,14 @@ namespace SurfaceGroundHeatExchanger {
 			SurfaceGHE( Item ).TubeSpacing = rNumericArgs( 3 );
 
 			if ( rNumericArgs( 2 ) == 0 ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 2 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 2 ), 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 2 ) + '=' + RoundSigDigits( rNumericArgs( 2 ), 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "Value must be greater than 0.0" );
 				ErrorsFound = true;
 			}
 			if ( rNumericArgs( 3 ) == 0.0 ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 3 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 3 ), 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 3 ) + '=' + RoundSigDigits( rNumericArgs( 3 ), 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "Value must be greater than 0.0" );
 				ErrorsFound = true;
 			}
@@ -382,14 +381,14 @@ namespace SurfaceGroundHeatExchanger {
 			SurfaceGHE( Item ).SurfaceLength = rNumericArgs( 4 );
 			SurfaceGHE( Item ).SurfaceWidth = rNumericArgs( 5 );
 			if ( rNumericArgs( 4 ) <= 0.0 ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 4 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 4 ), 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 4 ) + '=' + RoundSigDigits( rNumericArgs( 4 ), 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "Value must be greater than 0.0" );
 				ErrorsFound = true;
 			}
 			if ( rNumericArgs( 5 ) <= 0.0 ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 5 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 5 ), 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 5 ) + '=' + RoundSigDigits( rNumericArgs( 5 ), 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "Value must be greater than 0.0" );
 				ErrorsFound = true;
 			}
@@ -400,8 +399,8 @@ namespace SurfaceGroundHeatExchanger {
 			} else if ( SameString( cAlphaArgs( 5 ), "EXPOSED" ) ) {
 				SurfaceGHE( Item ).LowerSurfCond = SurfCond_Exposed;
 			} else {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 5 ) ) + "=" + trim( cAlphaArgs( 5 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 5 ) + '=' + cAlphaArgs( 5 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "Only \"Ground\" or \"Exposed\" is allowed." );
 				ErrorsFound = true;
 			}
@@ -410,7 +409,7 @@ namespace SurfaceGroundHeatExchanger {
 
 		// final error check
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + trim( cCurrentModuleObject ) );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
 		}
 
 		// Set up the output variables
@@ -433,7 +432,7 @@ namespace SurfaceGroundHeatExchanger {
 		if ( NoSurfaceGroundTempObjWarning ) {
 			if ( ! GroundTemp_SurfaceObjInput ) {
 				ShowWarningError( "GetSurfaceGroundHeatExchanger: No \"Site:GroundTemperature:Shallow\" were input." );
-				ShowContinueError( "Defaults, constant throughout the year of (" + trim( RoundSigDigits( GroundTemp_Surface, 1 ) ) + ") will be used." );
+				ShowContinueError( "Defaults, constant throughout the year of (" + RoundSigDigits( GroundTemp_Surface, 1 ) + ") will be used." );
 			}
 			NoSurfaceGroundTempObjWarning = false;
 		}
@@ -796,10 +795,10 @@ namespace SurfaceGroundHeatExchanger {
 				//Check for non-convergence
 				if ( iter > Maxiter ) {
 					if ( SurfaceGHE( SurfaceGHENum ).ConvErrIndex1 == 0 ) {
-						ShowWarningMessage( "CalcSurfaceGroundHeatExchanger=\"" + trim( SurfaceGHE( SurfaceGHENum ).Name ) + "\", Did not converge (part 1), Iterations=" + trim( TrimSigDigits( Maxiter ) ) );
-						ShowContinueErrorTimeStamp( " " );
+						ShowWarningMessage( "CalcSurfaceGroundHeatExchanger=\"" + SurfaceGHE( SurfaceGHENum ).Name + "\", Did not converge (part 1), Iterations=" + TrimSigDigits( Maxiter ) );
+						ShowContinueErrorTimeStamp( "" );
 					}
-					ShowRecurringWarningErrorAtEnd( "CalcSurfaceGroundHeatExchanger=\"" + trim( SurfaceGHE( SurfaceGHENum ).Name ) + "\", Did not converge (part 1)", SurfaceGHE( SurfaceGHENum ).ConvErrIndex1 );
+					ShowRecurringWarningErrorAtEnd( "CalcSurfaceGroundHeatExchanger=\"" + SurfaceGHE( SurfaceGHENum ).Name + "\", Did not converge (part 1)", SurfaceGHE( SurfaceGHENum ).ConvErrIndex1 );
 					break;
 				}
 			}
@@ -883,10 +882,10 @@ namespace SurfaceGroundHeatExchanger {
 					//Check for non-convergence
 					if ( iter1 > Maxiter1 ) {
 						if ( SurfaceGHE( SurfaceGHENum ).ConvErrIndex2 == 0 ) {
-							ShowWarningMessage( "CalcSurfaceGroundHeatExchanger=\"" + trim( SurfaceGHE( SurfaceGHENum ).Name ) + "\", Did not converge (part 2), Iterations=" + trim( TrimSigDigits( Maxiter ) ) );
-							ShowContinueErrorTimeStamp( " " );
+							ShowWarningMessage( "CalcSurfaceGroundHeatExchanger=\"" + SurfaceGHE( SurfaceGHENum ).Name + "\", Did not converge (part 2), Iterations=" + TrimSigDigits( Maxiter ) );
+							ShowContinueErrorTimeStamp( "" );
 						}
-						ShowRecurringWarningErrorAtEnd( "CalcSurfaceGroundHeatExchanger=\"" + trim( SurfaceGHE( SurfaceGHENum ).Name ) + "\", Did not converge (part 2)", SurfaceGHE( SurfaceGHENum ).ConvErrIndex2 );
+						ShowRecurringWarningErrorAtEnd( "CalcSurfaceGroundHeatExchanger=\"" + SurfaceGHE( SurfaceGHENum ).Name + "\", Did not converge (part 2)", SurfaceGHE( SurfaceGHENum ).ConvErrIndex2 );
 						break;
 					}
 				}
@@ -900,10 +899,10 @@ namespace SurfaceGroundHeatExchanger {
 				//Check for non-convergence
 				if ( iter > Maxiter ) {
 					if ( SurfaceGHE( SurfaceGHENum ).ConvErrIndex3 == 0 ) {
-						ShowWarningMessage( "CalcSurfaceGroundHeatExchanger=\"" + trim( SurfaceGHE( SurfaceGHENum ).Name ) + "\", Did not converge (part 3), Iterations=" + trim( TrimSigDigits( Maxiter ) ) );
-						ShowContinueErrorTimeStamp( " " );
+						ShowWarningMessage( "CalcSurfaceGroundHeatExchanger=\"" + SurfaceGHE( SurfaceGHENum ).Name + "\", Did not converge (part 3), Iterations=" + TrimSigDigits( Maxiter ) );
+						ShowContinueErrorTimeStamp( "" );
 					}
-					ShowRecurringWarningErrorAtEnd( "CalcSurfaceGroundHeatExchanger=\"" + trim( SurfaceGHE( SurfaceGHENum ).Name ) + "\", Did not converge (part 3)", SurfaceGHE( SurfaceGHENum ).ConvErrIndex3 );
+					ShowRecurringWarningErrorAtEnd( "CalcSurfaceGroundHeatExchanger=\"" + SurfaceGHE( SurfaceGHENum ).Name + "\", Did not converge (part 3)", SurfaceGHE( SurfaceGHENum ).ConvErrIndex3 );
 					break;
 				}
 			} // end surface heat balance iteration
@@ -1365,10 +1364,10 @@ namespace SurfaceGroundHeatExchanger {
 		if ( Temperature < 0.0 ) { // check if fluid is water and would be freezing
 			if ( PlantLoop( SurfaceGHE( SurfaceGHENum ).LoopNum ).FluidIndex == WaterIndex ) {
 				if ( SurfaceGHE( SurfaceGHENum ).FrozenErrIndex1 == 0 ) {
-					ShowWarningMessage( "GroundHeatExchanger:Surface=\"" + trim( SurfaceGHE( SurfaceGHENum ).Name ) + "\", water is frozen; Model not valid. Calculated Water Temperature=[" + trim( RoundSigDigits( InletTemp, 2 ) ) + "] C" );
-					ShowContinueErrorTimeStamp( " " );
+					ShowWarningMessage( "GroundHeatExchanger:Surface=\"" + SurfaceGHE( SurfaceGHENum ).Name + "\", water is frozen; Model not valid. Calculated Water Temperature=[" + RoundSigDigits( InletTemp, 2 ) + "] C" );
+					ShowContinueErrorTimeStamp( "" );
 				}
-				ShowRecurringWarningErrorAtEnd( "GroundHeatExchanger:Surface=\"" + trim( SurfaceGHE( SurfaceGHENum ).Name ) + "\", water is frozen", SurfaceGHE( SurfaceGHENum ).FrozenErrIndex1, InletTemp, InletTemp, _, "[C]", "[C]" );
+				ShowRecurringWarningErrorAtEnd( "GroundHeatExchanger:Surface=\"" + SurfaceGHE( SurfaceGHENum ).Name + "\", water is frozen", SurfaceGHE( SurfaceGHENum ).FrozenErrIndex1, InletTemp, InletTemp, _, "[C]", "[C]" );
 				InletTemp = max( InletTemp, 0.0 );
 			}
 		}
@@ -1654,7 +1653,7 @@ namespace SurfaceGroundHeatExchanger {
 		// appropriate conditions on the correct HVAC node.
 		if ( PlantLoop( SurfaceGHE( SurfaceGHENum ).LoopNum ).FluidName == "WATER" ) {
 			if ( InletTemp < 0.0 ) {
-				ShowRecurringWarningErrorAtEnd( "UpdateSurfaceGroundHeatExchngr: Water is frozen in Surf HX=" + trim( SurfaceGHE( SurfaceGHENum ).Name ), SurfaceGHE( SurfaceGHENum ).FrozenErrIndex2, InletTemp, InletTemp );
+				ShowRecurringWarningErrorAtEnd( "UpdateSurfaceGroundHeatExchngr: Water is frozen in Surf HX=" + SurfaceGHE( SurfaceGHENum ).Name, SurfaceGHE( SurfaceGHENum ).FrozenErrIndex2, InletTemp, InletTemp );
 			}
 			InletTemp = max( InletTemp, 0.0 );
 		}

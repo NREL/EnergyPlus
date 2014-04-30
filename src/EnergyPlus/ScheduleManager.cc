@@ -2,6 +2,7 @@
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <ScheduleManager.hh>
@@ -46,7 +47,6 @@ namespace ScheduleManager {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::HourOfDay;
 	using DataGlobals::OutputFileInits;
 	using DataGlobals::NumOfTimeStepInHour;
@@ -66,11 +66,11 @@ namespace ScheduleManager {
 	// Data
 	//MODULE PARAMETER DEFINITIONS
 	int const MaxDayTypes( 12 );
-	Fstring const Blank( 1 );
-	FArray1D_Fstring const ValidDayTypes( MaxDayTypes, sFstring( 15 ), { "Sunday         ", "Monday         ", "Tuesday        ", "Wednesday      ", "Thursday       ", "Friday         ", "Saturday       ", "Holiday        ", "SummerDesignDay", "WinterDesignDay", "CustomDay1     ", "CustomDay2     " } );
+	std::string const Blank;
+	FArray1D_string const ValidDayTypes( MaxDayTypes, { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2" } );
 
 	int const NumScheduleTypeLimitUnitTypes( 14 );
-	FArray1D_Fstring const ScheduleTypeLimitUnitTypes( NumScheduleTypeLimitUnitTypes, sFstring( 28 ), { "Dimensionless               ", "Temperature                 ", "DeltaTemperature            ", "PrecipitationRate           ", "Angle                       ", "ConvectionCoefficient       ", "ActivityLevel               ", "Velocity                    ", "Capacity                    ", "Power                       ", "Availability                ", "Percent                     ", "Control                     ", "Mode                        " } );
+	FArray1D_string const ScheduleTypeLimitUnitTypes( NumScheduleTypeLimitUnitTypes, { "Dimensionless", "Temperature", "DeltaTemperature", "PrecipitationRate", "Angle", "ConvectionCoefficient", "ActivityLevel", "Velocity", "Capacity", "Power", "Availability", "Percent", "Control", "Mode" } );
 
 	int const ScheduleInput_year( 1 );
 	int const ScheduleInput_compact( 2 );
@@ -152,7 +152,7 @@ namespace ScheduleManager {
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "ProcessScheduleInput: " );
+		static std::string const RoutineName( "ProcessScheduleInput: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -168,9 +168,9 @@ namespace ScheduleManager {
 		int InLoopIndex;
 		int DayIndex;
 		int WeekIndex;
-		FArray1D_Fstring Alphas( sFstring( MaxNameLength ) );
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) );
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) );
+		FArray1D_string Alphas;
+		FArray1D_string cAlphaFields;
+		FArray1D_string cNumericFields;
 		FArray1D< Real64 > Numbers;
 		FArray1D_bool lAlphaBlanks;
 		FArray1D_bool lNumericBlanks;
@@ -191,7 +191,7 @@ namespace ScheduleManager {
 		bool IsBlank; // Flag for blank name
 		bool NumErrorFlag;
 		int SchedTypePtr;
-		Fstring CFld( 20 ); // Character field for error message
+		std::string CFld; // Character field for error message
 		//  CHARACTER(len=20) CFld1        ! Character field for error message
 		int NumHrDaySchedules; // Number of "hourly" dayschedules
 		int NumIntDaySchedules; // Number of "interval" dayschedules
@@ -233,14 +233,14 @@ namespace ScheduleManager {
 		int PDateType;
 		int PWeekDay;
 		int ThruField;
-		Fstring ExtraField( 25 );
+		std::string ExtraField;
 		int UntilFld;
 		int xxcount;
 		//  REAL(r64) tempval
 		static bool FullYearSet( false );
-		static Fstring CurrentThrough( MaxNameLength, Blank );
-		static Fstring LastFor( MaxNameLength, Blank );
-		static Fstring errmsg( 220, Blank );
+		static std::string CurrentThrough;
+		static std::string LastFor;
+		static std::string errmsg;
 		int kdy;
 		bool FileExists;
 		// for SCHEDULE:FILE
@@ -250,9 +250,9 @@ namespace ScheduleManager {
 		int rowCnt;
 		int wordStart;
 		int wordEnd;
-		int sepPos;
-		Fstring LineIn( 1000 );
-		Fstring subString( MaxNameLength );
+		std::string::size_type sepPos;
+		std::string LineIn;
+		std::string subString;
 		Real64 columnValue;
 		int read_stat;
 		int iDay;
@@ -261,12 +261,12 @@ namespace ScheduleManager {
 		int kDayType;
 		Real64 curHrVal;
 		bool errFlag;
-		int sPos;
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in getting objects
+		std::string::size_type sPos;
+		std::string CurrentModuleObject; // for ease in getting objects
 		int MaxNums1;
 		bool StripCR; // If true, strip last character (<cr> off each schedule:file line)
-		int endLine;
-		Fstring ColumnSep( 1 );
+		std::string::size_type endLine;
+		std::string ColumnSep;
 		bool firstLine;
 		bool FileIntervalInterpolated;
 		int rowLimitCount;
@@ -380,11 +380,11 @@ namespace ScheduleManager {
 		MaxAlps = max( MaxAlps, NumAlphas );
 
 		Alphas.allocate( MaxAlps ); // Maximum Alphas possible
-		Alphas = " ";
+		Alphas = "";
 		cAlphaFields.allocate( MaxAlps );
-		cAlphaFields = " ";
+		cAlphaFields = "";
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = " ";
+		cNumericFields = "";
 		Numbers.allocate( MaxNums ); // Maximum Numbers possible
 		Numbers = 0.0;
 		lAlphaBlanks.allocate( MaxAlps );
@@ -402,9 +402,9 @@ namespace ScheduleManager {
 			// # 'THROUGH" => Number of additional week schedules
 			// # 'FOR' => Number of additional day schedules
 			for ( Count = 3; Count <= NumAlphas; ++Count ) {
-				if ( Alphas( Count )( 1, 7 ) == "THROUGH" ) ++AddWeekSch;
-				if ( Alphas( Count )( 1, 3 ) == "FOR" ) ++AddDaySch;
-				if ( Alphas( Count )( 1, 5 ) == "UNTIL" ) ++MaxNums1;
+				if ( has_prefix( Alphas( Count ), "THROUGH" ) ) ++AddWeekSch;
+				if ( has_prefix( Alphas( Count ), "FOR" ) ) ++AddDaySch;
+				if ( has_prefix( Alphas( Count ), "UNTIL" ) ) ++MaxNums1;
 			}
 		}
 		if ( MaxNums1 > MaxNums ) {
@@ -413,7 +413,7 @@ namespace ScheduleManager {
 			Numbers.deallocate();
 			lNumericBlanks.deallocate();
 			cNumericFields.allocate( MaxNums );
-			cNumericFields = " ";
+			cNumericFields = "";
 			Numbers.allocate( MaxNums ); // Maximum Numbers possible
 			Numbers = 0.0;
 			lNumericBlanks.allocate( MaxNums );
@@ -480,7 +480,7 @@ namespace ScheduleManager {
 			GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), ScheduleType( {1,NumScheduleTypes} ).Name(), LoopIndex - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), ScheduleType( {1,NumScheduleTypes} ).Name(), LoopIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -502,7 +502,7 @@ namespace ScheduleManager {
 					ScheduleType( LoopIndex ).IsReal = false;
 				} else {
 					if ( Alphas( 2 ) != "CONTINUOUS" && Alphas( 2 ) != "REAL" ) {
-						ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( ScheduleType( LoopIndex ).Name ) + "\", invalid " + trim( cAlphaFields( 2 ) ) + "=" + trim( Alphas( 2 ) ) );
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + ScheduleType( LoopIndex ).Name + "\", invalid " + cAlphaFields( 2 ) + '=' + Alphas( 2 ) );
 						ErrorsFound = true;
 					}
 					ScheduleType( LoopIndex ).IsReal = true;
@@ -512,17 +512,17 @@ namespace ScheduleManager {
 				if ( ! lAlphaBlanks( 3 ) ) {
 					ScheduleType( LoopIndex ).UnitType = FindItem( Alphas( 3 ), ScheduleTypeLimitUnitTypes, NumScheduleTypeLimitUnitTypes );
 					if ( ScheduleType( LoopIndex ).UnitType == 0 ) {
-						ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", " + trim( cAlphaFields( 3 ) ) + "=\"" + trim( Alphas( 3 ) ) + "\" is invalid." );
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 3 ) + "=\"" + Alphas( 3 ) + "\" is invalid." );
 					}
 				}
 			}
 			if ( ScheduleType( LoopIndex ).Limited ) {
 				if ( ScheduleType( LoopIndex ).Minimum > ScheduleType( LoopIndex ).Maximum ) {
 					if ( ScheduleType( LoopIndex ).IsReal ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", " + trim( cNumericFields( 1 ) ) + " [" + trim( RoundSigDigits( ScheduleType( LoopIndex ).Minimum, 2 ) ) + "] > " + trim( cNumericFields( 2 ) ) + " [" + trim( RoundSigDigits( ScheduleType( LoopIndex ).Maximum, 2 ) ) + "]." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cNumericFields( 1 ) + " [" + RoundSigDigits( ScheduleType( LoopIndex ).Minimum, 2 ) + "] > " + cNumericFields( 2 ) + " [" + RoundSigDigits( ScheduleType( LoopIndex ).Maximum, 2 ) + "]." );
 						ShowContinueError( "  Other warning/severes about schedule values may appear." );
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", " + trim( cNumericFields( 1 ) ) + " [" + trim( RoundSigDigits( ScheduleType( LoopIndex ).Minimum, 0 ) ) + "] > " + trim( cNumericFields( 2 ) ) + " [" + trim( RoundSigDigits( ScheduleType( LoopIndex ).Maximum, 0 ) ) + "]." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cNumericFields( 1 ) + " [" + RoundSigDigits( ScheduleType( LoopIndex ).Minimum, 0 ) + "] > " + cNumericFields( 2 ) + " [" + RoundSigDigits( ScheduleType( LoopIndex ).Maximum, 0 ) + "]." );
 						ShowContinueError( "  Other warning/severes about schedule values may appear." );
 					}
 				}
@@ -539,7 +539,7 @@ namespace ScheduleManager {
 			GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DaySchedule.Name(), Count, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), DaySchedule.Name(), Count, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -551,9 +551,9 @@ namespace ScheduleManager {
 				CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ).Name(), NumScheduleTypes );
 				if ( CheckIndex == 0 ) {
 					if ( ! lAlphaBlanks( 2 ) ) {
-						ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", " + trim( cAlphaFields( 2 ) ) + "=\"" + trim( Alphas( 2 ) ) + "\" not found -- will not be validated" );
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
 					} else {
-						ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", Blank " + trim( cAlphaFields( 2 ) ) + " input -- will not be validated." );
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", Blank " + cAlphaFields( 2 ) + " input -- will not be validated." );
 					}
 				} else {
 					DaySchedule( Count ).ScheduleTypePtr = CheckIndex;
@@ -566,7 +566,7 @@ namespace ScheduleManager {
 			SchedTypePtr = DaySchedule( Count ).ScheduleTypePtr;
 			if ( ScheduleType( SchedTypePtr ).Limited ) {
 				if ( any_lt( DaySchedule( Count ).TSValue, ScheduleType( SchedTypePtr ).Minimum ) || any_gt( DaySchedule( Count ).TSValue, ScheduleType( SchedTypePtr ).Maximum ) ) {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", Values are outside of range for " + trim( cAlphaFields( 2 ) ) + "=" + trim( Alphas( 2 ) ) );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", Values are outside of range for " + cAlphaFields( 2 ) + '=' + Alphas( 2 ) );
 				}
 			}
 			if ( ! ScheduleType( SchedTypePtr ).IsReal ) {
@@ -576,7 +576,7 @@ namespace ScheduleManager {
 					for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
 						if ( DaySchedule( Count ).TSValue( Hr, TS ) != int( DaySchedule( Count ).TSValue( Hr, TS ) ) ) {
 							if ( ! NumErrorFlag ) {
-								ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", One or more values are not integer as required by " + trim( cAlphaFields( 2 ) ) + "=" + trim( Alphas( 2 ) ) );
+								ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", One or more values are not integer as required by " + cAlphaFields( 2 ) + '=' + Alphas( 2 ) );
 								NumErrorFlag = true;
 							}
 						}
@@ -595,7 +595,7 @@ namespace ScheduleManager {
 			GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DaySchedule.Name(), Count, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), DaySchedule.Name(), Count, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -607,9 +607,9 @@ namespace ScheduleManager {
 				CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ).Name(), NumScheduleTypes );
 				if ( CheckIndex == 0 ) {
 					if ( ! lAlphaBlanks( 2 ) ) {
-						ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", " + trim( cAlphaFields( 2 ) ) + "=\"" + trim( Alphas( 2 ) ) + "\" not found -- will not be validated" );
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
 					} else {
-						ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", Blank " + trim( cAlphaFields( 2 ) ) + " input -- will not be validated." );
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", Blank " + cAlphaFields( 2 ) + " input -- will not be validated." );
 					}
 				} else {
 					DaySchedule( Count ).ScheduleTypePtr = CheckIndex;
@@ -618,15 +618,15 @@ namespace ScheduleManager {
 			NumFields = NumAlphas - 3;
 			// check to see if numfield=0
 			if ( NumFields == 0 ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", Insufficient data entered for a full schedule day." );
-				ShowContinueError( "...Number of interval fields = = [" + trim( RoundSigDigits( NumFields ) ) + "]." );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", Insufficient data entered for a full schedule day." );
+				ShowContinueError( "...Number of interval fields = = [" + RoundSigDigits( NumFields ) + "]." );
 				ErrorsFound = true;
 			}
 
-			ProcessIntervalFields( Alphas( {4,_} ), Numbers, NumFields, NumNumbers, MinuteValue, SetMinuteValue, ErrorsFound, Alphas( 1 ), trim( CurrentModuleObject ) );
+			ProcessIntervalFields( Alphas( {4,_} ), Numbers, NumFields, NumNumbers, MinuteValue, SetMinuteValue, ErrorsFound, Alphas( 1 ), CurrentModuleObject );
 			// Depending on value of "Interpolate" field, the value for each time step in each hour gets processed:
 			if ( Alphas( 3 ) != "NO" && Alphas( 3 ) != "YES" ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "Invalid value for \"" + trim( cAlphaFields( 3 ) ) + "\" field=\"" + trim( Alphas( 3 ) ) + "\"" );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "Invalid value for \"" + cAlphaFields( 3 ) + "\" field=\"" + Alphas( 3 ) + "\"" );
 				ErrorsFound = true;
 			} else if ( Alphas( 3 ) != "YES" ) { // No validation done on the value of the interpolation field
 				DaySchedule( Count ).IntervalInterpolated = false;
@@ -653,7 +653,7 @@ namespace ScheduleManager {
 			SchedTypePtr = DaySchedule( Count ).ScheduleTypePtr;
 			if ( ScheduleType( SchedTypePtr ).Limited ) {
 				if ( any_lt( DaySchedule( Count ).TSValue, ScheduleType( SchedTypePtr ).Minimum ) || any_gt( DaySchedule( Count ).TSValue, ScheduleType( SchedTypePtr ).Maximum ) ) {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", Values are outside of range for " + trim( cAlphaFields( 2 ) ) + "=" + trim( Alphas( 2 ) ) );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", Values are outside of range for " + cAlphaFields( 2 ) + '=' + Alphas( 2 ) );
 				}
 			}
 			if ( ! ScheduleType( SchedTypePtr ).IsReal ) {
@@ -663,7 +663,7 @@ namespace ScheduleManager {
 					for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
 						if ( DaySchedule( Count ).TSValue( Hr, TS ) != int( DaySchedule( Count ).TSValue( Hr, TS ) ) ) {
 							if ( ! NumErrorFlag ) {
-								ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", , One or more values are not integer as required by " + trim( cAlphaFields( 2 ) ) + "=" + trim( Alphas( 2 ) ) );
+								ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", , One or more values are not integer as required by " + cAlphaFields( 2 ) + '=' + Alphas( 2 ) );
 								NumErrorFlag = true;
 							}
 						}
@@ -679,7 +679,7 @@ namespace ScheduleManager {
 			GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DaySchedule.Name(), Count, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), DaySchedule.Name(), Count, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -691,9 +691,9 @@ namespace ScheduleManager {
 				CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ).Name(), NumScheduleTypes );
 				if ( CheckIndex == 0 ) {
 					if ( ! lAlphaBlanks( 2 ) ) {
-						ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", " + trim( cAlphaFields( 2 ) ) + "=\"" + trim( Alphas( 2 ) ) + "\" not found -- will not be validated" );
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
 					} else {
-						ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", Blank " + trim( cAlphaFields( 2 ) ) + " input -- will not be validated." );
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", Blank " + cAlphaFields( 2 ) + " input -- will not be validated." );
 					}
 				} else {
 					DaySchedule( Count ).ScheduleTypePtr = CheckIndex;
@@ -702,7 +702,7 @@ namespace ScheduleManager {
 
 			// Depending on value of "Interpolate" field, the value for each time step in each hour gets processed:
 			if ( Alphas( 3 ) != "NO" && Alphas( 3 ) != "YES" ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "Invalid value for \"" + trim( cAlphaFields( 3 ) ) + "\" field=\"" + trim( Alphas( 3 ) ) + "\"" );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "Invalid value for \"" + cAlphaFields( 3 ) + "\" field=\"" + Alphas( 3 ) + "\"" );
 				ErrorsFound = true;
 			} else if ( Alphas( 3 ) != "YES" ) { // No validation done on the value of the interpolation field
 				DaySchedule( Count ).IntervalInterpolated = false;
@@ -712,29 +712,29 @@ namespace ScheduleManager {
 
 			// check to see if there are any fields
 			if ( Numbers( 1 ) <= 0.0 ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", Insufficient data entered for a full schedule day." );
-				ShowContinueError( "...Minutes per Item field = [" + trim( RoundSigDigits( int( Numbers( 1 ) ) ) ) + "]." );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", Insufficient data entered for a full schedule day." );
+				ShowContinueError( "...Minutes per Item field = [" + RoundSigDigits( int( Numbers( 1 ) ) ) + "]." );
 				ErrorsFound = true;
 				continue;
 			}
 			if ( NumNumbers < 25 ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", Insufficient data entered for a full schedule day." );
-				ShowContinueError( "...Minutes per Item field = [" + trim( RoundSigDigits( int( Numbers( 1 ) ) ) ) + "] and " " only [" + trim( RoundSigDigits( NumNumbers - 1 ) ) + "] to apply to list fields." );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", Insufficient data entered for a full schedule day." );
+				ShowContinueError( "...Minutes per Item field = [" + RoundSigDigits( int( Numbers( 1 ) ) ) + "] and " " only [" + RoundSigDigits( NumNumbers - 1 ) + "] to apply to list fields." );
 				ErrorsFound = true;
 				continue;
 			}
 			MinutesPerItem = int( Numbers( 1 ) );
 			NumExpectedItems = 1440 / MinutesPerItem;
 			if ( ( NumNumbers - 1 ) != NumExpectedItems ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + ", Number of Entered Items=" + trim( RoundSigDigits( NumNumbers - 1 ) ) + " not equal number of expected items=" + trim( RoundSigDigits( NumExpectedItems ) ) );
-				ShowContinueError( "based on " + trim( cNumericFields( 1 ) ) + " field value=" + trim( RoundSigDigits( MinutesPerItem ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", Number of Entered Items=" + RoundSigDigits( NumNumbers - 1 ) + " not equal number of expected items=" + RoundSigDigits( NumExpectedItems ) );
+				ShowContinueError( "based on " + cNumericFields( 1 ) + " field value=" + RoundSigDigits( MinutesPerItem ) );
 				ErrorsFound = true;
 				continue;
 			}
 
 			if ( mod( 60, MinutesPerItem ) != 0 ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) );
-				ShowContinueError( "Requested " + trim( cNumericFields( 1 ) ) + " field value (" + trim( RoundSigDigits( MinutesPerItem ) ) + ") not evenly divisible into 60" );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) );
+				ShowContinueError( "Requested " + cNumericFields( 1 ) + " field value (" + RoundSigDigits( MinutesPerItem ) + ") not evenly divisible into 60" );
 				ErrorsFound = true;
 				continue;
 			}
@@ -779,7 +779,7 @@ namespace ScheduleManager {
 			SchedTypePtr = DaySchedule( Count ).ScheduleTypePtr;
 			if ( ScheduleType( SchedTypePtr ).Limited ) {
 				if ( any_lt( DaySchedule( Count ).TSValue, ScheduleType( SchedTypePtr ).Minimum ) || any_gt( DaySchedule( Count ).TSValue, ScheduleType( SchedTypePtr ).Maximum ) ) {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", Values are outside of range for " + trim( cAlphaFields( 2 ) ) + "=" + trim( Alphas( 2 ) ) );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", Values are outside of range for " + cAlphaFields( 2 ) + '=' + Alphas( 2 ) );
 				}
 			}
 			if ( ! ScheduleType( SchedTypePtr ).IsReal ) {
@@ -789,7 +789,7 @@ namespace ScheduleManager {
 					for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
 						if ( DaySchedule( Count ).TSValue( Hr, TS ) != int( DaySchedule( Count ).TSValue( Hr, TS ) ) ) {
 							if ( ! NumErrorFlag ) {
-								ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", , One or more values are not integer as required by " + trim( cAlphaFields( 2 ) ) + "=" + trim( Alphas( 2 ) ) );
+								ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", , One or more values are not integer as required by " + cAlphaFields( 2 ) + '=' + Alphas( 2 ) );
 								NumErrorFlag = true;
 							}
 						}
@@ -805,7 +805,7 @@ namespace ScheduleManager {
 			GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), WeekSchedule( {1,NumRegWeekSchedules} ).Name(), LoopIndex - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), WeekSchedule( {1,NumRegWeekSchedules} ).Name(), LoopIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -815,7 +815,7 @@ namespace ScheduleManager {
 			for ( InLoopIndex = 1; InLoopIndex <= MaxDayTypes; ++InLoopIndex ) {
 				DayIndex = FindItemInList( Alphas( InLoopIndex + 1 ), DaySchedule( {1,NumRegDaySchedules} ).Name(), NumRegDaySchedules );
 				if ( DayIndex == 0 ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", " + trim( cAlphaFields( InLoopIndex + 1 ) ) + " \"" + trim( Alphas( InLoopIndex + 1 ) ) + "\" not Found", UnitNumber );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( InLoopIndex + 1 ) + " \"" + Alphas( InLoopIndex + 1 ) + "\" not Found", UnitNumber );
 					ErrorsFound = true;
 				} else {
 					WeekSchedule( LoopIndex ).DaySchedulePointer( InLoopIndex ) = DayIndex;
@@ -831,7 +831,7 @@ namespace ScheduleManager {
 			IsNotOK = false;
 			IsBlank = false;
 			if ( Count > 0 ) {
-				VerifyName( Alphas( 1 ), WeekSchedule( {1,Count} ).Name(), Count, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+				VerifyName( Alphas( 1 ), WeekSchedule( {1,Count} ).Name(), Count, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -844,15 +844,15 @@ namespace ScheduleManager {
 			for ( InLoopIndex = 2; InLoopIndex <= NumAlphas; InLoopIndex += 2 ) {
 				DayIndex = FindItemInList( Alphas( InLoopIndex + 1 ), DaySchedule( {1,NumRegDaySchedules} ).Name(), NumRegDaySchedules );
 				if ( DayIndex == 0 ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", " + trim( cAlphaFields( InLoopIndex + 1 ) ) + " \"" + trim( Alphas( InLoopIndex + 1 ) ) + "\" not Found", UnitNumber );
-					ShowContinueError( "ref: " + trim( cAlphaFields( InLoopIndex ) ) + " \"" + trim( Alphas( InLoopIndex ) ) + "\"" );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( InLoopIndex + 1 ) + " \"" + Alphas( InLoopIndex + 1 ) + "\" not Found", UnitNumber );
+					ShowContinueError( "ref: " + cAlphaFields( InLoopIndex ) + " \"" + Alphas( InLoopIndex ) + "\"" );
 					ErrorsFound = true;
 				} else {
 					TheseDays = false;
 					ErrorHere = false;
 					ProcessForDayTypes( Alphas( InLoopIndex ), TheseDays, AllDays, ErrorHere );
 					if ( ErrorHere ) {
-						ShowContinueError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) );
+						ShowContinueError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) );
 						ErrorsFound = true;
 					} else {
 						for ( Hr = 1; Hr <= MaxDayTypes; ++Hr ) {
@@ -865,7 +865,7 @@ namespace ScheduleManager {
 			}
 			//  Have processed all named days, check to make sure all given
 			if ( ! all( AllDays ) ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", Missing some day assignments" );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", Missing some day assignments" );
 				ErrorsFound = true;
 			}
 		}
@@ -880,7 +880,7 @@ namespace ScheduleManager {
 			GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), LoopIndex - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), LoopIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -892,9 +892,9 @@ namespace ScheduleManager {
 				CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ).Name(), NumScheduleTypes );
 				if ( CheckIndex == 0 ) {
 					if ( ! lAlphaBlanks( 2 ) ) {
-						ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", " + trim( cAlphaFields( 2 ) ) + "=\"" + trim( Alphas( 2 ) ) + "\" not found -- will not be validated" );
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
 					} else {
-						ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", Blank " + trim( cAlphaFields( 2 ) ) + " input -- will not be validated." );
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", Blank " + cAlphaFields( 2 ) + " input -- will not be validated." );
 					}
 				} else {
 					Schedule( LoopIndex ).ScheduleTypePtr = CheckIndex;
@@ -906,7 +906,7 @@ namespace ScheduleManager {
 			for ( InLoopIndex = 3; InLoopIndex <= NumAlphas; ++InLoopIndex ) {
 				WeekIndex = FindItemInList( Alphas( InLoopIndex ), WeekSchedule( {1,NumRegWeekSchedules} ).Name(), NumRegWeekSchedules );
 				if ( WeekIndex == 0 ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", " + trim( cAlphaFields( InLoopIndex ) ) + "=\"" + trim( Alphas( InLoopIndex ) ) + "\" not found.", UnitNumber );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( InLoopIndex ) + "=\"" + Alphas( InLoopIndex ) + "\" not found.", UnitNumber );
 					ErrorsFound = true;
 				} else {
 					// Process for month, day
@@ -941,11 +941,11 @@ namespace ScheduleManager {
 				Schedule( LoopIndex ).WeekSchedulePointer( 60 ) = Schedule( LoopIndex ).WeekSchedulePointer( 59 );
 			}
 			if ( any_eq( DaysInYear, 0 ) ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Schedule( LoopIndex ).Name ) + "\" has missing days in its schedule pointers", UnitNumber );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Schedule( LoopIndex ).Name + "\" has missing days in its schedule pointers", UnitNumber );
 				ErrorsFound = true;
 			}
 			if ( any_gt( DaysInYear, 1 ) ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Schedule( LoopIndex ).Name ) + "\" has overlapping days in its schedule pointers", UnitNumber );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Schedule( LoopIndex ).Name + "\" has overlapping days in its schedule pointers", UnitNumber );
 				ErrorsFound = true;
 			}
 
@@ -983,7 +983,7 @@ namespace ScheduleManager {
 			GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -995,9 +995,9 @@ namespace ScheduleManager {
 			CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ).Name(), NumScheduleTypes );
 			if ( CheckIndex == 0 ) {
 				if ( ! lAlphaBlanks( 2 ) ) {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", " + trim( cAlphaFields( 2 ) ) + "=\"" + trim( Alphas( 2 ) ) + "\" not found -- will not be validated" );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
 				} else {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", Blank " + trim( cAlphaFields( 2 ) ) + " input -- will not be validated." );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", Blank " + cAlphaFields( 2 ) + " input -- will not be validated." );
 				}
 			} else {
 				Schedule( SchNum ).ScheduleTypePtr = CheckIndex;
@@ -1013,39 +1013,39 @@ namespace ScheduleManager {
 			FullYearSet = false;
 			Through: while ( NumField < NumAlphas ) {
 				//   Process "Through"
-				if ( Alphas( NumField )( 1, 8 ) != "THROUGH:" && Alphas( NumField )( 1, 7 ) != "THROUGH" ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Schedule( SchNum ).Name ) + "\", Expecting \"Through:\" date" );
-					ShowContinueError( "Instead, found entry=" + trim( Alphas( NumField ) ) );
+				if ( ! has_prefix( Alphas( NumField ), "THROUGH:" ) && ! has_prefix( Alphas( NumField ), "THROUGH" ) ) {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Schedule( SchNum ).Name + "\", Expecting \"Through:\" date" );
+					ShowContinueError( "Instead, found entry=" + Alphas( NumField ) );
 					ErrorsFound = true;
 					goto Through_exit;
 				} else {
-					if ( Alphas( NumField )( 8, 8 ) == ":" ) {
-						sPos = 9;
-					} else {
+					if ( Alphas( NumField )[ 7 ] == ':' ) {
 						sPos = 8;
+					} else {
+						sPos = 7;
 					}
-					Alphas( NumField ) = Alphas( NumField )( sPos );
-					Alphas( NumField ) = adjustl( Alphas( NumField ) );
+					Alphas( NumField ).erase( 0, sPos );
+					strip( Alphas( NumField ) );
 				}
 				CurrentThrough = Alphas( NumField );
 				ErrorHere = false;
 				ProcessDateString( Alphas( NumField ), EndMonth, EndDay, PWeekDay, PDateType, ErrorHere );
 				if ( PDateType > 1 ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Schedule( SchNum ).Name ) + "\", Invalid \"Through:\" date" );
-					ShowContinueError( "Found entry=" + trim( Alphas( NumField ) ) );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Schedule( SchNum ).Name + "\", Invalid \"Through:\" date" );
+					ShowContinueError( "Found entry=" + Alphas( NumField ) );
 					ErrorsFound = true;
 					goto Through_exit;
 				} else if ( ErrorHere ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Schedule( SchNum ).Name ) + "\", Invalid \"Through:\" date" );
-					ShowContinueError( "Found entry=" + trim( Alphas( NumField ) ) );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Schedule( SchNum ).Name + "\", Invalid \"Through:\" date" );
+					ShowContinueError( "Found entry=" + Alphas( NumField ) );
 					ErrorsFound = true;
 					goto Through_exit;
 				} else {
 					EndPointer = JulianDay( EndMonth, EndDay, 1 );
 					if ( EndPointer == 366 ) {
 						if ( FullYearSet ) {
-							ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Schedule( SchNum ).Name ) + "\", New \"Through\" entry when \"full year\" already set" );
-							ShowContinueError( "\"Through\" field=" + trim( CurrentThrough ) );
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Schedule( SchNum ).Name + "\", New \"Through\" entry when \"full year\" already set" );
+							ShowContinueError( "\"Through\" field=" + CurrentThrough );
 							ErrorsFound = true;
 						}
 						FullYearSet = true;
@@ -1054,8 +1054,8 @@ namespace ScheduleManager {
 				++WkCount;
 				++AddWeekSch;
 				gio::write( ExtraField, "*" ) << WkCount;
-				ExtraField = adjustl( ExtraField );
-				WeekSchedule( AddWeekSch ).Name = trim( Alphas( 1 ) ) + "_wk_" + trim( ExtraField );
+				strip( ExtraField );
+				WeekSchedule( AddWeekSch ).Name = Alphas( 1 ) + "_wk_" + ExtraField;
 				WeekSchedule( AddWeekSch ).Used = true;
 				for ( Hr = StartPointer; Hr <= EndPointer; ++Hr ) {
 					Schedule( SchNum ).WeekSchedulePointer( Hr ) = AddWeekSch;
@@ -1066,14 +1066,14 @@ namespace ScheduleManager {
 				AllDays = false;
 				++NumField;
 				For: while ( NumField < NumAlphas ) { // Continues until next "Through"
-					if ( Alphas( NumField )( 1, 7 ) == "THROUGH" ) goto For_exit;
+					if ( has_prefix( Alphas( NumField ), "THROUGH" ) ) goto For_exit;
 					//   "For" must be next, adds to "# Day Schedules"
-					if ( Alphas( NumField )( 1, 3 ) == "FOR" ) {
+					if ( has_prefix( Alphas( NumField ), "FOR" ) ) {
 						++DyCount;
 						++AddDaySch;
 						gio::write( ExtraField, "*" ) << DyCount;
-						ExtraField = adjustl( ExtraField );
-						DaySchedule( AddDaySch ).Name = trim( Alphas( 1 ) ) + "_dy_" + trim( ExtraField );
+						strip( ExtraField );
+						DaySchedule( AddDaySch ).Name = Alphas( 1 ) + "_dy_" + ExtraField;
 						DaySchedule( AddDaySch ).ScheduleTypePtr = Schedule( SchNum ).ScheduleTypePtr;
 						DaySchedule( AddDaySch ).Used = true;
 						TheseDays = false;
@@ -1081,8 +1081,8 @@ namespace ScheduleManager {
 						LastFor = Alphas( NumField );
 						ProcessForDayTypes( Alphas( NumField ), TheseDays, AllDays, ErrorHere );
 						if ( ErrorHere ) {
-							ShowContinueError( "ref " + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\"" );
-							ShowContinueError( "ref Through field=" + trim( Alphas( ThruField ) ) );
+							ShowContinueError( "ref " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"" );
+							ShowContinueError( "ref Through field=" + Alphas( ThruField ) );
 							ErrorsFound = true;
 						} else {
 							for ( Hr = 1; Hr <= MaxDayTypes; ++Hr ) {
@@ -1092,7 +1092,7 @@ namespace ScheduleManager {
 							}
 						}
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", Looking for \"For\" field, found=" + trim( Alphas( NumField ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", Looking for \"For\" field, found=" + Alphas( NumField ) );
 						ErrorsFound = true;
 						//          CALL ShowSevereError(RoutineName//TRIM(CurrentModuleObject)//'="'//TRIM(Schedule(SchNum)%Name)//  &
 						//               '", Expecting "For:" day types')
@@ -1101,21 +1101,21 @@ namespace ScheduleManager {
 					}
 					// Check for "Interpolate"
 					++NumField;
-					if ( Alphas( NumField )( 1, 11 ) == "INTERPOLATE" ) {
-						if ( index( Alphas( NumField ), "YES" ) > 0 ) {
+					if ( has_prefix( Alphas( NumField ), "INTERPOLATE" ) ) {
+						if ( has( Alphas( NumField ), "YES" ) ) {
 							DaySchedule( AddDaySch ).IntervalInterpolated = true;
 						} else {
 							DaySchedule( AddDaySch ).IntervalInterpolated = false;
 						}
 						++NumField;
 					} else {
-						if ( Alphas( NumField )( 1, 5 ) != "UNTIL" ) {
-							if ( index( Alphas( NumField ), "YES" ) > 0 ) {
+						if ( ! has_prefix( Alphas( NumField ), "UNTIL" ) ) {
+							if ( has( Alphas( NumField ), "YES" ) ) {
 								DaySchedule( AddDaySch ).IntervalInterpolated = true;
-							} else if ( index( Alphas( NumField ), "NO" ) > 0 ) {
+							} else if ( has( Alphas( NumField ), "NO" ) ) {
 								DaySchedule( AddDaySch ).IntervalInterpolated = false;
 							} else {
-								ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", Illegal Field entered =" + trim( Alphas( NumField ) ) );
+								ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", Illegal Field entered =" + Alphas( NumField ) );
 								ErrorsFound = true;
 							}
 							++NumField;
@@ -1125,23 +1125,23 @@ namespace ScheduleManager {
 					xxcount = 0;
 					UntilFld = NumField;
 					Until: while ( true ) {
-						if ( Alphas( NumField )( 1, 3 ) == "FOR" ) goto Until_exit;
-						if ( Alphas( NumField )( 1, 7 ) == "THROUGH" ) goto Until_exit;
-						if ( Alphas( NumField )( 1, 5 ) == "UNTIL" ) {
+						if ( has_prefix( Alphas( NumField ), "FOR" ) ) goto Until_exit;
+						if ( has_prefix( Alphas( NumField ), "THROUGH" ) ) goto Until_exit;
+						if ( has_prefix( Alphas( NumField ), "UNTIL" ) ) {
 							// Process Until/Value pairs for later processing by other routine.
 							++NumField;
 							++xxcount;
 							++NumNumbers;
 							Numbers( NumNumbers ) = ProcessNumber( Alphas( NumField ), ErrorHere );
 							if ( ErrorHere ) {
-								ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\"" );
-								ShowContinueError( "Until field=[" + trim( Alphas( NumField - 1 ) ) + "] has illegal value field=[" + trim( Alphas( NumField ) ) + "]." );
+								ShowSevereError( CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"" );
+								ShowContinueError( "Until field=[" + Alphas( NumField - 1 ) + "] has illegal value field=[" + Alphas( NumField ) + "]." );
 								ErrorsFound = true;
 							}
 							++NumField;
 							Alphas( UntilFld + xxcount ) = Alphas( NumField ); // Incase next is "until"
 						} else {
-							ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", Looking for \"Until\" field, found=" + trim( Alphas( NumField ) ) );
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", Looking for \"Until\" field, found=" + Alphas( NumField ) );
 							ErrorsFound = true;
 							goto Through_exit;
 						}
@@ -1153,10 +1153,10 @@ namespace ScheduleManager {
 					if ( NumNumbers > 0 ) {
 						NumFields = NumNumbers;
 						ErrorHere = false;
-						ProcessIntervalFields( Alphas( {UntilFld,_} ), Numbers, NumFields, NumNumbers, MinuteValue, SetMinuteValue, ErrorHere, DaySchedule( AddDaySch ).Name, trim( CurrentModuleObject ) + " DaySchedule Fields" );
+						ProcessIntervalFields( Alphas( {UntilFld,_} ), Numbers, NumFields, NumNumbers, MinuteValue, SetMinuteValue, ErrorHere, DaySchedule( AddDaySch ).Name, CurrentModuleObject + " DaySchedule Fields" );
 						// Depending on value of "Interpolate" field, the value for each time step in each hour gets processed:
 						if ( ErrorHere ) {
-							ShowContinueError( "ref " + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\"" );
+							ShowContinueError( "ref " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"" );
 							ErrorsFound = true;
 						}
 						if ( ! DaySchedule( AddDaySch ).IntervalInterpolated ) { // No validation done on the value of the interpolation field
@@ -1184,15 +1184,16 @@ namespace ScheduleManager {
 				}
 				For_exit: ;
 				if ( ! all( AllDays ) ) {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Schedule( SchNum ).Name ) + "\" has missing day types in Through=" + trim( CurrentThrough ) );
-					ShowContinueError( "Last \"For\" field=" + trim( LastFor ) );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Schedule( SchNum ).Name + "\" has missing day types in Through=" + CurrentThrough );
+					ShowContinueError( "Last \"For\" field=" + LastFor );
 					errmsg = "Missing day types=,";
 					for ( kdy = 1; kdy <= MaxDayTypes; ++kdy ) {
 						if ( AllDays( kdy ) ) continue;
-						errmsg = errmsg( 1, len_trim( errmsg ) - 1 ) + "\"" + trim( ValidDayTypes( kdy ) ) + "\",-";
+						errmsg.erase( errmsg.length() - 1 );
+						errmsg += "\"" + ValidDayTypes( kdy ) + "\",-";
 					}
-					errmsg = errmsg( 1, len_trim( errmsg ) - 2 );
-					ShowContinueError( trim( errmsg ) );
+					errmsg.erase( errmsg.length() - 2 );
+					ShowContinueError( errmsg );
 					ShowContinueError( "Missing day types will have 0.0 as Schedule Values" );
 				}
 				Through_loop: ;
@@ -1203,11 +1204,11 @@ namespace ScheduleManager {
 				Schedule( LoopIndex ).WeekSchedulePointer( 60 ) = Schedule( LoopIndex ).WeekSchedulePointer( 59 );
 			}
 			if ( any_eq( DaysInYear, 0 ) ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Schedule( SchNum ).Name ) + "\" has missing days in its schedule pointers", UnitNumber );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Schedule( SchNum ).Name + "\" has missing days in its schedule pointers", UnitNumber );
 				ErrorsFound = true;
 			}
 			if ( any_gt( DaysInYear, 1 ) ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Schedule( SchNum ).Name ) + "\" has overlapping days in its schedule pointers", UnitNumber );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Schedule( SchNum ).Name + "\" has overlapping days in its schedule pointers", UnitNumber );
 				ErrorsFound = true;
 			}
 
@@ -1274,7 +1275,7 @@ namespace ScheduleManager {
 			GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1288,9 +1289,9 @@ namespace ScheduleManager {
 				if ( ! lAlphaBlanks( 2 ) ) CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ).Name(), NumScheduleTypes );
 				if ( CheckIndex == 0 ) {
 					if ( ! lAlphaBlanks( 2 ) ) {
-						ShowWarningError( "ProcessScheduleInput: For " + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", " + trim( cAlphaFields( 2 ) ) + "=\"" + trim( Alphas( 2 ) ) + "\" not found -- will not be validated" );
+						ShowWarningError( "ProcessScheduleInput: For " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
 					} else {
-						ShowWarningError( "For " + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", Blank " + trim( cAlphaFields( 2 ) ) + " input -- will not be validated." );
+						ShowWarningError( "For " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", Blank " + cAlphaFields( 2 ) + " input -- will not be validated." );
 					}
 				} else {
 					Schedule( SchNum ).ScheduleTypePtr = CheckIndex;
@@ -1304,8 +1305,8 @@ namespace ScheduleManager {
 			skiprowCount = Numbers( 2 );
 			if ( Numbers( 3 ) == 0 ) Numbers( 3 ) = 8760.0;
 			if ( Numbers( 3 ) != 8760 && Numbers( 3 ) != 8784 ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", " + trim( cNumericFields( 3 ) ) + " must = 8760 or 8784 (for a leap year)" );
-				ShowContinueError( "..Value for field = " + trim( TrimSigDigits( Numbers( 3 ), 0 ) ) + ", Schedule not processed." );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cNumericFields( 3 ) + " must = 8760 or 8784 (for a leap year)" );
+				ShowContinueError( "..Value for field = " + TrimSigDigits( Numbers( 3 ), 0 ) + ", Schedule not processed." );
 				ErrorsFound = true;
 				continue;
 			}
@@ -1320,7 +1321,7 @@ namespace ScheduleManager {
 			} else if ( SameString( Alphas( 4 ), "space" ) ) {
 				ColumnSep = CharSpace;
 			} else {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", " + trim( cAlphaFields( 4 ) ) + " illegal value=\"" + trim( Alphas( 4 ) ) + "\"." );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 4 ) + " illegal value=\"" + Alphas( 4 ) + "\"." );
 				ShowContinueError( "..must be Comma, Semicolon, Tab, or Space." );
 				ErrorsFound = true;
 				continue;
@@ -1330,7 +1331,7 @@ namespace ScheduleManager {
 			FileIntervalInterpolated = false;
 			if ( lAlphaBlanks( 5 ) ) Alphas( 5 ) = "NO";
 			if ( Alphas( 5 ) != "NO" && Alphas( 5 ) != "YES" ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "Invalid value for \"" + trim( cAlphaFields( 5 ) ) + "\" field=\"" + trim( Alphas( 5 ) ) + "\"" );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "Invalid value for \"" + cAlphaFields( 5 ) + "\" field=\"" + Alphas( 5 ) + "\"" );
 				ErrorsFound = true;
 			} else if ( Alphas( 5 ) != "YES" ) { // No validation done on the value of the interpolation field
 				FileIntervalInterpolated = false;
@@ -1344,8 +1345,8 @@ namespace ScheduleManager {
 				MinutesPerItem = int( Numbers( 4 ) );
 				NumExpectedItems = 1440 / MinutesPerItem;
 				if ( mod( 60, MinutesPerItem ) != 0 ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) );
-					ShowContinueError( "Requested " + trim( cNumericFields( 4 ) ) + " field value (" + trim( RoundSigDigits( MinutesPerItem ) ) + ") not evenly divisible into 60" );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) );
+					ShowContinueError( "Requested " + cNumericFields( 4 ) + " field value (" + RoundSigDigits( MinutesPerItem ) + ") not evenly divisible into 60" );
 					ErrorsFound = true;
 					continue;
 				}
@@ -1396,8 +1397,8 @@ namespace ScheduleManager {
 			// Setup file reading parameters
 			StripCR = false;
 			if ( ! FileExists ) {
-				DisplayString( "Missing " + trim( Alphas( 3 ) ) );
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", " + trim( cAlphaFields( 3 ) ) + "=\"" + trim( Alphas( 3 ) ) + "\" not found." );
+				DisplayString( "Missing " + Alphas( 3 ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 3 ) + "=\"" + Alphas( 3 ) + "\" not found." );
 				ShowContinueError( "Certain run environments require a full path to be included with the file name in the input field." );
 				ShowContinueError( "Try again with putting full path and file name in the field." );
 				ErrorsFound = true;
@@ -1405,21 +1406,21 @@ namespace ScheduleManager {
 				SchdFile = GetNewUnitNumber();
 				{ IOFlags flags; flags.ACTION( "read" ); gio::open( SchdFile, TempFullFileName, flags ); read_stat = flags.ios(); }
 				if ( read_stat != 0 ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", " + trim( cAlphaFields( 3 ) ) + "=\"" + trim( Alphas( 3 ) ) + "\" cannot be opened." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 3 ) + "=\"" + Alphas( 3 ) + "\" cannot be opened." );
 					ShowContinueError( "... It may be open in another program (such as Excel).  Please close and try again." );
 					ShowFatalError( "Program terminates due to previous condition." );
 				}
 				// check for stripping
 				{ IOFlags flags; gio::read( SchdFile, "(A)", flags ) >> LineIn; read_stat = flags.ios(); }
-				endLine = len_trim( LineIn );
+				endLine = len( LineIn );
 				if ( endLine > 0 ) {
-					if ( ichar( LineIn( endLine, endLine ) ) == iASCII_CR ) {
+					if ( int( LineIn[ endLine - 1 ] ) == iASCII_CR ) {
 						StripCR = true;
-						LineIn( endLine, endLine ) = Blank;
+						LineIn.erase( endLine - 1 );
 					}
-					if ( ichar( LineIn( endLine, endLine ) ) == iUnicode_end ) {
+					if ( int( LineIn[ endLine - 1 ] ) == iUnicode_end ) {
 						gio::close( SchdFile );
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", " + trim( cAlphaFields( 3 ) ) + "=\"" + trim( Alphas( 3 ) ) + " appears to be a Unicode or binary file." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 3 ) + "=\"" + Alphas( 3 ) + " appears to be a Unicode or binary file." );
 						ShowContinueError( "...This file cannot be read by this program. Please save as PC or Unix file and try again" );
 						ShowFatalError( "Program terminates due to previous condition." );
 					}
@@ -1434,9 +1435,9 @@ namespace ScheduleManager {
 					while ( read_stat == 0 ) { //end of file
 						{ IOFlags flags; gio::read( SchdFile, "(A)", flags ) >> LineIn; read_stat = flags.ios(); }
 						if ( StripCR ) {
-							endLine = len_trim( LineIn );
+							endLine = len( LineIn );
 							if ( endLine > 0 ) {
-								if ( ichar( LineIn( endLine, endLine ) ) == iASCII_CR ) LineIn( endLine, endLine ) = Blank;
+								if ( int( LineIn[ endLine - 1 ] ) == iASCII_CR ) LineIn.erase( endLine - 1 );
 							}
 						}
 						++rowCnt;
@@ -1453,38 +1454,38 @@ namespace ScheduleManager {
 				while ( read_stat == 0 ) { //end of file
 					{ IOFlags flags; gio::read( SchdFile, "(A)", flags ) >> LineIn; read_stat = flags.ios(); }
 					if ( StripCR ) {
-						endLine = len_trim( LineIn );
+						endLine = len( LineIn );
 						if ( endLine > 0 ) {
-							if ( ichar( LineIn( endLine, endLine ) ) == iASCII_CR ) LineIn( endLine, endLine ) = Blank;
+							if ( int( LineIn[ endLine - 1 ] ) == iASCII_CR ) LineIn.erase( endLine - 1 );
 						}
 					}
 					++rowCnt;
 					colCnt = 0;
-					wordStart = 1;
+					wordStart = 0;
 					columnValue = 0.0;
 					//scan through the line looking for a specific column
 					while ( true ) {
 						sepPos = index( LineIn, ColumnSep );
 						++colCnt;
-						if ( sepPos > 0 ) {
-							if ( sepPos > 1 ) {
+						if ( sepPos != std::string::npos ) {
+							if ( sepPos > 0 ) {
 								wordEnd = sepPos - 1;
 							} else {
 								wordEnd = wordStart;
 							}
-							subString = trim( LineIn( wordStart, wordEnd ) );
+							subString = LineIn.substr( wordStart, wordEnd - wordStart + 1 );
 							//the next word will start after the comma
 							wordStart = sepPos + 1;
 							//get rid of separator so next INDEX will find next separator
-							LineIn = LineIn( wordStart );
+							LineIn.erase( 0, wordStart );
 							firstLine = false;
-							wordStart = 1;
+							wordStart = 0;
 						} else {
 							//no more commas
-							subString = LineIn( wordStart );
+							subString = LineIn.substr( wordStart );
 							if ( firstLine && subString == Blank ) {
-								ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\" first line does not contain the indicated column separator=" + trim( Alphas( 4 ) ) + "." );
-								ShowContinueError( "...first 40 characters of line=[" + trim( LineIn( 1, 40 ) ) + "]" );
+								ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\" first line does not contain the indicated column separator=" + Alphas( 4 ) + '.' );
+								ShowContinueError( "...first 40 characters of line=[" + LineIn.substr( 0, 40 ) + ']' );
 								firstLine = false;
 							}
 							break;
@@ -1508,16 +1509,16 @@ namespace ScheduleManager {
 				// schedule values have been filled into the hourlyFileValues array.
 
 				if ( numerrors > 0 ) {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\" " + trim( RoundSigDigits( numerrors ) ) + " records had errors - these values are set to 0." );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\" " + RoundSigDigits( numerrors ) + " records had errors - these values are set to 0." );
 					ShowContinueError( "Use Output:Diagnostics,DisplayExtraWarnings; to see individual records in error." );
 				}
 				if ( rowCnt < rowLimitCount ) {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\" less than " + trim( RoundSigDigits( numHourlyValues ) ) + " hourly values read from file." );
-					ShowContinueError( "..Number read=" + trim( TrimSigDigits( ( rowCnt * 60 ) / MinutesPerItem ) ) + "." );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\" less than " + RoundSigDigits( numHourlyValues ) + " hourly values read from file." );
+					ShowContinueError( "..Number read=" + TrimSigDigits( ( rowCnt * 60 ) / MinutesPerItem ) + '.' );
 				}
 				if ( rowCnt < rowLimitCount ) {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\" less than specified hourly values read from file." );
-					ShowContinueError( "..Specified Number of Hourly Values=" + trim( TrimSigDigits( numHourlyValues ) ) + " Actual number of hourly values included=" + trim( TrimSigDigits( ( rowCnt * 60 ) / MinutesPerItem ) ) );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\" less than specified hourly values read from file." );
+					ShowContinueError( "..Specified Number of Hourly Values=" + TrimSigDigits( numHourlyValues ) + " Actual number of hourly values included=" + TrimSigDigits( ( rowCnt * 60 ) / MinutesPerItem ) );
 				}
 				// process the data into the normal schedule data structures
 				// note -- schedules are ALWAYS 366 days so some special measures have to be done at 29 Feb "day of year" (60)
@@ -1535,13 +1536,13 @@ namespace ScheduleManager {
 					++AddWeekSch;
 					++AddDaySch;
 					// define week schedule
-					WeekSchedule( AddWeekSch ).Name = trim( Alphas( 1 ) ) + "_wk_" + ExtraField;
+					WeekSchedule( AddWeekSch ).Name = Alphas( 1 ) + "_wk_" + ExtraField;
 					// for all day types point the week schedule to the newly defined day schedule
 					for ( kDayType = 1; kDayType <= MaxDayTypes; ++kDayType ) {
 						WeekSchedule( AddWeekSch ).DaySchedulePointer( kDayType ) = AddDaySch;
 					}
 					// day schedule
-					DaySchedule( AddDaySch ).Name = trim( Alphas( 1 ) ) + "_dy_" + ExtraField;
+					DaySchedule( AddDaySch ).Name = Alphas( 1 ) + "_dy_" + ExtraField;
 					DaySchedule( AddDaySch ).ScheduleTypePtr = Schedule( SchNum ).ScheduleTypePtr;
 					// schedule is pointing to the week schedule
 					Schedule( SchNum ).WeekSchedulePointer( iDay ) = AddWeekSch;
@@ -1609,7 +1610,7 @@ namespace ScheduleManager {
 			GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1622,9 +1623,9 @@ namespace ScheduleManager {
 				CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ).Name(), NumScheduleTypes );
 				if ( CheckIndex == 0 ) {
 					if ( ! lAlphaBlanks( 2 ) ) {
-						ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", " + trim( cAlphaFields( 2 ) ) + "=\"" + trim( Alphas( 2 ) ) + "\" not found -- will not be validated" );
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
 					} else {
-						ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", Blank " + trim( cAlphaFields( 2 ) ) + " input -- will not be validated." );
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", Blank " + cAlphaFields( 2 ) + " input -- will not be validated." );
 					}
 				} else {
 					Schedule( SchNum ).ScheduleTypePtr = CheckIndex;
@@ -1633,13 +1634,13 @@ namespace ScheduleManager {
 			++AddWeekSch;
 			++AddDaySch;
 			// define week schedule
-			WeekSchedule( AddWeekSch ).Name = trim( Alphas( 1 ) ) + "_wk_";
+			WeekSchedule( AddWeekSch ).Name = Alphas( 1 ) + "_wk_";
 			// for all day types point the week schedule to the newly defined day schedule
 			for ( kDayType = 1; kDayType <= MaxDayTypes; ++kDayType ) {
 				WeekSchedule( AddWeekSch ).DaySchedulePointer( kDayType ) = AddDaySch;
 			}
 			// day schedule
-			DaySchedule( AddDaySch ).Name = trim( Alphas( 1 ) ) + "_dy_";
+			DaySchedule( AddDaySch ).Name = Alphas( 1 ) + "_dy_";
 			DaySchedule( AddDaySch ).ScheduleTypePtr = Schedule( SchNum ).ScheduleTypePtr;
 			// schedule is pointing to the week schedule
 			Schedule( SchNum ).WeekSchedulePointer = AddWeekSch;
@@ -1658,7 +1659,7 @@ namespace ScheduleManager {
 			IsNotOK = false;
 			IsBlank = false;
 
-			VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" ); // Bug fix
+			VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" ); // Bug fix
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1671,21 +1672,21 @@ namespace ScheduleManager {
 			CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ).Name(), NumScheduleTypes );
 			if ( CheckIndex == 0 ) {
 				if ( ! lAlphaBlanks( 2 ) ) {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", " + trim( cAlphaFields( 2 ) ) + "=\"" + trim( Alphas( 2 ) ) + "\" not found -- will not be validated" );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
 				} else {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", Blank " + trim( cAlphaFields( 2 ) ) + " input -- will not be validated." );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", Blank " + cAlphaFields( 2 ) + " input -- will not be validated." );
 				}
 			} else {
 				Schedule( SchNum ).ScheduleTypePtr = CheckIndex;
 			}
 			++AddWeekSch;
-			WeekSchedule( AddWeekSch ).Name = trim( Alphas( 1 ) );
+			WeekSchedule( AddWeekSch ).Name = Alphas( 1 );
 			WeekSchedule( AddWeekSch ).Used = true;
 			for ( Hr = 1; Hr <= 366; ++Hr ) {
 				Schedule( SchNum ).WeekSchedulePointer( Hr ) = AddWeekSch;
 			}
 			++AddDaySch;
-			DaySchedule( AddDaySch ).Name = trim( Alphas( 1 ) );
+			DaySchedule( AddDaySch ).Name = Alphas( 1 );
 			DaySchedule( AddDaySch ).ScheduleTypePtr = Schedule( SchNum ).ScheduleTypePtr;
 			DaySchedule( AddDaySch ).Used = true;
 			for ( Hr = 1; Hr <= MaxDayTypes; ++Hr ) {
@@ -1694,7 +1695,7 @@ namespace ScheduleManager {
 			//   Initialize the ExternalInterface day schedule for the ExternalInterface compact schedule.
 			//   It will be overwritten during run time stepping after the warm up period
 			if ( NumNumbers < 1 ) {
-				ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", initial value is not numeric or is missing. Fix idf file." );
+				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", initial value is not numeric or is missing. Fix idf file." );
 				NumErrorFlag = true;
 			}
 			ExternalInterfaceSetSchedule( AddDaySch, Numbers( 1 ) );
@@ -1709,9 +1710,9 @@ namespace ScheduleManager {
 			IsBlank = false;
 
 			if ( NumExternalInterfaceSchedules >= 1 ) {
-				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, "The schedule object with the name \"" + trim( Alphas( 1 ) ) + "\" is defined as an ExternalInterface:Schedule and " "ExternalInterface:FunctionalMockupUnitImport:To:Schedule. This will cause the schedule to be overwritten" " by PtolemyServer and FunctionalMockUpUnitImport." );
+				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, "The schedule object with the name \"" + Alphas( 1 ) + "\" is defined as an ExternalInterface:Schedule and " "ExternalInterface:FunctionalMockupUnitImport:To:Schedule. This will cause the schedule to be overwritten" " by PtolemyServer and FunctionalMockUpUnitImport." );
 			} else {
-				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			}
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -1726,21 +1727,21 @@ namespace ScheduleManager {
 			CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ).Name(), NumScheduleTypes );
 			if ( CheckIndex == 0 ) {
 				if ( ! lAlphaBlanks( 2 ) ) {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", " + trim( cAlphaFields( 2 ) ) + "=\"" + trim( Alphas( 2 ) ) + "\" not found -- will not be validated" );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
 				} else {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", Blank " + trim( cAlphaFields( 2 ) ) + " input -- will not be validated." );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", Blank " + cAlphaFields( 2 ) + " input -- will not be validated." );
 				}
 			} else {
 				Schedule( SchNum ).ScheduleTypePtr = CheckIndex;
 			}
 			++AddWeekSch;
-			WeekSchedule( AddWeekSch ).Name = trim( Alphas( 1 ) );
+			WeekSchedule( AddWeekSch ).Name = Alphas( 1 );
 			WeekSchedule( AddWeekSch ).Used = true;
 			for ( Hr = 1; Hr <= 366; ++Hr ) {
 				Schedule( SchNum ).WeekSchedulePointer( Hr ) = AddWeekSch;
 			}
 			++AddDaySch;
-			DaySchedule( AddDaySch ).Name = trim( Alphas( 1 ) );
+			DaySchedule( AddDaySch ).Name = Alphas( 1 );
 			DaySchedule( AddDaySch ).ScheduleTypePtr = Schedule( SchNum ).ScheduleTypePtr;
 			DaySchedule( AddDaySch ).Used = true;
 			for ( Hr = 1; Hr <= MaxDayTypes; ++Hr ) {
@@ -1749,7 +1750,7 @@ namespace ScheduleManager {
 			//   Initialize the ExternalInterface day schedule for the ExternalInterface compact schedule.
 			//   It will be overwritten during run time stepping after the warm up period
 			if ( NumNumbers < 1 ) {
-				ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", initial value is not numeric or is missing. Fix idf file." );
+				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", initial value is not numeric or is missing. Fix idf file." );
 				NumErrorFlag = true;
 			}
 			ExternalInterfaceSetSchedule( AddDaySch, Numbers( 1 ) );
@@ -1765,9 +1766,9 @@ namespace ScheduleManager {
 			IsBlank = false;
 
 			if ( NumExternalInterfaceSchedules >= 1 ) {
-				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, "The schedule object with the name \"" + trim( Alphas( 1 ) ) + "\" is defined as an ExternalInterface:Schedule and " "ExternalInterface:FunctionalMockupUnitExport:To:Schedule. This will cause the schedule to be overwritten" " by PtolemyServer and FunctionalMockUpUnitExport." );
+				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, "The schedule object with the name \"" + Alphas( 1 ) + "\" is defined as an ExternalInterface:Schedule and " "ExternalInterface:FunctionalMockupUnitExport:To:Schedule. This will cause the schedule to be overwritten" " by PtolemyServer and FunctionalMockUpUnitExport." );
 			} else {
-				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			}
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -1782,21 +1783,21 @@ namespace ScheduleManager {
 			CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ).Name(), NumScheduleTypes );
 			if ( CheckIndex == 0 ) {
 				if ( ! lAlphaBlanks( 2 ) ) {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", " + trim( cAlphaFields( 2 ) ) + "=\"" + trim( Alphas( 2 ) ) + "\" not found -- will not be validated" );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
 				} else {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", Blank " + trim( cAlphaFields( 2 ) ) + " input -- will not be validated." );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", Blank " + cAlphaFields( 2 ) + " input -- will not be validated." );
 				}
 			} else {
 				Schedule( SchNum ).ScheduleTypePtr = CheckIndex;
 			}
 			++AddWeekSch;
-			WeekSchedule( AddWeekSch ).Name = trim( Alphas( 1 ) );
+			WeekSchedule( AddWeekSch ).Name = Alphas( 1 );
 			WeekSchedule( AddWeekSch ).Used = true;
 			for ( Hr = 1; Hr <= 366; ++Hr ) {
 				Schedule( SchNum ).WeekSchedulePointer( Hr ) = AddWeekSch;
 			}
 			++AddDaySch;
-			DaySchedule( AddDaySch ).Name = trim( Alphas( 1 ) );
+			DaySchedule( AddDaySch ).Name = Alphas( 1 );
 			DaySchedule( AddDaySch ).ScheduleTypePtr = Schedule( SchNum ).ScheduleTypePtr;
 			DaySchedule( AddDaySch ).Used = true;
 			for ( Hr = 1; Hr <= MaxDayTypes; ++Hr ) {
@@ -1805,7 +1806,7 @@ namespace ScheduleManager {
 			//   Initialize the ExternalInterface day schedule for the ExternalInterface compact schedule.
 			//   It will be overwritten during run time stepping after the warm up period
 			if ( NumNumbers < 1 ) {
-				ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", initial value is not numeric or is missing. Fix idf file." );
+				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", initial value is not numeric or is missing. Fix idf file." );
 				NumErrorFlag = true;
 			}
 			ExternalInterfaceSetSchedule( AddDaySch, Numbers( 1 ) );
@@ -1817,8 +1818,8 @@ namespace ScheduleManager {
 			NumPointer = Schedule( SchNum ).ScheduleTypePtr;
 			if ( ! ScheduleType( NumPointer ).Limited ) continue;
 			if ( CheckScheduleValueMinMax( SchNum, ">=", ScheduleType( NumPointer ).Minimum, "<=", ScheduleType( NumPointer ).Maximum ) ) continue;
-			ShowSevereError( RoutineName + "Schedule=\"" + trim( Schedule( SchNum ).Name ) + "\" has values outside its Schedule Type (" + trim( ScheduleType( NumPointer ).Name ) + ") range" );
-			ShowContinueError( "  Minimum should be >=" + trim( RoundSigDigits( ScheduleType( NumPointer ).Minimum, 3 ) ) + " and Maximum should be <=" + trim( RoundSigDigits( ScheduleType( NumPointer ).Maximum, 3 ) ) );
+			ShowSevereError( RoutineName + "Schedule=\"" + Schedule( SchNum ).Name + "\" has values outside its Schedule Type (" + ScheduleType( NumPointer ).Name + ") range" );
+			ShowContinueError( "  Minimum should be >=" + RoundSigDigits( ScheduleType( NumPointer ).Minimum, 3 ) + " and Maximum should be <=" + RoundSigDigits( ScheduleType( NumPointer ).Maximum, 3 ) );
 			ErrorsFound = true;
 		}
 
@@ -1899,18 +1900,18 @@ namespace ScheduleManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_Fstring const Months( 12, sFstring( 3 ), { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" } );
-		static FArray1D_Fstring const HrField( {0,24}, sFstring( 2 ), { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24" } );
-		static Fstring const SchTFmt0( "('! Schedule Details Report=',A,' =====================')" );
-		static Fstring const SchTFmt( "('! <ScheduleType>,Name,Limited? {Yes/No},Minimum,Maximum,',   'Continuous? {Yes/No - Discrete}')" );
-		static Fstring const SchSFmt( "('! <Schedule>,Name,ScheduleType,{Until Date,WeekSchedule}** Repeated until Dec 31')" );
-		static Fstring const SchTFmtdata( "('ScheduleTypeLimits',5(',',A))" );
-		static Fstring const SchWFmtdata( "('Schedule:Week:Daily',',',A,$)" );
-		static Fstring const fmta( "(A)" );
-		static Fstring const CMinFmt( "(I2.2)" );
-		static Fstring const ThruFmt( "(',Through ',A,1X,I2.2,',',A)" );
-		static Fstring const SchDFmt0( "('! <DaySchedule>,Name,ScheduleType,Interpolated {Yes/No},Time (HH:MM) =>',$)" );
-		static Fstring const SchDFmtdata0( "('DaySchedule,',A,',',A,',',A,',',A,$)" );
+		static FArray1D_string const Months( 12, { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" } );
+		static FArray1D_string const HrField( {0,24}, { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24" } );
+		static gio::Fmt const SchTFmt0( "('! Schedule Details Report=',A,' =====================')" );
+		static gio::Fmt const SchTFmt( "('! <ScheduleType>,Name,Limited? {Yes/No},Minimum,Maximum,',   'Continuous? {Yes/No - Discrete}')" );
+		static gio::Fmt const SchSFmt( "('! <Schedule>,Name,ScheduleType,{Until Date,WeekSchedule}** Repeated until Dec 31')" );
+		static gio::Fmt const SchTFmtdata( "('ScheduleTypeLimits',5(',',A))" );
+		static gio::Fmt const SchWFmtdata( "('Schedule:Week:Daily',',',A,$)" );
+		static gio::Fmt const fmta( "(A)" );
+		static gio::Fmt const CMinFmt( "(I2.2)" );
+		static gio::Fmt const ThruFmt( "(',Through ',A,1X,I2.2,',',A)" );
+		static gio::Fmt const SchDFmt0( "('! <DaySchedule>,Name,ScheduleType,Interpolated {Yes/No},Time (HH:MM) =>',$)" );
+		static gio::Fmt const SchDFmtdata0( "('DaySchedule,',A,',',A,',',A,',',A,$)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1929,17 +1930,17 @@ namespace ScheduleManager {
 		int iDay;
 		int DT;
 		int iDayP;
-		FArray1D_Fstring ShowMinute( sFstring( 2 ) );
+		FArray1D_string ShowMinute;
 		int CurMinute;
-		FArray1D_Fstring TimeHHMM( sFstring( 5 ) );
-		static Fstring SchWFmt( 500, "('! <WeekSchedule>,Name" );
-		static Fstring SchDFmt( 100 );
-		static Fstring SchDFmtdata( 100 );
-		Fstring YesNo1( 3 );
-		Fstring YesNo2( 3 );
-		Fstring Num1( 32 );
-		Fstring Num2( 32 );
-		FArray2D_Fstring RoundTSValue( sFstring( 32 ) );
+		FArray1D_string TimeHHMM;
+		std::string SchWFmt( "('! <WeekSchedule>,Name" );
+		std::string SchDFmt;
+		std::string SchDFmtdata;
+		std::string YesNo1;
+		std::string YesNo2;
+		std::string Num1;
+		std::string Num2;
+		FArray2D_string RoundTSValue;
 
 		ShowMinute.allocate( NumOfTimeStepInHour );
 		TimeHHMM.allocate( NumOfTimeStepInHour * 24 );
@@ -1962,11 +1963,11 @@ namespace ScheduleManager {
 			for ( Hr = 1; Hr <= 24; ++Hr ) {
 				if ( LevelOfDetail == 2 ) {
 					for ( TS = 1; TS <= NumOfTimeStepInHour - 1; ++TS ) {
-						TimeHHMM( NumF ) = HrField( Hr - 1 ) + ":" + ShowMinute( TS );
+						TimeHHMM( NumF ) = HrField( Hr - 1 ) + ':' + ShowMinute( TS );
 						++NumF;
 					}
 				}
-				TimeHHMM( NumF ) = HrField( Hr ) + ":" + ShowMinute( NumOfTimeStepInHour );
+				TimeHHMM( NumF ) = HrField( Hr ) + ':' + ShowMinute( NumOfTimeStepInHour );
 				++NumF;
 			}
 			--NumF;
@@ -1979,9 +1980,9 @@ namespace ScheduleManager {
 			} else {
 				gio::write( OutputFileInits, SchTFmt0 ) << "Timestep";
 				gio::write( Num1, "*" ) << NumOfTimeStepInHour * 24;
-				Num1 = adjustl( Num1 );
-				SchDFmt = "(" + trim( Num1 ) + ",',',A,$)";
-				SchDFmtdata = "(" + trim( Num1 ) + ",',',A,$)";
+				strip( Num1 );
+				SchDFmt = "(" + Num1 + ",',',A,$)";
+				SchDFmtdata = "(" + Num1 + ",',',A,$)";
 			}
 
 			gio::write( OutputFileInits, SchTFmt );
@@ -1997,9 +1998,9 @@ namespace ScheduleManager {
 			} gio::write( OutputFileInits );
 			// SchWFmt Header (WeekSchedule)
 			for ( Count = 1; Count <= MaxDayTypes; ++Count ) {
-				SchWFmt = trim( SchWFmt ) + "," + trim( ValidDayTypes( Count ) );
+				SchWFmt += "," + ValidDayTypes( Count );
 			}
-			SchWFmt = trim( SchWFmt ) + "')";
+			SchWFmt += "')";
 			gio::write( OutputFileInits, SchWFmt );
 			gio::write( OutputFileInits, SchSFmt );
 
@@ -2007,17 +2008,17 @@ namespace ScheduleManager {
 				if ( ScheduleType( Count ).Limited ) {
 					YesNo1 = "Yes";
 					Num1 = RoundSigDigits( ScheduleType( Count ).Minimum, 2 );
-					Num1 = adjustl( Num1 );
+					strip( Num1 );
 					Num2 = RoundSigDigits( ScheduleType( Count ).Maximum, 2 );
-					Num2 = adjustl( Num2 );
+					strip( Num2 );
 					if ( ScheduleType( Count ).IsReal ) {
 						YesNo2 = "Yes";
 					} else {
 						YesNo2 = "No";
 						gio::write( Num1, "*" ) << int( ScheduleType( Count ).Minimum );
-						Num1 = adjustl( Num1 );
+						strip( Num1 );
 						gio::write( Num2, "*" ) << int( ScheduleType( Count ).Maximum );
-						Num2 = adjustl( Num2 );
+						strip( Num2 );
 					}
 				} else {
 					YesNo1 = "No";
@@ -2025,7 +2026,7 @@ namespace ScheduleManager {
 					Num2 = "N/A";
 					YesNo2 = "N/A";
 				}
-				gio::write( OutputFileInits, SchTFmtdata ) << trim( ScheduleType( Count ).Name ) << trim( YesNo1 ) << trim( Num1 ) << trim( Num2 ) << trim( YesNo2 );
+				gio::write( OutputFileInits, SchTFmtdata ) << ScheduleType( Count ).Name << YesNo1 << Num1 << Num2 << YesNo2;
 			}
 
 			//      WRITE(Num1,*) NumOfTimeStepInHour*24
@@ -2044,24 +2045,24 @@ namespace ScheduleManager {
 				}
 				if ( LevelOfDetail == 1 ) {
 					gio::write( OutputFileInits, SchDFmtdata0 )
-						<< trim( DaySchedule( Count ).Name )
-						<< trim( ScheduleType( DaySchedule( Count ).ScheduleTypePtr ).Name )
-						<< trim( YesNo1 )
+						<< DaySchedule( Count ).Name
+						<< ScheduleType( DaySchedule( Count ).ScheduleTypePtr ).Name
+						<< YesNo1
 						<< "Values:";
 					for ( Hr = 1; Hr <= 24; ++Hr ) {
 						gio::write( OutputFileInits, SchDFmtdata )
-							<< trim( RoundTSValue( Hr, NumOfTimeStepInHour ) );
+							<< RoundTSValue( Hr, NumOfTimeStepInHour );
 					} gio::write( OutputFileInits );
 				} else if ( LevelOfDetail == 2 ) {
 					gio::write( OutputFileInits, SchDFmtdata0 )
-						<< trim( DaySchedule( Count ).Name )
-						<< trim( ScheduleType( DaySchedule( Count ).ScheduleTypePtr ).Name )
-						<< trim( YesNo1 )
+						<< DaySchedule( Count ).Name
+						<< ScheduleType( DaySchedule( Count ).ScheduleTypePtr ).Name
+						<< YesNo1
 						<< "Values:";
 					for ( Hr = 1; Hr <= 24; ++Hr ) {
 						for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
 							gio::write( OutputFileInits, SchDFmtdata )
-								<< trim( RoundTSValue( Hr, TS ) );
+								<< RoundTSValue( Hr, TS );
 						}
 					} gio::write( OutputFileInits );
 				}
@@ -2069,29 +2070,29 @@ namespace ScheduleManager {
 
 			for ( Count = 1; Count <= NumWeekSchedules; ++Count ) {
 				gio::write( OutputFileInits, SchWFmtdata )
-					<< trim( WeekSchedule( Count ).Name );
+					<< WeekSchedule( Count ).Name;
 				for ( NumF = 1; NumF <= MaxDayTypes; ++NumF ) {
 					gio::write( OutputFileInits, "(',',A,$)" )
-						<< trim( DaySchedule( WeekSchedule( Count ).DaySchedulePointer( NumF ) ).Name );
+						<< DaySchedule( WeekSchedule( Count ).DaySchedulePointer( NumF ) ).Name;
 				} gio::write( OutputFileInits );
 			}
 
 			for ( Count = 1; Count <= NumSchedules; ++Count ) {
 				NumF = 1;
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, "('Schedule,',A,',',A)", flags ) << trim( Schedule( Count ).Name ) << trim( ScheduleType( Schedule( Count ).ScheduleTypePtr ).Name ); }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, "('Schedule,',A,',',A)", flags ) << Schedule( Count ).Name << ScheduleType( Schedule( Count ).ScheduleTypePtr ).Name; }
 				while ( NumF <= 366 ) {
 					TS = Schedule( Count ).WeekSchedulePointer( NumF );
 					while ( Schedule( Count ).WeekSchedulePointer( NumF ) == TS && NumF <= 366 ) {
 						if ( NumF == 366 ) {
 							InvJulianDay( NumF, PMon, PDay, 1 );
-							{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, ThruFmt, flags ) << trim( Months( PMon ) ) << PDay << trim( WeekSchedule( TS ).Name ); }
+							{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, ThruFmt, flags ) << Months( PMon ) << PDay << WeekSchedule( TS ).Name; }
 						}
 						++NumF;
 						if ( NumF > 366 ) break; // compound If might have a problem unless this included.
 					}
 					if ( NumF <= 366 ) {
 						InvJulianDay( NumF - 1, PMon, PDay, 1 );
-						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, ThruFmt, flags ) << trim( Months( PMon ) ) << PDay << trim( WeekSchedule( TS ).Name ); }
+						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, ThruFmt, flags ) << Months( PMon ) << PDay << WeekSchedule( TS ).Name; }
 					}
 				}
 				gio::write( OutputFileInits, "(1X)" );
@@ -2099,25 +2100,25 @@ namespace ScheduleManager {
 
 		} else if ( SELECT_CASE_var == 3 ) {
 			for ( Count = 1; Count <= NumSchedules; ++Count ) {
-				gio::write( OutputFileDebug, "(A)" ) << " ";
+				gio::write( OutputFileDebug );
 				gio::write( OutputFileDebug, "(A)" ) << "  Schedule:Compact,";
-				gio::write( OutputFileDebug, "(A)" ) << "    " + trim( Schedule( Count ).Name ) + ",           !- Name";
-				gio::write( OutputFileDebug, "(A)" ) << "    " + trim( ScheduleType( Schedule( Count ).ScheduleTypePtr ).Name ) + ",          !- ScheduleTypeLimits";
+				gio::write( OutputFileDebug, "(A)" ) << "    " + Schedule( Count ).Name + ",           !- Name";
+				gio::write( OutputFileDebug, "(A)" ) << "    " + ScheduleType( Schedule( Count ).ScheduleTypePtr ).Name + ",          !- ScheduleTypeLimits";
 				NumF = 1;
 				while ( NumF <= 366 ) {
 					TS = Schedule( Count ).WeekSchedulePointer( NumF );
 					while ( Schedule( Count ).WeekSchedulePointer( NumF ) == TS && NumF <= 366 ) {
 						if ( NumF == 366 ) {
 							InvJulianDay( NumF, PMon, PDay, 1 );
-							gio::write( OutputFileDebug, "(A)" ) << "    Through: " + trim( RoundSigDigits( PMon ) ) + "/" + trim( RoundSigDigits( PDay ) ) + ",";
+							gio::write( OutputFileDebug, "(A)" ) << "    Through: " + RoundSigDigits( PMon ) + '/' + RoundSigDigits( PDay ) + ',';
 							iDayP = 0;
 							for ( DT = 2; DT <= 6; ++DT ) {
-								gio::write( OutputFileDebug, "(A)" ) << "    For: " + trim( ValidDayTypes( DT ) ) + ",";
+								gio::write( OutputFileDebug, "(A)" ) << "    For: " + ValidDayTypes( DT ) + ',';
 								iWeek = Schedule( Count ).WeekSchedulePointer( NumF - 1 );
 								iDay = WeekSchedule( iWeek ).DaySchedulePointer( DT );
 								if ( iDay != iDayP ) {
 									for ( Hr = 1; Hr <= 24; ++Hr ) {
-										gio::write( OutputFileDebug, "(A)" ) << "    Until: " + trim( RoundSigDigits( Hr ) ) + ":" + trim( ShowMinute( NumOfTimeStepInHour ) ) + "," + trim( RoundSigDigits( DaySchedule( iDay ).TSValue( Hr, NumOfTimeStepInHour ), 2 ) ) + ",";
+										gio::write( OutputFileDebug, "(A)" ) << "    Until: " + RoundSigDigits( Hr ) + ':' + ShowMinute( NumOfTimeStepInHour ) + ',' + RoundSigDigits( DaySchedule( iDay ).TSValue( Hr, NumOfTimeStepInHour ), 2 ) + ',';
 									}
 								} else {
 									gio::write( OutputFileDebug, "(A)" ) << "    Same as previous";
@@ -2125,24 +2126,24 @@ namespace ScheduleManager {
 								iDayP = iDay;
 							}
 							DT = 1;
-							gio::write( OutputFileDebug, "(A)" ) << "    For: " + trim( ValidDayTypes( DT ) ) + ",";
+							gio::write( OutputFileDebug, "(A)" ) << "    For: " + ValidDayTypes( DT ) + ',';
 							iWeek = Schedule( Count ).WeekSchedulePointer( NumF - 1 );
 							iDay = WeekSchedule( iWeek ).DaySchedulePointer( DT );
 							if ( iDay != iDayP ) {
 								for ( Hr = 1; Hr <= 24; ++Hr ) {
-									gio::write( OutputFileDebug, "(A)" ) << "    Until: " + trim( RoundSigDigits( Hr ) ) + ":" + trim( ShowMinute( NumOfTimeStepInHour ) ) + "," + trim( RoundSigDigits( DaySchedule( iDay ).TSValue( Hr, NumOfTimeStepInHour ), 2 ) ) + ",";
+									gio::write( OutputFileDebug, "(A)" ) << "    Until: " + RoundSigDigits( Hr ) + ':' + ShowMinute( NumOfTimeStepInHour ) + ',' + RoundSigDigits( DaySchedule( iDay ).TSValue( Hr, NumOfTimeStepInHour ), 2 ) + ',';
 								}
 							} else {
 								gio::write( OutputFileDebug, "(A)" ) << "    Same as previous";
 							}
 							iDayP = iDay;
 							for ( DT = 7; DT <= MaxDayTypes; ++DT ) {
-								gio::write( OutputFileDebug, "(A)" ) << "    For: " + trim( ValidDayTypes( DT ) ) + ",";
+								gio::write( OutputFileDebug, "(A)" ) << "    For: " + ValidDayTypes( DT ) + ',';
 								iWeek = Schedule( Count ).WeekSchedulePointer( NumF - 1 );
 								iDay = WeekSchedule( iWeek ).DaySchedulePointer( DT );
 								if ( iDay != iDayP ) {
 									for ( Hr = 1; Hr <= 24; ++Hr ) {
-										gio::write( OutputFileDebug, "(A)" ) << "    Until: " + trim( RoundSigDigits( Hr ) ) + ":" + trim( ShowMinute( NumOfTimeStepInHour ) ) + "," + trim( RoundSigDigits( DaySchedule( iDay ).TSValue( Hr, NumOfTimeStepInHour ), 2 ) ) + ",";
+										gio::write( OutputFileDebug, "(A)" ) << "    Until: " + RoundSigDigits( Hr ) + ':' + ShowMinute( NumOfTimeStepInHour ) + ',' + RoundSigDigits( DaySchedule( iDay ).TSValue( Hr, NumOfTimeStepInHour ), 2 ) + ',';
 									}
 								} else {
 									gio::write( OutputFileDebug, "(A)" ) << "    Same as previous";
@@ -2155,15 +2156,15 @@ namespace ScheduleManager {
 					}
 					if ( NumF <= 366 ) {
 						InvJulianDay( NumF - 1, PMon, PDay, 1 );
-						gio::write( OutputFileDebug, "(A)" ) << "    Through: " + trim( RoundSigDigits( PMon ) ) + "/" + trim( RoundSigDigits( PDay ) ) + ",";
+						gio::write( OutputFileDebug, "(A)" ) << "    Through: " + RoundSigDigits( PMon ) + '/' + RoundSigDigits( PDay ) + ',';
 						iDayP = 0;
 						for ( DT = 2; DT <= 6; ++DT ) {
-							gio::write( OutputFileDebug, "(A)" ) << "    For: " + trim( ValidDayTypes( DT ) ) + ",";
+							gio::write( OutputFileDebug, "(A)" ) << "    For: " + ValidDayTypes( DT ) + ',';
 							iWeek = Schedule( Count ).WeekSchedulePointer( NumF - 1 );
 							iDay = WeekSchedule( iWeek ).DaySchedulePointer( DT );
 							if ( iDay != iDayP ) {
 								for ( Hr = 1; Hr <= 24; ++Hr ) {
-									gio::write( OutputFileDebug, "(A)" ) << "    Until: " + trim( RoundSigDigits( Hr ) ) + ":" + trim( ShowMinute( NumOfTimeStepInHour ) ) + "," + trim( RoundSigDigits( DaySchedule( iDay ).TSValue( Hr, NumOfTimeStepInHour ), 2 ) ) + ",";
+									gio::write( OutputFileDebug, "(A)" ) << "    Until: " + RoundSigDigits( Hr ) + ':' + ShowMinute( NumOfTimeStepInHour ) + ',' + RoundSigDigits( DaySchedule( iDay ).TSValue( Hr, NumOfTimeStepInHour ), 2 ) + ',';
 								}
 							} else {
 								gio::write( OutputFileDebug, "(A)" ) << "    Same as previous";
@@ -2171,24 +2172,24 @@ namespace ScheduleManager {
 							iDayP = iDay;
 						}
 						DT = 1;
-						gio::write( OutputFileDebug, "(A)" ) << "    For: " + trim( ValidDayTypes( DT ) ) + ",";
+						gio::write( OutputFileDebug, "(A)" ) << "    For: " + ValidDayTypes( DT ) + ',';
 						iWeek = Schedule( Count ).WeekSchedulePointer( NumF - 1 );
 						iDay = WeekSchedule( iWeek ).DaySchedulePointer( DT );
 						if ( iDay != iDayP ) {
 							for ( Hr = 1; Hr <= 24; ++Hr ) {
-								gio::write( OutputFileDebug, "(A)" ) << "    Until: " + trim( RoundSigDigits( Hr ) ) + ":" + trim( ShowMinute( NumOfTimeStepInHour ) ) + "," + trim( RoundSigDigits( DaySchedule( iDay ).TSValue( Hr, NumOfTimeStepInHour ), 2 ) ) + ",";
+								gio::write( OutputFileDebug, "(A)" ) << "    Until: " + RoundSigDigits( Hr ) + ':' + ShowMinute( NumOfTimeStepInHour ) + ',' + RoundSigDigits( DaySchedule( iDay ).TSValue( Hr, NumOfTimeStepInHour ), 2 ) + ',';
 							}
 						} else {
 							gio::write( OutputFileDebug, "(A)" ) << "    Same as previous";
 						}
 						iDayP = iDay;
 						for ( DT = 7; DT <= MaxDayTypes; ++DT ) {
-							gio::write( OutputFileDebug, "(A)" ) << "    For: " + trim( ValidDayTypes( DT ) ) + ",";
+							gio::write( OutputFileDebug, "(A)" ) << "    For: " + ValidDayTypes( DT ) + ',';
 							iWeek = Schedule( Count ).WeekSchedulePointer( NumF - 1 );
 							iDay = WeekSchedule( iWeek ).DaySchedulePointer( DT );
 							if ( iDay != iDayP ) {
 								for ( Hr = 1; Hr <= 24; ++Hr ) {
-									gio::write( OutputFileDebug, "(A)" ) << "    Until: " + trim( RoundSigDigits( Hr ) ) + ":" + trim( ShowMinute( NumOfTimeStepInHour ) ) + "," + trim( RoundSigDigits( DaySchedule( iDay ).TSValue( Hr, NumOfTimeStepInHour ), 2 ) ) + ",";
+									gio::write( OutputFileDebug, "(A)" ) << "    Until: " + RoundSigDigits( Hr ) + ':' + ShowMinute( NumOfTimeStepInHour ) + ',' + RoundSigDigits( DaySchedule( iDay ).TSValue( Hr, NumOfTimeStepInHour ), 2 ) + ',';
 								}
 							} else {
 								gio::write( OutputFileDebug, "(A)" ) << "    Same as previous";
@@ -2253,7 +2254,7 @@ namespace ScheduleManager {
 		if ( ! ScheduleDSTSFileWarningIssued ) {
 			if ( DSTIndicator == 1 ) {
 				if ( Schedule( ScheduleIndex ).SchType == ScheduleInput_file ) {
-					ShowWarningError( "GetCurrentScheduleValue: Schedule=\"" + trim( Schedule( ScheduleIndex ).Name ) + "\" is a Schedule:File" );
+					ShowWarningError( "GetCurrentScheduleValue: Schedule=\"" + Schedule( ScheduleIndex ).Name + "\" is a Schedule:File" );
 					ShowContinueError( "...Use of Schedule:File when DaylightSavingTime is in effect is not recommended." );
 					ShowContinueError( "...1) Remove RunperiodControl:DaylightSavingTime object or remove DST period from Weather File." );
 					ShowContinueError( "...2) Configure other schedules and Schedule:File to account for occupant behavior during DST." );
@@ -2389,7 +2390,7 @@ namespace ScheduleManager {
 		using General::JulianDay;
 
 		// Return value
-		Real64 LookUpScheduleValue;
+		Real64 LookUpScheduleValue( 0.0 );
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -2506,7 +2507,7 @@ namespace ScheduleManager {
 	}
 
 	int
-	GetScheduleIndex( Fstring const & ScheduleName )
+	GetScheduleIndex( std::string const & ScheduleName )
 	{
 
 		// FUNCTION INFORMATION:
@@ -2574,7 +2575,7 @@ namespace ScheduleManager {
 
 	}
 
-	Fstring
+	std::string
 	GetScheduleType( int const ScheduleIndex )
 	{
 
@@ -2596,7 +2597,7 @@ namespace ScheduleManager {
 		// USE STATEMENTS:
 
 		// Return value
-		Fstring TypeOfSchedule( MaxNameLength );
+		std::string TypeOfSchedule;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -2632,7 +2633,7 @@ namespace ScheduleManager {
 	}
 
 	int
-	GetDayScheduleIndex( Fstring & ScheduleName )
+	GetDayScheduleIndex( std::string & ScheduleName )
 	{
 
 		// FUNCTION INFORMATION:
@@ -2879,15 +2880,15 @@ namespace ScheduleManager {
 
 	void
 	ProcessIntervalFields(
-		FArray1S_Fstring const Untils,
+		FArray1S_string const Untils,
 		FArray1S< Real64 > const Numbers,
 		int const NumUntils,
 		int const NumNumbers,
 		FArray2A< Real64 > MinuteValue,
 		FArray2A_bool SetMinuteValue,
 		bool & ErrorsFound,
-		Fstring const & DayScheduleName, // Name (used for errors)
-		Fstring const & ErrContext // Context (used for errors)
+		std::string const & DayScheduleName, // Name (used for errors)
+		std::string const & ErrContext // Context (used for errors)
 	)
 	{
 
@@ -2928,7 +2929,7 @@ namespace ScheduleManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Count;
-		int Pos;
+		std::string::size_type Pos;
 		int HHField;
 		int MMField;
 		int Hr;
@@ -2937,7 +2938,7 @@ namespace ScheduleManager {
 		int SMin;
 		int EHr;
 		int EMin;
-		int sFld;
+		std::string::size_type sFld;
 
 		MinuteValue = 0.0;
 		SetMinuteValue = false;
@@ -2948,40 +2949,38 @@ namespace ScheduleManager {
 		sFld = 0;
 
 		if ( NumUntils != NumNumbers ) {
-			ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, " "  number of Time fields does not match number of value fields, " + trim( ErrContext ) + "=" + trim( DayScheduleName ) );
+			ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, " "  number of Time fields does not match number of value fields, " + ErrContext + '=' + DayScheduleName );
 			ErrorsFound = true;
 			return;
 		}
 
 		UntilLoop: for ( Count = 1; Count <= NumUntils; ++Count ) {
 			Pos = index( Untils( Count ), "UNTIL" );
-			if ( Pos != 0 && Pos == 1 ) {
-				if ( Untils( Count )( 6, 6 ) == ":" ) {
-					sFld = 7;
-				} else {
+			if ( Pos == 0 ) {
+				if ( Untils( Count )[ 5 ] == ':' ) {
 					sFld = 6;
+				} else {
+					sFld = 5;
 				}
-			}
-			if ( Pos != 0 && Pos == 1 ) {
-				DecodeHHMMField( Untils( Count )( sFld ), HHField, MMField, ErrorsFound, DayScheduleName, Untils( Count ) );
-			} else if ( Pos == 0 ) {
+				DecodeHHMMField( Untils( Count ).substr( sFld ), HHField, MMField, ErrorsFound, DayScheduleName, Untils( Count ) );
+			} else if ( Pos == std::string::npos ) {
 				DecodeHHMMField( Untils( Count ), HHField, MMField, ErrorsFound, DayScheduleName, Untils( Count ) );
 			} else { // Until found but wasn't first field
-				ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, " "Invalid \"Until\" field encountered=" + trim( Untils( Count ) ) );
-				ShowContinueError( "Occurred in Day Schedule=" + trim( DayScheduleName ) );
+				ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, " "Invalid \"Until\" field encountered=" + Untils( Count ) );
+				ShowContinueError( "Occurred in Day Schedule=" + DayScheduleName );
 				ErrorsFound = true;
 				continue;
 			}
 			// Field decoded
 			if ( HHField < 0 || HHField > 24 || MMField < 0 || MMField > 60 ) {
-				ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, " "Invalid \"Until\" field encountered=" + trim( Untils( Count ) ) );
-				ShowContinueError( "Occurred in Day Schedule=" + trim( DayScheduleName ) );
+				ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, " "Invalid \"Until\" field encountered=" + Untils( Count ) );
+				ShowContinueError( "Occurred in Day Schedule=" + DayScheduleName );
 				ErrorsFound = true;
 				continue;
 			}
 			if ( HHField == 24 && MMField > 0 && MMField < 60 ) {
-				ShowWarningError( "ProcessScheduleInput: ProcessIntervalFields, " "Invalid \"Until\" field encountered=" + trim( Untils( Count ) ) );
-				ShowContinueError( "Occurred in Day Schedule=" + trim( DayScheduleName ) );
+				ShowWarningError( "ProcessScheduleInput: ProcessIntervalFields, " "Invalid \"Until\" field encountered=" + Untils( Count ) );
+				ShowContinueError( "Occurred in Day Schedule=" + DayScheduleName );
 				ShowContinueError( "Terminating the field at 24:00" );
 				MMField = 0;
 			}
@@ -2999,7 +2998,7 @@ namespace ScheduleManager {
 			if ( SHr == EHr ) {
 				for ( Min = SMin; Min <= EMin; ++Min ) {
 					if ( SetMinuteValue( SHr, Min ) ) {
-						ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, " "Processing time fields, overlapping times detected, " + trim( ErrContext ) + "=" + trim( DayScheduleName ) );
+						ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, " "Processing time fields, overlapping times detected, " + ErrContext + '=' + DayScheduleName );
 						ErrorsFound = true;
 						goto UntilLoop_exit;
 					}
@@ -3012,7 +3011,7 @@ namespace ScheduleManager {
 					SMin = 1;
 				}
 			} else if ( EHr < SHr ) {
-				ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, " "Processing time fields, overlapping times detected, " + trim( ErrContext ) + "=" + trim( DayScheduleName ) );
+				ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, " "Processing time fields, overlapping times detected, " + ErrContext + '=' + DayScheduleName );
 				ErrorsFound = true;
 			} else {
 				for ( Min = SMin; Min <= 60; ++Min ) {
@@ -3040,7 +3039,7 @@ namespace ScheduleManager {
 		UntilLoop_exit: ;
 
 		if ( ! all( SetMinuteValue ) ) {
-			ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, " "Processing time fields, incomplete day detected, " + trim( ErrContext ) + "=" + trim( DayScheduleName ) );
+			ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, " "Processing time fields, incomplete day detected, " + ErrContext + '=' + DayScheduleName );
 			ErrorsFound = true;
 		}
 
@@ -3048,12 +3047,12 @@ namespace ScheduleManager {
 
 	void
 	DecodeHHMMField(
-		Fstring const & FieldValue, // Input field value
+		std::string const & FieldValue, // Input field value
 		int & RetHH, // Returned "hour"
 		int & RetMM, // Returned "minute"
 		bool & ErrorsFound, // True if errors found in this field
-		Fstring const & DayScheduleName, // originating day schedule name
-		Fstring const & FullFieldValue // Full Input field value
+		std::string const & DayScheduleName, // originating day schedule name
+		std::string const & FullFieldValue // Full Input field value
 	)
 	{
 
@@ -3080,7 +3079,7 @@ namespace ScheduleManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const hhmmFormat( "(I2.2)" );
+		static gio::Fmt const hhmmFormat( "(I2.2)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3089,53 +3088,51 @@ namespace ScheduleManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int Pos; // Position value for scanning the Field
-		Fstring String( len( FieldValue ) );
 		int IOS;
 		Real64 rRetHH; // real Returned "hour"
 		Real64 rRetMM; // real Returned "minute"
 		bool nonIntegral;
-		Fstring hHour( 2 );
-		Fstring mMinute( 2 );
+		std::string hHour;
+		std::string mMinute;
 
-		String = adjustl( FieldValue );
-		Pos = index( String, ":" );
+		std::string String = stripped( FieldValue );
+		std::string::size_type const Pos = index( String, ':' );
 		nonIntegral = false;
-		if ( Pos == 0 ) {
-			ShowSevereError( "ProcessScheduleInput: DecodeHHMMField, " "Invalid \"until\" field submitted (no : separator in hh:mm)=" + trim( adjustl( FullFieldValue ) ) );
-			ShowContinueError( "Occurred in Day Schedule=" + trim( DayScheduleName ) );
+		if ( Pos == std::string::npos ) {
+			ShowSevereError( "ProcessScheduleInput: DecodeHHMMField, " "Invalid \"until\" field submitted (no : separator in hh:mm)=" + stripped( FullFieldValue ) );
+			ShowContinueError( "Occurred in Day Schedule=" + DayScheduleName );
 			ErrorsFound = true;
 			return;
-		} else if ( Pos == 1 ) {
+		} else if ( Pos == 0 ) {
 			RetHH = 0;
 		} else {
-			{ IOFlags flags; gio::read( String( 1, Pos - 1 ), "*", flags ) >> rRetHH; IOS = flags.ios(); }
+			{ IOFlags flags; gio::read( String.substr( 0, Pos ), "*", flags ) >> rRetHH; IOS = flags.ios(); }
 			RetHH = int( rRetHH );
 			if ( double( RetHH ) != rRetHH || IOS != 0 || rRetHH < 0.0 ) {
 				if ( double( RetHH ) != rRetHH && rRetHH >= 0.0 ) {
-					ShowWarningError( "ProcessScheduleInput: DecodeHHMMField, " "Invalid \"until\" field submitted (non-integer numeric in HH)=" + trim( adjustl( FullFieldValue ) ) );
-					ShowContinueError( "Other errors may result. Occurred in Day Schedule=" + trim( DayScheduleName ) );
+					ShowWarningError( "ProcessScheduleInput: DecodeHHMMField, " "Invalid \"until\" field submitted (non-integer numeric in HH)=" + stripped( FullFieldValue ) );
+					ShowContinueError( "Other errors may result. Occurred in Day Schedule=" + DayScheduleName );
 					nonIntegral = true;
 				} else {
-					ShowSevereError( "ProcessScheduleInput: DecodeHHMMField, " "Invalid \"until\" field submitted (invalid numeric in HH)=" + trim( adjustl( FullFieldValue ) ) );
-					ShowContinueError( "Field values must be integer and represent hours:minutes. Occurred in Day Schedule=" + trim( DayScheduleName ) );
+					ShowSevereError( "ProcessScheduleInput: DecodeHHMMField, " "Invalid \"until\" field submitted (invalid numeric in HH)=" + stripped( FullFieldValue ) );
+					ShowContinueError( "Field values must be integer and represent hours:minutes. Occurred in Day Schedule=" + DayScheduleName );
 					ErrorsFound = true;
 					return;
 				}
 			}
 		}
 
-		String = String( Pos + 1 );
+		String.erase( 0, Pos + 1 );
 		{ IOFlags flags; gio::read( String, "*", flags ) >> rRetMM; IOS = flags.ios(); }
 		RetMM = int( rRetMM );
 		if ( double( RetMM ) != rRetMM || IOS != 0 || rRetMM < 0.0 ) {
 			if ( double( RetMM ) != rRetMM && rRetMM >= 0.0 ) {
-				ShowWarningError( "ProcessScheduleInput: DecodeHHMMField, " "Invalid \"until\" field submitted (non-integer numeric in MM)=" + trim( adjustl( FullFieldValue ) ) );
-				ShowContinueError( "Other errors may result. Occurred in Day Schedule=" + trim( DayScheduleName ) );
+				ShowWarningError( "ProcessScheduleInput: DecodeHHMMField, " "Invalid \"until\" field submitted (non-integer numeric in MM)=" + stripped( FullFieldValue ) );
+				ShowContinueError( "Other errors may result. Occurred in Day Schedule=" + DayScheduleName );
 				nonIntegral = true;
 			} else {
-				ShowSevereError( "ProcessScheduleInput: DecodeHHMMField, " "Invalid \"until\" field submitted (invalid numeric in MM)=" + trim( adjustl( FullFieldValue ) ) );
-				ShowContinueError( "Field values must be integer and represent hours:minutes. Occurred in Day Schedule=" + trim( DayScheduleName ) );
+				ShowSevereError( "ProcessScheduleInput: DecodeHHMMField, " "Invalid \"until\" field submitted (invalid numeric in MM)=" + stripped( FullFieldValue ) );
+				ShowContinueError( "Field values must be integer and represent hours:minutes. Occurred in Day Schedule=" + DayScheduleName );
 				ErrorsFound = true;
 				return;
 			}
@@ -3144,14 +3141,14 @@ namespace ScheduleManager {
 		if ( nonIntegral ) {
 			gio::write( hHour, hhmmFormat ) << RetHH;
 			gio::write( mMinute, hhmmFormat ) << RetMM;
-			ShowContinueError( "Until value to be used will be: " + hHour + ":" + mMinute );
+			ShowContinueError( "Until value to be used will be: " + hHour + ':' + mMinute );
 		}
 
 	}
 
 	void
 	ProcessForDayTypes(
-		Fstring const & ForDayField, // Field containing the "FOR:..."
+		std::string const & ForDayField, // Field containing the "FOR:..."
 		FArray1A_bool TheseDays, // Array to contain returned "true" days
 		FArray1A_bool AlReady, // Array of days already done
 		bool & ErrorsFound // Will be true if error found.
@@ -3201,7 +3198,7 @@ namespace ScheduleManager {
 		OneValid = false;
 		DupAssignment = false;
 		// Just test for specific days
-		if ( index( ForDayField, "WEEKDAY" ) > 0 ) {
+		if ( has( ForDayField, "WEEKDAY" ) ) {
 			TheseDays( {2,6} ) = true;
 			if ( any( AlReady( {2,6} ) ) ) {
 				DupAssignment = true;
@@ -3210,7 +3207,7 @@ namespace ScheduleManager {
 			}
 			OneValid = true;
 		}
-		if ( index( ForDayField, "MONDAY" ) > 0 ) {
+		if ( has( ForDayField, "MONDAY" ) ) {
 			TheseDays( 2 ) = true;
 			if ( AlReady( 2 ) ) {
 				DupAssignment = true;
@@ -3219,7 +3216,7 @@ namespace ScheduleManager {
 			}
 			OneValid = true;
 		}
-		if ( index( ForDayField, "TUESDAY" ) > 0 ) {
+		if ( has( ForDayField, "TUESDAY" ) ) {
 			TheseDays( 3 ) = true;
 			if ( AlReady( 3 ) ) {
 				DupAssignment = true;
@@ -3228,7 +3225,7 @@ namespace ScheduleManager {
 			}
 			OneValid = true;
 		}
-		if ( index( ForDayField, "WEDNESDAY" ) > 0 ) {
+		if ( has( ForDayField, "WEDNESDAY" ) ) {
 			TheseDays( 4 ) = true;
 			if ( AlReady( 4 ) ) {
 				DupAssignment = true;
@@ -3237,7 +3234,7 @@ namespace ScheduleManager {
 			}
 			OneValid = true;
 		}
-		if ( index( ForDayField, "THURSDAY" ) > 0 ) {
+		if ( has( ForDayField, "THURSDAY" ) ) {
 			TheseDays( 5 ) = true;
 			if ( AlReady( 5 ) ) {
 				DupAssignment = true;
@@ -3246,7 +3243,7 @@ namespace ScheduleManager {
 			}
 			OneValid = true;
 		}
-		if ( index( ForDayField, "FRIDAY" ) > 0 ) {
+		if ( has( ForDayField, "FRIDAY" ) ) {
 			TheseDays( 6 ) = true;
 			if ( AlReady( 6 ) ) {
 				DupAssignment = true;
@@ -3255,7 +3252,7 @@ namespace ScheduleManager {
 			}
 			OneValid = true;
 		}
-		if ( index( ForDayField, "WEEKEND" ) > 0 ) {
+		if ( has( ForDayField, "WEEKEND" ) ) {
 			TheseDays( 1 ) = true;
 			TheseDays( 7 ) = true;
 			if ( AlReady( 1 ) ) {
@@ -3270,7 +3267,7 @@ namespace ScheduleManager {
 			}
 			OneValid = true;
 		}
-		if ( index( ForDayField, "SATURDAY" ) > 0 ) {
+		if ( has( ForDayField, "SATURDAY" ) ) {
 			TheseDays( 7 ) = true;
 			if ( AlReady( 7 ) ) {
 				DupAssignment = true;
@@ -3279,7 +3276,7 @@ namespace ScheduleManager {
 			}
 			OneValid = true;
 		}
-		if ( index( ForDayField, "SUNDAY" ) > 0 ) {
+		if ( has( ForDayField, "SUNDAY" ) ) {
 			TheseDays( 1 ) = true;
 			if ( AlReady( 1 ) ) {
 				DupAssignment = true;
@@ -3288,7 +3285,7 @@ namespace ScheduleManager {
 			}
 			OneValid = true;
 		}
-		if ( index( ForDayField, "CUSTOMDAY1" ) > 0 ) {
+		if ( has( ForDayField, "CUSTOMDAY1" ) ) {
 			TheseDays( 11 ) = true;
 			if ( AlReady( 11 ) ) {
 				DupAssignment = true;
@@ -3297,7 +3294,7 @@ namespace ScheduleManager {
 			}
 			OneValid = true;
 		}
-		if ( index( ForDayField, "CUSTOMDAY2" ) > 0 ) {
+		if ( has( ForDayField, "CUSTOMDAY2" ) ) {
 			TheseDays( 12 ) = true;
 			if ( AlReady( 12 ) ) {
 				DupAssignment = true;
@@ -3306,16 +3303,16 @@ namespace ScheduleManager {
 			}
 			OneValid = true;
 		}
-		if ( index( ForDayField, "ALLDAY" ) > 0 ) {
+		if ( has( ForDayField, "ALLDAY" ) ) {
 			TheseDays( {1,MaxDayTypes} ) = true;
-			if ( any( AlReady( {1,MaxDayTypes} ) ) ) {
+			if ( any( AlReady ) ) {
 				DupAssignment = true;
 			} else {
-				AlReady( {1,MaxDayTypes} ) = true;
+				AlReady = true;
 			}
 			OneValid = true;
 		}
-		if ( index( ForDayField, "HOLIDAY" ) > 0 ) {
+		if ( has( ForDayField, "HOLIDAY" ) ) {
 			TheseDays( 8 ) = true;
 			if ( AlReady( 8 ) ) {
 				DupAssignment = true;
@@ -3324,7 +3321,7 @@ namespace ScheduleManager {
 			}
 			OneValid = true;
 		}
-		if ( index( ForDayField, "SUMMER" ) > 0 ) {
+		if ( has( ForDayField, "SUMMER" ) ) {
 			TheseDays( 9 ) = true;
 			if ( AlReady( 9 ) ) {
 				DupAssignment = true;
@@ -3333,7 +3330,7 @@ namespace ScheduleManager {
 			}
 			OneValid = true;
 		}
-		if ( index( ForDayField, "WINTER" ) > 0 ) {
+		if ( has( ForDayField, "WINTER" ) ) {
 			TheseDays( 10 ) = true;
 			if ( AlReady( 10 ) ) {
 				DupAssignment = true;
@@ -3342,7 +3339,7 @@ namespace ScheduleManager {
 			}
 			OneValid = true;
 		}
-		if ( index( ForDayField, "ALLOTHERDAY" ) > 0 ) {
+		if ( has( ForDayField, "ALLOTHERDAY" ) ) {
 			for ( DayT = 1; DayT <= MaxDayTypes; ++DayT ) {
 				if ( AlReady( DayT ) ) continue;
 				TheseDays( DayT ) = true;
@@ -3352,11 +3349,11 @@ namespace ScheduleManager {
 		}
 
 		if ( DupAssignment ) {
-			ShowSevereError( "ProcessScheduleInput: ProcessForDayTypes, " "Duplicate assignment attempted in \"for\" days field=" + trim( ForDayField ) );
+			ShowSevereError( "ProcessScheduleInput: ProcessForDayTypes, " "Duplicate assignment attempted in \"for\" days field=" + ForDayField );
 			ErrorsFound = true;
 		}
 		if ( ! OneValid ) {
-			ShowSevereError( "ProcessScheduleInput: ProcessForDayTypes, " "No valid day assignments found in \"for\" days field=" + trim( ForDayField ) );
+			ShowSevereError( "ProcessScheduleInput: ProcessForDayTypes, " "No valid day assignments found in \"for\" days field=" + ForDayField );
 			ErrorsFound = true;
 		}
 
@@ -3365,7 +3362,7 @@ namespace ScheduleManager {
 	bool
 	CheckScheduleValueMinMax(
 		int const ScheduleIndex, // Which Schedule being tested
-		Fstring const & MinString, // Minimum indicator ('>', '>=')
+		std::string const & MinString, // Minimum indicator ('>', '>=')
 		Real64 const Minimum // Minimum desired value
 	)
 	{
@@ -3410,8 +3407,8 @@ namespace ScheduleManager {
 		int Loop; // Loop Control variable
 		int DayT; // Day Type Loop control
 		int WkSch; // Pointer for WeekSchedule value
-		Real64 MinValue; // For total minimum
-		Real64 MaxValue; // For total maximum
+		Real64 MinValue( 0.0 ); // For total minimum
+		Real64 MaxValue( 0.0 ); // For total maximum
 		bool MinValueOk;
 		bool MaxValueOk;
 
@@ -3466,9 +3463,9 @@ namespace ScheduleManager {
 	bool
 	CheckScheduleValueMinMax(
 		int const ScheduleIndex, // Which Schedule being tested
-		Fstring const & MinString, // Minimum indicator ('>', '>=')
+		std::string const & MinString, // Minimum indicator ('>', '>=')
 		Real64 const Minimum, // Minimum desired value
-		Fstring const & MaxString, // Maximum indicator ('<', ',=')
+		std::string const & MaxString, // Maximum indicator ('<', ',=')
 		Real64 const Maximum // Maximum desired value
 	)
 	{
@@ -3513,8 +3510,8 @@ namespace ScheduleManager {
 		int Loop; // Loop Control variable
 		int DayT; // Day Type Loop control
 		int WkSch; // Pointer for WeekSchedule value
-		Real64 MinValue; // For total minimum
-		Real64 MaxValue; // For total maximum
+		Real64 MinValue( 0.0 ); // For total minimum
+		Real64 MaxValue( 0.0 ); // For total maximum
 		bool MinValueOk;
 		bool MaxValueOk;
 		static bool RunOnceOnly( true );
@@ -3585,7 +3582,7 @@ namespace ScheduleManager {
 	bool
 	CheckScheduleValueMinMax(
 		int const ScheduleIndex, // Which Schedule being tested
-		Fstring const & MinString, // Minimum indicator ('>', '>=')
+		std::string const & MinString, // Minimum indicator ('>', '>=')
 		Real32 const Minimum // Minimum desired value
 	)
 	{
@@ -3630,8 +3627,8 @@ namespace ScheduleManager {
 		int Loop; // Loop Control variable
 		int DayT; // Day Type Loop control
 		int WkSch; // Pointer for WeekSchedule value
-		Real64 MinValue; // For total minimum
-		Real64 MaxValue; // For total maximum
+		Real64 MinValue( 0.0 ); // For total minimum
+		Real64 MaxValue( 0.0 ); // For total maximum
 		bool MinValueOk;
 		bool MaxValueOk;
 
@@ -3686,9 +3683,9 @@ namespace ScheduleManager {
 	bool
 	CheckScheduleValueMinMax(
 		int const ScheduleIndex, // Which Schedule being tested
-		Fstring const & MinString, // Minimum indicator ('>', '>=')
+		std::string const & MinString, // Minimum indicator ('>', '>=')
 		Real32 const Minimum, // Minimum desired value
-		Fstring const & MaxString, // Maximum indicator ('<', ',=')
+		std::string const & MaxString, // Maximum indicator ('<', ',=')
 		Real32 const Maximum // Maximum desired value
 	)
 	{
@@ -3733,8 +3730,8 @@ namespace ScheduleManager {
 		int Loop; // Loop Control variable
 		int DayT; // Day Type Loop control
 		int WkSch; // Pointer for WeekSchedule value
-		Real64 MinValue; // For total minimum
-		Real64 MaxValue; // For total maximum
+		Real64 MinValue( 0.0 ); // For total minimum
+		Real64 MaxValue( 0.0 ); // For total maximum
 		bool MinValueOk;
 		bool MaxValueOk;
 
@@ -3947,9 +3944,9 @@ namespace ScheduleManager {
 	CheckDayScheduleValueMinMax(
 		int const ScheduleIndex, // Which Day Schedule being tested
 		Real64 const Minimum, // Minimum desired value
-		Fstring const & MinString, // Minimum indicator ('>', '>=')
+		std::string const & MinString, // Minimum indicator ('>', '>=')
 		Optional< Real64 const > Maximum, // Maximum desired value
-		Optional_Fstring_const MaxString // Maximum indicator ('<', ',=')
+		Optional_string_const MaxString // Maximum indicator ('<', ',=')
 	)
 	{
 
@@ -3990,8 +3987,8 @@ namespace ScheduleManager {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 MinValue; // For total minimum
-		Real64 MaxValue; // For total maximum
+		Real64 MinValue( 0.0 ); // For total minimum
+		Real64 MaxValue( 0.0 ); // For total maximum
 		bool MinValueOk;
 		bool MaxValueOk;
 
@@ -4042,9 +4039,9 @@ namespace ScheduleManager {
 	CheckDayScheduleValueMinMax(
 		int const ScheduleIndex, // Which Day Schedule being tested
 		Real32 const Minimum, // Minimum desired value
-		Fstring const & MinString, // Minimum indicator ('>', '>=')
+		std::string const & MinString, // Minimum indicator ('>', '>=')
 		Optional< Real32 const > Maximum, // Maximum desired value
-		Optional_Fstring_const MaxString // Maximum indicator ('<', ',=')
+		Optional_string_const MaxString // Maximum indicator ('<', ',=')
 	)
 	{
 
@@ -4085,8 +4082,8 @@ namespace ScheduleManager {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 MinValue; // For total minimum
-		Real64 MaxValue; // For total maximum
+		Real64 MinValue( 0.0 ); // For total minimum
+		Real64 MaxValue( 0.0 ); // For total maximum
 		bool MinValueOk;
 		bool MaxValueOk;
 
@@ -4261,8 +4258,8 @@ namespace ScheduleManager {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 MinValue;
-		Real64 MaxValue;
+		Real64 MinValue( 0.0 );
+		Real64 MaxValue( 0.0 );
 		int WkSch;
 		int DayT;
 		int Loop;
@@ -4347,8 +4344,8 @@ namespace ScheduleManager {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 MinValue;
-		Real64 MaxValue;
+		Real64 MinValue( 0.0 );
+		Real64 MaxValue( 0.0 );
 		int WkSch;
 		int DayT;
 		int Loop;
@@ -4395,7 +4392,7 @@ namespace ScheduleManager {
 
 	}
 
-	Fstring
+	std::string
 	GetScheduleName( int const ScheduleIndex )
 	{
 
@@ -4418,7 +4415,7 @@ namespace ScheduleManager {
 		// na
 
 		// Return value
-		Fstring ScheduleName( MaxNameLength );
+		std::string ScheduleName;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -4594,14 +4591,14 @@ namespace ScheduleManager {
 				NeedOrphanMessage = false;
 			}
 			if ( DisplayUnusedSchedules ) {
-				ShowMessage( "Schedule:Year or Schedule:Compact or Schedule:File or Schedule:Constant=" + trim( Schedule( Item ).Name ) );
+				ShowMessage( "Schedule:Year or Schedule:Compact or Schedule:File or Schedule:Constant=" + Schedule( Item ).Name );
 			} else {
 				++NumCount;
 			}
 		}
 
 		if ( NumCount > 0 ) {
-			ShowMessage( "There are " + trim( RoundSigDigits( NumCount ) ) + " unused schedules in input." );
+			ShowMessage( "There are " + RoundSigDigits( NumCount ) + " unused schedules in input." );
 			NeedUseMessage = true;
 		}
 
@@ -4617,14 +4614,14 @@ namespace ScheduleManager {
 				NeedOrphanMessage = false;
 			}
 			if ( DisplayUnusedSchedules ) {
-				ShowMessage( "Schedule:Week:Daily or Schedule:Week:Compact=" + trim( WeekSchedule( Item ).Name ) );
+				ShowMessage( "Schedule:Week:Daily or Schedule:Week:Compact=" + WeekSchedule( Item ).Name );
 			} else {
 				++NumCount;
 			}
 		}
 
 		if ( NumCount > 0 ) {
-			ShowMessage( "There are " + trim( RoundSigDigits( NumCount ) ) + " unused week schedules in input." );
+			ShowMessage( "There are " + RoundSigDigits( NumCount ) + " unused week schedules in input." );
 			NeedUseMessage = true;
 		}
 
@@ -4640,14 +4637,14 @@ namespace ScheduleManager {
 				NeedOrphanMessage = false;
 			}
 			if ( DisplayUnusedSchedules ) {
-				ShowMessage( "Schedule:Day:Hourly or Schedule:Day:Interval or Schedule:Day:List=" + trim( DaySchedule( Item ).Name ) );
+				ShowMessage( "Schedule:Day:Hourly or Schedule:Day:Interval or Schedule:Day:List=" + DaySchedule( Item ).Name );
 			} else {
 				++NumCount;
 			}
 		}
 
 		if ( NumCount > 0 ) {
-			ShowMessage( "There are " + trim( RoundSigDigits( NumCount ) ) + " unused day schedules in input." );
+			ShowMessage( "There are " + RoundSigDigits( NumCount ) + " unused day schedules in input." );
 			NeedUseMessage = true;
 		}
 

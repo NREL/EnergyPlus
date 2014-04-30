@@ -4,7 +4,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
@@ -127,7 +126,7 @@ namespace MoistureBalanceEMPDManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_Fstring MaterialNames( 3, sFstring( MaxNameLength ) ); // Number of Material Alpha names defined
+		FArray1D_string MaterialNames( 3 ); // Number of Material Alpha names defined
 		int MaterNum; // Counter to keep track of the material number
 		int MaterialNumAlpha; // Number of material alpha names being passed
 		int MaterialNumProp; // Number of material properties being passed
@@ -148,7 +147,7 @@ namespace MoistureBalanceEMPDManager {
 		EMPDMat = GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( EMPDMat == 0 ) {
-			ShowSevereError( "EMPD Solution requested, but no \"" + trim( cCurrentModuleObject ) + "\" objects were found." );
+			ShowSevereError( "EMPD Solution requested, but no \"" + cCurrentModuleObject + "\" objects were found." );
 			ErrorsFound = true;
 		}
 
@@ -160,7 +159,7 @@ namespace MoistureBalanceEMPDManager {
 			//Load the material derived type from the input data.
 			MaterNum = FindItemInList( MaterialNames( 1 ), Material.Name(), TotMaterials );
 			if ( MaterNum == 0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 1 ) ) + " entered=" + trim( MaterialNames( 1 ) ) + ", must match to a valid Material name." );
+				ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + " entered=" + MaterialNames( 1 ) + ", must match to a valid Material name." );
 				ErrorsFound = true;
 				continue;
 			}
@@ -172,14 +171,14 @@ namespace MoistureBalanceEMPDManager {
 					//        CALL ShowSevereError('EMPD base material = "'//TRIM(Material(MaterNum)%Name)//  &
 					//                             '" was Material:NoMass. It cannot be used for EMPD calculations.')
 					ShowContinueError( "..Only Material base materials are allowed to have EMPD properties." );
-					ShowSevereError( trim( cCurrentModuleObject ) + ": Reference Material is not appropriate type for EMPD properties, material=" + trim( Material( MaterNum ).Name ) + ", must have regular properties (L,Cp,K,D)" );
+					ShowSevereError( cCurrentModuleObject + ": Reference Material is not appropriate type for EMPD properties, material=" + Material( MaterNum ).Name + ", must have regular properties (L,Cp,K,D)" );
 					ErrorsFound = true;
 				}
 			}
 			if ( Material( MaterNum ).Group != RegularMaterial ) {
 				//      CALL ShowSevereError('GetMoistureBalanceEMPDInput: Only Material:Regular base materials are allowed '// &
 				//                           'to have EMPD properties, material = '// TRIM(Material(MaterNum)%Name))
-				ShowSevereError( trim( cCurrentModuleObject ) + ": Reference Material is not appropriate type for EMPD properties, material=" + trim( Material( MaterNum ).Name ) + ", must have regular properties (L,Cp,K,D)" );
+				ShowSevereError( cCurrentModuleObject + ": Reference Material is not appropriate type for EMPD properties, material=" + Material( MaterNum ).Name + ", must have regular properties (L,Cp,K,D)" );
 				ErrorsFound = true;
 			}
 
@@ -210,23 +209,23 @@ namespace MoistureBalanceEMPDManager {
 					ShowContinueError( "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces." );
 				}
 				if ( DisplayExtraWarnings ) {
-					ShowMessage( "GetMoistureBalanceEMPDInput: EMPD properties are not assigned to the " "inside layer in Surface=" + trim( Surface( SurfNum ).Name ) );
-					ShowContinueError( "with Construction=" + trim( Construct( ConstrNum ).Name ) );
+					ShowMessage( "GetMoistureBalanceEMPDInput: EMPD properties are not assigned to the " "inside layer in Surface=" + Surface( SurfNum ).Name );
+					ShowContinueError( "with Construction=" + Construct( ConstrNum ).Name );
 				}
 			}
 			if ( Construct( ConstrNum ).TotLayers == 1 ) { // One layer construction
 				continue;
 			} else { // Multiple layer construction
 				if ( Material( Construct( ConstrNum ).LayerPoint( 1 ) ).EMPDMaterialProps && Surface( SurfNum ).ExtBoundCond <= 0 ) { // The external layer is not exposed to zone
-					ShowSevereError( "GetMoistureBalanceEMPDInput: EMPD properties are assigned to the " "outside layer in Construction=" + trim( Construct( ConstrNum ).Name ) );
-					ShowContinueError( "..Outside layer material with EMPD properties = " + trim( Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Name ) );
+					ShowSevereError( "GetMoistureBalanceEMPDInput: EMPD properties are assigned to the " "outside layer in Construction=" + Construct( ConstrNum ).Name );
+					ShowContinueError( "..Outside layer material with EMPD properties = " + Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Name );
 					ShowContinueError( "..A material with EMPD properties must be assigned to the inside layer of a construction." );
 					ErrorsFound = true;
 				}
 				for ( Layer = 2; Layer <= Construct( ConstrNum ).TotLayers - 1; ++Layer ) {
 					if ( Material( Construct( ConstrNum ).LayerPoint( Layer ) ).EMPDMaterialProps ) {
-						ShowSevereError( "GetMoistureBalanceEMPDInput: EMPD properties are assigned to a " "middle layer in Construction=" + trim( Construct( ConstrNum ).Name ) );
-						ShowContinueError( "..Middle layer material with EMPD properties = " + trim( Material( Construct( ConstrNum ).LayerPoint( Layer ) ).Name ) );
+						ShowSevereError( "GetMoistureBalanceEMPDInput: EMPD properties are assigned to a " "middle layer in Construction=" + Construct( ConstrNum ).Name );
+						ShowContinueError( "..Middle layer material with EMPD properties = " + Material( Construct( ConstrNum ).LayerPoint( Layer ) ).Name );
 						ShowContinueError( "..A material with EMPD properties must be assigned to the inside layer of a construction." );
 						ErrorsFound = true;
 					}
@@ -236,7 +235,7 @@ namespace MoistureBalanceEMPDManager {
 
 		for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
 			if ( ! EMPDzone( Loop ) ) {
-				ShowSevereError( "GetMoistureBalanceEMPDInput: None of the constructions for zone = " + trim( Zone( Loop ).Name ) + " has an inside layer with EMPD properties" );
+				ShowSevereError( "GetMoistureBalanceEMPDInput: None of the constructions for zone = " + Zone( Loop ).Name + " has an inside layer with EMPD properties" );
 				ShowContinueError( "..For each zone, the inside layer of at least one construction must have EMPD properties" );
 				ErrorsFound = true;
 			}
@@ -620,7 +619,7 @@ namespace MoistureBalanceEMPDManager {
 		int MatNum;
 
 		// Formats
-		std::string const Format_700( "(' Construction EMPD, ',A,', ',A,', ',4(F8.4,', '),F8.4)" );
+		static gio::Fmt const Format_700( "(' Construction EMPD, ',A,', ',A,', ',4(F8.4,', '),F8.4)" );
 
 		ScanForReports( "Constructions", DoReport, "Constructions" );
 
@@ -632,7 +631,7 @@ namespace MoistureBalanceEMPDManager {
 			if ( Construct( ConstrNum ).TypeIsWindow ) continue;
 			MatNum = Construct( ConstrNum ).LayerPoint( Construct( ConstrNum ).TotLayers );
 			if ( Material( MatNum ).EMPDMaterialProps ) {
-				gio::write( OutputFileInits, Format_700 ) << trim( Construct( ConstrNum ).Name ) << trim( Material( MatNum ).Name ) << Material( MatNum ).EMPDVALUE << Material( MatNum ).MoistACoeff << Material( MatNum ).MoistBCoeff << Material( MatNum ).MoistCCoeff << Material( MatNum ).MoistDCoeff;
+				gio::write( OutputFileInits, Format_700 ) << Construct( ConstrNum ).Name << Material( MatNum ).Name << Material( MatNum ).EMPDVALUE << Material( MatNum ).MoistACoeff << Material( MatNum ).MoistBCoeff << Material( MatNum ).MoistCCoeff << Material( MatNum ).MoistDCoeff;
 			}
 		}
 

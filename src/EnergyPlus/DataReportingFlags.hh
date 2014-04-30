@@ -1,8 +1,8 @@
 #ifndef DataReportingFlags_hh_INCLUDED
 #define DataReportingFlags_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Fstring.hh>
+// C++ Headers
+#include <string>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -20,7 +20,7 @@ namespace DataReportingFlags {
 
 	// MODULE VARIABLE DECLARATIONS:
 	extern int NumOfWarmupDays; // reinitialized for each environment.
-	extern Fstring cWarmupDay;
+	extern std::string cWarmupDay;
 	extern bool DisplayPerfSimulationFlag; // True when "Performing Simulation" should be displayed
 	extern bool DoWeatherInitReporting; // Init reporting -- items that go onto OutputFileInits
 	extern bool PrintEndDataDictionary; // Flag for printing "End of Data Dictionary" on output files

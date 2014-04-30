@@ -56,7 +56,6 @@ namespace CTElectricGenerator {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::NumOfTimeStepInHour;
 	using DataGlobals::SecInHour;
 	using DataGlobals::BeginEnvrnFlag;
@@ -90,7 +89,7 @@ namespace CTElectricGenerator {
 	void
 	SimCTGenerator(
 		int const GeneratorType, // type of Generator
-		Fstring const & GeneratorName, // user specified name of Generator
+		std::string const & GeneratorName, // user specified name of Generator
 		int & GeneratorIndex,
 		bool const RunFlag, // simulate Generator when TRUE
 		Real64 const MyLoad, // generator demand
@@ -139,16 +138,16 @@ namespace CTElectricGenerator {
 		//SELECT and CALL MODELS
 		if ( GeneratorIndex == 0 ) {
 			GenNum = FindItemInList( GeneratorName, CTGenerator.Name(), NumCTGenerators );
-			if ( GenNum == 0 ) ShowFatalError( "SimCTGenerator: Specified Generator not one of Valid COMBUSTION Turbine Generators " + trim( GeneratorName ) );
+			if ( GenNum == 0 ) ShowFatalError( "SimCTGenerator: Specified Generator not one of Valid COMBUSTION Turbine Generators " + GeneratorName );
 			GeneratorIndex = GenNum;
 		} else {
 			GenNum = GeneratorIndex;
 			if ( GenNum > NumCTGenerators || GenNum < 1 ) {
-				ShowFatalError( "SimCTGenerator: Invalid GeneratorIndex passed=" + trim( TrimSigDigits( GenNum ) ) + ", Number of CT Engine Generators=" + trim( TrimSigDigits( NumCTGenerators ) ) + ", Generator name=" + trim( GeneratorName ) );
+				ShowFatalError( "SimCTGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( GenNum ) + ", Number of CT Engine Generators=" + TrimSigDigits( NumCTGenerators ) + ", Generator name=" + GeneratorName );
 			}
 			if ( CheckEquipName( GenNum ) ) {
 				if ( GeneratorName != CTGenerator( GenNum ).Name ) {
-					ShowFatalError( "SimCTGenerator: Invalid GeneratorIndex passed=" + trim( TrimSigDigits( GenNum ) ) + ", Generator name=" + trim( GeneratorName ) + ", stored Generator Name for that index=" + trim( CTGenerator( GenNum ).Name ) );
+					ShowFatalError( "SimCTGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( GenNum ) + ", Generator name=" + GeneratorName + ", stored Generator Name for that index=" + CTGenerator( GenNum ).Name );
 				}
 				CheckEquipName( GenNum ) = false;
 			}
@@ -162,8 +161,8 @@ namespace CTElectricGenerator {
 
 	void
 	SimCTPlantHeatRecovery(
-		Fstring const & CompType, // unused1208
-		Fstring const & CompName,
+		std::string const & CompType, // unused1208
+		std::string const & CompName,
 		int const CompTypeNum, // unused1208
 		int & CompNum,
 		bool const RunFlag,
@@ -214,7 +213,7 @@ namespace CTElectricGenerator {
 		if ( InitLoopEquip ) {
 			CompNum = FindItemInList( CompName, CTGenerator.Name(), NumCTGenerators );
 			if ( CompNum == 0 ) {
-				ShowFatalError( "SimCTPlantHeatRecovery: CT Generator Unit not found=" + trim( CompName ) );
+				ShowFatalError( "SimCTPlantHeatRecovery: CT Generator Unit not found=" + CompName );
 				return;
 			}
 			MinCap = 0.0;
@@ -267,7 +266,7 @@ namespace CTElectricGenerator {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_Fstring AlphArray( 12, sFstring( MaxNameLength ) ); // character string data
+		FArray1D_string AlphArray( 12 ); // character string data
 		FArray1D< Real64 > NumArray( 12 ); // numeric data
 		static bool ErrorsFound( false ); // error flag
 		bool IsNotOK; // Flag to verify name
@@ -279,7 +278,7 @@ namespace CTElectricGenerator {
 		NumCTGenerators = GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumCTGenerators <= 0 ) {
-			ShowSevereError( "No " + trim( cCurrentModuleObject ) + " equipment specified in input file" );
+			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
 			ErrorsFound = true;
 		}
 
@@ -296,7 +295,7 @@ namespace CTElectricGenerator {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), CTGenerator.Name(), GeneratorNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( AlphArray( 1 ), CTGenerator.Name(), GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -305,13 +304,13 @@ namespace CTElectricGenerator {
 
 			CTGenerator( GeneratorNum ).RatedPowerOutput = NumArray( 1 );
 			if ( NumArray( 1 ) == 0.0 ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 1 ) ) + "=" + trim( RoundSigDigits( NumArray( 1 ), 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 1 ) + '=' + RoundSigDigits( NumArray( 1 ), 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
 			// Not sure what to do with electric nodes, so do not use optional arguments
-			CTGenerator( GeneratorNum ).ElectricCircuitNode = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, trim( cCurrentModuleObject ), AlphArray( 1 ), NodeType_Electric, NodeConnectionType_Electric, 1, ObjectIsNotParent );
+			CTGenerator( GeneratorNum ).ElectricCircuitNode = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Electric, NodeConnectionType_Electric, 1, ObjectIsNotParent );
 
 			CTGenerator( GeneratorNum ).MinPartLoadRat = NumArray( 2 );
 			CTGenerator( GeneratorNum ).MaxPartLoadRat = NumArray( 3 );
@@ -321,43 +320,43 @@ namespace CTElectricGenerator {
 
 			CTGenerator( GeneratorNum ).PLBasedFuelInputCurve = GetCurveIndex( AlphArray( 3 ) ); // convert curve name to number
 			if ( CTGenerator( GeneratorNum ).PLBasedFuelInputCurve == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + "=" + trim( AlphArray( 3 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + '=' + AlphArray( 3 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
 			CTGenerator( GeneratorNum ).TempBasedFuelInputCurve = GetCurveIndex( AlphArray( 4 ) ); // convert curve name to number
 			if ( CTGenerator( GeneratorNum ).TempBasedFuelInputCurve == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 4 ) ) + "=" + trim( AlphArray( 4 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + '=' + AlphArray( 4 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
 			CTGenerator( GeneratorNum ).ExhaustFlowCurve = GetCurveIndex( AlphArray( 5 ) ); // convert curve name to number
 			if ( CTGenerator( GeneratorNum ).ExhaustFlowCurve == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 5 ) ) + "=" + trim( AlphArray( 5 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 5 ) + '=' + AlphArray( 5 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
 			CTGenerator( GeneratorNum ).PLBasedExhaustTempCurve = GetCurveIndex( AlphArray( 6 ) ); // convert curve name to number
 			if ( CTGenerator( GeneratorNum ).PLBasedExhaustTempCurve == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 6 ) ) + "=" + trim( AlphArray( 6 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + '=' + AlphArray( 6 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
 			CTGenerator( GeneratorNum ).TempBasedExhaustTempCurve = GetCurveIndex( AlphArray( 7 ) ); // convert curve name to number
 			if ( CTGenerator( GeneratorNum ).TempBasedExhaustTempCurve == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( AlphArray( 7 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + AlphArray( 7 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
 			CTGenerator( GeneratorNum ).QLubeOilRecoveredCurve = GetCurveIndex( AlphArray( 8 ) ); // convert curve name to number
 			if ( CTGenerator( GeneratorNum ).QLubeOilRecoveredCurve == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 8 ) ) + "=" + trim( AlphArray( 8 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 8 ) + '=' + AlphArray( 8 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
@@ -372,31 +371,31 @@ namespace CTElectricGenerator {
 
 			if ( CTGenerator( GeneratorNum ).DesignHeatRecVolFlowRate > 0.0 ) {
 				CTGenerator( GeneratorNum ).HeatRecActive = true;
-				CTGenerator( GeneratorNum ).HeatRecInletNodeNum = GetOnlySingleNode( AlphArray( 9 ), ErrorsFound, trim( cCurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+				CTGenerator( GeneratorNum ).HeatRecInletNodeNum = GetOnlySingleNode( AlphArray( 9 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 				if ( CTGenerator( GeneratorNum ).HeatRecInletNodeNum == 0 ) {
-					ShowSevereError( "Missing Node Name, Heat Recovery Inlet, for " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+					ShowSevereError( "Missing Node Name, Heat Recovery Inlet, for " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 					ErrorsFound = true;
 				}
-				CTGenerator( GeneratorNum ).HeatRecOutletNodeNum = GetOnlySingleNode( AlphArray( 10 ), ErrorsFound, trim( cCurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+				CTGenerator( GeneratorNum ).HeatRecOutletNodeNum = GetOnlySingleNode( AlphArray( 10 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 				if ( CTGenerator( GeneratorNum ).HeatRecOutletNodeNum == 0 ) {
-					ShowSevereError( "Missing Node Name, Heat Recovery Outlet, for " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+					ShowSevereError( "Missing Node Name, Heat Recovery Outlet, for " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 					ErrorsFound = true;
 				}
-				TestCompSet( trim( cCurrentModuleObject ), AlphArray( 1 ), AlphArray( 9 ), AlphArray( 10 ), "Heat Recovery Nodes" );
+				TestCompSet( cCurrentModuleObject, AlphArray( 1 ), AlphArray( 9 ), AlphArray( 10 ), "Heat Recovery Nodes" );
 				RegisterPlantCompDesignFlow( CTGenerator( GeneratorNum ).HeatRecInletNodeNum, CTGenerator( GeneratorNum ).DesignHeatRecVolFlowRate );
 			} else {
 				CTGenerator( GeneratorNum ).HeatRecActive = false;
 				CTGenerator( GeneratorNum ).HeatRecInletNodeNum = 0;
 				CTGenerator( GeneratorNum ).HeatRecOutletNodeNum = 0;
 				if ( ! lAlphaFieldBlanks( 9 ) || ! lAlphaFieldBlanks( 10 ) ) {
-					ShowWarningError( "Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+					ShowWarningError( "Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 					ShowContinueError( "However, Node names were specified for Heat Recovery inlet or outlet nodes" );
 				}
 			}
 
 			//Fuel Type Case Statement
 			{ auto const SELECT_CASE_var( AlphArray( 11 ) );
-			if ( SELECT_CASE_var == "  " ) { //If blank then the default is Natural Gas
+			if ( is_blank( SELECT_CASE_var ) ) { //If blank then the default is Natural Gas
 				CTGenerator( GeneratorNum ).FuelType = "Gas";
 
 			} else if ( ( SELECT_CASE_var == "GAS" ) || ( SELECT_CASE_var == "NATURALGAS" ) || ( SELECT_CASE_var == "NATURAL GAS" ) ) {
@@ -424,8 +423,8 @@ namespace CTElectricGenerator {
 				CTGenerator( GeneratorNum ).FuelType = "OtherFuel2";
 
 			} else {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 11 ) ) + "=" + trim( AlphArray( 11 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 11 ) + '=' + AlphArray( 11 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}}
 
@@ -435,9 +434,9 @@ namespace CTElectricGenerator {
 			if ( lAlphaFieldBlanks( 12 ) ) {
 				CTGenerator( GeneratorNum ).OAInletNode = 0;
 			} else {
-				CTGenerator( GeneratorNum ).OAInletNode = GetOnlySingleNode( AlphArray( 12 ), ErrorsFound, trim( cCurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
+				CTGenerator( GeneratorNum ).OAInletNode = GetOnlySingleNode( AlphArray( 12 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
 				if ( ! CheckOutAirNodeNumber( CTGenerator( GeneratorNum ).OAInletNode ) ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( CTGenerator( GeneratorNum ).Name ) + "\" Outdoor Air Inlet Node Name not valid Outdoor Air Node= " + trim( AlphArray( 12 ) ) );
+					ShowSevereError( cCurrentModuleObject + ", \"" + CTGenerator( GeneratorNum ).Name + "\" Outdoor Air Inlet Node Name not valid Outdoor Air Node= " + AlphArray( 12 ) );
 					ShowContinueError( "...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node." );
 					ErrorsFound = true;
 				}
@@ -447,21 +446,21 @@ namespace CTElectricGenerator {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + trim( cCurrentModuleObject ) );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
 		}
 
 		for ( GeneratorNum = 1; GeneratorNum <= NumCTGenerators; ++GeneratorNum ) {
 			SetupOutputVariable( "Generator Produced Electric Power [W]", CTGeneratorReport( GeneratorNum ).PowerGen, "System", "Average", CTGenerator( GeneratorNum ).Name );
 			SetupOutputVariable( "Generator Produced Electric Energy [J]", CTGeneratorReport( GeneratorNum ).EnergyGen, "System", "Sum", CTGenerator( GeneratorNum ).Name, _, "ElectricityProduced", "COGENERATION", _, "Plant" );
 
-			SetupOutputVariable( "Generator " + trim( CTGenerator( GeneratorNum ).FuelType ) + " Rate [W]", CTGeneratorReport( GeneratorNum ).FuelEnergyUseRate, "System", "Average", CTGenerator( GeneratorNum ).Name );
-			SetupOutputVariable( "Generator " + trim( CTGenerator( GeneratorNum ).FuelType ) + " Energy [J]", CTGeneratorReport( GeneratorNum ).FuelEnergy, "System", "Sum", CTGenerator( GeneratorNum ).Name, _, CTGenerator( GeneratorNum ).FuelType, "COGENERATION", _, "Plant" );
+			SetupOutputVariable( "Generator " + CTGenerator( GeneratorNum ).FuelType + " Rate [W]", CTGeneratorReport( GeneratorNum ).FuelEnergyUseRate, "System", "Average", CTGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator " + CTGenerator( GeneratorNum ).FuelType + " Energy [J]", CTGeneratorReport( GeneratorNum ).FuelEnergy, "System", "Sum", CTGenerator( GeneratorNum ).Name, _, CTGenerator( GeneratorNum ).FuelType, "COGENERATION", _, "Plant" );
 
 			//    general fuel use report (to match other generators)
 			SetupOutputVariable( "Generator Fuel HHV Basis Rate [W]", CTGeneratorReport( GeneratorNum ).FuelEnergyUseRate, "System", "Average", CTGenerator( GeneratorNum ).Name );
 			SetupOutputVariable( "Generator Fuel HHV Basis Energy [J]", CTGeneratorReport( GeneratorNum ).FuelEnergy, "System", "Sum", CTGenerator( GeneratorNum ).Name );
 
-			SetupOutputVariable( "Generator " + trim( CTGenerator( GeneratorNum ).FuelType ) + " Mass Flow Rate [kg/s]", CTGeneratorReport( GeneratorNum ).FuelMdot, "System", "Average", CTGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator " + CTGenerator( GeneratorNum ).FuelType + " Mass Flow Rate [kg/s]", CTGeneratorReport( GeneratorNum ).FuelMdot, "System", "Average", CTGenerator( GeneratorNum ).Name );
 
 			SetupOutputVariable( "Generator Exhaust Air Temperature [C]", CTGeneratorReport( GeneratorNum ).ExhaustStackTemp, "System", "Average", CTGenerator( GeneratorNum ).Name );
 

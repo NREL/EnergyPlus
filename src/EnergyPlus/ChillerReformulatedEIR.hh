@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -16,7 +15,6 @@ namespace EnergyPlus {
 namespace ChillerReformulatedEIR {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -62,11 +60,11 @@ namespace ChillerReformulatedEIR {
 	struct ReformulatedEIRChillerSpecs
 	{
 		// Members
-		Fstring Name; // User identifier
+		std::string Name; // User identifier
 		int TypeNum; // plant loop type identifier
-		Fstring CAPFTName; // CAPFT curve name
-		Fstring EIRFTName; // EIRFT curve name
-		Fstring EIRFPLRName; // EIRPLR curve name
+		std::string CAPFTName; // CAPFT curve name
+		std::string EIRFTName; // EIRFT curve name
+		std::string EIRFPLRName; // EIRPLR curve name
 		int CondenserType; // Type of Condenser. Water Cooled is the only available option for now
 		Real64 RefCap; // Reference capacity of the chiller [W]
 		Real64 RefCOP; // Reference coefficient of performance [W/W]
@@ -170,11 +168,7 @@ namespace ChillerReformulatedEIR {
 
 		// Default Constructor
 		ReformulatedEIRChillerSpecs() :
-			Name( MaxNameLength ),
 			TypeNum( 0 ),
-			CAPFTName( MaxNameLength ),
-			EIRFTName( MaxNameLength ),
-			EIRFPLRName( MaxNameLength ),
 			CondenserType( 0 ),
 			RefCap( 0.0 ),
 			RefCOP( 0.0 ),
@@ -266,11 +260,11 @@ namespace ChillerReformulatedEIR {
 
 		// Member Constructor
 		ReformulatedEIRChillerSpecs(
-			Fstring const & Name, // User identifier
+			std::string const & Name, // User identifier
 			int const TypeNum, // plant loop type identifier
-			Fstring const & CAPFTName, // CAPFT curve name
-			Fstring const & EIRFTName, // EIRFT curve name
-			Fstring const & EIRFPLRName, // EIRPLR curve name
+			std::string const & CAPFTName, // CAPFT curve name
+			std::string const & EIRFTName, // EIRFT curve name
+			std::string const & EIRFPLRName, // EIRPLR curve name
 			int const CondenserType, // Type of Condenser. Water Cooled is the only available option for now
 			Real64 const RefCap, // Reference capacity of the chiller [W]
 			Real64 const RefCOP, // Reference coefficient of performance [W/W]
@@ -359,11 +353,11 @@ namespace ChillerReformulatedEIR {
 			bool const PossibleSubcooling, // flag to indicate chiller is doing less cooling that requested
 			bool const IsThisSized // true if sizing is done
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			TypeNum( TypeNum ),
-			CAPFTName( MaxNameLength, CAPFTName ),
-			EIRFTName( MaxNameLength, EIRFTName ),
-			EIRFPLRName( MaxNameLength, EIRFPLRName ),
+			CAPFTName( CAPFTName ),
+			EIRFTName( EIRFTName ),
+			EIRFPLRName( EIRFPLRName ),
 			CondenserType( CondenserType ),
 			RefCap( RefCap ),
 			RefCOP( RefCOP ),
@@ -584,8 +578,8 @@ namespace ChillerReformulatedEIR {
 
 	void
 	SimReformulatedEIRChiller(
-		Fstring const & EIRChillerType, // Type of chiller !unused1208
-		Fstring const & EIRChillerName, // User specified name of chiller
+		std::string const & EIRChillerType, // Type of chiller !unused1208
+		std::string const & EIRChillerName, // User specified name of chiller
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // Chiller number pointer
 		int const LoopNum, // plant loop index pointer

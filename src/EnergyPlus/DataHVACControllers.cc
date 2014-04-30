@@ -33,13 +33,13 @@ namespace DataHVACControllers {
 	// MODULE PARAMETER DEFINITIONS:
 
 	int const ControllerSimple_Type( 1 );
-	FArray1D_Fstring const ControllerTypes( 1, sFstring( 20 ), "Controller:WaterCoil" );
+	FArray1D_string const ControllerTypes( 1, std::string( "Controller:WaterCoil" ) );
 
 	// Controller action used in modules HVACControllers and ZoneControllers
 	int const iNoAction( 0 );
 	int const iReverseAction( 1 );
 	int const iNormalAction( 2 );
-	FArray1D_Fstring const ActionTypes( {0,2}, sFstring( 14 ), { "No action     ", "Reverse action", "Normal action " } );
+	FArray1D_string const ActionTypes( {0,2}, { "No action", "Reverse action", "Normal action" } );
 
 	// Controller mode used in modules HVACControllers and ZoneControllers
 	int const iModeWrongAction( -2 ); // Controller error. E.g., bad action
@@ -52,7 +52,7 @@ namespace DataHVACControllers {
 
 	int const iFirstMode( iModeWrongAction ); // First operating mode in range
 	int const iLastMode( iModeMaxActive ); // Last operating mode in range
-	FArray1D_Fstring const ControllerModeTypes( {-2,4}, sFstring( 38 ), { "Wrong action mode                     ", "No controller mode                    ", "Off controller mode                   ", "Inactive controller mode              ", "Active unconstrained controller mode  ", "Active min-constrained controller mode", "Active max-constrained controller mode" } );
+	FArray1D_string const ControllerModeTypes( {-2,4}, { "Wrong action mode", "No controller mode", "Off controller mode", "Inactive controller mode", "Active unconstrained controller mode", "Active min-constrained controller mode", "Active max-constrained controller mode" } );
 
 	// Controller operation used in module HVACControllers
 	int const iControllerOpColdStart( 1 ); // Reset for cold start
