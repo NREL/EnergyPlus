@@ -9,14 +9,12 @@ endif ()
 # **** WINDOWS **** #
 if (WIN32 AND NOT UNIX)  # UNIX clause required to filter out cygwin installations
     
-    # need to figure out how to set these:
+    # need to figure out how to set this to avoid the major slow-down in debugging:
     # Configuration Properties ->Debugging -> Environment, use drop-down list to choose <Edit> and type _NO_DEBUG_HEAP=1 then click OK 
-    # C/C++ -> General -> Multi-processor Compilation use drop-down to choose Yes (/MP) 
-    # C/C++ -> Code Generation -> Basic Runtime Checks use drop-down to choose Default 
-    # C/C++ -> Language -> Disable Language Extensions use drop-down to choose Yes (/Za) -- IN USE BELOW
     
     # visual c++ (VS 2013)
     if (MSVC)    
+	
         # Disabled Warnings:
         #  4101
 		#  4102
@@ -27,11 +25,39 @@ if (WIN32 AND NOT UNIX)  # UNIX clause required to filter out cygwin installatio
         #  4521
 		#  4800 
 		#  4996  Deprecated" STL functions (that MS has safer, non-std alternatives for)
-        SET(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -nologo -Za -EHsc -GR -wd4101 -wd4102 -wd4244 -wd4258 -wd4305 -wd4355 -wd4521 -wd4800 -wd4996 -DVC_EXTRALEAN -DWIN32_LEAN_AND_MEAN -DNOMINMAX -D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -D_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES -TP -O2 -DNDEBUG")
-        # -RTCc gave exe blocked by Windows 8.1 Defender with ostringstream
-        SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -nologo -Za -EHsc -GR -wd4244 -wd4258 -wd4355 -wd4996 -DVC_EXTRALEAN -DWIN32_LEAN_AND_MEAN -DNOMINMAX -D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -D_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES -TP -Z7 -Od -Ob0 -RTCsu")
-        SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -nologo -F2097152")  # was LDFLAGS
+		
+        SET(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -nologo") #Suppresses compiler copyright notice and informational messages
+		SET(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -MP") # Enables multi-processor compilation of source within a single project
+		SET(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -Za") # Disables MS language extensions
+		SET(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -EHsc") # Specifies that exceptions are caught from C++ code only
+		#SET(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -GR") # Adds code to check object types at runtime -- ON by DEFAULT 
+		SET(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -wd4101 -wd4102 -wd4244 -wd4258 -wd4305 -wd4355 -wd4521 -wd4800 -wd4996") # Disables warning messages listed above 
+		SET(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -DVC_EXTRALEAN -DWIN32_LEAN_AND_MEAN") # Excludes rarely used services and headers from compilation
+		SET(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
+		SET(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -D_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES") # ???
+		SET(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -TP") # Globally treat all source files as C++
+		SET(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -O2") # Optimize code to level 2
+		SET(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG") # Define the "NDEBUG" flag; disables standard-C assertions
+		
+        # A note from Stuart: -RTCc gave exe blocked by Windows 8.1 Defender with ostringstream
+        SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -nologo")
+		SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -MP")
+		SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Za")
+		SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -EHsc")
+		#SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -GR")
+		SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -wd4101 -wd4102 -wd4244 -wd4258 -wd4305 -wd4355 -wd4521 -wd4800 -wd4996")
+		SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DVC_EXTRALEAN -DWIN32_LEAN_AND_MEAN")
+		SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DNOMINMAX")
+		SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -D_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES")
+		SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -TP")
+		SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Z7") # Produces obj file with symbolic debugging info; no pdb file
+		SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Od") # Turns off all optimization
+		SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Ob0") # Disables inline expansion
+        
+		# Linker
+		SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -nologo -F2097152")  # was LDFLAGS
         #SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -link -NODEFAULTLIB:libcd")  # was LINKFLAGS
+		
     endif ()
     # g++
     if (CMAKE_COMPILER_IS_GNUCXX)
