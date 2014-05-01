@@ -85,7 +85,7 @@ public: // Assignment
 	Reference &
 	operator =( Value const & val )
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		*ptr_ = val;
 		return *this;
 	}
@@ -96,7 +96,7 @@ public: // Assignment
 	Reference &
 	operator =( U const & val )
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		*ptr_ = val;
 		return *this;
 	}
@@ -107,7 +107,7 @@ public: // Conversion
 	inline
 	operator Value const &() const
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		return *ptr_;
 	}
 
@@ -115,7 +115,7 @@ public: // Conversion
 	inline
 	operator Value &()
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		return *ptr_;
 	}
 
@@ -126,7 +126,7 @@ public: // Operators
 	Value const &
 	operator ()() const
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		return *ptr_;
 	}
 
@@ -135,7 +135,7 @@ public: // Operators
 	Value &
 	operator ()()
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		return *ptr_;
 	}
 
@@ -319,8 +319,8 @@ public: // Comparison
 	bool
 	operator ==( Reference const & a, Reference const & b )
 	{
-		assert( a.ptr_ && b.ptr_ ); // Fortran disallows use if not associated
-		return ( a.ptr_ && b.ptr_ && ( *a.ptr_ == *b.ptr_ ) );
+		assert( ( a.ptr_ != nullptr ) && ( b.ptr_ != nullptr ) ); // Fortran disallows use if not associated
+		return ( ( a.ptr_ != nullptr ) && ( b.ptr_ != nullptr ) && ( *a.ptr_ == *b.ptr_ ) );
 	}
 
 	// Reference != Reference
@@ -329,8 +329,8 @@ public: // Comparison
 	bool
 	operator !=( Reference const & a, Reference const & b )
 	{
-		assert( a.ptr_ && b.ptr_ ); // Fortran disallows use if not associated
-		return ( ! a.ptr_ || ! b.ptr_ || ( *a.ptr_ != *b.ptr_ ) );
+		assert( ( a.ptr_ != nullptr ) && ( b.ptr_ != nullptr ) ); // Fortran disallows use if not associated
+		return ( ( a.ptr_ == nullptr ) || ( b.ptr_ == nullptr ) || ( *a.ptr_ != *b.ptr_ ) );
 	}
 
 	// Reference == Value
@@ -339,8 +339,8 @@ public: // Comparison
 	bool
 	operator ==( Reference const & a, Value const & b )
 	{
-		assert( a.ptr_ ); // Fortran disallows use if not associated
-		return ( a.ptr_ && ( *a.ptr_ == b ) );
+		assert( a.ptr_ != nullptr ); // Fortran disallows use if not associated
+		return ( ( a.ptr_ != nullptr ) && ( *a.ptr_ == b ) );
 	}
 
 	// Reference != Value
@@ -349,8 +349,8 @@ public: // Comparison
 	bool
 	operator !=( Reference const & a, Value const & b )
 	{
-		assert( a.ptr_ ); // Fortran disallows use if not associated
-		return !( a.ptr_ && ( *a.ptr_ == b ) );
+		assert( a.ptr_ != nullptr ); // Fortran disallows use if not associated
+		return ( ( a.ptr_ == nullptr ) || ( *a.ptr_ != b ) );
 	}
 
 	// Value == Reference
@@ -359,8 +359,8 @@ public: // Comparison
 	bool
 	operator ==( Value const & a, Reference const & b )
 	{
-		assert( b.ptr_ ); // Fortran disallows use if not associated
-		return ( b.ptr_ && ( a == *b.ptr_ ) );
+		assert( b.ptr_ != nullptr ); // Fortran disallows use if not associated
+		return ( ( b.ptr_ != nullptr ) && ( a == *b.ptr_ ) );
 	}
 
 	// Value != Reference
@@ -369,8 +369,8 @@ public: // Comparison
 	bool
 	operator !=( Value const & a, Reference const & b )
 	{
-		assert( b.ptr_ ); // Fortran disallows use if not associated
-		return !( b.ptr_ && ( a == *b.ptr_ ) );
+		assert( b.ptr_ != nullptr ); // Fortran disallows use if not associated
+		return ( ( b.ptr_ == nullptr ) || ( a != *b.ptr_ ) );
 	}
 
 private: // Data

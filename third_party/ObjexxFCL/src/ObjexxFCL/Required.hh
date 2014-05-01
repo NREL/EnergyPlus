@@ -53,7 +53,7 @@ public: // Creation
 		ptr_( r.own_ ? new Value( r() ) : r.ptr_ ),
 		own_( r.own_ )
 	{
-		assert( ptr_ ); // Required object must be present
+		assert( ptr_ != nullptr ); // Required object must be present
 	}
 
 	// Required Constructor Template
@@ -63,7 +63,7 @@ public: // Creation
 		ptr_( o.own_ ? new Value( o() ) : o.ptr_ ),
 		own_( o.own_ )
 	{
-		assert( ptr_ ); // Required object must be present
+		assert( ptr_ != nullptr ); // Required object must be present
 	}
 
 	// Value Constructor
@@ -113,7 +113,7 @@ public: // Assignment
 	{
 		if ( own_ ) delete ptr_;
 		ptr_ = r.own_ ? new Value( r() ) : r.ptr_;
-		assert( ptr_ ); // Required object must be present
+		assert( ptr_ != nullptr ); // Required object must be present
 		own_ = r.own_;
 		return *this;
 	}
@@ -123,7 +123,7 @@ public: // Assignment
 	Required &
 	operator =( Value const & val )
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		*ptr_ = val;
 		return *this;
 	}
@@ -134,7 +134,7 @@ public: // Assignment
 	Required &
 	operator =( U const & val )
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		*ptr_ = val;
 		return *this;
 	}
@@ -144,7 +144,7 @@ public: // Assignment
 	Required &
 	operator =( Value && val )
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		*ptr_ = val;
 		return *this;
 	}
@@ -155,7 +155,7 @@ public: // Conversion
 	inline
 	operator Value const &() const
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		return *ptr_;
 	}
 
@@ -163,7 +163,7 @@ public: // Conversion
 	inline
 	operator Value &()
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		return *ptr_;
 	}
 
@@ -174,7 +174,7 @@ public: // Operators
 	Value const &
 	operator ()() const
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		return *ptr_;
 	}
 
@@ -183,7 +183,7 @@ public: // Operators
 	Value &
 	operator ()()
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		return *ptr_;
 	}
 
@@ -194,7 +194,7 @@ public: // Properties
 	bool
 	present() const
 	{
-		return ptr_;
+		return ( ptr_ != nullptr );
 	}
 
 	// Own?
@@ -213,7 +213,7 @@ public: // Comparison
 	bool
 	operator ==( Required const & a, Required const & b )
 	{
-		return ( a.ptr_ && b.ptr_ && ( *a.ptr_ == *b.ptr_ ) ) || ( ( ! a.ptr_ ) && ( ! b.ptr_ ) );
+		return ( ( a.ptr_ != nullptr ) && ( b.ptr_ != nullptr ) ? ( *a.ptr_ == *b.ptr_ ) : ( a.ptr_ == b.ptr_ ) );
 	}
 
 	// Required != Required
@@ -231,7 +231,7 @@ public: // Comparison
 	bool
 	operator ==( Required const & a, Value const & b )
 	{
-		return ( ( a.ptr_ ) && ( *a.ptr_ == b ) );
+		return ( ( a.ptr_ != nullptr ) && ( *a.ptr_ == b ) );
 	}
 
 	// Required != Value
@@ -249,7 +249,7 @@ public: // Comparison
 	bool
 	operator ==( Value const & a, Required const & b )
 	{
-		return ( ( b.ptr_ ) && ( a == *b.ptr_ ) );
+		return ( ( b.ptr_ != nullptr ) && ( a == *b.ptr_ ) );
 	}
 
 	// Value != Required
@@ -263,8 +263,8 @@ public: // Comparison
 
 private: // Data
 
-	Value * ptr_; // Pointer
-	bool own_; // Owner?
+	Value * ptr_; // Pointer to object
+	bool own_; // Own the object?
 
 }; // Required
 
@@ -297,7 +297,7 @@ public: // Creation
 	Required( Required const & r ) :
 		ptr_( r.ptr_ )
 	{
-		assert( ptr_ ); // Required object must be present
+		assert( ptr_ != nullptr ); // Required object must be present
 	}
 
 	// Required Constructor Template
@@ -306,7 +306,7 @@ public: // Creation
 	Required( Required< U, EnableType > const & o, typename std::enable_if< std::is_const< T >::value && std::is_same< U, typename std::remove_const< T >::type >::value >::type * = 0 ) :
 		ptr_( o.ptr_ )
 	{
-		assert( ptr_ ); // Required object must be present
+		assert( ptr_ != nullptr ); // Required object must be present
 	}
 
 	// Value Constructor
@@ -336,7 +336,7 @@ public: // Assignment
 	operator =( Required const & r )
 	{
 		ptr_ = r.ptr_;
-		assert( ptr_ ); // Required object must be present
+		assert( ptr_ != nullptr ); // Required object must be present
 		return *this;
 	}
 
@@ -345,7 +345,7 @@ public: // Assignment
 	Required &
 	operator =( Value const & val )
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		*ptr_ = val;
 		return *this;
 	}
@@ -356,7 +356,7 @@ public: // Assignment
 	Required &
 	operator =( U const & val )
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		*ptr_ = val;
 		return *this;
 	}
@@ -366,7 +366,7 @@ public: // Assignment
 	Required &
 	operator =( Value && val )
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		*ptr_ = val;
 		return *this;
 	}
@@ -377,7 +377,7 @@ public: // Conversion
 	inline
 	operator Value const &() const
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		return *ptr_;
 	}
 
@@ -385,7 +385,7 @@ public: // Conversion
 	inline
 	operator Value &()
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		return *ptr_;
 	}
 
@@ -396,7 +396,7 @@ public: // Operators
 	Value const &
 	operator ()() const
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		return *ptr_;
 	}
 
@@ -405,7 +405,7 @@ public: // Operators
 	Value &
 	operator ()()
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		return *ptr_;
 	}
 
@@ -416,7 +416,7 @@ public: // Properties
 	bool
 	present() const
 	{
-		return ptr_;
+		return ( ptr_ != nullptr );
 	}
 
 public: // Comparison
@@ -427,7 +427,7 @@ public: // Comparison
 	bool
 	operator ==( Required const & a, Required const & b )
 	{
-		return ( a.ptr_ && b.ptr_ && ( *a.ptr_ == *b.ptr_ ) ) || ( ( ! a.ptr_ ) && ( ! b.ptr_ ) );
+		return ( ( a.ptr_ != nullptr ) && ( b.ptr_ != nullptr ) ? ( *a.ptr_ == *b.ptr_ ) : ( a.ptr_ == b.ptr_ ) );
 	}
 
 	// Required != Required
@@ -445,7 +445,7 @@ public: // Comparison
 	bool
 	operator ==( Required const & a, Value const & b )
 	{
-		return ( ( a.ptr_ ) && ( *a.ptr_ == b ) );
+		return ( ( a.ptr_ != nullptr ) && ( *a.ptr_ == b ) );
 	}
 
 	// Required != Value
@@ -463,7 +463,7 @@ public: // Comparison
 	bool
 	operator ==( Value const & a, Required const & b )
 	{
-		return ( ( b.ptr_ ) && ( a == *b.ptr_ ) );
+		return ( ( b.ptr_ != nullptr ) && ( a == *b.ptr_ ) );
 	}
 
 	// Value != Required
