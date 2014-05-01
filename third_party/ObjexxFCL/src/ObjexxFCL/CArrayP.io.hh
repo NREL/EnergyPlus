@@ -15,7 +15,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/CArrayP.hh>
-#include <ObjexxFCL/char.constants.hh>
 #include <ObjexxFCL/TypeTraits.hh>
 
 // C++ Headers
@@ -47,7 +46,7 @@ operator <<( std::ostream & stream, CArrayP< T > const & a )
 		size_type const e( a.size() - 1 );
 		int const w( Traits::width() );
 		for ( size_type i = 0; i < e; ++i ) {
-			stream << setw( w ) << a[ i ] << SPC;
+			stream << setw( w ) << a[ i ] << ' ';
 		} stream << setw( w ) << a[ e ];
 
 		// Restore previous stream state

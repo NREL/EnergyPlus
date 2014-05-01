@@ -74,7 +74,6 @@ namespace VentilatedSlab {
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::BeginDayFlag;
 	using DataGlobals::BeginTimeStepFlag;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::WarmupFlag;
@@ -96,7 +95,7 @@ namespace VentilatedSlab {
 	// MODULE PARAMETER DEFINITIONS
 
 	// Module Object
-	Fstring const cMO_VentilatedSlab( "ZoneHVAC:VentilatedSlab" );
+	std::string const cMO_VentilatedSlab( "ZoneHVAC:VentilatedSlab" );
 
 	// Parameters for outside air control types:
 	int const Heating_ElectricCoilType( 1 );
@@ -165,7 +164,7 @@ namespace VentilatedSlab {
 
 	void
 	SimVentilatedSlab(
-		Fstring const & CompName, // name of the fan coil unit
+		std::string const & CompName, // name of the fan coil unit
 		int const ZoneNum, // number of zone being served
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		Real64 & PowerMet, // Sensible power supplied (W)
@@ -220,17 +219,17 @@ namespace VentilatedSlab {
 		if ( CompIndex == 0 ) {
 			Item = FindItemInList( CompName, VentSlab.Name(), NumOfVentSlabs );
 			if ( Item == 0 ) {
-				ShowFatalError( "SimVentilatedSlab: system not found=" + trim( CompName ) );
+				ShowFatalError( "SimVentilatedSlab: system not found=" + CompName );
 			}
 			CompIndex = Item;
 		} else {
 			Item = CompIndex;
 			if ( Item > NumOfVentSlabs || Item < 1 ) {
-				ShowFatalError( "SimVentilatedSlab:  Invalid CompIndex passed=" + trim( TrimSigDigits( Item ) ) + ", Number of Systems=" + trim( TrimSigDigits( NumOfVentSlabs ) ) + ", Entered System name=" + trim( CompName ) );
+				ShowFatalError( "SimVentilatedSlab:  Invalid CompIndex passed=" + TrimSigDigits( Item ) + ", Number of Systems=" + TrimSigDigits( NumOfVentSlabs ) + ", Entered System name=" + CompName );
 			}
 			if ( CheckEquipName( Item ) ) {
 				if ( CompName != VentSlab( Item ).Name ) {
-					ShowFatalError( "SimVentilatedSlab: Invalid CompIndex passed=" + trim( TrimSigDigits( Item ) ) + ", System name=" + trim( CompName ) + ", stored System Name for that index=" + trim( VentSlab( Item ).Name ) );
+					ShowFatalError( "SimVentilatedSlab: Invalid CompIndex passed=" + TrimSigDigits( Item ) + ", System name=" + CompName + ", stored System Name for that index=" + VentSlab( Item ).Name );
 				}
 				CheckEquipName( Item ) = false;
 			}
@@ -303,15 +302,15 @@ namespace VentilatedSlab {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const Blank;
-		static Fstring const MeanAirTemperature( "MeanAirTemperature" );
-		static Fstring const MeanRadiantTemperature( "MeanRadiantTemperature" );
-		static Fstring const OperativeTemperature( "OperativeTemperature" );
-		static Fstring const OutsideAirDryBulbTemperature( "OutdoorDryBulbTemperature" );
-		static Fstring const OutsideAirWetBulbTemperature( "OutdoorWetBulbTemperature" );
-		static Fstring const SlabSurfaceTemperature( "SurfaceTemperature" );
-		static Fstring const SlabSurfaceDewPointTemperature( "ZoneAirDewPointTemperature" );
-		static Fstring const CurrentModuleObject( "ZoneHVAC:VentilatedSlab" );
+		static std::string const Blank;
+		static std::string const MeanAirTemperature( "MeanAirTemperature" );
+		static std::string const MeanRadiantTemperature( "MeanRadiantTemperature" );
+		static std::string const OperativeTemperature( "OperativeTemperature" );
+		static std::string const OutsideAirDryBulbTemperature( "OutdoorDryBulbTemperature" );
+		static std::string const OutsideAirWetBulbTemperature( "OutdoorWetBulbTemperature" );
+		static std::string const SlabSurfaceTemperature( "SurfaceTemperature" );
+		static std::string const SlabSurfaceDewPointTemperature( "ZoneAirDewPointTemperature" );
+		static std::string const CurrentModuleObject( "ZoneHVAC:VentilatedSlab" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -334,9 +333,9 @@ namespace VentilatedSlab {
 		//unused0309  INTEGER                         :: NumOfSurfListVB  ! Number of surface lists in the user input file
 		int SurfNum; // DO loop counter for surfaces
 		bool IsValid; // Set for outside air node check
-		FArray1D_Fstring cAlphaArgs( sFstring( MaxNameLength ) ); // Alpha input items for object
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) ); // Numeric field names
+		FArray1D_string cAlphaArgs; // Alpha input items for object
+		FArray1D_string cAlphaFields; // Alpha field names
+		FArray1D_string cNumericFields; // Numeric field names
 		FArray1D< Real64 > rNumericArgs; // Numeric input items for object
 		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
@@ -348,11 +347,11 @@ namespace VentilatedSlab {
 		SteamMessageNeeded = true;
 		GetObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 		cAlphaArgs.allocate( NumAlphas );
-		cAlphaArgs = " ";
+		cAlphaArgs = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = " ";
+		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = " ";
+		cNumericFields = "";
 		rNumericArgs.allocate( NumNumbers );
 		rNumericArgs = 0.0;
 		lAlphaBlanks.allocate( NumAlphas );
@@ -375,7 +374,7 @@ namespace VentilatedSlab {
 			GetObjectItem( CurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), VentSlab.Name(), Item - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), VentSlab.Name(), Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -388,7 +387,7 @@ namespace VentilatedSlab {
 			} else {
 				VentSlab( Item ).SchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) ); // convert schedule name to pointer
 				if ( VentSlab( Item ).SchedPtr == 0 ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" not found." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 					ErrorsFound = true;
 				}
 			}
@@ -397,9 +396,9 @@ namespace VentilatedSlab {
 			VentSlab( Item ).ZonePtr = FindItemInList( cAlphaArgs( 3 ), Zone.Name(), NumOfZones );
 			if ( VentSlab( Item ).ZonePtr == 0 ) {
 				if ( lAlphaBlanks( 3 ) ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 3 ) ) + " is required but input is blank." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 3 ) + " is required but input is blank." );
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 3 ) ) + "=\"" + trim( cAlphaArgs( 3 ) ) + "\" not found." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\" not found." );
 				}
 				ErrorsFound = true;
 			}
@@ -447,11 +446,11 @@ namespace VentilatedSlab {
 				VentSlab( Item ).SurfaceFlowFrac( 1 ) = 1.0;
 				// Error checking for single surfaces
 				if ( VentSlab( Item ).SurfacePtr( 1 ) == 0 ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 4 ) ) + "=\"" + trim( cAlphaArgs( 4 ) ) + "\" not found." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" not found." );
 					ErrorsFound = true;
 				} else if ( Surface( VentSlab( Item ).SurfacePtr( 1 ) ).PartOfVentSlabOrRadiantSurface ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid Surface" );
-					ShowContinueError( trim( cAlphaFields( 4 ) ) + "=\"" + trim( cAlphaArgs( 4 ) ) + "\" has been used in another radiant system or ventilated slab." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid Surface" );
+					ShowContinueError( cAlphaFields( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" has been used in another radiant system or ventilated slab." );
 					ErrorsFound = true;
 				}
 				if ( VentSlab( Item ).SurfacePtr( 1 ) != 0 ) {
@@ -477,8 +476,8 @@ namespace VentilatedSlab {
 					//      END IF
 					if ( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Construction == 0 ) continue; // invalid construction, detected earlier
 					if ( ! Construct( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Construction ).SourceSinkPresent ) {
-						ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " "surface=\"" + trim( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Name ) + "\"." );
-						ShowContinueError( "Surface Construction does not have a source/sink, Construction name= \"" + trim( Construct( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Construction ).Name ) + "\"." );
+						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " "surface=\"" + Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Name + "\"." );
+						ShowContinueError( "Surface Construction does not have a source/sink, Construction name= \"" + Construct( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Construction ).Name + "\"." );
 						ErrorsFound = true;
 					}
 				}
@@ -487,14 +486,14 @@ namespace VentilatedSlab {
 					if ( VentSlab( Item ).SurfacePtr( SurfNum ) == 0 ) continue; // invalid surface -- detected earlier
 					if ( VentSlab( Item ).ZonePtr == 0 ) continue; // invalid zone -- detected earlier
 					if ( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Zone != VentSlab( Item ).ZonePtr ) {
-						ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " "surface=\"" + trim( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Name ) + "\"." );
-						ShowContinueError( "Surface in Zone=" + trim( Zone( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Zone ).Name ) + " " + CurrentModuleObject + " in Zone=" + trim( cAlphaArgs( 3 ) ) );
+						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " "surface=\"" + Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Name + "\"." );
+						ShowContinueError( "Surface in Zone=" + Zone( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Zone ).Name + ' ' + CurrentModuleObject + " in Zone=" + cAlphaArgs( 3 ) );
 						ErrorsFound = true;
 					}
 					if ( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Construction == 0 ) continue; // invalid construction, detected earlier
 					if ( ! Construct( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Construction ).SourceSinkPresent ) {
-						ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " "surface=\"" + trim( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Name ) + "\"." );
-						ShowContinueError( "Surface Construction does not have a source/sink, Construction name= \"" + trim( Construct( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Construction ).Name ) + "\"." );
+						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " "surface=\"" + Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Name + "\"." );
+						ShowContinueError( "Surface Construction does not have a source/sink, Construction name= \"" + Construct( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Construction ).Name + "\"." );
 						ErrorsFound = true;
 					}
 				}
@@ -512,10 +511,10 @@ namespace VentilatedSlab {
 				VentSlab( Item ).MaxOASchedName = cAlphaArgs( 6 );
 				VentSlab( Item ).MaxOASchedPtr = GetScheduleIndex( cAlphaArgs( 7 ) ); // convert schedule name to pointer
 				if ( VentSlab( Item ).MaxOASchedPtr == 0 ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 7 ) ) + "=\"" + trim( cAlphaArgs( 7 ) ) + "\" not found." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" not found." );
 					ErrorsFound = true;
 				} else if ( ! CheckScheduleValueMinMax( VentSlab( Item ).MaxOASchedPtr, ">=0", 0.0, "<=", 1.0 ) ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 7 ) ) + "=\"" + trim( cAlphaArgs( 7 ) ) + "\" values out of range [0,1]." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" values out of range [0,1]." );
 					ErrorsFound = true;
 				}
 			} else if ( SELECT_CASE_var == "FIXEDAMOUNT" ) {
@@ -523,10 +522,10 @@ namespace VentilatedSlab {
 				VentSlab( Item ).MaxOASchedName = cAlphaArgs( 7 );
 				VentSlab( Item ).MaxOASchedPtr = GetScheduleIndex( cAlphaArgs( 7 ) ); // convert schedule name to pointer
 				if ( VentSlab( Item ).MaxOASchedPtr == 0 ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 7 ) ) + "=\"" + trim( cAlphaArgs( 7 ) ) + "\" not found." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" not found." );
 					ErrorsFound = true;
 				} else if ( ! CheckScheduleValueMinMax( VentSlab( Item ).MaxOASchedPtr, ">=0", 0.0 ) ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 7 ) ) + "=\"" + trim( cAlphaArgs( 7 ) ) + "\" values out of range (must be >=0)." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" values out of range (must be >=0)." );
 					ErrorsFound = true;
 				}
 			} else if ( SELECT_CASE_var == "FIXEDTEMPERATURE" ) {
@@ -534,17 +533,17 @@ namespace VentilatedSlab {
 				VentSlab( Item ).TempSchedName = cAlphaArgs( 7 );
 				VentSlab( Item ).TempSchedPtr = GetScheduleIndex( cAlphaArgs( 7 ) ); // convert schedule name to pointer
 				if ( VentSlab( Item ).TempSchedPtr == 0 ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 7 ) ) + "=\"" + trim( cAlphaArgs( 7 ) ) + "\" not found." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" not found." );
 					ErrorsFound = true;
 				}
 			} else {
-				ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 5 ) ) + "=\"" + trim( cAlphaArgs( 5 ) ) + "\"." );
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
 			}}
 
 			VentSlab( Item ).MinOASchedName = cAlphaArgs( 6 );
 			VentSlab( Item ).MinOASchedPtr = GetScheduleIndex( cAlphaArgs( 6 ) ); // convert schedule name to pointer
 			if ( VentSlab( Item ).MinOASchedPtr == 0 ) {
-				ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 6 ) ) + "=\"" + trim( cAlphaArgs( 6 ) ) + "\" not found." );
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\" not found." );
 				ErrorsFound = true;
 			}
 
@@ -556,7 +555,7 @@ namespace VentilatedSlab {
 			} else if ( SameString( cAlphaArgs( 8 ), "SeriesSlabs" ) ) {
 				VentSlab( Item ).SysConfg = SeriesSlabs;
 			} else {
-				ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 8 ) ) + "=\"" + trim( cAlphaArgs( 8 ) ) + "\"." );
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 8 ) + "=\"" + cAlphaArgs( 8 ) + "\"." );
 				ShowContinueError( "Control reset to SLAB ONLY Configuration." );
 				VentSlab( Item ).SysConfg = SlabOnly;
 			}
@@ -568,21 +567,21 @@ namespace VentilatedSlab {
 
 			if ( SameString( cAlphaArgs( 8 ), "SurfaceListNames" ) ) {
 				if ( ! lNumericBlanks( 4 ) ) {
-					ShowWarningError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" " " Core Diameter is not needed for the series slabs configuration- ignored." );
+					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" " " Core Diameter is not needed for the series slabs configuration- ignored." );
 					ShowContinueError( "...It has been asigned on SlabGroup." );
 				}
 			}
 
 			if ( SameString( cAlphaArgs( 8 ), "SurfaceListNames" ) ) {
 				if ( ! lNumericBlanks( 5 ) ) {
-					ShowWarningError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" " " Core Length is not needed for the series slabs configuration- ignored." );
+					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" " " Core Length is not needed for the series slabs configuration- ignored." );
 					ShowContinueError( "...It has been asigned on SlabGroup." );
 				}
 			}
 
 			if ( SameString( cAlphaArgs( 8 ), "SurfaceListNames" ) ) {
 				if ( ! lNumericBlanks( 6 ) ) {
-					ShowWarningError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" " " Core Numbers is not needed for the series slabs configuration- ignored." );
+					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" " " Core Numbers is not needed for the series slabs configuration- ignored." );
 					ShowContinueError( "...It has been asigned on SlabGroup." );
 				}
 			}
@@ -603,7 +602,7 @@ namespace VentilatedSlab {
 			} else if ( SameString( cAlphaArgs( 9 ), SlabSurfaceDewPointTemperature ) ) {
 				VentSlab( Item ).ControlType = DPTZControl;
 			} else {
-				ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 9 ) ) + "=\"" + trim( cAlphaArgs( 9 ) ) + "\"." );
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 9 ) + "=\"" + cAlphaArgs( 9 ) + "\"." );
 				ShowContinueError( "Control reset to ODB control." );
 				VentSlab( Item ).ControlType = ODBControl;
 			}
@@ -614,7 +613,7 @@ namespace VentilatedSlab {
 			VentSlab( Item ).HotAirHiTempSched = cAlphaArgs( 10 );
 			VentSlab( Item ).HotAirHiTempSchedPtr = GetScheduleIndex( cAlphaArgs( 10 ) );
 			if ( ( VentSlab( Item ).HotAirHiTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 10 ) ) ) {
-				ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 10 ) ) + "=\"" + trim( cAlphaArgs( 10 ) ) + "\" not found." );
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 10 ) + "=\"" + cAlphaArgs( 10 ) + "\" not found." );
 				ErrorsFound = true;
 			}
 
@@ -623,21 +622,21 @@ namespace VentilatedSlab {
 			VentSlab( Item ).HotAirLoTempSched = cAlphaArgs( 11 );
 			VentSlab( Item ).HotAirLoTempSchedPtr = GetScheduleIndex( cAlphaArgs( 11 ) );
 			if ( ( VentSlab( Item ).HotAirLoTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 11 ) ) ) {
-				ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 11 ) ) + "=\"" + trim( cAlphaArgs( 11 ) ) + "\" not found." );
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 11 ) + "=\"" + cAlphaArgs( 11 ) + "\" not found." );
 				ErrorsFound = true;
 			}
 
 			VentSlab( Item ).HotCtrlHiTempSched = cAlphaArgs( 12 );
 			VentSlab( Item ).HotCtrlHiTempSchedPtr = GetScheduleIndex( cAlphaArgs( 12 ) );
 			if ( ( VentSlab( Item ).HotCtrlHiTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 12 ) ) ) {
-				ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 12 ) ) + "=\"" + trim( cAlphaArgs( 12 ) ) + "\" not found." );
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 12 ) + "=\"" + cAlphaArgs( 12 ) + "\" not found." );
 				ErrorsFound = true;
 			}
 
 			VentSlab( Item ).HotCtrlLoTempSched = cAlphaArgs( 13 );
 			VentSlab( Item ).HotCtrlLoTempSchedPtr = GetScheduleIndex( cAlphaArgs( 13 ) );
 			if ( ( VentSlab( Item ).HotCtrlLoTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 13 ) ) ) {
-				ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 13 ) ) + "=\"" + trim( cAlphaArgs( 13 ) ) + "\" not found." );
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 13 ) + "=\"" + cAlphaArgs( 13 ) + "\" not found." );
 				ErrorsFound = true;
 			}
 
@@ -646,7 +645,7 @@ namespace VentilatedSlab {
 			VentSlab( Item ).ColdAirHiTempSched = cAlphaArgs( 13 );
 			VentSlab( Item ).ColdAirHiTempSchedPtr = GetScheduleIndex( cAlphaArgs( 14 ) );
 			if ( ( VentSlab( Item ).ColdAirHiTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 14 ) ) ) {
-				ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 14 ) ) + "=\"" + trim( cAlphaArgs( 14 ) ) + "\" not found." );
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 14 ) + "=\"" + cAlphaArgs( 14 ) + "\" not found." );
 				ErrorsFound = true;
 			}
 
@@ -655,7 +654,7 @@ namespace VentilatedSlab {
 			VentSlab( Item ).ColdAirLoTempSched = cAlphaArgs( 15 );
 			VentSlab( Item ).ColdAirLoTempSchedPtr = GetScheduleIndex( cAlphaArgs( 15 ) );
 			if ( ( VentSlab( Item ).ColdAirLoTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 15 ) ) ) {
-				ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 15 ) ) + "=\"" + trim( cAlphaArgs( 15 ) ) + "\" not found." );
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 15 ) + "=\"" + cAlphaArgs( 15 ) + "\" not found." );
 				ErrorsFound = true;
 			}
 
@@ -664,7 +663,7 @@ namespace VentilatedSlab {
 			VentSlab( Item ).ColdCtrlHiTempSched = cAlphaArgs( 16 );
 			VentSlab( Item ).ColdCtrlHiTempSchedPtr = GetScheduleIndex( cAlphaArgs( 16 ) );
 			if ( ( VentSlab( Item ).ColdCtrlHiTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 16 ) ) ) {
-				ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 16 ) ) + "=\"" + trim( cAlphaArgs( 16 ) ) + "\" not found." );
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 16 ) + "=\"" + cAlphaArgs( 16 ) + "\" not found." );
 				ErrorsFound = true;
 			}
 
@@ -673,7 +672,7 @@ namespace VentilatedSlab {
 			VentSlab( Item ).ColdCtrlLoTempSched = cAlphaArgs( 17 );
 			VentSlab( Item ).ColdCtrlLoTempSchedPtr = GetScheduleIndex( cAlphaArgs( 17 ) );
 			if ( ( VentSlab( Item ).ColdCtrlLoTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 17 ) ) ) {
-				ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 17 ) ) + "=\"" + trim( cAlphaArgs( 17 ) ) + "\" not found." );
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 17 ) + "=\"" + cAlphaArgs( 17 ) + "\" not found." );
 				ErrorsFound = true;
 			}
 
@@ -712,58 +711,58 @@ namespace VentilatedSlab {
 
 			if ( VentSlab( Item ).SysConfg == SlabOnly ) {
 
-				VentSlab( Item ).ReturnAirNode = GetOnlySingleNode( cAlphaArgs( 18 ), ErrorsFound, trim( CurrentModuleObject ) + "-OA MIXER", trim( cAlphaArgs( 1 ) ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsNotParent );
+				VentSlab( Item ).ReturnAirNode = GetOnlySingleNode( cAlphaArgs( 18 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", cAlphaArgs( 1 ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsNotParent );
 				VentSlab( Item ).RadInNode = GetOnlySingleNode( cAlphaArgs( 19 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
-				VentSlab( Item ).OAMixerOutNode = GetOnlySingleNode( cAlphaArgs( 23 ), ErrorsFound, trim( CurrentModuleObject ) + "-OA MIXER", trim( cAlphaArgs( 1 ) ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+				VentSlab( Item ).OAMixerOutNode = GetOnlySingleNode( cAlphaArgs( 23 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", cAlphaArgs( 1 ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 				VentSlab( Item ).FanOutletNode = GetOnlySingleNode( cAlphaArgs( 24 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsParent );
 
 			} else if ( VentSlab( Item ).SysConfg == SeriesSlabs ) {
 
-				VentSlab( Item ).ReturnAirNode = GetOnlySingleNode( cAlphaArgs( 18 ), ErrorsFound, trim( CurrentModuleObject ) + "-OA MIXER", trim( cAlphaArgs( 1 ) ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsNotParent );
+				VentSlab( Item ).ReturnAirNode = GetOnlySingleNode( cAlphaArgs( 18 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", cAlphaArgs( 1 ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsNotParent );
 				VentSlab( Item ).RadInNode = GetOnlySingleNode( cAlphaArgs( 19 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
-				VentSlab( Item ).OAMixerOutNode = GetOnlySingleNode( cAlphaArgs( 23 ), ErrorsFound, trim( CurrentModuleObject ) + "-OA MIXER", trim( cAlphaArgs( 1 ) ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+				VentSlab( Item ).OAMixerOutNode = GetOnlySingleNode( cAlphaArgs( 23 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", cAlphaArgs( 1 ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 				VentSlab( Item ).FanOutletNode = GetOnlySingleNode( cAlphaArgs( 24 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsParent );
 
 			} else if ( VentSlab( Item ).SysConfg == SlabAndZone ) {
 
-				VentSlab( Item ).ReturnAirNode = GetOnlySingleNode( cAlphaArgs( 18 ), ErrorsFound, trim( CurrentModuleObject ) + "-SYSTEM", trim( cAlphaArgs( 1 ) ) + "-SYSTEM", NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
-				VentSlab( Item ).ReturnAirNode = GetOnlySingleNode( cAlphaArgs( 18 ), ErrorsFound, trim( CurrentModuleObject ) + "-OA MIXER", trim( cAlphaArgs( 1 ) ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+				VentSlab( Item ).ReturnAirNode = GetOnlySingleNode( cAlphaArgs( 18 ), ErrorsFound, CurrentModuleObject + "-SYSTEM", cAlphaArgs( 1 ) + "-SYSTEM", NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
+				VentSlab( Item ).ReturnAirNode = GetOnlySingleNode( cAlphaArgs( 18 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", cAlphaArgs( 1 ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 				VentSlab( Item ).RadInNode = GetOnlySingleNode( cAlphaArgs( 19 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-				VentSlab( Item ).OAMixerOutNode = GetOnlySingleNode( cAlphaArgs( 23 ), ErrorsFound, trim( CurrentModuleObject ) + "-OA MIXER", trim( cAlphaArgs( 1 ) ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+				VentSlab( Item ).OAMixerOutNode = GetOnlySingleNode( cAlphaArgs( 23 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", cAlphaArgs( 1 ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 				VentSlab( Item ).FanOutletNode = GetOnlySingleNode( cAlphaArgs( 24 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsParent );
 			}
 
 			if ( VentSlab( Item ).SysConfg == SlabOnly ) {
 				if ( ! lAlphaBlanks( 20 ) ) {
-					ShowWarningError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" " + trim( cAlphaFields( 20 ) ) + "=\"" + trim( cAlphaArgs( 20 ) ) + "\" not needed - ignored." );
+					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" " + cAlphaFields( 20 ) + "=\"" + cAlphaArgs( 20 ) + "\" not needed - ignored." );
 					ShowContinueError( "It is used for \"SlabAndZone\" only" );
 				}
 
 			} else if ( VentSlab( Item ).SysConfg == SlabAndZone ) {
 				if ( lAlphaBlanks( 20 ) ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 20 ) ) + " is blank and must be entered." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 20 ) + " is blank and must be entered." );
 					ErrorsFound = true;
 				}
 
-				VentSlab( Item ).ZoneAirInNode = GetOnlySingleNode( cAlphaArgs( 20 ), ErrorsFound, trim( CurrentModuleObject ) + "-SYSTEM", trim( cAlphaArgs( 1 ) ) + "-SYSTEM", NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
+				VentSlab( Item ).ZoneAirInNode = GetOnlySingleNode( cAlphaArgs( 20 ), ErrorsFound, CurrentModuleObject + "-SYSTEM", cAlphaArgs( 1 ) + "-SYSTEM", NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 
 				VentSlab( Item ).ZoneAirInNode = GetOnlySingleNode( cAlphaArgs( 20 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 			}
 
 			//  Set connection type to 'Inlet', because it now uses an OA node
-			VentSlab( Item ).OutsideAirNode = GetOnlySingleNode( cAlphaArgs( 21 ), ErrorsFound, trim( CurrentModuleObject ) + "-OA MIXER", trim( cAlphaArgs( 1 ) ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			VentSlab( Item ).OutsideAirNode = GetOnlySingleNode( cAlphaArgs( 21 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", cAlphaArgs( 1 ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
 			if ( ! lAlphaBlanks( 21 ) ) {
 				CheckAndAddAirNodeNumber( VentSlab( Item ).OutsideAirNode, IsValid );
 				if ( ! IsValid ) {
-					ShowWarningError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", Adding OutdoorAir:Node=" + trim( cAlphaArgs( 21 ) ) );
+					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", Adding OutdoorAir:Node=" + cAlphaArgs( 21 ) );
 				}
 
 			}
 
-			VentSlab( Item ).AirReliefNode = GetOnlySingleNode( cAlphaArgs( 22 ), ErrorsFound, trim( CurrentModuleObject ) + "-OA MIXER", trim( cAlphaArgs( 1 ) ) + "-OA MIXER", NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsNotParent );
+			VentSlab( Item ).AirReliefNode = GetOnlySingleNode( cAlphaArgs( 22 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", cAlphaArgs( 1 ) + "-OA MIXER", NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsNotParent );
 
 			// Fan information:
 			VentSlab( Item ).FanName = cAlphaArgs( 25 );
@@ -775,7 +774,7 @@ namespace VentilatedSlab {
 			}
 
 			// Add fan to component sets array
-			SetUpCompSets( trim( CurrentModuleObject ) + "-SYSTEM", trim( VentSlab( Item ).Name ) + "-SYSTEM", "UNDEFINED", cAlphaArgs( 25 ), cAlphaArgs( 23 ), cAlphaArgs( 24 ) );
+			SetUpCompSets( CurrentModuleObject + "-SYSTEM", VentSlab( Item ).Name + "-SYSTEM", "UNDEFINED", cAlphaArgs( 25 ), cAlphaArgs( 23 ), cAlphaArgs( 24 ) );
 
 			// Coil options assign
 
@@ -789,7 +788,7 @@ namespace VentilatedSlab {
 			} else if ( SELECT_CASE_var == "NONE" ) {
 				VentSlab( Item ).CoilOption = NoneOption;
 			} else {
-				ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 26 ) ) + "=\"" + trim( cAlphaArgs( 26 ) ) + "\"." );
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 26 ) + "=\"" + cAlphaArgs( 26 ) + "\"." );
 				ErrorsFound = true;
 			}}
 
@@ -820,7 +819,7 @@ namespace VentilatedSlab {
 						VentSlab( Item ).HCoil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
 						VentSlab( Item ).HCoil_FluidIndex = FindRefrigerant( "Steam" );
 						if ( VentSlab( Item ).HCoil_FluidIndex == 0 ) {
-							ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "Steam Properties not found." );
+							ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "Steam Properties not found." );
 							if ( SteamMessageNeeded ) ShowContinueError( "Steam Fluid Properties should have been included in the input file." );
 							ErrorsFound = true;
 							SteamMessageNeeded = false;
@@ -830,15 +829,15 @@ namespace VentilatedSlab {
 					} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
 						VentSlab( Item ).HCoilType = Heating_GasCoilType;
 					} else {
-						ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 27 ) ) + "=\"" + trim( cAlphaArgs( 27 ) ) + "\"." );
+						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 27 ) + "=\"" + cAlphaArgs( 27 ) + "\"." );
 						ErrorsFound = true;
 					}}
 					if ( ! errFlag ) {
 						VentSlab( Item ).HCoilName = cAlphaArgs( 28 );
 						ValidateComponent( cAlphaArgs( 27 ), VentSlab( Item ).HCoilName, IsNotOK, CurrentModuleObject );
 						if ( IsNotOK ) {
-							ShowContinueError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 28 ) ) + "=\"" + trim( cAlphaArgs( 28 ) ) + "\"." );
-							ShowContinueError( "... not valid for " + trim( cAlphaFields( 27 ) ) + "=\"" + trim( cAlphaArgs( 27 ) ) + "\"." );
+							ShowContinueError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 28 ) + "=\"" + cAlphaArgs( 28 ) + "\"." );
+							ShowContinueError( "... not valid for " + cAlphaFields( 27 ) + "=\"" + cAlphaArgs( 27 ) + "\"." );
 							ErrorsFound = true;
 						}
 					}
@@ -850,12 +849,12 @@ namespace VentilatedSlab {
 					// electric or gas coil.
 					if ( VentSlab( Item ).HCoilType == Heating_GasCoilType || VentSlab( Item ).HCoilType == Heating_ElectricCoilType ) {
 						if ( ! lAlphaBlanks( 29 ) ) {
-							ShowWarningError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" " + trim( cAlphaFields( 29 ) ) + "=\"" + trim( cAlphaArgs( 29 ) ) + "\" not needed - ignored." );
+							ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" " + cAlphaFields( 29 ) + "=\"" + cAlphaArgs( 29 ) + "\" not needed - ignored." );
 							ShowContinueError( "..It is used for hot water coils only." );
 						}
 					} else {
 						if ( lAlphaBlanks( 29 ) ) {
-							ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 29 ) ) + " is blank and must be entered." );
+							ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 29 ) + " is blank and must be entered." );
 							ErrorsFound = true;
 						}
 						VentSlab( Item ).HotControlNode = GetOnlySingleNode( cAlphaArgs( 29 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Actuator, 1, ObjectIsParent );
@@ -871,8 +870,8 @@ namespace VentilatedSlab {
 					}
 
 				} else { // no heating coil
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" missing heating coil." );
-					ShowContinueError( "a heating coil is required for " + trim( cAlphaFields( 26 ) ) + "=\"" + trim( cAlphaArgs( 26 ) ) + "\"." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" missing heating coil." );
+					ShowContinueError( "a heating coil is required for " + cAlphaFields( 26 ) + "=\"" + cAlphaArgs( 26 ) + "\"." );
 					ErrorsFound = true;
 				}
 			}
@@ -910,14 +909,14 @@ namespace VentilatedSlab {
 						} else if ( SameString( VentSlab( Item ).CCoilPlantType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
 							VentSlab( Item ).CCoil_PlantTypeNum = TypeOf_CoilWaterDetailedFlatCooling;
 						} else {
-							ShowSevereError( "GetVentilatedSlabInput: " + trim( CurrentModuleObject ) + "=\"" + trim( VentSlab( Item ).Name ) + "\", invalid" );
-							ShowContinueError( "For: " + trim( cAlphaFields( 30 ) ) + "=\"" + trim( cAlphaArgs( 30 ) ) + "\"." );
-							ShowContinueError( "Invalid Coil Type=" + trim( VentSlab( Item ).CCoilPlantType ) + ", Name=" + trim( VentSlab( Item ).CCoilPlantName ) );
+							ShowSevereError( "GetVentilatedSlabInput: " + CurrentModuleObject + "=\"" + VentSlab( Item ).Name + "\", invalid" );
+							ShowContinueError( "For: " + cAlphaFields( 30 ) + "=\"" + cAlphaArgs( 30 ) + "\"." );
+							ShowContinueError( "Invalid Coil Type=" + VentSlab( Item ).CCoilPlantType + ", Name=" + VentSlab( Item ).CCoilPlantName );
 							ShowContinueError( "must be \"Coil:Cooling:Water\" or \"Coil:Cooling:Water:DetailedGeometry\"" );
 							ErrorsFound = true;
 						}
 					} else {
-						ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 29 ) ) + "=\"" + trim( cAlphaArgs( 29 ) ) + "\"." );
+						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 29 ) + "=\"" + cAlphaArgs( 29 ) + "\"." );
 						ErrorsFound = true;
 						errFlag = true;
 					}}
@@ -926,8 +925,8 @@ namespace VentilatedSlab {
 						VentSlab( Item ).CCoilName = cAlphaArgs( 31 );
 						ValidateComponent( cAlphaArgs( 30 ), VentSlab( Item ).CCoilName, IsNotOK, "ZoneHVAC:VentilatedSlab " );
 						if ( IsNotOK ) {
-							ShowContinueError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 31 ) ) + "=\"" + trim( cAlphaArgs( 31 ) ) + "\"." );
-							ShowContinueError( "... not valid for " + trim( cAlphaFields( 30 ) ) + "=\"" + trim( cAlphaArgs( 30 ) ) + "\"." );
+							ShowContinueError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 31 ) + "=\"" + cAlphaArgs( 31 ) + "\"." );
+							ShowContinueError( "... not valid for " + cAlphaFields( 30 ) + "=\"" + cAlphaArgs( 30 ) + "\"." );
 							ErrorsFound = true;
 						}
 					}
@@ -937,7 +936,7 @@ namespace VentilatedSlab {
 					VentSlab( Item ).ColdControlNode = GetOnlySingleNode( cAlphaArgs( 32 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Actuator, 1, ObjectIsParent );
 
 					if ( lAlphaBlanks( 32 ) ) {
-						ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 32 ) ) + " is blank and must be entered." );
+						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 32 ) + " is blank and must be entered." );
 						ErrorsFound = true;
 					}
 
@@ -952,8 +951,8 @@ namespace VentilatedSlab {
 					}
 
 				} else { // No Cooling Coil
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" missing cooling coil." );
-					ShowContinueError( "a cooling coil is required for " + trim( cAlphaFields( 26 ) ) + "=\"" + trim( cAlphaArgs( 26 ) ) + "\"." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" missing cooling coil." );
+					ShowContinueError( "a cooling coil is required for " + cAlphaFields( 26 ) + "=\"" + cAlphaArgs( 26 ) + "\"." );
 					ErrorsFound = true;
 				}
 			}
@@ -965,18 +964,18 @@ namespace VentilatedSlab {
 			{ auto const SELECT_CASE_var( VentSlab( Item ).CoilOption );
 			if ( SELECT_CASE_var == BothOption ) { // 'HeatingAndCooling'
 				// Add cooling coil to component sets array when present
-				SetUpCompSets( trim( CurrentModuleObject ) + "-SYSTEM", trim( VentSlab( Item ).Name ) + "-SYSTEM", cAlphaArgs( 30 ), cAlphaArgs( 31 ), cAlphaArgs( 24 ), "UNDEFINED" );
+				SetUpCompSets( CurrentModuleObject + "-SYSTEM", VentSlab( Item ).Name + "-SYSTEM", cAlphaArgs( 30 ), cAlphaArgs( 31 ), cAlphaArgs( 24 ), "UNDEFINED" );
 
 				// Add heating coil to component sets array when cooling coil present
-				SetUpCompSets( trim( CurrentModuleObject ) + "-SYSTEM", trim( VentSlab( Item ).Name ) + "-SYSTEM", cAlphaArgs( 27 ), cAlphaArgs( 28 ), "UNDEFINED", cAlphaArgs( 19 ) );
+				SetUpCompSets( CurrentModuleObject + "-SYSTEM", VentSlab( Item ).Name + "-SYSTEM", cAlphaArgs( 27 ), cAlphaArgs( 28 ), "UNDEFINED", cAlphaArgs( 19 ) );
 
 			} else if ( SELECT_CASE_var == HeatingOption ) { // 'Heating'
 				// Add heating coil to component sets array when no cooling coil present
-				SetUpCompSets( trim( CurrentModuleObject ) + "-SYSTEM", trim( VentSlab( Item ).Name ) + "-SYSTEM", cAlphaArgs( 27 ), cAlphaArgs( 28 ), cAlphaArgs( 24 ), cAlphaArgs( 19 ) );
+				SetUpCompSets( CurrentModuleObject + "-SYSTEM", VentSlab( Item ).Name + "-SYSTEM", cAlphaArgs( 27 ), cAlphaArgs( 28 ), cAlphaArgs( 24 ), cAlphaArgs( 19 ) );
 
 			} else if ( SELECT_CASE_var == CoolingOption ) { // 'Cooling'
 				// Add cooling coil to component sets array when no heating coil present
-				SetUpCompSets( trim( CurrentModuleObject ) + "-SYSTEM", trim( VentSlab( Item ).Name ) + "-SYSTEM", cAlphaArgs( 30 ), cAlphaArgs( 31 ), cAlphaArgs( 24 ), cAlphaArgs( 19 ) );
+				SetUpCompSets( CurrentModuleObject + "-SYSTEM", VentSlab( Item ).Name + "-SYSTEM", cAlphaArgs( 30 ), cAlphaArgs( 31 ), cAlphaArgs( 24 ), cAlphaArgs( 19 ) );
 
 			} else if ( SELECT_CASE_var == NoneOption ) {
 
@@ -1164,7 +1163,7 @@ namespace VentilatedSlab {
 				errFlag = false;
 				ScanPlantLoopsForObject( VentSlab( Item ).HCoilName, VentSlab( Item ).HCoil_PlantTypeNum, VentSlab( Item ).HWLoopNum, VentSlab( Item ).HWLoopSide, VentSlab( Item ).HWBranchNum, VentSlab( Item ).HWCompNum, _, _, _, _, _, errFlag );
 				if ( errFlag ) {
-					ShowContinueError( "Reference Unit=\"" + trim( VentSlab( Item ).Name ) + "\", type=ZoneHVAC:VentilatedSlab" );
+					ShowContinueError( "Reference Unit=\"" + VentSlab( Item ).Name + "\", type=ZoneHVAC:VentilatedSlab" );
 					ShowFatalError( "InitVentilatedSlab: Program terminated due to previous condition(s)." );
 				}
 
@@ -1175,12 +1174,12 @@ namespace VentilatedSlab {
 				errFlag = false;
 				ScanPlantLoopsForObject( VentSlab( Item ).CCoilPlantName, VentSlab( Item ).CCoil_PlantTypeNum, VentSlab( Item ).CWLoopNum, VentSlab( Item ).CWLoopSide, VentSlab( Item ).CWBranchNum, VentSlab( Item ).CWCompNum );
 				if ( errFlag ) {
-					ShowContinueError( "Reference Unit=\"" + trim( VentSlab( Item ).Name ) + "\", type=ZoneHVAC:VentilatedSlab" );
+					ShowContinueError( "Reference Unit=\"" + VentSlab( Item ).Name + "\", type=ZoneHVAC:VentilatedSlab" );
 					ShowFatalError( "InitVentilatedSlab: Program terminated due to previous condition(s)." );
 				}
 				VentSlab( Item ).ColdCoilOutNodeNum = PlantLoop( VentSlab( Item ).CWLoopNum ).LoopSide( VentSlab( Item ).CWLoopSide ).Branch( VentSlab( Item ).CWBranchNum ).Comp( VentSlab( Item ).CWCompNum ).NodeNumOut;
 			} else {
-				if ( VentSlab( Item ).CCoilPresent ) ShowFatalError( "InitVentilatedSlab: Unit=" + trim( VentSlab( Item ).Name ) + ", invalid cooling coil type. Program terminated." );
+				if ( VentSlab( Item ).CCoilPresent ) ShowFatalError( "InitVentilatedSlab: Unit=" + VentSlab( Item ).Name + ", invalid cooling coil type. Program terminated." );
 			}
 			MyPlantScanFlag( Item ) = false;
 		} else if ( MyPlantScanFlag( Item ) && ! AnyPlantInModel ) {
@@ -1192,7 +1191,7 @@ namespace VentilatedSlab {
 			ZoneEquipmentListChecked = true;
 			for ( RadNum = 1; RadNum <= NumOfVentSlabs; ++RadNum ) {
 				if ( CheckZoneEquipmentList( cMO_VentilatedSlab, VentSlab( RadNum ).Name ) ) continue;
-				ShowSevereError( "InitVentilatedSlab: Ventilated Slab Unit=[" + trim( cMO_VentilatedSlab ) + "," + trim( VentSlab( RadNum ).Name ) + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
+				ShowSevereError( "InitVentilatedSlab: Ventilated Slab Unit=[" + cMO_VentilatedSlab + ',' + VentSlab( RadNum ).Name + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
 			}
 		}
 
@@ -1237,7 +1236,7 @@ namespace VentilatedSlab {
 			if ( VentSlab( Item ).OutAirMassFlow > VentSlab( Item ).MaxAirMassFlow ) {
 				VentSlab( Item ).OutAirMassFlow = VentSlab( Item ).MaxAirMassFlow;
 				VentSlab( Item ).MinOutAirMassFlow = VentSlab( Item ).OutAirMassFlow * ( VentSlab( Item ).MinOutAirVolFlow / VentSlab( Item ).OutAirVolFlow );
-				ShowWarningError( "Outdoor air mass flow rate higher than unit flow rate, reset to unit flow rate for " + trim( VentSlab( Item ).Name ) );
+				ShowWarningError( "Outdoor air mass flow rate higher than unit flow rate, reset to unit flow rate for " + VentSlab( Item ).Name );
 			}
 
 			// set the node max and min mass flow rates
@@ -1417,8 +1416,8 @@ namespace VentilatedSlab {
 		static int CoilWaterOutletNode( 0 );
 		static int CoilSteamInletNode( 0 );
 		static int CoilSteamOutletNode( 0 );
-		Fstring CoolingCoilName( MaxNameLength );
-		Fstring CoolingCoilType( MaxNameLength );
+		std::string CoolingCoilName;
+		std::string CoolingCoilType;
 		Real64 rho;
 		Real64 Cp;
 		static int DummyWaterIndex( 1 );
@@ -1476,9 +1475,9 @@ namespace VentilatedSlab {
 						ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Air Flow Rate [m3/s]", MaxAirVolFlowDes, "User-Specified Maximum Air Flow Rate [m3/s]", MaxAirVolFlowUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( MaxAirVolFlowDes - MaxAirVolFlowUser ) / MaxAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + trim( VentSlab( Item ).Name ) + "\"." );
-								ShowContinueError( "User-Specified Maximum Air Flow Rate of " + trim( RoundSigDigits( MaxAirVolFlowUser, 5 ) ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Maximum Air Flow of " + trim( RoundSigDigits( MaxAirVolFlowDes, 5 ) ) + " [m3/s]" );
+								ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + VentSlab( Item ).Name + "\"." );
+								ShowContinueError( "User-Specified Maximum Air Flow Rate of " + RoundSigDigits( MaxAirVolFlowUser, 5 ) + " [m3/s]" );
+								ShowContinueError( "differs from Design Size Maximum Air Flow of " + RoundSigDigits( MaxAirVolFlowDes, 5 ) + " [m3/s]" );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
@@ -1509,9 +1508,9 @@ namespace VentilatedSlab {
 						ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowDes, "User-Specified Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( OutAirVolFlowDes - OutAirVolFlowUser ) / OutAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + trim( VentSlab( Item ).Name ) + "\"." );
-								ShowContinueError( "User-Specified Maximum Outdoor Air Flow Rate of " + trim( RoundSigDigits( OutAirVolFlowUser, 5 ) ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Maximum Outdoor Air Flow Rate of " + trim( RoundSigDigits( OutAirVolFlowDes, 5 ) ) + " [m3/s]" );
+								ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + VentSlab( Item ).Name + "\"." );
+								ShowContinueError( "User-Specified Maximum Outdoor Air Flow Rate of " + RoundSigDigits( OutAirVolFlowUser, 5 ) + " [m3/s]" );
+								ShowContinueError( "differs from Design Size Maximum Outdoor Air Flow Rate of " + RoundSigDigits( OutAirVolFlowDes, 5 ) + " [m3/s]" );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
@@ -1545,9 +1544,9 @@ namespace VentilatedSlab {
 						ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Minimum Outdoor Air Flow Rate [m3/s]", MinOutAirVolFlowDes, "User-Specified Minimum Outdoor Air Flow Rate [m3/s]", MinOutAirVolFlowUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( MinOutAirVolFlowDes - MinOutAirVolFlowUser ) / MinOutAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + trim( VentSlab( Item ).Name ) + "\"." );
-								ShowContinueError( "User-Specified Minimum Outdoor Air Flow Rate of " + trim( RoundSigDigits( MinOutAirVolFlowUser, 5 ) ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Minimum Outdoor Air Flow Rate of " + trim( RoundSigDigits( MinOutAirVolFlowDes, 5 ) ) + " [m3/s]" );
+								ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + VentSlab( Item ).Name + "\"." );
+								ShowContinueError( "User-Specified Minimum Outdoor Air Flow Rate of " + RoundSigDigits( MinOutAirVolFlowUser, 5 ) + " [m3/s]" );
+								ShowContinueError( "differs from Design Size Minimum Outdoor Air Flow Rate of " + RoundSigDigits( MinOutAirVolFlowDes, 5 ) + " [m3/s]" );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
@@ -1592,7 +1591,7 @@ namespace VentilatedSlab {
 							}
 						} else {
 							ShowSevereError( "Autosizing of water flow requires a heating loop Sizing:Plant object" );
-							ShowContinueError( "Occurs in " + cMO_VentilatedSlab + " Object=" + trim( VentSlab( Item ).Name ) );
+							ShowContinueError( "Occurs in " + cMO_VentilatedSlab + " Object=" + VentSlab( Item ).Name );
 							ErrorsFound = true;
 						}
 					}
@@ -1605,9 +1604,9 @@ namespace VentilatedSlab {
 							ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Hot Water Flow [m3/s]", MaxVolHotWaterFlowDes, "User-Specified Maximum Hot Water Flow [m3/s]", MaxVolHotWaterFlowUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( MaxVolHotWaterFlowDes - MaxVolHotWaterFlowUser ) / MaxVolHotWaterFlowUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + trim( VentSlab( Item ).Name ) + "\"." );
-									ShowContinueError( "User-Specified Maximum Hot Water Flow of " + trim( RoundSigDigits( MaxVolHotWaterFlowUser, 5 ) ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Maximum Hot Water Flow of " + trim( RoundSigDigits( MaxVolHotWaterFlowDes, 5 ) ) + " [m3/s]" );
+									ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + VentSlab( Item ).Name + "\"." );
+									ShowContinueError( "User-Specified Maximum Hot Water Flow of " + RoundSigDigits( MaxVolHotWaterFlowUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Maximum Hot Water Flow of " + RoundSigDigits( MaxVolHotWaterFlowDes, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -1658,7 +1657,7 @@ namespace VentilatedSlab {
 							}
 						} else {
 							ShowSevereError( "Autosizing of Steam flow requires a heating loop Sizing:Plant object" );
-							ShowContinueError( "Occurs in " "ZoneHVAC:VentilatedSlab" " Object=" + trim( VentSlab( Item ).Name ) );
+							ShowContinueError( "Occurs in " "ZoneHVAC:VentilatedSlab" " Object=" + VentSlab( Item ).Name );
 							ErrorsFound = true;
 						}
 					}
@@ -1671,9 +1670,9 @@ namespace VentilatedSlab {
 							ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Steam Flow [m3/s]", MaxVolHotSteamFlowDes, "User-Specified Maximum Steam Flow [m3/s]", MaxVolHotSteamFlowUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( MaxVolHotSteamFlowDes - MaxVolHotSteamFlowUser ) / MaxVolHotSteamFlowUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + trim( VentSlab( Item ).Name ) + "\"." );
-									ShowContinueError( "User-Specified Maximum Steam Flow of " + trim( RoundSigDigits( MaxVolHotSteamFlowUser, 5 ) ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Maximum Steam Flow of " + trim( RoundSigDigits( MaxVolHotSteamFlowDes, 5 ) ) + " [m3/s]" );
+									ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + VentSlab( Item ).Name + "\"." );
+									ShowContinueError( "User-Specified Maximum Steam Flow of " + RoundSigDigits( MaxVolHotSteamFlowUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Maximum Steam Flow of " + RoundSigDigits( MaxVolHotSteamFlowDes, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -1725,7 +1724,7 @@ namespace VentilatedSlab {
 						}
 					} else {
 						ShowSevereError( "Autosizing of water flow requires a cooling loop Sizing:Plant object" );
-						ShowContinueError( "Occurs in " + cMO_VentilatedSlab + " Object=" + trim( VentSlab( Item ).Name ) );
+						ShowContinueError( "Occurs in " + cMO_VentilatedSlab + " Object=" + VentSlab( Item ).Name );
 						ErrorsFound = true;
 					}
 				}
@@ -1738,9 +1737,9 @@ namespace VentilatedSlab {
 						ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxVolColdWaterFlowDes, "User-Specified Maximum Cold Water Flow [m3/s]", MaxVolColdWaterFlowUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( MaxVolColdWaterFlowDes - MaxVolColdWaterFlowUser ) / MaxVolColdWaterFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + trim( VentSlab( Item ).Name ) + "\"." );
-								ShowContinueError( "User-Specified Maximum Cold Water Flow of " + trim( RoundSigDigits( MaxVolColdWaterFlowUser, 5 ) ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Maximum Cold Water Flow of " + trim( RoundSigDigits( MaxVolColdWaterFlowDes, 5 ) ) + " [m3/s]" );
+								ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + VentSlab( Item ).Name + "\"." );
+								ShowContinueError( "User-Specified Maximum Cold Water Flow of " + RoundSigDigits( MaxVolColdWaterFlowUser, 5 ) + " [m3/s]" );
+								ShowContinueError( "differs from Design Size Maximum Cold Water Flow of " + RoundSigDigits( MaxVolColdWaterFlowDes, 5 ) + " [m3/s]" );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
@@ -1897,13 +1896,13 @@ namespace VentilatedSlab {
 		Real64 CpFan; // Intermediate calculational variable for specific heat of air <<NOV9 Updated
 		Real64 ZoneRadNum; // number of zone being served *********************
 		int RadSurfNum; // DO loop counter for the surfaces that comprise a particular radiant system
-		Fstring MSlabIn( MaxNameLength );
-		Fstring MSlabOut( MaxNameLength );
-		Fstring SlabName( MaxNameLength );
+		std::string MSlabIn;
+		std::string MSlabOut;
+		std::string SlabName;
 		int MSlabInletNode;
 		int MSlabOutletNode;
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
-		static Fstring const CurrentModuleObject( "ZoneHVAC:VentilatedSlab" );
+		static std::string const CurrentModuleObject( "ZoneHVAC:VentilatedSlab" );
 
 		{ auto const SELECT_CASE_var( VentSlab( Item ).CoilOption );
 		if ( SELECT_CASE_var == BothOption ) {
@@ -2003,7 +2002,7 @@ namespace VentilatedSlab {
 			SetPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZonePtr ), OutBaroPress );
 
 		} else { // Should never get here
-			ShowSevereError( "Illegal control type in low temperature radiant system: " + trim( VentSlab( Item ).Name ) );
+			ShowSevereError( "Illegal control type in low temperature radiant system: " + VentSlab( Item ).Name );
 			ShowFatalError( "Preceding condition causes termination." );
 		}}
 
@@ -2063,7 +2062,7 @@ namespace VentilatedSlab {
 				SetPointTempHi = GetCurrentScheduleValue( VentSlab( Item ).HotCtrlHiTempSchedPtr );
 				SetPointTempLo = GetCurrentScheduleValue( VentSlab( Item ).HotCtrlLoTempSchedPtr );
 				if ( SetPointTempHi < SetPointTempLo ) {
-					ShowSevereError( "Heating setpoint temperature mismatch in" + trim( VentSlab( Item ).Name ) );
+					ShowSevereError( "Heating setpoint temperature mismatch in" + VentSlab( Item ).Name );
 					ShowContinueError( "High setpoint temperature is less than low setpoint temperature--check your schedule input" );
 					ShowFatalError( "Preceding condition causes termination." );
 				}
@@ -2071,7 +2070,7 @@ namespace VentilatedSlab {
 				AirTempLo = GetCurrentScheduleValue( VentSlab( Item ).HotAirLoTempSchedPtr );
 
 				if ( AirTempHi < AirTempLo ) {
-					ShowSevereError( "Heating Air temperature mismatch in" + trim( VentSlab( Item ).Name ) );
+					ShowSevereError( "Heating Air temperature mismatch in" + VentSlab( Item ).Name );
 					ShowContinueError( "High Air temperature is less than low Air temperature--check your schedule input" );
 					ShowFatalError( "Preceding condition causes termination." );
 				}
@@ -2193,7 +2192,7 @@ namespace VentilatedSlab {
 							}
 						} else {
 							// It should NEVER get to this point, but just in case...
-							ShowFatalError( "Ventilated Slab simulation control: illogical condition for " + trim( VentSlab( Item ).Name ) );
+							ShowFatalError( "Ventilated Slab simulation control: illogical condition for " + VentSlab( Item ).Name );
 						}
 
 					}}
@@ -2256,7 +2255,7 @@ namespace VentilatedSlab {
 							}
 						} else {
 							// It should NEVER get to this point, but just in case...
-							ShowFatalError( "Ventilated Slab simulation control: illogical condition for " + trim( VentSlab( Item ).Name ) );
+							ShowFatalError( "Ventilated Slab simulation control: illogical condition for " + VentSlab( Item ).Name );
 						}
 
 					}}
@@ -2289,7 +2288,7 @@ namespace VentilatedSlab {
 				SetPointTempHi = GetCurrentScheduleValue( VentSlab( Item ).ColdCtrlHiTempSchedPtr );
 				SetPointTempLo = GetCurrentScheduleValue( VentSlab( Item ).ColdCtrlLoTempSchedPtr );
 				if ( SetPointTempHi < SetPointTempLo ) {
-					ShowSevereError( "Cooling setpoint temperature mismatch in" + trim( VentSlab( Item ).Name ) );
+					ShowSevereError( "Cooling setpoint temperature mismatch in" + VentSlab( Item ).Name );
 					ShowContinueError( "High setpoint temperature is less than low setpoint temperature--check your schedule input" );
 					ShowFatalError( "Preceding condition causes termination." );
 				}
@@ -2297,7 +2296,7 @@ namespace VentilatedSlab {
 				AirTempHi = GetCurrentScheduleValue( VentSlab( Item ).ColdAirHiTempSchedPtr );
 				AirTempLo = GetCurrentScheduleValue( VentSlab( Item ).ColdAirLoTempSchedPtr );
 				if ( AirTempHi < AirTempLo ) {
-					ShowSevereError( "Cooling Air temperature mismatch in" + trim( VentSlab( Item ).Name ) );
+					ShowSevereError( "Cooling Air temperature mismatch in" + VentSlab( Item ).Name );
 					ShowContinueError( "High Air temperature is less than low Air temperature--check your schedule input" );
 					ShowFatalError( "Preceding condition causes termination." );
 				}
@@ -2413,7 +2412,7 @@ namespace VentilatedSlab {
 							}
 						} else {
 							// It should NEVER get to this point, but just in case...
-							ShowFatalError( cMO_VentilatedSlab + " simulation control: illogical condition for " + trim( VentSlab( Item ).Name ) );
+							ShowFatalError( cMO_VentilatedSlab + " simulation control: illogical condition for " + VentSlab( Item ).Name );
 						}
 
 					}}
@@ -2479,7 +2478,7 @@ namespace VentilatedSlab {
 							}
 						} else {
 							// It should NEVER get to this point, but just in case...
-							ShowFatalError( cMO_VentilatedSlab + " simulation control: illogical condition for " + trim( VentSlab( Item ).Name ) );
+							ShowFatalError( cMO_VentilatedSlab + " simulation control: illogical condition for " + VentSlab( Item ).Name );
 						}
 
 					}}
@@ -2710,7 +2709,7 @@ namespace VentilatedSlab {
 		Real64 const ZeroSystemResp( 0.1 ); // Response below which the system response is really zero
 		Real64 const TempCheckLimit( 0.1 ); // Maximum allowed temperature difference between outlet temperature calculations
 		Real64 const VentSlabAirTempToler( 0.001 ); // Maximum allowed temperature difference between the zone and return air
-		static Fstring const CurrentModuleObject( "ZoneHVAC:VentilatedSlab" );
+		static std::string const CurrentModuleObject( "ZoneHVAC:VentilatedSlab" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2770,9 +2769,9 @@ namespace VentilatedSlab {
 		Real64 MSlabAirInTemp;
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 
-		Fstring MSlabIn( MaxNameLength );
-		Fstring MSlabOut( MaxNameLength );
-		Fstring SlabName( MaxNameLength );
+		std::string MSlabIn;
+		std::string MSlabOut;
+		std::string SlabName;
 		int MSlabInletNode;
 		int MSlabOutletNode;
 		static int CondensationErrorCount( 0 ); // Counts for # times the radiant systems are shutdown due to condensation
@@ -2975,18 +2974,18 @@ namespace VentilatedSlab {
 									++CondensationErrorCount;
 
 									if ( VentSlab( Item ).CondErrIndex == 0 ) {
-										ShowWarningMessage( cMO_VentilatedSlab + " [" + trim( trim( VentSlab( Item ).Name ) ) + "]" );
-										ShowContinueError( "Surface [" + trim( Surface( VentSlab( Item ).SurfacePtr( RadSurfNum2 ) ).Name ) + "] temperature below dew-point temperature--potential for condensation exists" );
+										ShowWarningMessage( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + ']' );
+										ShowContinueError( "Surface [" + Surface( VentSlab( Item ).SurfacePtr( RadSurfNum2 ) ).Name + "] temperature below dew-point temperature--potential for condensation exists" );
 										ShowContinueError( "Flow to the ventilated slab system will be shut-off to avoid condensation" );
-										ShowContinueError( "Predicted radiant system surface temperature = " + trim( RoundSigDigits( TH( VentSlab( Item ).SurfacePtr( RadSurfNum2 ), 1, 2 ), 2 ) ) );
-										ShowContinueError( "Zone dew-point temperature + safety factor delta= " + trim( RoundSigDigits( DewPointTemp + CondDeltaTemp, 2 ) ) );
-										ShowContinueErrorTimeStamp( " " );
+										ShowContinueError( "Predicted radiant system surface temperature = " + RoundSigDigits( TH( VentSlab( Item ).SurfacePtr( RadSurfNum2 ), 1, 2 ), 2 ) );
+										ShowContinueError( "Zone dew-point temperature + safety factor delta= " + RoundSigDigits( DewPointTemp + CondDeltaTemp, 2 ) );
+										ShowContinueErrorTimeStamp( "" );
 									}
 									if ( CondensationErrorCount == 1 ) {
-										ShowContinueError( "Note that there is a " + trim( RoundSigDigits( CondDeltaTemp, 4 ) ) + " C safety built-in to the shut-off criteria" );
+										ShowContinueError( "Note that there is a " + RoundSigDigits( CondDeltaTemp, 4 ) + " C safety built-in to the shut-off criteria" );
 										ShowContinueError( "Note also that this affects all surfaces that are part of this system" );
 									}
-									ShowRecurringWarningErrorAtEnd( cMO_VentilatedSlab + " [" + trim( trim( VentSlab( Item ).Name ) ) + "] condensation shut-off occurrence continues.", VentSlab( Item ).CondErrIndex, DewPointTemp, DewPointTemp, _, "C", "C" );
+									ShowRecurringWarningErrorAtEnd( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + "] condensation shut-off occurrence continues.", VentSlab( Item ).CondErrIndex, DewPointTemp, DewPointTemp, _, "C", "C" );
 								}
 								break; // outer do loop
 							}
@@ -3014,18 +3013,18 @@ namespace VentilatedSlab {
 							if ( ! WarmupFlag ) {
 								++EnergyImbalanceErrorCount;
 								if ( VentSlab( Item ).EnrgyImbalErrIndex == 0 ) {
-									ShowWarningMessage( cMO_VentilatedSlab + " [" + trim( trim( VentSlab( Item ).Name ) ) + "]" );
+									ShowWarningMessage( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + ']' );
 									ShowContinueError( "Ventilated Slab (slab only type) air outlet temperature calculation mismatch." );
 									ShowContinueError( "This should not happen as it indicates a potential energy imbalance in the calculations." );
 									ShowContinueError( "However, it could also result from improper input for the ventilated slab or" );
 									ShowContinueError( "illogical control temperatures.  Check your input for this ventilated slab and" );
 									ShowContinueError( "also look at the internal data shown below." );
-									ShowContinueError( "Predicted return air temperature [C] from the overall energy balance = " + trim( RoundSigDigits( Node( ReturnAirNode ).Temp, 4 ) ) );
-									ShowContinueError( "Predicted return air temperature [C] from the slab section energy balances = " + trim( RoundSigDigits( AirOutletTempCheck, 4 ) ) );
-									ShowContinueError( "Total energy rate (power) [W] added to the slab = " + trim( RoundSigDigits( TotalVentSlabRadPower, 4 ) ) );
-									ShowContinueErrorTimeStamp( " " );
+									ShowContinueError( "Predicted return air temperature [C] from the overall energy balance = " + RoundSigDigits( Node( ReturnAirNode ).Temp, 4 ) );
+									ShowContinueError( "Predicted return air temperature [C] from the slab section energy balances = " + RoundSigDigits( AirOutletTempCheck, 4 ) );
+									ShowContinueError( "Total energy rate (power) [W] added to the slab = " + RoundSigDigits( TotalVentSlabRadPower, 4 ) );
+									ShowContinueErrorTimeStamp( "" );
 								}
-								ShowRecurringWarningErrorAtEnd( cMO_VentilatedSlab + " [" + trim( trim( VentSlab( Item ).Name ) ) + "] temperature calculation mismatch occurrence continues.", VentSlab( Item ).EnrgyImbalErrIndex );
+								ShowRecurringWarningErrorAtEnd( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + "] temperature calculation mismatch occurrence continues.", VentSlab( Item ).EnrgyImbalErrIndex );
 							}
 
 						}
@@ -3042,18 +3041,18 @@ namespace VentilatedSlab {
 							if ( ! WarmupFlag ) {
 								++EnergyImbalanceErrorCount;
 								if ( VentSlab( Item ).EnrgyImbalErrIndex == 0 ) {
-									ShowWarningMessage( cMO_VentilatedSlab + " [" + trim( trim( VentSlab( Item ).Name ) ) + "]" );
+									ShowWarningMessage( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + ']' );
 									ShowContinueError( "Ventilated Slab (slab only type) air outlet temperature calculation mismatch." );
 									ShowContinueError( "This should not happen as it indicates a potential energy imbalance in the calculations." );
 									ShowContinueError( "However, it could also result from improper input for the ventilated slab or" );
 									ShowContinueError( "illogical control temperatures.  Check your input for this ventilated slab and" );
 									ShowContinueError( "also look at the internal data shown below." );
-									ShowContinueError( "Predicted return air temperature [C] from the overall energy balance = " + trim( RoundSigDigits( Node( ReturnAirNode ).Temp, 4 ) ) );
-									ShowContinueError( "Predicted return air temperature [C] from the slab section energy balances = " + trim( RoundSigDigits( AirOutletTempCheck, 4 ) ) );
-									ShowContinueError( "Total energy rate (power) [W] added to the slab = " + trim( RoundSigDigits( TotalVentSlabRadPower, 4 ) ) );
-									ShowContinueErrorTimeStamp( " " );
+									ShowContinueError( "Predicted return air temperature [C] from the overall energy balance = " + RoundSigDigits( Node( ReturnAirNode ).Temp, 4 ) );
+									ShowContinueError( "Predicted return air temperature [C] from the slab section energy balances = " + RoundSigDigits( AirOutletTempCheck, 4 ) );
+									ShowContinueError( "Total energy rate (power) [W] added to the slab = " + RoundSigDigits( TotalVentSlabRadPower, 4 ) );
+									ShowContinueErrorTimeStamp( "" );
 								}
-								ShowRecurringWarningErrorAtEnd( cMO_VentilatedSlab + " [" + trim( trim( VentSlab( Item ).Name ) ) + "] temperature calculation mismatch occurrence continues.", VentSlab( Item ).EnrgyImbalErrIndex );
+								ShowRecurringWarningErrorAtEnd( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + "] temperature calculation mismatch occurrence continues.", VentSlab( Item ).EnrgyImbalErrIndex );
 							}
 
 						}
@@ -3198,18 +3197,18 @@ namespace VentilatedSlab {
 								if ( ! WarmupFlag ) {
 									++CondensationErrorCount;
 									if ( VentSlab( Item ).CondErrIndex == 0 ) {
-										ShowWarningMessage( cMO_VentilatedSlab + " [" + trim( trim( VentSlab( Item ).Name ) ) + "]" );
-										ShowContinueError( "Surface [" + trim( Surface( VentSlab( Item ).SurfacePtr( RadSurfNum2 ) ).Name ) + "] temperature below dew-point temperature--potential for condensation exists" );
+										ShowWarningMessage( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + ']' );
+										ShowContinueError( "Surface [" + Surface( VentSlab( Item ).SurfacePtr( RadSurfNum2 ) ).Name + "] temperature below dew-point temperature--potential for condensation exists" );
 										ShowContinueError( "Flow to the ventilated slab system will be shut-off to avoid condensation" );
-										ShowContinueError( "Predicted radiant system surface temperature = " + trim( RoundSigDigits( TH( VentSlab( Item ).SurfacePtr( RadSurfNum2 ), 1, 2 ), 2 ) ) );
-										ShowContinueError( "Zone dew-point temperature + safety factor delta= " + trim( RoundSigDigits( DewPointTemp + CondDeltaTemp, 2 ) ) );
-										ShowContinueErrorTimeStamp( " " );
+										ShowContinueError( "Predicted radiant system surface temperature = " + RoundSigDigits( TH( VentSlab( Item ).SurfacePtr( RadSurfNum2 ), 1, 2 ), 2 ) );
+										ShowContinueError( "Zone dew-point temperature + safety factor delta= " + RoundSigDigits( DewPointTemp + CondDeltaTemp, 2 ) );
+										ShowContinueErrorTimeStamp( "" );
 									}
 									if ( CondensationErrorCount == 1 ) {
-										ShowContinueError( "Note that there is a " + trim( RoundSigDigits( CondDeltaTemp, 4 ) ) + " C safety built-in to the shut-off criteria" );
+										ShowContinueError( "Note that there is a " + RoundSigDigits( CondDeltaTemp, 4 ) + " C safety built-in to the shut-off criteria" );
 										ShowContinueError( "Note also that this affects all surfaces that are part of this system" );
 									}
-									ShowRecurringWarningErrorAtEnd( cMO_VentilatedSlab + " [" + trim( trim( VentSlab( Item ).Name ) ) + "] condensation shut-off occurrence continues.", VentSlab( Item ).CondErrIndex, DewPointTemp, DewPointTemp, _, "C", "C" );
+									ShowRecurringWarningErrorAtEnd( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + "] condensation shut-off occurrence continues.", VentSlab( Item ).CondErrIndex, DewPointTemp, DewPointTemp, _, "C", "C" );
 								}
 								break; // outer do loop
 							}
@@ -3265,18 +3264,18 @@ namespace VentilatedSlab {
 						if ( ! WarmupFlag ) {
 							++EnergyImbalanceErrorCount;
 							if ( VentSlab( Item ).EnrgyImbalErrIndex == 0 ) {
-								ShowWarningMessage( cMO_VentilatedSlab + " [" + trim( trim( VentSlab( Item ).Name ) ) + "]" );
+								ShowWarningMessage( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + ']' );
 								ShowContinueError( "Ventilated Slab (slab only type) air outlet temperature calculation mismatch." );
 								ShowContinueError( "This should not happen as it indicates a potential energy imbalance in the calculations." );
 								ShowContinueError( "However, it could also result from improper input for the ventilated slab or" );
 								ShowContinueError( "illogical control temperatures.  Check your input for this ventilated slab and" );
 								ShowContinueError( "also look at the internal data shown below." );
-								ShowContinueError( "Predicted return air temperature [C] from the overall energy balance = " + trim( RoundSigDigits( Node( ReturnAirNode ).Temp, 4 ) ) );
-								ShowContinueError( "Predicted return air temperature [C] from the slab section energy balances = " + trim( RoundSigDigits( AirOutletTempCheck, 4 ) ) );
-								ShowContinueError( "Total energy rate (power) [W] added to the slab = " + trim( RoundSigDigits( TotalVentSlabRadPower, 4 ) ) );
-								ShowContinueErrorTimeStamp( " " );
+								ShowContinueError( "Predicted return air temperature [C] from the overall energy balance = " + RoundSigDigits( Node( ReturnAirNode ).Temp, 4 ) );
+								ShowContinueError( "Predicted return air temperature [C] from the slab section energy balances = " + RoundSigDigits( AirOutletTempCheck, 4 ) );
+								ShowContinueError( "Total energy rate (power) [W] added to the slab = " + RoundSigDigits( TotalVentSlabRadPower, 4 ) );
+								ShowContinueErrorTimeStamp( "" );
 							}
-							ShowRecurringWarningErrorAtEnd( cMO_VentilatedSlab + " [" + trim( trim( VentSlab( Item ).Name ) ) + "] temperature calculation mismatch occurrence continues.", VentSlab( Item ).EnrgyImbalErrIndex );
+							ShowRecurringWarningErrorAtEnd( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + "] temperature calculation mismatch occurrence continues.", VentSlab( Item ).EnrgyImbalErrIndex );
 						}
 					}
 

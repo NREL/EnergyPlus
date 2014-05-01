@@ -167,7 +167,7 @@ namespace ThermalChimney {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const Blank;
+		static std::string const Blank;
 		Real64 const FlowFractionTolerance( 0.0001 ); // Smallest deviation from unity for the sum of all fractions
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -213,13 +213,13 @@ namespace ThermalChimney {
 			// First Alpha is Thermal Chimney Name
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ThermalChimneySys.Name(), Loop, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ThermalChimneySys.Name(), Loop, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) {
 					continue;
 				} else {
-					cAlphaArgs( 1 ) = trim( cAlphaArgs( 1 ) ) + "--dup";
+					cAlphaArgs( 1 ) = cAlphaArgs( 1 ) + "--dup";
 				}
 			}
 			ThermalChimneySys( Loop ).Name = cAlphaArgs( 1 );
@@ -227,12 +227,12 @@ namespace ThermalChimney {
 			// Second Alpha is Zone Name
 			ThermalChimneySys( Loop ).RealZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
 			if ( ThermalChimneySys( Loop ).RealZonePtr == 0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid Zone" );
-				ShowContinueError( "invalid - not found " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\"." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid Zone" );
+				ShowContinueError( "invalid - not found " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
 			} else if ( ! Zone( ThermalChimneySys( Loop ).RealZonePtr ).HasWindow ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid Zone" );
-				ShowContinueError( "...invalid - no window(s) in " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\"." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid Zone" );
+				ShowContinueError( "...invalid - no window(s) in " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ShowContinueError( "...thermal chimney zones must have window(s)." );
 				ErrorsFound = true;
 			}
@@ -244,27 +244,27 @@ namespace ThermalChimney {
 			} else {
 				ThermalChimneySys( Loop ).SchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
 				if ( ThermalChimneySys( Loop ).SchedPtr == 0 ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid data" );
-					ShowContinueError( "Invalid-not found " + trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( cAlphaArgs( 3 ) ) + "\"." );
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid data" );
+					ShowContinueError( "Invalid-not found " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
 					ErrorsFound = true;
 				}
 			}
 
 			ThermalChimneySys( Loop ).AbsorberWallWidth = rNumericArgs( 1 );
 			if ( ThermalChimneySys( Loop ).AbsorberWallWidth < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cNumericFieldNames( 1 ) ) + " must be >= 0, entered value=[" + trim( RoundSigDigits( rNumericArgs( 1 ), 2 ) ) + "]." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 1 ) + " must be >= 0, entered value=[" + RoundSigDigits( rNumericArgs( 1 ), 2 ) + "]." );
 				ErrorsFound = true;
 			}
 
 			ThermalChimneySys( Loop ).AirOutletCrossArea = rNumericArgs( 2 );
 			if ( ThermalChimneySys( Loop ).AirOutletCrossArea < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cNumericFieldNames( 2 ) ) + " must be >= 0, entered value=[" + trim( RoundSigDigits( rNumericArgs( 2 ), 2 ) ) + "]." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 2 ) + " must be >= 0, entered value=[" + RoundSigDigits( rNumericArgs( 2 ), 2 ) + "]." );
 				ErrorsFound = true;
 			}
 
 			ThermalChimneySys( Loop ).DischargeCoeff = rNumericArgs( 3 );
 			if ( ( ThermalChimneySys( Loop ).DischargeCoeff <= 0.0 ) || ( ThermalChimneySys( Loop ).DischargeCoeff > 1.0 ) ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cNumericFieldNames( 3 ) ) + " must be > 0 and <=1.0, entered value=[" + trim( RoundSigDigits( rNumericArgs( 3 ), 2 ) ) + "]." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 3 ) + " must be > 0 and <=1.0, entered value=[" + RoundSigDigits( rNumericArgs( 3 ), 2 ) + "]." );
 				ErrorsFound = true;
 			}
 
@@ -286,26 +286,26 @@ namespace ThermalChimney {
 
 				//!! Error trap for zones that do not exist or zones not in the zone the thermal chimney is in
 				if ( ThermalChimneySys( Loop ).ZonePtr( TCZoneNum ) == 0 ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cAlphaFieldNames( TCZoneNum + 3 ) ) + "=\"" + trim( cAlphaArgs( TCZoneNum + 3 ) ) + "\" not found." );
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( TCZoneNum + 3 ) + "=\"" + cAlphaArgs( TCZoneNum + 3 ) + "\" not found." );
 					ErrorsFound = true;
 				} else if ( ThermalChimneySys( Loop ).ZonePtr( TCZoneNum ) == ThermalChimneySys( Loop ).RealZonePtr ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid reference " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) );
-					ShowContinueError( "...must not have same zone as reference= " + trim( cAlphaFieldNames( TCZoneNum + 3 ) ) + "=\"" + trim( cAlphaArgs( TCZoneNum + 3 ) ) + "\"." );
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid reference " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) );
+					ShowContinueError( "...must not have same zone as reference= " + cAlphaFieldNames( TCZoneNum + 3 ) + "=\"" + cAlphaArgs( TCZoneNum + 3 ) + "\"." );
 					ErrorsFound = true;
 				}
 
 				if ( ThermalChimneySys( Loop ).DistanceThermChimInlet( TCZoneNum ) < 0.0 ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cNumericFieldNames( 3 * TCZoneNum + 1 ) ) + " must be >= 0, entered value=[" + trim( RoundSigDigits( rNumericArgs( 3 * TCZoneNum + 1 ), 2 ) ) + "]." );
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 3 * TCZoneNum + 1 ) + " must be >= 0, entered value=[" + RoundSigDigits( rNumericArgs( 3 * TCZoneNum + 1 ), 2 ) + "]." );
 					ErrorsFound = true;
 				}
 
 				if ( ( ThermalChimneySys( Loop ).RatioThermChimAirFlow( TCZoneNum ) <= 0.0 ) || ( ThermalChimneySys( Loop ).RatioThermChimAirFlow( TCZoneNum ) > 1.0 ) ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cNumericFieldNames( 3 * TCZoneNum + 2 ) ) + " must be > 0 and <=1.0, entered value=[" + trim( RoundSigDigits( rNumericArgs( 3 * TCZoneNum + 2 ), 2 ) ) + "]." );
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 3 * TCZoneNum + 2 ) + " must be > 0 and <=1.0, entered value=[" + RoundSigDigits( rNumericArgs( 3 * TCZoneNum + 2 ), 2 ) + "]." );
 					ErrorsFound = true;
 				}
 
 				if ( ThermalChimneySys( Loop ).EachAirInletCrossArea( TCZoneNum ) < 0.0 ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cNumericFieldNames( 3 * TCZoneNum + 3 ) ) + " must be >= 0, entered value=[" + trim( RoundSigDigits( rNumericArgs( 3 * TCZoneNum + 3 ), 2 ) ) + "]." );
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 3 * TCZoneNum + 3 ) + " must be >= 0, entered value=[" + RoundSigDigits( rNumericArgs( 3 * TCZoneNum + 3 ), 2 ) + "]." );
 					ErrorsFound = true;
 				}
 
@@ -315,7 +315,7 @@ namespace ThermalChimney {
 
 			// Error trap if the sum of fractions is not equal to 1.0
 			if ( std::abs( AllRatiosSummed - 1.0 ) > FlowFractionTolerance ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid " "sum of fractions, must be =1.0, entered value (summed from entries)=[" + trim( RoundSigDigits( AllRatiosSummed, 4 ) ) + "]." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " "sum of fractions, must be =1.0, entered value (summed from entries)=[" + RoundSigDigits( AllRatiosSummed, 4 ) + "]." );
 				ErrorsFound = true;
 			}
 
@@ -345,20 +345,20 @@ namespace ThermalChimney {
 					if ( ThermalChimneySys( Loop ).TotZoneToDistrib >= ( TCZoneNum + 1 ) ) {
 						for ( TCZoneNum1 = TCZoneNum + 1; TCZoneNum1 <= ThermalChimneySys( Loop ).TotZoneToDistrib; ++TCZoneNum1 ) {
 							if ( ThermalChimneySys( Loop ).ZonePtr( TCZoneNum ) == ThermalChimneySys( Loop ).ZonePtr( TCZoneNum1 ) ) {
-								ShowSevereError( "Only one ZoneThermalChimney object allowed per zone but zone " + trim( ThermalChimneySys( Loop ).ZoneName( TCZoneNum ) ) + " has two ZoneThermalChimney objects associated with it" );
+								ShowSevereError( "Only one ZoneThermalChimney object allowed per zone but zone " + ThermalChimneySys( Loop ).ZoneName( TCZoneNum ) + " has two ZoneThermalChimney objects associated with it" );
 								ErrorsFound = true;
 							}
 						}
 						for ( TCZoneNum1 = 1; TCZoneNum1 <= TCZoneNum - 1; ++TCZoneNum1 ) {
 							if ( ThermalChimneySys( Loop ).ZonePtr( TCZoneNum ) == ThermalChimneySys( Loop ).ZonePtr( TCZoneNum1 ) ) {
-								ShowSevereError( "Only one ZoneThermalChimney object allowed per zone but zone " + trim( ThermalChimneySys( Loop ).ZoneName( TCZoneNum ) ) + " has two ZoneThermalChimney objects associated with it" );
+								ShowSevereError( "Only one ZoneThermalChimney object allowed per zone but zone " + ThermalChimneySys( Loop ).ZoneName( TCZoneNum ) + " has two ZoneThermalChimney objects associated with it" );
 								ErrorsFound = true;
 							}
 						}
 					} else { // IF ( ThermalChimneySys(Loop)%TotZoneToDistrib >= (TCZoneNum+1) ) THEN
 						for ( TCZoneNum1 = 1; TCZoneNum1 <= TCZoneNum - 1; ++TCZoneNum1 ) {
 							if ( ThermalChimneySys( Loop ).ZonePtr( TCZoneNum ) == ThermalChimneySys( Loop ).ZonePtr( TCZoneNum1 ) ) {
-								ShowSevereError( "Only one ZoneThermalChimney object allowed per zone but zone " + trim( ThermalChimneySys( Loop ).ZoneName( TCZoneNum ) ) + " has two ZoneThermalChimney objects associated with it" );
+								ShowSevereError( "Only one ZoneThermalChimney object allowed per zone but zone " + ThermalChimneySys( Loop ).ZoneName( TCZoneNum ) + " has two ZoneThermalChimney objects associated with it" );
 								ErrorsFound = true;
 							}
 						}
@@ -377,7 +377,7 @@ namespace ThermalChimney {
 						for ( TCZoneNum = 1; TCZoneNum <= ThermalChimneySys( Loop ).TotZoneToDistrib; ++TCZoneNum ) {
 							for ( TCZoneNum1 = 1; TCZoneNum1 <= ThermalChimneySys( Loop1 ).TotZoneToDistrib; ++TCZoneNum1 ) {
 								if ( ThermalChimneySys( Loop ).ZonePtr( TCZoneNum ) == ThermalChimneySys( Loop1 ).ZonePtr( TCZoneNum1 ) ) {
-									ShowSevereError( "Only one ZoneThermalChimney object allowed per zone but zone " + trim( ThermalChimneySys( Loop ).ZoneName( TCZoneNum ) ) + " has two ZoneThermalChimney objects associated with it" );
+									ShowSevereError( "Only one ZoneThermalChimney object allowed per zone but zone " + ThermalChimneySys( Loop ).ZoneName( TCZoneNum ) + " has two ZoneThermalChimney objects associated with it" );
 									ErrorsFound = true;
 								}
 							}
@@ -387,7 +387,7 @@ namespace ThermalChimney {
 						for ( TCZoneNum = 1; TCZoneNum <= ThermalChimneySys( Loop ).TotZoneToDistrib; ++TCZoneNum ) {
 							for ( TCZoneNum1 = 1; TCZoneNum1 <= ThermalChimneySys( Loop1 ).TotZoneToDistrib; ++TCZoneNum1 ) {
 								if ( ThermalChimneySys( Loop ).ZonePtr( TCZoneNum ) == ThermalChimneySys( Loop1 ).ZonePtr( TCZoneNum1 ) ) {
-									ShowSevereError( "Only one ZoneThermalChimney object allowed per zone but zone " + trim( ThermalChimneySys( Loop ).ZoneName( TCZoneNum ) ) + " has two ZoneThermalChimney objects associated with it" );
+									ShowSevereError( "Only one ZoneThermalChimney object allowed per zone but zone " + ThermalChimneySys( Loop ).ZoneName( TCZoneNum ) + " has two ZoneThermalChimney objects associated with it" );
 									ErrorsFound = true;
 								}
 							}
@@ -398,7 +398,7 @@ namespace ThermalChimney {
 						for ( TCZoneNum = 1; TCZoneNum <= ThermalChimneySys( Loop ).TotZoneToDistrib; ++TCZoneNum ) {
 							for ( TCZoneNum1 = 1; TCZoneNum1 <= ThermalChimneySys( Loop1 ).TotZoneToDistrib; ++TCZoneNum1 ) {
 								if ( ThermalChimneySys( Loop ).ZonePtr( TCZoneNum ) == ThermalChimneySys( Loop1 ).ZonePtr( TCZoneNum1 ) ) {
-									ShowSevereError( "Only one ZoneThermalChimney object allowed per zone but zone " + trim( ThermalChimneySys( Loop ).ZoneName( TCZoneNum ) ) + " has two ZoneThermalChimney objects associated with it" );
+									ShowSevereError( "Only one ZoneThermalChimney object allowed per zone but zone " + ThermalChimneySys( Loop ).ZoneName( TCZoneNum ) + " has two ZoneThermalChimney objects associated with it" );
 									ErrorsFound = true;
 								}
 							}
@@ -410,7 +410,7 @@ namespace ThermalChimney {
 		} // IF (TotThermalChimney > 1) THEN
 
 		if ( ErrorsFound ) {
-			ShowFatalError( trim( cCurrentModuleObject ) + " Errors found in input.  Preceding condition(s) cause termination." );
+			ShowFatalError( cCurrentModuleObject + " Errors found in input.  Preceding condition(s) cause termination." );
 		}
 
 	}

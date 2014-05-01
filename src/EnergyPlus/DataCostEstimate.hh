@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace DataCostEstimate {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// -only module should be available to other modules and routines.
@@ -44,11 +42,11 @@ namespace DataCostEstimate {
 	struct CostLineItemStruct
 	{
 		// Members
-		Fstring LineName; // object name (needed ?)
-		Fstring LineType; // Case statement driver?
-		Fstring ParentObjType; // parent reference to IDD object type
-		Fstring ParentObjName; // parent instance in IDF
-		Fstring ParentObjKey; // end use key for parent object
+		std::string LineName; // object name (needed ?)
+		std::string LineType; // Case statement driver?
+		std::string ParentObjType; // parent reference to IDD object type
+		std::string ParentObjName; // parent instance in IDF
+		std::string ParentObjKey; // end use key for parent object
 		int ParentObjIDinList;
 		Real64 PerSquareMeter; // cost per square meter
 		Real64 PerEach; // cost per each
@@ -66,17 +64,12 @@ namespace DataCostEstimate {
 		//  REAL(r64)    :: ValueAtReplacement = 0.0d0 ! residual value at end of life
 		int LineNumber; // number of line item in detail list
 		Real64 Qty; // quantity in calculations (can be input)
-		Fstring Units; // Reported units
+		std::string Units; // Reported units
 		Real64 ValuePer; // Cost used in final calculation
 		Real64 LineSubTotal; // line item total  Qty * ValuePer
 
 		// Default Constructor
 		CostLineItemStruct() :
-			LineName( MaxNameLength ),
-			LineType( MaxNameLength ),
-			ParentObjType( MaxNameLength ),
-			ParentObjName( MaxNameLength ),
-			ParentObjKey( MaxNameLength ),
 			ParentObjIDinList( 1 ),
 			PerSquareMeter( 0.0 ),
 			PerEach( 0.0 ),
@@ -87,18 +80,17 @@ namespace DataCostEstimate {
 			PerUAinWattperDelK( 0.0 ),
 			LineNumber( -1 ),
 			Qty( 0.0 ),
-			Units( MaxNameLength ),
 			ValuePer( 0.0 ),
 			LineSubTotal( 0.0 )
 		{}
 
 		// Member Constructor
 		CostLineItemStruct(
-			Fstring const & LineName, // object name (needed ?)
-			Fstring const & LineType, // Case statement driver?
-			Fstring const & ParentObjType, // parent reference to IDD object type
-			Fstring const & ParentObjName, // parent instance in IDF
-			Fstring const & ParentObjKey, // end use key for parent object
+			std::string const & LineName, // object name (needed ?)
+			std::string const & LineType, // Case statement driver?
+			std::string const & ParentObjType, // parent reference to IDD object type
+			std::string const & ParentObjName, // parent instance in IDF
+			std::string const & ParentObjKey, // end use key for parent object
 			int const ParentObjIDinList,
 			Real64 const PerSquareMeter, // cost per square meter
 			Real64 const PerEach, // cost per each
@@ -109,15 +101,15 @@ namespace DataCostEstimate {
 			Real64 const PerUAinWattperDelK, // cost per (UA) in Watt/deltaK
 			int const LineNumber, // number of line item in detail list
 			Real64 const Qty, // quantity in calculations (can be input)
-			Fstring const & Units, // Reported units
+			std::string const & Units, // Reported units
 			Real64 const ValuePer, // Cost used in final calculation
 			Real64 const LineSubTotal // line item total  Qty * ValuePer
 		) :
-			LineName( MaxNameLength, LineName ),
-			LineType( MaxNameLength, LineType ),
-			ParentObjType( MaxNameLength, ParentObjType ),
-			ParentObjName( MaxNameLength, ParentObjName ),
-			ParentObjKey( MaxNameLength, ParentObjKey ),
+			LineName( LineName ),
+			LineType( LineType ),
+			ParentObjType( ParentObjType ),
+			ParentObjName( ParentObjName ),
+			ParentObjKey( ParentObjKey ),
 			ParentObjIDinList( ParentObjIDinList ),
 			PerSquareMeter( PerSquareMeter ),
 			PerEach( PerEach ),
@@ -128,7 +120,7 @@ namespace DataCostEstimate {
 			PerUAinWattperDelK( PerUAinWattperDelK ),
 			LineNumber( LineNumber ),
 			Qty( Qty ),
-			Units( MaxNameLength, Units ),
+			Units( Units ),
 			ValuePer( ValuePer ),
 			LineSubTotal( LineSubTotal )
 		{}
@@ -180,26 +172,23 @@ namespace DataCostEstimate {
 	struct monetaryUnitType
 	{
 		// Members
-		Fstring code; // ISO code for currency such as USD or EUR
-		Fstring txt; // text representation of the currency
-		Fstring html; // representation for HTML file - contains unicode references
+		std::string code; // ISO code for currency such as USD or EUR
+		std::string txt; // text representation of the currency
+		std::string html; // representation for HTML file - contains unicode references
 
 		// Default Constructor
-		monetaryUnitType() :
-			code( MaxNameLength ),
-			txt( MaxNameLength ),
-			html( MaxNameLength )
+		monetaryUnitType()
 		{}
 
 		// Member Constructor
 		monetaryUnitType(
-			Fstring const & code, // ISO code for currency such as USD or EUR
-			Fstring const & txt, // text representation of the currency
-			Fstring const & html // representation for HTML file - contains unicode references
+			std::string const & code, // ISO code for currency such as USD or EUR
+			std::string const & txt, // text representation of the currency
+			std::string const & html // representation for HTML file - contains unicode references
 		) :
-			code( MaxNameLength, code ),
-			txt( MaxNameLength, txt ),
-			html( MaxNameLength, html )
+			code( code ),
+			txt( txt ),
+			html( html )
 		{}
 
 	};

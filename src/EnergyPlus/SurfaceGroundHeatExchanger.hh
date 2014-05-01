@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -15,7 +14,6 @@ namespace EnergyPlus {
 namespace SurfaceGroundHeatExchanger {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 	using DataHeatBalance::MaxCTFTerms;
 
 	// Data
@@ -23,7 +21,7 @@ namespace SurfaceGroundHeatExchanger {
 	extern Real64 const SmallNum; // Very small number to avoid div0 errors
 	extern Real64 const StefBoltzmann; // Stefan-Boltzmann constant
 	extern Real64 const SurfaceHXHeight; // Surface Height above ground -- used in height dependent calcs.
-	extern Fstring const Blank;
+	extern std::string const Blank;
 
 	extern int const SurfCond_Ground;
 	extern int const SurfCond_Exposed;
@@ -86,10 +84,10 @@ namespace SurfaceGroundHeatExchanger {
 	{
 		// Members
 		// Input data
-		Fstring Name; // name of surface GHE
-		Fstring ConstructionName; // name of the associated construction
-		Fstring InletNode; // surface GHE inlet fluid node
-		Fstring OutletNode; // surface GHE outlet fluid node
+		std::string Name; // name of surface GHE
+		std::string ConstructionName; // name of the associated construction
+		std::string InletNode; // surface GHE inlet fluid node
+		std::string OutletNode; // surface GHE outlet fluid node
 		Real64 DesignMassFlowRate;
 		Real64 TubeDiameter; // hydronic tube inside diameter
 		Real64 TubeSpacing; // tube spacing
@@ -118,10 +116,6 @@ namespace SurfaceGroundHeatExchanger {
 
 		// Default Constructor
 		SurfaceGroundHeatExchangerData() :
-			Name( MaxNameLength, Blank ),
-			ConstructionName( MaxNameLength, Blank ),
-			InletNode( MaxNameLength, Blank ),
-			OutletNode( MaxNameLength, Blank ),
 			DesignMassFlowRate( 0.0 ),
 			TubeDiameter( 0.0 ),
 			TubeSpacing( 0.0 ),
@@ -150,10 +144,10 @@ namespace SurfaceGroundHeatExchanger {
 
 		// Member Constructor
 		SurfaceGroundHeatExchangerData(
-			Fstring const & Name, // name of surface GHE
-			Fstring const & ConstructionName, // name of the associated construction
-			Fstring const & InletNode, // surface GHE inlet fluid node
-			Fstring const & OutletNode, // surface GHE outlet fluid node
+			std::string const & Name, // name of surface GHE
+			std::string const & ConstructionName, // name of the associated construction
+			std::string const & InletNode, // surface GHE inlet fluid node
+			std::string const & OutletNode, // surface GHE outlet fluid node
 			Real64 const DesignMassFlowRate,
 			Real64 const TubeDiameter, // hydronic tube inside diameter
 			Real64 const TubeSpacing, // tube spacing
@@ -179,10 +173,10 @@ namespace SurfaceGroundHeatExchanger {
 			int const BranchNum,
 			int const CompNum
 		) :
-			Name( MaxNameLength, Name ),
-			ConstructionName( MaxNameLength, ConstructionName ),
-			InletNode( MaxNameLength, InletNode ),
-			OutletNode( MaxNameLength, OutletNode ),
+			Name( Name ),
+			ConstructionName( ConstructionName ),
+			InletNode( InletNode ),
+			OutletNode( OutletNode ),
 			DesignMassFlowRate( DesignMassFlowRate ),
 			TubeDiameter( TubeDiameter ),
 			TubeSpacing( TubeSpacing ),
@@ -412,7 +406,7 @@ namespace SurfaceGroundHeatExchanger {
 
 	void
 	SimSurfaceGroundHeatExchanger(
-		Fstring const & CompName, // name of the surface GHE
+		std::string const & CompName, // name of the surface GHE
 		int & CompIndex,
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		bool const RunFlag, // TRUE if equipment is operating

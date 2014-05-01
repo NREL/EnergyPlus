@@ -18,7 +18,6 @@
 
 namespace ObjexxFCL {
 
-extern std::string const READ_STOPPERS;
 extern std::string const VERSION;
 extern std::string const WHITESPACE;
 

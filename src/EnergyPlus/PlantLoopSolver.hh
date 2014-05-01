@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -65,23 +64,22 @@ namespace PlantLoopSolver {
 		// Members
 		bool Valid; // Assume true
 		Location ErrorPoint; // Branch where the error was thrown
-		Fstring Reason; // Brief description of error
+		std::string Reason; // Brief description of error
 
 		// Default Constructor
 		m_FlowControlValidator() :
-			Valid( true ),
-			Reason( 175 )
+			Valid( true )
 		{}
 
 		// Member Constructor
 		m_FlowControlValidator(
 			bool const Valid, // Assume true
 			Location const & ErrorPoint, // Branch where the error was thrown
-			Fstring const & Reason // Brief description of error
+			std::string const & Reason // Brief description of error
 		) :
 			Valid( Valid ),
 			ErrorPoint( ErrorPoint ),
-			Reason( 175, Reason )
+			Reason( Reason )
 		{}
 
 	};

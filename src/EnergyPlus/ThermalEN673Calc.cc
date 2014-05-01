@@ -74,7 +74,7 @@ namespace ThermalEN673Calc {
 		Real64 & hout,
 		Real64 & shgc,
 		int & nperr,
-		Fstring & ErrorMessage,
+		std::string & ErrorMessage,
 		FArray1A_int const ibc,
 		FArray1A< Real64 > hg,
 		FArray1A< Real64 > hr,
@@ -186,7 +186,7 @@ namespace ThermalEN673Calc {
 		FArray1A< Real64 > Ra,
 		FArray1A< Real64 > Nu,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	)
 	{
 		// Using
@@ -441,7 +441,7 @@ namespace ThermalEN673Calc {
 		Real64 & sf,
 		int const standard,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	)
 	{
 		//***********************************************************************

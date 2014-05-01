@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace Pumps {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS:
@@ -28,17 +26,17 @@ namespace Pumps {
 	extern int const SequentialScheme; // Control sequencing for pump bank
 	extern int const UserDefined; // Control sequencing for pump bank
 
-	extern Fstring const cPump_VarSpeed;
+	extern std::string const cPump_VarSpeed;
 	extern int const Pump_VarSpeed;
-	extern Fstring const cPump_ConSpeed;
+	extern std::string const cPump_ConSpeed;
 	extern int const Pump_ConSpeed;
-	extern Fstring const cPump_Cond;
+	extern std::string const cPump_Cond;
 	extern int const Pump_Cond;
-	extern Fstring const cPumpBank_VarSpeed;
+	extern std::string const cPumpBank_VarSpeed;
 	extern int const PumpBank_VarSpeed;
-	extern Fstring const cPumpBank_ConSpeed;
+	extern std::string const cPumpBank_ConSpeed;
 	extern int const PumpBank_ConSpeed;
-	extern FArray1D_Fstring const cPumpTypes;
+	extern FArray1D_string const cPumpTypes;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -64,16 +62,16 @@ namespace Pumps {
 	struct PumpVFDControlData
 	{
 		// Members
-		Fstring Name;
-		Fstring ManualRPMSchedName;
+		std::string Name;
+		std::string ManualRPMSchedName;
 		int ManualRPMSchedIndex;
-		Fstring LowerPsetSchedName;
+		std::string LowerPsetSchedName;
 		int LowerPsetSchedIndex;
-		Fstring UpperPsetSchedName;
+		std::string UpperPsetSchedName;
 		int UpperPsetSchedIndex;
-		Fstring MinRPMSchedName;
+		std::string MinRPMSchedName;
 		int MinRPMSchedIndex;
-		Fstring MaxRPMSchedName;
+		std::string MaxRPMSchedName;
 		int MaxRPMSchedIndex;
 		int VFDControlType; // Integer equivalent of VFDControlType
 		Real64 MaxRPM; // Maximum RPM range value - schedule limit
@@ -82,16 +80,10 @@ namespace Pumps {
 
 		// Default Constructor
 		PumpVFDControlData() :
-			Name( MaxNameLength, "  " ),
-			ManualRPMSchedName( MaxNameLength, "  " ),
 			ManualRPMSchedIndex( 0 ),
-			LowerPsetSchedName( MaxNameLength, "  " ),
 			LowerPsetSchedIndex( 0 ),
-			UpperPsetSchedName( MaxNameLength, "  " ),
 			UpperPsetSchedIndex( 0 ),
-			MinRPMSchedName( MaxNameLength, "  " ),
 			MinRPMSchedIndex( 0 ),
-			MaxRPMSchedName( MaxNameLength, "  " ),
 			MaxRPMSchedIndex( 0 ),
 			VFDControlType( 0 ),
 			MaxRPM( 0.0 ),
@@ -101,32 +93,32 @@ namespace Pumps {
 
 		// Member Constructor
 		PumpVFDControlData(
-			Fstring const & Name,
-			Fstring const & ManualRPMSchedName,
+			std::string const & Name,
+			std::string const & ManualRPMSchedName,
 			int const ManualRPMSchedIndex,
-			Fstring const & LowerPsetSchedName,
+			std::string const & LowerPsetSchedName,
 			int const LowerPsetSchedIndex,
-			Fstring const & UpperPsetSchedName,
+			std::string const & UpperPsetSchedName,
 			int const UpperPsetSchedIndex,
-			Fstring const & MinRPMSchedName,
+			std::string const & MinRPMSchedName,
 			int const MinRPMSchedIndex,
-			Fstring const & MaxRPMSchedName,
+			std::string const & MaxRPMSchedName,
 			int const MaxRPMSchedIndex,
 			int const VFDControlType, // Integer equivalent of VFDControlType
 			Real64 const MaxRPM, // Maximum RPM range value - schedule limit
 			Real64 const MinRPM, // Minimum RPM range value - schedule limit
 			Real64 const PumpActualRPM // RPM recalculated from final flow through the loop
 		) :
-			Name( MaxNameLength, Name ),
-			ManualRPMSchedName( MaxNameLength, ManualRPMSchedName ),
+			Name( Name ),
+			ManualRPMSchedName( ManualRPMSchedName ),
 			ManualRPMSchedIndex( ManualRPMSchedIndex ),
-			LowerPsetSchedName( MaxNameLength, LowerPsetSchedName ),
+			LowerPsetSchedName( LowerPsetSchedName ),
 			LowerPsetSchedIndex( LowerPsetSchedIndex ),
-			UpperPsetSchedName( MaxNameLength, UpperPsetSchedName ),
+			UpperPsetSchedName( UpperPsetSchedName ),
 			UpperPsetSchedIndex( UpperPsetSchedIndex ),
-			MinRPMSchedName( MaxNameLength, MinRPMSchedName ),
+			MinRPMSchedName( MinRPMSchedName ),
 			MinRPMSchedIndex( MinRPMSchedIndex ),
-			MaxRPMSchedName( MaxNameLength, MaxRPMSchedName ),
+			MaxRPMSchedName( MaxRPMSchedName ),
 			MaxRPMSchedIndex( MaxRPMSchedIndex ),
 			VFDControlType( VFDControlType ),
 			MaxRPM( MaxRPM ),
@@ -139,9 +131,9 @@ namespace Pumps {
 	struct PumpSpecs
 	{
 		// Members
-		Fstring Name; // user identifier
-		Fstring PumpSchedule; // Schedule to modify the design nominal capacity of the pump
-		Fstring PressureCurve_Name; // - placeholder for pump curve name
+		std::string Name; // user identifier
+		std::string PumpSchedule; // Schedule to modify the design nominal capacity of the pump
+		std::string PressureCurve_Name; // - placeholder for pump curve name
 		int PumpType; // pump type integer, based on local parameter values, used to identify
 		// index in the cPumpTypes string array to do error reporting
 		int TypeOf_Num; // pump type of number in reference to the dataplant values
@@ -196,9 +188,6 @@ namespace Pumps {
 
 		// Default Constructor
 		PumpSpecs() :
-			Name( MaxNameLength ),
-			PumpSchedule( MaxNameLength ),
-			PressureCurve_Name( MaxNameLength ),
 			PumpType( 0 ),
 			TypeOf_Num( 0 ),
 			LoopNum( 0 ),
@@ -252,9 +241,9 @@ namespace Pumps {
 
 		// Member Constructor
 		PumpSpecs(
-			Fstring const & Name, // user identifier
-			Fstring const & PumpSchedule, // Schedule to modify the design nominal capacity of the pump
-			Fstring const & PressureCurve_Name, // - placeholder for pump curve name
+			std::string const & Name, // user identifier
+			std::string const & PumpSchedule, // Schedule to modify the design nominal capacity of the pump
+			std::string const & PressureCurve_Name, // - placeholder for pump curve name
 			int const PumpType, // pump type integer, based on local parameter values, used to identify
 			int const TypeOf_Num, // pump type of number in reference to the dataplant values
 			int const LoopNum, // loop where pump is located
@@ -306,9 +295,9 @@ namespace Pumps {
 			int const ZoneNum, // index for zone surrounding pump
 			Real64 const SkinLossRadFraction // radiative split for skin losses to zone
 		) :
-			Name( MaxNameLength, Name ),
-			PumpSchedule( MaxNameLength, PumpSchedule ),
-			PressureCurve_Name( MaxNameLength, PressureCurve_Name ),
+			Name( Name ),
+			PumpSchedule( PumpSchedule ),
+			PressureCurve_Name( PressureCurve_Name ),
 			PumpType( PumpType ),
 			TypeOf_Num( TypeOf_Num ),
 			LoopNum( LoopNum ),
@@ -426,7 +415,7 @@ namespace Pumps {
 
 	void
 	SimPumps(
-		Fstring const & PumpName, // Name of pump to be managed
+		std::string const & PumpName, // Name of pump to be managed
 		int const LoopNum, // Plant loop number
 		Real64 const FlowRequest, // requested flow from adjacent demand side
 		bool & PumpRunning, // .TRUE. if the loop pump is actually operating

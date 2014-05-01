@@ -58,7 +58,7 @@ namespace DataSurfaceColors {
 
 	FArray1D_int const defaultcolorno( NumColors, { 3, 43, 143, 143, 45, 8, 15, 195, 9, 13, 174, 143, 143, 10, 5 } ); // text | wall | window | glassdoor | door | floor | roof | detached building shade (moves with building) | detached building fixed | attached building shading | PV | TDD:Dome | TDD:Diffuser | Daylight Sensor 1 | Daylight Sensor 2
 
-	FArray1D_Fstring const colorkeys( NumColors, sFstring( 25 ), { "Text                     ", "Walls                    ", "Windows                  ", "GlassDoors               ", "Doors                    ", "Roofs                    ", "Floors                   ", "DetachedBuildingShades   ", "DetachedFixedShades      ", "AttachedBuildingShades   ", "Photovoltaics            ", "TubularDaylightDomes     ", "TubularDaylightDiffusers ", "DaylightReferencePoint1  ", "DaylightReferencePoint2  " } );
+	FArray1D_string const colorkeys( NumColors, { "Text", "Walls", "Windows", "GlassDoors", "Doors", "Roofs", "Floors", "DetachedBuildingShades", "DetachedFixedShades", "AttachedBuildingShades", "Photovoltaics", "TubularDaylightDomes", "TubularDaylightDiffusers", "DaylightReferencePoint1", "DaylightReferencePoint2" } );
 
 	FArray1D_int const colorkeyptr( NumColors, { ColorNo_Text, ColorNo_Wall, ColorNo_Window, ColorNo_GlassDoor, ColorNo_Door, ColorNo_Floor, ColorNo_Roof, ColorNo_ShdDetBldg, ColorNo_ShdDetFix, ColorNo_ShdAtt, ColorNo_PV, ColorNo_TDDDome, ColorNo_TDDDiffuser, ColorNo_DaylSensor1, ColorNo_DaylSensor2 } );
 
@@ -74,9 +74,9 @@ namespace DataSurfaceColors {
 
 	bool
 	MatchAndSetColorTextString(
-		Fstring const & String, // string to be matched
+		std::string const & String, // string to be matched
 		int const SetValue, // value to be used for the color
-		Optional_Fstring_const ColorType // for now, must be DXF
+		Optional_string_const ColorType // for now, must be DXF
 	)
 	{
 
@@ -138,8 +138,8 @@ namespace DataSurfaceColors {
 
 	void
 	SetUpSchemeColors(
-		Fstring const & SchemeName,
-		Optional_Fstring_const ColorType
+		std::string const & SchemeName,
+		Optional_string_const ColorType
 	)
 	{
 
@@ -163,7 +163,6 @@ namespace DataSurfaceColors {
 		// na
 
 		// Using/Aliasing
-		using DataGlobals::MaxNameLength;
 		using InputProcessor::GetObjectItemNum;
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::GetObjectDefMaxArgs;
@@ -172,7 +171,7 @@ namespace DataSurfaceColors {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const CurrentModuleObject( "OutputControl:SurfaceColorScheme" );
+		static std::string const CurrentModuleObject( "OutputControl:SurfaceColorScheme" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -186,9 +185,9 @@ namespace DataSurfaceColors {
 		int numptr;
 		int numargs;
 		int status;
-		FArray1D_Fstring cAlphas( sFstring( MaxNameLength ) );
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) );
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) );
+		FArray1D_string cAlphas;
+		FArray1D_string cAlphaFields;
+		FArray1D_string cNumericFields;
 		FArray1D_bool lAlphaBlanks;
 		FArray1D_bool lNumericBlanks;
 		FArray1D< Real64 > rNumerics;
@@ -208,7 +207,7 @@ namespace DataSurfaceColors {
 			cNumericFields.allocate( numNumbers );
 			lNumericBlanks.allocate( numNumbers );
 
-			cAlphas( {1,NumAlphas} ) = " ";
+			cAlphas( {1,NumAlphas} ) = "";
 			rNumerics( {1,numNumbers} ) = 0.0;
 
 			GetObjectItem( CurrentModuleObject, numptr, cAlphas, NumAlphas, rNumerics, numNumbers, status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
@@ -216,12 +215,12 @@ namespace DataSurfaceColors {
 				numptr = rNumerics( numargs ); // set to integer
 				if ( lNumericBlanks( numargs ) ) {
 					if ( ! lAlphaBlanks( numargs + 1 ) ) {
-						ShowWarningError( "SetUpSchemeColors: " + trim( cAlphaFields( 1 ) ) + "=" + trim( SchemeName ) + ", " + trim( cAlphaFields( numargs + 1 ) ) + "=" + trim( cAlphas( numargs + 1 ) ) + ", " + trim( cNumericFields( numargs ) ) + " was blank.  Default color retained." );
+						ShowWarningError( "SetUpSchemeColors: " + cAlphaFields( 1 ) + '=' + SchemeName + ", " + cAlphaFields( numargs + 1 ) + '=' + cAlphas( numargs + 1 ) + ", " + cNumericFields( numargs ) + " was blank.  Default color retained." );
 					}
 					continue;
 				}
 				if ( ! MatchAndSetColorTextString( cAlphas( numargs + 1 ), numptr, ColorType ) ) {
-					ShowWarningError( "SetUpSchemeColors: " + trim( cAlphaFields( 1 ) ) + "=" + trim( SchemeName ) + ", " + trim( cAlphaFields( numargs + 1 ) ) + "=" + trim( cAlphas( numargs + 1 ) ) + ", is invalid.  No color set." );
+					ShowWarningError( "SetUpSchemeColors: " + cAlphaFields( 1 ) + '=' + SchemeName + ", " + cAlphaFields( numargs + 1 ) + '=' + cAlphas( numargs + 1 ) + ", is invalid.  No color set." );
 				}
 			}
 
@@ -233,7 +232,7 @@ namespace DataSurfaceColors {
 			lNumericBlanks.deallocate();
 
 		} else {
-			ShowWarningError( "SetUpSchemeColors: Name=" + trim( SchemeName ) + " not on input file. Default colors will be used." );
+			ShowWarningError( "SetUpSchemeColors: Name=" + SchemeName + " not on input file. Default colors will be used." );
 		}
 
 	}

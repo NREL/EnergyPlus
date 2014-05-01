@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray3D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -15,7 +14,6 @@ namespace EnergyPlus {
 namespace DataPlantPipingSystems {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -737,9 +735,9 @@ namespace DataPlantPipingSystems {
 		Real64 Depth; // m
 		Real64 Width; // m
 		bool ShiftPipesByWidth;
-		Fstring WallBoundaryOSCMName;
+		std::string WallBoundaryOSCMName;
 		int WallBoundaryOSCMIndex;
-		Fstring FloorBoundaryOSCMName;
+		std::string FloorBoundaryOSCMName;
 		int FloorBoundaryOSCMIndex;
 		FArray1D_int WallSurfacePointers;
 		FArray1D_int FloorSurfacePointers;
@@ -751,9 +749,7 @@ namespace DataPlantPipingSystems {
 			Depth( 0.0 ),
 			Width( 0.0 ),
 			ShiftPipesByWidth( false ),
-			WallBoundaryOSCMName( MaxNameLength ),
 			WallBoundaryOSCMIndex( 0 ),
-			FloorBoundaryOSCMName( MaxNameLength ),
 			FloorBoundaryOSCMIndex( 0 ),
 			BasementWallXIndex( -1 ),
 			BasementFloorYIndex( -1 )
@@ -764,9 +760,9 @@ namespace DataPlantPipingSystems {
 			Real64 const Depth, // m
 			Real64 const Width, // m
 			bool const ShiftPipesByWidth,
-			Fstring const & WallBoundaryOSCMName,
+			std::string const & WallBoundaryOSCMName,
 			int const WallBoundaryOSCMIndex,
-			Fstring const & FloorBoundaryOSCMName,
+			std::string const & FloorBoundaryOSCMName,
 			int const FloorBoundaryOSCMIndex,
 			FArray1_int const & WallSurfacePointers,
 			FArray1_int const & FloorSurfacePointers,
@@ -776,9 +772,9 @@ namespace DataPlantPipingSystems {
 			Depth( Depth ),
 			Width( Width ),
 			ShiftPipesByWidth( ShiftPipesByWidth ),
-			WallBoundaryOSCMName( MaxNameLength, WallBoundaryOSCMName ),
+			WallBoundaryOSCMName( WallBoundaryOSCMName ),
 			WallBoundaryOSCMIndex( WallBoundaryOSCMIndex ),
-			FloorBoundaryOSCMName( MaxNameLength, FloorBoundaryOSCMName ),
+			FloorBoundaryOSCMName( FloorBoundaryOSCMName ),
 			FloorBoundaryOSCMIndex( FloorBoundaryOSCMIndex ),
 			WallSurfacePointers( WallSurfacePointers ),
 			FloorSurfacePointers( FloorSurfacePointers ),
@@ -962,7 +958,7 @@ namespace DataPlantPipingSystems {
 	{
 		// Members
 		// ID
-		Fstring Name;
+		std::string Name;
 		// Misc inputs
 		PointF PipeLocation;
 		Point PipeCellCoordinates;
@@ -980,7 +976,6 @@ namespace DataPlantPipingSystems {
 
 		// Default Constructor
 		PipeSegmentInfo() :
-			Name( MaxNameLength ),
 			FlowDirection( 0 ),
 			ParentCircuitIndex( 0 ),
 			InletTemperature( 0.0 ),
@@ -992,7 +987,7 @@ namespace DataPlantPipingSystems {
 
 		// Member Constructor
 		PipeSegmentInfo(
-			Fstring const & Name,
+			std::string const & Name,
 			PointF const & PipeLocation,
 			Point const & PipeCellCoordinates,
 			int const FlowDirection, // From Enum: SegmentFlow
@@ -1003,7 +998,7 @@ namespace DataPlantPipingSystems {
 			bool const PipeCellCoordinatesSet,
 			bool const IsActuallyPartOfAHorizontalTrench
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			PipeLocation( PipeLocation ),
 			PipeCellCoordinates( PipeCellCoordinates ),
 			FlowDirection( FlowDirection ),
@@ -1021,16 +1016,16 @@ namespace DataPlantPipingSystems {
 	{
 		// Members
 		// ID
-		Fstring Name;
+		std::string Name;
 		// Inlet and outlet information
-		Fstring InletNodeName;
-		Fstring OutletNodeName;
+		std::string InletNodeName;
+		std::string OutletNodeName;
 		int InletNodeNum;
 		int OutletNodeNum;
 		Point3DInteger CircuitInletCell;
 		Point3DInteger CircuitOutletCell;
 		// Names and pointers to pipe segments found in this pipe circuit
-		FArray1D_Fstring PipeSegmentNames;
+		FArray1D_string PipeSegmentNames;
 		FArray1D_int PipeSegmentIndeces;
 		// Pointer to the domain which contains this pipe circuit
 		int ParentDomainIndex;
@@ -1075,12 +1070,8 @@ namespace DataPlantPipingSystems {
 
 		// Default Constructor
 		PipeCircuitInfo() :
-			Name( MaxNameLength ),
-			InletNodeName( MaxNameLength ),
-			OutletNodeName( MaxNameLength ),
 			InletNodeNum( 0 ),
 			OutletNodeNum( 0 ),
-			PipeSegmentNames( sFstring( MaxNameLength ) ),
 			ParentDomainIndex( 0 ),
 			RadialMeshThickness( 0.0 ),
 			HasInsulation( false ),
@@ -1111,14 +1102,14 @@ namespace DataPlantPipingSystems {
 
 		// Member Constructor
 		PipeCircuitInfo(
-			Fstring const & Name,
-			Fstring const & InletNodeName,
-			Fstring const & OutletNodeName,
+			std::string const & Name,
+			std::string const & InletNodeName,
+			std::string const & OutletNodeName,
 			int const InletNodeNum,
 			int const OutletNodeNum,
 			Point3DInteger const & CircuitInletCell,
 			Point3DInteger const & CircuitOutletCell,
-			FArray1_Fstring const & PipeSegmentNames,
+			FArray1_string const & PipeSegmentNames,
 			FArray1_int const & PipeSegmentIndeces,
 			int const ParentDomainIndex,
 			RadialSizing const & PipeSize,
@@ -1153,9 +1144,9 @@ namespace DataPlantPipingSystems {
 			Real64 const OutletTemperature,
 			Real64 const FluidHeatLoss
 		) :
-			Name( MaxNameLength, Name ),
-			InletNodeName( MaxNameLength, InletNodeName ),
-			OutletNodeName( MaxNameLength, OutletNodeName ),
+			Name( Name ),
+			InletNodeName( InletNodeName ),
+			OutletNodeName( OutletNodeName ),
 			InletNodeNum( InletNodeNum ),
 			OutletNodeNum( OutletNodeNum ),
 			CircuitInletCell( CircuitInletCell ),
@@ -1202,9 +1193,9 @@ namespace DataPlantPipingSystems {
 	{
 		// Members
 		// ID
-		Fstring Name;
+		std::string Name;
 		// Names and pointers to circuits found in this domain
-		FArray1D_Fstring CircuitNames;
+		FArray1D_string CircuitNames;
 		FArray1D_int CircuitIndeces;
 		// Flag variables
 		bool OneTimeInit;
@@ -1231,8 +1222,6 @@ namespace DataPlantPipingSystems {
 
 		// Default Constructor
 		FullDomainStructureInfo() :
-			Name( MaxNameLength ),
-			CircuitNames( sFstring( MaxNameLength ) ),
 			OneTimeInit( true ),
 			BeginSimInit( true ),
 			BeginSimEnvrn( true ),
@@ -1244,8 +1233,8 @@ namespace DataPlantPipingSystems {
 
 		// Member Constructor
 		FullDomainStructureInfo(
-			Fstring const & Name,
-			FArray1_Fstring const & CircuitNames,
+			std::string const & Name,
+			FArray1_string const & CircuitNames,
 			FArray1_int const & CircuitIndeces,
 			bool const OneTimeInit,
 			bool const BeginSimInit,
@@ -1266,7 +1255,7 @@ namespace DataPlantPipingSystems {
 			bool const HasBasement,
 			FArray3< CartesianCell > const & Cells
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			CircuitNames( CircuitNames ),
 			CircuitIndeces( CircuitIndeces ),
 			OneTimeInit( OneTimeInit ),

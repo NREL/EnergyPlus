@@ -4,6 +4,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <WindTurbine.hh>
@@ -50,7 +51,6 @@ namespace WindTurbine {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataGenerators;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::Pi;
 	using DataGlobals::SecInHour;
 	using DataGlobals::BeginEnvrnFlag;
@@ -82,7 +82,7 @@ namespace WindTurbine {
 	void
 	SimWindTurbine(
 		int const GeneratorType, // Type of Generator
-		Fstring const & GeneratorName, // User specified name of Generator
+		std::string const & GeneratorName, // User specified name of Generator
 		int & GeneratorIndex, // Generator index
 		bool const RunFlag, // ON or OFF
 		Real64 const WTLoad // Electrical load on WT (not used)
@@ -136,16 +136,16 @@ namespace WindTurbine {
 		if ( GeneratorIndex == 0 ) {
 			WindTurbineNum = FindItemInList( GeneratorName, WindTurbineSys.Name(), NumWindTurbines );
 			if ( WindTurbineNum == 0 ) {
-				ShowFatalError( "SimWindTurbine: Specified Generator not one of Valid Wind Turbine Generators " + trim( GeneratorName ) );
+				ShowFatalError( "SimWindTurbine: Specified Generator not one of Valid Wind Turbine Generators " + GeneratorName );
 			}
 			GeneratorIndex = WindTurbineNum;
 		} else {
 			WindTurbineNum = GeneratorIndex;
 			if ( WindTurbineNum > NumWindTurbines || WindTurbineNum < 1 ) {
-				ShowFatalError( "SimWindTurbine: Invalid GeneratorIndex passed=" + trim( TrimSigDigits( WindTurbineNum ) ) + ", Number of Wind Turbine Generators=" + trim( TrimSigDigits( NumWindTurbines ) ) + ", Generator name=" + trim( GeneratorName ) );
+				ShowFatalError( "SimWindTurbine: Invalid GeneratorIndex passed=" + TrimSigDigits( WindTurbineNum ) + ", Number of Wind Turbine Generators=" + TrimSigDigits( NumWindTurbines ) + ", Generator name=" + GeneratorName );
 			}
 			if ( GeneratorName != WindTurbineSys( WindTurbineNum ).Name ) {
-				ShowFatalError( "SimMWindTurbine: Invalid GeneratorIndex passed=" + trim( TrimSigDigits( WindTurbineNum ) ) + ", Generator name=" + trim( GeneratorName ) + ", stored Generator Name for that index=" + trim( WindTurbineSys( WindTurbineNum ).Name ) );
+				ShowFatalError( "SimMWindTurbine: Invalid GeneratorIndex passed=" + TrimSigDigits( WindTurbineNum ) + ", Generator name=" + GeneratorName + ", stored Generator Name for that index=" + WindTurbineSys( WindTurbineNum ).Name );
 			}
 		}
 
@@ -241,8 +241,8 @@ namespace WindTurbine {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const Blank;
-		static Fstring const CurrentModuleObject( "Generator:WindTurbine" );
+		static std::string const Blank;
+		static std::string const CurrentModuleObject( "Generator:WindTurbine" );
 		Real64 const SysEffDefault( 0.835 ); // Default value of overall system efficiency
 		Real64 const MaxTSR( 12.0 ); // Maximum tip speed ratio
 		Real64 const DefaultPC( 0.25 ); // Default power coefficient
@@ -264,9 +264,9 @@ namespace WindTurbine {
 		int NumNumbers; // Number of Numbers for each GetobjectItem call
 		int NumArgs;
 		int IOStat;
-		FArray1D_Fstring cAlphaArgs( sFstring( MaxNameLength ) ); // Alpha input items for object
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) ); // Numeric field names
+		FArray1D_string cAlphaArgs; // Alpha input items for object
+		FArray1D_string cAlphaFields; // Alpha field names
+		FArray1D_string cNumericFields; // Numeric field names
 		FArray1D< Real64 > rNumericArgs; // Numeric input items for object
 		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
@@ -274,11 +274,11 @@ namespace WindTurbine {
 		// Initializations and allocations
 		GetObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 		cAlphaArgs.allocate( NumAlphas );
-		cAlphaArgs = " ";
+		cAlphaArgs = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = " ";
+		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = " ";
+		cNumericFields = "";
 		rNumericArgs.allocate( NumNumbers );
 		rNumericArgs = 0.0;
 		lAlphaBlanks.allocate( NumAlphas );
@@ -310,18 +310,18 @@ namespace WindTurbine {
 			} else {
 				WindTurbineSys( WindTurbineNum ).SchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 				if ( WindTurbineSys( WindTurbineNum ).SchedPtr == 0 ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" not found." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 					ErrorsFound = true;
 				}
 			}
 			// Select rotor type
 			{ auto const SELECT_CASE_var( cAlphaArgs( 3 ) );
-			if ( ( SELECT_CASE_var == "HORIZONTALAXISWINDTURBINE" ) || ( SELECT_CASE_var == "HAWT" ) || ( SELECT_CASE_var == "NONE" ) || ( SELECT_CASE_var == " " ) ) {
+			if ( ( SELECT_CASE_var == "HORIZONTALAXISWINDTURBINE" ) || ( SELECT_CASE_var == "HAWT" ) || ( SELECT_CASE_var == "NONE" ) || ( SELECT_CASE_var == "" ) ) {
 				WindTurbineSys( WindTurbineNum ).RotorType = HAWT;
 			} else if ( ( SELECT_CASE_var == "VERTICALAXISWINDTURBINE" ) || ( SELECT_CASE_var == "VAWT" ) ) {
 				WindTurbineSys( WindTurbineNum ).RotorType = VAWT;
 			} else {
-				ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 3 ) ) + "=\"" + trim( cAlphaArgs( 3 ) ) + "\"." );
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
 				ErrorsFound = true;
 			}}
 
@@ -333,19 +333,19 @@ namespace WindTurbine {
 				WindTurbineSys( WindTurbineNum ).ControlType = FSVP;
 			} else if ( ( SELECT_CASE_var == "VARIABLESPEEDFIXEDPITCH" ) || ( SELECT_CASE_var == "VSFP" ) ) {
 				WindTurbineSys( WindTurbineNum ).ControlType = VSFP;
-			} else if ( ( SELECT_CASE_var == "VARIABLESPEEDVARIABLEPITCH" ) || ( SELECT_CASE_var == "VSVP" ) || ( SELECT_CASE_var == "NONE" ) || ( SELECT_CASE_var == " " ) ) {
+			} else if ( ( SELECT_CASE_var == "VARIABLESPEEDVARIABLEPITCH" ) || ( SELECT_CASE_var == "VSVP" ) || ( SELECT_CASE_var == "NONE" ) || ( SELECT_CASE_var == "" ) ) {
 				WindTurbineSys( WindTurbineNum ).ControlType = VSVP;
 			} else {
-				ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 4 ) ) + "=\"" + trim( cAlphaArgs( 4 ) ) + "\"." );
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
 				ErrorsFound = true;
 			}}
 
 			WindTurbineSys( WindTurbineNum ).RatedRotorSpeed = rNumericArgs( 1 ); // Maximum rotor speed in rpm
 			if ( WindTurbineSys( WindTurbineNum ).RatedRotorSpeed <= 0.0 ) {
 				if ( lNumericBlanks( 1 ) ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 1 ) ) + " is required but input is blank." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 1 ) + " is required but input is blank." );
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 1 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 1 ), 2 ) ) + "] must be greater than zero." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 1 ) + "=[" + RoundSigDigits( rNumericArgs( 1 ), 2 ) + "] must be greater than zero." );
 				}
 				ErrorsFound = true;
 			}
@@ -353,9 +353,9 @@ namespace WindTurbine {
 			WindTurbineSys( WindTurbineNum ).RotorDiameter = rNumericArgs( 2 ); // Rotor diameter in m
 			if ( WindTurbineSys( WindTurbineNum ).RotorDiameter <= 0.0 ) {
 				if ( lNumericBlanks( 2 ) ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 2 ) ) + " is required but input is blank." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 2 ) + " is required but input is blank." );
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 2 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 2 ), 1 ) ) + "] must be greater than zero." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 2 ) + "=[" + RoundSigDigits( rNumericArgs( 2 ), 1 ) + "] must be greater than zero." );
 				}
 				ErrorsFound = true;
 			}
@@ -363,25 +363,25 @@ namespace WindTurbine {
 			WindTurbineSys( WindTurbineNum ).RotorHeight = rNumericArgs( 3 ); // Overall height of the rotor
 			if ( WindTurbineSys( WindTurbineNum ).RotorHeight <= 0.0 ) {
 				if ( lNumericBlanks( 3 ) ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 3 ) ) + " is required but input is blank." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 3 ) + " is required but input is blank." );
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 3 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 3 ), 1 ) ) + "] must be greater than zero." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 3 ) + "=[" + RoundSigDigits( rNumericArgs( 3 ), 1 ) + "] must be greater than zero." );
 				}
 				ErrorsFound = true;
 			}
 
 			WindTurbineSys( WindTurbineNum ).NumOfBlade = rNumericArgs( 4 ); // Total number of blade
 			if ( WindTurbineSys( WindTurbineNum ).NumOfBlade == 0 ) {
-				ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 4 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 4 ), 0 ) ) + "] must be greater than zero." );
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 4 ) + "=[" + RoundSigDigits( rNumericArgs( 4 ), 0 ) + "] must be greater than zero." );
 				ErrorsFound = true;
 			}
 
 			WindTurbineSys( WindTurbineNum ).RatedPower = rNumericArgs( 5 ); // Rated average power
 			if ( WindTurbineSys( WindTurbineNum ).RatedPower == 0.0 ) {
 				if ( lNumericBlanks( 5 ) ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 5 ) ) + " is required but input is blank." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 5 ) + " is required but input is blank." );
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 5 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 5 ), 2 ) ) + "] must be greater than zero." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 5 ) + "=[" + RoundSigDigits( rNumericArgs( 5 ), 2 ) + "] must be greater than zero." );
 				}
 				ErrorsFound = true;
 			}
@@ -389,9 +389,9 @@ namespace WindTurbine {
 			WindTurbineSys( WindTurbineNum ).RatedWindSpeed = rNumericArgs( 6 ); // Rated wind speed
 			if ( WindTurbineSys( WindTurbineNum ).RatedWindSpeed == 0.0 ) {
 				if ( lNumericBlanks( 6 ) ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 6 ) ) + " is required but input is blank." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 6 ) + " is required but input is blank." );
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 6 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 6 ), 2 ) ) + "] must be greater than zero." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 6 ) + "=[" + RoundSigDigits( rNumericArgs( 6 ), 2 ) + "] must be greater than zero." );
 				}
 				ErrorsFound = true;
 			}
@@ -399,9 +399,9 @@ namespace WindTurbine {
 			WindTurbineSys( WindTurbineNum ).CutInSpeed = rNumericArgs( 7 ); // Minimum wind speed for system operation
 			if ( WindTurbineSys( WindTurbineNum ).CutInSpeed == 0.0 ) {
 				if ( lNumericBlanks( 7 ) ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 7 ) ) + " is required but input is blank." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 7 ) + " is required but input is blank." );
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 7 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 7 ), 2 ) ) + "] must be greater than zero." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 7 ) + "=[" + RoundSigDigits( rNumericArgs( 7 ), 2 ) + "] must be greater than zero." );
 				}
 				ErrorsFound = true;
 			}
@@ -409,11 +409,11 @@ namespace WindTurbine {
 			WindTurbineSys( WindTurbineNum ).CutOutSpeed = rNumericArgs( 8 ); // Minimum wind speed for system operation
 			if ( WindTurbineSys( WindTurbineNum ).CutOutSpeed == 0.0 ) {
 				if ( lNumericBlanks( 8 ) ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 8 ) ) + " is required but input is blank." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 8 ) + " is required but input is blank." );
 				} else if ( WindTurbineSys( WindTurbineNum ).CutOutSpeed <= WindTurbineSys( WindTurbineNum ).RatedWindSpeed ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 8 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 8 ), 2 ) ) + "] must be greater than " + trim( cNumericFields( 6 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 6 ), 2 ) ) + "]." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 8 ) + "=[" + RoundSigDigits( rNumericArgs( 8 ), 2 ) + "] must be greater than " + cNumericFields( 6 ) + "=[" + RoundSigDigits( rNumericArgs( 6 ), 2 ) + "]." );
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 8 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 8 ), 2 ) ) + "] must be greater than zero" );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 8 ) + "=[" + RoundSigDigits( rNumericArgs( 8 ), 2 ) + "] must be greater than zero" );
 				}
 				ErrorsFound = true;
 			}
@@ -421,46 +421,46 @@ namespace WindTurbine {
 			WindTurbineSys( WindTurbineNum ).SysEfficiency = rNumericArgs( 9 ); // Overall wind turbine system efficiency
 			if ( lNumericBlanks( 9 ) || WindTurbineSys( WindTurbineNum ).SysEfficiency == 0.0 || WindTurbineSys( WindTurbineNum ).SysEfficiency > 1.0 ) {
 				WindTurbineSys( WindTurbineNum ).SysEfficiency = SysEffDefault;
-				ShowWarningError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 9 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 9 ), 2 ) ) + "]." );
-				ShowContinueError( "...The default value of " + trim( RoundSigDigits( SysEffDefault, 3 ) ) + " for " + trim( cNumericFields( 9 ) ) + " was assumed." );
+				ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 9 ) + "=[" + RoundSigDigits( rNumericArgs( 9 ), 2 ) + "]." );
+				ShowContinueError( "...The default value of " + RoundSigDigits( SysEffDefault, 3 ) + " for " + cNumericFields( 9 ) + " was assumed." );
 			}
 
 			WindTurbineSys( WindTurbineNum ).MaxTipSpeedRatio = rNumericArgs( 10 ); // Maximum tip speed ratio
 			if ( WindTurbineSys( WindTurbineNum ).MaxTipSpeedRatio == 0.0 ) {
 				if ( lNumericBlanks( 10 ) ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 10 ) ) + " is required but input is blank." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 10 ) + " is required but input is blank." );
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 10 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 10 ), 2 ) ) + "] must be greater than zero." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 10 ) + "=[" + RoundSigDigits( rNumericArgs( 10 ), 2 ) + "] must be greater than zero." );
 				}
 				ErrorsFound = true;
 			}
 			if ( WindTurbineSys( WindTurbineNum ).SysEfficiency > MaxTSR ) {
 				WindTurbineSys( WindTurbineNum ).SysEfficiency = MaxTSR;
-				ShowWarningError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 10 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 10 ), 2 ) ) + "]." );
-				ShowContinueError( "...The default value of " + trim( RoundSigDigits( MaxTSR, 1 ) ) + " for " + trim( cNumericFields( 10 ) ) + " was assumed." );
+				ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 10 ) + "=[" + RoundSigDigits( rNumericArgs( 10 ), 2 ) + "]." );
+				ShowContinueError( "...The default value of " + RoundSigDigits( MaxTSR, 1 ) + " for " + cNumericFields( 10 ) + " was assumed." );
 			}
 
 			WindTurbineSys( WindTurbineNum ).MaxPowerCoeff = rNumericArgs( 11 ); // Maximum power coefficient
 			if ( WindTurbineSys( WindTurbineNum ).RotorType == HAWT && WindTurbineSys( WindTurbineNum ).MaxPowerCoeff == 0.0 ) {
 				if ( lNumericBlanks( 11 ) ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 11 ) ) + " is required but input is blank." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 11 ) + " is required but input is blank." );
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 11 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 11 ), 2 ) ) + "] must be greater than zero." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 11 ) + "=[" + RoundSigDigits( rNumericArgs( 11 ), 2 ) + "] must be greater than zero." );
 				}
 				ErrorsFound = true;
 			}
 			if ( WindTurbineSys( WindTurbineNum ).MaxPowerCoeff > MaxPowerCoeff ) {
 				WindTurbineSys( WindTurbineNum ).MaxPowerCoeff = DefaultPC;
-				ShowWarningError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 11 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 11 ), 2 ) ) + "]." );
-				ShowContinueError( "...The default value of " + trim( RoundSigDigits( DefaultPC, 2 ) ) + " for " + trim( cNumericFields( 11 ) ) + " will be used." );
+				ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 11 ) + "=[" + RoundSigDigits( rNumericArgs( 11 ), 2 ) + "]." );
+				ShowContinueError( "...The default value of " + RoundSigDigits( DefaultPC, 2 ) + " for " + cNumericFields( 11 ) + " will be used." );
 			}
 
 			WindTurbineSys( WindTurbineNum ).LocalAnnualAvgWS = rNumericArgs( 12 ); // Local wind speed annually averaged
 			if ( WindTurbineSys( WindTurbineNum ).LocalAnnualAvgWS == 0.0 ) {
 				if ( lNumericBlanks( 12 ) ) {
-					ShowWarningError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 12 ) ) + " is necessary for accurate prediction but input is blank." );
+					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 12 ) + " is necessary for accurate prediction but input is blank." );
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 12 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 12 ), 2 ) ) + "] must be greater than zero." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 12 ) + "=[" + RoundSigDigits( rNumericArgs( 12 ), 2 ) + "] must be greater than zero." );
 					ErrorsFound = true;
 				}
 			}
@@ -472,10 +472,10 @@ namespace WindTurbine {
 				} else {
 					WindTurbineSys( WindTurbineNum ).HeightForLocalWS = DefaultH;
 					if ( lNumericBlanks( 13 ) ) {
-						ShowWarningError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 13 ) ) + " is necessary for accurate prediction but input is blank." );
-						ShowContinueError( "...The default value of " + trim( RoundSigDigits( DefaultH, 2 ) ) + " for " + trim( cNumericFields( 13 ) ) + " will be used." );
+						ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 13 ) + " is necessary for accurate prediction but input is blank." );
+						ShowContinueError( "...The default value of " + RoundSigDigits( DefaultH, 2 ) + " for " + cNumericFields( 13 ) + " will be used." );
 					} else {
-						ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 13 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 13 ), 2 ) ) + "] must be greater than zero." );
+						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 13 ) + "=[" + RoundSigDigits( rNumericArgs( 13 ), 2 ) + "] must be greater than zero." );
 						ErrorsFound = true;
 					}
 				}
@@ -484,9 +484,9 @@ namespace WindTurbine {
 			WindTurbineSys( WindTurbineNum ).ChordArea = rNumericArgs( 14 ); // Chord area of a single blade for VAWTs
 			if ( WindTurbineSys( WindTurbineNum ).RotorType == VAWT && WindTurbineSys( WindTurbineNum ).ChordArea == 0.0 ) {
 				if ( lNumericBlanks( 14 ) ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 14 ) ) + " is required but input is blank." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 14 ) + " is required but input is blank." );
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 14 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 14 ), 2 ) ) + "] must be greater than zero." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 14 ) + "=[" + RoundSigDigits( rNumericArgs( 14 ), 2 ) + "] must be greater than zero." );
 				}
 				ErrorsFound = true;
 			}
@@ -494,9 +494,9 @@ namespace WindTurbine {
 			WindTurbineSys( WindTurbineNum ).DragCoeff = rNumericArgs( 15 ); // Blade drag coefficient
 			if ( WindTurbineSys( WindTurbineNum ).RotorType == VAWT && WindTurbineSys( WindTurbineNum ).DragCoeff == 0.0 ) {
 				if ( lNumericBlanks( 15 ) ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 15 ) ) + " is required but input is blank." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 15 ) + " is required but input is blank." );
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 15 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 15 ), 2 ) ) + "] must be greater than zero." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 15 ) + "=[" + RoundSigDigits( rNumericArgs( 15 ), 2 ) + "] must be greater than zero." );
 				}
 				ErrorsFound = true;
 			}
@@ -504,9 +504,9 @@ namespace WindTurbine {
 			WindTurbineSys( WindTurbineNum ).LiftCoeff = rNumericArgs( 16 ); // Blade lift coefficient
 			if ( WindTurbineSys( WindTurbineNum ).RotorType == VAWT && WindTurbineSys( WindTurbineNum ).LiftCoeff == 0.0 ) {
 				if ( lNumericBlanks( 16 ) ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 16 ) ) + " is required but input is blank." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 16 ) + " is required but input is blank." );
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cNumericFields( 16 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 16 ), 2 ) ) + "] must be greater than zero." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cNumericFields( 16 ) + "=[" + RoundSigDigits( rNumericArgs( 16 ), 2 ) + "] must be greater than zero." );
 				}
 				ErrorsFound = true;
 			}
@@ -598,8 +598,8 @@ namespace WindTurbine {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const Blank;
-		static Fstring const TabChr( 1, CHAR( 9 ) ); // Tab character
+		static std::string const Blank;
+		static char const TabChr( '\t' ); // Tab character
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -612,12 +612,12 @@ namespace WindTurbine {
 		int OpenStatus; // Open status of stat file
 		int ReadStatus; // Reading status of stat file
 		int statFile; // Weather Stat File
-		int lnPtr; // scan pointer for Line input
+		std::string::size_type lnPtr; // scan pointer for Line input
 		int mon; // loop counter
 		bool wsStatFound; // logical noting that wind stats were found
 		bool fileExists; // true if in.stat file exists
 		bool warningShown; // true if the <365 warning has already been shown
-		Fstring lineIn( 200 );
+		std::string lineIn;
 		FArray1D< Real64 > MonthWS( 12 );
 		static Real64 AnnualTMYWS( 0.0 ); // Annual average wind speed in stat file
 		Real64 LocalTMYWS; // Annual average wind speed at the rotor height
@@ -637,36 +637,36 @@ namespace WindTurbine {
 					{ IOFlags flags; gio::read( statFile, "(A)", flags ) >> lineIn; ReadStatus = flags.ios(); }
 					// reconcile line with different versions of stat file
 					lnPtr = index( lineIn, "Wind Speed" );
-					if ( lnPtr == 0 ) continue;
+					if ( lnPtr == std::string::npos ) continue;
 					// have hit correct section.
 					while ( ReadStatus == 0 ) { // find daily avg line
 						{ IOFlags flags; gio::read( statFile, "(A)", flags ) >> lineIn; ReadStatus = flags.ios(); }
 						lnPtr = index( lineIn, "Daily Avg" );
-						if ( lnPtr == 0 ) continue;
+						if ( lnPtr == std::string::npos ) continue;
 						// tab delimited file
-						lineIn = lineIn( lnPtr + 10 );
+						lineIn.erase( 0, lnPtr + 10 );
 						MonthWS = 0.0;
 						wsStatFound = true;
 						warningShown = false;
 						for ( mon = 1; mon <= 12; ++mon ) {
 							lnPtr = index( lineIn, TabChr );
 							if ( lnPtr != 1 ) {
-								if ( lineIn( 1, lnPtr - 1 ) != Blank ) {
-									if ( lnPtr != 0 ) {
-										gio::read( lineIn( 1, lnPtr - 1 ), "*" ) >> MonthWS( mon );
-										lineIn = lineIn( lnPtr + 1 );
+								if ( ( lnPtr == std::string::npos ) || ( stripped( lineIn.substr( 0, lnPtr ) ) != Blank ) ) {
+									if ( lnPtr != std::string::npos ) {
+										gio::read( lineIn.substr( 0, lnPtr ), "*" ) >> MonthWS( mon );
+										lineIn.erase( 0, lnPtr + 1 );
 									}
 								} else { // blank field
 									if ( ! warningShown ) {
 										ShowWarningError( "InitWindTurbine: read from in.stat file shows <365 days in weather file. " "Annual average wind speed used will be inaccurate." );
-										lineIn = lineIn( lnPtr + 1 );
+										lineIn.erase( 0, lnPtr + 1 );
 										warningShown = true;
 									}
 								}
 							} else { // two tabs in succession
 								if ( ! warningShown ) {
 									ShowWarningError( "InitWindTurbine: read from in.stat file shows <365 days in weather file. " "Annual average wind speed used will be inaccurate." );
-									lineIn = lineIn( lnPtr + 1 );
+									lineIn.erase( 0, lnPtr + 1 );
 									warningShown = true;
 								}
 							}

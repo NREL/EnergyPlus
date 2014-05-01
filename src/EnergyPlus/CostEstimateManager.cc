@@ -1,7 +1,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/MArray.functions.hh>
 
 // EnergyPlus Headers
@@ -51,7 +50,6 @@ namespace CostEstimateManager {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::KickOffSimulation;
 	using namespace DataCostEstimate;
 
@@ -228,7 +226,7 @@ namespace CostEstimateManager {
 			CurntBldg.RegionalModifier = rNumericArgs( 7 );
 
 		} else if ( NumCostAdjust > 1 ) {
-			ShowSevereError( trim( cCurrentModuleObject ) + ": Only one instance of this object is allowed." );
+			ShowSevereError( cCurrentModuleObject + ": Only one instance of this object is allowed." );
 			ErrorsFound = true;
 		}
 
@@ -246,7 +244,7 @@ namespace CostEstimateManager {
 			RefrncBldg.RegionalModifier = rNumericArgs( 8 );
 
 		} else if ( NumRefAdjust > 1 ) {
-			ShowSevereError( trim( cCurrentModuleObject ) + " : Only one instance of this object is allowed." );
+			ShowSevereError( cCurrentModuleObject + " : Only one instance of this object is allowed." );
 			ErrorsFound = true;
 		}
 
@@ -323,7 +321,7 @@ namespace CostEstimateManager {
 		int ThisSurfID; // hold result from findItem
 		int ThisZoneID; // hold result from findItem
 
-		Fstring ThisConstructStr( MaxNameLength );
+		std::string ThisConstructStr;
 
 		//  LOGICAL,ALLOCATABLE, DIMENSION(:) :: uniqueSurfMask !
 		//  REAL(r64), ALLOCATABLE, DIMENSION(:)   :: SurfMultipleARR
@@ -349,14 +347,14 @@ namespace CostEstimateManager {
 				//  is PerSquareMeter non-zero? if it is are other cost per values set?
 				//   issue warning that 'Cost Estimate requested for Constructions with zero cost per unit area
 				if ( CostLineItem( Item ).PerSquareMeter == 0 ) {
-					ShowSevereError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\" Construction object needs non-zero construction costs per square meter" );
+					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\" Construction object needs non-zero construction costs per square meter" );
 					ErrorsFound = true;
 				}
 
 				ThisConstructStr = CostLineItem( Item ).ParentObjName;
 				ThisConstructID = FindItem( ThisConstructStr, Construct.Name(), TotConstructs );
 				if ( ThisConstructID == 0 ) { // do any surfaces have the specified construction? If not issue warning.
-					ShowWarningError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\" Construction=\"" + trim( CostLineItem( Item ).ParentObjName ) + "\", no surfaces have the Construction specified" );
+					ShowWarningError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\" Construction=\"" + CostLineItem( Item ).ParentObjName + "\", no surfaces have the Construction specified" );
 					ShowContinueError( "No costs will be calculated for this Construction." );
 					//        ErrorsFound = .TRUE.
 					continue;
@@ -367,30 +365,30 @@ namespace CostEstimateManager {
 				thisCoil = 0;
 				// test if too many pricing methods are set in user input
 				if ( ( CostLineItem( Item ).PerKiloWattCap > 0.0 ) && ( CostLineItem( Item ).PerEach > 0.0 ) ) {
-					ShowSevereError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\", Coil:DX, too many pricing methods specified" );
+					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:DX, too many pricing methods specified" );
 					ErrorsFound = true;
 				}
 				if ( ( CostLineItem( Item ).PerKiloWattCap > 0.0 ) && ( CostLineItem( Item ).PerKWCapPerCOP > 0.0 ) ) {
-					ShowSevereError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\", Coil:DX, too many pricing methods specified" );
+					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:DX, too many pricing methods specified" );
 					ErrorsFound = true;
 				}
 				if ( ( CostLineItem( Item ).PerEach > 0.0 ) && ( CostLineItem( Item ).PerKWCapPerCOP > 0.0 ) ) {
-					ShowSevereError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\", Coil:DX, too many pricing methods specified" );
+					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:DX, too many pricing methods specified" );
 					ErrorsFound = true;
 				}
 				//  check for wildcard * in object name..
-				if ( trim( CostLineItem( Item ).ParentObjName ) == "*" ) { // wildcard, apply to all such components
+				if ( CostLineItem( Item ).ParentObjName == "*" ) { // wildcard, apply to all such components
 					WildcardObjNames = true;
 
 				} else if ( CostLineItem( Item ).ParentObjName == "" ) {
-					ShowSevereError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\", Coil:DX: need to specify a Reference Object Name " );
+					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:DX: need to specify a Reference Object Name " );
 					ErrorsFound = true;
 
 				} else { // assume name is probably useful
 					thisCoil = FindItem( CostLineItem( Item ).ParentObjName, DXCoil.Name(), NumDXCoils );
 					if ( thisCoil == 0 ) {
-						ShowWarningError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\", Coil:DX, invalid coil specified" );
-						ShowContinueError( "Coil Specified=\"" + trim( CostLineItem( Item ).ParentObjName ) + "\", calculations will not be completed for this item." );
+						ShowWarningError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:DX, invalid coil specified" );
+						ShowContinueError( "Coil Specified=\"" + CostLineItem( Item ).ParentObjName + "\", calculations will not be completed for this item." );
 					}
 				}
 
@@ -400,60 +398,60 @@ namespace CostEstimateManager {
 				thisCoil = 0;
 				// test if too many pricing methods are set in user input
 				if ( ( CostLineItem( Item ).PerKiloWattCap > 0.0 ) && ( CostLineItem( Item ).PerEach > 0.0 ) ) {
-					ShowSevereError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\", Coil:Heating:Gas, too many pricing methods specified" );
+					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Gas, too many pricing methods specified" );
 					ErrorsFound = true;
 				}
 				if ( ( CostLineItem( Item ).PerKiloWattCap > 0.0 ) && ( CostLineItem( Item ).PerKWCapPerCOP > 0.0 ) ) {
-					ShowSevereError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\", Coil:Heating:Gas, too many pricing methods specified" );
+					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Gas, too many pricing methods specified" );
 					ErrorsFound = true;
 				}
 				if ( ( CostLineItem( Item ).PerEach > 0.0 ) && ( CostLineItem( Item ).PerKWCapPerCOP > 0.0 ) ) {
-					ShowSevereError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\", Coil:Heating:Gas, too many pricing methods specified" );
+					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Gas, too many pricing methods specified" );
 					ErrorsFound = true;
 				}
 				//  check for wildcard * in object name..
-				if ( trim( CostLineItem( Item ).ParentObjName ) == "*" ) { // wildcard, apply to all such components
+				if ( CostLineItem( Item ).ParentObjName == "*" ) { // wildcard, apply to all such components
 					WildcardObjNames = true;
 
 				} else if ( CostLineItem( Item ).ParentObjName == "" ) {
-					ShowSevereError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\", Coil:Heating:Gas, need to specify a Reference Object Name" );
+					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Gas, need to specify a Reference Object Name" );
 					ErrorsFound = true;
 
 				} else { // assume name is probably useful
 					thisCoil = FindItem( CostLineItem( Item ).ParentObjName, HeatingCoil.Name(), NumHeatingCoils );
 					if ( thisCoil == 0 ) {
-						ShowWarningError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\", Coil:Heating:Gas, invalid coil specified" );
-						ShowContinueError( "Coil Specified=\"" + trim( CostLineItem( Item ).ParentObjName ) + "\", calculations will not be completed for this item." );
+						ShowWarningError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Gas, invalid coil specified" );
+						ShowContinueError( "Coil Specified=\"" + CostLineItem( Item ).ParentObjName + "\", calculations will not be completed for this item." );
 					}
 				}
 
 			} else if ( SELECT_CASE_var == "CHILLER:ELECTRIC" ) {
 				if ( CostLineItem( Item ).ParentObjName == "" ) {
-					ShowSevereError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\", Chiller:Electric, need to specify a Reference Object Name" );
+					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Chiller:Electric, need to specify a Reference Object Name" );
 					ErrorsFound = true;
 				}
 
 				thisChil = FindItem( CostLineItem( Item ).ParentObjName, ElectricChiller.ma( &ElectricChillerSpecs::Base ).Name(), NumElectricChillers );
 				if ( thisChil == 0 ) {
-					ShowWarningError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\", Chiller:Electric, invalid chiller specified." );
-					ShowContinueError( "Chiller Specified=\"" + trim( CostLineItem( Item ).ParentObjName ) + "\", calculations will not be completed for this item." );
+					ShowWarningError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Chiller:Electric, invalid chiller specified." );
+					ShowContinueError( "Chiller Specified=\"" + CostLineItem( Item ).ParentObjName + "\", calculations will not be completed for this item." );
 				}
 
 			} else if ( SELECT_CASE_var == "DAYLIGHTING:CONTROLS" ) {
 				WildcardObjNames = false;
 
-				if ( trim( CostLineItem( Item ).ParentObjName ) == "*" ) { // wildcard, apply to all such components
+				if ( CostLineItem( Item ).ParentObjName == "*" ) { // wildcard, apply to all such components
 					WildcardObjNames = true;
 				} else if ( CostLineItem( Item ).ParentObjName == "" ) {
-					ShowSevereError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\", Daylighting:Controls, need to specify a Reference Object Name" );
+					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Daylighting:Controls, need to specify a Reference Object Name" );
 					ErrorsFound = true;
 				} else {
 					ThisZoneID = FindItem( CostLineItem( Item ).ParentObjName, Zone.Name(), NumOfZones );
 					if ( ThisZoneID > 0 ) {
 						CostLineItem( Item ).Qty = ZoneDaylight( ThisZoneID ).TotalDaylRefPoints;
 					} else {
-						ShowSevereError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\", Daylighting:Controls, need to specify a valid zone name" );
-						ShowContinueError( "Zone specified=\"" + trim( CostLineItem( Item ).ParentObjName ) + "\"." );
+						ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Daylighting:Controls, need to specify a valid zone name" );
+						ShowContinueError( "Zone specified=\"" + CostLineItem( Item ).ParentObjName + "\"." );
 						ErrorsFound = true;
 					}
 				}
@@ -464,24 +462,24 @@ namespace CostEstimateManager {
 					if ( ThisSurfID > 0 ) {
 						ThisZoneID = FindItem( Surface( ThisSurfID ).ZoneName, Zone.Name(), NumOfZones );
 						if ( ThisZoneID == 0 ) {
-							ShowSevereError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\", Shading:Zone:Detailed, need to specify a valid zone name" );
-							ShowContinueError( "Zone specified=\"" + trim( Surface( ThisSurfID ).ZoneName ) + "\"." );
+							ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Shading:Zone:Detailed, need to specify a valid zone name" );
+							ShowContinueError( "Zone specified=\"" + Surface( ThisSurfID ).ZoneName + "\"." );
 							ErrorsFound = true;
 						}
 					} else {
-						ShowSevereError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\", Shading:Zone:Detailed, need to specify a valid surface name" );
-						ShowContinueError( "Surface specified=\"" + trim( CostLineItem( Item ).ParentObjName ) + "\"." );
+						ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Shading:Zone:Detailed, need to specify a valid surface name" );
+						ShowContinueError( "Surface specified=\"" + CostLineItem( Item ).ParentObjName + "\"." );
 						ErrorsFound = true;
 					}
 				} else {
-					ShowSevereError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\", Shading:Zone:Detailed, specify a Reference Object Name" );
+					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Shading:Zone:Detailed, specify a Reference Object Name" );
 					ErrorsFound = true;
 				}
 
 			} else if ( SELECT_CASE_var == "LIGHTS" ) {
 
 				if ( ( CostLineItem( Item ).PerKiloWattCap > 0.0 ) && ( CostLineItem( Item ).PerEach > 0.0 ) ) {
-					ShowSevereError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\", Lights, too many pricing methods specified" );
+					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Lights, too many pricing methods specified" );
 					ErrorsFound = true;
 				}
 
@@ -489,12 +487,12 @@ namespace CostEstimateManager {
 					if ( CostLineItem( Item ).ParentObjName != "" ) {
 						ThisZoneID = FindItem( CostLineItem( Item ).ParentObjName, Zone.Name(), NumOfZones );
 						if ( ThisZoneID == 0 ) {
-							ShowSevereError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\", Lights, need to specify a valid zone name" );
-							ShowContinueError( "Zone specified=\"" + trim( CostLineItem( Item ).ParentObjName ) + "\"." );
+							ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Lights, need to specify a valid zone name" );
+							ShowContinueError( "Zone specified=\"" + CostLineItem( Item ).ParentObjName + "\"." );
 							ErrorsFound = true;
 						}
 					} else {
-						ShowSevereError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\", Lights, need to specify a Reference Object Name" );
+						ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Lights, need to specify a Reference Object Name" );
 						ErrorsFound = true;
 					}
 				}
@@ -512,26 +510,26 @@ namespace CostEstimateManager {
 								Multipliers = Zone( ThisZoneID ).Multiplier * Zone( ThisZoneID ).ListMultiplier;
 							}
 							if ( PVarray( thisPV ).PVModelType != iSimplePVModel ) {
-								ShowSevereError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\", Generator:Photovoltaic, only available for model type PhotovoltaicPerformance:Simple" );
+								ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Generator:Photovoltaic, only available for model type PhotovoltaicPerformance:Simple" );
 								ErrorsFound = true;
 							}
 						} else {
-							ShowSevereError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\", Generator:Photovoltaic, need to specify a valid PV array" );
-							ShowContinueError( "PV Array specified=\"" + trim( CostLineItem( Item ).ParentObjName ) + "\"." );
+							ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Generator:Photovoltaic, need to specify a valid PV array" );
+							ShowContinueError( "PV Array specified=\"" + CostLineItem( Item ).ParentObjName + "\"." );
 							ErrorsFound = true;
 						}
 					} else {
-						ShowSevereError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\", Generator:Photovoltaic, need to specify a Reference Object Name" );
+						ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Generator:Photovoltaic, need to specify a Reference Object Name" );
 						ErrorsFound = true;
 					}
 				} else {
-					ShowSevereError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\", Generator:Photovoltaic, need to specify a per-kilowatt cost " );
+					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Generator:Photovoltaic, need to specify a per-kilowatt cost " );
 					ErrorsFound = true;
 				}
 
 			} else {
-				ShowWarningError( "ComponentCost:LineItem: \"" + trim( CostLineItem( Item ).LineName ) + "\", invalid cost item -- not included in cost estimate." );
-				ShowContinueError( "... invalid object type=" + trim( CostLineItem( Item ).ParentObjType ) );
+				ShowWarningError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", invalid cost item -- not included in cost estimate." );
+				ShowContinueError( "... invalid object type=" + CostLineItem( Item ).ParentObjType );
 
 			}}
 
@@ -601,7 +599,7 @@ namespace CostEstimateManager {
 		int ThisSurfID; // hold result from findItem
 		int ThisZoneID; // hold result from findItem
 
-		Fstring ThisConstructStr( MaxNameLength );
+		std::string ThisConstructStr;
 
 		FArray1D_bool uniqueSurfMask;
 		FArray1D< Real64 > SurfMultipleARR;
@@ -661,7 +659,7 @@ namespace CostEstimateManager {
 				WildcardObjNames = false;
 				thisCoil = 0;
 				//  check for wildcard * in object name..
-				if ( trim( CostLineItem( Item ).ParentObjName ) == "*" ) { // wildcard, apply to all such components
+				if ( CostLineItem( Item ).ParentObjName == "*" ) { // wildcard, apply to all such components
 					WildcardObjNames = true;
 				} else if ( CostLineItem( Item ).ParentObjName != "" ) {
 					thisCoil = FindItem( CostLineItem( Item ).ParentObjName, DXCoil.Name(), NumDXCoils );
@@ -709,7 +707,7 @@ namespace CostEstimateManager {
 				WildcardObjNames = false;
 				thisCoil = 0;
 				//  check for wildcard * in object name..
-				if ( trim( CostLineItem( Item ).ParentObjName ) == "*" ) { // wildcard, apply to all such components
+				if ( CostLineItem( Item ).ParentObjName == "*" ) { // wildcard, apply to all such components
 					WildcardObjNames = true;
 				} else if ( CostLineItem( Item ).ParentObjName != "" ) {
 					thisCoil = FindItem( CostLineItem( Item ).ParentObjName, HeatingCoil.Name(), NumHeatingCoils );
@@ -778,7 +776,7 @@ namespace CostEstimateManager {
 			} else if ( SELECT_CASE_var == "DAYLIGHTING:CONTROLS" ) {
 				WildcardObjNames = false;
 
-				if ( trim( CostLineItem( Item ).ParentObjName ) == "*" ) { // wildcard, apply to all such components
+				if ( CostLineItem( Item ).ParentObjName == "*" ) { // wildcard, apply to all such components
 					WildcardObjNames = true;
 					CostLineItem( Item ).Qty = sum( ZoneDaylight.TotalDaylRefPoints() );
 				} else if ( CostLineItem( Item ).ParentObjName != "" ) {

@@ -2,7 +2,6 @@
 #define PlantPressureSystem_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -14,7 +13,7 @@ namespace PlantPressureSystem {
 
 	// Data
 	// MODULE PARAMETER/ENUMERATIONS DEFINITIONS:
-	extern Fstring const Blank;
+	extern std::string const Blank;
 
 	// DERIVED TYPE DEFINITIONS:
 	//TYPE, PUBLIC:: PlantPressureCurveData

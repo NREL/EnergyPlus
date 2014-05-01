@@ -28,7 +28,6 @@ namespace FaultsManager {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::ScheduleAlwaysOn;
 	using namespace InputProcessor;
 
@@ -70,7 +69,7 @@ namespace FaultsManager {
 	//  10. Meter: air flow, water flow
 	//  11. CO2 sensor
 	//  12. more
-	FArray1D_Fstring const cFaults( NumFaultTypes, sFstring( 45 ), { "FaultModel:TemperatureSensorOffset:OutdoorAir", "FaultModel:HumiditySensorOffset:OutdoorAir   ", "FaultModel:EnthalpySensorOffset:OutdoorAir   ", "FaultModel:TemperatureSensorOffset:ReturnAir ", "FaultModel:EnthalpySensorOffset:ReturnAir    ", "FaultModel:Fouling:Coil                      " } );
+	FArray1D_string const cFaults( NumFaultTypes, { "FaultModel:TemperatureSensorOffset:OutdoorAir", "FaultModel:HumiditySensorOffset:OutdoorAir", "FaultModel:EnthalpySensorOffset:OutdoorAir", "FaultModel:TemperatureSensorOffset:ReturnAir", "FaultModel:EnthalpySensorOffset:ReturnAir", "FaultModel:Fouling:Coil" } );
 	//      'FaultModel:PressureSensorOffset:OutdoorAir   ', &
 	//      'FaultModel:TemperatureSensorOffset:SupplyAir ', &
 	//      'FaultModel:TemperatureSensorOffset:ZoneAir   ', &
@@ -141,11 +140,11 @@ namespace FaultsManager {
 		int NumAlphas; // Number of Alphas for each GetobjectItem call
 		int NumNumbers; // Number of Numbers for each GetobjectItem call
 		int IOStatus;
-		FArray1D_Fstring cAlphaArgs( 5, sFstring( MaxNameLength ) ); // Alpha input items for object
+		FArray1D_string cAlphaArgs( 5 ); // Alpha input items for object
 		static FArray1D_bool lAlphaFieldBlanks( 5, false );
 		static FArray1D_bool lNumericFieldBlanks( 5, false );
-		FArray1D_Fstring cAlphaFieldNames( 5, sFstring( MaxNameLength ) );
-		FArray1D_Fstring cNumericFieldNames( 5, sFstring( MaxNameLength ) );
+		FArray1D_string cAlphaFieldNames( 5 );
+		FArray1D_string cNumericFieldNames( 5 );
 		FArray1D< Real64 > rNumericArgs( 5 ); // Numeric input items for object
 
 		int i;
@@ -154,7 +153,7 @@ namespace FaultsManager {
 		int jj;
 		int iFaults;
 		int iTotalFaults;
-		Fstring cFault1( MaxNameLength );
+		std::string cFault1;
 
 		if ( RunMeOnceFlag ) return;
 
@@ -206,7 +205,7 @@ namespace FaultsManager {
 					} else {
 						FouledCoils( j1 ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
 						if ( FouledCoils( j1 ).AvaiSchedPtr == 0 ) {
-							ShowSevereError( trim( cFault1 ) + " = \"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 3 ) ) + " = \"" + trim( cAlphaArgs( 3 ) ) + "\" not found." );
+							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					}
@@ -218,12 +217,12 @@ namespace FaultsManager {
 					} else {
 						FouledCoils( j1 ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 4 ) );
 						if ( FouledCoils( j1 ).SeveritySchedPtr == 0 ) {
-							ShowSevereError( trim( cFault1 ) + " = \"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 4 ) ) + " = \"" + trim( cAlphaArgs( 4 ) ) + "\" not found." );
+							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					}
 
-					{ auto const SELECT_CASE_var( MakeUPPERCase( trim( cAlphaArgs( 5 ) ) ) );
+					{ auto const SELECT_CASE_var( MakeUPPERCase( cAlphaArgs( 5 ) ) );
 					if ( SELECT_CASE_var == "FOULEDUARATED" ) {
 						FouledCoils( j1 ).FoulingInputMethod = iFouledCoil_UARated;
 
@@ -253,7 +252,7 @@ namespace FaultsManager {
 					} else {
 						Faults( j ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 						if ( Faults( j ).AvaiSchedPtr == 0 ) {
-							ShowSevereError( trim( cFault1 ) + " = \"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 2 ) ) + " = \"" + trim( cAlphaArgs( 2 ) ) + "\" not found." );
+							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + " = \"" + cAlphaArgs( 2 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					}
@@ -265,7 +264,7 @@ namespace FaultsManager {
 					} else {
 						Faults( j ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
 						if ( Faults( j ).SeveritySchedPtr == 0 ) {
-							ShowSevereError( trim( cFault1 ) + " = \"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 3 ) ) + " = \"" + trim( cAlphaArgs( 3 ) ) + "\" not found." );
+							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					}
@@ -273,10 +272,10 @@ namespace FaultsManager {
 					Faults( j ).ControllerType = cAlphaArgs( 4 );
 					// check controller type
 					if ( lAlphaFieldBlanks( 4 ) ) {
-						ShowSevereError( trim( cFault1 ) + " = \"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 4 ) ) + " = \"" + trim( cAlphaArgs( 4 ) ) + "\" blank." );
+						ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" blank." );
 						ErrorsFound = true;
 					} else {
-						{ auto const SELECT_CASE_var( MakeUPPERCase( trim( cAlphaArgs( 4 ) ) ) );
+						{ auto const SELECT_CASE_var( MakeUPPERCase( cAlphaArgs( 4 ) ) );
 						if ( SELECT_CASE_var == "CONTROLLER:OUTDOORAIR" ) {
 							Faults( j ).ControllerTypeEnum = iController_AirEconomizer;
 
@@ -289,7 +288,7 @@ namespace FaultsManager {
 					Faults( j ).ControllerName = cAlphaArgs( 5 );
 					// check controller name
 					if ( lAlphaFieldBlanks( 5 ) ) {
-						ShowSevereError( trim( cFault1 ) + " = \"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 5 ) ) + " = \"" + trim( cAlphaArgs( 5 ) ) + "\" blank." );
+						ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" blank." );
 						ErrorsFound = true;
 					}
 

@@ -111,7 +111,7 @@ namespace PlantCentralGSHP {
 
 	void
 	SimCentralGroundSourceHeatPump(
-		Fstring const & WrapperName, // User specified name of wrapper
+		std::string const & WrapperName, // User specified name of wrapper
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // Chiller number pointer
 		int const LoopNum, // plant loop index pointer
@@ -167,17 +167,17 @@ namespace PlantCentralGSHP {
 		if ( CompIndex == 0 ) {
 			WrapperNum = FindItemInList( WrapperName, Wrapper.Name(), NumWrappers );
 			if ( WrapperNum == 0 ) {
-				ShowFatalError( "SimCentralGroundSourceHeatPump: Specified Wrapper not one of Valid Wrappers=" + trim( WrapperName ) );
+				ShowFatalError( "SimCentralGroundSourceHeatPump: Specified Wrapper not one of Valid Wrappers=" + WrapperName );
 			}
 			CompIndex = WrapperNum;
 		} else {
 			WrapperNum = CompIndex;
 			if ( WrapperNum > NumWrappers || WrapperNum < 1 ) {
-				ShowFatalError( "SimCentralGroundSourceHeatPump:  Invalid CompIndex passed=" + trim( TrimSigDigits( WrapperNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumWrappers ) ) + ", Entered Unit name=" + trim( WrapperName ) );
+				ShowFatalError( "SimCentralGroundSourceHeatPump:  Invalid CompIndex passed=" + TrimSigDigits( WrapperNum ) + ", Number of Units=" + TrimSigDigits( NumWrappers ) + ", Entered Unit name=" + WrapperName );
 			}
 			if ( CheckEquipName( WrapperNum ) ) {
 				if ( WrapperName != Wrapper( WrapperNum ).Name ) {
-					ShowFatalError( "SimCentralGroundSourceHeatPump:  Invalid CompIndex passed=" + trim( TrimSigDigits( WrapperNum ) ) + ", Unit name=" + trim( WrapperName ) + ", stored Unit Name for that index=" + trim( Wrapper( WrapperNum ).Name ) );
+					ShowFatalError( "SimCentralGroundSourceHeatPump:  Invalid CompIndex passed=" + TrimSigDigits( WrapperNum ) + ", Unit name=" + WrapperName + ", stored Unit Name for that index=" + Wrapper( WrapperNum ).Name );
 				}
 				CheckEquipName( WrapperNum ) = false;
 			}
@@ -296,7 +296,7 @@ namespace PlantCentralGSHP {
 		bool ErrorsFound; // If errors detected in input
 		bool LoopErrorsFound;
 		bool errFlag; // error flag for node connection
-		Fstring equipName( MaxNameLength );
+		std::string equipName;
 		Real64 rho;
 		Real64 Cp;
 		Real64 tmpNomCap; // local nominal capacity cooling power
@@ -387,9 +387,9 @@ namespace PlantCentralGSHP {
 								tmpEvapVolFlowRate = EvapVolFlowRateUser;
 								if ( DisplayExtraWarnings ) {
 									if ( ( std::abs( tmpEvapVolFlowRate - EvapVolFlowRateUser ) / EvapVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeChillerHeaterPerformanceElectricEIR: Potential issue with equipment sizing for " + trim( Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name ) );
-										ShowContinueError( "User-Specified Reference Chilled Water Flow Rate of " + trim( RoundSigDigits( EvapVolFlowRateUser, 5 ) ) + " [m3/s]" );
-										ShowContinueError( "differs from Design Size Reference Chilled Water Flow Rate of " + trim( RoundSigDigits( tmpEvapVolFlowRate, 5 ) ) + " [m3/s]" );
+										ShowMessage( "SizeChillerHeaterPerformanceElectricEIR: Potential issue with equipment sizing for " + Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name );
+										ShowContinueError( "User-Specified Reference Chilled Water Flow Rate of " + RoundSigDigits( EvapVolFlowRateUser, 5 ) + " [m3/s]" );
+										ShowContinueError( "differs from Design Size Reference Chilled Water Flow Rate of " + RoundSigDigits( tmpEvapVolFlowRate, 5 ) + " [m3/s]" );
 										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 									}
@@ -400,7 +400,7 @@ namespace PlantCentralGSHP {
 				} else {
 					if ( IsAutoSize ) {
 						ShowSevereError( "Autosizing of CGSHP Chiller Heater evap flow rate requires a loop Sizing:Plant object" );
-						ShowContinueError( "Occurs in CGSHP Chiller Heater Performance object=" + trim( Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name ) );
+						ShowContinueError( "Occurs in CGSHP Chiller Heater Performance object=" + Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name );
 						ErrorsFound = true;
 					} else {
 						if ( Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).EvapVolFlowRate > 0.0 ) {
@@ -439,9 +439,9 @@ namespace PlantCentralGSHP {
 								tmpNomCap = NomCapUser;
 								if ( DisplayExtraWarnings ) {
 									if ( ( std::abs( tmpNomCap - NomCapUser ) / NomCapUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeChillerHeaterPerformanceElectricEIR: Potential issue with equipment sizing for " + trim( Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name ) );
-										ShowContinueError( "User-Specified Reference Capacity of " + trim( RoundSigDigits( NomCapUser, 2 ) ) + " [W]" );
-										ShowContinueError( "differs from Design Size Reference Capacity of " + trim( RoundSigDigits( tmpNomCap, 2 ) ) + " [W]" );
+										ShowMessage( "SizeChillerHeaterPerformanceElectricEIR: Potential issue with equipment sizing for " + Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name );
+										ShowContinueError( "User-Specified Reference Capacity of " + RoundSigDigits( NomCapUser, 2 ) + " [W]" );
+										ShowContinueError( "differs from Design Size Reference Capacity of " + RoundSigDigits( tmpNomCap, 2 ) + " [W]" );
 										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 									}
@@ -451,7 +451,7 @@ namespace PlantCentralGSHP {
 					}
 				} else {
 					if ( IsAutoSize ) {
-						ShowSevereError( "Size ChillerHeaterPerformance:Electric:EIR=\"" + trim( Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name ) + "\", autosize error." );
+						ShowSevereError( "Size ChillerHeaterPerformance:Electric:EIR=\"" + Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name + "\", autosize error." );
 						ShowContinueError( "Autosizing of CGSHP Chiller Heater reference capacity requires" );
 						ShowContinueError( "a cooling loop Sizing:Plant object." );
 						ErrorsFound = true;
@@ -493,9 +493,9 @@ namespace PlantCentralGSHP {
 								ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name, "Design Size Reference Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate, "User-Specified Reference Condenser Water Flow Rate [m3/s]", CondVolFlowRateUser );
 								if ( DisplayExtraWarnings ) {
 									if ( ( std::abs( tmpCondVolFlowRate - CondVolFlowRateUser ) / CondVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeChillerHeaterPerformanceElectricEIR: Potential issue with equipment sizing for " + trim( Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name ) );
-										ShowContinueError( "User-Specified Reference Condenser Water Flow Rate of " + trim( RoundSigDigits( CondVolFlowRateUser, 5 ) ) + " [m3/s]" );
-										ShowContinueError( "differs from Design Size Reference Condenser Water Flow Rate of " + trim( RoundSigDigits( tmpCondVolFlowRate, 5 ) ) + " [m3/s]" );
+										ShowMessage( "SizeChillerHeaterPerformanceElectricEIR: Potential issue with equipment sizing for " + Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name );
+										ShowContinueError( "User-Specified Reference Condenser Water Flow Rate of " + RoundSigDigits( CondVolFlowRateUser, 5 ) + " [m3/s]" );
+										ShowContinueError( "differs from Design Size Reference Condenser Water Flow Rate of " + RoundSigDigits( tmpCondVolFlowRate, 5 ) + " [m3/s]" );
 										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 									}
@@ -505,7 +505,7 @@ namespace PlantCentralGSHP {
 					}
 				} else {
 					if ( IsAutoSize ) {
-						ShowSevereError( "Size ChillerHeaterPerformance:Electric:EIR=\"" + trim( Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name ) + "\", autosize error." );
+						ShowSevereError( "Size ChillerHeaterPerformance:Electric:EIR=\"" + Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name + "\", autosize error." );
 						ShowContinueError( "Autosizing of CGSHP Chiller Heater condenser flow rate requires" );
 						ShowContinueError( "a condenser loop Sizing:Plant object." );
 						ErrorsFound = true;
@@ -580,7 +580,6 @@ namespace PlantCentralGSHP {
 		using CurveManager::CurveValue;
 		using ScheduleManager::GetScheduleIndex;
 		using DataSizing::AutoSize;
-		using InputProcessor::MakeUPPERCase;
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
 
@@ -591,20 +590,20 @@ namespace PlantCentralGSHP {
 		// na
 
 		// LOCAL VARIABLES
-		static Fstring CompName( MaxNameLength ); // component name
-		Fstring temp_char( MaxNameLength ); // temporary character variable
-		Fstring temp_char1( MaxNameLength ); // temporary character variable
-		Fstring temp_char2( MaxNameLength ); // temporary character variable
-		Fstring EvapInletNodeName( MaxNameLength ); // virtual evaporator inlet node name for chiller heater
-		Fstring EvapOutletNodeName( MaxNameLength ); // virtual evaporator outlet node name for chiller heater
-		Fstring CondInletNodeName( MaxNameLength ); // virtual condenser inlet node name for chiller heater
-		Fstring CondOutletNodeName( MaxNameLength ); // virtual condenser outlet node name for chiller heater
-		Fstring LoadsideInletNodeName( MaxNameLength ); // virtual load inlet node name for heat pump
-		Fstring LoadsideOutletNodeName( MaxNameLength ); // virtual load outlet node name for heat pump
-		Fstring SourcesideInletNodeName( MaxNameLength ); // virtual source inlet node name for heat pump
-		Fstring SourcesideOutletNodeName( MaxNameLength ); // virtual source outlet node name for heat pump
-		Fstring DummyInletNodeName( MaxNameLength ); // virtual dummy inlet node name
-		Fstring DummyOutletNodeName( MaxNameLength ); // virtual dummy inlet node name
+		static std::string CompName; // component name
+		std::string temp_char; // temporary character variable
+		std::string temp_char1; // temporary character variable
+		std::string temp_char2; // temporary character variable
+		std::string EvapInletNodeName; // virtual evaporator inlet node name for chiller heater
+		std::string EvapOutletNodeName; // virtual evaporator outlet node name for chiller heater
+		std::string CondInletNodeName; // virtual condenser inlet node name for chiller heater
+		std::string CondOutletNodeName; // virtual condenser outlet node name for chiller heater
+		std::string LoadsideInletNodeName; // virtual load inlet node name for heat pump
+		std::string LoadsideOutletNodeName; // virtual load outlet node name for heat pump
+		std::string SourcesideInletNodeName; // virtual source inlet node name for heat pump
+		std::string SourcesideOutletNodeName; // virtual source outlet node name for heat pump
+		std::string DummyInletNodeName; // virtual dummy inlet node name
+		std::string DummyOutletNodeName; // virtual dummy inlet node name
 		static bool ErrorsFound( false ); // True when input errors are found
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
@@ -636,7 +635,7 @@ namespace PlantCentralGSHP {
 		NumWrappers = GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumWrappers <= 0 ) {
-			ShowSevereError( "No " + trim( cCurrentModuleObject ) + " equipment specified in input file" );
+			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
 			ErrorsFound = true;
 		}
 
@@ -658,7 +657,7 @@ namespace PlantCentralGSHP {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Wrapper.Name(), WrapperNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Wrapper.Name(), WrapperNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -670,17 +669,17 @@ namespace PlantCentralGSHP {
 				Wrapper( WrapperNum ).ControlMode = SmartMixing;
 			}
 
-			Wrapper( WrapperNum ).CHWInletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent ); //node name : connection should be careful!
-			Wrapper( WrapperNum ).CHWOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Chilled Water Nodes" );
+			Wrapper( WrapperNum ).CHWInletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent ); //node name : connection should be careful!
+			Wrapper( WrapperNum ).CHWOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Chilled Water Nodes" );
 
-			Wrapper( WrapperNum ).GLHEInletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent ); //node name : connection should be careful!
-			Wrapper( WrapperNum ).GLHEOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 5 ), cAlphaArgs( 6 ), "GLHE Nodes" );
+			Wrapper( WrapperNum ).GLHEInletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent ); //node name : connection should be careful!
+			Wrapper( WrapperNum ).GLHEOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 5 ), cAlphaArgs( 6 ), "GLHE Nodes" );
 
-			Wrapper( WrapperNum ).HWInletNodeNum = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent ); //node name : connection should be careful!
-			Wrapper( WrapperNum ).HWOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 3, ObjectIsNotParent );
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 7 ), cAlphaArgs( 8 ), "Hot Water Nodes" );
+			Wrapper( WrapperNum ).HWInletNodeNum = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent ); //node name : connection should be careful!
+			Wrapper( WrapperNum ).HWOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 3, ObjectIsNotParent );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 7 ), cAlphaArgs( 8 ), "Hot Water Nodes" );
 
 			Wrapper( WrapperNum ).AncilliaryPower = rNumericArgs( 1 );
 			Wrapper( WrapperNum ).AncilliaryPwSchedule = cAlphaArgs( 9 );
@@ -695,7 +694,7 @@ namespace PlantCentralGSHP {
 			Wrapper( WrapperNum ).WrapperComp.allocate( NumberOfComp );
 
 			if ( Wrapper( WrapperNum ).NumOfComp == 0 ) {
-				ShowSevereError( "GetWrapperInput: No component names on " + trim( cCurrentModuleObject ) + "=" + trim( Wrapper( WrapperNum ).Name ) );
+				ShowSevereError( "GetWrapperInput: No component names on " + cCurrentModuleObject + '=' + Wrapper( WrapperNum ).Name );
 				ErrorsFound = true;
 			} else {
 				Comp = 0;
@@ -710,7 +709,7 @@ namespace PlantCentralGSHP {
 						Wrapper( WrapperNum ).WrapperComp( Comp ).CHSchedPtr = GetScheduleIndex( cAlphaArgs( loop + 2 ) );
 					}
 					Wrapper( WrapperNum ).WrapperComp( Comp ).WrapperIdenticalObjectNum = rNumericArgs( 1 + Comp );
-					if ( Wrapper( WrapperNum ).WrapperComp( Comp ).WrapperPerformanceObjectType == MakeUPPERCase( "ChillerHeaterPerformance:Electric:EIR" ) ) {
+					if ( Wrapper( WrapperNum ).WrapperComp( Comp ).WrapperPerformanceObjectType == "CHILLERHEATERPERFORMANCE:ELECTRIC:EIR" ) {
 
 						// count number of chiller heaters (including identical units) for current wrapper
 						if ( Wrapper( WrapperNum ).WrapperComp( Comp ).WrapperIdenticalObjectNum > 1 ) {
@@ -729,12 +728,12 @@ namespace PlantCentralGSHP {
 			}
 
 			if ( ErrorsFound ) {
-				ShowFatalError( "GetWrapperInput: Invalid " + trim( cCurrentModuleObject ) + " Input, preceding condition(s) cause termination." );
+				ShowFatalError( "GetWrapperInput: Invalid " + cCurrentModuleObject + " Input, preceding condition(s) cause termination." );
 			}
 
 			// ALLOCATE ARRAYS
 			if ( ( NumChillerHeaters == 0 ) && ( Wrapper( WrapperNum ).ControlMode == SmartMixing ) ) {
-				ShowFatalError( "SmartMixing Control Mode in object " + trim( cCurrentModuleObject ) + " : " + trim( Wrapper( WrapperNum ).Name ) + " need to apply to ChillerHeaterPerformance:Electric:EIR object(s)." );
+				ShowFatalError( "SmartMixing Control Mode in object " + cCurrentModuleObject + " : " + Wrapper( WrapperNum ).Name + " need to apply to ChillerHeaterPerformance:Electric:EIR object(s)." );
 			}
 
 		}
@@ -753,12 +752,12 @@ namespace PlantCentralGSHP {
 		for ( WrapperNum = 1; WrapperNum <= NumWrappers; ++WrapperNum ) {
 			ChillerHeaterNum = 0; // intialize nth chiller heater index (including identical units) for current wrapper
 			for ( Comp = 1; Comp <= Wrapper( WrapperNum ).NumOfComp; ++Comp ) {
-				if ( Wrapper( WrapperNum ).WrapperComp( Comp ).WrapperPerformanceObjectType == MakeUPPERCase( "ChillerHeaterPerformance:Electric:EIR" ) ) {
+				if ( Wrapper( WrapperNum ).WrapperComp( Comp ).WrapperPerformanceObjectType == "CHILLERHEATERPERFORMANCE:ELECTRIC:EIR" ) {
 					CompName = Wrapper( WrapperNum ).WrapperComp( Comp ).WrapperComponentName;
 					CompIndex = FindItemInList( CompName, ChillerHeater.Name(), ubound( ChillerHeater.Name(), 1 ) );
 					// User may enter invalid name rather than selecting one from the object list
 					if ( CompIndex <= 0 ) {
-						ShowSevereError( "GetWrapperInput: Invalid Chiller Heater Modules Performance Component Name =" + trim( CompName ) );
+						ShowSevereError( "GetWrapperInput: Invalid Chiller Heater Modules Performance Component Name =" + CompName );
 						ShowContinueError( "Select the name of ChillerHeaterPerformance:Electric:EIR object(s) from the object list." );
 						ShowFatalError( "Program terminates due to preceding condition." );
 					}
@@ -824,51 +823,51 @@ namespace PlantCentralGSHP {
 
 				for ( ChillerHeaterNum = 1; ChillerHeaterNum <= Wrapper( WrapperNum ).ChillerHeaterNums; ++ChillerHeaterNum ) {
 
-					SetupOutputVariable( "Chiller Heater Operation Mode Unit " + trim( TrimSigDigits( ChillerHeaterNum ) ) + " []", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).CurrentMode, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Operation Mode Unit " + TrimSigDigits( ChillerHeaterNum ) + " []", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).CurrentMode, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Part Load Ratio Unit " + trim( TrimSigDigits( ChillerHeaterNum ) ) + " []", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerPartLoadRatio, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Part Load Ratio Unit " + TrimSigDigits( ChillerHeaterNum ) + " []", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerPartLoadRatio, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Cycling Ratio Unit " + trim( TrimSigDigits( ChillerHeaterNum ) ) + " []", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerCyclingRatio, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Cycling Ratio Unit " + TrimSigDigits( ChillerHeaterNum ) + " []", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerCyclingRatio, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Cooling Electric Power Unit " + trim( TrimSigDigits( ChillerHeaterNum ) ) + " [W]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).CoolingPower, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Cooling Electric Power Unit " + TrimSigDigits( ChillerHeaterNum ) + " [W]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).CoolingPower, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Heating Electric Power Unit " + trim( TrimSigDigits( ChillerHeaterNum ) ) + " [W]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).HeatingPower, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Heating Electric Power Unit " + TrimSigDigits( ChillerHeaterNum ) + " [W]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).HeatingPower, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Cooling Electric Energy Unit " + trim( TrimSigDigits( ChillerHeaterNum ) ) + " [J]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).CoolingEnergy, "System", "Sum", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Cooling Electric Energy Unit " + TrimSigDigits( ChillerHeaterNum ) + " [J]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).CoolingEnergy, "System", "Sum", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Heating Electric Energy Unit " + trim( TrimSigDigits( ChillerHeaterNum ) ) + " [J]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).HeatingEnergy, "System", "Sum", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Heating Electric Energy Unit " + TrimSigDigits( ChillerHeaterNum ) + " [J]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).HeatingEnergy, "System", "Sum", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Cooling Rate Unit " + trim( TrimSigDigits( ChillerHeaterNum ) ) + " [W]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).QEvap, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Cooling Rate Unit " + TrimSigDigits( ChillerHeaterNum ) + " [W]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).QEvap, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Cooling Energy Unit " + trim( TrimSigDigits( ChillerHeaterNum ) ) + " [J]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).EvapEnergy, "System", "Sum", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Cooling Energy Unit " + TrimSigDigits( ChillerHeaterNum ) + " [J]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).EvapEnergy, "System", "Sum", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater False Load Heat Transfer Rate Unit " + trim( TrimSigDigits( ChillerHeaterNum ) ) + " [W]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerFalseLoadRate, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater False Load Heat Transfer Rate Unit " + TrimSigDigits( ChillerHeaterNum ) + " [W]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerFalseLoadRate, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater False Load Heat Transfer Energy Unit " + trim( TrimSigDigits( ChillerHeaterNum ) ) + " [J]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerFalseLoad, "System", "Sum", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater False Load Heat Transfer Energy Unit " + TrimSigDigits( ChillerHeaterNum ) + " [J]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerFalseLoad, "System", "Sum", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Evaporator Inlet Temperature Unit " + trim( TrimSigDigits( ChillerHeaterNum ) ) + " [C]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).EvapInletTemp, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Evaporator Inlet Temperature Unit " + TrimSigDigits( ChillerHeaterNum ) + " [C]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).EvapInletTemp, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Evaporator Outlet Temperature Unit " + trim( TrimSigDigits( ChillerHeaterNum ) ) + " [C]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).EvapOutletTemp, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Evaporator Outlet Temperature Unit " + TrimSigDigits( ChillerHeaterNum ) + " [C]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).EvapOutletTemp, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Evaporator Mass Flow Rate Unit " + trim( TrimSigDigits( ChillerHeaterNum ) ) + " [kg/s]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).Evapmdot, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Evaporator Mass Flow Rate Unit " + TrimSigDigits( ChillerHeaterNum ) + " [kg/s]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).Evapmdot, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Condenser Heat Transfer Rate Unit " + trim( TrimSigDigits( ChillerHeaterNum ) ) + " [W]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).QCond, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Condenser Heat Transfer Rate Unit " + TrimSigDigits( ChillerHeaterNum ) + " [W]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).QCond, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Condenser Heat Transfer Energy Unit " + trim( TrimSigDigits( ChillerHeaterNum ) ) + " [J]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).CondEnergy, "System", "Sum", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Condenser Heat Transfer Energy Unit " + TrimSigDigits( ChillerHeaterNum ) + " [J]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).CondEnergy, "System", "Sum", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater COP Unit " + trim( TrimSigDigits( ChillerHeaterNum ) ) + " [W/W]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ActualCOP, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater COP Unit " + TrimSigDigits( ChillerHeaterNum ) + " [W/W]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ActualCOP, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Capacity Temperature Modifier Multiplier Unit " + trim( TrimSigDigits( ChillerHeaterNum ) ) + " []", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerCapFT, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Capacity Temperature Modifier Multiplier Unit " + TrimSigDigits( ChillerHeaterNum ) + " []", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerCapFT, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater EIR Temperature Modifier Multiplier Unit " + trim( TrimSigDigits( ChillerHeaterNum ) ) + " []", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerEIRFT, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater EIR Temperature Modifier Multiplier Unit " + TrimSigDigits( ChillerHeaterNum ) + " []", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerEIRFT, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater EIR Part Load Modifier Multiplier Unit " + trim( TrimSigDigits( ChillerHeaterNum ) ) + " []", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerEIRFPLR, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater EIR Part Load Modifier Multiplier Unit " + TrimSigDigits( ChillerHeaterNum ) + " []", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerEIRFPLR, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Condenser Inlet Temperature Unit " + trim( TrimSigDigits( ChillerHeaterNum ) ) + " [C]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).CondInletTemp, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Condenser Inlet Temperature Unit " + TrimSigDigits( ChillerHeaterNum ) + " [C]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).CondInletTemp, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Condenser Outlet Temperature Unit " + trim( TrimSigDigits( ChillerHeaterNum ) ) + " [C]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).CondOutletTemp, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Condenser Outlet Temperature Unit " + TrimSigDigits( ChillerHeaterNum ) + " [C]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).CondOutletTemp, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Condenser Mass Flow Rate Unit " + trim( TrimSigDigits( ChillerHeaterNum ) ) + " [kg/s]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).Condmdot, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Condenser Mass Flow Rate Unit " + TrimSigDigits( ChillerHeaterNum ) + " [kg/s]", Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).Condmdot, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 				} // End of individual chiller heater count for current wrapper
 
 			} // End of individual chiller heater output
@@ -912,12 +911,12 @@ namespace PlantCentralGSHP {
 		// na
 
 		// LOCAL VARIABLES
-		Fstring EvapInletNodeName( MaxNameLength ); // Evaporator inlet node name
-		Fstring EvapOutletNodeName( MaxNameLength ); // Evaporator outlet node name
-		Fstring CondInletNodeName( MaxNameLength ); // Condenser inlet node name
-		Fstring CondOutletNodeName( MaxNameLength ); // Condenser outlet node name
-		Fstring temp_char( MaxNameLength ); // temporary character variable
-		Fstring StringVar( MaxNameLength ); // Used for EIRFPLR warning messages
+		std::string EvapInletNodeName; // Evaporator inlet node name
+		std::string EvapOutletNodeName; // Evaporator outlet node name
+		std::string CondInletNodeName; // Condenser inlet node name
+		std::string CondOutletNodeName; // Condenser outlet node name
+		std::string temp_char; // temporary character variable
+		std::string StringVar; // Used for EIRFPLR warning messages
 		static bool CHErrorsFound( false ); // True when input errors are found
 		static bool AllocatedFlag( false ); // True when arrays are allocated
 		bool IsNotOK; // Flag to verify name
@@ -935,14 +934,14 @@ namespace PlantCentralGSHP {
 		Real64 CurveValTmp; // Used to evaluate PLFFPLR curve objects
 
 		// Formats
-		std::string const Format_530( "('Curve Output = ',11(F7.2))" );
-		std::string const Format_550( "('Curve Output = ',11(F7.2))" );
+		static gio::Fmt const Format_530( "('Curve Output = ',11(F7.2))" );
+		static gio::Fmt const Format_550( "('Curve Output = ',11(F7.2))" );
 
 		cCurrentModuleObject = "ChillerHeaterPerformance:Electric:EIR";
 		NumChillerHeaters = GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumChillerHeaters <= 0 ) {
-			ShowSevereError( "No " + trim( cCurrentModuleObject ) + " equipment specified in input file" );
+			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
 			CHErrorsFound = true;
 		}
 
@@ -960,7 +959,7 @@ namespace PlantCentralGSHP {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ChillerHeater.Name(), ChillerHeaterNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ChillerHeater.Name(), ChillerHeaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				CHErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -971,22 +970,22 @@ namespace PlantCentralGSHP {
 			// Performance curves
 			ChillerHeater( ChillerHeaterNum ).ChillerCapFTCooling = GetCurveIndex( cAlphaArgs( 5 ) );
 			if ( ChillerHeater( ChillerHeaterNum ).ChillerCapFTCooling == 0 ) {
-				ShowSevereError( "Invalid " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Entered in " + trim( cAlphaFieldNames( 5 ) ) + "=" + trim( cAlphaArgs( 5 ) ) );
+				ShowSevereError( "Invalid " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
+				ShowContinueError( "Entered in " + cAlphaFieldNames( 5 ) + '=' + cAlphaArgs( 5 ) );
 				CHErrorsFound = true;
 			}
 
 			ChillerHeater( ChillerHeaterNum ).ChillerEIRFTCooling = GetCurveIndex( cAlphaArgs( 6 ) );
 			if ( ChillerHeater( ChillerHeaterNum ).ChillerEIRFTCooling == 0 ) {
-				ShowSevereError( "Invalid " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Entered in " + trim( cAlphaFieldNames( 6 ) ) + "=" + trim( cAlphaArgs( 6 ) ) );
+				ShowSevereError( "Invalid " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
+				ShowContinueError( "Entered in " + cAlphaFieldNames( 6 ) + '=' + cAlphaArgs( 6 ) );
 				CHErrorsFound = true;
 			}
 
 			ChillerHeater( ChillerHeaterNum ).ChillerEIRFPLRCooling = GetCurveIndex( cAlphaArgs( 7 ) );
 			if ( ChillerHeater( ChillerHeaterNum ).ChillerEIRFPLRCooling == 0 ) {
-				ShowSevereError( "Invalid " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Entered in " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( cAlphaArgs( 7 ) ) );
+				ShowSevereError( "Invalid " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
+				ShowContinueError( "Entered in " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
 				CHErrorsFound = true;
 			}
 
@@ -995,22 +994,22 @@ namespace PlantCentralGSHP {
 			// Performance curves
 			ChillerHeater( ChillerHeaterNum ).ChillerCapFTHeating = GetCurveIndex( cAlphaArgs( 9 ) );
 			if ( ChillerHeater( ChillerHeaterNum ).ChillerCapFTHeating == 0 ) {
-				ShowSevereError( "Invalid " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Entered in " + trim( cAlphaFieldNames( 9 ) ) + "=" + trim( cAlphaArgs( 9 ) ) );
+				ShowSevereError( "Invalid " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
+				ShowContinueError( "Entered in " + cAlphaFieldNames( 9 ) + '=' + cAlphaArgs( 9 ) );
 				CHErrorsFound = true;
 			}
 
 			ChillerHeater( ChillerHeaterNum ).ChillerEIRFTHeating = GetCurveIndex( cAlphaArgs( 10 ) );
 			if ( ChillerHeater( ChillerHeaterNum ).ChillerEIRFTHeating == 0 ) {
-				ShowSevereError( "Invalid " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Entered in " + trim( cAlphaFieldNames( 10 ) ) + "=" + trim( cAlphaArgs( 10 ) ) );
+				ShowSevereError( "Invalid " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
+				ShowContinueError( "Entered in " + cAlphaFieldNames( 10 ) + '=' + cAlphaArgs( 10 ) );
 				CHErrorsFound = true;
 			}
 
 			ChillerHeater( ChillerHeaterNum ).ChillerEIRFPLRHeating = GetCurveIndex( cAlphaArgs( 11 ) );
 			if ( ChillerHeater( ChillerHeaterNum ).ChillerEIRFPLRHeating == 0 ) {
-				ShowSevereError( "Invalid " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Entered in " + trim( cAlphaFieldNames( 11 ) ) + "=" + trim( cAlphaArgs( 11 ) ) );
+				ShowSevereError( "Invalid " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
+				ShowContinueError( "Entered in " + cAlphaFieldNames( 11 ) + '=' + cAlphaArgs( 11 ) );
 				CHErrorsFound = true;
 			}
 
@@ -1023,16 +1022,16 @@ namespace PlantCentralGSHP {
 			} else { // Assume a constant flow chiller if none is specified
 				ChillerHeater( ChillerHeaterNum ).ConstantFlow = true;
 				ChillerHeater( ChillerHeaterNum ).VariableFlow = false;
-				ShowSevereError( "Invalid " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Entered in " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
+				ShowSevereError( "Invalid " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
+				ShowContinueError( "Entered in " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
 				ShowContinueError( "simulation assumes CONSTANTFLOW and continues.." );
 			}
 
 			if ( ChillerHeaterNum > 1 ) {
 				if ( ChillerHeater( ChillerHeaterNum ).ConstantFlow != ChillerHeater( ChillerHeaterNum - 1 ).ConstantFlow ) {
 					ChillerHeater( ChillerHeaterNum ).ConstantFlow = true;
-					ShowWarningError( "Water flow mode is different from the other chiller heater(s) " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
-					ShowContinueError( "Entered in " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
+					ShowWarningError( "Water flow mode is different from the other chiller heater(s) " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
+					ShowContinueError( "Entered in " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
 					ShowContinueError( "Simulation assumes CONSTANTFLOW and continues.." );
 				}
 			}
@@ -1040,8 +1039,8 @@ namespace PlantCentralGSHP {
 			if ( SameString( cAlphaArgs( 3 ), "WaterCooled" ) ) {
 				ChillerHeater( ChillerHeaterNum ).CondenserType = WaterCooled;
 			} else {
-				ShowSevereError( "Invalid " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Entered in " + trim( cAlphaFieldNames( 3 ) ) + "=" + trim( cAlphaArgs( 3 ) ) );
+				ShowSevereError( "Invalid " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
+				ShowContinueError( "Entered in " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) );
 				ShowContinueError( "Valid entries is WaterCooled" );
 				CHErrorsFound = true;
 			}
@@ -1049,14 +1048,14 @@ namespace PlantCentralGSHP {
 			// Chiller rated performance data
 			ChillerHeater( ChillerHeaterNum ).RefCapCooling = rNumericArgs( 1 );
 			if ( rNumericArgs( 1 ) == 0.0 ) {
-				ShowSevereError( "Invalid " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Entered in " + trim( cNumericFieldNames( 1 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 1 ), 2 ) ) );
+				ShowSevereError( "Invalid " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
+				ShowContinueError( "Entered in " + cNumericFieldNames( 1 ) + '=' + RoundSigDigits( rNumericArgs( 1 ), 2 ) );
 				CHErrorsFound = true;
 			}
 			ChillerHeater( ChillerHeaterNum ).RefCOPCooling = rNumericArgs( 2 );
 			if ( rNumericArgs( 2 ) == 0.0 ) {
-				ShowSevereError( "Invalid " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Entered in " + trim( cNumericFieldNames( 2 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 2 ), 2 ) ) );
+				ShowSevereError( "Invalid " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
+				ShowContinueError( "Entered in " + cNumericFieldNames( 2 ) + '=' + RoundSigDigits( rNumericArgs( 2 ), 2 ) );
 				CHErrorsFound = true;
 			}
 
@@ -1067,8 +1066,8 @@ namespace PlantCentralGSHP {
 			ChillerHeater( ChillerHeaterNum ).RefCapClgHtg = rNumericArgs( 6 ) * ChillerHeater( ChillerHeaterNum ).RefCapCooling;
 
 			if ( rNumericArgs( 6 ) == 0.0 ) {
-				ShowSevereError( "Invalid " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Entered in " + trim( cNumericFieldNames( 6 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 6 ), 2 ) ) );
+				ShowSevereError( "Invalid " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
+				ShowContinueError( "Entered in " + cNumericFieldNames( 6 ) + '=' + RoundSigDigits( rNumericArgs( 6 ), 2 ) );
 				CHErrorsFound = true;
 			}
 
@@ -1077,8 +1076,8 @@ namespace PlantCentralGSHP {
 			ChillerHeater( ChillerHeaterNum ).RefCOPClgHtg = ChillerHeater( ChillerHeaterNum ).RefCapClgHtg / ChillerHeater( ChillerHeaterNum ).RefPowerClgHtg;
 
 			if ( rNumericArgs( 7 ) == 0.0 ) {
-				ShowSevereError( "Invalid " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Entered in " + trim( cNumericFieldNames( 7 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 7 ), 2 ) ) );
+				ShowSevereError( "Invalid " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
+				ShowContinueError( "Entered in " + cNumericFieldNames( 7 ) + '=' + RoundSigDigits( rNumericArgs( 7 ), 2 ) );
 				CHErrorsFound = true;
 			}
 
@@ -1097,10 +1096,10 @@ namespace PlantCentralGSHP {
 			if ( ChillerHeater( ChillerHeaterNum ).SizFac <= 0.0 ) ChillerHeater( ChillerHeaterNum ).SizFac = 1.0;
 
 			if ( ChillerHeater( ChillerHeaterNum ).OpenMotorEff < 0.0 || ChillerHeater( ChillerHeaterNum ).OpenMotorEff > 1.0 ) {
-				ShowSevereError( "GetCurveInput: For " + trim( cCurrentModuleObject ) + ": " + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 14 ) ) + " = " + trim( RoundSigDigits( rNumericArgs( 14 ), 3 ) ) );
-				ShowContinueError( trim( cNumericFieldNames( 14 ) ) + " must be greater than or equal to zero" );
-				ShowContinueError( trim( cNumericFieldNames( 14 ) ) + " must be less than or equal to one" );
+				ShowSevereError( "GetCurveInput: For " + cCurrentModuleObject + ": " + cAlphaArgs( 1 ) );
+				ShowContinueError( cNumericFieldNames( 14 ) + " = " + RoundSigDigits( rNumericArgs( 14 ), 3 ) );
+				ShowContinueError( cNumericFieldNames( 14 ) + " must be greater than or equal to zero" );
+				ShowContinueError( cNumericFieldNames( 14 ) + " must be less than or equal to one" );
 				CHErrorsFound = true;
 			}
 
@@ -1109,8 +1108,8 @@ namespace PlantCentralGSHP {
 				CurveVal = CurveValue( ChillerHeater( ChillerHeaterNum ).ChillerCapFTCooling, ChillerHeater( ChillerHeaterNum ).TempRefEvapOutCooling, ChillerHeater( ChillerHeaterNum ).TempRefCondInCooling );
 				if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
 					ShowWarningError( "Capacity ratio as a function of temperature curve output is not equal to 1.0" );
-					ShowContinueError( "(+ or - 10%) at reference conditions for " + trim( cCurrentModuleObject ) + "= " + trim( cAlphaArgs( 1 ) ) );
-					ShowContinueError( "Curve output at reference conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+					ShowContinueError( "(+ or - 10%) at reference conditions for " + cCurrentModuleObject + "= " + cAlphaArgs( 1 ) );
+					ShowContinueError( "Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
 				}
 			}
 
@@ -1118,8 +1117,8 @@ namespace PlantCentralGSHP {
 				CurveVal = CurveValue( ChillerHeater( ChillerHeaterNum ).ChillerEIRFTCooling, ChillerHeater( ChillerHeaterNum ).TempRefEvapOutCooling, ChillerHeater( ChillerHeaterNum ).TempRefCondInCooling );
 				if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
 					ShowWarningError( "Energy input ratio as a function of temperature curve output is not equal to 1.0" );
-					ShowContinueError( "(+ or - 10%) at reference conditions for " + trim( cCurrentModuleObject ) + "= " + trim( cAlphaArgs( 1 ) ) );
-					ShowContinueError( "Curve output at reference conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+					ShowContinueError( "(+ or - 10%) at reference conditions for " + cCurrentModuleObject + "= " + cAlphaArgs( 1 ) );
+					ShowContinueError( "Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
 				}
 			}
 
@@ -1128,8 +1127,8 @@ namespace PlantCentralGSHP {
 
 				if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
 					ShowWarningError( "Energy input ratio as a function of part-load ratio curve output is not equal to 1.0" );
-					ShowContinueError( "(+ or - 10%) at reference conditions for " + trim( cCurrentModuleObject ) + "= " + trim( cAlphaArgs( 1 ) ) );
-					ShowContinueError( "Curve output at reference conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+					ShowContinueError( "(+ or - 10%) at reference conditions for " + cCurrentModuleObject + "= " + cAlphaArgs( 1 ) );
+					ShowContinueError( "Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
 				}
 			}
 
@@ -1142,7 +1141,7 @@ namespace PlantCentralGSHP {
 				}
 				if ( FoundNegValue ) {
 					ShowWarningError( "Energy input ratio as a function of part-load ratio curve shows negative values " );
-					ShowContinueError( "for " + trim( cCurrentModuleObject ) + "= " + trim( cAlphaArgs( 1 ) ) );
+					ShowContinueError( "for " + cCurrentModuleObject + "= " + cAlphaArgs( 1 ) );
 					ShowContinueError( "EIR as a function of PLR curve output at various part-load ratios shown below:" );
 					ShowContinueError( "PLR   =  0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00" );
 					gio::write( StringVar, "'Curve Output = '" );
@@ -1151,7 +1150,7 @@ namespace PlantCentralGSHP {
 							<< CurveValArray( CurveValPtr );
 					}
 					gio::write( StringVar );
-					ShowContinueError( trim( StringVar ) );
+					ShowContinueError( StringVar );
 					CHErrorsFound = true;
 				}
 			}
@@ -1160,8 +1159,8 @@ namespace PlantCentralGSHP {
 				CurveVal = CurveValue( ChillerHeater( ChillerHeaterNum ).ChillerCapFTHeating, ChillerHeater( ChillerHeaterNum ).TempRefEvapOutClgHtg, ChillerHeater( ChillerHeaterNum ).TempRefCondInClgHtg );
 				if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
 					ShowWarningError( "Capacity ratio as a function of temperature curve output is not equal to 1.0" );
-					ShowContinueError( "(+ or - 10%) at reference conditions for " + trim( cCurrentModuleObject ) + "= " + trim( cAlphaArgs( 1 ) ) );
-					ShowContinueError( "Curve output at reference conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+					ShowContinueError( "(+ or - 10%) at reference conditions for " + cCurrentModuleObject + "= " + cAlphaArgs( 1 ) );
+					ShowContinueError( "Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
 				}
 			}
 
@@ -1169,8 +1168,8 @@ namespace PlantCentralGSHP {
 				CurveVal = CurveValue( ChillerHeater( ChillerHeaterNum ).ChillerEIRFTHeating, ChillerHeater( ChillerHeaterNum ).TempRefEvapOutClgHtg, ChillerHeater( ChillerHeaterNum ).TempRefCondInClgHtg );
 				if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
 					ShowWarningError( "Energy input ratio as a function of temperature curve output is not equal to 1.0" );
-					ShowContinueError( "(+ or - 10%) at reference conditions for " + trim( cCurrentModuleObject ) + "= " + trim( cAlphaArgs( 1 ) ) );
-					ShowContinueError( "Curve output at reference conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+					ShowContinueError( "(+ or - 10%) at reference conditions for " + cCurrentModuleObject + "= " + cAlphaArgs( 1 ) );
+					ShowContinueError( "Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
 				}
 			}
 
@@ -1179,8 +1178,8 @@ namespace PlantCentralGSHP {
 
 				if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
 					ShowWarningError( "Energy input ratio as a function of part-load ratio curve output is not equal to 1.0" );
-					ShowContinueError( "(+ or - 10%) at reference conditions for " + trim( cCurrentModuleObject ) + "= " + trim( cAlphaArgs( 1 ) ) );
-					ShowContinueError( "Curve output at reference conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+					ShowContinueError( "(+ or - 10%) at reference conditions for " + cCurrentModuleObject + "= " + cAlphaArgs( 1 ) );
+					ShowContinueError( "Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
 				}
 			}
 
@@ -1193,7 +1192,7 @@ namespace PlantCentralGSHP {
 				}
 				if ( FoundNegValue ) {
 					ShowWarningError( "Energy input ratio as a function of part-load ratio curve shows negative values " );
-					ShowContinueError( "for " + trim( cCurrentModuleObject ) + "= " + trim( cAlphaArgs( 1 ) ) );
+					ShowContinueError( "for " + cCurrentModuleObject + "= " + cAlphaArgs( 1 ) );
 					ShowContinueError( "EIR as a function of PLR curve output at various part-load ratios shown below:" );
 					ShowContinueError( "PLR          =    0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00" );
 					gio::write( StringVar, "'Curve Output = '" );
@@ -1202,7 +1201,7 @@ namespace PlantCentralGSHP {
 						    << CurveValArray( CurveValPtr );
 					}
 					gio::write( StringVar );
-					ShowContinueError( trim( StringVar ) );
+					ShowContinueError( StringVar );
 					CHErrorsFound = true;
 				}
 			}
@@ -1214,7 +1213,7 @@ namespace PlantCentralGSHP {
 		}
 
 		if ( CHErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + trim( cCurrentModuleObject ) );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
 		}
 
 	}
@@ -1345,9 +1344,9 @@ namespace PlantCentralGSHP {
 				if ( Node( Wrapper( WrapperNum ).CHWOutletNodeNum ).TempSetPoint == SensedNodeFlagValue ) {
 					if ( ! AnyEnergyManagementSystemInModel ) {
 						if ( ! Wrapper( WrapperNum ).CoolSetPointErrDone ) {
-							ShowWarningError( "Missing temperature setpoint on cooling side for CentralHeatPumpSystem named " + trim( Wrapper( WrapperNum ).Name ) );
-							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a CentralHeatPumpSystem " ", use a SetpointManager" );
-							ShowContinueError( "  The overall loop setpoint will be assumed for CentralHeatPumpSystem. " "The simulation continues ... " );
+							ShowWarningError( "Missing temperature setpoint on cooling side for CentralHeatPumpSystem named " + Wrapper( WrapperNum ).Name );
+							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a CentralHeatPumpSystem, use a SetpointManager" );
+							ShowContinueError( "  The overall loop setpoint will be assumed for CentralHeatPumpSystem. The simulation continues ... " );
 							Wrapper( WrapperNum ).CoolSetPointErrDone = true;
 						}
 					} else {
@@ -1356,11 +1355,11 @@ namespace PlantCentralGSHP {
 						CheckIfNodeSetPointManagedByEMS( Wrapper( WrapperNum ).CHWOutletNodeNum, iTemperatureSetPoint, FatalError );
 						if ( FatalError ) {
 							if ( ! Wrapper( WrapperNum ).CoolSetPointErrDone ) {
-								ShowWarningError( "Missing temperature setpoint on cooling side for CentralHeatPumpSystem named " + trim( Wrapper( WrapperNum ).Name ) );
+								ShowWarningError( "Missing temperature setpoint on cooling side for CentralHeatPumpSystem named " + Wrapper( WrapperNum ).Name );
 								ShowContinueError( "A temperature setpoint is needed at the outlet node of a CentralHeatPumpSystem " );
 								ShowContinueError( "use a Setpoint Manager to establish a setpoint at the chiller side outlet node " );
 								ShowContinueError( "or use an EMS actuator to establish a setpoint at the outlet node " );
-								ShowContinueError( "The overall loop setpoint will be assumed for chiller side. " "The simulation continues ... " );
+								ShowContinueError( "The overall loop setpoint will be assumed for chiller side. The simulation continues ... " );
 								Wrapper( WrapperNum ).CoolSetPointErrDone = true;
 							}
 						}
@@ -1372,9 +1371,9 @@ namespace PlantCentralGSHP {
 				if ( Node( Wrapper( WrapperNum ).HWOutletNodeNum ).TempSetPoint == SensedNodeFlagValue ) {
 					if ( ! AnyEnergyManagementSystemInModel ) {
 						if ( ! Wrapper( WrapperNum ).HeatSetPointErrDone ) {
-							ShowWarningError( "Missing temperature setpoint on heating side for CentralHeatPumpSystem named " + trim( Wrapper( WrapperNum ).Name ) );
-							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a CentralHeatPumpSystem " ", use a SetpointManager" );
-							ShowContinueError( "  The overall loop setpoint will be assumed for CentralHeatPumpSystem. " "The simulation continues ... " );
+							ShowWarningError( "Missing temperature setpoint on heating side for CentralHeatPumpSystem named " + Wrapper( WrapperNum ).Name );
+							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a CentralHeatPumpSystem, use a SetpointManager" );
+							ShowContinueError( "  The overall loop setpoint will be assumed for CentralHeatPumpSystem. The simulation continues ... " );
 							Wrapper( WrapperNum ).HeatSetPointErrDone = true;
 						}
 					} else {
@@ -1383,11 +1382,11 @@ namespace PlantCentralGSHP {
 						CheckIfNodeSetPointManagedByEMS( Wrapper( WrapperNum ).HWOutletNodeNum, iTemperatureSetPoint, FatalError );
 						if ( FatalError ) {
 							if ( ! Wrapper( WrapperNum ).HeatSetPointErrDone ) {
-								ShowWarningError( "Missing temperature setpoint on heating side for CentralHeatPumpSystem named " + trim( Wrapper( WrapperNum ).Name ) );
+								ShowWarningError( "Missing temperature setpoint on heating side for CentralHeatPumpSystem named " + Wrapper( WrapperNum ).Name );
 								ShowContinueError( "A temperature setpoint is needed at the outlet node of a CentralHeatPumpSystem " );
 								ShowContinueError( "use a Setpoint Manager to establish a setpoint at the chiller side outlet node " );
 								ShowContinueError( "or use an EMS actuator to establish a setpoint at the outlet node " );
-								ShowContinueError( "The overall loop setpoint will be assumed for chiller side. " "The simulation continues ... " );
+								ShowContinueError( "The overall loop setpoint will be assumed for chiller side. The simulation continues ... " );
 								Wrapper( WrapperNum ).HeatSetPointErrDone = true;
 							}
 						}
@@ -1563,7 +1562,6 @@ namespace PlantCentralGSHP {
 		using DataPlant::DeltaTempTol;
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using ScheduleManager::GetCurrentScheduleValue;
-		using InputProcessor::MakeUPPERCase;
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
 
@@ -1703,8 +1701,8 @@ namespace PlantCentralGSHP {
 			}
 
 			if ( CompNum > Wrapper( WrapperNum ).NumOfComp ) {
-				ShowSevereError( "CalcChillerModel: ChillerHeater=\"" + trim( Wrapper( WrapperNum ).Name ) + "\", calculated component number too big." );
-				ShowContinueError( "Max number of components=[" + trim( RoundSigDigits( Wrapper( WrapperNum ).NumOfComp ) ) + "], indicated component number=[" + trim( RoundSigDigits( CompNum ) ) + "]." );
+				ShowSevereError( "CalcChillerModel: ChillerHeater=\"" + Wrapper( WrapperNum ).Name + "\", calculated component number too big." );
+				ShowContinueError( "Max number of components=[" + RoundSigDigits( Wrapper( WrapperNum ).NumOfComp ) + "], indicated component number=[" + RoundSigDigits( CompNum ) + "]." );
 				ShowFatalError( "Program terminates due to preceding condition." );
 			}
 
@@ -1772,13 +1770,13 @@ namespace PlantCentralGSHP {
 
 				// Only used to read curve values
 				CondOutletTemp = Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).TempRefCondOutCooling;
-				if ( trim( Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).CondMode ) == MakeUPPERCase( "EnteringCondenser" ) ) {
+				if ( Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).CondMode == "ENTERINGCONDENSER" ) {
 					CondTempforCurve = CondInletTemp;
-				} else if ( trim( Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).CondMode ) == MakeUPPERCase( "LeavingCondenser" ) ) {
+				} else if ( Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).CondMode == "LEAVINGCONDENSER" ) {
 					CondTempforCurve = CondOutletTemp;
 				} else {
-					ShowWarningError( "ChillerHeaterPerformance:Electric:EIR \"" + trim( Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name ) + "\":" );
-					ShowContinueError( "Chiller condensor temperature for curve fit are not decided, defalt value= cond_leaving (" + trim( RoundSigDigits( ChillerCapFT, 3 ) ) + ")." );
+					ShowWarningError( "ChillerHeaterPerformance:Electric:EIR \"" + Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name + "\":" );
+					ShowContinueError( "Chiller condensor temperature for curve fit are not decided, defalt value= cond_leaving (" + RoundSigDigits( ChillerCapFT, 3 ) + ")." );
 					CondTempforCurve = CondOutletTemp;
 				}
 
@@ -1794,13 +1792,13 @@ namespace PlantCentralGSHP {
 				if ( ChillerCapFT < 0 ) {
 					if ( Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).ChillerCapFTError < 1 && ! WarmupFlag ) {
 						++Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).ChillerCapFTError;
-						ShowWarningError( "ChillerHeaterPerformance:Electric:EIR \"" + trim( Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name ) + "\":" );
-						ShowContinueError( " ChillerHeater Capacity as a Function of Temperature curve output is negative (" + trim( RoundSigDigits( ChillerCapFT, 3 ) ) + ")." );
-						ShowContinueError( " Negative value occurs using an Evaporator Outlet Temp of " + trim( RoundSigDigits( EvapOutletTempSetPoint, 1 ) ) + " and a Condenser Inlet Temp of " + trim( RoundSigDigits( CondInletTemp, 1 ) ) + "." );
+						ShowWarningError( "ChillerHeaterPerformance:Electric:EIR \"" + Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name + "\":" );
+						ShowContinueError( " ChillerHeater Capacity as a Function of Temperature curve output is negative (" + RoundSigDigits( ChillerCapFT, 3 ) + ")." );
+						ShowContinueError( " Negative value occurs using an Evaporator Outlet Temp of " + RoundSigDigits( EvapOutletTempSetPoint, 1 ) + " and a Condenser Inlet Temp of " + RoundSigDigits( CondInletTemp, 1 ) + '.' );
 						ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
 					} else if ( ! WarmupFlag ) {
 						++Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).ChillerCapFTError;
-						ShowRecurringWarningErrorAtEnd( "ChillerHeaterPerformance:Electric:EIR \"" + trim( Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name ) + "\":" " ChillerHeater Capacity as a Function of Temperature curve output is negative warning continues...", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).ChillerCapFTErrorIndex, ChillerCapFT, ChillerCapFT );
+						ShowRecurringWarningErrorAtEnd( "ChillerHeaterPerformance:Electric:EIR \"" + Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name + "\": ChillerHeater Capacity as a Function of Temperature curve output is negative warning continues...", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).ChillerCapFTErrorIndex, ChillerCapFT, ChillerCapFT );
 					}
 					ChillerCapFT = 0.0;
 				}
@@ -1933,8 +1931,8 @@ namespace PlantCentralGSHP {
 					Cp = GetSpecificHeatGlycol( PlantLoop( Wrapper( WrapperNum ).GLHELoopNum ).FluidName, CondInletTemp, PlantLoop( Wrapper( WrapperNum ).GLHELoopNum ).FluidIndex, "CalcElectricEIRChillerModel" );
 					CondOutletTemp = QCondenser / CondMassFlowRate / Cp + CondInletTemp;
 				} else {
-					ShowSevereError( "CalcChillerheaterModel: Condenser flow = 0, for Chillerheater=" + trim( Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name ) );
-					ShowContinueErrorTimeStamp( " " );
+					ShowSevereError( "CalcChillerheaterModel: Condenser flow = 0, for Chillerheater=" + Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					ShowContinueErrorTimeStamp( "" );
 				}
 
 				// Determine load next chillers should meet
@@ -2049,7 +2047,6 @@ namespace PlantCentralGSHP {
 		using CurveManager::GetCurveMinMaxValues;
 		using DataPlant::DeltaTempTol;
 		using ScheduleManager::GetCurrentScheduleValue;
-		using InputProcessor::MakeUPPERCase;
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
 		using DataBranchAirLoopPlant::MassFlowTolerance;
@@ -2222,13 +2219,13 @@ namespace PlantCentralGSHP {
 
 				if ( CondDeltaTemp < 0.0 ) { // Hot water temperature is greater than the maximum
 					if ( Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).ChillerEIRRefTempErrorIndex == 0 ) {
-						ShowSevereMessage( "CalcChillerHeaterModel: ChillerHeaterPerformance:Electric:EIR=\"" + trim( Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name ) + "\", DeltaTemp < 0" );
-						ShowContinueError( " Reference Simultaneous Cooling-Heating Mode Leaving Condenser Water Temperature [" + trim( RoundSigDigits( CondOutletTemp, 1 ) ) + "]" );
-						ShowContinueError( "is below condenser inlet temperature of [" + trim( RoundSigDigits( CondInletTemp, 1 ) ) + "]." );
-						ShowContinueErrorTimeStamp( " " );
+						ShowSevereMessage( "CalcChillerHeaterModel: ChillerHeaterPerformance:Electric:EIR=\"" + Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name + "\", DeltaTemp < 0" );
+						ShowContinueError( " Reference Simultaneous Cooling-Heating Mode Leaving Condenser Water Temperature [" + RoundSigDigits( CondOutletTemp, 1 ) + ']' );
+						ShowContinueError( "is below condenser inlet temperature of [" + RoundSigDigits( CondInletTemp, 1 ) + "]." );
+						ShowContinueErrorTimeStamp( "" );
 						ShowContinueError( " Reset reference temperature to one greater than the inlet temperature " );
 					}
-					ShowRecurringSevereErrorAtEnd( "ChillerHeaterPerformance:Electric:EIR=\"" + trim( Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name ) + "\": Reference temperature problems continue.", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).ChillerEIRRefTempErrorIndex, CondDeltaTemp, CondDeltaTemp, _, "deltaC", "deltaC" );
+					ShowRecurringSevereErrorAtEnd( "ChillerHeaterPerformance:Electric:EIR=\"" + Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name + "\": Reference temperature problems continue.", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).ChillerEIRRefTempErrorIndex, CondDeltaTemp, CondDeltaTemp, _, "deltaC", "deltaC" );
 					QCondenser = 0.0;
 					IsLoadHeatRemaining = false;
 				}
@@ -2319,13 +2316,13 @@ namespace PlantCentralGSHP {
 					Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).ChillerEIRFT = Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).ChillerEIRFTHeating;
 					Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).ChillerEIRFPLR = Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).ChillerEIRFPLRHeating;
 
-					if ( trim( Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).CondMode ) == MakeUPPERCase( "EnteringCondenser" ) ) {
+					if ( Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).CondMode == "ENTERINGCONDENSER" ) {
 						CondTempforCurve = CondInletTemp;
-					} else if ( trim( Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).CondMode ) == MakeUPPERCase( "LeavingCondenser" ) ) {
+					} else if ( Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).CondMode == "LEAVINGCONDENSER" ) {
 						CondTempforCurve = Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).TempRefCondOutClgHtg; //!CondOutletTemp
 					} else {
-						ShowWarningError( "ChillerHeaterPerformance:Electric:EIR \"" + trim( Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name ) + "\":" );
-						ShowContinueError( "Chiller condensor temperature for curve fit are not decided, defalt value= cond_leaving (" + trim( RoundSigDigits( ChillerCapFT, 3 ) ) + ")." );
+						ShowWarningError( "ChillerHeaterPerformance:Electric:EIR \"" + Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name + "\":" );
+						ShowContinueError( "Chiller condensor temperature for curve fit are not decided, defalt value= cond_leaving (" + RoundSigDigits( ChillerCapFT, 3 ) + ")." );
 						CondTempforCurve = Node( PlantLoop( Wrapper( WrapperNum ).HWLoopNum ).TempSetPointNodeNum ).TempSetPoint;
 					}
 
@@ -2340,13 +2337,13 @@ namespace PlantCentralGSHP {
 					if ( ChillerCapFT < 0 ) {
 						if ( Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).ChillerCapFTError < 1 && ! WarmupFlag ) {
 							++Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).ChillerCapFTError;
-							ShowWarningError( "ChillerHeaterPerformance:Electric:EIR \"" + trim( Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name ) + "\":" );
-							ShowContinueError( " ChillerHeater Capacity as a Function of Temperature curve output is negative (" + trim( RoundSigDigits( ChillerCapFT, 3 ) ) + ")." );
-							ShowContinueError( " Negative value occurs using an Evaporator Outlet Temp of " + trim( RoundSigDigits( EvapOutletTempSetPoint, 1 ) ) + " and a Condenser Inlet Temp of " + trim( RoundSigDigits( CondInletTemp, 1 ) ) + "." );
+							ShowWarningError( "ChillerHeaterPerformance:Electric:EIR \"" + Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name + "\":" );
+							ShowContinueError( " ChillerHeater Capacity as a Function of Temperature curve output is negative (" + RoundSigDigits( ChillerCapFT, 3 ) + ")." );
+							ShowContinueError( " Negative value occurs using an Evaporator Outlet Temp of " + RoundSigDigits( EvapOutletTempSetPoint, 1 ) + " and a Condenser Inlet Temp of " + RoundSigDigits( CondInletTemp, 1 ) + '.' );
 							ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
 						} else if ( ! WarmupFlag ) {
 							++Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).ChillerCapFTError;
-							ShowRecurringWarningErrorAtEnd( "ChillerHeaterPerformance:Electric:EIR \"" + trim( Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name ) + "\":" " ChillerHeater Capacity as a Function of Temperature curve output is negative warning continues...", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).ChillerCapFTErrorIndex, ChillerCapFT, ChillerCapFT );
+							ShowRecurringWarningErrorAtEnd( "ChillerHeaterPerformance:Electric:EIR \"" + Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name + "\": ChillerHeater Capacity as a Function of Temperature curve output is negative warning continues...", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).ChillerCapFTErrorIndex, ChillerCapFT, ChillerCapFT );
 						}
 						ChillerCapFT = 0.0;
 					}

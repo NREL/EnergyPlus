@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -20,12 +19,11 @@ namespace EnergyPlus {
 namespace BaseboardRadiator {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
 	extern Real64 const SimpConvAirFlowSpeed; // m/s
-	extern Fstring const cCMO_BBRadiator_Water;
+	extern std::string const cCMO_BBRadiator_Water;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -42,8 +40,8 @@ namespace BaseboardRadiator {
 	struct BaseboardParams
 	{
 		// Members
-		Fstring EquipID;
-		Fstring Schedule;
+		std::string EquipID;
+		std::string Schedule;
 		int SchedPtr;
 		int EquipType;
 		int ZonePtr;
@@ -77,8 +75,6 @@ namespace BaseboardRadiator {
 
 		// Default Constructor
 		BaseboardParams() :
-			EquipID( MaxNameLength ),
-			Schedule( MaxNameLength ),
 			SchedPtr( 0 ),
 			EquipType( 0 ),
 			ZonePtr( 0 ),
@@ -113,8 +109,8 @@ namespace BaseboardRadiator {
 
 		// Member Constructor
 		BaseboardParams(
-			Fstring const & EquipID,
-			Fstring const & Schedule,
+			std::string const & EquipID,
+			std::string const & Schedule,
 			int const SchedPtr,
 			int const EquipType,
 			int const ZonePtr,
@@ -146,8 +142,8 @@ namespace BaseboardRadiator {
 			int const BBMassFlowReSimIndex,
 			int const BBInletTempFlowReSimIndex
 		) :
-			EquipID( MaxNameLength, EquipID ),
-			Schedule( MaxNameLength, Schedule ),
+			EquipID( EquipID ),
+			Schedule( Schedule ),
 			SchedPtr( SchedPtr ),
 			EquipType( EquipType ),
 			ZonePtr( ZonePtr ),
@@ -189,7 +185,7 @@ namespace BaseboardRadiator {
 
 	void
 	SimBaseboard(
-		Fstring const & EquipName,
+		std::string const & EquipName,
 		int const ActualZoneNum,
 		int const ControlledZoneNum,
 		bool const FirstHVACIteration,
@@ -230,7 +226,7 @@ namespace BaseboardRadiator {
 	void
 	UpdateBaseboardPlantConnection(
 		int const BaseboardTypeNum, // type index
-		Fstring const & BaseboardName, // component name
+		std::string const & BaseboardName, // component name
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int const LoopNum, // Plant loop index for where called from
 		int const LoopSide, // Plant loop side index for where called from

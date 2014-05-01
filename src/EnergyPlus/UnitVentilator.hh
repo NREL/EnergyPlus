@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -16,13 +15,12 @@ namespace EnergyPlus {
 namespace UnitVentilator {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
 
 	// Currrent Module Unit type
-	extern Fstring const cMO_UnitVentilator;
+	extern std::string const cMO_UnitVentilator;
 
 	// Parameters for outside air control types:
 	extern int const Heating_ElectricCoilType;
@@ -64,16 +62,16 @@ namespace UnitVentilator {
 	{
 		// Members
 		// Input data
-		Fstring Name; // name of unit
-		Fstring SchedName; // availability schedule
+		std::string Name; // name of unit
+		std::string SchedName; // availability schedule
 		int SchedPtr; // index to schedule
 		int AirInNode; // inlet air node number
 		int AirOutNode; // outlet air node number
 		int FanOutletNode; // outlet node number for fan exit
 		// (assumes fan is upstream of heating coil)
 		int FanType_Num; // Fan type number (see DataHVACGlobals)
-		Fstring FanType; // type of fan
-		Fstring FanName; // name of fan
+		std::string FanType; // type of fan
+		std::string FanName; // name of fan
 		int Fan_Index;
 		int FanSchedPtr; // index to fan operating mode schedule
 		int FanAvailSchedPtr; // index to fan availability schedule
@@ -83,11 +81,11 @@ namespace UnitVentilator {
 		Real64 MaxAirVolFlow; // m3/s
 		Real64 MaxAirMassFlow; // kg/s
 		int OAControlType; // type of control; options are VARIABLE PERCENT and FIXED TEMPERATURE
-		Fstring MinOASchedName; // schedule of fraction for minimum outside air (all controls)
+		std::string MinOASchedName; // schedule of fraction for minimum outside air (all controls)
 		int MinOASchedPtr; // index to schedule
-		Fstring MaxOASchedName; // schedule of percentages for maximum outside air fraction (variable %)
+		std::string MaxOASchedName; // schedule of percentages for maximum outside air fraction (variable %)
 		int MaxOASchedPtr; // index to schedule
-		Fstring TempSchedName; // schedule of temperatures for desired "mixed air"
+		std::string TempSchedName; // schedule of temperatures for desired "mixed air"
 		// temperature (fixed temp.)
 		int TempSchedPtr; // index to schedule
 		int OutsideAirNode; // outside air node number
@@ -100,12 +98,12 @@ namespace UnitVentilator {
 		int CoilOption; // type of coil option; options are BOTH, HEATING, COOLING, AND NONE
 		bool HCoilPresent; // .TRUE. if unit ventilator has a heating coil
 		int HCoilType; // type of heating coil (water, gas, electric, etc.)
-		Fstring HCoilName; // name of heating coil
-		Fstring HCoilTypeCh; // type of heating coil character string (same as type on idf file).
+		std::string HCoilName; // name of heating coil
+		std::string HCoilTypeCh; // type of heating coil character string (same as type on idf file).
 		int HCoil_Index;
 		int HCoil_PlantTypeNum;
 		int HCoil_FluidIndex;
-		Fstring HCoilSchedName; // availability schedule for the heating coil
+		std::string HCoilSchedName; // availability schedule for the heating coil
 		int HCoilSchedPtr; // index to schedule
 		Real64 HCoilSchedValue;
 		Real64 MaxVolHotWaterFlow; // m3/s
@@ -124,16 +122,16 @@ namespace UnitVentilator {
 		int HWBranchNum; // index for plant branch for hot water coil
 		int HWCompNum; // index for plant component for hot water coil
 		bool CCoilPresent; // .TRUE. if unit ventilator has a cooling coil
-		Fstring CCoilName; // name of cooling coil
-		Fstring CCoilTypeCh; // type of cooling coil as character string (same as on idf file)
+		std::string CCoilName; // name of cooling coil
+		std::string CCoilTypeCh; // type of cooling coil as character string (same as on idf file)
 		int CCoil_Index;
-		Fstring CCoilPlantName; // name of cooling coil for plant
-		Fstring CCoilPlantType; // type of cooling coil for plant
+		std::string CCoilPlantName; // name of cooling coil for plant
+		std::string CCoilPlantType; // type of cooling coil for plant
 		int CCoil_PlantTypeNum;
 		int CCoilType; // type of cooling coil:
 		// 'Coil:Cooling:Water:DetailedGeometry' or
 		// 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
-		Fstring CCoilSchedName; // availability schedule for the cooling coil
+		std::string CCoilSchedName; // availability schedule for the cooling coil
 		int CCoilSchedPtr; // index to schedule
 		Real64 CCoilSchedValue;
 		Real64 MaxVolColdWaterFlow; // m3/s
@@ -156,7 +154,7 @@ namespace UnitVentilator {
 		Real64 SensCoolEnergy;
 		Real64 ElecPower;
 		Real64 ElecEnergy;
-		Fstring AvailManagerListName; // Name of an availability manager list object
+		std::string AvailManagerListName; // Name of an availability manager list object
 		int AvailStatus;
 		Real64 FanPartLoadRatio; // fan part-load ratio for time step
 		Real64 PartLoadFrac; // unit ventilator part-load ratio for time step
@@ -164,15 +162,11 @@ namespace UnitVentilator {
 
 		// Default Constructor
 		UnitVentilatorData() :
-			Name( MaxNameLength ),
-			SchedName( MaxNameLength ),
 			SchedPtr( 0 ),
 			AirInNode( 0 ),
 			AirOutNode( 0 ),
 			FanOutletNode( 0 ),
 			FanType_Num( 0 ),
-			FanType( MaxNameLength ),
-			FanName( MaxNameLength ),
 			Fan_Index( 0 ),
 			FanSchedPtr( 0 ),
 			FanAvailSchedPtr( 0 ),
@@ -182,11 +176,8 @@ namespace UnitVentilator {
 			MaxAirVolFlow( 0.0 ),
 			MaxAirMassFlow( 0.0 ),
 			OAControlType( 0 ),
-			MinOASchedName( MaxNameLength ),
 			MinOASchedPtr( 0 ),
-			MaxOASchedName( MaxNameLength ),
 			MaxOASchedPtr( 0 ),
-			TempSchedName( MaxNameLength ),
 			TempSchedPtr( 0 ),
 			OutsideAirNode( 0 ),
 			AirReliefNode( 0 ),
@@ -198,12 +189,9 @@ namespace UnitVentilator {
 			CoilOption( 0 ),
 			HCoilPresent( false ),
 			HCoilType( 0 ),
-			HCoilName( MaxNameLength ),
-			HCoilTypeCh( MaxNameLength ),
 			HCoil_Index( 0 ),
 			HCoil_PlantTypeNum( 0 ),
 			HCoil_FluidIndex( 0 ),
-			HCoilSchedName( MaxNameLength ),
 			HCoilSchedPtr( 0 ),
 			HCoilSchedValue( 0.0 ),
 			MaxVolHotWaterFlow( 0.0 ),
@@ -222,14 +210,9 @@ namespace UnitVentilator {
 			HWBranchNum( 0 ),
 			HWCompNum( 0 ),
 			CCoilPresent( false ),
-			CCoilName( MaxNameLength ),
-			CCoilTypeCh( MaxNameLength ),
 			CCoil_Index( 0 ),
-			CCoilPlantName( MaxNameLength ),
-			CCoilPlantType( MaxNameLength ),
 			CCoil_PlantTypeNum( 0 ),
 			CCoilType( 0 ),
-			CCoilSchedName( MaxNameLength ),
 			CCoilSchedPtr( 0 ),
 			CCoilSchedValue( 0.0 ),
 			MaxVolColdWaterFlow( 0.0 ),
@@ -251,7 +234,6 @@ namespace UnitVentilator {
 			SensCoolEnergy( 0.0 ),
 			ElecPower( 0.0 ),
 			ElecEnergy( 0.0 ),
-			AvailManagerListName( MaxNameLength ),
 			AvailStatus( 0 ),
 			FanPartLoadRatio( 0.0 ),
 			PartLoadFrac( 0.0 )
@@ -259,15 +241,15 @@ namespace UnitVentilator {
 
 		// Member Constructor
 		UnitVentilatorData(
-			Fstring const & Name, // name of unit
-			Fstring const & SchedName, // availability schedule
+			std::string const & Name, // name of unit
+			std::string const & SchedName, // availability schedule
 			int const SchedPtr, // index to schedule
 			int const AirInNode, // inlet air node number
 			int const AirOutNode, // outlet air node number
 			int const FanOutletNode, // outlet node number for fan exit
 			int const FanType_Num, // Fan type number (see DataHVACGlobals)
-			Fstring const & FanType, // type of fan
-			Fstring const & FanName, // name of fan
+			std::string const & FanType, // type of fan
+			std::string const & FanName, // name of fan
 			int const Fan_Index,
 			int const FanSchedPtr, // index to fan operating mode schedule
 			int const FanAvailSchedPtr, // index to fan availability schedule
@@ -277,11 +259,11 @@ namespace UnitVentilator {
 			Real64 const MaxAirVolFlow, // m3/s
 			Real64 const MaxAirMassFlow, // kg/s
 			int const OAControlType, // type of control; options are VARIABLE PERCENT and FIXED TEMPERATURE
-			Fstring const & MinOASchedName, // schedule of fraction for minimum outside air (all controls)
+			std::string const & MinOASchedName, // schedule of fraction for minimum outside air (all controls)
 			int const MinOASchedPtr, // index to schedule
-			Fstring const & MaxOASchedName, // schedule of percentages for maximum outside air fraction (variable %)
+			std::string const & MaxOASchedName, // schedule of percentages for maximum outside air fraction (variable %)
 			int const MaxOASchedPtr, // index to schedule
-			Fstring const & TempSchedName, // schedule of temperatures for desired "mixed air"
+			std::string const & TempSchedName, // schedule of temperatures for desired "mixed air"
 			int const TempSchedPtr, // index to schedule
 			int const OutsideAirNode, // outside air node number
 			int const AirReliefNode, // relief air node number
@@ -293,12 +275,12 @@ namespace UnitVentilator {
 			int const CoilOption, // type of coil option; options are BOTH, HEATING, COOLING, AND NONE
 			bool const HCoilPresent, // .TRUE. if unit ventilator has a heating coil
 			int const HCoilType, // type of heating coil (water, gas, electric, etc.)
-			Fstring const & HCoilName, // name of heating coil
-			Fstring const & HCoilTypeCh, // type of heating coil character string (same as type on idf file).
+			std::string const & HCoilName, // name of heating coil
+			std::string const & HCoilTypeCh, // type of heating coil character string (same as type on idf file).
 			int const HCoil_Index,
 			int const HCoil_PlantTypeNum,
 			int const HCoil_FluidIndex,
-			Fstring const & HCoilSchedName, // availability schedule for the heating coil
+			std::string const & HCoilSchedName, // availability schedule for the heating coil
 			int const HCoilSchedPtr, // index to schedule
 			Real64 const HCoilSchedValue,
 			Real64 const MaxVolHotWaterFlow, // m3/s
@@ -317,14 +299,14 @@ namespace UnitVentilator {
 			int const HWBranchNum, // index for plant branch for hot water coil
 			int const HWCompNum, // index for plant component for hot water coil
 			bool const CCoilPresent, // .TRUE. if unit ventilator has a cooling coil
-			Fstring const & CCoilName, // name of cooling coil
-			Fstring const & CCoilTypeCh, // type of cooling coil as character string (same as on idf file)
+			std::string const & CCoilName, // name of cooling coil
+			std::string const & CCoilTypeCh, // type of cooling coil as character string (same as on idf file)
 			int const CCoil_Index,
-			Fstring const & CCoilPlantName, // name of cooling coil for plant
-			Fstring const & CCoilPlantType, // type of cooling coil for plant
+			std::string const & CCoilPlantName, // name of cooling coil for plant
+			std::string const & CCoilPlantType, // type of cooling coil for plant
 			int const CCoil_PlantTypeNum,
 			int const CCoilType, // type of cooling coil:
-			Fstring const & CCoilSchedName, // availability schedule for the cooling coil
+			std::string const & CCoilSchedName, // availability schedule for the cooling coil
 			int const CCoilSchedPtr, // index to schedule
 			Real64 const CCoilSchedValue,
 			Real64 const MaxVolColdWaterFlow, // m3/s
@@ -346,20 +328,20 @@ namespace UnitVentilator {
 			Real64 const SensCoolEnergy,
 			Real64 const ElecPower,
 			Real64 const ElecEnergy,
-			Fstring const & AvailManagerListName, // Name of an availability manager list object
+			std::string const & AvailManagerListName, // Name of an availability manager list object
 			int const AvailStatus,
 			Real64 const FanPartLoadRatio, // fan part-load ratio for time step
 			Real64 const PartLoadFrac // unit ventilator part-load ratio for time step
 		) :
-			Name( MaxNameLength, Name ),
-			SchedName( MaxNameLength, SchedName ),
+			Name( Name ),
+			SchedName( SchedName ),
 			SchedPtr( SchedPtr ),
 			AirInNode( AirInNode ),
 			AirOutNode( AirOutNode ),
 			FanOutletNode( FanOutletNode ),
 			FanType_Num( FanType_Num ),
-			FanType( MaxNameLength, FanType ),
-			FanName( MaxNameLength, FanName ),
+			FanType( FanType ),
+			FanName( FanName ),
 			Fan_Index( Fan_Index ),
 			FanSchedPtr( FanSchedPtr ),
 			FanAvailSchedPtr( FanAvailSchedPtr ),
@@ -369,11 +351,11 @@ namespace UnitVentilator {
 			MaxAirVolFlow( MaxAirVolFlow ),
 			MaxAirMassFlow( MaxAirMassFlow ),
 			OAControlType( OAControlType ),
-			MinOASchedName( MaxNameLength, MinOASchedName ),
+			MinOASchedName( MinOASchedName ),
 			MinOASchedPtr( MinOASchedPtr ),
-			MaxOASchedName( MaxNameLength, MaxOASchedName ),
+			MaxOASchedName( MaxOASchedName ),
 			MaxOASchedPtr( MaxOASchedPtr ),
-			TempSchedName( MaxNameLength, TempSchedName ),
+			TempSchedName( TempSchedName ),
 			TempSchedPtr( TempSchedPtr ),
 			OutsideAirNode( OutsideAirNode ),
 			AirReliefNode( AirReliefNode ),
@@ -385,12 +367,12 @@ namespace UnitVentilator {
 			CoilOption( CoilOption ),
 			HCoilPresent( HCoilPresent ),
 			HCoilType( HCoilType ),
-			HCoilName( MaxNameLength, HCoilName ),
-			HCoilTypeCh( MaxNameLength, HCoilTypeCh ),
+			HCoilName( HCoilName ),
+			HCoilTypeCh( HCoilTypeCh ),
 			HCoil_Index( HCoil_Index ),
 			HCoil_PlantTypeNum( HCoil_PlantTypeNum ),
 			HCoil_FluidIndex( HCoil_FluidIndex ),
-			HCoilSchedName( MaxNameLength, HCoilSchedName ),
+			HCoilSchedName( HCoilSchedName ),
 			HCoilSchedPtr( HCoilSchedPtr ),
 			HCoilSchedValue( HCoilSchedValue ),
 			MaxVolHotWaterFlow( MaxVolHotWaterFlow ),
@@ -409,14 +391,14 @@ namespace UnitVentilator {
 			HWBranchNum( HWBranchNum ),
 			HWCompNum( HWCompNum ),
 			CCoilPresent( CCoilPresent ),
-			CCoilName( MaxNameLength, CCoilName ),
-			CCoilTypeCh( MaxNameLength, CCoilTypeCh ),
+			CCoilName( CCoilName ),
+			CCoilTypeCh( CCoilTypeCh ),
 			CCoil_Index( CCoil_Index ),
-			CCoilPlantName( MaxNameLength, CCoilPlantName ),
-			CCoilPlantType( MaxNameLength, CCoilPlantType ),
+			CCoilPlantName( CCoilPlantName ),
+			CCoilPlantType( CCoilPlantType ),
 			CCoil_PlantTypeNum( CCoil_PlantTypeNum ),
 			CCoilType( CCoilType ),
-			CCoilSchedName( MaxNameLength, CCoilSchedName ),
+			CCoilSchedName( CCoilSchedName ),
 			CCoilSchedPtr( CCoilSchedPtr ),
 			CCoilSchedValue( CCoilSchedValue ),
 			MaxVolColdWaterFlow( MaxVolColdWaterFlow ),
@@ -438,7 +420,7 @@ namespace UnitVentilator {
 			SensCoolEnergy( SensCoolEnergy ),
 			ElecPower( ElecPower ),
 			ElecEnergy( ElecEnergy ),
-			AvailManagerListName( MaxNameLength, AvailManagerListName ),
+			AvailManagerListName( AvailManagerListName ),
 			AvailStatus( AvailStatus ),
 			FanPartLoadRatio( FanPartLoadRatio ),
 			PartLoadFrac( PartLoadFrac )
@@ -453,7 +435,7 @@ namespace UnitVentilator {
 
 	void
 	SimUnitVentilator(
-		Fstring const & CompName, // name of the fan coil unit
+		std::string const & CompName, // name of the fan coil unit
 		int const ZoneNum, // number of zone being served
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		Real64 & PowerMet, // Sensible power supplied (W)

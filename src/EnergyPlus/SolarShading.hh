@@ -6,7 +6,6 @@
 #include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/FArray2D.hh>
 #include <ObjexxFCL/FArray3D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -43,7 +42,7 @@ namespace SolarShading {
 	extern int const PartialOverlap;
 	extern int const TooManyVertices;
 	extern int const TooManyFigures;
-	extern FArray1D_Fstring const cOverLapStatus;
+	extern FArray1D_string const cOverLapStatus;
 
 	// DERIVED TYPE DEFINITIONS:
 	// INTERFACE BLOCK SPECIFICATIONS:

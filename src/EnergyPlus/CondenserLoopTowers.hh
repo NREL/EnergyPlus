@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -16,7 +15,6 @@ namespace EnergyPlus {
 namespace CondenserLoopTowers {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
@@ -35,10 +33,10 @@ namespace CondenserLoopTowers {
 	extern int const BlowdownByConcentration;
 	extern int const BlowdownBySchedule;
 
-	extern Fstring const cCoolingTower_SingleSpeed;
-	extern Fstring const cCoolingTower_TwoSpeed;
-	extern Fstring const cCoolingTower_VariableSpeed;
-	extern Fstring const cCoolingTower_VariableSpeedMerkel;
+	extern std::string const cCoolingTower_SingleSpeed;
+	extern std::string const cCoolingTower_TwoSpeed;
+	extern std::string const cCoolingTower_VariableSpeed;
+	extern std::string const cCoolingTower_VariableSpeedMerkel;
 
 	extern int const PIM_NominalCapacity;
 	extern int const PIM_UFactor;
@@ -96,12 +94,12 @@ namespace CondenserLoopTowers {
 	struct Towerspecs
 	{
 		// Members
-		Fstring Name; // User identifier
-		Fstring TowerType; // Type of cooling tower
+		std::string Name; // User identifier
+		std::string TowerType; // Type of cooling tower
 		int TowerType_Num;
 		int PerformanceInputMethod_Num; // Method of entering tower performance: UA and Design Water
 		//  Flow Rate, or Nominal Capacity
-		Fstring ModelCoeffObjectName; // Cooling Tower:Variable Speed Model Coefficient Object name
+		std::string ModelCoeffObjectName; // Cooling Tower:Variable Speed Model Coefficient Object name
 		bool Available; // need an array of logicals--load identifiers of available equipment
 		bool ON; // Simulate the machine at it's operating part load ratio
 		Real64 DesignWaterFlowRate; // Design water flow rate through the tower [m3/s]
@@ -179,7 +177,7 @@ namespace CondenserLoopTowers {
 		//  through the tower sump
 		//multi cell tower
 		int NumCell; // Number of cells in the cooling tower
-		Fstring CellCtrl; // Cell control type : either MaxCell or MinCell
+		std::string CellCtrl; // Cell control type : either MaxCell or MinCell
 		int CellCtrl_Num;
 		int NumCellOn; // number of cells working
 		Real64 MinFracFlowRate; // Minimal fraction of design flow/cell allowable
@@ -210,11 +208,8 @@ namespace CondenserLoopTowers {
 
 		// Default Constructor
 		Towerspecs() :
-			Name( MaxNameLength ),
-			TowerType( MaxNameLength ),
 			TowerType_Num( 0 ),
 			PerformanceInputMethod_Num( 0 ),
-			ModelCoeffObjectName( MaxNameLength ),
 			Available( true ),
 			ON( true ),
 			DesignWaterFlowRate( 0.0 ),
@@ -279,7 +274,6 @@ namespace CondenserLoopTowers {
 			CapacityControl( 0 ),
 			BypassFraction( 0.0 ),
 			NumCell( 0 ),
-			CellCtrl( 15 ),
 			CellCtrl_Num( 0 ),
 			NumCellOn( 0 ),
 			MinFracFlowRate( 0.0 ),
@@ -307,11 +301,11 @@ namespace CondenserLoopTowers {
 
 		// Member Constructor
 		Towerspecs(
-			Fstring const & Name, // User identifier
-			Fstring const & TowerType, // Type of cooling tower
+			std::string const & Name, // User identifier
+			std::string const & TowerType, // Type of cooling tower
 			int const TowerType_Num,
 			int const PerformanceInputMethod_Num, // Method of entering tower performance: UA and Design Water
-			Fstring const & ModelCoeffObjectName, // Cooling Tower:Variable Speed Model Coefficient Object name
+			std::string const & ModelCoeffObjectName, // Cooling Tower:Variable Speed Model Coefficient Object name
 			bool const Available, // need an array of logicals--load identifiers of available equipment
 			bool const ON, // Simulate the machine at it's operating part load ratio
 			Real64 const DesignWaterFlowRate, // Design water flow rate through the tower [m3/s]
@@ -376,7 +370,7 @@ namespace CondenserLoopTowers {
 			int const CapacityControl, // Type of capacity control for single speed cooling tower:
 			Real64 const BypassFraction, // Fraction of fluid bypass as a ratio of total fluid flow
 			int const NumCell, // Number of cells in the cooling tower
-			Fstring const & CellCtrl, // Cell control type : either MaxCell or MinCell
+			std::string const & CellCtrl, // Cell control type : either MaxCell or MinCell
 			int const CellCtrl_Num,
 			int const NumCellOn, // number of cells working
 			Real64 const MinFracFlowRate, // Minimal fraction of design flow/cell allowable
@@ -401,11 +395,11 @@ namespace CondenserLoopTowers {
 			int const VSMerkelAFRErrorIter, // error counter for regula falsi failed with max iterations, vs merkel model
 			int const VSMerkelAFRErrorFail // error counter for regula falsi failed with limits exceeded, vs merkel model
 		) :
-			Name( MaxNameLength, Name ),
-			TowerType( MaxNameLength, TowerType ),
+			Name( Name ),
+			TowerType( TowerType ),
 			TowerType_Num( TowerType_Num ),
 			PerformanceInputMethod_Num( PerformanceInputMethod_Num ),
-			ModelCoeffObjectName( MaxNameLength, ModelCoeffObjectName ),
+			ModelCoeffObjectName( ModelCoeffObjectName ),
 			Available( Available ),
 			ON( ON ),
 			DesignWaterFlowRate( DesignWaterFlowRate ),
@@ -470,7 +464,7 @@ namespace CondenserLoopTowers {
 			CapacityControl( CapacityControl ),
 			BypassFraction( BypassFraction ),
 			NumCell( NumCell ),
-			CellCtrl( 15, CellCtrl ),
+			CellCtrl( CellCtrl ),
 			CellCtrl_Num( CellCtrl_Num ),
 			NumCellOn( NumCellOn ),
 			MinFracFlowRate( MinFracFlowRate ),
@@ -679,25 +673,25 @@ namespace CondenserLoopTowers {
 		int ErrIndexTA; // - index to recurring error structure for tower approach
 		int ErrIndexLG; // - index to recurring error structure for tower liquid/gas ratio
 		//- Tr = Range temperature
-		Fstring TrBuffer1; // - buffer to print Tr warning messages on following time step
-		Fstring TrBuffer2; // - buffer to print Tr warning messages on following time step
-		Fstring TrBuffer3; // - buffer to print Tr warning messages on following time step
+		std::string TrBuffer1; // - buffer to print Tr warning messages on following time step
+		std::string TrBuffer2; // - buffer to print Tr warning messages on following time step
+		std::string TrBuffer3; // - buffer to print Tr warning messages on following time step
 		//- Twb = Wet-bulb temperature
-		Fstring TwbBuffer1; // - buffer to print Twb warning messages on following time step
-		Fstring TwbBuffer2; // - buffer to print Twb warning messages on following time step
-		Fstring TwbBuffer3; // - buffer to print Twb warning messages on following time step
+		std::string TwbBuffer1; // - buffer to print Twb warning messages on following time step
+		std::string TwbBuffer2; // - buffer to print Twb warning messages on following time step
+		std::string TwbBuffer3; // - buffer to print Twb warning messages on following time step
 		//- Ta = Approach temperature
-		Fstring TaBuffer1; // - buffer to print Ta warning messages on following time step
-		Fstring TaBuffer2; // - buffer to print Ta warning messages on following time step
-		Fstring TaBuffer3; // - buffer to print Ta warning messages on following time step
+		std::string TaBuffer1; // - buffer to print Ta warning messages on following time step
+		std::string TaBuffer2; // - buffer to print Ta warning messages on following time step
+		std::string TaBuffer3; // - buffer to print Ta warning messages on following time step
 		//- WFRR = Water flow rate ratio
-		Fstring WFRRBuffer1; // - buffer to print WFRR warning messages on following time step
-		Fstring WFRRBuffer2; // - buffer to print WFRR warning messages on following time step
-		Fstring WFRRBuffer3; // - buffer to print WFRR warning messages on following time step
+		std::string WFRRBuffer1; // - buffer to print WFRR warning messages on following time step
+		std::string WFRRBuffer2; // - buffer to print WFRR warning messages on following time step
+		std::string WFRRBuffer3; // - buffer to print WFRR warning messages on following time step
 		//- LG = Liquid to gas ratio
-		Fstring LGBuffer1; // - buffer to print LG warning messages on following time step
-		Fstring LGBuffer2; // - buffer to print LG warning messages on following time step
-		Fstring LGBuffer3; // - buffer to print LG warning messages on following time step
+		std::string LGBuffer1; // - buffer to print LG warning messages on following time step
+		std::string LGBuffer2; // - buffer to print LG warning messages on following time step
+		std::string LGBuffer3; // - buffer to print LG warning messages on following time step
 		bool PrintTrMessage; // - flag to print Tr error message
 		bool PrintTwbMessage; // - flag to print Twb error message
 		bool PrintTaMessage; // - flag to print Ta error message
@@ -732,21 +726,6 @@ namespace CondenserLoopTowers {
 			ErrIndexTR( 0 ),
 			ErrIndexTA( 0 ),
 			ErrIndexLG( 0 ),
-			TrBuffer1( 220 ),
-			TrBuffer2( 300 ),
-			TrBuffer3( 80 ),
-			TwbBuffer1( 220 ),
-			TwbBuffer2( 300 ),
-			TwbBuffer3( 80 ),
-			TaBuffer1( 220 ),
-			TaBuffer2( 300 ),
-			TaBuffer3( 80 ),
-			WFRRBuffer1( 220 ),
-			WFRRBuffer2( 300 ),
-			WFRRBuffer3( 80 ),
-			LGBuffer1( 220 ),
-			LGBuffer2( 300 ),
-			LGBuffer3( 80 ),
 			PrintTrMessage( false ),
 			PrintTwbMessage( false ),
 			PrintTaMessage( false ),
@@ -783,21 +762,21 @@ namespace CondenserLoopTowers {
 			int const ErrIndexTR, // - index to recurring error structure for tower range
 			int const ErrIndexTA, // - index to recurring error structure for tower approach
 			int const ErrIndexLG, // - index to recurring error structure for tower liquid/gas ratio
-			Fstring const & TrBuffer1, // - buffer to print Tr warning messages on following time step
-			Fstring const & TrBuffer2, // - buffer to print Tr warning messages on following time step
-			Fstring const & TrBuffer3, // - buffer to print Tr warning messages on following time step
-			Fstring const & TwbBuffer1, // - buffer to print Twb warning messages on following time step
-			Fstring const & TwbBuffer2, // - buffer to print Twb warning messages on following time step
-			Fstring const & TwbBuffer3, // - buffer to print Twb warning messages on following time step
-			Fstring const & TaBuffer1, // - buffer to print Ta warning messages on following time step
-			Fstring const & TaBuffer2, // - buffer to print Ta warning messages on following time step
-			Fstring const & TaBuffer3, // - buffer to print Ta warning messages on following time step
-			Fstring const & WFRRBuffer1, // - buffer to print WFRR warning messages on following time step
-			Fstring const & WFRRBuffer2, // - buffer to print WFRR warning messages on following time step
-			Fstring const & WFRRBuffer3, // - buffer to print WFRR warning messages on following time step
-			Fstring const & LGBuffer1, // - buffer to print LG warning messages on following time step
-			Fstring const & LGBuffer2, // - buffer to print LG warning messages on following time step
-			Fstring const & LGBuffer3, // - buffer to print LG warning messages on following time step
+			std::string const & TrBuffer1, // - buffer to print Tr warning messages on following time step
+			std::string const & TrBuffer2, // - buffer to print Tr warning messages on following time step
+			std::string const & TrBuffer3, // - buffer to print Tr warning messages on following time step
+			std::string const & TwbBuffer1, // - buffer to print Twb warning messages on following time step
+			std::string const & TwbBuffer2, // - buffer to print Twb warning messages on following time step
+			std::string const & TwbBuffer3, // - buffer to print Twb warning messages on following time step
+			std::string const & TaBuffer1, // - buffer to print Ta warning messages on following time step
+			std::string const & TaBuffer2, // - buffer to print Ta warning messages on following time step
+			std::string const & TaBuffer3, // - buffer to print Ta warning messages on following time step
+			std::string const & WFRRBuffer1, // - buffer to print WFRR warning messages on following time step
+			std::string const & WFRRBuffer2, // - buffer to print WFRR warning messages on following time step
+			std::string const & WFRRBuffer3, // - buffer to print WFRR warning messages on following time step
+			std::string const & LGBuffer1, // - buffer to print LG warning messages on following time step
+			std::string const & LGBuffer2, // - buffer to print LG warning messages on following time step
+			std::string const & LGBuffer3, // - buffer to print LG warning messages on following time step
 			bool const PrintTrMessage, // - flag to print Tr error message
 			bool const PrintTwbMessage, // - flag to print Twb error message
 			bool const PrintTaMessage, // - flag to print Ta error message
@@ -831,21 +810,21 @@ namespace CondenserLoopTowers {
 			ErrIndexTR( ErrIndexTR ),
 			ErrIndexTA( ErrIndexTA ),
 			ErrIndexLG( ErrIndexLG ),
-			TrBuffer1( 220, TrBuffer1 ),
-			TrBuffer2( 300, TrBuffer2 ),
-			TrBuffer3( 80, TrBuffer3 ),
-			TwbBuffer1( 220, TwbBuffer1 ),
-			TwbBuffer2( 300, TwbBuffer2 ),
-			TwbBuffer3( 80, TwbBuffer3 ),
-			TaBuffer1( 220, TaBuffer1 ),
-			TaBuffer2( 300, TaBuffer2 ),
-			TaBuffer3( 80, TaBuffer3 ),
-			WFRRBuffer1( 220, WFRRBuffer1 ),
-			WFRRBuffer2( 300, WFRRBuffer2 ),
-			WFRRBuffer3( 80, WFRRBuffer3 ),
-			LGBuffer1( 220, LGBuffer1 ),
-			LGBuffer2( 300, LGBuffer2 ),
-			LGBuffer3( 80, LGBuffer3 ),
+			TrBuffer1( TrBuffer1 ),
+			TrBuffer2( TrBuffer2 ),
+			TrBuffer3( TrBuffer3 ),
+			TwbBuffer1( TwbBuffer1 ),
+			TwbBuffer2( TwbBuffer2 ),
+			TwbBuffer3( TwbBuffer3 ),
+			TaBuffer1( TaBuffer1 ),
+			TaBuffer2( TaBuffer2 ),
+			TaBuffer3( TaBuffer3 ),
+			WFRRBuffer1( WFRRBuffer1 ),
+			WFRRBuffer2( WFRRBuffer2 ),
+			WFRRBuffer3( WFRRBuffer3 ),
+			LGBuffer1( LGBuffer1 ),
+			LGBuffer2( LGBuffer2 ),
+			LGBuffer3( LGBuffer3 ),
 			PrintTrMessage( PrintTrMessage ),
 			PrintTwbMessage( PrintTwbMessage ),
 			PrintTaMessage( PrintTaMessage ),
@@ -870,8 +849,8 @@ namespace CondenserLoopTowers {
 
 	void
 	SimTowers(
-		Fstring const & TowerType,
-		Fstring const & TowerName,
+		std::string const & TowerType,
+		std::string const & TowerName,
 		int & CompIndex,
 		bool & RunFlag,
 		bool const InitLoopEquip,

@@ -71,7 +71,6 @@ namespace UnitHeater {
 	using namespace DataLoopNode;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::BeginDayFlag;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::ScheduleAlwaysOn;
@@ -93,13 +92,13 @@ namespace UnitHeater {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	Fstring const cMO_UnitHeater( "ZoneHVAC:UnitHeater" );
+	std::string const cMO_UnitHeater( "ZoneHVAC:UnitHeater" );
 
 	// Character parameters for outside air control types:
-	Fstring const ElectricCoil( "ElectricCoil" );
-	Fstring const GasCoil( "GasCoil" );
-	Fstring const WaterCoil( "WaterCoil" );
-	Fstring const SteamCoil( "SteamCoil" );
+	std::string const ElectricCoil( "ElectricCoil" );
+	std::string const GasCoil( "GasCoil" );
+	std::string const WaterCoil( "WaterCoil" );
+	std::string const SteamCoil( "SteamCoil" );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -119,7 +118,7 @@ namespace UnitHeater {
 
 	void
 	SimUnitHeater(
-		Fstring const & CompName, // name of the fan coil unit
+		std::string const & CompName, // name of the fan coil unit
 		int const ZoneNum, // number of zone being served
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		Real64 & PowerMet, // Sensible power supplied (W)
@@ -174,17 +173,17 @@ namespace UnitHeater {
 		if ( CompIndex == 0 ) {
 			UnitHeatNum = FindItemInList( CompName, UnitHeat.Name(), NumOfUnitHeats );
 			if ( UnitHeatNum == 0 ) {
-				ShowFatalError( "SimUnitHeater: Unit not found=" + trim( CompName ) );
+				ShowFatalError( "SimUnitHeater: Unit not found=" + CompName );
 			}
 			CompIndex = UnitHeatNum;
 		} else {
 			UnitHeatNum = CompIndex;
 			if ( UnitHeatNum > NumOfUnitHeats || UnitHeatNum < 1 ) {
-				ShowFatalError( "SimUnitHeater:  Invalid CompIndex passed=" + trim( TrimSigDigits( UnitHeatNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumOfUnitHeats ) ) + ", Entered Unit name=" + trim( CompName ) );
+				ShowFatalError( "SimUnitHeater:  Invalid CompIndex passed=" + TrimSigDigits( UnitHeatNum ) + ", Number of Units=" + TrimSigDigits( NumOfUnitHeats ) + ", Entered Unit name=" + CompName );
 			}
 			if ( CheckEquipName( UnitHeatNum ) ) {
 				if ( CompName != UnitHeat( UnitHeatNum ).Name ) {
-					ShowFatalError( "SimUnitHeater: Invalid CompIndex passed=" + trim( TrimSigDigits( UnitHeatNum ) ) + ", Unit name=" + trim( CompName ) + ", stored Unit Name for that index=" + trim( UnitHeat( UnitHeatNum ).Name ) );
+					ShowFatalError( "SimUnitHeater: Invalid CompIndex passed=" + TrimSigDigits( UnitHeatNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + UnitHeat( UnitHeatNum ).Name );
 				}
 				CheckEquipName( UnitHeatNum ) = false;
 			}
@@ -276,13 +275,13 @@ namespace UnitHeater {
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int NumFields; // Total number of fields in object
 		int UnitHeatNum; // Item to be "gotten"
-		static Fstring const RoutineName( "GetUnitHeaterInput: " ); // include trailing blank space
+		static std::string const RoutineName( "GetUnitHeaterInput: " ); // include trailing blank space
 		Real64 FanVolFlow; // Fan volumetric flow rate
-		Fstring CurrentModuleObject( MaxNameLength );
-		FArray1D_Fstring Alphas( sFstring( MaxNameLength ) ); // Alpha items for object
+		std::string CurrentModuleObject;
+		FArray1D_string Alphas; // Alpha items for object
 		FArray1D< Real64 > Numbers; // Numeric items for object
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) ); // Numeric field names
+		FArray1D_string cAlphaFields; // Alpha field names
+		FArray1D_string cNumericFields; // Numeric field names
 		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		int CtrlZone; // index to loop counter
@@ -297,13 +296,13 @@ namespace UnitHeater {
 		GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
-		Alphas = " ";
+		Alphas = "";
 		Numbers.allocate( NumNumbers );
 		Numbers = 0.0;
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = " ";
+		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = " ";
+		cNumericFields = "";
 		lAlphaBlanks.allocate( NumAlphas );
 		lAlphaBlanks = true;
 		lNumericBlanks.allocate( NumNumbers );
@@ -322,7 +321,7 @@ namespace UnitHeater {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), UnitHeat.Name(), UnitHeatNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), UnitHeat.Name(), UnitHeatNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -335,15 +334,15 @@ namespace UnitHeater {
 			} else {
 				UnitHeat( UnitHeatNum ).SchedPtr = GetScheduleIndex( Alphas( 2 ) ); // convert schedule name to pointer
 				if ( UnitHeat( UnitHeatNum ).SchedPtr == 0 ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + ": invalid " + trim( cAlphaFields( 2 ) ) + " entered =" + trim( Alphas( 2 ) ) + " for " + trim( cAlphaFields( 1 ) ) + "=" + trim( Alphas( 1 ) ) );
+					ShowSevereError( RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields( 2 ) + " entered =" + Alphas( 2 ) + " for " + cAlphaFields( 1 ) + '=' + Alphas( 1 ) );
 					ErrorsFound = true;
 				}
 			}
 
 			// Main air nodes (except outside air node):
-			UnitHeat( UnitHeatNum ).AirInNode = GetOnlySingleNode( Alphas( 3 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
+			UnitHeat( UnitHeatNum ).AirInNode = GetOnlySingleNode( Alphas( 3 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
 
-			UnitHeat( UnitHeatNum ).AirOutNode = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
+			UnitHeat( UnitHeatNum ).AirOutNode = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 
 			// Fan information:
 			UnitHeat( UnitHeatNum ).FanType = Alphas( 5 );
@@ -351,9 +350,9 @@ namespace UnitHeater {
 			UnitHeat( UnitHeatNum ).MaxAirVolFlow = Numbers( 1 );
 
 			errFlag = false;
-			ValidateComponent( UnitHeat( UnitHeatNum ).FanType, UnitHeat( UnitHeatNum ).FanName, errFlag, trim( CurrentModuleObject ) );
+			ValidateComponent( UnitHeat( UnitHeatNum ).FanType, UnitHeat( UnitHeatNum ).FanName, errFlag, CurrentModuleObject );
 			if ( errFlag ) {
-				ShowContinueError( "specified in " + trim( CurrentModuleObject ) + " = \"" + trim( UnitHeat( UnitHeatNum ).Name ) + "\"." );
+				ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + UnitHeat( UnitHeatNum ).Name + "\"." );
 				ErrorsFound = true;
 			} else {
 				GetFanType( UnitHeat( UnitHeatNum ).FanName, UnitHeat( UnitHeatNum ).FanType_Num, errFlag, CurrentModuleObject, UnitHeat( UnitHeatNum ).Name );
@@ -363,31 +362,31 @@ namespace UnitHeater {
 					// Get fan outlet node
 					UnitHeat( UnitHeatNum ).FanOutletNode = GetFanOutletNode( UnitHeat( UnitHeatNum ).FanType, UnitHeat( UnitHeatNum ).FanName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "specified in " + trim( CurrentModuleObject ) + " = \"" + trim( UnitHeat( UnitHeatNum ).Name ) + "\"." );
+						ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + UnitHeat( UnitHeatNum ).Name + "\"." );
 						ErrorsFound = true;
 					}
 				} else {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + " = \"" + trim( Alphas( 1 ) ) + "\"" );
+					ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + Alphas( 1 ) + "\"" );
 					ShowContinueError( "Fan Type must be Fan:ConstantVolume or Fan:VariableVolume" );
 					ErrorsFound = true;
 				}}
-				GetFanIndex( UnitHeat( UnitHeatNum ).FanName, UnitHeat( UnitHeatNum ).Fan_Index, errFlag, trim( CurrentModuleObject ) );
+				GetFanIndex( UnitHeat( UnitHeatNum ).FanName, UnitHeat( UnitHeatNum ).Fan_Index, errFlag, CurrentModuleObject );
 				if ( errFlag ) {
 					ErrorsFound = true;
 				} else {
 					GetFanVolFlow( UnitHeat( UnitHeatNum ).Fan_Index, FanVolFlow );
 
 					if ( FanVolFlow != AutoSize && UnitHeat( UnitHeatNum ).MaxAirVolFlow != AutoSize && FanVolFlow < UnitHeat( UnitHeatNum ).MaxAirVolFlow ) {
-						ShowSevereError( "Specified in " + trim( CurrentModuleObject ) + " = " + trim( UnitHeat( UnitHeatNum ).Name ) );
-						ShowContinueError( "...air flow rate (" + trim( TrimSigDigits( FanVolFlow, 7 ) ) + ") in" " fan object " + trim( UnitHeat( UnitHeatNum ).FanName ) + " is less than the unit heater maximum supply air" " flow rate (" + trim( TrimSigDigits( UnitHeat( UnitHeatNum ).MaxAirVolFlow, 7 ) ) + ")." );
+						ShowSevereError( "Specified in " + CurrentModuleObject + " = " + UnitHeat( UnitHeatNum ).Name );
+						ShowContinueError( "...air flow rate (" + TrimSigDigits( FanVolFlow, 7 ) + ") in" " fan object " + UnitHeat( UnitHeatNum ).FanName + " is less than the unit heater maximum supply air" " flow rate (" + TrimSigDigits( UnitHeat( UnitHeatNum ).MaxAirVolFlow, 7 ) + ")." );
 						ShowContinueError( "...the fan flow rate must be greater than or equal to the unit heater maximum" " supply air flow rate." );
 						ErrorsFound = true;
 					} else if ( FanVolFlow == AutoSize && UnitHeat( UnitHeatNum ).MaxAirVolFlow != AutoSize ) {
-						ShowWarningError( "Specified in " + trim( CurrentModuleObject ) + " = " + trim( UnitHeat( UnitHeatNum ).Name ) );
+						ShowWarningError( "Specified in " + CurrentModuleObject + " = " + UnitHeat( UnitHeatNum ).Name );
 						ShowContinueError( "...the fan flow rate is autosized while the unit heater flow rate is not." );
 						ShowContinueError( "...this can lead to unexpected results where the fan flow rate is less than required." );
 					} else if ( FanVolFlow != AutoSize && UnitHeat( UnitHeatNum ).MaxAirVolFlow == AutoSize ) {
-						ShowWarningError( "Specified in " + trim( CurrentModuleObject ) + " = " + trim( UnitHeat( UnitHeatNum ).Name ) );
+						ShowWarningError( "Specified in " + CurrentModuleObject + " = " + UnitHeat( UnitHeatNum ).Name );
 						ShowContinueError( "...the unit heater flow rate is autosized while the fan flow rate is not." );
 						ShowContinueError( "...this can lead to unexpected results where the fan flow rate is less than required." );
 					}
@@ -408,17 +407,17 @@ namespace UnitHeater {
 			} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
 				UnitHeat( UnitHeatNum ).HCoilType = GasCoil;
 			} else {
-				ShowSevereError( "Illegal " + trim( cAlphaFields( 7 ) ) + " = " + trim( Alphas( 7 ) ) );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + "=" + trim( UnitHeat( UnitHeatNum ).Name ) );
+				ShowSevereError( "Illegal " + cAlphaFields( 7 ) + " = " + Alphas( 7 ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + '=' + UnitHeat( UnitHeatNum ).Name );
 				ErrorsFound = true;
 				errFlag = true;
 			}}
 			if ( ! errFlag ) {
 				UnitHeat( UnitHeatNum ).HCoilTypeCh = Alphas( 7 );
 				UnitHeat( UnitHeatNum ).HCoilName = Alphas( 8 );
-				ValidateComponent( Alphas( 7 ), UnitHeat( UnitHeatNum ).HCoilName, IsNotOK, trim( CurrentModuleObject ) );
+				ValidateComponent( Alphas( 7 ), UnitHeat( UnitHeatNum ).HCoilName, IsNotOK, CurrentModuleObject );
 				if ( IsNotOK ) {
-					ShowContinueError( "specified in " + trim( CurrentModuleObject ) + " = \"" + trim( UnitHeat( UnitHeatNum ).Name ) + "\"" );
+					ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + UnitHeat( UnitHeatNum ).Name + "\"" );
 					ErrorsFound = true;
 				} else {
 					// The heating coil control node is necessary for hot water and steam coils, but not necessary for an
@@ -434,7 +433,7 @@ namespace UnitHeater {
 						}
 						// Other error checks should trap before it gets to this point in the code, but including just in case.
 						if ( errFlag ) {
-							ShowContinueError( "that was specified in " + trim( CurrentModuleObject ) + " = \"" + trim( UnitHeat( UnitHeatNum ).Name ) + "\"" );
+							ShowContinueError( "that was specified in " + CurrentModuleObject + " = \"" + UnitHeat( UnitHeatNum ).Name + "\"" );
 							ErrorsFound = true;
 						}
 					}
@@ -444,7 +443,7 @@ namespace UnitHeater {
 			UnitHeat( UnitHeatNum ).FanSchedPtr = GetScheduleIndex( Alphas( 9 ) );
 			// Default to cycling fan when fan operating mode schedule is not present
 			if ( ! lAlphaBlanks( 9 ) && UnitHeat( UnitHeatNum ).FanSchedPtr == 0 ) {
-				ShowSevereError( trim( CurrentModuleObject ) + " \"" + trim( UnitHeat( UnitHeatNum ).Name ) + "\" " + trim( cAlphaFields( 9 ) ) + " not found: " + trim( Alphas( 9 ) ) );
+				ShowSevereError( CurrentModuleObject + " \"" + UnitHeat( UnitHeatNum ).Name + "\" " + cAlphaFields( 9 ) + " not found: " + Alphas( 9 ) );
 				ErrorsFound = true;
 			} else if ( lAlphaBlanks( 9 ) ) {
 				if ( UnitHeat( UnitHeatNum ).FanType_Num == FanType_SimpleOnOff ) {
@@ -457,10 +456,10 @@ namespace UnitHeater {
 			// Check fan's schedule for cycling fan operation if constant volume fan is used
 			if ( UnitHeat( UnitHeatNum ).FanSchedPtr > 0 && UnitHeat( UnitHeatNum ).FanType_Num == FanType_SimpleConstVolume ) {
 				if ( ! CheckScheduleValueMinMax( UnitHeat( UnitHeatNum ).FanSchedPtr, ">", 0.0, "<=", 1.0 ) ) {
-					ShowSevereError( trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
-					ShowContinueError( "For " + trim( cAlphaFields( 5 ) ) + " = " + trim( Alphas( 5 ) ) );
+					ShowSevereError( CurrentModuleObject + " = " + Alphas( 1 ) );
+					ShowContinueError( "For " + cAlphaFields( 5 ) + " = " + Alphas( 5 ) );
 					ShowContinueError( "Fan operating mode must be continuous (fan operating mode schedule values > 0)." );
-					ShowContinueError( "Error found in " + trim( cAlphaFields( 9 ) ) + " = " + trim( Alphas( 9 ) ) );
+					ShowContinueError( "Error found in " + cAlphaFields( 9 ) + " = " + Alphas( 9 ) );
 					ShowContinueError( "...schedule values must be (>0., <=1.)" );
 					ErrorsFound = true;
 				}
@@ -469,8 +468,8 @@ namespace UnitHeater {
 			UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating = Alphas( 10 );
 			if ( ( ! SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "Yes" ) ) && ( ! SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "No" ) ) ) {
 				ErrorsFound = true;
-				ShowSevereError( "Illegal " + trim( cAlphaFields( 10 ) ) + " = " + trim( Alphas( 10 ) ) );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + "=" + trim( UnitHeat( UnitHeatNum ).Name ) );
+				ShowSevereError( "Illegal " + cAlphaFields( 10 ) + " = " + Alphas( 10 ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + '=' + UnitHeat( UnitHeatNum ).Name );
 			} else if ( SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "No" ) ) {
 				UnitHeat( UnitHeatNum ).FanOffNoHeating = true;
 			}
@@ -503,9 +502,9 @@ namespace UnitHeater {
 				}
 			}
 			if ( ZoneNodeNotFound ) {
-				ShowSevereError( trim( CurrentModuleObject ) + " = \"" + trim( UnitHeat( UnitHeatNum ).Name ) + "\"." " Unit heater air inlet node name must be the same as a zone exhaust node name." );
+				ShowSevereError( CurrentModuleObject + " = \"" + UnitHeat( UnitHeatNum ).Name + "\"." " Unit heater air inlet node name must be the same as a zone exhaust node name." );
 				ShowContinueError( "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object." );
-				ShowContinueError( "..Unit heater air inlet node name = " + trim( NodeID( UnitHeat( UnitHeatNum ).AirInNode ) ) );
+				ShowContinueError( "..Unit heater air inlet node name = " + NodeID( UnitHeat( UnitHeatNum ).AirInNode ) );
 				ErrorsFound = true;
 			}
 			// check that unit heater air outlet node is a zone inlet node.
@@ -520,17 +519,17 @@ namespace UnitHeater {
 				}
 			}
 			if ( ZoneNodeNotFound ) {
-				ShowSevereError( trim( CurrentModuleObject ) + " = \"" + trim( UnitHeat( UnitHeatNum ).Name ) + "\"." " Unit heater air outlet node name must be the same as a zone inlet node name." );
+				ShowSevereError( CurrentModuleObject + " = \"" + UnitHeat( UnitHeatNum ).Name + "\"." " Unit heater air outlet node name must be the same as a zone inlet node name." );
 				ShowContinueError( "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object." );
-				ShowContinueError( "..Unit heater air outlet node name = " + trim( NodeID( UnitHeat( UnitHeatNum ).AirOutNode ) ) );
+				ShowContinueError( "..Unit heater air outlet node name = " + NodeID( UnitHeat( UnitHeatNum ).AirOutNode ) );
 				ErrorsFound = true;
 			}
 
 			// Add fan to component sets array
-			SetUpCompSets( trim( CurrentModuleObject ), UnitHeat( UnitHeatNum ).Name, UnitHeat( UnitHeatNum ).FanType, UnitHeat( UnitHeatNum ).FanName, NodeID( UnitHeat( UnitHeatNum ).AirInNode ), NodeID( UnitHeat( UnitHeatNum ).FanOutletNode ) );
+			SetUpCompSets( CurrentModuleObject, UnitHeat( UnitHeatNum ).Name, UnitHeat( UnitHeatNum ).FanType, UnitHeat( UnitHeatNum ).FanName, NodeID( UnitHeat( UnitHeatNum ).AirInNode ), NodeID( UnitHeat( UnitHeatNum ).FanOutletNode ) );
 
 			// Add heating coil to component sets array
-			SetUpCompSets( trim( CurrentModuleObject ), UnitHeat( UnitHeatNum ).Name, UnitHeat( UnitHeatNum ).HCoilTypeCh, UnitHeat( UnitHeatNum ).HCoilName, NodeID( UnitHeat( UnitHeatNum ).FanOutletNode ), NodeID( UnitHeat( UnitHeatNum ).AirOutNode ) );
+			SetUpCompSets( CurrentModuleObject, UnitHeat( UnitHeatNum ).Name, UnitHeat( UnitHeatNum ).HCoilTypeCh, UnitHeat( UnitHeatNum ).HCoilName, NodeID( UnitHeat( UnitHeatNum ).FanOutletNode ), NodeID( UnitHeat( UnitHeatNum ).AirOutNode ) );
 
 		} // ...loop over all of the unit heaters found in the input file
 
@@ -655,7 +654,7 @@ namespace UnitHeater {
 				errFlag = false;
 				ScanPlantLoopsForObject( UnitHeat( UnitHeatNum ).HCoilName, UnitHeat( UnitHeatNum ).HCoil_PlantTypeNum, UnitHeat( UnitHeatNum ).HWLoopNum, UnitHeat( UnitHeatNum ).HWLoopSide, UnitHeat( UnitHeatNum ).HWBranchNum, UnitHeat( UnitHeatNum ).HWCompNum, _, _, _, _, _, errFlag );
 				if ( errFlag ) {
-					ShowContinueError( "Reference Unit=\"" + trim( UnitHeat( UnitHeatNum ).Name ) + "\", type=ZoneHVAC:UnitHeater" );
+					ShowContinueError( "Reference Unit=\"" + UnitHeat( UnitHeatNum ).Name + "\", type=ZoneHVAC:UnitHeater" );
 					ShowFatalError( "InitUnitHeater: Program terminated due to previous condition(s)." );
 				}
 
@@ -670,7 +669,7 @@ namespace UnitHeater {
 			ZoneEquipmentListChecked = true;
 			for ( Loop = 1; Loop <= NumOfUnitHeats; ++Loop ) {
 				if ( CheckZoneEquipmentList( "ZoneHVAC:UnitHeater", UnitHeat( Loop ).Name ) ) continue;
-				ShowSevereError( "InitUnitHeater: Unit=[UNIT HEATER," + trim( UnitHeat( Loop ).Name ) + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
+				ShowSevereError( "InitUnitHeater: Unit=[UNIT HEATER," + UnitHeat( Loop ).Name + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
 			}
 		}
 
@@ -880,9 +879,9 @@ namespace UnitHeater {
 						ReportSizingOutput( "ZoneHVAC:UnitHeater", UnitHeat( UnitHeatNum ).Name, "Design Size Maximum Supply Air Flow Rate [m3/s]", MaxAirVolFlowDes, "User-Specified Maximum Supply Air Flow Rate [m3/s]", MaxAirVolFlowUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( MaxAirVolFlowDes - MaxAirVolFlowUser ) / MaxAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeUnitHeater: Potential issue with equipment sizing for ZoneHVAC:UnitHeater " + trim( UnitHeat( UnitHeatNum ).Name ) );
-								ShowContinueError( "User-Specified Maximum Hot Water Flow of " + trim( RoundSigDigits( MaxAirVolFlowUser, 5 ) ) + " [m3/s]" );
-								ShowContinueError( ".differs from Design Size Maximum Hot Water Flow of " + trim( RoundSigDigits( MaxAirVolFlowDes, 5 ) ) + " [m3/s]" );
+								ShowMessage( "SizeUnitHeater: Potential issue with equipment sizing for ZoneHVAC:UnitHeater " + UnitHeat( UnitHeatNum ).Name );
+								ShowContinueError( "User-Specified Maximum Hot Water Flow of " + RoundSigDigits( MaxAirVolFlowUser, 5 ) + " [m3/s]" );
+								ShowContinueError( ".differs from Design Size Maximum Hot Water Flow of " + RoundSigDigits( MaxAirVolFlowDes, 5 ) + " [m3/s]" );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
@@ -924,7 +923,7 @@ namespace UnitHeater {
 							}
 						} else {
 							ShowSevereError( "Autosizing of water flow requires a heating loop Sizing:Plant object" );
-							ShowContinueError( "Occurs in " "ZoneHVAC:UnitHeater" " Object=" + trim( UnitHeat( UnitHeatNum ).Name ) );
+							ShowContinueError( "Occurs in " "ZoneHVAC:UnitHeater" " Object=" + UnitHeat( UnitHeatNum ).Name );
 							ErrorsFound = true;
 						}
 					}
@@ -937,9 +936,9 @@ namespace UnitHeater {
 							ReportSizingOutput( "ZoneHVAC:UnitHeater", UnitHeat( UnitHeatNum ).Name, "Design Size Maximum Hot Water Flow [m3/s]", MaxVolHotWaterFlowDes, "User-Specified Maximum Hot Water Flow [m3/s]", MaxVolHotWaterFlowUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( MaxVolHotWaterFlowDes - MaxVolHotWaterFlowUser ) / MaxVolHotWaterFlowUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeUnitHeater: Potential issue with equipment sizing for ZoneHVAC:UnitHeater " + trim( UnitHeat( UnitHeatNum ).Name ) );
-									ShowContinueError( "User-Specified Maximum Hot Water Flow of " + trim( RoundSigDigits( MaxVolHotWaterFlowUser, 5 ) ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Maximum Hot Water Flow of " + trim( RoundSigDigits( MaxVolHotWaterFlowDes, 5 ) ) + " [m3/s]" );
+									ShowMessage( "SizeUnitHeater: Potential issue with equipment sizing for ZoneHVAC:UnitHeater " + UnitHeat( UnitHeatNum ).Name );
+									ShowContinueError( "User-Specified Maximum Hot Water Flow of " + RoundSigDigits( MaxVolHotWaterFlowUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Maximum Hot Water Flow of " + RoundSigDigits( MaxVolHotWaterFlowDes, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -985,7 +984,7 @@ namespace UnitHeater {
 							}
 						} else {
 							ShowSevereError( "Autosizing of Steam flow requires a heating loop Sizing:Plant object" );
-							ShowContinueError( "Occurs in " "ZoneHVAC:UnitHeater" " Object=" + trim( UnitHeat( UnitHeatNum ).Name ) );
+							ShowContinueError( "Occurs in " "ZoneHVAC:UnitHeater" " Object=" + UnitHeat( UnitHeatNum ).Name );
 							ErrorsFound = true;
 						}
 					}
@@ -998,9 +997,9 @@ namespace UnitHeater {
 							ReportSizingOutput( "ZoneHVAC:UnitHeater", UnitHeat( UnitHeatNum ).Name, "Design Size Maximum Steam Flow [m3/s]", MaxVolHotSteamFlowDes, "User-Specified Maximum Steam Flow [m3/s]", MaxVolHotSteamFlowUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( MaxVolHotSteamFlowDes - MaxVolHotSteamFlowUser ) / MaxVolHotSteamFlowUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeUnitHeater: Potential issue with equipment sizing for ZoneHVAC:UnitHeater " + trim( UnitHeat( UnitHeatNum ).Name ) );
-									ShowContinueError( "User-Specified Maximum Steam Flow of " + trim( RoundSigDigits( MaxVolHotSteamFlowUser, 5 ) ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Maximum Steam Flow of " + trim( RoundSigDigits( MaxVolHotSteamFlowDes, 5 ) ) + " [m3/s]" );
+									ShowMessage( "SizeUnitHeater: Potential issue with equipment sizing for ZoneHVAC:UnitHeater " + UnitHeat( UnitHeatNum ).Name );
+									ShowContinueError( "User-Specified Maximum Steam Flow of " + RoundSigDigits( MaxVolHotSteamFlowUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Maximum Steam Flow of " + RoundSigDigits( MaxVolHotSteamFlowDes, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}

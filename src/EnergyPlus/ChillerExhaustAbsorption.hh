@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace ChillerExhaustAbsorption {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS:
@@ -40,7 +38,7 @@ namespace ChillerExhaustAbsorption {
 		bool InCoolingMode;
 		bool InHeatingMode;
 		// Part of Type that directly corresponds with IDD definition
-		Fstring Name; // user identifier
+		std::string Name; // user identifier
 		Real64 NomCoolingCap; // W - design nominal capacity of Absorber
 		Real64 NomHeatCoolRatio; // ratio of heating to cooling capacity
 		Real64 ThermalEnergyCoolRatio; // ratio of thermal energy input to cooling output
@@ -105,8 +103,8 @@ namespace ChillerExhaustAbsorption {
 		int CompType_Num; // Numeric designator for CompType (TypeOf)
 		int ExhTempLTAbsLeavingTempIndex; // index for exhaust potentail less than thermal energy needed during cooling
 		int ExhTempLTAbsLeavingHeatingTempIndex; // index for exhaust potentail less than thermal energy needed during heating
-		Fstring TypeOf; // Generator type
-		Fstring ExhuastSourceName; // Generator type Name
+		std::string TypeOf; // Generator type
+		std::string ExhuastSourceName; // Generator type Name
 		bool IsThisSized; // True if sizing is done
 
 		// Default Constructor
@@ -115,7 +113,6 @@ namespace ChillerExhaustAbsorption {
 			ON( false ),
 			InCoolingMode( false ),
 			InHeatingMode( false ),
-			Name( MaxNameLength ),
 			NomCoolingCap( 0.0 ),
 			NomHeatCoolRatio( 0.0 ),
 			ThermalEnergyCoolRatio( 0.0 ),
@@ -173,8 +170,6 @@ namespace ChillerExhaustAbsorption {
 			CompType_Num( 0 ),
 			ExhTempLTAbsLeavingTempIndex( 0 ),
 			ExhTempLTAbsLeavingHeatingTempIndex( 0 ),
-			TypeOf( MaxNameLength ),
-			ExhuastSourceName( MaxNameLength ),
 			IsThisSized( false )
 		{}
 
@@ -184,7 +179,7 @@ namespace ChillerExhaustAbsorption {
 			bool const ON, // simulate the machine at it's operating part load ratio
 			bool const InCoolingMode,
 			bool const InHeatingMode,
-			Fstring const & Name, // user identifier
+			std::string const & Name, // user identifier
 			Real64 const NomCoolingCap, // W - design nominal capacity of Absorber
 			Real64 const NomHeatCoolRatio, // ratio of heating to cooling capacity
 			Real64 const ThermalEnergyCoolRatio, // ratio of thermal energy input to cooling output
@@ -243,15 +238,15 @@ namespace ChillerExhaustAbsorption {
 			int const CompType_Num, // Numeric designator for CompType (TypeOf)
 			int const ExhTempLTAbsLeavingTempIndex, // index for exhaust potentail less than thermal energy needed during cooling
 			int const ExhTempLTAbsLeavingHeatingTempIndex, // index for exhaust potentail less than thermal energy needed during heating
-			Fstring const & TypeOf, // Generator type
-			Fstring const & ExhuastSourceName, // Generator type Name
+			std::string const & TypeOf, // Generator type
+			std::string const & ExhuastSourceName, // Generator type Name
 			bool const IsThisSized // True if sizing is done
 		) :
 			Available( Available ),
 			ON( ON ),
 			InCoolingMode( InCoolingMode ),
 			InHeatingMode( InHeatingMode ),
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NomCoolingCap( NomCoolingCap ),
 			NomHeatCoolRatio( NomHeatCoolRatio ),
 			ThermalEnergyCoolRatio( ThermalEnergyCoolRatio ),
@@ -310,8 +305,8 @@ namespace ChillerExhaustAbsorption {
 			CompType_Num( CompType_Num ),
 			ExhTempLTAbsLeavingTempIndex( ExhTempLTAbsLeavingTempIndex ),
 			ExhTempLTAbsLeavingHeatingTempIndex( ExhTempLTAbsLeavingHeatingTempIndex ),
-			TypeOf( MaxNameLength, TypeOf ),
-			ExhuastSourceName( MaxNameLength, ExhuastSourceName ),
+			TypeOf( TypeOf ),
+			ExhuastSourceName( ExhuastSourceName ),
 			IsThisSized( IsThisSized )
 		{}
 
@@ -488,8 +483,8 @@ namespace ChillerExhaustAbsorption {
 
 	void
 	SimExhaustAbsorber(
-		Fstring const & AbsorberType, // type of Absorber
-		Fstring const & AbsorberName, // user specified name of Absorber
+		std::string const & AbsorberType, // type of Absorber
+		std::string const & AbsorberName, // user specified name of Absorber
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // Absorber number counter
 		bool const RunFlag, // simulate Absorber when TRUE

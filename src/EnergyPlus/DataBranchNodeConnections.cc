@@ -26,12 +26,11 @@ namespace DataBranchNodeConnections {
 	// na
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 	// <use statements for access to subroutines in other modules>
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
-	Fstring const Blank;
+	std::string const Blank;
 
 	// DERIVED TYPE DEFINITIONS:
 

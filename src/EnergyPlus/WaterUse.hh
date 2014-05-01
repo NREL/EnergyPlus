@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace WaterUse {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -46,8 +44,8 @@ namespace WaterUse {
 	struct WaterEquipmentType
 	{
 		// Members
-		Fstring Name; // Name of DHW
-		Fstring EndUseSubcatName;
+		std::string Name; // Name of DHW
+		std::string EndUseSubcatName;
 		int Connections; // Index for WATER USE CONNECTIONS object
 		Real64 PeakVolFlowRate; // Peak volumetric flow rate, also water consumption rate (m3/s)
 		int FlowRateFracSchedule; // Pointer to schedule object
@@ -85,8 +83,6 @@ namespace WaterUse {
 
 		// Default Constructor
 		WaterEquipmentType() :
-			Name( MaxNameLength ),
-			EndUseSubcatName( MaxNameLength ),
 			Connections( 0 ),
 			PeakVolFlowRate( 0.0 ),
 			FlowRateFracSchedule( 0 ),
@@ -125,8 +121,8 @@ namespace WaterUse {
 
 		// Member Constructor
 		WaterEquipmentType(
-			Fstring const & Name, // Name of DHW
-			Fstring const & EndUseSubcatName,
+			std::string const & Name, // Name of DHW
+			std::string const & EndUseSubcatName,
 			int const Connections, // Index for WATER USE CONNECTIONS object
 			Real64 const PeakVolFlowRate, // Peak volumetric flow rate, also water consumption rate (m3/s)
 			int const FlowRateFracSchedule, // Pointer to schedule object
@@ -162,8 +158,8 @@ namespace WaterUse {
 			Real64 const Power, // Heating rate required to meet the mixed water temperature (W)
 			Real64 const Energy // Heating energy required to meet the mixed water temperature (J)
 		) :
-			Name( MaxNameLength, Name ),
-			EndUseSubcatName( MaxNameLength, EndUseSubcatName ),
+			Name( Name ),
+			EndUseSubcatName( EndUseSubcatName ),
 			Connections( Connections ),
 			PeakVolFlowRate( PeakVolFlowRate ),
 			FlowRateFracSchedule( FlowRateFracSchedule ),
@@ -205,7 +201,7 @@ namespace WaterUse {
 	struct WaterConnectionsType
 	{
 		// Members
-		Fstring Name; // Name of DHW
+		std::string Name; // Name of DHW
 		bool Init; // Flag for initialization:  TRUE means do the init
 		bool InitSizing; // Flag for initialization of plant sizing
 		bool StandAlone; // Flag for operation with no plant connections
@@ -266,7 +262,6 @@ namespace WaterUse {
 
 		// Default Constructor
 		WaterConnectionsType() :
-			Name( MaxNameLength ),
 			Init( true ),
 			InitSizing( true ),
 			StandAlone( false ),
@@ -327,7 +322,7 @@ namespace WaterUse {
 
 		// Member Constructor
 		WaterConnectionsType(
-			Fstring const & Name, // Name of DHW
+			std::string const & Name, // Name of DHW
 			bool const Init, // Flag for initialization:  TRUE means do the init
 			bool const InitSizing, // Flag for initialization of plant sizing
 			bool const StandAlone, // Flag for operation with no plant connections
@@ -386,7 +381,7 @@ namespace WaterUse {
 			int const PlantLoopBranchNum,
 			int const PlantLoopCompNum
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			Init( Init ),
 			InitSizing( InitSizing ),
 			StandAlone( StandAlone ),
@@ -460,7 +455,7 @@ namespace WaterUse {
 	void
 	SimulateWaterUseConnection(
 		int const EquipTypeNum,
-		Fstring const & CompName,
+		std::string const & CompName,
 		int & CompIndex,
 		bool const InitLoopEquip,
 		bool const FirstHVACIteration

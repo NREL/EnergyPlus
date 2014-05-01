@@ -1,3 +1,6 @@
+// ObjexxFCL Headers
+#include <ObjexxFCL/string.functions.hh>
+
 // EnergyPlus Headers
 #include <DataOutputs.hh>
 
@@ -29,12 +32,11 @@ namespace DataOutputs {
 	// na
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	int const NumMonthlyReports( 62 );
-	FArray1D_Fstring const MonthlyNamedReports( NumMonthlyReports, sFstring( 51 ), { "ZONECOOLINGSUMMARYMONTHLY                          ", "ZONEHEATINGSUMMARYMONTHLY                          ", "ZONEELECTRICSUMMARYMONTHLY                         ", "SPACEGAINSMONTHLY                                  ", "PEAKSPACEGAINSMONTHLY                              ", "SPACEGAINCOMPONENTSATCOOLINGPEAKMONTHLY            ", "ENERGYCONSUMPTIONELECTRICITYNATURALGASMONTHLY      ", "ENERGYCONSUMPTIONELECTRICITYGENERATEDPROPANEMONTHLY", "ENERGYCONSUMPTIONDIESELFUELOILMONTHLY              ", "ENERGYCONSUMPTIONDISTRICTHEATINGCOOLINGMONTHLY     ", "ENERGYCONSUMPTIONCOALGASOLINEMONTHLY               ", "ENERGYCONSUMPTIONOTHERFUELSMONTHLY                 ", "ENDUSEENERGYCONSUMPTIONELECTRICITYMONTHLY          ", "ENDUSEENERGYCONSUMPTIONNATURALGASMONTHLY           ", "ENDUSEENERGYCONSUMPTIONDIESELMONTHLY               ", "ENDUSEENERGYCONSUMPTIONFUELOILMONTHLY              ", "ENDUSEENERGYCONSUMPTIONCOALMONTHLY                 ", "ENDUSEENERGYCONSUMPTIONPROPANEMONTHLY              ", "ENDUSEENERGYCONSUMPTIONGASOLINEMONTHLY             ", "ENDUSEENERGYCONSUMPTIONOTHERFUELSMONTHLY           ", "PEAKENERGYENDUSEELECTRICITYPART1MONTHLY            ", "PEAKENERGYENDUSEELECTRICITYPART2MONTHLY            ", "ELECTRICCOMPONENTSOFPEAKDEMANDMONTHLY              ", "PEAKENERGYENDUSENATURALGASMONTHLY                  ", "PEAKENERGYENDUSEDIESELMONTHLY                      ", "PEAKENERGYENDUSEFUELOILMONTHLY                     ", "PEAKENERGYENDUSECOALMONTHLY                        ", "PEAKENERGYENDUSEPROPANEMONTHLY                     ", "PEAKENERGYENDUSEGASOLINEMONTHLY                    ", "PEAKENERGYENDUSEOTHERFUELSMONTHLY                  ", "SETPOINTSNOTMETWITHTEMPERATURESMONTHLY             ", "COMFORTREPORTSIMPLE55MONTHLY                       ", "UNGLAZEDTRANSPIREDSOLARCOLLECTORSUMMARYMONTHLY     ", "OCCUPANTCOMFORTDATASUMMARYMONTHLY                  ", "CHILLERREPORTMONTHLY                               ", "TOWERREPORTMONTHLY                                 ", "BOILERREPORTMONTHLY                                ", "DXREPORTMONTHLY                                    ", "WINDOWREPORTMONTHLY                                ", "WINDOWENERGYREPORTMONTHLY                          ", "WINDOWZONESUMMARYMONTHLY                           ", "WINDOWENERGYZONESUMMARYMONTHLY                     ", "AVERAGEOUTDOORCONDITIONSMONTHLY                    ", "OUTDOORCONDITIONSMAXIMUMDRYBULBMONTHLY             ", "OUTDOORCONDITIONSMINIMUMDRYBULBMONTHLY             ", "OUTDOORCONDITIONSMAXIMUMWETBULBMONTHLY             ", "OUTDOORCONDITIONSMAXIMUMDEWPOINTMONTHLY            ", "OUTDOORGROUNDCONDITIONSMONTHLY                     ", "WINDOWACREPORTMONTHLY                              ", "WATERHEATERREPORTMONTHLY                           ", "GENERATORREPORTMONTHLY                             ", "DAYLIGHTINGREPORTMONTHLY                           ", "COILREPORTMONTHLY                                  ", "PLANTLOOPDEMANDREPORTMONTHLY                       ", "FANREPORTMONTHLY                                   ", "PUMPREPORTMONTHLY                                  ", "CONDLOOPDEMANDREPORTMONTHLY                        ", "ZONETEMPERATUREOSCILLATIONREPORTMONTHLY            ", "AIRLOOPSYSTEMENERGYANDWATERUSEMONTHLY              ", "AIRLOOPSYSTEMCOMPONENTLOADSMONTHLY                 ", "AIRLOOPSYSTEMCOMPONENTENERGYUSEMONTHLY             ", "MECHANICALVENTILATIONLOADSMONTHLY                  " } );
+	FArray1D_string const MonthlyNamedReports( NumMonthlyReports, { "ZONECOOLINGSUMMARYMONTHLY", "ZONEHEATINGSUMMARYMONTHLY", "ZONEELECTRICSUMMARYMONTHLY", "SPACEGAINSMONTHLY", "PEAKSPACEGAINSMONTHLY", "SPACEGAINCOMPONENTSATCOOLINGPEAKMONTHLY", "ENERGYCONSUMPTIONELECTRICITYNATURALGASMONTHLY", "ENERGYCONSUMPTIONELECTRICITYGENERATEDPROPANEMONTHLY", "ENERGYCONSUMPTIONDIESELFUELOILMONTHLY", "ENERGYCONSUMPTIONDISTRICTHEATINGCOOLINGMONTHLY", "ENERGYCONSUMPTIONCOALGASOLINEMONTHLY", "ENERGYCONSUMPTIONOTHERFUELSMONTHLY", "ENDUSEENERGYCONSUMPTIONELECTRICITYMONTHLY", "ENDUSEENERGYCONSUMPTIONNATURALGASMONTHLY", "ENDUSEENERGYCONSUMPTIONDIESELMONTHLY", "ENDUSEENERGYCONSUMPTIONFUELOILMONTHLY", "ENDUSEENERGYCONSUMPTIONCOALMONTHLY", "ENDUSEENERGYCONSUMPTIONPROPANEMONTHLY", "ENDUSEENERGYCONSUMPTIONGASOLINEMONTHLY", "ENDUSEENERGYCONSUMPTIONOTHERFUELSMONTHLY", "PEAKENERGYENDUSEELECTRICITYPART1MONTHLY", "PEAKENERGYENDUSEELECTRICITYPART2MONTHLY", "ELECTRICCOMPONENTSOFPEAKDEMANDMONTHLY", "PEAKENERGYENDUSENATURALGASMONTHLY", "PEAKENERGYENDUSEDIESELMONTHLY", "PEAKENERGYENDUSEFUELOILMONTHLY", "PEAKENERGYENDUSECOALMONTHLY", "PEAKENERGYENDUSEPROPANEMONTHLY", "PEAKENERGYENDUSEGASOLINEMONTHLY", "PEAKENERGYENDUSEOTHERFUELSMONTHLY", "SETPOINTSNOTMETWITHTEMPERATURESMONTHLY", "COMFORTREPORTSIMPLE55MONTHLY", "UNGLAZEDTRANSPIREDSOLARCOLLECTORSUMMARYMONTHLY", "OCCUPANTCOMFORTDATASUMMARYMONTHLY", "CHILLERREPORTMONTHLY", "TOWERREPORTMONTHLY", "BOILERREPORTMONTHLY", "DXREPORTMONTHLY", "WINDOWREPORTMONTHLY", "WINDOWENERGYREPORTMONTHLY", "WINDOWZONESUMMARYMONTHLY", "WINDOWENERGYZONESUMMARYMONTHLY", "AVERAGEOUTDOORCONDITIONSMONTHLY", "OUTDOORCONDITIONSMAXIMUMDRYBULBMONTHLY", "OUTDOORCONDITIONSMINIMUMDRYBULBMONTHLY", "OUTDOORCONDITIONSMAXIMUMWETBULBMONTHLY", "OUTDOORCONDITIONSMAXIMUMDEWPOINTMONTHLY", "OUTDOORGROUNDCONDITIONSMONTHLY", "WINDOWACREPORTMONTHLY", "WATERHEATERREPORTMONTHLY", "GENERATORREPORTMONTHLY", "DAYLIGHTINGREPORTMONTHLY", "COILREPORTMONTHLY", "PLANTLOOPDEMANDREPORTMONTHLY", "FANREPORTMONTHLY", "PUMPREPORTMONTHLY", "CONDLOOPDEMANDREPORTMONTHLY", "ZONETEMPERATUREOSCILLATIONREPORTMONTHLY", "AIRLOOPSYSTEMENERGYANDWATERUSEMONTHLY", "AIRLOOPSYSTEMCOMPONENTLOADSMONTHLY", "AIRLOOPSYSTEMCOMPONENTENERGYUSEMONTHLY", "MECHANICALVENTILATIONLOADSMONTHLY" } );
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -57,8 +59,8 @@ namespace DataOutputs {
 
 	bool
 	FindItemInVariableList(
-		Fstring const & KeyedValue,
-		Fstring const & VariableName
+		std::string const & KeyedValue,
+		std::string const & VariableName
 	)
 	{
 
@@ -103,18 +105,18 @@ namespace DataOutputs {
 		InVariableList = false;
 		Found = 0;
 		for ( Item = 1; Item <= NumConsideredOutputVariables; ++Item ) {
-			if ( ! DOSameString( VariableName, OutputVariablesForSimulation( Item ).VarName ) ) continue;
+			if ( ! equali( VariableName, OutputVariablesForSimulation( Item ).VarName ) ) continue;
 			Found = Item;
 			break;
 		}
 		if ( Found != 0 ) {
-			if ( DOSameString( KeyedValue, OutputVariablesForSimulation( Found ).Key ) || OutputVariablesForSimulation( Found ).Key == "*" ) {
+			if ( equali( KeyedValue, OutputVariablesForSimulation( Found ).Key ) || OutputVariablesForSimulation( Found ).Key == "*" ) {
 				InVariableList = true;
 			} else {
 				while ( Found != 0 ) {
 					Found = OutputVariablesForSimulation( Found ).Next;
 					if ( Found != 0 ) {
-						if ( DOSameString( KeyedValue, OutputVariablesForSimulation( Found ).Key ) || OutputVariablesForSimulation( Found ).Key == "*" ) {
+						if ( equali( KeyedValue, OutputVariablesForSimulation( Found ).Key ) || OutputVariablesForSimulation( Found ).Key == "*" ) {
 							InVariableList = true;
 							break;
 						}
@@ -124,167 +126,6 @@ namespace DataOutputs {
 		}
 
 		return InVariableList;
-
-	}
-
-	bool
-	DOSameString(
-		Fstring const & TestString1, // First String to Test
-		Fstring const & TestString2 // Second String to Test
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   November 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This function returns true if the two strings are equal (case insensitively)
-
-		// METHODOLOGY EMPLOYED:
-		// Make both strings uppercase.  Do internal compare.
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-		bool DOSameString;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		if ( len_trim( TestString1 ) != len_trim( TestString2 ) ) {
-			DOSameString = false;
-		} else if ( TestString1 == TestString2 ) {
-			DOSameString = true;
-		} else {
-			DOSameString = DOMakeUPPERCase( TestString1 ) == DOMakeUPPERCase( TestString2 );
-		}
-
-		return DOSameString;
-
-	}
-
-	Fstring
-	DOMakeUPPERCase( Fstring const & InputString ) // Input String
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   September 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This function returns the Upper Case representation of the InputString.
-
-		// METHODOLOGY EMPLOYED:
-		// Uses the Intrinsic SCAN function to scan the lowercase representation of
-		// characters (DataStringGlobals) for each character in the given string.
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-		Fstring ResultString( len( InputString ) ); // Result String, string is limited to
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-		// MaxInputLineLength because of PowerStation Compiler
-		// otherwise could say (CHARACTER(len=LEN(InputString))
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int curCharVal;
-
-		ResultString = InputString;
-
-		for ( int i = 1; i <= len_trim( InputString ); ++i ) {
-			curCharVal = ichar( InputString( i, i ) );
-			{ auto const SELECT_CASE_var( curCharVal );
-			if ( ( 97 <= SELECT_CASE_var && SELECT_CASE_var <= 122 ) || ( 224 <= SELECT_CASE_var && SELECT_CASE_var <= 255 ) ) { // lowercase ASCII and accented characters
-				ResultString( i, i ) = CHAR( curCharVal - 32 );
-			}}
-		}
-		//       ! first check for normal lowercase char, then normal uppercase char
-		//       if(InputString(i:i) >= "a" .and. InputString(i:i) <= "z") then
-		//          ResultString(i:i) = achar(iachar(InputString(i:i)) - 32)
-		//       else if (InputString(i:i) >= "A" .and. InputString(i:i) <= "Z") then
-		//          cycle !ResultString(i:i) = InputString(i:i)  ! leave as is
-		//       else ! now see if it's an accented char that needs uppercaseing
-		//          Pos=SCAN(AccentedLowerCase,InputString(i:i))
-		//          if (Pos /= 0) THEN
-		//             ResultString(i:i)=AccentedUpperCase(Pos:Pos)
-		//          ELSE
-		//             cycle !ResultString(i:i) = InputString(i:i)
-		//          ENDIF
-		//       end if
-		//    end do
-
-		//    do i = 1, LEN_TRIM(InputString)
-		//       ! first check for normal lowercase char, then normal uppercase char
-		//       if(InputString(i:i) >= "a" .and. InputString(i:i) <= "z") then
-		//          ResultString(i:i) = achar(iachar(InputString(i:i)) - 32)
-		//       else if (InputString(i:i) >= "A" .and. InputString(i:i) <= "Z") then
-		//          cycle !ResultString(i:i) = InputString(i:i)  ! leave as is
-		//       else ! now see if it's an accented char that needs uppercaseing
-		//          Pos=SCAN(AccentedLowerCase,InputString(i:i))
-		//          if (Pos /= 0) THEN
-		//             ResultString(i:i)=AccentedUpperCase(Pos:Pos)
-		//          ELSE
-		//             cycle !ResultString(i:i) = InputString(i:i)
-		//          ENDIF
-		//       end if
-		//    end do
-		//    ResultString=TRIM(ResultString)
-
-		//  ResultString=Blank
-		//  Pos=SCAN(InputString,LowerCase)
-		//  IF (POS /= 0) THEN
-		//    LengthInputString=LEN_TRIM(InputString)
-		//    DO Count=1,LengthInputString
-		//      Pos=SCAN(LowerCase,InputString(Count:Count))
-		//      IF (Pos /= 0) THEN
-		//        ResultString(Count:Count)=UpperCase(Pos:Pos)
-		//      ELSE
-		//        ResultString(Count:Count)=InputString(Count:Count)
-		//      ENDIF
-		//    END DO
-		//    ResultString=TRIM(ResultString)
-		//  ELSE
-		//    ! String already in Upper Case
-		//    ResultString=TRIM(InputString)
-		//  ENDIF
-
-		return ResultString;
 
 	}
 

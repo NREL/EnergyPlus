@@ -42,7 +42,6 @@ namespace ExteriorEnergyUse {
 	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::TimeStepZone;
 
 	// Use statements for access to subroutines in other modules
@@ -168,8 +167,8 @@ namespace ExteriorEnergyUse {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetExteriorEnergyUseInput: " );
-		static Fstring const Blank;
+		static std::string const RoutineName( "GetExteriorEnergyUseInput: " );
+		static std::string const Blank;
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -185,9 +184,9 @@ namespace ExteriorEnergyUse {
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int NumFuelEq; // Temporary -- number of ExteriorFuelEquipment statements
 		int NumWtrEq; // Temporary -- number of ExteriorWaterEquipment statements
-		Fstring TypeString( 20 ); // Fuel Type string (returned from Validation)
-		Fstring ConUnits( 4 ); // String for Fuel Consumption units (allow Water)
-		Fstring EndUseSubcategoryName( MaxNameLength );
+		std::string TypeString; // Fuel Type string (returned from Validation)
+		std::string ConUnits; // String for Fuel Consumption units (allow Water)
+		std::string EndUseSubcategoryName;
 		bool ErrorInName;
 		bool IsBlank;
 		Real64 SchMax; // Max value of schedule for item
@@ -210,7 +209,7 @@ namespace ExteriorEnergyUse {
 			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ExteriorLights.Name(), Item, ErrorInName, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ExteriorLights.Name(), Item, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ErrorsFound = true;
 				continue;
@@ -219,9 +218,9 @@ namespace ExteriorEnergyUse {
 			ExteriorLights( Item ).SchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 			if ( ExteriorLights( Item ).SchedPtr == 0 ) {
 				if ( lAlphaFieldBlanks( 2 ) ) {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": " + trim( cAlphaFieldNames( 2 ) ) + " is required, missing for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + ": " + cAlphaFieldNames( 2 ) + " is required, missing for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 				} else {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 2 ) ) + " entered=" + trim( cAlphaArgs( 2 ) ) + " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) + " entered=" + cAlphaArgs( 2 ) + " for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 				}
 				ErrorsFound = true;
 			} else { // check min/max on schedule
@@ -229,13 +228,13 @@ namespace ExteriorEnergyUse {
 				SchMax = GetScheduleMaxValue( ExteriorLights( Item ).SchedPtr );
 				if ( SchMin < 0.0 || SchMax < 0.0 ) {
 					if ( SchMin < 0.0 ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 2 ) ) + " minimum, is < 0.0 for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
-						ShowContinueError( trim( cAlphaArgs( 2 ) ) + "\". Minimum is [" + trim( RoundSigDigits( SchMin, 1 ) ) + "]. Values must be >= 0.0." );
+						ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) + " minimum, is < 0.0 for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
+						ShowContinueError( cAlphaArgs( 2 ) + "\". Minimum is [" + RoundSigDigits( SchMin, 1 ) + "]. Values must be >= 0.0." );
 						ErrorsFound = true;
 					}
 					if ( SchMax < 0.0 ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 2 ) ) + " maximum, is < 0.0 for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
-						ShowContinueError( trim( cAlphaArgs( 2 ) ) + "\". Maximum is [" + trim( RoundSigDigits( SchMax, 1 ) ) + "]. Values must be >= 0.0." );
+						ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) + " maximum, is < 0.0 for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
+						ShowContinueError( cAlphaArgs( 2 ) + "\". Maximum is [" + RoundSigDigits( SchMax, 1 ) + "]. Values must be >= 0.0." );
 						ErrorsFound = true;
 					}
 				}
@@ -247,7 +246,7 @@ namespace ExteriorEnergyUse {
 			} else if ( SameString( cAlphaArgs( 3 ), "AstronomicalClock" ) ) {
 				ExteriorLights( Item ).ControlMode = AstroClockOverride;
 			} else {
-				ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 3 ) ) + "=" + trim( cAlphaArgs( 3 ) ) + " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) + " for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 			}
 
 			if ( NumAlphas > 3 ) {
@@ -286,7 +285,7 @@ namespace ExteriorEnergyUse {
 			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ExteriorEquipment.Name(), Item, ErrorInName, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ExteriorEquipment.Name(), Item, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ErrorsFound = true;
 				continue;
@@ -303,9 +302,9 @@ namespace ExteriorEnergyUse {
 			ValidateFuelType( ExteriorEquipment( NumExteriorEqs ).FuelType, cAlphaArgs( 2 ), TypeString, cCurrentModuleObject, cAlphaFieldNames( 2 ), cAlphaArgs( 2 ) );
 			if ( ExteriorEquipment( NumExteriorEqs ).FuelType == 0 ) {
 				if ( lAlphaFieldBlanks( 2 ) ) {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": " + trim( cAlphaFieldNames( 2 ) ) + " is required, missing for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + ": " + cAlphaFieldNames( 2 ) + " is required, missing for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 				} else {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 2 ) ) + " entered=" + trim( cAlphaArgs( 2 ) ) + " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) + " entered=" + cAlphaArgs( 2 ) + " for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 				}
 				ErrorsFound = true;
 			} else {
@@ -313,21 +312,21 @@ namespace ExteriorEnergyUse {
 					SetupOutputVariable( "Exterior Equipment Fuel Rate [W]", ExteriorEquipment( NumExteriorEqs ).Power, "Zone", "Average", ExteriorEquipment( NumExteriorEqs ).Name );
 
 					ConUnits = "[J]";
-					SetupOutputVariable( "Exterior Equipment " + trim( TypeString ) + " Energy " + trim( ConUnits ), ExteriorEquipment( NumExteriorEqs ).CurrentUse, "Zone", "Sum", ExteriorEquipment( NumExteriorEqs ).Name, _, TypeString, "ExteriorEquipment", EndUseSubcategoryName );
+					SetupOutputVariable( "Exterior Equipment " + TypeString + " Energy " + ConUnits, ExteriorEquipment( NumExteriorEqs ).CurrentUse, "Zone", "Sum", ExteriorEquipment( NumExteriorEqs ).Name, _, TypeString, "ExteriorEquipment", EndUseSubcategoryName );
 				} else {
-					SetupOutputVariable( "Exterior Equipment Water Volume Flow Rate [m3/s]", ExteriorEquipment( NumExteriorEqs ).Power, "Zone", "Average", trim( ExteriorEquipment( NumExteriorEqs ).Name ) );
+					SetupOutputVariable( "Exterior Equipment Water Volume Flow Rate [m3/s]", ExteriorEquipment( NumExteriorEqs ).Power, "Zone", "Average", ExteriorEquipment( NumExteriorEqs ).Name );
 
 					ConUnits = "[m3]";
-					SetupOutputVariable( "Exterior Equipment " + trim( TypeString ) + " Volume " + trim( ConUnits ), ExteriorEquipment( NumExteriorEqs ).CurrentUse, "Zone", "Sum", ExteriorEquipment( NumExteriorEqs ).Name, _, TypeString, "ExteriorEquipment", EndUseSubcategoryName );
+					SetupOutputVariable( "Exterior Equipment " + TypeString + " Volume " + ConUnits, ExteriorEquipment( NumExteriorEqs ).CurrentUse, "Zone", "Sum", ExteriorEquipment( NumExteriorEqs ).Name, _, TypeString, "ExteriorEquipment", EndUseSubcategoryName );
 				}
 
 			}
 			ExteriorEquipment( NumExteriorEqs ).SchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
 			if ( ExteriorEquipment( NumExteriorEqs ).SchedPtr == 0 ) {
 				if ( lAlphaFieldBlanks( 3 ) ) {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": " + trim( cAlphaFieldNames( 3 ) ) + " is required, missing for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + ": " + cAlphaFieldNames( 3 ) + " is required, missing for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 				} else {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 3 ) ) + " entered=" + trim( cAlphaArgs( 3 ) ) + " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 3 ) + " entered=" + cAlphaArgs( 3 ) + " for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 				}
 				ErrorsFound = true;
 			} else { // check min/max on schedule
@@ -335,13 +334,13 @@ namespace ExteriorEnergyUse {
 				SchMax = GetScheduleMaxValue( ExteriorEquipment( NumExteriorEqs ).SchedPtr );
 				if ( SchMin < 0.0 || SchMax < 0.0 ) {
 					if ( SchMin < 0.0 ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 3 ) ) + " minimum, is < 0.0 for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
-						ShowContinueError( trim( cAlphaArgs( 3 ) ) + "\". Minimum is [" + trim( RoundSigDigits( SchMin, 1 ) ) + "]. Values must be >= 0.0." );
+						ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 3 ) + " minimum, is < 0.0 for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
+						ShowContinueError( cAlphaArgs( 3 ) + "\". Minimum is [" + RoundSigDigits( SchMin, 1 ) + "]. Values must be >= 0.0." );
 						ErrorsFound = true;
 					}
 					if ( SchMax < 0.0 ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 3 ) ) + " maximum, is < 0.0 for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
-						ShowContinueError( trim( cAlphaArgs( 3 ) ) + "\". Maximum is [" + trim( RoundSigDigits( SchMax, 1 ) ) + "]. Values must be >= 0.0." );
+						ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 3 ) + " maximum, is < 0.0 for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
+						ShowContinueError( cAlphaArgs( 3 ) + "\". Maximum is [" + RoundSigDigits( SchMax, 1 ) + "]. Values must be >= 0.0." );
 						ErrorsFound = true;
 					}
 				}
@@ -356,7 +355,7 @@ namespace ExteriorEnergyUse {
 			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ExteriorEquipment.Name(), Item, ErrorInName, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ExteriorEquipment.Name(), Item, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ErrorsFound = true;
 				continue;
@@ -367,9 +366,9 @@ namespace ExteriorEnergyUse {
 			ExteriorEquipment( NumExteriorEqs ).SchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
 			if ( ExteriorEquipment( NumExteriorEqs ).SchedPtr == 0 ) {
 				if ( lAlphaFieldBlanks( 3 ) ) {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": " + trim( cAlphaFieldNames( 3 ) ) + " is required, missing for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + ": " + cAlphaFieldNames( 3 ) + " is required, missing for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 				} else {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 3 ) ) + " entered=" + trim( cAlphaArgs( 3 ) ) + " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 3 ) + " entered=" + cAlphaArgs( 3 ) + " for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 				}
 				ErrorsFound = true;
 			} else { // check min/max on schedule
@@ -377,13 +376,13 @@ namespace ExteriorEnergyUse {
 				SchMax = GetScheduleMaxValue( ExteriorEquipment( NumExteriorEqs ).SchedPtr );
 				if ( SchMin < 0.0 || SchMax < 0.0 ) {
 					if ( SchMin < 0.0 ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 3 ) ) + " minimum, is < 0.0 for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
-						ShowContinueError( trim( cAlphaArgs( 3 ) ) + "\". Minimum is [" + trim( RoundSigDigits( SchMin, 1 ) ) + "]. Values must be >= 0.0." );
+						ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 3 ) + " minimum, is < 0.0 for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
+						ShowContinueError( cAlphaArgs( 3 ) + "\". Minimum is [" + RoundSigDigits( SchMin, 1 ) + "]. Values must be >= 0.0." );
 						ErrorsFound = true;
 					}
 					if ( SchMax < 0.0 ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 3 ) ) + " maximum, is < 0.0 for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
-						ShowContinueError( trim( cAlphaArgs( 3 ) ) + "\". Maximum is [" + trim( RoundSigDigits( SchMax, 1 ) ) + "]. Values must be >= 0.0." );
+						ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 3 ) + " maximum, is < 0.0 for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
+						ShowContinueError( cAlphaArgs( 3 ) + "\". Maximum is [" + RoundSigDigits( SchMax, 1 ) + "]. Values must be >= 0.0." );
 						ErrorsFound = true;
 					}
 				}
@@ -412,11 +411,11 @@ namespace ExteriorEnergyUse {
 	void
 	ValidateFuelType(
 		int & FuelTypeNumber, // Fuel Type to be set in structure.
-		Fstring const & FuelTypeAlpha, // Fuel Type String
-		Fstring & FuelTypeString, // Standardized Fuel Type String (for variable naming)
-		Fstring const & CurrentModuleObject, // object being parsed
-		Fstring const & CurrentField, // current field being parsed
-		Fstring const & CurrentName // current object name being parsed
+		std::string const & FuelTypeAlpha, // Fuel Type String
+		std::string & FuelTypeString, // Standardized Fuel Type String (for variable naming)
+		std::string const & CurrentModuleObject, // object being parsed
+		std::string const & CurrentField, // current field being parsed
+		std::string const & CurrentName // current object name being parsed
 	)
 	{
 
@@ -443,7 +442,7 @@ namespace ExteriorEnergyUse {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "ValidateFuelType: " );
+		static std::string const RoutineName( "ValidateFuelType: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -454,7 +453,7 @@ namespace ExteriorEnergyUse {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		FuelTypeNumber = 0;
-		FuelTypeString = " ";
+		FuelTypeString = "";
 
 		//Select the correct Number for the associated ascii name for the fuel type
 		if ( SameString( FuelTypeAlpha, "Electricity" ) || SameString( FuelTypeAlpha, "Electric" ) ) {
@@ -463,8 +462,8 @@ namespace ExteriorEnergyUse {
 		}
 		if ( SameString( FuelTypeAlpha, "Gas" ) || SameString( FuelTypeAlpha, "NaturalGas" ) ) {
 			if ( SameString( FuelTypeAlpha, "Gas" ) ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( CurrentName ) + "\"." );
-				ShowContinueError( "Deprecated value in " + trim( CurrentField ) + "=\"" + trim( FuelTypeAlpha ) + "\", using \"NaturalGas\"." );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + CurrentName + "\"." );
+				ShowContinueError( "Deprecated value in " + CurrentField + "=\"" + FuelTypeAlpha + "\", using \"NaturalGas\"." );
 			}
 			FuelTypeNumber = GasUse;
 			FuelTypeString = "Gas";
@@ -479,8 +478,8 @@ namespace ExteriorEnergyUse {
 		}
 		if ( SameString( FuelTypeAlpha, "PropaneGas" ) || SameString( FuelTypeAlpha, "LPG" ) ) {
 			if ( SameString( FuelTypeAlpha, "LPG" ) ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( CurrentName ) + "\"." );
-				ShowContinueError( "Deprecated value in " + trim( CurrentField ) + "=\"" + trim( FuelTypeAlpha ) + "\", using \"PropaneGas\"." );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + CurrentName + "\"." );
+				ShowContinueError( "Deprecated value in " + CurrentField + "=\"" + FuelTypeAlpha + "\", using \"PropaneGas\"." );
 			}
 			FuelTypeNumber = LPGUse;
 			FuelTypeString = "Propane";

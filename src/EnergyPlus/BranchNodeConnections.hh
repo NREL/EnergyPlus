@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1A.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -16,7 +15,7 @@ namespace BranchNodeConnections {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
-	extern Fstring const Blank;
+	extern std::string const Blank;
 
 	// DERIVED TYPE DEFINITIONS:
 	// na
@@ -31,80 +30,80 @@ namespace BranchNodeConnections {
 	void
 	RegisterNodeConnection(
 		int const NodeNumber, // Number for this Node
-		Fstring const & NodeName, // Name of this Node
-		Fstring const & ObjectType, // Type of object this Node is connected to (e.g. Chiller:Electric)
-		Fstring const & ObjectName, // Name of object this Node is connected to (e.g. MyChiller)
-		Fstring const & ConnectionType, // Connection Type for this Node (must be valid)
+		std::string const & NodeName, // Name of this Node
+		std::string const & ObjectType, // Type of object this Node is connected to (e.g. Chiller:Electric)
+		std::string const & ObjectName, // Name of object this Node is connected to (e.g. MyChiller)
+		std::string const & ConnectionType, // Connection Type for this Node (must be valid)
 		int const FluidStream, // Count on Fluid Streams
 		bool const IsParent, // True when node is a parent node
 		bool & errFlag, // Will be True if errors already detected or if errors found here
-		Optional_Fstring_const InputFieldName = _ // Input Field Name
+		Optional_string_const InputFieldName = _ // Input Field Name
 	);
 
 	bool
-	IsValidConnectionType( Fstring const & ConnectionType );
+	IsValidConnectionType( std::string const & ConnectionType );
 
 	void
 	CheckNodeConnections( bool & ErrorsFound );
 
 	bool
 	IsParentObject(
-		Fstring const & ComponentType,
-		Fstring const & ComponentName
+		std::string const & ComponentType,
+		std::string const & ComponentName
 	);
 
 	int
 	WhichParentSet(
-		Fstring const & ComponentType,
-		Fstring const & ComponentName
+		std::string const & ComponentType,
+		std::string const & ComponentName
 	);
 
 	void
 	GetParentData(
-		Fstring const & ComponentType,
-		Fstring const & ComponentName,
-		Fstring & InletNodeName,
+		std::string const & ComponentType,
+		std::string const & ComponentName,
+		std::string & InletNodeName,
 		int & InletNodeNum,
-		Fstring & OutletNodeName,
+		std::string & OutletNodeName,
 		int & OutletNodeNum,
 		bool & ErrorsFound
 	);
 
 	bool
 	IsParentObjectCompSet(
-		Fstring const & ComponentType,
-		Fstring const & ComponentName
+		std::string const & ComponentType,
+		std::string const & ComponentName
 	);
 
 	int
 	WhichCompSet(
-		Fstring const & ComponentType,
-		Fstring const & ComponentName
+		std::string const & ComponentType,
+		std::string const & ComponentName
 	);
 
 	int
 	WhichParentCompSet(
-		Fstring const & ComponentType,
-		Fstring const & ComponentName
+		std::string const & ComponentType,
+		std::string const & ComponentName
 	);
 
 	int
 	GetNumChildren(
-		Fstring const & ComponentType,
-		Fstring const & ComponentName
+		std::string const & ComponentType,
+		std::string const & ComponentName
 	);
 
 	void
 	GetComponentData(
-		Fstring const & ComponentType,
-		Fstring const & ComponentName,
+		std::string const & ComponentType,
+		std::string const & ComponentName,
 		bool & IsParent,
 		int & NumInlets,
-		FArray1D_Fstring & InletNodeNames,
+		FArray1D_string & InletNodeNames,
 		FArray1D_int & InletNodeNums,
 		FArray1D_int & InletFluidStreams,
 		int & NumOutlets,
-		FArray1D_Fstring & OutletNodeNames,
+		FArray1D_string & OutletNodeNames,
 		FArray1D_int & OutletNodeNums,
 		FArray1D_int & OutletFluidStreams,
 		bool & ErrorsFound
@@ -112,27 +111,27 @@ namespace BranchNodeConnections {
 
 	void
 	GetChildrenData(
-		Fstring const & ComponentType,
-		Fstring const & ComponentName,
+		std::string const & ComponentType,
+		std::string const & ComponentName,
 		int & NumChildren,
-		FArray1S_Fstring ChildrenCType,
-		FArray1S_Fstring ChildrenCName,
-		FArray1S_Fstring InletNodeName,
+		FArray1S_string ChildrenCType,
+		FArray1S_string ChildrenCName,
+		FArray1S_string InletNodeName,
 		FArray1S_int InletNodeNum,
-		FArray1S_Fstring OutletNodeName,
+		FArray1S_string OutletNodeName,
 		FArray1S_int OutletNodeNum,
 		bool & ErrorsFound
 	);
 
 	void
 	SetUpCompSets(
-		Fstring const & ParentType, // Parent Object Type
-		Fstring const & ParentName, // Parent Object Name
-		Fstring const & CompType, // Component Type
-		Fstring const & CompName, // Component Name
-		Fstring const & InletNode, // Inlet Node Name
-		Fstring const & OutletNode, // Outlet Node Name
-		Optional_Fstring_const Description = _ // Description
+		std::string const & ParentType, // Parent Object Type
+		std::string const & ParentName, // Parent Object Name
+		std::string const & CompType, // Component Type
+		std::string const & CompName, // Component Name
+		std::string const & InletNode, // Inlet Node Name
+		std::string const & OutletNode, // Outlet Node Name
+		Optional_string_const Description = _ // Description
 	);
 
 	void
@@ -140,11 +139,11 @@ namespace BranchNodeConnections {
 
 	void
 	TestCompSet(
-		Fstring const & CompType, // Component Type
-		Fstring const & CompName, // Component Name
-		Fstring const & InletNode, // Inlet Node Name
-		Fstring const & OutletNode, // Outlet Node Name
-		Fstring const & Description // Description of Node Pair (for warning message)
+		std::string const & CompType, // Component Type
+		std::string const & CompName, // Component Name
+		std::string const & InletNode, // Inlet Node Name
+		std::string const & OutletNode, // Outlet Node Name
+		std::string const & Description // Description of Node Pair (for warning message)
 	);
 
 	void

@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -17,7 +16,6 @@ namespace EnergyPlus {
 namespace DataPlant {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 	using DataLoopNode::SensedNodeFlagValue;
 
 	// Data
@@ -118,7 +116,7 @@ namespace DataPlant {
 	extern int const SupplySide;
 	extern int const DemandSupply_Yes; // DSU
 
-	extern FArray1D_Fstring const cLoopSideLocations;
+	extern FArray1D_string const cLoopSideLocations;
 	// Parameters for economizer
 	extern int const Integrated;
 	extern int const NonIntegrated;
@@ -145,7 +143,7 @@ namespace DataPlant {
 	extern int const FlowUnlocked; // components request flow
 	extern int const FlowLocked; // components take their inlet flow
 
-	extern FArray1D_Fstring const cLoopTypes;
+	extern FArray1D_string const cLoopTypes;
 
 	// Pressure Routine Call Enumeration
 	extern int const PressureCall_Init;
@@ -157,12 +155,12 @@ namespace DataPlant {
 	extern int const Press_PumpPowerCorrection; // Only updating the pump power
 	extern int const Press_FlowCorrection; // Update pump flow rate based on pump curve
 	extern int const Press_FlowSimulation; // Full pressure network simulation
-	extern FArray1D_Fstring const PressureSimType;
+	extern FArray1D_string const PressureSimType;
 	// Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
 	extern int const NumSimPlantEquipTypes;
-	extern FArray1D_Fstring const SimPlantEquipTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 ! demand side component | 39 ! demand side component | 40 ! demand side component | 41 ! demand side component | 42 ! demand side component | 43 ! demand side component | 44 ! demand side component' | 45 | 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57 | 58 | 59 | 60 | 61 | 62 | 63 | 64 | 65 | 66 | 67 | 68 | 69 | 70 | 71 | 72 | 73 | 74 | 75 | 76 | 77 | 78 | 79 | 80 | 81 | 82 | 83 | 84 | 85 | 86 | 87 | 88 | 89
+	extern FArray1D_string const SimPlantEquipTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 ! demand side component | 39 ! demand side component | 40 ! demand side component | 41 ! demand side component | 42 ! demand side component | 43 ! demand side component | 44 ! demand side component' | 45 | 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57 | 58 | 59 | 60 | 61 | 62 | 63 | 64 | 65 | 66 | 67 | 68 | 69 | 70 | 71 | 72 | 73 | 74 | 75 | 76 | 77 | 78 | 79 | 80 | 81 | 82 | 83 | 84 | 85 | 86 | 87 | 88 | 89
 
-	extern FArray1D_Fstring const ccSimPlantEquipTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 ! demand side component | 39 Demand Side Component | 40 Demand Side Component | 41 Demand Side Component | 42 Demand Side Component | 43 Demand Side Component | 44 Demand Side Component' | 45 | 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57 | 58 | 59 | 60 | 61 | 62 | 63 | 64 | 65 | 66 | 67 | 68 | 69 | 70 | 71 | 72 | 73 | 74 | 75 | 76 | 77 | 78 | 79 | 80 | 81 | 82 | 83 | 84 | 85 | 86 | 87 | 88 | 89
+	extern FArray1D_string const ccSimPlantEquipTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 ! demand side component | 39 Demand Side Component | 40 Demand Side Component | 41 Demand Side Component | 42 Demand Side Component | 43 Demand Side Component | 44 Demand Side Component' | 45 | 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57 | 58 | 59 | 60 | 61 | 62 | 63 | 64 | 65 | 66 | 67 | 68 | 69 | 70 | 71 | 72 | 73 | 74 | 75 | 76 | 77 | 78 | 79 | 80 | 81 | 82 | 83 | 84 | 85 | 86 | 87 | 88 | 89
 
 	extern FArray1D_int const ValidLoopEquipTypes; // 01  BOILER:HOTWATER | 02  BOILER:STEAM | 03  CHILLER:ABSORPTION | 04  CHILLER:ABSORPTION:INDIRECT | 05  CHILLER:COMBUSTIONTURBINE | 06  CHILLER:CONSTANTCOP | 07  CHILLERHEATER:ABSORPTION:DIRECTFIRED | 08  CHILLER:ELECTRIC | 09  CHILLER:ELECTRIC:EIR | 10  CHILLER:ELECTRIC:REFORMULATEDEIR | 11  CHILLER:ENGINEDRIVEN | 12  COOLINGTOWER:SINGLESPEED | 13  COOLINGTOWER:TWOSPEED | 14  COOLINGTOWER:VARIABLESPEED | 15  GENERATOR:FUELCELL:EXHAUSTGASTOWATERHEATEXCHANGER | 16  WATERHEATER:HEATPUMP | 17  HEATPUMP:WATERTOWATER:EQUATIONFIT:COOLING | 18  HEATPUMP:WATERTOWATER:EQUATIONFIT:HEATING | 19  HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:COOLING | 20  HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:HEATING | 21  PIPE:ADIABATIC | 22  PIPE:ADIABATIC:STEAM | 23  PIPE:OUTDOOR | 24  PIPE:INDOOR | 25  PIPE:UNDERGROUND | 26  DISTRICTCOOLING | 27  DISTRICTHEATING | 28  THERMALSTORAGE:ICE:DETAILED | 29  THERMALSTORAGE:ICE:SIMPLE | 30  TEMPERINGVALVE | 31  WATERHEATER:MIXED | 32  WATERHEATER:STRATIFIED | 33  PUMP:VARIABLESPEED | 34  PUMP:CONSTANTSPEED | 35  PUMP:VARIABLESPEED:CONDENSATE | 36  HEADEREDPUMPS:VARIABLESPEED | 37  HEADEREDPUMPS:CONSTANTSPEED | 38  WATERUSE:CONNECTIONS | 39  COIL:COOLING:WATER | 40  COIL:COOLING:WATER:DETAILEDGEOMETRY | 41  COIL:HEATING:WATER | 42  COIL:HEATING:STEAM | 43  SOLARCOLLECTOR:FLATPLATE:WATER | 44  LOADPROFILE:PLANT | 45  GROUNDHEATEXCHANGER:VERTICAL | 46  GROUNDHEATEXCHANGER:SURFACE | 47  GROUNDHEATEXCHANGER:POND | 48  GENERATOR:MICROTURBINE | 49  GENERATOR:INTERNALCOMBUSTIONENGINE | 50  GENERATOR:COMBUSTIONTURBINE | 51  GENERATOR:MICROCHP | 52  GENERATOR:FUELCELL:STACKCOOLER | 53  FLUIDCOOLER:SINGLESPEED | 54  FLUIDCOOLER:TWOSPEED | 55  EVAPORATIVEFLUIDCOOLER:SINGLESPEED | 56  EVAPORATIVEFLUIDCOOLER:TWOSPEED | 57  THERMALSTORAGE:CHILLEDWATER:MIXED | 58  THERMALSTORAGE:CHILLEDWATER:STRATIFIED | 59  SOLARCOLLECTOR:FLATPLATE:PHOTOVOLTAICTHERMAL | 60  ZONEHVAC:BASEBOARD:CONVECTIVE:WATER | 61  ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM | 62  ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER | 63  ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW | 64  ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW | 65 AirTerminal:SingleDuct:ConstantVolume:CooledBeam | 66  Coil:Heating:WaterToAirHeatPump:EquationFit | 67  Coil:Cooling:WaterTOAIRHeatPump:EquationFit | 68  Coil:Heating:WaterTOAIRHeatPump:ParameterEstimation | 69  Coil:Cooling:WaterTOAIRHeatPump:ParameterEstimation | 70  Refrigeration:Condenser:WaterCooled | 71  Refrigeration:CompressorRack | 72  AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed | 73  CHILLERHEATER:ABSORPTION:DOUBLEEFFECT | 74  PipingSystem:Underground:PipeCircuit | 75  SolarCollector:IntegralCollectorStorage | 76  Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit | 77  Coil:Cooling:WaterTOAIRHeatPump:VariableSpeedEquationFit | 78  PlantComponent:UserDefined | 79  Coil:UserDefined | 80  ZoneHVAC:ForcedAir:UserDefined | 81  AirTerminal:SingleDuct:UserDefined | 82  AirConditioner:VariableRefrigerantFlow | 83  GroundHeatExchanger:HorizontalTrench | 84  HeatExchanger:FluidToFluid | 85  PlantComponent:TemperatureSource | 86  PlantCentralGroundSourceWrapper | 87  AirloopHVAC:UnitarySystem | 88  Coil:Cooling:DX:SingleSpeed:ThermalStorage | 89  CoolingTower:VariableSpeed:Merkel
 
@@ -259,7 +257,7 @@ namespace DataPlant {
 
 	// Parameters for General Equipment Types
 	extern int const NumGeneralEquipTypes;
-	extern FArray1D_Fstring const GeneralEquipTypes;
+	extern FArray1D_string const GeneralEquipTypes;
 
 	extern int const GenEquipTypes_Boiler;
 	extern int const GenEquipTypes_Chiller;
@@ -285,7 +283,7 @@ namespace DataPlant {
 	extern int const GenEquipTypes_PlantComponent;
 	extern int const GenEquipTypes_CentralHeatPumpSystem;
 
-	extern FArray1D_Fstring const OpSchemeTypes; // long since Deprecated, remove?
+	extern FArray1D_string const OpSchemeTypes; // long since Deprecated, remove?
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -366,55 +364,52 @@ namespace DataPlant {
 	{
 		// Members
 		bool Exists; // True if there is a splitter (only 1 allowed per loop)
-		Fstring Name; // Name of the splitter
+		std::string Name; // Name of the splitter
 		int NodeNumIn; // Node number for the inlet to the splitter
 		int BranchNumIn; // Reference number for branch connected to splitter inlet
 		int LevelIn; // Branch Level of splitter inlet in the loop topology
 		int LevelOut; // Branch Level of splitter outlet in the loop topology
 		int CorrMixIndex; // Index of Mixer corresponding to this Splitter
-		Fstring NodeNameIn; // Node name for the inlet to the splitter
+		std::string NodeNameIn; // Node name for the inlet to the splitter
 		int TotalOutletNodes; // Number of outlet nodes for the splitter
 		FArray1D_int NodeNumOut; // Node number for the outlet to the splitter
 		FArray1D_int BranchNumOut; // Reference number for branch connected to splitter outlet
-		FArray1D_Fstring NodeNameOut; // Node name for the outlet to the splitter
+		FArray1D_string NodeNameOut; // Node name for the outlet to the splitter
 
 		// Default Constructor
 		SplitterData() :
 			Exists( false ),
-			Name( MaxNameLength ),
 			NodeNumIn( 0 ),
 			BranchNumIn( 0 ),
 			LevelIn( 0 ),
 			LevelOut( 0 ),
 			CorrMixIndex( 0 ),
-			NodeNameIn( MaxNameLength ),
-			TotalOutletNodes( 0 ),
-			NodeNameOut( sFstring( MaxNameLength ) )
+			TotalOutletNodes( 0 )
 		{}
 
 		// Member Constructor
 		SplitterData(
 			bool const Exists, // True if there is a splitter (only 1 allowed per loop)
-			Fstring const & Name, // Name of the splitter
+			std::string const & Name, // Name of the splitter
 			int const NodeNumIn, // Node number for the inlet to the splitter
 			int const BranchNumIn, // Reference number for branch connected to splitter inlet
 			int const LevelIn, // Branch Level of splitter inlet in the loop topology
 			int const LevelOut, // Branch Level of splitter outlet in the loop topology
 			int const CorrMixIndex, // Index of Mixer corresponding to this Splitter
-			Fstring const & NodeNameIn, // Node name for the inlet to the splitter
+			std::string const & NodeNameIn, // Node name for the inlet to the splitter
 			int const TotalOutletNodes, // Number of outlet nodes for the splitter
 			FArray1_int const & NodeNumOut, // Node number for the outlet to the splitter
 			FArray1_int const & BranchNumOut, // Reference number for branch connected to splitter outlet
-			FArray1_Fstring const & NodeNameOut // Node name for the outlet to the splitter
+			FArray1_string const & NodeNameOut // Node name for the outlet to the splitter
 		) :
 			Exists( Exists ),
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NodeNumIn( NodeNumIn ),
 			BranchNumIn( BranchNumIn ),
 			LevelIn( LevelIn ),
 			LevelOut( LevelOut ),
 			CorrMixIndex( CorrMixIndex ),
-			NodeNameIn( MaxNameLength, NodeNameIn ),
+			NodeNameIn( NodeNameIn ),
 			TotalOutletNodes( TotalOutletNodes ),
 			NodeNumOut( NodeNumOut ),
 			BranchNumOut( BranchNumOut ),
@@ -427,55 +422,52 @@ namespace DataPlant {
 	{
 		// Members
 		bool Exists; // True if there is a mixer (only 1 allowed per loop)
-		Fstring Name; // Name of the mixer
+		std::string Name; // Name of the mixer
 		int NodeNumOut; // Node number for the outlet to the mixer
 		int BranchNumOut; // Reference number for branch connected to splitter inlet
 		int LevelIn; // Branch Level of mixer inlet in the loop topology
 		int LevelOut; // Branch Level of mixer outlet in the loop topology
 		int CorrSplitIndex; // Index of Splitter corresponding to this mixer
-		Fstring NodeNameOut; // Node name for the outlet to the mixer
+		std::string NodeNameOut; // Node name for the outlet to the mixer
 		int TotalInletNodes; // Number of inlet nodes for the mixer
 		FArray1D_int NodeNumIn; // Node number for the inlet to the mixer
 		FArray1D_int BranchNumIn; // Reference number for branch connected to splitter outlet
-		FArray1D_Fstring NodeNameIn; // Node name for the inlet to the mixer
+		FArray1D_string NodeNameIn; // Node name for the inlet to the mixer
 
 		// Default Constructor
 		MixerData() :
 			Exists( false ),
-			Name( MaxNameLength ),
 			NodeNumOut( 0 ),
 			BranchNumOut( 0 ),
 			LevelIn( 0 ),
 			LevelOut( 0 ),
 			CorrSplitIndex( 0 ),
-			NodeNameOut( MaxNameLength ),
-			TotalInletNodes( 0 ),
-			NodeNameIn( sFstring( MaxNameLength ) )
+			TotalInletNodes( 0 )
 		{}
 
 		// Member Constructor
 		MixerData(
 			bool const Exists, // True if there is a mixer (only 1 allowed per loop)
-			Fstring const & Name, // Name of the mixer
+			std::string const & Name, // Name of the mixer
 			int const NodeNumOut, // Node number for the outlet to the mixer
 			int const BranchNumOut, // Reference number for branch connected to splitter inlet
 			int const LevelIn, // Branch Level of mixer inlet in the loop topology
 			int const LevelOut, // Branch Level of mixer outlet in the loop topology
 			int const CorrSplitIndex, // Index of Splitter corresponding to this mixer
-			Fstring const & NodeNameOut, // Node name for the outlet to the mixer
+			std::string const & NodeNameOut, // Node name for the outlet to the mixer
 			int const TotalInletNodes, // Number of inlet nodes for the mixer
 			FArray1_int const & NodeNumIn, // Node number for the inlet to the mixer
 			FArray1_int const & BranchNumIn, // Reference number for branch connected to splitter outlet
-			FArray1_Fstring const & NodeNameIn // Node name for the inlet to the mixer
+			FArray1_string const & NodeNameIn // Node name for the inlet to the mixer
 		) :
 			Exists( Exists ),
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NodeNumOut( NodeNumOut ),
 			BranchNumOut( BranchNumOut ),
 			LevelIn( LevelIn ),
 			LevelOut( LevelOut ),
 			CorrSplitIndex( CorrSplitIndex ),
-			NodeNameOut( MaxNameLength, NodeNameOut ),
+			NodeNameOut( NodeNameOut ),
 			TotalInletNodes( TotalInletNodes ),
 			NodeNumIn( NodeNumIn ),
 			BranchNumIn( BranchNumIn ),
@@ -487,7 +479,7 @@ namespace DataPlant {
 	struct LoopSidePumpInformation
 	{
 		// Members
-		Fstring PumpName;
+		std::string PumpName;
 		int PumpTypeOf;
 		int BranchNum;
 		int CompNum;
@@ -499,7 +491,6 @@ namespace DataPlant {
 
 		// Default Constructor
 		LoopSidePumpInformation() :
-			PumpName( MaxNameLength ),
 			PumpTypeOf( 0 ),
 			BranchNum( 0 ),
 			CompNum( 0 ),
@@ -512,7 +503,7 @@ namespace DataPlant {
 
 		// Member Constructor
 		LoopSidePumpInformation(
-			Fstring const & PumpName,
+			std::string const & PumpName,
 			int const PumpTypeOf,
 			int const BranchNum,
 			int const CompNum,
@@ -522,7 +513,7 @@ namespace DataPlant {
 			Real64 const CurrentMaxAvail,
 			Real64 const PumpHeatToFluid
 		) :
-			PumpName( MaxNameLength, PumpName ),
+			PumpName( PumpName ),
 			PumpTypeOf( PumpTypeOf ),
 			BranchNum( BranchNum ),
 			CompNum( CompNum ),
@@ -590,17 +581,17 @@ namespace DataPlant {
 	struct CompData
 	{
 		// Members
-		Fstring TypeOf; // The 'keyWord' identifying  component type
+		std::string TypeOf; // The 'keyWord' identifying  component type
 		int TypeOf_Num; // Reference the "TypeOf" parameters in DataPlant
 		int GeneralEquipType; // General Equipment Type (e.g. Chillers, Pumps, etc)
-		Fstring Name; // Component name
+		std::string Name; // Component name
 		int CompNum; // Component ID number
 		int FlowCtrl; // flow control for splitter/mixer (ACTIVE/PASSIVE/BYPASS)
 		int FlowPriority; // status for overall loop flow determination
 		bool ON; // TRUE = designated component or operation scheme available
 		bool Available; // TRUE = designated component or operation scheme available
-		Fstring NodeNameIn; // Component inlet node name
-		Fstring NodeNameOut; // Component outlet node name
+		std::string NodeNameIn; // Component inlet node name
+		std::string NodeNameOut; // Component outlet node name
 		int NodeNumIn; // Component inlet node number
 		int NodeNumOut; // Component outlet node number
 		Real64 MyLoad; // Distributed Load
@@ -630,17 +621,13 @@ namespace DataPlant {
 
 		// Default Constructor
 		CompData() :
-			TypeOf( MaxNameLength ),
 			TypeOf_Num( 0 ),
 			GeneralEquipType( 0 ),
-			Name( MaxNameLength ),
 			CompNum( 0 ),
 			FlowCtrl( 0 ),
 			FlowPriority( LoopFlowStatus_Unknown ),
 			ON( false ),
 			Available( false ),
-			NodeNameIn( MaxNameLength ),
-			NodeNameOut( MaxNameLength ),
 			NodeNumIn( 0 ),
 			NodeNumOut( 0 ),
 			MyLoad( 0.0 ),
@@ -668,17 +655,17 @@ namespace DataPlant {
 
 		// Member Constructor
 		CompData(
-			Fstring const & TypeOf, // The 'keyWord' identifying  component type
+			std::string const & TypeOf, // The 'keyWord' identifying  component type
 			int const TypeOf_Num, // Reference the "TypeOf" parameters in DataPlant
 			int const GeneralEquipType, // General Equipment Type (e.g. Chillers, Pumps, etc)
-			Fstring const & Name, // Component name
+			std::string const & Name, // Component name
 			int const CompNum, // Component ID number
 			int const FlowCtrl, // flow control for splitter/mixer (ACTIVE/PASSIVE/BYPASS)
 			int const FlowPriority, // status for overall loop flow determination
 			bool const ON, // TRUE = designated component or operation scheme available
 			bool const Available, // TRUE = designated component or operation scheme available
-			Fstring const & NodeNameIn, // Component inlet node name
-			Fstring const & NodeNameOut, // Component outlet node name
+			std::string const & NodeNameIn, // Component inlet node name
+			std::string const & NodeNameOut, // Component outlet node name
 			int const NodeNumIn, // Component inlet node number
 			int const NodeNumOut, // Component outlet node number
 			Real64 const MyLoad, // Distributed Load
@@ -704,17 +691,17 @@ namespace DataPlant {
 			Real64 const TempDesCondIn,
 			Real64 const TempDesEvapOut
 		) :
-			TypeOf( MaxNameLength, TypeOf ),
+			TypeOf( TypeOf ),
 			TypeOf_Num( TypeOf_Num ),
 			GeneralEquipType( GeneralEquipType ),
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			CompNum( CompNum ),
 			FlowCtrl( FlowCtrl ),
 			FlowPriority( FlowPriority ),
 			ON( ON ),
 			Available( Available ),
-			NodeNameIn( MaxNameLength, NodeNameIn ),
-			NodeNameOut( MaxNameLength, NodeNameOut ),
+			NodeNameIn( NodeNameIn ),
+			NodeNameOut( NodeNameOut ),
 			NodeNumIn( NodeNumIn ),
 			NodeNumOut( NodeNumOut ),
 			MyLoad( MyLoad ),
@@ -746,7 +733,7 @@ namespace DataPlant {
 	struct BranchData
 	{
 		// Members
-		Fstring Name; // Name of the branch
+		std::string Name; // Name of the branch
 		int ControlType;
 		Real64 MinVolFlowRate;
 		Real64 MaxVolFlowRate;
@@ -773,7 +760,6 @@ namespace DataPlant {
 
 		// Default Constructor
 		BranchData() :
-			Name( MaxNameLength ),
 			ControlType( 0 ),
 			MinVolFlowRate( 0.0 ),
 			MaxVolFlowRate( 0.0 ),
@@ -800,7 +786,7 @@ namespace DataPlant {
 
 		// Member Constructor
 		BranchData(
-			Fstring const & Name, // Name of the branch
+			std::string const & Name, // Name of the branch
 			int const ControlType,
 			Real64 const MinVolFlowRate,
 			Real64 const MaxVolFlowRate,
@@ -825,7 +811,7 @@ namespace DataPlant {
 			int const PressureCurveIndex, // Curve: index for pressure drop calculations
 			Real64 const PressureEffectiveK
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ControlType( ControlType ),
 			MinVolFlowRate( MinVolFlowRate ),
 			MaxVolFlowRate( MaxVolFlowRate ),
@@ -867,68 +853,63 @@ namespace DataPlant {
 	struct EquipListCompData
 	{
 		// Members
-		Fstring Name; // The name of each item in the list
-		Fstring TypeOf; // The name of each item in the list
+		std::string Name; // The name of each item in the list
+		std::string TypeOf; // The name of each item in the list
 		int TypeOf_Num;
-		Fstring CtrlType; // CoolingOp, HeatingOp, DualOp
+		std::string CtrlType; // CoolingOp, HeatingOp, DualOp
 		int CtrlTypeNum; // CoolingOp, HeatingOp, DualOp
 		int LoopNumPtr; // pointer to the comp location in the data structure
 		int LoopSideNumPtr; // pointer to the comp location in the data structure
 		int BranchNumPtr; // pointer to the comp location in the data structure
 		int CompNumPtr; // pointer to the comp location in the data structure
 		Real64 SetPointFlowRate; // COMP SETPOINT CTRL ONLY--load calculation comp flow rate
-		Fstring DemandNodeName; // COMP SETPOINT CTRL ONLY--The name of each item in the list
+		std::string DemandNodeName; // COMP SETPOINT CTRL ONLY--The name of each item in the list
 		int DemandNodeNum; // COMP SETPOINT CTRL ONLY--The 'keyWord' identifying each item in list
-		Fstring SetPointNodeName; // COMP SETPOINT CTRL ONLY--The name of each item in the list
+		std::string SetPointNodeName; // COMP SETPOINT CTRL ONLY--The name of each item in the list
 		int SetPointNodeNum; // COMP SETPOINT CTRL ONLY--The 'keyWord' identifying each item in list
 		Real64 EMSIntVarRemainingLoadValue; // EMS internal variable remaining load, neg cooling [W]
 		Real64 EMSActuatorDispatchedLoadValue; // EMS actuator for dispatched load, neg= cooling [W]
 
 		// Default Constructor
 		EquipListCompData() :
-			Name( MaxNameLength ),
-			TypeOf( MaxNameLength ),
 			TypeOf_Num( 0 ),
-			CtrlType( MaxNameLength ),
 			SetPointFlowRate( 0.0 ),
-			DemandNodeName( MaxNameLength ),
-			SetPointNodeName( MaxNameLength ),
 			EMSIntVarRemainingLoadValue( 0.0 ),
 			EMSActuatorDispatchedLoadValue( 0.0 )
 		{}
 
 		// Member Constructor
 		EquipListCompData(
-			Fstring const & Name, // The name of each item in the list
-			Fstring const & TypeOf, // The name of each item in the list
+			std::string const & Name, // The name of each item in the list
+			std::string const & TypeOf, // The name of each item in the list
 			int const TypeOf_Num,
-			Fstring const & CtrlType, // CoolingOp, HeatingOp, DualOp
+			std::string const & CtrlType, // CoolingOp, HeatingOp, DualOp
 			int const CtrlTypeNum, // CoolingOp, HeatingOp, DualOp
 			int const LoopNumPtr, // pointer to the comp location in the data structure
 			int const LoopSideNumPtr, // pointer to the comp location in the data structure
 			int const BranchNumPtr, // pointer to the comp location in the data structure
 			int const CompNumPtr, // pointer to the comp location in the data structure
 			Real64 const SetPointFlowRate, // COMP SETPOINT CTRL ONLY--load calculation comp flow rate
-			Fstring const & DemandNodeName, // COMP SETPOINT CTRL ONLY--The name of each item in the list
+			std::string const & DemandNodeName, // COMP SETPOINT CTRL ONLY--The name of each item in the list
 			int const DemandNodeNum, // COMP SETPOINT CTRL ONLY--The 'keyWord' identifying each item in list
-			Fstring const & SetPointNodeName, // COMP SETPOINT CTRL ONLY--The name of each item in the list
+			std::string const & SetPointNodeName, // COMP SETPOINT CTRL ONLY--The name of each item in the list
 			int const SetPointNodeNum, // COMP SETPOINT CTRL ONLY--The 'keyWord' identifying each item in list
 			Real64 const EMSIntVarRemainingLoadValue, // EMS internal variable remaining load, neg cooling [W]
 			Real64 const EMSActuatorDispatchedLoadValue // EMS actuator for dispatched load, neg= cooling [W]
 		) :
-			Name( MaxNameLength, Name ),
-			TypeOf( MaxNameLength, TypeOf ),
+			Name( Name ),
+			TypeOf( TypeOf ),
 			TypeOf_Num( TypeOf_Num ),
-			CtrlType( MaxNameLength, CtrlType ),
+			CtrlType( CtrlType ),
 			CtrlTypeNum( CtrlTypeNum ),
 			LoopNumPtr( LoopNumPtr ),
 			LoopSideNumPtr( LoopSideNumPtr ),
 			BranchNumPtr( BranchNumPtr ),
 			CompNumPtr( CompNumPtr ),
 			SetPointFlowRate( SetPointFlowRate ),
-			DemandNodeName( MaxNameLength, DemandNodeName ),
+			DemandNodeName( DemandNodeName ),
 			DemandNodeNum( DemandNodeNum ),
-			SetPointNodeName( MaxNameLength, SetPointNodeName ),
+			SetPointNodeName( SetPointNodeName ),
 			SetPointNodeNum( SetPointNodeNum ),
 			EMSIntVarRemainingLoadValue( EMSIntVarRemainingLoadValue ),
 			EMSActuatorDispatchedLoadValue( EMSActuatorDispatchedLoadValue )
@@ -939,7 +920,7 @@ namespace DataPlant {
 	struct EquipOpList // DSU
 	{
 		// Members
-		Fstring Name; // The name of each item in the list
+		std::string Name; // The name of each item in the list
 		Real64 RangeUpperLimit; // for range based controls
 		Real64 RangeLowerLimit; // for range based controls
 		int NumComps; // ALLOCATABLE to the schedule (for valid schedules)
@@ -947,7 +928,6 @@ namespace DataPlant {
 
 		// Default Constructor
 		EquipOpList() :
-			Name( MaxNameLength ),
 			RangeUpperLimit( 0.0 ),
 			RangeLowerLimit( 0.0 ),
 			NumComps( 0 )
@@ -955,13 +935,13 @@ namespace DataPlant {
 
 		// Member Constructor
 		EquipOpList(
-			Fstring const & Name, // The name of each item in the list
+			std::string const & Name, // The name of each item in the list
 			Real64 const RangeUpperLimit, // for range based controls
 			Real64 const RangeLowerLimit, // for range based controls
 			int const NumComps, // ALLOCATABLE to the schedule (for valid schedules)
 			FArray1< EquipListCompData > const & Comp // Component type list
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			RangeUpperLimit( RangeUpperLimit ),
 			RangeLowerLimit( RangeLowerLimit ),
 			NumComps( NumComps ),
@@ -973,17 +953,17 @@ namespace DataPlant {
 	struct OperationData // DSU
 	{
 		// Members
-		Fstring Name; // The name of each item in the list
-		Fstring TypeOf; // The 'keyWord' identifying each item in the list
+		std::string Name; // The name of each item in the list
+		std::string TypeOf; // The 'keyWord' identifying each item in the list
 		int OpSchemeType; // Op scheme type (from keyword)
-		Fstring Sched; // The name of the schedule associated with the list
+		std::string Sched; // The name of the schedule associated with the list
 		int SchedPtr; // ALLOCATABLE to the schedule (for valid schedules)
 		bool Available; // TRUE = designated component or operation scheme available
 		int NumEquipLists; // number of equipment lists
 		int CurListPtr; // points to the current equipment list
 		FArray1D< EquipOpList > EquipList; // Component type list
 		int EquipListNumForLastStage; // points to the equipment list with the highest upper limit
-		Fstring ReferenceNodeName; // DELTA CTRL ONLY--for calculation of delta Temp
+		std::string ReferenceNodeName; // DELTA CTRL ONLY--for calculation of delta Temp
 		int ReferenceNodeNumber; // DELTA CTRL ONLY--for calculation of delta Temp
 		int ErlSimProgramMngr; // EMS:ProgramManager to always run when this model is called
 		int ErlInitProgramMngr; // EMS:ProgramManager to run when this model is initialized and setup
@@ -992,16 +972,12 @@ namespace DataPlant {
 
 		// Default Constructor
 		OperationData() :
-			Name( MaxNameLength ),
-			TypeOf( MaxNameLength ),
 			OpSchemeType( 0 ),
-			Sched( MaxNameLength ),
 			SchedPtr( 0 ),
 			Available( false ),
 			NumEquipLists( 0 ),
 			CurListPtr( 0 ),
 			EquipListNumForLastStage( 0 ),
-			ReferenceNodeName( MaxNameLength ),
 			ErlSimProgramMngr( 0 ),
 			ErlInitProgramMngr( 0 ),
 			EMSIntVarLoopDemandRate( 0.0 ),
@@ -1010,34 +986,34 @@ namespace DataPlant {
 
 		// Member Constructor
 		OperationData(
-			Fstring const & Name, // The name of each item in the list
-			Fstring const & TypeOf, // The 'keyWord' identifying each item in the list
+			std::string const & Name, // The name of each item in the list
+			std::string const & TypeOf, // The 'keyWord' identifying each item in the list
 			int const OpSchemeType, // Op scheme type (from keyword)
-			Fstring const & Sched, // The name of the schedule associated with the list
+			std::string const & Sched, // The name of the schedule associated with the list
 			int const SchedPtr, // ALLOCATABLE to the schedule (for valid schedules)
 			bool const Available, // TRUE = designated component or operation scheme available
 			int const NumEquipLists, // number of equipment lists
 			int const CurListPtr, // points to the current equipment list
 			FArray1< EquipOpList > const & EquipList, // Component type list
 			int const EquipListNumForLastStage, // points to the equipment list with the highest upper limit
-			Fstring const & ReferenceNodeName, // DELTA CTRL ONLY--for calculation of delta Temp
+			std::string const & ReferenceNodeName, // DELTA CTRL ONLY--for calculation of delta Temp
 			int const ReferenceNodeNumber, // DELTA CTRL ONLY--for calculation of delta Temp
 			int const ErlSimProgramMngr, // EMS:ProgramManager to always run when this model is called
 			int const ErlInitProgramMngr, // EMS:ProgramManager to run when this model is initialized and setup
 			Real64 const EMSIntVarLoopDemandRate, // EMS internal variable for loop-level demand rate, neg cooling [W]
 			bool const MyEnvrnFlag
 		) :
-			Name( MaxNameLength, Name ),
-			TypeOf( MaxNameLength, TypeOf ),
+			Name( Name ),
+			TypeOf( TypeOf ),
 			OpSchemeType( OpSchemeType ),
-			Sched( MaxNameLength, Sched ),
+			Sched( Sched ),
 			SchedPtr( SchedPtr ),
 			Available( Available ),
 			NumEquipLists( NumEquipLists ),
 			CurListPtr( CurListPtr ),
 			EquipList( EquipList ),
 			EquipListNumForLastStage( EquipListNumForLastStage ),
-			ReferenceNodeName( MaxNameLength, ReferenceNodeName ),
+			ReferenceNodeName( ReferenceNodeName ),
 			ReferenceNodeNumber( ReferenceNodeNumber ),
 			ErlSimProgramMngr( ErlSimProgramMngr ),
 			ErlInitProgramMngr( ErlInitProgramMngr ),
@@ -1157,13 +1133,13 @@ namespace DataPlant {
 		// This is the temperature at the loop outlet linterface
 		// with half-loop capacitance and pump heat accounted for.
 		Real64 LastTempInterfaceTankOutlet;
-		Fstring BranchList; // Branch list name for the half loop
-		Fstring ConnectList; // Connector list name for the half loop
+		std::string BranchList; // Branch list name for the half loop
+		std::string ConnectList; // Connector list name for the half loop
 		int TotalBranches; // Total number of branches on the half loop
 		int NodeNumIn; // Node number for the inlet to this loop
-		Fstring NodeNameIn; // Node name for the inlet to this loop
+		std::string NodeNameIn; // Node name for the inlet to this loop
 		int NodeNumOut; // Node number for the outlet to this loop
-		Fstring NodeNameOut; // Node name for the outlet to this loop
+		std::string NodeNameOut; // Node name for the outlet to this loop
 		int NumSplitters; // Number of splitters in the half loop
 		int NumMixers; // Number of mixers in the half loop
 		bool SplitterExists; // Logical Flag indication splitter exists in the half loop
@@ -1213,13 +1189,9 @@ namespace DataPlant {
 			TempSetPointLo( SensedNodeFlagValue ),
 			TempInterfaceTankOutlet( 0.0 ),
 			LastTempInterfaceTankOutlet( 0.0 ),
-			BranchList( MaxNameLength ),
-			ConnectList( MaxNameLength ),
 			TotalBranches( 0 ),
 			NodeNumIn( 0 ),
-			NodeNameIn( MaxNameLength ),
 			NodeNumOut( 0 ),
-			NodeNameOut( MaxNameLength ),
 			NumSplitters( 0 ),
 			NumMixers( 0 ),
 			SplitterExists( false ),
@@ -1263,13 +1235,13 @@ namespace DataPlant {
 			Real64 const TempSetPointLo, // Low Loop temperature setpoint
 			Real64 const TempInterfaceTankOutlet, // Used by interface manager in common pipe simulation
 			Real64 const LastTempInterfaceTankOutlet,
-			Fstring const & BranchList, // Branch list name for the half loop
-			Fstring const & ConnectList, // Connector list name for the half loop
+			std::string const & BranchList, // Branch list name for the half loop
+			std::string const & ConnectList, // Connector list name for the half loop
 			int const TotalBranches, // Total number of branches on the half loop
 			int const NodeNumIn, // Node number for the inlet to this loop
-			Fstring const & NodeNameIn, // Node name for the inlet to this loop
+			std::string const & NodeNameIn, // Node name for the inlet to this loop
 			int const NodeNumOut, // Node number for the outlet to this loop
-			Fstring const & NodeNameOut, // Node name for the outlet to this loop
+			std::string const & NodeNameOut, // Node name for the outlet to this loop
 			int const NumSplitters, // Number of splitters in the half loop
 			int const NumMixers, // Number of mixers in the half loop
 			bool const SplitterExists, // Logical Flag indication splitter exists in the half loop
@@ -1316,13 +1288,13 @@ namespace DataPlant {
 			TempSetPointLo( TempSetPointLo ),
 			TempInterfaceTankOutlet( TempInterfaceTankOutlet ),
 			LastTempInterfaceTankOutlet( LastTempInterfaceTankOutlet ),
-			BranchList( MaxNameLength, BranchList ),
-			ConnectList( MaxNameLength, ConnectList ),
+			BranchList( BranchList ),
+			ConnectList( ConnectList ),
 			TotalBranches( TotalBranches ),
 			NodeNumIn( NodeNumIn ),
-			NodeNameIn( MaxNameLength, NodeNameIn ),
+			NodeNameIn( NodeNameIn ),
 			NodeNumOut( NodeNumOut ),
-			NodeNameOut( MaxNameLength, NodeNameOut ),
+			NodeNameOut( NodeNameOut ),
 			NumSplitters( NumSplitters ),
 			NumMixers( NumMixers ),
 			SplitterExists( SplitterExists ),
@@ -1361,8 +1333,8 @@ namespace DataPlant {
 	struct PlantLoopData
 	{
 		// Members
-		Fstring Name; // Name of the component list
-		Fstring FluidName; // Name of the fluid specified for this loop
+		std::string Name; // Name of the component list
+		std::string FluidName; // Name of the fluid specified for this loop
 		int FluidType; // Type of fluid in the loop
 		int FluidIndex; // Index for Fluid in FluidProperties
 		int MFErrIndex; // for recurring mass flow errors
@@ -1386,7 +1358,7 @@ namespace DataPlant {
 		Real64 EMSValue;
 		// Loop Inlet and Outlet Nodes
 		FArray1D< HalfLoopData > LoopSide; // Half loop data (Demand side or Supply Side)
-		Fstring OperationScheme; // Operation scheme name for the loop
+		std::string OperationScheme; // Operation scheme name for the loop
 		int NumOpSchemes; // Number of items in list identified by "OpScheme"
 		FArray1D< OperationData > OpScheme; // Operation scheme data
 		int LoadDistribution; // Load distribution scheme 1 for optimal, 2 for overloading
@@ -1396,9 +1368,9 @@ namespace DataPlant {
 		int CommonPipeType;
 		//  TYPE(TwoWayCommonPipeData), &
 		//       ALLOCATABLE                 :: TwoWayCommonPipe                ! two-way common pipe data, primary secondary loop model
-		Fstring EconomizerHtExchanger; // DSU review, should move these out of here
-		Fstring EconPlantSideSensedNodeName; // DSU review, should move these out of here
-		Fstring EconCondSideSensedNodeName; // DSU review, should move these out of here
+		std::string EconomizerHtExchanger; // DSU review, should move these out of here
+		std::string EconPlantSideSensedNodeName; // DSU review, should move these out of here
+		std::string EconCondSideSensedNodeName; // DSU review, should move these out of here
 		int EconPlantSideSensedNodeNum; // DSU review, should move these out of here
 		int EconCondSideSensedNodeNum; // DSU review, should move these out of here
 		int EconPlacement; // DSU review, should move these out of here
@@ -1415,8 +1387,6 @@ namespace DataPlant {
 
 		// Default Constructor
 		PlantLoopData() :
-			Name( MaxNameLength ),
-			FluidName( MaxNameLength ),
 			FluidType( 0 ),
 			FluidIndex( 0 ),
 			MFErrIndex( 0 ),
@@ -1436,15 +1406,11 @@ namespace DataPlant {
 			Mass( 0.0 ),
 			EMSCtrl( false ),
 			EMSValue( 0.0 ),
-			OperationScheme( MaxNameLength ),
 			NumOpSchemes( 0 ),
 			LoadDistribution( 0 ),
 			PlantSizNum( 0 ),
 			LoopDemandCalcScheme( 0 ),
 			CommonPipeType( 0 ),
-			EconomizerHtExchanger( MaxNameLength ),
-			EconPlantSideSensedNodeName( MaxNameLength ),
-			EconCondSideSensedNodeName( MaxNameLength ),
 			EconPlantSideSensedNodeNum( 0 ),
 			EconCondSideSensedNodeNum( 0 ),
 			EconPlacement( 0 ),
@@ -1462,8 +1428,8 @@ namespace DataPlant {
 
 		// Member Constructor
 		PlantLoopData(
-			Fstring const & Name, // Name of the component list
-			Fstring const & FluidName, // Name of the fluid specified for this loop
+			std::string const & Name, // Name of the component list
+			std::string const & FluidName, // Name of the fluid specified for this loop
 			int const FluidType, // Type of fluid in the loop
 			int const FluidIndex, // Index for Fluid in FluidProperties
 			int const MFErrIndex, // for recurring mass flow errors
@@ -1484,16 +1450,16 @@ namespace DataPlant {
 			bool const EMSCtrl,
 			Real64 const EMSValue,
 			FArray1< HalfLoopData > const & LoopSide, // Half loop data (Demand side or Supply Side)
-			Fstring const & OperationScheme, // Operation scheme name for the loop
+			std::string const & OperationScheme, // Operation scheme name for the loop
 			int const NumOpSchemes, // Number of items in list identified by "OpScheme"
 			FArray1< OperationData > const & OpScheme, // Operation scheme data
 			int const LoadDistribution, // Load distribution scheme 1 for optimal, 2 for overloading
 			int const PlantSizNum, // index to corresponding plant sizing data array
 			int const LoopDemandCalcScheme, // Load distribution scheme 1 SingleSetPoint,
 			int const CommonPipeType,
-			Fstring const & EconomizerHtExchanger, // DSU review, should move these out of here
-			Fstring const & EconPlantSideSensedNodeName, // DSU review, should move these out of here
-			Fstring const & EconCondSideSensedNodeName, // DSU review, should move these out of here
+			std::string const & EconomizerHtExchanger, // DSU review, should move these out of here
+			std::string const & EconPlantSideSensedNodeName, // DSU review, should move these out of here
+			std::string const & EconCondSideSensedNodeName, // DSU review, should move these out of here
 			int const EconPlantSideSensedNodeNum, // DSU review, should move these out of here
 			int const EconCondSideSensedNodeNum, // DSU review, should move these out of here
 			int const EconPlacement, // DSU review, should move these out of here
@@ -1508,8 +1474,8 @@ namespace DataPlant {
 			bool const UsePressureForPumpCalcs,
 			Real64 const PressureEffectiveK
 		) :
-			Name( MaxNameLength, Name ),
-			FluidName( MaxNameLength, FluidName ),
+			Name( Name ),
+			FluidName( FluidName ),
 			FluidType( FluidType ),
 			FluidIndex( FluidIndex ),
 			MFErrIndex( MFErrIndex ),
@@ -1530,16 +1496,16 @@ namespace DataPlant {
 			EMSCtrl( EMSCtrl ),
 			EMSValue( EMSValue ),
 			LoopSide( LoopSide ),
-			OperationScheme( MaxNameLength, OperationScheme ),
+			OperationScheme( OperationScheme ),
 			NumOpSchemes( NumOpSchemes ),
 			OpScheme( OpScheme ),
 			LoadDistribution( LoadDistribution ),
 			PlantSizNum( PlantSizNum ),
 			LoopDemandCalcScheme( LoopDemandCalcScheme ),
 			CommonPipeType( CommonPipeType ),
-			EconomizerHtExchanger( MaxNameLength, EconomizerHtExchanger ),
-			EconPlantSideSensedNodeName( MaxNameLength, EconPlantSideSensedNodeName ),
-			EconCondSideSensedNodeName( MaxNameLength, EconCondSideSensedNodeName ),
+			EconomizerHtExchanger( EconomizerHtExchanger ),
+			EconPlantSideSensedNodeName( EconPlantSideSensedNodeName ),
+			EconCondSideSensedNodeName( EconCondSideSensedNodeName ),
 			EconPlantSideSensedNodeNum( EconPlantSideSensedNodeNum ),
 			EconCondSideSensedNodeNum( EconCondSideSensedNodeNum ),
 			EconPlacement( EconPlacement ),
@@ -1560,32 +1526,29 @@ namespace DataPlant {
 	struct ComponentData
 	{
 		// Members
-		Fstring Name; // Name of the component
-		Fstring NodeNameIn; // Name of Node In
-		Fstring NodeNameOut; // Name of Node Out
+		std::string Name; // Name of the component
+		std::string NodeNameIn; // Name of Node In
+		std::string NodeNameOut; // Name of Node Out
 		int NodeNumIn; // Inlet node number
 		int NodeNumOut; // Outlet node number
 
 		// Default Constructor
 		ComponentData() :
-			Name( MaxNameLength ),
-			NodeNameIn( MaxNameLength ),
-			NodeNameOut( MaxNameLength ),
 			NodeNumIn( 0 ),
 			NodeNumOut( 0 )
 		{}
 
 		// Member Constructor
 		ComponentData(
-			Fstring const & Name, // Name of the component
-			Fstring const & NodeNameIn, // Name of Node In
-			Fstring const & NodeNameOut, // Name of Node Out
+			std::string const & Name, // Name of the component
+			std::string const & NodeNameIn, // Name of Node In
+			std::string const & NodeNameOut, // Name of Node Out
 			int const NodeNumIn, // Inlet node number
 			int const NodeNumOut // Outlet node number
 		) :
-			Name( MaxNameLength, Name ),
-			NodeNameIn( MaxNameLength, NodeNameIn ),
-			NodeNameOut( MaxNameLength, NodeNameOut ),
+			Name( Name ),
+			NodeNameIn( NodeNameIn ),
+			NodeNameOut( NodeNameOut ),
 			NodeNumIn( NodeNumIn ),
 			NodeNumOut( NodeNumOut )
 		{}
@@ -1595,48 +1558,45 @@ namespace DataPlant {
 	struct PipeData
 	{
 		// Members
-		Fstring Name; // Pipe name
+		std::string Name; // Pipe name
 		int TypeOf;
 		int EquipNum;
 		int FlowCtrl; // Pipe control (should always be BYPASS)
-		Fstring NodeNameIn; // Pipe inlet node name
+		std::string NodeNameIn; // Pipe inlet node name
 		int NodeNumIn; // Pipe inlet node number
-		Fstring NodeNameOut; // Pipe outlet node name
+		std::string NodeNameOut; // Pipe outlet node name
 		int NodeNumOut; // Pipe outlet node number
 		int ParentHalfLoop; // Half loop where the pipe is present
 
 		// Default Constructor
 		PipeData() :
-			Name( MaxNameLength ),
 			TypeOf( 0 ),
 			EquipNum( 0 ),
 			FlowCtrl( 0 ),
-			NodeNameIn( MaxNameLength ),
 			NodeNumIn( 0 ),
-			NodeNameOut( MaxNameLength ),
 			NodeNumOut( 0 ),
 			ParentHalfLoop( 0 )
 		{}
 
 		// Member Constructor
 		PipeData(
-			Fstring const & Name, // Pipe name
+			std::string const & Name, // Pipe name
 			int const TypeOf,
 			int const EquipNum,
 			int const FlowCtrl, // Pipe control (should always be BYPASS)
-			Fstring const & NodeNameIn, // Pipe inlet node name
+			std::string const & NodeNameIn, // Pipe inlet node name
 			int const NodeNumIn, // Pipe inlet node number
-			Fstring const & NodeNameOut, // Pipe outlet node name
+			std::string const & NodeNameOut, // Pipe outlet node name
 			int const NodeNumOut, // Pipe outlet node number
 			int const ParentHalfLoop // Half loop where the pipe is present
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			TypeOf( TypeOf ),
 			EquipNum( EquipNum ),
 			FlowCtrl( FlowCtrl ),
-			NodeNameIn( MaxNameLength, NodeNameIn ),
+			NodeNameIn( NodeNameIn ),
 			NodeNumIn( NodeNumIn ),
-			NodeNameOut( MaxNameLength, NodeNameOut ),
+			NodeNameOut( NodeNameOut ),
 			NodeNumOut( NodeNumOut ),
 			ParentHalfLoop( ParentHalfLoop )
 		{}
@@ -1650,7 +1610,7 @@ namespace DataPlant {
 		int AvailStatus; // system availability status
 		int StartTime; // cycle on time (in SimTimeSteps)
 		int StopTime; // cycle off time (in SimTimeSteps)
-		FArray1D_Fstring AvailManagerName; // name of each availability manager
+		FArray1D_string AvailManagerName; // name of each availability manager
 		FArray1D_int AvailManagerType; // type of availability manager
 		FArray1D_int AvailManagerNum; // index of availability manager
 
@@ -1659,8 +1619,7 @@ namespace DataPlant {
 			NumAvailManagers( 0 ),
 			AvailStatus( 0 ),
 			StartTime( 0 ),
-			StopTime( 0 ),
-			AvailManagerName( sFstring( MaxNameLength ) )
+			StopTime( 0 )
 		{}
 
 		// Member Constructor
@@ -1669,7 +1628,7 @@ namespace DataPlant {
 			int const AvailStatus, // system availability status
 			int const StartTime, // cycle on time (in SimTimeSteps)
 			int const StopTime, // cycle off time (in SimTimeSteps)
-			FArray1_Fstring const & AvailManagerName, // name of each availability manager
+			FArray1_string const & AvailManagerName, // name of each availability manager
 			FArray1_int const & AvailManagerType, // type of availability manager
 			FArray1_int const & AvailManagerNum // index of availability manager
 		) :
@@ -1802,12 +1761,12 @@ namespace DataPlant {
 	struct MeterData
 	{
 		// Members
-		Fstring ReportVarName;
-		Fstring ReportVarUnits;
+		std::string ReportVarName;
+		std::string ReportVarUnits;
 		int ResourceType;
-		Fstring EndUse;
+		std::string EndUse;
 		int EndUse_CompMode;
-		Fstring Group;
+		std::string Group;
 		int ReportVarIndex;
 		int ReportVarIndexType;
 		int ReportVarType;
@@ -1815,12 +1774,8 @@ namespace DataPlant {
 
 		// Default Constructor
 		MeterData() :
-			ReportVarName( MaxNameLength ),
-			ReportVarUnits( 15 ),
 			ResourceType( 0 ),
-			EndUse( MaxNameLength ),
 			EndUse_CompMode( 0 ),
-			Group( MaxNameLength ),
 			ReportVarIndex( 0 ),
 			ReportVarIndexType( 0 ),
 			ReportVarType( 0 ),
@@ -1829,23 +1784,23 @@ namespace DataPlant {
 
 		// Member Constructor
 		MeterData(
-			Fstring const & ReportVarName,
-			Fstring const & ReportVarUnits,
+			std::string const & ReportVarName,
+			std::string const & ReportVarUnits,
 			int const ResourceType,
-			Fstring const & EndUse,
+			std::string const & EndUse,
 			int const EndUse_CompMode,
-			Fstring const & Group,
+			std::string const & Group,
 			int const ReportVarIndex,
 			int const ReportVarIndexType,
 			int const ReportVarType,
 			Real64 const CurMeterReading
 		) :
-			ReportVarName( MaxNameLength, ReportVarName ),
-			ReportVarUnits( 15, ReportVarUnits ),
+			ReportVarName( ReportVarName ),
+			ReportVarUnits( ReportVarUnits ),
 			ResourceType( ResourceType ),
-			EndUse( MaxNameLength, EndUse ),
+			EndUse( EndUse ),
 			EndUse_CompMode( EndUse_CompMode ),
-			Group( MaxNameLength, Group ),
+			Group( Group ),
 			ReportVarIndex( ReportVarIndex ),
 			ReportVarIndexType( ReportVarIndexType ),
 			ReportVarType( ReportVarType ),
@@ -1857,11 +1812,11 @@ namespace DataPlant {
 	struct SubSubcomponentData // data for an individual component
 	{
 		// Members
-		Fstring TypeOf; // The 'keyWord' identifying  component type
-		Fstring Name; // Component name
+		std::string TypeOf; // The 'keyWord' identifying  component type
+		std::string Name; // Component name
 		int CompIndex; // Component Index in whatever is using this component
-		Fstring NodeNameIn; // Component inlet node name
-		Fstring NodeNameOut; // Component outlet node name
+		std::string NodeNameIn; // Component inlet node name
+		std::string NodeNameOut; // Component outlet node name
 		bool ON; // TRUE = designated component or operation scheme available
 		int NodeNumIn; // Component inlet node number
 		int NodeNumOut; // Component outlet node number
@@ -1888,11 +1843,7 @@ namespace DataPlant {
 
 		// Default Constructor
 		SubSubcomponentData() :
-			TypeOf( MaxNameLength ),
-			Name( MaxNameLength ),
 			CompIndex( 0 ),
-			NodeNameIn( MaxNameLength ),
-			NodeNameOut( MaxNameLength ),
 			ON( true ),
 			NodeNumIn( 0 ),
 			NodeNumOut( 0 ),
@@ -1919,11 +1870,11 @@ namespace DataPlant {
 
 		// Member Constructor
 		SubSubcomponentData(
-			Fstring const & TypeOf, // The 'keyWord' identifying  component type
-			Fstring const & Name, // Component name
+			std::string const & TypeOf, // The 'keyWord' identifying  component type
+			std::string const & Name, // Component name
 			int const CompIndex, // Component Index in whatever is using this component
-			Fstring const & NodeNameIn, // Component inlet node name
-			Fstring const & NodeNameOut, // Component outlet node name
+			std::string const & NodeNameIn, // Component inlet node name
+			std::string const & NodeNameOut, // Component outlet node name
 			bool const ON, // TRUE = designated component or operation scheme available
 			int const NodeNumIn, // Component inlet node number
 			int const NodeNumOut, // Component outlet node number
@@ -1948,11 +1899,11 @@ namespace DataPlant {
 			FArray1< MeterData > const & MeteredVar, // Index of energy output report data
 			int const AirSysToPlantPtr // 0=No plant connection, >0 = index to AirSysToPlant array
 		) :
-			TypeOf( MaxNameLength, TypeOf ),
-			Name( MaxNameLength, Name ),
+			TypeOf( TypeOf ),
+			Name( Name ),
 			CompIndex( CompIndex ),
-			NodeNameIn( MaxNameLength, NodeNameIn ),
-			NodeNameOut( MaxNameLength, NodeNameOut ),
+			NodeNameIn( NodeNameIn ),
+			NodeNameOut( NodeNameOut ),
 			ON( ON ),
 			NodeNumIn( NodeNumIn ),
 			NodeNumOut( NodeNumOut ),
@@ -1983,13 +1934,13 @@ namespace DataPlant {
 	struct SubcomponentData // data for an individual component
 	{
 		// Members
-		Fstring TypeOf; // The 'keyWord' identifying  component type
-		Fstring Name; // Component name
+		std::string TypeOf; // The 'keyWord' identifying  component type
+		std::string Name; // Component name
 		int CompIndex; // Component Index in whatever is using this component
 		bool Parent; // TRUE = designated component is made up of sub-components
 		int NumSubSubComps;
-		Fstring NodeNameIn; // Component inlet node name
-		Fstring NodeNameOut; // Component outlet node name
+		std::string NodeNameIn; // Component inlet node name
+		std::string NodeNameOut; // Component outlet node name
 		int NodeNumIn; // Component inlet node number
 		int NodeNumOut; // Component outlet node number
 		bool MeteredVarsFound;
@@ -2018,13 +1969,9 @@ namespace DataPlant {
 
 		// Default Constructor
 		SubcomponentData() :
-			TypeOf( MaxNameLength ),
-			Name( MaxNameLength ),
 			CompIndex( 0 ),
 			Parent( false ),
 			NumSubSubComps( 0 ),
-			NodeNameIn( MaxNameLength ),
-			NodeNameOut( MaxNameLength ),
 			NodeNumIn( 0 ),
 			NodeNumOut( 0 ),
 			MeteredVarsFound( false ),
@@ -2052,13 +1999,13 @@ namespace DataPlant {
 
 		// Member Constructor
 		SubcomponentData(
-			Fstring const & TypeOf, // The 'keyWord' identifying  component type
-			Fstring const & Name, // Component name
+			std::string const & TypeOf, // The 'keyWord' identifying  component type
+			std::string const & Name, // Component name
 			int const CompIndex, // Component Index in whatever is using this component
 			bool const Parent, // TRUE = designated component is made up of sub-components
 			int const NumSubSubComps,
-			Fstring const & NodeNameIn, // Component inlet node name
-			Fstring const & NodeNameOut, // Component outlet node name
+			std::string const & NodeNameIn, // Component inlet node name
+			std::string const & NodeNameOut, // Component outlet node name
 			int const NodeNumIn, // Component inlet node number
 			int const NodeNumOut, // Component outlet node number
 			bool const MeteredVarsFound,
@@ -2085,13 +2032,13 @@ namespace DataPlant {
 			FArray1< MeterData > const & MeteredVar, // Index of energy output report data
 			FArray1< SubSubcomponentData > const & SubSubComp // Component list
 		) :
-			TypeOf( MaxNameLength, TypeOf ),
-			Name( MaxNameLength, Name ),
+			TypeOf( TypeOf ),
+			Name( Name ),
 			CompIndex( CompIndex ),
 			Parent( Parent ),
 			NumSubSubComps( NumSubSubComps ),
-			NodeNameIn( MaxNameLength, NodeNameIn ),
-			NodeNameOut( MaxNameLength, NodeNameOut ),
+			NodeNameIn( NodeNameIn ),
+			NodeNameOut( NodeNameOut ),
 			NodeNumIn( NodeNumIn ),
 			NodeNumOut( NodeNumOut ),
 			MeteredVarsFound( MeteredVarsFound ),
@@ -2125,11 +2072,11 @@ namespace DataPlant {
 	{
 		// Members
 		bool Parent; // TRUE = designated component is made up of sub-components
-		Fstring TypeOf; // The 'keyWord' identifying  component type
-		Fstring Name; // Component name
+		std::string TypeOf; // The 'keyWord' identifying  component type
+		std::string Name; // Component name
 		int CompIndex; // Component Index in whatever is using this component
-		Fstring NodeNameIn; // Component inlet node name
-		Fstring NodeNameOut; // Component outlet node name
+		std::string NodeNameIn; // Component inlet node name
+		std::string NodeNameOut; // Component outlet node name
 		int NodeNumIn; // Component inlet node number
 		int NodeNumOut; // Component outlet node number
 		int NumMeteredVars;
@@ -2146,11 +2093,7 @@ namespace DataPlant {
 		// Default Constructor
 		ReportCompData() :
 			Parent( false ),
-			TypeOf( MaxNameLength ),
-			Name( MaxNameLength ),
 			CompIndex( 0 ),
-			NodeNameIn( MaxNameLength ),
-			NodeNameOut( MaxNameLength ),
 			NodeNumIn( 0 ),
 			NodeNumOut( 0 ),
 			NumMeteredVars( 0 ),
@@ -2165,11 +2108,11 @@ namespace DataPlant {
 		// Member Constructor
 		ReportCompData(
 			bool const Parent, // TRUE = designated component is made up of sub-components
-			Fstring const & TypeOf, // The 'keyWord' identifying  component type
-			Fstring const & Name, // Component name
+			std::string const & TypeOf, // The 'keyWord' identifying  component type
+			std::string const & Name, // Component name
 			int const CompIndex, // Component Index in whatever is using this component
-			Fstring const & NodeNameIn, // Component inlet node name
-			Fstring const & NodeNameOut, // Component outlet node name
+			std::string const & NodeNameIn, // Component inlet node name
+			std::string const & NodeNameOut, // Component outlet node name
 			int const NodeNumIn, // Component inlet node number
 			int const NodeNumOut, // Component outlet node number
 			int const NumMeteredVars,
@@ -2184,11 +2127,11 @@ namespace DataPlant {
 			FArray1< SubcomponentData > const & SubComp
 		) :
 			Parent( Parent ),
-			TypeOf( MaxNameLength, TypeOf ),
-			Name( MaxNameLength, Name ),
+			TypeOf( TypeOf ),
+			Name( Name ),
 			CompIndex( CompIndex ),
-			NodeNameIn( MaxNameLength, NodeNameIn ),
-			NodeNameOut( MaxNameLength, NodeNameOut ),
+			NodeNameIn( NodeNameIn ),
+			NodeNameOut( NodeNameOut ),
 			NodeNumIn( NodeNumIn ),
 			NodeNumOut( NodeNumOut ),
 			NumMeteredVars( NumMeteredVars ),
@@ -2208,7 +2151,7 @@ namespace DataPlant {
 	struct ReportBranchData
 	{
 		// Members
-		Fstring Name; // Name of the branch
+		std::string Name; // Name of the branch
 		int TotalComponents; // Total number of components on the branch
 		int NodeNumIn; // Branch inlet node number
 		int NodeNumOut; // Branch outlet node number
@@ -2216,7 +2159,6 @@ namespace DataPlant {
 
 		// Default Constructor
 		ReportBranchData() :
-			Name( MaxNameLength ),
 			TotalComponents( 0 ),
 			NodeNumIn( 0 ),
 			NodeNumOut( 0 )
@@ -2224,13 +2166,13 @@ namespace DataPlant {
 
 		// Member Constructor
 		ReportBranchData(
-			Fstring const & Name, // Name of the branch
+			std::string const & Name, // Name of the branch
 			int const TotalComponents, // Total number of components on the branch
 			int const NodeNumIn, // Branch inlet node number
 			int const NodeNumOut, // Branch outlet node number
 			FArray1< ReportCompData > const & Comp // Component type list
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			TotalComponents( TotalComponents ),
 			NodeNumIn( NodeNumIn ),
 			NodeNumOut( NodeNumOut ),
@@ -2242,11 +2184,11 @@ namespace DataPlant {
 	struct ReportLoopData
 	{
 		// Members
-		Fstring Name; // Name of the component list
+		std::string Name; // Name of the component list
 		int NodeNumIn; // Node number for the inlet to this loop
-		Fstring NodeNameIn; // Node name for the inlet to this loop
+		std::string NodeNameIn; // Node name for the inlet to this loop
 		int NodeNumOut; // Node number for the outlet to this loop
-		Fstring NodeNameOut; // Node name for the outlet to this loop
+		std::string NodeNameOut; // Node name for the outlet to this loop
 		Real64 Electric;
 		Real64 Gas;
 		Real64 Purchased;
@@ -2258,11 +2200,8 @@ namespace DataPlant {
 
 		// Default Constructor
 		ReportLoopData() :
-			Name( MaxNameLength ),
 			NodeNumIn( 0 ),
-			NodeNameIn( MaxNameLength ),
 			NodeNumOut( 0 ),
-			NodeNameOut( MaxNameLength ),
 			Electric( 0.0 ),
 			Gas( 0.0 ),
 			Purchased( 0.0 ),
@@ -2274,11 +2213,11 @@ namespace DataPlant {
 
 		// Member Constructor
 		ReportLoopData(
-			Fstring const & Name, // Name of the component list
+			std::string const & Name, // Name of the component list
 			int const NodeNumIn, // Node number for the inlet to this loop
-			Fstring const & NodeNameIn, // Node name for the inlet to this loop
+			std::string const & NodeNameIn, // Node name for the inlet to this loop
 			int const NodeNumOut, // Node number for the outlet to this loop
-			Fstring const & NodeNameOut, // Node name for the outlet to this loop
+			std::string const & NodeNameOut, // Node name for the outlet to this loop
 			Real64 const Electric,
 			Real64 const Gas,
 			Real64 const Purchased,
@@ -2288,11 +2227,11 @@ namespace DataPlant {
 			Real64 const VentLoadFrac,
 			FArray1< ReportBranchData > const & Branch // Branch data
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NodeNumIn( NodeNumIn ),
-			NodeNameIn( MaxNameLength, NodeNameIn ),
+			NodeNameIn( NodeNameIn ),
 			NodeNumOut( NodeNumOut ),
-			NodeNameOut( MaxNameLength, NodeNameOut ),
+			NodeNameOut( NodeNameOut ),
 			Electric( Electric ),
 			Gas( Gas ),
 			Purchased( Purchased ),
@@ -2351,7 +2290,7 @@ namespace DataPlant {
 
 	void
 	ScanPlantLoopsForObject(
-		Fstring const & CompName,
+		std::string const & CompName,
 		int const CompType,
 		int & LoopNum,
 		int & LoopSideNum,
@@ -2367,7 +2306,7 @@ namespace DataPlant {
 
 	void
 	ScanPlantLoopsForNodeNum(
-		Fstring const & CallerName, // really used for error messages
+		std::string const & CallerName, // really used for error messages
 		int const NodeNum, // index in Node structure of node to be scanned
 		int & LoopNum, // return value for plant loop
 		int & LoopSideNum, // return value for plant loop side
@@ -2394,8 +2333,8 @@ namespace DataPlant {
 
 	int
 	MyPlantSizingIndex(
-		Fstring const & CompType, // component description
-		Fstring const & CompName, // user name of component
+		std::string const & CompType, // component description
+		std::string const & CompName, // user name of component
 		int const NodeNumIn, // component water inlet node
 		int const NodeNumOut, // component water outlet node
 		bool & ErrorsFound, // set to true if there's an error

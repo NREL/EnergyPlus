@@ -57,7 +57,6 @@ namespace Boilers {
 	using namespace DataLoopNode;
 	using namespace DataHVACGlobals;
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::InitConvTemp;
 	using DataGlobals::SecInHour;
 	using DataGlobals::DisplayExtraWarnings;
@@ -123,8 +122,8 @@ namespace Boilers {
 
 	void
 	SimBoiler(
-		Fstring const & BoilerType, // boiler type (used in CASE statement)
-		Fstring const & BoilerName, // boiler identifier
+		std::string const & BoilerType, // boiler type (used in CASE statement)
+		std::string const & BoilerName, // boiler identifier
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // boiler counter/identifier
 		bool const RunFlag, // if TRUE run boiler simulation--boiler is ON
@@ -177,17 +176,17 @@ namespace Boilers {
 		if ( CompIndex == 0 ) {
 			BoilerNum = FindItemInList( BoilerName, Boiler.Name(), NumBoilers );
 			if ( BoilerNum == 0 ) {
-				ShowFatalError( "SimBoiler: Unit not found=" + trim( BoilerName ) );
+				ShowFatalError( "SimBoiler: Unit not found=" + BoilerName );
 			}
 			CompIndex = BoilerNum;
 		} else {
 			BoilerNum = CompIndex;
 			if ( BoilerNum > NumBoilers || BoilerNum < 1 ) {
-				ShowFatalError( "SimBoiler:  Invalid CompIndex passed=" + trim( TrimSigDigits( BoilerNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumBoilers ) ) + ", Entered Unit name=" + trim( BoilerName ) );
+				ShowFatalError( "SimBoiler:  Invalid CompIndex passed=" + TrimSigDigits( BoilerNum ) + ", Number of Units=" + TrimSigDigits( NumBoilers ) + ", Entered Unit name=" + BoilerName );
 			}
 			if ( CheckEquipName( BoilerNum ) ) {
 				if ( BoilerName != Boiler( BoilerNum ).Name ) {
-					ShowFatalError( "SimBoiler: Invalid CompIndex passed=" + trim( TrimSigDigits( BoilerNum ) ) + ", Unit name=" + trim( BoilerName ) + ", stored Unit Name for that index=" + trim( Boiler( BoilerNum ).Name ) );
+					ShowFatalError( "SimBoiler: Invalid CompIndex passed=" + TrimSigDigits( BoilerNum ) + ", Unit name=" + BoilerName + ", stored Unit Name for that index=" + Boiler( BoilerNum ).Name );
 				}
 				CheckEquipName( BoilerNum ) = false;
 			}
@@ -234,7 +233,6 @@ namespace Boilers {
 		// REFERENCES: na
 
 		// Using/Aliasing
-		using DataGlobals::MaxNameLength;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using namespace DataGlobalConstants;
 		using InputProcessor::GetNumObjectsFound;
@@ -251,7 +249,7 @@ namespace Boilers {
 
 		// Locals
 		// PARAMETERS
-		static Fstring const RoutineName( "GetBoilerInput: " );
+		static std::string const RoutineName( "GetBoilerInput: " );
 
 		//LOCAL VARIABLES
 		int BoilerNum; // boiler identifier
@@ -262,14 +260,14 @@ namespace Boilers {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		bool errFlag; // Flag to show errors were found during function call
-		FArray1D_Fstring BoilerFuelTypeForOutputVariable( sFstring( MaxNameLength ) ); // used to set up report variables
+		FArray1D_string BoilerFuelTypeForOutputVariable; // used to set up report variables
 
 		//GET NUMBER OF ALL EQUIPMENT
 		cCurrentModuleObject = "Boiler:HotWater";
 		NumBoilers = GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumBoilers <= 0 ) {
-			ShowSevereError( "No " + trim( cCurrentModuleObject ) + " Equipment specified in input file" );
+			ShowSevereError( "No " + cCurrentModuleObject + " Equipment specified in input file" );
 			ErrorsFound = true;
 		}
 
@@ -281,7 +279,7 @@ namespace Boilers {
 		CheckEquipName.allocate( NumBoilers );
 		BoilerFuelTypeForOutputVariable.allocate( NumBoilers );
 		CheckEquipName = true;
-		BoilerFuelTypeForOutputVariable = " ";
+		BoilerFuelTypeForOutputVariable = "";
 
 		//LOAD ARRAYS WITH CURVE FIT Boiler DATA
 
@@ -290,12 +288,12 @@ namespace Boilers {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Boiler.Name(), BoilerNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Boiler.Name(), BoilerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
-			VerifyUniqueBoilerName( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), errFlag, trim( cCurrentModuleObject ) + " Name" );
+			VerifyUniqueBoilerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
 			}
@@ -345,8 +343,8 @@ namespace Boilers {
 				Boiler( BoilerNum ).FuelType = AssignResourceTypeNum( "OTHERFUEL2" );
 
 			} else {
-				ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"," );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
+				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
 				// Set to Electric to avoid errors when setting up output variables
 				BoilerFuelTypeForOutputVariable( BoilerNum ) = "Electric";
 				Boiler( BoilerNum ).FuelType = AssignResourceTypeNum( "ELECTRICITY" );
@@ -355,17 +353,17 @@ namespace Boilers {
 
 			Boiler( BoilerNum ).NomCap = rNumericArgs( 1 );
 			if ( rNumericArgs( 1 ) == 0.0 ) {
-				ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"," );
-				ShowContinueError( "Invalid " + trim( cNumericFieldNames( 1 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 1 ), 2 ) ) );
-				ShowContinueError( "..." + trim( cNumericFieldNames( 1 ) ) + " must be greater than 0.0" );
+				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," );
+				ShowContinueError( "Invalid " + cNumericFieldNames( 1 ) + '=' + RoundSigDigits( rNumericArgs( 1 ), 2 ) );
+				ShowContinueError( "..." + cNumericFieldNames( 1 ) + " must be greater than 0.0" );
 				ErrorsFound = true;
 			}
 
 			Boiler( BoilerNum ).Effic = rNumericArgs( 2 );
 			if ( rNumericArgs( 2 ) == 0.0 ) {
-				ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"," );
-				ShowContinueError( "Invalid " + trim( cNumericFieldNames( 2 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 2 ), 3 ) ) );
-				ShowSevereError( "..." + trim( cNumericFieldNames( 2 ) ) + " must be greater than 0.0" );
+				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," );
+				ShowContinueError( "Invalid " + cNumericFieldNames( 2 ) + '=' + RoundSigDigits( rNumericArgs( 2 ), 3 ) );
+				ShowSevereError( "..." + cNumericFieldNames( 2 ) + " must be greater than 0.0" );
 				ErrorsFound = true;
 			}
 
@@ -395,15 +393,15 @@ namespace Boilers {
 				} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					Boiler( BoilerNum ).EfficiencyCurveType = BiQuadratic;
 				} else {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"," );
-					ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 4 ) ) + "=" + trim( cAlphaArgs( 4 ) ) );
-					ShowContinueError( "...Curve type for " + trim( cAlphaFieldNames( 4 ) ) + "  = " + trim( GetCurveType( Boiler( BoilerNum ).EfficiencyCurvePtr ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," );
+					ShowContinueError( "Invalid " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
+					ShowContinueError( "...Curve type for " + cAlphaFieldNames( 4 ) + "  = " + GetCurveType( Boiler( BoilerNum ).EfficiencyCurvePtr ) );
 					ErrorsFound = true;
 				}}
 			} else if ( ! lAlphaFieldBlanks( 4 ) ) {
-				ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"," );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 4 ) ) + "=" + trim( cAlphaArgs( 4 ) ) );
-				ShowSevereError( "..." + trim( cAlphaFieldNames( 4 ) ) + " not found." );
+				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
+				ShowSevereError( "..." + cAlphaFieldNames( 4 ) + " not found." );
 				ErrorsFound = true;
 			}
 
@@ -412,14 +410,14 @@ namespace Boilers {
 			if ( ( SELECT_CASE_var == BiQuadratic ) || ( SELECT_CASE_var == QuadraticLinear ) || ( SELECT_CASE_var == BiCubic ) ) { //curve uses water temperature
 				if ( Boiler( BoilerNum ).CurveTempMode == BoilerTempModeNotSet ) { // throw error
 					if ( ! lAlphaFieldBlanks( 3 ) ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"," );
-						ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + "=" + trim( cAlphaArgs( 3 ) ) );
-						ShowContinueError( "Boiler using curve type of " + trim( GetCurveType( Boiler( BoilerNum ).EfficiencyCurvePtr ) ) + " must specify " + trim( cAlphaFieldNames( 3 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) );
+						ShowContinueError( "Boiler using curve type of " + GetCurveType( Boiler( BoilerNum ).EfficiencyCurvePtr ) + " must specify " + cAlphaFieldNames( 3 ) );
 						ShowContinueError( "Available choices are EnteringBoiler or LeavingBoiler" );
 					} else {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"," );
-						ShowContinueError( "Field " + trim( cAlphaFieldNames( 3 ) ) + " is blank" );
-						ShowContinueError( "Boiler using curve type of " + trim( GetCurveType( Boiler( BoilerNum ).EfficiencyCurvePtr ) ) + " must specify either EnteringBoiler or LeavingBoiler" );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," );
+						ShowContinueError( "Field " + cAlphaFieldNames( 3 ) + " is blank" );
+						ShowContinueError( "Boiler using curve type of " + GetCurveType( Boiler( BoilerNum ).EfficiencyCurvePtr ) + " must specify either EnteringBoiler or LeavingBoiler" );
 					}
 					ErrorsFound = true;
 				}
@@ -441,25 +439,25 @@ namespace Boilers {
 			Boiler( BoilerNum ).SizFac = rNumericArgs( 10 );
 			if ( Boiler( BoilerNum ).SizFac == 0.0 ) Boiler( BoilerNum ).SizFac = 1.0;
 
-			Boiler( BoilerNum ).BoilerInletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			Boiler( BoilerNum ).BoilerOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 5 ), cAlphaArgs( 6 ), "Hot Water Nodes" );
+			Boiler( BoilerNum ).BoilerInletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			Boiler( BoilerNum ).BoilerOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 5 ), cAlphaArgs( 6 ), "Hot Water Nodes" );
 
-			{ auto const SELECT_CASE_var( trim( cAlphaArgs( 7 ) ) );
+			{ auto const SELECT_CASE_var( cAlphaArgs( 7 ) );
 			if ( SELECT_CASE_var == "CONSTANTFLOW" ) {
 				Boiler( BoilerNum ).FlowMode = ConstantFlow;
 			} else if ( SELECT_CASE_var == "VARIABLEFLOW" ) { // backward compatible, clean out eventually
 				Boiler( BoilerNum ).FlowMode = LeavingSetPointModulated;
-				ShowWarningError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"," );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( cAlphaArgs( 7 ) ) );
+				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
 				ShowContinueError( "Key choice is now called \"LeavingSetpointModulated\" and the simulation continues" );
 			} else if ( SELECT_CASE_var == "LEAVINGSETPOINTMODULATED" ) {
 				Boiler( BoilerNum ).FlowMode = LeavingSetPointModulated;
 			} else if ( SELECT_CASE_var == "NOTMODULATED" ) {
 				Boiler( BoilerNum ).FlowMode = NotModulated;
 			} else {
-				ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"," );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( cAlphaArgs( 7 ) ) );
+				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
 				ShowContinueError( "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated" );
 				ShowContinueError( "Flow mode NotModulated is assumed and the simulation continues." );
 				// We will assume variable flow if not specified
@@ -469,18 +467,18 @@ namespace Boilers {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in processing " + trim( cCurrentModuleObject ) + " input." );
+			ShowFatalError( RoutineName + "Errors found in processing " + cCurrentModuleObject + " input." );
 		}
 
 		for ( BoilerNum = 1; BoilerNum <= NumBoilers; ++BoilerNum ) {
 			SetupOutputVariable( "Boiler Heating Rate [W]", BoilerReport( BoilerNum ).BoilerLoad, "System", "Average", Boiler( BoilerNum ).Name );
 			SetupOutputVariable( "Boiler Heating Energy [J]", BoilerReport( BoilerNum ).BoilerEnergy, "System", "Sum", Boiler( BoilerNum ).Name, _, "ENERGYTRANSFER", "BOILERS", _, "Plant" );
 			if ( SameString( BoilerFuelTypeForOutputVariable( BoilerNum ), "Electric" ) ) {
-				SetupOutputVariable( "Boiler " + trim( BoilerFuelTypeForOutputVariable( BoilerNum ) ) + " Power [W]", BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
+				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Power [W]", BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
 			} else {
-				SetupOutputVariable( "Boiler " + trim( BoilerFuelTypeForOutputVariable( BoilerNum ) ) + " Rate [W]", BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
+				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Rate [W]", BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
 			}
-			SetupOutputVariable( "Boiler " + trim( BoilerFuelTypeForOutputVariable( BoilerNum ) ) + " Energy [J]", BoilerReport( BoilerNum ).FuelConsumed, "System", "Sum", Boiler( BoilerNum ).Name, _, trim( BoilerFuelTypeForOutputVariable( BoilerNum ) ), "Heating", "Boiler", "Plant" );
+			SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Energy [J]", BoilerReport( BoilerNum ).FuelConsumed, "System", "Sum", Boiler( BoilerNum ).Name, _, BoilerFuelTypeForOutputVariable( BoilerNum ), "Heating", "Boiler", "Plant" );
 			SetupOutputVariable( "Boiler Inlet Temperature [C]", BoilerReport( BoilerNum ).BoilerInletTemp, "System", "Average", Boiler( BoilerNum ).Name );
 			SetupOutputVariable( "Boiler Outlet Temperature [C]", BoilerReport( BoilerNum ).BoilerOutletTemp, "System", "Average", Boiler( BoilerNum ).Name );
 			SetupOutputVariable( "Boiler Mass Flow Rate [kg/s]", BoilerReport( BoilerNum ).Mdot, "System", "Average", Boiler( BoilerNum ).Name );
@@ -588,7 +586,7 @@ namespace Boilers {
 				if ( ( Node( Boiler( BoilerNum ).BoilerOutletNodeNum ).TempSetPoint == SensedNodeFlagValue ) && ( Node( Boiler( BoilerNum ).BoilerOutletNodeNum ).TempSetPointLo == SensedNodeFlagValue ) ) {
 					if ( ! AnyEnergyManagementSystemInModel ) {
 						if ( ! Boiler( BoilerNum ).ModulatedFlowErrDone ) {
-							ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " + trim( Boiler( BoilerNum ).Name ) );
+							ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " + Boiler( BoilerNum ).Name );
 							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a boiler " "in variable flow mode, use a SetpointManager" );
 							ShowContinueError( "  The overall loop setpoint will be assumed for Boiler. The simulation continues ... " );
 							Boiler( BoilerNum ).ModulatedFlowErrDone = true;
@@ -599,7 +597,7 @@ namespace Boilers {
 						CheckIfNodeSetPointManagedByEMS( Boiler( BoilerNum ).BoilerOutletNodeNum, iTemperatureSetPoint, FatalError );
 						if ( FatalError ) {
 							if ( ! Boiler( BoilerNum ).ModulatedFlowErrDone ) {
-								ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " + trim( Boiler( BoilerNum ).Name ) );
+								ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " + Boiler( BoilerNum ).Name );
 								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a boiler " "in variable flow mode" );
 								ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the boiler outlet node " );
 								ShowContinueError( "  or use an EMS actuator to establish a setpoint at the boiler outlet node " );
@@ -680,7 +678,7 @@ namespace Boilers {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
 		bool ErrorsFound; // If errors detected in input
-		Fstring equipName( MaxNameLength ); // Name of boiler object
+		std::string equipName; // Name of boiler object
 		Real64 rho;
 		Real64 Cp;
 		Real64 tmpNomCap; // local nominal capacity cooling power
@@ -727,9 +725,9 @@ namespace Boilers {
 							ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name, "Design Size Nominal Capacity [W]", tmpNomCap, "User-Specified Nominal Capacity [W]", NomCapUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpNomCap - NomCapUser ) / NomCapUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeBoilerHotWater: Potential issue with equipment sizing for " + trim( Boiler( BoilerNum ).Name ) );
-									ShowContinueError( "User-Specified Nominal Capacity of " + trim( RoundSigDigits( NomCapUser, 2 ) ) + " [W]" );
-									ShowContinueError( "differs from Design Size Nominal Capacity of " + trim( RoundSigDigits( tmpNomCap, 2 ) ) + " [W]" );
+									ShowMessage( "SizeBoilerHotWater: Potential issue with equipment sizing for " + Boiler( BoilerNum ).Name );
+									ShowContinueError( "User-Specified Nominal Capacity of " + RoundSigDigits( NomCapUser, 2 ) + " [W]" );
+									ShowContinueError( "differs from Design Size Nominal Capacity of " + RoundSigDigits( tmpNomCap, 2 ) + " [W]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -742,7 +740,7 @@ namespace Boilers {
 		} else {
 			if ( IsAutoSize ) {
 				ShowSevereError( "Autosizing of Boiler nominal capacity requires a loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in Boiler object=" + trim( Boiler( BoilerNum ).Name ) );
+				ShowContinueError( "Occurs in Boiler object=" + Boiler( BoilerNum ).Name );
 				ErrorsFound = true;
 			} else { // Hard-sized with no sizing data
 				if ( ! Boiler( BoilerNum ).IsThisSized ) {
@@ -779,9 +777,9 @@ namespace Boilers {
 							ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name, "Design Size Design Water Flow Rate [m3/s]", tmpBoilerVolFlowRate, "User-Specified Design Water Flow Rate [m3/s]", VolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpBoilerVolFlowRate - VolFlowRateUser ) / VolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeBoilerHotWater: Potential issue with equipment sizing for " + trim( Boiler( BoilerNum ).Name ) );
-									ShowContinueError( "User-Specified Design Water Flow Rate of " + trim( RoundSigDigits( VolFlowRateUser, 2 ) ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Design Water Flow Rate of " + trim( RoundSigDigits( tmpBoilerVolFlowRate, 2 ) ) + " [m3/s]" );
+									ShowMessage( "SizeBoilerHotWater: Potential issue with equipment sizing for " + Boiler( BoilerNum ).Name );
+									ShowContinueError( "User-Specified Design Water Flow Rate of " + RoundSigDigits( VolFlowRateUser, 2 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Design Water Flow Rate of " + RoundSigDigits( tmpBoilerVolFlowRate, 2 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -794,7 +792,7 @@ namespace Boilers {
 		} else {
 			if ( IsAutoSize ) {
 				ShowSevereError( "Autosizing of Boiler design flow rate requires a loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in Boiler object=" + trim( Boiler( BoilerNum ).Name ) );
+				ShowContinueError( "Occurs in Boiler object=" + Boiler( BoilerNum ).Name );
 				ErrorsFound = true;
 			} else { // Hard-sized with no sizing data
 				if ( ! Boiler( BoilerNum ).IsThisSized ) {
@@ -1013,7 +1011,7 @@ namespace Boilers {
 			if ( BoilerLoad > 0.0 ) {
 				if ( Boiler( BoilerNum ).EffCurveOutputError < 1 ) {
 					++Boiler( BoilerNum ).EffCurveOutputError;
-					ShowWarningError( "Boiler:HotWater \"" + trim( Boiler( BoilerNum ).Name ) + "\"" );
+					ShowWarningError( "Boiler:HotWater \"" + Boiler( BoilerNum ).Name + "\"" );
 					ShowContinueError( "...Normalized Boiler Efficiency Curve output is less than or equal to 0." );
 					ShowContinueError( "...Curve input x value (PLR)     = " + TrimSigDigits( OperPLR, 5 ) );
 					if ( Boiler( BoilerNum ).EfficiencyCurveType == BiQuadratic || Boiler( BoilerNum ).EfficiencyCurveType == QuadraticLinear || Boiler( BoilerNum ).EfficiencyCurveType == BiCubic ) {
@@ -1024,10 +1022,10 @@ namespace Boilers {
 						}
 					}
 					ShowContinueError( "...Curve output (normalized eff) = " + TrimSigDigits( EffCurveOutput, 5 ) );
-					ShowContinueError( "...Calculated Boiler efficiency  = " + trim( TrimSigDigits( EffCurveOutput * BoilerEff, 5 ) ) + " (Boiler efficiency = Nominal Thermal Efficiency * Normalized Boiler Efficiency Curve output)" );
+					ShowContinueError( "...Calculated Boiler efficiency  = " + TrimSigDigits( EffCurveOutput * BoilerEff, 5 ) + " (Boiler efficiency = Nominal Thermal Efficiency * Normalized Boiler Efficiency Curve output)" );
 					ShowContinueErrorTimeStamp( "...Curve output reset to 0.01 and simulation continues." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( "Boiler:HotWater \"" + trim( Boiler( BoilerNum ).Name ) + "\":" " Boiler Efficiency Curve output is less than or equal to 0 warning continues...", Boiler( BoilerNum ).EffCurveOutputIndex, EffCurveOutput, EffCurveOutput );
+					ShowRecurringWarningErrorAtEnd( "Boiler:HotWater \"" + Boiler( BoilerNum ).Name + "\": Boiler Efficiency Curve output is less than or equal to 0 warning continues...", Boiler( BoilerNum ).EffCurveOutputIndex, EffCurveOutput, EffCurveOutput );
 				}
 			}
 			EffCurveOutput = 0.01;
@@ -1038,7 +1036,7 @@ namespace Boilers {
 			if ( BoilerLoad > 0.0 && Boiler( BoilerNum ).EfficiencyCurvePtr > 0 ) {
 				if ( Boiler( BoilerNum ).CalculatedEffError < 1 ) {
 					++Boiler( BoilerNum ).CalculatedEffError;
-					ShowWarningError( "Boiler:HotWater \"" + trim( Boiler( BoilerNum ).Name ) + "\"" );
+					ShowWarningError( "Boiler:HotWater \"" + Boiler( BoilerNum ).Name + "\"" );
 					ShowContinueError( "...Calculated Boiler Efficiency is greater than 1.1." );
 					ShowContinueError( "...Boiler Efficiency calculations shown below." );
 					ShowContinueError( "...Curve input x value (PLR)     = " + TrimSigDigits( OperPLR, 5 ) );
@@ -1050,10 +1048,10 @@ namespace Boilers {
 						}
 					}
 					ShowContinueError( "...Curve output (normalized eff) = " + TrimSigDigits( EffCurveOutput, 5 ) );
-					ShowContinueError( "...Calculated Boiler efficiency  = " + trim( TrimSigDigits( EffCurveOutput * BoilerEff, 5 ) ) + " (Boiler efficiency = Nominal Thermal Efficiency * Normalized Boiler Efficiency Curve output)" );
+					ShowContinueError( "...Calculated Boiler efficiency  = " + TrimSigDigits( EffCurveOutput * BoilerEff, 5 ) + " (Boiler efficiency = Nominal Thermal Efficiency * Normalized Boiler Efficiency Curve output)" );
 					ShowContinueErrorTimeStamp( "...Curve output reset to 1.1 and simulation continues." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( "Boiler:HotWater \"" + trim( Boiler( BoilerNum ).Name ) + "\":" " Calculated Boiler Efficiency is greater than 1.1 warning continues...", Boiler( BoilerNum ).CalculatedEffIndex, EffCurveOutput * BoilerEff, EffCurveOutput * BoilerEff );
+					ShowRecurringWarningErrorAtEnd( "Boiler:HotWater \"" + Boiler( BoilerNum ).Name + "\": Calculated Boiler Efficiency is greater than 1.1 warning continues...", Boiler( BoilerNum ).CalculatedEffIndex, EffCurveOutput * BoilerEff, EffCurveOutput * BoilerEff );
 				}
 			}
 			EffCurveOutput = 1.1;

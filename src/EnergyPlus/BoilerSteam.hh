@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace BoilerSteam {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
@@ -41,7 +39,7 @@ namespace BoilerSteam {
 	struct BoilerSpecs
 	{
 		// Members
-		Fstring Name; // user identifier
+		std::string Name; // user identifier
 		int FuelType; // resource type
 		bool Available; // TRUE if machine available in current time step
 		bool ON; // TRUE: simulate the machine at it's operating part load ratio
@@ -74,7 +72,6 @@ namespace BoilerSteam {
 
 		// Default Constructor
 		BoilerSpecs() :
-			Name( MaxNameLength ),
 			FuelType( 0 ),
 			Available( false ),
 			ON( false ),
@@ -107,7 +104,7 @@ namespace BoilerSteam {
 
 		// Member Constructor
 		BoilerSpecs(
-			Fstring const & Name, // user identifier
+			std::string const & Name, // user identifier
 			int const FuelType, // resource type
 			bool const Available, // TRUE if machine available in current time step
 			bool const ON, // TRUE: simulate the machine at it's operating part load ratio
@@ -137,7 +134,7 @@ namespace BoilerSteam {
 			int const FluidIndex, // Steam index
 			bool const IsThisSized // TRUE if sizing is done
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			FuelType( FuelType ),
 			Available( Available ),
 			ON( ON ),
@@ -225,8 +222,8 @@ namespace BoilerSteam {
 
 	void
 	SimSteamBoiler(
-		Fstring const & BoilerType, // boiler type (used in CASE statement)
-		Fstring const & BoilerName, // boiler identifier
+		std::string const & BoilerType, // boiler type (used in CASE statement)
+		std::string const & BoilerName, // boiler identifier
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // boiler counter/identifier
 		bool const RunFlag, // if TRUE run boiler simulation--boiler is ON

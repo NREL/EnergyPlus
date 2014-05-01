@@ -2,7 +2,6 @@
 #define HeatBalanceInternalHeatGains_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -13,8 +12,8 @@ namespace EnergyPlus {
 void
 SetupZoneInternalGain(
 	int const ZoneNum,
-	Fstring const & cComponentObject, // object class name for device contributing internal gain
-	Fstring const & cComponentName, // user unique name for device
+	std::string const & cComponentObject, // object class name for device contributing internal gain
+	std::string const & cComponentName, // user unique name for device
 	int const IntGainComp_TypeOfNum,
 	Optional< Real64 > ConvectionGainRate = _, // pointer target for remote convection gain value to be accessed
 	Optional< Real64 > ReturnAirConvectionGainRate = _,

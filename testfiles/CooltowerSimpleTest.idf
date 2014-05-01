@@ -2181,7 +2181,9 @@
 
   Output:Variable,*,Zone Cooltower Air Volume,hourly;
 
-  Output:Variable,*,Zone Cooltower Air Volume Flow Rate,hourly;
+  Output:Variable,*,Zone Cooltower Current Density Volumetric Flow Rate,hourly;
+
+  Output:Variable,*,Zone Cooltower Standard Density Volumetric Flow Rate,hourly;
 
   Output:Variable,*,Zone Cooltower Air Mass,hourly;
 

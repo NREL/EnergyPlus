@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace DataBranchAirLoopPlant {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -33,7 +31,7 @@ namespace DataBranchAirLoopPlant {
 	extern int const ControlType_Passive; // 'Passive'
 	extern int const ControlType_SeriesActive; // 'SeriesActive'
 	extern int const ControlType_Bypass; // 'Bypass
-	extern FArray1D_Fstring const cControlType;
+	extern FArray1D_string const cControlType;
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -45,7 +43,7 @@ namespace DataBranchAirLoopPlant {
 	struct PlantPressureCurveData
 	{
 		// Members
-		Fstring Name;
+		std::string Name;
 		Real64 EquivDiameter; // - An effective diameter for calculation of Re & e/D [m]
 		Real64 MinorLossCoeff; // - K factor                                          [-]
 		Real64 EquivLength; // - An effective length to apply friction calculation [m]
@@ -62,7 +60,6 @@ namespace DataBranchAirLoopPlant {
 
 		// Default Constructor
 		PlantPressureCurveData() :
-			Name( MaxNameLength ),
 			EquivDiameter( 0.0 ),
 			MinorLossCoeff( 0.0 ),
 			EquivLength( 0.0 ),
@@ -79,7 +76,7 @@ namespace DataBranchAirLoopPlant {
 
 		// Member Constructor
 		PlantPressureCurveData(
-			Fstring const & Name,
+			std::string const & Name,
 			Real64 const EquivDiameter, // - An effective diameter for calculation of Re & e/D [m]
 			Real64 const MinorLossCoeff, // - K factor                                          [-]
 			Real64 const EquivLength, // - An effective length to apply friction calculation [m]
@@ -93,7 +90,7 @@ namespace DataBranchAirLoopPlant {
 			Real64 const CurveInput2, // - Density                                          [kg/m3]
 			Real64 const CurveInput3 // - Velocity                                         [m/s]
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			EquivDiameter( EquivDiameter ),
 			MinorLossCoeff( MinorLossCoeff ),
 			EquivLength( EquivLength ),

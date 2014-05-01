@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -16,14 +15,13 @@ namespace EnergyPlus {
 namespace WaterThermalTanks {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
-	extern Fstring const cMixedWHModuleObj;
-	extern Fstring const cStratifiedWHModuleObj;
-	extern Fstring const cMixedCWTankModuleObj;
-	extern Fstring const cStratifiedCWTankModuleObj;
+	extern std::string const cMixedWHModuleObj;
+	extern std::string const cStratifiedWHModuleObj;
+	extern std::string const cMixedCWTankModuleObj;
+	extern std::string const cStratifiedCWTankModuleObj;
 
 	extern int const HeatMode; // heating source is on, source will not turn off until setpoint temp is reached
 	extern int const FloatMode; // heating source is off, source will not turn on until cutin temp is reached
@@ -324,11 +322,11 @@ namespace WaterThermalTanks {
 	struct WaterThermalTankData
 	{
 		// Members
-		Fstring Name; // Name of water heater
-		Fstring Type; // Type of water heater (MIXED or STRATIFIED)
+		std::string Name; // Name of water heater
+		std::string Type; // Type of water heater (MIXED or STRATIFIED)
 		int TypeNum; // integer parameter for water heater(if part of an HPWH,then=HPWH)
 		bool IsChilledWaterTank; // logical flag, true if for chilled water, false if for hot water
-		Fstring EndUseSubcategoryName; // User-defined end-use subcategory name
+		std::string EndUseSubcategoryName; // User-defined end-use subcategory name
 		bool Init; // Flag for initialization:  TRUE means do the init
 		bool StandAlone; // Flag for operation with no plant connections (no source or use)
 		Real64 Volume; // Tank volume (m3)
@@ -349,7 +347,7 @@ namespace WaterThermalTanks {
 		int Mode; // Indicator for current operating mode
 		int SavedMode; // Mode indicator saved from previous time step
 		int ControlType; // Indicator for control type
-		Fstring FuelType; // Fuel type
+		std::string FuelType; // Fuel type
 		Real64 MaxCapacity; // Maximum capacity of auxiliary heater 1 (W)
 		Real64 MinCapacity; // Minimum capacity of auxiliary heater 1 (W)
 		Real64 Efficiency; // Thermal efficiency of auxiliary heater 1 ()
@@ -360,10 +358,10 @@ namespace WaterThermalTanks {
 		Real64 TankTempLimit; // Maximum tank temperature limit before venting (C)
 		Real64 IgnitionDelay; // Time delay before heater is allowed to turn on (s)
 		Real64 OffCycParaLoad; // Rate for off-cycle parasitic load (W)
-		Fstring OffCycParaFuelType; // Fuel type for off-cycle parasitic load
+		std::string OffCycParaFuelType; // Fuel type for off-cycle parasitic load
 		Real64 OffCycParaFracToTank; // Fraction of off-cycle parasitic energy ending up in tank (W)
 		Real64 OnCycParaLoad; // Rate for on-cycle parasitic load (W)
-		Fstring OnCycParaFuelType; // Fuel type for on-cycle parasitic load
+		std::string OnCycParaFuelType; // Fuel type for on-cycle parasitic load
 		Real64 OnCycParaFracToTank; // Fraction of on-cycle parasitic energy ending up in tank (W)
 		int UseCurrentFlowLock; // current flow lock setting on use side
 		int UseInletNode; // Inlet node on the use side; colder water returning to a hottank
@@ -505,11 +503,8 @@ namespace WaterThermalTanks {
 
 		// Default Constructor
 		WaterThermalTankData() :
-			Name( MaxNameLength ),
-			Type( MaxNameLength ),
 			TypeNum( 0 ),
 			IsChilledWaterTank( false ),
-			EndUseSubcategoryName( MaxNameLength ),
 			Init( true ),
 			StandAlone( false ),
 			Volume( 0.0 ),
@@ -529,7 +524,6 @@ namespace WaterThermalTanks {
 			Mode( 0 ),
 			SavedMode( 0 ),
 			ControlType( 1 ),
-			FuelType( MaxNameLength ),
 			MaxCapacity( 0.0 ),
 			MinCapacity( 0.0 ),
 			Efficiency( 0.0 ),
@@ -540,10 +534,8 @@ namespace WaterThermalTanks {
 			TankTempLimit( 0.0 ),
 			IgnitionDelay( 0.0 ),
 			OffCycParaLoad( 0.0 ),
-			OffCycParaFuelType( MaxNameLength ),
 			OffCycParaFracToTank( 0.0 ),
 			OnCycParaLoad( 0.0 ),
-			OnCycParaFuelType( MaxNameLength ),
 			OnCycParaFracToTank( 0.0 ),
 			UseCurrentFlowLock( 0 ),
 			UseInletNode( 0 ),
@@ -681,11 +673,11 @@ namespace WaterThermalTanks {
 
 		// Member Constructor
 		WaterThermalTankData(
-			Fstring const & Name, // Name of water heater
-			Fstring const & Type, // Type of water heater (MIXED or STRATIFIED)
+			std::string const & Name, // Name of water heater
+			std::string const & Type, // Type of water heater (MIXED or STRATIFIED)
 			int const TypeNum, // integer parameter for water heater(if part of an HPWH,then=HPWH)
 			bool const IsChilledWaterTank, // logical flag, true if for chilled water, false if for hot water
-			Fstring const & EndUseSubcategoryName, // User-defined end-use subcategory name
+			std::string const & EndUseSubcategoryName, // User-defined end-use subcategory name
 			bool const Init, // Flag for initialization:  TRUE means do the init
 			bool const StandAlone, // Flag for operation with no plant connections (no source or use)
 			Real64 const Volume, // Tank volume (m3)
@@ -705,7 +697,7 @@ namespace WaterThermalTanks {
 			int const Mode, // Indicator for current operating mode
 			int const SavedMode, // Mode indicator saved from previous time step
 			int const ControlType, // Indicator for control type
-			Fstring const & FuelType, // Fuel type
+			std::string const & FuelType, // Fuel type
 			Real64 const MaxCapacity, // Maximum capacity of auxiliary heater 1 (W)
 			Real64 const MinCapacity, // Minimum capacity of auxiliary heater 1 (W)
 			Real64 const Efficiency, // Thermal efficiency of auxiliary heater 1 ()
@@ -716,10 +708,10 @@ namespace WaterThermalTanks {
 			Real64 const TankTempLimit, // Maximum tank temperature limit before venting (C)
 			Real64 const IgnitionDelay, // Time delay before heater is allowed to turn on (s)
 			Real64 const OffCycParaLoad, // Rate for off-cycle parasitic load (W)
-			Fstring const & OffCycParaFuelType, // Fuel type for off-cycle parasitic load
+			std::string const & OffCycParaFuelType, // Fuel type for off-cycle parasitic load
 			Real64 const OffCycParaFracToTank, // Fraction of off-cycle parasitic energy ending up in tank (W)
 			Real64 const OnCycParaLoad, // Rate for on-cycle parasitic load (W)
-			Fstring const & OnCycParaFuelType, // Fuel type for on-cycle parasitic load
+			std::string const & OnCycParaFuelType, // Fuel type for on-cycle parasitic load
 			Real64 const OnCycParaFracToTank, // Fraction of on-cycle parasitic energy ending up in tank (W)
 			int const UseCurrentFlowLock, // current flow lock setting on use side
 			int const UseInletNode, // Inlet node on the use side; colder water returning to a hottank
@@ -857,11 +849,11 @@ namespace WaterThermalTanks {
 			int const MaxCycleErrorIndex, // recurring error index
 			WaterHeaterSizingData const & Sizing // ancillary data for autosizing
 		) :
-			Name( MaxNameLength, Name ),
-			Type( MaxNameLength, Type ),
+			Name( Name ),
+			Type( Type ),
 			TypeNum( TypeNum ),
 			IsChilledWaterTank( IsChilledWaterTank ),
-			EndUseSubcategoryName( MaxNameLength, EndUseSubcategoryName ),
+			EndUseSubcategoryName( EndUseSubcategoryName ),
 			Init( Init ),
 			StandAlone( StandAlone ),
 			Volume( Volume ),
@@ -881,7 +873,7 @@ namespace WaterThermalTanks {
 			Mode( Mode ),
 			SavedMode( SavedMode ),
 			ControlType( ControlType ),
-			FuelType( MaxNameLength, FuelType ),
+			FuelType( FuelType ),
 			MaxCapacity( MaxCapacity ),
 			MinCapacity( MinCapacity ),
 			Efficiency( Efficiency ),
@@ -892,10 +884,10 @@ namespace WaterThermalTanks {
 			TankTempLimit( TankTempLimit ),
 			IgnitionDelay( IgnitionDelay ),
 			OffCycParaLoad( OffCycParaLoad ),
-			OffCycParaFuelType( MaxNameLength, OffCycParaFuelType ),
+			OffCycParaFuelType( OffCycParaFuelType ),
 			OffCycParaFracToTank( OffCycParaFracToTank ),
 			OnCycParaLoad( OnCycParaLoad ),
-			OnCycParaFuelType( MaxNameLength, OnCycParaFuelType ),
+			OnCycParaFuelType( OnCycParaFuelType ),
 			OnCycParaFracToTank( OnCycParaFracToTank ),
 			UseCurrentFlowLock( UseCurrentFlowLock ),
 			UseInletNode( UseInletNode ),
@@ -1039,11 +1031,11 @@ namespace WaterThermalTanks {
 	struct HeatPumpWaterHeaterData
 	{
 		// Members
-		Fstring Name; // Name of heat pump water heater
-		Fstring Type; // Type of water heater (HEAT PUMP:WATER HEATER)
+		std::string Name; // Name of heat pump water heater
+		std::string Type; // Type of water heater (HEAT PUMP:WATER HEATER)
 		int TypeNum; // integer parameter for heat pump water heater
-		Fstring TankName; // Name of tank associated with heat pump water heater
-		Fstring TankType; // Type of water heater (MIXED or STRATIFIED) used with heat pump
+		std::string TankName; // Name of tank associated with heat pump water heater
+		std::string TankType; // Type of water heater (MIXED or STRATIFIED) used with heat pump
 		int TankTypeNum; // Parameter for tank type (MIXED or STRATIFIED)
 		bool StandAlone; // Flag for operation with no plant connections (no use nodes)
 		int AvailSchedPtr; // Index to Availability Schedule curve index
@@ -1074,14 +1066,14 @@ namespace WaterThermalTanks {
 		int WHUseInletNode; // Water heater tank use side inlet node
 		int WHUseOutletNode; // Water heater tank use side outlet node
 		int WHUseSidePlantLoopNum; // if not zero, then this water heater is on plant loop #
-		Fstring DXCoilType; // Type of DX coil (Coil:DX:HeatPumpWaterHeater)
-		Fstring DXCoilName; // Name of DX coil
+		std::string DXCoilType; // Type of DX coil (Coil:DX:HeatPumpWaterHeater)
+		std::string DXCoilName; // Name of DX coil
 		int DXCoilNum; // Index of DX coil
 		int DXCoilAirInletNode; // Inlet air node number of DX coil
 		int DXCoilPLFFPLR; // Index to HPWH's DX Coil PLF as a function of PLR curve
-		Fstring FanType; // Type of Fan (Fan:OnOff)
+		std::string FanType; // Type of Fan (Fan:OnOff)
 		int FanType_Num; // Integer type of fan (3 = Fan:OnOff)
-		Fstring FanName; // Name of Fan
+		std::string FanName; // Name of Fan
 		int FanNum; // Index of Fan
 		int FanPlacement; // Location of Fan
 		int FanOutletNode; // Outlet node of heat pump water heater fan
@@ -1133,11 +1125,7 @@ namespace WaterThermalTanks {
 
 		// Default Constructor
 		HeatPumpWaterHeaterData() :
-			Name( MaxNameLength ),
-			Type( MaxNameLength ),
 			TypeNum( 0 ),
-			TankName( MaxNameLength ),
-			TankType( MaxNameLength ),
 			TankTypeNum( 0 ),
 			StandAlone( false ),
 			AvailSchedPtr( 0 ),
@@ -1168,14 +1156,10 @@ namespace WaterThermalTanks {
 			WHUseInletNode( 0 ),
 			WHUseOutletNode( 0 ),
 			WHUseSidePlantLoopNum( 0 ),
-			DXCoilType( MaxNameLength ),
-			DXCoilName( MaxNameLength ),
 			DXCoilNum( 0 ),
 			DXCoilAirInletNode( 0 ),
 			DXCoilPLFFPLR( 0 ),
-			FanType( MaxNameLength ),
 			FanType_Num( 0 ),
-			FanName( MaxNameLength ),
 			FanNum( 0 ),
 			FanPlacement( 0 ),
 			FanOutletNode( 0 ),
@@ -1228,11 +1212,11 @@ namespace WaterThermalTanks {
 
 		// Member Constructor
 		HeatPumpWaterHeaterData(
-			Fstring const & Name, // Name of heat pump water heater
-			Fstring const & Type, // Type of water heater (HEAT PUMP:WATER HEATER)
+			std::string const & Name, // Name of heat pump water heater
+			std::string const & Type, // Type of water heater (HEAT PUMP:WATER HEATER)
 			int const TypeNum, // integer parameter for heat pump water heater
-			Fstring const & TankName, // Name of tank associated with heat pump water heater
-			Fstring const & TankType, // Type of water heater (MIXED or STRATIFIED) used with heat pump
+			std::string const & TankName, // Name of tank associated with heat pump water heater
+			std::string const & TankType, // Type of water heater (MIXED or STRATIFIED) used with heat pump
 			int const TankTypeNum, // Parameter for tank type (MIXED or STRATIFIED)
 			bool const StandAlone, // Flag for operation with no plant connections (no use nodes)
 			int const AvailSchedPtr, // Index to Availability Schedule curve index
@@ -1263,14 +1247,14 @@ namespace WaterThermalTanks {
 			int const WHUseInletNode, // Water heater tank use side inlet node
 			int const WHUseOutletNode, // Water heater tank use side outlet node
 			int const WHUseSidePlantLoopNum, // if not zero, then this water heater is on plant loop #
-			Fstring const & DXCoilType, // Type of DX coil (Coil:DX:HeatPumpWaterHeater)
-			Fstring const & DXCoilName, // Name of DX coil
+			std::string const & DXCoilType, // Type of DX coil (Coil:DX:HeatPumpWaterHeater)
+			std::string const & DXCoilName, // Name of DX coil
 			int const DXCoilNum, // Index of DX coil
 			int const DXCoilAirInletNode, // Inlet air node number of DX coil
 			int const DXCoilPLFFPLR, // Index to HPWH's DX Coil PLF as a function of PLR curve
-			Fstring const & FanType, // Type of Fan (Fan:OnOff)
+			std::string const & FanType, // Type of Fan (Fan:OnOff)
 			int const FanType_Num, // Integer type of fan (3 = Fan:OnOff)
-			Fstring const & FanName, // Name of Fan
+			std::string const & FanName, // Name of Fan
 			int const FanNum, // Index of Fan
 			int const FanPlacement, // Location of Fan
 			int const FanOutletNode, // Outlet node of heat pump water heater fan
@@ -1320,11 +1304,11 @@ namespace WaterThermalTanks {
 			Real64 const HPWaterHeaterLatentCapacity, // latent capacity delivered when HPWH is attached to a zone (kg/s)
 			int const ControlSensorLocation // if using stratified tank, indicates control point
 		) :
-			Name( MaxNameLength, Name ),
-			Type( MaxNameLength, Type ),
+			Name( Name ),
+			Type( Type ),
 			TypeNum( TypeNum ),
-			TankName( MaxNameLength, TankName ),
-			TankType( MaxNameLength, TankType ),
+			TankName( TankName ),
+			TankType( TankType ),
 			TankTypeNum( TankTypeNum ),
 			StandAlone( StandAlone ),
 			AvailSchedPtr( AvailSchedPtr ),
@@ -1355,14 +1339,14 @@ namespace WaterThermalTanks {
 			WHUseInletNode( WHUseInletNode ),
 			WHUseOutletNode( WHUseOutletNode ),
 			WHUseSidePlantLoopNum( WHUseSidePlantLoopNum ),
-			DXCoilType( MaxNameLength, DXCoilType ),
-			DXCoilName( MaxNameLength, DXCoilName ),
+			DXCoilType( DXCoilType ),
+			DXCoilName( DXCoilName ),
 			DXCoilNum( DXCoilNum ),
 			DXCoilAirInletNode( DXCoilAirInletNode ),
 			DXCoilPLFFPLR( DXCoilPLFFPLR ),
-			FanType( MaxNameLength, FanType ),
+			FanType( FanType ),
 			FanType_Num( FanType_Num ),
-			FanName( MaxNameLength, FanName ),
+			FanName( FanName ),
 			FanNum( FanNum ),
 			FanPlacement( FanPlacement ),
 			FanOutletNode( FanOutletNode ),
@@ -1418,8 +1402,8 @@ namespace WaterThermalTanks {
 	struct WaterHeaterDesuperheaterData
 	{
 		// Members
-		Fstring Name; // Name of heat pump water heater desuperheater
-		Fstring Type; // Type of water heater desuperheating coil
+		std::string Name; // Name of heat pump water heater desuperheater
+		std::string Type; // Type of water heater desuperheating coil
 		int InsuffTemperatureWarn; // Used for recurring error count on low source temperature
 		int AvailSchedPtr; // Index to Availability Schedule curve index
 		int SetPointTempSchedule; // Index to Setpoint Temperature Schedule curve
@@ -1430,13 +1414,13 @@ namespace WaterThermalTanks {
 		Real64 RatedInletWaterTemp; // Inlet water temp at rated heat reclaim recovery eff (C)
 		Real64 RatedOutdoorAirTemp; // Outdoor air temp at rated heat reclaim recovery eff (C)
 		Real64 MaxInletWaterTemp; // Max water temp for heat reclaim recovery (C)
-		Fstring TankType; // Type of water heater (MIXED or STRATIFIED)
+		std::string TankType; // Type of water heater (MIXED or STRATIFIED)
 		int TankTypeNum; // Parameter for tank type (MIXED or STRATIFIED)
-		Fstring TankName; // Name of tank associated with desuperheater
+		std::string TankName; // Name of tank associated with desuperheater
 		bool StandAlone; // Flag for operation with no plant connections (no use nodes)
 		//note char variable heatingsourcetype doesn't seem to be used anywhere
-		Fstring HeatingSourceType; // Type of heating source (DX coil or refrigerated rack)
-		Fstring HeatingSourceName; // Name of heating source
+		std::string HeatingSourceType; // Type of heating source (DX coil or refrigerated rack)
+		std::string HeatingSourceName; // Name of heating source
 		Real64 HeaterRate; // Report variable for desuperheater heating rate [W]
 		Real64 HeaterEnergy; // Report variable for desuperheater heating energy [J]
 		Real64 PumpPower; // Report variable for water circulation pump power [W]
@@ -1460,7 +1444,7 @@ namespace WaterThermalTanks {
 		int SaveWHMode; // mode of water heater tank element (backup element)
 		Real64 BackupElementCapacity; // Tank backup element capacity (W)
 		Real64 DXSysPLR; // runtime fraction of desuperheater heating coil
-		Fstring ReclaimHeatingSourceName; // The source name for the Desuperheater Heating Coil
+		std::string ReclaimHeatingSourceName; // The source name for the Desuperheater Heating Coil
 		int ReclaimHeatingSourceIndexNum; // Index to reclaim heating source (condenser) of a specific type
 		int ReclaimHeatingSource; // The source for the Desuperheater Heating Coil
 		// COMPRESSOR RACK:REFRIGERATED CASE    = 1
@@ -1481,8 +1465,6 @@ namespace WaterThermalTanks {
 
 		// Default Constructor
 		WaterHeaterDesuperheaterData() :
-			Name( MaxNameLength ),
-			Type( MaxNameLength ),
 			InsuffTemperatureWarn( 0 ),
 			AvailSchedPtr( 0 ),
 			SetPointTempSchedule( 0 ),
@@ -1493,12 +1475,8 @@ namespace WaterThermalTanks {
 			RatedInletWaterTemp( 0.0 ),
 			RatedOutdoorAirTemp( 0.0 ),
 			MaxInletWaterTemp( 0.0 ),
-			TankType( MaxNameLength ),
 			TankTypeNum( 0 ),
-			TankName( MaxNameLength ),
 			StandAlone( false ),
-			HeatingSourceType( MaxNameLength ),
-			HeatingSourceName( MaxNameLength ),
 			HeaterRate( 0.0 ),
 			HeaterEnergy( 0.0 ),
 			PumpPower( 0.0 ),
@@ -1522,7 +1500,6 @@ namespace WaterThermalTanks {
 			SaveWHMode( 0 ),
 			BackupElementCapacity( 0.0 ),
 			DXSysPLR( 0.0 ),
-			ReclaimHeatingSourceName( MaxNameLength ),
 			ReclaimHeatingSourceIndexNum( 0 ),
 			ReclaimHeatingSource( 0 ),
 			SetPointError( 0 ),
@@ -1539,8 +1516,8 @@ namespace WaterThermalTanks {
 
 		// Member Constructor
 		WaterHeaterDesuperheaterData(
-			Fstring const & Name, // Name of heat pump water heater desuperheater
-			Fstring const & Type, // Type of water heater desuperheating coil
+			std::string const & Name, // Name of heat pump water heater desuperheater
+			std::string const & Type, // Type of water heater desuperheating coil
 			int const InsuffTemperatureWarn, // Used for recurring error count on low source temperature
 			int const AvailSchedPtr, // Index to Availability Schedule curve index
 			int const SetPointTempSchedule, // Index to Setpoint Temperature Schedule curve
@@ -1551,12 +1528,12 @@ namespace WaterThermalTanks {
 			Real64 const RatedInletWaterTemp, // Inlet water temp at rated heat reclaim recovery eff (C)
 			Real64 const RatedOutdoorAirTemp, // Outdoor air temp at rated heat reclaim recovery eff (C)
 			Real64 const MaxInletWaterTemp, // Max water temp for heat reclaim recovery (C)
-			Fstring const & TankType, // Type of water heater (MIXED or STRATIFIED)
+			std::string const & TankType, // Type of water heater (MIXED or STRATIFIED)
 			int const TankTypeNum, // Parameter for tank type (MIXED or STRATIFIED)
-			Fstring const & TankName, // Name of tank associated with desuperheater
+			std::string const & TankName, // Name of tank associated with desuperheater
 			bool const StandAlone, // Flag for operation with no plant connections (no use nodes)
-			Fstring const & HeatingSourceType, // Type of heating source (DX coil or refrigerated rack)
-			Fstring const & HeatingSourceName, // Name of heating source
+			std::string const & HeatingSourceType, // Type of heating source (DX coil or refrigerated rack)
+			std::string const & HeatingSourceName, // Name of heating source
 			Real64 const HeaterRate, // Report variable for desuperheater heating rate [W]
 			Real64 const HeaterEnergy, // Report variable for desuperheater heating energy [J]
 			Real64 const PumpPower, // Report variable for water circulation pump power [W]
@@ -1580,7 +1557,7 @@ namespace WaterThermalTanks {
 			int const SaveWHMode, // mode of water heater tank element (backup element)
 			Real64 const BackupElementCapacity, // Tank backup element capacity (W)
 			Real64 const DXSysPLR, // runtime fraction of desuperheater heating coil
-			Fstring const & ReclaimHeatingSourceName, // The source name for the Desuperheater Heating Coil
+			std::string const & ReclaimHeatingSourceName, // The source name for the Desuperheater Heating Coil
 			int const ReclaimHeatingSourceIndexNum, // Index to reclaim heating source (condenser) of a specific type
 			int const ReclaimHeatingSource, // The source for the Desuperheater Heating Coil
 			int const SetPointError, // Used when temp SP in tank and desuperheater are reversed
@@ -1594,8 +1571,8 @@ namespace WaterThermalTanks {
 			int const RegulaFalsiFailedIndex2, // Index for recurring RegulaFalsi failed warning messages
 			int const RegulaFalsiFailedNum2 // Counter for recurring RegulaFalsi failed warning messages
 		) :
-			Name( MaxNameLength, Name ),
-			Type( MaxNameLength, Type ),
+			Name( Name ),
+			Type( Type ),
 			InsuffTemperatureWarn( InsuffTemperatureWarn ),
 			AvailSchedPtr( AvailSchedPtr ),
 			SetPointTempSchedule( SetPointTempSchedule ),
@@ -1606,12 +1583,12 @@ namespace WaterThermalTanks {
 			RatedInletWaterTemp( RatedInletWaterTemp ),
 			RatedOutdoorAirTemp( RatedOutdoorAirTemp ),
 			MaxInletWaterTemp( MaxInletWaterTemp ),
-			TankType( MaxNameLength, TankType ),
+			TankType( TankType ),
 			TankTypeNum( TankTypeNum ),
-			TankName( MaxNameLength, TankName ),
+			TankName( TankName ),
 			StandAlone( StandAlone ),
-			HeatingSourceType( MaxNameLength, HeatingSourceType ),
-			HeatingSourceName( MaxNameLength, HeatingSourceName ),
+			HeatingSourceType( HeatingSourceType ),
+			HeatingSourceName( HeatingSourceName ),
 			HeaterRate( HeaterRate ),
 			HeaterEnergy( HeaterEnergy ),
 			PumpPower( PumpPower ),
@@ -1635,7 +1612,7 @@ namespace WaterThermalTanks {
 			SaveWHMode( SaveWHMode ),
 			BackupElementCapacity( BackupElementCapacity ),
 			DXSysPLR( DXSysPLR ),
-			ReclaimHeatingSourceName( MaxNameLength, ReclaimHeatingSourceName ),
+			ReclaimHeatingSourceName( ReclaimHeatingSourceName ),
 			ReclaimHeatingSourceIndexNum( ReclaimHeatingSourceIndexNum ),
 			ReclaimHeatingSource( ReclaimHeatingSource ),
 			SetPointError( SetPointError ),
@@ -1662,7 +1639,7 @@ namespace WaterThermalTanks {
 	void
 	SimWaterThermalTank(
 		int const CompType,
-		Fstring const & CompName,
+		std::string const & CompName,
 		int & CompIndex,
 		bool const RunFlag, // unused1208
 		bool const InitLoopEquip,
@@ -1683,7 +1660,7 @@ namespace WaterThermalTanks {
 
 	void
 	SimHeatPumpWaterHeater(
-		Fstring const & CompName,
+		std::string const & CompName,
 		bool const FirstHVACIteration,
 		Real64 & SensLoadMet, // sensible load met by this equipment and sent to zone, W
 		Real64 & LatLoadMet, // net latent load met and sent to zone (kg/s), dehumid = negative

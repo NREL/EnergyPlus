@@ -65,7 +65,6 @@ namespace TranspiredCollector {
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::DegToRadians;
 	using DataGlobals::KelvinConv;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::SecInHour;
 	using DataVectorTypes::Vector;
 	using DataHeatBalance::QRadSWOutIncident;
@@ -95,7 +94,7 @@ namespace TranspiredCollector {
 
 	void
 	SimTranspiredCollector(
-		Fstring const & CompName, // component name
+		std::string const & CompName, // component name
 		int & CompIndex // component index (to reduce string compares during simulation)
 	)
 	{
@@ -147,17 +146,17 @@ namespace TranspiredCollector {
 		if ( CompIndex == 0 ) {
 			UTSCNum = FindItemInList( CompName, UTSC.Name(), NumUTSC );
 			if ( UTSCNum == 0 ) {
-				ShowFatalError( "Transpired Collector not found=" + trim( CompName ) );
+				ShowFatalError( "Transpired Collector not found=" + CompName );
 			}
 			CompIndex = UTSCNum;
 		} else {
 			UTSCNum = CompIndex;
 			if ( UTSCNum > NumUTSC || UTSCNum < 1 ) {
-				ShowFatalError( "SimTranspiredCollector: Invalid CompIndex passed=" + trim( TrimSigDigits( UTSCNum ) ) + ", Number of Transpired Collectors=" + trim( TrimSigDigits( NumUTSC ) ) + ", UTSC name=" + trim( CompName ) );
+				ShowFatalError( "SimTranspiredCollector: Invalid CompIndex passed=" + TrimSigDigits( UTSCNum ) + ", Number of Transpired Collectors=" + TrimSigDigits( NumUTSC ) + ", UTSC name=" + CompName );
 			}
 			if ( CheckEquipName( UTSCNum ) ) {
 				if ( CompName != UTSC( UTSCNum ).Name ) {
-					ShowFatalError( "SimTranspiredCollector: Invalid CompIndex passed=" + trim( TrimSigDigits( UTSCNum ) ) + ", Transpired Collector name=" + trim( CompName ) + ", stored Transpired Collector Name for that index=" + trim( UTSC( UTSCNum ).Name ) );
+					ShowFatalError( "SimTranspiredCollector: Invalid CompIndex passed=" + TrimSigDigits( UTSCNum ) + ", Transpired Collector name=" + CompName + ", stored Transpired Collector Name for that index=" + UTSC( UTSCNum ).Name );
 				}
 				CheckEquipName( UTSCNum ) = false;
 			}
@@ -260,7 +259,7 @@ namespace TranspiredCollector {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		FArray1D_Fstring Alphas( sFstring( MaxNameLength ) ); // Alpha items for extensible
+		FArray1D_string Alphas; // Alpha items for extensible
 		// Solar Collectors:Unglazed Transpired object
 		int Item; // Item to be "gotten"
 		FArray1D< Real64 > Numbers( 11 ); // Numeric items for object
@@ -273,7 +272,7 @@ namespace TranspiredCollector {
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int Found;
 		int AlphaOffset; // local temp var
-		Fstring Roughness( MaxNameLength );
+		std::string Roughness;
 		int ThisSurf; // do loop counter
 		Real64 AvgAzimuth; // temp for error checking
 		Real64 AvgTilt; // temp for error checking
@@ -281,7 +280,7 @@ namespace TranspiredCollector {
 		Real64 TiltRads; // average tilt of collector in radians
 		Real64 tempHdeltaNPL; // temporary variable for bouyancy length scale
 		int NumUTSCSplitter;
-		FArray1D_Fstring AlphasSplit( sFstring( MaxNameLength ) ); // Alpha items for extensible
+		FArray1D_string AlphasSplit; // Alpha items for extensible
 		// Solar Collectors:Unglazed Transpired object
 		int ItemSplit; // Item to be "gotten"
 		FArray1D< Real64 > NumbersSplit( 1 ); // Numeric items for object
@@ -293,19 +292,19 @@ namespace TranspiredCollector {
 		int NumOASys; // do loop counter
 		int ACountBase; // counter for alhpasSplit
 		FArray1D_bool SplitterNameOK; // check for correct association of
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in renaming.
-		Fstring CurrentModuleMultiObject( MaxNameLength ); // for ease in renaming.
+		std::string CurrentModuleObject; // for ease in renaming.
+		std::string CurrentModuleMultiObject; // for ease in renaming.
 
 		CurrentModuleObject = "SolarCollector:UnglazedTranspired";
 		GetObjectDefMaxArgs( CurrentModuleObject, Dummy, MaxNumAlphas, MaxNumNumbers );
 
 		if ( MaxNumNumbers != 11 ) {
-			ShowSevereError( "GetTranspiredCollectorInput: " + trim( CurrentModuleObject ) + " Object Definition indicates " "not = 11 Number Objects, Number Indicated=" + trim( TrimSigDigits( MaxNumNumbers ) ) );
+			ShowSevereError( "GetTranspiredCollectorInput: " + CurrentModuleObject + " Object Definition indicates " "not = 11 Number Objects, Number Indicated=" + TrimSigDigits( MaxNumNumbers ) );
 			ErrorsFound = true;
 		}
 		Alphas.allocate( MaxNumAlphas );
 		Numbers = 0.0;
-		Alphas = " ";
+		Alphas = "";
 
 		NumUTSC = GetNumObjectsFound( CurrentModuleObject );
 		NumUTSCSplitter = 0; //init
@@ -326,22 +325,22 @@ namespace TranspiredCollector {
 
 			// now check for multisystem
 			if ( NumUTSCSplitter > 0 ) {
-				GetObjectDefMaxArgs( trim( CurrentModuleMultiObject ), Dummy, MaxNumAlphasSplit, MaxNumNumbersSplit );
+				GetObjectDefMaxArgs( CurrentModuleMultiObject, Dummy, MaxNumAlphasSplit, MaxNumNumbersSplit );
 
 				if ( MaxNumNumbersSplit != 0 ) {
-					ShowSevereError( "GetTranspiredCollectorInput: " + trim( CurrentModuleMultiObject ) + " Object Definition " "indicates not = 0 Number Objects, Number Indicated=" + trim( TrimSigDigits( MaxNumNumbersSplit ) ) );
+					ShowSevereError( "GetTranspiredCollectorInput: " + CurrentModuleMultiObject + " Object Definition " "indicates not = 0 Number Objects, Number Indicated=" + TrimSigDigits( MaxNumNumbersSplit ) );
 					ErrorsFound = true;
 				}
 				if ( ! allocated( AlphasSplit ) ) AlphasSplit.allocate( MaxNumAlphasSplit );
 				NumbersSplit = 0.0;
-				AlphasSplit = " ";
+				AlphasSplit = "";
 				for ( ItemSplit = 1; ItemSplit <= NumUTSCSplitter; ++ItemSplit ) {
 					GetObjectItem( CurrentModuleMultiObject, ItemSplit, AlphasSplit, NumAlphasSplit, NumbersSplit, NumNumbersSplit, IOStatusSplit );
 					if ( ! ( SameString( AlphasSplit( 1 ), Alphas( 1 ) ) ) ) continue;
 					SplitterNameOK( ItemSplit ) = true;
 					UTSC( Item ).NumOASysAttached = std::floor( NumAlphasSplit / 4.0 );
 					if ( mod( ( NumAlphasSplit ), 4 ) != 1 ) {
-						ShowSevereError( "GetTranspiredCollectorInput: " + trim( CurrentModuleMultiObject ) + " Object Definition indicates not uniform quadtuples of nodes for " + trim( AlphasSplit( 1 ) ) );
+						ShowSevereError( "GetTranspiredCollectorInput: " + CurrentModuleMultiObject + " Object Definition indicates not uniform quadtuples of nodes for " + AlphasSplit( 1 ) );
 						ErrorsFound = true;
 					}
 					UTSC( Item ).InletNode.allocate( UTSC( Item ).NumOASysAttached );
@@ -354,13 +353,13 @@ namespace TranspiredCollector {
 					UTSC( Item ).ZoneNode = 0;
 					for ( NumOASys = 1; NumOASys <= UTSC( Item ).NumOASysAttached; ++NumOASys ) {
 						ACountBase = ( NumOASys - 1 ) * 4 + 2;
-						UTSC( Item ).InletNode( NumOASys ) = GetOnlySingleNode( AlphasSplit( ACountBase ), ErrorsFound, trim( CurrentModuleObject ), AlphasSplit( 1 ), NodeType_Air, NodeConnectionType_Inlet, NumOASys, ObjectIsNotParent );
+						UTSC( Item ).InletNode( NumOASys ) = GetOnlySingleNode( AlphasSplit( ACountBase ), ErrorsFound, CurrentModuleObject, AlphasSplit( 1 ), NodeType_Air, NodeConnectionType_Inlet, NumOASys, ObjectIsNotParent );
 
-						UTSC( Item ).OutletNode( NumOASys ) = GetOnlySingleNode( AlphasSplit( ACountBase + 1 ), ErrorsFound, trim( CurrentModuleObject ), AlphasSplit( 1 ), NodeType_Air, NodeConnectionType_Outlet, NumOASys, ObjectIsNotParent );
-						TestCompSet( trim( CurrentModuleObject ), AlphasSplit( 1 ), AlphasSplit( ACountBase ), AlphasSplit( ACountBase + 1 ), "Transpired Collector Air Nodes" ); //appears that test fails by design??
-						UTSC( Item ).ControlNode( NumOASys ) = GetOnlySingleNode( AlphasSplit( ACountBase + 2 ), ErrorsFound, trim( CurrentModuleObject ), AlphasSplit( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+						UTSC( Item ).OutletNode( NumOASys ) = GetOnlySingleNode( AlphasSplit( ACountBase + 1 ), ErrorsFound, CurrentModuleObject, AlphasSplit( 1 ), NodeType_Air, NodeConnectionType_Outlet, NumOASys, ObjectIsNotParent );
+						TestCompSet( CurrentModuleObject, AlphasSplit( 1 ), AlphasSplit( ACountBase ), AlphasSplit( ACountBase + 1 ), "Transpired Collector Air Nodes" ); //appears that test fails by design??
+						UTSC( Item ).ControlNode( NumOASys ) = GetOnlySingleNode( AlphasSplit( ACountBase + 2 ), ErrorsFound, CurrentModuleObject, AlphasSplit( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
 
-						UTSC( Item ).ZoneNode( NumOASys ) = GetOnlySingleNode( AlphasSplit( ACountBase + 3 ), ErrorsFound, trim( CurrentModuleObject ), AlphasSplit( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+						UTSC( Item ).ZoneNode( NumOASys ) = GetOnlySingleNode( AlphasSplit( ACountBase + 3 ), ErrorsFound, CurrentModuleObject, AlphasSplit( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
 
 					} // Each OA System in a Multisystem
 					// DEALLOCATE(AlphasSplit)
@@ -370,7 +369,7 @@ namespace TranspiredCollector {
 			UTSC( Item ).OSCMName = Alphas( 2 );
 			Found = FindItemInList( UTSC( Item ).OSCMName, OSCM.Name(), TotOSCM );
 			if ( Found == 0 ) {
-				ShowSevereError( trim( cAlphaFieldNames( 2 ) ) + " not found=" + trim( UTSC( Item ).OSCMName ) + " in " + trim( CurrentModuleObject ) + " =" + trim( UTSC( Item ).Name ) );
+				ShowSevereError( cAlphaFieldNames( 2 ) + " not found=" + UTSC( Item ).OSCMName + " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 				ErrorsFound = true;
 			}
 			UTSC( Item ).OSCMPtr = Found;
@@ -379,7 +378,7 @@ namespace TranspiredCollector {
 			} else {
 				UTSC( Item ).SchedPtr = GetScheduleIndex( Alphas( 3 ) );
 				if ( UTSC( Item ).SchedPtr == 0 ) {
-					ShowSevereError( trim( cAlphaFieldNames( 3 ) ) + "not found=" + trim( Alphas( 3 ) ) + " in " + trim( CurrentModuleObject ) + " =" + trim( UTSC( Item ).Name ) );
+					ShowSevereError( cAlphaFieldNames( 3 ) + "not found=" + Alphas( 3 ) + " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 					ErrorsFound = true;
 					continue;
 				}
@@ -397,17 +396,17 @@ namespace TranspiredCollector {
 				UTSC( Item ).ZoneNode.allocate( 1 );
 				UTSC( Item ).ZoneNode( 1 ) = 0;
 
-				UTSC( Item ).InletNode( 1 ) = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-				UTSC( Item ).OutletNode( 1 ) = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-				TestCompSet( trim( CurrentModuleObject ), Alphas( 1 ), Alphas( 4 ), Alphas( 5 ), "Transpired Collector Air Nodes" );
+				UTSC( Item ).InletNode( 1 ) = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+				UTSC( Item ).OutletNode( 1 ) = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+				TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 4 ), Alphas( 5 ), "Transpired Collector Air Nodes" );
 
-				UTSC( Item ).ControlNode( 1 ) = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
-				UTSC( Item ).ZoneNode( 1 ) = GetOnlySingleNode( Alphas( 7 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+				UTSC( Item ).ControlNode( 1 ) = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+				UTSC( Item ).ZoneNode( 1 ) = GetOnlySingleNode( Alphas( 7 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
 			} //no splitter
 
 			UTSC( Item ).FreeHeatSetPointSchedPtr = GetScheduleIndex( Alphas( 8 ) );
 			if ( UTSC( Item ).FreeHeatSetPointSchedPtr == 0 ) {
-				ShowSevereError( trim( cAlphaFieldNames( 8 ) ) + " not found=" + trim( Alphas( 8 ) ) + " in " + trim( CurrentModuleObject ) + " =" + trim( UTSC( Item ).Name ) );
+				ShowSevereError( cAlphaFieldNames( 8 ) + " not found=" + Alphas( 8 ) + " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 				ErrorsFound = true;
 				continue;
 			}
@@ -417,7 +416,7 @@ namespace TranspiredCollector {
 			} else if ( SameString( Alphas( 9 ), "Square" ) ) {
 				UTSC( Item ).Layout = Layout_Square;
 			} else {
-				ShowSevereError( trim( cAlphaFieldNames( 9 ) ) + " has incorrect entry of " + trim( Alphas( 9 ) ) + " in " + trim( CurrentModuleObject ) + " =" + trim( UTSC( Item ).Name ) );
+				ShowSevereError( cAlphaFieldNames( 9 ) + " has incorrect entry of " + Alphas( 9 ) + " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 				ErrorsFound = true;
 				continue;
 			}
@@ -427,7 +426,7 @@ namespace TranspiredCollector {
 			} else if ( SameString( Alphas( 10 ), "VanDeckerHollandsBrunger2001" ) ) {
 				UTSC( Item ).Correlation = Correlation_VanDeckerHollandsBrunger2001;
 			} else {
-				ShowSevereError( trim( cAlphaFieldNames( 10 ) ) + " has incorrect entry of " + trim( Alphas( 9 ) ) + " in " + trim( CurrentModuleObject ) + " =" + trim( UTSC( Item ).Name ) );
+				ShowSevereError( cAlphaFieldNames( 10 ) + " has incorrect entry of " + Alphas( 9 ) + " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 				ErrorsFound = true;
 				continue;
 			}
@@ -443,14 +442,14 @@ namespace TranspiredCollector {
 
 			// Was it set?
 			if ( UTSC( Item ).CollRoughness == 0 ) {
-				ShowSevereError( trim( cAlphaFieldNames( 11 ) ) + " has incorrect entry of " + trim( Alphas( 11 ) ) + " in " + trim( CurrentModuleObject ) + " =" + trim( UTSC( Item ).Name ) );
+				ShowSevereError( cAlphaFieldNames( 11 ) + " has incorrect entry of " + Alphas( 11 ) + " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 				ErrorsFound = true;
 			}
 
 			AlphaOffset = 11;
 			UTSC( Item ).NumSurfs = NumAlphas - AlphaOffset;
 			if ( UTSC( Item ).NumSurfs == 0 ) {
-				ShowSevereError( "No underlying surfaces specified in " + trim( CurrentModuleObject ) + " =" + trim( UTSC( Item ).Name ) );
+				ShowSevereError( "No underlying surfaces specified in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 				ErrorsFound = true;
 				continue;
 			}
@@ -459,37 +458,37 @@ namespace TranspiredCollector {
 			for ( ThisSurf = 1; ThisSurf <= UTSC( Item ).NumSurfs; ++ThisSurf ) {
 				Found = FindItemInList( Alphas( ThisSurf + AlphaOffset ), Surface.Name(), TotSurfaces );
 				if ( Found == 0 ) {
-					ShowSevereError( "Surface Name not found=" + trim( Alphas( ThisSurf + AlphaOffset ) ) + " in " + trim( CurrentModuleObject ) + " =" + trim( UTSC( Item ).Name ) );
+					ShowSevereError( "Surface Name not found=" + Alphas( ThisSurf + AlphaOffset ) + " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 					ErrorsFound = true;
 					continue;
 				}
 				// check that surface is appropriate, Heat transfer, Sun, Wind,
 				if ( ! Surface( Found ).HeatTransSurf ) {
-					ShowSevereError( "Surface " + trim( Alphas( ThisSurf + AlphaOffset ) ) + " not of Heat Transfer type " " in " + trim( CurrentModuleObject ) + " =" + trim( UTSC( Item ).Name ) );
+					ShowSevereError( "Surface " + Alphas( ThisSurf + AlphaOffset ) + " not of Heat Transfer type " " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 					ErrorsFound = true;
 					continue;
 				}
 				if ( ! Surface( Found ).ExtSolar ) {
-					ShowSevereError( "Surface " + trim( Alphas( ThisSurf + AlphaOffset ) ) + " not exposed to sun " " in " + trim( CurrentModuleObject ) + " =" + trim( UTSC( Item ).Name ) );
+					ShowSevereError( "Surface " + Alphas( ThisSurf + AlphaOffset ) + " not exposed to sun " " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 					ErrorsFound = true;
 					continue;
 				}
 				if ( ! Surface( Found ).ExtWind ) {
-					ShowSevereError( "Surface " + trim( Alphas( ThisSurf + AlphaOffset ) ) + " not exposed to wind " " in " + trim( CurrentModuleObject ) + " =" + trim( UTSC( Item ).Name ) );
+					ShowSevereError( "Surface " + Alphas( ThisSurf + AlphaOffset ) + " not exposed to wind " " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 					ErrorsFound = true;
 					continue;
 				}
 				if ( Surface( Found ).ExtBoundCond != OtherSideCondModeledExt ) {
-					ShowSevereError( "Surface " + trim( Alphas( ThisSurf + AlphaOffset ) ) + " does not have OtherSideConditionsModel " "for exterior boundary conditions in " + trim( CurrentModuleObject ) + " =" + trim( UTSC( Item ).Name ) );
+					ShowSevereError( "Surface " + Alphas( ThisSurf + AlphaOffset ) + " does not have OtherSideConditionsModel " "for exterior boundary conditions in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 					ErrorsFound = true;
 					continue;
 				}
 				// check surface orientation, warn if upside down
 				if ( ( Surface( Found ).Tilt < -95.0 ) || ( Surface( Found ).Tilt > 95.0 ) ) {
-					ShowWarningError( "Suspected input problem with collector surface = " + trim( Alphas( ThisSurf + AlphaOffset ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + " = " + trim( UTSC( Item ).Name ) );
+					ShowWarningError( "Suspected input problem with collector surface = " + Alphas( ThisSurf + AlphaOffset ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + UTSC( Item ).Name );
 					ShowContinueError( "Surface used for solar collector faces down" );
-					ShowContinueError( "Surface tilt angle (degrees from ground outward normal) = " + trim( RoundSigDigits( Surface( Found ).Tilt, 2 ) ) );
+					ShowContinueError( "Surface tilt angle (degrees from ground outward normal) = " + RoundSigDigits( Surface( Found ).Tilt, 2 ) );
 				}
 
 				UTSC( Item ).SurfPtrs( ThisSurf ) = Found;
@@ -508,10 +507,10 @@ namespace TranspiredCollector {
 			for ( ThisSurf = 1; ThisSurf <= UTSC( Item ).NumSurfs; ++ThisSurf ) {
 				SurfID = UTSC( Item ).SurfPtrs( ThisSurf );
 				if ( std::abs( Surface( SurfID ).Azimuth - AvgAzimuth ) > 15. ) {
-					ShowWarningError( "Surface " + trim( Surface( SurfID ).Name ) + " has Azimuth different from others in " "the group associated with " + trim( CurrentModuleObject ) + " =" + trim( UTSC( Item ).Name ) );
+					ShowWarningError( "Surface " + Surface( SurfID ).Name + " has Azimuth different from others in " "the group associated with " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 				}
 				if ( std::abs( Surface( SurfID ).Tilt - AvgTilt ) > 10. ) {
-					ShowWarningError( "Surface " + trim( Surface( SurfID ).Name ) + " has Tilt different from others in " "the group associated with " + trim( CurrentModuleObject ) + " =" + trim( UTSC( Item ).Name ) );
+					ShowWarningError( "Surface " + Surface( SurfID ).Name + " has Tilt different from others in " "the group associated with " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 				}
 
 				//test that there are no windows.  Now allow windows
@@ -540,7 +539,7 @@ namespace TranspiredCollector {
 			UTSC( Item ).Height = Numbers( 5 );
 			UTSC( Item ).PlenGapThick = Numbers( 6 );
 			if ( UTSC( Item ).PlenGapThick <= 0.0 ) {
-				ShowSevereError( "Plenum gap must be greater than Zero in " + trim( CurrentModuleObject ) + " =" + trim( UTSC( Item ).Name ) );
+				ShowSevereError( "Plenum gap must be greater than Zero in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 				continue;
 			}
 			UTSC( Item ).PlenCrossArea = Numbers( 7 );
@@ -554,7 +553,7 @@ namespace TranspiredCollector {
 //			UTSC( Item ).ProjArea = sum( Surface( UTSC( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
 			UTSC( Item ).ProjArea = sum_sub( Surface.Area(), UTSC( Item ).SurfPtrs ); //Autodesk:F2C++ Functions handle array subscript usage
 			if ( UTSC( Item ).ProjArea == 0 ) {
-				ShowSevereError( "Gross area of underlying surfaces is zero in " + trim( CurrentModuleObject ) + " =" + trim( UTSC( Item ).Name ) );
+				ShowSevereError( "Gross area of underlying surfaces is zero in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 				continue;
 			}
 			UTSC( Item ).ActualArea = UTSC( Item ).ProjArea * UTSC( Item ).AreaRatio;
@@ -685,14 +684,14 @@ namespace TranspiredCollector {
 					if ( ControlNode > 0 ) {
 						if ( Node( ControlNode ).TempSetPoint == SensedNodeFlagValue ) {
 							if ( ! AnyEnergyManagementSystemInModel ) {
-								ShowSevereError( "Missing temperature setpoint for UTSC " + trim( UTSC( UTSCUnitNum ).Name ) );
+								ShowSevereError( "Missing temperature setpoint for UTSC " + UTSC( UTSCUnitNum ).Name );
 								ShowContinueError( " use a Setpoint Manager to establish a setpoint at the unit control node." );
 								SetPointErrorFlag = true;
 							} else {
 								// need call to EMS to check node
 								CheckIfNodeSetPointManagedByEMS( ControlNode, iTemperatureSetPoint, SetPointErrorFlag );
 								if ( SetPointErrorFlag ) {
-									ShowSevereError( "Missing temperature setpoint for UTSC " + trim( UTSC( UTSCUnitNum ).Name ) );
+									ShowSevereError( "Missing temperature setpoint for UTSC " + UTSC( UTSCUnitNum ).Name );
 									ShowContinueError( " use a Setpoint Manager to establish a setpoint at the unit control node." );
 									ShowContinueError( "Or add EMS Actuator to provide temperature setpoint at this node" );
 								}
@@ -875,8 +874,8 @@ namespace TranspiredCollector {
 
 		if ( ( Vsuction < 0.001 ) || ( Vsuction > 0.08 ) ) { // warn that collector is not sized well
 			if ( UTSC( UTSCNum ).VsucErrIndex == 0 ) {
-				ShowWarningMessage( "Solar Collector:Unglazed Transpired=\"" + trim( UTSC( UTSCNum ).Name ) + "\", Suction velocity is outside of range for a good design" );
-				ShowContinueErrorTimeStamp( "Suction velocity =" + trim( RoundSigDigits( Vsuction, 4 ) ) );
+				ShowWarningMessage( "Solar Collector:Unglazed Transpired=\"" + UTSC( UTSCNum ).Name + "\", Suction velocity is outside of range for a good design" );
+				ShowContinueErrorTimeStamp( "Suction velocity =" + RoundSigDigits( Vsuction, 4 ) );
 				if ( Vsuction < 0.003 ) {
 					ShowContinueError( "Velocity is low -- suggest decreasing area of transpired collector" );
 				}
@@ -885,7 +884,7 @@ namespace TranspiredCollector {
 				}
 				ShowContinueError( "Occasional suction velocity messages are not unexpected when simulating actual conditions" );
 			}
-			ShowRecurringWarningErrorAtEnd( "Solar Collector:Unglazed Transpired=\"" + trim( UTSC( UTSCNum ).Name ) + "\", Suction velocity is outside of range", UTSC( UTSCNum ).VsucErrIndex, Vsuction, Vsuction, _, "[m/s]", "[m/s]" );
+			ShowRecurringWarningErrorAtEnd( "Solar Collector:Unglazed Transpired=\"" + UTSC( UTSCNum ).Name + "\", Suction velocity is outside of range", UTSC( UTSCNum ).VsucErrIndex, Vsuction, Vsuction, _, "[m/s]", "[m/s]" );
 		}
 
 		HcPlen = 5.62 + 3.92 * Vplen;
@@ -1338,7 +1337,7 @@ namespace TranspiredCollector {
 		}
 
 		if ( SurfacePtr == 0 ) {
-			ShowFatalError( "Invalid surface passed to GetTranspiredCollectorIndex, Surface name = " + trim( Surface( SurfacePtr ).Name ) );
+			ShowFatalError( "Invalid surface passed to GetTranspiredCollectorIndex, Surface name = " + Surface( SurfacePtr ).Name );
 		}
 
 		UTSCNum = 0;
@@ -1353,7 +1352,7 @@ namespace TranspiredCollector {
 		}
 
 		if ( ! Found ) {
-			ShowFatalError( "Did not find surface in UTSC description in GetTranspiredCollectorIndex, Surface name = " + trim( Surface( SurfacePtr ).Name ) );
+			ShowFatalError( "Did not find surface in UTSC description in GetTranspiredCollectorIndex, Surface name = " + Surface( SurfacePtr ).Name );
 		} else {
 
 			UTSCIndex = UTSCNum;

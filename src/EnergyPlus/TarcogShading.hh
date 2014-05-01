@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1A.hh>
 #include <ObjexxFCL/FArray2A.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -47,7 +46,7 @@ namespace TarcogShading {
 		FArray1A< Real64 > Tgaps,
 		FArray1A< Real64 > qv,
 		int & nperr,
-		Fstring & ErrorMessage,
+		std::string & ErrorMessage,
 		FArray1A< Real64 > vfreevent
 	);
 
@@ -71,7 +70,7 @@ namespace TarcogShading {
 		Real64 & hcv,
 		Real64 & qv,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	);
 
 	void
@@ -111,7 +110,7 @@ namespace TarcogShading {
 		Real64 & qv1,
 		Real64 & qv2,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	);
 
 	void
@@ -145,7 +144,7 @@ namespace TarcogShading {
 		Real64 & hcv,
 		Real64 & qv,
 		int & nperr,
-		Fstring & ErrorMessage,
+		std::string & ErrorMessage,
 		Real64 & speed
 	);
 

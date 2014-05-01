@@ -64,7 +64,6 @@ namespace SQLiteProcedures {
 
 		// Using/Aliasing
 		using InputProcessor::GetNumObjectsFound;
-		using DataGlobals::MaxNameLength;
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
@@ -86,13 +85,13 @@ namespace SQLiteProcedures {
 	CreateSQLiteReportVariableDictionaryRecord(
 		int const reportVariableReportID,
 		int const storeTypeIndex,
-		Fstring const & indexGroup,
-		Fstring const & keyedValueString,
-		Fstring const & variableName,
+		std::string const & indexGroup,
+		std::string const & keyedValueString,
+		std::string const & variableName,
 		int const indexType,
-		Fstring const & units,
+		std::string const & units,
 		int const reportingFreq,
-		Optional_Fstring_const ScheduleName
+		Optional_string_const ScheduleName
 	)
 	{
 
@@ -131,7 +130,7 @@ namespace SQLiteProcedures {
 		Optional< Real64 const > EndMinute,
 		Optional< Real64 const > StartMinute,
 		Optional_int_const DST,
-		Optional_Fstring_const DayType
+		Optional_string_const DayType
 	)
 	{
 
@@ -245,14 +244,14 @@ namespace SQLiteProcedures {
 
 	void
 	AddSQLiteZoneSizingRecord(
-		Fstring const & ZoneName, // the name of the zone
-		Fstring const & LoadType, // the description of the input variable
+		std::string const & ZoneName, // the name of the zone
+		std::string const & LoadType, // the description of the input variable
 		Real64 const CalcDesLoad, // the value from the sizing calculation [W]
 		Real64 const UserDesLoad, // the value from the sizing calculation modified by user input [W]
 		Real64 const CalcDesFlow, // calculated design air flow rate [m3/s]
 		Real64 const UserDesFlow, // user input or modified design air flow rate [m3/s]
-		Fstring const & DesDayName, // the name of the design day that produced the peak
-		Fstring const & PeakHrMin, // time stamp of the peak
+		std::string const & DesDayName, // the name of the design day that produced the peak
+		std::string const & PeakHrMin, // time stamp of the peak
 		Real64 const PeakTemp, // temperature at peak [C]
 		Real64 const PeakHumRat, // humidity ratio at peak [kg water/kg dry air]
 		Real64 const MinOAVolFlow // zone design minimum outside air flow rate [m3/s]
@@ -266,8 +265,8 @@ namespace SQLiteProcedures {
 
 	void
 	AddSQLiteSystemSizingRecord(
-		Fstring const & SysName, // the name of the system
-		Fstring const & VarDesc, // the description of the input variable
+		std::string const & SysName, // the name of the system
+		std::string const & VarDesc, // the description of the input variable
 		Real64 const VarValue // the value from the sizing calculation
 	)
 	{
@@ -279,9 +278,9 @@ namespace SQLiteProcedures {
 
 	void
 	AddSQLiteComponentSizingRecord(
-		Fstring const & CompType, // the type of the component
-		Fstring const & CompName, // the name of the component
-		Fstring const & VarDesc, // the description of the input variable
+		std::string const & CompType, // the type of the component
+		std::string const & CompName, // the name of the component
+		std::string const & VarDesc, // the description of the input variable
 		Real64 const VarValue // the value from the sizing calculation
 	)
 	{
@@ -301,13 +300,13 @@ namespace SQLiteProcedures {
 	CreateSQLiteMeterDictionaryRecord(
 		int const meterReportID,
 		int const storeTypeIndex,
-		Fstring const & indexGroup,
-		Fstring const & keyedValueString,
-		Fstring const & variableName,
+		std::string const & indexGroup,
+		std::string const & keyedValueString,
+		std::string const & variableName,
 		int const indexType,
-		Fstring const & units,
+		std::string const & units,
 		int const reportingFreq,
-		Optional_Fstring_const ScheduleName
+		Optional_string_const ScheduleName
 	)
 	{
 
@@ -336,7 +335,7 @@ namespace SQLiteProcedures {
 	}
 
 	void
-	SQLiteWriteMessageMacro( Fstring const & message )
+	SQLiteWriteMessageMacro( std::string const & message )
 	{
 
 		// Locals
@@ -353,11 +352,11 @@ namespace SQLiteProcedures {
 	void
 	CreateSQLiteDaylightMapTitle(
 		int const mapNum,
-		Fstring const & mapName,
-		Fstring const & environmentName,
+		std::string const & mapName,
+		std::string const & environmentName,
 		int const zone,
-		Fstring const & refPt1,
-		Fstring const & refPt2,
+		std::string const & refPt1,
+		std::string const & refPt2,
 		Real64 const zCoord
 	)
 	{
@@ -423,12 +422,12 @@ namespace SQLiteProcedures {
 
 	void
 	CreateSQLiteTabularDataRecords(
-		FArray2S_Fstring const body, // row,column
-		FArray1S_Fstring const rowLabels,
-		FArray1S_Fstring const columnLabels,
-		Fstring const & ReportName,
-		Fstring const & ReportForString,
-		Fstring const & TableName
+		FArray2S_string const body, // row,column
+		FArray1S_string const rowLabels,
+		FArray1S_string const columnLabels,
+		std::string const & ReportName,
+		std::string const & ReportForString,
+		std::string const & TableName
 	)
 	{
 
@@ -506,7 +505,7 @@ namespace SQLiteProcedures {
 	CreateSQLiteErrorRecord(
 		int const simulationIndex,
 		int const errorType,
-		Fstring const & errorMessage,
+		std::string const & errorMessage,
 		int const cnt
 	)
 	{
@@ -528,7 +527,7 @@ namespace SQLiteProcedures {
 	}
 
 	void
-	UpdateSQLiteErrorRecord( Fstring const & errorMessage )
+	UpdateSQLiteErrorRecord( std::string const & errorMessage )
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Kyle Benne

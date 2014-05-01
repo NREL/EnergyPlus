@@ -238,7 +238,7 @@ namespace SolarReflectionManager {
 				// Warning if any receiving surface vertex is below ground level, taken to be at Z = 0 in absolute coords
 				for ( loop = 1; loop <= Surface( SurfNum ).Sides; ++loop ) {
 					if ( Surface( SurfNum ).Vertex( loop ).z < GroundLevelZ ) {
-						ShowWarningError( "Calculation of reflected solar onto surface=" + trim( Surface( SurfNum ).Name ) + " may be inaccurate" );
+						ShowWarningError( "Calculation of reflected solar onto surface=" + Surface( SurfNum ).Name + " may be inaccurate" );
 						ShowContinueError( "because it has one or more vertices below ground level." );
 						break;
 					}

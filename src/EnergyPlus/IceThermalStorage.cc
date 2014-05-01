@@ -71,8 +71,8 @@ namespace IceThermalStorage {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	Fstring const cIceStorageSimple( "ThermalStorage:Ice:Simple" );
-	Fstring const cIceStorageDetailed( "ThermalStorage:Ice:Detailed" );
+	std::string const cIceStorageSimple( "ThermalStorage:Ice:Simple" );
+	std::string const cIceStorageDetailed( "ThermalStorage:Ice:Detailed" );
 
 	int const IceStorageType_Simple( 1 );
 	int const IceStorageType_Detailed( 2 );
@@ -165,8 +165,8 @@ namespace IceThermalStorage {
 
 	void
 	SimIceStorage(
-		Fstring const & IceStorageType,
-		Fstring const & IceStorageName,
+		std::string const & IceStorageType,
+		std::string const & IceStorageName,
 		int & CompIndex,
 		bool const RunFlag,
 		bool const FirstIteration,
@@ -245,17 +245,17 @@ namespace IceThermalStorage {
 		if ( CompIndex == 0 ) {
 			IceStorageNum = FindItemInList( IceStorageName, IceStorageTypeMap.Name(), TotalIceStorages );
 			if ( IceStorageNum == 0 ) {
-				ShowFatalError( "SimIceStorage: Unit not found=" + trim( IceStorageName ) );
+				ShowFatalError( "SimIceStorage: Unit not found=" + IceStorageName );
 			}
 			CompIndex = IceStorageNum;
 		} else {
 			IceStorageNum = CompIndex;
 			if ( IceStorageNum > TotalIceStorages || IceStorageNum < 1 ) {
-				ShowFatalError( "SimIceStorage:  Invalid CompIndex passed=" + trim( TrimSigDigits( IceStorageNum ) ) + ", Number of Units=" + trim( TrimSigDigits( TotalIceStorages ) ) + ", Entered Unit name=" + trim( IceStorageName ) );
+				ShowFatalError( "SimIceStorage:  Invalid CompIndex passed=" + TrimSigDigits( IceStorageNum ) + ", Number of Units=" + TrimSigDigits( TotalIceStorages ) + ", Entered Unit name=" + IceStorageName );
 			}
 			if ( CheckEquipName( IceStorageNum ) ) {
 				if ( IceStorageName != IceStorageTypeMap( IceStorageNum ).Name ) {
-					ShowFatalError( "SimIceStorage: Invalid CompIndex passed=" + trim( TrimSigDigits( IceStorageNum ) ) + ", Unit name=" + trim( IceStorageName ) + ", stored Unit Name for that index=" + trim( IceStorageTypeMap( IceStorageNum ).Name ) );
+					ShowFatalError( "SimIceStorage: Invalid CompIndex passed=" + TrimSigDigits( IceStorageNum ) + ", Unit name=" + IceStorageName + ", stored Unit Name for that index=" + IceStorageTypeMap( IceStorageNum ).Name );
 				}
 				CheckEquipName( IceStorageNum ) = false;
 			}
@@ -371,7 +371,7 @@ namespace IceThermalStorage {
 			ReportDetailedIceStorage(); // Report detailed ice storage
 
 		} else {
-			ShowFatalError( "Specified IceStorage not found in SimIceStorage" + trim( IceStorageType ) );
+			ShowFatalError( "Specified IceStorage not found in SimIceStorage" + IceStorageType );
 		}}
 
 	}
@@ -595,10 +595,10 @@ namespace IceThermalStorage {
 						++DetIceStor( IceNum ).ChargeIterErrors;
 						if ( DetIceStor( IceNum ).ChargeIterErrors <= 25 ) {
 							ShowWarningError( "Detailed Ice Storage model exceeded its internal charging maximum iteration limit" );
-							ShowContinueError( "Detailed Ice Storage System Name = " + trim( DetIceStor( IceNum ).Name ) );
-							ShowContinueErrorTimeStamp( " " );
+							ShowContinueError( "Detailed Ice Storage System Name = " + DetIceStor( IceNum ).Name );
+							ShowContinueErrorTimeStamp( "" );
 						} else {
-							ShowRecurringWarningErrorAtEnd( "Detailed Ice Storage system [" + trim( DetIceStor( IceNum ).Name ) + "]  charging maximum iteration limit exceeded occurrence continues.", DetIceStor( IceNum ).ChargeErrorCount );
+							ShowRecurringWarningErrorAtEnd( "Detailed Ice Storage system [" + DetIceStor( IceNum ).Name + "]  charging maximum iteration limit exceeded occurrence continues.", DetIceStor( IceNum ).ChargeErrorCount );
 						}
 					}
 
@@ -714,10 +714,10 @@ namespace IceThermalStorage {
 						++DetIceStor( IceNum ).DischargeIterErrors;
 						if ( DetIceStor( IceNum ).DischargeIterErrors <= 25 ) {
 							ShowWarningError( "Detailed Ice Storage model exceeded its internal discharging maximum iteration limit" );
-							ShowContinueError( "Detailed Ice Storage System Name = " + trim( DetIceStor( IceNum ).Name ) );
-							ShowContinueErrorTimeStamp( " " );
+							ShowContinueError( "Detailed Ice Storage System Name = " + DetIceStor( IceNum ).Name );
+							ShowContinueErrorTimeStamp( "" );
 						} else {
-							ShowRecurringWarningErrorAtEnd( "Detailed Ice Storage system [" + trim( DetIceStor( IceNum ).Name ) + "]  discharging maximum iteration limit exceeded occurrence continues.", DetIceStor( IceNum ).DischargeErrorCount );
+							ShowRecurringWarningErrorAtEnd( "Detailed Ice Storage system [" + DetIceStor( IceNum ).Name + "]  discharging maximum iteration limit exceeded occurrence continues.", DetIceStor( IceNum ).DischargeErrorCount );
 						}
 					}
 
@@ -791,7 +791,7 @@ namespace IceThermalStorage {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const Blank;
+		static std::string const Blank;
 
 		// DERIVED TYPE DEFINITIONS
 		// na
@@ -825,7 +825,7 @@ namespace IceThermalStorage {
 			GetObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, _, _, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), IceStorage.Name(), IceNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), IceStorage.Name(), IceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -848,27 +848,27 @@ namespace IceThermalStorage {
 			} else if ( SameString( IceStorage( IceNum ).ITSType, "IceOnCoilExternal" ) ) {
 				IceStorage( IceNum ).ITSType_Num = ITSType_IceOnCoilExternal;
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
+				ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
 				ErrorsFound = true;
 			}
 
 			// Get and Verify ITS nominal Capacity (user input is in GJ, internal value in in J)
 			IceStorage( IceNum ).ITSNomCap = rNumericArgs( 1 ) * 1.e+09;
 			if ( rNumericArgs( 1 ) == 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Invalid " + trim( cNumericFieldNames( 1 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 1 ), 2 ) ) );
+				ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
+				ShowContinueError( "Invalid " + cNumericFieldNames( 1 ) + '=' + RoundSigDigits( rNumericArgs( 1 ), 2 ) );
 				ErrorsFound = true;
 			}
 
 			// Get Plant Inlet Node Num
-			IceStorage( IceNum ).PltInletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			IceStorage( IceNum ).PltInletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
 			// Get Plant Outlet Node Num
-			IceStorage( IceNum ).PltOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			IceStorage( IceNum ).PltOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 			// Test InletNode and OutletNode
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Chilled Water Nodes" );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Chilled Water Nodes" );
 
 			// Initialize Report Variables
 			IceStorageReport( IceNum ).MyLoad = 0.0;
@@ -886,7 +886,7 @@ namespace IceThermalStorage {
 		} // IceNum
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + trim( cCurrentModuleObject ) );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
 		}
 
 		// Setup Output Variables to Report  CurrentModuleObject='ThermalStorage:Ice:Simple'
@@ -921,7 +921,7 @@ namespace IceThermalStorage {
 			GetObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), DetIceStor.Name(), IceNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), DetIceStor.Name(), IceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -943,8 +943,8 @@ namespace IceThermalStorage {
 			} else {
 				DetIceStor( IceNum ).ScheduleIndex = GetScheduleIndex( DetIceStor( IceNum ).ScheduleName );
 				if ( DetIceStor( IceNum ).ScheduleIndex == 0 ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -955,33 +955,33 @@ namespace IceThermalStorage {
 			DetIceStor( IceNum ).NomCapacity = rNumericArgs( 1 ) * ( 1.e+09 ) / ( SecInHour );
 
 			if ( rNumericArgs( 1 ) <= 0.0 ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 1 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 1 ), 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 1 ) + '=' + RoundSigDigits( rNumericArgs( 1 ), 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
 			// Get Plant Inlet Node Num
-			DetIceStor( IceNum ).PlantInNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			DetIceStor( IceNum ).PlantInNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
 			// Get Plant Outlet Node Num
-			DetIceStor( IceNum ).PlantOutNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			DetIceStor( IceNum ).PlantOutNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 			// Test InletNode and OutletNode
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Chilled Water Nodes" );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Chilled Water Nodes" );
 
 			// Obtain the Charging and Discharging Curve types and names
 			DetIceStor( IceNum ).DischargeCurveName = cAlphaArgs( 6 );
 			DetIceStor( IceNum ).DischargeCurveNum = GetCurveIndex( cAlphaArgs( 6 ) );
 			if ( DetIceStor( IceNum ).DischargeCurveNum <= 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 6 ) ) + "=" + trim( cAlphaArgs( 6 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + '=' + cAlphaArgs( 6 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			} else {
 				DetIceStor( IceNum ).DischargeCurveType = GetCurveType( DetIceStor( IceNum ).DischargeCurveNum );
 			}
 			if ( ( DetIceStor( IceNum ).DischargeCurveType != cAlphaArgs( 5 ) ) || ( DetIceStor( IceNum ).DischargeCurveType != "QUADRATICLINEAR" ) ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ": Discharge curve type not valid, type=" + trim( cAlphaArgs( 5 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( cCurrentModuleObject + ": Discharge curve type not valid, type=" + cAlphaArgs( 5 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "Type does not match type for curve name or type does not equal QuadraticLinear" );
 				ErrorsFound = true;
 			}
@@ -989,24 +989,24 @@ namespace IceThermalStorage {
 			DetIceStor( IceNum ).ChargeCurveName = cAlphaArgs( 8 );
 			DetIceStor( IceNum ).ChargeCurveNum = GetCurveIndex( cAlphaArgs( 8 ) );
 			if ( DetIceStor( IceNum ).ChargeCurveNum <= 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 8 ) ) + "=" + trim( cAlphaArgs( 8 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 8 ) + '=' + cAlphaArgs( 8 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			} else {
 				DetIceStor( IceNum ).ChargeCurveType = GetCurveType( DetIceStor( IceNum ).ChargeCurveNum );
 			}
 			if ( ( DetIceStor( IceNum ).ChargeCurveType != cAlphaArgs( 7 ) ) || ( DetIceStor( IceNum ).ChargeCurveType != "QUADRATICLINEAR" ) ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ": Charge curve type not valid, type=" + trim( cAlphaArgs( 7 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( cCurrentModuleObject + ": Charge curve type not valid, type=" + cAlphaArgs( 7 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "Type does not match type for curve name or type does not equal QuadraticLinear" );
 				ErrorsFound = true;
 			}
 
 			DetIceStor( IceNum ).CurveFitTimeStep = rNumericArgs( 2 );
 			if ( ( DetIceStor( IceNum ).CurveFitTimeStep <= 0.0 ) || ( DetIceStor( IceNum ).CurveFitTimeStep > 1.0 ) ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 2 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 2 ), 3 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
-				ShowContinueError( "Curve fit time step invalid, less than zero or greater than 1 for " + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 2 ) + '=' + RoundSigDigits( rNumericArgs( 2 ), 3 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
+				ShowContinueError( "Curve fit time step invalid, less than zero or greater than 1 for " + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
@@ -1016,8 +1016,8 @@ namespace IceThermalStorage {
 			} else if ( ( SameString( DetIceStor( IceNum ).ThawProcessIndicator, "OUTSIDEMELT" ) ) || ( SameString( DetIceStor( IceNum ).ThawProcessIndicator, Blank ) ) ) {
 				DetIceStor( IceNum ).ThawProcessIndex = DetIceOutsideMelt;
 			} else {
-				ShowSevereError( "Invalid thaw process indicator of " + trim( cAlphaArgs( 9 ) ) + " was entered" );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid thaw process indicator of " + cAlphaArgs( 9 ) + " was entered" );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "Value should either be \"InsideMelt\" or \"OutsideMelt\"" );
 				DetIceStor( IceNum ).ThawProcessIndex = DetIceInsideMelt; // Severe error will end simulation, but just in case...
 				ErrorsFound = true;
@@ -1030,29 +1030,29 @@ namespace IceThermalStorage {
 			DetIceStor( IceNum ).FreezingTemp = rNumericArgs( 6 );
 
 			if ( ( DetIceStor( IceNum ).DischargeParaElecLoad < 0.0 ) || ( DetIceStor( IceNum ).DischargeParaElecLoad > 1.0 ) ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 3 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 3 ), 3 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 3 ) + '=' + RoundSigDigits( rNumericArgs( 3 ), 3 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "Value is either less than/equal to zero or greater than 1" );
 				ErrorsFound = true;
 			}
 
 			if ( ( DetIceStor( IceNum ).ChargeParaElecLoad < 0.0 ) || ( DetIceStor( IceNum ).ChargeParaElecLoad > 1.0 ) ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 4 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 4 ), 3 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 4 ) + '=' + RoundSigDigits( rNumericArgs( 4 ), 3 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "Value is either less than/equal to zero or greater than 1" );
 				ErrorsFound = true;
 			}
 
 			if ( ( DetIceStor( IceNum ).TankLossCoeff < 0.0 ) || ( DetIceStor( IceNum ).TankLossCoeff > 0.1 ) ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 5 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 5 ), 3 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 5 ) + '=' + RoundSigDigits( rNumericArgs( 5 ), 3 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "Value is either less than/equal to zero or greater than 0.1 (10%)" );
 				ErrorsFound = true;
 			}
 
 			if ( ( DetIceStor( IceNum ).FreezingTemp < -10.0 ) || ( DetIceStor( IceNum ).FreezingTemp > 10.0 ) ) {
-				ShowWarningError( "Potentially invalid " + trim( cNumericFieldNames( 6 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 6 ), 3 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowWarningError( "Potentially invalid " + cNumericFieldNames( 6 ) + '=' + RoundSigDigits( rNumericArgs( 6 ), 3 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "Value is either less than -10.0C or greater than 10.0C" );
 				ShowContinueError( "This value will be allowed but the user should verify that this temperature is correct" );
 			}
@@ -1083,7 +1083,7 @@ namespace IceThermalStorage {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + trim( cCurrentModuleObject ) );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
 		}
 
 		// Setup Output Variables to Report CurrentModuleObject='ThermalStorage:Ice:Detailed'

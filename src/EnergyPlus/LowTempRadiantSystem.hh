@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace LowTempRadiantSystem {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -22,9 +20,9 @@ namespace LowTempRadiantSystem {
 	extern int const HydronicSystem; // Variable flow hydronic radiant system
 	extern int const ConstantFlowSystem; // Constant flow, variable (controlled) temperature radiant system
 	extern int const ElectricSystem; // Electric resistance radiant heating system
-	extern Fstring const cHydronicSystem;
-	extern Fstring const cConstantFlowSystem;
-	extern Fstring const cElectricSystem;
+	extern std::string const cHydronicSystem;
+	extern std::string const cConstantFlowSystem;
+	extern std::string const cElectricSystem;
 	// Operating modes:
 	extern int const NotOperating; // Parameter for use with OperatingMode variable, set for heating
 	extern int const HeatingMode; // Parameter for use with OperatingMode variable, set for heating
@@ -42,8 +40,8 @@ namespace LowTempRadiantSystem {
 	// Number of Circuits per Surface Calculation Method
 	extern int const OneCircuit; // there is 1 circuit per surface
 	extern int const CalculateFromLength; // The number of circuits is TubeLength*SurfaceFlowFrac / CircuitLength
-	extern Fstring const OnePerSurf;
-	extern Fstring const CalcFromLength;
+	extern std::string const OnePerSurf;
+	extern std::string const CalcFromLength;
 	// Limit temperatures to indicate that a system cannot heat or cannot cool
 	extern Real64 LowTempHeating; // Used to indicate that a user does not have a heating control temperature
 	extern Real64 HighTempCooling; // Used to indicate that a user does not have a cooling control temperature
@@ -81,15 +79,15 @@ namespace LowTempRadiantSystem {
 	{
 		// Members
 		// Input data
-		Fstring Name; // name of hydronic radiant system
-		Fstring SchedName; // availability schedule
+		std::string Name; // name of hydronic radiant system
+		std::string SchedName; // availability schedule
 		int SchedPtr; // index to schedule
-		Fstring ZoneName; // Name of zone the system is serving
+		std::string ZoneName; // Name of zone the system is serving
 		int ZonePtr; // Point to this zone in the Zone derived type
-		Fstring SurfListName; // Name of surface/surface list that is the radiant system
+		std::string SurfListName; // Name of surface/surface list that is the radiant system
 		int NumOfSurfaces; // Number of surfaces included in this radiant system (coordinated control)
 		FArray1D_int SurfacePtr; // Pointer to the surface(s) in the Surface derived type
-		FArray1D_Fstring SurfaceName; // Name of surfaces that are the radiant system (can be one or more)
+		FArray1D_string SurfaceName; // Name of surfaces that are the radiant system (can be one or more)
 		FArray1D< Real64 > SurfaceFlowFrac; // Fraction of flow/pipe length for a particular surface
 		FArray1D< Real64 > NumCircuits; // Number of fluid circuits in the surface
 		Real64 TotalSurfaceArea; // Total surface area for all surfaces that are part of this radiant system
@@ -102,7 +100,7 @@ namespace LowTempRadiantSystem {
 		int HotWaterInNode; // hot water inlet node
 		int HotWaterOutNode; // hot water outlet node
 		Real64 HotThrottlRange; // Throttling range for heating [C]
-		Fstring HotSetptSched; // Schedule name for the zone setpoint temperature
+		std::string HotSetptSched; // Schedule name for the zone setpoint temperature
 		int HotSetptSchedPtr; // Schedule index for the zone setpoint temperature
 		int HWLoopNum;
 		int HWLoopSide;
@@ -114,7 +112,7 @@ namespace LowTempRadiantSystem {
 		int ColdWaterInNode; // cold water inlet node
 		int ColdWaterOutNode; // cold water outlet node
 		Real64 ColdThrottlRange; // Throttling range for cooling [C]
-		Fstring ColdSetptSched; // Schedule name for the zone setpoint temperature
+		std::string ColdSetptSched; // Schedule name for the zone setpoint temperature
 		int ColdSetptSchedPtr; // Schedule index for the zone setpoint temperature
 		int CWLoopNum;
 		int CWLoopSide;
@@ -144,14 +142,9 @@ namespace LowTempRadiantSystem {
 
 		// Default Constructor
 		HydronicRadiantSystemData() :
-			Name( MaxNameLength ),
-			SchedName( MaxNameLength ),
 			SchedPtr( 0 ),
-			ZoneName( MaxNameLength ),
 			ZonePtr( 0 ),
-			SurfListName( MaxNameLength ),
 			NumOfSurfaces( 0 ),
-			SurfaceName( sFstring( MaxNameLength ) ),
 			TotalSurfaceArea( 0.0 ),
 			TubeDiameter( 0.0 ),
 			TubeLength( 0.0 ),
@@ -162,7 +155,6 @@ namespace LowTempRadiantSystem {
 			HotWaterInNode( 0 ),
 			HotWaterOutNode( 0 ),
 			HotThrottlRange( 0.0 ),
-			HotSetptSched( MaxNameLength ),
 			HotSetptSchedPtr( 0 ),
 			HWLoopNum( 0 ),
 			HWLoopSide( 0 ),
@@ -174,7 +166,6 @@ namespace LowTempRadiantSystem {
 			ColdWaterInNode( 0 ),
 			ColdWaterOutNode( 0 ),
 			ColdThrottlRange( 0.0 ),
-			ColdSetptSched( MaxNameLength ),
 			ColdSetptSchedPtr( 0 ),
 			CWLoopNum( 0 ),
 			CWLoopSide( 0 ),
@@ -203,15 +194,15 @@ namespace LowTempRadiantSystem {
 
 		// Member Constructor
 		HydronicRadiantSystemData(
-			Fstring const & Name, // name of hydronic radiant system
-			Fstring const & SchedName, // availability schedule
+			std::string const & Name, // name of hydronic radiant system
+			std::string const & SchedName, // availability schedule
 			int const SchedPtr, // index to schedule
-			Fstring const & ZoneName, // Name of zone the system is serving
+			std::string const & ZoneName, // Name of zone the system is serving
 			int const ZonePtr, // Point to this zone in the Zone derived type
-			Fstring const & SurfListName, // Name of surface/surface list that is the radiant system
+			std::string const & SurfListName, // Name of surface/surface list that is the radiant system
 			int const NumOfSurfaces, // Number of surfaces included in this radiant system (coordinated control)
 			FArray1_int const & SurfacePtr, // Pointer to the surface(s) in the Surface derived type
-			FArray1_Fstring const & SurfaceName, // Name of surfaces that are the radiant system (can be one or more)
+			FArray1_string const & SurfaceName, // Name of surfaces that are the radiant system (can be one or more)
 			FArray1< Real64 > const & SurfaceFlowFrac, // Fraction of flow/pipe length for a particular surface
 			FArray1< Real64 > const & NumCircuits, // Number of fluid circuits in the surface
 			Real64 const TotalSurfaceArea, // Total surface area for all surfaces that are part of this radiant system
@@ -224,7 +215,7 @@ namespace LowTempRadiantSystem {
 			int const HotWaterInNode, // hot water inlet node
 			int const HotWaterOutNode, // hot water outlet node
 			Real64 const HotThrottlRange, // Throttling range for heating [C]
-			Fstring const & HotSetptSched, // Schedule name for the zone setpoint temperature
+			std::string const & HotSetptSched, // Schedule name for the zone setpoint temperature
 			int const HotSetptSchedPtr, // Schedule index for the zone setpoint temperature
 			int const HWLoopNum,
 			int const HWLoopSide,
@@ -236,7 +227,7 @@ namespace LowTempRadiantSystem {
 			int const ColdWaterInNode, // cold water inlet node
 			int const ColdWaterOutNode, // cold water outlet node
 			Real64 const ColdThrottlRange, // Throttling range for cooling [C]
-			Fstring const & ColdSetptSched, // Schedule name for the zone setpoint temperature
+			std::string const & ColdSetptSched, // Schedule name for the zone setpoint temperature
 			int const ColdSetptSchedPtr, // Schedule index for the zone setpoint temperature
 			int const CWLoopNum,
 			int const CWLoopSide,
@@ -262,12 +253,12 @@ namespace LowTempRadiantSystem {
 			int const OutRangeHiErrorCount, // recurring errors for crazy results too high fluid temperature
 			int const OutRangeLoErrorCount // recurring errors for crazy results too low fluid temperature
 		) :
-			Name( MaxNameLength, Name ),
-			SchedName( MaxNameLength, SchedName ),
+			Name( Name ),
+			SchedName( SchedName ),
 			SchedPtr( SchedPtr ),
-			ZoneName( MaxNameLength, ZoneName ),
+			ZoneName( ZoneName ),
 			ZonePtr( ZonePtr ),
-			SurfListName( MaxNameLength, SurfListName ),
+			SurfListName( SurfListName ),
 			NumOfSurfaces( NumOfSurfaces ),
 			SurfacePtr( SurfacePtr ),
 			SurfaceName( SurfaceName ),
@@ -283,7 +274,7 @@ namespace LowTempRadiantSystem {
 			HotWaterInNode( HotWaterInNode ),
 			HotWaterOutNode( HotWaterOutNode ),
 			HotThrottlRange( HotThrottlRange ),
-			HotSetptSched( MaxNameLength, HotSetptSched ),
+			HotSetptSched( HotSetptSched ),
 			HotSetptSchedPtr( HotSetptSchedPtr ),
 			HWLoopNum( HWLoopNum ),
 			HWLoopSide( HWLoopSide ),
@@ -295,7 +286,7 @@ namespace LowTempRadiantSystem {
 			ColdWaterInNode( ColdWaterInNode ),
 			ColdWaterOutNode( ColdWaterOutNode ),
 			ColdThrottlRange( ColdThrottlRange ),
-			ColdSetptSched( MaxNameLength, ColdSetptSched ),
+			ColdSetptSched( ColdSetptSched ),
 			ColdSetptSchedPtr( ColdSetptSchedPtr ),
 			CWLoopNum( CWLoopNum ),
 			CWLoopSide( CWLoopSide ),
@@ -328,15 +319,15 @@ namespace LowTempRadiantSystem {
 	{
 		// Members
 		// Input data
-		Fstring Name; // name of hydronic radiant system
-		Fstring SchedName; // availability schedule
+		std::string Name; // name of hydronic radiant system
+		std::string SchedName; // availability schedule
 		int SchedPtr; // index to schedule
-		Fstring ZoneName; // Name of zone the system is serving
+		std::string ZoneName; // Name of zone the system is serving
 		int ZonePtr; // Point to this zone in the Zone derived type
-		Fstring SurfListName; // Name of surface/surface list that is the radiant system
+		std::string SurfListName; // Name of surface/surface list that is the radiant system
 		int NumOfSurfaces; // Number of surfaces included in this radiant system (coordinated control)
 		FArray1D_int SurfacePtr; // Pointer to the surface(s) in the Surface derived type
-		FArray1D_Fstring SurfaceName; // Name of surfaces that are the radiant system (can be one or more)
+		FArray1D_string SurfaceName; // Name of surfaces that are the radiant system (can be one or more)
 		FArray1D< Real64 > SurfaceFlowFrac; // Fraction of flow/pipe length for a particular surface
 		FArray1D< Real64 > NumCircuits; // Number of fluid circuits in the surface
 		Real64 TotalSurfaceArea; // Total surface area for all surfaces that are part of this radiant system
@@ -347,7 +338,7 @@ namespace LowTempRadiantSystem {
 		Real64 ColdDesignWaterMassFlowRate;
 		Real64 HotDesignWaterMassFlowRate;
 		Real64 WaterMassFlowRate; // current flow rate through system (calculated)
-		Fstring VolFlowSched; // schedule of maximum flow at the current time
+		std::string VolFlowSched; // schedule of maximum flow at the current time
 		int VolFlowSchedPtr; // index to the volumetric flow schedule
 		Real64 NomPumpHead; // nominal head of the constant flow pump
 		Real64 NomPowerUse; // nominal power use of the constant flow pump
@@ -357,15 +348,15 @@ namespace LowTempRadiantSystem {
 		bool HeatingSystem; // .TRUE. when the system is able to heat (parameters are valid)
 		int HotWaterInNode; // hot water inlet node
 		int HotWaterOutNode; // hot water outlet node
-		Fstring HotWaterHiTempSched; // Schedule name for the highest water temperature
+		std::string HotWaterHiTempSched; // Schedule name for the highest water temperature
 		int HotWaterHiTempSchedPtr; // Schedule index for the highest water temperature
-		Fstring HotWaterLoTempSched; // Schedule name for the lowest water temperature
+		std::string HotWaterLoTempSched; // Schedule name for the lowest water temperature
 		int HotWaterLoTempSchedPtr; // Schedule index for the lowest water temperature
-		Fstring HotCtrlHiTempSched; // Schedule name for the highest control temperature
+		std::string HotCtrlHiTempSched; // Schedule name for the highest control temperature
 		// (where the lowest water temperature is requested)
 		int HotCtrlHiTempSchedPtr; // Schedule index for the highest control temperature
 		// (where the lowest water temperature is requested)
-		Fstring HotCtrlLoTempSched; // Schedule name for the lowest control temperature
+		std::string HotCtrlLoTempSched; // Schedule name for the lowest control temperature
 		// (where the highest water temperature is requested)
 		int HotCtrlLoTempSchedPtr; // Schedule index for the lowest control temperature
 		// (where the highest water temperature is requested)
@@ -376,15 +367,15 @@ namespace LowTempRadiantSystem {
 		bool CoolingSystem; // .TRUE. when the system is able to cool (parameters are valid)
 		int ColdWaterInNode; // cold water inlet node
 		int ColdWaterOutNode; // cold water outlet node
-		Fstring ColdWaterHiTempSched; // Schedule name for the highest water temperature
+		std::string ColdWaterHiTempSched; // Schedule name for the highest water temperature
 		int ColdWaterHiTempSchedPtr; // Schedule index for the highest water temperature
-		Fstring ColdWaterLoTempSched; // Schedule name for the lowest water temperature
+		std::string ColdWaterLoTempSched; // Schedule name for the lowest water temperature
 		int ColdWaterLoTempSchedPtr; // Schedule index for the lowest water temperature
-		Fstring ColdCtrlHiTempSched; // Schedule name for the highest control temperature
+		std::string ColdCtrlHiTempSched; // Schedule name for the highest control temperature
 		// (where the lowest water temperature is requested)
 		int ColdCtrlHiTempSchedPtr; // Schedule index for the highest control temperature
 		// (where the lowest water temperature is requested)
-		Fstring ColdCtrlLoTempSched; // Schedule name for the lowest control temperature
+		std::string ColdCtrlLoTempSched; // Schedule name for the lowest control temperature
 		// (where the highest water temperature is requested)
 		int ColdCtrlLoTempSchedPtr; // Schedule index for the lowest control temperature
 		// (where the highest water temperature is requested)
@@ -423,14 +414,9 @@ namespace LowTempRadiantSystem {
 
 		// Default Constructor
 		ConstantFlowRadiantSystemData() :
-			Name( MaxNameLength ),
-			SchedName( MaxNameLength ),
 			SchedPtr( 0 ),
-			ZoneName( MaxNameLength ),
 			ZonePtr( 0 ),
-			SurfListName( MaxNameLength ),
 			NumOfSurfaces( 0 ),
-			SurfaceName( sFstring( MaxNameLength ) ),
 			TotalSurfaceArea( 0.0 ),
 			TubeDiameter( 0.0 ),
 			TubeLength( 0.0 ),
@@ -439,7 +425,6 @@ namespace LowTempRadiantSystem {
 			ColdDesignWaterMassFlowRate( 0.0 ),
 			HotDesignWaterMassFlowRate( 0.0 ),
 			WaterMassFlowRate( 0.0 ),
-			VolFlowSched( MaxNameLength ),
 			VolFlowSchedPtr( 0 ),
 			NomPumpHead( 0.0 ),
 			NomPowerUse( 0.0 ),
@@ -449,13 +434,9 @@ namespace LowTempRadiantSystem {
 			HeatingSystem( false ),
 			HotWaterInNode( 0 ),
 			HotWaterOutNode( 0 ),
-			HotWaterHiTempSched( MaxNameLength ),
 			HotWaterHiTempSchedPtr( 0 ),
-			HotWaterLoTempSched( MaxNameLength ),
 			HotWaterLoTempSchedPtr( 0 ),
-			HotCtrlHiTempSched( MaxNameLength ),
 			HotCtrlHiTempSchedPtr( 0 ),
-			HotCtrlLoTempSched( MaxNameLength ),
 			HotCtrlLoTempSchedPtr( 0 ),
 			HWLoopNum( 0 ),
 			HWLoopSide( 0 ),
@@ -464,13 +445,9 @@ namespace LowTempRadiantSystem {
 			CoolingSystem( false ),
 			ColdWaterInNode( 0 ),
 			ColdWaterOutNode( 0 ),
-			ColdWaterHiTempSched( MaxNameLength ),
 			ColdWaterHiTempSchedPtr( 0 ),
-			ColdWaterLoTempSched( MaxNameLength ),
 			ColdWaterLoTempSchedPtr( 0 ),
-			ColdCtrlHiTempSched( MaxNameLength ),
 			ColdCtrlHiTempSchedPtr( 0 ),
-			ColdCtrlLoTempSched( MaxNameLength ),
 			ColdCtrlLoTempSchedPtr( 0 ),
 			CWLoopNum( 0 ),
 			CWLoopSide( 0 ),
@@ -506,15 +483,15 @@ namespace LowTempRadiantSystem {
 
 		// Member Constructor
 		ConstantFlowRadiantSystemData(
-			Fstring const & Name, // name of hydronic radiant system
-			Fstring const & SchedName, // availability schedule
+			std::string const & Name, // name of hydronic radiant system
+			std::string const & SchedName, // availability schedule
 			int const SchedPtr, // index to schedule
-			Fstring const & ZoneName, // Name of zone the system is serving
+			std::string const & ZoneName, // Name of zone the system is serving
 			int const ZonePtr, // Point to this zone in the Zone derived type
-			Fstring const & SurfListName, // Name of surface/surface list that is the radiant system
+			std::string const & SurfListName, // Name of surface/surface list that is the radiant system
 			int const NumOfSurfaces, // Number of surfaces included in this radiant system (coordinated control)
 			FArray1_int const & SurfacePtr, // Pointer to the surface(s) in the Surface derived type
-			FArray1_Fstring const & SurfaceName, // Name of surfaces that are the radiant system (can be one or more)
+			FArray1_string const & SurfaceName, // Name of surfaces that are the radiant system (can be one or more)
 			FArray1< Real64 > const & SurfaceFlowFrac, // Fraction of flow/pipe length for a particular surface
 			FArray1< Real64 > const & NumCircuits, // Number of fluid circuits in the surface
 			Real64 const TotalSurfaceArea, // Total surface area for all surfaces that are part of this radiant system
@@ -525,7 +502,7 @@ namespace LowTempRadiantSystem {
 			Real64 const ColdDesignWaterMassFlowRate,
 			Real64 const HotDesignWaterMassFlowRate,
 			Real64 const WaterMassFlowRate, // current flow rate through system (calculated)
-			Fstring const & VolFlowSched, // schedule of maximum flow at the current time
+			std::string const & VolFlowSched, // schedule of maximum flow at the current time
 			int const VolFlowSchedPtr, // index to the volumetric flow schedule
 			Real64 const NomPumpHead, // nominal head of the constant flow pump
 			Real64 const NomPowerUse, // nominal power use of the constant flow pump
@@ -535,13 +512,13 @@ namespace LowTempRadiantSystem {
 			bool const HeatingSystem, // .TRUE. when the system is able to heat (parameters are valid)
 			int const HotWaterInNode, // hot water inlet node
 			int const HotWaterOutNode, // hot water outlet node
-			Fstring const & HotWaterHiTempSched, // Schedule name for the highest water temperature
+			std::string const & HotWaterHiTempSched, // Schedule name for the highest water temperature
 			int const HotWaterHiTempSchedPtr, // Schedule index for the highest water temperature
-			Fstring const & HotWaterLoTempSched, // Schedule name for the lowest water temperature
+			std::string const & HotWaterLoTempSched, // Schedule name for the lowest water temperature
 			int const HotWaterLoTempSchedPtr, // Schedule index for the lowest water temperature
-			Fstring const & HotCtrlHiTempSched, // Schedule name for the highest control temperature
+			std::string const & HotCtrlHiTempSched, // Schedule name for the highest control temperature
 			int const HotCtrlHiTempSchedPtr, // Schedule index for the highest control temperature
-			Fstring const & HotCtrlLoTempSched, // Schedule name for the lowest control temperature
+			std::string const & HotCtrlLoTempSched, // Schedule name for the lowest control temperature
 			int const HotCtrlLoTempSchedPtr, // Schedule index for the lowest control temperature
 			int const HWLoopNum,
 			int const HWLoopSide,
@@ -550,13 +527,13 @@ namespace LowTempRadiantSystem {
 			bool const CoolingSystem, // .TRUE. when the system is able to cool (parameters are valid)
 			int const ColdWaterInNode, // cold water inlet node
 			int const ColdWaterOutNode, // cold water outlet node
-			Fstring const & ColdWaterHiTempSched, // Schedule name for the highest water temperature
+			std::string const & ColdWaterHiTempSched, // Schedule name for the highest water temperature
 			int const ColdWaterHiTempSchedPtr, // Schedule index for the highest water temperature
-			Fstring const & ColdWaterLoTempSched, // Schedule name for the lowest water temperature
+			std::string const & ColdWaterLoTempSched, // Schedule name for the lowest water temperature
 			int const ColdWaterLoTempSchedPtr, // Schedule index for the lowest water temperature
-			Fstring const & ColdCtrlHiTempSched, // Schedule name for the highest control temperature
+			std::string const & ColdCtrlHiTempSched, // Schedule name for the highest control temperature
 			int const ColdCtrlHiTempSchedPtr, // Schedule index for the highest control temperature
-			Fstring const & ColdCtrlLoTempSched, // Schedule name for the lowest control temperature
+			std::string const & ColdCtrlLoTempSched, // Schedule name for the lowest control temperature
 			int const ColdCtrlLoTempSchedPtr, // Schedule index for the lowest control temperature
 			int const CWLoopNum,
 			int const CWLoopSide,
@@ -589,12 +566,12 @@ namespace LowTempRadiantSystem {
 			int const OutRangeHiErrorCount, // recurring errors for crazy results too high fluid temperature
 			int const OutRangeLoErrorCount // recurring errors for crazy results too low fluid temperature
 		) :
-			Name( MaxNameLength, Name ),
-			SchedName( MaxNameLength, SchedName ),
+			Name( Name ),
+			SchedName( SchedName ),
 			SchedPtr( SchedPtr ),
-			ZoneName( MaxNameLength, ZoneName ),
+			ZoneName( ZoneName ),
 			ZonePtr( ZonePtr ),
-			SurfListName( MaxNameLength, SurfListName ),
+			SurfListName( SurfListName ),
 			NumOfSurfaces( NumOfSurfaces ),
 			SurfacePtr( SurfacePtr ),
 			SurfaceName( SurfaceName ),
@@ -608,7 +585,7 @@ namespace LowTempRadiantSystem {
 			ColdDesignWaterMassFlowRate( ColdDesignWaterMassFlowRate ),
 			HotDesignWaterMassFlowRate( HotDesignWaterMassFlowRate ),
 			WaterMassFlowRate( WaterMassFlowRate ),
-			VolFlowSched( MaxNameLength, VolFlowSched ),
+			VolFlowSched( VolFlowSched ),
 			VolFlowSchedPtr( VolFlowSchedPtr ),
 			NomPumpHead( NomPumpHead ),
 			NomPowerUse( NomPowerUse ),
@@ -618,13 +595,13 @@ namespace LowTempRadiantSystem {
 			HeatingSystem( HeatingSystem ),
 			HotWaterInNode( HotWaterInNode ),
 			HotWaterOutNode( HotWaterOutNode ),
-			HotWaterHiTempSched( MaxNameLength, HotWaterHiTempSched ),
+			HotWaterHiTempSched( HotWaterHiTempSched ),
 			HotWaterHiTempSchedPtr( HotWaterHiTempSchedPtr ),
-			HotWaterLoTempSched( MaxNameLength, HotWaterLoTempSched ),
+			HotWaterLoTempSched( HotWaterLoTempSched ),
 			HotWaterLoTempSchedPtr( HotWaterLoTempSchedPtr ),
-			HotCtrlHiTempSched( MaxNameLength, HotCtrlHiTempSched ),
+			HotCtrlHiTempSched( HotCtrlHiTempSched ),
 			HotCtrlHiTempSchedPtr( HotCtrlHiTempSchedPtr ),
-			HotCtrlLoTempSched( MaxNameLength, HotCtrlLoTempSched ),
+			HotCtrlLoTempSched( HotCtrlLoTempSched ),
 			HotCtrlLoTempSchedPtr( HotCtrlLoTempSchedPtr ),
 			HWLoopNum( HWLoopNum ),
 			HWLoopSide( HWLoopSide ),
@@ -633,13 +610,13 @@ namespace LowTempRadiantSystem {
 			CoolingSystem( CoolingSystem ),
 			ColdWaterInNode( ColdWaterInNode ),
 			ColdWaterOutNode( ColdWaterOutNode ),
-			ColdWaterHiTempSched( MaxNameLength, ColdWaterHiTempSched ),
+			ColdWaterHiTempSched( ColdWaterHiTempSched ),
 			ColdWaterHiTempSchedPtr( ColdWaterHiTempSchedPtr ),
-			ColdWaterLoTempSched( MaxNameLength, ColdWaterLoTempSched ),
+			ColdWaterLoTempSched( ColdWaterLoTempSched ),
 			ColdWaterLoTempSchedPtr( ColdWaterLoTempSchedPtr ),
-			ColdCtrlHiTempSched( MaxNameLength, ColdCtrlHiTempSched ),
+			ColdCtrlHiTempSched( ColdCtrlHiTempSched ),
 			ColdCtrlHiTempSchedPtr( ColdCtrlHiTempSchedPtr ),
-			ColdCtrlLoTempSched( MaxNameLength, ColdCtrlLoTempSched ),
+			ColdCtrlLoTempSched( ColdCtrlLoTempSched ),
 			ColdCtrlLoTempSchedPtr( ColdCtrlLoTempSchedPtr ),
 			CWLoopNum( CWLoopNum ),
 			CWLoopSide( CWLoopSide ),
@@ -679,21 +656,21 @@ namespace LowTempRadiantSystem {
 	{
 		// Members
 		// Input data
-		Fstring Name; // name of hydronic radiant system
-		Fstring SchedName; // availability schedule
+		std::string Name; // name of hydronic radiant system
+		std::string SchedName; // availability schedule
 		int SchedPtr; // index to schedule
-		Fstring ZoneName; // Name of zone the system is serving
+		std::string ZoneName; // Name of zone the system is serving
 		int ZonePtr; // Point to this zone in the Zone derived type
-		Fstring SurfListName; // Name of surface/surface list that is the radiant system
+		std::string SurfListName; // Name of surface/surface list that is the radiant system
 		int NumOfSurfaces; // Number of surfaces included in this radiant system (coordinated control)
 		FArray1D_int SurfacePtr; // Pointer to the surface(s) in the Surface derived type
-		FArray1D_Fstring SurfaceName; // Name of surfaces that are the radiant system (can be one or more)
+		FArray1D_string SurfaceName; // Name of surfaces that are the radiant system (can be one or more)
 		FArray1D< Real64 > SurfacePowerFrac; // Fraction of total power input to surface
 		Real64 TotalSurfaceArea; // Total surface area for all surfaces that are part of this radiant system
 		Real64 MaxElecPower; // Maximum electric power that can be supplied to surface, Watts
 		int ControlType; // Control type for the system (MAT, MRT, Op temp, ODB, OWB)
 		Real64 ThrottlRange; // Throttling range for heating [C]
-		Fstring SetptSched; // Schedule name for the zone setpoint temperature
+		std::string SetptSched; // Schedule name for the zone setpoint temperature
 		int SetptSchedPtr; // Schedule index for the zone setpoint temperature
 		// Other parameters
 		// Report data
@@ -704,19 +681,13 @@ namespace LowTempRadiantSystem {
 
 		// Default Constructor
 		ElectricRadiantSystemData() :
-			Name( MaxNameLength ),
-			SchedName( MaxNameLength ),
 			SchedPtr( 0 ),
-			ZoneName( MaxNameLength ),
 			ZonePtr( 0 ),
-			SurfListName( MaxNameLength ),
 			NumOfSurfaces( 0 ),
-			SurfaceName( sFstring( MaxNameLength ) ),
 			TotalSurfaceArea( 0.0 ),
 			MaxElecPower( 0.0 ),
 			ControlType( 0 ),
 			ThrottlRange( 0.0 ),
-			SetptSched( MaxNameLength ),
 			SetptSchedPtr( 0 ),
 			ElecPower( 0.0 ),
 			ElecEnergy( 0.0 ),
@@ -726,33 +697,33 @@ namespace LowTempRadiantSystem {
 
 		// Member Constructor
 		ElectricRadiantSystemData(
-			Fstring const & Name, // name of hydronic radiant system
-			Fstring const & SchedName, // availability schedule
+			std::string const & Name, // name of hydronic radiant system
+			std::string const & SchedName, // availability schedule
 			int const SchedPtr, // index to schedule
-			Fstring const & ZoneName, // Name of zone the system is serving
+			std::string const & ZoneName, // Name of zone the system is serving
 			int const ZonePtr, // Point to this zone in the Zone derived type
-			Fstring const & SurfListName, // Name of surface/surface list that is the radiant system
+			std::string const & SurfListName, // Name of surface/surface list that is the radiant system
 			int const NumOfSurfaces, // Number of surfaces included in this radiant system (coordinated control)
 			FArray1_int const & SurfacePtr, // Pointer to the surface(s) in the Surface derived type
-			FArray1_Fstring const & SurfaceName, // Name of surfaces that are the radiant system (can be one or more)
+			FArray1_string const & SurfaceName, // Name of surfaces that are the radiant system (can be one or more)
 			FArray1< Real64 > const & SurfacePowerFrac, // Fraction of total power input to surface
 			Real64 const TotalSurfaceArea, // Total surface area for all surfaces that are part of this radiant system
 			Real64 const MaxElecPower, // Maximum electric power that can be supplied to surface, Watts
 			int const ControlType, // Control type for the system (MAT, MRT, Op temp, ODB, OWB)
 			Real64 const ThrottlRange, // Throttling range for heating [C]
-			Fstring const & SetptSched, // Schedule name for the zone setpoint temperature
+			std::string const & SetptSched, // Schedule name for the zone setpoint temperature
 			int const SetptSchedPtr, // Schedule index for the zone setpoint temperature
 			Real64 const ElecPower, // heating sent to panel in Watts
 			Real64 const ElecEnergy, // heating sent to panel in Joules
 			Real64 const HeatPower, // heating sent to panel in Watts (same as ElecPower)
 			Real64 const HeatEnergy // heating sent to panel in Joules (same as ElecEnergy)
 		) :
-			Name( MaxNameLength, Name ),
-			SchedName( MaxNameLength, SchedName ),
+			Name( Name ),
+			SchedName( SchedName ),
 			SchedPtr( SchedPtr ),
-			ZoneName( MaxNameLength, ZoneName ),
+			ZoneName( ZoneName ),
 			ZonePtr( ZonePtr ),
-			SurfListName( MaxNameLength, SurfListName ),
+			SurfListName( SurfListName ),
 			NumOfSurfaces( NumOfSurfaces ),
 			SurfacePtr( SurfacePtr ),
 			SurfaceName( SurfaceName ),
@@ -761,7 +732,7 @@ namespace LowTempRadiantSystem {
 			MaxElecPower( MaxElecPower ),
 			ControlType( ControlType ),
 			ThrottlRange( ThrottlRange ),
-			SetptSched( MaxNameLength, SetptSched ),
+			SetptSched( SetptSched ),
 			SetptSchedPtr( SetptSchedPtr ),
 			ElecPower( ElecPower ),
 			ElecEnergy( ElecEnergy ),
@@ -775,24 +746,23 @@ namespace LowTempRadiantSystem {
 	{
 		// Members
 		// This type used to track different components/types for efficiency
-		Fstring Name; // name of radiant system
+		std::string Name; // name of radiant system
 		int SystemType; // Type of System (see System Types in Parameters)
 		int CompIndex; // Index in specific system types
 
 		// Default Constructor
 		RadSysTypeData() :
-			Name( MaxNameLength ),
 			SystemType( 0 ),
 			CompIndex( 0 )
 		{}
 
 		// Member Constructor
 		RadSysTypeData(
-			Fstring const & Name, // name of radiant system
+			std::string const & Name, // name of radiant system
 			int const SystemType, // Type of System (see System Types in Parameters)
 			int const CompIndex // Index in specific system types
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			SystemType( SystemType ),
 			CompIndex( CompIndex )
 		{}
@@ -809,7 +779,7 @@ namespace LowTempRadiantSystem {
 
 	void
 	SimLowTempRadiantSystem(
-		Fstring const & CompName, // name of the low temperature radiant system
+		std::string const & CompName, // name of the low temperature radiant system
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		Real64 & LoadMet, // load met by the radiant system, in Watts
 		int & CompIndex

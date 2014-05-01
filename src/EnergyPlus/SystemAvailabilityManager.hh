@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -15,7 +14,6 @@ namespace EnergyPlus {
 namespace SystemAvailabilityManager {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
@@ -46,7 +44,7 @@ namespace SystemAvailabilityManager {
 	extern int const HybridVentCtrl_Close; // Close windows or doors
 
 	extern int const NumValidSysAvailManagerTypes;
-	extern FArray1D_Fstring const cValidSysAvailManagerTypes;
+	extern FArray1D_string const cValidSysAvailManagerTypes;
 	extern int const SysAvailMgr_Scheduled;
 	extern int const SysAvailMgr_ScheduledOn;
 	extern int const SysAvailMgr_ScheduledOff;
@@ -90,14 +88,13 @@ namespace SystemAvailabilityManager {
 	struct DefineSchedSysAvailManager // Derived type for Scheduled Sys Avail Managers
 	{
 		// Members
-		Fstring Name; // Name of the manager object
+		std::string Name; // Name of the manager object
 		int MgrType; // Integer equivalent of availability manager type
 		int SchedPtr; // Schedule pointer
 		int AvailStatus; // reports status of availability manager
 
 		// Default Constructor
 		DefineSchedSysAvailManager() :
-			Name( MaxNameLength ),
 			MgrType( 0 ),
 			SchedPtr( 0 ),
 			AvailStatus( 0 )
@@ -105,12 +102,12 @@ namespace SystemAvailabilityManager {
 
 		// Member Constructor
 		DefineSchedSysAvailManager(
-			Fstring const & Name, // Name of the manager object
+			std::string const & Name, // Name of the manager object
 			int const MgrType, // Integer equivalent of availability manager type
 			int const SchedPtr, // Schedule pointer
 			int const AvailStatus // reports status of availability manager
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			MgrType( MgrType ),
 			SchedPtr( SchedPtr ),
 			AvailStatus( AvailStatus )
@@ -121,14 +118,13 @@ namespace SystemAvailabilityManager {
 	struct DefineSchedOnSysAvailManager // Derived type for Scheduled On Sys Avail Managers
 	{
 		// Members
-		Fstring Name; // Name of the manager object
+		std::string Name; // Name of the manager object
 		int MgrType; // Integer equivalent of availability manager type
 		int SchedPtr; // Schedule pointer
 		int AvailStatus; // reports status of availability manager
 
 		// Default Constructor
 		DefineSchedOnSysAvailManager() :
-			Name( MaxNameLength ),
 			MgrType( 0 ),
 			SchedPtr( 0 ),
 			AvailStatus( 0 )
@@ -136,12 +132,12 @@ namespace SystemAvailabilityManager {
 
 		// Member Constructor
 		DefineSchedOnSysAvailManager(
-			Fstring const & Name, // Name of the manager object
+			std::string const & Name, // Name of the manager object
 			int const MgrType, // Integer equivalent of availability manager type
 			int const SchedPtr, // Schedule pointer
 			int const AvailStatus // reports status of availability manager
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			MgrType( MgrType ),
 			SchedPtr( SchedPtr ),
 			AvailStatus( AvailStatus )
@@ -152,14 +148,13 @@ namespace SystemAvailabilityManager {
 	struct DefineSchedOffSysAvailManager // Derived type for Scheduled Off Sys Avail Managers
 	{
 		// Members
-		Fstring Name; // Name of the manager object
+		std::string Name; // Name of the manager object
 		int MgrType; // Integer equivalent of availability manager type
 		int SchedPtr; // Schedule pointer
 		int AvailStatus; // reports status of availability manager
 
 		// Default Constructor
 		DefineSchedOffSysAvailManager() :
-			Name( MaxNameLength ),
 			MgrType( 0 ),
 			SchedPtr( 0 ),
 			AvailStatus( 0 )
@@ -167,12 +162,12 @@ namespace SystemAvailabilityManager {
 
 		// Member Constructor
 		DefineSchedOffSysAvailManager(
-			Fstring const & Name, // Name of the manager object
+			std::string const & Name, // Name of the manager object
 			int const MgrType, // Integer equivalent of availability manager type
 			int const SchedPtr, // Schedule pointer
 			int const AvailStatus // reports status of availability manager
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			MgrType( MgrType ),
 			SchedPtr( SchedPtr ),
 			AvailStatus( AvailStatus )
@@ -183,31 +178,28 @@ namespace SystemAvailabilityManager {
 	struct DefineNightCycSysAvailManager // Derived type for Night Cycle Sys Avail Managers
 	{
 		// Members
-		Fstring Name; // Name of the manager object
+		std::string Name; // Name of the manager object
 		int MgrType; // Integer equivalent of availability manager type
 		int SchedPtr; // Applicability schedule pointer
-		Fstring FanSched; // Fan schedule name
+		std::string FanSched; // Fan schedule name
 		int FanSchedPtr; // Fan schedule pointer
 		int CtrlType; // type of control: Stay Off, Cycle On Any,
 		//   Cycle On Control Zone, or Cycle On Any - Zone Fans Only
 		Real64 TempTolRange; // range in degrees C of thermostat tolerance
 		int CyclingTimeSteps; // period (in Loads time steps) system will cycle on.
-		Fstring CtrlZoneName; // Name of the control zone
+		std::string CtrlZoneName; // Name of the control zone
 		int ZoneNum; // zone number of control zone
 		int ControlledZoneNum; // controlled zone number of control zone
 		int AvailStatus; // reports status of availability manager
 
 		// Default Constructor
 		DefineNightCycSysAvailManager() :
-			Name( MaxNameLength ),
 			MgrType( 0 ),
 			SchedPtr( 0 ),
-			FanSched( MaxNameLength ),
 			FanSchedPtr( 0 ),
 			CtrlType( 0 ),
 			TempTolRange( 1.0 ),
 			CyclingTimeSteps( 1 ),
-			CtrlZoneName( MaxNameLength ),
 			ZoneNum( 0 ),
 			ControlledZoneNum( 0 ),
 			AvailStatus( 0 )
@@ -215,28 +207,28 @@ namespace SystemAvailabilityManager {
 
 		// Member Constructor
 		DefineNightCycSysAvailManager(
-			Fstring const & Name, // Name of the manager object
+			std::string const & Name, // Name of the manager object
 			int const MgrType, // Integer equivalent of availability manager type
 			int const SchedPtr, // Applicability schedule pointer
-			Fstring const & FanSched, // Fan schedule name
+			std::string const & FanSched, // Fan schedule name
 			int const FanSchedPtr, // Fan schedule pointer
 			int const CtrlType, // type of control: Stay Off, Cycle On Any,
 			Real64 const TempTolRange, // range in degrees C of thermostat tolerance
 			int const CyclingTimeSteps, // period (in Loads time steps) system will cycle on.
-			Fstring const & CtrlZoneName, // Name of the control zone
+			std::string const & CtrlZoneName, // Name of the control zone
 			int const ZoneNum, // zone number of control zone
 			int const ControlledZoneNum, // controlled zone number of control zone
 			int const AvailStatus // reports status of availability manager
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			MgrType( MgrType ),
 			SchedPtr( SchedPtr ),
-			FanSched( MaxNameLength, FanSched ),
+			FanSched( FanSched ),
 			FanSchedPtr( FanSchedPtr ),
 			CtrlType( CtrlType ),
 			TempTolRange( TempTolRange ),
 			CyclingTimeSteps( CyclingTimeSteps ),
-			CtrlZoneName( MaxNameLength, CtrlZoneName ),
+			CtrlZoneName( CtrlZoneName ),
 			ZoneNum( ZoneNum ),
 			ControlledZoneNum( ControlledZoneNum ),
 			AvailStatus( AvailStatus )
@@ -247,16 +239,16 @@ namespace SystemAvailabilityManager {
 	struct DefineOptStartSysAvailManager // Derived type for Optimal Start Sys Avail Managers
 	{
 		// Members
-		Fstring Name; // Name of the manager object
+		std::string Name; // Name of the manager object
 		int MgrType; // Integer equivalent of availability manager type
 		int SchedPtr; // Applicability schedule pointer
-		Fstring FanSched; // Fan schedule name
+		std::string FanSched; // Fan schedule name
 		int FanSchedPtr; // Fan schedule pointer
 		int CtrlType; // Type of control: Stay Off, ControlZone, MaximumofZoneList
-		Fstring CtrlZoneName; // Name of the control zone
+		std::string CtrlZoneName; // Name of the control zone
 		int ZoneNum; // zone number of control zone
 		int ControlledZoneNum; // controlled zone number of control zone
-		Fstring ZoneListName; // Zone List name
+		std::string ZoneListName; // Zone List name
 		int NumOfZones; // Number of zones in the list
 		FArray1D_int ZonePtrs; // Pointers to zones in the list
 		Real64 MaxOptStartTime; // Maximum value of start time in hours
@@ -275,16 +267,12 @@ namespace SystemAvailabilityManager {
 
 		// Default Constructor
 		DefineOptStartSysAvailManager() :
-			Name( MaxNameLength ),
 			MgrType( 0 ),
 			SchedPtr( 0 ),
-			FanSched( MaxNameLength ),
 			FanSchedPtr( 0 ),
 			CtrlType( 0 ),
-			CtrlZoneName( MaxNameLength ),
 			ZoneNum( 0 ),
 			ControlledZoneNum( 0 ),
-			ZoneListName( MaxNameLength ),
 			NumOfZones( 0 ),
 			MaxOptStartTime( 6.0 ),
 			CtrlAlgType( 0 ),
@@ -302,16 +290,16 @@ namespace SystemAvailabilityManager {
 
 		// Member Constructor
 		DefineOptStartSysAvailManager(
-			Fstring const & Name, // Name of the manager object
+			std::string const & Name, // Name of the manager object
 			int const MgrType, // Integer equivalent of availability manager type
 			int const SchedPtr, // Applicability schedule pointer
-			Fstring const & FanSched, // Fan schedule name
+			std::string const & FanSched, // Fan schedule name
 			int const FanSchedPtr, // Fan schedule pointer
 			int const CtrlType, // Type of control: Stay Off, ControlZone, MaximumofZoneList
-			Fstring const & CtrlZoneName, // Name of the control zone
+			std::string const & CtrlZoneName, // Name of the control zone
 			int const ZoneNum, // zone number of control zone
 			int const ControlledZoneNum, // controlled zone number of control zone
-			Fstring const & ZoneListName, // Zone List name
+			std::string const & ZoneListName, // Zone List name
 			int const NumOfZones, // Number of zones in the list
 			FArray1_int const & ZonePtrs, // Pointers to zones in the list
 			Real64 const MaxOptStartTime, // Maximum value of start time in hours
@@ -327,16 +315,16 @@ namespace SystemAvailabilityManager {
 			int const AvailStatus, // reports status of availability manager
 			Real64 const NumHoursBeforeOccupancy
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			MgrType( MgrType ),
 			SchedPtr( SchedPtr ),
-			FanSched( MaxNameLength, FanSched ),
+			FanSched( FanSched ),
 			FanSchedPtr( FanSchedPtr ),
 			CtrlType( CtrlType ),
-			CtrlZoneName( MaxNameLength, CtrlZoneName ),
+			CtrlZoneName( CtrlZoneName ),
 			ZoneNum( ZoneNum ),
 			ControlledZoneNum( ControlledZoneNum ),
-			ZoneListName( MaxNameLength, ZoneListName ),
+			ZoneListName( ZoneListName ),
 			NumOfZones( NumOfZones ),
 			ZonePtrs( ZonePtrs ),
 			MaxOptStartTime( MaxOptStartTime ),
@@ -358,7 +346,7 @@ namespace SystemAvailabilityManager {
 	struct DefineASHRAEAdaptiveOptimumStartCoeffs // Derived type for Differential Thermostat Sys Avail Managers
 	{
 		// Members
-		Fstring Name; // Name of the object
+		std::string Name; // Name of the object
 		Real64 Coeff1; // 1st Coefficient of the equation
 		Real64 Coeff2; // 2nd Coefficient of the equation
 		Real64 Coeff3; // 3rd Coefficient of the equation
@@ -366,7 +354,6 @@ namespace SystemAvailabilityManager {
 
 		// Default Constructor
 		DefineASHRAEAdaptiveOptimumStartCoeffs() :
-			Name( MaxNameLength ),
 			Coeff1( 0.0 ),
 			Coeff2( 0.0 ),
 			Coeff3( 0.0 ),
@@ -375,13 +362,13 @@ namespace SystemAvailabilityManager {
 
 		// Member Constructor
 		DefineASHRAEAdaptiveOptimumStartCoeffs(
-			Fstring const & Name, // Name of the object
+			std::string const & Name, // Name of the object
 			Real64 const Coeff1, // 1st Coefficient of the equation
 			Real64 const Coeff2, // 2nd Coefficient of the equation
 			Real64 const Coeff3, // 3rd Coefficient of the equation
 			Real64 const Coeff4 // 4th Coefficient of the equation
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			Coeff1( Coeff1 ),
 			Coeff2( Coeff2 ),
 			Coeff3( Coeff3 ),
@@ -393,7 +380,7 @@ namespace SystemAvailabilityManager {
 	struct DefineDiffTSysAvailManager // Derived type for Differential Thermostat Sys Avail Managers
 	{
 		// Members
-		Fstring Name; // Name of the manager object
+		std::string Name; // Name of the manager object
 		int MgrType; // Integer equivalent of availability manager type
 		int HotNode; // "Hot" sensor node
 		int ColdNode; // "Cold" sensor node
@@ -403,7 +390,6 @@ namespace SystemAvailabilityManager {
 
 		// Default Constructor
 		DefineDiffTSysAvailManager() :
-			Name( MaxNameLength ),
 			MgrType( 0 ),
 			HotNode( 0 ),
 			ColdNode( 0 ),
@@ -414,7 +400,7 @@ namespace SystemAvailabilityManager {
 
 		// Member Constructor
 		DefineDiffTSysAvailManager(
-			Fstring const & Name, // Name of the manager object
+			std::string const & Name, // Name of the manager object
 			int const MgrType, // Integer equivalent of availability manager type
 			int const HotNode, // "Hot" sensor node
 			int const ColdNode, // "Cold" sensor node
@@ -422,7 +408,7 @@ namespace SystemAvailabilityManager {
 			Real64 const TempDiffOff, // Temperature difference for turn off (delta C)
 			int const AvailStatus // reports status of availability manager
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			MgrType( MgrType ),
 			HotNode( HotNode ),
 			ColdNode( ColdNode ),
@@ -436,7 +422,7 @@ namespace SystemAvailabilityManager {
 	struct DefineHiLoSysAvailManager // Derived type for High/Low Temperature On/Off Sys Avail Managers
 	{
 		// Members
-		Fstring Name; // Name of the manager object
+		std::string Name; // Name of the manager object
 		int MgrType; // Integer equivalent of availability manager type
 		int Node; // Sensor node
 		Real64 Temp; // Temperature for on/off (C)
@@ -445,7 +431,6 @@ namespace SystemAvailabilityManager {
 
 		// Default Constructor
 		DefineHiLoSysAvailManager() :
-			Name( MaxNameLength ),
 			MgrType( 0 ),
 			Node( 0 ),
 			Temp( 0.0 ),
@@ -455,14 +440,14 @@ namespace SystemAvailabilityManager {
 
 		// Member Constructor
 		DefineHiLoSysAvailManager(
-			Fstring const & Name, // Name of the manager object
+			std::string const & Name, // Name of the manager object
 			int const MgrType, // Integer equivalent of availability manager type
 			int const Node, // Sensor node
 			Real64 const Temp, // Temperature for on/off (C)
 			int const SchedPtr, // Applicability schedule pointer
 			int const AvailStatus // reports status of availability manager
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			MgrType( MgrType ),
 			Node( Node ),
 			Temp( Temp ),
@@ -475,16 +460,16 @@ namespace SystemAvailabilityManager {
 	struct DefineNightVentSysAvailManager
 	{
 		// Members
-		Fstring Name; // Name of the manager object
+		std::string Name; // Name of the manager object
 		int MgrType; // Integer equivalent of availability manager type
 		int SchedPtr; // Applicability schedule pointer
-		Fstring FanSched; // Fan schedule name
+		std::string FanSched; // Fan schedule name
 		int FanSchedPtr; // Fan schedule pointer
-		Fstring VentTempSched; // Ventilation temperature schedule
+		std::string VentTempSched; // Ventilation temperature schedule
 		int VentTempSchedPtr; // Ventilation temperature schedule pointer
 		Real64 VentDelT; // Ventilation delta T [deltaC]
 		Real64 VentTempLowLim; // ventilation temperature low limit
-		Fstring CtrlZoneName; // Name of the control zone
+		std::string CtrlZoneName; // Name of the control zone
 		int ZoneNum; // zome number of control zone
 		int ControlledZoneNum; // controlled zone number of control zone
 		Real64 VentFlowFrac; // the night venting flow fraction
@@ -492,16 +477,12 @@ namespace SystemAvailabilityManager {
 
 		// Default Constructor
 		DefineNightVentSysAvailManager() :
-			Name( MaxNameLength ),
 			MgrType( 0 ),
 			SchedPtr( 0 ),
-			FanSched( MaxNameLength ),
 			FanSchedPtr( 0 ),
-			VentTempSched( MaxNameLength ),
 			VentTempSchedPtr( 0 ),
 			VentDelT( 0.0 ),
 			VentTempLowLim( 0.0 ),
-			CtrlZoneName( MaxNameLength ),
 			ZoneNum( 0 ),
 			ControlledZoneNum( 0 ),
 			VentFlowFrac( 0.0 ),
@@ -510,31 +491,31 @@ namespace SystemAvailabilityManager {
 
 		// Member Constructor
 		DefineNightVentSysAvailManager(
-			Fstring const & Name, // Name of the manager object
+			std::string const & Name, // Name of the manager object
 			int const MgrType, // Integer equivalent of availability manager type
 			int const SchedPtr, // Applicability schedule pointer
-			Fstring const & FanSched, // Fan schedule name
+			std::string const & FanSched, // Fan schedule name
 			int const FanSchedPtr, // Fan schedule pointer
-			Fstring const & VentTempSched, // Ventilation temperature schedule
+			std::string const & VentTempSched, // Ventilation temperature schedule
 			int const VentTempSchedPtr, // Ventilation temperature schedule pointer
 			Real64 const VentDelT, // Ventilation delta T [deltaC]
 			Real64 const VentTempLowLim, // ventilation temperature low limit
-			Fstring const & CtrlZoneName, // Name of the control zone
+			std::string const & CtrlZoneName, // Name of the control zone
 			int const ZoneNum, // zome number of control zone
 			int const ControlledZoneNum, // controlled zone number of control zone
 			Real64 const VentFlowFrac, // the night venting flow fraction
 			int const AvailStatus // reports status of availability manager
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			MgrType( MgrType ),
 			SchedPtr( SchedPtr ),
-			FanSched( MaxNameLength, FanSched ),
+			FanSched( FanSched ),
 			FanSchedPtr( FanSchedPtr ),
-			VentTempSched( MaxNameLength, VentTempSched ),
+			VentTempSched( VentTempSched ),
 			VentTempSchedPtr( VentTempSchedPtr ),
 			VentDelT( VentDelT ),
 			VentTempLowLim( VentTempLowLim ),
-			CtrlZoneName( MaxNameLength, CtrlZoneName ),
+			CtrlZoneName( CtrlZoneName ),
 			ZoneNum( ZoneNum ),
 			ControlledZoneNum( ControlledZoneNum ),
 			VentFlowFrac( VentFlowFrac ),
@@ -546,11 +527,11 @@ namespace SystemAvailabilityManager {
 	struct DefineHybridVentSysAvailManager
 	{
 		// Members
-		Fstring Name; // Name of the object
+		std::string Name; // Name of the object
 		int MgrType; // Integer equivalent of availability manager type
-		Fstring AirLoopName; // Name of HVAC Air Loop
+		std::string AirLoopName; // Name of HVAC Air Loop
 		int AirLoopNum; // HVAC Air Loop number
-		Fstring ControlZoneName; // Controlled zone name
+		std::string ControlZoneName; // Controlled zone name
 		int NodeNumOfControlledZone; // Controlled zone node number
 		int ActualZoneNum; // Actual zone number
 		int ControlledZoneNum; // Controlled zone number
@@ -565,7 +546,7 @@ namespace SystemAvailabilityManager {
 		Real64 MaxOutdoorDewPoint; // Maximum Outdoor Dew Point Temperature [C]
 		Real64 MaxWindSpeed; // Maximum Wind speed [m/s]
 		bool UseRainIndicator; // Use WeatherFile Rain Indicators
-		Fstring MinOASched; // Minimum Outdoor Ventilation Air Schedule Name
+		std::string MinOASched; // Minimum Outdoor Ventilation Air Schedule Name
 		int MinOASchedPtr; // Minimum Outdoor Ventilation Air Schedule pointer
 		int DewPointNoRHErrCount; // Dewpoint control mode error count without a humidistat
 		int DewPointNoRHErrIndex; // Dewpoint control mode error index without a humidistat
@@ -580,7 +561,7 @@ namespace SystemAvailabilityManager {
 		int SimpleControlTypeSchedPtr; // Simple airflow object control type schedule pointer
 		int VentilationPtr; // Ventilation object name pointer
 		int AvailStatus; // reports status of availability manager
-		Fstring VentilationName; // Ventilation object name
+		std::string VentilationName; // Ventilation object name
 		bool HybridVentMgrConnectedToAirLoop; // Flag to check whether hybrid ventilation
 		// manager is connected to air loop
 		bool SimHybridVentSysAvailMgr; // Set to false when a zone has two hybrid ventilation
@@ -588,11 +569,8 @@ namespace SystemAvailabilityManager {
 
 		// Default Constructor
 		DefineHybridVentSysAvailManager() :
-			Name( MaxNameLength ),
 			MgrType( 0 ),
-			AirLoopName( MaxNameLength ),
 			AirLoopNum( 0 ),
-			ControlZoneName( MaxNameLength ),
 			NodeNumOfControlledZone( 0 ),
 			ActualZoneNum( 0 ),
 			ControlledZoneNum( 0 ),
@@ -607,7 +585,6 @@ namespace SystemAvailabilityManager {
 			MaxOutdoorDewPoint( 100.0 ),
 			MaxWindSpeed( 0.0 ),
 			UseRainIndicator( true ),
-			MinOASched( MaxNameLength ),
 			MinOASchedPtr( 0 ),
 			DewPointNoRHErrCount( 0 ),
 			DewPointNoRHErrIndex( 0 ),
@@ -620,18 +597,17 @@ namespace SystemAvailabilityManager {
 			SimpleControlTypeSchedPtr( 0 ),
 			VentilationPtr( 0 ),
 			AvailStatus( 0 ),
-			VentilationName( MaxNameLength ),
 			HybridVentMgrConnectedToAirLoop( true ),
 			SimHybridVentSysAvailMgr( false )
 		{}
 
 		// Member Constructor
 		DefineHybridVentSysAvailManager(
-			Fstring const & Name, // Name of the object
+			std::string const & Name, // Name of the object
 			int const MgrType, // Integer equivalent of availability manager type
-			Fstring const & AirLoopName, // Name of HVAC Air Loop
+			std::string const & AirLoopName, // Name of HVAC Air Loop
 			int const AirLoopNum, // HVAC Air Loop number
-			Fstring const & ControlZoneName, // Controlled zone name
+			std::string const & ControlZoneName, // Controlled zone name
 			int const NodeNumOfControlledZone, // Controlled zone node number
 			int const ActualZoneNum, // Actual zone number
 			int const ControlledZoneNum, // Controlled zone number
@@ -646,7 +622,7 @@ namespace SystemAvailabilityManager {
 			Real64 const MaxOutdoorDewPoint, // Maximum Outdoor Dew Point Temperature [C]
 			Real64 const MaxWindSpeed, // Maximum Wind speed [m/s]
 			bool const UseRainIndicator, // Use WeatherFile Rain Indicators
-			Fstring const & MinOASched, // Minimum Outdoor Ventilation Air Schedule Name
+			std::string const & MinOASched, // Minimum Outdoor Ventilation Air Schedule Name
 			int const MinOASchedPtr, // Minimum Outdoor Ventilation Air Schedule pointer
 			int const DewPointNoRHErrCount, // Dewpoint control mode error count without a humidistat
 			int const DewPointNoRHErrIndex, // Dewpoint control mode error index without a humidistat
@@ -659,15 +635,15 @@ namespace SystemAvailabilityManager {
 			int const SimpleControlTypeSchedPtr, // Simple airflow object control type schedule pointer
 			int const VentilationPtr, // Ventilation object name pointer
 			int const AvailStatus, // reports status of availability manager
-			Fstring const & VentilationName, // Ventilation object name
+			std::string const & VentilationName, // Ventilation object name
 			bool const HybridVentMgrConnectedToAirLoop, // Flag to check whether hybrid ventilation
 			bool const SimHybridVentSysAvailMgr // Set to false when a zone has two hybrid ventilation
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			MgrType( MgrType ),
-			AirLoopName( MaxNameLength, AirLoopName ),
+			AirLoopName( AirLoopName ),
 			AirLoopNum( AirLoopNum ),
-			ControlZoneName( MaxNameLength, ControlZoneName ),
+			ControlZoneName( ControlZoneName ),
 			NodeNumOfControlledZone( NodeNumOfControlledZone ),
 			ActualZoneNum( ActualZoneNum ),
 			ControlledZoneNum( ControlledZoneNum ),
@@ -682,7 +658,7 @@ namespace SystemAvailabilityManager {
 			MaxOutdoorDewPoint( MaxOutdoorDewPoint ),
 			MaxWindSpeed( MaxWindSpeed ),
 			UseRainIndicator( UseRainIndicator ),
-			MinOASched( MaxNameLength, MinOASched ),
+			MinOASched( MinOASched ),
 			MinOASchedPtr( MinOASchedPtr ),
 			DewPointNoRHErrCount( DewPointNoRHErrCount ),
 			DewPointNoRHErrIndex( DewPointNoRHErrIndex ),
@@ -695,7 +671,7 @@ namespace SystemAvailabilityManager {
 			SimpleControlTypeSchedPtr( SimpleControlTypeSchedPtr ),
 			VentilationPtr( VentilationPtr ),
 			AvailStatus( AvailStatus ),
-			VentilationName( MaxNameLength, VentilationName ),
+			VentilationName( VentilationName ),
 			HybridVentMgrConnectedToAirLoop( HybridVentMgrConnectedToAirLoop ),
 			SimHybridVentSysAvailMgr( SimHybridVentSysAvailMgr )
 		{}
@@ -705,29 +681,26 @@ namespace SystemAvailabilityManager {
 	struct SysAvailManagerList
 	{
 		// Members
-		Fstring Name; // Availability Manager List Name
+		std::string Name; // Availability Manager List Name
 		int NumItems;
-		FArray1D_Fstring AvailManagerName;
-		FArray1D_Fstring cAvailManagerType;
+		FArray1D_string AvailManagerName;
+		FArray1D_string cAvailManagerType;
 		FArray1D_int AvailManagerType;
 
 		// Default Constructor
 		SysAvailManagerList() :
-			Name( MaxNameLength ),
-			NumItems( 0 ),
-			AvailManagerName( sFstring( MaxNameLength ) ),
-			cAvailManagerType( sFstring( MaxNameLength ) )
+			NumItems( 0 )
 		{}
 
 		// Member Constructor
 		SysAvailManagerList(
-			Fstring const & Name, // Availability Manager List Name
+			std::string const & Name, // Availability Manager List Name
 			int const NumItems,
-			FArray1_Fstring const & AvailManagerName,
-			FArray1_Fstring const & cAvailManagerType,
+			FArray1_string const & AvailManagerName,
+			FArray1_string const & cAvailManagerType,
 			FArray1_int const & AvailManagerType
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NumItems( NumItems ),
 			AvailManagerName( AvailManagerName ),
 			cAvailManagerType( cAvailManagerType ),
@@ -766,7 +739,7 @@ namespace SystemAvailabilityManager {
 
 	void
 	GetPlantAvailabilityManager(
-		Fstring const & AvailabilityListName, // name that should be an Availability Manager List Name
+		std::string const & AvailabilityListName, // name that should be an Availability Manager List Name
 		int const Loop, // which loop this is
 		int const NumPlantLoops, // Total number of plant loops
 		bool & ErrorsFound // true if certain errors are detected here
@@ -774,7 +747,7 @@ namespace SystemAvailabilityManager {
 
 	void
 	GetAirLoopAvailabilityManager(
-		Fstring const & AvailabilityListName, // name that should be an Availability Manager List Name
+		std::string const & AvailabilityListName, // name that should be an Availability Manager List Name
 		int const Loop, // which loop this is
 		int const NumAirLoops, // Total number of air loops
 		bool & ErrorsFound // true if certain errors are detected here
@@ -793,7 +766,7 @@ namespace SystemAvailabilityManager {
 	void
 	SimSysAvailManager(
 		int const SysAvailType,
-		Fstring const & SysAvailName,
+		std::string const & SysAvailName,
 		int & SysAvailNum,
 		int const PriAirSysNum, // Primary Air System index. If being called for a ZoneHVAC:* component
 		int const PreviousStatus,
@@ -878,7 +851,7 @@ namespace SystemAvailabilityManager {
 	);
 
 	int
-	ValidateAndSetSysAvailabilityManagerType( Fstring const & AvailMgrName ); // name to validate
+	ValidateAndSetSysAvailabilityManagerType( std::string const & AvailMgrName ); // name to validate
 
 	void
 	ManageHybridVentilation();

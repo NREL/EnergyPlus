@@ -28,8 +28,8 @@ template< typename > class FArray1D;
 	typedef  MA1S< int >  MA1S_int;
 	typedef  MA1Sc< double >  MA1Sc_double;
 	typedef  MA1S< double >  MA1S_double;
-	typedef  MA1Sc< Fstring >  MA1Sc_Fstring;
-	typedef  MA1S< Fstring >  MA1S_Fstring;
+	typedef  MA1Sc< std::string >  MA1Sc_string;
+	typedef  MA1S< std::string >  MA1S_string;
 
 	// bool const Members
 	inline MA1Sc_bool DefinedFlag() const { return ma( &T::DefinedFlag ); }
@@ -105,25 +105,25 @@ template< typename > class FArray1D;
 	inline MA1S_double y() { return ma( &T::y ); }
 	inline MA1S_double z() { return ma( &T::z ); }
 
-	// Fstring const Members
-	inline MA1Sc_Fstring EquipName() const { return ma( &T::EquipName ); }
-	inline MA1Sc_Fstring EquipType() const { return ma( &T::EquipType ); }
-	inline MA1Sc_Fstring FieldName() const { return ma( &T::FieldName ); }
-	inline MA1Sc_Fstring Name() const { return ma( &T::Name ); }
-	inline MA1Sc_Fstring SurfaceName() const { return ma( &T::SurfaceName ); }
-	inline MA1Sc_Fstring VarName() const { return ma( &T::VarName ); }
-	inline MA1Sc_Fstring VarNameOnly() const { return ma( &T::VarNameOnly ); }
+	// string const Members
+	inline MA1Sc_string EquipName() const { return ma( &T::EquipName ); }
+	inline MA1Sc_string EquipType() const { return ma( &T::EquipType ); }
+	inline MA1Sc_string FieldName() const { return ma( &T::FieldName ); }
+	inline MA1Sc_string Name() const { return ma( &T::Name ); }
+	inline MA1Sc_string SurfaceName() const { return ma( &T::SurfaceName ); }
+	inline MA1Sc_string VarName() const { return ma( &T::VarName ); }
+	inline MA1Sc_string VarNameOnly() const { return ma( &T::VarNameOnly ); }
 
-	// Fstring Members
-	inline MA1S_Fstring EquipName() { return ma( &T::EquipName ); }
-	inline MA1S_Fstring EquipType() { return ma( &T::EquipType ); }
-	inline MA1S_Fstring FieldName() { return ma( &T::FieldName ); }
-	inline MA1S_Fstring Name() { return ma( &T::Name ); }
-	inline MA1S_Fstring SurfaceName() { return ma( &T::SurfaceName ); }
-	inline MA1S_Fstring VarName() { return ma( &T::VarName ); }
-	inline MA1S_Fstring VarNameOnly() { return ma( &T::VarNameOnly ); }
+	// string Members
+	inline MA1S_string EquipName() { return ma( &T::EquipName ); }
+	inline MA1S_string EquipType() { return ma( &T::EquipType ); }
+	inline MA1S_string FieldName() { return ma( &T::FieldName ); }
+	inline MA1S_string Name() { return ma( &T::Name ); }
+	inline MA1S_string SurfaceName() { return ma( &T::SurfaceName ); }
+	inline MA1S_string VarName() { return ma( &T::VarName ); }
+	inline MA1S_string VarNameOnly() { return ma( &T::VarNameOnly ); }
 
-	// FArra1D< double >
+	// FArray1D< double >
 	inline MA1Sc< FArray1D< double > > origin() const { return ma( &T::origin ); }
 	inline MA1S< FArray1D< double > > origin() { return ma( &T::origin ); }
 

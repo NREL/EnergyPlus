@@ -2,7 +2,6 @@
 #define UtilityRoutines_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -29,130 +28,133 @@ int
 GetNewUnitNumber();
 
 int
-FindUnitNumber( Fstring const & FileName ); // File name to be searched.
+FindUnitNumber( std::string const & FileName ); // File name to be searched.
 
 void
 ConvertCaseToUpper(
-	Fstring const & InputString, // Input string
-	Fstring & OutputString // Output string (in UpperCase)
+	std::string const & InputString, // Input string
+	std::string & OutputString // Output string (in UpperCase)
 );
 
 void
 ConvertCaseToLower(
-	Fstring const & InputString, // Input string
-	Fstring & OutputString // Output string (in LowerCase)
+	std::string const & InputString, // Input string
+	std::string & OutputString // Output string (in LowerCase)
 );
 
-int
-FindNonSpace( Fstring const & String ); // String to be scanned
+std::string::size_type
+FindNonSpace( std::string const & String ); // String to be scanned
+
+bool
+env_var_on( std::string const & env_var_str );
 
 void
 ShowFatalError(
-	Fstring const & ErrorMessage,
+	std::string const & ErrorMessage,
 	Optional_int OutUnit1 = _,
 	Optional_int OutUnit2 = _
 );
 
 void
 ShowSevereError(
-	Fstring const & ErrorMessage,
+	std::string const & ErrorMessage,
 	Optional_int OutUnit1 = _,
 	Optional_int OutUnit2 = _
 );
 
 void
 ShowSevereMessage(
-	Fstring const & ErrorMessage,
+	std::string const & ErrorMessage,
 	Optional_int OutUnit1 = _,
 	Optional_int OutUnit2 = _
 );
 
 void
 ShowContinueError(
-	Fstring const & Message,
+	std::string const & Message,
 	Optional_int OutUnit1 = _,
 	Optional_int OutUnit2 = _
 );
 
 void
 ShowContinueErrorTimeStamp(
-	Fstring const & Message,
+	std::string const & Message,
 	Optional_int OutUnit1 = _,
 	Optional_int OutUnit2 = _
 );
 
 void
 ShowMessage(
-	Fstring const & Message,
+	std::string const & Message,
 	Optional_int OutUnit1 = _,
 	Optional_int OutUnit2 = _
 );
 
 void
 ShowWarningError(
-	Fstring const & ErrorMessage,
+	std::string const & ErrorMessage,
 	Optional_int OutUnit1 = _,
 	Optional_int OutUnit2 = _
 );
 
 void
 ShowWarningMessage(
-	Fstring const & ErrorMessage,
+	std::string const & ErrorMessage,
 	Optional_int OutUnit1 = _,
 	Optional_int OutUnit2 = _
 );
 
 void
 ShowRecurringSevereErrorAtEnd(
-	Fstring const & Message, // Message automatically written to "error file" at end of simulation
+	std::string const & Message, // Message automatically written to "error file" at end of simulation
 	int & MsgIndex, // Recurring message index, if zero, next available index is assigned
 	Optional< Real64 const > ReportMaxOf = _, // Track and report the max of the values passed to this argument
 	Optional< Real64 const > ReportMinOf = _, // Track and report the min of the values passed to this argument
 	Optional< Real64 const > ReportSumOf = _, // Track and report the sum of the values passed to this argument
-	Optional_Fstring_const ReportMaxUnits = _, // optional char string (<=15 length) of units for max value
-	Optional_Fstring_const ReportMinUnits = _, // optional char string (<=15 length) of units for min value
-	Optional_Fstring_const ReportSumUnits = _ // optional char string (<=15 length) of units for sum value
+	Optional_string_const ReportMaxUnits = _, // optional char string (<=15 length) of units for max value
+	Optional_string_const ReportMinUnits = _, // optional char string (<=15 length) of units for min value
+	Optional_string_const ReportSumUnits = _ // optional char string (<=15 length) of units for sum value
 );
 
 void
 ShowRecurringWarningErrorAtEnd(
-	Fstring const & Message, // Message automatically written to "error file" at end of simulation
+	std::string const & Message, // Message automatically written to "error file" at end of simulation
 	int & MsgIndex, // Recurring message index, if zero, next available index is assigned
 	Optional< Real64 const > ReportMaxOf = _, // Track and report the max of the values passed to this argument
 	Optional< Real64 const > ReportMinOf = _, // Track and report the min of the values passed to this argument
 	Optional< Real64 const > ReportSumOf = _, // Track and report the sum of the values passed to this argument
-	Optional_Fstring_const ReportMaxUnits = _, // optional char string (<=15 length) of units for max value
-	Optional_Fstring_const ReportMinUnits = _, // optional char string (<=15 length) of units for min value
-	Optional_Fstring_const ReportSumUnits = _ // optional char string (<=15 length) of units for sum value
+	Optional_string_const ReportMaxUnits = _, // optional char string (<=15 length) of units for max value
+	Optional_string_const ReportMinUnits = _, // optional char string (<=15 length) of units for min value
+	Optional_string_const ReportSumUnits = _ // optional char string (<=15 length) of units for sum value
 );
 
 void
 ShowRecurringContinueErrorAtEnd(
-	Fstring const & Message, // Message automatically written to "error file" at end of simulation
+	std::string const & Message, // Message automatically written to "error file" at end of simulation
 	int & MsgIndex, // Recurring message index, if zero, next available index is assigned
 	Optional< Real64 const > ReportMaxOf = _, // Track and report the max of the values passed to this argument
 	Optional< Real64 const > ReportMinOf = _, // Track and report the min of the values passed to this argument
 	Optional< Real64 const > ReportSumOf = _, // Track and report the sum of the values passed to this argument
-	Optional_Fstring_const ReportMaxUnits = _, // optional char string (<=15 length) of units for max value
-	Optional_Fstring_const ReportMinUnits = _, // optional char string (<=15 length) of units for min value
-	Optional_Fstring_const ReportSumUnits = _ // optional char string (<=15 length) of units for sum value
+	Optional_string_const ReportMaxUnits = _, // optional char string (<=15 length) of units for max value
+	Optional_string_const ReportMinUnits = _, // optional char string (<=15 length) of units for min value
+	Optional_string_const ReportSumUnits = _ // optional char string (<=15 length) of units for sum value
 );
 
 void
 StoreRecurringErrorMessage(
-	Fstring const & ErrorMessage, // Message automatically written to "error file" at end of simulation
+	std::string const & ErrorMessage, // Message automatically written to "error file" at end of simulation
 	int & ErrorMsgIndex, // Recurring message index, if zero, next available index is assigned
 	Optional< Real64 const > ErrorReportMaxOf = _, // Track and report the max of the values passed to this argument
 	Optional< Real64 const > ErrorReportMinOf = _, // Track and report the min of the values passed to this argument
 	Optional< Real64 const > ErrorReportSumOf = _, // Track and report the sum of the values passed to this argument
-	Optional_Fstring_const ErrorReportMaxUnits = _, // Units for "max" reporting
-	Optional_Fstring_const ErrorReportMinUnits = _, // Units for "min" reporting
-	Optional_Fstring_const ErrorReportSumUnits = _ // Units for "sum" reporting
+	Optional_string_const ErrorReportMaxUnits = _, // Units for "max" reporting
+	Optional_string_const ErrorReportMinUnits = _, // Units for "min" reporting
+	Optional_string_const ErrorReportSumUnits = _ // Units for "sum" reporting
 );
 
 void
 ShowErrorMessage(
-	Fstring const & ErrorMessage,
+	std::string const & ErrorMessage,
 	Optional_int OutUnit1 = _,
 	Optional_int OutUnit2 = _
 );

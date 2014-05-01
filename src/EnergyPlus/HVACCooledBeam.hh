@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -16,7 +15,6 @@ namespace EnergyPlus {
 namespace HVACCooledBeam {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -42,12 +40,12 @@ namespace HVACCooledBeam {
 	{
 		// Members
 		// input data
-		Fstring Name; // name of unit
-		Fstring UnitType; // type of unit = AirTerminal:SingleDuct:ConstantVolume:CooledBeam
+		std::string Name; // name of unit
+		std::string UnitType; // type of unit = AirTerminal:SingleDuct:ConstantVolume:CooledBeam
 		int UnitType_Num; // index to type of unit = 1 (there's only 1 type so far)
-		Fstring CBType; // type of cooled beam: active | passive
+		std::string CBType; // type of cooled beam: active | passive
 		int CBType_Num; // index to type of cooled beam: passive=1; active=2
-		Fstring Sched; // availability schedule
+		std::string Sched; // availability schedule
 		int SchedPtr; // index to schedule
 		Real64 MaxAirVolFlow; // m3/s (autosizable)
 		Real64 MaxAirMassFlow; // kg/s
@@ -94,12 +92,8 @@ namespace HVACCooledBeam {
 
 		// Default Constructor
 		CoolBeamData() :
-			Name( MaxNameLength ),
-			UnitType( MaxNameLength ),
 			UnitType_Num( 0 ),
-			CBType( MaxNameLength ),
 			CBType_Num( 0 ),
-			Sched( MaxNameLength ),
 			SchedPtr( 0 ),
 			MaxAirVolFlow( 0.0 ),
 			MaxAirMassFlow( 0.0 ),
@@ -146,12 +140,12 @@ namespace HVACCooledBeam {
 
 		// Member Constructor
 		CoolBeamData(
-			Fstring const & Name, // name of unit
-			Fstring const & UnitType, // type of unit = AirTerminal:SingleDuct:ConstantVolume:CooledBeam
+			std::string const & Name, // name of unit
+			std::string const & UnitType, // type of unit = AirTerminal:SingleDuct:ConstantVolume:CooledBeam
 			int const UnitType_Num, // index to type of unit = 1 (there's only 1 type so far)
-			Fstring const & CBType, // type of cooled beam: active | passive
+			std::string const & CBType, // type of cooled beam: active | passive
 			int const CBType_Num, // index to type of cooled beam: passive=1; active=2
-			Fstring const & Sched, // availability schedule
+			std::string const & Sched, // availability schedule
 			int const SchedPtr, // index to schedule
 			Real64 const MaxAirVolFlow, // m3/s (autosizable)
 			Real64 const MaxAirMassFlow, // kg/s
@@ -195,12 +189,12 @@ namespace HVACCooledBeam {
 			int const CBMassFlowReSimIndex,
 			int const CBWaterOutletTempReSimIndex
 		) :
-			Name( MaxNameLength, Name ),
-			UnitType( MaxNameLength, UnitType ),
+			Name( Name ),
+			UnitType( UnitType ),
 			UnitType_Num( UnitType_Num ),
-			CBType( MaxNameLength, CBType ),
+			CBType( CBType ),
 			CBType_Num( CBType_Num ),
-			Sched( MaxNameLength, Sched ),
+			Sched( Sched ),
 			SchedPtr( SchedPtr ),
 			MaxAirVolFlow( MaxAirVolFlow ),
 			MaxAirMassFlow( MaxAirMassFlow ),
@@ -254,7 +248,7 @@ namespace HVACCooledBeam {
 
 	void
 	SimCoolBeam(
-		Fstring const & CompName, // name of the cooled beam unit
+		std::string const & CompName, // name of the cooled beam unit
 		bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
 		int const ZoneNum, // index of zone served by the unit
 		int const ZoneNodeNum, // zone node number of zone served by the unit

@@ -6,6 +6,7 @@
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/MArray.functions.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <SolarShading.hh>
@@ -114,7 +115,7 @@ namespace SolarShading {
 	int const PartialOverlap( 4 );
 	int const TooManyVertices( 5 );
 	int const TooManyFigures( 6 );
-	FArray1D_Fstring const cOverLapStatus( 6, sFstring( 19 ), { "No-Overlap         ", "1st-Surf-within-2nd", "2nd-Surf-within-1st", "Partial-Overlap    ", "Too-Many-Vertices  ", "Too-Many-Figures   " } );
+	FArray1D_string const cOverLapStatus( 6, { "No-Overlap", "1st-Surf-within-2nd", "2nd-Surf-within-1st", "Partial-Overlap", "Too-Many-Vertices", "Too-Many-Figures" } );
 
 	// DERIVED TYPE DEFINITIONS:
 	// INTERFACE BLOCK SPECIFICATIONS:
@@ -434,7 +435,7 @@ namespace SolarShading {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const fmta( "(A)" );
+		static gio::Fmt const fmta( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -449,14 +450,14 @@ namespace SolarShading {
 		int IOStat;
 
 		rNumericArgs( {1,4} ) = 0.0; // so if nothing gotten, defaults will be maintained.
-		cAlphaArgs( 1 ) = " ";
-		cAlphaArgs( 2 ) = " ";
+		cAlphaArgs( 1 ) = "";
+		cAlphaArgs( 2 ) = "";
 		cCurrentModuleObject = "ShadowCalculation";
 		NumItems = GetNumObjectsFound( cCurrentModuleObject );
 		NumAlphas = 0;
 		NumNumbers = 0;
 		if ( NumItems > 1 ) {
-			ShowWarningError( trim( cCurrentModuleObject ) + ": More than 1 occurence of this object found, only first will be used." );
+			ShowWarningError( cCurrentModuleObject + ": More than 1 occurence of this object found, only first will be used." );
 		}
 
 		if ( NumItems != 0 ) {
@@ -469,8 +470,8 @@ namespace SolarShading {
 			ShadowingCalcFrequency = 20;
 		}
 		if ( ShadowingCalcFrequency > 31 ) {
-			ShowWarningError( trim( cCurrentModuleObject ) + ": suspect " + trim( cNumericFieldNames( 1 ) ) );
-			ShowContinueError( "Value entered=[" + trim( RoundSigDigits( rNumericArgs( 1 ), 0 ) ) + "], Shadowing Calculations will be inaccurate." );
+			ShowWarningError( cCurrentModuleObject + ": suspect " + cNumericFieldNames( 1 ) );
+			ShowContinueError( "Value entered=[" + RoundSigDigits( rNumericArgs( 1 ), 0 ) + "], Shadowing Calculations will be inaccurate." );
 		}
 
 		if ( rNumericArgs( 2 ) > 199. ) {
@@ -487,8 +488,8 @@ namespace SolarShading {
 				DetailedSolarTimestepIntegration = true;
 				cAlphaArgs( 1 ) = "TimestepFrequency";
 			} else {
-				ShowWarningError( trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 1 ) ) );
-				ShowContinueError( "Value entered=\"" + trim( cAlphaArgs( 1 ) ) + "\", AverageOverDaysInFrequency will be used." );
+				ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) );
+				ShowContinueError( "Value entered=\"" + cAlphaArgs( 1 ) + "\", AverageOverDaysInFrequency will be used." );
 				DetailedSolarTimestepIntegration = false;
 				cAlphaArgs( 1 ) = "AverageOverDaysInFrequency";
 			}
@@ -511,11 +512,11 @@ namespace SolarShading {
 					cAlphaArgs( 2 ) = "SutherlandHodgman";
 				}
 			} else {
-				ShowWarningError( trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 2 ) ) );
+				ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) );
 				if ( ! SutherlandHodgman ) {
-					ShowContinueError( "Value entered=\"" + trim( cAlphaArgs( 2 ) ) + "\", ConvexWeilerAtherton will be used." );
+					ShowContinueError( "Value entered=\"" + cAlphaArgs( 2 ) + "\", ConvexWeilerAtherton will be used." );
 				} else {
-					ShowContinueError( "Value entered=\"" + trim( cAlphaArgs( 2 ) ) + "\", SutherlandHodgman will be used." );
+					ShowContinueError( "Value entered=\"" + cAlphaArgs( 2 ) + "\", SutherlandHodgman will be used." );
 				}
 			}
 		} else {
@@ -537,8 +538,8 @@ namespace SolarShading {
 				DetailedSkyDiffuseAlgorithm = false;
 				cAlphaArgs( 3 ) = "SimpleSkyDiffuseModeling";
 			} else {
-				ShowWarningError( trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 3 ) ) );
-				ShowContinueError( "Value entered=\"" + trim( cAlphaArgs( 3 ) ) + "\", SimpleSkyDiffuseModeling will be used." );
+				ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 3 ) );
+				ShowContinueError( "Value entered=\"" + cAlphaArgs( 3 ) + "\", SimpleSkyDiffuseModeling will be used." );
 			}
 		} else {
 			cAlphaArgs( 3 ) = "SimpleSkyDiffuseModeling";
@@ -546,24 +547,24 @@ namespace SolarShading {
 		}
 
 		if ( ! DetailedSkyDiffuseAlgorithm && ShadingTransmittanceVaries && SolarDistribution != MinimalShadowing ) {
-			ShowWarningError( "GetShadowingInput: The shading transmittance for shading devices changes throughout the year." " Choose DetailedSkyDiffuseModeling in the " + trim( cCurrentModuleObject ) + " object to remove this warning." );
+			ShowWarningError( "GetShadowingInput: The shading transmittance for shading devices changes throughout the year." " Choose DetailedSkyDiffuseModeling in the " + cCurrentModuleObject + " object to remove this warning." );
 			ShowContinueError( "Simulation has been reset to use DetailedSkyDiffuseModeling. Simulation continues." );
 			DetailedSkyDiffuseAlgorithm = true;
 			cAlphaArgs( 2 ) = "DetailedSkyDiffuseModeling";
 			if ( ShadowingCalcFrequency > 1 ) {
-				ShowContinueError( "Better accuracy may be gained by setting the " + trim( cNumericFieldNames( 1 ) ) + " to 1 in the " + trim( cCurrentModuleObject ) + " object." );
+				ShowContinueError( "Better accuracy may be gained by setting the " + cNumericFieldNames( 1 ) + " to 1 in the " + cCurrentModuleObject + " object." );
 			}
 		} else if ( DetailedSkyDiffuseAlgorithm ) {
 			if ( ! ShadingTransmittanceVaries || SolarDistribution == MinimalShadowing ) {
 				ShowWarningError( "GetShadowingInput: DetailedSkyDiffuseModeling is chosen but not needed as" " either the shading transmittance for shading devices does not change throughout the year" );
 				ShowContinueError( " or MinimalShadowing has been chosen." );
 				ShowContinueError( "Simulation should be set to use SimpleSkyDiffuseModeling, but is left at Detailed for simulation." );
-				ShowContinueError( "Choose SimpleSkyDiffuseModeling in the " + trim( cCurrentModuleObject ) + " object to reduce computation time." );
+				ShowContinueError( "Choose SimpleSkyDiffuseModeling in the " + cCurrentModuleObject + " object to reduce computation time." );
 			}
 		}
 
 		gio::write( OutputFileInits, fmta ) << "! <Shadowing/Sun Position Calculations> [Annual Simulations], Calculation Method," "Value {days}, Allowable Number Figures in Shadow Overlap {}, Polygon Clipping Algorithm, " "Sky Diffuse Modeling Algorithm";
-		gio::write( OutputFileInits, fmta ) << "Shadowing/Sun Position Calculations," + trim( cAlphaArgs( 1 ) ) + "," + trim( RoundSigDigits( ShadowingCalcFrequency ) ) + "," + trim( RoundSigDigits( MaxHCS ) ) + "," + trim( cAlphaArgs( 2 ) ) + "," + trim( cAlphaArgs( 3 ) );
+		gio::write( OutputFileInits, fmta ) << "Shadowing/Sun Position Calculations," + cAlphaArgs( 1 ) + ',' + RoundSigDigits( ShadowingCalcFrequency ) + ',' + RoundSigDigits( MaxHCS ) + ',' + cAlphaArgs( 2 ) + ',' + cAlphaArgs( 3 );
 
 	}
 
@@ -961,9 +962,9 @@ namespace SolarShading {
 						NumOfLayers = Construct( Surface( SurfLoop ).Construction ).TotLayers;
 					}
 					for ( I = 1; I <= NumOfLayers; ++I ) {
-						SetupOutputVariable( "Surface Window Total Absorbed Shortwave Radiation Rate Layer " + trim( RoundSigDigits( I ) ) + " [W]", QRadSWwinAbsLayer( SurfLoop, I ), "Zone", "Average", trim( Surface( SurfLoop ).Name ) );
-						SetupOutputVariable( "Surface Window Front Face Temperature Layer " + trim( RoundSigDigits( I ) ) + " [C]", FenLaySurfTempFront( SurfLoop, I ), "Zone", "Average", trim( Surface( SurfLoop ).Name ) );
-						SetupOutputVariable( "Surface Window Back Face Temperature Layer " + trim( RoundSigDigits( I ) ) + " [C]", FenLaySurfTempBack( SurfLoop, I ), "Zone", "Average", trim( Surface( SurfLoop ).Name ) );
+						SetupOutputVariable( "Surface Window Total Absorbed Shortwave Radiation Rate Layer " + RoundSigDigits( I ) + " [W]", QRadSWwinAbsLayer( SurfLoop, I ), "Zone", "Average", Surface( SurfLoop ).Name );
+						SetupOutputVariable( "Surface Window Front Face Temperature Layer " + RoundSigDigits( I ) + " [C]", FenLaySurfTempFront( SurfLoop, I ), "Zone", "Average", Surface( SurfLoop ).Name );
+						SetupOutputVariable( "Surface Window Back Face Temperature Layer " + RoundSigDigits( I ) + " [C]", FenLaySurfTempBack( SurfLoop, I ), "Zone", "Average", Surface( SurfLoop ).Name );
 					}
 
 					SetupOutputVariable( "Surface Window Transmitted Solar Radiation Rate [W]", WinTransSolar( SurfLoop ), "Zone", "Average", Surface( SurfLoop ).Name );
@@ -1387,7 +1388,7 @@ namespace SolarShading {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const ValFmt( "(F20.4)" );
+		static gio::Fmt const ValFmt( "(F20.4)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1400,8 +1401,8 @@ namespace SolarShading {
 		int NVRS; // Number of vertices of the receiving surface
 		int NVBS; // Number of vertices of the back surface
 		Real64 DOTP; // Dot product of C and D
-		Fstring CharDotP( 20 ); // for error messages
-		Fstring VTString( 4 );
+		std::string CharDotP; // for error messages
+		std::string VTString;
 
 		// Object Data
 		Vector AVec; // Vector from vertex 2 to vertex 1, both same surface
@@ -1424,13 +1425,13 @@ namespace SolarShading {
 			DOTP = dot( CVec, DVec );
 			if ( DOTP > .0009 ) {
 				ShowSevereError( "Problem in interior solar distribution calculation (CHKBKS)" );
-				ShowContinueError( "   Solar Distribution = FullInteriorExterior will not work in Zone=" + trim( Surface( NRS ).ZoneName ) );
+				ShowContinueError( "   Solar Distribution = FullInteriorExterior will not work in Zone=" + Surface( NRS ).ZoneName );
 				gio::write( VTString, "(I4)" ) << N;
-				VTString = adjustl( VTString );
-				ShowContinueError( "   because vertex " + trim( VTString ) + " of back surface=" + trim( Surface( NBS ).Name ) + " is in front of receiving surface=" + trim( Surface( NRS ).Name ) );
+				strip( VTString );
+				ShowContinueError( "   because vertex " + VTString + " of back surface=" + Surface( NBS ).Name + " is in front of receiving surface=" + Surface( NRS ).Name );
 				gio::write( CharDotP, ValFmt ) << DOTP;
-				CharDotP = adjustl( CharDotP );
-				ShowContinueError( "   (Dot Product indicator=" + trim( CharDotP ) + ")" );
+				strip( CharDotP );
+				ShowContinueError( "   (Dot Product indicator=" + CharDotP + ')' );
 				ShowContinueError( "   Check surface geometry; if OK, use Solar Distribution = FullExterior instead." );
 			}
 		}
@@ -1590,11 +1591,11 @@ namespace SolarShading {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// MSG - for error message
-		static FArray1D_Fstring const MSG( 4, sFstring( 8 ), { "misses  ", "        ", "within  ", "overlaps" } );
-		static Fstring const AFormat( "(1X,A)" );
-		static Fstring const A4Format( "(1X,A,A,A,A)" );
-		static Fstring const A2I2Format( "(1X,A,I5,A,I5)" );
-		static Fstring const VFormat( "(1X,A,I5,A,\"(\",2(F15.2,\",\"),F15.2,\")\")" );
+		static FArray1D_string const MSG( 4, { "misses", "", "within", "overlaps" } );
+		static gio::Fmt const AFormat( "(1X,A)" );
+		static gio::Fmt const A4Format( "(1X,A,A,A,A)" );
+		static gio::Fmt const A2I2Format( "(1X,A,I5,A,I5)" );
+		static gio::Fmt const VFormat( "(1X,A,I5,A,\"(\",2(F15.2,\",\"),F15.2,\")\")" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1812,13 +1813,13 @@ namespace SolarShading {
 				//                      TrackBaseSubSurround(SBSNR)%ErrIndex2)
 
 				gio::write( OutputFileShading, AFormat ) << "==== Base does not Surround subsurface details ====";
-				gio::write( OutputFileShading, A4Format ) << "Surface=" << trim( Surface( GRSNR ).Name ) << " " << trim( cOverLapStatus( OverlapStatus ) );
+				gio::write( OutputFileShading, A4Format ) << "Surface=" << Surface( GRSNR ).Name << " " << cOverLapStatus( OverlapStatus );
 				gio::write( OutputFileShading, A2I2Format ) << "Surface#=" << GRSNR << " NSides=" << Surface( GRSNR ).Sides;
 				for ( N = 1; N <= Surface( GRSNR ).Sides; ++N ) {
 					Vector const & v( Surface( GRSNR ).Vertex( N ) );
 					gio::write( OutputFileShading, VFormat ) << "Vertex " << N << "=" << v.x << v.y << v.z;
 				}
-				gio::write( OutputFileShading, A4Format ) << "SubSurface=" << trim( Surface( SBSNR ).Name );
+				gio::write( OutputFileShading, A4Format ) << "SubSurface=" << Surface( SBSNR ).Name;
 				gio::write( OutputFileShading, A2I2Format ) << "Surface#=" << SBSNR << " NSides=" << Surface( SBSNR ).Sides;
 				for ( N = 1; N <= Surface( SBSNR ).Sides; ++N ) {
 					Vector const & v( Surface( SBSNR ).Vertex( N ) );
@@ -2014,8 +2015,8 @@ namespace SolarShading {
 				//fill floor area even though surfs not called "Floor", they are roughly horizontal and face upwards.
 				Zone( ZoneNum ).FloorArea = HorizAreaSum;
 				ShowWarningError( "ComputeIntSolarAbsorpFactors: Solar distribution model is set to place solar gains " "on the zone floor," );
-				ShowContinueError( "...Zone=\"" + trim( Zone( ZoneNum ).Name ) + "\" has no floor, but has approximate horizontal surfaces." );
-				ShowContinueError( "...these Tilt > 120°, (area=[" + trim( RoundSigDigits( HorizAreaSum, 2 ) ) + "] m2) will be used." );
+				ShowContinueError( "...Zone=\"" + Zone( ZoneNum ).Name + "\" has no floor, but has approximate horizontal surfaces." );
+				ShowContinueError( "...these Tilt > 120°, (area=[" + RoundSigDigits( HorizAreaSum, 2 ) + "] m2) will be used." );
 			}
 
 			// Compute ISABSF
@@ -2059,11 +2060,11 @@ namespace SolarShading {
 				if ( Zone( ZoneNum ).ExtWindowArea > 0.0 ) { // we have a problem, the sun has no floor to go to
 					if ( Zone( ZoneNum ).FloorArea <= 0.0 ) {
 						ShowSevereError( "ComputeIntSolarAbsorpFactors: Solar distribution model is set to place solar gains " "on the zone floor," );
-						ShowContinueError( "but Zone =\"" + trim( Zone( ZoneNum ).Name ) + "\" does not appear to have any floor surfaces." );
+						ShowContinueError( "but Zone =\"" + Zone( ZoneNum ).Name + "\" does not appear to have any floor surfaces." );
 						ShowContinueError( "Solar gains will be spread evenly on all surfaces in the zone, and the simulation continues..." );
 					} else { // Floor Area > 0 but still can't absorb
 						ShowSevereError( "ComputeIntSolarAbsorpFactors: Solar distribution model is set to place solar gains " "on the zone floor," );
-						ShowContinueError( "but Zone =\"" + trim( Zone( ZoneNum ).Name ) + "\" floor cannot absorb any solar gains. " );
+						ShowContinueError( "but Zone =\"" + Zone( ZoneNum ).Name + "\" floor cannot absorb any solar gains. " );
 						ShowContinueError( "Check the solar absorptance of the inside layer of the floor surface construction/material." );
 						ShowContinueError( "Solar gains will be spread evenly on all surfaces in the zone, and the simulation continues..." );
 					}
@@ -2369,7 +2370,7 @@ namespace SolarShading {
 		Int64 ITEMP;
 
 		if ( NS > MaxHCS * 2 ) {
-			ShowFatalError( "Solar Shading: HTrans: Too many Figures (>" + trim( TrimSigDigits( MaxHCS ) ) + ")" );
+			ShowFatalError( "Solar Shading: HTrans: Too many Figures (>" + TrimSigDigits( MaxHCS ) + ')' );
 		}
 
 		HCNV( NS ) = NumVertices;
@@ -2424,7 +2425,7 @@ namespace SolarShading {
 		Real64 SUM; // Sum variable
 
 		if ( NS > MaxHCS * 2 ) {
-			ShowFatalError( "Solar Shading: HTrans0: Too many Figures (>" + trim( TrimSigDigits( MaxHCS ) ) + ")" );
+			ShowFatalError( "Solar Shading: HTrans0: Too many Figures (>" + TrimSigDigits( MaxHCS ) + ')' );
 		}
 
 		HCNV( NS ) = NumVertices;
@@ -2458,7 +2459,7 @@ namespace SolarShading {
 		Int64 ITEMP;
 
 		if ( NS > MaxHCS * 2 ) {
-			ShowFatalError( "Solar Shading: HTrans1: Too many Figures (>" + trim( TrimSigDigits( MaxHCS ) ) + ")" );
+			ShowFatalError( "Solar Shading: HTrans1: Too many Figures (>" + TrimSigDigits( MaxHCS ) + ')' );
 		}
 
 		// only in HTRANS1
@@ -3189,7 +3190,7 @@ namespace SolarShading {
 			OverlapStatus = TooManyFigures;
 
 			if ( ! TooManyFiguresMessage && ! DisplayExtraWarnings ) {
-				ShowWarningError( "DeterminePolygonOverlap: Too many figures [>" + trim( RoundSigDigits( MaxHCS ) ) + "]  detected in an overlap calculation." " Use Output:Diagnostics,DisplayExtraWarnings; for more details." );
+				ShowWarningError( "DeterminePolygonOverlap: Too many figures [>" + RoundSigDigits( MaxHCS ) + "]  detected in an overlap calculation." " Use Output:Diagnostics,DisplayExtraWarnings; for more details." );
 				TooManyFiguresMessage = true;
 			}
 
@@ -3282,7 +3283,7 @@ namespace SolarShading {
 			OverlapStatus = TooManyVertices;
 
 			if ( ! TooManyVerticesMessage && ! DisplayExtraWarnings ) {
-				ShowWarningError( "DeterminePolygonOverlap: Too many vertices [>" + trim( RoundSigDigits( MaxHCV ) ) + "] detected in an overlap calculation." " Use Output:Diagnostics,DisplayExtraWarnings; for more details." );
+				ShowWarningError( "DeterminePolygonOverlap: Too many vertices [>" + RoundSigDigits( MaxHCV ) + "] detected in an overlap calculation." " Use Output:Diagnostics,DisplayExtraWarnings; for more details." );
 				TooManyVerticesMessage = true;
 			}
 
@@ -3307,7 +3308,7 @@ namespace SolarShading {
 			OverlapStatus = TooManyFigures;
 
 			if ( ! TooManyFiguresMessage && ! DisplayExtraWarnings ) {
-				ShowWarningError( "DeterminePolygonOverlap: Too many figures [>" + trim( RoundSigDigits( MaxHCS ) ) + "]  detected in an overlap calculation." " Use Output:Diagnostics,DisplayExtraWarnings; for more details." );
+				ShowWarningError( "DeterminePolygonOverlap: Too many figures [>" + RoundSigDigits( MaxHCS ) + "]  detected in an overlap calculation." " Use Output:Diagnostics,DisplayExtraWarnings; for more details." );
 				TooManyFiguresMessage = true;
 			}
 
@@ -3692,7 +3693,7 @@ namespace SolarShading {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const fmta( "(A)" );
+		static gio::Fmt const fmta( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3981,12 +3982,12 @@ namespace SolarShading {
 			gio::write( OutputFileShading, fmta ) << " ==================================";
 			if ( ShadowComb( HTS ).UseThisSurf ) {
 				if ( Surface( HTS ).IsConvex ) {
-					gio::write( OutputFileShading, fmta ) << " Surface=" + trim( Surface( HTS ).Name ) + " is used as Receiving Surface in calculations and is convex.";
+					gio::write( OutputFileShading, fmta ) << " Surface=" + Surface( HTS ).Name + " is used as Receiving Surface in calculations and is convex.";
 				} else {
-					gio::write( OutputFileShading, fmta ) << " Surface=" + trim( Surface( HTS ).Name ) + " is used as Receiving Surface in calculations and is non-convex.";
+					gio::write( OutputFileShading, fmta ) << " Surface=" + Surface( HTS ).Name + " is used as Receiving Surface in calculations and is non-convex.";
 					if ( ShadowComb( HTS ).NumGenSurf > 0 ) {
 						if ( DisplayExtraWarnings ) {
-							ShowWarningError( "DetermineShadowingCombinations: Surface=\"" + trim( Surface( HTS ).Name ) + "\" is a receiving surface and is non-convex." );
+							ShowWarningError( "DetermineShadowingCombinations: Surface=\"" + Surface( HTS ).Name + "\" is a receiving surface and is non-convex." );
 							ShowContinueError( "...Shadowing values may be inaccurate. Check .shd report file for more surface shading details" );
 						} else {
 							++TotalReceivingNonConvexSurfaces;
@@ -3994,27 +3995,27 @@ namespace SolarShading {
 					}
 				}
 			} else {
-				gio::write( OutputFileShading, fmta ) << " Surface=" + trim( Surface( HTS ).Name ) + " is not used as Receiving Surface in calculations.";
+				gio::write( OutputFileShading, fmta ) << " Surface=" + Surface( HTS ).Name + " is not used as Receiving Surface in calculations.";
 			}
 			gio::write( OutputFileShading, "*" ) << "Number of general casting surfaces=" << ShadowComb( HTS ).NumGenSurf;
 			for ( NGSS = 1; NGSS <= ShadowComb( HTS ).NumGenSurf; ++NGSS ) {
-				if ( NGSS <= 10 ) gio::write( OutputFileShading, fmta ) << " ..Surface=" + trim( Surface( ShadowComb( HTS ).GenSurf( NGSS ) ).Name );
+				if ( NGSS <= 10 ) gio::write( OutputFileShading, fmta ) << " ..Surface=" + Surface( ShadowComb( HTS ).GenSurf( NGSS ) ).Name;
 				CastingSurface( ShadowComb( HTS ).GenSurf( NGSS ) ) = true;
 			}
 			gio::write( OutputFileShading, "*" ) << "Number of back surfaces=" << ShadowComb( HTS ).NumBackSurf;
 			for ( NGSS = 1; NGSS <= min( 10, ShadowComb( HTS ).NumBackSurf ); ++NGSS ) {
-				gio::write( OutputFileShading, fmta ) << " ...Surface=" + trim( Surface( ShadowComb( HTS ).BackSurf( NGSS ) ).Name );
+				gio::write( OutputFileShading, fmta ) << " ...Surface=" + Surface( ShadowComb( HTS ).BackSurf( NGSS ) ).Name;
 			}
 			gio::write( OutputFileShading, "*" ) << "Number of receiving sub surfaces=" << ShadowComb( HTS ).NumSubSurf;
 			for ( NGSS = 1; NGSS <= min( 10, ShadowComb( HTS ).NumSubSurf ); ++NGSS ) {
-				gio::write( OutputFileShading, fmta ) << " ....Surface=" + trim( Surface( ShadowComb( HTS ).SubSurf( NGSS ) ).Name );
+				gio::write( OutputFileShading, fmta ) << " ....Surface=" + Surface( ShadowComb( HTS ).SubSurf( NGSS ) ).Name;
 			}
 		}
 
 		for ( HTS = 1; HTS <= TotSurfaces; ++HTS ) {
 			if ( CastingSurface( HTS ) && ! Surface( HTS ).IsConvex ) {
 				if ( DisplayExtraWarnings ) {
-					ShowSevereError( "DetermineShadowingCombinations: Surface=\"" + trim( Surface( HTS ).Name ) + "\" is a casting surface and is non-convex." );
+					ShowSevereError( "DetermineShadowingCombinations: Surface=\"" + Surface( HTS ).Name + "\" is a casting surface and is non-convex." );
 					ShowContinueError( "...Shadowing values may be inaccurate. Check .shd report file for more surface shading details" );
 				} else {
 					++TotalCastingNonConvexSurfaces;
@@ -4025,14 +4026,14 @@ namespace SolarShading {
 		CastingSurface.deallocate();
 
 		if ( TotalReceivingNonConvexSurfaces > 0 ) {
-			ShowWarningMessage( "DetermineShadowingCombinations: There are " + trim( TrimSigDigits( TotalReceivingNonConvexSurfaces ) ) + " surfaces which are receiving surfaces and are non-convex." );
+			ShowWarningMessage( "DetermineShadowingCombinations: There are " + TrimSigDigits( TotalReceivingNonConvexSurfaces ) + " surfaces which are receiving surfaces and are non-convex." );
 			ShowContinueError( "...Shadowing values may be inaccurate. Check .shd report file for more surface shading details" );
 			ShowContinueError( "...Add Output:Diagnostics,DisplayExtraWarnings; to see individual warnings for each surface." );
 			TotalWarningErrors += TotalReceivingNonConvexSurfaces;
 		}
 
 		if ( TotalCastingNonConvexSurfaces > 0 ) {
-			ShowSevereMessage( "DetermineShadowingCombinations: There are " + trim( TrimSigDigits( TotalCastingNonConvexSurfaces ) ) + " surfaces which are casting surfaces and are non-convex." );
+			ShowSevereMessage( "DetermineShadowingCombinations: There are " + TrimSigDigits( TotalCastingNonConvexSurfaces ) + " surfaces which are casting surfaces and are non-convex." );
 			ShowContinueError( "...Shadowing values may be inaccurate. Check .shd report file for more surface shading details" );
 			ShowContinueError( "...Add Output:Diagnostics,DisplayExtraWarnings; to see individual severes for each surface." );
 			TotalSevereErrors += TotalCastingNonConvexSurfaces;
@@ -8244,7 +8245,7 @@ namespace SolarShading {
 					SchedulePtr = SurfaceWindow( ISurf ).AirflowSchedulePtr;
 					ScheduleMult = GetCurrentScheduleValue( SchedulePtr );
 					if ( ScheduleMult < 0.0 || ScheduleMult > 1.0 ) {
-						ShowFatalError( "Airflow schedule has a value outside the range 0.0 to 1.0 for window=" + trim( Surface( ISurf ).Name ) );
+						ShowFatalError( "Airflow schedule has a value outside the range 0.0 to 1.0 for window=" + Surface( ISurf ).Name );
 					}
 					SurfaceWindow( ISurf ).AirflowThisTS = ScheduleMult * SurfaceWindow( ISurf ).MaxAirflow;
 				}
@@ -9387,7 +9388,7 @@ namespace SolarShading {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_Fstring const MSG( 4, sFstring( 8 ), { "misses  ", "        ", "within  ", "overlaps" } );
+		static FArray1D_string const MSG( 4, { "misses", "", "within", "overlaps" } );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -9400,20 +9401,20 @@ namespace SolarShading {
 		int Loop2;
 		int Count;
 		int TotCount;
-		Fstring CountOut( 25 );
+		std::string CountOut;
 		FArray1D_bool SurfErrorReported;
 		FArray1D_bool SurfErrorReported2;
 
 		if ( NumTooManyFigures + NumTooManyVertices + NumBaseSubSurround > 0 ) {
-			ShowMessage( " " );
+			ShowMessage( "" );
 			ShowMessage( "===== Recurring Surface Error Summary =====" );
 			ShowMessage( "The following surface error messages occurred." );
-			ShowMessage( " " );
+			ShowMessage( "" );
 
 			if ( NumBaseSubSurround > 0 ) {
 				ShowMessage( "Base Surface does not surround subsurface errors occuring..." );
 				ShowMessage( "Check that the GlobalGeometryRules object is expressing the proper starting corner and " "direction [CounterClockwise/Clockwise]" );
-				ShowMessage( " " );
+				ShowMessage( "" );
 			}
 
 			SurfErrorReported.allocate( TotSurfaces );
@@ -9430,27 +9431,27 @@ namespace SolarShading {
 				gio::write( CountOut, "*" ) << Count;
 				TotCount += Count;
 				TotalWarningErrors += Count - 1;
-				ShowWarningError( "Base surface does not surround subsurface (CHKSBS), Overlap Status=" + trim( cOverLapStatus( TrackBaseSubSurround( Loop1 ).MiscIndex ) ) );
-				ShowContinueError( "  The base surround errors occurred " + trim( adjustl( CountOut ) ) + " times." );
+				ShowWarningError( "Base surface does not surround subsurface (CHKSBS), Overlap Status=" + cOverLapStatus( TrackBaseSubSurround( Loop1 ).MiscIndex ) );
+				ShowContinueError( "  The base surround errors occurred " + stripped( CountOut ) + " times." );
 				for ( Loop2 = 1; Loop2 <= NumBaseSubSurround; ++Loop2 ) {
 					if ( TrackBaseSubSurround( Loop1 ).SurfIndex1 == TrackBaseSubSurround( Loop2 ).SurfIndex1 && TrackBaseSubSurround( Loop1 ).MiscIndex == TrackBaseSubSurround( Loop2 ).MiscIndex ) {
-						ShowContinueError( "Surface \"" + trim( Surface( TrackBaseSubSurround( Loop1 ).SurfIndex1 ).Name ) + "\" " + trim( MSG( TrackBaseSubSurround( Loop1 ).MiscIndex ) ) + " SubSurface \"" + trim( Surface( TrackBaseSubSurround( Loop2 ).SurfIndex2 ).Name ) + "\"" );
+						ShowContinueError( "Surface \"" + Surface( TrackBaseSubSurround( Loop1 ).SurfIndex1 ).Name + "\" " + MSG( TrackBaseSubSurround( Loop1 ).MiscIndex ) + " SubSurface \"" + Surface( TrackBaseSubSurround( Loop2 ).SurfIndex2 ).Name + "\"" );
 					}
 				}
 				SurfErrorReported( TrackBaseSubSurround( Loop1 ).SurfIndex1 ) = true;
 			}
 			if ( TotCount > 0 ) {
-				ShowMessage( " " );
+				ShowMessage( "" );
 				gio::write( CountOut, "*" ) << TotCount;
-				ShowContinueError( "  The base surround errors occurred " + trim( adjustl( CountOut ) ) + " times (total)." );
-				ShowMessage( " " );
+				ShowContinueError( "  The base surround errors occurred " + stripped( CountOut ) + " times (total)." );
+				ShowMessage( "" );
 			}
 
 			SurfErrorReported2.allocate( TotSurfaces );
 			SurfErrorReported = false;
 			TotCount = 0;
 			if ( NumTooManyVertices > 0 ) {
-				ShowMessage( "Too many vertices [>=" + trim( RoundSigDigits( MaxHCV ) ) + "] in shadow overlap errors occurring..." );
+				ShowMessage( "Too many vertices [>=" + RoundSigDigits( MaxHCV ) + "] in shadow overlap errors occurring..." );
 				ShowMessage( "These occur throughout the year and may occur several times for the same surfaces. " "You may be able to reduce them by adding Output:Diagnostics,DoNotMirrorDetachedShading;" );
 			}
 			for ( Loop1 = 1; Loop1 <= NumTooManyVertices; ++Loop1 ) {
@@ -9465,30 +9466,30 @@ namespace SolarShading {
 				gio::write( CountOut, "*" ) << Count;
 				TotCount += Count;
 				TotalWarningErrors += Count - 1;
-				ShowMessage( " " );
-				ShowWarningError( "Too many vertices [>=" + trim( RoundSigDigits( MaxHCV ) ) + "] in a shadow overlap" );
-				ShowContinueError( "Overlapping figure=" + trim( Surface( TrackTooManyVertices( Loop1 ).SurfIndex1 ).Name ) + ", Surface Class=[" + trim( cSurfaceClass( Surface( TrackTooManyVertices( Loop1 ).SurfIndex1 ).Class ) ) + "]" );
-				ShowContinueError( "  This error occurred " + trim( adjustl( CountOut ) ) + " times." );
+				ShowMessage( "" );
+				ShowWarningError( "Too many vertices [>=" + RoundSigDigits( MaxHCV ) + "] in a shadow overlap" );
+				ShowContinueError( "Overlapping figure=" + Surface( TrackTooManyVertices( Loop1 ).SurfIndex1 ).Name + ", Surface Class=[" + cSurfaceClass( Surface( TrackTooManyVertices( Loop1 ).SurfIndex1 ).Class ) + ']' );
+				ShowContinueError( "  This error occurred " + stripped( CountOut ) + " times." );
 				for ( Loop2 = 1; Loop2 <= NumTooManyVertices; ++Loop2 ) {
 					if ( TrackTooManyVertices( Loop1 ).SurfIndex1 == TrackTooManyVertices( Loop2 ).SurfIndex1 ) {
 						if ( SurfErrorReported2( TrackTooManyVertices( Loop2 ).SurfIndex2 ) ) continue;
-						ShowContinueError( "Figure being Overlapped=" + trim( Surface( TrackTooManyVertices( Loop2 ).SurfIndex2 ).Name ) + ", Surface Class=[" + trim( cSurfaceClass( Surface( TrackTooManyVertices( Loop2 ).SurfIndex2 ).Class ) ) + "]" );
+						ShowContinueError( "Figure being Overlapped=" + Surface( TrackTooManyVertices( Loop2 ).SurfIndex2 ).Name + ", Surface Class=[" + cSurfaceClass( Surface( TrackTooManyVertices( Loop2 ).SurfIndex2 ).Class ) + ']' );
 						SurfErrorReported2( TrackTooManyVertices( Loop2 ).SurfIndex2 ) = true;
 					}
 				}
 				SurfErrorReported( TrackTooManyVertices( Loop1 ).SurfIndex1 ) = true;
 			}
 			if ( TotCount > 0 ) {
-				ShowMessage( " " );
+				ShowMessage( "" );
 				gio::write( CountOut, "*" ) << TotCount;
-				ShowContinueError( "  The too many vertices errors occurred " + trim( adjustl( CountOut ) ) + " times (total)." );
-				ShowMessage( " " );
+				ShowContinueError( "  The too many vertices errors occurred " + stripped( CountOut ) + " times (total)." );
+				ShowMessage( "" );
 			}
 
 			SurfErrorReported = false;
 			TotCount = 0;
 			if ( NumTooManyFigures > 0 ) {
-				ShowMessage( "Too many figures [>=" + trim( RoundSigDigits( MaxHCS ) ) + "] in shadow overlap errors occurring..." );
+				ShowMessage( "Too many figures [>=" + RoundSigDigits( MaxHCS ) + "] in shadow overlap errors occurring..." );
 				ShowMessage( "These occur throughout the year and may occur several times for the same surfaces. " "You may be able to reduce them by adding OutputDiagnostics,DoNotMirrorDetachedShading;" );
 			}
 			for ( Loop1 = 1; Loop1 <= NumTooManyFigures; ++Loop1 ) {
@@ -9503,24 +9504,24 @@ namespace SolarShading {
 				gio::write( CountOut, "*" ) << Count;
 				TotCount += Count;
 				TotalWarningErrors += Count - 1;
-				ShowMessage( " " );
-				ShowWarningError( "Too many figures [>=" + trim( RoundSigDigits( MaxHCS ) ) + "] in a shadow overlap" );
-				ShowContinueError( "Overlapping figure=" + trim( Surface( TrackTooManyFigures( Loop1 ).SurfIndex1 ).Name ) + ", Surface Class=[" + trim( cSurfaceClass( Surface( TrackTooManyFigures( Loop1 ).SurfIndex1 ).Class ) ) + "]" );
-				ShowContinueError( "  This error occurred " + trim( adjustl( CountOut ) ) + " times." );
+				ShowMessage( "" );
+				ShowWarningError( "Too many figures [>=" + RoundSigDigits( MaxHCS ) + "] in a shadow overlap" );
+				ShowContinueError( "Overlapping figure=" + Surface( TrackTooManyFigures( Loop1 ).SurfIndex1 ).Name + ", Surface Class=[" + cSurfaceClass( Surface( TrackTooManyFigures( Loop1 ).SurfIndex1 ).Class ) + ']' );
+				ShowContinueError( "  This error occurred " + stripped( CountOut ) + " times." );
 				for ( Loop2 = 1; Loop2 <= NumTooManyFigures; ++Loop2 ) {
 					if ( TrackTooManyFigures( Loop1 ).SurfIndex1 == TrackTooManyFigures( Loop2 ).SurfIndex1 ) {
 						if ( SurfErrorReported2( TrackTooManyFigures( Loop2 ).SurfIndex2 ) ) continue;
-						ShowContinueError( "Figure being Overlapped=" + trim( Surface( TrackTooManyFigures( Loop2 ).SurfIndex2 ).Name ) + ", Surface Class=[" + trim( cSurfaceClass( Surface( TrackTooManyFigures( Loop2 ).SurfIndex2 ).Class ) ) + "]" );
+						ShowContinueError( "Figure being Overlapped=" + Surface( TrackTooManyFigures( Loop2 ).SurfIndex2 ).Name + ", Surface Class=[" + cSurfaceClass( Surface( TrackTooManyFigures( Loop2 ).SurfIndex2 ).Class ) + ']' );
 						SurfErrorReported2( TrackTooManyFigures( Loop2 ).SurfIndex2 ) = true;
 					}
 				}
 				SurfErrorReported( TrackTooManyFigures( Loop1 ).SurfIndex1 ) = true;
 			}
 			if ( TotCount > 0 ) {
-				ShowMessage( " " );
+				ShowMessage( "" );
 				gio::write( CountOut, "*" ) << TotCount;
-				ShowContinueError( "  The too many figures errors occurred " + trim( adjustl( CountOut ) ) + " times (total)." );
-				ShowMessage( " " );
+				ShowContinueError( "  The too many figures errors occurred " + stripped( CountOut ) + " times (total)." );
+				ShowMessage( "" );
 			}
 			SurfErrorReported.deallocate();
 			SurfErrorReported2.deallocate();

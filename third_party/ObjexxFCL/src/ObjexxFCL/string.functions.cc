@@ -12,7 +12,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/string.functions.hh>
-#include <ObjexxFCL/string.constants.hh>
 
 namespace ObjexxFCL {
 
@@ -59,6 +58,19 @@ has_prefix( std::string const & s, c_cstring const pre, bool const exact_case )
 			if ( ! equali( s[ i ], pre[ i ] ) ) return false;
 		}
 		return true;
+	}
+}
+
+// Has a Prefix Case-Optionally?
+bool
+has_prefix( std::string const & s, char const pre, bool const exact_case )
+{
+	if ( s.length() == 0 ) {
+		return false;
+	} else if ( exact_case ) {
+		return ( s[ 0 ] == pre );
+	} else {
+		return equali( s[ 0 ], pre );
 	}
 }
 
@@ -116,6 +128,20 @@ has_suffix( std::string const & s, c_cstring const suf, bool const exact_case )
 	}
 }
 
+// Has a Suffix Case-Optionally?
+bool
+has_suffix( std::string const & s, char const pre, bool const exact_case )
+{
+	std::string::size_type const s_len( s.length() );
+	if ( s_len == 0 ) {
+		return false;
+	} else if ( exact_case ) {
+		return ( s[ s_len - 1 ] == pre );
+	} else {
+		return equali( s[ s_len - 1 ], pre );
+	}
+}
+
 // Modifier
 
 // Lowercase a string
@@ -144,9 +170,9 @@ uppercase( std::string & s )
 std::string &
 left_justify( std::string & s )
 {
-	std::string::size_type const off( s.find_first_not_of( SPC ) );
+	std::string::size_type const off( s.find_first_not_of( ' ' ) );
 	if ( ( off > 0 ) && ( off != std::string::npos ) ) {
-		s.erase( 0, off ).append( off, SPC );
+		s.erase( 0, off ).append( off, ' ' );
 	}
 	return s;
 }
@@ -158,7 +184,7 @@ right_justify( std::string & s )
 	std::string::size_type const s_len_trim( len_trim( s ) );
 	std::string::size_type const off( s.length() - s_len_trim );
 	if ( off > 0 ) {
-		s.erase( s_len_trim ).insert( 0, off, SPC );
+		s.erase( s_len_trim ).insert( 0, off, ' ' );
 	}
 	return s;
 }
@@ -168,7 +194,7 @@ std::string &
 trim( std::string & s )
 {
 	if ( ! s.empty() ) {
-		std::string::size_type const ie( s.find_last_not_of( SPC ) );
+		std::string::size_type const ie( s.find_last_not_of( ' ' ) );
 		if ( ie == std::string::npos ) { // Blank string: return empty string
 			s.clear();
 		} else if ( ie + 1 < s.length() ) { // Trim tail
@@ -182,8 +208,9 @@ trim( std::string & s )
 std::string &
 trim_whitespace( std::string & s )
 {
+	static std::string const WHITE( " \t\0", 3 );
 	if ( ! s.empty() ) {
-		std::string::size_type const ie( s.find_last_not_of( WHITESPACE ) );
+		std::string::size_type const ie( s.find_last_not_of( WHITE ) );
 		if ( ie == std::string::npos ) { // Blank string: return empty string
 			s.clear();
 		} else if ( ie + 1 < s.length() ) { // Trim tail
@@ -245,9 +272,9 @@ std::string &
 strip( std::string & s )
 {
 	if ( ! s.empty() ) {
-		std::string::size_type const ib( s.find_first_not_of( SPC ) );
-		std::string::size_type const ie( s.find_last_not_of( SPC ) );
-		if ( ( ib == std::string::npos ) || ( ie == std::string::npos ) ) { // All of string is SPC
+		std::string::size_type const ib( s.find_first_not_of( ' ' ) );
+		std::string::size_type const ie( s.find_last_not_of( ' ' ) );
+		if ( ( ib == std::string::npos ) || ( ie == std::string::npos ) ) { // All of string is ' '
 			s.clear();
 		} else {
 			if ( ie < s.length() - 1 ) s.erase( ie + 1 );
@@ -262,8 +289,8 @@ std::string &
 lstrip( std::string & s )
 {
 	if ( ! s.empty() ) {
-		std::string::size_type const ib( s.find_first_not_of( SPC ) );
-		if ( ib == std::string::npos ) { // All of string is SPC
+		std::string::size_type const ib( s.find_first_not_of( ' ' ) );
+		if ( ib == std::string::npos ) { // All of string is ' '
 			s.clear();
 		} else if ( ib > 0 ) {
 			s.erase( 0, ib );
@@ -277,8 +304,8 @@ std::string &
 rstrip( std::string & s )
 {
 	if ( ! s.empty() ) {
-		std::string::size_type const ie( s.find_last_not_of( SPC ) );
-		if ( ie == std::string::npos ) { // All of string is SPC
+		std::string::size_type const ie( s.find_last_not_of( ' ' ) );
+		if ( ie == std::string::npos ) { // All of string is ' '
 			s.clear();
 		} else {
 			if ( ie < s.length() - 1 ) s.erase( ie + 1 );
@@ -291,10 +318,11 @@ rstrip( std::string & s )
 std::string &
 strip_whitespace( std::string & s )
 {
+	static std::string const WHITE( " \t\0", 3 );
 	if ( ! s.empty() ) {
-		std::string::size_type const ib( s.find_first_not_of( WHITESPACE ) );
-		std::string::size_type const ie( s.find_last_not_of( WHITESPACE ) );
-		if ( ( ib == std::string::npos ) || ( ie == std::string::npos ) ) { // All of string is from WHITESPACE
+		std::string::size_type const ib( s.find_first_not_of( WHITE ) );
+		std::string::size_type const ie( s.find_last_not_of( WHITE ) );
+		if ( ( ib == std::string::npos ) || ( ie == std::string::npos ) ) { // All of string is WHITE
 			s.clear();
 		} else {
 			if ( ie < s.length() - 1 ) s.erase( ie + 1 );
@@ -308,9 +336,10 @@ strip_whitespace( std::string & s )
 std::string &
 lstrip_whitespace( std::string & s )
 {
+	static std::string const WHITE( " \t\0", 3 );
 	if ( ! s.empty() ) {
-		std::string::size_type const ib( s.find_first_not_of( WHITESPACE ) );
-		if ( ib == std::string::npos ) { // All of string is from WHITESPACE
+		std::string::size_type const ib( s.find_first_not_of( WHITE ) );
+		if ( ib == std::string::npos ) { // All of string is WHITE
 			s.clear();
 		} else if ( ib > 0 ) {
 			s.erase( 0, ib );
@@ -323,46 +352,14 @@ lstrip_whitespace( std::string & s )
 std::string &
 rstrip_whitespace( std::string & s )
 {
+	static std::string const WHITE( " \t\0", 3 );
 	if ( ! s.empty() ) {
-		std::string::size_type const ie( s.find_last_not_of( WHITESPACE ) );
-		if ( ie == std::string::npos ) { // All of string is from WHITESPACE
+		std::string::size_type const ie( s.find_last_not_of( WHITE ) );
+		if ( ie == std::string::npos ) { // All of string is WHITE
 			s.clear();
 		} else {
 			if ( ie < s.length() - 1 ) s.erase( ie + 1 );
 		}
-	}
-	return s;
-}
-
-// Pad a string to a Specified Length
-std::string &
-pad( std::string & s, std::string::size_type const len )
-{
-	std::string::size_type const s_len( s.length() );
-	if ( s_len < len ) { // Pad
-		s.append( len - s_len, SPC );
-	}
-	return s;
-}
-
-// Left-Pad a string to a Specified Length
-std::string &
-lpad( std::string & s, std::string::size_type const len )
-{
-	std::string::size_type const s_len( s.length() );
-	if ( s_len < len ) { // Left-pad
-		s.insert( static_cast< std::string::size_type >( 0 ), len - s_len, SPC );
-	}
-	return s;
-}
-
-// Right-Pad a string to a Specified Length
-std::string &
-rpad( std::string & s, std::string::size_type const len )
-{
-	std::string::size_type const s_len( s.length() );
-	if ( s_len < len ) { // Pad
-		s.append( len - s_len, SPC );
 	}
 	return s;
 }
@@ -373,7 +370,7 @@ size( std::string & s, std::string::size_type const len )
 {
 	std::string::size_type const s_len( s.length() );
 	if ( s_len < len ) { // Pad
-		s.append( len - s_len, SPC );
+		s.append( len - s_len, ' ' );
 	} else if ( s_len > len ) { // Truncate
 		s.erase( len );
 	}
@@ -396,7 +393,7 @@ center( std::string & s, std::string::size_type const len )
 	std::string::size_type const s_len( s.length() );
 	if ( s_len < len ) { // Pad
 		std::string::size_type const off( ( len - s_len ) / 2 );
-		s = std::string( off, SPC ).append( s ).append( std::string( len - s_len - off, SPC ) );
+		s = std::string( off, ' ' ).append( s ).append( std::string( len - s_len - off, ' ' ) );
 	} else if ( s_len > len ) { // Truncate
 		s.erase( len );
 	}
@@ -437,7 +434,7 @@ overlay( std::string & s, std::string const & t, std::string::size_type const po
 {
 	std::string::size_type const t_len( t.length() );
 	std::string::size_type const l_len( pos + t_len ); // Lower bound on new string length
-	if ( l_len > s.length() ) s.resize( l_len, SPC ); // Expand
+	if ( l_len > s.length() ) s.resize( l_len, ' ' ); // Expand
 	s.replace( pos, t_len, t ); // Overlay the string
 	return s;
 }
@@ -472,9 +469,9 @@ uppercased( std::string const & s )
 std::string
 left_justified( std::string const & s )
 {
-	std::string::size_type const off( s.find_first_not_of( SPC ) );
+	std::string::size_type const off( s.find_first_not_of( ' ' ) );
 	if ( ( off > 0 ) && ( off != std::string::npos ) ) {
-		return s.substr( off ).append( off, SPC );
+		return s.substr( off ).append( off, ' ' );
 	} else {
 		return s;
 	}
@@ -487,7 +484,7 @@ right_justified( std::string const & s )
 	std::string::size_type const s_len_trim( len_trim( s ) );
 	std::string::size_type const off( s.length() - s_len_trim );
 	if ( off > 0 ) {
-		return std::string( off, SPC ).append( s.substr( 0, s_len_trim ) );
+		return std::string( off, ' ' ).append( s.substr( 0, s_len_trim ) );
 	} else {
 		return s;
 	}
@@ -500,7 +497,7 @@ trimmed( std::string const & s )
 	if ( s.empty() ) { // Empty string
 		return s;
 	} else {
-		std::string::size_type const ie( s.find_last_not_of( SPC ) );
+		std::string::size_type const ie( s.find_last_not_of( ' ' ) );
 		if ( ie == std::string::npos ) { // Blank string: return empty string
 			return std::string();
 		} else if ( ie < s.length() - 1 ) { // Trimmed
@@ -515,10 +512,11 @@ trimmed( std::string const & s )
 std::string
 trimmed_whitespace( std::string const & s )
 {
+	static std::string const WHITE( " \t\0", 3 );
 	if ( s.empty() ) { // Empty string
 		return s;
 	} else {
-		std::string::size_type const ie( s.find_last_not_of( WHITESPACE ) );
+		std::string::size_type const ie( s.find_last_not_of( WHITE ) );
 		if ( ie == std::string::npos ) { // Blank string: return empty string
 			return std::string();
 		} else if ( ie < s.length() - 1 ) { // Trimmed
@@ -587,9 +585,9 @@ stripped( std::string const & s )
 	if ( s.empty() ) {
 		return s;
 	} else {
-		std::string::size_type const ib( s.find_first_not_of( SPC ) );
-		std::string::size_type const ie( s.find_last_not_of( SPC ) );
-		if ( ( ib == std::string::npos ) || ( ie == std::string::npos ) ) { // All of string is SPC
+		std::string::size_type const ib( s.find_first_not_of( ' ' ) );
+		std::string::size_type const ie( s.find_last_not_of( ' ' ) );
+		if ( ( ib == std::string::npos ) || ( ie == std::string::npos ) ) { // All of string is ' '
 			return std::string(); // Return empty string
 		} else {
 			return s.substr( ib, ie - ib + 1 );
@@ -604,8 +602,8 @@ lstripped( std::string const & s )
 	if ( s.empty() ) {
 		return s;
 	} else {
-		std::string::size_type const ib( s.find_first_not_of( SPC ) );
-		if ( ib == std::string::npos ) { // All of string is SPC
+		std::string::size_type const ib( s.find_first_not_of( ' ' ) );
+		if ( ib == std::string::npos ) { // All of string is ' '
 			return std::string(); // Return empty string
 		} else if ( ib > 0 ) {
 			return s.substr( ib );
@@ -622,8 +620,8 @@ rstripped( std::string const & s )
 	if ( s.empty() ) {
 		return s;
 	} else {
-		std::string::size_type const ie( s.find_last_not_of( SPC ) );
-		if ( ie == std::string::npos ) { // All of string is SPC
+		std::string::size_type const ie( s.find_last_not_of( ' ' ) );
+		if ( ie == std::string::npos ) { // All of string is ' '
 			return std::string(); // Return empty string
 		} else {
 			return s.substr( 0, ie + 1 );
@@ -635,12 +633,13 @@ rstripped( std::string const & s )
 std::string
 stripped_whitespace( std::string const & s )
 {
+	static std::string const WHITE( " \t\0", 3 );
 	if ( s.empty() ) {
 		return s;
 	} else {
-		std::string::size_type const ib( s.find_first_not_of( WHITESPACE ) );
-		std::string::size_type const ie( s.find_last_not_of( WHITESPACE ) );
-		if ( ( ib == std::string::npos ) || ( ie == std::string::npos ) ) { // All of string is from WHITESPACE
+		std::string::size_type const ib( s.find_first_not_of( WHITE ) );
+		std::string::size_type const ie( s.find_last_not_of( WHITE ) );
+		if ( ( ib == std::string::npos ) || ( ie == std::string::npos ) ) { // All of string is WHITE
 			return std::string(); // Return empty string
 		} else {
 			return s.substr( ib, ie - ib + 1 );
@@ -652,11 +651,12 @@ stripped_whitespace( std::string const & s )
 std::string
 lstripped_whitespace( std::string const & s )
 {
+	static std::string const WHITE( " \t\0", 3 );
 	if ( s.empty() ) {
 		return s;
 	} else {
-		std::string::size_type const ib( s.find_first_not_of( WHITESPACE ) );
-		if ( ib == std::string::npos ) { // All of string is from WHITESPACE
+		std::string::size_type const ib( s.find_first_not_of( WHITE ) );
+		if ( ib == std::string::npos ) { // All of string is WHITE
 			return std::string(); // Return empty string
 		} else if ( ib > 0 ) {
 			return s.substr( ib );
@@ -670,51 +670,16 @@ lstripped_whitespace( std::string const & s )
 std::string
 rstripped_whitespace( std::string const & s )
 {
+	static std::string const WHITE( " \t\0", 3 );
 	if ( s.empty() ) {
 		return s;
 	} else {
-		std::string::size_type const ie( s.find_last_not_of( WHITESPACE ) );
-		if ( ie == std::string::npos ) { // All of string is from WHITESPACE
+		std::string::size_type const ie( s.find_last_not_of( WHITE ) );
+		if ( ie == std::string::npos ) { // All of string is WHITE
 			return std::string(); // Return empty string
 		} else {
 			return s.substr( 0, ie + 1 );
 		}
-	}
-}
-
-// Padded to a Specified Length Copy of a string
-std::string
-padded( std::string const & s, std::string::size_type const len )
-{
-	std::string::size_type const s_len( s.length() );
-	if ( s_len < len ) { // Padded
-		return s + std::string( len - s_len, SPC );
-	} else { // Unchanged
-		return s;
-	}
-}
-
-// Left-Padded to a Specified Length Copy of a string
-std::string
-lpadded( std::string const & s, std::string::size_type const len )
-{
-	std::string::size_type const s_len( s.length() );
-	if ( s_len < len ) { // Left-padded
-		return std::string( len - s_len, SPC ).append( s );
-	} else { // Unchanged
-		return s;
-	}
-}
-
-// Right-Padded to a Specified Length Copy of a string
-std::string
-rpadded( std::string const & s, std::string::size_type const len )
-{
-	std::string::size_type const s_len( s.length() );
-	if ( s_len < len ) { // Padded
-		return s + std::string( len - s_len, SPC );
-	} else { // Unchanged
-		return s;
 	}
 }
 
@@ -724,7 +689,7 @@ sized( std::string const & s, std::string::size_type const len )
 {
 	std::string::size_type const s_len( s.length() );
 	if ( s_len < len ) { // Right-padded
-		return s + std::string( len - s_len, SPC );
+		return s + std::string( len - s_len, ' ' );
 	} else if ( s_len == len ) { // Unchanged
 		return s;
 	} else { // Truncated
@@ -738,7 +703,7 @@ lsized( std::string const & s, std::string::size_type const len )
 {
 	std::string::size_type const s_len( s.length() );
 	if ( s_len < len ) { // Left-padded
-		return std::string( len - s_len, SPC ) + s;
+		return std::string( len - s_len, ' ' ) + s;
 	} else if ( s_len == len ) { // Unchanged
 		return s;
 	} else { // Truncated
@@ -753,7 +718,7 @@ centered( std::string const & s, std::string::size_type const len )
 	std::string::size_type const s_len( s.length() );
 	if ( s_len < len ) { // Padded
 		std::string::size_type const off( ( len - s_len ) / 2 );
-		return std::string( off, SPC ).append( s ).append( std::string( len - s_len - off, SPC ) );
+		return std::string( off, ' ' ).append( s ).append( std::string( len - s_len - off, ' ' ) );
 	} else if ( s_len == len ) { // Unchanged
 		return s;
 	} else { // Truncated
@@ -782,7 +747,7 @@ head( std::string const & s )
 	if ( s.empty() ) { // Empty string
 		return s;
 	} else {
-		std::string::size_type const ie( s.find( SPC ) );
+		std::string::size_type const ie( s.find( ' ' ) );
 		if ( ie == std::string::npos ) { // Space-free string
 			return s;
 		} else {

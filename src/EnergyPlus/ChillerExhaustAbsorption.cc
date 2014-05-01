@@ -69,7 +69,6 @@ namespace ChillerExhaustAbsorption {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::BigNumber;
 	using DataGlobals::InitConvTemp;
 	using DataGlobals::SecInHour;
@@ -109,8 +108,8 @@ namespace ChillerExhaustAbsorption {
 
 	void
 	SimExhaustAbsorber(
-		Fstring const & AbsorberType, // type of Absorber
-		Fstring const & AbsorberName, // user specified name of Absorber
+		std::string const & AbsorberType, // type of Absorber
+		std::string const & AbsorberName, // user specified name of Absorber
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // Absorber number counter
 		bool const RunFlag, // simulate Absorber when TRUE
@@ -176,17 +175,17 @@ namespace ChillerExhaustAbsorption {
 		if ( CompIndex == 0 ) {
 			ChillNum = FindItemInList( AbsorberName, ExhaustAbsorber.Name(), NumExhaustAbsorbers );
 			if ( ChillNum == 0 ) {
-				ShowFatalError( "SimExhaustAbsorber: Unit not found=" + trim( AbsorberName ) );
+				ShowFatalError( "SimExhaustAbsorber: Unit not found=" + AbsorberName );
 			}
 			CompIndex = ChillNum;
 		} else {
 			ChillNum = CompIndex;
 			if ( ChillNum > NumExhaustAbsorbers || ChillNum < 1 ) {
-				ShowFatalError( "SimExhaustAbsorber:  Invalid CompIndex passed=" + trim( TrimSigDigits( ChillNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumExhaustAbsorbers ) ) + ", Entered Unit name=" + trim( AbsorberName ) );
+				ShowFatalError( "SimExhaustAbsorber:  Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Number of Units=" + TrimSigDigits( NumExhaustAbsorbers ) + ", Entered Unit name=" + AbsorberName );
 			}
 			if ( CheckEquipName( ChillNum ) ) {
 				if ( AbsorberName != ExhaustAbsorber( ChillNum ).Name ) {
-					ShowFatalError( "SimExhaustAbsorber: Invalid CompIndex passed=" + trim( TrimSigDigits( ChillNum ) ) + ", Unit name=" + trim( AbsorberName ) + ", stored Unit Name for that index=" + trim( ExhaustAbsorber( ChillNum ).Name ) );
+					ShowFatalError( "SimExhaustAbsorber: Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Unit name=" + AbsorberName + ", stored Unit Name for that index=" + ExhaustAbsorber( ChillNum ).Name );
 				}
 				CheckEquipName( ChillNum ) = false;
 			}
@@ -214,7 +213,7 @@ namespace ChillerExhaustAbsorption {
 				MaxCap = 0.0;
 				OptCap = 0.0;
 			} else { // Error, nodes do not match
-				ShowSevereError( "SimExhaustAbsorber: Invalid call to Exhaust Absorbtion Chiller-Heater " + trim( AbsorberName ) );
+				ShowSevereError( "SimExhaustAbsorber: Invalid call to Exhaust Absorbtion Chiller-Heater " + AbsorberName );
 				ShowContinueError( "Node connections in branch are not consistent with object nodes." );
 				ShowFatalError( "Preceding conditions cause termination." );
 			} // Operate as Chiller or Heater
@@ -251,7 +250,7 @@ namespace ChillerExhaustAbsorption {
 			UpdateChillerComponentCondenserSide( ExhaustAbsorber( ChillNum ).CDLoopNum, ExhaustAbsorber( ChillNum ).CDLoopSideNum, TypeOf_Chiller_ExhFiredAbsorption, ExhaustAbsorber( ChillNum ).CondReturnNodeNum, ExhaustAbsorber( ChillNum ).CondSupplyNodeNum, ExhaustAbsorberReport( ChillNum ).TowerLoad, ExhaustAbsorberReport( ChillNum ).CondReturnTemp, ExhaustAbsorberReport( ChillNum ).CondSupplyTemp, ExhaustAbsorberReport( ChillNum ).CondWaterFlowRate, FirstIteration );
 
 		} else { // Error, nodes do not match
-			ShowSevereError( "Invalid call to Exhaust Absorber Chiller " + trim( AbsorberName ) );
+			ShowSevereError( "Invalid call to Exhaust Absorber Chiller " + AbsorberName );
 			ShowContinueError( "Node connections in branch are not consistent with object nodes." );
 			ShowFatalError( "Preceding conditions cause termination." );
 		}
@@ -307,7 +306,7 @@ namespace ChillerExhaustAbsorption {
 		static bool ErrorsFound( false );
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		Fstring ChillerName( MaxNameLength );
+		std::string ChillerName;
 		bool errFlag;
 		bool Okay;
 
@@ -316,7 +315,7 @@ namespace ChillerExhaustAbsorption {
 		NumExhaustAbsorbers = GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumExhaustAbsorbers <= 0 ) {
-			ShowSevereError( "No " + trim( cCurrentModuleObject ) + " equipment found in input file" );
+			ShowSevereError( "No " + cCurrentModuleObject + " equipment found in input file" );
 			ErrorsFound = true;
 		}
 
@@ -336,17 +335,17 @@ namespace ChillerExhaustAbsorption {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ExhaustAbsorber.Name(), AbsorberNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ExhaustAbsorber.Name(), AbsorberNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
-			VerifyUniqueChillerName( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), errFlag, trim( cCurrentModuleObject ) + " Name" );
+			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
 			}
 			ExhaustAbsorber( AbsorberNum ).Name = cAlphaArgs( 1 );
-			ChillerName = trim( cCurrentModuleObject ) + " Named " + trim( ExhaustAbsorber( AbsorberNum ).Name );
+			ChillerName = cCurrentModuleObject + " Named " + ExhaustAbsorber( AbsorberNum ).Name;
 
 			// Assign capacities
 			ExhaustAbsorber( AbsorberNum ).NomCoolingCap = rNumericArgs( 1 );
@@ -358,15 +357,15 @@ namespace ChillerExhaustAbsorption {
 			ExhaustAbsorber( AbsorberNum ).ElecHeatRatio = rNumericArgs( 6 );
 
 			// Assign Node Numbers to specified nodes
-			ExhaustAbsorber( AbsorberNum ).ChillReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			ExhaustAbsorber( AbsorberNum ).ChillSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Chilled Water Nodes" );
+			ExhaustAbsorber( AbsorberNum ).ChillReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			ExhaustAbsorber( AbsorberNum ).ChillSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Chilled Water Nodes" );
 			// Condenser node processing depends on condenser type, see below
-			ExhaustAbsorber( AbsorberNum ).HeatReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
-			ExhaustAbsorber( AbsorberNum ).HeatSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 3, ObjectIsNotParent );
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 6 ), cAlphaArgs( 7 ), "Hot Water Nodes" );
+			ExhaustAbsorber( AbsorberNum ).HeatReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
+			ExhaustAbsorber( AbsorberNum ).HeatSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 3, ObjectIsNotParent );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 6 ), cAlphaArgs( 7 ), "Hot Water Nodes" );
 			if ( ErrorsFound ) {
-				ShowFatalError( "Errors found in processing node input for " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowFatalError( "Errors found in processing node input for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = false;
 			}
 
@@ -393,7 +392,7 @@ namespace ChillerExhaustAbsorption {
 			ExhaustAbsorber( AbsorberNum ).HeatCapFCoolCurve = GetCurveCheck( cAlphaArgs( 13 ), ErrorsFound, ChillerName );
 			ExhaustAbsorber( AbsorberNum ).ThermalEnergyHeatFHPLRCurve = GetCurveCheck( cAlphaArgs( 14 ), ErrorsFound, ChillerName );
 			if ( ErrorsFound ) {
-				ShowFatalError( "Errors found in processing curve input for " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowFatalError( "Errors found in processing curve input for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = false;
 			}
 			if ( SameString( cAlphaArgs( 15 ), "LeavingCondenser" ) ) {
@@ -402,8 +401,8 @@ namespace ChillerExhaustAbsorption {
 				ExhaustAbsorber( AbsorberNum ).isEnterCondensTemp = true;
 			} else {
 				ExhaustAbsorber( AbsorberNum ).isEnterCondensTemp = true;
-				ShowWarningError( "Invalid " + trim( cAlphaFieldNames( 15 ) ) + "=" + trim( cAlphaArgs( 15 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowWarningError( "Invalid " + cAlphaFieldNames( 15 ) + '=' + cAlphaArgs( 15 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "resetting to ENTERING-CONDENSER, simulation continues" );
 			}
 			// Assign Other Paramters
@@ -413,21 +412,21 @@ namespace ChillerExhaustAbsorption {
 				ExhaustAbsorber( AbsorberNum ).isWaterCooled = true;
 			} else {
 				ExhaustAbsorber( AbsorberNum ).isWaterCooled = true;
-				ShowWarningError( "Invalid " + trim( cAlphaFieldNames( 16 ) ) + "=" + trim( cAlphaArgs( 16 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowWarningError( "Invalid " + cAlphaFieldNames( 16 ) + '=' + cAlphaArgs( 16 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "resetting to WATER-COOLED, simulation continues" );
 			}
 			if ( ExhaustAbsorber( AbsorberNum ).isWaterCooled ) {
-				ExhaustAbsorber( AbsorberNum ).CondReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
-				ExhaustAbsorber( AbsorberNum ).CondSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
-				TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 4 ), cAlphaArgs( 5 ), "Condenser Water Nodes" );
+				ExhaustAbsorber( AbsorberNum ).CondReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+				ExhaustAbsorber( AbsorberNum ).CondSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 4 ), cAlphaArgs( 5 ), "Condenser Water Nodes" );
 			} else {
-				ExhaustAbsorber( AbsorberNum ).CondReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 2, ObjectIsNotParent );
-				ExhaustAbsorber( AbsorberNum ).CondSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+				ExhaustAbsorber( AbsorberNum ).CondReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 2, ObjectIsNotParent );
+				ExhaustAbsorber( AbsorberNum ).CondSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 				// Connection not required for air or evap cooled condenser so no call to TestCompSet here
 				CheckAndAddAirNodeNumber( ExhaustAbsorber( AbsorberNum ).CondReturnNodeNum, Okay );
 				if ( ! Okay ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ", Adding OutdoorAir:Node=" + trim( cAlphaArgs( 4 ) ) );
+					ShowWarningError( cCurrentModuleObject + ", Adding OutdoorAir:Node=" + cAlphaArgs( 4 ) );
 				}
 			}
 
@@ -446,7 +445,7 @@ namespace ChillerExhaustAbsorption {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + trim( cCurrentModuleObject ) );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
 		}
 
 		for ( AbsorberNum = 1; AbsorberNum <= NumExhaustAbsorbers; ++AbsorberNum ) {
@@ -615,8 +614,8 @@ namespace ChillerExhaustAbsorption {
 			if ( ( Node( ExhaustAbsorber( ChillNum ).ChillSupplyNodeNum ).TempSetPoint == SensedNodeFlagValue ) && ( Node( ExhaustAbsorber( ChillNum ).ChillSupplyNodeNum ).TempSetPointHi == SensedNodeFlagValue ) ) {
 				if ( ! AnyEnergyManagementSystemInModel ) {
 					if ( ! ExhaustAbsorber( ChillNum ).ChillSetPointErrDone ) {
-						ShowWarningError( "Missing temperature setpoint on cool side for chiller heater named " + trim( ExhaustAbsorber( ChillNum ).Name ) );
-						ShowContinueError( "  A temperature setpoint is needed at the outlet node of this chiller " ", use a SetpointManager" );
+						ShowWarningError( "Missing temperature setpoint on cool side for chiller heater named " + ExhaustAbsorber( ChillNum ).Name );
+						ShowContinueError( "  A temperature setpoint is needed at the outlet node of this chiller, use a SetpointManager" );
 						ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );
 						ExhaustAbsorber( ChillNum ).ChillSetPointErrDone = true;
 					}
@@ -626,7 +625,7 @@ namespace ChillerExhaustAbsorption {
 					CheckIfNodeSetPointManagedByEMS( ExhaustAbsorber( ChillNum ).ChillSupplyNodeNum, iTemperatureSetPoint, errFlag );
 					if ( errFlag ) {
 						if ( ! ExhaustAbsorber( ChillNum ).ChillSetPointErrDone ) {
-							ShowWarningError( "Missing temperature setpoint on cool side for chiller heater named " + trim( ExhaustAbsorber( ChillNum ).Name ) );
+							ShowWarningError( "Missing temperature setpoint on cool side for chiller heater named " + ExhaustAbsorber( ChillNum ).Name );
 							ShowContinueError( "  A temperature setpoint is needed at the outlet node of this chiller evaporator " );
 							ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node " );
 							ShowContinueError( "  or use an EMS actuator to establish a setpoint at the outlet node " );
@@ -645,8 +644,8 @@ namespace ChillerExhaustAbsorption {
 			if ( ( Node( ExhaustAbsorber( ChillNum ).HeatSupplyNodeNum ).TempSetPoint == SensedNodeFlagValue ) && ( Node( ExhaustAbsorber( ChillNum ).HeatSupplyNodeNum ).TempSetPointLo == SensedNodeFlagValue ) ) {
 				if ( ! AnyEnergyManagementSystemInModel ) {
 					if ( ! ExhaustAbsorber( ChillNum ).HeatSetPointErrDone ) {
-						ShowWarningError( "Missing temperature setpoint on heat side for chiller heater named " + trim( ExhaustAbsorber( ChillNum ).Name ) );
-						ShowContinueError( "  A temperature setpoint is needed at the outlet node of this chiller " ", use a SetpointManager" );
+						ShowWarningError( "Missing temperature setpoint on heat side for chiller heater named " + ExhaustAbsorber( ChillNum ).Name );
+						ShowContinueError( "  A temperature setpoint is needed at the outlet node of this chiller, use a SetpointManager" );
 						ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );
 						ExhaustAbsorber( ChillNum ).HeatSetPointErrDone = true;
 					}
@@ -656,7 +655,7 @@ namespace ChillerExhaustAbsorption {
 					CheckIfNodeSetPointManagedByEMS( ExhaustAbsorber( ChillNum ).HeatSupplyNodeNum, iTemperatureSetPoint, errFlag );
 					if ( errFlag ) {
 						if ( ! ExhaustAbsorber( ChillNum ).HeatSetPointErrDone ) {
-							ShowWarningError( "Missing temperature setpoint on heat side for chiller heater named " + trim( ExhaustAbsorber( ChillNum ).Name ) );
+							ShowWarningError( "Missing temperature setpoint on heat side for chiller heater named " + ExhaustAbsorber( ChillNum ).Name );
 							ShowContinueError( "  A temperature setpoint is needed at the outlet node of this chiller heater " );
 							ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the heater side outlet node " );
 							ShowContinueError( "  or use an EMS actuator to establish a setpoint at the outlet node " );
@@ -794,7 +793,7 @@ namespace ChillerExhaustAbsorption {
 
 		bool ErrorsFound; // If errors detected in input
 		//  LOGICAL             :: LoopErrorsFound
-		Fstring equipName( MaxNameLength );
+		std::string equipName;
 		Real64 Cp; // local fluid specific heat
 		Real64 rho; // local fluid density
 		Real64 tmpNomCap; // local nominal capacity cooling power
@@ -861,9 +860,9 @@ namespace ChillerExhaustAbsorption {
 							ReportSizingOutput( "ChillerHeater:Absorption:DoubleEffect", ExhaustAbsorber( ChillNum ).Name, "Design Size Nominal Cooling Capacity [W]", tmpNomCap, "User-Specified Nominal Cooling Capacity [W]", NomCapUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpNomCap - NomCapUser ) / NomCapUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeChillerHeaterAbsorptionDoubleEffect: Potential issue with equipment sizing for " + trim( ExhaustAbsorber( ChillNum ).Name ) );
-									ShowContinueError( "User-Specified Nominal Capacity of " + trim( RoundSigDigits( NomCapUser, 2 ) ) + " [W]" );
-									ShowContinueError( "differs from Design Size Nominal Capacity of " + trim( RoundSigDigits( tmpNomCap, 2 ) ) + " [W]" );
+									ShowMessage( "SizeChillerHeaterAbsorptionDoubleEffect: Potential issue with equipment sizing for " + ExhaustAbsorber( ChillNum ).Name );
+									ShowContinueError( "User-Specified Nominal Capacity of " + RoundSigDigits( NomCapUser, 2 ) + " [W]" );
+									ShowContinueError( "differs from Design Size Nominal Capacity of " + RoundSigDigits( tmpNomCap, 2 ) + " [W]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -875,7 +874,7 @@ namespace ChillerExhaustAbsorption {
 			}
 		} else {
 			if ( IsAutoSize ) {
-				ShowSevereError( "SizeExhaustAbsorber: ChillerHeater:Absorption:DoubleEffect=\"" + trim( ExhaustAbsorber( ChillNum ).Name ) + "\", autosize error." );
+				ShowSevereError( "SizeExhaustAbsorber: ChillerHeater:Absorption:DoubleEffect=\"" + ExhaustAbsorber( ChillNum ).Name + "\", autosize error." );
 				ShowContinueError( "Autosizing of Exhaust Fired Absorption Chiller nominal cooling capacity requires" );
 				ShowContinueError( "a cooling loop Sizing:Plant object." );
 				ErrorsFound = true;
@@ -914,9 +913,9 @@ namespace ChillerExhaustAbsorption {
 							ReportSizingOutput( "ChillerHeater:Absorption:DoubleEffect", ExhaustAbsorber( ChillNum ).Name, "Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate, "User-Specified Design Chilled Water Flow Rate [m3/s]", EvapVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpEvapVolFlowRate - EvapVolFlowRateUser ) / EvapVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeChillerAbsorptionDoubleEffect: Potential issue with equipment sizing for " + trim( ExhaustAbsorber( ChillNum ).Name ) );
-									ShowContinueError( "User-Specified Design Chilled Water Flow Rate of " + trim( RoundSigDigits( EvapVolFlowRateUser, 5 ) ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Design Chilled Water Flow Rate of " + trim( RoundSigDigits( tmpEvapVolFlowRate, 5 ) ) + " [m3/s]" );
+									ShowMessage( "SizeChillerAbsorptionDoubleEffect: Potential issue with equipment sizing for " + ExhaustAbsorber( ChillNum ).Name );
+									ShowContinueError( "User-Specified Design Chilled Water Flow Rate of " + RoundSigDigits( EvapVolFlowRateUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Design Chilled Water Flow Rate of " + RoundSigDigits( tmpEvapVolFlowRate, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -928,7 +927,7 @@ namespace ChillerExhaustAbsorption {
 			}
 		} else {
 			if ( IsAutoSize ) {
-				ShowSevereError( "SizeExhaustAbsorber: ChillerHeater:Absorption:DoubleEffect=\"" + trim( ExhaustAbsorber( ChillNum ).Name ) + "\", autosize error." );
+				ShowSevereError( "SizeExhaustAbsorber: ChillerHeater:Absorption:DoubleEffect=\"" + ExhaustAbsorber( ChillNum ).Name + "\", autosize error." );
 				ShowContinueError( "Autosizing of Exhaust Fired Absorption Chiller evap flow rate requires" );
 				ShowContinueError( "a cooling loop Sizing:Plant object." );
 				ErrorsFound = true;
@@ -969,9 +968,9 @@ namespace ChillerExhaustAbsorption {
 							ReportSizingOutput( "ChillerHeater:Absorption:DoubleEffect", ExhaustAbsorber( ChillNum ).Name, "Design Size Design Hot Water Flow Rate [m3/s]", tmpHeatRecVolFlowRate, "User-Specified Design Hot Water Flow Rate [m3/s]", HeatRecVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpHeatRecVolFlowRate - HeatRecVolFlowRateUser ) / HeatRecVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeChillerHeaterAbsorptionDoubleEffect: Potential issue with equipment sizing for " + trim( ExhaustAbsorber( ChillNum ).Name ) );
-									ShowContinueError( "User-Specified Design Hot Water Flow Rate of " + trim( RoundSigDigits( HeatRecVolFlowRateUser, 5 ) ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Design Hot Water Flow Rate of " + trim( RoundSigDigits( tmpHeatRecVolFlowRate, 5 ) ) + " [m3/s]" );
+									ShowMessage( "SizeChillerHeaterAbsorptionDoubleEffect: Potential issue with equipment sizing for " + ExhaustAbsorber( ChillNum ).Name );
+									ShowContinueError( "User-Specified Design Hot Water Flow Rate of " + RoundSigDigits( HeatRecVolFlowRateUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Design Hot Water Flow Rate of " + RoundSigDigits( tmpHeatRecVolFlowRate, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -983,7 +982,7 @@ namespace ChillerExhaustAbsorption {
 			}
 		} else {
 			if ( IsAutoSize ) {
-				ShowSevereError( "SizeExhaustAbsorber: ChillerHeater:Absorption:DoubleEffect=\"" + trim( ExhaustAbsorber( ChillNum ).Name ) + "\", autosize error." );
+				ShowSevereError( "SizeExhaustAbsorber: ChillerHeater:Absorption:DoubleEffect=\"" + ExhaustAbsorber( ChillNum ).Name + "\", autosize error." );
 				ShowContinueError( "Autosizing of Exhaust Fired Absorption Chiller hot water flow rate requires" );
 				ShowContinueError( "a heating loop Sizing:Plant object." );
 				ErrorsFound = true;
@@ -1027,9 +1026,9 @@ namespace ChillerExhaustAbsorption {
 							ReportSizingOutput( "ChillerHeater:Absorption:DoubleEffect", ExhaustAbsorber( ChillNum ).Name, "Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate, "User-Specified Design Condenser Water Flow Rate [m3/s]", CondVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpCondVolFlowRate - CondVolFlowRateUser ) / CondVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeChillerAbsorptionDoubleEffect: Potential issue with equipment sizing for " + trim( ExhaustAbsorber( ChillNum ).Name ) );
-									ShowContinueError( "User-Specified Design Condenser Water Flow Rate of " + trim( RoundSigDigits( CondVolFlowRateUser, 5 ) ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Design Condenser Water Flow Rate of " + trim( RoundSigDigits( tmpCondVolFlowRate, 5 ) ) + " [m3/s]" );
+									ShowMessage( "SizeChillerAbsorptionDoubleEffect: Potential issue with equipment sizing for " + ExhaustAbsorber( ChillNum ).Name );
+									ShowContinueError( "User-Specified Design Condenser Water Flow Rate of " + RoundSigDigits( CondVolFlowRateUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Design Condenser Water Flow Rate of " + RoundSigDigits( tmpCondVolFlowRate, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -1041,7 +1040,7 @@ namespace ChillerExhaustAbsorption {
 			}
 		} else {
 			if ( IsAutoSize ) {
-				ShowSevereError( "SizeExhaustAbsorber: ChillerHeater:Absorption:DoubleEffect=\"" + trim( ExhaustAbsorber( ChillNum ).Name ) + "\", autosize error." );
+				ShowSevereError( "SizeExhaustAbsorber: ChillerHeater:Absorption:DoubleEffect=\"" + ExhaustAbsorber( ChillNum ).Name + "\", autosize error." );
 				ShowSevereError( "Autosizing of Exhaust Fired Absorption Chiller condenser flow rate requires a condenser" );
 				ShowContinueError( "loop Sizing:Plant object." );
 				ErrorsFound = true;
@@ -1362,7 +1361,7 @@ namespace ChillerExhaustAbsorption {
 					}}
 				} else {
 					lChillWaterMassFlowRate = 0.0;
-					ShowRecurringWarningErrorAtEnd( "ExhaustAbsorberChillerModel:Cooling\"" + trim( ExhaustAbsorber( ChillNum ).Name ) + "\", DeltaTemp = 0 in mass flow calculation", ExhaustAbsorber( ChillNum ).DeltaTempCoolErrCount );
+					ShowRecurringWarningErrorAtEnd( "ExhaustAbsorberChillerModel:Cooling\"" + ExhaustAbsorber( ChillNum ).Name + "\", DeltaTemp = 0 in mass flow calculation", ExhaustAbsorber( ChillNum ).DeltaTempCoolErrCount );
 				}
 				lChillSupplyTemp = ChillSupplySetPointTemp;
 			} else if ( SELECT_CASE_var == 1 ) { // mass flow rates may not be changed by loop components
@@ -1461,15 +1460,15 @@ namespace ChillerExhaustAbsorption {
 
 			if ( lExhHeatRecPotentialCool < lCoolThermalEnergyUseRate ) {
 				if ( ExhaustAbsorber( ChillNum ).ExhTempLTAbsLeavingTempIndex == 0 ) {
-					ShowWarningError( "ChillerHeater:Absorption:DoubleEffect \"" + trim( ExhaustAbsorber( ChillNum ).Name ) + "\"" );
-					ShowContinueError( "...Exhaust temperature and flow input from Micro Turbine is not sufficient during cooling " "to run the chiller " );
-					ShowContinueError( "...Value of Exhaust air inlet temp =" + trim( TrimSigDigits( lExhaustInTemp, 4 ) ) + " C." );
-					ShowContinueError( "... and Exhaust air flow rate of " + trim( TrimSigDigits( lExhaustInFlow, 2 ) ) + " kg/s." );
-					ShowContinueError( "...Value of minimum absorber leaving temp =" + trim( TrimSigDigits( AbsLeavingTemp, 4 ) ) + " C." );
-					ShowContinueError( "...Either increase the Exhaust temperature (min required = 350 C )  " "or flow or both of Micro Turbine to meet the min available potential criteria." );
+					ShowWarningError( "ChillerHeater:Absorption:DoubleEffect \"" + ExhaustAbsorber( ChillNum ).Name + "\"" );
+					ShowContinueError( "...Exhaust temperature and flow input from Micro Turbine is not sufficient during cooling to run the chiller " );
+					ShowContinueError( "...Value of Exhaust air inlet temp =" + TrimSigDigits( lExhaustInTemp, 4 ) + " C." );
+					ShowContinueError( "... and Exhaust air flow rate of " + TrimSigDigits( lExhaustInFlow, 2 ) + " kg/s." );
+					ShowContinueError( "...Value of minimum absorber leaving temp =" + TrimSigDigits( AbsLeavingTemp, 4 ) + " C." );
+					ShowContinueError( "...Either increase the Exhaust temperature (min required = 350 C )  or flow or both of Micro Turbine to meet the min available potential criteria." );
 					ShowContinueErrorTimeStamp( "... Simulation will continue." );
 				}
-				ShowRecurringWarningErrorAtEnd( "ChillerHeater:Absorption:DoubleEffect \"" + trim( ExhaustAbsorber( ChillNum ).Name ) + "\":" " Exhaust temperature from Micro Turbine is not sufficient to run the chiller during cooling warning continues...", ExhaustAbsorber( ChillNum ).ExhTempLTAbsLeavingTempIndex, lExhaustInTemp, AbsLeavingTemp );
+				ShowRecurringWarningErrorAtEnd( "ChillerHeater:Absorption:DoubleEffect \"" + ExhaustAbsorber( ChillNum ).Name + "\": Exhaust temperature from Micro Turbine is not sufficient to run the chiller during cooling warning continues...", ExhaustAbsorber( ChillNum ).ExhTempLTAbsLeavingTempIndex, lExhaustInTemp, AbsLeavingTemp );
 				// If exhaust is not available, it means the avilable thermal energy is 0.0 and Chiller is not available
 				lCoolThermalEnergyUseRate = 0.0;
 				lTowerLoad = 0.0;
@@ -1485,8 +1484,8 @@ namespace ChillerExhaustAbsorption {
 				if ( lCondWaterMassFlowRate > MassFlowTolerance ) {
 					lCondSupplyTemp = lCondReturnTemp + lTowerLoad / ( lCondWaterMassFlowRate * Cp_CD );
 				} else {
-					ShowSevereError( "CalcExhaustAbsorberChillerModel: Condenser flow = 0, for Exhaust Absorber Chiller=" + trim( ExhaustAbsorber( ChillNum ).Name ) );
-					ShowContinueErrorTimeStamp( " " );
+					ShowSevereError( "CalcExhaustAbsorberChillerModel: Condenser flow = 0, for Exhaust Absorber Chiller=" + ExhaustAbsorber( ChillNum ).Name );
+					ShowContinueErrorTimeStamp( "" );
 					ShowFatalError( "Program Terminates due to previous error condition." );
 				}
 			} else {
@@ -1505,7 +1504,7 @@ namespace ChillerExhaustAbsorption {
 				if ( revisedEstimateAvailCap > 0.0 ) {
 					errorAvailCap = std::abs( ( revisedEstimateAvailCap - lAvailableCoolingCapacity ) / revisedEstimateAvailCap );
 					if ( errorAvailCap > 0.05 ) { // if more than 5% error in estimate
-						ShowRecurringWarningErrorAtEnd( "ExhaustAbsorberChillerModel:\"" + trim( ExhaustAbsorber( ChillNum ).Name ) + "\", poor Condenser Supply Estimate", ExhaustAbsorber( ChillNum ).CondErrCount, errorAvailCap, errorAvailCap );
+						ShowRecurringWarningErrorAtEnd( "ExhaustAbsorberChillerModel:\"" + ExhaustAbsorber( ChillNum ).Name + "\", poor Condenser Supply Estimate", ExhaustAbsorber( ChillNum ).CondErrCount, errorAvailCap, errorAvailCap );
 					}
 				}
 			}
@@ -1642,7 +1641,7 @@ namespace ChillerExhaustAbsorption {
 		Real64 CpAir;
 		Real64 rhoHW; // local fluid density for hot water
 		int lExhaustAirInletNodeNum; // Combustion Air Inlet Node number
-		Fstring GeneratorName( MaxNameLength );
+		std::string GeneratorName;
 
 		//  INTEGER      :: lExhaustAirOutletNodeNum      ! Combustion Air Outlet (Exhaust) Node number
 
@@ -1741,7 +1740,7 @@ namespace ChillerExhaustAbsorption {
 
 				} else {
 					lHotWaterMassFlowRate = 0.0;
-					ShowRecurringWarningErrorAtEnd( "ExhaustAbsorberChillerModel:Heating\"" + trim( ExhaustAbsorber( ChillNum ).Name ) + "\", DeltaTemp = 0 in mass flow calculation", ExhaustAbsorber( ChillNum ).DeltaTempHeatErrCount );
+					ShowRecurringWarningErrorAtEnd( "ExhaustAbsorberChillerModel:Heating\"" + ExhaustAbsorber( ChillNum ).Name + "\", DeltaTemp = 0 in mass flow calculation", ExhaustAbsorber( ChillNum ).DeltaTempHeatErrCount );
 				}
 				lHotWaterSupplyTemp = HeatSupplySetPointTemp;
 			} else if ( SELECT_CASE_var == 1 ) { // mass flow rates may not be changed by loop components
@@ -1791,15 +1790,15 @@ namespace ChillerExhaustAbsorption {
 			lExhHeatRecPotentialHeat = lExhaustInFlow * CpAir * ( lExhaustInTemp - AbsLeavingTemp );
 			if ( lExhHeatRecPotentialHeat < lHeatThermalEnergyUseRate ) {
 				if ( ExhaustAbsorber( ChillNum ).ExhTempLTAbsLeavingHeatingTempIndex == 0 ) {
-					ShowWarningError( "ChillerHeater:Absorption:DoubleEffect \"" + trim( ExhaustAbsorber( ChillNum ).Name ) + "\"" );
-					ShowContinueError( "...Exhaust temperature and flow input from Micro Turbine is not sufficient " "to run the chiller during heating ." );
-					ShowContinueError( "...Value of Exhaust air inlet temp =" + trim( TrimSigDigits( lExhaustInTemp, 4 ) ) + " C." );
-					ShowContinueError( "... and Exhaust air flow rate of " + trim( TrimSigDigits( lExhaustInFlow, 2 ) ) + " kg/s." );
-					ShowContinueError( "...Value of minimum absorber leaving temp =" + trim( TrimSigDigits( AbsLeavingTemp, 4 ) ) + " C." );
-					ShowContinueError( "...Either increase the Exhaust temperature (min required = 350 C  )  " "or flow or both of Micro Turbine to meet the min available potential criteria." );
+					ShowWarningError( "ChillerHeater:Absorption:DoubleEffect \"" + ExhaustAbsorber( ChillNum ).Name + "\"" );
+					ShowContinueError( "...Exhaust temperature and flow input from Micro Turbine is not sufficient to run the chiller during heating ." );
+					ShowContinueError( "...Value of Exhaust air inlet temp =" + TrimSigDigits( lExhaustInTemp, 4 ) + " C." );
+					ShowContinueError( "... and Exhaust air flow rate of " + TrimSigDigits( lExhaustInFlow, 2 ) + " kg/s." );
+					ShowContinueError( "...Value of minimum absorber leaving temp =" + TrimSigDigits( AbsLeavingTemp, 4 ) + " C." );
+					ShowContinueError( "...Either increase the Exhaust temperature (min required = 350 C  )  or flow or both of Micro Turbine to meet the min available potential criteria." );
 					ShowContinueErrorTimeStamp( "... Simulation will continue." );
 				}
-				ShowRecurringWarningErrorAtEnd( "ChillerHeater:Absorption:DoubleEffect \"" + trim( ExhaustAbsorber( ChillNum ).Name ) + "\":" " Exhaust temperature from Micro Turbine is not sufficient to run the chiller during " "heating warning continues...", ExhaustAbsorber( ChillNum ).ExhTempLTAbsLeavingHeatingTempIndex, lExhaustInTemp, AbsLeavingTemp );
+				ShowRecurringWarningErrorAtEnd( "ChillerHeater:Absorption:DoubleEffect \"" + ExhaustAbsorber( ChillNum ).Name + "\": Exhaust temperature from Micro Turbine is not sufficient to run the chiller during heating warning continues...", ExhaustAbsorber( ChillNum ).ExhTempLTAbsLeavingHeatingTempIndex, lExhaustInTemp, AbsLeavingTemp );
 				// If exhaust is not available, it means the avilable thermal energy is 0.0 and Chiller is not available
 				lHeatThermalEnergyUseRate = 0.0;
 				lHeatElectricPower = 0.0;

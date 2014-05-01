@@ -51,7 +51,6 @@ namespace ICEngineElectricGenerator {
 
 	// Using/Aliasing
 	using namespace DataLoopNode;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::NumOfTimeStepInHour;
 	using DataGlobals::SecInHour;
 	using DataGlobals::BeginEnvrnFlag;
@@ -87,7 +86,7 @@ namespace ICEngineElectricGenerator {
 	void
 	SimICEngineGenerator(
 		int const GeneratorType, // type of Generator
-		Fstring const & GeneratorName, // user specified name of Generator
+		std::string const & GeneratorName, // user specified name of Generator
 		int & GeneratorIndex,
 		bool const RunFlag, // simulate Generator when TRUE
 		Real64 const MyLoad, // demand on electric generator
@@ -134,16 +133,16 @@ namespace ICEngineElectricGenerator {
 		//SELECT and CALL MODELS
 		if ( GeneratorIndex == 0 ) {
 			GenNum = FindItemInList( GeneratorName, ICEngineGenerator.Name(), NumICEngineGenerators );
-			if ( GenNum == 0 ) ShowFatalError( "SimICEngineGenerator: Specified Generator not one of Valid ICEngine Generators " + trim( GeneratorName ) );
+			if ( GenNum == 0 ) ShowFatalError( "SimICEngineGenerator: Specified Generator not one of Valid ICEngine Generators " + GeneratorName );
 			GeneratorIndex = GenNum;
 		} else {
 			GenNum = GeneratorIndex;
 			if ( GenNum > NumICEngineGenerators || GenNum < 1 ) {
-				ShowFatalError( "SimICEngineGenerator: Invalid GeneratorIndex passed=" + trim( TrimSigDigits( GenNum ) ) + ", Number of IC Engine Generators=" + trim( TrimSigDigits( NumICEngineGenerators ) ) + ", Generator name=" + trim( GeneratorName ) );
+				ShowFatalError( "SimICEngineGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( GenNum ) + ", Number of IC Engine Generators=" + TrimSigDigits( NumICEngineGenerators ) + ", Generator name=" + GeneratorName );
 			}
 			if ( CheckEquipName( GenNum ) ) {
 				if ( GeneratorName != ICEngineGenerator( GenNum ).Name ) {
-					ShowFatalError( "SimICEngineGenerator: Invalid GeneratorIndex passed=" + trim( TrimSigDigits( GenNum ) ) + ", Generator name=" + trim( GeneratorName ) + ", stored Generator Name for that index=" + trim( ICEngineGenerator( GenNum ).Name ) );
+					ShowFatalError( "SimICEngineGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( GenNum ) + ", Generator name=" + GeneratorName + ", stored Generator Name for that index=" + ICEngineGenerator( GenNum ).Name );
 				}
 				CheckEquipName( GenNum ) = false;
 			}
@@ -206,8 +205,8 @@ namespace ICEngineElectricGenerator {
 
 	void
 	SimICEPlantHeatRecovery(
-		Fstring const & CompType,
-		Fstring const & CompName,
+		std::string const & CompType,
+		std::string const & CompName,
 		int const CompTypeNum,
 		int & CompNum,
 		bool const RunFlag,
@@ -264,7 +263,7 @@ namespace ICEngineElectricGenerator {
 		if ( InitLoopEquip ) {
 			CompNum = FindItemInList( CompName, ICEngineGenerator.Name(), NumICEngineGenerators );
 			if ( CompNum == 0 ) {
-				ShowFatalError( "SimICEPlantHeatRecovery: ICE Generator Unit not found=" + trim( CompName ) );
+				ShowFatalError( "SimICEPlantHeatRecovery: ICE Generator Unit not found=" + CompName );
 				return;
 			}
 			MinCap = 0.0;
@@ -319,7 +318,7 @@ namespace ICEngineElectricGenerator {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_Fstring AlphArray( 10, sFstring( MaxNameLength ) ); // character string data
+		FArray1D_string AlphArray( 10 ); // character string data
 		FArray1D< Real64 > NumArray( 11 ); // numeric data
 		static bool ErrorsFound( false ); // error flag
 		bool IsNotOK; // Flag to verify name
@@ -331,7 +330,7 @@ namespace ICEngineElectricGenerator {
 		NumICEngineGenerators = GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumICEngineGenerators <= 0 ) {
-			ShowSevereError( "No " + trim( cCurrentModuleObject ) + " equipment specified in input file" );
+			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
 			ErrorsFound = true;
 		}
 
@@ -348,7 +347,7 @@ namespace ICEngineElectricGenerator {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), ICEngineGenerator.Name(), GeneratorNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( AlphArray( 1 ), ICEngineGenerator.Name(), GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -357,13 +356,13 @@ namespace ICEngineElectricGenerator {
 
 			ICEngineGenerator( GeneratorNum ).RatedPowerOutput = NumArray( 1 );
 			if ( NumArray( 1 ) == 0.0 ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 1 ) ) + "=" + trim( RoundSigDigits( NumArray( 1 ), 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 1 ) + '=' + RoundSigDigits( NumArray( 1 ), 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
 			// Not sure what to do with electric nodes, so do not use optional arguments
-			ICEngineGenerator( GeneratorNum ).ElectricCircuitNode = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, trim( cCurrentModuleObject ), AlphArray( 1 ), NodeType_Electric, NodeConnectionType_Electric, 1, ObjectIsNotParent );
+			ICEngineGenerator( GeneratorNum ).ElectricCircuitNode = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Electric, NodeConnectionType_Electric, 1, ObjectIsNotParent );
 
 			ICEngineGenerator( GeneratorNum ).MinPartLoadRat = NumArray( 2 );
 			ICEngineGenerator( GeneratorNum ).MaxPartLoadRat = NumArray( 3 );
@@ -372,43 +371,43 @@ namespace ICEngineElectricGenerator {
 			//Load Special IC ENGINE Generator Curve Fit Inputs
 			ICEngineGenerator( GeneratorNum ).ElecOutputFuelCurve = GetCurveIndex( AlphArray( 3 ) ); // convert curve name to number
 			if ( ICEngineGenerator( GeneratorNum ).ElecOutputFuelCurve == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + "=" + trim( AlphArray( 3 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + '=' + AlphArray( 3 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
 			ICEngineGenerator( GeneratorNum ).RecJacHeattoFuelCurve = GetCurveIndex( AlphArray( 4 ) ); // convert curve name to number
 			if ( ICEngineGenerator( GeneratorNum ).RecJacHeattoFuelCurve == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 4 ) ) + "=" + trim( AlphArray( 4 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + '=' + AlphArray( 4 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
 			ICEngineGenerator( GeneratorNum ).RecLubeHeattoFuelCurve = GetCurveIndex( AlphArray( 5 ) ); // convert curve name to number
 			if ( ICEngineGenerator( GeneratorNum ).RecLubeHeattoFuelCurve == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 5 ) ) + "=" + trim( AlphArray( 5 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 5 ) + '=' + AlphArray( 5 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
 			ICEngineGenerator( GeneratorNum ).TotExhausttoFuelCurve = GetCurveIndex( AlphArray( 6 ) ); // convert curve name to number
 			if ( ICEngineGenerator( GeneratorNum ).TotExhausttoFuelCurve == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 6 ) ) + "=" + trim( AlphArray( 6 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + '=' + AlphArray( 6 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
 			ICEngineGenerator( GeneratorNum ).ExhaustTempCurve = GetCurveIndex( AlphArray( 7 ) ); // convert curve name to number
 			if ( ICEngineGenerator( GeneratorNum ).ExhaustTempCurve == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( AlphArray( 7 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + AlphArray( 7 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 				ErrorsFound = true;
 			} else {
 				xValue = CurveValue( ICEngineGenerator( GeneratorNum ).ExhaustTempCurve, 1.0 );
 				if ( xValue < ReferenceTemp ) {
-					ShowSevereError( "GetICEngineGeneratorInput: " + trim( cAlphaFieldNames( 7 ) ) + " output has very low value." );
-					ShowContinueError( "...curve generates [" + trim( RoundSigDigits( xValue, 3 ) ) + " C] at PLR=1.0" );
-					ShowContinueError( "...this is less than the Reference Temperature [" + trim( RoundSigDigits( ReferenceTemp, 2 ) ) + " C] and may cause errors." );
+					ShowSevereError( "GetICEngineGeneratorInput: " + cAlphaFieldNames( 7 ) + " output has very low value." );
+					ShowContinueError( "...curve generates [" + RoundSigDigits( xValue, 3 ) + " C] at PLR=1.0" );
+					ShowContinueError( "...this is less than the Reference Temperature [" + RoundSigDigits( ReferenceTemp, 2 ) + " C] and may cause errors." );
 				}
 			}
 
@@ -421,33 +420,33 @@ namespace ICEngineElectricGenerator {
 			ICEngineGenerator( GeneratorNum ).DesignHeatRecVolFlowRate = NumArray( 10 );
 			if ( ICEngineGenerator( GeneratorNum ).DesignHeatRecVolFlowRate > 0.0 ) {
 				ICEngineGenerator( GeneratorNum ).HeatRecActive = true;
-				ICEngineGenerator( GeneratorNum ).HeatRecInletNodeNum = GetOnlySingleNode( AlphArray( 8 ), ErrorsFound, trim( cCurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+				ICEngineGenerator( GeneratorNum ).HeatRecInletNodeNum = GetOnlySingleNode( AlphArray( 8 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 				if ( ICEngineGenerator( GeneratorNum ).HeatRecInletNodeNum == 0 ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 8 ) ) + "=" + trim( AlphArray( 8 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 8 ) + '=' + AlphArray( 8 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 					ErrorsFound = true;
 				}
-				ICEngineGenerator( GeneratorNum ).HeatRecOutletNodeNum = GetOnlySingleNode( AlphArray( 9 ), ErrorsFound, trim( cCurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+				ICEngineGenerator( GeneratorNum ).HeatRecOutletNodeNum = GetOnlySingleNode( AlphArray( 9 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 				if ( ICEngineGenerator( GeneratorNum ).HeatRecOutletNodeNum == 0 ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 9 ) ) + "=" + trim( AlphArray( 9 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 9 ) + '=' + AlphArray( 9 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 					ErrorsFound = true;
 				}
-				TestCompSet( trim( cCurrentModuleObject ), AlphArray( 1 ), AlphArray( 8 ), AlphArray( 9 ), "Heat Recovery Nodes" );
+				TestCompSet( cCurrentModuleObject, AlphArray( 1 ), AlphArray( 8 ), AlphArray( 9 ), "Heat Recovery Nodes" );
 				RegisterPlantCompDesignFlow( ICEngineGenerator( GeneratorNum ).HeatRecInletNodeNum, ICEngineGenerator( GeneratorNum ).DesignHeatRecVolFlowRate );
 			} else {
 				ICEngineGenerator( GeneratorNum ).HeatRecActive = false;
 				ICEngineGenerator( GeneratorNum ).HeatRecInletNodeNum = 0;
 				ICEngineGenerator( GeneratorNum ).HeatRecOutletNodeNum = 0;
 				if ( ! lAlphaFieldBlanks( 8 ) || ! lAlphaFieldBlanks( 9 ) ) {
-					ShowWarningError( "Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+					ShowWarningError( "Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 					ShowContinueError( "However, Node names were specified for Heat Recovery inlet or outlet nodes" );
 				}
 			}
 
 			//Fuel Type Case Statement
 			{ auto const SELECT_CASE_var( AlphArray( 10 ) );
-			if ( SELECT_CASE_var == "  " ) { //If blank then the default is Diesel
+			if ( is_blank( SELECT_CASE_var ) ) { //If blank then the default is Diesel
 				ICEngineGenerator( GeneratorNum ).FuelType = "Diesel";
 
 			} else if ( ( SELECT_CASE_var == "GAS" ) || ( SELECT_CASE_var == "NATURALGAS" ) || ( SELECT_CASE_var == "NATURAL GAS" ) ) {
@@ -475,8 +474,8 @@ namespace ICEngineElectricGenerator {
 				ICEngineGenerator( GeneratorNum ).FuelType = "OtherFuel2";
 
 			} else {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 10 ) ) + "=" + trim( AlphArray( 10 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( AlphArray( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 10 ) + '=' + AlphArray( 10 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}}
 
@@ -485,21 +484,21 @@ namespace ICEngineElectricGenerator {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + trim( cCurrentModuleObject ) );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
 		}
 
 		for ( GeneratorNum = 1; GeneratorNum <= NumICEngineGenerators; ++GeneratorNum ) {
 			SetupOutputVariable( "Generator Produced Electric Power [W]", ICEngineGeneratorReport( GeneratorNum ).PowerGen, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
 			SetupOutputVariable( "Generator Produced Electric Energy [J]", ICEngineGeneratorReport( GeneratorNum ).EnergyGen, "System", "Sum", ICEngineGenerator( GeneratorNum ).Name, _, "ElectricityProduced", "COGENERATION", _, "Plant" );
 
-			SetupOutputVariable( "Generator " + trim( ICEngineGenerator( GeneratorNum ).FuelType ) + " Rate [W]", ICEngineGeneratorReport( GeneratorNum ).FuelEnergyUseRate, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
-			SetupOutputVariable( "Generator " + trim( ICEngineGenerator( GeneratorNum ).FuelType ) + " Energy [J]", ICEngineGeneratorReport( GeneratorNum ).FuelEnergy, "System", "Sum", ICEngineGenerator( GeneratorNum ).Name, _, ICEngineGenerator( GeneratorNum ).FuelType, "COGENERATION", _, "Plant" );
+			SetupOutputVariable( "Generator " + ICEngineGenerator( GeneratorNum ).FuelType + " Rate [W]", ICEngineGeneratorReport( GeneratorNum ).FuelEnergyUseRate, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator " + ICEngineGenerator( GeneratorNum ).FuelType + " Energy [J]", ICEngineGeneratorReport( GeneratorNum ).FuelEnergy, "System", "Sum", ICEngineGenerator( GeneratorNum ).Name, _, ICEngineGenerator( GeneratorNum ).FuelType, "COGENERATION", _, "Plant" );
 
 			//    general fuel use report to match other generators.
 			SetupOutputVariable( "Generator Fuel HHV Basis Rate [W]", ICEngineGeneratorReport( GeneratorNum ).FuelEnergyUseRate, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
 			SetupOutputVariable( "Generator Fuel HHV Basis Energy [J]", ICEngineGeneratorReport( GeneratorNum ).FuelEnergy, "System", "Sum", ICEngineGenerator( GeneratorNum ).Name );
 
-			SetupOutputVariable( "Generator " + trim( ICEngineGenerator( GeneratorNum ).FuelType ) + " Mass Flow Rate [kg/s]", ICEngineGeneratorReport( GeneratorNum ).FuelMdot, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator " + ICEngineGenerator( GeneratorNum ).FuelType + " Mass Flow Rate [kg/s]", ICEngineGeneratorReport( GeneratorNum ).FuelMdot, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
 
 			SetupOutputVariable( "Generator Exhaust Air Temperature [C]", ICEngineGeneratorReport( GeneratorNum ).ExhaustStackTemp, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
 
@@ -703,11 +702,11 @@ namespace ICEngineElectricGenerator {
 				QExhaustRec = max( ExhaustGasFlow * ExhaustCP * ( ExhaustTemp - ExhaustStackTemp ), 0.0 );
 			} else {
 				if ( ICEngineGenerator( GeneratorNum ).ErrExhaustTempIndex == 0 ) {
-					ShowWarningMessage( "CalcICEngineGeneratorModel: " + trim( ICEngineGenerator( GeneratorNum ).TypeOf ) + "=\"" + trim( ICEngineGenerator( GeneratorNum ).Name ) + "\" low Exhaust Temperature from Curve Value" );
-					ShowContinueError( "...curve generated temperature=[" + trim( RoundSigDigits( ExhaustTemp, 3 ) ) + " C], PLR=[" + trim( RoundSigDigits( PLR, 3 ) ) + "]." );
+					ShowWarningMessage( "CalcICEngineGeneratorModel: " + ICEngineGenerator( GeneratorNum ).TypeOf + "=\"" + ICEngineGenerator( GeneratorNum ).Name + "\" low Exhaust Temperature from Curve Value" );
+					ShowContinueError( "...curve generated temperature=[" + RoundSigDigits( ExhaustTemp, 3 ) + " C], PLR=[" + RoundSigDigits( PLR, 3 ) + "]." );
 					ShowContinueError( "...simulation will continue with exhaust heat reclaim set to 0." );
 				}
-				ShowRecurringWarningErrorAtEnd( "CalcICEngineGeneratorModel: " + trim( ICEngineGenerator( GeneratorNum ).TypeOf ) + "=\"" + trim( ICEngineGenerator( GeneratorNum ).Name ) + "\" low Exhaust Temperature continues...", ICEngineGenerator( GeneratorNum ).ErrExhaustTempIndex, ExhaustTemp, ExhaustTemp, _, "[C]", "[C]" );
+				ShowRecurringWarningErrorAtEnd( "CalcICEngineGeneratorModel: " + ICEngineGenerator( GeneratorNum ).TypeOf + "=\"" + ICEngineGenerator( GeneratorNum ).Name + "\" low Exhaust Temperature continues...", ICEngineGenerator( GeneratorNum ).ErrExhaustTempIndex, ExhaustTemp, ExhaustTemp, _, "[C]", "[C]" );
 				QExhaustRec = 0.0;
 				ExhaustStackTemp = ICEngineGenerator( GeneratorNum ).DesignMinExitGasTemp;
 			}

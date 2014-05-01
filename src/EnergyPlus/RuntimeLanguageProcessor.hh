@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -17,7 +16,6 @@ namespace EnergyPlus {
 namespace RuntimeLanguageProcessor {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 	using DataRuntimeLanguage::ErlValueType;
 
 	// Data
@@ -97,44 +95,42 @@ namespace RuntimeLanguageProcessor {
 		// structure for token information for parsing Erl code
 		int Type; // token type, eg. TokenNumber
 		Real64 Number; // May want to store all literals as a variable?
-		Fstring String; // Serves double duty, also saves string version of token for easy debugging
+		std::string String; // Serves double duty, also saves string version of token for easy debugging
 		int Operator; // indentifies operator or function 1..64
 		int Variable; // points to a variable in ErlVariable structure
 		int Parenthesis; // identifes if token is left or right parenthesis
 		int Expression; // points to an expression in ErlExpression structure
-		Fstring Error; // holds token processing error message content
+		std::string Error; // holds token processing error message content
 
 		// Default Constructor
 		TokenType() :
 			Type( 0 ),
 			Number( 0.0 ),
-			String( 2 * MaxNameLength ),
 			Operator( 0 ),
 			Variable( 0 ),
 			Parenthesis( 0 ),
-			Expression( 0 ),
-			Error( 2 * MaxNameLength )
+			Expression( 0 )
 		{}
 
 		// Member Constructor
 		TokenType(
 			int const Type, // token type, eg. TokenNumber
 			Real64 const Number, // May want to store all literals as a variable?
-			Fstring const & String, // Serves double duty, also saves string version of token for easy debugging
+			std::string const & String, // Serves double duty, also saves string version of token for easy debugging
 			int const Operator, // indentifies operator or function 1..64
 			int const Variable, // points to a variable in ErlVariable structure
 			int const Parenthesis, // identifes if token is left or right parenthesis
 			int const Expression, // points to an expression in ErlExpression structure
-			Fstring const & Error // holds token processing error message content
+			std::string const & Error // holds token processing error message content
 		) :
 			Type( Type ),
 			Number( Number ),
-			String( 2 * MaxNameLength, String ),
+			String( String ),
 			Operator( Operator ),
 			Variable( Variable ),
 			Parenthesis( Parenthesis ),
 			Expression( Expression ),
-			Error( 2 * MaxNameLength, Error )
+			Error( Error )
 		{}
 
 	};
@@ -142,24 +138,23 @@ namespace RuntimeLanguageProcessor {
 	struct RuntimeReportVarType
 	{
 		// Members
-		Fstring Name; // name of custom Erl report variable
+		std::string Name; // name of custom Erl report variable
 		int VariableNum; // pointer to Erl variable associated with custom report variable
 		Real64 Value; // Value registered with output processor for report variable
 
 		// Default Constructor
 		RuntimeReportVarType() :
-			Name( MaxNameLength ),
 			VariableNum( 0 ),
 			Value( 0.0 )
 		{}
 
 		// Member Constructor
 		RuntimeReportVarType(
-			Fstring const & Name, // name of custom Erl report variable
+			std::string const & Name, // name of custom Erl report variable
 			int const VariableNum, // pointer to Erl variable associated with custom report variable
 			Real64 const Value // Value registered with output processor for report variable
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			VariableNum( VariableNum ),
 			Value( Value )
 		{}
@@ -193,7 +188,7 @@ namespace RuntimeLanguageProcessor {
 	AddError(
 		int const StackNum, // index pointer to location in ErlStack structure
 		int const LineNum, // Erl program line number
-		Fstring const & Error // error message to be added to ErlStack
+		std::string const & Error // error message to be added to ErlStack
 	);
 
 	ErlValueType
@@ -214,10 +209,10 @@ namespace RuntimeLanguageProcessor {
 
 	void
 	ParseExpression(
-		Fstring const & InString, // String of expression text written in the Runtime Language
+		std::string const & InString, // String of expression text written in the Runtime Language
 		int const StackNum, // Parent StackNum??
 		int & ExpressionNum, // index of expression in structure
-		Fstring const & Line // Actual line from string
+		std::string const & Line // Actual line from string
 	);
 
 	int
@@ -225,7 +220,7 @@ namespace RuntimeLanguageProcessor {
 		FArray1S< TokenType > const TokenIN,
 		int const NumTokensIN,
 		int const StackNum,
-		Fstring const & ParsingString
+		std::string const & ParsingString
 	);
 
 	int
@@ -240,7 +235,7 @@ namespace RuntimeLanguageProcessor {
 	void
 	ReportRuntimeLanguage();
 
-	Fstring
+	std::string
 	IntegerToString( int const Number );
 
 	ErlValueType
@@ -250,20 +245,20 @@ namespace RuntimeLanguageProcessor {
 	);
 
 	ErlValueType
-	StringValue( Fstring const & String );
+	StringValue( std::string const & String );
 
-	Fstring
+	std::string
 	ValueToString( ErlValueType const & Value );
 
 	int
 	FindEMSVariable(
-		Fstring const & VariableName, // variable name in Erl
+		std::string const & VariableName, // variable name in Erl
 		int const StackNum
 	);
 
 	int
 	NewEMSVariable(
-		Fstring const & VariableName,
+		std::string const & VariableName,
 		int const StackNum,
 		Optional< ErlValueType const > Value = _
 	);

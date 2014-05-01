@@ -42,7 +42,7 @@ public: // Creation
 	// Default Constructor
 	inline
 	Dimension() :
-		exp_p_( 0 ),
+		exp_p_( nullptr ),
 		initialized_( false ),
 		value_( 0 )
 	{}

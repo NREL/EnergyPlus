@@ -45,7 +45,6 @@ namespace WaterManager {
 	// <use statements for data only modules>
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::BigNumber;
 	using namespace DataWater;
 
@@ -266,14 +265,14 @@ namespace WaterManager {
 		static bool IsBlank( false );
 		static int alphaOffset( 0 );
 		static int SurfNum( 0 );
-		static Fstring objNameMsg( MaxNameLength );
-		FArray1D_Fstring cAlphaFieldNames( sFstring( MaxNameLength + 40 ) );
-		FArray1D_Fstring cNumericFieldNames( sFstring( MaxNameLength + 40 ) );
+		static std::string objNameMsg;
+		FArray1D_string cAlphaFieldNames;
+		FArray1D_string cNumericFieldNames;
 		FArray1D_bool lNumericFieldBlanks;
 		FArray1D_bool lAlphaFieldBlanks;
-		FArray1D_Fstring cAlphaArgs( sFstring( MaxNameLength ) );
+		FArray1D_string cAlphaArgs;
 		FArray1D< Real64 > rNumericArgs;
-		Fstring cCurrentModuleObject( MaxNameLength );
+		std::string cCurrentModuleObject;
 		static Real64 tmpMax( 0.0 );
 		static Real64 tmpMin( 0.0 );
 		static Real64 tmpNumerator( 0.0 );
@@ -307,13 +306,13 @@ namespace WaterManager {
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 			cAlphaFieldNames.allocate( MaxNumAlphas );
-			cAlphaFieldNames = " ";
+			cAlphaFieldNames = "";
 			cAlphaArgs.allocate( MaxNumAlphas );
-			cAlphaArgs = " ";
+			cAlphaArgs = "";
 			lAlphaFieldBlanks.allocate( MaxNumAlphas );
 			lAlphaFieldBlanks = false;
 			cNumericFieldNames.allocate( MaxNumNumbers );
-			cNumericFieldNames = " ";
+			cNumericFieldNames = "";
 			rNumericArgs.allocate( MaxNumNumbers );
 			rNumericArgs = 0.0;
 			lNumericFieldBlanks.allocate( MaxNumNumbers );
@@ -330,12 +329,12 @@ namespace WaterManager {
 					GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 					AnyWaterSystemsInModel = true;
 					WaterStorage( Item ).Name = cAlphaArgs( 1 );
-					VerifyName( cAlphaArgs( 1 ), WaterStorage.Name(), Item - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+					VerifyName( cAlphaArgs( 1 ), WaterStorage.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 					}
-					objNameMsg = trim( trim( cCurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+					objNameMsg = cCurrentModuleObject + " = " + cAlphaArgs( 1 );
 
 					WaterStorage( Item ).QualitySubCategoryName = cAlphaArgs( 2 );
 					//    If (SameString(cAlphaArgs(2), 'Mains')) Then
@@ -382,19 +381,19 @@ namespace WaterManager {
 					} else if ( SameString( cAlphaArgs( 4 ), "OtherTank" ) ) {
 						WaterStorage( Item ).ControlSupplyType = OtherTankFloatValve;
 					} else {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 4 ) ) + "=" + trim( cAlphaArgs( 4 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					}
 					WaterStorage( Item ).ValveOnCapacity = rNumericArgs( 5 );
 					WaterStorage( Item ).ValveOffCapacity = rNumericArgs( 6 );
 					if ( WaterStorage( Item ).ControlSupplyType != NoControlLevel ) {
 						if ( WaterStorage( Item ).ValveOffCapacity < WaterStorage( Item ).ValveOnCapacity ) {
-							ShowSevereError( "Invalid " + trim( cNumericFieldNames( 5 ) ) + " and/or " + trim( cNumericFieldNames( 6 ) ) );
-							ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
-							ShowContinueError( trim( cNumericFieldNames( 6 ) ) + " must be greater than " + trim( cNumericFieldNames( 5 ) ) );
-							ShowContinueError( "Check value for " + trim( cNumericFieldNames( 5 ) ) + " = " + trim( RoundSigDigits( WaterStorage( Item ).ValveOnCapacity, 5 ) ) );
-							ShowContinueError( "which must be lower than " + trim( cNumericFieldNames( 6 ) ) + " = " + trim( RoundSigDigits( WaterStorage( Item ).ValveOffCapacity, 5 ) ) );
+							ShowSevereError( "Invalid " + cNumericFieldNames( 5 ) + " and/or " + cNumericFieldNames( 6 ) );
+							ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
+							ShowContinueError( cNumericFieldNames( 6 ) + " must be greater than " + cNumericFieldNames( 5 ) );
+							ShowContinueError( "Check value for " + cNumericFieldNames( 5 ) + " = " + RoundSigDigits( WaterStorage( Item ).ValveOnCapacity, 5 ) );
+							ShowContinueError( "which must be lower than " + cNumericFieldNames( 6 ) + " = " + RoundSigDigits( WaterStorage( Item ).ValveOffCapacity, 5 ) );
 							ErrorsFound = true;
 						}
 					}
@@ -416,29 +415,29 @@ namespace WaterManager {
 					} else if ( SameString( cAlphaArgs( 6 ), "ThermalModel" ) ) {
 						WaterStorage( Item ).ThermalMode = TankZoneThermalCoupled;
 					} else {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 6 ) ) + "=" + trim( cAlphaArgs( 6 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + '=' + cAlphaArgs( 6 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					}
 
 					if ( WaterStorage( Item ).ThermalMode == ScheduledTankTemp ) {
 						WaterStorage( Item ).TempSchedID = GetScheduleIndex( cAlphaArgs( 7 ) );
 						if ( WaterStorage( Item ).TempSchedID == 0 ) {
-							ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( cAlphaArgs( 7 ) ) );
-							ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+							ShowSevereError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
+							ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 							ErrorsFound = true;
 						}
 						tmpMin = GetScheduleMinValue( WaterStorage( Item ).TempSchedID );
 						if ( tmpMin < 0.0 ) {
-							ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( cAlphaArgs( 7 ) ) );
-							ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
-							ShowContinueError( "Found storage tank temperature schedule value less than 0.0 in " + trim( objNameMsg ) );
+							ShowSevereError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
+							ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
+							ShowContinueError( "Found storage tank temperature schedule value less than 0.0 in " + objNameMsg );
 							ErrorsFound = true;
 						}
 						tmpMax = GetScheduleMaxValue( WaterStorage( Item ).TempSchedID );
 						if ( tmpMax > 100.0 ) {
-							ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( cAlphaArgs( 7 ) ) );
-							ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
-							ShowContinueError( "found storage tank temperature schedule value greater than 100.0 in " + trim( objNameMsg ) );
+							ShowSevereError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
+							ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
+							ShowContinueError( "found storage tank temperature schedule value greater than 100.0 in " + objNameMsg );
 							ErrorsFound = true;
 						}
 
@@ -452,20 +451,20 @@ namespace WaterManager {
 						} else if ( SameString( cAlphaArgs( 8 ), "Outdoors" ) ) {
 							WaterStorage( Item ).AmbientTempIndicator = AmbientTempExterior;
 						} else {
-							ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 8 ) ) + "=" + trim( cAlphaArgs( 8 ) ) );
-							ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+							ShowSevereError( "Invalid " + cAlphaFieldNames( 8 ) + '=' + cAlphaArgs( 8 ) );
+							ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 							ErrorsFound = true;
 						}
 						WaterStorage( Item ).AmbientTempSchedule = GetScheduleIndex( cAlphaArgs( 9 ) );
 						if ( ( WaterStorage( Item ).AmbientTempSchedule == 0 ) && ( WaterStorage( Item ).AmbientTempIndicator == AmbientTempSchedule ) ) {
-							ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 9 ) ) + "=" + trim( cAlphaArgs( 9 ) ) );
-							ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+							ShowSevereError( "Invalid " + cAlphaFieldNames( 9 ) + '=' + cAlphaArgs( 9 ) );
+							ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 							ErrorsFound = true;
 						}
 						WaterStorage( Item ).ZoneID = FindItemInList( cAlphaArgs( 10 ), Zone.Name(), NumOfZones );
 						if ( ( WaterStorage( Item ).ZoneID == 0 ) && ( WaterStorage( Item ).AmbientTempIndicator == AmbientTempZone ) ) {
-							ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 10 ) ) + "=" + trim( cAlphaArgs( 10 ) ) );
-							ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+							ShowSevereError( "Invalid " + cAlphaFieldNames( 10 ) + '=' + cAlphaArgs( 10 ) );
+							ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 							ErrorsFound = true;
 						}
 						WaterStorage( Item ).SurfArea = rNumericArgs( 8 );
@@ -486,18 +485,18 @@ namespace WaterManager {
 				for ( Item = 1; Item <= NumRainCollectors; ++Item ) {
 					GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 					RainCollector( Item ).Name = cAlphaArgs( 1 );
-					VerifyName( cAlphaArgs( 1 ), RainCollector.Name(), Item - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Named " );
+					VerifyName( cAlphaArgs( 1 ), RainCollector.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Named " );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 					}
-					objNameMsg = trim( cCurrentModuleObject ) + " Named " + trim( cAlphaArgs( 1 ) );
+					objNameMsg = cCurrentModuleObject + " Named " + cAlphaArgs( 1 );
 
 					RainCollector( Item ).StorageTankName = cAlphaArgs( 2 );
 					RainCollector( Item ).StorageTankID = FindItemInList( cAlphaArgs( 2 ), WaterStorage.Name(), NumWaterStorageTanks );
 					if ( RainCollector( Item ).StorageTankID == 0 ) {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					}
 
@@ -506,19 +505,19 @@ namespace WaterManager {
 					} else if ( SameString( cAlphaArgs( 3 ), "Scheduled" ) ) {
 						RainCollector( Item ).LossFactorMode = ScheduledRainLossFactor;
 					} else {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + "=" + trim( cAlphaArgs( 3 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					}
 					RainCollector( Item ).LossFactor = rNumericArgs( 1 );
 					if ( RainCollector( Item ).LossFactor > 1.0 ) {
-						ShowWarningError( "Invalid " + trim( cNumericFieldNames( 1 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 1 ), 2 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowWarningError( "Invalid " + cNumericFieldNames( 1 ) + '=' + RoundSigDigits( rNumericArgs( 1 ), 2 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ShowContinueError( "found rain water collection loss factor greater than 1.0, simulation continues" );
 					}
 					if ( RainCollector( Item ).LossFactor < 0.0 ) {
-						ShowSevereError( "Invalid " + trim( cNumericFieldNames( 1 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 1 ), 2 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cNumericFieldNames( 1 ) + '=' + RoundSigDigits( rNumericArgs( 1 ), 2 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ShowContinueError( "found rain water collection loss factor less than 0.0" );
 						ErrorsFound = true;
 					}
@@ -526,19 +525,19 @@ namespace WaterManager {
 					if ( RainCollector( Item ).LossFactorMode == ScheduledRainLossFactor ) {
 						RainCollector( Item ).LossFactorSchedID = GetScheduleIndex( cAlphaArgs( 4 ) );
 						if ( RainCollector( Item ).LossFactorSchedID == 0 ) {
-							ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 4 ) ) + "=" + trim( cAlphaArgs( 4 ) ) );
-							ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+							ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
+							ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 							ErrorsFound = true;
 						}
 						if ( GetScheduleMinValue( RainCollector( Item ).LossFactorSchedID ) < 0.0 ) {
-							ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 4 ) ) + "=" + trim( cAlphaArgs( 4 ) ) );
-							ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
-							ShowContinueError( "found rain water collection loss factor schedule value less than 0.0 in " + trim( objNameMsg ) );
+							ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
+							ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
+							ShowContinueError( "found rain water collection loss factor schedule value less than 0.0 in " + objNameMsg );
 							ErrorsFound = true;
 						}
 						if ( GetScheduleMaxValue( RainCollector( Item ).LossFactorSchedID ) > 1.0 ) {
-							ShowWarningError( "Potentially invalid " + trim( cAlphaFieldNames( 4 ) ) + "=" + trim( cAlphaArgs( 4 ) ) );
-							ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+							ShowWarningError( "Potentially invalid " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
+							ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 							ShowContinueError( "found rain water collection loss factor schedule value greater than 1.0, " "simulation continues" );
 							// allowing it to continue
 						}
@@ -555,8 +554,8 @@ namespace WaterManager {
 						RainCollector( Item ).SurfName( SurfNum ) = cAlphaArgs( SurfNum + alphaOffset );
 						RainCollector( Item ).SurfID( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + alphaOffset ), Surface.Name(), TotSurfaces );
 						if ( RainCollector( Item ).SurfID( SurfNum ) == 0 ) {
-							ShowSevereError( "Invalid " + trim( cAlphaFieldNames( SurfNum + alphaOffset ) ) + "=" + trim( cAlphaArgs( SurfNum + alphaOffset ) ) );
-							ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+							ShowSevereError( "Invalid " + cAlphaFieldNames( SurfNum + alphaOffset ) + '=' + cAlphaArgs( SurfNum + alphaOffset ) );
+							ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 							ErrorsFound = true;
 						}
 					}
@@ -576,7 +575,7 @@ namespace WaterManager {
 					RainCollector( Item ).MeanHeight = tmpNumerator / tmpDenominator;
 
 					// now set up tank supply connection
-					InternalSetupTankSupplyComponent( RainCollector( Item ).Name, trim( cCurrentModuleObject ), RainCollector( Item ).StorageTankName, ErrorsFound, RainCollector( Item ).StorageTankID, RainCollector( Item ).StorageTankSupplyARRID );
+					InternalSetupTankSupplyComponent( RainCollector( Item ).Name, cCurrentModuleObject, RainCollector( Item ).StorageTankName, ErrorsFound, RainCollector( Item ).StorageTankID, RainCollector( Item ).StorageTankSupplyARRID );
 				}
 			} // (NumRainCollectors > 0)
 
@@ -588,15 +587,15 @@ namespace WaterManager {
 				for ( Item = 1; Item <= NumGroundWaterWells; ++Item ) {
 					GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					GroundwaterWell( Item ).Name = cAlphaArgs( 1 );
-					VerifyName( cAlphaArgs( 1 ), GroundwaterWell.Name(), Item - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+					VerifyName( cAlphaArgs( 1 ), GroundwaterWell.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 					}
-					objNameMsg = trim( cCurrentModuleObject ) + " Named " + trim( cAlphaArgs( 1 ) );
+					objNameMsg = cCurrentModuleObject + " Named " + cAlphaArgs( 1 );
 					GroundwaterWell( Item ).StorageTankName = cAlphaArgs( 2 );
 
-					InternalSetupTankSupplyComponent( GroundwaterWell( Item ).Name, trim( cCurrentModuleObject ), GroundwaterWell( Item ).StorageTankName, ErrorsFound, GroundwaterWell( Item ).StorageTankID, GroundwaterWell( Item ).StorageTankSupplyARRID );
+					InternalSetupTankSupplyComponent( GroundwaterWell( Item ).Name, cCurrentModuleObject, GroundwaterWell( Item ).StorageTankName, ErrorsFound, GroundwaterWell( Item ).StorageTankID, GroundwaterWell( Item ).StorageTankSupplyARRID );
 
 					if ( allocated( WaterStorage ) ) WaterStorage( GroundwaterWell( Item ).StorageTankID ).GroundWellID = Item;
 
@@ -614,8 +613,8 @@ namespace WaterManager {
 					} else if ( lAlphaFieldBlanks( 3 ) ) {
 						GroundwaterWell( Item ).GroundwaterTableMode = 0;
 					} else {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + "=" + trim( cAlphaArgs( 3 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					}
 
@@ -624,8 +623,8 @@ namespace WaterManager {
 					// A4; \field water table depth schedule
 					GroundwaterWell( Item ).WaterTableDepthSchedID = GetScheduleIndex( cAlphaArgs( 4 ) );
 					if ( ( GroundwaterWell( Item ).GroundwaterTableMode == ScheduledWaterTable ) && ( GroundwaterWell( Item ).WaterTableDepthSchedID == 0 ) ) {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 4 ) ) + "=" + trim( cAlphaArgs( 4 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					}
 
@@ -639,7 +638,7 @@ namespace WaterManager {
 					// check that all storage tanks with ground well controls actually had wells pointing to them
 					if ( ( WaterStorage( Item ).ControlSupplyType == WellFloatValve ) || ( WaterStorage( Item ).ControlSupplyType == WellFloatMainsBackup ) ) {
 						if ( WaterStorage( Item ).GroundWellID == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + "= \"" + trim( WaterStorage( Item ).Name ) + "\" does not have a WaterUse:Well (groundwater well) that names it." );
+							ShowSevereError( cCurrentModuleObject + "= \"" + WaterStorage( Item ).Name + "\" does not have a WaterUse:Well (groundwater well) that names it." );
 							ErrorsFound = true;
 						}
 					}
@@ -648,28 +647,28 @@ namespace WaterManager {
 					if ( ( WaterStorage( Item ).ControlSupplyType == OtherTankFloatValve ) || ( WaterStorage( Item ).ControlSupplyType == TankMainsBackup ) ) {
 						WaterStorage( Item ).SupplyTankID = FindItemInList( WaterStorage( Item ).SupplyTankName, WaterStorage.Name(), NumWaterStorageTanks );
 						if ( WaterStorage( Item ).SupplyTankID == 0 ) {
-							ShowSevereError( "Other tank called " + trim( WaterStorage( Item ).SupplyTankName ) + " not found for " + trim( cCurrentModuleObject ) + " Named " + trim( WaterStorage( Item ).Name ) ); // TODO rename point
+							ShowSevereError( "Other tank called " + WaterStorage( Item ).SupplyTankName + " not found for " + cCurrentModuleObject + " Named " + WaterStorage( Item ).Name ); // TODO rename point
 							ErrorsFound = true;
 						}
-						InternalSetupTankDemandComponent( WaterStorage( Item ).Name, trim( cCurrentModuleObject ), WaterStorage( Item ).SupplyTankName, ErrorsFound, WaterStorage( Item ).SupplyTankID, WaterStorage( Item ).SupplyTankDemandARRID );
+						InternalSetupTankDemandComponent( WaterStorage( Item ).Name, cCurrentModuleObject, WaterStorage( Item ).SupplyTankName, ErrorsFound, WaterStorage( Item ).SupplyTankID, WaterStorage( Item ).SupplyTankDemandARRID );
 						//call to setup tank supply as well
-						InternalSetupTankSupplyComponent( WaterStorage( Item ).SupplyTankName, trim( cCurrentModuleObject ), WaterStorage( Item ).Name, ErrorsFound, Dummy, Dummy );
+						InternalSetupTankSupplyComponent( WaterStorage( Item ).SupplyTankName, cCurrentModuleObject, WaterStorage( Item ).Name, ErrorsFound, Dummy, Dummy );
 					}
 					// setup overflow inputs
 					WaterStorage( Item ).OverflowTankID = FindItemInList( WaterStorage( Item ).OverflowTankName, WaterStorage.Name(), NumWaterStorageTanks );
 					if ( WaterStorage( Item ).OverflowTankID == 0 ) {
 						// if blank, then okay it is discarded.  but if not blank then error
-						if ( WaterStorage( Item ).OverflowTankName == "     " ) {
+						if ( is_blank( WaterStorage( Item ).OverflowTankName ) ) {
 							WaterStorage( Item ).OverflowMode = OverflowDiscarded;
 						} else {
-							ShowSevereError( "Overflow tank name of " + trim( WaterStorage( Item ).OverflowTankName ) + " not found for " + trim( cCurrentModuleObject ) + " Named " + trim( WaterStorage( Item ).Name ) );
+							ShowSevereError( "Overflow tank name of " + WaterStorage( Item ).OverflowTankName + " not found for " + cCurrentModuleObject + " Named " + WaterStorage( Item ).Name );
 							ErrorsFound = true;
 						}
 					} else {
 						WaterStorage( Item ).OverflowMode = OverflowToTank;
 					}
 					if ( WaterStorage( Item ).OverflowMode == OverflowToTank ) {
-						InternalSetupTankSupplyComponent( WaterStorage( Item ).Name, trim( cCurrentModuleObject ), WaterStorage( Item ).OverflowTankName, ErrorsFound, WaterStorage( Item ).OverflowTankID, WaterStorage( Item ).OverflowTankSupplyARRID );
+						InternalSetupTankSupplyComponent( WaterStorage( Item ).Name, cCurrentModuleObject, WaterStorage( Item ).OverflowTankName, ErrorsFound, WaterStorage( Item ).OverflowTankID, WaterStorage( Item ).OverflowTankSupplyARRID );
 					}
 
 				}
@@ -678,7 +677,7 @@ namespace WaterManager {
 			cCurrentModuleObject = "Site:Precipitation";
 			NumSiteRainFall = GetNumObjectsFound( cCurrentModuleObject );
 			if ( NumSiteRainFall > 1 ) { // throw error
-				ShowSevereError( "Only one " + trim( cCurrentModuleObject ) + " object is allowed" );
+				ShowSevereError( "Only one " + cCurrentModuleObject + " object is allowed" );
 				ErrorsFound = true;
 			}
 
@@ -689,17 +688,17 @@ namespace WaterManager {
 				if ( SameString( cAlphaArgs( 1 ), "ScheduleAndDesignLevel" ) ) {
 					RainFall.ModeID = RainSchedDesign;
 				} else {
-					ShowSevereError( "Precipitation Model Type of " + trim( cCurrentModuleObject ) + " is incorrect." );
+					ShowSevereError( "Precipitation Model Type of " + cCurrentModuleObject + " is incorrect." );
 					ShowContinueError( "Only available option is ScheduleAndDesignLevel." );
 					ErrorsFound = true;
 				}
 				RainFall.RainSchedID = GetScheduleIndex( cAlphaArgs( 2 ) );
 				if ( ( RainFall.RainSchedID == 0 ) && ( RainFall.ModeID == RainSchedDesign ) ) {
-					ShowSevereError( "Schedule not found for " + trim( cCurrentModuleObject ) + " object" );
+					ShowSevereError( "Schedule not found for " + cCurrentModuleObject + " object" );
 					ErrorsFound = true;
 				} else if ( ( RainFall.RainSchedID == 0 ) && ( RainFall.ModeID == RainSchedDesign ) ) {
 					if ( ! CheckScheduleValueMinMax( RainFall.RainSchedID, ">=", 0.0 ) ) {
-						ShowSevereError( "Schedule=" + trim( cAlphaArgs( 2 ) ) + " for " + trim( cCurrentModuleObject ) + " object has values < 0." );
+						ShowSevereError( "Schedule=" + cAlphaArgs( 2 ) + " for " + cCurrentModuleObject + " object has values < 0." );
 						ErrorsFound = true;
 					}
 				}
@@ -712,7 +711,7 @@ namespace WaterManager {
 			cCurrentModuleObject = "RoofIrrigation";
 			NumIrrigation = GetNumObjectsFound( cCurrentModuleObject );
 			if ( NumIrrigation > 1 ) {
-				ShowSevereError( "Only one " + trim( cCurrentModuleObject ) + " object is allowed" );
+				ShowSevereError( "Only one " + cCurrentModuleObject + " object is allowed" );
 				ErrorsFound = true;
 			}
 
@@ -724,16 +723,16 @@ namespace WaterManager {
 				} else if ( SameString( cAlphaArgs( 1 ), "SmartSchedule" ) ) {
 					Irrigation.ModeID = IrrSmartSched;
 				} else {
-					ShowSevereError( "Type of " + trim( cCurrentModuleObject ) + " is incorrect. Options are " "Schedule or SmartSchedule" );
+					ShowSevereError( "Type of " + cCurrentModuleObject + " is incorrect. Options are " "Schedule or SmartSchedule" );
 					ErrorsFound = true;
 				}
 				Irrigation.IrrSchedID = GetScheduleIndex( cAlphaArgs( 2 ) );
 				if ( ( Irrigation.IrrSchedID == 0 ) && ( ( Irrigation.ModeID == IrrSchedDesign ) || Irrigation.ModeID == IrrSmartSched ) ) {
-					ShowSevereError( "Schedule not found for " + trim( cCurrentModuleObject ) + " object" );
+					ShowSevereError( "Schedule not found for " + cCurrentModuleObject + " object" );
 					ErrorsFound = true;
 				} else if ( ( Irrigation.IrrSchedID == 0 ) && ( Irrigation.ModeID == IrrSchedDesign ) ) {
 					if ( ! CheckScheduleValueMinMax( Irrigation.IrrSchedID, ">=", 0.0 ) ) {
-						ShowSevereError( "Schedule=" + trim( cAlphaArgs( 2 ) ) + " for " + trim( cCurrentModuleObject ) + " object has values < 0." );
+						ShowSevereError( "Schedule=" + cAlphaArgs( 2 ) + " for " + cCurrentModuleObject + " object has values < 0." );
 						ErrorsFound = true;
 					}
 				}
@@ -743,7 +742,7 @@ namespace WaterManager {
 				Irrigation.IrrigationThreshold = 0.4;
 				if ( Irrigation.ModeID == IrrSmartSched && NumNumbers > 0 ) {
 					if ( rNumericArgs( 1 ) > 100. || rNumericArgs( 1 ) < 0.0 ) {
-						ShowSevereError( "Irrigation threshold for " + trim( cCurrentModuleObject ) + " object has values > 100 or < 0." );
+						ShowSevereError( "Irrigation threshold for " + cCurrentModuleObject + " object has values > 100 or < 0." );
 						ErrorsFound = true;
 					} else {
 						Irrigation.IrrigationThreshold = rNumericArgs( 1 ) / 100.;
@@ -1165,9 +1164,9 @@ namespace WaterManager {
 
 	void
 	SetupTankSupplyComponent(
-		Fstring const & CompName,
-		Fstring const & CompType,
-		Fstring const & TankName,
+		std::string const & CompName,
+		std::string const & CompType,
+		std::string const & TankName,
 		bool & ErrorsFound,
 		int & TankIndex,
 		int & WaterSupplyIndex
@@ -1220,9 +1219,9 @@ namespace WaterManager {
 
 	void
 	InternalSetupTankSupplyComponent(
-		Fstring const & CompName,
-		Fstring const & CompType,
-		Fstring const & TankName,
+		std::string const & CompName,
+		std::string const & CompType,
+		std::string const & TankName,
 		bool & ErrorsFound,
 		int & TankIndex,
 		int & WaterSupplyIndex
@@ -1264,13 +1263,13 @@ namespace WaterManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int oldNumSupply;
-		FArray1D_Fstring oldSupplyCompNames( sFstring( MaxNameLength ) );
-		FArray1D_Fstring oldSupplyCompTypes( sFstring( MaxNameLength ) );
+		FArray1D_string oldSupplyCompNames;
+		FArray1D_string oldSupplyCompTypes;
 		//  LOGICAL , SAVE    :: MyOneTimeFlag = .TRUE.
 
 		TankIndex = FindItemInList( TankName, WaterStorage.Name(), NumWaterStorageTanks );
 		if ( TankIndex == 0 ) {
-			ShowSevereError( "WaterUse:Storage (Water Storage Tank) =\"" + trim( TankName ) + "\" not found in " + trim( CompType ) + " called " + trim( CompName ) );
+			ShowSevereError( "WaterUse:Storage (Water Storage Tank) =\"" + TankName + "\" not found in " + CompType + " called " + CompName );
 			ErrorsFound = true;
 			return; // So we don't pass TankIndex=0
 		}
@@ -1320,9 +1319,9 @@ namespace WaterManager {
 
 	void
 	SetupTankDemandComponent(
-		Fstring const & CompName,
-		Fstring const & CompType,
-		Fstring const & TankName,
+		std::string const & CompName,
+		std::string const & CompType,
+		std::string const & TankName,
 		bool & ErrorsFound,
 		int & TankIndex,
 		int & WaterDemandIndex
@@ -1375,9 +1374,9 @@ namespace WaterManager {
 
 	void
 	InternalSetupTankDemandComponent(
-		Fstring const & CompName,
-		Fstring const & CompType,
-		Fstring const & TankName,
+		std::string const & CompName,
+		std::string const & CompType,
+		std::string const & TankName,
 		bool & ErrorsFound,
 		int & TankIndex,
 		int & WaterDemandIndex
@@ -1421,13 +1420,13 @@ namespace WaterManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int oldNumDemand;
-		FArray1D_Fstring oldDemandCompNames( sFstring( MaxNameLength ) );
-		FArray1D_Fstring oldDemandCompTypes( sFstring( MaxNameLength ) );
+		FArray1D_string oldDemandCompNames;
+		FArray1D_string oldDemandCompTypes;
 		//  LOGICAL , SAVE    :: MyOneTimeFlag = .TRUE.
 
 		TankIndex = FindItemInList( TankName, WaterStorage.Name(), NumWaterStorageTanks );
 		if ( TankIndex == 0 ) {
-			ShowSevereError( "WaterUse:Storage (Water Storage Tank) =\"" + trim( TankName ) + "\" not found in " + trim( CompType ) + " called " + trim( CompName ) );
+			ShowSevereError( "WaterUse:Storage (Water Storage Tank) =\"" + TankName + "\" not found in " + CompType + " called " + CompName );
 			ErrorsFound = true;
 			return;
 		}
@@ -1701,7 +1700,7 @@ namespace WaterManager {
 					for ( TankNum = 1; TankNum <= NumWaterStorageTanks; ++TankNum ) {
 						if ( WaterStorage( TankNum ).NumWaterDemands == 0 ) {
 							ShowWarningError( "Found WaterUse:Tank that has nothing connected to draw water from it." );
-							ShowContinueError( "Occurs for WaterUse:Tank = " + trim( WaterStorage( TankNum ).Name ) );
+							ShowContinueError( "Occurs for WaterUse:Tank = " + WaterStorage( TankNum ).Name );
 							ShowContinueError( "Check that input for water consuming components specifies a water supply tank." );
 						}
 					}

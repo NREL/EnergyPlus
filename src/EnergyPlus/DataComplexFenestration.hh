@@ -2,7 +2,6 @@
 #define DataComplexFenestration_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -13,7 +12,6 @@ namespace EnergyPlus {
 namespace DataComplexFenestration {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// Parameters for complex shade
@@ -55,24 +53,23 @@ namespace DataComplexFenestration {
 	struct GapSupportPillar
 	{
 		// Members
-		Fstring Name; // Name of support pillar
+		std::string Name; // Name of support pillar
 		Real64 Spacing; // Spacing between centers of support pillars (m)
 		Real64 Radius; // Support pillar radius (m)
 
 		// Default Constructor
 		GapSupportPillar() :
-			Name( MaxNameLength ),
 			Spacing( 0.0 ),
 			Radius( 0.0 )
 		{}
 
 		// Member Constructor
 		GapSupportPillar(
-			Fstring const & Name, // Name of support pillar
+			std::string const & Name, // Name of support pillar
 			Real64 const Spacing, // Spacing between centers of support pillars (m)
 			Real64 const Radius // Support pillar radius (m)
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			Spacing( Spacing ),
 			Radius( Radius )
 		{}
@@ -82,21 +79,20 @@ namespace DataComplexFenestration {
 	struct GapDeflectionState
 	{
 		// Members
-		Fstring Name; // Name of deflection state
+		std::string Name; // Name of deflection state
 		Real64 DeflectedThickness;
 
 		// Default Constructor
 		GapDeflectionState() :
-			Name( MaxNameLength ),
 			DeflectedThickness( 0.0 )
 		{}
 
 		// Member Constructor
 		GapDeflectionState(
-			Fstring const & Name, // Name of deflection state
+			std::string const & Name, // Name of deflection state
 			Real64 const DeflectedThickness
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			DeflectedThickness( DeflectedThickness )
 		{}
 
@@ -105,7 +101,7 @@ namespace DataComplexFenestration {
 	struct WindowComplexShade
 	{
 		// Members
-		Fstring Name; // Name for complex shade
+		std::string Name; // Name for complex shade
 		int LayerType; // Layer type (OtherShadingType, Venetian, Woven, Perforated)
 		Real64 Thickness; // Layer thickness (m)
 		Real64 Conductivity; // Layer conductivity (W/m2K)
@@ -126,7 +122,6 @@ namespace DataComplexFenestration {
 
 		// Default Constructor
 		WindowComplexShade() :
-			Name( MaxNameLength ),
 			LayerType( -1 ),
 			Thickness( 0.0 ),
 			Conductivity( 0.0 ),
@@ -148,7 +143,7 @@ namespace DataComplexFenestration {
 
 		// Member Constructor
 		WindowComplexShade(
-			Fstring const & Name, // Name for complex shade
+			std::string const & Name, // Name for complex shade
 			int const LayerType, // Layer type (OtherShadingType, Venetian, Woven, Perforated)
 			Real64 const Thickness, // Layer thickness (m)
 			Real64 const Conductivity, // Layer conductivity (W/m2K)
@@ -167,7 +162,7 @@ namespace DataComplexFenestration {
 			Real64 const SlatConductivity, // Slat conductivity (W/m2K)
 			Real64 const SlatCurve // Curvature radius of slat (if =0 then flat) (m)
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			LayerType( LayerType ),
 			Thickness( Thickness ),
 			Conductivity( Conductivity ),
@@ -192,7 +187,7 @@ namespace DataComplexFenestration {
 	struct WindowThermalModelParams
 	{
 		// Members
-		Fstring Name; // Window thermal model name
+		std::string Name; // Window thermal model name
 		int CalculationStandard; // Tarcog calculation standard
 		int ThermalModel; // Tarcog thermal model
 		Real64 SDScalar; // SDScalar coefficient
@@ -203,7 +198,6 @@ namespace DataComplexFenestration {
 
 		// Default Constructor
 		WindowThermalModelParams() :
-			Name( MaxNameLength ),
 			CalculationStandard( -1 ),
 			ThermalModel( -1 ),
 			SDScalar( 0.0 ),
@@ -215,7 +209,7 @@ namespace DataComplexFenestration {
 
 		// Member Constructor
 		WindowThermalModelParams(
-			Fstring const & Name, // Window thermal model name
+			std::string const & Name, // Window thermal model name
 			int const CalculationStandard, // Tarcog calculation standard
 			int const ThermalModel, // Tarcog thermal model
 			Real64 const SDScalar, // SDScalar coefficient
@@ -224,7 +218,7 @@ namespace DataComplexFenestration {
 			Real64 const InitialTemperature, // Window(s) temperature in time of fabrication
 			Real64 const InitialPressure // Window(s) pressure in time of fabrication
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			CalculationStandard( CalculationStandard ),
 			ThermalModel( ThermalModel ),
 			SDScalar( SDScalar ),

@@ -13,9 +13,6 @@
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/char.constants.hh>
-
 // C++ Headers
 #include <string>
 
@@ -67,7 +64,7 @@ inline
 bool
 is_blank( char const c )
 {
-	return ( c == SPC );
+	return ( c == ' ' );
 }
 
 // Character is Not Blank?
@@ -75,7 +72,7 @@ inline
 bool
 not_blank( char const c )
 {
-	return ( c != SPC );
+	return ( c != ' ' );
 }
 
 // Character is in a string?
@@ -89,6 +86,22 @@ is_any_of( char const c, std::string const & s )
 // Character is in a cstring?
 bool
 is_any_of( char const c, c_cstring const s );
+
+// Character is in a string?
+inline
+bool
+has_any_of( char const c, std::string const & s )
+{
+	return ( s.find( c ) != std::string::npos );
+}
+
+// Character is in a cstring?
+inline
+bool
+has_any_of( char const c, c_cstring const s )
+{
+	return is_any_of( c, s );
+}
 
 // Character is not in a string?
 inline

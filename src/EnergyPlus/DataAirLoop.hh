@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace DataAirLoop {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// -only module should be available to other modules and routines.
@@ -45,7 +43,7 @@ namespace DataAirLoop {
 	struct AirLoopZoneEquipConnectData
 	{
 		// Members
-		Fstring AirLoopName; // Name of Primary Air System
+		std::string AirLoopName; // Name of Primary Air System
 		int NumReturnNodes; // Number of return nodes connected to system
 		int NumSupplyNodes; // number of supply nodes exiting primary air system
 		int NumZonesCooled; // number of zones cooled by this primary air system
@@ -64,7 +62,6 @@ namespace DataAirLoop {
 
 		// Default Constructor
 		AirLoopZoneEquipConnectData() :
-			AirLoopName( MaxNameLength ),
 			NumReturnNodes( 0 ),
 			NumSupplyNodes( 0 ),
 			NumZonesCooled( 0 ),
@@ -73,7 +70,7 @@ namespace DataAirLoop {
 
 		// Member Constructor
 		AirLoopZoneEquipConnectData(
-			Fstring const & AirLoopName, // Name of Primary Air System
+			std::string const & AirLoopName, // Name of Primary Air System
 			int const NumReturnNodes, // Number of return nodes connected to system
 			int const NumSupplyNodes, // number of supply nodes exiting primary air system
 			int const NumZonesCooled, // number of zones cooled by this primary air system
@@ -90,7 +87,7 @@ namespace DataAirLoop {
 			FArray1_int const & TermUnitHeatInletNodes, // Air terminal unit heating inlet node numbers for this air loop
 			FArray1_int const & SupplyDuctType // 1=main, 2=cooling, 3=heating, 4=other
 		) :
-			AirLoopName( MaxNameLength, AirLoopName ),
+			AirLoopName( AirLoopName ),
 			NumReturnNodes( NumReturnNodes ),
 			NumSupplyNodes( NumSupplyNodes ),
 			NumZonesCooled( NumZonesCooled ),
@@ -145,7 +142,7 @@ namespace DataAirLoop {
 		int StartTime; // cycle on time (in SimTimeSteps)
 		int StopTime; // cycle off time (in SimTimeSteps)
 		Real64 ReqSupplyFrac; // required system flow rate (as a fraction)
-		FArray1D_Fstring AvailManagerName; // name of each availability manager
+		FArray1D_string AvailManagerName; // name of each availability manager
 		FArray1D_int AvailManagerType; // type of availability manager
 		FArray1D_int AvailManagerNum; // index for availability manager
 
@@ -155,8 +152,7 @@ namespace DataAirLoop {
 			AvailStatus( 0 ),
 			StartTime( 0 ),
 			StopTime( 0 ),
-			ReqSupplyFrac( 0.0 ),
-			AvailManagerName( sFstring( MaxNameLength ) )
+			ReqSupplyFrac( 0.0 )
 		{}
 
 		// Member Constructor
@@ -166,7 +162,7 @@ namespace DataAirLoop {
 			int const StartTime, // cycle on time (in SimTimeSteps)
 			int const StopTime, // cycle off time (in SimTimeSteps)
 			Real64 const ReqSupplyFrac, // required system flow rate (as a fraction)
-			FArray1_Fstring const & AvailManagerName, // name of each availability manager
+			FArray1_string const & AvailManagerName, // name of each availability manager
 			FArray1_int const & AvailManagerType, // type of availability manager
 			FArray1_int const & AvailManagerNum // index for availability manager
 		) :
@@ -210,7 +206,7 @@ namespace DataAirLoop {
 	struct AirLoopControlData // Derived type for air control information
 	{
 		// Members
-		Fstring OACtrlName; // name of OA controller
+		std::string OACtrlName; // name of OA controller
 		int OACtrlNum; // index of OA controller
 		bool CyclingFan; // TRUE if currently the air loop supply fan is cycling
 		bool AnyContFan; // TRUE if at any time supply fan is continuous
@@ -246,7 +242,6 @@ namespace DataAirLoop {
 
 		// Default Constructor
 		AirLoopControlData() :
-			OACtrlName( MaxNameLength ),
 			OACtrlNum( 0 ),
 			CyclingFan( false ),
 			AnyContFan( false ),
@@ -282,7 +277,7 @@ namespace DataAirLoop {
 
 		// Member Constructor
 		AirLoopControlData(
-			Fstring const & OACtrlName, // name of OA controller
+			std::string const & OACtrlName, // name of OA controller
 			int const OACtrlNum, // index of OA controller
 			bool const CyclingFan, // TRUE if currently the air loop supply fan is cycling
 			bool const AnyContFan, // TRUE if at any time supply fan is continuous
@@ -315,7 +310,7 @@ namespace DataAirLoop {
 			bool const OASysComponentsSimulated, // - true after OA components have been simulated
 			bool const AirLoopDCVFlag // TRUE if the air loop has OA Controller specifying a Mechanical controller with DCV
 		) :
-			OACtrlName( MaxNameLength, OACtrlName ),
+			OACtrlName( OACtrlName ),
 			OACtrlNum( OACtrlNum ),
 			CyclingFan( CyclingFan ),
 			AnyContFan( AnyContFan ),
@@ -460,57 +455,50 @@ namespace DataAirLoop {
 	struct OutsideAirSysProps
 	{
 		// Members
-		Fstring Name;
-		Fstring ControllerListName;
-		Fstring ComponentListName;
+		std::string Name;
+		std::string ControllerListName;
+		std::string ComponentListName;
 		int ControllerListNum; // index of the Controller List
 		int NumComponents;
 		int NumControllers;
 		int NumSimpleControllers; // number of CONTROLLER:SIMPLE objects in OA Sys controller list
-		FArray1D_Fstring ComponentName;
-		FArray1D_Fstring ComponentType;
+		FArray1D_string ComponentName;
+		FArray1D_string ComponentType;
 		FArray1D_int ComponentType_Num; // Parameterized (see above) Component Types this
 		// module can address
 		FArray1D_int ComponentIndex; // Which one in list -- updated by routines called from here
-		FArray1D_Fstring ControllerName;
-		FArray1D_Fstring ControllerType;
+		FArray1D_string ControllerName;
+		FArray1D_string ControllerType;
 		FArray1D_int ControllerIndex; // Which one in list -- updated by routines called from here
 
 		// Default Constructor
 		OutsideAirSysProps() :
-			Name( MaxNameLength ),
-			ControllerListName( MaxNameLength ),
-			ComponentListName( MaxNameLength ),
 			ControllerListNum( 0 ),
 			NumComponents( 0 ),
 			NumControllers( 0 ),
-			NumSimpleControllers( 0 ),
-			ComponentName( sFstring( MaxNameLength ) ),
-			ComponentType( sFstring( MaxNameLength ) ),
-			ControllerName( sFstring( MaxNameLength ) ),
-			ControllerType( sFstring( MaxNameLength ) )
+			NumSimpleControllers( 0 )
 		{}
 
 		// Member Constructor
 		OutsideAirSysProps(
-			Fstring const & Name,
-			Fstring const & ControllerListName,
-			Fstring const & ComponentListName,
+			std::string const & Name,
+			std::string const & ControllerListName,
+			std::string const & ComponentListName,
 			int const ControllerListNum, // index of the Controller List
 			int const NumComponents,
 			int const NumControllers,
 			int const NumSimpleControllers, // number of CONTROLLER:SIMPLE objects in OA Sys controller list
-			FArray1_Fstring const & ComponentName,
-			FArray1_Fstring const & ComponentType,
+			FArray1_string const & ComponentName,
+			FArray1_string const & ComponentType,
 			FArray1_int const & ComponentType_Num, // Parameterized (see above) Component Types this
 			FArray1_int const & ComponentIndex, // Which one in list -- updated by routines called from here
-			FArray1_Fstring const & ControllerName,
-			FArray1_Fstring const & ControllerType,
+			FArray1_string const & ControllerName,
+			FArray1_string const & ControllerType,
 			FArray1_int const & ControllerIndex // Which one in list -- updated by routines called from here
 		) :
-			Name( MaxNameLength, Name ),
-			ControllerListName( MaxNameLength, ControllerListName ),
-			ComponentListName( MaxNameLength, ComponentListName ),
+			Name( Name ),
+			ControllerListName( ControllerListName ),
+			ComponentListName( ComponentListName ),
 			ControllerListNum( ControllerListNum ),
 			NumComponents( NumComponents ),
 			NumControllers( NumControllers ),

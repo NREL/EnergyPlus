@@ -1898,6 +1898,8 @@
 
   Output:Variable,*,Zone Combined Outdoor Air Mass,TimeStep,ReportSch;
 
+  Output:Variable,*,Zone Combined Outdoor Air Mass Flow Rate,TimeStep,ReportSch;
+
   Output:Variable,*,Cooling Coil Total Cooling Energy,TimeStep,ReportSch;
 
   Output:Variable,*,Heating Coil Total Heating Energy,TimeStep,ReportSch;

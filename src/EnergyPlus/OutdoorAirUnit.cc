@@ -75,7 +75,6 @@ namespace OutdoorAirUnit {
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::BeginDayFlag;
 	using DataGlobals::BeginTimeStepFlag;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::InitConvTemp;
 	using DataGlobals::ZoneSizingCalc;
 	using DataGlobals::SysSizingCalc;
@@ -99,7 +98,7 @@ namespace OutdoorAirUnit {
 	// MODULE PARAMETER DEFINITIONS
 
 	// component types addressed by this module
-	Fstring const cMO_OutdoorAirUnit( "ZoneHVAC:OutdoorAirUnit" );
+	std::string const cMO_OutdoorAirUnit( "ZoneHVAC:OutdoorAirUnit" );
 
 	int const WaterCoil_SimpleCool( 1 );
 	int const WaterCoil_Cooling( 2 );
@@ -125,7 +124,7 @@ namespace OutdoorAirUnit {
 	int const CoolingMode( 2 ); // normal cooling coil operation
 	int const NeutralMode( 3 ); // signal coil shouldn't run
 
-	FArray1D_Fstring const CurrentModuleObjects( 2, sFstring( 40 ), { "ZoneHVAC:OutdoorAirUnit                 ", "ZoneHVAC:OutdoorAirUnit:EquipmentList   " } );
+	FArray1D_string const CurrentModuleObjects( 2, { "ZoneHVAC:OutdoorAirUnit", "ZoneHVAC:OutdoorAirUnit:EquipmentList" } );
 
 	// Parameters below (CO - Current module Object.  used primarily in Get Inputs)
 	// Multiple Get Input routines in this module or these would be in individual routines.
@@ -155,7 +154,7 @@ namespace OutdoorAirUnit {
 
 	void
 	SimOutdoorAirUnit(
-		Fstring const & CompName, // name of the outdoor air unit
+		std::string const & CompName, // name of the outdoor air unit
 		int const ZoneNum, // number of zone being served
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		Real64 & PowerMet, // Sensible power supplied (W)
@@ -210,16 +209,16 @@ namespace OutdoorAirUnit {
 		if ( CompIndex == 0 ) {
 			OAUnitNum = FindItemInList( CompName, OutAirUnit.Name(), NumOfOAUnits );
 			if ( OAUnitNum == 0 ) {
-				ShowFatalError( "ZoneHVAC:OutdoorAirUnit not found=" + trim( CompName ) );
+				ShowFatalError( "ZoneHVAC:OutdoorAirUnit not found=" + CompName );
 			}
 		} else {
 			OAUnitNum = CompIndex;
 			if ( OAUnitNum > NumOfOAUnits || OAUnitNum < 1 ) {
-				ShowFatalError( "SimOutdoorAirUnit:  Invalid CompIndex passed=" + trim( TrimSigDigits( OAUnitNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumOfOAUnits ) ) + ", Entered Unit name=" + trim( CompName ) );
+				ShowFatalError( "SimOutdoorAirUnit:  Invalid CompIndex passed=" + TrimSigDigits( OAUnitNum ) + ", Number of Units=" + TrimSigDigits( NumOfOAUnits ) + ", Entered Unit name=" + CompName );
 			}
 			if ( CheckEquipName( OAUnitNum ) ) {
 				if ( CompName != OutAirUnit( OAUnitNum ).Name ) {
-					ShowFatalError( "SimOutdoorAirUnit: Invalid CompIndex passed=" + trim( TrimSigDigits( OAUnitNum ) ) + ", Unit name=" + trim( CompName ) + ", stored Unit Name for that index=" + trim( OutAirUnit( OAUnitNum ).Name ) );
+					ShowFatalError( "SimOutdoorAirUnit: Invalid CompIndex passed=" + TrimSigDigits( OAUnitNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + OutAirUnit( OAUnitNum ).Name );
 				}
 				CheckEquipName( OAUnitNum ) = false;
 			}
@@ -314,8 +313,8 @@ namespace OutdoorAirUnit {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const Blank;
-		static Fstring const RoutineName( "GetOutdoorAirUnitInputs: " ); // include trailing blank space
+		static std::string const Blank;
+		static std::string const RoutineName( "GetOutdoorAirUnitInputs: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -333,7 +332,7 @@ namespace OutdoorAirUnit {
 		int Item;
 		int NumComponents;
 		int AlphaNum;
-		Fstring ComponentListName( MaxNameLength );
+		std::string ComponentListName;
 		int NumInList;
 		int InListNum;
 		int ListNum;
@@ -344,14 +343,14 @@ namespace OutdoorAirUnit {
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
 		bool IsValid; // Set for outside air node check
-		FArray1D_Fstring cAlphaArgs( sFstring( MaxNameLength ) ); // Alpha input items for object
-		Fstring CurrentModuleObject( MaxNameLength ); // Object type for getting and messages
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) ); // Numeric field names
+		FArray1D_string cAlphaArgs; // Alpha input items for object
+		std::string CurrentModuleObject; // Object type for getting and messages
+		FArray1D_string cAlphaFields; // Alpha field names
+		FArray1D_string cNumericFields; // Numeric field names
 		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		FArray1D< Real64 > NumArray;
-		FArray1D_Fstring AlphArray( sFstring( MaxNameLength ) );
+		FArray1D_string AlphArray;
 		static bool errFlag( false );
 
 		// FLOW:
@@ -367,19 +366,19 @@ namespace OutdoorAirUnit {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		AlphArray.allocate( MaxAlphas );
-		AlphArray = " ";
+		AlphArray = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = " ";
+		cAlphaFields = "";
 		NumArray.allocate( MaxNums );
 		NumArray = 0.0;
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = " ";
+		cNumericFields = "";
 		lAlphaBlanks.allocate( MaxAlphas );
 		lAlphaBlanks = true;
 		lNumericBlanks.allocate( MaxNums );
 		lNumericBlanks = true;
 		cAlphaArgs.allocate( NumAlphas );
-		cAlphaArgs = " ";
+		cAlphaArgs = "";
 
 		CurrentModuleObject = CurrentModuleObjects( CO_OAUnit );
 		NumOfOAUnits = GetNumObjectsFound( CurrentModuleObject );
@@ -395,7 +394,7 @@ namespace OutdoorAirUnit {
 			GetObjectItem( CurrentModuleObject, OAUnitNum, cAlphaArgs, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), OutAirUnit.Name(), OAUnitNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), OutAirUnit.Name(), OAUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -412,7 +411,7 @@ namespace OutdoorAirUnit {
 			} else {
 				OutAirUnit( OAUnitNum ).SchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) ); // convert schedule name to pointer
 				if ( OutAirUnit( OAUnitNum ).SchedPtr == 0 ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaArgs( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" not found." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaArgs( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 					ErrorsFound = true;
 				}
 			}
@@ -423,9 +422,9 @@ namespace OutdoorAirUnit {
 
 			if ( OutAirUnit( OAUnitNum ).ZonePtr == 0 ) {
 				if ( lAlphaBlanks( 3 ) ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaArgs( 3 ) ) + " is required but input is blank." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaArgs( 3 ) + " is required but input is blank." );
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaArgs( 3 ) ) + "=\"" + trim( cAlphaArgs( 3 ) ) + "\" not found." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaArgs( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\" not found." );
 				}
 				ErrorsFound = true;
 			}
@@ -438,7 +437,7 @@ namespace OutdoorAirUnit {
 			// convert schedule name to pointer
 			OutAirUnit( OAUnitNum ).OutAirSchedPtr = GetScheduleIndex( OutAirUnit( OAUnitNum ).OutAirSchedName );
 			if ( OutAirUnit( OAUnitNum ).OutAirSchedPtr == 0 ) {
-				ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 4 ) ) + "=\"" + trim( cAlphaArgs( 4 ) ) + "\" not found." );
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" not found." );
 				ErrorsFound = true;
 			}
 
@@ -450,7 +449,7 @@ namespace OutdoorAirUnit {
 				if ( IsBlank ) cAlphaArgs( 5 ) = "xxxxx";
 			}
 			errFlag = false;
-			GetFanType( OutAirUnit( OAUnitNum ).SFanName, OutAirUnit( OAUnitNum ).SFanType, errFlag, trim( CurrentModuleObject ), OutAirUnit( OAUnitNum ).Name );
+			GetFanType( OutAirUnit( OAUnitNum ).SFanName, OutAirUnit( OAUnitNum ).SFanType, errFlag, CurrentModuleObject, OutAirUnit( OAUnitNum ).Name );
 			if ( ! errFlag ) {
 				OutAirUnit( OAUnitNum ).SFanAvailSchedPtr = GetFanAvailSchPtr( cFanTypes( OutAirUnit( OAUnitNum ).SFanType ), OutAirUnit( OAUnitNum ).SFanName, errFlag );
 				// get fan index
@@ -462,8 +461,8 @@ namespace OutdoorAirUnit {
 			if ( SameString( cAlphaArgs( 6 ), "BlowThrough" ) ) OutAirUnit( OAUnitNum ).FanPlace = BlowThru;
 			if ( SameString( cAlphaArgs( 6 ), "DrawThrough" ) ) OutAirUnit( OAUnitNum ).FanPlace = DrawThru;
 			if ( OutAirUnit( OAUnitNum ).FanPlace == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFields( 6 ) ) + " = " + trim( cAlphaArgs( 6 ) ) );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFields( 6 ) + " = " + cAlphaArgs( 6 ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
@@ -479,7 +478,7 @@ namespace OutdoorAirUnit {
 					if ( IsBlank ) cAlphaArgs( 7 ) = "xxxxx";
 				}
 				errFlag = false;
-				GetFanType( OutAirUnit( OAUnitNum ).ExtFanName, OutAirUnit( OAUnitNum ).ExtFanType, errFlag, trim( CurrentModuleObject ), OutAirUnit( OAUnitNum ).Name );
+				GetFanType( OutAirUnit( OAUnitNum ).ExtFanName, OutAirUnit( OAUnitNum ).ExtFanType, errFlag, CurrentModuleObject, OutAirUnit( OAUnitNum ).Name );
 				if ( ! errFlag ) {
 					OutAirUnit( OAUnitNum ).ExtFanAvailSchedPtr = GetFanAvailSchPtr( cFanTypes( OutAirUnit( OAUnitNum ).ExtFanType ), OutAirUnit( OAUnitNum ).ExtFanName, errFlag );
 					// get fan index
@@ -498,14 +497,14 @@ namespace OutdoorAirUnit {
 			OutAirUnit( OAUnitNum ).ExtOutAirSchedPtr = GetScheduleIndex( OutAirUnit( OAUnitNum ).ExtAirSchedName );
 			if ( OutAirUnit( OAUnitNum ).ExtFan ) {
 				if ( ( OutAirUnit( OAUnitNum ).ExtOutAirSchedPtr == 0 ) || ( lNumericBlanks( 2 ) ) ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 7 ) ) + "=\"" + trim( cAlphaArgs( 8 ) ) + "\" not found." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 7 ) + "=\"" + cAlphaArgs( 8 ) + "\" not found." );
 					ErrorsFound = true;
 				}
 			}
 
 			if ( OutAirUnit( OAUnitNum ).ExtFan ) {
 
-				SetUpCompSets( trim( CurrentModuleObject ), OutAirUnit( OAUnitNum ).Name, "UNDEFINED", cAlphaArgs( 7 ), "UNDEFINED", "UNDEFINED" );
+				SetUpCompSets( CurrentModuleObject, OutAirUnit( OAUnitNum ).Name, "UNDEFINED", cAlphaArgs( 7 ), "UNDEFINED", "UNDEFINED" );
 			}
 
 			// Process the unit control type
@@ -518,7 +517,7 @@ namespace OutdoorAirUnit {
 					OutAirUnit( OAUnitNum ).ControlType = Temperature;
 				}}
 			} else {
-				ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 9 ) ) + "=\"" + trim( cAlphaArgs( 9 ) ) + "\"." );
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 9 ) + "=\"" + cAlphaArgs( 9 ) + "\"." );
 				ShowContinueError( "Control reset to Unconditioned Control." );
 				OutAirUnit( OAUnitNum ).ControlType = Neutral;
 			}
@@ -527,7 +526,7 @@ namespace OutdoorAirUnit {
 			OutAirUnit( OAUnitNum ).HiCtrlTempSched = cAlphaArgs( 10 );
 			OutAirUnit( OAUnitNum ).HiCtrlTempSchedPtr = GetScheduleIndex( cAlphaArgs( 10 ) );
 			if ( ( OutAirUnit( OAUnitNum ).HiCtrlTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 10 ) ) ) {
-				ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 10 ) ) + "=\"" + trim( cAlphaArgs( 9 ) ) + "\" not found." );
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 10 ) + "=\"" + cAlphaArgs( 9 ) + "\" not found." );
 				ErrorsFound = true;
 			}
 
@@ -535,7 +534,7 @@ namespace OutdoorAirUnit {
 			OutAirUnit( OAUnitNum ).LoCtrlTempSched = cAlphaArgs( 11 );
 			OutAirUnit( OAUnitNum ).LoCtrlTempSchedPtr = GetScheduleIndex( cAlphaArgs( 11 ) );
 			if ( ( OutAirUnit( OAUnitNum ).LoCtrlTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 11 ) ) ) {
-				ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 11 ) ) + "=\"" + trim( cAlphaArgs( 10 ) ) + "\" not found." );
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 11 ) + "=\"" + cAlphaArgs( 10 ) + "\" not found." );
 				ErrorsFound = true;
 			}
 
@@ -545,17 +544,17 @@ namespace OutdoorAirUnit {
 
 			// Main air nodes (except outside air node):
 
-			OutAirUnit( OAUnitNum ).AirOutletNode = GetOnlySingleNode( cAlphaArgs( 13 ), ErrorsFound, trim( CurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
+			OutAirUnit( OAUnitNum ).AirOutletNode = GetOnlySingleNode( cAlphaArgs( 13 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 			if ( ! lAlphaBlanks( 14 ) ) {
-				OutAirUnit( OAUnitNum ).AirInletNode = GetOnlySingleNode( cAlphaArgs( 14 ), ErrorsFound, trim( CurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
+				OutAirUnit( OAUnitNum ).AirInletNode = GetOnlySingleNode( cAlphaArgs( 14 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
 			} else {
 				if ( OutAirUnit( OAUnitNum ).ExtFan ) {
-					ShowSevereError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 14 ) ) + " cannot be blank when there is an exhaust fan." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 14 ) + " cannot be blank when there is an exhaust fan." );
 					ErrorsFound = true;
 				}
 			}
 
-			OutAirUnit( OAUnitNum ).SFanOutletNode = GetOnlySingleNode( cAlphaArgs( 15 ), ErrorsFound, trim( CurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsNotParent );
+			OutAirUnit( OAUnitNum ).SFanOutletNode = GetOnlySingleNode( cAlphaArgs( 15 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsNotParent );
 
 			//  Set connection type to 'OutdoorAir', because this is hardwired to OA conditions
 			OutAirUnit( OAUnitNum ).OutsideAirNode = GetOnlySingleNode( cAlphaArgs( 12 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
@@ -563,7 +562,7 @@ namespace OutdoorAirUnit {
 			if ( ! lAlphaBlanks( 12 ) ) {
 				CheckAndAddAirNodeNumber( OutAirUnit( OAUnitNum ).OutsideAirNode, IsValid );
 				if ( ! IsValid ) {
-					ShowWarningError( trim( CurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", Adding OutdoorAir:Node=" + trim( cAlphaArgs( 12 ) ) );
+					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", Adding OutdoorAir:Node=" + cAlphaArgs( 12 ) );
 				}
 
 			}
@@ -571,11 +570,11 @@ namespace OutdoorAirUnit {
 			// When the fan position is "BlowThru", Each node is set up
 
 			if ( OutAirUnit( OAUnitNum ).FanPlace == BlowThru ) {
-				SetUpCompSets( trim( CurrentModuleObject ), OutAirUnit( OAUnitNum ).Name, "UNDEFINED", cAlphaArgs( 5 ), cAlphaArgs( 12 ), cAlphaArgs( 15 ) );
+				SetUpCompSets( CurrentModuleObject, OutAirUnit( OAUnitNum ).Name, "UNDEFINED", cAlphaArgs( 5 ), cAlphaArgs( 12 ), cAlphaArgs( 15 ) );
 			}
 
 			//A16 : component list
-			VerifyName( cAlphaArgs( 16 ), OutAirUnit.ComponentListName(), OAUnitNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObjects( CO_OAEqList ) ) + " Name" );
+			VerifyName( cAlphaArgs( 16 ), OutAirUnit.ComponentListName(), OAUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObjects( CO_OAEqList ) + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 16 ) = "xxxxx";
@@ -691,7 +690,7 @@ namespace OutdoorAirUnit {
 							//          OutAirUnit(OAUnitNum)%OAEquip(CompNum)%ComponentType_Num= Desiccant
 
 						} else {
-							ShowSevereError( trim( CurrentModuleObject ) + " = \"" + trim( AlphArray( 1 ) ) + "\" invalid " "Outside Air Component=\"" + trim( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType ) + "\"." );
+							ShowSevereError( CurrentModuleObject + " = \"" + AlphArray( 1 ) + "\" invalid " "Outside Air Component=\"" + OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType + "\"." );
 							ErrorsFound = true;
 
 						}}
@@ -719,15 +718,15 @@ namespace OutdoorAirUnit {
 
 					// In case of draw through, the last component is linked with the zone air supply node
 					if ( OutAirUnit( OAUnitNum ).FanPlace == DrawThru ) {
-						SetUpCompSets( trim( CurrentModuleObject ), OutAirUnit( OAUnitNum ).Name, "UNDEFINED", cAlphaArgs( 5 ), "UNDEFINED", cAlphaArgs( 13 ) );
+						SetUpCompSets( CurrentModuleObject, OutAirUnit( OAUnitNum ).Name, "UNDEFINED", cAlphaArgs( 5 ), "UNDEFINED", cAlphaArgs( 13 ) );
 					}
 
 				} else { // when ListNum<0
-					ShowSevereError( trim( CurrentModuleObject ) + " = \"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 16 ) ) + "=\"" + trim( cAlphaArgs( 16 ) ) + "\" not found." );
+					ShowSevereError( CurrentModuleObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 16 ) + "=\"" + cAlphaArgs( 16 ) + "\" not found." );
 					ErrorsFound = true;
 				}
 			} else { // when Equipment list is left blanked
-				ShowSevereError( trim( CurrentModuleObject ) + " = \"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFields( 16 ) ) + " is blank and must be entered." );
+				ShowSevereError( CurrentModuleObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 16 ) + " is blank and must be entered." );
 				ErrorsFound = true;
 			}
 			if ( ! lAlphaBlanks( 17 ) ) {
@@ -738,7 +737,7 @@ namespace OutdoorAirUnit {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting " + trim( CurrentModuleObject ) + "." );
+			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + '.' );
 		}
 
 		AlphArray.deallocate();
@@ -829,7 +828,7 @@ namespace OutdoorAirUnit {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const CurrentModuleObject( "ZoneHVAC:OutdoorAirUnit" );
+		static std::string const CurrentModuleObject( "ZoneHVAC:OutdoorAirUnit" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -902,7 +901,7 @@ namespace OutdoorAirUnit {
 			ZoneEquipmentListChecked = true;
 			for ( Loop = 1; Loop <= NumOfOAUnits; ++Loop ) {
 				if ( CheckZoneEquipmentList( CurrentModuleObject, OutAirUnit( Loop ).Name ) ) continue;
-				ShowSevereError( "InitOutdoorAirUnit: Zone Outdoor Air Unit=[" + trim( CurrentModuleObject ) + "," + trim( OutAirUnit( Loop ).Name ) + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
+				ShowSevereError( "InitOutdoorAirUnit: Zone Outdoor Air Unit=[" + CurrentModuleObject + ',' + OutAirUnit( Loop ).Name + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
 			}
 		}
 
@@ -1122,8 +1121,8 @@ namespace OutdoorAirUnit {
 		static int CoilWaterOutletNode( 0 );
 		static int CoilSteamInletNode( 0 );
 		static int CoilSteamOutletNode( 0 );
-		Fstring CoolingCoilName( MaxNameLength );
-		Fstring CoolingCoilType( MaxNameLength );
+		std::string CoolingCoilName;
+		std::string CoolingCoilType;
 		int SizeComp;
 		int CompNum;
 		int ComponentType_Num;
@@ -1158,7 +1157,7 @@ namespace OutdoorAirUnit {
 			if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // Simulation continue
 				if ( OutAirUnit( OAUnitNum ).OutAirVolFlow > 0.0 ) {
 					ReportSizingOutput( CurrentModuleObjects( 1 ), OutAirUnit( OAUnitNum ).Name, "User-Specified Outdoor Air Flow Rate [m3/s]", OutAirUnit( OAUnitNum ).OutAirVolFlow );
-					ReportSizingOutput( trim( cFanTypes( OutAirUnit( OAUnitNum ).SFanType ) ), OutAirUnit( OAUnitNum ).SFanName, "User-Specified Maximum Outdoor Air Flow Rate [m3/s]", OutAirUnit( OAUnitNum ).OutAirVolFlow );
+					ReportSizingOutput( cFanTypes( OutAirUnit( OAUnitNum ).SFanType ), OutAirUnit( OAUnitNum ).SFanName, "User-Specified Maximum Outdoor Air Flow Rate [m3/s]", OutAirUnit( OAUnitNum ).OutAirVolFlow );
 				}
 			} else {
 				CheckZoneSizing( CurrentModuleObjects( 1 ), OutAirUnit( OAUnitNum ).Name );
@@ -1177,9 +1176,9 @@ namespace OutdoorAirUnit {
 						ReportSizingOutput( CurrentModuleObjects( 1 ), OutAirUnit( OAUnitNum ).Name, "Design Size Outdoor Air Flow Rate [m3/s]", OutAirVolFlowDes, "User-Specified Outdoor Air Flow Rate [m3/s]", OutAirVolFlowUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( OutAirVolFlowDes - OutAirVolFlowUser ) / OutAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + trim( OutAirUnit( OAUnitNum ).Name ) );
-								ShowContinueError( "User-Specified Outdoor Air Flow Rate of " + trim( RoundSigDigits( OutAirVolFlowUser, 5 ) ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Outdoor Air Flow Rate of " + trim( RoundSigDigits( OutAirVolFlowDes, 5 ) ) + " [m3/s]" );
+								ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + OutAirUnit( OAUnitNum ).Name );
+								ShowContinueError( "User-Specified Outdoor Air Flow Rate of " + RoundSigDigits( OutAirVolFlowUser, 5 ) + " [m3/s]" );
+								ShowContinueError( "differs from Design Size Outdoor Air Flow Rate of " + RoundSigDigits( OutAirVolFlowDes, 5 ) + " [m3/s]" );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
@@ -1188,9 +1187,9 @@ namespace OutdoorAirUnit {
 						ReportSizingOutput( cFanTypes( OutAirUnit( OAUnitNum ).SFanType ), OutAirUnit( OAUnitNum ).SFanName, "Design Size Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowDes, "User-Specified Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( OutAirVolFlowDes - OutAirVolFlowUser ) / OutAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + trim( cFanTypes( OutAirUnit( OAUnitNum ).SFanType ) ) + " " + trim( OutAirUnit( OAUnitNum ).SFanName ) );
-								ShowContinueError( "User-Specified Maximum Outdoor Air Flow Rate of " + trim( RoundSigDigits( OutAirVolFlowUser, 5 ) ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Maximum Outdoor Air Flow Rate of " + trim( RoundSigDigits( OutAirVolFlowDes, 5 ) ) + " [m3/s]" );
+								ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + cFanTypes( OutAirUnit( OAUnitNum ).SFanType ) + ' ' + OutAirUnit( OAUnitNum ).SFanName );
+								ShowContinueError( "User-Specified Maximum Outdoor Air Flow Rate of " + RoundSigDigits( OutAirVolFlowUser, 5 ) + " [m3/s]" );
+								ShowContinueError( "differs from Design Size Maximum Outdoor Air Flow Rate of " + RoundSigDigits( OutAirVolFlowDes, 5 ) + " [m3/s]" );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
@@ -1208,7 +1207,7 @@ namespace OutdoorAirUnit {
 			if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // Simulation continue
 				if ( OutAirUnit( OAUnitNum ).ExtAirVolFlow > 0.0 ) {
 					ReportSizingOutput( CurrentModuleObjects( 1 ), OutAirUnit( OAUnitNum ).Name, "User-Specified Exhaust Air Flow Rate [m3/s]", OutAirUnit( OAUnitNum ).ExtAirVolFlow );
-					ReportSizingOutput( trim( cFanTypes( OutAirUnit( OAUnitNum ).ExtFanType ) ), OutAirUnit( OAUnitNum ).ExtFanName, "User-Specified Maximum Exhaust Air Flow Rate [m3/s]", OutAirUnit( OAUnitNum ).ExtAirVolFlow );
+					ReportSizingOutput( cFanTypes( OutAirUnit( OAUnitNum ).ExtFanType ), OutAirUnit( OAUnitNum ).ExtFanName, "User-Specified Maximum Exhaust Air Flow Rate [m3/s]", OutAirUnit( OAUnitNum ).ExtAirVolFlow );
 				}
 			} else {
 				// set exhaust flow equal to the oa inlet flow
@@ -1217,27 +1216,27 @@ namespace OutdoorAirUnit {
 					OutAirUnit( OAUnitNum ).ExtAirVolFlow = ExtAirVolFlowDes;
 					ReportSizingOutput( CurrentModuleObjects( 1 ), OutAirUnit( OAUnitNum ).Name, "Design Size Exhaust Air Flow Rate [m3/s]", ExtAirVolFlowDes );
 					SetFanData( OutAirUnit( OAUnitNum ).ExtFan_Index, ErrorsFound, OutAirUnit( OAUnitNum ).ExtFanName, ExtAirVolFlowDes, 0.0 );
-					ReportSizingOutput( trim( cFanTypes( OutAirUnit( OAUnitNum ).ExtFanType ) ), OutAirUnit( OAUnitNum ).ExtFanName, "Design Size Maximum Exhaust Air Flow Rate [m3/s]", ExtAirVolFlowDes );
+					ReportSizingOutput( cFanTypes( OutAirUnit( OAUnitNum ).ExtFanType ), OutAirUnit( OAUnitNum ).ExtFanName, "Design Size Maximum Exhaust Air Flow Rate [m3/s]", ExtAirVolFlowDes );
 				} else {
 					if ( OutAirUnit( OAUnitNum ).ExtAirVolFlow > 0.0 && ExtAirVolFlowDes > 0.0 ) {
 						ExtAirVolFlowUser = OutAirUnit( OAUnitNum ).ExtAirVolFlow;
 						ReportSizingOutput( CurrentModuleObjects( 1 ), OutAirUnit( OAUnitNum ).Name, "Design Size Exhaust Air Flow Rate [m3/s]", ExtAirVolFlowDes, "User-Specified Exhaust Air Flow Rate [m3/s]", ExtAirVolFlowUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( ExtAirVolFlowDes - ExtAirVolFlowUser ) / ExtAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + trim( OutAirUnit( OAUnitNum ).Name ) );
-								ShowContinueError( "User-Specified Exhaust Air Flow Rate of " + trim( RoundSigDigits( ExtAirVolFlowUser, 5 ) ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Exhaust Air Flow Rate of " + trim( RoundSigDigits( ExtAirVolFlowDes, 5 ) ) + " [m3/s]" );
+								ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + OutAirUnit( OAUnitNum ).Name );
+								ShowContinueError( "User-Specified Exhaust Air Flow Rate of " + RoundSigDigits( ExtAirVolFlowUser, 5 ) + " [m3/s]" );
+								ShowContinueError( "differs from Design Size Exhaust Air Flow Rate of " + RoundSigDigits( ExtAirVolFlowDes, 5 ) + " [m3/s]" );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
 						}
 
-						ReportSizingOutput( trim( cFanTypes( OutAirUnit( OAUnitNum ).ExtFanType ) ), OutAirUnit( OAUnitNum ).ExtFanName, "Design Size Maximum Exhaust Air Flow Rate [m3/s]", ExtAirVolFlowDes, "User-Specified Maximum Exhaust Air Flow Rate [m3/s]", ExtAirVolFlowUser );
+						ReportSizingOutput( cFanTypes( OutAirUnit( OAUnitNum ).ExtFanType ), OutAirUnit( OAUnitNum ).ExtFanName, "Design Size Maximum Exhaust Air Flow Rate [m3/s]", ExtAirVolFlowDes, "User-Specified Maximum Exhaust Air Flow Rate [m3/s]", ExtAirVolFlowUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( ExtAirVolFlowDes - ExtAirVolFlowUser ) / ExtAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + trim( cFanTypes( OutAirUnit( OAUnitNum ).SFanType ) ) + " " + trim( OutAirUnit( OAUnitNum ).SFanName ) );
-								ShowContinueError( "User-Specified Maximum Exhaust Air Flow Rate of " + trim( RoundSigDigits( ExtAirVolFlowUser, 5 ) ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Maximum Exhaust Air Flow Rate of " + trim( RoundSigDigits( ExtAirVolFlowDes, 5 ) ) + " [m3/s]" );
+								ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + cFanTypes( OutAirUnit( OAUnitNum ).SFanType ) + ' ' + OutAirUnit( OAUnitNum ).SFanName );
+								ShowContinueError( "User-Specified Maximum Exhaust Air Flow Rate of " + RoundSigDigits( ExtAirVolFlowUser, 5 ) + " [m3/s]" );
+								ShowContinueError( "differs from Design Size Maximum Exhaust Air Flow Rate of " + RoundSigDigits( ExtAirVolFlowDes, 5 ) + " [m3/s]" );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
@@ -1292,7 +1291,7 @@ namespace OutdoorAirUnit {
 									}
 								} else {
 									ShowSevereError( "Autosizing of water flow requires a Sizing:Zone object " "or a cooling loop Sizing:Plant object" );
-									ShowContinueError( "Occurs in " "ZoneHVAC:OutdoorAirUnit" " Object=" + trim( OutAirUnit( OAUnitNum ).Name ) );
+									ShowContinueError( "Occurs in " "ZoneHVAC:OutdoorAirUnit" " Object=" + OutAirUnit( OAUnitNum ).Name );
 									ErrorsFound = true;
 								}
 							}
@@ -1305,9 +1304,9 @@ namespace OutdoorAirUnit {
 									ReportSizingOutput( "ZoneHVAC:OutdoorAirUnit", OutAirUnit( OAUnitNum ).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxVolWaterFlowDes, "User-Specified Maximum Cold Water Flow [m3/s]", MaxVolWaterFlowUser );
 									if ( DisplayExtraWarnings ) {
 										if ( ( std::abs( MaxVolWaterFlowDes - MaxVolWaterFlowUser ) / MaxVolWaterFlowUser ) > AutoVsHardSizingThreshold ) {
-											ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + trim( OutAirUnit( OAUnitNum ).Name ) );
-											ShowContinueError( "User-Specified Maximum Cold Water Flow of " + trim( RoundSigDigits( MaxVolWaterFlowUser, 5 ) ) + " [m3/s]" );
-											ShowContinueError( "differs from Design Size Maximum Cold Water Flow of " + trim( RoundSigDigits( MaxVolWaterFlowDes, 5 ) ) + " [m3/s]" );
+											ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + OutAirUnit( OAUnitNum ).Name );
+											ShowContinueError( "User-Specified Maximum Cold Water Flow of " + RoundSigDigits( MaxVolWaterFlowUser, 5 ) + " [m3/s]" );
+											ShowContinueError( "differs from Design Size Maximum Cold Water Flow of " + RoundSigDigits( MaxVolWaterFlowDes, 5 ) + " [m3/s]" );
 											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 										}
@@ -1353,7 +1352,7 @@ namespace OutdoorAirUnit {
 									}
 								} else {
 									ShowSevereError( "Autosizing of water flow requires a Sizing:Zone object " "or a heating loop Sizing:Plant object" );
-									ShowContinueError( "Occurs in " "ZoneHVAC:OutdoorAirUnit" " Object=" + trim( OutAirUnit( OAUnitNum ).Name ) );
+									ShowContinueError( "Occurs in " "ZoneHVAC:OutdoorAirUnit" " Object=" + OutAirUnit( OAUnitNum ).Name );
 									ErrorsFound = true;
 								}
 							}
@@ -1366,9 +1365,9 @@ namespace OutdoorAirUnit {
 									ReportSizingOutput( "ZoneHVAC:OutdoorAirUnit", OutAirUnit( OAUnitNum ).Name, "Design Size Maximum Hot Water Flow [m3/s]", MaxVolWaterFlowDes, "User-Specified Maximum Hot Water Flow [m3/s]", MaxVolWaterFlowUser );
 									if ( DisplayExtraWarnings ) {
 										if ( ( std::abs( MaxVolWaterFlowDes - MaxVolWaterFlowUser ) / MaxVolWaterFlowUser ) > AutoVsHardSizingThreshold ) {
-											ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + trim( OutAirUnit( OAUnitNum ).Name ) );
-											ShowContinueError( "User-Specified Maximum Hot Water Flow of " + trim( RoundSigDigits( MaxVolWaterFlowUser, 5 ) ) + " [m3/s]" );
-											ShowContinueError( "differs from Design Size Maximum Hot Water Flow of " + trim( RoundSigDigits( MaxVolWaterFlowDes, 5 ) ) + " [m3/s]" );
+											ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + OutAirUnit( OAUnitNum ).Name );
+											ShowContinueError( "User-Specified Maximum Hot Water Flow of " + RoundSigDigits( MaxVolWaterFlowUser, 5 ) + " [m3/s]" );
+											ShowContinueError( "differs from Design Size Maximum Hot Water Flow of " + RoundSigDigits( MaxVolWaterFlowDes, 5 ) + " [m3/s]" );
 											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 										}
@@ -1416,7 +1415,7 @@ namespace OutdoorAirUnit {
 									}
 								} else {
 									ShowSevereError( "Autosizing of Steam flow requires a Sizing:Zone object " "or a heating loop Sizing:Plant object" );
-									ShowContinueError( "Occurs in " "ZoneHVAC:OutdoorAirUnit" " Object=" + trim( OutAirUnit( OAUnitNum ).Name ) );
+									ShowContinueError( "Occurs in " "ZoneHVAC:OutdoorAirUnit" " Object=" + OutAirUnit( OAUnitNum ).Name );
 									ErrorsFound = true;
 								}
 							}
@@ -1429,9 +1428,9 @@ namespace OutdoorAirUnit {
 									ReportSizingOutput( "ZoneHVAC:OutdoorAirUnit", OutAirUnit( OAUnitNum ).Name, "Design Size Maximum Steam Flow [m3/s]", MaxVolWaterFlowDes, "User-Specified Maximum Steam Flow [m3/s]", MaxVolWaterFlowUser );
 									if ( DisplayExtraWarnings ) {
 										if ( ( std::abs( MaxVolWaterFlowDes - MaxVolWaterFlowUser ) / MaxVolWaterFlowUser ) > AutoVsHardSizingThreshold ) {
-											ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + trim( OutAirUnit( OAUnitNum ).Name ) );
-											ShowContinueError( "User-Specified Maximum Steam Flow of " + trim( RoundSigDigits( MaxVolWaterFlowUser, 5 ) ) + " [m3/s]" );
-											ShowContinueError( "differs from Design Size Maximum Steam Flow of " + trim( RoundSigDigits( MaxVolWaterFlowDes, 5 ) ) + " [m3/s]" );
+											ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + OutAirUnit( OAUnitNum ).Name );
+											ShowContinueError( "User-Specified Maximum Steam Flow of " + RoundSigDigits( MaxVolWaterFlowUser, 5 ) + " [m3/s]" );
+											ShowContinueError( "differs from Design Size Maximum Steam Flow of " + RoundSigDigits( MaxVolWaterFlowDes, 5 ) + " [m3/s]" );
 											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 										}
@@ -1475,7 +1474,7 @@ namespace OutdoorAirUnit {
 									}
 								} else {
 									ShowSevereError( "Autosizing of water flow requires a Sizing:Zone object " "or a cooling loop Sizing:Plant object" );
-									ShowContinueError( "Occurs in " "ZoneHVAC:OutdoorAirUnit" " Object=" + trim( OutAirUnit( OAUnitNum ).Name ) );
+									ShowContinueError( "Occurs in " "ZoneHVAC:OutdoorAirUnit" " Object=" + OutAirUnit( OAUnitNum ).Name );
 									ErrorsFound = true;
 								}
 							}
@@ -1488,9 +1487,9 @@ namespace OutdoorAirUnit {
 									ReportSizingOutput( "ZoneHVAC:OutdoorAirUnit", OutAirUnit( OAUnitNum ).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxVolWaterFlowDes, "User-Specified Maximum Cold Water Flow [m3/s]", MaxVolWaterFlowUser );
 									if ( DisplayExtraWarnings ) {
 										if ( ( std::abs( MaxVolWaterFlowDes - MaxVolWaterFlowUser ) / MaxVolWaterFlowUser ) > AutoVsHardSizingThreshold ) {
-											ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + trim( OutAirUnit( OAUnitNum ).Name ) );
-											ShowContinueError( "User-Specified Maximum Cold Water Flow of " + trim( RoundSigDigits( MaxVolWaterFlowUser, 5 ) ) + " [m3/s]" );
-											ShowContinueError( "differs from Design Size Maximum Cold Water Flow of " + trim( RoundSigDigits( MaxVolWaterFlowDes, 5 ) ) + " [m3/s]" );
+											ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + OutAirUnit( OAUnitNum ).Name );
+											ShowContinueError( "User-Specified Maximum Cold Water Flow of " + RoundSigDigits( MaxVolWaterFlowUser, 5 ) + " [m3/s]" );
+											ShowContinueError( "differs from Design Size Maximum Cold Water Flow of " + RoundSigDigits( MaxVolWaterFlowDes, 5 ) + " [m3/s]" );
 											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 										}
@@ -1536,7 +1535,7 @@ namespace OutdoorAirUnit {
 									}
 								} else {
 									ShowSevereError( "Autosizing of water flow requires a Sizing:Zone object " "or a cooling loop Sizing:Plant object" );
-									ShowContinueError( "Occurs in " "ZoneHVAC:OutdoorAirUnit" " Object=" + trim( OutAirUnit( OAUnitNum ).Name ) );
+									ShowContinueError( "Occurs in " "ZoneHVAC:OutdoorAirUnit" " Object=" + OutAirUnit( OAUnitNum ).Name );
 									ErrorsFound = true;
 								}
 							}
@@ -1549,9 +1548,9 @@ namespace OutdoorAirUnit {
 									ReportSizingOutput( "ZoneHVAC:OutdoorAirUnit", OutAirUnit( OAUnitNum ).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxVolWaterFlowDes, "User-Specified Maximum Cold Water Flow [m3/s]", MaxVolWaterFlowUser );
 									if ( DisplayExtraWarnings ) {
 										if ( ( std::abs( MaxVolWaterFlowDes - MaxVolWaterFlowUser ) / MaxVolWaterFlowUser ) > AutoVsHardSizingThreshold ) {
-											ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + trim( OutAirUnit( OAUnitNum ).Name ) );
-											ShowContinueError( "User-Specified Maximum Cold Water Flow of " + trim( RoundSigDigits( MaxVolWaterFlowUser, 5 ) ) + " [m3/s]" );
-											ShowContinueError( "differs from Design Size Maximum Cold Water Flow of " + trim( RoundSigDigits( MaxVolWaterFlowDes, 5 ) ) + " [m3/s]" );
+											ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + OutAirUnit( OAUnitNum ).Name );
+											ShowContinueError( "User-Specified Maximum Cold Water Flow of " + RoundSigDigits( MaxVolWaterFlowUser, 5 ) + " [m3/s]" );
+											ShowContinueError( "differs from Design Size Maximum Cold Water Flow of " + RoundSigDigits( MaxVolWaterFlowDes, 5 ) + " [m3/s]" );
 											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 										}
@@ -1589,7 +1588,7 @@ namespace OutdoorAirUnit {
 				} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
 					OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = Coil_GasHeat;
 				} else {
-					ShowSevereError( "ZoneHVAC:OutdoorAirUnit:EquipmentList" " = \"" "OutAirUnit(OAUnitNum)%OAEquip(CompNum)%ComponentListName" "\" invalid to sizing" "Outside Air Component=\"" + trim( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType ) + "\"." );
+					ShowSevereError( "ZoneHVAC:OutdoorAirUnit:EquipmentList" " = \"" "OutAirUnit(OAUnitNum)%OAEquip(CompNum)%ComponentListName" "\" invalid to sizing" "Outside Air Component=\"" + OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType + "\"." );
 					ErrorsFound = true;
 
 				}}
@@ -1667,11 +1666,11 @@ namespace OutdoorAirUnit {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static Fstring const CurrentModuleObject( "ZoneHVAC:OutdoorAirUnit" );
+		static std::string const CurrentModuleObject( "ZoneHVAC:OutdoorAirUnit" );
 		int CompNum;
-		Fstring EquipType( MaxNameLength );
-		Fstring EquipName( MaxNameLength );
-		Fstring CtrlName( MaxNameLength );
+		std::string EquipType;
+		std::string EquipName;
+		std::string CtrlName;
 		bool Sim;
 		bool ReSim;
 		Real64 DesOATemp; // Design OA Temp degree C
@@ -1948,8 +1947,8 @@ namespace OutdoorAirUnit {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EquipNum;
 		int CurOAUnitNum;
-		Fstring EquipType( MaxNameLength );
-		Fstring EquipName( MaxNameLength );
+		std::string EquipType;
+		std::string EquipName;
 		bool FatalErrorFlag;
 		bool Sim;
 
@@ -1970,8 +1969,8 @@ namespace OutdoorAirUnit {
 	void
 	SimOutdoorAirEquipComps(
 		int const OAUnitNum, // actual outdoor air unit num
-		Fstring const & EquipType, // the component type
-		Fstring const & EquipName, // the component Name
+		std::string const & EquipType, // the component type
+		std::string const & EquipName, // the component Name
 		int const EquipNum,
 		int const CompTypeNum, // Component Type -- Integerized for this module
 		bool const FirstHVACIteration,
@@ -2269,7 +2268,7 @@ namespace OutdoorAirUnit {
 			}
 
 		} else {
-			ShowFatalError( "Invalid Outdoor Air Unit Component=" + trim( EquipType ) ); // validate
+			ShowFatalError( "Invalid Outdoor Air Unit Component=" + EquipType ); // validate
 		}}
 
 	}

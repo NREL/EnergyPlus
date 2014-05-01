@@ -1,7 +1,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <ReturnAirPathManager.hh>
@@ -46,7 +45,6 @@ namespace ReturnAirPathManager {
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::BeginDayFlag;
-	using DataGlobals::MaxNameLength;
 	using DataZoneEquipment::ReturnAirPath;
 	using DataZoneEquipment::NumReturnAirPaths;
 	using DataZoneEquipment::ZoneMixer_Type;
@@ -153,7 +151,7 @@ namespace ReturnAirPathManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), ReturnAirPath.Name(), PathNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+				VerifyName( cAlphaArgs( 1 ), ReturnAirPath.Name(), PathNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -161,14 +159,14 @@ namespace ReturnAirPathManager {
 				ReturnAirPath( PathNum ).Name = cAlphaArgs( 1 );
 				ReturnAirPath( PathNum ).NumOfComponents = nint( ( NumAlphas - 2.0 ) / 2.0 );
 
-				ReturnAirPath( PathNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
+				ReturnAirPath( PathNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 
 				ReturnAirPath( PathNum ).ComponentType.allocate( ReturnAirPath( PathNum ).NumOfComponents );
-				ReturnAirPath( PathNum ).ComponentType = " ";
+				ReturnAirPath( PathNum ).ComponentType = "";
 				ReturnAirPath( PathNum ).ComponentType_Num.allocate( ReturnAirPath( PathNum ).NumOfComponents );
 				ReturnAirPath( PathNum ).ComponentType_Num = 0;
 				ReturnAirPath( PathNum ).ComponentName.allocate( ReturnAirPath( PathNum ).NumOfComponents );
-				ReturnAirPath( PathNum ).ComponentName = " ";
+				ReturnAirPath( PathNum ).ComponentName = "";
 				ReturnAirPath( PathNum ).ComponentIndex.allocate( ReturnAirPath( PathNum ).NumOfComponents );
 				ReturnAirPath( PathNum ).ComponentIndex = 0;
 				Counter = 3;
@@ -181,14 +179,14 @@ namespace ReturnAirPathManager {
 						ReturnAirPath( PathNum ).ComponentName( CompNum ) = cAlphaArgs( Counter + 1 );
 						ValidateComponent( ReturnAirPath( PathNum ).ComponentType( CompNum ), ReturnAirPath( PathNum ).ComponentName( CompNum ), IsNotOK, "AirLoopHVAC:ReturnPath" );
 						if ( IsNotOK ) {
-							ShowContinueError( "In AirLoopHVAC:ReturnPath =" + trim( ReturnAirPath( PathNum ).Name ) );
+							ShowContinueError( "In AirLoopHVAC:ReturnPath =" + ReturnAirPath( PathNum ).Name );
 							ErrorsFound = true;
 						}
 						if ( SameString( cAlphaArgs( Counter ), "AirLoopHVAC:ZoneMixer" ) ) ReturnAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneMixer_Type;
 						if ( SameString( cAlphaArgs( Counter ), "AirLoopHVAC:ReturnPlenum" ) ) ReturnAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneReturnPlenum_Type;
 					} else {
-						ShowSevereError( "Unhandled component type in AirLoopHVAC:ReturnPath of " + trim( cAlphaArgs( Counter ) ) );
-						ShowContinueError( "Occurs in AirLoopHVAC:ReturnPath = " + trim( ReturnAirPath( PathNum ).Name ) );
+						ShowSevereError( "Unhandled component type in AirLoopHVAC:ReturnPath of " + cAlphaArgs( Counter ) );
+						ShowContinueError( "Occurs in AirLoopHVAC:ReturnPath = " + ReturnAirPath( PathNum ).Name );
 						ShowContinueError( "Must be \"AirLoopHVAC:ZoneMixer\" or \"AirLoopHVAC:ReturnPlenum\"" );
 						ErrorsFound = true;
 					}
@@ -265,8 +263,8 @@ namespace ReturnAirPathManager {
 				SimAirZonePlenum( ReturnAirPath( ReturnAirPathNum ).ComponentName( ComponentNum ), ZoneReturnPlenum_Type, ReturnAirPath( ReturnAirPathNum ).ComponentIndex( ComponentNum ) );
 
 			} else {
-				ShowSevereError( "Invalid AirLoopHVAC:ReturnPath Component=" + trim( ReturnAirPath( ReturnAirPathNum ).ComponentType( ComponentNum ) ) );
-				ShowContinueError( "Occurs in AirLoopHVAC:ReturnPath =" + trim( ReturnAirPath( ReturnAirPathNum ).Name ) );
+				ShowSevereError( "Invalid AirLoopHVAC:ReturnPath Component=" + ReturnAirPath( ReturnAirPathNum ).ComponentType( ComponentNum ) );
+				ShowContinueError( "Occurs in AirLoopHVAC:ReturnPath =" + ReturnAirPath( ReturnAirPathNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 
 			}}

@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace PlantChillers {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS:
@@ -97,7 +95,7 @@ namespace PlantChillers {
 	struct BaseChillerSpecs
 	{
 		// Members
-		Fstring Name; // user identifier
+		std::string Name; // user identifier
 		int CondenserType; // Type of Condenser - Air or Water Cooled
 		Real64 NomCap; // design nominal capacity of chiller
 		Real64 COP; // COP
@@ -127,8 +125,8 @@ namespace PlantChillers {
 		int BasinHeaterSchedulePtr; // Pointer to basin heater schedule
 		int ErrCount1; // for recurring error messages
 		int ErrCount2; // for recurring error messages
-		Fstring MsgBuffer1; // - buffer to print warning messages on following time step
-		Fstring MsgBuffer2; // - buffer to print warning messages on following time step
+		std::string MsgBuffer1; // - buffer to print warning messages on following time step
+		std::string MsgBuffer2; // - buffer to print warning messages on following time step
 		Real64 MsgDataLast; // value of data when warning occurred (passed to Recurring Warn)
 		bool PrintMessage; // logical to determine if message is valid
 		int MsgErrorCount; // number of occurrences of warning
@@ -139,7 +137,6 @@ namespace PlantChillers {
 
 		// Default Constructor
 		BaseChillerSpecs() :
-			Name( MaxNameLength ),
 			CondenserType( 0 ),
 			NomCap( 0.0 ),
 			COP( 0.0 ),
@@ -169,8 +166,6 @@ namespace PlantChillers {
 			BasinHeaterSchedulePtr( 0 ),
 			ErrCount1( 0 ),
 			ErrCount2( 0 ),
-			MsgBuffer1( 220 ),
-			MsgBuffer2( 300 ),
 			MsgDataLast( 0.0 ),
 			PrintMessage( false ),
 			MsgErrorCount( 0 ),
@@ -182,7 +177,7 @@ namespace PlantChillers {
 
 		// Member Constructor
 		BaseChillerSpecs(
-			Fstring const & Name, // user identifier
+			std::string const & Name, // user identifier
 			int const CondenserType, // Type of Condenser - Air or Water Cooled
 			Real64 const NomCap, // design nominal capacity of chiller
 			Real64 const COP, // COP
@@ -212,8 +207,8 @@ namespace PlantChillers {
 			int const BasinHeaterSchedulePtr, // Pointer to basin heater schedule
 			int const ErrCount1, // for recurring error messages
 			int const ErrCount2, // for recurring error messages
-			Fstring const & MsgBuffer1, // - buffer to print warning messages on following time step
-			Fstring const & MsgBuffer2, // - buffer to print warning messages on following time step
+			std::string const & MsgBuffer1, // - buffer to print warning messages on following time step
+			std::string const & MsgBuffer2, // - buffer to print warning messages on following time step
 			Real64 const MsgDataLast, // value of data when warning occurred (passed to Recurring Warn)
 			bool const PrintMessage, // logical to determine if message is valid
 			int const MsgErrorCount, // number of occurrences of warning
@@ -222,7 +217,7 @@ namespace PlantChillers {
 			int const CondMassFlowIndex,
 			bool const IsThisSized // Ture if sizing is done
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			CondenserType( CondenserType ),
 			NomCap( NomCap ),
 			COP( COP ),
@@ -252,8 +247,8 @@ namespace PlantChillers {
 			BasinHeaterSchedulePtr( BasinHeaterSchedulePtr ),
 			ErrCount1( ErrCount1 ),
 			ErrCount2( ErrCount2 ),
-			MsgBuffer1( 220, MsgBuffer1 ),
-			MsgBuffer2( 300, MsgBuffer2 ),
+			MsgBuffer1( MsgBuffer1 ),
+			MsgBuffer2( MsgBuffer2 ),
 			MsgDataLast( MsgDataLast ),
 			PrintMessage( PrintMessage ),
 			MsgErrorCount( MsgErrorCount ),
@@ -385,7 +380,7 @@ namespace PlantChillers {
 	{
 		// Members
 		BaseChillerSpecs Base;
-		Fstring FuelType; // Type of Fuel - DIESEL, GASOLINE, GAS
+		std::string FuelType; // Type of Fuel - DIESEL, GASOLINE, GAS
 		Real64 MinPartLoadRat; // (EngineDriven MIN) min allowed operating frac full load
 		Real64 MaxPartLoadRat; // (EngineDriven MAX) max allowed operating frac full load
 		Real64 OptPartLoadRat; // (EngineDriven BEST) optimal operating frac full load
@@ -423,7 +418,6 @@ namespace PlantChillers {
 
 		// Default Constructor
 		EngineDrivenChillerSpecs() :
-			FuelType( MaxNameLength ),
 			MinPartLoadRat( 0.0 ),
 			MaxPartLoadRat( 0.0 ),
 			OptPartLoadRat( 0.0 ),
@@ -461,7 +455,7 @@ namespace PlantChillers {
 		// Member Constructor
 		EngineDrivenChillerSpecs(
 			BaseChillerSpecs const & Base,
-			Fstring const & FuelType, // Type of Fuel - DIESEL, GASOLINE, GAS
+			std::string const & FuelType, // Type of Fuel - DIESEL, GASOLINE, GAS
 			Real64 const MinPartLoadRat, // (EngineDriven MIN) min allowed operating frac full load
 			Real64 const MaxPartLoadRat, // (EngineDriven MAX) max allowed operating frac full load
 			Real64 const OptPartLoadRat, // (EngineDriven BEST) optimal operating frac full load
@@ -496,7 +490,7 @@ namespace PlantChillers {
 			bool const IsThisSized // Ture if sizing is done
 		) :
 			Base( Base ),
-			FuelType( MaxNameLength, FuelType ),
+			FuelType( FuelType ),
 			MinPartLoadRat( MinPartLoadRat ),
 			MaxPartLoadRat( MaxPartLoadRat ),
 			OptPartLoadRat( OptPartLoadRat ),
@@ -537,7 +531,7 @@ namespace PlantChillers {
 	{
 		// Members
 		BaseChillerSpecs Base;
-		Fstring FuelType; // Type of Fuel - DIESEL, GASOLINE, GAS
+		std::string FuelType; // Type of Fuel - DIESEL, GASOLINE, GAS
 		Real64 MinPartLoadRat; // (GT MIN) min allowed operating frac full load
 		Real64 MaxPartLoadRat; // (GT MAX) max allowed operating frac full load
 		Real64 OptPartLoadRat; // (GT BEST) optimal operating frac full load
@@ -587,7 +581,6 @@ namespace PlantChillers {
 
 		// Default Constructor
 		GTChillerSpecs() :
-			FuelType( MaxNameLength ),
 			MinPartLoadRat( 0.0 ),
 			MaxPartLoadRat( 0.0 ),
 			OptPartLoadRat( 0.0 ),
@@ -635,7 +628,7 @@ namespace PlantChillers {
 		// Member Constructor
 		GTChillerSpecs(
 			BaseChillerSpecs const & Base,
-			Fstring const & FuelType, // Type of Fuel - DIESEL, GASOLINE, GAS
+			std::string const & FuelType, // Type of Fuel - DIESEL, GASOLINE, GAS
 			Real64 const MinPartLoadRat, // (GT MIN) min allowed operating frac full load
 			Real64 const MaxPartLoadRat, // (GT MAX) max allowed operating frac full load
 			Real64 const OptPartLoadRat, // (GT BEST) optimal operating frac full load
@@ -680,7 +673,7 @@ namespace PlantChillers {
 			bool const IsThisSized // Ture if sizing is done
 		) :
 			Base( Base ),
-			FuelType( MaxNameLength, FuelType ),
+			FuelType( FuelType ),
 			MinPartLoadRat( MinPartLoadRat ),
 			MaxPartLoadRat( MaxPartLoadRat ),
 			OptPartLoadRat( OptPartLoadRat ),
@@ -1044,7 +1037,7 @@ namespace PlantChillers {
 		int const LoopNum, // Flow control mode for the equipment
 		int const LoopSide, // chiller number pointer
 		int const ChillerType, // type of chiller
-		Fstring const & ChillerName, // user specified name of chiller
+		std::string const & ChillerName, // user specified name of chiller
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // chiller number pointer
 		bool const RunFlag, // simulate chiller when TRUE

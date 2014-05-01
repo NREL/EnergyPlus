@@ -1,3 +1,6 @@
+// ObjexxFCL Headers
+#include <ObjexxFCL/string.functions.hh>
+
 // EnergyPlus Headers
 #include <DataRuntimeLanguage.hh>
 #include <DataPrecisionGlobals.hh>
@@ -21,7 +24,6 @@ namespace DataRuntimeLanguage {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// module should be available to other modules and routines.
@@ -198,17 +200,17 @@ namespace DataRuntimeLanguage {
 	FArray1D< InternalVarsAvailableType > EMSInternalVarsAvailable; // internal data that could be used
 	FArray1D< InternalVarsUsedType > EMSInternalVarsUsed; // internal data that are used
 	FArray1D< EMSProgramCallManagementType > EMSProgramCallManager; // program calling managers
-	ErlValueType Null( 0, 0.0, " ", 0, 0, false, 0, " " ); // special "null" Erl variable value instance
-	ErlValueType False( 0, 0.0, " ", 0, 0, false, 0, " " ); // special "false" Erl variable value instance
-	ErlValueType True( 0, 0.0, " ", 0, 0, false, 0, " " ); // special "True" Erl variable value instance, gets reset
+	ErlValueType Null( 0, 0.0, "", 0, 0, false, 0, "" ); // special "null" Erl variable value instance
+	ErlValueType False( 0, 0.0, "", 0, 0, false, 0, "" ); // special "false" Erl variable value instance
+	ErlValueType True( 0, 0.0, "", 0, 0, false, 0, "" ); // special "True" Erl variable value instance, gets reset
 
 	// Functions
 
 	void
 	ValidateEMSVariableName(
-		Fstring const & cModuleObject, // the current object name
-		Fstring const & cFieldValue, // the field value
-		Fstring const & cFieldName, // the current field name
+		std::string const & cModuleObject, // the current object name
+		std::string const & cFieldValue, // the field value
+		std::string const & cFieldName, // the current field name
 		bool & errFlag, // true if errors found in this routine.
 		bool & ErrorsFound // true if errors found in this routine.
 	)
@@ -235,7 +237,7 @@ namespace DataRuntimeLanguage {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const InvalidStartCharacters( "0123456789" );
+		static std::string const InvalidStartCharacters( "0123456789" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -244,37 +246,35 @@ namespace DataRuntimeLanguage {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int pos;
 
 		errFlag = false;
-		if ( SCAN( trim( cFieldValue ), " " ) > 0 ) {
-			ShowSevereError( trim( cModuleObject ) + "=\"" + trim( cFieldValue ) + "\", Invalid variable name entered." );
-			ShowContinueError( "..." + trim( cFieldName ) + "; Names used as EMS variables cannot contain spaces" );
+		if ( has( cFieldValue, ' ' ) ) {
+			ShowSevereError( cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered." );
+			ShowContinueError( "..." + cFieldName + "; Names used as EMS variables cannot contain spaces" );
 			errFlag = true;
 			ErrorsFound = true;
 		}
-		if ( SCAN( trim( cFieldValue ), "-" ) > 0 ) {
-			ShowSevereError( trim( cModuleObject ) + "=\"" + trim( cFieldValue ) + "\", Invalid variable name entered." );
-			ShowContinueError( "..." + trim( cFieldName ) + "; Names used as EMS variables cannot contain \"-\" characters." );
+		if ( has( cFieldValue, '-' ) ) {
+			ShowSevereError( cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered." );
+			ShowContinueError( "..." + cFieldName + "; Names used as EMS variables cannot contain \"-\" characters." );
 			errFlag = true;
 			ErrorsFound = true;
 		}
-		if ( SCAN( trim( cFieldValue ), "+" ) > 0 ) {
-			ShowSevereError( trim( cModuleObject ) + "=\"" + trim( cFieldValue ) + "\", Invalid variable name entered." );
-			ShowContinueError( "..." + trim( cFieldName ) + "; Names used as EMS variables cannot contain \"+\" characters." );
+		if ( has( cFieldValue, '+' ) ) {
+			ShowSevereError( cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered." );
+			ShowContinueError( "..." + cFieldName + "; Names used as EMS variables cannot contain \"+\" characters." );
 			errFlag = true;
 			ErrorsFound = true;
 		}
-		if ( SCAN( trim( cFieldValue ), "." ) > 0 ) {
-			ShowSevereError( trim( cModuleObject ) + "=\"" + trim( cFieldValue ) + "\", Invalid variable name entered." );
-			ShowContinueError( "..." + trim( cFieldName ) + "; Names used as EMS variables cannot contain \".\" characters." );
+		if ( has( cFieldValue, '.' ) ) {
+			ShowSevereError( cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered." );
+			ShowContinueError( "..." + cFieldName + "; Names used as EMS variables cannot contain \".\" characters." );
 			errFlag = true;
 			ErrorsFound = true;
 		}
-		pos = SCAN( cFieldValue( 1, 1 ), InvalidStartCharacters );
-		if ( pos > 0 ) {
-			ShowSevereError( trim( cModuleObject ) + "=\"" + trim( cFieldValue ) + "\", Invalid variable name entered." );
-			ShowContinueError( "..." + trim( cFieldName ) + "; Names used as EMS variables cannot start with numeric characters." );
+		if ( ( cFieldValue.length() > 0 ) && ( has_any_of( cFieldValue[ 0 ], InvalidStartCharacters ) ) ) {
+			ShowSevereError( cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered." );
+			ShowContinueError( "..." + cFieldName + "; Names used as EMS variables cannot start with numeric characters." );
 			errFlag = true;
 			ErrorsFound = true;
 		}
@@ -283,10 +283,10 @@ namespace DataRuntimeLanguage {
 
 	void
 	ValidateEMSProgramName(
-		Fstring const & cModuleObject, // the current object name
-		Fstring const & cFieldValue, // the field value
-		Fstring const & cFieldName, // the current field name
-		Fstring const & cSubType, // sub type = Program or Subroutine
+		std::string const & cModuleObject, // the current object name
+		std::string const & cFieldValue, // the field value
+		std::string const & cFieldName, // the current field name
+		std::string const & cSubType, // sub type = Program or Subroutine
 		bool & errFlag, // true if errors found in this routine.
 		bool & ErrorsFound // true if errors found in this routine.
 	)
@@ -313,7 +313,7 @@ namespace DataRuntimeLanguage {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const InvalidStartCharacters( "0123456789" );
+		static std::string const InvalidStartCharacters( "0123456789" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -325,21 +325,21 @@ namespace DataRuntimeLanguage {
 		// INTEGER :: pos
 
 		errFlag = false;
-		if ( SCAN( trim( cFieldValue ), " " ) > 0 ) {
-			ShowSevereError( trim( cModuleObject ) + "=\"" + trim( cFieldValue ) + "\", Invalid variable name entered." );
-			ShowContinueError( "..." + trim( cFieldName ) + "; Names used for EMS " + trim( cSubType ) + " cannot contain spaces" );
+		if ( has( cFieldValue, ' ' ) ) {
+			ShowSevereError( cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered." );
+			ShowContinueError( "..." + cFieldName + "; Names used for EMS " + cSubType + " cannot contain spaces" );
 			errFlag = true;
 			ErrorsFound = true;
 		}
-		if ( SCAN( trim( cFieldValue ), "-" ) > 0 ) {
-			ShowSevereError( trim( cModuleObject ) + "=\"" + trim( cFieldValue ) + "\", Invalid variable name entered." );
-			ShowContinueError( "..." + trim( cFieldName ) + "; Names used for EMS " + trim( cSubType ) + " cannot contain \"-\" characters." );
+		if ( has( cFieldValue, '-' ) ) {
+			ShowSevereError( cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered." );
+			ShowContinueError( "..." + cFieldName + "; Names used for EMS " + cSubType + " cannot contain \"-\" characters." );
 			errFlag = true;
 			ErrorsFound = true;
 		}
-		if ( SCAN( trim( cFieldValue ), "+" ) > 0 ) {
-			ShowSevereError( trim( cModuleObject ) + "=\"" + trim( cFieldValue ) + "\", Invalid variable name entered." );
-			ShowContinueError( "..." + trim( cFieldName ) + "; Names used for EMS " + trim( cSubType ) + " cannot contain \"+\" characters." );
+		if ( has( cFieldValue, '+' ) ) {
+			ShowSevereError( cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered." );
+			ShowContinueError( "..." + cFieldName + "; Names used for EMS " + cSubType + " cannot contain \"+\" characters." );
 			errFlag = true;
 			ErrorsFound = true;
 		}

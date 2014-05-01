@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -334,7 +333,7 @@ namespace SystemReports {
 	CalcSystemEnergyUse(
 		bool const CompLoadFlag,
 		int const AirLoopNum,
-		Fstring const & CompType,
+		std::string const & CompType,
 		int const EnergyType,
 		Real64 const CompLoad,
 		Real64 const CompEnergy
@@ -351,8 +350,8 @@ namespace SystemReports {
 
 	void
 	FindDemandSideMatch(
-		Fstring const & CompType, // Inlet node of the component to find the match of
-		Fstring const & CompName, // Outlet node of the component to find the match of
+		std::string const & CompType, // Inlet node of the component to find the match of
+		std::string const & CompName, // Outlet node of the component to find the match of
 		bool & MatchFound, // Set to .TRUE. when a match is found
 		int & MatchLoopType, // Loop number of the match
 		int & MatchLoop, // Loop number of the match

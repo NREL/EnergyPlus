@@ -25,7 +25,6 @@ namespace DataWindowEquivalentLayer {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// CFSTY: Complex Fenestration System

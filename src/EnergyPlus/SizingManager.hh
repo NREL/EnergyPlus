@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace SizingManager {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS: none
@@ -33,23 +31,22 @@ namespace SizingManager {
 	struct ZoneListData
 	{
 		// Members
-		Fstring Name;
+		std::string Name;
 		int NumOfZones;
 		FArray1D_int Zones;
 
 		// Default Constructor
 		ZoneListData() :
-			Name( MaxNameLength ),
 			NumOfZones( 0 )
 		{}
 
 		// Member Constructor
 		ZoneListData(
-			Fstring const & Name,
+			std::string const & Name,
 			int const NumOfZones,
 			FArray1_int const & Zones
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NumOfZones( NumOfZones ),
 			Zones( Zones )
 		{}
@@ -77,7 +74,7 @@ namespace SizingManager {
 	GetZoneAndZoneListNames(
 		bool & ErrorsFound,
 		int & NumZones,
-		FArray1D_Fstring & ZoneNames,
+		FArray1D_string & ZoneNames,
 		int & NumZoneLists,
 		FArray1D< ZoneListData > & ZoneListNames
 	);
@@ -93,14 +90,14 @@ namespace SizingManager {
 
 	void
 	ReportZoneSizing(
-		Fstring const & ZoneName, // the name of the zone
-		Fstring const & LoadType, // the description of the input variable
+		std::string const & ZoneName, // the name of the zone
+		std::string const & LoadType, // the description of the input variable
 		Real64 const CalcDesLoad, // the value from the sizing calculation [W]
 		Real64 const UserDesLoad, // the value from the sizing calculation modified by user input [W]
 		Real64 const CalcDesFlow, // calculated design air flow rate [m3/s]
 		Real64 const UserDesFlow, // user input or modified design air flow rate [m3/s]
-		Fstring const & DesDayName, // the name of the design day that produced the peak
-		Fstring const & PeakHrMin, // time stamp of the peak
+		std::string const & DesDayName, // the name of the design day that produced the peak
+		std::string const & PeakHrMin, // time stamp of the peak
 		Real64 const PeakTemp, // temperature at peak [C]
 		Real64 const PeakHumRat, // humidity ratio at peak [kg water/kg dry air]
 		Real64 const FloorArea, // zone floor area [m2]
@@ -110,8 +107,8 @@ namespace SizingManager {
 
 	void
 	ReportSysSizing(
-		Fstring const & SysName, // the name of the zone
-		Fstring const & VarDesc, // the description of the input variable
+		std::string const & SysName, // the name of the zone
+		std::string const & VarDesc, // the description of the input variable
 		Real64 const VarValue // the value from the sizing calculation
 	);
 

@@ -4,7 +4,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
+#include <ObjexxFCL/gio_Fmt.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -16,7 +16,6 @@ namespace EnergyPlus {
 namespace InputProcessor {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
@@ -29,14 +28,14 @@ namespace InputProcessor {
 	// when max is reached
 	extern int const ObjectsIDFAllocInc; // Initial number of Objects allowed in IDF as well as the increment
 	// when max is reached
-	extern int const MaxObjectNameLength; // Maximum number of characters in an Object Name
-	extern int const MaxSectionNameLength; // Maximum number of characters in a Section Name
-	extern int const MaxAlphaArgLength; // Maximum number of characters in an Alpha Argument
-	extern int const MaxInputLineLength; // Maximum number of characters in an input line (in.idf, energy+.idd)
-	extern int const MaxFieldNameLength; // Maximum number of characters in a field name string
-	extern Fstring const Blank;
-	extern Fstring const AlphaNum; // Valid indicators for Alpha or Numeric fields (A or N)
-	extern Fstring const fmta;
+	extern std::string::size_type const MaxObjectNameLength; // Maximum number of characters in an Object Name
+	extern std::string::size_type const MaxSectionNameLength; // Maximum number of characters in a Section Name
+	extern std::string::size_type const MaxAlphaArgLength; // Maximum number of characters in an Alpha Argument
+	extern std::string::size_type const MaxInputLineLength; // Maximum number of characters in an input line (in.idf, energy+.idd)
+	extern std::string::size_type const MaxFieldNameLength; // Maximum number of characters in a field name string
+	extern std::string const Blank;
+	extern std::string const AlphaNum; // Valid indicators for Alpha or Numeric fields (A or N)
+	extern gio::Fmt const fmta;
 	extern Real64 const DefAutoSizeValue;
 	extern Real64 const DefAutoCalculateValue;
 
@@ -82,15 +81,15 @@ namespace InputProcessor {
 	//na
 
 	//Character Variables for Module
-	extern Fstring InputLine; // Each line can be up to MaxInputLineLength characters long
-	extern FArray1D_Fstring ListOfSections;
-	extern FArray1D_Fstring ListOfObjects;
+	extern std::string InputLine; // Each line can be up to MaxInputLineLength characters long
+	extern FArray1D_string ListOfSections;
+	extern FArray1D_string ListOfObjects;
 	extern FArray1D_int iListOfObjects;
 	extern FArray1D_int ObjectGotCount;
 	extern FArray1D_int ObjectStartRecord;
-	extern Fstring CurrentFieldName; // Current Field Name (IDD)
-	extern FArray1D_Fstring ObsoleteObjectsRepNames; // Array of Replacement names for Obsolete objects
-	extern Fstring ReplacementName;
+	extern std::string CurrentFieldName; // Current Field Name (IDD)
+	extern FArray1D_string ObsoleteObjectsRepNames; // Array of Replacement names for Obsolete objects
+	extern std::string ReplacementName;
 
 	//Logical Variables for Module
 	extern bool OverallErrorFlag; // If errors found during parse of IDF, will fatal at end
@@ -117,8 +116,8 @@ namespace InputProcessor {
 		// Members
 		bool MinMaxChk; // true when Min/Max has been added
 		int FieldNumber; // which field number this is
-		Fstring FieldName; // Name of the field
-		FArray1D_Fstring MinMaxString; // appropriate Min/Max Strings
+		std::string FieldName; // Name of the field
+		FArray1D_string MinMaxString; // appropriate Min/Max Strings
 		FArray1D< Real64 > MinMaxValue; // appropriate Min/Max Values
 		FArray1D_int WhichMinMax; // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
 		bool DefaultChk; // true when default has been entered
@@ -134,8 +133,7 @@ namespace InputProcessor {
 		RangeCheckDef() :
 			MinMaxChk( false ),
 			FieldNumber( 0 ),
-			FieldName( MaxFieldNameLength, Blank ),
-			MinMaxString( 2, sFstring( 32 ), Blank ),
+			MinMaxString( 2, Blank ),
 			MinMaxValue( 2, 0.0 ),
 			WhichMinMax( 2, 0 ),
 			DefaultChk( false ),
@@ -152,8 +150,8 @@ namespace InputProcessor {
 		RangeCheckDef(
 			bool const MinMaxChk, // true when Min/Max has been added
 			int const FieldNumber, // which field number this is
-			Fstring const & FieldName, // Name of the field
-			FArray1_Fstring const & MinMaxString, // appropriate Min/Max Strings
+			std::string const & FieldName, // Name of the field
+			FArray1_string const & MinMaxString, // appropriate Min/Max Strings
 			FArray1< Real64 > const & MinMaxValue, // appropriate Min/Max Values
 			FArray1_int const & WhichMinMax, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
 			bool const DefaultChk, // true when default has been entered
@@ -167,8 +165,8 @@ namespace InputProcessor {
 		) :
 			MinMaxChk( MinMaxChk ),
 			FieldNumber( FieldNumber ),
-			FieldName( MaxFieldNameLength, FieldName ),
-			MinMaxString( 2, sFstring( 32 ), MinMaxString ),
+			FieldName( FieldName ),
+			MinMaxString( 2, MinMaxString ),
 			MinMaxValue( 2, MinMaxValue ),
 			WhichMinMax( 2, WhichMinMax ),
 			DefaultChk( DefaultChk ),
@@ -186,7 +184,7 @@ namespace InputProcessor {
 	struct ObjectsDefinition
 	{
 		// Members
-		Fstring Name; // Name of the Object
+		std::string Name; // Name of the Object
 		int NumParams; // Number of parameters to be processed for each object
 		int NumAlpha; // Number of Alpha elements in the object
 		int NumNumeric; // Number of Numeric elements in the object
@@ -204,14 +202,13 @@ namespace InputProcessor {
 		// is alpha (true) or numeric (false)
 		FArray1D_bool ReqField; // True for required fields
 		FArray1D_bool AlphRetainCase; // true if retaincase is set for this field (alpha fields only)
-		FArray1D_Fstring AlphFieldChks; // Field names for alphas
-		FArray1D_Fstring AlphFieldDefs; // Defaults for alphas
+		FArray1D_string AlphFieldChks; // Field names for alphas
+		FArray1D_string AlphFieldDefs; // Defaults for alphas
 		FArray1D< RangeCheckDef > NumRangeChks; // Used to range check and default numeric fields
 		int NumFound; // Number of this object found in IDF
 
 		// Default Constructor
 		ObjectsDefinition() :
-			Name( MaxObjectNameLength, Blank ),
 			NumParams( 0 ),
 			NumAlpha( 0 ),
 			NumNumeric( 0 ),
@@ -224,14 +221,12 @@ namespace InputProcessor {
 			LastExtendAlpha( 0 ),
 			LastExtendNum( 0 ),
 			ObsPtr( 0 ),
-			AlphFieldChks( sFstring( MaxFieldNameLength ) ),
-			AlphFieldDefs( sFstring( MaxNameLength ) ),
 			NumFound( 0 )
 		{}
 
 		// Member Constructor
 		ObjectsDefinition(
-			Fstring const & Name, // Name of the Object
+			std::string const & Name, // Name of the Object
 			int const NumParams, // Number of parameters to be processed for each object
 			int const NumAlpha, // Number of Alpha elements in the object
 			int const NumNumeric, // Number of Numeric elements in the object
@@ -247,12 +242,11 @@ namespace InputProcessor {
 			FArray1_bool const & AlphaOrNumeric, // Positionally, whether the argument
 			FArray1_bool const & ReqField, // True for required fields
 			FArray1_bool const & AlphRetainCase, // true if retaincase is set for this field (alpha fields only)
-			FArray1_Fstring const & AlphFieldChks, // Field names for alphas
-			FArray1_Fstring const & AlphFieldDefs, // Defaults for alphas
+			FArray1_string const & AlphFieldChks, // Field names for alphas
+			FArray1_string const & AlphFieldDefs, // Defaults for alphas
 			FArray1< RangeCheckDef > const & NumRangeChks, // Used to range check and default numeric fields
 			int const NumFound // Number of this object found in IDF
 		) :
-			Name( MaxObjectNameLength, Name ),
 			NumParams( NumParams ),
 			NumAlpha( NumAlpha ),
 			NumNumeric( NumNumeric ),
@@ -279,21 +273,20 @@ namespace InputProcessor {
 	struct SectionsDefinition
 	{
 		// Members
-		Fstring Name; // Name of the Section
+		std::string Name; // Name of the Section
 		int NumFound; // Number of this object found in IDF
 
 		// Default Constructor
 		SectionsDefinition() :
-			Name( MaxSectionNameLength, Blank ),
 			NumFound( 0 )
 		{}
 
 		// Member Constructor
 		SectionsDefinition(
-			Fstring const & Name, // Name of the Section
+			std::string const & Name, // Name of the Section
 			int const NumFound // Number of this object found in IDF
 		) :
-			Name( MaxSectionNameLength, Name ),
+			Name( Name ),
 			NumFound( NumFound )
 		{}
 
@@ -302,14 +295,13 @@ namespace InputProcessor {
 	struct FileSectionsDefinition
 	{
 		// Members
-		Fstring Name; // Name of this section
+		std::string Name; // Name of this section
 		int FirstRecord; // Record number of first object in section
 		int FirstLineNo; // Record number of first object in section
 		int LastRecord; // Record number of last object in section
 
 		// Default Constructor
 		FileSectionsDefinition() :
-			Name( MaxSectionNameLength, Blank ),
 			FirstRecord( 0 ),
 			FirstLineNo( 0 ),
 			LastRecord( 0 )
@@ -317,12 +309,12 @@ namespace InputProcessor {
 
 		// Member Constructor
 		FileSectionsDefinition(
-			Fstring const & Name, // Name of this section
+			std::string const & Name, // Name of this section
 			int const FirstRecord, // Record number of first object in section
 			int const FirstLineNo, // Record number of first object in section
 			int const LastRecord // Record number of last object in section
 		) :
-			Name( MaxSectionNameLength, Name ),
+			Name( Name ),
 			FirstRecord( FirstRecord ),
 			FirstLineNo( FirstLineNo ),
 			LastRecord( LastRecord )
@@ -335,36 +327,33 @@ namespace InputProcessor {
 		// Members
 		// The arrays (Alphas, Numbers) will be dimensioned to be
 		// the size expected from the definition.
-		Fstring Name; // Object name for this record
+		std::string Name; // Object name for this record
 		int NumAlphas; // Number of alphas on this record
 		int NumNumbers; // Number of numbers on this record
 		int ObjectDefPtr; // Which Object Def is this
-		FArray1D_Fstring Alphas; // Storage for the alphas
+		FArray1D_string Alphas; // Storage for the alphas
 		FArray1D_bool AlphBlank; // Set to true if this field was blank on input
 		FArray1D< Real64 > Numbers; // Storage for the numbers
 		FArray1D_bool NumBlank; // Set to true if this field was blank on input
 
 		// Default Constructor
 		LineDefinition() :
-			Name( MaxObjectNameLength, Blank ),
 			NumAlphas( 0 ),
 			NumNumbers( 0 ),
-			ObjectDefPtr( 0 ),
-			Alphas( sFstring( MaxAlphaArgLength ) )
+			ObjectDefPtr( 0 )
 		{}
 
 		// Member Constructor
 		LineDefinition(
-			Fstring const & Name, // Object name for this record
+			std::string const & Name, // Object name for this record
 			int const NumAlphas, // Number of alphas on this record
 			int const NumNumbers, // Number of numbers on this record
 			int const ObjectDefPtr, // Which Object Def is this
-			FArray1_Fstring const & Alphas, // Storage for the alphas
+			FArray1_string const & Alphas, // Storage for the alphas
 			FArray1_bool const & AlphBlank, // Set to true if this field was blank on input
 			FArray1< Real64 > const & Numbers, // Storage for the numbers
 			FArray1_bool const & NumBlank // Set to true if this field was blank on input
 		) :
-			Name( MaxObjectNameLength, Name ),
 			NumAlphas( NumAlphas ),
 			NumNumbers( NumNumbers ),
 			ObjectDefPtr( ObjectDefPtr ),
@@ -379,8 +368,8 @@ namespace InputProcessor {
 	struct SecretObjects
 	{
 		// Members
-		Fstring OldName; // Old Object Name
-		Fstring NewName; // New Object Name if applicable
+		std::string OldName; // Old Object Name
+		std::string NewName; // New Object Name if applicable
 		bool Deleted; // true if this (old name) was deleted
 		bool Used; // true when used (and reported) in this input file
 		bool Transitioned; // true if old name will be transitioned to new object within IP
@@ -388,8 +377,6 @@ namespace InputProcessor {
 
 		// Default Constructor
 		SecretObjects() :
-			OldName( MaxObjectNameLength, Blank ),
-			NewName( MaxObjectNameLength, Blank ),
 			Deleted( false ),
 			Used( false ),
 			Transitioned( false ),
@@ -398,15 +385,15 @@ namespace InputProcessor {
 
 		// Member Constructor
 		SecretObjects(
-			Fstring const & OldName, // Old Object Name
-			Fstring const & NewName, // New Object Name if applicable
+			std::string const & OldName, // Old Object Name
+			std::string const & NewName, // New Object Name if applicable
 			bool const Deleted, // true if this (old name) was deleted
 			bool const Used, // true when used (and reported) in this input file
 			bool const Transitioned, // true if old name will be transitioned to new object within IP
 			bool const TransitionDefer // true if old name will be transitioned to new object within IP
 		) :
-			OldName( MaxObjectNameLength, OldName ),
-			NewName( MaxObjectNameLength, NewName ),
+			OldName( OldName ),
+			NewName( NewName ),
 			Deleted( Deleted ),
 			Used( Used ),
 			Transitioned( Transitioned ),
@@ -433,14 +420,14 @@ namespace InputProcessor {
 
 	void
 	AddSectionDef(
-		Fstring const & ProposedSection, // Proposed Section to be added
+		std::string const & ProposedSection, // Proposed Section to be added
 		bool & ErrorsFound // set to true if errors found here
 	);
 
 	void
 	AddObjectDefandParse(
-		Fstring const & ProposedObject, // Proposed Object to Add
-		int & CurPos, // Current position (initially at first ',') of InputLine
+		std::string const & ProposedObject, // Proposed Object to Add
+		std::string::size_type & CurPos, // Current position (initially at first ',') of InputLine
 		bool & EndofFile, // End of File marker
 		bool & ErrorsFound // set to true if errors found here
 	);
@@ -450,14 +437,14 @@ namespace InputProcessor {
 
 	void
 	ValidateSection(
-		Fstring const & ProposedSection,
+		std::string const & ProposedSection,
 		int const LineNo
 	);
 
 	void
 	ValidateObjectandParse(
-		Fstring const & ProposedObject,
-		int & CurPos,
+		std::string const & ProposedObject,
+		std::string::size_type & CurPos,
 		bool & EndofFile
 	);
 
@@ -465,19 +452,19 @@ namespace InputProcessor {
 	ValidateSectionsInput();
 
 	int
-	GetNumSectionsFound( Fstring const & SectionWord );
+	GetNumSectionsFound( std::string const & SectionWord );
 
 	int
 	GetNumSectionsinInput();
 
 	void
 	GetListofSectionsinInput(
-		FArray1S_Fstring SectionList,
+		FArray1S_string SectionList,
 		int & NuminList
 	);
 
 	int
-	GetNumObjectsFound( Fstring const & ObjectWord );
+	GetNumObjectsFound( std::string const & ObjectWord );
 
 	void
 	GetRecordLocations(
@@ -488,28 +475,28 @@ namespace InputProcessor {
 
 	void
 	GetObjectItem(
-		Fstring const & Object,
+		std::string const & Object,
 		int const Number,
-		FArray1S_Fstring Alphas,
+		FArray1S_string Alphas,
 		int & NumAlphas,
 		FArray1S< Real64 > Numbers,
 		int & NumNumbers,
 		int & Status,
 		Optional< FArray1_bool > NumBlank = _,
 		Optional< FArray1_bool > AlphaBlank = _,
-		Optional< FArray1_Fstring > AlphaFieldNames = _,
-		Optional< FArray1_Fstring > NumericFieldNames = _
+		Optional< FArray1_string > AlphaFieldNames = _,
+		Optional< FArray1_string > NumericFieldNames = _
 	);
 
 	int
 	GetObjectItemNum(
-		Fstring const & ObjType, // Object Type (ref: IDD Objects)
-		Fstring const & ObjName // Name of the object type
+		std::string const & ObjType, // Object Type (ref: IDD Objects)
+		std::string const & ObjName // Name of the object type
 	);
 
 	void
 	TellMeHowManyObjectItemArgs(
-		Fstring const & Object,
+		std::string const & Object,
 		int const Number,
 		int & NumAlpha,
 		int & NumNumbers,
@@ -519,10 +506,10 @@ namespace InputProcessor {
 	void
 	GetObjectItemfromFile(
 		int const Which,
-		Fstring & ObjectWord,
+		std::string & ObjectWord,
 		int & NumAlpha,
 		int & NumNumeric,
-		Optional< FArray1S_Fstring > AlphaArgs = _,
+		Optional< FArray1S_string > AlphaArgs = _,
 		Optional< FArray1S< Real64 > > NumericArgs = _,
 		Optional< FArray1S_bool > AlphaBlanks = _,
 		Optional< FArray1S_bool > NumericBlanks = _
@@ -533,16 +520,16 @@ namespace InputProcessor {
 	void
 	ReadInputLine(
 		int const UnitNumber,
-		int & CurPos,
+		std::string::size_type & CurPos,
 		bool & BlankLine,
 		int & InputLineLength,
 		bool & EndofFile,
 		Optional_bool MinMax = _,
 		Optional_int WhichMinMax = _, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max< //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_Fstring MinMaxString = _, //Autodesk:OPTIONAL Used without PRESENT check
+		Optional_string MinMaxString = _, //Autodesk:OPTIONAL Used without PRESENT check
 		Optional< Real64 > Value = _, //Autodesk:OPTIONAL Used without PRESENT check
 		Optional_bool Default = _,
-		Optional_Fstring DefString = _, //Autodesk:OPTIONAL Used without PRESENT check
+		Optional_string DefString = _, //Autodesk:OPTIONAL Used without PRESENT check
 		Optional_bool AutoSizable = _,
 		Optional_bool AutoCalculatable = _,
 		Optional_bool RetainCase = _, //Autodesk:OPTIONAL Used without PRESENT check
@@ -557,24 +544,24 @@ namespace InputProcessor {
 
 	Real64
 	ProcessNumber(
-		Fstring const & String,
+		std::string const & String,
 		bool & ErrorFlag
 	);
 
 	void
 	ProcessMinMaxDefLine(
-		Fstring const & UCInputLine, // part of input line starting \min or \max
+		std::string const & UCInputLine, // part of input line starting \min or \max
 		int & WhichMinMax, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
-		Fstring & MinMaxString,
+		std::string & MinMaxString,
 		Real64 & Value,
-		Fstring & DefaultString,
+		std::string & DefaultString,
 		int & ErrLevel
 	);
 
 	int
 	FindItemInList(
-		Fstring const & String,
-		FArray1S_Fstring const ListOfItems,
+		std::string const & String,
+		FArray1S_string const ListOfItems,
 		int const NumItems
 	);
 
@@ -582,18 +569,18 @@ namespace InputProcessor {
 	inline
 	int
 	FindItemInList(
-		Fstring const & String,
-		MArray1< A, Fstring > const & ListOfItems,
+		std::string const & String,
+		MArray1< A, std::string > const & ListOfItems,
 		int const NumItems
 	)
 	{
-		return FindItemInList( String, FArray1D_Fstring( ListOfItems ), NumItems );
+		return FindItemInList( String, FArray1D_string( ListOfItems ), NumItems );
 	}
 
 	int
 	FindItemInSortedList(
-		Fstring const & String,
-		FArray1S_Fstring const ListOfItems,
+		std::string const & String,
+		FArray1S_string const ListOfItems,
 		int const NumItems
 	);
 
@@ -601,18 +588,18 @@ namespace InputProcessor {
 	inline
 	int
 	FindItemInSortedList(
-		Fstring const & String,
-		MArray1< A, Fstring > const & ListOfItems,
+		std::string const & String,
+		MArray1< A, std::string > const & ListOfItems,
 		int const NumItems
 	)
 	{
-		return FindItemInSortedList( String, FArray1D_Fstring( ListOfItems ), NumItems );
+		return FindItemInSortedList( String, FArray1D_string( ListOfItems ), NumItems );
 	}
 
 	int
 	FindItem(
-		Fstring const & String,
-		FArray1S_Fstring const ListOfItems,
+		std::string const & String,
+		FArray1S_string const ListOfItems,
 		int const NumItems
 	);
 
@@ -620,60 +607,60 @@ namespace InputProcessor {
 	inline
 	int
 	FindItem(
-		Fstring const & String,
-		MArray1< A, Fstring > const & ListOfItems,
+		std::string const & String,
+		MArray1< A, std::string > const & ListOfItems,
 		int const NumItems
 	)
 	{
-		return FindItem( String, FArray1D_Fstring( ListOfItems ), NumItems );
+		return FindItem( String, FArray1D_string( ListOfItems ), NumItems );
 	}
 
-	Fstring
-	MakeUPPERCase( Fstring const & InputString ); // Input String
+	std::string
+	MakeUPPERCase( std::string const & InputString ); // Input String
 
 	bool
 	SameString(
-		Fstring const & TestString1, // First String to Test
-		Fstring const & TestString2 // Second String to Test
+		std::string const & TestString1, // First String to Test
+		std::string const & TestString2 // Second String to Test
 	);
 
 	void
 	VerifyName(
-		Fstring const & NameToVerify,
-		FArray1S_Fstring const NamesList,
+		std::string const & NameToVerify,
+		FArray1S_string const NamesList,
 		int const NumOfNames,
 		bool & ErrorFound,
 		bool & IsBlank,
-		Fstring const & StringToDisplay
+		std::string const & StringToDisplay
 	);
 
 	template< typename A >
 	inline
 	void
 	VerifyName(
-		Fstring const & NameToVerify,
-		MArray1< A, Fstring > const & NamesList,
+		std::string const & NameToVerify,
+		MArray1< A, std::string > const & NamesList,
 		int const NumOfNames,
 		bool & ErrorFound,
 		bool & IsBlank,
-		Fstring const & StringToDisplay
+		std::string const & StringToDisplay
 	)
 	{
-		VerifyName( NameToVerify, FArray1D_Fstring( NamesList ), NumOfNames, ErrorFound, IsBlank, StringToDisplay );
+		VerifyName( NameToVerify, FArray1D_string( NamesList ), NumOfNames, ErrorFound, IsBlank, StringToDisplay );
 	}
 
 	void
 	RangeCheck(
 		bool & ErrorsFound, // Set to true if error detected
-		Fstring const & WhatFieldString, // Descriptive field for string
-		Fstring const & WhatObjectString, // Descriptive field for object, Zone Name, etc.
-		Fstring const & ErrorLevel, // 'Warning','Severe','Fatal')
-		Optional_Fstring_const LowerBoundString = _, // String for error message, if applicable
+		std::string const & WhatFieldString, // Descriptive field for string
+		std::string const & WhatObjectString, // Descriptive field for object, Zone Name, etc.
+		std::string const & ErrorLevel, // 'Warning','Severe','Fatal')
+		Optional_string_const LowerBoundString = _, // String for error message, if applicable
 		Optional_bool_const LowerBoundCondition = _, // Condition for error condition, if applicable
-		Optional_Fstring_const UpperBoundString = _, // String for error message, if applicable
+		Optional_string_const UpperBoundString = _, // String for error message, if applicable
 		Optional_bool_const UpperBoundCondition = _, // Condition for error condition, if applicable
-		Optional_Fstring_const ValueString = _, // Value with digits if to be displayed with error
-		Optional_Fstring_const WhatObjectName = _ // ObjectName -- used for error messages
+		Optional_string_const ValueString = _, // Value with digits if to be displayed with error
+		Optional_string_const WhatObjectName = _ // ObjectName -- used for error messages
 	);
 
 	void
@@ -681,7 +668,7 @@ namespace InputProcessor {
 		Real64 const Value,
 		int const FieldNumber,
 		int const WhichObject,
-		Fstring const & PossibleAlpha,
+		std::string const & PossibleAlpha,
 		bool const AutoSizable,
 		bool const AutoCalculatable
 	);
@@ -704,13 +691,13 @@ namespace InputProcessor {
 
 	void
 	GetListOfObjectsInIDD(
-		FArray1S_Fstring ObjectNames, // List of Object Names (from IDD)
+		FArray1S_string ObjectNames, // List of Object Names (from IDD)
 		int & Number // Number in List
 	);
 
 	void
 	GetObjectDefInIDD(
-		Fstring const & ObjectWord, // Object for definition
+		std::string const & ObjectWord, // Object for definition
 		int & NumArgs, // How many arguments (max) this Object can have
 		FArray1S_bool AlphaOrNumeric, // Array designating Alpha (true) or Numeric (false) for each
 		FArray1S_bool RequiredFields, // Array designating RequiredFields (true) for each argument
@@ -719,7 +706,7 @@ namespace InputProcessor {
 
 	void
 	GetObjectDefMaxArgs(
-		Fstring const & ObjectWord, // Object for definition
+		std::string const & ObjectWord, // Object for definition
 		int & NumArgs, // How many arguments (max) this Object can have
 		int & NumAlpha, // How many Alpha arguments (max) this Object can have
 		int & NumNumeric // How many Numeric arguments (max) this Object can have
@@ -761,21 +748,21 @@ namespace InputProcessor {
 	PreScanReportingVariables();
 
 	void
-	AddVariablesForMonthlyReport( Fstring const & reportName );
+	AddVariablesForMonthlyReport( std::string const & reportName );
 
 	int
-	FindFirstRecord( Fstring const & UCObjType );
+	FindFirstRecord( std::string const & UCObjType );
 
 	int
 	FindNextRecord(
-		Fstring const & UCObjType,
+		std::string const & UCObjType,
 		int const StartPointer
 	);
 
 	void
 	AddRecordToOutputVariableStructure(
-		Fstring const & KeyValue,
-		Fstring const & VariableName
+		std::string const & KeyValue,
+		std::string const & VariableName
 	);
 
 	void
@@ -784,21 +771,21 @@ namespace InputProcessor {
 	void
 	DumpCurrentLineBuffer(
 		int const StartLine,
-		Fstring const & cStartLine,
-		Fstring const & cStartName,
+		std::string const & cStartLine,
+		std::string const & cStartName,
 		int const CurLine,
 		int const NumConxLines,
-		FArray1S_Fstring const LineBuf,
+		FArray1S_string const LineBuf,
 		int const CurQPtr
 	);
 
 	void
 	ShowAuditErrorMessage(
-		Fstring const & Severity, // if blank, does not add to sum
-		Fstring const & ErrorMessage
+		std::string const & Severity, // if blank, does not add to sum
+		std::string const & ErrorMessage
 	);
 
-	Fstring
+	std::string
 	IPTrimSigDigits( int const IntegerValue );
 
 	//     NOTICE

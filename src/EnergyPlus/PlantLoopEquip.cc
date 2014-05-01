@@ -1,5 +1,4 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <PlantLoopEquip.hh>
@@ -78,7 +77,6 @@ namespace PlantLoopEquip {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using namespace DataPlant;
 	using DataLoopNode::Node;
 
@@ -219,8 +217,8 @@ namespace PlantLoopEquip {
 		int PumpOutletNode;
 		int LoopControl;
 		bool RunFlag; // TRUE if operating this iteration
-		Fstring EquipType( MaxNameLength ); // local equipment type
-		Fstring EquipName( MaxNameLength ); // local equipment name
+		std::string EquipType; // local equipment type
+		std::string EquipName; // local equipment name
 		int EquipFlowCtrl;
 		Real64 CurLoad;
 		Real64 MaxLoad;
@@ -235,22 +233,25 @@ namespace PlantLoopEquip {
 		Real64 TempCondInDesign; // Design condenser inlet temp. C , or 25.d0
 		Real64 TempEvapOutDesign;
 
+		// set up a reference for this component
+		auto & sim_component( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ) );
+
 		// Based on the general equip type and the GetCompSizFac value, see if we can just leave early
-		GeneralEquipType = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).GeneralEquipType;
+		GeneralEquipType = sim_component.GeneralEquipType;
 		if ( GetCompSizFac && ( GeneralEquipType != GenEquipTypes_Chiller && GeneralEquipType != GenEquipTypes_Boiler ) && GeneralEquipType != GenEquipTypes_CoolingTower ) {
-			PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).SizFac = 0.0;
+			sim_component.SizFac = 0.0;
 			return;
 		}
 
 		//set local variables
-		EquipType = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).TypeOf;
-		EquipTypeNum = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).TypeOf_Num;
-		EquipFlowCtrl = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).FlowCtrl;
-		GeneralEquipType = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).GeneralEquipType;
-		EquipName = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).Name;
-		EquipNum = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum;
-		RunFlag = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).ON;
-		CurLoad = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MyLoad;
+		EquipType = sim_component.TypeOf;
+		EquipTypeNum = sim_component.TypeOf_Num;
+		EquipFlowCtrl = sim_component.FlowCtrl;
+		GeneralEquipType = sim_component.GeneralEquipType;
+		EquipName = sim_component.Name;
+		EquipNum = sim_component.CompNum;
+		RunFlag = sim_component.ON;
+		CurLoad = sim_component.MyLoad;
 
 		//select equipment and call equiment simulation
 		TypeOfEquip: { auto const SELECT_CASE_var( GeneralEquipType );
@@ -260,26 +261,26 @@ namespace PlantLoopEquip {
 			{ auto const SELECT_CASE_var1( EquipTypeNum );
 
 			if ( SELECT_CASE_var1 == TypeOf_Pipe ) {
-				SimPipes( TypeOf_Pipe, EquipName, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).MaxVolFlowRate, InitLoopEquip, FirstHVACIteration );
+				SimPipes( TypeOf_Pipe, EquipName, sim_component.CompNum, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).MaxVolFlowRate, InitLoopEquip, FirstHVACIteration );
 
 			} else if ( SELECT_CASE_var1 == TypeOf_PipeSteam ) {
-				SimPipes( TypeOf_PipeSteam, EquipName, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).MaxVolFlowRate, InitLoopEquip, FirstHVACIteration );
+				SimPipes( TypeOf_PipeSteam, EquipName, sim_component.CompNum, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).MaxVolFlowRate, InitLoopEquip, FirstHVACIteration );
 
 			} else if ( SELECT_CASE_var1 == TypeOf_PipeExterior ) {
-				SimPipesHeatTransfer( TypeOf_PipeExterior, EquipName, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum, InitLoopEquip, FirstHVACIteration );
+				SimPipesHeatTransfer( TypeOf_PipeExterior, EquipName, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
 
 			} else if ( SELECT_CASE_var1 == TypeOf_PipeInterior ) {
-				SimPipesHeatTransfer( TypeOf_PipeInterior, EquipName, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum, InitLoopEquip, FirstHVACIteration );
+				SimPipesHeatTransfer( TypeOf_PipeInterior, EquipName, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
 
 			} else if ( SELECT_CASE_var1 == TypeOf_PipeUnderground ) {
-				SimPipesHeatTransfer( TypeOf_PipeUnderground, EquipName, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum, InitLoopEquip, FirstHVACIteration );
+				SimPipesHeatTransfer( TypeOf_PipeUnderground, EquipName, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
 
 			} else if ( SELECT_CASE_var1 == TypeOf_PipingSystemPipeCircuit ) {
-				SimPipingSystemCircuit( EquipName, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum, InitLoopEquip, FirstHVACIteration );
+				SimPipingSystemCircuit( EquipName, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
 
 			} else {
-				ShowSevereError( "SimPlantEquip: Invalid Pipe Type=" + trim( EquipType ) );
-				ShowContinueError( "Occurs in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "SimPlantEquip: Invalid Pipe Type=" + EquipType );
+				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 			}}
 
@@ -317,69 +318,69 @@ namespace PlantLoopEquip {
 			if ( ( SELECT_CASE_var1 == TypeOf_Chiller_EngineDriven ) || ( SELECT_CASE_var1 == TypeOf_Chiller_Electric ) || ( SELECT_CASE_var1 == TypeOf_Chiller_ConstCOP ) || ( SELECT_CASE_var1 == TypeOf_Chiller_CombTurbine ) ) {
 				SimChiller( LoopNum, LoopSideNum, EquipTypeNum, EquipName, EquipFlowCtrl, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac, TempCondInDesign, TempEvapOutDesign );
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).TempDesCondIn = TempCondInDesign;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).TempDesEvapOut = TempEvapOutDesign;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
+					sim_component.TempDesCondIn = TempCondInDesign;
+					sim_component.TempDesEvapOut = TempEvapOutDesign;
 				}
 				if ( GetCompSizFac ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).SizFac = SizingFac;
+					sim_component.SizFac = SizingFac;
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_Chiller_Absorption ) {
 				SimBLASTAbsorber( EquipType, EquipName, EquipFlowCtrl, LoopNum, LoopSideNum, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac, TempCondInDesign );
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).TempDesCondIn = TempCondInDesign;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
+					sim_component.TempDesCondIn = TempCondInDesign;
 				}
 				if ( GetCompSizFac ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).SizFac = SizingFac;
+					sim_component.SizFac = SizingFac;
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_Chiller_Indirect_Absorption ) {
 				SimIndirectAbsorber( EquipType, EquipName, EquipFlowCtrl, LoopNum, LoopSideNum, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac, TempCondInDesign );
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).TempDesCondIn = TempCondInDesign;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
+					sim_component.TempDesCondIn = TempCondInDesign;
 				}
 				if ( GetCompSizFac ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).SizFac = SizingFac;
+					sim_component.SizFac = SizingFac;
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_Chiller_ElectricEIR ) {
 				SimElectricEIRChiller( EquipType, EquipName, EquipFlowCtrl, EquipNum, LoopNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac, TempCondInDesign, TempEvapOutDesign );
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).TempDesCondIn = TempCondInDesign;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).TempDesEvapOut = TempEvapOutDesign;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
+					sim_component.TempDesCondIn = TempCondInDesign;
+					sim_component.TempDesEvapOut = TempEvapOutDesign;
 				}
 				if ( GetCompSizFac ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).SizFac = SizingFac;
+					sim_component.SizFac = SizingFac;
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_Chiller_ElectricReformEIR ) {
 				SimReformulatedEIRChiller( EquipType, EquipName, EquipFlowCtrl, EquipNum, LoopNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac, TempCondInDesign, TempEvapOutDesign );
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).TempDesCondIn = TempCondInDesign;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).TempDesEvapOut = TempEvapOutDesign;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
+					sim_component.TempDesCondIn = TempCondInDesign;
+					sim_component.TempDesEvapOut = TempEvapOutDesign;
 				}
 				if ( GetCompSizFac ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).SizFac = SizingFac;
+					sim_component.SizFac = SizingFac;
 				}
 
 				// Chiller-Heater needs to know whether it is being called for heating or cooling
@@ -387,15 +388,15 @@ namespace PlantLoopEquip {
 			} else if ( SELECT_CASE_var1 == TypeOf_Chiller_DFAbsorption ) {
 				SimGasAbsorber( EquipType, EquipName, EquipFlowCtrl, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).NodeNumIn, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac, TempCondInDesign, TempEvapOutDesign ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).TempDesCondIn = TempCondInDesign;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).TempDesEvapOut = TempEvapOutDesign;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
+					sim_component.TempDesCondIn = TempCondInDesign;
+					sim_component.TempDesEvapOut = TempEvapOutDesign;
 				}
 				if ( GetCompSizFac ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).SizFac = SizingFac;
+					sim_component.SizFac = SizingFac;
 				}
 
 				// Exhaust Fired Absorption Chiller
@@ -403,24 +404,24 @@ namespace PlantLoopEquip {
 			} else if ( SELECT_CASE_var1 == TypeOf_Chiller_ExhFiredAbsorption ) {
 				SimExhaustAbsorber( EquipType, EquipName, EquipFlowCtrl, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).NodeNumIn, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 				if ( GetCompSizFac ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).SizFac = SizingFac;
+					sim_component.SizFac = SizingFac;
 				}
 
 			} else {
-				ShowSevereError( "SimPlantEquip: Invalid Chiller Type=" + trim( EquipType ) );
-				ShowContinueError( "Occurs in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "SimPlantEquip: Invalid Chiller Type=" + EquipType );
+				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 			}}
 
 			if ( InitLoopEquip && EquipNum == 0 ) {
-				ShowSevereError( "InitLoop did not set Equipment Index for Chiller=" + trim( EquipType ) );
-				ShowContinueError( "..Chiller Name=" + trim( EquipName ) + ", in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "InitLoop did not set Equipment Index for Chiller=" + EquipType );
+				ShowContinueError( "..Chiller Name=" + EquipName + ", in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Previous condition causes termination." );
 			}
 
@@ -431,58 +432,58 @@ namespace PlantLoopEquip {
 			if ( SELECT_CASE_var1 == TypeOf_HPWaterPECooling ) {
 				SimHPWatertoWaterCOOLING( EquipType, EquipName, EquipNum, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, LoopNum ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_HPWaterPEHeating ) {
 				SimHPWatertoWaterHEATING( EquipType, EquipName, EquipNum, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, LoopNum ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_HPWaterEFCooling ) {
 				SimHPWatertoWaterSimple( EquipType, EquipTypeNum, EquipName, EquipNum, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, LoopNum ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_HPWaterEFHeating ) {
 				SimHPWatertoWaterSimple( EquipType, EquipTypeNum, EquipName, EquipNum, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, LoopNum ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_HeatPumpVRF ) {
 
 				SimVRFCondenserPlant( EquipType, EquipTypeNum, EquipName, EquipNum, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, LoopNum ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else {
-				ShowSevereError( "SimPlantEquip: Invalid Heat Pump Type=" + trim( EquipType ) );
-				ShowContinueError( "Occurs in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "SimPlantEquip: Invalid Heat Pump Type=" + EquipType );
+				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 			}}
 
 			if ( InitLoopEquip && EquipNum == 0 ) {
-				ShowSevereError( "InitLoop did not set Equipment Index for HeatPump=" + trim( EquipType ) );
-				ShowContinueError( "..HeatPump Name=" + trim( EquipName ) + ", in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "InitLoop did not set Equipment Index for HeatPump=" + EquipType );
+				ShowContinueError( "..HeatPump Name=" + EquipName + ", in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Previous condition causes termination." );
 			}
 
@@ -496,62 +497,62 @@ namespace PlantLoopEquip {
 
 				SimTowers( EquipType, EquipName, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 				if ( GetCompSizFac ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).SizFac = SizingFac;
+					sim_component.SizFac = SizingFac;
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_CoolingTower_TwoSpd ) {
 
 				SimTowers( EquipType, EquipName, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 				if ( GetCompSizFac ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).SizFac = SizingFac;
+					sim_component.SizFac = SizingFac;
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_CoolingTower_VarSpd ) { // 'CoolingTower:VariableSpeed'
 
 				SimTowers( EquipType, EquipName, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 				if ( GetCompSizFac ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).SizFac = SizingFac;
+					sim_component.SizFac = SizingFac;
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_CoolingTower_VarSpdMerkel ) {
 
 				SimTowers( EquipType, EquipName, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac );
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 				if ( GetCompSizFac ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).SizFac = SizingFac;
+					sim_component.SizFac = SizingFac;
 				}
 			} else {
-				ShowSevereError( "SimPlantEquip: Invalid Tower Type=" + trim( EquipType ) );
-				ShowContinueError( "Occurs in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "SimPlantEquip: Invalid Tower Type=" + EquipType );
+				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 			}}
 
 			if ( InitLoopEquip && EquipNum == 0 ) {
-				ShowSevereError( "InitLoop did not set Equipment Index for Cooling Tower=" + trim( EquipType ) );
-				ShowContinueError( "..Tower Name=" + trim( EquipName ) + ", in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "InitLoop did not set Equipment Index for Cooling Tower=" + EquipType );
+				ShowContinueError( "..Tower Name=" + EquipName + ", in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Previous condition causes termination." );
 			}
 
@@ -565,30 +566,30 @@ namespace PlantLoopEquip {
 
 				SimFluidCoolers( EquipType, EquipName, EquipNum, RunFlag, InitLoopEquip, MaxLoad, MinLoad, OptLoad ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_FluidCooler_TwoSpd ) {
 
 				SimFluidCoolers( EquipType, EquipName, EquipNum, RunFlag, InitLoopEquip, MaxLoad, MinLoad, OptLoad ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 			} else {
-				ShowSevereError( "SimPlantEquip: Invalid FluidCooler Type=" + trim( EquipType ) );
-				ShowContinueError( "Occurs in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "SimPlantEquip: Invalid FluidCooler Type=" + EquipType );
+				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 			}}
 
 			if ( InitLoopEquip && EquipNum == 0 ) {
-				ShowSevereError( "InitLoop did not set Equipment Index for Fluid Cooler=" + trim( EquipType ) );
-				ShowContinueError( "..Fluid Cooler Name=" + trim( EquipName ) + ", in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "InitLoop did not set Equipment Index for Fluid Cooler=" + EquipType );
+				ShowContinueError( "..Fluid Cooler Name=" + EquipName + ", in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Previous condition causes termination." );
 			}
 
@@ -601,30 +602,30 @@ namespace PlantLoopEquip {
 
 				SimEvapFluidCoolers( EquipType, EquipName, EquipNum, RunFlag, InitLoopEquip, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_EvapFluidCooler_TwoSpd ) {
 
 				SimEvapFluidCoolers( EquipType, EquipName, EquipNum, RunFlag, InitLoopEquip, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 			} else {
-				ShowSevereError( "SimPlantEquip: Invalid EvapFluidCooler Type=" + trim( EquipType ) );
-				ShowContinueError( "Occurs in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "SimPlantEquip: Invalid EvapFluidCooler Type=" + EquipType );
+				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 			}}
 
 			if ( InitLoopEquip && EquipNum == 0 ) {
-				ShowSevereError( "InitLoop did not set Equipment Index for Fluid Cooler=" + trim( EquipType ) );
-				ShowContinueError( "..Fluid Cooler Name=" + trim( EquipName ) + ", in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "InitLoop did not set Equipment Index for Fluid Cooler=" + EquipType );
+				ShowContinueError( "..Fluid Cooler Name=" + EquipName + ", in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Previous condition causes termination." );
 			}
 
@@ -634,36 +635,36 @@ namespace PlantLoopEquip {
 			if ( SELECT_CASE_var1 == TypeOf_Boiler_Simple ) {
 				SimBoiler( EquipType, EquipName, EquipFlowCtrl, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 				if ( GetCompSizFac ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).SizFac = SizingFac;
+					sim_component.SizFac = SizingFac;
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_Boiler_Steam ) {
 				SimSteamBoiler( EquipType, EquipName, EquipFlowCtrl, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 				if ( GetCompSizFac ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).SizFac = SizingFac;
+					sim_component.SizFac = SizingFac;
 				}
 
 			} else {
-				ShowSevereError( "SimPlantEquip: Invalid Boiler Type=" + trim( EquipType ) );
-				ShowContinueError( "Occurs in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "SimPlantEquip: Invalid Boiler Type=" + EquipType );
+				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 			}}
 
 			if ( InitLoopEquip && EquipNum == 0 ) {
-				ShowSevereError( "InitLoop did not set Equipment Index for Boiler=" + trim( EquipType ) );
-				ShowContinueError( "..Boiler Name=" + trim( EquipName ) + ", in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "InitLoop did not set Equipment Index for Boiler=" + EquipType );
+				ShowContinueError( "..Boiler Name=" + EquipName + ", in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Previous condition causes termination." );
 			}
 
@@ -674,31 +675,31 @@ namespace PlantLoopEquip {
 			if ( ( SELECT_CASE_var1 == TypeOf_WtrHeaterMixed ) || ( SELECT_CASE_var1 == TypeOf_WtrHeaterStratified ) ) {
 				SimWaterThermalTank( EquipTypeNum, EquipName, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, FirstHVACIteration, LoopNum, LoopSideNum ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 
 				// HEAT PUMP WATER HEATER
 			} else if ( SELECT_CASE_var1 == TypeOf_HeatPumpWtrHeater ) {
 				SimWaterThermalTank( EquipTypeNum, EquipName, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, FirstHVACIteration, LoopNum, LoopSideNum ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else {
-				ShowSevereError( "SimPlantEquip: Invalid Water Heater Type=" + trim( EquipType ) );
-				ShowContinueError( "Occurs in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "SimPlantEquip: Invalid Water Heater Type=" + EquipType );
+				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 			}}
 
 			if ( InitLoopEquip && EquipNum == 0 ) {
-				ShowSevereError( "InitLoop did not set Equipment Index for Water Heater=" + trim( EquipType ) );
-				ShowContinueError( "..Water Thermal Tank Name=" + trim( EquipName ) + ", in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "InitLoop did not set Equipment Index for Water Heater=" + EquipType );
+				ShowContinueError( "..Water Thermal Tank Name=" + EquipName + ", in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Previous condition causes termination." );
 			}
 
@@ -708,30 +709,30 @@ namespace PlantLoopEquip {
 			if ( SELECT_CASE_var1 == TypeOf_PurchChilledWater ) {
 				SimOutsideEnergy( EquipType, EquipName, EquipFlowCtrl, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, FirstHVACIteration ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_PurchHotWater ) {
 				SimOutsideEnergy( EquipType, EquipName, EquipFlowCtrl, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, FirstHVACIteration ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else {
-				ShowSevereError( "SimPlantEquip: Invalid District Energy Type=" + trim( EquipType ) );
-				ShowContinueError( "Occurs in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "SimPlantEquip: Invalid District Energy Type=" + EquipType );
+				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 			}}
 
 			if ( InitLoopEquip && EquipNum == 0 ) {
-				ShowSevereError( "InitLoop did not set Equipment Index for District Energy=" + trim( EquipType ) );
-				ShowContinueError( "..District Cooling/Heating Name=" + trim( EquipName ) + ", in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "InitLoop did not set Equipment Index for District Energy=" + EquipType );
+				ShowContinueError( "..District Cooling/Heating Name=" + EquipName + ", in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Previous condition causes termination." );
 			}
 
@@ -742,15 +743,15 @@ namespace PlantLoopEquip {
 			if ( SELECT_CASE_var1 == TypeOf_FluidToFluidPlantHtExchg ) {
 				SimFluidHeatExchanger( LoopNum, LoopSideNum, EquipType, EquipName, EquipNum, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad );
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else {
-				ShowSevereError( "SimPlantEquip: Invalid Heat Exchanger Type=" + trim( EquipType ) );
-				ShowContinueError( "Occurs in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "SimPlantEquip: Invalid Heat Exchanger Type=" + EquipType );
+				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 
 			}}
@@ -762,32 +763,32 @@ namespace PlantLoopEquip {
 				SimGroundHeatExchangers( EquipType, EquipName, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip ); //DSU
 
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_GrndHtExchgSurface ) { // 'GROUND HEAT EXCHANGER:SURFACE'
 				SimSurfaceGroundHeatExchanger( EquipName, EquipNum, FirstHVACIteration, RunFlag, InitLoopEquip ); //DSU
 
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_GrndHtExchgPond ) { // 'GROUND HEAT EXCHANGER:POND'
 				SimPondGroundHeatExchanger( EquipName, EquipNum, FirstHVACIteration, RunFlag, InitLoopEquip, MaxLoad, MinLoad, OptLoad ); //DSU
 
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_GrndHtExchgHorizTrench ) {
-				SimPipingSystemCircuit( EquipName, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum, InitLoopEquip, FirstHVACIteration );
+				SimPipingSystemCircuit( EquipName, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
 
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.CompNum = EquipNum;
 				}
 
 			}}
@@ -798,8 +799,8 @@ namespace PlantLoopEquip {
 			// then reset CurLoad to original EquipDemand.
 			// Allow negative CurLoad.  For cold storage this means the storage should
 			// charge, for hot storage, this means the storage should discharge.
-			if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CurOpSchemeType == CompSetPtBasedSchemeType ) {
-				CurLoad = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).EquipDemand;
+			if ( sim_component.CurOpSchemeType == CompSetPtBasedSchemeType ) {
+				CurLoad = sim_component.EquipDemand;
 				if ( CurLoad != 0 ) RunFlag = true;
 			}
 
@@ -810,10 +811,10 @@ namespace PlantLoopEquip {
 				SimIceStorage( EquipType, EquipName, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad ); //DSU | ,EquipFlowCtrl
 
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = 0.0;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = 0.0;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = 0.0;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = 0.0;
+					sim_component.MinLoad = 0.0;
+					sim_component.OptLoad = 0.0;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_TS_IceDetailed ) {
@@ -822,30 +823,30 @@ namespace PlantLoopEquip {
 
 				// Not sure what this really needs to do here...
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = 0.0;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = 0.0;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = 0.0;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = 0.0;
+					sim_component.MinLoad = 0.0;
+					sim_component.OptLoad = 0.0;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else if ( ( SELECT_CASE_var1 == TypeOf_ChilledWaterTankMixed ) || ( SELECT_CASE_var1 == TypeOf_ChilledWaterTankStratified ) ) {
 				SimWaterThermalTank( EquipTypeNum, EquipName, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, FirstHVACIteration, LoopNum, LoopSideNum ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else {
-				ShowSevereError( "SimPlantEquip: Invalid Chilled/Ice Thermal Storage Type=" + trim( EquipType ) );
-				ShowContinueError( "Occurs in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "SimPlantEquip: Invalid Chilled/Ice Thermal Storage Type=" + EquipType );
+				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 			}}
 
 			if ( InitLoopEquip && EquipNum == 0 ) {
-				ShowSevereError( "InitLoop did not set Equipment Index for Thermal Storage=" + trim( EquipType ) );
-				ShowContinueError( "..Chilled/Ice Thermal Storage Name=" + trim( EquipName ) + ", in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "InitLoop did not set Equipment Index for Thermal Storage=" + EquipType );
+				ShowContinueError( "..Chilled/Ice Thermal Storage Name=" + EquipName + ", in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Previous condition causes termination." );
 			}
 
@@ -854,20 +855,20 @@ namespace PlantLoopEquip {
 			if ( SELECT_CASE_var1 == TypeOf_ValveTempering ) {
 				SimPlantValves( EquipTypeNum, EquipName, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, FirstHVACIteration ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 			} else {
-				ShowSevereError( "SimPlantEquip: Invalid Valve Type=" + trim( EquipType ) );
-				ShowContinueError( "Occurs in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "SimPlantEquip: Invalid Valve Type=" + EquipType );
+				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 			}}
 
 			if ( InitLoopEquip && EquipNum == 0 ) {
-				ShowSevereError( "InitLoop did not set Equipment Index for Valves=" + trim( EquipType ) );
-				ShowContinueError( "..Valve Name=" + trim( EquipName ) + ", in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "InitLoop did not set Equipment Index for Valves=" + EquipType );
+				ShowContinueError( "..Valve Name=" + EquipName + ", in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Previous condition causes termination." );
 			}
 
@@ -878,67 +879,67 @@ namespace PlantLoopEquip {
 			if ( SELECT_CASE_var1 == TypeOf_Generator_FCExhaust ) {
 				SimFuelCellPlantHeatRecovery( EquipType, EquipName, TypeOf_Generator_FCExhaust, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, FirstHVACIteration ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_Generator_FCStackCooler ) {
 				SimFuelCellPlantHeatRecovery( EquipType, EquipName, TypeOf_Generator_FCStackCooler, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, FirstHVACIteration ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_Generator_MicroCHP ) {
 				SimMicroCHPPlantHeatRecovery( EquipType, EquipName, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, FirstHVACIteration ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_Generator_MicroTurbine ) {
 				SimMTPlantHeatRecovery( EquipType, EquipName, TypeOf_Generator_MicroTurbine, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, FirstHVACIteration ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_Generator_ICEngine ) {
 				SimICEPlantHeatRecovery( EquipType, EquipName, TypeOf_Generator_ICEngine, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, FirstHVACIteration ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_Generator_CTurbine ) {
 				SimCTPlantHeatRecovery( EquipType, EquipName, TypeOf_Generator_CTurbine, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, FirstHVACIteration ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else {
-				ShowSevereError( "SimPlantEquip: Invalid Generator Type=" + trim( EquipType ) );
-				ShowContinueError( "Occurs in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "SimPlantEquip: Invalid Generator Type=" + EquipType );
+				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 
 			}}
 
 			if ( InitLoopEquip && EquipNum == 0 ) {
-				ShowSevereError( "InitLoop did not set Equipment Index for Generator=" + trim( EquipType ) );
-				ShowContinueError( "..Generator Name=" + trim( EquipName ) + ", in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "InitLoop did not set Equipment Index for Generator=" + EquipType );
+				ShowContinueError( "..Generator Name=" + EquipName + ", in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Previous condition causes termination." );
 			}
 
@@ -948,13 +949,13 @@ namespace PlantLoopEquip {
 			if ( SELECT_CASE_var1 == TypeOf_PlantLoadProfile ) {
 				SimulatePlantProfile( EquipType, EquipName, TypeOf_PlantLoadProfile, EquipNum, FirstHVACIteration, InitLoopEquip );
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.CompNum = EquipNum;
 
 				}
 
 			} else {
-				ShowSevereError( "SimPlantEquip: Invalid Load Profile Type=" + trim( EquipType ) );
-				ShowContinueError( "Occurs in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "SimPlantEquip: Invalid Load Profile Type=" + EquipType );
+				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 			}}
 
@@ -1001,8 +1002,8 @@ namespace PlantLoopEquip {
 			} else if ( SELECT_CASE_var1 == TypeOf_PackagedTESCoolingCoil ) {
 
 			} else {
-				ShowSevereError( "SimPlantEquip: Invalid Load Coil Type=" + trim( EquipType ) );
-				ShowContinueError( "Occurs in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "SimPlantEquip: Invalid Load Coil Type=" + EquipType );
+				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 
 			}} //DSU3
@@ -1016,11 +1017,11 @@ namespace PlantLoopEquip {
 				SimulateWaterUseConnection( EquipTypeNum, EquipName, EquipNum, InitLoopEquip, FirstHVACIteration );
 
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.CompNum = EquipNum;
 				}
 			} else {
-				ShowSevereError( "SimPlantEquip: Invalid Load Coil Type=" + trim( EquipType ) );
-				ShowContinueError( "Occurs in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "SimPlantEquip: Invalid Load Coil Type=" + EquipType );
+				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 			}}
 
@@ -1033,7 +1034,7 @@ namespace PlantLoopEquip {
 				SimSolarCollector( EquipTypeNum, EquipName, EquipNum, InitLoopEquip, FirstHVACIteration );
 
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_PVTSolarCollectorFlatPlate ) {
@@ -1041,12 +1042,12 @@ namespace PlantLoopEquip {
 				SimPVTcollectors( EquipNum, FirstHVACIteration, CalledFromPlantLoopEquipMgr, EquipName, InitLoopEquip );
 
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else {
-				ShowSevereError( "SimPlantEquip: Invalid Solar Collector Type=" + trim( EquipType ) );
-				ShowContinueError( "Occurs in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "SimPlantEquip: Invalid Solar Collector Type=" + EquipType );
+				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 			}}
 
@@ -1074,8 +1075,8 @@ namespace PlantLoopEquip {
 
 			} else {
 
-				ShowSevereError( "SimPlantEquip: Invalid ZoneHVAC Type=" + trim( EquipType ) );
-				ShowContinueError( "Occurs in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "SimPlantEquip: Invalid ZoneHVAC Type=" + EquipType );
+				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 
 			}}
@@ -1088,19 +1089,19 @@ namespace PlantLoopEquip {
 				SimRefrigCondenser( EquipTypeNum, EquipName, EquipNum, FirstHVACIteration, InitLoopEquip );
 
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_RefrigerationWaterCoolRack ) {
 				SimRefrigCondenser( EquipTypeNum, EquipName, EquipNum, FirstHVACIteration, InitLoopEquip );
 
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else {
-				ShowSevereError( "SimPlantEquip: Invalid Refrigeration Type=" + trim( EquipType ) );
-				ShowContinueError( "Occurs in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "SimPlantEquip: Invalid Refrigeration Type=" + EquipType );
+				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 			}}
 
@@ -1112,20 +1113,20 @@ namespace PlantLoopEquip {
 
 				SimUserDefinedPlantComponent( LoopNum, LoopSideNum, EquipType, EquipName, EquipNum, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad );
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else if ( SELECT_CASE_var1 == TypeOf_WaterSource ) {
 
 				SimWaterSource( EquipName, EquipFlowCtrl, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac ); //DSU
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 
 			} else {
@@ -1143,25 +1144,25 @@ namespace PlantLoopEquip {
 
 				SimCentralGroundSourceHeatPump( EquipName, EquipFlowCtrl, EquipNum, LoopNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac );
 				if ( InitLoopEquip ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MaxLoad = MaxLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).MinLoad = MinLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).OptLoad = OptLoad;
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).CompNum = EquipNum;
+					sim_component.MaxLoad = MaxLoad;
+					sim_component.MinLoad = MinLoad;
+					sim_component.OptLoad = OptLoad;
+					sim_component.CompNum = EquipNum;
 				}
 
 				if ( GetCompSizFac ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ).SizFac = SizingFac;
+					sim_component.SizFac = SizingFac;
 				}
 
 			} else {
-				ShowSevereError( "SimPlantEquip: Invalid Central Heat Pump System Type=" + trim( EquipType ) );
-				ShowContinueError( "Occurs in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+				ShowSevereError( "SimPlantEquip: Invalid Central Heat Pump System Type=" + EquipType );
+				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 			}}
 
 		} else {
-			ShowSevereError( "SimPlantEquip: Invalid Equipment Type=" + trim( EquipType ) );
-			ShowContinueError( "Occurs in Plant Loop=" + trim( PlantLoop( LoopNum ).Name ) );
+			ShowSevereError( "SimPlantEquip: Invalid Equipment Type=" + EquipType );
+			ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
 			ShowFatalError( "Preceding condition causes termination." );
 		}} // TypeOfEquip
 

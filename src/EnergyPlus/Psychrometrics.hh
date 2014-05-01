@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -46,7 +45,7 @@ namespace Psychrometrics {
 	extern int const iPsyPsatFnTemp_cache;
 	extern int const NumPsychMonitors; // Parameterization of Number of psychrometric routines that
 #ifdef EP_psych_stats
-	extern FArray1D_Fstring const PsyRoutineNames; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 - HR | 15 - max iter | 16 - HR | 17 - max iter | 18 - PsyTwbFnTdbWPb_raw (raw calc) | 19 - PsyPsatFnTemp_raw (raw calc)
+	extern FArray1D_string const PsyRoutineNames; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 - HR | 15 - max iter | 16 - HR | 17 - max iter | 18 - PsyTwbFnTdbWPb_raw (raw calc) | 19 - PsyPsatFnTemp_raw (raw calc)
 
 	extern FArray1D_bool const PsyReportIt; // PsyTdpFnTdbTwbPb     1 | PsyRhFnTdbWPb        2 | PsyTwbFnTdbWPb       3 | PsyVFnTdbWPb         4 | PsyWFnTdpPb          5 | PsyWFnTdbH           6 | PsyWFnTdbTwbPb       7 | PsyWFnTdbRhPb        8 | PsyPsatFnTemp        9 | PsyTsatFnHPb         10 | PsyTsatFnPb          11 | PsyRhFnTdbRhov       12 | PsyRhFnTdbRhovLBnd0C 13 | PsyTwbFnTdbWPb       14 - HR | PsyTwbFnTdbWPb       15 - max iter | PsyWFnTdbTwbPb       16 - HR | PsyTsatFnPb          17 - max iter | PsyTwbFnTdbWPb_cache 18 - PsyTwbFnTdbWPb_raw (raw calc) | PsyPsatFnTemp_cache  19 - PsyPsatFnTemp_raw (raw calc)
 #endif
@@ -68,7 +67,7 @@ namespace Psychrometrics {
 	// na
 
 	// MODULE VARIABLE DEFINITIONS:
-	extern Fstring String;
+	extern std::string String;
 	extern bool ReportErrors;
 	extern FArray1D_int iPsyErrIndex; // Number of times error occurred
 #ifdef EP_psych_stats
@@ -161,28 +160,28 @@ namespace Psychrometrics {
 		Real64 const pb, // barometric pressure (Pascals)
 		Real64 const tdb, // dry bulb temperature (Celsius)
 		Real64 const dw, // humidity ratio (kgWater/kgDryAir)
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages) !unused1208
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages) !unused1208
 	);
 
 	Real64
 	PsyCpAirFnWTdb(
 		Real64 const dw, // humidity ratio {kgWater/kgDryAir}
 		Real64 const T, // input temperature {Celsius}
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages)
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages)
 	);
 
 	Real64
 	PsyHfgAirFnWTdb(
 		Real64 const w, // humidity ratio {kgWater/kgDryAir} !unused1208
 		Real64 const T, // input temperature {Celsius}
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages) !unused1208
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages) !unused1208
 	);
 
 	Real64
 	PsyHgAirFnWTdb(
 		Real64 const w, // humidity ratio {kgWater/kgDryAir} !unused1208
 		Real64 const T, // input temperature {Celsius}
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages) !unused1208
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages) !unused1208
 	);
 
 	Real64
@@ -190,21 +189,21 @@ namespace Psychrometrics {
 		Real64 const TDB, // dry-bulb temperature {C}
 		Real64 const TWB, // wet-bulb temperature {C}
 		Real64 const PB, // barometric pressure (N/M**2) {Pascals}
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages)
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages)
 	);
 
 	Real64
 	PsyTdpFnWPb(
 		Real64 const W, // humidity ratio
 		Real64 const PB, // barometric pressure (N/M**2) {Pascals}
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages)
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages)
 	);
 
 	Real64
 	PsyHFnTdbW(
 		Real64 const TDB, // dry-bulb temperature {C}
 		Real64 const dW, // humidity ratio
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages) !unused1208
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages) !unused1208
 	);
 
 	Real64
@@ -212,28 +211,28 @@ namespace Psychrometrics {
 		Real64 const TDB, // dry-bulb temperature {C}
 		Real64 const RH, // relative humidity value (0.0 - 1.0)
 		Real64 const PB, // barometric pressure (N/M**2) {Pascals}
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages) !unused1208
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages) !unused1208
 	);
 
 	Real64
 	PsyTdbFnHW(
 		Real64 const H, // enthalpy {J/kg}
 		Real64 const dW, // humidity ratio
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages) !unused1208
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages) !unused1208
 	);
 
 	Real64
 	PsyRhovFnTdbRh(
 		Real64 const Tdb, // dry-bulb temperature {C}
 		Real64 const RH, // relative humidity value (0.0-1.0)
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages) !unused1208
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages) !unused1208
 	);
 
 	Real64
 	PsyRhovFnTdbRhLBnd0C(
 		Real64 const Tdb, // dry-bulb temperature {C}
 		Real64 const RH, // relative humidity value (0.0-1.0)
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages) !unused1208
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages) !unused1208
 	);
 
 	Real64
@@ -241,21 +240,21 @@ namespace Psychrometrics {
 		Real64 const Tdb, // dry-bulb temperature {C}
 		Real64 const dW, // humidity ratio
 		Real64 const PB, // Barometric Pressure {Pascals}
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages) !unused1208
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages) !unused1208
 	);
 
 	Real64
 	PsyRhFnTdbRhov(
 		Real64 const Tdb, // dry-bulb temperature {C}
 		Real64 const Rhovapor, // vapor density in air {kg/m3}
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages)
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages)
 	);
 
 	Real64
 	PsyRhFnTdbRhovLBnd0C(
 		Real64 const Tdb, // dry-bulb temperature {C}
 		Real64 const Rhovapor, // vapor density in air {kg/m3}
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages)
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages)
 	);
 
 	Real64
@@ -263,7 +262,7 @@ namespace Psychrometrics {
 		Real64 const TDB, // dry-bulb temperature {C}
 		Real64 const dW, // humidity ratio
 		Real64 const PB, // barometric pressure {Pascals}
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages)
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages)
 	);
 
 #ifdef EP_cache_PsyTwbFnTdbWPb
@@ -273,7 +272,7 @@ namespace Psychrometrics {
 		Real64 const Tdb, // dry-bulb temperature {C}
 		Real64 const W, // humidity ratio
 		Real64 const Pb, // barometric pressure {Pascals}
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages)
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages)
 	);
 
 	Real64
@@ -281,7 +280,7 @@ namespace Psychrometrics {
 		Real64 const TDB, // dry-bulb temperature {C}
 		Real64 const dW, // humidity ratio
 		Real64 const Patm, // barometric pressure {Pascals}
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages)
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages)
 	);
 
 #else
@@ -291,7 +290,7 @@ namespace Psychrometrics {
 		Real64 const TDB, // dry-bulb temperature {C}
 		Real64 const dW, // humidity ratio
 		Real64 const Patm, // barometric pressure {Pascals}
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages)
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages)
 	);
 
 #endif
@@ -301,21 +300,21 @@ namespace Psychrometrics {
 		Real64 const TDB, // dry-bulb temperature {C}
 		Real64 const dW, // humidity ratio
 		Real64 const PB, // barometric pressure {Pascals}
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages)
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages)
 	);
 
 	Real64
 	PsyWFnTdpPb(
 		Real64 const TDP, // dew-point temperature {C}
 		Real64 const PB, // barometric pressure {Pascals}
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages)
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages)
 	);
 
 	Real64
 	PsyWFnTdbH(
 		Real64 const TDB, // dry-bulb temperature {C}
 		Real64 const H, // enthalpy {J/kg}
-		Optional_Fstring_const CalledFrom = _, // routine this function was called from (error messages)
+		Optional_string_const CalledFrom = _, // routine this function was called from (error messages)
 		Optional_bool_const SuppressWarnings = _ // if calling function is calculating an intermediate state
 	);
 
@@ -324,7 +323,7 @@ namespace Psychrometrics {
 		Real64 const TDB, // dry-bulb temperature {C}
 		Real64 const TWBin, // wet-bulb temperature {C}
 		Real64 const PB, // barometric pressure {Pascals}
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages)
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages)
 	);
 
 	Real64
@@ -332,7 +331,7 @@ namespace Psychrometrics {
 		Real64 const TDB, // dry-bulb temperature {C}
 		Real64 const RH, // relative humidity value (0.0-1.0)
 		Real64 const PB, // barometric pressure {Pascals}
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages)
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages)
 	);
 
 #ifdef EP_cache_PsyPsatFnTemp
@@ -340,13 +339,13 @@ namespace Psychrometrics {
 	Real64
 	PsyPsatFnTemp(
 		Real64 const T, // dry-bulb temperature {C}
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages)
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages)
 	);
 
 	Real64
 	PsyPsatFnTemp_raw(
 		Real64 const T, // dry-bulb temperature {C}
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages)
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages)
 	);
 
 #else
@@ -354,7 +353,7 @@ namespace Psychrometrics {
 	Real64
 	PsyPsatFnTemp(
 		Real64 const T, // dry-bulb temperature {C}
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages)
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages)
 	);
 
 #endif
@@ -363,7 +362,7 @@ namespace Psychrometrics {
 	PsyTsatFnHPb(
 		Real64 const H, // enthalpy {J/kg}
 		Real64 const PB, // barometric pressure {Pascals}
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages)
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages)
 	);
 
 	Real64
@@ -392,25 +391,25 @@ namespace Psychrometrics {
 	Real64
 	PsyTsatFnPb(
 		Real64 const Press, // barometric pressure {Pascals}
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages)
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages)
 	);
 
 	Real64
 	CPCW(
 		Real64 const Temperature, // unused1208
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages) !unused1208
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages) !unused1208
 	);
 
 	Real64
 	CPHW(
 		Real64 const Temperature, // unused1208
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages) !unused1208
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages) !unused1208
 	);
 
 	Real64
 	RhoH2O(
 		Real64 const TB, // Dry bulb temperature. {C}
-		Optional_Fstring_const CalledFrom = _ // routine this function was called from (error messages) !unused1208
+		Optional_string_const CalledFrom = _ // routine this function was called from (error messages) !unused1208
 	);
 
 	//     NOTICE

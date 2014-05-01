@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace DirectAirManager {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS:
@@ -33,9 +31,9 @@ namespace DirectAirManager {
 	{
 		// Members
 		// Input Data
-		Fstring cObjectName;
-		Fstring EquipID;
-		Fstring Schedule;
+		std::string cObjectName;
+		std::string EquipID;
+		std::string Schedule;
 		int ZoneSupplyAirNode;
 		int SchedPtr;
 		Real64 MaxAirVolFlowRate; // Max Specified Volume Flow Rate of Sys [m3/sec]
@@ -55,9 +53,6 @@ namespace DirectAirManager {
 
 		// Default Constructor
 		DirectAirProps() :
-			cObjectName( MaxNameLength ),
-			EquipID( MaxNameLength ),
-			Schedule( MaxNameLength ),
 			ZoneSupplyAirNode( 0 ),
 			SchedPtr( 0 ),
 			MaxAirVolFlowRate( 0.0 ),
@@ -76,9 +71,9 @@ namespace DirectAirManager {
 
 		// Member Constructor
 		DirectAirProps(
-			Fstring const & cObjectName,
-			Fstring const & EquipID,
-			Fstring const & Schedule,
+			std::string const & cObjectName,
+			std::string const & EquipID,
+			std::string const & Schedule,
 			int const ZoneSupplyAirNode,
 			int const SchedPtr,
 			Real64 const MaxAirVolFlowRate, // Max Specified Volume Flow Rate of Sys [m3/sec]
@@ -94,9 +89,9 @@ namespace DirectAirManager {
 			Real64 const HeatEnergy,
 			Real64 const CoolEnergy
 		) :
-			cObjectName( MaxNameLength, cObjectName ),
-			EquipID( MaxNameLength, EquipID ),
-			Schedule( MaxNameLength, Schedule ),
+			cObjectName( cObjectName ),
+			EquipID( EquipID ),
+			Schedule( Schedule ),
 			ZoneSupplyAirNode( ZoneSupplyAirNode ),
 			SchedPtr( SchedPtr ),
 			MaxAirVolFlowRate( MaxAirVolFlowRate ),
@@ -122,7 +117,7 @@ namespace DirectAirManager {
 
 	void
 	SimDirectAir(
-		Fstring const & EquipName,
+		std::string const & EquipName,
 		int const ControlledZoneNum,
 		bool const FirstHVACIteration,
 		Real64 & SensOutputProvided,

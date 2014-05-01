@@ -27,7 +27,6 @@ namespace DataAirSystems {
 	// Use statements for data only modules (only modules that should be used here and sparingly)
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using namespace DataPlant;
 
 	// Data

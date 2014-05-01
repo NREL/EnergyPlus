@@ -25,8 +25,8 @@
 	typedef  MA1< int >  MA1_int;
 	typedef  MA1c< double >  MA1c_double;
 	typedef  MA1< double >  MA1_double;
-	typedef  MA1c< Fstring >  MA1c_Fstring;
-	typedef  MA1< Fstring >  MA1_Fstring;
+	typedef  MA1c< std::string >  MA1c_string;
+	typedef  MA1< std::string >  MA1_string;
 
 	// bool const Members
 	inline MA1c_bool AbsorpSolarEMSOverrideOn() const { return ma( &T::AbsorpSolarEMSOverrideOn ); }
@@ -1476,141 +1476,141 @@
 	inline MA1_double ZoneTempAtCoolPeak() { return ma( &T::ZoneTempAtCoolPeak ); }
 	inline MA1_double ZoneTempAtHeatPeak() { return ma( &T::ZoneTempAtHeatPeak ); }
 
-	// Fstring const Members
-	inline MA1c_Fstring AirLoopName() const { return ma( &T::AirLoopName ); }
-	inline MA1c_Fstring AirPriLoopName() const { return ma( &T::AirPriLoopName ); }
-	inline MA1c_Fstring AssignedLoopName() const { return ma( &T::AssignedLoopName ); }
-	inline MA1c_Fstring CompName() const { return ma( &T::CompName ); }
-	inline MA1c_Fstring ComponentListName() const { return ma( &T::ComponentListName ); }
-	inline MA1c_Fstring ComponentTypeName() const { return ma( &T::ComponentTypeName ); }
-	inline MA1c_Fstring CompType() const { return ma( &T::CompType ); }
-	inline MA1c_Fstring computeName() const { return ma( &T::computeName ); }
-	inline MA1c_Fstring ConstituentName() const { return ma( &T::ConstituentName ); }
-	inline MA1c_Fstring ControllerListName() const { return ma( &T::ControllerListName ); }
-	inline MA1c_Fstring ControllerName() const { return ma( &T::ControllerName ); }
-	inline MA1c_Fstring ControlName() const { return ma( &T::ControlName ); }
-	inline MA1c_Fstring ControlTypeName() const { return ma( &T::ControlTypeName ); }
-	inline MA1c_Fstring CoolDesDay() const { return ma( &T::CoolDesDay ); }
-	inline MA1c_Fstring DamperName() const { return ma( &T::DamperName ); }
-	inline MA1c_Fstring DataTypeName() const { return ma( &T::DataTypeName ); }
-	inline MA1c_Fstring EquipID() const { return ma( &T::EquipID ); }
-	inline MA1c_Fstring EquipListName() const { return ma( &T::EquipListName ); }
-	inline MA1c_Fstring EquipName() const { return ma( &T::EquipName ); }
-	inline MA1c_Fstring EquipType() const { return ma( &T::EquipType ); }
-	inline MA1c_Fstring EvapCoolerName() const { return ma( &T::EvapCoolerName ); }
-	inline MA1c_Fstring ExhaustAirFanName() const { return ma( &T::ExhaustAirFanName ); }
-	inline MA1c_Fstring ExtFanName() const { return ma( &T::ExtFanName ); }
-	inline MA1c_Fstring FanName() const { return ma( &T::FanName ); }
-	inline MA1c_Fstring HeatDesDay() const { return ma( &T::HeatDesDay ); }
-	inline MA1c_Fstring HeatExchangerName() const { return ma( &T::HeatExchangerName ); }
-	inline MA1c_Fstring InverterName() const { return ma( &T::InverterName ); }
-	inline MA1c_Fstring keyValue() const { return ma( &T::keyValue ); }
-	inline MA1c_Fstring LoopName() const { return ma( &T::LoopName ); }
-	inline MA1c_Fstring LoopType_s() const { return ma( &T::LoopType ); } // Also used as int so name decorated
-	inline MA1c_Fstring MatchValue() const { return ma( &T::MatchValue ); }
-	inline MA1c_Fstring MatchValue1() const { return ma( &T::MatchValue1 ); }
-	inline MA1c_Fstring MatchValue2() const { return ma( &T::MatchValue2 ); }
-	inline MA1c_Fstring MixerName() const { return ma( &T::MixerName ); }
-	inline MA1c_Fstring Name() const { return ma( &T::Name ); }
-	inline MA1c_Fstring name() const { return ma( &T::name ); }
-	inline MA1c_Fstring NameElecStorage() const { return ma( &T::NameElecStorage ); }
-	inline MA1c_Fstring NameExhaustHX() const { return ma( &T::NameExhaustHX ); }
-	inline MA1c_Fstring NameFCAirSup() const { return ma( &T::NameFCAirSup ); }
-	inline MA1c_Fstring NameFCAuxilHeat() const { return ma( &T::NameFCAuxilHeat ); }
-	inline MA1c_Fstring NameFCPM() const { return ma( &T::NameFCPM ); }
-	inline MA1c_Fstring NameFCWaterSup() const { return ma( &T::NameFCWaterSup ); }
-	inline MA1c_Fstring NameInverter() const { return ma( &T::NameInverter ); }
-	inline MA1c_Fstring NameStackCooler() const { return ma( &T::NameStackCooler ); }
-	inline MA1c_Fstring NodeName() const { return ma( &T::NodeName ); }
-	inline MA1c_Fstring ObjName() const { return ma( &T::ObjName ); }
-	inline MA1c_Fstring OldName() const { return ma( &T::OldName ); }
-	inline MA1c_Fstring PlantLoopName() const { return ma( &T::PlantLoopName ); }
-	inline MA1c_Fstring SFanName() const { return ma( &T::SFanName ); }
-	inline MA1c_Fstring SplitterName() const { return ma( &T::SplitterName ); }
-	inline MA1c_Fstring StorageName() const { return ma( &T::StorageName ); }
-	inline MA1c_Fstring SupplyAirFanName() const { return ma( &T::SupplyAirFanName ); }
-	inline MA1c_Fstring SurfName() const { return ma( &T::SurfName ); }
-	inline MA1c_Fstring SysName() const { return ma( &T::SysName ); }
-	inline MA1c_Fstring Title() const { return ma( &T::Title ); }
-	inline MA1c_Fstring units() const { return ma( &T::units ); }
-	inline MA1c_Fstring VarName() const { return ma( &T::VarName ); }
-	inline MA1c_Fstring varName() const { return ma( &T::varName ); }
-	inline MA1c_Fstring VarNameOnly() const { return ma( &T::VarNameOnly ); }
-	inline MA1c_Fstring ZoneHVACUnitName() const { return ma( &T::ZoneHVACUnitName ); }
-	inline MA1c_Fstring ZoneName() const { return ma( &T::ZoneName ); }
-	inline MA1c_Fstring ZonePlenumName() const { return ma( &T::ZonePlenumName ); }
+	// string const Members
+	inline MA1c_string AirLoopName() const { return ma( &T::AirLoopName ); }
+	inline MA1c_string AirPriLoopName() const { return ma( &T::AirPriLoopName ); }
+	inline MA1c_string AssignedLoopName() const { return ma( &T::AssignedLoopName ); }
+	inline MA1c_string CompName() const { return ma( &T::CompName ); }
+	inline MA1c_string ComponentListName() const { return ma( &T::ComponentListName ); }
+	inline MA1c_string ComponentTypeName() const { return ma( &T::ComponentTypeName ); }
+	inline MA1c_string CompType() const { return ma( &T::CompType ); }
+	inline MA1c_string computeName() const { return ma( &T::computeName ); }
+	inline MA1c_string ConstituentName() const { return ma( &T::ConstituentName ); }
+	inline MA1c_string ControllerListName() const { return ma( &T::ControllerListName ); }
+	inline MA1c_string ControllerName() const { return ma( &T::ControllerName ); }
+	inline MA1c_string ControlName() const { return ma( &T::ControlName ); }
+	inline MA1c_string ControlTypeName() const { return ma( &T::ControlTypeName ); }
+	inline MA1c_string CoolDesDay() const { return ma( &T::CoolDesDay ); }
+	inline MA1c_string DamperName() const { return ma( &T::DamperName ); }
+	inline MA1c_string DataTypeName() const { return ma( &T::DataTypeName ); }
+	inline MA1c_string EquipID() const { return ma( &T::EquipID ); }
+	inline MA1c_string EquipListName() const { return ma( &T::EquipListName ); }
+	inline MA1c_string EquipName() const { return ma( &T::EquipName ); }
+	inline MA1c_string EquipType() const { return ma( &T::EquipType ); }
+	inline MA1c_string EvapCoolerName() const { return ma( &T::EvapCoolerName ); }
+	inline MA1c_string ExhaustAirFanName() const { return ma( &T::ExhaustAirFanName ); }
+	inline MA1c_string ExtFanName() const { return ma( &T::ExtFanName ); }
+	inline MA1c_string FanName() const { return ma( &T::FanName ); }
+	inline MA1c_string HeatDesDay() const { return ma( &T::HeatDesDay ); }
+	inline MA1c_string HeatExchangerName() const { return ma( &T::HeatExchangerName ); }
+	inline MA1c_string InverterName() const { return ma( &T::InverterName ); }
+	inline MA1c_string keyValue() const { return ma( &T::keyValue ); }
+	inline MA1c_string LoopName() const { return ma( &T::LoopName ); }
+	inline MA1c_string LoopType_s() const { return ma( &T::LoopType ); } // Also used as int so name decorated
+	inline MA1c_string MatchValue() const { return ma( &T::MatchValue ); }
+	inline MA1c_string MatchValue1() const { return ma( &T::MatchValue1 ); }
+	inline MA1c_string MatchValue2() const { return ma( &T::MatchValue2 ); }
+	inline MA1c_string MixerName() const { return ma( &T::MixerName ); }
+	inline MA1c_string Name() const { return ma( &T::Name ); }
+	inline MA1c_string name() const { return ma( &T::name ); }
+	inline MA1c_string NameElecStorage() const { return ma( &T::NameElecStorage ); }
+	inline MA1c_string NameExhaustHX() const { return ma( &T::NameExhaustHX ); }
+	inline MA1c_string NameFCAirSup() const { return ma( &T::NameFCAirSup ); }
+	inline MA1c_string NameFCAuxilHeat() const { return ma( &T::NameFCAuxilHeat ); }
+	inline MA1c_string NameFCPM() const { return ma( &T::NameFCPM ); }
+	inline MA1c_string NameFCWaterSup() const { return ma( &T::NameFCWaterSup ); }
+	inline MA1c_string NameInverter() const { return ma( &T::NameInverter ); }
+	inline MA1c_string NameStackCooler() const { return ma( &T::NameStackCooler ); }
+	inline MA1c_string NodeName() const { return ma( &T::NodeName ); }
+	inline MA1c_string ObjName() const { return ma( &T::ObjName ); }
+	inline MA1c_string OldName() const { return ma( &T::OldName ); }
+	inline MA1c_string PlantLoopName() const { return ma( &T::PlantLoopName ); }
+	inline MA1c_string SFanName() const { return ma( &T::SFanName ); }
+	inline MA1c_string SplitterName() const { return ma( &T::SplitterName ); }
+	inline MA1c_string StorageName() const { return ma( &T::StorageName ); }
+	inline MA1c_string SupplyAirFanName() const { return ma( &T::SupplyAirFanName ); }
+	inline MA1c_string SurfName() const { return ma( &T::SurfName ); }
+	inline MA1c_string SysName() const { return ma( &T::SysName ); }
+	inline MA1c_string Title() const { return ma( &T::Title ); }
+	inline MA1c_string units() const { return ma( &T::units ); }
+	inline MA1c_string VarName() const { return ma( &T::VarName ); }
+	inline MA1c_string varName() const { return ma( &T::varName ); }
+	inline MA1c_string VarNameOnly() const { return ma( &T::VarNameOnly ); }
+	inline MA1c_string ZoneHVACUnitName() const { return ma( &T::ZoneHVACUnitName ); }
+	inline MA1c_string ZoneName() const { return ma( &T::ZoneName ); }
+	inline MA1c_string ZonePlenumName() const { return ma( &T::ZonePlenumName ); }
 
-	// Fstring Members
-	inline MA1_Fstring AirLoopName() { return ma( &T::AirLoopName ); }
-	inline MA1_Fstring AirPriLoopName() { return ma( &T::AirPriLoopName ); }
-	inline MA1_Fstring AssignedLoopName() { return ma( &T::AssignedLoopName ); }
-	inline MA1_Fstring CompName() { return ma( &T::CompName ); }
-	inline MA1_Fstring ComponentListName() { return ma( &T::ComponentListName ); }
-	inline MA1_Fstring ComponentTypeName() { return ma( &T::ComponentTypeName ); }
-	inline MA1_Fstring CompType() { return ma( &T::CompType ); }
-	inline MA1_Fstring computeName() { return ma( &T::computeName ); }
-	inline MA1_Fstring ConstituentName() { return ma( &T::ConstituentName ); }
-	inline MA1_Fstring ControllerListName() { return ma( &T::ControllerListName ); }
-	inline MA1_Fstring ControllerName() { return ma( &T::ControllerName ); }
-	inline MA1_Fstring ControlName() { return ma( &T::ControlName ); }
-	inline MA1_Fstring ControlTypeName() { return ma( &T::ControlTypeName ); }
-	inline MA1_Fstring CoolDesDay() { return ma( &T::CoolDesDay ); }
-	inline MA1_Fstring DamperName() { return ma( &T::DamperName ); }
-	inline MA1_Fstring DataTypeName() { return ma( &T::DataTypeName ); }
-	inline MA1_Fstring EquipID() { return ma( &T::EquipID ); }
-	inline MA1_Fstring EquipListName() { return ma( &T::EquipListName ); }
-	inline MA1_Fstring EquipName() { return ma( &T::EquipName ); }
-	inline MA1_Fstring EquipType() { return ma( &T::EquipType ); }
-	inline MA1_Fstring EvapCoolerName() { return ma( &T::EvapCoolerName ); }
-	inline MA1_Fstring ExhaustAirFanName() { return ma( &T::ExhaustAirFanName ); }
-	inline MA1_Fstring ExtFanName() { return ma( &T::ExtFanName ); }
-	inline MA1_Fstring FanName() { return ma( &T::FanName ); }
-	inline MA1_Fstring HeatDesDay() { return ma( &T::HeatDesDay ); }
-	inline MA1_Fstring HeatExchangerName() { return ma( &T::HeatExchangerName ); }
-	inline MA1_Fstring InverterName() { return ma( &T::InverterName ); }
-	inline MA1_Fstring keyValue() { return ma( &T::keyValue ); }
-	inline MA1_Fstring LoopName() { return ma( &T::LoopName ); }
-	inline MA1_Fstring LoopType_s() { return ma( &T::LoopType ); } // Also used as int so name decorated
-	inline MA1_Fstring MatchValue() { return ma( &T::MatchValue ); }
-	inline MA1_Fstring MatchValue1() { return ma( &T::MatchValue1 ); }
-	inline MA1_Fstring MatchValue2() { return ma( &T::MatchValue2 ); }
-	inline MA1_Fstring MixerName() { return ma( &T::MixerName ); }
-	inline MA1_Fstring Name() { return ma( &T::Name ); }
-	inline MA1_Fstring name() { return ma( &T::name ); }
-	inline MA1_Fstring NameElecStorage() { return ma( &T::NameElecStorage ); }
-	inline MA1_Fstring NameExhaustHX() { return ma( &T::NameExhaustHX ); }
-	inline MA1_Fstring NameFCAirSup() { return ma( &T::NameFCAirSup ); }
-	inline MA1_Fstring NameFCAuxilHeat() { return ma( &T::NameFCAuxilHeat ); }
-	inline MA1_Fstring NameFCPM() { return ma( &T::NameFCPM ); }
-	inline MA1_Fstring NameFCWaterSup() { return ma( &T::NameFCWaterSup ); }
-	inline MA1_Fstring NameInverter() { return ma( &T::NameInverter ); }
-	inline MA1_Fstring NameStackCooler() { return ma( &T::NameStackCooler ); }
-	inline MA1_Fstring NodeName() { return ma( &T::NodeName ); }
-	inline MA1_Fstring ObjName() { return ma( &T::ObjName ); }
-	inline MA1_Fstring OldName() { return ma( &T::OldName ); }
-	inline MA1_Fstring PlantLoopName() { return ma( &T::PlantLoopName ); }
-	inline MA1_Fstring SFanName() { return ma( &T::SFanName ); }
-	inline MA1_Fstring SplitterName() { return ma( &T::SplitterName ); }
-	inline MA1_Fstring StorageName() { return ma( &T::StorageName ); }
-	inline MA1_Fstring SupplyAirFanName() { return ma( &T::SupplyAirFanName ); }
-	inline MA1_Fstring SurfName() { return ma( &T::SurfName ); }
-	inline MA1_Fstring SysName() { return ma( &T::SysName ); }
-	inline MA1_Fstring Title() { return ma( &T::Title ); }
-	inline MA1_Fstring units() { return ma( &T::units ); }
-	inline MA1_Fstring VarName() { return ma( &T::VarName ); }
-	inline MA1_Fstring varName() { return ma( &T::varName ); }
-	inline MA1_Fstring VarNameOnly() { return ma( &T::VarNameOnly ); }
-	inline MA1_Fstring ZoneHVACUnitName() { return ma( &T::ZoneHVACUnitName ); }
-	inline MA1_Fstring ZoneName() { return ma( &T::ZoneName ); }
-	inline MA1_Fstring ZonePlenumName() { return ma( &T::ZonePlenumName ); }
+	// string Members
+	inline MA1_string AirLoopName() { return ma( &T::AirLoopName ); }
+	inline MA1_string AirPriLoopName() { return ma( &T::AirPriLoopName ); }
+	inline MA1_string AssignedLoopName() { return ma( &T::AssignedLoopName ); }
+	inline MA1_string CompName() { return ma( &T::CompName ); }
+	inline MA1_string ComponentListName() { return ma( &T::ComponentListName ); }
+	inline MA1_string ComponentTypeName() { return ma( &T::ComponentTypeName ); }
+	inline MA1_string CompType() { return ma( &T::CompType ); }
+	inline MA1_string computeName() { return ma( &T::computeName ); }
+	inline MA1_string ConstituentName() { return ma( &T::ConstituentName ); }
+	inline MA1_string ControllerListName() { return ma( &T::ControllerListName ); }
+	inline MA1_string ControllerName() { return ma( &T::ControllerName ); }
+	inline MA1_string ControlName() { return ma( &T::ControlName ); }
+	inline MA1_string ControlTypeName() { return ma( &T::ControlTypeName ); }
+	inline MA1_string CoolDesDay() { return ma( &T::CoolDesDay ); }
+	inline MA1_string DamperName() { return ma( &T::DamperName ); }
+	inline MA1_string DataTypeName() { return ma( &T::DataTypeName ); }
+	inline MA1_string EquipID() { return ma( &T::EquipID ); }
+	inline MA1_string EquipListName() { return ma( &T::EquipListName ); }
+	inline MA1_string EquipName() { return ma( &T::EquipName ); }
+	inline MA1_string EquipType() { return ma( &T::EquipType ); }
+	inline MA1_string EvapCoolerName() { return ma( &T::EvapCoolerName ); }
+	inline MA1_string ExhaustAirFanName() { return ma( &T::ExhaustAirFanName ); }
+	inline MA1_string ExtFanName() { return ma( &T::ExtFanName ); }
+	inline MA1_string FanName() { return ma( &T::FanName ); }
+	inline MA1_string HeatDesDay() { return ma( &T::HeatDesDay ); }
+	inline MA1_string HeatExchangerName() { return ma( &T::HeatExchangerName ); }
+	inline MA1_string InverterName() { return ma( &T::InverterName ); }
+	inline MA1_string keyValue() { return ma( &T::keyValue ); }
+	inline MA1_string LoopName() { return ma( &T::LoopName ); }
+	inline MA1_string LoopType_s() { return ma( &T::LoopType ); } // Also used as int so name decorated
+	inline MA1_string MatchValue() { return ma( &T::MatchValue ); }
+	inline MA1_string MatchValue1() { return ma( &T::MatchValue1 ); }
+	inline MA1_string MatchValue2() { return ma( &T::MatchValue2 ); }
+	inline MA1_string MixerName() { return ma( &T::MixerName ); }
+	inline MA1_string Name() { return ma( &T::Name ); }
+	inline MA1_string name() { return ma( &T::name ); }
+	inline MA1_string NameElecStorage() { return ma( &T::NameElecStorage ); }
+	inline MA1_string NameExhaustHX() { return ma( &T::NameExhaustHX ); }
+	inline MA1_string NameFCAirSup() { return ma( &T::NameFCAirSup ); }
+	inline MA1_string NameFCAuxilHeat() { return ma( &T::NameFCAuxilHeat ); }
+	inline MA1_string NameFCPM() { return ma( &T::NameFCPM ); }
+	inline MA1_string NameFCWaterSup() { return ma( &T::NameFCWaterSup ); }
+	inline MA1_string NameInverter() { return ma( &T::NameInverter ); }
+	inline MA1_string NameStackCooler() { return ma( &T::NameStackCooler ); }
+	inline MA1_string NodeName() { return ma( &T::NodeName ); }
+	inline MA1_string ObjName() { return ma( &T::ObjName ); }
+	inline MA1_string OldName() { return ma( &T::OldName ); }
+	inline MA1_string PlantLoopName() { return ma( &T::PlantLoopName ); }
+	inline MA1_string SFanName() { return ma( &T::SFanName ); }
+	inline MA1_string SplitterName() { return ma( &T::SplitterName ); }
+	inline MA1_string StorageName() { return ma( &T::StorageName ); }
+	inline MA1_string SupplyAirFanName() { return ma( &T::SupplyAirFanName ); }
+	inline MA1_string SurfName() { return ma( &T::SurfName ); }
+	inline MA1_string SysName() { return ma( &T::SysName ); }
+	inline MA1_string Title() { return ma( &T::Title ); }
+	inline MA1_string units() { return ma( &T::units ); }
+	inline MA1_string VarName() { return ma( &T::VarName ); }
+	inline MA1_string varName() { return ma( &T::varName ); }
+	inline MA1_string VarNameOnly() { return ma( &T::VarNameOnly ); }
+	inline MA1_string ZoneHVACUnitName() { return ma( &T::ZoneHVACUnitName ); }
+	inline MA1_string ZoneName() { return ma( &T::ZoneName ); }
+	inline MA1_string ZonePlenumName() { return ma( &T::ZonePlenumName ); }
 
-	// FArra1D< int >
+	// FArray1D< int >
 	inline MA1< FArray1D< int > > adjs() { return ma( &T::adjs ); }
 	inline MA1< FArray1D< int > > adjsl() { return ma( &T::adjsl ); }
 	inline MA1c< FArray1D< int > > adjs() const { return ma( &T::adjs ); }
 	inline MA1c< FArray1D< int > > adjsl() const { return ma( &T::adjsl ); }
 
-	// FArra1D< double >
+	// FArray1D< double >
 	inline MA1c< FArray1D< double > > hrly() const { return ma( &T::hrly ); }
 	inline MA1< FArray1D< double > > hrly() { return ma( &T::hrly ); }
 	inline MA1c< FArray1D< double > > InOutProjSLFracMult() const { return ma( &T::InOutProjSLFracMult ); }

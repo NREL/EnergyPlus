@@ -97,7 +97,7 @@ namespace DataTimings {
 	// Functions
 
 	void
-	epStartTime( Fstring const & ctimingElementstring )
+	epStartTime( std::string const & ctimingElementstring )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -178,9 +178,9 @@ namespace DataTimings {
 
 	void
 	epStopTime(
-		Fstring const & ctimingElementstring,
+		std::string const & ctimingElementstring,
 		Optional_bool_const printit, // true if it should be printed here.
-		Optional_Fstring_const wprint // only needed (and assumed, if printit is true)
+		Optional_string_const wprint // only needed (and assumed, if printit is true)
 	)
 	{
 
@@ -235,7 +235,7 @@ namespace DataTimings {
 		}
 
 		if ( found == 0 ) {
-			ShowFatalError( "epStopTime: No element=" + trim( ctimingElementstring ) );
+			ShowFatalError( "epStopTime: No element=" + ctimingElementstring );
 		}
 
 		TSTOP( stoptime );
@@ -267,7 +267,7 @@ namespace DataTimings {
 				} else if ( SELECT_CASE_var == "PRINT_TIME_AIF" ) {
 					gio::write( "(a55,i10,f16.4)" ) << ctimingElementstring << Timing( found ).calls << Timing( found ).currentTimeSum;
 				} else {
-					gio::write( "*" ) << trim( ctimingElementstring ) << Timing( found ).currentTimeSum;
+					gio::write( "*" ) << ctimingElementstring << Timing( found ).currentTimeSum;
 				}}
 			}
 			//could not cover:
@@ -305,7 +305,7 @@ namespace DataTimings {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const fmta( "(A)" );
+		static gio::Fmt const fmta( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -326,18 +326,18 @@ namespace DataTimings {
 
 		for ( loop = 1; loop <= NumTimingElements; ++loop ) {
 			if ( Timing( loop ).calls > 0 ) {
-				gio::write( EchoInputFile, fmta ) << trim( Timing( loop ).Element ) + tabchar + trim( RoundSigDigits( Timing( loop ).calls ) ) + tabchar + trim( RoundSigDigits( Timing( loop ).currentTimeSum, 3 ) ) + tabchar + trim( RoundSigDigits( Timing( loop ).currentTimeSum / double( Timing( loop ).calls ), 3 ) );
+				gio::write( EchoInputFile, fmta ) << Timing( loop ).Element + tabchar + RoundSigDigits( Timing( loop ).calls ) + tabchar + RoundSigDigits( Timing( loop ).currentTimeSum, 3 ) + tabchar + RoundSigDigits( Timing( loop ).currentTimeSum / double( Timing( loop ).calls ), 3 );
 			} else {
-				gio::write( EchoInputFile, fmta ) << trim( Timing( loop ).Element ) + tabchar + trim( RoundSigDigits( Timing( loop ).calls ) ) + tabchar + trim( RoundSigDigits( Timing( loop ).currentTimeSum, 3 ) ) + tabchar + trim( RoundSigDigits( -999.0, 3 ) );
+				gio::write( EchoInputFile, fmta ) << Timing( loop ).Element + tabchar + RoundSigDigits( Timing( loop ).calls ) + tabchar + RoundSigDigits( Timing( loop ).currentTimeSum, 3 ) + tabchar + RoundSigDigits( -999.0, 3 );
 			}
 		}
-		gio::write( EchoInputFile, fmta ) << "Time from CPU_Time" + tabchar + trim( RoundSigDigits( TimeUsed_CPUTime, 3 ) );
+		gio::write( EchoInputFile, fmta ) << "Time from CPU_Time" + tabchar + RoundSigDigits( TimeUsed_CPUTime, 3 );
 #endif
 
 	}
 
 	Real64
-	epGetTimeUsed( Fstring const & ctimingElementstring )
+	epGetTimeUsed( std::string const & ctimingElementstring )
 	{
 
 		// FUNCTION INFORMATION:
@@ -384,9 +384,9 @@ namespace DataTimings {
 		}
 
 		if ( found == 0 && ! AbortProcessing ) {
-			ShowFatalError( "epGetTimeUsed: No element=" + trim( ctimingElementstring ) );
+			ShowFatalError( "epGetTimeUsed: No element=" + ctimingElementstring );
 		} else {
-			ShowSevereError( "epGetTimeUsed: No element=" + trim( ctimingElementstring ) );
+			ShowSevereError( "epGetTimeUsed: No element=" + ctimingElementstring );
 		}
 
 		totalTimeUsed = Timing( found ).currentTimeSum;
@@ -396,7 +396,7 @@ namespace DataTimings {
 	}
 
 	Real64
-	epGetTimeUsedperCall( Fstring const & ctimingElementstring )
+	epGetTimeUsedperCall( std::string const & ctimingElementstring )
 	{
 
 		// FUNCTION INFORMATION:
@@ -444,9 +444,9 @@ namespace DataTimings {
 		}
 
 		if ( found == 0 ) {
-			ShowFatalError( "epGetTimeUsedperCall: No element=" + trim( ctimingElementstring ) );
+			ShowFatalError( "epGetTimeUsedperCall: No element=" + ctimingElementstring );
 		} else {
-			ShowSevereError( "epGetTimeUsedperCall: No element=" + trim( ctimingElementstring ) );
+			ShowSevereError( "epGetTimeUsedperCall: No element=" + ctimingElementstring );
 		}
 
 		if ( Timing( found ).calls > 0 ) {
@@ -559,7 +559,7 @@ namespace DataTimings {
 		//value(7)   Seconds (0-59)
 		//value(8)   Milliseconds (0-999)
 
-		date_and_time( _, _, _, clockvalues );
+		date_and_time_string( _, _, _, clockvalues );
 		calctime = clockvalues( 5 ) * 3600. + clockvalues( 6 ) * 60. + clockvalues( 7 ) + clockvalues( 8 ) / 1000.;
 
 		return calctime;
