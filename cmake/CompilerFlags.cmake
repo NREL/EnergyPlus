@@ -26,6 +26,7 @@ if (WIN32 AND NOT UNIX)  # UNIX clause required to filter out cygwin installatio
 		#  4800 
 		#  4996  Deprecated" STL functions (that MS has safer, non-std alternatives for)
 		
+		# RELEASE MODE FLAGS
         SET(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -nologo") #Suppresses compiler copyright notice and informational messages
 		SET(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -MP") # Enables multi-processor compilation of source within a single project
 		SET(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -Za") # Disables MS language extensions
@@ -38,7 +39,9 @@ if (WIN32 AND NOT UNIX)  # UNIX clause required to filter out cygwin installatio
 		SET(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -TP") # Globally treat all source files as C++
 		SET(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -O2") # Optimize code to level 2
 		SET(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG") # Define the "NDEBUG" flag; disables standard-C assertions
+		SET(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -GS-") # Disable buffer overrun checks for performance in release mode
 		
+		# DEBUG MODE FLAGS
         # A note from Stuart: -RTCc gave exe blocked by Windows 8.1 Defender with ostringstream
         SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -nologo")
 		SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -MP")
@@ -54,11 +57,11 @@ if (WIN32 AND NOT UNIX)  # UNIX clause required to filter out cygwin installatio
 		SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Od") # Turns off all optimization
 		SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Ob0") # Disables inline expansion
         
-		# Linker
+		# LINKER FLAGS
 		SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -nologo -F2097152")  # was LDFLAGS
-        #SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -link -NODEFAULTLIB:libcd")  # was LINKFLAGS
-		
+        		
     endif ()
+	
     # g++
     if (CMAKE_COMPILER_IS_GNUCXX)
         if (CMAKE_BUILD_TYPE_B MATCHES RELEASE)
@@ -70,6 +73,7 @@ if (WIN32 AND NOT UNIX)  # UNIX clause required to filter out cygwin installatio
             SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pipe -Wall -ggdb")
         endif ()
     endif ()
+	
 endif ()
 
 # **** LINUX-ish **** #
