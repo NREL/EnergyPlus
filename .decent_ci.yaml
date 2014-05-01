@@ -1,3 +1,3 @@
-results_repository : lefticus/energyplus_build_results
+results_repository : NREL/EnergyPlusBuildResults
 results_path : _posts
-results_base_url : https://lefticus.github.io/energyplus_build_results
+results_base_url : https://nrel.github.io/EnergyPlusBuildResults

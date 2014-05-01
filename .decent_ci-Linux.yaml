@@ -4,4 +4,5 @@ compilers:
     cmake_extra_flags: -DBUILD_TESTING:BOOL=ON
   - name: "clang"
     cmake_extra_flags: -DBUILD_TESTING:BOOL=ON
+    build_type: Debug
   - name: cppcheck
