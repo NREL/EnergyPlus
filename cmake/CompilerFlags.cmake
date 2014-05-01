@@ -18,15 +18,20 @@ if (WIN32 AND NOT UNIX)  # UNIX clause required to filter out cygwin installatio
     # visual c++ (VS 2013)
     if (MSVC)    
         # Disabled Warnings:
-        #  4244  Narrowing conversions
+        #  4101
+		#  4102
+		#  4244  Narrowing conversions
         #  4258  Definition from the loop is ignored
+		#  4305
         #  4355  Passing this pointer in class initializer (object is incomplete so bases/members can only use this in limited ways)
-        #  4996  Deprecated" STL functions (that MS has safer, non-std alternatives for)
-        SET(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -nologo -Za -EHsc -GR -wd4244 -wd4258 -wd4355 -wd4996 -DVC_EXTRALEAN -DWIN32_LEAN_AND_MEAN -DNOMINMAX -D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -D_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES -TP -O2 -DNDEBUG")
+        #  4521
+		#  4800 
+		#  4996  Deprecated" STL functions (that MS has safer, non-std alternatives for)
+        SET(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -nologo -Za -EHsc -GR -wd4101 -wd4102 -wd4244 -wd4258 -wd4305 -wd4355 -wd4521 -wd4800 -wd4996 -DVC_EXTRALEAN -DWIN32_LEAN_AND_MEAN -DNOMINMAX -D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -D_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES -TP -O2 -DNDEBUG")
         # -RTCc gave exe blocked by Windows 8.1 Defender with ostringstream
         SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -nologo -Za -EHsc -GR -wd4244 -wd4258 -wd4355 -wd4996 -DVC_EXTRALEAN -DWIN32_LEAN_AND_MEAN -DNOMINMAX -D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -D_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES -TP -Z7 -Od -Ob0 -RTCsu")
         SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -nologo -F2097152")  # was LDFLAGS
-        SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -link -NODEFAULTLIB:libcd")  # was LINKFLAGS
+        #SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -link -NODEFAULTLIB:libcd")  # was LINKFLAGS
     endif ()
     # g++
     if (CMAKE_COMPILER_IS_GNUCXX)
