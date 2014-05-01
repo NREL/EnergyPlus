@@ -382,14 +382,6 @@
  - Module: General
  - FileName:General.cc
 
-**General.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
-
-**General.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
-
 **GlobalNames.f90**
  - Module: GlobalNames
  - FileName:GlobalNames.cc
@@ -473,18 +465,6 @@
 **HVACSteamCoilComponent.f90**
  - Module: SteamCoils
  - FileName:SteamCoils.cc
-
-**HVACSteamCoilComponent.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
-
-**HVACSteamCoilComponent.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
-
-**HVACSteamCoilComponent.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
 
 **HVACTranspiredCollector.f90**
  - Module: TranspiredCollector
@@ -601,10 +581,6 @@
 **OutputReportPredefined.f90**
  - Module: OutputReportPredefined
  - FileName:OutputReportPredefined.cc
-
-**OutputReportPredefined.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
 
 **OutputReportTabular.f90**
  - Module: OutputReportTabular
@@ -725,22 +701,6 @@
 **PlantPipingSystemManager.f90**
  - Module: PlantPipingSystemsManager
  - FileName:PlantPipingSystemsManager.cc
-
-**PlantPipingSystemManager.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
-
-**PlantPipingSystemManager.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
-
-**PlantPipingSystemManager.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
-
-**PlantPipingSystemManager.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
 
 **PlantPondGroundHeatExchanger.f90**
  - Module: PondGroundHeatExchanger
@@ -882,18 +842,6 @@
  - Module: ScheduleManager
  - FileName:ScheduleManager.cc
 
-**ScheduleManager.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
-
-**ScheduleManager.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
-
-**ScheduleManager.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
-
 **SetPointManager.f90**
  - Module: SetPointManager
  - FileName:SetPointManager.cc
@@ -1005,66 +953,6 @@
 **VectorUtilities.f90**
  - Module: vectors
  - FileName:vectors.cc
-
-**VectorUtilities.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
-
-**VectorUtilities.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
-
-**VectorUtilities.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
-
-**VectorUtilities.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
-
-**VectorUtilities.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
-
-**VectorUtilities.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
-
-**VectorUtilities.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
-
-**VectorUtilities.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
-
-**VectorUtilities.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
-
-**VectorUtilities.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
-
-**VectorUtilities.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
-
-**VectorUtilities.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
-
-**VectorUtilities.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
-
-**VectorUtilities.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
-
-**VectorUtilities.f90**
- - Module: PROCEDURE
- - FileName:PROCEDURE.cc
 
 **VectorUtilities.f90**
  - Module: DXFEarClipping
