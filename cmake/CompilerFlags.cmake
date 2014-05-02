@@ -1,7 +1,4 @@
 
-# need to figure out how to set this to avoid the major slow-down in debugging:
-# Configuration Properties ->Debugging -> Environment, use drop-down list to choose <Edit> and type _NO_DEBUG_HEAP=1 then click OK 
-
 IF ( MSVC ) # visual c++ (VS 2013)
 
     # Disabled Warnings:
@@ -14,6 +11,9 @@ IF ( MSVC ) # visual c++ (VS 2013)
     #  4521
     #  4800 
     #  4996  Deprecated" STL functions (that MS has safer, non-std alternatives for)
+    
+    # need to figure out how to set this to avoid the major slow-down in debugging:
+    # Configuration Properties ->Debugging -> Environment, use drop-down list to choose <Edit> and type _NO_DEBUG_HEAP=1 then click OK 
             
     # ALL MODE FLAGS
     ADD_DEFINITIONS("-MP") # Enables multi-processor compilation of source within a single project
