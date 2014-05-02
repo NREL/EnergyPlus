@@ -1,4 +1,7 @@
 
+# Compiler-agnostic compiler flags first
+SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DOBJEXXFCL_FARRAY_INIT -DOBJEXXFCL_FARRAY_INIT_DEBUG") # Objexx DEFinition
+    
 IF ( MSVC ) # visual c++ (VS 2013)
 
     # Disabled Warnings:
@@ -24,7 +27,7 @@ IF ( MSVC ) # visual c++ (VS 2013)
     ADD_DEFINITIONS("-DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
     ADD_DEFINITIONS("-D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -D_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES") # ???
     ADD_DEFINITIONS("-TP") # Globally treat all source files as C++
-    
+        
     # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
     SET(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -GS-") # Disable buffer overrun checks for performance in release mode
     
@@ -39,7 +42,6 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX ) # g++
     
     # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
     SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsignaling-nans") # Disable optimizations that may have concealed NaN behavior
-    SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DOBJEXXFCL_FARRAY_INIT -DOBJEXXFCL_FARRAY_INIT_DEBUG") # Objexx DEFinition
     SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0") # Turns off all optimization
     SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -ggdb") # Produces debugging information specifically for gdb
              
@@ -62,7 +64,7 @@ ELSEIF ( INTEL )
     SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Qoption,c,-ip_ninl_max_stats=500") # Sets the max increase in the # of intermediate language statements to 500 for each function
     SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Qoption,c,-ip_ninl_max_total_stats=5000") # Sets the total max increase in the # of intermediate language statements to 5000
         
-    # COMPILER FLAGS
+    # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
     SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /check:stack,uninit") # Enables runtime checking of the stack (buffer over and underruns; pointer verification) and uninitialized variables
     SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Gs0") # ??? Disable/Enable stack checking
     SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Qfp-stack-check") # Tells the compiler to generate extra code after every function call to ensure fp stack is as expected
