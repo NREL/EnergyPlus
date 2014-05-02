@@ -7415,10 +7415,11 @@
     Corridor_Flr_6 Unit Heater Inlet Node Name,  !- Air Outlet Node Name
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     Corridor_Flr_6 Unit HeaterFan,  !- Supply Air Fan Name
-    AUTOSIZE,                !- Maximum Supply Air Flow Rate {m3/s}
-    OnOff,                   !- Fan Control Type
+    AUTOSIZE,                 !- Maximum Supply Air Flow Rate {m3/s}
     Coil:Heating:Electric,   !- Heating Coil Object Type
     Corridor_Flr_6 Unit Heater coil,  !- Heating Coil Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    No,                      !- Supply Air Fan Operation During No Heating
     AUTOSIZE,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance

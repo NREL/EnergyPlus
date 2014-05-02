@@ -1,4 +1,4 @@
-!IDD_Version 8.1.0.009
+!IDD_Version 8.2.0.001
 ! **************************************************************************
 ! This file is the Input Data Dictionary (IDD) for EnergyPlus.
 ! The IDD defines the syntax and data model for each type of input "Object."
@@ -21743,7 +21743,7 @@ AirflowNetwork:MultiZone:Zone,
       \default 300000.0
       \note Applicable only if Ventilation Control Mode = Enthalpy.
       \note This value must be greater than the corresponding lower value (previous field).
-  A4; \field Venting Availability Schedule Name
+  A4, \field Venting Availability Schedule Name
       \type object-list
       \object-list ScheduleNames
       \note Non-zero Schedule value means venting is allowed if other venting control conditions are
@@ -21752,6 +21752,21 @@ AirflowNetwork:MultiZone:Zone,
       \note circumstances. If this Schedule is not specified then venting is allowed if
       \note other venting control conditions are satisfied.
       \note Not used if Ventilation Control Mode = NoVent.
+  A5, \field Single Sided Wind Pressure Coefficient Algorithm
+      \type choice
+	    \key Advanced
+	    \key Standard
+	    \default Standard
+	    \note Selecting Advanced results in EnergyPlus calculating modified Wind Pressure Coefficients
+	    \note to account for wind direction and turbulence effects on single sided ventilation rates.
+	    \note Model is only valid for zones with 2 openings, both of which are on a single facade.
+  N6; \field Facade Width
+      \type real
+	    \units m
+	    \minimum 0.0
+	    \default 10.0
+	    \note This is the whole building width along the direction of the facade of this zone.
+	  
 
 AirflowNetwork:MultiZone:Surface,
       \min-fields 4
@@ -31857,9 +31872,10 @@ ZoneHVAC:UnitVentilator,
    A11, \field Supply Air Fan Object Type
         \required-field
         \type choice
+        \key Fan:OnOff
         \key Fan:ConstantVolume
         \key Fan:VariableVolume
-        \note Allowable fan types are Fan:ConstantVolume and
+        \note Allowable fan types are Fan:ConstantVolume, Fan:OnOff and
         \note Fan:VariableVolume
    A12, \field Supply Air Fan Name
         \required-field
@@ -31872,32 +31888,40 @@ ZoneHVAC:UnitVentilator,
         \key Heating
         \key Cooling
         \key HeatingAndCooling
-   A14, \field Heating Coil Object Type
+   A14, \field Supply Air Fan Operating Mode Schedule Name
+        \object-list ScheduleNames
+        \note Enter the name of a schedule that controls fan operation. Schedule
+        \note name values of 0 denote cycling fan operation (fan cycles with
+        \note cooling/heating coil). Schedule values greater than 0 denote
+        \note constant fan operation (fan runs continually regardless of coil 
+        \note operation). The fan operating mode defaults to cycling fan operation 
+        \note if this input field is left blank.
+   A15, \field Heating Coil Object Type
         \type choice
         \key Coil:Heating:Water
         \key Coil:Heating:Electric
         \key Coil:Heating:Gas
         \key Coil:Heating:Steam
-   A15, \field Heating Coil Name
+   A16, \field Heating Coil Name
         \type object-list
         \object-list HeatingCoilName
    N4 , \field Heating Convergence Tolerance
         \type real
         \minimum> 0.0
         \default 0.001
-   A16, \field Cooling Coil Object Type
+   A17, \field Cooling Coil Object Type
         \type choice
         \key Coil:Cooling:Water
         \key Coil:Cooling:Water:DetailedGeometry
         \key CoilSystem:Cooling:Water:HeatExchangerAssisted
-   A17, \field Cooling Coil Name
+   A18, \field Cooling Coil Name
         \type object-list
         \object-list CoolingCoilsWater
    N5 , \field Cooling Convergence Tolerance
         \type real
         \minimum> 0.0
         \default 0.001
-   A18; \field Availability Manager List Name
+   A19; \field Availability Manager List Name
         \note Enter the name of an AvailabilityManagerAssignmentList object.
         \type object-list
         \object-list SystemAvailabilityManagerLists
@@ -31919,9 +31943,10 @@ ZoneHVAC:UnitHeater,
    A5 , \field Supply Air Fan Object Type
         \required-field
         \type choice
+        \key Fan:OnOff
         \key Fan:ConstantVolume
         \key Fan:VariableVolume
-        \note Allowable fan types are Fan:ConstantVolume and
+        \note Allowable fan types are Fan:ConstantVolume, Fan:OnOff and
         \note Fan:VariableVolume
    A6 , \field Supply Air Fan Name
         \required-field
@@ -31932,22 +31957,37 @@ ZoneHVAC:UnitHeater,
         \units m3/s
         \minimum> 0
         \autosizable
-   A7 , \field Fan Control Type
-        \required-field
-        \type choice
-        \key OnOff
-        \key Continuous
-   A8 , \field Heating Coil Object Type
+   A7 , \field Heating Coil Object Type
         \required-field
         \type choice
         \key Coil:Heating:Water
         \key Coil:Heating:Electric
         \key Coil:Heating:Gas
         \key Coil:Heating:Steam
-   A9 , \field Heating Coil Name
+   A8 , \field Heating Coil Name
         \required-field
         \type object-list
         \object-list HeatingCoilName
+   A9 , \field Supply Air Fan Operating Mode Schedule Name
+        \object-list ScheduleNames
+        \note Enter the name of a schedule that controls fan operation. Schedule
+        \note name values of 0 denote cycling fan operation (fan cycles with the
+        \note heating coil). Schedule values greater than 0 denote constant fan
+        \note operation (fan runs continually regardless of coil operation). 
+        \note The fan operating mode defaults to cycling fan operation if this 
+        \note input field is left blank.
+   A10, \field Supply Air Fan Operation During No Heating
+        \required-field
+        \type choice
+        \key Yes
+        \key No
+        \note This choice field allows the user to define how the unit heater will operate 
+        \note under "no heating load" or cooling conditions. If the "No" is selected, then 
+        \note the fan will not run unless there is a heating load. If the fan does not run, 
+        \note this effectively shuts the unit heater system off when there is no heating load. 
+        \note If the "Yes" is selected, the unit heater is available and has a ConstantVolume 
+        \note fan, or has an OnOff fan with "Supply Air Fan Operating Mode Schedule" value 
+        \note greater than zero, then the fan will always run regardless of the zone load.
    N2 , \field Maximum Hot Water or Steam Flow Rate
         \note Not used when heating coil is gas or electric
         \units m3/s
@@ -31964,7 +32004,7 @@ ZoneHVAC:UnitHeater,
         \type real
         \minimum> 0.0
         \default 0.001
-   A10; \field Availability Manager List Name
+   A11; \field Availability Manager List Name
         \note Enter the name of an AvailabilityManagerAssignmentList object.
         \type object-list
         \object-list SystemAvailabilityManagerLists
@@ -38831,6 +38871,7 @@ Coil:Cooling:Water,
        \reference CoolingCoilsWater
        \reference CoolingCoilsWaterNoHX
        \reference AFNCoilNames
+       \reference SimpleCoils
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -41222,6 +41263,7 @@ Coil:Heating:Water,
        \reference HeatingCoilName
        \reference HeatingCoilsWater
        \reference AFNCoilNames
+       \reference SimpleCoils
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -72670,6 +72712,56 @@ FaultModel:EnthalpySensorOffset:ReturnAir,
        \maximum< 20000
        \default 0.0
        \units J/kg
+	   
+FaultModel:Fouling:Coil,
+   \memo This object describes fouling water heating or cooling coils
+   A1, \field Name
+       \required-field
+       \type alpha
+   A2, \field Coil Name
+       \required-field
+       \type object-list
+       \object-list SimpleCoils
+   A3, \field Availability Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A4, \field Severity Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A5, \field Fouling Input Method
+       \type choice
+       \key FouledUARated
+       \key FoulingFactor
+       \default FouledUARated
+   N1, \field UAFouled
+       \note Fouling coil UA value under rating conditions
+	     \note For Fouling Input Method: FouledUARated
+       \units W/K
+       \type real       
+       \minimum> 0.0
+   N2, \field Water Side Fouling Factor       
+	     \note For Fouling Input Method: FoulingFactor
+       \units m2-K/W  
+       \type real	   
+       \minimum 0.0
+       \default 0.0
+   N3, \field Air Side Fouling Factor       
+	     \note For Fouling Input Method: FoulingFactor
+       \units m2-K/W 
+       \type real
+       \minimum 0.0	   
+       \default 0.0
+   N4, \field Outside Coil Surface Area       
+	     \note For Fouling Input Method: FoulingFactor
+       \units m2 
+       \type real	   
+       \minimum> 0.0	   
+   N5; \field Inside to Outside Coil Surface Area Ratio      
+	     \note For Fouling Input Method: FoulingFactor
+       \units dimensionless
+       \type real       
+	     \minimum> 0.0
+       \default 0.07
 
 \group General Data Entry
 

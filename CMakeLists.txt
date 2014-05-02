@@ -15,6 +15,13 @@ option( BUILD_TESTING "Build testing targets" OFF )
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ")
 
+if (UNIX AND NOT APPLE AND NOT WIN32)
+  if (CMAKE_COMPILER_IS_GNUCXX)
+  #if ( CMAKE_CXX_COMPILER MATCHES "g++" )
+    SET( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -pedantic -Wall -Wextra -Wno-unused-parameter -Wno-unused-but-set-parameter -Wno-unused-variable -Wno-unused-but-set-variable -Wno-unused-label -ffor-scope -fmessage-length=0 -m64 -march=native -O3 -DNDEBUG -s")
+  endif()
+endif()
+
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )

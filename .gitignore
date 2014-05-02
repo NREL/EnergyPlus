@@ -25,4 +25,5 @@ builds
 
 # App-specific project files, for example, for Geany IDE:
 *.geany
-
+.project
+.cproject

@@ -114,7 +114,7 @@ public: // Assignment
 	Optional &
 	operator =( Value const & val )
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		*ptr_ = val;
 		return *this;
 	}
@@ -125,8 +125,8 @@ public: // Assignment
 	Optional &
 	operator =( U const & val )
 	{
-		assert( ptr_ );
-		*ptr_ = static_cast< Value >( val );
+		assert( ptr_ != nullptr );
+		*ptr_ = val;
 		return *this;
 	}
 
@@ -135,7 +135,7 @@ public: // Assignment
 	Optional &
 	operator =( Value && val )
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		*ptr_ = val;
 		return *this;
 	}
@@ -157,7 +157,7 @@ public: // Conversion
 	inline
 	operator Value const &() const
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		return *ptr_;
 	}
 
@@ -165,7 +165,7 @@ public: // Conversion
 	inline
 	operator Value &()
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		return *ptr_;
 	}
 
@@ -176,7 +176,7 @@ public: // Operators
 	Value const &
 	operator ()() const
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		return *ptr_;
 	}
 
@@ -185,7 +185,7 @@ public: // Operators
 	Value &
 	operator ()()
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		return *ptr_;
 	}
 
@@ -227,7 +227,7 @@ public: // Comparison
 	bool
 	operator ==( Optional const & a, Optional const & b )
 	{
-		return ( a.ptr_ && b.ptr_ && ( *a.ptr_ == *b.ptr_ ) ) || ( ( ! a.ptr_ ) && ( ! b.ptr_ ) );
+		return ( ( a.ptr_ != nullptr ) && ( b.ptr_ != nullptr ) ? ( *a.ptr_ == *b.ptr_ ) : ( a.ptr_ == b.ptr_ ) );
 	}
 
 	// Optional != Optional
@@ -245,7 +245,7 @@ public: // Comparison
 	bool
 	operator ==( Optional const & a, Value const & b )
 	{
-		return ( ( a.ptr_ ) && ( *a.ptr_ == b ) );
+		return ( ( a.ptr_ != nullptr ) && ( *a.ptr_ == b ) );
 	}
 
 	// Optional != Value
@@ -263,7 +263,7 @@ public: // Comparison
 	bool
 	operator ==( Value const & a, Optional const & b )
 	{
-		return ( ( b.ptr_ ) && ( a == *b.ptr_ ) );
+		return ( ( b.ptr_ != nullptr ) && ( a == *b.ptr_ ) );
 	}
 
 	// Value != Optional
@@ -350,7 +350,7 @@ public: // Assignment
 	Optional &
 	operator =( Value const & val )
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		*ptr_ = val;
 		return *this;
 	}
@@ -361,7 +361,7 @@ public: // Assignment
 	Optional &
 	operator =( U const & val )
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		*ptr_ = val;
 		return *this;
 	}
@@ -371,7 +371,7 @@ public: // Assignment
 	Optional &
 	operator =( Value && val )
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		*ptr_ = val;
 		return *this;
 	}
@@ -391,7 +391,7 @@ public: // Conversion
 	inline
 	operator Value const &() const
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		return *ptr_;
 	}
 
@@ -399,7 +399,7 @@ public: // Conversion
 	inline
 	operator Value &()
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		return *ptr_;
 	}
 
@@ -410,7 +410,7 @@ public: // Operators
 	Value const &
 	operator ()() const
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		return *ptr_;
 	}
 
@@ -419,7 +419,7 @@ public: // Operators
 	Value &
 	operator ()()
 	{
-		assert( ptr_ );
+		assert( ptr_ != nullptr );
 		return *ptr_;
 	}
 
@@ -451,7 +451,7 @@ public: // Comparison
 	bool
 	operator ==( Optional const & a, Optional const & b )
 	{
-		return ( a.ptr_ && b.ptr_ && ( *a.ptr_ == *b.ptr_ ) ) || ( ( ! a.ptr_ ) && ( ! b.ptr_ ) );
+		return ( ( a.ptr_ != nullptr ) && ( b.ptr_ != nullptr ) ? ( *a.ptr_ == *b.ptr_ ) : ( a.ptr_ == b.ptr_ ) );
 	}
 
 	// Optional != Optional
@@ -469,7 +469,7 @@ public: // Comparison
 	bool
 	operator ==( Optional const & a, Value const & b )
 	{
-		return ( ( a.ptr_ ) && ( *a.ptr_ == b ) );
+		return ( ( a.ptr_ != nullptr ) && ( *a.ptr_ == b ) );
 	}
 
 	// Optional != Value
@@ -487,7 +487,7 @@ public: // Comparison
 	bool
 	operator ==( Value const & a, Optional const & b )
 	{
-		return ( ( b.ptr_ ) && ( a == *b.ptr_ ) );
+		return ( ( b.ptr_ != nullptr ) && ( a == *b.ptr_ ) );
 	}
 
 	// Value != Optional
