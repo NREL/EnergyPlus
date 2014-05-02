@@ -45,7 +45,7 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX ) # g++
     SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0") # Turns off all optimization
     SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -ggdb") # Produces debugging information specifically for gdb
              
-ELSEIF ( INTEL )
+ELSEIF ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     
     # Warnings ignored:
     #  1786: Use of deprecated items
