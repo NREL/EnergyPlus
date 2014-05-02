@@ -66,7 +66,8 @@ if ( WIN32 AND NOT UNIX )
 		SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Ob0") # Disables inline expansion
         
 		# LINKER FLAGS
-		SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -nologo -F2097152")  # was LDFLAGS
+		SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -nologo") # Suppresses compiler copyright notice and informational messages
+        SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -F2097152") # Increases stack size to ~ 2 MiB
         		
     endif () #MSVC
 	
@@ -126,29 +127,33 @@ if ( WIN32 AND NOT UNIX )
     # INTEL
     if ( ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel" ) # ??? Not sure if this is a good match as I don't have intel C++ (http://www.cmake.org/pipermail/cmake/2011-May/044445.html)
         
+        # Warnings ignored:
+        #  1786: Use of deprecated items
+        #  2259: Non-pointer conversion from "type" to "type" may lose significant bits
+        
         # RELEASE
         if ( CMAKE_BUILD_TYPE_B MATCHES RELEASE )
             
             # COMPILER FLAGS
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /nologo") 
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qstd=c++11")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qcxx-features")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Wall")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Wp64")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qdiag-disable:1786,2259")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DVC_EXTRALEAN /DWIN32_LEAN_AND_MEAN")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DNOMINMAX")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /O3")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DNDEBUG")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fp:fast")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qprec-div-")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qip")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qoption,c,-ip_ninl_max_stats=500")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qoption,c,-ip_ninl_max_total_stats=5000")
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /nologo") # Suppresses compiler copyright notice and informational messages
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qstd=c++11") # Enabled C++11 features; ON by default in Visual Studio 2010 and 2012
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qcxx-features") # ???
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Wall") # Enable "all" warnings
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Wp64") # Look for warnings that may occur related to 64-bit code compilation
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qdiag-disable:1786,2259") # Disable warnings listed above
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DVC_EXTRALEAN /DWIN32_LEAN_AND_MEAN") # Excludes rarely used services and headers from compilation
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /O3") # Optimization level 3
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DNDEBUG") # Define the "NDEBUG" flag; disables standard-C assertions
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fp:fast") # Enables more aggressive optimizations on floating-point data
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qprec-div-") # ???If this is equivalent to /Qno-prec-div, it disables the improved division accuracy in favor of speed
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qip") # Enables inter-procedural optimnization within a single file
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qoption,c,-ip_ninl_max_stats=500") # Sets the max increase in the # of intermediate language statements to 500 for each function
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qoption,c,-ip_ninl_max_total_stats=5000") # Sets the total max increase in the # of intermediate language statements to 5000
             
             # LINKER FLAGS
-            SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /nologo")
-            SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /F2097152")
+            SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /nologo") # Suppresses linker copyright notice and informational messages
+            SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /F2097152") # Increases stack size to ~ 2 MiB
             
         endif () # RELEASE
         
@@ -156,25 +161,25 @@ if ( WIN32 AND NOT UNIX )
         if ( CMAKE_BUILD_TYPE_B MATCHES DEBUG )
             
             # COMPILER FLAGS
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /nologo") 
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qstd=c++11")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qcxx-features")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Wall")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Wp64")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qdiag-disable:1786,2259")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DVC_EXTRALEAN /DWIN32_LEAN_AND_MEAN")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DNOMINMAX")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Od")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Z7")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /traceback")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /check:stack,uninit")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Gs0")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qfp-stack-check")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qtrapuv")
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /nologo") # Suppresses compiler copyright notice and informational messages
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qstd=c++11") # Enabled C++11 features; ON by default in Visual Studio 2010 and 2012
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qcxx-features") # ???
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Wall") # Enable "all" warnings
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Wp64") # Look for warnings that may occur related to 64-bit code compilation
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qdiag-disable:1786,2259") # Disable warnings listed above
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DVC_EXTRALEAN /DWIN32_LEAN_AND_MEAN") # Excludes rarely used services and headers from compilation
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Od") # No optimization
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Z7") # Generates full debugging information
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /traceback") # Generates trackback information 
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /check:stack,uninit") # Enables runtime checking of the stack (buffer over and underruns; pointer verification) and uninitialized variables
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Gs0") # ??? Disable/Enable stack checking
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qfp-stack-check") # Tells the compiler to generate extra code after every function call to ensure fp stack is as expected
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qtrapuv") # ??? Initializes variables with NaN
             
             # LINKER FLAGS
-            SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /nologo")
-            SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /F2097152")
+            SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /nologo") # Suppresses linker copyright notice and informational messages
+            SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /F2097152") # Increases stack size to ~ 2 MiB
             
         endif () # DEBUG
             
