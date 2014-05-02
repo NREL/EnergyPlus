@@ -9,9 +9,11 @@
 # convert the build type string to upper case for comparisons
 #  http://www.cmake.org/pipermail/cmake/2012-June/050651.html
 # don't do this for multiple build-type generators, such as MSVC; Others???
-if ( NOT MSVC )
-	STRING( TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_B )
-endif () 
+if ( NOT "${CMAKE_BUILD_TYPE}" STREQUAL "")
+    if ( NOT MSVC )
+        STRING( TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_B )
+    endif () 
+endif ()
 
 # **** WINDOWS **** #
 # UNIX clause in IF block required to filter out cygwin installations
