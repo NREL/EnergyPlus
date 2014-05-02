@@ -31,11 +31,11 @@ IF ( MSVC ) # visual c++ (VS 2013)
 ELSEIF ( CMAKE_COMPILER_IS_GNUCXX ) # g++
 
     # COMPILER FLAGS
-    ADD_DEFINITIONS(CMAKE_CXX_FLAGS "-std=c++11") # Enable C++11 features in g++
-    ADD_DEFINITIONS(CMAKE_CXX_FLAGS "-pedantic") # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
-    ADD_DEFINITIONS(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unused-parameter") # Turn on warnings (all, extra, "???don't warn about unused parameters???")
-    ADD_DEFINITIONS(CMAKE_CXX_FLAGS "-ffor-scope") # Variables in for-init statements are scoped to the for loop itself
-    ADD_DEFINITIONS(CMAKE_CXX_FLAGS "-fmessage-length=0") # Disable automatic line wrapping on error messages
+    ADD_DEFINITIONS("-std=c++11") # Enable C++11 features in g++
+    ADD_DEFINITIONS("-pedantic") # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
+    ADD_DEFINITIONS("-Wall -Wextra -Wno-unused-parameter") # Turn on warnings (all, extra, "???don't warn about unused parameters???")
+    ADD_DEFINITIONS("-ffor-scope") # Variables in for-init statements are scoped to the for loop itself
+    ADD_DEFINITIONS("-fmessage-length=0") # Disable automatic line wrapping on error messages
     
     # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
     SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsignaling-nans") # Disable optimizations that may have concealed NaN behavior
@@ -50,10 +50,10 @@ ELSEIF ( INTEL )
     #  2259: Non-pointer conversion from "type" to "type" may lose significant bits
     
      # COMPILER FLAGS
-    ADD_DEFINITIONS(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Wall") # Enable "all" warnings
-    ADD_DEFINITIONS(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qdiag-disable:1786,2259") # Disable warnings listed above
-    ADD_DEFINITIONS(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DVC_EXTRALEAN /DWIN32_LEAN_AND_MEAN") # Excludes rarely used services and headers from compilation
-    ADD_DEFINITIONS(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
+    ADD_DEFINITIONS("${CMAKE_CXX_FLAGS} /Wall") # Enable "all" warnings
+    ADD_DEFINITIONS("${CMAKE_CXX_FLAGS} /Qdiag-disable:1786,2259") # Disable warnings listed above
+    ADD_DEFINITIONS("${CMAKE_CXX_FLAGS} /DVC_EXTRALEAN /DWIN32_LEAN_AND_MEAN") # Excludes rarely used services and headers from compilation
+    ADD_DEFINITIONS("${CMAKE_CXX_FLAGS} /DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
     
     # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
     SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /fp:fast") # Enables more aggressive optimizations on floating-point data
