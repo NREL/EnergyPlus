@@ -13,19 +13,17 @@ option( BUILD_TESTING "Build testing targets" OFF )
 # This will help us set the proper options for c++11 across various configurations
 #FIND_PACKAGE( CXXFeatures ) 
 
-if(MSVC)
-  add_definitions(/W3 /MP)
-else()
-  add_definitions(-Wall -Wnon-virtual-dtor -pedantic -std=c++11)
+if (MSVC)
+  set(gtest_force_shared_crt ON)
 endif()
 
-set(gtest_force_shared_crt ON)
 
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 
 include(cmake/ProjectMacros.cmake)
+include(cmake/CompilerFlags.cmake)
 
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/gtest/include/ SYSTEM )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/ObjexxFCL/src/ )
