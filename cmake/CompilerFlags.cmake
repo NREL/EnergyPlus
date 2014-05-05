@@ -16,9 +16,7 @@ IF ( MSVC ) # visual c++ (VS 2013)
     # COMPILER FLAGS
     ADD_DEFINITIONS("-MP") # Enables multi-processor compilation of source within a single project
     ADD_DEFINITIONS("-Za") # Disables MS language extensions
-    ADD_DEFINITIONS("-EHsc") # Specifies that exceptions are caught from C++ code only
     ADD_DEFINITIONS("-wd4244 -wd4258 -wd4355 -wd4996") # Disables warning messages listed above 
-    ADD_DEFINITIONS("-DVC_EXTRALEAN -DWIN32_LEAN_AND_MEAN") # Excludes rarely used services and headers from compilation
     ADD_DEFINITIONS("-DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
     ADD_DEFINITIONS("-D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -D_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES") # ???
         
