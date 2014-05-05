@@ -5,24 +5,19 @@ SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DOBJEXXFCL_FARRAY_INIT -DOB
 IF ( MSVC ) # visual c++ (VS 2013)
 
     # Disabled Warnings:
-    #  4101
-    #  4102
     #  4244  Narrowing conversions
     #  4258  Definition from the loop is ignored
-    #  4305
     #  4355  Passing this pointer in class initializer (object is incomplete so bases/members can only use this in limited ways)
-    #  4521
-    #  4800 
     #  4996  Deprecated" STL functions (that MS has safer, non-std alternatives for)
     
     # need to figure out how to set this to avoid the major slow-down in debugging:
     # Configuration Properties ->Debugging -> Environment, use drop-down list to choose <Edit> and type _NO_DEBUG_HEAP=1 then click OK 
             
-    # ALL MODE FLAGS
+    # COMPILER FLAGS
     ADD_DEFINITIONS("-MP") # Enables multi-processor compilation of source within a single project
     ADD_DEFINITIONS("-Za") # Disables MS language extensions
     ADD_DEFINITIONS("-EHsc") # Specifies that exceptions are caught from C++ code only
-    ADD_DEFINITIONS("-wd4101 -wd4102 -wd4244 -wd4258 -wd4305 -wd4355 -wd4521 -wd4800 -wd4996") # Disables warning messages listed above 
+    ADD_DEFINITIONS("-wd4244 -wd4258 -wd4305 -wd4355 -wd4996") # Disables warning messages listed above 
     ADD_DEFINITIONS("-DVC_EXTRALEAN -DWIN32_LEAN_AND_MEAN") # Excludes rarely used services and headers from compilation
     ADD_DEFINITIONS("-DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
     ADD_DEFINITIONS("-D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -D_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES") # ???
@@ -31,18 +26,15 @@ IF ( MSVC ) # visual c++ (VS 2013)
     # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
     SET(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -GS-") # Disable buffer overrun checks for performance in release mode
     
-ELSEIF ( CMAKE_COMPILER_IS_GNUCXX ) # g++
+ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) # g++/Clang
 
     # COMPILER FLAGS
     ADD_DEFINITIONS("-std=c++11") # Enable C++11 features in g++
     ADD_DEFINITIONS("-pedantic") # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
     ADD_DEFINITIONS("-Wall -Wextra -Wno-unused-parameter") # Turn on warnings (all, extra, "???don't warn about unused parameters???")
-    ADD_DEFINITIONS("-ffor-scope") # Variables in for-init statements are scoped to the for loop itself
-    ADD_DEFINITIONS("-fmessage-length=0") # Disable automatic line wrapping on error messages
     
     # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
     SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsignaling-nans") # Disable optimizations that may have concealed NaN behavior
-    SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0") # Turns off all optimization
     SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -ggdb") # Produces debugging information specifically for gdb
              
 ELSEIF ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
@@ -51,7 +43,7 @@ ELSEIF ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     #  1786: Use of deprecated items
     #  2259: Non-pointer conversion from "type" to "type" may lose significant bits
     
-     # COMPILER FLAGS
+    # COMPILER FLAGS
     ADD_DEFINITIONS("${CMAKE_CXX_FLAGS} /Wall") # Enable "all" warnings
     ADD_DEFINITIONS("${CMAKE_CXX_FLAGS} /Qdiag-disable:1786,2259") # Disable warnings listed above
     ADD_DEFINITIONS("${CMAKE_CXX_FLAGS} /DVC_EXTRALEAN /DWIN32_LEAN_AND_MEAN") # Excludes rarely used services and headers from compilation
@@ -71,4 +63,3 @@ ELSEIF ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Qtrapuv") # ??? Initializes variables with NaN
     
 ENDIF () # COMPILER TYPE
-    
