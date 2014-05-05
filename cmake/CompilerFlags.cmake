@@ -21,7 +21,6 @@ IF ( MSVC ) # visual c++ (VS 2013)
     ADD_DEFINITIONS("-DVC_EXTRALEAN -DWIN32_LEAN_AND_MEAN") # Excludes rarely used services and headers from compilation
     ADD_DEFINITIONS("-DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
     ADD_DEFINITIONS("-D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -D_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES") # ???
-    ADD_DEFINITIONS("-TP") # Globally treat all source files as C++
         
     # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
     SET(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -GS-") # Disable buffer overrun checks for performance in release mode
