@@ -1,7 +1,7 @@
 set( target_name objexx )
 
 if(MSVC)
-  add_definitions(/Za)
+  ADD_DEFINITIONS("-Za -TP") # Disables MS language extensions, forces C++
 endif()
 
 
@@ -334,6 +334,7 @@ set( test_src
   tst/unit/string.functions.unit.cc
   tst/unit/ubyte.unit.cc
 )
+
 
 add_library( ${target_name} ${src} )
 

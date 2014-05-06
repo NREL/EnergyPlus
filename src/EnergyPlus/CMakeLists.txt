@@ -521,6 +521,10 @@ SET( SRC
   main.hh
 )
 
+if(MSVC)
+  ADD_DEFINITIONS("-TP") # force C++
+endif()
+
 ADD_EXECUTABLE(EnergyPlus ${SRC})
 
 #TARGET_LINK_LIBRARIES( EnergyPlus sqlite )
