@@ -30,9 +30,9 @@ endif()
 if( BUILD_TESTING )
   enable_testing()
   include(CTest) 
+  ADD_SUBDIRECTORY(third_party/gtest)
 endif()
 
-ADD_SUBDIRECTORY(third_party/gtest)
 ADD_SUBDIRECTORY(third_party/ObjexxFCL)
 ADD_SUBDIRECTORY(src/EnergyPlus)
 
