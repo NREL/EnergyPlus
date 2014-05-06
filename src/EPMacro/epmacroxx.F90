@@ -159,30 +159,33 @@
       DATA prefix(7)/' -FROM- - -'/
       DATA prefix(8)/' -NOTE- - -'/
 
-      DATA holl/'0','1','2','3','4','5','6','7','8','9','.',',','=',' ',&
-     &'(',')','[',']','..','-','+','*','/','E','THRU','TYPE','NAME',';',&
-     &' ',' '/
-      DATA kcexcl/'!   '/,kcnumb/'#   '/,kce/'e   '/,kcquo/'''   '/,    &
-     &kcdquo/'"   '/
+      DATA holl/1H0,1H1,1H2,1H3,1H4,1H5,1H6,1H7,1H8,1H9,1H.,1H,,1H=,1H ,&
+     &1H(,1H),1H[,1H],2H..,1H-,1H+,1H*,1H/,1HE,4HTHRU,4HTYPE,4HNAME,1H;,&
+     &1H ,1H /
+      DATA kcexcl/4H!   /
+      DATA kcnumb/4H#   /
+      DATA kce/4He   /
+      DATA kcquo/4H''  /  ! This was originally a 5 character width string: "''   " 
+      DATA kcdquo/4H"   /
 !              SET SIZE OF IA ARRAY
       DATA iadim/6000000/
       DATA idblsp/0/
       DATA ieof/0/
       DATA ifatal/0/
-      DATA iundef/'*UND','EFIN','ED* ','    '/
-      DATA iunuse/'*UNU','SED*','    ','    '/
+      DATA iundef/4H*UND,4HEFIN,4HED* ,4H    /
+      DATA iunuse/4H*UNU,4HSED*,4H    ,4H    /
       DATA kardx/501/,kardi1/1/,kardi2/501/,kardim/65536/
       DATA kore/0/
       DATA krdnum/0/
       DATA krdnuminp/0/
-      DATA kardd/' ',' '/
-      DATA listop/'ERRO','RS  ','    ','    ','WARN','INGS','    ','    &
-     &','CAUT','IONS','    ','    ','DEFA','ULTS','    ','    ','COMM','&
-     &ENTS','    ','    ','WIDE','    ','    ','    ','NARR','OW  ','   &
-     & ','    ','ECHO','    ','    ','    ','NO-E','CHO ','    ','    ',&
-     &'SING','LE-S','PACE','D   ','DOUB','LE-S','PACE','D   ','LIMI','TS&
-     &  ','    ','    ','NO-L','IMIT','S   ','    ','LIBR','ARY-','CONT'&
-     &,'ENTS','    ','    ','    ','    '/
+      DATA kardd/1H ,1H /
+      DATA listop/4HERRO,4HRS  ,4H    ,4H    ,4HWARN,4HINGS,4H    ,4H    &
+     &,4HCAUT,4HIONS,4H    ,4H    ,4HDEFA,4HULTS,4H    ,4H    ,4HCOMM,4H&
+     &ENTS,4H    ,4H    ,4HWIDE,4H    ,4H    ,4H    ,4HNARR,4HOW  ,4H   &
+     & ,4H    ,4HECHO,4H    ,4H    ,4H    ,4HNO-E,4HCHO ,4H    ,4H    ,&
+     &4HSING,4HLE-S,4HPACE,4HD   ,4HDOUB,4HLE-S,4HPACE,4HD   ,4HLIMI,4HTS&
+     &  ,4H    ,4H    ,4HNO-L,4HIMIT,4HS   ,4H    ,4HLIBR,4HARY-,4HCONT&
+     &,4HENTS,4H    ,4H    ,4H    ,4H    /
       DATA msglvl/3/
       DATA narrow/0/
       DATA noecho/0/
@@ -428,7 +431,7 @@
       EQUIVALENCE (it,l4(1)),(j1,l1(1))
       INTEGER it,j1
       INTEGER iblnk
-      DATA iblnk/'    '/
+      DATA iblnk/4H    /
       INTEGER i,j,k
       j=0
       DO 20 i=1,n
@@ -684,7 +687,7 @@
       INTEGER mifcon
       INTEGER ceval(3)
       INTEGER iii
-      DATA ceval/'#eva','l   ','#   '/
+      DATA ceval/4H#eva,4Hl   ,4H#   /
 !
 !****************************************************************
 !
@@ -1445,10 +1448,10 @@
       INTEGER n
 !
       INTEGER iend(3)
-      DATA iend/'..  ','END ','..  '/
+      DATA iend/4H..  ,4HEND ,4H..  /
 !****************************************************************
    10 READ (infil,20,end=50) n,(kard(i),i=kardi1,max(kardi1,kardi1+n-1))
-   20 FORMAT (q,500a1)
+   20 FORMAT (500a1)  ! took out the q specifier EDWIN
       krdnum=krdnum+1
       IF (infil.ne.incopy) krdnuminp=krdnuminp+1
 !---- eliminate trailing blanks, leave only one trailing blank
@@ -1715,28 +1718,28 @@
 !---- install '#eval' ,  first put delimiter char in place of tilda
       evdefptr=mevdef
       eptr=1
-      evdef0(eptr)='#eva'
-      evdef0(eptr+1)='l   '
+      evdef0(eptr)=4H#eva
+      evdef0(eptr+1)=4Hl   
       DO iii=3,maxnmlenwrd
-        evdef0(eptr+iii-1)='    '
+        evdef0(eptr+iii-1)=4H    
       END DO
       eptr=eptr+maxnmlenwrd
       evdef0(eptr)=-1
       evdef0(eptr+1)=3
       eptr=eptr+2
-      evdef0(eptr)='x   '
+      evdef0(eptr)=4Hx   
       DO iii=2,maxnmlenwrd
-        evdef0(eptr+iii-1)='    '
+        evdef0(eptr+iii-1)=4H    
       END DO
       eptr=eptr+maxnmlenwrd
-      evdef0(eptr)='o   '
+      evdef0(eptr)=4Ho   
       DO iii=2,maxnmlenwrd
-        evdef0(eptr+iii-1)='    '
+        evdef0(eptr+iii-1)=4H    
       END DO
       eptr=eptr+maxnmlenwrd
-      evdef0(eptr)='y   '
+      evdef0(eptr)=4Hy   
       DO iii=2,maxnmlenwrd
-        evdef0(eptr+iii-1)='    '
+        evdef0(eptr+iii-1)=4H    
       END DO
 !     4     -2, 1,1h ,2,2h~ , -3, 1,1h ,3,3h~  , -999 /
       eptr=eptr+maxnmlenwrd
@@ -2721,8 +2724,8 @@
 
 !
       INTEGER idumnm(4),idumtx(4)
-      DATA idumnm/'!!!U','ndef','ined','!!! '/
-      DATA idumtx/'0000','0   ','    ','    '/
+      DATA idumnm/4H!!!U,4Hndef,4Hined,4H!!! /
+      DATA idumtx/4H0000,4H0   ,4H    ,4H    /
 !
 !16       call  MOVEN( IDUMNM, ISYMB, 4 )
       CALL moven (idumnm, isymb, maxnmlenwrd)
@@ -2816,40 +2819,40 @@
       INTEGER mdef1
       INTEGER m1tb(2,30),mrestb(2,3)
       DATA m1tb/        &
-        'DEF1','    ',  &  ! 1
-        'DEF ','    ',  &  ! 2
-        'ENDD','EF  ',  &  ! 3
-        'LIST','    ',  &  ! 4
-        'NOLI','ST  ',  &  ! 5
-        'INCL','UDES',  &  ! 6
-        'INCL','UDE ',  &  ! 7
-        'NOSI','LENT',  &  ! 8
-        'IFDE','F   ',  &  ! 9
-        'IFND','EF  ',  &  ! 10
-        'IF  ','    ',  &  ! 11
-        'IFN ','    ',  &  ! 12
-        'ELSE','IF  ',  &  ! 13
-        'ELSE','    ',  &  ! 14
-        'ENDI','F   ',  &  ! 15
-        'SET1','    ',  &  ! 16
-        'RESE','RVE ',  &  ! 17
-        'SHOW','    ',  &  ! 18
-        'NOSH','OW  ',  &  ! 19
-        'SHOW','DETA',  &  ! 20
-        'NOSH','OWDE',  &  ! 21
-        'CLEA','R   ',  &  ! 22
-        'TRAC','EBAC',  &  ! 23
-        'NOTR','ACEB',  &  ! 24
-        'WRIT','E   ',  &  ! 25
-        'NOWR','ITE ',  &  ! 26
-        'SYMB','OLTA',  &  ! 27
-        'FILE','PREF',  &  ! 28
-        'EXPA','NDCO',  &  ! 29
-        'NOEX','PAND'/     ! 30
+        4HDEF1,4H    ,  &  ! 1
+        4HDEF ,4H    ,  &  ! 2
+        4HENDD,4HEF  ,  &  ! 3
+        4HLIST,4H    ,  &  ! 4
+        4HNOLI,4HST  ,  &  ! 5
+        4HINCL,4HUDES,  &  ! 6
+        4HINCL,4HUDE ,  &  ! 7
+        4HNOSI,4HLENT,  &  ! 8
+        4HIFDE,4HF   ,  &  ! 9
+        4HIFND,4HEF  ,  &  ! 10
+        4HIF  ,4H    ,  &  ! 11
+        4HIFN ,4H    ,  &  ! 12
+        4HELSE,4HIF  ,  &  ! 13
+        4HELSE,4H    ,  &  ! 14
+        4HENDI,4HF   ,  &  ! 15
+        4HSET1,4H    ,  &  ! 16
+        4HRESE,4HRVE ,  &  ! 17
+        4HSHOW,4H    ,  &  ! 18
+        4HNOSH,4HOW  ,  &  ! 19
+        4HSHOW,4HDETA,  &  ! 20
+        4HNOSH,4HOWDE,  &  ! 21
+        4HCLEA,4HR   ,  &  ! 22
+        4HTRAC,4HEBAC,  &  ! 23
+        4HNOTR,4HACEB,  &  ! 24
+        4HWRIT,4HE   ,  &  ! 25
+        4HNOWR,4HITE ,  &  ! 26
+        4HSYMB,4HOLTA,  &  ! 27
+        4HFILE,4HPREF,  &  ! 28
+        4HEXPA,4HNDCO,  &  ! 29
+        4HNOEX,4HPAND/     ! 30
       DATA mrestb/      &
-        'TEXT','    ',  &
-        'STAC','K   ',  &
-        'NAME','S   '/
+        4HTEXT,4H    ,  &
+        4HSTAC,4HK   ,  &
+        4HNAME,4HS   /
 !****************************************************************
 #if DEBUGDMP
 !$    write(6,'('' mPP -->'')' )
@@ -3827,10 +3830,10 @@
       INTEGER ic8(2)
       EQUIVALENCE (c8,ic8(1))
       INTEGER kinput(4),karrow(2)
-      DATA kinput/'...i','nput','... ','    '/
-      DATA karrow/'  --','->  '/
+      DATA kinput/4H...i,4Hnput,4H... ,4H    /
+      DATA karrow/4H  --,4H->  /
       INTEGER kccol,kcperd
-      DATA kccol/':'/,kcperd/'.'/
+      DATA kccol/1H:/,kcperd/1H./
       INTEGER j
       INTEGER i2
       INTEGER jbuf
@@ -4023,7 +4026,7 @@
       EQUIVALENCE (c8,ic8)
       INTEGER i
       INTEGER n
-      character(len=1), parameter :: char29=char(29)
+!      character(len=1), parameter :: char29=char(29)
       character(len=1), dimension(600) :: lineout
       character(len=4), dimension(500) :: cmtrbuf
       equivalence(cmtrbuf(1),mtrbuf(1))
@@ -4481,12 +4484,12 @@
 !
 ! MJW - 25Oct2004 - Add new EQSU and NESU case-insensitive string compar
       INTEGER moptb(24)
-      DATA moptb/'+   ','-   ','*   ','/   ','EQ  ','NE  ','GT  ','GE  '&
-     &,'LT  ','LE  ','OF  ','//  ','/// ','EQS ','NES ','AND ','OR  ','N&
-     &OT ','**  ','MIN ','MAX ','MOD ','EQSU','NESU'/
+      DATA moptb/4H+   ,4H-   ,4H*   ,4H/   ,4HEQ  ,4HNE  ,4HGT  ,4HGE  &
+     &,4HLT  ,4HLE  ,4HOF  ,4H//  ,4H/// ,4HEQS ,4HNES ,4HAND ,4HOR  ,&
+     4HNOT ,4H**  ,4HMIN ,4HMAX ,4HMOD ,4HEQSU,4HNESU/
       INTEGER mfntb(11)
-      DATA mfntb/'SIN ','COS ','TAN ','SQRT','ABS ','ASIN','ACOS','ATAN'&
-     &,'INT ','LOG ','LOG1'/
+      DATA mfntb/4HSIN ,4HCOS ,4HTAN ,4HSQRT,4HABS ,4HASIN,4HACOS,4HATAN&
+     &,4HINT ,4HLOG ,4HLOG1/
       INTEGER kc0
       EQUIVALENCE (kc0,holl(1))
       INTEGER miop(1)
@@ -4827,7 +4830,7 @@
 !
 
       INTEGER ldr(2)
-      DATA ldr/'*','-'/
+      DATA ldr/1H*,1H-/
       INTEGER i1
       INTEGER i2
       INTEGER ldrtyp
@@ -4836,7 +4839,7 @@
       character(len=200) cmsgtxt
       character(len=25) cmsgnumbr
       character(len=25) cmsgnumbr1
-      character(len=1), parameter :: char29=char(29)
+      !character(len=1), parameter :: char29=char(29)
       character(len=1), parameter :: char59=char(59)  ! semicolon
       character(len=1), parameter :: char44=char(44)  ! comma
 !****************************************************************
