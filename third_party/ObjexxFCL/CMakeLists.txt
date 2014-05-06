@@ -1,7 +1,7 @@
 set( target_name objexx )
 
 if(MSVC)
-  ADD_DEFINITIONS("-Za -TP") # Disables MS language extensions, forces C++
+  ADD_DEFINITIONS("-Za") # Disables MS language extensions
 endif()
 
 

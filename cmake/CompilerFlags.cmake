@@ -21,6 +21,7 @@ IF ( MSVC ) # visual c++ (VS 2013)
 
     ADD_DEFINITIONS("-wd4244 -wd4258 -wd4355 -wd4996") # Disables warning messages listed above 
     ADD_DEFINITIONS("-DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
+    ADD_DEFINITIONS("-W3")
 
     # -D_CRT_SECURE_NO_DEPRECATE hides function calls which make the library thread-unsafe
     # -D_SCL_SECURE_NO_DEPRECATE is itself deprecated and replaced by _SCL_SECURE_NO_WARNING which is made irrelevant by -wd4996 above
