@@ -11,7 +11,12 @@ option( BUILD_TESTING "Build testing targets" OFF )
 
 # Not yet released by CMake, but is being developed
 # This will help us set the proper options for c++11 across various configurations
-# FIND_PACKAGE( CXXFeatures ) 
+#FIND_PACKAGE( CXXFeatures ) 
+
+if (MSVC)
+  set(gtest_force_shared_crt ON)
+endif()
+
 
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
@@ -35,4 +40,6 @@ endif()
 
 ADD_SUBDIRECTORY(third_party/ObjexxFCL)
 ADD_SUBDIRECTORY(src/EnergyPlus)
+ADD_SUBDIRECTORY(testfiles)
+
 

@@ -1,5 +1,10 @@
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
 
+if(MSVC)
+  add_definitions(/Za)
+endif()
+
+
 SET( SRC
   Timer.h
   AirflowNetworkBalanceManager.cc
