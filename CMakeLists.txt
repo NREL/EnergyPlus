@@ -33,6 +33,7 @@ if( BUILD_TESTING )
 endif()
 
 ADD_SUBDIRECTORY(third_party/gtest)
+ADD_SUBDIRECTORY(third_party/SQLite)
 ADD_SUBDIRECTORY(third_party/ObjexxFCL)
 ADD_SUBDIRECTORY(src/EnergyPlus)
 

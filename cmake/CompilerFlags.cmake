@@ -26,9 +26,9 @@ IF ( MSVC ) # visual c++ (VS 2013)
 ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) # g++/Clang
 
     # COMPILER FLAGS
-    ADD_DEFINITIONS("-std=c++11") # Enable C++11 features in g++
     ADD_DEFINITIONS("-pedantic") # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
     ADD_DEFINITIONS("-Wall -Wextra -Wno-unused-parameter") # Turn on warnings (all, extra, "???don't warn about unused parameters???")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11") # Enable C++11 features in g++
     
     # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
     SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsignaling-nans") # Disable optimizations that may have concealed NaN behavior
