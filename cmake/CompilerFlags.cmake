@@ -15,11 +15,19 @@ IF ( MSVC ) # visual c++ (VS 2013)
             
     # COMPILER FLAGS
     ADD_DEFINITIONS("-MP") # Enables multi-processor compilation of source within a single project
-    ADD_DEFINITIONS("-Za") # Disables MS language extensions
+
+    # Za must be set in the individual projects because gtest uses win.h and cannot compile with it
+    #ADD_DEFINITIONS("-Za") # Disables MS language extensions
+
     ADD_DEFINITIONS("-wd4244 -wd4258 -wd4355 -wd4996") # Disables warning messages listed above 
     ADD_DEFINITIONS("-DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
-    ADD_DEFINITIONS("-D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -D_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES") # ???
-        
+    ADD_DEFINITIONS("-W3")
+
+    # -D_CRT_SECURE_NO_DEPRECATE hides function calls which make the library thread-unsafe
+    # -D_SCL_SECURE_NO_DEPRECATE is itself deprecated and replaced by _SCL_SECURE_NO_WARNING which is made irrelevant by -wd4996 above
+    # Todo remove this line entirely
+    #ADD_DEFINITIONS("-D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -D_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES") # ???
+
     # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
     SET(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -GS-") # Disable buffer overrun checks for performance in release mode
     

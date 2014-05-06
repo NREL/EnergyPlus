@@ -1,0 +1,4 @@
+compilers:
+  - name: clang
+    cmake_extra_flags: -DBUILD_TESTING:BOOL=ON
+

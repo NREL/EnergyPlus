@@ -1,5 +1,10 @@
 set( target_name objexx )
 
+if(MSVC)
+  ADD_DEFINITIONS("-Za") # Disables MS language extensions
+endif()
+
+
 set(src 
   src/ObjexxFCL/array.iterator.hh
   src/ObjexxFCL/ArrayTraits.hh
@@ -329,6 +334,7 @@ set( test_src
   tst/unit/string.functions.unit.cc
   tst/unit/ubyte.unit.cc
 )
+
 
 add_library( ${target_name} ${src} )
 
