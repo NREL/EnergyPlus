@@ -2877,7 +2877,7 @@ namespace InputProcessor {
 							}
 						}
 					} // Min-Fields Arg
-					if ( UCInputLine.substr( Slash, 10 ) == "\\OBSOLETE" ) {
+					if ( UCInputLine.substr( Slash, 9 ) == "\\OBSOLETE" ) {
 						NSpace = index( UCInputLine.substr( Slash + 9 ), "=>" );
 						if ( NSpace == std::string::npos ) {
 							ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Need replacement object for \\Obsolete objects", EchoInputFile );
