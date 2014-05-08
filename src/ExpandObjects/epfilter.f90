@@ -2039,7 +2039,7 @@ END IF
 CONTAINS
 
 !----------------------------------------------------------------------------------
-LOGICAL FUNCTION DoesGroundHeatTransferExist
+LOGICAL FUNCTION DoesGroundHeatTransferExist()
           ! SUBROUTINE INFORMATION:
           !    AUTHOR         Jason Glazer of GARD Analytics, Inc.
           !    DATE WRITTEN   September 2012
@@ -4124,7 +4124,8 @@ IF (checkOutputFieldNamesAgainstIDD) THEN
         END IF
       END DO
       IF (found .EQ. 0) THEN
-        CALL WriteError('For object: "' // TRIM(iddObj(checkObjectIndex)%name) // '" field name not found: "' // TRIM(FldNoUnits) // '"')
+        CALL WriteError('For object: "' // TRIM(iddObj(checkObjectIndex)%name) // '" field name not found: "' // &
+	 TRIM(FldNoUnits) // '"')
       END IF
     END IF
   END IF
@@ -5331,7 +5332,8 @@ DO iHeldObj = 1,numHeldObj
           END  IF
         END DO
       ELSE
-        CALL WriteError('The number of fields in the IDD do not match the number of fields assumed. ' // TRIM(objToProcess(curObjToProc)%ccName))
+        CALL WriteError('The number of fields in the IDD do not match the number of fields assumed. ' // &
+	   TRIM(objToProcess(curObjToProc)%ccName))
       END IF
     END IF
   END IF
@@ -7022,7 +7024,7 @@ ELSEIF (prelimCount .EQ. 1) THEN
         (numCompactZoneUnit .EQ. 0) .AND. (numCompactPTAC .EQ. 0) .AND. &
          (numCompactPTHP .EQ. 0) .AND. (numCompactWaterAirHP .EQ. 0) .AND. &
          (numCompactDedOutAir .EQ. 0) .AND. (numCompactSysPVAV .EQ. 0) .AND. &
-         (numCompactSysUnitHP) .AND. (numCompactSysConstVol .EQ. 0) .AND. &
+         (numCompactSysUnitHP .EQ. 0) .AND. (numCompactSysConstVol .EQ. 0) .AND. &
          (numCompactSysDualDuct .EQ. 0) .AND. ((numCompactSysUnitarySystem .EQ. 0) .AND. numCompactBaseBoard .EQ. 0)) THEN
       CALL WriteError('You must specify at least one HVACTemplate:System:VAV or HVACTemplate:Zone:FanCoil ' // &
                       'or HVACTemplate:Zone:Unitary or HVACTemplate:Zone:PTAC or HVACTemplate:Zone:PTHP ' // &
@@ -18529,8 +18531,8 @@ LOGICAL :: isCoolCoilChW
 LOGICAL :: isHeatCoilCapAutosize
 LOGICAL :: usePreheatTempforHeatDesignSuppT = .FALSE.
 LOGICAL :: isReturnFanYes = .FALSE.
-LOGICAL :: coolCtrlZoneBase = 0
-LOGICAL :: heatCtrlZoneBase = 0
+INTEGER :: coolCtrlZoneBase = 0
+INTEGER :: heatCtrlZoneBase = 0
 
 ! Node Names
 CHARACTER(len=MaxAlphaLength) :: lastOutlet=''
