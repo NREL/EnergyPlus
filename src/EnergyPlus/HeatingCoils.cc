@@ -1135,6 +1135,7 @@ namespace HeatingCoils {
 		CompType = "Coil:" + trim( HeatingCoil( CoilNum ).HeatingCoilType ) + ":" + trim( HeatingCoil( CoilNum ).HeatingCoilModel );
 		CompName = HeatingCoil( CoilNum ).Name;
 		DataCoilIsSuppHeater = CoilIsSuppHeater; // set global instead of using optional argument
+		DataCoolCoilCap = 0.0; // global only used for heat pump heating coils, non-HP heating coils are sized with other global variables
 		RequestSizing( CompType, CompName, HeatingCapacitySizing, trim(SizingString ), TempCap, bPRINT, RoutineName );
 		DataCoilIsSuppHeater = false; // reset global to false so other heating coils are not affected
 
@@ -1196,8 +1197,7 @@ namespace HeatingCoils {
 			HeatingCoil( CoilNum ).NominalCapacity = TempCap;
 		}
 
-		++NumCoilsSized;
-		if ( NumCoilsSized == NumHeatingCoils ) HeatingCoilNumericFields.deallocate(); // remove temporary array for field names at end of sizing
+		if ( ++NumCoilsSized == NumHeatingCoils ) HeatingCoilNumericFields.deallocate(); // remove temporary array for field names at end of sizing
 
 		//create predefined report entries
 		{ auto const SELECT_CASE_var( HeatingCoil( CoilNum ).HCoilType_Num );

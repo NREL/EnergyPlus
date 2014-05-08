@@ -1107,8 +1107,45 @@ namespace DXCoils {
 
 	};
 
+	struct PerfModeData
+	{
+		// Members
+		FArray1D_Fstring FieldNames;
+
+		// Default Constructor
+		PerfModeData ():
+			FieldNames( sFstring( MaxNameLength ) )
+		{}
+
+		// Member Constructor
+		PerfModeData(
+			FArray1_Fstring const & FieldNames // Name of the HeatingCoil numeric field descriptions
+	) :
+	    FieldNames( MaxNameLength, FieldNames)
+		{}
+	};
+
+	struct DXCoilNumericFieldData
+	{
+		// Members
+		FArray1D < PerfModeData > PerfMode; // Coil Performance object type
+
+		// Default Constructor
+		DXCoilNumericFieldData ():
+			PerfMode( 0 )
+		{}
+
+		// Member Constructor
+		DXCoilNumericFieldData(
+			FArray1_int const & PerfMode // Name of the HeatingCoil numeric field descriptions
+	) :
+		PerfMode( 0 )
+		{}
+	};
+
 	// Object Data
 	extern FArray1D< DXCoilData > DXCoil;
+	extern FArray1D< DXCoilNumericFieldData > DXCoilNumericFields;
 
 	// Functions
 

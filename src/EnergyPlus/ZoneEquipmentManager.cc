@@ -2701,6 +2701,7 @@ namespace ZoneEquipmentManager {
 				EquipPtr = PrioritySimOrder( EquipTypeNum ).EquipPtr;
 				SysOutputProvided = 0.0;
 				LatOutputProvided = 0.0;
+				DataCoolCoilCap = 0.0; // reset global variable used only for heat pumps (i.e., DX cooling and heating coils)
 
 				ZoneEquipTypeNum = PrioritySimOrder( EquipTypeNum ).EquipType_Num;
 

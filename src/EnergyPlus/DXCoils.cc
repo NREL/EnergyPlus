@@ -200,7 +200,8 @@ namespace DXCoils {
 
 	// Object Data
 	FArray1D< DXCoilData > DXCoil;
-
+	FArray1D< DXCoilNumericFieldData > DXCoilNumericFields;
+	
 	// Functions
 
 	void
@@ -986,6 +987,7 @@ namespace DXCoils {
 
 		// Derived types
 		DXCoil.allocate( NumDXCoils );
+		DXCoilNumericFields.allocate( NumDXCoils );
 		HeatReclaimDXCoil.allocate( NumDXCoils );
 		CheckEquipName.allocate( NumDXCoils );
 		CheckEquipName = true;
@@ -1018,8 +1020,12 @@ namespace DXCoils {
 		for ( DXCoilIndex = 1; DXCoilIndex <= NumDoe2DXCoils; ++DXCoilIndex ) {
 
 			GetObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
+			
 			++DXCoilNum;
+			// allocate single performance mode for numeric field strings used for sizing routine
+			DXCoilNumericFields ( DXCoilNum ).PerfMode.allocate ( 1 );
+			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate ( MaxNumbers );
+			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( Alphas( 1 ), DXCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
@@ -1477,6 +1483,8 @@ namespace DXCoils {
 
 			//  Set starting alpha index for coil performance inputs
 			AlphaIndex = 5;
+			// allocate performance modes for numeric field strings used for sizing routine
+			DXCoilNumericFields ( DXCoilNum ).PerfMode.allocate ( DXCoil( DXCoilNum ).NumDehumidModes * 2 + DXCoil( DXCoilNum ).NumCapacityStages * 2 ); // not sure this math is correct, ask MW
 
 			//  Loop through capacity stages and dehumidification modes
 			for ( DehumidModeNum = 0; DehumidModeNum <= DXCoil( DXCoilNum ).NumDehumidModes; ++DehumidModeNum ) {
@@ -1507,6 +1515,10 @@ namespace DXCoils {
 
 							GetObjectItem( PerfObjectType, PerfObjectNum, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
 
+							// allocate performance mode numeric field strings used for sizing routine
+							DXCoilNumericFields( DXCoilNum ).PerfMode( PerfModeNum ).FieldNames.allocate ( NumNumbers2 ); // use MaxNumbers here??
+							DXCoilNumericFields ( DXCoilNum ).PerfMode ( PerfModeNum ).FieldNames = cNumericFields2;
+							
 							DXCoil( DXCoilNum ).RatedTotCap( PerfModeNum ) = Numbers2( 1 );
 							DXCoil( DXCoilNum ).RatedSHR( PerfModeNum ) = Numbers2( 2 );
 							DXCoil( DXCoilNum ).RatedCOP( PerfModeNum ) = Numbers2( 3 );
@@ -1873,6 +1885,12 @@ namespace DXCoils {
 			++DXCoilNum;
 
 			GetObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+			// allocate single performance mode for numeric field strings used for sizing routine
+			DXCoilNumericFields ( DXCoilNum ).PerfMode.allocate ( 1 );
+			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate ( MaxNumbers );
+			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
+
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( Alphas( 1 ), DXCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
@@ -2210,6 +2228,10 @@ namespace DXCoils {
 
 			GetObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
+			// allocate single performance mode for numeric field strings used for sizing routine
+			DXCoilNumericFields ( DXCoilNum ).PerfMode.allocate ( 1 );
+			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate ( MaxNumbers );
+			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( Alphas( 1 ), DXCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
@@ -2696,6 +2718,12 @@ namespace DXCoils {
 			GetObjectItem( CurrentModuleObject, DXHPWaterHeaterCoilNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			++DXCoilNum;
+
+			// allocate single performance mode for numeric field strings used for sizing routine
+			DXCoilNumericFields ( DXCoilNum ).PerfMode.allocate ( 1 );
+			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate ( MaxNumbers );
+			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
+
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( Alphas( 1 ), DXCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
@@ -3165,6 +3193,12 @@ namespace DXCoils {
 			++DXCoilNum;
 
 			GetObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+			// *** will have to circle back to this one to fix since the multispeed coil has all fields in this coil object ***
+			// allocate single performance mode for numeric field strings used for sizing routine
+			DXCoilNumericFields ( DXCoilNum ).PerfMode.allocate ( 1 );
+			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate ( MaxNumbers );
+			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
 
 			IsNotOK = false;
 			IsBlank = false;
@@ -3666,6 +3700,12 @@ namespace DXCoils {
 
 			GetObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
+			// *** will have to circle back to this one to fix since the multispeed coil has all fields in this coil object ***
+			// allocate single performance mode for numeric field strings used for sizing routine
+			DXCoilNumericFields ( DXCoilNum ).PerfMode.allocate ( 1 );
+			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate ( MaxNumbers );
+			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
+
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( Alphas( 1 ), DXCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
@@ -4130,6 +4170,12 @@ namespace DXCoils {
 			GetObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			++DXCoilNum;
+
+			// allocate single performance mode for numeric field strings used for sizing routine
+			DXCoilNumericFields ( DXCoilNum ).PerfMode.allocate ( 1 );
+			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate ( MaxNumbers );
+			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
+
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( Alphas( 1 ), DXCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
@@ -4229,6 +4275,12 @@ namespace DXCoils {
 			GetObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			++DXCoilNum;
+
+			// allocate single performance mode for numeric field strings used for sizing routine
+			DXCoilNumericFields ( DXCoilNum ).PerfMode.allocate ( 1 );
+			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate ( MaxNumbers );
+			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
+
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( Alphas( 1 ), DXCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
@@ -4927,6 +4979,7 @@ namespace DXCoils {
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
 		using ReportSizingManager::ReportSizingOutput;
+		using ReportSizingManager::RequestSizing;
 		using namespace OutputReportPredefined;
 		using DataAirSystems::PrimaryAirSystem;
 		using StandardRatings::CalcDXCoilStandardRating;
@@ -5011,6 +5064,13 @@ namespace DXCoils {
 		bool IsCoolCoilCapAutoSize; // Indicator to cooling capacity autosize for reporting
 		bool SizingDesRunThisAirSys; // true if a particular air system had a Sizing:System object and system sizing done
 		bool SizingDesRunThisZone; // true if a particular zone had a Sizing:Zone object and zone sizing was done
+		Fstring CompName( MaxNameLength ); // component name
+		Fstring	CompType( MaxNameLength ); // component type
+		Fstring SizingString( MaxNameLength ); // input field sizing description (e.g., Nominal Capacity)
+		bool bPRINT = true; // TRUE if sizing is reported to output (eio)
+		Real64 TempSize; // autosized value of coil input field
+		int FieldNum = 2; // IDD numeric field number where input field description is found
+		int SizingMethod;
 
 		// Initiate all reporting variables
 		if ( SysSizingRunDone || ZoneSizingRunDone ) {
@@ -5080,80 +5140,80 @@ namespace DXCoils {
 			for ( CapacityStageNum = 1; CapacityStageNum <= DXCoil( DXCoilNum ).NumCapacityStages; ++CapacityStageNum ) {
 				Mode = DehumidModeNum * 2 + CapacityStageNum;
 
-				if ( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) == AutoSize ) {
-					IsAutoSize = true;
-				}
-				// Sizing rated air volume flow rate
-				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingSingleSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatingEmpirical || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Heating ) {
-					if ( SizingDesRunThisAirSys ) HardSizeNoDesRun = false;
-					if ( CurSysNum > 0 ) {
-						// If hard-sized, check if system sizing data is available for system coil
-						if ( ! IsAutoSize && ! SizingDesRunThisAirSys ) {
-							HardSizeNoDesRun = true;
-							if ( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) > 0.0 ) {
-								if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "User-Specified Rated Air Flow Rate [m3/s]", DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) );
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "User-Specified Rated Air Flow Rate (non-bypassed) [m3/s]", DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) );
-								} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "User-Specified Rated High Speed Air Flow Rate [m3/s]", DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) );
-								} else {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "User-Specified Rated Air Flow Rate [m3/s]", DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) );
-								}
-							}
-						} else { // autosize or hard-sized with system sizing data
-							CheckSysSizing( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name );
-							if ( CurOASysNum > 0 ) {
-								if ( OASysEqSizing( CurOASysNum ).AirFlow ) {
-									// Parent object sets flow rate
-									RatedAirVolFlowRateDes = OASysEqSizing( CurOASysNum ).AirVolFlow;
-								} else {
-									RatedAirVolFlowRateDes = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
-								}
-							} else {
-								if ( UnitarySysEqSizing( CurSysNum ).AirFlow ) {
-									// Parent object sets flow rate
-									RatedAirVolFlowRateDes = UnitarySysEqSizing( CurSysNum ).AirVolFlow;
-								} else {
-									RatedAirVolFlowRateDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-								}
-							}
-						}
-
-					} else if ( CurZoneEqNum > 0 ) {
-						// If hard-sized, check if zone sizing data is available for zone coil
-						if ( ! IsAutoSize && ! SizingDesRunThisZone ) {
-							HardSizeNoDesRun = true;
-							if ( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) > 0.0 ) {
-								if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "User-Specified Rated Air Flow Rate [m3/s]", DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) );
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "User-Specified Rated Air Flow Rate (non-bypassed) [m3/s]", DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) );
-								} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "User-Specified Rated High Speed Air Flow Rate [m3/s]", DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) );
-								} else {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "User-Specified Rated Air Flow Rate [m3/s]", DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) );
-								}
-							}
-						} else { // autosize or hard-sized with zone sizing data
-							if ( ZoneEqSizing( CurZoneEqNum ).AirFlow ) {
-								// Parent object sets flow rate
-								RatedAirVolFlowRateDes = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
-							} else {
-								CheckZoneSizing( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name );
-								if ( ZoneCoolingOnlyFan ) {
-									RatedAirVolFlowRateDes = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
-								} else {
-									RatedAirVolFlowRateDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
-								}
-							} // IF(ZoneEqSizing(CurZoneEqNum)%AirFlow)THEN
-						}
-					}
-					if ( RatedAirVolFlowRateDes < SmallAirVolFlow ) {
-						RatedAirVolFlowRateDes = 0.0;
-					}
-					if ( DXCoil( DXCoilNum ).RatedAirVolFlowRateEMSOverrideON( Mode ) ) {
-						RatedAirVolFlowRateDes = DXCoil( DXCoilNum ).RatedAirVolFlowRateEMSOverrideValue( Mode );
-					}
-				}
+//				if ( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) == AutoSize ) {
+//					IsAutoSize = true;
+//				}
+//				// Sizing rated air volume flow rate
+//				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingSingleSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatingEmpirical || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Heating ) {
+//					if ( SizingDesRunThisAirSys ) HardSizeNoDesRun = false;
+//					if ( CurSysNum > 0 ) {
+//						// If hard-sized, check if system sizing data is available for system coil
+//						if ( ! IsAutoSize && ! SizingDesRunThisAirSys ) {
+//							HardSizeNoDesRun = true;
+//							if ( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) > 0.0 ) {
+//								if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "User-Specified Rated Air Flow Rate [m3/s]", DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) );
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "User-Specified Rated Air Flow Rate (non-bypassed) [m3/s]", DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) );
+//								} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "User-Specified Rated High Speed Air Flow Rate [m3/s]", DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) );
+//								} else {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "User-Specified Rated Air Flow Rate [m3/s]", DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) );
+//								}
+//							}
+//						} else { // autosize or hard-sized with system sizing data
+//							CheckSysSizing( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name );
+//							if ( CurOASysNum > 0 ) {
+//								if ( OASysEqSizing( CurOASysNum ).AirFlow ) {
+//									// Parent object sets flow rate
+//									RatedAirVolFlowRateDes = OASysEqSizing( CurOASysNum ).AirVolFlow;
+//								} else {
+//									RatedAirVolFlowRateDes = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+//								}
+//							} else {
+//								if ( UnitarySysEqSizing( CurSysNum ).AirFlow ) {
+//									// Parent object sets flow rate
+//									RatedAirVolFlowRateDes = UnitarySysEqSizing( CurSysNum ).AirVolFlow;
+//								} else {
+//									RatedAirVolFlowRateDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+//								}
+//							}
+//						}
+//
+//					} else if ( CurZoneEqNum > 0 ) {
+//						// If hard-sized, check if zone sizing data is available for zone coil
+//						if ( ! IsAutoSize && ! SizingDesRunThisZone ) {
+//							HardSizeNoDesRun = true;
+//							if ( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) > 0.0 ) {
+//								if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "User-Specified Rated Air Flow Rate [m3/s]", DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) );
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "User-Specified Rated Air Flow Rate (non-bypassed) [m3/s]", DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) );
+//								} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "User-Specified Rated High Speed Air Flow Rate [m3/s]", DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) );
+//								} else {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "User-Specified Rated Air Flow Rate [m3/s]", DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) );
+//								}
+//							}
+//						} else { // autosize or hard-sized with zone sizing data
+//							if ( ZoneEqSizing( CurZoneEqNum ).AirFlow ) {
+//								// Parent object sets flow rate
+//								RatedAirVolFlowRateDes = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
+//							} else {
+//								CheckZoneSizing( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name );
+//								if ( ZoneCoolingOnlyFan ) {
+//									RatedAirVolFlowRateDes = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+//								} else {
+//									RatedAirVolFlowRateDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+//								}
+//							} // IF(ZoneEqSizing(CurZoneEqNum)%AirFlow)THEN
+//						}
+//					}
+//					if ( RatedAirVolFlowRateDes < SmallAirVolFlow ) {
+//						RatedAirVolFlowRateDes = 0.0;
+//					}
+//					if ( DXCoil( DXCoilNum ).RatedAirVolFlowRateEMSOverrideON( Mode ) ) {
+//						RatedAirVolFlowRateDes = DXCoil( DXCoilNum ).RatedAirVolFlowRateEMSOverrideValue( Mode );
+//					}
+//				}
 				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeater ) {
 					if ( DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) == AutoCalculate ) {
 						DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) = DXCoil( DXCoilNum ).RatedTotCap2 * 0.00005035;
@@ -5168,651 +5228,790 @@ namespace DXCoils {
 						//                                  'Rated Condenser Water Volume Flow Rate [m3/s]', DXCoil(DXCoilNum)%RatedHPWHCondWaterFlow)
 					}
 				} else {
-
-					if ( ! HardSizeNoDesRun ) {
-						if ( ! DXCoil( DXCoilNum ).AirVolFlowAutoSized || ! DXCoil( DXCoilNum ).WaterVolFlowAutoSized ) {
-							if ( IsAutoSize ) { // Design Size values are available for both autosized and hard-sized
-								DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) = RatedAirVolFlowRateDes;
-								if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "Design Size Rated Air Flow Rate [m3/s]", RatedAirVolFlowRateDes );
-									// For Multimode Coil, Rated flow must be adjusted for bypass fraction
-									RatedAirVolFlowRateDes *= ( 1 - DXCoil( DXCoilNum ).BypassedFlowFrac( Mode ) );
-									DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) = RatedAirVolFlowRateDes;
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "Design Size Rated Air Flow Rate (non-bypassed) [m3/s]", RatedAirVolFlowRateDes );
-								} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated High Speed Air Flow Rate [m3/s]", RatedAirVolFlowRateDes );
-								} else {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated Air Flow Rate [m3/s]", RatedAirVolFlowRateDes );
-								}
-							} else { // Hard size with sizing data
-								if ( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) > 0.0 && RatedAirVolFlowRateDes > 0.0 ) {
-									RatedAirVolFlowRateUser = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode );
-									if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
-										ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "Design Size Rated Air Flow Rate [m3/s]", RatedAirVolFlowRateDes, "User-Specified Rated Air Flow Rate [m3/s]", RatedAirVolFlowRateUser );
-										// For Multimode Coil, Rated flow must be adjusted for bypass fraction
-										RatedAirVolFlowRateDes *= ( 1 - DXCoil( DXCoilNum ).BypassedFlowFrac( Mode ) );
-										ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "Design Size Rated Air Flow Rate (non-bypassed) [m3/s]", RatedAirVolFlowRateDes, "User-Specified Rated Air Flow Rate (non-bypassed) [m3/s]", RatedAirVolFlowRateUser );
-									} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
-										ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated High Speed Air Flow Rate [m3/s]", RatedAirVolFlowRateDes, "User-Specified Rated High Speed Air Flow Rate [m3/s]", RatedAirVolFlowRateUser );
-									} else {
-										ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated Air Flow Rate [m3/s]", RatedAirVolFlowRateDes, "User-Specified Rated Air Flow Rate [m3/s]", RatedAirVolFlowRateUser );
-									}
-									if ( DisplayExtraWarnings ) {
-										if ( ( std::abs( RatedAirVolFlowRateDes - RatedAirVolFlowRateUser ) / RatedAirVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-											ShowMessage( "SizeDxCoil: Potential issue with equipment sizing for " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
-											ShowContinueError( "User-Specified Rated Air Volume Flow Rate of " + trim( RoundSigDigits( RatedAirVolFlowRateUser, 5 ) ) + " [m3/s]" );
-											ShowContinueError( "differs from Design Size Rated Air Volume Flow Rate of " + trim( RoundSigDigits( RatedAirVolFlowRateDes, 5 ) ) + " [m3/s]" );
-											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-										}
-									}
-								}
-							}
-						}
+					if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+						SizingMethod = CoolingAirflowSizing;
+						CompName =trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) );
+						FieldNum = 4;
+						DataBypassFrac = DXCoil ( DXCoilNum ).BypassedFlowFrac ( Mode );
 					}
-				}
-
-				OASysFlag = false;
-				AirLoopSysFlag = false;
-				// logicals used when parent sizes coil
-				if ( CurOASysNum > 0 ) OASysFlag = OASysEqSizing( CurOASysNum ).Capacity;
-				if ( CurSysNum > 0 ) AirLoopSysFlag = UnitarySysEqSizing( CurSysNum ).Capacity;
-
-				IsAutoSize = false;
-				if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) == AutoSize ) {
-					IsAutoSize = true;
-				}
-				// Sizing rated total capacity
-				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingSingleSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling ) {
-					IsCoolCoilCapAutoSize = true;
-					if ( SizingDesRunThisAirSys || SizingDesRunThisZone ) HardSizeNoDesRun = false;
-					if ( CurSysNum > 0 ) {
-						// If hard-sized, check if system sizing data is available for system coil
-						if ( ! IsAutoSize && ! SizingDesRunThisZone ) {
-							HardSizeNoDesRun = true;
-							if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) > 0.0 ) {
-								if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "User-Specified Rated Total Cooling Capacity (gross) [W]", DXCoil( DXCoilNum ).RatedTotCap( Mode ) );
-								} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "User-Specified Rated High Speed Total Cooling Capacity (gross) [W]", DXCoil( DXCoilNum ).RatedTotCap( Mode ) );
-								} else {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "User-Specified Rated Total Cooling Capacity (gross) [W]", DXCoil( DXCoilNum ).RatedTotCap( Mode ) );
-								}
-							}
-						} else { // autosize or hard-sized with system sizing data
-							if ( OASysFlag ) {
-								RatedTotCapDes = OASysEqSizing( CurOASysNum ).DesCoolingLoad;
-							} else if ( AirLoopSysFlag ) {
-								RatedTotCapDes = UnitarySysEqSizing( CurSysNum ).DesCoolingLoad;
-							} else {
-								CheckSysSizing( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name );
-								VolFlowRate = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode );
-								if ( VolFlowRate >= SmallAirVolFlow ) {
-									if ( CurOASysNum > 0 ) { // coil is in the OA stream
-										MixTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
-										MixHumRat = FinalSysSizing( CurSysNum ).CoolOutHumRat;
-										SupTemp = FinalSysSizing( CurSysNum ).PrecoolTemp;
-										SupHumRat = FinalSysSizing( CurSysNum ).PrecoolHumRat;
-									} else { // coil is on the main air loop
-										SupTemp = FinalSysSizing( CurSysNum ).CoolSupTemp;
-										SupHumRat = FinalSysSizing( CurSysNum ).CoolSupHumRat;
-										if ( PrimaryAirSystem( CurSysNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
-											MixTemp = FinalSysSizing( CurSysNum ).CoolMixTemp;
-											MixHumRat = FinalSysSizing( CurSysNum ).CoolMixHumRat;
-										} else { // there is precooling of OA stream
-											if ( VolFlowRate > 0.0 ) {
-												OutAirFrac = FinalSysSizing( CurSysNum ).DesOutAirVolFlow / VolFlowRate;
-											} else {
-												OutAirFrac = 1.0;
-											}
-											OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
-											MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetTemp;
-											MixHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetHumRat;
-										}
-									}
-									OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
-									rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-									MixEnth = PsyHFnTdbW( MixTemp, MixHumRat, RoutineName );
-									MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-									SupEnth = PsyHFnTdbW( SupTemp, SupHumRat, RoutineName );
-									TotCapTempModFac = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( Mode ), MixWetBulb, OutTemp );
-									CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
-									if ( TotCapTempModFac > 0.0 ) {
-										RatedTotCapDes = CoolCapAtPeak / TotCapTempModFac;
-									} else {
-										RatedTotCapDes = CoolCapAtPeak;
-									}
-								} else {
-									RatedTotCapDes = 0.0;
-								}
-							} // IF(OASysFlag) THEN or ELSE IF(AirLoopSysFlag) THEN
-							if ( RatedTotCapDes > 0.0 ) {
-								RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / RatedTotCapDes;
-							} else {
-								RatedVolFlowPerRatedTotCap = 0.0;
-							}
-							// check capacity to make sure design volume flow per total capacity is within range
-							if ( RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap( DXCT ) ) {
-								if ( ! DXCoil( DXCoilNum ).RatedTotCapEMSOverrideOn( Mode ) && DisplayExtraWarnings ) {
-									ShowWarningError( "SizeDXCoil: " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
-									ShowContinueError( "...Rated Total Cooling Capacity will be limited by the minimum rated volume flow per" " rated total capacity ratio." );
-									ShowContinueError( "...DX coil volume flow rate (m3/s) = " + TrimSigDigits( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ), 6 ) );
-									ShowContinueError( "...Requested capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
-									ShowContinueError( "...Requested flow/capacity ratio (m3/s/W) = " + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) );
-									ShowContinueError( "...Minimum flow/capacity ratio (m3/s/W) = " + TrimSigDigits( MinRatedVolFlowPerRatedTotCap( DXCT ), 3 ) );
-								}
-								RatedTotCapDes = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / MinRatedVolFlowPerRatedTotCap( DXCT );
-								if ( ! DXCoil( DXCoilNum ).RatedTotCapEMSOverrideOn( Mode ) && DisplayExtraWarnings ) {
-									ShowContinueError( "...Adjusted capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
-								}
-							} else if ( RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap( DXCT ) ) {
-								if ( ! DXCoil( DXCoilNum ).RatedTotCapEMSOverrideOn( Mode ) && DisplayExtraWarnings ) {
-									ShowWarningError( "SizeDXCoil: " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
-									ShowContinueError( "...Rated Total Cooling Capacity will be limited by the maximum rated volume flow per" " rated total capacity ratio." );
-									ShowContinueError( "...DX coil volume flow rate (m3/s) = " + TrimSigDigits( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ), 6 ) );
-									ShowContinueError( "...Requested capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
-									ShowContinueError( "...Requested flow/capacity ratio (m3/s/W) = " + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) );
-									ShowContinueError( "...Maximum flow/capacity ratio (m3/s/W) = " + TrimSigDigits( MaxRatedVolFlowPerRatedTotCap( DXCT ), 3 ) );
-								}
-								RatedTotCapDes = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / MaxRatedVolFlowPerRatedTotCap( DXCT );
-								if ( ! DXCoil( DXCoilNum ).RatedTotCapEMSOverrideOn( Mode ) && DisplayExtraWarnings ) {
-									ShowContinueError( "...Adjusted capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
-								}
-							}
-						}
-					} else if ( CurZoneEqNum > 0 ) {
-						// If hard-sized, check if zone sizing data is available for system coil
-						if ( ! IsAutoSize && ! SizingDesRunThisZone ) {
-							HardSizeNoDesRun = true;
-							if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) > 0.0 ) {
-								if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "User-Specified Rated Total Cooling Capacity (gross) [W]", DXCoil( DXCoilNum ).RatedTotCap( Mode ) );
-								} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "User-Specified Rated High Speed Total Cooling Capacity (gross) [W]", DXCoil( DXCoilNum ).RatedTotCap( Mode ) );
-								} else {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "User-Specified Rated Total Cooling Capacity (gross) [W]", DXCoil( DXCoilNum ).RatedTotCap( Mode ) );
-								}
-							}
-						} else { // autosize or hard-sized with system sizing data
-							if ( ZoneEqSizing( CurZoneEqNum ).Capacity ) { // Parent object calculated capacity
-								DXCoil( DXCoilNum ).RatedTotCap( Mode ) = ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad;
-							} else {
-								CheckZoneSizing( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name );
-								VolFlowRate = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode );
-								if ( VolFlowRate >= SmallAirVolFlow ) {
-									if ( ZoneEqDXCoil ) {
-										if ( ZoneEqSizing( CurZoneEqNum ).OAVolFlow > 0.0 ) {
-											MixTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
-											MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
-										} else {
-											MixTemp = FinalZoneSizing( CurZoneEqNum ).ZoneRetTempAtCoolPeak;
-											MixHumRat = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtCoolPeak;
-										}
-									} else {
-										MixTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
-										MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
-									}
-									SupTemp = FinalZoneSizing( CurZoneEqNum ).CoolDesTemp;
-									SupHumRat = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
-									TimeStepNumAtMax = FinalZoneSizing( CurZoneEqNum ).TimeStepNumAtCoolMax;
-									DDNum = FinalZoneSizing( CurZoneEqNum ).CoolDDNum;
-									if ( DDNum > 0 && TimeStepNumAtMax > 0 ) {
-										OutTemp = DesDayWeath( DDNum ).Temp( TimeStepNumAtMax );
-									} else {
-										OutTemp = 0.0;
-									}
-									rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-									MixEnth = PsyHFnTdbW( MixTemp, MixHumRat, RoutineName );
-									MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-									SupEnth = PsyHFnTdbW( SupTemp, SupHumRat, RoutineName );
-									TotCapTempModFac = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( Mode ), MixWetBulb, OutTemp );
-									CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
-									if ( TotCapTempModFac > 0.0 ) {
-										RatedTotCapDes = CoolCapAtPeak / TotCapTempModFac;
-									} else {
-										RatedTotCapDes = CoolCapAtPeak;
-									}
-								} else {
-									RatedTotCapDes = 0.0;
-								}
-							}
-						} // End of desing sizing
-						if ( RatedTotCapDes > 0.0 ) {
-							RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / RatedTotCapDes;
-						} else {
-							RatedVolFlowPerRatedTotCap = 0.0;
-						}
-						// check capacity to make sure design volume flow per total capacity is within range
-						if ( RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap( DXCT ) ) {
-							if ( ! DXCoil( DXCoilNum ).RatedTotCapEMSOverrideOn( Mode ) && DisplayExtraWarnings ) {
-								ShowWarningError( "SizeDXCoil: " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
-								ShowContinueError( "...Rated Total Cooling Capacity will be limited by the minimum rated volume flow per" " rated total capacity ratio." );
-								ShowContinueError( "...DX coil volume flow rate (m3/s) = " + TrimSigDigits( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ), 6 ) );
-								ShowContinueError( "...Requested capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
-								ShowContinueError( "...Requested flow/capacity ratio (m3/s/W) = " + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) );
-								ShowContinueError( "...Minimum flow/capacity ratio (m3/s/W) = " + TrimSigDigits( MinRatedVolFlowPerRatedTotCap( DXCT ), 3 ) );
-							}
-							RatedTotCapDes = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / MinRatedVolFlowPerRatedTotCap( DXCT );
-							if ( ! DXCoil( DXCoilNum ).RatedTotCapEMSOverrideOn( Mode ) && DisplayExtraWarnings ) {
-								ShowContinueError( "...Adjusted capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
-							}
-						} else if ( RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap( DXCT ) ) {
-							if ( ! DXCoil( DXCoilNum ).RatedTotCapEMSOverrideOn( Mode ) && DisplayExtraWarnings ) {
-								ShowWarningError( "SizeDXCoil: " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
-								ShowContinueError( "...Rated Total Cooling Capacity will be limited by the maximum rated volume flow per" " rated total capacity ratio." );
-								ShowContinueError( "...DX coil volume flow rate (m3/s) = " + TrimSigDigits( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ), 6 ) );
-								ShowContinueError( "...Requested capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
-								ShowContinueError( "...Requested flow/capacity ratio (m3/s/W) = " + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) );
-								ShowContinueError( "...Maximum flow/capacity ratio (m3/s/W) = " + TrimSigDigits( MaxRatedVolFlowPerRatedTotCap( DXCT ), 3 ) );
-							}
-							RatedTotCapDes = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / MaxRatedVolFlowPerRatedTotCap( DXCT );
-							if ( ! DXCoil( DXCoilNum ).RatedTotCapEMSOverrideOn( Mode ) && DisplayExtraWarnings ) {
-								ShowContinueError( "...Adjusted capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
-							}
-						}
-					} // End of sys/zone coil type
-					if ( ! HardSizeNoDesRun ) {
-						if ( IsAutoSize ) { // Design Size values are available for both autosized and hard-sized
-							// Set Design Size and User-Specified values
-							if ( DXCoil( DXCoilNum ).RatedTotCapEMSOverrideOn( Mode ) ) {
-								RatedTotCapDes = DXCoil( DXCoilNum ).RatedTotCapEMSOverrideValue( Mode );
-							}
-							DXCoil( DXCoilNum ).RatedTotCap( Mode ) = RatedTotCapDes;
-							if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
-								ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "Design Size Rated Total Cooling Capacity (gross) [W]", RatedTotCapDes );
-							} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
-								ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated High Speed Total Cooling Capacity (gross) [W]", RatedTotCapDes );
-							} else {
-								ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated Total Cooling Capacity (gross) [W]", RatedTotCapDes );
-							}
-
-						} else { // Hard size with sizing data
-							if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) > 0.0 && RatedTotCapDes > 0.0 ) {
-								RatedTotCapUser = DXCoil( DXCoilNum ).RatedTotCap( Mode );
-								if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "Design Size Rated Total Cooling Capacity (gross) [W]", RatedTotCapDes, "User-Specified Rated Total Cooling Capacity (gross) [W]", RatedTotCapUser );
-								} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated High Speed Total Cooling Capacity (gross) [W]", RatedTotCapDes, "User-Specified Rated High Speed Total Cooling Capacity (gross) [W]", RatedTotCapUser );
-								} else {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated Total Cooling Capacity (gross) [W]", RatedTotCapDes, "User-Specified Rated Total Cooling Capacity (gross) [W]", RatedTotCapUser );
-								}
-								if ( DisplayExtraWarnings ) {
-									if ( ( std::abs( RatedTotCapDes - RatedTotCapUser ) / RatedTotCapUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeDxCoil: Potential issue with equipment sizing for " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
-										ShowContinueError( "User-Specified Total Cooling Capacity of " + trim( RoundSigDigits( RatedTotCapUser, 2 ) ) + " [W]" );
-										ShowContinueError( "differs from Design Size Total Cooling Capacity of " + trim( RoundSigDigits( RatedTotCapDes, 2 ) ) + " [W]" );
-										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-									}
-								}
-							}
-						}
+					else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatingEmpirical ) {
+						SizingMethod = HeatingAirflowSizing;
+						CompName = trim( DXCoil( DXCoilNum ).Name );
+						FieldNum = 3;
+						DataCoolCoilCap = DXCoolCap; // pass global variable used only for heat pumps (i.e., DX cooling and heating coils)
 					}
+					else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Heating ) {
+						SizingMethod = HeatingAirflowSizing;
+						CompName = trim( DXCoil( DXCoilNum ).Name );
+						FieldNum = 2;
+					}
+					else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling ) {
+						SizingMethod = CoolingAirflowSizing;
+						CompName = trim( DXCoil( DXCoilNum ).Name );
+						FieldNum = 3;
+					}
+					else {
+						SizingMethod = CoolingAirflowSizing;
+						CompName = trim( DXCoil( DXCoilNum ).Name );
+						FieldNum = 4;
+					}
+					TempSize = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode );
+					SizingString = trim( DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) ) + " [m3/s]";
+					CompType = trim( DXCoil( DXCoilNum ).DXCoilType );
+					DataIsDXCoil = true;
+					DataEMSOverrideON = DXCoil ( DXCoilNum ).RatedAirVolFlowRateEMSOverrideON ( Mode );
+					DataEMSOverride = DXCoil( DXCoilNum ).RatedAirVolFlowRateEMSOverrideValue( Mode );
+					RequestSizing( CompType, CompName, SizingMethod, trim(SizingString ), TempSize, bPRINT, RoutineName );
+					DXCoil ( DXCoilNum ).RatedAirVolFlowRate ( Mode ) = TempSize;
+					DataIsDXCoil = false;
+					DataEMSOverrideON = false;
+					DataEMSOverride = 0.0;
+					DataBypassFrac = 0.0;
+
+//
+//					if ( ! HardSizeNoDesRun ) {
+//						if ( ! DXCoil( DXCoilNum ).AirVolFlowAutoSized || ! DXCoil( DXCoilNum ).WaterVolFlowAutoSized ) {
+//							if ( IsAutoSize ) { // Design Size values are available for both autosized and hard-sized
+//								DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) = RatedAirVolFlowRateDes;
+//								if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "Design Size Rated Air Flow Rate [m3/s]", RatedAirVolFlowRateDes );
+//									// For Multimode Coil, Rated flow must be adjusted for bypass fraction
+//									RatedAirVolFlowRateDes *= ( 1 - DXCoil( DXCoilNum ).BypassedFlowFrac( Mode ) );
+//									DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) = RatedAirVolFlowRateDes;
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "Design Size Rated Air Flow Rate (non-bypassed) [m3/s]", RatedAirVolFlowRateDes );
+//								} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated High Speed Air Flow Rate [m3/s]", RatedAirVolFlowRateDes );
+//								} else {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated Air Flow Rate [m3/s]", RatedAirVolFlowRateDes );
+//								}
+//							} else { // Hard size with sizing data
+//								if ( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) > 0.0 && RatedAirVolFlowRateDes > 0.0 ) {
+//									RatedAirVolFlowRateUser = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode );
+//									if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+//										ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "Design Size Rated Air Flow Rate [m3/s]", RatedAirVolFlowRateDes, "User-Specified Rated Air Flow Rate [m3/s]", RatedAirVolFlowRateUser );
+//										// For Multimode Coil, Rated flow must be adjusted for bypass fraction
+//										RatedAirVolFlowRateDes *= ( 1 - DXCoil( DXCoilNum ).BypassedFlowFrac( Mode ) );
+//										ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "Design Size Rated Air Flow Rate (non-bypassed) [m3/s]", RatedAirVolFlowRateDes, "User-Specified Rated Air Flow Rate (non-bypassed) [m3/s]", RatedAirVolFlowRateUser );
+//									} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
+//										ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated High Speed Air Flow Rate [m3/s]", RatedAirVolFlowRateDes, "User-Specified Rated High Speed Air Flow Rate [m3/s]", RatedAirVolFlowRateUser );
+//									} else {
+//										ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated Air Flow Rate [m3/s]", RatedAirVolFlowRateDes, "User-Specified Rated Air Flow Rate [m3/s]", RatedAirVolFlowRateUser );
+//									}
+//									if ( DisplayExtraWarnings ) {
+//										if ( ( std::abs( RatedAirVolFlowRateDes - RatedAirVolFlowRateUser ) / RatedAirVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
+//											ShowMessage( "SizeDxCoil: Potential issue with equipment sizing for " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
+//											ShowContinueError( "User-Specified Rated Air Volume Flow Rate of " + trim( RoundSigDigits( RatedAirVolFlowRateUser, 5 ) ) + " [m3/s]" );
+//											ShowContinueError( "differs from Design Size Rated Air Volume Flow Rate of " + trim( RoundSigDigits( RatedAirVolFlowRateDes, 5 ) ) + " [m3/s]" );
+//											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+//											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+//										}
+//									}
+//								}
+//							}
+//						}
+//					}
 				}
+
+				DataFlowUsedForSizing = DXCoil ( DXCoilNum ).RatedAirVolFlowRate ( Mode );
+				// get autosized air flow for capacity calc's if capacity is not autosized
+				// *** RAR this if block is a last minute addition to correct capacity reporting when not autosized and a sizing run is done. Test suite was not run with this code included. ***
+				if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) /= AutoSize && ( ( SysSizingRunDone && CurSysNum > 0 ) || ( ZoneSizingRunDone && CurZoneEqNum > 0 ) ) ) {
+					if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+						SizingMethod = CoolingAirflowSizing;
+						DataBypassFrac = DXCoil ( DXCoilNum ).BypassedFlowFrac ( Mode );
+					}
+					else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatingEmpirical ) {
+						SizingMethod = HeatingAirflowSizing;
+						DataCoolCoilCap = DXCoolCap; // pass global variable used only for heat pumps (i.e., DX cooling and heating coils)
+					}
+					else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Heating ) {
+						SizingMethod = HeatingAirflowSizing;
+					}
+					else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling ) {
+						SizingMethod = CoolingAirflowSizing;
+					}
+					else {
+						SizingMethod = CoolingAirflowSizing;
+					}
+					CompName = trim( DXCoil( DXCoilNum ).Name );
+					FieldNum = 1; // don't care, not printing
+					TempSize = AutoSize;
+					SizingString = " "; // don't care
+					CompType = trim( DXCoil( DXCoilNum ).DXCoilType );
+					DataIsDXCoil = true;
+					DataEMSOverrideON = DXCoil ( DXCoilNum ).RatedAirVolFlowRateEMSOverrideON ( Mode );
+					DataEMSOverride = DXCoil( DXCoilNum ).RatedAirVolFlowRateEMSOverrideValue( Mode );
+					RequestSizing( CompType, CompName, SizingMethod, trim(SizingString ), TempSize, false , RoutineName );
+					DataFlowUsedForSizing = TempSize;
+					DataIsDXCoil = false; // don't need this and next 2 of they are just overwritten. Delete on next pass so testing will show problems if any.
+					DataEMSOverrideON = false;
+					DataEMSOverride = 0.0;
+					DataBypassFrac = 0.0;
+				}
+
+				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+					SizingMethod = CoolingCapacitySizing;
+					CompName =trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) );
+					FieldNum = 1;
+					TempSize = DXCoil( DXCoilNum ).RatedTotCap( Mode );
+					SizingString = trim( DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) ) + " [W]";
+				} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatingEmpirical || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Heating ) {
+					SizingMethod = HeatingCapacitySizing;
+					CompName = trim( DXCoil( DXCoilNum ).Name );
+					FieldNum = 1;
+					TempSize = DXCoil( DXCoilNum ).RatedTotCap( Mode );
+					SizingString = trim( DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) ) + " [W]";
+					DataCoolCoilCap = DXCoolCap;
+				} else {
+					SizingMethod = CoolingCapacitySizing;
+					CompName = trim( DXCoil( DXCoilNum ).Name );
+					FieldNum = 1;
+					TempSize = DXCoil( DXCoilNum ).RatedTotCap( Mode );
+					SizingString = trim( DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) ) + " [W]";
+				}
+				CompType = trim( DXCoil( DXCoilNum ).DXCoilType );
+				DataIsDXCoil = true;
+				DataDXCT = DXCT;
+				DataTotCapCurveIndex = DXCoil ( DXCoilNum ).CCapFTemp ( Mode );
+				DataEMSOverrideON = DXCoil( DXCoilNum ).RatedTotCapEMSOverrideOn( Mode );
+				DataEMSOverride = DXCoil( DXCoilNum ).RatedTotCapEMSOverrideValue( Mode );
+				RequestSizing( CompType, CompName, SizingMethod, trim(SizingString ), TempSize, bPRINT, RoutineName );
+				DXCoil( DXCoilNum ).RatedTotCap ( Mode ) = TempSize;
+				DataIsDXCoil = false;
+				DataDXCT = 1;
+				DataFlowUsedForSizing = 0.0;
+				DataTotCapCurveIndex = 0;
+				DataEMSOverrideON = false;
+				DataEMSOverride = 0.0;
+				
+//				OASysFlag = false;
+//				AirLoopSysFlag = false;
+//				// logicals used when parent sizes coil
+//				if ( CurOASysNum > 0 ) OASysFlag = OASysEqSizing( CurOASysNum ).Capacity;
+//				if ( CurSysNum > 0 ) AirLoopSysFlag = UnitarySysEqSizing( CurSysNum ).Capacity;
+
+//				IsAutoSize = false;
+//				if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) == AutoSize ) {
+//					IsAutoSize = true;
+//				}
+//				// Sizing rated total capacity
+//				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingSingleSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling ) {
+//					IsCoolCoilCapAutoSize = true;
+//					if ( SizingDesRunThisAirSys || SizingDesRunThisZone ) HardSizeNoDesRun = false;
+//					if ( CurSysNum > 0 ) {
+//						// If hard-sized, check if system sizing data is available for system coil
+//						if ( ! IsAutoSize && ! SizingDesRunThisZone ) {
+//							HardSizeNoDesRun = true;
+//							if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) > 0.0 ) {
+//								if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "User-Specified Rated Total Cooling Capacity (gross) [W]", DXCoil( DXCoilNum ).RatedTotCap( Mode ) );
+//								} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "User-Specified Rated High Speed Total Cooling Capacity (gross) [W]", DXCoil( DXCoilNum ).RatedTotCap( Mode ) );
+//								} else {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "User-Specified Rated Total Cooling Capacity (gross) [W]", DXCoil( DXCoilNum ).RatedTotCap( Mode ) );
+//								}
+//							}
+//						} else { // autosize or hard-sized with system sizing data
+//							if ( OASysFlag ) {
+//								RatedTotCapDes = OASysEqSizing( CurOASysNum ).DesCoolingLoad;
+//							} else if ( AirLoopSysFlag ) {
+//								RatedTotCapDes = UnitarySysEqSizing( CurSysNum ).DesCoolingLoad;
+//							} else {
+//								CheckSysSizing( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name );
+//								VolFlowRate = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode );
+//								if ( VolFlowRate >= SmallAirVolFlow ) {
+//									if ( CurOASysNum > 0 ) { // coil is in the OA stream
+//										MixTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
+//										MixHumRat = FinalSysSizing( CurSysNum ).CoolOutHumRat;
+//										SupTemp = FinalSysSizing( CurSysNum ).PrecoolTemp;
+//										SupHumRat = FinalSysSizing( CurSysNum ).PrecoolHumRat;
+//									} else { // coil is on the main air loop
+//										SupTemp = FinalSysSizing( CurSysNum ).CoolSupTemp;
+//										SupHumRat = FinalSysSizing( CurSysNum ).CoolSupHumRat;
+//										if ( PrimaryAirSystem( CurSysNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
+//											MixTemp = FinalSysSizing( CurSysNum ).CoolMixTemp;
+//											MixHumRat = FinalSysSizing( CurSysNum ).CoolMixHumRat;
+//										} else { // there is precooling of OA stream
+//											if ( VolFlowRate > 0.0 ) {
+//												OutAirFrac = FinalSysSizing( CurSysNum ).DesOutAirVolFlow / VolFlowRate;
+//											} else {
+//												OutAirFrac = 1.0;
+//											}
+//											OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
+//											MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetTemp;
+//											MixHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetHumRat;
+//										}
+//									}
+//									OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
+//									rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
+//									MixEnth = PsyHFnTdbW( MixTemp, MixHumRat, RoutineName );
+//									MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
+//									SupEnth = PsyHFnTdbW( SupTemp, SupHumRat, RoutineName );
+//									TotCapTempModFac = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( Mode ), MixWetBulb, OutTemp );
+//									CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
+//									if ( TotCapTempModFac > 0.0 ) {
+//										RatedTotCapDes = CoolCapAtPeak / TotCapTempModFac;
+//									} else {
+//										RatedTotCapDes = CoolCapAtPeak;
+//									}
+//								} else {
+//									RatedTotCapDes = 0.0;
+//								}
+//							} // IF(OASysFlag) THEN or ELSE IF(AirLoopSysFlag) THEN
+//							if ( RatedTotCapDes > 0.0 ) {
+//								RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / RatedTotCapDes;
+//							} else {
+//								RatedVolFlowPerRatedTotCap = 0.0;
+//							}
+//							// check capacity to make sure design volume flow per total capacity is within range
+//							if ( RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap( DXCT ) ) {
+//								if ( ! DXCoil( DXCoilNum ).RatedTotCapEMSOverrideOn( Mode ) && DisplayExtraWarnings ) {
+//									ShowWarningError( "SizeDXCoil: " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
+//									ShowContinueError( "...Rated Total Cooling Capacity will be limited by the minimum rated volume flow per" " rated total capacity ratio." );
+//									ShowContinueError( "...DX coil volume flow rate (m3/s) = " + TrimSigDigits( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ), 6 ) );
+//									ShowContinueError( "...Requested capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
+//									ShowContinueError( "...Requested flow/capacity ratio (m3/s/W) = " + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) );
+//									ShowContinueError( "...Minimum flow/capacity ratio (m3/s/W) = " + TrimSigDigits( MinRatedVolFlowPerRatedTotCap( DXCT ), 3 ) );
+//								}
+//								RatedTotCapDes = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / MinRatedVolFlowPerRatedTotCap( DXCT );
+//								if ( ! DXCoil( DXCoilNum ).RatedTotCapEMSOverrideOn( Mode ) && DisplayExtraWarnings ) {
+//									ShowContinueError( "...Adjusted capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
+//								}
+//							} else if ( RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap( DXCT ) ) {
+//								if ( ! DXCoil( DXCoilNum ).RatedTotCapEMSOverrideOn( Mode ) && DisplayExtraWarnings ) {
+//									ShowWarningError( "SizeDXCoil: " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
+//									ShowContinueError( "...Rated Total Cooling Capacity will be limited by the maximum rated volume flow per" " rated total capacity ratio." );
+//									ShowContinueError( "...DX coil volume flow rate (m3/s) = " + TrimSigDigits( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ), 6 ) );
+//									ShowContinueError( "...Requested capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
+//									ShowContinueError( "...Requested flow/capacity ratio (m3/s/W) = " + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) );
+//									ShowContinueError( "...Maximum flow/capacity ratio (m3/s/W) = " + TrimSigDigits( MaxRatedVolFlowPerRatedTotCap( DXCT ), 3 ) );
+//								}
+//								RatedTotCapDes = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / MaxRatedVolFlowPerRatedTotCap( DXCT );
+//								if ( ! DXCoil( DXCoilNum ).RatedTotCapEMSOverrideOn( Mode ) && DisplayExtraWarnings ) {
+//									ShowContinueError( "...Adjusted capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
+//								}
+//							}
+//						}
+//					} else if ( CurZoneEqNum > 0 ) {
+//						// If hard-sized, check if zone sizing data is available for system coil
+//						if ( ! IsAutoSize && ! SizingDesRunThisZone ) {
+//							HardSizeNoDesRun = true;
+//							if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) > 0.0 ) {
+//								if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "User-Specified Rated Total Cooling Capacity (gross) [W]", DXCoil( DXCoilNum ).RatedTotCap( Mode ) );
+//								} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "User-Specified Rated High Speed Total Cooling Capacity (gross) [W]", DXCoil( DXCoilNum ).RatedTotCap( Mode ) );
+//								} else {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "User-Specified Rated Total Cooling Capacity (gross) [W]", DXCoil( DXCoilNum ).RatedTotCap( Mode ) );
+//								}
+//							}
+//						} else { // autosize or hard-sized with system sizing data
+//							if ( ZoneEqSizing( CurZoneEqNum ).Capacity ) { // Parent object calculated capacity
+//								DXCoil( DXCoilNum ).RatedTotCap( Mode ) = ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad;
+//							} else {
+//								CheckZoneSizing( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name );
+//								VolFlowRate = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode );
+//								if ( VolFlowRate >= SmallAirVolFlow ) {
+//									if ( ZoneEqDXCoil ) {
+//										if ( ZoneEqSizing( CurZoneEqNum ).OAVolFlow > 0.0 ) {
+//											MixTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
+//											MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
+//										} else {
+//											MixTemp = FinalZoneSizing( CurZoneEqNum ).ZoneRetTempAtCoolPeak;
+//											MixHumRat = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtCoolPeak;
+//										}
+//									} else {
+//										MixTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
+//										MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
+//									}
+//									SupTemp = FinalZoneSizing( CurZoneEqNum ).CoolDesTemp;
+//									SupHumRat = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
+//									TimeStepNumAtMax = FinalZoneSizing( CurZoneEqNum ).TimeStepNumAtCoolMax;
+//									DDNum = FinalZoneSizing( CurZoneEqNum ).CoolDDNum;
+//									if ( DDNum > 0 && TimeStepNumAtMax > 0 ) {
+//										OutTemp = DesDayWeath( DDNum ).Temp( TimeStepNumAtMax );
+//									} else {
+//										OutTemp = 0.0;
+//									}
+//									rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
+//									MixEnth = PsyHFnTdbW( MixTemp, MixHumRat, RoutineName );
+//									MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
+//									SupEnth = PsyHFnTdbW( SupTemp, SupHumRat, RoutineName );
+//									TotCapTempModFac = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( Mode ), MixWetBulb, OutTemp );
+//									CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
+//									if ( TotCapTempModFac > 0.0 ) {
+//										RatedTotCapDes = CoolCapAtPeak / TotCapTempModFac;
+//									} else {
+//										RatedTotCapDes = CoolCapAtPeak;
+//									}
+//								} else {
+//									RatedTotCapDes = 0.0;
+//								}
+//							}
+//						} // End of desing sizing
+//						if ( RatedTotCapDes > 0.0 ) {
+//							RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / RatedTotCapDes;
+//						} else {
+//							RatedVolFlowPerRatedTotCap = 0.0;
+//						}
+//						// check capacity to make sure design volume flow per total capacity is within range
+//						if ( RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap( DXCT ) ) {
+//							if ( ! DXCoil( DXCoilNum ).RatedTotCapEMSOverrideOn( Mode ) && DisplayExtraWarnings ) {
+//								ShowWarningError( "SizeDXCoil: " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
+//								ShowContinueError( "...Rated Total Cooling Capacity will be limited by the minimum rated volume flow per" " rated total capacity ratio." );
+//								ShowContinueError( "...DX coil volume flow rate (m3/s) = " + TrimSigDigits( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ), 6 ) );
+//								ShowContinueError( "...Requested capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
+//								ShowContinueError( "...Requested flow/capacity ratio (m3/s/W) = " + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) );
+//								ShowContinueError( "...Minimum flow/capacity ratio (m3/s/W) = " + TrimSigDigits( MinRatedVolFlowPerRatedTotCap( DXCT ), 3 ) );
+//							}
+//							RatedTotCapDes = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / MinRatedVolFlowPerRatedTotCap( DXCT );
+//							if ( ! DXCoil( DXCoilNum ).RatedTotCapEMSOverrideOn( Mode ) && DisplayExtraWarnings ) {
+//								ShowContinueError( "...Adjusted capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
+//							}
+//						} else if ( RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap( DXCT ) ) {
+//							if ( ! DXCoil( DXCoilNum ).RatedTotCapEMSOverrideOn( Mode ) && DisplayExtraWarnings ) {
+//								ShowWarningError( "SizeDXCoil: " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
+//								ShowContinueError( "...Rated Total Cooling Capacity will be limited by the maximum rated volume flow per" " rated total capacity ratio." );
+//								ShowContinueError( "...DX coil volume flow rate (m3/s) = " + TrimSigDigits( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ), 6 ) );
+//								ShowContinueError( "...Requested capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
+//								ShowContinueError( "...Requested flow/capacity ratio (m3/s/W) = " + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) );
+//								ShowContinueError( "...Maximum flow/capacity ratio (m3/s/W) = " + TrimSigDigits( MaxRatedVolFlowPerRatedTotCap( DXCT ), 3 ) );
+//							}
+//							RatedTotCapDes = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / MaxRatedVolFlowPerRatedTotCap( DXCT );
+//							if ( ! DXCoil( DXCoilNum ).RatedTotCapEMSOverrideOn( Mode ) && DisplayExtraWarnings ) {
+//								ShowContinueError( "...Adjusted capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
+//							}
+//						}
+//					} // End of sys/zone coil type
+//					if ( ! HardSizeNoDesRun ) {
+//						if ( IsAutoSize ) { // Design Size values are available for both autosized and hard-sized
+//							// Set Design Size and User-Specified values
+//							if ( DXCoil( DXCoilNum ).RatedTotCapEMSOverrideOn( Mode ) ) {
+//								RatedTotCapDes = DXCoil( DXCoilNum ).RatedTotCapEMSOverrideValue( Mode );
+//							}
+//							DXCoil( DXCoilNum ).RatedTotCap( Mode ) = RatedTotCapDes;
+//							if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+//								ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "Design Size Rated Total Cooling Capacity (gross) [W]", RatedTotCapDes );
+//							} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
+//								ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated High Speed Total Cooling Capacity (gross) [W]", RatedTotCapDes );
+//							} else {
+//								ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated Total Cooling Capacity (gross) [W]", RatedTotCapDes );
+//							}
+//
+//						} else { // Hard size with sizing data
+//							if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) > 0.0 && RatedTotCapDes > 0.0 ) {
+//								RatedTotCapUser = DXCoil( DXCoilNum ).RatedTotCap( Mode );
+//								if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "Design Size Rated Total Cooling Capacity (gross) [W]", RatedTotCapDes, "User-Specified Rated Total Cooling Capacity (gross) [W]", RatedTotCapUser );
+//								} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated High Speed Total Cooling Capacity (gross) [W]", RatedTotCapDes, "User-Specified Rated High Speed Total Cooling Capacity (gross) [W]", RatedTotCapUser );
+//								} else {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated Total Cooling Capacity (gross) [W]", RatedTotCapDes, "User-Specified Rated Total Cooling Capacity (gross) [W]", RatedTotCapUser );
+//								}
+//								if ( DisplayExtraWarnings ) {
+//									if ( ( std::abs( RatedTotCapDes - RatedTotCapUser ) / RatedTotCapUser ) > AutoVsHardSizingThreshold ) {
+//										ShowMessage( "SizeDxCoil: Potential issue with equipment sizing for " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
+//										ShowContinueError( "User-Specified Total Cooling Capacity of " + trim( RoundSigDigits( RatedTotCapUser, 2 ) ) + " [W]" );
+//										ShowContinueError( "differs from Design Size Total Cooling Capacity of " + trim( RoundSigDigits( RatedTotCapDes, 2 ) ) + " [W]" );
+//										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+//										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+//									}
+//								}
+//							}
+//						}
+//					}
+//				}
 
 				// Heating coil capacity
 				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingSingleSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling ) {
 					DXCoolCap = DXCoil( DXCoilNum ).RatedTotCap( Mode );
 				}
-
-				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatingEmpirical || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Heating ) {
-
-					IsAutoSize = false;
-					if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) == AutoSize ) {
-						IsAutoSize = true;
-					}
-
-					//    IF (.NOT. DXCoil(DXCoilNum)%AirVolFlowAutoSized .AND. .NOT. DXCoil(DXCoilNum)%WaterVolFlowAutoSized) THEN
-					if ( SizingDesRunThisAirSys || SizingDesRunThisZone ) HardSizeNoDesRun = false;
-
-					if ( ! IsAutoSize && ! SizingDesRunThisAirSys ) {
-						HardSizeNoDesRun = true;
-						if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) > 0.0 ) {
-							ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "User-Specified Rated Total Heating Capacity [W]", DXCoil( DXCoilNum ).RatedTotCap( Mode ) );
-						}
-					} else { // autosize or hard-sized with system sizing data
-						if ( OASysFlag ) {
-							if ( UnitarySysEqSizing( CurSysNum ).DesHeatingLoad > 0.0 ) {
-								DXCoil( DXCoilNum ).RatedTotCap( Mode ) = OASysEqSizing( CurOASysNum ).DesHeatingLoad;
-								RatedTotCapDes = DXCoil( DXCoilNum ).RatedTotCap( Mode );
-							} else {
-								DXCoil( DXCoilNum ).RatedTotCap( Mode ) = OASysEqSizing( CurOASysNum ).DesCoolingLoad * DXCoil( DXCoilNum ).HeatSizeRatio;
-								RatedTotCapDes = DXCoil( DXCoilNum ).RatedTotCap( Mode );
-							}
-						} else if ( AirLoopSysFlag ) {
-							if ( UnitarySysEqSizing( CurSysNum ).DesHeatingLoad > 0.0 ) {
-								DXCoil( DXCoilNum ).RatedTotCap( Mode ) = UnitarySysEqSizing( CurSysNum ).DesHeatingLoad;
-							} else {
-								DXCoil( DXCoilNum ).RatedTotCap( Mode ) = UnitarySysEqSizing( CurSysNum ).DesCoolingLoad * DXCoil( DXCoilNum ).HeatSizeRatio;
-							}
-							RatedTotCapDes = DXCoil( DXCoilNum ).RatedTotCap( Mode );
-						} else if ( DXCoil( DXCoilNum ).CoolingCoilPresent ) {
-							DXCoil( DXCoilNum ).RatedTotCap( Mode ) = DXCoolCap * DXCoil( DXCoilNum ).HeatSizeRatio;
-							RatedTotCapDes = DXCoil( DXCoilNum ).RatedTotCap( Mode );
-						} else {
-
-							if ( CurSysNum > 0 ) {
-								CheckSysSizing( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name );
-								VolFlowRate = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode );
-								if ( VolFlowRate >= SmallAirVolFlow ) {
-									if ( CurOASysNum > 0 ) { // coil is in the OA stream
-										MixTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
-										MixHumRat = FinalSysSizing( CurSysNum ).CoolOutHumRat;
-										SupTemp = FinalSysSizing( CurSysNum ).PrecoolTemp;
-										SupHumRat = FinalSysSizing( CurSysNum ).PrecoolHumRat;
-									} else { // coil is on the main air loop
-										SupTemp = FinalSysSizing( CurSysNum ).CoolSupTemp;
-										SupHumRat = FinalSysSizing( CurSysNum ).CoolSupHumRat;
-										if ( PrimaryAirSystem( CurSysNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
-											MixTemp = FinalSysSizing( CurSysNum ).CoolMixTemp;
-											MixHumRat = FinalSysSizing( CurSysNum ).CoolMixHumRat;
-										} else { // there is precooling of OA stream
-											if ( VolFlowRate > 0.0 ) {
-												OutAirFrac = FinalSysSizing( CurSysNum ).DesOutAirVolFlow / VolFlowRate;
-											} else {
-												OutAirFrac = 1.0;
-											}
-											OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
-											MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetTemp;
-											MixHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetHumRat;
-										}
-									}
-									OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
-									rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-									MixEnth = PsyHFnTdbW( MixTemp, MixHumRat, RoutineName );
-									MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-									SupEnth = PsyHFnTdbW( SupTemp, SupHumRat, RoutineName );
-									TotCapTempModFac = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( Mode ), MixWetBulb, OutTemp );
-									CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
-									if ( TotCapTempModFac > 0.0 ) {
-										RatedTotCapDes = CoolCapAtPeak / TotCapTempModFac;
-									} else {
-										RatedTotCapDes = CoolCapAtPeak;
-									}
-								} else {
-									RatedTotCapDes = 0.0;
-								}
-
-								if ( RatedTotCapDes > 0.0 ) {
-									RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / RatedTotCapDes;
-								} else {
-									RatedVolFlowPerRatedTotCap = 0.0;
-								}
-								// check capacity to make sure design volume flow per total capacity is within range
-								if ( RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap( DXCT ) ) {
-									if ( DisplayExtraWarnings ) {
-										ShowWarningError( "SizeDXCoil: " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
-										ShowContinueError( "...Rated Total Heating Capacity will be limited by the minimum rated volume flow per" " rated total capacity ratio." );
-										ShowContinueError( "...DX coil volume flow rate (m3/s) = " + TrimSigDigits( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ), 6 ) );
-										ShowContinueError( "...Requested capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
-										ShowContinueError( "...Requested flow/capacity ratio (m3/s/W) = " + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) );
-										ShowContinueError( "...Minimum flow/capacity ratio (m3/s/W) = " + TrimSigDigits( MinRatedVolFlowPerRatedTotCap( DXCT ), 3 ) );
-									}
-									RatedTotCapDes = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / MinRatedVolFlowPerRatedTotCap( DXCT );
-									if ( DisplayExtraWarnings ) {
-										ShowContinueError( "...Adjusted capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
-									}
-								} else if ( RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap( DXCT ) ) {
-									if ( DisplayExtraWarnings ) {
-										ShowWarningError( "SizeDXCoil: " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
-										ShowContinueError( "...Rated Total Heating Capacity will be limited by the maximum rated volume flow per" " rated total capacity ratio." );
-										ShowContinueError( "...DX coil volume flow rate (m3/s) = " + TrimSigDigits( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ), 6 ) );
-										ShowContinueError( "...Requested capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
-										ShowContinueError( "...Requested flow/capacity ratio (m3/s/W) = " + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) );
-										ShowContinueError( "...Maximum flow/capacity ratio (m3/s/W) = " + TrimSigDigits( MaxRatedVolFlowPerRatedTotCap( DXCT ), 3 ) );
-									}
-									RatedTotCapDes = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / MaxRatedVolFlowPerRatedTotCap( DXCT );
-									if ( DisplayExtraWarnings ) {
-										ShowContinueError( "...Adjusted capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
-									}
-								}
-							} else if ( CurZoneEqNum > 0 ) {
-
-								CheckZoneSizing( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name );
-								VolFlowRate = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode );
-								if ( VolFlowRate >= SmallAirVolFlow ) {
-									if ( ZoneEqSizing( CurZoneEqNum ).Capacity ) {
-										if ( ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad > 0.0 ) {
-											DXCoil( DXCoilNum ).RatedTotCap( Mode ) = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
-										} else {
-											DXCoil( DXCoilNum ).RatedTotCap( Mode ) = ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad * DXCoil( DXCoilNum ).HeatSizeRatio;
-										}
-										RatedTotCapDes = DXCoil( DXCoilNum ).RatedTotCap( Mode );
-									} else {
-										if ( ZoneEqDXCoil ) {
-											if ( ZoneEqSizing( CurZoneEqNum ).OAVolFlow > 0.0 ) {
-												MixTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
-												MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
-											} else {
-												MixTemp = FinalZoneSizing( CurZoneEqNum ).ZoneRetTempAtCoolPeak;
-												MixHumRat = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtCoolPeak;
-											}
-										} else {
-											MixTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
-											MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
-										}
-										SupTemp = FinalZoneSizing( CurZoneEqNum ).CoolDesTemp;
-										SupHumRat = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
-										TimeStepNumAtMax = FinalZoneSizing( CurZoneEqNum ).TimeStepNumAtCoolMax;
-										DDNum = FinalZoneSizing( CurZoneEqNum ).CoolDDNum;
-										if ( DDNum > 0 && TimeStepNumAtMax > 0 ) {
-											OutTemp = DesDayWeath( DDNum ).Temp( TimeStepNumAtMax );
-										} else {
-											OutTemp = 0.0;
-										}
-										rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-										MixEnth = PsyHFnTdbW( MixTemp, MixHumRat, RoutineName );
-										MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-										SupEnth = PsyHFnTdbW( SupTemp, SupHumRat, RoutineName );
-										TotCapTempModFac = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( Mode ), MixWetBulb, OutTemp );
-										CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
-										if ( TotCapTempModFac > 0.0 ) {
-											RatedTotCapDes = CoolCapAtPeak / TotCapTempModFac;
-										} else {
-											RatedTotCapDes = CoolCapAtPeak;
-										}
-									}
-								} else {
-									RatedTotCapDes = 0.0;
-								}
-								if ( RatedTotCapDes > 0.0 ) {
-									RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / RatedTotCapDes;
-								} else {
-									RatedVolFlowPerRatedTotCap = 0.0;
-								}
-								// check capacity to make sure design volume flow per total capacity is within range
-								if ( RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap( DXCT ) ) {
-									if ( DisplayExtraWarnings ) {
-										ShowWarningError( "SizeDXCoil: " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
-										ShowContinueError( "...Rated Total Heating Capacity will be limited by the minimum rated volume flow per" " rated total capacity ratio." );
-										ShowContinueError( "...DX coil volume flow rate (m3/s) = " + TrimSigDigits( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ), 6 ) );
-										ShowContinueError( "...Requested capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
-										ShowContinueError( "...Requested flow/capacity ratio (m3/s/W) = " + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) );
-										ShowContinueError( "...Minimum flow/capacity ratio (m3/s/W) = " + TrimSigDigits( MinRatedVolFlowPerRatedTotCap( DXCT ), 3 ) );
-									}
-									RatedTotCapDes = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / MinRatedVolFlowPerRatedTotCap( DXCT );
-									if ( DisplayExtraWarnings ) {
-										ShowContinueError( "...Adjusted capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
-									}
-								} else if ( RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap( DXCT ) ) {
-									if ( DisplayExtraWarnings ) {
-										ShowWarningError( "SizeDXCoil: " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
-										ShowContinueError( "...Rated Total Heating Capacity will be limited by the maximum rated volume flow per" " rated total capacity ratio." );
-										ShowContinueError( "...DX coil volume flow rate (m3/s) = " + TrimSigDigits( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ), 6 ) );
-										ShowContinueError( "...Requested capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
-										ShowContinueError( "...Requested flow/capacity ratio (m3/s/W) = " + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) );
-										ShowContinueError( "...Maximum flow/capacity ratio (m3/s/W) = " + TrimSigDigits( MaxRatedVolFlowPerRatedTotCap( DXCT ), 3 ) );
-									}
-									RatedTotCapDes = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / MaxRatedVolFlowPerRatedTotCap( DXCT );
-									if ( DisplayExtraWarnings ) {
-										ShowContinueError( "...Adjusted capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
-									}
-								}
-
-							} // zone or sys coil
-						}
-					}
-
-					if ( ! HardSizeNoDesRun ) { // .AND. .NOT. DXCoil(DXCoilNum)%CoolingCoilPresent) THEN
-						if ( IsAutoSize ) {
-							if ( DXCoil( DXCoilNum ).CoolingCoilPresent ) {
-								RatedTotCapDes = DXCoolCap * DXCoil( DXCoilNum ).HeatSizeRatio;
-								DXCoil( DXCoilNum ).RatedTotCap( Mode ) = RatedTotCapDes;
-							} else {
-								DXCoil( DXCoilNum ).RatedTotCap( Mode ) = RatedTotCapDes;
-							}
-							ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated Total Heating Capacity [W]", RatedTotCapDes );
-						} else {
-							if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) > 0.0 && RatedTotCapDes > 0.0 ) {
-								RatedTotCapUser = DXCoil( DXCoilNum ).RatedTotCap( Mode );
-								ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated Total Heating Capacity [W]", RatedTotCapDes, "User-Specified Rated Total Heating Capacity [W]", RatedTotCapUser );
-								if ( DisplayExtraWarnings ) {
-									if ( ( std::abs( RatedTotCapDes - RatedTotCapUser ) / RatedTotCapUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeDxCoil: Potential issue with equipment sizing for " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
-										ShowContinueError( "User-Specified Total Heating Capacity of " + trim( RoundSigDigits( RatedTotCapUser, 2 ) ) + " [W]" );
-										ShowContinueError( "differs from Design Size Total Heating Capacity of " + trim( RoundSigDigits( RatedTotCapDes, 2 ) ) + " [W]" );
-										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-									}
-								}
-							}
-						} // End of design sizing
-					} // End of zone/sys coil type  Rated Total Heating Capacity
-				} // heating coil
-				// Sizing RatedSHR
-				IsAutoSize = false;
-				if ( DXCoil( DXCoilNum ).RatedSHR( Mode ) == AutoSize ) {
-					IsAutoSize = true;
-				}
+//
+//				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatingEmpirical || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Heating ) {
+//
+//					IsAutoSize = false;
+//					if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) == AutoSize ) {
+//						IsAutoSize = true;
+//					}
+//
+//					//    IF (.NOT. DXCoil(DXCoilNum)%AirVolFlowAutoSized .AND. .NOT. DXCoil(DXCoilNum)%WaterVolFlowAutoSized) THEN
+//					if ( SizingDesRunThisAirSys || SizingDesRunThisZone ) HardSizeNoDesRun = false;
+//
+//					if ( ! IsAutoSize && ! SizingDesRunThisAirSys ) {
+//						HardSizeNoDesRun = true;
+//						if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) > 0.0 ) {
+//							ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "User-Specified Rated Total Heating Capacity [W]", DXCoil( DXCoilNum ).RatedTotCap( Mode ) );
+//						}
+//					} else { // autosize or hard-sized with system sizing data
+//						if ( OASysFlag ) {
+//							if ( UnitarySysEqSizing( CurSysNum ).DesHeatingLoad > 0.0 ) {
+//								DXCoil( DXCoilNum ).RatedTotCap( Mode ) = OASysEqSizing( CurOASysNum ).DesHeatingLoad;
+//								RatedTotCapDes = DXCoil( DXCoilNum ).RatedTotCap( Mode );
+//							} else {
+//								DXCoil( DXCoilNum ).RatedTotCap( Mode ) = OASysEqSizing( CurOASysNum ).DesCoolingLoad * DXCoil( DXCoilNum ).HeatSizeRatio;
+//								RatedTotCapDes = DXCoil( DXCoilNum ).RatedTotCap( Mode );
+//							}
+//						} else if ( AirLoopSysFlag ) {
+//							if ( UnitarySysEqSizing( CurSysNum ).DesHeatingLoad > 0.0 ) {
+//								DXCoil( DXCoilNum ).RatedTotCap( Mode ) = UnitarySysEqSizing( CurSysNum ).DesHeatingLoad;
+//							} else {
+//								DXCoil( DXCoilNum ).RatedTotCap( Mode ) = UnitarySysEqSizing( CurSysNum ).DesCoolingLoad * DXCoil( DXCoilNum ).HeatSizeRatio;
+//							}
+//							RatedTotCapDes = DXCoil( DXCoilNum ).RatedTotCap( Mode );
+//						} else if ( DXCoil( DXCoilNum ).CoolingCoilPresent ) {
+//							DXCoil( DXCoilNum ).RatedTotCap( Mode ) = DXCoolCap * DXCoil( DXCoilNum ).HeatSizeRatio;
+//							RatedTotCapDes = DXCoil( DXCoilNum ).RatedTotCap( Mode );
+//						} else {
+//
+//							if ( CurSysNum > 0 ) {
+//								CheckSysSizing( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name );
+//								VolFlowRate = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode );
+//								if ( VolFlowRate >= SmallAirVolFlow ) {
+//									if ( CurOASysNum > 0 ) { // coil is in the OA stream
+//										MixTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
+//										MixHumRat = FinalSysSizing( CurSysNum ).CoolOutHumRat;
+//										SupTemp = FinalSysSizing( CurSysNum ).PrecoolTemp;
+//										SupHumRat = FinalSysSizing( CurSysNum ).PrecoolHumRat;
+//									} else { // coil is on the main air loop
+//										SupTemp = FinalSysSizing( CurSysNum ).CoolSupTemp;
+//										SupHumRat = FinalSysSizing( CurSysNum ).CoolSupHumRat;
+//										if ( PrimaryAirSystem( CurSysNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
+//											MixTemp = FinalSysSizing( CurSysNum ).CoolMixTemp;
+//											MixHumRat = FinalSysSizing( CurSysNum ).CoolMixHumRat;
+//										} else { // there is precooling of OA stream
+//											if ( VolFlowRate > 0.0 ) {
+//												OutAirFrac = FinalSysSizing( CurSysNum ).DesOutAirVolFlow / VolFlowRate;
+//											} else {
+//												OutAirFrac = 1.0;
+//											}
+//											OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
+//											MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetTemp;
+//											MixHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetHumRat;
+//										}
+//									}
+//									OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
+//									rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
+//									MixEnth = PsyHFnTdbW( MixTemp, MixHumRat, RoutineName );
+//									MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
+//									SupEnth = PsyHFnTdbW( SupTemp, SupHumRat, RoutineName );
+//									TotCapTempModFac = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( Mode ), MixWetBulb, OutTemp );
+//									CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
+//									if ( TotCapTempModFac > 0.0 ) {
+//										RatedTotCapDes = CoolCapAtPeak / TotCapTempModFac;
+//									} else {
+//										RatedTotCapDes = CoolCapAtPeak;
+//									}
+//								} else {
+//									RatedTotCapDes = 0.0;
+//								}
+//
+//								if ( RatedTotCapDes > 0.0 ) {
+//									RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / RatedTotCapDes;
+//								} else {
+//									RatedVolFlowPerRatedTotCap = 0.0;
+//								}
+//								// check capacity to make sure design volume flow per total capacity is within range
+//								if ( RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap( DXCT ) ) {
+//									if ( DisplayExtraWarnings ) {
+//										ShowWarningError( "SizeDXCoil: " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
+//										ShowContinueError( "...Rated Total Heating Capacity will be limited by the minimum rated volume flow per" " rated total capacity ratio." );
+//										ShowContinueError( "...DX coil volume flow rate (m3/s) = " + TrimSigDigits( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ), 6 ) );
+//										ShowContinueError( "...Requested capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
+//										ShowContinueError( "...Requested flow/capacity ratio (m3/s/W) = " + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) );
+//										ShowContinueError( "...Minimum flow/capacity ratio (m3/s/W) = " + TrimSigDigits( MinRatedVolFlowPerRatedTotCap( DXCT ), 3 ) );
+//									}
+//									RatedTotCapDes = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / MinRatedVolFlowPerRatedTotCap( DXCT );
+//									if ( DisplayExtraWarnings ) {
+//										ShowContinueError( "...Adjusted capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
+//									}
+//								} else if ( RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap( DXCT ) ) {
+//									if ( DisplayExtraWarnings ) {
+//										ShowWarningError( "SizeDXCoil: " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
+//										ShowContinueError( "...Rated Total Heating Capacity will be limited by the maximum rated volume flow per" " rated total capacity ratio." );
+//										ShowContinueError( "...DX coil volume flow rate (m3/s) = " + TrimSigDigits( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ), 6 ) );
+//										ShowContinueError( "...Requested capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
+//										ShowContinueError( "...Requested flow/capacity ratio (m3/s/W) = " + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) );
+//										ShowContinueError( "...Maximum flow/capacity ratio (m3/s/W) = " + TrimSigDigits( MaxRatedVolFlowPerRatedTotCap( DXCT ), 3 ) );
+//									}
+//									RatedTotCapDes = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / MaxRatedVolFlowPerRatedTotCap( DXCT );
+//									if ( DisplayExtraWarnings ) {
+//										ShowContinueError( "...Adjusted capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
+//									}
+//								}
+//							} else if ( CurZoneEqNum > 0 ) {
+//
+//								CheckZoneSizing( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name );
+//								VolFlowRate = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode );
+//								if ( VolFlowRate >= SmallAirVolFlow ) {
+//									if ( ZoneEqSizing( CurZoneEqNum ).Capacity ) {
+//										if ( ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad > 0.0 ) {
+//											DXCoil( DXCoilNum ).RatedTotCap( Mode ) = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
+//										} else {
+//											DXCoil( DXCoilNum ).RatedTotCap( Mode ) = ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad * DXCoil( DXCoilNum ).HeatSizeRatio;
+//										}
+//										RatedTotCapDes = DXCoil( DXCoilNum ).RatedTotCap( Mode );
+//									} else {
+//										if ( ZoneEqDXCoil ) {
+//											if ( ZoneEqSizing( CurZoneEqNum ).OAVolFlow > 0.0 ) {
+//												MixTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
+//												MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
+//											} else {
+//												MixTemp = FinalZoneSizing( CurZoneEqNum ).ZoneRetTempAtCoolPeak;
+//												MixHumRat = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtCoolPeak;
+//											}
+//										} else {
+//											MixTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
+//											MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
+//										}
+//										SupTemp = FinalZoneSizing( CurZoneEqNum ).CoolDesTemp;
+//										SupHumRat = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
+//										TimeStepNumAtMax = FinalZoneSizing( CurZoneEqNum ).TimeStepNumAtCoolMax;
+//										DDNum = FinalZoneSizing( CurZoneEqNum ).CoolDDNum;
+//										if ( DDNum > 0 && TimeStepNumAtMax > 0 ) {
+//											OutTemp = DesDayWeath( DDNum ).Temp( TimeStepNumAtMax );
+//										} else {
+//											OutTemp = 0.0;
+//										}
+//										rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
+//										MixEnth = PsyHFnTdbW( MixTemp, MixHumRat, RoutineName );
+//										MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
+//										SupEnth = PsyHFnTdbW( SupTemp, SupHumRat, RoutineName );
+//										TotCapTempModFac = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( Mode ), MixWetBulb, OutTemp );
+//										CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
+//										if ( TotCapTempModFac > 0.0 ) {
+//											RatedTotCapDes = CoolCapAtPeak / TotCapTempModFac;
+//										} else {
+//											RatedTotCapDes = CoolCapAtPeak;
+//										}
+//									}
+//								} else {
+//									RatedTotCapDes = 0.0;
+//								}
+//								if ( RatedTotCapDes > 0.0 ) {
+//									RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / RatedTotCapDes;
+//								} else {
+//									RatedVolFlowPerRatedTotCap = 0.0;
+//								}
+//								// check capacity to make sure design volume flow per total capacity is within range
+//								if ( RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap( DXCT ) ) {
+//									if ( DisplayExtraWarnings ) {
+//										ShowWarningError( "SizeDXCoil: " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
+//										ShowContinueError( "...Rated Total Heating Capacity will be limited by the minimum rated volume flow per" " rated total capacity ratio." );
+//										ShowContinueError( "...DX coil volume flow rate (m3/s) = " + TrimSigDigits( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ), 6 ) );
+//										ShowContinueError( "...Requested capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
+//										ShowContinueError( "...Requested flow/capacity ratio (m3/s/W) = " + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) );
+//										ShowContinueError( "...Minimum flow/capacity ratio (m3/s/W) = " + TrimSigDigits( MinRatedVolFlowPerRatedTotCap( DXCT ), 3 ) );
+//									}
+//									RatedTotCapDes = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / MinRatedVolFlowPerRatedTotCap( DXCT );
+//									if ( DisplayExtraWarnings ) {
+//										ShowContinueError( "...Adjusted capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
+//									}
+//								} else if ( RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap( DXCT ) ) {
+//									if ( DisplayExtraWarnings ) {
+//										ShowWarningError( "SizeDXCoil: " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
+//										ShowContinueError( "...Rated Total Heating Capacity will be limited by the maximum rated volume flow per" " rated total capacity ratio." );
+//										ShowContinueError( "...DX coil volume flow rate (m3/s) = " + TrimSigDigits( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ), 6 ) );
+//										ShowContinueError( "...Requested capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
+//										ShowContinueError( "...Requested flow/capacity ratio (m3/s/W) = " + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) );
+//										ShowContinueError( "...Maximum flow/capacity ratio (m3/s/W) = " + TrimSigDigits( MaxRatedVolFlowPerRatedTotCap( DXCT ), 3 ) );
+//									}
+//									RatedTotCapDes = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / MaxRatedVolFlowPerRatedTotCap( DXCT );
+//									if ( DisplayExtraWarnings ) {
+//										ShowContinueError( "...Adjusted capacity (W) = " + TrimSigDigits( RatedTotCapDes, 3 ) );
+//									}
+//								}
+//
+//							} // zone or sys coil
+//						}
+//					}
+//
+//					if ( ! HardSizeNoDesRun ) { // .AND. .NOT. DXCoil(DXCoilNum)%CoolingCoilPresent) THEN
+//						if ( IsAutoSize ) {
+//							if ( DXCoil( DXCoilNum ).CoolingCoilPresent ) {
+//								RatedTotCapDes = DXCoolCap * DXCoil( DXCoilNum ).HeatSizeRatio;
+//								DXCoil( DXCoilNum ).RatedTotCap( Mode ) = RatedTotCapDes;
+//							} else {
+//								DXCoil( DXCoilNum ).RatedTotCap( Mode ) = RatedTotCapDes;
+//							}
+//							ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated Total Heating Capacity [W]", RatedTotCapDes );
+//						} else {
+//							if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) > 0.0 && RatedTotCapDes > 0.0 ) {
+//								RatedTotCapUser = DXCoil( DXCoilNum ).RatedTotCap( Mode );
+//								ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated Total Heating Capacity [W]", RatedTotCapDes, "User-Specified Rated Total Heating Capacity [W]", RatedTotCapUser );
+//								if ( DisplayExtraWarnings ) {
+//									if ( ( std::abs( RatedTotCapDes - RatedTotCapUser ) / RatedTotCapUser ) > AutoVsHardSizingThreshold ) {
+//										ShowMessage( "SizeDxCoil: Potential issue with equipment sizing for " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
+//										ShowContinueError( "User-Specified Total Heating Capacity of " + trim( RoundSigDigits( RatedTotCapUser, 2 ) ) + " [W]" );
+//										ShowContinueError( "differs from Design Size Total Heating Capacity of " + trim( RoundSigDigits( RatedTotCapDes, 2 ) ) + " [W]" );
+//										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+//										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+//									}
+//								}
+//							}
+//						} // End of design sizing
+//					} // End of zone/sys coil type  Rated Total Heating Capacity
+//				} // heating coil
+//				// Sizing RatedSHR
+//				IsAutoSize = false;
+//				if ( DXCoil( DXCoilNum ).RatedSHR( Mode ) == AutoSize ) {
+//					IsAutoSize = true;
+//				}
 
 				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingSingleSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling ) {
 
-					CpAir = PsyCpAirFnWTdb( RatedInletAirHumRat, RatedInletAirTemp, RoutineName );
+					if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+						CompName =trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) );
+					}
+					else {
+						CompName = trim( DXCoil( DXCoilNum ).Name );
+					}
+					SizingMethod = CoolingSHRSizing;
+					CompType = trim( DXCoil( DXCoilNum ).DXCoilType );
+					FieldNum = 2;
+					TempSize = DXCoil( DXCoilNum ).RatedSHR( Mode );
+					SizingString = trim( DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) );
+//					DataIsDXCoil = true;
+					DataFlowUsedForSizing = DXCoil ( DXCoilNum ).RatedAirVolFlowRate ( Mode );
+//					DataTotCapCurveIndex = DXCoil ( DXCoilNum ).CCapFTemp ( Mode );
+					DataCapacityUsedForSizing = DXCoil ( DXCoilNum ).RatedTotCap ( Mode );
+					DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
+					DataEMSOverride = DXCoil( DXCoilNum ).RatedSHREMSOverrideValue( Mode );
+					RequestSizing( CompType, CompName, SizingMethod, trim(SizingString ), TempSize, bPRINT, RoutineName );
+					DXCoil ( DXCoilNum ).RatedSHR ( Mode ) = TempSize;
+//					DataIsDXCoil = false;
+					DataFlowUsedForSizing = 0.0;
+//					DataTotCapCurveIndex = 0;
+					DataCapacityUsedForSizing = 0.0;
+					DataEMSOverrideON = false;
+					DataEMSOverride = 0.0;
 
-					if ( SizingDesRunThisAirSys || SizingDesRunThisZone ) HardSizeNoDesRun = false;
-					if ( CurSysNum > 0 ) {
-						if ( ! IsAutoSize && ! SizingDesRunThisAirSys ) {
-							HardSizeNoDesRun = true;
-							if ( DXCoil( DXCoilNum ).RatedSHR( Mode ) > 0.0 ) {
-								if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "User-Specified Rated Sensible Heat Ratio", DXCoil( DXCoilNum ).RatedSHR( Mode ) );
-								} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "User-Specified Rated High Speed Sensible Heat Ratio", DXCoil( DXCoilNum ).RatedSHR( Mode ) );
-								} else {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "User-Specified Rated Sensible Heat Ratio", DXCoil( DXCoilNum ).RatedSHR( Mode ) );
-								}
-							}
 
-						} else { // autosize or hard-sized with system sizing data
-
-							CheckSysSizing( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name );
-
-						}
-
-					} else if ( CurZoneEqNum > 0 ) {
-						if ( ! IsAutoSize && ! SizingDesRunThisZone ) {
-							HardSizeNoDesRun = true;
-							if ( DXCoil( DXCoilNum ).RatedSHR( Mode ) > 0.0 ) {
-								if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "User-Specified Rated Sensible Heat Ratio", DXCoil( DXCoilNum ).RatedSHR( Mode ) );
-								} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "User-Specified Rated High Speed Sensible Heat Ratio", DXCoil( DXCoilNum ).RatedSHR( Mode ) );
-								} else {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name + ":" + DXCoil( DXCoilNum ).CoilPerformanceName( Mode ), "User-Specified Rated Sensible Heat Ratio", DXCoil( DXCoilNum ).RatedSHR( Mode ) );
-								}
-							}
-
-						} else { // autosize or hard-sized with system sizing data
-
-							CheckZoneSizing( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name );
-
-						}
-
-					} // End of Sys/Zone coil type
-
-					if ( ! HardSizeNoDesRun ) {
-
-						if ( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) >= SmallAirVolFlow && DXCoil( DXCoilNum ).RatedTotCap( Mode ) > 0.0 ) {
-							// For autosizing the rated SHR, we set a minimum SHR of 0.676 and a maximum of 0.798. The min SHR occurs occurs at the
-							// minimum flow / capacity ratio = MinRatedVolFlowPerRatedTotCap = 0.00004027 [m3/s / W] = 300 [cfm/ton].
-							// The max SHR occurs at maximum flow / capacity ratio = MaxRatedVolFlowPerRatedTotCap = 0.00006041 [m3/s / W] = 450 [cfm/ton].
-							// For flow / capacity ratios between the min and max we linearly interpolate between min and max SHR. Thus rated SHR is a
-							// linear function of the rated flow / capacity ratio. This linear function (see below) is the result of a regression
-							// of flow/capacity ratio vs SHR for several actual coils.
-							RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / DXCoil( DXCoilNum ).RatedTotCap( Mode );
-							if ( DXCT == RegularDXCoil ) {
-								if ( RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap( DXCT ) ) {
-									RatedSHRDes = 0.431 + 6086.0 * MaxRatedVolFlowPerRatedTotCap( DXCT );
-								} else if ( RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap( DXCT ) ) {
-									RatedSHRDes = 0.431 + 6086.0 * MinRatedVolFlowPerRatedTotCap( DXCT );
-								} else {
-									RatedSHRDes = 0.431 + 6086.0 * RatedVolFlowPerRatedTotCap;
-								}
-							} else { // DOASDXCoil, or DXCT = 2
-								if ( RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap( DXCT ) ) {
-									RatedSHRDes = 0.389 + 7684.0 * MaxRatedVolFlowPerRatedTotCap( DXCT );
-								} else if ( RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap( DXCT ) ) {
-									RatedSHRDes = 0.389 + 7684.0 * MinRatedVolFlowPerRatedTotCap( DXCT );
-								} else {
-									RatedSHRDes = 0.389 + 7684.0 * RatedVolFlowPerRatedTotCap;
-								}
-							}
-						} else {
-							RatedSHRDes = 1.0;
-						}
-						if ( DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode ) ) {
-							RatedSHRDes = DXCoil( DXCoilNum ).RatedSHREMSOverrideValue( Mode );
-						}
-						if ( IsAutoSize ) { // Design Size values are available for both autosized and hard-sized
-							DXCoil( DXCoilNum ).RatedSHR( Mode ) = RatedSHRDes;
-							if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
-								ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "Design Size Rated Sensible Heat Ratio", RatedSHRDes );
-							} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
-								ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated High Speed Sensible Heat Ratio", RatedSHRDes );
-							} else {
-								ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated Sensible Heat Ratio", RatedSHRDes );
-							}
-						} else { // Hard size with sizing data
-							if ( DXCoil( DXCoilNum ).RatedSHR( Mode ) > 0.0 && RatedSHRDes > 0.0 ) {
-								RatedSHRUser = DXCoil( DXCoilNum ).RatedSHR( Mode );
-								if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "Design Size Rated Sensible Heat Ratio", RatedSHRDes, "User-Specified Rated Sensible Heat Ratio", RatedSHRUser );
-									if ( DisplayExtraWarnings ) {
-										if ( ( std::abs( RatedSHRDes - RatedSHRUser ) / RatedSHRUser ) > AutoVsHardSizingThreshold ) {
-											ShowMessage( "SizeDxCoil: Potential issue with equipment sizing for " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
-											ShowContinueError( "User-Specified Sensible Heat Ratio of " + trim( RoundSigDigits( RatedSHRUser, 3 ) ) );
-											ShowContinueError( "differs from Design Size Sensible Heat Ratio of " + trim( RoundSigDigits( RatedSHRDes, 3 ) ) );
-											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-										}
-									}
-
-								} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated High Speed Sensible Heat Ratio", RatedSHRDes, "User-Specified Rated High Speed Sensible Heat Ratio", RatedSHRUser );
-									if ( DisplayExtraWarnings ) {
-										if ( ( std::abs( RatedSHRDes - RatedSHRUser ) / RatedSHRUser ) > AutoVsHardSizingThreshold ) {
-											ShowMessage( "SizeDxCoil: Potential issue with equipment sizing for " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
-											ShowContinueError( "User-Specified Rated High Speed Sensible Heat Ratio of " + trim( RoundSigDigits( RatedSHRUser, 3 ) ) );
-											ShowContinueError( "differs from Design Size Rated High Speed Sensible Heat Ratio of " + trim( RoundSigDigits( RatedSHRDes, 3 ) ) );
-											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-										}
-									}
-								} else {
-									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated Sensible Heat Ratio", RatedSHRDes, "User-Specified Rated Sensible Heat Ratio", RatedSHRUser );
-									if ( DisplayExtraWarnings ) {
-										if ( ( std::abs( RatedSHRDes - RatedSHRUser ) / RatedSHRUser ) > AutoVsHardSizingThreshold ) {
-											ShowMessage( "SizeDxCoil: Potential issue with equipment sizing for " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
-											ShowContinueError( "User-Specified Sensible Heat Ratio of " + trim( RoundSigDigits( RatedSHRUser, 3 ) ) );
-											ShowContinueError( "differs from Design Size Sensible Heat Ratio of " + trim( RoundSigDigits( RatedSHRDes, 3 ) ) );
-											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-										}
-									}
-								}
-							}
-						}
-					} // End of reproting
+//					CpAir = PsyCpAirFnWTdb( RatedInletAirHumRat, RatedInletAirTemp, RoutineName );
+//
+//					if ( SizingDesRunThisAirSys || SizingDesRunThisZone ) HardSizeNoDesRun = false;
+//					if ( CurSysNum > 0 ) {
+//						if ( ! IsAutoSize && ! SizingDesRunThisAirSys ) {
+//							HardSizeNoDesRun = true;
+//							if ( DXCoil( DXCoilNum ).RatedSHR( Mode ) > 0.0 ) {
+//								if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "User-Specified Rated Sensible Heat Ratio", DXCoil( DXCoilNum ).RatedSHR( Mode ) );
+//								} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "User-Specified Rated High Speed Sensible Heat Ratio", DXCoil( DXCoilNum ).RatedSHR( Mode ) );
+//								} else {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "User-Specified Rated Sensible Heat Ratio", DXCoil( DXCoilNum ).RatedSHR( Mode ) );
+//								}
+//							}
+//
+//						} else { // autosize or hard-sized with system sizing data
+//
+//							CheckSysSizing( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name );
+//
+//						}
+//
+//					} else if ( CurZoneEqNum > 0 ) {
+//						if ( ! IsAutoSize && ! SizingDesRunThisZone ) {
+//							HardSizeNoDesRun = true;
+//							if ( DXCoil( DXCoilNum ).RatedSHR( Mode ) > 0.0 ) {
+//								if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "User-Specified Rated Sensible Heat Ratio", DXCoil( DXCoilNum ).RatedSHR( Mode ) );
+//								} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "User-Specified Rated High Speed Sensible Heat Ratio", DXCoil( DXCoilNum ).RatedSHR( Mode ) );
+//								} else {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name + ":" + DXCoil( DXCoilNum ).CoilPerformanceName( Mode ), "User-Specified Rated Sensible Heat Ratio", DXCoil( DXCoilNum ).RatedSHR( Mode ) );
+//								}
+//							}
+//
+//						} else { // autosize or hard-sized with system sizing data
+//
+//							CheckZoneSizing( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name );
+//
+//						}
+//
+//					} // End of Sys/Zone coil type
+//
+//					if ( ! HardSizeNoDesRun ) {
+//
+//						if ( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) >= SmallAirVolFlow && DXCoil( DXCoilNum ).RatedTotCap( Mode ) > 0.0 ) {
+//							// For autosizing the rated SHR, we set a minimum SHR of 0.676 and a maximum of 0.798. The min SHR occurs occurs at the
+//							// minimum flow / capacity ratio = MinRatedVolFlowPerRatedTotCap = 0.00004027 [m3/s / W] = 300 [cfm/ton].
+//							// The max SHR occurs at maximum flow / capacity ratio = MaxRatedVolFlowPerRatedTotCap = 0.00006041 [m3/s / W] = 450 [cfm/ton].
+//							// For flow / capacity ratios between the min and max we linearly interpolate between min and max SHR. Thus rated SHR is a
+//							// linear function of the rated flow / capacity ratio. This linear function (see below) is the result of a regression
+//							// of flow/capacity ratio vs SHR for several actual coils.
+//							RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / DXCoil( DXCoilNum ).RatedTotCap( Mode );
+//							if ( DXCT == RegularDXCoil ) {
+//								if ( RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap( DXCT ) ) {
+//									RatedSHRDes = 0.431 + 6086.0 * MaxRatedVolFlowPerRatedTotCap( DXCT );
+//								} else if ( RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap( DXCT ) ) {
+//									RatedSHRDes = 0.431 + 6086.0 * MinRatedVolFlowPerRatedTotCap( DXCT );
+//								} else {
+//									RatedSHRDes = 0.431 + 6086.0 * RatedVolFlowPerRatedTotCap;
+//								}
+//							} else { // DOASDXCoil, or DXCT = 2
+//								if ( RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap( DXCT ) ) {
+//									RatedSHRDes = 0.389 + 7684.0 * MaxRatedVolFlowPerRatedTotCap( DXCT );
+//								} else if ( RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap( DXCT ) ) {
+//									RatedSHRDes = 0.389 + 7684.0 * MinRatedVolFlowPerRatedTotCap( DXCT );
+//								} else {
+//									RatedSHRDes = 0.389 + 7684.0 * RatedVolFlowPerRatedTotCap;
+//								}
+//							}
+//						} else {
+//							RatedSHRDes = 1.0;
+//						}
+//						if ( DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode ) ) {
+//							RatedSHRDes = DXCoil( DXCoilNum ).RatedSHREMSOverrideValue( Mode );
+//						}
+//						if ( IsAutoSize ) { // Design Size values are available for both autosized and hard-sized
+//							DXCoil( DXCoilNum ).RatedSHR( Mode ) = RatedSHRDes;
+//							if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+//								ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "Design Size Rated Sensible Heat Ratio", RatedSHRDes );
+//							} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
+//								ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated High Speed Sensible Heat Ratio", RatedSHRDes );
+//							} else {
+//								ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated Sensible Heat Ratio", RatedSHRDes );
+//							}
+//						} else { // Hard size with sizing data
+//							if ( DXCoil( DXCoilNum ).RatedSHR( Mode ) > 0.0 && RatedSHRDes > 0.0 ) {
+//								RatedSHRUser = DXCoil( DXCoilNum ).RatedSHR( Mode );
+//								if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, trim( DXCoil( DXCoilNum ).Name ) + ":" + trim( DXCoil( DXCoilNum ).CoilPerformanceName( Mode ) ), "Design Size Rated Sensible Heat Ratio", RatedSHRDes, "User-Specified Rated Sensible Heat Ratio", RatedSHRUser );
+//									if ( DisplayExtraWarnings ) {
+//										if ( ( std::abs( RatedSHRDes - RatedSHRUser ) / RatedSHRUser ) > AutoVsHardSizingThreshold ) {
+//											ShowMessage( "SizeDxCoil: Potential issue with equipment sizing for " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
+//											ShowContinueError( "User-Specified Sensible Heat Ratio of " + trim( RoundSigDigits( RatedSHRUser, 3 ) ) );
+//											ShowContinueError( "differs from Design Size Sensible Heat Ratio of " + trim( RoundSigDigits( RatedSHRDes, 3 ) ) );
+//											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+//											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+//										}
+//									}
+//
+//								} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated High Speed Sensible Heat Ratio", RatedSHRDes, "User-Specified Rated High Speed Sensible Heat Ratio", RatedSHRUser );
+//									if ( DisplayExtraWarnings ) {
+//										if ( ( std::abs( RatedSHRDes - RatedSHRUser ) / RatedSHRUser ) > AutoVsHardSizingThreshold ) {
+//											ShowMessage( "SizeDxCoil: Potential issue with equipment sizing for " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
+//											ShowContinueError( "User-Specified Rated High Speed Sensible Heat Ratio of " + trim( RoundSigDigits( RatedSHRUser, 3 ) ) );
+//											ShowContinueError( "differs from Design Size Rated High Speed Sensible Heat Ratio of " + trim( RoundSigDigits( RatedSHRDes, 3 ) ) );
+//											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+//											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+//										}
+//									}
+//								} else {
+//									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated Sensible Heat Ratio", RatedSHRDes, "User-Specified Rated Sensible Heat Ratio", RatedSHRUser );
+//									if ( DisplayExtraWarnings ) {
+//										if ( ( std::abs( RatedSHRDes - RatedSHRUser ) / RatedSHRUser ) > AutoVsHardSizingThreshold ) {
+//											ShowMessage( "SizeDxCoil: Potential issue with equipment sizing for " + trim( DXCoil( DXCoilNum ).DXCoilType ) + " " + trim( DXCoil( DXCoilNum ).Name ) );
+//											ShowContinueError( "User-Specified Sensible Heat Ratio of " + trim( RoundSigDigits( RatedSHRUser, 3 ) ) );
+//											ShowContinueError( "differs from Design Size Sensible Heat Ratio of " + trim( RoundSigDigits( RatedSHRDes, 3 ) ) );
+//											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+//											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+//										}
+//									}
+//								}
+//							}
+//						}
+//					} // End of reproting
 				} // End of Rated SHR
 
 				// Sizing evaporator condenser air flow
