@@ -986,11 +986,7 @@ namespace Psychrometrics {
 		Real64 PWS; // Pressure -- saturated for pure water
 		Real64 W; // humidity ratio
 
-		if ( !CalledFrom.empty() ) {
-			PWS = PsyPsatFnTemp( TDB, CalledFrom );
-		} else {
-			PWS = PsyPsatFnTemp( TDB, "PsyRhFnTdbWPb" );
-		}
+		PWS = PsyPsatFnTemp( TDB, ( CalledFrom.empty() ? "PsyRhFnTdbWPb" : CalledFrom ) );
 
 		//                   Find Degree Of Saturation
 		W = max( dW, 1.0e-5 );
@@ -1127,11 +1123,7 @@ namespace Psychrometrics {
 			W_tag_r = TRANSFER( bit::bit_shift( W_tag, Grid_Shift ), W_tag_r );
 			Pb_tag_r = TRANSFER( bit::bit_shift( Pb_tag, Grid_Shift ), Pb_tag_r );
 
-			if ( !CalledFrom.empty() ) {
-				cached_Twb( hash ).Twb = PsyTwbFnTdbWPb_raw( Tdb_tag_r, W_tag_r, Pb_tag_r, CalledFrom );
-			} else {
-				cached_Twb( hash ).Twb = PsyTwbFnTdbWPb_raw( Tdb_tag_r, W_tag_r, Pb_tag_r );
-			}
+			cached_Twb( hash ).Twb = PsyTwbFnTdbWPb_raw( Tdb_tag_r, W_tag_r, Pb_tag_r, CalledFrom );
 		}
 
 		//  Twbresult_last = cached_Twb(hash)%Twb
@@ -1264,22 +1256,12 @@ namespace Psychrometrics {
 		}
 
 		// Initial temperature guess at atmospheric pressure
-		if ( !CalledFrom.empty() ) {
-			if ( Patm != last_Patm ) {
-				tBoil = PsyTsatFnPb( Patm, CalledFrom );
-				last_Patm = Patm;
-				last_tBoil = tBoil;
-			} else {
-				tBoil = last_tBoil;
-			}
+		if ( Patm != last_Patm ) {
+			tBoil = PsyTsatFnPb( Patm, ( CalledFrom.empty() ? "PsyTwbFnTdbWPb" : CalledFrom ) );
+			last_Patm = Patm;
+			last_tBoil = tBoil;
 		} else {
-			if ( Patm != last_Patm ) {
-				tBoil = PsyTsatFnPb( Patm, "PsyTwbFnTdbWPb" );
-				last_Patm = Patm;
-				last_tBoil = tBoil;
-			} else {
-				tBoil = last_tBoil;
-			}
+			tBoil = last_tBoil;
 		}
 
 		// Set initial guess of WetBulbTemp=Entering Dry Bulb Temperature
@@ -1295,11 +1277,7 @@ namespace Psychrometrics {
 			if ( WBT >= ( tBoil - 0.09 ) ) WBT = tBoil - 0.1;
 
 			// Determine the saturation pressure for wet bulb temperature
-			if ( !CalledFrom.empty() ) {
-				PSatstar = PsyPsatFnTemp( WBT, CalledFrom );
-			} else {
-				PSatstar = PsyPsatFnTemp( WBT, "PsyTwbFnTdbWPb" );
-			}
+			PSatstar = PsyPsatFnTemp( WBT, ( CalledFrom.empty() ? "PsyTwbFnTdbWPb" : CalledFrom ) );
 
 			// Determine humidity ratio for given saturation pressure
 			Wstar = 0.62198 * PSatstar / ( Patm - PSatstar );
@@ -1500,11 +1478,7 @@ namespace Psychrometrics {
 		++NumTimesCalled( iPsyWFnTdpPb );
 #endif
 
-		if ( !CalledFrom.empty() ) {
-			PDEW = PsyPsatFnTemp( TDP, CalledFrom );
-		} else {
-			PDEW = PsyPsatFnTemp( TDP, "PsyWFnTdpPb" );
-		}
+		PDEW = PsyPsatFnTemp( TDP, ( CalledFrom.empty() ? "PsyWFnTdpPb" : CalledFrom ) );
 		W = PDEW * 0.62198 / ( PB - PDEW );
 		//                                      VALIDITY TEST.
 		if ( W < 0.0 ) {
@@ -1697,11 +1671,7 @@ namespace Psychrometrics {
 			TWB = TDB;
 		}
 		//                                      CALCULATION.
-		if ( !CalledFrom.empty() ) {
-			PWET = PsyPsatFnTemp( TWB, CalledFrom );
-		} else {
-			PWET = PsyPsatFnTemp( TWB, "PsyWFnTdbTwbPb" );
-		}
+		PWET = PsyPsatFnTemp( TWB, ( CalledFrom.empty() ? "PsyWFnTdbTwbPb" : CalledFrom ) );
 		WET = 0.62198 * PWET / ( PB - PWET );
 
 		W = ( ( 2501.0 - 2.381 * TWB ) * WET - ( TDB - TWB ) ) / ( 2501.0 + 1.805 * TDB - 4.186 * TWB );
@@ -1782,12 +1752,7 @@ namespace Psychrometrics {
 		++NumTimesCalled( iPsyWFnTdbRhPb );
 #endif
 
-		if ( !CalledFrom.empty() ) {
-			PDRY = PsyPsatFnTemp( TDB, CalledFrom );
-		} else {
-			PDRY = PsyPsatFnTemp( TDB, "PsyWFnTdbRhPb" );
-		}
-
+		PDRY = PsyPsatFnTemp( TDB, ( CalledFrom.empty() ? "PsyWFnTdbRhPb" : CalledFrom ) );
 		PDEW = RH * PDRY;
 
 		//Numeric error check when the temperature and RH values cause Pdew to equal or exceed
@@ -1893,11 +1858,7 @@ namespace Psychrometrics {
 			cached_Psat( hash ).iTdb = Tdb_tag;
 			Tdb_tag_r = TRANSFER( bit::bit_shift( Tdb_tag, Grid_Shift ), Tdb_tag_r );
 
-			if ( !CalledFrom.empty() ) {
-				cached_Psat( hash ).Psat = PsyPsatFnTemp_raw( Tdb_tag_r, CalledFrom );
-			} else {
-				cached_Psat( hash ).Psat = PsyPsatFnTemp_raw( Tdb_tag_r );
-			}
+			cached_Psat( hash ).Psat = PsyPsatFnTemp_raw( Tdb_tag_r, CalledFrom );
 		}
 
 		Pascal = cached_Psat( hash ).Psat;
@@ -2361,11 +2322,7 @@ Label170: ;
 			for ( iter = 1; iter <= itmax; ++iter ) {
 
 				// Calculate saturation pressure for estimated boiling temperature
-				if ( !CalledFrom.empty() ) {
-					pSat = PsyPsatFnTemp( tSat, CalledFrom );
-				} else {
-					pSat = PsyPsatFnTemp( tSat, "PsyTsatFnPb" );
-				}
+				pSat = PsyPsatFnTemp( tSat, ( CalledFrom.empty() ? "PsyTsatFnPb" : CalledFrom ) );
 
 				//Compare with specified pressure and update estimate of temperature
 				error = Press - pSat;
