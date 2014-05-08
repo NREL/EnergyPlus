@@ -624,6 +624,7 @@ namespace InputProcessor {
 	bool
 	SameString( std::string const & s,  std::string const & t )
 	{
+		// case insensitive comparison
 		return equali( s, t );
 	}
 
@@ -631,6 +632,7 @@ namespace InputProcessor {
 	bool
 	SameString( std::string const & s,  c_cstring const & t )
 	{
+		// case insensitive comparison
 		return equali( s, t );
 	}
 
@@ -638,6 +640,7 @@ namespace InputProcessor {
 	bool
 	SameString( c_cstring const & s,  std::string const & t )
 	{
+		// case insensitive comparison
 		return equali( s, t );
 	}
 
@@ -645,6 +648,7 @@ namespace InputProcessor {
 	bool
 	SameString( c_cstring const & s,  c_cstring const & t )
 	{
+		// case insensitive comparison
 		return equali( s, t );
 	}
 
