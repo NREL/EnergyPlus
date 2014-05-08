@@ -2373,7 +2373,7 @@ namespace PackagedThermalStorageCoil {
 			TotCap = TESCoil( TESCoilNum ).CoolingOnlyRatedTotCap * TotCapTempModFac * TotCapFlowModFac;
 			// now see if coil might be running dry
 			PartLoadOutAirEnth = EvapInletEnthalpy - ( TotCap * PartLoadRatio ) / EvapAirMassFlow;
-			PartLoadDryCoilOutAirTemp = PsyTdbFnHW( PartLoadOutAirEnth, EvapInletHumRat, "CalcTESCoilCoolingOnlyMode" );
+			PartLoadDryCoilOutAirTemp = PsyTdbFnHW( PartLoadOutAirEnth, EvapInletHumRat );
 			if ( PartLoadDryCoilOutAirTemp > PsyTsatFnHPb( PartLoadOutAirEnth, OutBaroPress, "CalcTESCoilCoolingOnlyMode" ) ) {
 				CoilMightBeDry = true;
 				// find wADP, humidity ratio at apparatus dewpoint and inlet hum rat that would have dry coil
@@ -2443,7 +2443,7 @@ namespace PackagedThermalStorageCoil {
 			hTinwout = EvapInletEnthalpy - ( 1.0 - SHR ) * ( TotCap / EvapAirMassFlow );
 			//The following will often throw psych warnings for neg w, suppress warnings because error condition is handled in next IF
 			FullLoadOutAirHumRat = PsyWFnTdbH( EvapInletDryBulb, hTinwout, "CalcTESCoilCoolingOnlyMode", true );
-			FullLoadOutAirTemp = PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat, "CalcTESCoilCoolingOnlyMode" );
+			FullLoadOutAirTemp = PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat );
 			// Check for saturation error and modify temperature at constant enthalpy
 			if ( FullLoadOutAirTemp < PsyTsatFnHPb( FullLoadOutAirEnth, OutBaroPress, "CalcTESCoilCoolingOnlyMode" ) ) {
 				FullLoadOutAirTemp = PsyTsatFnHPb( FullLoadOutAirEnth, OutBaroPress, "CalcTESCoilCoolingOnlyMode" );
@@ -2478,7 +2478,7 @@ namespace PackagedThermalStorageCoil {
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).MassFlowRate = TESCoil( TESCoilNum ).CondenserAirMassFlow;
 			CondInletEnthalpy = PsyHFnTdbW( CondInletTemp, CondInletHumRat, "CalcTESCoilCoolingOnlyMode" );
 			CondOutletEnthalpy = CondInletEnthalpy + QdotCond / TESCoil( TESCoilNum ).CondenserAirMassFlow;
-			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp = PsyTdbFnHW( CondOutletEnthalpy, CondInletHumRat, "CalcTESCoilCoolingOnlyMode" );
+			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp = PsyTdbFnHW( CondOutletEnthalpy, CondInletHumRat );
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat = CondInletHumRat;
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Enthalpy = CondOutletEnthalpy;
 
@@ -2720,7 +2720,7 @@ namespace PackagedThermalStorageCoil {
 			EvapTotCap = TESCoil( TESCoilNum ).CoolingAndChargeRatedTotCap * EvapTotCapTempModFac * EvapTotCapFlowModFac;
 			// now see if coil is running dry
 			PartLoadOutAirEnth = EvapInletEnthalpy - ( EvapTotCap * PartLoadRatio ) / EvapAirMassFlow;
-			PartLoadDryCoilOutAirTemp = PsyTdbFnHW( PartLoadOutAirEnth, EvapInletHumRat, "CalcTESCoilCoolingAndChargeMode" );
+			PartLoadDryCoilOutAirTemp = PsyTdbFnHW( PartLoadOutAirEnth, EvapInletHumRat );
 			if ( PartLoadDryCoilOutAirTemp > PsyTsatFnHPb( PartLoadOutAirEnth, OutBaroPress, "CalcTESCoilCoolingAndChargeMode" ) ) {
 				CoilMightBeDry = true;
 				// find wADP, humidity ratio at apparatus dewpoint and inlet hum rat that would have dry coil
@@ -2832,7 +2832,7 @@ namespace PackagedThermalStorageCoil {
 			hTinwout = EvapInletEnthalpy - ( 1.0 - SHR ) * ( EvapTotCap / EvapAirMassFlow );
 			//The following will often throw psych warnings for neg w, suppress warnings because error condition is handled in next IF
 			FullLoadOutAirHumRat = PsyWFnTdbH( EvapInletDryBulb, hTinwout, "CalcTESCoilCoolingAndChargeMode", true );
-			FullLoadOutAirTemp = PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat, "CalcTESCoilCoolingAndChargeMode" );
+			FullLoadOutAirTemp = PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat );
 			// Check for saturation error and modify temperature at constant enthalpy
 			if ( FullLoadOutAirTemp < PsyTsatFnHPb( FullLoadOutAirEnth, OutBaroPress, "CalcTESCoilCoolingAndChargeMode" ) ) {
 				FullLoadOutAirTemp = PsyTsatFnHPb( FullLoadOutAirEnth, OutBaroPress, "CalcTESCoilCoolingAndChargeMode" );
@@ -2859,7 +2859,7 @@ namespace PackagedThermalStorageCoil {
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).MassFlowRate = TESCoil( TESCoilNum ).CondenserAirMassFlow;
 			CondInletEnthalpy = PsyHFnTdbW( CondInletTemp, CondInletHumRat, "CalcTESCoilCoolingAndChargeMode" );
 			CondOutletEnthalpy = CondInletEnthalpy + QdotCond / TESCoil( TESCoilNum ).CondenserAirMassFlow;
-			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp = PsyTdbFnHW( CondOutletEnthalpy, CondInletHumRat, "CalcTESCoilCoolingAndChargeMode" );
+			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp = PsyTdbFnHW( CondOutletEnthalpy, CondInletHumRat );
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat = CondInletHumRat;
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Enthalpy = CondOutletEnthalpy;
 
@@ -2945,7 +2945,7 @@ namespace PackagedThermalStorageCoil {
 				Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).MassFlowRate = TESCoil( TESCoilNum ).CondenserAirMassFlow;
 				CondInletEnthalpy = PsyHFnTdbW( CondInletTemp, CondInletHumRat, "CalcTESCoilCoolingAndChargeMode" );
 				CondOutletEnthalpy = CondInletEnthalpy + QdotCond / TESCoil( TESCoilNum ).CondenserAirMassFlow;
-				Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp = PsyTdbFnHW( CondOutletEnthalpy, CondInletHumRat, "CalcTESCoilCoolingAndChargeMode" );
+				Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp = PsyTdbFnHW( CondOutletEnthalpy, CondInletHumRat );
 				Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat = CondInletHumRat;
 				Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Enthalpy = CondOutletEnthalpy;
 				TESCoil( TESCoilNum ).CondenserRuntimeFraction = 1.0;
@@ -3153,7 +3153,7 @@ namespace PackagedThermalStorageCoil {
 			EvapTotCap = TESCoil( TESCoilNum ).CoolingAndDischargeRatedTotCap * EvapTotCapTempModFac * EvapTotCapFlowModFac;
 			// now see if coil is running dry
 			PartLoadOutAirEnth = EvapInletEnthalpy - ( EvapTotCap * PartLoadRatio ) / EvapAirMassFlow;
-			PartLoadDryCoilOutAirTemp = PsyTdbFnHW( PartLoadOutAirEnth, EvapInletHumRat, "CalcTESCoilCoolingAndDischargeMode" );
+			PartLoadDryCoilOutAirTemp = PsyTdbFnHW( PartLoadOutAirEnth, EvapInletHumRat );
 			if ( PartLoadDryCoilOutAirTemp > PsyTsatFnHPb( PartLoadOutAirEnth, OutBaroPress, "CalcTESCoilCoolingAndDischargeMode" ) ) {
 				CoilMightBeDry = true;
 				// find wADP, humidity ratio at apparatus dewpoint and inlet hum rat that would have dry coil
@@ -3267,7 +3267,7 @@ namespace PackagedThermalStorageCoil {
 			hTinwout = EvapInletEnthalpy - ( 1.0 - SHR ) * ( TotCap / EvapAirMassFlow );
 			//The following will often throw psych warnings for neg w, suppress warnings because error condition is handled in next IF
 			FullLoadOutAirHumRat = PsyWFnTdbH( EvapInletDryBulb, hTinwout, "CalcTESCoilCoolingAndDischargeMode", true );
-			FullLoadOutAirTemp = PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat, "CalcTESCoilCoolingAndDischargeMode" );
+			FullLoadOutAirTemp = PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat );
 			// Check for saturation error and modify temperature at constant enthalpy
 			if ( FullLoadOutAirTemp < PsyTsatFnHPb( FullLoadOutAirEnth, OutBaroPress, "CalcTESCoilCoolingAndDischargeMode" ) ) {
 				FullLoadOutAirTemp = PsyTsatFnHPb( FullLoadOutAirEnth, OutBaroPress, "CalcTESCoilCoolingAndDischargeMode" );
@@ -3293,7 +3293,7 @@ namespace PackagedThermalStorageCoil {
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).MassFlowRate = TESCoil( TESCoilNum ).CondenserAirMassFlow;
 			CondInletEnthalpy = PsyHFnTdbW( CondInletTemp, CondInletHumRat, "CalcTESCoilCoolingAndDischargeMode" );
 			CondOutletEnthalpy = CondInletEnthalpy + QdotCond / TESCoil( TESCoilNum ).CondenserAirMassFlow;
-			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp = PsyTdbFnHW( CondOutletEnthalpy, CondInletHumRat, "CalcTESCoilCoolingAndDischargeMode" );
+			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp = PsyTdbFnHW( CondOutletEnthalpy, CondInletHumRat );
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat = CondInletHumRat;
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Enthalpy = CondOutletEnthalpy;
 
@@ -3493,7 +3493,7 @@ namespace PackagedThermalStorageCoil {
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).MassFlowRate = TESCoil( TESCoilNum ).CondenserAirMassFlow;
 			CondInletEnthalpy = PsyHFnTdbW( CondInletTemp, CondInletHumRat, "CalcTESCoilChargeOnlyMode" );
 			CondOutletEnthalpy = CondInletEnthalpy + QdotCond / TESCoil( TESCoilNum ).CondenserAirMassFlow;
-			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp = PsyTdbFnHW( CondOutletEnthalpy, CondInletHumRat, "CalcTESCoilChargeOnlyMode" );
+			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp = PsyTdbFnHW( CondOutletEnthalpy, CondInletHumRat );
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat = CondInletHumRat;
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Enthalpy = CondOutletEnthalpy;
 
@@ -3690,7 +3690,7 @@ namespace PackagedThermalStorageCoil {
 			}
 			// now see if coil is running dry
 			PartLoadOutAirEnth = EvapInletEnthalpy - ( TotCap * PartLoadRatio ) / EvapAirMassFlow;
-			PartLoadDryCoilOutAirTemp = PsyTdbFnHW( PartLoadOutAirEnth, EvapInletHumRat, "CalcTESCoilDischargeOnlyMode" );
+			PartLoadDryCoilOutAirTemp = PsyTdbFnHW( PartLoadOutAirEnth, EvapInletHumRat );
 			if ( PartLoadDryCoilOutAirTemp > PsyTsatFnHPb( PartLoadOutAirEnth, OutBaroPress, "CalcTESCoilDischargeOnlyMode" ) ) {
 				CoilMightBeDry = true;
 				// find wADP, humidity ratio at apparatus dewpoint and inlet hum rat that would have dry coil
@@ -3758,7 +3758,7 @@ namespace PackagedThermalStorageCoil {
 			hTinwout = EvapInletEnthalpy - ( 1.0 - SHR ) * ( TotCap / EvapAirMassFlow );
 			//The following will often throw psych warnings for neg w, suppress warnings because error condition is handled in next IF
 			FullLoadOutAirHumRat = PsyWFnTdbH( EvapInletDryBulb, hTinwout, "CalcTESCoilDischargeOnlyMode", true );
-			FullLoadOutAirTemp = PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat, "CalcTESCoilDischargeOnlyMode" );
+			FullLoadOutAirTemp = PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat );
 			// Check for saturation error and modify temperature at constant enthalpy
 			if ( FullLoadOutAirTemp < PsyTsatFnHPb( FullLoadOutAirEnth, OutBaroPress, "CalcTESCoilDischargeOnlyMode" ) ) {
 				FullLoadOutAirTemp = PsyTsatFnHPb( FullLoadOutAirEnth, OutBaroPress, "CalcTESCoilDischargeOnlyMode" );

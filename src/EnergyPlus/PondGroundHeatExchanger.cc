@@ -795,7 +795,7 @@ namespace PondGroundHeatExchanger {
 		HumRatioAir = PsyWFnTdbTwbPb( OutDryBulb, OutWetBulb, OutBaroPress );
 		HumRatioFilm = PsyWFnTdbTwbPb( PondBulkTemp, PondBulkTemp, OutBaroPress );
 		SpecHeatAir = PsyCpAirFnWTdb( HumRatioAir, OutDryBulb );
-		LatentHeatAir = PsyHfgAirFnWTdb( HumRatioAir, OutDryBulb, "PondGroundHeatExchanger:CalcTotalFlux" );
+		LatentHeatAir = PsyHfgAirFnWTdb( HumRatioAir, OutDryBulb );
 
 		FluxEvap = std::pow( ( PrantlAir / SchmidtAir ), 2.0 ) / 3.0 * ConvCoef / SpecHeatAir * ( HumRatioFilm - HumRatioAir ) * LatentHeatAir;
 

@@ -1856,7 +1856,7 @@ namespace WaterToAirHeatPumpSimple {
 			// continuous fan, cycling compressor
 			SimpleWatertoAirHP( HPNum ).OutletAirEnthalpy = PartLoadRatio * LoadSideOutletEnth + ( 1.0 - PartLoadRatio ) * LoadSideInletEnth;
 			SimpleWatertoAirHP( HPNum ).OutletAirHumRat = PartLoadRatio * LoadSideOutletHumRat + ( 1.0 - PartLoadRatio ) * LoadSideInletHumRat;
-			SimpleWatertoAirHP( HPNum ).OutletAirDBTemp = PsyTdbFnHW( SimpleWatertoAirHP( HPNum ).OutletAirEnthalpy, SimpleWatertoAirHP( HPNum ).OutletAirHumRat, RoutineName );
+			SimpleWatertoAirHP( HPNum ).OutletAirDBTemp = PsyTdbFnHW( SimpleWatertoAirHP( HPNum ).OutletAirEnthalpy, SimpleWatertoAirHP( HPNum ).OutletAirHumRat );
 			PLRCorrLoadSideMdot = LoadSideMassFlowRate;
 		} else {
 			// default to cycling fan, cycling compressor
@@ -2055,7 +2055,7 @@ namespace WaterToAirHeatPumpSimple {
 			// continuous fan, cycling compressor
 			SimpleWatertoAirHP( HPNum ).OutletAirEnthalpy = PartLoadRatio * LoadSideOutletEnth + ( 1.0 - PartLoadRatio ) * LoadSideInletEnth;
 			SimpleWatertoAirHP( HPNum ).OutletAirHumRat = PartLoadRatio * LoadSideOutletHumRat + ( 1.0 - PartLoadRatio ) * LoadSideInletHumRat;
-			SimpleWatertoAirHP( HPNum ).OutletAirDBTemp = PsyTdbFnHW( SimpleWatertoAirHP( HPNum ).OutletAirEnthalpy, SimpleWatertoAirHP( HPNum ).OutletAirHumRat, RoutineName );
+			SimpleWatertoAirHP( HPNum ).OutletAirDBTemp = PsyTdbFnHW( SimpleWatertoAirHP( HPNum ).OutletAirEnthalpy, SimpleWatertoAirHP( HPNum ).OutletAirHumRat );
 			PLRCorrLoadSideMdot = LoadSideMassFlowRate;
 		} else {
 			// default to cycling fan, cycling compressor

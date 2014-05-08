@@ -3615,7 +3615,7 @@ namespace VariableSpeedCoils {
 			// continuous fan, cycling compressor
 			VarSpeedCoil( DXCoilNum ).OutletAirEnthalpy = PartLoadRatio * LoadSideOutletEnth + ( 1.0 - PartLoadRatio ) * LoadSideInletEnth;
 			VarSpeedCoil( DXCoilNum ).OutletAirHumRat = PartLoadRatio * LoadSideOutletHumRat + ( 1.0 - PartLoadRatio ) * LoadSideInletHumRat;
-			VarSpeedCoil( DXCoilNum ).OutletAirDBTemp = PsyTdbFnHW( VarSpeedCoil( DXCoilNum ).OutletAirEnthalpy, VarSpeedCoil( DXCoilNum ).OutletAirHumRat, RoutineName );
+			VarSpeedCoil( DXCoilNum ).OutletAirDBTemp = PsyTdbFnHW( VarSpeedCoil( DXCoilNum ).OutletAirEnthalpy, VarSpeedCoil( DXCoilNum ).OutletAirHumRat );
 			PLRCorrLoadSideMdot = LoadSideMassFlowRate;
 		} else {
 			// default to cycling fan, cycling compressor
@@ -4066,7 +4066,7 @@ namespace VariableSpeedCoils {
 			// continuous fan, cycling compressor
 			VarSpeedCoil( DXCoilNum ).OutletAirEnthalpy = PartLoadRatio * LoadSideOutletEnth + ( 1.0 - PartLoadRatio ) * LoadSideInletEnth;
 			VarSpeedCoil( DXCoilNum ).OutletAirHumRat = PartLoadRatio * LoadSideOutletHumRat + ( 1.0 - PartLoadRatio ) * LoadSideInletHumRat;
-			VarSpeedCoil( DXCoilNum ).OutletAirDBTemp = PsyTdbFnHW( VarSpeedCoil( DXCoilNum ).OutletAirEnthalpy, VarSpeedCoil( DXCoilNum ).OutletAirHumRat, RoutineName );
+			VarSpeedCoil( DXCoilNum ).OutletAirDBTemp = PsyTdbFnHW( VarSpeedCoil( DXCoilNum ).OutletAirEnthalpy, VarSpeedCoil( DXCoilNum ).OutletAirHumRat );
 			PLRCorrLoadSideMdot = LoadSideMassFlowRate;
 		} else {
 			// default to cycling fan, cycling compressor

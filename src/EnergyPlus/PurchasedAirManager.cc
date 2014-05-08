@@ -1473,7 +1473,7 @@ namespace PurchasedAirManager {
 						if ( CoolSensOutput >= PurchAir( PurchAirNum ).MaxCoolTotCap ) {
 							CoolSensOutput = PurchAir( PurchAirNum ).MaxCoolTotCap;
 							SupplyEnthalpy = MixedAirEnthalpy - CoolSensOutput / SupplyMassFlowRate;
-							SupplyTemp = PsyTdbFnHW( SupplyEnthalpy, SupplyHumRat, "CalcPurchAirLoads" );
+							SupplyTemp = PsyTdbFnHW( SupplyEnthalpy, SupplyHumRat );
 							// This is the cooling mode, so SupplyTemp can't be more than MixedAirTemp
 							SupplyTemp = min( SupplyTemp, MixedAirTemp );
 						} // Capacity limit exceeded
@@ -1565,7 +1565,7 @@ namespace PurchasedAirManager {
 										SupplyHumRat = PsyWFnTdbH( SupplyTemp, SupplyEnthalpy, "CalcPurchAirLoads" );
 										CoolLatOutput = PurchAir( PurchAirNum ).MaxCoolTotCap;
 									} else {
-										SupplyTemp = PsyTdbFnHW( SupplyEnthalpy, SupplyHumRat, "CalcPurchAirLoads" );
+										SupplyTemp = PsyTdbFnHW( SupplyEnthalpy, SupplyHumRat );
 										// This is the cooling mode, so SupplyTemp can't be more than MixedAirTemp
 										SupplyTemp = min( SupplyTemp, MixedAirTemp );
 									}
@@ -2132,7 +2132,7 @@ namespace PurchasedAirManager {
 				MixedAirEnthalpy = ( RecircMassFlowRate * Node( RecircNodeNum ).Enthalpy + OAMassFlowRate * OAAfterHtRecEnthalpy ) / SupplyMassFlowRate;
 				MixedAirHumRat = ( RecircMassFlowRate * Node( RecircNodeNum ).HumRat + OAMassFlowRate * OAAfterHtRecHumRat ) / SupplyMassFlowRate;
 				// Mixed air temperature is calculated from the mixed air enthalpy and humidity ratio.
-				MixedAirTemp = PsyTdbFnHW( MixedAirEnthalpy, MixedAirHumRat, "CalcPurchAirMixedAir" );
+				MixedAirTemp = PsyTdbFnHW( MixedAirEnthalpy, MixedAirHumRat );
 			} else {
 				RecircMassFlowRate = 0.0;
 				MixedAirEnthalpy = OAAfterHtRecEnthalpy;

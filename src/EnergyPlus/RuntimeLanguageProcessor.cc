@@ -2254,7 +2254,7 @@ namespace RuntimeLanguageProcessor {
 				ReturnValue = SetErlValueNumber( PsyCpAirFnWTdb( Operand( 1 ).Number, Operand( 2 ).Number, "EMS Built-In Function" ) ); // result =>   heat capacity of air {J/kg-C} | Humidity ratio (kg water vapor/kg dry air) | drybulb (C)
 			} else if ( SELECT_CASE_var == FuncHfgAirFnWTdb ) {
 				//BG comment these two psych funct seems confusing (?) is this the enthalpy of water in the air?
-				ReturnValue = SetErlValueNumber( PsyHfgAirFnWTdb( Operand( 1 ).Number, Operand( 2 ).Number, "EMS Built-In Function" ) ); // result =>   heat of vaporization for moist air {J/kg} | Humidity ratio (kg water vapor/kg dry air) | drybulb (C)
+				ReturnValue = SetErlValueNumber( PsyHfgAirFnWTdb( Operand( 1 ).Number, Operand( 2 ).Number ) ); // result =>   heat of vaporization for moist air {J/kg} | Humidity ratio (kg water vapor/kg dry air) | drybulb (C)
 			} else if ( SELECT_CASE_var == FuncHgAirFnWTdb ) {
 				// confusing ?  seems like this is really classical Hfg, heat of vaporization
 				ReturnValue = SetErlValueNumber( PsyHgAirFnWTdb( Operand( 1 ).Number, Operand( 2 ).Number, "EMS Built-In Function" ) ); // result =>   enthalpy of the gas {units?} | Humidity ratio (kg water vapor/kg dry air) | drybulb (C)
@@ -2267,7 +2267,7 @@ namespace RuntimeLanguageProcessor {
 			} else if ( SELECT_CASE_var == FuncHFnTdbRhPb ) {
 				ReturnValue = SetErlValueNumber( PsyHFnTdbRhPb( Operand( 1 ).Number, Operand( 2 ).Number, Operand( 3 ).Number, "EMS Built-In Function" ) ); // result =>  enthalpy (J/kg) | drybulb (C) | relative humidity value (0.0 - 1.0) | pressure (Pa)
 			} else if ( SELECT_CASE_var == FuncTdbFnHW ) {
-				ReturnValue = SetErlValueNumber( PsyTdbFnHW( Operand( 1 ).Number, Operand( 2 ).Number, "EMS Built-In Function" ) ); // result =>  dry-bulb temperature {C} | enthalpy (J/kg) | Humidity ratio (kg water vapor/kg dry air)
+				ReturnValue = SetErlValueNumber( PsyTdbFnHW( Operand( 1 ).Number, Operand( 2 ).Number ) ); // result =>  dry-bulb temperature {C} | enthalpy (J/kg) | Humidity ratio (kg water vapor/kg dry air)
 			} else if ( SELECT_CASE_var == FuncRhovFnTdbRh ) {
 				ReturnValue = SetErlValueNumber( PsyRhovFnTdbRh( Operand( 1 ).Number, Operand( 2 ).Number, "EMS Built-In Function" ) ); // result =>  Vapor density in air (kg/m3) | drybulb (C) | relative humidity value (0.0 - 1.0)
 			} else if ( SELECT_CASE_var == FuncRhovFnTdbRhLBnd0C ) {

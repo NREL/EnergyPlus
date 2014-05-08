@@ -2277,7 +2277,7 @@ namespace HeatRecovery {
 
 				//     Check for saturation in the model's calculated supply outlet and reset temp, then humidity ratio at constant enthalpy
 				//     Reset delta T and delta W such that the model does not allow an outlet condition over saturation
-				TestSaturationEnthalpy = PsyHFnTdbW( FullLoadSupOutTemp, FullLoadSupOutHumRat, ThisSub + " TestSatSup" );
+				TestSaturationEnthalpy = PsyHFnTdbW( FullLoadSupOutTemp, FullLoadSupOutHumRat );
 				if ( PsyTsatFnHPb( TestSaturationEnthalpy, OutBaroPress, ThisSub + " TSat" ) > FullLoadSupOutTemp ) {
 					FullLoadSupOutTemp = PsyTsatFnHPb( TestSaturationEnthalpy, OutBaroPress, ThisSub + " TSat-FullLoadOutTemp" );
 					FullLoadSupOutHumRat = PsyWFnTdbH( FullLoadSupOutTemp, TestSaturationEnthalpy, ThisSub + " TSat-FullLoadOutHumRat" );
@@ -2334,10 +2334,10 @@ namespace HeatRecovery {
 				//     the mass flow rate on the process and secondary side of HX may be imbalanced when the HX is used in the OA branch
 				//     use the average mass flow rate to avoid psych warnings, mass flow rates will converge at the end of the iteration
 				//     if the air mass flow rates do not converge, this model should not be used
-				CSup = AverageMassFlowRate * PsyCpAirFnWTdb( ExchCond( ExNum ).SupInHumRat, ExchCond( ExNum ).SupInTemp, ThisSub + " CSup" );
-				CSec = AverageMassFlowRate * PsyCpAirFnWTdb( ExchCond( ExNum ).SecInHumRat, ExchCond( ExNum ).SecInTemp, ThisSub + " CSec" );
+				CSup = AverageMassFlowRate * PsyCpAirFnWTdb( ExchCond( ExNum ).SupInHumRat, ExchCond( ExNum ).SupInTemp );
+				CSec = AverageMassFlowRate * PsyCpAirFnWTdb( ExchCond( ExNum ).SecInHumRat, ExchCond( ExNum ).SecInTemp );
 
-				ExchCond( ExNum ).SupOutEnth = PsyHFnTdbW( ExchCond( ExNum ).SupOutTemp, ExchCond( ExNum ).SupOutHumRat, ThisSub + " SupOutEnth" );
+				ExchCond( ExNum ).SupOutEnth = PsyHFnTdbW( ExchCond( ExNum ).SupOutTemp, ExchCond( ExNum ).SupOutHumRat );
 
 				SensHeatRecRate = CSup * ( ExchCond( ExNum ).SupOutTemp - ExchCond( ExNum ).SupInTemp );
 
@@ -2369,7 +2369,7 @@ namespace HeatRecovery {
 		} //ENDIF for "IF (UnitOn) THEN"
 
 		// Report the process side heat transfer
-		CSec = AverageMassFlowRate * PsyCpAirFnWTdb( ExchCond( ExNum ).SecInHumRat, ExchCond( ExNum ).SecInTemp, ThisSub );
+		CSec = AverageMassFlowRate * PsyCpAirFnWTdb( ExchCond( ExNum ).SecInHumRat, ExchCond( ExNum ).SecInTemp );
 		ProcessSensHeatRecRate = CSec * ( ExchCond( ExNum ).SecOutTemp - ExchCond( ExNum ).SecInTemp );
 
 		ProcessTotHeatRecRate = ExchCond( ExNum ).SecOutMassFlow * ( ExchCond( ExNum ).SecOutEnth - ExchCond( ExNum ).SecInEnth );

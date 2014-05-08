@@ -4572,7 +4572,7 @@ namespace ConvectionCoefficients {
 		lambda = 2.873E-3 + 7.76E-5 * TmeanFilmKelvin; // Table B.1 in ISO 15099,
 		mu = 3.723E-6 + 4.94E-8 * TmeanFilmKelvin; // Table B.2 in ISO 15099
 
-		Cp = PsyCpAirFnWTdb( AirHumRat, TmeanFilm, "WindowTempsForNominalCond" );
+		Cp = PsyCpAirFnWTdb( AirHumRat, TmeanFilm );
 
 		TiltDeg = Surface( SurfNum ).Tilt;
 		sineTilt = Surface( SurfNum ).SinTilt;
