@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace OutsideEnergySources {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
@@ -33,10 +31,10 @@ namespace OutsideEnergySources {
 	struct OutsideEnergySourceSpecs
 	{
 		// Members
-		Fstring PlantLoopID; // main plant loop ID
-		Fstring SecndryLoopID; // secondary chiller loop (cond loop) ID
-		Fstring ScheduleID; // equipment availability schedule
-		Fstring Name; // user identifier
+		std::string PlantLoopID; // main plant loop ID
+		std::string SecndryLoopID; // secondary chiller loop (cond loop) ID
+		std::string ScheduleID; // equipment availability schedule
+		std::string Name; // user identifier
 		Real64 NomCap; // design nominal capacity of district service
 		int CapFractionSchedNum; // capacity modifier schedule number
 		int InletNodeNum; // Node number on the inlet side of the plant
@@ -57,10 +55,6 @@ namespace OutsideEnergySources {
 
 		// Default Constructor
 		OutsideEnergySourceSpecs() :
-			PlantLoopID( MaxNameLength ),
-			SecndryLoopID( MaxNameLength ),
-			ScheduleID( MaxNameLength ),
-			Name( MaxNameLength ),
 			NomCap( 0.0 ),
 			CapFractionSchedNum( 0 ),
 			InletNodeNum( 0 ),
@@ -80,10 +74,10 @@ namespace OutsideEnergySources {
 
 		// Member Constructor
 		OutsideEnergySourceSpecs(
-			Fstring const & PlantLoopID, // main plant loop ID
-			Fstring const & SecndryLoopID, // secondary chiller loop (cond loop) ID
-			Fstring const & ScheduleID, // equipment availability schedule
-			Fstring const & Name, // user identifier
+			std::string const & PlantLoopID, // main plant loop ID
+			std::string const & SecndryLoopID, // secondary chiller loop (cond loop) ID
+			std::string const & ScheduleID, // equipment availability schedule
+			std::string const & Name, // user identifier
 			Real64 const NomCap, // design nominal capacity of district service
 			int const CapFractionSchedNum, // capacity modifier schedule number
 			int const InletNodeNum, // Node number on the inlet side of the plant
@@ -100,10 +94,10 @@ namespace OutsideEnergySources {
 			bool const BeginEnvrnInitFlag,
 			bool const CheckEquipName
 		) :
-			PlantLoopID( MaxNameLength, PlantLoopID ),
-			SecndryLoopID( MaxNameLength, SecndryLoopID ),
-			ScheduleID( MaxNameLength, ScheduleID ),
-			Name( MaxNameLength, Name ),
+			PlantLoopID( PlantLoopID ),
+			SecndryLoopID( SecndryLoopID ),
+			ScheduleID( ScheduleID ),
+			Name( Name ),
 			NomCap( NomCap ),
 			CapFractionSchedNum( CapFractionSchedNum ),
 			InletNodeNum( InletNodeNum ),
@@ -162,8 +156,8 @@ namespace OutsideEnergySources {
 
 	void
 	SimOutsideEnergy(
-		Fstring const & EnergyType,
-		Fstring const & EquipName,
+		std::string const & EnergyType,
+		std::string const & EquipName,
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex,
 		bool const RunFlag,

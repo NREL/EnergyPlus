@@ -56,7 +56,6 @@ namespace ZoneAirLoopEquipmentManager {
 	using DataGlobals::BeginDayFlag;
 	using DataGlobals::BeginHourFlag;
 	using DataGlobals::BeginTimeStepFlag;
-	using DataGlobals::MaxNameLength;
 	using DataHVACGlobals::FirstTimeStepSysFlag;
 	using namespace DataDefineEquip;
 
@@ -78,7 +77,7 @@ namespace ZoneAirLoopEquipmentManager {
 
 	void
 	ManageZoneAirLoopEquipment(
-		Fstring const & ZoneAirLoopEquipName,
+		std::string const & ZoneAirLoopEquipName,
 		bool const FirstHVACIteration,
 		Real64 & SysOutputProvided,
 		Real64 & NonAirSysOutput,
@@ -106,7 +105,6 @@ namespace ZoneAirLoopEquipmentManager {
 		// na
 
 		// Using/Aliasing
-		using DataGlobals::MaxNameLength;
 		using General::TrimSigDigits;
 		using InputProcessor::FindItemInList;
 
@@ -134,16 +132,16 @@ namespace ZoneAirLoopEquipmentManager {
 		if ( CompIndex == 0 ) {
 			AirDistUnitNum = FindItemInList( ZoneAirLoopEquipName, AirDistUnit.Name(), NumAirDistUnits );
 			if ( AirDistUnitNum == 0 ) {
-				ShowFatalError( "ManageZoneAirLoopEquipment: Unit not found=" + trim( ZoneAirLoopEquipName ) );
+				ShowFatalError( "ManageZoneAirLoopEquipment: Unit not found=" + ZoneAirLoopEquipName );
 			}
 			CompIndex = AirDistUnitNum;
 		} else {
 			AirDistUnitNum = CompIndex;
 			if ( AirDistUnitNum > NumAirDistUnits || AirDistUnitNum < 1 ) {
-				ShowFatalError( "ManageZoneAirLoopEquipment:  Invalid CompIndex passed=" + trim( TrimSigDigits( AirDistUnitNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumAirDistUnits ) ) + ", Entered Unit name=" + trim( ZoneAirLoopEquipName ) );
+				ShowFatalError( "ManageZoneAirLoopEquipment:  Invalid CompIndex passed=" + TrimSigDigits( AirDistUnitNum ) + ", Number of Units=" + TrimSigDigits( NumAirDistUnits ) + ", Entered Unit name=" + ZoneAirLoopEquipName );
 			}
 			if ( ZoneAirLoopEquipName != AirDistUnit( AirDistUnitNum ).Name ) {
-				ShowFatalError( "ManageZoneAirLoopEquipment: Invalid CompIndex passed=" + trim( TrimSigDigits( AirDistUnitNum ) ) + ", Unit name=" + trim( ZoneAirLoopEquipName ) + ", stored Unit Name for that index=" + trim( AirDistUnit( AirDistUnitNum ).Name ) );
+				ShowFatalError( "ManageZoneAirLoopEquipment: Invalid CompIndex passed=" + TrimSigDigits( AirDistUnitNum ) + ", Unit name=" + ZoneAirLoopEquipName + ", stored Unit Name for that index=" + AirDistUnit( AirDistUnitNum ).Name );
 			}
 		}
 
@@ -198,7 +196,7 @@ namespace ZoneAirLoopEquipmentManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetZoneAirLoopEquipment: " ); // include trailing blank space
+		static std::string const RoutineName( "GetZoneAirLoopEquipment: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -214,14 +212,14 @@ namespace ZoneAirLoopEquipmentManager {
 		int NumAlphas;
 		int NumNums;
 		int IOStat;
-		FArray1D_Fstring AlphArray( 4, sFstring( MaxNameLength ) );
+		FArray1D_string AlphArray( 4 );
 		FArray1D< Real64 > NumArray( 2 );
 		static bool ErrorsFound( false ); // If errors detected in input
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		Fstring CurrentModuleObject( MaxNameLength ); // Object type for getting and error messages
-		FArray1D_Fstring cAlphaFields( 4, sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( 2, sFstring( MaxNameLength ) ); // Numeric field names
+		std::string CurrentModuleObject; // Object type for getting and error messages
+		FArray1D_string cAlphaFields( 4 ); // Alpha field names
+		FArray1D_string cNumericFields( 2 ); // Numeric field names
 		FArray1D_bool lAlphaBlanks( 4 ); // Logical array, alpha field input BLANK = .TRUE.
 		FArray1D_bool lNumericBlanks( 2 ); // Logical array, numeric field input BLANK = .TRUE.
 		bool DualDuctRecircIsUsed; // local temporary for deciding if recirc side used by dual duct terminal
@@ -247,23 +245,23 @@ namespace ZoneAirLoopEquipmentManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), AirDistUnit.Name(), AirDistUnitNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+				VerifyName( AlphArray( 1 ), AirDistUnit.Name(), AirDistUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
 				}
 				AirDistUnit( AirDistUnitNum ).Name = AlphArray( 1 );
 				//Input Outlet Node Num
-				AirDistUnit( AirDistUnitNum ).OutletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
+				AirDistUnit( AirDistUnitNum ).OutletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 				AirDistUnit( AirDistUnitNum ).InletNodeNum = 0;
 				AirDistUnit( AirDistUnitNum ).NumComponents = 1;
 				AirDistCompUnitNum = 1;
 				//Load the air Distribution Unit Equip and Name
 				AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) = AlphArray( 3 );
 				AirDistUnit( AirDistUnitNum ).EquipName( AirDistCompUnitNum ) = AlphArray( 4 );
-				ValidateComponent( AlphArray( 3 ), AlphArray( 4 ), IsNotOK, trim( CurrentModuleObject ) );
+				ValidateComponent( AlphArray( 3 ), AlphArray( 4 ), IsNotOK, CurrentModuleObject );
 				if ( IsNotOK ) {
-					ShowContinueError( "In " + trim( CurrentModuleObject ) + " = " + trim( AlphArray( 1 ) ) );
+					ShowContinueError( "In " + CurrentModuleObject + " = " + AlphArray( 1 ) );
 					ErrorsFound = true;
 				}
 				AirDistUnit( AirDistUnitNum ).UpStreamLeakFrac = NumArray( 1 );
@@ -273,8 +271,8 @@ namespace ZoneAirLoopEquipmentManager {
 				} else if ( AirDistUnit( AirDistUnitNum ).DownStreamLeakFrac < 1.0 && AirDistUnit( AirDistUnitNum ).DownStreamLeakFrac > 0.0 ) {
 					AirDistUnit( AirDistUnitNum ).LeakLoadMult = 1.0 / ( 1.0 - AirDistUnit( AirDistUnitNum ).DownStreamLeakFrac );
 				} else {
-					ShowSevereError( "Error found in " + trim( CurrentModuleObject ) + " = " + trim( AirDistUnit( AirDistUnitNum ).Name ) );
-					ShowContinueError( trim( cNumericFields( 2 ) ) + " must be less than 1.0" );
+					ShowSevereError( "Error found in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
+					ShowContinueError( cNumericFields( 2 ) + " must be less than 1.0" );
 					ErrorsFound = true;
 				}
 				if ( AirDistUnit( AirDistUnitNum ).UpStreamLeakFrac > 0.0 ) {
@@ -292,22 +290,22 @@ namespace ZoneAirLoopEquipmentManager {
 				if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:DualDuct:ConstantVolume" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = DualDuctConstVolume;
 					if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
-						ShowSevereError( "Error found in " + trim( CurrentModuleObject ) + " = " + trim( AirDistUnit( AirDistUnitNum ).Name ) );
-						ShowContinueError( "Simple duct leakage model not available for " + trim( cAlphaFields( 3 ) ) + " = " + trim( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) ) );
+						ShowSevereError( "Error found in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
+						ShowContinueError( "Simple duct leakage model not available for " + cAlphaFields( 3 ) + " = " + AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) );
 						ErrorsFound = true;
 					}
 				} else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:DualDuct:VAV" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = DualDuctVAV;
 					if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
-						ShowSevereError( "Error found in " + trim( CurrentModuleObject ) + " = " + trim( AirDistUnit( AirDistUnitNum ).Name ) );
-						ShowContinueError( "Simple duct leakage model not available for " + trim( cAlphaFields( 3 ) ) + " = " + trim( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) ) );
+						ShowSevereError( "Error found in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
+						ShowContinueError( "Simple duct leakage model not available for " + cAlphaFields( 3 ) + " = " + AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) );
 						ErrorsFound = true;
 					}
 				} else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:DualDuct:VAV:OutdoorAir" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = DualDuctVAVOutdoorAir;
 					if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
-						ShowSevereError( "Error found in " + trim( CurrentModuleObject ) + " = " + trim( AirDistUnit( AirDistUnitNum ).Name ) );
-						ShowContinueError( "Simple duct leakage model not available for " + trim( cAlphaFields( 3 ) ) + " = " + trim( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) ) );
+						ShowSevereError( "Error found in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
+						ShowContinueError( "Simple duct leakage model not available for " + cAlphaFields( 3 ) + " = " + AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) );
 						ErrorsFound = true;
 					}
 				} else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:ConstantVolume:Reheat" ) ) {
@@ -323,36 +321,36 @@ namespace ZoneAirLoopEquipmentManager {
 				} else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:SeriesPIU:Reheat" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuct_SeriesPIU_Reheat;
 					if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
-						ShowSevereError( "Error found in " + trim( CurrentModuleObject ) + " = " + trim( AirDistUnit( AirDistUnitNum ).Name ) );
-						ShowContinueError( "Simple duct leakage model not available for " + trim( cAlphaFields( 3 ) ) + " = " + trim( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) ) );
+						ShowSevereError( "Error found in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
+						ShowContinueError( "Simple duct leakage model not available for " + cAlphaFields( 3 ) + " = " + AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) );
 						ErrorsFound = true;
 					}
 				} else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:ParallelPIU:Reheat" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuct_ParallelPIU_Reheat;
 					if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
-						ShowSevereError( "Error found in " + trim( CurrentModuleObject ) + " = " + trim( AirDistUnit( AirDistUnitNum ).Name ) );
-						ShowContinueError( "Simple duct leakage model not available for " + trim( cAlphaFields( 3 ) ) + " = " + trim( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) ) );
+						ShowSevereError( "Error found in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
+						ShowContinueError( "Simple duct leakage model not available for " + cAlphaFields( 3 ) + " = " + AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) );
 						ErrorsFound = true;
 					}
 				} else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuct_ConstVol_4PipeInduc;
 					if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
-						ShowSevereError( "Error found in " + trim( CurrentModuleObject ) + " = " + trim( AirDistUnit( AirDistUnitNum ).Name ) );
-						ShowContinueError( "Simple duct leakage model not available for " + trim( cAlphaFields( 3 ) ) + " = " + trim( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) ) );
+						ShowSevereError( "Error found in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
+						ShowContinueError( "Simple duct leakage model not available for " + cAlphaFields( 3 ) + " = " + AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) );
 						ErrorsFound = true;
 					}
 				} else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctVAVReheatVSFan;
 					if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
-						ShowSevereError( "Error found in " + trim( CurrentModuleObject ) + " = " + trim( AirDistUnit( AirDistUnitNum ).Name ) );
-						ShowContinueError( "Simple duct leakage model not available for " + trim( cAlphaFields( 3 ) ) + " = " + trim( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) ) );
+						ShowSevereError( "Error found in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
+						ShowContinueError( "Simple duct leakage model not available for " + cAlphaFields( 3 ) + " = " + AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) );
 						ErrorsFound = true;
 					}
 				} else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:ConstantVolume:CooledBeam" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctConstVolCooledBeam;
 					if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
-						ShowSevereError( "Error found in " + trim( CurrentModuleObject ) + " = " + trim( AirDistUnit( AirDistUnitNum ).Name ) );
-						ShowContinueError( "Simple duct leakage model not available for " + trim( cAlphaFields( 3 ) ) + " = " + trim( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) ) );
+						ShowSevereError( "Error found in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
+						ShowContinueError( "Simple duct leakage model not available for " + cAlphaFields( 3 ) + " = " + AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) );
 						ErrorsFound = true;
 					}
 				} else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:UserDefined" ) ) {
@@ -362,8 +360,8 @@ namespace ZoneAirLoopEquipmentManager {
 					GetATMixerPriNode( AirDistUnit( AirDistUnitNum ).EquipName( 1 ), ATMixerPriNode );
 					AirDistUnit( AirDistUnitNum ).InletNodeNum = ATMixerPriNode;
 					if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
-						ShowSevereError( "Error found in " + trim( CurrentModuleObject ) + " = " + trim( AirDistUnit( AirDistUnitNum ).Name ) );
-						ShowContinueError( "Simple duct leakage model not available for " + trim( cAlphaFields( 3 ) ) + " = " + trim( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) ) );
+						ShowSevereError( "Error found in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
+						ShowContinueError( "Simple duct leakage model not available for " + cAlphaFields( 3 ) + " = " + AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) );
 						ErrorsFound = true;
 					}
 				} else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:SupplySideMixer" ) ) {
@@ -371,31 +369,31 @@ namespace ZoneAirLoopEquipmentManager {
 					GetATMixerPriNode( AirDistUnit( AirDistUnitNum ).EquipName( 1 ), ATMixerPriNode );
 					AirDistUnit( AirDistUnitNum ).InletNodeNum = ATMixerPriNode;
 					if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
-						ShowSevereError( "Error found in " + trim( CurrentModuleObject ) + " = " + trim( AirDistUnit( AirDistUnitNum ).Name ) );
-						ShowContinueError( "Simple duct leakage model not available for " + trim( cAlphaFields( 3 ) ) + " = " + trim( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) ) );
+						ShowSevereError( "Error found in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
+						ShowContinueError( "Simple duct leakage model not available for " + cAlphaFields( 3 ) + " = " + AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) );
 						ErrorsFound = true;
 					}
 				} else {
-					ShowSevereError( "Error found in " + trim( CurrentModuleObject ) + " = " + trim( AirDistUnit( AirDistUnitNum ).Name ) );
-					ShowContinueError( "Invalid " + trim( cAlphaFields( 3 ) ) + " = " + trim( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) ) );
+					ShowSevereError( "Error found in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
+					ShowContinueError( "Invalid " + cAlphaFields( 3 ) + " = " + AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) );
 					ErrorsFound = true;
 				}
 
 				// Set up component set for air terminal unit
 				if ( ( AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) == DualDuctConstVolume ) || ( AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) == DualDuctVAV ) ) {
 					//  For dual duct units, set up two component sets, one for heat and one for cool
-					SetUpCompSets( trim( CurrentModuleObject ), AirDistUnit( AirDistUnitNum ).Name, trim( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) ) + ":HEAT", AirDistUnit( AirDistUnitNum ).EquipName( AirDistCompUnitNum ), "UNDEFINED", AlphArray( 2 ) );
-					SetUpCompSets( trim( CurrentModuleObject ), AirDistUnit( AirDistUnitNum ).Name, trim( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) ) + ":COOL", AirDistUnit( AirDistUnitNum ).EquipName( AirDistCompUnitNum ), "UNDEFINED", AlphArray( 2 ) );
+					SetUpCompSets( CurrentModuleObject, AirDistUnit( AirDistUnitNum ).Name, AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) + ":HEAT", AirDistUnit( AirDistUnitNum ).EquipName( AirDistCompUnitNum ), "UNDEFINED", AlphArray( 2 ) );
+					SetUpCompSets( CurrentModuleObject, AirDistUnit( AirDistUnitNum ).Name, AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) + ":COOL", AirDistUnit( AirDistUnitNum ).EquipName( AirDistCompUnitNum ), "UNDEFINED", AlphArray( 2 ) );
 					//  For dual duct units with decoupled OA and RA, set up two component sets, one for OA (Outdoor Air)
 					//  and one for RA (Recirculated Air)
 				} else if ( ( AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) == DualDuctVAVOutdoorAir ) ) {
-					SetUpCompSets( trim( CurrentModuleObject ), AirDistUnit( AirDistUnitNum ).Name, trim( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) ) + ":OutdoorAir", AirDistUnit( AirDistUnitNum ).EquipName( AirDistCompUnitNum ), "UNDEFINED", AlphArray( 2 ) );
+					SetUpCompSets( CurrentModuleObject, AirDistUnit( AirDistUnitNum ).Name, AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) + ":OutdoorAir", AirDistUnit( AirDistUnitNum ).EquipName( AirDistCompUnitNum ), "UNDEFINED", AlphArray( 2 ) );
 					GetDualDuctOutdoorAirRecircUse( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), AirDistUnit( AirDistUnitNum ).EquipName( AirDistCompUnitNum ), DualDuctRecircIsUsed );
 					if ( DualDuctRecircIsUsed ) {
-						SetUpCompSets( trim( CurrentModuleObject ), AirDistUnit( AirDistUnitNum ).Name, trim( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) ) + ":RecirculatedAir", AirDistUnit( AirDistUnitNum ).EquipName( AirDistCompUnitNum ), "UNDEFINED", AlphArray( 2 ) );
+						SetUpCompSets( CurrentModuleObject, AirDistUnit( AirDistUnitNum ).Name, AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) + ":RecirculatedAir", AirDistUnit( AirDistUnitNum ).EquipName( AirDistCompUnitNum ), "UNDEFINED", AlphArray( 2 ) );
 					}
 				} else {
-					SetUpCompSets( trim( CurrentModuleObject ), AirDistUnit( AirDistUnitNum ).Name, AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), AirDistUnit( AirDistUnitNum ).EquipName( AirDistCompUnitNum ), "UNDEFINED", AlphArray( 2 ) );
+					SetUpCompSets( CurrentModuleObject, AirDistUnit( AirDistUnitNum ).Name, AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), AirDistUnit( AirDistUnitNum ).EquipName( AirDistCompUnitNum ), "UNDEFINED", AlphArray( 2 ) );
 				}
 
 				// find and save corresponding zone equip config
@@ -416,7 +414,7 @@ namespace ZoneAirLoopEquipmentManager {
 
 		}
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting " + trim( CurrentModuleObject ) + " Input" );
+			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " Input" );
 		}
 
 	}
@@ -616,8 +614,8 @@ namespace ZoneAirLoopEquipmentManager {
 				ProvideSysOutput = false;
 
 			} else {
-				ShowSevereError( "Error found in ZoneHVAC:AirDistributionUnit=" + trim( AirDistUnit( AirDistUnitNum ).Name ) );
-				ShowContinueError( "Invalid Component=" + trim( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompNum ) ) );
+				ShowSevereError( "Error found in ZoneHVAC:AirDistributionUnit=" + AirDistUnit( AirDistUnitNum ).Name );
+				ShowContinueError( "Invalid Component=" + AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompNum ) );
 				ShowFatalError( "Preceding condition causes termination." );
 
 			}}

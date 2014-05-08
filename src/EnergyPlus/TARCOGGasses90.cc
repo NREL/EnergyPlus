@@ -66,7 +66,7 @@ namespace TARCOGGasses90 {
 		Real64 & pr,
 		int const standard,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	)
 	{
 
@@ -249,7 +249,7 @@ namespace TARCOGGasses90 {
 		Real64 const gama,
 		Real64 & cond,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	)
 	{
 

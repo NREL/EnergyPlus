@@ -70,8 +70,8 @@ namespace HeatBalanceIntRadExchange {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	Fstring const fmtx( "(A,I4,1x,A,1x,6f16.8)" );
-	Fstring const fmty( "(A,1x,6f16.8)" );
+	gio::Fmt const fmtx( "(A,I4,1x,A,1x,6f16.8)" );
+	gio::Fmt const fmty( "(A,1x,6f16.8)" );
 
 	// DERIVED TYPE DEFINITIONS
 	// na
@@ -89,7 +89,7 @@ namespace HeatBalanceIntRadExchange {
 		int const SurfIterations, // Number of iterations in calling subroutine
 		FArray1S< Real64 > NetLWRadToSurf, // Net long wavelength radiant exchange from other surfaces
 		Optional_int_const ZoneToResimulate, // if passed in, then only calculate for this zone
-		Optional_Fstring CalledFrom
+		Optional_string CalledFrom
 	)
 	{
 
@@ -151,7 +151,7 @@ namespace HeatBalanceIntRadExchange {
 		// one window in a zone has changed from previous time step
 		int ShadeFlag; // Window shading status current time step
 		int ShadeFlagPrev; // Window shading status previous time step
-		Fstring tdstring( 158 );
+		std::string tdstring;
 
 		//variables added as part of strategy to reduce calculation time - Glazer 2011-04-22
 		Real64 SendSurfTempInKTo4th; // Sending surface temperature in K to 4th power
@@ -173,7 +173,7 @@ namespace HeatBalanceIntRadExchange {
 			firstTime = false;
 			if ( DeveloperFlag ) {
 				gio::write( tdstring, "*" ) << " OMP turned off, HBIRE loop executed in serial";
-				DisplayString( trim( tdstring ) );
+				DisplayString( tdstring );
 			}
 		}
 
@@ -411,7 +411,7 @@ namespace HeatBalanceIntRadExchange {
 		Real64 RowSum;
 		Real64 FixedRowSum;
 		int NumIterations;
-		Fstring Option1( MaxNameLength ); // view factor report option
+		std::string Option1; // view factor report option
 
 		// FLOW:
 
@@ -492,7 +492,7 @@ namespace HeatBalanceIntRadExchange {
 				// If there is only one surface in a zone, then there is no radiant exchange
 				ZoneInfo( ZoneNum ).F = 0.0;
 				ZoneInfo( ZoneNum ).ScriptF = 0.0;
-				if ( DisplayAdvancedReportVariables ) gio::write( OutputFileInits, "(A)" ) << "Surface View Factor Check Values," + trim( Zone( ZoneNum ).Name ) + ",0,0,0,-1,0,0";
+				if ( DisplayAdvancedReportVariables ) gio::write( OutputFileInits, "(A)" ) << "Surface View Factor Check Values," + Zone( ZoneNum ).Name + ",0,0,0,-1,0,0";
 				continue; // Go to the next zone in the  ZoneNum DO loop
 			}
 
@@ -523,24 +523,24 @@ namespace HeatBalanceIntRadExchange {
 
 			if ( ViewFactorReport ) { // Write to SurfInfo File
 				// Zone Surface Information Output
-				gio::write( OutputFileInits, "(A)" ) << "Surface View Factor - Zone Information," + trim( ZoneInfo( ZoneNum ).Name ) + "," + trim( RoundSigDigits( ZoneInfo( ZoneNum ).NumOfSurfaces ) );
+				gio::write( OutputFileInits, "(A)" ) << "Surface View Factor - Zone Information," + ZoneInfo( ZoneNum ).Name + ',' + RoundSigDigits( ZoneInfo( ZoneNum ).NumOfSurfaces );
 
 				for ( SurfNum = 1; SurfNum <= ZoneInfo( ZoneNum ).NumOfSurfaces; ++SurfNum ) {
 					gio::write( OutputFileInits, "(A,',',A,$)" )
 						<< "Surface View Factor - Surface Information,"
-						+ trim( Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Name ) + ","
-						+ trim( cSurfaceClass( Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Class ) )
-						<< trim( RoundSigDigits( ZoneInfo( ZoneNum ).Area( SurfNum ), 4 ) ) + ","
-						+ trim( RoundSigDigits( ZoneInfo( ZoneNum ).Azimuth( SurfNum ), 4 ) ) + ","
-						+ trim( RoundSigDigits( ZoneInfo( ZoneNum ).Tilt( SurfNum ), 4 ) ) + ","
-						+ trim( RoundSigDigits( ZoneInfo( ZoneNum ).Emissivity( SurfNum ), 4 ) ) + ","
-						+ trim( RoundSigDigits( Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Sides ) );
+						+ Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Name + ','
+						+ cSurfaceClass( Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Class )
+						<< RoundSigDigits( ZoneInfo( ZoneNum ).Area( SurfNum ), 4 ) + ','
+						+ RoundSigDigits( ZoneInfo( ZoneNum ).Azimuth( SurfNum ), 4 ) + ','
+						+ RoundSigDigits( ZoneInfo( ZoneNum ).Tilt( SurfNum ), 4 ) + ','
+						+ RoundSigDigits( ZoneInfo( ZoneNum ).Emissivity( SurfNum ), 4 ) + ','
+						+ RoundSigDigits( Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Sides );
 					for ( Vindex = 1; Vindex <= Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Sides; ++Vindex ) {
 						auto & Vertex = Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Vertex( Vindex );
 						gio::write( OutputFileInits, "(3(',',A),$)" )
-							<< trim( RoundSigDigits( Vertex.x, 4 ) )
-							<< trim( RoundSigDigits( Vertex.y, 4 ) )
-							<< trim( RoundSigDigits( Vertex.z, 4 ) );
+							<< RoundSigDigits( Vertex.x, 4 )
+							<< RoundSigDigits( Vertex.y, 4 )
+							<< RoundSigDigits( Vertex.z, 4 );
 					} gio::write( OutputFileInits );
 				}
 
@@ -549,19 +549,19 @@ namespace HeatBalanceIntRadExchange {
 					<< ",To Surface,Surface Class,RowSum";
 				for ( SurfNum = 1; SurfNum <= ZoneInfo( ZoneNum ).NumOfSurfaces; ++SurfNum ) {
 					gio::write( OutputFileInits, "(',',A,$)" )
-						<< trim( Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Name );
+						<< Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Name;
 				} gio::write( OutputFileInits );
 
 				for ( Findex = 1; Findex <= ZoneInfo( ZoneNum ).NumOfSurfaces; ++Findex ) {
 					RowSum = sum( SaveApproximateViewFactors( Findex, _ ) );
 					gio::write( OutputFileInits, "(A,3(',',A),$)" )
 						<< "View Factor"
-						<< trim( Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Name )
-						<< trim( cSurfaceClass( Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Class ) )
-						<< trim( RoundSigDigits( RowSum, 4 ) );
+						<< Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Name
+						<< cSurfaceClass( Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Class )
+						<< RoundSigDigits( RowSum, 4 );
 					for ( SurfNum = 1; SurfNum <= ZoneInfo( ZoneNum ).NumOfSurfaces; ++SurfNum ) {
 						gio::write( OutputFileInits, "(',',A,$)" )
-							<< trim( RoundSigDigits( SaveApproximateViewFactors( Findex, SurfNum ), 4 ) );
+							<< RoundSigDigits( SaveApproximateViewFactors( Findex, SurfNum ), 4 );
 					} gio::write( OutputFileInits );
 				}
 			}
@@ -569,43 +569,43 @@ namespace HeatBalanceIntRadExchange {
 			if ( ViewFactorReport ) {
 				gio::write( OutputFileInits, "(A,A,$)" ) << "Final ViewFactors" << ",To Surface,Surface Class,RowSum";
 				for ( SurfNum = 1; SurfNum <= ZoneInfo( ZoneNum ).NumOfSurfaces; ++SurfNum ) {
-					gio::write( OutputFileInits, "(',',A,$)" ) << trim( Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Name );
+					gio::write( OutputFileInits, "(',',A,$)" ) << Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Name;
 				} gio::write( OutputFileInits );
 
 				for ( Findex = 1; Findex <= ZoneInfo( ZoneNum ).NumOfSurfaces; ++Findex ) {
 					RowSum = sum( ZoneInfo( ZoneNum ).F( Findex, _ ) );
 					gio::write( OutputFileInits, "(A,3(',',A),$)" )
 						<< "View Factor"
-						<< trim( Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Name )
-						<< trim( cSurfaceClass( Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Class ) )
-						<< trim( RoundSigDigits( RowSum, 4 ) );
+						<< Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Name
+						<< cSurfaceClass( Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Class )
+						<< RoundSigDigits( RowSum, 4 );
 					for ( SurfNum = 1; SurfNum <= ZoneInfo( ZoneNum ).NumOfSurfaces; ++SurfNum ) {
-						gio::write( OutputFileInits, "(',',A,$)" ) << trim( RoundSigDigits( ZoneInfo( ZoneNum ).F( Findex, SurfNum ), 4 ) );
+						gio::write( OutputFileInits, "(',',A,$)" ) << RoundSigDigits( ZoneInfo( ZoneNum ).F( Findex, SurfNum ), 4 );
 					} gio::write( OutputFileInits );
 				}
 
 				if ( Option1 == "IDF" ) {
 					gio::write( OutputFileDebug, "(A)" ) << "!======== original input factors ===========================";
-					gio::write( OutputFileDebug, "(A)" ) << "ZoneProperty:UserViewFactors:bySurfaceName," + trim( ZoneInfo( ZoneNum ).Name ) + ",";
+					gio::write( OutputFileDebug, "(A)" ) << "ZoneProperty:UserViewFactors:bySurfaceName," + ZoneInfo( ZoneNum ).Name + ',';
 					for ( SurfNum = 1; SurfNum <= ZoneInfo( ZoneNum ).NumOfSurfaces; ++SurfNum ) {
 						for ( Findex = 1; Findex <= ZoneInfo( ZoneNum ).NumOfSurfaces; ++Findex ) {
 							if ( ! ( SurfNum == ZoneInfo( ZoneNum ).NumOfSurfaces && Findex == ZoneInfo( ZoneNum ).NumOfSurfaces ) ) {
-								gio::write( OutputFileDebug, "(A)" ) << "  " + trim( Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Name ) + "," + trim( Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Name ) + "," + trim( RoundSigDigits( ZoneInfo( ZoneNum ).F( SurfNum, Findex ), 6 ) ) + ",";
+								gio::write( OutputFileDebug, "(A)" ) << "  " + Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Name + ',' + Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Name + ',' + RoundSigDigits( ZoneInfo( ZoneNum ).F( SurfNum, Findex ), 6 ) + ',';
 							} else {
-								gio::write( OutputFileDebug, "(A)" ) << "  " + trim( Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Name ) + "," + trim( Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Name ) + "," + trim( RoundSigDigits( ZoneInfo( ZoneNum ).F( SurfNum, Findex ), 6 ) ) + ";";
+								gio::write( OutputFileDebug, "(A)" ) << "  " + Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Name + ',' + Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Name + ',' + RoundSigDigits( ZoneInfo( ZoneNum ).F( SurfNum, Findex ), 6 ) + ';';
 							}
 						}
 					}
 					gio::write( OutputFileDebug, "(A)" ) << "!============= end of data ======================";
 
 					gio::write( OutputFileDebug, "(A)" ) << "!============ final view factors =======================";
-					gio::write( OutputFileDebug, "(A)" ) << "ZoneProperty:UserViewFactors:bySurfaceName," + trim( ZoneInfo( ZoneNum ).Name ) + ",";
+					gio::write( OutputFileDebug, "(A)" ) << "ZoneProperty:UserViewFactors:bySurfaceName," + ZoneInfo( ZoneNum ).Name + ',';
 					for ( SurfNum = 1; SurfNum <= ZoneInfo( ZoneNum ).NumOfSurfaces; ++SurfNum ) {
 						for ( Findex = 1; Findex <= ZoneInfo( ZoneNum ).NumOfSurfaces; ++Findex ) {
 							if ( ! ( SurfNum == ZoneInfo( ZoneNum ).NumOfSurfaces && Findex == ZoneInfo( ZoneNum ).NumOfSurfaces ) ) {
-								gio::write( OutputFileDebug, "(A)" ) << "  " + trim( Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Name ) + "," + trim( Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Name ) + "," + trim( RoundSigDigits( ZoneInfo( ZoneNum ).F( SurfNum, Findex ), 6 ) ) + ",";
+								gio::write( OutputFileDebug, "(A)" ) << "  " + Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Name + ',' + Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Name + ',' + RoundSigDigits( ZoneInfo( ZoneNum ).F( SurfNum, Findex ), 6 ) + ',';
 							} else {
-								gio::write( OutputFileDebug, "(A)" ) << "  " + trim( Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Name ) + "," + trim( Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Name ) + "," + trim( RoundSigDigits( ZoneInfo( ZoneNum ).F( SurfNum, Findex ), 6 ) ) + ";";
+								gio::write( OutputFileDebug, "(A)" ) << "  " + Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Name + ',' + Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Name + ',' + RoundSigDigits( ZoneInfo( ZoneNum ).F( SurfNum, Findex ), 6 ) + ';';
 							}
 						}
 					}
@@ -620,15 +620,15 @@ namespace HeatBalanceIntRadExchange {
 					<< ",X Surface";
 				for ( SurfNum = 1; SurfNum <= ZoneInfo( ZoneNum ).NumOfSurfaces; ++SurfNum ) {
 					gio::write( OutputFileInits, "(',',A,$)" ) <<
-						trim( Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Name );
+						Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Name;
 				} gio::write( OutputFileInits );
 				for ( Findex = 1; Findex <= ZoneInfo( ZoneNum ).NumOfSurfaces; ++Findex ) {
 					gio::write( OutputFileInits, "(A,',',A,$)" )
 						<< "Script F Factor"
-						<< trim( Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Name );
+						<< Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Name;
 					for ( SurfNum = 1; SurfNum <= ZoneInfo( ZoneNum ).NumOfSurfaces; ++SurfNum ) {
 						gio::write( OutputFileInits, "(',',A,$)" )
-							<< trim( RoundSigDigits( ZoneInfo( ZoneNum ).ScriptF( Findex, SurfNum ), 4 ) );
+							<< RoundSigDigits( ZoneInfo( ZoneNum ).ScriptF( Findex, SurfNum ), 4 );
 					} gio::write( OutputFileInits );
 				}
 			}
@@ -646,13 +646,13 @@ namespace HeatBalanceIntRadExchange {
 			if ( DisplayAdvancedReportVariables ) {
 				gio::write( OutputFileInits, "(8A)" )
 					<< "Surface View Factor Check Values,"
-					 + trim( Zone( ZoneNum ).Name ) + ","
-					 + trim( RoundSigDigits( CheckValue1, 6 ) ) + ","
-					 + trim( RoundSigDigits( CheckValue2, 6 ) ) + ","
-					 + trim( RoundSigDigits( FinalCheckValue, 6 ) ) + ","
-					 + trim( RoundSigDigits( NumIterations ) ) + ","
-					 + trim( RoundSigDigits( FixedRowSum, 6 ) ) + ","
-					 + trim( RoundSigDigits( RowSum, 6 ) );
+					 + Zone( ZoneNum ).Name + ','
+					 + RoundSigDigits( CheckValue1, 6 ) + ','
+					 + RoundSigDigits( CheckValue2, 6 ) + ','
+					 + RoundSigDigits( FinalCheckValue, 6 ) + ','
+					 + RoundSigDigits( NumIterations ) + ','
+					 + RoundSigDigits( FixedRowSum, 6 ) + ','
+					 + RoundSigDigits( RowSum, 6 );
 			}
 
 		}
@@ -665,7 +665,7 @@ namespace HeatBalanceIntRadExchange {
 
 	void
 	GetInputViewFactors(
-		Fstring const & ZoneName, // Needed to check for user input view factors.
+		std::string const & ZoneName, // Needed to check for user input view factors.
 		int const N, // NUMBER OF SURFACES
 		FArray2A< Real64 > F, // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
 		FArray1A_int const SPtr, // pointer to actual surface number
@@ -731,8 +731,8 @@ namespace HeatBalanceIntRadExchange {
 			GetObjectItem( "ZoneProperty:UserViewFactors", UserFZoneIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			if ( NumNums < 3 * std::pow( ( N ), 2 ) ) {
-				ShowSevereError( "GetInputViewFactors: " + trim( cCurrentModuleObject ) + "=\"" + trim( ZoneName ) + "\", not enough values." );
-				ShowContinueError( "...Number of input values [" + trim( TrimSigDigits( NumNums ) ) + "] is less than the required number=[" + trim( TrimSigDigits( 3 * std::pow( ( N ), 2 ) ) ) + "]." );
+				ShowSevereError( "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", not enough values." );
+				ShowContinueError( "...Number of input values [" + TrimSigDigits( NumNums ) + "] is less than the required number=[" + TrimSigDigits( 3 * std::pow( ( N ), 2 ) ) + "]." );
 				ErrorsFound = true;
 				NumNums = 0;
 			}
@@ -748,7 +748,7 @@ namespace HeatBalanceIntRadExchange {
 
 	void
 	GetInputViewFactorsbyName(
-		Fstring const & ZoneName, // Needed to check for user input view factors.
+		std::string const & ZoneName, // Needed to check for user input view factors.
 		int const N, // NUMBER OF SURFACES
 		FArray2A< Real64 > F, // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
 		FArray1A_int const SPtr, // pointer to actual surface number
@@ -804,7 +804,7 @@ namespace HeatBalanceIntRadExchange {
 		int numinx1;
 		int inx1;
 		int inx2;
-		FArray1D_Fstring ZoneSurfaceNames( sFstring( MaxNameLength ) );
+		FArray1D_string ZoneSurfaceNames;
 
 		NoUserInputF = true;
 		UserFZoneIndex = GetObjectItemNum( "ZoneProperty:UserViewFactors:bySurfaceName", ZoneName );
@@ -819,8 +819,8 @@ namespace HeatBalanceIntRadExchange {
 			GetObjectItem( "ZoneProperty:UserViewFactors:bySurfaceName", UserFZoneIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			if ( NumNums < std::pow( N, 2 ) ) {
-				ShowSevereError( "GetInputViewFactors: " + trim( cCurrentModuleObject ) + "=\"" + trim( ZoneName ) + "\", not enough values." );
-				ShowContinueError( "...Number of input values [" + trim( TrimSigDigits( NumNums ) ) + "] is less than the required number=[" + trim( TrimSigDigits( std::pow( N, 2 ) ) ) + "]." );
+				ShowSevereError( "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", not enough values." );
+				ShowContinueError( "...Number of input values [" + TrimSigDigits( NumNums ) + "] is less than the required number=[" + TrimSigDigits( std::pow( N, 2 ) ) + "]." );
 				ErrorsFound = true;
 				NumNums = 0; // cancel getting any coordinates
 			}
@@ -831,13 +831,13 @@ namespace HeatBalanceIntRadExchange {
 				inx1 = FindItemInList( cAlphaArgs( index ), ZoneSurfaceNames, N );
 				inx2 = FindItemInList( cAlphaArgs( index + 1 ), ZoneSurfaceNames, N );
 				if ( inx1 == 0 ) {
-					ShowSevereError( "GetInputViewFactors: " + trim( cCurrentModuleObject ) + "=\"" + trim( ZoneName ) + "\", invalid surface name." );
-					ShowContinueError( "...Surface name=\"" + trim( cAlphaArgs( index ) ) + "\", not in this zone." );
+					ShowSevereError( "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", invalid surface name." );
+					ShowContinueError( "...Surface name=\"" + cAlphaArgs( index ) + "\", not in this zone." );
 					ErrorsFound = true;
 				}
 				if ( inx2 == 0 ) {
-					ShowSevereError( "GetInputViewFactors: " + trim( cCurrentModuleObject ) + "=\"" + trim( ZoneName ) + "\", invalid surface name." );
-					ShowContinueError( "...Surface name=\"" + trim( cAlphaArgs( index + 2 ) ) + "\", not in this zone." );
+					ShowSevereError( "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", invalid surface name." );
+					ShowContinueError( "...Surface name=\"" + cAlphaArgs( index + 2 ) + "\", not in this zone." );
 					ErrorsFound = true;
 				}
 				++numinx1;
@@ -934,7 +934,7 @@ namespace HeatBalanceIntRadExchange {
 			}
 			if ( ZoneArea( i ) <= 0.0 ) {
 				ShowWarningError( "CalcApproximateViewFactors: Zero area for all other zone surfaces." );
-				ShowContinueError( "Happens for Surface=\"" + trim( Surface( SPtr( i ) ).Name ) + "\" in Zone=" + trim( Zone( Surface( SPtr( i ) ).Zone ).Name ) );
+				ShowContinueError( "Happens for Surface=\"" + Surface( SPtr( i ) ).Name + "\" in Zone=" + Zone( Surface( SPtr( i ) ).Zone ).Name );
 			}
 		}
 
@@ -1111,7 +1111,7 @@ namespace HeatBalanceIntRadExchange {
 				}
 			}
 
-			ShowWarningError( "Surfaces in Zone=\"" + trim( Zone( ZoneNum ).Name ) + "\" do not define an enclosure." );
+			ShowWarningError( "Surfaces in Zone=\"" + Zone( ZoneNum ).Name + "\" do not define an enclosure." );
 			ShowContinueError( "Number of surfaces <= 3, view factors are set to force reciprocity." );
 
 			F = FixedF;
@@ -1177,8 +1177,8 @@ namespace HeatBalanceIntRadExchange {
 				}
 				CheckConvergeTolerance = std::abs( sum( FixedF ) - N );
 				if ( CheckConvergeTolerance > .005 ) {
-					ShowWarningError( "FixViewFactors: View factors not complete. Check for " "bad surface descriptions or unenclosed zone=\"" + trim( Zone( ZoneNum ).Name ) + "\"." );
-					ShowContinueError( "Enforced reciprocity has tolerance (ideal is 0)=[" + trim( RoundSigDigits( CheckConvergeTolerance, 6 ) ) + "], Row Sum (ideal is " + trim( RoundSigDigits( N ) ) + ")=[" + trim( RoundSigDigits( RowSum, 2 ) ) + "]." );
+					ShowWarningError( "FixViewFactors: View factors not complete. Check for " "bad surface descriptions or unenclosed zone=\"" + Zone( ZoneNum ).Name + "\"." );
+					ShowContinueError( "Enforced reciprocity has tolerance (ideal is 0)=[" + RoundSigDigits( CheckConvergeTolerance, 6 ) + "], Row Sum (ideal is " + RoundSigDigits( N ) + ")=[" + RoundSigDigits( RowSum, 2 ) + "]." );
 					ShowContinueError( "If zone is unusual, or tolerance is on the order of 0.001, view factors are probably OK." );
 				}
 				FixedCheckValue = std::abs( sum( FixedF ) - N );
@@ -1212,7 +1212,7 @@ namespace HeatBalanceIntRadExchange {
 				F = FixedF;
 				FinalCheckValue = FixedCheckValue;
 			} else {
-				ShowWarningError( "FixViewFactors: View factors not complete. Check for " "bad surface descriptions or unenclosed zone=\"" + trim( Zone( ZoneNum ).Name ) + "\"." );
+				ShowWarningError( "FixViewFactors: View factors not complete. Check for " "bad surface descriptions or unenclosed zone=\"" + Zone( ZoneNum ).Name + "\"." );
 			}
 		}
 

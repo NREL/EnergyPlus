@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -17,12 +16,11 @@ namespace EnergyPlus {
 namespace Furnaces {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 	using VariableSpeedCoils::MaxSpedLevels;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
-	extern Fstring const Blank;
+	extern std::string const Blank;
 
 	// Last mode of operation
 	extern int const CoolingMode; // last compressor operating mode was in cooling
@@ -63,7 +61,7 @@ namespace Furnaces {
 	extern Real64 TempSteamIn; // steam coil steam inlet temperature
 	//starting add variables for variable speed water source heat pump
 	extern Real64 SaveCompressorPLR; // holds compressor PLR from active DX coil
-	extern Fstring CurrentModuleObject; // Object type for getting and error messages
+	extern std::string CurrentModuleObject; // Object type for getting and error messages
 	//ending varibles for variable speed water source heat pump
 
 	// Subroutine Specifications for the Module
@@ -86,7 +84,7 @@ namespace Furnaces {
 	struct FurnaceEquipConditions
 	{
 		// Members
-		Fstring Name; // Name of the Furnace
+		std::string Name; // Name of the Furnace
 		int FurnaceType_Num; // Numeric Equivalent for Furnace Type
 		int FurnaceIndex; // Index to furnace
 		int SchedPtr; // Index to furnace operating schedule
@@ -103,8 +101,8 @@ namespace Furnaces {
 		int HeatingCoilIndex; // Index to heating coil
 		int ReheatingCoilType_Num; // Numeric Equivalent for Reheat Coil Type
 		int ReheatingCoilIndex; // Index to reheat coil
-		Fstring HeatingCoilName; // name of heating coil
-		Fstring HeatingCoilType; // type of heating coil
+		std::string HeatingCoilName; // name of heating coil
+		std::string HeatingCoilType; // type of heating coil
 		int CoilControlNode; // control node for hot water and steam heating coils
 		int HWCoilAirInletNode; // air inlet node number of HW coil for PTAC, PTHP, HeatCool, HeatOnly
 		int HWCoilAirOutletNode; // air outlet node number of HW coil for PTAC, PTHP, HeatCool, HeatOnly
@@ -113,8 +111,8 @@ namespace Furnaces {
 		int SuppHeatCoilType_Num; // Numeric Equivalent for Supplemental Heat Coil Type
 		int SuppHeatCoilIndex; // Index to supplemental heater
 		int SuppCoilControlNode; // control node for steam and hot water heating coil
-		Fstring SuppHeatCoilName; // name of supplemental heating coil
-		Fstring SuppHeatCoilType; // type of supplemental heating coil
+		std::string SuppHeatCoilName; // name of supplemental heating coil
+		std::string SuppHeatCoilType; // type of supplemental heating coil
 		int FanType_Num; // Integer equivalent of fan type (1=OnOff, 2 = ConstVolume)
 		int FanIndex; // Index to fan object
 		int FurnaceInletNodeNum; // Furnace inlet node number
@@ -238,7 +236,6 @@ namespace Furnaces {
 
 		// Default Constructor
 		FurnaceEquipConditions() :
-			Name( MaxNameLength ),
 			FurnaceType_Num( 0 ),
 			FurnaceIndex( 0 ),
 			SchedPtr( 0 ),
@@ -255,8 +252,6 @@ namespace Furnaces {
 			HeatingCoilIndex( 0 ),
 			ReheatingCoilType_Num( 0 ),
 			ReheatingCoilIndex( 0 ),
-			HeatingCoilName( MaxNameLength ),
-			HeatingCoilType( MaxNameLength ),
 			CoilControlNode( 0 ),
 			HWCoilAirInletNode( 0 ),
 			HWCoilAirOutletNode( 0 ),
@@ -265,8 +260,6 @@ namespace Furnaces {
 			SuppHeatCoilType_Num( 0 ),
 			SuppHeatCoilIndex( 0 ),
 			SuppCoilControlNode( 0 ),
-			SuppHeatCoilName( MaxNameLength ),
-			SuppHeatCoilType( MaxNameLength ),
 			FanType_Num( 0 ),
 			FanIndex( 0 ),
 			FurnaceInletNodeNum( 0 ),
@@ -382,7 +375,7 @@ namespace Furnaces {
 
 		// Member Constructor
 		FurnaceEquipConditions(
-			Fstring const & Name, // Name of the Furnace
+			std::string const & Name, // Name of the Furnace
 			int const FurnaceType_Num, // Numeric Equivalent for Furnace Type
 			int const FurnaceIndex, // Index to furnace
 			int const SchedPtr, // Index to furnace operating schedule
@@ -399,8 +392,8 @@ namespace Furnaces {
 			int const HeatingCoilIndex, // Index to heating coil
 			int const ReheatingCoilType_Num, // Numeric Equivalent for Reheat Coil Type
 			int const ReheatingCoilIndex, // Index to reheat coil
-			Fstring const & HeatingCoilName, // name of heating coil
-			Fstring const & HeatingCoilType, // type of heating coil
+			std::string const & HeatingCoilName, // name of heating coil
+			std::string const & HeatingCoilType, // type of heating coil
 			int const CoilControlNode, // control node for hot water and steam heating coils
 			int const HWCoilAirInletNode, // air inlet node number of HW coil for PTAC, PTHP, HeatCool, HeatOnly
 			int const HWCoilAirOutletNode, // air outlet node number of HW coil for PTAC, PTHP, HeatCool, HeatOnly
@@ -409,8 +402,8 @@ namespace Furnaces {
 			int const SuppHeatCoilType_Num, // Numeric Equivalent for Supplemental Heat Coil Type
 			int const SuppHeatCoilIndex, // Index to supplemental heater
 			int const SuppCoilControlNode, // control node for steam and hot water heating coil
-			Fstring const & SuppHeatCoilName, // name of supplemental heating coil
-			Fstring const & SuppHeatCoilType, // type of supplemental heating coil
+			std::string const & SuppHeatCoilName, // name of supplemental heating coil
+			std::string const & SuppHeatCoilType, // type of supplemental heating coil
 			int const FanType_Num, // Integer equivalent of fan type (1=OnOff, 2 = ConstVolume)
 			int const FanIndex, // Index to fan object
 			int const FurnaceInletNodeNum, // Furnace inlet node number
@@ -523,7 +516,7 @@ namespace Furnaces {
 			int const ErrIndexVar,
 			int const WaterCyclingMode // Heat Pump Coil water flow mode; See definitions in DataHVACGlobals,
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			FurnaceType_Num( FurnaceType_Num ),
 			FurnaceIndex( FurnaceIndex ),
 			SchedPtr( SchedPtr ),
@@ -540,8 +533,8 @@ namespace Furnaces {
 			HeatingCoilIndex( HeatingCoilIndex ),
 			ReheatingCoilType_Num( ReheatingCoilType_Num ),
 			ReheatingCoilIndex( ReheatingCoilIndex ),
-			HeatingCoilName( MaxNameLength, HeatingCoilName ),
-			HeatingCoilType( MaxNameLength, HeatingCoilType ),
+			HeatingCoilName( HeatingCoilName ),
+			HeatingCoilType( HeatingCoilType ),
 			CoilControlNode( CoilControlNode ),
 			HWCoilAirInletNode( HWCoilAirInletNode ),
 			HWCoilAirOutletNode( HWCoilAirOutletNode ),
@@ -550,8 +543,8 @@ namespace Furnaces {
 			SuppHeatCoilType_Num( SuppHeatCoilType_Num ),
 			SuppHeatCoilIndex( SuppHeatCoilIndex ),
 			SuppCoilControlNode( SuppCoilControlNode ),
-			SuppHeatCoilName( MaxNameLength, SuppHeatCoilName ),
-			SuppHeatCoilType( MaxNameLength, SuppHeatCoilType ),
+			SuppHeatCoilName( SuppHeatCoilName ),
+			SuppHeatCoilType( SuppHeatCoilType ),
 			FanType_Num( FanType_Num ),
 			FanIndex( FanIndex ),
 			FurnaceInletNodeNum( FurnaceInletNodeNum ),
@@ -674,7 +667,7 @@ namespace Furnaces {
 
 	void
 	SimFurnace(
-		Fstring const & FurnaceName,
+		std::string const & FurnaceName,
 		bool const FirstHVACIteration,
 		int const AirLoopNum, // Primary air loop number
 		int & CompIndex // Pointer to which furnace

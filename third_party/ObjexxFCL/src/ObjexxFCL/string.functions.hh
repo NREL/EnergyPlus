@@ -15,7 +15,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/TypeTraits.hh>
-#include <ObjexxFCL/char.constants.hh>
 #include <ObjexxFCL/char.functions.hh>
 
 // C++ Headers
@@ -122,7 +121,7 @@ inline
 bool
 is_blank( std::string const & s )
 {
-	return ( s.empty() ? true : s.find_first_not_of( SPC ) == std::string::npos );
+	return ( s.empty() ? true : s.find_first_not_of( ' ' ) == std::string::npos );
 }
 
 // string is Not Blank?
@@ -205,12 +204,8 @@ has( std::string const & s, char const c )
 
 // string has a String/Character Case-Insensitively?
 template< typename T >
-inline
 bool
-hasi( std::string const & s, T const & t )
-{
-	return ( indexi( s, t ) != std::string::npos );
-}
+hasi( std::string const & s, T const & t ); // Implementation below
 
 // string has any Character of a string?
 inline
@@ -264,22 +259,19 @@ has_any_not_of( std::string const & s, char const c )
 bool
 has_prefix( std::string const & s, std::string const & pre, bool const exact_case = true );
 
-// Has a Prefix Case-Insensitively?
-inline
-bool
-has_prefixi( std::string const & s, std::string const & pre )
-{
-	return has_prefix( s, pre, false );
-}
-
 // Has a Prefix Case-Optionally?
 bool
 has_prefix( std::string const & s, c_cstring const pre, bool const exact_case = true );
 
+// Has a Prefix Case-Optionally?
+bool
+has_prefix( std::string const & s, char const pre, bool const exact_case = true );
+
 // Has a Prefix Case-Insensitively?
+template< typename S >
 inline
 bool
-has_prefixi( std::string const & s, c_cstring const pre )
+has_prefixi( std::string const & s, S const & pre )
 {
 	return has_prefix( s, pre, false );
 }
@@ -288,22 +280,19 @@ has_prefixi( std::string const & s, c_cstring const pre )
 bool
 has_suffix( std::string const & s, std::string const & suf, bool const exact_case = true );
 
-// Has a Suffix Case-Insensitively?
-inline
-bool
-has_suffixi( std::string const & s, std::string const & suf )
-{
-	return has_suffix( s, suf, false );
-}
-
 // Has a Suffix Case-Optionally?
 bool
 has_suffix( std::string const & s, c_cstring const suf, bool const exact_case = true );
 
+// Has a Suffix Case-Optionally?
+bool
+has_suffix( std::string const & s, char const suf, bool const exact_case = true );
+
 // Has a Suffix Case-Insensitively?
+template< typename S >
 inline
 bool
-has_suffixi( std::string const & s, c_cstring const suf )
+has_suffixi( std::string const & s, S const & suf )
 {
 	return has_suffix( s, suf, false );
 }
@@ -323,7 +312,7 @@ inline
 std::string::size_type
 len_trim( std::string const & s )
 {
-	return s.find_last_not_of( SPC ) + 1; // Works if npos returned: npos + 1 == 0
+	return s.find_last_not_of( ' ' ) + 1; // Works if npos returned: npos + 1 == 0
 }
 
 // Length Whitespace-Trimmed
@@ -404,6 +393,15 @@ std::string::size_type
 rindexi( std::string const & s, T const & t )
 {
 	return indexi( s, t, true );
+}
+
+// string has a String/Character Case-Insensitively?
+template< typename T >
+inline
+bool
+hasi( std::string const & s, T const & t )
+{
+	return ( indexi( s, t ) != std::string::npos );
 }
 
 // Find any Characters of Another String
@@ -533,16 +531,62 @@ std::string &
 rstrip_whitespace( std::string & s );
 
 // Pad a string to a Specified Length
+inline
 std::string &
-pad( std::string & s, std::string::size_type const len );
+pad( std::string & s, std::string::size_type const len )
+{
+	std::string::size_type const s_len( s.length() );
+	if ( s_len < len ) s.append( len - s_len, ' ' ); // Pad
+	return s;
+}
 
 // Left-Pad a string to a Specified Length
+inline
 std::string &
-lpad( std::string & s, std::string::size_type const len );
+lpad( std::string & s, std::string::size_type const len )
+{
+	std::string::size_type const s_len( s.length() );
+	if ( s_len < len ) s.insert( static_cast< std::string::size_type >( 0 ), len - s_len, ' ' ); // Left-pad
+	return s;
+}
 
 // Right-Pad a string to a Specified Length
+inline
 std::string &
-rpad( std::string & s, std::string::size_type const len );
+rpad( std::string & s, std::string::size_type const len )
+{
+	std::string::size_type const s_len( s.length() );
+	if ( s_len < len ) s.append( len - s_len, ' ' ); // Pad
+	return s;
+}
+
+// Pare a string to a Specified Length
+inline
+std::string &
+pare( std::string & s, std::string::size_type const len )
+{
+	if ( s.length() > len ) s.erase( len ); // Pare
+	return s;
+}
+
+// Left-Pare a string to a Specified Length
+inline
+std::string &
+lpare( std::string & s, std::string::size_type const len )
+{
+	std::string::size_type const s_len( s.length() );
+	if ( s_len > len ) s.erase( 0, s_len - len ); // Pare
+	return s;
+}
+
+// Right-Pare a string to a Specified Length
+inline
+std::string &
+rpare( std::string & s, std::string::size_type const len )
+{
+	if ( s.length() > len ) s.erase( len ); // Pare
+	return s;
+}
 
 // Size a string to a Specified Length
 std::string &
@@ -584,7 +628,7 @@ inline
 std::string
 blank( std::string::size_type const len )
 {
-	return std::string( len, SPC );
+	return std::string( len, ' ' );
 }
 
 // Lowercased Copy of a string
@@ -664,16 +708,56 @@ std::string
 rstripped_whitespace( std::string const & s );
 
 // Padded to a Specified Length Copy of a string
+inline
 std::string
-padded( std::string const & s, std::string::size_type const len );
+padded( std::string const & s, std::string::size_type const len )
+{
+	std::string::size_type const s_len( s.length() );
+	return ( s_len < len ? s + std::string( len - s_len, ' ' ) : s );
+}
 
 // Left-Padded to a Specified Length Copy of a string
+inline
 std::string
-lpadded( std::string const & s, std::string::size_type const len );
+lpadded( std::string const & s, std::string::size_type const len )
+{
+	std::string::size_type const s_len( s.length() );
+	return ( s_len < len ? std::string( len - s_len, ' ' ).append( s ) : s );
+}
 
 // Right-Padded to a Specified Length Copy of a string
+inline
 std::string
-rpadded( std::string const & s, std::string::size_type const len );
+rpadded( std::string const & s, std::string::size_type const len )
+{
+	std::string::size_type const s_len( s.length() );
+	return ( s_len < len ? s + std::string( len - s_len, ' ' ) : s );
+}
+
+// Pared to a Specified Length Copy of a string
+inline
+std::string
+pared( std::string const & s, std::string::size_type const len )
+{
+	return ( s.length() > len ? std::string( s, 0, len ) : s );
+}
+
+// Left-Pared to a Specified Length Copy of a string
+inline
+std::string
+lpared( std::string const & s, std::string::size_type const len )
+{
+	std::string::size_type const s_len( s.length() );
+	return ( s_len > len ? std::string( s, s_len - len ) : s );
+}
+
+// Right-Pared to a Specified Length Copy of a string
+inline
+std::string
+rpared( std::string const & s, std::string::size_type const len )
+{
+	return ( s.length() > len ? std::string( s, 0, len ) : s );
+}
 
 // Sized to a Specified Length Copy of a string
 std::string
@@ -763,7 +847,7 @@ std::string
 left_string_of(
 	T const & t,
 	int const w, // Minimum width
-	char const f = SPC // Fill character
+	char const f = ' ' // Fill character
 )
 {
 	std::ostringstream t_stream;
@@ -779,7 +863,7 @@ std::string
 right_string_of(
 	T const & t,
 	int const w, // Minimum width
-	char const f = SPC // Fill character
+	char const f = ' ' // Fill character
 )
 {
 	std::ostringstream t_stream;

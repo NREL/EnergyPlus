@@ -1,10 +1,12 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <General.hh>
@@ -861,7 +863,7 @@ namespace General {
 
 	}
 
-	Fstring
+	std::string
 	TrimSigDigits(
 		Real64 const RealValue,
 		int const SigDigits
@@ -890,9 +892,6 @@ namespace General {
 
 		//USE, INTRINSIC :: IEEE_ARITHMETIC, ONLY : IEEE_IS_NAN ! Use IEEE_IS_NAN when GFortran supports it
 
-		// Return value
-		Fstring OutputString( 32 );
-
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
 
@@ -906,47 +905,40 @@ namespace General {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int DotPos; // Position of decimal point in original string
-		int EPos; // Position of E in original string format xxEyy
-		int SLen; // Length of String (w/o E part)
-		Fstring String( 32 ); // Working string
-		Fstring EString( 10 ); // E string retained from original string
-		bool IncludeDot; // True when decimal point output
 
+		if ( std::isnan( RealValue ) ) return "NAN";
+
+		std::string String; // Working string
 		if ( RealValue != 0.0 ) {
 			gio::write( String, "*" ) << RealValue;
 		} else {
 			String = "0.000000000000000000000000000";
 		}
-		EPos = index( String, "E" );
-		if ( EPos > 0 ) {
-			EString = String( EPos );
-			String( EPos ) = " ";
-		} else {
-			EString = " ";
+		std::string::size_type const EPos = index( String, 'E' ); // Position of E in original string format xxEyy
+		std::string EString; // E string retained from original string
+		if ( EPos != std::string::npos ) {
+			EString = String.substr( EPos );
+			String.erase( EPos );
 		}
-		DotPos = index( String, "." );
-		SLen = len_trim( String );
-		if ( SigDigits > 0 || EString != " " ) {
+		std::string::size_type const DotPos = index( String, '.' ); // Position of decimal point in original string
+		std::string::size_type const SLen = len( String ); // Length of String (w/o E part)
+		bool IncludeDot; // True when decimal point output
+		if ( SigDigits > 0 || EString != "" ) {
 			IncludeDot = true;
 		} else {
 			IncludeDot = false;
 		}
 		if ( IncludeDot ) {
-			String = String( 1, min( DotPos + SigDigits, SLen ) ) + EString;
+			String.erase( min( DotPos + SigDigits + 1, SLen ) );
+			String += EString;
 		} else {
-			String = String( 1, DotPos - 1 );
+			String.erase( DotPos );
 		}
-		if ( std::isnan( RealValue ) ) { // Use IEEE_IS_NAN when GFortran supports it
-			String = "NAN";
-		}
-		OutputString = adjustl( String );
-
-		return OutputString;
+		return stripped( String );
 
 	}
 
-	Fstring
+	std::string
 	TrimSigDigits(
 		int const IntegerValue,
 		Optional_int_const SigDigits // ignored
@@ -973,9 +965,6 @@ namespace General {
 		// USE STATEMENTS:
 		// na
 
-		// Return value
-		Fstring OutputString( 32 );
-
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
 
@@ -989,16 +978,13 @@ namespace General {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Fstring String( 32 ); // Working string
+		std::string String; // Working string
 
 		gio::write( String, "*" ) << IntegerValue;
-		OutputString = adjustl( String );
-
-		return OutputString;
-
+		return stripped( String );
 	}
 
-	Fstring
+	std::string
 	RoundSigDigits(
 		Real64 const RealValue,
 		int const SigDigits
@@ -1027,14 +1013,11 @@ namespace General {
 
 		//USE, INTRINSIC :: IEEE_ARITHMETIC, ONLY : IEEE_IS_NAN ! Use IEEE_IS_NAN when GFortran supports it
 
-		// Return value
-		Fstring OutputString( 32 );
-
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static Fstring DigitChar( "01234567890" );
+		static std::string const DigitChar( "01234567890" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1043,104 +1026,105 @@ namespace General {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int DotPos; // Position of decimal point in original string
-		int EPos; // Position of E in original string format xxEyy
-		int TPos; // Position of Testchar in Digit string
-		int NPos; // Position of "next" char in Digit String
-		int TPos1; // Position of "next" char rounded in Digit string
-		int SPos; // Actual string position being replaced
-		int SLen; // Length of String (w/o E part)
-		Fstring String( 32 ); // Working string
-		Fstring EString( 10 ); // E string retained from original string
-		Fstring TestChar( 1 ); // Test character (digit) for rounding, if position in digit string > 5 (digit is 5 or greater)
-		// then will round
-		Fstring Char2Rep( 1 ); // Character (digit) to be replaced
-		bool IncludeDot; // True when decimal point output
 
+		if ( std::isnan( RealValue ) ) return "NAN";
+
+		std::string String; // Working string
 		if ( RealValue != 0.0 ) {
 			gio::write( String, "*" ) << RealValue;
 		} else {
 			String = "0.000000000000000000000000000";
 		}
-		EPos = index( String, "E" );
-		if ( EPos > 0 ) {
-			EString = String( EPos );
-			String( EPos ) = " ";
-		} else {
-			EString = " ";
+
+		std::string::size_type const EPos = index( String, 'E' ); // Position of E in original string format xxEyy
+		std::string EString; // E string retained from original string
+		if ( EPos != std::string::npos ) {
+			EString = String.substr( EPos );
+			String.erase( EPos );
 		}
 
-		DotPos = index( String, "." );
-		TestChar = String( DotPos + SigDigits + 1, DotPos + SigDigits + 1 );
-		TPos = index( DigitChar, TestChar );
+		std::string::size_type const DotPos = index( String, '.' ); // Position of decimal point in original string
+		assert( DotPos != std::string::npos );
+		assert( DotPos > 0 ); // Or SPos will not be valid
+		char TestChar( DotPos + SigDigits + 1 < String.length() ? String[ DotPos + SigDigits + 1 ] : ' ' ); // Test character (digit) for rounding, if position in digit string >= 5 (digit is 5 or greater) then will round
+		std::string::size_type const TPos = index( DigitChar, TestChar ); // Position of Testchar in Digit string
 
+		std::string::size_type SPos; // Actual string position being replaced
 		if ( SigDigits == 0 ) {
 			SPos = DotPos - 1;
 		} else {
 			SPos = DotPos + SigDigits;
 		}
 
-		if ( TPos > 5 ) { // Must round to next Digit
-			Char2Rep = String( SPos, SPos );
-			NPos = index( DigitChar, Char2Rep );
-			String( SPos, SPos ) = DigitChar( NPos + 1, NPos + 1 );
-			while ( NPos == 10 ) {
-				// Must change other char too
+		if ( ( TPos != std::string::npos ) && ( TPos >= 5 ) ) { // Must round to next Digit
+			char const Char2Rep = String[ SPos ]; // Character (digit) to be replaced
+			std::string::size_type NPos = index( DigitChar, Char2Rep ); // Position of "next" char in Digit String
+			std::string::size_type TPos1;
+			assert( NPos != std::string::npos );
+			String[ SPos ] = DigitChar[ NPos + 1 ];
+			while ( NPos == 9 ) { // Must change other char too
 				if ( SigDigits == 1 ) {
-					TestChar = String( SPos - 2, SPos - 2 );
-					if ( TestChar == "." ) {
-						TestChar = String( SPos - 3, SPos - 3 );
+					assert( SPos >= 2u );
+					TestChar = String[ SPos - 2 ];
+					if ( TestChar == '.' ) {
+						assert( SPos >= 3u );
+						TestChar = String[ SPos - 3 ];
 						SPos -= 2;
 					}
-					if ( TestChar == " " ) {
-						TestChar = "0"; // all 999s
-					} else if ( TestChar == "-" ) { //Autodesk Added to fix bug for values like -9.9999
-						String( SPos - 3, SPos - 3 ) = TestChar; // Shift sign left to avoid overwriting it
-						TestChar = "0"; // all 999s
+					if ( TestChar == ' ' ) {
+						TestChar = '0'; // all 999s
+					} else if ( TestChar == '-' ) { //Autodesk Added to fix bug for values like -9.9999
+						assert( SPos >= 3u );
+						String[ SPos - 3 ] = TestChar; // Shift sign left to avoid overwriting it
+						TestChar = '0'; // all 999s
 					}
 					TPos1 = index( DigitChar, TestChar );
-					String( SPos - 2, SPos - 2 ) = DigitChar( TPos1 + 1, TPos1 + 1 );
+					assert( TPos1 != std::string::npos );
+					assert( SPos >= 2u );
+					String[ SPos - 2 ] = DigitChar[ TPos1 + 1 ];
 				} else {
-					TestChar = String( SPos - 1, SPos - 1 );
-					if ( TestChar == "." ) {
-						TestChar = String( SPos - 2, SPos - 2 );
+					assert( SPos >= 1u );
+					TestChar = String[ SPos - 1 ];
+					if ( TestChar == '.' ) {
+						assert( SPos >= 2u );
+						TestChar = String[ SPos - 2 ];
 						--SPos;
 					}
-					if ( TestChar == " " ) {
-						TestChar = "0"; // all 999s
-					} else if ( TestChar == "-" ) { //Autodesk Added to fix bug for values like -9.9999
-						String( SPos - 2, SPos - 2 ) = TestChar; // Shift sign left to avoid overwriting it
-						TestChar = "0"; // all 999s
+					if ( TestChar == ' ' ) {
+						TestChar = '0'; // all 999s
+					} else if ( TestChar == '-' ) { //Autodesk Added to fix bug for values like -9.9999
+						assert( SPos >= 2u );
+						String[ SPos - 2 ] = TestChar; // Shift sign left to avoid overwriting it
+						TestChar = '0'; // all 999s
 					}
 					TPos1 = index( DigitChar, TestChar );
-					String( SPos - 1, SPos - 1 ) = DigitChar( TPos1 + 1, TPos1 + 1 );
+					assert( TPos1 != std::string::npos );
+					assert( SPos >= 1u );
+					String[ SPos - 1 ] = DigitChar[ TPos1 + 1 ];
 				}
 				--SPos;
 				NPos = TPos1;
 			}
 		}
 
-		SLen = len_trim( String );
-		if ( SigDigits > 0 || EString != " " ) {
+		bool IncludeDot; // True when decimal point output
+		if ( SigDigits > 0 || EString != "" ) {
 			IncludeDot = true;
 		} else {
 			IncludeDot = false;
 		}
 		if ( IncludeDot ) {
-			String = String( 1, min( DotPos + SigDigits, SLen ) ) + EString;
+			String.erase( min( DotPos + SigDigits + 1, len( String ) ) );
+			String += EString;
 		} else {
-			String = String( 1, DotPos - 1 );
+			String.erase( DotPos );
 		}
-		if ( std::isnan( RealValue ) ) { // Use IEEE_IS_NAN when GFortran supports it
-			String = "NAN";
-		}
-		OutputString = adjustl( String );
 
-		return OutputString;
+		return stripped( String );
 
 	}
 
-	Fstring
+	std::string
 	RoundSigDigits(
 		int const IntegerValue,
 		Optional_int_const SigDigits // ignored
@@ -1167,9 +1151,6 @@ namespace General {
 		// USE STATEMENTS:
 		// na
 
-		// Return value
-		Fstring OutputString( 32 );
-
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
 
@@ -1183,17 +1164,14 @@ namespace General {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Fstring String( 32 ); // Working string
+		std::string String; // Working string
 
 		gio::write( String, "*" ) << IntegerValue;
-		OutputString = adjustl( String );
-
-		return OutputString;
-
+		return stripped( String );
 	}
 
-	Fstring
-	RemoveTrailingZeros( Fstring const & InputString )
+	std::string
+	RemoveTrailingZeros( std::string const & InputString )
 	{
 
 		// FUNCTION INFORMATION:
@@ -1215,7 +1193,7 @@ namespace General {
 		// na
 
 		// Return value
-		Fstring ResultString( len( InputString ) );
+		std::string ResultString;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -1230,16 +1208,14 @@ namespace General {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int Pos;
 
-		Pos = SCAN( InputString, "ED" );
-
-		if ( Pos == 0 ) {
-			Pos = SCAN( InputString, "." );
-			if ( Pos != 0 ) {
-				Pos = SCAN( InputString, "123456789.", true );
-				if ( Pos > 0 ) {
-					ResultString = InputString( 1, Pos );
+		std::string::size_type Pos = scan( InputString, "ED" );
+		if ( Pos == std::string::npos ) {
+			Pos = scan( InputString, '.' );
+			if ( Pos != std::string::npos ) {
+				Pos = scan( InputString, "123456789.", true );
+				if ( Pos != std::string::npos ) {
+					ResultString = InputString.substr( 0, Pos + 1 );
 				} else {
 					ResultString = "0.";
 				}
@@ -1251,7 +1227,6 @@ namespace General {
 		}
 
 		return ResultString;
-
 	}
 
 	void
@@ -1323,7 +1298,7 @@ namespace General {
 
 	void
 	ProcessDateString(
-		Fstring const & String,
+		std::string const & String,
 		int & PMonth,
 		int & PDay,
 		int & PWeekDay,
@@ -1383,7 +1358,7 @@ namespace General {
 				PDay = 0;
 				DateType = 1;
 			} else if ( FstNum < 0 || FstNum > 366 ) {
-				ShowSevereError( "Invalid Julian date Entered=" + trim( String ) );
+				ShowSevereError( "Invalid Julian date Entered=" + String );
 				ErrorsFound = true;
 			} else {
 				InvJulianDay( FstNum, PMonth, PDay, 0 );
@@ -1412,7 +1387,7 @@ namespace General {
 
 	void
 	DetermineDateTokens(
-		Fstring const & String,
+		std::string const & String,
 		int & NumTokens, // Number of tokens found in string
 		int & TokenDay, // Value of numeric field found
 		int & TokenMonth, // Value of Month field found (1=Jan, 2=Feb, etc)
@@ -1441,7 +1416,6 @@ namespace General {
 		// na
 
 		// Using/Aliasing
-		using DataGlobals::MaxNameLength;
 		using InputProcessor::FindItemInList;
 		using InputProcessor::ProcessNumber;
 
@@ -1449,14 +1423,14 @@ namespace General {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const Blank( 1 );
-		int const NumSingleChars( 3 );
-		static FArray1D_Fstring const SingleChars( NumSingleChars, sFstring( 1 ), { "/", ":", "-" } );
-		int const NumDoubleChars( 6 );
-		static FArray1D_Fstring const DoubleChars( NumDoubleChars, sFstring( 3 ), { "ST ", "ND ", "RD ", "TH ", "OF ", "IN " } );
-		static FArray1D_Fstring const Months( 12, sFstring( 3 ), { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" } );
-		static FArray1D_Fstring const Weekdays( 7, sFstring( 3 ), { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT" } );
-		static Fstring const Numbers( "0123456789" );
+		static std::string const Blank;
+		static int const NumSingleChars( 3 );
+		static FArray1D_string const SingleChars( NumSingleChars, { "/", ":", "-" } );
+		static int const NumDoubleChars( 6 );
+		static FArray1D_string const DoubleChars( NumDoubleChars, { "ST ", "ND ", "RD ", "TH ", "OF ", "IN " } ); // Need trailing spaces: Want thse only at end of words
+		static FArray1D_string const Months( 12, { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" } );
+		static FArray1D_string const Weekdays( 7, { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT" } );
+		static std::string const Numbers( "0123456789" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1465,10 +1439,10 @@ namespace General {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Fstring CurrentString( MaxNameLength );
-		int Pos;
+		std::string CurrentString;
+		std::string::size_type Pos;
 		int Loop;
-		FArray1D_Fstring Fields( 3, sFstring( 15 ) );
+		FArray1D_string Fields( 3 );
 		int NumField1;
 		int NumField2;
 		int NumField3;
@@ -1489,37 +1463,38 @@ namespace General {
 
 		for ( Loop = 1; Loop <= NumSingleChars; ++Loop ) {
 			Pos = index( CurrentString, SingleChars( Loop ) );
-			while ( Pos > 0 ) {
-				CurrentString( Pos, Pos ) = " ";
+			while ( Pos != std::string::npos ) {
+				CurrentString[ Pos ] = ' ';
 				Pos = index( CurrentString, SingleChars( Loop ) );
 			}
 		}
 
 		for ( Loop = 1; Loop <= NumDoubleChars; ++Loop ) {
 			Pos = index( CurrentString, DoubleChars( Loop ) );
-			while ( Pos > 0 ) {
-				CurrentString( Pos, Pos + 1 ) = "  ";
+			while ( Pos != std::string::npos ) {
+				CurrentString.replace( Pos, 2, "  " );
 				Pos = index( CurrentString, DoubleChars( Loop ) );
 				WkDayInMonth = true;
 			}
 		}
 
-		CurrentString = adjustl( CurrentString );
+		strip( CurrentString );
 		if ( CurrentString == Blank ) {
-			ShowSevereError( "Invalid date field=" + trim( String ) );
+			ShowSevereError( "Invalid date field=" + String );
 			ErrorsFound = true;
 		} else {
 			Loop = 0;
 			while ( Loop < 3 ) { // Max of 3 fields
 				if ( CurrentString == Blank ) break;
-				Pos = index( CurrentString, " " );
+				Pos = index( CurrentString, ' ' );
 				++Loop;
-				Fields( Loop ) = CurrentString( 1, Pos - 1 );
-				CurrentString = CurrentString( Pos );
-				CurrentString = adjustl( CurrentString );
+				if ( Pos == std::string::npos ) Pos = CurrentString.length();
+				Fields( Loop ) = CurrentString.substr( 0, Pos );
+				CurrentString.erase( 0, Pos );
+				strip( CurrentString );
 			}
-			if ( CurrentString != Blank ) {
-				ShowSevereError( "Invalid date field=" + trim( String ) );
+			if ( not_blank( CurrentString ) ) {
+				ShowSevereError( "Invalid date field=" + String );
 				ErrorsFound = true;
 			} else if ( Loop == 2 ) {
 				// Field must be Day Month or Month Day (if both numeric, mon / day)
@@ -1529,12 +1504,12 @@ namespace General {
 					// Month day, but first field is not numeric, 2nd must be
 					NumField2 = int( ProcessNumber( Fields( 2 ), errFlag ) );
 					if ( errFlag ) {
-						ShowSevereError( "Invalid date field=" + trim( String ) );
+						ShowSevereError( "Invalid date field=" + String );
 						InternalError = true;
 					} else {
 						TokenDay = NumField2;
 					}
-					TokenMonth = FindItemInList( Fields( 1 )( 1, 3 ), Months, 12 );
+					TokenMonth = FindItemInList( Fields( 1 ).substr( 0, 3 ), Months, 12 );
 					ValidateMonthDay( String, TokenDay, TokenMonth, InternalError );
 					if ( ! InternalError ) {
 						DateType = 1;
@@ -1555,7 +1530,7 @@ namespace General {
 						}
 					} else { // 2nd field was not numeric.  Must be Month
 						TokenDay = NumField1;
-						TokenMonth = FindItemInList( Fields( 2 )( 1, 3 ), Months, 12 );
+						TokenMonth = FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
 						ValidateMonthDay( String, TokenDay, TokenMonth, InternalError );
 						if ( ! InternalError ) {
 							DateType = 1;
@@ -1571,33 +1546,33 @@ namespace General {
 					NumField1 = int( ProcessNumber( Fields( 1 ), errFlag ) );
 					if ( ! errFlag ) { // the expected result
 						TokenDay = NumField1;
-						TokenWeekday = FindItemInList( Fields( 2 )( 1, 3 ), Weekdays, 7 );
+						TokenWeekday = FindItemInList( Fields( 2 ).substr( 0, 3 ), Weekdays, 7 );
 						if ( TokenWeekday == 0 ) {
-							TokenMonth = FindItemInList( Fields( 2 )( 1, 3 ), Months, 12 );
-							TokenWeekday = FindItemInList( Fields( 3 )( 1, 3 ), Weekdays, 7 );
+							TokenMonth = FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
+							TokenWeekday = FindItemInList( Fields( 3 ).substr( 0, 3 ), Weekdays, 7 );
 							if ( TokenMonth == 0 || TokenWeekday == 0 ) InternalError = true;
 						} else {
-							TokenMonth = FindItemInList( Fields( 3 )( 1, 3 ), Months, 12 );
+							TokenMonth = FindItemInList( Fields( 3 ).substr( 0, 3 ), Months, 12 );
 							if ( TokenMonth == 0 ) InternalError = true;
 						}
 						DateType = 2;
 						NumTokens = 3;
 						if ( TokenDay < 0 || TokenDay > 5 ) InternalError = true;
 					} else { // first field was not numeric....
-						if ( Fields( 1 ) == "LA " ) {
+						if ( Fields( 1 ) == "LA" ) {
 							DateType = 3;
 							NumTokens = 3;
-							TokenWeekday = FindItemInList( Fields( 2 )( 1, 3 ), Weekdays, 7 );
+							TokenWeekday = FindItemInList( Fields( 2 ).substr( 0, 3 ), Weekdays, 7 );
 							if ( TokenWeekday == 0 ) {
-								TokenMonth = FindItemInList( Fields( 2 )( 1, 3 ), Months, 12 );
-								TokenWeekday = FindItemInList( Fields( 3 )( 1, 3 ), Weekdays, 7 );
+								TokenMonth = FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
+								TokenWeekday = FindItemInList( Fields( 3 ).substr( 0, 3 ), Weekdays, 7 );
 								if ( TokenMonth == 0 || TokenWeekday == 0 ) InternalError = true;
 							} else {
-								TokenMonth = FindItemInList( Fields( 3 )( 1, 3 ), Months, 12 );
+								TokenMonth = FindItemInList( Fields( 3 ).substr( 0, 3 ), Months, 12 );
 								if ( TokenMonth == 0 ) InternalError = true;
 							}
 						} else { // error....
-							ShowSevereError( "First date field not numeric, field=" + trim( String ) );
+							ShowSevereError( "First date field not numeric, field=" + String );
 						}
 					}
 				} else { // mm/dd/yyyy or yyyy/mm/dd
@@ -1622,7 +1597,7 @@ namespace General {
 				}
 			} else {
 				// Not enough or too many fields
-				ShowSevereError( "Invalid date field=" + trim( String ) );
+				ShowSevereError( "Invalid date field=" + String );
 				ErrorsFound = true;
 			}
 		}
@@ -1636,7 +1611,7 @@ namespace General {
 
 	void
 	ValidateMonthDay(
-		Fstring const & String, // REAL(r64) string being processed
+		std::string const & String, // REAL(r64) string being processed
 		int const Day,
 		int const Month,
 		bool & ErrorsFound
@@ -1682,7 +1657,7 @@ namespace General {
 			if ( Day < 1 || Day > EndMonthDay( Month ) ) InternalError = true;
 		}
 		if ( InternalError ) {
-			ShowSevereError( "Invalid Month Day date format=" + trim( String ) );
+			ShowSevereError( "Invalid Month Day date format=" + String );
 			ErrorsFound = true;
 		} else {
 			ErrorsFound = false;
@@ -1884,7 +1859,7 @@ namespace General {
 
 	}
 
-	Fstring
+	std::string
 	CreateSysTimeIntervalString()
 	{
 
@@ -1911,14 +1886,14 @@ namespace General {
 		using DataHVACGlobals::SysTimeElapsed;
 
 		// Return value
-		Fstring OutputString( 70 );
+		std::string OutputString;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static Fstring const TStmpFmt( "(I2.2,':',F3.0)" );
-		static Fstring const TStmpFmti( "(I2.2,':',I2.2)" );
+		static gio::Fmt const TStmpFmt( "(I2.2,':',F3.0)" );
+		static gio::Fmt const TStmpFmti( "(I2.2,':',I2.2)" );
 		Real64 const FracToMin( 60.0 );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -1932,8 +1907,8 @@ namespace General {
 		Real64 ActualTimeE; // End of current interval (HVAC time step)
 		int ActualTimeHrS;
 		//  INTEGER ActualTimeHrE
-		Fstring TimeStmpS( 10 ); // Character representation of start of interval
-		Fstring TimeStmpE( 10 ); // Character representation of end of interval
+		std::string TimeStmpS; // Character representation of start of interval
+		std::string TimeStmpE; // Character representation of end of interval
 		int ActualTimeMinS;
 
 		//  ActualTimeS=INT(CurrentTime)+(SysTimeElapsed+(CurrentTime - INT(CurrentTime)))
@@ -1952,11 +1927,11 @@ namespace General {
 		gio::write( TimeStmpS, TStmpFmti ) << ActualTimeHrS << ActualTimeMinS;
 
 		gio::write( TimeStmpE, TStmpFmt ) << int( ActualTimeE ) << ( ActualTimeE - int( ActualTimeE ) ) * FracToMin;
-		if ( TimeStmpE( 4, 4 ) == " " ) TimeStmpE( 4, 4 ) = "0";
-		TimeStmpE = adjustl( TimeStmpE );
-		TimeStmpE( 6, 6 ) = " ";
+		if ( TimeStmpE[ 3 ] == ' ' ) TimeStmpE[ 3 ] = '0';
+		TimeStmpE[ 5 ] = ' ';
+		strip( TimeStmpE );
 
-		OutputString = trim( TimeStmpS ) + " - " + trim( TimeStmpE );
+		OutputString = TimeStmpS + " - " + TimeStmpE;
 
 		return OutputString;
 
@@ -2609,7 +2584,7 @@ namespace General {
 
 	}
 
-	Fstring
+	std::string
 	CreateHVACTimeIntervalString()
 	{
 
@@ -2632,7 +2607,7 @@ namespace General {
 		// USE STATEMENTS:
 
 		// Return value
-		Fstring OutputString( 32 );
+		std::string OutputString;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -2655,7 +2630,7 @@ namespace General {
 
 	}
 
-	Fstring
+	std::string
 	CreateTimeString( Real64 const Time ) // Time in seconds
 	{
 
@@ -2682,13 +2657,13 @@ namespace General {
 		// na
 
 		// Return value
-		Fstring OutputString( 10 ); // Contains time stamp
+		std::string OutputString; // Contains time stamp
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static Fstring const TStampFmt( "(I2.2,':',I2.2,':',F4.1)" );
+		static gio::Fmt const TStampFmt( "(I2.2,':',I2.2,':',F4.1)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2697,22 +2672,22 @@ namespace General {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Fstring TimeStamp( 10 ); // Character representation of time using hh:mm:ss.ssss format
+		std::string TimeStamp; // Character representation of time using hh:mm:ss.ssss format
 		int Hours; // Number of hours <= 24
 		int Minutes; // Remaining minutes < 60
 		Real64 Seconds; // Remaining seconds < 60
 
 		ParseTime( Time, Hours, Minutes, Seconds );
 
-		TimeStamp = " ";
+		TimeStamp = "";
 		// TimeStamp written with formatting
 		// "hh:mm:ss.s"
 		// "1234567890"
 		gio::write( TimeStamp, TStampFmt ) << Hours << Minutes << Seconds;
-		if ( TimeStamp( 4, 4 ) == " " ) TimeStamp( 4, 4 ) = "0";
-		if ( TimeStamp( 7, 7 ) == " " ) TimeStamp( 7, 7 ) = "0";
-		if ( TimeStamp( 10, 10 ) == " " ) TimeStamp( 10, 10 ) = "0";
-		TimeStamp = adjustl( TimeStamp );
+		if ( TimeStamp[ 3 ] == ' ' ) TimeStamp[ 3 ] = '0';
+		if ( TimeStamp[ 6 ] == ' ' ) TimeStamp[ 6 ] = '0';
+		if ( TimeStamp[ 9 ] == ' ' ) TimeStamp[ 9 ] = '0';
+		strip( TimeStamp );
 
 		OutputString = TimeStamp;
 
@@ -2729,7 +2704,7 @@ namespace General {
 
 	}
 
-	Fstring
+	std::string
 	CreateTimeIntervalString(
 		Real64 const StartTime, // Start of current interval in seconds
 		Real64 const EndTime // End of current interval in seconds
@@ -2757,7 +2732,7 @@ namespace General {
 		// na
 
 		// Return value
-		Fstring OutputString( 32 ); // Contains time stamp
+		std::string OutputString; // Contains time stamp
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -2772,16 +2747,16 @@ namespace General {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Fstring TimeStmpS( 10 ); // Character representation of start of interval
-		Fstring TimeStmpE( 10 ); // Character representation of end of interval
+		std::string TimeStmpS; // Character representation of start of interval
+		std::string TimeStmpE; // Character representation of end of interval
 
 		TimeStmpS = CreateTimeString( StartTime );
-		TimeStmpS = adjustl( TimeStmpS );
+		strip( TimeStmpS );
 
 		TimeStmpE = CreateTimeString( EndTime );
-		TimeStmpE = adjustl( TimeStmpE );
+		strip( TimeStmpE );
 
-		OutputString = trim( TimeStmpS ) + " - " + trim( TimeStmpE );
+		OutputString = TimeStmpS + " - " + TimeStmpE;
 
 		return OutputString;
 
@@ -2865,11 +2840,11 @@ namespace General {
 
 	void
 	ScanForReports(
-		Fstring const & reportName,
+		std::string const & reportName,
 		bool & DoReport,
-		Optional_Fstring_const ReportKey,
-		Optional_Fstring Option1,
-		Optional_Fstring Option2
+		Optional_string_const ReportKey,
+		Optional_string Option1,
+		Optional_string Option2
 	)
 	{
 
@@ -2904,7 +2879,6 @@ namespace General {
 		using DataRuntimeLanguage::OutputEMSActuatorAvailSmall;
 		using DataRuntimeLanguage::OutputEMSInternalVarsFull;
 		using DataRuntimeLanguage::OutputEMSInternalVarsSmall;
-		using DataGlobals::MaxNameLength;
 		using DataGlobals::ShowDecayCurvesInEIO;
 
 		// Locals
@@ -2929,25 +2903,25 @@ namespace General {
 		static bool SurfDet( false );
 		static bool SurfDetWVert( false );
 		static bool DXFReport( false );
-		static Fstring DXFOption1( MaxNameLength );
-		static Fstring DXFOption2( MaxNameLength );
+		static std::string DXFOption1;
+		static std::string DXFOption2;
 		static bool DXFWFReport( false );
-		static Fstring DXFWFOption1( MaxNameLength );
-		static Fstring DXFWFOption2( MaxNameLength );
+		static std::string DXFWFOption1;
+		static std::string DXFWFOption2;
 		static bool VRMLReport( false );
-		static Fstring VRMLOption1( MaxNameLength );
-		static Fstring VRMLOption2( MaxNameLength );
+		static std::string VRMLOption1;
+		static std::string VRMLOption2;
 		static bool CostInfo( false );
 		static bool ViewFactorInfo( false );
-		static Fstring ViewRptOption1( MaxNameLength );
+		static std::string ViewRptOption1;
 		static bool Constructions( false );
 		static bool Materials( false );
 		static bool LineRpt( false );
-		static Fstring LineRptOption1( MaxNameLength );
+		static std::string LineRptOption1;
 		static bool VarDict( false );
 		static bool EMSoutput( false );
-		static Fstring VarDictOption1( MaxNameLength );
-		static Fstring VarDictOption2( MaxNameLength );
+		static std::string VarDictOption1;
+		static std::string VarDictOption2;
 		//  LOGICAL,SAVE :: SchRpt = .FALSE.
 		//  CHARACTER(len=MaxNameLength) :: SchRptOption
 		static bool GetReportInput( true );
@@ -2986,12 +2960,12 @@ namespace General {
 				} else if ( SELECT_CASE_var == "DECAYCURVESFROMZONECOMPONENTLOADS" ) { //Should the Radiant to Convective Decay Curves from the load component report appear in the EIO file
 					ShowDecayCurvesInEIO = true;
 
-				} else if ( SELECT_CASE_var == " " ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ": No " + trim( cAlphaFieldNames( 1 ) ) + " supplied." );
+				} else if ( SELECT_CASE_var == "" ) {
+					ShowWarningError( cCurrentModuleObject + ": No " + cAlphaFieldNames( 1 ) + " supplied." );
 					ShowContinueError( " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", " "\"CostInfo\", \"ViewFactorIinfo\"." );
 
 				} else {
-					ShowWarningError( trim( cCurrentModuleObject ) + ": Invalid " + trim( cAlphaFieldNames( 1 ) ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" supplied." );
+					ShowWarningError( cCurrentModuleObject + ": Invalid " + cAlphaFieldNames( 1 ) + "=\"" + cAlphaArgs( 1 ) + "\" supplied." );
 					ShowContinueError( " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", " "\"CostInfo\", \"ViewFactorIinfo\"." );
 
 				}}
@@ -3020,12 +2994,12 @@ namespace General {
 					VRMLOption1 = cAlphaArgs( 2 );
 					VRMLOption2 = cAlphaArgs( 3 );
 
-				} else if ( SELECT_CASE_var == " " ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ": No " + trim( cAlphaFieldNames( 1 ) ) + " supplied." );
+				} else if ( SELECT_CASE_var == "" ) {
+					ShowWarningError( cCurrentModuleObject + ": No " + cAlphaFieldNames( 1 ) + " supplied." );
 					ShowContinueError( " Legal values are: \"DXF\", \"DXF:WireFrame\", \"VRML\"." );
 
 				} else {
-					ShowWarningError( trim( cCurrentModuleObject ) + ": Invalid " + trim( cAlphaFieldNames( 1 ) ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" supplied." );
+					ShowWarningError( cCurrentModuleObject + ": Invalid " + cAlphaFieldNames( 1 ) + "=\"" + cAlphaArgs( 1 ) + "\" supplied." );
 					ShowContinueError( " Legal values are: \"DXF\", \"DXF:WireFrame\", \"VRML\"." );
 
 				}}
@@ -3035,7 +3009,7 @@ namespace General {
 			if ( RepNum > 0 ) {
 				VarDict = true;
 				VarDictOption1 = "REGULAR";
-				VarDictOption2 = " ";
+				VarDictOption2 = "";
 			}
 
 			cCurrentModuleObject = "Output:VariableDictionary";
@@ -3053,15 +3027,15 @@ namespace General {
 			NumReports = GetNumObjectsFound( cCurrentModuleObject );
 			for ( RepNum = 1; RepNum <= NumReports; ++RepNum ) {
 				GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				if ( cAlphaArgs( 1 )( {1,9} ) == "CONSTRUCT" ) {
+				if ( has_prefix( cAlphaArgs( 1 ), "CONSTRUCT" ) ) {
 					Constructions = true;
-				} else if ( cAlphaArgs( 1 )( {1,3} ) == "MAT" ) {
+				} else if ( has_prefix( cAlphaArgs( 1 ), "MAT" ) ) {
 					Materials = true;
 				}
 				if ( NumNames > 1 ) {
-					if ( cAlphaArgs( 2 )( {1,9} ) == "CONSTRUCT" ) {
+					if ( has_prefix( cAlphaArgs( 2 ), "CONSTRUCT" ) ) {
 						Constructions = true;
-					} else if ( cAlphaArgs( 2 )( {1,3} ) == "MAT" ) {
+					} else if ( has_prefix( cAlphaArgs( 2 ), "MAT" ) ) {
 						Materials = true;
 					}
 				}
@@ -3074,7 +3048,7 @@ namespace General {
 
 				EMSoutput = true;
 
-				{ auto const SELECT_CASE_var( trim( cAlphaArgs( 1 ) ) );
+				{ auto const SELECT_CASE_var( cAlphaArgs( 1 ) );
 
 				if ( SELECT_CASE_var == "NONE" ) {
 					OutputEMSActuatorAvailSmall = false;
@@ -3086,13 +3060,13 @@ namespace General {
 					OutputEMSActuatorAvailSmall = false;
 					OutputEMSActuatorAvailFull = true;
 
-				} else if ( SELECT_CASE_var == " " ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ": Blank " + trim( cAlphaFieldNames( 1 ) ) + " supplied." );
+				} else if ( SELECT_CASE_var == "" ) {
+					ShowWarningError( cCurrentModuleObject + ": Blank " + cAlphaFieldNames( 1 ) + " supplied." );
 					ShowContinueError( " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used." );
 					OutputEMSActuatorAvailSmall = false;
 					OutputEMSActuatorAvailFull = false;
 				} else {
-					ShowWarningError( trim( cCurrentModuleObject ) + ": Invalid " + trim( cAlphaFieldNames( 1 ) ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" supplied." );
+					ShowWarningError( cCurrentModuleObject + ": Invalid " + cAlphaFieldNames( 1 ) + "=\"" + cAlphaArgs( 1 ) + "\" supplied." );
 					ShowContinueError( " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used." );
 					OutputEMSActuatorAvailSmall = false;
 					OutputEMSActuatorAvailFull = false;
@@ -3109,13 +3083,13 @@ namespace General {
 				} else if ( SELECT_CASE_var == "VERBOSE" ) {
 					OutputEMSInternalVarsFull = true;
 					OutputEMSInternalVarsSmall = false;
-				} else if ( SELECT_CASE_var == " " ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ": Blank " + trim( cAlphaFieldNames( 2 ) ) + " supplied." );
+				} else if ( SELECT_CASE_var == "" ) {
+					ShowWarningError( cCurrentModuleObject + ": Blank " + cAlphaFieldNames( 2 ) + " supplied." );
 					ShowContinueError( " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used." );
 					OutputEMSInternalVarsFull = false;
 					OutputEMSInternalVarsSmall = false;
 				} else {
-					ShowWarningError( trim( cCurrentModuleObject ) + ": Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" supplied." );
+					ShowWarningError( cCurrentModuleObject + ": Invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 1 ) + "\" supplied." );
 					ShowContinueError( " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used." );
 					OutputEMSInternalVarsFull = false;
 					OutputEMSInternalVarsSmall = false;
@@ -3132,13 +3106,13 @@ namespace General {
 				} else if ( SELECT_CASE_var == "VERBOSE" ) {
 					OutputFullEMSTrace = true;
 					OutputEMSErrors = true;
-				} else if ( SELECT_CASE_var == " " ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ": Blank " + trim( cAlphaFieldNames( 3 ) ) + " supplied." );
+				} else if ( SELECT_CASE_var == "" ) {
+					ShowWarningError( cCurrentModuleObject + ": Blank " + cAlphaFieldNames( 3 ) + " supplied." );
 					ShowContinueError( " Legal values are: \"None\", \"ErrorsOnly\", \"Verbose\". \"None\" will be used." );
 					OutputEMSErrors = false;
 					OutputFullEMSTrace = false;
 				} else {
-					ShowWarningError( trim( cCurrentModuleObject ) + ": Invalid " + trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" supplied." );
+					ShowWarningError( cCurrentModuleObject + ": Invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 1 ) + "\" supplied." );
 					ShowContinueError( " Legal values are: \"None\", \"ErrorsOnly\", \"Verbose\". \"None\" will be used." );
 					OutputEMSErrors = false;
 					OutputFullEMSTrace = false;
@@ -3272,14 +3246,14 @@ namespace General {
 
 	void
 	CheckCreatedZoneItemName(
-		Fstring const & calledFrom, // routine called from
-		Fstring const & CurrentObject, // object being parsed
-		Fstring const & ZoneName, // Zone Name associated
-		int const MaxZoneNameLength, // maximum length of zonelist zone names
-		Fstring const & ItemName, // Item name (People, Lights, etc object)
-		FArray1S_Fstring const ItemNames, // Item Names to check for duplication
+		std::string const & calledFrom, // routine called from
+		std::string const & CurrentObject, // object being parsed
+		std::string const & ZoneName, // Zone Name associated
+		std::string::size_type const MaxZoneNameLength, // maximum length of zonelist zone names
+		std::string const & ItemName, // Item name (People, Lights, etc object)
+		FArray1S_string const ItemNames, // Item Names to check for duplication
 		int const NumItems, // Number of items in ItemNames array
-		Fstring & ResultName, // Resultant name
+		std::string & ResultName, // Resultant name
 		bool & errFlag // Error flag set to true if error found here.
 	)
 	{
@@ -3320,33 +3294,28 @@ namespace General {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int ItemLength;
-		bool DuplicateNameError;
-		int FoundItem;
-		int ItemNameLength;
-		bool TooLong;
 
 		errFlag = false;
-		DuplicateNameError = false;
-		ItemNameLength = len_trim( ItemName );
-		ItemLength = len_trim( ZoneName ) + ItemNameLength;
-		ResultName = trim( ZoneName ) + " " + ItemName;
-		TooLong = false;
+		bool DuplicateNameError = false;
+		std::string::size_type const ItemNameLength = len( ItemName );
+		std::string::size_type const ItemLength = len( ZoneName ) + ItemNameLength;
+		ResultName = ZoneName + ' ' + ItemName;
+		bool TooLong = false;
 		if ( ItemLength > MaxNameLength ) {
-			ShowWarningError( calledFrom + trim( CurrentObject ) + " Combination of ZoneList and Object Name generate a name too long." );
-			ShowContinueError( "Object Name=\"" + trim( ItemName ) + "\"." );
-			ShowContinueError( "ZoneList/Zone Name=\"" + trim( ZoneName ) + "\"." );
-			ShowContinueError( "Item length=[" + trim( RoundSigDigits( ItemLength ) ) + "] > Maximum Length=[" + trim( RoundSigDigits( MaxNameLength ) ) + "]. You may need to shorten the names." );
-			ShowContinueError( "Shortening the Object Name by [" + trim( RoundSigDigits( ( MaxZoneNameLength + 1 + ItemNameLength ) - MaxNameLength ) ) + "] characters will assure uniqueness for this ZoneList." );
-			ShowContinueError( "name that will be used (may be needed in reporting)=\"" + trim( ResultName ) + "\"." );
+			ShowWarningError( calledFrom + CurrentObject + " Combination of ZoneList and Object Name generate a name too long." );
+			ShowContinueError( "Object Name=\"" + ItemName + "\"." );
+			ShowContinueError( "ZoneList/Zone Name=\"" + ZoneName + "\"." );
+			ShowContinueError( "Item length=[" + RoundSigDigits( ItemLength ) + "] > Maximum Length=[" + RoundSigDigits( MaxNameLength ) + "]. You may need to shorten the names." );
+			ShowContinueError( "Shortening the Object Name by [" + RoundSigDigits( ( MaxZoneNameLength + 1 + ItemNameLength ) - MaxNameLength ) + "] characters will assure uniqueness for this ZoneList." );
+			ShowContinueError( "name that will be used (may be needed in reporting)=\"" + ResultName + "\"." );
 			TooLong = true;
 		}
 
-		FoundItem = FindItemInList( ResultName, ItemNames, NumItems );
+		int FoundItem = FindItemInList( ResultName, ItemNames, NumItems );
 
 		if ( FoundItem != 0 ) {
-			ShowSevereError( calledFrom + trim( CurrentObject ) + "=\"" + trim( ItemName ) + "\", Duplicate Generated name encountered." );
-			ShowContinueError( "name=\"" + trim( ResultName ) + "\" has already been generated or entered as " + trim( CurrentObject ) + " item=[" + trim( RoundSigDigits( FoundItem ) ) + "]." );
+			ShowSevereError( calledFrom + CurrentObject + "=\"" + ItemName + "\", Duplicate Generated name encountered." );
+			ShowContinueError( "name=\"" + ResultName + "\" has already been generated or entered as " + CurrentObject + " item=[" + RoundSigDigits( FoundItem ) + "]." );
 			if ( TooLong ) ShowContinueError( "Duplicate name likely caused by the previous \"too long\" warning." );
 			ResultName = "xxxxxxx";
 			errFlag = true;

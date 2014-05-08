@@ -2,7 +2,6 @@
 #define PlantCondLoopOperation_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -59,7 +58,7 @@ namespace PlantCondLoopOperation {
 
 	void
 	FindRangeBasedOrUncontrolledInput(
-		Fstring & CurrentModuleObject, // for ease in renaming
+		std::string & CurrentModuleObject, // for ease in renaming
 		int const NumSchemes, // May be set here and passed on
 		int const LoopNum, // May be set here and passed on
 		int const SchemeNum, // May be set here and passed on
@@ -68,7 +67,7 @@ namespace PlantCondLoopOperation {
 
 	void
 	FindDeltaTempRangeInput(
-		Fstring & CurrentModuleObject, // for ease in renaming
+		std::string & CurrentModuleObject, // for ease in renaming
 		int const NumSchemes, // May be set here and passed on
 		int const LoopNum, // May be set here and passed on
 		int const SchemeNum, // May be set here and passed on
@@ -85,7 +84,7 @@ namespace PlantCondLoopOperation {
 
 	void
 	FindCompSPInput(
-		Fstring & CurrentModuleObject, // for ease in renaming
+		std::string & CurrentModuleObject, // for ease in renaming
 		int const NumSchemes, // May be set here and passed on
 		int const LoopNum, // May be set here and passed on
 		int const SchemeNum, // May be set here and passed on
@@ -94,7 +93,7 @@ namespace PlantCondLoopOperation {
 
 	void
 	GetUserDefinedOpSchemeInput(
-		Fstring & CurrentModuleObject, // for ease in renaming
+		std::string & CurrentModuleObject, // for ease in renaming
 		int const NumSchemes, // May be set here and passed on
 		int const LoopNum, // May be set here and passed on
 		int const SchemeNum, // May be set here and passed on

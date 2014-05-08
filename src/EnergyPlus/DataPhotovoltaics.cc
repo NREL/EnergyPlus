@@ -27,17 +27,16 @@ namespace DataPhotovoltaics {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// -only module should be available to other modules and routines.
 	// Thus, all variables in this module must be PUBLIC.
 
 	// MODULE PARAMETER DEFINITIONS:
-	Fstring const cPVGeneratorObjectName( "Generator:Photovoltaic" );
-	Fstring const cPVSimplePerfObjectName( "PhotovoltaicPerformance:Simple" );
-	Fstring const cPVEquiv1DiodePerfObjectName( "PhotovoltaicPerformance:EquivalentOne-Diode" );
-	Fstring const cPVSandiaPerfObjectName( "PhotovoltaicPerformance:Sandia" );
+	std::string const cPVGeneratorObjectName( "Generator:Photovoltaic" );
+	std::string const cPVSimplePerfObjectName( "PhotovoltaicPerformance:Simple" );
+	std::string const cPVEquiv1DiodePerfObjectName( "PhotovoltaicPerformance:EquivalentOne-Diode" );
+	std::string const cPVSandiaPerfObjectName( "PhotovoltaicPerformance:Sandia" );
 
 	int const iNotYetSetPVModel( 0 );
 	int const iSimplePVModel( 1001 );

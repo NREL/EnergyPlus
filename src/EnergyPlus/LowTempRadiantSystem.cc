@@ -5,6 +5,7 @@
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <LowTempRadiantSystem.hh>
@@ -87,7 +88,6 @@ namespace LowTempRadiantSystem {
 	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::BeginTimeStepFlag;
 	using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
@@ -119,9 +119,9 @@ namespace LowTempRadiantSystem {
 	int const HydronicSystem( 1 ); // Variable flow hydronic radiant system
 	int const ConstantFlowSystem( 2 ); // Constant flow, variable (controlled) temperature radiant system
 	int const ElectricSystem( 3 ); // Electric resistance radiant heating system
-	Fstring const cHydronicSystem( "ZoneHVAC:LowTemperatureRadiant:VariableFlow" );
-	Fstring const cConstantFlowSystem( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow" );
-	Fstring const cElectricSystem( "ZoneHVAC:LowTemperatureRadiant:Electric" );
+	std::string const cHydronicSystem( "ZoneHVAC:LowTemperatureRadiant:VariableFlow" );
+	std::string const cConstantFlowSystem( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow" );
+	std::string const cElectricSystem( "ZoneHVAC:LowTemperatureRadiant:Electric" );
 	// Operating modes:
 	int const NotOperating( 0 ); // Parameter for use with OperatingMode variable, set for heating
 	int const HeatingMode( 1 ); // Parameter for use with OperatingMode variable, set for heating
@@ -139,8 +139,8 @@ namespace LowTempRadiantSystem {
 	// Number of Circuits per Surface Calculation Method
 	int const OneCircuit( 1 ); // there is 1 circuit per surface
 	int const CalculateFromLength( 2 ); // The number of circuits is TubeLength*SurfaceFlowFrac / CircuitLength
-	Fstring const OnePerSurf( "OnePerSurface" );
-	Fstring const CalcFromLength( "CalculateFromCircuitLength" );
+	std::string const OnePerSurf( "OnePerSurface" );
+	std::string const CalcFromLength( "CalculateFromCircuitLength" );
 	// Limit temperatures to indicate that a system cannot heat or cannot cool
 	Real64 LowTempHeating( -200.0 ); // Used to indicate that a user does not have a heating control temperature
 	Real64 HighTempCooling( 200.0 ); // Used to indicate that a user does not have a cooling control temperature
@@ -182,7 +182,7 @@ namespace LowTempRadiantSystem {
 
 	void
 	SimLowTempRadiantSystem(
-		Fstring const & CompName, // name of the low temperature radiant system
+		std::string const & CompName, // name of the low temperature radiant system
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		Real64 & LoadMet, // load met by the radiant system, in Watts
 		int & CompIndex
@@ -253,7 +253,7 @@ namespace LowTempRadiantSystem {
 		if ( CompIndex == 0 ) {
 			RadSysNum = FindItemInList( CompName, RadSysTypes.Name(), TotalNumOfRadSystems );
 			if ( RadSysNum == 0 ) {
-				ShowFatalError( "SimLowTempRadiantSystem: Unit not found=" + trim( CompName ) );
+				ShowFatalError( "SimLowTempRadiantSystem: Unit not found=" + CompName );
 			}
 			CompIndex = RadSysNum;
 			SystemType = RadSysTypes( RadSysNum ).SystemType;
@@ -269,11 +269,11 @@ namespace LowTempRadiantSystem {
 			RadSysNum = CompIndex;
 			SystemType = RadSysTypes( RadSysNum ).SystemType;
 			if ( RadSysNum > TotalNumOfRadSystems || RadSysNum < 1 ) {
-				ShowFatalError( "SimLowTempRadiantSystem:  Invalid CompIndex passed=" + trim( TrimSigDigits( RadSysNum ) ) + ", Number of Units=" + trim( TrimSigDigits( TotalNumOfRadSystems ) ) + ", Entered Unit name=" + trim( CompName ) );
+				ShowFatalError( "SimLowTempRadiantSystem:  Invalid CompIndex passed=" + TrimSigDigits( RadSysNum ) + ", Number of Units=" + TrimSigDigits( TotalNumOfRadSystems ) + ", Entered Unit name=" + CompName );
 			}
 			if ( CheckEquipName( RadSysNum ) ) {
 				if ( CompName != RadSysTypes( RadSysNum ).Name ) {
-					ShowFatalError( "SimLowTempRadiantSystem: Invalid CompIndex passed=" + trim( TrimSigDigits( RadSysNum ) ) + ", Unit name=" + trim( CompName ) + ", stored Unit Name for that index=" + trim( RadSysTypes( RadSysNum ).Name ) );
+					ShowFatalError( "SimLowTempRadiantSystem: Invalid CompIndex passed=" + TrimSigDigits( RadSysNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + RadSysTypes( RadSysNum ).Name );
 				}
 				CheckEquipName( RadSysNum ) = false;
 			}
@@ -289,7 +289,7 @@ namespace LowTempRadiantSystem {
 		} else if ( SELECT_CASE_var == ElectricSystem ) {
 			CalcLowTempElecRadiantSystem( RadSysTypes( RadSysNum ).CompIndex, LoadMet );
 		} else {
-			ShowFatalError( "SimLowTempRadiantSystem: Illegal system type for system " + trim( CompName ) );
+			ShowFatalError( "SimLowTempRadiantSystem: Illegal system type for system " + CompName );
 		}}
 
 		UpdateLowTempRadiantSystem( FirstHVACIteration, RadSysTypes( RadSysNum ).CompIndex, SystemType );
@@ -346,15 +346,15 @@ namespace LowTempRadiantSystem {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		//  REAL(r64),        PARAMETER :: FlowFractionTolerance = 0.0001 ! Smallest deviation from unity for the sum of all fractions
 		Real64 const MinThrottlingRange( 0.5 ); // Smallest throttling range allowed in degrees Celsius
-		static Fstring const MeanAirTemperature( "MeanAirTemperature" );
-		static Fstring const MeanRadiantTemperature( "MeanRadiantTemperature" );
-		static Fstring const OperativeTemperature( "OperativeTemperature" );
-		static Fstring const OutsideAirDryBulbTemperature( "OutdoorDryBulbTemperature" );
-		static Fstring const OutsideAirWetBulbTemperature( "OutdoorWetBulbTemperature" );
-		static Fstring const RoutineName( "GetLowTempRadiantSystem: " ); // include trailing blank space
-		static Fstring const Off( "Off" );
-		static Fstring const SimpleOff( "SimpleOff" );
-		static Fstring const VariableOff( "VariableOff" );
+		static std::string const MeanAirTemperature( "MeanAirTemperature" );
+		static std::string const MeanRadiantTemperature( "MeanRadiantTemperature" );
+		static std::string const OperativeTemperature( "OperativeTemperature" );
+		static std::string const OutsideAirDryBulbTemperature( "OutdoorDryBulbTemperature" );
+		static std::string const OutsideAirWetBulbTemperature( "OutdoorWetBulbTemperature" );
+		static std::string const RoutineName( "GetLowTempRadiantSystem: " ); // include trailing blank space
+		static std::string const Off( "Off" );
+		static std::string const SimpleOff( "SimpleOff" );
+		static std::string const VariableOff( "VariableOff" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -363,10 +363,10 @@ namespace LowTempRadiantSystem {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in getting objects
-		FArray1D_Fstring Alphas( sFstring( MaxNameLength ) ); // Alpha items for object
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) ); // Numeric field names
+		std::string CurrentModuleObject; // for ease in getting objects
+		FArray1D_string Alphas; // Alpha items for object
+		FArray1D_string cAlphaFields; // Alpha field names
+		FArray1D_string cNumericFields; // Numeric field names
 		FArray1D_bool AssignedAsRadiantSurface; // Set to true when a surface is part of a radiant system
 		int CheckSurfNum; // Surface number to check to see if it has already been used by a radiant system
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
@@ -408,13 +408,13 @@ namespace LowTempRadiantSystem {
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 
 		Alphas.allocate( MaxAlphas );
-		Alphas = " ";
+		Alphas = "";
 		Numbers.allocate( MaxNumbers );
 		Numbers = 0.0;
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = " ";
+		cAlphaFields = "";
 		cNumericFields.allocate( MaxNumbers );
-		cNumericFields = " ";
+		cNumericFields = "";
 		lAlphaBlanks.allocate( MaxAlphas );
 		lAlphaBlanks = true;
 		lNumericBlanks.allocate( MaxNumbers );
@@ -467,7 +467,7 @@ namespace LowTempRadiantSystem {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), RadSysTypes.Name(), BaseNum, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), RadSysTypes.Name(), BaseNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -484,8 +484,8 @@ namespace LowTempRadiantSystem {
 			} else {
 				HydrRadSys( Item ).SchedPtr = GetScheduleIndex( Alphas( 2 ) );
 				if ( HydrRadSys( Item ).SchedPtr == 0 ) {
-					ShowSevereError( trim( cAlphaFields( 2 ) ) + " not found for " + trim( Alphas( 1 ) ) );
-					ShowContinueError( "Missing " + trim( cAlphaFields( 2 ) ) + " is " + trim( Alphas( 2 ) ) );
+					ShowSevereError( cAlphaFields( 2 ) + " not found for " + Alphas( 1 ) );
+					ShowContinueError( "Missing " + cAlphaFields( 2 ) + " is " + Alphas( 2 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -493,8 +493,8 @@ namespace LowTempRadiantSystem {
 			HydrRadSys( Item ).ZoneName = Alphas( 3 );
 			HydrRadSys( Item ).ZonePtr = FindItemInList( Alphas( 3 ), Zone.Name(), NumOfZones );
 			if ( HydrRadSys( Item ).ZonePtr == 0 ) {
-				ShowSevereError( RoutineName + "Invalid " + trim( cAlphaFields( 3 ) ) + " = " + trim( Alphas( 3 ) ) );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+				ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 				ErrorsFound = true;
 				//    ELSEIF (Zone(HydrRadSys(Item)%ZonePtr)%Multiplier > 1 .or. Zone(HydrRadSys(Item)%ZonePtr)%ListMultiplier > 1) THEN
 				//      CALL ShowSevereError(RoutineName//'Zone Multiplier or Zone List Multipliers cannot be used (i.e., >1)')
@@ -533,12 +533,12 @@ namespace LowTempRadiantSystem {
 				HydrRadSys( Item ).NumCircuits( 1 ) = 0.0;
 				// Error checking for single surfaces
 				if ( HydrRadSys( Item ).SurfacePtr( 1 ) == 0 ) {
-					ShowSevereError( RoutineName + "Invalid " + trim( cAlphaFields( 4 ) ) + " = " + trim( Alphas( 4 ) ) );
-					ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+					ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 4 ) + " = " + Alphas( 4 ) );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 					ErrorsFound = true;
 				} else if ( Surface( HydrRadSys( Item ).SurfacePtr( 1 ) ).PartOfVentSlabOrRadiantSurface ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", Invalid Surface" );
-					ShowContinueError( trim( cAlphaFields( 4 ) ) + "=\"" + trim( Alphas( 4 ) ) + "\" has been used in another radiant system or ventilated slab." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", Invalid Surface" );
+					ShowContinueError( cAlphaFields( 4 ) + "=\"" + Alphas( 4 ) + "\" has been used in another radiant system or ventilated slab." );
 					ErrorsFound = true;
 				}
 				if ( HydrRadSys( Item ).SurfacePtr( 1 ) != 0 ) {
@@ -551,15 +551,15 @@ namespace LowTempRadiantSystem {
 			for ( SurfNum = 1; SurfNum <= HydrRadSys( Item ).NumOfSurfaces; ++SurfNum ) {
 				if ( HydrRadSys( Item ).SurfacePtr( SurfNum ) == 0 ) continue; // invalid surface -- detected earlier
 				if ( Surface( HydrRadSys( Item ).SurfacePtr( SurfNum ) ).Zone != HydrRadSys( Item ).ZonePtr ) {
-					ShowSevereError( "Surface referenced in " + trim( CurrentModuleObject ) + " not in same zone as Radiant System, surface=" + trim( Surface( HydrRadSys( Item ).SurfacePtr( SurfNum ) ).Name ) );
-					ShowContinueError( "Surface in Zone=" + trim( Zone( Surface( HydrRadSys( Item ).SurfacePtr( SurfNum ) ).Zone ).Name ) + " " "Hydronic Radiant System in " + trim( cAlphaFields( 3 ) ) + " = " + trim( Alphas( 3 ) ) );
-					ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+					ShowSevereError( "Surface referenced in " + CurrentModuleObject + " not in same zone as Radiant System, surface=" + Surface( HydrRadSys( Item ).SurfacePtr( SurfNum ) ).Name );
+					ShowContinueError( "Surface in Zone=" + Zone( Surface( HydrRadSys( Item ).SurfacePtr( SurfNum ) ).Zone ).Name + " Hydronic Radiant System in " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 					ErrorsFound = true;
 				}
 				if ( Surface( HydrRadSys( Item ).SurfacePtr( SurfNum ) ).Construction == 0 ) continue; // Invalid construction -- detected earlier
 				if ( ! Construct( Surface( HydrRadSys( Item ).SurfacePtr( SurfNum ) ).Construction ).SourceSinkPresent ) {
 					ShowSevereError( "Construction referenced in Hydronic Radiant System Surface does not have a source/sink present" );
-					ShowContinueError( "Surface name= " + trim( Surface( HydrRadSys( Item ).SurfacePtr( SurfNum ) ).Name ) + "  Construction name = " + trim( Construct( Surface( HydrRadSys( Item ).SurfacePtr( SurfNum ) ).Construction ).Name ) );
+					ShowContinueError( "Surface name= " + Surface( HydrRadSys( Item ).SurfacePtr( SurfNum ) ).Name + "  Construction name = " + Construct( Surface( HydrRadSys( Item ).SurfacePtr( SurfNum ) ).Construction ).Name );
 					ShowContinueError( "Construction needs to be defined with a \"Construction:InternalSource\" object." );
 					ErrorsFound = true;
 				}
@@ -580,8 +580,8 @@ namespace LowTempRadiantSystem {
 			} else if ( SameString( Alphas( 5 ), OutsideAirWetBulbTemperature ) ) {
 				HydrRadSys( Item ).ControlType = OWBControl;
 			} else {
-				ShowWarningError( "Invalid " + trim( cAlphaFields( 5 ) ) + " =" + trim( Alphas( 5 ) ) );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+				ShowWarningError( "Invalid " + cAlphaFields( 5 ) + " =" + Alphas( 5 ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 				ShowContinueError( "Control reset to MAT control for this Hydronic Radiant System." );
 				HydrRadSys( Item ).ControlType = MATControl;
 			}
@@ -589,58 +589,58 @@ namespace LowTempRadiantSystem {
 			// Heating user input data
 			HydrRadSys( Item ).WaterVolFlowMaxHeat = Numbers( 3 );
 
-			HydrRadSys( Item ).HotWaterInNode = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			HydrRadSys( Item ).HotWaterInNode = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
-			HydrRadSys( Item ).HotWaterOutNode = GetOnlySingleNode( Alphas( 7 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			HydrRadSys( Item ).HotWaterOutNode = GetOnlySingleNode( Alphas( 7 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 			if ( ( ! lAlphaBlanks( 6 ) ) || ( ! lAlphaBlanks( 7 ) ) ) {
-				TestCompSet( trim( CurrentModuleObject ), Alphas( 1 ), Alphas( 6 ), Alphas( 7 ), "Hot Water Nodes" );
+				TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 6 ), Alphas( 7 ), "Hot Water Nodes" );
 			}
 
 			HydrRadSys( Item ).HotThrottlRange = Numbers( 4 );
 			if ( HydrRadSys( Item ).HotThrottlRange < MinThrottlingRange ) {
 				ShowWarningError( "ZoneHVAC:LowTemperatureRadiant:VariableFlow: Heating throttling range too small, reset to 0.5" );
-				ShowContinueError( "Occurs in Radiant System=" + trim( HydrRadSys( Item ).Name ) );
+				ShowContinueError( "Occurs in Radiant System=" + HydrRadSys( Item ).Name );
 				HydrRadSys( Item ).HotThrottlRange = MinThrottlingRange;
 			}
 
 			HydrRadSys( Item ).HotSetptSched = Alphas( 8 );
 			HydrRadSys( Item ).HotSetptSchedPtr = GetScheduleIndex( Alphas( 8 ) );
 			if ( ( HydrRadSys( Item ).HotSetptSchedPtr == 0 ) && ( ! lAlphaBlanks( 8 ) ) ) {
-				ShowSevereError( trim( cAlphaFields( 8 ) ) + " not found: " + trim( Alphas( 8 ) ) );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+				ShowSevereError( cAlphaFields( 8 ) + " not found: " + Alphas( 8 ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 				ErrorsFound = true;
 			}
 
 			if ( ( HydrRadSys( Item ).WaterVolFlowMaxHeat == AutoSize ) && ( lAlphaBlanks( 6 ) || lAlphaBlanks( 7 ) || lAlphaBlanks( 8 ) || ( HydrRadSys( Item ).HotWaterInNode <= 0 ) || ( HydrRadSys( Item ).HotWaterOutNode <= 0 ) || ( HydrRadSys( Item ).HotSetptSchedPtr == 0 ) ) ) {
 				ShowSevereError( "Hydronic radiant systems may not be autosized without specification of nodes or schedules." );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " (heating input) = " + trim( Alphas( 1 ) ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " (heating input) = " + Alphas( 1 ) );
 				ErrorsFound = true;
 			}
 
 			// Cooling user input data
 			HydrRadSys( Item ).WaterVolFlowMaxCool = Numbers( 5 );
 
-			HydrRadSys( Item ).ColdWaterInNode = GetOnlySingleNode( Alphas( 9 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+			HydrRadSys( Item ).ColdWaterInNode = GetOnlySingleNode( Alphas( 9 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
 
-			HydrRadSys( Item ).ColdWaterOutNode = GetOnlySingleNode( Alphas( 10 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+			HydrRadSys( Item ).ColdWaterOutNode = GetOnlySingleNode( Alphas( 10 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 
 			if ( ( ! lAlphaBlanks( 9 ) ) || ( ! lAlphaBlanks( 10 ) ) ) {
-				TestCompSet( trim( CurrentModuleObject ), Alphas( 1 ), Alphas( 9 ), Alphas( 10 ), "Chilled Water Nodes" );
+				TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 9 ), Alphas( 10 ), "Chilled Water Nodes" );
 			}
 
 			HydrRadSys( Item ).ColdThrottlRange = Numbers( 6 );
 			if ( HydrRadSys( Item ).ColdThrottlRange < MinThrottlingRange ) {
 				ShowWarningError( "ZoneHVAC:LowTemperatureRadiant:VariableFlow: Cooling throttling range too small, reset to 0.5" );
-				ShowContinueError( "Occurs in Radiant System=" + trim( HydrRadSys( Item ).Name ) );
+				ShowContinueError( "Occurs in Radiant System=" + HydrRadSys( Item ).Name );
 				HydrRadSys( Item ).ColdThrottlRange = MinThrottlingRange;
 			}
 
 			HydrRadSys( Item ).ColdSetptSched = Alphas( 11 );
 			HydrRadSys( Item ).ColdSetptSchedPtr = GetScheduleIndex( Alphas( 11 ) );
 			if ( ( HydrRadSys( Item ).ColdSetptSchedPtr == 0 ) && ( ! lAlphaBlanks( 11 ) ) ) {
-				ShowSevereError( trim( cAlphaFields( 11 ) ) + " not found: " + trim( Alphas( 11 ) ) );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+				ShowSevereError( cAlphaFields( 11 ) + " not found: " + Alphas( 11 ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 				ErrorsFound = true;
 			}
 
@@ -668,7 +668,7 @@ namespace LowTempRadiantSystem {
 
 			if ( ( HydrRadSys( Item ).WaterVolFlowMaxCool == AutoSize ) && ( lAlphaBlanks( 9 ) || lAlphaBlanks( 10 ) || lAlphaBlanks( 11 ) || ( HydrRadSys( Item ).ColdWaterInNode <= 0 ) || ( HydrRadSys( Item ).ColdWaterOutNode <= 0 ) || ( HydrRadSys( Item ).ColdSetptSchedPtr == 0 ) ) ) {
 				ShowSevereError( "Hydronic radiant systems may not be autosized without specification of nodes or schedules" );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " (cooling input) =" + trim( Alphas( 1 ) ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " (cooling input) =" + Alphas( 1 ) );
 				ErrorsFound = true;
 			}
 
@@ -684,7 +684,7 @@ namespace LowTempRadiantSystem {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), RadSysTypes.Name(), BaseNum, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), RadSysTypes.Name(), BaseNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -701,8 +701,8 @@ namespace LowTempRadiantSystem {
 			} else {
 				CFloRadSys( Item ).SchedPtr = GetScheduleIndex( Alphas( 2 ) );
 				if ( CFloRadSys( Item ).SchedPtr == 0 ) {
-					ShowSevereError( trim( cAlphaFields( 2 ) ) + " not found for " + trim( Alphas( 1 ) ) );
-					ShowContinueError( "Missing " + trim( cAlphaFields( 2 ) ) + " is " + trim( Alphas( 2 ) ) );
+					ShowSevereError( cAlphaFields( 2 ) + " not found for " + Alphas( 1 ) );
+					ShowContinueError( "Missing " + cAlphaFields( 2 ) + " is " + Alphas( 2 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -710,8 +710,8 @@ namespace LowTempRadiantSystem {
 			CFloRadSys( Item ).ZoneName = Alphas( 3 );
 			CFloRadSys( Item ).ZonePtr = FindItemInList( Alphas( 3 ), Zone.Name(), NumOfZones );
 			if ( CFloRadSys( Item ).ZonePtr == 0 ) {
-				ShowSevereError( RoutineName + "Invalid " + trim( cAlphaFields( 3 ) ) + " = " + trim( Alphas( 3 ) ) );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+				ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 				ErrorsFound = true;
 				//    ELSEIF (Zone(CFloRadSys(Item)%ZonePtr)%Multiplier > 1 .or. Zone(CFloRadSys(Item)%ZonePtr)%ListMultiplier > 1) THEN
 				//      CALL ShowSevereError(RoutineName//'Zone Multiplier or Zone List Multipliers cannot be used (i.e., >1)')
@@ -753,12 +753,12 @@ namespace LowTempRadiantSystem {
 				CFloRadSys( Item ).NumCircuits( 1 ) = 0.0;
 				// Error checking for single surfaces
 				if ( CFloRadSys( Item ).SurfacePtr( 1 ) == 0 ) {
-					ShowSevereError( RoutineName + "Invalid " + trim( cAlphaFields( 4 ) ) + " = " + trim( Alphas( 4 ) ) );
-					ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+					ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 4 ) + " = " + Alphas( 4 ) );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 					ErrorsFound = true;
 				} else if ( Surface( CFloRadSys( Item ).SurfacePtr( 1 ) ).PartOfVentSlabOrRadiantSurface ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", Invalid Surface" );
-					ShowContinueError( trim( cAlphaFields( 4 ) ) + "=\"" + trim( Alphas( 4 ) ) + "\" has been used in another radiant system or ventilated slab." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", Invalid Surface" );
+					ShowContinueError( cAlphaFields( 4 ) + "=\"" + Alphas( 4 ) + "\" has been used in another radiant system or ventilated slab." );
 					ErrorsFound = true;
 				}
 				if ( CFloRadSys( Item ).SurfacePtr( 1 ) != 0 ) {
@@ -771,15 +771,15 @@ namespace LowTempRadiantSystem {
 			for ( SurfNum = 1; SurfNum <= CFloRadSys( Item ).NumOfSurfaces; ++SurfNum ) {
 				if ( CFloRadSys( Item ).SurfacePtr( SurfNum ) == 0 ) continue; // invalid surface -- detected earlier
 				if ( Surface( CFloRadSys( Item ).SurfacePtr( SurfNum ) ).Zone != CFloRadSys( Item ).ZonePtr ) {
-					ShowSevereError( "Surface referenced in " + trim( CurrentModuleObject ) + " not in same zone as Radiant System, " "surface=" + trim( Surface( CFloRadSys( Item ).SurfacePtr( SurfNum ) ).Name ) );
-					ShowContinueError( "Surface in Zone=" + trim( Zone( Surface( CFloRadSys( Item ).SurfacePtr( SurfNum ) ).Zone ).Name ) + " " "Constant Flow Radiant System in " + trim( cAlphaFields( 3 ) ) + " = " + trim( Alphas( 3 ) ) );
-					ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+					ShowSevereError( "Surface referenced in " + CurrentModuleObject + " not in same zone as Radiant System, " "surface=" + Surface( CFloRadSys( Item ).SurfacePtr( SurfNum ) ).Name );
+					ShowContinueError( "Surface in Zone=" + Zone( Surface( CFloRadSys( Item ).SurfacePtr( SurfNum ) ).Zone ).Name + " Constant Flow Radiant System in " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 					ErrorsFound = true;
 				}
 				if ( Surface( CFloRadSys( Item ).SurfacePtr( SurfNum ) ).Construction == 0 ) continue; // invalid construction, detected earlier
 				if ( ! Construct( Surface( CFloRadSys( Item ).SurfacePtr( SurfNum ) ).Construction ).SourceSinkPresent ) {
 					ShowSevereError( "Construction referenced in Constant Flow Radiant System Surface does not have a source/sink" );
-					ShowContinueError( "Surface name= " + trim( Surface( CFloRadSys( Item ).SurfacePtr( SurfNum ) ).Name ) + "  Construction name = " + trim( Construct( Surface( CFloRadSys( Item ).SurfacePtr( SurfNum ) ).Construction ).Name ) );
+					ShowContinueError( "Surface name= " + Surface( CFloRadSys( Item ).SurfacePtr( SurfNum ) ).Name + "  Construction name = " + Construct( Surface( CFloRadSys( Item ).SurfacePtr( SurfNum ) ).Construction ).Name );
 					ShowContinueError( "Construction needs to be defined with a \"Construction:InternalSource\" object." );
 					ErrorsFound = true;
 				}
@@ -800,8 +800,8 @@ namespace LowTempRadiantSystem {
 			} else if ( SameString( Alphas( 5 ), OutsideAirWetBulbTemperature ) ) {
 				CFloRadSys( Item ).ControlType = OWBControl;
 			} else {
-				ShowWarningError( "Invalid " + trim( cAlphaFields( 5 ) ) + " =" + trim( Alphas( 5 ) ) );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+				ShowWarningError( "Invalid " + cAlphaFields( 5 ) + " =" + Alphas( 5 ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 				ShowContinueError( "Control reset to MAT control for this Constant Flow Radiant System." );
 				CFloRadSys( Item ).ControlType = MATControl;
 			}
@@ -811,8 +811,8 @@ namespace LowTempRadiantSystem {
 			CFloRadSys( Item ).VolFlowSched = Alphas( 6 );
 			CFloRadSys( Item ).VolFlowSchedPtr = GetScheduleIndex( Alphas( 6 ) );
 			if ( ( CFloRadSys( Item ).VolFlowSchedPtr == 0 ) && ( ! lAlphaBlanks( 6 ) ) ) {
-				ShowSevereError( trim( cAlphaFields( 6 ) ) + " not found: " + trim( Alphas( 6 ) ) );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+				ShowSevereError( cAlphaFields( 6 ) + " not found: " + Alphas( 6 ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 				ErrorsFound = true;
 			}
 			CFloRadSys( Item ).NomPumpHead = Numbers( 4 );
@@ -821,84 +821,84 @@ namespace LowTempRadiantSystem {
 			CFloRadSys( Item ).FracMotorLossToFluid = Numbers( 7 );
 
 			// Heating user input data
-			CFloRadSys( Item ).HotWaterInNode = GetOnlySingleNode( Alphas( 7 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			CFloRadSys( Item ).HotWaterInNode = GetOnlySingleNode( Alphas( 7 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
-			CFloRadSys( Item ).HotWaterOutNode = GetOnlySingleNode( Alphas( 8 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			CFloRadSys( Item ).HotWaterOutNode = GetOnlySingleNode( Alphas( 8 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 			if ( ( ! lAlphaBlanks( 7 ) ) || ( ! lAlphaBlanks( 8 ) ) ) {
-				TestCompSet( trim( CurrentModuleObject ), Alphas( 1 ), Alphas( 7 ), Alphas( 8 ), "Hot Water Nodes" );
+				TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 7 ), Alphas( 8 ), "Hot Water Nodes" );
 			}
 
 			CFloRadSys( Item ).HotWaterHiTempSched = Alphas( 9 );
 			CFloRadSys( Item ).HotWaterHiTempSchedPtr = GetScheduleIndex( Alphas( 9 ) );
 			if ( ( CFloRadSys( Item ).HotWaterHiTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 9 ) ) ) {
-				ShowSevereError( trim( cAlphaFields( 9 ) ) + " not found: " + trim( Alphas( 9 ) ) );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+				ShowSevereError( cAlphaFields( 9 ) + " not found: " + Alphas( 9 ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 				ErrorsFound = true;
 			}
 
 			CFloRadSys( Item ).HotWaterLoTempSched = Alphas( 10 );
 			CFloRadSys( Item ).HotWaterLoTempSchedPtr = GetScheduleIndex( Alphas( 10 ) );
 			if ( ( CFloRadSys( Item ).HotWaterLoTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 10 ) ) ) {
-				ShowSevereError( trim( cAlphaFields( 10 ) ) + " not found: " + trim( Alphas( 10 ) ) );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+				ShowSevereError( cAlphaFields( 10 ) + " not found: " + Alphas( 10 ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 				ErrorsFound = true;
 			}
 
 			CFloRadSys( Item ).HotCtrlHiTempSched = Alphas( 11 );
 			CFloRadSys( Item ).HotCtrlHiTempSchedPtr = GetScheduleIndex( Alphas( 11 ) );
 			if ( ( CFloRadSys( Item ).HotCtrlHiTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 11 ) ) ) {
-				ShowSevereError( trim( cAlphaFields( 11 ) ) + " not found: " + trim( Alphas( 11 ) ) );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+				ShowSevereError( cAlphaFields( 11 ) + " not found: " + Alphas( 11 ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 				ErrorsFound = true;
 			}
 
 			CFloRadSys( Item ).HotCtrlLoTempSched = Alphas( 12 );
 			CFloRadSys( Item ).HotCtrlLoTempSchedPtr = GetScheduleIndex( Alphas( 12 ) );
 			if ( ( CFloRadSys( Item ).HotCtrlLoTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 12 ) ) ) {
-				ShowSevereError( trim( cAlphaFields( 12 ) ) + " not found: " + trim( Alphas( 12 ) ) );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+				ShowSevereError( cAlphaFields( 12 ) + " not found: " + Alphas( 12 ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 				ErrorsFound = true;
 			}
 
 			// Cooling user input data
-			CFloRadSys( Item ).ColdWaterInNode = GetOnlySingleNode( Alphas( 13 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+			CFloRadSys( Item ).ColdWaterInNode = GetOnlySingleNode( Alphas( 13 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
 
-			CFloRadSys( Item ).ColdWaterOutNode = GetOnlySingleNode( Alphas( 14 ), ErrorsFound, trim( CurrentModuleObject ), Alphas( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+			CFloRadSys( Item ).ColdWaterOutNode = GetOnlySingleNode( Alphas( 14 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 
 			if ( ( ! lAlphaBlanks( 13 ) ) || ( ! lAlphaBlanks( 14 ) ) ) {
-				TestCompSet( trim( CurrentModuleObject ), Alphas( 1 ), Alphas( 13 ), Alphas( 14 ), "Chilled Water Nodes" );
+				TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 13 ), Alphas( 14 ), "Chilled Water Nodes" );
 			}
 
 			CFloRadSys( Item ).ColdWaterHiTempSched = Alphas( 15 );
 			CFloRadSys( Item ).ColdWaterHiTempSchedPtr = GetScheduleIndex( Alphas( 15 ) );
 			if ( ( CFloRadSys( Item ).ColdWaterHiTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 15 ) ) ) {
-				ShowSevereError( trim( cAlphaFields( 15 ) ) + " not found: " + trim( Alphas( 15 ) ) );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+				ShowSevereError( cAlphaFields( 15 ) + " not found: " + Alphas( 15 ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 				ErrorsFound = true;
 			}
 
 			CFloRadSys( Item ).ColdWaterLoTempSched = Alphas( 16 );
 			CFloRadSys( Item ).ColdWaterLoTempSchedPtr = GetScheduleIndex( Alphas( 16 ) );
 			if ( ( CFloRadSys( Item ).ColdWaterLoTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 16 ) ) ) {
-				ShowSevereError( trim( cAlphaFields( 16 ) ) + " not found: " + trim( Alphas( 16 ) ) );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+				ShowSevereError( cAlphaFields( 16 ) + " not found: " + Alphas( 16 ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 				ErrorsFound = true;
 			}
 
 			CFloRadSys( Item ).ColdCtrlHiTempSched = Alphas( 17 );
 			CFloRadSys( Item ).ColdCtrlHiTempSchedPtr = GetScheduleIndex( Alphas( 17 ) );
 			if ( ( CFloRadSys( Item ).ColdCtrlHiTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 17 ) ) ) {
-				ShowSevereError( trim( cAlphaFields( 17 ) ) + " not found: " + trim( Alphas( 17 ) ) );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+				ShowSevereError( cAlphaFields( 17 ) + " not found: " + Alphas( 17 ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 				ErrorsFound = true;
 			}
 
 			CFloRadSys( Item ).ColdCtrlLoTempSched = Alphas( 18 );
 			CFloRadSys( Item ).ColdCtrlLoTempSchedPtr = GetScheduleIndex( Alphas( 18 ) );
 			if ( ( CFloRadSys( Item ).ColdCtrlLoTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 18 ) ) ) {
-				ShowSevereError( trim( cAlphaFields( 18 ) ) + " not found: " + trim( Alphas( 18 ) ) );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+				ShowSevereError( cAlphaFields( 18 ) + " not found: " + Alphas( 18 ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 				ErrorsFound = true;
 			}
 
@@ -935,7 +935,7 @@ namespace LowTempRadiantSystem {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), RadSysTypes.Name(), BaseNum, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), RadSysTypes.Name(), BaseNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -952,8 +952,8 @@ namespace LowTempRadiantSystem {
 			} else {
 				ElecRadSys( Item ).SchedPtr = GetScheduleIndex( Alphas( 2 ) );
 				if ( ElecRadSys( Item ).SchedPtr == 0 ) {
-					ShowSevereError( trim( cAlphaFields( 2 ) ) + " not found for" + trim( Alphas( 1 ) ) );
-					ShowContinueError( "Incorrect " + trim( cAlphaFields( 2 ) ) + " = " + trim( Alphas( 2 ) ) );
+					ShowSevereError( cAlphaFields( 2 ) + " not found for" + Alphas( 1 ) );
+					ShowContinueError( "Incorrect " + cAlphaFields( 2 ) + " = " + Alphas( 2 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -961,8 +961,8 @@ namespace LowTempRadiantSystem {
 			ElecRadSys( Item ).ZoneName = Alphas( 3 );
 			ElecRadSys( Item ).ZonePtr = FindItemInList( Alphas( 3 ), Zone.Name(), NumOfZones );
 			if ( ElecRadSys( Item ).ZonePtr == 0 ) {
-				ShowSevereError( RoutineName + "Invalid " + trim( cAlphaFields( 3 ) ) + " = " + trim( Alphas( 3 ) ) );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+				ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 				ErrorsFound = true;
 				//    ELSEIF (Zone(ElecRadSys(Item)%ZonePtr)%Multiplier > 1 .or. Zone(ElecRadSys(Item)%ZonePtr)%ListMultiplier > 1) THEN
 				//      CALL ShowSevereError(RoutineName//'Zone Multiplier or Zone List Multipliers cannot be used (i.e., >1)')
@@ -995,12 +995,12 @@ namespace LowTempRadiantSystem {
 				ElecRadSys( Item ).SurfacePowerFrac( 1 ) = 1.0;
 				// Error checking for single surfaces
 				if ( ElecRadSys( Item ).SurfacePtr( 1 ) == 0 ) {
-					ShowSevereError( RoutineName + "Invalid " + trim( cAlphaFields( 4 ) ) + " = " + trim( Alphas( 4 ) ) );
-					ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+					ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 4 ) + " = " + Alphas( 4 ) );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 					ErrorsFound = true;
 				} else if ( Surface( ElecRadSys( Item ).SurfacePtr( 1 ) ).PartOfVentSlabOrRadiantSurface ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", Invalid Surface" );
-					ShowContinueError( trim( cAlphaFields( 4 ) ) + "=\"" + trim( Alphas( 4 ) ) + "\" has been used in another radiant system or ventilated slab." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", Invalid Surface" );
+					ShowContinueError( cAlphaFields( 4 ) + "=\"" + Alphas( 4 ) + "\" has been used in another radiant system or ventilated slab." );
 					ErrorsFound = true;
 				}
 				if ( ElecRadSys( Item ).SurfacePtr( 1 ) != 0 ) {
@@ -1012,15 +1012,15 @@ namespace LowTempRadiantSystem {
 			for ( SurfNum = 1; SurfNum <= ElecRadSys( Item ).NumOfSurfaces; ++SurfNum ) {
 				if ( ElecRadSys( Item ).SurfacePtr( SurfNum ) == 0 ) continue; // Invalid surface -- detected earlier
 				if ( Surface( ElecRadSys( Item ).SurfacePtr( SurfNum ) ).Zone != ElecRadSys( Item ).ZonePtr ) {
-					ShowSevereError( "Surface referenced in " + trim( CurrentModuleObject ) + " not in same zone as Radiant System," " surface=" + trim( Surface( ElecRadSys( Item ).SurfacePtr( SurfNum ) ).Name ) );
-					ShowContinueError( "Surface in Zone=" + trim( Zone( Surface( ElecRadSys( Item ).SurfacePtr( SurfNum ) ).Zone ).Name ) + " " "Electric Radiant System in " + trim( cAlphaFields( 3 ) ) + " = " + trim( Alphas( 3 ) ) );
-					ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+					ShowSevereError( "Surface referenced in " + CurrentModuleObject + " not in same zone as Radiant System, surface=" + Surface( ElecRadSys( Item ).SurfacePtr( SurfNum ) ).Name );
+					ShowContinueError( "Surface in Zone=" + Zone( Surface( ElecRadSys( Item ).SurfacePtr( SurfNum ) ).Zone ).Name + " Electric Radiant System in " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 					ErrorsFound = true;
 				}
 				if ( Surface( ElecRadSys( Item ).SurfacePtr( SurfNum ) ).Construction == 0 ) continue; // invalid construction -- detected earlier
 				if ( ! Construct( Surface( ElecRadSys( Item ).SurfacePtr( SurfNum ) ).Construction ).SourceSinkPresent ) {
 					ShowSevereError( "Construction referenced in Electric Radiant System Surface does not have a source/sink present" );
-					ShowContinueError( "Surface name= " + trim( Surface( ElecRadSys( Item ).SurfacePtr( SurfNum ) ).Name ) + "  Construction name = " + trim( Construct( Surface( ElecRadSys( Item ).SurfacePtr( SurfNum ) ).Construction ).Name ) );
+					ShowContinueError( "Surface name= " + Surface( ElecRadSys( Item ).SurfacePtr( SurfNum ) ).Name + "  Construction name = " + Construct( Surface( ElecRadSys( Item ).SurfacePtr( SurfNum ) ).Construction ).Name );
 					ShowContinueError( "Construction needs to be defined with a \"Construction:InternalSource\" object." );
 					ErrorsFound = true;
 				}
@@ -1041,16 +1041,16 @@ namespace LowTempRadiantSystem {
 			} else if ( SameString( Alphas( 5 ), OutsideAirWetBulbTemperature ) ) {
 				ElecRadSys( Item ).ControlType = OWBControl;
 			} else {
-				ShowWarningError( "Invalid " + trim( cAlphaFields( 5 ) ) + " = " + trim( Alphas( 5 ) ) );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+				ShowWarningError( "Invalid " + cAlphaFields( 5 ) + " = " + Alphas( 5 ) );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 				ShowContinueError( "Control reset to MAT control for this Electric Radiant System." );
 				ElecRadSys( Item ).ControlType = MATControl;
 			}
 
 			ElecRadSys( Item ).ThrottlRange = Numbers( 2 );
 			if ( ElecRadSys( Item ).ThrottlRange < MinThrottlingRange ) {
-				ShowWarningError( trim( cNumericFields( 2 ) ) + " out of range, reset to 0.5" );
-				ShowContinueError( "Occurs in " + trim( CurrentModuleObject ) + " = " + trim( Alphas( 1 ) ) );
+				ShowWarningError( cNumericFields( 2 ) + " out of range, reset to 0.5" );
+				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 				ElecRadSys( Item ).ThrottlRange = MinThrottlingRange;
 			}
 
@@ -1058,10 +1058,10 @@ namespace LowTempRadiantSystem {
 			ElecRadSys( Item ).SetptSchedPtr = GetScheduleIndex( Alphas( 6 ) );
 			if ( ElecRadSys( Item ).SetptSchedPtr == 0 ) {
 				if ( lAlphaBlanks( 6 ) ) {
-					ShowSevereError( trim( cAlphaFields( 6 ) ) + " must be input, missing for " + trim( Alphas( 1 ) ) );
+					ShowSevereError( cAlphaFields( 6 ) + " must be input, missing for " + Alphas( 1 ) );
 				} else {
-					ShowSevereError( trim( cAlphaFields( 6 ) ) + " not found for " + trim( Alphas( 1 ) ) );
-					ShowContinueError( "Incorrect " + trim( cAlphaFields( 6 ) ) + " = " + trim( Alphas( 6 ) ) );
+					ShowSevereError( cAlphaFields( 6 ) + " not found for " + Alphas( 1 ) );
+					ShowContinueError( "Incorrect " + cAlphaFields( 6 ) + " = " + Alphas( 6 ) );
 				}
 				ErrorsFound = true;
 			}
@@ -1080,7 +1080,7 @@ namespace LowTempRadiantSystem {
 				CheckSurfNum = HydrRadSys( Item ).SurfacePtr( SurfNum );
 				if ( CheckSurfNum == 0 ) continue;
 				if ( AssignedAsRadiantSurface( CheckSurfNum ) ) {
-					ShowSevereError( "Surface " + trim( Surface( CheckSurfNum ).Name ) + " is referenced by more than one " "radiant system--this is not allowed" );
+					ShowSevereError( "Surface " + Surface( CheckSurfNum ).Name + " is referenced by more than one " "radiant system--this is not allowed" );
 					ErrorsFound = true;
 				} else {
 					AssignedAsRadiantSurface( CheckSurfNum ) = true;
@@ -1088,7 +1088,7 @@ namespace LowTempRadiantSystem {
 				// Also check the other side of interzone partitions
 				if ( ( Surface( CheckSurfNum ).ExtBoundCond > 0 ) && ( Surface( CheckSurfNum ).ExtBoundCond != CheckSurfNum ) ) {
 					if ( AssignedAsRadiantSurface( Surface( CheckSurfNum ).ExtBoundCond ) ) {
-						ShowSevereError( "Interzone surface " + trim( Surface( Surface( CheckSurfNum ).ExtBoundCond ).Name ) + " is referenced by more than one radiant system--this is not allowed" );
+						ShowSevereError( "Interzone surface " + Surface( Surface( CheckSurfNum ).ExtBoundCond ).Name + " is referenced by more than one radiant system--this is not allowed" );
 						ErrorsFound = true;
 					} else {
 						AssignedAsRadiantSurface( Surface( CheckSurfNum ).ExtBoundCond ) = true;
@@ -1102,7 +1102,7 @@ namespace LowTempRadiantSystem {
 				CheckSurfNum = CFloRadSys( Item ).SurfacePtr( SurfNum );
 				if ( CheckSurfNum == 0 ) continue;
 				if ( AssignedAsRadiantSurface( CheckSurfNum ) ) {
-					ShowSevereError( "Surface " + trim( Surface( CheckSurfNum ).Name ) + " is referenced by more than one " "radiant system--this is not allowed" );
+					ShowSevereError( "Surface " + Surface( CheckSurfNum ).Name + " is referenced by more than one " "radiant system--this is not allowed" );
 					ErrorsFound = true;
 				} else {
 					AssignedAsRadiantSurface( CheckSurfNum ) = true;
@@ -1110,7 +1110,7 @@ namespace LowTempRadiantSystem {
 				// Also check the other side of interzone partitions
 				if ( ( Surface( CheckSurfNum ).ExtBoundCond > 0 ) && ( Surface( CheckSurfNum ).ExtBoundCond != CheckSurfNum ) ) {
 					if ( AssignedAsRadiantSurface( Surface( CheckSurfNum ).ExtBoundCond ) ) {
-						ShowSevereError( "Interzone surface " + trim( Surface( Surface( CheckSurfNum ).ExtBoundCond ).Name ) + " is referenced by more than one radiant system--this is not allowed" );
+						ShowSevereError( "Interzone surface " + Surface( Surface( CheckSurfNum ).ExtBoundCond ).Name + " is referenced by more than one radiant system--this is not allowed" );
 						ErrorsFound = true;
 					} else {
 						AssignedAsRadiantSurface( Surface( CheckSurfNum ).ExtBoundCond ) = true;
@@ -1124,7 +1124,7 @@ namespace LowTempRadiantSystem {
 				CheckSurfNum = ElecRadSys( Item ).SurfacePtr( SurfNum );
 				if ( CheckSurfNum == 0 ) continue;
 				if ( AssignedAsRadiantSurface( CheckSurfNum ) ) {
-					ShowSevereError( "Surface " + trim( Surface( CheckSurfNum ).Name ) + " is referenced by more than one " "radiant system--this is not allowed" );
+					ShowSevereError( "Surface " + Surface( CheckSurfNum ).Name + " is referenced by more than one " "radiant system--this is not allowed" );
 					ErrorsFound = true;
 				} else {
 					AssignedAsRadiantSurface( CheckSurfNum ) = true;
@@ -1132,7 +1132,7 @@ namespace LowTempRadiantSystem {
 				// Also check the other side of interzone partitions
 				if ( ( Surface( CheckSurfNum ).ExtBoundCond > 0 ) && ( Surface( CheckSurfNum ).ExtBoundCond != CheckSurfNum ) ) {
 					if ( AssignedAsRadiantSurface( Surface( CheckSurfNum ).ExtBoundCond ) ) {
-						ShowSevereError( "Interzone surface " + trim( Surface( Surface( CheckSurfNum ).ExtBoundCond ).Name ) + " is referenced by more than one radiant system--this is not allowed" );
+						ShowSevereError( "Interzone surface " + Surface( Surface( CheckSurfNum ).ExtBoundCond ).Name + " is referenced by more than one radiant system--this is not allowed" );
 						ErrorsFound = true;
 					} else {
 						AssignedAsRadiantSurface( Surface( CheckSurfNum ).ExtBoundCond ) = true;
@@ -1264,7 +1264,7 @@ namespace LowTempRadiantSystem {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 CurrentFlowSchedule; // Schedule value for flow fraction in a constant flow radiant system
 		static bool ErrorsFound( false ); // In one-time initializations
-		Fstring Errout( 10 ); // Message for errors
+		std::string Errout; // Message for errors
 		static bool firstTime( true ); // For one-time initializations
 		int RadNum; // Number of the radiant system (DO loop counter)
 		int RadSurfNum; // Number of the radiant system surface (DO loop counter)
@@ -1348,17 +1348,17 @@ namespace LowTempRadiantSystem {
 					CFloRadSys( RadNum ).PumpEffic = TotalEffic / CFloRadSys( RadNum ).MotorEffic;
 					if ( CFloRadSys( RadNum ).PumpEffic < 0.50 ) {
 						gio::write( Errout, "(F10.2)" ) << CFloRadSys( RadNum ).PumpEffic * 100.0;
-						ShowWarningError( "Check input. Calc Pump Efficiency=" + trim( adjustl( Errout ) ) + "% which is less than 50%, for pump in radiant system " + trim( CFloRadSys( RadNum ).Name ) );
+						ShowWarningError( "Check input. Calc Pump Efficiency=" + stripped( Errout ) + "% which is less than 50%, for pump in radiant system " + CFloRadSys( RadNum ).Name );
 					} else if ( ( CFloRadSys( RadNum ).PumpEffic > 0.95 ) && ( CFloRadSys( RadNum ).PumpEffic <= 1.0 ) ) {
 						gio::write( Errout, "(F10.2)" ) << CFloRadSys( RadNum ).PumpEffic * 100.0;
-						ShowWarningError( "Check input.  Calc Pump Efficiency=" + trim( adjustl( Errout ) ) + "% is approaching 100%, for pump in radiant system " + trim( CFloRadSys( RadNum ).Name ) );
+						ShowWarningError( "Check input.  Calc Pump Efficiency=" + stripped( Errout ) + "% is approaching 100%, for pump in radiant system " + CFloRadSys( RadNum ).Name );
 					} else if ( CFloRadSys( RadNum ).PumpEffic > 1.0 ) {
 						gio::write( Errout, "(F10.2)" ) << CFloRadSys( RadNum ).PumpEffic * 100.0;
-						ShowSevereError( "Check input.  Calc Pump Efficiency=" + trim( adjustl( Errout ) ) + "% which is bigger than 100%, for pump in radiant system " + trim( CFloRadSys( RadNum ).Name ) );
+						ShowSevereError( "Check input.  Calc Pump Efficiency=" + stripped( Errout ) + "% which is bigger than 100%, for pump in radiant system " + CFloRadSys( RadNum ).Name );
 						ErrorsFound = true;
 					}
 				} else {
-					ShowSevereError( "Check input.  Pump nominal power and motor efficiency cannot be 0, for pump=" + trim( CFloRadSys( RadNum ).Name ) );
+					ShowSevereError( "Check input.  Pump nominal power and motor efficiency cannot be 0, for pump=" + CFloRadSys( RadNum ).Name );
 					ErrorsFound = true;
 				}
 			}
@@ -1417,13 +1417,13 @@ namespace LowTempRadiantSystem {
 
 				if ( SELECT_CASE_var == HydronicSystem ) {
 					if ( CheckZoneEquipmentList( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", RadSysTypes( Loop ).Name ) ) continue;
-					ShowSevereError( "InitLowTempRadiantSystem: Unit=[ZoneHVAC:LowTemperatureRadiant:VariableFlow," + trim( RadSysTypes( Loop ).Name ) + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
+					ShowSevereError( "InitLowTempRadiantSystem: Unit=[ZoneHVAC:LowTemperatureRadiant:VariableFlow," + RadSysTypes( Loop ).Name + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
 				} else if ( SELECT_CASE_var == ConstantFlowSystem ) {
 					if ( CheckZoneEquipmentList( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", RadSysTypes( Loop ).Name ) ) continue;
-					ShowSevereError( "InitLowTempRadiantSystem: Unit=[ZoneHVAC:LowTemperatureRadiant:ConstantFlow," + trim( RadSysTypes( Loop ).Name ) + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
+					ShowSevereError( "InitLowTempRadiantSystem: Unit=[ZoneHVAC:LowTemperatureRadiant:ConstantFlow," + RadSysTypes( Loop ).Name + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
 				} else if ( SELECT_CASE_var == ElectricSystem ) {
 					if ( CheckZoneEquipmentList( "ZoneHVAC:LowTemperatureRadiant:Electric", RadSysTypes( Loop ).Name ) ) continue;
-					ShowSevereError( "InitLowTempRadiantSystem: Unit=[ZoneHVAC:LowTemperatureRadiant:Electric," + trim( RadSysTypes( Loop ).Name ) + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
+					ShowSevereError( "InitLowTempRadiantSystem: Unit=[ZoneHVAC:LowTemperatureRadiant:Electric," + RadSysTypes( Loop ).Name + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
 				} else { // Illegal system, but checked earlier
 				}}
 			}
@@ -1617,7 +1617,7 @@ namespace LowTempRadiantSystem {
 			} else {
 
 				ShowSevereError( "Radiant system entered without specification of type: electric, constant flow, or hydronic?" );
-				ShowContinueError( "Occurs in Radiant System=" + trim( HydrRadSys( RadSysNum ).Name ) );
+				ShowContinueError( "Occurs in Radiant System=" + HydrRadSys( RadSysNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 
 			}}
@@ -1783,9 +1783,9 @@ namespace LowTempRadiantSystem {
 							ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:Electric", ElecRadSys( RadSysNum ).Name, "Design Size Maximum Electrical Power to Panel [W]", MaxElecPowerDes, "User-Specified Maximum Electrical Power to Panel [W]", MaxElecPowerUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( MaxElecPowerDes - MaxElecPowerUser ) / MaxElecPowerUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for " "ZoneHVAC:LowTemperatureRadiant:Electric = \" " + trim( HydrRadSys( RadSysNum ).Name ) + "\"." );
-									ShowContinueError( "User-Specified Maximum Electrical Power to Panel of " + trim( RoundSigDigits( MaxElecPowerUser, 2 ) ) + " [W]" );
-									ShowContinueError( "differs from Design Size Maximum Electrical Power to Panel of " + trim( RoundSigDigits( MaxElecPowerDes, 2 ) ) + " [W]" );
+									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for " "ZoneHVAC:LowTemperatureRadiant:Electric = \" " + ElecRadSys( RadSysNum ).Name + "\"." ); // Fix from LL: HydrRadSys->ElecRadSys
+									ShowContinueError( "User-Specified Maximum Electrical Power to Panel of " + RoundSigDigits( MaxElecPowerUser, 2 ) + " [W]" );
+									ShowContinueError( "differs from Design Size Maximum Electrical Power to Panel of " + RoundSigDigits( MaxElecPowerDes, 2 ) + " [W]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -1824,7 +1824,7 @@ namespace LowTempRadiantSystem {
 							}
 						} else {
 							ShowSevereError( "Autosizing of water flow requires a heating loop Sizing:Plant object" );
-							ShowContinueError( "Occurs in " "ZoneHVAC:LowTemperatureRadiant:VariableFlow" " Object=" + trim( HydrRadSys( RadSysNum ).Name ) );
+							ShowContinueError( "Occurs in " "ZoneHVAC:LowTemperatureRadiant:VariableFlow" " Object=" + HydrRadSys( RadSysNum ).Name );
 							ErrorsFound = true;
 						}
 					}
@@ -1837,9 +1837,9 @@ namespace LowTempRadiantSystem {
 							ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name, "Design Size Maximum Hot Water Flow [m3/s]", WaterVolFlowMaxHeatDes, "User-Specified Maximum Hot Water Flow [m3/s]", WaterVolFlowMaxHeatUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( WaterVolFlowMaxHeatDes - WaterVolFlowMaxHeatUser ) / WaterVolFlowMaxHeatUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for " "ZoneHVAC:LowTemperatureRadiant:Electric = \" " + trim( HydrRadSys( RadSysNum ).Name ) + "\"." );
-									ShowContinueError( "User-Specified Maximum Hot Water Flow of " + trim( RoundSigDigits( WaterVolFlowMaxHeatUser, 5 ) ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Maximum Hot Water Flow of " + trim( RoundSigDigits( WaterVolFlowMaxHeatDes, 5 ) ) + " [m3/s]" );
+									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for " "ZoneHVAC:LowTemperatureRadiant:Electric = \" " + HydrRadSys( RadSysNum ).Name + "\"." );
+									ShowContinueError( "User-Specified Maximum Hot Water Flow of " + RoundSigDigits( WaterVolFlowMaxHeatUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Maximum Hot Water Flow of " + RoundSigDigits( WaterVolFlowMaxHeatDes, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -1874,7 +1874,7 @@ namespace LowTempRadiantSystem {
 							}
 						} else {
 							ShowSevereError( "Autosizing of water flow requires a cooling loop Sizing:Plant object" );
-							ShowContinueError( "Occurs in " "ZoneHVAC:LowTemperatureRadiant:VariableFlow" " Object=" + trim( HydrRadSys( RadSysNum ).Name ) );
+							ShowContinueError( "Occurs in " "ZoneHVAC:LowTemperatureRadiant:VariableFlow" " Object=" + HydrRadSys( RadSysNum ).Name );
 							ErrorsFound = true;
 						}
 					}
@@ -1887,9 +1887,9 @@ namespace LowTempRadiantSystem {
 							ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name, "Design Size Maximum Cold Water Flow [m3/s]", WaterVolFlowMaxCoolDes, "User-Specified Maximum Cold Water Flow [m3/s]", WaterVolFlowMaxCoolUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( WaterVolFlowMaxCoolDes - WaterVolFlowMaxCoolUser ) / WaterVolFlowMaxCoolUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for " "ZoneHVAC:LowTemperatureRadiant:Electric = \" " + trim( HydrRadSys( RadSysNum ).Name ) + "\"." );
-									ShowContinueError( "User-Specified Maximum Cool Water Flow of " + trim( RoundSigDigits( WaterVolFlowMaxCoolUser, 5 ) ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Maximum Cool Water Flow of " + trim( RoundSigDigits( WaterVolFlowMaxCoolDes, 5 ) ) + " [m3/s]" );
+									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for " "ZoneHVAC:LowTemperatureRadiant:Electric = \" " + HydrRadSys( RadSysNum ).Name + "\"." );
+									ShowContinueError( "User-Specified Maximum Cool Water Flow of " + RoundSigDigits( WaterVolFlowMaxCoolUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Maximum Cool Water Flow of " + RoundSigDigits( WaterVolFlowMaxCoolDes, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -1921,9 +1921,9 @@ namespace LowTempRadiantSystem {
 							ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name, "Design Size Hydronic Tubing Length [m]", TubeLengthDes, "User-Specified Hydronic Tubing Length [m]", TubeLengthUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( TubeLengthDes - TubeLengthUser ) / TubeLengthUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for " "ZoneHVAC:LowTemperatureRadiant:Electric = \" " + trim( HydrRadSys( RadSysNum ).Name ) + "\"." );
-									ShowContinueError( "User-Specified Hydronic Tubing Length of " + trim( RoundSigDigits( TubeLengthUser, 5 ) ) + " [m]" );
-									ShowContinueError( "differs from Design Size Hydronic Tubing Length of " + trim( RoundSigDigits( TubeLengthDes, 5 ) ) + " [m]" );
+									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for " "ZoneHVAC:LowTemperatureRadiant:Electric = \" " + HydrRadSys( RadSysNum ).Name + "\"." );
+									ShowContinueError( "User-Specified Hydronic Tubing Length of " + RoundSigDigits( TubeLengthUser, 5 ) + " [m]" );
+									ShowContinueError( "differs from Design Size Hydronic Tubing Length of " + RoundSigDigits( TubeLengthDes, 5 ) + " [m]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -2086,7 +2086,7 @@ namespace LowTempRadiantSystem {
 				ControlTemp = Zone( ZoneNum ).OutWetBulbTemp;
 			} else { // Should never get here
 				ControlTemp = MAT( ZoneNum );
-				ShowSevereError( "Illegal control type in low temperature radiant system: " + trim( HydrRadSys( RadSysNum ).Name ) );
+				ShowSevereError( "Illegal control type in low temperature radiant system: " + HydrRadSys( RadSysNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 			}}
 
@@ -2107,7 +2107,7 @@ namespace LowTempRadiantSystem {
 			// potentially be heating or cooling at a particular control temperature
 			if ( OffTempHeat > OffTempCool ) {
 				MassFlowFrac = 0.0;
-				ShowSevereError( "Overlapping heating and cooling control temps in radiant system: " + trim( HydrRadSys( RadSysNum ).Name ) );
+				ShowSevereError( "Overlapping heating and cooling control temps in radiant system: " + HydrRadSys( RadSysNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 
 			} else { // Temperatures for heating and cooling do not overlap--calculate the mass flow fraction
@@ -2267,7 +2267,7 @@ namespace LowTempRadiantSystem {
 			WaterNodeIn = HydrRadSys( RadSysNum ).ColdWaterInNode;
 		} else {
 			ShowSevereError( "Illegal low temperature radiant system operating mode" );
-			ShowContinueError( "Occurs in Radiant System=" + trim( HydrRadSys( RadSysNum ).Name ) );
+			ShowContinueError( "Occurs in Radiant System=" + HydrRadSys( RadSysNum ).Name );
 			ShowFatalError( "Preceding condition causes termination." );
 		}}
 		ZoneNum = HydrRadSys( RadSysNum ).ZonePtr;
@@ -2438,16 +2438,16 @@ namespace LowTempRadiantSystem {
 						// Produce a warning message so that user knows the system was shut-off due to potential for condensation
 						if ( ! WarmupFlag ) {
 							if ( HydrRadSys( RadSysNum ).CondErrIndex == 0 ) { // allow errors up to number of radiant systems
-								ShowWarningMessage( cHydronicSystem + " [" + trim( HydrRadSys( RadSysNum ).Name ) + "]" );
-								ShowContinueError( "Surface [" + trim( Surface( HydrRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ) ).Name ) + "] temperature below dew-point temperature--potential for condensation exists" );
+								ShowWarningMessage( cHydronicSystem + " [" + HydrRadSys( RadSysNum ).Name + ']' );
+								ShowContinueError( "Surface [" + Surface( HydrRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ) ).Name + "] temperature below dew-point temperature--potential for condensation exists" );
 								ShowContinueError( "Flow to the radiant system will be shut-off to avoid condensation" );
-								ShowContinueError( "Predicted radiant system surface temperature = " + trim( RoundSigDigits( TH( HydrRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ), 1, 2 ), 2 ) ) );
-								ShowContinueError( "Zone dew-point temperature + safety delta T= " + trim( RoundSigDigits( DewPointTemp + HydrRadSys( RadSysNum ).CondDewPtDeltaT, 2 ) ) );
-								ShowContinueErrorTimeStamp( " " );
-								ShowContinueError( "Note that a " + trim( RoundSigDigits( HydrRadSys( RadSysNum ).CondDewPtDeltaT, 4 ) ) + " C safety was chosen in the input for the shut-off criteria" );
+								ShowContinueError( "Predicted radiant system surface temperature = " + RoundSigDigits( TH( HydrRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ), 1, 2 ), 2 ) );
+								ShowContinueError( "Zone dew-point temperature + safety delta T= " + RoundSigDigits( DewPointTemp + HydrRadSys( RadSysNum ).CondDewPtDeltaT, 2 ) );
+								ShowContinueErrorTimeStamp( "" );
+								ShowContinueError( "Note that a " + RoundSigDigits( HydrRadSys( RadSysNum ).CondDewPtDeltaT, 4 ) + " C safety was chosen in the input for the shut-off criteria" );
 								ShowContinueError( "Note also that this affects all surfaces that are part of this radiant system" );
 							}
-							ShowRecurringWarningErrorAtEnd( cHydronicSystem + " [" + trim( HydrRadSys( RadSysNum ).Name ) + "] condensation shut-off occurrence continues.", HydrRadSys( RadSysNum ).CondErrIndex, DewPointTemp, DewPointTemp, _, "C", "C" );
+							ShowRecurringWarningErrorAtEnd( cHydronicSystem + " [" + HydrRadSys( RadSysNum ).Name + "] condensation shut-off occurrence continues.", HydrRadSys( RadSysNum ).CondErrIndex, DewPointTemp, DewPointTemp, _, "C", "C" );
 						}
 						break; // outer do loop
 					}
@@ -2570,16 +2570,16 @@ namespace LowTempRadiantSystem {
 						// Produce a warning message so that user knows the system was shut-off due to potential for condensation
 						if ( ! WarmupFlag ) {
 							if ( HydrRadSys( RadSysNum ).CondErrIndex == 0 ) { // allow errors up to number of radiant systems
-								ShowWarningMessage( cHydronicSystem + " [" + trim( HydrRadSys( RadSysNum ).Name ) + "]" );
-								ShowContinueError( "Surface [" + trim( Surface( HydrRadSys( RadSysNum ).SurfacePtr( CondSurfNum ) ).Name ) + "] temperature below dew-point temperature--potential for condensation exists" );
+								ShowWarningMessage( cHydronicSystem + " [" + HydrRadSys( RadSysNum ).Name + ']' );
+								ShowContinueError( "Surface [" + Surface( HydrRadSys( RadSysNum ).SurfacePtr( CondSurfNum ) ).Name + "] temperature below dew-point temperature--potential for condensation exists" );
 								ShowContinueError( "Flow to the radiant system will be shut-off to avoid condensation" );
-								ShowContinueError( "Predicted radiant system surface temperature = " + trim( RoundSigDigits( TH( HydrRadSys( RadSysNum ).SurfacePtr( CondSurfNum ), 1, 2 ), 2 ) ) );
-								ShowContinueError( "Zone dew-point temperature + safety delta T= " + trim( RoundSigDigits( DewPointTemp + HydrRadSys( RadSysNum ).CondDewPtDeltaT, 2 ) ) );
-								ShowContinueErrorTimeStamp( " " );
-								ShowContinueError( "Note that a " + trim( RoundSigDigits( HydrRadSys( RadSysNum ).CondDewPtDeltaT, 4 ) ) + " C safety was chosen in the input for the shut-off criteria" );
+								ShowContinueError( "Predicted radiant system surface temperature = " + RoundSigDigits( TH( HydrRadSys( RadSysNum ).SurfacePtr( CondSurfNum ), 1, 2 ), 2 ) );
+								ShowContinueError( "Zone dew-point temperature + safety delta T= " + RoundSigDigits( DewPointTemp + HydrRadSys( RadSysNum ).CondDewPtDeltaT, 2 ) );
+								ShowContinueErrorTimeStamp( "" );
+								ShowContinueError( "Note that a " + RoundSigDigits( HydrRadSys( RadSysNum ).CondDewPtDeltaT, 4 ) + " C safety was chosen in the input for the shut-off criteria" );
 								ShowContinueError( "Note also that this affects all surfaces that are part of this radiant system" );
 							}
-							ShowRecurringWarningErrorAtEnd( cHydronicSystem + " [" + trim( HydrRadSys( RadSysNum ).Name ) + "] condensation shut-off occurrence continues.", HydrRadSys( RadSysNum ).CondErrIndex, DewPointTemp, DewPointTemp, _, "C", "C" );
+							ShowRecurringWarningErrorAtEnd( cHydronicSystem + " [" + HydrRadSys( RadSysNum ).Name + "] condensation shut-off occurrence continues.", HydrRadSys( RadSysNum ).CondErrIndex, DewPointTemp, DewPointTemp, _, "C", "C" );
 						}
 					}
 				} // Condensation Predicted in Variable Shut-Off Control Type
@@ -2709,7 +2709,7 @@ namespace LowTempRadiantSystem {
 			} else if ( SELECT_CASE_var == OWBControl ) {
 				SetPointTemp = Zone( ZoneNum ).OutWetBulbTemp;
 			} else { // Should never get here
-				ShowSevereError( "Illegal control type in low temperature radiant system: " + trim( CFloRadSys( RadSysNum ).Name ) );
+				ShowSevereError( "Illegal control type in low temperature radiant system: " + CFloRadSys( RadSysNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 			}}
 
@@ -2739,7 +2739,7 @@ namespace LowTempRadiantSystem {
 					SetPointTempHi = GetCurrentScheduleValue( CFloRadSys( RadSysNum ).HotCtrlHiTempSchedPtr );
 					SetPointTempLo = GetCurrentScheduleValue( CFloRadSys( RadSysNum ).HotCtrlLoTempSchedPtr );
 					if ( SetPointTempHi < SetPointTempLo ) {
-						ShowSevereError( "Heating setpoint temperature mismatch in" + trim( CFloRadSys( RadSysNum ).Name ) );
+						ShowSevereError( "Heating setpoint temperature mismatch in" + CFloRadSys( RadSysNum ).Name );
 						ShowContinueError( "High setpoint temperature is less than low setpoint temperature--check your schedule input" );
 						ShowFatalError( "Preceding condition causes termination." );
 					}
@@ -2747,7 +2747,7 @@ namespace LowTempRadiantSystem {
 					WaterTempHi = GetCurrentScheduleValue( CFloRadSys( RadSysNum ).HotWaterHiTempSchedPtr );
 					WaterTempLo = GetCurrentScheduleValue( CFloRadSys( RadSysNum ).HotWaterLoTempSchedPtr );
 					if ( WaterTempHi < WaterTempLo ) {
-						ShowSevereError( "Heating water temperature mismatch in" + trim( CFloRadSys( RadSysNum ).Name ) );
+						ShowSevereError( "Heating water temperature mismatch in" + CFloRadSys( RadSysNum ).Name );
 						ShowContinueError( "High water temperature is less than low water temperature--check your schedule input" );
 						ShowFatalError( "Preceding condition causes termination." );
 					}
@@ -2779,7 +2779,7 @@ namespace LowTempRadiantSystem {
 					SetPointTempHi = GetCurrentScheduleValue( CFloRadSys( RadSysNum ).ColdCtrlHiTempSchedPtr );
 					SetPointTempLo = GetCurrentScheduleValue( CFloRadSys( RadSysNum ).ColdCtrlLoTempSchedPtr );
 					if ( SetPointTempHi < SetPointTempLo ) {
-						ShowSevereError( "Cooling setpoint temperature mismatch in" + trim( CFloRadSys( RadSysNum ).Name ) );
+						ShowSevereError( "Cooling setpoint temperature mismatch in" + CFloRadSys( RadSysNum ).Name );
 						ShowContinueError( "High setpoint temperature is less than low setpoint temperature--check your schedule input" );
 						ShowFatalError( "Preceding condition causes termination." );
 					}
@@ -2787,7 +2787,7 @@ namespace LowTempRadiantSystem {
 					WaterTempHi = GetCurrentScheduleValue( CFloRadSys( RadSysNum ).ColdWaterHiTempSchedPtr );
 					WaterTempLo = GetCurrentScheduleValue( CFloRadSys( RadSysNum ).ColdWaterLoTempSchedPtr );
 					if ( WaterTempHi < WaterTempLo ) {
-						ShowSevereError( "Cooling water temperature mismatch in" + trim( CFloRadSys( RadSysNum ).Name ) );
+						ShowSevereError( "Cooling water temperature mismatch in" + CFloRadSys( RadSysNum ).Name );
 						ShowContinueError( "High water temperature is less than low water temperature--check your schedule input" );
 						ShowFatalError( "Preceding condition causes termination." );
 					}
@@ -3091,7 +3091,7 @@ namespace LowTempRadiantSystem {
 			// Error check, just in case
 			if ( CFloRadSys( RadSysNum ).WaterRecircRate < 0.0 ) {
 				ShowWarningError( "Flow mismatch in radiant system--result will be an energy imbalance--should not get this error" );
-				ShowContinueErrorTimeStamp( "WaterRecircRate=" + trim( TrimSigDigits( CFloRadSys( RadSysNum ).WaterRecircRate, 2 ) ) + ", in Radiant System=" + trim( CFloRadSys( RadSysNum ).Name ) + "," );
+				ShowContinueErrorTimeStamp( "WaterRecircRate=" + TrimSigDigits( CFloRadSys( RadSysNum ).WaterRecircRate, 2 ) + ", in Radiant System=" + CFloRadSys( RadSysNum ).Name + ',' );
 				CFloRadSys( RadSysNum ).WaterRecircRate = 0.0;
 				CFloRadSys( RadSysNum ).WaterInjectionRate = CFloRadSys( RadSysNum ).WaterMassFlowRate;
 			}
@@ -3242,7 +3242,7 @@ namespace LowTempRadiantSystem {
 			WaterNodeIn = CFloRadSys( RadSysNum ).ColdWaterInNode;
 		} else {
 			ShowSevereError( "Illegal low temperature radiant system operating mode" );
-			ShowContinueError( "Occurs in Radiant System=" + trim( CFloRadSys( RadSysNum ).Name ) );
+			ShowContinueError( "Occurs in Radiant System=" + CFloRadSys( RadSysNum ).Name );
 			ShowFatalError( "Preceding condition causes termination." );
 		}}
 		ZoneNum = CFloRadSys( RadSysNum ).ZonePtr;
@@ -3482,16 +3482,16 @@ namespace LowTempRadiantSystem {
 						// Produce a warning message so that user knows the system was shut-off due to potential for condensation
 						if ( ! WarmupFlag ) {
 							if ( CFloRadSys( RadSysNum ).CondErrIndex == 0 ) { // allow errors up to number of radiant systems
-								ShowWarningMessage( cConstantFlowSystem + " [" + trim( CFloRadSys( RadSysNum ).Name ) + "]" );
-								ShowContinueError( "Surface [" + trim( Surface( CFloRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ) ).Name ) + "] temperature below dew-point temperature--potential for condensation exists" );
+								ShowWarningMessage( cConstantFlowSystem + " [" + CFloRadSys( RadSysNum ).Name + ']' );
+								ShowContinueError( "Surface [" + Surface( CFloRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ) ).Name + "] temperature below dew-point temperature--potential for condensation exists" );
 								ShowContinueError( "Flow to the radiant system will be shut-off to avoid condensation" );
-								ShowContinueError( "Predicted radiant system surface temperature = " + trim( RoundSigDigits( TH( CFloRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ), 1, 2 ), 2 ) ) );
-								ShowContinueError( "Zone dew-point temperature + safety delta T= " + trim( RoundSigDigits( DewPointTemp + CFloRadSys( RadSysNum ).CondDewPtDeltaT, 2 ) ) );
-								ShowContinueErrorTimeStamp( " " );
-								ShowContinueError( "Note that a " + trim( RoundSigDigits( CFloRadSys( RadSysNum ).CondDewPtDeltaT, 4 ) ) + " C safety was chosen in the input for the shut-off criteria" );
+								ShowContinueError( "Predicted radiant system surface temperature = " + RoundSigDigits( TH( CFloRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ), 1, 2 ), 2 ) );
+								ShowContinueError( "Zone dew-point temperature + safety delta T= " + RoundSigDigits( DewPointTemp + CFloRadSys( RadSysNum ).CondDewPtDeltaT, 2 ) );
+								ShowContinueErrorTimeStamp( "" );
+								ShowContinueError( "Note that a " + RoundSigDigits( CFloRadSys( RadSysNum ).CondDewPtDeltaT, 4 ) + " C safety was chosen in the input for the shut-off criteria" );
 								ShowContinueError( "Note also that this affects all surfaces that are part of this radiant system" );
 							}
-							ShowRecurringWarningErrorAtEnd( cConstantFlowSystem + " [" + trim( CFloRadSys( RadSysNum ).Name ) + "] condensation shut-off occurrence continues.", CFloRadSys( RadSysNum ).CondErrIndex, DewPointTemp, DewPointTemp, _, "C", "C" );
+							ShowRecurringWarningErrorAtEnd( cConstantFlowSystem + " [" + CFloRadSys( RadSysNum ).Name + "] condensation shut-off occurrence continues.", CFloRadSys( RadSysNum ).CondErrIndex, DewPointTemp, DewPointTemp, _, "C", "C" );
 						}
 						break; // outer do loop
 					}
@@ -3525,16 +3525,16 @@ namespace LowTempRadiantSystem {
 							// Produce a warning message so that user knows the system was shut-off due to potential for condensation
 							if ( ! WarmupFlag ) {
 								if ( CFloRadSys( RadSysNum ).CondErrIndex == 0 ) { // allow errors up to number of radiant systems
-									ShowWarningMessage( cConstantFlowSystem + " [" + trim( CFloRadSys( RadSysNum ).Name ) + "]" );
-									ShowContinueError( "Surface [" + trim( Surface( CFloRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ) ).Name ) + "] temperature below dew-point temperature--potential for condensation exists" );
+									ShowWarningMessage( cConstantFlowSystem + " [" + CFloRadSys( RadSysNum ).Name + ']' );
+									ShowContinueError( "Surface [" + Surface( CFloRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ) ).Name + "] temperature below dew-point temperature--potential for condensation exists" );
 									ShowContinueError( "Flow to the radiant system will be shut-off to avoid condensation" );
-									ShowContinueError( "Predicted radiant system surface temperature = " + trim( RoundSigDigits( TH( CFloRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ), 1, 2 ), 2 ) ) );
-									ShowContinueError( "Zone dew-point temperature + safety delta T= " + trim( RoundSigDigits( DewPointTemp + CFloRadSys( RadSysNum ).CondDewPtDeltaT, 2 ) ) );
-									ShowContinueErrorTimeStamp( " " );
-									ShowContinueError( "Note that a " + trim( RoundSigDigits( CFloRadSys( RadSysNum ).CondDewPtDeltaT, 4 ) ) + " C safety was chosen in the input for the shut-off criteria" );
+									ShowContinueError( "Predicted radiant system surface temperature = " + RoundSigDigits( TH( CFloRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ), 1, 2 ), 2 ) );
+									ShowContinueError( "Zone dew-point temperature + safety delta T= " + RoundSigDigits( DewPointTemp + CFloRadSys( RadSysNum ).CondDewPtDeltaT, 2 ) );
+									ShowContinueErrorTimeStamp( "" );
+									ShowContinueError( "Note that a " + RoundSigDigits( CFloRadSys( RadSysNum ).CondDewPtDeltaT, 4 ) + " C safety was chosen in the input for the shut-off criteria" );
 									ShowContinueError( "Note also that this affects all surfaces that are part of this radiant system" );
 								}
-								ShowRecurringWarningErrorAtEnd( cConstantFlowSystem + " [" + trim( CFloRadSys( RadSysNum ).Name ) + "] condensation shut-off occurrence continues.", CFloRadSys( RadSysNum ).CondErrIndex, DewPointTemp, DewPointTemp, _, "C", "C" );
+								ShowRecurringWarningErrorAtEnd( cConstantFlowSystem + " [" + CFloRadSys( RadSysNum ).Name + "] condensation shut-off occurrence continues.", CFloRadSys( RadSysNum ).CondErrIndex, DewPointTemp, DewPointTemp, _, "C", "C" );
 							}
 							break; // outer do loop
 						} else { // (First iteration--reset loop required temperature and try again to avoid condensation)
@@ -3686,7 +3686,7 @@ namespace LowTempRadiantSystem {
 				ControlTemp = Zone( ZoneNum ).OutWetBulbTemp;
 			} else { // Should never get here
 				ControlTemp = MAT( ZoneNum );
-				ShowSevereError( "Illegal control type in low temperature radiant system: " + trim( ElecRadSys( RadSysNum ).Name ) );
+				ShowSevereError( "Illegal control type in low temperature radiant system: " + ElecRadSys( RadSysNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 			}}
 
@@ -4026,23 +4026,23 @@ namespace LowTempRadiantSystem {
 				if ( WarnTooLow ) {
 					if ( HydrRadSys( RadSysNum ).OutRangeLoErrorCount == 0 ) {
 						ShowSevereMessage( "UpdateLowTempRadiantSystem: model result for fluid outlet temperature is not physical." );
-						ShowContinueError( "Occurs for radiant system name = " + trim( HydrRadSys( RadSysNum ).Name ) );
-						ShowContinueError( "Calculated radiant system outlet temperature = " + trim( RoundSigDigits( outletTemp, 3 ) ) + " [C]" );
-						ShowContinueError( "Radiant system inlet temperature = " + trim( RoundSigDigits( inletTemp, 3 ) ) + " [C]" );
+						ShowContinueError( "Occurs for radiant system name = " + HydrRadSys( RadSysNum ).Name );
+						ShowContinueError( "Calculated radiant system outlet temperature = " + RoundSigDigits( outletTemp, 3 ) + " [C]" );
+						ShowContinueError( "Radiant system inlet temperature = " + RoundSigDigits( inletTemp, 3 ) + " [C]" );
 						ShowContinueError( "A possible cause is that the materials used in the internal source construction are " "not compatible with the model." );
 					}
-					ShowRecurringSevereErrorAtEnd( "UpdateLowTempRadiantSystem: Detected low out of range outlet temperature result " "for radiant system name =" + trim( HydrRadSys( RadSysNum ).Name ), HydrRadSys( RadSysNum ).OutRangeLoErrorCount, outletTemp, outletTemp );
+					ShowRecurringSevereErrorAtEnd( "UpdateLowTempRadiantSystem: Detected low out of range outlet temperature result " "for radiant system name =" + HydrRadSys( RadSysNum ).Name, HydrRadSys( RadSysNum ).OutRangeLoErrorCount, outletTemp, outletTemp );
 				}
 				if ( WarnTooHigh ) {
 					if ( HydrRadSys( RadSysNum ).OutRangeHiErrorCount == 0 ) {
 						ShowSevereMessage( "UpdateLowTempRadiantSystem: model result for fluid outlet temperature is not physical." );
-						ShowContinueError( "Occurs for radiant system name = " + trim( HydrRadSys( RadSysNum ).Name ) );
-						ShowContinueError( "Calculated radiant system outlet temperature = " + trim( RoundSigDigits( outletTemp, 3 ) ) + " [C]" );
-						ShowContinueError( "Radiant system inlet temperature = " + trim( RoundSigDigits( inletTemp, 3 ) ) + " [C]" );
+						ShowContinueError( "Occurs for radiant system name = " + HydrRadSys( RadSysNum ).Name );
+						ShowContinueError( "Calculated radiant system outlet temperature = " + RoundSigDigits( outletTemp, 3 ) + " [C]" );
+						ShowContinueError( "Radiant system inlet temperature = " + RoundSigDigits( inletTemp, 3 ) + " [C]" );
 						ShowContinueError( "A possible cause is that the materials used in the internal source construction are " "not compatible with the model." );
 
 					}
-					ShowRecurringSevereErrorAtEnd( "UpdateLowTempRadiantSystem: Detected high out of range outlet temperature result " " radiant system name =" + trim( HydrRadSys( RadSysNum ).Name ), HydrRadSys( RadSysNum ).OutRangeHiErrorCount, outletTemp, outletTemp );
+					ShowRecurringSevereErrorAtEnd( "UpdateLowTempRadiantSystem: Detected high out of range outlet temperature result " " radiant system name =" + HydrRadSys( RadSysNum ).Name, HydrRadSys( RadSysNum ).OutRangeHiErrorCount, outletTemp, outletTemp );
 
 				}
 
@@ -4051,25 +4051,25 @@ namespace LowTempRadiantSystem {
 
 					if ( CFloRadSys( RadSysNum ).OutRangeLoErrorCount == 0 ) {
 						ShowSevereMessage( "UpdateLowTempRadiantSystem: model result for fluid outlet temperature is not physical." );
-						ShowContinueError( "Occurs for radiant system name = " + trim( CFloRadSys( RadSysNum ).Name ) );
-						ShowContinueError( "Calculated radiant system outlet temperature = " + trim( RoundSigDigits( outletTemp, 3 ) ) + " [C]" );
-						ShowContinueError( "Radiant system inlet temperature = " + trim( RoundSigDigits( inletTemp, 3 ) ) + " [C]" );
+						ShowContinueError( "Occurs for radiant system name = " + CFloRadSys( RadSysNum ).Name );
+						ShowContinueError( "Calculated radiant system outlet temperature = " + RoundSigDigits( outletTemp, 3 ) + " [C]" );
+						ShowContinueError( "Radiant system inlet temperature = " + RoundSigDigits( inletTemp, 3 ) + " [C]" );
 						ShowContinueError( "A possible cause is that the materials used in the internal source construction are " "not compatible with the model." );
 
 					}
-					ShowRecurringSevereErrorAtEnd( "UpdateLowTempRadiantSystem: Detected high out of range temperature result for " " radiant system name =" + trim( CFloRadSys( RadSysNum ).Name ), CFloRadSys( RadSysNum ).OutRangeLoErrorCount, outletTemp, outletTemp );
+					ShowRecurringSevereErrorAtEnd( "UpdateLowTempRadiantSystem: Detected high out of range temperature result for " " radiant system name =" + CFloRadSys( RadSysNum ).Name, CFloRadSys( RadSysNum ).OutRangeLoErrorCount, outletTemp, outletTemp );
 
 				}
 				if ( WarnTooHigh ) {
 					if ( CFloRadSys( RadSysNum ).OutRangeHiErrorCount == 0 ) {
 						ShowSevereMessage( "UpdateLowTempRadiantSystem: model result for fluid outlet temperature is not physical." );
-						ShowContinueError( "Occurs for radiant system name = " + trim( CFloRadSys( RadSysNum ).Name ) );
-						ShowContinueError( "Calculated radiant system outlet temperature = " + trim( RoundSigDigits( outletTemp, 3 ) ) + " [C]" );
-						ShowContinueError( "Radiant system inlet temperature = " + trim( RoundSigDigits( inletTemp, 3 ) ) + " [C]" );
+						ShowContinueError( "Occurs for radiant system name = " + CFloRadSys( RadSysNum ).Name );
+						ShowContinueError( "Calculated radiant system outlet temperature = " + RoundSigDigits( outletTemp, 3 ) + " [C]" );
+						ShowContinueError( "Radiant system inlet temperature = " + RoundSigDigits( inletTemp, 3 ) + " [C]" );
 						ShowContinueError( "A possible cause is that the materials used in the internal source construction are " "not compatible with the model." );
 
 					}
-					ShowRecurringSevereErrorAtEnd( "UpdateLowTempRadiantSystem: Detected high out of range temperature result for " " radiant system name =" + trim( CFloRadSys( RadSysNum ).Name ), CFloRadSys( RadSysNum ).OutRangeHiErrorCount, outletTemp, outletTemp );
+					ShowRecurringSevereErrorAtEnd( "UpdateLowTempRadiantSystem: Detected high out of range temperature result for " " radiant system name =" + CFloRadSys( RadSysNum ).Name, CFloRadSys( RadSysNum ).OutRangeHiErrorCount, outletTemp, outletTemp );
 
 				}
 			}}

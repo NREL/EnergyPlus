@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -18,7 +17,6 @@ namespace EnergyPlus {
 namespace PlantCentralGSHP {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -109,36 +107,33 @@ namespace PlantCentralGSHP {
 	struct WrapperComponentSpecs
 	{
 		// Members
-		Fstring WrapperPerformanceObjectType; // Component type
-		Fstring WrapperComponentName; // Component name
+		std::string WrapperPerformanceObjectType; // Component type
+		std::string WrapperComponentName; // Component name
 		int WrapperPerformanceObjectIndex; // Component index in the input array
-		Fstring WrapperPerformanceObjectSch; // Component operation schedule
+		std::string WrapperPerformanceObjectSch; // Component operation schedule
 		int WrapperIdenticalObjectNum; // Number of identical objects
 		int CHSchedPtr; // Index to schedule
 
 		// Default Constructor
 		WrapperComponentSpecs() :
-			WrapperPerformanceObjectType( MaxNameLength ),
-			WrapperComponentName( MaxNameLength ),
 			WrapperPerformanceObjectIndex( 0 ),
-			WrapperPerformanceObjectSch( MaxNameLength ),
 			WrapperIdenticalObjectNum( 0 ),
 			CHSchedPtr( 0 )
 		{}
 
 		// Member Constructor
 		WrapperComponentSpecs(
-			Fstring const & WrapperPerformanceObjectType, // Component type
-			Fstring const & WrapperComponentName, // Component name
+			std::string const & WrapperPerformanceObjectType, // Component type
+			std::string const & WrapperComponentName, // Component name
 			int const WrapperPerformanceObjectIndex, // Component index in the input array
-			Fstring const & WrapperPerformanceObjectSch, // Component operation schedule
+			std::string const & WrapperPerformanceObjectSch, // Component operation schedule
 			int const WrapperIdenticalObjectNum, // Number of identical objects
 			int const CHSchedPtr // Index to schedule
 		) :
-			WrapperPerformanceObjectType( MaxNameLength, WrapperPerformanceObjectType ),
-			WrapperComponentName( MaxNameLength, WrapperComponentName ),
+			WrapperPerformanceObjectType( WrapperPerformanceObjectType ),
+			WrapperComponentName( WrapperComponentName ),
 			WrapperPerformanceObjectIndex( WrapperPerformanceObjectIndex ),
-			WrapperPerformanceObjectSch( MaxNameLength, WrapperPerformanceObjectSch ),
+			WrapperPerformanceObjectSch( WrapperPerformanceObjectSch ),
 			WrapperIdenticalObjectNum( WrapperIdenticalObjectNum ),
 			CHSchedPtr( CHSchedPtr )
 		{}
@@ -148,10 +143,10 @@ namespace PlantCentralGSHP {
 	struct ChillerHeaterSpecs
 	{
 		// Members
-		Fstring Name; // Name of the Chiller Heater object
-		Fstring CondModeCooling; // Cooling mode temperature curve input variable
-		Fstring CondModeHeating; // Clg/Htg mode temperature curve input variable
-		Fstring CondMode; // Current mode temperature curve input variable
+		std::string Name; // Name of the Chiller Heater object
+		std::string CondModeCooling; // Cooling mode temperature curve input variable
+		std::string CondModeHeating; // Clg/Htg mode temperature curve input variable
+		std::string CondMode; // Current mode temperature curve input variable
 		bool ConstantFlow; // True if this is a Constant Flow Chiller
 		bool VariableFlow; // True if this is a Variable Flow Chiller
 		bool CoolSetPointSetToLoop; // True if the setpoint is missing at the outlet node
@@ -230,10 +225,6 @@ namespace PlantCentralGSHP {
 
 		// Default Constructor
 		ChillerHeaterSpecs() :
-			Name( MaxNameLength ),
-			CondModeCooling( MaxNameLength ),
-			CondModeHeating( MaxNameLength ),
-			CondMode( MaxNameLength ),
 			ConstantFlow( false ),
 			VariableFlow( false ),
 			CoolSetPointSetToLoop( false ),
@@ -309,10 +300,10 @@ namespace PlantCentralGSHP {
 
 		// Member Constructor
 		ChillerHeaterSpecs(
-			Fstring const & Name, // Name of the Chiller Heater object
-			Fstring const & CondModeCooling, // Cooling mode temperature curve input variable
-			Fstring const & CondModeHeating, // Clg/Htg mode temperature curve input variable
-			Fstring const & CondMode, // Current mode temperature curve input variable
+			std::string const & Name, // Name of the Chiller Heater object
+			std::string const & CondModeCooling, // Cooling mode temperature curve input variable
+			std::string const & CondModeHeating, // Clg/Htg mode temperature curve input variable
+			std::string const & CondMode, // Current mode temperature curve input variable
 			bool const ConstantFlow, // True if this is a Constant Flow Chiller
 			bool const VariableFlow, // True if this is a Variable Flow Chiller
 			bool const CoolSetPointSetToLoop, // True if the setpoint is missing at the outlet node
@@ -389,10 +380,10 @@ namespace PlantCentralGSHP {
 			Real64 const ChillerEIRFPLRMin, // Minimum value of PLR from EIRFPLR curve
 			Real64 const ChillerEIRFPLRMax // Maximum value of PLR from EIRFPLR curve
 		) :
-			Name( MaxNameLength, Name ),
-			CondModeCooling( MaxNameLength, CondModeCooling ),
-			CondModeHeating( MaxNameLength, CondModeHeating ),
-			CondMode( MaxNameLength, CondMode ),
+			Name( Name ),
+			CondModeCooling( CondModeCooling ),
+			CondModeHeating( CondModeHeating ),
+			CondMode( CondMode ),
 			ConstantFlow( ConstantFlow ),
 			VariableFlow( VariableFlow ),
 			CoolSetPointSetToLoop( CoolSetPointSetToLoop ),
@@ -670,8 +661,8 @@ namespace PlantCentralGSHP {
 	struct WrapperSpecs // This will be used for Wrapper Object. This object will decide the mode of Chiller
 	{
 		// Members
-		Fstring Name; // User identifier
-		Fstring AncilliaryPwSchedule; // Ancilliary Power Schedule Name
+		std::string Name; // User identifier
+		std::string AncilliaryPwSchedule; // Ancilliary Power Schedule Name
 		bool VariableFlowCH; // True if all chiller heters are variable flow control
 		int SchedPtr; // Schedule value for ancilliar power control
 		int CHSchedPtr; // Schedule value for individual chiller heater control
@@ -722,8 +713,6 @@ namespace PlantCentralGSHP {
 
 		// Default Constructor
 		WrapperSpecs() :
-			Name( MaxNameLength ),
-			AncilliaryPwSchedule( MaxNameLength ),
 			VariableFlowCH( false ),
 			SchedPtr( 0 ),
 			CHSchedPtr( 0 ),
@@ -771,8 +760,8 @@ namespace PlantCentralGSHP {
 
 		// Member Constructor
 		WrapperSpecs(
-			Fstring const & Name, // User identifier
-			Fstring const & AncilliaryPwSchedule, // Ancilliary Power Schedule Name
+			std::string const & Name, // User identifier
+			std::string const & AncilliaryPwSchedule, // Ancilliary Power Schedule Name
 			bool const VariableFlowCH, // True if all chiller heters are variable flow control
 			int const SchedPtr, // Schedule value for ancilliar power control
 			int const CHSchedPtr, // Schedule value for individual chiller heater control
@@ -821,8 +810,8 @@ namespace PlantCentralGSHP {
 			Real64 const HWVolFlowRate, // Hot water volume flow rate [kg/s]
 			Real64 const GLHEVolFlowRate // Geo-field volume flow rate [kg/s]
 		) :
-			Name( MaxNameLength, Name ),
-			AncilliaryPwSchedule( MaxNameLength, AncilliaryPwSchedule ),
+			Name( Name ),
+			AncilliaryPwSchedule( AncilliaryPwSchedule ),
 			VariableFlowCH( VariableFlowCH ),
 			SchedPtr( SchedPtr ),
 			CHSchedPtr( CHSchedPtr ),
@@ -1031,7 +1020,7 @@ namespace PlantCentralGSHP {
 
 	void
 	SimCentralGroundSourceHeatPump(
-		Fstring const & WrapperName, // User specified name of wrapper
+		std::string const & WrapperName, // User specified name of wrapper
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // Chiller number pointer
 		int const LoopNum, // plant loop index pointer

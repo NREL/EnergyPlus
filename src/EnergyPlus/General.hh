@@ -8,7 +8,6 @@
 #include <ObjexxFCL/FArray1A.hh>
 #include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/FArray2A.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -134,32 +133,32 @@ namespace General {
 		int & N // number of terms in polynomial
 	);
 
-	Fstring
+	std::string
 	TrimSigDigits(
 		Real64 const RealValue,
 		int const SigDigits
 	);
 
-	Fstring
+	std::string
 	TrimSigDigits(
 		int const IntegerValue,
 		Optional_int_const SigDigits = _ // ignored
 	);
 
-	Fstring
+	std::string
 	RoundSigDigits(
 		Real64 const RealValue,
 		int const SigDigits
 	);
 
-	Fstring
+	std::string
 	RoundSigDigits(
 		int const IntegerValue,
 		Optional_int_const SigDigits = _ // ignored
 	);
 
-	Fstring
-	RemoveTrailingZeros( Fstring const & InputString );
+	std::string
+	RemoveTrailingZeros( std::string const & InputString );
 
 	void
 	MovingAvg(
@@ -171,7 +170,7 @@ namespace General {
 
 	void
 	ProcessDateString(
-		Fstring const & String,
+		std::string const & String,
 		int & PMonth,
 		int & PDay,
 		int & PWeekDay,
@@ -182,7 +181,7 @@ namespace General {
 
 	void
 	DetermineDateTokens(
-		Fstring const & String,
+		std::string const & String,
 		int & NumTokens, // Number of tokens found in string
 		int & TokenDay, // Value of numeric field found
 		int & TokenMonth, // Value of Month field found (1=Jan, 2=Feb, etc)
@@ -194,7 +193,7 @@ namespace General {
 
 	void
 	ValidateMonthDay(
-		Fstring const & String, // REAL(r64) string being processed
+		std::string const & String, // REAL(r64) string being processed
 		int const Day,
 		int const Month,
 		bool & ErrorsFound
@@ -222,7 +221,7 @@ namespace General {
 		int const EndDate // End date in sequence
 	);
 
-	Fstring
+	std::string
 	CreateSysTimeIntervalString();
 
 	Real64
@@ -230,77 +229,6 @@ namespace General {
 		Real64 const a,
 		Real64 const b
 	);
-
-	//SUBROUTINE SaveCompDesWaterFlow(WaterInletNodeNum,DesWaterFlow)
-
-	//          ! SUBROUTINE INFORMATION:
-	//          !       AUTHOR         Fred Buhl
-	//          !       DATE WRITTEN   January 2004
-	//          !       MODIFIED       na
-	//          !       RE-ENGINEERED  na
-
-	//          ! PURPOSE OF THIS SUBROUTINE:
-	//          ! Save the design water flow rates of those components using water as an energy source
-	//          ! or sink in an array that can be accessed by the water loop managers for sizing calculations.
-
-	//          ! METHODOLOGY EMPLOYED:
-	//          ! The design flow rate is stored in a dynamic array along with the water inlet node number
-	//          ! (which is used by the water loops as a component identifier instead if name and type).
-
-	//          ! REFERENCES:
-	//          ! na
-
-	//          ! USE STATEMENTS:
-	//  USE DataSizing
-
-	//  IMPLICIT NONE ! Enforce explicit typing of all variables in this routine
-
-	//          ! SUBROUTINE ARGUMENT DEFINITIONS:
-	//  INTEGER :: WaterInletNodeNum ! the component's water inlet node number (condenser side for water / water compoennts)
-	//  REAL(r64)    :: DesWaterFlow      ! the component's design water flow rate [m3/s]
-
-	//          ! SUBROUTINE PARAMETER DEFINITIONS:
-	//          ! na
-
-	//          ! INTERFACE BLOCK SPECIFICATIONS:
-	//          ! na
-
-	//          ! DERIVED TYPE DEFINITIONS:
-	//          ! na
-
-	//          ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	//  TYPE (CompDesWaterFlowData), ALLOCATABLE, DIMENSION(:) :: CompDesWaterFlow0 ! scratch array to store components'
-	//                                                                            ! design water flow rate
-	//  INTEGER :: WaterCompNum ! component do loop index
-
-	//  NumWaterComps = NumWaterComps + 1 ! increment the number of components that use water as a source of heat or coolth
-	//  ! save the existing data in a scratch array
-	//  IF (NumWaterComps > 1) THEN
-	//    ALLOCATE(CompDesWaterFlow0(NumWaterComps-1))
-	//    DO WaterCompNum=1,NumWaterComps-1
-	//      CompDesWaterFlow0(WaterCompNum)%SupNode = CompDesWaterFlow(WaterCompNum)%SupNode
-	//      CompDesWaterFlow0(WaterCompNum)%DesVolFlowRate = CompDesWaterFlow(WaterCompNum)%DesVolFlowRate
-	//    END DO
-	//    ! get rid of the old array
-	//    DEALLOCATE(CompDesWaterFlow)
-	//  END IF
-	//  ! allocate a new array
-	//  ALLOCATE(CompDesWaterFlow(NumWaterComps))
-	//  ! save the new data
-	//  CompDesWaterFlow(NumWaterComps)%SupNode = WaterInletNodeNum
-	//  CompDesWaterFlow(NumWaterComps)%DesVolFlowRate = DesWaterFlow
-	//  ! move the old data back from the scratch array
-	//  IF (NumWaterComps > 1) THEN
-	//    DO WaterCompNum=1,NumWaterComps-1
-	//      CompDesWaterFlow(WaterCompNum)%SupNode = CompDesWaterFlow0(WaterCompNum)%SupNode
-	//      CompDesWaterFlow(WaterCompNum)%DesVolFlowRate = CompDesWaterFlow0(WaterCompNum)%DesVolFlowRate
-	//    END DO
-	//    DEALLOCATE(CompDesWaterFlow0)
-	//  END IF
-
-	//  RETURN
-
-	//END SUBROUTINE SaveCompDesWaterFlow
 
 	void
 	Invert3By3Matrix(
@@ -369,13 +297,13 @@ namespace General {
 	Real64
 	GetPreviousHVACTime();
 
-	Fstring
+	std::string
 	CreateHVACTimeIntervalString();
 
-	Fstring
+	std::string
 	CreateTimeString( Real64 const Time ); // Time in seconds
 
-	Fstring
+	std::string
 	CreateTimeIntervalString(
 		Real64 const StartTime, // Start of current interval in seconds
 		Real64 const EndTime // End of current interval in seconds
@@ -391,11 +319,11 @@ namespace General {
 
 	void
 	ScanForReports(
-		Fstring const & reportName,
+		std::string const & reportName,
 		bool & DoReport,
-		Optional_Fstring_const ReportKey = _,
-		Optional_Fstring Option1 = _,
-		Optional_Fstring Option2 = _
+		Optional_string_const ReportKey = _,
+		Optional_string Option1 = _,
+		Optional_string Option2 = _
 	);
 
 	void
@@ -407,14 +335,14 @@ namespace General {
 
 	void
 	CheckCreatedZoneItemName(
-		Fstring const & calledFrom, // routine called from
-		Fstring const & CurrentObject, // object being parsed
-		Fstring const & ZoneName, // Zone Name associated
-		int const MaxZoneNameLength, // maximum length of zonelist zone names
-		Fstring const & ItemName, // Item name (People, Lights, etc object)
-		FArray1S_Fstring const ItemNames, // Item Names to check for duplication
+		std::string const & calledFrom, // routine called from
+		std::string const & CurrentObject, // object being parsed
+		std::string const & ZoneName, // Zone Name associated
+		std::string::size_type const MaxZoneNameLength, // maximum length of zonelist zone names
+		std::string const & ItemName, // Item name (People, Lights, etc object)
+		FArray1S_string const ItemNames, // Item Names to check for duplication
 		int const NumItems, // Number of items in ItemNames array
-		Fstring & ResultName, // Resultant name
+		std::string & ResultName, // Resultant name
 		bool & errFlag // Error flag set to true if error found here.
 	);
 
@@ -422,18 +350,18 @@ namespace General {
 	inline
 	void
 	CheckCreatedZoneItemName(
-		Fstring const & calledFrom, // routine called from
-		Fstring const & CurrentObject, // object being parsed
-		Fstring const & ZoneName, // Zone Name associated
-		int const MaxZoneNameLength, // maximum length of zonelist zone names
-		Fstring const & ItemName, // Item name (People, Lights, etc object)
-		MArray1< A, Fstring > const & ItemNames, // Item Names to check for duplication
+		std::string const & calledFrom, // routine called from
+		std::string const & CurrentObject, // object being parsed
+		std::string const & ZoneName, // Zone Name associated
+		std::string::size_type const MaxZoneNameLength, // maximum length of zonelist zone names
+		std::string const & ItemName, // Item name (People, Lights, etc object)
+		MArray1< A, std::string > const & ItemNames, // Item Names to check for duplication
 		int const NumItems, // Number of items in ItemNames array
-		Fstring & ResultName, // Resultant name
+		std::string & ResultName, // Resultant name
 		bool & errFlag // Error flag set to true if error found here.
 	)
 	{
-		CheckCreatedZoneItemName( calledFrom, CurrentObject, ZoneName, MaxZoneNameLength, ItemName, FArray1D_Fstring( ItemNames ), NumItems, ResultName, errFlag );
+		CheckCreatedZoneItemName( calledFrom, CurrentObject, ZoneName, MaxZoneNameLength, ItemName, FArray1D_string( ItemNames ), NumItems, ResultName, errFlag );
 	}
 
 	//     NOTICE

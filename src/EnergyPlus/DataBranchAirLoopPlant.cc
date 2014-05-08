@@ -31,7 +31,6 @@ namespace DataBranchAirLoopPlant {
 	// <use statements for data only modules>
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	// <use statements for access to subroutines in other modules>
 
 	// Data
@@ -51,7 +50,7 @@ namespace DataBranchAirLoopPlant {
 	int const ControlType_Passive( 2 ); // 'Passive'
 	int const ControlType_SeriesActive( 3 ); // 'SeriesActive'
 	int const ControlType_Bypass( 4 ); // 'Bypass
-	FArray1D_Fstring const cControlType( {0,4}, sFstring( 12 ), { "Unknown     ", "Active      ", "Passive     ", "SeriesActive", "Bypass      " } );
+	FArray1D_string const cControlType( {0,4}, { "Unknown", "Active", "Passive", "SeriesActive", "Bypass" } );
 
 	// DERIVED TYPE DEFINITIONS:
 

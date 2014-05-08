@@ -47,7 +47,6 @@ namespace EMSManager {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 	using namespace DataRuntimeLanguage;
 
 	// Data
@@ -121,7 +120,7 @@ namespace EMSManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int write_stat;
-		Fstring cCurrentModuleObject( MaxNameLength );
+		std::string cCurrentModuleObject;
 
 		cCurrentModuleObject = "EnergyManagementSystem:Sensor";
 		NumSensors = GetNumObjectsFound( cCurrentModuleObject );
@@ -196,8 +195,8 @@ namespace EMSManager {
 		} else {
 			ScanForReports( "EnergyManagementSystem", OutputEDDFile );
 			if ( OutputEDDFile ) {
-				ShowWarningError( "CheckIFAnyEMS: No EnergyManagementSystem has been set up in the input file but" " output is requested." );
-				ShowContinueError( "No EDD file will be produced. Refer to EMS Application Guide and/or InputOutput Reference" " to set up your EnergyManagementSystem." );
+				ShowWarningError( "CheckIFAnyEMS: No EnergyManagementSystem has been set up in the input file but output is requested." );
+				ShowContinueError( "No EDD file will be produced. Refer to EMS Application Guide and/or InputOutput Reference to set up your EnergyManagementSystem." );
 			}
 		}
 
@@ -272,9 +271,6 @@ namespace EMSManager {
 		int tmpInteger;
 		//  INTEGER  :: ProgramNum
 
-		// Object Data
-		ErlValueType ReturnValue; // local Erl value structure
-
 		// FLOW:
 		if ( ! AnyEnergyManagementSystemInModel ) return; // quick return if nothing to do
 
@@ -294,7 +290,7 @@ namespace EMSManager {
 
 				if ( EMSProgramCallManager( ProgramManagerNum ).CallingPoint == iCalledFrom ) {
 					for ( ErlProgramNum = 1; ErlProgramNum <= EMSProgramCallManager( ProgramManagerNum ).NumErlPrograms; ++ErlProgramNum ) {
-						ReturnValue = EvaluateStack( EMSProgramCallManager( ProgramManagerNum ).ErlProgramARR( ErlProgramNum ) );
+						EvaluateStack( EMSProgramCallManager( ProgramManagerNum ).ErlProgramARR( ErlProgramNum ) );
 						AnyProgramRan = true;
 					}
 				}
@@ -302,7 +298,7 @@ namespace EMSManager {
 		} else { // call specific program manager
 			if ( present( ProgramManagerToRun ) ) {
 				for ( ErlProgramNum = 1; ErlProgramNum <= EMSProgramCallManager( ProgramManagerToRun ).NumErlPrograms; ++ErlProgramNum ) {
-					ReturnValue = EvaluateStack( EMSProgramCallManager( ProgramManagerToRun ).ErlProgramARR( ErlProgramNum ) );
+					EvaluateStack( EMSProgramCallManager( ProgramManagerToRun ).ErlProgramARR( ErlProgramNum ) );
 					AnyProgramRan = true;
 				}
 			}
@@ -526,7 +522,6 @@ namespace EMSManager {
 		// Standard EnergyPlus methodology.
 
 		// Using/Aliasing
-		using DataGlobals::MaxNameLength;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using DataGlobals::emsCallFromZoneSizing;
 		using DataGlobals::emsCallFromSystemSizing;
@@ -561,7 +556,7 @@ namespace EMSManager {
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const Blank;
+		static std::string const Blank;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -581,13 +576,13 @@ namespace EMSManager {
 		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false );
 		//  CHARACTER(len=MaxNameLength)   :: objNameMsg = ' '
-		FArray1D_Fstring cAlphaFieldNames( sFstring( MaxNameLength + 40 ) );
-		FArray1D_Fstring cNumericFieldNames( sFstring( MaxNameLength + 40 ) );
+		FArray1D_string cAlphaFieldNames;
+		FArray1D_string cNumericFieldNames;
 		FArray1D_bool lNumericFieldBlanks;
 		FArray1D_bool lAlphaFieldBlanks;
-		FArray1D_Fstring cAlphaArgs( sFstring( MaxNameLength ) );
+		FArray1D_string cAlphaArgs;
 		FArray1D< Real64 > rNumericArgs;
-		Fstring cCurrentModuleObject( MaxNameLength );
+		std::string cCurrentModuleObject;
 		int VarType;
 		int VarIndex;
 		bool FoundObjectType;
@@ -647,13 +642,13 @@ namespace EMSManager {
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cAlphaFieldNames.allocate( MaxNumAlphas );
-		cAlphaFieldNames = " ";
+		cAlphaFieldNames = "";
 		cAlphaArgs.allocate( MaxNumAlphas );
-		cAlphaArgs = " ";
+		cAlphaArgs = "";
 		lAlphaFieldBlanks.allocate( MaxNumAlphas );
 		lAlphaFieldBlanks = false;
 		cNumericFieldNames.allocate( MaxNumNumbers );
-		cNumericFieldNames = " ";
+		cNumericFieldNames = "";
 		rNumericArgs.allocate( MaxNumNumbers );
 		rNumericArgs = 0.0;
 		lNumericFieldBlanks.allocate( MaxNumNumbers );
@@ -668,7 +663,7 @@ namespace EMSManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Sensor.Name(), SensorNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+				VerifyName( cAlphaArgs( 1 ), Sensor.Name(), SensorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -676,14 +671,14 @@ namespace EMSManager {
 
 				ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
 				if ( ! errFlag ) {
-					Sensor( SensorNum ).Name = trim( cAlphaArgs( 1 ) );
+					Sensor( SensorNum ).Name = cAlphaArgs( 1 );
 
 					// really needs to check for conflicts with program and function names too...done later
 					VariableNum = FindEMSVariable( cAlphaArgs( 1 ), 0 );
 
 					if ( VariableNum > 0 ) {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ShowContinueError( "Object name conflicts with a global variable name in EMS" );
 						ErrorsFound = true;
 					} else {
@@ -699,8 +694,8 @@ namespace EMSManager {
 				VarIndex = GetMeterIndex( cAlphaArgs( 3 ) );
 				if ( VarIndex > 0 ) {
 					if ( ! lAlphaFieldBlanks( 2 ) ) {
-						ShowWarningError( "Unused" + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowWarningError( "Unused" + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ShowContinueError( "Meter Name found; Key Name will be ignored" ); // why meters have no keys..
 					} else {
 						Sensor( SensorNum ).Type = 3;
@@ -744,7 +739,7 @@ namespace EMSManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), EMSActuatorUsed.Name(), ActuatorNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+				VerifyName( cAlphaArgs( 1 ), EMSActuatorUsed.Name(), ActuatorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -758,8 +753,8 @@ namespace EMSManager {
 					VariableNum = FindEMSVariable( cAlphaArgs( 1 ), 0 );
 
 					if ( VariableNum > 0 ) {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ShowContinueError( "Object name conflicts with a global variable name in EMS" );
 						ErrorsFound = true;
 					} else {
@@ -810,7 +805,7 @@ namespace EMSManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), EMSInternalVarsUsed.Name(), InternVarNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+				VerifyName( cAlphaArgs( 1 ), EMSInternalVarsUsed.Name(), InternVarNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -821,8 +816,8 @@ namespace EMSManager {
 					EMSInternalVarsUsed( InternVarNum ).Name = cAlphaArgs( 1 );
 					VariableNum = FindEMSVariable( cAlphaArgs( 1 ), 0 );
 					if ( VariableNum > 0 ) {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ShowContinueError( "Object name conflicts with a global variable name in EMS" );
 						ErrorsFound = true;
 					} else {
@@ -866,14 +861,14 @@ namespace EMSManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), EMSProgramCallManager.Name(), CallManagerNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+				VerifyName( cAlphaArgs( 1 ), EMSProgramCallManager.Name(), CallManagerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 				}
 				EMSProgramCallManager( CallManagerNum ).Name = cAlphaArgs( 1 );
 
-				{ auto const SELECT_CASE_var( trim( cAlphaArgs( 2 ) ) );
+				{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );
 
 				if ( SELECT_CASE_var == "BEGINNEWENVIRONMENT" ) {
 					EMSProgramCallManager( CallManagerNum ).CallingPoint = emsCallFromBeginNewEvironment;
@@ -906,8 +901,8 @@ namespace EMSManager {
 				} else if ( SELECT_CASE_var == "UNITARYSYSTEMSIZING" ) {
 					EMSProgramCallManager( CallManagerNum ).CallingPoint = emsCallFromUnitarySystemSizing;
 				} else {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}}
 
@@ -918,8 +913,8 @@ namespace EMSManager {
 				for ( AlphaNum = 3; AlphaNum <= NumAlphas; ++AlphaNum ) {
 					// find program name in Stack structure
 					if ( lAlphaFieldBlanks( AlphaNum ) ) { // throw error
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( AlphaNum ) ) + "=" + trim( cAlphaArgs( AlphaNum ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( AlphaNum ) + '=' + cAlphaArgs( AlphaNum ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ShowContinueError( "Program names cannot be blank" );
 						ErrorsFound = true;
 					}
@@ -930,8 +925,8 @@ namespace EMSManager {
 						// check for duplicate and warn.
 						for ( Loop = 1; Loop <= ManagerProgramNum; ++Loop ) {
 							if ( EMSProgramCallManager( CallManagerNum ).ErlProgramARR( Loop ) == StackNum ) {
-								ShowWarningError( "Duplicate " + trim( cAlphaFieldNames( AlphaNum ) ) + "=" + trim( cAlphaArgs( AlphaNum ) ) );
-								ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+								ShowWarningError( "Duplicate " + cAlphaFieldNames( AlphaNum ) + '=' + cAlphaArgs( AlphaNum ) );
+								ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 								ShowContinueError( "Erl program appears more than once, and the simulation continues." );
 							}
 						}
@@ -941,8 +936,8 @@ namespace EMSManager {
 						EMSProgramCallManager( CallManagerNum ).ErlProgramARR( ManagerProgramNum ) = StackNum;
 
 					} else {
-						ShowSevereError( "Invalid " + trim( cAlphaFieldNames( AlphaNum ) ) + "=" + trim( cAlphaArgs( AlphaNum ) ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( AlphaNum ) + '=' + cAlphaArgs( AlphaNum ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ShowContinueError( "Program Name not found." );
 						ErrorsFound = true;
 					}
@@ -953,7 +948,7 @@ namespace EMSManager {
 		} else { // no program calling manager in input
 			if ( NumErlPrograms > 0 ) {
 				cCurrentModuleObject = "EnergyManagementSystem:ProgramCallingManager";
-				ShowWarningError( "Energy Management System is missing input object " + trim( cCurrentModuleObject ) );
+				ShowWarningError( "Energy Management System is missing input object " + cCurrentModuleObject );
 				ShowContinueError( "EnergyPlus Runtime Language programs need a calling manager to control when they get executed" );
 
 			}
@@ -1028,7 +1023,7 @@ namespace EMSManager {
 		int ActuatorVariableNum;
 		int InternVarNum; // local do loop index
 		int InternalVarAvailNum; // local do loop index
-		Fstring cCurrentModuleObject( MaxNameLength );
+		std::string cCurrentModuleObject;
 
 		cCurrentModuleObject = "EnergyManagementSystem:Sensor";
 		for ( SensorNum = 1; SensorNum <= NumSensors; ++SensorNum ) {
@@ -1046,16 +1041,16 @@ namespace EMSManager {
 				GetVariableTypeAndIndex( Sensor( SensorNum ).OutputVarName, Sensor( SensorNum ).UniqueKeyName, VarType, VarIndex );
 				if ( VarType == 0 ) {
 					if ( reportErrors ) {
-						ShowSevereError( "Invalid Output:Variable or Output:Meter Name =" + trim( Sensor( SensorNum ).OutputVarName ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( Sensor( SensorNum ).Name ) );
+						ShowSevereError( "Invalid Output:Variable or Output:Meter Name =" + Sensor( SensorNum ).OutputVarName );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + Sensor( SensorNum ).Name );
 						ShowContinueError( "Output:Variable Name not found" );
 						ErrorsFound = true;
 					}
 				} else if ( VarIndex == 0 ) {
 					if ( reportErrors ) {
-						ShowSevereError( "Invalid Output:Variable or Output:Meter Index Key Name =" + trim( Sensor( SensorNum ).UniqueKeyName ) );
-						ShowContinueError( "For Output:Variable or Output:Meter = " + trim( Sensor( SensorNum ).OutputVarName ) );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( Sensor( SensorNum ).Name ) );
+						ShowSevereError( "Invalid Output:Variable or Output:Meter Index Key Name =" + Sensor( SensorNum ).UniqueKeyName );
+						ShowContinueError( "For Output:Variable or Output:Meter = " + Sensor( SensorNum ).OutputVarName );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + Sensor( SensorNum ).Name );
 						ShowContinueError( "Unique Key Name not found." );
 						ErrorsFound = true;
 					}
@@ -1069,9 +1064,9 @@ namespace EMSManager {
 						if ( Sensor( SensorNum ).SchedNum == 0 ) {
 							Sensor( SensorNum ).CheckedOkay = false;
 							if ( reportErrors ) {
-								ShowSevereError( "Invalid Output:Variable or Output:Meter Index Key Name =" + trim( Sensor( SensorNum ).UniqueKeyName ) );
-								ShowContinueError( "For Output:Variable or Output:Meter = " + trim( Sensor( SensorNum ).OutputVarName ) );
-								ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( Sensor( SensorNum ).Name ) );
+								ShowSevereError( "Invalid Output:Variable or Output:Meter Index Key Name =" + Sensor( SensorNum ).UniqueKeyName );
+								ShowContinueError( "For Output:Variable or Output:Meter = " + Sensor( SensorNum ).OutputVarName );
+								ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + Sensor( SensorNum ).Name );
 								ShowContinueError( "Schedule Name not found." );
 								ErrorsFound = true;
 							}
@@ -1116,8 +1111,8 @@ namespace EMSManager {
 
 			if ( ! FoundObjectType ) {
 				if ( reportErrors ) {
-					ShowSevereError( "Invalid Actuated Component Type =" + trim( EMSActuatorUsed( ActuatorNum ).ComponentTypeName ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( EMSActuatorUsed( ActuatorNum ).Name ) );
+					ShowSevereError( "Invalid Actuated Component Type =" + EMSActuatorUsed( ActuatorNum ).ComponentTypeName );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + EMSActuatorUsed( ActuatorNum ).Name );
 					ShowContinueError( "Component Type not found" );
 					if ( OutputEDDFile ) {
 						ShowContinueError( "Review .edd file for valid component types." );
@@ -1130,8 +1125,8 @@ namespace EMSManager {
 
 			if ( ! FoundObjectName ) {
 				if ( reportErrors ) {
-					ShowSevereError( "Invalid Actuated Component Unique Name =" + trim( EMSActuatorUsed( ActuatorNum ).UniqueIDName ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( EMSActuatorUsed( ActuatorNum ).Name ) );
+					ShowSevereError( "Invalid Actuated Component Unique Name =" + EMSActuatorUsed( ActuatorNum ).UniqueIDName );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + EMSActuatorUsed( ActuatorNum ).Name );
 					ShowContinueError( "Component Unique key name not found " );
 					if ( OutputEDDFile ) {
 						ShowContinueError( "Review edd file for valid component names." );
@@ -1144,8 +1139,8 @@ namespace EMSManager {
 
 			if ( ! FoundActuatorName ) {
 				if ( reportErrors ) {
-					ShowSevereError( "Invalid Actuated Component Control Type =" + trim( EMSActuatorUsed( ActuatorNum ).ControlTypeName ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( EMSActuatorUsed( ActuatorNum ).Name ) );
+					ShowSevereError( "Invalid Actuated Component Control Type =" + EMSActuatorUsed( ActuatorNum ).ControlTypeName );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + EMSActuatorUsed( ActuatorNum ).Name );
 					ShowContinueError( "Control Type not found" );
 					if ( OutputEDDFile ) {
 						ShowContinueError( "Review edd file for valid component control types." );
@@ -1177,8 +1172,8 @@ namespace EMSManager {
 
 			if ( ! FoundObjectType ) {
 				if ( reportErrors ) {
-					ShowSevereError( "Invalid Internal Data Type =" + trim( EMSInternalVarsUsed( InternVarNum ).InternalDataTypeName ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( EMSInternalVarsUsed( InternVarNum ).Name ) );
+					ShowSevereError( "Invalid Internal Data Type =" + EMSInternalVarsUsed( InternVarNum ).InternalDataTypeName );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + EMSInternalVarsUsed( InternVarNum ).Name );
 					ShowContinueError( "Internal data type name not found" );
 					ErrorsFound = true;
 				}
@@ -1186,8 +1181,8 @@ namespace EMSManager {
 
 			if ( ! FoundObjectName ) {
 				if ( reportErrors ) {
-					ShowSevereError( "Invalid Internal Data Index Key Name =" + trim( EMSInternalVarsUsed( InternVarNum ).UniqueIDName ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( EMSInternalVarsUsed( InternVarNum ).Name ) );
+					ShowSevereError( "Invalid Internal Data Index Key Name =" + EMSInternalVarsUsed( InternVarNum ).UniqueIDName );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + EMSInternalVarsUsed( InternVarNum ).Name );
 					ShowContinueError( "Internal data unique identifier not found" );
 					ErrorsFound = true;
 				}
@@ -1214,8 +1209,8 @@ namespace EMSManager {
 
 	void
 	GetVariableTypeAndIndex(
-		Fstring const & VarName,
-		Fstring const & VarKeyName,
+		std::string const & VarName,
+		std::string const & VarKeyName,
 		int & VarType,
 		int & VarIndex
 	)
@@ -1247,8 +1242,8 @@ namespace EMSManager {
 		int KeyNum;
 		int AvgOrSum;
 		int StepType;
-		Fstring Units( MaxNameLength );
-		FArray1D_Fstring KeyName( sFstring( MaxNameLength ) );
+		std::string Units;
+		FArray1D_string KeyName;
 		FArray1D_int KeyIndex;
 		bool Found;
 
@@ -1321,20 +1316,20 @@ namespace EMSManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ActuatorLoop;
-		FArray1D_Fstring TempTypeName( sFstring( MaxNameLength ) );
-		FArray1D_Fstring TempCntrlType( sFstring( MaxNameLength ) );
+		FArray1D_string TempTypeName;
+		FArray1D_string TempCntrlType;
 		FArray1D_bool NonUniqueARRflag;
 		int FoundTypeName;
 		int FoundControlType;
 
 		if ( OutputEMSActuatorAvailFull ) {
 
-			gio::write( OutputEMSFileUnitNum, "(A)" ) << "! <EnergyManagementSystem:Actuator Available>, Component Unique Name," " Component Type,  Control Type, Units";
+			gio::write( OutputEMSFileUnitNum, "(A)" ) << "! <EnergyManagementSystem:Actuator Available>, Component Unique Name, Component Type,  Control Type, Units";
 			for ( ActuatorLoop = 1; ActuatorLoop <= numEMSActuatorsAvailable; ++ActuatorLoop ) {
-				gio::write( OutputEMSFileUnitNum, "(A)" ) << "EnergyManagementSystem:Actuator Available," + trim( EMSActuatorAvailable( ActuatorLoop ).UniqueIDName ) + "," + trim( EMSActuatorAvailable( ActuatorLoop ).ComponentTypeName ) + "," + trim( EMSActuatorAvailable( ActuatorLoop ).ControlTypeName ) + "," + trim( EMSActuatorAvailable( ActuatorLoop ).Units );
+				gio::write( OutputEMSFileUnitNum, "(A)" ) << "EnergyManagementSystem:Actuator Available," + EMSActuatorAvailable( ActuatorLoop ).UniqueIDName + ',' + EMSActuatorAvailable( ActuatorLoop ).ComponentTypeName + ',' + EMSActuatorAvailable( ActuatorLoop ).ControlTypeName + ',' + EMSActuatorAvailable( ActuatorLoop ).Units;
 			}
 		} else if ( OutputEMSActuatorAvailSmall ) {
-			gio::write( OutputEMSFileUnitNum, "(A)" ) << "! <EnergyManagementSystem:Actuator Available>, *, Component Type, " "Control Type, Units";
+			gio::write( OutputEMSFileUnitNum, "(A)" ) << "! <EnergyManagementSystem:Actuator Available>, *, Component Type, Control Type, Units";
 
 			TempTypeName.allocate( numEMSActuatorsAvailable );
 			TempTypeName = EMSActuatorAvailable.ComponentTypeName();
@@ -1356,7 +1351,7 @@ namespace EMSManager {
 			}
 			for ( ActuatorLoop = 1; ActuatorLoop <= numEMSActuatorsAvailable; ++ActuatorLoop ) {
 				if ( ! NonUniqueARRflag( ActuatorLoop ) ) {
-					gio::write( OutputEMSFileUnitNum, "(A)" ) << "EnergyManagementSystem:Actuator Available," " *" "," + trim( EMSActuatorAvailable( ActuatorLoop ).ComponentTypeName ) + "," + trim( EMSActuatorAvailable( ActuatorLoop ).ControlTypeName ) + "," + trim( EMSActuatorAvailable( ActuatorLoop ).Units );
+					gio::write( OutputEMSFileUnitNum, "(A)" ) << "EnergyManagementSystem:Actuator Available, *," + EMSActuatorAvailable( ActuatorLoop ).ComponentTypeName + ',' + EMSActuatorAvailable( ActuatorLoop ).ControlTypeName + ',' + EMSActuatorAvailable( ActuatorLoop ).Units;
 				}
 			}
 
@@ -1406,15 +1401,15 @@ namespace EMSManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int InternalDataLoop;
-		FArray1D_Fstring TempTypeName( sFstring( MaxNameLength ) );
+		FArray1D_string TempTypeName;
 		FArray1D_bool UniqueARRflag;
 		int Found;
 
 		if ( OutputEMSInternalVarsFull ) {
 
-			gio::write( OutputEMSFileUnitNum, "(A)" ) << "! <EnergyManagementSystem:InternalVariable Available>, Unique Name, Internal Data Type" ", Units ";
+			gio::write( OutputEMSFileUnitNum, "(A)" ) << "! <EnergyManagementSystem:InternalVariable Available>, Unique Name, Internal Data Type, Units ";
 			for ( InternalDataLoop = 1; InternalDataLoop <= numEMSInternalVarsAvailable; ++InternalDataLoop ) {
-				gio::write( OutputEMSFileUnitNum, "(A)" ) << "EnergyManagementSystem:InternalVariable Available," + trim( EMSInternalVarsAvailable( InternalDataLoop ).UniqueIDName ) + "," + trim( EMSInternalVarsAvailable( InternalDataLoop ).DataTypeName ) + "," + trim( EMSInternalVarsAvailable( InternalDataLoop ).Units );
+				gio::write( OutputEMSFileUnitNum, "(A)" ) << "EnergyManagementSystem:InternalVariable Available," + EMSInternalVarsAvailable( InternalDataLoop ).UniqueIDName + ',' + EMSInternalVarsAvailable( InternalDataLoop ).DataTypeName + ',' + EMSInternalVarsAvailable( InternalDataLoop ).Units;
 			}
 
 		} else if ( OutputEMSInternalVarsSmall ) {
@@ -1433,7 +1428,7 @@ namespace EMSManager {
 			}
 			for ( InternalDataLoop = 1; InternalDataLoop <= numEMSInternalVarsAvailable; ++InternalDataLoop ) {
 				if ( UniqueARRflag( InternalDataLoop ) ) {
-					gio::write( OutputEMSFileUnitNum, "(A)" ) << "EnergyManagementSystem:InternalVariable Available," " *" "," + trim( EMSInternalVarsAvailable( InternalDataLoop ).DataTypeName ) + "," + trim( EMSInternalVarsAvailable( InternalDataLoop ).Units );
+					gio::write( OutputEMSFileUnitNum, "(A)" ) << "EnergyManagementSystem:InternalVariable Available, *," + EMSInternalVarsAvailable( InternalDataLoop ).DataTypeName + ',' + EMSInternalVarsAvailable( InternalDataLoop ).Units;
 				}
 			}
 
@@ -1624,9 +1619,9 @@ namespace EMSManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static int Loop( 0 ); // local do loop index
-		Fstring cControlTypeName( MaxNameLength );
-		Fstring cComponentTypeName( MaxNameLength );
-		Fstring cNodeName( MaxNameLength );
+		std::string cControlTypeName;
+		std::string cComponentTypeName;
+		std::string cNodeName;
 		static bool FoundControl( false );
 
 		FoundControl = false;
@@ -2077,10 +2072,10 @@ namespace EMSManager {
 
 void
 SetupEMSActuator(
-	Fstring const & cComponentTypeName,
-	Fstring const & cUniqueIDName,
-	Fstring const & cControlTypeName,
-	Fstring const & cUnits,
+	std::string const & cComponentTypeName,
+	std::string const & cUniqueIDName,
+	std::string const & cControlTypeName,
+	std::string const & cUnits,
 	bool & lEMSActuated,
 	Real64 & rValue
 )
@@ -2112,9 +2107,9 @@ SetupEMSActuator(
 	int ActuatorVariableNum;
 	bool FoundActuatorType;
 	bool FoundDuplicate;
-	Fstring UpperCaseObjectType( MaxNameLength );
-	Fstring UpperCaseObjectName( MaxNameLength );
-	Fstring UpperCaseActuatorName( MaxNameLength );
+	std::string UpperCaseObjectType;
+	std::string UpperCaseObjectName;
+	std::string UpperCaseActuatorName;
 
 	// Object Data
 	FArray1D< EMSActuatorAvailableType > TempEMSActuatorAvailable;
@@ -2176,10 +2171,10 @@ SetupEMSActuator(
 
 void
 SetupEMSActuator(
-	Fstring const & cComponentTypeName,
-	Fstring const & cUniqueIDName,
-	Fstring const & cControlTypeName,
-	Fstring const & cUnits,
+	std::string const & cComponentTypeName,
+	std::string const & cUniqueIDName,
+	std::string const & cControlTypeName,
+	std::string const & cUnits,
 	bool & lEMSActuated,
 	int & iValue
 )
@@ -2211,9 +2206,9 @@ SetupEMSActuator(
 	int ActuatorVariableNum;
 	bool FoundActuatorType;
 	bool FoundDuplicate;
-	Fstring UpperCaseObjectType( MaxNameLength );
-	Fstring UpperCaseObjectName( MaxNameLength );
-	Fstring UpperCaseActuatorName( MaxNameLength );
+	std::string UpperCaseObjectType;
+	std::string UpperCaseObjectName;
+	std::string UpperCaseActuatorName;
 
 	// Object Data
 	FArray1D< EMSActuatorAvailableType > TempEMSActuatorAvailable;
@@ -2280,10 +2275,10 @@ SetupEMSActuator(
 
 void
 SetupEMSActuator(
-	Fstring const & cComponentTypeName,
-	Fstring const & cUniqueIDName,
-	Fstring const & cControlTypeName,
-	Fstring const & cUnits,
+	std::string const & cComponentTypeName,
+	std::string const & cUniqueIDName,
+	std::string const & cControlTypeName,
+	std::string const & cUnits,
 	bool & lEMSActuated,
 	bool & lValue
 )
@@ -2315,9 +2310,9 @@ SetupEMSActuator(
 	int ActuatorVariableNum;
 	bool FoundActuatorType;
 	bool FoundDuplicate;
-	Fstring UpperCaseObjectType( MaxNameLength );
-	Fstring UpperCaseObjectName( MaxNameLength );
-	Fstring UpperCaseActuatorName( MaxNameLength );
+	std::string UpperCaseObjectType;
+	std::string UpperCaseObjectName;
+	std::string UpperCaseActuatorName;
 
 	// Object Data
 	FArray1D< EMSActuatorAvailableType > TempEMSActuatorAvailable;
@@ -2378,9 +2373,9 @@ SetupEMSActuator(
 
 void
 SetupEMSInternalVariable(
-	Fstring const & cDataTypeName,
-	Fstring const & cUniqueIDName,
-	Fstring const & cUnits,
+	std::string const & cDataTypeName,
+	std::string const & cUniqueIDName,
+	std::string const & cUnits,
 	Real64 & rValue
 )
 {
@@ -2437,7 +2432,7 @@ SetupEMSInternalVariable(
 
 	if ( FoundDuplicate ) {
 		ShowSevereError( "Duplicate internal variable was sent to SetupEMSInternalVariable." );
-		ShowContinueError( "Internal variable type = " + trim( cDataTypeName ) + " ; name = " + trim( cUniqueIDName ) );
+		ShowContinueError( "Internal variable type = " + cDataTypeName + " ; name = " + cUniqueIDName );
 		ShowContinueError( "Called from SetupEMSInternalVariable." );
 	} else {
 		// add new internal data variable
@@ -2470,9 +2465,9 @@ SetupEMSInternalVariable(
 
 void
 SetupEMSInternalVariable(
-	Fstring const & cDataTypeName,
-	Fstring const & cUniqueIDName,
-	Fstring const & cUnits,
+	std::string const & cDataTypeName,
+	std::string const & cUniqueIDName,
+	std::string const & cUnits,
 	int & iValue
 )
 {
@@ -2529,7 +2524,7 @@ SetupEMSInternalVariable(
 
 	if ( FoundDuplicate ) {
 		ShowSevereError( "Duplicate internal variable was sent to SetupEMSInternalVariable." );
-		ShowContinueError( "Internal variable type = " + trim( cDataTypeName ) + " ; name = " + trim( cUniqueIDName ) );
+		ShowContinueError( "Internal variable type = " + cDataTypeName + " ; name = " + cUniqueIDName );
 		ShowContinueError( "called from SetupEMSInternalVariable" );
 	} else {
 		// add new internal data variable

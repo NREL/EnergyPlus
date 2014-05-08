@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace ExteriorEnergyUse {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -51,7 +49,7 @@ namespace ExteriorEnergyUse {
 	struct ExteriorLightUsage
 	{
 		// Members
-		Fstring Name; // Descriptive name -- will show on reporting
+		std::string Name; // Descriptive name -- will show on reporting
 		int SchedPtr; // Can be scheduled
 		Real64 DesignLevel; // Consumption in Watts
 		Real64 Power; // Power = DesignLevel * ScheduleValue
@@ -66,7 +64,6 @@ namespace ExteriorEnergyUse {
 
 		// Default Constructor
 		ExteriorLightUsage() :
-			Name( MaxNameLength ),
 			SchedPtr( 0 ),
 			DesignLevel( 0.0 ),
 			Power( 0.0 ),
@@ -81,7 +78,7 @@ namespace ExteriorEnergyUse {
 
 		// Member Constructor
 		ExteriorLightUsage(
-			Fstring const & Name, // Descriptive name -- will show on reporting
+			std::string const & Name, // Descriptive name -- will show on reporting
 			int const SchedPtr, // Can be scheduled
 			Real64 const DesignLevel, // Consumption in Watts
 			Real64 const Power, // Power = DesignLevel * ScheduleValue
@@ -94,7 +91,7 @@ namespace ExteriorEnergyUse {
 			Real64 const SumConsumption, // sum of electric consumption [J] for reporting
 			Real64 const SumTimeNotZeroCons // sum of time of positive electric consumption [hr]
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			SchedPtr( SchedPtr ),
 			DesignLevel( DesignLevel ),
 			Power( Power ),
@@ -113,7 +110,7 @@ namespace ExteriorEnergyUse {
 	struct ExteriorEquipmentUsage
 	{
 		// Members
-		Fstring Name; // Descriptive name -- will show on reporting
+		std::string Name; // Descriptive name -- will show on reporting
 		int FuelType;
 		int SchedPtr; // Can be scheduled
 		Real64 DesignLevel; // Design Consumption (Watts, except for Water Equipment)
@@ -124,7 +121,6 @@ namespace ExteriorEnergyUse {
 
 		// Default Constructor
 		ExteriorEquipmentUsage() :
-			Name( MaxNameLength ),
 			FuelType( 0 ),
 			SchedPtr( 0 ),
 			DesignLevel( 0.0 ),
@@ -136,7 +132,7 @@ namespace ExteriorEnergyUse {
 
 		// Member Constructor
 		ExteriorEquipmentUsage(
-			Fstring const & Name, // Descriptive name -- will show on reporting
+			std::string const & Name, // Descriptive name -- will show on reporting
 			int const FuelType,
 			int const SchedPtr, // Can be scheduled
 			Real64 const DesignLevel, // Design Consumption (Watts, except for Water Equipment)
@@ -145,7 +141,7 @@ namespace ExteriorEnergyUse {
 			bool const ManageDemand, // Flag to indicate whether to use demand limiting
 			Real64 const DemandLimit // Demand limit set by demand manager [W]
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			FuelType( FuelType ),
 			SchedPtr( SchedPtr ),
 			DesignLevel( DesignLevel ),
@@ -172,11 +168,11 @@ namespace ExteriorEnergyUse {
 	void
 	ValidateFuelType(
 		int & FuelTypeNumber, // Fuel Type to be set in structure.
-		Fstring const & FuelTypeAlpha, // Fuel Type String
-		Fstring & FuelTypeString, // Standardized Fuel Type String (for variable naming)
-		Fstring const & CurrentModuleObject, // object being parsed
-		Fstring const & CurrentField, // current field being parsed
-		Fstring const & CurrentName // current object name being parsed
+		std::string const & FuelTypeAlpha, // Fuel Type String
+		std::string & FuelTypeString, // Standardized Fuel Type String (for variable naming)
+		std::string const & CurrentModuleObject, // object being parsed
+		std::string const & CurrentField, // current field being parsed
+		std::string const & CurrentName // current object name being parsed
 	);
 
 	void

@@ -1,8 +1,8 @@
 #ifndef DisplayRoutines_hh_INCLUDED
 #define DisplayRoutines_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Fstring.hh>
+// C++ Headers
+#include <string>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -10,12 +10,12 @@
 namespace EnergyPlus {
 
 void
-DisplayString( Fstring const & String ); // String to be displayed
+DisplayString( std::string const & String ); // String to be displayed
 
 void
 DisplayNumberAndString(
 	int const Number, // number to be displayed
-	Fstring const & String // String to be displayed
+	std::string const & String // String to be displayed
 );
 
 void

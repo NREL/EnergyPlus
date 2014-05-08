@@ -4,7 +4,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray2D.hh>
-#include <ObjexxFCL/Fstring.hh>
+#include <ObjexxFCL/gio_Fmt.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -15,10 +15,10 @@ namespace HeatBalanceManager {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	extern Fstring const Blank;
-	extern Fstring const fmtA;
+	extern std::string const Blank;
+	extern gio::Fmt const fmtA;
 
-	extern FArray1D_Fstring const PassFail;
+	extern FArray1D_string const PassFail;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -52,7 +52,7 @@ namespace HeatBalanceManager {
 	extern FArray2D< Real64 > MaxLoadZoneRpt; // Maximum zone load for reporting calcs
 	extern int CountWarmupDayPoints; // Count of warmup timesteps (to achieve warmup)
 
-	extern Fstring CurrentModuleObject; // to assist in getting input
+	extern std::string CurrentModuleObject; // to assist in getting input
 
 	// Subroutine Specifications for the Heat Balance Module
 	// Driver Routines
@@ -142,7 +142,7 @@ namespace HeatBalanceManager {
 	void
 	ValidateMaterialRoughness(
 		int const MaterNum, // Which Material number being validated.
-		Fstring const & Roughness, // Roughness String
+		std::string const & Roughness, // Roughness String
 		bool & ErrorsFound // If errors found
 	);
 
@@ -198,8 +198,8 @@ namespace HeatBalanceManager {
 
 	void
 	SearchWindow5DataFile(
-		Fstring const & DesiredFileName, // File name that contains the Window5 constructions.
-		Fstring const & DesiredConstructionName, // Name that will be searched for in the Window5 data file
+		std::string const & DesiredFileName, // File name that contains the Window5 constructions.
+		std::string const & DesiredConstructionName, // Name that will be searched for in the Window5 data file
 		bool & ConstructionFound, // True if DesiredConstructionName is in the Window5 data file
 		bool & EOFonFile, // True if EOF during file read
 		bool & ErrorsFound // True if there is a problem with the entry requested from the data file

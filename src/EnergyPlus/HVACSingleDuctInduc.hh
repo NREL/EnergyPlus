@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -16,7 +15,6 @@ namespace EnergyPlus {
 namespace HVACSingleDuctInduc {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -42,10 +40,10 @@ namespace HVACSingleDuctInduc {
 	{
 		// Members
 		// input data
-		Fstring Name; // name of unit
-		Fstring UnitType; // type of unit
+		std::string Name; // name of unit
+		std::string UnitType; // type of unit
 		int UnitType_Num; // index to type of unit
-		Fstring Sched; // availability schedule
+		std::string Sched; // availability schedule
 		int SchedPtr; // index to schedule
 		Real64 MaxTotAirVolFlow; // m3/s (autosizable)
 		Real64 MaxTotAirMassFlow; // kg/s
@@ -55,8 +53,8 @@ namespace HVACSingleDuctInduc {
 		int OutAirNode; // unit air outlet node number
 		int HWControlNode; // hot water control node
 		int CWControlNode; // cold water control node
-		Fstring HCoilType; // type of heating coil component
-		Fstring HCoil; // name of heating coil component
+		std::string HCoilType; // type of heating coil component
+		std::string HCoil; // name of heating coil component
 		int HCoil_Num; // index to this coil
 		int HCoil_PlantTypeNum;
 		Real64 MaxVolHotWaterFlow; // m3/s (autosizable)
@@ -70,8 +68,8 @@ namespace HVACSingleDuctInduc {
 		int HWCompNum; // index for plant component for hot water coil
 		int HWCoilFailNum1; // index for errors
 		int HWCoilFailNum2; // index for errors
-		Fstring CCoilType; // type of cooling coil component
-		Fstring CCoil; // name of cooling coil component
+		std::string CCoilType; // type of cooling coil component
+		std::string CCoil; // name of cooling coil component
 		int CCoil_Num; // index to this coil
 		int CCoil_PlantTypeNum;
 		Real64 MaxVolColdWaterFlow; // m3/s (autosizable)
@@ -85,7 +83,7 @@ namespace HVACSingleDuctInduc {
 		int CWCompNum; // index for plant component for chilled water coil
 		int CWCoilFailNum1; // index for errors
 		int CWCoilFailNum2; // index for errors
-		Fstring MixerName; // name of air mixer component
+		std::string MixerName; // name of air mixer component
 		int Mixer_Num; // index to this mixer
 		Real64 MaxPriAirMassFlow; // kg/s
 		Real64 MaxSecAirMassFlow; // kg/s
@@ -95,10 +93,7 @@ namespace HVACSingleDuctInduc {
 
 		// Default Constructor
 		IndUnitData() :
-			Name( MaxNameLength ),
-			UnitType( MaxNameLength ),
 			UnitType_Num( 0 ),
-			Sched( MaxNameLength ),
 			SchedPtr( 0 ),
 			MaxTotAirVolFlow( 0.0 ),
 			MaxTotAirMassFlow( 0.0 ),
@@ -108,8 +103,6 @@ namespace HVACSingleDuctInduc {
 			OutAirNode( 0 ),
 			HWControlNode( 0 ),
 			CWControlNode( 0 ),
-			HCoilType( MaxNameLength ),
-			HCoil( MaxNameLength ),
 			HCoil_Num( 0 ),
 			HCoil_PlantTypeNum( 0 ),
 			MaxVolHotWaterFlow( 0.0 ),
@@ -123,8 +116,6 @@ namespace HVACSingleDuctInduc {
 			HWCompNum( 0 ),
 			HWCoilFailNum1( 0 ),
 			HWCoilFailNum2( 0 ),
-			CCoilType( MaxNameLength ),
-			CCoil( MaxNameLength ),
 			CCoil_Num( 0 ),
 			CCoil_PlantTypeNum( 0 ),
 			MaxVolColdWaterFlow( 0.0 ),
@@ -138,7 +129,6 @@ namespace HVACSingleDuctInduc {
 			CWCompNum( 0 ),
 			CWCoilFailNum1( 0 ),
 			CWCoilFailNum2( 0 ),
-			MixerName( MaxNameLength ),
 			Mixer_Num( 0 ),
 			MaxPriAirMassFlow( 0.0 ),
 			MaxSecAirMassFlow( 0.0 ),
@@ -149,10 +139,10 @@ namespace HVACSingleDuctInduc {
 
 		// Member Constructor
 		IndUnitData(
-			Fstring const & Name, // name of unit
-			Fstring const & UnitType, // type of unit
+			std::string const & Name, // name of unit
+			std::string const & UnitType, // type of unit
 			int const UnitType_Num, // index to type of unit
-			Fstring const & Sched, // availability schedule
+			std::string const & Sched, // availability schedule
 			int const SchedPtr, // index to schedule
 			Real64 const MaxTotAirVolFlow, // m3/s (autosizable)
 			Real64 const MaxTotAirMassFlow, // kg/s
@@ -162,8 +152,8 @@ namespace HVACSingleDuctInduc {
 			int const OutAirNode, // unit air outlet node number
 			int const HWControlNode, // hot water control node
 			int const CWControlNode, // cold water control node
-			Fstring const & HCoilType, // type of heating coil component
-			Fstring const & HCoil, // name of heating coil component
+			std::string const & HCoilType, // type of heating coil component
+			std::string const & HCoil, // name of heating coil component
 			int const HCoil_Num, // index to this coil
 			int const HCoil_PlantTypeNum,
 			Real64 const MaxVolHotWaterFlow, // m3/s (autosizable)
@@ -177,8 +167,8 @@ namespace HVACSingleDuctInduc {
 			int const HWCompNum, // index for plant component for hot water coil
 			int const HWCoilFailNum1, // index for errors
 			int const HWCoilFailNum2, // index for errors
-			Fstring const & CCoilType, // type of cooling coil component
-			Fstring const & CCoil, // name of cooling coil component
+			std::string const & CCoilType, // type of cooling coil component
+			std::string const & CCoil, // name of cooling coil component
 			int const CCoil_Num, // index to this coil
 			int const CCoil_PlantTypeNum,
 			Real64 const MaxVolColdWaterFlow, // m3/s (autosizable)
@@ -192,7 +182,7 @@ namespace HVACSingleDuctInduc {
 			int const CWCompNum, // index for plant component for chilled water coil
 			int const CWCoilFailNum1, // index for errors
 			int const CWCoilFailNum2, // index for errors
-			Fstring const & MixerName, // name of air mixer component
+			std::string const & MixerName, // name of air mixer component
 			int const Mixer_Num, // index to this mixer
 			Real64 const MaxPriAirMassFlow, // kg/s
 			Real64 const MaxSecAirMassFlow, // kg/s
@@ -200,10 +190,10 @@ namespace HVACSingleDuctInduc {
 			Real64 const DesCoolingLoad, // used for reporting during coil sizing
 			Real64 const DesHeatingLoad // used for reporting during coil sizing
 		) :
-			Name( MaxNameLength, Name ),
-			UnitType( MaxNameLength, UnitType ),
+			Name( Name ),
+			UnitType( UnitType ),
 			UnitType_Num( UnitType_Num ),
-			Sched( MaxNameLength, Sched ),
+			Sched( Sched ),
 			SchedPtr( SchedPtr ),
 			MaxTotAirVolFlow( MaxTotAirVolFlow ),
 			MaxTotAirMassFlow( MaxTotAirMassFlow ),
@@ -213,8 +203,8 @@ namespace HVACSingleDuctInduc {
 			OutAirNode( OutAirNode ),
 			HWControlNode( HWControlNode ),
 			CWControlNode( CWControlNode ),
-			HCoilType( MaxNameLength, HCoilType ),
-			HCoil( MaxNameLength, HCoil ),
+			HCoilType( HCoilType ),
+			HCoil( HCoil ),
 			HCoil_Num( HCoil_Num ),
 			HCoil_PlantTypeNum( HCoil_PlantTypeNum ),
 			MaxVolHotWaterFlow( MaxVolHotWaterFlow ),
@@ -228,8 +218,8 @@ namespace HVACSingleDuctInduc {
 			HWCompNum( HWCompNum ),
 			HWCoilFailNum1( HWCoilFailNum1 ),
 			HWCoilFailNum2( HWCoilFailNum2 ),
-			CCoilType( MaxNameLength, CCoilType ),
-			CCoil( MaxNameLength, CCoil ),
+			CCoilType( CCoilType ),
+			CCoil( CCoil ),
 			CCoil_Num( CCoil_Num ),
 			CCoil_PlantTypeNum( CCoil_PlantTypeNum ),
 			MaxVolColdWaterFlow( MaxVolColdWaterFlow ),
@@ -243,7 +233,7 @@ namespace HVACSingleDuctInduc {
 			CWCompNum( CWCompNum ),
 			CWCoilFailNum1( CWCoilFailNum1 ),
 			CWCoilFailNum2( CWCoilFailNum2 ),
-			MixerName( MaxNameLength, MixerName ),
+			MixerName( MixerName ),
 			Mixer_Num( Mixer_Num ),
 			MaxPriAirMassFlow( MaxPriAirMassFlow ),
 			MaxSecAirMassFlow( MaxSecAirMassFlow ),
@@ -261,7 +251,7 @@ namespace HVACSingleDuctInduc {
 
 	void
 	SimIndUnit(
-		Fstring const & CompName, // name of the terminal unit
+		std::string const & CompName, // name of the terminal unit
 		bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
 		int const ZoneNum, // index of zone served by the terminal unit
 		int const ZoneNodeNum, // zone node number of zone served by the terminal unit
@@ -313,7 +303,7 @@ namespace HVACSingleDuctInduc {
 	// ========================= Utilities =======================
 
 	bool
-	FourPipeInductionUnitHasMixer( Fstring const & CompName ); // component (mixer) name
+	FourPipeInductionUnitHasMixer( std::string const & CompName ); // component (mixer) name
 
 	//     NOTICE
 

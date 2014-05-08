@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,11 +13,10 @@ namespace EnergyPlus {
 namespace DataBranchNodeConnections {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
-	extern Fstring const Blank;
+	extern std::string const Blank;
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -39,45 +37,38 @@ namespace DataBranchNodeConnections {
 	struct ComponentListData
 	{
 		// Members
-		Fstring ParentCType; // Parent Object Type (Cannot be SPLITTER or MIXER)
-		Fstring ParentCName; // Parent Object Name
-		Fstring CType; // Component Type (Cannot be SPLITTER or MIXER)
-		Fstring CName; // Component Name
-		Fstring InletNodeName; // Inlet Node ID
-		Fstring OutletNodeName; // Outlet Node ID
-		Fstring Description; // Description of Component List Type
+		std::string ParentCType; // Parent Object Type (Cannot be SPLITTER or MIXER)
+		std::string ParentCName; // Parent Object Name
+		std::string CType; // Component Type (Cannot be SPLITTER or MIXER)
+		std::string CName; // Component Name
+		std::string InletNodeName; // Inlet Node ID
+		std::string OutletNodeName; // Outlet Node ID
+		std::string Description; // Description of Component List Type
 		bool InfoFilled; // true when all information has been filled
 
 		// Default Constructor
 		ComponentListData() :
-			ParentCType( MaxNameLength, Blank ),
-			ParentCName( MaxNameLength, Blank ),
-			CType( MaxNameLength, Blank ),
-			CName( MaxNameLength, Blank ),
-			InletNodeName( MaxNameLength, Blank ),
-			OutletNodeName( MaxNameLength, Blank ),
-			Description( MaxNameLength, Blank ),
 			InfoFilled( false )
 		{}
 
 		// Member Constructor
 		ComponentListData(
-			Fstring const & ParentCType, // Parent Object Type (Cannot be SPLITTER or MIXER)
-			Fstring const & ParentCName, // Parent Object Name
-			Fstring const & CType, // Component Type (Cannot be SPLITTER or MIXER)
-			Fstring const & CName, // Component Name
-			Fstring const & InletNodeName, // Inlet Node ID
-			Fstring const & OutletNodeName, // Outlet Node ID
-			Fstring const & Description, // Description of Component List Type
+			std::string const & ParentCType, // Parent Object Type (Cannot be SPLITTER or MIXER)
+			std::string const & ParentCName, // Parent Object Name
+			std::string const & CType, // Component Type (Cannot be SPLITTER or MIXER)
+			std::string const & CName, // Component Name
+			std::string const & InletNodeName, // Inlet Node ID
+			std::string const & OutletNodeName, // Outlet Node ID
+			std::string const & Description, // Description of Component List Type
 			bool const InfoFilled // true when all information has been filled
 		) :
-			ParentCType( MaxNameLength, ParentCType ),
-			ParentCName( MaxNameLength, ParentCName ),
-			CType( MaxNameLength, CType ),
-			CName( MaxNameLength, CName ),
-			InletNodeName( MaxNameLength, InletNodeName ),
-			OutletNodeName( MaxNameLength, OutletNodeName ),
-			Description( MaxNameLength, Description ),
+			ParentCType( ParentCType ),
+			ParentCName( ParentCName ),
+			CType( CType ),
+			CName( CName ),
+			InletNodeName( InletNodeName ),
+			OutletNodeName( OutletNodeName ),
+			Description( Description ),
 			InfoFilled( InfoFilled )
 		{}
 
@@ -87,20 +78,16 @@ namespace DataBranchNodeConnections {
 	{
 		// Members
 		int NodeNumber; // Node number of this node connection
-		Fstring NodeName; // Node Name of this node connection
-		Fstring ObjectType; // Object/Component Type of this node connection
-		Fstring ObjectName; // Name of the Object/Component Type of this node connection
-		Fstring ConnectionType; // Connection Type (must be valid) for this node connection
+		std::string NodeName; // Node Name of this node connection
+		std::string ObjectType; // Object/Component Type of this node connection
+		std::string ObjectName; // Name of the Object/Component Type of this node connection
+		std::string ConnectionType; // Connection Type (must be valid) for this node connection
 		int FluidStream; // Fluid Stream for this node connection
 		bool ObjectIsParent; // Indicator whether the object is a parent or not
 
 		// Default Constructor
 		NodeConnectionDef() :
 			NodeNumber( 0 ),
-			NodeName( MaxNameLength, Blank ),
-			ObjectType( MaxNameLength, Blank ),
-			ObjectName( MaxNameLength, Blank ),
-			ConnectionType( 19, Blank ),
 			FluidStream( 0 ),
 			ObjectIsParent( false )
 		{}
@@ -108,18 +95,18 @@ namespace DataBranchNodeConnections {
 		// Member Constructor
 		NodeConnectionDef(
 			int const NodeNumber, // Node number of this node connection
-			Fstring const & NodeName, // Node Name of this node connection
-			Fstring const & ObjectType, // Object/Component Type of this node connection
-			Fstring const & ObjectName, // Name of the Object/Component Type of this node connection
-			Fstring const & ConnectionType, // Connection Type (must be valid) for this node connection
+			std::string const & NodeName, // Node Name of this node connection
+			std::string const & ObjectType, // Object/Component Type of this node connection
+			std::string const & ObjectName, // Name of the Object/Component Type of this node connection
+			std::string const & ConnectionType, // Connection Type (must be valid) for this node connection
 			int const FluidStream, // Fluid Stream for this node connection
 			bool const ObjectIsParent // Indicator whether the object is a parent or not
 		) :
 			NodeNumber( NodeNumber ),
-			NodeName( MaxNameLength, NodeName ),
-			ObjectType( MaxNameLength, ObjectType ),
-			ObjectName( MaxNameLength, ObjectName ),
-			ConnectionType( 19, ConnectionType ),
+			NodeName( NodeName ),
+			ObjectType( ObjectType ),
+			ObjectName( ObjectName ),
+			ConnectionType( ConnectionType ),
 			FluidStream( FluidStream ),
 			ObjectIsParent( ObjectIsParent )
 		{}
@@ -129,37 +116,32 @@ namespace DataBranchNodeConnections {
 	struct ParentListData
 	{
 		// Members
-		Fstring CType; // Component Type (Cannot be SPLITTER or MIXER)
-		Fstring CName; // Component Name
-		Fstring InletNodeName; // Inlet Node ID
-		Fstring OutletNodeName; // Outlet Node ID
-		Fstring Description; // Description of Component List Type
+		std::string CType; // Component Type (Cannot be SPLITTER or MIXER)
+		std::string CName; // Component Name
+		std::string InletNodeName; // Inlet Node ID
+		std::string OutletNodeName; // Outlet Node ID
+		std::string Description; // Description of Component List Type
 		bool InfoFilled; // true when all information has been filled
 
 		// Default Constructor
 		ParentListData() :
-			CType( MaxNameLength, Blank ),
-			CName( MaxNameLength, Blank ),
-			InletNodeName( MaxNameLength, Blank ),
-			OutletNodeName( MaxNameLength, Blank ),
-			Description( MaxNameLength, Blank ),
 			InfoFilled( false )
 		{}
 
 		// Member Constructor
 		ParentListData(
-			Fstring const & CType, // Component Type (Cannot be SPLITTER or MIXER)
-			Fstring const & CName, // Component Name
-			Fstring const & InletNodeName, // Inlet Node ID
-			Fstring const & OutletNodeName, // Outlet Node ID
-			Fstring const & Description, // Description of Component List Type
+			std::string const & CType, // Component Type (Cannot be SPLITTER or MIXER)
+			std::string const & CName, // Component Name
+			std::string const & InletNodeName, // Inlet Node ID
+			std::string const & OutletNodeName, // Outlet Node ID
+			std::string const & Description, // Description of Component List Type
 			bool const InfoFilled // true when all information has been filled
 		) :
-			CType( MaxNameLength, CType ),
-			CName( MaxNameLength, CName ),
-			InletNodeName( MaxNameLength, InletNodeName ),
-			OutletNodeName( MaxNameLength, OutletNodeName ),
-			Description( MaxNameLength, Description ),
+			CType( CType ),
+			CName( CName ),
+			InletNodeName( InletNodeName ),
+			OutletNodeName( OutletNodeName ),
+			Description( Description ),
 			InfoFilled( InfoFilled )
 		{}
 
@@ -168,34 +150,29 @@ namespace DataBranchNodeConnections {
 	struct EqNodeConnectionDef
 	{
 		// Members
-		Fstring NodeName; // Node Name of this node connection
-		Fstring ObjectType; // Object/Component Type of this node connection
-		Fstring ObjectName; // Name of the Object/Component Type of this node connection
-		Fstring InputFieldName; // Input Field Name for this connection
-		Fstring ConnectionType; // Connection Type (must be valid) for this node connection
+		std::string NodeName; // Node Name of this node connection
+		std::string ObjectType; // Object/Component Type of this node connection
+		std::string ObjectName; // Name of the Object/Component Type of this node connection
+		std::string InputFieldName; // Input Field Name for this connection
+		std::string ConnectionType; // Connection Type (must be valid) for this node connection
 
 		// Default Constructor
-		EqNodeConnectionDef() :
-			NodeName( MaxNameLength, Blank ),
-			ObjectType( MaxNameLength, Blank ),
-			ObjectName( MaxNameLength, Blank ),
-			InputFieldName( MaxNameLength, Blank ),
-			ConnectionType( 19, Blank )
+		EqNodeConnectionDef()
 		{}
 
 		// Member Constructor
 		EqNodeConnectionDef(
-			Fstring const & NodeName, // Node Name of this node connection
-			Fstring const & ObjectType, // Object/Component Type of this node connection
-			Fstring const & ObjectName, // Name of the Object/Component Type of this node connection
-			Fstring const & InputFieldName, // Input Field Name for this connection
-			Fstring const & ConnectionType // Connection Type (must be valid) for this node connection
+			std::string const & NodeName, // Node Name of this node connection
+			std::string const & ObjectType, // Object/Component Type of this node connection
+			std::string const & ObjectName, // Name of the Object/Component Type of this node connection
+			std::string const & InputFieldName, // Input Field Name for this connection
+			std::string const & ConnectionType // Connection Type (must be valid) for this node connection
 		) :
-			NodeName( MaxNameLength, NodeName ),
-			ObjectType( MaxNameLength, ObjectType ),
-			ObjectName( MaxNameLength, ObjectName ),
-			InputFieldName( MaxNameLength, InputFieldName ),
-			ConnectionType( 19, ConnectionType )
+			NodeName( NodeName ),
+			ObjectType( ObjectType ),
+			ObjectName( ObjectName ),
+			InputFieldName( InputFieldName ),
+			ConnectionType( ConnectionType )
 		{}
 
 	};

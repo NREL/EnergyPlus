@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace ZoneDehumidifier {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -56,8 +54,8 @@ namespace ZoneDehumidifier {
 	{
 		// Members
 		// input data and others required during calculations
-		Fstring Name; // Name of unit
-		Fstring UnitType; // Type of unit
+		std::string Name; // Name of unit
+		std::string UnitType; // Type of unit
 		int UnitType_Num; // Parameter equivalent to type of unit
 		int SchedPtr; // Index number to availability schedule
 		Real64 RatedWaterRemoval; // Rated water removal [liters/day]
@@ -91,7 +89,7 @@ namespace ZoneDehumidifier {
 		int PLFPLRErrorCount; // Count number of times PLF < PLR
 		int PLFPLRErrorIndex; // Index for PLF < PLR recurring warning messages
 		int CondensateCollectMode; // Where does water come from
-		Fstring CondensateCollectName; // Name of water storage (collection) tank
+		std::string CondensateCollectName; // Name of water storage (collection) tank
 		int CondensateTankID; // Condensate collection tank ID number
 		int CondensateTankSupplyARRID; // Condensate collection tank supply ID number
 		// Report data
@@ -111,8 +109,6 @@ namespace ZoneDehumidifier {
 
 		// Default Constructor
 		ZoneDehumidifierData() :
-			Name( MaxNameLength ),
-			UnitType( MaxNameLength ),
 			UnitType_Num( 0 ),
 			SchedPtr( 0 ),
 			RatedWaterRemoval( 0.0 ),
@@ -146,7 +142,6 @@ namespace ZoneDehumidifier {
 			PLFPLRErrorCount( 0 ),
 			PLFPLRErrorIndex( 0 ),
 			CondensateCollectMode( CondensateDiscarded ),
-			CondensateCollectName( MaxNameLength ),
 			CondensateTankID( 0 ),
 			CondensateTankSupplyARRID( 0 ),
 			SensHeatingRate( 0.0 ),
@@ -166,8 +161,8 @@ namespace ZoneDehumidifier {
 
 		// Member Constructor
 		ZoneDehumidifierData(
-			Fstring const & Name, // Name of unit
-			Fstring const & UnitType, // Type of unit
+			std::string const & Name, // Name of unit
+			std::string const & UnitType, // Type of unit
 			int const UnitType_Num, // Parameter equivalent to type of unit
 			int const SchedPtr, // Index number to availability schedule
 			Real64 const RatedWaterRemoval, // Rated water removal [liters/day]
@@ -201,7 +196,7 @@ namespace ZoneDehumidifier {
 			int const PLFPLRErrorCount, // Count number of times PLF < PLR
 			int const PLFPLRErrorIndex, // Index for PLF < PLR recurring warning messages
 			int const CondensateCollectMode, // Where does water come from
-			Fstring const & CondensateCollectName, // Name of water storage (collection) tank
+			std::string const & CondensateCollectName, // Name of water storage (collection) tank
 			int const CondensateTankID, // Condensate collection tank ID number
 			int const CondensateTankSupplyARRID, // Condensate collection tank supply ID number
 			Real64 const SensHeatingRate, // Zone Dehumidifier Sensible Heating Rate [W]
@@ -218,8 +213,8 @@ namespace ZoneDehumidifier {
 			Real64 const OffCycleParasiticElecPower, // Zone Dehumidifier Off-Cycle Parasitic Electric Power [W]
 			Real64 const OffCycleParasiticElecCons // Zone Dehumidifier Off-Cycle Parasitic Electric Consumption [J]
 		) :
-			Name( MaxNameLength, Name ),
-			UnitType( MaxNameLength, UnitType ),
+			Name( Name ),
+			UnitType( UnitType ),
 			UnitType_Num( UnitType_Num ),
 			SchedPtr( SchedPtr ),
 			RatedWaterRemoval( RatedWaterRemoval ),
@@ -253,7 +248,7 @@ namespace ZoneDehumidifier {
 			PLFPLRErrorCount( PLFPLRErrorCount ),
 			PLFPLRErrorIndex( PLFPLRErrorIndex ),
 			CondensateCollectMode( CondensateCollectMode ),
-			CondensateCollectName( MaxNameLength, CondensateCollectName ),
+			CondensateCollectName( CondensateCollectName ),
 			CondensateTankID( CondensateTankID ),
 			CondensateTankSupplyARRID( CondensateTankSupplyARRID ),
 			SensHeatingRate( SensHeatingRate ),
@@ -280,7 +275,7 @@ namespace ZoneDehumidifier {
 
 	void
 	SimZoneDehumidifier(
-		Fstring const & CompName, // Name of the zone dehumidifier
+		std::string const & CompName, // Name of the zone dehumidifier
 		int const ZoneNum, // Number of zone being served
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		Real64 & QSensOut, // Sensible capacity delivered to zone (W)

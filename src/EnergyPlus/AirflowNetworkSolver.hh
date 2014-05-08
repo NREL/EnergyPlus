@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1A.hh>
 #include <ObjexxFCL/FArray2D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -350,7 +349,7 @@ namespace AirflowNetworkSolver {
 
 	void
 	DUMPVD(
-		Fstring const & S, // Description
+		std::string const & S, // Description
 		FArray1A< Real64 > const V, // Output values
 		int const n, // Array size
 		int const UOUT // Output file unit
@@ -358,7 +357,7 @@ namespace AirflowNetworkSolver {
 
 	void
 	DUMPVR(
-		Fstring const & S, // Description
+		std::string const & S, // Description
 		FArray1A< Real64 > const V, // Output values
 		int const n, // Array size
 		int const UOUT // Output file unit

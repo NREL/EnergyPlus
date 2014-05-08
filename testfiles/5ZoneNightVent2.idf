@@ -3895,6 +3895,12 @@
   Output:Variable,*,Cooling Coil Sensible Cooling Rate,hourly;
 
   Output:Variable,*,Zone Air Terminal VAV Damper Position,hourly;
+  
+  Output:Variable,*,Zone Zone Mixing Mass Flow Rate,hourly;
+  
+  Output:Variable,*,Zone Zone Mixing Current Density Volumetric Flow Rate,hourly;
+  
+  Output:Variable,*,Zone Zone Mixing Standard Density Volumetric Flow Rate,hourly;
 
   Output:Variable,*,Chiller Evaporator Cooling Rate,hourly;
 

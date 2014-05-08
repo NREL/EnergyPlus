@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace DataHVACGlobals {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// -only module should be available to other modules and routines.
@@ -86,7 +84,7 @@ namespace DataHVACGlobals {
 	extern int const BypassWhenWithinEconomizerLimits; // heat recovery controlled by economizer limits
 	extern int const BypassWhenOAFlowGreaterThanMinimum; // heat recovery ON at minimum OA in economizer mode
 
-	extern FArray1D_Fstring const cFanTypes; // cpw22Aug2010 | cpw22Aug2010 (new)
+	extern FArray1D_string const cFanTypes; // cpw22Aug2010 | cpw22Aug2010 (new)
 
 	// parameters describing unitary systems
 	extern int const NumUnitarySystemTypes;
@@ -98,7 +96,7 @@ namespace DataHVACGlobals {
 	extern int const UnitarySys_HeatPump_AirToAir;
 	extern int const UnitarySys_HeatPump_WaterToAir;
 	extern int const UnitarySystem_AnyCoilType;
-	extern FArray1D_Fstring const cFurnaceTypes;
+	extern FArray1D_string const cFurnaceTypes;
 
 	// parameters describing coil types
 	extern int const NumAllCoilTypes;
@@ -149,7 +147,7 @@ namespace DataHVACGlobals {
 	extern int const WaterConstant; // water flow is constant
 	extern int const WaterConstantOnDemand; // water flow is constant whenever the coil is operational - this is the only method used in EP V7.2 and earlier
 
-	extern FArray1D_Fstring const cAllCoilTypes;
+	extern FArray1D_string const cAllCoilTypes;
 
 	// parameters describing coil performance types
 	extern int const CoilPerfDX_CoolBypassEmpirical;
@@ -186,7 +184,7 @@ namespace DataHVACGlobals {
 	extern int const HX_AIRTOAIR_GENERIC;
 	extern int const HX_DESICCANT_BALANCED;
 
-	extern FArray1D_Fstring const cHXTypes;
+	extern FArray1D_string const cHXTypes;
 
 	// Parameters describing air terminal mixers
 	extern int const NumATMixerTypes;
@@ -195,7 +193,7 @@ namespace DataHVACGlobals {
 	extern int const ATMixer_InletSide;
 	extern int const ATMixer_SupplySide;
 
-	extern FArray1D_Fstring const cATMixerTypes;
+	extern FArray1D_string const cATMixerTypes;
 	extern bool const ATMixerExists;
 
 	// Parameters describing variable refrigerant flow terminal unit types
@@ -203,14 +201,14 @@ namespace DataHVACGlobals {
 
 	extern int const VRFTUType_ConstVolume;
 
-	extern FArray1D_Fstring const cVRFTUTypes;
+	extern FArray1D_string const cVRFTUTypes;
 
 	// VRF Heating Performance Curve Temperature Type
 	extern int const NumVRFHeatingPerformanceOATTypes;
 	extern int const WetBulbIndicator;
 	extern int const DryBulbIndicator;
 
-	extern FArray1D_Fstring const cVRFHeatingPerformanceOATTypes;
+	extern FArray1D_string const cVRFHeatingPerformanceOATTypes;
 
 	// parameter concerning the amount of change in zone temperature is needed
 	// for oscillation of zone temperature to be detected.
@@ -295,45 +293,42 @@ namespace DataHVACGlobals {
 	{
 		// Members
 		// CHARACTER(len=MaxNameLength) :: EquipOperListName
-		Fstring EquipmentType;
-		Fstring EquipmentName;
+		std::string EquipmentType;
+		std::string EquipmentName;
 		int NodeNumIn;
 		int NodeNumOut;
 		Real64 EquipDemand;
 		Real64 DesignFlowRate;
-		Fstring HeatOrCool;
+		std::string HeatOrCool;
 		int OpType;
 
 		// Default Constructor
 		ComponentSetPtData() :
-			EquipmentType( MaxNameLength ),
-			EquipmentName( MaxNameLength ),
 			NodeNumIn( 0 ),
 			NodeNumOut( 0 ),
 			EquipDemand( 0.0 ),
 			DesignFlowRate( 0.0 ),
-			HeatOrCool( 7 ),
 			OpType( 0 )
 		{}
 
 		// Member Constructor
 		ComponentSetPtData(
-			Fstring const & EquipmentType,
-			Fstring const & EquipmentName,
+			std::string const & EquipmentType,
+			std::string const & EquipmentName,
 			int const NodeNumIn,
 			int const NodeNumOut,
 			Real64 const EquipDemand,
 			Real64 const DesignFlowRate,
-			Fstring const & HeatOrCool,
+			std::string const & HeatOrCool,
 			int const OpType
 		) :
-			EquipmentType( MaxNameLength, EquipmentType ),
-			EquipmentName( MaxNameLength, EquipmentName ),
+			EquipmentType( EquipmentType ),
+			EquipmentName( EquipmentName ),
 			NodeNumIn( NodeNumIn ),
 			NodeNumOut( NodeNumOut ),
 			EquipDemand( EquipDemand ),
 			DesignFlowRate( DesignFlowRate ),
-			HeatOrCool( 7, HeatOrCool ),
+			HeatOrCool( HeatOrCool ),
 			OpType( OpType )
 		{}
 
@@ -346,8 +341,8 @@ namespace DataHVACGlobals {
 		int AvailStatus; // system availability status
 		int StartTime; // cycle on time (in SimTimeSteps)
 		int StopTime; // cycle off time (in SimTimeSteps)
-		Fstring AvailManagerListName; // name of each availability manager
-		FArray1D_Fstring AvailManagerName; // name of each availability manager
+		std::string AvailManagerListName; // name of each availability manager
+		FArray1D_string AvailManagerName; // name of each availability manager
 		FArray1D_int AvailManagerType; // type of availability manager
 		FArray1D_int AvailManagerNum; // index for availability manager
 		int ZoneNum; // cycle off time (in SimTimeSteps)
@@ -359,8 +354,6 @@ namespace DataHVACGlobals {
 			AvailStatus( 0 ),
 			StartTime( 0 ),
 			StopTime( 0 ),
-			AvailManagerListName( MaxNameLength ),
-			AvailManagerName( sFstring( MaxNameLength ) ),
 			ZoneNum( 0 ),
 			Input( true )
 		{}
@@ -371,8 +364,8 @@ namespace DataHVACGlobals {
 			int const AvailStatus, // system availability status
 			int const StartTime, // cycle on time (in SimTimeSteps)
 			int const StopTime, // cycle off time (in SimTimeSteps)
-			Fstring const & AvailManagerListName, // name of each availability manager
-			FArray1_Fstring const & AvailManagerName, // name of each availability manager
+			std::string const & AvailManagerListName, // name of each availability manager
+			FArray1_string const & AvailManagerName, // name of each availability manager
 			FArray1_int const & AvailManagerType, // type of availability manager
 			FArray1_int const & AvailManagerNum, // index for availability manager
 			int const ZoneNum, // cycle off time (in SimTimeSteps)
@@ -382,7 +375,7 @@ namespace DataHVACGlobals {
 			AvailStatus( AvailStatus ),
 			StartTime( StartTime ),
 			StopTime( StopTime ),
-			AvailManagerListName( MaxNameLength, AvailManagerListName ),
+			AvailManagerListName( AvailManagerListName ),
 			AvailManagerName( AvailManagerName ),
 			AvailManagerType( AvailManagerType ),
 			AvailManagerNum( AvailManagerNum ),

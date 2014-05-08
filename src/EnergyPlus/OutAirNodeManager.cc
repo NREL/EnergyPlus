@@ -1,7 +1,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <OutAirNodeManager.hh>
@@ -132,7 +131,7 @@ namespace OutAirNodeManager {
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetOutAirNodesInput: " ); // include trailing blank space
+		static std::string const RoutineName( "GetOutAirNodesInput: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -162,10 +161,10 @@ namespace OutAirNodeManager {
 		int NextFluidStreamNum; // Fluid stream index (all outside air inlet nodes need a unique fluid stream number)
 		FArray1D_int TmpNums;
 		FArray1D_int TmpNums1;
-		Fstring CurrentModuleObject( MaxNameLength ); // Object type for getting and error messages
-		FArray1D_Fstring Alphas( sFstring( MaxNameLength ) ); // Alpha input items for object
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) ); // Numeric field names
+		std::string CurrentModuleObject; // Object type for getting and error messages
+		FArray1D_string Alphas; // Alpha input items for object
+		FArray1D_string cAlphaFields; // Alpha field names
+		FArray1D_string cNumericFields; // Numeric field names
 		FArray1D< Real64 > Numbers; // Numeric input items for object
 		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
@@ -196,11 +195,11 @@ namespace OutAirNodeManager {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		Alphas.allocate( MaxAlphas );
-		Alphas = " ";
+		Alphas = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = " ";
+		cAlphaFields = "";
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = " ";
+		cNumericFields = "";
 		Numbers.allocate( MaxNums );
 		Numbers = 0.0;
 		lAlphaBlanks.allocate( MaxAlphas );
@@ -219,10 +218,10 @@ namespace OutAirNodeManager {
 					//  To support HVAC diagram, every outside inlet node must have a unique fluid stream number
 					//  GetNodeNums will increment the value across a node list, the starting value must be incremented
 					//  here across lists and across objects
-					GetNodeNums( Alphas( AlphaNum ), NumNodes, NodeNums, ErrInList, NodeType_Air, trim( CurrentModuleObject ), trim( CurrentModuleObject ), NodeConnectionType_OutsideAir, NextFluidStreamNum, ObjectIsNotParent, IncrementFluidStreamYes, cAlphaFields( AlphaNum ) );
+					GetNodeNums( Alphas( AlphaNum ), NumNodes, NodeNums, ErrInList, NodeType_Air, CurrentModuleObject, CurrentModuleObject, NodeConnectionType_OutsideAir, NextFluidStreamNum, ObjectIsNotParent, IncrementFluidStreamYes, cAlphaFields( AlphaNum ) );
 					NextFluidStreamNum += NumNodes;
 					if ( ErrInList ) {
-						ShowContinueError( "Occurred in " + trim( CurrentModuleObject ) + ", " + trim( cAlphaFields( AlphaNum ) ) + " = " + trim( Alphas( AlphaNum ) ) );
+						ShowContinueError( "Occurred in " + CurrentModuleObject + ", " + cAlphaFields( AlphaNum ) + " = " + Alphas( AlphaNum ) );
 						ErrorsFound = true;
 					}
 					for ( NodeNum = 1; NodeNum <= NumNodes; ++NodeNum ) {
@@ -246,7 +245,7 @@ namespace OutAirNodeManager {
 			}
 
 			if ( ErrorsFound ) {
-				ShowFatalError( RoutineName + "Errors found in getting " + trim( CurrentModuleObject ) + " input." );
+				ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input." );
 			}
 		}
 
@@ -260,15 +259,15 @@ namespace OutAirNodeManager {
 				//  To support HVAC diagram, every outside inlet node must have a unique fluid stream number
 				//  GetNodeNums will increment the value across a node list, the starting value must be incremented
 				//  here across lists and across objects
-				GetNodeNums( Alphas( 1 ), NumNodes, NodeNums, ErrInList, NodeType_Air, trim( CurrentModuleObject ), trim( CurrentModuleObject ), NodeConnectionType_OutsideAir, NextFluidStreamNum, ObjectIsNotParent, IncrementFluidStreamYes, cAlphaFields( 1 ) );
+				GetNodeNums( Alphas( 1 ), NumNodes, NodeNums, ErrInList, NodeType_Air, CurrentModuleObject, CurrentModuleObject, NodeConnectionType_OutsideAir, NextFluidStreamNum, ObjectIsNotParent, IncrementFluidStreamYes, cAlphaFields( 1 ) );
 				NextFluidStreamNum += NumNodes;
 				if ( ErrInList ) {
-					ShowContinueError( "Occurred in " + trim( CurrentModuleObject ) + ", " + trim( cAlphaFields( 1 ) ) + " = " + trim( Alphas( 1 ) ) );
+					ShowContinueError( "Occurred in " + CurrentModuleObject + ", " + cAlphaFields( 1 ) + " = " + Alphas( 1 ) );
 					ErrorsFound = true;
 				}
 
 				if ( NumNodes > 1 ) {
-					ShowSevereError( trim( CurrentModuleObject ) + ", " + trim( cAlphaFields( 1 ) ) + " = " + trim( Alphas( 1 ) ) );
+					ShowSevereError( CurrentModuleObject + ", " + cAlphaFields( 1 ) + " = " + Alphas( 1 ) );
 					ShowContinueError( "...appears to point to a node list, not a single node." );
 					ErrorsFound = true;
 					continue;
@@ -288,8 +287,8 @@ namespace OutAirNodeManager {
 					}
 					TmpNums( ListSize ) = NodeNums( 1 );
 				} else { // Duplicates are a problem
-					ShowSevereError( trim( CurrentModuleObject ) + ", duplicate " + trim( cAlphaFields( 1 ) ) + " = " + trim( Alphas( 1 ) ) );
-					ShowContinueError( "Duplicate " + trim( cAlphaFields( 1 ) ) + " might be found in an OutdoorAir:NodeList." );
+					ShowSevereError( CurrentModuleObject + ", duplicate " + cAlphaFields( 1 ) + " = " + Alphas( 1 ) );
+					ShowContinueError( "Duplicate " + cAlphaFields( 1 ) + " might be found in an OutdoorAir:NodeList." );
 					ErrorsFound = true;
 					continue;
 				}
@@ -300,7 +299,7 @@ namespace OutAirNodeManager {
 			}
 
 			if ( ErrorsFound ) {
-				ShowFatalError( RoutineName + "Errors found in getting " + trim( CurrentModuleObject ) + " input." );
+				ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input." );
 			}
 		}
 

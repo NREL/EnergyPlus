@@ -61,7 +61,6 @@ namespace HeatRecovery {
 	using namespace DataPrecisionGlobals;
 	using namespace DataHVACGlobals;
 	using DataGlobals::WarmupFlag;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::SecInHour;
@@ -142,7 +141,7 @@ namespace HeatRecovery {
 
 	void
 	SimHeatRecovery(
-		Fstring const & CompName, // name of the heat exchanger unit
+		std::string const & CompName, // name of the heat exchanger unit
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		int & CompIndex, // Pointer to Component
 		int const FanOpMode, // Supply air fan operating mode
@@ -203,17 +202,17 @@ namespace HeatRecovery {
 		if ( CompIndex == 0 ) {
 			HeatExchNum = FindItemInList( CompName, ExchCond.Name(), NumHeatExchangers );
 			if ( HeatExchNum == 0 ) {
-				ShowFatalError( "SimHeatRecovery: Unit not found=" + trim( CompName ) );
+				ShowFatalError( "SimHeatRecovery: Unit not found=" + CompName );
 			}
 			CompIndex = HeatExchNum;
 		} else {
 			HeatExchNum = CompIndex;
 			if ( HeatExchNum > NumHeatExchangers || HeatExchNum < 1 ) {
-				ShowFatalError( "SimHeatRecovery:  Invalid CompIndex passed=" + trim( TrimSigDigits( HeatExchNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumHeatExchangers ) ) + ", Entered Unit name=" + trim( CompName ) );
+				ShowFatalError( "SimHeatRecovery:  Invalid CompIndex passed=" + TrimSigDigits( HeatExchNum ) + ", Number of Units=" + TrimSigDigits( NumHeatExchangers ) + ", Entered Unit name=" + CompName );
 			}
 			if ( CheckEquipName( HeatExchNum ) ) {
 				if ( CompName != ExchCond( HeatExchNum ).Name ) {
-					ShowFatalError( "SimHeatRecovery: Invalid CompIndex passed=" + trim( TrimSigDigits( HeatExchNum ) ) + ", Unit name=" + trim( CompName ) + ", stored Unit Name for that index=" + trim( ExchCond( HeatExchNum ).Name ) );
+					ShowFatalError( "SimHeatRecovery: Invalid CompIndex passed=" + TrimSigDigits( HeatExchNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + ExchCond( HeatExchNum ).Name );
 				}
 				CheckEquipName( HeatExchNum ) = false;
 			}
@@ -327,8 +326,8 @@ namespace HeatRecovery {
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		static Fstring HeatExchPerfType( MaxNameLength ); // Desiccant balanced heat exchanger performance data type
-		static Fstring const RoutineName( "GetHeatRecoveryInput: " ); // include trailing blank space
+		static std::string HeatExchPerfType; // Desiccant balanced heat exchanger performance data type
+		static std::string const RoutineName( "GetHeatRecoveryInput: " ); // include trailing blank space
 
 		NumAirToAirPlateExchs = GetNumObjectsFound( "HeatExchanger:AirToAir:FlatPlate" );
 		NumAirToAirGenericExchs = GetNumObjectsFound( "HeatExchanger:AirToAir:SensibleAndLatent" );
@@ -352,7 +351,7 @@ namespace HeatRecovery {
 			ExchNum = ExchIndex;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ExchCond.Name(), ExchNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ExchCond.Name(), ExchNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -364,11 +363,11 @@ namespace HeatRecovery {
 			} else {
 				ExchCond( ExchNum ).SchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 				if ( ExchCond( ExchNum ).SchedPtr == 0 ) {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 2 ) ) + " entered =" + trim( cAlphaArgs( 2 ) ) + " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) + " entered =" + cAlphaArgs( 2 ) + " for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 			}
-			{ auto const SELECT_CASE_var( trim( cAlphaArgs( 3 ) ) );
+			{ auto const SELECT_CASE_var( cAlphaArgs( 3 ) );
 			if ( SELECT_CASE_var == "COUNTERFLOW" ) {
 				ExchCond( ExchNum ).FlowArr = Counter_Flow;
 			} else if ( SELECT_CASE_var == "PARALLELFLOW" ) {
@@ -376,10 +375,10 @@ namespace HeatRecovery {
 			} else if ( SELECT_CASE_var == "CROSSFLOWBOTHUNMIXED" ) {
 				ExchCond( ExchNum ).FlowArr = Cross_Flow_Both_Unmixed;
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + ": incorrect flow arrangement: " + trim( cAlphaArgs( 3 ) ) );
+				ShowSevereError( cCurrentModuleObject + ": incorrect flow arrangement: " + cAlphaArgs( 3 ) );
 				ErrorsFound = true;
 			}}
-			{ auto const SELECT_CASE_var( trim( cAlphaArgs( 4 ) ) );
+			{ auto const SELECT_CASE_var( cAlphaArgs( 4 ) );
 			if ( SELECT_CASE_var == "YES" ) {
 				ExchCond( ExchNum ).EconoLockOut = EconoLockOut_Yes;
 			} else if ( SELECT_CASE_var == "NO" ) {
@@ -388,7 +387,7 @@ namespace HeatRecovery {
 				if ( lAlphaFieldBlanks( 4 ) ) {
 					ExchCond( ExchNum ).EconoLockOut = EconoLockOut_Yes;
 				} else {
-					ShowSevereError( trim( cCurrentModuleObject ) + ": incorrect econo lockout: " + trim( cAlphaArgs( 4 ) ) );
+					ShowSevereError( cCurrentModuleObject + ": incorrect econo lockout: " + cAlphaArgs( 4 ) );
 					ErrorsFound = true;
 				}
 			}}
@@ -399,10 +398,10 @@ namespace HeatRecovery {
 			ExchCond( ExchNum ).NomSecAirVolFlow = rNumericArgs( 5 );
 			ExchCond( ExchNum ).NomSecAirInTemp = rNumericArgs( 6 );
 			ExchCond( ExchNum ).NomElecPower = rNumericArgs( 7 );
-			ExchCond( ExchNum ).SupInletNode = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			ExchCond( ExchNum ).SupOutletNode = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-			ExchCond( ExchNum ).SecInletNode = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
-			ExchCond( ExchNum ).SecOutletNode = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+			ExchCond( ExchNum ).SupInletNode = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			ExchCond( ExchNum ).SupOutletNode = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			ExchCond( ExchNum ).SecInletNode = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+			ExchCond( ExchNum ).SecOutletNode = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 
 			TestCompSet( cHXTypes( ExchCond( ExchNum ).ExchTypeNum ), ExchCond( ExchNum ).Name, cAlphaArgs( 5 ), cAlphaArgs( 6 ), "Process Air Nodes" );
 
@@ -415,7 +414,7 @@ namespace HeatRecovery {
 			ExchNum = ExchIndex + NumAirToAirPlateExchs;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ExchCond.Name(), ExchNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ExchCond.Name(), ExchNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -427,7 +426,7 @@ namespace HeatRecovery {
 			} else {
 				ExchCond( ExchNum ).SchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 				if ( ExchCond( ExchNum ).SchedPtr == 0 ) {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 2 ) ) + " entered =" + trim( cAlphaArgs( 2 ) ) + " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) + " entered =" + cAlphaArgs( 2 ) + " for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -437,11 +436,11 @@ namespace HeatRecovery {
 			ExchCond( ExchNum ).HeatEffectSensible75 = rNumericArgs( 4 );
 			ExchCond( ExchNum ).HeatEffectLatent75 = rNumericArgs( 5 );
 			if ( ExchCond( ExchNum ).HeatEffectSensible75 < ExchCond( ExchNum ).HeatEffectSensible100 ) {
-				ShowWarningError( trim( cCurrentModuleObject ) + " \"" + trim( ExchCond( ExchNum ).Name ) + "\" sensible heating effectiveness at 75% rated flow is less than at 100% rated flow." );
+				ShowWarningError( cCurrentModuleObject + " \"" + ExchCond( ExchNum ).Name + "\" sensible heating effectiveness at 75% rated flow is less than at 100% rated flow." );
 				ShowContinueError( "Sensible heating effectiveness at 75% rated flow is usually greater than at 100% rated flow." );
 			}
 			if ( ExchCond( ExchNum ).HeatEffectLatent75 < ExchCond( ExchNum ).HeatEffectLatent100 ) {
-				ShowWarningError( trim( cCurrentModuleObject ) + " \"" + trim( ExchCond( ExchNum ).Name ) + "\" latent heating effectiveness at 75% rated flow is less than at 100% rated flow." );
+				ShowWarningError( cCurrentModuleObject + " \"" + ExchCond( ExchNum ).Name + "\" latent heating effectiveness at 75% rated flow is less than at 100% rated flow." );
 				ShowContinueError( "Latent heating effectiveness at 75% rated flow is usually greater than at 100% rated flow." );
 			}
 			ExchCond( ExchNum ).CoolEffectSensible100 = rNumericArgs( 6 );
@@ -449,17 +448,17 @@ namespace HeatRecovery {
 			ExchCond( ExchNum ).CoolEffectSensible75 = rNumericArgs( 8 );
 			ExchCond( ExchNum ).CoolEffectLatent75 = rNumericArgs( 9 );
 			if ( ExchCond( ExchNum ).CoolEffectSensible75 < ExchCond( ExchNum ).CoolEffectSensible100 ) {
-				ShowWarningError( trim( cCurrentModuleObject ) + " \"" + trim( ExchCond( ExchNum ).Name ) + "\" sensible cooling effectiveness at 75% rated flow is less than at 100% rated flow." );
+				ShowWarningError( cCurrentModuleObject + " \"" + ExchCond( ExchNum ).Name + "\" sensible cooling effectiveness at 75% rated flow is less than at 100% rated flow." );
 				ShowContinueError( "Sensible cooling effectiveness at 75% rated flow is usually greater than at 100% rated flow." );
 			}
 			if ( ExchCond( ExchNum ).CoolEffectLatent75 < ExchCond( ExchNum ).CoolEffectLatent100 ) {
-				ShowWarningError( trim( cCurrentModuleObject ) + " \"" + trim( ExchCond( ExchNum ).Name ) + "\" latent cooling effectiveness at 75% rated flow is less than at 100% rated flow." );
+				ShowWarningError( cCurrentModuleObject + " \"" + ExchCond( ExchNum ).Name + "\" latent cooling effectiveness at 75% rated flow is less than at 100% rated flow." );
 				ShowContinueError( "Latent cooling effectiveness at 75% rated flow is usually greater than at 100% rated flow." );
 			}
-			ExchCond( ExchNum ).SupInletNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			ExchCond( ExchNum ).SupOutletNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-			ExchCond( ExchNum ).SecInletNode = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
-			ExchCond( ExchNum ).SecOutletNode = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+			ExchCond( ExchNum ).SupInletNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			ExchCond( ExchNum ).SupOutletNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			ExchCond( ExchNum ).SecInletNode = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+			ExchCond( ExchNum ).SecOutletNode = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 
 			ExchCond( ExchNum ).NomElecPower = rNumericArgs( 10 );
 
@@ -468,7 +467,7 @@ namespace HeatRecovery {
 			} else {
 				if ( ! SameString( cAlphaArgs( 7 ), "No" ) ) {
 					ShowSevereError( "Rotary HX Speed Modulation or Plate Bypass for Temperature Control for " );
-					ShowContinueError( trim( ExchCond( ExchNum ).Name ) + " must be set to Yes or No" );
+					ShowContinueError( ExchCond( ExchNum ).Name + " must be set to Yes or No" );
 					ErrorsFound = true;
 				}
 			}
@@ -478,7 +477,7 @@ namespace HeatRecovery {
 			} else if ( SameString( cAlphaArgs( 8 ), "Rotary" ) ) {
 				ExchCond( ExchNum ).ExchConfigNum = Rotary;
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + " configuration not found= " + trim( cAlphaArgs( 8 ) ) );
+				ShowSevereError( cCurrentModuleObject + " configuration not found= " + cAlphaArgs( 8 ) );
 				ShowContinueError( "HX configuration must be either Plate or Rotary" );
 				ErrorsFound = true;
 			}
@@ -489,7 +488,7 @@ namespace HeatRecovery {
 				if ( ! SameString( ExchCond( ExchNum ).FrostControlType, "ExhaustOnly" ) ) {
 					if ( ! SameString( ExchCond( ExchNum ).FrostControlType, "ExhaustAirRecirculation" ) ) {
 						if ( ! SameString( ExchCond( ExchNum ).FrostControlType, "MinimumExhaustTemperature" ) ) {
-							ShowSevereError( "Invalid Frost Control method for " + trim( ExchCond( ExchNum ).Name ) + " =  " + trim( cAlphaArgs( 9 ) ) );
+							ShowSevereError( "Invalid Frost Control method for " + ExchCond( ExchNum ).Name + " =  " + cAlphaArgs( 9 ) );
 							ErrorsFound = true;
 						}
 					}
@@ -502,7 +501,7 @@ namespace HeatRecovery {
 				ExchCond( ExchNum ).RateofDefrostTimeIncrease = rNumericArgs( 13 );
 			}
 
-			{ auto const SELECT_CASE_var( trim( cAlphaArgs( 10 ) ) );
+			{ auto const SELECT_CASE_var( cAlphaArgs( 10 ) );
 			if ( SELECT_CASE_var == "YES" ) {
 				ExchCond( ExchNum ).EconoLockOut = EconoLockOut_Yes;
 			} else if ( SELECT_CASE_var == "NO" ) {
@@ -511,7 +510,7 @@ namespace HeatRecovery {
 				if ( lAlphaFieldBlanks( 10 ) ) {
 					ExchCond( ExchNum ).EconoLockOut = EconoLockOut_Yes;
 				} else {
-					ShowSevereError( trim( cCurrentModuleObject ) + ": incorrect econo lockout: " + trim( cAlphaArgs( 10 ) ) );
+					ShowSevereError( cCurrentModuleObject + ": incorrect econo lockout: " + cAlphaArgs( 10 ) );
 					ErrorsFound = true;
 				}
 			}}
@@ -526,7 +525,7 @@ namespace HeatRecovery {
 			ExchNum = ExchIndex + NumAirToAirPlateExchs + NumAirToAirGenericExchs;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ExchCond.Name(), ExchNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ExchCond.Name(), ExchNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -538,18 +537,18 @@ namespace HeatRecovery {
 			} else {
 				ExchCond( ExchNum ).SchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 				if ( ExchCond( ExchNum ).SchedPtr == 0 ) {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + ": invalid " + trim( cAlphaFieldNames( 2 ) ) + " entered =" + trim( cAlphaArgs( 2 ) ) + " for " + trim( cAlphaFieldNames( 1 ) ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) + " entered =" + cAlphaArgs( 2 ) + " for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 			}
 			// desiccant HX's usually refer to process and regeneration air streams
 			// In this module, Sup = Regeneration nodes and Sec = Process nodes
 			// regeneration air inlet and outlet nodes
-			ExchCond( ExchNum ).SupInletNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			ExchCond( ExchNum ).SupOutletNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			ExchCond( ExchNum ).SupInletNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			ExchCond( ExchNum ).SupOutletNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 			// process air inlet and outlet nodes
-			ExchCond( ExchNum ).SecInletNode = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
-			ExchCond( ExchNum ).SecOutletNode = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+			ExchCond( ExchNum ).SecInletNode = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+			ExchCond( ExchNum ).SecOutletNode = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 
 			// Set up the component set for the process side of the HX (Sec = Process)
 			TestCompSet( cHXTypes( ExchCond( ExchNum ).ExchTypeNum ), ExchCond( ExchNum ).Name, NodeID( ExchCond( ExchNum ).SecInletNode ), NodeID( ExchCond( ExchNum ).SecOutletNode ), "Process Air Nodes" );
@@ -558,15 +557,15 @@ namespace HeatRecovery {
 			if ( SameString( HeatExchPerfType, "HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1" ) ) {
 				ExchCond( ExchNum ).HeatExchPerfTypeNum = BALANCEDHX_PERFDATATYPE1;
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( ExchCond( ExchNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + ExchCond( ExchNum ).Name + "\"" );
 				ShowContinueError( "Invalid performance data type selected." );
-				ShowContinueError( "...performance data type selected = " + trim( HeatExchPerfType ) );
+				ShowContinueError( "...performance data type selected = " + HeatExchPerfType );
 				ErrorsFound = true;
 			}
 
 			ExchCond( ExchNum ).HeatExchPerfName = cAlphaArgs( 8 );
 
-			{ auto const SELECT_CASE_var( trim( cAlphaArgs( 9 ) ) );
+			{ auto const SELECT_CASE_var( cAlphaArgs( 9 ) );
 			if ( SELECT_CASE_var == "YES" ) {
 				ExchCond( ExchNum ).EconoLockOut = EconoLockOut_Yes;
 			} else if ( SELECT_CASE_var == "NO" ) {
@@ -575,7 +574,7 @@ namespace HeatRecovery {
 				if ( lAlphaFieldBlanks( 9 ) ) {
 					ExchCond( ExchNum ).EconoLockOut = EconoLockOut_No;
 				} else {
-					ShowSevereError( trim( cCurrentModuleObject ) + ": incorrect econo lockout: " + trim( cAlphaArgs( 9 ) ) );
+					ShowSevereError( cCurrentModuleObject + ": incorrect econo lockout: " + cAlphaArgs( 9 ) );
 					ErrorsFound = true;
 				}
 			}}
@@ -590,7 +589,7 @@ namespace HeatRecovery {
 			PerfDataNum = PerfDataIndex;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), BalDesDehumPerfData.Name(), PerfDataNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), BalDesDehumPerfData.Name(), PerfDataNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -600,7 +599,7 @@ namespace HeatRecovery {
 			BalDesDehumPerfData( PerfDataNum ).NomSupAirVolFlow = rNumericArgs( 1 );
 			// check validity
 			if ( BalDesDehumPerfData( PerfDataNum ).NomSupAirVolFlow <= 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Nominal air flow rate must be greater than zero." );
 				ShowContinueError( "... value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).NomSupAirVolFlow, 6 ) );
 				ErrorsFound = true;
@@ -609,7 +608,7 @@ namespace HeatRecovery {
 			BalDesDehumPerfData( PerfDataNum ).NomProcAirFaceVel = rNumericArgs( 2 );
 			// check validity
 			if ( BalDesDehumPerfData( PerfDataNum ).NomProcAirFaceVel <= 0.0 || BalDesDehumPerfData( PerfDataNum ).NomProcAirFaceVel > 6.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Nominal air face velocity cannot be less than or equal to zero or greater than 6 m/s." );
 				ShowContinueError( "... value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).NomProcAirFaceVel, 6 ) );
 				ErrorsFound = true;
@@ -617,7 +616,7 @@ namespace HeatRecovery {
 			BalDesDehumPerfData( PerfDataNum ).NomElecPower = rNumericArgs( 3 );
 			// check validity
 			if ( BalDesDehumPerfData( PerfDataNum ).NomElecPower < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Nominal electric power cannot be less than zero." );
 				ShowContinueError( "... value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).NomElecPower, 6 ) );
 				ErrorsFound = true;
@@ -637,7 +636,7 @@ namespace HeatRecovery {
 			BalDesDehumPerfData( PerfDataNum ).T_MinRegenAirInHumRat = rNumericArgs( 12 );
 			BalDesDehumPerfData( PerfDataNum ).T_MaxRegenAirInHumRat = rNumericArgs( 13 );
 			if ( BalDesDehumPerfData( PerfDataNum ).T_MinRegenAirInHumRat >= BalDesDehumPerfData( PerfDataNum ).T_MaxRegenAirInHumRat ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in min/max boundary for the regen outlet air temperature equation." );
 				ShowContinueError( "... the minimum value of regeneration inlet air humidity ratio must be less than the maximum." );
 				ShowContinueError( "... minimum value entered by user = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).T_MinRegenAirInHumRat, 6 ) );
@@ -645,14 +644,14 @@ namespace HeatRecovery {
 				ErrorsFound = true;
 			}
 			if ( BalDesDehumPerfData( PerfDataNum ).T_MinRegenAirInHumRat < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in min boundary for the regen outlet air temperature equation." );
 				ShowContinueError( "... the minimum value of regeneration inlet air humidity ratio must be greater than" " or equal to 0." );
 				ShowContinueError( "... minimum value entered by user = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).T_MinRegenAirInHumRat, 6 ) );
 				ErrorsFound = true;
 			}
 			if ( BalDesDehumPerfData( PerfDataNum ).T_MaxRegenAirInHumRat > 1.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in max boundary for the regen outlet air temperature equation." );
 				ShowContinueError( "... the maximum value of regeneration inlet air humidity ratio must be less than or equal to 1." );
 				ShowContinueError( "... maximum value entered by user = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).T_MaxRegenAirInHumRat, 6 ) );
@@ -662,7 +661,7 @@ namespace HeatRecovery {
 			BalDesDehumPerfData( PerfDataNum ).T_MinRegenAirInTemp = rNumericArgs( 14 );
 			BalDesDehumPerfData( PerfDataNum ).T_MaxRegenAirInTemp = rNumericArgs( 15 );
 			if ( BalDesDehumPerfData( PerfDataNum ).T_MinRegenAirInTemp >= BalDesDehumPerfData( PerfDataNum ).T_MaxRegenAirInTemp ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in min/max boundary for the regen outlet air temperature equation." );
 				ShowContinueError( "... the minimum value of regeneration inlet air temperature must be less than the maximum." );
 				ShowContinueError( "... minimum value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).T_MinRegenAirInTemp, 6 ) );
@@ -673,7 +672,7 @@ namespace HeatRecovery {
 			BalDesDehumPerfData( PerfDataNum ).T_MinProcAirInHumRat = rNumericArgs( 16 );
 			BalDesDehumPerfData( PerfDataNum ).T_MaxProcAirInHumRat = rNumericArgs( 17 );
 			if ( BalDesDehumPerfData( PerfDataNum ).T_MinProcAirInHumRat >= BalDesDehumPerfData( PerfDataNum ).T_MaxProcAirInHumRat ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in min/max boundary for the regen outlet air temperature equation." );
 				ShowContinueError( "... the minimum value of process inlet air humidity ratio must be less than the maximum." );
 				ShowContinueError( "... minimum value entered by user = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).T_MinProcAirInHumRat, 6 ) );
@@ -681,14 +680,14 @@ namespace HeatRecovery {
 				ErrorsFound = true;
 			}
 			if ( BalDesDehumPerfData( PerfDataNum ).T_MinProcAirInHumRat < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in min boundary for the regen outlet air temperature equation." );
 				ShowContinueError( "... the minimum value of process inlet air humidity ratio must be greater than or equal to 0." );
 				ShowContinueError( "... minimum value entered by user = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).T_MinProcAirInHumRat, 6 ) );
 				ErrorsFound = true;
 			}
 			if ( BalDesDehumPerfData( PerfDataNum ).T_MaxProcAirInHumRat > 1.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in max boundary for the regen outlet air temperature equation." );
 				ShowContinueError( "... the maximum value of process inlet air humidity ratio must be less than or equal to 1." );
 				ShowContinueError( "... maximum value entered by user = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).T_MaxProcAirInHumRat, 6 ) );
@@ -698,7 +697,7 @@ namespace HeatRecovery {
 			BalDesDehumPerfData( PerfDataNum ).T_MinProcAirInTemp = rNumericArgs( 18 );
 			BalDesDehumPerfData( PerfDataNum ).T_MaxProcAirInTemp = rNumericArgs( 19 );
 			if ( BalDesDehumPerfData( PerfDataNum ).T_MinProcAirInTemp >= BalDesDehumPerfData( PerfDataNum ).T_MaxProcAirInTemp ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in min/max boundary for the regen outlet air temperature equation." );
 				ShowContinueError( "... the minimum value of process inlet air temperature must be less than the maximum." );
 				ShowContinueError( "... minimum value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).T_MinProcAirInTemp, 6 ) );
@@ -709,7 +708,7 @@ namespace HeatRecovery {
 			BalDesDehumPerfData( PerfDataNum ).T_MinFaceVel = rNumericArgs( 20 );
 			BalDesDehumPerfData( PerfDataNum ).T_MaxFaceVel = rNumericArgs( 21 );
 			if ( BalDesDehumPerfData( PerfDataNum ).T_MinFaceVel >= BalDesDehumPerfData( PerfDataNum ).T_MaxFaceVel ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in min/max boundary for the regen outlet air temperature equation." );
 				ShowContinueError( "... the minimum value of regen air velocity must be less than the maximum." );
 				ShowContinueError( "... minimum value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).T_MinFaceVel, 6 ) );
@@ -720,7 +719,7 @@ namespace HeatRecovery {
 			BalDesDehumPerfData( PerfDataNum ).MinRegenAirOutTemp = rNumericArgs( 22 );
 			BalDesDehumPerfData( PerfDataNum ).MaxRegenAirOutTemp = rNumericArgs( 23 );
 			if ( BalDesDehumPerfData( PerfDataNum ).MinRegenAirOutTemp >= BalDesDehumPerfData( PerfDataNum ).MaxRegenAirOutTemp ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in min/max boundary for the regen outlet air temperature equation." );
 				ShowContinueError( "... the minimum value of regen outlet air temperature must be less than the maximum." );
 				ShowContinueError( "... minimum value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).MinRegenAirOutTemp, 6 ) );
@@ -731,7 +730,7 @@ namespace HeatRecovery {
 			BalDesDehumPerfData( PerfDataNum ).T_MinRegenAirInRelHum = rNumericArgs( 24 ) / 100.0;
 			BalDesDehumPerfData( PerfDataNum ).T_MaxRegenAirInRelHum = rNumericArgs( 25 ) / 100.0;
 			if ( BalDesDehumPerfData( PerfDataNum ).T_MinRegenAirInRelHum >= BalDesDehumPerfData( PerfDataNum ).T_MaxRegenAirInRelHum ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in min/max boundary for the regen outlet air temperature equation." );
 				ShowContinueError( "... the minimum value of regen inlet air relative humidity must be less than the maximum." );
 				ShowContinueError( "... minimum value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).T_MinRegenAirInRelHum * 100.0, 6 ) );
@@ -739,14 +738,14 @@ namespace HeatRecovery {
 				ErrorsFound = true;
 			}
 			if ( BalDesDehumPerfData( PerfDataNum ).T_MinRegenAirInRelHum < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in min boundary for the regen outlet air temperature equation." );
 				ShowContinueError( "... the minimum value of regen inlet air relative humidity must be greater than or equal to 0." );
 				ShowContinueError( "... minimum value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).T_MinRegenAirInRelHum * 100.0, 6 ) );
 				ErrorsFound = true;
 			}
 			if ( BalDesDehumPerfData( PerfDataNum ).T_MaxRegenAirInRelHum > 1.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in max boundary for the regen outlet air temperature equation." );
 				ShowContinueError( "... the maximum value of regen inlet air relative humidity must be less than or equal to 100." );
 				ShowContinueError( "... maximum value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).T_MaxRegenAirInRelHum * 100.0, 6 ) );
@@ -756,7 +755,7 @@ namespace HeatRecovery {
 			BalDesDehumPerfData( PerfDataNum ).T_MinProcAirInRelHum = rNumericArgs( 26 ) / 100.0;
 			BalDesDehumPerfData( PerfDataNum ).T_MaxProcAirInRelHum = rNumericArgs( 27 ) / 100.0;
 			if ( BalDesDehumPerfData( PerfDataNum ).T_MinProcAirInRelHum >= BalDesDehumPerfData( PerfDataNum ).T_MaxProcAirInRelHum ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in min/max boundary for the regen outlet air temperature equation." );
 				ShowContinueError( "... the minimum value of process inlet air relative humidity must be less than the maximum." );
 				ShowContinueError( "... minimum value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).T_MinProcAirInRelHum * 100.0, 6 ) );
@@ -764,14 +763,14 @@ namespace HeatRecovery {
 				ErrorsFound = true;
 			}
 			if ( BalDesDehumPerfData( PerfDataNum ).T_MinProcAirInRelHum < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in min boundary for the regen outlet air temperature equation." );
 				ShowContinueError( "... the minimum value of process inlet air relative humidity must be greater than or equal to 0." );
 				ShowContinueError( "... minimum value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).T_MinProcAirInRelHum * 100.0, 6 ) );
 				ErrorsFound = true;
 			}
 			if ( BalDesDehumPerfData( PerfDataNum ).T_MaxProcAirInRelHum > 1.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in max boundary for the regen outlet air temperature equation." );
 				ShowContinueError( "... the maximum value of process inlet air relative humidity must be less than or equal to 100." );
 				ShowContinueError( "... maximum value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).T_MaxProcAirInRelHum * 100.0, 6 ) );
@@ -792,7 +791,7 @@ namespace HeatRecovery {
 			BalDesDehumPerfData( PerfDataNum ).H_MinRegenAirInHumRat = rNumericArgs( 36 );
 			BalDesDehumPerfData( PerfDataNum ).H_MaxRegenAirInHumRat = rNumericArgs( 37 );
 			if ( BalDesDehumPerfData( PerfDataNum ).H_MinRegenAirInHumRat >= BalDesDehumPerfData( PerfDataNum ).H_MaxRegenAirInHumRat ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in min/max boundary for the regen outlet air humidity ratio equation." );
 				ShowContinueError( "... the minimum value of regeneration inlet air humidity ratio must be less than the maximum." );
 				ShowContinueError( "... minimum value entered by user = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).H_MinRegenAirInHumRat, 6 ) );
@@ -800,14 +799,14 @@ namespace HeatRecovery {
 				ErrorsFound = true;
 			}
 			if ( BalDesDehumPerfData( PerfDataNum ).H_MinRegenAirInHumRat < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in min boundary for the regen outlet air humidity ratio equation." );
 				ShowContinueError( "... the minimum value of regeneration inlet air humidity ratio must be greater than" " or equal to 0." );
 				ShowContinueError( "... minimum value entered by user = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).H_MinRegenAirInHumRat, 6 ) );
 				ErrorsFound = true;
 			}
 			if ( BalDesDehumPerfData( PerfDataNum ).H_MaxRegenAirInHumRat > 1.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in max boundary for the regen outlet air humidity ratio equation." );
 				ShowContinueError( "... the maximum value of regeneration inlet air humidity ratio must be less than or equal to 1." );
 				ShowContinueError( "... maximum value entered by user = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).H_MaxRegenAirInHumRat, 6 ) );
@@ -817,7 +816,7 @@ namespace HeatRecovery {
 			BalDesDehumPerfData( PerfDataNum ).H_MinRegenAirInTemp = rNumericArgs( 38 );
 			BalDesDehumPerfData( PerfDataNum ).H_MaxRegenAirInTemp = rNumericArgs( 39 );
 			if ( BalDesDehumPerfData( PerfDataNum ).H_MinRegenAirInTemp >= BalDesDehumPerfData( PerfDataNum ).H_MaxRegenAirInTemp ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in min/max boundary for the regen outlet air humidity ratio equation." );
 				ShowContinueError( "... the minimum value of regeneration inlet air temperature must be less than the maximum." );
 				ShowContinueError( "... minimum value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).H_MinRegenAirInTemp, 6 ) );
@@ -828,7 +827,7 @@ namespace HeatRecovery {
 			BalDesDehumPerfData( PerfDataNum ).H_MinProcAirInHumRat = rNumericArgs( 40 );
 			BalDesDehumPerfData( PerfDataNum ).H_MaxProcAirInHumRat = rNumericArgs( 41 );
 			if ( BalDesDehumPerfData( PerfDataNum ).H_MinProcAirInHumRat >= BalDesDehumPerfData( PerfDataNum ).H_MaxProcAirInHumRat ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in min/max boundary for the regen outlet air humidity ratio equation." );
 				ShowContinueError( "... the minimum value of process inlet air humidity ratio must be less than the maximum." );
 				ShowContinueError( "... minimum value entered by user = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).H_MinProcAirInHumRat, 6 ) );
@@ -836,14 +835,14 @@ namespace HeatRecovery {
 				ErrorsFound = true;
 			}
 			if ( BalDesDehumPerfData( PerfDataNum ).H_MinProcAirInHumRat < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in min boundary for the regen outlet air humidity ratio equation." );
 				ShowContinueError( "... the minimum value of process inlet air humidity ratio must be greater than or equal to 0." );
 				ShowContinueError( "... minimum value entered by user = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).H_MinProcAirInHumRat, 6 ) );
 				ErrorsFound = true;
 			}
 			if ( BalDesDehumPerfData( PerfDataNum ).H_MaxProcAirInHumRat > 1.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in max boundary for the regen outlet air humidity ratio equation." );
 				ShowContinueError( "... the maximum value of process inlet air humidity ratio must be less than or equal to 1." );
 				ShowContinueError( "... maximum value entered by user = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).H_MaxProcAirInHumRat, 6 ) );
@@ -853,7 +852,7 @@ namespace HeatRecovery {
 			BalDesDehumPerfData( PerfDataNum ).H_MinProcAirInTemp = rNumericArgs( 42 );
 			BalDesDehumPerfData( PerfDataNum ).H_MaxProcAirInTemp = rNumericArgs( 43 );
 			if ( BalDesDehumPerfData( PerfDataNum ).H_MinProcAirInTemp >= BalDesDehumPerfData( PerfDataNum ).H_MaxProcAirInTemp ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in min/max boundary for the regen outlet air humidity ratio equation." );
 				ShowContinueError( "... the minimum value of process inlet air temperature must be less than the maximum." );
 				ShowContinueError( "... minimum value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).H_MinProcAirInTemp, 6 ) );
@@ -864,7 +863,7 @@ namespace HeatRecovery {
 			BalDesDehumPerfData( PerfDataNum ).H_MinFaceVel = rNumericArgs( 44 );
 			BalDesDehumPerfData( PerfDataNum ).H_MaxFaceVel = rNumericArgs( 45 );
 			if ( BalDesDehumPerfData( PerfDataNum ).H_MinFaceVel >= BalDesDehumPerfData( PerfDataNum ).H_MaxFaceVel ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in min/max boundary for the regen outlet air humidity ratio equation." );
 				ShowContinueError( "... the minimum value of regen air velocity must be less than the maximum." );
 				ShowContinueError( "... minimum value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).H_MinFaceVel, 6 ) );
@@ -875,7 +874,7 @@ namespace HeatRecovery {
 			BalDesDehumPerfData( PerfDataNum ).MinRegenAirOutHumRat = rNumericArgs( 46 );
 			BalDesDehumPerfData( PerfDataNum ).MaxRegenAirOutHumRat = rNumericArgs( 47 );
 			if ( BalDesDehumPerfData( PerfDataNum ).MinRegenAirOutHumRat >= BalDesDehumPerfData( PerfDataNum ).MaxRegenAirOutHumRat ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in min/max boundary for the regen outlet air humidity ratio equation." );
 				ShowContinueError( "... the minimum value of regen outlet air humidity ratio must be less than the maximum." );
 				ShowContinueError( "... minimum value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).MinRegenAirOutHumRat, 6 ) );
@@ -883,14 +882,14 @@ namespace HeatRecovery {
 				ErrorsFound = true;
 			}
 			if ( BalDesDehumPerfData( PerfDataNum ).MinRegenAirOutHumRat < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in min boundary for the regen outlet air humidity ratio equation." );
 				ShowContinueError( "... the minimum value of regen outlet air humidity ratio must be greater than or equal to 0." );
 				ShowContinueError( "... minimum value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).MinRegenAirOutHumRat, 6 ) );
 				ErrorsFound = true;
 			}
 			if ( BalDesDehumPerfData( PerfDataNum ).MaxRegenAirOutHumRat > 1.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in max boundary for the regen outlet air humidity ratio equation." );
 				ShowContinueError( "... the maximum value of regen outlet air humidity ratio must be less or equal to 1." );
 				ShowContinueError( "... maximum value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).MaxRegenAirOutHumRat, 6 ) );
@@ -900,7 +899,7 @@ namespace HeatRecovery {
 			BalDesDehumPerfData( PerfDataNum ).H_MinRegenAirInRelHum = rNumericArgs( 48 ) / 100.0;
 			BalDesDehumPerfData( PerfDataNum ).H_MaxRegenAirInRelHum = rNumericArgs( 49 ) / 100.0;
 			if ( BalDesDehumPerfData( PerfDataNum ).H_MinRegenAirInRelHum >= BalDesDehumPerfData( PerfDataNum ).H_MaxRegenAirInRelHum ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in min/max boundary for the regen outlet air humidity ratio equation." );
 				ShowContinueError( "... the minimum value of regen inlet air relative humidity must be less than the maximum." );
 				ShowContinueError( "... minimum value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).H_MinRegenAirInRelHum * 100.0, 6 ) );
@@ -908,14 +907,14 @@ namespace HeatRecovery {
 				ErrorsFound = true;
 			}
 			if ( BalDesDehumPerfData( PerfDataNum ).H_MinRegenAirInRelHum < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in min boundary for the regen outlet air humidity ratio equation." );
 				ShowContinueError( "... the minimum value of regen inlet air relative humidity must be greater than or equal to 0." );
 				ShowContinueError( "... minimum value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).H_MinRegenAirInRelHum * 100.0, 6 ) );
 				ErrorsFound = true;
 			}
 			if ( BalDesDehumPerfData( PerfDataNum ).H_MaxRegenAirInRelHum > 1.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in max boundary for the regen outlet air humidity ratio equation." );
 				ShowContinueError( "... the maximum value of regen inlet air relative humidity must be less or equal to 100." );
 				ShowContinueError( "... maximum value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).H_MaxRegenAirInRelHum * 100.0, 6 ) );
@@ -925,7 +924,7 @@ namespace HeatRecovery {
 			BalDesDehumPerfData( PerfDataNum ).H_MinProcAirInRelHum = rNumericArgs( 50 ) / 100.0;
 			BalDesDehumPerfData( PerfDataNum ).H_MaxProcAirInRelHum = rNumericArgs( 51 ) / 100.0;
 			if ( BalDesDehumPerfData( PerfDataNum ).H_MinProcAirInRelHum >= BalDesDehumPerfData( PerfDataNum ).H_MaxProcAirInRelHum ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in min/max boundary for the regen outlet air humidity ratio equation." );
 				ShowContinueError( "... the minimum value of process inlet air relative humidity must be less than the maximum." );
 				ShowContinueError( "... minimum value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).H_MinProcAirInRelHum * 100.0, 6 ) );
@@ -933,14 +932,14 @@ namespace HeatRecovery {
 				ErrorsFound = true;
 			}
 			if ( BalDesDehumPerfData( PerfDataNum ).H_MinProcAirInRelHum < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in min boundary for the regen outlet air humidity ratio equation." );
 				ShowContinueError( "... the minimum value of process inlet air relative humidity must be greater than or equal to 0." );
 				ShowContinueError( "... minimum value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).H_MinProcAirInRelHum * 100.0, 6 ) );
 				ErrorsFound = true;
 			}
 			if ( BalDesDehumPerfData( PerfDataNum ).H_MaxProcAirInRelHum > 1.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + " \"" + trim( BalDesDehumPerfData( PerfDataNum ).Name ) + "\"" );
+				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
 				ShowContinueError( "Error found in max boundary for the regen outlet air humidity ratio equation." );
 				ShowContinueError( "... the maximum value of process inlet air relative humidity must be less than or equal to 100." );
 				ShowContinueError( "... maximum value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).H_MaxProcAirInRelHum * 100.0, 6 ) );
@@ -960,8 +959,8 @@ namespace HeatRecovery {
 				}
 			}
 			if ( ExchCond( ExchNum ).PerfDataIndex == 0 ) {
-				ShowSevereError( trim( cHXTypes( ExchCond( ExchNum ).ExchTypeNum ) ) + " \"" + trim( ExchCond( ExchNum ).Name ) + "\"" );
-				ShowContinueError( "... Performance data set not found = " + trim( ExchCond( ExchNum ).HeatExchPerfName ) );
+				ShowSevereError( cHXTypes( ExchCond( ExchNum ).ExchTypeNum ) + " \"" + ExchCond( ExchNum ).Name + "\"" );
+				ShowContinueError( "... Performance data set not found = " + ExchCond( ExchNum ).HeatExchPerfName );
 				ErrorsFound = true;
 			} else {
 				if ( ! ErrorsFound ) {
@@ -1129,51 +1128,51 @@ namespace HeatRecovery {
 					if ( ErrStat == 1 ) {
 
 						FatalError = true;
-						ShowSevereError( "In the HeatExchanger:AirToAir:FlatPlate component " + trim( ExchCond( ExIndex ).Name ) );
+						ShowSevereError( "In the HeatExchanger:AirToAir:FlatPlate component " + ExchCond( ExIndex ).Name );
 						ShowContinueError( "  the mass flow ratio is out of bounds" );
-						ShowContinueError( "The mass flow ratio is (Min_Mass_Flow_Rate / Max_Mass_Flow_Rate) = " + trim( RoundSigDigits( Z, 2 ) ) );
+						ShowContinueError( "The mass flow ratio is (Min_Mass_Flow_Rate / Max_Mass_Flow_Rate) = " + RoundSigDigits( Z, 2 ) );
 						ShowContinueError( "The mass flow ratio should be >= 0.0 and <= 1.0" );
-						ShowContinueError( "Min_Mass_Flow_Rate = " + trim( RoundSigDigits( RhoAir, 2 ) ) + " [air density] * " + trim( RoundSigDigits( min( ExchCond( ExIndex ).NomSupAirVolFlow, ExchCond( ExIndex ).NomSecAirVolFlow ), 1 ) ) + " [Min_Vol_Flow_Rate]" );
-						ShowContinueError( "Max_Mass_Flow_Rate = " + trim( RoundSigDigits( RhoAir, 2 ) ) + " [air density] * " + trim( RoundSigDigits( max( ExchCond( ExIndex ).NomSupAirVolFlow, ExchCond( ExIndex ).NomSecAirVolFlow ), 1 ) ) + " [Max_Vol_Flow_Rate]" );
+						ShowContinueError( "Min_Mass_Flow_Rate = " + RoundSigDigits( RhoAir, 2 ) + " [air density] * " + RoundSigDigits( min( ExchCond( ExIndex ).NomSupAirVolFlow, ExchCond( ExIndex ).NomSecAirVolFlow ), 1 ) + " [Min_Vol_Flow_Rate]" );
+						ShowContinueError( "Max_Mass_Flow_Rate = " + RoundSigDigits( RhoAir, 2 ) + " [air density] * " + RoundSigDigits( max( ExchCond( ExIndex ).NomSupAirVolFlow, ExchCond( ExIndex ).NomSecAirVolFlow ), 1 ) + " [Max_Vol_Flow_Rate]" );
 					} else if ( ErrStat == 2 ) {
 						FatalError = true;
-						ShowSevereError( "In the HeatExchanger:AirToAir:FlatPlate component " + trim( ExchCond( ExIndex ).Name ) );
+						ShowSevereError( "In the HeatExchanger:AirToAir:FlatPlate component " + ExchCond( ExIndex ).Name );
 						ShowContinueError( "  the calculated nominal effectiveness is out of bounds" );
-						ShowContinueError( "The effectiveness is " + trim( RoundSigDigits( Eps0, 3 ) ) );
-						ShowContinueError( "The effectiveness should be >= 0.0 and <= " + trim( RoundSigDigits( 1.0 / ( 1.0 + Z ), 3 ) ) );
+						ShowContinueError( "The effectiveness is " + RoundSigDigits( Eps0, 3 ) );
+						ShowContinueError( "The effectiveness should be >= 0.0 and <= " + RoundSigDigits( 1.0 / ( 1.0 + Z ), 3 ) );
 						ShowContinueError( "Eff = (Nom_Sup_Mass_Flow_Rate/Min_Mass_Flow_Rate)*(T_nom_sup_out-T_nom_sup_in)" "/(T_nom_sec_in-T_nom_sup_in)" );
 						ShowContinueError( "The temperatures are user inputs. The mass flow rates are user input volume flow rates" );
-						ShowContinueError( "  times the density of air [" + trim( RoundSigDigits( RhoAir, 2 ) ) + " kg/m3]" );
+						ShowContinueError( "  times the density of air [" + RoundSigDigits( RhoAir, 2 ) + " kg/m3]" );
 						ShowContinueError( "Change these inputs to obtain a physically realizable heat exchanger effectiveness" );
 					} else if ( ErrStat == 3 ) {
 						FatalError = true;
-						ShowSevereError( "In the HeatExchanger:AirToAir:FlatPlate component " + trim( ExchCond( ExIndex ).Name ) );
+						ShowSevereError( "In the HeatExchanger:AirToAir:FlatPlate component " + ExchCond( ExIndex ).Name );
 						ShowContinueError( "  the calculated nominal effectiveness is out of bounds" );
-						ShowContinueError( "The effectiveness is " + trim( RoundSigDigits( Eps0, 3 ) ) );
-						ShowContinueError( "The effectiveness should be >= 0.0 and <= " + trim( RoundSigDigits( ( 1.0 - std::exp( -Z ) ) / Z, 3 ) ) );
+						ShowContinueError( "The effectiveness is " + RoundSigDigits( Eps0, 3 ) );
+						ShowContinueError( "The effectiveness should be >= 0.0 and <= " + RoundSigDigits( ( 1.0 - std::exp( -Z ) ) / Z, 3 ) );
 						ShowContinueError( "Eff = (Nom_Sup_Mass_Flow_Rate/Min_Mass_Flow_Rate)*(T_nom_sup_out-T_nom_sup_in)" "/(T_nom_sec_in-T_nom_sup_in)" );
 						ShowContinueError( "The temperatures are user inputs. The mass flow rates are user input volume flow rates" );
-						ShowContinueError( "  times the density of air [" + trim( RoundSigDigits( RhoAir, 2 ) ) + " kg/m3]" );
+						ShowContinueError( "  times the density of air [" + RoundSigDigits( RhoAir, 2 ) + " kg/m3]" );
 						ShowContinueError( "Change these inputs to obtain a physically realizable heat exchanger effectiveness" );
 					} else if ( ErrStat == 4 ) {
 						FatalError = true;
-						ShowSevereError( "In the HeatExchanger:AirToAir:FlatPlate component " + trim( ExchCond( ExIndex ).Name ) );
+						ShowSevereError( "In the HeatExchanger:AirToAir:FlatPlate component " + ExchCond( ExIndex ).Name );
 						ShowContinueError( "  the quantity Eff_nom*(Min_Mass_Flow_Rate / Max_Mass_Flow_Rate) is out of bounds" );
-						ShowContinueError( "The value is " + trim( RoundSigDigits( Eps0 * Z, 3 ) ) );
-						ShowContinueError( "The value should be >= 0.0 and <= " + trim( RoundSigDigits( 1.0 - std::exp( Z * ( SMALL - 1.0 ) ), 3 ) ) );
+						ShowContinueError( "The value is " + RoundSigDigits( Eps0 * Z, 3 ) );
+						ShowContinueError( "The value should be >= 0.0 and <= " + RoundSigDigits( 1.0 - std::exp( Z * ( SMALL - 1.0 ) ), 3 ) );
 						ShowContinueError( "Eff_nom = (Nom_Sup_Mass_Flow_Rate/Min_Mass_Flow_Rate) * (T_nom_sup_out - T_nom_sup_in)" "/(T_nom_sec_in - T_nom_sup_in)" );
 						ShowContinueError( "The temperatures are user inputs. The mass flow rates are user input volume flow rates" );
-						ShowContinueError( "  times the density of air [" + trim( RoundSigDigits( RhoAir, 2 ) ) + " kg/m3]" );
+						ShowContinueError( "  times the density of air [" + RoundSigDigits( RhoAir, 2 ) + " kg/m3]" );
 						ShowContinueError( "Change these inputs to obtain a physically realizable product of effectiveness" "times min/max mass ratio for this heat exchanger" );
 					} else if ( ErrStat == 5 ) {
 						FatalError = true;
-						ShowSevereError( "In the HeatExchanger:AirToAir:FlatPlate component " + trim( ExchCond( ExIndex ).Name ) );
+						ShowSevereError( "In the HeatExchanger:AirToAir:FlatPlate component " + ExchCond( ExIndex ).Name );
 						ShowContinueError( "  the calculated nominal effectiveness is out of bounds" );
-						ShowContinueError( "The effectiveness is " + trim( RoundSigDigits( Eps0, 3 ) ) );
+						ShowContinueError( "The effectiveness is " + RoundSigDigits( Eps0, 3 ) );
 						ShowContinueError( "The effectiveness should be >= 0.0 and <= 1.0" );
 						ShowContinueError( "Eff = (Nom_Sup_Mass_Flow_Rate/Min_Mass_Flow_Rate)*(T_nom_sup_out-T_nom_sup_in)" "/(T_nom_sec_in-T_nom_sup_in)" );
 						ShowContinueError( "The temperatures are user inputs. The mass flow rates are user input volume flow rates" );
-						ShowContinueError( "  times the density of air [" + trim( RoundSigDigits( RhoAir, 2 ) ) + " kg/m3]" );
+						ShowContinueError( "  times the density of air [" + RoundSigDigits( RhoAir, 2 ) + " kg/m3]" );
 						ShowContinueError( "Change these inputs to obtain a physically realizable heat exchanger effectiveness" );
 
 					}
@@ -1208,14 +1207,14 @@ namespace HeatRecovery {
 					if ( ExchCond( ExIndex ).SupOutletNode > 0 && ExchCond( ExIndex ).ControlToTemperatureSetPoint ) {
 						if ( Node( ExchCond( ExIndex ).SupOutletNode ).TempSetPoint == SensedNodeFlagValue ) {
 							if ( ! AnyEnergyManagementSystemInModel ) {
-								ShowSevereError( "Missing temperature setpoint for " + trim( cHXTypes( ExchCond( ExIndex ).ExchTypeNum ) ) + " \"" + trim( ExchCond( ExIndex ).Name ) + "\" :" );
+								ShowSevereError( "Missing temperature setpoint for " + cHXTypes( ExchCond( ExIndex ).ExchTypeNum ) + " \"" + ExchCond( ExIndex ).Name + "\" :" );
 								ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the supply air outlet node " "of the Heat Exchanger." );
 								ShowFatalError( " Previous condition causes program termination." );
 							} else {
 								// need call to EMS to check node
 								CheckIfNodeSetPointManagedByEMS( ExchCond( ExIndex ).SupOutletNode, iTemperatureSetPoint, FatalError );
 								if ( FatalError ) {
-									ShowSevereError( "Missing temperature setpoint for " + trim( cHXTypes( ExchCond( ExIndex ).ExchTypeNum ) ) + " \"" + trim( ExchCond( ExIndex ).Name ) + "\" :" );
+									ShowSevereError( "Missing temperature setpoint for " + cHXTypes( ExchCond( ExIndex ).ExchTypeNum ) + " \"" + ExchCond( ExIndex ).Name + "\" :" );
 									ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the supply air outlet node " "of the Heat Exchanger." );
 									ShowContinueError( "  or use an EMS actuator to establish a setpoint at the supply air outlet node " "of the Heat Exchanger." );
 									ShowFatalError( " Previous condition causes program termination." );
@@ -1289,14 +1288,14 @@ namespace HeatRecovery {
 					if ( ! CalledFromParentObject ) {
 						if ( Node( ExchCond( ExchNum ).SecOutletNode ).HumRatMax == SensedNodeFlagValue ) {
 							if ( ! AnyEnergyManagementSystemInModel ) {
-								ShowWarningError( "Missing optional HumRatMax setpoint for " + trim( cHXTypes( ExchCond( ExchNum ).ExchTypeNum ) ) + " \"" + trim( ExchCond( ExchNum ).Name ) + "\"" );
+								ShowWarningError( "Missing optional HumRatMax setpoint for " + cHXTypes( ExchCond( ExchNum ).ExchTypeNum ) + " \"" + ExchCond( ExchNum ).Name + "\"" );
 								ShowContinueError( "...the simulation will continue without control of the desiccant heat exchanger to" " a maximum humidity ratio setpoint." );
 								ShowContinueError( "...use a Setpoint Manager to establish a setpoint at the process air outlet node " "of the desiccant Heat Exchanger if control is desired." );
 							} else {
 								// need call to EMS to check node
 								CheckIfNodeSetPointManagedByEMS( ExchCond( ExchNum ).SecOutletNode, iHumidityRatioMaxSetPoint, LocalWarningError );
 								if ( LocalWarningError ) {
-									ShowWarningError( "Missing optional HumRatMax setpoint for " + trim( cHXTypes( ExchCond( ExchNum ).ExchTypeNum ) ) + " \"" + trim( ExchCond( ExchNum ).Name ) + "\"" );
+									ShowWarningError( "Missing optional HumRatMax setpoint for " + cHXTypes( ExchCond( ExchNum ).ExchTypeNum ) + " \"" + ExchCond( ExchNum ).Name + "\"" );
 									ShowContinueError( "...the simulation will continue without control of the desiccant heat exchanger to" " a maximum humidity ratio setpoint." );
 									ShowContinueError( "...use a Setpoint Manager to establish a setpoint at the process air outlet node " "of the desiccant Heat Exchanger if control is desired." );
 									ShowContinueError( "...or use an EMS Actuator to establish a maximum humidity ratio setpoint at the " "process air outlet node of the desiccant Heat Exchanger if control is desired." );
@@ -1433,7 +1432,7 @@ namespace HeatRecovery {
 				// Generic HX will be turned off if nominal air flow rate is 0, even if simulated air flow through
 				// HX is greater than 0. Avoids a divide by 0 in Sub CalcAirToAirGenericHeatExch.
 				if ( ExchCond( ExchNum ).ExchTypeNum == HX_AIRTOAIR_GENERIC ) {
-					ShowWarningError( trim( cHXTypes( ExchCond( ExchNum ).ExchTypeNum ) ) + ": \"" + trim( ExchCond( ExchNum ).Name ) + "\"" );
+					ShowWarningError( cHXTypes( ExchCond( ExchNum ).ExchTypeNum ) + ": \"" + ExchCond( ExchNum ).Name + "\"" );
 					ShowContinueError( "... nominal supply air volume flow rate through the heat exchanger is sized to 0" ", see eio file for sizing results." );
 					ShowContinueError( "... HX will not be enabled and the simulation continues." );
 					ShowContinueError( "... To eliminate this warning, check sizing and HX inputs to correct HX sizing issue." );
@@ -1815,10 +1814,10 @@ namespace HeatRecovery {
 					if ( ( ( HXSupAirVolFlowRate / HXSecAirVolFlowRate ) > 2.0 ) || ( ( HXSecAirVolFlowRate / HXSupAirVolFlowRate ) > 2.0 ) ) {
 						++ExchCond( ExNum ).UnBalancedErrCount;
 						if ( ExchCond( ExNum ).UnBalancedErrCount <= 2 ) {
-							ShowSevereError( trim( cHXTypes( ExchCond( ExNum ).ExchTypeNum ) ) + ": \"" + trim( ExchCond( ExNum ).Name ) + "\" unbalanced air volume flow ratio through the heat exchanger is greater than 2:1." );
-							ShowContinueErrorTimeStamp( "...HX Supply air to Exhaust air flow ratio = " + trim( RoundSigDigits( HXSupAirVolFlowRate / HXSecAirVolFlowRate, 5 ) ) + "." );
+							ShowSevereError( cHXTypes( ExchCond( ExNum ).ExchTypeNum ) + ": \"" + ExchCond( ExNum ).Name + "\" unbalanced air volume flow ratio through the heat exchanger is greater than 2:1." );
+							ShowContinueErrorTimeStamp( "...HX Supply air to Exhaust air flow ratio = " + RoundSigDigits( HXSupAirVolFlowRate / HXSecAirVolFlowRate, 5 ) + '.' );
 						} else {
-							ShowRecurringWarningErrorAtEnd( trim( cHXTypes( ExchCond( ExNum ).ExchTypeNum ) ) + " \"" + trim( ExchCond( ExNum ).Name ) + "\":  Unbalanced air volume flow ratio exceeds " " 2:1 warning continues. HX flow ratio statistics follow.", ExchCond( ExNum ).UnBalancedErrIndex, HXSupAirVolFlowRate / HXSecAirVolFlowRate, HXSupAirVolFlowRate / HXSecAirVolFlowRate );
+							ShowRecurringWarningErrorAtEnd( cHXTypes( ExchCond( ExNum ).ExchTypeNum ) + " \"" + ExchCond( ExNum ).Name + "\":  Unbalanced air volume flow ratio exceeds " " 2:1 warning continues. HX flow ratio statistics follow.", ExchCond( ExNum ).UnBalancedErrIndex, HXSupAirVolFlowRate / HXSecAirVolFlowRate, HXSupAirVolFlowRate / HXSecAirVolFlowRate );
 						}
 					}
 				}
@@ -1831,11 +1830,11 @@ namespace HeatRecovery {
 				if ( ! WarmupFlag && ! FirstHVACIteration ) {
 					++ExchCond( ExNum ).LowFlowErrCount;
 					if ( ExchCond( ExNum ).LowFlowErrCount == 1 ) {
-						ShowWarningError( trim( cHXTypes( ExchCond( ExNum ).ExchTypeNum ) ) + " \"" + trim( ExchCond( ExNum ).Name ) + "\"" );
+						ShowWarningError( cHXTypes( ExchCond( ExNum ).ExchTypeNum ) + " \"" + ExchCond( ExNum ).Name + "\"" );
 						ShowContinueError( "Average air volume flow rate is <50% or >130% of the nominal HX supply air volume flow rate." );
-						ShowContinueErrorTimeStamp( "Air volume flow rate ratio = " + trim( RoundSigDigits( HXAirVolFlowRatio, 3 ) ) + "." );
+						ShowContinueErrorTimeStamp( "Air volume flow rate ratio = " + RoundSigDigits( HXAirVolFlowRatio, 3 ) + '.' );
 					} else {
-						ShowRecurringWarningErrorAtEnd( trim( cHXTypes( ExchCond( ExNum ).ExchTypeNum ) ) + " \"" + trim( ExchCond( ExNum ).Name ) + "\":  Average air volume flow rate is <50% or >130% warning continues. Air flow rate ratio statistics follow.", ExchCond( ExNum ).LowFlowErrIndex, HXAirVolFlowRatio, HXAirVolFlowRatio );
+						ShowRecurringWarningErrorAtEnd( cHXTypes( ExchCond( ExNum ).ExchTypeNum ) + " \"" + ExchCond( ExNum ).Name + "\":  Average air volume flow rate is <50% or >130% warning continues. Air flow rate ratio statistics follow.", ExchCond( ExNum ).LowFlowErrIndex, HXAirVolFlowRatio, HXAirVolFlowRatio );
 					}
 				}
 			}
@@ -2138,7 +2137,7 @@ namespace HeatRecovery {
 		Real64 MinHumRatNeeded; // minimum humidity ratio setpoint for balanced desiccant HX [kg/kg]
 		Real64 HXPartLoadRatio; // local heat exchanger part-load ratio
 		Real64 TestSaturationEnthalpy; // enthalpy used to test for regeneration outlet condition over saturation curve (J/kg)
-		static Fstring ThisSub( "CalcDesiccantBalancedHeatExch:  " ); // Used to pass to Psyc routines
+		static std::string ThisSub( "CalcDesiccantBalancedHeatExch:  " ); // Used to pass to Psyc routines
 		Real64 AverageMassFlowRate; // average of supply (regen) and secondary (process) mass flow rates [kg/s]
 		bool EconomizerActiveFlag; // local representing the economizer status when PRESENT
 		bool HighHumCtrlActiveFlag; // local representing high humidity control when PRESENT
@@ -2893,7 +2892,7 @@ namespace HeatRecovery {
 
 		// check input validity
 		if ( Z < 0.0 || Z > 1.0 ) {
-			ShowFatalError( "Variable Z (" + trim( RoundSigDigits( Z, 2 ) ) + ") out of range [0.0,1.0] in CalculateEpsFromNTUandZ" );
+			ShowFatalError( "Variable Z (" + RoundSigDigits( Z, 2 ) + ") out of range [0.0,1.0] in CalculateEpsFromNTUandZ" );
 		}
 
 		// effectiveness
@@ -2919,7 +2918,7 @@ namespace HeatRecovery {
 			} else if ( SELECT_CASE_var == Cross_Flow_Other ) { // CROSS FLOW, Cmax MIXED, Cmin UNMIXED
 				Eps = ( 1.0 - std::exp( -Z * ( 1.0 - std::exp( -NTU ) ) ) ) / Z;
 			} else {
-				ShowFatalError( "HeatRecovery: Illegal flow arrangement in CalculateEpsFromNTUandZ, Value=" + trim( RoundSigDigits( FlowArr ) ) );
+				ShowFatalError( "HeatRecovery: Illegal flow arrangement in CalculateEpsFromNTUandZ, Value=" + RoundSigDigits( FlowArr ) );
 			}}
 		}
 
@@ -3028,7 +3027,7 @@ namespace HeatRecovery {
 			} else if ( SELECT_CASE_var == Cross_Flow_Other ) { // CROSS FLOW, Cmax MIXED, Cmin UNMIXED
 				NTU = - std::log( 1.0 + std::log( 1.0 - Eps * Z ) / Z );
 			} else {
-				ShowFatalError( "HeatRecovery: Illegal flow arrangement in CalculateNTUfromEpsAndZ, Value=" + trim( RoundSigDigits( FlowArr ) ) );
+				ShowFatalError( "HeatRecovery: Illegal flow arrangement in CalculateNTUfromEpsAndZ, Value=" + RoundSigDigits( FlowArr ) );
 			}}
 		}
 
@@ -3210,10 +3209,10 @@ namespace HeatRecovery {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static Fstring OutputChar( 32 ); // character string for warning messages
-		static Fstring OutputCharLo( 32 ); // character string for warning messages
-		static Fstring OutputCharHi( 32 ); // character string for warning messages
-		static Fstring CharValue( 32 ); // character string for warning messages
+		static std::string OutputChar; // character string for warning messages
+		static std::string OutputCharLo; // character string for warning messages
+		static std::string OutputCharHi; // character string for warning messages
+		static std::string CharValue; // character string for warning messages
 		static Real64 TimeStepSysLast( 0.0 ); // last system time step (used to check for downshifting)
 		static Real64 CurrentEndTime( 0.0 ); // end time of time step for current simulation time step
 		static Real64 CurrentEndTimeLast( 0.0 ); // end time of time step for last simulation time step
@@ -3233,60 +3232,60 @@ namespace HeatRecovery {
 			if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintT_RegenInTempMessage ) {
 				++BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInTempErrorCount;
 				if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInTempErrorCount < 2 ) {
-					ShowWarningError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInTempBuffer1 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInTempBuffer2 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInTempBuffer3 ) );
+					ShowWarningError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInTempBuffer1 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInTempBuffer2 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInTempBuffer3 );
 					ShowContinueError( "...Using regeneration inlet air temperatures that are outside the regeneration outlet " "air temperature equation model boundaries may adversely affect desiccant model performance." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Regeneration inlet air temp used in regen outlet air temperature equation is out of range error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInTempErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInTempLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInTempLast );
+					ShowRecurringWarningErrorAtEnd( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Regeneration inlet air temp used in regen outlet air temperature equation is out of range error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInTempErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInTempLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInTempLast );
 				}
 			}
 			// Regen inlet humidity ratio for temp eqn
 			if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintT_RegenInHumRatMessage ) {
 				++BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInHumRatErrorCount;
 				if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInHumRatErrorCount < 2 ) {
-					ShowWarningError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInHumRatBuffer1 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInHumRatBuffer2 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInHumRatBuffer3 ) );
+					ShowWarningError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInHumRatBuffer1 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInHumRatBuffer2 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInHumRatBuffer3 );
 					ShowContinueError( "...Using regeneration inlet air humidity ratios that are outside the regeneration outlet " "air temperature equation model boundaries may adversely affect desiccant model performance." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Regeneration inlet air " "humidity ratio used in regen outlet temperature equation is out of range error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInHumRatErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInHumRatLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInHumRatLast );
+					ShowRecurringWarningErrorAtEnd( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Regeneration inlet air " "humidity ratio used in regen outlet temperature equation is out of range error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInHumRatErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInHumRatLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInHumRatLast );
 				}
 			}
 			// Process inlet temp for temp eqn
 			if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintT_ProcInTempMessage ) {
 				++BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInTempErrorCount;
 				if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInTempErrorCount < 2 ) {
-					ShowWarningError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInTempBuffer1 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInTempBuffer2 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInTempBuffer3 ) );
+					ShowWarningError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInTempBuffer1 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInTempBuffer2 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInTempBuffer3 );
 					ShowContinueError( "...Using process inlet air temperatures that are outside the regeneration outlet " "air temperature equation model boundaries may adversely affect desiccant model performance." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Process inlet air temperature used in regen outlet temperature equation is out of range error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInTempErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInTempLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInTempLast );
+					ShowRecurringWarningErrorAtEnd( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Process inlet air temperature used in regen outlet temperature equation is out of range error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInTempErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInTempLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInTempLast );
 				}
 			}
 			// Process inlet humidity ratio for temp eqn
 			if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintT_ProcInHumRatMessage ) {
 				++BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInHumRatErrorCount;
 				if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInHumRatErrorCount < 2 ) {
-					ShowWarningError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInHumRatBuffer1 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInHumRatBuffer2 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInHumRatBuffer3 ) );
+					ShowWarningError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInHumRatBuffer1 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInHumRatBuffer2 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInHumRatBuffer3 );
 					ShowContinueError( "...Using process inlet air humidity ratios that are outside the regeneratoin outlet " "air temperature equation model boundaries may adversely affect desiccant model performance." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Process inlet air humidity ratio used in regen outlet temperature equation is out of range error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInHumRatErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInHumRatLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInHumRatLast );
+					ShowRecurringWarningErrorAtEnd( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Process inlet air humidity ratio used in regen outlet temperature equation is out of range error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInHumRatErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInHumRatLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInHumRatLast );
 				}
 			}
 			// Process and regeneration face velocity for temp eqn
 			if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintT_FaceVelMessage ) {
 				++BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_FaceVelErrorCount;
 				if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_FaceVelErrorCount < 2 ) {
-					ShowWarningError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_FaceVelBuffer1 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_FaceVelBuffer2 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_FaceVelBuffer3 ) );
+					ShowWarningError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_FaceVelBuffer1 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_FaceVelBuffer2 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_FaceVelBuffer3 );
 					ShowContinueError( "...Using process and regeneration face velocities that are outside the regeneration outlet " "air temperature equation model boundaries may adversely affect desiccant model performance." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Process " "and regen inlet air face velocity used in regen outlet temperature equation is out of range error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_FaceVelocityErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_FaceVelLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_FaceVelLast );
+					ShowRecurringWarningErrorAtEnd( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Process " "and regen inlet air face velocity used in regen outlet temperature equation is out of range error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_FaceVelocityErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_FaceVelLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_FaceVelLast );
 				}
 			}
 		} // IF(CurrentEndTime .GT. CurrentEndTimeLast .AND. TimeStepSys .GE. TimeStepSysLast)THEN
@@ -3321,10 +3320,10 @@ namespace HeatRecovery {
 			}
 			if ( ! WarmupFlag && ! FirstHVACIteration ) {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintT_RegenInTempMessage = true;
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInTempBuffer1 = trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Regeneration inlet air temperature " "used in regen outlet air temperature equation is outside model boundaries at " + trim( OutputChar ) + ".";
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInTempBuffer2 = "...Valid range = " + trim( OutputCharLo ) + " to " + trim( OutputCharHi ) + ". Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + " " + trim( CreateSysTimeIntervalString() );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInTempBuffer1 = BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Regeneration inlet air temperature " "used in regen outlet air temperature equation is outside model boundaries at " + OutputChar + '.';
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInTempBuffer2 = "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 				CharValue = RoundSigDigits( T_RegenInTemp, 6 );
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInTempBuffer3 = "...Regeneration outlet air temperature " "equation: regeneration inlet air temperature passed to the model = " + trim( CharValue );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInTempBuffer3 = "...Regeneration outlet air temperature " "equation: regeneration inlet air temperature passed to the model = " + CharValue;
 			} else {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintT_RegenInTempMessage = false;
 			}
@@ -3345,10 +3344,10 @@ namespace HeatRecovery {
 			}
 			if ( ! WarmupFlag && ! FirstHVACIteration ) {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintT_RegenInHumRatMessage = true;
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInHumRatBuffer1 = trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Regeneration inlet air" " humidity ratio used in regen outlet air temperature equation is outside model boundaries at " + trim( OutputChar ) + ".";
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInHumRatBuffer2 = "...Valid range = " + trim( OutputCharLo ) + " to " + trim( OutputCharHi ) + ". Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + " " + trim( CreateSysTimeIntervalString() );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInHumRatBuffer1 = BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Regeneration inlet air" " humidity ratio used in regen outlet air temperature equation is outside model boundaries at " + OutputChar + '.';
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInHumRatBuffer2 = "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 				CharValue = RoundSigDigits( T_RegenInHumRat, 6 );
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInHumRatBuffer3 = "...Regeneration outlet air temperature " "equation: regeneration inlet air humidity ratio passed to the model = " + trim( CharValue );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_RegenInHumRatBuffer3 = "...Regeneration outlet air temperature " "equation: regeneration inlet air humidity ratio passed to the model = " + CharValue;
 			} else {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintT_RegenInHumRatMessage = false;
 			}
@@ -3371,10 +3370,10 @@ namespace HeatRecovery {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintT_ProcInTempMessage = true;
 				//       Suppress warning message when process inlet temperature = 0 (DX coil is off)
 				if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInTempLast == 0.0 ) BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintT_ProcInTempMessage = false;
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInTempBuffer1 = trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Process inlet air " "temperature used in regen outlet air temperature equation is outside model boundaries at " + trim( OutputChar ) + ".";
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInTempBuffer2 = "...Valid range = " + trim( OutputCharLo ) + " to " + trim( OutputCharHi ) + ". Occurrence info = " + trim( EnvironmentName ) + "," + trim( CurMnDy ) + " " + trim( CreateSysTimeIntervalString() );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInTempBuffer1 = BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Process inlet air " "temperature used in regen outlet air temperature equation is outside model boundaries at " + OutputChar + '.';
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInTempBuffer2 = "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + EnvironmentName + ',' + CurMnDy + ' ' + CreateSysTimeIntervalString();
 				CharValue = RoundSigDigits( T_ProcInTemp, 6 );
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInTempBuffer3 = "...Regeneration outlet air temperature equation: process inlet air temperature passed to the model = " + trim( CharValue );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInTempBuffer3 = "...Regeneration outlet air temperature equation: process inlet air temperature passed to the model = " + CharValue;
 			} else {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintT_ProcInTempMessage = false;
 			}
@@ -3397,10 +3396,10 @@ namespace HeatRecovery {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintT_ProcInHumRatMessage = true;
 				//       Suppress warning message when process inlet humrat = 0 (DX coil is off)
 				if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInHumRatLast == 0.0 ) BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintT_ProcInHumRatMessage = false;
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInHumRatBuffer1 = trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Process inlet air" " humidity ratio used in regen outlet air temperature equation is outside model boundaries at " + trim( OutputChar ) + ".";
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInHumRatBuffer2 = "...Valid range = " + trim( OutputCharLo ) + " to " + trim( OutputCharHi ) + ". Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + " " + trim( CreateSysTimeIntervalString() );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInHumRatBuffer1 = BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Process inlet air" " humidity ratio used in regen outlet air temperature equation is outside model boundaries at " + OutputChar + '.';
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInHumRatBuffer2 = "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 				CharValue = RoundSigDigits( T_ProcInHumRat, 6 );
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInHumRatBuffer3 = "...Regeneration outlet air " "temperature equation: process inlet air humidity ratio passed to the model = " + trim( CharValue );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInHumRatBuffer3 = "...Regeneration outlet air " "temperature equation: process inlet air humidity ratio passed to the model = " + CharValue;
 			} else {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintT_ProcInHumRatMessage = false;
 			}
@@ -3421,10 +3420,10 @@ namespace HeatRecovery {
 			}
 			if ( ! WarmupFlag && ! FirstHVACIteration ) {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintT_FaceVelMessage = true;
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_FaceVelBuffer1 = trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Process and regen inlet air face " "velocity used in regen outlet air temperature equation is outside model boundaries at " + trim( OutputChar ) + ".";
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_FaceVelBuffer2 = "...Valid range = " + trim( OutputCharLo ) + " to " + trim( OutputCharHi ) + ". Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + " " + trim( CreateSysTimeIntervalString() );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_FaceVelBuffer1 = BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Process and regen inlet air face " "velocity used in regen outlet air temperature equation is outside model boundaries at " + OutputChar + '.';
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_FaceVelBuffer2 = "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 				CharValue = RoundSigDigits( T_FaceVel, 6 );
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_FaceVelBuffer3 = "...Regeneration outlet air temperature equation: process and regen face velocity passed to the model = " + trim( CharValue );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_FaceVelBuffer3 = "...Regeneration outlet air temperature equation: process and regen face velocity passed to the model = " + CharValue;
 			} else {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintT_FaceVelMessage = false;
 			}
@@ -3486,10 +3485,10 @@ namespace HeatRecovery {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static Fstring OutputChar( 32 ); // character string for warning messages
-		static Fstring OutputCharLo( 32 ); // character string for warning messages
-		static Fstring OutputCharHi( 32 ); // character string for warning messages
-		static Fstring CharValue( 32 ); // character string for warning messages
+		static std::string OutputChar; // character string for warning messages
+		static std::string OutputCharLo; // character string for warning messages
+		static std::string OutputCharHi; // character string for warning messages
+		static std::string CharValue; // character string for warning messages
 		static Real64 TimeStepSysLast( 0.0 ); // last system time step (used to check for downshifting)
 		static Real64 CurrentEndTime( 0.0 ); // end time of time step for current simulation time step
 		static Real64 CurrentEndTimeLast( 0.0 ); // end time of time step for last simulation time step
@@ -3509,60 +3508,60 @@ namespace HeatRecovery {
 			if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintH_RegenInTempMessage ) {
 				++BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInTempErrorCount;
 				if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInTempErrorCount < 2 ) {
-					ShowWarningError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInTempBuffer1 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInTempBuffer2 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInTempBuffer3 ) );
+					ShowWarningError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInTempBuffer1 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInTempBuffer2 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInTempBuffer3 );
 					ShowContinueError( "...Using regeneration inlet air temperatures that are outside the regeneration inlet " "air temperature equation model boundaries may adversely affect desiccant model performance." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Regeneration inlet air " "temperature used in regen outlet air humidity ratio equation is out of range error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInTempErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInTempLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInTempLast );
+					ShowRecurringWarningErrorAtEnd( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Regeneration inlet air " "temperature used in regen outlet air humidity ratio equation is out of range error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInTempErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInTempLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInTempLast );
 				}
 			}
 			// Regen inlet humidity ratio for humidity ratio eqn
 			if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintH_RegenInHumRatMessage ) {
 				++BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInHumRatErrorCount;
 				if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInHumRatErrorCount < 2 ) {
-					ShowWarningError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInHumRatBuffer1 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInHumRatBuffer2 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInHumRatBuffer3 ) );
+					ShowWarningError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInHumRatBuffer1 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInHumRatBuffer2 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInHumRatBuffer3 );
 					ShowContinueError( "...Using regeneration inlet air humidity ratios that are outside the regeneration " "outlet air humidity ratio equation model boundaries may adversely affect desiccant model performance." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Regeneration inlet air humidity ratio used in regen outlet air humidity ratio equation is out of range " "error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInHumRatErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInHumRatLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInHumRatLast );
+					ShowRecurringWarningErrorAtEnd( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Regeneration inlet air humidity ratio used in regen outlet air humidity ratio equation is out of range " "error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInHumRatErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInHumRatLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInHumRatLast );
 				}
 			}
 			// Process inlet temp for humidity ratio eqn
 			if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintH_ProcInTempMessage ) {
 				++BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInTempErrorCount;
 				if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInTempErrorCount < 2 ) {
-					ShowWarningError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInTempBuffer1 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInTempBuffer2 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInTempBuffer3 ) );
+					ShowWarningError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInTempBuffer1 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInTempBuffer2 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInTempBuffer3 );
 					ShowContinueError( "...Using process inlet air temperatures that are outside the regeneration outlet " "air humidity ratio equation model may adversely affect desiccant model performance." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Process inlet air " "temperature used in regen outlet air humidity ratio equation is out of range error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInTempErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInTempLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInTempLast );
+					ShowRecurringWarningErrorAtEnd( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Process inlet air " "temperature used in regen outlet air humidity ratio equation is out of range error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInTempErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInTempLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInTempLast );
 				}
 			}
 			// Process inlet humidity ratio for humidity ratio eqn
 			if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintH_ProcInHumRatMessage ) {
 				++BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInHumRatErrorCount;
 				if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInHumRatErrorCount < 2 ) {
-					ShowWarningError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInHumRatBuffer1 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInHumRatBuffer2 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInHumRatBuffer3 ) );
+					ShowWarningError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInHumRatBuffer1 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInHumRatBuffer2 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInHumRatBuffer3 );
 					ShowContinueError( "...Using process inlet air humidity ratios that are outside the regeneration outlet " "humidity ratio equation model boundaries may adversely affect desiccant model performance." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Process inlet air " "humidity ratio used in regen outlet air humidity ratio equation is out of range error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInHumRatErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInHumRatLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInHumRatLast );
+					ShowRecurringWarningErrorAtEnd( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Process inlet air " "humidity ratio used in regen outlet air humidity ratio equation is out of range error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_ProcInHumRatErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInHumRatLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInHumRatLast );
 				}
 			}
 			// Process and regeneration face velocity for humidity ratio eqn
 			if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintH_FaceVelMessage ) {
 				++BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_FaceVelErrorCount;
 				if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_FaceVelErrorCount < 2 ) {
-					ShowWarningError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_FaceVelBuffer1 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_FaceVelBuffer2 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_FaceVelBuffer3 ) );
+					ShowWarningError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_FaceVelBuffer1 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_FaceVelBuffer2 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_FaceVelBuffer3 );
 					ShowContinueError( "...Using process and regeneration face velocities that are outside the regeneration outlet " "air humidity ratio equation model boundaries may adversely affect desiccant model performance." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Process and regen face " "velocity used in regen outlet air humidity ratio equation is out of range error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_FaceVelocityErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_FaceVelLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_FaceVelLast );
+					ShowRecurringWarningErrorAtEnd( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Process and regen face " "velocity used in regen outlet air humidity ratio equation is out of range error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_FaceVelocityErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_FaceVelLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_FaceVelLast );
 				}
 			}
 		} // IF(CurrentEndTime .GT. CurrentEndTimeLast .AND. TimeStepSys .GE. TimeStepSysLast)THEN
@@ -3597,10 +3596,10 @@ namespace HeatRecovery {
 			}
 			if ( ! WarmupFlag && ! FirstHVACIteration ) {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintH_RegenInTempMessage = true;
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInTempBuffer1 = trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Regeneration inlet air " "temperature used in regen outlet air humidity ratio equation is outside model boundaries at " + trim( OutputChar ) + ".";
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInTempBuffer2 = "...Valid range = " + trim( OutputCharLo ) + " to " + trim( OutputCharHi ) + ". Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + " , " + trim( CreateSysTimeIntervalString() );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInTempBuffer1 = BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Regeneration inlet air " "temperature used in regen outlet air humidity ratio equation is outside model boundaries at " + OutputChar + '.';
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInTempBuffer2 = "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + EnvironmentName + ", " + CurMnDy + " , " + CreateSysTimeIntervalString();
 				CharValue = RoundSigDigits( H_RegenInTemp, 2 );
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInTempBuffer3 = "...Regeneration outlet air humidity ratio " "equation: regeneration inlet air temperature passed to the model = " + trim( CharValue );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInTempBuffer3 = "...Regeneration outlet air humidity ratio " "equation: regeneration inlet air temperature passed to the model = " + CharValue;
 			} else {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintH_RegenInTempMessage = false;
 			}
@@ -3621,10 +3620,10 @@ namespace HeatRecovery {
 			}
 			if ( ! WarmupFlag && ! FirstHVACIteration ) {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintH_RegenInHumRatMessage = true;
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInHumRatBuffer1 = trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Regeneration inlet air humidity " "ratio used in regen outlet air humidity ratio equation is outside model boundaries at " + trim( OutputChar ) + ".";
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInHumRatBuffer2 = "...Valid range = " + trim( OutputCharLo ) + " to " + trim( OutputCharHi ) + ". Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + " " + trim( CreateSysTimeIntervalString() );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInHumRatBuffer1 = BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Regeneration inlet air humidity " "ratio used in regen outlet air humidity ratio equation is outside model boundaries at " + OutputChar + '.';
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInHumRatBuffer2 = "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 				CharValue = RoundSigDigits( H_RegenInHumRat, 6 );
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInHumRatBuffer3 = "...Regeneration outlet air humidity " "ratio equation: regeneration inlet air humidity ratio passed to the model = " + trim( CharValue );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_RegenInHumRatBuffer3 = "...Regeneration outlet air humidity " "ratio equation: regeneration inlet air humidity ratio passed to the model = " + CharValue;
 			} else {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintH_RegenInHumRatMessage = false;
 			}
@@ -3647,10 +3646,10 @@ namespace HeatRecovery {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintH_ProcInTempMessage = true;
 				//       Suppress warning message when process inlet temperature = 0 (DX coil is off)
 				if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInTempLast == 0.0 ) BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintH_ProcInTempMessage = false;
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInTempBuffer1 = trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Process inlet air temperature " "used in regen outlet air humidity ratio equation is outside model boundaries at " + trim( OutputChar ) + ".";
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInTempBuffer2 = "...Valid range = " + trim( OutputCharLo ) + " to " + trim( OutputCharHi ) + ". Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + " " + trim( CreateSysTimeIntervalString() );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInTempBuffer1 = BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Process inlet air temperature " "used in regen outlet air humidity ratio equation is outside model boundaries at " + OutputChar + '.';
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInTempBuffer2 = "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 				CharValue = RoundSigDigits( H_ProcInTemp, 6 );
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInTempBuffer3 = "...Regeneration outlet air humidity ratio " "equation: process inlet air temperature passed to the model = " + trim( CharValue );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInTempBuffer3 = "...Regeneration outlet air humidity ratio " "equation: process inlet air temperature passed to the model = " + CharValue;
 			} else {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintH_ProcInTempMessage = false;
 			}
@@ -3673,10 +3672,10 @@ namespace HeatRecovery {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintH_ProcInHumRatMessage = true;
 				//       Suppress warning message when process inlet humrat = 0 (DX coil is off)
 				if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInHumRatLast == 0.0 ) BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintH_ProcInHumRatMessage = false;
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInHumRatBuffer1 = trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Process inlet air humidity ratio " "used in regen outlet air humidity ratio equation is outside model boundaries at " + trim( OutputChar ) + ".";
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInHumRatBuffer2 = "...Valid range = " + trim( OutputCharLo ) + " to " + trim( OutputCharHi ) + ". Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + ", " + trim( CreateSysTimeIntervalString() );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInHumRatBuffer1 = BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Process inlet air humidity ratio " "used in regen outlet air humidity ratio equation is outside model boundaries at " + OutputChar + '.';
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInHumRatBuffer2 = "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + EnvironmentName + ", " + CurMnDy + ", " + CreateSysTimeIntervalString();
 				CharValue = RoundSigDigits( H_ProcInHumRat, 6 );
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInHumRatBuffer3 = "...Regeneration outlet air humidity " "ratio equation: process inlet air humidity ratio passed to the model = " + trim( CharValue );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_ProcInHumRatBuffer3 = "...Regeneration outlet air humidity " "ratio equation: process inlet air humidity ratio passed to the model = " + CharValue;
 			} else {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintH_ProcInHumRatMessage = false;
 			}
@@ -3697,10 +3696,10 @@ namespace HeatRecovery {
 			}
 			if ( ! WarmupFlag && ! FirstHVACIteration ) {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintH_FaceVelMessage = true;
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_FaceVelBuffer1 = trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Process and regen inlet air face " "velocity used in regen outlet air humidity ratio equation is outside model boundaries at " + trim( OutputChar ) + ".";
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_FaceVelBuffer2 = "...Valid range = " + trim( OutputCharLo ) + " to " + trim( OutputCharHi ) + ". Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + ", " + trim( CreateSysTimeIntervalString() );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_FaceVelBuffer1 = BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Process and regen inlet air face " "velocity used in regen outlet air humidity ratio equation is outside model boundaries at " + OutputChar + '.';
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_FaceVelBuffer2 = "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + EnvironmentName + ", " + CurMnDy + ", " + CreateSysTimeIntervalString();
 				CharValue = RoundSigDigits( H_FaceVel, 6 );
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_FaceVelBuffer3 = "...Regeneration outlet air humidity ratio " "equation: process and regeneration face velocity passed to the model = " + trim( CharValue );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_FaceVelBuffer3 = "...Regeneration outlet air humidity ratio " "equation: process and regeneration face velocity passed to the model = " + CharValue;
 			} else {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintH_FaceVelMessage = false;
 			}
@@ -3758,10 +3757,10 @@ namespace HeatRecovery {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static Fstring OutputChar( 32 ); // character string for warning messages
-		static Fstring OutputCharLo( 32 ); // character string for warning messages
-		static Fstring OutputCharHi( 32 ); // character string for warning messages
-		static Fstring CharValue( 32 ); // character string for warning messages
+		static std::string OutputChar; // character string for warning messages
+		static std::string OutputCharLo; // character string for warning messages
+		static std::string OutputCharHi; // character string for warning messages
+		static std::string CharValue; // character string for warning messages
 		static Real64 TimeStepSysLast( 0.0 ); // last system time step (used to check for downshifting)
 		static Real64 CurrentEndTime( 0.0 ); // end time of time step for current simulation time step
 		static Real64 CurrentEndTimeLast( 0.0 ); // end time of time step for last simulation time step
@@ -3780,11 +3779,11 @@ namespace HeatRecovery {
 			if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintRegenOutTempFailedMessage ) {
 				++BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempFailedErrorCount;
 				if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempFailedErrorCount < 2 ) {
-					ShowWarningError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempFailedBuffer1 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempFailedBuffer2 ) );
+					ShowWarningError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempFailedBuffer1 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempFailedBuffer2 );
 					ShowContinueError( "...Regeneration outlet air temperature should always be less than or equal " "to regen inlet air temperature. Verify correct model coefficients." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Regeneration outlet air temperature above regen inlet air temperature error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempFailedErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempFailedLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempFailedLast );
+					ShowRecurringWarningErrorAtEnd( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Regeneration outlet air temperature above regen inlet air temperature error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempFailedErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempFailedLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempFailedLast );
 				}
 			}
 
@@ -3792,12 +3791,12 @@ namespace HeatRecovery {
 			if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintRegenOutTempMessage ) {
 				++BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempErrorCount;
 				if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempErrorCount < 2 ) {
-					ShowWarningError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempBuffer1 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempBuffer2 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempBuffer3 ) );
+					ShowWarningError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempBuffer1 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempBuffer2 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempBuffer3 );
 					ShowContinueError( "...Regeneration outlet air temperature should always be less than or equal " "to regen inlet air temperature. Verify correct model coefficients." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Regeneration outlet air temperature should be less than regen inlet air temperature error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempLast );
+					ShowRecurringWarningErrorAtEnd( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Regeneration outlet air temperature should be less than regen inlet air temperature error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempLast );
 				}
 			}
 		} // IF(CurrentEndTime .GT. CurrentEndTimeLast .AND. TimeStepSys .GE. TimeStepSysLast)THEN
@@ -3816,10 +3815,10 @@ namespace HeatRecovery {
 			//      END IF
 			if ( ! WarmupFlag && ! FirstHVACIteration ) {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintRegenOutTempFailedMessage = true;
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempFailedBuffer1 = trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Regeneration outlet air " "temperature is greater than inlet temperature at " + trim( OutputChar ) + ".";
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempFailedBuffer2 = "...Regen inlet air temperature = " + trim( OutputCharHi ) + ". Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + ", " + trim( CreateSysTimeIntervalString() );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempFailedBuffer1 = BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Regeneration outlet air " "temperature is greater than inlet temperature at " + OutputChar + '.';
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempFailedBuffer2 = "...Regen inlet air temperature = " + OutputCharHi + ". Occurrence info = " + EnvironmentName + ", " + CurMnDy + ", " + CreateSysTimeIntervalString();
 				CharValue = RoundSigDigits( RegenOutTemp, 6 );
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempFailedBuffer3 = "...Regen outlet air temperature " "equation: regeneration outlet air temperature allowed from the model = " + trim( CharValue );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempFailedBuffer3 = "...Regen outlet air temperature " "equation: regeneration outlet air temperature allowed from the model = " + CharValue;
 			} else {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintRegenOutTempMessage = false;
 			}
@@ -3842,10 +3841,10 @@ namespace HeatRecovery {
 			}
 			if ( ! WarmupFlag && ! FirstHVACIteration ) {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintRegenOutTempMessage = true;
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempBuffer1 = trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Regeneration outlet air " "temperature equation is outside model boundaries at " + trim( OutputChar ) + ".";
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempBuffer2 = "...Valid range = " + trim( OutputCharLo ) + " to " + trim( OutputCharHi ) + ". Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + ", " + trim( CreateSysTimeIntervalString() );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempBuffer1 = BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Regeneration outlet air " "temperature equation is outside model boundaries at " + OutputChar + '.';
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempBuffer2 = "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + EnvironmentName + ", " + CurMnDy + ", " + CreateSysTimeIntervalString();
 				CharValue = RoundSigDigits( RegenOutTemp, 6 );
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempBuffer3 = "...Regen outlet air temperature equation: " "regeneration outlet air temperature allowed from the model = " + trim( CharValue );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutTempBuffer3 = "...Regen outlet air temperature equation: " "regeneration outlet air temperature allowed from the model = " + CharValue;
 			} else {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintRegenOutTempMessage = false;
 			}
@@ -3903,10 +3902,10 @@ namespace HeatRecovery {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static Fstring OutputChar( 32 ); // character string for warning messages
-		static Fstring OutputCharLo( 32 ); // character string for warning messages
-		static Fstring OutputCharHi( 32 ); // character string for warning messages
-		static Fstring CharValue( 32 ); // character string for warning messages
+		static std::string OutputChar; // character string for warning messages
+		static std::string OutputCharLo; // character string for warning messages
+		static std::string OutputCharHi; // character string for warning messages
+		static std::string CharValue; // character string for warning messages
 		static Real64 TimeStepSysLast( 0.0 ); // last system time step (used to check for downshifting)
 		static Real64 CurrentEndTime( 0.0 ); // end time of time step for current simulation time step
 		static Real64 CurrentEndTimeLast( 0.0 ); // end time of time step for last simulation time step
@@ -3925,11 +3924,11 @@ namespace HeatRecovery {
 			if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintRegenOutHumRatFailedMess ) {
 				++BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatFailedErrorCount;
 				if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatFailedErrorCount < 2 ) {
-					ShowWarningError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatFailedBuffer1 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatFailedBuffer2 ) );
+					ShowWarningError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatFailedBuffer1 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatFailedBuffer2 );
 					ShowContinueError( "...Regeneration outlet air humidity ratio should always be greater than or equal " "to regen inlet air humidity ratio. Verify correct model coefficients." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Regeneration outlet air humidity ratio should be greater than regen inlet air humidity ratio error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatFailedErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatFailedLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatFailedLast );
+					ShowRecurringWarningErrorAtEnd( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Regeneration outlet air humidity ratio should be greater than regen inlet air humidity ratio error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatFailedErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatFailedLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatFailedLast );
 				}
 			}
 
@@ -3937,12 +3936,12 @@ namespace HeatRecovery {
 			if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintRegenOutHumRatMessage ) {
 				++BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatErrorCount;
 				if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatErrorCount < 2 ) {
-					ShowWarningError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatBuffer1 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatBuffer2 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatBuffer3 ) );
+					ShowWarningError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatBuffer1 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatBuffer2 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatBuffer3 );
 					ShowContinueError( "...Regeneration outlet air humidity ratio outside model boundaries may " "adversely affect desiccant model performance." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Regeneration outlet air humidity ratio is out of range error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatLast );
+					ShowRecurringWarningErrorAtEnd( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Regeneration outlet air humidity ratio is out of range error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatLast );
 				}
 			}
 		} // IF(CurrentEndTime .GT. CurrentEndTimeLast .AND. TimeStepSys .GE. TimeStepSysLast)THEN
@@ -3961,10 +3960,10 @@ namespace HeatRecovery {
 			//      END IF
 			if ( ! WarmupFlag && ! FirstHVACIteration ) {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintRegenOutHumRatFailedMess = true;
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatFailedBuffer1 = trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Regeneration outlet air " "humidity ratio is less than the inlet air humidity ratio at " + trim( OutputChar ) + ".";
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatFailedBuffer2 = "...Regen inlet air humidity " "ratio = " + trim( OutputCharHi ) + ". Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + ", " + trim( CreateSysTimeIntervalString() );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatFailedBuffer1 = BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Regeneration outlet air " "humidity ratio is less than the inlet air humidity ratio at " + OutputChar + '.';
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatFailedBuffer2 = "...Regen inlet air humidity " "ratio = " + OutputCharHi + ". Occurrence info = " + EnvironmentName + ", " + CurMnDy + ", " + CreateSysTimeIntervalString();
 				CharValue = RoundSigDigits( RegenOutHumRat, 6 );
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatFailedBuffer3 = "...Regen outlet air humidity " "ratio equation: regeneration outlet air humidity ratio allowed from the model = " + trim( CharValue );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatFailedBuffer3 = "...Regen outlet air humidity " "ratio equation: regeneration outlet air humidity ratio allowed from the model = " + CharValue;
 			} else {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintRegenOutHumRatFailedMess = false;
 			}
@@ -3987,10 +3986,10 @@ namespace HeatRecovery {
 			}
 			if ( ! WarmupFlag && ! FirstHVACIteration ) {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintRegenOutHumRatMessage = true;
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatBuffer1 = trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Regeneration outlet air " "humidity ratio is outside model boundaries at " + trim( OutputChar ) + ".";
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatBuffer2 = "...Valid range = " + trim( OutputCharLo ) + " to " + trim( OutputCharHi ) + ". Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + ", " + trim( CreateSysTimeIntervalString() );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatBuffer1 = BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Regeneration outlet air " "humidity ratio is outside model boundaries at " + OutputChar + '.';
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatBuffer2 = "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + EnvironmentName + ", " + CurMnDy + ", " + CreateSysTimeIntervalString();
 				CharValue = RoundSigDigits( RegenOutHumRat, 6 );
-				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatBuffer3 = "...Regen outlet air humidity " "ratio equation: regeneration outlet air humidity ratio allowed from the model = " + trim( CharValue );
+				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenOutHumRatBuffer3 = "...Regen outlet air humidity " "ratio equation: regeneration outlet air humidity ratio allowed from the model = " + CharValue;
 			} else {
 				BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintRegenOutHumRatMessage = false;
 			}
@@ -4053,9 +4052,9 @@ namespace HeatRecovery {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static Real64 RegenInletRH( 0.0 ); // Regeneration inlet air relative humidity
 		static Real64 ProcInletRH( 0.0 ); // Process inlet air relative humidity
-		static Fstring OutputChar( 32 ); // character string for warning messages
-		static Fstring OutputCharLo( 32 ); // character string for warning messages
-		static Fstring OutputCharHi( 32 ); // character string for warning messages
+		static std::string OutputChar; // character string for warning messages
+		static std::string OutputCharLo; // character string for warning messages
+		static std::string OutputCharHi; // character string for warning messages
 		static Real64 TimeStepSysLast( 0.0 ); // last system time step (used to check for downshifting)
 		static Real64 CurrentEndTime( 0.0 ); // end time of time step for current simulation time step
 		static Real64 CurrentEndTimeLast( 0.0 ); // end time of time step for last simulation time step
@@ -4076,12 +4075,12 @@ namespace HeatRecovery {
 			if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintRegenInRelHumTempMess ) {
 				++BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumTempErrorCount;
 				if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumTempErrorCount < 2 ) {
-					ShowWarningError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumTempBuffer1 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumTempBuffer2 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumTempBuffer3 ) );
+					ShowWarningError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumTempBuffer1 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumTempBuffer2 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumTempBuffer3 );
 					ShowContinueError( "...Using regeneration inlet air relative humidities that are outside the regeneration " "outlet temperature equation model boundaries may adversely affect desiccant model performance. " "Verify correct model coefficients." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Regeneration inlet air relative humidity related to regen outlet air temperature equation is outside " "model boundaries error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumTempErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumTempLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumTempLast );
+					ShowRecurringWarningErrorAtEnd( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Regeneration inlet air relative humidity related to regen outlet air temperature equation is outside " "model boundaries error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumTempErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumTempLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumTempLast );
 				}
 			}
 
@@ -4089,12 +4088,12 @@ namespace HeatRecovery {
 			if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintProcInRelHumTempMess ) {
 				++BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumTempErrorCount;
 				if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumTempErrorCount < 2 ) {
-					ShowWarningError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumTempBuffer1 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumTempBuffer2 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumTempBuffer3 ) );
+					ShowWarningError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumTempBuffer1 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumTempBuffer2 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumTempBuffer3 );
 					ShowContinueError( "...Using process inlet air relative humidities that are outside the regeneration " "outlet temperature equation model boundaries may adversely affect desiccant model performance. " "Verify correct model coefficients." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Process inlet air relative humidity related to regen outlet air temperature equation is outside " "model boundaries error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumTempErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumTempLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumTempLast );
+					ShowRecurringWarningErrorAtEnd( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Process inlet air relative humidity related to regen outlet air temperature equation is outside " "model boundaries error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumTempErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumTempLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumTempLast );
 				}
 			}
 
@@ -4139,9 +4138,9 @@ namespace HeatRecovery {
 			OutputCharHi = RoundSigDigits( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_MaxRegenAirInRelHum * 100.0, 1 );
 			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintRegenInRelHumTempMess = true;
 
-			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumTempBuffer1 = trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Regeneration inlet air relative " "humidity related to regen outlet air temperature equation is outside model boundaries at " + trim( OutputChar ) + ".";
-			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumTempBuffer2 = "...Model limit on regeneration inlet air relative humidity is " + trim( OutputCharLo ) + " to " + trim( OutputCharHi ) + ".";
-			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumTempBuffer3 = "...Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + ", " + trim( CreateSysTimeIntervalString() );
+			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumTempBuffer1 = BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Regeneration inlet air relative " "humidity related to regen outlet air temperature equation is outside model boundaries at " + OutputChar + '.';
+			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumTempBuffer2 = "...Model limit on regeneration inlet air relative humidity is " + OutputCharLo + " to " + OutputCharHi + '.';
+			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumTempBuffer3 = "...Occurrence info = " + EnvironmentName + ", " + CurMnDy + ", " + CreateSysTimeIntervalString();
 		} else {
 			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintRegenInRelHumTempMess = false;
 		}
@@ -4154,9 +4153,9 @@ namespace HeatRecovery {
 			OutputCharHi = RoundSigDigits( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_MaxProcAirInRelHum * 100.0, 1 );
 			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintProcInRelHumTempMess = true;
 
-			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumTempBuffer1 = trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Process inlet air relative " "humidity related to regen outlet air temperature equation is outside model boundaries at " + trim( OutputChar ) + ".";
-			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumTempBuffer2 = "...Model limit on process inlet air relative humidity is " + trim( OutputCharLo ) + " to " + trim( OutputCharHi ) + ".";
-			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumTempBuffer3 = "...Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + ", " + trim( CreateSysTimeIntervalString() );
+			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumTempBuffer1 = BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Process inlet air relative " "humidity related to regen outlet air temperature equation is outside model boundaries at " + OutputChar + '.';
+			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumTempBuffer2 = "...Model limit on process inlet air relative humidity is " + OutputCharLo + " to " + OutputCharHi + '.';
+			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumTempBuffer3 = "...Occurrence info = " + EnvironmentName + ", " + CurMnDy + ", " + CreateSysTimeIntervalString();
 		} else {
 			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintProcInRelHumTempMess = false;
 		}
@@ -4216,9 +4215,9 @@ namespace HeatRecovery {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static Real64 RegenInletRH( 0.0 ); // Regeneration inlet air relative humidity
 		static Real64 ProcInletRH( 0.0 ); // Process inlet air relative humidity
-		static Fstring OutputChar( 32 ); // character string for warning messages
-		static Fstring OutputCharLo( 32 ); // character string for warning messages
-		static Fstring OutputCharHi( 32 ); // character string for warning messages
+		static std::string OutputChar; // character string for warning messages
+		static std::string OutputCharLo; // character string for warning messages
+		static std::string OutputCharHi; // character string for warning messages
 		static Real64 TimeStepSysLast( 0.0 ); // last system time step (used to check for downshifting)
 		static Real64 CurrentEndTime( 0.0 ); // end time of time step for current simulation time step
 		static Real64 CurrentEndTimeLast( 0.0 ); // end time of time step for last simulation time step
@@ -4239,12 +4238,12 @@ namespace HeatRecovery {
 			if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintRegenInRelHumHumRatMess ) {
 				++BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumHumRatErrorCount;
 				if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumHumRatErrorCount < 2 ) {
-					ShowWarningError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumHumRatBuffer1 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumHumRatBuffer2 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumHumRatBuffer3 ) );
+					ShowWarningError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumHumRatBuffer1 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumHumRatBuffer2 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumHumRatBuffer3 );
 					ShowContinueError( "...Using regeneration inlet air relative humidities that are outside the regeneration " "outlet humidity ratio equation model boundaries may adversely affect desiccant model performance. " "Verify correct model coefficients." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Regeneration inlet air relative humidity related to regen outlet air humidity ratio equation is " "outside model boundaries error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumHumRatErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumHumRatLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumHumRatLast );
+					ShowRecurringWarningErrorAtEnd( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Regeneration inlet air relative humidity related to regen outlet air humidity ratio equation is " "outside model boundaries error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumHumRatErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumHumRatLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumHumRatLast );
 				}
 			}
 
@@ -4252,12 +4251,12 @@ namespace HeatRecovery {
 			if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintProcInRelHumHumRatMess ) {
 				++BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumHumRatErrorCount;
 				if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumHumRatErrorCount < 2 ) {
-					ShowWarningError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumHumRatBuffer1 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumHumRatBuffer2 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumHumRatBuffer3 ) );
+					ShowWarningError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumHumRatBuffer1 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumHumRatBuffer2 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumHumRatBuffer3 );
 					ShowContinueError( "...Using process inlet air relative humidities that are outside the regeneration " "outlet humidity ratio equation model boundaries may adversely affect desiccant model performance. " "Verify correct model coefficients." );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Process inlet air relative humidity related to regen outlet air humidity ratio equation is outside " "model boundaries error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumHumRatErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumHumRatLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumHumRatLast );
+					ShowRecurringWarningErrorAtEnd( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Process inlet air relative humidity related to regen outlet air humidity ratio equation is outside " "model boundaries error continues...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumHumRatErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumHumRatLast, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumHumRatLast );
 				}
 			}
 
@@ -4302,9 +4301,9 @@ namespace HeatRecovery {
 			OutputCharHi = RoundSigDigits( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_MaxRegenAirInRelHum * 100.0, 1 );
 			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintRegenInRelHumHumRatMess = true;
 
-			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumHumRatBuffer1 = trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Regeneration inlet air relative " "humidity related to regen outlet air humidity ratio equation is outside model boundaries at " + trim( OutputChar ) + ".";
-			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumHumRatBuffer2 = "...Model limit on regeneration inlet air relative humidity is " + trim( OutputCharLo ) + " to " + trim( OutputCharHi ) + ".";
-			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumHumRatBuffer3 = "...Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + ", " + trim( CreateSysTimeIntervalString() );
+			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumHumRatBuffer1 = BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Regeneration inlet air relative " "humidity related to regen outlet air humidity ratio equation is outside model boundaries at " + OutputChar + '.';
+			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumHumRatBuffer2 = "...Model limit on regeneration inlet air relative humidity is " + OutputCharLo + " to " + OutputCharHi + '.';
+			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).RegenInRelHumHumRatBuffer3 = "...Occurrence info = " + EnvironmentName + ", " + CurMnDy + ", " + CreateSysTimeIntervalString();
 		} else {
 			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintRegenInRelHumHumRatMess = false;
 		}
@@ -4317,9 +4316,9 @@ namespace HeatRecovery {
 			OutputCharHi = RoundSigDigits( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_MaxProcAirInRelHum * 100.0, 1 );
 			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintProcInRelHumHumRatMess = true;
 
-			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumHumRatBuffer1 = trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType ) + " \"" + trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name ) + "\" - Process inlet air relative " "humidity related to regen outlet air humidity ratio equation is outside model boundaries at " + trim( OutputChar ) + ".";
-			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumHumRatBuffer2 = "...Model limit on process inlet air relative humidity is " + trim( OutputCharLo ) + " to " + trim( OutputCharHi ) + ".";
-			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumHumRatBuffer3 = "...Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + ", " + trim( CreateSysTimeIntervalString() );
+			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumHumRatBuffer1 = BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PerfType + " \"" + BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).Name + "\" - Process inlet air relative " "humidity related to regen outlet air humidity ratio equation is outside model boundaries at " + OutputChar + '.';
+			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumHumRatBuffer2 = "...Model limit on process inlet air relative humidity is " + OutputCharLo + " to " + OutputCharHi + '.';
+			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ProcInRelHumHumRatBuffer3 = "...Occurrence info = " + EnvironmentName + ", " + CurMnDy + ", " + CreateSysTimeIntervalString();
 		} else {
 			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintProcInRelHumHumRatMess = false;
 		}
@@ -4369,8 +4368,8 @@ namespace HeatRecovery {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static Fstring OutputCharProc( 32 ); // character string for warning messages
-		static Fstring OutputCharRegen( 32 ); // character string for warning messages
+		static std::string OutputCharProc; // character string for warning messages
+		static std::string OutputCharRegen; // character string for warning messages
 		static Real64 TimeStepSysLast( 0.0 ); // last system time step (used to check for downshifting)
 		static Real64 CurrentEndTime( 0.0 ); // end time of time step for current simulation time step
 		static Real64 CurrentEndTimeLast( 0.0 ); // end time of time step for last simulation time step
@@ -4392,14 +4391,14 @@ namespace HeatRecovery {
 			if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintImbalancedMassFlowMess ) {
 				++BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ImbalancedMassFlowErrorCount;
 				if ( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ImbalancedMassFlowErrorCount < 2 ) {
-					ShowWarningError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ImbalancedMassFlowBuffer1 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ImbalancedMassFlowBuffer2 ) );
-					ShowContinueError( trim( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ImbalancedMassFlowBuffer3 ) );
+					ShowWarningError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ImbalancedMassFlowBuffer1 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ImbalancedMassFlowBuffer2 );
+					ShowContinueError( BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ImbalancedMassFlowBuffer3 );
 					//           CALL ShowContinueError('...Using regeneration inlet air relative humidities that are outside the regeneration '&
 					//                 //'outlet humidity ratio equation model boundaries may adversely affect desiccant model performance. '&
 					//                 //'Verify correct model coefficients.')
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( cHXTypes( ExchCond( ExchNum ).ExchTypeNum ) ) + " \"" + trim( ExchCond( ExchNum ).Name ) + "\" - unbalanced air flow rate is limited to 2% error continues with the imbalanced fraction statistics reported...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ImbalancedFlowErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ABSImbalancedFlow, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ABSImbalancedFlow );
+					ShowRecurringWarningErrorAtEnd( cHXTypes( ExchCond( ExchNum ).ExchTypeNum ) + " \"" + ExchCond( ExchNum ).Name + "\" - unbalanced air flow rate is limited to 2% error continues with the imbalanced fraction statistics reported...", BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ImbalancedFlowErrIndex, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ABSImbalancedFlow, BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ABSImbalancedFlow );
 				}
 			}
 
@@ -4417,9 +4416,9 @@ namespace HeatRecovery {
 			OutputCharProc = RoundSigDigits( ProcessInMassFlow, 6 );
 			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintImbalancedMassFlowMess = true;
 
-			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ImbalancedMassFlowBuffer1 = trim( cHXTypes( ExchCond( ExchNum ).ExchTypeNum ) ) + " \"" + trim( ExchCond( ExchNum ).Name ) + "\" - unbalanced air flow rate is limited to 2%.";
-			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ImbalancedMassFlowBuffer2 = "...Regeneration air " "mass flow rate is " + trim( OutputCharRegen ) + " and process air mass flow rate is " + trim( OutputCharProc ) + ".";
-			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ImbalancedMassFlowBuffer3 = "...Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + ", " + trim( CreateSysTimeIntervalString() );
+			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ImbalancedMassFlowBuffer1 = cHXTypes( ExchCond( ExchNum ).ExchTypeNum ) + " \"" + ExchCond( ExchNum ).Name + "\" - unbalanced air flow rate is limited to 2%.";
+			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ImbalancedMassFlowBuffer2 = "...Regeneration air " "mass flow rate is " + OutputCharRegen + " and process air mass flow rate is " + OutputCharProc + '.';
+			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).ImbalancedMassFlowBuffer3 = "...Occurrence info = " + EnvironmentName + ", " + CurMnDy + ", " + CreateSysTimeIntervalString();
 		} else {
 			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintImbalancedMassFlowMess = false;
 		}
@@ -4428,7 +4427,7 @@ namespace HeatRecovery {
 
 	int
 	GetSupplyInletNode(
-		Fstring const & HXName, // must match HX names for the ExchCond type
+		std::string const & HXName, // must match HX names for the ExchCond type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -4480,7 +4479,7 @@ namespace HeatRecovery {
 		if ( WhichHX != 0 ) {
 			GetSupplyInletNode = ExchCond( WhichHX ).SupInletNode;
 		} else {
-			ShowSevereError( "GetSupplyInletNode: Could not find heat exchanger = \"" + trim( HXName ) + "\"" );
+			ShowSevereError( "GetSupplyInletNode: Could not find heat exchanger = \"" + HXName + "\"" );
 			ErrorsFound = true;
 			GetSupplyInletNode = 0;
 		}
@@ -4491,7 +4490,7 @@ namespace HeatRecovery {
 
 	int
 	GetSupplyOutletNode(
-		Fstring const & HXName, // must match HX names for the ExchCond type
+		std::string const & HXName, // must match HX names for the ExchCond type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -4543,7 +4542,7 @@ namespace HeatRecovery {
 		if ( WhichHX != 0 ) {
 			GetSupplyOutletNode = ExchCond( WhichHX ).SupOutletNode;
 		} else {
-			ShowSevereError( "GetSupplyOutletNode: Could not find heat exchanger = \"" + trim( HXName ) + "\"" );
+			ShowSevereError( "GetSupplyOutletNode: Could not find heat exchanger = \"" + HXName + "\"" );
 			ErrorsFound = true;
 			GetSupplyOutletNode = 0;
 		}
@@ -4554,7 +4553,7 @@ namespace HeatRecovery {
 
 	int
 	GetSecondaryInletNode(
-		Fstring const & HXName, // must match HX names for the ExchCond type
+		std::string const & HXName, // must match HX names for the ExchCond type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -4606,7 +4605,7 @@ namespace HeatRecovery {
 		if ( WhichHX != 0 ) {
 			GetSecondaryInletNode = ExchCond( WhichHX ).SecInletNode;
 		} else {
-			ShowSevereError( "GetSecondaryInletNode: Could not find heat exchanger = \"" + trim( HXName ) + "\"" );
+			ShowSevereError( "GetSecondaryInletNode: Could not find heat exchanger = \"" + HXName + "\"" );
 			ErrorsFound = true;
 			GetSecondaryInletNode = 0;
 		}
@@ -4617,7 +4616,7 @@ namespace HeatRecovery {
 
 	int
 	GetSecondaryOutletNode(
-		Fstring const & HXName, // must match HX names for the ExchCond type
+		std::string const & HXName, // must match HX names for the ExchCond type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -4669,7 +4668,7 @@ namespace HeatRecovery {
 		if ( WhichHX != 0 ) {
 			GetSecondaryOutletNode = ExchCond( WhichHX ).SecOutletNode;
 		} else {
-			ShowSevereError( "GetSecondaryOutletNode: Could not find heat exchanger = \"" + trim( HXName ) + "\"" );
+			ShowSevereError( "GetSecondaryOutletNode: Could not find heat exchanger = \"" + HXName + "\"" );
 			ErrorsFound = true;
 			GetSecondaryOutletNode = 0;
 		}
@@ -4680,7 +4679,7 @@ namespace HeatRecovery {
 
 	Real64
 	GetSupplyAirFlowRate(
-		Fstring const & HXName, // must match HX names for the ExchCond type
+		std::string const & HXName, // must match HX names for the ExchCond type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -4732,7 +4731,7 @@ namespace HeatRecovery {
 		if ( WhichHX != 0 ) {
 			GetSupplyAirFlowRate = ExchCond( WhichHX ).NomSupAirVolFlow;
 		} else {
-			ShowSevereError( "GetSupplyAirFlowRate: Could not find heat exchanger = \"" + trim( HXName ) + "\"" );
+			ShowSevereError( "GetSupplyAirFlowRate: Could not find heat exchanger = \"" + HXName + "\"" );
 			ShowContinueError( "... Supply Air Flow Rate returned as 0." );
 			ErrorsFound = true;
 			GetSupplyAirFlowRate = 0.0;
@@ -4744,7 +4743,7 @@ namespace HeatRecovery {
 
 	int
 	GetHeatExchangerObjectTypeNum(
-		Fstring const & HXName, // must match HX names for the ExchCond type
+		std::string const & HXName, // must match HX names for the ExchCond type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -4796,7 +4795,7 @@ namespace HeatRecovery {
 		if ( WhichHX != 0 ) {
 			GetHeatExchangerObjectTypeNum = ExchCond( WhichHX ).ExchTypeNum;
 		} else {
-			ShowSevereError( "GetHeatExchangerObjectTypeNum: Could not find heat exchanger = \"" + trim( HXName ) + "\"" );
+			ShowSevereError( "GetHeatExchangerObjectTypeNum: Could not find heat exchanger = \"" + HXName + "\"" );
 			ErrorsFound = true;
 			GetHeatExchangerObjectTypeNum = 0;
 		}
@@ -4809,7 +4808,7 @@ namespace HeatRecovery {
 	SetHeatExchangerData(
 		int const HXNum, // Index of HX
 		bool & ErrorsFound, // Set to true if certain errors found
-		Fstring const & HXName, // Name of HX
+		std::string const & HXName, // Name of HX
 		Optional< Real64 > SupplyAirVolFlow, // HX supply air flow rate    [m3/s]
 		Optional< Real64 > SecondaryAirVolFlow // HX secondary air flow rate [m3/s]
 	)
@@ -4864,7 +4863,7 @@ namespace HeatRecovery {
 		}
 
 		if ( WhichHX <= 0 || WhichHX > NumHeatExchangers ) {
-			ShowSevereError( "SetHeatExchangerData: Could not find heat exchanger = \"" + trim( HXName ) + "\"" );
+			ShowSevereError( "SetHeatExchangerData: Could not find heat exchanger = \"" + HXName + "\"" );
 			ErrorsFound = true;
 			return;
 		}

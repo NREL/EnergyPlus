@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace DataGenerators {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// -only module should be available to other modules and routines.
@@ -102,7 +100,7 @@ namespace DataGenerators {
 	{
 		// Members
 		// user input data
-		Fstring Name; // name of this PowerModule data
+		std::string Name; // name of this PowerModule data
 		int EffMode; // mode for efficiency curves
 		int EffCurveID; // pointer to curve for efficiency
 		Real64 NomEff; // nominal efficiency
@@ -124,7 +122,7 @@ namespace DataGenerators {
 		Real64 ANC0; // Ancilliary Loads constant term
 		Real64 ANC1; // Ancilliary Loads linear term
 		int SkinLossMode; // how are skin losses determined
-		Fstring ZoneName;
+		std::string ZoneName;
 		int ZoneID; // "pointer" to zone with component in it
 		Real64 RadiativeFract;
 		Real64 QdotSkin;
@@ -133,9 +131,9 @@ namespace DataGenerators {
 		int WaterSupplyCurveID; // pointer to curve for water use in reforming
 		Real64 NdotDilutionAir; // user defined constant flow of dilution air (kmol/sec)
 		Real64 StackHeatLossToDilution; // (watts)
-		Fstring DilutionInletNodeName; // dilution -> AirHR ?? added air heat recovery path
+		std::string DilutionInletNodeName; // dilution -> AirHR ?? added air heat recovery path
 		int DilutionInletNode; // pointer to node for inlet
-		Fstring DilutionExhaustNodeName;
+		std::string DilutionExhaustNodeName;
 		int DilutionExhaustNode; // pointer to node getting exhaust
 		Real64 PelMin; // minimum operating point for FCPM electrical power Pel
 		Real64 PelMax; // maximum operating point for FCPM electrical power Pel
@@ -170,7 +168,6 @@ namespace DataGenerators {
 
 		// Default Constructor
 		FCPowerModuleStruct() :
-			Name( MaxNameLength ),
 			EffMode( 0 ),
 			EffCurveID( 0 ),
 			NomEff( 0.0 ),
@@ -192,7 +189,6 @@ namespace DataGenerators {
 			ANC0( 0.0 ),
 			ANC1( 0.0 ),
 			SkinLossMode( 0 ),
-			ZoneName( MaxNameLength ),
 			ZoneID( 0 ),
 			RadiativeFract( 0.0 ),
 			QdotSkin( 0.0 ),
@@ -201,9 +197,7 @@ namespace DataGenerators {
 			WaterSupplyCurveID( 0 ),
 			NdotDilutionAir( 0.0 ),
 			StackHeatLossToDilution( 0.0 ),
-			DilutionInletNodeName( MaxNameLength ),
 			DilutionInletNode( 0 ),
-			DilutionExhaustNodeName( MaxNameLength ),
 			DilutionExhaustNode( 0 ),
 			PelMin( 0.0 ),
 			PelMax( 0.0 ),
@@ -238,7 +232,7 @@ namespace DataGenerators {
 
 		// Member Constructor
 		FCPowerModuleStruct(
-			Fstring const & Name, // name of this PowerModule data
+			std::string const & Name, // name of this PowerModule data
 			int const EffMode, // mode for efficiency curves
 			int const EffCurveID, // pointer to curve for efficiency
 			Real64 const NomEff, // nominal efficiency
@@ -260,7 +254,7 @@ namespace DataGenerators {
 			Real64 const ANC0, // Ancilliary Loads constant term
 			Real64 const ANC1, // Ancilliary Loads linear term
 			int const SkinLossMode, // how are skin losses determined
-			Fstring const & ZoneName,
+			std::string const & ZoneName,
 			int const ZoneID, // "pointer" to zone with component in it
 			Real64 const RadiativeFract,
 			Real64 const QdotSkin,
@@ -269,9 +263,9 @@ namespace DataGenerators {
 			int const WaterSupplyCurveID, // pointer to curve for water use in reforming
 			Real64 const NdotDilutionAir, // user defined constant flow of dilution air (kmol/sec)
 			Real64 const StackHeatLossToDilution, // (watts)
-			Fstring const & DilutionInletNodeName, // dilution -> AirHR ?? added air heat recovery path
+			std::string const & DilutionInletNodeName, // dilution -> AirHR ?? added air heat recovery path
 			int const DilutionInletNode, // pointer to node for inlet
-			Fstring const & DilutionExhaustNodeName,
+			std::string const & DilutionExhaustNodeName,
 			int const DilutionExhaustNode, // pointer to node getting exhaust
 			Real64 const PelMin, // minimum operating point for FCPM electrical power Pel
 			Real64 const PelMax, // maximum operating point for FCPM electrical power Pel
@@ -303,7 +297,7 @@ namespace DataGenerators {
 			int const SeqSubstitIter,
 			int const RegulaFalsiIter
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			EffMode( EffMode ),
 			EffCurveID( EffCurveID ),
 			NomEff( NomEff ),
@@ -325,7 +319,7 @@ namespace DataGenerators {
 			ANC0( ANC0 ),
 			ANC1( ANC1 ),
 			SkinLossMode( SkinLossMode ),
-			ZoneName( MaxNameLength, ZoneName ),
+			ZoneName( ZoneName ),
 			ZoneID( ZoneID ),
 			RadiativeFract( RadiativeFract ),
 			QdotSkin( QdotSkin ),
@@ -334,9 +328,9 @@ namespace DataGenerators {
 			WaterSupplyCurveID( WaterSupplyCurveID ),
 			NdotDilutionAir( NdotDilutionAir ),
 			StackHeatLossToDilution( StackHeatLossToDilution ),
-			DilutionInletNodeName( MaxNameLength, DilutionInletNodeName ),
+			DilutionInletNodeName( DilutionInletNodeName ),
 			DilutionInletNode( DilutionInletNode ),
-			DilutionExhaustNodeName( MaxNameLength, DilutionExhaustNodeName ),
+			DilutionExhaustNodeName( DilutionExhaustNodeName ),
 			DilutionExhaustNode( DilutionExhaustNode ),
 			PelMin( PelMin ),
 			PelMax( PelMax ),
@@ -375,8 +369,8 @@ namespace DataGenerators {
 	{
 		// Members
 		// user input data
-		Fstring Name; // name of this
-		Fstring NodeName; // Air supply node name
+		std::string Name; // name of this
+		std::string NodeName; // Air supply node name
 		int SupNodeNum; // Air supply node ID
 		int BlowerPowerCurveID; // "pointer" to blower power quadratic
 		Real64 BlowerHeatLossFactor; // alpha for blower heat loss fraction
@@ -388,7 +382,7 @@ namespace DataGenerators {
 		int IntakeRecoveryMode;
 		int ConstituentMode; // how are air data input
 		int NumConstituents;
-		FArray1D_Fstring ConstitName;
+		FArray1D_string ConstitName;
 		FArray1D< Real64 > ConstitMolalFract;
 		//Calculated values and input from elsewhere
 		FArray1D_int GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
@@ -401,8 +395,6 @@ namespace DataGenerators {
 
 		// Default Constructor
 		FCAirSupplyDataStruct() :
-			Name( MaxNameLength ),
-			NodeName( MaxNameLength ),
 			SupNodeNum( 0 ),
 			BlowerPowerCurveID( 0 ),
 			BlowerHeatLossFactor( 0.0 ),
@@ -414,7 +406,7 @@ namespace DataGenerators {
 			IntakeRecoveryMode( 0 ),
 			ConstituentMode( 0 ),
 			NumConstituents( 0 ),
-			ConstitName( 14, sFstring( MaxNameLength ) ),
+			ConstitName( 14 ),
 			ConstitMolalFract( 14, 0.0 ),
 			GasLibID( 14, 0 ),
 			O2fraction( 0.0 ),
@@ -427,8 +419,8 @@ namespace DataGenerators {
 
 		// Member Constructor
 		FCAirSupplyDataStruct(
-			Fstring const & Name, // name of this
-			Fstring const & NodeName, // Air supply node name
+			std::string const & Name, // name of this
+			std::string const & NodeName, // Air supply node name
 			int const SupNodeNum, // Air supply node ID
 			int const BlowerPowerCurveID, // "pointer" to blower power quadratic
 			Real64 const BlowerHeatLossFactor, // alpha for blower heat loss fraction
@@ -440,7 +432,7 @@ namespace DataGenerators {
 			int const IntakeRecoveryMode,
 			int const ConstituentMode, // how are air data input
 			int const NumConstituents,
-			FArray1_Fstring const & ConstitName,
+			FArray1_string const & ConstitName,
 			FArray1< Real64 > const & ConstitMolalFract,
 			FArray1_int const & GasLibID, // lookup ID in Gas Phase ThermoChemistry Structure Array
 			Real64 const O2fraction,
@@ -450,8 +442,8 @@ namespace DataGenerators {
 			Real64 const QskinLoss, // pumping losses for zone
 			Real64 const QintakeRecovery // heat recovered on intake air by accessories
 		) :
-			Name( MaxNameLength, Name ),
-			NodeName( MaxNameLength, NodeName ),
+			Name( Name ),
+			NodeName( NodeName ),
 			SupNodeNum( SupNodeNum ),
 			BlowerPowerCurveID( BlowerPowerCurveID ),
 			BlowerHeatLossFactor( BlowerHeatLossFactor ),
@@ -463,7 +455,7 @@ namespace DataGenerators {
 			IntakeRecoveryMode( IntakeRecoveryMode ),
 			ConstituentMode( ConstituentMode ),
 			NumConstituents( NumConstituents ),
-			ConstitName( 14, sFstring( MaxNameLength ), ConstitName ),
+			ConstitName( 14, ConstitName ),
 			ConstitMolalFract( 14, ConstitMolalFract ),
 			GasLibID( 14, GasLibID ),
 			O2fraction( O2fraction ),
@@ -480,10 +472,10 @@ namespace DataGenerators {
 	{
 		// Members
 		// user input data
-		Fstring Name; // name of this stack cooler module
-		Fstring WaterInNodeName; // HR Water Inlet Node
+		std::string Name; // name of this stack cooler module
+		std::string WaterInNodeName; // HR Water Inlet Node
 		int WaterInNode; // HR Water Outlet Node ID
-		Fstring WaterOutNodeName; // HR water outlet Node name
+		std::string WaterOutNodeName; // HR water outlet Node name
 		int WaterOutNode; // HR Water outlet Node ID
 		Real64 TstackNom; // nominal fuel cell stack temperature
 		Real64 TstackActual; // actual fuel cell stack temperature
@@ -510,10 +502,7 @@ namespace DataGenerators {
 
 		// Default Constructor
 		FCStackCoolerDataStruct() :
-			Name( MaxNameLength ),
-			WaterInNodeName( MaxNameLength ),
 			WaterInNode( 0 ),
-			WaterOutNodeName( MaxNameLength ),
 			WaterOutNode( 0 ),
 			TstackNom( 0.0 ),
 			TstackActual( 0.0 ),
@@ -540,10 +529,10 @@ namespace DataGenerators {
 
 		// Member Constructor
 		FCStackCoolerDataStruct(
-			Fstring const & Name, // name of this stack cooler module
-			Fstring const & WaterInNodeName, // HR Water Inlet Node
+			std::string const & Name, // name of this stack cooler module
+			std::string const & WaterInNodeName, // HR Water Inlet Node
 			int const WaterInNode, // HR Water Outlet Node ID
-			Fstring const & WaterOutNodeName, // HR water outlet Node name
+			std::string const & WaterOutNodeName, // HR water outlet Node name
 			int const WaterOutNode, // HR Water outlet Node ID
 			Real64 const TstackNom, // nominal fuel cell stack temperature
 			Real64 const TstackActual, // actual fuel cell stack temperature
@@ -567,10 +556,10 @@ namespace DataGenerators {
 			Real64 const qs_cool,
 			Real64 const qs_air
 		) :
-			Name( MaxNameLength, Name ),
-			WaterInNodeName( MaxNameLength, WaterInNodeName ),
+			Name( Name ),
+			WaterInNodeName( WaterInNodeName ),
 			WaterInNode( WaterInNode ),
-			WaterOutNodeName( MaxNameLength, WaterOutNodeName ),
+			WaterOutNodeName( WaterOutNodeName ),
 			WaterOutNode( WaterOutNode ),
 			TstackNom( TstackNom ),
 			TstackActual( TstackActual ),
@@ -600,9 +589,9 @@ namespace DataGenerators {
 	struct FCWaterSupplyDataStruct
 	{
 		// Members
-		Fstring Name; // name of this water supply module
+		std::string Name; // name of this water supply module
 		int WaterTempMode; // temperature of water inlet determination
-		Fstring NodeName; // node name for temperature at input
+		std::string NodeName; // node name for temperature at input
 		int NodeNum; // node number for temperature at input
 		int SchedNum; // water temperature at input
 		int WaterSupRateCurveID; // "pointer" to water flow rate curve as a function of fuel rate
@@ -617,9 +606,7 @@ namespace DataGenerators {
 
 		// Default Constructor
 		FCWaterSupplyDataStruct() :
-			Name( MaxNameLength ),
 			WaterTempMode( 0 ),
-			NodeName( MaxNameLength ),
 			NodeNum( 0 ),
 			SchedNum( 0 ),
 			WaterSupRateCurveID( 0 ),
@@ -634,9 +621,9 @@ namespace DataGenerators {
 
 		// Member Constructor
 		FCWaterSupplyDataStruct(
-			Fstring const & Name, // name of this water supply module
+			std::string const & Name, // name of this water supply module
 			int const WaterTempMode, // temperature of water inlet determination
-			Fstring const & NodeName, // node name for temperature at input
+			std::string const & NodeName, // node name for temperature at input
 			int const NodeNum, // node number for temperature at input
 			int const SchedNum, // water temperature at input
 			int const WaterSupRateCurveID, // "pointer" to water flow rate curve as a function of fuel rate
@@ -648,9 +635,9 @@ namespace DataGenerators {
 			Real64 const PwaterCompEl, // water pump power
 			Real64 const QskinLoss // pumping losses for zone
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			WaterTempMode( WaterTempMode ),
-			NodeName( MaxNameLength, NodeName ),
+			NodeName( NodeName ),
 			NodeNum( NodeNum ),
 			SchedNum( SchedNum ),
 			WaterSupRateCurveID( WaterSupRateCurveID ),
@@ -668,8 +655,8 @@ namespace DataGenerators {
 	struct FCAuxilHeatDataStruct
 	{
 		// Members
-		Fstring Name; // name of this auxiliary heating module
-		Fstring ZoneName;
+		std::string Name; // name of this auxiliary heating module
+		std::string ZoneName;
 		int ZoneID;
 		Real64 UASkin; // for skin losses to zone
 		Real64 ExcessAirRAT;
@@ -691,8 +678,6 @@ namespace DataGenerators {
 
 		// Default Constructor
 		FCAuxilHeatDataStruct() :
-			Name( MaxNameLength ),
-			ZoneName( MaxNameLength ),
 			ZoneID( 0 ),
 			UASkin( 0.0 ),
 			ExcessAirRAT( 0.0 ),
@@ -714,8 +699,8 @@ namespace DataGenerators {
 
 		// Member Constructor
 		FCAuxilHeatDataStruct(
-			Fstring const & Name, // name of this auxiliary heating module
-			Fstring const & ZoneName,
+			std::string const & Name, // name of this auxiliary heating module
+			std::string const & ZoneName,
 			int const ZoneID,
 			Real64 const UASkin, // for skin losses to zone
 			Real64 const ExcessAirRAT,
@@ -734,8 +719,8 @@ namespace DataGenerators {
 			Real64 const QskinLoss, // Heat lost to room
 			Real64 const QairIntake // heat into intake air
 		) :
-			Name( MaxNameLength, Name ),
-			ZoneName( MaxNameLength, ZoneName ),
+			Name( Name ),
+			ZoneName( ZoneName ),
 			ZoneID( ZoneID ),
 			UASkin( UASkin ),
 			ExcessAirRAT( ExcessAirRAT ),
@@ -761,13 +746,13 @@ namespace DataGenerators {
 	{
 		// Members
 		// user defined variables
-		Fstring Name; // name of this exhaust gas heat recovery
-		Fstring WaterInNodeName; // HR Water Inlet Node
+		std::string Name; // name of this exhaust gas heat recovery
+		std::string WaterInNodeName; // HR Water Inlet Node
 		int WaterInNode; // HR Water Outlet Node ID
-		Fstring WaterOutNodeName; // HR water outlet Node name
+		std::string WaterOutNodeName; // HR water outlet Node name
 		int WaterOutNode; // HR Water outlet Node ID
 		Real64 WaterVolumeFlowMax; // HR water flow rate max avail
-		Fstring ExhaustOutNodeName; // air node for exhaust flow
+		std::string ExhaustOutNodeName; // air node for exhaust flow
 		int ExhaustOutNode; // Exhaust Air node ID
 		int HXmodelMode; // Heat Exchanger Calculation Method
 		Real64 HXEffect; // Heat Exchanger Effectiveness (method 1)
@@ -804,13 +789,9 @@ namespace DataGenerators {
 
 		// Default Constructor
 		FCExhaustHXDataStruct() :
-			Name( MaxNameLength ),
-			WaterInNodeName( MaxNameLength ),
 			WaterInNode( 0 ),
-			WaterOutNodeName( MaxNameLength ),
 			WaterOutNode( 0 ),
 			WaterVolumeFlowMax( 0.0 ),
-			ExhaustOutNodeName( MaxNameLength ),
 			ExhaustOutNode( 0 ),
 			HXmodelMode( 0 ),
 			HXEffect( 0.0 ),
@@ -847,13 +828,13 @@ namespace DataGenerators {
 
 		// Member Constructor
 		FCExhaustHXDataStruct(
-			Fstring const & Name, // name of this exhaust gas heat recovery
-			Fstring const & WaterInNodeName, // HR Water Inlet Node
+			std::string const & Name, // name of this exhaust gas heat recovery
+			std::string const & WaterInNodeName, // HR Water Inlet Node
 			int const WaterInNode, // HR Water Outlet Node ID
-			Fstring const & WaterOutNodeName, // HR water outlet Node name
+			std::string const & WaterOutNodeName, // HR water outlet Node name
 			int const WaterOutNode, // HR Water outlet Node ID
 			Real64 const WaterVolumeFlowMax, // HR water flow rate max avail
-			Fstring const & ExhaustOutNodeName, // air node for exhaust flow
+			std::string const & ExhaustOutNodeName, // air node for exhaust flow
 			int const ExhaustOutNode, // Exhaust Air node ID
 			int const HXmodelMode, // Heat Exchanger Calculation Method
 			Real64 const HXEffect, // Heat Exchanger Effectiveness (method 1)
@@ -887,13 +868,13 @@ namespace DataGenerators {
 			Real64 const WaterOutletTemp,
 			Real64 const WaterOutletEnthalpy
 		) :
-			Name( MaxNameLength, Name ),
-			WaterInNodeName( MaxNameLength, WaterInNodeName ),
+			Name( Name ),
+			WaterInNodeName( WaterInNodeName ),
 			WaterInNode( WaterInNode ),
-			WaterOutNodeName( MaxNameLength, WaterOutNodeName ),
+			WaterOutNodeName( WaterOutNodeName ),
 			WaterOutNode( WaterOutNode ),
 			WaterVolumeFlowMax( WaterVolumeFlowMax ),
-			ExhaustOutNodeName( MaxNameLength, ExhaustOutNodeName ),
+			ExhaustOutNodeName( ExhaustOutNodeName ),
 			ExhaustOutNode( ExhaustOutNode ),
 			HXmodelMode( HXmodelMode ),
 			HXEffect( HXEffect ),
@@ -934,7 +915,7 @@ namespace DataGenerators {
 	{
 		// Members
 		// user defined variables
-		Fstring Name; // name of this battery data set
+		std::string Name; // name of this battery data set
 		Real64 NumInSeries;
 		Real64 NumInParallel;
 		Real64 NominalVoltage;
@@ -949,7 +930,6 @@ namespace DataGenerators {
 
 		// Default Constructor
 		BatteryDichargeDataStruct() :
-			Name( MaxNameLength ),
 			NumInSeries( 0.0 ),
 			NumInParallel( 0.0 ),
 			NominalVoltage( 0.0 ),
@@ -962,7 +942,7 @@ namespace DataGenerators {
 
 		// Member Constructor
 		BatteryDichargeDataStruct(
-			Fstring const & Name, // name of this battery data set
+			std::string const & Name, // name of this battery data set
 			Real64 const NumInSeries,
 			Real64 const NumInParallel,
 			Real64 const NominalVoltage,
@@ -974,7 +954,7 @@ namespace DataGenerators {
 			Real64 const c, // parameter in Manwell McGowan model
 			Real64 const qmax // parameter in Manwell McGowan model
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NumInSeries( NumInSeries ),
 			NumInParallel( NumInParallel ),
 			NominalVoltage( NominalVoltage ),
@@ -993,7 +973,7 @@ namespace DataGenerators {
 	{
 		// Members
 		//user defined variables
-		Fstring Name; // name of this electrical storage module
+		std::string Name; // name of this electrical storage module
 		int StorageModelMode;
 		Real64 StartingEnergyStored; // joules inside
 		Real64 EnergeticEfficCharge; // for
@@ -1016,7 +996,6 @@ namespace DataGenerators {
 
 		// Default Constructor
 		FCElecStorageDataStruct() :
-			Name( MaxNameLength ),
 			StorageModelMode( 0 ),
 			StartingEnergyStored( 0.0 ),
 			EnergeticEfficCharge( 0.0 ),
@@ -1037,7 +1016,7 @@ namespace DataGenerators {
 
 		// Member Constructor
 		FCElecStorageDataStruct(
-			Fstring const & Name, // name of this electrical storage module
+			std::string const & Name, // name of this electrical storage module
 			int const StorageModelMode,
 			Real64 const StartingEnergyStored, // joules inside
 			Real64 const EnergeticEfficCharge, // for
@@ -1056,7 +1035,7 @@ namespace DataGenerators {
 			Real64 const QairIntake, // heat into intake air
 			BatteryDichargeDataStruct const & Battery
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			StorageModelMode( StorageModelMode ),
 			StartingEnergyStored( StartingEnergyStored ),
 			EnergeticEfficCharge( EnergeticEfficCharge ),
@@ -1082,7 +1061,7 @@ namespace DataGenerators {
 	{
 		// Members
 		// user-defined data
-		Fstring Name; // name of this inverter
+		std::string Name; // name of this inverter
 		int EffMode; // efficiency calculation mode
 		Real64 ConstEff;
 		int EffQuadraticCurveID;
@@ -1092,7 +1071,6 @@ namespace DataGenerators {
 
 		// Default Constructor
 		FCInverterDataStruct() :
-			Name( MaxNameLength ),
 			EffMode( 0 ),
 			ConstEff( 0.0 ),
 			EffQuadraticCurveID( 0 ),
@@ -1102,14 +1080,14 @@ namespace DataGenerators {
 
 		// Member Constructor
 		FCInverterDataStruct(
-			Fstring const & Name, // name of this inverter
+			std::string const & Name, // name of this inverter
 			int const EffMode, // efficiency calculation mode
 			Real64 const ConstEff,
 			int const EffQuadraticCurveID,
 			Real64 const PCUlosses,
 			Real64 const QairIntake
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			EffMode( EffMode ),
 			ConstEff( ConstEff ),
 			EffQuadraticCurveID( EffQuadraticCurveID ),
@@ -1408,24 +1386,24 @@ namespace DataGenerators {
 	{
 		// Members
 		// from input data and nested types for subsystems
-		Fstring Name; // user identifier
-		Fstring NameFCPM; // name of FC Power Module
+		std::string Name; // user identifier
+		std::string NameFCPM; // name of FC Power Module
 		FCPowerModuleStruct FCPM; // data for Power Module
-		Fstring NameFCAirSup; // name of air supply module for fuel cell
+		std::string NameFCAirSup; // name of air supply module for fuel cell
 		FCAirSupplyDataStruct AirSup; // data for air supply module
-		Fstring NameFCFuelSup; // name of fuel supply module
+		std::string NameFCFuelSup; // name of fuel supply module
 		int FuelSupNum; // indes for fuel supply module structure
-		Fstring NameFCWaterSup; // name of water supply module
+		std::string NameFCWaterSup; // name of water supply module
 		FCWaterSupplyDataStruct WaterSup; // data for water supply module
-		Fstring NameFCAuxilHeat; // name of auxiliary heating module
+		std::string NameFCAuxilHeat; // name of auxiliary heating module
 		FCAuxilHeatDataStruct AuxilHeat; // data for auxiliary heating module
-		Fstring NameExhaustHX; // name of Exhaust HX module
+		std::string NameExhaustHX; // name of Exhaust HX module
 		FCExhaustHXDataStruct ExhaustHX; // data for Exhaust heat exchanger module
-		Fstring NameElecStorage; // name of Battery module
+		std::string NameElecStorage; // name of Battery module
 		FCElecStorageDataStruct ElecStorage; // data for Battery module
-		Fstring NameInverter; // name of Inverter Module
+		std::string NameInverter; // name of Inverter Module
 		FCInverterDataStruct Inverter; // data for INverter module
-		Fstring NameStackCooler; // name of Inverter Module
+		std::string NameStackCooler; // name of Inverter Module
 		FCStackCoolerDataStruct StackCooler; // data for INverter module
 		int CWLoopNum; // cooling water plant loop index number
 		int CWLoopSideNum; // cooling water plant loop side index
@@ -1441,17 +1419,7 @@ namespace DataGenerators {
 
 		// Default Constructor
 		FCDataStruct() :
-			Name( MaxNameLength ),
-			NameFCPM( MaxNameLength ),
-			NameFCAirSup( MaxNameLength ),
-			NameFCFuelSup( MaxNameLength ),
 			FuelSupNum( 0 ),
-			NameFCWaterSup( MaxNameLength ),
-			NameFCAuxilHeat( MaxNameLength ),
-			NameExhaustHX( MaxNameLength ),
-			NameElecStorage( MaxNameLength ),
-			NameInverter( MaxNameLength ),
-			NameStackCooler( MaxNameLength ),
 			CWLoopNum( 0 ),
 			CWLoopSideNum( 0 ),
 			CWBranchNum( 0 ),
@@ -1465,24 +1433,24 @@ namespace DataGenerators {
 
 		// Member Constructor
 		FCDataStruct(
-			Fstring const & Name, // user identifier
-			Fstring const & NameFCPM, // name of FC Power Module
+			std::string const & Name, // user identifier
+			std::string const & NameFCPM, // name of FC Power Module
 			FCPowerModuleStruct const & FCPM, // data for Power Module
-			Fstring const & NameFCAirSup, // name of air supply module for fuel cell
+			std::string const & NameFCAirSup, // name of air supply module for fuel cell
 			FCAirSupplyDataStruct const & AirSup, // data for air supply module
-			Fstring const & NameFCFuelSup, // name of fuel supply module
+			std::string const & NameFCFuelSup, // name of fuel supply module
 			int const FuelSupNum, // indes for fuel supply module structure
-			Fstring const & NameFCWaterSup, // name of water supply module
+			std::string const & NameFCWaterSup, // name of water supply module
 			FCWaterSupplyDataStruct const & WaterSup, // data for water supply module
-			Fstring const & NameFCAuxilHeat, // name of auxiliary heating module
+			std::string const & NameFCAuxilHeat, // name of auxiliary heating module
 			FCAuxilHeatDataStruct const & AuxilHeat, // data for auxiliary heating module
-			Fstring const & NameExhaustHX, // name of Exhaust HX module
+			std::string const & NameExhaustHX, // name of Exhaust HX module
 			FCExhaustHXDataStruct const & ExhaustHX, // data for Exhaust heat exchanger module
-			Fstring const & NameElecStorage, // name of Battery module
+			std::string const & NameElecStorage, // name of Battery module
 			FCElecStorageDataStruct const & ElecStorage, // data for Battery module
-			Fstring const & NameInverter, // name of Inverter Module
+			std::string const & NameInverter, // name of Inverter Module
 			FCInverterDataStruct const & Inverter, // data for INverter module
-			Fstring const & NameStackCooler, // name of Inverter Module
+			std::string const & NameStackCooler, // name of Inverter Module
 			FCStackCoolerDataStruct const & StackCooler, // data for INverter module
 			int const CWLoopNum, // cooling water plant loop index number
 			int const CWLoopSideNum, // cooling water plant loop side index
@@ -1495,24 +1463,24 @@ namespace DataGenerators {
 			int const DynamicsControlID,
 			Real64 const TimeElapsed // used to track when timestep has changed
 		) :
-			Name( MaxNameLength, Name ),
-			NameFCPM( MaxNameLength, NameFCPM ),
+			Name( Name ),
+			NameFCPM( NameFCPM ),
 			FCPM( FCPM ),
-			NameFCAirSup( MaxNameLength, NameFCAirSup ),
+			NameFCAirSup( NameFCAirSup ),
 			AirSup( AirSup ),
-			NameFCFuelSup( MaxNameLength, NameFCFuelSup ),
+			NameFCFuelSup( NameFCFuelSup ),
 			FuelSupNum( FuelSupNum ),
-			NameFCWaterSup( MaxNameLength, NameFCWaterSup ),
+			NameFCWaterSup( NameFCWaterSup ),
 			WaterSup( WaterSup ),
-			NameFCAuxilHeat( MaxNameLength, NameFCAuxilHeat ),
+			NameFCAuxilHeat( NameFCAuxilHeat ),
 			AuxilHeat( AuxilHeat ),
-			NameExhaustHX( MaxNameLength, NameExhaustHX ),
+			NameExhaustHX( NameExhaustHX ),
 			ExhaustHX( ExhaustHX ),
-			NameElecStorage( MaxNameLength, NameElecStorage ),
+			NameElecStorage( NameElecStorage ),
 			ElecStorage( ElecStorage ),
-			NameInverter( MaxNameLength, NameInverter ),
+			NameInverter( NameInverter ),
 			Inverter( Inverter ),
-			NameStackCooler( MaxNameLength, NameStackCooler ),
+			NameStackCooler( NameStackCooler ),
 			StackCooler( StackCooler ),
 			CWLoopNum( CWLoopNum ),
 			CWLoopSideNum( CWLoopSideNum ),
@@ -1532,16 +1500,16 @@ namespace DataGenerators {
 	{
 		// Members
 		// user input data
-		Fstring Name; // name of this fuel supply module
+		std::string Name; // name of this fuel supply module
 		int FuelTempMode; // temperature of fuel node
 		int FuelTypeMode; // type of fuel, gasous or liquid
-		Fstring NodeName; // node name for temperature at input
+		std::string NodeName; // node name for temperature at input
 		int NodeNum; // node number for temperature at input
 		int SchedNum; // fuel temperature at input
 		int CompPowerCurveID; // "pointer" to compressor power cubic curve
 		Real64 CompPowerLossFactor;
 		int NumConstituents; // number of constituents in fue supply
-		FArray1D_Fstring ConstitName;
+		FArray1D_string ConstitName;
 		FArray1D< Real64 > ConstitMolalFract;
 		//calculated data (except some for generic liquid)
 		FArray1D_int GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
@@ -1562,15 +1530,13 @@ namespace DataGenerators {
 
 		// Default Constructor
 		GeneratorFuelSupplyDataStruct() :
-			Name( MaxNameLength ),
 			FuelTempMode( 0 ),
 			FuelTypeMode( 0 ),
-			NodeName( MaxNameLength ),
 			NodeNum( 0 ),
 			SchedNum( 0 ),
 			CompPowerCurveID( 0 ),
 			CompPowerLossFactor( 0.0 ),
-			ConstitName( 14, sFstring( MaxNameLength ) ),
+			ConstitName( 14 ),
 			ConstitMolalFract( 14, 0.0 ),
 			GasLibID( 14, 0 ),
 			LHV( 0.0 ),
@@ -1591,16 +1557,16 @@ namespace DataGenerators {
 
 		// Member Constructor
 		GeneratorFuelSupplyDataStruct(
-			Fstring const & Name, // name of this fuel supply module
+			std::string const & Name, // name of this fuel supply module
 			int const FuelTempMode, // temperature of fuel node
 			int const FuelTypeMode, // type of fuel, gasous or liquid
-			Fstring const & NodeName, // node name for temperature at input
+			std::string const & NodeName, // node name for temperature at input
 			int const NodeNum, // node number for temperature at input
 			int const SchedNum, // fuel temperature at input
 			int const CompPowerCurveID, // "pointer" to compressor power cubic curve
 			Real64 const CompPowerLossFactor,
 			int const NumConstituents, // number of constituents in fue supply
-			FArray1_Fstring const & ConstitName,
+			FArray1_string const & ConstitName,
 			FArray1< Real64 > const & ConstitMolalFract,
 			FArray1_int const & GasLibID, // lookup ID in Gas Phase ThermoChemistry Structure Array
 			Real64 const LHV, // lower heating value of gaseous fuel (kJ/mol)
@@ -1618,16 +1584,16 @@ namespace DataGenerators {
 			Real64 const CO2ProductGasCoef, // molar multiplier for stoic products of this fuel
 			Real64 const H20ProductGasCoef // molar multiplier for stoic products of this fuel
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			FuelTempMode( FuelTempMode ),
 			FuelTypeMode( FuelTypeMode ),
-			NodeName( MaxNameLength, NodeName ),
+			NodeName( NodeName ),
 			NodeNum( NodeNum ),
 			SchedNum( SchedNum ),
 			CompPowerCurveID( CompPowerCurveID ),
 			CompPowerLossFactor( CompPowerLossFactor ),
 			NumConstituents( NumConstituents ),
-			ConstitName( 14, sFstring( MaxNameLength ), ConstitName ),
+			ConstitName( 14, ConstitName ),
 			ConstitMolalFract( 14, ConstitMolalFract ),
 			GasLibID( 14, GasLibID ),
 			LHV( LHV ),
@@ -1651,8 +1617,8 @@ namespace DataGenerators {
 	struct GasPropertyDataStruct
 	{
 		// Members
-		Fstring ConstituentName;
-		Fstring ConstituentFormula;
+		std::string ConstituentName;
+		std::string ConstituentFormula;
 		Real64 StdRefMolarEnthOfForm;
 		int ThermoMode; // method of calculation for thermodynamics
 		Real64 ShomateA;
@@ -1677,8 +1643,6 @@ namespace DataGenerators {
 
 		// Default Constructor
 		GasPropertyDataStruct() :
-			ConstituentName( MaxNameLength ),
-			ConstituentFormula( MaxNameLength ),
 			StdRefMolarEnthOfForm( 0.0 ),
 			ThermoMode( 0 ),
 			ShomateA( 0.0 ),
@@ -1704,8 +1668,8 @@ namespace DataGenerators {
 
 		// Member Constructor
 		GasPropertyDataStruct(
-			Fstring const & ConstituentName,
-			Fstring const & ConstituentFormula,
+			std::string const & ConstituentName,
+			std::string const & ConstituentFormula,
 			Real64 const StdRefMolarEnthOfForm,
 			int const ThermoMode, // method of calculation for thermodynamics
 			Real64 const ShomateA,
@@ -1728,8 +1692,8 @@ namespace DataGenerators {
 			Real64 const NASA_A6,
 			Real64 const NASA_A7
 		) :
-			ConstituentName( MaxNameLength, ConstituentName ),
-			ConstituentFormula( MaxNameLength, ConstituentFormula ),
+			ConstituentName( ConstituentName ),
+			ConstituentFormula( ConstituentFormula ),
 			StdRefMolarEnthOfForm( StdRefMolarEnthOfForm ),
 			ThermoMode( ThermoMode ),
 			ShomateA( ShomateA ),
@@ -1759,7 +1723,7 @@ namespace DataGenerators {
 	{
 		// Members
 		// user input data
-		Fstring Name;
+		std::string Name;
 		Real64 PelMin; // minimum operating point for electrical power Pel
 		Real64 PelMax; // maximum operating point for electrical power Pel
 		Real64 UpTranLimit; // power up transient limit W/s
@@ -1809,7 +1773,6 @@ namespace DataGenerators {
 
 		// Default Constructor
 		GeneratorDynamicsManagerStruct() :
-			Name( MaxNameLength ),
 			PelMin( 0.0 ),
 			PelMax( 0.0 ),
 			UpTranLimit( 0.0 ),
@@ -1859,7 +1822,7 @@ namespace DataGenerators {
 
 		// Member Constructor
 		GeneratorDynamicsManagerStruct(
-			Fstring const & Name,
+			std::string const & Name,
 			Real64 const PelMin, // minimum operating point for electrical power Pel
 			Real64 const PelMax, // maximum operating point for electrical power Pel
 			Real64 const UpTranLimit, // power up transient limit W/s
@@ -1906,7 +1869,7 @@ namespace DataGenerators {
 			Real64 const QdotHXMin, // thermal power min
 			Real64 const QdotHXOpt // thermal power nominal/optimal
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			PelMin( PelMin ),
 			PelMax( PelMax ),
 			UpTranLimit( UpTranLimit ),
@@ -1960,7 +1923,7 @@ namespace DataGenerators {
 	{
 		// Members
 		//user parameters
-		Fstring Name; // name of this PowerModule data
+		std::string Name; // name of this PowerModule data
 		Real64 MaxElecPower; // net electric power [W]
 		Real64 MinElecPower; // net electric power [W]
 		Real64 MinWaterMdot; // minimum cooling water flow [kg/s]
@@ -2018,7 +1981,6 @@ namespace DataGenerators {
 
 		// Default Constructor
 		MicroCHPParamsNonNormalized() :
-			Name( MaxNameLength ),
 			MaxElecPower( 0.0 ),
 			MinElecPower( 0.0 ),
 			MinWaterMdot( 0.0 ),
@@ -2075,7 +2037,7 @@ namespace DataGenerators {
 
 		// Member Constructor
 		MicroCHPParamsNonNormalized(
-			Fstring const & Name, // name of this PowerModule data
+			std::string const & Name, // name of this PowerModule data
 			Real64 const MaxElecPower, // net electric power [W]
 			Real64 const MinElecPower, // net electric power [W]
 			Real64 const MinWaterMdot, // minimum cooling water flow [kg/s]
@@ -2129,7 +2091,7 @@ namespace DataGenerators {
 			Real64 const QdotConvZone,
 			Real64 const QdotRadZone
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			MaxElecPower( MaxElecPower ),
 			MinElecPower( MinElecPower ),
 			MinWaterMdot( MinWaterMdot ),
@@ -2363,22 +2325,22 @@ namespace DataGenerators {
 	{
 		// Members
 		// user input data
-		Fstring Name; // name of this Micro CHP Generator
-		Fstring ParamObjName; // name of parameter object
+		std::string Name; // name of this Micro CHP Generator
+		std::string ParamObjName; // name of parameter object
 		MicroCHPParamsNonNormalized A42Model; // Nested parameter data structure
 		bool ModelTypeAnnex42; // normalized =  non-normalized?
 		Real64 NomEff; // nominal efficiency
-		Fstring ZoneName;
+		std::string ZoneName;
 		int ZoneID;
-		Fstring PlantInletNodeName;
+		std::string PlantInletNodeName;
 		int PlantInletNodeID;
-		Fstring PlantOutletNodeName;
+		std::string PlantOutletNodeName;
 		int PlantOutletNodeID;
 		Real64 PlantMassFlowRate; // only if internal control
 		Real64 PlantMassFlowRateMax; // hardware limit for node%massflowrateMax
-		Fstring AirInletNodeName;
+		std::string AirInletNodeName;
 		int AirInletNodeID;
-		Fstring AirOutletNodeName;
+		std::string AirOutletNodeName;
 		int AirOutletNodeID;
 		MicroCHPReportDataStruct Report; // structure of report variables
 		int FuelSupplyID; // index for fuel supply data structure
@@ -2391,21 +2353,14 @@ namespace DataGenerators {
 
 		// Default Constructor
 		MicroCHPDataStruct() :
-			Name( MaxNameLength ),
-			ParamObjName( MaxNameLength ),
 			ModelTypeAnnex42( true ),
 			NomEff( 0.0 ),
-			ZoneName( MaxNameLength ),
 			ZoneID( 0 ),
-			PlantInletNodeName( MaxNameLength ),
 			PlantInletNodeID( 0 ),
-			PlantOutletNodeName( MaxNameLength ),
 			PlantOutletNodeID( 0 ),
 			PlantMassFlowRate( 0.0 ),
 			PlantMassFlowRateMax( 0.0 ),
-			AirInletNodeName( MaxNameLength ),
 			AirInletNodeID( 0 ),
-			AirOutletNodeName( MaxNameLength ),
 			AirOutletNodeID( 0 ),
 			FuelSupplyID( 0 ),
 			DynamicsControlID( 0 ),
@@ -2418,22 +2373,22 @@ namespace DataGenerators {
 
 		// Member Constructor
 		MicroCHPDataStruct(
-			Fstring const & Name, // name of this Micro CHP Generator
-			Fstring const & ParamObjName, // name of parameter object
+			std::string const & Name, // name of this Micro CHP Generator
+			std::string const & ParamObjName, // name of parameter object
 			MicroCHPParamsNonNormalized const & A42Model, // Nested parameter data structure
 			bool const ModelTypeAnnex42, // normalized =  non-normalized?
 			Real64 const NomEff, // nominal efficiency
-			Fstring const & ZoneName,
+			std::string const & ZoneName,
 			int const ZoneID,
-			Fstring const & PlantInletNodeName,
+			std::string const & PlantInletNodeName,
 			int const PlantInletNodeID,
-			Fstring const & PlantOutletNodeName,
+			std::string const & PlantOutletNodeName,
 			int const PlantOutletNodeID,
 			Real64 const PlantMassFlowRate, // only if internal control
 			Real64 const PlantMassFlowRateMax, // hardware limit for node%massflowrateMax
-			Fstring const & AirInletNodeName,
+			std::string const & AirInletNodeName,
 			int const AirInletNodeID,
-			Fstring const & AirOutletNodeName,
+			std::string const & AirOutletNodeName,
 			int const AirOutletNodeID,
 			MicroCHPReportDataStruct const & Report, // structure of report variables
 			int const FuelSupplyID, // index for fuel supply data structure
@@ -2444,22 +2399,22 @@ namespace DataGenerators {
 			int const CWBranchNum, // cooling water plant loop branch index
 			int const CWCompNum // cooling water plant loop component index
 		) :
-			Name( MaxNameLength, Name ),
-			ParamObjName( MaxNameLength, ParamObjName ),
+			Name( Name ),
+			ParamObjName( ParamObjName ),
 			A42Model( A42Model ),
 			ModelTypeAnnex42( ModelTypeAnnex42 ),
 			NomEff( NomEff ),
-			ZoneName( MaxNameLength, ZoneName ),
+			ZoneName( ZoneName ),
 			ZoneID( ZoneID ),
-			PlantInletNodeName( MaxNameLength, PlantInletNodeName ),
+			PlantInletNodeName( PlantInletNodeName ),
 			PlantInletNodeID( PlantInletNodeID ),
-			PlantOutletNodeName( MaxNameLength, PlantOutletNodeName ),
+			PlantOutletNodeName( PlantOutletNodeName ),
 			PlantOutletNodeID( PlantOutletNodeID ),
 			PlantMassFlowRate( PlantMassFlowRate ),
 			PlantMassFlowRateMax( PlantMassFlowRateMax ),
-			AirInletNodeName( MaxNameLength, AirInletNodeName ),
+			AirInletNodeName( AirInletNodeName ),
 			AirInletNodeID( AirInletNodeID ),
-			AirOutletNodeName( MaxNameLength, AirOutletNodeName ),
+			AirOutletNodeName( AirOutletNodeName ),
 			AirOutletNodeID( AirOutletNodeID ),
 			Report( Report ),
 			FuelSupplyID( FuelSupplyID ),

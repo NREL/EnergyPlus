@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -15,7 +14,6 @@ namespace EnergyPlus {
 namespace ZonePlenum {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// DERIVED TYPE DEFINITIONS
@@ -33,9 +31,9 @@ namespace ZonePlenum {
 	struct ZoneReturnPlenumConditions
 	{
 		// Members
-		Fstring ZonePlenumName;
-		Fstring ZoneName;
-		Fstring ZoneNodeName;
+		std::string ZonePlenumName;
+		std::string ZoneName;
+		std::string ZoneNodeName;
 		Real64 ZoneTemp;
 		Real64 ZoneHumRat;
 		Real64 ZoneEnthalpy;
@@ -74,9 +72,6 @@ namespace ZonePlenum {
 
 		// Default Constructor
 		ZoneReturnPlenumConditions() :
-			ZonePlenumName( MaxNameLength ),
-			ZoneName( MaxNameLength ),
-			ZoneNodeName( MaxNameLength ),
 			ZoneTemp( 0.0 ),
 			ZoneHumRat( 0.0 ),
 			ZoneEnthalpy( 0.0 ),
@@ -97,9 +92,9 @@ namespace ZonePlenum {
 
 		// Member Constructor
 		ZoneReturnPlenumConditions(
-			Fstring const & ZonePlenumName,
-			Fstring const & ZoneName,
-			Fstring const & ZoneNodeName,
+			std::string const & ZonePlenumName,
+			std::string const & ZoneName,
+			std::string const & ZoneNodeName,
 			Real64 const ZoneTemp,
 			Real64 const ZoneHumRat,
 			Real64 const ZoneEnthalpy,
@@ -136,9 +131,9 @@ namespace ZonePlenum {
 			int const NumADUs, // number of ADU's that can leak to this plenum
 			FArray1_int const & ZoneEqNum // list of zone equip config indices for this plenum
 		) :
-			ZonePlenumName( MaxNameLength, ZonePlenumName ),
-			ZoneName( MaxNameLength, ZoneName ),
-			ZoneNodeName( MaxNameLength, ZoneNodeName ),
+			ZonePlenumName( ZonePlenumName ),
+			ZoneName( ZoneName ),
+			ZoneNodeName( ZoneNodeName ),
 			ZoneTemp( ZoneTemp ),
 			ZoneHumRat( ZoneHumRat ),
 			ZoneEnthalpy( ZoneEnthalpy ),
@@ -181,9 +176,9 @@ namespace ZonePlenum {
 	struct ZoneSupplyPlenumConditions
 	{
 		// Members
-		Fstring ZonePlenumName;
-		Fstring ZoneName;
-		Fstring ZoneNodeName;
+		std::string ZonePlenumName;
+		std::string ZoneName;
+		std::string ZoneNodeName;
 		Real64 ZoneTemp;
 		Real64 ZoneHumRat;
 		Real64 ZoneEnthalpy;
@@ -210,9 +205,6 @@ namespace ZonePlenum {
 
 		// Default Constructor
 		ZoneSupplyPlenumConditions() :
-			ZonePlenumName( MaxNameLength ),
-			ZoneName( MaxNameLength ),
-			ZoneNodeName( MaxNameLength ),
 			ZoneTemp( 0.0 ),
 			ZoneHumRat( 0.0 ),
 			ZoneEnthalpy( 0.0 ),
@@ -232,9 +224,9 @@ namespace ZonePlenum {
 
 		// Member Constructor
 		ZoneSupplyPlenumConditions(
-			Fstring const & ZonePlenumName,
-			Fstring const & ZoneName,
-			Fstring const & ZoneNodeName,
+			std::string const & ZonePlenumName,
+			std::string const & ZoneName,
+			std::string const & ZoneNodeName,
 			Real64 const ZoneTemp,
 			Real64 const ZoneHumRat,
 			Real64 const ZoneEnthalpy,
@@ -259,9 +251,9 @@ namespace ZonePlenum {
 			FArray1< Real64 > const & OutletEnthalpy,
 			FArray1< Real64 > const & OutletPressure
 		) :
-			ZonePlenumName( MaxNameLength, ZonePlenumName ),
-			ZoneName( MaxNameLength, ZoneName ),
-			ZoneNodeName( MaxNameLength, ZoneNodeName ),
+			ZonePlenumName( ZonePlenumName ),
+			ZoneName( ZoneName ),
+			ZoneNodeName( ZoneNodeName ),
 			ZoneTemp( ZoneTemp ),
 			ZoneHumRat( ZoneHumRat ),
 			ZoneEnthalpy( ZoneEnthalpy ),
@@ -297,7 +289,7 @@ namespace ZonePlenum {
 
 	void
 	SimAirZonePlenum(
-		Fstring const & CompName,
+		std::string const & CompName,
 		int const iCompType,
 		int & CompIndex,
 		Optional_bool_const FirstHVACIteration = _, //Autodesk:OPTIONAL Used without PRESENT check

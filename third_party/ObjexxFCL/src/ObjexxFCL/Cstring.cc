@@ -12,7 +12,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Cstring.hh>
-#include <ObjexxFCL/char.constants.hh>
 #include <ObjexxFCL/char.functions.hh>
 
 // C++ Headers
@@ -85,7 +84,7 @@ namespace ObjexxFCL {
 	Cstring::len_trim() const
 	{
 		for ( size_type i = std::strlen( str_ ); i > 0; --i ) {
-			if ( str_[ i - 1 ] != SPC ) return i;
+			if ( str_[ i - 1 ] != ' ' ) return i;
 		}
 		return 0;
 	}
@@ -96,7 +95,7 @@ namespace ObjexxFCL {
 	{
 		for ( size_type i = std::strlen( str_ ); i > 0; --i ) {
 			char const c( str_[ i - 1 ] );
-			if ( ( c != SPC ) && ( c != TAB ) && ( c != NUL ) ) return i;
+			if ( ( c != ' ' ) && ( c != '\t' ) && ( c != '\0' ) ) return i;
 		}
 		return 0;
 	}
@@ -147,10 +146,10 @@ namespace ObjexxFCL {
 	{
 		size_type const len( std::strlen( str_ ) );
 		for ( size_type i = 0; i < len; ++i ) {
-			if ( str_[ i ] != SPC ) {
+			if ( str_[ i ] != ' ' ) {
 				if ( i > 0 ) {
 					std::memmove( str_, str_ + i, len - i );
-					std::memset( str_ + len - i, SPC, i );
+					std::memset( str_ + len - i, ' ', i );
 				}
 				return *this;
 			}
@@ -164,10 +163,10 @@ namespace ObjexxFCL {
 	{
 		size_type const len( std::strlen( str_ ) );
 		for ( size_type i = len; i > 0; --i ) {
-			if ( str_[ i - 1 ] != SPC ) {
+			if ( str_[ i - 1 ] != ' ' ) {
 				if ( i < len ) {
 					std::memmove( str_ + len - i, str_, i );
-					std::memset( str_, SPC, len - i );
+					std::memset( str_, ' ', len - i );
 				}
 				return *this;
 			}
@@ -184,7 +183,7 @@ namespace ObjexxFCL {
 		size_type const pad( ( length() - len_t ) / 2 );
 		if ( pad > 0 ) {
 			std::memmove( str_ + pad, str_, len_t );
-			std::memset( str_, SPC, pad );
+			std::memset( str_, ' ', pad );
 		}
 		return *this;
 	}
@@ -197,9 +196,9 @@ namespace ObjexxFCL {
 		size_type j = 0;
 		for ( size_type i = 0; i < len; ++i ) {
 			char const c( str_[ i ] );
-			if ( ( c != SPC ) && ( c != TAB ) && ( c != NUL ) ) str_[ j++ ] = c;
+			if ( ( c != ' ' ) && ( c != '\t' ) && ( c != '\0' ) ) str_[ j++ ] = c;
 		}
-		if ( j < len ) std::memset( str_ + j, SPC, len - j );
+		if ( j < len ) std::memset( str_ + j, ' ', len - j );
 		return *this;
 	}
 
@@ -319,10 +318,10 @@ namespace ObjexxFCL {
 
 // Static Data Member Definitions
 
-//#ifndef _MSC_VER // Microsoft Visual C++ extensions doesn't need or like these: Enable #ifndef block if not using /Za
+#ifndef MSC_EXTENSIONS // Define when compiling with Visual C++ extensions (not using /Za)
 
 	Cstring::size_type const Cstring::npos;
 
-//#endif // _MSC_VER
+#endif
 
 } // ObjexxFCL

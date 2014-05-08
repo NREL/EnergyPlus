@@ -5,6 +5,7 @@
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/MArray.functions.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <ManageElectricPower.hh>
@@ -66,7 +67,6 @@ namespace ManageElectricPower {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::NumOfTimeStepInHour;
 	using DataGlobals::TimeStepZone;
 	using DataGlobals::SecInHour;
@@ -255,7 +255,7 @@ namespace ManageElectricPower {
 						//Index function is used here because some resource types are not Electricity but strings containing
 						// Electricity such as ElectricityPurchased and ElectricityProduced.
 						//It is not proper to have this check in GetInput routine because the meter index may have not been defined
-						if ( index( GetMeterResourceType( MeterIndex ), "Electricity" ) == 0 ) {
+						if ( ! has( GetMeterResourceType( MeterIndex ), "Electricity" ) ) {
 							ShowFatalError( "Non-electricity meter used for " + Transformer( TransfNum ).Name );
 						}
 					}
@@ -796,7 +796,7 @@ namespace ManageElectricPower {
 			} else if ( SELECT_CASE_var == 0 ) { // This case allows for the reporting to be done without generators specified.
 
 			} else {
-				ShowFatalError( "Invalid operation scheme type for Electric Load Center=" + trim( ElecLoadCenter( LoadCenterNum ).Name ) );
+				ShowFatalError( "Invalid operation scheme type for Electric Load Center=" + ElecLoadCenter( LoadCenterNum ).Name );
 
 			}} // TypeOfEquip
 
@@ -891,8 +891,8 @@ namespace ManageElectricPower {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const Blank;
-		static Fstring const RoutineName( "GetPowerManagerInput: " );
+		static std::string const Blank;
+		static std::string const RoutineName( "GetPowerManagerInput: " );
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
 
@@ -915,10 +915,10 @@ namespace ManageElectricPower {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 
-		FArray1D_Fstring ListName( sFstring( MaxNameLength ) );
-		FArray1D_Fstring InverterNames( sFstring( MaxNameLength ) );
-		FArray1D_Fstring StorageNames( sFstring( MaxNameLength ) );
-		FArray1D_Fstring TransformerNames( sFstring( MaxNameLength ) );
+		FArray1D_string ListName;
+		FArray1D_string InverterNames;
+		FArray1D_string StorageNames;
+		FArray1D_string TransformerNames;
 		int AnyElectricityPresent; // local test for presence of Electricty in Facility
 		int NumGenerators; // local number of generators per electric load center
 		bool SetupWholeBldgReports;
@@ -964,12 +964,12 @@ namespace ManageElectricPower {
 					GetObjectItem( cCurrentModuleObject, InvertNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), InverterNames, InvertNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+					VerifyName( cAlphaArgs( 1 ), InverterNames, InvertNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 					}
-					InverterNames( InvertNum ) = trim( cAlphaArgs( 1 ) );
+					InverterNames( InvertNum ) = cAlphaArgs( 1 );
 					Inverter( InvertNum ).Name = cAlphaArgs( 1 );
 					Inverter( InvertNum ).ModelType = CECLookUpTableModel;
 
@@ -978,8 +978,8 @@ namespace ManageElectricPower {
 					} else {
 						Inverter( InvertNum ).AvailSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 						if ( Inverter( InvertNum ).AvailSchedPtr == 0 ) {
-							ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
 							ErrorsFound = true;
 						}
 					}
@@ -991,8 +991,8 @@ namespace ManageElectricPower {
 							Inverter( InvertNum ).HeatLossesDestination = LostToOutside;
 						} else {
 							Inverter( InvertNum ).HeatLossesDestination = LostToOutside;
-							ShowWarningError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + " = " + trim( cAlphaArgs( 3 ) ) );
+							ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
 							ShowContinueError( "Zone name not found. Inverter heat losses will not be added to a zone" );
 							// continue with simulation but inverter losses not sent to a zone.
 						}
@@ -1019,12 +1019,12 @@ namespace ManageElectricPower {
 					GetObjectItem( cCurrentModuleObject, InvertNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), InverterNames, InvertNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+					VerifyName( cAlphaArgs( 1 ), InverterNames, InvertNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 					}
-					InverterNames( InvertNum ) = trim( cAlphaArgs( 1 ) );
+					InverterNames( InvertNum ) = cAlphaArgs( 1 );
 					Inverter( InvertNum ).ModelType = CurveFuncOfPower;
 					Inverter( InvertNum ).Name = cAlphaArgs( 1 );
 
@@ -1033,8 +1033,8 @@ namespace ManageElectricPower {
 					} else {
 						Inverter( InvertNum ).AvailSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 						if ( Inverter( InvertNum ).AvailSchedPtr == 0 ) {
-							ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
 							ErrorsFound = true;
 						}
 					}
@@ -1046,16 +1046,16 @@ namespace ManageElectricPower {
 							Inverter( InvertNum ).HeatLossesDestination = LostToOutside;
 						} else {
 							Inverter( InvertNum ).HeatLossesDestination = LostToOutside;
-							ShowWarningError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + " = " + trim( cAlphaArgs( 3 ) ) );
+							ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
 							// continue with simulation but inverter losses not sent to a zone.
 							ShowContinueError( "Zone name not found. Inverter heat losses will not be added to a zone" );
 						}
 					}
 					Inverter( InvertNum ).CurveNum = GetCurveIndex( cAlphaArgs( 4 ) );
 					if ( Inverter( InvertNum ).CurveNum == 0 ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-						ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 4 ) ) + " = " + trim( cAlphaArgs( 4 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 4 ) + " = " + cAlphaArgs( 4 ) );
 						ShowContinueError( "Curve was not found" );
 						ErrorsFound = true;
 					}
@@ -1076,13 +1076,13 @@ namespace ManageElectricPower {
 					GetObjectItem( cCurrentModuleObject, InvertNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), InverterNames, InvertNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+					VerifyName( cAlphaArgs( 1 ), InverterNames, InvertNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxx";
 					}
-					InverterNames( InvertNum ) = trim( cAlphaArgs( 1 ) );
-					Inverter( InvertNum ).Name = trim( cAlphaArgs( 1 ) );
+					InverterNames( InvertNum ) = cAlphaArgs( 1 );
+					Inverter( InvertNum ).Name = cAlphaArgs( 1 );
 					Inverter( InvertNum ).ModelType = SimpleConstantEff;
 
 					if ( lAlphaFieldBlanks( 2 ) ) {
@@ -1090,8 +1090,8 @@ namespace ManageElectricPower {
 					} else {
 						Inverter( InvertNum ).AvailSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 						if ( Inverter( InvertNum ).AvailSchedPtr == 0 ) {
-							ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
 							ErrorsFound = true;
 						}
 					}
@@ -1102,8 +1102,8 @@ namespace ManageElectricPower {
 						if ( lAlphaFieldBlanks( 3 ) ) {
 							Inverter( InvertNum ).HeatLossesDestination = LostToOutside;
 						} else {
-							ShowWarningError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + " = " + trim( cAlphaArgs( 3 ) ) );
+							ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
 							ShowContinueError( "Zone name not found. Inverter heat losses will not be added to a zone" );
 							// continue with simulation but inverter losses not sent to a zone.
 						}
@@ -1153,12 +1153,12 @@ namespace ManageElectricPower {
 					GetObjectItem( cCurrentModuleObject, StorNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), StorageNames, StorNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+					VerifyName( cAlphaArgs( 1 ), StorageNames, StorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxx";
 					}
-					StorageNames( StorNum ) = trim( cAlphaArgs( 1 ) );
+					StorageNames( StorNum ) = cAlphaArgs( 1 );
 					ElecStorage( StorNum ).Name = cAlphaArgs( 1 );
 
 					if ( lAlphaFieldBlanks( 2 ) ) {
@@ -1166,8 +1166,8 @@ namespace ManageElectricPower {
 					} else {
 						ElecStorage( StorNum ).AvailSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 						if ( ElecStorage( StorNum ).AvailSchedPtr == 0 ) {
-							ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
 							ErrorsFound = true;
 						}
 					}
@@ -1179,8 +1179,8 @@ namespace ManageElectricPower {
 							ElecStorage( StorNum ).HeatLossesDestination = LostToOutside;
 						} else {
 							ElecStorage( StorNum ).HeatLossesDestination = LostToOutside;
-							ShowWarningError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + " = " + trim( cAlphaArgs( 3 ) ) );
+							ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
 							ShowContinueError( "Zone name not found. Electrical storage heat losses will not be added to a zone" );
 							//continue with simulation but storage losses not sent to a zone.
 						}
@@ -1207,12 +1207,12 @@ namespace ManageElectricPower {
 					GetObjectItem( cCurrentModuleObject, StorNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), StorageNames, StorNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+					VerifyName( cAlphaArgs( 1 ), StorageNames, StorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxx";
 					}
-					StorageNames( StorNum ) = trim( cAlphaArgs( 1 ) );
+					StorageNames( StorNum ) = cAlphaArgs( 1 );
 					ElecStorage( StorNum ).Name = cAlphaArgs( 1 );
 
 					if ( lAlphaFieldBlanks( 2 ) ) {
@@ -1220,8 +1220,8 @@ namespace ManageElectricPower {
 					} else {
 						ElecStorage( StorNum ).AvailSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 						if ( ElecStorage( StorNum ).AvailSchedPtr == 0 ) {
-							ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
 							ErrorsFound = true;
 						}
 					}
@@ -1233,8 +1233,8 @@ namespace ManageElectricPower {
 							ElecStorage( StorNum ).HeatLossesDestination = LostToOutside;
 						} else {
 							ElecStorage( StorNum ).HeatLossesDestination = LostToOutside;
-							ShowWarningError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + " = " + trim( cAlphaArgs( 3 ) ) );
+							ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
 							ShowContinueError( "Zone name not found. Electrical storage heat losses will not be added to a zone" );
 							//continue with simulation but storage losses not sent to a zone.
 						}
@@ -1242,32 +1242,32 @@ namespace ManageElectricPower {
 
 					ElecStorage( StorNum ).ChargeCurveNum = GetCurveIndex( cAlphaArgs( 4 ) ); //voltage calculation for charging
 					if ( ElecStorage( StorNum ).ChargeCurveNum == 0 && ! lAlphaFieldBlanks( 4 ) ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-						ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 4 ) ) + "=" + trim( cAlphaArgs( 4 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
 						ErrorsFound = true;
 					} else if ( lAlphaFieldBlanks( 4 ) ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-						ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 4 ) ) + " cannot be blank. But no entry found." );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 4 ) + " cannot be blank. But no entry found." );
 						ErrorsFound = true;
 					} else if ( ! SameString( GetCurveType( ElecStorage( StorNum ).ChargeCurveNum ), "RectangularHyperbola2" ) ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-						ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 4 ) ) + "=" + trim( cAlphaArgs( 4 ) ) );
-						ShowContinueError( "Curve Type must be RectangularHyperbola2 but was " + trim( GetCurveType( ElecStorage( StorNum ).ChargeCurveNum ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
+						ShowContinueError( "Curve Type must be RectangularHyperbola2 but was " + GetCurveType( ElecStorage( StorNum ).ChargeCurveNum ) );
 						ErrorsFound = true;
 					}
 					ElecStorage( StorNum ).DischargeCurveNum = GetCurveIndex( cAlphaArgs( 5 ) ); // voltage calculation for discharging
 					if ( ElecStorage( StorNum ).DischargeCurveNum == 0 && ! lAlphaFieldBlanks( 5 ) ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-						ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 5 ) ) + "=" + trim( cAlphaArgs( 5 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 5 ) + '=' + cAlphaArgs( 5 ) );
 						ErrorsFound = true;
 					} else if ( lAlphaFieldBlanks( 5 ) ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-						ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 5 ) ) + " cannot be blank. But no entry found." );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 5 ) + " cannot be blank. But no entry found." );
 						ErrorsFound = true;
 					} else if ( ! SameString( GetCurveType( ElecStorage( StorNum ).DischargeCurveNum ), "RectangularHyperbola2" ) ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-						ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 5 ) ) + "=" + trim( cAlphaArgs( 5 ) ) );
-						ShowContinueError( "Curve Type must be RectangularHyperbola2 but was " + trim( GetCurveType( ElecStorage( StorNum ).DischargeCurveNum ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 5 ) + '=' + cAlphaArgs( 5 ) );
+						ShowContinueError( "Curve Type must be RectangularHyperbola2 but was " + GetCurveType( ElecStorage( StorNum ).DischargeCurveNum ) );
 						ErrorsFound = true;
 					}
 
@@ -1276,8 +1276,8 @@ namespace ManageElectricPower {
 					} else if ( SameString( cAlphaArgs( 6 ), "No" ) ) {
 						ElecStorage( StorNum ).LifeCalculation = Battery_LifeCalculation_No;
 					} else {
-						ShowWarningError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-						ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 6 ) ) + " = " + trim( cAlphaArgs( 6 ) ) );
+						ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 6 ) + " = " + cAlphaArgs( 6 ) );
 						ShowContinueError( "Yes or No should be selected. Default value No is used to continue simulation" );
 						ElecStorage( StorNum ).LifeCalculation = Battery_LifeCalculation_No;
 					}
@@ -1285,17 +1285,17 @@ namespace ManageElectricPower {
 					if ( ElecStorage( StorNum ).LifeCalculation == Battery_LifeCalculation_Yes ) {
 						ElecStorage( StorNum ).LifeCurveNum = GetCurveIndex( cAlphaArgs( 7 ) ); //Battery life calculation
 						if ( ElecStorage( StorNum ).LifeCurveNum == 0 && ! lAlphaFieldBlanks( 7 ) ) {
-							ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( cAlphaArgs( 7 ) ) );
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
 							ErrorsFound = true;
 						} else if ( lAlphaFieldBlanks( 7 ) ) {
-							ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + " cannot be blank when " + trim( cAlphaArgs( 6 ) ) + " = Yes. But no entry found." );
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( 7 ) + " cannot be blank when " + cAlphaArgs( 6 ) + " = Yes. But no entry found." );
 							ErrorsFound = true;
 						} else if ( ! SameString( GetCurveType( ElecStorage( StorNum ).LifeCurveNum ), "DoubleExponentialDecay" ) ) {
-							ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( cAlphaArgs( 7 ) ) );
-							ShowContinueError( "Curve Type must be DoubleExponentialDecay but was " + trim( GetCurveType( ElecStorage( StorNum ).LifeCurveNum ) ) );
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
+							ShowContinueError( "Curve Type must be DoubleExponentialDecay but was " + GetCurveType( ElecStorage( StorNum ).LifeCurveNum ) );
 							ErrorsFound = true;
 						}
 
@@ -1387,12 +1387,12 @@ namespace ManageElectricPower {
 				GetObjectItem( cCurrentModuleObject, TransfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), TransformerNames, TransfNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+				VerifyName( cAlphaArgs( 1 ), TransformerNames, TransfNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxx"; //Actually, this line is not necessary because name is a required field
 				}
-				TransformerNames( TransfNum ) = trim( cAlphaArgs( 1 ) );
+				TransformerNames( TransfNum ) = cAlphaArgs( 1 );
 				Transformer( TransfNum ).Name = cAlphaArgs( 1 );
 
 				if ( lAlphaFieldBlanks( 2 ) ) {
@@ -1400,8 +1400,8 @@ namespace ManageElectricPower {
 				} else {
 					Transformer( TransfNum ).AvailSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 					if ( Transformer( TransfNum ).AvailSchedPtr == 0 ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-						ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + " = " + trim( cAlphaArgs( 2 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
 						ErrorsFound = true;
 					}
 				}
@@ -1411,8 +1411,8 @@ namespace ManageElectricPower {
 				} else if ( SameString( cAlphaArgs( 3 ), "PowerOutFromOnsiteGeneration" ) ) {
 					Transformer( TransfNum ).UsageMode = PowerOutFromBldg;
 				} else {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-					ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + " = " + trim( cAlphaArgs( 3 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+					ShowContinueError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
 					ErrorsFound = true;
 				}
 
@@ -1423,8 +1423,8 @@ namespace ManageElectricPower {
 						Transformer( TransfNum ).HeatLossesDestination = LostToOutside;
 					} else {
 						Transformer( TransfNum ).HeatLossesDestination = LostToOutside;
-						ShowWarningError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-						ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 4 ) ) + " = " + trim( cAlphaArgs( 4 ) ) );
+						ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 4 ) + " = " + cAlphaArgs( 4 ) );
 						ShowContinueError( "Zone name not found. Transformer heat losses will not be added to a zone" );
 						//continue with simulation but storage losses not sent to a zone.
 					}
@@ -1439,8 +1439,8 @@ namespace ManageElectricPower {
 				} else if ( SameString( cAlphaArgs( 5 ), "Aluminum" ) ) {
 					Transformer( TransfNum ).FactorTempCoeff = 225.0;
 				} else {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-					ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 5 ) ) + " = " + trim( cAlphaArgs( 5 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+					ShowContinueError( "Invalid " + cAlphaFieldNames( 5 ) + " = " + cAlphaArgs( 5 ) );
 					ErrorsFound = true;
 				}
 
@@ -1452,8 +1452,8 @@ namespace ManageElectricPower {
 				} else if ( SameString( cAlphaArgs( 6 ), "NominalEfficiency" ) ) {
 					Transformer( TransfNum ).PerformanceInputMode = EfficiencyMethod;
 				} else {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-					ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 6 ) ) + " = " + trim( cAlphaArgs( 6 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+					ShowContinueError( "Invalid " + cAlphaFieldNames( 6 ) + " = " + cAlphaArgs( 6 ) );
 					ErrorsFound = true;
 				}
 
@@ -1470,8 +1470,8 @@ namespace ManageElectricPower {
 					if ( lNumericFieldBlanks( 11 ) ) {
 						Transformer( TransfNum ).MaxPUL = Transformer( TransfNum ).RatedPUL;
 					} else if ( Transformer( TransfNum ).MaxPUL <= 0 || Transformer( TransfNum ).MaxPUL > 1 ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-						ShowContinueError( "Invalid " + trim( cNumericFieldNames( 11 ) ) + "=[" + trim( RoundSigDigits( rNumericArgs( 11 ), 3 ) ) + "]." );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+						ShowContinueError( "Invalid " + cNumericFieldNames( 11 ) + "=[" + RoundSigDigits( rNumericArgs( 11 ), 3 ) + "]." );
 						ShowContinueError( "Entered value must be > 0 and <= 1." );
 						ErrorsFound = true;
 					}
@@ -1483,8 +1483,8 @@ namespace ManageElectricPower {
 					Transformer( TransfNum ).ConsiderLosses = false;
 				} else {
 					if ( Transformer( TransfNum ).UsageMode == PowerInFromGrid ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-						ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + " = " + trim( cAlphaArgs( 7 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 7 ) + " = " + cAlphaArgs( 7 ) );
 						ErrorsFound = true;
 					}
 				}
@@ -1495,7 +1495,7 @@ namespace ManageElectricPower {
 
 					//Provide warning if no meter is wired to a transformer used to get power from the grid
 					if ( NumWiredMeters <= 0 ) {
-						ShowWarningError( RoutineName + "ElectricLoadCenter:Transformer=\"" + trim( Transformer( TransfNum ).Name ) + "\":" );
+						ShowWarningError( RoutineName + "ElectricLoadCenter:Transformer=\"" + Transformer( TransfNum ).Name + "\":" );
 						ShowContinueError( "ISOLATED Transformer: No meter wired to a transformer used to input power from grid" );
 					}
 
@@ -1559,11 +1559,11 @@ namespace ManageElectricPower {
 			GetObjectItem( cCurrentModuleObject, Count, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ListName, Count - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ListName, Count - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 			}
-			ListName( Count ) = trim( cAlphaArgs( 1 ) );
+			ListName( Count ) = cAlphaArgs( 1 );
 		}
 
 		for ( Count = 1; Count <= NumLoadCenters; ++Count ) {
@@ -1573,7 +1573,7 @@ namespace ManageElectricPower {
 			GetObjectItem( cCurrentModuleObject, Count, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ElecLoadCenter.Name(), Count - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ElecLoadCenter.Name(), Count - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1600,8 +1600,8 @@ namespace ManageElectricPower {
 			} else if ( SameString( cAlphaArgs( 3 ), "FollowThermalLimitElectrical" ) ) {
 				ElecLoadCenter( Count ).OperationScheme = iOpSchemeThermalFollowLimitElectrical;
 			} else {
-				ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 3 ) ) + " = " + trim( cAlphaArgs( 3 ) ) );
+				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
 				ErrorsFound = true;
 			}
 
@@ -1612,11 +1612,11 @@ namespace ManageElectricPower {
 			// test if schedule valid and 'TRACK SCHEDULE'
 			if ( ( ElecLoadCenter( Count ).TrackSchedPtr == 0 ) && ( ElecLoadCenter( Count ).OperationScheme == iOpSchemeTrackSchedule ) ) { // throw error
 				if ( ! lAlphaFieldBlanks( 4 ) ) {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-					ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 4 ) ) + " = " + trim( cAlphaArgs( 4 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+					ShowContinueError( "Invalid " + cAlphaFieldNames( 4 ) + " = " + cAlphaArgs( 4 ) );
 				} else {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-					ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 4 ) ) + " = blank field." );
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+					ShowContinueError( "Invalid " + cAlphaFieldNames( 4 ) + " = blank field." );
 				}
 				ShowContinueError( "Schedule not found; Must be entered and valid when Operation Scheme=TrackSchedule" );
 				ErrorsFound = true;
@@ -1650,8 +1650,8 @@ namespace ManageElectricPower {
 				ElecLoadCenter( Count ).BussType = ACBuss;
 				cAlphaArgs( 6 ) = "AlternatingCurrent (field was blank)";
 			} else {
-				ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 6 ) ) + " = " + trim( cAlphaArgs( 6 ) ) );
+				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 6 ) + " = " + cAlphaArgs( 6 ) );
 				ErrorsFound = true;
 			}
 
@@ -1659,54 +1659,54 @@ namespace ManageElectricPower {
 				ElecLoadCenter( Count ).InverterModelNum = FindItemInList( cAlphaArgs( 7 ), InverterNames, NumInverters );
 				if ( ElecLoadCenter( Count ).InverterModelNum <= 0 ) {
 					if ( ! lAlphaFieldBlanks( 7 ) ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-						ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + " = " + trim( cAlphaArgs( 7 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 7 ) + " = " + cAlphaArgs( 7 ) );
 					} else {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-						ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + " = blank field." );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 7 ) + " = blank field." );
 					}
-					ShowContinueError( "Inverter object was not found; Must have and be valid when Buss Type=\"" + trim( cAlphaArgs( 6 ) ) + "\"." );
+					ShowContinueError( "Inverter object was not found; Must have and be valid when Buss Type=\"" + cAlphaArgs( 6 ) + "\"." );
 					ErrorsFound = true;
 				} else {
 					// check if previous elec load center already uses this inverter.
 					if ( Count - 1 > 0 ) {
 						Found = FindItemInList( cAlphaArgs( 7 ), ElecLoadCenter.InverterName(), Count - 1 );
 						if ( Found != 0 ) {
-							ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + " = " + trim( cAlphaArgs( 7 ) ) );
-							ShowContinueError( "Inverter object has already been used by another " + trim( cCurrentModuleObject ) );
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( 7 ) + " = " + cAlphaArgs( 7 ) );
+							ShowContinueError( "Inverter object has already been used by another " + cCurrentModuleObject );
 							ErrorsFound = true;
 						}
 					}
 				}
-				ElecLoadCenter( Count ).InverterName = trim( cAlphaArgs( 7 ) );
+				ElecLoadCenter( Count ).InverterName = cAlphaArgs( 7 );
 			}
 
 			if ( ElecLoadCenter( Count ).StoragePresent ) {
 				ElecLoadCenter( Count ).StorageModelNum = FindItemInList( cAlphaArgs( 8 ), StorageNames, NumElecStorageDevices );
 				if ( ElecLoadCenter( Count ).StorageModelNum <= 0 ) {
 					if ( ! lAlphaFieldBlanks( 8 ) ) {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-						ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 8 ) ) + " = " + trim( cAlphaArgs( 8 ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 8 ) + " = " + cAlphaArgs( 8 ) );
 					} else {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-						ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 8 ) ) + " = blank field." );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 8 ) + " = blank field." );
 					}
-					ShowContinueError( "Electrical storage object was not found; Must have and be valid when Buss Type=\"" + trim( cAlphaArgs( 6 ) ) + "\"." );
+					ShowContinueError( "Electrical storage object was not found; Must have and be valid when Buss Type=\"" + cAlphaArgs( 6 ) + "\"." );
 					ErrorsFound = true;
 				} else {
 					// check if previous elec load center already uses this storage.
 					if ( Count - 1 > 0 ) {
 						Found = FindItemInList( cAlphaArgs( 8 ), ElecLoadCenter.StorageName(), Count - 1 );
 						if ( Found != 0 ) {
-							ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 8 ) ) + " = " + trim( cAlphaArgs( 8 ) ) );
-							ShowContinueError( "Storage object has already been used by another " + trim( cCurrentModuleObject ) );
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( 8 ) + " = " + cAlphaArgs( 8 ) );
+							ShowContinueError( "Storage object has already been used by another " + cCurrentModuleObject );
 							ErrorsFound = true;
 						}
 					}
 				}
-				ElecLoadCenter( Count ).StorageName = trim( cAlphaArgs( 8 ) );
+				ElecLoadCenter( Count ).StorageName = cAlphaArgs( 8 );
 			}
 
 			//    If a transformer is used in an electric load center, the program needs to 1) update the number of
@@ -1715,13 +1715,13 @@ namespace ManageElectricPower {
 			if ( NumAlphas >= 9 && ( ! lAlphaFieldBlanks( 9 ) ) ) {
 				ElecLoadCenter( Count ).TransformerModelNum = FindItemInList( cAlphaArgs( 9 ), TransformerNames, NumTransformers );
 				if ( ElecLoadCenter( Count ).TransformerModelNum <= 0 ) {
-					ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-					ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 9 ) ) + " = " + trim( cAlphaArgs( 9 ) ) );
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+					ShowContinueError( "Invalid " + cAlphaFieldNames( 9 ) + " = " + cAlphaArgs( 9 ) );
 					ErrorsFound = true;
 				} else {
 					// It is allowed that a transformer can serve multiple load centers.
 					// This differs from inverters and batteries (electrical storage) implemented previously
-					ElecLoadCenter( Count ).TransformerName = trim( cAlphaArgs( 9 ) );
+					ElecLoadCenter( Count ).TransformerName = cAlphaArgs( 9 );
 					LCofTransformer = Transformer( ElecLoadCenter( Count ).TransformerModelNum ).LoadCenterNum + 1;
 					Transformer( ElecLoadCenter( Count ).TransformerModelNum ).LoadCenterNum = LCofTransformer;
 					Transformer( ElecLoadCenter( Count ).TransformerModelNum ).LoadCenterIndexes( LCofTransformer ) = Count;
@@ -1739,11 +1739,11 @@ namespace ManageElectricPower {
 
 			SetupOutputVariable( "Electric Load Center Produced Thermal Energy [J]", ElecLoadCenter( Count ).ThermalProd, "System", "Sum", ElecLoadCenter( Count ).Name );
 
-			if ( trim( ElecLoadCenter( Count ).GeneratorList ) != "" ) {
+			if ( ElecLoadCenter( Count ).GeneratorList != "" ) {
 				ListNum = FindItemInList( ElecLoadCenter( Count ).GeneratorList, ListName, NumGenLists );
 				if ( ListNum == 0 ) {
 
-					ShowSevereError( "Requested Generator List=" + trim( ElecLoadCenter( Count ).GeneratorList ) + ", not found.  Load Center=" + trim( ElecLoadCenter( Count ).Name ) );
+					ShowSevereError( "Requested Generator List=" + ElecLoadCenter( Count ).GeneratorList + ", not found.  Load Center=" + ElecLoadCenter( Count ).Name );
 					ErrorsFound = true;
 					continue;
 				}
@@ -1781,13 +1781,13 @@ namespace ManageElectricPower {
 					} else if ( SameString( cAlphaArgs( AlphaCount ), "Generator:WindTurbine" ) ) {
 						ElecLoadCenter( Count ).ElecGen( GenCount ).CompType_Num = iGeneratorWindTurbine;
 					} else {
-						ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-						ShowContinueError( "Invalid " + trim( cAlphaFieldNames( AlphaCount ) ) + " = " + trim( cAlphaArgs( AlphaCount ) ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( AlphaCount ) + " = " + cAlphaArgs( AlphaCount ) );
 						ErrorsFound = true;
 					}
 					ValidateComponent( ElecLoadCenter( Count ).ElecGen( GenCount ).TypeOf, ElecLoadCenter( Count ).ElecGen( GenCount ).Name, IsNotOK, "Generator" );
 					if ( IsNotOK ) {
-						ShowContinueError( "In " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowContinueError( "In " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					}
 
@@ -1808,8 +1808,8 @@ namespace ManageElectricPower {
 					} else {
 						ElecLoadCenter( Count ).ElecGen( GenCount ).AvailSchedPtr = GetScheduleIndex( cAlphaArgs( AlphaCount ) );
 						if ( ElecLoadCenter( Count ).ElecGen( GenCount ).AvailSchedPtr <= 0 ) {
-							ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\", invalid entry." );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( AlphaCount ) ) + " = " + trim( cAlphaArgs( AlphaCount ) ) );
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( AlphaCount ) + " = " + cAlphaArgs( AlphaCount ) );
 							ShowContinueError( "Schedule was not found " );
 							ErrorsFound = true;
 						}
@@ -1834,7 +1834,7 @@ namespace ManageElectricPower {
 		pvTotalCapacity = 0.0;
 		windTotalCapacity = 0.0;
 		for ( Count = 1; Count <= NumLoadCenters; ++Count ) {
-			if ( trim( ElecLoadCenter( Count ).GeneratorList ) != "" ) {
+			if ( ElecLoadCenter( Count ).GeneratorList != "" ) {
 				for ( GenCount = 1; GenCount <= ElecLoadCenter( Count ).NumGenerators; ++GenCount ) {
 					if ( ElecLoadCenter( Count ).ElecGen( GenCount ).CompType_Num == iGeneratorPV ) {
 						pvTotalCapacity += ElecLoadCenter( Count ).ElecGen( GenCount ).MaxPowerOut;
@@ -1888,7 +1888,7 @@ namespace ManageElectricPower {
 		//This has to be done after reading in all load centers
 		for ( TransfNum = 1; TransfNum <= NumTransformers; ++TransfNum ) {
 			if ( Transformer( TransfNum ).UsageMode == PowerOutFromBldg && Transformer( TransfNum ).LoadCenterNum == 0 ) {
-				ShowSevereError( RoutineName + "ElectricLoadCenter:Transformer=\"" + trim( Transformer( TransfNum ).Name ) + "\", invalid entry." );
+				ShowSevereError( RoutineName + "ElectricLoadCenter:Transformer=\"" + Transformer( TransfNum ).Name + "\", invalid entry." );
 				ShowContinueError( "ISOLATED Transformer: No load center connects to a transformer used to output power" );
 			}
 		}
@@ -1955,7 +1955,7 @@ namespace ManageElectricPower {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Fstring GeneratorName( MaxNameLength ); // User-specified name of generator
+		std::string GeneratorName; // User-specified name of generator
 		int GeneratorType; // Type of generator
 		bool RunFlag; // Simulate generator when TRUE
 		Real64 MyLoad; // Generator load request (W)
@@ -2011,8 +2011,8 @@ namespace ManageElectricPower {
 			ThermalPowerOutput = ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).ThermalProdRate;
 
 		} else {
-			ShowSevereError( "ManageElectricPower: Invalid Generator Type found= " + trim( ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).TypeOf ) );
-			ShowContinueError( ".. Generator Name=" + trim( GeneratorName ) );
+			ShowSevereError( "ManageElectricPower: Invalid Generator Type found= " + ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).TypeOf );
+			ShowContinueError( ".. Generator Name=" + GeneratorName );
 			ShowFatalError( ".. preceding error causes termination." );
 
 		}} // TypeOfEquip
@@ -2081,7 +2081,7 @@ namespace ManageElectricPower {
 		int SideID;
 		int BranchID;
 		int CompID;
-		Fstring thisName( MaxNameLength );
+		std::string thisName;
 		//unused  INTEGER :: ThisTypeNum
 
 		//debugstuff
@@ -2193,7 +2193,7 @@ namespace ManageElectricPower {
 		for ( loop = 1; loop <= NumLoadCenters; ++loop ) {
 			ElecLoadCenter( loop ).DemandMeterPtr = GetMeterIndex( ElecLoadCenter( loop ).DemandMeterName );
 			if ( ( ElecLoadCenter( loop ).DemandMeterPtr == 0 ) && ( ElecLoadCenter( loop ).OperationScheme == iOpSchemeTrackMeter ) ) { // throw error
-				ShowFatalError( "Did not find Meter named: " + trim( ElecLoadCenter( loop ).DemandMeterName ) + " in " + trim( ElecLoadCenter( loop ).Name ) );
+				ShowFatalError( "Did not find Meter named: " + ElecLoadCenter( loop ).DemandMeterName + " in " + ElecLoadCenter( loop ).Name );
 			}
 		}
 
@@ -2261,7 +2261,7 @@ namespace ManageElectricPower {
 				Inverter( InvertNum ).DCPowerIn = ElecLoadCenter( LoadCenterNum ).DCElectProdRate;
 				Inverter( InvertNum ).DCEnergyIn = Inverter( InvertNum ).DCPowerIn * ( TimeStepSys * SecInHour );
 			} else { // throw error
-				ShowFatalError( "Electric load center is not set up properly, check electrical storage object for " + trim( ElecLoadCenter( LoadCenterNum ).Name ) );
+				ShowFatalError( "Electric load center is not set up properly, check electrical storage object for " + ElecLoadCenter( LoadCenterNum ).Name );
 			}
 
 		}}
@@ -3399,9 +3399,9 @@ namespace ManageElectricPower {
 				if ( ( PastElecLoad / Capacity ) > 1.0 ) {
 					if ( Transformer( TransfNum ).OverloadErrorIndex == 0 ) {
 						ShowSevereError( "Transformer Overloaded" );
-						ShowContinueError( "Entered in ElectricLoadCenter:Transformer =" + trim( Transformer( TransfNum ).Name ) );
+						ShowContinueError( "Entered in ElectricLoadCenter:Transformer =" + Transformer( TransfNum ).Name );
 					}
-					ShowRecurringSevereErrorAtEnd( "Transformer Overloaded: " "Entered in ElectricLoadCenter:Transformer =" + trim( Transformer( TransfNum ).Name ), Transformer( TransfNum ).OverloadErrorIndex );
+					ShowRecurringSevereErrorAtEnd( "Transformer Overloaded: " "Entered in ElectricLoadCenter:Transformer =" + Transformer( TransfNum ).Name, Transformer( TransfNum ).OverloadErrorIndex );
 				}
 
 				TempChange = ( std::pow( PUL, 1.6 ) ) * Transformer( TransfNum ).TempRise;

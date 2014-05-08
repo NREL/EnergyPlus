@@ -6,9 +6,9 @@
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray2D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/MArray.functions.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <HeatBalanceSurfaceManager.hh>
@@ -324,8 +324,8 @@ namespace HeatBalanceSurfaceManager {
 		int iErrorFlag; // Error Flag for warning/errors returned from DElight
 		int iDElightErrorFile; // Unit number for reading DElight Error File (eplusout.delightdfdmp)
 		int iReadStatus; // Error File Read Status
-		Fstring cErrorLine( 210 ); // Each DElight Error line can be up to 210 characters long
-		Fstring cErrorMsg( 200 ); // Each DElight Error Message can be up to 200 characters long
+		std::string cErrorLine; // Each DElight Error line can be up to 210 characters long
+		std::string cErrorMsg; // Each DElight Error Message can be up to 200 characters long
 		bool bEndofErrFile; // End of Error File flag
 		int iDElightRefPt; // Reference Point number for reading DElight Dump File (eplusout.delighteldmp)
 		Real64 dRefPtIllum; // tmp var for reading RefPt illuminance
@@ -482,7 +482,7 @@ namespace HeatBalanceSurfaceManager {
 				dCloudFraction = CloudFraction;
 				// Init Error Flag to 0 (no Warnings or Errors)
 				iErrorFlag = 0;
-				DElightElecLtgCtrl( len_trim( Zone( NZ ).Name ), trim( Zone( NZ ).Name ), dLatitude, dHISKFFC, dHISUNFFC, dCloudFraction, dSOLCOS1, dSOLCOS2, dSOLCOS3, dPowerReducFac, iErrorFlag );
+				DElightElecLtgCtrl( len( Zone( NZ ).Name ), Zone( NZ ).Name, dLatitude, dHISKFFC, dHISUNFFC, dCloudFraction, dSOLCOS1, dSOLCOS2, dSOLCOS3, dPowerReducFac, iErrorFlag );
 				// Check Error Flag for Warnings or Errors returning from DElight
 				// RJH 2008-03-07: If no warnings/errors then read refpt illuminances for standard output reporting
 				if ( iErrorFlag != 0 ) {
@@ -511,15 +511,15 @@ namespace HeatBalanceSurfaceManager {
 							continue;
 						}
 						// Is the current line a Warning message?
-						if ( cErrorLine( 1, 9 ) == "WARNING: " ) {
-							cErrorMsg = cErrorLine( 10, 210 );
-							cErrorMsg = trim( cErrorMsg );
+						if ( has_prefix( cErrorLine, "WARNING: " ) ) {
+							cErrorMsg = cErrorLine.substr( 9 );
+							cErrorMsg = cErrorMsg;
 							ShowWarningError( cErrorMsg );
 						}
 						// Is the current line an Error message?
-						if ( cErrorLine( 1, 7 ) == "ERROR: " ) {
-							cErrorMsg = cErrorLine( 8, 210 );
-							cErrorMsg = trim( cErrorMsg );
+						if ( has_prefix( cErrorLine, "ERROR: " ) ) {
+							cErrorMsg = cErrorLine.substr( 7 );
+							cErrorMsg = cErrorMsg;
 							ShowSevereError( cErrorMsg );
 							iErrorFlag = 1;
 						}
@@ -746,7 +746,7 @@ namespace HeatBalanceSurfaceManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Fstring surfName( MaxNameLength );
+		std::string surfName;
 		int curCons;
 		int zonePt;
 		Real64 mult;
@@ -989,15 +989,15 @@ namespace HeatBalanceSurfaceManager {
 				}}
 			} else {
 				isExterior = false;
-				//interior window report
+				// interior window report
 				if ( Surface( iSurf ).Class == SurfaceClass_Window ) {
-					if ( Surface( iSurf ).Name( {1,3} ) != "iz-" ) { //don't count created interzone surfaces that are mirrors of other surfaces
+					if ( ! has_prefix( Surface( iSurf ).Name, "iz-" ) ) { // don't count created interzone surfaces that are mirrors of other surfaces
 						surfName = Surface( iSurf ).Name;
 						curCons = Surface( iSurf ).Construction;
 						PreDefTableEntry( pdchIntFenCons, surfName, Construct( curCons ).Name );
 						zonePt = Surface( iSurf ).Zone;
 						mult = Zone( zonePt ).Multiplier * Zone( zonePt ).ListMultiplier * Surface( iSurf ).Multiplier;
-						//include the frame area if present
+						// include the frame area if present
 						windowArea = Surface( iSurf ).GrossArea;
 						if ( Surface( iSurf ).FrameDivider != 0 ) {
 							frameWidth = FrameDivider( Surface( iSurf ).FrameDivider ).FrameWidth;
@@ -1009,12 +1009,12 @@ namespace HeatBalanceSurfaceManager {
 						PreDefTableEntry( pdchIntFenArea, surfName, windowAreaWMult );
 						nomUfact = NominalU( Surface( iSurf ).Construction );
 						PreDefTableEntry( pdchIntFenUfact, surfName, nomUfact, 3 );
-						//if the construction report is requested the SummerSHGC is already calculated
+						// if the construction report is requested the SummerSHGC is already calculated
 						if ( Construct( curCons ).SummerSHGC != 0 ) {
 							SHGCSummer = Construct( curCons ).SummerSHGC;
 							TransVisNorm = Construct( curCons ).VisTransNorm;
 						} else {
-							//must calculate Summer SHGC
+							// must calculate Summer SHGC
 							if ( ! Construct( curCons ).WindowTypeEQL ) {
 								CalcNominalWindowCond( curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag );
 							}
@@ -1022,7 +1022,7 @@ namespace HeatBalanceSurfaceManager {
 						PreDefTableEntry( pdchIntFenSHGC, surfName, SHGCSummer, 3 );
 						PreDefTableEntry( pdchIntFenVisTr, surfName, TransVisNorm, 3 );
 						PreDefTableEntry( pdchIntFenParent, surfName, Surface( iSurf ).BaseSurfName );
-						//compute totals for area weighted averages
+						// compute totals for area weighted averages
 						intFenTotArea += windowAreaWMult;
 						intUfactArea += nomUfact * windowAreaWMult;
 						intShgcArea += SHGCSummer * windowAreaWMult;
@@ -3366,7 +3366,7 @@ namespace HeatBalanceSurfaceManager {
 				// That's probably not correct, but how correct is it to assume that no solar is absorbed anywhere
 				// in the zone?
 				if ( FirstCalcZone( ZoneNum ) ) {
-					ShowWarningError( "ComputeIntSWAbsorbFactors: Sum of area times inside solar absorption " "for all surfaces is zero in Zone: " + trim( Zone( ZoneNum ).Name ) );
+					ShowWarningError( "ComputeIntSWAbsorbFactors: Sum of area times inside solar absorption " "for all surfaces is zero in Zone: " + Zone( ZoneNum ).Name );
 					FirstCalcZone( ZoneNum ) = false;
 				}
 				VMULT( ZoneNum ) = 0.0;
@@ -3681,17 +3681,17 @@ namespace HeatBalanceSurfaceManager {
 							if ( Construct( Surface( SurfNum ).Construction ).NumHistories != Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).NumHistories ) {
 								//thow warning, but allow
 								ShowWarningError( "InitEMSControlledConstructions: EMS Construction State Actuator may be unrealistic, " "incompatible CTF timescales are being used." );
-								ShowContinueError( "Construction named = " + trim( Construct( Surface( SurfNum ).Construction ).Name ) + " has CTF timesteps = " + trim( TrimSigDigits( Construct( Surface( SurfNum ).Construction ).NumHistories ) ) );
-								ShowContinueError( "While construction named = " + trim( Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).Name ) + " has CTF timesteps = " + trim( TrimSigDigits( Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).NumHistories ) ) );
-								ShowContinueError( "Transient heat transfer modeling may not be valid for surface name = " + trim( Surface( SurfNum ).Name ) + ", and the simulation continues" );
+								ShowContinueError( "Construction named = " + Construct( Surface( SurfNum ).Construction ).Name + " has CTF timesteps = " + TrimSigDigits( Construct( Surface( SurfNum ).Construction ).NumHistories ) );
+								ShowContinueError( "While construction named = " + Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).Name + " has CTF timesteps = " + TrimSigDigits( Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).NumHistories ) );
+								ShowContinueError( "Transient heat transfer modeling may not be valid for surface name = " + Surface( SurfNum ).Name + ", and the simulation continues" );
 
 							}
 							if ( Construct( Surface( SurfNum ).Construction ).NumCTFTerms != Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).NumCTFTerms ) {
 								//thow warning, but allow
 								ShowWarningError( "InitEMSControlledConstructions: EMS Construction State Actuator may be unrealistic, " "incompatible CTF terms are being used." );
-								ShowContinueError( "Construction named = " + trim( Construct( Surface( SurfNum ).Construction ).Name ) + " has number of CTF terms = " + trim( TrimSigDigits( Construct( Surface( SurfNum ).Construction ).NumCTFTerms ) ) );
-								ShowContinueError( "While construction named = " + trim( Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).Name ) + " has number of CTF terms = " + trim( TrimSigDigits( Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).NumCTFTerms ) ) );
-								ShowContinueError( "The actuator is allowed but the transient heat transfer modeling may not be valid for" " surface name = " + trim( Surface( SurfNum ).Name ) + ", and the simulation continues" );
+								ShowContinueError( "Construction named = " + Construct( Surface( SurfNum ).Construction ).Name + " has number of CTF terms = " + TrimSigDigits( Construct( Surface( SurfNum ).Construction ).NumCTFTerms ) );
+								ShowContinueError( "While construction named = " + Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).Name + " has number of CTF terms = " + TrimSigDigits( Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).NumCTFTerms ) );
+								ShowContinueError( "The actuator is allowed but the transient heat transfer modeling may not be valid for" " surface name = " + Surface( SurfNum ).Name + ", and the simulation continues" );
 
 							}
 
@@ -3699,9 +3699,9 @@ namespace HeatBalanceSurfaceManager {
 								if ( ! Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).SourceSinkPresent ) {
 									//thow warning, and do not allow
 									ShowSevereError( "InitEMSControlledConstructions: EMS Construction State Actuator not valid." );
-									ShowContinueError( "Construction named = " + trim( Construct( Surface( SurfNum ).Construction ).Name ) + " has internal source/sink" );
-									ShowContinueError( "While construction named = " + trim( Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).Name ) + " is not an internal source/sink construction" );
-									ShowContinueError( "This actuator is not allowed for surface name = " + trim( Surface( SurfNum ).Name ) + ", and the simulation continues without the override" );
+									ShowContinueError( "Construction named = " + Construct( Surface( SurfNum ).Construction ).Name + " has internal source/sink" );
+									ShowContinueError( "While construction named = " + Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).Name + " is not an internal source/sink construction" );
+									ShowContinueError( "This actuator is not allowed for surface name = " + Surface( SurfNum ).Name + ", and the simulation continues without the override" );
 
 									EMSConstructActuatorIsOkay( SurfNum, Surface( SurfNum ).EMSConstructionOverrideValue ) = false;
 								}
@@ -3718,9 +3718,9 @@ namespace HeatBalanceSurfaceManager {
 							if ( ConstructFD( Surface( SurfNum ).Construction ).TotNodes != ConstructFD( Surface( SurfNum ).EMSConstructionOverrideValue ).TotNodes ) {
 								//thow warning, and do not allow
 								ShowSevereError( "InitEMSControlledConstructions: EMS Construction State Actuator not valid." );
-								ShowContinueError( "Construction named = " + trim( Construct( Surface( SurfNum ).Construction ).Name ) + " has number of finite difference nodes =" + trim( TrimSigDigits( ConstructFD( Surface( SurfNum ).Construction ).TotNodes ) ) );
-								ShowContinueError( "While construction named = " + trim( Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).Name ) + "has number of finite difference nodes =" + trim( TrimSigDigits( ConstructFD( Surface( SurfNum ).EMSConstructionOverrideValue ).TotNodes ) ) );
-								ShowContinueError( "This actuator is not allowed for surface name = " + trim( Surface( SurfNum ).Name ) + ", and the simulation continues without the override" );
+								ShowContinueError( "Construction named = " + Construct( Surface( SurfNum ).Construction ).Name + " has number of finite difference nodes =" + TrimSigDigits( ConstructFD( Surface( SurfNum ).Construction ).TotNodes ) );
+								ShowContinueError( "While construction named = " + Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).Name + "has number of finite difference nodes =" + TrimSigDigits( ConstructFD( Surface( SurfNum ).EMSConstructionOverrideValue ).TotNodes ) );
+								ShowContinueError( "This actuator is not allowed for surface name = " + Surface( SurfNum ).Name + ", and the simulation continues without the override" );
 
 								EMSConstructActuatorIsOkay( SurfNum, Surface( SurfNum ).EMSConstructionOverrideValue ) = false;
 							}
@@ -3729,9 +3729,9 @@ namespace HeatBalanceSurfaceManager {
 								if ( ! Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).SourceSinkPresent ) {
 									//thow warning, and do not allow
 									ShowSevereError( "InitEMSControlledConstructions: EMS Construction State Actuator not valid." );
-									ShowContinueError( "Construction named = " + trim( Construct( Surface( SurfNum ).Construction ).Name ) + " has internal source/sink" );
-									ShowContinueError( "While construction named = " + trim( Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).Name ) + " is not an internal source/sink construction" );
-									ShowContinueError( "This actuator is not allowed for surface name = " + trim( Surface( SurfNum ).Name ) + ", and the simulation continues without the override" );
+									ShowContinueError( "Construction named = " + Construct( Surface( SurfNum ).Construction ).Name + " has internal source/sink" );
+									ShowContinueError( "While construction named = " + Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).Name + " is not an internal source/sink construction" );
+									ShowContinueError( "This actuator is not allowed for surface name = " + Surface( SurfNum ).Name + ", and the simulation continues without the override" );
 
 									EMSConstructActuatorIsOkay( SurfNum, Surface( SurfNum ).EMSConstructionOverrideValue ) = false;
 								}
@@ -3744,7 +3744,7 @@ namespace HeatBalanceSurfaceManager {
 
 						} else if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_HAMT ) { // don't allow
 							ShowSevereError( "InitEMSControlledConstructions: EMS Construction State Actuator not available with " "Heat transfer algorithm CombinedHeatAndMoistureFiniteElement." );
-							ShowContinueError( "This actuator is not allowed for surface name = " + trim( Surface( SurfNum ).Name ) + ", and the simulation continues without the override" );
+							ShowContinueError( "This actuator is not allowed for surface name = " + Surface( SurfNum ).Name + ", and the simulation continues without the override" );
 							EMSConstructActuatorChecked( SurfNum, Surface( SurfNum ).EMSConstructionOverrideValue ) = true;
 							EMSConstructActuatorIsOkay( SurfNum, Surface( SurfNum ).EMSConstructionOverrideValue ) = false;
 
@@ -4130,7 +4130,7 @@ namespace HeatBalanceSurfaceManager {
 				MRT( ZoneNum ) = SumAET / ZoneAESum( ZoneNum );
 			} else {
 				if ( firstTime ) {
-					ShowWarningError( "Zone areas*inside surface emissivities are summing to zero, for Zone=\"" + trim( Zone( ZoneNum ).Name ) + "\"" );
+					ShowWarningError( "Zone areas*inside surface emissivities are summing to zero, for Zone=\"" + Zone( ZoneNum ).Name + "\"" );
 					ShowContinueError( "As a result, MRT will be set to MAT for that zone" );
 				}
 				MRT( ZoneNum ) = MAT( ZoneNum );
@@ -5024,7 +5024,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 			ZoneEquipConfigNum = ZoneNum;
 			// check whether this zone is a controlled zone or not
 			if ( ! Zone( ZoneNum ).IsControlled ) {
-				ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + trim( Zone( ZoneNum ).Name ) );
+				ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone( ZoneNum ).Name );
 				return;
 			}
 			// determine supply air conditions
@@ -5422,18 +5422,18 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 				if ( ! WarmupFlag || ( WarmupFlag && WarmupSurfTemp > 10 ) || DisplayExtraWarnings ) {
 					if ( TH( SurfNum, 1, 2 ) < MinSurfaceTempLimit ) {
 						if ( Surface( SurfNum ).LowTempErrCount == 0 ) {
-							ShowSevereMessage( "Temperature (low) out of bounds [" + trim( RoundSigDigits( TH( SurfNum, 1, 2 ), 2 ) ) + "] for zone=\"" + trim( Zone( ZoneNum ).Name ) + "\", for surface=\"" + trim( Surface( SurfNum ).Name ) + "\"" );
-							ShowContinueErrorTimeStamp( " " );
+							ShowSevereMessage( "Temperature (low) out of bounds [" + RoundSigDigits( TH( SurfNum, 1, 2 ), 2 ) + "] for zone=\"" + Zone( ZoneNum ).Name + "\", for surface=\"" + Surface( SurfNum ).Name + "\"" );
+							ShowContinueErrorTimeStamp( "" );
 							if ( ! Zone( ZoneNum ).TempOutOfBoundsReported ) {
-								ShowContinueError( "Zone=\"" + trim( Zone( ZoneNum ).Name ) + "\", Diagnostic Details:" );
+								ShowContinueError( "Zone=\"" + Zone( ZoneNum ).Name + "\", Diagnostic Details:" );
 								if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
-									ShowContinueError( "...Internal Heat Gain [" + trim( RoundSigDigits( Zone( ZoneNum ).InternalHeatGains / Zone( ZoneNum ).FloorArea, 3 ) ) + "] W/m2" );
+									ShowContinueError( "...Internal Heat Gain [" + RoundSigDigits( Zone( ZoneNum ).InternalHeatGains / Zone( ZoneNum ).FloorArea, 3 ) + "] W/m2" );
 								} else {
-									ShowContinueError( "...Internal Heat Gain (no floor) [" + trim( RoundSigDigits( Zone( ZoneNum ).InternalHeatGains, 3 ) ) + "] W" );
+									ShowContinueError( "...Internal Heat Gain (no floor) [" + RoundSigDigits( Zone( ZoneNum ).InternalHeatGains, 3 ) + "] W" );
 								}
 								if ( SimulateAirflowNetwork <= AirflowNetworkControlSimple ) {
-									ShowContinueError( "...Infiltration/Ventilation [" + trim( RoundSigDigits( Zone( ZoneNum ).NominalInfilVent, 3 ) ) + "] m3/s" );
-									ShowContinueError( "...Mixing/Cross Mixing [" + trim( RoundSigDigits( Zone( ZoneNum ).NominalMixing, 3 ) ) + "] m3/s" );
+									ShowContinueError( "...Infiltration/Ventilation [" + RoundSigDigits( Zone( ZoneNum ).NominalInfilVent, 3 ) + "] m3/s" );
+									ShowContinueError( "...Mixing/Cross Mixing [" + RoundSigDigits( Zone( ZoneNum ).NominalMixing, 3 ) + "] m3/s" );
 								} else {
 									ShowContinueError( "...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available." );
 								}
@@ -5444,24 +5444,24 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 								}
 								Zone( ZoneNum ).TempOutOfBoundsReported = true;
 							}
-							ShowRecurringSevereErrorAtEnd( "Temperature (low) out of bounds for zone=" + trim( Zone( ZoneNum ).Name ) + " for surface=" + trim( Surface( SurfNum ).Name ), Surface( SurfNum ).LowTempErrCount, TH( SurfNum, 1, 2 ), TH( SurfNum, 1, 2 ), _, "C", "C" );
+							ShowRecurringSevereErrorAtEnd( "Temperature (low) out of bounds for zone=" + Zone( ZoneNum ).Name + " for surface=" + Surface( SurfNum ).Name, Surface( SurfNum ).LowTempErrCount, TH( SurfNum, 1, 2 ), TH( SurfNum, 1, 2 ), _, "C", "C" );
 						} else {
-							ShowRecurringSevereErrorAtEnd( "Temperature (low) out of bounds for zone=" + trim( Zone( ZoneNum ).Name ) + " for surface=" + trim( Surface( SurfNum ).Name ), Surface( SurfNum ).LowTempErrCount, TH( SurfNum, 1, 2 ), TH( SurfNum, 1, 2 ), _, "C", "C" );
+							ShowRecurringSevereErrorAtEnd( "Temperature (low) out of bounds for zone=" + Zone( ZoneNum ).Name + " for surface=" + Surface( SurfNum ).Name, Surface( SurfNum ).LowTempErrCount, TH( SurfNum, 1, 2 ), TH( SurfNum, 1, 2 ), _, "C", "C" );
 						}
 					} else {
 						if ( Surface( SurfNum ).HighTempErrCount == 0 ) {
-							ShowSevereMessage( "Temperature (high) out of bounds (" + trim( RoundSigDigits( TH( SurfNum, 1, 2 ), 2 ) ) + "] for zone=\"" + trim( Zone( ZoneNum ).Name ) + "\", for surface=\"" + trim( Surface( SurfNum ).Name ) + "\"" );
-							ShowContinueErrorTimeStamp( " " );
+							ShowSevereMessage( "Temperature (high) out of bounds (" + RoundSigDigits( TH( SurfNum, 1, 2 ), 2 ) + "] for zone=\"" + Zone( ZoneNum ).Name + "\", for surface=\"" + Surface( SurfNum ).Name + "\"" );
+							ShowContinueErrorTimeStamp( "" );
 							if ( ! Zone( ZoneNum ).TempOutOfBoundsReported ) {
-								ShowContinueError( "Zone=\"" + trim( Zone( ZoneNum ).Name ) + "\", Diagnostic Details:" );
+								ShowContinueError( "Zone=\"" + Zone( ZoneNum ).Name + "\", Diagnostic Details:" );
 								if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
-									ShowContinueError( "...Internal Heat Gain [" + trim( RoundSigDigits( Zone( ZoneNum ).InternalHeatGains / Zone( ZoneNum ).FloorArea, 3 ) ) + "] W/m2" );
+									ShowContinueError( "...Internal Heat Gain [" + RoundSigDigits( Zone( ZoneNum ).InternalHeatGains / Zone( ZoneNum ).FloorArea, 3 ) + "] W/m2" );
 								} else {
-									ShowContinueError( "...Internal Heat Gain (no floor) [" + trim( RoundSigDigits( Zone( ZoneNum ).InternalHeatGains, 3 ) ) + "] W" );
+									ShowContinueError( "...Internal Heat Gain (no floor) [" + RoundSigDigits( Zone( ZoneNum ).InternalHeatGains, 3 ) + "] W" );
 								}
 								if ( SimulateAirflowNetwork <= AirflowNetworkControlSimple ) {
-									ShowContinueError( "...Infiltration/Ventilation [" + trim( RoundSigDigits( Zone( ZoneNum ).NominalInfilVent, 3 ) ) + "] m3/s" );
-									ShowContinueError( "...Mixing/Cross Mixing [" + trim( RoundSigDigits( Zone( ZoneNum ).NominalMixing, 3 ) ) + "] m3/s" );
+									ShowContinueError( "...Infiltration/Ventilation [" + RoundSigDigits( Zone( ZoneNum ).NominalInfilVent, 3 ) + "] m3/s" );
+									ShowContinueError( "...Mixing/Cross Mixing [" + RoundSigDigits( Zone( ZoneNum ).NominalMixing, 3 ) + "] m3/s" );
 								} else {
 									ShowContinueError( "...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available." );
 								}
@@ -5472,14 +5472,14 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 								}
 								Zone( ZoneNum ).TempOutOfBoundsReported = true;
 							}
-							ShowRecurringSevereErrorAtEnd( "Temperature (high) out of bounds for zone=" + trim( Zone( ZoneNum ).Name ) + " for surface=" + trim( Surface( SurfNum ).Name ), Surface( SurfNum ).HighTempErrCount, TH( SurfNum, 1, 2 ), TH( SurfNum, 1, 2 ), _, "C", "C" );
+							ShowRecurringSevereErrorAtEnd( "Temperature (high) out of bounds for zone=" + Zone( ZoneNum ).Name + " for surface=" + Surface( SurfNum ).Name, Surface( SurfNum ).HighTempErrCount, TH( SurfNum, 1, 2 ), TH( SurfNum, 1, 2 ), _, "C", "C" );
 						} else {
-							ShowRecurringSevereErrorAtEnd( "Temperature (high) out of bounds for zone=" + trim( Zone( ZoneNum ).Name ) + " for surface=" + trim( Surface( SurfNum ).Name ), Surface( SurfNum ).HighTempErrCount, TH( SurfNum, 1, 2 ), TH( SurfNum, 1, 2 ), _, "C", "C" );
+							ShowRecurringSevereErrorAtEnd( "Temperature (high) out of bounds for zone=" + Zone( ZoneNum ).Name + " for surface=" + Surface( SurfNum ).Name, Surface( SurfNum ).HighTempErrCount, TH( SurfNum, 1, 2 ), TH( SurfNum, 1, 2 ), _, "C", "C" );
 						}
 					}
 					if ( Zone( ZoneNum ).EnforcedReciprocity ) {
 						if ( WarmupSurfTemp > 3 ) {
-							ShowSevereError( "CalcHeatBalanceInsideSurf: Zone=\"" + trim( Zone( ZoneNum ).Name ) + "\" has view factor enforced reciprocity" );
+							ShowSevereError( "CalcHeatBalanceInsideSurf: Zone=\"" + Zone( ZoneNum ).Name + "\" has view factor enforced reciprocity" );
 							ShowContinueError( " and is having temperature out of bounds errors. Please correct zone geometry and rerun." );
 							ShowFatalError( "CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions." );
 						}
@@ -5491,18 +5491,18 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 			if ( ( TH( SurfNum, 1, 2 ) > MaxSurfaceTempLimitBeforeFatal ) || ( TH( SurfNum, 1, 2 ) < MinSurfaceTempLimitBeforeFatal ) ) {
 				if ( ! WarmupFlag ) {
 					if ( TH( SurfNum, 1, 2 ) < MinSurfaceTempLimitBeforeFatal ) {
-						ShowSevereError( "Temperature (low) out of bounds [" + trim( RoundSigDigits( TH( SurfNum, 1, 2 ), 2 ) ) + "] for zone=\"" + trim( Zone( ZoneNum ).Name ) + "\", for surface=\"" + trim( Surface( SurfNum ).Name ) + "\"" );
-						ShowContinueErrorTimeStamp( " " );
+						ShowSevereError( "Temperature (low) out of bounds [" + RoundSigDigits( TH( SurfNum, 1, 2 ), 2 ) + "] for zone=\"" + Zone( ZoneNum ).Name + "\", for surface=\"" + Surface( SurfNum ).Name + "\"" );
+						ShowContinueErrorTimeStamp( "" );
 						if ( ! Zone( ZoneNum ).TempOutOfBoundsReported ) {
-							ShowContinueError( "Zone=\"" + trim( Zone( ZoneNum ).Name ) + "\", Diagnostic Details:" );
+							ShowContinueError( "Zone=\"" + Zone( ZoneNum ).Name + "\", Diagnostic Details:" );
 							if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
-								ShowContinueError( "...Internal Heat Gain [" + trim( RoundSigDigits( Zone( ZoneNum ).InternalHeatGains / Zone( ZoneNum ).FloorArea, 3 ) ) + "] W/m2" );
+								ShowContinueError( "...Internal Heat Gain [" + RoundSigDigits( Zone( ZoneNum ).InternalHeatGains / Zone( ZoneNum ).FloorArea, 3 ) + "] W/m2" );
 							} else {
-								ShowContinueError( "...Internal Heat Gain (no floor) [" + trim( RoundSigDigits( Zone( ZoneNum ).InternalHeatGains / Zone( ZoneNum ).FloorArea, 3 ) ) + "] W" );
+								ShowContinueError( "...Internal Heat Gain (no floor) [" + RoundSigDigits( Zone( ZoneNum ).InternalHeatGains / Zone( ZoneNum ).FloorArea, 3 ) + "] W" );
 							}
 							if ( SimulateAirflowNetwork <= AirflowNetworkControlSimple ) {
-								ShowContinueError( "...Infiltration/Ventilation [" + trim( RoundSigDigits( Zone( ZoneNum ).NominalInfilVent, 3 ) ) + "] m3/s" );
-								ShowContinueError( "...Mixing/Cross Mixing [" + trim( RoundSigDigits( Zone( ZoneNum ).NominalMixing, 3 ) ) + "] m3/s" );
+								ShowContinueError( "...Infiltration/Ventilation [" + RoundSigDigits( Zone( ZoneNum ).NominalInfilVent, 3 ) + "] m3/s" );
+								ShowContinueError( "...Mixing/Cross Mixing [" + RoundSigDigits( Zone( ZoneNum ).NominalMixing, 3 ) + "] m3/s" );
 							} else {
 								ShowContinueError( "...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available." );
 							}
@@ -5515,18 +5515,18 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 						}
 						ShowFatalError( "Program terminates due to preceding condition." );
 					} else {
-						ShowSevereError( "Temperature (high) out of bounds [" + trim( RoundSigDigits( TH( SurfNum, 1, 2 ), 2 ) ) + "] for zone=\"" + trim( Zone( ZoneNum ).Name ) + "\", for surface=\"" + trim( Surface( SurfNum ).Name ) + "\"" );
-						ShowContinueErrorTimeStamp( " " );
+						ShowSevereError( "Temperature (high) out of bounds [" + RoundSigDigits( TH( SurfNum, 1, 2 ), 2 ) + "] for zone=\"" + Zone( ZoneNum ).Name + "\", for surface=\"" + Surface( SurfNum ).Name + "\"" );
+						ShowContinueErrorTimeStamp( "" );
 						if ( ! Zone( ZoneNum ).TempOutOfBoundsReported ) {
-							ShowContinueError( "Zone=\"" + trim( Zone( ZoneNum ).Name ) + "\", Diagnostic Details:" );
+							ShowContinueError( "Zone=\"" + Zone( ZoneNum ).Name + "\", Diagnostic Details:" );
 							if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
-								ShowContinueError( "...Internal Heat Gain [" + trim( RoundSigDigits( Zone( ZoneNum ).InternalHeatGains / Zone( ZoneNum ).FloorArea, 3 ) ) + "] W/m2" );
+								ShowContinueError( "...Internal Heat Gain [" + RoundSigDigits( Zone( ZoneNum ).InternalHeatGains / Zone( ZoneNum ).FloorArea, 3 ) + "] W/m2" );
 							} else {
-								ShowContinueError( "...Internal Heat Gain (no floor) [" + trim( RoundSigDigits( Zone( ZoneNum ).InternalHeatGains / Zone( ZoneNum ).FloorArea, 3 ) ) + "] W" );
+								ShowContinueError( "...Internal Heat Gain (no floor) [" + RoundSigDigits( Zone( ZoneNum ).InternalHeatGains / Zone( ZoneNum ).FloorArea, 3 ) + "] W" );
 							}
 							if ( SimulateAirflowNetwork <= AirflowNetworkControlSimple ) {
-								ShowContinueError( "...Infiltration/Ventilation [" + trim( RoundSigDigits( Zone( ZoneNum ).NominalInfilVent, 3 ) ) + "] m3/s" );
-								ShowContinueError( "...Mixing/Cross Mixing [" + trim( RoundSigDigits( Zone( ZoneNum ).NominalMixing, 3 ) ) + "] m3/s" );
+								ShowContinueError( "...Infiltration/Ventilation [" + RoundSigDigits( Zone( ZoneNum ).NominalInfilVent, 3 ) + "] m3/s" );
+								ShowContinueError( "...Mixing/Cross Mixing [" + RoundSigDigits( Zone( ZoneNum ).NominalMixing, 3 ) + "] m3/s" );
 							} else {
 								ShowContinueError( "...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available." );
 							}
@@ -5626,11 +5626,11 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 				++ErrCount;
 				if ( ErrCount < 16 ) {
 					if ( ! any_eq( HeatTransferAlgosUsed, UseCondFD ) ) {
-						ShowWarningError( "Inside surface heat balance did not converge " "with Max Temp Difference [C] =" + trim( RoundSigDigits( MaxDelTemp, 3 ) ) + " vs Max Allowed Temp Diff [C] =" + trim( RoundSigDigits( MaxAllowedDelTemp, 3 ) ) );
-						ShowContinueErrorTimeStamp( " " );
+						ShowWarningError( "Inside surface heat balance did not converge " "with Max Temp Difference [C] =" + RoundSigDigits( MaxDelTemp, 3 ) + " vs Max Allowed Temp Diff [C] =" + RoundSigDigits( MaxAllowedDelTemp, 3 ) );
+						ShowContinueErrorTimeStamp( "" );
 					} else {
-						ShowWarningError( "Inside surface heat balance did not converge " "with Max Temp Difference [C] =" + trim( RoundSigDigits( MaxDelTemp, 3 ) ) + " vs Max Allowed Temp Diff [C] =" + trim( RoundSigDigits( MaxAllowedDelTempCondFD, 6 ) ) );
-						ShowContinueErrorTimeStamp( " " );
+						ShowWarningError( "Inside surface heat balance did not converge " "with Max Temp Difference [C] =" + RoundSigDigits( MaxDelTemp, 3 ) + " vs Max Allowed Temp Diff [C] =" + RoundSigDigits( MaxAllowedDelTempCondFD, 6 ) );
+						ShowContinueErrorTimeStamp( "" );
 					}
 				} else {
 					ShowRecurringWarningErrorAtEnd( "Inside surface heat balance convergence problem continues", InsideSurfErrCount, MaxDelTemp, MaxDelTemp, _, "[C]", "[C]" );

@@ -2,7 +2,6 @@
 #define EMSManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -64,8 +63,8 @@ namespace EMSManager {
 
 	void
 	GetVariableTypeAndIndex(
-		Fstring const & VarName,
-		Fstring const & VarKeyName,
+		std::string const & VarName,
+		std::string const & VarKeyName,
 		int & VarType,
 		int & VarIndex
 	);
@@ -140,47 +139,47 @@ namespace EMSManager {
 
 void
 SetupEMSActuator(
-	Fstring const & cComponentTypeName,
-	Fstring const & cUniqueIDName,
-	Fstring const & cControlTypeName,
-	Fstring const & cUnits,
+	std::string const & cComponentTypeName,
+	std::string const & cUniqueIDName,
+	std::string const & cControlTypeName,
+	std::string const & cUnits,
 	bool & lEMSActuated,
 	Real64 & rValue
 );
 
 void
 SetupEMSActuator(
-	Fstring const & cComponentTypeName,
-	Fstring const & cUniqueIDName,
-	Fstring const & cControlTypeName,
-	Fstring const & cUnits,
+	std::string const & cComponentTypeName,
+	std::string const & cUniqueIDName,
+	std::string const & cControlTypeName,
+	std::string const & cUnits,
 	bool & lEMSActuated,
 	int & iValue
 );
 
 void
 SetupEMSActuator(
-	Fstring const & cComponentTypeName,
-	Fstring const & cUniqueIDName,
-	Fstring const & cControlTypeName,
-	Fstring const & cUnits,
+	std::string const & cComponentTypeName,
+	std::string const & cUniqueIDName,
+	std::string const & cControlTypeName,
+	std::string const & cUnits,
 	bool & lEMSActuated,
 	bool & lValue
 );
 
 void
 SetupEMSInternalVariable(
-	Fstring const & cDataTypeName,
-	Fstring const & cUniqueIDName,
-	Fstring const & cUnits,
+	std::string const & cDataTypeName,
+	std::string const & cUniqueIDName,
+	std::string const & cUnits,
 	Real64 & rValue
 );
 
 void
 SetupEMSInternalVariable(
-	Fstring const & cDataTypeName,
-	Fstring const & cUniqueIDName,
-	Fstring const & cUnits,
+	std::string const & cDataTypeName,
+	std::string const & cUniqueIDName,
+	std::string const & cUnits,
 	int & iValue
 );
 

@@ -6,7 +6,6 @@
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/FArrayS.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <WindowComplexManager.hh>
@@ -60,7 +59,6 @@ namespace WindowComplexManager {
 	using namespace DataPrecisionGlobals;
 	using namespace DataVectorTypes;
 	using namespace DataBSDFWindow;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::Pi;
 	using DataGlobals::DegToRadians;
 	using DataGlobals::NumOfTimeStepInHour;
@@ -3166,8 +3164,8 @@ namespace WindowComplexManager {
 		//                 0 - don’t create debug output files
 		//                 1 - append results to existing debug output file (where applicable)
 		//                 2 - store results in a new debug output file
-		static Fstring Debug_dir( 256 ); // Target directory for debug files (pointer to a character array)
-		static Fstring Debug_file( 256, "Test" ); // Template file name used to create debug output files
+		static std::string Debug_dir; // Target directory for debug files (pointer to a character array)
+		static std::string Debug_file( "Test" ); // Template file name used to create debug output files
 		static std::int32_t Window_ID( -1 ); // ID of the window (long integer value, passed by W6)
 		static std::int32_t IGU_ID( -1 ); // ID of the IGU (long integer value, passed by W6)
 		static Real64 SDScalar( 0.0 ); // SD convection factor (value between 0 and 1)
@@ -3315,7 +3313,7 @@ namespace WindowComplexManager {
 		int GasType; // locally used coefficent to point at correct gas type
 		int ICoeff;
 
-		Fstring tarcogErrorMessage( 2000 ); // store error text from tarcog
+		std::string tarcogErrorMessage; // store error text from tarcog
 
 		//Simon: locally used variables
 		int ngllayer;
@@ -3389,7 +3387,7 @@ namespace WindowComplexManager {
 				//            END DO ! ZoneEquipConfigNum
 				// check whether this zone is a controlled zone or not
 				if ( ! Zone( ZoneNum ).IsControlled ) {
-					ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + trim( Zone( ZoneNum ).Name ) );
+					ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone( ZoneNum ).Name );
 					return;
 				}
 				// determine supply air conditions
@@ -3427,7 +3425,7 @@ namespace WindowComplexManager {
 					ZoneEquipConfigNum = ZoneNum;
 					// check whether this zone is a controlled zone or not
 					if ( ! Zone( ZoneNum ).IsControlled ) {
-						ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + trim( Zone( ZoneNum ).Name ) );
+						ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone( ZoneNum ).Name );
 						return;
 					}
 					// determine supply air conditions

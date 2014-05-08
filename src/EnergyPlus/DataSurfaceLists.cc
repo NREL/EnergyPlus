@@ -35,7 +35,6 @@ namespace DataSurfaceLists {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// -only module should be available to other modules and routines.
@@ -99,8 +98,8 @@ namespace DataSurfaceLists {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const CurrentModuleObject1( "ZoneHVAC:LowTemperatureRadiant:SurfaceGroup" );
-		static Fstring const CurrentModuleObject2( "ZoneHVAC:VentilatedSlab:SlabGroup" );
+		static std::string const CurrentModuleObject1( "ZoneHVAC:LowTemperatureRadiant:SurfaceGroup" );
+		static std::string const CurrentModuleObject2( "ZoneHVAC:VentilatedSlab:SlabGroup" );
 		Real64 const FlowFractionTolerance( 0.0001 ); // Smallest deviation from unity for the sum of all fractions
 		Real64 const SurfListMinFlowFrac( 0.001 ); // Minimum allowed flow fraction (to avoid divide by zero)
 
@@ -111,9 +110,9 @@ namespace DataSurfaceLists {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_Fstring Alphas( sFstring( MaxNameLength ) ); // Alpha items for object
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) ); // Numeric field names
+		FArray1D_string Alphas; // Alpha items for object
+		FArray1D_string cAlphaFields; // Alpha field names
+		FArray1D_string cNumericFields; // Numeric field names
 		int MaxAlphas; // Maximum number of alphas for these input keywords
 		int MaxNumbers; // Maximum number of numbers for these input keywords
 		int NameConflict; // Used to see if a surface name matches the name of a surface list (not allowed)
@@ -149,15 +148,15 @@ namespace DataSurfaceLists {
 
 			GetObjectDefMaxArgs( CurrentModuleObject1, NumArgs, MaxAlphas, MaxNumbers );
 			Alphas.allocate( MaxAlphas );
-			Alphas = " ";
+			Alphas = "";
 			lAlphaBlanks.allocate( MaxAlphas );
 			lAlphaBlanks = false;
 			cAlphaFields.allocate( MaxAlphas );
-			cAlphaFields = " ";
+			cAlphaFields = "";
 			Numbers.allocate( MaxNumbers );
 			Numbers = 0.0;
 			cNumericFields.allocate( MaxNumbers );
-			cNumericFields = " ";
+			cNumericFields = "";
 			lNumericBlanks.allocate( MaxNumbers );
 			lNumericBlanks = false;
 
@@ -167,7 +166,7 @@ namespace DataSurfaceLists {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), SurfList.Name(), Item - 1, IsNotOK, IsBlank, trim( CurrentModuleObject1 ) + " Name" );
+				VerifyName( Alphas( 1 ), SurfList.Name(), Item - 1, IsNotOK, IsBlank, CurrentModuleObject1 + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -178,12 +177,12 @@ namespace DataSurfaceLists {
 
 				NameConflict = FindItemInList( SurfList( Item ).Name, Surface.Name(), TotSurfaces );
 				if ( NameConflict > 0 ) { // A surface list has the same name as a surface--not allowed
-					ShowSevereError( trim( CurrentModuleObject1 ) + " = " + trim( SurfList( Item ).Name ) + " has the same name as a surface; this is not allowed." );
+					ShowSevereError( CurrentModuleObject1 + " = " + SurfList( Item ).Name + " has the same name as a surface; this is not allowed." );
 					ErrorsFound = true;
 				}
 
 				if ( SurfList( Item ).NumOfSurfaces < 1 ) {
-					ShowSevereError( trim( CurrentModuleObject1 ) + " = " + trim( SurfList( Item ).Name ) + " does not have any surfaces listed." );
+					ShowSevereError( CurrentModuleObject1 + " = " + SurfList( Item ).Name + " does not have any surfaces listed." );
 					ErrorsFound = true;
 				} else {
 					SurfList( Item ).SurfName.allocate( SurfList( Item ).NumOfSurfaces );
@@ -196,7 +195,7 @@ namespace DataSurfaceLists {
 					SurfList( Item ).SurfName( SurfNum ) = Alphas( SurfNum + 1 );
 					SurfList( Item ).SurfPtr( SurfNum ) = FindItemInList( Alphas( SurfNum + 1 ), Surface.Name(), TotSurfaces );
 					if ( SurfList( Item ).SurfPtr( SurfNum ) == 0 ) {
-						ShowSevereError( trim( cAlphaFields( SurfNum + 1 ) ) + " in " + trim( CurrentModuleObject1 ) + " statement not found = " + trim( SurfList( Item ).SurfName( SurfNum ) ) );
+						ShowSevereError( cAlphaFields( SurfNum + 1 ) + " in " + CurrentModuleObject1 + " statement not found = " + SurfList( Item ).SurfName( SurfNum ) );
 						ErrorsFound = true;
 					} else { // Make sure that all of the surfaces are located in the same zone
 						Surface( SurfList( Item ).SurfPtr( SurfNum ) ).PartOfVentSlabOrRadiantSurface = true;
@@ -205,15 +204,15 @@ namespace DataSurfaceLists {
 						}
 						if ( SurfNum > 1 ) {
 							if ( ZoneForSurface != Surface( SurfList( Item ).SurfPtr( SurfNum ) ).Zone ) {
-								ShowSevereError( "Not all surfaces in same zone for " + trim( CurrentModuleObject1 ) + " = " + trim( SurfList( Item ).Name ) );
+								ShowSevereError( "Not all surfaces in same zone for " + CurrentModuleObject1 + " = " + SurfList( Item ).Name );
 								ErrorsFound = true;
 							}
 						}
 					}
 					SurfList( Item ).SurfFlowFrac( SurfNum ) = Numbers( SurfNum );
 					if ( SurfList( Item ).SurfFlowFrac( SurfNum ) < SurfListMinFlowFrac ) {
-						ShowSevereError( "The Flow Fraction for Surface " + trim( SurfList( Item ).SurfName( SurfNum ) ) + " in Surface Group " + trim( SurfList( Item ).Name ) + " is too low" );
-						ShowContinueError( "Flow fraction of " + trim( RoundSigDigits( SurfList( Item ).SurfFlowFrac( SurfNum ), 6 ) ) + " is less than minimum criteria = " + trim( RoundSigDigits( SurfListMinFlowFrac, 6 ) ) );
+						ShowSevereError( "The Flow Fraction for Surface " + SurfList( Item ).SurfName( SurfNum ) + " in Surface Group " + SurfList( Item ).Name + " is too low" );
+						ShowContinueError( "Flow fraction of " + RoundSigDigits( SurfList( Item ).SurfFlowFrac( SurfNum ), 6 ) + " is less than minimum criteria = " + RoundSigDigits( SurfListMinFlowFrac, 6 ) );
 						ShowContinueError( "Zero or extremely low flow fractions are not allowed. " "Remove this surface from the surface group or combine small surfaces together." );
 						ErrorsFound = true;
 					}
@@ -221,7 +220,7 @@ namespace DataSurfaceLists {
 				}
 
 				if ( std::abs( SumOfAllFractions - 1.0 ) > FlowFractionTolerance ) {
-					ShowSevereError( trim( CurrentModuleObject1 ) + " flow fractions do not add up to unity for " + trim( SurfList( Item ).Name ) );
+					ShowSevereError( CurrentModuleObject1 + " flow fractions do not add up to unity for " + SurfList( Item ).Name );
 					ErrorsFound = true;
 				}
 
@@ -234,21 +233,21 @@ namespace DataSurfaceLists {
 			cNumericFields.deallocate();
 			lNumericBlanks.deallocate();
 
-			if ( ErrorsFound ) ShowSevereError( trim( CurrentModuleObject1 ) + " errors found getting input. Program will terminate." );
+			if ( ErrorsFound ) ShowSevereError( CurrentModuleObject1 + " errors found getting input. Program will terminate." );
 		}
 
 		if ( NumOfSurfListVentSlab > 0 ) {
 			GetObjectDefMaxArgs( CurrentModuleObject2, NumArgs, MaxAlphas, MaxNumbers );
 			Alphas.allocate( MaxAlphas );
-			Alphas = " ";
+			Alphas = "";
 			lAlphaBlanks.allocate( MaxAlphas );
 			lAlphaBlanks = false;
 			cAlphaFields.allocate( MaxAlphas );
-			cAlphaFields = " ";
+			cAlphaFields = "";
 			Numbers.allocate( MaxNumbers );
 			Numbers = 0.0;
 			cNumericFields.allocate( MaxNumbers );
-			cNumericFields = " ";
+			cNumericFields = "";
 			lNumericBlanks.allocate( MaxNumbers );
 			lNumericBlanks = false;
 
@@ -258,7 +257,7 @@ namespace DataSurfaceLists {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), SlabList.Name(), Item - 1, IsNotOK, IsBlank, trim( CurrentModuleObject2 ) + " Name" );
+				VerifyName( Alphas( 1 ), SlabList.Name(), Item - 1, IsNotOK, IsBlank, CurrentModuleObject2 + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -269,12 +268,12 @@ namespace DataSurfaceLists {
 
 				NameConflict = FindItemInList( SlabList( Item ).Name, Surface.Name(), TotSurfaces );
 				if ( NameConflict > 0 ) { // A surface list has the same name as a surface--not allowed
-					ShowSevereError( trim( CurrentModuleObject2 ) + " = " + trim( SlabList( Item ).Name ) + " has the same name as a slab; this is not allowed." );
+					ShowSevereError( CurrentModuleObject2 + " = " + SlabList( Item ).Name + " has the same name as a slab; this is not allowed." );
 					ErrorsFound = true;
 				}
 
 				if ( SlabList( Item ).NumOfSurfaces < 1 ) {
-					ShowSevereError( trim( CurrentModuleObject2 ) + " = " + trim( SlabList( Item ).Name ) + " does not have any slabs listed." );
+					ShowSevereError( CurrentModuleObject2 + " = " + SlabList( Item ).Name + " does not have any slabs listed." );
 					ErrorsFound = true;
 				} else {
 					SlabList( Item ).ZoneName.allocate( SlabList( Item ).NumOfSurfaces );
@@ -295,23 +294,23 @@ namespace DataSurfaceLists {
 					SlabList( Item ).ZoneName( SurfNum ) = Alphas( AlphaArray );
 					SlabList( Item ).ZonePtr = FindItemInList( Alphas( AlphaArray ), Zone.Name(), NumOfZones );
 					if ( SlabList( Item ).ZonePtr( SurfNum ) == 0 ) {
-						ShowSevereError( trim( cAlphaFields( AlphaArray + 1 ) ) + " in " + trim( CurrentModuleObject2 ) + " Zone not found = " + trim( SlabList( Item ).SurfName( SurfNum ) ) );
+						ShowSevereError( cAlphaFields( AlphaArray + 1 ) + " in " + CurrentModuleObject2 + " Zone not found = " + SlabList( Item ).SurfName( SurfNum ) );
 						ErrorsFound = true;
 					}
 
 					SlabList( Item ).SurfName( SurfNum ) = Alphas( AlphaArray + 1 );
 					SlabList( Item ).SurfPtr( SurfNum ) = FindItemInList( Alphas( AlphaArray + 1 ), Surface.Name(), TotSurfaces );
 					if ( SlabList( Item ).SurfPtr( SurfNum ) == 0 ) {
-						ShowSevereError( trim( cAlphaFields( AlphaArray + 1 ) ) + " in " + trim( CurrentModuleObject2 ) + " statement not found = " + trim( SlabList( Item ).SurfName( SurfNum ) ) );
+						ShowSevereError( cAlphaFields( AlphaArray + 1 ) + " in " + CurrentModuleObject2 + " statement not found = " + SlabList( Item ).SurfName( SurfNum ) );
 						ErrorsFound = true;
 
 					}
 					for ( SrfList = 1; SrfList <= NumOfSurfaceLists; ++SrfList ) {
 						NameConflict = FindItemInList( SlabList( Item ).SurfName( SurfNum ), SurfList( SrfList ).SurfName, SurfList( SrfList ).NumOfSurfaces );
 						if ( NameConflict > 0 ) { // A slab list includes a surface on a surface list--not allowed
-							ShowSevereError( trim( CurrentModuleObject2 ) + "=\"" + trim( SlabList( Item ).Name ) + "\", invalid surface specified." );
-							ShowContinueError( "Surface=\"" + trim( SlabList( Item ).SurfName( SurfNum ) ) + "\" is also on a Surface List." );
-							ShowContinueError( trim( CurrentModuleObject1 ) + "=\"" + trim( SurfList( SrfList ).Name ) + "\" has this surface also." );
+							ShowSevereError( CurrentModuleObject2 + "=\"" + SlabList( Item ).Name + "\", invalid surface specified." );
+							ShowContinueError( "Surface=\"" + SlabList( Item ).SurfName( SurfNum ) + "\" is also on a Surface List." );
+							ShowContinueError( CurrentModuleObject1 + "=\"" + SurfList( SrfList ).Name + "\" has this surface also." );
 							ShowContinueError( "A surface cannot be on both lists. The models cannot operate correctly." );
 							ErrorsFound = true;
 						}
@@ -335,7 +334,7 @@ namespace DataSurfaceLists {
 			cNumericFields.deallocate();
 			lNumericBlanks.deallocate();
 
-			if ( ErrorsFound ) ShowSevereError( trim( CurrentModuleObject2 ) + " errors found getting input. Program will terminate." );
+			if ( ErrorsFound ) ShowSevereError( CurrentModuleObject2 + " errors found getting input. Program will terminate." );
 
 		}
 

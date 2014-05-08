@@ -97,11 +97,11 @@ namespace ZoneTempPredictorCorrector {
 	//INTEGER, PUBLIC, PARAMETER :: iPushZoneTimestepHistories    = 5
 	//INTEGER, PUBLIC, PARAMETER :: iPushSystemTimestepHistories  = 6
 
-	FArray1D_Fstring const ValidControlTypes( 4, sFstring( 41 ), { "ThermostatSetpoint:SingleHeating         ", "ThermostatSetpoint:SingleCooling         ", "ThermostatSetpoint:SingleHeatingOrCooling", "ThermostatSetpoint:DualSetpoint          " } );
+	FArray1D_string const ValidControlTypes( 4, { "ThermostatSetpoint:SingleHeating", "ThermostatSetpoint:SingleCooling", "ThermostatSetpoint:SingleHeatingOrCooling", "ThermostatSetpoint:DualSetpoint" } );
 
-	FArray1D_Fstring const ValidComfortControlTypes( 12, sFstring( 63 ), { "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating         ", "ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling         ", "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling", "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint          ", "ThermostatSetpoint:ThermalComfort:Pierce:SingleHeating         ", "ThermostatSetpoint:ThermalComfort:Pierce:SingleCooling         ", "ThermostatSetpoint:ThermalComfort:Pierce:SingleHeatingOrCooling", "ThermostatSetpoint:ThermalComfort:Pierce:DualSetpoint          ", "ThermostatSetpoint:ThermalComfort:KSU:SingleHeating            ", "ThermostatSetpoint:ThermalComfort:KSU:SingleCooling            ", "ThermostatSetpoint:ThermalComfort:KSU:SingleHeatingOrCooling   ", "ThermostatSetpoint:ThermalComfort:KSU:DualSetpoint             " } );
+	FArray1D_string const ValidComfortControlTypes( 12, { "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating", "ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling", "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling", "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint", "ThermostatSetpoint:ThermalComfort:Pierce:SingleHeating", "ThermostatSetpoint:ThermalComfort:Pierce:SingleCooling", "ThermostatSetpoint:ThermalComfort:Pierce:SingleHeatingOrCooling", "ThermostatSetpoint:ThermalComfort:Pierce:DualSetpoint", "ThermostatSetpoint:ThermalComfort:KSU:SingleHeating", "ThermostatSetpoint:ThermalComfort:KSU:SingleCooling", "ThermostatSetpoint:ThermalComfort:KSU:SingleHeatingOrCooling", "ThermostatSetpoint:ThermalComfort:KSU:DualSetpoint" } );
 
-	FArray1D_Fstring const cZControlTypes( 6, sFstring( 45 ), { "ZoneControl:Thermostat                       ", "ZoneControl:Thermostat:ThermalComfort        ", "ZoneControl:Thermostat:OperativeTemperature  ", "ZoneControl:Humidistat                       ", "ZoneControl:Thermostat:TemperatureAndHumidity", "ZoneControl:Thermostat:StagedDualSetpoint    " } );
+	FArray1D_string const cZControlTypes( 6, { "ZoneControl:Thermostat", "ZoneControl:Thermostat:ThermalComfort", "ZoneControl:Thermostat:OperativeTemperature", "ZoneControl:Humidistat", "ZoneControl:Thermostat:TemperatureAndHumidity", "ZoneControl:Thermostat:StagedDualSetpoint" } );
 
 	int const iZC_TStat( 1 );
 	int const iZC_TCTStat( 2 );
@@ -292,7 +292,7 @@ namespace ZoneTempPredictorCorrector {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetZoneAirSetpoints: " );
+		static std::string const RoutineName( "GetZoneAirSetpoints: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -402,8 +402,8 @@ namespace ZoneTempPredictorCorrector {
 		FArray1D< NeededComfortControlTypes > TComfortControlTypes;
 
 		// Formats
-		std::string const Format_700( "('! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, ','Carbon Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier')" );
-		std::string const Format_701( "('Zone Volume Capacitance Multiplier,',F8.3,' ,',F8.3,',',F8.3,',',F8.3)" );
+		static gio::Fmt const Format_700( "('! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, ','Carbon Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier')" );
+		static gio::Fmt const Format_701( "('Zone Volume Capacitance Multiplier,',F8.3,' ,',F8.3,',',F8.3,',',F8.3)" );
 
 		// FLOW:
 		cCurrentModuleObject = cZControlTypes( iZC_TStat );
@@ -416,7 +416,7 @@ namespace ZoneTempPredictorCorrector {
 			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), TStatObjects.Name(), Item - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), TStatObjects.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -438,13 +438,13 @@ namespace ZoneTempPredictorCorrector {
 				TStatObjects( Item ).ZoneListActive = true;
 				TStatObjects( Item ).ZoneOrZoneListPtr = ZLItem;
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" not found." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 				ErrorsFound = true;
 			}
 		}
 
 		if ( ErrorsFound ) {
-			ShowSevereError( "GetZoneAirSetpoints: Errors with invalid names in " + trim( cCurrentModuleObject ) + " objects." );
+			ShowSevereError( "GetZoneAirSetpoints: Errors with invalid names in " + cCurrentModuleObject + " objects." );
 			ShowContinueError( "...These will not be read in.  Other errors may occur." );
 			NumTempControlledZones = 0;
 		}
@@ -468,15 +468,15 @@ namespace ZoneTempPredictorCorrector {
 						TempControlledZone( TempControlledZoneNum ).ZoneName = cAlphaArgs( 2 );
 						TempControlledZone( TempControlledZoneNum ).ActualZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
 						if ( TempControlledZone( TempControlledZoneNum ).ActualZoneNum == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" not found." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 							ErrorsFound = true;
 						} else {
 							Zone( TempControlledZone( TempControlledZoneNum ).ActualZoneNum ).TempControlledZoneIndex = TempControlledZoneNum;
 						}
 					} else {
 						TempControlledZone( TempControlledZoneNum ).ZoneName = cAlphaArgs( 2 ); // for continuity
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" zone previously assigned." );
-						ShowContinueError( "...Zone was previously assigned to Thermostat=\"" + trim( TempControlledZone( ZoneAssigned ).Name ) + "\"." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" zone previously assigned." );
+						ShowContinueError( "...Zone was previously assigned to Thermostat=\"" + TempControlledZone( ZoneAssigned ).Name + "\"." );
 						ErrorsFound = true;
 						continue;
 					}
@@ -492,13 +492,13 @@ namespace ZoneTempPredictorCorrector {
 					TempControlledZone( TempControlledZoneNum ).CTSchedIndex = GetScheduleIndex( cAlphaArgs( 3 ) );
 					if ( Item1 == 1 ) { // only show error on first of several if zone list
 						if ( TempControlledZone( TempControlledZoneNum ).CTSchedIndex == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( cAlphaArgs( 3 ) ) + "\" not found." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\" not found." );
 							ErrorsFound = true;
 						} else {
 							// Check validity of control types.
 							ValidScheduleControlType = CheckScheduleValueMinMax( TempControlledZone( TempControlledZoneNum ).CTSchedIndex, ">=", 0.0, "<=", 4.0 );
 							if ( ! ValidScheduleControlType ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid range " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\"" );
+								ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid range " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"" );
 								ShowContinueError( "..contains values outside of range [0,4]." );
 								ErrorsFound = true;
 							}
@@ -515,14 +515,14 @@ namespace ZoneTempPredictorCorrector {
 						TempControlledZone( TempControlledZoneNum ).ControlType( ControlTypeNum ) = cAlphaArgs( nint( 2.0 * ControlTypeNum - 1 + 3 ) );
 						TempControlledZone( TempControlledZoneNum ).ControlTypeName( ControlTypeNum ) = cAlphaArgs( nint( 2.0 * ControlTypeNum + 3 ) );
 
-						if ( TempControlledZone( TempControlledZoneNum ).ControlType( ControlTypeNum ) != " " ) {
+						if ( TempControlledZone( TempControlledZoneNum ).ControlType( ControlTypeNum ) != "" ) {
 							CTIndex = FindItem( TempControlledZone( TempControlledZoneNum ).ControlType( ControlTypeNum ), ValidControlTypes, 4 );
 							if ( CTIndex == 0 ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( nint( 2.0 * ControlTypeNum - 1 + 3 ) ) ) + "=\"" + trim( cAlphaArgs( nint( 2.0 * ControlTypeNum - 1 + 3 ) ) ) + "\"" );
+								ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( nint( 2.0 * ControlTypeNum - 1 + 3 ) ) + "=\"" + cAlphaArgs( nint( 2.0 * ControlTypeNum - 1 + 3 ) ) + "\"" );
 								ErrorsFound = true;
 							}
 						} else {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( nint( 2.0 * ControlTypeNum - 1 + 3 ) ) ) + "=\"<blank>\"" );
+							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( nint( 2.0 * ControlTypeNum - 1 + 3 ) ) + "=\"<blank>\"" );
 							ErrorsFound = true;
 						}
 						TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( ControlTypeNum ) = 0;
@@ -540,7 +540,7 @@ namespace ZoneTempPredictorCorrector {
 			GetObjectItem( cCurrentModuleObject, SingleTempHeatingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SetPointSingleHeating.Name(), SingleTempHeatingControlNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SetPointSingleHeating.Name(), SingleTempHeatingControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -549,7 +549,7 @@ namespace ZoneTempPredictorCorrector {
 			SetPointSingleHeating( SingleTempHeatingControlNum ).TempSchedName = cAlphaArgs( 2 );
 			SetPointSingleHeating( SingleTempHeatingControlNum ).TempSchedIndex = GetScheduleIndex( cAlphaArgs( 2 ) );
 			if ( SetPointSingleHeating( SingleTempHeatingControlNum ).TempSchedIndex == 0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" not found." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 				ErrorsFound = true;
 			}
 
@@ -564,7 +564,7 @@ namespace ZoneTempPredictorCorrector {
 			GetObjectItem( cCurrentModuleObject, SingleTempCoolingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SetPointSingleCooling.Name(), SingleTempCoolingControlNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SetPointSingleCooling.Name(), SingleTempCoolingControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -573,7 +573,7 @@ namespace ZoneTempPredictorCorrector {
 			SetPointSingleCooling( SingleTempCoolingControlNum ).TempSchedName = cAlphaArgs( 2 );
 			SetPointSingleCooling( SingleTempCoolingControlNum ).TempSchedIndex = GetScheduleIndex( cAlphaArgs( 2 ) );
 			if ( SetPointSingleCooling( SingleTempCoolingControlNum ).TempSchedIndex == 0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" not found." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 				ErrorsFound = true;
 			}
 
@@ -590,7 +590,7 @@ namespace ZoneTempPredictorCorrector {
 			SetPointSingleHeatCool( SingleTempHeatCoolControlNum ).TempSchedName = cAlphaArgs( 2 );
 			SetPointSingleHeatCool( SingleTempHeatCoolControlNum ).TempSchedIndex = GetScheduleIndex( cAlphaArgs( 2 ) );
 			if ( SetPointSingleHeatCool( SingleTempHeatCoolControlNum ).TempSchedIndex == 0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" not found." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 				ErrorsFound = true;
 			}
 
@@ -605,7 +605,7 @@ namespace ZoneTempPredictorCorrector {
 			GetObjectItem( cCurrentModuleObject, DualTempHeatCoolControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SetPointDualHeatCool.Name(), DualTempHeatCoolControlNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SetPointDualHeatCool.Name(), DualTempHeatCoolControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -614,13 +614,13 @@ namespace ZoneTempPredictorCorrector {
 			SetPointDualHeatCool( DualTempHeatCoolControlNum ).HeatTempSetptSchedName = cAlphaArgs( 2 );
 			SetPointDualHeatCool( DualTempHeatCoolControlNum ).HeatTempSchedIndex = GetScheduleIndex( cAlphaArgs( 2 ) );
 			if ( SetPointDualHeatCool( DualTempHeatCoolControlNum ).HeatTempSchedIndex == 0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" not found." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 				ErrorsFound = true;
 			}
 			SetPointDualHeatCool( DualTempHeatCoolControlNum ).CoolTempSetptSchedName = cAlphaArgs( 3 );
 			SetPointDualHeatCool( DualTempHeatCoolControlNum ).CoolTempSchedIndex = GetScheduleIndex( cAlphaArgs( 3 ) );
 			if ( SetPointDualHeatCool( DualTempHeatCoolControlNum ).CoolTempSchedIndex == 0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( cAlphaArgs( 3 ) ) + "\" not found." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\" not found." );
 				ErrorsFound = true;
 			}
 
@@ -628,28 +628,28 @@ namespace ZoneTempPredictorCorrector {
 
 		// Finish filling in Schedule pointing indexes
 		for ( TempControlledZoneNum = 1; TempControlledZoneNum <= NumTempControlledZones; ++TempControlledZoneNum ) {
-			TempIndex = FindItem( trim( ValidControlTypes( SglHeatSetPoint ) ), TempControlledZone( TempControlledZoneNum ).ControlType, TempControlledZone( TempControlledZoneNum ).NumControlTypes );
+			TempIndex = FindItem( ValidControlTypes( SglHeatSetPoint ), TempControlledZone( TempControlledZoneNum ).ControlType, TempControlledZone( TempControlledZoneNum ).NumControlTypes );
 			TempControlledZone( TempControlledZoneNum ).SchIndx_SingleHeatSetPoint = TempIndex;
 			if ( TempIndex > 0 ) {
 				TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( TempIndex ) = FindItem( TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ), SetPointSingleHeating.Name(), NumSingleTempHeatingControls );
 				TStatControlTypes( TempControlledZoneNum ).MustHave( SingleHeatingSetPoint ) = true;
 			}
 
-			TempIndex = FindItem( trim( ValidControlTypes( SglCoolSetPoint ) ), TempControlledZone( TempControlledZoneNum ).ControlType, TempControlledZone( TempControlledZoneNum ).NumControlTypes );
+			TempIndex = FindItem( ValidControlTypes( SglCoolSetPoint ), TempControlledZone( TempControlledZoneNum ).ControlType, TempControlledZone( TempControlledZoneNum ).NumControlTypes );
 			TempControlledZone( TempControlledZoneNum ).SchIndx_SingleCoolSetPoint = TempIndex;
 			if ( TempIndex > 0 ) {
 				TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( TempIndex ) = FindItem( TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ), SetPointSingleCooling.Name(), NumSingleTempCoolingControls );
 				TStatControlTypes( TempControlledZoneNum ).MustHave( SingleCoolingSetPoint ) = true;
 			}
 
-			TempIndex = FindItem( trim( ValidControlTypes( SglHCSetPoint ) ), TempControlledZone( TempControlledZoneNum ).ControlType, TempControlledZone( TempControlledZoneNum ).NumControlTypes );
+			TempIndex = FindItem( ValidControlTypes( SglHCSetPoint ), TempControlledZone( TempControlledZoneNum ).ControlType, TempControlledZone( TempControlledZoneNum ).NumControlTypes );
 			TempControlledZone( TempControlledZoneNum ).SchIndx_SingleHeatCoolSetPoint = TempIndex;
 			if ( TempIndex > 0 ) {
 				TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( TempIndex ) = FindItem( TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ), SetPointSingleHeatCool.Name(), NumSingleTempHeatCoolControls );
 				TStatControlTypes( TempControlledZoneNum ).MustHave( SingleHeatCoolSetPoint ) = true;
 			}
 
-			TempIndex = FindItem( trim( ValidControlTypes( DualSetPoint ) ), TempControlledZone( TempControlledZoneNum ).ControlType, TempControlledZone( TempControlledZoneNum ).NumControlTypes );
+			TempIndex = FindItem( ValidControlTypes( DualSetPoint ), TempControlledZone( TempControlledZoneNum ).ControlType, TempControlledZone( TempControlledZoneNum ).NumControlTypes );
 			TempControlledZone( TempControlledZoneNum ).SchIndx_DualSetPointWDeadBand = TempIndex;
 			if ( TempIndex > 0 ) {
 				TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( TempIndex ) = FindItem( TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ), SetPointDualHeatCool.Name(), NumDualTempHeatCoolControls );
@@ -669,7 +669,7 @@ namespace ZoneTempPredictorCorrector {
 
 			if ( SchedMin == 0 && SchedMax == 0 ) {
 				if ( FindNumberInList( CTIndex, CTSchedMapToControlledZone, NumTempControlledZones ) == 0 ) {
-					ShowSevereError( "Control Type Schedule=" + trim( TempControlledZone( TempControlledZoneNum ).ControlTypeSchedName ) );
+					ShowSevereError( "Control Type Schedule=" + TempControlledZone( TempControlledZoneNum ).ControlTypeSchedName );
 					ShowContinueError( "..specifies control type 0 for all entries." );
 					ShowContinueError( "All zones using this Control Type Schedule have no heating or cooling available." );
 				}
@@ -689,15 +689,15 @@ namespace ZoneTempPredictorCorrector {
 					if ( TempIndex != 0 ) {
 						SchedTypeIndex = TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( TempIndex );
 						if ( SchedTypeIndex == 0 ) {
-							ShowSevereError( "GetZoneAirSetpoints: Could not find " + trim( ValidControlTypes( SglHeatSetPoint ) ) + " Schedule=" + trim( TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ) ) );
+							ShowSevereError( "GetZoneAirSetpoints: Could not find " + ValidControlTypes( SglHeatSetPoint ) + " Schedule=" + TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ) );
 							ErrorsFound = true;
 						}
 					} else { // TempIndex = 0
 						if ( CheckScheduleValue( CTIndex, SingleHeatingSetPoint ) ) {
-							ShowSevereError( "Control Type Schedule=" + trim( TempControlledZone( TempControlledZoneNum ).ControlTypeSchedName ) );
-							ShowContinueError( "..specifies control type 1 (" + trim( ValidControlTypes( SglHeatSetPoint ) ) + ") as the control type. Not valid for this zone." );
-							ShowContinueError( "..reference " + trim( cZControlTypes( iZC_TStat ) ) + "=" + trim( TempControlledZone( TempControlledZoneNum ).Name ) );
-							ShowContinueError( "..reference ZONE=" + trim( TempControlledZone( TempControlledZoneNum ).ZoneName ) );
+							ShowSevereError( "Control Type Schedule=" + TempControlledZone( TempControlledZoneNum ).ControlTypeSchedName );
+							ShowContinueError( "..specifies control type 1 (" + ValidControlTypes( SglHeatSetPoint ) + ") as the control type. Not valid for this zone." );
+							ShowContinueError( "..reference " + cZControlTypes( iZC_TStat ) + '=' + TempControlledZone( TempControlledZoneNum ).Name );
+							ShowContinueError( "..reference ZONE=" + TempControlledZone( TempControlledZoneNum ).ZoneName );
 							ErrorsFound = true;
 						}
 					}
@@ -709,15 +709,15 @@ namespace ZoneTempPredictorCorrector {
 					if ( TempIndex != 0 ) {
 						SchedTypeIndex = TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( TempIndex );
 						if ( SchedTypeIndex == 0 ) {
-							ShowSevereError( "GetZoneAirSetpoints: Could not find " + trim( ValidControlTypes( SglCoolSetPoint ) ) + " Schedule=" + trim( TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ) ) );
+							ShowSevereError( "GetZoneAirSetpoints: Could not find " + ValidControlTypes( SglCoolSetPoint ) + " Schedule=" + TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ) );
 							ErrorsFound = true;
 						}
 					} else { // TempIndex = 0
 						if ( CheckScheduleValue( CTIndex, SingleCoolingSetPoint ) ) {
-							ShowSevereError( "Control Type Schedule=" + trim( TempControlledZone( TempControlledZoneNum ).ControlTypeSchedName ) );
-							ShowContinueError( "..specifies control type 2 (" + trim( ValidControlTypes( SglCoolSetPoint ) ) + ") as the control type. Not valid for this zone." );
-							ShowContinueError( "..reference " + trim( cZControlTypes( iZC_TStat ) ) + "=" + trim( TempControlledZone( TempControlledZoneNum ).Name ) );
-							ShowContinueError( "..reference ZONE=" + trim( TempControlledZone( TempControlledZoneNum ).ZoneName ) );
+							ShowSevereError( "Control Type Schedule=" + TempControlledZone( TempControlledZoneNum ).ControlTypeSchedName );
+							ShowContinueError( "..specifies control type 2 (" + ValidControlTypes( SglCoolSetPoint ) + ") as the control type. Not valid for this zone." );
+							ShowContinueError( "..reference " + cZControlTypes( iZC_TStat ) + '=' + TempControlledZone( TempControlledZoneNum ).Name );
+							ShowContinueError( "..reference ZONE=" + TempControlledZone( TempControlledZoneNum ).ZoneName );
 							ErrorsFound = true;
 						}
 					}
@@ -729,15 +729,15 @@ namespace ZoneTempPredictorCorrector {
 					if ( TempIndex != 0 ) {
 						SchedTypeIndex = TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( TempIndex );
 						if ( SchedTypeIndex == 0 ) {
-							ShowSevereError( "GetZoneAirSetpoints: Could not find " + trim( ValidControlTypes( SglHCSetPoint ) ) + " Schedule=" + trim( TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ) ) );
+							ShowSevereError( "GetZoneAirSetpoints: Could not find " + ValidControlTypes( SglHCSetPoint ) + " Schedule=" + TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ) );
 							ErrorsFound = true;
 						}
 					} else { // TempIndex = 0
 						if ( CheckScheduleValue( CTIndex, SingleHeatCoolSetPoint ) ) {
-							ShowSevereError( "Schedule=" + trim( TempControlledZone( TempControlledZoneNum ).ControlTypeSchedName ) );
-							ShowContinueError( "..specifies control type 3 (" + trim( ValidControlTypes( SglHCSetPoint ) ) + ") as the control type. Not valid for this zone." );
-							ShowContinueError( "..reference " + trim( cZControlTypes( iZC_TStat ) ) + "=" + trim( TempControlledZone( TempControlledZoneNum ).Name ) );
-							ShowContinueError( "..reference ZONE=" + trim( TempControlledZone( TempControlledZoneNum ).ZoneName ) );
+							ShowSevereError( "Schedule=" + TempControlledZone( TempControlledZoneNum ).ControlTypeSchedName );
+							ShowContinueError( "..specifies control type 3 (" + ValidControlTypes( SglHCSetPoint ) + ") as the control type. Not valid for this zone." );
+							ShowContinueError( "..reference " + cZControlTypes( iZC_TStat ) + '=' + TempControlledZone( TempControlledZoneNum ).Name );
+							ShowContinueError( "..reference ZONE=" + TempControlledZone( TempControlledZoneNum ).ZoneName );
 							ErrorsFound = true;
 						}
 					}
@@ -749,21 +749,21 @@ namespace ZoneTempPredictorCorrector {
 					if ( TempIndex != 0 ) {
 						SchedTypeIndex = TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( TempIndex );
 						if ( SchedTypeIndex == 0 ) {
-							ShowSevereError( "GetZoneAirSetpoints: Could not find " + trim( ValidControlTypes( DualSetPoint ) ) + " Schedule=" + trim( TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ) ) );
+							ShowSevereError( "GetZoneAirSetpoints: Could not find " + ValidControlTypes( DualSetPoint ) + " Schedule=" + TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ) );
 							ErrorsFound = true;
 						}
 					} else { // TempIndex = 0
 						if ( CheckScheduleValue( CTIndex, DualSetPointWithDeadBand ) ) {
-							ShowSevereError( "Schedule=" + trim( TempControlledZone( TempControlledZoneNum ).ControlTypeSchedName ) );
-							ShowContinueError( "..specifies control type 4 (" + trim( ValidControlTypes( DualSetPoint ) ) + ") as the control type. Not valid for this zone." );
-							ShowContinueError( "..reference " + trim( cZControlTypes( iZC_TStat ) ) + "=" + trim( TempControlledZone( TempControlledZoneNum ).Name ) );
-							ShowContinueError( "..reference ZONE=" + trim( TempControlledZone( TempControlledZoneNum ).ZoneName ) );
+							ShowSevereError( "Schedule=" + TempControlledZone( TempControlledZoneNum ).ControlTypeSchedName );
+							ShowContinueError( "..specifies control type 4 (" + ValidControlTypes( DualSetPoint ) + ") as the control type. Not valid for this zone." );
+							ShowContinueError( "..reference " + cZControlTypes( iZC_TStat ) + '=' + TempControlledZone( TempControlledZoneNum ).Name );
+							ShowContinueError( "..reference ZONE=" + TempControlledZone( TempControlledZoneNum ).ZoneName );
 							ErrorsFound = true;
 						}
 					}
 
 				} else {
-					ShowSevereError( "GetZoneAirSetpoints: Illegal control type for Zone=" + trim( Zone( ActualZoneNum ).Name ) + ", Found value=" + trim( TrimSigDigits( ControlTypeNum ) ) + ", in Schedule=" + trim( TempControlledZone( TempControlledZoneNum ).ControlTypeSchedName ) );
+					ShowSevereError( "GetZoneAirSetpoints: Illegal control type for Zone=" + Zone( ActualZoneNum ).Name + ", Found value=" + TrimSigDigits( ControlTypeNum ) + ", in Schedule=" + TempControlledZone( TempControlledZoneNum ).ControlTypeSchedName );
 					ShowContinueError( "..valid range values are [0,4]." );
 					ErrorsFound = true;
 
@@ -785,31 +785,31 @@ namespace ZoneTempPredictorCorrector {
 
 				if ( SELECT_CASE_var == SingleHeatingSetPoint ) {
 					if ( ! TStatControlTypes( TempControlledZoneNum ).MustHave( ControlTypeNum ) ) continue;
-					ShowWarningError( "Schedule=" + trim( TempControlledZone( TempControlledZoneNum ).ControlTypeSchedName ) );
-					ShowContinueError( "...should include control type 1 (" + trim( ValidControlTypes( SglHeatSetPoint ) ) + ") but does not." );
-					ShowContinueError( "..reference " + trim( cZControlTypes( iZC_TStat ) ) + "=" + trim( TempControlledZone( TempControlledZoneNum ).Name ) );
-					ShowContinueError( "..reference ZONE=" + trim( TempControlledZone( TempControlledZoneNum ).ZoneName ) );
+					ShowWarningError( "Schedule=" + TempControlledZone( TempControlledZoneNum ).ControlTypeSchedName );
+					ShowContinueError( "...should include control type 1 (" + ValidControlTypes( SglHeatSetPoint ) + ") but does not." );
+					ShowContinueError( "..reference " + cZControlTypes( iZC_TStat ) + '=' + TempControlledZone( TempControlledZoneNum ).Name );
+					ShowContinueError( "..reference ZONE=" + TempControlledZone( TempControlledZoneNum ).ZoneName );
 
 				} else if ( SELECT_CASE_var == SingleCoolingSetPoint ) {
 					if ( ! TStatControlTypes( TempControlledZoneNum ).MustHave( ControlTypeNum ) ) continue;
-					ShowWarningError( "Schedule=" + trim( TempControlledZone( TempControlledZoneNum ).ControlTypeSchedName ) );
-					ShowContinueError( "...should include control type 2 (" + trim( ValidControlTypes( SglCoolSetPoint ) ) + ") but does not." );
-					ShowContinueError( "..reference " + trim( cZControlTypes( iZC_TStat ) ) + "=" + trim( TempControlledZone( TempControlledZoneNum ).Name ) );
-					ShowContinueError( "..reference ZONE=" + trim( TempControlledZone( TempControlledZoneNum ).ZoneName ) );
+					ShowWarningError( "Schedule=" + TempControlledZone( TempControlledZoneNum ).ControlTypeSchedName );
+					ShowContinueError( "...should include control type 2 (" + ValidControlTypes( SglCoolSetPoint ) + ") but does not." );
+					ShowContinueError( "..reference " + cZControlTypes( iZC_TStat ) + '=' + TempControlledZone( TempControlledZoneNum ).Name );
+					ShowContinueError( "..reference ZONE=" + TempControlledZone( TempControlledZoneNum ).ZoneName );
 
 				} else if ( SELECT_CASE_var == SingleHeatCoolSetPoint ) {
 					if ( ! TStatControlTypes( TempControlledZoneNum ).MustHave( ControlTypeNum ) ) continue;
-					ShowWarningError( "Schedule=" + trim( TempControlledZone( TempControlledZoneNum ).ControlTypeSchedName ) );
-					ShowContinueError( "...should include control type 3 (" + trim( ValidControlTypes( SglHCSetPoint ) ) + ") but does not." );
-					ShowContinueError( "..reference " + trim( cZControlTypes( iZC_TStat ) ) + "=" + trim( TempControlledZone( TempControlledZoneNum ).Name ) );
-					ShowContinueError( "..reference ZONE=" + trim( TempControlledZone( TempControlledZoneNum ).ZoneName ) );
+					ShowWarningError( "Schedule=" + TempControlledZone( TempControlledZoneNum ).ControlTypeSchedName );
+					ShowContinueError( "...should include control type 3 (" + ValidControlTypes( SglHCSetPoint ) + ") but does not." );
+					ShowContinueError( "..reference " + cZControlTypes( iZC_TStat ) + '=' + TempControlledZone( TempControlledZoneNum ).Name );
+					ShowContinueError( "..reference ZONE=" + TempControlledZone( TempControlledZoneNum ).ZoneName );
 
 				} else if ( SELECT_CASE_var == DualSetPointWithDeadBand ) {
 					if ( ! TStatControlTypes( TempControlledZoneNum ).MustHave( ControlTypeNum ) ) continue;
-					ShowWarningError( "Schedule=" + trim( TempControlledZone( TempControlledZoneNum ).ControlTypeSchedName ) );
-					ShowContinueError( "...should include control type 4 (" + trim( ValidControlTypes( DualSetPoint ) ) + ") but does not." );
-					ShowContinueError( "..reference " + trim( cZControlTypes( iZC_TStat ) ) + "=" + trim( TempControlledZone( TempControlledZoneNum ).Name ) );
-					ShowContinueError( "..reference ZONE=" + trim( TempControlledZone( TempControlledZoneNum ).ZoneName ) );
+					ShowWarningError( "Schedule=" + TempControlledZone( TempControlledZoneNum ).ControlTypeSchedName );
+					ShowContinueError( "...should include control type 4 (" + ValidControlTypes( DualSetPoint ) + ") but does not." );
+					ShowContinueError( "..reference " + cZControlTypes( iZC_TStat ) + '=' + TempControlledZone( TempControlledZoneNum ).Name );
+					ShowContinueError( "..reference ZONE=" + TempControlledZone( TempControlledZoneNum ).ZoneName );
 
 				} else {
 				}}
@@ -827,7 +827,7 @@ namespace ZoneTempPredictorCorrector {
 			GetObjectItem( cCurrentModuleObject, HumidControlledZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), HumidityControlZone.ControlName(), HumidControlledZoneNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), HumidityControlZone.ControlName(), HumidControlledZoneNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -836,7 +836,7 @@ namespace ZoneTempPredictorCorrector {
 			// Ensure unique zone name
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 2 ), HumidityControlZone.ZoneName(), HumidControlledZoneNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Zone Name" );
+			VerifyName( cAlphaArgs( 2 ), HumidityControlZone.ZoneName(), HumidControlledZoneNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Zone Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 2 ) = "xxxxx";
@@ -845,20 +845,20 @@ namespace ZoneTempPredictorCorrector {
 			HumidityControlZone( HumidControlledZoneNum ).ZoneName = cAlphaArgs( 2 );
 			HumidityControlZone( HumidControlledZoneNum ).ActualZoneNum = FindItem( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
 			if ( HumidityControlZone( HumidControlledZoneNum ).ActualZoneNum == 0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" not found." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 				ErrorsFound = true;
 			}
 			HumidityControlZone( HumidControlledZoneNum ).HumidifyingSched = cAlphaArgs( 3 );
 			HumidityControlZone( HumidControlledZoneNum ).HumidifyingSchedIndex = GetScheduleIndex( cAlphaArgs( 3 ) );
 			if ( HumidityControlZone( HumidControlledZoneNum ).HumidifyingSchedIndex == 0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( cAlphaArgs( 3 ) ) + "\" not found." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\" not found." );
 				ErrorsFound = true;
 			}
 			if ( NumAlphas == 4 ) {
 				HumidityControlZone( HumidControlledZoneNum ).DehumidifyingSched = cAlphaArgs( 4 );
 				HumidityControlZone( HumidControlledZoneNum ).DehumidifyingSchedIndex = GetScheduleIndex( cAlphaArgs( 4 ) );
 				if ( HumidityControlZone( HumidControlledZoneNum ).DehumidifyingSchedIndex == 0 ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cAlphaFieldNames( 4 ) ) + "=\"" + trim( cAlphaArgs( 4 ) ) + "\" not found." );
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" not found." );
 					ErrorsFound = true;
 				}
 			} else {
@@ -881,7 +881,7 @@ namespace ZoneTempPredictorCorrector {
 			// will not do much verifying -- that will come later.
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ComfortTStatObjects.Name(), Item - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ComfortTStatObjects.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				errFlag = true;
 				ErrorsFound = true;
@@ -904,14 +904,14 @@ namespace ZoneTempPredictorCorrector {
 				ComfortTStatObjects( Item ).ZoneListActive = true;
 				ComfortTStatObjects( Item ).ZoneOrZoneListPtr = ZLItem;
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" not found." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 				errFlag = true;
 				ErrorsFound = true;
 			}
 		}
 
 		if ( errFlag ) {
-			ShowSevereError( "GetZoneAirSetpoints: Errors with invalid names in " + trim( cCurrentModuleObject ) + " objects." );
+			ShowSevereError( "GetZoneAirSetpoints: Errors with invalid names in " + cCurrentModuleObject + " objects." );
 			ShowContinueError( "...These will not be read in.  Other errors may occur." );
 			NumComfortControlledZones = 0;
 		}
@@ -935,13 +935,13 @@ namespace ZoneTempPredictorCorrector {
 						ComfortControlledZone( ComfortControlledZoneNum ).ZoneName = cAlphaArgs( 2 );
 						ComfortControlledZone( ComfortControlledZoneNum ).ActualZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
 						if ( ComfortControlledZone( ComfortControlledZoneNum ).ActualZoneNum == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" not found." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					} else {
 						ComfortControlledZone( ComfortControlledZoneNum ).ZoneName = cAlphaArgs( 2 ); // for continuity
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" zone previously assigned." );
-						ShowContinueError( "...Zone was previously assigned to Thermostat=\"" + trim( ComfortControlledZone( ZoneAssigned ).Name ) + "\"." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" zone previously assigned." );
+						ShowContinueError( "...Zone was previously assigned to Thermostat=\"" + ComfortControlledZone( ZoneAssigned ).Name + "\"." );
 						ErrorsFound = true;
 						continue;
 					}
@@ -949,7 +949,7 @@ namespace ZoneTempPredictorCorrector {
 					if ( ! ComfortTStatObjects( Item ).ZoneListActive ) {
 						ComfortControlledZone( ComfortControlledZoneNum ).Name = cAlphaArgs( 1 );
 					} else {
-						ComfortControlledZone( ComfortControlledZoneNum ).Name = trim( Zone( ZoneList( ComfortTStatObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name ) + " " + trim( ComfortTStatObjects( Item ).Name );
+						ComfortControlledZone( ComfortControlledZoneNum ).Name = Zone( ZoneList( ComfortTStatObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name + ' ' + ComfortTStatObjects( Item ).Name;
 					}
 
 					// Read Fields A3 and A4 for averaging method
@@ -961,7 +961,7 @@ namespace ZoneTempPredictorCorrector {
 					}
 					// Could not find a people object for this particular zone
 					if ( IZoneCount == 0 && ComfortControlledZone( ComfortControlledZoneNum ).ActualZoneNum > 0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " no PEOPLE in " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" - cannot use Comfort Control." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " no PEOPLE in " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" - cannot use Comfort Control." );
 						ErrorsFound = true;
 					}
 					ComfortControlledZone( ComfortControlledZoneNum ).AverageMethodNum = AverageMethodNum_NO;
@@ -977,14 +977,14 @@ namespace ZoneTempPredictorCorrector {
 							ComfortControlledZone( ComfortControlledZoneNum ).AverageMethodNum = AverageMethodNum_PEO;
 						}
 						if ( ComfortControlledZone( ComfortControlledZoneNum ).AverageMethodNum == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( cAlphaArgs( 3 ) ) + "\"." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
 							ShowContinueError( "Allowed keys are SpecificObject, ObjectAverage, or PeopleAverage" );
 							ErrorsFound = true;
 						}
 						if ( ComfortControlledZone( ComfortControlledZoneNum ).AverageMethodNum == AverageMethodNum_SPE ) {
 							ComfortControlledZone( ComfortControlledZoneNum ).AverageObjectName = cAlphaArgs( 4 );
 							if ( FindItem( cAlphaArgs( 4 ), People.Name(), TotPeople ) == 0 ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cAlphaFieldNames( 4 ) ) + "=\"" + trim( cAlphaArgs( 4 ) ) + "\"." );
+								ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
 								ErrorsFound = true;
 							} else {
 								ComfortControlledZone( ComfortControlledZoneNum ).SpecificObjectNum = FindItem( cAlphaArgs( 4 ), People.Name(), TotPeople );
@@ -1004,11 +1004,11 @@ namespace ZoneTempPredictorCorrector {
 								ValidScheduleControlType = CheckScheduleValueMinMax( People( i ).ActivityLevelPtr, ">=", 72.0, "<=", 909.0 );
 								if ( ! ValidScheduleControlType ) {
 									ShowSevereError( "GetPeople Activity Level: Invalid activity level values entered " "for thermal comfort calculation" );
-									ShowContinueError( "Outside of range values [72,909], Reference object=" + trim( People( i ).Name ) );
+									ShowContinueError( "Outside of range values [72,909], Reference object=" + People( i ).Name );
 									ErrorsFound = true;
 								}
 							} else {
-								ShowSevereError( "GetPeople Activity Level: Activity level schedule is not found=" + trim( People( i ).Name ) );
+								ShowSevereError( "GetPeople Activity Level: Activity level schedule is not found=" + People( i ).Name );
 								ShowContinueError( "Required when the zone has Thermal Comfort Controls." );
 								ErrorsFound = true;
 							}
@@ -1017,11 +1017,11 @@ namespace ZoneTempPredictorCorrector {
 								ValidScheduleControlType = CheckScheduleValueMinMax( People( i ).WorkEffPtr, ">=", 0.0, "<=", 1.0 );
 								if ( ! ValidScheduleControlType ) {
 									ShowSevereError( "GetPeople work efficiency: Invalid work efficiency values entered " "for thermal comfort calculation" );
-									ShowContinueError( "Outside of range values [0,1], Reference object=" + trim( People( i ).Name ) );
+									ShowContinueError( "Outside of range values [0,1], Reference object=" + People( i ).Name );
 									ErrorsFound = true;
 								}
 							} else {
-								ShowSevereError( "GetPeople work efficiency: Work efficiency schedule is not found=" + trim( People( i ).Name ) );
+								ShowSevereError( "GetPeople work efficiency: Work efficiency schedule is not found=" + People( i ).Name );
 								ShowContinueError( "Required when the zone has Thermal Comfort Controls." );
 								ErrorsFound = true;
 							}
@@ -1030,17 +1030,17 @@ namespace ZoneTempPredictorCorrector {
 								ValidScheduleControlType = CheckScheduleValueMinMax( People( i ).ClothingPtr, ">", 0.0, "<=", 2.0 );
 								if ( ! ValidScheduleControlType ) {
 									ShowSevereError( "GetPeople Clothing Insulation: Invalid Clothing Insulation values entered " "for thermal comfort calculation" );
-									ShowContinueError( "Outside of range values [0.0,2.0], Reference object=" + trim( People( i ).Name ) );
+									ShowContinueError( "Outside of range values [0.0,2.0], Reference object=" + People( i ).Name );
 									ErrorsFound = true;
 								}
 							} else {
-								ShowSevereError( "GetPeople Clothing Insulation: Clothing Insulation schedule is not found=" + trim( People( i ).Name ) );
+								ShowSevereError( "GetPeople Clothing Insulation: Clothing Insulation schedule is not found=" + People( i ).Name );
 								ShowContinueError( "Required when the zone has Thermal Comfort Controls." );
 								ErrorsFound = true;
 							}
 							// Check Air velocity
 							if ( People( i ).AirVelocityPtr <= 0 ) {
-								ShowSevereError( "GetPeople Air Velocity: Air velocity schedule is not found=" + trim( People( i ).Name ) );
+								ShowSevereError( "GetPeople Air Velocity: Air velocity schedule is not found=" + People( i ).Name );
 								ShowContinueError( "Required when the zone has Thermal Comfort Controls." );
 								ErrorsFound = true;
 							}
@@ -1051,7 +1051,7 @@ namespace ZoneTempPredictorCorrector {
 					if ( NumNums > 0 ) {
 						ComfortControlledZone( ComfortControlledZoneNum ).TdbMinSetPoint = rNumericArgs( 1 );
 						if ( rNumericArgs( 1 ) > 50 || rNumericArgs( 1 ) < 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cNumericFieldNames( 1 ) ) + "=[" + trim( TrimSigDigits( rNumericArgs( 1 ), 0 ) ) + "]." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 1 ) + "=[" + TrimSigDigits( rNumericArgs( 1 ), 0 ) + "]." );
 							ShowContinueError( "..Allowable values must be between 0 C and 50 C" );
 							ErrorsFound = true;
 						}
@@ -1059,35 +1059,35 @@ namespace ZoneTempPredictorCorrector {
 					if ( NumNums > 1 ) {
 						ComfortControlledZone( ComfortControlledZoneNum ).TdbMaxSetPoint = rNumericArgs( 2 );
 						if ( rNumericArgs( 2 ) > 50 || rNumericArgs( 2 ) < 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cNumericFieldNames( 2 ) ) + "=[" + trim( TrimSigDigits( rNumericArgs( 2 ), 0 ) ) + "]." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 2 ) + "=[" + TrimSigDigits( rNumericArgs( 2 ), 0 ) + "]." );
 							ShowContinueError( "..Allowable values must be between 0 C and 50 C" );
 							ErrorsFound = true;
 						}
 					}
 					// Ensure MaxTemp >= MinTemp
 					if ( ComfortControlledZone( ComfortControlledZoneNum ).TdbMinSetPoint > ComfortControlledZone( ComfortControlledZoneNum ).TdbMaxSetPoint ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) );
-						ShowContinueError( ".." + trim( cNumericFieldNames( 1 ) ) + " > " + trim( cNumericFieldNames( 2 ) ) );
-						ShowContinueError( "..[" + trim( TrimSigDigits( rNumericArgs( 1 ), 0 ) ) + "] > [" + trim( TrimSigDigits( rNumericArgs( 2 ), 0 ) ) + "]." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) );
+						ShowContinueError( ".." + cNumericFieldNames( 1 ) + " > " + cNumericFieldNames( 2 ) );
+						ShowContinueError( "..[" + TrimSigDigits( rNumericArgs( 1 ), 0 ) + "] > [" + TrimSigDigits( rNumericArgs( 2 ), 0 ) + "]." );
 						ErrorsFound = true;
 					}
 					// If MaxTemp = MinTemp, no thermal comfort control
 					if ( ComfortControlledZone( ComfortControlledZoneNum ).TdbMinSetPoint == ComfortControlledZone( ComfortControlledZoneNum ).TdbMaxSetPoint ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) );
-						ShowContinueError( ".." + trim( cNumericFieldNames( 1 ) ) + " = " + trim( cNumericFieldNames( 2 ) ) );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) );
+						ShowContinueError( ".." + cNumericFieldNames( 1 ) + " = " + cNumericFieldNames( 2 ) );
 						ShowContinueError( "The zone will be controlled using this dry-bulb temperature setpoint." );
 					}
 					// read Thermal comfort type schedule name
 					ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName = cAlphaArgs( 5 );
 					ComfortControlledZone( ComfortControlledZoneNum ).ComfortSchedIndex = GetScheduleIndex( cAlphaArgs( 5 ) );
 					if ( ComfortControlledZone( ComfortControlledZoneNum ).ComfortSchedIndex == 0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cAlphaFieldNames( 5 ) ) + "=\"" + trim( cAlphaArgs( 5 ) ) + "\" not found." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
 					} else {
 						// Check validity of control types.
 						ValidScheduleControlType = CheckScheduleValueMinMax( ComfortControlledZone( ComfortControlledZoneNum ).ComfortSchedIndex, ">=", 0.0, "<=", 4.0 );
 						if ( ! ValidScheduleControlType ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid range " + trim( cAlphaFieldNames( 5 ) ) + "=\"" + trim( cAlphaArgs( 5 ) ) + "\"" );
+							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid range " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"" );
 							ShowContinueError( "..contains values outside of range [0,4]." );
 							ErrorsFound = true;
 						}
@@ -1100,19 +1100,19 @@ namespace ZoneTempPredictorCorrector {
 					for ( ControlTypeNum = 1; ControlTypeNum <= ComfortControlledZone( ComfortControlledZoneNum ).NumControlTypes; ++ControlTypeNum ) {
 						ComfortControlledZone( ComfortControlledZoneNum ).ControlType( ControlTypeNum ) = cAlphaArgs( nint( 2.0 * ControlTypeNum - 1 + 5 ) );
 						ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ControlTypeNum ) = cAlphaArgs( nint( 2.0 * ControlTypeNum + 5 ) );
-						if ( ComfortControlledZone( ComfortControlledZoneNum ).ControlType( ControlTypeNum ) != " " ) {
+						if ( ComfortControlledZone( ComfortControlledZoneNum ).ControlType( ControlTypeNum ) != "" ) {
 							CTIndex = FindItem( ComfortControlledZone( ComfortControlledZoneNum ).ControlType( ControlTypeNum ), ValidComfortControlTypes, 12 );
 							if ( CTIndex == 0 ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( nint( 2.0 * ControlTypeNum - 1 + 5 ) ) ) + "=\"" + trim( cAlphaArgs( nint( 2.0 * ControlTypeNum - 1 + 5 ) ) ) + "\"" );
+								ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( nint( 2.0 * ControlTypeNum - 1 + 5 ) ) + "=\"" + cAlphaArgs( nint( 2.0 * ControlTypeNum - 1 + 5 ) ) + "\"" );
 								ErrorsFound = true;
 							}
 							if ( CTIndex > 4 ) { // For Fanger control only for the time being
-								ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( nint( 2.0 * ControlTypeNum - 1 + 5 ) ) ) + "=\"" + trim( cAlphaArgs( nint( 2.0 * ControlTypeNum - 1 + 5 ) ) ) + "\"" );
+								ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( nint( 2.0 * ControlTypeNum - 1 + 5 ) ) + "=\"" + cAlphaArgs( nint( 2.0 * ControlTypeNum - 1 + 5 ) ) + "\"" );
 								ShowContinueError( "..Fanger is the only valid model." );
 								ErrorsFound = true;
 							}
 						} else {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( nint( 2.0 * ControlTypeNum - 1 + 5 ) ) ) + "=\"<blank>\"" );
+							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( nint( 2.0 * ControlTypeNum - 1 + 5 ) ) + "=\"<blank>\"" );
 							ErrorsFound = true;
 						}
 						ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx( ControlTypeNum ) = 0;
@@ -1131,7 +1131,7 @@ namespace ZoneTempPredictorCorrector {
 			GetObjectItem( cCurrentModuleObject, SingleFangerHeatingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SetPointSingleHeatingFanger.Name(), SingleFangerHeatingControlNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SetPointSingleHeatingFanger.Name(), SingleFangerHeatingControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1140,12 +1140,12 @@ namespace ZoneTempPredictorCorrector {
 			SetPointSingleHeatingFanger( SingleFangerHeatingControlNum ).PMVSchedName = cAlphaArgs( 2 );
 			SetPointSingleHeatingFanger( SingleFangerHeatingControlNum ).PMVSchedIndex = GetScheduleIndex( cAlphaArgs( 2 ) );
 			if ( SetPointSingleHeatingFanger( SingleFangerHeatingControlNum ).PMVSchedIndex == 0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" not found." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 				ErrorsFound = true;
 			} else {
 				ValidScheduleControlType = CheckScheduleValueMinMax( SetPointSingleHeatingFanger( SingleFangerHeatingControlNum ).PMVSchedIndex, ">=", -3.0, "<=", 3.0 );
 				if ( ! ValidScheduleControlType ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid PMV values " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" entered." );
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid PMV values " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" entered." );
 					ShowContinueError( "..Values outside of range [-3,+3]." );
 					ErrorsFound = true;
 				}
@@ -1161,7 +1161,7 @@ namespace ZoneTempPredictorCorrector {
 			GetObjectItem( cCurrentModuleObject, SingleFangerCoolingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SetPointSingleCoolingFanger.Name(), SingleFangerCoolingControlNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SetPointSingleCoolingFanger.Name(), SingleFangerCoolingControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1170,12 +1170,12 @@ namespace ZoneTempPredictorCorrector {
 			SetPointSingleCoolingFanger( SingleFangerCoolingControlNum ).PMVSchedName = cAlphaArgs( 2 );
 			SetPointSingleCoolingFanger( SingleFangerCoolingControlNum ).PMVSchedIndex = GetScheduleIndex( cAlphaArgs( 2 ) );
 			if ( SetPointSingleCoolingFanger( SingleFangerCoolingControlNum ).PMVSchedIndex == 0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" not found." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 				ErrorsFound = true;
 			} else {
 				ValidScheduleControlType = CheckScheduleValueMinMax( SetPointSingleCoolingFanger( SingleFangerCoolingControlNum ).PMVSchedIndex, ">=", -3.0, "<=", 3.0 );
 				if ( ! ValidScheduleControlType ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid PMV values " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" entered." );
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid PMV values " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" entered." );
 					ShowContinueError( "..Values outside of range [-3,+3]." );
 					ErrorsFound = true;
 				}
@@ -1192,7 +1192,7 @@ namespace ZoneTempPredictorCorrector {
 			GetObjectItem( cCurrentModuleObject, SingleFangerHeatCoolControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SetPointSingleCoolingFanger.Name(), SingleFangerCoolingControlNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SetPointSingleCoolingFanger.Name(), SingleFangerCoolingControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1202,12 +1202,12 @@ namespace ZoneTempPredictorCorrector {
 			SetPointSingleHeatCoolFanger( SingleFangerHeatCoolControlNum ).PMVSchedName = cAlphaArgs( 2 );
 			SetPointSingleHeatCoolFanger( SingleFangerHeatCoolControlNum ).PMVSchedIndex = GetScheduleIndex( cAlphaArgs( 2 ) );
 			if ( SetPointSingleHeatCoolFanger( SingleFangerHeatCoolControlNum ).PMVSchedIndex == 0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" not found." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 				ErrorsFound = true;
 			} else {
 				ValidScheduleControlType = CheckScheduleValueMinMax( SetPointSingleHeatCoolFanger( SingleFangerHeatCoolControlNum ).PMVSchedIndex, ">=", -3.0, "<=", 3.0 );
 				if ( ! ValidScheduleControlType ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid PMV values " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" entered." );
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid PMV values " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" entered." );
 					ShowContinueError( "..Values outside of range [-3,+3]." );
 					ErrorsFound = true;
 				}
@@ -1224,7 +1224,7 @@ namespace ZoneTempPredictorCorrector {
 			GetObjectItem( cCurrentModuleObject, DualFangerHeatCoolControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SetPointDualHeatCoolFanger.Name(), DualFangerHeatCoolControlNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SetPointDualHeatCoolFanger.Name(), DualFangerHeatCoolControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1233,24 +1233,24 @@ namespace ZoneTempPredictorCorrector {
 			SetPointDualHeatCoolFanger( DualFangerHeatCoolControlNum ).HeatPMVSetptSchedName = cAlphaArgs( 2 );
 			SetPointDualHeatCoolFanger( DualFangerHeatCoolControlNum ).HeatPMVSchedIndex = GetScheduleIndex( cAlphaArgs( 2 ) );
 			if ( SetPointDualHeatCoolFanger( DualFangerHeatCoolControlNum ).HeatPMVSchedIndex == 0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" not found." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 				ErrorsFound = true;
 			}
 			SetPointDualHeatCoolFanger( DualFangerHeatCoolControlNum ).CoolPMVSetptSchedName = cAlphaArgs( 3 );
 			SetPointDualHeatCoolFanger( DualFangerHeatCoolControlNum ).CoolPMVSchedIndex = GetScheduleIndex( cAlphaArgs( 3 ) );
 			if ( SetPointDualHeatCoolFanger( DualFangerHeatCoolControlNum ).CoolPMVSchedIndex == 0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( cAlphaArgs( 3 ) ) + "\" not found." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\" not found." );
 				ErrorsFound = true;
 			} else {
 				ValidScheduleControlType = CheckScheduleValueMinMax( SetPointDualHeatCoolFanger( DualFangerHeatCoolControlNum ).HeatPMVSchedIndex, ">=", -3.0, "<=", 3.0 );
 				if ( ! ValidScheduleControlType ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid PMV values " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" entered." );
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid PMV values " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" entered." );
 					ShowContinueError( "..Values outside of range [-3,+3]." );
 					ErrorsFound = true;
 				}
 				ValidScheduleControlType = CheckScheduleValueMinMax( SetPointDualHeatCoolFanger( DualFangerHeatCoolControlNum ).CoolPMVSchedIndex, ">=", -3.0, "<=", 3.0 );
 				if ( ! ValidScheduleControlType ) {
-					ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid PMV values " + trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( cAlphaArgs( 3 ) ) + "\" entered." );
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid PMV values " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\" entered." );
 					ShowContinueError( "..Values outside of range [-3,+3]." );
 					ErrorsFound = true;
 				}
@@ -1260,28 +1260,28 @@ namespace ZoneTempPredictorCorrector {
 
 		// Finish filling in Schedule pointing indexes for Thermal Comfort Control
 		for ( ComfortControlledZoneNum = 1; ComfortControlledZoneNum <= NumComfortControlledZones; ++ComfortControlledZoneNum ) {
-			ComfortIndex = FindItem( trim( ValidComfortControlTypes( SglHeatSetPointFanger ) ), ComfortControlledZone( ComfortControlledZoneNum ).ControlType, ComfortControlledZone( ComfortControlledZoneNum ).NumControlTypes );
+			ComfortIndex = FindItem( ValidComfortControlTypes( SglHeatSetPointFanger ), ComfortControlledZone( ComfortControlledZoneNum ).ControlType, ComfortControlledZone( ComfortControlledZoneNum ).NumControlTypes );
 			ComfortControlledZone( ComfortControlledZoneNum ).SchIndx_SglHeatSetPointFanger = ComfortIndex;
 			if ( ComfortIndex > 0 ) {
 				ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx( ComfortIndex ) = FindItem( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ), SetPointSingleHeatingFanger.Name(), NumSingleFangerHeatingControls );
 				TComfortControlTypes( ComfortControlledZoneNum ).MustHave( SglHeatSetPointFanger ) = true;
 			}
 
-			ComfortIndex = FindItem( trim( ValidComfortControlTypes( SglCoolSetPointFanger ) ), ComfortControlledZone( ComfortControlledZoneNum ).ControlType, ComfortControlledZone( ComfortControlledZoneNum ).NumControlTypes );
+			ComfortIndex = FindItem( ValidComfortControlTypes( SglCoolSetPointFanger ), ComfortControlledZone( ComfortControlledZoneNum ).ControlType, ComfortControlledZone( ComfortControlledZoneNum ).NumControlTypes );
 			ComfortControlledZone( ComfortControlledZoneNum ).SchIndx_SglCoolSetPointFanger = ComfortIndex;
 			if ( ComfortIndex > 0 ) {
 				ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx( ComfortIndex ) = FindItem( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ), SetPointSingleCoolingFanger.Name(), NumSingleFangerCoolingControls );
 				TComfortControlTypes( ComfortControlledZoneNum ).MustHave( SglCoolSetPointFanger ) = true;
 			}
 
-			ComfortIndex = FindItem( trim( ValidComfortControlTypes( SglHCSetPointFanger ) ), ComfortControlledZone( ComfortControlledZoneNum ).ControlType, ComfortControlledZone( ComfortControlledZoneNum ).NumControlTypes );
+			ComfortIndex = FindItem( ValidComfortControlTypes( SglHCSetPointFanger ), ComfortControlledZone( ComfortControlledZoneNum ).ControlType, ComfortControlledZone( ComfortControlledZoneNum ).NumControlTypes );
 			ComfortControlledZone( ComfortControlledZoneNum ).SchIndx_SglHCSetPointFanger = ComfortIndex;
 			if ( ComfortIndex > 0 ) {
 				ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx( ComfortIndex ) = FindItem( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ), SetPointSingleHeatCoolFanger.Name(), NumSingleFangerHeatCoolControls );
 				TComfortControlTypes( ComfortControlledZoneNum ).MustHave( SglHCSetPointFanger ) = true;
 			}
 
-			ComfortIndex = FindItem( trim( ValidComfortControlTypes( DualSetPointFanger ) ), ComfortControlledZone( ComfortControlledZoneNum ).ControlType, ComfortControlledZone( ComfortControlledZoneNum ).NumControlTypes );
+			ComfortIndex = FindItem( ValidComfortControlTypes( DualSetPointFanger ), ComfortControlledZone( ComfortControlledZoneNum ).ControlType, ComfortControlledZone( ComfortControlledZoneNum ).NumControlTypes );
 			ComfortControlledZone( ComfortControlledZoneNum ).SchIndx_DualSetPointFanger = ComfortIndex;
 			if ( ComfortIndex > 0 ) {
 				ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx( ComfortIndex ) = FindItem( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ), SetPointDualHeatCoolFanger.Name(), NumDualFangerHeatCoolControls );
@@ -1301,7 +1301,7 @@ namespace ZoneTempPredictorCorrector {
 
 			if ( SchedMin == 0 && SchedMax == 0 ) {
 				if ( FindNumberInList( CTIndex, CCmSchedMapToControlledZone, NumComfortControlledZones ) == 0 ) {
-					ShowWarningError( "Control Type Schedule=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName ) );
+					ShowWarningError( "Control Type Schedule=" + ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName );
 					ShowContinueError( "..specifies control type 0 for all entries." );
 					ShowContinueError( "All zones using this Control Type Schedule have no thermal comfort control." );
 				}
@@ -1321,15 +1321,15 @@ namespace ZoneTempPredictorCorrector {
 					if ( ComfortIndex != 0 ) {
 						SchedTypeIndex = ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx( ComfortIndex );
 						if ( SchedTypeIndex == 0 ) {
-							ShowSevereError( "GetZoneAirSetpoints: Could not find " + trim( ValidComfortControlTypes( SglHeatSetPointFanger ) ) + " Schedule=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ) ) );
+							ShowSevereError( "GetZoneAirSetpoints: Could not find " + ValidComfortControlTypes( SglHeatSetPointFanger ) + " Schedule=" + ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ) );
 							ErrorsFound = true;
 						}
 					} else { // ComfortIndex = 0
 						if ( CheckScheduleValue( CTIndex, SglHeatSetPointFanger ) ) {
-							ShowSevereError( "Control Type Schedule=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName ) );
-							ShowContinueError( "..specifies thermal control type 1 (" + trim( ValidComfortControlTypes( SglHeatSetPointFanger ) ) + ") as the control type. Not valid for this zone." );
-							ShowContinueError( "..reference " + trim( cZControlTypes( iZC_TCTStat ) ) + "=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).Name ) );
-							ShowContinueError( "..reference ZONE=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).ZoneName ) );
+							ShowSevereError( "Control Type Schedule=" + ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName );
+							ShowContinueError( "..specifies thermal control type 1 (" + ValidComfortControlTypes( SglHeatSetPointFanger ) + ") as the control type. Not valid for this zone." );
+							ShowContinueError( "..reference " + cZControlTypes( iZC_TCTStat ) + '=' + ComfortControlledZone( ComfortControlledZoneNum ).Name );
+							ShowContinueError( "..reference ZONE=" + ComfortControlledZone( ComfortControlledZoneNum ).ZoneName );
 							ErrorsFound = true;
 						}
 					}
@@ -1341,15 +1341,15 @@ namespace ZoneTempPredictorCorrector {
 					if ( ComfortIndex != 0 ) {
 						SchedTypeIndex = ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx( ComfortIndex );
 						if ( SchedTypeIndex == 0 ) {
-							ShowSevereError( "GetZoneAirSetpoints: Could not find " + trim( ValidComfortControlTypes( SglCoolSetPointFanger ) ) + " Schedule=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ) ) );
+							ShowSevereError( "GetZoneAirSetpoints: Could not find " + ValidComfortControlTypes( SglCoolSetPointFanger ) + " Schedule=" + ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ) );
 							ErrorsFound = true;
 						}
 					} else { // ComfortIndex = 0
 						if ( CheckScheduleValue( CTIndex, SglCoolSetPointFanger ) ) {
-							ShowSevereError( "Control Type Schedule=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName ) );
-							ShowContinueError( "..specifies thermal control type 2 (" + trim( ValidComfortControlTypes( SglCoolSetPointFanger ) ) + ") as the control type. Not valid for this zone." );
-							ShowContinueError( "..reference " + trim( cZControlTypes( iZC_TCTStat ) ) + "=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).Name ) );
-							ShowContinueError( "..reference ZONE=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).ZoneName ) );
+							ShowSevereError( "Control Type Schedule=" + ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName );
+							ShowContinueError( "..specifies thermal control type 2 (" + ValidComfortControlTypes( SglCoolSetPointFanger ) + ") as the control type. Not valid for this zone." );
+							ShowContinueError( "..reference " + cZControlTypes( iZC_TCTStat ) + '=' + ComfortControlledZone( ComfortControlledZoneNum ).Name );
+							ShowContinueError( "..reference ZONE=" + ComfortControlledZone( ComfortControlledZoneNum ).ZoneName );
 							ErrorsFound = true;
 						}
 					}
@@ -1361,15 +1361,15 @@ namespace ZoneTempPredictorCorrector {
 					if ( ComfortIndex != 0 ) {
 						SchedTypeIndex = ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx( ComfortIndex );
 						if ( SchedTypeIndex == 0 ) {
-							ShowSevereError( "GetZoneAirSetpoints: Could not find " + trim( ValidComfortControlTypes( SglHCSetPointFanger ) ) + " Schedule=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ) ) );
+							ShowSevereError( "GetZoneAirSetpoints: Could not find " + ValidComfortControlTypes( SglHCSetPointFanger ) + " Schedule=" + ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ) );
 							ErrorsFound = true;
 						}
 					} else { // ComfortIndex = 0
 						if ( CheckScheduleValue( CTIndex, SglHCSetPointFanger ) ) {
-							ShowSevereError( "Schedule=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName ) );
-							ShowContinueError( "..specifies thermal control type 3 (" + trim( ValidComfortControlTypes( SglHCSetPointFanger ) ) + ") as the control type. Not valid for this zone." );
-							ShowContinueError( "..reference " + trim( cZControlTypes( iZC_TCTStat ) ) + "=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).Name ) );
-							ShowContinueError( "..reference ZONE=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).ZoneName ) );
+							ShowSevereError( "Schedule=" + ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName );
+							ShowContinueError( "..specifies thermal control type 3 (" + ValidComfortControlTypes( SglHCSetPointFanger ) + ") as the control type. Not valid for this zone." );
+							ShowContinueError( "..reference " + cZControlTypes( iZC_TCTStat ) + '=' + ComfortControlledZone( ComfortControlledZoneNum ).Name );
+							ShowContinueError( "..reference ZONE=" + ComfortControlledZone( ComfortControlledZoneNum ).ZoneName );
 							ErrorsFound = true;
 						}
 					}
@@ -1381,15 +1381,15 @@ namespace ZoneTempPredictorCorrector {
 					if ( ComfortIndex != 0 ) {
 						SchedTypeIndex = ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx( ComfortIndex );
 						if ( SchedTypeIndex == 0 ) {
-							ShowSevereError( "GetZoneAirSetpoints: Could not find " + trim( ValidComfortControlTypes( DualSetPointFanger ) ) + " Schedule=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ) ) );
+							ShowSevereError( "GetZoneAirSetpoints: Could not find " + ValidComfortControlTypes( DualSetPointFanger ) + " Schedule=" + ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ) );
 							ErrorsFound = true;
 						}
 					} else { // ComfortIndex = 0
 						if ( CheckScheduleValue( CTIndex, DualSetPointFanger ) ) {
-							ShowSevereError( "Schedule=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName ) );
-							ShowContinueError( "..specifies thermal control type 4 (" + trim( ValidComfortControlTypes( DualSetPointFanger ) ) + ") as the control type. Not valid for this zone." );
-							ShowContinueError( "..reference " + trim( cZControlTypes( iZC_TCTStat ) ) + "=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).Name ) );
-							ShowContinueError( "..reference ZONE=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).ZoneName ) );
+							ShowSevereError( "Schedule=" + ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName );
+							ShowContinueError( "..specifies thermal control type 4 (" + ValidComfortControlTypes( DualSetPointFanger ) + ") as the control type. Not valid for this zone." );
+							ShowContinueError( "..reference " + cZControlTypes( iZC_TCTStat ) + '=' + ComfortControlledZone( ComfortControlledZoneNum ).Name );
+							ShowContinueError( "..reference ZONE=" + ComfortControlledZone( ComfortControlledZoneNum ).ZoneName );
 							ErrorsFound = true;
 						}
 					}
@@ -1397,7 +1397,7 @@ namespace ZoneTempPredictorCorrector {
 					// CASE KSU
 
 				} else {
-					ShowSevereError( "GetZoneAirSetpoints: Illegal control type for Zone=" + trim( Zone( ActualZoneNum ).Name ) + ", Found value=" + trim( TrimSigDigits( ControlTypeNum ) ) + ", in Schedule=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName ) );
+					ShowSevereError( "GetZoneAirSetpoints: Illegal control type for Zone=" + Zone( ActualZoneNum ).Name + ", Found value=" + TrimSigDigits( ControlTypeNum ) + ", in Schedule=" + ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName );
 					ShowContinueError( "..valid range values are [0,4]." );
 					ErrorsFound = true;
 
@@ -1419,31 +1419,31 @@ namespace ZoneTempPredictorCorrector {
 
 				if ( SELECT_CASE_var == SglHeatSetPointFanger ) {
 					if ( ! TComfortControlTypes( ComfortControlledZoneNum ).MustHave( ControlTypeNum ) ) continue;
-					ShowWarningError( "Schedule=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName ) );
-					ShowContinueError( "...should include control type 1 (" + trim( ValidComfortControlTypes( SglHeatSetPointFanger ) ) + ") but does not." );
-					ShowContinueError( "..reference " + trim( cZControlTypes( iZC_TCTStat ) ) + "=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).Name ) );
-					ShowContinueError( "..reference ZONE=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).ZoneName ) );
+					ShowWarningError( "Schedule=" + ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName );
+					ShowContinueError( "...should include control type 1 (" + ValidComfortControlTypes( SglHeatSetPointFanger ) + ") but does not." );
+					ShowContinueError( "..reference " + cZControlTypes( iZC_TCTStat ) + '=' + ComfortControlledZone( ComfortControlledZoneNum ).Name );
+					ShowContinueError( "..reference ZONE=" + ComfortControlledZone( ComfortControlledZoneNum ).ZoneName );
 
 				} else if ( SELECT_CASE_var == SglCoolSetPointFanger ) {
 					if ( ! TComfortControlTypes( ComfortControlledZoneNum ).MustHave( ControlTypeNum ) ) continue;
-					ShowWarningError( "Schedule=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName ) );
-					ShowContinueError( "...should include control type 2 (" + trim( ValidComfortControlTypes( SglCoolSetPointFanger ) ) + ") but does not." );
-					ShowContinueError( "..reference " + trim( cZControlTypes( iZC_TCTStat ) ) + "=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).Name ) );
-					ShowContinueError( "..reference ZONE=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).ZoneName ) );
+					ShowWarningError( "Schedule=" + ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName );
+					ShowContinueError( "...should include control type 2 (" + ValidComfortControlTypes( SglCoolSetPointFanger ) + ") but does not." );
+					ShowContinueError( "..reference " + cZControlTypes( iZC_TCTStat ) + '=' + ComfortControlledZone( ComfortControlledZoneNum ).Name );
+					ShowContinueError( "..reference ZONE=" + ComfortControlledZone( ComfortControlledZoneNum ).ZoneName );
 
 				} else if ( SELECT_CASE_var == SglHCSetPointFanger ) {
 					if ( ! TComfortControlTypes( ComfortControlledZoneNum ).MustHave( ControlTypeNum ) ) continue;
-					ShowWarningError( "Schedule=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName ) );
-					ShowContinueError( "...should include control type 3 (" + trim( ValidComfortControlTypes( SglHCSetPointFanger ) ) + ") but does not." );
-					ShowContinueError( "..reference " + trim( cZControlTypes( iZC_TCTStat ) ) + "=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).Name ) );
-					ShowContinueError( "..reference ZONE=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).ZoneName ) );
+					ShowWarningError( "Schedule=" + ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName );
+					ShowContinueError( "...should include control type 3 (" + ValidComfortControlTypes( SglHCSetPointFanger ) + ") but does not." );
+					ShowContinueError( "..reference " + cZControlTypes( iZC_TCTStat ) + '=' + ComfortControlledZone( ComfortControlledZoneNum ).Name );
+					ShowContinueError( "..reference ZONE=" + ComfortControlledZone( ComfortControlledZoneNum ).ZoneName );
 
 				} else if ( SELECT_CASE_var == DualSetPointFanger ) {
 					if ( ! TComfortControlTypes( ComfortControlledZoneNum ).MustHave( ControlTypeNum ) ) continue;
-					ShowWarningError( "Schedule=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName ) );
-					ShowContinueError( "...should include control type 4 (" + trim( ValidComfortControlTypes( DualSetPointFanger ) ) + ") but does not." );
-					ShowContinueError( "..reference " + trim( cZControlTypes( iZC_TCTStat ) ) + "=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).Name ) );
-					ShowContinueError( "..reference ZONE=" + trim( ComfortControlledZone( ComfortControlledZoneNum ).ZoneName ) );
+					ShowWarningError( "Schedule=" + ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName );
+					ShowContinueError( "...should include control type 4 (" + ValidComfortControlTypes( DualSetPointFanger ) + ") but does not." );
+					ShowContinueError( "..reference " + cZControlTypes( iZC_TCTStat ) + '=' + ComfortControlledZone( ComfortControlledZoneNum ).Name );
+					ShowContinueError( "..reference ZONE=" + ComfortControlledZone( ComfortControlledZoneNum ).ZoneName );
 
 					// CASE PIERCE
 					// CASE KSU
@@ -1488,7 +1488,7 @@ namespace ZoneTempPredictorCorrector {
 					// It might be in the TempControlledZones
 					found = FindItem( cAlphaArgs( 1 ), TempControlledZone.Name(), NumTempControlledZones );
 					if ( found == 0 ) { // throw error
-						ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cZControlTypes( iZC_TStat ) ) + " reference not found." );
+						ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cZControlTypes( iZC_TStat ) + " reference not found." );
 						ErrorsFound = true;
 					} else {
 						TempControlledZoneNum = found;
@@ -1497,24 +1497,24 @@ namespace ZoneTempPredictorCorrector {
 							TempControlledZone( TempControlledZoneNum ).OpTempCntrlModeScheduled = true;
 						}
 						if ( ( ! ( SameString( cAlphaArgs( 2 ), "Scheduled" ) ) ) && ( ! ( SameString( cAlphaArgs( 2 ), "Constant" ) ) ) ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\"." );
+							ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 							ErrorsFound = true;
 						}
 
 						TempControlledZone( TempControlledZoneNum ).FixedRadiativeFraction = rNumericArgs( 1 );
 						TempControlledZone( TempControlledZoneNum ).OpTempRadiativeFractionSched = GetScheduleIndex( cAlphaArgs( 3 ) );
 						if ( ( TempControlledZone( TempControlledZoneNum ).OpTempRadiativeFractionSched == 0 ) && ( TempControlledZone( TempControlledZoneNum ).OpTempCntrlModeScheduled ) ) { //throw error
-							ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( cAlphaArgs( 3 ) ) + "\" not found." );
+							ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 
 						//check validity of fixed radiative fraction
 						if ( ( TempControlledZone( TempControlledZoneNum ).FixedRadiativeFraction < 0.0 ) && ( ! ( TempControlledZone( TempControlledZoneNum ).OpTempCntrlModeScheduled ) ) ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cNumericFieldNames( 1 ) ) + "=[" + trim( TrimSigDigits( rNumericArgs( 1 ), 2 ) ) + "\" cannot be negative." );
+							ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 1 ) + "=[" + TrimSigDigits( rNumericArgs( 1 ), 2 ) + "\" cannot be negative." );
 							ErrorsFound = true;
 						}
 						if ( ( TempControlledZone( TempControlledZoneNum ).FixedRadiativeFraction >= 0.9 ) && ( ! ( TempControlledZone( TempControlledZoneNum ).OpTempCntrlModeScheduled ) ) ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cNumericFieldNames( 1 ) ) + "=[" + trim( TrimSigDigits( rNumericArgs( 1 ), 2 ) ) + "\" cannot >= .9." );
+							ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 1 ) + "=[" + TrimSigDigits( rNumericArgs( 1 ), 2 ) + "\" cannot >= .9." );
 							ErrorsFound = true;
 						}
 
@@ -1522,7 +1522,7 @@ namespace ZoneTempPredictorCorrector {
 						if ( TempControlledZone( TempControlledZoneNum ).OpTempCntrlModeScheduled ) {
 							ValidRadFractSched = CheckScheduleValueMinMax( TempControlledZone( TempControlledZoneNum ).OpTempRadiativeFractionSched, ">=", 0.0, "<", 0.9 );
 							if ( ! ValidRadFractSched ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) + " invalid values " + trim( cAlphaFieldNames( 3 ) ) + "=[" + trim( cAlphaArgs( 3 ) ) + "\"." );
+								ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid values " + cAlphaFieldNames( 3 ) + "=[" + cAlphaArgs( 3 ) + "\"." );
 								ShowContinueError( "..Values outside of range [0.0,0.9)." );
 								ErrorsFound = true;
 							}
@@ -1541,7 +1541,7 @@ namespace ZoneTempPredictorCorrector {
 						}
 						if ( Item == 1 ) {
 							if ( ( ! ( SameString( cAlphaArgs( 2 ), "Scheduled" ) ) ) && ( ! ( SameString( cAlphaArgs( 2 ), "Constant" ) ) ) ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\"." );
+								ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 								ErrorsFound = true;
 							}
 						}
@@ -1550,7 +1550,7 @@ namespace ZoneTempPredictorCorrector {
 						TempControlledZone( TempControlledZoneNum ).OpTempRadiativeFractionSched = GetScheduleIndex( cAlphaArgs( 3 ) );
 						if ( Item == 1 ) {
 							if ( ( TempControlledZone( TempControlledZoneNum ).OpTempRadiativeFractionSched == 0 ) && ( TempControlledZone( TempControlledZoneNum ).OpTempCntrlModeScheduled ) ) { //throw error
-								ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( cAlphaArgs( 3 ) ) + "\" not found." );
+								ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\" not found." );
 								ErrorsFound = true;
 							}
 						}
@@ -1558,13 +1558,13 @@ namespace ZoneTempPredictorCorrector {
 						//check validity of fixed radiative fraction
 						if ( Item == 1 ) {
 							if ( ( TempControlledZone( TempControlledZoneNum ).FixedRadiativeFraction < 0.0 ) && ( ! ( TempControlledZone( TempControlledZoneNum ).OpTempCntrlModeScheduled ) ) ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cNumericFieldNames( 1 ) ) + "=[" + trim( TrimSigDigits( rNumericArgs( 1 ), 2 ) ) + "\" cannot be negative." );
+								ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 1 ) + "=[" + TrimSigDigits( rNumericArgs( 1 ), 2 ) + "\" cannot be negative." );
 								ErrorsFound = true;
 							}
 						}
 						if ( Item == 1 ) {
 							if ( ( TempControlledZone( TempControlledZoneNum ).FixedRadiativeFraction >= 0.9 ) && ( ! ( TempControlledZone( TempControlledZoneNum ).OpTempCntrlModeScheduled ) ) ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cNumericFieldNames( 1 ) ) + "=[" + trim( TrimSigDigits( rNumericArgs( 1 ), 2 ) ) + "\" cannot >= .9." );
+								ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 1 ) + "=[" + TrimSigDigits( rNumericArgs( 1 ), 2 ) + "\" cannot >= .9." );
 								ErrorsFound = true;
 							}
 						}
@@ -1574,7 +1574,7 @@ namespace ZoneTempPredictorCorrector {
 							if ( TempControlledZone( TempControlledZoneNum ).OpTempCntrlModeScheduled ) {
 								ValidRadFractSched = CheckScheduleValueMinMax( TempControlledZone( TempControlledZoneNum ).OpTempRadiativeFractionSched, ">=", 0.0, "<", 0.9 );
 								if ( ! ValidRadFractSched ) {
-									ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) + " invalid values " + trim( cAlphaFieldNames( 3 ) ) + "=[" + trim( cAlphaArgs( 3 ) ) + "\"." );
+									ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid values " + cAlphaFieldNames( 3 ) + "=[" + cAlphaArgs( 3 ) + "\"." );
 									ShowContinueError( "..Values outside of range [0.0,0.9)." );
 									ErrorsFound = true;
 								}
@@ -1603,14 +1603,14 @@ namespace ZoneTempPredictorCorrector {
 					// It might be in the TempControlledZones
 					found = FindItem( cAlphaArgs( 1 ), TempControlledZone.Name(), NumTempControlledZones );
 					if ( found == 0 ) { // throw error
-						ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cZControlTypes( iZC_TStat ) ) + " reference not found." );
+						ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cZControlTypes( iZC_TStat ) + " reference not found." );
 						ErrorsFound = true;
 					} else {
 						TempControlledZoneNum = found;
 						TempControlledZone( TempControlledZoneNum ).DehumidifyingSched = cAlphaArgs( 2 );
 						TempControlledZone( TempControlledZoneNum ).DehumidifyingSchedIndex = GetScheduleIndex( cAlphaArgs( 2 ) );
 						if ( TempControlledZone( TempControlledZoneNum ).DehumidifyingSchedIndex == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" not found." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 						TempControlledZone( TempControlledZoneNum ).ZoneOvercoolControl = true;
@@ -1621,24 +1621,24 @@ namespace ZoneTempPredictorCorrector {
 							TempControlledZone( TempControlledZoneNum ).OvercoolCntrlModeScheduled = true;
 						}
 						if ( ( ! ( SameString( cAlphaArgs( 4 ), "Scheduled" ) ) ) && ( ! ( SameString( cAlphaArgs( 4 ), "Constant" ) ) ) ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cAlphaFieldNames( 4 ) ) + "=\"" + trim( cAlphaArgs( 4 ) ) + "\"." );
+							ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
 							ErrorsFound = true;
 						}
 
 						TempControlledZone( TempControlledZoneNum ).ZoneOvercoolConstRange = rNumericArgs( 1 );
 						TempControlledZone( TempControlledZoneNum ).ZoneOvercoolRangeSchedIndex = GetScheduleIndex( cAlphaArgs( 4 ) );
 						if ( ( TempControlledZone( TempControlledZoneNum ).ZoneOvercoolRangeSchedIndex == 0 ) && ( TempControlledZone( TempControlledZoneNum ).OvercoolCntrlModeScheduled ) ) { //throw error
-							ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cAlphaFieldNames( 5 ) ) + "=\"" + trim( cAlphaArgs( 5 ) ) + "\" not found." );
+							ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 
 						//check validity of zone Overcool constant range
 						if ( ( TempControlledZone( TempControlledZoneNum ).ZoneOvercoolConstRange < 0.0 ) && ( ! ( TempControlledZone( TempControlledZoneNum ).OvercoolCntrlModeScheduled ) ) ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cNumericFieldNames( 1 ) ) + "=[" + trim( TrimSigDigits( rNumericArgs( 1 ), 2 ) ) + "\" cannot be negative." );
+							ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 1 ) + "=[" + TrimSigDigits( rNumericArgs( 1 ), 2 ) + "\" cannot be negative." );
 							ErrorsFound = true;
 						}
 						if ( ( TempControlledZone( TempControlledZoneNum ).ZoneOvercoolConstRange > 3.0 ) && ( ! ( TempControlledZone( TempControlledZoneNum ).OvercoolCntrlModeScheduled ) ) ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cNumericFieldNames( 1 ) ) + "=[" + trim( TrimSigDigits( rNumericArgs( 1 ), 2 ) ) + "\" cannot be > 3.0" );
+							ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 1 ) + "=[" + TrimSigDigits( rNumericArgs( 1 ), 2 ) + "\" cannot be > 3.0" );
 							ErrorsFound = true;
 						}
 
@@ -1646,7 +1646,7 @@ namespace ZoneTempPredictorCorrector {
 						if ( TempControlledZone( TempControlledZoneNum ).OvercoolCntrlModeScheduled ) {
 							ValidZoneOvercoolRangeSched = CheckScheduleValueMinMax( TempControlledZone( TempControlledZoneNum ).ZoneOvercoolRangeSchedIndex, ">=", 0.0, "<=", 3.0 );
 							if ( ! ValidZoneOvercoolRangeSched ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) + " invalid values " + trim( cAlphaFieldNames( 5 ) ) + "=[" + trim( cAlphaArgs( 5 ) ) + "\"." );
+								ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid values " + cAlphaFieldNames( 5 ) + "=[" + cAlphaArgs( 5 ) + "\"." );
 								ShowContinueError( "..Values outside of range [0.0,3.0]." );
 								ErrorsFound = true;
 							}
@@ -1654,7 +1654,7 @@ namespace ZoneTempPredictorCorrector {
 						// check Overcool Control Ratio limits
 						TempControlledZone( TempControlledZoneNum ).ZoneOvercoolControlRatio = rNumericArgs( 2 );
 						if ( TempControlledZone( TempControlledZoneNum ).ZoneOvercoolControlRatio < 0.0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 2 ) ) + " invalid " + trim( cNumericFieldNames( 2 ) ) + "=[" + trim( TrimSigDigits( rNumericArgs( 2 ), 2 ) ) + "\" cannot be negative." );
+							ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 2 ) + " invalid " + cNumericFieldNames( 2 ) + "=[" + TrimSigDigits( rNumericArgs( 2 ), 2 ) + "\" cannot be negative." );
 							ErrorsFound = true;
 						}
 					}
@@ -1664,7 +1664,7 @@ namespace ZoneTempPredictorCorrector {
 						TempControlledZone( TempControlledZoneNum ).DehumidifyingSched = cAlphaArgs( 2 );
 						TempControlledZone( TempControlledZoneNum ).DehumidifyingSchedIndex = GetScheduleIndex( cAlphaArgs( 2 ) );
 						if ( TempControlledZone( TempControlledZoneNum ).DehumidifyingSchedIndex == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" not found." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 						TempControlledZone( TempControlledZoneNum ).ZoneOvercoolControl = true;
@@ -1676,7 +1676,7 @@ namespace ZoneTempPredictorCorrector {
 						}
 						if ( Item == 1 ) {
 							if ( ( ! ( SameString( cAlphaArgs( 4 ), "Scheduled" ) ) ) && ( ! ( SameString( cAlphaArgs( 4 ), "Constant" ) ) ) ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cAlphaFieldNames( 4 ) ) + "=\"" + trim( cAlphaArgs( 4 ) ) + "\"." );
+								ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
 								ErrorsFound = true;
 							}
 						}
@@ -1684,20 +1684,20 @@ namespace ZoneTempPredictorCorrector {
 						TempControlledZone( TempControlledZoneNum ).ZoneOvercoolRangeSchedIndex = GetScheduleIndex( cAlphaArgs( 6 ) );
 						if ( Item == 1 ) {
 							if ( ( TempControlledZone( TempControlledZoneNum ).ZoneOvercoolRangeSchedIndex == 0 ) && ( TempControlledZone( TempControlledZoneNum ).OvercoolCntrlModeScheduled ) ) { //throw error
-								ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cAlphaFieldNames( 5 ) ) + "=\"" + trim( cAlphaArgs( 5 ) ) + "\" not found." );
+								ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\" not found." );
 								ErrorsFound = true;
 							}
 						}
 						//check validity of zone Overcool constant range
 						if ( Item == 1 ) {
 							if ( ( TempControlledZone( TempControlledZoneNum ).ZoneOvercoolConstRange < 0.0 ) && ( ! ( TempControlledZone( TempControlledZoneNum ).OvercoolCntrlModeScheduled ) ) ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cNumericFieldNames( 1 ) ) + "=[" + trim( TrimSigDigits( rNumericArgs( 1 ), 2 ) ) + "\" cannot be negative." );
+								ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 1 ) + "=[" + TrimSigDigits( rNumericArgs( 1 ), 2 ) + "\" cannot be negative." );
 								ErrorsFound = true;
 							}
 						}
 						if ( Item == 1 ) {
 							if ( ( TempControlledZone( TempControlledZoneNum ).ZoneOvercoolConstRange > 3.0 ) && ( ! ( TempControlledZone( TempControlledZoneNum ).OvercoolCntrlModeScheduled ) ) ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) + " invalid " + trim( cNumericFieldNames( 1 ) ) + "=[" + trim( TrimSigDigits( rNumericArgs( 1 ), 2 ) ) + "\" cannot > 3.0" );
+								ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 1 ) + "=[" + TrimSigDigits( rNumericArgs( 1 ), 2 ) + "\" cannot > 3.0" );
 								ErrorsFound = true;
 							}
 						}
@@ -1706,7 +1706,7 @@ namespace ZoneTempPredictorCorrector {
 							if ( TempControlledZone( TempControlledZoneNum ).OvercoolCntrlModeScheduled ) {
 								ValidZoneOvercoolRangeSched = CheckScheduleValueMinMax( TempControlledZone( TempControlledZoneNum ).ZoneOvercoolRangeSchedIndex, ">=", 0.0, "<=", 3.0 );
 								if ( ! ValidZoneOvercoolRangeSched ) {
-									ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) + " invalid values " + trim( cAlphaFieldNames( 5 ) ) + "=[" + trim( cAlphaArgs( 5 ) ) + "\"." );
+									ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid values " + cAlphaFieldNames( 5 ) + "=[" + cAlphaArgs( 5 ) + "\"." );
 									ShowContinueError( "..Values outside of range [0.0,3.0]." );
 									ErrorsFound = true;
 								}
@@ -1716,7 +1716,7 @@ namespace ZoneTempPredictorCorrector {
 						// check Overcool Control Ratio limits
 						if ( Item == 1 ) {
 							if ( TempControlledZone( TempControlledZoneNum ).ZoneOvercoolControlRatio < 0.0 ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 2 ) ) + " invalid " + trim( cNumericFieldNames( 2 ) ) + "=[" + trim( TrimSigDigits( rNumericArgs( 2 ), 2 ) ) + "\" cannot be negative." );
+								ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 2 ) + " invalid " + cNumericFieldNames( 2 ) + "=[" + TrimSigDigits( rNumericArgs( 2 ), 2 ) + "\" cannot be negative." );
 								ErrorsFound = true;
 							}
 						}
@@ -1737,7 +1737,7 @@ namespace ZoneTempPredictorCorrector {
 			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), StagedTStatObjects.Name(), Item - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), StagedTStatObjects.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1759,13 +1759,13 @@ namespace ZoneTempPredictorCorrector {
 				StagedTStatObjects( Item ).ZoneListActive = true;
 				StagedTStatObjects( Item ).ZoneOrZoneListPtr = ZLItem;
 			} else {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" not found." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 				ErrorsFound = true;
 			}
 		}
 
 		if ( ErrorsFound ) {
-			ShowSevereError( "GetStagedDualSetpoint: Errors with invalid names in " + trim( cCurrentModuleObject ) + " objects." );
+			ShowSevereError( "GetStagedDualSetpoint: Errors with invalid names in " + cCurrentModuleObject + " objects." );
 			ShowContinueError( "...These will not be read in.  Other errors may occur." );
 			NumStageCtrZone = 0;
 		}
@@ -1788,7 +1788,7 @@ namespace ZoneTempPredictorCorrector {
 						StageControlledZone( StageControlledZoneNum ).ZoneName = cAlphaArgs( 2 );
 						StageControlledZone( StageControlledZoneNum ).ActualZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
 						if ( StageControlledZone( StageControlledZoneNum ).ActualZoneNum == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" not found." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 							ErrorsFound = true;
 						} else {
 							//           Zone(StageControlledZone(StageControlledZoneNum)%ActualZoneNum)%StageControlledZoneIndex = StageControlledZoneNum
@@ -1796,8 +1796,8 @@ namespace ZoneTempPredictorCorrector {
 						StageZoneLogic( StageControlledZone( StageControlledZoneNum ).ActualZoneNum ) = true;
 					} else {
 						StageControlledZone( StageControlledZoneNum ).ZoneName = cAlphaArgs( 2 ); // for continuity
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 2 ) ) + "=\"" + trim( cAlphaArgs( 2 ) ) + "\" zone previously assigned." );
-						ShowContinueError( "...Zone was previously assigned to Thermostat=\"" + trim( StageControlledZone( ZoneAssigned ).Name ) + "\"." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" zone previously assigned." );
+						ShowContinueError( "...Zone was previously assigned to Thermostat=\"" + StageControlledZone( ZoneAssigned ).Name + "\"." );
 						ErrorsFound = true;
 						continue;
 					}
@@ -1811,7 +1811,7 @@ namespace ZoneTempPredictorCorrector {
 
 					StageControlledZone( StageControlledZoneNum ).NumOfHeatStages = rNumericArgs( 1 );
 					if ( rNumericArgs( 1 ) < 1 || rNumericArgs( 1 ) > 4 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid range " + trim( cNumericFieldNames( 1 ) ) + "=\"" + trim( RoundSigDigits( rNumericArgs( 1 ), 0 ) ) + "\"" );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid range " + cNumericFieldNames( 1 ) + "=\"" + RoundSigDigits( rNumericArgs( 1 ), 0 ) + "\"" );
 						ShowContinueError( "..contains values outside of range [1,4]." );
 						ErrorsFound = true;
 					}
@@ -1820,14 +1820,14 @@ namespace ZoneTempPredictorCorrector {
 					StageControlledZone( StageControlledZoneNum ).HSBchedIndex = GetScheduleIndex( cAlphaArgs( 3 ) );
 					if ( Item1 == 1 ) { // only show error on first of several if zone list
 						if ( StageControlledZone( StageControlledZoneNum ).HSBchedIndex == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 3 ) ) + "=\"" + trim( cAlphaArgs( 3 ) ) + "\" not found." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					}
 
 					StageControlledZone( StageControlledZoneNum ).HeatThroRange = rNumericArgs( 2 );
 					if ( rNumericArgs( 1 ) < 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" negative value is found at " + trim( cNumericFieldNames( 2 ) ) + "=\"" + trim( RoundSigDigits( rNumericArgs( 2 ), 1 ) ) + "\"" );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" negative value is found at " + cNumericFieldNames( 2 ) + "=\"" + RoundSigDigits( rNumericArgs( 2 ), 1 ) + "\"" );
 						ShowContinueError( ".. The minumum value is 0." );
 						ErrorsFound = true;
 					}
@@ -1837,18 +1837,18 @@ namespace ZoneTempPredictorCorrector {
 						for ( i = 1; i <= StageControlledZone( StageControlledZoneNum ).NumOfHeatStages; ++i ) {
 							StageControlledZone( StageControlledZoneNum ).HeatTOffset( i ) = rNumericArgs( 2 + i );
 							if ( rNumericArgs( 2 + i ) > 0.0 ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" positive value is found at " + trim( cNumericFieldNames( 2 + i ) ) + "=\"" + trim( RoundSigDigits( rNumericArgs( 2 + i ), 1 ) ) + "\"" );
+								ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" positive value is found at " + cNumericFieldNames( 2 + i ) + "=\"" + RoundSigDigits( rNumericArgs( 2 + i ), 1 ) + "\"" );
 								ShowContinueError( ".. The maximum value is 0." );
 								ErrorsFound = true;
 							}
 							if ( lNumericFieldBlanks( 2 + i ) ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + " object =" + trim( cAlphaArgs( 1 ) ) + ". The input of " + trim( cNumericFieldNames( 2 + i ) ) + " is required, but a blank is found." );
+								ShowSevereError( cCurrentModuleObject + " object =" + cAlphaArgs( 1 ) + ". The input of " + cNumericFieldNames( 2 + i ) + " is required, but a blank is found." );
 								ErrorsFound = true;
 							}
 							if ( i > 1 ) {
 								if ( rNumericArgs( 2 + i ) >= rNumericArgs( 1 + i ) ) {
-									ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" The value at " + trim( cNumericFieldNames( 2 + i ) ) + "=\"" + trim( RoundSigDigits( rNumericArgs( 2 + i ), 1 ) ) + "\" has to be less than " );
-									ShowContinueError( trim( cNumericFieldNames( 1 + i ) ) + "=\"" + trim( RoundSigDigits( rNumericArgs( 1 + i ), 1 ) ) );
+									ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" The value at " + cNumericFieldNames( 2 + i ) + "=\"" + RoundSigDigits( rNumericArgs( 2 + i ), 1 ) + "\" has to be less than " );
+									ShowContinueError( cNumericFieldNames( 1 + i ) + "=\"" + RoundSigDigits( rNumericArgs( 1 + i ), 1 ) );
 									ErrorsFound = true;
 								}
 							}
@@ -1857,7 +1857,7 @@ namespace ZoneTempPredictorCorrector {
 
 					StageControlledZone( StageControlledZoneNum ).NumOfCoolStages = rNumericArgs( 7 );
 					if ( rNumericArgs( 7 ) < 1 || rNumericArgs( 7 ) > 4 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid range " + trim( cNumericFieldNames( 7 ) ) + "=\"" + trim( RoundSigDigits( rNumericArgs( 7 ), 0 ) ) + "\"" );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid range " + cNumericFieldNames( 7 ) + "=\"" + RoundSigDigits( rNumericArgs( 7 ), 0 ) + "\"" );
 						ShowContinueError( "..contains values outside of range [1,4]." );
 						ErrorsFound = true;
 					}
@@ -1866,14 +1866,14 @@ namespace ZoneTempPredictorCorrector {
 					StageControlledZone( StageControlledZoneNum ).CSBchedIndex = GetScheduleIndex( cAlphaArgs( 4 ) );
 					if ( Item1 == 1 ) { // only show error on first of several if zone list
 						if ( StageControlledZone( StageControlledZoneNum ).CSBchedIndex == 0 ) {
-							ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" invalid " + trim( cAlphaFieldNames( 4 ) ) + "=\"" + trim( cAlphaArgs( 4 ) ) + "\" not found." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					}
 
 					StageControlledZone( StageControlledZoneNum ).CoolThroRange = rNumericArgs( 8 );
 					if ( rNumericArgs( 8 ) < 0.0 ) {
-						ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" negative value is found at " + trim( cNumericFieldNames( 8 ) ) + "=\"" + trim( RoundSigDigits( rNumericArgs( 8 ), 1 ) ) + "\"" );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" negative value is found at " + cNumericFieldNames( 8 ) + "=\"" + RoundSigDigits( rNumericArgs( 8 ), 1 ) + "\"" );
 						ShowContinueError( ".. The minumum value is 0." );
 						ErrorsFound = true;
 					}
@@ -1883,18 +1883,18 @@ namespace ZoneTempPredictorCorrector {
 						for ( i = 1; i <= StageControlledZone( StageControlledZoneNum ).NumOfCoolStages; ++i ) {
 							StageControlledZone( StageControlledZoneNum ).CoolTOffset( i ) = rNumericArgs( 8 + i );
 							if ( rNumericArgs( 8 + i ) < 0.0 ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" negative value is found at " + trim( cNumericFieldNames( 8 + i ) ) + "=\"" + trim( RoundSigDigits( rNumericArgs( 8 + i ), 1 ) ) + "\"" );
+								ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" negative value is found at " + cNumericFieldNames( 8 + i ) + "=\"" + RoundSigDigits( rNumericArgs( 8 + i ), 1 ) + "\"" );
 								ShowContinueError( ".. The minimum value is 0." );
 								ErrorsFound = true;
 							}
 							if ( lNumericFieldBlanks( 8 + i ) ) {
-								ShowSevereError( trim( cCurrentModuleObject ) + " object =" + trim( cAlphaArgs( 1 ) ) + ". The input of " + trim( cNumericFieldNames( 8 + i ) ) + " is required, but a blank is found." );
+								ShowSevereError( cCurrentModuleObject + " object =" + cAlphaArgs( 1 ) + ". The input of " + cNumericFieldNames( 8 + i ) + " is required, but a blank is found." );
 								ErrorsFound = true;
 							}
 							if ( i > 1 ) {
 								if ( rNumericArgs( 8 + i ) <= rNumericArgs( 7 + i ) ) {
-									ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" The value at " + trim( cNumericFieldNames( 8 + i ) ) + "=\"" + trim( RoundSigDigits( rNumericArgs( 8 + i ), 1 ) ) + "\" has to be greater than " );
-									ShowContinueError( trim( cNumericFieldNames( 7 + i ) ) + "=\"" + trim( RoundSigDigits( rNumericArgs( 7 + i ), 1 ) ) );
+									ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" The value at " + cNumericFieldNames( 8 + i ) + "=\"" + RoundSigDigits( rNumericArgs( 8 + i ), 1 ) + "\" has to be greater than " );
+									ShowContinueError( cNumericFieldNames( 7 + i ) + "=\"" + RoundSigDigits( rNumericArgs( 7 + i ), 1 ) );
 									ErrorsFound = true;
 								}
 							}
@@ -1903,7 +1903,7 @@ namespace ZoneTempPredictorCorrector {
 				}
 			} //loop over NumStageControlledZones
 			if ( ( GetNumObjectsFound( "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed" ) == 0 ) && ( GetNumObjectsFound( "AirLoopHVAC:UnitarySystem" ) == 0 ) && ( GetNumObjectsFound( "SetpointManager:SingleZone:OneStageCooling" ) == 0 ) && ( GetNumObjectsFound( "SetpointManager:SingleZone:OneStageHeating" ) == 0 ) ) {
-				ShowWarningError( trim( cCurrentModuleObject ) + " is applicable to only selected HVAC objects which are missing from input." );
+				ShowWarningError( cCurrentModuleObject + " is applicable to only selected HVAC objects which are missing from input." );
 				ShowContinueError( "Model should include one or more of the following objects:  " );
 				ShowContinueError( "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, AirLoopHVAC:UnitarySystem, " );
 				ShowContinueError( "SetpointManager:SingleZone:OneStageCooling, " "and/or SetpointManager:SingleZone:OneStageHeating. The simulation continues..." );
@@ -1946,7 +1946,7 @@ namespace ZoneTempPredictorCorrector {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "InitZoneAirSetpoints: " );
+		static std::string const RoutineName( "InitZoneAirSetpoints: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2097,7 +2097,7 @@ namespace ZoneTempPredictorCorrector {
 					// for each particular zone, the reference air temperature(s) should be the same
 					// (either mean air, bulk air, or supply air temp).
 					if ( Surface( SurfNum ).TAirRef != TRefFlag ) {
-						ShowWarningError( "Different reference air temperatures for difference surfaces encountered in zone " + trim( Zone( Loop ).Name ) );
+						ShowWarningError( "Different reference air temperatures for difference surfaces encountered in zone " + Zone( Loop ).Name );
 					}
 
 				}
@@ -2245,7 +2245,7 @@ namespace ZoneTempPredictorCorrector {
 		for ( Loop = 1; Loop <= NumTempControlledZones; ++Loop ) {
 			if ( ZoneEquipInputsFilled && ! ControlledZonesChecked ) {
 				if ( ! VerifyControlledZoneForThermostat( TempControlledZone( Loop ).ZoneName ) ) {
-					ShowSevereError( RoutineName + "Zone=\"" + trim( TempControlledZone( Loop ).ZoneName ) + "\" has specified a" " Thermostatic control but is not a controlled zone." );
+					ShowSevereError( RoutineName + "Zone=\"" + TempControlledZone( Loop ).ZoneName + "\" has specified a" " Thermostatic control but is not a controlled zone." );
 					ShowContinueError( "...must have a ZoneHVAC:EquipmentConnections specification for this zone." );
 					ErrorsFound = true;
 				}
@@ -2296,7 +2296,7 @@ namespace ZoneTempPredictorCorrector {
 		for ( Loop = 1; Loop <= NumComfortControlledZones; ++Loop ) {
 			if ( ZoneEquipInputsFilled && ! ControlledZonesChecked ) {
 				if ( ! VerifyControlledZoneForThermostat( ComfortControlledZone( Loop ).ZoneName ) ) {
-					ShowSevereError( RoutineName + "Zone=\"" + trim( ComfortControlledZone( Loop ).ZoneName ) + "\" has specified a" " Comfort control but is not a controlled zone." );
+					ShowSevereError( RoutineName + "Zone=\"" + ComfortControlledZone( Loop ).ZoneName + "\" has specified a" " Comfort control but is not a controlled zone." );
 					ShowContinueError( "...must have a ZoneHVAC:EquipmentConnections specification for this zone." );
 					ErrorsFound = true;
 				}
@@ -2573,9 +2573,9 @@ namespace ZoneTempPredictorCorrector {
 				if ( StageControlledZone( RelativeZoneNum ).HeatSetPoint >= StageControlledZone( RelativeZoneNum ).CoolSetPoint ) {
 					++StageControlledZone( RelativeZoneNum ).StageErrCount;
 					if ( StageControlledZone( RelativeZoneNum ).StageErrCount < 2 ) {
-						ShowWarningError( "ZoneControl:Thermostat:StagedDualSetpoint: The heating setpoint is equal to or above " "the cooling setpoint in " + trim( StageControlledZone( RelativeZoneNum ).Name ) );
+						ShowWarningError( "ZoneControl:Thermostat:StagedDualSetpoint: The heating setpoint is equal to or above " "the cooling setpoint in " + StageControlledZone( RelativeZoneNum ).Name );
 						ShowContinueError( "The zone heating setpoint is set to the cooling setpoint - 0.1C." );
-						ShowContinueErrorTimeStamp( " Occurrence info: " );
+						ShowContinueErrorTimeStamp( "Occurrence info:" );
 					} else {
 						ShowRecurringWarningErrorAtEnd( "The heating setpoint is still above " "the cooling setpoint", StageControlledZone( RelativeZoneNum ).StageErrIndex, StageControlledZone( RelativeZoneNum ).HeatSetPoint, StageControlledZone( RelativeZoneNum ).HeatSetPoint );
 					}
@@ -2918,7 +2918,7 @@ namespace ZoneTempPredictorCorrector {
 				AdjustCoolingSetPointforTempAndHumidityControl( RelativeZoneNum, ActualZoneNum );
 
 			} else {
-				ShowSevereError( "CalcZoneAirTempSetpoints: Illegal control type for Zone=" + trim( Zone( ActualZoneNum ).Name ) + ", Found value=" + trim( TrimSigDigits( TempControlType( ActualZoneNum ) ) ) + ", in Schedule=" + trim( TempControlledZone( RelativeZoneNum ).ControlTypeSchedName ) );
+				ShowSevereError( "CalcZoneAirTempSetpoints: Illegal control type for Zone=" + Zone( ActualZoneNum ).Name + ", Found value=" + TrimSigDigits( TempControlType( ActualZoneNum ) ) + ", in Schedule=" + TempControlledZone( RelativeZoneNum ).ControlTypeSchedName );
 
 			}}
 
@@ -3070,11 +3070,11 @@ namespace ZoneTempPredictorCorrector {
 			// First trap bad set-points
 			if ( LoadToHeatingSetPoint > LoadToCoolingSetPoint ) {
 				ShowSevereError( "SingleHeatCoolSetPoint: Effective heating set-point higher than effective cooling set-point - " "use DualSetPointWithDeadBand if using unmixed air model" );
-				ShowContinueErrorTimeStamp( "occurs in Zone=" + trim( Zone( ZoneNum ).Name ) );
-				ShowContinueError( "LoadToHeatingSetPoint=" + trim( RoundSigDigits( LoadToHeatingSetPoint, 3 ) ) + ", LoadToCoolingSetPoint=" + trim( RoundSigDigits( LoadToCoolingSetPoint, 3 ) ) );
-				ShowContinueError( "Zone TempDepZnLd=" + trim( RoundSigDigits( TempDepZnLd( ZoneNum ), 2 ) ) );
-				ShowContinueError( "Zone TempIndZnLd=" + trim( RoundSigDigits( TempIndZnLd( ZoneNum ), 2 ) ) );
-				ShowContinueError( "Zone ThermostatSetPoint=" + trim( RoundSigDigits( TempZoneThermostatSetPoint( ZoneNum ), 2 ) ) );
+				ShowContinueErrorTimeStamp( "occurs in Zone=" + Zone( ZoneNum ).Name );
+				ShowContinueError( "LoadToHeatingSetPoint=" + RoundSigDigits( LoadToHeatingSetPoint, 3 ) + ", LoadToCoolingSetPoint=" + RoundSigDigits( LoadToCoolingSetPoint, 3 ) );
+				ShowContinueError( "Zone TempDepZnLd=" + RoundSigDigits( TempDepZnLd( ZoneNum ), 2 ) );
+				ShowContinueError( "Zone TempIndZnLd=" + RoundSigDigits( TempIndZnLd( ZoneNum ), 2 ) );
+				ShowContinueError( "Zone ThermostatSetPoint=" + RoundSigDigits( TempZoneThermostatSetPoint( ZoneNum ), 2 ) );
 				ShowFatalError( "Program terminates due to above conditions." );
 			}
 
@@ -3092,11 +3092,11 @@ namespace ZoneTempPredictorCorrector {
 				DeadBandOrSetback( ZoneNum ) = true;
 			} else { // this should never occur!
 				ShowSevereError( "SingleHeatCoolSetPoint: Unanticipated combination of heating and cooling loads - " "report to EnergyPlus Development Team" );
-				ShowContinueErrorTimeStamp( "occurs in Zone=" + trim( Zone( ZoneNum ).Name ) );
-				ShowContinueError( "LoadToHeatingSetPoint=" + trim( RoundSigDigits( LoadToHeatingSetPoint, 3 ) ) + ", LoadToCoolingSetPoint=" + trim( RoundSigDigits( LoadToCoolingSetPoint, 3 ) ) );
-				ShowContinueError( "Zone TempDepZnLd=" + trim( RoundSigDigits( TempDepZnLd( ZoneNum ), 2 ) ) );
-				ShowContinueError( "Zone TempIndZnLd=" + trim( RoundSigDigits( TempIndZnLd( ZoneNum ), 2 ) ) );
-				ShowContinueError( "Zone ThermostatSetPoint=" + trim( RoundSigDigits( TempZoneThermostatSetPoint( ZoneNum ), 2 ) ) );
+				ShowContinueErrorTimeStamp( "occurs in Zone=" + Zone( ZoneNum ).Name );
+				ShowContinueError( "LoadToHeatingSetPoint=" + RoundSigDigits( LoadToHeatingSetPoint, 3 ) + ", LoadToCoolingSetPoint=" + RoundSigDigits( LoadToCoolingSetPoint, 3 ) );
+				ShowContinueError( "Zone TempDepZnLd=" + RoundSigDigits( TempDepZnLd( ZoneNum ), 2 ) );
+				ShowContinueError( "Zone TempIndZnLd=" + RoundSigDigits( TempIndZnLd( ZoneNum ), 2 ) );
+				ShowContinueError( "Zone ThermostatSetPoint=" + RoundSigDigits( TempZoneThermostatSetPoint( ZoneNum ), 2 ) );
 				ShowFatalError( "Program terminates due to above conditions." );
 			}
 
@@ -3129,12 +3129,12 @@ namespace ZoneTempPredictorCorrector {
 			// First trap bad set-points
 			if ( LoadToHeatingSetPoint > LoadToCoolingSetPoint ) {
 				ShowSevereError( "DualSetPointWithDeadBand: Effective heating set-point higher than effective cooling set-point - " "increase deadband if using unmixed air model" );
-				ShowContinueErrorTimeStamp( "occurs in Zone=" + trim( Zone( ZoneNum ).Name ) );
-				ShowContinueError( "LoadToHeatingSetPoint=" + trim( RoundSigDigits( LoadToHeatingSetPoint, 3 ) ) + ", LoadToCoolingSetPoint=" + trim( RoundSigDigits( LoadToCoolingSetPoint, 3 ) ) );
-				ShowContinueError( "Zone TempDepZnLd=" + trim( RoundSigDigits( TempDepZnLd( ZoneNum ), 2 ) ) );
-				ShowContinueError( "Zone TempIndZnLd=" + trim( RoundSigDigits( TempIndZnLd( ZoneNum ), 2 ) ) );
-				ShowContinueError( "Zone Heating ThermostatSetPoint=" + trim( RoundSigDigits( ZoneThermostatSetPointLo( ZoneNum ), 2 ) ) );
-				ShowContinueError( "Zone Cooling ThermostatSetPoint=" + trim( RoundSigDigits( ZoneThermostatSetPointHi( ZoneNum ), 2 ) ) );
+				ShowContinueErrorTimeStamp( "occurs in Zone=" + Zone( ZoneNum ).Name );
+				ShowContinueError( "LoadToHeatingSetPoint=" + RoundSigDigits( LoadToHeatingSetPoint, 3 ) + ", LoadToCoolingSetPoint=" + RoundSigDigits( LoadToCoolingSetPoint, 3 ) );
+				ShowContinueError( "Zone TempDepZnLd=" + RoundSigDigits( TempDepZnLd( ZoneNum ), 2 ) );
+				ShowContinueError( "Zone TempIndZnLd=" + RoundSigDigits( TempIndZnLd( ZoneNum ), 2 ) );
+				ShowContinueError( "Zone Heating ThermostatSetPoint=" + RoundSigDigits( ZoneThermostatSetPointLo( ZoneNum ), 2 ) );
+				ShowContinueError( "Zone Cooling ThermostatSetPoint=" + RoundSigDigits( ZoneThermostatSetPointHi( ZoneNum ), 2 ) );
 				ShowFatalError( "Program terminates due to above conditions." );
 			}
 			if ( LoadToHeatingSetPoint > 0.0 && LoadToCoolingSetPoint > 0.0 ) {
@@ -3154,13 +3154,13 @@ namespace ZoneTempPredictorCorrector {
 				DeadBandOrSetback( ZoneNum ) = true;
 			} else { // this should never occur!
 				ShowSevereError( "DualSetPointWithDeadBand: Unanticipated combination of heating and cooling loads - " "report to EnergyPlus Development Team" );
-				ShowContinueErrorTimeStamp( "occurs in Zone=" + trim( Zone( ZoneNum ).Name ) );
-				ShowContinueError( "LoadToHeatingSetPoint=" + trim( RoundSigDigits( LoadToHeatingSetPoint, 3 ) ) + ", LoadToCoolingSetPoint=" + trim( RoundSigDigits( LoadToCoolingSetPoint, 3 ) ) );
-				ShowContinueError( "Zone Heating Set-point=" + trim( RoundSigDigits( ZoneThermostatSetPointLo( ZoneNum ), 2 ) ) );
-				ShowContinueError( "Zone Cooling Set-point=" + trim( RoundSigDigits( ZoneThermostatSetPointHi( ZoneNum ), 2 ) ) );
-				ShowContinueError( "Zone TempDepZnLd=" + trim( RoundSigDigits( TempDepZnLd( ZoneNum ), 2 ) ) );
-				ShowContinueError( "Zone TempIndZnLd=" + trim( RoundSigDigits( TempIndZnLd( ZoneNum ), 2 ) ) );
-				ShowContinueError( "Zone ThermostatSetPoint=" + trim( RoundSigDigits( TempZoneThermostatSetPoint( ZoneNum ), 2 ) ) );
+				ShowContinueErrorTimeStamp( "occurs in Zone=" + Zone( ZoneNum ).Name );
+				ShowContinueError( "LoadToHeatingSetPoint=" + RoundSigDigits( LoadToHeatingSetPoint, 3 ) + ", LoadToCoolingSetPoint=" + RoundSigDigits( LoadToCoolingSetPoint, 3 ) );
+				ShowContinueError( "Zone Heating Set-point=" + RoundSigDigits( ZoneThermostatSetPointLo( ZoneNum ), 2 ) );
+				ShowContinueError( "Zone Cooling Set-point=" + RoundSigDigits( ZoneThermostatSetPointHi( ZoneNum ), 2 ) );
+				ShowContinueError( "Zone TempDepZnLd=" + RoundSigDigits( TempDepZnLd( ZoneNum ), 2 ) );
+				ShowContinueError( "Zone TempIndZnLd=" + RoundSigDigits( TempIndZnLd( ZoneNum ), 2 ) );
+				ShowContinueError( "Zone ThermostatSetPoint=" + RoundSigDigits( TempZoneThermostatSetPoint( ZoneNum ), 2 ) );
 
 				ShowFatalError( "Program terminates due to above conditions." );
 			}
@@ -3336,9 +3336,9 @@ namespace ZoneTempPredictorCorrector {
 			if ( ZoneRHHumidifyingSetPoint > ZoneRHDehumidifyingSetPoint ) {
 				//      HumidityControlZone(HumidControlledZoneNum)%ErrorCount = HumidityControlZone(HumidControlledZoneNum)%ErrorCount + 1
 				if ( HumidityControlZone( HumidControlledZoneNum ).ErrorIndex == 0 ) {
-					ShowWarningMessage( "HUMIDISTAT: The humidifying setpoint is above " "the dehumidifying setpoint in " + trim( HumidityControlZone( HumidControlledZoneNum ).ControlName ) );
+					ShowWarningMessage( "HUMIDISTAT: The humidifying setpoint is above " "the dehumidifying setpoint in " + HumidityControlZone( HumidControlledZoneNum ).ControlName );
 					ShowContinueError( "The zone humidifying setpoint is set to the dehumidifying setpoint." );
-					ShowContinueErrorTimeStamp( " Occurrence info: " );
+					ShowContinueErrorTimeStamp( "Occurrence info:" );
 				}
 				ShowRecurringWarningErrorAtEnd( "The humidifying setpoint is still above " "the dehumidifying setpoint", HumidityControlZone( HumidControlledZoneNum ).ErrorIndex, ZoneRHHumidifyingSetPoint, ZoneRHHumidifyingSetPoint );
 				ZoneRHHumidifyingSetPoint = ZoneRHDehumidifyingSetPoint;
@@ -3435,10 +3435,10 @@ namespace ZoneTempPredictorCorrector {
 					ZoneSysMoistureDemand( ZoneNum ).TotalOutputRequired = 0.0;
 				} else { // this should never occur!
 					ShowSevereError( "Humidistat: Unanticipated combination of humidifying and dehumidifying loads - " "report to EnergyPlus Development Team" );
-					ShowContinueErrorTimeStamp( "occurs in Zone=" + trim( Zone( ZoneNum ).Name ) );
-					ShowContinueError( "LoadToHumidifySetPoint=" + trim( RoundSigDigits( LoadToHumidifySetPoint, 5 ) ) + ", LoadToDehumidifySetPoint=" + trim( RoundSigDigits( LoadToDehumidifySetPoint, 5 ) ) );
-					ShowContinueError( "Zone RH Humidifying Set-point=" + trim( RoundSigDigits( ZoneRHHumidifyingSetPoint, 1 ) ) );
-					ShowContinueError( "Zone RH Dehumidifying Set-point=" + trim( RoundSigDigits( ZoneRHDehumidifyingSetPoint, 2 ) ) );
+					ShowContinueErrorTimeStamp( "occurs in Zone=" + Zone( ZoneNum ).Name );
+					ShowContinueError( "LoadToHumidifySetPoint=" + RoundSigDigits( LoadToHumidifySetPoint, 5 ) + ", LoadToDehumidifySetPoint=" + RoundSigDigits( LoadToDehumidifySetPoint, 5 ) );
+					ShowContinueError( "Zone RH Humidifying Set-point=" + RoundSigDigits( ZoneRHHumidifyingSetPoint, 1 ) );
+					ShowContinueError( "Zone RH Dehumidifying Set-point=" + RoundSigDigits( ZoneRHDehumidifyingSetPoint, 2 ) );
 					ShowFatalError( "Program terminates due to above conditions." );
 				}
 			}
@@ -4654,7 +4654,7 @@ namespace ZoneTempPredictorCorrector {
 			} else if ( SELECT_CASE_var == ZoneSupplyAirTemp ) {
 				// check whether this zone is a controlled zone or not
 				if ( ! ControlledZoneAirFlag ) {
-					ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + trim( Zone( ZoneNum ).Name ) );
+					ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone( ZoneNum ).Name );
 					return;
 				}
 				// determine supply air temperature as a weighted average of the inlet temperatures.
@@ -4894,7 +4894,7 @@ namespace ZoneTempPredictorCorrector {
 			} else if ( SELECT_CASE_var == ZoneSupplyAirTemp ) {
 				// check whether this zone is a controlled zone or not
 				if ( ! ControlledZoneAirFlag ) {
-					ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + trim( Zone( ZoneNum ).Name ) );
+					ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone( ZoneNum ).Name );
 					return;
 				}
 				// determine supply air temperature as a weighted average of the inlet temperatures.
@@ -4991,22 +4991,22 @@ namespace ZoneTempPredictorCorrector {
 			Threshold = 0.2 * std::sqrt( std::pow( SumIntGains, 2 ) + std::pow( SumHADTsurfs, 2 ) + std::pow( SumMCpDTzones, 2 ) + std::pow( SumMCpDtInfil, 2 ) + std::pow( SumMCpDTsystem, 2 ) + std::pow( SumNonAirSystem, 2 ) + std::pow( CzdTdt, 2 ) );
 			if ( ( std::abs( imBalance ) > Threshold ) && ( ! WarmupFlag ) && ( ! DoingSizing ) ) { // air balance is out by more than threshold
 				if ( Zone( ZoneNum ).AirHBimBalanceErrIndex == 0 ) {
-					ShowWarningMessage( "Zone Air Heat Balance is out of balance for zone named " + trim( Zone( ZoneNum ).Name ) );
-					ShowContinueError( "Zone Air Heat Balance Deviation Rate is more than " + trim( RoundSigDigits( Threshold, 1 ) ) + " {W}" );
+					ShowWarningMessage( "Zone Air Heat Balance is out of balance for zone named " + Zone( ZoneNum ).Name );
+					ShowContinueError( "Zone Air Heat Balance Deviation Rate is more than " + RoundSigDigits( Threshold, 1 ) + " {W}" );
 					if ( TurnFansOn ) {
 						ShowContinueError( "Night cycle fan operation may be causing above error" );
 					}
 
-					ShowContinueErrorTimeStamp( " Occurance info:  " );
+					ShowContinueErrorTimeStamp( " Occurrence info:" );
 				}
-				ShowRecurringWarningErrorAtEnd( "Zone Air Heat Balance is out of balance ... zone named " + trim( Zone( ZoneNum ).Name ), Zone( ZoneNum ).AirHBimBalanceErrIndex, std::abs( imBalance ) - Threshold, std::abs( imBalance ) - Threshold, _, "{W}", "{W}" );
+				ShowRecurringWarningErrorAtEnd( "Zone Air Heat Balance is out of balance ... zone named " + Zone( ZoneNum ).Name, Zone( ZoneNum ).AirHBimBalanceErrIndex, std::abs( imBalance ) - Threshold, std::abs( imBalance ) - Threshold, _, "{W}", "{W}" );
 			}
 		}
 
 	}
 
 	bool
-	VerifyThermostatInZone( Fstring const & ZoneName ) // Zone to verify
+	VerifyThermostatInZone( std::string const & ZoneName ) // Zone to verify
 	{
 
 		// FUNCTION INFORMATION:
@@ -5064,7 +5064,7 @@ namespace ZoneTempPredictorCorrector {
 	}
 
 	bool
-	VerifyControlledZoneForThermostat( Fstring const & ZoneName ) // Zone to verify
+	VerifyControlledZoneForThermostat( std::string const & ZoneName ) // Zone to verify
 	{
 
 		// FUNCTION INFORMATION:
@@ -5406,9 +5406,9 @@ namespace ZoneTempPredictorCorrector {
 				if ( ZoneComfortControlsFanger( ActualZoneNum ).LowPMV > ZoneComfortControlsFanger( ActualZoneNum ).HighPMV ) {
 					++ZoneComfortControlsFanger( ActualZoneNum ).DualPMVErrCount;
 					if ( ZoneComfortControlsFanger( ActualZoneNum ).DualPMVErrCount < 2 ) {
-						ShowWarningError( "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint: The heating PMV setpoint is above " "the cooling PMV setpoint in " + trim( SetPointDualHeatCoolFanger( SchedTypeIndex ).Name ) );
+						ShowWarningError( "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint: The heating PMV setpoint is above " "the cooling PMV setpoint in " + SetPointDualHeatCoolFanger( SchedTypeIndex ).Name );
 						ShowContinueError( "The zone dual heating PMV setpoint is set to the dual cooling PMV setpoint." );
-						ShowContinueErrorTimeStamp( " Occurrence info: " );
+						ShowContinueErrorTimeStamp( "Occurrence info:" );
 					} else {
 						ShowRecurringWarningErrorAtEnd( "The heating PMV setpoint is still above " "the cooling PMV setpoint", ZoneComfortControlsFanger( ActualZoneNum ).DualPMVErrIndex, ZoneComfortControlsFanger( ActualZoneNum ).LowPMV, ZoneComfortControlsFanger( ActualZoneNum ).LowPMV );
 					}
@@ -5416,7 +5416,7 @@ namespace ZoneTempPredictorCorrector {
 				}
 
 			} else {
-				ShowSevereError( "CalcZoneAirTempSetpoints: Illegal thermal control control type for Zone=" + trim( Zone( ActualZoneNum ).Name ) + ", Found value=" + trim( TrimSigDigits( ComfortControlType( ActualZoneNum ) ) ) + ", in Schedule=" + trim( ComfortControlledZone( RelativeZoneNum ).ControlTypeSchedName ) );
+				ShowSevereError( "CalcZoneAirTempSetpoints: Illegal thermal control control type for Zone=" + Zone( ActualZoneNum ).Name + ", Found value=" + TrimSigDigits( ComfortControlType( ActualZoneNum ) ) + ", in Schedule=" + ComfortControlledZone( RelativeZoneNum ).ControlTypeSchedName );
 
 			}}
 
@@ -5479,11 +5479,11 @@ namespace ZoneTempPredictorCorrector {
 					//          ComfortControlledZone(RelativeZoneNum)%PeopleAverageErrCount = &
 					//                                           ComfortControlledZone(RelativeZoneNum)%PeopleAverageErrCount + 1
 					if ( ComfortControlledZone( RelativeZoneNum ).PeopleAverageErrIndex == 0 ) {
-						ShowWarningMessage( "ZoneControl:Thermostat:ThermalComfort: The total number of people in Zone = " + trim( Zone( ActualZoneNum ).Name ) + " is zero. The People Average option is not used." );
+						ShowWarningMessage( "ZoneControl:Thermostat:ThermalComfort: The total number of people in Zone = " + Zone( ActualZoneNum ).Name + " is zero. The People Average option is not used." );
 						ShowContinueError( "The Object Average option is used instead. Simulation continues ....." );
-						ShowContinueErrorTimeStamp( " Occurrence info: " );
+						ShowContinueErrorTimeStamp( "Occurrence info:" );
 					}
-					ShowRecurringWarningErrorAtEnd( "ZoneControl:Thermostat:ThermalComfort: The total number of people in Zone = " + trim( Zone( ActualZoneNum ).Name ) + " is still zero. The People Average option is not used", ComfortControlledZone( RelativeZoneNum ).PeopleAverageErrIndex, PeopleCount, PeopleCount );
+					ShowRecurringWarningErrorAtEnd( "ZoneControl:Thermostat:ThermalComfort: The total number of people in Zone = " + Zone( ActualZoneNum ).Name + " is still zero. The People Average option is not used", ComfortControlledZone( RelativeZoneNum ).PeopleAverageErrIndex, PeopleCount, PeopleCount );
 					ObjectCount = 0;
 					SetPointLo = 0.0;
 					SetPointHi = 0.0;
@@ -5519,9 +5519,9 @@ namespace ZoneTempPredictorCorrector {
 					SetPointLo = ComfortControlledZone( RelativeZoneNum ).TdbMinSetPoint;
 					//          ComfortControlledZone(RelativeZoneNum)%TdbMinErrCount = ComfortControlledZone(RelativeZoneNum)%TdbMinErrCount + 1
 					if ( ComfortControlledZone( RelativeZoneNum ).TdbMinErrIndex < 2 ) {
-						ShowWarningMessage( "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating temperature is below " "the Minimum dry-bulb temperature setpoint " + trim( ComfortControlledZone( RelativeZoneNum ).Name ) );
+						ShowWarningMessage( "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating temperature is below " "the Minimum dry-bulb temperature setpoint " + ComfortControlledZone( RelativeZoneNum ).Name );
 						ShowContinueError( "The zone heating setpoint is set to the Minimum dry-bulb temperature setpoint" );
-						ShowContinueErrorTimeStamp( " Occurrence info: " );
+						ShowContinueErrorTimeStamp( "Occurrence info:" );
 					}
 					ShowRecurringWarningErrorAtEnd( "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating temperature is still" " below the Minimum dry-bulb temperature setpoint ...", ComfortControlledZone( RelativeZoneNum ).TdbMinErrIndex, SetPointLo, SetPointLo );
 				}
@@ -5535,9 +5535,9 @@ namespace ZoneTempPredictorCorrector {
 					SetPointLo = ComfortControlledZone( RelativeZoneNum ).TdbMaxSetPoint;
 					//          ComfortControlledZone(RelativeZoneNum)%TdbMaxErrCount = ComfortControlledZone(RelativeZoneNum)%TdbMaxErrCount + 1
 					if ( ComfortControlledZone( RelativeZoneNum ).TdbMaxErrIndex == 0 ) {
-						ShowWarningMessage( "ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling temperature is above  " "the Maximum dry-bulb temperature setpoint " + trim( ComfortControlledZone( RelativeZoneNum ).Name ) );
+						ShowWarningMessage( "ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling temperature is above  " "the Maximum dry-bulb temperature setpoint " + ComfortControlledZone( RelativeZoneNum ).Name );
 						ShowContinueError( "The zone cooling setpoint is set to the Maximum dry-bulb temperature setpoint" );
-						ShowContinueErrorTimeStamp( " Occurrence info: " );
+						ShowContinueErrorTimeStamp( "Occurrence info:" );
 					}
 					ShowRecurringWarningErrorAtEnd( "ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling temperature is still" " above the Maximum dry-bulb temperature setpoint ...", ComfortControlledZone( RelativeZoneNum ).TdbMaxErrIndex, SetPointLo, SetPointLo );
 				}
@@ -5555,9 +5555,9 @@ namespace ZoneTempPredictorCorrector {
 				if ( SetPointLo < ComfortControlledZone( RelativeZoneNum ).TdbMinSetPoint || SetPointLo > ComfortControlledZone( RelativeZoneNum ).TdbMaxSetPoint ) {
 					//          ComfortControlledZone(RelativeZoneNum)%TdbHCErrCount = ComfortControlledZone(RelativeZoneNum)%TdbHCErrCount + 1
 					if ( ComfortControlledZone( RelativeZoneNum ).TdbHCErrIndex == 0 ) {
-						ShowWarningMessage( "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling temperature is above  " "the Maximum or below the Minimum dry-bulb temperature setpoint " + trim( ComfortControlledZone( RelativeZoneNum ).Name ) );
+						ShowWarningMessage( "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling temperature is above  " "the Maximum or below the Minimum dry-bulb temperature setpoint " + ComfortControlledZone( RelativeZoneNum ).Name );
 						ShowContinueError( "The zone setpoint is set to the Maximum dry-bulb temperature setpoint if above or " "the Minimum dry-bulb temperature setpoint if below" );
-						ShowContinueErrorTimeStamp( " Occurrence info: " );
+						ShowContinueErrorTimeStamp( "Occurrence info:" );
 					}
 					ShowRecurringWarningErrorAtEnd( "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling " "temperature is still beyond the range between Maximum and Minimum dry-bulb temperature setpoint ...", ComfortControlledZone( RelativeZoneNum ).TdbHCErrIndex, SetPointLo, SetPointLo );
 				}
@@ -5572,9 +5572,9 @@ namespace ZoneTempPredictorCorrector {
 					SetPointLo = ComfortControlledZone( RelativeZoneNum ).TdbMinSetPoint;
 					//          ComfortControlledZone(RelativeZoneNum)%TdbDualMinErrCount = ComfortControlledZone(RelativeZoneNum)%TdbDualMinErrCount+1
 					if ( ComfortControlledZone( RelativeZoneNum ).TdbDualMinErrIndex == 0 ) {
-						ShowWarningMessage( "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is below " "the Minimum dry-bulb temperature setpoint " + trim( ComfortControlledZone( RelativeZoneNum ).Name ) );
+						ShowWarningMessage( "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is below " "the Minimum dry-bulb temperature setpoint " + ComfortControlledZone( RelativeZoneNum ).Name );
 						ShowContinueError( "The zone dual heating setpoint is set to the Minimum dry-bulb temperature setpoint" );
-						ShowContinueErrorTimeStamp( " Occurrence info: " );
+						ShowContinueErrorTimeStamp( "Occurrence info:" );
 					}
 					ShowRecurringWarningErrorAtEnd( "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is still" " below the Minimum dry-bulb temperature setpoint ...", ComfortControlledZone( RelativeZoneNum ).TdbDualMinErrIndex, SetPointLo, SetPointLo );
 				}
@@ -5582,9 +5582,9 @@ namespace ZoneTempPredictorCorrector {
 					SetPointHi = ComfortControlledZone( RelativeZoneNum ).TdbMaxSetPoint;
 					//          ComfortControlledZone(RelativeZoneNum)%TdbDualMaxErrCount = ComfortControlledZone(RelativeZoneNum)%TdbDualMaxErrCount + 1
 					if ( ComfortControlledZone( RelativeZoneNum ).TdbDualMaxErrIndex == 0 ) {
-						ShowWarningMessage( "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is above  " "the Maximum dry-bulb temperature setpoint " + trim( ComfortControlledZone( RelativeZoneNum ).Name ) );
+						ShowWarningMessage( "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is above  " "the Maximum dry-bulb temperature setpoint " + ComfortControlledZone( RelativeZoneNum ).Name );
 						ShowContinueError( "The zone dual cooling setpoint is set to the Maximum dry-bulb temperature setpoint" );
-						ShowContinueErrorTimeStamp( " Occurrence info: " );
+						ShowContinueErrorTimeStamp( "Occurrence info:" );
 					}
 					ShowRecurringWarningErrorAtEnd( "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is still" " above the Maximum dry-bulb temperature setpoint ...", ComfortControlledZone( RelativeZoneNum ).TdbDualMaxErrIndex, SetPointLo, SetPointLo );
 				}
@@ -5594,7 +5594,7 @@ namespace ZoneTempPredictorCorrector {
 				TempControlType( ActualZoneNum ) = DualSetPointWithDeadBand;
 
 			} else {
-				ShowSevereError( "CalcZoneAirComfortSetpoints: Illegal thermal control control type for Zone=" + trim( Zone( ActualZoneNum ).Name ) + ", Found value=" + trim( TrimSigDigits( ComfortControlType( ActualZoneNum ) ) ) + ", in Schedule=" + trim( ComfortControlledZone( ActualZoneNum ).ControlTypeSchedName ) );
+				ShowSevereError( "CalcZoneAirComfortSetpoints: Illegal thermal control control type for Zone=" + Zone( ActualZoneNum ).Name + ", Found value=" + TrimSigDigits( ComfortControlType( ActualZoneNum ) ) + ", in Schedule=" + ComfortControlledZone( ActualZoneNum ).ControlTypeSchedName );
 
 			}}
 
@@ -5674,18 +5674,18 @@ namespace ZoneTempPredictorCorrector {
 				if ( ! WarmupFlag ) {
 					++IterLimitExceededNum1;
 					if ( IterLimitExceededNum1 == 1 ) {
-						ShowWarningError( trim( ComfortControlledZone( ComfortControlNum ).Name ) + ": Iteration limit exceeded calculating thermal comfort Fanger setpoint and non-converged setpoint is used" );
+						ShowWarningError( ComfortControlledZone( ComfortControlNum ).Name + ": Iteration limit exceeded calculating thermal comfort Fanger setpoint and non-converged setpoint is used" );
 					} else {
-						ShowRecurringWarningErrorAtEnd( trim( ComfortControlledZone( ComfortControlNum ).Name ) + ":  Iteration limit exceeded calculating thermal comfort setpoint.", IterLimitErrIndex1, Tset, Tset );
+						ShowRecurringWarningErrorAtEnd( ComfortControlledZone( ComfortControlNum ).Name + ":  Iteration limit exceeded calculating thermal comfort setpoint.", IterLimitErrIndex1, Tset, Tset );
 					}
 				}
 			} else if ( SolFla == -2 ) {
 				if ( ! WarmupFlag ) {
 					++IterLimitExceededNum2;
 					if ( IterLimitExceededNum2 == 1 ) {
-						ShowWarningError( trim( ComfortControlledZone( ComfortControlNum ).Name ) + ": Solution is not found in calculating thermal comfort Fanger setpoint and the minimum setpoint is used" );
+						ShowWarningError( ComfortControlledZone( ComfortControlNum ).Name + ": Solution is not found in calculating thermal comfort Fanger setpoint and the minimum setpoint is used" );
 					} else {
-						ShowRecurringWarningErrorAtEnd( trim( ComfortControlledZone( ComfortControlNum ).Name ) + ":  Solution is not found in  calculating thermal comfort Fanger setpoint.", IterLimitErrIndex2, Tset, Tset );
+						ShowRecurringWarningErrorAtEnd( ComfortControlledZone( ComfortControlNum ).Name + ":  Solution is not found in  calculating thermal comfort Fanger setpoint.", IterLimitErrIndex2, Tset, Tset );
 					}
 				}
 			}

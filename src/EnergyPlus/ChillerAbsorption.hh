@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace ChillerAbsorption {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -54,7 +52,7 @@ namespace ChillerAbsorption {
 	struct BLASTAbsorberSpecs
 	{
 		// Members
-		Fstring Name; // user identifier
+		std::string Name; // user identifier
 		bool Available; // need an array of logicals--load identifiers of available equipment
 		bool ON; // simulate the machine at it's operating part load ratio
 		Real64 NomCap; // W - design nominal capacity of Absorber
@@ -105,7 +103,6 @@ namespace ChillerAbsorption {
 
 		// Default Constructor
 		BLASTAbsorberSpecs() :
-			Name( MaxNameLength ),
 			Available( false ),
 			ON( false ),
 			NomCap( 0.0 ),
@@ -156,7 +153,7 @@ namespace ChillerAbsorption {
 
 		// Member Constructor
 		BLASTAbsorberSpecs(
-			Fstring const & Name, // user identifier
+			std::string const & Name, // user identifier
 			bool const Available, // need an array of logicals--load identifiers of available equipment
 			bool const ON, // simulate the machine at it's operating part load ratio
 			Real64 const NomCap, // W - design nominal capacity of Absorber
@@ -204,7 +201,7 @@ namespace ChillerAbsorption {
 			bool const PossibleSubcooling, // flag to indicate chiller is doing less cooling that requested
 			bool const IsThisSized // TRUE if sizing is done
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			Available( Available ),
 			ON( ON ),
 			NomCap( NomCap ),
@@ -346,8 +343,8 @@ namespace ChillerAbsorption {
 
 	void
 	SimBLASTAbsorber(
-		Fstring const & AbsorberType, // type of Absorber
-		Fstring const & AbsorberName, // user specified name of Absorber
+		std::string const & AbsorberType, // type of Absorber
+		std::string const & AbsorberName, // user specified name of Absorber
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int const LoopNum, // Plant loop index for where called from
 		int const LoopSide, // Plant loop side index for where called from

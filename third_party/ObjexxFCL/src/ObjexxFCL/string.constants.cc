@@ -15,8 +15,7 @@
 
 namespace ObjexxFCL {
 
-std::string const READ_STOPPERS( '\n' + std::string( 1, std::char_traits< char >::eof() ) );
 std::string const VERSION( "4.0.0" );
-std::string const WHITESPACE( " \t\0", 3 ); // Need the 3 arg so it includes the nul
+std::string const WHITESPACE( " \t\0", 3 );
 
 } // ObjexxFCL

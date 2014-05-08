@@ -5,7 +5,6 @@
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <PlantUtilities.hh>
@@ -236,7 +235,7 @@ namespace PlantUtilities {
 		if ( LoopNum == 0 ) { // protect from hard crash below
 			if ( ! NullPlantErrorMsgIssued ) { // throw one dev error message
 				if ( InletNode > 0 ) {
-					ShowSevereError( "SetComponentFlowRate: trapped plant loop index = 0, check component with inlet node named=" + trim( NodeID( InletNode ) ) );
+					ShowSevereError( "SetComponentFlowRate: trapped plant loop index = 0, check component with inlet node named=" + NodeID( InletNode ) );
 				} else {
 					ShowSevereError( "SetComponentFlowRate: trapped plant loop node id = 0" );
 				}
@@ -276,8 +275,8 @@ namespace PlantUtilities {
 				// throw error for developers, need to change a componennt model to set hardware limits on inlet
 				if ( ! NodeErrorMsgIssued( InletNode ) ) {
 
-					ShowSevereError( "SetComponentFlowRate: check component model implementation for component with inlet node named=" + trim( NodeID( InletNode ) ) );
-					ShowContinueError( "Inlet node MassFlowRatMax = " + trim( RoundSigDigits( Node( InletNode ).MassFlowRateMax, 8 ) ) );
+					ShowSevereError( "SetComponentFlowRate: check component model implementation for component with inlet node named=" + NodeID( InletNode ) );
+					ShowContinueError( "Inlet node MassFlowRatMax = " + RoundSigDigits( Node( InletNode ).MassFlowRateMax, 8 ) );
 					NodeErrorMsgIssued( InletNode ) = true;
 				}
 			}
@@ -480,13 +479,13 @@ namespace PlantUtilities {
 				Node( ActuatedNode ).MassFlowRateRequest = MdotOldRequest;
 				if ( ( ( CompFlow - Node( ActuatedNode ).MassFlowRateMaxAvail ) > MassFlowTolerance ) || ( ( Node( ActuatedNode ).MassFlowRateMinAvail - CompFlow ) > MassFlowTolerance ) ) {
 					ShowSevereError( "SetActuatedBranchFlowRate: Flow rate is out of range" ); //DEBUG error...should never get here
-					ShowContinueErrorTimeStamp( " " );
-					ShowContinueError( "Component flow rate [kg/s] = " + trim( RoundSigDigits( CompFlow, 8 ) ) );
-					ShowContinueError( "Node maximum flow rate available [kg/s] = " + trim( RoundSigDigits( Node( ActuatedNode ).MassFlowRateMaxAvail, 8 ) ) );
-					ShowContinueError( "Node minimum flow rate available [kg/s] = " + trim( RoundSigDigits( Node( ActuatedNode ).MassFlowRateMinAvail, 8 ) ) );
+					ShowContinueErrorTimeStamp( "" );
+					ShowContinueError( "Component flow rate [kg/s] = " + RoundSigDigits( CompFlow, 8 ) );
+					ShowContinueError( "Node maximum flow rate available [kg/s] = " + RoundSigDigits( Node( ActuatedNode ).MassFlowRateMaxAvail, 8 ) );
+					ShowContinueError( "Node minimum flow rate available [kg/s] = " + RoundSigDigits( Node( ActuatedNode ).MassFlowRateMinAvail, 8 ) );
 				}
 			} else {
-				ShowFatalError( "SetActuatedBranchFlowRate: Flowlock out of range, value=" + trim( RoundSigDigits( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).FlowLock ) ) ); //DEBUG error...should never get here
+				ShowFatalError( "SetActuatedBranchFlowRate: Flowlock out of range, value=" + RoundSigDigits( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).FlowLock ) ); //DEBUG error...should never get here
 			}
 
 			for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
@@ -864,25 +863,25 @@ namespace PlantUtilities {
 				if ( AbsDifference > MassFlowTolerance ) {
 					if ( PlantLoop( LoopNum ).MFErrIndex1 == 0 ) {
 						ShowSevereMessage( "Plant flows do not resolve -- splitter inlet flow does not match mixer outlet flow " );
-						ShowContinueErrorTimeStamp( " " );
-						ShowContinueError( "PlantLoop name= " + trim( PlantLoop( LoopNum ).Name ) );
-						ShowContinueError( "Plant Connector:Mixer name= " + trim( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Mixer( MixNum ).Name ) );
-						ShowContinueError( "Mixer outlet mass flow rate= " + trim( RoundSigDigits( Node( MixerOutletNode ).MassFlowRate, 6 ) ) + " {kg/s}" );
-						ShowContinueError( "Plant Connector:Splitter name= " + trim( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Splitter( SplitNum ).Name ) );
-						ShowContinueError( "Splitter inlet mass flow rate= " + trim( RoundSigDigits( Node( SplitterInletNode ).MassFlowRate, 6 ) ) + " {kg/s}" );
-						ShowContinueError( "Difference in two mass flow rates= " + trim( RoundSigDigits( AbsDifference, 6 ) ) + " {kg/s}" );
+						ShowContinueErrorTimeStamp( "" );
+						ShowContinueError( "PlantLoop name= " + PlantLoop( LoopNum ).Name );
+						ShowContinueError( "Plant Connector:Mixer name= " + PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Mixer( MixNum ).Name );
+						ShowContinueError( "Mixer outlet mass flow rate= " + RoundSigDigits( Node( MixerOutletNode ).MassFlowRate, 6 ) + " {kg/s}" );
+						ShowContinueError( "Plant Connector:Splitter name= " + PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Splitter( SplitNum ).Name );
+						ShowContinueError( "Splitter inlet mass flow rate= " + RoundSigDigits( Node( SplitterInletNode ).MassFlowRate, 6 ) + " {kg/s}" );
+						ShowContinueError( "Difference in two mass flow rates= " + RoundSigDigits( AbsDifference, 6 ) + " {kg/s}" );
 					}
-					ShowRecurringSevereErrorAtEnd( "Plant Flows (Loop=" + trim( PlantLoop( LoopNum ).Name ) + ") splitter inlet flow not match mixer outlet flow", PlantLoop( LoopNum ).MFErrIndex1, AbsDifference, AbsDifference, _, "kg/s", "kg/s" );
+					ShowRecurringSevereErrorAtEnd( "Plant Flows (Loop=" + PlantLoop( LoopNum ).Name + ") splitter inlet flow not match mixer outlet flow", PlantLoop( LoopNum ).MFErrIndex1, AbsDifference, AbsDifference, _, "kg/s", "kg/s" );
 					if ( AbsDifference > MassFlowTolerance * 10.0 ) {
 						ShowSevereError( "Plant flows do not resolve -- splitter inlet flow does not match mixer outlet flow " );
-						ShowContinueErrorTimeStamp( " " );
-						ShowContinueError( "PlantLoop name= " + trim( PlantLoop( LoopNum ).Name ) );
-						ShowContinueError( "Plant Connector:Mixer name= " + trim( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Mixer( MixNum ).Name ) );
-						ShowContinueError( "Mixer outlet mass flow rate= " + trim( RoundSigDigits( Node( MixerOutletNode ).MassFlowRate, 6 ) ) + " {kg/s}" );
-						ShowContinueError( "Plant Connector:Splitter name= " + trim( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Splitter( SplitNum ).Name ) );
-						ShowContinueError( "Splitter inlet mass flow rate= " + trim( RoundSigDigits( Node( SplitterInletNode ).MassFlowRate, 6 ) ) + " {kg/s}" );
-						ShowContinueError( "Difference in two mass flow rates= " + trim( RoundSigDigits( AbsDifference, 6 ) ) + " {kg/s}" );
-						ShowFatalError( "CheckPlantMixerSplitterConsistency: " "Simulation terminated because of problems in plant flow resolver" );
+						ShowContinueErrorTimeStamp( "" );
+						ShowContinueError( "PlantLoop name= " + PlantLoop( LoopNum ).Name );
+						ShowContinueError( "Plant Connector:Mixer name= " + PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Mixer( MixNum ).Name );
+						ShowContinueError( "Mixer outlet mass flow rate= " + RoundSigDigits( Node( MixerOutletNode ).MassFlowRate, 6 ) + " {kg/s}" );
+						ShowContinueError( "Plant Connector:Splitter name= " + PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Splitter( SplitNum ).Name );
+						ShowContinueError( "Splitter inlet mass flow rate= " + RoundSigDigits( Node( SplitterInletNode ).MassFlowRate, 6 ) + " {kg/s}" );
+						ShowContinueError( "Difference in two mass flow rates= " + RoundSigDigits( AbsDifference, 6 ) + " {kg/s}" );
+						ShowFatalError( "CheckPlantMixerSplitterConsistency: Simulation terminated because of problems in plant flow resolver" );
 					}
 				}
 
@@ -903,15 +902,15 @@ namespace PlantUtilities {
 				if ( AbsDifference > CriteriaDelta_MassFlowRate ) {
 					if ( PlantLoop( LoopNum ).MFErrIndex2 == 0 ) {
 						ShowSevereMessage( "Plant flows do not resolve -- splitter inlet flow does not match branch outlet flows" );
-						ShowContinueErrorTimeStamp( " " );
-						ShowContinueError( "PlantLoop name= " + trim( PlantLoop( LoopNum ).Name ) );
-						ShowContinueError( "Plant Connector:Mixer name= " + trim( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Mixer( MixNum ).Name ) );
-						ShowContinueError( "Sum of Branch outlet mass flow rates= " + trim( RoundSigDigits( SumOutletFlow, 6 ) ) + " {kg/s}" );
-						ShowContinueError( "Plant Connector:Splitter name= " + trim( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Splitter( SplitNum ).Name ) );
-						ShowContinueError( "Splitter inlet mass flow rate= " + trim( RoundSigDigits( Node( SplitterInletNode ).MassFlowRate, 6 ) ) + " {kg/s}" );
-						ShowContinueError( "Difference in two mass flow rates= " + trim( RoundSigDigits( AbsDifference, 6 ) ) + " {kg/s}" );
+						ShowContinueErrorTimeStamp( "" );
+						ShowContinueError( "PlantLoop name= " + PlantLoop( LoopNum ).Name );
+						ShowContinueError( "Plant Connector:Mixer name= " + PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Mixer( MixNum ).Name );
+						ShowContinueError( "Sum of Branch outlet mass flow rates= " + RoundSigDigits( SumOutletFlow, 6 ) + " {kg/s}" );
+						ShowContinueError( "Plant Connector:Splitter name= " + PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Splitter( SplitNum ).Name );
+						ShowContinueError( "Splitter inlet mass flow rate= " + RoundSigDigits( Node( SplitterInletNode ).MassFlowRate, 6 ) + " {kg/s}" );
+						ShowContinueError( "Difference in two mass flow rates= " + RoundSigDigits( AbsDifference, 6 ) + " {kg/s}" );
 					}
-					ShowRecurringSevereErrorAtEnd( "Plant Flows (Loop=" + trim( PlantLoop( LoopNum ).Name ) + ") splitter inlet flow does not match branch outlet flows", PlantLoop( LoopNum ).MFErrIndex2, AbsDifference, AbsDifference, _, "kg/s", "kg/s" );
+					ShowRecurringSevereErrorAtEnd( "Plant Flows (Loop=" + PlantLoop( LoopNum ).Name + ") splitter inlet flow does not match branch outlet flows", PlantLoop( LoopNum ).MFErrIndex2, AbsDifference, AbsDifference, _, "kg/s", "kg/s" );
 					//        IF (AbsDifference > CriteriaDelta_MassFlowRate*10.0d0) THEN
 					//          CALL ShowSevereError('Plant flows do not resolve -- splitter inlet flow does not match branch outlet flows')
 					//          CALL ShowContinueErrorTimeStamp(' ')
@@ -985,9 +984,9 @@ namespace PlantUtilities {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Fstring hotcold( 4 );
+		std::string hotcold;
 		bool makefatalerror;
-		Fstring DemandSupply( 10 );
+		std::string DemandSupply;
 		int LSN;
 		int BrN;
 		int CpN;
@@ -1002,7 +1001,7 @@ namespace PlantUtilities {
 		if ( Node( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).NodeNumOut ).Temp > ( PlantLoop( LoopNum ).MaxTemp + OverShootOffset ) ) {
 
 			// first stage, throw recurring warning that plant loop is getting out of control
-			ShowRecurringWarningErrorAtEnd( "Plant loop exceeding upper temperature limit, PlantLoop=\"" + trim( PlantLoop( LoopNum ).Name ) + "\"", PlantLoop( LoopNum ).MaxTempErrIndex, Node( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).NodeNumOut ).Temp );
+			ShowRecurringWarningErrorAtEnd( "Plant loop exceeding upper temperature limit, PlantLoop=\"" + PlantLoop( LoopNum ).Name + "\"", PlantLoop( LoopNum ).MaxTempErrIndex, Node( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).NodeNumOut ).Temp );
 
 			if ( Node( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).NodeNumOut ).Temp > ( PlantLoop( LoopNum ).MaxTemp + FatalOverShootOffset ) ) {
 				hotcold = "hot";
@@ -1014,7 +1013,7 @@ namespace PlantUtilities {
 		if ( Node( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).NodeNumOut ).Temp < ( PlantLoop( LoopNum ).MinTemp - UnderShootOffset ) ) {
 
 			// first stage, throw recurring warning that plant loop is getting out of control
-			ShowRecurringWarningErrorAtEnd( "Plant loop falling below lower temperature limit, PlantLoop=\"" + trim( PlantLoop( LoopNum ).Name ) + "\"", PlantLoop( LoopNum ).MinTempErrIndex, _, Node( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).NodeNumOut ).Temp );
+			ShowRecurringWarningErrorAtEnd( "Plant loop falling below lower temperature limit, PlantLoop=\"" + PlantLoop( LoopNum ).Name + "\"", PlantLoop( LoopNum ).MinTempErrIndex, _, Node( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).NodeNumOut ).Temp );
 
 			if ( Node( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).NodeNumOut ).Temp < ( PlantLoop( LoopNum ).MinTemp - FatalUnderShootOffset ) ) {
 				hotcold = "cold";
@@ -1024,7 +1023,7 @@ namespace PlantUtilities {
 		}
 
 		if ( makefatalerror ) {
-			ShowSevereError( "Plant temperatures are getting far too " + trim( hotcold ) + ", check controls and relative loads and capacities" );
+			ShowSevereError( "Plant temperatures are getting far too " + hotcold + ", check controls and relative loads and capacities" );
 			ShowContinueErrorTimeStamp( "" );
 			if ( LoopSideNum == DemandSide ) {
 				DemandSupply = "Demand";
@@ -1033,8 +1032,8 @@ namespace PlantUtilities {
 			} else {
 				DemandSupply = "Unknown";
 			}
-			ShowContinueError( "PlantLoop Name (" + trim( DemandSupply ) + "Side)= " + trim( PlantLoop( LoopNum ).Name ) );
-			ShowContinueError( "PlantLoop Setpoint Temperature=" + trim( RoundSigDigits( Node( PlantLoop( LoopNum ).TempSetPointNodeNum ).TempSetPoint, 1 ) ) + " {C}" );
+			ShowContinueError( "PlantLoop Name (" + DemandSupply + "Side)= " + PlantLoop( LoopNum ).Name );
+			ShowContinueError( "PlantLoop Setpoint Temperature=" + RoundSigDigits( Node( PlantLoop( LoopNum ).TempSetPointNodeNum ).TempSetPoint, 1 ) + " {C}" );
 			if ( PlantLoop( LoopNum ).LoopSide( SupplySide ).InletNodeSetPt ) {
 				ShowContinueError( "PlantLoop Inlet Node (SupplySide) has a Setpoint." );
 			} else {
@@ -1055,19 +1054,19 @@ namespace PlantUtilities {
 			} else {
 				ShowContinueError( "PlantLoop Outlet Node (DemandSide) does not have a Setpoint." );
 			}
-			ShowContinueError( "PlantLoop Outlet Node (" + trim( DemandSupply ) + "Side) \"" + trim( NodeID( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).NodeNumOut ) ) + "\" has temperature=" + trim( RoundSigDigits( Node( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).NodeNumOut ).Temp, 1 ) ) + " {C}" );
-			ShowContinueError( "PlantLoop  Inlet Node (" + trim( DemandSupply ) + "Side) \"" + trim( NodeID( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).NodeNumIn ) ) + "\" has temperature=" + trim( RoundSigDigits( Node( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).NodeNumIn ).Temp, 1 ) ) + " {C}" );
-			ShowContinueError( "PlantLoop Minimum Temperature=" + trim( RoundSigDigits( PlantLoop( LoopNum ).MinTemp, 1 ) ) + " {C}" );
-			ShowContinueError( "PlantLoop Maximum Temperature=" + trim( RoundSigDigits( PlantLoop( LoopNum ).MaxTemp, 1 ) ) + " {C}" );
-			ShowContinueError( "PlantLoop Flow Request (SupplySide)=" + trim( RoundSigDigits( PlantLoop( LoopNum ).LoopSide( SupplySide ).FlowRequest, 1 ) ) + " {kg/s}" );
-			ShowContinueError( "PlantLoop Flow Request (DemandSide)=" + trim( RoundSigDigits( PlantLoop( LoopNum ).LoopSide( DemandSide ).FlowRequest, 1 ) ) + " {kg/s}" );
-			ShowContinueError( "PlantLoop Node (" + trim( DemandSupply ) + "Side) \"" + trim( NodeID( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).NodeNumOut ) ) + "\" has mass flow rate =" + trim( RoundSigDigits( Node( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).NodeNumOut ).MassFlowRate, 1 ) ) + " {kg/s}" );
-			ShowContinueError( "PlantLoop PumpHeat (SupplySide)=" + trim( RoundSigDigits( PlantLoop( LoopNum ).LoopSide( SupplySide ).TotalPumpHeat, 1 ) ) + " {W}" );
-			ShowContinueError( "PlantLoop PumpHeat (DemandSide)=" + trim( RoundSigDigits( PlantLoop( LoopNum ).LoopSide( DemandSide ).TotalPumpHeat, 1 ) ) + " {W}" );
-			ShowContinueError( "PlantLoop Cooling Demand=" + trim( RoundSigDigits( PlantReport( LoopNum ).CoolingDemand, 1 ) ) + " {W}" );
-			ShowContinueError( "PlantLoop Heating Demand=" + trim( RoundSigDigits( PlantReport( LoopNum ).HeatingDemand, 1 ) ) + " {W}" );
-			ShowContinueError( "PlantLoop Demand not Dispatched=" + trim( RoundSigDigits( PlantReport( LoopNum ).DemandNotDispatched, 1 ) ) + " {W}" );
-			ShowContinueError( "PlantLoop Unmet Demand=" + trim( RoundSigDigits( PlantReport( LoopNum ).UnmetDemand, 1 ) ) + " {W}" );
+			ShowContinueError( "PlantLoop Outlet Node (" + DemandSupply + "Side) \"" + NodeID( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).NodeNumOut ) + "\" has temperature=" + RoundSigDigits( Node( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).NodeNumOut ).Temp, 1 ) + " {C}" );
+			ShowContinueError( "PlantLoop  Inlet Node (" + DemandSupply + "Side) \"" + NodeID( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).NodeNumIn ) + "\" has temperature=" + RoundSigDigits( Node( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).NodeNumIn ).Temp, 1 ) + " {C}" );
+			ShowContinueError( "PlantLoop Minimum Temperature=" + RoundSigDigits( PlantLoop( LoopNum ).MinTemp, 1 ) + " {C}" );
+			ShowContinueError( "PlantLoop Maximum Temperature=" + RoundSigDigits( PlantLoop( LoopNum ).MaxTemp, 1 ) + " {C}" );
+			ShowContinueError( "PlantLoop Flow Request (SupplySide)=" + RoundSigDigits( PlantLoop( LoopNum ).LoopSide( SupplySide ).FlowRequest, 1 ) + " {kg/s}" );
+			ShowContinueError( "PlantLoop Flow Request (DemandSide)=" + RoundSigDigits( PlantLoop( LoopNum ).LoopSide( DemandSide ).FlowRequest, 1 ) + " {kg/s}" );
+			ShowContinueError( "PlantLoop Node (" + DemandSupply + "Side) \"" + NodeID( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).NodeNumOut ) + "\" has mass flow rate =" + RoundSigDigits( Node( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).NodeNumOut ).MassFlowRate, 1 ) + " {kg/s}" );
+			ShowContinueError( "PlantLoop PumpHeat (SupplySide)=" + RoundSigDigits( PlantLoop( LoopNum ).LoopSide( SupplySide ).TotalPumpHeat, 1 ) + " {W}" );
+			ShowContinueError( "PlantLoop PumpHeat (DemandSide)=" + RoundSigDigits( PlantLoop( LoopNum ).LoopSide( DemandSide ).TotalPumpHeat, 1 ) + " {W}" );
+			ShowContinueError( "PlantLoop Cooling Demand=" + RoundSigDigits( PlantReport( LoopNum ).CoolingDemand, 1 ) + " {W}" );
+			ShowContinueError( "PlantLoop Heating Demand=" + RoundSigDigits( PlantReport( LoopNum ).HeatingDemand, 1 ) + " {W}" );
+			ShowContinueError( "PlantLoop Demand not Dispatched=" + RoundSigDigits( PlantReport( LoopNum ).DemandNotDispatched, 1 ) + " {W}" );
+			ShowContinueError( "PlantLoop Unmet Demand=" + RoundSigDigits( PlantReport( LoopNum ).UnmetDemand, 1 ) + " {W}" );
 
 			LoopCapacity = 0.0;
 			DispatchedCapacity = 0.0;
@@ -1086,13 +1085,13 @@ namespace PlantUtilities {
 					LoopSupplySideDispatchedCapacity = DispatchedCapacity - LoopDemandSideDispatchedCapacity;
 				}
 			}
-			ShowContinueError( "PlantLoop Capacity=" + trim( RoundSigDigits( LoopCapacity, 1 ) ) + " {W}" );
-			ShowContinueError( "PlantLoop Capacity (SupplySide)=" + trim( RoundSigDigits( LoopSupplySideCapacity, 1 ) ) + " {W}" );
-			ShowContinueError( "PlantLoop Capacity (DemandSide)=" + trim( RoundSigDigits( LoopDemandSideCapacity, 1 ) ) + " {W}" );
-			ShowContinueError( "PlantLoop Operation Scheme=" + trim( PlantLoop( LoopNum ).OperationScheme ) );
-			ShowContinueError( "PlantLoop Operation Dispatched Load = " + trim( RoundSigDigits( DispatchedCapacity, 1 ) ) + " {W}" );
-			ShowContinueError( "PlantLoop Operation Dispatched Load (SupplySide)= " + trim( RoundSigDigits( LoopSupplySideDispatchedCapacity, 1 ) ) + " {W}" );
-			ShowContinueError( "PlantLoop Operation Dispatched Load (DemandSide)= " + trim( RoundSigDigits( LoopDemandSideDispatchedCapacity, 1 ) ) + " {W}" );
+			ShowContinueError( "PlantLoop Capacity=" + RoundSigDigits( LoopCapacity, 1 ) + " {W}" );
+			ShowContinueError( "PlantLoop Capacity (SupplySide)=" + RoundSigDigits( LoopSupplySideCapacity, 1 ) + " {W}" );
+			ShowContinueError( "PlantLoop Capacity (DemandSide)=" + RoundSigDigits( LoopDemandSideCapacity, 1 ) + " {W}" );
+			ShowContinueError( "PlantLoop Operation Scheme=" + PlantLoop( LoopNum ).OperationScheme );
+			ShowContinueError( "PlantLoop Operation Dispatched Load = " + RoundSigDigits( DispatchedCapacity, 1 ) + " {W}" );
+			ShowContinueError( "PlantLoop Operation Dispatched Load (SupplySide)= " + RoundSigDigits( LoopSupplySideDispatchedCapacity, 1 ) + " {W}" );
+			ShowContinueError( "PlantLoop Operation Dispatched Load (DemandSide)= " + RoundSigDigits( LoopDemandSideDispatchedCapacity, 1 ) + " {W}" );
 			ShowContinueError( "Branches on the Loop." );
 			ShowBranchesOnLoop( LoopNum );
 			ShowContinueError( "*************************" );
@@ -1102,7 +1101,7 @@ namespace PlantUtilities {
 			ShowContinueError( "    lots of node time series data to see what is going wrong." );
 			ShowContinueError( "  If this is happening during Warmup, you can use Output:Diagnostics,ReportDuringWarmup;" );
 			ShowContinueError( "  This is detected at the loop level, but the typical problems are in the components." );
-			ShowFatalError( "CheckForRunawayPlantTemps: Simulation terminated because of run away plant temperatures, too " + trim( hotcold ) );
+			ShowFatalError( "CheckForRunawayPlantTemps: Simulation terminated because of run away plant temperatures, too " + hotcold );
 		}
 
 	}

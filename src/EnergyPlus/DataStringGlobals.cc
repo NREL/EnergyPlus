@@ -32,29 +32,33 @@ namespace DataStringGlobals {
 	// Thus, all variables in this module must be PUBLIC.
 
 	// MODULE PARAMETER DEFINITIONS:
-	Fstring const UpperCase( "ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖØÙÚÛÜİ" );
-	Fstring const LowerCase( "abcdefghijklmnopqrstuvwxyzàáâãäåæçèéêëìíîïğñòóôõöøùúûüı" );
-	Fstring const AccentedUpperCase( "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖØÙÚÛÜİ" );
-	Fstring const AccentedLowerCase( "àáâãäåæçèéêëìíîïğñòóôõöøùúûüı" );
-	Fstring const AllCase( "àáâãäåæçèéêëìíîïğñòóôõöøùúûüıÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖØÙÚÛÜİABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" );
-#ifdef WINDOWS
-	Fstring const pathChar( "\\" );
-	Fstring const altpathChar( "/" );
-#elif defined LINUX
-	Fstring const pathChar( "/" );
-	Fstring const altpathChar( "\\" );
-#elif defined MAC
-	Fstring const pathChar( "/" );
-	Fstring const altpathChar( "\\" );
+	std::string const UpperCase( "ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖØÙÚÛÜİ" );
+	std::string const LowerCase( "abcdefghijklmnopqrstuvwxyzàáâãäåæçèéêëìíîïğñòóôõöøùúûüı" );
+	std::string const AccentedUpperCase( "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖØÙÚÛÜİ" );
+	std::string const AccentedLowerCase( "àáâãäåæçèéêëìíîïğñòóôõöøùúûüı" );
+	std::string const AllCase( "àáâãäåæçèéêëìíîïğñòóôõöøùúûüıÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖØÙÚÛÜİABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" );
+#ifdef _WIN32
+	char const pathChar( '\\' );
+	char const altpathChar( '/' );
+#elif __linux__
+	char const pathChar( '/' );
+	char const altpathChar( '\\' );
+#elif __unix__
+	char const pathChar( '/' );
+	char const altpathChar( '\\' );
+#elif __posix__
+	char const pathChar( '/' );
+	char const altpathChar( '\\' );
+#elif __APPLE__
+	char const pathChar( '/' );
+	char const altpathChar( '\\' );
 #else
-	Fstring const pathChar( "\\" ); // default to Windows
-	Fstring const altpathChar( "/" );
+#error "Invalid platform detection in DataStringGlobals."
 #endif
-	int const PathLimit( 255 );
-	Fstring const CharComma( 1, CHAR( 44 ) ); // comma
-	Fstring const CharSemicolon( 1, CHAR( 59 ) ); // semicolon
-	Fstring const CharTab( 1, CHAR( 9 ) ); // tab
-	Fstring const CharSpace( 1, CHAR( 32 ) ); // space
+	char const CharComma( ',' ); // comma
+	char const CharSemicolon( ';' ); // semicolon
+	char const CharTab( '\t' ); // tab
+	char const CharSpace( ' ' ); // space
 
 	// DERIVED TYPE DEFINITIONS
 	// na
@@ -63,13 +67,13 @@ namespace DataStringGlobals {
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
-	Fstring ProgramPath( PathLimit ); // Path for Program from Energy+.ini
-	Fstring CurrentWorkingFolder( PathLimit ); // Current working directory for run
-	Fstring FullName( PathLimit + 15 ); // Full name of file to open, including path
-	Fstring IDDVerString( 120 ); // Version information from the IDD (line 1)
-	Fstring VerString( 120, "EnergyPlus, Version 8.1" ); // String that represents version information
-	Fstring MatchVersion( "8.1.0" ); // String to be matched by Version object
-	Fstring CurrentDateTime( 40 ); // For printing current date and time at start of run
+	std::string ProgramPath; // Path for Program from Energy+.ini
+	std::string CurrentWorkingFolder; // Current working directory for run
+	std::string FullName; // Full name of file to open, including path
+	std::string IDDVerString; // Version information from the IDD (line 1)
+	std::string VerString( "EnergyPlus, Version 8.1" ); // String that represents version information
+	std::string MatchVersion( "8.1.0" ); // String to be matched by Version object
+	std::string CurrentDateTime; // For printing current date and time at start of run
 
 	//     NOTICE
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois

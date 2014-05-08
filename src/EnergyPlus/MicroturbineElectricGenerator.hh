@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -16,11 +15,10 @@ namespace MicroturbineElectricGenerator {
 
 	// Using/Aliasing
 	using DataGlobalConstants::iGeneratorMicroturbine;
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
-	extern Fstring const Blank;
+	extern std::string const Blank;
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -38,7 +36,7 @@ namespace MicroturbineElectricGenerator {
 	{
 		// Members
 		//      User inputs
-		Fstring Name; // User identifier (name)
+		std::string Name; // User identifier (name)
 		Real64 RefElecPowerOutput; // Reference Electrical Power Output from generator (W)
 		Real64 MinElecPowerOutput; // Minimum Electrical Power Output (W)
 		Real64 MaxElecPowerOutput; // Maximum Electrical Power Output (W)
@@ -146,7 +144,6 @@ namespace MicroturbineElectricGenerator {
 
 		// Default Constructor
 		MTGeneratorSpecs() :
-			Name( MaxNameLength ),
 			RefElecPowerOutput( 0.0 ),
 			MinElecPowerOutput( 0.0 ),
 			MaxElecPowerOutput( 0.0 ),
@@ -236,7 +233,7 @@ namespace MicroturbineElectricGenerator {
 
 		// Member Constructor
 		MTGeneratorSpecs(
-			Fstring const & Name, // User identifier (name)
+			std::string const & Name, // User identifier (name)
 			Real64 const RefElecPowerOutput, // Reference Electrical Power Output from generator (W)
 			Real64 const MinElecPowerOutput, // Minimum Electrical Power Output (W)
 			Real64 const MaxElecPowerOutput, // Maximum Electrical Power Output (W)
@@ -323,7 +320,7 @@ namespace MicroturbineElectricGenerator {
 			int const HeatRecRateFFlowErrorIndex, // Index to heat recovery rate as a function of flow warning messages
 			int const ThermEffFTempElevErrorIndex // Index to thermal efficiency as a function of temp/elevation warnings
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			RefElecPowerOutput( RefElecPowerOutput ),
 			MinElecPowerOutput( MinElecPowerOutput ),
 			MaxElecPowerOutput( MaxElecPowerOutput ),
@@ -509,7 +506,7 @@ namespace MicroturbineElectricGenerator {
 	void
 	SimMTGenerator(
 		int const GeneratorType, // Type of generator !unused1208
-		Fstring const & GeneratorName, // User-specified name of generator
+		std::string const & GeneratorName, // User-specified name of generator
 		int & GeneratorIndex, // Index to microturbine generator
 		bool const RunFlag, // Simulate generator when TRUE
 		Real64 const MyLoad, // Generator demand (W)
@@ -518,8 +515,8 @@ namespace MicroturbineElectricGenerator {
 
 	void
 	SimMTPlantHeatRecovery(
-		Fstring const & CompType, // unused1208
-		Fstring const & CompName,
+		std::string const & CompType, // unused1208
+		std::string const & CompName,
 		int const CompTypeNum, // unused1208
 		int & CompNum,
 		bool const RunFlag, // unused1208
@@ -590,7 +587,7 @@ namespace MicroturbineElectricGenerator {
 	void
 	GetMTGeneratorExhaustNode(
 		int const CompType,
-		Fstring const & CompName,
+		std::string const & CompName,
 		int & ExhaustOutletNodeNum
 	);
 

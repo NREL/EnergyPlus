@@ -5,6 +5,7 @@
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <PlantChillers.hh>
@@ -172,7 +173,7 @@ namespace PlantChillers {
 		int const LoopNum, // Flow control mode for the equipment
 		int const LoopSide, // chiller number pointer
 		int const ChillerType, // type of chiller
-		Fstring const & ChillerName, // user specified name of chiller
+		std::string const & ChillerName, // user specified name of chiller
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // chiller number pointer
 		bool const RunFlag, // simulate chiller when TRUE
@@ -235,17 +236,17 @@ namespace PlantChillers {
 			if ( CompIndex == 0 ) {
 				ChillNum = FindItemInList( ChillerName, ElectricChiller.ma( &ElectricChillerSpecs::Base ).Name(), NumElectricChillers );
 				if ( ChillNum == 0 ) {
-					ShowFatalError( "SimElectricChiller: Specified Chiller not one of Valid Electric Chillers=" + trim( ChillerName ) );
+					ShowFatalError( "SimElectricChiller: Specified Chiller not one of Valid Electric Chillers=" + ChillerName );
 				}
 				CompIndex = ChillNum;
 			} else {
 				ChillNum = CompIndex;
 				if ( ChillNum > NumElectricChillers || ChillNum < 1 ) {
-					ShowFatalError( "SimElectricChiller:  Invalid CompIndex passed=" + trim( TrimSigDigits( ChillNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumElectricChillers ) ) + ", Entered Unit name=" + trim( ChillerName ) );
+					ShowFatalError( "SimElectricChiller:  Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Number of Units=" + TrimSigDigits( NumElectricChillers ) + ", Entered Unit name=" + ChillerName );
 				}
 				if ( ElectricChiller( ChillNum ).Base.CheckEquipName ) {
 					if ( ChillerName != ElectricChiller( ChillNum ).Base.Name ) {
-						ShowFatalError( "SimElectricChiller: Invalid CompIndex passed=" + trim( TrimSigDigits( ChillNum ) ) + ", Unit name=" + trim( ChillerName ) + ", stored Unit Name for that index=" + trim( ElectricChiller( ChillNum ).Base.Name ) );
+						ShowFatalError( "SimElectricChiller: Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Unit name=" + ChillerName + ", stored Unit Name for that index=" + ElectricChiller( ChillNum ).Base.Name );
 					}
 					ElectricChiller( ChillNum ).Base.CheckEquipName = false;
 				}
@@ -297,17 +298,17 @@ namespace PlantChillers {
 			if ( CompIndex == 0 ) {
 				ChillNum = FindItemInList( ChillerName, EngineDrivenChiller.ma( &EngineDrivenChillerSpecs::Base ).Name(), NumEngineDrivenChillers );
 				if ( ChillNum == 0 ) {
-					ShowFatalError( "SimEngineDrivenChiller: Specified Chiller not one of Valid EngineDriven Chillers=" + trim( ChillerName ) );
+					ShowFatalError( "SimEngineDrivenChiller: Specified Chiller not one of Valid EngineDriven Chillers=" + ChillerName );
 				}
 				CompIndex = ChillNum;
 			} else {
 				ChillNum = CompIndex;
 				if ( ChillNum > NumEngineDrivenChillers || ChillNum < 1 ) {
-					ShowFatalError( "SimEngineDrivenChiller:  Invalid CompIndex passed=" + trim( TrimSigDigits( ChillNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumEngineDrivenChillers ) ) + ", Entered Unit name=" + trim( ChillerName ) );
+					ShowFatalError( "SimEngineDrivenChiller:  Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Number of Units=" + TrimSigDigits( NumEngineDrivenChillers ) + ", Entered Unit name=" + ChillerName );
 				}
 				if ( EngineDrivenChiller( ChillNum ).Base.CheckEquipName ) {
 					if ( ChillerName != EngineDrivenChiller( ChillNum ).Base.Name ) {
-						ShowFatalError( "SimEngineDrivenChiller: Invalid CompIndex passed=" + trim( TrimSigDigits( ChillNum ) ) + ", Unit name=" + trim( ChillerName ) + ", stored Unit Name for that index=" + trim( EngineDrivenChiller( ChillNum ).Base.Name ) );
+						ShowFatalError( "SimEngineDrivenChiller: Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Unit name=" + ChillerName + ", stored Unit Name for that index=" + EngineDrivenChiller( ChillNum ).Base.Name );
 					}
 					EngineDrivenChiller( ChillNum ).Base.CheckEquipName = false;
 				}
@@ -356,17 +357,17 @@ namespace PlantChillers {
 			if ( CompIndex == 0 ) {
 				ChillNum = FindItemInList( ChillerName, GTChiller.ma( &GTChillerSpecs::Base ).Name(), NumGTChillers );
 				if ( ChillNum == 0 ) {
-					ShowFatalError( "SimGTChiller: Specified Chiller not one of Valid Gas Turbine Chillers=" + trim( ChillerName ) );
+					ShowFatalError( "SimGTChiller: Specified Chiller not one of Valid Gas Turbine Chillers=" + ChillerName );
 				}
 				CompIndex = ChillNum;
 			} else {
 				ChillNum = CompIndex;
 				if ( ChillNum > NumGTChillers || ChillNum < 1 ) {
-					ShowFatalError( "SimGTChiller:  Invalid CompIndex passed=" + trim( TrimSigDigits( ChillNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumGTChillers ) ) + ", Entered Unit name=" + trim( ChillerName ) );
+					ShowFatalError( "SimGTChiller:  Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Number of Units=" + TrimSigDigits( NumGTChillers ) + ", Entered Unit name=" + ChillerName );
 				}
 				if ( GTChiller( ChillNum ).Base.CheckEquipName ) {
 					if ( ChillerName != GTChiller( ChillNum ).Base.Name ) {
-						ShowFatalError( "SimGTChiller: Invalid CompIndex passed=" + trim( TrimSigDigits( ChillNum ) ) + ", Unit name=" + trim( ChillerName ) + ", stored Unit Name for that index=" + trim( GTChiller( ChillNum ).Base.Name ) );
+						ShowFatalError( "SimGTChiller: Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Unit name=" + ChillerName + ", stored Unit Name for that index=" + GTChiller( ChillNum ).Base.Name );
 					}
 					GTChiller( ChillNum ).Base.CheckEquipName = false;
 				}
@@ -419,17 +420,17 @@ namespace PlantChillers {
 			if ( CompIndex == 0 ) {
 				ChillNum = FindItemInList( ChillerName, ConstCOPChiller.ma( &ConstCOPChillerSpecs::Base ).Name(), NumConstCOPChillers );
 				if ( ChillNum == 0 ) {
-					ShowFatalError( "SimConstCOPChiller: Specified Chiller not one of Valid Constant COP Chillers=" + trim( ChillerName ) );
+					ShowFatalError( "SimConstCOPChiller: Specified Chiller not one of Valid Constant COP Chillers=" + ChillerName );
 				}
 				CompIndex = ChillNum;
 			} else {
 				ChillNum = CompIndex;
 				if ( ChillNum > NumConstCOPChillers || ChillNum < 1 ) {
-					ShowFatalError( "SimConstCOPChiller:  Invalid CompIndex passed=" + trim( TrimSigDigits( ChillNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumConstCOPChillers ) ) + ", Entered Unit name=" + trim( ChillerName ) );
+					ShowFatalError( "SimConstCOPChiller:  Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Number of Units=" + TrimSigDigits( NumConstCOPChillers ) + ", Entered Unit name=" + ChillerName );
 				}
 				if ( ConstCOPChiller( ChillNum ).Base.CheckEquipName ) {
 					if ( ChillerName != ConstCOPChiller( ChillNum ).Base.Name ) {
-						ShowFatalError( "SimConstCOPChiller: Invalid CompIndex passed=" + trim( TrimSigDigits( ChillNum ) ) + ", Unit name=" + trim( ChillerName ) + ", stored Unit Name for that index=" + trim( ConstCOPChiller( ChillNum ).Base.Name ) );
+						ShowFatalError( "SimConstCOPChiller: Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Unit name=" + ChillerName + ", stored Unit Name for that index=" + ConstCOPChiller( ChillNum ).Base.Name );
 					}
 					ConstCOPChiller( ChillNum ).Base.CheckEquipName = false;
 				}
@@ -504,7 +505,7 @@ namespace PlantChillers {
 
 		// Locals
 		// PARAMETERS
-		static Fstring const RoutineName( "GetElectricChillerInput: " ); // include trailing blank space
+		static std::string const RoutineName( "GetElectricChillerInput: " ); // include trailing blank space
 		//LOCAL VARIABLES
 		int ChillerNum; // chiller counter
 		int NumAlphas; // Number of elements in the alpha array
@@ -524,7 +525,7 @@ namespace PlantChillers {
 		NumElectricChillers = GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumElectricChillers <= 0 ) {
-			ShowSevereError( "No " + trim( cCurrentModuleObject ) + " Equipment specified in input file" );
+			ShowSevereError( "No " + cCurrentModuleObject + " Equipment specified in input file" );
 			ErrorsFound = true;
 		}
 
@@ -541,12 +542,12 @@ namespace PlantChillers {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ElectricChiller.ma( &ElectricChillerSpecs::Base ).Name(), ChillerNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ElectricChiller.ma( &ElectricChillerSpecs::Base ).Name(), ChillerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
-			VerifyUniqueChillerName( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), errFlag, trim( cCurrentModuleObject ) + " Name" );
+			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
 			}
@@ -559,26 +560,26 @@ namespace PlantChillers {
 			} else if ( cAlphaArgs( 2 ) == "EVAPORATIVELYCOOLED" ) {
 				ElectricChiller( ChillerNum ).Base.CondenserType = EvapCooled;
 			} else {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
 			ElectricChiller( ChillerNum ).Base.NomCap = rNumericArgs( 1 );
 			if ( rNumericArgs( 1 ) == 0.0 ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 1 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 1 ), 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 1 ) + '=' + RoundSigDigits( rNumericArgs( 1 ), 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 			ElectricChiller( ChillerNum ).Base.COP = rNumericArgs( 2 );
 			if ( rNumericArgs( 2 ) == 0.0 ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 2 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 2 ), 3 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 2 ) + '=' + RoundSigDigits( rNumericArgs( 2 ), 3 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
-			ElectricChiller( ChillerNum ).Base.EvapInletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			ElectricChiller( ChillerNum ).Base.EvapOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Chilled Water Nodes" );
+			ElectricChiller( ChillerNum ).Base.EvapInletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			ElectricChiller( ChillerNum ).Base.EvapOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Chilled Water Nodes" );
 
 			if ( ElectricChiller( ChillerNum ).Base.CondenserType == AirCooled || ElectricChiller( ChillerNum ).Base.CondenserType == EvapCooled ) {
 				// Connection not required for air or evap cooled condenser
@@ -586,53 +587,53 @@ namespace PlantChillers {
 				//  since it is not used elsewhere for connection
 				// for transition purposes, add this node if not there.
 				if ( lAlphaFieldBlanks( 5 ) ) {
-					if ( len_trim( cAlphaArgs( 1 ) ) < ( MaxNameLength - 21 ) ) { // protect against long name leading to > 100 chars
-						cAlphaArgs( 5 ) = trim( cAlphaArgs( 1 ) ) + " CONDENSER INLET NODE";
+					if ( len( cAlphaArgs( 1 ) ) < MaxNameLength - 21 ) { // protect against long name leading to > 100 chars
+						cAlphaArgs( 5 ) = cAlphaArgs( 1 ) + " CONDENSER INLET NODE";
 					} else {
-						cAlphaArgs( 5 ) = trim( cAlphaArgs( 1 )( {1,79} ) ) + " CONDENSER INLET NODE";
+						cAlphaArgs( 5 ) = cAlphaArgs( 1 ).substr( 0, 79 ) + " CONDENSER INLET NODE";
 					}
 				}
 				if ( lAlphaFieldBlanks( 6 ) ) {
-					if ( len_trim( cAlphaArgs( 1 ) ) < ( MaxNameLength - 22 ) ) { // protect against long name leading to > 100 chars
-						cAlphaArgs( 6 ) = trim( cAlphaArgs( 1 ) ) + " CONDENSER OUTLET NODE";
+					if ( len( cAlphaArgs( 1 ) ) < MaxNameLength - 22 ) { // protect against long name leading to > 100 chars
+						cAlphaArgs( 6 ) = cAlphaArgs( 1 ) + " CONDENSER OUTLET NODE";
 					} else {
-						cAlphaArgs( 6 ) = trim( cAlphaArgs( 1 )( {1,78} ) ) + " CONDENSER OUTLET NODE";
+						cAlphaArgs( 6 ) = cAlphaArgs( 1 ).substr( 0, 78 ) + " CONDENSER OUTLET NODE";
 					}
 				}
 
-				ElectricChiller( ChillerNum ).Base.CondInletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 2, ObjectIsNotParent );
+				ElectricChiller( ChillerNum ).Base.CondInletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 2, ObjectIsNotParent );
 				CheckAndAddAirNodeNumber( ElectricChiller( ChillerNum ).Base.CondInletNodeNum, Okay );
 				if ( ! Okay ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ", Adding OutdoorAir:Node=" + trim( cAlphaArgs( 5 ) ) );
+					ShowWarningError( cCurrentModuleObject + ", Adding OutdoorAir:Node=" + cAlphaArgs( 5 ) );
 				}
 
-				ElectricChiller( ChillerNum ).Base.CondOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+				ElectricChiller( ChillerNum ).Base.CondOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 			} else if ( ElectricChiller( ChillerNum ).Base.CondenserType == WaterCooled ) {
-				ElectricChiller( ChillerNum ).Base.CondInletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
-				ElectricChiller( ChillerNum ).Base.CondOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
-				TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 5 ), cAlphaArgs( 6 ), "Condenser Water Nodes" );
+				ElectricChiller( ChillerNum ).Base.CondInletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+				ElectricChiller( ChillerNum ).Base.CondOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 5 ), cAlphaArgs( 6 ), "Condenser Water Nodes" );
 				//Condenser Inlet node name is necessary for Water Cooled
 				if ( lAlphaFieldBlanks( 5 ) ) {
-					ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 5 ) ) + "is blank " );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid, " + cAlphaFieldNames( 5 ) + "is blank " );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				} else if ( lAlphaFieldBlanks( 6 ) ) {
-					ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 6 ) ) + "is blank " );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid, " + cAlphaFieldNames( 6 ) + "is blank " );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 			} else {
-				ElectricChiller( ChillerNum ).Base.CondInletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Unknown, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
-				ElectricChiller( ChillerNum ).Base.CondOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Unknown, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
-				TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 5 ), cAlphaArgs( 6 ), "Condenser (unknown?) Nodes" );
+				ElectricChiller( ChillerNum ).Base.CondInletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Unknown, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+				ElectricChiller( ChillerNum ).Base.CondOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Unknown, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 5 ), cAlphaArgs( 6 ), "Condenser (unknown?) Nodes" );
 				//Condenser Inlet node name is necessary
 				if ( lAlphaFieldBlanks( 5 ) ) {
-					ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 5 ) ) + "is blank " );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid, " + cAlphaFieldNames( 5 ) + "is blank " );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				} else if ( lAlphaFieldBlanks( 6 ) ) {
-					ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 6 ) ) + "is blank " );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid, " + cAlphaFieldNames( 6 ) + "is blank " );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -649,7 +650,7 @@ namespace PlantChillers {
 			ElectricChiller( ChillerNum ).CapRatCoef( 2 ) = rNumericArgs( 12 );
 			ElectricChiller( ChillerNum ).CapRatCoef( 3 ) = rNumericArgs( 13 );
 			if ( ( rNumericArgs( 11 ) + rNumericArgs( 12 ) + rNumericArgs( 13 ) ) == 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ": Sum of Capacity Ratio Coef = 0.0, chiller=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( cCurrentModuleObject + ": Sum of Capacity Ratio Coef = 0.0, chiller=" + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 			ElectricChiller( ChillerNum ).PowerRatCoef( 1 ) = rNumericArgs( 14 );
@@ -662,21 +663,21 @@ namespace PlantChillers {
 			ElectricChiller( ChillerNum ).Base.SizFac = rNumericArgs( 22 );
 			if ( ElectricChiller( ChillerNum ).Base.SizFac <= 0.0 ) ElectricChiller( ChillerNum ).Base.SizFac = 1.0;
 
-			{ auto const SELECT_CASE_var( trim( cAlphaArgs( 7 ) ) );
+			{ auto const SELECT_CASE_var( cAlphaArgs( 7 ) );
 			if ( SELECT_CASE_var == "CONSTANTFLOW" ) {
 				ElectricChiller( ChillerNum ).Base.FlowMode = ConstantFlow;
 			} else if ( SELECT_CASE_var == "VARIABLEFLOW" ) {
 				ElectricChiller( ChillerNum ).Base.FlowMode = LeavingSetPointModulated;
-				ShowWarningError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"," );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( cAlphaArgs( 7 ) ) );
+				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
 				ShowContinueError( "Key choice is now called \"LeavingSetpointModulated\" and the simulation continues" );
 			} else if ( SELECT_CASE_var == "LEAVINGSETPOINTMODULATED" ) {
 				ElectricChiller( ChillerNum ).Base.FlowMode = LeavingSetPointModulated;
 			} else if ( SELECT_CASE_var == "NOTMODULATED" ) {
 				ElectricChiller( ChillerNum ).Base.FlowMode = NotModulated;
 			} else {
-				ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"," );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( cAlphaArgs( 7 ) ) );
+				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
 				ShowContinueError( "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated" );
 				ShowContinueError( "Flow mode NotModulated is assumed and the simulation continues." );
 				ElectricChiller( ChillerNum ).Base.FlowMode = NotModulated;
@@ -686,29 +687,29 @@ namespace PlantChillers {
 			ElectricChiller( ChillerNum ).DesignHeatRecVolFlowRate = rNumericArgs( 21 );
 			if ( ( ElectricChiller( ChillerNum ).DesignHeatRecVolFlowRate > 0.0 ) || ( ElectricChiller( ChillerNum ).DesignHeatRecVolFlowRate == AutoSize ) ) {
 				ElectricChiller( ChillerNum ).HeatRecActive = true;
-				ElectricChiller( ChillerNum ).HeatRecInletNodeNum = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
+				ElectricChiller( ChillerNum ).HeatRecInletNodeNum = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
 				if ( ElectricChiller( ChillerNum ).HeatRecInletNodeNum == 0 ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 8 ) ) + "=" + trim( cAlphaArgs( 8 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 8 ) + '=' + cAlphaArgs( 8 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
-				ElectricChiller( ChillerNum ).HeatRecOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 9 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 3, ObjectIsNotParent );
+				ElectricChiller( ChillerNum ).HeatRecOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 9 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 3, ObjectIsNotParent );
 				if ( ElectricChiller( ChillerNum ).HeatRecOutletNodeNum == 0 ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 9 ) ) + "=" + trim( cAlphaArgs( 9 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 9 ) + '=' + cAlphaArgs( 9 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 
-				TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 8 ), cAlphaArgs( 9 ), "Heat Recovery Nodes" );
+				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 8 ), cAlphaArgs( 9 ), "Heat Recovery Nodes" );
 				if ( ElectricChiller( ChillerNum ).DesignHeatRecVolFlowRate > 0.0 ) {
 					RegisterPlantCompDesignFlow( ElectricChiller( ChillerNum ).HeatRecInletNodeNum, ElectricChiller( ChillerNum ).DesignHeatRecVolFlowRate );
 				}
 				// Condenser flow rate must be specified for heat reclaim
 				if ( ElectricChiller( ChillerNum ).Base.CondenserType == AirCooled || ElectricChiller( ChillerNum ).Base.CondenserType == EvapCooled ) {
 					if ( ElectricChiller( ChillerNum ).Base.CondVolFlowRate <= 0.0 ) {
-						ShowSevereError( "Invalid " + trim( cNumericFieldNames( 10 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 10 ), 6 ) ) );
+						ShowSevereError( "Invalid " + cNumericFieldNames( 10 ) + '=' + RoundSigDigits( rNumericArgs( 10 ), 6 ) );
 						ShowSevereError( "Condenser fluid flow rate must be specified for Heat Reclaim applications." );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					}
 				}
@@ -727,8 +728,8 @@ namespace PlantChillers {
 					if ( ! lAlphaFieldBlanks( 11 ) ) {
 						ElectricChiller( ChillerNum ).HeatRecInletLimitSchedNum = GetScheduleIndex( cAlphaArgs( 11 ) );
 						if ( ElectricChiller( ChillerNum ).HeatRecInletLimitSchedNum == 0 ) {
-							ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"" );
-							ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 11 ) ) + "=" + trim( cAlphaArgs( 11 ) ) );
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
+							ShowContinueError( "Invalid " + cAlphaFieldNames( 11 ) + '=' + cAlphaArgs( 11 ) );
 							ErrorsFound = true;
 						}
 					} else {
@@ -740,7 +741,7 @@ namespace PlantChillers {
 
 				if ( NumAlphas > 11 ) {
 					if ( ! lAlphaFieldBlanks( 12 ) ) {
-						ElectricChiller( ChillerNum ).HeatRecSetPointNodeNum = GetOnlySingleNode( cAlphaArgs( 12 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+						ElectricChiller( ChillerNum ).HeatRecSetPointNodeNum = GetOnlySingleNode( cAlphaArgs( 12 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
 					} else {
 						ElectricChiller( ChillerNum ).HeatRecSetPointNodeNum = 0;
 					}
@@ -758,7 +759,7 @@ namespace PlantChillers {
 					ElectricChiller( ChillerNum ).Base.CondVolFlowRate = 0.0011; // set to avoid errors in calc routine
 				}
 				if ( ( ! lAlphaFieldBlanks( 8 ) ) || ( ! lAlphaFieldBlanks( 9 ) ) ) {
-					ShowWarningError( "Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowWarningError( "Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ShowContinueError( "However, Node names were specified for Heat Recovery inlet or outlet nodes" );
 				}
 
@@ -766,7 +767,7 @@ namespace PlantChillers {
 			//   Basin heater power as a function of temperature must be greater than or equal to 0
 			ElectricChiller( ChillerNum ).Base.BasinHeaterPowerFTempDiff = rNumericArgs( 23 );
 			if ( rNumericArgs( 23 ) < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( ElectricChiller( ChillerNum ).Base.Name ) + "\" TRIM(cNumericFieldNames(23)) must be >= 0" );
+				ShowSevereError( cCurrentModuleObject + ", \"" + ElectricChiller( ChillerNum ).Base.Name + "\" TRIM(cNumericFieldNames(23)) must be >= 0" );
 				ErrorsFound = true;
 			}
 
@@ -777,21 +778,21 @@ namespace PlantChillers {
 					ElectricChiller( ChillerNum ).Base.BasinHeaterSetPointTemp = 2.0;
 				}
 				if ( ElectricChiller( ChillerNum ).Base.BasinHeaterSetPointTemp < 2.0 ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ":\"" + trim( ElectricChiller( ChillerNum ).Base.Name ) + "\", " + trim( cNumericFieldNames( 24 ) ) + " is less than 2 deg C. Freezing could occur." );
+					ShowWarningError( cCurrentModuleObject + ":\"" + ElectricChiller( ChillerNum ).Base.Name + "\", " + cNumericFieldNames( 24 ) + " is less than 2 deg C. Freezing could occur." );
 				}
 			}
 
 			if ( ! lAlphaFieldBlanks( 10 ) ) {
 				ElectricChiller( ChillerNum ).Base.BasinHeaterSchedulePtr = GetScheduleIndex( cAlphaArgs( 10 ) );
 				if ( ElectricChiller( ChillerNum ).Base.BasinHeaterSchedulePtr == 0 ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ", \"" + trim( ElectricChiller( ChillerNum ).Base.Name ) + "\" TRIM(cAlphaFieldNames(10)) \"" + trim( cAlphaArgs( 10 ) ) + "\" was not found. Basin heater operation will not be modeled and the simulation continues" );
+					ShowWarningError( cCurrentModuleObject + ", \"" + ElectricChiller( ChillerNum ).Base.Name + "\" TRIM(cAlphaFieldNames(10)) \"" + cAlphaArgs( 10 ) + "\" was not found. Basin heater operation will not be modeled and the simulation continues" );
 				}
 			}
 
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + trim( cCurrentModuleObject ) );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
 		}
 
 		for ( ChillerNum = 1; ChillerNum <= NumElectricChillers; ++ChillerNum ) {
@@ -874,7 +875,7 @@ namespace PlantChillers {
 
 		// Locals
 		// PARAMETERS
-		static Fstring const RoutineName( "GetEngineDrivenChillerInput: " ); // include trailing blank space
+		static std::string const RoutineName( "GetEngineDrivenChillerInput: " ); // include trailing blank space
 		//LOCAL VARIABLES
 		int ChillerNum; // chiller counter
 		int NumAlphas; // Number of elements in the alpha array
@@ -891,7 +892,7 @@ namespace PlantChillers {
 		NumEngineDrivenChillers = GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumEngineDrivenChillers <= 0 ) {
-			ShowSevereError( "No " + trim( cCurrentModuleObject ) + " equipment specified in input file" );
+			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
 			ErrorsFound = true;
 		}
 		//See if load distribution manager has already gotten the input
@@ -907,12 +908,12 @@ namespace PlantChillers {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), EngineDrivenChiller.ma( &EngineDrivenChillerSpecs::Base ).Name(), ChillerNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), EngineDrivenChiller.ma( &EngineDrivenChillerSpecs::Base ).Name(), ChillerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
-			VerifyUniqueChillerName( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), errFlag, trim( cCurrentModuleObject ) + " Name" );
+			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
 			}
@@ -920,15 +921,15 @@ namespace PlantChillers {
 
 			EngineDrivenChiller( ChillerNum ).Base.NomCap = rNumericArgs( 1 );
 			if ( rNumericArgs( 1 ) == 0.0 ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 1 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 1 ), 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 1 ) + '=' + RoundSigDigits( rNumericArgs( 1 ), 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
 			EngineDrivenChiller( ChillerNum ).Base.COP = rNumericArgs( 2 );
 			if ( rNumericArgs( 2 ) == 0.0 ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 2 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 2 ), 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 2 ) + '=' + RoundSigDigits( rNumericArgs( 2 ), 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
@@ -939,68 +940,68 @@ namespace PlantChillers {
 			} else if ( cAlphaArgs( 2 ) == "EVAPORATIVELYCOOLED" ) {
 				EngineDrivenChiller( ChillerNum ).Base.CondenserType = EvapCooled;
 			} else {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
-			EngineDrivenChiller( ChillerNum ).Base.EvapInletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			EngineDrivenChiller( ChillerNum ).Base.EvapOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Chilled Water Nodes" );
+			EngineDrivenChiller( ChillerNum ).Base.EvapInletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			EngineDrivenChiller( ChillerNum ).Base.EvapOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Chilled Water Nodes" );
 
 			if ( EngineDrivenChiller( ChillerNum ).Base.CondenserType == AirCooled || EngineDrivenChiller( ChillerNum ).Base.CondenserType == EvapCooled ) {
 				// Connection not required for air or evap cooled condenser
 				//If the condenser inlet is blank for air cooled and evap cooled condensers then supply a generic name
 				//  since it is not used elsewhere for connection
 				if ( lAlphaFieldBlanks( 5 ) ) {
-					if ( len_trim( cAlphaArgs( 1 ) ) < ( MaxNameLength - 21 ) ) { // protect against long name leading to > 100 chars
-						cAlphaArgs( 5 ) = trim( cAlphaArgs( 1 ) ) + " CONDENSER INLET NODE";
+					if ( len( cAlphaArgs( 1 ) ) < MaxNameLength - 21 ) { // protect against long name leading to > 100 chars
+						cAlphaArgs( 5 ) = cAlphaArgs( 1 ) + " CONDENSER INLET NODE";
 					} else {
-						cAlphaArgs( 5 ) = trim( cAlphaArgs( 1 )( {1,79} ) ) + " CONDENSER INLET NODE";
+						cAlphaArgs( 5 ) = cAlphaArgs( 1 ).substr( 0, 79 ) + " CONDENSER INLET NODE";
 					}
 				}
 				if ( lAlphaFieldBlanks( 6 ) ) {
-					if ( len_trim( cAlphaArgs( 1 ) ) < ( MaxNameLength - 22 ) ) { // protect against long name leading to > 100 chars
-						cAlphaArgs( 6 ) = trim( cAlphaArgs( 1 ) ) + " CONDENSER OUTLET NODE";
+					if ( len( cAlphaArgs( 1 ) ) < MaxNameLength - 22 ) { // protect against long name leading to > 100 chars
+						cAlphaArgs( 6 ) = cAlphaArgs( 1 ) + " CONDENSER OUTLET NODE";
 					} else {
-						cAlphaArgs( 6 ) = trim( cAlphaArgs( 1 )( {1,78} ) ) + " CONDENSER OUTLET NODE";
+						cAlphaArgs( 6 ) = cAlphaArgs( 1 ).substr( 0, 78 ) + " CONDENSER OUTLET NODE";
 					}
 				}
 
-				EngineDrivenChiller( ChillerNum ).Base.CondInletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 2, ObjectIsNotParent );
+				EngineDrivenChiller( ChillerNum ).Base.CondInletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 2, ObjectIsNotParent );
 				CheckAndAddAirNodeNumber( EngineDrivenChiller( ChillerNum ).Base.CondInletNodeNum, Okay );
 				if ( ! Okay ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ", Adding OutdoorAir:Node=" + trim( cAlphaArgs( 5 ) ) );
+					ShowWarningError( cCurrentModuleObject + ", Adding OutdoorAir:Node=" + cAlphaArgs( 5 ) );
 				}
 
-				EngineDrivenChiller( ChillerNum ).Base.CondOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+				EngineDrivenChiller( ChillerNum ).Base.CondOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 				//CALL TestCompSet(TRIM(cCurrentModuleObject),cAlphaArgs(1),cAlphaArgs(5),cAlphaArgs(6),'Condenser (Air) Nodes')
 			} else if ( EngineDrivenChiller( ChillerNum ).Base.CondenserType == WaterCooled ) {
-				EngineDrivenChiller( ChillerNum ).Base.CondInletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
-				EngineDrivenChiller( ChillerNum ).Base.CondOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
-				TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 5 ), cAlphaArgs( 6 ), "Condenser Water Nodes" );
+				EngineDrivenChiller( ChillerNum ).Base.CondInletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+				EngineDrivenChiller( ChillerNum ).Base.CondOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 5 ), cAlphaArgs( 6 ), "Condenser Water Nodes" );
 				//Condenser Inlet node name is necessary for Water Cooled
 				if ( lAlphaFieldBlanks( 5 ) ) {
-					ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 5 ) ) + " is blank " );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid, " + cAlphaFieldNames( 5 ) + " is blank " );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				} else if ( lAlphaFieldBlanks( 6 ) ) {
-					ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 6 ) ) + " is blank " );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid, " + cAlphaFieldNames( 6 ) + " is blank " );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 			} else {
-				EngineDrivenChiller( ChillerNum ).Base.CondInletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Unknown, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
-				EngineDrivenChiller( ChillerNum ).Base.CondOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Unknown, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
-				TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 5 ), cAlphaArgs( 6 ), "Condenser (unknown?) Nodes" );
+				EngineDrivenChiller( ChillerNum ).Base.CondInletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Unknown, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+				EngineDrivenChiller( ChillerNum ).Base.CondOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Unknown, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 5 ), cAlphaArgs( 6 ), "Condenser (unknown?) Nodes" );
 				//Condenser Inlet node name is necessary for Water Cooled
 				if ( lAlphaFieldBlanks( 5 ) ) {
-					ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 5 ) ) + " is blank " );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid, " + cAlphaFieldNames( 5 ) + " is blank " );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				} else if ( lAlphaFieldBlanks( 6 ) ) {
-					ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 6 ) ) + " is blank " );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid, " + cAlphaFieldNames( 6 ) + " is blank " );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -1017,7 +1018,7 @@ namespace PlantChillers {
 			EngineDrivenChiller( ChillerNum ).CapRatCoef( 2 ) = rNumericArgs( 12 );
 			EngineDrivenChiller( ChillerNum ).CapRatCoef( 3 ) = rNumericArgs( 13 );
 			if ( ( rNumericArgs( 11 ) + rNumericArgs( 12 ) + rNumericArgs( 13 ) ) == 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ": Sum of Capacity Ratio Coef = 0.0, chiller=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( cCurrentModuleObject + ": Sum of Capacity Ratio Coef = 0.0, chiller=" + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 			EngineDrivenChiller( ChillerNum ).PowerRatCoef( 1 ) = rNumericArgs( 14 );
@@ -1031,36 +1032,36 @@ namespace PlantChillers {
 			//Load Special EngineDriven Chiller Curve Fit Inputs
 			EngineDrivenChiller( ChillerNum ).ClngLoadtoFuelCurve = GetCurveIndex( cAlphaArgs( 7 ) ); // convert curve name to number
 			if ( EngineDrivenChiller( ChillerNum ).ClngLoadtoFuelCurve == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( cAlphaArgs( 7 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
 			EngineDrivenChiller( ChillerNum ).RecJacHeattoFuelCurve = GetCurveIndex( cAlphaArgs( 8 ) ); // convert curve name to number
 			if ( EngineDrivenChiller( ChillerNum ).RecJacHeattoFuelCurve == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 8 ) ) + "=" + trim( cAlphaArgs( 8 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 8 ) + '=' + cAlphaArgs( 8 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
 			EngineDrivenChiller( ChillerNum ).RecLubeHeattoFuelCurve = GetCurveIndex( cAlphaArgs( 9 ) ); // convert curve name to number
 			if ( EngineDrivenChiller( ChillerNum ).RecLubeHeattoFuelCurve == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 9 ) ) + "=" + trim( cAlphaArgs( 9 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 9 ) + '=' + cAlphaArgs( 9 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
 			EngineDrivenChiller( ChillerNum ).TotExhausttoFuelCurve = GetCurveIndex( cAlphaArgs( 10 ) ); // convert curve name to number
 			if ( EngineDrivenChiller( ChillerNum ).TotExhausttoFuelCurve == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 10 ) ) + "=" + trim( cAlphaArgs( 10 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 10 ) + '=' + cAlphaArgs( 10 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
 			EngineDrivenChiller( ChillerNum ).ExhaustTempCurve = GetCurveIndex( cAlphaArgs( 11 ) ); // convert curve name to number
 			if ( EngineDrivenChiller( ChillerNum ).ExhaustTempCurve == 0 ) {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 11 ) ) + "=" + trim( cAlphaArgs( 11 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 11 ) + '=' + cAlphaArgs( 11 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
@@ -1070,7 +1071,7 @@ namespace PlantChillers {
 			EngineDrivenChiller( ChillerNum ).MaxExhaustperPowerOutput = rNumericArgs( 23 );
 			EngineDrivenChiller( ChillerNum ).DesignMinExitGasTemp = rNumericArgs( 24 );
 
-			EngineDrivenChiller( ChillerNum ).FuelType = trim( cAlphaArgs( 12 ) );
+			EngineDrivenChiller( ChillerNum ).FuelType = cAlphaArgs( 12 );
 
 			{ auto const SELECT_CASE_var( cAlphaArgs( 12 ) );
 
@@ -1099,8 +1100,8 @@ namespace PlantChillers {
 				EngineDrivenChiller( ChillerNum ).FuelType = "OtherFuel2";
 
 			} else {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 12 ) ) + "=" + trim( cAlphaArgs( 12 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 12 ) + '=' + cAlphaArgs( 12 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil#1, FuelOil#2," "OtherFuel1 or OtherFuel2" );
 				ErrorsFound = true;
 			}}
@@ -1109,26 +1110,26 @@ namespace PlantChillers {
 			EngineDrivenChiller( ChillerNum ).DesignHeatRecVolFlowRate = rNumericArgs( 26 );
 			if ( EngineDrivenChiller( ChillerNum ).DesignHeatRecVolFlowRate > 0.0 ) {
 				EngineDrivenChiller( ChillerNum ).HeatRecActive = true;
-				EngineDrivenChiller( ChillerNum ).HeatRecInletNodeNum = GetOnlySingleNode( cAlphaArgs( 13 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
+				EngineDrivenChiller( ChillerNum ).HeatRecInletNodeNum = GetOnlySingleNode( cAlphaArgs( 13 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
 				if ( EngineDrivenChiller( ChillerNum ).HeatRecInletNodeNum == 0 ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 13 ) ) + "=" + trim( cAlphaArgs( 13 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 13 ) + '=' + cAlphaArgs( 13 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
-				EngineDrivenChiller( ChillerNum ).HeatRecOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 14 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 3, ObjectIsNotParent );
+				EngineDrivenChiller( ChillerNum ).HeatRecOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 14 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 3, ObjectIsNotParent );
 				if ( EngineDrivenChiller( ChillerNum ).HeatRecOutletNodeNum == 0 ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 14 ) ) + "=" + trim( cAlphaArgs( 14 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 14 ) + '=' + cAlphaArgs( 14 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
-				TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 13 ), cAlphaArgs( 14 ), "Heat Recovery Nodes" );
+				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 13 ), cAlphaArgs( 14 ), "Heat Recovery Nodes" );
 				RegisterPlantCompDesignFlow( EngineDrivenChiller( ChillerNum ).HeatRecInletNodeNum, EngineDrivenChiller( ChillerNum ).DesignHeatRecVolFlowRate );
 				// Condenser flow rate must be specified for heat reclaim
 				if ( EngineDrivenChiller( ChillerNum ).Base.CondenserType == AirCooled || EngineDrivenChiller( ChillerNum ).Base.CondenserType == EvapCooled ) {
 					if ( EngineDrivenChiller( ChillerNum ).Base.CondVolFlowRate <= 0.0 ) {
-						ShowSevereError( "Invalid " + trim( cNumericFieldNames( 10 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 10 ), 6 ) ) );
+						ShowSevereError( "Invalid " + cNumericFieldNames( 10 ) + '=' + RoundSigDigits( rNumericArgs( 10 ), 6 ) );
 						ShowSevereError( "Condenser fluid flow rate must be specified for Heat Reclaim applications." );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					}
 				}
@@ -1144,26 +1145,26 @@ namespace PlantChillers {
 					EngineDrivenChiller( ChillerNum ).Base.CondVolFlowRate = 0.0011; // set to avoid errors in calc routine
 				}
 				if ( ( ! lAlphaFieldBlanks( 13 ) ) || ( ! lAlphaFieldBlanks( 14 ) ) ) {
-					ShowWarningError( "Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowWarningError( "Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ShowContinueError( "However, Node names were specified for Heat Recovery inlet or outlet nodes" );
 				}
 			}
 
-			{ auto const SELECT_CASE_var( trim( cAlphaArgs( 15 ) ) );
+			{ auto const SELECT_CASE_var( cAlphaArgs( 15 ) );
 			if ( SELECT_CASE_var == "CONSTANTFLOW" ) {
 				EngineDrivenChiller( ChillerNum ).Base.FlowMode = ConstantFlow;
 			} else if ( SELECT_CASE_var == "VARIABLEFLOW" ) {
 				EngineDrivenChiller( ChillerNum ).Base.FlowMode = LeavingSetPointModulated;
-				ShowWarningError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"," );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 15 ) ) + "=" + trim( cAlphaArgs( 15 ) ) );
+				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 15 ) + '=' + cAlphaArgs( 15 ) );
 				ShowContinueError( "Key choice is now called \"LeavingSetpointModulated\" and the simulation continues" );
 			} else if ( SELECT_CASE_var == "LEAVINGSETPOINTMODULATED" ) {
 				EngineDrivenChiller( ChillerNum ).Base.FlowMode = LeavingSetPointModulated;
 			} else if ( SELECT_CASE_var == "NOTMODULATED" ) {
 				EngineDrivenChiller( ChillerNum ).Base.FlowMode = NotModulated;
 			} else {
-				ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"," );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 15 ) ) + "=" + trim( cAlphaArgs( 15 ) ) );
+				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 15 ) + '=' + cAlphaArgs( 15 ) );
 				ShowContinueError( "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated" );
 				ShowContinueError( "Flow mode NotModulated is assumed and the simulation continues." );
 				EngineDrivenChiller( ChillerNum ).Base.FlowMode = NotModulated;
@@ -1176,7 +1177,7 @@ namespace PlantChillers {
 			//   Basin heater power as a function of temperature must be greater than or equal to 0
 			EngineDrivenChiller( ChillerNum ).Base.BasinHeaterPowerFTempDiff = rNumericArgs( 29 );
 			if ( rNumericArgs( 29 ) < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( EngineDrivenChiller( ChillerNum ).Base.Name ) + "\" TRIM(cNumericFieldNames(29)) must be >= 0" );
+				ShowSevereError( cCurrentModuleObject + ", \"" + EngineDrivenChiller( ChillerNum ).Base.Name + "\" TRIM(cNumericFieldNames(29)) must be >= 0" );
 				ErrorsFound = true;
 			}
 
@@ -1187,21 +1188,21 @@ namespace PlantChillers {
 					EngineDrivenChiller( ChillerNum ).Base.BasinHeaterSetPointTemp = 2.0;
 				}
 				if ( EngineDrivenChiller( ChillerNum ).Base.BasinHeaterSetPointTemp < 2.0 ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ":\"" + trim( EngineDrivenChiller( ChillerNum ).Base.Name ) + "\", " + trim( cNumericFieldNames( 30 ) ) + " is less than 2 deg C. Freezing could occur." );
+					ShowWarningError( cCurrentModuleObject + ":\"" + EngineDrivenChiller( ChillerNum ).Base.Name + "\", " + cNumericFieldNames( 30 ) + " is less than 2 deg C. Freezing could occur." );
 				}
 			}
 
 			if ( ! lAlphaFieldBlanks( 16 ) ) {
 				EngineDrivenChiller( ChillerNum ).Base.BasinHeaterSchedulePtr = GetScheduleIndex( cAlphaArgs( 16 ) );
 				if ( EngineDrivenChiller( ChillerNum ).Base.BasinHeaterSchedulePtr == 0 ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ", \"" + trim( EngineDrivenChiller( ChillerNum ).Base.Name ) + "\" TRIM(cAlphaFieldNames(16)) \"" + trim( cAlphaArgs( 16 ) ) + "\" was not found. Basin heater operation will not be modeled and the simulation continues" );
+					ShowWarningError( cCurrentModuleObject + ", \"" + EngineDrivenChiller( ChillerNum ).Base.Name + "\" TRIM(cAlphaFieldNames(16)) \"" + cAlphaArgs( 16 ) + "\" was not found. Basin heater operation will not be modeled and the simulation continues" );
 				}
 			}
 
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + trim( cCurrentModuleObject ) );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
 		}
 
 		for ( ChillerNum = 1; ChillerNum <= NumEngineDrivenChillers; ++ChillerNum ) {
@@ -1231,12 +1232,12 @@ namespace PlantChillers {
 				}
 			}
 
-			SetupOutputVariable( "Chiller " + trim( EngineDrivenChiller( ChillerNum ).FuelType ) + " Rate [W]", EngineDrivenChillerReport( ChillerNum ).FuelEnergyUseRate, "System", "Average", EngineDrivenChiller( ChillerNum ).Base.Name );
-			SetupOutputVariable( "Chiller " + trim( EngineDrivenChiller( ChillerNum ).FuelType ) + " Energy [J]", EngineDrivenChillerReport( ChillerNum ).FuelEnergy, "System", "Sum", EngineDrivenChiller( ChillerNum ).Base.Name, _, EngineDrivenChiller( ChillerNum ).FuelType, "Cooling", _, "Plant" );
+			SetupOutputVariable( "Chiller " + EngineDrivenChiller( ChillerNum ).FuelType + " Rate [W]", EngineDrivenChillerReport( ChillerNum ).FuelEnergyUseRate, "System", "Average", EngineDrivenChiller( ChillerNum ).Base.Name );
+			SetupOutputVariable( "Chiller " + EngineDrivenChiller( ChillerNum ).FuelType + " Energy [J]", EngineDrivenChillerReport( ChillerNum ).FuelEnergy, "System", "Sum", EngineDrivenChiller( ChillerNum ).Base.Name, _, EngineDrivenChiller( ChillerNum ).FuelType, "Cooling", _, "Plant" );
 
 			SetupOutputVariable( "Chiller COP [W/W]", EngineDrivenChillerReport( ChillerNum ).FuelCOP, "System", "Average", EngineDrivenChiller( ChillerNum ).Base.Name );
 
-			SetupOutputVariable( "Chiller " + trim( EngineDrivenChiller( ChillerNum ).FuelType ) + " Mass Flow Rate [kg/s]", EngineDrivenChillerReport( ChillerNum ).FuelMdot, "System", "Average", EngineDrivenChiller( ChillerNum ).Base.Name );
+			SetupOutputVariable( "Chiller " + EngineDrivenChiller( ChillerNum ).FuelType + " Mass Flow Rate [kg/s]", EngineDrivenChillerReport( ChillerNum ).FuelMdot, "System", "Average", EngineDrivenChiller( ChillerNum ).Base.Name );
 
 			SetupOutputVariable( "Chiller Exhaust Temperature [C]", EngineDrivenChillerReport( ChillerNum ).ExhaustStackTemp, "System", "Average", EngineDrivenChiller( ChillerNum ).Base.Name );
 
@@ -1300,7 +1301,7 @@ namespace PlantChillers {
 
 		// Locals
 		// PARAMETERS
-		static Fstring const RoutineName( "GetGTChillerInput: " ); // include trailing blank space
+		static std::string const RoutineName( "GetGTChillerInput: " ); // include trailing blank space
 		//LOCAL VARIABLES
 		int ChillerNum; // chiller counter
 		int NumAlphas; // Number of elements in the alpha array
@@ -1317,7 +1318,7 @@ namespace PlantChillers {
 		NumGTChillers = GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumGTChillers <= 0 ) {
-			ShowSevereError( "No " + trim( cCurrentModuleObject ) + " equipment specified in input file" );
+			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
 			ErrorsFound = true;
 		}
 		//See if load distribution manager has already gotten the input
@@ -1332,12 +1333,12 @@ namespace PlantChillers {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), GTChiller.ma( &GTChillerSpecs::Base ).Name(), ChillerNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), GTChiller.ma( &GTChillerSpecs::Base ).Name(), ChillerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
-			VerifyUniqueChillerName( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), errFlag, trim( cCurrentModuleObject ) + " Name" );
+			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
 			}
@@ -1345,15 +1346,15 @@ namespace PlantChillers {
 
 			GTChiller( ChillerNum ).Base.NomCap = rNumericArgs( 1 );
 			if ( rNumericArgs( 1 ) == 0.0 ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 1 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 1 ), 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 1 ) + '=' + RoundSigDigits( rNumericArgs( 1 ), 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
 			GTChiller( ChillerNum ).Base.COP = rNumericArgs( 2 );
 			if ( rNumericArgs( 2 ) == 0.0 ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 2 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 2 ), 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 2 ) + '=' + RoundSigDigits( rNumericArgs( 2 ), 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
@@ -1364,53 +1365,53 @@ namespace PlantChillers {
 			} else if ( cAlphaArgs( 2 ) == "EVAPORATIVELYCOOLED" ) {
 				GTChiller( ChillerNum ).Base.CondenserType = EvapCooled;
 			} else {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 2 ) ) + "=" + trim( cAlphaArgs( 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
-			GTChiller( ChillerNum ).Base.EvapInletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			GTChiller( ChillerNum ).Base.EvapOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Chilled Water Nodes" );
+			GTChiller( ChillerNum ).Base.EvapInletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			GTChiller( ChillerNum ).Base.EvapOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Chilled Water Nodes" );
 
 			if ( GTChiller( ChillerNum ).Base.CondenserType == AirCooled || GTChiller( ChillerNum ).Base.CondenserType == EvapCooled ) {
 				// Connection not required for air or evap cooled condenser
 				// If the condenser inlet is blank for air cooled and evap cooled condensers then supply a generic name
 				// since it is not used elsewhere for connection
 				if ( lAlphaFieldBlanks( 5 ) ) {
-					if ( len_trim( cAlphaArgs( 1 ) ) < ( MaxNameLength - 21 ) ) { // protect against long name leading to > 100 chars
-						cAlphaArgs( 5 ) = trim( cAlphaArgs( 1 ) ) + " CONDENSER INLET NODE";
+					if ( len( cAlphaArgs( 1 ) ) < MaxNameLength - 21 ) { // protect against long name leading to > 100 chars
+						cAlphaArgs( 5 ) = cAlphaArgs( 1 ) + " CONDENSER INLET NODE";
 					} else {
-						cAlphaArgs( 5 ) = trim( cAlphaArgs( 1 )( {1,79} ) ) + " CONDENSER INLET NODE";
+						cAlphaArgs( 5 ) = cAlphaArgs( 1 ).substr( 0, 79 ) + " CONDENSER INLET NODE";
 					}
 				}
 				if ( lAlphaFieldBlanks( 6 ) ) {
-					if ( len_trim( cAlphaArgs( 1 ) ) < ( MaxNameLength - 22 ) ) { // protect against long name leading to > 100 chars
-						cAlphaArgs( 6 ) = trim( cAlphaArgs( 1 ) ) + " CONDENSER OUTLET NODE";
+					if ( len( cAlphaArgs( 1 ) ) < MaxNameLength - 22 ) { // protect against long name leading to > 100 chars
+						cAlphaArgs( 6 ) = cAlphaArgs( 1 ) + " CONDENSER OUTLET NODE";
 					} else {
-						cAlphaArgs( 6 ) = trim( cAlphaArgs( 1 )( {1,78} ) ) + " CONDENSER OUTLET NODE";
+						cAlphaArgs( 6 ) = cAlphaArgs( 1 ).substr( 0, 78 ) + " CONDENSER OUTLET NODE";
 					}
 				}
 
-				GTChiller( ChillerNum ).Base.CondInletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 2, ObjectIsNotParent );
+				GTChiller( ChillerNum ).Base.CondInletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 2, ObjectIsNotParent );
 				CheckAndAddAirNodeNumber( GTChiller( ChillerNum ).Base.CondInletNodeNum, Okay );
 				if ( ! Okay ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ", Adding OutdoorAir:Node=" + trim( cAlphaArgs( 5 ) ) );
+					ShowWarningError( cCurrentModuleObject + ", Adding OutdoorAir:Node=" + cAlphaArgs( 5 ) );
 				}
 
-				GTChiller( ChillerNum ).Base.CondOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+				GTChiller( ChillerNum ).Base.CondOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 			} else { // WaterCooled CondenserType
-				GTChiller( ChillerNum ).Base.CondInletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Unknown, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
-				GTChiller( ChillerNum ).Base.CondOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Unknown, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
-				TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 5 ), cAlphaArgs( 6 ), "Condenser (unknown?) Nodes" );
+				GTChiller( ChillerNum ).Base.CondInletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Unknown, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+				GTChiller( ChillerNum ).Base.CondOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Unknown, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 5 ), cAlphaArgs( 6 ), "Condenser (unknown?) Nodes" );
 				//Condenser Inlet node name is necessary for Water Cooled
 				if ( lAlphaFieldBlanks( 5 ) ) {
-					ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 5 ) ) + " is blank " );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid, " + cAlphaFieldNames( 5 ) + " is blank " );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				} else if ( lAlphaFieldBlanks( 6 ) ) {
-					ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 6 ) ) + " is blank " );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid, " + cAlphaFieldNames( 6 ) + " is blank " );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -1427,7 +1428,7 @@ namespace PlantChillers {
 			GTChiller( ChillerNum ).CapRatCoef( 2 ) = rNumericArgs( 12 );
 			GTChiller( ChillerNum ).CapRatCoef( 3 ) = rNumericArgs( 13 );
 			if ( ( rNumericArgs( 11 ) + rNumericArgs( 12 ) + rNumericArgs( 13 ) ) == 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ": Sum of Capacity Ratio Coef = 0.0, chiller=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( cCurrentModuleObject + ": Sum of Capacity Ratio Coef = 0.0, chiller=" + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 			GTChiller( ChillerNum ).PowerRatCoef( 1 ) = rNumericArgs( 14 );
@@ -1476,27 +1477,27 @@ namespace PlantChillers {
 			GTChiller( ChillerNum ).DesignHeatRecVolFlowRate = rNumericArgs( 45 );
 			if ( GTChiller( ChillerNum ).DesignHeatRecVolFlowRate > 0.0 ) {
 				GTChiller( ChillerNum ).HeatRecActive = true;
-				GTChiller( ChillerNum ).HeatRecInletNodeNum = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
+				GTChiller( ChillerNum ).HeatRecInletNodeNum = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
 				if ( GTChiller( ChillerNum ).HeatRecInletNodeNum == 0 ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( cAlphaArgs( 7 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
-				GTChiller( ChillerNum ).HeatRecOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 3, ObjectIsNotParent );
+				GTChiller( ChillerNum ).HeatRecOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 3, ObjectIsNotParent );
 				if ( GTChiller( ChillerNum ).HeatRecOutletNodeNum == 0 ) {
-					ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 8 ) ) + "=" + trim( cAlphaArgs( 8 ) ) );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 8 ) + '=' + cAlphaArgs( 8 ) );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
-				TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 7 ), cAlphaArgs( 8 ), "Heat Recovery Nodes" );
+				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 7 ), cAlphaArgs( 8 ), "Heat Recovery Nodes" );
 
 				RegisterPlantCompDesignFlow( GTChiller( ChillerNum ).HeatRecInletNodeNum, GTChiller( ChillerNum ).DesignHeatRecVolFlowRate );
 				// Condenser flow rate must be specified for heat reclaim
 				if ( GTChiller( ChillerNum ).Base.CondenserType == AirCooled || GTChiller( ChillerNum ).Base.CondenserType == EvapCooled ) {
 					if ( GTChiller( ChillerNum ).Base.CondVolFlowRate <= 0.0 ) {
-						ShowSevereError( "Invalid " + trim( cNumericFieldNames( 10 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 10 ), 6 ) ) );
+						ShowSevereError( "Invalid " + cNumericFieldNames( 10 ) + '=' + RoundSigDigits( rNumericArgs( 10 ), 6 ) );
 						ShowSevereError( "Condenser fluid flow rate must be specified for Heat Reclaim applications." );
-						ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					}
 
@@ -1508,7 +1509,7 @@ namespace PlantChillers {
 				GTChiller( ChillerNum ).HeatRecInletNodeNum = 0;
 				GTChiller( ChillerNum ).HeatRecOutletNodeNum = 0;
 				if ( ( ! lAlphaFieldBlanks( 7 ) ) || ( ! lAlphaFieldBlanks( 8 ) ) ) {
-					ShowWarningError( "Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowWarningError( "Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ShowContinueError( "However, Node names were specified for heat recovery inlet or outlet nodes" );
 				}
 				if ( GTChiller( ChillerNum ).Base.CondenserType == AirCooled || GTChiller( ChillerNum ).Base.CondenserType == EvapCooled ) {
@@ -1516,21 +1517,21 @@ namespace PlantChillers {
 				}
 			}
 
-			{ auto const SELECT_CASE_var( trim( cAlphaArgs( 9 ) ) );
+			{ auto const SELECT_CASE_var( cAlphaArgs( 9 ) );
 			if ( SELECT_CASE_var == "CONSTANTFLOW" ) {
 				GTChiller( ChillerNum ).Base.FlowMode = ConstantFlow;
 			} else if ( SELECT_CASE_var == "VARIABLEFLOW" ) {
 				GTChiller( ChillerNum ).Base.FlowMode = LeavingSetPointModulated;
-				ShowWarningError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"," );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 9 ) ) + "=" + trim( cAlphaArgs( 9 ) ) );
+				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 9 ) + '=' + cAlphaArgs( 9 ) );
 				ShowContinueError( "Key choice is now called \"LeavingSetpointModulated\" and the simulation continues" );
 			} else if ( SELECT_CASE_var == "LEAVINGSETPOINTMODULATED" ) {
 				GTChiller( ChillerNum ).Base.FlowMode = LeavingSetPointModulated;
 			} else if ( SELECT_CASE_var == "NOTMODULATED" ) {
 				GTChiller( ChillerNum ).Base.FlowMode = NotModulated;
 			} else {
-				ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"," );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 9 ) ) + "=" + trim( cAlphaArgs( 9 ) ) );
+				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 9 ) + '=' + cAlphaArgs( 9 ) );
 				ShowContinueError( "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated" );
 				ShowContinueError( "Flow mode NotModulated is assumed and the simulation continues." );
 				GTChiller( ChillerNum ).Base.FlowMode = NotModulated;
@@ -1563,8 +1564,8 @@ namespace PlantChillers {
 				GTChiller( ChillerNum ).FuelType = "OtherFuel2";
 
 			} else {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 10 ) ) + "=" + trim( cAlphaArgs( 10 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 10 ) + '=' + cAlphaArgs( 10 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil#1, FuelOil#2," "OtherFuel1 or OtherFuel2" );
 				ErrorsFound = true;
 			}}
@@ -1576,7 +1577,7 @@ namespace PlantChillers {
 			//   Basin heater power as a function of temperature must be greater than or equal to 0
 			GTChiller( ChillerNum ).Base.BasinHeaterPowerFTempDiff = rNumericArgs( 48 );
 			if ( rNumericArgs( 48 ) < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( GTChiller( ChillerNum ).Base.Name ) + "\"" + trim( cNumericFieldNames( 48 ) ) + " must be >= 0" );
+				ShowSevereError( cCurrentModuleObject + "=\"" + GTChiller( ChillerNum ).Base.Name + "\"" + cNumericFieldNames( 48 ) + " must be >= 0" );
 				ErrorsFound = true;
 			}
 
@@ -1587,21 +1588,21 @@ namespace PlantChillers {
 					GTChiller( ChillerNum ).Base.BasinHeaterSetPointTemp = 2.0;
 				}
 				if ( GTChiller( ChillerNum ).Base.BasinHeaterSetPointTemp < 2.0 ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ":\"" + trim( GTChiller( ChillerNum ).Base.Name ) + "\", " + trim( cNumericFieldNames( 49 ) ) + " is less than 2 deg C. Freezing could occur." );
+					ShowWarningError( cCurrentModuleObject + ":\"" + GTChiller( ChillerNum ).Base.Name + "\", " + cNumericFieldNames( 49 ) + " is less than 2 deg C. Freezing could occur." );
 				}
 			}
 
 			if ( ! lAlphaFieldBlanks( 11 ) ) {
 				GTChiller( ChillerNum ).Base.BasinHeaterSchedulePtr = GetScheduleIndex( cAlphaArgs( 11 ) );
 				if ( GTChiller( ChillerNum ).Base.BasinHeaterSchedulePtr == 0 ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ", \"" + trim( GTChiller( ChillerNum ).Base.Name ) + "\" TRIM(cAlphaFieldNames(11)) \"" + trim( cAlphaArgs( 11 ) ) + "\" was not found. Basin heater operation will not be modeled and the simulation continues" );
+					ShowWarningError( cCurrentModuleObject + ", \"" + GTChiller( ChillerNum ).Base.Name + "\" TRIM(cAlphaFieldNames(11)) \"" + cAlphaArgs( 11 ) + "\" was not found. Basin heater operation will not be modeled and the simulation continues" );
 				}
 			}
 
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + trim( cCurrentModuleObject ) );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
 		}
 
 		for ( ChillerNum = 1; ChillerNum <= NumGTChillers; ++ChillerNum ) {
@@ -1635,13 +1636,13 @@ namespace PlantChillers {
 			SetupOutputVariable( "Chiller Lube Recovered Heat Rate [W]", GTChillerReport( ChillerNum ).HeatRecLubeRate, "System", "Average", GTChiller( ChillerNum ).Base.Name );
 			SetupOutputVariable( "Chiller Lube Recovered Heat Energy [J]", GTChillerReport( ChillerNum ).HeatRecLubeEnergy, "System", "Sum", GTChiller( ChillerNum ).Base.Name, _, "ENERGYTRANSFER", "HeatRecovery", _, "Plant" );
 
-			SetupOutputVariable( "Chiller " + trim( GTChiller( ChillerNum ).FuelType ) + " Rate [W]", GTChillerReport( ChillerNum ).FuelEnergyUsedRate, "System", "Average", GTChiller( ChillerNum ).Base.Name );
+			SetupOutputVariable( "Chiller " + GTChiller( ChillerNum ).FuelType + " Rate [W]", GTChillerReport( ChillerNum ).FuelEnergyUsedRate, "System", "Average", GTChiller( ChillerNum ).Base.Name );
 
-			SetupOutputVariable( "Chiller " + trim( GTChiller( ChillerNum ).FuelType ) + " Energy [J]", GTChillerReport( ChillerNum ).FuelEnergyUsed, "System", "Sum", GTChiller( ChillerNum ).Base.Name, _, GTChiller( ChillerNum ).FuelType, "Cooling", _, "Plant" );
+			SetupOutputVariable( "Chiller " + GTChiller( ChillerNum ).FuelType + " Energy [J]", GTChillerReport( ChillerNum ).FuelEnergyUsed, "System", "Sum", GTChiller( ChillerNum ).Base.Name, _, GTChiller( ChillerNum ).FuelType, "Cooling", _, "Plant" );
 
-			SetupOutputVariable( "Chiller " + trim( GTChiller( ChillerNum ).FuelType ) + " Mass Flow Rate [kg/s]", GTChillerReport( ChillerNum ).FuelMassUsedRate, "System", "Average", GTChiller( ChillerNum ).Base.Name );
+			SetupOutputVariable( "Chiller " + GTChiller( ChillerNum ).FuelType + " Mass Flow Rate [kg/s]", GTChillerReport( ChillerNum ).FuelMassUsedRate, "System", "Average", GTChiller( ChillerNum ).Base.Name );
 
-			SetupOutputVariable( "Chiller " + trim( GTChiller( ChillerNum ).FuelType ) + " Mass [kg]", GTChillerReport( ChillerNum ).FuelMassUsed, "System", "Sum", GTChiller( ChillerNum ).Base.Name );
+			SetupOutputVariable( "Chiller " + GTChiller( ChillerNum ).FuelType + " Mass [kg]", GTChillerReport( ChillerNum ).FuelMassUsed, "System", "Sum", GTChiller( ChillerNum ).Base.Name );
 
 			SetupOutputVariable( "Chiller Exhaust Temperature [C]", GTChillerReport( ChillerNum ).ExhaustStackTemp, "System", "Average", GTChiller( ChillerNum ).Base.Name );
 
@@ -1697,7 +1698,7 @@ namespace PlantChillers {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetConstCOPChillerInput: " ); // include trailing blank space
+		static std::string const RoutineName( "GetConstCOPChillerInput: " ); // include trailing blank space
 
 		// DERIVED TYPE DEFINITIONS
 		// na
@@ -1718,7 +1719,7 @@ namespace PlantChillers {
 		NumConstCOPChillers = GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumConstCOPChillers <= 0 ) {
-			ShowSevereError( "No " + trim( cCurrentModuleObject ) + " equipment specified in input file" );
+			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
 			ErrorsFound = true;
 		}
 
@@ -1734,26 +1735,26 @@ namespace PlantChillers {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ConstCOPChiller.ma( &ConstCOPChillerSpecs::Base ).Name(), ChillerNum - 1, IsNotOK, IsBlank, trim( cCurrentModuleObject ) + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ConstCOPChiller.ma( &ConstCOPChillerSpecs::Base ).Name(), ChillerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
-			VerifyUniqueChillerName( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), errFlag, trim( cCurrentModuleObject ) + " Name" );
+			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
 			}
 			ConstCOPChiller( ChillerNum ).Base.Name = cAlphaArgs( 1 );
 			ConstCOPChiller( ChillerNum ).Base.NomCap = rNumericArgs( 1 );
 			if ( rNumericArgs( 1 ) == 0.0 ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 1 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 1 ), 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 1 ) + '=' + RoundSigDigits( rNumericArgs( 1 ), 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 			ConstCOPChiller( ChillerNum ).Base.COP = rNumericArgs( 2 );
 			if ( rNumericArgs( 2 ) == 0.0 ) {
-				ShowSevereError( "Invalid " + trim( cNumericFieldNames( 2 ) ) + "=" + trim( RoundSigDigits( rNumericArgs( 2 ), 2 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cNumericFieldNames( 2 ) + '=' + RoundSigDigits( rNumericArgs( 2 ), 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
@@ -1765,8 +1766,8 @@ namespace PlantChillers {
 			} else if ( cAlphaArgs( 6 ) == "WATERCOOLED" ) {
 				ConstCOPChiller( ChillerNum ).Base.CondenserType = WaterCooled;
 			} else {
-				ShowSevereError( "Invalid " + trim( cAlphaFieldNames( 6 ) ) + "=" + trim( cAlphaArgs( 6 ) ) );
-				ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + '=' + cAlphaArgs( 6 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
@@ -1778,81 +1779,81 @@ namespace PlantChillers {
 			}
 			ConstCOPChiller( ChillerNum ).Base.SizFac = rNumericArgs( 5 );
 
-			ConstCOPChiller( ChillerNum ).Base.EvapInletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			ConstCOPChiller( ChillerNum ).Base.EvapOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-			TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Chilled Water Nodes" );
+			ConstCOPChiller( ChillerNum ).Base.EvapInletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			ConstCOPChiller( ChillerNum ).Base.EvapOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Chilled Water Nodes" );
 
 			if ( ConstCOPChiller( ChillerNum ).Base.CondenserType == AirCooled || ConstCOPChiller( ChillerNum ).Base.CondenserType == EvapCooled ) {
 				// Connection not required for air or evap cooled condenser
 				//If the condenser inlet is blank for air cooled and evap cooled condensers then supply a generic name
 				//  since it is not used elsewhere for connection
 				if ( lAlphaFieldBlanks( 4 ) ) {
-					if ( len_trim( cAlphaArgs( 1 ) ) < ( MaxNameLength - 21 ) ) { // protect against long name leading to > 100 chars
-						cAlphaArgs( 4 ) = trim( cAlphaArgs( 1 ) ) + " CONDENSER INLET NODE";
+					if ( len( cAlphaArgs( 1 ) ) < MaxNameLength - 21 ) { // protect against long name leading to > 100 chars
+						cAlphaArgs( 4 ) = cAlphaArgs( 1 ) + " CONDENSER INLET NODE";
 					} else {
-						cAlphaArgs( 4 ) = trim( cAlphaArgs( 1 )( {1,79} ) ) + " CONDENSER INLET NODE";
+						cAlphaArgs( 4 ) = cAlphaArgs( 1 ).substr( 0, 79 ) + " CONDENSER INLET NODE";
 					}
 				}
 				if ( lAlphaFieldBlanks( 5 ) ) {
-					if ( len_trim( cAlphaArgs( 1 ) ) < ( MaxNameLength - 22 ) ) { // protect against long name leading to > 100 chars
-						cAlphaArgs( 5 ) = trim( cAlphaArgs( 1 ) ) + " CONDENSER OUTLET NODE";
+					if ( len( cAlphaArgs( 1 ) ) < MaxNameLength - 22 ) { // protect against long name leading to > 100 chars
+						cAlphaArgs( 5 ) = cAlphaArgs( 1 ) + " CONDENSER OUTLET NODE";
 					} else {
-						cAlphaArgs( 5 ) = trim( cAlphaArgs( 1 )( {1,78} ) ) + " CONDENSER OUTLET NODE";
+						cAlphaArgs( 5 ) = cAlphaArgs( 1 ).substr( 0, 78 ) + " CONDENSER OUTLET NODE";
 					}
 				}
 
-				ConstCOPChiller( ChillerNum ).Base.CondInletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 2, ObjectIsNotParent );
+				ConstCOPChiller( ChillerNum ).Base.CondInletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 2, ObjectIsNotParent );
 				CheckAndAddAirNodeNumber( ConstCOPChiller( ChillerNum ).Base.CondInletNodeNum, Okay );
 				if ( ! Okay ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ", Adding OutdoorAir:Node=" + trim( cAlphaArgs( 4 ) ) );
+					ShowWarningError( cCurrentModuleObject + ", Adding OutdoorAir:Node=" + cAlphaArgs( 4 ) );
 				}
 
-				ConstCOPChiller( ChillerNum ).Base.CondOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+				ConstCOPChiller( ChillerNum ).Base.CondOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 			} else if ( ConstCOPChiller( ChillerNum ).Base.CondenserType == WaterCooled ) {
-				ConstCOPChiller( ChillerNum ).Base.CondInletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
-				ConstCOPChiller( ChillerNum ).Base.CondOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
-				TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 4 ), cAlphaArgs( 5 ), "Condenser Water Nodes" );
+				ConstCOPChiller( ChillerNum ).Base.CondInletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+				ConstCOPChiller( ChillerNum ).Base.CondOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 4 ), cAlphaArgs( 5 ), "Condenser Water Nodes" );
 				//Condenser Inlet node name is necessary for Water Cooled
 				if ( lAlphaFieldBlanks( 4 ) ) {
-					ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 4 ) ) + "is blank " );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid, " + cAlphaFieldNames( 4 ) + "is blank " );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				} else if ( lAlphaFieldBlanks( 5 ) ) {
-					ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 5 ) ) + "is blank " );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid, " + cAlphaFieldNames( 5 ) + "is blank " );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 			} else {
-				ConstCOPChiller( ChillerNum ).Base.CondInletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Unknown, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
-				ConstCOPChiller( ChillerNum ).Base.CondOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, trim( cCurrentModuleObject ), cAlphaArgs( 1 ), NodeType_Unknown, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
-				TestCompSet( trim( cCurrentModuleObject ), cAlphaArgs( 1 ), cAlphaArgs( 4 ), cAlphaArgs( 5 ), "Condenser (unknown?) Nodes" );
+				ConstCOPChiller( ChillerNum ).Base.CondInletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Unknown, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+				ConstCOPChiller( ChillerNum ).Base.CondOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Unknown, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 4 ), cAlphaArgs( 5 ), "Condenser (unknown?) Nodes" );
 				//Condenser Inlet node name is necessary for Water Cooled
 				if ( lAlphaFieldBlanks( 4 ) ) {
-					ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 4 ) ) + "is blank " );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid, " + cAlphaFieldNames( 4 ) + "is blank " );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				} else if ( lAlphaFieldBlanks( 5 ) ) {
-					ShowSevereError( "Invalid, " + trim( cAlphaFieldNames( 5 ) ) + "is blank " );
-					ShowContinueError( "Entered in " + trim( cCurrentModuleObject ) + "=" + trim( cAlphaArgs( 1 ) ) );
+					ShowSevereError( "Invalid, " + cAlphaFieldNames( 5 ) + "is blank " );
+					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 			}
 
-			{ auto const SELECT_CASE_var( trim( cAlphaArgs( 7 ) ) );
+			{ auto const SELECT_CASE_var( cAlphaArgs( 7 ) );
 			if ( SELECT_CASE_var == "CONSTANTFLOW" ) {
 				ConstCOPChiller( ChillerNum ).Base.FlowMode = ConstantFlow;
 			} else if ( SELECT_CASE_var == "VARIABLEFLOW" ) {
 				ConstCOPChiller( ChillerNum ).Base.FlowMode = LeavingSetPointModulated;
-				ShowWarningError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"," );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( cAlphaArgs( 7 ) ) );
+				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
 				ShowContinueError( "Key choice is now called \"LeavingSetpointModulated\" and the simulation continues" );
 			} else if ( SELECT_CASE_var == "LEAVINGSETPOINTMODULATED" ) {
 				ConstCOPChiller( ChillerNum ).Base.FlowMode = LeavingSetPointModulated;
 			} else if ( SELECT_CASE_var == "NOTMODULATED" ) {
 				ConstCOPChiller( ChillerNum ).Base.FlowMode = NotModulated;
 			} else {
-				ShowSevereError( RoutineName + trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\"," );
-				ShowContinueError( "Invalid " + trim( cAlphaFieldNames( 7 ) ) + "=" + trim( cAlphaArgs( 7 ) ) );
+				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
 				ShowContinueError( "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated" );
 				ShowContinueError( "Flow mode NotModulated is assumed and the simulation continues." );
 				ConstCOPChiller( ChillerNum ).Base.FlowMode = NotModulated;
@@ -1861,7 +1862,7 @@ namespace PlantChillers {
 			//   Basin heater power as a function of temperature must be greater than or equal to 0
 			ConstCOPChiller( ChillerNum ).Base.BasinHeaterPowerFTempDiff = rNumericArgs( 6 );
 			if ( rNumericArgs( 6 ) < 0.0 ) {
-				ShowSevereError( trim( cCurrentModuleObject ) + ", \"" + trim( ConstCOPChiller( ChillerNum ).Base.Name ) + "\" TRIM(cNumericFieldNames(6)) must be >= 0" );
+				ShowSevereError( cCurrentModuleObject + ", \"" + ConstCOPChiller( ChillerNum ).Base.Name + "\" TRIM(cNumericFieldNames(6)) must be >= 0" );
 				ErrorsFound = true;
 			}
 
@@ -1872,21 +1873,21 @@ namespace PlantChillers {
 					ConstCOPChiller( ChillerNum ).Base.BasinHeaterSetPointTemp = 2.0;
 				}
 				if ( ConstCOPChiller( ChillerNum ).Base.BasinHeaterSetPointTemp < 2.0 ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ":\"" + trim( ConstCOPChiller( ChillerNum ).Base.Name ) + "\", " + trim( cNumericFieldNames( 7 ) ) + " is less than 2 deg C. Freezing could occur." );
+					ShowWarningError( cCurrentModuleObject + ":\"" + ConstCOPChiller( ChillerNum ).Base.Name + "\", " + cNumericFieldNames( 7 ) + " is less than 2 deg C. Freezing could occur." );
 				}
 			}
 
 			if ( ! lAlphaFieldBlanks( 8 ) ) {
 				ConstCOPChiller( ChillerNum ).Base.BasinHeaterSchedulePtr = GetScheduleIndex( cAlphaArgs( 8 ) );
 				if ( ConstCOPChiller( ChillerNum ).Base.BasinHeaterSchedulePtr == 0 ) {
-					ShowWarningError( trim( cCurrentModuleObject ) + ", \"" + trim( ConstCOPChiller( ChillerNum ).Base.Name ) + "\" TRIM(cAlphaFieldNames(8)) \"" + trim( cAlphaArgs( 8 ) ) + "\" was not found. Basin heater operation will not be modeled and the simulation continues" );
+					ShowWarningError( cCurrentModuleObject + ", \"" + ConstCOPChiller( ChillerNum ).Base.Name + "\" TRIM(cAlphaFieldNames(8)) \"" + cAlphaArgs( 8 ) + "\" was not found. Basin heater operation will not be modeled and the simulation continues" );
 				}
 			}
 
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + trim( cCurrentModuleObject ) );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
 		}
 
 		for ( ChillerNum = 1; ChillerNum <= NumConstCOPChillers; ++ChillerNum ) {
@@ -1972,7 +1973,7 @@ namespace PlantChillers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "InitElectricChiller" );
+		static std::string const RoutineName( "InitElectricChiller" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2059,7 +2060,7 @@ namespace PlantChillers {
 				if ( ( Node( ElectricChiller( ChillNum ).Base.EvapOutletNodeNum ).TempSetPoint == SensedNodeFlagValue ) && ( Node( ElectricChiller( ChillNum ).Base.EvapOutletNodeNum ).TempSetPointHi == SensedNodeFlagValue ) ) {
 					if ( ! AnyEnergyManagementSystemInModel ) {
 						if ( ! ElectricChiller( ChillNum ).Base.ModulatedFlowErrDone ) {
-							ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + trim( ElectricChiller( ChillNum ).Base.Name ) );
+							ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + ElectricChiller( ChillNum ).Base.Name );
 							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller " "in variable flow mode, use a SetpointManager" );
 							ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );
 							ElectricChiller( ChillNum ).Base.ModulatedFlowErrDone = true;
@@ -2070,7 +2071,7 @@ namespace PlantChillers {
 						CheckIfNodeSetPointManagedByEMS( ElectricChiller( ChillNum ).Base.EvapOutletNodeNum, iTemperatureSetPoint, FatalError );
 						if ( FatalError ) {
 							if ( ! ElectricChiller( ChillNum ).Base.ModulatedFlowErrDone ) {
-								ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + trim( ElectricChiller( ChillNum ).Base.Name ) );
+								ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + ElectricChiller( ChillNum ).Base.Name );
 								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller evaporator " "in variable flow mode" );
 								ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node " );
 								ShowContinueError( "  or use an EMS actuator to establish a setpoint at the outlet node " );
@@ -2142,7 +2143,7 @@ namespace PlantChillers {
 					if ( THeatRecSetPoint == SensedNodeFlagValue ) {
 						if ( ! AnyEnergyManagementSystemInModel ) {
 							if ( ! ElectricChiller( ChillNum ).Base.HRSPErrDone ) {
-								ShowWarningError( "Missing heat recovery temperature setpoint for chiller named " + trim( ElectricChiller( ChillNum ).Base.Name ) );
+								ShowWarningError( "Missing heat recovery temperature setpoint for chiller named " + ElectricChiller( ChillNum ).Base.Name );
 								ShowContinueError( "  A temperature setpoint is needed at the heat recovery leaving temperature " "setpoint node specified, use a SetpointManager" );
 								ShowContinueError( "  The overall loop setpoint will be assumed for heat recovery. The simulation continues ..." );
 								ElectricChiller( ChillNum ).HeatRecSetPointNodeNum = PlantLoop( ElectricChiller( ChillNum ).HRLoopNum ).TempSetPointNodeNum;
@@ -2154,7 +2155,7 @@ namespace PlantChillers {
 							CheckIfNodeSetPointManagedByEMS( ElectricChiller( ChillNum ).Base.EvapOutletNodeNum, iTemperatureSetPoint, FatalError );
 							if ( FatalError ) {
 								if ( ! ElectricChiller( ChillNum ).Base.HRSPErrDone ) {
-									ShowWarningError( "Missing heat recovery temperature setpoint for chiller named " + trim( ElectricChiller( ChillNum ).Base.Name ) );
+									ShowWarningError( "Missing heat recovery temperature setpoint for chiller named " + ElectricChiller( ChillNum ).Base.Name );
 									ShowContinueError( "  A temperature setpoint is needed at the heat recovery leaving temperature " "setpoint node specified, use a SetpointManager to establish a setpoint" );
 									ShowContinueError( "  or use an EMS actuator to establish a setpoint at this node " );
 									ShowContinueError( "  The overall loop setpoint will be assumed " "for heat recovery. The simulation continues ..." );
@@ -2270,7 +2271,7 @@ namespace PlantChillers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "InitEngineDrivenChiller" );
+		static std::string const RoutineName( "InitEngineDrivenChiller" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2355,7 +2356,7 @@ namespace PlantChillers {
 				if ( ( Node( EngineDrivenChiller( ChillNum ).Base.EvapOutletNodeNum ).TempSetPoint == SensedNodeFlagValue ) && ( Node( EngineDrivenChiller( ChillNum ).Base.EvapOutletNodeNum ).TempSetPointHi == SensedNodeFlagValue ) ) {
 					if ( ! AnyEnergyManagementSystemInModel ) {
 						if ( ! EngineDrivenChiller( ChillNum ).Base.ModulatedFlowErrDone ) {
-							ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + trim( EngineDrivenChiller( ChillNum ).Base.Name ) );
+							ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + EngineDrivenChiller( ChillNum ).Base.Name );
 							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller " "in variable flow mode, use a SetpointManager" );
 							ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );
 							EngineDrivenChiller( ChillNum ).Base.ModulatedFlowErrDone = true;
@@ -2366,7 +2367,7 @@ namespace PlantChillers {
 						CheckIfNodeSetPointManagedByEMS( EngineDrivenChiller( ChillNum ).Base.EvapOutletNodeNum, iTemperatureSetPoint, FatalError );
 						if ( FatalError ) {
 							if ( ! EngineDrivenChiller( ChillNum ).Base.ModulatedFlowErrDone ) {
-								ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + trim( EngineDrivenChiller( ChillNum ).Base.Name ) );
+								ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + EngineDrivenChiller( ChillNum ).Base.Name );
 								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller evaporator " "in variable flow mode" );
 								ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node " );
 								ShowContinueError( "  or use an EMS actuator to establish a setpoint at the outlet node " );
@@ -2522,7 +2523,7 @@ namespace PlantChillers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "InitGTChiller" );
+		static std::string const RoutineName( "InitGTChiller" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2606,7 +2607,7 @@ namespace PlantChillers {
 				if ( ( Node( GTChiller( ChillNum ).Base.EvapOutletNodeNum ).TempSetPoint == SensedNodeFlagValue ) && ( Node( GTChiller( ChillNum ).Base.EvapOutletNodeNum ).TempSetPointHi == SensedNodeFlagValue ) ) {
 					if ( ! AnyEnergyManagementSystemInModel ) {
 						if ( ! GTChiller( ChillNum ).Base.ModulatedFlowErrDone ) {
-							ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + trim( GTChiller( ChillNum ).Base.Name ) );
+							ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + GTChiller( ChillNum ).Base.Name );
 							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller " "in variable flow mode, use a SetpointManager" );
 							ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );
 							GTChiller( ChillNum ).Base.ModulatedFlowErrDone = true;
@@ -2617,7 +2618,7 @@ namespace PlantChillers {
 						CheckIfNodeSetPointManagedByEMS( GTChiller( ChillNum ).Base.EvapOutletNodeNum, iTemperatureSetPoint, FatalError );
 						if ( FatalError ) {
 							if ( ! GTChiller( ChillNum ).Base.ModulatedFlowErrDone ) {
-								ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + trim( GTChiller( ChillNum ).Base.Name ) );
+								ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + GTChiller( ChillNum ).Base.Name );
 								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller evaporator " "in variable flow mode" );
 								ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node " );
 								ShowContinueError( "  or use an EMS actuator to establish a setpoint at the outlet node " );
@@ -2770,7 +2771,7 @@ namespace PlantChillers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "InitConstCOPChiller" );
+		static std::string const RoutineName( "InitConstCOPChiller" );
 		Real64 const TempDesCondIn( 25. ); // Design condenser inlet temp. C
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -2834,7 +2835,7 @@ namespace PlantChillers {
 				if ( ( Node( ConstCOPChiller( ChillNum ).Base.EvapOutletNodeNum ).TempSetPoint == SensedNodeFlagValue ) && ( Node( ConstCOPChiller( ChillNum ).Base.EvapOutletNodeNum ).TempSetPointHi == SensedNodeFlagValue ) ) {
 					if ( ! AnyEnergyManagementSystemInModel ) {
 						if ( ! ConstCOPChiller( ChillNum ).Base.ModulatedFlowErrDone ) {
-							ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + trim( ConstCOPChiller( ChillNum ).Base.Name ) );
+							ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + ConstCOPChiller( ChillNum ).Base.Name );
 							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller " "in variable flow mode, use a SetpointManager" );
 							ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );
 							ConstCOPChiller( ChillNum ).Base.ModulatedFlowErrDone = true;
@@ -2845,7 +2846,7 @@ namespace PlantChillers {
 						CheckIfNodeSetPointManagedByEMS( ConstCOPChiller( ChillNum ).Base.EvapOutletNodeNum, iTemperatureSetPoint, FatalError );
 						if ( FatalError ) {
 							if ( ! ConstCOPChiller( ChillNum ).Base.ModulatedFlowErrDone ) {
-								ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + trim( ConstCOPChiller( ChillNum ).Base.Name ) );
+								ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + ConstCOPChiller( ChillNum ).Base.Name );
 								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller evaporator " "in variable flow mode" );
 								ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node " );
 								ShowContinueError( "  or use an EMS actuator to establish a setpoint at the outlet node " );
@@ -2974,7 +2975,7 @@ namespace PlantChillers {
 		int PltSizCondNum; // Plant Sizing index for condenser loop
 		bool ErrorsFound; // If errors detected in input
 		bool LoopErrorsFound;
-		Fstring equipName( MaxNameLength );
+		std::string equipName;
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
 		Real64 tmpNomCap; // local nominal capacity cooling power
@@ -3036,9 +3037,9 @@ namespace PlantChillers {
 							ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, "Design Size Nominal Capacity [W]", tmpNomCap, "User-Specified Nominal Capacity [W]", NomCapUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpNomCap - NomCapUser ) / NomCapUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeChillerElectric: Potential issue with equipment sizing for " + trim( ElectricChiller( ChillNum ).Base.Name ) );
-									ShowContinueError( "User-Specified Nominal Capacity of " + trim( RoundSigDigits( NomCapUser, 2 ) ) + " [W]" );
-									ShowContinueError( "differs from Design Size Nominal Capacity of " + trim( RoundSigDigits( tmpNomCap, 2 ) ) + " [W]" );
+									ShowMessage( "SizeChillerElectric: Potential issue with equipment sizing for " + ElectricChiller( ChillNum ).Base.Name );
+									ShowContinueError( "User-Specified Nominal Capacity of " + RoundSigDigits( NomCapUser, 2 ) + " [W]" );
+									ShowContinueError( "differs from Design Size Nominal Capacity of " + RoundSigDigits( tmpNomCap, 2 ) + " [W]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -3051,7 +3052,7 @@ namespace PlantChillers {
 		} else {
 			if ( IsAutoSize ) {
 				ShowSevereError( "Autosizing of Electric Chiller nominal capacity requires a loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in Electric Chiller object=" + trim( ElectricChiller( ChillNum ).Base.Name ) );
+				ShowContinueError( "Occurs in Electric Chiller object=" + ElectricChiller( ChillNum ).Base.Name );
 				ErrorsFound = true;
 			} else {
 				if ( ! ElectricChiller( ChillNum ).Base.IsThisSized ) {
@@ -3088,9 +3089,9 @@ namespace PlantChillers {
 							ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, "Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate, "User-Specified Design Chilled Water Flow Rate [m3/s]", EvapVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpEvapVolFlowRate - EvapVolFlowRateUser ) / EvapVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeChillerElectric: Potential issue with equipment sizing for " + trim( ElectricChiller( ChillNum ).Base.Name ) );
-									ShowContinueError( "User-Specified Design Chilled Water Flow Rate of " + trim( RoundSigDigits( EvapVolFlowRateUser, 5 ) ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Design Chilled Water Flow Rate of " + trim( RoundSigDigits( tmpEvapVolFlowRate, 5 ) ) + " [m3/s]" );
+									ShowMessage( "SizeChillerElectric: Potential issue with equipment sizing for " + ElectricChiller( ChillNum ).Base.Name );
+									ShowContinueError( "User-Specified Design Chilled Water Flow Rate of " + RoundSigDigits( EvapVolFlowRateUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Design Chilled Water Flow Rate of " + RoundSigDigits( tmpEvapVolFlowRate, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -3103,7 +3104,7 @@ namespace PlantChillers {
 		} else {
 			if ( IsAutoSize ) {
 				ShowSevereError( "Autosizing of Electric Chiller evap flow rate requires a loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in Electric Chiller object=" + trim( ElectricChiller( ChillNum ).Base.Name ) );
+				ShowContinueError( "Occurs in Electric Chiller object=" + ElectricChiller( ChillNum ).Base.Name );
 				ErrorsFound = true;
 			} else {
 				if ( ! ElectricChiller( ChillNum ).Base.IsThisSized ) {
@@ -3145,9 +3146,9 @@ namespace PlantChillers {
 							ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, "Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate, "User-Specified Design Condenser Water Flow Rate [m3/s]", CondVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpCondVolFlowRate - CondVolFlowRateUser ) / CondVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeChillerElectric: Potential issue with equipment sizing for " + trim( ElectricChiller( ChillNum ).Base.Name ) );
-									ShowContinueError( "User-Specified Design Condenser Water Flow Rate of " + trim( RoundSigDigits( CondVolFlowRateUser, 5 ) ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Design Condenser Water Flow Rate of " + trim( RoundSigDigits( tmpCondVolFlowRate, 5 ) ) + " [m3/s]" );
+									ShowMessage( "SizeChillerElectric: Potential issue with equipment sizing for " + ElectricChiller( ChillNum ).Base.Name );
+									ShowContinueError( "User-Specified Design Condenser Water Flow Rate of " + RoundSigDigits( CondVolFlowRateUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Design Condenser Water Flow Rate of " + RoundSigDigits( tmpCondVolFlowRate, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -3161,7 +3162,7 @@ namespace PlantChillers {
 			if ( IsAutoSize ) {
 				ShowSevereError( "Autosizing of Electric Chiller condenser flow rate requires a condenser" );
 				ShowContinueError( "loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in Electric Chiller object=" + trim( ElectricChiller( ChillNum ).Base.Name ) );
+				ShowContinueError( "Occurs in Electric Chiller object=" + ElectricChiller( ChillNum ).Base.Name );
 				ErrorsFound = true;
 			} else {
 				if ( ! ElectricChiller( ChillNum ).Base.IsThisSized ) {
@@ -3201,9 +3202,9 @@ namespace PlantChillers {
 							ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, "Design Size Design Heat Recovery Fluid Flow Rate [m3/s]", tmpHeatRecVolFlowRate, "User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]", DesignHeatRecVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpHeatRecVolFlowRate - DesignHeatRecVolFlowRateUser ) / DesignHeatRecVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeChillerElectric: Potential issue with equipment sizing for " + trim( ElectricChiller( ChillNum ).Base.Name ) );
-									ShowContinueError( "User-Specified Design Heat Recovery Fluid Flow Rate of " + trim( RoundSigDigits( DesignHeatRecVolFlowRateUser, 5 ) ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Design Heat Recovery Fluid Flow Rate of " + trim( RoundSigDigits( tmpHeatRecVolFlowRate, 5 ) ) + " [m3/s]" );
+									ShowMessage( "SizeChillerElectric: Potential issue with equipment sizing for " + ElectricChiller( ChillNum ).Base.Name );
+									ShowContinueError( "User-Specified Design Heat Recovery Fluid Flow Rate of " + RoundSigDigits( DesignHeatRecVolFlowRateUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Design Heat Recovery Fluid Flow Rate of " + RoundSigDigits( tmpHeatRecVolFlowRate, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -3277,7 +3278,7 @@ namespace PlantChillers {
 		int PltSizCondNum; // Plant Sizing index for condenser loop
 		bool ErrorsFound; // If errors detected in input
 		bool LoopErrorsFound;
-		Fstring equipName( MaxNameLength );
+		std::string equipName;
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
 		Real64 tmpNomCap; // local nominal capacity cooling power
@@ -3334,9 +3335,9 @@ namespace PlantChillers {
 							ReportSizingOutput( "Chiller:EngineDriven", EngineDrivenChiller( ChillNum ).Base.Name, "Design Size Nominal Capacity [W]", tmpNomCap, "User-Specified Nominal Capacity [W]", NomCapUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpNomCap - NomCapUser ) / NomCapUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeChillerEngineDriven: Potential issue with equipment sizing for " + trim( EngineDrivenChiller( ChillNum ).Base.Name ) );
-									ShowContinueError( "User-Specified Nominal Capacity of " + trim( RoundSigDigits( NomCapUser, 2 ) ) + " [W]" );
-									ShowContinueError( "differs from Design Size Nominal Capacity of " + trim( RoundSigDigits( tmpNomCap, 2 ) ) + " [W]" );
+									ShowMessage( "SizeChillerEngineDriven: Potential issue with equipment sizing for " + EngineDrivenChiller( ChillNum ).Base.Name );
+									ShowContinueError( "User-Specified Nominal Capacity of " + RoundSigDigits( NomCapUser, 2 ) + " [W]" );
+									ShowContinueError( "differs from Design Size Nominal Capacity of " + RoundSigDigits( tmpNomCap, 2 ) + " [W]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -3349,7 +3350,7 @@ namespace PlantChillers {
 		} else {
 			if ( IsAutoSize ) {
 				ShowSevereError( "Autosizing of Engine Driven Chiller nominal capacity requires a loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in Engine Driven Chiller object=" + trim( EngineDrivenChiller( ChillNum ).Base.Name ) );
+				ShowContinueError( "Occurs in Engine Driven Chiller object=" + EngineDrivenChiller( ChillNum ).Base.Name );
 				ErrorsFound = true;
 			} else {
 				if ( ! EngineDrivenChiller( ChillNum ).Base.IsThisSized ) {
@@ -3386,9 +3387,9 @@ namespace PlantChillers {
 							ReportSizingOutput( "Chiller:EngineDriven", EngineDrivenChiller( ChillNum ).Base.Name, "Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate, "User-Specified Design Chilled Water Flow Rate [m3/s]", EvapVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpEvapVolFlowRate - EvapVolFlowRateUser ) / EvapVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeChillerEngineDriven: Potential issue with equipment sizing for " + trim( EngineDrivenChiller( ChillNum ).Base.Name ) );
-									ShowContinueError( "User-Specified Design Chilled Water Flow Rate of " + trim( RoundSigDigits( EvapVolFlowRateUser, 5 ) ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Design Chilled Water Flow Rate of " + trim( RoundSigDigits( tmpEvapVolFlowRate, 5 ) ) + " [m3/s]" );
+									ShowMessage( "SizeChillerEngineDriven: Potential issue with equipment sizing for " + EngineDrivenChiller( ChillNum ).Base.Name );
+									ShowContinueError( "User-Specified Design Chilled Water Flow Rate of " + RoundSigDigits( EvapVolFlowRateUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Design Chilled Water Flow Rate of " + RoundSigDigits( tmpEvapVolFlowRate, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -3401,7 +3402,7 @@ namespace PlantChillers {
 		} else {
 			if ( IsAutoSize ) {
 				ShowSevereError( "Autosizing of Engine Driven Chiller evap flow rate requires a loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in Engine Driven Chiller object=" + trim( EngineDrivenChiller( ChillNum ).Base.Name ) );
+				ShowContinueError( "Occurs in Engine Driven Chiller object=" + EngineDrivenChiller( ChillNum ).Base.Name );
 				ErrorsFound = true;
 			} else {
 				if ( ! EngineDrivenChiller( ChillNum ).Base.IsThisSized ) {
@@ -3444,9 +3445,9 @@ namespace PlantChillers {
 							ReportSizingOutput( "Chiller:EngineDriven", EngineDrivenChiller( ChillNum ).Base.Name, "Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate, "User-Specified Design Condenser Water Flow Rate [m3/s]", CondVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpCondVolFlowRate - CondVolFlowRateUser ) / CondVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeChillerEngineDriven: Potential issue with equipment sizing for " + trim( EngineDrivenChiller( ChillNum ).Base.Name ) );
-									ShowContinueError( "User-Specified Design Condenser Water Flow Rate of " + trim( RoundSigDigits( CondVolFlowRateUser, 5 ) ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Design Condenser Water Flow Rate of " + trim( RoundSigDigits( tmpCondVolFlowRate, 5 ) ) + " [m3/s]" );
+									ShowMessage( "SizeChillerEngineDriven: Potential issue with equipment sizing for " + EngineDrivenChiller( ChillNum ).Base.Name );
+									ShowContinueError( "User-Specified Design Condenser Water Flow Rate of " + RoundSigDigits( CondVolFlowRateUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Design Condenser Water Flow Rate of " + RoundSigDigits( tmpCondVolFlowRate, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -3460,7 +3461,7 @@ namespace PlantChillers {
 			if ( IsAutoSize ) {
 				ShowSevereError( "Autosizing of EngineDriven Chiller condenser flow rate requires a condenser" );
 				ShowContinueError( "loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in EngineDriven Chiller object=" + trim( EngineDrivenChiller( ChillNum ).Base.Name ) );
+				ShowContinueError( "Occurs in EngineDriven Chiller object=" + EngineDrivenChiller( ChillNum ).Base.Name );
 				ErrorsFound = true;
 			} else {
 				if ( ! EngineDrivenChiller( ChillNum ).Base.IsThisSized ) {
@@ -3541,7 +3542,7 @@ namespace PlantChillers {
 		bool ErrorsFound; // If errors detected in input
 		bool LoopErrorsFound;
 		Real64 EngineEff; // this should be an input! needed to autosize the engine capacity.
-		Fstring equipName( MaxNameLength );
+		std::string equipName;
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
 		Real64 tmpNomCap; // local nominal capacity cooling power
@@ -3603,9 +3604,9 @@ namespace PlantChillers {
 							ReportSizingOutput( "Chiller:CombustionTurbine", GTChiller( ChillNum ).Base.Name, "Design Size Nominal Capacity [W]", tmpNomCap, "User-Specified Nominal Capacity [W]", NomCapUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpNomCap - NomCapUser ) / NomCapUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeChillerElectricEIR: Potential issue with equipment sizing for " + trim( GTChiller( ChillNum ).Base.Name ) );
-									ShowContinueError( "User-Specified Nominal Capacity of " + trim( RoundSigDigits( NomCapUser, 2 ) ) + " [W]" );
-									ShowContinueError( "differs from Design Size Nominal Capacity of " + trim( RoundSigDigits( tmpNomCap, 2 ) ) + " [W]" );
+									ShowMessage( "SizeChillerElectricEIR: Potential issue with equipment sizing for " + GTChiller( ChillNum ).Base.Name );
+									ShowContinueError( "User-Specified Nominal Capacity of " + RoundSigDigits( NomCapUser, 2 ) + " [W]" );
+									ShowContinueError( "differs from Design Size Nominal Capacity of " + RoundSigDigits( tmpNomCap, 2 ) + " [W]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -3618,7 +3619,7 @@ namespace PlantChillers {
 		} else {
 			if ( IsAutoSize ) {
 				ShowSevereError( "Autosizing of Gas Turbine Chiller nominal capacity requires a loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in Gas Turbine Chiller object=" + trim( GTChiller( ChillNum ).Base.Name ) );
+				ShowContinueError( "Occurs in Gas Turbine Chiller object=" + GTChiller( ChillNum ).Base.Name );
 				ErrorsFound = true;
 			} else {
 				if ( ! GTChiller( ChillNum ).Base.IsThisSized ) {
@@ -3655,9 +3656,9 @@ namespace PlantChillers {
 							ReportSizingOutput( "Chiller:CombustionTurbine", GTChiller( ChillNum ).Base.Name, "Design size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate, "User-Specified Design Chilled Water Flow Rate [m3/s]", EvapVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpEvapVolFlowRate - EvapVolFlowRateUser ) / EvapVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeChillerElectricEIR: Potential issue with equipment sizing for " + trim( GTChiller( ChillNum ).Base.Name ) );
-									ShowContinueError( "User-Specified Design Chilled Water Flow Rate of " + trim( RoundSigDigits( EvapVolFlowRateUser, 5 ) ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Design Chilled Water Flow Rate of " + trim( RoundSigDigits( tmpEvapVolFlowRate, 5 ) ) + " [m3/s]" );
+									ShowMessage( "SizeChillerElectricEIR: Potential issue with equipment sizing for " + GTChiller( ChillNum ).Base.Name );
+									ShowContinueError( "User-Specified Design Chilled Water Flow Rate of " + RoundSigDigits( EvapVolFlowRateUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Design Chilled Water Flow Rate of " + RoundSigDigits( tmpEvapVolFlowRate, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -3670,7 +3671,7 @@ namespace PlantChillers {
 		} else {
 			if ( IsAutoSize ) {
 				ShowSevereError( "Autosizing of Gas Turbine Chiller evap flow rate requires a loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in Gas Turbine Chiller object=" + trim( GTChiller( ChillNum ).Base.Name ) );
+				ShowContinueError( "Occurs in Gas Turbine Chiller object=" + GTChiller( ChillNum ).Base.Name );
 				ErrorsFound = true;
 			} else {
 				if ( ! GTChiller( ChillNum ).Base.IsThisSized ) {
@@ -3712,9 +3713,9 @@ namespace PlantChillers {
 							ReportSizingOutput( "Chiller:CombustionTurbine", GTChiller( ChillNum ).Base.Name, "Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate, "User-Specified Design Condenser Water Flow Rate [m3/s]", CondVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpCondVolFlowRate - CondVolFlowRateUser ) / CondVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeChillerElectricEIR: Potential issue with equipment sizing for " + trim( GTChiller( ChillNum ).Base.Name ) );
-									ShowContinueError( "User-Specified Design Condenser Water Flow Rate of " + trim( RoundSigDigits( CondVolFlowRateUser, 5 ) ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Design Condenser Water Flow Rate of " + trim( RoundSigDigits( tmpCondVolFlowRate, 5 ) ) + " [m3/s]" );
+									ShowMessage( "SizeChillerElectricEIR: Potential issue with equipment sizing for " + GTChiller( ChillNum ).Base.Name );
+									ShowContinueError( "User-Specified Design Condenser Water Flow Rate of " + RoundSigDigits( CondVolFlowRateUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Design Condenser Water Flow Rate of " + RoundSigDigits( tmpCondVolFlowRate, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -3728,7 +3729,7 @@ namespace PlantChillers {
 			if ( IsAutoSize ) {
 				ShowSevereError( "Autosizing of Gas Turbine Chiller condenser flow rate requires a condenser" );
 				ShowContinueError( "loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in Gas Turbine Chiller object=" + trim( GTChiller( ChillNum ).Base.Name ) );
+				ShowContinueError( "Occurs in Gas Turbine Chiller object=" + GTChiller( ChillNum ).Base.Name );
 				ErrorsFound = true;
 			} else {
 				if ( ! GTChiller( ChillNum ).Base.IsThisSized ) {
@@ -3760,9 +3761,9 @@ namespace PlantChillers {
 					}
 					if ( DisplayExtraWarnings ) {
 						if ( ( std::abs( GTEngineCapacityDes - GTEngineCapacityUser ) / GTEngineCapacityUser ) > AutoVsHardSizingThreshold ) {
-							ShowMessage( "SizeChillerElectricEIR: Potential issue with equipment sizing for " + trim( GTChiller( ChillNum ).Base.Name ) );
-							ShowContinueError( "User-Specified Gas Turbine Engine Capacity of " + trim( RoundSigDigits( GTEngineCapacityUser, 2 ) ) + " [W]" );
-							ShowContinueError( "differs from Design Size Gas Turbine Engine Capacity of " + trim( RoundSigDigits( GTEngineCapacityDes, 2 ) ) + " [W]" );
+							ShowMessage( "SizeChillerElectricEIR: Potential issue with equipment sizing for " + GTChiller( ChillNum ).Base.Name );
+							ShowContinueError( "User-Specified Gas Turbine Engine Capacity of " + RoundSigDigits( GTEngineCapacityUser, 2 ) + " [W]" );
+							ShowContinueError( "differs from Design Size Gas Turbine Engine Capacity of " + RoundSigDigits( GTEngineCapacityDes, 2 ) + " [W]" );
 							ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 							ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 						}
@@ -3835,7 +3836,7 @@ namespace PlantChillers {
 		int PltSizCondNum; // Plant Sizing index for condenser loop
 		bool ErrorsFound; // If errors detected in input
 		bool LoopErrorsFound;
-		Fstring equipName( MaxNameLength );
+		std::string equipName;
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
 		Real64 tmpNomCap; // local nominal capacity cooling power
@@ -3892,9 +3893,9 @@ namespace PlantChillers {
 							ReportSizingOutput( "Chiller:ConstantCOP", ConstCOPChiller( ChillNum ).Base.Name, "Design Size Nominal Capacity [W]", tmpNomCap, "User-Specified Nominal Capacity [W]", NomCapUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpNomCap - NomCapUser ) / NomCapUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeChillerConstantCOP: Potential issue with equipment sizing for " + trim( ConstCOPChiller( ChillNum ).Base.Name ) );
-									ShowContinueError( "User-Specified Nominal Capacity of " + trim( RoundSigDigits( NomCapUser, 2 ) ) + " [W]" );
-									ShowContinueError( "differs from Design Size Nominal Capacity of " + trim( RoundSigDigits( tmpNomCap, 2 ) ) + " [W]" );
+									ShowMessage( "SizeChillerConstantCOP: Potential issue with equipment sizing for " + ConstCOPChiller( ChillNum ).Base.Name );
+									ShowContinueError( "User-Specified Nominal Capacity of " + RoundSigDigits( NomCapUser, 2 ) + " [W]" );
+									ShowContinueError( "differs from Design Size Nominal Capacity of " + RoundSigDigits( tmpNomCap, 2 ) + " [W]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -3907,7 +3908,7 @@ namespace PlantChillers {
 		} else {
 			if ( IsAutoSize ) {
 				ShowSevereError( "Autosizing of Constant COP Chiller nominal capacity requires a loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in Chiller:ConstantCOP object=" + trim( ConstCOPChiller( ChillNum ).Base.Name ) );
+				ShowContinueError( "Occurs in Chiller:ConstantCOP object=" + ConstCOPChiller( ChillNum ).Base.Name );
 				ErrorsFound = true;
 			} else {
 				if ( ! ConstCOPChiller( ChillNum ).Base.IsThisSized ) {
@@ -3944,9 +3945,9 @@ namespace PlantChillers {
 							ReportSizingOutput( "Chiller:ConstantCOP", ConstCOPChiller( ChillNum ).Base.Name, "Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate, "User-Specified Design Chilled Water Flow Rate [m3/s]", EvapVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpEvapVolFlowRate - EvapVolFlowRateUser ) / EvapVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeChillerConstantCOP: Potential issue with equipment sizing for " + trim( ConstCOPChiller( ChillNum ).Base.Name ) );
-									ShowContinueError( "User-Specified Design Chilled Water Flow Rate of " + trim( RoundSigDigits( EvapVolFlowRateUser, 5 ) ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Design Chilled Water Flow Rate of " + trim( RoundSigDigits( tmpEvapVolFlowRate, 5 ) ) + " [m3/s]" );
+									ShowMessage( "SizeChillerConstantCOP: Potential issue with equipment sizing for " + ConstCOPChiller( ChillNum ).Base.Name );
+									ShowContinueError( "User-Specified Design Chilled Water Flow Rate of " + RoundSigDigits( EvapVolFlowRateUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Design Chilled Water Flow Rate of " + RoundSigDigits( tmpEvapVolFlowRate, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -3959,7 +3960,7 @@ namespace PlantChillers {
 		} else {
 			if ( IsAutoSize ) {
 				ShowSevereError( "Autosizing of Constant COP Chiller evap flow rate requires a loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in Chiller:ConstantCOP object=" + trim( ConstCOPChiller( ChillNum ).Base.Name ) );
+				ShowContinueError( "Occurs in Chiller:ConstantCOP object=" + ConstCOPChiller( ChillNum ).Base.Name );
 				ErrorsFound = true;
 			} else {
 				if ( ! ConstCOPChiller( ChillNum ).Base.IsThisSized ) {
@@ -4002,9 +4003,9 @@ namespace PlantChillers {
 								ReportSizingOutput( "Chiller:ConstantCOP", ConstCOPChiller( ChillNum ).Base.Name, "Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate, "User-Specified Design Condenser Water Flow Rate [m3/s]", CondVolFlowRateUser );
 								if ( DisplayExtraWarnings ) {
 									if ( ( std::abs( tmpCondVolFlowRate - CondVolFlowRateUser ) / CondVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeChillerConstantCOP: Potential issue with equipment sizing for " + trim( ConstCOPChiller( ChillNum ).Base.Name ) );
-										ShowContinueError( "User-Specified Design Condenser Water Flow Rate of " + trim( RoundSigDigits( CondVolFlowRateUser, 5 ) ) + " [m3/s]" );
-										ShowContinueError( "differs from Design Size Design Condenser Water Flow Rate of " + trim( RoundSigDigits( tmpCondVolFlowRate, 5 ) ) + " [m3/s]" );
+										ShowMessage( "SizeChillerConstantCOP: Potential issue with equipment sizing for " + ConstCOPChiller( ChillNum ).Base.Name );
+										ShowContinueError( "User-Specified Design Condenser Water Flow Rate of " + RoundSigDigits( CondVolFlowRateUser, 5 ) + " [m3/s]" );
+										ShowContinueError( "differs from Design Size Design Condenser Water Flow Rate of " + RoundSigDigits( tmpCondVolFlowRate, 5 ) + " [m3/s]" );
 										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 									}
@@ -4018,7 +4019,7 @@ namespace PlantChillers {
 				if ( IsAutoSize ) {
 					ShowSevereError( "Autosizing of Constant COP Chiller condenser flow rate requires a condenser" );
 					ShowContinueError( "loop Sizing:Plant object" );
-					ShowContinueError( "Occurs in Chiller:ConstantCOP object=" + trim( ConstCOPChiller( ChillNum ).Base.Name ) );
+					ShowContinueError( "Occurs in Chiller:ConstantCOP object=" + ConstCOPChiller( ChillNum ).Base.Name );
 					ErrorsFound = true;
 				} else {
 					if ( ! ConstCOPChiller( ChillNum ).Base.IsThisSized ) {
@@ -4107,7 +4108,7 @@ namespace PlantChillers {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 
-		static Fstring const OutputFormat( "(F6.2)" );
+		static gio::Fmt const OutputFormat( "(F6.2)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -4152,7 +4153,7 @@ namespace PlantChillers {
 		static Real64 TimeStepSysLast( 0.0 ); // last system time step (used to check for downshifting)
 		Real64 CurrentEndTime; // end time of time step for current simulation time step
 		static Real64 CurrentEndTimeLast( 0.0 ); // end time of time step for last simulation time step
-		static Fstring OutputChar( 6 ); // character string for warning messages
+		static std::string OutputChar; // character string for warning messages
 		Real64 Cp; // local for fluid specif heat, for evaporator
 		Real64 CpCond; // local for fluid specif heat, for condenser
 
@@ -4189,10 +4190,10 @@ namespace PlantChillers {
 				++ElectricChiller( ChillNum ).Base.MsgErrorCount;
 				//       Show single warning and pass additional info to ShowRecurringWarningErrorAtEnd
 				if ( ElectricChiller( ChillNum ).Base.MsgErrorCount < 2 ) {
-					ShowWarningError( trim( ElectricChiller( ChillNum ).Base.MsgBuffer1 ) + "." );
-					ShowContinueError( trim( ElectricChiller( ChillNum ).Base.MsgBuffer2 ) );
+					ShowWarningError( ElectricChiller( ChillNum ).Base.MsgBuffer1 + '.' );
+					ShowContinueError( ElectricChiller( ChillNum ).Base.MsgBuffer2 );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( ElectricChiller( ChillNum ).Base.MsgBuffer1 ) + " error continues.", ElectricChiller( ChillNum ).Base.ErrCount1, ElectricChiller( ChillNum ).Base.MsgDataLast, ElectricChiller( ChillNum ).Base.MsgDataLast, _, "[C]", "[C]" );
+					ShowRecurringWarningErrorAtEnd( ElectricChiller( ChillNum ).Base.MsgBuffer1 + " error continues.", ElectricChiller( ChillNum ).Base.ErrCount1, ElectricChiller( ChillNum ).Base.MsgDataLast, ElectricChiller( ChillNum ).Base.MsgDataLast, _, "[C]", "[C]" );
 				}
 			}
 		}
@@ -4267,8 +4268,8 @@ namespace PlantChillers {
 			if ( Node( CondInletNode ).Temp < 0.0 && ! WarmupFlag ) {
 				ElectricChiller( ChillNum ).Base.PrintMessage = true;
 				gio::write( OutputChar, OutputFormat ) << Node( CondInletNode ).Temp;
-				ElectricChiller( ChillNum ).Base.MsgBuffer1 = "CalcElectricChillerModel - Chiller:Electric \"" + trim( ElectricChiller( ChillNum ).Base.Name ) + "\" - Air Cooled Condenser Inlet Temperature below 0C";
-				ElectricChiller( ChillNum ).Base.MsgBuffer2 = "... Outdoor Dry-bulb Condition = " + trim( OutputChar ) + " C. Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + " " + trim( CreateSysTimeIntervalString() );
+				ElectricChiller( ChillNum ).Base.MsgBuffer1 = "CalcElectricChillerModel - Chiller:Electric \"" + ElectricChiller( ChillNum ).Base.Name + "\" - Air Cooled Condenser Inlet Temperature below 0C";
+				ElectricChiller( ChillNum ).Base.MsgBuffer2 = "... Outdoor Dry-bulb Condition = " + OutputChar + " C. Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 				ElectricChiller( ChillNum ).Base.MsgDataLast = Node( CondInletNode ).Temp;
 			} else {
 				ElectricChiller( ChillNum ).Base.PrintMessage = false;
@@ -4281,8 +4282,8 @@ namespace PlantChillers {
 			if ( Node( CondInletNode ).Temp < 10.0 && ! WarmupFlag ) {
 				ElectricChiller( ChillNum ).Base.PrintMessage = true;
 				gio::write( OutputChar, OutputFormat ) << Node( CondInletNode ).Temp;
-				ElectricChiller( ChillNum ).Base.MsgBuffer1 = "CalcElectricChillerModel - Chiller:Electric \"" + trim( ElectricChiller( ChillNum ).Base.Name ) + "\" - Evap Cooled Condenser Inlet Temperature below 10C";
-				ElectricChiller( ChillNum ).Base.MsgBuffer2 = "... Outdoor Wet-bulb Condition = " + trim( OutputChar ) + " C. Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + " " + trim( CreateSysTimeIntervalString() );
+				ElectricChiller( ChillNum ).Base.MsgBuffer1 = "CalcElectricChillerModel - Chiller:Electric \"" + ElectricChiller( ChillNum ).Base.Name + "\" - Evap Cooled Condenser Inlet Temperature below 10C";
+				ElectricChiller( ChillNum ).Base.MsgBuffer2 = "... Outdoor Wet-bulb Condition = " + OutputChar + " C. Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 				ElectricChiller( ChillNum ).Base.MsgDataLast = Node( CondInletNode ).Temp;
 			} else {
 				ElectricChiller( ChillNum ).Base.PrintMessage = false;
@@ -4539,8 +4540,8 @@ namespace PlantChillers {
 				CpCond = GetSpecificHeatGlycol( PlantLoop( ElectricChiller( ChillNum ).Base.CDLoopNum ).FluidName, CondInletTemp, PlantLoop( ElectricChiller( ChillNum ).Base.CDLoopNum ).FluidIndex, "CalcElectricChillerModel" );
 				CondOutletTemp = QCondenser / CondMassFlowRate / CpCond + CondInletTemp;
 			} else {
-				ShowSevereError( "CalcElectricChillerModel: Condenser flow = 0, for ElectricChiller=" + trim( ElectricChiller( ChillNum ).Base.Name ) );
-				ShowContinueErrorTimeStamp( " " );
+				ShowSevereError( "CalcElectricChillerModel: Condenser flow = 0, for ElectricChiller=" + ElectricChiller( ChillNum ).Base.Name );
+				ShowContinueErrorTimeStamp( "" );
 
 			}
 		} else { //Air Cooled or Evap Cooled
@@ -4572,22 +4573,22 @@ namespace PlantChillers {
 			if ( ElectricChiller( ChillNum ).Base.CondenserType == WaterCooled ) {
 				// first check for run away condenser loop temps (only reason yet to be observed for this?)
 				if ( CondInletTemp > 70.0 ) {
-					ShowSevereError( "CalcElectricChillerModel: Condenser loop inlet temperatures over 70.0 C for ElectricChiller=" + trim( ElectricChiller( ChillNum ).Base.Name ) );
-					ShowContinueErrorTimeStamp( " " );
-					ShowContinueError( "Condenser loop water temperatures are too high at" + trim( RoundSigDigits( CondInletTemp, 2 ) ) );
+					ShowSevereError( "CalcElectricChillerModel: Condenser loop inlet temperatures over 70.0 C for ElectricChiller=" + ElectricChiller( ChillNum ).Base.Name );
+					ShowContinueErrorTimeStamp( "" );
+					ShowContinueError( "Condenser loop water temperatures are too high at" + RoundSigDigits( CondInletTemp, 2 ) );
 					ShowContinueError( "Check input for condenser plant loop, especially cooling tower" );
-					ShowContinueError( "Evaporator inlet temperature: " + trim( RoundSigDigits( Node( EvapInletNode ).Temp, 2 ) ) );
+					ShowContinueError( "Evaporator inlet temperature: " + RoundSigDigits( Node( EvapInletNode ).Temp, 2 ) );
 
 					ShowFatalError( "Program Terminates due to previous error condition" );
 				}
 			}
 			if ( ! WarmupFlag ) {
 				if ( AvailNomCapRat < 0.0 ) { // apparently the real reason energy goes negative
-					ShowSevereError( "CalcElectricChillerModel: Capacity ratio below zero for ElectricChiller=" + trim( ElectricChiller( ChillNum ).Base.Name ) );
-					ShowContinueErrorTimeStamp( " " );
+					ShowSevereError( "CalcElectricChillerModel: Capacity ratio below zero for ElectricChiller=" + ElectricChiller( ChillNum ).Base.Name );
+					ShowContinueErrorTimeStamp( "" );
 					ShowContinueError( "Check input for Capacity Ratio Curve" );
-					ShowContinueError( "Condenser inlet temperature: " + trim( RoundSigDigits( CondInletTemp, 2 ) ) );
-					ShowContinueError( "Evaporator inlet temperature: " + trim( RoundSigDigits( Node( EvapInletNode ).Temp, 2 ) ) );
+					ShowContinueError( "Condenser inlet temperature: " + RoundSigDigits( CondInletTemp, 2 ) );
+					ShowContinueError( "Evaporator inlet temperature: " + RoundSigDigits( Node( EvapInletNode ).Temp, 2 ) );
 					ShowFatalError( "Program Terminates due to previous error condition" );
 				}
 			}
@@ -4659,7 +4660,7 @@ namespace PlantChillers {
 		Real64 const ReferenceTemp( 25.0 ); // Reference temperature by which lower heating
 		// value is reported.  This should be subtracted
 		// off of when calculated exhaust energies.
-		static Fstring const OutputFormat( "(F6.2)" );
+		static gio::Fmt const OutputFormat( "(F6.2)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -4701,7 +4702,7 @@ namespace PlantChillers {
 		static Real64 TimeStepSysLast( 0.0 ); // last system time step (used to check for downshifting)
 		Real64 CurrentEndTime; // end time of time step for current simulation time step
 		static Real64 CurrentEndTimeLast( 0.0 ); // end time of time step for last simulation time step
-		static Fstring OutputChar( 6 ); // character string for warning messages
+		static std::string OutputChar; // character string for warning messages
 		Real64 Cp; // local for fluid specif heat, for evaporator
 		Real64 CpCond; // local for fluid specif heat, for condenser
 
@@ -4773,10 +4774,10 @@ namespace PlantChillers {
 				++EngineDrivenChiller( ChillerNum ).Base.MsgErrorCount;
 				//     Show single warning and pass additional info to ShowRecurringWarningErrorAtEnd
 				if ( EngineDrivenChiller( ChillerNum ).Base.MsgErrorCount < 2 ) {
-					ShowWarningError( trim( EngineDrivenChiller( ChillerNum ).Base.MsgBuffer1 ) + "." );
-					ShowContinueError( trim( EngineDrivenChiller( ChillerNum ).Base.MsgBuffer2 ) );
+					ShowWarningError( EngineDrivenChiller( ChillerNum ).Base.MsgBuffer1 + '.' );
+					ShowContinueError( EngineDrivenChiller( ChillerNum ).Base.MsgBuffer2 );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( EngineDrivenChiller( ChillerNum ).Base.MsgBuffer1 ) + " error continues.", EngineDrivenChiller( ChillerNum ).Base.ErrCount1, EngineDrivenChiller( ChillerNum ).Base.MsgDataLast, EngineDrivenChiller( ChillerNum ).Base.MsgDataLast, _, "[C]", "[C]" );
+					ShowRecurringWarningErrorAtEnd( EngineDrivenChiller( ChillerNum ).Base.MsgBuffer1 + " error continues.", EngineDrivenChiller( ChillerNum ).Base.ErrCount1, EngineDrivenChiller( ChillerNum ).Base.MsgDataLast, EngineDrivenChiller( ChillerNum ).Base.MsgDataLast, _, "[C]", "[C]" );
 				}
 			}
 		}
@@ -4817,8 +4818,8 @@ namespace PlantChillers {
 			if ( Node( CondInletNode ).Temp < 0.0 && ! WarmupFlag ) {
 				EngineDrivenChiller( ChillerNum ).Base.PrintMessage = true;
 				gio::write( OutputChar, OutputFormat ) << Node( CondInletNode ).Temp;
-				EngineDrivenChiller( ChillerNum ).Base.MsgBuffer1 = "CalcEngineDrivenChillerModel - Chiller:EngineDriven \"" + trim( EngineDrivenChiller( ChillerNum ).Base.Name ) + "\" - Air Cooled Condenser Inlet Temperature below 0C";
-				EngineDrivenChiller( ChillerNum ).Base.MsgBuffer2 = "... Outdoor Dry-bulb Condition = " + trim( OutputChar ) + " C. Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + " " + trim( CreateSysTimeIntervalString() );
+				EngineDrivenChiller( ChillerNum ).Base.MsgBuffer1 = "CalcEngineDrivenChillerModel - Chiller:EngineDriven \"" + EngineDrivenChiller( ChillerNum ).Base.Name + "\" - Air Cooled Condenser Inlet Temperature below 0C";
+				EngineDrivenChiller( ChillerNum ).Base.MsgBuffer2 = "... Outdoor Dry-bulb Condition = " + OutputChar + " C. Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 				EngineDrivenChiller( ChillerNum ).Base.MsgDataLast = Node( CondInletNode ).Temp;
 			} else {
 				EngineDrivenChiller( ChillerNum ).Base.PrintMessage = false;
@@ -4829,8 +4830,8 @@ namespace PlantChillers {
 			if ( Node( CondInletNode ).Temp < 10.0 && ! WarmupFlag ) {
 				EngineDrivenChiller( ChillerNum ).Base.PrintMessage = true;
 				gio::write( OutputChar, OutputFormat ) << Node( CondInletNode ).Temp;
-				EngineDrivenChiller( ChillerNum ).Base.MsgBuffer1 = "CalcEngineDrivenChillerModel - Chiller:EngineDriven \"" + trim( EngineDrivenChiller( ChillerNum ).Base.Name ) + "\" - Evap Cooled Condenser Inlet Temperature below 10C";
-				EngineDrivenChiller( ChillerNum ).Base.MsgBuffer2 = "... Outdoor Wet-bulb Condition = " + trim( OutputChar ) + " C. Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + " " + trim( CreateSysTimeIntervalString() );
+				EngineDrivenChiller( ChillerNum ).Base.MsgBuffer1 = "CalcEngineDrivenChillerModel - Chiller:EngineDriven \"" + EngineDrivenChiller( ChillerNum ).Base.Name + "\" - Evap Cooled Condenser Inlet Temperature below 10C";
+				EngineDrivenChiller( ChillerNum ).Base.MsgBuffer2 = "... Outdoor Wet-bulb Condition = " + OutputChar + " C. Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 				EngineDrivenChiller( ChillerNum ).Base.MsgDataLast = Node( CondInletNode ).Temp;
 			} else {
 				EngineDrivenChiller( ChillerNum ).Base.PrintMessage = false;
@@ -5086,8 +5087,8 @@ namespace PlantChillers {
 				CpCond = GetSpecificHeatGlycol( PlantLoop( EngineDrivenChiller( ChillerNum ).Base.CDLoopNum ).FluidName, CondInletTemp, PlantLoop( EngineDrivenChiller( ChillerNum ).Base.CDLoopNum ).FluidIndex, "CalcEngineDrivenChillerModel" );
 				CondOutletTemp = QCondenser / CondMassFlowRate / CpCond + CondInletTemp;
 			} else {
-				ShowSevereError( "CalcEngineDrivenChillerModel: Condenser flow = 0, for EngineDrivenChiller=" + trim( EngineDrivenChiller( ChillerNum ).Base.Name ) );
-				ShowContinueErrorTimeStamp( " " );
+				ShowSevereError( "CalcEngineDrivenChillerModel: Condenser flow = 0, for EngineDrivenChiller=" + EngineDrivenChiller( ChillerNum ).Base.Name );
+				ShowContinueErrorTimeStamp( "" );
 			}
 
 		} else { //Air Cooled or Evap Cooled
@@ -5176,22 +5177,22 @@ namespace PlantChillers {
 			if ( EngineDrivenChiller( ChillerNum ).Base.CondenserType == WaterCooled ) {
 				// first check for run away condenser loop temps (only reason yet to be observed for this?)
 				if ( CondInletTemp > 70.0 ) {
-					ShowSevereError( "CalcEngineDrivenChillerModel: Condenser loop inlet temperatures " "> 70.0 C for EngineDrivenChiller=" + trim( EngineDrivenChiller( ChillerNum ).Base.Name ) );
-					ShowContinueErrorTimeStamp( " " );
-					ShowContinueError( "Condenser loop water temperatures are too high at" + trim( RoundSigDigits( CondInletTemp, 2 ) ) );
+					ShowSevereError( "CalcEngineDrivenChillerModel: Condenser loop inlet temperatures " "> 70.0 C for EngineDrivenChiller=" + EngineDrivenChiller( ChillerNum ).Base.Name );
+					ShowContinueErrorTimeStamp( "" );
+					ShowContinueError( "Condenser loop water temperatures are too high at" + RoundSigDigits( CondInletTemp, 2 ) );
 					ShowContinueError( "Check input for condenser plant loop, especially cooling tower" );
-					ShowContinueError( "Evaporator inlet temperature: " + trim( RoundSigDigits( Node( EvapInletNode ).Temp, 2 ) ) );
+					ShowContinueError( "Evaporator inlet temperature: " + RoundSigDigits( Node( EvapInletNode ).Temp, 2 ) );
 
 					ShowFatalError( "Program Terminates due to previous error condition" );
 				}
 			}
 			if ( ! WarmupFlag ) {
 				if ( AvailNomCapRat < 0.0 ) { // apparently the real reason energy goes negative
-					ShowSevereError( "CalcEngineDrivenChillerModel: Capacity ratio below zero for EngineDrivenChiller=" + trim( EngineDrivenChiller( ChillerNum ).Base.Name ) );
-					ShowContinueErrorTimeStamp( " " );
+					ShowSevereError( "CalcEngineDrivenChillerModel: Capacity ratio below zero for EngineDrivenChiller=" + EngineDrivenChiller( ChillerNum ).Base.Name );
+					ShowContinueErrorTimeStamp( "" );
 					ShowContinueError( "Check input for Capacity Ratio Curve" );
-					ShowContinueError( "Condenser inlet temperature: " + trim( RoundSigDigits( CondInletTemp, 2 ) ) );
-					ShowContinueError( "Evaporator inlet temperature: " + trim( RoundSigDigits( Node( EvapInletNode ).Temp, 2 ) ) );
+					ShowContinueError( "Condenser inlet temperature: " + RoundSigDigits( CondInletTemp, 2 ) );
+					ShowContinueError( "Evaporator inlet temperature: " + RoundSigDigits( Node( EvapInletNode ).Temp, 2 ) );
 					ShowFatalError( "Program Terminates due to previous error condition" );
 				}
 			}
@@ -5261,7 +5262,7 @@ namespace PlantChillers {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 
 		Real64 const ExhaustCP( 1.047 ); // Exhaust Gas Specific Heat
-		static Fstring const OutputFormat( "(F6.2)" );
+		static gio::Fmt const OutputFormat( "(F6.2)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -5315,7 +5316,7 @@ namespace PlantChillers {
 		static Real64 TimeStepSysLast( 0.0 ); // last system time step (used to check for downshifting)
 		Real64 CurrentEndTime; // end time of time step for current simulation time step
 		static Real64 CurrentEndTimeLast( 0.0 ); // end time of time step for last simulation time step
-		static Fstring OutputChar( 6 ); // character string for warning messages
+		static std::string OutputChar; // character string for warning messages
 
 		int HeatRecInNode; // Heat Recovery Fluid Inlet Node Num
 		int HeatRecOutNode; // Heat Recovery Fluid Outlet Node Num
@@ -5367,10 +5368,10 @@ namespace PlantChillers {
 				++GTChiller( ChillerNum ).Base.MsgErrorCount;
 				// Show single warning and pass additional info to ShowRecurringWarningErrorAtEnd
 				if ( GTChiller( ChillerNum ).Base.MsgErrorCount < 2 ) {
-					ShowWarningError( trim( GTChiller( ChillerNum ).Base.MsgBuffer1 ) + "." );
-					ShowContinueError( trim( GTChiller( ChillerNum ).Base.MsgBuffer2 ) );
+					ShowWarningError( GTChiller( ChillerNum ).Base.MsgBuffer1 + '.' );
+					ShowContinueError( GTChiller( ChillerNum ).Base.MsgBuffer2 );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( GTChiller( ChillerNum ).Base.MsgBuffer1 ) + " error continues.", GTChiller( ChillerNum ).Base.ErrCount1, GTChiller( ChillerNum ).Base.MsgDataLast, GTChiller( ChillerNum ).Base.MsgDataLast, _, "[C]", "[C]" );
+					ShowRecurringWarningErrorAtEnd( GTChiller( ChillerNum ).Base.MsgBuffer1 + " error continues.", GTChiller( ChillerNum ).Base.ErrCount1, GTChiller( ChillerNum ).Base.MsgDataLast, GTChiller( ChillerNum ).Base.MsgDataLast, _, "[C]", "[C]" );
 				}
 			}
 		}
@@ -5412,8 +5413,8 @@ namespace PlantChillers {
 			if ( Node( CondInletNode ).Temp < 0.0 && ! WarmupFlag ) {
 				GTChiller( ChillerNum ).Base.PrintMessage = true;
 				gio::write( OutputChar, OutputFormat ) << Node( CondInletNode ).Temp;
-				GTChiller( ChillerNum ).Base.MsgBuffer1 = "CalcGasTurbineChillerModel - Chiller:CombustionTurbine \"" + trim( GTChiller( ChillerNum ).Base.Name ) + "\" - Air Cooled Condenser Inlet Temperature below 0C";
-				GTChiller( ChillerNum ).Base.MsgBuffer2 = "... Outdoor Dry-bulb Condition = " + trim( OutputChar ) + " C. Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + " " + trim( CreateSysTimeIntervalString() );
+				GTChiller( ChillerNum ).Base.MsgBuffer1 = "CalcGasTurbineChillerModel - Chiller:CombustionTurbine \"" + GTChiller( ChillerNum ).Base.Name + "\" - Air Cooled Condenser Inlet Temperature below 0C";
+				GTChiller( ChillerNum ).Base.MsgBuffer2 = "... Outdoor Dry-bulb Condition = " + OutputChar + " C. Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 				GTChiller( ChillerNum ).Base.MsgDataLast = Node( CondInletNode ).Temp;
 			} else {
 				GTChiller( ChillerNum ).Base.PrintMessage = false;
@@ -5424,8 +5425,8 @@ namespace PlantChillers {
 			if ( Node( CondInletNode ).Temp < 10.0 && ! WarmupFlag ) {
 				GTChiller( ChillerNum ).Base.PrintMessage = true;
 				gio::write( OutputChar, OutputFormat ) << Node( CondInletNode ).Temp;
-				GTChiller( ChillerNum ).Base.MsgBuffer1 = "CalcGasTurbineChillerModel - Chiller:CombustionTurbine \"" + trim( GTChiller( ChillerNum ).Base.Name ) + "\" - Evap Cooled Condenser Inlet Temperature below 10C";
-				GTChiller( ChillerNum ).Base.MsgBuffer2 = "... Outdoor Wet-bulb Condition = " + trim( OutputChar ) + " C. Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + " " + trim( CreateSysTimeIntervalString() );
+				GTChiller( ChillerNum ).Base.MsgBuffer1 = "CalcGasTurbineChillerModel - Chiller:CombustionTurbine \"" + GTChiller( ChillerNum ).Base.Name + "\" - Evap Cooled Condenser Inlet Temperature below 10C";
+				GTChiller( ChillerNum ).Base.MsgBuffer2 = "... Outdoor Wet-bulb Condition = " + OutputChar + " C. Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 				GTChiller( ChillerNum ).Base.MsgDataLast = Node( CondInletNode ).Temp;
 			} else {
 				GTChiller( ChillerNum ).Base.PrintMessage = false;
@@ -5674,8 +5675,8 @@ namespace PlantChillers {
 				CpCond = GetSpecificHeatGlycol( PlantLoop( GTChiller( ChillerNum ).Base.CDLoopNum ).FluidName, CondInletTemp, PlantLoop( GTChiller( ChillerNum ).Base.CDLoopNum ).FluidIndex, "CalcGTChillerModel" );
 				CondOutletTemp = QCondenser / CondMassFlowRate / CpCond + CondInletTemp;
 			} else {
-				ShowSevereError( "CalcGasTurbineChillerModel: Condenser flow = 0, for GasTurbineChiller=" + trim( GTChiller( ChillerNum ).Base.Name ) );
-				ShowContinueErrorTimeStamp( " " );
+				ShowSevereError( "CalcGasTurbineChillerModel: Condenser flow = 0, for GasTurbineChiller=" + GTChiller( ChillerNum ).Base.Name );
+				ShowContinueErrorTimeStamp( "" );
 
 			}
 
@@ -5856,22 +5857,22 @@ namespace PlantChillers {
 			if ( GTChiller( ChillerNum ).Base.CondenserType == WaterCooled ) {
 				// first check for run away condenser loop temps (only reason yet to be observed for this?)
 				if ( CondInletTemp > 70.0 ) {
-					ShowSevereError( "CalcGTChillerModel: Condenser loop inlet temperatures over 70.0 C for GTChiller=" + trim( GTChiller( ChillerNum ).Base.Name ) );
-					ShowContinueErrorTimeStamp( " " );
-					ShowContinueError( "Condenser loop water temperatures are too high at" + trim( RoundSigDigits( CondInletTemp, 2 ) ) );
+					ShowSevereError( "CalcGTChillerModel: Condenser loop inlet temperatures over 70.0 C for GTChiller=" + GTChiller( ChillerNum ).Base.Name );
+					ShowContinueErrorTimeStamp( "" );
+					ShowContinueError( "Condenser loop water temperatures are too high at" + RoundSigDigits( CondInletTemp, 2 ) );
 					ShowContinueError( "Check input for condenser plant loop, especially cooling tower" );
-					ShowContinueError( "Evaporator inlet temperature: " + trim( RoundSigDigits( Node( EvapInletNode ).Temp, 2 ) ) );
+					ShowContinueError( "Evaporator inlet temperature: " + RoundSigDigits( Node( EvapInletNode ).Temp, 2 ) );
 
 					ShowFatalError( "Program Terminates due to previous error condition" );
 				}
 			}
 			if ( ! WarmupFlag ) {
 				if ( AvailNomCapRat < 0.0 ) { // apparently the real reason energy goes negative
-					ShowSevereError( "CalcGTChillerModel: Capacity ratio below zero for GTChiller=" + trim( GTChiller( ChillerNum ).Base.Name ) );
-					ShowContinueErrorTimeStamp( " " );
+					ShowSevereError( "CalcGTChillerModel: Capacity ratio below zero for GTChiller=" + GTChiller( ChillerNum ).Base.Name );
+					ShowContinueErrorTimeStamp( "" );
 					ShowContinueError( "Check input for Capacity Ratio Curve" );
-					ShowContinueError( "Condenser inlet temperature: " + trim( RoundSigDigits( CondInletTemp, 2 ) ) );
-					ShowContinueError( "Evaporator inlet temperature: " + trim( RoundSigDigits( Node( EvapInletNode ).Temp, 2 ) ) );
+					ShowContinueError( "Condenser inlet temperature: " + RoundSigDigits( CondInletTemp, 2 ) );
+					ShowContinueError( "Evaporator inlet temperature: " + RoundSigDigits( Node( EvapInletNode ).Temp, 2 ) );
 					ShowFatalError( "Program Terminates due to previous error condition" );
 				}
 			}
@@ -5930,7 +5931,7 @@ namespace PlantChillers {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 
 		Real64 const DeltaTempTol( 0.0001 ); // C - minimum significant mass flow rate
-		static Fstring const OutputFormat( "(F6.2)" );
+		static gio::Fmt const OutputFormat( "(F6.2)" );
 
 		// DERIVED TYPE DEFINITIONS
 		// na
@@ -5948,7 +5949,7 @@ namespace PlantChillers {
 		static Real64 TimeStepSysLast( 0.0 ); // last system time step (used to check for downshifting)
 		Real64 CurrentEndTime; // end time of time step for current simulation time step
 		static Real64 CurrentEndTimeLast( 0.0 ); // end time of time step for last simulation time step
-		static Fstring OutputChar( 6 ); // character string for warning messages
+		static std::string OutputChar; // character string for warning messages
 		Real64 Cp; // local for fluid specif heat, for evaporator
 		Real64 CpCond; // local for fluid specif heat, for condenser
 
@@ -6028,10 +6029,10 @@ namespace PlantChillers {
 				++ConstCOPChiller( ChillNum ).Base.MsgErrorCount;
 				//       Show single warning and pass additional info to ShowRecurringWarningErrorAtEnd
 				if ( ConstCOPChiller( ChillNum ).Base.MsgErrorCount < 2 ) {
-					ShowWarningError( trim( ConstCOPChiller( ChillNum ).Base.MsgBuffer1 ) + "." );
-					ShowContinueError( trim( ConstCOPChiller( ChillNum ).Base.MsgBuffer2 ) );
+					ShowWarningError( ConstCOPChiller( ChillNum ).Base.MsgBuffer1 + '.' );
+					ShowContinueError( ConstCOPChiller( ChillNum ).Base.MsgBuffer2 );
 				} else {
-					ShowRecurringWarningErrorAtEnd( trim( ConstCOPChiller( ChillNum ).Base.MsgBuffer1 ) + " error continues.", ConstCOPChiller( ChillNum ).Base.ErrCount1, ConstCOPChiller( ChillNum ).Base.MsgDataLast, ConstCOPChiller( ChillNum ).Base.MsgDataLast, _, "[C]", "[C]" );
+					ShowRecurringWarningErrorAtEnd( ConstCOPChiller( ChillNum ).Base.MsgBuffer1 + " error continues.", ConstCOPChiller( ChillNum ).Base.ErrCount1, ConstCOPChiller( ChillNum ).Base.MsgDataLast, ConstCOPChiller( ChillNum ).Base.MsgDataLast, _, "[C]", "[C]" );
 				}
 			}
 		}
@@ -6048,8 +6049,8 @@ namespace PlantChillers {
 			if ( Node( CondInletNode ).Temp < 0.0 && ! WarmupFlag ) {
 				ConstCOPChiller( ChillNum ).Base.PrintMessage = true;
 				gio::write( OutputChar, OutputFormat ) << Node( CondInletNode ).Temp;
-				ConstCOPChiller( ChillNum ).Base.MsgBuffer1 = "CalcConstCOPChillerModel - Chiller:ConstantCOP \"" + trim( ConstCOPChiller( ChillNum ).Base.Name ) + "\" - Air Cooled Condenser Inlet Temperature below 0C";
-				ConstCOPChiller( ChillNum ).Base.MsgBuffer2 = "... Outdoor Dry-bulb Condition = " + trim( OutputChar ) + " C. Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + " " + trim( CreateSysTimeIntervalString() );
+				ConstCOPChiller( ChillNum ).Base.MsgBuffer1 = "CalcConstCOPChillerModel - Chiller:ConstantCOP \"" + ConstCOPChiller( ChillNum ).Base.Name + "\" - Air Cooled Condenser Inlet Temperature below 0C";
+				ConstCOPChiller( ChillNum ).Base.MsgBuffer2 = "... Outdoor Dry-bulb Condition = " + OutputChar + " C. Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 				ConstCOPChiller( ChillNum ).Base.MsgDataLast = Node( CondInletNode ).Temp;
 			} else {
 				ConstCOPChiller( ChillNum ).Base.PrintMessage = false;
@@ -6060,8 +6061,8 @@ namespace PlantChillers {
 			if ( Node( CondInletNode ).Temp < 10.0 && ! WarmupFlag ) {
 				ConstCOPChiller( ChillNum ).Base.PrintMessage = true;
 				gio::write( OutputChar, OutputFormat ) << Node( CondInletNode ).Temp;
-				ConstCOPChiller( ChillNum ).Base.MsgBuffer1 = "CalcConstCOPChillerModel - Chiller:ConstantCOP \"" + trim( ConstCOPChiller( ChillNum ).Base.Name ) + "\" - Evap Cooled Condenser Inlet Temperature below 10C";
-				ConstCOPChiller( ChillNum ).Base.MsgBuffer2 = "... Outdoor Wet-bulb Condition = " + trim( OutputChar ) + " C. Occurrence info = " + trim( EnvironmentName ) + ", " + trim( CurMnDy ) + " " + trim( CreateSysTimeIntervalString() );
+				ConstCOPChiller( ChillNum ).Base.MsgBuffer1 = "CalcConstCOPChillerModel - Chiller:ConstantCOP \"" + ConstCOPChiller( ChillNum ).Base.Name + "\" - Evap Cooled Condenser Inlet Temperature below 10C";
+				ConstCOPChiller( ChillNum ).Base.MsgBuffer2 = "... Outdoor Wet-bulb Condition = " + OutputChar + " C. Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 				ConstCOPChiller( ChillNum ).Base.MsgDataLast = Node( CondInletNode ).Temp;
 			} else {
 				ConstCOPChiller( ChillNum ).Base.PrintMessage = false;
@@ -6229,8 +6230,8 @@ namespace PlantChillers {
 			if ( CondMassFlowRate > MassFlowTolerance ) {
 				CondOutletTemp = QCondenser / CondMassFlowRate / CpCond + CondInletTemp;
 			} else {
-				ShowSevereError( "CalcConstCOPChillerModel: Condenser flow = 0, for CONST COP Chiller=" + trim( ConstCOPChiller( ChillNum ).Base.Name ) );
-				ShowContinueErrorTimeStamp( " " );
+				ShowSevereError( "CalcConstCOPChillerModel: Condenser flow = 0, for CONST COP Chiller=" + ConstCOPChiller( ChillNum ).Base.Name );
+				ShowContinueErrorTimeStamp( "" );
 
 			}
 		} else { // Air Cooled or Evap Cooled
@@ -6250,11 +6251,11 @@ namespace PlantChillers {
 			if ( ConstCOPChiller( ChillNum ).Base.CondenserType == WaterCooled ) {
 				// first check for run away condenser loop temps (only reason yet to be observed for this?)
 				if ( CondInletTemp > 70.0 ) {
-					ShowSevereError( "CalcConstCOPChillerModel: Condenser loop inlet temperatures over 70.0 C for ConstCOPChiller=" + trim( ConstCOPChiller( ChillNum ).Base.Name ) );
-					ShowContinueErrorTimeStamp( " " );
-					ShowContinueError( "Condenser loop water temperatures are too high at" + trim( RoundSigDigits( CondInletTemp, 2 ) ) );
+					ShowSevereError( "CalcConstCOPChillerModel: Condenser loop inlet temperatures over 70.0 C for ConstCOPChiller=" + ConstCOPChiller( ChillNum ).Base.Name );
+					ShowContinueErrorTimeStamp( "" );
+					ShowContinueError( "Condenser loop water temperatures are too high at" + RoundSigDigits( CondInletTemp, 2 ) );
 					ShowContinueError( "Check input for condenser plant loop, especially cooling tower" );
-					ShowContinueError( "Evaporator inlet temperature: " + trim( RoundSigDigits( Node( EvapInletNode ).Temp, 2 ) ) );
+					ShowContinueError( "Evaporator inlet temperature: " + RoundSigDigits( Node( EvapInletNode ).Temp, 2 ) );
 
 					ShowFatalError( "Program Terminates due to previous error condition" );
 				}

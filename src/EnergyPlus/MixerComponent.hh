@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace MixerComponent {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
@@ -35,7 +33,7 @@ namespace MixerComponent {
 	struct MixerConditions
 	{
 		// Members
-		Fstring MixerName; // Name of the Mixer
+		std::string MixerName; // Name of the Mixer
 		Real64 OutletTemp;
 		Real64 OutletHumRat;
 		Real64 OutletEnthalpy;
@@ -57,7 +55,6 @@ namespace MixerComponent {
 
 		// Default Constructor
 		MixerConditions() :
-			MixerName( MaxNameLength ),
 			OutletTemp( 0.0 ),
 			OutletHumRat( 0.0 ),
 			OutletEnthalpy( 0.0 ),
@@ -72,7 +69,7 @@ namespace MixerComponent {
 
 		// Member Constructor
 		MixerConditions(
-			Fstring const & MixerName, // Name of the Mixer
+			std::string const & MixerName, // Name of the Mixer
 			Real64 const OutletTemp,
 			Real64 const OutletHumRat,
 			Real64 const OutletEnthalpy,
@@ -92,7 +89,7 @@ namespace MixerComponent {
 			FArray1< Real64 > const & InletEnthalpy,
 			FArray1< Real64 > const & InletPressure
 		) :
-			MixerName( MaxNameLength, MixerName ),
+			MixerName( MixerName ),
 			OutletTemp( OutletTemp ),
 			OutletHumRat( OutletHumRat ),
 			OutletEnthalpy( OutletEnthalpy ),
@@ -122,7 +119,7 @@ namespace MixerComponent {
 
 	void
 	SimAirMixer(
-		Fstring const & CompName,
+		std::string const & CompName,
 		int & CompIndex
 	);
 

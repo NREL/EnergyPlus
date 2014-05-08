@@ -72,7 +72,6 @@ namespace FanCoilUnits {
 	using namespace DataSizing;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::BeginDayFlag;
-	using DataGlobals::MaxNameLength;
 	using DataGlobals::SecInHour;
 	using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
@@ -101,7 +100,7 @@ namespace FanCoilUnits {
 	// Data
 	// MODULE PARAMETER DEFINITIONS
 
-	Fstring const cMO_FanCoil( "ZoneHVAC:FourPipeFanCoil" );
+	std::string const cMO_FanCoil( "ZoneHVAC:FourPipeFanCoil" );
 
 	// coil operation
 	int const On( 1 ); // normal coil operation
@@ -143,7 +142,7 @@ namespace FanCoilUnits {
 
 	void
 	SimFanCoilUnit(
-		Fstring const & CompName, // name of the fan coil unit
+		std::string const & CompName, // name of the fan coil unit
 		int const ZoneNum, // number of zone being served
 		int const ControlledZoneNum, // index into ZoneEquipConfig array; may not be equal to ZoneNum
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
@@ -199,17 +198,17 @@ namespace FanCoilUnits {
 		if ( CompIndex == 0 ) {
 			FanCoilNum = FindItemInList( CompName, FanCoil.Name(), NumFanCoils );
 			if ( FanCoilNum == 0 ) {
-				ShowFatalError( "SimFanCoil: Unit not found=" + trim( CompName ) );
+				ShowFatalError( "SimFanCoil: Unit not found=" + CompName );
 			}
 			CompIndex = FanCoilNum;
 		} else {
 			FanCoilNum = CompIndex;
 			if ( FanCoilNum > NumFanCoils || FanCoilNum < 1 ) {
-				ShowFatalError( "SimFanCoil:  Invalid CompIndex passed=" + trim( TrimSigDigits( FanCoilNum ) ) + ", Number of Units=" + trim( TrimSigDigits( NumFanCoils ) ) + ", Entered Unit name=" + trim( CompName ) );
+				ShowFatalError( "SimFanCoil:  Invalid CompIndex passed=" + TrimSigDigits( FanCoilNum ) + ", Number of Units=" + TrimSigDigits( NumFanCoils ) + ", Entered Unit name=" + CompName );
 			}
 			if ( CheckEquipName( FanCoilNum ) ) {
 				if ( CompName != FanCoil( FanCoilNum ).Name ) {
-					ShowFatalError( "SimFanCoil: Invalid CompIndex passed=" + trim( TrimSigDigits( FanCoilNum ) ) + ", Unit name=" + trim( CompName ) + ", stored Unit Name for that index=" + trim( FanCoil( FanCoilNum ).Name ) );
+					ShowFatalError( "SimFanCoil: Invalid CompIndex passed=" + TrimSigDigits( FanCoilNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + FanCoil( FanCoilNum ).Name );
 				}
 				CheckEquipName( FanCoilNum ) = false;
 			}
@@ -291,7 +290,7 @@ namespace FanCoilUnits {
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
-		static Fstring const RoutineName( "GetFanCoilUnits: " ); // include trailing blank space
+		static std::string const RoutineName( "GetFanCoilUnits: " ); // include trailing blank space
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// na
@@ -313,10 +312,10 @@ namespace FanCoilUnits {
 		static bool errFlag( false ); // Local error flag for GetOAMixerNodeNums
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		Fstring CurrentModuleObject( MaxNameLength ); // Object type for getting and error messages
-		FArray1D_Fstring Alphas( sFstring( MaxNameLength ) ); // Alpha input items for object
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) ); // Numeric field names
+		std::string CurrentModuleObject; // Object type for getting and error messages
+		FArray1D_string Alphas; // Alpha input items for object
+		FArray1D_string cAlphaFields; // Alpha field names
+		FArray1D_string cNumericFields; // Numeric field names
 		FArray1D< Real64 > Numbers; // Numeric input items for object
 		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
@@ -330,7 +329,7 @@ namespace FanCoilUnits {
 		static int ATMixerPriNode( 0 ); // node number of the air terminal mixer primary air inlet
 		static int ATMixerSecNode( 0 ); // node number of the air terminal mixer secondary air inlet
 		static int ATMixerOutNode( 0 ); // node number of the air terminal mixer secondary air inlet
-		Fstring ATMixerName( MaxNameLength );
+		std::string ATMixerName;
 
 		// FLOW
 
@@ -346,11 +345,11 @@ namespace FanCoilUnits {
 
 		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 		Alphas.allocate( NumAlphas );
-		Alphas = " ";
+		Alphas = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = " ";
+		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = " ";
+		cNumericFields = "";
 		Numbers.allocate( NumNumbers );
 		Numbers = 0.0;
 		lAlphaBlanks.allocate( NumAlphas );
@@ -366,13 +365,13 @@ namespace FanCoilUnits {
 			FanCoilNum = FanCoilIndex;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), FanCoil.Name(), FanCoilNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( Alphas( 1 ), FanCoil.Name(), FanCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			FanCoil( FanCoilNum ).Name = Alphas( 1 );
-			FanCoil( FanCoilNum ).UnitType = trim( CurrentModuleObject );
+			FanCoil( FanCoilNum ).UnitType = CurrentModuleObject;
 			FanCoil( FanCoilNum ).UnitType_Num = FanCoilUnit_4Pipe;
 			FanCoil( FanCoilNum ).Sched = Alphas( 2 );
 			if ( lAlphaBlanks( 2 ) ) {
@@ -380,8 +379,8 @@ namespace FanCoilUnits {
 			} else {
 				FanCoil( FanCoilNum ).SchedPtr = GetScheduleIndex( Alphas( 2 ) ); // convert schedule name to pointer
 				if ( FanCoil( FanCoilNum ).SchedPtr == 0 ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( Alphas( 1 ) ) + "\", invalid" );
-					ShowContinueError( "invalid-not found: " + trim( cAlphaFields( 2 ) ) + "=\"" + trim( Alphas( 2 ) ) + "\"." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid" );
+					ShowContinueError( "invalid-not found: " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\"." );
 					ErrorsFound = true;
 				}
 			}
@@ -393,16 +392,16 @@ namespace FanCoilUnits {
 				if ( SameString( Alphas( 3 ), "VariableFanVariableFlow" ) ) FanCoil( FanCoilNum ).CapCtrlMeth_Num = CCM_VarFanVarFlow;
 				if ( SameString( Alphas( 3 ), "VariableFanConstantFlow" ) ) FanCoil( FanCoilNum ).CapCtrlMeth_Num = CCM_VarFanConsFlow;
 			} else {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( FanCoil( FanCoilNum ).Name ) + "\", invalid" );
-				ShowContinueError( "illegal value: " + trim( cAlphaFields( 3 ) ) + "=\"" + trim( Alphas( 3 ) ) + "\"." );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + FanCoil( FanCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "illegal value: " + cAlphaFields( 3 ) + "=\"" + Alphas( 3 ) + "\"." );
 				ErrorsFound = true;
 			}
 
 			FanCoil( FanCoilNum ).SchedOutAir = Alphas( 4 );
 			FanCoil( FanCoilNum ).SchedOutAirPtr = GetScheduleIndex( Alphas( 4 ) ); // convert schedule name to pointer
 			if ( FanCoil( FanCoilNum ).SchedOutAirPtr == 0 && ( ! lAlphaBlanks( 4 ) ) ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( FanCoil( FanCoilNum ).Name ) + "\", invalid" );
-				ShowContinueError( "illegal value: " + trim( cAlphaFields( 4 ) ) + "=\"" + trim( Alphas( 4 ) ) + "\"." );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + FanCoil( FanCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "illegal value: " + cAlphaFields( 4 ) + "=\"" + Alphas( 4 ) + "\"." );
 				ErrorsFound = true;
 			}
 			FanCoil( FanCoilNum ).MaxAirVolFlow = Numbers( 1 );
@@ -410,10 +409,10 @@ namespace FanCoilUnits {
 			FanCoil( FanCoilNum ).MedSpeedRatio = Numbers( 3 );
 			// check if low speed ratio < medium speed ratio, if not : warning & set to default values
 			if ( FanCoil( FanCoilNum ).LowSpeedRatio > FanCoil( FanCoilNum ).MedSpeedRatio ) {
-				ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( FanCoil( FanCoilNum ).Name ) + "\"," );
-				ShowContinueError( "... " + trim( cNumericFields( 2 ) ) + " is greater than the medium speed supply air flow ratio." );
-				ShowContinueError( "... Fan Coil Unit low speed supply air flow ratio = " + trim( TrimSigDigits( FanCoil( FanCoilNum ).LowSpeedRatio, 5 ) ) + " " );
-				ShowContinueError( "... Fan Coit Unit medium speed supply air flow ratio = " + trim( TrimSigDigits( FanCoil( FanCoilNum ).MedSpeedRatio, 5 ) ) + " " );
+				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + FanCoil( FanCoilNum ).Name + "\"," );
+				ShowContinueError( "... " + cNumericFields( 2 ) + " is greater than the medium speed supply air flow ratio." );
+				ShowContinueError( "... Fan Coil Unit low speed supply air flow ratio = " + TrimSigDigits( FanCoil( FanCoilNum ).LowSpeedRatio, 5 ) + ' ' );
+				ShowContinueError( "... Fan Coit Unit medium speed supply air flow ratio = " + TrimSigDigits( FanCoil( FanCoilNum ).MedSpeedRatio, 5 ) + ' ' );
 				ShowContinueError( "... Fan Coil Unit low speed supply air flow ratio and medium speed " "supply air flow ratio set to default values" );
 				FanCoil( FanCoilNum ).LowSpeedRatio = 1.0 / 3.0;
 				FanCoil( FanCoilNum ).MedSpeedRatio = 2.0 / 3.0;
@@ -430,15 +429,15 @@ namespace FanCoilUnits {
 			// check to see if local OA mixer specified
 			if ( ! lAlphaBlanks( 8 ) ) {
 				errFlag = false;
-				ValidateComponent( FanCoil( FanCoilNum ).OAMixType, FanCoil( FanCoilNum ).OAMixName, errFlag, trim( CurrentModuleObject ) );
+				ValidateComponent( FanCoil( FanCoilNum ).OAMixType, FanCoil( FanCoilNum ).OAMixName, errFlag, CurrentModuleObject );
 				if ( errFlag ) {
-					ShowContinueError( "specified in " + trim( CurrentModuleObject ) + " = \"" + trim( FanCoil( FanCoilNum ).Name ) + "\"." );
+					ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\"." );
 					ErrorsFound = true;
 				} else {
 					// Get outdoor air mixer node numbers
 					OANodeNums = GetOAMixerNodeNumbers( FanCoil( FanCoilNum ).OAMixName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "that was specified in " + trim( CurrentModuleObject ) + " = " + trim( FanCoil( FanCoilNum ).Name ) );
+						ShowContinueError( "that was specified in " + CurrentModuleObject + " = " + FanCoil( FanCoilNum ).Name );
 						ShowContinueError( "..OutdoorAir:Mixer is required. Enter an OutdoorAir:Mixer object with this name." );
 						ErrorsFound = true;
 					} else {
@@ -479,9 +478,9 @@ namespace FanCoilUnits {
 					} else if ( SameString( FanCoil( FanCoilNum ).CCoilPlantType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
 						FanCoil( FanCoilNum ).CCoilPlantTypeOfNum = TypeOf_CoilWaterDetailedFlatCooling;
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( FanCoil( FanCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "For: " + trim( cAlphaFields( 11 ) ) + "=\"" + trim( Alphas( 11 ) ) + "\"." );
-						ShowContinueError( "Invalid Coil Type=" + trim( FanCoil( FanCoilNum ).CCoilPlantType ) + ", Name=" + trim( FanCoil( FanCoilNum ).CCoilPlantName ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + FanCoil( FanCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "For: " + cAlphaFields( 11 ) + "=\"" + Alphas( 11 ) + "\"." );
+						ShowContinueError( "Invalid Coil Type=" + FanCoil( FanCoilNum ).CCoilPlantType + ", Name=" + FanCoil( FanCoilNum ).CCoilPlantName );
 						ShowContinueError( "must be \"Coil:Cooling:Water\" or \"Coil:Cooling:Water:DetailedGeometry\"" );
 						ErrorsFound = true;
 					}
@@ -489,7 +488,7 @@ namespace FanCoilUnits {
 				IsNotOK = false;
 				ValidateComponent( FanCoil( FanCoilNum ).CCoilType, FanCoil( FanCoilNum ).CCoilName, IsNotOK, FanCoil( FanCoilNum ).UnitType );
 				if ( IsNotOK ) {
-					ShowContinueError( "...specified in " + trim( CurrentModuleObject ) + "=\"" + trim( FanCoil( FanCoilNum ).Name ) + "\"." );
+					ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + FanCoil( FanCoilNum ).Name + "\"." );
 					ErrorsFound = true;
 				} else {
 					if ( FanCoil( FanCoilNum ).CCoilType_Num != CCoil_HXAssist ) {
@@ -500,13 +499,13 @@ namespace FanCoilUnits {
 					}
 					// Other error checks should trap before it gets to this point in the code, but including just in case.
 					if ( IsNotOK ) {
-						ShowContinueError( "...specified in " + trim( CurrentModuleObject ) + "=\"" + trim( FanCoil( FanCoilNum ).Name ) + "\"." );
+						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + FanCoil( FanCoilNum ).Name + "\"." );
 						ErrorsFound = true;
 					}
 				}
 			} else {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( FanCoil( FanCoilNum ).Name ) + "\", invalid" );
-				ShowContinueError( "illegal value: " + trim( cAlphaFields( 11 ) ) + "=\"" + trim( Alphas( 11 ) ) + "\"." );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + FanCoil( FanCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "illegal value: " + cAlphaFields( 11 ) + "=\"" + Alphas( 11 ) + "\"." );
 				ErrorsFound = true;
 			}
 
@@ -514,21 +513,21 @@ namespace FanCoilUnits {
 				FanCoil( FanCoilNum ).HCoilType_Num = HCoil_Water;
 				FanCoil( FanCoilNum ).HCoilPlantTypeOfNum = TypeOf_CoilWaterSimpleHeating;
 				IsNotOK = false;
-				ValidateComponent( FanCoil( FanCoilNum ).HCoilType, FanCoil( FanCoilNum ).HCoilName, IsNotOK, trim( CurrentModuleObject ) );
+				ValidateComponent( FanCoil( FanCoilNum ).HCoilType, FanCoil( FanCoilNum ).HCoilName, IsNotOK, CurrentModuleObject );
 				if ( IsNotOK ) {
-					ShowContinueError( "...specified in " + trim( CurrentModuleObject ) + "=\"" + trim( FanCoil( FanCoilNum ).Name ) + "\"." );
+					ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + FanCoil( FanCoilNum ).Name + "\"." );
 					ErrorsFound = true;
 				} else {
 					// mine the hot water node from the coil object
 					FanCoil( FanCoilNum ).HotControlNode = GetCoilWaterInletNode( FanCoil( FanCoilNum ).HCoilType, FanCoil( FanCoilNum ).HCoilName, IsNotOK );
 					if ( IsNotOK ) {
-						ShowContinueError( "...specified in " + trim( CurrentModuleObject ) + "=\"" + trim( FanCoil( FanCoilNum ).Name ) + "\"." );
+						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + FanCoil( FanCoilNum ).Name + "\"." );
 						ErrorsFound = true;
 					}
 				}
 			} else {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( FanCoil( FanCoilNum ).Name ) + "\", invalid" );
-				ShowContinueError( "illegal value: " + trim( cAlphaFields( 13 ) ) + "=\"" + trim( Alphas( 13 ) ) + "\"." );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + FanCoil( FanCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "illegal value: " + cAlphaFields( 13 ) + "=\"" + Alphas( 13 ) + "\"." );
 				ErrorsFound = true;
 			}
 
@@ -541,9 +540,9 @@ namespace FanCoilUnits {
 			}
 
 			errFlag = false;
-			ValidateComponent( FanCoil( FanCoilNum ).FanType, FanCoil( FanCoilNum ).FanName, errFlag, trim( CurrentModuleObject ) );
+			ValidateComponent( FanCoil( FanCoilNum ).FanType, FanCoil( FanCoilNum ).FanName, errFlag, CurrentModuleObject );
 			if ( errFlag ) {
-				ShowContinueError( "specified in " + trim( CurrentModuleObject ) + " = \"" + trim( FanCoil( FanCoilNum ).Name ) + "\"." );
+				ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\"." );
 				ErrorsFound = true;
 			} else {
 				GetFanType( FanCoil( FanCoilNum ).FanName, FanCoil( FanCoilNum ).FanType_Num, errFlag, CurrentModuleObject, FanCoil( FanCoilNum ).Name );
@@ -553,19 +552,19 @@ namespace FanCoilUnits {
 					FanCoil( FanCoilNum ).FanAirVolFlow = GetFanDesignVolumeFlowRate( FanCoil( FanCoilNum ).FanType, FanCoil( FanCoilNum ).FanName, IsNotOK );
 					// Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
 					if ( FanCoil( FanCoilNum ).MaxAirVolFlow > FanCoil( FanCoilNum ).FanAirVolFlow && FanCoil( FanCoilNum ).FanAirVolFlow != AutoSize ) {
-						ShowWarningError( RoutineName + trim( FanCoil( FanCoilNum ).UnitType ) + ": " + trim( FanCoil( FanCoilNum ).Name ) );
-						ShowContinueError( "... " + trim( cNumericFields( 1 ) ) + " is greater than the maximum fan flow rate." );
-						ShowContinueError( "... Fan Coil Unit flow = " + trim( TrimSigDigits( FanCoil( FanCoilNum ).MaxAirVolFlow, 5 ) ) + " m3/s." );
-						ShowContinueError( "... Fan = " + trim( cFanTypes( FanCoil( FanCoilNum ).FanType_Num ) ) + ": " + trim( FanCoil( FanCoilNum ).FanName ) );
-						ShowContinueError( "... Fan flow = " + trim( TrimSigDigits( FanCoil( FanCoilNum ).FanAirVolFlow, 5 ) ) + " m3/s." );
+						ShowWarningError( RoutineName + FanCoil( FanCoilNum ).UnitType + ": " + FanCoil( FanCoilNum ).Name );
+						ShowContinueError( "... " + cNumericFields( 1 ) + " is greater than the maximum fan flow rate." );
+						ShowContinueError( "... Fan Coil Unit flow = " + TrimSigDigits( FanCoil( FanCoilNum ).MaxAirVolFlow, 5 ) + " m3/s." );
+						ShowContinueError( "... Fan = " + cFanTypes( FanCoil( FanCoilNum ).FanType_Num ) + ": " + FanCoil( FanCoilNum ).FanName );
+						ShowContinueError( "... Fan flow = " + TrimSigDigits( FanCoil( FanCoilNum ).FanAirVolFlow, 5 ) + " m3/s." );
 						ShowContinueError( "... Fan Coil Unit flow rate reduced to match the fan flow rate and the simulation continues." );
 						FanCoil( FanCoilNum ).MaxAirVolFlow = FanCoil( FanCoilNum ).FanAirVolFlow;
 					}
 
 					// Check that the fan type match with the capacity control method selected
 					if ( ( FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_ConsFanVarFlow && ( FanCoil( FanCoilNum ).FanType_Num == FanType_SimpleVAV ) ) || ( FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_CycFan && FanCoil( FanCoilNum ).FanType_Num != FanType_SimpleOnOff ) || ( FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_VarFanVarFlow && FanCoil( FanCoilNum ).FanType_Num != FanType_SimpleVAV ) || ( FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_VarFanConsFlow && FanCoil( FanCoilNum ).FanType_Num != FanType_SimpleVAV ) ) {
-						ShowSevereError( RoutineName + trim( FanCoil( FanCoilNum ).UnitType ) + ": " + trim( FanCoil( FanCoilNum ).Name ) );
-						ShowContinueError( "...the fan type of the object : " + trim( FanCoil( FanCoilNum ).FanName ) + " does not match with the capacity control method selected : " + trim( FanCoil( FanCoilNum ).CapCtrlMeth ) + " please see I/O reference" );
+						ShowSevereError( RoutineName + FanCoil( FanCoilNum ).UnitType + ": " + FanCoil( FanCoilNum ).Name );
+						ShowContinueError( "...the fan type of the object : " + FanCoil( FanCoilNum ).FanName + " does not match with the capacity control method selected : " + FanCoil( FanCoilNum ).CapCtrlMeth + " please see I/O reference" );
 						ShowContinueError( "...for ConstantFanVariableFlow a Fan:OnOff or Fan:ConstantVolume is valid." );
 						ShowContinueError( "...for CyclingFan a Fan:OnOff is valid." );
 						ShowContinueError( "...for VariableFanVariableFlow or VariableFanConstantFlow a Fan:VariableVolume is valid." );
@@ -573,7 +572,7 @@ namespace FanCoilUnits {
 					}
 
 				} else {
-					ShowSevereError( trim( CurrentModuleObject ) + " = \"" + trim( Alphas( 1 ) ) + "\"" );
+					ShowSevereError( CurrentModuleObject + " = \"" + Alphas( 1 ) + "\"" );
 					ShowContinueError( "Fan Type must be Fan:OnOff, Fan:ConstantVolume or Fan:VariableVolume." );
 					ErrorsFound = true;
 				}}
@@ -599,13 +598,13 @@ namespace FanCoilUnits {
 				FanCoil( FanCoilNum ).ATMixerOutNode = ATMixerOutNode;
 				// check that fan coil doesn' have local outside air
 				if ( ! lAlphaBlanks( 8 ) ) {
-					ShowSevereError( trim( CurrentModuleObject ) + " = \"" + trim( FanCoil( FanCoilNum ).Name ) + "\"." " Fan coil unit has local as well as central outdoor air specified" );
+					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\"." " Fan coil unit has local as well as central outdoor air specified" );
 				}
 				// check that the air teminal mixer out node is the fan coil inlet node
 				if ( FanCoil( FanCoilNum ).AirInNode != ATMixerOutNode ) {
-					ShowSevereError( trim( CurrentModuleObject ) + " = \"" + trim( FanCoil( FanCoilNum ).Name ) + "\"." " Fan coil unit air inlet node name must be the same as an air terminal mixer outlet node name." );
+					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\"." " Fan coil unit air inlet node name must be the same as an air terminal mixer outlet node name." );
 					ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:InletSideMixer object." );
-					ShowContinueError( "..Fan coil unit air inlet node name = " + trim( NodeID( FanCoil( FanCoilNum ).AirInNode ) ) );
+					ShowContinueError( "..Fan coil unit air inlet node name = " + NodeID( FanCoil( FanCoilNum ).AirInNode ) );
 					ErrorsFound = true;
 				}
 				// check for supply side air terminal mixer
@@ -620,13 +619,13 @@ namespace FanCoilUnits {
 				FanCoil( FanCoilNum ).ATMixerOutNode = ATMixerOutNode;
 				// check that fan coil doesn' have local outside air
 				if ( ! lAlphaBlanks( 8 ) ) {
-					ShowSevereError( trim( CurrentModuleObject ) + " = \"" + trim( FanCoil( FanCoilNum ).Name ) + "\"." " Fan coil unit has local as well as central outdoor air specified" );
+					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\"." " Fan coil unit has local as well as central outdoor air specified" );
 				}
 				// check that the air teminal mixer secondary air inlet node is the fan coil outlet node
 				if ( FanCoil( FanCoilNum ).AirOutNode != ATMixerSecNode ) {
-					ShowSevereError( trim( CurrentModuleObject ) + " = \"" + trim( FanCoil( FanCoilNum ).Name ) + "\"." " Fan coil unit air outlet node name must be the same as the air terminal mixer secondary air inlet node name." );
+					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\"." " Fan coil unit air outlet node name must be the same as the air terminal mixer secondary air inlet node name." );
 					ShowContinueError( "..Air terminal mixer secondary inlet node name is specified in " "AirTerminal:SingleDuct:SupplySideMixer object." );
-					ShowContinueError( "..Fan coil unit air outlet node name = " + trim( NodeID( FanCoil( FanCoilNum ).AirOutNode ) ) );
+					ShowContinueError( "..Fan coil unit air outlet node name = " + NodeID( FanCoil( FanCoilNum ).AirOutNode ) );
 					ErrorsFound = true;
 				}
 				// no air terminal mixer; do the normal connectivity checks
@@ -642,9 +641,9 @@ namespace FanCoilUnits {
 					}
 				}
 				if ( ZoneExNodeNotFound ) {
-					ShowSevereError( trim( CurrentModuleObject ) + " = \"" + trim( FanCoil( FanCoilNum ).Name ) + "\"." " Fan coil unit air inlet node name must be the same as a zone exhaust node name." );
+					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\"." " Fan coil unit air inlet node name must be the same as a zone exhaust node name." );
 					ShowContinueError( "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object." );
-					ShowContinueError( "..Fan coil unit air inlet node name = " + trim( NodeID( FanCoil( FanCoilNum ).AirInNode ) ) );
+					ShowContinueError( "..Fan coil unit air inlet node name = " + NodeID( FanCoil( FanCoilNum ).AirInNode ) );
 					ErrorsFound = true;
 				}
 				// check that the fan coil outlet node is the same as one of the zone inlet nodes
@@ -658,9 +657,9 @@ namespace FanCoilUnits {
 					}
 				}
 				if ( ZoneInNodeNotFound ) {
-					ShowSevereError( trim( CurrentModuleObject ) + " = \"" + trim( FanCoil( FanCoilNum ).Name ) + "\"." " Fan coil unit air outlet node name must be the same as a zone inlet node name." );
+					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\"." " Fan coil unit air outlet node name must be the same as a zone inlet node name." );
 					ShowContinueError( "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object." );
-					ShowContinueError( "..Fan coil unit air outlet node name = " + trim( NodeID( FanCoil( FanCoilNum ).AirOutNode ) ) );
+					ShowContinueError( "..Fan coil unit air outlet node name = " + NodeID( FanCoil( FanCoilNum ).AirOutNode ) );
 
 					ErrorsFound = true;
 				}
@@ -807,7 +806,7 @@ namespace FanCoilUnits {
 			ScanPlantLoopsForObject( FanCoil( FanCoilNum ).HCoilName, FanCoil( FanCoilNum ).HCoilPlantTypeOfNum, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum, _, _, _, _, _, errFlag );
 
 			if ( errFlag ) {
-				ShowContinueError( "Reference Unit=\"" + trim( FanCoil( FanCoilNum ).Name ) + "\", type=" + trim( FanCoil( FanCoilNum ).UnitType ) );
+				ShowContinueError( "Reference Unit=\"" + FanCoil( FanCoilNum ).Name + "\", type=" + FanCoil( FanCoilNum ).UnitType );
 				ShowFatalError( "InitFanCoilUnits: Program terminated for previous conditions." );
 			}
 
@@ -816,12 +815,12 @@ namespace FanCoilUnits {
 			if ( ( FanCoil( FanCoilNum ).CCoilPlantTypeOfNum == TypeOf_CoilWaterCooling ) || ( FanCoil( FanCoilNum ).CCoilPlantTypeOfNum == TypeOf_CoilWaterDetailedFlatCooling ) ) {
 				ScanPlantLoopsForObject( FanCoil( FanCoilNum ).CCoilPlantName, FanCoil( FanCoilNum ).CCoilPlantTypeOfNum, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum, _, _, _, _, _, errFlag );
 				if ( errFlag ) {
-					ShowContinueError( "Reference Unit=\"" + trim( FanCoil( FanCoilNum ).Name ) + "\", type=" + trim( FanCoil( FanCoilNum ).UnitType ) );
+					ShowContinueError( "Reference Unit=\"" + FanCoil( FanCoilNum ).Name + "\", type=" + FanCoil( FanCoilNum ).UnitType );
 					ShowFatalError( "InitFanCoilUnits: Program terminated for previous conditions." );
 				}
 				FanCoil( FanCoilNum ).ColdPlantOutletNode = PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).LoopSide( FanCoil( FanCoilNum ).CWLoopSide ).Branch( FanCoil( FanCoilNum ).CWBranchNum ).Comp( FanCoil( FanCoilNum ).CWCompNum ).NodeNumOut;
 			} else {
-				ShowFatalError( "InitFanCoilUnits: FanCoil=" + trim( FanCoil( FanCoilNum ).Name ) + ", invalid cooling coil type. Program terminated." );
+				ShowFatalError( "InitFanCoilUnits: FanCoil=" + FanCoil( FanCoilNum ).Name + ", invalid cooling coil type. Program terminated." );
 			}
 
 			MyPlantScanFlag( FanCoilNum ) = false;
@@ -831,7 +830,7 @@ namespace FanCoilUnits {
 			ZoneEquipmentListChecked = true;
 			for ( Loop = 1; Loop <= NumFanCoils; ++Loop ) {
 				if ( CheckZoneEquipmentList( FanCoil( Loop ).UnitType, FanCoil( Loop ).Name ) ) continue;
-				ShowSevereError( "InitFanCoil: FanCoil Unit=[" + trim( FanCoil( Loop ).UnitType ) + "," + trim( FanCoil( Loop ).Name ) + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
+				ShowSevereError( "InitFanCoil: FanCoil Unit=[" + FanCoil( Loop ).UnitType + ',' + FanCoil( Loop ).Name + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
 			}
 		}
 
@@ -964,7 +963,7 @@ namespace FanCoilUnits {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "SizeFanCoilUnit: " ); // include trailing blank space
+		static std::string const RoutineName( "SizeFanCoilUnit: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -984,8 +983,8 @@ namespace FanCoilUnits {
 		Real64 FCOAFrac; // design outside air fraction for the fan coil unit
 		static int CoilWaterInletNode( 0 );
 		static int CoilWaterOutletNode( 0 );
-		Fstring CoolingCoilName( MaxNameLength );
-		Fstring CoolingCoilType( MaxNameLength );
+		std::string CoolingCoilName;
+		std::string CoolingCoilType;
 		Real64 rho;
 		Real64 Cp;
 		bool IsAutoSize; // Indicator to autosize for reporting
@@ -1030,15 +1029,15 @@ namespace FanCoilUnits {
 				//     If fan is autosized, get fan volumetric flow rate
 				if ( FanCoil( FanCoilNum ).FanAirVolFlow == AutoSize ) {
 					SimulateFanComponents( FanCoil( FanCoilNum ).FanName, true, FanCoil( FanCoilNum ).FanIndex );
-					FanCoil( FanCoilNum ).FanAirVolFlow = GetFanDesignVolumeFlowRate( trim( cFanTypes( FanCoil( FanCoilNum ).FanType_Num ) ), trim( FanCoil( FanCoilNum ).FanName ), ErrorsFound );
+					FanCoil( FanCoilNum ).FanAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( FanCoil( FanCoilNum ).FanType_Num ), FanCoil( FanCoilNum ).FanName, ErrorsFound );
 				}
 				//     Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
 				if ( MaxAirVolFlowDes > FanCoil( FanCoilNum ).FanAirVolFlow ) {
-					ShowWarningError( RoutineName + trim( FanCoil( FanCoilNum ).UnitType ) + ": " + trim( FanCoil( FanCoilNum ).Name ) );
+					ShowWarningError( RoutineName + FanCoil( FanCoilNum ).UnitType + ": " + FanCoil( FanCoilNum ).Name );
 					ShowContinueError( "... Maximum supply air flow rate is greater than the maximum fan flow rate." );
-					ShowContinueError( "... Fan Coil Unit flow = " + trim( TrimSigDigits( MaxAirVolFlowDes, 5 ) ) + " [m3/s]." );
-					ShowContinueError( "... Fan = " + trim( cFanTypes( FanCoil( FanCoilNum ).FanType_Num ) ) + ": " + trim( FanCoil( FanCoilNum ).FanName ) );
-					ShowContinueError( "... Fan flow = " + trim( TrimSigDigits( FanCoil( FanCoilNum ).FanAirVolFlow, 5 ) ) + " [m3/s]." );
+					ShowContinueError( "... Fan Coil Unit flow = " + TrimSigDigits( MaxAirVolFlowDes, 5 ) + " [m3/s]." );
+					ShowContinueError( "... Fan = " + cFanTypes( FanCoil( FanCoilNum ).FanType_Num ) + ": " + FanCoil( FanCoilNum ).FanName );
+					ShowContinueError( "... Fan flow = " + TrimSigDigits( FanCoil( FanCoilNum ).FanAirVolFlow, 5 ) + " [m3/s]." );
 					ShowContinueError( "... Fan Coil Unit flow rate reduced to match the fan flow rate and the simulation continues." );
 					MaxAirVolFlowDes = FanCoil( FanCoilNum ).FanAirVolFlow;
 				}
@@ -1051,9 +1050,9 @@ namespace FanCoilUnits {
 						ReportSizingOutput( FanCoil( FanCoilNum ).UnitType, FanCoil( FanCoilNum ).Name, "Design Size Supply Air Maximum Flow Rate [m3/s]", MaxAirVolFlowDes, "User-Specified Supply Air Maximum Flow Rate [m3/s]", MaxAirVolFlowUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( MaxAirVolFlowDes - MaxAirVolFlowUser ) / MaxAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeFanCoilUnit: Potential issue with equipment sizing for " + trim( FanCoil( FanCoilNum ).UnitType ) + " " + trim( FanCoil( FanCoilNum ).Name ) );
-								ShowContinueError( "User-Specified Supply Air Maximum Flow Rate of " + trim( RoundSigDigits( MaxAirVolFlowUser, 5 ) ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Supply Air Maximum Flow Rate of " + trim( RoundSigDigits( MaxAirVolFlowDes, 5 ) ) + " [m3/s]" );
+								ShowMessage( "SizeFanCoilUnit: Potential issue with equipment sizing for " + FanCoil( FanCoilNum ).UnitType + ' ' + FanCoil( FanCoilNum ).Name );
+								ShowContinueError( "User-Specified Supply Air Maximum Flow Rate of " + RoundSigDigits( MaxAirVolFlowUser, 5 ) + " [m3/s]" );
+								ShowContinueError( "differs from Design Size Supply Air Maximum Flow Rate of " + RoundSigDigits( MaxAirVolFlowDes, 5 ) + " [m3/s]" );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
@@ -1064,14 +1063,14 @@ namespace FanCoilUnits {
 
 		} else if ( FanCoil( FanCoilNum ).FanAirVolFlow == AutoSize ) {
 			SimulateFanComponents( FanCoil( FanCoilNum ).FanName, true, FanCoil( FanCoilNum ).FanIndex );
-			FanCoil( FanCoilNum ).FanAirVolFlow = GetFanDesignVolumeFlowRate( trim( cFanTypes( FanCoil( FanCoilNum ).FanType_Num ) ), trim( FanCoil( FanCoilNum ).FanName ), ErrorsFound );
+			FanCoil( FanCoilNum ).FanAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( FanCoil( FanCoilNum ).FanType_Num ), FanCoil( FanCoilNum ).FanName, ErrorsFound );
 			//   Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
 			if ( FanCoil( FanCoilNum ).MaxAirVolFlow > FanCoil( FanCoilNum ).FanAirVolFlow ) {
-				ShowWarningError( RoutineName + trim( FanCoil( FanCoilNum ).UnitType ) + ": " + trim( FanCoil( FanCoilNum ).Name ) );
+				ShowWarningError( RoutineName + FanCoil( FanCoilNum ).UnitType + ": " + FanCoil( FanCoilNum ).Name );
 				ShowContinueError( "... Maximum supply air flow rate is greater than the maximum fan flow rate." );
-				ShowContinueError( "... Fan Coil Unit flow = " + trim( TrimSigDigits( FanCoil( FanCoilNum ).MaxAirVolFlow, 5 ) ) + " m3/s." );
-				ShowContinueError( "... Fan = " + trim( cFanTypes( FanCoil( FanCoilNum ).FanType_Num ) ) + ": " + trim( FanCoil( FanCoilNum ).FanName ) );
-				ShowContinueError( "... Fan flow = " + trim( TrimSigDigits( FanCoil( FanCoilNum ).FanAirVolFlow, 5 ) ) + " m3/s." );
+				ShowContinueError( "... Fan Coil Unit flow = " + TrimSigDigits( FanCoil( FanCoilNum ).MaxAirVolFlow, 5 ) + " m3/s." );
+				ShowContinueError( "... Fan = " + cFanTypes( FanCoil( FanCoilNum ).FanType_Num ) + ": " + FanCoil( FanCoilNum ).FanName );
+				ShowContinueError( "... Fan flow = " + TrimSigDigits( FanCoil( FanCoilNum ).FanAirVolFlow, 5 ) + " m3/s." );
 				ShowContinueError( "... Fan Coil Unit flow rate reduced to match the fan flow rate and the simulation continues." );
 				FanCoil( FanCoilNum ).MaxAirVolFlow = FanCoil( FanCoilNum ).FanAirVolFlow;
 			}
@@ -1102,9 +1101,9 @@ namespace FanCoilUnits {
 						ReportSizingOutput( FanCoil( FanCoilNum ).UnitType, FanCoil( FanCoilNum ).Name, "Design Size Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowDes, "User-Specified Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( OutAirVolFlowDes - OutAirVolFlowUser ) / OutAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeFanCoilUnit: Potential issue with equipment sizing for " + trim( FanCoil( FanCoilNum ).UnitType ) + " " + trim( FanCoil( FanCoilNum ).Name ) );
-								ShowContinueError( "User-Specified Maximum Outdoor Air Flow Rate of " + trim( RoundSigDigits( OutAirVolFlowUser, 5 ) ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Maximum Outdoor Air Flow Rate of " + trim( RoundSigDigits( OutAirVolFlowDes, 5 ) ) + " [m3/s]" );
+								ShowMessage( "SizeFanCoilUnit: Potential issue with equipment sizing for " + FanCoil( FanCoilNum ).UnitType + ' ' + FanCoil( FanCoilNum ).Name );
+								ShowContinueError( "User-Specified Maximum Outdoor Air Flow Rate of " + RoundSigDigits( OutAirVolFlowUser, 5 ) + " [m3/s]" );
+								ShowContinueError( "differs from Design Size Maximum Outdoor Air Flow Rate of " + RoundSigDigits( OutAirVolFlowDes, 5 ) + " [m3/s]" );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
@@ -1152,7 +1151,7 @@ namespace FanCoilUnits {
 						}
 					} else {
 						ShowSevereError( "Autosizing of water flow requires a heating loop Sizing:Plant object" );
-						ShowContinueError( "Occurs in " + trim( FanCoil( FanCoilNum ).UnitType ) + " Object=" + trim( FanCoil( FanCoilNum ).Name ) );
+						ShowContinueError( "Occurs in " + FanCoil( FanCoilNum ).UnitType + " Object=" + FanCoil( FanCoilNum ).Name );
 						ErrorsFound = true;
 					}
 				}
@@ -1165,9 +1164,9 @@ namespace FanCoilUnits {
 						ReportSizingOutput( FanCoil( FanCoilNum ).UnitType, FanCoil( FanCoilNum ).Name, "Design Size Maximum Hot Water Flow [m3/s]", MaxHotWaterVolFlowDes, "User-Specified Maximum Hot Water Flow [m3/s]", MaxHotWaterVolFlowUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( MaxHotWaterVolFlowDes - MaxHotWaterVolFlowUser ) / MaxHotWaterVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeFanCoilUnit: Potential issue with equipment sizing for " + trim( FanCoil( FanCoilNum ).UnitType ) + " " + trim( FanCoil( FanCoilNum ).Name ) );
-								ShowContinueError( "User-Specified Maximum Hot Water Flow of " + trim( RoundSigDigits( MaxHotWaterVolFlowUser, 5 ) ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Maximum Hot Water Flow of " + trim( RoundSigDigits( MaxHotWaterVolFlowDes, 5 ) ) + " [m3/s]" );
+								ShowMessage( "SizeFanCoilUnit: Potential issue with equipment sizing for " + FanCoil( FanCoilNum ).UnitType + ' ' + FanCoil( FanCoilNum ).Name );
+								ShowContinueError( "User-Specified Maximum Hot Water Flow of " + RoundSigDigits( MaxHotWaterVolFlowUser, 5 ) + " [m3/s]" );
+								ShowContinueError( "differs from Design Size Maximum Hot Water Flow of " + RoundSigDigits( MaxHotWaterVolFlowDes, 5 ) + " [m3/s]" );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
@@ -1231,7 +1230,7 @@ namespace FanCoilUnits {
 						}
 					} else {
 						ShowSevereError( "Autosizing of water flow requires a cooling loop Sizing:Plant object" );
-						ShowContinueError( "Occurs in " + trim( FanCoil( FanCoilNum ).UnitType ) + " Object=" + trim( FanCoil( FanCoilNum ).Name ) );
+						ShowContinueError( "Occurs in " + FanCoil( FanCoilNum ).UnitType + " Object=" + FanCoil( FanCoilNum ).Name );
 						ErrorsFound = true;
 					}
 				}
@@ -1244,9 +1243,9 @@ namespace FanCoilUnits {
 						ReportSizingOutput( FanCoil( FanCoilNum ).UnitType, FanCoil( FanCoilNum ).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxColdWaterVolFlowDes, "User-Specified Maximum Cold Water Flow [m3/s]", MaxColdWaterVolFlowUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( MaxColdWaterVolFlowDes - MaxColdWaterVolFlowUser ) / MaxColdWaterVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeFanCoilUnit: Potential issue with equipment sizing for " + trim( FanCoil( FanCoilNum ).UnitType ) + " " + trim( FanCoil( FanCoilNum ).Name ) );
-								ShowContinueError( "User-Specified Maximum Cold Water Flow of " + trim( RoundSigDigits( MaxColdWaterVolFlowUser, 5 ) ) + "[m3/s]" );
-								ShowContinueError( "differs from Design Size Maximum Cold Water Flow of " + trim( RoundSigDigits( MaxColdWaterVolFlowDes, 5 ) ) + "[m3/s]" );
+								ShowMessage( "SizeFanCoilUnit: Potential issue with equipment sizing for " + FanCoil( FanCoilNum ).UnitType + ' ' + FanCoil( FanCoilNum ).Name );
+								ShowContinueError( "User-Specified Maximum Cold Water Flow of " + RoundSigDigits( MaxColdWaterVolFlowUser, 5 ) + "[m3/s]" );
+								ShowContinueError( "differs from Design Size Maximum Cold Water Flow of " + RoundSigDigits( MaxColdWaterVolFlowDes, 5 ) + "[m3/s]" );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
@@ -1538,10 +1537,10 @@ namespace FanCoilUnits {
 				// warning if not converged
 				if ( Iter > ( MaxIterCycl - 1 ) ) {
 					if ( FanCoil( FanCoilNum ).MaxIterIndexC == 0 ) {
-						ShowWarningMessage( "ZoneHVAC:FourPipeFanCoil=\"" + trim( FanCoil( FanCoilNum ).Name ) + "\" -- Exceeded max iterations while adjusting cycling fan" " sensible runtime to meet the zone load within the cooling convergence tolerance." );
-						ShowContinueErrorTimeStamp( "Iterations=" + trim( TrimSigDigits( MaxIterCycl ) ) );
+						ShowWarningMessage( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\" -- Exceeded max iterations while adjusting cycling fan" " sensible runtime to meet the zone load within the cooling convergence tolerance." );
+						ShowContinueErrorTimeStamp( "Iterations=" + TrimSigDigits( MaxIterCycl ) );
 					}
-					ShowRecurringWarningErrorAtEnd( "ZoneHVAC:FourPipeFanCoil=\"" + trim( FanCoil( FanCoilNum ).Name ) + "\"  -- Exceeded max iterations error (sensible runtime) continues...", FanCoil( FanCoilNum ).MaxIterIndexC );
+					ShowRecurringWarningErrorAtEnd( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\"  -- Exceeded max iterations error (sensible runtime) continues...", FanCoil( FanCoilNum ).MaxIterIndexC );
 				}
 
 				// at the end calculate output with adjusted PLR
@@ -1589,10 +1588,10 @@ namespace FanCoilUnits {
 				// warning if not converged
 				if ( Iter > ( MaxIterCycl - 1 ) ) {
 					if ( FanCoil( FanCoilNum ).MaxIterIndexH == 0 ) {
-						ShowWarningMessage( "ZoneHVAC:FourPipeFanCoil=\"" + trim( FanCoil( FanCoilNum ).Name ) + "\" -- Exceeded max iterations while adjusting cycling fan" " sensible runtime to meet the zone load within the heating convergence tolerance." );
-						ShowContinueErrorTimeStamp( "Iterations=" + trim( TrimSigDigits( MaxIterCycl ) ) );
+						ShowWarningMessage( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\" -- Exceeded max iterations while adjusting cycling fan" " sensible runtime to meet the zone load within the heating convergence tolerance." );
+						ShowContinueErrorTimeStamp( "Iterations=" + TrimSigDigits( MaxIterCycl ) );
 					}
-					ShowRecurringWarningErrorAtEnd( "ZoneHVAC:FourPipeFanCoil=\"" + trim( FanCoil( FanCoilNum ).Name ) + "\"  -- Exceeded max iterations error (sensible runtime) continues...", FanCoil( FanCoilNum ).MaxIterIndexH );
+					ShowRecurringWarningErrorAtEnd( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\"  -- Exceeded max iterations error (sensible runtime) continues...", FanCoil( FanCoilNum ).MaxIterIndexH );
 				}
 
 				// at the end calculate output with adjusted PLR
@@ -1672,10 +1671,10 @@ namespace FanCoilUnits {
 				// warning if not converged
 				if ( Iter > ( MaxIterCycl - 1 ) ) {
 					if ( FanCoil( FanCoilNum ).MaxIterIndexC == 0 ) {
-						ShowWarningMessage( "ZoneHVAC:FourPipeFanCoil=\"" + trim( FanCoil( FanCoilNum ).Name ) + "\" -- Exceeded max iterations while adjusting cycling fan" " sensible runtime to meet the zone load within the cooling convergence tolerance." );
-						ShowContinueErrorTimeStamp( "Iterations=" + trim( TrimSigDigits( MaxIterCycl ) ) );
+						ShowWarningMessage( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\" -- Exceeded max iterations while adjusting cycling fan" " sensible runtime to meet the zone load within the cooling convergence tolerance." );
+						ShowContinueErrorTimeStamp( "Iterations=" + TrimSigDigits( MaxIterCycl ) );
 					}
-					ShowRecurringWarningErrorAtEnd( "ZoneHVAC:FourPipeFanCoil=\"" + trim( FanCoil( FanCoilNum ).Name ) + "\"  -- Exceeded max iterations error (sensible runtime) continues...", FanCoil( FanCoilNum ).MaxIterIndexC );
+					ShowRecurringWarningErrorAtEnd( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\"  -- Exceeded max iterations error (sensible runtime) continues...", FanCoil( FanCoilNum ).MaxIterIndexC );
 				}
 
 				// at the end calculate output with adjusted PLR
@@ -1710,10 +1709,10 @@ namespace FanCoilUnits {
 				// warning if not converged
 				if ( Iter > ( MaxIterCycl - 1 ) ) {
 					if ( FanCoil( FanCoilNum ).MaxIterIndexH == 0 ) {
-						ShowWarningMessage( "ZoneHVAC:FourPipeFanCoil=\"" + trim( FanCoil( FanCoilNum ).Name ) + "\" -- Exceeded max iterations while adjusting cycling fan" " sensible runtime to meet the zone load within the heating convergence tolerance." );
-						ShowContinueErrorTimeStamp( "Iterations=" + trim( TrimSigDigits( MaxIterCycl ) ) );
+						ShowWarningMessage( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\" -- Exceeded max iterations while adjusting cycling fan" " sensible runtime to meet the zone load within the heating convergence tolerance." );
+						ShowContinueErrorTimeStamp( "Iterations=" + TrimSigDigits( MaxIterCycl ) );
 					}
-					ShowRecurringWarningErrorAtEnd( "ZoneHVAC:FourPipeFanCoil=\"" + trim( FanCoil( FanCoilNum ).Name ) + "\"  -- Exceeded max iterations error (sensible runtime) continues...", FanCoil( FanCoilNum ).MaxIterIndexH );
+					ShowRecurringWarningErrorAtEnd( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\"  -- Exceeded max iterations error (sensible runtime) continues...", FanCoil( FanCoilNum ).MaxIterIndexH );
 				}
 
 				// at the end calculate output with adjusted PLR
@@ -2230,7 +2229,7 @@ namespace FanCoilUnits {
 
 	void
 	GetFanCoilIndex(
-		Fstring const & FanCoilName,
+		std::string const & FanCoilName,
 		int & FanCoilIndex
 	)
 	{
@@ -2276,7 +2275,7 @@ namespace FanCoilUnits {
 
 		FanCoilIndex = FindItemInList( FanCoilName, FanCoil.Name(), NumFanCoils );
 		if ( FanCoilIndex == 0 ) {
-			ShowSevereError( "GetFanCoilIndex: Fan Coil Unit not found=" + trim( FanCoilName ) );
+			ShowSevereError( "GetFanCoilIndex: Fan Coil Unit not found=" + FanCoilName );
 		}
 		ErrorsFound = true;
 

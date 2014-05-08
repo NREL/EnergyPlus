@@ -31,7 +31,6 @@ namespace DataViewFactorInformation {
 	// <use statements for data only modules>
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::MaxNameLength;
 
 	// <use statements for access to subroutines in other modules>
 

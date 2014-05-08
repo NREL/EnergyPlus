@@ -1,8 +1,8 @@
 #ifndef ZoneAirLoopEquipmentManager_hh_INCLUDED
 #define ZoneAirLoopEquipmentManager_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Fstring.hh>
+// C++ Headers
+#include <string>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -27,7 +27,7 @@ namespace ZoneAirLoopEquipmentManager {
 
 	void
 	ManageZoneAirLoopEquipment(
-		Fstring const & ZoneAirLoopEquipName,
+		std::string const & ZoneAirLoopEquipName,
 		bool const FirstHVACIteration,
 		Real64 & SysOutputProvided,
 		Real64 & NonAirSysOutput,

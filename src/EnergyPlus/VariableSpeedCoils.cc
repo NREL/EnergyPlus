@@ -153,7 +153,7 @@ namespace VariableSpeedCoils {
 
 	void
 	SimVariableSpeedCoils(
-		Fstring const & CompName, // Coil Name
+		std::string const & CompName, // Coil Name
 		int & CompIndex, // Index for Component name
 		int const CyclingScheme, // Continuous fan OR cycling compressor
 		Real64 & MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
@@ -196,7 +196,7 @@ namespace VariableSpeedCoils {
 		// part-load ratio = load/total capacity, passed in by the parent object
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const Blank;
+		static std::string const Blank;
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -220,16 +220,16 @@ namespace VariableSpeedCoils {
 		if ( CompIndex == 0 ) {
 			DXCoilNum = FindItemInList( CompName, VarSpeedCoil.Name(), NumWatertoAirHPs );
 			if ( DXCoilNum == 0 ) {
-				ShowFatalError( "WaterToAirHPVSWEquationFit not found=" + trim( CompName ) );
+				ShowFatalError( "WaterToAirHPVSWEquationFit not found=" + CompName );
 			}
 			CompIndex = DXCoilNum;
 		} else {
 			DXCoilNum = CompIndex;
 			if ( DXCoilNum > NumWatertoAirHPs || DXCoilNum < 1 ) {
-				ShowFatalError( "SimVariableSpeedCoils: Invalid CompIndex passed=" + trim( TrimSigDigits( DXCoilNum ) ) + ", Number of Water to Air HPs=" + trim( TrimSigDigits( NumWatertoAirHPs ) ) + ", WaterToAir HP name=" + trim( CompName ) );
+				ShowFatalError( "SimVariableSpeedCoils: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) + ", Number of Water to Air HPs=" + TrimSigDigits( NumWatertoAirHPs ) + ", WaterToAir HP name=" + CompName );
 			}
 			if ( CompName != Blank && CompName != VarSpeedCoil( DXCoilNum ).Name ) {
-				ShowFatalError( "SimVariableSpeedCoils: Invalid CompIndex passed=" + trim( TrimSigDigits( DXCoilNum ) ) + ", WaterToAir HP name=" + trim( CompName ) + ", stored WaterToAir HP Name for that index=" + trim( VarSpeedCoil( DXCoilNum ).Name ) );
+				ShowFatalError( "SimVariableSpeedCoils: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) + ", WaterToAir HP name=" + CompName + ", stored WaterToAir HP Name for that index=" + VarSpeedCoil( DXCoilNum ).Name );
 			}
 		}
 
@@ -306,7 +306,7 @@ namespace VariableSpeedCoils {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "GetVarSpeedCoilInput: " ); // include trailing blank space
+		static std::string const RoutineName( "GetVarSpeedCoilInput: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -334,10 +334,10 @@ namespace VariableSpeedCoils {
 		bool IsBlank; // Flag for blank name
 		bool errFlag;
 		Real64 CurveVal; // Used to verify modifier curves equal 1 at rated conditions
-		Fstring CurrentModuleObject( MaxNameLength ); // for ease in getting objects
-		FArray1D_Fstring AlphArray( sFstring( MaxNameLength ) ); // Alpha input items for object
-		FArray1D_Fstring cAlphaFields( sFstring( MaxNameLength ) ); // Alpha field names
-		FArray1D_Fstring cNumericFields( sFstring( MaxNameLength ) ); // Numeric field names
+		std::string CurrentModuleObject; // for ease in getting objects
+		FArray1D_string AlphArray; // Alpha input items for object
+		FArray1D_string cAlphaFields; // Alpha field names
+		FArray1D_string cNumericFields; // Numeric field names
 		FArray1D< Real64 > NumArray; // Numeric input items for object
 		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
@@ -374,13 +374,13 @@ namespace VariableSpeedCoils {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		AlphArray.allocate( MaxAlphas );
-		AlphArray = " ";
+		AlphArray = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = " ";
+		cAlphaFields = "";
 		lAlphaBlanks.allocate( MaxAlphas );
 		lAlphaBlanks = true;
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = " ";
+		cNumericFields = "";
 		lNumericBlanks.allocate( MaxNums );
 		lNumericBlanks = true;
 		NumArray.allocate( MaxNums );
@@ -399,17 +399,17 @@ namespace VariableSpeedCoils {
 			IsNotOK = false;
 			IsBlank = false;
 
-			VerifyName( AlphArray( 1 ), VarSpeedCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( AlphArray( 1 ), VarSpeedCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
 			}
-			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, trim( CurrentModuleObject ) + " Name" );
+			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
 			}
 
-			VarSpeedCoil( DXCoilNum ).Name = trim( AlphArray( 1 ) );
+			VarSpeedCoil( DXCoilNum ).Name = AlphArray( 1 );
 			VarSpeedCoil( DXCoilNum ).CoolHeatType = "COOLING";
 			VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum = TypeOf_CoilVSWAHPCoolingEquationFit;
 			VarSpeedCoil( DXCoilNum ).NumOfSpeeds = int( NumArray( 1 ) );
@@ -422,18 +422,18 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).HOTGASREHEATFLG = int( NumArray( 8 ) );
 			VarSpeedCoil( DXCoilNum ).CondenserType = WaterCooled;
 
-			VarSpeedCoil( DXCoilNum ).WaterInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
-			VarSpeedCoil( DXCoilNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
-			VarSpeedCoil( DXCoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			VarSpeedCoil( DXCoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			VarSpeedCoil( DXCoilNum ).WaterInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+			VarSpeedCoil( DXCoilNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+			VarSpeedCoil( DXCoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			VarSpeedCoil( DXCoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-			TestCompSet( trim( CurrentModuleObject ), AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Water Nodes" );
-			TestCompSet( trim( CurrentModuleObject ), AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Air Nodes" );
+			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Water Nodes" );
+			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Air Nodes" );
 
 			//   If (VarSpeedCoil(DXCoilNum)%NumOfSpeeds .LT. 2) Then
 			if ( VarSpeedCoil( DXCoilNum ).NumOfSpeeds < 1 ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-				ShowContinueError( "..." + trim( cNumericFields( 1 ) ) + " must be >= 1." " entered number is " + trim( TrimSigDigits( NumArray( 1 ), 0 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "..." + cNumericFields( 1 ) + " must be >= 1." " entered number is " + TrimSigDigits( NumArray( 1 ), 0 ) );
 				ErrorsFound = true;
 			}
 
@@ -442,8 +442,8 @@ namespace VariableSpeedCoils {
 			}
 
 			if ( ( VarSpeedCoil( DXCoilNum ).NormSpedLevel > VarSpeedCoil( DXCoilNum ).NumOfSpeeds ) || ( VarSpeedCoil( DXCoilNum ).NormSpedLevel <= 0 ) ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-				ShowContinueError( "..." + trim( cNumericFields( 2 ) ) + " must be valid speed level" " entered number is " + trim( TrimSigDigits( NumArray( 2 ), 0 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "..." + cNumericFields( 2 ) + " must be valid speed level" " entered number is " + TrimSigDigits( NumArray( 2 ), 0 ) );
 				ErrorsFound = true;
 			}
 
@@ -451,19 +451,19 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).PLFFPLR = GetCurveIndex( AlphArray( 6 ) ); // convert curve name to number
 			if ( VarSpeedCoil( DXCoilNum ).PLFFPLR == 0 ) {
 				if ( lAlphaBlanks( 6 ) ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-					ShowContinueError( "...required " + trim( cAlphaFields( 6 ) ) + " is blank." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+					ShowContinueError( "...required " + cAlphaFields( 6 ) + " is blank." );
 				} else {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-					ShowContinueError( "...not found " + trim( cAlphaFields( 6 ) ) + "=\"" + trim( AlphArray( 6 ) ) + "\"." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+					ShowContinueError( "...not found " + cAlphaFields( 6 ) + "=\"" + AlphArray( 6 ) + "\"." );
 				}
 				ErrorsFound = true;
 			} else {
 				CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).PLFFPLR, 1.0 );
 				if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-					ShowContinueError( "..." + trim( cAlphaFields( 6 ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-					ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+					ShowContinueError( "..." + cAlphaFields( 6 ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+					ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 				}
 			}
 
@@ -479,11 +479,11 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSCCapFTemp( I ) = GetCurveIndex( AlphArray( AlfaFieldIncre ) ); // convert curve name to number
 				if ( VarSpeedCoil( DXCoilNum ).MSCCapFTemp( I ) == 0 ) {
 					if ( lAlphaBlanks( AlfaFieldIncre ) ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-						ShowContinueError( "...required " + trim( cAlphaFields( AlfaFieldIncre ) ) + " is blank." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+						ShowContinueError( "...required " + cAlphaFields( AlfaFieldIncre ) + " is blank." );
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...not found " + trim( cAlphaFields( AlfaFieldIncre ) ) + "=\"" + trim( AlphArray( AlfaFieldIncre ) ) + "\"." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...not found " + cAlphaFields( AlfaFieldIncre ) + "=\"" + AlphArray( AlfaFieldIncre ) + "\"." );
 					}
 					ErrorsFound = true;
 				} else {
@@ -493,14 +493,14 @@ namespace VariableSpeedCoils {
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapFTemp( I ), RatedInletWetBulbTemp, RatedInletWaterTemp );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...illegal " + trim( cAlphaFields( AlfaFieldIncre ) ) + " type for this object = " + trim( GetCurveType( VarSpeedCoil( DXCoilNum ).MSCCapFTemp( I ) ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFields( AlfaFieldIncre ) + " type for this object = " + GetCurveType( VarSpeedCoil( DXCoilNum ).MSCCapFTemp( I ) ) );
 						ShowContinueError( "Curve type must be BiQuadratic." );
 						ErrorsFound = true;
 					}}
@@ -510,11 +510,11 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( I ) = GetCurveIndex( AlphArray( AlfaFieldIncre ) ); // convert curve name to number
 				if ( VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( I ) == 0 ) {
 					if ( lAlphaBlanks( AlfaFieldIncre ) ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-						ShowContinueError( "...required " + trim( cAlphaFields( AlfaFieldIncre ) ) + " is blank." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+						ShowContinueError( "...required " + cAlphaFields( AlfaFieldIncre ) + " is blank." );
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...not found " + trim( cAlphaFields( AlfaFieldIncre ) ) + "=\"" + trim( AlphArray( AlfaFieldIncre ) ) + "\"." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...not found " + cAlphaFields( AlfaFieldIncre ) + "=\"" + AlphArray( AlfaFieldIncre ) + "\"." );
 					}
 					ErrorsFound = true;
 				} else {
@@ -524,22 +524,22 @@ namespace VariableSpeedCoils {
 					if ( SELECT_CASE_var == "QUADRATIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( I ), 1.0 );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else if ( SELECT_CASE_var == "CUBIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( I ), 1.0 );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...illegal " + trim( cAlphaFields( AlfaFieldIncre ) ) + " type for this object = " + trim( GetCurveType( VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( I ) ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFields( AlfaFieldIncre ) + " type for this object = " + GetCurveType( VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( I ) ) );
 						ShowContinueError( "Curve type must be Quadratic or Cubic." );
 						ErrorsFound = true;
 					}}
@@ -549,11 +549,11 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( I ) = GetCurveIndex( AlphArray( AlfaFieldIncre ) ); // convert curve name to number
 				if ( VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( I ) == 0 ) {
 					if ( lAlphaBlanks( AlfaFieldIncre ) ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-						ShowContinueError( "...required " + trim( cAlphaFields( AlfaFieldIncre ) ) + " is blank." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+						ShowContinueError( "...required " + cAlphaFields( AlfaFieldIncre ) + " is blank." );
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...not found " + trim( cAlphaFields( AlfaFieldIncre ) ) + "=\"" + trim( AlphArray( AlfaFieldIncre ) ) + "\"." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...not found " + cAlphaFields( AlfaFieldIncre ) + "=\"" + AlphArray( AlfaFieldIncre ) + "\"." );
 					}
 					ErrorsFound = true;
 				} else {
@@ -563,22 +563,22 @@ namespace VariableSpeedCoils {
 					if ( SELECT_CASE_var == "QUADRATIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( I ), 1.0 );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else if ( SELECT_CASE_var == "CUBIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( I ), 1.0 );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...illegal " + trim( cAlphaFields( AlfaFieldIncre ) ) + " type for this object = " + trim( GetCurveType( VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( I ) ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFields( AlfaFieldIncre ) + " type for this object = " + GetCurveType( VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( I ) ) );
 						ShowContinueError( "Curve type must be Quadratic or Cubic." );
 						ErrorsFound = true;
 					}}
@@ -588,11 +588,11 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSEIRFTemp( I ) = GetCurveIndex( AlphArray( AlfaFieldIncre ) ); // convert curve name to number
 				if ( VarSpeedCoil( DXCoilNum ).MSEIRFTemp( I ) == 0 ) {
 					if ( lAlphaBlanks( AlfaFieldIncre ) ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-						ShowContinueError( "...required " + trim( cAlphaFields( AlfaFieldIncre ) ) + " is blank." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+						ShowContinueError( "...required " + cAlphaFields( AlfaFieldIncre ) + " is blank." );
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...not found " + trim( cAlphaFields( AlfaFieldIncre ) ) + "=\"" + trim( AlphArray( AlfaFieldIncre ) ) + "\"." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...not found " + cAlphaFields( AlfaFieldIncre ) + "=\"" + AlphArray( AlfaFieldIncre ) + "\"." );
 					}
 					ErrorsFound = true;
 				} else {
@@ -602,14 +602,14 @@ namespace VariableSpeedCoils {
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRFTemp( I ), RatedInletWetBulbTemp, RatedInletWaterTemp );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...illegal " + trim( cAlphaFields( AlfaFieldIncre ) ) + " type for this object = " + trim( GetCurveType( VarSpeedCoil( DXCoilNum ).MSEIRFTemp( 1 ) ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFields( AlfaFieldIncre ) + " type for this object = " + GetCurveType( VarSpeedCoil( DXCoilNum ).MSEIRFTemp( 1 ) ) );
 						ShowContinueError( "Curve type must be BiQuadratic." );
 						ErrorsFound = true;
 					}}
@@ -619,11 +619,11 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( I ) = GetCurveIndex( AlphArray( AlfaFieldIncre ) ); // convert curve name to number
 				if ( VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( I ) == 0 ) {
 					if ( lAlphaBlanks( AlfaFieldIncre ) ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-						ShowContinueError( "...required " + trim( cAlphaFields( AlfaFieldIncre ) ) + " is blank." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+						ShowContinueError( "...required " + cAlphaFields( AlfaFieldIncre ) + " is blank." );
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...not found " + trim( cAlphaFields( AlfaFieldIncre ) ) + "=\"" + trim( AlphArray( AlfaFieldIncre ) ) + "\"." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...not found " + cAlphaFields( AlfaFieldIncre ) + "=\"" + AlphArray( AlfaFieldIncre ) + "\"." );
 					}
 					ErrorsFound = true;
 				} else {
@@ -633,22 +633,22 @@ namespace VariableSpeedCoils {
 					if ( SELECT_CASE_var == "QUADRATIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( I ), 1.0 );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else if ( SELECT_CASE_var == "CUBIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( I ), 1.0 );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...illegal " + trim( cAlphaFields( AlfaFieldIncre ) ) + " type for this object = " + trim( GetCurveType( VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( I ) ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFields( AlfaFieldIncre ) + " type for this object = " + GetCurveType( VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( I ) ) );
 						ShowContinueError( "Curve type must be Quadratic or Cubic." );
 						ErrorsFound = true;
 					}}
@@ -658,11 +658,11 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSEIRWaterFFlow( I ) = GetCurveIndex( AlphArray( AlfaFieldIncre ) ); // convert curve name to number
 				if ( VarSpeedCoil( DXCoilNum ).MSEIRWaterFFlow( I ) == 0 ) {
 					if ( lAlphaBlanks( AlfaFieldIncre ) ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-						ShowContinueError( "...required " + trim( cAlphaFields( AlfaFieldIncre ) ) + " is blank." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+						ShowContinueError( "...required " + cAlphaFields( AlfaFieldIncre ) + " is blank." );
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...not found " + trim( cAlphaFields( AlfaFieldIncre ) ) + "=\"" + trim( AlphArray( AlfaFieldIncre ) ) + "\"." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...not found " + cAlphaFields( AlfaFieldIncre ) + "=\"" + AlphArray( AlfaFieldIncre ) + "\"." );
 					}
 					ErrorsFound = true;
 				} else {
@@ -672,22 +672,22 @@ namespace VariableSpeedCoils {
 					if ( SELECT_CASE_var == "QUADRATIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRWaterFFlow( I ), 1.0 );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else if ( SELECT_CASE_var == "CUBIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRWaterFFlow( I ), 1.0 );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...illegal " + trim( cAlphaFields( AlfaFieldIncre ) ) + " type for this object = " + trim( GetCurveType( VarSpeedCoil( DXCoilNum ).MSEIRWaterFFlow( I ) ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFields( AlfaFieldIncre ) + " type for this object = " + GetCurveType( VarSpeedCoil( DXCoilNum ).MSEIRWaterFFlow( I ) ) );
 						ShowContinueError( "Curve type must be Quadratic or Cubic." );
 						ErrorsFound = true;
 					}}
@@ -698,11 +698,11 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSWasteHeat( I ) = GetCurveIndex( AlphArray( AlfaFieldIncre ) ); // convert curve name to number
 				if ( VarSpeedCoil( DXCoilNum ).MSWasteHeat( I ) == 0 ) {
 					if ( lAlphaBlanks( AlfaFieldIncre ) ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-						ShowContinueError( "...required " + trim( cAlphaFields( AlfaFieldIncre ) ) + " is blank." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+						ShowContinueError( "...required " + cAlphaFields( AlfaFieldIncre ) + " is blank." );
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...not found " + trim( cAlphaFields( AlfaFieldIncre ) ) + "=\"" + trim( AlphArray( AlfaFieldIncre ) ) + "\"." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...not found " + cAlphaFields( AlfaFieldIncre ) + "=\"" + AlphArray( AlfaFieldIncre ) + "\"." );
 					}
 					ErrorsFound = true;
 				} else {
@@ -712,14 +712,14 @@ namespace VariableSpeedCoils {
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSWasteHeat( I ), RatedInletWaterTemp, RatedInletAirTemp );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...illegal " + trim( cAlphaFields( AlfaFieldIncre ) ) + " type for this object = " + trim( GetCurveType( VarSpeedCoil( DXCoilNum ).MSWasteHeat( I ) ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFields( AlfaFieldIncre ) + " type for this object = " + GetCurveType( VarSpeedCoil( DXCoilNum ).MSWasteHeat( I ) ) );
 						ShowContinueError( "Curve type must be BiQuadratic." );
 						ErrorsFound = true;
 					}}
@@ -777,17 +777,17 @@ namespace VariableSpeedCoils {
 			IsNotOK = false;
 			IsBlank = false;
 
-			VerifyName( AlphArray( 1 ), VarSpeedCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( AlphArray( 1 ), VarSpeedCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
 			}
-			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, trim( CurrentModuleObject ) + " Name" );
+			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
 			}
 
-			VarSpeedCoil( DXCoilNum ).Name = trim( AlphArray( 1 ) );
+			VarSpeedCoil( DXCoilNum ).Name = AlphArray( 1 );
 			VarSpeedCoil( DXCoilNum ).CoolHeatType = "COOLING";
 			VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum = Coil_CoolingAirToAirVariableSpeed;
 			VarSpeedCoil( DXCoilNum ).NumOfSpeeds = int( NumArray( 1 ) );
@@ -797,14 +797,14 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).Twet_Rated = NumArray( 5 );
 			VarSpeedCoil( DXCoilNum ).Gamma_Rated = NumArray( 6 );
 
-			VarSpeedCoil( DXCoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			VarSpeedCoil( DXCoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			VarSpeedCoil( DXCoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			VarSpeedCoil( DXCoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-			TestCompSet( trim( CurrentModuleObject ), AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Air Nodes" );
+			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Air Nodes" );
 
 			if ( VarSpeedCoil( DXCoilNum ).NumOfSpeeds < 1 ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-				ShowContinueError( "..." + trim( cNumericFields( 1 ) ) + " must be >= 1." " entered number is " + trim( TrimSigDigits( NumArray( 1 ), 0 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "..." + cNumericFields( 1 ) + " must be >= 1." " entered number is " + TrimSigDigits( NumArray( 1 ), 0 ) );
 				ErrorsFound = true;
 			}
 
@@ -813,8 +813,8 @@ namespace VariableSpeedCoils {
 			}
 
 			if ( ( VarSpeedCoil( DXCoilNum ).NormSpedLevel > VarSpeedCoil( DXCoilNum ).NumOfSpeeds ) || ( VarSpeedCoil( DXCoilNum ).NormSpedLevel <= 0 ) ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-				ShowContinueError( "..." + trim( cNumericFields( 2 ) ) + " must be valid speed level" " entered number is " + trim( TrimSigDigits( NumArray( 2 ), 0 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "..." + cNumericFields( 2 ) + " must be valid speed level" " entered number is " + TrimSigDigits( NumArray( 2 ), 0 ) );
 				ErrorsFound = true;
 			}
 
@@ -822,19 +822,19 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).PLFFPLR = GetCurveIndex( AlphArray( 4 ) ); // convert curve name to number
 			if ( VarSpeedCoil( DXCoilNum ).PLFFPLR == 0 ) {
 				if ( lAlphaBlanks( 4 ) ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-					ShowContinueError( "...required " + trim( cAlphaFields( 6 ) ) + " is blank." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+					ShowContinueError( "...required " + cAlphaFields( 6 ) + " is blank." );
 				} else {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-					ShowContinueError( "...not found " + trim( cAlphaFields( 4 ) ) + "=\"" + trim( AlphArray( 4 ) ) + "\"." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+					ShowContinueError( "...not found " + cAlphaFields( 4 ) + "=\"" + AlphArray( 4 ) + "\"." );
 				}
 				ErrorsFound = true;
 			} else {
 				CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).PLFFPLR, 1.0 );
 				if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-					ShowContinueError( "..." + trim( cAlphaFields( 4 ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-					ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+					ShowContinueError( "..." + cAlphaFields( 4 ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+					ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 				}
 			}
 
@@ -842,11 +842,11 @@ namespace VariableSpeedCoils {
 			if ( lAlphaBlanks( 5 ) ) {
 				VarSpeedCoil( DXCoilNum ).CondenserInletNodeNum = 0;
 			} else {
-				VarSpeedCoil( DXCoilNum ).CondenserInletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, trim( CurrentModuleObject ), VarSpeedCoil( DXCoilNum ).Name, NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
+				VarSpeedCoil( DXCoilNum ).CondenserInletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, CurrentModuleObject, VarSpeedCoil( DXCoilNum ).Name, NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
 
 				if ( ! CheckOutAirNodeNumber( VarSpeedCoil( DXCoilNum ).CondenserInletNodeNum ) ) {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", may be invalid" );
-					ShowContinueError( trim( cAlphaFields( 10 ) ) + "=\"" + trim( AlphArray( 5 ) ) + "\", node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node." );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", may be invalid" );
+					ShowContinueError( cAlphaFields( 10 ) + "=\"" + AlphArray( 5 ) + "\", node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node." );
 					ShowContinueError( "This node needs to be included in an air system or the coil model will not be valid" ", and the simulation continues" );
 				}
 			}
@@ -857,8 +857,8 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).CondenserType = EvapCooled;
 				VarSpeedCoil( DXCoilNum ).ReportEvapCondVars = true;
 			} else {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-				ShowContinueError( "..." + trim( cAlphaFields( 6 ) ) + "=\"" + trim( AlphArray( 6 ) ) + "\":" );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "..." + cAlphaFields( 6 ) + "=\"" + AlphArray( 6 ) + "\":" );
 				ShowContinueError( "...must be AirCooled or EvaporativelyCooled." );
 				ErrorsFound = true;
 			}
@@ -866,18 +866,18 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).EvapCondPumpElecNomPower = NumArray( 7 );
 
 			if ( VarSpeedCoil( DXCoilNum ).EvapCondPumpElecNomPower < 0.0 ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-				ShowContinueError( "..." + trim( cNumericFields( 7 ) ) + " cannot be < 0.0." );
-				ShowContinueError( "...entered value=[" + trim( TrimSigDigits( NumArray( 7 ), 2 ) ) + "]." );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "..." + cNumericFields( 7 ) + " cannot be < 0.0." );
+				ShowContinueError( "...entered value=[" + TrimSigDigits( NumArray( 7 ), 2 ) + "]." );
 				ErrorsFound = true;
 			}
 
 			//Set crankcase heater capacity
 			VarSpeedCoil( DXCoilNum ).CrankcaseHeaterCapacity = NumArray( 8 );
 			if ( VarSpeedCoil( DXCoilNum ).CrankcaseHeaterCapacity < 0.0 ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-				ShowContinueError( "..." + trim( cNumericFields( 8 ) ) + " cannot be < 0.0." );
-				ShowContinueError( "...entered value=[" + trim( TrimSigDigits( NumArray( 8 ), 2 ) ) + "]." );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "..." + cNumericFields( 8 ) + " cannot be < 0.0." );
+				ShowContinueError( "...entered value=[" + TrimSigDigits( NumArray( 8 ), 2 ) + "]." );
 				ErrorsFound = true;
 			}
 
@@ -891,7 +891,7 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).EvapWaterSupplyMode = WaterSupplyFromMains;
 			} else {
 				VarSpeedCoil( DXCoilNum ).EvapWaterSupplyMode = WaterSupplyFromTank;
-				SetupTankDemandComponent( VarSpeedCoil( DXCoilNum ).Name, trim( CurrentModuleObject ), VarSpeedCoil( DXCoilNum ).EvapWaterSupplyName, ErrorsFound, VarSpeedCoil( DXCoilNum ).EvapWaterSupTankID, VarSpeedCoil( DXCoilNum ).EvapWaterTankDemandARRID );
+				SetupTankDemandComponent( VarSpeedCoil( DXCoilNum ).Name, CurrentModuleObject, VarSpeedCoil( DXCoilNum ).EvapWaterSupplyName, ErrorsFound, VarSpeedCoil( DXCoilNum ).EvapWaterSupTankID, VarSpeedCoil( DXCoilNum ).EvapWaterTankDemandARRID );
 			}
 
 			//A8; \field Name of Water Storage Tank for Condensate Collection
@@ -900,32 +900,32 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).CondensateCollectMode = CondensateDiscarded;
 			} else {
 				VarSpeedCoil( DXCoilNum ).CondensateCollectMode = CondensateToTank;
-				SetupTankSupplyComponent( VarSpeedCoil( DXCoilNum ).Name, trim( CurrentModuleObject ), VarSpeedCoil( DXCoilNum ).CondensateCollectName, ErrorsFound, VarSpeedCoil( DXCoilNum ).CondensateTankID, VarSpeedCoil( DXCoilNum ).CondensateTankSupplyARRID );
+				SetupTankSupplyComponent( VarSpeedCoil( DXCoilNum ).Name, CurrentModuleObject, VarSpeedCoil( DXCoilNum ).CondensateCollectName, ErrorsFound, VarSpeedCoil( DXCoilNum ).CondensateTankID, VarSpeedCoil( DXCoilNum ).CondensateTankSupplyARRID );
 			}
 
 			//   Basin heater power as a function of temperature must be greater than or equal to 0
 			VarSpeedCoil( DXCoilNum ).BasinHeaterPowerFTempDiff = NumArray( 10 );
 			if ( NumArray( 10 ) < 0.0 ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-				ShowContinueError( "..." + trim( cNumericFields( 10 ) ) + " must be >= 0.0." );
-				ShowContinueError( "...entered value=[" + trim( TrimSigDigits( NumArray( 10 ), 2 ) ) + "]." );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "..." + cNumericFields( 10 ) + " must be >= 0.0." );
+				ShowContinueError( "...entered value=[" + TrimSigDigits( NumArray( 10 ), 2 ) + "]." );
 				ErrorsFound = true;
 			}
 
 			VarSpeedCoil( DXCoilNum ).BasinHeaterSetPointTemp = NumArray( 11 );
 			if ( VarSpeedCoil( DXCoilNum ).BasinHeaterPowerFTempDiff > 0.0 ) {
 				if ( VarSpeedCoil( DXCoilNum ).BasinHeaterSetPointTemp < 2.0 ) {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", freeze possible" );
-					ShowContinueError( "..." + trim( cNumericFields( 11 ) ) + " is < 2 {C}. Freezing could occur." );
-					ShowContinueError( "...entered value=[" + trim( TrimSigDigits( NumArray( 11 ), 2 ) ) + "]." );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", freeze possible" );
+					ShowContinueError( "..." + cNumericFields( 11 ) + " is < 2 {C}. Freezing could occur." );
+					ShowContinueError( "...entered value=[" + TrimSigDigits( NumArray( 11 ), 2 ) + "]." );
 				}
 			}
 
 			if ( ! lAlphaBlanks( 9 ) ) {
 				VarSpeedCoil( DXCoilNum ).BasinHeaterSchedulePtr = GetScheduleIndex( AlphArray( 9 ) );
 				if ( VarSpeedCoil( DXCoilNum ).BasinHeaterSchedulePtr == 0 ) {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-					ShowContinueError( "...not found " + trim( cAlphaFields( 14 ) ) + "=\"" + trim( AlphArray( 9 ) ) + "\"." );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+					ShowContinueError( "...not found " + cAlphaFields( 14 ) + "=\"" + AlphArray( 9 ) + "\"." );
 					ShowContinueError( "Basin heater will be available to operate throughout the simulation." );
 				}
 			}
@@ -939,9 +939,9 @@ namespace VariableSpeedCoils {
 
 				VarSpeedCoil( DXCoilNum ).EvapCondEffect( I ) = NumArray( 17 + ( I - 1 ) * 6 );
 				if ( VarSpeedCoil( DXCoilNum ).EvapCondEffect( I ) < 0.0 || VarSpeedCoil( DXCoilNum ).EvapCondEffect( I ) > 1.0 ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-					ShowContinueError( "..." + trim( cNumericFields( 17 + ( I - 1 ) * 6 ) ) + " cannot be < 0.0 or > 1.0." );
-					ShowContinueError( "...entered value=[" + trim( TrimSigDigits( NumArray( 17 + ( I - 1 ) * 6 ), 2 ) ) + "]." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+					ShowContinueError( "..." + cNumericFields( 17 + ( I - 1 ) * 6 ) + " cannot be < 0.0 or > 1.0." );
+					ShowContinueError( "...entered value=[" + TrimSigDigits( NumArray( 17 + ( I - 1 ) * 6 ), 2 ) + "]." );
 					ErrorsFound = true;
 				}
 
@@ -949,11 +949,11 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSCCapFTemp( I ) = GetCurveIndex( AlphArray( AlfaFieldIncre ) ); // convert curve name to number
 				if ( VarSpeedCoil( DXCoilNum ).MSCCapFTemp( I ) == 0 ) {
 					if ( lAlphaBlanks( AlfaFieldIncre ) ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-						ShowContinueError( "...required " + trim( cAlphaFields( AlfaFieldIncre ) ) + " is blank." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+						ShowContinueError( "...required " + cAlphaFields( AlfaFieldIncre ) + " is blank." );
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...not found " + trim( cAlphaFields( AlfaFieldIncre ) ) + "=\"" + trim( AlphArray( AlfaFieldIncre ) ) + "\"." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...not found " + cAlphaFields( AlfaFieldIncre ) + "=\"" + AlphArray( AlfaFieldIncre ) + "\"." );
 					}
 					ErrorsFound = true;
 				} else {
@@ -963,14 +963,14 @@ namespace VariableSpeedCoils {
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapFTemp( I ), RatedInletWetBulbTemp, RatedAmbAirTemp );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...illegal " + trim( cAlphaFields( AlfaFieldIncre ) ) + " type for this object = " + trim( GetCurveType( VarSpeedCoil( DXCoilNum ).MSCCapFTemp( I ) ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFields( AlfaFieldIncre ) + " type for this object = " + GetCurveType( VarSpeedCoil( DXCoilNum ).MSCCapFTemp( I ) ) );
 						ShowContinueError( "Curve type must be BiQuadratic." );
 						ErrorsFound = true;
 					}}
@@ -980,11 +980,11 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( I ) = GetCurveIndex( AlphArray( AlfaFieldIncre ) ); // convert curve name to number
 				if ( VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( I ) == 0 ) {
 					if ( lAlphaBlanks( AlfaFieldIncre ) ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-						ShowContinueError( "...required " + trim( cAlphaFields( AlfaFieldIncre ) ) + " is blank." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+						ShowContinueError( "...required " + cAlphaFields( AlfaFieldIncre ) + " is blank." );
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...not found " + trim( cAlphaFields( AlfaFieldIncre ) ) + "=\"" + trim( AlphArray( AlfaFieldIncre ) ) + "\"." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...not found " + cAlphaFields( AlfaFieldIncre ) + "=\"" + AlphArray( AlfaFieldIncre ) + "\"." );
 					}
 					ErrorsFound = true;
 				} else {
@@ -994,22 +994,22 @@ namespace VariableSpeedCoils {
 					if ( SELECT_CASE_var == "QUADRATIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( I ), 1.0 );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else if ( SELECT_CASE_var == "CUBIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( I ), 1.0 );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...illegal " + trim( cAlphaFields( AlfaFieldIncre ) ) + " type for this object = " + trim( GetCurveType( VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( I ) ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFields( AlfaFieldIncre ) + " type for this object = " + GetCurveType( VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( I ) ) );
 						ShowContinueError( "Curve type must be Quadratic or Cubic." );
 						ErrorsFound = true;
 					}}
@@ -1019,11 +1019,11 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSEIRFTemp( I ) = GetCurveIndex( AlphArray( AlfaFieldIncre ) ); // convert curve name to number
 				if ( VarSpeedCoil( DXCoilNum ).MSEIRFTemp( I ) == 0 ) {
 					if ( lAlphaBlanks( AlfaFieldIncre ) ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-						ShowContinueError( "...required " + trim( cAlphaFields( AlfaFieldIncre ) ) + " is blank." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+						ShowContinueError( "...required " + cAlphaFields( AlfaFieldIncre ) + " is blank." );
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...not found " + trim( cAlphaFields( AlfaFieldIncre ) ) + "=\"" + trim( AlphArray( AlfaFieldIncre ) ) + "\"." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...not found " + cAlphaFields( AlfaFieldIncre ) + "=\"" + AlphArray( AlfaFieldIncre ) + "\"." );
 					}
 					ErrorsFound = true;
 				} else {
@@ -1033,14 +1033,14 @@ namespace VariableSpeedCoils {
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRFTemp( I ), RatedInletWetBulbTemp, RatedAmbAirTemp );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...illegal " + trim( cAlphaFields( AlfaFieldIncre ) ) + " type for this object = " + trim( GetCurveType( VarSpeedCoil( DXCoilNum ).MSEIRFTemp( 1 ) ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFields( AlfaFieldIncre ) + " type for this object = " + GetCurveType( VarSpeedCoil( DXCoilNum ).MSEIRFTemp( 1 ) ) );
 						ShowContinueError( "Curve type must be BiQuadratic." );
 						ErrorsFound = true;
 					}}
@@ -1050,11 +1050,11 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( I ) = GetCurveIndex( AlphArray( AlfaFieldIncre ) ); // convert curve name to number
 				if ( VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( I ) == 0 ) {
 					if ( lAlphaBlanks( AlfaFieldIncre ) ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-						ShowContinueError( "...required " + trim( cAlphaFields( AlfaFieldIncre ) ) + " is blank." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+						ShowContinueError( "...required " + cAlphaFields( AlfaFieldIncre ) + " is blank." );
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...not found " + trim( cAlphaFields( AlfaFieldIncre ) ) + "=\"" + trim( AlphArray( AlfaFieldIncre ) ) + "\"." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...not found " + cAlphaFields( AlfaFieldIncre ) + "=\"" + AlphArray( AlfaFieldIncre ) + "\"." );
 					}
 					ErrorsFound = true;
 				} else {
@@ -1064,22 +1064,22 @@ namespace VariableSpeedCoils {
 					if ( SELECT_CASE_var == "QUADRATIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( I ), 1.0 );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else if ( SELECT_CASE_var == "CUBIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( I ), 1.0 );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...illegal " + trim( cAlphaFields( AlfaFieldIncre ) ) + " type for this object = " + trim( GetCurveType( VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( I ) ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFields( AlfaFieldIncre ) + " type for this object = " + GetCurveType( VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( I ) ) );
 						ShowContinueError( "Curve type must be Quadratic or Cubic." );
 						ErrorsFound = true;
 					}}
@@ -1129,17 +1129,17 @@ namespace VariableSpeedCoils {
 			IsNotOK = false;
 			IsBlank = false;
 
-			VerifyName( AlphArray( 1 ), VarSpeedCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( AlphArray( 1 ), VarSpeedCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
 			}
-			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, trim( CurrentModuleObject ) + " Name" );
+			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
 			}
 
-			VarSpeedCoil( DXCoilNum ).Name = trim( AlphArray( 1 ) );
+			VarSpeedCoil( DXCoilNum ).Name = AlphArray( 1 );
 			VarSpeedCoil( DXCoilNum ).CoolHeatType = "HEATING";
 			VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum = TypeOf_CoilVSWAHPHeatingEquationFit;
 			VarSpeedCoil( DXCoilNum ).NumOfSpeeds = int( NumArray( 1 ) );
@@ -1149,18 +1149,18 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).RatedWaterVolFlowRate = NumArray( 5 );
 			VarSpeedCoil( DXCoilNum ).CondenserType = WaterCooled;
 
-			VarSpeedCoil( DXCoilNum ).WaterInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
-			VarSpeedCoil( DXCoilNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
-			VarSpeedCoil( DXCoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			VarSpeedCoil( DXCoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			VarSpeedCoil( DXCoilNum ).WaterInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+			VarSpeedCoil( DXCoilNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+			VarSpeedCoil( DXCoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			VarSpeedCoil( DXCoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-			TestCompSet( trim( CurrentModuleObject ), AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Water Nodes" );
-			TestCompSet( trim( CurrentModuleObject ), AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Air Nodes" );
+			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Water Nodes" );
+			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Air Nodes" );
 
 			//       If (VarSpeedCoil(DXCoilNum)%NumOfSpeeds .LT. 2) Then
 			if ( VarSpeedCoil( DXCoilNum ).NumOfSpeeds < 1 ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-				ShowContinueError( "..." + trim( cNumericFields( 1 ) ) + " must be >= 1." " entered number is " + trim( TrimSigDigits( NumArray( 1 ), 0 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "..." + cNumericFields( 1 ) + " must be >= 1." " entered number is " + TrimSigDigits( NumArray( 1 ), 0 ) );
 				ErrorsFound = true;
 			}
 
@@ -1169,8 +1169,8 @@ namespace VariableSpeedCoils {
 			}
 
 			if ( ( VarSpeedCoil( DXCoilNum ).NormSpedLevel > VarSpeedCoil( DXCoilNum ).NumOfSpeeds ) || ( VarSpeedCoil( DXCoilNum ).NormSpedLevel <= 0 ) ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-				ShowContinueError( "..." + trim( cNumericFields( 2 ) ) + " must be valid speed level" " entered number is " + trim( TrimSigDigits( NumArray( 2 ), 0 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "..." + cNumericFields( 2 ) + " must be valid speed level" " entered number is " + TrimSigDigits( NumArray( 2 ), 0 ) );
 				ErrorsFound = true;
 			}
 
@@ -1178,19 +1178,19 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).PLFFPLR = GetCurveIndex( AlphArray( 6 ) ); // convert curve name to number
 			if ( VarSpeedCoil( DXCoilNum ).PLFFPLR == 0 ) {
 				if ( lAlphaBlanks( 6 ) ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-					ShowContinueError( "...required " + trim( cAlphaFields( 6 ) ) + " is blank." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+					ShowContinueError( "...required " + cAlphaFields( 6 ) + " is blank." );
 				} else {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-					ShowContinueError( "...not found " + trim( cAlphaFields( 6 ) ) + "=\"" + trim( AlphArray( 6 ) ) + "\"." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+					ShowContinueError( "...not found " + cAlphaFields( 6 ) + "=\"" + AlphArray( 6 ) + "\"." );
 				}
 				ErrorsFound = true;
 			} else {
 				CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).PLFFPLR, 1.0 );
 				if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-					ShowContinueError( "..." + trim( cAlphaFields( 6 ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-					ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+					ShowContinueError( "..." + cAlphaFields( 6 ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+					ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 				}
 			}
 
@@ -1205,11 +1205,11 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSCCapFTemp( I ) = GetCurveIndex( AlphArray( AlfaFieldIncre ) ); // convert curve name to number
 				if ( VarSpeedCoil( DXCoilNum ).MSCCapFTemp( I ) == 0 ) {
 					if ( lAlphaBlanks( AlfaFieldIncre ) ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-						ShowContinueError( "...required " + trim( cAlphaFields( AlfaFieldIncre ) ) + " is blank." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+						ShowContinueError( "...required " + cAlphaFields( AlfaFieldIncre ) + " is blank." );
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...not found " + trim( cAlphaFields( AlfaFieldIncre ) ) + "=\"" + trim( AlphArray( AlfaFieldIncre ) ) + "\"." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...not found " + cAlphaFields( AlfaFieldIncre ) + "=\"" + AlphArray( AlfaFieldIncre ) + "\"." );
 					}
 					ErrorsFound = true;
 				} else {
@@ -1219,14 +1219,14 @@ namespace VariableSpeedCoils {
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapFTemp( I ), RatedInletAirTempHeat, RatedInletWaterTempHeat );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...illegal " + trim( cAlphaFields( AlfaFieldIncre ) ) + " type for this object = " + trim( GetCurveType( VarSpeedCoil( DXCoilNum ).MSCCapFTemp( I ) ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFields( AlfaFieldIncre ) + " type for this object = " + GetCurveType( VarSpeedCoil( DXCoilNum ).MSCCapFTemp( I ) ) );
 						ShowContinueError( "Curve type must be BiQuadratic." );
 						ErrorsFound = true;
 					}}
@@ -1236,11 +1236,11 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( I ) = GetCurveIndex( AlphArray( AlfaFieldIncre ) ); // convert curve name to number
 				if ( VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( I ) == 0 ) {
 					if ( lAlphaBlanks( AlfaFieldIncre ) ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-						ShowContinueError( "...required " + trim( cAlphaFields( AlfaFieldIncre ) ) + " is blank." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+						ShowContinueError( "...required " + cAlphaFields( AlfaFieldIncre ) + " is blank." );
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...not found " + trim( cAlphaFields( AlfaFieldIncre ) ) + "=\"" + trim( AlphArray( AlfaFieldIncre ) ) + "\"." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...not found " + cAlphaFields( AlfaFieldIncre ) + "=\"" + AlphArray( AlfaFieldIncre ) + "\"." );
 					}
 					ErrorsFound = true;
 				} else {
@@ -1250,22 +1250,22 @@ namespace VariableSpeedCoils {
 					if ( SELECT_CASE_var == "QUADRATIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( I ), 1.0 );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else if ( SELECT_CASE_var == "CUBIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( I ), 1.0 );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...illegal " + trim( cAlphaFields( AlfaFieldIncre ) ) + " type for this object = " + trim( GetCurveType( VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( I ) ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFields( AlfaFieldIncre ) + " type for this object = " + GetCurveType( VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( I ) ) );
 						ShowContinueError( "Curve type must be Quadratic or Cubic." );
 						ErrorsFound = true;
 					}}
@@ -1275,11 +1275,11 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( I ) = GetCurveIndex( AlphArray( AlfaFieldIncre ) ); // convert curve name to number
 				if ( VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( I ) == 0 ) {
 					if ( lAlphaBlanks( AlfaFieldIncre ) ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-						ShowContinueError( "...required " + trim( cAlphaFields( AlfaFieldIncre ) ) + " is blank." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+						ShowContinueError( "...required " + cAlphaFields( AlfaFieldIncre ) + " is blank." );
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...not found " + trim( cAlphaFields( AlfaFieldIncre ) ) + "=\"" + trim( AlphArray( 14 + ( I - 1 ) * 6 ) ) + "\"." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...not found " + cAlphaFields( AlfaFieldIncre ) + "=\"" + AlphArray( 14 + ( I - 1 ) * 6 ) + "\"." );
 					}
 					ErrorsFound = true;
 				} else {
@@ -1289,22 +1289,22 @@ namespace VariableSpeedCoils {
 					if ( SELECT_CASE_var == "QUADRATIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( I ), 1.0 );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else if ( SELECT_CASE_var == "CUBIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( I ), 1.0 );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...illegal " + trim( cAlphaFields( AlfaFieldIncre ) ) + " type for this object = " + trim( GetCurveType( VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( I ) ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFields( AlfaFieldIncre ) + " type for this object = " + GetCurveType( VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( I ) ) );
 						ShowContinueError( "Curve type must be Quadratic or Cubic." );
 						ErrorsFound = true;
 					}}
@@ -1314,11 +1314,11 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSEIRFTemp( I ) = GetCurveIndex( AlphArray( AlfaFieldIncre ) ); // convert curve name to number
 				if ( VarSpeedCoil( DXCoilNum ).MSEIRFTemp( I ) == 0 ) {
 					if ( lAlphaBlanks( AlfaFieldIncre ) ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-						ShowContinueError( "...required " + trim( cAlphaFields( AlfaFieldIncre ) ) + " is blank." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+						ShowContinueError( "...required " + cAlphaFields( AlfaFieldIncre ) + " is blank." );
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...not found " + trim( cAlphaFields( AlfaFieldIncre ) ) + "=\"" + trim( AlphArray( AlfaFieldIncre ) ) + "\"." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...not found " + cAlphaFields( AlfaFieldIncre ) + "=\"" + AlphArray( AlfaFieldIncre ) + "\"." );
 					}
 					ErrorsFound = true;
 				} else {
@@ -1328,14 +1328,14 @@ namespace VariableSpeedCoils {
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRFTemp( I ), RatedInletAirTempHeat, RatedInletWaterTempHeat );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...illegal " + trim( cAlphaFields( AlfaFieldIncre ) ) + " type for this object = " + trim( GetCurveType( VarSpeedCoil( DXCoilNum ).MSEIRFTemp( 1 ) ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFields( AlfaFieldIncre ) + " type for this object = " + GetCurveType( VarSpeedCoil( DXCoilNum ).MSEIRFTemp( 1 ) ) );
 						ShowContinueError( "Curve type must be BiQuadratic." );
 						ErrorsFound = true;
 					}}
@@ -1345,11 +1345,11 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( I ) = GetCurveIndex( AlphArray( AlfaFieldIncre ) ); // convert curve name to number
 				if ( VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( I ) == 0 ) {
 					if ( lAlphaBlanks( AlfaFieldIncre ) ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-						ShowContinueError( "...required " + trim( cAlphaFields( AlfaFieldIncre ) ) + " is blank." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+						ShowContinueError( "...required " + cAlphaFields( AlfaFieldIncre ) + " is blank." );
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...not found " + trim( cAlphaFields( AlfaFieldIncre ) ) + "=\"" + trim( AlphArray( 16 + ( I - 1 ) * 6 ) ) + "\"." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...not found " + cAlphaFields( AlfaFieldIncre ) + "=\"" + AlphArray( 16 + ( I - 1 ) * 6 ) + "\"." );
 					}
 					ErrorsFound = true;
 				} else {
@@ -1359,22 +1359,22 @@ namespace VariableSpeedCoils {
 					if ( SELECT_CASE_var == "QUADRATIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( I ), 1.0 );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else if ( SELECT_CASE_var == "CUBIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( I ), 1.0 );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...illegal " + trim( cAlphaFields( AlfaFieldIncre ) ) + " type for this object = " + trim( GetCurveType( VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( I ) ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFields( AlfaFieldIncre ) + " type for this object = " + GetCurveType( VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( I ) ) );
 						ShowContinueError( "Curve type must be Quadratic or Cubic." );
 						ErrorsFound = true;
 					}}
@@ -1384,11 +1384,11 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSEIRWaterFFlow( I ) = GetCurveIndex( AlphArray( AlfaFieldIncre ) ); // convert curve name to number
 				if ( VarSpeedCoil( DXCoilNum ).MSEIRWaterFFlow( I ) == 0 ) {
 					if ( lAlphaBlanks( AlfaFieldIncre ) ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-						ShowContinueError( "...required " + trim( cAlphaFields( AlfaFieldIncre ) ) + " is blank." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+						ShowContinueError( "...required " + cAlphaFields( AlfaFieldIncre ) + " is blank." );
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...not found " + trim( cAlphaFields( AlfaFieldIncre ) ) + "=\"" + trim( AlphArray( AlfaFieldIncre ) ) + "\"." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...not found " + cAlphaFields( AlfaFieldIncre ) + "=\"" + AlphArray( AlfaFieldIncre ) + "\"." );
 					}
 					ErrorsFound = true;
 				} else {
@@ -1398,22 +1398,22 @@ namespace VariableSpeedCoils {
 					if ( SELECT_CASE_var == "QUADRATIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRWaterFFlow( I ), 1.0 );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else if ( SELECT_CASE_var == "CUBIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRWaterFFlow( I ), 1.0 );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...illegal " + trim( cAlphaFields( AlfaFieldIncre ) ) + " type for this object = " + trim( GetCurveType( VarSpeedCoil( DXCoilNum ).MSEIRWaterFFlow( I ) ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFields( AlfaFieldIncre ) + " type for this object = " + GetCurveType( VarSpeedCoil( DXCoilNum ).MSEIRWaterFFlow( I ) ) );
 						ShowContinueError( "Curve type must be Quadratic or Cubic." );
 						ErrorsFound = true;
 					}}
@@ -1424,11 +1424,11 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSWasteHeat( I ) = GetCurveIndex( AlphArray( AlfaFieldIncre ) ); // convert curve name to number
 				if ( VarSpeedCoil( DXCoilNum ).MSWasteHeat( I ) == 0 ) {
 					if ( lAlphaBlanks( AlfaFieldIncre ) ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-						ShowContinueError( "...required " + trim( cAlphaFields( AlfaFieldIncre ) ) + " is blank." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+						ShowContinueError( "...required " + cAlphaFields( AlfaFieldIncre ) + " is blank." );
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...not found " + trim( cAlphaFields( AlfaFieldIncre ) ) + "=\"" + trim( AlphArray( AlfaFieldIncre ) ) + "\"." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...not found " + cAlphaFields( AlfaFieldIncre ) + "=\"" + AlphArray( AlfaFieldIncre ) + "\"." );
 					}
 					ErrorsFound = true;
 				} else {
@@ -1438,14 +1438,14 @@ namespace VariableSpeedCoils {
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSWasteHeat( I ), RatedInletAirTempHeat, RatedInletWaterTempHeat );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...illegal " + trim( cAlphaFields( AlfaFieldIncre ) ) + " type for this object = " + trim( GetCurveType( VarSpeedCoil( DXCoilNum ).MSWasteHeat( I ) ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFields( AlfaFieldIncre ) + " type for this object = " + GetCurveType( VarSpeedCoil( DXCoilNum ).MSWasteHeat( I ) ) );
 						ShowContinueError( "Curve type must be BiQuadratic." );
 						ErrorsFound = true;
 					}}
@@ -1485,17 +1485,17 @@ namespace VariableSpeedCoils {
 			IsNotOK = false;
 			IsBlank = false;
 
-			VerifyName( AlphArray( 1 ), VarSpeedCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, trim( CurrentModuleObject ) + " Name" );
+			VerifyName( AlphArray( 1 ), VarSpeedCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
 			}
-			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, trim( CurrentModuleObject ) + " Name" );
+			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
 			}
 
-			VarSpeedCoil( DXCoilNum ).Name = trim( AlphArray( 1 ) );
+			VarSpeedCoil( DXCoilNum ).Name = AlphArray( 1 );
 			VarSpeedCoil( DXCoilNum ).CoolHeatType = "HEATING";
 			VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum = Coil_HeatingAirToAirVariableSpeed;
 			VarSpeedCoil( DXCoilNum ).NumOfSpeeds = int( NumArray( 1 ) );
@@ -1503,14 +1503,14 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).RatedCapHeat = NumArray( 3 );
 			VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate = NumArray( 4 );
 
-			VarSpeedCoil( DXCoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			VarSpeedCoil( DXCoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, trim( CurrentModuleObject ), AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			VarSpeedCoil( DXCoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			VarSpeedCoil( DXCoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-			TestCompSet( trim( CurrentModuleObject ), AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Air Nodes" );
+			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Air Nodes" );
 
 			if ( VarSpeedCoil( DXCoilNum ).NumOfSpeeds < 1 ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-				ShowContinueError( "..." + trim( cNumericFields( 1 ) ) + " must be >= 1." " entered number is " + trim( TrimSigDigits( NumArray( 1 ), 0 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "..." + cNumericFields( 1 ) + " must be >= 1." " entered number is " + TrimSigDigits( NumArray( 1 ), 0 ) );
 				ErrorsFound = true;
 			}
 
@@ -1519,8 +1519,8 @@ namespace VariableSpeedCoils {
 			}
 
 			if ( ( VarSpeedCoil( DXCoilNum ).NormSpedLevel > VarSpeedCoil( DXCoilNum ).NumOfSpeeds ) || ( VarSpeedCoil( DXCoilNum ).NormSpedLevel <= 0 ) ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-				ShowContinueError( "..." + trim( cNumericFields( 2 ) ) + " must be valid speed level" " entered number is " + trim( TrimSigDigits( NumArray( 2 ), 0 ) ) );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "..." + cNumericFields( 2 ) + " must be valid speed level" " entered number is " + TrimSigDigits( NumArray( 2 ), 0 ) );
 				ErrorsFound = true;
 			}
 
@@ -1528,19 +1528,19 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).PLFFPLR = GetCurveIndex( AlphArray( 4 ) ); // convert curve name to number
 			if ( VarSpeedCoil( DXCoilNum ).PLFFPLR == 0 ) {
 				if ( lAlphaBlanks( 4 ) ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-					ShowContinueError( "...required " + trim( cAlphaFields( 4 ) ) + " is blank." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+					ShowContinueError( "...required " + cAlphaFields( 4 ) + " is blank." );
 				} else {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-					ShowContinueError( "...not found " + trim( cAlphaFields( 4 ) ) + "=\"" + trim( AlphArray( 4 ) ) + "\"." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+					ShowContinueError( "...not found " + cAlphaFields( 4 ) + "=\"" + AlphArray( 4 ) + "\"." );
 				}
 				ErrorsFound = true;
 			} else {
 				CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).PLFFPLR, 1.0 );
 				if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-					ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-					ShowContinueError( "..." + trim( cAlphaFields( 4 ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-					ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+					ShowContinueError( "..." + cAlphaFields( 4 ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+					ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 				}
 			}
 
@@ -1549,12 +1549,12 @@ namespace VariableSpeedCoils {
 			if ( SameString( AlphArray( 6 ), "ReverseCycle" ) ) {
 				if ( VarSpeedCoil( DXCoilNum ).DefrostEIRFT == 0 ) {
 					if ( lAlphaBlanks( 5 ) ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-						ShowContinueError( "...required " + trim( cAlphaFields( 5 ) ) + " is blank." );
-						ShowContinueError( "...field is required because " + trim( cAlphaFields( 6 ) ) + " is \"ReverseCycle\"." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+						ShowContinueError( "...required " + cAlphaFields( 5 ) + " is blank." );
+						ShowContinueError( "...field is required because " + cAlphaFields( 6 ) + " is \"ReverseCycle\"." );
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...not found " + trim( cAlphaFields( 5 ) ) + "=\"" + trim( AlphArray( 5 ) ) + "\"." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...not found " + cAlphaFields( 5 ) + "=\"" + AlphArray( 5 ) + "\"." );
 					}
 					ErrorsFound = true;
 				} else {
@@ -1564,8 +1564,8 @@ namespace VariableSpeedCoils {
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...illegal " + trim( cAlphaFields( 5 ) ) + " type for this object = " + trim( GetCurveType( VarSpeedCoil( DXCoilNum ).DefrostEIRFT ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFields( 5 ) + " type for this object = " + GetCurveType( VarSpeedCoil( DXCoilNum ).DefrostEIRFT ) );
 						ShowContinueError( "Curve type must be BiQuadratic." );
 						ErrorsFound = true;
 					}}
@@ -1575,8 +1575,8 @@ namespace VariableSpeedCoils {
 			if ( SameString( AlphArray( 6 ), "ReverseCycle" ) ) VarSpeedCoil( DXCoilNum ).DefrostStrategy = ReverseCycle;
 			if ( SameString( AlphArray( 6 ), "Resistive" ) ) VarSpeedCoil( DXCoilNum ).DefrostStrategy = Resistive;
 			if ( VarSpeedCoil( DXCoilNum ).DefrostStrategy == 0 ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-				ShowContinueError( "...illegal " + trim( cAlphaFields( 6 ) ) + "=\"" + trim( AlphArray( 6 ) ) + "\"." );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "...illegal " + cAlphaFields( 6 ) + "=\"" + AlphArray( 6 ) + "\"." );
 				ShowContinueError( "...valid values for this field are ReverseCycle or Resistive." );
 				ErrorsFound = true;
 			}
@@ -1584,8 +1584,8 @@ namespace VariableSpeedCoils {
 			if ( SameString( AlphArray( 7 ), "Timed" ) ) VarSpeedCoil( DXCoilNum ).DefrostControl = Timed;
 			if ( SameString( AlphArray( 7 ), "OnDemand" ) ) VarSpeedCoil( DXCoilNum ).DefrostControl = OnDemand;
 			if ( VarSpeedCoil( DXCoilNum ).DefrostControl == 0 ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-				ShowContinueError( "...illegal " + trim( cAlphaFields( 7 ) ) + "=\"" + trim( AlphArray( 7 ) ) + "\"." );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "...illegal " + cAlphaFields( 7 ) + "=\"" + AlphArray( 7 ) + "\"." );
 				ShowContinueError( "...valid values for this field are Timed or OnDemand." );
 				ErrorsFound = true;
 			}
@@ -1602,9 +1602,9 @@ namespace VariableSpeedCoils {
 			//Set crankcase heater capacity
 			VarSpeedCoil( DXCoilNum ).CrankcaseHeaterCapacity = NumArray( 8 );
 			if ( VarSpeedCoil( DXCoilNum ).CrankcaseHeaterCapacity < 0.0 ) {
-				ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-				ShowContinueError( "..." + trim( cNumericFields( 9 ) ) + " cannot be < 0.0." );
-				ShowContinueError( "...entered value=[" + trim( TrimSigDigits( NumArray( 9 ), 2 ) ) + "]." );
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "..." + cNumericFields( 9 ) + " cannot be < 0.0." );
+				ShowContinueError( "...entered value=[" + TrimSigDigits( NumArray( 9 ), 2 ) + "]." );
 				ErrorsFound = true;
 			}
 
@@ -1614,15 +1614,15 @@ namespace VariableSpeedCoils {
 			//Set defrost time period
 			VarSpeedCoil( DXCoilNum ).DefrostTime = NumArray( 10 );
 			if ( VarSpeedCoil( DXCoilNum ).DefrostTime == 0.0 && VarSpeedCoil( DXCoilNum ).DefrostControl == 1 ) {
-				ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", " );
-				ShowContinueError( "..." + trim( cNumericFields( 5 ) ) + " = 0.0 for defrost control = TIMED." );
+				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", " );
+				ShowContinueError( "..." + cNumericFields( 5 ) + " = 0.0 for defrost control = TIMED." );
 			}
 
 			//Set defrost capacity (for resistive defrost)
 			VarSpeedCoil( DXCoilNum ).DefrostCapacity = NumArray( 11 );
 			if ( VarSpeedCoil( DXCoilNum ).DefrostCapacity == 0.0 && VarSpeedCoil( DXCoilNum ).DefrostStrategy == 2 ) {
-				ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", " );
-				ShowContinueError( "..." + trim( cNumericFields( 6 ) ) + " = 0.0 for defrost strategy = RESISTIVE." );
+				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", " );
+				ShowContinueError( "..." + cNumericFields( 6 ) + " = 0.0 for defrost strategy = RESISTIVE." );
 			}
 
 			for ( I = 1; I <= VarSpeedCoil( DXCoilNum ).NumOfSpeeds; ++I ) {
@@ -1631,8 +1631,8 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( I ) = NumArray( 14 + ( I - 1 ) * 3 );
 
 				if ( VarSpeedCoil( DXCoilNum ).MSRatedTotCap( I ) < 1.e-10 ) {
-					ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid value" );
-					ShowContinueError( "...too small " + trim( cNumericFields( 12 + ( I - 1 ) * 3 ) ) + "=[" + trim( RoundSigDigits( VarSpeedCoil( DXCoilNum ).MSRatedTotCap( I ), 2 ) ) + "]." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid value" );
+					ShowContinueError( "...too small " + cNumericFields( 12 + ( I - 1 ) * 3 ) + "=[" + RoundSigDigits( VarSpeedCoil( DXCoilNum ).MSRatedTotCap( I ), 2 ) + "]." );
 					ErrorsFound = true;
 				}
 
@@ -1640,11 +1640,11 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSCCapFTemp( I ) = GetCurveIndex( AlphArray( AlfaFieldIncre ) ); // convert curve name to number
 				if ( VarSpeedCoil( DXCoilNum ).MSCCapFTemp( I ) == 0 ) {
 					if ( lAlphaBlanks( AlfaFieldIncre ) ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-						ShowContinueError( "...required " + trim( cAlphaFields( AlfaFieldIncre ) ) + " is blank." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+						ShowContinueError( "...required " + cAlphaFields( AlfaFieldIncre ) + " is blank." );
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...not found " + trim( cAlphaFields( AlfaFieldIncre ) ) + "=\"" + trim( AlphArray( AlfaFieldIncre ) ) + "\"." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...not found " + cAlphaFields( AlfaFieldIncre ) + "=\"" + AlphArray( AlfaFieldIncre ) + "\"." );
 					}
 					ErrorsFound = true;
 				} else {
@@ -1654,14 +1654,14 @@ namespace VariableSpeedCoils {
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapFTemp( I ), RatedInletAirTempHeat, RatedAmbAirTempHeat );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...illegal " + trim( cAlphaFields( AlfaFieldIncre ) ) + " type for this object = " + trim( GetCurveType( VarSpeedCoil( DXCoilNum ).MSCCapFTemp( I ) ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFields( AlfaFieldIncre ) + " type for this object = " + GetCurveType( VarSpeedCoil( DXCoilNum ).MSCCapFTemp( I ) ) );
 						ShowContinueError( "Curve type must be BiQuadratic." );
 						ErrorsFound = true;
 					}}
@@ -1671,11 +1671,11 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( I ) = GetCurveIndex( AlphArray( AlfaFieldIncre ) ); // convert curve name to number
 				if ( VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( I ) == 0 ) {
 					if ( lAlphaBlanks( AlfaFieldIncre ) ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-						ShowContinueError( "...required " + trim( cAlphaFields( AlfaFieldIncre ) ) + " is blank." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+						ShowContinueError( "...required " + cAlphaFields( AlfaFieldIncre ) + " is blank." );
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...not found " + trim( cAlphaFields( AlfaFieldIncre ) ) + "=\"" + trim( AlphArray( AlfaFieldIncre ) ) + "\"." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...not found " + cAlphaFields( AlfaFieldIncre ) + "=\"" + AlphArray( AlfaFieldIncre ) + "\"." );
 					}
 					ErrorsFound = true;
 				} else {
@@ -1685,22 +1685,22 @@ namespace VariableSpeedCoils {
 					if ( SELECT_CASE_var == "QUADRATIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( I ), 1.0 );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else if ( SELECT_CASE_var == "CUBIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( I ), 1.0 );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...illegal " + trim( cAlphaFields( AlfaFieldIncre ) ) + " type for this object = " + trim( GetCurveType( VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( I ) ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFields( AlfaFieldIncre ) + " type for this object = " + GetCurveType( VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( I ) ) );
 						ShowContinueError( "Curve type must be Quadratic or Cubic." );
 						ErrorsFound = true;
 					}}
@@ -1710,11 +1710,11 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSEIRFTemp( I ) = GetCurveIndex( AlphArray( AlfaFieldIncre ) ); // convert curve name to number
 				if ( VarSpeedCoil( DXCoilNum ).MSEIRFTemp( I ) == 0 ) {
 					if ( lAlphaBlanks( AlfaFieldIncre ) ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-						ShowContinueError( "...required " + trim( cAlphaFields( AlfaFieldIncre ) ) + " is blank." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+						ShowContinueError( "...required " + cAlphaFields( AlfaFieldIncre ) + " is blank." );
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...not found " + trim( cAlphaFields( AlfaFieldIncre ) ) + "=\"" + trim( AlphArray( AlfaFieldIncre ) ) + "\"." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...not found " + cAlphaFields( AlfaFieldIncre ) + "=\"" + AlphArray( AlfaFieldIncre ) + "\"." );
 					}
 					ErrorsFound = true;
 				} else {
@@ -1724,14 +1724,14 @@ namespace VariableSpeedCoils {
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRFTemp( I ), RatedInletAirTempHeat, RatedAmbAirTempHeat );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...illegal " + trim( cAlphaFields( AlfaFieldIncre ) ) + " type for this object = " + trim( GetCurveType( VarSpeedCoil( DXCoilNum ).MSEIRFTemp( 1 ) ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFields( AlfaFieldIncre ) + " type for this object = " + GetCurveType( VarSpeedCoil( DXCoilNum ).MSEIRFTemp( 1 ) ) );
 						ShowContinueError( "Curve type must be BiQuadratic." );
 						ErrorsFound = true;
 					}}
@@ -1741,11 +1741,11 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( I ) = GetCurveIndex( AlphArray( AlfaFieldIncre ) ); // convert curve name to number
 				if ( VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( I ) == 0 ) {
 					if ( lAlphaBlanks( AlfaFieldIncre ) ) {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", missing" );
-						ShowContinueError( "...required " + trim( cAlphaFields( AlfaFieldIncre ) ) + " is blank." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
+						ShowContinueError( "...required " + cAlphaFields( AlfaFieldIncre ) + " is blank." );
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...not found " + trim( cAlphaFields( AlfaFieldIncre ) ) + "=\"" + trim( AlphArray( 16 + ( I - 1 ) * 6 ) ) + "\"." );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...not found " + cAlphaFields( AlfaFieldIncre ) + "=\"" + AlphArray( 16 + ( I - 1 ) * 6 ) + "\"." );
 					}
 					ErrorsFound = true;
 				} else {
@@ -1755,22 +1755,22 @@ namespace VariableSpeedCoils {
 					if ( SELECT_CASE_var == "QUADRATIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( I ), 1.0 );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else if ( SELECT_CASE_var == "CUBIC" ) {
 						CurveVal = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( I ), 1.0 );
 						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", curve values" );
-							ShowContinueError( "..." + trim( cAlphaFields( AlfaFieldIncre ) ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + trim( TrimSigDigits( CurveVal, 3 ) ) );
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", curve values" );
+							ShowContinueError( "..." + cAlphaFields( AlfaFieldIncre ) + " output is not equal to 1.0 " "(+ or - 10%) at rated conditions." );
+							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
 						}
 
 					} else {
-						ShowSevereError( RoutineName + trim( CurrentModuleObject ) + "=\"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\", invalid" );
-						ShowContinueError( "...illegal " + trim( cAlphaFields( AlfaFieldIncre ) ) + " type for this object = " + trim( GetCurveType( VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( I ) ) ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFields( AlfaFieldIncre ) + " type for this object = " + GetCurveType( VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( I ) ) );
 						ShowContinueError( "Curve type must be Quadratic or Cubic." );
 						ErrorsFound = true;
 					}}
@@ -1927,7 +1927,7 @@ namespace VariableSpeedCoils {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting " + trim( CurrentModuleObject ) + " input.  " "Preceding condition(s) causes termination." );
+			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input.  " "Preceding condition(s) causes termination." );
 		}
 
 	}
@@ -2010,7 +2010,7 @@ namespace VariableSpeedCoils {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Real64 SmallDifferenceTest( 0.00000001 );
-		static Fstring const RoutineName( "InitVarSpeedCoil" );
+		static std::string const RoutineName( "InitVarSpeedCoil" );
 
 		if ( MyOneTimeFlag ) {
 			// initialize the environment and sizing flags
@@ -2049,11 +2049,11 @@ namespace VariableSpeedCoils {
 				for ( Mode = 1; Mode <= VarSpeedCoil( DXCoilNum ).NumOfSpeeds; ++Mode ) {
 					// Check for zero capacity or zero max flow rate
 					if ( VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode ) <= 0.0 ) {
-						ShowSevereError( "Sizing: " + trim( VarSpeedCoil( DXCoilNum ).VarSpeedCoilType ) + " " + trim( VarSpeedCoil( DXCoilNum ).Name ) + " has zero rated total capacity at speed " + trim( TrimSigDigits( Mode ) ) );
+						ShowSevereError( "Sizing: " + VarSpeedCoil( DXCoilNum ).VarSpeedCoilType + ' ' + VarSpeedCoil( DXCoilNum ).Name + " has zero rated total capacity at speed " + TrimSigDigits( Mode ) );
 						ErrorsFound = true;
 					}
 					if ( VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) <= 0.0 ) {
-						ShowSevereError( "Sizing: " + trim( VarSpeedCoil( DXCoilNum ).VarSpeedCoilType ) + " " + trim( VarSpeedCoil( DXCoilNum ).Name ) + " has zero rated air flow rate at speed " + trim( TrimSigDigits( Mode ) ) );
+						ShowSevereError( "Sizing: " + VarSpeedCoil( DXCoilNum ).VarSpeedCoilType + ' ' + VarSpeedCoil( DXCoilNum ).Name + " has zero rated air flow rate at speed " + TrimSigDigits( Mode ) );
 						ErrorsFound = true;
 					}
 					if ( ErrorsFound ) {
@@ -2336,7 +2336,7 @@ namespace VariableSpeedCoils {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "SizeVarSpeedCoil" );
+		static std::string const RoutineName( "SizeVarSpeedCoil" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2386,7 +2386,7 @@ namespace VariableSpeedCoils {
 		Real64 AirMassFlowRatio; // air mass flow ratio
 		Real64 WaterMassFlowRatio; // water mass flow rate
 		Real64 RatedSourceTempCool; // rated source temperature, space cooling mode
-		Fstring CurrentObjSubfix( MaxNameLength ); // Object subfix type for printing
+		std::string CurrentObjSubfix; // Object subfix type for printing
 		bool IsAutoSize; // Indicator to autosize
 		bool HardSizeNoDesRun; // Indicator to hardsize withouth sizing runs
 		bool HardSizeNoDesRunAirFlow; // Indicator to hardsize withouth sizing runs for rated air flow field
@@ -2460,10 +2460,10 @@ namespace VariableSpeedCoils {
 			if ( ! RatedAirFlowAutoSized && ! SizingDesRunThisAirSys ) { // Simulation continue
 				HardSizeNoDesRunAirFlow = true;
 				if ( VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate > 0.0 ) {
-					ReportSizingOutput( "COIL:" + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + trim( CurrentObjSubfix ), VarSpeedCoil( DXCoilNum ).Name, "User-Specified Rated Air Flow Rate [m3/s]", VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate );
+					ReportSizingOutput( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix, VarSpeedCoil( DXCoilNum ).Name, "User-Specified Rated Air Flow Rate [m3/s]", VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate );
 				}
 			} else {
-				CheckSysSizing( "COIL:" + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + trim( CurrentObjSubfix ), VarSpeedCoil( DXCoilNum ).Name );
+				CheckSysSizing( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix, VarSpeedCoil( DXCoilNum ).Name );
 				if ( FinalSysSizing( CurSysNum ).DesMainVolFlow >= SmallAirVolFlow ) {
 					RatedAirVolFlowRateDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 				} else {
@@ -2476,10 +2476,10 @@ namespace VariableSpeedCoils {
 			if ( ! RatedAirFlowAutoSized && ! SizingDesRunThisZone ) { // Simulation continue
 				HardSizeNoDesRunAirFlow = true;
 				if ( VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate > 0.0 ) {
-					ReportSizingOutput( "COIL:" + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + trim( CurrentObjSubfix ), VarSpeedCoil( DXCoilNum ).Name, "User-Specified Rated Air Flow Rate [m3/s]", VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate );
+					ReportSizingOutput( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix, VarSpeedCoil( DXCoilNum ).Name, "User-Specified Rated Air Flow Rate [m3/s]", VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate );
 				}
 			} else {
-				CheckZoneSizing( "COIL:" + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + trim( CurrentObjSubfix ), VarSpeedCoil( DXCoilNum ).Name );
+				CheckZoneSizing( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix, VarSpeedCoil( DXCoilNum ).Name );
 				RatedAirVolFlowRateDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
 				if ( RatedAirVolFlowRateDes < SmallAirVolFlow ) {
 					RatedAirVolFlowRateDes = 0.0;
@@ -2508,10 +2508,10 @@ namespace VariableSpeedCoils {
 			if ( ! RatedCapCoolTotalAutoSized && ! SizingDesRunThisAirSys ) { // Simulation continue
 				HardSizeNoDesRun = true;
 				if ( VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal > 0.0 ) {
-					ReportSizingOutput( "COIL:" + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + trim( CurrentObjSubfix ), VarSpeedCoil( DXCoilNum ).Name, "User-Specified Rated Total Cooling Capacity [W]", VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal );
+					ReportSizingOutput( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix, VarSpeedCoil( DXCoilNum ).Name, "User-Specified Rated Total Cooling Capacity [W]", VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal );
 				}
 			} else {
-				CheckSysSizing( "COIL:" + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + trim( CurrentObjSubfix ), VarSpeedCoil( DXCoilNum ).Name );
+				CheckSysSizing( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix, VarSpeedCoil( DXCoilNum ).Name );
 				VolFlowRate = VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate;
 				if ( VolFlowRate >= SmallAirVolFlow ) {
 					if ( CurOASysNum > 0 ) { // coil is in the OA stream
@@ -2565,10 +2565,10 @@ namespace VariableSpeedCoils {
 			if ( ! RatedCapCoolTotalAutoSized && ! SizingDesRunThisZone ) { // Simulation continue
 				HardSizeNoDesRun = true;
 				if ( VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal > 0.0 ) {
-					ReportSizingOutput( "COIL:" + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + trim( CurrentObjSubfix ), VarSpeedCoil( DXCoilNum ).Name, "User-Specified Rated Total Cooling Capacity [W]", VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal );
+					ReportSizingOutput( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix, VarSpeedCoil( DXCoilNum ).Name, "User-Specified Rated Total Cooling Capacity [W]", VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal );
 				}
 			} else {
-				CheckZoneSizing( "COIL:" + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + trim( CurrentObjSubfix ), VarSpeedCoil( DXCoilNum ).Name );
+				CheckZoneSizing( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix, VarSpeedCoil( DXCoilNum ).Name );
 				VolFlowRate = VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate;
 				if ( VolFlowRate >= SmallAirVolFlow ) {
 					if ( ZoneEqDXCoil ) {
@@ -2622,7 +2622,7 @@ namespace VariableSpeedCoils {
 		if ( ! HardSizeNoDesRun ) {
 			if ( RatedCapCoolTotalAutoSized ) {
 				VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal = RatedCapCoolTotalDes;
-				ReportSizingOutput( "COIL:" + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + trim( CurrentObjSubfix ), VarSpeedCoil( DXCoilNum ).Name, "Design Size Rated Total Cooling Capacity [W]", VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal );
+				ReportSizingOutput( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix, VarSpeedCoil( DXCoilNum ).Name, "Design Size Rated Total Cooling Capacity [W]", VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal );
 				PreDefTableEntry( pdchCoolCoilTotCap, VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal );
 				PreDefTableEntry( pdchCoolCoilLatCap, VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal - VarSpeedCoil( DXCoilNum ).RatedCapCoolSens );
 				if ( VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal != 0.0 ) {
@@ -2636,13 +2636,13 @@ namespace VariableSpeedCoils {
 			} else {
 				if ( VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal > 0.0 && RatedCapCoolTotalDes > 0.0 ) {
 					RatedCapCoolTotalUser = VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal;
-					ReportSizingOutput( "COIL:" + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + trim( CurrentObjSubfix ), VarSpeedCoil( DXCoilNum ).Name, "Design Size Rated Total Cooling Capacity [W]", RatedCapCoolTotalDes, "User-Specified Rated Total Cooling Capacity [W]", RatedCapCoolTotalUser );
+					ReportSizingOutput( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix, VarSpeedCoil( DXCoilNum ).Name, "Design Size Rated Total Cooling Capacity [W]", RatedCapCoolTotalDes, "User-Specified Rated Total Cooling Capacity [W]", RatedCapCoolTotalUser );
 					if ( DisplayExtraWarnings ) {
 						if ( ( std::abs( RatedCapCoolTotalDes - RatedCapCoolTotalUser ) / RatedCapCoolTotalUser ) > AutoVsHardSizingThreshold ) {
-							ShowMessage( "SizeVarSpeedCoil: Potential issue with equipment sizing for " + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + " " + trim( CurrentObjSubfix ) );
-							ShowContinueError( "Coil Name =" + trim( VarSpeedCoil( DXCoilNum ).Name ) );
-							ShowContinueError( "User-Specified Rated Total Cooling Capacity of " + trim( RoundSigDigits( RatedCapCoolTotalUser, 2 ) ) + " [W]" );
-							ShowContinueError( "differs from Design Size Rated Total Cooling Capacity of " + trim( RoundSigDigits( RatedCapCoolTotalDes, 2 ) ) + " [W]" );
+							ShowMessage( "SizeVarSpeedCoil: Potential issue with equipment sizing for " + VarSpeedCoil( DXCoilNum ).CoolHeatType + ' ' + CurrentObjSubfix );
+							ShowContinueError( "Coil Name =" + VarSpeedCoil( DXCoilNum ).Name );
+							ShowContinueError( "User-Specified Rated Total Cooling Capacity of " + RoundSigDigits( RatedCapCoolTotalUser, 2 ) + " [W]" );
+							ShowContinueError( "differs from Design Size Rated Total Cooling Capacity of " + RoundSigDigits( RatedCapCoolTotalDes, 2 ) + " [W]" );
 							ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 							ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 						}
@@ -2672,7 +2672,7 @@ namespace VariableSpeedCoils {
 			//END IF
 			if ( RatedCapHeatAutoSized ) {
 				if ( RatedCapHeatDes == AutoSize ) {
-					ShowWarningError( "COIL:" + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + ":WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT \"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\"" );
+					ShowWarningError( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + ":WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT \"" + VarSpeedCoil( DXCoilNum ).Name + "\"" );
 					ShowContinueError( RoutineName + ": Heating coil could not be autosized since cooling coil was not previously sized." );
 					ShowContinueError( "... Cooling coil must be upstream of heating coil." );
 					ShowContinueError( "... Manually sizing this heating coil will be required." );
@@ -2684,7 +2684,7 @@ namespace VariableSpeedCoils {
 		}
 		if ( RatedCapHeatAutoSized ) {
 			VarSpeedCoil( DXCoilNum ).RatedCapHeat = RatedCapHeatDes;
-			ReportSizingOutput( "COIL:" + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + trim( CurrentObjSubfix ), VarSpeedCoil( DXCoilNum ).Name, "Design Size Nominal Heating Capacity [W]", RatedCapHeatDes );
+			ReportSizingOutput( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix, VarSpeedCoil( DXCoilNum ).Name, "Design Size Nominal Heating Capacity [W]", RatedCapHeatDes );
 			PreDefTableEntry( pdchHeatCoilNomCap, VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).RatedCapHeat );
 			if ( VarSpeedCoil( DXCoilNum ).RatedCapHeat != 0.0 ) {
 				PreDefTableEntry( pdchHeatCoilNomEff, VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).MSRatedCOP( NormSpeed ) );
@@ -2695,13 +2695,13 @@ namespace VariableSpeedCoils {
 		} else {
 			if ( VarSpeedCoil( DXCoilNum ).RatedCapHeat > 0.0 && RatedCapHeatDes > 0.0 ) {
 				RatedCapHeatUser = VarSpeedCoil( DXCoilNum ).RatedCapHeat;
-				ReportSizingOutput( "COIL:" + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + trim( CurrentObjSubfix ), VarSpeedCoil( DXCoilNum ).Name, "Design Size Nominal Heating Capacity [W]", RatedCapHeatDes, "User-Specified Nominal Heating Capacity [W]", RatedCapHeatUser );
+				ReportSizingOutput( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix, VarSpeedCoil( DXCoilNum ).Name, "Design Size Nominal Heating Capacity [W]", RatedCapHeatDes, "User-Specified Nominal Heating Capacity [W]", RatedCapHeatUser );
 				if ( DisplayExtraWarnings ) {
 					if ( ( std::abs( RatedCapHeatDes - RatedCapHeatUser ) / RatedCapHeatUser ) > AutoVsHardSizingThreshold ) {
-						ShowMessage( "SizeVarSpeedCoil: Potential issue with equipment sizing for " + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + " " + trim( CurrentObjSubfix ) );
-						ShowContinueError( "Coil Name =" + trim( VarSpeedCoil( DXCoilNum ).Name ) );
-						ShowContinueError( "User-Specified Rated Total Heating Capacity of " + trim( RoundSigDigits( RatedCapHeatUser, 2 ) ) + " [W]" );
-						ShowContinueError( "differs from Design Size Rated Total Heating Capacity of " + trim( RoundSigDigits( RatedCapHeatDes, 2 ) ) + " [W]" );
+						ShowMessage( "SizeVarSpeedCoil: Potential issue with equipment sizing for " + VarSpeedCoil( DXCoilNum ).CoolHeatType + ' ' + CurrentObjSubfix );
+						ShowContinueError( "Coil Name =" + VarSpeedCoil( DXCoilNum ).Name );
+						ShowContinueError( "User-Specified Rated Total Heating Capacity of " + RoundSigDigits( RatedCapHeatUser, 2 ) + " [W]" );
+						ShowContinueError( "differs from Design Size Rated Total Heating Capacity of " + RoundSigDigits( RatedCapHeatDes, 2 ) + " [W]" );
 						ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 						ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 					}
@@ -2720,17 +2720,17 @@ namespace VariableSpeedCoils {
 			// write the air flow sizing output
 			if ( RatedAirFlowAutoSized ) {
 				VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate = RatedAirVolFlowRateDes;
-				ReportSizingOutput( "COIL:" + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + trim( CurrentObjSubfix ), VarSpeedCoil( DXCoilNum ).Name, "Design Size Rated Air Flow Rate [m3/s]", RatedAirVolFlowRateDes );
+				ReportSizingOutput( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix, VarSpeedCoil( DXCoilNum ).Name, "Design Size Rated Air Flow Rate [m3/s]", RatedAirVolFlowRateDes );
 			} else {
 				if ( VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate > 0.0 && RatedAirVolFlowRateDes > 0.0 ) {
 					RatedAirVolFlowRateUser = VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate;
-					ReportSizingOutput( "COIL:" + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + trim( CurrentObjSubfix ), VarSpeedCoil( DXCoilNum ).Name, "Design Size Rated Air Flow Rate [m3/s]", RatedAirVolFlowRateDes, "User-Specified Rated Air Flow Rate [m3/s]", RatedAirVolFlowRateUser );
+					ReportSizingOutput( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix, VarSpeedCoil( DXCoilNum ).Name, "Design Size Rated Air Flow Rate [m3/s]", RatedAirVolFlowRateDes, "User-Specified Rated Air Flow Rate [m3/s]", RatedAirVolFlowRateUser );
 					if ( DisplayExtraWarnings ) {
 						if ( ( std::abs( RatedAirVolFlowRateDes - RatedAirVolFlowRateUser ) / RatedAirVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-							ShowMessage( "SizeVarSpeedCoil: Potential issue with equipment sizing for" + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + " " + trim( CurrentObjSubfix ) );
-							ShowContinueError( "Coil Name =" + trim( VarSpeedCoil( DXCoilNum ).Name ) );
-							ShowContinueError( "User-Specified Rated Air Flow Rate of " + trim( RoundSigDigits( RatedAirVolFlowRateUser, 5 ) ) + " [m3/s]" );
-							ShowContinueError( "differs from Design Size Rated Air Flow Rate of " + trim( RoundSigDigits( RatedAirVolFlowRateDes, 5 ) ) + " [m3/s]" );
+							ShowMessage( "SizeVarSpeedCoil: Potential issue with equipment sizing for" + VarSpeedCoil( DXCoilNum ).CoolHeatType + ' ' + CurrentObjSubfix );
+							ShowContinueError( "Coil Name =" + VarSpeedCoil( DXCoilNum ).Name );
+							ShowContinueError( "User-Specified Rated Air Flow Rate of " + RoundSigDigits( RatedAirVolFlowRateUser, 5 ) + " [m3/s]" );
+							ShowContinueError( "differs from Design Size Rated Air Flow Rate of " + RoundSigDigits( RatedAirVolFlowRateDes, 5 ) + " [m3/s]" );
 							ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 							ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 						}
@@ -2746,11 +2746,11 @@ namespace VariableSpeedCoils {
 
 				if ( std::abs( VarSpeedCoil( VarSpeedCoil( DXCoilNum ).CompanionCoolingCoilNum ).RatedCapCoolTotal - VarSpeedCoil( DXCoilNum ).RatedCapHeat ) / VarSpeedCoil( VarSpeedCoil( DXCoilNum ).CompanionCoolingCoilNum ).RatedCapCoolTotal > 0.2 ) {
 
-					ShowWarningError( "COIL:" + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + ":WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT \"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\"" );
-					ShowContinueError( "...used with COIL:" + trim( VarSpeedCoil( VarSpeedCoil( DXCoilNum ).CompanionCoolingCoilNum ).CoolHeatType ) + ":WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT \"" + trim( VarSpeedCoil( VarSpeedCoil( DXCoilNum ).CompanionCoolingCoilNum ).Name ) + "\"" );
+					ShowWarningError( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + ":WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT \"" + VarSpeedCoil( DXCoilNum ).Name + "\"" );
+					ShowContinueError( "...used with COIL:" + VarSpeedCoil( VarSpeedCoil( DXCoilNum ).CompanionCoolingCoilNum ).CoolHeatType + ":WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT \"" + VarSpeedCoil( VarSpeedCoil( DXCoilNum ).CompanionCoolingCoilNum ).Name + "\"" );
 					ShowContinueError( "...heating capacity is disproportionate (> 20% different) to total cooling capacity" );
-					ShowContinueError( "...heating capacity = " + trim( TrimSigDigits( VarSpeedCoil( DXCoilNum ).RatedCapHeat, 3 ) ) + " W" );
-					ShowContinueError( "...cooling capacity = " + trim( TrimSigDigits( VarSpeedCoil( VarSpeedCoil( DXCoilNum ).CompanionCoolingCoilNum ).RatedCapCoolTotal, 3 ) ) + " W" );
+					ShowContinueError( "...heating capacity = " + TrimSigDigits( VarSpeedCoil( DXCoilNum ).RatedCapHeat, 3 ) + " W" );
+					ShowContinueError( "...cooling capacity = " + TrimSigDigits( VarSpeedCoil( VarSpeedCoil( DXCoilNum ).CompanionCoolingCoilNum ).RatedCapCoolTotal, 3 ) + " W" );
 				}
 			}
 		}
@@ -2801,7 +2801,7 @@ namespace VariableSpeedCoils {
 		//   WSHP condenser can be on either a plant loop or condenser loop. Test each to find plant sizing number.
 		//   first check to see if coil is connected to a plant loop, no warning on this CALL
 		if ( RatedWaterFlowAutoSized ) {
-			if ( VarSpeedCoil( DXCoilNum ).CondenserType == WaterCooled ) PltSizNum = MyPlantSizingIndex( "COIL:" + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + trim( CurrentObjSubfix ), VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).WaterInletNodeNum, VarSpeedCoil( DXCoilNum ).WaterOutletNodeNum, ErrorsFound, false );
+			if ( VarSpeedCoil( DXCoilNum ).CondenserType == WaterCooled ) PltSizNum = MyPlantSizingIndex( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix, VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).WaterInletNodeNum, VarSpeedCoil( DXCoilNum ).WaterOutletNodeNum, ErrorsFound, false );
 
 			if ( PltSizNum > 0 ) {
 				rho = GetDensityGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, PlantSizData( PltSizNum ).ExitTemp, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, "SizeHVACWaterToAir" );
@@ -2835,7 +2835,7 @@ namespace VariableSpeedCoils {
 			} else {
 				ShowSevereError( "Autosizing of water flow requires a loop Sizing:Plant object" );
 				ShowContinueError( "Autosizing also requires physical connection to a plant or condenser loop." );
-				ShowContinueError( "Occurs in " "COIL:" + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + trim( CurrentObjSubfix ) + " Object=" + trim( VarSpeedCoil( DXCoilNum ).Name ) );
+				ShowContinueError( "Occurs in " "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix + " Object=" + VarSpeedCoil( DXCoilNum ).Name );
 				ErrorsFound = true;
 			}
 		}
@@ -2849,26 +2849,26 @@ namespace VariableSpeedCoils {
 				RatedWaterVolFlowRateDes = VarSpeedCoil( DXCoilNum ).RatedCapHeat * VarSpeedCoil( DXCoilNum ).MSRatedWaterVolFlowPerRatedTotCap( NormSpeed );
 			}
 			VarSpeedCoil( DXCoilNum ).RatedWaterVolFlowRate = RatedWaterVolFlowRateDes;
-			ReportSizingOutput( "COIL:" + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + trim( CurrentObjSubfix ), VarSpeedCoil( DXCoilNum ).Name, "Design Size Rated Water Flow Rate [m3/s]", RatedWaterVolFlowRateDes );
+			ReportSizingOutput( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix, VarSpeedCoil( DXCoilNum ).Name, "Design Size Rated Water Flow Rate [m3/s]", RatedWaterVolFlowRateDes );
 			// Ensure water flow rate at lower speed must be lower or
 			// equal to the flow rate at higher speed. Otherwise, a severe error is isssued.
 			for ( Mode = 1; Mode <= VarSpeedCoil( DXCoilNum ).NumOfSpeeds - 1; ++Mode ) {
 				if ( VarSpeedCoil( DXCoilNum ).MSRatedWaterVolFlowRate( Mode ) > VarSpeedCoil( DXCoilNum ).MSRatedWaterVolFlowRate( Mode + 1 ) * 1.05 ) {
-					ShowWarningError( "SizeDXCoil: " + trim( VarSpeedCoil( DXCoilNum ).VarSpeedCoilType ) + " " + trim( VarSpeedCoil( DXCoilNum ).Name ) + ", " "Speed " + trim( TrimSigDigits( Mode ) ) + " Rated Air Flow Rate must be less than or equal to " "Speed " + trim( TrimSigDigits( Mode + 1 ) ) + " Rated Air Flow Rate." );
-					ShowContinueError( "Instead, " + trim( RoundSigDigits( VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ), 2 ) ) + " > " + trim( RoundSigDigits( VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode + 1 ), 2 ) ) );
+					ShowWarningError( "SizeDXCoil: " + VarSpeedCoil( DXCoilNum ).VarSpeedCoilType + ' ' + VarSpeedCoil( DXCoilNum ).Name + ", " "Speed " + TrimSigDigits( Mode ) + " Rated Air Flow Rate must be less than or equal to " "Speed " + TrimSigDigits( Mode + 1 ) + " Rated Air Flow Rate." );
+					ShowContinueError( "Instead, " + RoundSigDigits( VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ), 2 ) + " > " + RoundSigDigits( VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode + 1 ), 2 ) );
 					ShowFatalError( "Preceding conditions cause termination." );
 				}
 			}
 		} else {
 			if ( VarSpeedCoil( DXCoilNum ).RatedWaterVolFlowRate > 0.0 && RatedWaterVolFlowRateDes > 0.0 ) {
 				RatedWaterVolFlowRateUser = VarSpeedCoil( DXCoilNum ).RatedWaterVolFlowRate;
-				ReportSizingOutput( "COIL:" + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + trim( CurrentObjSubfix ), VarSpeedCoil( DXCoilNum ).Name, "Design Size Rated Water Flow Rate [m3/s]", RatedWaterVolFlowRateDes, "User-Specified Rated Water Flow Rate [m3/s]", RatedWaterVolFlowRateUser );
+				ReportSizingOutput( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix, VarSpeedCoil( DXCoilNum ).Name, "Design Size Rated Water Flow Rate [m3/s]", RatedWaterVolFlowRateDes, "User-Specified Rated Water Flow Rate [m3/s]", RatedWaterVolFlowRateUser );
 				if ( DisplayExtraWarnings ) {
 					if ( ( std::abs( RatedWaterVolFlowRateDes - RatedWaterVolFlowRateUser ) / RatedWaterVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-						ShowMessage( "SizeVarSpeedCoil: Potential issue with equipment sizing for" + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + " " + trim( CurrentObjSubfix ) );
-						ShowContinueError( "Coil Name =" + trim( VarSpeedCoil( DXCoilNum ).Name ) );
-						ShowContinueError( "User-Specified Rated Water Flow Rate of " + trim( RoundSigDigits( RatedWaterVolFlowRateUser, 5 ) ) + " [m3/s]" );
-						ShowContinueError( "differs from Design Size Rated Water Flow Rate of " + trim( RoundSigDigits( RatedWaterVolFlowRateDes, 5 ) ) + " [m3/s]" );
+						ShowMessage( "SizeVarSpeedCoil: Potential issue with equipment sizing for" + VarSpeedCoil( DXCoilNum ).CoolHeatType + ' ' + CurrentObjSubfix );
+						ShowContinueError( "Coil Name =" + VarSpeedCoil( DXCoilNum ).Name );
+						ShowContinueError( "User-Specified Rated Water Flow Rate of " + RoundSigDigits( RatedWaterVolFlowRateUser, 5 ) + " [m3/s]" );
+						ShowContinueError( "differs from Design Size Rated Water Flow Rate of " + RoundSigDigits( RatedWaterVolFlowRateDes, 5 ) + " [m3/s]" );
 						ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 						ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 					}
@@ -2907,8 +2907,8 @@ namespace VariableSpeedCoils {
 		// equal to the flow rate at higher speed. Otherwise, a severe error is isssued.
 		for ( Mode = 1; Mode <= VarSpeedCoil( DXCoilNum ).NumOfSpeeds - 1; ++Mode ) {
 			if ( VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) > VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode + 1 ) ) {
-				ShowWarningError( "SizeDXCoil: " + trim( VarSpeedCoil( DXCoilNum ).VarSpeedCoilType ) + " " + trim( VarSpeedCoil( DXCoilNum ).Name ) + ", " "Speed " + trim( TrimSigDigits( Mode ) ) + " Rated Air Flow Rate must be less than or equal to " "Speed " + trim( TrimSigDigits( Mode + 1 ) ) + " Rated Air Flow Rate." );
-				ShowContinueError( "Instead, " + trim( RoundSigDigits( VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ), 2 ) ) + " > " + trim( RoundSigDigits( VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode + 1 ), 2 ) ) );
+				ShowWarningError( "SizeDXCoil: " + VarSpeedCoil( DXCoilNum ).VarSpeedCoilType + ' ' + VarSpeedCoil( DXCoilNum ).Name + ", " "Speed " + TrimSigDigits( Mode ) + " Rated Air Flow Rate must be less than or equal to " "Speed " + TrimSigDigits( Mode + 1 ) + " Rated Air Flow Rate." );
+				ShowContinueError( "Instead, " + RoundSigDigits( VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ), 2 ) + " > " + RoundSigDigits( VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode + 1 ), 2 ) );
 				ShowFatalError( "Preceding conditions cause termination." );
 			}
 		}
@@ -2916,8 +2916,8 @@ namespace VariableSpeedCoils {
 		// Ensure capacity at lower speed must be lower or equal to the capacity at higher speed.
 		for ( Mode = 1; Mode <= VarSpeedCoil( DXCoilNum ).NumOfSpeeds - 1; ++Mode ) {
 			if ( VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode ) > VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode + 1 ) ) {
-				ShowWarningError( "SizeDXCoil: " + trim( VarSpeedCoil( DXCoilNum ).VarSpeedCoilType ) + " " + trim( VarSpeedCoil( DXCoilNum ).Name ) + ", " "Speed " + trim( TrimSigDigits( Mode ) ) + " Rated Total Cooling Capacity must be less than or equal to " "Speed " + trim( TrimSigDigits( Mode + 1 ) ) + " Rated Total Cooling Capacity." );
-				ShowContinueError( "Instead, " + trim( RoundSigDigits( VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode ), 2 ) ) + " > " + trim( RoundSigDigits( VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode + 1 ), 2 ) ) );
+				ShowWarningError( "SizeDXCoil: " + VarSpeedCoil( DXCoilNum ).VarSpeedCoilType + ' ' + VarSpeedCoil( DXCoilNum ).Name + ", " "Speed " + TrimSigDigits( Mode ) + " Rated Total Cooling Capacity must be less than or equal to " "Speed " + TrimSigDigits( Mode + 1 ) + " Rated Total Cooling Capacity." );
+				ShowContinueError( "Instead, " + RoundSigDigits( VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode ), 2 ) + " > " + RoundSigDigits( VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode + 1 ), 2 ) );
 				ShowFatalError( "Preceding conditions cause termination." );
 			}
 		}
@@ -2964,7 +2964,7 @@ namespace VariableSpeedCoils {
 		if ( VarSpeedCoil( DXCoilNum ).CoolHeatType == "COOLING" ) { //always report for cooling mode
 			if ( RatedCapCoolTotalAutoSized ) {
 				VarSpeedCoil( DXCoilNum ).RatedCapCoolSens = RatedCapCoolSensDes;
-				ReportSizingOutput( "COIL:" + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + trim( CurrentObjSubfix ), VarSpeedCoil( DXCoilNum ).Name, "Design Size Rated Sensible Cooling Capacity [W]", VarSpeedCoil( DXCoilNum ).RatedCapCoolSens );
+				ReportSizingOutput( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix, VarSpeedCoil( DXCoilNum ).Name, "Design Size Rated Sensible Cooling Capacity [W]", VarSpeedCoil( DXCoilNum ).RatedCapCoolSens );
 				//CALL PreDefTableEntry(pdchCoolCoilSensCap,VarSpeedCoil(DXCoilNum)%Name,VarSpeedCoil(DXCoilNum)%RatedCapCoolSens)
 				//CALL PreDefTableEntry(pdchCoolCoilLatCap,VarSpeedCoil(DXCoilNum)%Name,VarSpeedCoil(DXCoilNum)%RatedCapCoolTotal &
 				//                           - VarSpeedCoil(DXCoilNum)%RatedCapCoolSens)
@@ -2978,7 +2978,7 @@ namespace VariableSpeedCoils {
 				// sensible capacity does not have an input field
 				if ( RatedCapCoolSensDes > 0.0 && RatedCapCoolSensDes > 0.0 ) {
 					VarSpeedCoil( DXCoilNum ).RatedCapCoolSens = RatedCapCoolSensDes;
-					ReportSizingOutput( "COIL:" + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + trim( CurrentObjSubfix ), VarSpeedCoil( DXCoilNum ).Name, "Design Size Rated Sensible Cooling Capacity [W]", RatedCapCoolSensDes ); //, &
+					ReportSizingOutput( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix, VarSpeedCoil( DXCoilNum ).Name, "Design Size Rated Sensible Cooling Capacity [W]", RatedCapCoolSensDes ); //, &
 					//                            'User-Specified Rated Sensible Cooling Capacity [W]', &
 					//                             RatedCapCoolSensUser)
 					//       IF (DisplayExtraWarnings) THEN
@@ -3025,10 +3025,10 @@ namespace VariableSpeedCoils {
 					ReportSizingOutput( "AS VS COOLING COIL", VarSpeedCoil( DXCoilNum ).Name, "Design Size Evaporative Condenser Pump Rated Power Consumption [W]", EvapCondPumpElecNomPowerDes, "User-Specified Evaporative Condenser Pump Rated Power Consumption [W]", EvapCondPumpElecNomPowerUser );
 					if ( DisplayExtraWarnings ) {
 						if ( ( std::abs( EvapCondPumpElecNomPowerDes - EvapCondPumpElecNomPowerUser ) / EvapCondPumpElecNomPowerUser ) > AutoVsHardSizingThreshold ) {
-							ShowMessage( "SizeVarSpeedCoil: Potential issue with equipment sizing for " + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + " " + trim( CurrentObjSubfix ) );
-							ShowContinueError( "Coil Name =" + trim( VarSpeedCoil( DXCoilNum ).Name ) );
-							ShowContinueError( "User-Specified Evaporative Condenser Pump Rated Power Consumption of " + trim( RoundSigDigits( EvapCondPumpElecNomPowerUser, 2 ) ) + " [W]" );
-							ShowContinueError( "differs from Design Size Evaporative Condenser Pump Rated Power Consumption of " + trim( RoundSigDigits( EvapCondPumpElecNomPowerDes, 2 ) ) + " [W]" );
+							ShowMessage( "SizeVarSpeedCoil: Potential issue with equipment sizing for " + VarSpeedCoil( DXCoilNum ).CoolHeatType + ' ' + CurrentObjSubfix );
+							ShowContinueError( "Coil Name =" + VarSpeedCoil( DXCoilNum ).Name );
+							ShowContinueError( "User-Specified Evaporative Condenser Pump Rated Power Consumption of " + RoundSigDigits( EvapCondPumpElecNomPowerUser, 2 ) + " [W]" );
+							ShowContinueError( "differs from Design Size Evaporative Condenser Pump Rated Power Consumption of " + RoundSigDigits( EvapCondPumpElecNomPowerDes, 2 ) + " [W]" );
 							ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 							ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 						}
@@ -3060,10 +3060,10 @@ namespace VariableSpeedCoils {
 					ReportSizingOutput( "AS VS HEATING COIL", VarSpeedCoil( DXCoilNum ).Name, "Design Size Resistive Defrost Heater Capacity [W]", DefrostCapacityDes, "User-Specified Resistive Defrost Heater Capacity [W]", DefrostCapacityUser );
 					if ( DisplayExtraWarnings ) {
 						if ( ( std::abs( DefrostCapacityDes - DefrostCapacityUser ) / DefrostCapacityUser ) > AutoVsHardSizingThreshold ) {
-							ShowMessage( "SizeVarSpeedCoil: Potential issue with equipment sizing for " + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + " " + trim( CurrentObjSubfix ) );
-							ShowContinueError( "Coil Name =" + trim( VarSpeedCoil( DXCoilNum ).Name ) );
-							ShowContinueError( "User-Specified Resistive Defrost Heater Capacity of " + trim( RoundSigDigits( DefrostCapacityUser, 2 ) ) + " [W]" );
-							ShowContinueError( "differs from Design Size Resistive Defrost Heater Capacity of " + trim( RoundSigDigits( DefrostCapacityDes, 2 ) ) + " [W]" );
+							ShowMessage( "SizeVarSpeedCoil: Potential issue with equipment sizing for " + VarSpeedCoil( DXCoilNum ).CoolHeatType + ' ' + CurrentObjSubfix );
+							ShowContinueError( "Coil Name =" + VarSpeedCoil( DXCoilNum ).Name );
+							ShowContinueError( "User-Specified Resistive Defrost Heater Capacity of " + RoundSigDigits( DefrostCapacityUser, 2 ) + " [W]" );
+							ShowContinueError( "differs from Design Size Resistive Defrost Heater Capacity of " + RoundSigDigits( DefrostCapacityDes, 2 ) + " [W]" );
 							ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 							ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 						}
@@ -3076,44 +3076,44 @@ namespace VariableSpeedCoils {
 		// test autosized sensible and total cooling capacity for total > sensible
 		if ( RatedCapCoolSensAutoSized && RatedCapCoolTotalAutoSized || RatedCapCoolSensAutoSized ) {
 			if ( VarSpeedCoil( DXCoilNum ).RatedCapCoolSens > VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal ) {
-				ShowWarningError( "COIL:" + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + ":WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT \"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\"" );
+				ShowWarningError( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + ":WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT \"" + VarSpeedCoil( DXCoilNum ).Name + "\"" );
 				ShowContinueError( RoutineName + ": Rated Sensible Cooling Capacity > Rated Total Cooling Capacity" );
 				ShowContinueError( "Each of these capacity inputs have been autosized." );
-				ShowContinueError( "Rated Sensible Cooling Capacity = " + trim( TrimSigDigits( VarSpeedCoil( DXCoilNum ).RatedCapCoolSens, 2 ) ) + " W" );
-				ShowContinueError( "Rated Total Cooling Capacity    = " + trim( TrimSigDigits( VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal, 2 ) ) + " W" );
+				ShowContinueError( "Rated Sensible Cooling Capacity = " + TrimSigDigits( VarSpeedCoil( DXCoilNum ).RatedCapCoolSens, 2 ) + " W" );
+				ShowContinueError( "Rated Total Cooling Capacity    = " + TrimSigDigits( VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal, 2 ) + " W" );
 				ShowContinueError( "See eio file for further details." );
 				ShowContinueError( "Check Total and Sensible Cooling Capacity Coefficients to ensure they are accurate." );
 				ShowContinueError( "Check Zone and System Sizing objects to verify sizing inputs." );
 				ShowContinueError( "Sizing statistics:" );
-				ShowContinueError( "Entering Air Dry-Bulb Temperature = " + trim( TrimSigDigits( MixTemp, 3 ) ) + " C" );
-				ShowContinueError( "Entering Air Wet-Bulb Temperature = " + trim( TrimSigDigits( MixWetBulb, 3 ) ) + " C" );
+				ShowContinueError( "Entering Air Dry-Bulb Temperature = " + TrimSigDigits( MixTemp, 3 ) + " C" );
+				ShowContinueError( "Entering Air Wet-Bulb Temperature = " + TrimSigDigits( MixWetBulb, 3 ) + " C" );
 				ShowContinueError( "Entering Condenser Water Temperature used = 24.4444 C" );
 				ShowContinueError( "Used design air and water flow rates (i.e., used 1 for ratioVL and ratioVS)" );
-				ShowContinueError( "ratioTDB = " + trim( TrimSigDigits( ( ( MixTemp + 283.15 ) / 273.15 ), 3 ) ) );
-				ShowContinueError( "ratioTWB = " + trim( TrimSigDigits( ( ( MixWetBulb + 283.15 ) / 273.15 ), 3 ) ) );
-				ShowContinueError( "ratioTS  = " + trim( TrimSigDigits( ( ( 85.0 + 283.15 ) / 273.15 ), 3 ) ) );
+				ShowContinueError( "ratioTDB = " + TrimSigDigits( ( ( MixTemp + 283.15 ) / 273.15 ), 3 ) );
+				ShowContinueError( "ratioTWB = " + TrimSigDigits( ( ( MixWetBulb + 283.15 ) / 273.15 ), 3 ) );
+				ShowContinueError( "ratioTS  = " + TrimSigDigits( ( ( 85.0 + 283.15 ) / 273.15 ), 3 ) );
 				ShowContinueError( "Rated Sensible Cooling Capacity = Rated Total Cooling Capacity * Sensible Heat Ratio" );
-				ShowContinueError( "Total Cooling Capacity Modifier = " + trim( TrimSigDigits( TotCapTempModFac, 5 ) ) );
+				ShowContinueError( "Total Cooling Capacity Modifier = " + TrimSigDigits( TotCapTempModFac, 5 ) );
 				ShowContinueError( "...Rated Total Cooling Capacity = Total Design Load / Total Cooling Capacity Modifier" );
 				ShowContinueError( "Carefully review the Load Side Total, Sensible, and Latent heat transfer rates" );
 				ShowContinueError( "... to ensure they meet the expected manufacturers performance specifications." );
 			}
 		} else if ( RatedCapCoolTotalAutoSized ) {
 			if ( VarSpeedCoil( DXCoilNum ).RatedCapCoolSens > VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal ) {
-				ShowWarningError( "COIL:" + trim( VarSpeedCoil( DXCoilNum ).CoolHeatType ) + ":WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT \"" + trim( VarSpeedCoil( DXCoilNum ).Name ) + "\"" );
+				ShowWarningError( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + ":WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT \"" + VarSpeedCoil( DXCoilNum ).Name + "\"" );
 				ShowContinueError( RoutineName + ": Rated Sensible Cooling Capacity > Rated Total Cooling Capacity" );
 				ShowContinueError( "Only the rated total capacity input is autosized, consider autosizing both inputs." );
-				ShowContinueError( "Rated Sensible Cooling Capacity = " + trim( TrimSigDigits( VarSpeedCoil( DXCoilNum ).RatedCapCoolSens, 2 ) ) + " W" );
-				ShowContinueError( "Rated Total Cooling Capacity    = " + trim( TrimSigDigits( VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal, 2 ) ) + " W" );
+				ShowContinueError( "Rated Sensible Cooling Capacity = " + TrimSigDigits( VarSpeedCoil( DXCoilNum ).RatedCapCoolSens, 2 ) + " W" );
+				ShowContinueError( "Rated Total Cooling Capacity    = " + TrimSigDigits( VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal, 2 ) + " W" );
 				ShowContinueError( "See eio file for further details." );
 				ShowContinueError( "Check Total and Sensible Cooling Capacity Coefficients to ensure they are accurate." );
 				ShowContinueError( "Check Zone and System Sizing objects to verify sizing inputs." );
 				ShowContinueError( "Sizing statistics for Total Cooling Capacity:" );
-				ShowContinueError( "Entering Air Wet-Bulb Temperature = " + trim( TrimSigDigits( MixWetBulb, 3 ) ) + " C" );
+				ShowContinueError( "Entering Air Wet-Bulb Temperature = " + TrimSigDigits( MixWetBulb, 3 ) + " C" );
 				ShowContinueError( "Entering Condenser Water Temperature used = 24.4444 C" );
 				ShowContinueError( "Used design air and water flow rates (i.e., used 1 for ratioVL and ratioVS)" );
-				ShowContinueError( "ratioTWB = " + trim( TrimSigDigits( ( ( MixWetBulb + 283.15 ) / 273.15 ), 3 ) ) );
-				ShowContinueError( "ratioTS  = " + trim( TrimSigDigits( ( ( 85.0 + 283.15 ) / 273.15 ), 3 ) ) );
+				ShowContinueError( "ratioTWB = " + TrimSigDigits( ( ( MixWetBulb + 283.15 ) / 273.15 ), 3 ) );
+				ShowContinueError( "ratioTS  = " + TrimSigDigits( ( ( 85.0 + 283.15 ) / 273.15 ), 3 ) );
 				ShowContinueError( "Rated Sensible Cooling Capacity = Rated Total Cooling Capacity * Sensible Heat Ratio" );
 				ShowContinueError( "Carefully review the Load Side Total, Sensible, and Latent heat transfer rates" );
 				ShowContinueError( "... to ensure they meet the expected manufacturers performance specifications." );
@@ -3179,7 +3179,7 @@ namespace VariableSpeedCoils {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const Tref( 283.15 ); // Reference Temperature for performance curves,10C [K]
-		static Fstring const RoutineName( "CalcMultiSpeedVarSpeedCoilCooling" );
+		static std::string const RoutineName( "CalcMultiSpeedVarSpeedCoilCooling" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3737,7 +3737,7 @@ namespace VariableSpeedCoils {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const Tref( 283.15 ); // Reference Temperature for performance curves,10C [K]
-		static Fstring const RoutineName( "CalcVarSpeedCoilHeating" );
+		static std::string const RoutineName( "CalcVarSpeedCoilHeating" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -4124,8 +4124,8 @@ namespace VariableSpeedCoils {
 
 	Real64
 	GetCoilCapacityVariableSpeed(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -4191,7 +4191,7 @@ namespace VariableSpeedCoils {
 		}
 
 		if ( WhichCoil == 0 ) {
-			ShowSevereError( "GetCoilCapacityVariableSpeed: Could not find CoilType=\"" + trim( CoilType ) + "\" with Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "GetCoilCapacityVariableSpeed: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			CoilCapacity = -1000.0;
 		}
@@ -4202,8 +4202,8 @@ namespace VariableSpeedCoils {
 
 	int
 	GetCoilIndexVariableSpeed(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -4257,7 +4257,7 @@ namespace VariableSpeedCoils {
 		IndexNum = FindItemInList( CoilName, VarSpeedCoil.Name(), NumWatertoAirHPs );
 
 		if ( IndexNum == 0 ) {
-			ShowSevereError( "GetCoilIndexVariableSpeed: Could not find CoilType=\"" + trim( CoilType ) + "\" with Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "GetCoilIndexVariableSpeed: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 		}
 
@@ -4267,8 +4267,8 @@ namespace VariableSpeedCoils {
 
 	Real64
 	GetCoilAirFlowRateVariableSpeed(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -4336,7 +4336,7 @@ namespace VariableSpeedCoils {
 		}
 
 		if ( WhichCoil == 0 ) {
-			ShowSevereError( "GetCoilAirFlowRateVariableSpeed: Could not find CoilType=\"" + trim( CoilType ) + "\" with Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "GetCoilAirFlowRateVariableSpeed: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			CoilAirFlowRate = -1000.0;
 		}
@@ -4347,8 +4347,8 @@ namespace VariableSpeedCoils {
 
 	int
 	GetCoilInletNodeVariableSpeed(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -4404,7 +4404,7 @@ namespace VariableSpeedCoils {
 		}
 
 		if ( WhichCoil == 0 ) {
-			ShowSevereError( "GetCoilInletNodeVariableSpeed: Could not find CoilType=\"" + trim( CoilType ) + "\" with Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "GetCoilInletNodeVariableSpeed: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		}
@@ -4415,8 +4415,8 @@ namespace VariableSpeedCoils {
 
 	int
 	GetCoilOutletNodeVariableSpeed(
-		Fstring const & CoilType, // must match coil types in this module
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -4473,7 +4473,7 @@ namespace VariableSpeedCoils {
 		}
 
 		if ( WhichCoil == 0 ) {
-			ShowSevereError( "GetCoilOutletNodeVariableSpeed: Could not find CoilType=\"" + trim( CoilType ) + "\" with Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "GetCoilOutletNodeVariableSpeed: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		}
@@ -4484,7 +4484,7 @@ namespace VariableSpeedCoils {
 
 	int
 	GetVSCoilCondenserInletNode(
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -4537,7 +4537,7 @@ namespace VariableSpeedCoils {
 		if ( WhichCoil != 0 ) {
 			CondNode = VarSpeedCoil( WhichCoil ).CondenserInletNodeNum;
 		} else {
-			ShowSevereError( "GetCoilCondenserInletNode: Invalid VS DX Coil, Type= VS DX Cooling Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "GetCoilCondenserInletNode: Invalid VS DX Coil, Type= VS DX Cooling Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			CondNode = 0;
 		}
@@ -4548,7 +4548,7 @@ namespace VariableSpeedCoils {
 
 	Real64
 	GetVSCoilMinOATCompressor(
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -4601,7 +4601,7 @@ namespace VariableSpeedCoils {
 		if ( WhichCoil != 0 ) {
 			MinOAT = VarSpeedCoil( WhichCoil ).MinOATCompressor;
 		} else {
-			ShowSevereError( "GetVSCoilMinOATCompressor: Invalid VS DX Coil, Type= VS DX Cooling Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "GetVSCoilMinOATCompressor: Invalid VS DX Coil, Type= VS DX Cooling Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			MinOAT = -1000.0;
 		}
@@ -4612,7 +4612,7 @@ namespace VariableSpeedCoils {
 
 	int
 	GetVSCoilNumOfSpeeds(
-		Fstring const & CoilName, // must match coil names for the coil type
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
 	)
 	{
@@ -4664,7 +4664,7 @@ namespace VariableSpeedCoils {
 		if ( WhichCoil != 0 ) {
 			Speeds = VarSpeedCoil( WhichCoil ).NumOfSpeeds;
 		} else {
-			ShowSevereError( "GetVSCoilNumOfSpeeds: Invalid VS DX Coil, Type= VS DX Cooling Name=\"" + trim( CoilName ) + "\"" );
+			ShowSevereError( "GetVSCoilNumOfSpeeds: Invalid VS DX Coil, Type= VS DX Cooling Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			Speeds = 0;
 		}
@@ -4726,7 +4726,7 @@ namespace VariableSpeedCoils {
 		}
 
 		if ( WSHPNum <= 0 || WSHPNum > NumWatertoAirHPs ) {
-			ShowSevereError( "SetVarSpeedCoilData: called with VS WSHP Coil Number out of range=" + trim( TrimSigDigits( WSHPNum ) ) + " should be >0 and <" + trim( TrimSigDigits( NumWatertoAirHPs ) ) );
+			ShowSevereError( "SetVarSpeedCoilData: called with VS WSHP Coil Number out of range=" + TrimSigDigits( WSHPNum ) + " should be >0 and <" + TrimSigDigits( NumWatertoAirHPs ) );
 			ErrorsFound = true;
 			return;
 		}
@@ -5057,7 +5057,7 @@ namespace VariableSpeedCoils {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "CalcTotCapSHR_VSWSHP" );
+		static std::string const RoutineName( "CalcTotCapSHR_VSWSHP" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -5245,8 +5245,8 @@ namespace VariableSpeedCoils {
 
 	Real64
 	CalcCBF(
-		Fstring const & UnitType,
-		Fstring const & UnitName,
+		std::string const & UnitType,
+		std::string const & UnitName,
 		Real64 const InletAirTemp, // inlet air temperature [C]
 		Real64 const InletAirHumRat, // inlet air humidity ratio [kg water / kg dry air]
 		Real64 const TotCap, // total cooling  capacity [Watts]
@@ -5288,7 +5288,7 @@ namespace VariableSpeedCoils {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static Fstring const RoutineName( "CalcCBF" );
+		static std::string const RoutineName( "CalcCBF" );
 		static Real64 SmallDifferenceTest( 0.00000001 );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -5341,50 +5341,50 @@ namespace VariableSpeedCoils {
 		//  Pressure will have to be pass into this subroutine to fix this one
 		OutletAirRH = PsyRhFnTdbWPb( OutletAirTemp, OutletAirHumRat, StdBaroPress, "CalcCBF" );
 		if ( OutletAirRH >= 1.0 ) {
-			ShowSevereError( "For object = " + trim( UnitType ) + ", name = \"" + trim( UnitName ) + "\"" );
+			ShowSevereError( "For object = " + UnitType + ", name = \"" + UnitName + "\"" );
 			ShowContinueError( "Calculated outlet air relative humidity greater than 1. The combination of" );
 			ShowContinueError( "rated air volume flow rate, total cooling capacity and sensible heat ratio yields coil exiting" );
 			ShowContinueError( "air conditions above the saturation curve. Possible fixes are to reduce the rated total cooling" );
 			ShowContinueError( "capacity, increase the rated air volume flow rate, or reduce the rated sensible heat" " ratio for this coil." );
 			ShowContinueError( "If autosizing, it is recommended that all three of these values be autosized." );
 			ShowContinueError( "...Inputs used for calculating cooling coil bypass factor." );
-			ShowContinueError( "...Inlet Air Temperature     = " + trim( RoundSigDigits( InletAirTemp, 2 ) ) + " C" );
-			ShowContinueError( "...Outlet Air Temperature    = " + trim( RoundSigDigits( OutletAirTemp, 2 ) ) + " C" );
-			ShowContinueError( "...Inlet Air Humidity Ratio  = " + trim( RoundSigDigits( InletAirHumRat, 6 ) ) + " kgWater/kgDryAir" );
-			ShowContinueError( "...Outlet Air Humidity Ratio = " + trim( RoundSigDigits( OutletAirHumRat, 6 ) ) + " kgWater/kgDryAir" );
-			ShowContinueError( "...Total Cooling Capacity used in calculation = " + trim( RoundSigDigits( TotCap, 2 ) ) + " W" );
-			ShowContinueError( "...Air Mass Flow Rate used in calculation     = " + trim( RoundSigDigits( AirMassFlowRate, 6 ) ) + " kg/s" );
-			ShowContinueError( "...Air Volume Flow Rate used in calculation   = " + trim( RoundSigDigits( AirMassFlowRate / PsyRhoAirFnPbTdbW( StdBaroPress, InletAirTemp, InletAirHumRat, RoutineName ), 6 ) ) + " m3/s" );
+			ShowContinueError( "...Inlet Air Temperature     = " + RoundSigDigits( InletAirTemp, 2 ) + " C" );
+			ShowContinueError( "...Outlet Air Temperature    = " + RoundSigDigits( OutletAirTemp, 2 ) + " C" );
+			ShowContinueError( "...Inlet Air Humidity Ratio  = " + RoundSigDigits( InletAirHumRat, 6 ) + " kgWater/kgDryAir" );
+			ShowContinueError( "...Outlet Air Humidity Ratio = " + RoundSigDigits( OutletAirHumRat, 6 ) + " kgWater/kgDryAir" );
+			ShowContinueError( "...Total Cooling Capacity used in calculation = " + RoundSigDigits( TotCap, 2 ) + " W" );
+			ShowContinueError( "...Air Mass Flow Rate used in calculation     = " + RoundSigDigits( AirMassFlowRate, 6 ) + " kg/s" );
+			ShowContinueError( "...Air Volume Flow Rate used in calculation   = " + RoundSigDigits( AirMassFlowRate / PsyRhoAirFnPbTdbW( StdBaroPress, InletAirTemp, InletAirHumRat, RoutineName ), 6 ) + " m3/s" );
 			if ( TotCap > 0.0 ) {
 				if ( ( ( MinRatedVolFlowPerRatedTotCap - AirMassFlowRate / PsyRhoAirFnPbTdbW( StdBaroPress, InletAirTemp, InletAirHumRat, RoutineName ) / TotCap ) > SmallDifferenceTest ) || ( ( AirMassFlowRate / PsyRhoAirFnPbTdbW( StdBaroPress, InletAirTemp, InletAirHumRat, RoutineName ) / TotCap - MaxRatedVolFlowPerRatedTotCap ) > SmallDifferenceTest ) ) {
-					ShowContinueError( "...Air Volume Flow Rate per Watt of Rated Cooling Capacity is also out of bounds at = " + trim( RoundSigDigits( AirMassFlowRate / PsyRhoAirFnPbTdbW( StdBaroPress, InletAirTemp, InletAirHumRat, RoutineName ) / TotCap, 7 ) ) + " m3/s/W" );
+					ShowContinueError( "...Air Volume Flow Rate per Watt of Rated Cooling Capacity is also out of bounds at = " + RoundSigDigits( AirMassFlowRate / PsyRhoAirFnPbTdbW( StdBaroPress, InletAirTemp, InletAirHumRat, RoutineName ) / TotCap, 7 ) + " m3/s/W" );
 				}
 			}
-			ShowContinueErrorTimeStamp( " " );
+			ShowContinueErrorTimeStamp( "" );
 			ShowFatalError( "Check and revise the input data for this coil before rerunning the simulation." );
 		}
 		DeltaT = InletAirTemp - OutletAirTemp;
 		if ( DeltaT <= 0.0 ) {
-			ShowSevereError( "For object = " + trim( UnitType ) + ", name = \"" + trim( UnitName ) + "\"" );
+			ShowSevereError( "For object = " + UnitType + ", name = \"" + UnitName + "\"" );
 			ShowContinueError( "Calculated coil delta T is less than or equal to 0. The combination of" );
 			ShowContinueError( "rated air volume flow rate, total cooling capacity and sensible heat ratio yields coil exiting" );
 			ShowContinueError( "air conditions that are not reasonable. Possible fixes are to adjust the rated total cooling" );
 			ShowContinueError( "capacity, rated air volume flow rate, or rated sensible heat" " ratio for this coil." );
 			ShowContinueError( "If autosizing, it is recommended that all three of these values be autosized." );
 			ShowContinueError( "...Inputs used for calculating cooling coil bypass factor." );
-			ShowContinueError( "...Inlet Air Temperature     = " + trim( RoundSigDigits( InletAirTemp, 2 ) ) + " C" );
-			ShowContinueError( "...Outlet Air Temperature    = " + trim( RoundSigDigits( OutletAirTemp, 2 ) ) + " C" );
-			ShowContinueError( "...Inlet Air Humidity Ratio  = " + trim( RoundSigDigits( InletAirHumRat, 6 ) ) + " kgWater/kgDryAir" );
-			ShowContinueError( "...Outlet Air Humidity Ratio = " + trim( RoundSigDigits( OutletAirHumRat, 6 ) ) + " kgWater/kgDryAir" );
-			ShowContinueError( "...Total Cooling Capacity used in calculation = " + trim( RoundSigDigits( TotCap, 2 ) ) + " W" );
-			ShowContinueError( "...Air Mass Flow Rate used in calculation     = " + trim( RoundSigDigits( AirMassFlowRate, 6 ) ) + " kg/s" );
-			ShowContinueError( "...Air Volume Flow Rate used in calculation   = " + trim( RoundSigDigits( AirMassFlowRate / PsyRhoAirFnPbTdbW( StdBaroPress, InletAirTemp, InletAirHumRat, RoutineName ), 6 ) ) + " m3/s" );
+			ShowContinueError( "...Inlet Air Temperature     = " + RoundSigDigits( InletAirTemp, 2 ) + " C" );
+			ShowContinueError( "...Outlet Air Temperature    = " + RoundSigDigits( OutletAirTemp, 2 ) + " C" );
+			ShowContinueError( "...Inlet Air Humidity Ratio  = " + RoundSigDigits( InletAirHumRat, 6 ) + " kgWater/kgDryAir" );
+			ShowContinueError( "...Outlet Air Humidity Ratio = " + RoundSigDigits( OutletAirHumRat, 6 ) + " kgWater/kgDryAir" );
+			ShowContinueError( "...Total Cooling Capacity used in calculation = " + RoundSigDigits( TotCap, 2 ) + " W" );
+			ShowContinueError( "...Air Mass Flow Rate used in calculation     = " + RoundSigDigits( AirMassFlowRate, 6 ) + " kg/s" );
+			ShowContinueError( "...Air Volume Flow Rate used in calculation   = " + RoundSigDigits( AirMassFlowRate / PsyRhoAirFnPbTdbW( StdBaroPress, InletAirTemp, InletAirHumRat, RoutineName ), 6 ) + " m3/s" );
 			if ( TotCap > 0.0 ) {
 				if ( ( ( MinRatedVolFlowPerRatedTotCap - AirMassFlowRate / PsyRhoAirFnPbTdbW( StdBaroPress, InletAirTemp, InletAirHumRat, RoutineName ) / TotCap ) > SmallDifferenceTest ) || ( ( AirMassFlowRate / PsyRhoAirFnPbTdbW( StdBaroPress, InletAirTemp, InletAirHumRat, RoutineName ) / TotCap - MaxRatedVolFlowPerRatedTotCap ) > SmallDifferenceTest ) ) {
-					ShowContinueError( "...Air Volume Flow Rate per Watt of Rated Cooling Capacity is also out of bounds at = " + trim( RoundSigDigits( AirMassFlowRate / PsyRhoAirFnPbTdbW( StdBaroPress, InletAirTemp, InletAirHumRat, RoutineName ) / TotCap, 7 ) ) + " m3/s/W" );
+					ShowContinueError( "...Air Volume Flow Rate per Watt of Rated Cooling Capacity is also out of bounds at = " + RoundSigDigits( AirMassFlowRate / PsyRhoAirFnPbTdbW( StdBaroPress, InletAirTemp, InletAirHumRat, RoutineName ) / TotCap, 7 ) + " m3/s/W" );
 				}
 			}
-			ShowContinueErrorTimeStamp( " " );
+			ShowContinueErrorTimeStamp( "" );
 			ShowFatalError( "Check and revise the input data for this coil before rerunning the simulation." );
 		}
 		// Calculate slope at given conditions
@@ -5394,22 +5394,22 @@ namespace VariableSpeedCoils {
 		if ( SlopeAtConds < 0.0 || OutletAirHumRat <= 0.0 ) {
 			//   Invalid conditions, slope can't be less than zero (SHR > 1) or
 			//   outlet air humidity ratio can't be less than zero.
-			ShowSevereError( trim( UnitType ) + " \"" + trim( UnitName ) + "\"" );
+			ShowSevereError( UnitType + " \"" + UnitName + "\"" );
 			ShowContinueError( "...Invalid slope or outlet air condition when calculating cooling coil bypass factor." );
-			ShowContinueError( "...Slope = " + trim( RoundSigDigits( SlopeAtConds, 8 ) ) );
-			ShowContinueError( "...Inlet Air Temperature     = " + trim( RoundSigDigits( InletAirTemp, 2 ) ) + " C" );
-			ShowContinueError( "...Outlet Air Temperature    = " + trim( RoundSigDigits( OutletAirTemp, 2 ) ) + " C" );
-			ShowContinueError( "...Inlet Air Humidity Ratio  = " + trim( RoundSigDigits( InletAirHumRat, 6 ) ) + " kgWater/kgDryAir" );
-			ShowContinueError( "...Outlet Air Humidity Ratio = " + trim( RoundSigDigits( OutletAirHumRat, 6 ) ) + " kgWater/kgDryAir" );
-			ShowContinueError( "...Total Cooling Capacity used in calculation = " + trim( RoundSigDigits( TotCap, 2 ) ) + " W" );
-			ShowContinueError( "...Air Mass Flow Rate used in calculation     = " + trim( RoundSigDigits( AirMassFlowRate, 6 ) ) + " kg/s" );
-			ShowContinueError( "...Air Volume Flow Rate used in calculation   = " + trim( RoundSigDigits( AirMassFlowRate / PsyRhoAirFnPbTdbW( StdBaroPress, InletAirTemp, InletAirHumRat, RoutineName ), 6 ) ) + " m3/s" );
+			ShowContinueError( "...Slope = " + RoundSigDigits( SlopeAtConds, 8 ) );
+			ShowContinueError( "...Inlet Air Temperature     = " + RoundSigDigits( InletAirTemp, 2 ) + " C" );
+			ShowContinueError( "...Outlet Air Temperature    = " + RoundSigDigits( OutletAirTemp, 2 ) + " C" );
+			ShowContinueError( "...Inlet Air Humidity Ratio  = " + RoundSigDigits( InletAirHumRat, 6 ) + " kgWater/kgDryAir" );
+			ShowContinueError( "...Outlet Air Humidity Ratio = " + RoundSigDigits( OutletAirHumRat, 6 ) + " kgWater/kgDryAir" );
+			ShowContinueError( "...Total Cooling Capacity used in calculation = " + RoundSigDigits( TotCap, 2 ) + " W" );
+			ShowContinueError( "...Air Mass Flow Rate used in calculation     = " + RoundSigDigits( AirMassFlowRate, 6 ) + " kg/s" );
+			ShowContinueError( "...Air Volume Flow Rate used in calculation   = " + RoundSigDigits( AirMassFlowRate / PsyRhoAirFnPbTdbW( StdBaroPress, InletAirTemp, InletAirHumRat, RoutineName ), 6 ) + " m3/s" );
 			if ( TotCap > 0.0 ) {
 				if ( ( ( MinRatedVolFlowPerRatedTotCap - AirMassFlowRate / PsyRhoAirFnPbTdbW( StdBaroPress, InletAirTemp, InletAirHumRat, RoutineName ) / TotCap ) > SmallDifferenceTest ) || ( ( AirMassFlowRate / PsyRhoAirFnPbTdbW( StdBaroPress, InletAirTemp, InletAirHumRat, RoutineName ) / TotCap - MaxRatedVolFlowPerRatedTotCap ) > SmallDifferenceTest ) ) {
-					ShowContinueError( "...Air Volume Flow Rate per Watt of Rated Cooling Capacity is also out of bounds at = " + trim( RoundSigDigits( AirMassFlowRate / PsyRhoAirFnPbTdbW( StdBaroPress, InletAirTemp, InletAirHumRat, RoutineName ) / TotCap, 7 ) ) + " m3/s/W" );
+					ShowContinueError( "...Air Volume Flow Rate per Watt of Rated Cooling Capacity is also out of bounds at = " + RoundSigDigits( AirMassFlowRate / PsyRhoAirFnPbTdbW( StdBaroPress, InletAirTemp, InletAirHumRat, RoutineName ) / TotCap, 7 ) + " m3/s/W" );
 				}
 			}
-			ShowContinueErrorTimeStamp( " " );
+			ShowContinueErrorTimeStamp( "" );
 			CBFErrors = true;
 			CBF = 0.0; //Autodesk:Return Suppress static testing from complaining about return value not set
 		} else {
@@ -5453,8 +5453,8 @@ namespace VariableSpeedCoils {
 			ADPEnthalpy = PsyHFnTdbW( ADPTemp, ADPHumRat );
 			CBF = ( OutletAirEnthalpy - ADPEnthalpy ) / ( InletAirEnthalpy - ADPEnthalpy );
 			if ( Iter > IterMax ) {
-				ShowSevereError( trim( UnitType ) + " \"" + trim( UnitName ) + "\" -- coil bypass factor calculation did not converge after max iterations." );
-				ShowContinueError( "The RatedSHR of [" + trim( RoundSigDigits( SHR, 3 ) ) + "], entered by the user or autosized (see *.eio file)," );
+				ShowSevereError( UnitType + " \"" + UnitName + "\" -- coil bypass factor calculation did not converge after max iterations." );
+				ShowContinueError( "The RatedSHR of [" + RoundSigDigits( SHR, 3 ) + "], entered by the user or autosized (see *.eio file)," );
 				ShowContinueError( "may be causing this. The line defined by the coil rated inlet air conditions" );
 				ShowContinueError( "(26.7C drybulb and 19.4C wetbulb) and the RatedSHR (i.e., slope of the line) must intersect" );
 				ShowContinueError( "the saturation curve of the psychrometric chart. If the RatedSHR is too low, then this" );
@@ -5463,19 +5463,19 @@ namespace VariableSpeedCoils {
 				ShowContinueError( "temperature values in the Sizing:System and Sizing:Zone objects. In general, the temperatures" );
 				ShowContinueError( "and humidity ratios specified in these two objects should be the same for each system" );
 				ShowContinueError( "and the zones that it serves." );
-				ShowContinueErrorTimeStamp( " " );
+				ShowContinueErrorTimeStamp( "" );
 				CBFErrors = true; // Didn't converge within MaxIter iterations
 			}
 			if ( CBF < 0.0 ) {
-				ShowSevereError( trim( UnitType ) + " \"" + trim( UnitName ) + "\" -- negative coil bypass factor calculated." );
-				ShowContinueErrorTimeStamp( " " );
+				ShowSevereError( UnitType + " \"" + UnitName + "\" -- negative coil bypass factor calculated." );
+				ShowContinueErrorTimeStamp( "" );
 				CBFErrors = true; // Negative CBF not valid
 			}
 		}
 
 		// Show fatal error for specific coil that caused a CBF error
 		if ( CBFErrors ) {
-			ShowFatalError( trim( UnitType ) + " \"" + trim( UnitName ) + "\" Errors found in calculating coil bypass factors" );
+			ShowFatalError( UnitType + " \"" + UnitName + "\" Errors found in calculating coil bypass factors" );
 		}
 
 		return CBF;

@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace Pipes {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
@@ -34,7 +32,7 @@ namespace Pipes {
 	struct LocalPipeData
 	{
 		// Members
-		Fstring Name; // main plant (cooling) loop ID
+		std::string Name; // main plant (cooling) loop ID
 		int TypeOf; // type of pipe
 		int InletNodeNum; // Node number on the inlet side of the plant
 		int OutletNodeNum; // Node number on the inlet side of the plant
@@ -48,7 +46,6 @@ namespace Pipes {
 
 		// Default Constructor
 		LocalPipeData() :
-			Name( MaxNameLength ),
 			TypeOf( 0 ),
 			InletNodeNum( 0 ),
 			OutletNodeNum( 0 ),
@@ -63,7 +60,7 @@ namespace Pipes {
 
 		// Member Constructor
 		LocalPipeData(
-			Fstring const & Name, // main plant (cooling) loop ID
+			std::string const & Name, // main plant (cooling) loop ID
 			int const TypeOf, // type of pipe
 			int const InletNodeNum, // Node number on the inlet side of the plant
 			int const OutletNodeNum, // Node number on the inlet side of the plant
@@ -75,7 +72,7 @@ namespace Pipes {
 			bool const CheckEquipName,
 			bool const EnvrnFlag
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			TypeOf( TypeOf ),
 			InletNodeNum( InletNodeNum ),
 			OutletNodeNum( OutletNodeNum ),
@@ -98,7 +95,7 @@ namespace Pipes {
 	void
 	SimPipes(
 		int const CompType,
-		Fstring & PipeName,
+		std::string & PipeName,
 		int & CompIndex,
 		Real64 const MaxVolFlowRate,
 		bool const InitLoopEquip,
@@ -123,7 +120,7 @@ namespace Pipes {
 	void
 	InitializePipes(
 		int const PipeType, // Type of Pipe
-		Fstring const & PipeName, // Name of Pipe
+		std::string const & PipeName, // Name of Pipe
 		int & PipeNum, // Index into pipe structure for name
 		Real64 const MaxVolFlowRate // unused at present time
 	);

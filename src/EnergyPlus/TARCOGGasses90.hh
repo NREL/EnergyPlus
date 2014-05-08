@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1A.hh>
 #include <ObjexxFCL/FArray2A.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -36,7 +35,7 @@ namespace TARCOGGasses90 {
 		Real64 & pr,
 		int const standard,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	);
 
 	void
@@ -47,7 +46,7 @@ namespace TARCOGGasses90 {
 		Real64 const gama,
 		Real64 & cond,
 		int & nperr,
-		Fstring & ErrorMessage
+		std::string & ErrorMessage
 	);
 
 	//  subroutine doe2gas90 (standard, iprop, frct, pres, nmix, con0, dcon, visc0, dvisc, dens0, ddens, pr0, dpr)

@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <HVACInterfaceManager.hh>
@@ -1261,6 +1260,11 @@ namespace HVACInterfaceManager {
 		PlantCommonPipe.allocate( TotNumLoops );
 
 		for ( CurLoopNum = 1; CurLoopNum <= TotNumLoops; ++CurLoopNum ) {
+		    
+			// reference to easily lookup the first item once
+			auto & first_demand_component_typenum( PlantLoop( CurLoopNum ).LoopSide( DemandSide ).Branch( 1 ).Comp( 1 ).TypeOf_Num );
+			auto & first_supply_component_typenum( PlantLoop( CurLoopNum ).LoopSide( SupplySide ).Branch( 1 ).Comp( 1 ).TypeOf_Num );
+		    
 			{ auto const SELECT_CASE_var( PlantLoop( CurLoopNum ).CommonPipeType );
 			if ( SELECT_CASE_var == CommonPipe_No ) {
 				PlantCommonPipe( CurLoopNum ).CommonPipeType = CommonPipe_No;
@@ -1271,10 +1275,10 @@ namespace HVACInterfaceManager {
 				SetupOutputVariable( "Plant Common Pipe Temperature [C]", PlantCommonPipe( CurLoopNum ).Temp, "System", "Average", PlantLoop( CurLoopNum ).Name );
 				SetupOutputVariable( "Plant Common Pipe Flow Direction Status []", PlantCommonPipe( CurLoopNum ).FlowDir, "System", "Average", PlantLoop( CurLoopNum ).Name );
 
-				if ( PlantLoop( CurLoopNum ).LoopSide( SupplySide ).Branch( 1 ).Comp( 1 ).TypeOf_Num == TypeOf_PumpVariableSpeed ) {
+				if ( first_supply_component_typenum == TypeOf_PumpVariableSpeed ) {
 					// If/when the model supports variable-pumping primary, this can be removed.
 					ShowWarningError( "SetupCommonPipes: detected variable speed pump on supply inlet of CommonPipe plant loop" );
-					ShowContinueError( "Occurs on plant loop name = " + trim( PlantLoop( CurLoopNum ).Name ) );
+					ShowContinueError( "Occurs on plant loop name = " + PlantLoop( CurLoopNum ).Name );
 					ShowContinueError( "The common pipe model does not support varying the flow rate on the primary/supply side" );
 					ShowContinueError( "The primary/supply side will operate as if constant speed, and the simulation continues" );
 
@@ -1288,21 +1292,21 @@ namespace HVACInterfaceManager {
 				SetupOutputVariable( "Plant Common Pipe Secondary to Primary Mass Flow Rate [kg/s]", PlantCommonPipe( CurLoopNum ).SecToPriFlow, "System", "Average", PlantLoop( CurLoopNum ).Name );
 
 				// check type of pump on supply side inlet
-				if ( PlantLoop( CurLoopNum ).LoopSide( SupplySide ).Branch( 1 ).Comp( 1 ).TypeOf_Num == TypeOf_PumpConstantSpeed ) {
+				if ( first_supply_component_typenum == TypeOf_PumpConstantSpeed ) {
 					PlantCommonPipe( CurLoopNum ).SupplySideInletPumpType = ConstantFlow;
-				} else if ( PlantLoop( CurLoopNum ).LoopSide( SupplySide ).Branch( 1 ).Comp( 1 ).TypeOf_Num == TypeOf_PumpVariableSpeed ) {
+				} else if ( first_supply_component_typenum == TypeOf_PumpVariableSpeed ) {
 					PlantCommonPipe( CurLoopNum ).SupplySideInletPumpType = VariableFlow;
 					// If/when the model supports variable-pumping primary, this can be removed.
 					ShowWarningError( "SetupCommonPipes: detected variable speed pump on supply inlet of TwoWayCommonPipe plant loop" );
-					ShowContinueError( "Occurs on plant loop name = " + trim( PlantLoop( CurLoopNum ).Name ) );
+					ShowContinueError( "Occurs on plant loop name = " + PlantLoop( CurLoopNum ).Name );
 					ShowContinueError( "The common pipe model does not support varying the flow rate on the primary/supply side" );
 					ShowContinueError( "The primary/supply side will operate as if constant speed, and the simulation continues" );
 
 				}
 				// check type of pump on demand side inlet
-				if ( PlantLoop( CurLoopNum ).LoopSide( DemandSide ).Branch( 1 ).Comp( 1 ).TypeOf_Num == TypeOf_PumpConstantSpeed ) {
+				if ( first_demand_component_typenum == TypeOf_PumpConstantSpeed ) {
 					PlantCommonPipe( CurLoopNum ).DemandSideInletPumpType = ConstantFlow;
-				} else if ( PlantLoop( CurLoopNum ).LoopSide( DemandSide ).Branch( 1 ).Comp( 1 ).TypeOf_Num == TypeOf_PumpVariableSpeed ) {
+				} else if ( first_demand_component_typenum == TypeOf_PumpVariableSpeed ) {
 					PlantCommonPipe( CurLoopNum ).DemandSideInletPumpType = VariableFlow;
 				}
 

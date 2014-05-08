@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -15,7 +14,6 @@ namespace EnergyPlus {
 namespace PlantComponentTemperatureSources {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 	using DataPlant::PlantLocation;
 
 	// Data
@@ -36,7 +34,7 @@ namespace PlantComponentTemperatureSources {
 	struct WaterSourceSpecs
 	{
 		// Members
-		Fstring Name; // user identifier
+		std::string Name; // user identifier
 		int InletNodeNum; // Node number on the inlet side of the plant
 		int OutletNodeNum; // Node number on the outlet side of the plant
 		Real64 DesVolFlowRate; // m**3/s - design nominal volumetric flow rate
@@ -45,7 +43,7 @@ namespace PlantComponentTemperatureSources {
 		Real64 EMSOverrideValueMassFlowRateMax; // value to use if EMS is overriding max mass flow
 		Real64 MassFlowRate;
 		int TempSpecType; // temperature specification type
-		Fstring TempSpecScheduleName;
+		std::string TempSpecScheduleName;
 		int TempSpecScheduleNum;
 		Real64 BoundaryTemp;
 		Real64 OutletTemp; // may be different if the flow is off
@@ -61,7 +59,6 @@ namespace PlantComponentTemperatureSources {
 
 		// Default Constructor
 		WaterSourceSpecs() :
-			Name( MaxNameLength ),
 			InletNodeNum( 0 ),
 			OutletNodeNum( 0 ),
 			DesVolFlowRate( 0.0 ),
@@ -70,7 +67,6 @@ namespace PlantComponentTemperatureSources {
 			EMSOverrideValueMassFlowRateMax( 0.0 ),
 			MassFlowRate( 0.0 ),
 			TempSpecType( 0 ),
-			TempSpecScheduleName( MaxNameLength ),
 			TempSpecScheduleNum( 0 ),
 			BoundaryTemp( 0.0 ),
 			OutletTemp( 0.0 ),
@@ -87,7 +83,7 @@ namespace PlantComponentTemperatureSources {
 
 		// Member Constructor
 		WaterSourceSpecs(
-			Fstring const & Name, // user identifier
+			std::string const & Name, // user identifier
 			int const InletNodeNum, // Node number on the inlet side of the plant
 			int const OutletNodeNum, // Node number on the outlet side of the plant
 			Real64 const DesVolFlowRate, // m**3/s - design nominal volumetric flow rate
@@ -96,7 +92,7 @@ namespace PlantComponentTemperatureSources {
 			Real64 const EMSOverrideValueMassFlowRateMax, // value to use if EMS is overriding max mass flow
 			Real64 const MassFlowRate,
 			int const TempSpecType, // temperature specification type
-			Fstring const & TempSpecScheduleName,
+			std::string const & TempSpecScheduleName,
 			int const TempSpecScheduleNum,
 			Real64 const BoundaryTemp,
 			Real64 const OutletTemp, // may be different if the flow is off
@@ -110,7 +106,7 @@ namespace PlantComponentTemperatureSources {
 			bool const MyEnvironFlag,
 			bool const IsThisSized // TRUE if sizing is done
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			InletNodeNum( InletNodeNum ),
 			OutletNodeNum( OutletNodeNum ),
 			DesVolFlowRate( DesVolFlowRate ),
@@ -119,7 +115,7 @@ namespace PlantComponentTemperatureSources {
 			EMSOverrideValueMassFlowRateMax( EMSOverrideValueMassFlowRateMax ),
 			MassFlowRate( MassFlowRate ),
 			TempSpecType( TempSpecType ),
-			TempSpecScheduleName( MaxNameLength, TempSpecScheduleName ),
+			TempSpecScheduleName( TempSpecScheduleName ),
 			TempSpecScheduleNum( TempSpecScheduleNum ),
 			BoundaryTemp( BoundaryTemp ),
 			OutletTemp( OutletTemp ),
@@ -143,7 +139,7 @@ namespace PlantComponentTemperatureSources {
 
 	void
 	SimWaterSource(
-		Fstring const & SourceName, // user-specified name for this component
+		std::string const & SourceName, // user-specified name for this component
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // HX number pointer
 		bool const RunFlag, // simulate HX when TRUE

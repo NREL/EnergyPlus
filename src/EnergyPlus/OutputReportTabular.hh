@@ -1,13 +1,15 @@
 #ifndef OutputReportTabular_hh_INCLUDED
 #define OutputReportTabular_hh_INCLUDED
 
+// C++ Headers
+#include <string>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/FArray2D.hh>
 #include <ObjexxFCL/FArray2S.hh>
 #include <ObjexxFCL/FArray3D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -19,7 +21,6 @@ namespace EnergyPlus {
 namespace OutputReportTabular {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS:
@@ -64,7 +65,7 @@ namespace OutputReportTabular {
 	extern int const numResourceTypes;
 	extern int const numSourceTypes;
 
-	extern Fstring const validChars;
+	extern std::string const validChars;
 
 	//MODULE VARIABLE DECLARATIONS:
 
@@ -102,7 +103,7 @@ namespace OutputReportTabular {
 	extern int unitsStyle; // see list of parameters
 	extern int numStyles;
 	extern FArray1D_int TabularOutputFile; // file number holder for output file
-	extern FArray1D_Fstring del; // the delimiter to use
+	extern FArray1D_string del; // the delimiter to use
 	extern FArray1D_int TableStyle; // see list of parameters
 
 	extern Real64 timeInYear;
@@ -132,9 +133,9 @@ namespace OutputReportTabular {
 	extern FArray2D_int meterNumEndUseBEPS;
 	extern FArray3D_int meterNumEndUseSubBEPS;
 	// arrays that hold the names of the resource and end uses
-	extern FArray1D_Fstring resourceTypeNames;
-	extern FArray1D_Fstring sourceTypeNames;
-	extern FArray1D_Fstring endUseNames;
+	extern FArray1D_string resourceTypeNames;
+	extern FArray1D_string sourceTypeNames;
+	extern FArray1D_string endUseNames;
 	// arrays that hold the actual values for the year
 	extern FArray1D< Real64 > gatherTotalsBEPS;
 	extern FArray1D< Real64 > gatherTotalsBySourceBEPS;
@@ -221,7 +222,7 @@ namespace OutputReportTabular {
 	//(8)   Milliseconds (0-999)
 
 	// Design day name storage
-	extern FArray1D_Fstring DesignDayName;
+	extern FArray1D_string DesignDayName;
 	extern int DesignDayCount;
 
 	//arrays related to pulse and load component reporting
@@ -286,11 +287,11 @@ namespace OutputReportTabular {
 	extern int maxUniqueKeyCount;
 
 	// for the XML report must keep track fo the active sub-table name and report set by other routines
-	extern Fstring activeSubTableName;
-	extern Fstring activeReportNameNoSpace;
-	extern Fstring activeReportName;
-	extern Fstring activeForName;
-	extern Fstring prevReportName;
+	extern std::string activeSubTableName;
+	extern std::string activeReportNameNoSpace;
+	extern std::string activeReportName;
+	extern std::string activeForName;
+	extern std::string prevReportName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
 	//PRIVATE      DateToStr
@@ -300,8 +301,8 @@ namespace OutputReportTabular {
 	struct OutputTableBinnedType
 	{
 		// Members
-		Fstring keyValue; // the key value (usually an asterisk to indicate all variables
-		Fstring varOrMeter; // the name of the variable or meter
+		std::string keyValue; // the key value (usually an asterisk to indicate all variables
+		std::string varOrMeter; // the name of the variable or meter
 		Real64 intervalStart; // The lowest value for the intervals being binned into.
 		Real64 intervalSize; // The size of the bins starting with Interval start.
 		int intervalCount; // The number of bins used. The number of hours below the start of
@@ -311,14 +312,12 @@ namespace OutputReportTabular {
 		int typeOfVar; // 0=not found, 1=integer, 2=real, 3=meter
 		int avgSum; // Variable  is Averaged=1 or Summed=2
 		int stepType; // Variable time step is Zone=1 or HVAC=2
-		Fstring units; // the units string, may be blank
-		Fstring ScheduleName; // the name of the schedule
+		std::string units; // the units string, may be blank
+		std::string ScheduleName; // the name of the schedule
 		int scheduleIndex; // index to the schedule specified - if no schedule use zero
 
 		// Default Constructor
 		OutputTableBinnedType() :
-			keyValue( MaxNameLength ),
-			varOrMeter( MaxNameLength ),
 			intervalStart( 0.0 ),
 			intervalSize( 0.0 ),
 			intervalCount( 0 ),
@@ -327,15 +326,13 @@ namespace OutputReportTabular {
 			typeOfVar( 0 ),
 			avgSum( 0 ),
 			stepType( 0 ),
-			units( MaxNameLength ),
-			ScheduleName( MaxNameLength ),
 			scheduleIndex( 0 )
 		{}
 
 		// Member Constructor
 		OutputTableBinnedType(
-			Fstring const & keyValue, // the key value (usually an asterisk to indicate all variables
-			Fstring const & varOrMeter, // the name of the variable or meter
+			std::string const & keyValue, // the key value (usually an asterisk to indicate all variables
+			std::string const & varOrMeter, // the name of the variable or meter
 			Real64 const intervalStart, // The lowest value for the intervals being binned into.
 			Real64 const intervalSize, // The size of the bins starting with Interval start.
 			int const intervalCount, // The number of bins used. The number of hours below the start of
@@ -344,12 +341,12 @@ namespace OutputReportTabular {
 			int const typeOfVar, // 0=not found, 1=integer, 2=real, 3=meter
 			int const avgSum, // Variable  is Averaged=1 or Summed=2
 			int const stepType, // Variable time step is Zone=1 or HVAC=2
-			Fstring const & units, // the units string, may be blank
-			Fstring const & ScheduleName, // the name of the schedule
+			std::string const & units, // the units string, may be blank
+			std::string const & ScheduleName, // the name of the schedule
 			int const scheduleIndex // index to the schedule specified - if no schedule use zero
 		) :
-			keyValue( MaxNameLength, keyValue ),
-			varOrMeter( MaxNameLength, varOrMeter ),
+			keyValue( keyValue ),
+			varOrMeter( varOrMeter ),
 			intervalStart( intervalStart ),
 			intervalSize( intervalSize ),
 			intervalCount( intervalCount ),
@@ -358,8 +355,8 @@ namespace OutputReportTabular {
 			typeOfVar( typeOfVar ),
 			avgSum( avgSum ),
 			stepType( stepType ),
-			units( MaxNameLength, units ),
-			ScheduleName( MaxNameLength, ScheduleName ),
+			units( units ),
+			ScheduleName( ScheduleName ),
 			scheduleIndex( scheduleIndex )
 		{}
 
@@ -391,21 +388,20 @@ namespace OutputReportTabular {
 	struct BinObjVarIDType
 	{
 		// Members
-		Fstring namesOfObj; // name of the object
+		std::string namesOfObj; // name of the object
 		int varMeterNum; // variable or meter number
 
 		// Default Constructor
 		BinObjVarIDType() :
-			namesOfObj( MaxNameLength ),
 			varMeterNum( 0 )
 		{}
 
 		// Member Constructor
 		BinObjVarIDType(
-			Fstring const & namesOfObj, // name of the object
+			std::string const & namesOfObj, // name of the object
 			int const varMeterNum // variable or meter number
 		) :
-			namesOfObj( MaxNameLength, namesOfObj ),
+			namesOfObj( namesOfObj ),
 			varMeterNum( varMeterNum )
 		{}
 
@@ -449,21 +445,20 @@ namespace OutputReportTabular {
 	struct NamedMonthlyType
 	{
 		// Members
-		Fstring title; // report title
+		std::string title; // report title
 		bool show; // if report should be shown
 
 		// Default Constructor
 		NamedMonthlyType() :
-			title( MaxNameLength ),
 			show( false )
 		{}
 
 		// Member Constructor
 		NamedMonthlyType(
-			Fstring const & title, // report title
+			std::string const & title, // report title
 			bool const show // if report should be shown
 		) :
-			title( MaxNameLength, title ),
+			title( title ),
 			show( show )
 		{}
 
@@ -472,7 +467,7 @@ namespace OutputReportTabular {
 	struct MonthlyInputType
 	{
 		// Members
-		Fstring name; // identifier
+		std::string name; // identifier
 		int numFieldSet; // number of monthly field sets
 		int firstFieldSet; // pointer to the first field set
 		int numTables; // number of tables
@@ -481,7 +476,6 @@ namespace OutputReportTabular {
 
 		// Default Constructor
 		MonthlyInputType() :
-			name( MaxNameLength * 2 ),
 			numFieldSet( 0 ),
 			firstFieldSet( 0 ),
 			numTables( 0 ),
@@ -491,14 +485,14 @@ namespace OutputReportTabular {
 
 		// Member Constructor
 		MonthlyInputType(
-			Fstring const & name, // identifier
+			std::string const & name, // identifier
 			int const numFieldSet, // number of monthly field sets
 			int const firstFieldSet, // pointer to the first field set
 			int const numTables, // number of tables
 			int const firstTable, // pointer to the first table
 			int const showDigits // the number of digits to be shown
 		) :
-			name( MaxNameLength * 2, name ),
+			name( name ),
 			numFieldSet( numFieldSet ),
 			firstFieldSet( firstFieldSet ),
 			numTables( numTables ),
@@ -511,51 +505,46 @@ namespace OutputReportTabular {
 	struct MonthlyFieldSetInputType
 	{
 		// Members
-		Fstring variMeter; // the name of the variable or meter
-		Fstring colHead; // the column header to use instead of the variable name (only for predefined)
+		std::string variMeter; // the name of the variable or meter
+		std::string colHead; // the column header to use instead of the variable name (only for predefined)
 		int aggregate; // the type of aggregation for the variable (see aggType parameters)
-		Fstring varUnits; // Units sting, may be blank
-		Fstring variMeterUpper; // the name of the variable or meter uppercased
+		std::string varUnits; // Units sting, may be blank
+		std::string variMeterUpper; // the name of the variable or meter uppercased
 		int typeOfVar; // 0=not found, 1=integer, 2=real, 3=meter
 		int keyCount; // noel
 		int varAvgSum; // Variable  is Averaged=1 or Summed=2
 		int varStepType; // Variable time step is Zone=1 or HVAC=2
-		FArray1D_Fstring NamesOfKeys; // keyNames !noel
+		FArray1D_string NamesOfKeys; // keyNames !noel
 		FArray1D_int IndexesForKeyVar; // keyVarIndexes !noel
 
 		// Default Constructor
 		MonthlyFieldSetInputType() :
-			variMeter( MaxNameLength ),
-			colHead( MaxNameLength ),
 			aggregate( 0 ),
-			varUnits( MaxNameLength ),
-			variMeterUpper( MaxNameLength ),
 			typeOfVar( 0 ),
 			keyCount( 0 ),
 			varAvgSum( 1 ),
-			varStepType( 1 ),
-			NamesOfKeys( sFstring( MaxNameLength ) )
+			varStepType( 1 )
 		{}
 
 		// Member Constructor
 		MonthlyFieldSetInputType(
-			Fstring const & variMeter, // the name of the variable or meter
-			Fstring const & colHead, // the column header to use instead of the variable name (only for predefined)
+			std::string const & variMeter, // the name of the variable or meter
+			std::string const & colHead, // the column header to use instead of the variable name (only for predefined)
 			int const aggregate, // the type of aggregation for the variable (see aggType parameters)
-			Fstring const & varUnits, // Units sting, may be blank
-			Fstring const & variMeterUpper, // the name of the variable or meter uppercased
+			std::string const & varUnits, // Units sting, may be blank
+			std::string const & variMeterUpper, // the name of the variable or meter uppercased
 			int const typeOfVar, // 0=not found, 1=integer, 2=real, 3=meter
 			int const keyCount, // noel
 			int const varAvgSum, // Variable  is Averaged=1 or Summed=2
 			int const varStepType, // Variable time step is Zone=1 or HVAC=2
-			FArray1_Fstring const & NamesOfKeys, // keyNames !noel
+			FArray1_string const & NamesOfKeys, // keyNames !noel
 			FArray1_int const & IndexesForKeyVar // keyVarIndexes !noel
 		) :
-			variMeter( MaxNameLength, variMeter ),
-			colHead( MaxNameLength, colHead ),
+			variMeter( variMeter ),
+			colHead( colHead ),
 			aggregate( aggregate ),
-			varUnits( MaxNameLength, varUnits ),
-			variMeterUpper( MaxNameLength, variMeterUpper ),
+			varUnits( varUnits ),
+			variMeterUpper( variMeterUpper ),
 			typeOfVar( typeOfVar ),
 			keyCount( keyCount ),
 			varAvgSum( varAvgSum ),
@@ -569,24 +558,23 @@ namespace OutputReportTabular {
 	struct MonthlyTablesType
 	{
 		// Members
-		Fstring keyValue; // the key value - the object names that result in the variable
+		std::string keyValue; // the key value - the object names that result in the variable
 		int firstColumn; // pointer to the monthly column array for the first item
 		int numColumns; // number of columns for the table
 
 		// Default Constructor
 		MonthlyTablesType() :
-			keyValue( MaxNameLength ),
 			firstColumn( 0 ),
 			numColumns( 0 )
 		{}
 
 		// Member Constructor
 		MonthlyTablesType(
-			Fstring const & keyValue, // the key value - the object names that result in the variable
+			std::string const & keyValue, // the key value - the object names that result in the variable
 			int const firstColumn, // pointer to the monthly column array for the first item
 			int const numColumns // number of columns for the table
 		) :
-			keyValue( MaxNameLength, keyValue ),
+			keyValue( keyValue ),
 			firstColumn( firstColumn ),
 			numColumns( numColumns )
 		{}
@@ -596,13 +584,13 @@ namespace OutputReportTabular {
 	struct MonthlyColumnsType
 	{
 		// Members
-		Fstring varName; // name of variable
-		Fstring colHead; // column header (not used for user defined monthly)
+		std::string varName; // name of variable
+		std::string colHead; // column header (not used for user defined monthly)
 		int varNum; // variable or meter number
 		int typeOfVar; // 0=not found, 1=integer, 2=real, 3=meter
 		int avgSum; // Variable  is Averaged=1 or Summed=2
 		int stepType; // Variable time step is Zone=1 or HVAC=2
-		Fstring units; // the units string, may be blank
+		std::string units; // the units string, may be blank
 		int aggType; // index to the type of aggregation (see list of parameters)
 		FArray1D< Real64 > reslt; // monthly results
 		FArray1D< Real64 > duration; // the time during which results are summed for use in averages
@@ -612,13 +600,10 @@ namespace OutputReportTabular {
 
 		// Default Constructor
 		MonthlyColumnsType() :
-			varName( MaxNameLength ),
-			colHead( MaxNameLength ),
 			varNum( 0 ),
 			typeOfVar( 0 ),
 			avgSum( 0 ),
 			stepType( 0 ),
-			units( MaxNameLength ),
 			aggType( 0 ),
 			reslt( 12, 0.0 ),
 			duration( 12, 0.0 ),
@@ -628,26 +613,26 @@ namespace OutputReportTabular {
 
 		// Member Constructor
 		MonthlyColumnsType(
-			Fstring const & varName, // name of variable
-			Fstring const & colHead, // column header (not used for user defined monthly)
+			std::string const & varName, // name of variable
+			std::string const & colHead, // column header (not used for user defined monthly)
 			int const varNum, // variable or meter number
 			int const typeOfVar, // 0=not found, 1=integer, 2=real, 3=meter
 			int const avgSum, // Variable  is Averaged=1 or Summed=2
 			int const stepType, // Variable time step is Zone=1 or HVAC=2
-			Fstring const & units, // the units string, may be blank
+			std::string const & units, // the units string, may be blank
 			int const aggType, // index to the type of aggregation (see list of parameters)
 			FArray1< Real64 > const & reslt, // monthly results
 			FArray1< Real64 > const & duration, // the time during which results are summed for use in averages
 			FArray1_int const & timeStamp, // encoded timestamp of max or min
 			Real64 const aggForStep // holds the aggregation for the HVAC time steps when smaller than
 		) :
-			varName( MaxNameLength, varName ),
-			colHead( MaxNameLength, colHead ),
+			varName( varName ),
+			colHead( colHead ),
 			varNum( varNum ),
 			typeOfVar( typeOfVar ),
 			avgSum( avgSum ),
 			stepType( stepType ),
-			units( MaxNameLength, units ),
+			units( units ),
 			aggType( aggType ),
 			reslt( 12, reslt ),
 			duration( 12, duration ),
@@ -660,25 +645,23 @@ namespace OutputReportTabular {
 	struct TOCEntriesType
 	{
 		// Members
-		Fstring reportName; // the name of the individual report
-		Fstring sectionName; // the name of the section containing individual reports
+		std::string reportName; // the name of the individual report
+		std::string sectionName; // the name of the section containing individual reports
 		bool isWritten; // flag if the entry has been written to TOC
 
 		// Default Constructor
 		TOCEntriesType() :
-			reportName( MaxNameLength ),
-			sectionName( MaxNameLength ),
 			isWritten( false )
 		{}
 
 		// Member Constructor
 		TOCEntriesType(
-			Fstring const & reportName, // the name of the individual report
-			Fstring const & sectionName, // the name of the section containing individual reports
+			std::string const & reportName, // the name of the individual report
+			std::string const & sectionName, // the name of the section containing individual reports
 			bool const isWritten // flag if the entry has been written to TOC
 		) :
-			reportName( MaxNameLength, reportName ),
-			sectionName( MaxNameLength, sectionName ),
+			reportName( reportName ),
+			sectionName( sectionName ),
 			isWritten( isWritten )
 		{}
 
@@ -687,40 +670,37 @@ namespace OutputReportTabular {
 	struct UnitConvType
 	{
 		// Members
-		Fstring siName; // the name abbreviation or symbol of the SI units
-		Fstring ipName; // the name abbreviation or symbol of the IP units
+		std::string siName; // the name abbreviation or symbol of the SI units
+		std::string ipName; // the name abbreviation or symbol of the IP units
 		Real64 mult; // the multiplier used to convert from SI to IP in IP = (SI * mult) + offset
 		Real64 offset; // the offset used to convert from SI to IP in IP = (SI * mult) + offset
-		Fstring hint; // the string used when multiple SI units match
+		std::string hint; // the string used when multiple SI units match
 		bool several; // several different options for the SI unit to be converted into IP
 		bool is_default; // if part of a set of "several" this should be used as default
 
 		// Default Constructor
 		UnitConvType() :
-			siName( 20 ),
-			ipName( 20 ),
 			mult( 1.0 ),
 			offset( 0.0 ),
-			hint( 20 ),
 			several( false ),
 			is_default( false )
 		{}
 
 		// Member Constructor
 		UnitConvType(
-			Fstring const & siName, // the name abbreviation or symbol of the SI units
-			Fstring const & ipName, // the name abbreviation or symbol of the IP units
+			std::string const & siName, // the name abbreviation or symbol of the SI units
+			std::string const & ipName, // the name abbreviation or symbol of the IP units
 			Real64 const mult, // the multiplier used to convert from SI to IP in IP = (SI * mult) + offset
 			Real64 const offset, // the offset used to convert from SI to IP in IP = (SI * mult) + offset
-			Fstring const & hint, // the string used when multiple SI units match
+			std::string const & hint, // the string used when multiple SI units match
 			bool const several, // several different options for the SI unit to be converted into IP
 			bool const is_default // if part of a set of "several" this should be used as default
 		) :
-			siName( 20, siName ),
-			ipName( 20, ipName ),
+			siName( siName ),
+			ipName( ipName ),
 			mult( mult ),
 			offset( offset ),
-			hint( 20, hint ),
+			hint( hint ),
 			several( several ),
 			is_default( is_default )
 		{}
@@ -763,15 +743,15 @@ namespace OutputReportTabular {
 
 	int
 	AddMonthlyReport(
-		Fstring const & inReportName,
+		std::string const & inReportName,
 		int const inNumDigitsShown
 	);
 
 	void
 	AddMonthlyFieldSetInput(
 		int const inMonthReport,
-		Fstring const & inVariMeter,
-		Fstring const & inColHead,
+		std::string const & inVariMeter,
+		std::string const & inColHead,
 		int const inAggregate
 	);
 
@@ -856,9 +836,9 @@ namespace OutputReportTabular {
 	void
 	FillWeatherPredefinedEntries();
 
-	Fstring
+	std::string
 	GetColumnUsingTabs(
-		Fstring const & inString, // Input String
+		std::string const & inString, // Input String
 		int const colNum // Column number
 	);
 
@@ -924,47 +904,47 @@ namespace OutputReportTabular {
 
 	void
 	WriteReportHeaders(
-		Fstring const & reportName,
-		Fstring const & objectName,
+		std::string const & reportName,
+		std::string const & objectName,
 		int const averageOrSum
 	);
 
 	void
-	WriteSubtitle( Fstring const & subtitle );
+	WriteSubtitle( std::string const & subtitle );
 
 	void
 	WriteTextLine(
-		Fstring const & lineOfText,
+		std::string const & lineOfText,
 		Optional_bool_const isBold = _
 	);
 
 	void
 	WriteTable(
-		FArray2S_Fstring const body, // row,column
-		FArray1S_Fstring const rowLabels,
-		FArray1S_Fstring const columnLabels,
+		FArray2S_string const body, // row,column
+		FArray1S_string const rowLabels,
+		FArray1S_string const columnLabels,
 		FArray1S_int widthColumn,
 		Optional_bool_const transposeXML = _,
-		Optional_Fstring_const footnoteText = _
+		Optional_string_const footnoteText = _
 	);
 
-	Fstring
+	std::string
 	MakeAnchorName(
-		Fstring const & reportString,
-		Fstring const & objectString
+		std::string const & reportString,
+		std::string const & objectString
 	);
 
-	Fstring
+	std::string
 	InsertCurrencySymbol(
-		Fstring const & inString, // Input String
+		std::string const & inString, // Input String
 		bool const isHTML // True if an HTML string
 	);
 
-	Fstring
-	ConvertToElementTag( Fstring const & inString ); // Input String
+	std::string
+	ConvertToElementTag( std::string const & inString ); // Input String
 
-	Fstring
-	ConvertToEscaped( Fstring const & inString ); // Input String
+	std::string
+	ConvertToEscaped( std::string const & inString ); // Input String
 
 	void
 	DetermineBuildingFloorArea();
@@ -1011,38 +991,38 @@ namespace OutputReportTabular {
 	//======================================================================================================================
 	//======================================================================================================================
 
-	Fstring
+	std::string
 	RealToStr(
 		Real64 const RealIn,
 		int const numDigits
 	);
 
-	Fstring
+	std::string
 	IntToStr( int const intIn );
 
 	Real64
-	StrToReal( Fstring const & stringIn );
+	StrToReal( std::string const & stringIn );
 
-	Fstring
+	std::string
 	DateToString( int const codedDate ); // word containing encoded month, day, hour, minute
 
 	void
 	AddTOCEntry(
-		Fstring const & nameSection,
-		Fstring const & nameReport
+		std::string const & nameSection,
+		std::string const & nameReport
 	);
 
 	void
 	SetupUnitConversions();
 
-	Fstring
-	GetUnitSubString( Fstring const & inString ); // Input String
+	std::string
+	GetUnitSubString( std::string const & inString ); // Input String
 
 	void
 	LookupSItoIP(
-		Fstring const & stringInWithSI,
+		std::string const & stringInWithSI,
 		int & unitConvIndex,
-		Fstring & stringOutWithIP
+		std::string & stringOutWithIP
 	);
 
 	Real64
@@ -1062,25 +1042,25 @@ namespace OutputReportTabular {
 		int const unitConvIndex,
 		Real64 & multiplier,
 		Real64 & offset,
-		Fstring & IPunit
+		std::string & IPunit
 	);
 
 	Real64
 	getSpecificUnitMultiplier(
-		Fstring const & SIunit,
-		Fstring const & IPunit
+		std::string const & SIunit,
+		std::string const & IPunit
 	);
 
 	Real64
 	getSpecificUnitDivider(
-		Fstring const & SIunit,
-		Fstring const & IPunit
+		std::string const & SIunit,
+		std::string const & IPunit
 	);
 
 	Real64
 	getSpecificUnitIndex(
-		Fstring const & SIunit,
-		Fstring const & IPunit
+		std::string const & SIunit,
+		std::string const & IPunit
 	);
 
 	//     NOTICE

@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -15,7 +14,6 @@ namespace EnergyPlus {
 namespace DataAirSystems {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 	using DataPlant::MeterData;
 	using DataPlant::SubcomponentData;
 
@@ -41,15 +39,15 @@ namespace DataAirSystems {
 	struct AirLoopCompData // data for an individual component
 	{
 		// Members
-		Fstring TypeOf; // The 'keyWord' identifying  component type
-		Fstring Name; // Component name
+		std::string TypeOf; // The 'keyWord' identifying  component type
+		std::string Name; // Component name
 		int CompType_Num; // Numeric designator for CompType (TypeOf)
 		int CompIndex; // Component Index in whatever is using this component
 		int FlowCtrl; // Component flow control (ACTIVE/PASSIVE)
 		bool ON; // When true, the designated component or operation scheme is available
 		bool Parent; // When true, the designated component is made up of sub-components
-		Fstring NodeNameIn; // Component inlet node name
-		Fstring NodeNameOut; // Component outlet node name
+		std::string NodeNameIn; // Component inlet node name
+		std::string NodeNameOut; // Component outlet node name
 		int NodeNumIn; // Component inlet node number
 		int NodeNumOut; // Component outlet node number
 		bool MeteredVarsFound;
@@ -76,15 +74,11 @@ namespace DataAirSystems {
 
 		// Default Constructor
 		AirLoopCompData() :
-			TypeOf( MaxNameLength ),
-			Name( MaxNameLength ),
 			CompType_Num( 0 ),
 			CompIndex( 0 ),
 			FlowCtrl( 0 ),
 			ON( true ),
 			Parent( false ),
-			NodeNameIn( MaxNameLength ),
-			NodeNameOut( MaxNameLength ),
 			NodeNumIn( 0 ),
 			NodeNumOut( 0 ),
 			MeteredVarsFound( false ),
@@ -110,15 +104,15 @@ namespace DataAirSystems {
 
 		// Member Constructor
 		AirLoopCompData(
-			Fstring const & TypeOf, // The 'keyWord' identifying  component type
-			Fstring const & Name, // Component name
+			std::string const & TypeOf, // The 'keyWord' identifying  component type
+			std::string const & Name, // Component name
 			int const CompType_Num, // Numeric designator for CompType (TypeOf)
 			int const CompIndex, // Component Index in whatever is using this component
 			int const FlowCtrl, // Component flow control (ACTIVE/PASSIVE)
 			bool const ON, // When true, the designated component or operation scheme is available
 			bool const Parent, // When true, the designated component is made up of sub-components
-			Fstring const & NodeNameIn, // Component inlet node name
-			Fstring const & NodeNameOut, // Component outlet node name
+			std::string const & NodeNameIn, // Component inlet node name
+			std::string const & NodeNameOut, // Component outlet node name
 			int const NodeNumIn, // Component inlet node number
 			int const NodeNumOut, // Component outlet node number
 			bool const MeteredVarsFound,
@@ -143,15 +137,15 @@ namespace DataAirSystems {
 			FArray1< MeterData > const & MeteredVar, // Index of energy output report data
 			FArray1< SubcomponentData > const & SubComp // Component list
 		) :
-			TypeOf( MaxNameLength, TypeOf ),
-			Name( MaxNameLength, Name ),
+			TypeOf( TypeOf ),
+			Name( Name ),
 			CompType_Num( CompType_Num ),
 			CompIndex( CompIndex ),
 			FlowCtrl( FlowCtrl ),
 			ON( ON ),
 			Parent( Parent ),
-			NodeNameIn( MaxNameLength, NodeNameIn ),
-			NodeNameOut( MaxNameLength, NodeNameOut ),
+			NodeNameIn( NodeNameIn ),
+			NodeNameOut( NodeNameOut ),
 			NodeNumIn( NodeNumIn ),
 			NodeNumOut( NodeNumOut ),
 			MeteredVarsFound( MeteredVarsFound ),
@@ -182,8 +176,8 @@ namespace DataAirSystems {
 	struct AirLoopBranchData // a branch is a sequence of components
 	{
 		// Members
-		Fstring Name; // Name of the branch
-		Fstring ControlType; // Control type for the branch (not used)
+		std::string Name; // Name of the branch
+		std::string ControlType; // Control type for the branch (not used)
 		Real64 MinVolFlowRate; // minimum flow rate for the branch (m3/s)
 		Real64 MaxVolFlowRate; // maximum flow rate for the branch (m3/s)
 		Real64 MinMassFlowRate; // minimum mass flow rate for the branch (kg/s)
@@ -203,8 +197,6 @@ namespace DataAirSystems {
 
 		// Default Constructor
 		AirLoopBranchData() :
-			Name( MaxNameLength ),
-			ControlType( MaxNameLength ),
 			MinVolFlowRate( 0.0 ),
 			MaxVolFlowRate( 0.0 ),
 			MinMassFlowRate( 0.0 ),
@@ -218,8 +210,8 @@ namespace DataAirSystems {
 
 		// Member Constructor
 		AirLoopBranchData(
-			Fstring const & Name, // Name of the branch
-			Fstring const & ControlType, // Control type for the branch (not used)
+			std::string const & Name, // Name of the branch
+			std::string const & ControlType, // Control type for the branch (not used)
 			Real64 const MinVolFlowRate, // minimum flow rate for the branch (m3/s)
 			Real64 const MaxVolFlowRate, // maximum flow rate for the branch (m3/s)
 			Real64 const MinMassFlowRate, // minimum mass flow rate for the branch (kg/s)
@@ -234,8 +226,8 @@ namespace DataAirSystems {
 			int const TotalNodes, // total number of nodes on branch
 			FArray1_int const & NodeNum // node list (numbers)
 		) :
-			Name( MaxNameLength, Name ),
-			ControlType( MaxNameLength, ControlType ),
+			Name( Name ),
+			ControlType( ControlType ),
 			MinVolFlowRate( MinVolFlowRate ),
 			MaxVolFlowRate( MaxVolFlowRate ),
 			MinMassFlowRate( MinMassFlowRate ),
@@ -257,43 +249,40 @@ namespace DataAirSystems {
 	{
 		// Members
 		bool Exists; // True if there is a splitter (only 1 allowed per loop)
-		Fstring Name; // Name of the Splitter
+		std::string Name; // Name of the Splitter
 		int NodeNumIn; // Node number for the inlet to the splitter
 		int BranchNumIn; // Reference number for branch connected to splitter inlet
-		Fstring NodeNameIn; // Node name for the inlet to the splitter
+		std::string NodeNameIn; // Node name for the inlet to the splitter
 		int TotalOutletNodes; // Number of outlet nodes for the splitter
 		FArray1D_int NodeNumOut; // Node numbers for the outlets to the splitter
 		FArray1D_int BranchNumOut; // Reference numbers for branches connected to splitter outlet
-		FArray1D_Fstring NodeNameOut; // Node names for the outlets to the splitter
+		FArray1D_string NodeNameOut; // Node names for the outlets to the splitter
 
 		// Default Constructor
 		AirLoopSplitterData() :
 			Exists( false ),
-			Name( MaxNameLength ),
 			NodeNumIn( 0 ),
 			BranchNumIn( 0 ),
-			NodeNameIn( MaxNameLength ),
-			TotalOutletNodes( 0 ),
-			NodeNameOut( sFstring( MaxNameLength ) )
+			TotalOutletNodes( 0 )
 		{}
 
 		// Member Constructor
 		AirLoopSplitterData(
 			bool const Exists, // True if there is a splitter (only 1 allowed per loop)
-			Fstring const & Name, // Name of the Splitter
+			std::string const & Name, // Name of the Splitter
 			int const NodeNumIn, // Node number for the inlet to the splitter
 			int const BranchNumIn, // Reference number for branch connected to splitter inlet
-			Fstring const & NodeNameIn, // Node name for the inlet to the splitter
+			std::string const & NodeNameIn, // Node name for the inlet to the splitter
 			int const TotalOutletNodes, // Number of outlet nodes for the splitter
 			FArray1_int const & NodeNumOut, // Node numbers for the outlets to the splitter
 			FArray1_int const & BranchNumOut, // Reference numbers for branches connected to splitter outlet
-			FArray1_Fstring const & NodeNameOut // Node names for the outlets to the splitter
+			FArray1_string const & NodeNameOut // Node names for the outlets to the splitter
 		) :
 			Exists( Exists ),
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NodeNumIn( NodeNumIn ),
 			BranchNumIn( BranchNumIn ),
-			NodeNameIn( MaxNameLength, NodeNameIn ),
+			NodeNameIn( NodeNameIn ),
 			TotalOutletNodes( TotalOutletNodes ),
 			NodeNumOut( NodeNumOut ),
 			BranchNumOut( BranchNumOut ),
@@ -306,43 +295,40 @@ namespace DataAirSystems {
 	{
 		// Members
 		bool Exists; // True if there is a Mixer (only 1 allowed per loop)
-		Fstring Name; // Name of the Mixer
+		std::string Name; // Name of the Mixer
 		int NodeNumOut; // Node number for the outlet to the mixer
 		int BranchNumOut; // Reference number for branch connected to mixer outlet
-		Fstring NodeNameOut; // Node name for the outlet to the mixer
+		std::string NodeNameOut; // Node name for the outlet to the mixer
 		int TotalInletNodes; // Number of inlet nodes for the mixer
 		FArray1D_int NodeNumIn; // Node numbers for the inlets to the mixer
 		FArray1D_int BranchNumIn; // Reference numbers for branches connected to mixer inlet
-		FArray1D_Fstring NodeNameIn; // Node names for the inlets to the mixer
+		FArray1D_string NodeNameIn; // Node names for the inlets to the mixer
 
 		// Default Constructor
 		AirLoopMixerData() :
 			Exists( false ),
-			Name( MaxNameLength ),
 			NodeNumOut( 0 ),
 			BranchNumOut( 0 ),
-			NodeNameOut( MaxNameLength ),
-			TotalInletNodes( 0 ),
-			NodeNameIn( sFstring( MaxNameLength ) )
+			TotalInletNodes( 0 )
 		{}
 
 		// Member Constructor
 		AirLoopMixerData(
 			bool const Exists, // True if there is a Mixer (only 1 allowed per loop)
-			Fstring const & Name, // Name of the Mixer
+			std::string const & Name, // Name of the Mixer
 			int const NodeNumOut, // Node number for the outlet to the mixer
 			int const BranchNumOut, // Reference number for branch connected to mixer outlet
-			Fstring const & NodeNameOut, // Node name for the outlet to the mixer
+			std::string const & NodeNameOut, // Node name for the outlet to the mixer
 			int const TotalInletNodes, // Number of inlet nodes for the mixer
 			FArray1_int const & NodeNumIn, // Node numbers for the inlets to the mixer
 			FArray1_int const & BranchNumIn, // Reference numbers for branches connected to mixer inlet
-			FArray1_Fstring const & NodeNameIn // Node names for the inlets to the mixer
+			FArray1_string const & NodeNameIn // Node names for the inlets to the mixer
 		) :
 			Exists( Exists ),
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NodeNumOut( NodeNumOut ),
 			BranchNumOut( BranchNumOut ),
-			NodeNameOut( MaxNameLength, NodeNameOut ),
+			NodeNameOut( NodeNameOut ),
 			TotalInletNodes( TotalInletNodes ),
 			NodeNumIn( NodeNumIn ),
 			BranchNumIn( BranchNumIn ),
@@ -354,11 +340,11 @@ namespace DataAirSystems {
 	struct DefinePrimaryAirSystem // There is an array of these for each primary air system
 	{
 		// Members
-		Fstring Name; // name of the system
+		std::string Name; // name of the system
 		Real64 DesignVolFlowRate; // the design total supply air flow rate (m3/s)
 		int NumControllers; // number of controllers on this air path
-		FArray1D_Fstring ControllerName; // name of each controller on this system
-		FArray1D_Fstring ControllerType; // type of each controller on this system
+		FArray1D_string ControllerName; // name of each controller on this system
+		FArray1D_string ControllerType; // type of each controller on this system
 		FArray1D_int ControllerIndex;
 		FArray1D_bool CanBeLockedOutByEcono; // true if controller inactive
 		// when the economizer is active
@@ -388,11 +374,8 @@ namespace DataAirSystems {
 
 		// Default Constructor
 		DefinePrimaryAirSystem() :
-			Name( MaxNameLength ),
 			DesignVolFlowRate( 0.0 ),
 			NumControllers( 0 ),
-			ControllerName( sFstring( MaxNameLength ) ),
-			ControllerType( sFstring( MaxNameLength ) ),
 			NumBranches( 0 ),
 			NumOutletBranches( 0 ),
 			OutletBranchNum( 3, 0 ),
@@ -415,11 +398,11 @@ namespace DataAirSystems {
 
 		// Member Constructor
 		DefinePrimaryAirSystem(
-			Fstring const & Name, // name of the system
+			std::string const & Name, // name of the system
 			Real64 const DesignVolFlowRate, // the design total supply air flow rate (m3/s)
 			int const NumControllers, // number of controllers on this air path
-			FArray1_Fstring const & ControllerName, // name of each controller on this system
-			FArray1_Fstring const & ControllerType, // type of each controller on this system
+			FArray1_string const & ControllerName, // name of each controller on this system
+			FArray1_string const & ControllerType, // type of each controller on this system
 			FArray1_int const & ControllerIndex,
 			FArray1_bool const & CanBeLockedOutByEcono, // true if controller inactive
 			int const NumBranches, // number of branches making up this system
@@ -445,7 +428,7 @@ namespace DataAirSystems {
 			int const NumOAHeatCoils, // number of heating coils in the outside air system
 			bool const SizeAirloopCoil // simulates air loop coils before calling controllers
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			DesignVolFlowRate( DesignVolFlowRate ),
 			NumControllers( NumControllers ),
 			ControllerName( ControllerName ),

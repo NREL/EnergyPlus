@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace ManageElectricPower {
 
 	// Using/Aliasing
-	using DataGlobals::MaxNameLength;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -74,12 +72,12 @@ namespace ManageElectricPower {
 	struct GenData
 	{
 		// Members
-		Fstring Name; // user identifier
-		Fstring TypeOf; // equipment type
+		std::string Name; // user identifier
+		std::string TypeOf; // equipment type
 		int CompType_Num; // Numeric designator for CompType (TypeOf)
 		int GeneratorIndex;
 		Real64 MaxPowerOut; // Maximum Power Output (W)
-		Fstring AvailSched; // Operation Schedule.
+		std::string AvailSched; // Operation Schedule.
 		int AvailSchedPtr; // pointer to operation schedule
 		Real64 PowerRequestThisTimestep; // Current Demand on Equipment (W)
 		bool ONThisTimestep; // Indicator whether Generator on
@@ -101,12 +99,9 @@ namespace ManageElectricPower {
 
 		// Default Constructor
 		GenData() :
-			Name( MaxNameLength ),
-			TypeOf( MaxNameLength ),
 			CompType_Num( 0 ),
 			GeneratorIndex( 0 ),
 			MaxPowerOut( 0.0 ),
-			AvailSched( MaxNameLength ),
 			AvailSchedPtr( 0 ),
 			PowerRequestThisTimestep( 0.0 ),
 			ONThisTimestep( false ),
@@ -128,12 +123,12 @@ namespace ManageElectricPower {
 
 		// Member Constructor
 		GenData(
-			Fstring const & Name, // user identifier
-			Fstring const & TypeOf, // equipment type
+			std::string const & Name, // user identifier
+			std::string const & TypeOf, // equipment type
 			int const CompType_Num, // Numeric designator for CompType (TypeOf)
 			int const GeneratorIndex,
 			Real64 const MaxPowerOut, // Maximum Power Output (W)
-			Fstring const & AvailSched, // Operation Schedule.
+			std::string const & AvailSched, // Operation Schedule.
 			int const AvailSchedPtr, // pointer to operation schedule
 			Real64 const PowerRequestThisTimestep, // Current Demand on Equipment (W)
 			bool const ONThisTimestep, // Indicator whether Generator on
@@ -152,12 +147,12 @@ namespace ManageElectricPower {
 			Real64 const ThermalProd, // Current Thermal energy Produced from Equipment (J)
 			Real64 const ThermalProdRate // Current Thermal energy Production Rate from Equipment (W)
 		) :
-			Name( MaxNameLength, Name ),
-			TypeOf( MaxNameLength, TypeOf ),
+			Name( Name ),
+			TypeOf( TypeOf ),
 			CompType_Num( CompType_Num ),
 			GeneratorIndex( GeneratorIndex ),
 			MaxPowerOut( MaxPowerOut ),
-			AvailSched( MaxNameLength, AvailSched ),
+			AvailSched( AvailSched ),
 			AvailSchedPtr( AvailSchedPtr ),
 			PowerRequestThisTimestep( PowerRequestThisTimestep ),
 			ONThisTimestep( ONThisTimestep ),
@@ -182,28 +177,28 @@ namespace ManageElectricPower {
 	struct ElectricPowerLoadCenter
 	{
 		// Members
-		Fstring Name; // user identifier
-		Fstring GeneratorList; // List name of available generators
+		std::string Name; // user identifier
+		std::string GeneratorList; // List name of available generators
 		int OperationScheme; // Name of Operation Scheme
-		Fstring DemandMeterName; // Name of Demand Energy Meter for "on demand" operation
+		std::string DemandMeterName; // Name of Demand Energy Meter for "on demand" operation
 		int DemandMeterPtr; // "pointer" to Meter for electrical Demand to meet
-		Fstring GenerationMeterName; // Name of Generated Energy Meter for "on demand" operation
+		std::string GenerationMeterName; // Name of Generated Energy Meter for "on demand" operation
 		int NumGenerators; // Number of Generators
 		FArray1D< GenData > ElecGen; // pointer to generator
 		Real64 DemandLimit; // Demand Limit in Watts(W) which the generator will operate above
 		int TrackSchedPtr; // "pointer" to schedule for electrical demand to meet.
 		int BussType; // is this load center powered by AC or DC generators
 		bool InverterPresent;
-		Fstring InverterName; // hold name for verificaton and error messages
+		std::string InverterName; // hold name for verificaton and error messages
 		int InverterModelNum; // simulation model parameter type
 		Real64 DCElectricityProd; // Current DC Elect produced (J) (if buss type DCbussInverter)
 		Real64 DCElectProdRate; // Current DC Elect power produced (W) (if buss type DCbussInverter)
 		Real64 DCpowerConditionLosses; // current DC to AC inverter losses (W) (if DCbussInverter)
 		bool StoragePresent;
-		Fstring StorageName; // hold name for verificaton and error messages
+		std::string StorageName; // hold name for verificaton and error messages
 		int StorageModelNum; // simulation model parameter type
 		bool TransformerPresent;
-		Fstring TransformerName; // hold name for verificaton and error messages
+		std::string TransformerName; // hold name for verificaton and error messages
 		int TransformerModelNum; // simulation model parameter type
 		Real64 ElectricityProd; // Current AC Electric Produced from Equipment (J)
 		Real64 ElectProdRate; // Current Electric Production Rate from Equipment (W)
@@ -215,27 +210,20 @@ namespace ManageElectricPower {
 
 		// Default Constructor
 		ElectricPowerLoadCenter() :
-			Name( MaxNameLength ),
-			GeneratorList( MaxNameLength ),
 			OperationScheme( 0 ),
-			DemandMeterName( MaxNameLength ),
 			DemandMeterPtr( 0 ),
-			GenerationMeterName( MaxNameLength ),
 			NumGenerators( 0 ),
 			DemandLimit( 0.0 ),
 			TrackSchedPtr( 0 ),
 			BussType( 0 ),
 			InverterPresent( false ),
-			InverterName( MaxNameLength ),
 			InverterModelNum( 0 ),
 			DCElectricityProd( 0.0 ),
 			DCElectProdRate( 0.0 ),
 			DCpowerConditionLosses( 0.0 ),
 			StoragePresent( false ),
-			StorageName( MaxNameLength ),
 			StorageModelNum( 0 ),
 			TransformerPresent( false ),
-			TransformerName( MaxNameLength ),
 			TransformerModelNum( 0 ),
 			ElectricityProd( 0.0 ),
 			ElectProdRate( 0.0 ),
@@ -248,28 +236,28 @@ namespace ManageElectricPower {
 
 		// Member Constructor
 		ElectricPowerLoadCenter(
-			Fstring const & Name, // user identifier
-			Fstring const & GeneratorList, // List name of available generators
+			std::string const & Name, // user identifier
+			std::string const & GeneratorList, // List name of available generators
 			int const OperationScheme, // Name of Operation Scheme
-			Fstring const & DemandMeterName, // Name of Demand Energy Meter for "on demand" operation
+			std::string const & DemandMeterName, // Name of Demand Energy Meter for "on demand" operation
 			int const DemandMeterPtr, // "pointer" to Meter for electrical Demand to meet
-			Fstring const & GenerationMeterName, // Name of Generated Energy Meter for "on demand" operation
+			std::string const & GenerationMeterName, // Name of Generated Energy Meter for "on demand" operation
 			int const NumGenerators, // Number of Generators
 			FArray1< GenData > const & ElecGen, // pointer to generator
 			Real64 const DemandLimit, // Demand Limit in Watts(W) which the generator will operate above
 			int const TrackSchedPtr, // "pointer" to schedule for electrical demand to meet.
 			int const BussType, // is this load center powered by AC or DC generators
 			bool const InverterPresent,
-			Fstring const & InverterName, // hold name for verificaton and error messages
+			std::string const & InverterName, // hold name for verificaton and error messages
 			int const InverterModelNum, // simulation model parameter type
 			Real64 const DCElectricityProd, // Current DC Elect produced (J) (if buss type DCbussInverter)
 			Real64 const DCElectProdRate, // Current DC Elect power produced (W) (if buss type DCbussInverter)
 			Real64 const DCpowerConditionLosses, // current DC to AC inverter losses (W) (if DCbussInverter)
 			bool const StoragePresent,
-			Fstring const & StorageName, // hold name for verificaton and error messages
+			std::string const & StorageName, // hold name for verificaton and error messages
 			int const StorageModelNum, // simulation model parameter type
 			bool const TransformerPresent,
-			Fstring const & TransformerName, // hold name for verificaton and error messages
+			std::string const & TransformerName, // hold name for verificaton and error messages
 			int const TransformerModelNum, // simulation model parameter type
 			Real64 const ElectricityProd, // Current AC Electric Produced from Equipment (J)
 			Real64 const ElectProdRate, // Current Electric Production Rate from Equipment (W)
@@ -279,28 +267,28 @@ namespace ManageElectricPower {
 			Real64 const TotalThermalPowerRequest, // Total thermal power request from the load center (W)
 			Real64 const ElectDemand // Current electric power demand on the load center (W)
 		) :
-			Name( MaxNameLength, Name ),
-			GeneratorList( MaxNameLength, GeneratorList ),
+			Name( Name ),
+			GeneratorList( GeneratorList ),
 			OperationScheme( OperationScheme ),
-			DemandMeterName( MaxNameLength, DemandMeterName ),
+			DemandMeterName( DemandMeterName ),
 			DemandMeterPtr( DemandMeterPtr ),
-			GenerationMeterName( MaxNameLength, GenerationMeterName ),
+			GenerationMeterName( GenerationMeterName ),
 			NumGenerators( NumGenerators ),
 			ElecGen( ElecGen ),
 			DemandLimit( DemandLimit ),
 			TrackSchedPtr( TrackSchedPtr ),
 			BussType( BussType ),
 			InverterPresent( InverterPresent ),
-			InverterName( MaxNameLength, InverterName ),
+			InverterName( InverterName ),
 			InverterModelNum( InverterModelNum ),
 			DCElectricityProd( DCElectricityProd ),
 			DCElectProdRate( DCElectProdRate ),
 			DCpowerConditionLosses( DCpowerConditionLosses ),
 			StoragePresent( StoragePresent ),
-			StorageName( MaxNameLength, StorageName ),
+			StorageName( StorageName ),
 			StorageModelNum( StorageModelNum ),
 			TransformerPresent( TransformerPresent ),
-			TransformerName( MaxNameLength, TransformerName ),
+			TransformerName( TransformerName ),
 			TransformerModelNum( TransformerModelNum ),
 			ElectricityProd( ElectricityProd ),
 			ElectProdRate( ElectProdRate ),
@@ -343,7 +331,7 @@ namespace ManageElectricPower {
 	struct DCtoACInverterStruct
 	{
 		// Members
-		Fstring Name; // user identifier
+		std::string Name; // user identifier
 		int ModelType; // type of inverter model used
 		int AvailSchedPtr; // number for availability schedule.
 		int HeatLossesDestination;
@@ -372,7 +360,6 @@ namespace ManageElectricPower {
 
 		// Default Constructor
 		DCtoACInverterStruct() :
-			Name( MaxNameLength ),
 			ModelType( 0 ),
 			AvailSchedPtr( 0 ),
 			HeatLossesDestination( 0 ),
@@ -400,7 +387,7 @@ namespace ManageElectricPower {
 
 		// Member Constructor
 		DCtoACInverterStruct(
-			Fstring const & Name, // user identifier
+			std::string const & Name, // user identifier
 			int const ModelType, // type of inverter model used
 			int const AvailSchedPtr, // number for availability schedule.
 			int const HeatLossesDestination,
@@ -426,7 +413,7 @@ namespace ManageElectricPower {
 			Real64 const AncillACuseRate,
 			Real64 const AncillACuseEnergy
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ModelType( ModelType ),
 			AvailSchedPtr( AvailSchedPtr ),
 			HeatLossesDestination( HeatLossesDestination ),
@@ -459,7 +446,7 @@ namespace ManageElectricPower {
 	{
 		// Members
 		//user defined variables
-		Fstring Name; // name of this electrical storage module
+		std::string Name; // name of this electrical storage module
 		int StorageModelMode; // type of model parameter, SimpleBucketStorage
 		int AvailSchedPtr; // availability schedule index.
 		int HeatLossesDestination; // mode for where thermal losses go
@@ -531,7 +518,6 @@ namespace ManageElectricPower {
 
 		// Default Constructor
 		ElecStorageDataStruct() :
-			Name( MaxNameLength ),
 			StorageModelMode( 0 ),
 			AvailSchedPtr( 0 ),
 			HeatLossesDestination( 0 ),
@@ -597,7 +583,7 @@ namespace ManageElectricPower {
 
 		// Member Constructor
 		ElecStorageDataStruct(
-			Fstring const & Name, // name of this electrical storage module
+			std::string const & Name, // name of this electrical storage module
 			int const StorageModelMode, // type of model parameter, SimpleBucketStorage
 			int const AvailSchedPtr, // availability schedule index.
 			int const HeatLossesDestination, // mode for where thermal losses go
@@ -664,7 +650,7 @@ namespace ManageElectricPower {
 			Real64 const BatteryVoltage, // [V] total voltage
 			Real64 const BatteryDamage // [ ] fractional battery damage
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			StorageModelMode( StorageModelMode ),
 			AvailSchedPtr( AvailSchedPtr ),
 			HeatLossesDestination( HeatLossesDestination ),
@@ -738,7 +724,7 @@ namespace ManageElectricPower {
 	{
 		// Members
 		// user defined variables
-		Fstring Name; // user identifier
+		std::string Name; // user identifier
 		int AvailSchedPtr; // availability schedule index.
 		int UsageMode; // mode for transformer usage
 		int HeatLossesDestination; // mode for where thermal losses go
@@ -755,7 +741,7 @@ namespace ManageElectricPower {
 		Real64 RatedTemp; // reference temperature for nameplate efficiency [C]
 		Real64 MaxPUL; // per unit load for maximum efficiency []
 		bool ConsiderLosses; // if true, consider transformer lossses in metering
-		FArray1D_Fstring WiredMeterNames; // names of the meters wired to transformer
+		FArray1D_string WiredMeterNames; // names of the meters wired to transformer
 		FArray1D_int WiredMeterPtrs; // array of "pointers" to meters wired to transformer
 		FArray1D_bool SpecialMeter; // indicates whether a meter needs special consideration
 		// Electricity:Facility and Electricity:HVAC are two special
@@ -787,7 +773,6 @@ namespace ManageElectricPower {
 
 		// Default Constructor
 		ElectricTransformer() :
-			Name( MaxNameLength ),
 			AvailSchedPtr( 0 ),
 			UsageMode( 0 ),
 			HeatLossesDestination( 0 ),
@@ -804,7 +789,6 @@ namespace ManageElectricPower {
 			RatedTemp( 0.0 ),
 			MaxPUL( 0.0 ),
 			ConsiderLosses( true ),
-			WiredMeterNames( sFstring( MaxNameLength ) ),
 			RatedNL( 0.0 ),
 			RatedLL( 0.0 ),
 			LoadCenterNum( 0 ),
@@ -828,7 +812,7 @@ namespace ManageElectricPower {
 
 		// Member Constructor
 		ElectricTransformer(
-			Fstring const & Name, // user identifier
+			std::string const & Name, // user identifier
 			int const AvailSchedPtr, // availability schedule index.
 			int const UsageMode, // mode for transformer usage
 			int const HeatLossesDestination, // mode for where thermal losses go
@@ -845,7 +829,7 @@ namespace ManageElectricPower {
 			Real64 const RatedTemp, // reference temperature for nameplate efficiency [C]
 			Real64 const MaxPUL, // per unit load for maximum efficiency []
 			bool const ConsiderLosses, // if true, consider transformer lossses in metering
-			FArray1_Fstring const & WiredMeterNames, // names of the meters wired to transformer
+			FArray1_string const & WiredMeterNames, // names of the meters wired to transformer
 			FArray1_int const & WiredMeterPtrs, // array of "pointers" to meters wired to transformer
 			FArray1_bool const & SpecialMeter, // indicates whether a meter needs special consideration
 			Real64 const RatedNL, // rated no load losses, user input or calculated [W]
@@ -869,7 +853,7 @@ namespace ManageElectricPower {
 			Real64 const QdotConvZone, // [W]
 			Real64 const QdotRadZone // [W]
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			AvailSchedPtr( AvailSchedPtr ),
 			UsageMode( UsageMode ),
 			HeatLossesDestination( HeatLossesDestination ),
@@ -916,7 +900,7 @@ namespace ManageElectricPower {
 	struct WholeBuildingElectricPowerSummary
 	{
 		// Members
-		Fstring Name;
+		std::string Name;
 		Real64 ElectricityProd; // Current Electric Produced from Equipment (J)
 		Real64 ElectProdRate; // Current Electric Production Rate from Equipment (W)
 		Real64 ElectricityPurch; // Current Purchased Electric (J)
@@ -933,7 +917,7 @@ namespace ManageElectricPower {
 
 		// Default Constructor
 		WholeBuildingElectricPowerSummary() :
-			Name( MaxNameLength, "Whole Building" ),
+			Name( "Whole Building" ),
 			ElectricityProd( 0.0 ),
 			ElectProdRate( 0.0 ),
 			ElectricityPurch( 0.0 ),
@@ -951,7 +935,7 @@ namespace ManageElectricPower {
 
 		// Member Constructor
 		WholeBuildingElectricPowerSummary(
-			Fstring const & Name,
+			std::string const & Name,
 			Real64 const ElectricityProd, // Current Electric Produced from Equipment (J)
 			Real64 const ElectProdRate, // Current Electric Production Rate from Equipment (W)
 			Real64 const ElectricityPurch, // Current Purchased Electric (J)
@@ -966,7 +950,7 @@ namespace ManageElectricPower {
 			Real64 const ElecProducedPVRate, // Current Rate of PV Produced from the Arrays (W)
 			Real64 const ElecProducedWTRate // Current Rate of Wind Turbine Produced (W)
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ElectricityProd( ElectricityProd ),
 			ElectProdRate( ElectProdRate ),
 			ElectricityPurch( ElectricityPurch ),

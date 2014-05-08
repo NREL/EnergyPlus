@@ -10,7 +10,6 @@
 #include <ObjexxFCL/FArray2A.hh>
 #include <ObjexxFCL/FArray2S.hh>
 #include <ObjexxFCL/FArray3D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -107,7 +106,7 @@ namespace WindowEquivalentLayer {
 	Real64
 	P01(
 		Real64 const P, // property
-		Fstring const & WHAT // identifier for err msg
+		std::string const & WHAT // identifier for err msg
 	);
 
 	Real64

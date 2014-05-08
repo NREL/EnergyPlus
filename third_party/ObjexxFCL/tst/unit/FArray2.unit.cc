@@ -1163,14 +1163,14 @@ TEST( FArray2Test, AssignOtherData )
 		}
 	}
 
-	A1 = 2.718; // May cause warnings about implicit conversion
+	A1 = 2.718; // May cause warnings about conversion
 	for ( int i2 = A1.l2(); i2 <= A1.u2(); ++i2 ) {
 		for ( int i1 = A1.l1(); i1 <= A1.u1(); ++i1 ) {
 			EXPECT_EQ( 2, A1( i1, i2 ) );
 		}
 	}
 
-	A1 = { 1.1, 2.1, 1.2, 2.2, 1.3, 2.3 };
+	A1 = { 1.1, 2.1, 1.2, 2.2, 1.3, 2.3 }; // May cause warnings about conversion
 	for ( int i2 = A1.l2(); i2 <= A1.u2(); ++i2 ) {
 		for ( int i1 = A1.l1(); i1 <= A1.u1(); ++i1 ) {
 			EXPECT_EQ( i1, A1( i1, i2 ) );

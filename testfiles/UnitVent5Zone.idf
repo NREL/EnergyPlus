@@ -2307,6 +2307,7 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     Zone1UnitVentFan,        !- Supply Air Fan Name
     HeatingAndCooling,       !- Coil Option
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
     Coil:Heating:Water,      !- Heating Coil Object Type
     Zone1UnitVentHeatingCoil,!- Heating Coil Name
     0.001,                   !- Heating Convergence Tolerance
@@ -2335,6 +2336,7 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     Zone2UnitVentFan,        !- Supply Air Fan Name
     HEATING,                 !- Coil Option
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
     Coil:Heating:Water,      !- Heating Coil Object Type
     Zone2UnitVentHeatingCoil,!- Heating Coil Name
     0.001;                   !- Heating Convergence Tolerance
@@ -2360,6 +2362,7 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     Zone3UnitVentFan,        !- Supply Air Fan Name
     HEATING,                 !- Coil Option
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
     Coil:Heating:Water,      !- Heating Coil Object Type
     Zone3UnitVentHeatingCoil,!- Heating Coil Name
     0.001;                   !- Heating Convergence Tolerance
@@ -2385,6 +2388,7 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     Zone4UnitVentFan,        !- Supply Air Fan Name
     HeatingAndCooling,       !- Coil Option
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
     Zone4UnitVentHeatingCoil,!- Heating Coil Name
     0.001,                   !- Heating Convergence Tolerance
@@ -2413,6 +2417,7 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     Zone5UnitVentFan,        !- Supply Air Fan Name
     Heating,                 !- Coil Option
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
     Coil:Heating:Gas,        !- Heating Coil Object Type
     Zone5UnitVentHeatingCoil,!- Heating Coil Name
     0.001;                   !- Heating Convergence Tolerance

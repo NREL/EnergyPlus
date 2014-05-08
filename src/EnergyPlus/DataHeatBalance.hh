@@ -6,7 +6,6 @@
 #include <ObjexxFCL/FArray2D.hh>
 #include <ObjexxFCL/FArray3D.hh>
 #include <ObjexxFCL/FArray4D.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 #include <ObjexxFCL/Reference.hh>
 
@@ -31,7 +30,6 @@ namespace DataHeatBalance {
 	using DataComplexFenestration::WindowComplexShade;
 	using DataComplexFenestration::WindowThermalModelParams;
 	using DataGlobals::AutoCalculate;
-	using DataGlobals::MaxNameLength;
 	using DataSurfaces::MaxSlatAngs;
 	using DataVectorTypes::Vector;
 	using DataWindowEquivalentLayer::CFSMAXNL;
@@ -72,7 +70,7 @@ namespace DataHeatBalance {
 	extern int const ScreenEquivalentLayer;
 	extern int const GapEquivalentLayer;
 
-	extern FArray1D_Fstring const cMaterialGroupType;
+	extern FArray1D_string const cMaterialGroupType;
 
 	// Parameters to indicate surface roughness for use with the Material
 	// derived type (see below):
@@ -179,9 +177,9 @@ namespace DataHeatBalance {
 	extern int const AirBalanceQuadrature;
 
 	extern int const NumZoneIntGainDeviceTypes;
-	extern FArray1D_Fstring const ZoneIntGainDeviceTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45
+	extern FArray1D_string const ZoneIntGainDeviceTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45
 
-	extern FArray1D_Fstring const ccZoneIntGainDeviceTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45
+	extern FArray1D_string const ccZoneIntGainDeviceTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45
 
 	extern int const IntGainTypeOf_People;
 	extern int const IntGainTypeOf_Lights;
@@ -273,7 +271,7 @@ namespace DataHeatBalance {
 	extern Real64 HighHConvLimit; // upper limit for HConv, mostly used for user input limits in practics. !W/m2-K
 	extern Real64 MaxAllowedDelTempCondFD; // Convergence criteria for inside surface temperatures for CondFD
 
-	extern Fstring BuildingName; // Name of building
+	extern std::string BuildingName; // Name of building
 	extern Real64 BuildingAzimuth; // North Axis of Building
 	extern Real64 LoadsConvergTol; // Tolerance value for Loads Convergence
 	extern Real64 TempConvergTol; // Tolerance value for Temperature Convergence
@@ -550,7 +548,7 @@ namespace DataHeatBalance {
 	struct MaterialProperties
 	{
 		// Members
-		Fstring Name; // Name of material layer
+		std::string Name; // Name of material layer
 		int Group; // Material group type (see Material Parameters above.  Currently
 		// active: RegularMaterial, Shade, Air, WindowGlass,
 		// WindowGas, WindowBlind, WindowGasMixture, Screen, EcoRoof,
@@ -611,7 +609,7 @@ namespace DataHeatBalance {
 		Real64 ReflectVisBeamFront; // Visible front reflectance (beam to everything)
 		Real64 ReflectVisDiffBack; // Visible back diffuse reflectance
 		Real64 ReflectVisDiffFront; // Visible front diffuse reflectance
-		Fstring ReflectanceModeling; // method used to account for screen scattering
+		std::string ReflectanceModeling; // method used to account for screen scattering
 		Real64 TransSolBeam; // Solar transmittance (beam to everything)
 		Real64 TransThermal; // Infrared radiation transmittance
 		Real64 TransVisBeam; // Visible transmittance (beam to everything)
@@ -729,11 +727,10 @@ namespace DataHeatBalance {
 		Real64 SlatAngle; // slat angle
 		int SlatAngleType; // slat angle control type, 0=fixed, 1=maximize solar, 2=block beam
 		int SlatOrientation; // horizontal or veritical
-		Fstring GasName; // Name of gas type ("Air", "Argon", "Krypton", "Xenon")
+		std::string GasName; // Name of gas type ("Air", "Argon", "Krypton", "Xenon")
 
 		// Default Constructor
 		MaterialProperties() :
-			Name( MaxNameLength ),
 			Group( -1 ),
 			Roughness( 0 ),
 			Conductivity( 0.0 ),
@@ -783,7 +780,6 @@ namespace DataHeatBalance {
 			ReflectVisBeamFront( 0.0 ),
 			ReflectVisDiffBack( 0.0 ),
 			ReflectVisDiffFront( 0.0 ),
-			ReflectanceModeling( MaxNameLength ),
 			TransSolBeam( 0.0 ),
 			TransThermal( 0.0 ),
 			TransVisBeam( 0.0 ),
@@ -887,13 +883,12 @@ namespace DataHeatBalance {
 			SlatCrown( 0.0 ),
 			SlatAngle( 0.0 ),
 			SlatAngleType( 0 ),
-			SlatOrientation( 0 ),
-			GasName( MaxNameLength )
+			SlatOrientation( 0 )
 		{}
 
 		// Member Constructor
 		MaterialProperties(
-			Fstring const & Name, // Name of material layer
+			std::string const & Name, // Name of material layer
 			int const Group, // Material group type (see Material Parameters above.  Currently
 			int const Roughness, // Surface roughness index (See Surface Roughness parameters
 			Real64 const Conductivity, // Thermal conductivity of layer (W/m2K)
@@ -943,7 +938,7 @@ namespace DataHeatBalance {
 			Real64 const ReflectVisBeamFront, // Visible front reflectance (beam to everything)
 			Real64 const ReflectVisDiffBack, // Visible back diffuse reflectance
 			Real64 const ReflectVisDiffFront, // Visible front diffuse reflectance
-			Fstring const & ReflectanceModeling, // method used to account for screen scattering
+			std::string const & ReflectanceModeling, // method used to account for screen scattering
 			Real64 const TransSolBeam, // Solar transmittance (beam to everything)
 			Real64 const TransThermal, // Infrared radiation transmittance
 			Real64 const TransVisBeam, // Visible transmittance (beam to everything)
@@ -1048,9 +1043,9 @@ namespace DataHeatBalance {
 			Real64 const SlatAngle, // slat angle
 			int const SlatAngleType, // slat angle control type, 0=fixed, 1=maximize solar, 2=block beam
 			int const SlatOrientation, // horizontal or veritical
-			Fstring const & GasName // Name of gas type ("Air", "Argon", "Krypton", "Xenon")
+			std::string const & GasName // Name of gas type ("Air", "Argon", "Krypton", "Xenon")
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			Group( Group ),
 			Roughness( Roughness ),
 			Conductivity( Conductivity ),
@@ -1100,7 +1095,7 @@ namespace DataHeatBalance {
 			ReflectVisBeamFront( ReflectVisBeamFront ),
 			ReflectVisDiffBack( ReflectVisDiffBack ),
 			ReflectVisDiffFront( ReflectVisDiffFront ),
-			ReflectanceModeling( MaxNameLength, ReflectanceModeling ),
+			ReflectanceModeling( ReflectanceModeling ),
 			TransSolBeam( TransSolBeam ),
 			TransThermal( TransThermal ),
 			TransVisBeam( TransVisBeam ),
@@ -1205,7 +1200,7 @@ namespace DataHeatBalance {
 			SlatAngle( SlatAngle ),
 			SlatAngleType( SlatAngleType ),
 			SlatOrientation( SlatOrientation ),
-			GasName( MaxNameLength, GasName )
+			GasName( GasName )
 		{}
 
 	};
@@ -1213,28 +1208,26 @@ namespace DataHeatBalance {
 	struct TCGlazingsType
 	{
 		// Members
-		Fstring Name; // Name
+		std::string Name; // Name
 		int NumGlzMat; // Number of TC glazing materials
 		FArray1D_int LayerPoint; // Layer pointer
 		FArray1D< Real64 > SpecTemp; // Temperature corresponding to the specified TC glaing optical data
-		FArray1D_Fstring LayerName; // Name of the referenced WindowMaterial:Glazing object
+		FArray1D_string LayerName; // Name of the referenced WindowMaterial:Glazing object
 
 		// Default Constructor
 		TCGlazingsType() :
-			Name( MaxNameLength ),
-			NumGlzMat( 0 ),
-			LayerName( sFstring( MaxNameLength ) )
+			NumGlzMat( 0 )
 		{}
 
 		// Member Constructor
 		TCGlazingsType(
-			Fstring const & Name, // Name
+			std::string const & Name, // Name
 			int const NumGlzMat, // Number of TC glazing materials
 			FArray1_int const & LayerPoint, // Layer pointer
 			FArray1< Real64 > const & SpecTemp, // Temperature corresponding to the specified TC glaing optical data
-			FArray1_Fstring const & LayerName // Name of the referenced WindowMaterial:Glazing object
+			FArray1_string const & LayerName // Name of the referenced WindowMaterial:Glazing object
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NumGlzMat( NumGlzMat ),
 			LayerPoint( LayerPoint ),
 			SpecTemp( SpecTemp ),
@@ -1246,7 +1239,7 @@ namespace DataHeatBalance {
 	struct ConstructionData
 	{
 		// Members
-		Fstring Name; // Name of construction
+		std::string Name; // Name of construction
 		int TotLayers; // Total number of layers for the construction; for windows
 		//  this is the total of the glass, gas and shade layers
 		int TotSolidLayers; // Total number of solid (glass or shade) layers (windows only)
@@ -1412,7 +1405,6 @@ namespace DataHeatBalance {
 
 		// Default Constructor
 		ConstructionData() :
-			Name( MaxNameLength ),
 			TotLayers( 0 ),
 			TotSolidLayers( 0 ),
 			TotGlassLayers( 0 ),
@@ -1535,7 +1527,7 @@ namespace DataHeatBalance {
 
 		// Member Constructor
 		ConstructionData(
-			Fstring const & Name, // Name of construction
+			std::string const & Name, // Name of construction
 			int const TotLayers, // Total number of layers for the construction; for windows
 			int const TotSolidLayers, // Total number of solid (glass or shade) layers (windows only)
 			int const TotGlassLayers, // Total number of glass layers (windows only)
@@ -1657,7 +1649,7 @@ namespace DataHeatBalance {
 			Real64 const TransDiffFrontEQL, // Diffuse system front transmittance for EQL window
 			Real64 const TransDiffBackEQL // Diffuse system back transmittance for EQL window
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			TotLayers( TotLayers ),
 			TotSolidLayers( TotSolidLayers ),
 			TotGlassLayers( TotGlassLayers ),
@@ -1785,7 +1777,7 @@ namespace DataHeatBalance {
 	struct SpectralDataProperties
 	{
 		// Members
-		Fstring Name; // Name of spectral data set
+		std::string Name; // Name of spectral data set
 		int NumOfWavelengths; // Number of wavelengths in the data set
 		FArray1D< Real64 > WaveLength; // Wavelength (microns)
 		FArray1D< Real64 > Trans; // Transmittance at normal incidence
@@ -1794,20 +1786,19 @@ namespace DataHeatBalance {
 
 		// Default Constructor
 		SpectralDataProperties() :
-			Name( MaxNameLength ),
 			NumOfWavelengths( 0 )
 		{}
 
 		// Member Constructor
 		SpectralDataProperties(
-			Fstring const & Name, // Name of spectral data set
+			std::string const & Name, // Name of spectral data set
 			int const NumOfWavelengths, // Number of wavelengths in the data set
 			FArray1< Real64 > const & WaveLength, // Wavelength (microns)
 			FArray1< Real64 > const & Trans, // Transmittance at normal incidence
 			FArray1< Real64 > const & ReflFront, // Front reflectance at normal incidence
 			FArray1< Real64 > const & ReflBack // Back reflectance at normal incidence
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NumOfWavelengths( NumOfWavelengths ),
 			WaveLength( WaveLength ),
 			Trans( Trans ),
@@ -1820,7 +1811,7 @@ namespace DataHeatBalance {
 	struct ZoneData
 	{
 		// Members
-		Fstring Name;
+		std::string Name;
 		int Multiplier; // Used in reporting and for systems calculations
 		int ListMultiplier; // For Zone Group object:  used in reporting and systems calculations
 		int ListGroup; // used only in Zone Group verification.  and for error message.
@@ -1893,7 +1884,6 @@ namespace DataHeatBalance {
 
 		// Default Constructor
 		ZoneData() :
-			Name( MaxNameLength ),
 			Multiplier( 1 ),
 			ListMultiplier( 1 ),
 			ListGroup( 0 ),
@@ -1960,7 +1950,7 @@ namespace DataHeatBalance {
 
 		// Member Constructor
 		ZoneData(
-			Fstring const & Name,
+			std::string const & Name,
 			int const Multiplier, // Used in reporting and for systems calculations
 			int const ListMultiplier, // For Zone Group object:  used in reporting and systems calculations
 			int const ListGroup, // used only in Zone Group verification.  and for error message.
@@ -2024,7 +2014,7 @@ namespace DataHeatBalance {
 			int const ZoneMinCO2SchedIndex, // Index for the schedule the schedule which determines minimum CO2 concentration
 			int const ZoneContamControllerSchedIndex // Index for this schedule
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			Multiplier( Multiplier ),
 			ListMultiplier( ListMultiplier ),
 			ListGroup( ListGroup ),
@@ -2094,26 +2084,25 @@ namespace DataHeatBalance {
 	struct ZoneListData
 	{
 		// Members
-		Fstring Name; // Zone List name
+		std::string Name; // Zone List name
 		int NumOfZones; // Number of zones in the list
-		int MaxZoneNameLength; // Max Name length of zones in the list
+		std::string::size_type MaxZoneNameLength; // Max Name length of zones in the list
 		FArray1D_int Zone; // Pointers to zones in the list
 
 		// Default Constructor
 		ZoneListData() :
-			Name( MaxNameLength ),
 			NumOfZones( 0 ),
-			MaxZoneNameLength( 0 )
+			MaxZoneNameLength( 0u )
 		{}
 
 		// Member Constructor
 		ZoneListData(
-			Fstring const & Name, // Zone List name
+			std::string const & Name, // Zone List name
 			int const NumOfZones, // Number of zones in the list
-			int const MaxZoneNameLength, // Max Name length of zones in the list
+			std::string::size_type const MaxZoneNameLength, // Max Name length of zones in the list
 			FArray1_int const & Zone // Pointers to zones in the list
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			NumOfZones( NumOfZones ),
 			MaxZoneNameLength( MaxZoneNameLength ),
 			Zone( Zone )
@@ -2124,24 +2113,23 @@ namespace DataHeatBalance {
 	struct ZoneGroupData
 	{
 		// Members
-		Fstring Name; // Zone Group name
+		std::string Name; // Zone Group name
 		int ZoneList; // Pointer to the zone list
 		int Multiplier; // Zone List multiplier
 
 		// Default Constructor
 		ZoneGroupData() :
-			Name( MaxNameLength ),
 			ZoneList( 0 ),
 			Multiplier( 1 )
 		{}
 
 		// Member Constructor
 		ZoneGroupData(
-			Fstring const & Name, // Zone Group name
+			std::string const & Name, // Zone Group name
 			int const ZoneList, // Pointer to the zone list
 			int const Multiplier // Zone List multiplier
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ZoneList( ZoneList ),
 			Multiplier( Multiplier )
 		{}
@@ -2151,7 +2139,7 @@ namespace DataHeatBalance {
 	struct GlobalInternalGainMiscObject
 	{
 		// Members
-		Fstring Name;
+		std::string Name;
 		int ZoneOrZoneListPtr;
 		int NumOfZones;
 		int StartPtr;
@@ -2159,7 +2147,6 @@ namespace DataHeatBalance {
 
 		// Default Constructor
 		GlobalInternalGainMiscObject() :
-			Name( MaxNameLength ),
 			ZoneOrZoneListPtr( 0 ),
 			NumOfZones( 0 ),
 			StartPtr( 0 ),
@@ -2168,13 +2155,13 @@ namespace DataHeatBalance {
 
 		// Member Constructor
 		GlobalInternalGainMiscObject(
-			Fstring const & Name,
+			std::string const & Name,
 			int const ZoneOrZoneListPtr,
 			int const NumOfZones,
 			int const StartPtr,
 			bool const ZoneListActive
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ZoneOrZoneListPtr( ZoneOrZoneListPtr ),
 			NumOfZones( NumOfZones ),
 			StartPtr( StartPtr ),
@@ -2186,7 +2173,7 @@ namespace DataHeatBalance {
 	struct PeopleData
 	{
 		// Members
-		Fstring Name; // PEOPLE object name
+		std::string Name; // PEOPLE object name
 		int ZonePtr; // Pointer to the zone number for this people statement
 		Real64 NumberOfPeople; // Maximum number of people for this statement
 		int NumberOfPeoplePtr; // Pointer to schedule for number of people
@@ -2215,7 +2202,7 @@ namespace DataHeatBalance {
 		//   to be performed
 		int MRTCalcType; // MRT calculation type (See MRT Calculation type parameters)
 		int SurfacePtr; // Pointer to the name of surface
-		Fstring AngleFactorListName; // Name of angle factor list
+		std::string AngleFactorListName; // Name of angle factor list
 		int AngleFactorListPtr; // Pointer to the name of angle factor list
 		Real64 UserSpecSensFrac; // User specified sensible fraction
 		bool Show55Warning; // show the warning messages about ASHRAE 55-2004
@@ -2246,7 +2233,6 @@ namespace DataHeatBalance {
 
 		// Default Constructor
 		PeopleData() :
-			Name( MaxNameLength ),
 			ZonePtr( 0 ),
 			NumberOfPeople( 0.0 ),
 			NumberOfPeoplePtr( -1 ),
@@ -2269,7 +2255,6 @@ namespace DataHeatBalance {
 			AdaptiveCEN15251( false ),
 			MRTCalcType( 0 ),
 			SurfacePtr( -1 ),
-			AngleFactorListName( MaxNameLength ),
 			AngleFactorListPtr( -1 ),
 			UserSpecSensFrac( 0.0 ),
 			Show55Warning( false ),
@@ -2298,7 +2283,7 @@ namespace DataHeatBalance {
 
 		// Member Constructor
 		PeopleData(
-			Fstring const & Name, // PEOPLE object name
+			std::string const & Name, // PEOPLE object name
 			int const ZonePtr, // Pointer to the zone number for this people statement
 			Real64 const NumberOfPeople, // Maximum number of people for this statement
 			int const NumberOfPeoplePtr, // Pointer to schedule for number of people
@@ -2321,7 +2306,7 @@ namespace DataHeatBalance {
 			bool const AdaptiveCEN15251, // True when CEN Standard 15251 adaptive comfort calculation
 			int const MRTCalcType, // MRT calculation type (See MRT Calculation type parameters)
 			int const SurfacePtr, // Pointer to the name of surface
-			Fstring const & AngleFactorListName, // Name of angle factor list
+			std::string const & AngleFactorListName, // Name of angle factor list
 			int const AngleFactorListPtr, // Pointer to the name of angle factor list
 			Real64 const UserSpecSensFrac, // User specified sensible fraction
 			bool const Show55Warning, // show the warning messages about ASHRAE 55-2004
@@ -2347,7 +2332,7 @@ namespace DataHeatBalance {
 			Real64 const TimeNotMetCEN15251CatII,
 			Real64 const TimeNotMetCEN15251CatIII
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ZonePtr( ZonePtr ),
 			NumberOfPeople( NumberOfPeople ),
 			NumberOfPeoplePtr( NumberOfPeoplePtr ),
@@ -2370,7 +2355,7 @@ namespace DataHeatBalance {
 			AdaptiveCEN15251( AdaptiveCEN15251 ),
 			MRTCalcType( MRTCalcType ),
 			SurfacePtr( SurfacePtr ),
-			AngleFactorListName( MaxNameLength, AngleFactorListName ),
+			AngleFactorListName( AngleFactorListName ),
 			AngleFactorListPtr( AngleFactorListPtr ),
 			UserSpecSensFrac( UserSpecSensFrac ),
 			Show55Warning( Show55Warning ),
@@ -2402,7 +2387,7 @@ namespace DataHeatBalance {
 	struct LightsData
 	{
 		// Members
-		Fstring Name; // LIGHTS object name
+		std::string Name; // LIGHTS object name
 		int ZonePtr; // Which zone lights are in
 		int SchedPtr; // Schedule for lights
 		Real64 DesignLevel; // design level for lights [W]
@@ -2433,13 +2418,12 @@ namespace DataHeatBalance {
 		Real64 ConGainEnergy; // Convective heat gain [J]
 		Real64 RetAirGainEnergy; // Return air heat gain [J]
 		Real64 TotGainEnergy; // Total heat gain [J]
-		Fstring EndUseSubcategory; // user defined name for the end use category
+		std::string EndUseSubcategory; // user defined name for the end use category
 		Real64 SumConsumption; // sum of electric consumption [J] for reporting
 		Real64 SumTimeNotZeroCons; // sum of time of positive electric consumption [hr]
 
 		// Default Constructor
 		LightsData() :
-			Name( MaxNameLength ),
 			ZonePtr( 0 ),
 			SchedPtr( -1 ),
 			DesignLevel( 0.0 ),
@@ -2469,14 +2453,13 @@ namespace DataHeatBalance {
 			ConGainEnergy( 0.0 ),
 			RetAirGainEnergy( 0.0 ),
 			TotGainEnergy( 0.0 ),
-			EndUseSubcategory( MaxNameLength ),
 			SumConsumption( 0.0 ),
 			SumTimeNotZeroCons( 0.0 )
 		{}
 
 		// Member Constructor
 		LightsData(
-			Fstring const & Name, // LIGHTS object name
+			std::string const & Name, // LIGHTS object name
 			int const ZonePtr, // Which zone lights are in
 			int const SchedPtr, // Schedule for lights
 			Real64 const DesignLevel, // design level for lights [W]
@@ -2506,11 +2489,11 @@ namespace DataHeatBalance {
 			Real64 const ConGainEnergy, // Convective heat gain [J]
 			Real64 const RetAirGainEnergy, // Return air heat gain [J]
 			Real64 const TotGainEnergy, // Total heat gain [J]
-			Fstring const & EndUseSubcategory, // user defined name for the end use category
+			std::string const & EndUseSubcategory, // user defined name for the end use category
 			Real64 const SumConsumption, // sum of electric consumption [J] for reporting
 			Real64 const SumTimeNotZeroCons // sum of time of positive electric consumption [hr]
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ZonePtr( ZonePtr ),
 			SchedPtr( SchedPtr ),
 			DesignLevel( DesignLevel ),
@@ -2540,7 +2523,7 @@ namespace DataHeatBalance {
 			ConGainEnergy( ConGainEnergy ),
 			RetAirGainEnergy( RetAirGainEnergy ),
 			TotGainEnergy( TotGainEnergy ),
-			EndUseSubcategory( MaxNameLength, EndUseSubcategory ),
+			EndUseSubcategory( EndUseSubcategory ),
 			SumConsumption( SumConsumption ),
 			SumTimeNotZeroCons( SumTimeNotZeroCons )
 		{}
@@ -2550,7 +2533,7 @@ namespace DataHeatBalance {
 	struct ZoneEquipData // Electric, Gas, Other Equipment, CO2
 	{
 		// Members
-		Fstring Name; // EQUIPMENT object name
+		std::string Name; // EQUIPMENT object name
 		int ZonePtr; // Which zone internal gain is in
 		int SchedPtr; // Schedule for internal gain
 		Real64 DesignLevel; // design level for internal gain [W]
@@ -2580,11 +2563,10 @@ namespace DataHeatBalance {
 		Real64 LatGainEnergy; // Latent heat gain [J]
 		Real64 LostEnergy; // Lost energy (converted to work) [J]
 		Real64 TotGainEnergy; // Total heat gain [J]
-		Fstring EndUseSubcategory; // user defined name for the end use category
+		std::string EndUseSubcategory; // user defined name for the end use category
 
 		// Default Constructor
 		ZoneEquipData() :
-			Name( MaxNameLength ),
 			ZonePtr( 0 ),
 			SchedPtr( 0 ),
 			DesignLevel( 0.0 ),
@@ -2612,13 +2594,12 @@ namespace DataHeatBalance {
 			ConGainEnergy( 0.0 ),
 			LatGainEnergy( 0.0 ),
 			LostEnergy( 0.0 ),
-			TotGainEnergy( 0.0 ),
-			EndUseSubcategory( MaxNameLength )
+			TotGainEnergy( 0.0 )
 		{}
 
 		// Member Constructor
 		ZoneEquipData(
-			Fstring const & Name, // EQUIPMENT object name
+			std::string const & Name, // EQUIPMENT object name
 			int const ZonePtr, // Which zone internal gain is in
 			int const SchedPtr, // Schedule for internal gain
 			Real64 const DesignLevel, // design level for internal gain [W]
@@ -2647,9 +2628,9 @@ namespace DataHeatBalance {
 			Real64 const LatGainEnergy, // Latent heat gain [J]
 			Real64 const LostEnergy, // Lost energy (converted to work) [J]
 			Real64 const TotGainEnergy, // Total heat gain [J]
-			Fstring const & EndUseSubcategory // user defined name for the end use category
+			std::string const & EndUseSubcategory // user defined name for the end use category
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ZonePtr( ZonePtr ),
 			SchedPtr( SchedPtr ),
 			DesignLevel( DesignLevel ),
@@ -2678,7 +2659,7 @@ namespace DataHeatBalance {
 			LatGainEnergy( LatGainEnergy ),
 			LostEnergy( LostEnergy ),
 			TotGainEnergy( TotGainEnergy ),
-			EndUseSubcategory( MaxNameLength, EndUseSubcategory )
+			EndUseSubcategory( EndUseSubcategory )
 		{}
 
 	};
@@ -2686,7 +2667,7 @@ namespace DataHeatBalance {
 	struct BBHeatData
 	{
 		// Members
-		Fstring Name; // BASEBOARD HEAT object name
+		std::string Name; // BASEBOARD HEAT object name
 		int ZonePtr;
 		int SchedPtr;
 		Real64 CapatLowTemperature;
@@ -2708,11 +2689,10 @@ namespace DataHeatBalance {
 		Real64 RadGainEnergy; // Radiant heat gain [J]
 		Real64 ConGainEnergy; // Convective heat gain [J]
 		Real64 TotGainEnergy; // Total heat gain [J]
-		Fstring EndUseSubcategory; // user defined name for the end use category
+		std::string EndUseSubcategory; // user defined name for the end use category
 
 		// Default Constructor
 		BBHeatData() :
-			Name( MaxNameLength ),
 			ZonePtr( 0 ),
 			SchedPtr( 0 ),
 			CapatLowTemperature( 0.0 ),
@@ -2732,13 +2712,12 @@ namespace DataHeatBalance {
 			Consumption( 0.0 ),
 			RadGainEnergy( 0.0 ),
 			ConGainEnergy( 0.0 ),
-			TotGainEnergy( 0.0 ),
-			EndUseSubcategory( MaxNameLength )
+			TotGainEnergy( 0.0 )
 		{}
 
 		// Member Constructor
 		BBHeatData(
-			Fstring const & Name, // BASEBOARD HEAT object name
+			std::string const & Name, // BASEBOARD HEAT object name
 			int const ZonePtr,
 			int const SchedPtr,
 			Real64 const CapatLowTemperature,
@@ -2759,9 +2738,9 @@ namespace DataHeatBalance {
 			Real64 const RadGainEnergy, // Radiant heat gain [J]
 			Real64 const ConGainEnergy, // Convective heat gain [J]
 			Real64 const TotGainEnergy, // Total heat gain [J]
-			Fstring const & EndUseSubcategory // user defined name for the end use category
+			std::string const & EndUseSubcategory // user defined name for the end use category
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ZonePtr( ZonePtr ),
 			SchedPtr( SchedPtr ),
 			CapatLowTemperature( CapatLowTemperature ),
@@ -2782,7 +2761,7 @@ namespace DataHeatBalance {
 			RadGainEnergy( RadGainEnergy ),
 			ConGainEnergy( ConGainEnergy ),
 			TotGainEnergy( TotGainEnergy ),
-			EndUseSubcategory( MaxNameLength, EndUseSubcategory )
+			EndUseSubcategory( EndUseSubcategory )
 		{}
 
 	};
@@ -2790,7 +2769,7 @@ namespace DataHeatBalance {
 	struct InfiltrationData
 	{
 		// Members
-		Fstring Name;
+		std::string Name;
 		int ZonePtr; // Which zone infiltration is in
 		int SchedPtr; // Schedule for infiltration
 		int ModelType; // which model is used for infiltration
@@ -2817,7 +2796,6 @@ namespace DataHeatBalance {
 
 		// Default Constructor
 		InfiltrationData() :
-			Name( MaxNameLength ),
 			ZonePtr( 0 ),
 			SchedPtr( 0 ),
 			ModelType( 0 ),
@@ -2842,7 +2820,7 @@ namespace DataHeatBalance {
 
 		// Member Constructor
 		InfiltrationData(
-			Fstring const & Name,
+			std::string const & Name,
 			int const ZonePtr, // Which zone infiltration is in
 			int const SchedPtr, // Schedule for infiltration
 			int const ModelType, // which model is used for infiltration
@@ -2864,7 +2842,7 @@ namespace DataHeatBalance {
 			bool const QuadratureSum, // If quadrature sum of zone air balance method is used
 			int const OABalancePtr // A pointer to ZoneAirBalance If quadrature is true
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ZonePtr( ZonePtr ),
 			SchedPtr( SchedPtr ),
 			ModelType( ModelType ),
@@ -2892,7 +2870,7 @@ namespace DataHeatBalance {
 	struct VentilationData
 	{
 		// Members
-		Fstring Name;
+		std::string Name;
 		int ZonePtr;
 		int SchedPtr;
 		int ModelType; // which model is used for ventilation: DesignFlowRate and WindandStackOpenArea
@@ -2938,7 +2916,6 @@ namespace DataHeatBalance {
 
 		// Default Constructor
 		VentilationData() :
-			Name( MaxNameLength ),
 			ZonePtr( 0 ),
 			SchedPtr( 0 ),
 			ModelType( 0 ),
@@ -2984,7 +2961,7 @@ namespace DataHeatBalance {
 
 		// Member Constructor
 		VentilationData(
-			Fstring const & Name,
+			std::string const & Name,
 			int const ZonePtr,
 			int const SchedPtr,
 			int const ModelType, // which model is used for ventilation: DesignFlowRate and WindandStackOpenArea
@@ -3027,7 +3004,7 @@ namespace DataHeatBalance {
 			Real64 const DH, // Height difference [m]
 			Real64 const DiscCoef // Discharge coefficient
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ZonePtr( ZonePtr ),
 			SchedPtr( SchedPtr ),
 			ModelType( ModelType ),
@@ -3076,8 +3053,8 @@ namespace DataHeatBalance {
 	struct ZoneAirBalanceData
 	{
 		// Members
-		Fstring Name; // Object name
-		Fstring ZoneName; // Zone name
+		std::string Name; // Object name
+		std::string ZoneName; // Zone name
 		int ZonePtr; // Zone number
 		int BalanceMethod; // Air Balance Method: None=0, Quadrature = 1
 		Real64 InducedAirRate; // Induced Outdoor Air Due to Duct Leakage Unbalance [m3/s]
@@ -3095,8 +3072,6 @@ namespace DataHeatBalance {
 
 		// Default Constructor
 		ZoneAirBalanceData() :
-			Name( MaxNameLength ),
-			ZoneName( MaxNameLength ),
 			ZonePtr( 0 ),
 			BalanceMethod( 0 ),
 			InducedAirRate( 0.0 ),
@@ -3113,8 +3088,8 @@ namespace DataHeatBalance {
 
 		// Member Constructor
 		ZoneAirBalanceData(
-			Fstring const & Name, // Object name
-			Fstring const & ZoneName, // Zone name
+			std::string const & Name, // Object name
+			std::string const & ZoneName, // Zone name
 			int const ZonePtr, // Zone number
 			int const BalanceMethod, // Air Balance Method: None=0, Quadrature = 1
 			Real64 const InducedAirRate, // Induced Outdoor Air Due to Duct Leakage Unbalance [m3/s]
@@ -3130,8 +3105,8 @@ namespace DataHeatBalance {
 			FArray1_int const & ERVInletNode, // Stand alone ERV supply air inlet nodes
 			FArray1_int const & ERVExhaustNode // Stand alone ERV air exhaust nodes
 		) :
-			Name( MaxNameLength, Name ),
-			ZoneName( MaxNameLength, ZoneName ),
+			Name( Name ),
+			ZoneName( ZoneName ),
 			ZonePtr( ZonePtr ),
 			BalanceMethod( BalanceMethod ),
 			InducedAirRate( InducedAirRate ),
@@ -3153,7 +3128,7 @@ namespace DataHeatBalance {
 	struct MixingData
 	{
 		// Members
-		Fstring Name;
+		std::string Name;
 		int ZonePtr;
 		int SchedPtr;
 		Real64 DesignLevel;
@@ -3187,14 +3162,13 @@ namespace DataHeatBalance {
 		FArray1D< Real64 > DoorArea; // Door area for refrigeration door, m2
 		FArray1D< Real64 > Protection; // Refrigeration door protection factor, dimensionless
 		FArray1D_int MateZonePtr; // Zone connected by refrigeration door (MateZone > ZonePtr)
-		FArray1D_Fstring DoorMixingObjectName; // Used in one error statement and eio
-		FArray1D_Fstring DoorProtTypeName; // Used in eio
+		FArray1D_string DoorMixingObjectName; // Used in one error statement and eio
+		FArray1D_string DoorProtTypeName; // Used in eio
 		//Note, for mixing and crossmixing, this type dimensioned by number of mixing objects.
 		//For ref door mixing, dimensioned by number of zones.
 
 		// Default Constructor
 		MixingData() :
-			Name( MaxNameLength ),
 			ZonePtr( 0 ),
 			SchedPtr( 0 ),
 			DesignLevel( 0.0 ),
@@ -3219,14 +3193,12 @@ namespace DataHeatBalance {
 			NumRefDoorConnections( 0 ),
 			EMSSimpleMixingOn( false ),
 			RefDoorMixFlag( false ),
-			EMSimpleMixingFlowRate( 0.0 ),
-			DoorMixingObjectName( sFstring( MaxNameLength ) ),
-			DoorProtTypeName( sFstring( MaxNameLength ) )
+			EMSimpleMixingFlowRate( 0.0 )
 		{}
 
 		// Member Constructor
 		MixingData(
-			Fstring const & Name,
+			std::string const & Name,
 			int const ZonePtr,
 			int const SchedPtr,
 			Real64 const DesignLevel,
@@ -3260,10 +3232,10 @@ namespace DataHeatBalance {
 			FArray1< Real64 > const & DoorArea, // Door area for refrigeration door, m2
 			FArray1< Real64 > const & Protection, // Refrigeration door protection factor, dimensionless
 			FArray1_int const & MateZonePtr, // Zone connected by refrigeration door (MateZone > ZonePtr)
-			FArray1_Fstring const & DoorMixingObjectName, // Used in one error statement and eio
-			FArray1_Fstring const & DoorProtTypeName // Used in eio
+			FArray1_string const & DoorMixingObjectName, // Used in one error statement and eio
+			FArray1_string const & DoorProtTypeName // Used in eio
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			ZonePtr( ZonePtr ),
 			SchedPtr( SchedPtr ),
 			DesignLevel( DesignLevel ),
@@ -3306,8 +3278,8 @@ namespace DataHeatBalance {
 	struct GenericComponentZoneIntGainStruct
 	{
 		// Members
-		Fstring CompObjectType; // device object class name
-		Fstring CompObjectName; // device user unique name
+		std::string CompObjectType; // device object class name
+		std::string CompObjectName; // device user unique name
 		int CompTypeOfNum; // type of internal gain device identifier
 		Reference< Real64 > PtrConvectGainRate; // fortan POINTER to value of convection heat gain rate for device, watts
 		Real64 ConvectGainRate; // current timestep value of convection heat gain rate for device, watts
@@ -3326,8 +3298,6 @@ namespace DataHeatBalance {
 
 		// Default Constructor
 		GenericComponentZoneIntGainStruct() :
-			CompObjectType( MaxNameLength ),
-			CompObjectName( MaxNameLength ),
 			CompTypeOfNum( 0 ),
 			ConvectGainRate( 0.0 ), //Autodesk:Init Zero initializations for Real64 members added to fix use uninitialized: Such use probably is a logic bug that still needs fixing
 			ReturnAirConvGainRate( 0.0 ),
@@ -3340,8 +3310,8 @@ namespace DataHeatBalance {
 
 		// Member Constructor
 		GenericComponentZoneIntGainStruct(
-			Fstring const & CompObjectType, // device object class name
-			Fstring const & CompObjectName, // device user unique name
+			std::string const & CompObjectType, // device object class name
+			std::string const & CompObjectName, // device user unique name
 			int const CompTypeOfNum, // type of internal gain device identifier
 			Reference< Real64 > const PtrConvectGainRate, // fortan POINTER to value of convection heat gain rate for device, watts
 			Real64 const ConvectGainRate, // current timestep value of convection heat gain rate for device, watts
@@ -3358,8 +3328,8 @@ namespace DataHeatBalance {
 			Reference< Real64 > const PtrGenericContamGainRate, // fortan POINTER to value of generic contaminant gain rate for device
 			Real64 const GenericContamGainRate // current timestep value of generic contaminant gain rate for device
 		) :
-			CompObjectType( MaxNameLength, CompObjectType ),
-			CompObjectName( MaxNameLength, CompObjectName ),
+			CompObjectType( CompObjectType ),
+			CompObjectName( CompObjectName ),
 			CompTypeOfNum( CompTypeOfNum ),
 			PtrConvectGainRate( PtrConvectGainRate ),
 			ConvectGainRate( ConvectGainRate ),
@@ -3540,7 +3510,7 @@ namespace DataHeatBalance {
 	struct WindowBlindProperties
 	{
 		// Members
-		Fstring Name;
+		std::string Name;
 		int MaterialNumber; // Material pointer for the blind
 		// Input properties
 		int SlatOrientation; // HORIZONTAL or VERTICAL
@@ -3654,7 +3624,6 @@ namespace DataHeatBalance {
 
 		// Default Constructor
 		WindowBlindProperties() :
-			Name( MaxNameLength + 1 ),
 			MaterialNumber( 0 ),
 			SlatOrientation( 0 ),
 			SlatAngleType( FixedSlats ),
@@ -3728,7 +3697,7 @@ namespace DataHeatBalance {
 
 		// Member Constructor
 		WindowBlindProperties(
-			Fstring const & Name,
+			std::string const & Name,
 			int const MaterialNumber, // Material pointer for the blind
 			int const SlatOrientation, // HORIZONTAL or VERTICAL
 			int const SlatAngleType, // FIXED or VARIABLE
@@ -3799,7 +3768,7 @@ namespace DataHeatBalance {
 			FArray1< Real64 > const & IRBackTrans, // Blind IR back transmittance vs. slat angle
 			FArray1< Real64 > const & IRBackEmiss // Blind IR back emissivity vs. slat angle
 		) :
-			Name( MaxNameLength + 1, Name ),
+			Name( Name ),
 			MaterialNumber( MaterialNumber ),
 			SlatOrientation( SlatOrientation ),
 			SlatAngleType( SlatAngleType ),
@@ -4074,16 +4043,14 @@ namespace DataHeatBalance {
 	struct HeatReclaimRefrigeratedRackData
 	{
 		// Members
-		Fstring Name; // Name of refrigerated rack
-		Fstring SourceType; // object type for refrigerated rack
+		std::string Name; // Name of refrigerated rack
+		std::string SourceType; // object type for refrigerated rack
 		Real64 AvailCapacity; // Total available heat reclaim capacity
 		Real64 UsedWaterHeater; // amount of avail used at plant water heater
 		Real64 UsedHVACCoil; // amount of avail used at hvac coil
 
 		// Default Constructor
 		HeatReclaimRefrigeratedRackData() :
-			Name( MaxNameLength ),
-			SourceType( MaxNameLength ),
 			AvailCapacity( 0.0 ),
 			UsedWaterHeater( 0.0 ),
 			UsedHVACCoil( 0.0 )
@@ -4091,14 +4058,14 @@ namespace DataHeatBalance {
 
 		// Member Constructor
 		HeatReclaimRefrigeratedRackData(
-			Fstring const & Name, // Name of refrigerated rack
-			Fstring const & SourceType, // object type for refrigerated rack
+			std::string const & Name, // Name of refrigerated rack
+			std::string const & SourceType, // object type for refrigerated rack
 			Real64 const AvailCapacity, // Total available heat reclaim capacity
 			Real64 const UsedWaterHeater, // amount of avail used at plant water heater
 			Real64 const UsedHVACCoil // amount of avail used at hvac coil
 		) :
-			Name( MaxNameLength, Name ),
-			SourceType( MaxNameLength, SourceType ),
+			Name( Name ),
+			SourceType( SourceType ),
 			AvailCapacity( AvailCapacity ),
 			UsedWaterHeater( UsedWaterHeater ),
 			UsedHVACCoil( UsedHVACCoil )
@@ -4109,7 +4076,7 @@ namespace DataHeatBalance {
 	struct HeatReclaimRefrigCondenserData
 	{
 		// Members
-		Fstring Name; // Name of refrigeration system
+		std::string Name; // Name of refrigeration system
 		int SourceType; // object type for refrigeration system
 		Real64 AvailCapacity; // Total available heat reclaim capacity
 		Real64 AvailTemperature; // Temperature of heat reclaim source
@@ -4118,7 +4085,6 @@ namespace DataHeatBalance {
 
 		// Default Constructor
 		HeatReclaimRefrigCondenserData() :
-			Name( MaxNameLength ),
 			SourceType( 0 ),
 			AvailCapacity( 0.0 ),
 			AvailTemperature( 0.0 ),
@@ -4128,14 +4094,14 @@ namespace DataHeatBalance {
 
 		// Member Constructor
 		HeatReclaimRefrigCondenserData(
-			Fstring const & Name, // Name of refrigeration system
+			std::string const & Name, // Name of refrigeration system
 			int const SourceType, // object type for refrigeration system
 			Real64 const AvailCapacity, // Total available heat reclaim capacity
 			Real64 const AvailTemperature, // Temperature of heat reclaim source
 			Real64 const UsedWaterHeater, // amount of avail used at plant water heater
 			Real64 const UsedHVACCoil // amount of avail used at hvac coil
 		) :
-			Name( MaxNameLength, Name ),
+			Name( Name ),
 			SourceType( SourceType ),
 			AvailCapacity( AvailCapacity ),
 			AvailTemperature( AvailTemperature ),
@@ -4148,25 +4114,23 @@ namespace DataHeatBalance {
 	struct HeatReclaimDXCoilData
 	{
 		// Members
-		Fstring Name; // Name of DX Coil
-		Fstring SourceType; // SourceType for DX Coil
+		std::string Name; // Name of DX Coil
+		std::string SourceType; // SourceType for DX Coil
 		Real64 AvailCapacity; // Total available heat reclaim capacity
 
 		// Default Constructor
 		HeatReclaimDXCoilData() :
-			Name( MaxNameLength ),
-			SourceType( MaxNameLength ),
 			AvailCapacity( 0.0 )
 		{}
 
 		// Member Constructor
 		HeatReclaimDXCoilData(
-			Fstring const & Name, // Name of DX Coil
-			Fstring const & SourceType, // SourceType for DX Coil
+			std::string const & Name, // Name of DX Coil
+			std::string const & SourceType, // SourceType for DX Coil
 			Real64 const AvailCapacity // Total available heat reclaim capacity
 		) :
-			Name( MaxNameLength, Name ),
-			SourceType( MaxNameLength, SourceType ),
+			Name( Name ),
+			SourceType( SourceType ),
 			AvailCapacity( AvailCapacity )
 		{}
 
@@ -5244,7 +5208,7 @@ namespace DataHeatBalance {
 		Optional_int_const ScreenNumber = _ // Optional screen number
 	);
 
-	Fstring
+	std::string
 	DisplayMaterialRoughness( int const Roughness ); // Roughness String
 
 	Real64
