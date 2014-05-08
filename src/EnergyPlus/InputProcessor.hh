@@ -618,11 +618,35 @@ namespace InputProcessor {
 	std::string
 	MakeUPPERCase( std::string const & InputString ); // Input String
 
+	typedef char const * c_cstring;
+
+	inline
 	bool
-	SameString(
-		std::string const & TestString1, // First String to Test
-		std::string const & TestString2 // Second String to Test
-	);
+	SameString( std::string const & s,  std::string const & t )
+	{
+		return equali( s, t );
+	}
+
+	inline
+	bool
+	SameString( std::string const & s,  c_cstring const & t )
+	{
+		return equali( s, t );
+	}
+
+	inline
+	bool
+	SameString( c_cstring const & s,  std::string const & t )
+	{
+		return equali( s, t );
+	}
+
+	inline
+	bool
+	SameString( c_cstring const & s,  c_cstring const & t )
+	{
+		return equali( s, t );
+	}
 
 	void
 	VerifyName(

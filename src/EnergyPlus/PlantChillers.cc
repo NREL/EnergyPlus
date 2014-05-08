@@ -4555,7 +4555,7 @@ namespace PlantChillers {
 			// If Heat Recovery specified for this vapor compression chiller, then Qcondenser will be adjusted by this subroutine
 			if ( ElectricChiller( ChillNum ).HeatRecActive ) CalcElectricChillerHeatRecovery( ChillNum, QCondenser, CondMassFlowRate, CondInletTemp, QHeatRecovered );
 			if ( CondMassFlowRate > 0.0 ) {
-				CpCond = PsyCpAirFnWTdb( Node( CondInletNode ).HumRat, CondInletTemp, "CalcElectricChillerModel" );
+				CpCond = PsyCpAirFnWTdb( Node( CondInletNode ).HumRat, CondInletTemp );
 				CondOutletTemp = CondInletTemp + QCondenser / CondMassFlowRate / CpCond;
 			} else {
 				CondOutletTemp = CondInletTemp;
@@ -6337,7 +6337,7 @@ namespace PlantChillers {
 		if ( ElectricChiller( ChillNum ).Base.CondenserType == WaterCooled ) {
 			CpCond = GetSpecificHeatGlycol( PlantLoop( ElectricChiller( ChillNum ).Base.CDLoopNum ).FluidName, CondInletTemp, PlantLoop( ElectricChiller( ChillNum ).Base.CDLoopNum ).FluidIndex, "ChillerHeatRecovery" );
 		} else {
-			CpCond = PsyCpAirFnWTdb( Node( CondInletNode ).HumRat, CondInletTemp, "ElecChillerHeatRecovery" );
+			CpCond = PsyCpAirFnWTdb( Node( CondInletNode ).HumRat, CondInletTemp );
 		}
 
 		// Before we modify the QCondenser, the total or original value is transferred to QTot

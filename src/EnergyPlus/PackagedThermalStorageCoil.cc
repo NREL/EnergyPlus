@@ -2022,9 +2022,9 @@ namespace PackagedThermalStorageCoil {
 					}
 					OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
 					rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-					MixEnth = PsyHFnTdbW( MixTemp, MixHumRat, RoutineName );
+					MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
 					MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-					SupEnth = PsyHFnTdbW( SupTemp, SupHumRat, RoutineName );
+					SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
 					TotCapTempModFac = CurveValue( TESCoil( TESCoilNum ).CoolingOnlyCapFTempCurve, MixWetBulb, OutTemp );
 					CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
 					if ( TotCapTempModFac > 0.0 ) {
@@ -2062,9 +2062,9 @@ namespace PackagedThermalStorageCoil {
 						OutTemp = 0.0;
 					}
 					rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-					MixEnth = PsyHFnTdbW( MixTemp, MixHumRat, RoutineName );
+					MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
 					MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-					SupEnth = PsyHFnTdbW( SupTemp, SupHumRat, RoutineName );
+					SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
 					TotCapTempModFac = CurveValue( TESCoil( TESCoilNum ).CoolingOnlyCapFTempCurve, MixWetBulb, OutTemp );
 					CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
 					if ( TotCapTempModFac > 0.0 ) {
@@ -2201,13 +2201,13 @@ namespace PackagedThermalStorageCoil {
 		Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).Temp;
 		Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).HumRat;
 		Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRate = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRate;
-		Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat, "CalcTESCoilOffMode" );
+		Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat );
 
 		Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp = Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).Temp;
 		Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat = Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).HumRat;
 		Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).MassFlowRate = 0.0;
 		Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).MassFlowRate = Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).MassFlowRate;
-		Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat, "CalcTESCoilOffMode" );
+		Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat );
 		TESCoil( TESCoilNum ).RuntimeFraction = 0.0;
 		TESCoil( TESCoilNum ).EvapTotCoolingRate = 0.0;
 		TESCoil( TESCoilNum ).EvapTotCoolingEnergy = 0.0;
@@ -2392,7 +2392,7 @@ namespace PackagedThermalStorageCoil {
 					hADP = EvapInletEnthalpy - ( TotCap / EvapAirMassFlow );
 					tADP = PsyTsatFnHPb( hADP, OutBaroPress, "CalcTESCoilCoolingOnlyMode" );
 					wADP = min( EvapInletHumRat, PsyWFnTdbH( tADP, hADP, "CalcTESCoilCoolingOnlyMode" ) );
-					hTinwADP = PsyHFnTdbW( EvapInletDryBulb, wADP, "CalcTESCoilCoolingOnlyMode" );
+					hTinwADP = PsyHFnTdbW( EvapInletDryBulb, wADP );
 					if ( ( EvapInletEnthalpy - hADP ) > 1.e-10 ) {
 						SHRadp = min( ( hTinwADP - hADP ) / ( EvapInletEnthalpy - hADP ), 1.0 );
 					} else {
@@ -2476,7 +2476,7 @@ namespace PackagedThermalStorageCoil {
 			QdotCond = TotCap * RuntimeFraction + ElecCoolingPower;
 			Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).MassFlowRate = TESCoil( TESCoilNum ).CondenserAirMassFlow;
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).MassFlowRate = TESCoil( TESCoilNum ).CondenserAirMassFlow;
-			CondInletEnthalpy = PsyHFnTdbW( CondInletTemp, CondInletHumRat, "CalcTESCoilCoolingOnlyMode" );
+			CondInletEnthalpy = PsyHFnTdbW( CondInletTemp, CondInletHumRat );
 			CondOutletEnthalpy = CondInletEnthalpy + QdotCond / TESCoil( TESCoilNum ).CondenserAirMassFlow;
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp = PsyTdbFnHW( CondOutletEnthalpy, CondInletHumRat );
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat = CondInletHumRat;
@@ -2490,7 +2490,7 @@ namespace PackagedThermalStorageCoil {
 			TESCoil( TESCoilNum ).EvapTotCoolingRate = TotCap * RuntimeFraction; // double check this
 			TESCoil( TESCoilNum ).EvapTotCoolingEnergy = TotCap * RuntimeFraction * TimeStepSys * SecInHour;
 			MinAirHumRat = min( Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat, Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).HumRat );
-			TESCoil( TESCoilNum ).EvapSensCoolingRate = EvapAirMassFlow * ( PsyHFnTdbW( EvapInletDryBulb, MinAirHumRat, "CalcTESCoilCoolingOnlyMode" ) - PsyHFnTdbW( EvapOutletAirTemp, MinAirHumRat, "CalcTESCoilCoolingOnlyMode" ) );
+			TESCoil( TESCoilNum ).EvapSensCoolingRate = EvapAirMassFlow * ( PsyHFnTdbW( EvapInletDryBulb, MinAirHumRat ) - PsyHFnTdbW( EvapOutletAirTemp, MinAirHumRat ) );
 			if ( TESCoil( TESCoilNum ).EvapSensCoolingRate > TESCoil( TESCoilNum ).EvapTotCoolingRate ) {
 				TESCoil( TESCoilNum ).EvapSensCoolingRate = TESCoil( TESCoilNum ).EvapTotCoolingRate;
 			}
@@ -2506,13 +2506,13 @@ namespace PackagedThermalStorageCoil {
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).Temp;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).HumRat;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRate = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRate;
-			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat, "CalcTESCoilCoolingOnlyMode" );
+			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat );
 
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp = Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).Temp;
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat = Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).HumRat;
 			Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).MassFlowRate = 0.0;
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).MassFlowRate = Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).MassFlowRate;
-			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat, "CalcTESCoilCoolingOnlyMode" );
+			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat );
 			TESCoil( TESCoilNum ).EvapTotCoolingRate = 0.0;
 			TESCoil( TESCoilNum ).EvapTotCoolingEnergy = 0.0;
 			TESCoil( TESCoilNum ).EvapSensCoolingRate = 0.0;
@@ -2738,7 +2738,7 @@ namespace PackagedThermalStorageCoil {
 					hADP = EvapInletEnthalpy - ( EvapTotCap / EvapAirMassFlow );
 					tADP = PsyTsatFnHPb( hADP, OutBaroPress, "CalcTESCoilCoolingAndChargeMode" );
 					wADP = min( EvapInletHumRat, PsyWFnTdbH( tADP, hADP, "CalcTESCoilCoolingAndChargeMode" ) );
-					hTinwADP = PsyHFnTdbW( EvapInletDryBulb, wADP, "CalcTESCoilCoolingAndChargeMode" );
+					hTinwADP = PsyHFnTdbW( EvapInletDryBulb, wADP );
 					if ( ( EvapInletEnthalpy - hADP ) > 1.e-10 ) {
 						SHRadp = min( ( hTinwADP - hADP ) / ( EvapInletEnthalpy - hADP ), 1.0 );
 					} else {
@@ -2857,7 +2857,7 @@ namespace PackagedThermalStorageCoil {
 			QdotCond = EvapTotCap * EvapRuntimeFraction + EvapElecCoolingPower + TotChargeCap + ChargeElectricCoolingPower;
 			Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).MassFlowRate = TESCoil( TESCoilNum ).CondenserAirMassFlow;
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).MassFlowRate = TESCoil( TESCoilNum ).CondenserAirMassFlow;
-			CondInletEnthalpy = PsyHFnTdbW( CondInletTemp, CondInletHumRat, "CalcTESCoilCoolingAndChargeMode" );
+			CondInletEnthalpy = PsyHFnTdbW( CondInletTemp, CondInletHumRat );
 			CondOutletEnthalpy = CondInletEnthalpy + QdotCond / TESCoil( TESCoilNum ).CondenserAirMassFlow;
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp = PsyTdbFnHW( CondOutletEnthalpy, CondInletHumRat );
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat = CondInletHumRat;
@@ -2876,7 +2876,7 @@ namespace PackagedThermalStorageCoil {
 			TESCoil( TESCoilNum ).EvapTotCoolingRate = EvapTotCap * EvapRuntimeFraction; // double check this
 			TESCoil( TESCoilNum ).EvapTotCoolingEnergy = EvapTotCap * EvapRuntimeFraction * TimeStepSys * SecInHour;
 			MinAirHumRat = min( Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat, Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).HumRat );
-			TESCoil( TESCoilNum ).EvapSensCoolingRate = EvapAirMassFlow * ( PsyHFnTdbW( EvapInletDryBulb, MinAirHumRat, "CalcTESCoilCoolingAndChargeMode" ) - PsyHFnTdbW( EvapOutletAirTemp, MinAirHumRat, "CalcTESCoilCoolingAndChargeMode" ) );
+			TESCoil( TESCoilNum ).EvapSensCoolingRate = EvapAirMassFlow * ( PsyHFnTdbW( EvapInletDryBulb, MinAirHumRat ) - PsyHFnTdbW( EvapOutletAirTemp, MinAirHumRat ) );
 			if ( TESCoil( TESCoilNum ).EvapSensCoolingRate > TESCoil( TESCoilNum ).EvapTotCoolingRate ) {
 				TESCoil( TESCoilNum ).EvapSensCoolingRate = TESCoil( TESCoilNum ).EvapTotCoolingRate;
 			}
@@ -2921,7 +2921,7 @@ namespace PackagedThermalStorageCoil {
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).Temp;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).HumRat;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRate = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRate;
-			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat, "CalcTESCoilCoolingOnlyMode" );
+			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat );
 
 			TESCoil( TESCoilNum ).EvapTotCoolingRate = 0.0;
 			TESCoil( TESCoilNum ).EvapTotCoolingEnergy = 0.0;
@@ -2935,7 +2935,7 @@ namespace PackagedThermalStorageCoil {
 				Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat = Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).HumRat;
 				Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).MassFlowRate = 0.0;
 				Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).MassFlowRate = Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).MassFlowRate;
-				Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat, "CalcTESCoilCoolingOnlyMode" );
+				Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat );
 				TESCoil( TESCoilNum ).CondenserRuntimeFraction = 0.0;
 			} else {
 
@@ -2943,7 +2943,7 @@ namespace PackagedThermalStorageCoil {
 				QdotCond = TotChargeCap + ChargeElectricCoolingPower;
 				Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).MassFlowRate = TESCoil( TESCoilNum ).CondenserAirMassFlow;
 				Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).MassFlowRate = TESCoil( TESCoilNum ).CondenserAirMassFlow;
-				CondInletEnthalpy = PsyHFnTdbW( CondInletTemp, CondInletHumRat, "CalcTESCoilCoolingAndChargeMode" );
+				CondInletEnthalpy = PsyHFnTdbW( CondInletTemp, CondInletHumRat );
 				CondOutletEnthalpy = CondInletEnthalpy + QdotCond / TESCoil( TESCoilNum ).CondenserAirMassFlow;
 				Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp = PsyTdbFnHW( CondOutletEnthalpy, CondInletHumRat );
 				Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat = CondInletHumRat;
@@ -3171,7 +3171,7 @@ namespace PackagedThermalStorageCoil {
 					hADP = EvapInletEnthalpy - ( EvapTotCap / EvapAirMassFlow );
 					tADP = PsyTsatFnHPb( hADP, OutBaroPress, "CalcTESCoilCoolingAndDischargeMode" );
 					wADP = min( EvapInletHumRat, PsyWFnTdbH( tADP, hADP, "CalcTESCoilCoolingAndDischargeMode" ) );
-					hTinwADP = PsyHFnTdbW( EvapInletDryBulb, wADP, "CalcTESCoilCoolingAndDischargeMode" );
+					hTinwADP = PsyHFnTdbW( EvapInletDryBulb, wADP );
 					if ( ( EvapInletEnthalpy - hADP ) > 1.e-10 ) {
 						SHRadp = min( ( hTinwADP - hADP ) / ( EvapInletEnthalpy - hADP ), 1.0 );
 					} else {
@@ -3291,7 +3291,7 @@ namespace PackagedThermalStorageCoil {
 			QdotCond = EvapTotCap * EvapRuntimeFraction + EvapElecCoolingPower;
 			Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).MassFlowRate = TESCoil( TESCoilNum ).CondenserAirMassFlow;
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).MassFlowRate = TESCoil( TESCoilNum ).CondenserAirMassFlow;
-			CondInletEnthalpy = PsyHFnTdbW( CondInletTemp, CondInletHumRat, "CalcTESCoilCoolingAndDischargeMode" );
+			CondInletEnthalpy = PsyHFnTdbW( CondInletTemp, CondInletHumRat );
 			CondOutletEnthalpy = CondInletEnthalpy + QdotCond / TESCoil( TESCoilNum ).CondenserAirMassFlow;
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp = PsyTdbFnHW( CondOutletEnthalpy, CondInletHumRat );
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat = CondInletHumRat;
@@ -3304,7 +3304,7 @@ namespace PackagedThermalStorageCoil {
 			TESCoil( TESCoilNum ).EvapTotCoolingRate = EvapTotCap * EvapRuntimeFraction + TotDischargeCap * DischargeRuntimeFraction;
 			TESCoil( TESCoilNum ).EvapTotCoolingEnergy = TESCoil( TESCoilNum ).EvapTotCoolingRate * TimeStepSys * SecInHour;
 			MinAirHumRat = min( Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat, Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).HumRat );
-			TESCoil( TESCoilNum ).EvapSensCoolingRate = EvapAirMassFlow * ( PsyHFnTdbW( EvapInletDryBulb, MinAirHumRat, "CalcTESCoilCoolingAndDischargeMode" ) - PsyHFnTdbW( EvapOutletAirTemp, MinAirHumRat, "CalcTESCoilCoolingAndDischargeMode" ) );
+			TESCoil( TESCoilNum ).EvapSensCoolingRate = EvapAirMassFlow * ( PsyHFnTdbW( EvapInletDryBulb, MinAirHumRat ) - PsyHFnTdbW( EvapOutletAirTemp, MinAirHumRat ) );
 			if ( TESCoil( TESCoilNum ).EvapSensCoolingRate > TESCoil( TESCoilNum ).EvapTotCoolingRate ) {
 				TESCoil( TESCoilNum ).EvapSensCoolingRate = TESCoil( TESCoilNum ).EvapTotCoolingRate;
 			}
@@ -3330,13 +3330,13 @@ namespace PackagedThermalStorageCoil {
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).Temp;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).HumRat;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRate = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRate;
-			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat, "CalcTESCoilCoolingAndDischargeMode" );
+			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat );
 			//nothing happens at condenser
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp = Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).Temp;
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat = Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).HumRat;
 			Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).MassFlowRate = 0.0;
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).MassFlowRate = Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).MassFlowRate;
-			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat, "CalcTESCoilCoolingAndDischargeMode" );
+			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat );
 			TESCoil( TESCoilNum ).CondInletTemp = Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).Temp;
 		}
 		TESCoil( TESCoilNum ).Q_TES = TESCoil( TESCoilNum ).QdotTES * TimeStepSys * SecInHour;
@@ -3417,7 +3417,7 @@ namespace PackagedThermalStorageCoil {
 		Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).Temp;
 		Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).HumRat;
 		Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRate = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRate;
-		Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat, "CalcTESCoilChargeOnlyMode" );
+		Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat );
 
 		// first deal with condenser
 		if ( TESCoil( TESCoilNum ).CondenserType == AirCooled ) {
@@ -3491,7 +3491,7 @@ namespace PackagedThermalStorageCoil {
 			QdotCond = TotCap + ElecCoolingPower;
 			Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).MassFlowRate = TESCoil( TESCoilNum ).CondenserAirMassFlow;
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).MassFlowRate = TESCoil( TESCoilNum ).CondenserAirMassFlow;
-			CondInletEnthalpy = PsyHFnTdbW( CondInletTemp, CondInletHumRat, "CalcTESCoilChargeOnlyMode" );
+			CondInletEnthalpy = PsyHFnTdbW( CondInletTemp, CondInletHumRat );
 			CondOutletEnthalpy = CondInletEnthalpy + QdotCond / TESCoil( TESCoilNum ).CondenserAirMassFlow;
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp = PsyTdbFnHW( CondOutletEnthalpy, CondInletHumRat );
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat = CondInletHumRat;
@@ -3511,7 +3511,7 @@ namespace PackagedThermalStorageCoil {
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat = Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).HumRat;
 			Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).MassFlowRate = 0.0;
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).MassFlowRate = Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).MassFlowRate;
-			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat, "CalcTESCoilChargeOnlyMode" );
+			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat );
 		}
 		TESCoil( TESCoilNum ).Q_TES = TESCoil( TESCoilNum ).QdotTES * TimeStepSys * SecInHour;
 
@@ -3708,7 +3708,7 @@ namespace PackagedThermalStorageCoil {
 					hADP = EvapInletEnthalpy - ( TotCap / EvapAirMassFlow );
 					tADP = PsyTsatFnHPb( hADP, OutBaroPress, "CalcTESCoilDischargeOnlyMode" );
 					wADP = min( EvapInletHumRat, PsyWFnTdbH( tADP, hADP, "CalcTESCoilDischargeOnlyMode" ) );
-					hTinwADP = PsyHFnTdbW( EvapInletDryBulb, wADP, "CalcTESCoilDischargeOnlyMode" );
+					hTinwADP = PsyHFnTdbW( EvapInletDryBulb, wADP );
 					if ( ( EvapInletEnthalpy - hADP ) > 1.e-10 ) {
 						SHRadp = min( ( hTinwADP - hADP ) / ( EvapInletEnthalpy - hADP ), 1.0 );
 					} else {
@@ -3784,7 +3784,7 @@ namespace PackagedThermalStorageCoil {
 			TESCoil( TESCoilNum ).EvapTotCoolingRate = TotCap * RuntimeFraction; // double check this
 			TESCoil( TESCoilNum ).EvapTotCoolingEnergy = TotCap * RuntimeFraction * TimeStepSys * SecInHour;
 			MinAirHumRat = min( Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat, Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).HumRat );
-			TESCoil( TESCoilNum ).EvapSensCoolingRate = EvapAirMassFlow * ( PsyHFnTdbW( EvapInletDryBulb, MinAirHumRat, "CalcTESCoilDischargeOnlyMode" ) - PsyHFnTdbW( EvapOutletAirTemp, MinAirHumRat, "CalcTESCoilDischargeOnlyMode" ) );
+			TESCoil( TESCoilNum ).EvapSensCoolingRate = EvapAirMassFlow * ( PsyHFnTdbW( EvapInletDryBulb, MinAirHumRat ) - PsyHFnTdbW( EvapOutletAirTemp, MinAirHumRat ) );
 			if ( TESCoil( TESCoilNum ).EvapSensCoolingRate > TESCoil( TESCoilNum ).EvapTotCoolingRate ) {
 				TESCoil( TESCoilNum ).EvapSensCoolingRate = TESCoil( TESCoilNum ).EvapTotCoolingRate;
 			}
@@ -3812,7 +3812,7 @@ namespace PackagedThermalStorageCoil {
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).Temp;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).HumRat;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRate = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRate;
-			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat, "CalcTESCoilCoolingOnlyMode" );
+			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat );
 		}
 
 		//nothing happens at condenser
@@ -3820,7 +3820,7 @@ namespace PackagedThermalStorageCoil {
 		Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat = Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).HumRat;
 		Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).MassFlowRate = 0.0;
 		Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).MassFlowRate = Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).MassFlowRate;
-		Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat, "CalcTESCoilCoolingOnlyMode" );
+		Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).HumRat );
 		TESCoil( TESCoilNum ).CondInletTemp = Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).Temp;
 		TESCoil( TESCoilNum ).Q_TES = TESCoil( TESCoilNum ).QdotTES * TimeStepSys * SecInHour;
 		UpdateTEStorage( TESCoilNum );

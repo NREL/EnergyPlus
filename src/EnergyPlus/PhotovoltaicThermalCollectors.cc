@@ -1098,7 +1098,7 @@ namespace PhotovoltaicThermalCollectors {
 
 				if ( PVT( PVTnum ).WorkingFluidType == AirWorkingFluid ) {
 					Winlet = Node( InletNode ).HumRat;
-					CpInlet = PsyCpAirFnWTdb( Winlet, Tinlet, "CalcPVTcollectors" );
+					CpInlet = PsyCpAirFnWTdb( Winlet, Tinlet );
 					if ( mdot * CpInlet > 0.0 ) {
 						PotentialOutletTemp = Tinlet + PotentialHeatGain / ( mdot * CpInlet );
 					} else {
@@ -1113,7 +1113,7 @@ namespace PhotovoltaicThermalCollectors {
 						}
 						BypassFraction = max( 0.0, BypassFraction );
 						PotentialOutletTemp = Node( PVT( PVTnum ).HVACOutletNodeNum ).TempSetPoint;
-						PotentialHeatGain = mdot * PsyCpAirFnWTdb( Winlet, Tinlet, "CalcPVTcollectors" ) * ( PotentialOutletTemp - Tinlet );
+						PotentialHeatGain = mdot * PsyCpAirFnWTdb( Winlet, Tinlet ) * ( PotentialOutletTemp - Tinlet );
 
 					} else {
 						BypassFraction = 0.0;
@@ -1146,7 +1146,7 @@ namespace PhotovoltaicThermalCollectors {
 
 				if ( PVT( PVTnum ).WorkingFluidType == AirWorkingFluid ) {
 					Winlet = Node( InletNode ).HumRat;
-					CpInlet = PsyCpAirFnWTdb( Winlet, Tinlet, "CalcPVTcollectors" );
+					CpInlet = PsyCpAirFnWTdb( Winlet, Tinlet );
 					WetBulbInlet = PsyTwbFnTdbWPb( Tinlet, Winlet, OutBaroPress, "CalcPVTcollectors" );
 					DewPointInlet = PsyTdpFnTdbTwbPb( Tinlet, WetBulbInlet, OutBaroPress, "CalcPVTcollectors" );
 				} else if ( PVT( PVTnum ).WorkingFluidType == LiquidWorkingFluid ) {

@@ -3647,61 +3647,61 @@ namespace InputProcessor {
 
 	}
 
-	bool
-	SameString(
-		std::string const & TestString1, // First String to Test
-		std::string const & TestString2 // Second String to Test
-	)
-	{
+// 	bool
+// 	SameString(
+// 		std::string const & TestString1, // First String to Test
+// 		std::string const & TestString2 // Second String to Test
+// 	)
+// 	{
 
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   November 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+// 		// FUNCTION INFORMATION:
+// 		//       AUTHOR         Linda K. Lawrie
+// 		//       DATE WRITTEN   November 1997
+// 		//       MODIFIED       na
+// 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// This function returns true if the two strings are equal (case insensitively)
+// 		// PURPOSE OF THIS SUBROUTINE:
+// 		// This function returns true if the two strings are equal (case insensitively)
 
-		// METHODOLOGY EMPLOYED:
-		// Make both strings uppercase.  Do internal compare.
+// 		// METHODOLOGY EMPLOYED:
+// 		// Make both strings uppercase.  Do internal compare.
 
-		// REFERENCES:
-		// na
+// 		// REFERENCES:
+// 		// na
 
-		// USE STATEMENTS:
-		// na
+// 		// USE STATEMENTS:
+// 		// na
 
-		// Return value
-//		bool SameString;
+// 		// Return value
+// //		bool SameString;
 
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
+// 		// Locals
+// 		// FUNCTION ARGUMENT DEFINITIONS:
 
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
+// 		// FUNCTION PARAMETER DEFINITIONS:
+// 		// na
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
+// 		// INTERFACE BLOCK SPECIFICATIONS
+// 		// na
 
-		// DERIVED TYPE DEFINITIONS
-		// na
+// 		// DERIVED TYPE DEFINITIONS
+// 		// na
 
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
+// 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+// 		// na
 
-//		if ( len( TestString1 ) != len( TestString2 ) ) {
-//			SameString = false;
-//		} else if ( TestString1 == TestString2 ) {
-//			SameString = true;
-//		} else {
-//			SameString = MakeUPPERCase( TestString1 ) == MakeUPPERCase( TestString2 );
-//		}
-//
-//		return SameString;
+// //		if ( len( TestString1 ) != len( TestString2 ) ) {
+// //			SameString = false;
+// //		} else if ( TestString1 == TestString2 ) {
+// //			SameString = true;
+// //		} else {
+// //			SameString = MakeUPPERCase( TestString1 ) == MakeUPPERCase( TestString2 );
+// //		}
+// //
+// //		return SameString;
 
-		return equali( TestString1, TestString2 ); //Autodesk:Tune Avoid string creation
-	}
+// 		return equali( TestString1, TestString2 ); //Autodesk:Tune Avoid string creation
+// 	}
 
 	void
 	VerifyName(

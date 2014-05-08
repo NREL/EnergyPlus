@@ -11329,7 +11329,7 @@ namespace RefrigeratedCase {
 			//Get infiltration loads if either type of door is present in this zone
 			if ( StockDoorArea > 0.0 || GlassDoorArea > 0.0 ) {
 				ZoneRHFrac = PsyRhFnTdbWPb( Node( ZoneNodeNum ).Temp, Node( ZoneNodeNum ).HumRat, OutBaroPress, RoutineName );
-				EnthalpyZoneAir = PsyHFnTdbRhPb( ZoneDryBulb, ZoneRHFrac, OutBaroPress, RoutineName );
+				EnthalpyZoneAir = PsyHFnTdbRhPb( ZoneDryBulb, ZoneRHFrac, OutBaroPress );
 				HumRatioZoneAir = PsyWFnTdbH( ZoneDryBulb, EnthalpyZoneAir, RoutineName );
 				DensityZoneAir = PsyRhoAirFnPbTdbW( OutBaroPress, ZoneDryBulb, HumRatioZoneAir, RoutineName );
 				if ( DensityZoneAir < DensityAirWalkIn ) { //usual case when walk in is colder than zone
@@ -12540,10 +12540,10 @@ namespace RefrigeratedCase {
 				ZoneMixedAirDryBulb = Node( ZoneNodeNum ).Temp;
 				ZoneMixedAirHumRatio = Node( ZoneNodeNum ).HumRat;
 				ZoneMixedAirRHFrac = PsyRhFnTdbWPb( ZoneMixedAirDryBulb, ZoneMixedAirHumRatio, OutBaroPress, TrackMessage );
-				ZoneMixedAirEnthalpy = PsyHFnTdbRhPb( ZoneMixedAirDryBulb, ZoneMixedAirRHFrac, OutBaroPress, TrackMessage );
+				ZoneMixedAirEnthalpy = PsyHFnTdbRhPb( ZoneMixedAirDryBulb, ZoneMixedAirRHFrac, OutBaroPress );
 				ZoneMixedAirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, ZoneMixedAirDryBulb, ZoneMixedAirHumRatio, TrackMessage );
 				ZoneDryAirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, ZoneMixedAirDryBulb, 0.0, TrackMessage );
-				ZoneMixedAirCp = PsyCpAirFnWTdb( ZoneMixedAirHumRatio, ZoneMixedAirDryBulb, TrackMessage );
+				ZoneMixedAirCp = PsyCpAirFnWTdb( ZoneMixedAirHumRatio, ZoneMixedAirDryBulb );
 				DryAirMassFlowRated = AirVolumeFlowRated * ZoneDryAirDensity;
 				//calc t inlet to coil assuming at middle/mixed point in room  bbb -
 				//    later need to do for hottest/coolest in room where Tin /= Tzonemixed
@@ -12558,7 +12558,7 @@ namespace RefrigeratedCase {
 					CoilInletCp = ZoneMixedAirCp;
 					CoilInletHumRatio = ZoneMixedAirHumRatio;
 					CoilInletDryAirDensity = ZoneDryAirDensity;
-					CoilInletDryAirCp = PsyCpAirFnWTdb( 0.0, CoilInletTemp, TrackMessage );
+					CoilInletDryAirCp = PsyCpAirFnWTdb( 0.0, CoilInletTemp );
 				} else if ( SELECT_CASE_var == Floor ) {
 				} else if ( SELECT_CASE_var == Ceiling ) {
 				}}
@@ -12589,12 +12589,12 @@ namespace RefrigeratedCase {
 						ShowWarningError( TrackMessage + "Refrigeration:AirCoil: " + WarehouseCoil( CoilID ).Name );
 						ShowContinueError( " The estimated air outlet temperature is less than the evaporating temperature." );
 					}
-					ExitEnthalpyEstimate = PsyHFnTdbRhPb( ExitTemperatureEstimate, 1.0, OutBaroPress, TrackMessage );
+					ExitEnthalpyEstimate = PsyHFnTdbRhPb( ExitTemperatureEstimate, 1.0, OutBaroPress );
 					if ( ExitEnthalpyEstimate <= CoilInletEnthalpy ) {
 						CoilCapTotEstimate = ( CoilInletEnthalpy - ExitEnthalpyEstimate ) * AirVolumeFlowMax * CoilInletDensity;
 					} else {
 						// Assume no water is extracted from flow
-						ExitEnthalpyEstimate = PsyHFnTdbW( ExitTemperatureEstimate, CoilInletHumRatio, TrackMessage );
+						ExitEnthalpyEstimate = PsyHFnTdbW( ExitTemperatureEstimate, CoilInletHumRatio );
 						CoilCapTotEstimate = ( CoilInletEnthalpy - ExitEnthalpyEstimate ) * AirVolumeFlowMax * CoilInletDensity;
 					}
 					if ( SensibleCapacityMax > CoilCapTotEstimate ) SensibleCapacityMax = CoilCapTotEstimate;
