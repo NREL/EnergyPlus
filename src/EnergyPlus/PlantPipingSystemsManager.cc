@@ -524,10 +524,10 @@ namespace PlantPipingSystemsManager {
 
 			//X direction mesh inputs, validated by IP
 			PipingSystemDomains( DomainNum ).Mesh.X.RegionMeshCount = rNumericArgs( 4 );
-			{ auto const SELECT_CASE_var( MakeUPPERCase( cAlphaArgs( 2 ) ) );
-			if ( SELECT_CASE_var == "UNIFORM" ) {
+			{ auto const meshDistribution( cAlphaArgs( 2 ) );
+			if ( SameString(meshDistribution, "UNIFORM") ) {
 				PipingSystemDomains( DomainNum ).Mesh.X.MeshDistribution = MeshDistribution_Uniform;
-			} else if ( SELECT_CASE_var == "SYMMETRICGEOMETRIC" ) {
+			} else if ( SameString(meshDistribution, "SYMMETRICGEOMETRIC") ) {
 				PipingSystemDomains( DomainNum ).Mesh.X.MeshDistribution = MeshDistribution_SymmetricGeometric;
 				if ( mod( PipingSystemDomains( DomainNum ).Mesh.X.RegionMeshCount, 2 ) != 0 ) {
 					ShowWarningError( "PipingSystems:" + RoutineName + ": Invalid mesh type-count combination." );
@@ -545,10 +545,10 @@ namespace PlantPipingSystemsManager {
 
 			//Y direction mesh inputs, validated by IP
 			PipingSystemDomains( DomainNum ).Mesh.Y.RegionMeshCount = rNumericArgs( 6 );
-			{ auto const SELECT_CASE_var( stripped( cAlphaArgs( 3 ) ) );
-			if ( SELECT_CASE_var == "UNIFORM" ) {
+			{ auto const meshDistribution( stripped( cAlphaArgs( 3 ) ) );
+			if ( SameString(meshDistribution, "UNIFORM") ) {
 				PipingSystemDomains( DomainNum ).Mesh.Y.MeshDistribution = MeshDistribution_Uniform;
-			} else if ( SELECT_CASE_var == "SYMMETRICGEOMETRIC" ) {
+			} else if ( SameString(meshDistribution, "SYMMETRICGEOMETRIC") ) {
 				PipingSystemDomains( DomainNum ).Mesh.Y.MeshDistribution = MeshDistribution_SymmetricGeometric;
 				if ( mod( PipingSystemDomains( DomainNum ).Mesh.Y.RegionMeshCount, 2 ) != 0 ) {
 					ShowWarningError( "PipingSystems:" + RoutineName + ": Invalid mesh type-count combination." );
@@ -566,10 +566,10 @@ namespace PlantPipingSystemsManager {
 
 			//Z direction mesh inputs, validated by IP
 			PipingSystemDomains( DomainNum ).Mesh.Z.RegionMeshCount = rNumericArgs( 8 );
-			{ auto const SELECT_CASE_var( stripped( cAlphaArgs( 4 ) ) );
-			if ( SELECT_CASE_var == "UNIFORM" ) {
+			{ auto const meshDistribution( stripped( cAlphaArgs( 4 ) ) );
+			if ( SameString(meshDistribution, "UNIFORM") ) {
 				PipingSystemDomains( DomainNum ).Mesh.Z.MeshDistribution = MeshDistribution_Uniform;
-			} else if ( SELECT_CASE_var == "SYMMETRICGEOMETRIC" ) {
+			} else if ( SameString(meshDistribution, "SYMMETRICGEOMETRIC") ) {
 				PipingSystemDomains( DomainNum ).Mesh.Z.MeshDistribution = MeshDistribution_SymmetricGeometric;
 				if ( mod( PipingSystemDomains( DomainNum ).Mesh.Z.RegionMeshCount, 2 ) != 0 ) {
 					ShowWarningError( "PipingSystems:" + RoutineName + ": Invalid mesh type-count combination." );

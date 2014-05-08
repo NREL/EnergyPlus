@@ -1664,6 +1664,7 @@ namespace OutputProcessor {
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
 		using namespace InputProcessor;
+		using InputProcessor::SameString;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2167,7 +2168,7 @@ namespace OutputProcessor {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::MakeUPPERCase;
+		using InputProcessor::SameString;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2187,147 +2188,147 @@ namespace OutputProcessor {
 		ErrorsFound = false;
 
 		//!!! Basic ResourceType for Meters
-		{ auto const SELECT_CASE_var( MakeUPPERCase( UserInputResourceType ) );
+		{ auto const meterType( UserInputResourceType );
 
-		if ( ( SELECT_CASE_var == "ELECTRICITY" ) || ( SELECT_CASE_var == "ELECTRIC" ) || ( SELECT_CASE_var == "ELEC" ) ) {
+		if ( SameString(meterType, "ELECTRICITY") || SameString(meterType, "ELECTRIC") || SameString(meterType, "ELEC") ) {
 			OutResourceType = "Electricity";
 
-		} else if ( ( SELECT_CASE_var == "GAS" ) || ( SELECT_CASE_var == "NATURALGAS" ) || ( SELECT_CASE_var == "NATURAL GAS" ) ) {
+		} else if ( SameString(meterType, "GAS") || SameString(meterType, "NATURALGAS") || SameString(meterType, "NATURAL GAS") ) {
 			OutResourceType = "Gas";
 
-		} else if ( SELECT_CASE_var == "GASOLINE" ) {
+		} else if ( SameString(meterType, "GASOLINE") ) {
 			OutResourceType = "Gasoline";
 
-		} else if ( SELECT_CASE_var == "DIESEL" ) {
+		} else if ( SameString(meterType, "DIESEL") ) {
 			OutResourceType = "Diesel";
 
-		} else if ( SELECT_CASE_var == "COAL" ) {
+		} else if ( SameString(meterType, "COAL") ) {
 			OutResourceType = "Coal";
 
-		} else if ( ( SELECT_CASE_var == "FUEL OIL #1" ) || ( SELECT_CASE_var == "FUELOIL#1" ) || ( SELECT_CASE_var == "FUEL OIL" ) || ( SELECT_CASE_var == "DISTILLATE OIL" ) ) {
+		} else if ( SameString(meterType, "FUEL OIL #1") || SameString(meterType, "FUELOIL#1") || SameString(meterType, "FUEL OIL") || SameString(meterType, "DISTILLATE OIL") ) {
 			OutResourceType = "FuelOil#1";
 
-		} else if ( ( SELECT_CASE_var == "FUEL OIL #2" ) || ( SELECT_CASE_var == "FUELOIL#2" ) || ( SELECT_CASE_var == "RESIDUAL OIL" ) ) {
+		} else if ( SameString(meterType, "FUEL OIL #2") || SameString(meterType, "FUELOIL#2") || SameString(meterType, "RESIDUAL OIL") ) {
 			OutResourceType = "FuelOil#2";
 
-		} else if ( ( SELECT_CASE_var == "PROPANE" ) || ( SELECT_CASE_var == "LPG" ) || ( SELECT_CASE_var == "PROPANEGAS" ) || ( SELECT_CASE_var == "PROPANE GAS" ) ) {
+		} else if ( SameString(meterType, "PROPANE") || SameString(meterType, "LPG") || SameString(meterType, "PROPANEGAS") || SameString(meterType, "PROPANE GAS") ) {
 			OutResourceType = "Propane";
 
-		} else if ( ( SELECT_CASE_var == "WATER" ) || ( SELECT_CASE_var == "H2O" ) ) {
+		} else if ( SameString(meterType, "WATER") || SameString(meterType, "H2O") ) {
 			OutResourceType = "Water"; // this is water "use"
 
-		} else if ( ( SELECT_CASE_var == "ONSITEWATER" ) || ( SELECT_CASE_var == "WATERPRODUCED" ) || ( SELECT_CASE_var == "ONSITE WATER" ) ) {
+		} else if ( SameString(meterType, "ONSITEWATER") || SameString(meterType, "WATERPRODUCED") || SameString(meterType, "ONSITE WATER") ) {
 			OutResourceType = "OnSiteWater"; // these are for supply record keeping
 
-		} else if ( ( SELECT_CASE_var == "MAINSWATER" ) || ( SELECT_CASE_var == "WATERSUPPLY" ) ) {
+		} else if ( SameString(meterType, "MAINSWATER") || SameString(meterType, "WATERSUPPLY") ) {
 			OutResourceType = "MainsWater"; // record keeping
 
-		} else if ( ( SELECT_CASE_var == "RAINWATER" ) || ( SELECT_CASE_var == "PRECIPITATION" ) ) {
+		} else if ( SameString(meterType, "RAINWATER") || SameString(meterType, "PRECIPITATION") ) {
 			OutResourceType = "RainWater"; // record keeping
 
-		} else if ( ( SELECT_CASE_var == "WELLWATER" ) || ( SELECT_CASE_var == "GROUNDWATER" ) ) {
+		} else if ( SameString(meterType, "WELLWATER") || SameString(meterType, "GROUNDWATER") ) {
 			OutResourceType = "WellWater"; // record keeping
 
-		} else if ( SELECT_CASE_var == "CONDENSATE" ) {
+		} else if ( SameString(meterType, "CONDENSATE") ) {
 			OutResourceType = "Condensate"; // record keeping
 
-		} else if ( ( SELECT_CASE_var == "ENERGYTRANSFER" ) || ( SELECT_CASE_var == "ENERGYXFER" ) || ( SELECT_CASE_var == "XFER" ) ) {
+		} else if ( SameString(meterType, "ENERGYTRANSFER") || SameString(meterType, "ENERGYXFER") || SameString(meterType, "XFER") ) {
 			OutResourceType = "EnergyTransfer";
 
-		} else if ( SELECT_CASE_var == "STEAM" ) {
+		} else if ( SameString(meterType, "STEAM") ) {
 			OutResourceType = "Steam";
 
-		} else if ( SELECT_CASE_var == "DISTRICTCOOLING" ) {
+		} else if ( SameString(meterType, "DISTRICTCOOLING") ) {
 			OutResourceType = "DistrictCooling";
 
-		} else if ( SELECT_CASE_var == "DISTRICTHEATING" ) {
+		} else if ( SameString(meterType, "DISTRICTHEATING") ) {
 			OutResourceType = "DistrictHeating";
 
-		} else if ( SELECT_CASE_var == "ELECTRICITYPRODUCED" ) {
+		} else if ( SameString(meterType, "ELECTRICITYPRODUCED") ) {
 			OutResourceType = "ElectricityProduced";
 
-		} else if ( SELECT_CASE_var == "ELECTRICITYPURCHASED" ) {
+		} else if ( SameString(meterType, "ELECTRICITYPURCHASED") ) {
 			OutResourceType = "ElectricityPurchased";
 
-		} else if ( SELECT_CASE_var == "ELECTRICITYSURPLUSSOLD" ) {
+		} else if ( SameString(meterType, "ELECTRICITYSURPLUSSOLD") ) {
 			OutResourceType = "ElectricitySurplusSold";
 
-		} else if ( SELECT_CASE_var == "ELECTRICITYNET" ) {
+		} else if ( SameString(meterType, "ELECTRICITYNET") ) {
 			OutResourceType = "ElectricityNet";
 
-		} else if ( SELECT_CASE_var == "SOLARWATER" ) {
+		} else if ( SameString(meterType, "SOLARWATER") ) {
 			OutResourceType = "SolarWater";
 
-		} else if ( SELECT_CASE_var == "SOLARAIR" ) {
+		} else if ( SameString(meterType, "SOLARAIR") ) {
 			OutResourceType = "SolarAir";
 
-		} else if ( SELECT_CASE_var == "SO2" ) {
+		} else if ( SameString(meterType, "SO2") ) {
 			OutResourceType = "SO2";
 
-		} else if ( SELECT_CASE_var == "NOX" ) {
+		} else if ( SameString(meterType, "NOX") ) {
 			OutResourceType = "NOx";
 
-		} else if ( SELECT_CASE_var == "N2O" ) {
+		} else if ( SameString(meterType, "N2O") ) {
 			OutResourceType = "N2O";
 
-		} else if ( SELECT_CASE_var == "PM" ) {
+		} else if ( SameString(meterType, "PM") ) {
 			OutResourceType = "PM";
 
-		} else if ( SELECT_CASE_var == "PM2.5" ) {
+		} else if ( SameString(meterType, "PM2.5") ) {
 			OutResourceType = "PM2.5";
 
-		} else if ( SELECT_CASE_var == "PM10" ) {
+		} else if ( SameString(meterType, "PM10") ) {
 			OutResourceType = "PM10";
 
-		} else if ( SELECT_CASE_var == "CO" ) {
+		} else if ( SameString(meterType, "CO") ) {
 			OutResourceType = "CO";
 
-		} else if ( SELECT_CASE_var == "CO2" ) {
+		} else if ( SameString(meterType, "CO2") ) {
 			OutResourceType = "CO2";
 
-		} else if ( SELECT_CASE_var == "CH4" ) {
+		} else if ( SameString(meterType, "CH4") ) {
 			OutResourceType = "CH4";
 
-		} else if ( SELECT_CASE_var == "NH3" ) {
+		} else if ( SameString(meterType, "NH3") ) {
 			OutResourceType = "NH3";
 
-		} else if ( SELECT_CASE_var == "NMVOC" ) {
+		} else if ( SameString(meterType, "NMVOC") ) {
 			OutResourceType = "NMVOC";
 
-		} else if ( SELECT_CASE_var == "HG" ) {
+		} else if ( SameString(meterType, "HG") ) {
 			OutResourceType = "Hg";
 
-		} else if ( SELECT_CASE_var == "PB" ) {
+		} else if ( SameString(meterType, "PB") ) {
 			OutResourceType = "Pb";
 
-		} else if ( SELECT_CASE_var == "NUCLEAR HIGH" ) {
+		} else if ( SameString(meterType, "NUCLEAR HIGH") ) {
 			OutResourceType = "Nuclear High";
 
-		} else if ( SELECT_CASE_var == "NUCLEAR LOW" ) {
+		} else if ( SameString(meterType, "NUCLEAR LOW") ) {
 			OutResourceType = "Nuclear Low";
 
-		} else if ( SELECT_CASE_var == "WATERENVIRONMENTALFACTORS" ) {
+		} else if ( SameString(meterType, "WATERENVIRONMENTALFACTORS") ) {
 			OutResourceType = "WaterEnvironmentalFactors";
 
-		} else if ( SELECT_CASE_var == "CARBON EQUIVALENT" ) {
+		} else if ( SameString(meterType, "CARBON EQUIVALENT") ) {
 			OutResourceType = "Carbon Equivalent";
 
-		} else if ( SELECT_CASE_var == "SOURCE" ) {
+		} else if ( SameString(meterType, "SOURCE") ) {
 			OutResourceType = "Source";
 
-		} else if ( SELECT_CASE_var == "PLANTLOOPHEATINGDEMAND" ) {
+		} else if ( SameString(meterType, "PLANTLOOPHEATINGDEMAND") ) {
 			OutResourceType = "PlantLoopHeatingDemand";
 
-		} else if ( SELECT_CASE_var == "PLANTLOOPCOOLINGDEMAND" ) {
+		} else if ( SameString(meterType, "PLANTLOOPCOOLINGDEMAND") ) {
 			OutResourceType = "PlantLoopCoolingDemand";
 
-		} else if ( SELECT_CASE_var == "GENERIC" ) { // only used by custom meters
+		} else if ( SameString(meterType, "GENERIC") ) { // only used by custom meters
 			OutResourceType = "Generic";
 
-		} else if ( SELECT_CASE_var == "OTHERFUEL1" ) { // other fuel type (defined by user)
+		} else if ( SameString(meterType, "OTHERFUEL1") ) { // other fuel type (defined by user)
 			OutResourceType = "OtherFuel1";
 
-		} else if ( SELECT_CASE_var == "OTHERFUEL2" ) { // other fuel type (defined by user)
+		} else if ( SameString(meterType, "OTHERFUEL2") ) { // other fuel type (defined by user)
 			OutResourceType = "OtherFuel2";
 
 		} else {
@@ -2734,6 +2735,7 @@ namespace OutputProcessor {
 		using InputProcessor::MakeUPPERCase;
 		using InputProcessor::FindItem;
 		using DataHeatBalance::Zone;
+		using InputProcessor::SameString;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2766,17 +2768,17 @@ namespace OutputProcessor {
 		}
 
 		//!!!  Group Meters
-		{ auto const SELECT_CASE_var( MakeUPPERCase( Group ) );
+		{ auto const groupMeter( Group );
 
-		if ( SELECT_CASE_var == BlankString ) {
+		if ( SameString(groupMeter, BlankString) ) {
 
-		} else if ( SELECT_CASE_var == "BUILDING" ) {
+		} else if ( SameString(groupMeter, "BUILDING") ) {
 			Group = "Building";
 
-		} else if ( ( SELECT_CASE_var == "HVAC" ) || ( SELECT_CASE_var == "SYSTEM" ) ) {
+		} else if ( SameString(groupMeter, "HVAC") || SameString(groupMeter, "SYSTEM") ) {
 			Group = "HVAC";
 
-		} else if ( SELECT_CASE_var == "PLANT" ) {
+		} else if ( SameString(groupMeter, "PLANT") ) {
 			Group = "Plant";
 
 		} else {
@@ -2797,155 +2799,155 @@ namespace OutputProcessor {
 		}
 
 		//!!! EndUse Meters
-		{ auto const SELECT_CASE_var( MakeUPPERCase( EndUse ) );
+		{ auto const endUseMeter( EndUse );
 
-		if ( SELECT_CASE_var == BlankString ) {
+		if ( SameString(endUseMeter, BlankString) ) {
 
-		} else if ( ( SELECT_CASE_var == "INTERIOR LIGHTS" ) || ( SELECT_CASE_var == "INTERIORLIGHTS" ) ) {
+		} else if ( SameString(endUseMeter, "INTERIOR LIGHTS") || SameString(endUseMeter, "INTERIORLIGHTS") ) {
 			EndUse = "InteriorLights";
 
-		} else if ( ( SELECT_CASE_var == "EXTERIOR LIGHTS" ) || ( SELECT_CASE_var == "EXTERIORLIGHTS" ) ) {
+		} else if ( SameString(endUseMeter, "EXTERIOR LIGHTS") || SameString(endUseMeter, "EXTERIORLIGHTS") ) {
 			EndUse = "ExteriorLights";
 
-		} else if ( ( SELECT_CASE_var == "HEATING" ) || ( SELECT_CASE_var == "HTG" ) ) {
+		} else if ( SameString(endUseMeter, "HEATING") || SameString(endUseMeter, "HTG") ) {
 			EndUse = "Heating";
 
-		} else if ( SELECT_CASE_var == "HEATPRODUCED" ) {
+		} else if ( SameString(endUseMeter, "HEATPRODUCED") ) {
 			EndUse = "HeatProduced";
 
-		} else if ( ( SELECT_CASE_var == "COOLING" ) || ( SELECT_CASE_var == "CLG" ) ) {
+		} else if ( SameString(endUseMeter, "COOLING") || SameString(endUseMeter, "CLG") ) {
 			EndUse = "Cooling";
 
-		} else if ( ( SELECT_CASE_var == "DOMESTICHOTWATER" ) || ( SELECT_CASE_var == "DHW" ) || ( SELECT_CASE_var == "DOMESTIC HOT WATER" ) ) {
+		} else if ( SameString(endUseMeter, "DOMESTICHOTWATER") || SameString(endUseMeter, "DHW") || SameString(endUseMeter, "DOMESTIC HOT WATER") ) {
 			EndUse = "WaterSystems";
 
-		} else if ( ( SELECT_CASE_var == "COGEN" ) || ( SELECT_CASE_var == "COGENERATION" ) ) {
+		} else if ( SameString(endUseMeter, "COGEN") || SameString(endUseMeter, "COGENERATION") ) {
 			EndUse = "Cogeneration";
 
-		} else if ( ( SELECT_CASE_var == "INTERIOREQUIPMENT" ) || ( SELECT_CASE_var == "INTERIOR EQUIPMENT" ) ) {
+		} else if ( SameString(endUseMeter, "INTERIOREQUIPMENT") || SameString(endUseMeter, "INTERIOR EQUIPMENT") ) {
 			EndUse = "InteriorEquipment";
 
-		} else if ( ( SELECT_CASE_var == "EXTERIOREQUIPMENT" ) || ( SELECT_CASE_var == "EXTERIOR EQUIPMENT" ) || ( SELECT_CASE_var == "EXT EQ" ) || ( SELECT_CASE_var == "EXTERIOREQ" ) ) {
+		} else if ( SameString(endUseMeter, "EXTERIOREQUIPMENT") || SameString(endUseMeter, "EXTERIOR EQUIPMENT") || SameString(endUseMeter, "EXT EQ") || SameString(endUseMeter, "EXTERIOREQ") ) {
 			EndUse = "ExteriorEquipment";
 
-		} else if ( SELECT_CASE_var == "EXTERIOR:WATEREQUIPMENT" ) {
+		} else if ( SameString(endUseMeter, "EXTERIOR:WATEREQUIPMENT") ) {
 			EndUse = "ExteriorEquipment";
 
-		} else if ( ( SELECT_CASE_var == "PURCHASEDHOTWATER" ) || ( SELECT_CASE_var == "DISTRICTHOTWATER" ) || ( SELECT_CASE_var == "PURCHASED HEATING" ) ) {
+		} else if ( SameString(endUseMeter, "PURCHASEDHOTWATER") || SameString(endUseMeter, "DISTRICTHOTWATER") || SameString(endUseMeter, "PURCHASED HEATING") ) {
 			EndUse = "DistrictHotWater";
 
-		} else if ( ( SELECT_CASE_var == "PURCHASEDCOLDWATER" ) || ( SELECT_CASE_var == "DISTRICTCHILLEDWATER" ) || ( SELECT_CASE_var == "PURCHASEDCHILLEDWATER" ) || ( SELECT_CASE_var == "PURCHASED COLD WATER" ) || ( SELECT_CASE_var == "PURCHASED COOLING" ) ) {
+		} else if ( SameString(endUseMeter, "PURCHASEDCOLDWATER") || SameString(endUseMeter, "DISTRICTCHILLEDWATER") || SameString(endUseMeter, "PURCHASEDCHILLEDWATER") || SameString(endUseMeter, "PURCHASED COLD WATER") || SameString(endUseMeter, "PURCHASED COOLING") ) {
 			EndUse = "DistrictChilledWater";
 
-		} else if ( ( SELECT_CASE_var == "FANS" ) || ( SELECT_CASE_var == "FAN" ) ) {
+		} else if ( SameString(endUseMeter, "FANS") || SameString(endUseMeter, "FAN") ) {
 			EndUse = "Fans";
 
-		} else if ( ( SELECT_CASE_var == "HEATINGCOILS" ) || ( SELECT_CASE_var == "HEATINGCOIL" ) || ( SELECT_CASE_var == "HEATING COILS" ) || ( SELECT_CASE_var == "HEATING COIL" ) ) {
+		} else if ( SameString(endUseMeter, "HEATINGCOILS") || SameString(endUseMeter, "HEATINGCOIL") || SameString(endUseMeter, "HEATING COILS") || SameString(endUseMeter, "HEATING COIL") ) {
 			EndUse = "HeatingCoils";
 
-		} else if ( ( SELECT_CASE_var == "COOLINGCOILS" ) || ( SELECT_CASE_var == "COOLINGCOIL" ) || ( SELECT_CASE_var == "COOLING COILS" ) || ( SELECT_CASE_var == "COOLING COIL" ) ) {
+		} else if ( SameString(endUseMeter, "COOLINGCOILS") || SameString(endUseMeter, "COOLINGCOIL") || SameString(endUseMeter, "COOLING COILS") || SameString(endUseMeter, "COOLING COIL") ) {
 			EndUse = "CoolingCoils";
 
-		} else if ( ( SELECT_CASE_var == "PUMPS" ) || ( SELECT_CASE_var == "PUMP" ) ) {
+		} else if ( SameString(endUseMeter, "PUMPS") || SameString(endUseMeter, "PUMP") ) {
 			EndUse = "Pumps";
 
-		} else if ( ( SELECT_CASE_var == "FREECOOLING" ) || ( SELECT_CASE_var == "FREE COOLING" ) ) {
+		} else if ( SameString(endUseMeter, "FREECOOLING") || SameString(endUseMeter, "FREE COOLING") ) {
 			EndUse = "Freecooling";
 
-		} else if ( SELECT_CASE_var == "LOOPTOLOOP" ) {
+		} else if ( SameString(endUseMeter, "LOOPTOLOOP") ) {
 			EndUse = "LoopToLoop";
 
-		} else if ( ( SELECT_CASE_var == "CHILLERS" ) || ( SELECT_CASE_var == "CHILLER" ) ) {
+		} else if ( SameString(endUseMeter, "CHILLERS") || SameString(endUseMeter, "CHILLER") ) {
 			EndUse = "Chillers";
 
-		} else if ( ( SELECT_CASE_var == "BOILERS" ) || ( SELECT_CASE_var == "BOILER" ) ) {
+		} else if ( SameString(endUseMeter, "BOILERS") || SameString(endUseMeter, "BOILER") ) {
 			EndUse = "Boilers";
 
-		} else if ( ( SELECT_CASE_var == "BASEBOARD" ) || ( SELECT_CASE_var == "BASEBOARDS" ) ) {
+		} else if ( SameString(endUseMeter, "BASEBOARD") || SameString(endUseMeter, "BASEBOARDS") ) {
 			EndUse = "Baseboard";
 
-		} else if ( ( SELECT_CASE_var == "HEATREJECTION" ) || ( SELECT_CASE_var == "HEAT REJECTION" ) ) {
+		} else if ( SameString(endUseMeter, "HEATREJECTION") || SameString(endUseMeter, "HEAT REJECTION") ) {
 			EndUse = "HeatRejection";
 
-		} else if ( ( SELECT_CASE_var == "HUMIDIFIER" ) || ( SELECT_CASE_var == "HUMIDIFIERS" ) ) {
+		} else if ( SameString(endUseMeter, "HUMIDIFIER") || SameString(endUseMeter, "HUMIDIFIERS") ) {
 			EndUse = "Humidifier";
 
-		} else if ( ( SELECT_CASE_var == "HEATRECOVERY" ) || ( SELECT_CASE_var == "HEAT RECOVERY" ) ) {
+		} else if ( SameString(endUseMeter, "HEATRECOVERY") || SameString(endUseMeter, "HEAT RECOVERY") ) {
 			EndUse = "HeatRecovery";
 
-		} else if ( ( SELECT_CASE_var == "PHOTOVOLTAICS" ) || ( SELECT_CASE_var == "PV" ) || ( SELECT_CASE_var == "PHOTOVOLTAIC" ) ) {
+		} else if ( SameString(endUseMeter, "PHOTOVOLTAICS") || SameString(endUseMeter, "PV") || SameString(endUseMeter, "PHOTOVOLTAIC") ) {
 			EndUse = "Photovoltaic";
 
-		} else if ( ( SELECT_CASE_var == "WINDTURBINES" ) || ( SELECT_CASE_var == "WT" ) || ( SELECT_CASE_var == "WINDTURBINE" ) ) {
+		} else if ( SameString(endUseMeter, "WINDTURBINES") || SameString(endUseMeter, "WT") || SameString(endUseMeter, "WINDTURBINE") ) {
 			EndUse = "WindTurbine";
 
-		} else if ( ( SELECT_CASE_var == "HEAT RECOVERY FOR COOLING" ) || ( SELECT_CASE_var == "HEATRECOVERYFORCOOLING" ) || ( SELECT_CASE_var == "HEATRECOVERYCOOLING" ) ) {
+		} else if ( SameString(endUseMeter, "HEAT RECOVERY FOR COOLING") || SameString(endUseMeter, "HEATRECOVERYFORCOOLING") || SameString(endUseMeter, "HEATRECOVERYCOOLING") ) {
 			EndUse = "HeatRecoveryForCooling";
 
-		} else if ( ( SELECT_CASE_var == "HEAT RECOVERY FOR HEATING" ) || ( SELECT_CASE_var == "HEATRECOVERYFORHEATING" ) || ( SELECT_CASE_var == "HEATRECOVERYHEATING" ) ) {
+		} else if ( SameString(endUseMeter, "HEAT RECOVERY FOR HEATING") || SameString(endUseMeter, "HEATRECOVERYFORHEATING") || SameString(endUseMeter, "HEATRECOVERYHEATING") ) {
 			EndUse = "HeatRecoveryForHeating";
 
-		} else if ( SELECT_CASE_var == "ELECTRICEMISSIONS" ) {
+		} else if ( SameString(endUseMeter, "ELECTRICEMISSIONS") ) {
 			EndUse = "ElectricEmissions";
 
-		} else if ( SELECT_CASE_var == "PURCHASEDELECTRICEMISSIONS" ) {
+		} else if ( SameString(endUseMeter, "PURCHASEDELECTRICEMISSIONS") ) {
 			EndUse = "PurchasedElectricEmissions";
 
-		} else if ( SELECT_CASE_var == "SOLDELECTRICEMISSIONS" ) {
+		} else if ( SameString(endUseMeter, "SOLDELECTRICEMISSIONS") ) {
 			EndUse = "SoldElectricEmissions";
 
-		} else if ( SELECT_CASE_var == "NATURALGASEMISSIONS" ) {
+		} else if ( SameString(endUseMeter, "NATURALGASEMISSIONS") ) {
 			EndUse = "NaturalGasEmissions";
 
-		} else if ( SELECT_CASE_var == "FUELOIL#1EMISSIONS" ) {
+		} else if ( SameString(endUseMeter, "FUELOIL#1EMISSIONS") ) {
 			EndUse = "FuelOil#1Emissions";
 
-		} else if ( SELECT_CASE_var == "FUELOIL#2EMISSIONS" ) {
+		} else if ( SameString(endUseMeter, "FUELOIL#2EMISSIONS") ) {
 			EndUse = "FuelOil#2Emissions";
 
-		} else if ( SELECT_CASE_var == "COALEMISSIONS" ) {
+		} else if ( SameString(endUseMeter, "COALEMISSIONS") ) {
 			EndUse = "CoalEmissions";
 
-		} else if ( SELECT_CASE_var == "GASOLINEEMISSIONS" ) {
+		} else if ( SameString(endUseMeter, "GASOLINEEMISSIONS") ) {
 			EndUse = "GasolineEmissions";
 
-		} else if ( SELECT_CASE_var == "PROPANEEMISSIONS" ) {
+		} else if ( SameString(endUseMeter, "PROPANEEMISSIONS") ) {
 			EndUse = "PropaneEmissions";
 
-		} else if ( SELECT_CASE_var == "DIESELEMISSIONS" ) {
+		} else if ( SameString(endUseMeter, "DIESELEMISSIONS") ) {
 			EndUse = "DieselEmissions";
 
-		} else if ( SELECT_CASE_var == "OTHERFUEL1EMISSIONS" ) {
+		} else if ( SameString(endUseMeter, "OTHERFUEL1EMISSIONS") ) {
 			EndUse = "OtherFuel1Emissions";
 
-		} else if ( SELECT_CASE_var == "OTHERFUEL2EMISSIONS" ) {
+		} else if ( SameString(endUseMeter, "OTHERFUEL2EMISSIONS") ) {
 			EndUse = "OtherFuel2Emissions";
 
-		} else if ( SELECT_CASE_var == "CARBONEQUIVALENTEMISSIONS" ) {
+		} else if ( SameString(endUseMeter, "CARBONEQUIVALENTEMISSIONS") ) {
 			EndUse = "CarbonEquivalentEmissions";
 
-		} else if ( SELECT_CASE_var == "REFRIGERATION" ) {
+		} else if ( SameString(endUseMeter, "REFRIGERATION") ) {
 			EndUse = "Refrigeration";
 
-		} else if ( SELECT_CASE_var == "COLDSTORAGECHARGE" ) {
+		} else if ( SameString(endUseMeter, "COLDSTORAGECHARGE") ) {
 			EndUse = "ColdStorageCharge";
 
-		} else if ( SELECT_CASE_var == "COLDSTORAGEDISCHARGE" ) {
+		} else if ( SameString(endUseMeter, "COLDSTORAGEDISCHARGE") ) {
 			EndUse = "ColdStorageDischarge";
 
-		} else if ( ( SELECT_CASE_var == "WATERSYSTEMS" ) || ( SELECT_CASE_var == "WATERSYSTEM" ) || ( SELECT_CASE_var == "Water System" ) ) {
+		} else if ( SameString(endUseMeter, "WATERSYSTEMS") || SameString(endUseMeter, "WATERSYSTEM") || SameString(endUseMeter, "Water System") ) {
 			EndUse = "WaterSystems";
 
-		} else if ( SELECT_CASE_var == "RAINWATER" ) {
+		} else if ( SameString(endUseMeter, "RAINWATER") ) {
 			EndUse = "Rainwater";
 
-		} else if ( SELECT_CASE_var == "CONDENSATE" ) {
+		} else if ( SameString(endUseMeter, "CONDENSATE") ) {
 			EndUse = "Condensate";
 
-		} else if ( SELECT_CASE_var == "WELLWATER" ) {
+		} else if ( SameString(endUseMeter, "WELLWATER") ) {
 			EndUse = "Wellwater";
 
-		} else if ( ( SELECT_CASE_var == "MAINSWATER" ) || ( SELECT_CASE_var == "PURCHASEDWATER" ) ) {
+		} else if ( SameString(endUseMeter, "MAINSWATER") || SameString(endUseMeter, "PURCHASEDWATER") ) {
 			EndUse = "MainsWater";
 
 		} else {

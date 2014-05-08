@@ -421,14 +421,14 @@ namespace InternalHeatGains {
 					}
 
 					// Number of people calculation method.
-					{ auto const SELECT_CASE_var( AlphaName( 4 ) );
-					if ( SELECT_CASE_var == "PEOPLE" ) {
+					{ auto const peopleMethod( AlphaName( 4 ) );
+					if ( SameString(peopleMethod, "PEOPLE") ) {
 						People( Loop ).NumberOfPeople = IHGNumbers( 1 );
 						if ( lNumericFieldBlanks( 1 ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + People( Loop ).Name + "\", specifies " + cNumericFieldNames( 1 ) + ", but that field is blank.  0 People will result." );
 						}
 
-					} else if ( SELECT_CASE_var == "PEOPLE/AREA" ) {
+					} else if ( SameString(peopleMethod, "PEOPLE/AREA") ) {
 						if ( People( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 2 ) >= 0.0 ) {
 								People( Loop ).NumberOfPeople = IHGNumbers( 2 ) * Zone( People( Loop ).ZonePtr ).FloorArea;
@@ -444,7 +444,7 @@ namespace InternalHeatGains {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + People( Loop ).Name + "\", specifies " + cNumericFieldNames( 2 ) + ", but that field is blank.  0 People will result." );
 						}
 
-					} else if ( SELECT_CASE_var == "AREA/PERSON" ) {
+					} else if ( SameString(peopleMethod, "AREA/PERSON") ) {
 						if ( People( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 3 ) > 0.0 ) {
 								People( Loop ).NumberOfPeople = Zone( People( Loop ).ZonePtr ).FloorArea / IHGNumbers( 3 );
@@ -559,36 +559,36 @@ namespace InternalHeatGains {
 
 						for ( OptionNum = 14; OptionNum <= lastOption; ++OptionNum ) {
 
-							{ auto const SELECT_CASE_var( AlphaName( OptionNum ) );
+							{ auto const thermalComfortType( AlphaName( OptionNum ) );
 
-							if ( SELECT_CASE_var == "FANGER" ) {
+							if ( SameString(thermalComfortType, "FANGER") ) {
 								People( Loop ).Fanger = true;
 								MustInpSch = true;
 								UsingThermalComfort = true;
 
-							} else if ( SELECT_CASE_var == "PIERCE" ) {
+							} else if ( SameString(thermalComfortType, "PIERCE") ) {
 								People( Loop ).Pierce = true;
 								MustInpSch = true;
 								UsingThermalComfort = true;
 
-							} else if ( SELECT_CASE_var == "KSU" ) {
+							} else if ( SameString(thermalComfortType, "KSU") ) {
 								People( Loop ).KSU = true;
 								MustInpSch = true;
 								UsingThermalComfort = true;
 
-							} else if ( SELECT_CASE_var == "ADAPTIVEASH55" ) {
+							} else if ( SameString(thermalComfortType, "ADAPTIVEASH55") ) {
 								People( Loop ).AdaptiveASH55 = true;
 								AdaptiveComfortRequested_ASH55 = true;
 								MustInpSch = true;
 								UsingThermalComfort = true;
 
-							} else if ( SELECT_CASE_var == "ADAPTIVECEN15251" ) {
+							} else if ( SameString(thermalComfortType, "ADAPTIVECEN15251") ) {
 								People( Loop ).AdaptiveCEN15251 = true;
 								AdaptiveComfortRequested_CEN15251 = true;
 								MustInpSch = true;
 								UsingThermalComfort = true;
 
-							} else if ( SELECT_CASE_var == Blank ) { // Blank input field--just ignore this
+							} else if ( SameString(thermalComfortType, "") ) { // Blank input field--just ignore this
 
 							} else { // An invalid keyword was entered--warn but ignore
 								if ( Item1 == 1 ) {
@@ -605,12 +605,12 @@ namespace InternalHeatGains {
 							People( Loop ).MRTCalcType = ZoneAveraged;
 
 							// MRT Calculation Type and Surface Name
-							{ auto const SELECT_CASE_var( AlphaName( 7 ) );
+							{ auto const mrtType( AlphaName( 7 ) );
 
-							if ( SELECT_CASE_var == "ZONEAVERAGED" ) {
+							if ( SameString(mrtType, "ZONEAVERAGED") ) {
 								People( Loop ).MRTCalcType = ZoneAveraged;
 
-							} else if ( SELECT_CASE_var == "SURFACEWEIGHTED" ) {
+							} else if ( SameString(mrtType, "SURFACEWEIGHTED") ) {
 								People( Loop ).MRTCalcType = SurfaceWeighted;
 								People( Loop ).SurfacePtr = FindItemInList( AlphaName( 8 ), Surface.Name(), TotSurfaces );
 								if ( People( Loop ).SurfacePtr == 0 ) {
@@ -624,11 +624,11 @@ namespace InternalHeatGains {
 									ErrorsFound = true;
 								}
 
-							} else if ( SELECT_CASE_var == "ANGLEFACTOR" ) {
+							} else if ( SameString(mrtType, "ANGLEFACTOR") ) {
 								People( Loop ).MRTCalcType = AngleFactor;
 								People( Loop ).AngleFactorListName = AlphaName( 8 );
 
-							} else if ( SELECT_CASE_var == Blank ) { // Blank input field--just ignore this
+							} else if ( SameString(mrtType, "") ) { // Blank input field--just ignore this
 								if ( MustInpSch && Item1 == 1 ) ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", blank " + cAlphaFieldNames( 7 ) );
 
 							} else { // An invalid keyword was entered--warn but ignore
@@ -679,8 +679,8 @@ namespace InternalHeatGains {
 							}
 
 							if ( ! lAlphaFieldBlanks( 10 ) || AlphaName( 10 ) != "" ) {
-								{ auto const SELECT_CASE_var( AlphaName( 10 ) );
-								if ( SELECT_CASE_var == "CLOTHINGINSULATIONSCHEDULE" ) {
+								{ auto const clothingType( AlphaName( 10 ) );
+								if ( SameString(clothingType, "CLOTHINGINSULATIONSCHEDULE") ) {
 									People( Loop ).ClothingType = 1;
 									People( Loop ).ClothingPtr = GetScheduleIndex( AlphaName( 12 ) );
 									if ( People( Loop ).ClothingPtr == 0 ) {
@@ -715,10 +715,10 @@ namespace InternalHeatGains {
 										}
 									}
 
-								} else if ( SELECT_CASE_var == "DYNAMICCLOTHINGMODELASHRAE55" ) {
+								} else if ( SameString(clothingType, "DYNAMICCLOTHINGMODELASHRAE55") ) {
 									People( Loop ).ClothingType = 2;
 
-								} else if ( SELECT_CASE_var == "CALCULATIONMETHODSCHEDULE" ) {
+								} else if ( SameString(clothingType, "CALCULATIONMETHODSCHEDULE") ) {
 									People( Loop ).ClothingType = 3;
 									People( Loop ).ClothingMethodPtr = GetScheduleIndex( AlphaName( 11 ) );
 									if ( People( Loop ).ClothingMethodPtr == 0 ) {
@@ -969,14 +969,14 @@ namespace InternalHeatGains {
 					}
 
 					// Lights Design Level calculation method.
-					{ auto const SELECT_CASE_var( AlphaName( 4 ) );
-					if ( SELECT_CASE_var == "LIGHTINGLEVEL" ) {
+					{ auto const lightingLevel( AlphaName( 4 ) );
+					if ( SameString(lightingLevel, "LIGHTINGLEVEL") ) {
 						Lights( Loop ).DesignLevel = IHGNumbers( 1 );
 						if ( lNumericFieldBlanks( 1 ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Lights( Loop ).Name + "\", specifies " + cNumericFieldNames( 1 ) + ", but that field is blank.  0 Lights will result." );
 						}
 
-					} else if ( SELECT_CASE_var == "WATTS/AREA" ) {
+					} else if ( SameString(lightingLevel, "WATTS/AREA") ) {
 						if ( Lights( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 2 ) >= 0.0 ) {
 								Lights( Loop ).DesignLevel = IHGNumbers( 2 ) * Zone( Lights( Loop ).ZonePtr ).FloorArea;
@@ -992,7 +992,7 @@ namespace InternalHeatGains {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Lights( Loop ).Name + "\", specifies " + cNumericFieldNames( 2 ) + ", but that field is blank.  0 Lights will result." );
 						}
 
-					} else if ( SELECT_CASE_var == "WATTS/PERSON" ) {
+					} else if ( SameString(lightingLevel, "WATTS/PERSON") ) {
 						if ( Lights( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 3 ) >= 0.0 ) {
 								Lights( Loop ).DesignLevel = IHGNumbers( 3 ) * Zone( Lights( Loop ).ZonePtr ).TotOccupants;
@@ -1230,14 +1230,14 @@ namespace InternalHeatGains {
 					}
 
 					// Electric equipment design level calculation method.
-					{ auto const SELECT_CASE_var( AlphaName( 4 ) );
-					if ( SELECT_CASE_var == "EQUIPMENTLEVEL" ) {
+					{ auto const equipmentLevel( AlphaName( 4 ) );
+					if ( SameString(equipmentLevel, "EQUIPMENTLEVEL") ) {
 						ZoneElectric( Loop ).DesignLevel = IHGNumbers( 1 );
 						if ( lNumericFieldBlanks( 1 ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 1 ) + ", but that field is blank.  0 Electric Equipment will result." );
 						}
 
-					} else if ( SELECT_CASE_var == "WATTS/AREA" ) {
+					} else if ( SameString(equipmentLevel, "WATTS/AREA") ) {
 						if ( ZoneElectric( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 2 ) >= 0.0 ) {
 								ZoneElectric( Loop ).DesignLevel = IHGNumbers( 2 ) * Zone( ZoneElectric( Loop ).ZonePtr ).FloorArea;
@@ -1253,7 +1253,7 @@ namespace InternalHeatGains {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 2 ) + ", but that field is blank.  0 Electric Equipment will result." );
 						}
 
-					} else if ( SELECT_CASE_var == "WATTS/PERSON" ) {
+					} else if ( SameString(equipmentLevel, "WATTS/PERSON") ) {
 						if ( ZoneElectric( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 3 ) >= 0.0 ) {
 								ZoneElectric( Loop ).DesignLevel = IHGNumbers( 3 ) * Zone( ZoneElectric( Loop ).ZonePtr ).TotOccupants;
@@ -1446,14 +1446,14 @@ namespace InternalHeatGains {
 					}
 
 					// equipment design level calculation method.
-					{ auto const SELECT_CASE_var( AlphaName( 4 ) );
-					if ( SELECT_CASE_var == "EQUIPMENTLEVEL" ) {
+					{ auto const equipmentLevel( AlphaName( 4 ) );
+					if ( SameString(equipmentLevel, "EQUIPMENTLEVEL") ) {
 						ZoneGas( Loop ).DesignLevel = IHGNumbers( 1 );
 						if ( lNumericFieldBlanks( 1 ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + ZoneGas( Loop ).Name + "\", specifies " + cNumericFieldNames( 1 ) + ", but that field is blank.  0 Gas Equipment will result." );
 						}
 
-					} else if ( ( SELECT_CASE_var == "WATTS/AREA" ) || ( SELECT_CASE_var == "POWER/AREA" ) ) {
+					} else if ( SameString(equipmentLevel, "WATTS/AREA") || SameString(equipmentLevel, "POWER/AREA") ) {
 						if ( ZoneGas( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 2 ) >= 0.0 ) {
 								ZoneGas( Loop ).DesignLevel = IHGNumbers( 2 ) * Zone( ZoneGas( Loop ).ZonePtr ).FloorArea;
@@ -1469,7 +1469,7 @@ namespace InternalHeatGains {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + ZoneGas( Loop ).Name + "\", specifies " + cNumericFieldNames( 2 ) + ", but that field is blank.  0 Gas Equipment will result." );
 						}
 
-					} else if ( ( SELECT_CASE_var == "WATTS/PERSON" ) || ( SELECT_CASE_var == "POWER/PERSON" ) ) {
+					} else if ( SameString(equipmentLevel, "WATTS/PERSON") || SameString(equipmentLevel, "POWER/PERSON") ) {
 						if ( ZoneGas( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 3 ) >= 0.0 ) {
 								ZoneGas( Loop ).DesignLevel = IHGNumbers( 3 ) * Zone( ZoneGas( Loop ).ZonePtr ).TotOccupants;
@@ -1671,14 +1671,14 @@ namespace InternalHeatGains {
 					}
 
 					// Hot Water equipment design level calculation method.
-					{ auto const SELECT_CASE_var( AlphaName( 4 ) );
-					if ( SELECT_CASE_var == "EQUIPMENTLEVEL" ) {
+					{ auto const equipmentLevel( AlphaName( 4 ) );
+					if ( SameString(equipmentLevel, "EQUIPMENTLEVEL") ) {
 						ZoneHWEq( Loop ).DesignLevel = IHGNumbers( 1 );
 						if ( lNumericFieldBlanks( 1 ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 1 ) + ", but that field is blank.  0 Hot Water Equipment will result." );
 						}
 
-					} else if ( ( SELECT_CASE_var == "WATTS/AREA" ) || ( SELECT_CASE_var == "POWER/AREA" ) ) {
+					} else if ( SameString(equipmentLevel, "WATTS/AREA") || SameString(equipmentLevel, "POWER/AREA") ) {
 						if ( ZoneHWEq( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 2 ) >= 0.0 ) {
 								ZoneHWEq( Loop ).DesignLevel = IHGNumbers( 2 ) * Zone( ZoneHWEq( Loop ).ZonePtr ).FloorArea;
@@ -1694,7 +1694,7 @@ namespace InternalHeatGains {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 2 ) + ", but that field is blank.  0 Hot Water Equipment will result." );
 						}
 
-					} else if ( ( SELECT_CASE_var == "WATTS/PERSON" ) || ( SELECT_CASE_var == "POWER/PERSON" ) ) {
+					} else if ( SameString(equipmentLevel, "WATTS/PERSON") || SameString(equipmentLevel, "POWER/PERSON") ) {
 						if ( ZoneHWEq( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 3 ) >= 0.0 ) {
 								ZoneHWEq( Loop ).DesignLevel = IHGNumbers( 3 ) * Zone( ZoneHWEq( Loop ).ZonePtr ).TotOccupants;
@@ -1881,14 +1881,14 @@ namespace InternalHeatGains {
 					}
 
 					// Hot Water equipment design level calculation method.
-					{ auto const SELECT_CASE_var( AlphaName( 4 ) );
-					if ( SELECT_CASE_var == "EQUIPMENTLEVEL" ) {
+					{ auto const equipmentLevel( AlphaName( 4 ) );
+					if ( SameString(equipmentLevel, "EQUIPMENTLEVEL") ) {
 						ZoneSteamEq( Loop ).DesignLevel = IHGNumbers( 1 );
 						if ( lNumericFieldBlanks( 1 ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 1 ) + ", but that field is blank.  0 Hot Water Equipment will result." );
 						}
 
-					} else if ( ( SELECT_CASE_var == "WATTS/AREA" ) || ( SELECT_CASE_var == "POWER/AREA" ) ) {
+					} else if ( SameString(equipmentLevel, "WATTS/AREA") || SameString(equipmentLevel, "POWER/AREA") ) {
 						if ( ZoneSteamEq( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 2 ) >= 0.0 ) {
 								ZoneSteamEq( Loop ).DesignLevel = IHGNumbers( 2 ) * Zone( ZoneSteamEq( Loop ).ZonePtr ).FloorArea;
@@ -1904,7 +1904,7 @@ namespace InternalHeatGains {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 2 ) + ", but that field is blank.  0 Hot Water Equipment will result." );
 						}
 
-					} else if ( ( SELECT_CASE_var == "WATTS/PERSON" ) || ( SELECT_CASE_var == "POWER/PERSON" ) ) {
+					} else if ( SameString(equipmentLevel, "WATTS/PERSON") || SameString(equipmentLevel, "POWER/PERSON") ) {
 						if ( ZoneSteamEq( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 3 ) >= 0.0 ) {
 								ZoneSteamEq( Loop ).DesignLevel = IHGNumbers( 3 ) * Zone( ZoneSteamEq( Loop ).ZonePtr ).TotOccupants;
@@ -2079,14 +2079,14 @@ namespace InternalHeatGains {
 					}
 
 					// Hot Water equipment design level calculation method.
-					{ auto const SELECT_CASE_var( AlphaName( 4 ) );
-					if ( SELECT_CASE_var == "EQUIPMENTLEVEL" ) {
+					{ auto const equipmentLevel( AlphaName( 4 ) );
+					if ( SameString(equipmentLevel, "EQUIPMENTLEVEL") ) {
 						ZoneOtherEq( Loop ).DesignLevel = IHGNumbers( 1 );
 						if ( lNumericFieldBlanks( 1 ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 1 ) + ", but that field is blank.  0 Hot Water Equipment will result." );
 						}
 
-					} else if ( ( SELECT_CASE_var == "WATTS/AREA" ) || ( SELECT_CASE_var == "POWER/AREA" ) ) {
+					} else if ( SameString(equipmentLevel, "WATTS/AREA") || SameString(equipmentLevel, "POWER/AREA") ) {
 						if ( ZoneOtherEq( Loop ).ZonePtr != 0 ) {
 							ZoneOtherEq( Loop ).DesignLevel = IHGNumbers( 2 ) * Zone( ZoneOtherEq( Loop ).ZonePtr ).FloorArea;
 							if ( Zone( ZoneOtherEq( Loop ).ZonePtr ).FloorArea <= 0.0 ) {
@@ -2097,7 +2097,7 @@ namespace InternalHeatGains {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 2 ) + ", but that field is blank.  0 Hot Water Equipment will result." );
 						}
 
-					} else if ( ( SELECT_CASE_var == "WATTS/PERSON" ) || ( SELECT_CASE_var == "POWER/PERSON" ) ) {
+					} else if ( SameString(equipmentLevel, "WATTS/PERSON") || SameString(equipmentLevel, "POWER/PERSON") ) {
 						if ( ZoneOtherEq( Loop ).ZonePtr != 0 ) {
 							ZoneOtherEq( Loop ).DesignLevel = IHGNumbers( 3 ) * Zone( ZoneOtherEq( Loop ).ZonePtr ).TotOccupants;
 							if ( Zone( ZoneOtherEq( Loop ).ZonePtr ).TotOccupants <= 0.0 ) {

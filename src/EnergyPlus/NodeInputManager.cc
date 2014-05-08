@@ -926,9 +926,9 @@ namespace NodeInputManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Found;
 
-		{ auto const SELECT_CASE_var( MakeUPPERCase( CheckType ) );
+		{ auto const nodeType( CheckType );
 
-		if ( ( SELECT_CASE_var == "NODENAME" ) || ( SELECT_CASE_var == "NODENAMES" ) || ( SELECT_CASE_var == "NODE NAME" ) || ( SELECT_CASE_var == "NODE NAMES" ) ) {
+		if ( SameString(nodeType, "NODENAME") || SameString(nodeType, "NODENAMES") || SameString(nodeType, "NODE NAME") || SameString(nodeType, "NODE NAMES") ) {
 			if ( ! present( CheckName ) ) {
 				ShowFatalError( "Routine CheckUniqueNodes called with Nodetypes=NodeName, " "but did not include CheckName argument." );
 			}
@@ -957,7 +957,7 @@ namespace NodeInputManager {
 				}
 			}
 
-		} else if ( ( SELECT_CASE_var == "NODENUMBER" ) || ( SELECT_CASE_var == "NODENUMBERS" ) || ( SELECT_CASE_var == "NODE NUMBER" ) || ( SELECT_CASE_var == "NODE NUMBERS" ) ) {
+		} else if (  SameString(nodeType, "NODENUMBER") ||  SameString(nodeType, "NODENUMBERS") ||  SameString(nodeType, "NODE NUMBER") ||  SameString(nodeType, "NODE NUMBERS") ) {
 			if ( ! present( CheckNumber ) ) {
 				ShowFatalError( "Routine CheckUniqueNodes called with Nodetypes=NodeNumber, " "but did not include CheckNumber argument." );
 			}
