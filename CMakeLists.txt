@@ -40,7 +40,6 @@ ADD_SUBDIRECTORY(src/EnergyPlus)
 
 if ( BUILD_FORTRAN )
     ENABLE_LANGUAGE(Fortran)
-    ADD_SUBDIRECTORY(src/EPMacro)
     ADD_SUBDIRECTORY(src/ExpandObjects)
     ADD_SUBDIRECTORY(src/ReadVars)
 endif()

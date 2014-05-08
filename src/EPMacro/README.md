@@ -1,1 +1,0 @@
-Note that the EPMacro Fortran source file is named with an extension of .F90, instead of the usual .f90.  This tells the Fortran compiler to run the C preprocessor before compilation without having to pass extra compiler flags.
