@@ -50,6 +50,7 @@ public: // Creation
 	virtual
 	~WriteBase()
 	{}
+
 private: // Creation
 
 	// Copy Constructor
@@ -103,6 +104,14 @@ protected: // Properties
 	IOFlags &
 	flags() = 0;
 
+	// Line Terminator
+	inline
+	std::string const &
+	ter() const
+	{
+		return flags().ter();
+	}
+
 	// Reversion Count Before Last next()
 	inline
 	Format::Size
@@ -122,13 +131,14 @@ public: // Operators
 		if ( stream() && format() ) {
 			reverts_ = format()->reverts();
 			Format * active( format()->current() );
-			while ( stream() && active && active->no_arg() && ( format()->reverts() == reverts_ ) && active->output( stream(), pos() ) ) { // Outputs up to arg-based format
+			std::string const & ter_( ter() );
+			while ( stream() && active && active->no_arg() && ( format()->reverts() == reverts_ ) && active->output_no_arg( stream(), pos(), ter_ ) ) { // Outputs up to arg-based format
 				active = active->next();
 			}
-			if ( stream() && active && active->uses_arg() && active->output( stream(), pos(), t ) ) { // Output arg using active format
+			if ( stream() && active && active->uses_arg() && active->output_val( stream(), pos(), t ) ) { // Output arg using active format
 				reverts_ = format()->reverts();
 				active = active->next();
-				while ( stream() && active && active->no_arg() && ( format()->reverts() == reverts_ ) && format()->not_colon_terminated() && active->output( stream(), pos() ) ) { // Outputs up to next arg-based format if not : terminated
+				while ( stream() && active && active->no_arg() && ( format()->reverts() == reverts_ ) && format()->not_colon_terminated() && active->output_no_arg( stream(), pos(), ter_ ) ) { // Outputs up to next arg-based format if not : terminated
 					active = active->next();
 				}
 			}
@@ -503,13 +513,14 @@ public: // Creation
 		if ( format_ ) {
 			if ( stream_ ) {
 				Format * active( format_->current() );
-				while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts() ) && active->output( stream_, pos_ ) ) { // Outputs up to arg-based format
+				std::string const & ter_( flags_.ter() );
+				while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts() ) && active->output_no_arg( stream_, pos_, ter_ ) ) { // Outputs up to arg-based format
 					active = active->next();
 				}
 				if ( format_->non_advancing() ) { // Non-advancing
 					format_->output_pos( stream_, pos_ ); // Move to virtual position
 				} else { // Advancing
-					stream_ << '\n'; // Add newline
+					stream_ << ter_; // Add line terminator
 				}
 				flags_.set_status( stream_ );
 			}
@@ -629,7 +640,7 @@ public: // Creation
 		if ( format_ ) {
 			if ( stream_ ) {
 				Format * active( format_->current() );
-				while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts() ) && active->output( stream_, pos_ ) ) { // Outputs up to arg-based format
+				while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts() ) && active->output_no_arg( stream_, pos_ ) ) { // Outputs up to arg-based format
 					active = active->next();
 				}
 				format_->output_pos( stream_, pos_ ); // Move to virtual position
@@ -751,7 +762,7 @@ public: // Creation
 		if ( format_ ) {
 			if ( stream_ ) {
 				Format * active( format_->current() );
-				while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts() ) && active->output( stream_, pos_ ) ) { // Outputs up to arg-based format
+				while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts() ) && active->output_no_arg( stream_, pos_ ) ) { // Outputs up to arg-based format
 					active = active->next();
 				}
 				format_->output_pos( stream_, pos_ ); // Move to virtual position
@@ -879,6 +890,24 @@ public: // Creation
 		flags_( IOFlags::handler() ),
 		write_( new WriteStream( stream, fmt, flags_ ) )
 	{}
+
+	// Stream + Format Constructor
+	inline
+	Write( std::ostream & stream, std::string const & fmt, std::string const & ter ) :
+		flags_( IOFlags::handler() ),
+		write_( new WriteStream( stream, fmt, flags_ ) )
+	{
+		flags_.ter( ter );
+	}
+
+	// Stream + Format Constructor
+	inline
+	Write( std::ostream & stream, gio::Fmt const & fmt, std::string const & ter ) :
+		flags_( IOFlags::handler() ),
+		write_( new WriteStream( stream, fmt, flags_ ) )
+	{
+		flags_.ter( ter );
+	}
 
 	// Stream + Format + Flags Constructor
 	inline

@@ -138,7 +138,7 @@ struct TypeTraits
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
@@ -196,7 +196,7 @@ struct TypeTraits< char >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
@@ -254,7 +254,7 @@ struct TypeTraits< signed char >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
@@ -312,7 +312,7 @@ struct TypeTraits< unsigned char >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
@@ -370,7 +370,7 @@ struct TypeTraits< bool >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
@@ -428,7 +428,7 @@ struct TypeTraits< byte >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
@@ -486,7 +486,7 @@ struct TypeTraits< ubyte >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
@@ -544,7 +544,7 @@ struct TypeTraits< short int >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
@@ -602,7 +602,7 @@ struct TypeTraits< unsigned short int >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
@@ -660,7 +660,7 @@ struct TypeTraits< int >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
@@ -718,7 +718,7 @@ struct TypeTraits< unsigned int >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
@@ -776,7 +776,7 @@ struct TypeTraits< long int >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
@@ -834,7 +834,7 @@ struct TypeTraits< unsigned long int >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
@@ -892,7 +892,7 @@ struct TypeTraits< long long int >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
@@ -950,7 +950,7 @@ struct TypeTraits< unsigned long long int >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
@@ -1008,7 +1008,7 @@ struct TypeTraits< float >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
@@ -1066,7 +1066,7 @@ struct TypeTraits< double >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
@@ -1124,7 +1124,7 @@ struct TypeTraits< long double >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
@@ -1183,7 +1183,7 @@ struct TypeTraits< std::complex< float > >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
@@ -1242,7 +1242,7 @@ struct TypeTraits< std::complex< double > >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
@@ -1301,7 +1301,7 @@ struct TypeTraits< std::complex< long double > >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision

@@ -26,7 +26,7 @@ TEST( WriteTest, WriteCharToStream )
 	std::ostringstream stream;
 	char c( 'X' );
 	Write( stream, "*" ) << c;
-	EXPECT_EQ( " X\n", stream.str() );
+	EXPECT_EQ( " X" + IOFlags::default_ter(), stream.str() );
 }
 
 TEST( WriteTest, WriteStringToStream )
@@ -34,7 +34,7 @@ TEST( WriteTest, WriteStringToStream )
 	std::ostringstream stream;
 	std::string s( "ABC" );
 	Write( stream, "*" ) << s;
-	EXPECT_EQ( " ABC\n", stream.str() );
+	EXPECT_EQ( " ABC" + IOFlags::default_ter(), stream.str() );
 }
 
 TEST( WriteTest, NonAdvancingListDirected )
@@ -51,9 +51,9 @@ TEST( WriteTest, NonAdvancingListDirected )
 TEST( WriteTest, WriteMultilineStringToStream )
 {
 	std::ostringstream stream;
-	std::string s( "ABC\nXYZ" );
+	std::string s( "ABC" + IOFlags::default_ter() + "XYZ" );
 	Write( stream, "(2A3)" ) << s;
-	EXPECT_EQ( "ABC\nXYZ\n", stream.str() );
+	EXPECT_EQ( "ABC" + IOFlags::default_ter() + "XYZ" + IOFlags::default_ter(), stream.str() );
 }
 
 TEST( WriteTest, WriteStringLiteralToStream )

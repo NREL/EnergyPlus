@@ -71,7 +71,7 @@ public: // Creation
 		if ( format_ ) {
 			if ( stream_ ) {
 				Format * active( format_->current() );
-				while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts_ ) && active->output( stream_, pos_ ) ) { // Outputs up to arg-based format
+				while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts_ ) && active->output_no_arg( stream_, pos_ ) ) { // Outputs up to arg-based format
 					active = active->next();
 				}
 				if ( format_->non_advancing() ) { // Non-advancing
@@ -108,13 +108,13 @@ public: // Operators
 		if ( stream_ && format_ ) {
 			reverts_ = format_->reverts();
 			Format * active( format_->current() );
-			while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts_ ) && active->output( stream_, pos_ ) ) { // Outputs up to arg-based format
+			while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts_ ) && active->output_no_arg( stream_, pos_ ) ) { // Outputs up to arg-based format
 				active = active->next();
 			}
-			if ( stream_ && active && active->uses_arg() && active->output( stream_, pos_, t ) ) { // Output arg using active format
+			if ( stream_ && active && active->uses_arg() && active->output_val( stream_, pos_, t ) ) { // Output arg using active format
 				reverts_ = format_->reverts();
 				active = active->next();
-				while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts_ ) && format_->not_colon_terminated() && active->output( stream_, pos_ ) ) { // Outputs up to next arg-based format if not : terminated
+				while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts_ ) && format_->not_colon_terminated() && active->output_no_arg( stream_, pos_ ) ) { // Outputs up to next arg-based format if not : terminated
 					active = active->next();
 				}
 			}
