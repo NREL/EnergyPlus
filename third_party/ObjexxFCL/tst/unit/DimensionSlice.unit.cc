@@ -27,7 +27,7 @@ TEST( DimensionSliceTest, ConstructionIndexSlice )
 	EXPECT_EQ( 2, d.m() );
 	EXPECT_EQ( s.l() - s.s(), d.k() );
 	EXPECT_EQ( -5, d.k() );
-	EXPECT_EQ( s.size(), d.u() );
+	EXPECT_EQ( int( s.size() ), d.u() );
 	EXPECT_EQ( 4, d.u() );
 }
 
@@ -39,7 +39,7 @@ TEST( DimensionSliceTest, ConstructionIndexSliceMultiplier )
 	EXPECT_EQ( 6, d.m() );
 	EXPECT_EQ( ( s.l() - s.s() ) * 3, d.k() );
 	EXPECT_EQ( -15, d.k() );
-	EXPECT_EQ( s.size(), d.u() );
+	EXPECT_EQ( int( s.size() ), d.u() );
 	EXPECT_EQ( 4, d.u() );
 	DimensionSlice dc( d ); // Copy construction
 	EXPECT_EQ( 6, dc.m() );
@@ -59,7 +59,7 @@ TEST( DimensionSliceTest, ConstructionIndexRangeSliceMultiplier )
 	EXPECT_EQ( 6, d.m() );
 	EXPECT_EQ( ( s.l() - s.s() ) * 3, d.k() );
 	EXPECT_EQ( -15, d.k() );
-	EXPECT_EQ( s.size(), d.u() );
+	EXPECT_EQ( int( s.size() ), d.u() );
 	EXPECT_EQ( 4, d.u() );
 }
 

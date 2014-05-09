@@ -53,12 +53,13 @@ public: // Creation
 		append_( false ),
 		truncate_( false ),
 		asis_( true ),
-		size_( 0 ),
-		pos_( 0 ),
 		bz_( false ),
 		nad_( false ),
 		del_( false ),
 		her_( false ),
+		size_( 0 ),
+		pos_( 0 ),
+		ter_( default_ter() ),
 		err_( false ),
 		end_( false ),
 		eor_( false ),
@@ -73,6 +74,18 @@ public: // Creation
 	{
 		IOFlags flags;
 		flags.her_on();
+		return flags;
+	}
+
+	// Handle Errors with Line Terminator Named Constructor
+	inline
+	static
+	IOFlags
+	handler( std::string const & ter )
+	{
+		IOFlags flags;
+		flags.her_on();
+		flags.ter( ter );
 		return flags;
 	}
 
@@ -689,40 +702,6 @@ public: // Properties
 		return "YES"; // Only sequential supported
 	}
 
-	// Size
-	inline
-	Size
-	size() const
-	{
-		return size_;
-	}
-
-	// Size
-	inline
-	IOFlags &
-	size( Size const size )
-	{
-		size_ = size;
-		return *this;
-	}
-
-	// Position
-	inline
-	Pos
-	pos() const
-	{
-		return pos_;
-	}
-
-	// Position
-	inline
-	IOFlags &
-	pos( Pos const pos )
-	{
-		pos_ = pos;
-		return *this;
-	}
-
 	// Treat Blanks in Numeric Inputs as Zero?
 	inline
 	bool
@@ -923,6 +902,160 @@ public: // Properties
 	IOFlags &
 	DISPOSE( std::string const & dispose );
 
+	// Size
+	inline
+	Size
+	size() const
+	{
+		return size_;
+	}
+
+	// Size Set
+	inline
+	IOFlags &
+	size( Size const size )
+	{
+		size_ = size;
+		return *this;
+	}
+
+	// Position
+	inline
+	Pos
+	pos() const
+	{
+		return pos_;
+	}
+
+	// Position Set
+	inline
+	IOFlags &
+	pos( Pos const pos )
+	{
+		pos_ = pos;
+		return *this;
+	}
+
+	// Terminator
+	inline
+	std::string const &
+	ter() const
+	{
+		return ter_;
+	}
+
+	// Terminator Set
+	inline
+	IOFlags &
+	ter( std::string const & ter )
+	{
+		ter_ = ter;
+		return *this;
+	}
+
+	// Linux Terminator Set
+	inline
+	IOFlags &
+	ter_linux()
+	{
+		ter_ = "\n";
+		return *this;
+	}
+
+	// Linux Terminator Set
+	inline
+	IOFlags &
+	ter_Linux()
+	{
+		ter_ = "\n";
+		return *this;
+	}
+
+	// OS X Terminator Set
+	inline
+	IOFlags &
+	ter_osx()
+	{
+		ter_ = "\n";
+		return *this;
+	}
+
+	// OS X Terminator Set
+	inline
+	IOFlags &
+	ter_OSX()
+	{
+		ter_ = "\n";
+		return *this;
+	}
+
+	// Windows Terminator Set
+	inline
+	IOFlags &
+	ter_windows()
+	{
+		ter_ = "\r\n";
+		return *this;
+	}
+
+	// Windows Terminator Set
+	inline
+	IOFlags &
+	ter_Windows()
+	{
+		ter_ = "\r\n";
+		return *this;
+	}
+
+	// DOS Terminator Set
+	inline
+	IOFlags &
+	ter_dos()
+	{
+		ter_ = "\r\n";
+		return *this;
+	}
+
+	// DOS Terminator Set
+	inline
+	IOFlags &
+	ter_DOS()
+	{
+		ter_ = "\r\n";
+		return *this;
+	}
+
+	// Linefeed Terminator Set
+	inline
+	IOFlags &
+	ter_lf()
+	{
+		ter_ = "\n";
+		return *this;
+	}
+
+	// Carriage Return + Linefeed Terminator Set
+	inline
+	IOFlags &
+	ter_crlf()
+	{
+		ter_ = "\r\n";
+		return *this;
+	}
+
+	// Native Terminator Set
+	inline
+	IOFlags &
+	ter_native()
+	{
+#ifdef _WIN32
+		ter_ = "\r\n";
+#else
+		ter_ = "\n";
+#endif
+		return *this;
+	}
+
 	// Error?
 	inline
 	bool
@@ -1083,6 +1216,7 @@ public: // Methods
 		asis_ = true;
 		size_ = 0;
 		pos_ = 0;
+		ter_ = default_ter();
 		bz_ = false;
 		nad_ = false;
 		del_ = false;
@@ -1151,6 +1285,48 @@ public: // Methods
 		ios_ = flags.ios_;
 	}
 
+public: // Static Methods
+
+	// Default Output Line Terminator
+	inline
+	static
+	std::string const &
+	default_ter()
+	{
+#ifdef OBJEXXFCL_DEFAULT_LINE_TERMINATOR_LF
+		static std::string const dter( "\n" );
+#elif defined(OBJEXXFCL_DEFAULT_LINE_TERMINATOR_CRLF)
+		static std::string const dter( "\r\n" );
+#else // Use native terminator
+#ifdef _WIN32
+		static std::string const dter( "\r\n" );
+#else
+		static std::string const dter( "\n" );
+#endif
+#endif
+		return dter;
+	}
+
+	// Linefeed
+	inline
+	static
+	std::string const &
+	lf()
+	{
+		static std::string const s( "\n" );
+		return s;
+	}
+
+	// Linefeed
+	inline
+	static
+	std::string const &
+	crlf()
+	{
+		static std::string const s( "\r\n" );
+		return s;
+	}
+
 private: // Data
 
 	// Control/Inquiry
@@ -1168,12 +1344,13 @@ private: // Data
 	bool append_; // Append?
 	bool truncate_; // Truncate?
 	bool asis_; // AsIs?
-	Size size_; // Size
-	Pos pos_; // Position
 	bool bz_; // Treat blanks as zero on numeric input?
 	bool nad_; // Non-advancing i/o?
 	bool del_; // Delete?
 	bool her_; // Handle Errors?
+	Size size_; // Size
+	Pos pos_; // Position
+	std::string ter_; // Output line terminator
 
 	// Status
 	bool err_; // Error?
