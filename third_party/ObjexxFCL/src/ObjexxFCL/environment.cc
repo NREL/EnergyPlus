@@ -30,7 +30,7 @@ get_environment_variable( Fstring const & name, Optional< Fstring > value, Optio
 	if ( value.present() ) value = val;
 	if ( length.present() ) length = val.length();
 	if ( status.present() ) {
-		if ( ! cval ) { // Env var does not exist
+		if ( cval == nullptr ) { // Env var does not exist
 			status = 1;
 		} else { // Env var exists
 			if ( value.present() ) {
@@ -47,7 +47,7 @@ int
 getenvqq( Fstring const & name, Fstring & value )
 {
 	char const * const cval( getenv( name.c_str() ) );
-	value = ( cval ? cval : "" );
+	value = ( cval != nullptr ? cval : "" );
 	return static_cast< int >( value.length() );
 }
 
@@ -81,7 +81,7 @@ get_environment_variable( std::string const & name, Optional< std::string > valu
 	if ( value.present() ) value = val;
 	if ( length.present() ) length = val.length();
 	if ( status.present() ) {
-		if ( ! cval ) { // Env var does not exist
+		if ( cval == nullptr ) { // Env var does not exist
 			status = 1;
 		} else { // Env var exists
 			if ( value.present() ) {
@@ -94,11 +94,19 @@ get_environment_variable( std::string const & name, Optional< std::string > valu
 }
 
 // Get Environment Variable Value
+std::string
+get_env_var( std::string const & name )
+{
+	char const * const cval( getenv( name.c_str() ) );
+	return ( cval != nullptr ? cval : "" );
+}
+
+// Get Environment Variable Value
 std::string::size_type
 getenvqq( std::string const & name, std::string & value )
 {
 	char const * const cval( getenv( name.c_str() ) );
-	value = ( cval ? cval : "" );
+	value = ( cval != nullptr ? cval : "" );
 	return value.length();
 }
 
