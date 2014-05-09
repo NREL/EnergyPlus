@@ -21,10 +21,11 @@
 #include <ObjexxFCL/gio_Fmt.hh>
 #include <ObjexxFCL/IOFlags.hh>
 #include <ObjexxFCL/MArray.all.hh>
+#include <ObjexxFCL/stream.functions.hh>
 
 // C++ Headers
 #include <complex>
-#include <ostream>
+#include <fstream>
 #include <sstream>
 #include <string>
 #include <type_traits>
@@ -877,48 +878,180 @@ public: // Creation
 		write_( nullptr )
 	{}
 
+	// File Stream + Format Constructor
+	inline
+	Write( std::fstream & stream, std::string const & fmt ) :
+		flags_( IOFlags::handler() ),
+		write_( new WriteStream( stream, fmt, flags_ ) )
+	{}
+
+	// File Stream + Format Constructor
+	inline
+	Write( std::fstream & stream, gio::Fmt const & fmt ) :
+		flags_( IOFlags::handler() ),
+		write_( new WriteStream( stream, fmt, flags_ ) )
+	{}
+
+	// Output File Stream + Format Constructor
+	inline
+	Write( std::ofstream & stream, std::string const & fmt ) :
+		flags_( IOFlags::handler() ),
+		write_( new WriteStream( stream, fmt, flags_ ) )
+	{}
+
+	// Output File Stream + Format Constructor
+	inline
+	Write( std::ofstream & stream, gio::Fmt const & fmt ) :
+		flags_( IOFlags::handler() ),
+		write_( new WriteStream( stream, fmt, flags_ ) )
+	{}
+
+	// String Stream + Format Constructor
+	inline
+	Write( std::stringstream & stream, std::string const & fmt ) :
+		flags_( IOFlags::handler( LF ) ),
+		write_( new WriteStream( stream, fmt, flags_ ) )
+	{}
+
+	// String Stream + Format Constructor
+	inline
+	Write( std::stringstream & stream, gio::Fmt const & fmt ) :
+		flags_( IOFlags::handler( LF ) ),
+		write_( new WriteStream( stream, fmt, flags_ ) )
+	{}
+
+	// String Stream + Format Constructor
+	inline
+	Write( std::ostringstream & stream, std::string const & fmt ) :
+		flags_( IOFlags::handler( LF ) ),
+		write_( new WriteStream( stream, fmt, flags_ ) )
+	{}
+
+	// String Stream + Format Constructor
+	inline
+	Write( std::ostringstream & stream, gio::Fmt const & fmt ) :
+		flags_( IOFlags::handler( LF ) ),
+		write_( new WriteStream( stream, fmt, flags_ ) )
+	{}
+
 	// Stream + Format Constructor
 	inline
 	Write( std::ostream & stream, std::string const & fmt ) :
 		flags_( IOFlags::handler() ),
 		write_( new WriteStream( stream, fmt, flags_ ) )
-	{}
+	{
+		if ( ! is_fstream( stream ) ) flags_.ter_lf();
+	}
 
 	// Stream + Format Constructor
 	inline
 	Write( std::ostream & stream, gio::Fmt const & fmt ) :
 		flags_( IOFlags::handler() ),
 		write_( new WriteStream( stream, fmt, flags_ ) )
-	{}
-
-	// Stream + Format Constructor
-	inline
-	Write( std::ostream & stream, std::string const & fmt, std::string const & ter ) :
-		flags_( IOFlags::handler() ),
-		write_( new WriteStream( stream, fmt, flags_ ) )
 	{
-		flags_.ter( ter );
+		if ( ! is_fstream( stream ) ) flags_.ter_lf();
 	}
 
-	// Stream + Format Constructor
+	// File Stream + Format + Flags Constructor
 	inline
-	Write( std::ostream & stream, gio::Fmt const & fmt, std::string const & ter ) :
-		flags_( IOFlags::handler() ),
-		write_( new WriteStream( stream, fmt, flags_ ) )
+	Write( std::fstream & stream, std::string const & fmt, IOFlags & flags ) :
+		write_( new WriteStream( stream, fmt, flags ) )
+	{}
+
+	// File Stream + Format + Flags Constructor
+	inline
+	Write( std::fstream & stream, gio::Fmt const & fmt, IOFlags & flags ) :
+		write_( new WriteStream( stream, fmt, flags ) )
+	{}
+
+	// Output File Stream + Format + Flags Constructor
+	inline
+	Write( std::ofstream & stream, std::string const & fmt, IOFlags & flags ) :
+		write_( new WriteStream( stream, fmt, flags ) )
+	{}
+
+	// Output File Stream + Format + Flags Constructor
+	inline
+	Write( std::ofstream & stream, gio::Fmt const & fmt, IOFlags & flags ) :
+		write_( new WriteStream( stream, fmt, flags ) )
+	{}
+
+	// String Stream + Format + Flags Constructor
+	inline
+	Write( std::stringstream & stream, std::string const & fmt, IOFlags & flags ) :
+		write_( new WriteStream( stream, fmt, flags ) )
 	{
-		flags_.ter( ter );
+		flags.ter_lf();
+	}
+
+	// String Stream + Format + Flags Constructor
+	inline
+	Write( std::stringstream & stream, gio::Fmt const & fmt, IOFlags & flags ) :
+		write_( new WriteStream( stream, fmt, flags ) )
+	{
+		flags.ter_lf();
+	}
+
+	// Output String Stream + Format + Flags Constructor
+	inline
+	Write( std::ostringstream & stream, std::string const & fmt, IOFlags & flags ) :
+		write_( new WriteStream( stream, fmt, flags ) )
+	{
+		flags.ter_lf();
+	}
+
+	// Output String Stream + Format + Flags Constructor
+	inline
+	Write( std::ostringstream & stream, gio::Fmt const & fmt, IOFlags & flags ) :
+		write_( new WriteStream( stream, fmt, flags ) )
+	{
+		flags.ter_lf();
 	}
 
 	// Stream + Format + Flags Constructor
 	inline
 	Write( std::ostream & stream, std::string const & fmt, IOFlags & flags ) :
 		write_( new WriteStream( stream, fmt, flags ) )
-	{}
+	{
+		if ( ! is_fstream( stream ) ) flags.ter_lf();
+	}
 
 	// Stream + Format + Flags Constructor
 	inline
 	Write( std::ostream & stream, gio::Fmt const & fmt, IOFlags & flags ) :
 		write_( new WriteStream( stream, fmt, flags ) )
+	{
+		if ( ! is_fstream( stream ) ) flags.ter_lf();
+	}
+
+	// Stream + Format + Flags Constructor
+	inline
+	Write( std::ostream & stream, std::string const & fmt, IOFlags & flags, std::string const & ter ) :
+		write_( new WriteStream( stream, fmt, flags ) )
+	{
+		flags.ter( ter );
+	}
+
+	// Stream + Format + Flags Constructor
+	inline
+	Write( std::ostream & stream, gio::Fmt const & fmt, IOFlags & flags, std::string const & ter ) :
+		write_( new WriteStream( stream, fmt, flags ) )
+	{
+		flags.ter( ter );
+	}
+
+	// Stream + Format + Terminator Constructor
+	inline
+	Write( std::ostream & stream, std::string const & fmt, std::string const & ter ) :
+		flags_( IOFlags::handler( ter ) ),
+		write_( new WriteStream( stream, fmt, flags_ ) )
+	{}
+
+	// Stream + Format + Terminator Constructor
+	inline
+	Write( std::ostream & stream, gio::Fmt const & fmt, std::string const & ter ) :
+		flags_( IOFlags::handler( ter ) ),
+		write_( new WriteStream( stream, fmt, flags_ ) )
 	{}
 
 	// String + Format Constructor
@@ -1025,6 +1158,10 @@ private: // Data
 
 	IOFlags flags_; // Internal i/o flags
 	WriteBase * write_; // Implementation object
+
+public: // Static Data
+
+	static std::string const LF;
 
 }; // Write
 

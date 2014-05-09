@@ -410,28 +410,28 @@ write( Unit const unit )
 Write
 write( std::string const & fmt, IOFlags & flags )
 {
-	return Write( std::cout, fmt, flags );
+	return Write( std::cout, fmt, flags, Write::LF );
 }
 
 // Write to stdout
 Write
 write( gio::Fmt const & fmt, IOFlags & flags )
 {
-	return Write( std::cout, fmt, flags );
+	return Write( std::cout, fmt, flags, Write::LF );
 }
 
 // Write to stdout
 Write
 write( std::string const & fmt )
 {
-	return Write( std::cout, fmt );
+	return Write( std::cout, fmt, Write::LF );
 }
 
 // Write to stdout
 Write
 write( gio::Fmt const & fmt )
 {
-	return Write( std::cout, fmt );
+	return Write( std::cout, fmt, Write::LF );
 }
 
 // Print /////

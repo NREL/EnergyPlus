@@ -19,10 +19,13 @@
 
 namespace ObjexxFCL {
 
+// Is an Output Stream a File Stream?
+bool
+is_fstream( std::ostream const & stream );
+
 // Read a Line from a Text Input Stream: Cross-Platform: Linux (\n) or Windows (\r\n)
 std::istream &
 cross_platform_get_line( std::istream & stream, std::string & line );
-
 
 // Auto-Detected Line Terminator from a Text Input Stream: Cross-Platform: Linux (\n) or Windows (\r\n)
 std::string

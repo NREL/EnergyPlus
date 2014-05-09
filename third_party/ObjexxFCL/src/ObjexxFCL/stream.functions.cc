@@ -13,7 +13,17 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/stream.functions.hh>
 
+// C++ Headers
+#include <fstream>
+
 namespace ObjexxFCL {
+
+// Is an Output Stream a File Stream?
+bool
+is_fstream( std::ostream const & stream )
+{
+	return ( ( dynamic_cast< std::fstream const * >( &stream ) != nullptr ) || ( dynamic_cast< std::ofstream const * >( &stream ) != nullptr ) );
+}
 
 // Read a Line from a Text Input Stream: Cross-Platform: Linux (\n) or Windows (\r\n)
 std::istream &

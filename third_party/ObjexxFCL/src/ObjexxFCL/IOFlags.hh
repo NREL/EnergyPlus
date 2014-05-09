@@ -77,6 +77,18 @@ public: // Creation
 		return flags;
 	}
 
+	// Handle Errors with Line Terminator Named Constructor
+	inline
+	static
+	IOFlags
+	handler( std::string const & ter )
+	{
+		IOFlags flags;
+		flags.her_on();
+		flags.ter( ter );
+		return flags;
+	}
+
 public: // Properties
 
 	// Unit
