@@ -8948,6 +8948,9 @@ Label50: ;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcMultiSpeedDXCoil" );
+		static std::string const RoutineNameHighSpeedOutlet( "CalcMultiSpeedDXCoil:highspeedoutlet" );
+		static std::string const RoutineNameLowSpeedOutlet( "CalcMultiSpeedDXCoil:lowspeedoutlet" );
+		static std::string const RoutineNameNewDewPointConditions( "CalcMultiSpeedDXCoil:newdewpointconditions" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -9129,10 +9132,10 @@ Label50: ;
 						OutletAirHumRat = InletAirHumRat;
 					}
 					OutletAirDryBulbTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
-					OutletAirDryBulbTempSat = PsyTdpFnWPb( OutletAirHumRat, OutdoorPressure );
+					OutletAirDryBulbTempSat = PsyTdpFnWPb( OutletAirHumRat, OutdoorPressure, RoutineNameHighSpeedOutlet );
 					if ( OutletAirDryBulbTempSat > OutletAirDryBulbTemp ) {
 						OutletAirDryBulbTemp = OutletAirDryBulbTempSat;
-						OutletAirHumRat = PsyWFnTdbH( OutletAirDryBulbTemp, OutletAirEnthalpy, "CalcMultiSpeedDXCoil:highspeedoutlet" );
+						OutletAirHumRat = PsyWFnTdbH( OutletAirDryBulbTemp, OutletAirEnthalpy, RoutineNameHighSpeedOutlet );
 					}
 					//LSOutletAirRH = PsyRhFnTdbWPb(OutletAirDryBulbTemp,OutletAirHumRat,OutdoorPressure,'CalcMultiSpeedDXCoil:highspeedoutlet')
 				} else {
@@ -9224,21 +9227,21 @@ Label50: ;
 						LSOutletAirHumRat = InletAirHumRat;
 					}
 					LSOutletAirDryBulbTemp = PsyTdbFnHW( LSOutletAirEnthalpy, LSOutletAirHumRat );
-					OutletAirDryBulbTempSat = PsyTdpFnWPb( LSOutletAirHumRat, OutdoorPressure );
+					OutletAirDryBulbTempSat = PsyTdpFnWPb( LSOutletAirHumRat, OutdoorPressure, RoutineNameLowSpeedOutlet );
 					if ( OutletAirDryBulbTempSat > LSOutletAirDryBulbTemp ) {
 						LSOutletAirDryBulbTemp = OutletAirDryBulbTempSat;
-						LSOutletAirHumRat = PsyWFnTdbH( LSOutletAirDryBulbTemp, LSOutletAirEnthalpy, "CalcMultiSpeedDXCoil:lowspeedoutlet" );
+						LSOutletAirHumRat = PsyWFnTdbH( LSOutletAirDryBulbTemp, LSOutletAirEnthalpy, RoutineNameLowSpeedOutlet );
 					}
-					LSOutletAirRH = PsyRhFnTdbWPb( LSOutletAirDryBulbTemp, LSOutletAirHumRat, OutdoorPressure, "CalcMultiSpeedDXCoil:lowspeedoutlet" );
+					LSOutletAirRH = PsyRhFnTdbWPb( LSOutletAirDryBulbTemp, LSOutletAirHumRat, OutdoorPressure, RoutineNameLowSpeedOutlet );
 				} else {
 					// Adjust CBF for off-nominal flow
 					CBF = AdjustCBF( DXCoil( DXCoilNum ).RatedCBF2, DXCoil( DXCoilNum ).RatedAirMassFlowRate2, AirMassFlow );
 					// Calculate new apparatus dew point conditions
 					hADP = InletAirEnthalpy - hDelta / ( 1.0 - CBF );
-					tADP = PsyTsatFnHPb( hADP, OutdoorPressure, "CalcMultiSpeedDXCoil:newdewpointconditions" );
+					tADP = PsyTsatFnHPb( hADP, OutdoorPressure, RoutineNameNewDewPointConditions );
 					//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 					//    tADP = PsyTsatFnHPb(hADP,InletAirPressure)
-					wADP = PsyWFnTdbH( tADP, hADP, "CalcMultiSpeedDXCoil:newdewpointconditions" );
+					wADP = PsyWFnTdbH( tADP, hADP, RoutineNameNewDewPointConditions );
 					hTinwADP = PsyHFnTdbW( InletAirDryBulbTemp, wADP );
 					// get corresponding SHR
 					if ( ( InletAirEnthalpy - hADP ) > 1.e-10 ) {
@@ -9252,14 +9255,14 @@ Label50: ;
 					hTinwout = InletAirEnthalpy - ( 1.0 - SHR ) * hDelta;
 					LSOutletAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout );
 					LSOutletAirDryBulbTemp = PsyTdbFnHW( LSOutletAirEnthalpy, LSOutletAirHumRat );
-					LSOutletAirRH = PsyRhFnTdbWPb( LSOutletAirDryBulbTemp, LSOutletAirHumRat, OutdoorPressure, "CalcMultiSpeedDXCoil:lowspeedoutlet" );
-					OutletAirDryBulbTempSat = PsyTsatFnHPb( LSOutletAirEnthalpy, OutdoorPressure, "CalcMultiSpeedDXCoil:lowspeedoutlet" );
+					LSOutletAirRH = PsyRhFnTdbWPb( LSOutletAirDryBulbTemp, LSOutletAirHumRat, OutdoorPressure, RoutineNameLowSpeedOutlet );
+					OutletAirDryBulbTempSat = PsyTsatFnHPb( LSOutletAirEnthalpy, OutdoorPressure, RoutineNameLowSpeedOutlet );
 					//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 					//    LSOutletAirRH = PsyRhFnTdbWPb(LSOutletAirDryBulbTemp,LSOutletAirHumRat,InletAirPressure)
 					//    OutletAirDryBulbTempSat = PsyTsatFnHPb(LSOutletAirEnthalpy,InletAirPressure)
 					if ( LSOutletAirDryBulbTemp < OutletAirDryBulbTempSat ) { // Limit to saturated conditions at OutletAirEnthalpy
 						LSOutletAirDryBulbTemp = OutletAirDryBulbTempSat;
-						LSOutletAirHumRat = PsyWFnTdbH( LSOutletAirDryBulbTemp, LSOutletAirEnthalpy, "CalcMultiSpeedDXCoil:lowspeedoutlet" );
+						LSOutletAirHumRat = PsyWFnTdbH( LSOutletAirDryBulbTemp, LSOutletAirEnthalpy, RoutineNameLowSpeedOutlet );
 					}
 				}
 				// outlet conditions are average of inlet and low speed weighted by CycRatio

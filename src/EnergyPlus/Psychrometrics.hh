@@ -255,7 +255,8 @@ namespace Psychrometrics {
 	Real64
 	PsyTdpFnWPb(
 		Real64 const W, // humidity ratio
-		Real64 const PB // barometric pressure (N/M**2) {Pascals}
+		Real64 const PB, // barometric pressure (N/M**2) {Pascals}
+		std::string const & CalledFrom = "" // routine this function was called from (error messages)
 	);
 
 	inline

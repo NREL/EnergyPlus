@@ -426,7 +426,7 @@ namespace Psychrometrics {
 		W = PsyWFnTdbTwbPb( TDB, TWB, PB, CalledFrom );
 		W = max( W, 1.0e-5 );
 
-		TDP = PsyTdpFnWPb( W, PB );
+		TDP = PsyTdpFnWPb( W, PB, CalledFrom );
 
 #ifdef EP_psych_stats
 		++NumTimesCalled( iPsyTdpFnTdbTwbPb );
@@ -470,7 +470,8 @@ namespace Psychrometrics {
 	Real64
 	PsyTdpFnWPb(
 		Real64 const W, // humidity ratio
-		Real64 const PB // barometric pressure (N/M**2) {Pascals}
+		Real64 const PB, // barometric pressure (N/M**2) {Pascals}
+		std::string const & CalledFrom // routine this function was called from (error messages)
 	)
 	{
 
@@ -513,7 +514,7 @@ namespace Psychrometrics {
 
 		W0 = max( W, 1.0e-5 );
 		PDEW = PB * W0 / ( 0.62198 + W0 );
-		TDP = PsyTsatFnPb( PDEW, "PsyTdpFnWPb" );
+		TDP = PsyTsatFnPb( PDEW, CalledFrom );
 
 		return TDP;
 	}

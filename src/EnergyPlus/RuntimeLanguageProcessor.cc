@@ -2261,7 +2261,7 @@ namespace RuntimeLanguageProcessor {
 			} else if ( SELECT_CASE_var == FuncTdpFnTdbTwbPb ) {
 				ReturnValue = SetErlValueNumber( PsyTdpFnTdbTwbPb( Operand( 1 ).Number, Operand( 2 ).Number, Operand( 3 ).Number, "EMS Built-In Function" ) ); // result =>   dew-point temperature {C} | drybulb (C) | wetbulb (C) | pressure (Pa)
 			} else if ( SELECT_CASE_var == FuncTdpFnWPb ) {
-				ReturnValue = SetErlValueNumber( PsyTdpFnWPb( Operand( 1 ).Number, Operand( 2 ).Number ) ); // result =>  dew-point temperature {C} | Humidity ratio (kg water vapor/kg dry air) | pressure (Pa)
+				ReturnValue = SetErlValueNumber( PsyTdpFnWPb( Operand( 1 ).Number, Operand( 2 ).Number, "EMS Built-In Function" ) ); // result =>  dew-point temperature {C} | Humidity ratio (kg water vapor/kg dry air) | pressure (Pa)
 			} else if ( SELECT_CASE_var == FuncHFnTdbW ) {
 				ReturnValue = SetErlValueNumber( PsyHFnTdbW( Operand( 1 ).Number, Operand( 2 ).Number ) ); // result =>  enthalpy (J/kg) | drybulb (C) | Humidity ratio (kg water vapor/kg dry air)
 			} else if ( SELECT_CASE_var == FuncHFnTdbRhPb ) {
