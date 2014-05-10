@@ -843,7 +843,7 @@ namespace WindowEquivalentLayer {
 				for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneEquipConfigNum ).NumInletNodes; ++NodeNum ) {
 					NodeTemp = Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).Temp;
 					MassFlowRate = Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).MassFlowRate;
-					CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), NodeTemp );
+					CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), NodeTemp ); // *&^unique^&* "EQLWindowSurfaceHeatBalance"
 					SumSysMCp += MassFlowRate * CpAir;
 					SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
 				}
@@ -881,7 +881,7 @@ namespace WindowEquivalentLayer {
 					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneEquipConfigNum ).NumInletNodes; ++NodeNum ) {
 						NodeTemp = Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).Temp;
 						MassFlowRate = Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).MassFlowRate;
-						CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNumAdj ), NodeTemp );
+						CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNumAdj ), NodeTemp ); // *&^unique^&* "EQLWindowSurfaceHeatBalance"
 						SumSysMCp += MassFlowRate * CpAir;
 						SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
 					}
@@ -9442,7 +9442,7 @@ namespace WindowEquivalentLayer {
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
 		// FUNCTION PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "HCInWindowStandardRatings" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -9470,7 +9470,7 @@ namespace WindowEquivalentLayer {
 		TmeanFilmKelvin = TAirIn + 0.25 * ( TSurfIn - TAirIn ); // eq. 133 in ISO 15099
 		TmeanFilm = TmeanFilmKelvin - 273.15;
 		// the following properties are constants or linear relations for "standard" type reporting
-		rho = PsyRhoAirFnPbTdbW( 101325.0, TmeanFilm, 0.0, "HCInWindowStandardRatings" ); // dry air assumption
+		rho = PsyRhoAirFnPbTdbW( 101325.0, TmeanFilm, 0.0, RoutineName ); // dry air assumption
 
 		lambda = 2.873E-3 + 7.76E-5 * TmeanFilmKelvin; // Table B.1 in ISO 15099
 		mu = 3.723E-6 + 4.94E-8 * TmeanFilmKelvin; // Table B.2 in ISO 15099

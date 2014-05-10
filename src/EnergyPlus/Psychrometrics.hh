@@ -334,7 +334,8 @@ namespace Psychrometrics {
 	Real64
 	PsyRhovFnTdbRh(
 		Real64 const Tdb, // dry-bulb temperature {C}
-		Real64 const RH // relative humidity value (0.0-1.0)
+		Real64 const RH, // relative humidity value (0.0-1.0)
+		std::string const & CalledFrom = "" // routine this function was called from (error messages)
 	);
 
 	Real64

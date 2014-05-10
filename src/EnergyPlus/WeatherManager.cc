@@ -1964,6 +1964,7 @@ namespace WeatherManager {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt const TimeStmpFmt( "(I2.2,'/',I2.2,' ',I2.2,':')" );
 		static gio::Fmt const MnDyFmt( "(I2.2,'/',I2.2)" );
+		static std::string const RoutineName( "SetCurrentWeather" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2028,7 +2029,7 @@ namespace WeatherManager {
 		}
 
 		// Humidity Ratio and Wet Bulb are derived
-		OutHumRat = PsyWFnTdbRhPb( OutDryBulbTemp, OutRelHumValue, OutBaroPress, "SetCurrentWeather" );
+		OutHumRat = PsyWFnTdbRhPb( OutDryBulbTemp, OutRelHumValue, OutBaroPress, RoutineName );
 		OutWetBulbTemp = PsyTwbFnTdbWPb( OutDryBulbTemp, OutHumRat, OutBaroPress );
 		if ( OutDryBulbTemp < OutWetBulbTemp ) {
 			OutWetBulbTemp = OutDryBulbTemp;
@@ -3373,6 +3374,11 @@ Label903: ;
 		Real64 const ZhangHuangModCoeff_C5( 0.014 ); // -0.0980d0
 		Real64 const ZhangHuangModCoeff_D( -17.853 ); // -10.8568d0
 		Real64 const ZhangHuangModCoeff_K( 0.843 ); // 49.3112d0
+		static std::string const RoutineNamePsyWFnTdbTwbPb( "SetUpDesignDay:PsyWFnTdbTwbPb" );
+		static std::string const RoutineNamePsyWFnTdpPb( "SetUpDesignDay:PsyWFnTdpPb" );
+		static std::string const RoutineNamePsyWFnTdbH( "SetUpDesignDay:PsyWFnTdbH" );
+		static std::string const WeatherManager( "WeatherManager" );
+		static std::string const RoutineNameLong( "WeatherManager.f90 subroutine SetUpDesignDay" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3604,11 +3610,11 @@ Label903: ;
 		{ auto const SELECT_CASE_var( DesDayInput( Envrn ).HumIndType );
 
 		if ( SELECT_CASE_var == DDHumIndType_WetBulb ) {
-			HumidityRatio = PsyWFnTdbTwbPb( DesDayInput( EnvrnNum ).MaxDryBulb, DesDayInput( EnvrnNum ).HumIndValue, DesDayInput( EnvrnNum ).PressBarom, "SetUpDesignDay:PsyWFnTdbTwbPb" );
+			HumidityRatio = PsyWFnTdbTwbPb( DesDayInput( EnvrnNum ).MaxDryBulb, DesDayInput( EnvrnNum ).HumIndValue, DesDayInput( EnvrnNum ).PressBarom, RoutineNamePsyWFnTdbTwbPb );
 			ConstantHumidityRatio = true;
 
 		} else if ( SELECT_CASE_var == DDHumIndType_DewPoint ) {
-			HumidityRatio = PsyWFnTdpPb( DesDayInput( EnvrnNum ).HumIndValue, DesDayInput( EnvrnNum ).PressBarom, "SetUpDesignDay:PsyWFnTdpPb" );
+			HumidityRatio = PsyWFnTdpPb( DesDayInput( EnvrnNum ).HumIndValue, DesDayInput( EnvrnNum ).PressBarom, RoutineNamePsyWFnTdpPb );
 			ConstantHumidityRatio = true;
 
 		} else if ( SELECT_CASE_var == DDHumIndType_HumRatio ) {
@@ -3616,7 +3622,7 @@ Label903: ;
 			ConstantHumidityRatio = true;
 
 		} else if ( SELECT_CASE_var == DDHumIndType_Enthalpy ) {
-			HumidityRatio = PsyWFnTdbH( DesDayInput( EnvrnNum ).MaxDryBulb, DesDayInput( EnvrnNum ).HumIndValue * 1000.0, "SetUpDesignDay:PsyWFnTdbH" );
+			HumidityRatio = PsyWFnTdbH( DesDayInput( EnvrnNum ).MaxDryBulb, DesDayInput( EnvrnNum ).HumIndValue * 1000.0, RoutineNamePsyWFnTdbH );
 			ConstantHumidityRatio = true;
 
 		} else if ( SELECT_CASE_var == DDHumIndType_RelHumSch ) {
@@ -3688,11 +3694,11 @@ Label903: ;
 					WetBulb = min( WetBulb, TomorrowOutDryBulbTemp( Hour, TS ) ); // WB must be <= DB
 					OutHumRat = PsyWFnTdbTwbPb( TomorrowOutDryBulbTemp( Hour, TS ), WetBulb, DesDayInput( EnvrnNum ).PressBarom );
 					TomorrowOutDewPointTemp( Hour, TS ) = PsyTdpFnWPb( OutHumRat, DesDayInput( EnvrnNum ).PressBarom );
-					TomorrowOutRelHum( Hour, TS ) = PsyRhFnTdbWPb( TomorrowOutDryBulbTemp( Hour, TS ), OutHumRat, DesDayInput( EnvrnNum ).PressBarom, "WeatherManager" ) * 100.0;
+					TomorrowOutRelHum( Hour, TS ) = PsyRhFnTdbWPb( TomorrowOutDryBulbTemp( Hour, TS ), OutHumRat, DesDayInput( EnvrnNum ).PressBarom, WeatherManager ) * 100.0;
 				} else if ( ConstantHumidityRatio ) {
 					//  Need Dew Point Temperature.  Use Relative Humidity to get Humidity Ratio, unless Humidity Ratio is constant
 					//BG 9-26-07  moved following inside this IF statment; when HumIndType is 'Schedule' HumidityRatio wasn't being initialized
-					WetBulb = PsyTwbFnTdbWPb( TomorrowOutDryBulbTemp( Hour, TS ), HumidityRatio, DesDayInput( EnvrnNum ).PressBarom, "WeatherManager.f90 subroutine SetUpDesignDay" );
+					WetBulb = PsyTwbFnTdbWPb( TomorrowOutDryBulbTemp( Hour, TS ), HumidityRatio, DesDayInput( EnvrnNum ).PressBarom, RoutineNameLong );
 
 					OutHumRat = PsyWFnTdpPb( TomorrowOutDryBulbTemp( Hour, TS ), DesDayInput( EnvrnNum ).PressBarom );
 					if ( HumidityRatio > OutHumRat ) {
@@ -3701,7 +3707,7 @@ Label903: ;
 						OutHumRat = PsyWFnTdbTwbPb( TomorrowOutDryBulbTemp( Hour, TS ), WetBulb, DesDayInput( EnvrnNum ).PressBarom );
 					}
 					TomorrowOutDewPointTemp( Hour, TS ) = PsyTdpFnWPb( OutHumRat, DesDayInput( EnvrnNum ).PressBarom );
-					TomorrowOutRelHum( Hour, TS ) = PsyRhFnTdbWPb( TomorrowOutDryBulbTemp( Hour, TS ), OutHumRat, DesDayInput( EnvrnNum ).PressBarom, "WeatherManager" ) * 100.0;
+					TomorrowOutRelHum( Hour, TS ) = PsyRhFnTdbWPb( TomorrowOutDryBulbTemp( Hour, TS ), OutHumRat, DesDayInput( EnvrnNum ).PressBarom, WeatherManager ) * 100.0;
 				} else {
 					HumidityRatio = PsyWFnTdbRhPb( TomorrowOutDryBulbTemp( Hour, TS ), DDHumIndModifier( EnvrnNum, Hour, TS ) / 100.0, DesDayInput( EnvrnNum ).PressBarom );
 					// TomorrowOutRelHum values set earlier

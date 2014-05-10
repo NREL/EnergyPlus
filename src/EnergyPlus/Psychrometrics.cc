@@ -574,7 +574,8 @@ namespace Psychrometrics {
 	Real64
 	PsyRhovFnTdbRh(
 		Real64 const Tdb, // dry-bulb temperature {C}
-		Real64 const RH // relative humidity value (0.0-1.0)
+		Real64 const RH, // relative humidity value (0.0-1.0)
+		std::string const & CalledFrom // routine this function was called from (error messages)
 	)
 	{
 
@@ -619,7 +620,7 @@ namespace Psychrometrics {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 pws; // saturation pressure for Tdb
 
-		pws = PsyPsatFnTemp( Tdb, "PsyRhovFnTdbRh" );
+		pws = PsyPsatFnTemp( Tdb, CalledFrom );
 
 		RhoV = ( pws * RH ) / ( 461.52 * ( Tdb + KelvinConv ) );
 
@@ -766,7 +767,7 @@ namespace Psychrometrics {
 		Real64 pws; // saturation pressure for Tdb
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "PsyRhFnTdbRhov" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -780,7 +781,7 @@ namespace Psychrometrics {
 		if ( Rhovapor <= 0.0 ) {
 			RHValue = 0.0;
 		} else {
-			pws = PsyPsatFnTemp( Tdb, "PsyRhFnTdbRhov" );
+			pws = PsyPsatFnTemp( Tdb, RoutineName );
 			RHValue = Rhovapor * 461.52 * ( Tdb + KelvinConv ) / pws;
 		}
 
@@ -974,7 +975,7 @@ namespace Psychrometrics {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "PsyRhFnTdbWPb" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -987,7 +988,7 @@ namespace Psychrometrics {
 		Real64 PWS; // Pressure -- saturated for pure water
 		Real64 W; // humidity ratio
 
-		PWS = PsyPsatFnTemp( TDB, ( CalledFrom.empty() ? "PsyRhFnTdbWPb" : CalledFrom ) );
+		PWS = PsyPsatFnTemp( TDB, ( CalledFrom.empty() ? RoutineName : CalledFrom ) );
 
 		//                   Find Degree Of Saturation
 		W = max( dW, 1.0e-5 );
@@ -1184,6 +1185,7 @@ namespace Psychrometrics {
 		// FUNCTION PARAMETER DEFINITIONS:
 		int const itmax( 100 ); // Maximum No of Iterations
 		static Real64 convTol( 0.0001 );
+		static std::string const RoutineName( "PsyTwbFnTdbWPb" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1258,7 +1260,7 @@ namespace Psychrometrics {
 
 		// Initial temperature guess at atmospheric pressure
 		if ( Patm != last_Patm ) {
-			tBoil = PsyTsatFnPb( Patm, ( CalledFrom.empty() ? "PsyTwbFnTdbWPb" : CalledFrom ) );
+			tBoil = PsyTsatFnPb( Patm, ( CalledFrom.empty() ? RoutineName : CalledFrom ) );
 			last_Patm = Patm;
 			last_tBoil = tBoil;
 		} else {
@@ -1278,7 +1280,7 @@ namespace Psychrometrics {
 			if ( WBT >= ( tBoil - 0.09 ) ) WBT = tBoil - 0.1;
 
 			// Determine the saturation pressure for wet bulb temperature
-			PSatstar = PsyPsatFnTemp( WBT, ( CalledFrom.empty() ? "PsyTwbFnTdbWPb" : CalledFrom ) );
+			PSatstar = PsyPsatFnTemp( WBT, ( CalledFrom.empty() ? RoutineName : CalledFrom ) );
 
 			// Determine humidity ratio for given saturation pressure
 			Wstar = 0.62198 * PSatstar / ( Patm - PSatstar );
@@ -1464,7 +1466,7 @@ namespace Psychrometrics {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "PsyWFnTdpPb" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1479,7 +1481,7 @@ namespace Psychrometrics {
 		++NumTimesCalled( iPsyWFnTdpPb );
 #endif
 
-		PDEW = PsyPsatFnTemp( TDP, ( CalledFrom.empty() ? "PsyWFnTdpPb" : CalledFrom ) );
+		PDEW = PsyPsatFnTemp( TDP, ( CalledFrom.empty() ? RoutineName : CalledFrom ) );
 		W = PDEW * 0.62198 / ( PB - PDEW );
 		//                                      VALIDITY TEST.
 		if ( W < 0.0 ) {
@@ -1630,7 +1632,7 @@ namespace Psychrometrics {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "PsyWFnTdbTwbPb" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1672,7 +1674,7 @@ namespace Psychrometrics {
 			TWB = TDB;
 		}
 		//                                      CALCULATION.
-		PWET = PsyPsatFnTemp( TWB, ( CalledFrom.empty() ? "PsyWFnTdbTwbPb" : CalledFrom ) );
+		PWET = PsyPsatFnTemp( TWB, ( CalledFrom.empty() ? RoutineName : CalledFrom ) );
 		WET = 0.62198 * PWET / ( PB - PWET );
 
 		W = ( ( 2501.0 - 2.381 * TWB ) * WET - ( TDB - TWB ) ) / ( 2501.0 + 1.805 * TDB - 4.186 * TWB );
@@ -1737,7 +1739,7 @@ namespace Psychrometrics {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "PsyWFnTdbRhPb" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1753,7 +1755,7 @@ namespace Psychrometrics {
 		++NumTimesCalled( iPsyWFnTdbRhPb );
 #endif
 
-		PDRY = PsyPsatFnTemp( TDB, ( CalledFrom.empty() ? "PsyWFnTdbRhPb" : CalledFrom ) );
+		PDRY = PsyPsatFnTemp( TDB, ( CalledFrom.empty() ? RoutineName : CalledFrom ) );
 		PDEW = RH * PDRY;
 
 		//Numeric error check when the temperature and RH values cause Pdew to equal or exceed
@@ -2247,6 +2249,7 @@ Label170: ;
 		// FUNCTION PARAMETER DEFINITIONS:
 		int const itmax( 50 ); // Maximum number of iterations
 		static Real64 convTol( 0.0001 );
+		static std::string const RoutineName( "PsyTsatFnPb" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2323,7 +2326,7 @@ Label170: ;
 			for ( iter = 1; iter <= itmax; ++iter ) {
 
 				// Calculate saturation pressure for estimated boiling temperature
-				pSat = PsyPsatFnTemp( tSat, ( CalledFrom.empty() ? "PsyTsatFnPb" : CalledFrom ) );
+				pSat = PsyPsatFnTemp( tSat, ( CalledFrom.empty() ? RoutineName : CalledFrom ) );
 
 				//Compare with specified pressure and update estimate of temperature
 				error = Press - pSat;

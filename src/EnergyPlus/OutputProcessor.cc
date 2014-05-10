@@ -115,7 +115,7 @@ namespace OutputProcessor {
 	gio::Fmt const RunPeriodStampFormat( "(A,',',A)" );
 	gio::Fmt const fmta( "(A)" );
 	FArray1D_string const DayTypes( 12, { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2" } );
-	std::string const BlankString;
+	static std::string const BlankString;
 	int const UnitsStringLength( 16 );
 
 	int const RVarAllocInc( 1000 );

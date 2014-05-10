@@ -3282,7 +3282,7 @@ namespace ZoneTempPredictorCorrector {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "CalcPredictedHumidityRatio" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3369,8 +3369,8 @@ namespace ZoneTempPredictorCorrector {
 			}
 
 			// The density of air and latent heat of vaporization are calculated as functions.
-			RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), "CalcPredictedHumidityRatio" );
-			H2OHtOfVap = PsyHgAirFnWTdb( ZoneAirHumRat( ZoneNum ), ZT( ZoneNum ) );
+			RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName );
+			H2OHtOfVap = PsyHgAirFnWTdb( ZoneAirHumRat( ZoneNum ), ZT( ZoneNum ) ); // *&^unique^&* "CalcPredictedHumidityRatio"
 
 			// Assume that the system will have flow
 			if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
@@ -3388,7 +3388,7 @@ namespace ZoneTempPredictorCorrector {
 			// this amount of moisture must be added to the zone to reach the setpoint.  Negative values represent
 			// the amount of moisture that must be removed by the system.
 			//MoistLoadHumidSetPoint = massflow * HumRat = kg air/sec  * kg H2O/kg Air = kg H2O/sec
-			WZoneSetPoint = PsyWFnTdbRhPb( ZT( ZoneNum ), ( ZoneRHHumidifyingSetPoint / 100.0 ), OutBaroPress, "CalcPredictedHumidityRatio" );
+			WZoneSetPoint = PsyWFnTdbRhPb( ZT( ZoneNum ), ( ZoneRHHumidifyingSetPoint / 100.0 ), OutBaroPress, RoutineName );
 			{ auto const SELECT_CASE_var( ZoneAirSolutionAlgo );
 			if ( SELECT_CASE_var == Use3rdOrder ) {
 				LoadToHumidifySetPoint = ( ( 11.0 / 6.0 ) * C + A ) * WZoneSetPoint - ( B + C * ( 3.0 * WZoneTimeMinus1Temp( ZoneNum ) - ( 3.0 / 2.0 ) * WZoneTimeMinus2Temp( ZoneNum ) + ( 1.0 / 3.0 ) * WZoneTimeMinus3Temp( ZoneNum ) ) );
@@ -3403,7 +3403,7 @@ namespace ZoneTempPredictorCorrector {
 				LoadToHumidifySetPoint = C * ( WZoneSetPoint - ZoneW1( ZoneNum ) ) + A * WZoneSetPoint - B;
 			}}
 			ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToHumidifyingSP = LoadToHumidifySetPoint;
-			WZoneSetPoint = PsyWFnTdbRhPb( ZT( ZoneNum ), ( ZoneRHDehumidifyingSetPoint / 100.0 ), OutBaroPress, "CalcPredictedHumidityRatio" );
+			WZoneSetPoint = PsyWFnTdbRhPb( ZT( ZoneNum ), ( ZoneRHDehumidifyingSetPoint / 100.0 ), OutBaroPress, RoutineName );
 			{ auto const SELECT_CASE_var( ZoneAirSolutionAlgo );
 			if ( SELECT_CASE_var == Use3rdOrder ) {
 				LoadToDehumidifySetPoint = ( ( 11.0 / 6.0 ) * C + A ) * WZoneSetPoint - ( B + C * ( 3.0 * WZoneTimeMinus1Temp( ZoneNum ) - ( 3.0 / 2.0 ) * WZoneTimeMinus2Temp( ZoneNum ) + ( 1.0 / 3.0 ) * WZoneTimeMinus3Temp( ZoneNum ) ) );
@@ -3524,7 +3524,7 @@ namespace ZoneTempPredictorCorrector {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "CorrectZoneAirTemp" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3601,7 +3601,7 @@ namespace ZoneTempPredictorCorrector {
 
 			}
 
-			AIRRAT( ZoneNum ) = Zone( ZoneNum ).Volume * ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), "CorrectZoneAirTemp" ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) ) / ( TimeStepSys * SecInHour );
+			AIRRAT( ZoneNum ) = Zone( ZoneNum ).Volume * ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) ) / ( TimeStepSys * SecInHour ); // *&^unique^&* "CorrectZoneAirTemp"
 
 			AirCap = AIRRAT( ZoneNum );
 
@@ -3738,7 +3738,7 @@ namespace ZoneTempPredictorCorrector {
 			CorrectZoneHumRat( ZoneNum );
 
 			ZoneAirHumRat( ZoneNum ) = ZoneAirHumRatTemp( ZoneNum );
-			ZoneAirRelHum( ZoneNum ) = 100.0 * PsyRhFnTdbWPb( ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress, "CorrectZoneAirTemp" );
+			ZoneAirRelHum( ZoneNum ) = 100.0 * PsyRhFnTdbWPb( ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress, RoutineName );
 
 			// ZoneTempChange is used by HVACManager to determine if the timestep needs to be shortened.
 			{ auto const SELECT_CASE_var( ZoneAirSolutionAlgo );
@@ -3806,7 +3806,7 @@ namespace ZoneTempPredictorCorrector {
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
+		static std::string const CorrectZoneAirTemp( "CorrectZoneAirTemp" );
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// na
@@ -3836,7 +3836,7 @@ namespace ZoneTempPredictorCorrector {
 			WZoneTimeMinus1( ZoneNum ) = ZoneAirHumRatAvg( ZoneNum ); // using average for whole zone time step.
 			ZoneAirHumRat( ZoneNum ) = ZoneAirHumRatTemp( ZoneNum );
 			WZoneTimeMinusP( ZoneNum ) = ZoneAirHumRatTemp( ZoneNum );
-			ZoneAirRelHum( ZoneNum ) = 100.0 * PsyRhFnTdbWPb( ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress, "CorrectZoneAirTemp" );
+			ZoneAirRelHum( ZoneNum ) = 100.0 * PsyRhFnTdbWPb( ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress, CorrectZoneAirTemp );
 
 			if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_UCSDDV || AirModel( ZoneNum ).AirModelType == RoomAirModel_UCSDUFI || AirModel( ZoneNum ).AirModelType == RoomAirModel_UCSDUFE ) {
 				XM4TFloor( ZoneNum ) = XM3TFloor( ZoneNum );
@@ -4075,7 +4075,7 @@ namespace ZoneTempPredictorCorrector {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "CorrectZoneHumRat" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -4207,8 +4207,8 @@ namespace ZoneTempPredictorCorrector {
 			SumHmARa( ZoneNum ) = 0.0;
 		}
 
-		RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), "CorrectZoneHumRat" );
-		H2OHtOfVap = PsyHgAirFnWTdb( ZoneAirHumRat( ZoneNum ), ZT( ZoneNum ) );
+		RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName );
+		H2OHtOfVap = PsyHgAirFnWTdb( ZoneAirHumRat( ZoneNum ), ZT( ZoneNum ) ); // *&^unique^&* "CorrectZoneHumRat"
 
 		// Check for the flow and NO flow condition
 		if ( ZoneMassFlowRate > 0.0 ) {
@@ -4256,7 +4256,7 @@ namespace ZoneTempPredictorCorrector {
 
 		// Check to make sure that is saturated there is condensation in the zone
 		// by resetting to saturation conditions.
-		WZSat = PsyWFnTdbRhPb( ZT( ZoneNum ), 1.0, OutBaroPress, "CorrectZoneHumRat" );
+		WZSat = PsyWFnTdbRhPb( ZT( ZoneNum ), 1.0, OutBaroPress, RoutineName );
 
 		if ( ZoneAirHumRatTemp( ZoneNum ) > WZSat ) ZoneAirHumRatTemp( ZoneNum ) = WZSat;
 

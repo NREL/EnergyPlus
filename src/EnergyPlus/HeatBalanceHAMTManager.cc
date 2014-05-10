@@ -1005,7 +1005,8 @@ namespace HeatBalanceHAMTManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const HAMTExt( "HAMT-Ext" );
+		static std::string const HAMTInt( "HAMT-Int" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1123,8 +1124,8 @@ namespace HeatBalanceHAMTManager {
 		// Check, Is this per unit area or for the whole wall.
 		//    cells(Intcell(sid))%Qadds=QRadSWInAbs(sid)+NetLWRadToSurf(sid)+QHtRadSysSurf(sid)+QRadThermInAbs(sid)
 
-		cells( ExtConcell( sid ) ).rh = PsyRhFnTdbRhov( cells( ExtConcell( sid ) ).temp, RhoOut, "HAMT-Ext" );
-		cells( IntConcell( sid ) ).rh = PsyRhFnTdbRhov( cells( IntConcell( sid ) ).temp, RhoIn, "HAMT-Int" );
+		cells( ExtConcell( sid ) ).rh = PsyRhFnTdbRhov( cells( ExtConcell( sid ) ).temp, RhoOut, HAMTExt );
+		cells( IntConcell( sid ) ).rh = PsyRhFnTdbRhov( cells( IntConcell( sid ) ).temp, RhoIn, HAMTInt );
 
 		if ( cells( ExtConcell( sid ) ).rh > rhmax ) {
 			cells( ExtConcell( sid ) ).rh = rhmax;

@@ -878,6 +878,8 @@ namespace WaterUse {
 		Real64 FlowMassMax;
 		Real64 MoistureMassMax;
 
+		static std::string const RoutineName( "CalcEquipmentDrainTemp" );
+
 		// FLOW:
 
 		WaterEquipment( WaterEquipNum ).SensibleRate = 0.0;
@@ -906,7 +908,7 @@ namespace WaterUse {
 				WaterEquipment( WaterEquipNum ).LatentEnergy = 0.0;
 			} else {
 				ZoneHumRat = ZoneAirHumRat( ZoneNum );
-				ZoneHumRatSat = PsyWFnTdbRhPb( ZoneMAT, 1.0, OutBaroPress, "CalcEquipmentDrainTemp" ); // Humidratio at 100% relative humidity
+				ZoneHumRatSat = PsyWFnTdbRhPb( ZoneMAT, 1.0, OutBaroPress, RoutineName ); // Humidratio at 100% relative humidity
 				RhoAirDry = PsyRhoAirFnPbTdbW( OutBaroPress, ZoneMAT, 0.0 );
 
 				ZoneMassMax = ( ZoneHumRatSat - ZoneHumRat ) * RhoAirDry * Zone( ZoneNum ).Volume; // Max water that can be evaporated to zone

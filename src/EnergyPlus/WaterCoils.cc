@@ -781,6 +781,7 @@ namespace WaterCoils {
 		int const itmax( 10 );
 		int const MaxIte( 500 ); // Maximum number of iterations
 		Real64 const Acc( 0.0001 ); // Accuracy of result
+		static std::string const RoutineName( "InitWaterCoil" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -910,7 +911,7 @@ namespace WaterCoils {
 
 			MySizeFlag( CoilNum ) = false;
 		}
-		rho = GetDensityGlycol( PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidIndex, "InitWaterCoil" );
+		rho = GetDensityGlycol( PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidIndex, RoutineName );
 
 		// Do the Begin Environment initializations
 		if ( BeginEnvrnFlag && MyEnvrnFlag( CoilNum ) ) {
@@ -933,7 +934,7 @@ namespace WaterCoils {
 			if ( WaterCoil( CoilNum ).WaterCoilType == CoilType_Cooling ) { // 'Cooling'
 				Node( WaterInletNode ).Temp = 5.0;
 
-				Cp = GetSpecificHeatGlycol( PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidName, Node( WaterInletNode ).Temp, PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidIndex, "InitWaterCoil" );
+				Cp = GetSpecificHeatGlycol( PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidName, Node( WaterInletNode ).Temp, PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidIndex, RoutineName );
 
 				Node( WaterInletNode ).Enthalpy = Cp * Node( WaterInletNode ).Temp;
 				Node( WaterInletNode ).Quality = 0.0;
@@ -944,7 +945,7 @@ namespace WaterCoils {
 			if ( WaterCoil( CoilNum ).WaterCoilType == CoilType_Heating ) { // 'Heating'
 				Node( WaterInletNode ).Temp = 60.0;
 
-				Cp = GetSpecificHeatGlycol( PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidName, Node( WaterInletNode ).Temp, PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidIndex, "InitWaterCoil" );
+				Cp = GetSpecificHeatGlycol( PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidName, Node( WaterInletNode ).Temp, PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidIndex, RoutineName );
 
 				Node( WaterInletNode ).Enthalpy = Cp * Node( WaterInletNode ).Temp;
 				Node( WaterInletNode ).Quality = 0.0;
@@ -1078,7 +1079,7 @@ namespace WaterCoils {
 				DesOutletAirEnth = PsyHFnTdbW( WaterCoil( CoilNum ).DesOutletAirTemp, WaterCoil( CoilNum ).DesOutletAirHumRat );
 				DesSatEnthAtWaterInTemp = PsyHFnTdbW( WaterCoil( CoilNum ).DesInletWaterTemp, PsyWFnTdpPb( WaterCoil( CoilNum ).DesInletWaterTemp, StdBaroPress ) );
 				// check for dry coil
-				DesHumRatAtWaterInTemp = PsyWFnTdbH( WaterCoil( CoilNum ).DesInletWaterTemp, DesSatEnthAtWaterInTemp, "InitWaterCoil" );
+				DesHumRatAtWaterInTemp = PsyWFnTdbH( WaterCoil( CoilNum ).DesInletWaterTemp, DesSatEnthAtWaterInTemp, RoutineName );
 				if ( DesHumRatAtWaterInTemp > WaterCoil( CoilNum ).DesOutletAirHumRat && WaterCoil( CoilNum ).DesOutletAirTemp > WaterCoil( CoilNum ).DesInletWaterTemp ) {
 					// if the design outlet air humrat is lower than the saturated air humrat at the design inlet water temp
 					// and the design outlet air temperature is higher than the design inlet water temp (i.e, cooling possible),
@@ -1155,7 +1156,7 @@ namespace WaterCoils {
 					WaterCoil( CoilNum ).DesTotWaterCoilLoad = WaterCoil( CoilNum ).DesAirMassFlowRate * ( DesInletAirEnth - DesOutletAirEnth );
 
 					// Enthalpy of Water at Intlet design conditions
-					Cp = GetSpecificHeatGlycol( PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidName, WaterCoil( CoilNum ).DesInletWaterTemp, PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidIndex, "InitWaterCoil" );
+					Cp = GetSpecificHeatGlycol( PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidName, WaterCoil( CoilNum ).DesInletWaterTemp, PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidIndex, RoutineName );
 
 					DesOutletWaterTemp = WaterCoil( CoilNum ).DesInletWaterTemp + WaterCoil( CoilNum ).DesTotWaterCoilLoad / ( WaterCoil( CoilNum ).MaxWaterMassFlowRate * Cp );
 
@@ -1356,19 +1357,19 @@ namespace WaterCoils {
 			// Calculate rated Total, latent, sensible capacity, SHR, effectiveness
 			if ( WaterCoil( CoilNum ).WaterCoilType_Num == WaterCoil_SimpleHeating ) {
 				WaterCoil( CoilNum ).InletAirTemp = 16.6;
-				WaterCoil( CoilNum ).InletAirHumRat = PsyWFnTdbRhPb( 16.6, 0.5, StdBaroPress, "InitWaterCoil" );
+				WaterCoil( CoilNum ).InletAirHumRat = PsyWFnTdbRhPb( 16.6, 0.5, StdBaroPress, RoutineName );
 				WaterCoil( CoilNum ).InletWaterTemp = 82.2;
 			} else {
 				WaterCoil( CoilNum ).InletAirTemp = 26.67;
-				WaterCoil( CoilNum ).InletAirHumRat = PsyWFnTdbTwbPb( 26.67, 19.44, StdBaroPress, "InitWaterCoil" );
+				WaterCoil( CoilNum ).InletAirHumRat = PsyWFnTdbTwbPb( 26.67, 19.44, StdBaroPress, RoutineName );
 				WaterCoil( CoilNum ).InletWaterTemp = 6.67;
 			}
-			WaterCoil( CoilNum ).InletAirEnthalpy = PsyHFnTdbW( WaterCoil( CoilNum ).InletAirTemp, WaterCoil( CoilNum ).InletAirHumRat );
+			WaterCoil( CoilNum ).InletAirEnthalpy = PsyHFnTdbW( WaterCoil( CoilNum ).InletAirTemp, WaterCoil( CoilNum ).InletAirHumRat ); // *&^unique^&* "InitWaterCoil"
 			WaterCoil( CoilNum ).InletWaterMassFlowRate = WaterCoil( CoilNum ).MaxWaterMassFlowRate;
 			WaterCoil( CoilNum ).InletAirMassFlowRate = StdRhoAir * WaterCoil( CoilNum ).DesAirVolFlowRate;
-			CapacitanceAir = WaterCoil( CoilNum ).InletAirMassFlowRate * PsyCpAirFnWTdb( WaterCoil( CoilNum ).InletAirHumRat, WaterCoil( CoilNum ).InletAirTemp );
+			CapacitanceAir = WaterCoil( CoilNum ).InletAirMassFlowRate * PsyCpAirFnWTdb( WaterCoil( CoilNum ).InletAirHumRat, WaterCoil( CoilNum ).InletAirTemp ); // *&^unique^&* "InitWaterCoil"
 
-			Cp = GetSpecificHeatGlycol( PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidName, WaterCoil( CoilNum ).InletWaterTemp, PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidIndex, "InitWaterCoil" );
+			Cp = GetSpecificHeatGlycol( PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidName, WaterCoil( CoilNum ).InletWaterTemp, PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidIndex, RoutineName );
 
 			CapacitanceWater = WaterCoil( CoilNum ).InletWaterMassFlowRate * Cp;
 			CMin = min( CapacitanceAir, CapacitanceWater );
@@ -1606,6 +1607,7 @@ namespace WaterCoils {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIte( 500 ); // Maximum number of iterations
 		Real64 const Acc( 0.0001 ); // Accuracy of result
+		static std::string const InitWaterCoil( "InitWaterCoil" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2156,7 +2158,7 @@ namespace WaterCoils {
 
 							// check for dry coil and reset outlet humrat if needed
 							DesSatEnthAtWaterInTemp = PsyHFnTdbW( WaterCoil( CoilNum ).DesInletWaterTemp, PsyWFnTdpPb( WaterCoil( CoilNum ).DesInletWaterTemp, StdBaroPress ) );
-							DesHumRatAtWaterInTemp = PsyWFnTdbH( WaterCoil( CoilNum ).DesInletWaterTemp, DesSatEnthAtWaterInTemp, "InitWaterCoil" );
+							DesHumRatAtWaterInTemp = PsyWFnTdbH( WaterCoil( CoilNum ).DesInletWaterTemp, DesSatEnthAtWaterInTemp, InitWaterCoil );
 							if ( DesOutletAirHumRatDes < WaterCoil( CoilNum ).DesInletAirHumRat && DesHumRatAtWaterInTemp > WaterCoil( CoilNum ).DesInletAirHumRat && WaterCoil( CoilNum ).MaxWaterVolFlowRate > 0.0 ) {
 								if ( WaterCoil( CoilNum ).DesInletAirHumRat > DesOutletAirHumRatDes ) {
 									ShowWarningError( "SizeWaterCoil: Coil=\"" + WaterCoil( CoilNum ).Name + "\", Cooling Coil is dry and has air leaving humidity ratio < entering humidity ratio." );
@@ -2744,7 +2746,7 @@ namespace WaterCoils {
 							}
 							// check for dry coil and reset outlet humrat if needed
 							DesSatEnthAtWaterInTemp = PsyHFnTdbW( WaterCoil( CoilNum ).DesInletWaterTemp, PsyWFnTdpPb( WaterCoil( CoilNum ).DesInletWaterTemp, StdBaroPress ) );
-							DesHumRatAtWaterInTemp = PsyWFnTdbH( WaterCoil( CoilNum ).DesInletWaterTemp, DesSatEnthAtWaterInTemp, "InitWaterCoil" );
+							DesHumRatAtWaterInTemp = PsyWFnTdbH( WaterCoil( CoilNum ).DesInletWaterTemp, DesSatEnthAtWaterInTemp, InitWaterCoil );
 							if ( DesOutletAirHumRatDes < WaterCoil( CoilNum ).DesInletAirHumRat && DesHumRatAtWaterInTemp > WaterCoil( CoilNum ).DesInletAirHumRat && WaterCoil( CoilNum ).MaxWaterVolFlowRate > 0.0 ) {
 								ShowWarningError( "SizeWaterCoil: Coil=\"" + WaterCoil( CoilNum ).Name + "\", Cooling Coil is dry and has air leaving humidity ratio < entering humidity ratio." );
 								ShowContinueError( "    Wair,in =  " + RoundSigDigits( WaterCoil( CoilNum ).DesInletAirHumRat, 6 ) );
@@ -3877,8 +3879,8 @@ namespace WaterCoils {
 			//        known thermodynamic functions
 			// All coil calcs are done in KJoules.  Convert to KJ here and then convert
 			//  back to Joules at the end of the Subroutine.
-			DryAirSpecHeat = PsyCpAirFnWTdb( zero, TempAirIn ) * ConvK;
-			MoistAirSpecificHeat = PsyCpAirFnWTdb( InletAirHumRat, TempAirIn ) * ConvK;
+			DryAirSpecHeat = PsyCpAirFnWTdb( zero, TempAirIn ) * ConvK; // *&^unique^&* "CalcDetailFlatFinCoolingCoil"
+			MoistAirSpecificHeat = PsyCpAirFnWTdb( InletAirHumRat, TempAirIn ) * ConvK; // *&^unique^&* "CalcDetailFlatFinCoolingCoil"
 			InletAirEnthalpy = WaterCoil( CoilNum ).InletAirEnthalpy * ConvK;
 
 			EnterAirDewPoint = PsyTdpFnWPb( InletAirHumRat, OutBaroPress, RoutineName );
@@ -3922,7 +3924,7 @@ namespace WaterCoils {
 			}
 
 			RsdInletWaterTempSatAirHumRat = PsyWFnTdbRhPb( RaisedInletWaterTemp, unity, OutBaroPress, RoutineName );
-			AirEnthAtRsdInletWaterTemp = PsyHFnTdbW( RaisedInletWaterTemp, RsdInletWaterTempSatAirHumRat ) * ConvK;
+			AirEnthAtRsdInletWaterTemp = PsyHFnTdbW( RaisedInletWaterTemp, RsdInletWaterTempSatAirHumRat ) * ConvK; // *&^unique^&* "CalcDetailFlatFinCoolingCoil"
 
 			SensToTotEnthDiffRatio = DryAirSpecHeat * ( TempAirIn - RaisedInletWaterTemp ) / ( InletAirEnthalpy - AirEnthAtRsdInletWaterTemp );
 
@@ -4009,8 +4011,8 @@ namespace WaterCoils {
 
 				if ( std::abs( MeanWaterTemp - WetSideEffctvWaterTemp ) > 0.01 ) {
 					WetSideEffctvWaterTemp = MeanWaterTemp;
-					InSurfTempSatAirEnthl = PsyHFnTdbRhPb( InCoilSurfTemp, unity, OutBaroPress ) * ConvK;
-					OutSurfTempSatAirEnthl = PsyHFnTdbRhPb( OutCoilSurfTemp, unity, OutBaroPress ) * ConvK;
+					InSurfTempSatAirEnthl = PsyHFnTdbRhPb( InCoilSurfTemp, unity, OutBaroPress ) * ConvK; // *&^unique^&* "CalcDetailFlatFinCoolingCoil"
+					OutSurfTempSatAirEnthl = PsyHFnTdbRhPb( OutCoilSurfTemp, unity, OutBaroPress ) * ConvK; // *&^unique^&* "CalcDetailFlatFinCoolingCoil"
 
 					WaterCoil( CoilNum ).SatEnthlCurveSlope = ( OutSurfTempSatAirEnthl - InSurfTempSatAirEnthl ) / ( OutCoilSurfTemp - InCoilSurfTemp );
 					WaterCoil( CoilNum ).SatEnthlCurveConstCoef = InSurfTempSatAirEnthl - WaterCoil( CoilNum ).SatEnthlCurveSlope * InCoilSurfTemp;
@@ -4172,12 +4174,12 @@ namespace WaterCoils {
 						WaterCoil( CoilNum ).SurfAreaWetFraction = 0.0;
 						WetDryInterfcWaterTemp = TempWaterIn;
 					}
-					InSurfTempSatAirEnthl = PsyHFnTdbRhPb( InCoilSurfTemp, unity, OutBaroPress ) * ConvK;
+					InSurfTempSatAirEnthl = PsyHFnTdbRhPb( InCoilSurfTemp, unity, OutBaroPress ) * ConvK; // *&^unique^&* "CalcDetailFlatFinCoolingCoil"
 					if ( ( EnterAirDewPoint - InCoilSurfTemp ) >= .0001 ) {
-						AirEnthAtWetDryIntrfcSurfTemp = PsyHFnTdbRhPb( EnterAirDewPoint, unity, OutBaroPress ) * ConvK;
+						AirEnthAtWetDryIntrfcSurfTemp = PsyHFnTdbRhPb( EnterAirDewPoint, unity, OutBaroPress ) * ConvK; // *&^unique^&* "CalcDetailFlatFinCoolingCoil"
 						WaterCoil( CoilNum ).EnthVsTempCurveAppxSlope = ( AirEnthAtWetDryIntrfcSurfTemp - InSurfTempSatAirEnthl ) / ( EnterAirDewPoint - InCoilSurfTemp );
 					} else {
-						AirEnthAtWetDryIntrfcSurfTemp = PsyHFnTdbRhPb( InCoilSurfTemp + 0.0001, unity, OutBaroPress ) * ConvK;
+						AirEnthAtWetDryIntrfcSurfTemp = PsyHFnTdbRhPb( InCoilSurfTemp + 0.0001, unity, OutBaroPress ) * ConvK; // *&^unique^&* "CalcDetailFlatFinCoolingCoil"
 						WaterCoil( CoilNum ).EnthVsTempCurveAppxSlope = ( AirEnthAtWetDryIntrfcSurfTemp - InSurfTempSatAirEnthl ) / 0.0001;
 					}
 					WaterCoil( CoilNum ).EnthVsTempCurveConst = InSurfTempSatAirEnthl - WaterCoil( CoilNum ).EnthVsTempCurveAppxSlope * InCoilSurfTemp;
@@ -4214,7 +4216,7 @@ namespace WaterCoils {
 				//       Implementation of epsilon*NTU method
 				TempAirOut = AirExitCoilSurfTemp + ( AirWetDryInterfcTemp - AirExitCoilSurfTemp ) * y;
 				OutletAirHumRat = PsyWFnTdbH( TempAirOut, 1000. * OutletAirEnthalpy, RoutineName );
-				SenWaterCoilLoad = AirMassFlow * ( PsyCpAirFnWTdb( InletAirHumRat, TempAirIn ) * TempAirIn - PsyCpAirFnWTdb( OutletAirHumRat, TempAirOut ) * TempAirOut ) * ConvK;
+				SenWaterCoilLoad = AirMassFlow * ( PsyCpAirFnWTdb( InletAirHumRat, TempAirIn ) * TempAirIn - PsyCpAirFnWTdb( OutletAirHumRat, TempAirOut ) * TempAirOut ) * ConvK; // *&^unique^&* "CalcDetailFlatFinCoolingCoil"
 			}
 
 			if ( FanOpMode == CycFanCycCoil ) {

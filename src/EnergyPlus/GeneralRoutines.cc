@@ -922,6 +922,7 @@ CalcPassiveExteriorBaffleGap(
 	Real64 const Pr( 0.71 ); // Prandtl number for air
 	Real64 const Sigma( 5.6697e-08 ); // Stefan-Boltzmann constant
 	Real64 const KelvinConv( 273.15 ); // Conversion from Celsius to Kelvin
+	static std::string const RoutineName( "CalcPassiveExteriorBaffleGap" );
 	// INTERFACE BLOCK SPECIFICATIONS:
 
 	// DERIVED TYPE DEFINITIONS:
@@ -981,10 +982,10 @@ CalcPassiveExteriorBaffleGap(
 //	LocalWetBulbTemp = sum( Surface( SurfPtrARR ).Area * Surface( SurfPtrARR ).OutWetBulbTemp ) / sum( Surface( SurfPtrARR ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
 	LocalWetBulbTemp = sum_product_sub( Surface.Area(), Surface.OutWetBulbTemp(), SurfPtrARR ) / sum_sub( Surface.Area(), SurfPtrARR ); //Autodesk:F2C++ Functions handle array subscript usage
 
-	LocalOutHumRat = PsyWFnTdbTwbPb( LocalOutDryBulbTemp, LocalWetBulbTemp, OutBaroPress, "CalcPassiveExteriorBaffleGap" );
+	LocalOutHumRat = PsyWFnTdbTwbPb( LocalOutDryBulbTemp, LocalWetBulbTemp, OutBaroPress, RoutineName );
 
-	RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, LocalOutDryBulbTemp, LocalOutHumRat, "CalcPassiveExteriorBaffleGap" );
-	CpAir = PsyCpAirFnWTdb( LocalOutHumRat, LocalOutDryBulbTemp );
+	RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, LocalOutDryBulbTemp, LocalOutHumRat, RoutineName );
+	CpAir = PsyCpAirFnWTdb( LocalOutHumRat, LocalOutDryBulbTemp ); // *&^unique^&* "CalcPassiveExteriorBaffleGap"
 	if ( ! IsRain ) {
 		Tamb = LocalOutDryBulbTemp;
 	} else { // when raining we use wetbulb not drybulb

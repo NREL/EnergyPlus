@@ -4509,6 +4509,7 @@ namespace ConvectionCoefficients {
 
 		// Locals
 		Real64 const OneThird( ( 1.0 / 3.0 ) ); // 1/3 in highest precision
+		static std::string const RoutineName( "WindowTempsForNominalCond" );
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -4564,7 +4565,7 @@ namespace ConvectionCoefficients {
 		TmeanFilmKelvin = AirTempKelvin + 0.25 * ( SurfTempKelvin - AirTempKelvin ); // eq. 133 in ISO 15099
 		TmeanFilm = TmeanFilmKelvin - 273.15;
 
-		rho = PsyRhoAirFnPbTdbW( OutBaroPress, TmeanFilm, AirHumRat, "WindowTempsForNominalCond" );
+		rho = PsyRhoAirFnPbTdbW( OutBaroPress, TmeanFilm, AirHumRat, RoutineName );
 		g = 9.81;
 		Height = Surface( SurfNum ).Height;
 
@@ -4572,7 +4573,7 @@ namespace ConvectionCoefficients {
 		lambda = 2.873E-3 + 7.76E-5 * TmeanFilmKelvin; // Table B.1 in ISO 15099,
 		mu = 3.723E-6 + 4.94E-8 * TmeanFilmKelvin; // Table B.2 in ISO 15099
 
-		Cp = PsyCpAirFnWTdb( AirHumRat, TmeanFilm );
+		Cp = PsyCpAirFnWTdb( AirHumRat, TmeanFilm ); // *&^unique^&* "WindowTempsForNominalCond"
 
 		TiltDeg = Surface( SurfNum ).Tilt;
 		sineTilt = Surface( SurfNum ).SinTilt;
