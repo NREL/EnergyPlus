@@ -217,9 +217,9 @@ protected: // Creation
 		shift_( 0 ),
 		sdata_( nullptr )
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT
+#if defined(OBJEXXFCL_FARRAY_INIT) || defined(OBJEXXFCL_FARRAY_INIT_DEBUG)
 		std::fill_n( data_, size_, Traits::initial_array_value() );
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT || OBJEXXFCL_FARRAY_INIT_DEBUG
 #ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
 		size_report();
 #endif // OBJEXXFCL_FARRAY_SIZE_REPORT
@@ -340,6 +340,7 @@ protected: // Creation
 		sdata_( nullptr )
 	{}
 
+#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
 	// Non-Const Array Proxy Constructor
 	inline
 	FArray( FArray & a, ProxySentinel const & ) :
@@ -347,12 +348,11 @@ protected: // Creation
 		data_( a.data_ ),
 		size_( a.size_ ),
 		owner_( false ),
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
 		const_proxy_( a.const_proxy_ ),
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 		shift_( 0 ),
 		sdata_( nullptr )
 	{}
+#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
 	// Tail Proxy Constructor
 	inline
@@ -368,6 +368,7 @@ protected: // Creation
 		sdata_( nullptr )
 	{}
 
+#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
 	// Non-Const Tail Proxy Constructor
 	inline
 	FArray( Tail & s, ProxySentinel const & ) :
@@ -375,12 +376,11 @@ protected: // Creation
 		data_( s.data_ ),
 		size_( data_size_ ),
 		owner_( false ),
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
 		const_proxy_( s.const_proxy_ ),
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 		shift_( 0 ),
 		sdata_( nullptr )
 	{}
+#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
 	// Value Proxy Constructor
 	inline
@@ -396,6 +396,7 @@ protected: // Creation
 		sdata_( nullptr )
 	{}
 
+#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
 	// Non-Const Value Proxy Constructor
 	inline
 	FArray( T & t, ProxySentinel const & ) :
@@ -403,12 +404,11 @@ protected: // Creation
 		data_( &t ),
 		size_( npos ), // Unbounded
 		owner_( false ),
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
 		const_proxy_( false ),
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 		shift_( 0 ),
 		sdata_( nullptr )
 	{}
+#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
 	// Switch to Size Construction
 	void
@@ -418,9 +418,9 @@ protected: // Creation
 		data_size_ = size;
 		size_ = data_size_;
 		data_ = new T[ data_size_ ];
-#ifdef OBJEXXFCL_FARRAY_INIT
+#if defined(OBJEXXFCL_FARRAY_INIT) || defined(OBJEXXFCL_FARRAY_INIT_DEBUG)
 		reassign( Traits::initial_array_value() );
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT || OBJEXXFCL_FARRAY_INIT_DEBUG
 #ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
 		size_report();
 #endif // OBJEXXFCL_FARRAY_SIZE_REPORT
@@ -919,7 +919,7 @@ public: // Predicate
 	is_uniform() const
 	{
 		if ( size_ <= 1 ) return true;
-		T const t( data_[ 0 ] );
+		T const & t( data_[ 0 ] );
 		for ( size_type i = 1; i < size_; ++i ) {
 			if ( data_[ i ] != t ) return false;
 		}
@@ -2209,9 +2209,9 @@ protected: // Methods
 			size_report();
 #endif // OBJEXXFCL_FARRAY_SIZE_REPORT
 		}
-#ifdef OBJEXXFCL_FARRAY_INIT
+#if defined(OBJEXXFCL_FARRAY_INIT) || defined(OBJEXXFCL_FARRAY_INIT_DEBUG)
 		if ( ! initializer_active() ) std::fill_n( data_, size_, Traits::initial_array_value() );
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT || OBJEXXFCL_FARRAY_INIT_DEBUG
 		return *this;
 	}
 

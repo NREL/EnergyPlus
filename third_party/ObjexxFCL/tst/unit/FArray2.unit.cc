@@ -745,7 +745,7 @@ TEST( FArray2Test, ConstructIndexesInitializerList )
 	EXPECT_FALSE( A2.initializer_active() );
 	for ( int i2 = A2.l2(); i2 <= A2.u2(); ++i2 ) {
 		for ( int i1 = A2.l1(); i1 <= A2.u1(); ++i1 ) {
-			EXPECT_EQ( i1 * 10 + i2, A2( i1, i2 ) );
+			EXPECT_EQ( unsigned( i1 * 10 + i2 ), A2( i1, i2 ) );
 		}
 	}
 
@@ -869,7 +869,7 @@ TEST( FArray2Test, ConstructIndexesStickyInitializerList )
 	EXPECT_TRUE( A2.initializer_active() );
 	for ( int i2 = A2.l2(); i2 <= A2.u2(); ++i2 ) {
 		for ( int i1 = A2.l1(); i1 <= A2.u1(); ++i1 ) {
-			EXPECT_EQ( i1 * 10 + i2, A2( i1, i2 ) );
+			EXPECT_EQ( unsigned( i1 * 10 + i2 ), A2( i1, i2 ) );
 		}
 	}
 
@@ -952,7 +952,7 @@ TEST( FArray2Test, ConstructIndexRangeStickyInitializerList )
 	EXPECT_TRUE( A2.initializer_active() );
 	for ( int i2 = A2.l2(); i2 <= A2.u2(); ++i2 ) {
 		for ( int i1 = A2.l1(); i1 <= A2.u1(); ++i1 ) {
-			EXPECT_EQ( i1 * 10 + i2, A2( i1, i2 ) );
+			EXPECT_EQ( unsigned( i1 * 10 + i2 ), A2( i1, i2 ) );
 		}
 	}
 
@@ -1295,8 +1295,8 @@ TEST( FArray2Test, SubscriptTail )
 	EXPECT_EQ( 4u, A2.size() );
 	FArray2P_double A3( A2 );
 	EXPECT_EQ( 4u, A3.size() );
-	EXPECT_EQ( 1, A3.size1() );
-	EXPECT_EQ( 4, A3.size2() );
+	EXPECT_EQ( 1u, A3.size1() );
+	EXPECT_EQ( 4u, A3.size2() );
 	EXPECT_TRUE( eq( FArray2D_double( 1, 4, { 1.2, 2.2, 1.3, 2.3 } ), A3 ) );
 
 	FArray2D_double const C1( 2, 3, { 1.1, 2.1, 1.2, 2.2, 1.3, 2.3 } );
@@ -1304,34 +1304,34 @@ TEST( FArray2Test, SubscriptTail )
 	EXPECT_EQ( 4u, C2.size() );
 	FArray2P_double const C3( C2 );
 	EXPECT_EQ( 4u, C3.size() );
-	EXPECT_EQ( 1, C3.size1() );
-	EXPECT_EQ( 4, C3.size2() );
+	EXPECT_EQ( 1u, C3.size1() );
+	EXPECT_EQ( 4u, C3.size2() );
 	EXPECT_TRUE( eq( FArray2D_double( 1, 4, { 1.2, 2.2, 1.3, 2.3 } ), C3 ) );
 }
 
 TEST( FArray2Test, SubscriptIndex )
 {
 	FArray2D_int A1( 2, 3 );
-	EXPECT_EQ( 0, A1.index( 1, 1 ) );
-	EXPECT_EQ( 2, A1.index( 1, 2 ) );
-	EXPECT_EQ( 4, A1.index( 1, 3 ) );
-	EXPECT_EQ( 1, A1.index( 2, 1 ) );
-	EXPECT_EQ( 3, A1.index( 2, 2 ) );
-	EXPECT_EQ( 5, A1.index( 2, 3 ) );
+	EXPECT_EQ( 0u, A1.index( 1, 1 ) );
+	EXPECT_EQ( 2u, A1.index( 1, 2 ) );
+	EXPECT_EQ( 4u, A1.index( 1, 3 ) );
+	EXPECT_EQ( 1u, A1.index( 2, 1 ) );
+	EXPECT_EQ( 3u, A1.index( 2, 2 ) );
+	EXPECT_EQ( 5u, A1.index( 2, 3 ) );
 
 	FArray2D_int const C1( 2, 3 );
-	EXPECT_EQ( 0, C1.index( 1, 1 ) );
-	EXPECT_EQ( 2, C1.index( 1, 2 ) );
-	EXPECT_EQ( 4, C1.index( 1, 3 ) );
-	EXPECT_EQ( 1, C1.index( 2, 1 ) );
-	EXPECT_EQ( 3, C1.index( 2, 2 ) );
-	EXPECT_EQ( 5, C1.index( 2, 3 ) );
+	EXPECT_EQ( 0u, C1.index( 1, 1 ) );
+	EXPECT_EQ( 2u, C1.index( 1, 2 ) );
+	EXPECT_EQ( 4u, C1.index( 1, 3 ) );
+	EXPECT_EQ( 1u, C1.index( 2, 1 ) );
+	EXPECT_EQ( 3u, C1.index( 2, 2 ) );
+	EXPECT_EQ( 5u, C1.index( 2, 3 ) );
 }
 
 TEST( FArray2Test, SubscriptOperator )
 {
 	FArray2D_int A1( 2, 3, { 11, 21, 12, 22, 13, 23 } );
-	EXPECT_EQ( 6, A1.size() );
+	EXPECT_EQ( 6u, A1.size() );
 	EXPECT_EQ( 11, A1[ 0 ] );
 	EXPECT_EQ( 21, A1[ 1 ] );
 	EXPECT_EQ( 12, A1[ 2 ] );
@@ -1722,9 +1722,9 @@ TEST( FArray2Test, Inspectors )
 	// Size
 	EXPECT_EQ( 0u, C1.size() );
 	EXPECT_EQ( 0u, C1.data_size() );
-	EXPECT_EQ( 0, C1.size( 1 ) );
+	EXPECT_EQ( 0u, C1.size( 1 ) );
 	EXPECT_EQ( C1.size1(), C1.size( 1 ) );
-	EXPECT_EQ( 0, C1.size( 2 ) );
+	EXPECT_EQ( 0u, C1.size( 2 ) );
 	EXPECT_EQ( C1.size2(), C1.size( 2 ) );
 	// Indexes
 	EXPECT_EQ( SRange(), C1.I( 1 ) );
@@ -1750,9 +1750,9 @@ TEST( FArray2Test, Inspectors )
 	// Size
 	EXPECT_EQ( 6u, C2.size() );
 	EXPECT_EQ( 6u, C2.data_size() );
-	EXPECT_EQ( 2, C2.size( 1 ) );
+	EXPECT_EQ( 2u, C2.size( 1 ) );
 	EXPECT_EQ( C2.size1(), C2.size( 1 ) );
-	EXPECT_EQ( 3, C2.size( 2 ) );
+	EXPECT_EQ( 3u, C2.size( 2 ) );
 	EXPECT_EQ( C2.size2(), C2.size( 2 ) );
 	// Indexes
 	EXPECT_EQ( SRange( 1, 2 ), C2.I( 1 ) );
@@ -2041,9 +2041,9 @@ static void dimension_initializer_function( FArray2D_int & A1 )
 TEST( FArray2Test, DimensionIndexRange )
 {
 	FArray2D_int A1( 3, 4 );
-	EXPECT_EQ( 12, A1.size() );
-	EXPECT_EQ( 3, A1.size1() );
-	EXPECT_EQ( 4, A1.size2() );
+	EXPECT_EQ( 12u, A1.size() );
+	EXPECT_EQ( 3u, A1.size1() );
+	EXPECT_EQ( 4u, A1.size2() );
 	EXPECT_EQ( 1, A1.l1() );
 	EXPECT_EQ( 3, A1.u1() );
 	EXPECT_EQ( 1, A1.l2() );
@@ -2052,9 +2052,9 @@ TEST( FArray2Test, DimensionIndexRange )
 
 	// 1:3, 1:4 -> 2:4, 2:5.
 	A1.dimension( { 2, 4 }, { 2, 5 } );
-	EXPECT_EQ( 12, A1.size() );
-	EXPECT_EQ( 3, A1.size1() );
-	EXPECT_EQ( 4, A1.size2() );
+	EXPECT_EQ( 12u, A1.size() );
+	EXPECT_EQ( 3u, A1.size1() );
+	EXPECT_EQ( 4u, A1.size2() );
 	EXPECT_EQ( 2, A1.l1() );
 	EXPECT_EQ( 4, A1.u1() );
 	EXPECT_EQ( 2, A1.l2() );
@@ -2064,8 +2064,8 @@ TEST( FArray2Test, DimensionIndexRange )
 	// 1:3, 1:4 -> 2:4, 2:5 := 2:3, 2:4
 	FArray2D_int A2( 3, 4 );
 	A2.dimension( { 2, 4 }, { 2, 5 }, 31459 ); // Without new initial value array is uninitialized (POD) or default contructed (UDT)
-	EXPECT_EQ( 3, A2.size1() );
-	EXPECT_EQ( 4, A2.size2() );
+	EXPECT_EQ( 3u, A2.size1() );
+	EXPECT_EQ( 4u, A2.size2() );
 	EXPECT_EQ( 2, A2.l1() );
 	EXPECT_EQ( 4, A2.u1() );
 	EXPECT_EQ( 2, A2.l2() );
@@ -2079,8 +2079,8 @@ TEST( FArray2Test, DimensionIndexRange )
 	// 1:3, 1:4 -> 2:4, 2:5 := 2:3, 2:4
 	FArray2D_int A3( 3, 4 );
 	A3.dimension( { 2, 4 }, { 2, 5 }, dimension_initializer_function );
-	EXPECT_EQ( 3, A3.size1() );
-	EXPECT_EQ( 4, A3.size2() );
+	EXPECT_EQ( 3u, A3.size1() );
+	EXPECT_EQ( 4u, A3.size2() );
 	EXPECT_EQ( 2, A3.l1() );
 	EXPECT_EQ( 4, A3.u1() );
 	EXPECT_EQ( 2, A3.l2() );
@@ -2094,8 +2094,8 @@ TEST( FArray2Test, DimensionIndexRange )
 	// 1:3, 1:4 -> 2:4, 2:5 := 2:3, 2:4
 	FArray2D_int A4( 3, 4, Sticky_int( 31459 ) ); // Sticky initializer is reapplied after dimension call
 	A4.dimension( { 2, 4 }, { 2, 5 } );
-	EXPECT_EQ( 3, A4.size1() );
-	EXPECT_EQ( 4, A4.size2() );
+	EXPECT_EQ( 3u, A4.size1() );
+	EXPECT_EQ( 4u, A4.size2() );
 	EXPECT_EQ( 2, A4.l1() );
 	EXPECT_EQ( 4, A4.u1() );
 	EXPECT_EQ( 2, A4.l2() );
@@ -2110,9 +2110,9 @@ TEST( FArray2Test, DimensionIndexRange )
 TEST( FArray2Test, DimensionArrays )
 {
 	FArray2D_int A1( 3, 4 );
-	EXPECT_EQ( 12, A1.size() );
-	EXPECT_EQ( 3, A1.size1() );
-	EXPECT_EQ( 4, A1.size2() );
+	EXPECT_EQ( 12u, A1.size() );
+	EXPECT_EQ( 3u, A1.size1() );
+	EXPECT_EQ( 4u, A1.size2() );
 	EXPECT_EQ( 1, A1.l1() );
 	EXPECT_EQ( 3, A1.u1() );
 	EXPECT_EQ( 1, A1.l2() );
@@ -2121,9 +2121,9 @@ TEST( FArray2Test, DimensionArrays )
 
 	// 1:3, 1:4 -> 2:4, 2:5.
 	A1.dimension( FArray2D_int( { 2, 4 }, { 2, 5 } ) );
-	EXPECT_EQ( 12, A1.size() );
-	EXPECT_EQ( 3, A1.size1() );
-	EXPECT_EQ( 4, A1.size2() );
+	EXPECT_EQ( 12u, A1.size() );
+	EXPECT_EQ( 3u, A1.size1() );
+	EXPECT_EQ( 4u, A1.size2() );
 	EXPECT_EQ( 2, A1.l1() );
 	EXPECT_EQ( 4, A1.u1() );
 	EXPECT_EQ( 2, A1.l2() );
@@ -2133,8 +2133,8 @@ TEST( FArray2Test, DimensionArrays )
 	// 1:3, 1:4 -> 2:4, 2:5 := 2:3, 2:4
 	FArray2D_int A2( 3, 4 );
 	A2.dimension( FArray2D_int( { 2, 4 }, { 2, 5 } ), 31459 );
-	EXPECT_EQ( 3, A2.size1() );
-	EXPECT_EQ( 4, A2.size2() );
+	EXPECT_EQ( 3u, A2.size1() );
+	EXPECT_EQ( 4u, A2.size2() );
 	EXPECT_EQ( 2, A2.l1() );
 	EXPECT_EQ( 4, A2.u1() );
 	EXPECT_EQ( 2, A2.l2() );
@@ -2148,8 +2148,8 @@ TEST( FArray2Test, DimensionArrays )
 	// 1:3, 1:4 -> 2:4, 2:5 := 2:3, 2:4
 	FArray2D_int A3( 3, 4 );
 	A3.dimension( FArray2D_int( { 2, 4 }, { 2, 5 } ), dimension_initializer_function );
-	EXPECT_EQ( 3, A3.size1() );
-	EXPECT_EQ( 4, A3.size2() );
+	EXPECT_EQ( 3u, A3.size1() );
+	EXPECT_EQ( 4u, A3.size2() );
 	EXPECT_EQ( 2, A3.l1() );
 	EXPECT_EQ( 4, A3.u1() );
 	EXPECT_EQ( 2, A3.l2() );
@@ -2167,9 +2167,9 @@ TEST( FArray2Test, RedimensionIndexRange )
 	FArray2D_int A2( A1 );
 	FArray2D_int A3( A1 );
 
-	EXPECT_EQ( 10, A1.size() );
-	EXPECT_EQ( 2, A1.size1() );
-	EXPECT_EQ( 5, A1.size2() );
+	EXPECT_EQ( 10u, A1.size() );
+	EXPECT_EQ( 2u, A1.size1() );
+	EXPECT_EQ( 5u, A1.size2() );
 	EXPECT_EQ( 1, A1.l1() );
 	EXPECT_EQ( 2, A1.u1() );
 	EXPECT_EQ( 1, A1.l2() );
@@ -2182,9 +2182,9 @@ TEST( FArray2Test, RedimensionIndexRange )
 
 	// 1:2, 1:5 -> 2:3, 3:7 := 2:2, 3:5
 	A2.redimension( { 2, 3 }, { 3, 7 } );
-	EXPECT_EQ( 10, A2.size() );
-	EXPECT_EQ( 2, A2.size1() );
-	EXPECT_EQ( 5, A2.size2() );
+	EXPECT_EQ( 10u, A2.size() );
+	EXPECT_EQ( 2u, A2.size1() );
+	EXPECT_EQ( 5u, A2.size2() );
 	EXPECT_EQ( 2, A2.l1() );
 	EXPECT_EQ( 3, A2.u1() );
 	EXPECT_EQ( 3, A2.l2() );
@@ -2198,9 +2198,9 @@ TEST( FArray2Test, RedimensionIndexRange )
 
 	// 1:2, 1:5 -> 2:3, 3:7 := 2:2, 3:5
 	A3.redimension( { 2, 3 }, { 3, 7 }, 31459 );
-	EXPECT_EQ( 10, A3.size() );
-	EXPECT_EQ( 2, A3.size1() );
-	EXPECT_EQ( 5, A3.size2() );
+	EXPECT_EQ( 10u, A3.size() );
+	EXPECT_EQ( 2u, A3.size1() );
+	EXPECT_EQ( 5u, A3.size2() );
 	EXPECT_EQ( 2, A3.l1() );
 	EXPECT_EQ( 3, A3.u1() );
 	EXPECT_EQ( 3, A3.l2() );
@@ -2222,9 +2222,9 @@ TEST( FArray2Test, RedimensionArrays )
 	FArray2D_int A3( A1 );
 	FArray2D_int A4( A1 );
 
-	EXPECT_EQ( 10, A1.size() );
-	EXPECT_EQ( 2, A1.size1() );
-	EXPECT_EQ( 5, A1.size2() );
+	EXPECT_EQ( 10u, A1.size() );
+	EXPECT_EQ( 2u, A1.size1() );
+	EXPECT_EQ( 5u, A1.size2() );
 	EXPECT_EQ( 1, A1.l1() );
 	EXPECT_EQ( 2, A1.u1() );
 	EXPECT_EQ( 1, A1.l2() );
@@ -2236,9 +2236,9 @@ TEST( FArray2Test, RedimensionArrays )
 	}
 
 	A2.redimension( FArray2D_int( { 2, 3 }, { 3, 7 } ) );
-	EXPECT_EQ( 10, A2.size() );
-	EXPECT_EQ( 2, A2.size1() );
-	EXPECT_EQ( 5, A2.size2() );
+	EXPECT_EQ( 10u, A2.size() );
+	EXPECT_EQ( 2u, A2.size1() );
+	EXPECT_EQ( 5u, A2.size2() );
 	EXPECT_EQ( 2, A2.l1() );
 	EXPECT_EQ( 3, A2.u1() );
 	EXPECT_EQ( 3, A2.l2() );
@@ -2251,9 +2251,9 @@ TEST( FArray2Test, RedimensionArrays )
 	}
 
 	A3.redimension( FArray2D_int( { 2, 3 }, { 3, 7 } ), 31459 );
-	EXPECT_EQ( 10, A3.size() );
-	EXPECT_EQ( 2, A3.size1() );
-	EXPECT_EQ( 5, A3.size2() );
+	EXPECT_EQ( 10u, A3.size() );
+	EXPECT_EQ( 2u, A3.size1() );
+	EXPECT_EQ( 5u, A3.size2() );
 	EXPECT_EQ( 2, A3.l1() );
 	EXPECT_EQ( 3, A3.u1() );
 	EXPECT_EQ( 3, A3.l2() );
@@ -2268,9 +2268,9 @@ TEST( FArray2Test, RedimensionArrays )
 	}
 
 	A4.redimension( FArray2D_int( { 2, 3 }, { 3, 7 } ) ); // "New" elements are uninitialized
-	EXPECT_EQ( 10, A4.size() );
-	EXPECT_EQ( 2, A4.size1() );
-	EXPECT_EQ( 5, A4.size2() );
+	EXPECT_EQ( 10u, A4.size() );
+	EXPECT_EQ( 2u, A4.size1() );
+	EXPECT_EQ( 5u, A4.size2() );
 	EXPECT_EQ( 2, A4.l1() );
 	EXPECT_EQ( 3, A4.u1() );
 	EXPECT_EQ( 3, A4.l2() );

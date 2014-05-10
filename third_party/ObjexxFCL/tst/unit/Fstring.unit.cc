@@ -128,7 +128,7 @@ TEST( FstringTest, JustifyTrim )
 	EXPECT_EQ( 6u, s.len_trim() );
 	EXPECT_EQ( 6u, s.len_trim_whitespace() );
 	EXPECT_EQ( 6, len_trim( s ) );
-	EXPECT_EQ( 6, len_trim_whitespace( s ) );
+	EXPECT_EQ( 6u, len_trim_whitespace( s ) );
 	s.left_justify();
 	EXPECT_EQ( "Fish   ", s );
 	s.right_justify();

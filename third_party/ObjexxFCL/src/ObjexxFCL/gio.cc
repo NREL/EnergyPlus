@@ -25,7 +25,7 @@
 #include <iostream>
 #include <sys/types.h>
 #include <sys/stat.h>
-#ifdef WIN32
+#ifdef _WIN32
 #define stat _stat
 #endif
 
@@ -65,8 +65,7 @@ Name
 def_name( Unit const unit, IOFlags const & flags )
 {
 	if ( flags.scratch() ) { // Scratch file name
-		char temp_name[ L_tmpnam ];
-		return Name( std::tmpnam( temp_name ) );
+		return Name( Stream::scratch_name() );
 	} else if ( flags.asis() ) { // Same name if already connected
 		Stream const * const p( streams()[ unit ] );
 		if ( p && p->is_open() && ( ! p->name().empty() ) && p->asis_compatible( flags ) ) {
@@ -88,7 +87,7 @@ open( Unit const unit, Name const & name, IOFlags & flags )
 	flags.clear_status();
 	if ( flags.asis() ) {
 		Stream * const p( streams()[ unit ] );
-		if ( p && p->is_open() && ( p->name() == name ) && p->asis_compatible( flags ) ) { // Case-sensitive name comparison used
+		if ( ( p != nullptr ) && p->is_open() && ( p->name() == name ) && p->asis_compatible( flags ) ) { // Case-sensitive name comparison used
 			p->asis_update( flags ); // Update flags that an AsIs re-open can change
 			return true; // Use existing connection
 		}
@@ -342,7 +341,10 @@ write( Unit const unit, std::string const & fmt, IOFlags & flags )
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit, flags ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
 		auto stream_p( dynamic_cast< std::ostream * >( &Stream_p->stream() ) );
-		if ( stream_p ) return Write( *stream_p, fmt, flags );
+		if ( stream_p ) {
+			flags.ter( Stream_p->ter() );
+			return Write( *stream_p, fmt, flags );
+		}
 	}
 	flags.err( true ).ios( 11 );
 	return Write( flags );
@@ -357,7 +359,10 @@ write( Unit const unit, gio::Fmt const & fmt, IOFlags & flags )
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit, flags ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
 		auto stream_p( dynamic_cast< std::ostream * >( &Stream_p->stream() ) );
-		if ( stream_p ) return Write( *stream_p, fmt, flags );
+		if ( stream_p ) {
+			flags.ter( Stream_p->ter() );
+			return Write( *stream_p, fmt, flags );
+		}
 	}
 	flags.err( true ).ios( 11 );
 	return Write( flags );
@@ -371,7 +376,7 @@ write( Unit const unit, std::string const & fmt )
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
 		auto stream_p( dynamic_cast< std::ostream * >( &Stream_p->stream() ) );
-		if ( stream_p ) return Write( *stream_p, fmt );
+		if ( stream_p ) return Write( *stream_p, fmt, Stream_p->ter() );
 	}
 	return Write();
 }
@@ -384,7 +389,7 @@ write( Unit const unit, gio::Fmt const & fmt )
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
 		auto stream_p( dynamic_cast< std::ostream * >( &Stream_p->stream() ) );
-		if ( stream_p ) return Write( *stream_p, fmt );
+		if ( stream_p ) return Write( *stream_p, fmt, Stream_p->ter() );
 	}
 	return Write();
 }
@@ -397,7 +402,7 @@ write( Unit const unit )
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
 		auto stream_p( dynamic_cast< std::ostream * >( &Stream_p->stream() ) );
-		if ( stream_p ) *stream_p << '\n';
+		if ( stream_p ) *stream_p << Stream_p->ter();
 	}
 }
 
@@ -405,28 +410,28 @@ write( Unit const unit )
 Write
 write( std::string const & fmt, IOFlags & flags )
 {
-	return Write( std::cout, fmt, flags );
+	return Write( std::cout, fmt, flags, Write::LF );
 }
 
 // Write to stdout
 Write
 write( gio::Fmt const & fmt, IOFlags & flags )
 {
-	return Write( std::cout, fmt, flags );
+	return Write( std::cout, fmt, flags, Write::LF );
 }
 
 // Write to stdout
 Write
 write( std::string const & fmt )
 {
-	return Write( std::cout, fmt );
+	return Write( std::cout, fmt, Write::LF );
 }
 
 // Write to stdout
 Write
 write( gio::Fmt const & fmt )
 {
-	return Write( std::cout, fmt );
+	return Write( std::cout, fmt, Write::LF );
 }
 
 // Print /////
