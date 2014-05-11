@@ -557,6 +557,7 @@ namespace HWBaseboardRadiator {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const Constant( 0.0062 ); // Constant of linear equation for air mass flow rate
 		Real64 const Coeff( 0.0000275 ); // Correlation coefficient to capacity
+		static std::string const RoutineName( "BaseboardRadiatorWater:InitHWBaseboard" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -641,7 +642,7 @@ namespace HWBaseboardRadiator {
 			RhoAirStdInit = StdRhoAir;
 			WaterInletNode = HWBaseboard( BaseboardNum ).WaterInletNode;
 
-			rho = GetDensityGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, "BaseboardRadiatorWater:InitHWBaseboard" );
+			rho = GetDensityGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
 
 			HWBaseboard( BaseboardNum ).WaterMassFlowRateMax = rho * HWBaseboard( BaseboardNum ).WaterVolFlowRateMax;
 
@@ -649,7 +650,7 @@ namespace HWBaseboardRadiator {
 
 			Node( WaterInletNode ).Temp = 60.0;
 
-			Cp = GetSpecificHeatGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, Node( WaterInletNode ).Temp, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, "BaseboardRadiatorWater:InitHWBaseboard" );
+			Cp = GetSpecificHeatGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, Node( WaterInletNode ).Temp, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
 
 			Node( WaterInletNode ).Enthalpy = Cp * Node( WaterInletNode ).Temp;
 			Node( WaterInletNode ).Quality = 0.0;
@@ -733,6 +734,8 @@ namespace HWBaseboardRadiator {
 		Real64 const CPAirStd( 1005.0 ); // Average specific heat of air at between 25C and 40C in J/kg-k
 		Real64 const Constant( 0.0062 ); // Constant of linear equation for air mass flow rate
 		Real64 const Coeff( 0.0000275 ); // Correlation coefficient to capacity
+		static std::string const RoutineName( "SizeHWBaseboard" );
+		static std::string const RoutineNameFull( "BaseboardRadiatorWater:SizeHWBaseboard" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -789,8 +792,8 @@ namespace HWBaseboardRadiator {
 					CheckZoneSizing( cCMO_BBRadiator_Water, HWBaseboard( BaseboardNum ).EquipID );
 					DesCoilLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
 					if ( DesCoilLoad >= SmallLoad ) {
-						Cp = GetSpecificHeatGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, 60.0, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, "SizeHWBaseboard" );
-						rho = GetDensityGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, "SizeHWBaseboard" );
+						Cp = GetSpecificHeatGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, 60.0, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
+						rho = GetDensityGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
 						WaterVolFlowRateMaxDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 					} else {
 						WaterVolFlowRateMaxDes = 0.0;
@@ -820,7 +823,7 @@ namespace HWBaseboardRadiator {
 					WaterMassFlowRateStd = HWBaseboard( BaseboardNum ).WaterMassFlowRateStd;
 				} else if ( HWBaseboard( BaseboardNum ).RatedCapacity == AutoSize || HWBaseboard( BaseboardNum ).RatedCapacity == 0.0 ) {
 					DesCoilLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
-					rho = GetDensityGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, "BaseboardRadiatorWater:SizeHWBaseboard" );
+					rho = GetDensityGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineNameFull );
 					WaterMassFlowRateStd = HWBaseboard( BaseboardNum ).WaterVolFlowRateMax * rho;
 				}
 				if ( DesCoilLoad >= SmallLoad ) {
@@ -828,7 +831,7 @@ namespace HWBaseboardRadiator {
 					// Air mass flow rate is obtained from the following linear equation
 					// m_dot = 0.0062 + 2.75e-05*q
 					AirMassFlowRate = Constant + Coeff * DesCoilLoad;
-					Cp = GetSpecificHeatGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, HWBaseboard( BaseboardNum ).WaterTempAvg, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, "SizeHWBaseboard" );
+					Cp = GetSpecificHeatGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, HWBaseboard( BaseboardNum ).WaterTempAvg, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
 					WaterInletTempStd = ( DesCoilLoad / ( 2.0 * WaterMassFlowRateStd * Cp ) ) + HWBaseboard( BaseboardNum ).WaterTempAvg;
 					WaterOutletTempStd = std::abs( ( 2.0 * HWBaseboard( BaseboardNum ).WaterTempAvg ) - WaterInletTempStd );
 					AirOutletTempStd = ( DesCoilLoad / ( AirMassFlowRate * CPAirStd ) ) + AirInletTempStd;
@@ -873,7 +876,7 @@ namespace HWBaseboardRadiator {
 				WaterMassFlowRateStd = HWBaseboard( BaseboardNum ).WaterMassFlowRateStd;
 				// m_dot = 0.0062 + 2.75e-05*q
 				AirMassFlowRate = Constant + Coeff * DesCoilLoad;
-				Cp = GetSpecificHeatGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, HWBaseboard( BaseboardNum ).WaterTempAvg, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, "SizeHWBaseboard" );
+				Cp = GetSpecificHeatGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, HWBaseboard( BaseboardNum ).WaterTempAvg, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
 				WaterInletTempStd = ( DesCoilLoad / ( 2.0 * WaterMassFlowRateStd * Cp ) ) + HWBaseboard( BaseboardNum ).WaterTempAvg;
 				WaterOutletTempStd = std::abs( ( 2.0 * HWBaseboard( BaseboardNum ).WaterTempAvg ) - WaterInletTempStd );
 				AirOutletTempStd = ( DesCoilLoad / ( AirMassFlowRate * CPAirStd ) ) + AirInletTempStd;
@@ -957,6 +960,7 @@ namespace HWBaseboardRadiator {
 		Real64 const Constant( 0.0062 ); // Constant of linear equation for air mass flow rate
 		Real64 const Coeff( 0.0000275 ); // Correlation coefficient to capacity
 		Real64 const MinFrac( 0.0005 ); // Minimum fraction that delivers radiant heats to surfaces
+		static std::string const RoutineName( "CalcHWBaseboard" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1000,7 +1004,7 @@ namespace HWBaseboardRadiator {
 			// Calculate air mass flow rate
 			AirMassFlowRate = HWBaseboard( BaseboardNum ).AirMassFlowRateStd * ( WaterMassFlowRate / HWBaseboard( BaseboardNum ).WaterMassFlowRateStd );
 			CapacitanceAir = PsyCpAirFnWTdb( HWBaseboard( BaseboardNum ).AirInletHumRat, AirInletTemp ) * AirMassFlowRate;
-			Cp = GetSpecificHeatGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, WaterInletTemp, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, "CalcHWBaseboard" );
+			Cp = GetSpecificHeatGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, WaterInletTemp, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
 
 			CapacitanceWater = Cp * WaterMassFlowRate;
 			CapacitanceMax = max( CapacitanceAir, CapacitanceWater );

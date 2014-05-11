@@ -928,6 +928,7 @@ namespace PipeHeatTransfer {
 		Real64 const LargeNumber( 9999.9 ); // Large number (compared to temperature values)
 		Real64 const SecondsInHour( 3600.0 ); // Number of seconds in hour
 		Real64 const HoursInDay( 24.0 ); // Number of hours in day
+		static std::string const RoutineName( "InitPipesHeatTransfer" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1185,8 +1186,8 @@ namespace PipeHeatTransfer {
 		//Even though the loop eventually has no flow rate, it appears it initializes to a value, then converges to OFF
 		//Thus, this is called at the beginning of every time step once.
 
-		PipeHT( PipeHTNum ).FluidSpecHeat = GetSpecificHeatGlycol( PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidName, InletTemp, PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidIndex, "InitPipesHeatTransfer" );
-		PipeHT( PipeHTNum ).FluidDensity = GetDensityGlycol( PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidName, InletTemp, PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidIndex, "InitPipesHeatTransfer" );
+		PipeHT( PipeHTNum ).FluidSpecHeat = GetSpecificHeatGlycol( PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidName, InletTemp, PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidIndex, RoutineName );
+		PipeHT( PipeHTNum ).FluidDensity = GetDensityGlycol( PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidName, InletTemp, PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidIndex, RoutineName );
 
 		// At this point, for all Pipe:Interior objects we should zero out the energy and rate arrays
 		PipeHTReport( PipeHTNum ).FluidHeatLossRate = 0.0;

@@ -163,6 +163,8 @@ namespace Furnaces {
 	int const DehumidControl_Multimode( 1 );
 	int const DehumidControl_CoolReheat( 2 );
 
+	static std::string const fluidNameSteam( "STEAM" );
+
 	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:
@@ -694,7 +696,8 @@ namespace Furnaces {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const getUnitaryHeatOnly( "GetUnitaryHeatOnly" );
+		static std::string const getAirLoopHVACHeatCoolInput( "GetAirLoopHVACHeatCoolInput" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1192,7 +1195,7 @@ namespace Furnaces {
 					Furnace( FurnaceNum ).MaxHeatCoilFluidFlow = GetCoilMaxSteamFlowRate( Furnace( FurnaceNum ).HeatingCoilIndex, errFlag );
 					if ( Furnace( FurnaceNum ).MaxHeatCoilFluidFlow > 0.0 ) {
 						SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-						SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "GetUnitaryHeatOnly" );
+						SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, getUnitaryHeatOnly );
 						Furnace( FurnaceNum ).MaxHeatCoilFluidFlow *= SteamDensity;
 					}
 
@@ -1717,7 +1720,7 @@ namespace Furnaces {
 					Furnace( FurnaceNum ).MaxHeatCoilFluidFlow = GetCoilMaxSteamFlowRate( Furnace( FurnaceNum ).HeatingCoilIndex, errFlag );
 					if ( Furnace( FurnaceNum ).MaxHeatCoilFluidFlow > 0.0 ) {
 						SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-						SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "GetAirLoopHVACHeatCoolInput" );
+						SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, getAirLoopHVACHeatCoolInput );
 						Furnace( FurnaceNum ).MaxHeatCoilFluidFlow *= SteamDensity;
 					}
 
@@ -2102,7 +2105,7 @@ namespace Furnaces {
 						Furnace( FurnaceNum ).MaxSuppCoilFluidFlow = GetCoilMaxSteamFlowRate( Furnace( FurnaceNum ).SuppHeatCoilIndex, errFlag );
 						if ( Furnace( FurnaceNum ).MaxSuppCoilFluidFlow > 0.0 ) {
 							SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-							SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "GetAirLoopHVACHeatCoolInput" );
+							SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, getAirLoopHVACHeatCoolInput );
 							Furnace( FurnaceNum ).MaxSuppCoilFluidFlow = GetCoilMaxSteamFlowRate( Furnace( FurnaceNum ).SuppHeatCoilIndex, errFlag ) * SteamDensity;
 						}
 
@@ -2932,7 +2935,7 @@ namespace Furnaces {
 					Furnace( FurnaceNum ).MaxSuppCoilFluidFlow = GetCoilMaxSteamFlowRate( Furnace( FurnaceNum ).SuppHeatCoilIndex, errFlag );
 					if ( Furnace( FurnaceNum ).MaxSuppCoilFluidFlow > 0.0 ) {
 						SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-						SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "GetAirLoopHVACHeatCoolInput" );
+						SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, getAirLoopHVACHeatCoolInput );
 						Furnace( FurnaceNum ).MaxSuppCoilFluidFlow = GetCoilMaxSteamFlowRate( Furnace( FurnaceNum ).SuppHeatCoilIndex, errFlag ) * SteamDensity;
 					}
 
@@ -3684,7 +3687,7 @@ namespace Furnaces {
 					Furnace( FurnaceNum ).MaxSuppCoilFluidFlow = GetCoilMaxSteamFlowRate( Furnace( FurnaceNum ).SuppHeatCoilIndex, errFlag );
 					if ( Furnace( FurnaceNum ).MaxSuppCoilFluidFlow > 0.0 ) {
 						SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-						SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "GetAirLoopHVACHeatCoolInput" );
+						SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, getAirLoopHVACHeatCoolInput );
 						Furnace( FurnaceNum ).MaxSuppCoilFluidFlow = GetCoilMaxSteamFlowRate( Furnace( FurnaceNum ).SuppHeatCoilIndex, errFlag ) * SteamDensity;
 					}
 
@@ -4192,6 +4195,7 @@ namespace Furnaces {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const Small5WLoad( 5.0 );
+		static std::string const RoutineName( "InitFurnace" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -4344,7 +4348,7 @@ namespace Furnaces {
 					}
 					Furnace( FurnaceNum ).MaxHeatCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", Furnace( FurnaceNum ).HeatingCoilName, ErrorsFound );
 					if ( Furnace( FurnaceNum ).MaxHeatCoilFluidFlow > 0.0 ) {
-						rho = GetDensityGlycol( PlantLoop( Furnace( FurnaceNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( Furnace( FurnaceNum ).LoopNum ).FluidIndex, "InitFurnace" );
+						rho = GetDensityGlycol( PlantLoop( Furnace( FurnaceNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( Furnace( FurnaceNum ).LoopNum ).FluidIndex, RoutineName );
 						Furnace( FurnaceNum ).MaxHeatCoilFluidFlow *= rho;
 					}
 				} else if ( Furnace( FurnaceNum ).HeatingCoilType_Num == Coil_HeatingSteam ) {
@@ -4357,7 +4361,7 @@ namespace Furnaces {
 					Furnace( FurnaceNum ).MaxHeatCoilFluidFlow = GetCoilMaxSteamFlowRate( Furnace( FurnaceNum ).HeatingCoilIndex, ErrorsFound );
 					if ( Furnace( FurnaceNum ).MaxHeatCoilFluidFlow > 0.0 ) {
 						SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-						SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "InitFurnace" );
+						SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName );
 						Furnace( FurnaceNum ).MaxHeatCoilFluidFlow *= SteamDensity;
 					}
 
@@ -4384,7 +4388,7 @@ namespace Furnaces {
 					}
 					Furnace( FurnaceNum ).MaxSuppCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", Furnace( FurnaceNum ).SuppHeatCoilName, ErrorsFound );
 					if ( Furnace( FurnaceNum ).MaxSuppCoilFluidFlow > 0.0 ) {
-						rho = GetDensityGlycol( PlantLoop( Furnace( FurnaceNum ).LoopNumSupp ).FluidName, InitConvTemp, PlantLoop( Furnace( FurnaceNum ).LoopNumSupp ).FluidIndex, "InitFurnace" );
+						rho = GetDensityGlycol( PlantLoop( Furnace( FurnaceNum ).LoopNumSupp ).FluidName, InitConvTemp, PlantLoop( Furnace( FurnaceNum ).LoopNumSupp ).FluidIndex, RoutineName );
 						Furnace( FurnaceNum ).MaxSuppCoilFluidFlow *= rho;
 					}
 				} else if ( Furnace( FurnaceNum ).SuppHeatCoilType_Num == Coil_HeatingSteam ) {
@@ -4396,7 +4400,7 @@ namespace Furnaces {
 					Furnace( FurnaceNum ).MaxSuppCoilFluidFlow = GetCoilMaxSteamFlowRate( Furnace( FurnaceNum ).SuppHeatCoilIndex, ErrorsFound );
 					if ( Furnace( FurnaceNum ).MaxSuppCoilFluidFlow > 0.0 ) {
 						SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-						SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "InitFurnace" );
+						SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName );
 						Furnace( FurnaceNum ).MaxSuppCoilFluidFlow *= SteamDensity;
 					}
 
@@ -4433,7 +4437,7 @@ namespace Furnaces {
 						SimulateWaterCoilComponents( Furnace( FurnaceNum ).HeatingCoilName, FirstHVACIteration, Furnace( FurnaceNum ).HeatingCoilIndex );
 						CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", Furnace( FurnaceNum ).HeatingCoilName, ErrorsFound );
 						if ( CoilMaxVolFlowRate != AutoSize ) {
-							rho = GetDensityGlycol( PlantLoop( Furnace( FurnaceNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( Furnace( FurnaceNum ).LoopNum ).FluidIndex, "InitFurnace" );
+							rho = GetDensityGlycol( PlantLoop( Furnace( FurnaceNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( Furnace( FurnaceNum ).LoopNum ).FluidIndex, RoutineName );
 							Furnace( FurnaceNum ).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * rho;
 						}
 					}
@@ -4443,7 +4447,7 @@ namespace Furnaces {
 						CoilMaxVolFlowRate = GetCoilMaxSteamFlowRate( Furnace( FurnaceNum ).HeatingCoilIndex, ErrorsFound );
 						if ( CoilMaxVolFlowRate != AutoSize ) {
 							SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-							SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "InitFurnace" );
+							SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName );
 							Furnace( FurnaceNum ).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
 						}
 					}
@@ -4458,7 +4462,7 @@ namespace Furnaces {
 						SimulateWaterCoilComponents( Furnace( FurnaceNum ).SuppHeatCoilName, FirstHVACIteration, Furnace( FurnaceNum ).SuppHeatCoilIndex );
 						CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", Furnace( FurnaceNum ).SuppHeatCoilName, ErrorsFound );
 						if ( CoilMaxVolFlowRate != AutoSize ) {
-							rho = GetDensityGlycol( PlantLoop( Furnace( FurnaceNum ).LoopNumSupp ).FluidName, InitConvTemp, PlantLoop( Furnace( FurnaceNum ).LoopNumSupp ).FluidIndex, "InitFurnace" );
+							rho = GetDensityGlycol( PlantLoop( Furnace( FurnaceNum ).LoopNumSupp ).FluidName, InitConvTemp, PlantLoop( Furnace( FurnaceNum ).LoopNumSupp ).FluidIndex, RoutineName );
 							Furnace( FurnaceNum ).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
 						}
 					}
@@ -4467,7 +4471,7 @@ namespace Furnaces {
 						CoilMaxVolFlowRate = GetCoilMaxSteamFlowRate( Furnace( FurnaceNum ).SuppHeatCoilIndex, ErrorsFound );
 						if ( CoilMaxVolFlowRate != AutoSize ) {
 							SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-							SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "InitFurnace" );
+							SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName );
 							Furnace( FurnaceNum ).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
 						}
 					}

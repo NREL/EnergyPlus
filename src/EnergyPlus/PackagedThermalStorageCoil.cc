@@ -1935,6 +1935,7 @@ namespace PackagedThermalStorageCoil {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeTESCoil " );
+		static std::string const calcTESWaterStorageTank( "CalcTESWaterStorageTank" );
 		Real64 const FluidTankSizingDeltaT( 10. );
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2116,8 +2117,8 @@ namespace PackagedThermalStorageCoil {
 			// for fluid tanks, assume a 10C deltaT or diff between max and min, whichever is smaller
 			deltaT = min( FluidTankSizingDeltaT, ( TESCoil( TESCoilNum ).MaximumFluidTankTempLimit - TESCoil( TESCoilNum ).MinimumFluidTankTempLimit ) );
 
-			rho = GetDensityGlycol( TESCoil( TESCoilNum ).StorageFluidName, InitConvTemp, TESCoil( TESCoilNum ).StorageFluidIndex, "CalcTESWaterStorageTank" );
-			Cp = GetSpecificHeatGlycol( TESCoil( TESCoilNum ).StorageFluidName, InitConvTemp, TESCoil( TESCoilNum ).StorageFluidIndex, "CalcTESWaterStorageTank" );
+			rho = GetDensityGlycol( TESCoil( TESCoilNum ).StorageFluidName, InitConvTemp, TESCoil( TESCoilNum ).StorageFluidIndex, calcTESWaterStorageTank );
+			Cp = GetSpecificHeatGlycol( TESCoil( TESCoilNum ).StorageFluidName, InitConvTemp, TESCoil( TESCoilNum ).StorageFluidIndex, calcTESWaterStorageTank );
 			if ( TESCoil( TESCoilNum ).DischargeOnlyRatedDischargeCap > 0.0 && TESCoil( TESCoilNum ).DischargeOnlyModeAvailable ) {
 				TESCoil( TESCoilNum ).FluidStorageVolume = ( TESCoil( TESCoilNum ).DischargeOnlyRatedDischargeCap * TESCoil( TESCoilNum ).StorageCapacitySizingFactor * SecInHour ) / ( rho * Cp * deltaT );
 			} else {
@@ -3919,7 +3920,8 @@ namespace PackagedThermalStorageCoil {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "CalcTESWaterStorageTank" );
+		static std::string const calcTESIceStorageTank( "CalcTESIceStorageTank" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3962,9 +3964,9 @@ namespace PackagedThermalStorageCoil {
 		AmbientTemp = Node( TESCoil( TESCoilNum ).StorageAmbientNodeNum ).Temp;
 		UseInletTemp = Node( TESCoil( TESCoilNum ).TESPlantInletNodeNum ).Temp;
 		SourceInletTemp = TESCoil( TESCoilNum ).FluidTankTempFinalLastTimestep;
-		rho = GetDensityGlycol( TESCoil( TESCoilNum ).StorageFluidName, TankTemp, TESCoil( TESCoilNum ).StorageFluidIndex, "CalcTESWaterStorageTank" );
+		rho = GetDensityGlycol( TESCoil( TESCoilNum ).StorageFluidName, TankTemp, TESCoil( TESCoilNum ).StorageFluidIndex, RoutineName );
 		TankMass = rho * TESCoil( TESCoilNum ).FluidStorageVolume;
-		CpTank = GetSpecificHeatGlycol( TESCoil( TESCoilNum ).StorageFluidName, TankTemp, TESCoil( TESCoilNum ).StorageFluidIndex, "CalcTESWaterStorageTank" );
+		CpTank = GetSpecificHeatGlycol( TESCoil( TESCoilNum ).StorageFluidName, TankTemp, TESCoil( TESCoilNum ).StorageFluidIndex, RoutineName );
 
 		if ( TESCoil( TESCoilNum ).TESPlantConnectionAvailable ) {
 			UseMassFlowRate = Node( TESCoil( TESCoilNum ).TESPlantInletNodeNum ).MassFlowRate * TESCoil( TESCoilNum ).TESPlantEffectiveness;
@@ -3980,7 +3982,7 @@ namespace PackagedThermalStorageCoil {
 		TESCoil( TESCoilNum ).FluidTankTempFinal = NewTankTemp;
 
 		if ( TESCoil( TESCoilNum ).TESPlantConnectionAvailable ) {
-			CpPlantConnection = GetSpecificHeatGlycol( PlantLoop( TESCoil( TESCoilNum ).TESPlantLoopNum ).FluidName, Node( TESCoil( TESCoilNum ).TESPlantInletNodeNum ).Temp, PlantLoop( TESCoil( TESCoilNum ).TESPlantLoopNum ).FluidIndex, "CalcTESIceStorageTank" );
+			CpPlantConnection = GetSpecificHeatGlycol( PlantLoop( TESCoil( TESCoilNum ).TESPlantLoopNum ).FluidName, Node( TESCoil( TESCoilNum ).TESPlantInletNodeNum ).Temp, PlantLoop( TESCoil( TESCoilNum ).TESPlantLoopNum ).FluidIndex, calcTESIceStorageTank );
 
 			TESCoil( TESCoilNum ).QdotPlant = Node( TESCoil( TESCoilNum ).TESPlantInletNodeNum ).MassFlowRate * CpPlantConnection * TESCoil( TESCoilNum ).TESPlantEffectiveness * ( UseInletTemp - NewTankTemp );
 			TESCoil( TESCoilNum ).Q_Plant = TESCoil( TESCoilNum ).QdotPlant * TimeStepSys * SecInHour;
@@ -4033,6 +4035,7 @@ namespace PackagedThermalStorageCoil {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Real64 FreezingTemp( 0.0 ); // zero degrees C
+		static std::string const RoutineName( "CalcTESIceStorageTank" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -4055,7 +4058,7 @@ namespace PackagedThermalStorageCoil {
 
 		//update plant connection (if any)
 		if ( TESCoil( TESCoilNum ).TESPlantConnectionAvailable ) {
-			Cp = GetSpecificHeatGlycol( PlantLoop( TESCoil( TESCoilNum ).TESPlantLoopNum ).FluidName, Node( TESCoil( TESCoilNum ).TESPlantInletNodeNum ).Temp, PlantLoop( TESCoil( TESCoilNum ).TESPlantLoopNum ).FluidIndex, "CalcTESIceStorageTank" );
+			Cp = GetSpecificHeatGlycol( PlantLoop( TESCoil( TESCoilNum ).TESPlantLoopNum ).FluidName, Node( TESCoil( TESCoilNum ).TESPlantInletNodeNum ).Temp, PlantLoop( TESCoil( TESCoilNum ).TESPlantLoopNum ).FluidIndex, RoutineName );
 
 			TESCoil( TESCoilNum ).QdotPlant = Node( TESCoil( TESCoilNum ).TESPlantInletNodeNum ).MassFlowRate * Cp * TESCoil( TESCoilNum ).TESPlantEffectiveness * ( Node( TESCoil( TESCoilNum ).TESPlantInletNodeNum ).Temp - FreezingTemp );
 			TESCoil( TESCoilNum ).Q_Plant = TESCoil( TESCoilNum ).QdotPlant * TimeStepSys * SecInHour;

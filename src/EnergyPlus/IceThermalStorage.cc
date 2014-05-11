@@ -210,7 +210,7 @@ namespace IceThermalStorage {
 		Real64 Cp; // local plant fluid specific heat
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "SimIceStorage" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -311,7 +311,7 @@ namespace IceThermalStorage {
 			}}
 			DemandMdot = IceStorage( IceNum ).DesignMassFlowRate;
 
-			Cp = GetSpecificHeatGlycol( PlantLoop( IceStorage( IceNum ).LoopNum ).FluidName, TempIn, PlantLoop( IceStorage( IceNum ).LoopNum ).FluidIndex, "SimIceStorage" );
+			Cp = GetSpecificHeatGlycol( PlantLoop( IceStorage( IceNum ).LoopNum ).FluidName, TempIn, PlantLoop( IceStorage( IceNum ).LoopNum ).FluidIndex, RoutineName );
 
 			MyLoad2 = ( DemandMdot * Cp * ( TempIn - TempSetPt ) );
 			MyLoad = MyLoad2;
@@ -423,6 +423,7 @@ namespace IceThermalStorage {
 		Real64 const TankDischargeToler( 0.001 ); // Below this fraction, there is nothing left to discharge
 		Real64 const TankChargeToler( 0.999 ); // Above this fraction, we don't have anything left to charge
 		Real64 const TemperatureToler( 0.1 ); // Temperature difference between iterations that indicates convergence [C]
+		static std::string const RoutineName( "SimDetailedIceStorage" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -471,7 +472,7 @@ namespace IceThermalStorage {
 		}
 
 		// Calculate the current load on the ice storage unit
-		Cp = GetSpecificHeatGlycol( PlantLoop( DetIceStor( IceNum ).PlantLoopNum ).FluidName, TempIn, PlantLoop( DetIceStor( IceNum ).PlantLoopNum ).FluidIndex, "SimDetailedIceStorage" );
+		Cp = GetSpecificHeatGlycol( PlantLoop( DetIceStor( IceNum ).PlantLoopNum ).FluidName, TempIn, PlantLoop( DetIceStor( IceNum ).PlantLoopNum ).FluidIndex, RoutineName );
 
 		LocalLoad = DetIceStor( IceNum ).MassFlowRate * Cp * ( TempIn - TempSetPt );
 
@@ -1805,6 +1806,7 @@ namespace IceThermalStorage {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const TempTol( 0.0001 ); // C - minimum significant mass flow rate
+		static std::string const RoutineName( "CalcIceStorageDischarge" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1868,7 +1870,7 @@ namespace IceThermalStorage {
 			LoopNum = IceStorage( IceNum ).LoopNum;
 			LoopSideNum = IceStorage( IceNum ).LoopSideNum;
 
-			CpFluid = GetDensityGlycol( PlantLoop( LoopNum ).FluidName, Node( InletNodeNum ).Temp, PlantLoop( LoopNum ).FluidIndex, "CalcIceStorageDischarge" );
+			CpFluid = GetDensityGlycol( PlantLoop( LoopNum ).FluidName, Node( InletNodeNum ).Temp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 
 			// Calculate Umyload based on MyLoad from E+
 			Umyload = -MyLoad * TimeInterval / ITSNomCap;

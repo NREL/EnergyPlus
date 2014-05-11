@@ -1981,7 +1981,7 @@ namespace VariableSpeedCoils {
 		// shut off after compressor cycle off  [s]
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineNameSimpleWatertoAirHP( "InitSimpleWatertoAirHP" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2171,8 +2171,8 @@ namespace VariableSpeedCoils {
 			if ( ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPHeatingEquationFit ) || ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPCoolingEquationFit ) ) {
 				WaterInletNode = VarSpeedCoil( DXCoilNum ).WaterInletNodeNum;
 
-				rho = GetDensityGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, "InitSimpleWatertoAirHP" );
-				Cp = GetSpecificHeatGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, "InitSimpleWatertoAirHP" );
+				rho = GetDensityGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, RoutineNameSimpleWatertoAirHP );
+				Cp = GetSpecificHeatGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, RoutineNameSimpleWatertoAirHP );
 
 				//    VarSpeedCoil(DXCoilNum)%DesignWaterMassFlowRate= &
 				//                             rho * VarSpeedCoil(DXCoilNum)%RatedWaterVolFlowRate
@@ -2337,6 +2337,7 @@ namespace VariableSpeedCoils {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeVarSpeedCoil" );
+		static std::string const RoutineNameAlt( "SizeHVACWaterToAir" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2804,8 +2805,8 @@ namespace VariableSpeedCoils {
 			if ( VarSpeedCoil( DXCoilNum ).CondenserType == WaterCooled ) PltSizNum = MyPlantSizingIndex( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix, VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).WaterInletNodeNum, VarSpeedCoil( DXCoilNum ).WaterOutletNodeNum, ErrorsFound, false );
 
 			if ( PltSizNum > 0 ) {
-				rho = GetDensityGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, PlantSizData( PltSizNum ).ExitTemp, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, "SizeHVACWaterToAir" );
-				cp = GetSpecificHeatGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, PlantSizData( PltSizNum ).ExitTemp, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, "SizeHVACWaterToAir" );
+				rho = GetDensityGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, PlantSizData( PltSizNum ).ExitTemp, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, RoutineNameAlt );
+				cp = GetSpecificHeatGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, PlantSizData( PltSizNum ).ExitTemp, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, RoutineNameAlt );
 
 				if ( VarSpeedCoil( DXCoilNum ).CoolHeatType == "HEATING" ) {
 
@@ -2889,9 +2890,9 @@ namespace VariableSpeedCoils {
 			if ( PltSizNum > 0 ) {
 				rhoW = rho;
 			} else if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPCoolingEquationFit ) {
-				rhoW = GetDensityGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, RatedInletWaterTemp, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, "SizeVarSpeedCoil" );
+				rhoW = GetDensityGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, RatedInletWaterTemp, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, RoutineName );
 			} else {
-				rhoW = GetDensityGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, RatedInletWaterTempHeat, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, "SizeVarSpeedCoil" );
+				rhoW = GetDensityGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, RatedInletWaterTempHeat, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, RoutineName );
 			}
 
 			VarSpeedCoil( DXCoilNum ).RatedWaterMassFlowRate = VarSpeedCoil( DXCoilNum ).RatedWaterVolFlowRate * rhoW;
@@ -3180,6 +3181,7 @@ namespace VariableSpeedCoils {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const Tref( 283.15 ); // Reference Temperature for performance curves,10C [K]
 		static std::string const RoutineName( "CalcMultiSpeedVarSpeedCoilCooling" );
+		static std::string const RoutineNameSourceSideInletTemp( "CalcVSHPCoolingSimple:SourceSideInletTemp" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3343,7 +3345,7 @@ namespace VariableSpeedCoils {
 			SourceSideMassFlowRate = VarSpeedCoil( DXCoilNum ).WaterMassFlowRate;
 			SourceSideInletTemp = VarSpeedCoil( DXCoilNum ).InletWaterTemp;
 			SourceSideInletEnth = VarSpeedCoil( DXCoilNum ).InletWaterEnthalpy;
-			CpSource = GetSpecificHeatGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, SourceSideInletTemp, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, "CalcVSHPCoolingSimple:SourceSideInletTemp" );
+			CpSource = GetSpecificHeatGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, SourceSideInletTemp, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, RoutineNameSourceSideInletTemp );
 		}
 
 		//Check for flows, do not perform simulation if no flow in load side or source side.
@@ -3738,6 +3740,7 @@ namespace VariableSpeedCoils {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const Tref( 283.15 ); // Reference Temperature for performance curves,10C [K]
 		static std::string const RoutineName( "CalcVarSpeedCoilHeating" );
+		static std::string const RoutineNameSourceSideInletTemp( "CalcVarSpeedCoilHeating:SourceSideInletTemp" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3828,7 +3831,7 @@ namespace VariableSpeedCoils {
 			SourceSideMassFlowRate = VarSpeedCoil( DXCoilNum ).WaterMassFlowRate;
 			SourceSideInletTemp = VarSpeedCoil( DXCoilNum ).InletWaterTemp;
 			SourceSideInletEnth = VarSpeedCoil( DXCoilNum ).InletWaterEnthalpy;
-			CpSource = GetSpecificHeatGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, SourceSideInletTemp, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, RoutineName + ":SourceSideInletTemp" );
+			CpSource = GetSpecificHeatGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, SourceSideInletTemp, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, RoutineNameSourceSideInletTemp );
 		}
 
 		//Check for flows, do not perform simulation if no flow in load side or source side.

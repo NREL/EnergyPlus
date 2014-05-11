@@ -465,7 +465,8 @@ namespace HeatPumpWaterToWaterSimple {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "InitGshp" );
+
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
 
@@ -520,14 +521,14 @@ namespace HeatPumpWaterToWaterSimple {
 			GSHP( GSHPNum ).MustRun = true;
 
 			if ( GSHP( GSHPNum ).WWHPPlantTypeOfNum == TypeOf_HPWaterEFHeating ) {
-				rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, InitConvTemp, PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, "InitGshp" );
+				rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, InitConvTemp, PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
 				GSHP( GSHPNum ).LoadSideDesignMassFlow = GSHP( GSHPNum ).RatedLoadVolFlowHeat * rho;
-				rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, InitConvTemp, PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, "InitGshp" );
+				rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, InitConvTemp, PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, RoutineName );
 				GSHP( GSHPNum ).SourceSideDesignMassFlow = GSHP( GSHPNum ).RatedSourceVolFlowHeat * rho;
 			} else if ( GSHP( GSHPNum ).WWHPPlantTypeOfNum == TypeOf_HPWaterEFCooling ) {
-				rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, InitConvTemp, PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, "InitGshp" );
+				rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, InitConvTemp, PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
 				GSHP( GSHPNum ).LoadSideDesignMassFlow = GSHP( GSHPNum ).RatedLoadVolFlowCool * rho;
-				rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, InitConvTemp, PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, "InitGshp" );
+				rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, InitConvTemp, PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, RoutineName );
 				GSHP( GSHPNum ).SourceSideDesignMassFlow = GSHP( GSHPNum ).RatedSourceVolFlowCool * rho;
 			}
 
@@ -653,6 +654,7 @@ namespace HeatPumpWaterToWaterSimple {
 
 		Real64 const CelsiustoKelvin( KelvinConv ); // Conversion from Celsius to Kelvin
 		Real64 const Tref( 283.15 ); // Reference Temperature for performance curves,10C [K]
+		static std::string const RoutineName( "CalcWatertoWaterHPCooling" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -724,9 +726,9 @@ namespace HeatPumpWaterToWaterSimple {
 			return;
 		}
 
-		rhoLoadSide = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, LoadSideInletTemp, PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, "CalcWatertoWaterHPCooling" );
+		rhoLoadSide = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, LoadSideInletTemp, PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
 
-		rhoSourceSide = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, SourceSideInletTemp, PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, "CalcWatertoWaterHPCooling" );
+		rhoSourceSide = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, SourceSideInletTemp, PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, RoutineName );
 
 		func1 = ( ( LoadSideInletTemp + CelsiustoKelvin ) / Tref );
 		func2 = ( ( SourceSideInletTemp + CelsiustoKelvin ) / Tref );
@@ -781,9 +783,9 @@ namespace HeatPumpWaterToWaterSimple {
 			QSource *= PartLoadRatio;
 		}
 
-		CpLoadSide = GetSpecificHeatGlycol( PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, LoadSideInletTemp, PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, "CalcWatertoWaterHPCooling" );
+		CpLoadSide = GetSpecificHeatGlycol( PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, LoadSideInletTemp, PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
 
-		CpSourceSide = GetSpecificHeatGlycol( PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, SourceSideInletTemp, PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, "CalcWatertoWaterHPCooling" );
+		CpSourceSide = GetSpecificHeatGlycol( PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, SourceSideInletTemp, PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, RoutineName );
 
 		LoadSideOutletTemp = LoadSideInletTemp - QLoad / ( LoadSideMassFlowRate * CpLoadSide );
 		SourceSideOutletTemp = SourceSideInletTemp + QSource / ( SourceSideMassFlowRate * CpSourceSide );
@@ -835,6 +837,7 @@ namespace HeatPumpWaterToWaterSimple {
 
 		Real64 const CelsiustoKelvin( KelvinConv ); // Conversion from Celsius to Kelvin
 		Real64 const Tref( 283.15 ); // Reference Temperature for performance curves,10C [K]
+		static std::string const RoutineName( "CalcWatertoWaterHPHeating" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -903,9 +906,9 @@ namespace HeatPumpWaterToWaterSimple {
 		if ( ! GSHP( GSHPNum ).MustRun ) {
 			return;
 		}
-		rhoLoadSide = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, LoadSideInletTemp, PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, "CalcWatertoWaterHPHeating" );
+		rhoLoadSide = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, LoadSideInletTemp, PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
 
-		rhoSourceSide = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, SourceSideInletTemp, PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, "CalcWatertoWaterHPHeating" );
+		rhoSourceSide = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, SourceSideInletTemp, PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, RoutineName );
 
 		func1 = ( ( LoadSideInletTemp + CelsiustoKelvin ) / Tref );
 		func2 = ( ( SourceSideInletTemp + CelsiustoKelvin ) / Tref );
@@ -960,9 +963,9 @@ namespace HeatPumpWaterToWaterSimple {
 			QSource *= PartLoadRatio;
 		}
 
-		CpLoadSide = GetSpecificHeatGlycol( PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, LoadSideInletTemp, PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, "CalcWatertoWaterHPHeating" );
+		CpLoadSide = GetSpecificHeatGlycol( PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, LoadSideInletTemp, PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
 
-		CpSourceSide = GetSpecificHeatGlycol( PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, SourceSideInletTemp, PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, "CalcWatertoWaterHPHeating" );
+		CpSourceSide = GetSpecificHeatGlycol( PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, SourceSideInletTemp, PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, RoutineName );
 
 		LoadSideOutletTemp = LoadSideInletTemp + QLoad / ( LoadSideMassFlowRate * CpLoadSide );
 		SourceSideOutletTemp = SourceSideInletTemp - QSource / ( SourceSideMassFlowRate * CpSourceSide );

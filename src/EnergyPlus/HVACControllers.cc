@@ -902,7 +902,7 @@ namespace HVACControllers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "InitController" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1091,7 +1091,7 @@ namespace HVACControllers {
 		// Do the Begin Environment initializations
 		if ( BeginEnvrnFlag && MyEnvrnFlag( ControlNum ) ) {
 
-			rho = GetDensityGlycol( PlantLoop( ControllerProps( ControlNum ).ActuatedNodePlantLoopNum ).FluidName, InitConvTemp, PlantLoop( ControllerProps( ControlNum ).ActuatedNodePlantLoopNum ).FluidIndex, "InitController" );
+			rho = GetDensityGlycol( PlantLoop( ControllerProps( ControlNum ).ActuatedNodePlantLoopNum ).FluidName, InitConvTemp, PlantLoop( ControllerProps( ControlNum ).ActuatedNodePlantLoopNum ).FluidIndex, RoutineName );
 
 			ControllerProps( ControlNum ).MinActuated = rho * ControllerProps( ControlNum ).MinVolFlowActuated;
 			ControllerProps( ControlNum ).MaxActuated = rho * ControllerProps( ControlNum ).MaxVolFlowActuated;

@@ -590,6 +590,8 @@ namespace RefrigeratedCase {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const TrackMessage( "from refrigerated case" );
 		static std::string const RoutineName( "GetRefrigerationInput: " );
+		static std::string const TrackMessageAlt( "GetInput in RefrigeratedCase" );
+
 		int const AlwaysOn( -1 ); // -1 pointer sent to schedule manager returns a value of 1.0
 		//unused INTEGER, Parameter   ::  InputTypeSecond = 1  ! Indicator that flow used to specify capacity of secondary heat exchanger
 		//unused INTEGER, Parameter   ::  InputTypeFirst = 2   ! Indicator that capacity of secondary heat exchanger is input directly
@@ -3876,8 +3878,8 @@ namespace RefrigeratedCase {
 						Secondary( SecondaryNum ).CircRate = DefaultCircRate;
 						if ( ! lNumericBlanks( 10 ) ) Secondary( SecondaryNum ).CircRate = Numbers( 10 );
 
-						DensityPhaseChange = GetSatDensityRefrig( Secondary( SecondaryNum ).FluidName, Secondary( SecondaryNum ).TCondense, 0.0, Secondary( SecondaryNum ).FluidID, "GetInput in RefrigeratedCase" );
-						DeltaHPhaseChange = GetSatEnthalpyRefrig( Secondary( SecondaryNum ).FluidName, Secondary( SecondaryNum ).TCondense, 1.0, Secondary( SecondaryNum ).FluidID, "GetInput in RefrigeratedCase" ) - GetSatEnthalpyRefrig( Secondary( SecondaryNum ).FluidName, Secondary( SecondaryNum ).TCondense, 0.0, Secondary( SecondaryNum ).FluidID, "GetInput in RefrigeratedCase" );
+						DensityPhaseChange = GetSatDensityRefrig( Secondary( SecondaryNum ).FluidName, Secondary( SecondaryNum ).TCondense, 0.0, Secondary( SecondaryNum ).FluidID, TrackMessageAlt );
+						DeltaHPhaseChange = GetSatEnthalpyRefrig( Secondary( SecondaryNum ).FluidName, Secondary( SecondaryNum ).TCondense, 1.0, Secondary( SecondaryNum ).FluidID, TrackMessageAlt ) - GetSatEnthalpyRefrig( Secondary( SecondaryNum ).FluidName, Secondary( SecondaryNum ).TCondense, 0.0, Secondary( SecondaryNum ).FluidID, TrackMessageAlt );
 
 						//TotRatedFlowVol= capacity*circrate/deltahphasechange/density
 						CalcTotFlowVol = Secondary( SecondaryNum ).CoolingLoadRated * Secondary( SecondaryNum ).CircRate / ( DensityPhaseChange * DeltaHPhaseChange );
@@ -7994,6 +7996,7 @@ namespace RefrigeratedCase {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static std::string const RoutineName( "SimRefrigCondenser" );
 		static Real64 DeltaT( 0.0 );
 		static Real64 InletTemp( 0.0 );
 		static Real64 DesVolFlowRate( 0.0 );
@@ -8142,8 +8145,8 @@ namespace RefrigeratedCase {
 		// Make demand request on first HVAC iteration
 
 		//get cooling fluid properties
-		rho = GetDensityGlycol( PlantLoop( PlantLoopIndex ).FluidName, InletTemp, PlantLoop( PlantLoopIndex ).FluidIndex, "SimRefrigCondenser" );
-		Cp = GetSpecificHeatGlycol( PlantLoop( PlantLoopIndex ).FluidName, InletTemp, PlantLoop( PlantLoopIndex ).FluidIndex, "SimRefrigCondenser" );
+		rho = GetDensityGlycol( PlantLoop( PlantLoopIndex ).FluidName, InletTemp, PlantLoop( PlantLoopIndex ).FluidIndex, RoutineName );
+		Cp = GetSpecificHeatGlycol( PlantLoop( PlantLoopIndex ).FluidName, InletTemp, PlantLoop( PlantLoopIndex ).FluidIndex, RoutineName );
 
 		// first determine desired flow
 		if ( FlowType == VariableFlow && TotalCondenserHeat > 0.0 ) {

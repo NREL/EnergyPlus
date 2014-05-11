@@ -23,7 +23,7 @@ namespace BaseboardRadiator {
 	// Data
 	//MODULE PARAMETER DEFINITIONS
 	extern Real64 const SimpConvAirFlowSpeed; // m/s
-	extern std::string const cCMO_BBRadiator_Water;
+	// extern std::string const cCMO_BBRadiator_Water;
 
 	// DERIVED TYPE DEFINITIONS
 

@@ -2365,7 +2365,7 @@ namespace PlantCondLoopOperation {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "PlantCondLoopOperation:DistributePlantLoad" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2397,7 +2397,7 @@ namespace PlantCondLoopOperation {
 			CurMassFlowRate = Node( this_component.NodeNumIn ).MassFlowRate;
 			ToutLowLimit = this_component.MinOutletTemp;
 			Tinlet = Node( this_component.NodeNumIn ).Temp;
-			CurSpecHeat = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, Tinlet, PlantLoop( LoopNum ).FluidIndex, "PlantCondLoopOperation:DistributePlantLoad" );
+			CurSpecHeat = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, Tinlet, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 			QdotTmp = CurMassFlowRate * CurSpecHeat * ( Tinlet - ToutLowLimit );
 
 			//        !- Don't correct if Q is zero, as this could indicate a component which this hasn't been implemented or not yet turned on
@@ -2461,7 +2461,7 @@ namespace PlantCondLoopOperation {
 				CurMassFlowRate = Node( this_component.NodeNumIn ).MassFlowRate;
 				ToutLowLimit = this_component.MinOutletTemp;
 				Tinlet = Node( this_component.NodeNumIn ).Temp;
-				CurSpecHeat = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, Tinlet, PlantLoop( LoopNum ).FluidIndex, "PlantCondLoopOperation:DistributePlantLoad" );
+				CurSpecHeat = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, Tinlet, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 				QdotTmp = CurMassFlowRate * CurSpecHeat * ( Tinlet - ToutLowLimit );
 
 				//        !- Don't correct if Q is zero, as this could indicate a component which this hasn't been implemented or not yet turned on
@@ -2475,7 +2475,7 @@ namespace PlantCondLoopOperation {
 			CurMassFlowRate = Node( this_component.NodeNumIn ).MassFlowRate;
 			ToutHiLimit = this_component.MaxOutletTemp;
 			Tinlet = Node( this_component.NodeNumIn ).Temp;
-			CurSpecHeat = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, Tinlet, PlantLoop( LoopNum ).FluidIndex, "PlantCondLoopOperation:DistributePlantLoad" );
+			CurSpecHeat = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, Tinlet, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 			QdotTmp = CurMassFlowRate * CurSpecHeat * ( ToutHiLimit - Tinlet );
 
 			if ( CurMassFlowRate > 0.0 ) {
@@ -2519,6 +2519,7 @@ namespace PlantCondLoopOperation {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "FindCompSPLoad" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 CompDemand;
@@ -2560,12 +2561,12 @@ namespace PlantCondLoopOperation {
 		DemandNode = PlantLoop( LoopNum ).OpScheme( OpSchemePtr ).EquipList( ListPtr ).Comp( CompPtr ).DemandNodeNum;
 		SetPtNode = PlantLoop( LoopNum ).OpScheme( OpSchemePtr ).EquipList( ListPtr ).Comp( CompPtr ).SetPointNodeNum;
 		TempIn = Node( DemandNode ).Temp;
-		rho = GetDensityGlycol( PlantLoop( LoopNum ).FluidName, TempIn, PlantLoop( LoopNum ).FluidIndex, "FindCompSPLoad" );
+		rho = GetDensityGlycol( PlantLoop( LoopNum ).FluidName, TempIn, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 
 		DemandMdot = PlantLoop( LoopNum ).OpScheme( OpSchemePtr ).EquipList( ListPtr ).Comp( CompPtr ).SetPointFlowRate * rho;
 		//DSU?  DemandMDot is a constant design flow rate, next based on actual current flow rate for accurate current demand?
 		ActualMdot = Node( DemandNode ).MassFlowRate;
-		CurSpecHeat = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, TempIn, PlantLoop( LoopNum ).FluidIndex, "FindCompSPLoad" );
+		CurSpecHeat = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, TempIn, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 		if ( ( ActualMdot > 0.0 ) && ( ActualMdot != DemandMdot ) ) {
 			DemandMdot = ActualMdot;
 		}
@@ -3058,7 +3059,7 @@ namespace PlantCondLoopOperation {
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS
-		// na
+		static std::string const RoutineName( "ActivateEMSControls" );
 
 		// SUBROUTINE VARIABLE DEFINITIONS
 		Real64 CurMassFlowRate;
@@ -3119,7 +3120,7 @@ namespace PlantCondLoopOperation {
 					CurMassFlowRate = Node( this_comp.NodeNumIn ).MassFlowRate;
 					ToutLowLimit = this_comp.MinOutletTemp;
 					Tinlet = Node( this_comp.NodeNumIn ).Temp;
-					CurSpecHeat = GetSpecificHeatGlycol( this_loop.FluidName, Tinlet, this_loop.FluidIndex, "ActivateEMSControls" );
+					CurSpecHeat = GetSpecificHeatGlycol( this_loop.FluidName, Tinlet, this_loop.FluidIndex, RoutineName );
 					QTemporary = CurMassFlowRate * CurSpecHeat * ( Tinlet - ToutLowLimit );
 
 					//- Don't correct if Q is zero, as this could indicate a component which this hasn't been implemented

@@ -2849,6 +2849,7 @@ namespace FluidProperties {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt const fmta( "(A)" );
 		Real64 const incr( 10.0 );
+		static std::string const RoutineName( "ReportAndTestGlycols" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2944,21 +2945,21 @@ namespace FluidProperties {
 				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CpTemps( GlycolData( GlycolNum ).NumCpTempPts ) + incr, 2 );
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Specific Heat:"; }
 				Temperature = GlycolData( GlycolNum ).CpTemps( 1 ) - incr;
-				ReturnValue = GetSpecificHeatGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
+				ReturnValue = GetSpecificHeatGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				for ( Loop = 1; Loop <= GlycolData( GlycolNum ).NumCpTempPts - 1; ++Loop ) {
 					Temperature = GlycolData( GlycolNum ).CpTemps( Loop );
-					ReturnValue = GetSpecificHeatGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
+					ReturnValue = GetSpecificHeatGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 					Temperature = GlycolData( GlycolNum ).CpTemps( Loop ) + ( GlycolData( GlycolNum ).CpTemps( Loop + 1 ) - GlycolData( GlycolNum ).CpTemps( Loop ) ) / 2.0;
-					ReturnValue = GetSpecificHeatGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
+					ReturnValue = GetSpecificHeatGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				}
 				Temperature = GlycolData( GlycolNum ).CpTemps( GlycolData( GlycolNum ).NumCpTempPts );
-				ReturnValue = GetSpecificHeatGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
+				ReturnValue = GetSpecificHeatGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				Temperature = GlycolData( GlycolNum ).CpTemps( GlycolData( GlycolNum ).NumCpTempPts ) + incr;
-				ReturnValue = GetSpecificHeatGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
+				ReturnValue = GetSpecificHeatGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
 				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( ReturnValue, 2 );
 			}
 
@@ -2975,21 +2976,21 @@ namespace FluidProperties {
 				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( GlycolData( GlycolNum ).RhoTemps( GlycolData( GlycolNum ).NumRhoTempPts ) + incr, 2 );
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Density:"; }
 				Temperature = GlycolData( GlycolNum ).RhoTemps( 1 ) - incr;
-				ReturnValue = GetDensityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
+				ReturnValue = GetDensityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 3 ); }
 				for ( Loop = 1; Loop <= GlycolData( GlycolNum ).NumRhoTempPts - 1; ++Loop ) {
 					Temperature = GlycolData( GlycolNum ).RhoTemps( Loop );
-					ReturnValue = GetDensityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
+					ReturnValue = GetDensityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 3 ); }
 					Temperature = GlycolData( GlycolNum ).RhoTemps( Loop ) + ( GlycolData( GlycolNum ).RhoTemps( Loop + 1 ) - GlycolData( GlycolNum ).RhoTemps( Loop ) ) / 2.0;
-					ReturnValue = GetDensityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
+					ReturnValue = GetDensityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 3 ); }
 				}
 				Temperature = GlycolData( GlycolNum ).RhoTemps( GlycolData( GlycolNum ).NumRhoTempPts );
-				ReturnValue = GetDensityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
+				ReturnValue = GetDensityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 3 ); }
 				Temperature = GlycolData( GlycolNum ).RhoTemps( GlycolData( GlycolNum ).NumRhoTempPts ) + incr;
-				ReturnValue = GetDensityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
+				ReturnValue = GetDensityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
 				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( ReturnValue, 3 );
 			}
 
@@ -3006,21 +3007,21 @@ namespace FluidProperties {
 				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CondTemps( GlycolData( GlycolNum ).NumCondTempPts ) + incr, 2 );
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Conductivity:"; }
 				Temperature = GlycolData( GlycolNum ).CondTemps( 1 ) - incr;
-				ReturnValue = GetConductivityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
+				ReturnValue = GetConductivityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 3 ); }
 				for ( Loop = 1; Loop <= GlycolData( GlycolNum ).NumCondTempPts - 1; ++Loop ) {
 					Temperature = GlycolData( GlycolNum ).CondTemps( Loop );
-					ReturnValue = GetConductivityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
+					ReturnValue = GetConductivityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 3 ); }
 					Temperature = GlycolData( GlycolNum ).CondTemps( Loop ) + ( GlycolData( GlycolNum ).CondTemps( Loop + 1 ) - GlycolData( GlycolNum ).CondTemps( Loop ) ) / 2.0;
-					ReturnValue = GetConductivityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
+					ReturnValue = GetConductivityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 3 ); }
 				}
 				Temperature = GlycolData( GlycolNum ).CondTemps( GlycolData( GlycolNum ).NumCondTempPts );
-				ReturnValue = GetConductivityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
+				ReturnValue = GetConductivityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 3 ); }
 				Temperature = GlycolData( GlycolNum ).CondTemps( GlycolData( GlycolNum ).NumCondTempPts ) + incr;
-				ReturnValue = GetConductivityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
+				ReturnValue = GetConductivityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
 				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( ReturnValue, 3 );
 			}
 
@@ -3037,21 +3038,21 @@ namespace FluidProperties {
 				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( GlycolData( GlycolNum ).ViscTemps( GlycolData( GlycolNum ).NumViscTempPts ) + incr, 2 );
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Viscosity:"; }
 				Temperature = GlycolData( GlycolNum ).ViscTemps( 1 ) - incr;
-				ReturnValue = GetViscosityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
+				ReturnValue = GetViscosityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 4 ); }
 				for ( Loop = 1; Loop <= GlycolData( GlycolNum ).NumViscTempPts - 1; ++Loop ) {
 					Temperature = GlycolData( GlycolNum ).ViscTemps( Loop );
-					ReturnValue = GetViscosityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
+					ReturnValue = GetViscosityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 4 ); }
 					Temperature = GlycolData( GlycolNum ).ViscTemps( Loop ) + ( GlycolData( GlycolNum ).ViscTemps( Loop + 1 ) - GlycolData( GlycolNum ).ViscTemps( Loop ) ) / 2.0;
-					ReturnValue = GetViscosityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
+					ReturnValue = GetViscosityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 4 ); }
 				}
 				Temperature = GlycolData( GlycolNum ).ViscTemps( GlycolData( GlycolNum ).NumViscTempPts );
-				ReturnValue = GetViscosityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
+				ReturnValue = GetViscosityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 4 ); }
 				Temperature = GlycolData( GlycolNum ).ViscTemps( GlycolData( GlycolNum ).NumViscTempPts ) + incr;
-				ReturnValue = GetViscosityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
+				ReturnValue = GetViscosityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
 				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( ReturnValue, 4 );
 			}
 		}
@@ -3092,6 +3093,7 @@ namespace FluidProperties {
 		static gio::Fmt const fmta( "(A)" );
 		Real64 const incr( 10.0 );
 		Real64 const Quality( 1.0 );
+		static std::string const RoutineName( "ReportAndTestRefrigerants" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3266,21 +3268,21 @@ namespace FluidProperties {
 				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).PsTemps( RefrigData( RefrigNum ).NumPsPoints ) + incr, 2 );
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Saturated Pressures:"; }
 				Temperature = RefrigData( RefrigNum ).PsTemps( 1 ) - incr;
-				ReturnValue = GetSatPressureRefrig( RefrigData( RefrigNum ).Name, Temperature, RefrigIndex, "ReportAndTestRefrigerants" );
+				ReturnValue = GetSatPressureRefrig( RefrigData( RefrigNum ).Name, Temperature, RefrigIndex, RoutineName );
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumPsPoints - 1; ++Loop ) {
 					Temperature = RefrigData( RefrigNum ).PsTemps( Loop );
-					ReturnValue = GetSatPressureRefrig( RefrigData( RefrigNum ).Name, Temperature, RefrigIndex, "ReportAndTestRefrigerants" );
+					ReturnValue = GetSatPressureRefrig( RefrigData( RefrigNum ).Name, Temperature, RefrigIndex, RoutineName );
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 					Temperature = RefrigData( RefrigNum ).PsTemps( Loop ) + ( RefrigData( RefrigNum ).PsTemps( Loop + 1 ) - RefrigData( RefrigNum ).PsTemps( Loop ) ) / 2.0;
-					ReturnValue = GetSatPressureRefrig( RefrigData( RefrigNum ).Name, Temperature, RefrigIndex, "ReportAndTestRefrigerants" );
+					ReturnValue = GetSatPressureRefrig( RefrigData( RefrigNum ).Name, Temperature, RefrigIndex, RoutineName );
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				}
 				Temperature = RefrigData( RefrigNum ).PsTemps( RefrigData( RefrigNum ).NumPsPoints );
-				ReturnValue = GetSatPressureRefrig( RefrigData( RefrigNum ).Name, Temperature, RefrigIndex, "ReportAndTestRefrigerants" );
+				ReturnValue = GetSatPressureRefrig( RefrigData( RefrigNum ).Name, Temperature, RefrigIndex, RoutineName );
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				Temperature = RefrigData( RefrigNum ).PsTemps( RefrigData( RefrigNum ).NumPsPoints ) + incr;
-				ReturnValue = GetSatPressureRefrig( RefrigData( RefrigNum ).Name, Temperature, RefrigIndex, "ReportAndTestRefrigerants" );
+				ReturnValue = GetSatPressureRefrig( RefrigData( RefrigNum ).Name, Temperature, RefrigIndex, RoutineName );
 				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( ReturnValue, 2 );
 			}
 
@@ -3297,21 +3299,21 @@ namespace FluidProperties {
 				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HTemps( RefrigData( RefrigNum ).NumHPoints ) + incr, 2 );
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Saturated Enthalpy:"; }
 				Temperature = RefrigData( RefrigNum ).HTemps( 1 ) - incr;
-				ReturnValue = GetSatEnthalpyRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
+				ReturnValue = GetSatEnthalpyRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumHPoints - 1; ++Loop ) {
 					Temperature = RefrigData( RefrigNum ).HTemps( Loop );
-					ReturnValue = GetSatEnthalpyRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
+					ReturnValue = GetSatEnthalpyRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 					Temperature = RefrigData( RefrigNum ).HTemps( Loop ) + ( RefrigData( RefrigNum ).HTemps( Loop + 1 ) - RefrigData( RefrigNum ).HTemps( Loop ) ) / 2.0;
-					ReturnValue = GetSatEnthalpyRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
+					ReturnValue = GetSatEnthalpyRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				}
 				Temperature = RefrigData( RefrigNum ).HTemps( RefrigData( RefrigNum ).NumHPoints );
-				ReturnValue = GetSatEnthalpyRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
+				ReturnValue = GetSatEnthalpyRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				Temperature = RefrigData( RefrigNum ).HTemps( RefrigData( RefrigNum ).NumHPoints ) + incr;
-				ReturnValue = GetSatEnthalpyRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
+				ReturnValue = GetSatEnthalpyRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
 				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( ReturnValue, 2 );
 			}
 
@@ -3328,21 +3330,21 @@ namespace FluidProperties {
 				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).CpTemps( RefrigData( RefrigNum ).NumCpPoints ) + incr, 2 );
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Saturated Specific Heat:"; }
 				Temperature = RefrigData( RefrigNum ).CpTemps( 1 ) - incr;
-				ReturnValue = GetSatSpecificHeatRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
+				ReturnValue = GetSatSpecificHeatRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumCpPoints - 1; ++Loop ) {
 					Temperature = RefrigData( RefrigNum ).CpTemps( Loop );
-					ReturnValue = GetSatSpecificHeatRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
+					ReturnValue = GetSatSpecificHeatRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 					Temperature = RefrigData( RefrigNum ).CpTemps( Loop ) + ( RefrigData( RefrigNum ).CpTemps( Loop + 1 ) - RefrigData( RefrigNum ).CpTemps( Loop ) ) / 2.0;
-					ReturnValue = GetSatSpecificHeatRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
+					ReturnValue = GetSatSpecificHeatRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				}
 				Temperature = RefrigData( RefrigNum ).CpTemps( RefrigData( RefrigNum ).NumCpPoints );
-				ReturnValue = GetSatSpecificHeatRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
+				ReturnValue = GetSatSpecificHeatRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				Temperature = RefrigData( RefrigNum ).CpTemps( RefrigData( RefrigNum ).NumCpPoints ) + incr;
-				ReturnValue = GetSatSpecificHeatRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
+				ReturnValue = GetSatSpecificHeatRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
 				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( ReturnValue, 2 );
 			}
 
@@ -3359,21 +3361,21 @@ namespace FluidProperties {
 				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhoTemps( RefrigData( RefrigNum ).NumRhoPoints ) + incr, 2 );
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Saturated Density:"; }
 				Temperature = RefrigData( RefrigNum ).RhoTemps( 1 ) - incr;
-				ReturnValue = GetSatDensityRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
+				ReturnValue = GetSatDensityRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumRhoPoints - 1; ++Loop ) {
 					Temperature = RefrigData( RefrigNum ).RhoTemps( Loop );
-					ReturnValue = GetSatDensityRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
+					ReturnValue = GetSatDensityRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 					Temperature = RefrigData( RefrigNum ).RhoTemps( Loop ) + ( RefrigData( RefrigNum ).RhoTemps( Loop + 1 ) - RefrigData( RefrigNum ).RhoTemps( Loop ) ) / 2.0;
-					ReturnValue = GetSatDensityRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
+					ReturnValue = GetSatDensityRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				}
 				Temperature = RefrigData( RefrigNum ).RhoTemps( RefrigData( RefrigNum ).NumRhoPoints );
-				ReturnValue = GetSatDensityRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
+				ReturnValue = GetSatDensityRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				Temperature = RefrigData( RefrigNum ).RhoTemps( RefrigData( RefrigNum ).NumRhoPoints ) + incr;
-				ReturnValue = GetSatDensityRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
+				ReturnValue = GetSatDensityRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
 				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( ReturnValue, 2 );
 			}
 		}
@@ -3974,6 +3976,8 @@ namespace FluidProperties {
 
 		// FUNCTION PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetSupHeatEnthalpyRefrig: " );
+		static std::string const RoutineNameNoSpace( "GetSupHeatEnthalpyRefrig:" );
+		static std::string const RoutineNameNoColon( "GetSupHeatEnthalpyRefrig" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -4016,7 +4020,7 @@ namespace FluidProperties {
 
 		RefrigNum = 0;
 		if ( NumOfRefrigerants == 0 ) {
-			ReportFatalRefrigerantErrors( NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatEnthalpyRefrig", "properties", CalledFrom );
+			ReportFatalRefrigerantErrors( NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineNameNoColon, "properties", CalledFrom );
 		}
 
 		ErrCount = 0;
@@ -4032,7 +4036,7 @@ namespace FluidProperties {
 			// Find which refrigerant (index) is being requested
 			RefrigNum = FindRefrigerant( Refrigerant );
 			if ( RefrigNum == 0 ) {
-				ReportFatalRefrigerantErrors( NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatEnthalpyRefrig", "properties", CalledFrom );
+				ReportFatalRefrigerantErrors( NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineNameNoColon, "properties", CalledFrom );
 			}
 			RefrigIndex = RefrigNum;
 		}
@@ -4085,16 +4089,16 @@ namespace FluidProperties {
 		// to give reasonable interpolation near saturation reset any point with zero value
 		// in table to saturation value
 		if ( LoTempLoEnthalpy <= 0.0 ) {
-			LoTempLoEnthalpy = GetSatEnthalpyRefrig( Refrigerant, Temperature, 1.0, RefrigNum, "GetSupHeatEnthalpyRefrig" );
+			LoTempLoEnthalpy = GetSatEnthalpyRefrig( Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoColon );
 		}
 		if ( LoTempHiEnthalpy <= 0.0 ) {
-			LoTempHiEnthalpy = GetSatEnthalpyRefrig( Refrigerant, Temperature, 1.0, RefrigNum, "GetSupHeatEnthalpyRefrig" );
+			LoTempHiEnthalpy = GetSatEnthalpyRefrig( Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoColon );
 		}
 		if ( HiTempLoEnthalpy <= 0.0 ) {
-			HiTempLoEnthalpy = GetSatEnthalpyRefrig( Refrigerant, Temperature, 1.0, RefrigNum, "GetSupHeatEnthalpyRefrig" );
+			HiTempLoEnthalpy = GetSatEnthalpyRefrig( Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoColon );
 		}
 		if ( HiTempHiEnthalpy <= 0.0 ) {
-			HiTempHiEnthalpy = GetSatEnthalpyRefrig( Refrigerant, Temperature, 1.0, RefrigNum, "GetSupHeatEnthalpyRefrig" );
+			HiTempHiEnthalpy = GetSatEnthalpyRefrig( Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoColon );
 		}
 
 		// interpolate w.r.t. pressure
@@ -4110,7 +4114,7 @@ namespace FluidProperties {
 		if ( ( RefrigData( RefrigNum ).HshValues( TempIndex, LoPressIndex ) <= 0.0 ) && ( RefrigData( RefrigNum ).HshValues( TempIndex, HiPressIndex ) <= 0.0 ) && ( RefrigData( RefrigNum ).HshValues( HiTempIndex, LoPressIndex ) <= 0.0 ) && ( RefrigData( RefrigNum ).HshValues( HiTempIndex, HiPressIndex ) <= 0.0 ) ) {
 			++SatErrCount;
 			// set return value
-			ReturnValue = GetSatEnthalpyRefrig( Refrigerant, Temperature, 1.0, RefrigNum, "GetSupHeatEnthalpyRefrig:" + CalledFrom );
+			ReturnValue = GetSatEnthalpyRefrig( Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoSpace + CalledFrom );
 			// send warning
 			if ( ! WarmupFlag ) {
 				RefrigErrorTracking( RefrigNum ).SatSupEnthalpyErrCount += SatErrCount;
@@ -4209,6 +4213,7 @@ namespace FluidProperties {
 		Real64 const EnthalpyDiff( 0.01 ); // Allows a 1% difference in the enthalpy input and
 		// the enthalpy calculated from the pressure found
 		static std::string const RoutineName( "GetSupHeatPressureRefrig: " );
+		static std::string const RoutineNameNoSpace( "GetSupHeatPressureRefrig:" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -4348,7 +4353,7 @@ namespace FluidProperties {
 		EnthalpyMax = max( RefrigData( RefrigNum ).HshValues( LoTempIndex, TempStart ), RefrigData( RefrigNum ).HshValues( HiTempIndex, TempStart ) );
 		EnthalpyMin = min( RefrigData( RefrigNum ).HshValues( LoTempIndex, TempFinish ), RefrigData( RefrigNum ).HshValues( HiTempIndex, TempFinish ) );
 		// get saturated enthalpy for checking
-		SatEnthalpy = GetSatEnthalpyRefrig( Refrigerant, Temperature, 1.0, RefrigNum, "GetSupHeatPressureRefrig:" + CalledFrom );
+		SatEnthalpy = GetSatEnthalpyRefrig( Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoSpace + CalledFrom );
 
 		// make some checks on the data before interpolating
 		if ( Enthalpy < SatEnthalpy ) {
@@ -4356,7 +4361,7 @@ namespace FluidProperties {
 			++CurSatErrCount;
 			++ErrCount;
 			// return sat pressure at this temperature
-			ReturnValue = GetSatPressureRefrig( Refrigerant, Temperature, RefrigNum, "GetSupHeatPressureRefrig:" + CalledFrom );
+			ReturnValue = GetSatPressureRefrig( Refrigerant, Temperature, RefrigNum, RoutineNameNoSpace + CalledFrom );
 
 		} else if ( EnthalpyMax < Enthalpy || EnthalpyMin > Enthalpy ) {
 			// out of range error

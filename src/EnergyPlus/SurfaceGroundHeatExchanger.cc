@@ -493,6 +493,7 @@ namespace SurfaceGroundHeatExchanger {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const DesignVelocity( 0.5 ); // Hypothetical design max pipe velocity [m/s]
+		static std::string const RoutineName( "InitSurfaceGroundHeatExchanger" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -531,7 +532,7 @@ namespace SurfaceGroundHeatExchanger {
 			if ( errFlag ) {
 				ShowFatalError( "InitSurfaceGroundHeatExchanger: Program terminated due to previous condition(s)." );
 			}
-			rho = GetDensityGlycol( PlantLoop( SurfaceGHE( SurfaceGHENum ).LoopNum ).FluidName, constant_zero, PlantLoop( SurfaceGHE( SurfaceGHENum ).LoopNum ).FluidIndex, "InitSurfaceGroundHeatExchanger" );
+			rho = GetDensityGlycol( PlantLoop( SurfaceGHE( SurfaceGHENum ).LoopNum ).FluidName, constant_zero, PlantLoop( SurfaceGHE( SurfaceGHENum ).LoopNum ).FluidIndex, RoutineName );
 			SurfaceGHE( SurfaceGHENum ).DesignMassFlowRate = Pi / 4.0 * std::pow( SurfaceGHE( SurfaceGHENum ).TubeDiameter, 2 ) * DesignVelocity * rho * SurfaceGHE( SurfaceGHENum ).TubeCircuits;
 			InitComponentNodes( 0.0, SurfaceGHE( SurfaceGHENum ).DesignMassFlowRate, SurfaceGHE( SurfaceGHENum ).InletNodeNum, SurfaceGHE( SurfaceGHENum ).OutletNodeNum, SurfaceGHE( SurfaceGHENum ).LoopNum, SurfaceGHE( SurfaceGHENum ).LoopSideNum, SurfaceGHE( SurfaceGHENum ).BranchNum, SurfaceGHE( SurfaceGHENum ).CompNum );
 			RegisterPlantCompDesignFlow( SurfaceGHE( SurfaceGHENum ).InletNodeNum, SurfaceGHE( SurfaceGHENum ).DesignMassFlowRate / rho );
@@ -1316,6 +1317,7 @@ namespace SurfaceGroundHeatExchanger {
 		static FArray1D< Real64 > const Conductivity( NumOfPropDivisions, { .574, .582, .590, .598, .606, .613, .620, .628, .634, .640, .645, .650, .656 } ); // Conductivity, in W/mK
 		static FArray1D< Real64 > const Pr( NumOfPropDivisions, { 12.22, 10.26, 8.81, 7.56, 6.62, 5.83, 5.20, 4.62, 4.16, 3.77, 3.42, 3.15, 2.88 } ); // Prandtl number (dimensionless)
 		int const WaterIndex( 1 );
+		static std::string const RoutineName( "SurfaceGroundHeatExchanger:CalcHXEffectTerm" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1371,7 +1373,7 @@ namespace SurfaceGroundHeatExchanger {
 				InletTemp = max( InletTemp, 0.0 );
 			}
 		}
-		CpWater = GetSpecificHeatGlycol( PlantLoop( SurfaceGHE( SurfaceGHENum ).LoopNum ).FluidName, Temperature, PlantLoop( SurfaceGHE( SurfaceGHENum ).LoopNum ).FluidIndex, "SurfaceGroundHeatExchanger:CalcHXEffectTerm" );
+		CpWater = GetSpecificHeatGlycol( PlantLoop( SurfaceGHE( SurfaceGHENum ).LoopNum ).FluidName, Temperature, PlantLoop( SurfaceGHE( SurfaceGHENum ).LoopNum ).FluidIndex, RoutineName );
 
 		// Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
 		ReD = 4.0 * WaterMassFlow / ( Pi * MUactual * SurfaceGHE( SurfaceGHENum ).TubeDiameter * SurfaceGHE( SurfaceGHENum ).TubeCircuits );
@@ -1615,6 +1617,7 @@ namespace SurfaceGroundHeatExchanger {
 		//  INTEGER, INTENT(IN) :: FlowLock            ! flow initialization/condition flag    !DSU
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "SurfaceGroundHeatExchanger:Update" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1658,7 +1661,7 @@ namespace SurfaceGroundHeatExchanger {
 			InletTemp = max( InletTemp, 0.0 );
 		}
 
-		CpFluid = GetSpecificHeatGlycol( PlantLoop( SurfaceGHE( SurfaceGHENum ).LoopNum ).FluidName, InletTemp, PlantLoop( SurfaceGHE( SurfaceGHENum ).LoopNum ).FluidIndex, "SurfaceGroundHeatExchanger:Update" );
+		CpFluid = GetSpecificHeatGlycol( PlantLoop( SurfaceGHE( SurfaceGHENum ).LoopNum ).FluidName, InletTemp, PlantLoop( SurfaceGHE( SurfaceGHENum ).LoopNum ).FluidIndex, RoutineName );
 
 		SafeCopyPlantNode( SurfaceGHE( SurfaceGHENum ).InletNodeNum, SurfaceGHE( SurfaceGHENum ).OutletNodeNum );
 		// check for flow

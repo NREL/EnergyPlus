@@ -208,6 +208,7 @@ namespace StandardRatings {
 		int const NumOfReducedCap( 4 ); // Number of reduced capacity test conditions (100%,75%,50%,and 25%)
 		int const IterMax( 500 ); // Maximum number of iterations
 		static FArray1D< Real64 > const IPLVWeightingFactor( 4, { 0.010, 0.42, 0.45, 0.12 } ); // EER Weighting factors (IPLV)
+		static std::string const RoutineName( "CalcChillerIPLV" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -309,9 +310,9 @@ namespace StandardRatings {
 				}
 
 			} else if ( SELECT_CASE_var == TypeOf_Chiller_ElectricReformEIR ) {
-				Cp = GetSpecificHeatGlycol( PlantLoop( CondLoopNum ).FluidName, EnteringWaterTempReduced, PlantLoop( CondLoopNum ).FluidIndex, "CalcChillerIPLV" );
+				Cp = GetSpecificHeatGlycol( PlantLoop( CondLoopNum ).FluidName, EnteringWaterTempReduced, PlantLoop( CondLoopNum ).FluidIndex, RoutineName );
 
-				Rho = GetDensityGlycol( PlantLoop( CondLoopNum ).FluidName, EnteringWaterTempReduced, PlantLoop( CondLoopNum ).FluidIndex, "CalcChillerIPLV" );
+				Rho = GetDensityGlycol( PlantLoop( CondLoopNum ).FluidName, EnteringWaterTempReduced, PlantLoop( CondLoopNum ).FluidIndex, RoutineName );
 
 				Par( 1 ) = EnteringWaterTempReduced;
 				Par( 2 ) = EvapOutletTemp;

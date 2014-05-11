@@ -607,7 +607,7 @@ namespace WaterToAirHeatPumpSimple {
 		// shut off after compressor cycle off  [s]
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "InitSimpleWatertoAirHP" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -733,8 +733,8 @@ namespace WaterToAirHeatPumpSimple {
 			SimpleWatertoAirHP( HPNum ).RunFrac = 0.0;
 			SimpleWatertoAirHP( HPNum ).PartLoadRatio = 0.0;
 
-			rho = GetDensityGlycol( PlantLoop( SimpleWatertoAirHP( HPNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleWatertoAirHP( HPNum ).LoopNum ).FluidIndex, "InitSimpleWatertoAirHP" );
-			Cp = GetSpecificHeatGlycol( PlantLoop( SimpleWatertoAirHP( HPNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleWatertoAirHP( HPNum ).LoopNum ).FluidIndex, "InitSimpleWatertoAirHP" );
+			rho = GetDensityGlycol( PlantLoop( SimpleWatertoAirHP( HPNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleWatertoAirHP( HPNum ).LoopNum ).FluidIndex, RoutineName );
+			Cp = GetSpecificHeatGlycol( PlantLoop( SimpleWatertoAirHP( HPNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleWatertoAirHP( HPNum ).LoopNum ).FluidIndex, RoutineName );
 
 			SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate = rho * SimpleWatertoAirHP( HPNum ).RatedWaterVolFlowRate;
 			SimpleWatertoAirHP( HPNum ).MaxONOFFCyclesperHour = MaxONOFFCyclesperHour;
@@ -907,6 +907,7 @@ namespace WaterToAirHeatPumpSimple {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeWaterToAirCoil" );
+		static std::string const RoutineNameAlt( "SizeHVACWaterToAir" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1533,8 +1534,8 @@ namespace WaterToAirHeatPumpSimple {
 			//    END IF
 
 			if ( PltSizNum > 0 ) {
-				rho = GetDensityGlycol( PlantLoop( SimpleWatertoAirHP( HPNum ).LoopNum ).FluidName, PlantSizData( PltSizNum ).ExitTemp, PlantLoop( SimpleWatertoAirHP( HPNum ).LoopNum ).FluidIndex, "SizeHVACWaterToAir" );
-				Cp = GetSpecificHeatGlycol( PlantLoop( SimpleWatertoAirHP( HPNum ).LoopNum ).FluidName, PlantSizData( PltSizNum ).ExitTemp, PlantLoop( SimpleWatertoAirHP( HPNum ).LoopNum ).FluidIndex, "SizeHVACWaterToAir" );
+				rho = GetDensityGlycol( PlantLoop( SimpleWatertoAirHP( HPNum ).LoopNum ).FluidName, PlantSizData( PltSizNum ).ExitTemp, PlantLoop( SimpleWatertoAirHP( HPNum ).LoopNum ).FluidIndex, RoutineNameAlt );
+				Cp = GetSpecificHeatGlycol( PlantLoop( SimpleWatertoAirHP( HPNum ).LoopNum ).FluidName, PlantSizData( PltSizNum ).ExitTemp, PlantLoop( SimpleWatertoAirHP( HPNum ).LoopNum ).FluidIndex, RoutineNameAlt );
 
 				if ( SimpleWatertoAirHP( HPNum ).WatertoAirHPType == "HEATING" ) {
 
@@ -1649,6 +1650,7 @@ namespace WaterToAirHeatPumpSimple {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const Tref( 283.15 ); // Reference Temperature for performance curves,10C [K]
 		static std::string const RoutineName( "CalcHPCoolingSimple" );
+		static std::string const RoutineNameSourceSideInletTemp( "CalcHPCoolingSimple:SourceSideInletTemp" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1751,7 +1753,7 @@ namespace WaterToAirHeatPumpSimple {
 		SourceSideMassFlowRate = SimpleWatertoAirHP( HPNum ).WaterMassFlowRate;
 		SourceSideInletTemp = SimpleWatertoAirHP( HPNum ).InletWaterTemp;
 		SourceSideInletEnth = SimpleWatertoAirHP( HPNum ).InletWaterEnthalpy;
-		CpWater = GetSpecificHeatGlycol( PlantLoop( SimpleWatertoAirHP( HPNum ).LoopNum ).FluidName, SourceSideInletTemp, PlantLoop( SimpleWatertoAirHP( HPNum ).LoopNum ).FluidIndex, "CalcHPCoolingSimple:SourceSideInletTemp" );
+		CpWater = GetSpecificHeatGlycol( PlantLoop( SimpleWatertoAirHP( HPNum ).LoopNum ).FluidName, SourceSideInletTemp, PlantLoop( SimpleWatertoAirHP( HPNum ).LoopNum ).FluidIndex, RoutineNameSourceSideInletTemp );
 
 		//Check for flows, do not perform simulation if no flow in load side or source side.
 		if ( SourceSideMassFlowRate <= 0.0 || LoadSideMassFlowRate <= 0.0 ) {
@@ -1956,6 +1958,7 @@ namespace WaterToAirHeatPumpSimple {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const Tref( 283.15 ); // Reference Temperature for performance curves,10C [K]
 		static std::string const RoutineName( "CalcHPHeatingSimple" );
+		static std::string const RoutineNameSourceSideInletTemp( "CalcHPHeatingSimple:SourceSideInletTemp" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2016,7 +2019,7 @@ namespace WaterToAirHeatPumpSimple {
 		SourceSideMassFlowRate = SimpleWatertoAirHP( HPNum ).WaterMassFlowRate;
 		SourceSideInletTemp = SimpleWatertoAirHP( HPNum ).InletWaterTemp;
 		SourceSideInletEnth = SimpleWatertoAirHP( HPNum ).InletWaterEnthalpy;
-		CpWater = GetSpecificHeatGlycol( PlantLoop( SimpleWatertoAirHP( HPNum ).LoopNum ).FluidName, SourceSideInletTemp, PlantLoop( SimpleWatertoAirHP( HPNum ).LoopNum ).FluidIndex, RoutineName + ":SourceSideInletTemp" );
+		CpWater = GetSpecificHeatGlycol( PlantLoop( SimpleWatertoAirHP( HPNum ).LoopNum ).FluidName, SourceSideInletTemp, PlantLoop( SimpleWatertoAirHP( HPNum ).LoopNum ).FluidIndex, RoutineNameSourceSideInletTemp );
 
 		//Check for flows, do not perform simulation if no flow in load side or source side.
 		if ( SourceSideMassFlowRate <= 0.0 || LoadSideMassFlowRate <= 0.0 ) {

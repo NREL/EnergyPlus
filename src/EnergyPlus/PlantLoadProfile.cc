@@ -102,6 +102,7 @@ namespace PlantLoadProfile {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static std::string const RoutineName( "SimulatePlantProfile" );
 		Real64 DeltaTemp;
 		static bool GetInput( true );
 		Real64 Cp; // local fluid specific heat
@@ -127,7 +128,7 @@ namespace PlantLoadProfile {
 
 			if ( PlantProfile( ProfileNum ).MassFlowRate > 0.0 ) {
 
-				Cp = GetSpecificHeatGlycol( PlantLoop( PlantProfile( ProfileNum ).WLoopNum ).FluidName, PlantProfile( ProfileNum ).InletTemp, PlantLoop( PlantProfile( ProfileNum ).WLoopNum ).FluidIndex, "SimulatePlantProfile" );
+				Cp = GetSpecificHeatGlycol( PlantLoop( PlantProfile( ProfileNum ).WLoopNum ).FluidName, PlantProfile( ProfileNum ).InletTemp, PlantLoop( PlantProfile( ProfileNum ).WLoopNum ).FluidIndex, RoutineName );
 
 				DeltaTemp = PlantProfile( ProfileNum ).Power / ( PlantProfile( ProfileNum ).MassFlowRate * Cp );
 			} else {
@@ -283,6 +284,7 @@ namespace PlantLoadProfile {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static std::string const RoutineName( "InitPlantProfile" );
 		int InletNode;
 		int OutletNode;
 		Real64 MaxFlowMultiplier;
@@ -319,7 +321,7 @@ namespace PlantLoadProfile {
 			//    Node(InletNode)%Temp = 0.0
 			Node( OutletNode ).Temp = 0.0;
 
-			FluidDensityInit = GetDensityGlycol( PlantLoop( PlantProfile( ProfileNum ).WLoopNum ).FluidName, InitConvTemp, PlantLoop( PlantProfile( ProfileNum ).WLoopNum ).FluidIndex, "InitPlantProfile" );
+			FluidDensityInit = GetDensityGlycol( PlantLoop( PlantProfile( ProfileNum ).WLoopNum ).FluidName, InitConvTemp, PlantLoop( PlantProfile( ProfileNum ).WLoopNum ).FluidIndex, RoutineName );
 
 			MaxFlowMultiplier = GetScheduleMaxValue( PlantProfile( ProfileNum ).FlowRateFracSchedule );
 
@@ -340,7 +342,7 @@ namespace PlantLoadProfile {
 
 		if ( PlantProfile( ProfileNum ).EMSOverridePower ) PlantProfile( ProfileNum ).Power = PlantProfile( ProfileNum ).EMSPowerValue;
 
-		FluidDensityInit = GetDensityGlycol( PlantLoop( PlantProfile( ProfileNum ).WLoopNum ).FluidName, PlantProfile( ProfileNum ).InletTemp, PlantLoop( PlantProfile( ProfileNum ).WLoopNum ).FluidIndex, "InitPlantProfile" );
+		FluidDensityInit = GetDensityGlycol( PlantLoop( PlantProfile( ProfileNum ).WLoopNum ).FluidName, PlantProfile( ProfileNum ).InletTemp, PlantLoop( PlantProfile( ProfileNum ).WLoopNum ).FluidIndex, RoutineName );
 
 		// Get the scheduled mass flow rate
 		PlantProfile( ProfileNum ).VolFlowRate = PlantProfile( ProfileNum ).PeakVolFlowRate * GetCurrentScheduleValue( PlantProfile( ProfileNum ).FlowRateFracSchedule );

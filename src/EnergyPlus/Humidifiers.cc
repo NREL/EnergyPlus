@@ -74,6 +74,9 @@ namespace Humidifiers {
 
 	FArray1D_string const HumidifierType( 1, std::string( "Humidifier:Steam:Electric" ) );
 
+	static std::string const fluidNameSteam( "STEAM" );
+	static std::string const fluidNameWater( "WATER" );
+
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -528,11 +531,11 @@ namespace Humidifiers {
 		if ( Humidifier( HumNum ).HumType_Code == Humidifier_Steam_Electric ) {
 			Humidifier( HumNum ).NomCap = RhoH2O( InitConvTemp ) * Humidifier( HumNum ).NomCapVol;
 
-			RefrigerantIndex = FindRefrigerant( "STEAM" );
-			WaterIndex = FindGlycol( "WATER" );
-			SteamSatEnthalpy = GetSatEnthalpyRefrig( "STEAM", TSteam, 1.0, RefrigerantIndex, CalledFrom );
-			WaterSatEnthalpy = GetSatEnthalpyRefrig( "STEAM", TSteam, 0.0, RefrigerantIndex, CalledFrom );
-			WaterSpecHeatAvg = 0.5 * ( GetSpecificHeatGlycol( "WATER", TSteam, WaterIndex, CalledFrom ) + GetSpecificHeatGlycol( "WATER", Tref, WaterIndex, CalledFrom ) );
+			RefrigerantIndex = FindRefrigerant( fluidNameSteam );
+			WaterIndex = FindGlycol( fluidNameWater );
+			SteamSatEnthalpy = GetSatEnthalpyRefrig( fluidNameSteam, TSteam, 1.0, RefrigerantIndex, CalledFrom );
+			WaterSatEnthalpy = GetSatEnthalpyRefrig( fluidNameSteam, TSteam, 0.0, RefrigerantIndex, CalledFrom );
+			WaterSpecHeatAvg = 0.5 * ( GetSpecificHeatGlycol( fluidNameWater, TSteam, WaterIndex, CalledFrom ) + GetSpecificHeatGlycol( fluidNameWater, Tref, WaterIndex, CalledFrom ) );
 
 			NominalPower = Humidifier( HumNum ).NomCap * ( ( SteamSatEnthalpy - WaterSatEnthalpy ) + WaterSpecHeatAvg * ( TSteam - Tref ) );
 

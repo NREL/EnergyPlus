@@ -4700,7 +4700,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 					if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_HAMT ) {
 						// Set variables used in the HAMT moisture balance
 						TempOutsideAirFD( SurfNum ) = TempExt;
-						RhoVaporAirOut( SurfNum ) = PsyRhovFnTdbRh( TempOutsideAirFD( SurfNum ), 1.0 HBSurfManRainHAMT );
+						RhoVaporAirOut( SurfNum ) = PsyRhovFnTdbRh( TempOutsideAirFD( SurfNum ), 1.0, HBSurfManRainHAMT );
 						HConvExtFD( SurfNum ) = HcExtSurf( SurfNum );
 						HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, TempOutsideAirFD( SurfNum ), PsyWFnTdbRhPb( TempOutsideAirFD( SurfNum ), 1.0, OutBaroPress, RoutineNameExtEnvWetSurf ) ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, TempOutsideAirFD( SurfNum ) ) );
 						HSkyFD( SurfNum ) = HSkyExtSurf( SurfNum );

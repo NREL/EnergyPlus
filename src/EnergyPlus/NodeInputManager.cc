@@ -58,7 +58,8 @@ namespace NodeInputManager {
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
-	std::string const Blank;
+	static std::string const Blank;
+	static std::string const fluidNameSteam( "STEAM" );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -1092,7 +1093,7 @@ namespace NodeInputManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "CalcMoreNodeInfo" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1243,8 +1244,8 @@ namespace NodeInputManager {
 				MoreNodeInfo( iNode ).RelHumidity = 100.0;
 			} else if ( Node( iNode ).FluidType == NodeType_Steam ) {
 				if ( Node( iNode ).Quality == 1.0 ) {
-					SteamDensity = GetSatDensityRefrig( "STEAM", Node( iNode ).Temp, Node( iNode ).Quality, Node( iNode ).FluidIndex, "CalcMoreNodeInfo" );
-					EnthSteamInDry = GetSatEnthalpyRefrig( "STEAM", Node( iNode ).Temp, Node( iNode ).Quality, Node( iNode ).FluidIndex, "CalcMoreNodeInfo" );
+					SteamDensity = GetSatDensityRefrig( fluidNameSteam, Node( iNode ).Temp, Node( iNode ).Quality, Node( iNode ).FluidIndex, RoutineName );
+					EnthSteamInDry = GetSatEnthalpyRefrig( fluidNameSteam, Node( iNode ).Temp, Node( iNode ).Quality, Node( iNode ).FluidIndex, RoutineName );
 					MoreNodeInfo( iNode ).VolFlowRateStdRho = Node( iNode ).MassFlowRate / SteamDensity;
 					MoreNodeInfo( iNode ).ReportEnthalpy = EnthSteamInDry;
 					MoreNodeInfo( iNode ).WetBulbTemp = 0.0;

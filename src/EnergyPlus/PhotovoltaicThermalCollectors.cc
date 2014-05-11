@@ -522,7 +522,7 @@ namespace PhotovoltaicThermalCollectors {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "InitPVTcollectors" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -640,7 +640,7 @@ namespace PhotovoltaicThermalCollectors {
 
 			if ( SELECT_CASE_var == LiquidWorkingFluid ) {
 
-				rho = GetDensityGlycol( PlantLoop( PVT( PVTnum ).WLoopNum ).FluidName, 60., PlantLoop( PVT( PVTnum ).WLoopNum ).FluidIndex, "InitPVTcollectors" );
+				rho = GetDensityGlycol( PlantLoop( PVT( PVTnum ).WLoopNum ).FluidName, 60., PlantLoop( PVT( PVTnum ).WLoopNum ).FluidIndex, RoutineName );
 
 				PVT( PVTnum ).MaxMassFlowRate = PVT( PVTnum ).DesignVolFlowRate * rho;
 

@@ -139,6 +139,8 @@ namespace HVACUnitaryBypassVAV {
 	int const UseCompressorOnFlow( 1 ); // Set compressor OFF air flow rate equal to compressor ON air flow rate
 	int const UseCompressorOffFlow( 2 ); // Set compressor OFF air flow rate equal to user defined value
 
+	static std::string const fluidNameSteam( "STEAM" );
+
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -457,7 +459,7 @@ namespace HVACUnitaryBypassVAV {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const getUnitaryHeatCoolVAVChangeoverBypass( "GetUnitaryHeatCool:VAVChangeoverBypass" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -905,7 +907,7 @@ namespace HVACUnitaryBypassVAV {
 					CBVAV( CBVAVNum ).CoilControlNode = GetCoilSteamInletNode( CBVAV( CBVAVNum ).HeatCoilIndex, CBVAV( CBVAVNum ).HeatCoilName, errFlag );
 					CBVAV( CBVAVNum ).MaxHeatCoilFluidFlow = GetCoilMaxSteamFlowRate( CBVAV( CBVAVNum ).HeatCoilIndex, errFlag );
 					SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-					SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "GetUnitaryHeatCool:VAVChangeoverBypass" );
+					SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, getUnitaryHeatCoolVAVChangeoverBypass );
 					if ( CBVAV( CBVAVNum ).MaxHeatCoilFluidFlow > 0.0 ) {
 						CBVAV( CBVAVNum ).MaxHeatCoilFluidFlow = GetCoilMaxSteamFlowRate( CBVAV( CBVAVNum ).HeatCoilIndex, errFlag ) * SteamDensity;
 					}
@@ -1213,7 +1215,7 @@ namespace HVACUnitaryBypassVAV {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "InitCBVAV" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1274,7 +1276,7 @@ namespace HVACUnitaryBypassVAV {
 					CBVAV( CBVAVNum ).MaxHeatCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", CBVAV( CBVAVNum ).HeatCoilName, ErrorsFound );
 
 					if ( CBVAV( CBVAVNum ).MaxHeatCoilFluidFlow > 0.0 ) {
-						FluidDensity = GetDensityGlycol( PlantLoop( CBVAV( CBVAVNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( CBVAV( CBVAVNum ).LoopNum ).FluidIndex, "InitCBVAV" );
+						FluidDensity = GetDensityGlycol( PlantLoop( CBVAV( CBVAVNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( CBVAV( CBVAVNum ).LoopNum ).FluidIndex, RoutineName );
 						CBVAV( CBVAVNum ).MaxHeatCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", CBVAV( CBVAVNum ).HeatCoilName, ErrorsFound ) * FluidDensity;
 					}
 
@@ -1291,7 +1293,7 @@ namespace HVACUnitaryBypassVAV {
 
 					if ( CBVAV( CBVAVNum ).MaxHeatCoilFluidFlow > 0.0 ) {
 						SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-						FluidDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "InitCBVAV" );
+						FluidDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName );
 						CBVAV( CBVAVNum ).MaxHeatCoilFluidFlow = GetCoilMaxSteamFlowRate( CBVAV( CBVAVNum ).HeatCoilIndex, ErrorsFound ) * FluidDensity;
 					}
 
@@ -1356,7 +1358,7 @@ namespace HVACUnitaryBypassVAV {
 							ErrorsFound = true;
 						}
 						if ( CoilMaxVolFlowRate != AutoSize ) {
-							FluidDensity = GetDensityGlycol( PlantLoop( CBVAV( CBVAVNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( CBVAV( CBVAVNum ).LoopNum ).FluidIndex, "InitCBVAV" );
+							FluidDensity = GetDensityGlycol( PlantLoop( CBVAV( CBVAVNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( CBVAV( CBVAVNum ).LoopNum ).FluidIndex, RoutineName );
 							CBVAV( CBVAVNum ).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;
 						}
 					}
@@ -1369,7 +1371,7 @@ namespace HVACUnitaryBypassVAV {
 						}
 						if ( CoilMaxVolFlowRate != AutoSize ) {
 							SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-							FluidDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "InitCBVAV" );
+							FluidDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName );
 							CBVAV( CBVAVNum ).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;
 						}
 					}
