@@ -96,6 +96,8 @@ namespace FluidCoolers {
 	int const FluidCooler_SingleSpeed( 1 );
 	int const FluidCooler_TwoSpeed( 2 );
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -305,7 +307,7 @@ namespace FluidCoolers {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -376,7 +378,7 @@ namespace FluidCoolers {
 			SimpleFluidCooler( FluidCoolerNum ).HighSpeedFanPower = NumArray( 8 );
 
 			//   outdoor air inlet node
-			if ( AlphArray( 5 ) == Blank ) {
+			if ( AlphArray( 5 ) == BlankString ) {
 				SimpleFluidCooler( FluidCoolerNum ).OutdoorAirInletNodeNum = 0;
 			} else {
 				SimpleFluidCooler( FluidCoolerNum ).OutdoorAirInletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, cCurrentModuleObject, SimpleFluidCooler( FluidCoolerNum ).Name, NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
@@ -488,7 +490,7 @@ namespace FluidCoolers {
 			SimpleFluidCooler( FluidCoolerNum ).LowSpeedFanPowerSizingFactor = NumArray( 16 );
 
 			//   outdoor air inlet node
-			if ( AlphArray( 5 ) == Blank ) {
+			if ( AlphArray( 5 ) == BlankString ) {
 				SimpleFluidCooler( FluidCoolerNum ).OutdoorAirInletNodeNum = 0;
 			} else {
 				SimpleFluidCooler( FluidCoolerNum ).OutdoorAirInletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, cCurrentModuleObject, SimpleFluidCooler( FluidCoolerNum ).Name, NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
@@ -1113,7 +1115,7 @@ namespace FluidCoolers {
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirTemp = SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirTemp; // design inlet air dry-bulb temp
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb = SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirWetBulbTemp; // design inlet air wet-bulb temp
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress = StdBaroPress;
-				SimpleFluidCoolerInlet( FluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleFluidCoolerInlet( FluidCoolerNum ).AirTemp, SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb, SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress );
+				SimpleFluidCoolerInlet( FluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleFluidCoolerInlet( FluidCoolerNum ).AirTemp, SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb, SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress, BlankString );
 				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowWarningError( "Iteration limit exceeded in calculating fluid cooler UA." );
@@ -1619,7 +1621,7 @@ namespace FluidCoolers {
 		if ( UAdesign == 0.0 ) return;
 
 		// set water and air properties
-		AirDensity = PsyRhoAirFnPbTdbW( SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress, InletAirTemp, SimpleFluidCoolerInlet( FluidCoolerNum ).AirHumRat );
+		AirDensity = PsyRhoAirFnPbTdbW( SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress, InletAirTemp, SimpleFluidCoolerInlet( FluidCoolerNum ).AirHumRat, BlankString );
 		AirMassFlowRate = AirFlowRate * AirDensity;
 		CpAir = PsyCpAirFnWTdb( SimpleFluidCoolerInlet( FluidCoolerNum ).AirHumRat, InletAirTemp );
 		CpWater = GetSpecificHeatGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, InletWaterTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, RoutineName );

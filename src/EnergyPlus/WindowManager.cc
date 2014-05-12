@@ -77,6 +77,7 @@ namespace WindowManager {
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS:
+	static std::string const BlankString;
 
 	Real64 const sigma( 5.6697e-8 ); // Stefan-Boltzmann constant
 	Real64 const TKelvin( KelvinConv ); // conversion from Kelvin to Celsius
@@ -2538,7 +2539,7 @@ namespace WindowManager {
 		if ( ! Construct( Surface( SurfNum ).Construction ).WindowTypeEQL ) {
 			InsideGlassTemp = thetas( 2 * ngllayer ) - TKelvin;
 			RoomHumRat = ZoneAirHumRat( Surface( SurfNum ).Zone );
-			RoomDewPoint = PsyTdpFnWPb( RoomHumRat, OutBaroPress );
+			RoomDewPoint = PsyTdpFnWPb( RoomHumRat, OutBaroPress, BlankString );
 			InsideGlassCondensationFlag( SurfNum ) = 0;
 			if ( InsideGlassTemp < RoomDewPoint ) InsideGlassCondensationFlag( SurfNum ) = 1;
 			// If airflow window, is there condensation on either glass face of the airflow gap?

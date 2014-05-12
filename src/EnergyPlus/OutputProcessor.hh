@@ -62,7 +62,6 @@ namespace OutputProcessor {
 	extern gio::Fmt const RunPeriodStampFormat;
 	extern gio::Fmt const fmta;
 	extern FArray1D_string const DayTypes;
-	// extern std::string const BlankString;
 	extern int const UnitsStringLength;
 
 	extern int const RVarAllocInc;

@@ -145,6 +145,8 @@ namespace HVACControllers {
 	Real64 const SomeFloatingPoint( 1.0 );
 	int const NumSigDigits( precision( SomeFloatingPoint ) );
 
+	static std::string const BlankString;
+
 	// Parameters for controls used here
 	int const iNoControlVariable( 0 );
 	int const iTemperature( 1 );
@@ -1147,9 +1149,9 @@ namespace HVACControllers {
 					// See routine CalcSimpleController() for the sequence of operations.
 					if ( ControllerProps( ControlNum ).NextActuatedValue == RootFinders( ControlNum ).MaxPoint.X ) {
 						// Calculate the approach temperature (difference between SA dry-bulb temp and SA dew point temp)
-						ApproachTemp = Node( SensedNode ).Temp - PsyTdpFnWPb( Node( SensedNode ).HumRat, OutBaroPress );
+						ApproachTemp = Node( SensedNode ).Temp - PsyTdpFnWPb( Node( SensedNode ).HumRat, OutBaroPress, BlankString );
 						// Calculate the dew point temperature at the SA humidity ratio setpoint
-						DesiredDewPoint = PsyTdpFnWPb( Node( SensedNode ).HumRatMax, OutBaroPress );
+						DesiredDewPoint = PsyTdpFnWPb( Node( SensedNode ).HumRatMax, OutBaroPress, BlankString );
 						// Adjust the calculated dew point temperature by the approach temp
 						HumidityControlTempSetPoint = DesiredDewPoint + ApproachTemp;
 						// NOTE: The next line introduces a potential discontinuity into the residual function

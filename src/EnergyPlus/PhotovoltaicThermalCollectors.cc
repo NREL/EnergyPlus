@@ -91,6 +91,8 @@ namespace PhotovoltaicThermalCollectors {
 
 	Real64 const SimplePVTWaterSizeFactor( 1.905e-5 ); // [ m3/s/m2 ] average of collectors in SolarCollectors.idf
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -247,7 +249,7 @@ namespace PhotovoltaicThermalCollectors {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na

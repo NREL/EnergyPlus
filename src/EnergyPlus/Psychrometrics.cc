@@ -66,6 +66,7 @@ namespace Psychrometrics {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
+	static std::string const BlankString;
 	// call for recurring errors
 	int const iPsyTdpFnTdbTwbPb( 1 );
 	int const iPsyRhFnTdbWPb( 2 );
@@ -523,7 +524,8 @@ namespace Psychrometrics {
 	PsyHFnTdbRhPb(
 		Real64 const TDB, // dry-bulb temperature {C}
 		Real64 const RH, // relative humidity value (0.0 - 1.0)
-		Real64 const PB // barometric pressure (N/M**2) {Pascals}
+		Real64 const PB, // barometric pressure (N/M**2) {Pascals}
+		std::string const & CalledFrom // routine this function was called from (error messages)
 	)
 	{
 
@@ -564,7 +566,7 @@ namespace Psychrometrics {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 W; // humidity ratio
 
-		W = PsyWFnTdbRhPb( TDB, RH, PB );
+		W = PsyWFnTdbRhPb( TDB, RH, PB, CalledFrom );
 		W = max( W, 1.0e-5 );
 		H = PsyHFnTdbW( TDB, W );
 
@@ -1517,7 +1519,7 @@ namespace Psychrometrics {
 		Real64 const TDB, // dry-bulb temperature {C}
 		Real64 const H, // enthalpy {J/kg}
 		std::string const & CalledFrom, // routine this function was called from (error messages)
-		Optional_bool_const SuppressWarnings // if calling function is calculating an intermediate state
+		bool const SuppressWarnings // if calling function is calculating an intermediate state
 	)
 	{
 
@@ -1555,13 +1557,6 @@ namespace Psychrometrics {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		bool ReportWarnings;
-
-		ReportWarnings = true;
-
-		if ( present( SuppressWarnings ) ) {
-			if ( SuppressWarnings ) ReportWarnings = false;
-		}
 
 		//CP-------- here is 1.2, 1200., 1.004, or 1004.  --------
 		W = ( H - 1.00484e3 * TDB ) / ( 2.50094e6 + 1.85895e3 * TDB );
@@ -1573,7 +1568,7 @@ namespace Psychrometrics {
 		if ( W < 0.0 ) {
 #ifdef EP_psych_errors
 			if ( W < -.0001 ) {
-				if ( ! WarmupFlag && ReportWarnings ) {
+				if ( ! WarmupFlag && ! SuppressWarnings ) {
 					if ( iPsyErrIndex( iPsyWFnTdbH ) == 0 ) {
 						String = " Dry-Bulb= " + TrimSigDigits( TDB, 2 ) + " Enthalpy= " + TrimSigDigits( H, 3 );
 						ShowWarningMessage( "Calculated Humidity Ratio invalid (PsyWFnTdbH)" );
@@ -2171,13 +2166,13 @@ Label120: ;
 		if ( std::abs( PB - 1.0133e5 ) / 1.0133e5 <= 0.01 ) goto Label170;
 		IterCount = 0;
 		T1 = T;
-		H1 = PsyHFnTdbW( T1, PsyWFnTdbTwbPb( T1, T1, PB ) );
+		H1 = PsyHFnTdbW( T1, PsyWFnTdbTwbPb( T1, T1, PB, BlankString ) );
 		Y1 = H1 - Hloc;
 		if ( std::abs( Y1 / Hloc ) <= 0.1e-4 ) goto Label140;
 		T2 = T1 * 0.9;
 Label130: ;
 		++IterCount;
-		H2 = PsyHFnTdbW( T2, PsyWFnTdbTwbPb( T2, T2, PB ) );
+		H2 = PsyHFnTdbW( T2, PsyWFnTdbTwbPb( T2, T2, PB, BlankString ) );
 		Y2 = H2 - Hloc;
 		if ( std::abs( Y2 / Hloc ) <= 0.1e-4 ) goto Label150;
 		if ( Y2 == Y1 ) goto Label150;

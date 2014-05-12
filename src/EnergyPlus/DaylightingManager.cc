@@ -104,7 +104,8 @@ namespace DaylightingManager {
 	//USE Vectors
 
 	// Data
-	// MODULE PARAMETER DEFINITIONS: na
+	// MODULE PARAMETER DEFINITIONS:
+	static std::string const BlankString;
 
 	// MODULE VARIABLE DECLARATIONS:
 	int TotWindowsWithDayl( 0 ); // Total number of exterior windows in all daylit zones
@@ -4358,7 +4359,7 @@ namespace DaylightingManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS: na
 		// DERIVED TYPE DEFINITIONS: na

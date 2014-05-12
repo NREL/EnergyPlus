@@ -72,6 +72,7 @@ namespace ChillerIndirectAbsorption {
 	int const ConstantFlow( 201 );
 	int const NotModulated( 202 );
 	int const LeavingSetPointModulated( 203 );
+	static std::string const BlankString;
 	static std::string const fluidNameSteam( "STEAM" );
 	static std::string const fluidNameWater( "WATER" );
 	static std::string const calcChillerAbsorptionIndirect( "CALC Chiller:Absorption:Indirect " );
@@ -282,7 +283,6 @@ namespace ChillerIndirectAbsorption {
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
 		static std::string const RoutineName( "GetIndirectAbsorberInput: " ); // include trailing blank space
 
 		//LOCAL VARIABLES
@@ -376,7 +376,7 @@ namespace ChillerIndirectAbsorption {
 				if ( SameString( cAlphaArgs( 16 ), "HotWater" ) || SameString( cAlphaArgs( 16 ), "HotWater" ) ) {
 					IndirectAbsorber( AbsorberNum ).GenHeatSourceType = NodeType_Water;
 					//       Default to Steam if left blank
-				} else if ( SameString( cAlphaArgs( 16 ), "Steam" ) || SameString( cAlphaArgs( 16 ), Blank ) ) {
+				} else if ( SameString( cAlphaArgs( 16 ), "Steam" ) || SameString( cAlphaArgs( 16 ), BlankString ) ) {
 					IndirectAbsorber( AbsorberNum ).GenHeatSourceType = NodeType_Steam;
 				} else {
 					ShowWarningError( cCurrentModuleObject + ", Name=" + cAlphaArgs( 1 ) );
@@ -389,7 +389,7 @@ namespace ChillerIndirectAbsorption {
 				IndirectAbsorber( AbsorberNum ).GenHeatSourceType = NodeType_Steam;
 			}
 
-			if ( ! SameString( cAlphaArgs( 9 ), Blank ) && ! SameString( cAlphaArgs( 10 ), Blank ) ) {
+			if ( ! SameString( cAlphaArgs( 9 ), BlankString ) && ! SameString( cAlphaArgs( 10 ), BlankString ) ) {
 				GenInputOutputNodesUsed( AbsorberNum ) = true;
 				if ( IndirectAbsorber( AbsorberNum ).GenHeatSourceType == NodeType_Water ) {
 					IndirectAbsorber( AbsorberNum ).GeneratorInletNodeNum = GetOnlySingleNode( cAlphaArgs( 9 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
@@ -401,7 +401,7 @@ namespace ChillerIndirectAbsorption {
 					IndirectAbsorber( AbsorberNum ).GeneratorOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 10 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Steam, NodeConnectionType_Outlet, 3, ObjectIsNotParent );
 					TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 9 ), cAlphaArgs( 10 ), "Steam Nodes" );
 				}
-			} else if ( ( SameString( cAlphaArgs( 9 ), Blank ) && ! SameString( cAlphaArgs( 10 ), Blank ) ) || ( ! SameString( cAlphaArgs( 9 ), Blank ) && SameString( cAlphaArgs( 10 ), Blank ) ) ) {
+			} else if ( ( SameString( cAlphaArgs( 9 ), BlankString ) && ! SameString( cAlphaArgs( 10 ), BlankString ) ) || ( ! SameString( cAlphaArgs( 9 ), BlankString ) && SameString( cAlphaArgs( 10 ), BlankString ) ) ) {
 				ShowWarningError( cCurrentModuleObject + ", Name=" + cAlphaArgs( 1 ) );
 				ShowContinueError( "...Generator fluid nodes must both be entered (or both left blank)." );
 				ShowContinueError( "...Generator fluid inlet node  = " + cAlphaArgs( 9 ) );

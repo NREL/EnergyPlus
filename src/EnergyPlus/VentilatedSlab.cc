@@ -96,6 +96,7 @@ namespace VentilatedSlab {
 
 	// Module Object
 	std::string const cMO_VentilatedSlab( "ZoneHVAC:VentilatedSlab" );
+	static std::string const BlankString;
 
 	// Parameters for outside air control types:
 	int const Heating_ElectricCoilType( 1 );
@@ -305,7 +306,6 @@ namespace VentilatedSlab {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
 		static std::string const MeanAirTemperature( "MeanAirTemperature" );
 		static std::string const MeanRadiantTemperature( "MeanRadiantTemperature" );
 		static std::string const OperativeTemperature( "OperativeTemperature" );
@@ -2002,7 +2002,7 @@ namespace VentilatedSlab {
 		} else if ( SELECT_CASE_var == SURControl ) {
 			SetPointTemp = TH( VentSlab( Item ).SurfacePtr( RadSurfNum ), 1, 2 );
 		} else if ( SELECT_CASE_var == DPTZControl ) {
-			SetPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZonePtr ), OutBaroPress );
+			SetPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZonePtr ), OutBaroPress, BlankString );
 
 		} else { // Should never get here
 			ShowSevereError( "Illegal control type in low temperature radiant system: " + VentSlab( Item ).Name );
@@ -2956,7 +2956,7 @@ namespace VentilatedSlab {
 					// conditions.
 
 					if ( OperatingMode == CoolingMode ) {
-						DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZonePtr ), OutBaroPress );
+						DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZonePtr ), OutBaroPress, BlankString );
 						for ( RadSurfNum2 = 1; RadSurfNum2 <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum2 ) {
 							if ( TH( VentSlab( Item ).SurfacePtr( RadSurfNum2 ), 1, 2 ) < ( DewPointTemp + CondDeltaTemp ) ) {
 								// Condensation warning--must shut off radiant system
@@ -3180,7 +3180,7 @@ namespace VentilatedSlab {
 					// conditions.
 
 					if ( OperatingMode == CoolingMode ) {
-						DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZPtr( RadSurfNum ) ), OutBaroPress );
+						DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZPtr( RadSurfNum ) ), OutBaroPress, BlankString );
 						for ( RadSurfNum2 = 1; RadSurfNum2 <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum2 ) {
 							if ( TH( VentSlab( Item ).SurfacePtr( RadSurfNum2 ), 1, 2 ) < ( DewPointTemp + CondDeltaTemp ) ) {
 								// Condensation warning--must shut off radiant system

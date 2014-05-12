@@ -80,8 +80,8 @@ namespace InputProcessor {
 	std::string::size_type const MaxAlphaArgLength( MaxNameLength ); // Maximum number of characters in an Alpha Argument
 	std::string::size_type const MaxInputLineLength( 500 ); // Maximum number of characters in an input line (in.idf, energy+.idd)
 	std::string::size_type const MaxFieldNameLength( 140 ); // Maximum number of characters in a field name string // Not used with std::string
-	std::string const Blank;
-	std::string const AlphaNum( "ANan" ); // Valid indicators for Alpha or Numeric fields (A or N)
+	static std::string const BlankString;
+	static std::string const AlphaNum( "ANan" ); // Valid indicators for Alpha or Numeric fields (A or N)
 	gio::Fmt const fmta( "(A)" );
 	Real64 const DefAutoSizeValue( AutoSize );
 	Real64 const DefAutoCalculateValue( AutoCalculate );
@@ -365,13 +365,13 @@ namespace InputProcessor {
 		gio::close( IDFFile );
 
 		cAlphaFieldNames.allocate( MaxAlphaIDFDefArgsFound );
-		cAlphaFieldNames = Blank;
+		cAlphaFieldNames = BlankString;
 		cAlphaArgs.allocate( MaxAlphaIDFDefArgsFound );
-		cAlphaArgs = Blank;
+		cAlphaArgs = BlankString;
 		lAlphaFieldBlanks.allocate( MaxAlphaIDFDefArgsFound );
 		lAlphaFieldBlanks = false;
 		cNumericFieldNames.allocate( MaxNumericIDFDefArgsFound );
-		cNumericFieldNames = Blank;
+		cNumericFieldNames = BlankString;
 		rNumericArgs.allocate( MaxNumericIDFDefArgsFound );
 		rNumericArgs = 0.0;
 		lNumericFieldBlanks.allocate( MaxNumericIDFDefArgsFound );
@@ -625,7 +625,7 @@ namespace InputProcessor {
 		}
 		errFlag = false;
 
-		if ( SqueezedSection != Blank ) {
+		if ( SqueezedSection != BlankString ) {
 			if ( FindItemInList( SqueezedSection, SectionDef.Name(), NumSectionDefs ) > 0 ) {
 				ShowSevereError( "IP: Already a Section called " + SqueezedSection + ". This definition ignored.", EchoInputFile );
 				// Error Condition
@@ -757,7 +757,7 @@ namespace InputProcessor {
 		AutoCalculate = false;
 		WhichMinMax = 0;
 
-		if ( SqueezedObject != Blank ) {
+		if ( SqueezedObject != BlankString ) {
 			if ( FindItemInList( SqueezedObject, ObjectDef.Name(), NumObjectDefs ) > 0 ) {
 				ShowSevereError( "IP: Already an Object called " + SqueezedObject + ". This definition ignored.", EchoInputFile );
 				// Error Condition
@@ -797,8 +797,8 @@ namespace InputProcessor {
 			PrevSizeNumAlpha = MaxANArgs;
 		}
 
-		AlphFieldChecks( {1,PrevSizeNumAlpha} ) = Blank;
-		AlphFieldDefaults( {1,PrevSizeNumAlpha} ) = Blank;
+		AlphFieldChecks( {1,PrevSizeNumAlpha} ) = BlankString;
+		AlphFieldDefaults( {1,PrevSizeNumAlpha} ) = BlankString;
 
 		if ( PrevSizeNumNumeric == -1 ) {
 			PrevSizeNumNumeric = MaxANArgs;
@@ -811,8 +811,8 @@ namespace InputProcessor {
 			RangeCheck.MinMaxChk = false;
 			RangeCheck.WhichMinMax( 1 ) = 0;
 			RangeCheck.WhichMinMax( 2 ) = 0;
-			RangeCheck.MinMaxString( 1 ) = Blank;
-			RangeCheck.MinMaxString( 2 ) = Blank;
+			RangeCheck.MinMaxString( 1 ) = BlankString;
+			RangeCheck.MinMaxString( 2 ) = BlankString;
 			RangeCheck.MinMaxValue( 1 ) = 0.0;
 			RangeCheck.MinMaxValue( 2 ) = 0.0;
 			RangeCheck.Default = 0.0;
@@ -820,7 +820,7 @@ namespace InputProcessor {
 			RangeCheck.DefAutoSize = false;
 			RangeCheck.DefAutoCalculate = false;
 			RangeCheck.FieldNumber = 0;
-			RangeCheck.FieldName = Blank;
+			RangeCheck.FieldName = BlankString;
 			RangeCheck.AutoSizable = false;
 			RangeCheck.AutoSizeValue = DefAutoSizeValue;
 			RangeCheck.AutoCalculatable = false;
@@ -858,11 +858,11 @@ namespace InputProcessor {
 						TempChecks( {1,MaxANArgs} ) = NumRangeChecks( {1,MaxANArgs} );
 						NumRangeChecks.deallocate();
 						TempAFC.allocate( MaxANArgs + ANArgsDefAllocInc );
-						TempAFC = Blank;
+						TempAFC = BlankString;
 						TempAFC( {1,MaxANArgs} ) = AlphFieldChecks;
 						AlphFieldChecks.deallocate();
 						TempAFD.allocate( MaxANArgs + ANArgsDefAllocInc );
-						TempAFD = Blank;
+						TempAFD = BlankString;
 						TempAFD( {1,MaxANArgs} ) = AlphFieldDefaults;
 						AlphFieldDefaults.deallocate();
 						AlphaOrNumeric.allocate( {0,MaxANArgs + ANArgsDefAllocInc} );
@@ -1572,7 +1572,7 @@ namespace InputProcessor {
 
 				errFlag = false;
 				LineItem.Name = SqueezedObject;
-				LineItem.Alphas = Blank;
+				LineItem.Alphas = BlankString;
 				LineItem.AlphBlank = false;
 				LineItem.NumAlphas = 0;
 				LineItem.Numbers = 0.0;
@@ -1604,11 +1604,11 @@ namespace InputProcessor {
 		++CurPos;
 
 		//  Keep context buffer in case of errors
-		LineBuf = Blank;
+		LineBuf = BlankString;
 		NumConxLines = 0;
 		StartLine = NumLines;
 		cStartLine = InputLine.substr( 0, 300 );
-		cStartName = Blank;
+		cStartName = BlankString;
 		NumConxLines = 0;
 		CurLines = NumLines;
 		CurQPtr = 0;
@@ -1668,7 +1668,7 @@ namespace InputProcessor {
 							ShowContinueError( "Will be processed as Alpha=" + SqueezedArg, EchoInputFile );
 						}
 					} else {
-						SqueezedArg = Blank;
+						SqueezedArg = BlankString;
 					}
 					if ( NumArg == NumArgExpected && ! ObjectDef( Found ).ExtensibleObject ) {
 						DumpCurrentLineBuffer( StartLine, cStartLine, cStartName, NumLines, NumConxLines, LineBuf, CurQPtr );
@@ -1693,10 +1693,10 @@ namespace InputProcessor {
 									SqueezedArg = InputLine.substr( CurPos, Pos );
 									strip( SqueezedArg );
 								}
-								if ( SqueezedArg != Blank ) {
+								if ( SqueezedArg != BlankString ) {
 									LineItem.Alphas( NumAlpha ) = SqueezedArg;
 								} else if ( ObjectDef( Found ).ReqField( NumArg ) ) { // Blank Argument
-									if ( ObjectDef( Found ).AlphFieldDefs( NumAlpha ) != Blank ) {
+									if ( ObjectDef( Found ).AlphFieldDefs( NumAlpha ) != BlankString ) {
 										LineItem.Alphas( NumAlpha ) = ObjectDef( Found ).AlphFieldDefs( NumAlpha );
 									} else {
 										if ( ObjectDef( Found ).NameAlpha1 && NumAlpha != 1 ) {
@@ -1711,7 +1711,7 @@ namespace InputProcessor {
 									}
 								} else {
 									LineItem.AlphBlank( NumAlpha ) = true;
-									if ( ObjectDef( Found ).AlphFieldDefs( NumAlpha ) != Blank ) {
+									if ( ObjectDef( Found ).AlphFieldDefs( NumAlpha ) != BlankString ) {
 										LineItem.Alphas( NumAlpha ) = ObjectDef( Found ).AlphFieldDefs( NumAlpha );
 									}
 								}
@@ -1725,7 +1725,7 @@ namespace InputProcessor {
 							} else {
 								++NumNumeric;
 								LineItem.NumNumbers = NumNumeric;
-								if ( SqueezedArg != Blank ) {
+								if ( SqueezedArg != BlankString ) {
 									if ( ! ObjectDef( Found ).NumRangeChks( NumNumeric ).AutoSizable && ! ObjectDef( Found ).NumRangeChks( NumNumeric ).AutoCalculatable ) {
 										LineItem.Numbers( NumNumeric ) = ProcessNumber( SqueezedArg, errFlag );
 									} else if ( SqueezedArg == "AUTOSIZE" ) {
@@ -1770,7 +1770,7 @@ namespace InputProcessor {
 									if ( SqueezedArg[ 0 ] != '=' ) { // argument does not start with "=" (parametric)
 										FieldString = IPTrimSigDigits( NumNumeric );
 										FieldNameString = ObjectDef( Found ).NumRangeChks( NumNumeric ).FieldName;
-										if ( FieldNameString != Blank ) {
+										if ( FieldNameString != BlankString ) {
 											Message = "Invalid Number in Numeric Field#" + FieldString + " (" + FieldNameString + "), value=" + SqueezedArg;
 										} else { // Field Name not recorded
 											Message = "Invalid Number in Numeric Field#" + FieldString + ", value=" + SqueezedArg;
@@ -1831,7 +1831,7 @@ namespace InputProcessor {
 							++NumAlpha;
 							if ( NumAlpha <= LineItem.NumAlphas ) continue;
 							++LineItem.NumAlphas;
-							if ( ObjectDef( Found ).AlphFieldDefs( LineItem.NumAlphas ) != Blank ) {
+							if ( ObjectDef( Found ).AlphFieldDefs( LineItem.NumAlphas ) != BlankString ) {
 								LineItem.Alphas( LineItem.NumAlphas ) = ObjectDef( Found ).AlphFieldDefs( LineItem.NumAlphas );
 								ShowAuditErrorMessage( " **   Add   ** ", ObjectDef( Found ).AlphFieldDefs( LineItem.NumAlphas ) + "   ! field=>" + ObjectDef( Found ).AlphFieldChks( NumAlpha ) );
 							} else if ( ObjectDef( Found ).ReqField( Count ) ) {
@@ -1842,7 +1842,7 @@ namespace InputProcessor {
 								}
 								errFlag = true;
 							} else {
-								LineItem.Alphas( LineItem.NumAlphas ) = Blank;
+								LineItem.Alphas( LineItem.NumAlphas ) = BlankString;
 								LineItem.AlphBlank( LineItem.NumAlphas ) = true;
 								ShowAuditErrorMessage( " **   Add   ** ", "<blank field>   ! field=>" + ObjectDef( Found ).AlphFieldChks( NumAlpha ) );
 							}
@@ -2336,7 +2336,7 @@ namespace InputProcessor {
 				cfld2 = IPTrimSigDigits( MaxAlphas );
 				ShowFatalError( "IP: GetObjectItem: " + Object + ", Number of ObjectDef Alpha Args [" + cfld1 + "] > Size of AlphaArg array [" + cfld2 + "]." );
 			}
-			Alphas( {1,ObjectDef( Found ).NumAlpha} ) = Blank;
+			Alphas( {1,ObjectDef( Found ).NumAlpha} ) = BlankString;
 		}
 		if ( ObjectDef( Found ).NumNumeric > 0 ) {
 			if ( ObjectDef( Found ).NumNumeric > MaxNumbers ) {
@@ -2758,7 +2758,7 @@ namespace InputProcessor {
 		LineTooLong = false;
 		{ IOFlags flags; gio::read( UnitNumber, fmta, flags ) >> InputLine; ReadStat = flags.ios(); }
 
-		if ( ReadStat != 0 ) InputLine = Blank;
+		if ( ReadStat != 0 ) InputLine = BlankString;
 
 		// Following section of code allows same software to read Win or Unix files without translating
 		if ( StripCR ) {
@@ -2910,7 +2910,7 @@ namespace InputProcessor {
 							// WhichMinMax, MinMaxString not filled here
 							Default = true;
 							ProcessMinMaxDefLine( InputLine.substr( Pos ), WhichMinMax, MinMaxString, Value, DefString, ErrLevel );
-							if ( ! RetainCase && DefString != Blank ) uppercase( DefString );
+							if ( ! RetainCase && DefString != BlankString ) uppercase( DefString );
 							if ( ErrLevel > 1 ) {
 								ShowContinueError( "Blank Default Field Encountered", EchoInputFile );
 								errFlag = true;
@@ -3095,7 +3095,7 @@ namespace InputProcessor {
 		if ( NumAlphaField > 0 ) {
 			TempFieldCharacter.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
 			TempFieldCharacter( {1,ObjectDef( ObjectNum ).NumAlpha} ) = ObjectDef( ObjectNum ).AlphFieldChks;
-			TempFieldCharacter( {ObjectDef( ObjectNum ).NumAlpha + 1,ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas} ) = Blank;
+			TempFieldCharacter( {ObjectDef( ObjectNum ).NumAlpha + 1,ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas} ) = BlankString;
 			ObjectDef( ObjectNum ).AlphFieldChks.deallocate();
 			ObjectDef( ObjectNum ).AlphFieldChks.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
 			ObjectDef( ObjectNum ).AlphFieldChks = TempFieldCharacter;
@@ -3108,7 +3108,7 @@ namespace InputProcessor {
 
 			TempCharacter.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
 			TempCharacter( {1,ObjectDef( ObjectNum ).NumAlpha} ) = ObjectDef( ObjectNum ).AlphFieldDefs;
-			TempCharacter( {ObjectDef( ObjectNum ).NumAlpha + 1,ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas} ) = Blank;
+			TempCharacter( {ObjectDef( ObjectNum ).NumAlpha + 1,ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas} ) = BlankString;
 			ObjectDef( ObjectNum ).AlphFieldDefs.deallocate();
 			ObjectDef( ObjectNum ).AlphFieldDefs.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
 			ObjectDef( ObjectNum ).AlphFieldDefs = TempCharacter;
@@ -3118,7 +3118,7 @@ namespace InputProcessor {
 				// must redimension LineItem args
 				TempCharacter.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
 				TempCharacter( {1,ObjectDef( ObjectNum ).NumAlpha} ) = LineItem.Alphas;
-				TempCharacter( {ObjectDef( ObjectNum ).NumAlpha + 1,ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas} ) = Blank;
+				TempCharacter( {ObjectDef( ObjectNum ).NumAlpha + 1,ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas} ) = BlankString;
 				LineItem.Alphas.deallocate();
 				LineItem.Alphas.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
 				LineItem.Alphas = TempCharacter;
@@ -3339,15 +3339,15 @@ namespace InputProcessor {
 
 		} else if ( SameString(maxMinDefLine, "\\DEF") ) {
 			WhichMinMax = 5;
-			MinMaxString = Blank;
+			MinMaxString = BlankString;
 
 		} else if ( SameString(maxMinDefLine, "\\AUT") ) {
 			WhichMinMax = 6;
-			MinMaxString = Blank;
+			MinMaxString = BlankString;
 
 		} else {
 			WhichMinMax = 0; // invalid field
-			MinMaxString = Blank;
+			MinMaxString = BlankString;
 			Value = -999999.0;
 
 		}}
@@ -3378,7 +3378,7 @@ namespace InputProcessor {
 					DefaultString = UCInputLine.substr( Pos );
 				}
 				strip( DefaultString );
-				if ( DefaultString == Blank ) {
+				if ( DefaultString == BlankString ) {
 					if ( WhichMinMax == 6 ) {
 						if ( has_prefix( UCInputLine, "\\AUTOS" ) ) {
 							Value = DefAutoSizeValue;
@@ -3885,7 +3885,7 @@ namespace InputProcessor {
 					FieldNameString = ObjectDef( WhichObject ).NumRangeChks( FieldNumber ).FieldName;
 					gio::write( ValueString, "(F20.5)" ) << Value;
 					strip( ValueString );
-					if ( FieldNameString != Blank ) {
+					if ( FieldNameString != BlankString ) {
 						Message = "Out of range value Numeric Field#" + FieldString + " (" + FieldNameString + "), value=" + ValueString + ", range={";
 					} else { // Field Name not recorded
 						Message = "Out of range value Numeric Field#" + FieldString + ", value=" + ValueString + ", range={";
@@ -4321,8 +4321,8 @@ namespace InputProcessor {
 			if ( IDFRecords( iRecord ).ObjectDefPtr <= 0 || IDFRecords( iRecord ).ObjectDefPtr > NumObjectDefs ) continue;
 			iObjectDef = IDFRecords( iRecord ).ObjectDefPtr;
 			for ( iField = 1; iField <= IDFRecords( iRecord ).NumAlphas; ++iField ) {
-				if ( ObjectDef( iObjectDef ).AlphFieldDefs( iField ) != Blank ) ++iTotalFieldsWithDefaults;
-				if ( ObjectDef( iObjectDef ).AlphFieldDefs( iField ) != Blank && IDFRecords( iRecord ).AlphBlank( iField ) ) ++iNumberOfDefaultedFields;
+				if ( ObjectDef( iObjectDef ).AlphFieldDefs( iField ) != BlankString ) ++iTotalFieldsWithDefaults;
+				if ( ObjectDef( iObjectDef ).AlphFieldDefs( iField ) != BlankString && IDFRecords( iRecord ).AlphBlank( iField ) ) ++iNumberOfDefaultedFields;
 			}
 			for ( iField = 1; iField <= IDFRecords( iRecord ).NumNumbers; ++iField ) {
 				if ( ObjectDef( iObjectDef ).NumRangeChks( iField ).DefaultChk ) ++iTotalFieldsWithDefaults;
@@ -4384,8 +4384,8 @@ namespace InputProcessor {
 
 		OrphanObjectNames.allocate( NumIDFRecords );
 		OrphanNames.allocate( NumIDFRecords );
-		OrphanObjectNames = Blank;
-		OrphanNames = Blank;
+		OrphanObjectNames = BlankString;
+		OrphanNames = BlankString;
 		NumOrphObjNames = 0;
 
 		for ( Count = 1; Count <= NumIDFRecords; ++Count ) {
@@ -4432,7 +4432,7 @@ namespace InputProcessor {
 		if ( NumOrphObjNames > 0 && DisplayUnusedObjects ) {
 			gio::write( EchoInputFile, "*" ) << "Unused Objects -- Objects in IDF that were never \"gotten\"";
 			for ( Count = 1; Count <= NumOrphObjNames; ++Count ) {
-				if ( OrphanNames( Count ) != Blank ) {
+				if ( OrphanNames( Count ) != BlankString ) {
 					gio::write( EchoInputFile, fmta ) << " " + OrphanObjectNames( Count ) + '=' + OrphanNames( Count );
 				} else {
 					gio::write( EchoInputFile, "*" ) << OrphanObjectNames( Count );
@@ -4446,13 +4446,13 @@ namespace InputProcessor {
 				ShowContinueError( " Each unused object is shown." );
 			}
 			ShowContinueError( " See InputOutputReference document for more details." );
-			if ( OrphanNames( 1 ) != Blank ) {
+			if ( OrphanNames( 1 ) != BlankString ) {
 				ShowMessage( "Object=" + OrphanObjectNames( 1 ) + '=' + OrphanNames( 1 ) );
 			} else {
 				ShowMessage( "Object=" + OrphanObjectNames( 1 ) );
 			}
 			for ( Count = 2; Count <= NumOrphObjNames; ++Count ) {
-				if ( OrphanNames( Count ) != Blank ) {
+				if ( OrphanNames( Count ) != BlankString ) {
 					ShowContinueError( "Object=" + OrphanObjectNames( Count ) + '=' + OrphanNames( Count ) );
 				} else {
 					ShowContinueError( "Object=" + OrphanObjectNames( Count ) );
@@ -4595,11 +4595,11 @@ namespace InputProcessor {
 				LineItem.Name = "OUTPUT:SURFACES:DRAWING";
 				LineItem.Alphas( 1 ) = LineItem.Alphas( 2 );
 				LineItem.NumAlphas = 1;
-				if ( LineItem.Alphas( 3 ) != Blank ) {
+				if ( LineItem.Alphas( 3 ) != BlankString ) {
 					++LineItem.NumAlphas;
 					LineItem.Alphas( 2 ) = LineItem.Alphas( 3 );
 				}
-				if ( LineItem.Alphas( 4 ) != Blank ) {
+				if ( LineItem.Alphas( 4 ) != BlankString ) {
 					++LineItem.NumAlphas;
 					LineItem.Alphas( 3 ) = LineItem.Alphas( 4 );
 				}
@@ -4608,7 +4608,7 @@ namespace InputProcessor {
 				LineItem.Name = "OUTPUT:SURFACES:LIST";
 				LineItem.Alphas( 1 ) = LineItem.Alphas( 2 );
 				LineItem.NumAlphas = 1;
-				if ( LineItem.Alphas( 3 ) != Blank ) {
+				if ( LineItem.Alphas( 3 ) != BlankString ) {
 					++LineItem.NumAlphas;
 					LineItem.Alphas( 2 ) = LineItem.Alphas( 3 );
 				}
@@ -4691,7 +4691,7 @@ namespace InputProcessor {
 
 		NumArg = 0;
 		LineItem.Name = ObjectDef( Which ).Name;
-		LineItem.Alphas = Blank;
+		LineItem.Alphas = BlankString;
 		LineItem.AlphBlank = false;
 		LineItem.NumAlphas = 0;
 		LineItem.Numbers = 0.0;
@@ -4721,7 +4721,7 @@ namespace InputProcessor {
 						++NumAlpha;
 						if ( NumAlpha <= LineItem.NumAlphas ) continue;
 						++LineItem.NumAlphas;
-						if ( ObjectDef( Which ).AlphFieldDefs( LineItem.NumAlphas ) != Blank ) {
+						if ( ObjectDef( Which ).AlphFieldDefs( LineItem.NumAlphas ) != BlankString ) {
 							LineItem.Alphas( LineItem.NumAlphas ) = ObjectDef( Which ).AlphFieldDefs( LineItem.NumAlphas );
 							ShowAuditErrorMessage( " **   Add   ** ", ObjectDef( Which ).AlphFieldDefs( LineItem.NumAlphas ) + "   ! field=>" + ObjectDef( Which ).AlphFieldChks( NumAlpha ) );
 						} else if ( ObjectDef( Which ).ReqField( Count ) ) {
@@ -4732,7 +4732,7 @@ namespace InputProcessor {
 							}
 							//            errFlag=.TRUE.
 						} else {
-							LineItem.Alphas( LineItem.NumAlphas ) = Blank;
+							LineItem.Alphas( LineItem.NumAlphas ) = BlankString;
 							LineItem.AlphBlank( LineItem.NumAlphas ) = true;
 							ShowAuditErrorMessage( " **   Add   ** ", "<blank field>   ! field=>" + ObjectDef( Which ).AlphFieldChks( NumAlpha ) );
 						}
@@ -4870,16 +4870,16 @@ namespace InputProcessor {
 		NumPrePM = GetNumObjectsFound( cCurrentModuleObject );
 		if ( NumPrePM > 0 ) {
 			GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNumbers );
-			cAlphaArgs( {1,NumAlphas} ) = Blank;
+			cAlphaArgs( {1,NumAlphas} ) = BlankString;
 			for ( CountP = 1; CountP <= NumPrePM; ++CountP ) {
 				GetObjectItem( cCurrentModuleObject, CountP, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				if ( cAlphaArgs( 1 ) == Blank ) cAlphaArgs( 1 ) = "Unknown";
+				if ( cAlphaArgs( 1 ) == BlankString ) cAlphaArgs( 1 ) = "Unknown";
 				if ( NumAlphas > 3 ) {
 					Multiples = "s";
 				} else {
-					Multiples = Blank;
+					Multiples = BlankString;
 				}
-				if ( cAlphaArgs( 2 ) == Blank ) cAlphaArgs( 2 ) = "Unknown";
+				if ( cAlphaArgs( 2 ) == BlankString ) cAlphaArgs( 2 ) = "Unknown";
 				{ auto const errorType( cAlphaArgs( 2 ) );
 				if ( SameString(errorType, "INFORMATION") ) {
 					ShowMessage( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" has the following Information message" + Multiples + ':' );
@@ -5132,7 +5132,7 @@ namespace InputProcessor {
 		CurrentRecord = FindFirstRecord( EMSSensor );
 		while ( CurrentRecord != 0 ) {
 			if ( IDFRecords( CurrentRecord ).NumAlphas < 2 ) CurrentRecord = FindNextRecord( EMSSensor, CurrentRecord );
-			if ( IDFRecords( CurrentRecord ).Alphas( 2 ) != Blank ) {
+			if ( IDFRecords( CurrentRecord ).Alphas( 2 ) != BlankString ) {
 				AddRecordToOutputVariableStructure( IDFRecords( CurrentRecord ).Alphas( 2 ), IDFRecords( CurrentRecord ).Alphas( 3 ) );
 			} else {
 				AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( 3 ) );
@@ -5891,7 +5891,7 @@ namespace InputProcessor {
 			gio::write( TextLine, "(1X,A,1X,A)" ) << cLineNo << cStartLine;
 		}
 		ShowMessage( TextLine );
-		if ( cStartName != Blank ) {
+		if ( cStartName != BlankString ) {
 			ShowMessage( "indicated Name=" + cStartName );
 		}
 		ShowMessage( "Only last " + IPTrimSigDigits( NumConxLines ) + " lines before error line shown....." );
@@ -5960,7 +5960,7 @@ namespace InputProcessor {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		if ( Severity != Blank ) {
+		if ( Severity != BlankString ) {
 			++TotalAuditErrors;
 			gio::write( EchoInputFile, ErrorFormat ) << Severity + ErrorMessage;
 		} else {

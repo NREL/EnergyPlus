@@ -93,6 +93,8 @@ namespace ChillerElectricEIR {
 	int const NotModulated( 202 );
 	int const LeavingSetPointModulated( 203 );
 
+	static std::string const BlankString;
+
 	// MODULE VARIABLE DECLARATIONS:
 	int NumElectricEIRChillers( 0 ); // Number of electric EIR chillers specified in input
 	Real64 CondMassFlowRate( 0.0 ); // Condenser mass flow rate [kg/s]
@@ -1499,7 +1501,7 @@ namespace ChillerElectricEIR {
 			//    Node(CondInletNode)%Temp = OutWetBulbTemp
 			Node( CondInletNode ).Temp = Node( CondInletNode ).OutAirWetBulb;
 			//  line above assumes evaporation pushes condenser inlet air humidity ratio to saturation
-			CondOutletHumRat = PsyWFnTdbTwbPb( Node( CondInletNode ).Temp, Node( CondInletNode ).Temp, Node( CondInletNode ).Press );
+			CondOutletHumRat = PsyWFnTdbTwbPb( Node( CondInletNode ).Temp, Node( CondInletNode ).Temp, Node( CondInletNode ).Press, BlankString );
 
 			// Warn user if evap condenser wet-bulb temperature falls below 10 C
 			if ( Node( CondInletNode ).Temp < 10.0 && std::abs( MyLoad ) > 0 && RunFlag && ! WarmupFlag ) {

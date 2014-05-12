@@ -80,6 +80,7 @@ namespace PondGroundHeatExchanger {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
+	static std::string const BlankString;
 	static std::string const fluidNameWater( "WATER" );
 	Real64 const SmallNum( 1.0e-30 ); // Very small number to avoid div0 errors
 	Real64 const StefBoltzmann( 5.6697e-08 ); // Stefan-Boltzmann constant
@@ -266,7 +267,7 @@ namespace PondGroundHeatExchanger {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -795,8 +796,8 @@ namespace PondGroundHeatExchanger {
 
 		// evaporation flux
 		// get air properties
-		HumRatioAir = PsyWFnTdbTwbPb( OutDryBulb, OutWetBulb, OutBaroPress );
-		HumRatioFilm = PsyWFnTdbTwbPb( PondBulkTemp, PondBulkTemp, OutBaroPress );
+		HumRatioAir = PsyWFnTdbTwbPb( OutDryBulb, OutWetBulb, OutBaroPress, BlankString );
+		HumRatioFilm = PsyWFnTdbTwbPb( PondBulkTemp, PondBulkTemp, OutBaroPress, BlankString );
 		SpecHeatAir = PsyCpAirFnWTdb( HumRatioAir, OutDryBulb );
 		LatentHeatAir = PsyHfgAirFnWTdb( HumRatioAir, OutDryBulb ); // *&^unique^&* "PondGroundHeatExchanger:CalcTotalFlux"
 

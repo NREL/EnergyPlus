@@ -22,7 +22,6 @@ namespace BranchInputManager {
 	//MODULE PARAMETER DEFINITIONS
 	extern std::string const cMIXER;
 	extern std::string const cSPLITTER;
-	extern std::string const Blank;
 
 	//DERIVED TYPE DEFINITIONS
 

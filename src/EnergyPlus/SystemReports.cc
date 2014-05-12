@@ -82,6 +82,8 @@ namespace SystemReports {
 	int const HeatAndCool( 3 );
 	int const MaxSetBackCount( 3 );
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -4136,7 +4138,7 @@ namespace SystemReports {
 			ZoneOAVolStdRho( CtrlZoneNum ) = ZoneOAVolFlowStdRho( CtrlZoneNum ) * TimeStepSys * SecInHour;
 
 			// determine volumetric values from mass flow using current air density for zone (adjusted for elevation)
-			currentZoneAirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ActualZoneNum ), ZoneAirHumRatAvg( ActualZoneNum ) );
+			currentZoneAirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ActualZoneNum ), ZoneAirHumRatAvg( ActualZoneNum ), BlankString );
 			if ( currentZoneAirDensity > 0.0 ) ZoneOAVolFlowCrntRho( CtrlZoneNum ) = ZoneOAMassFlow( CtrlZoneNum ) / currentZoneAirDensity;
 			ZoneOAVolCrntRho( CtrlZoneNum ) = ZoneOAVolFlowCrntRho( CtrlZoneNum ) * TimeStepSys * SecInHour;
 			if ( ZoneVolume > 0.0 ) ZoneMechACH( CtrlZoneNum ) = ( ZoneOAVolCrntRho( CtrlZoneNum ) / TimeStepSys ) / ZoneVolume;

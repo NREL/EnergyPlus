@@ -18,7 +18,6 @@ namespace PipeHeatTransfer {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	extern std::string const Blank;
 
 	extern int const None;
 	extern int const ZoneEnv;

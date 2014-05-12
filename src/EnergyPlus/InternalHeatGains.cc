@@ -80,6 +80,8 @@ namespace InternalHeatGains {
 
 	bool GetInternalHeatGainsInputFlag( true ); // Controls the GET routine calling (limited to first time)
 
+	static std::string const BlankString;
+
 	// SUBROUTINE SPECIFICATIONS FOR MODULE InternalHeatGains
 	//PUBLIC  SumInternalConvectionGainsByIndices
 	//PUBLIC SumReturnAirConvectionGainsByIndices
@@ -190,7 +192,6 @@ namespace InternalHeatGains {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
 		static gio::Fmt const fmta( "(A)" );
 		static std::string const RoutineName( "GetInternalHeatGains: " );
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -371,7 +372,7 @@ namespace InternalHeatGains {
 		if ( TotPeople > 0 ) {
 			Loop = 0;
 			for ( Item = 1; Item <= NumPeopleStatements; ++Item ) {
-				AlphaName = Blank;
+				AlphaName = BlankString;
 				IHGNumbers = 0.0;
 
 				GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -919,7 +920,7 @@ namespace InternalHeatGains {
 		if ( TotLights > 0 ) {
 			Loop = 0;
 			for ( Item = 1; Item <= NumLightsStatements; ++Item ) {
-				AlphaName = Blank;
+				AlphaName = BlankString;
 				IHGNumbers = 0.0;
 
 				GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -1186,7 +1187,7 @@ namespace InternalHeatGains {
 		if ( TotElecEquip > 0 ) {
 			Loop = 0;
 			for ( Item = 1; Item <= NumZoneElectricStatements; ++Item ) {
-				AlphaName = Blank;
+				AlphaName = BlankString;
 				IHGNumbers = 0.0;
 
 				GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -1396,7 +1397,7 @@ namespace InternalHeatGains {
 		if ( TotGasEquip > 0 ) {
 			Loop = 0;
 			for ( Item = 1; Item <= NumZoneGasStatements; ++Item ) {
-				AlphaName = Blank;
+				AlphaName = BlankString;
 				IHGNumbers = 0.0;
 
 				GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -1627,7 +1628,7 @@ namespace InternalHeatGains {
 		if ( TotHWEquip > 0 ) {
 			Loop = 0;
 			for ( Item = 1; Item <= NumHotWaterEqStatements; ++Item ) {
-				AlphaName = Blank;
+				AlphaName = BlankString;
 				IHGNumbers = 0.0;
 
 				GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -1837,7 +1838,7 @@ namespace InternalHeatGains {
 		if ( TotStmEquip > 0 ) {
 			Loop = 0;
 			for ( Item = 1; Item <= NumSteamEqStatements; ++Item ) {
-				AlphaName = Blank;
+				AlphaName = BlankString;
 				IHGNumbers = 0.0;
 
 				GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -2047,7 +2048,7 @@ namespace InternalHeatGains {
 		if ( TotOthEquip > 0 ) {
 			Loop = 0;
 			for ( Item = 1; Item <= NumOtherEqStatements; ++Item ) {
-				AlphaName = Blank;
+				AlphaName = BlankString;
 				IHGNumbers = 0.0;
 
 				GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
