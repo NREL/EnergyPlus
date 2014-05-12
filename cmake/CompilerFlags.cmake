@@ -21,7 +21,7 @@ IF ( MSVC ) # visual c++ (VS 2013)
 
     ADD_DEFINITIONS("-wd4244 -wd4258 -wd4355 -wd4996") # Disables warning messages listed above 
     ADD_DEFINITIONS("-DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
-    ADD_DEFINITIONS("-W3")
+    #ADD_DEFINITIONS("-W1")
 
     # -D_CRT_SECURE_NO_DEPRECATE hides function calls which make the library thread-unsafe
     # -D_SCL_SECURE_NO_DEPRECATE is itself deprecated and replaced by _SCL_SECURE_NO_WARNING which is made irrelevant by -wd4996 above
@@ -36,7 +36,7 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     # COMPILER FLAGS
     ADD_DEFINITIONS("-std=c++11") # Enable C++11 features in g++
     ADD_DEFINITIONS("-pedantic") # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
-    ADD_DEFINITIONS("-Wall -Wextra -Wno-unused-parameter") # Turn on warnings (all, extra, "???don't warn about unused parameters???")
+    #ADD_DEFINITIONS("-Wall -Wextra -Wno-unused-parameter") # Turn on warnings (all, extra, "???don't warn about unused parameters???")
     
     # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
     SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsignaling-nans") # Disable optimizations that may have concealed NaN behavior
@@ -49,7 +49,7 @@ ELSEIF ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     #  2259: Non-pointer conversion from "type" to "type" may lose significant bits
     
     # COMPILER FLAGS
-    ADD_DEFINITIONS("${CMAKE_CXX_FLAGS} /Wall") # Enable "all" warnings
+    #ADD_DEFINITIONS("${CMAKE_CXX_FLAGS} /Wall") # Enable "all" warnings
     ADD_DEFINITIONS("${CMAKE_CXX_FLAGS} /Qdiag-disable:1786,2259") # Disable warnings listed above
     ADD_DEFINITIONS("${CMAKE_CXX_FLAGS} /DVC_EXTRALEAN /DWIN32_LEAN_AND_MEAN") # Excludes rarely used services and headers from compilation
     ADD_DEFINITIONS("${CMAKE_CXX_FLAGS} /DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
