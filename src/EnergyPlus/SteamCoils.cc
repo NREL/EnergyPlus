@@ -77,6 +77,7 @@ namespace SteamCoils {
 	int const TemperatureSetPointControl( 1 );
 	int const ZoneLoadControl( 3 );
 	static std::string const fluidNameSteam( "STEAM" );
+	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -662,7 +663,7 @@ namespace SteamCoils {
 		MinFlowFrac = 0.0;
 		DesMassFlow = 0.0;
 		CpWater = 0.0;
-		RhoAirStd = PsyRhoAirFnPbTdbW( StdBaroPress, 20.0, 0.0 );
+		RhoAirStd = PsyRhoAirFnPbTdbW( StdBaroPress, 20.0, 0.0, BlankString );
 		CpAirStd = PsyCpAirFnWTdb( 0.0, 20.0 );
 
 		// If this is a steam coil

@@ -91,6 +91,8 @@ namespace HighTempRadiantSystem {
 	int const MRTSPControl( 1005 );
 	int const OperativeSPControl( 1006 );
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -240,7 +242,6 @@ namespace HighTempRadiantSystem {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
 		Real64 const MaxCombustionEffic( 1.00 ); // Limit the combustion efficiency to perfection
 		Real64 const MaxFraction( 1.0 ); // Limit the highest allowed fraction for heat transfer parts
 		Real64 const MinCombustionEffic( 0.01 ); // Limit the minimum combustion efficiency

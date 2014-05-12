@@ -63,7 +63,7 @@ namespace RoomAirModelManager {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	// na
+	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS
 	// na
@@ -949,7 +949,7 @@ namespace RoomAirModelManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS
-		static std::string const Blank;
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1664,7 +1664,7 @@ namespace RoomAirModelManager {
 								SurfParametersCVDV( Loop2 ).Height = HeightFactMax * Surface( MultizoneSurfaceData( Loop2 ).SurfNum ).Height;
 							} else if ( AirflowNetworkCompData( CompNum ).CompTypeNum == CompTypeNum_SCR ) { // surface type = CRACK
 								SurfParametersCVDV( Loop2 ).Width = Surface( MultizoneSurfaceData( Loop2 ).SurfNum ).Width / 2;
-								AinCV = MultizoneSurfaceCrackData( TypeNum ).FlowCoef / ( BaseDischargeCoef * std::sqrt( 2.0 / PsyRhoAirFnPbTdbW( OutBaroPress, MAT( Loop ), ZoneAirHumRat( Loop ) ) ) );
+								AinCV = MultizoneSurfaceCrackData( TypeNum ).FlowCoef / ( BaseDischargeCoef * std::sqrt( 2.0 / PsyRhoAirFnPbTdbW( OutBaroPress, MAT( Loop ), ZoneAirHumRat( Loop ), BlankString ) ) );
 								SurfParametersCVDV( Loop2 ).Height = AinCV / SurfParametersCVDV( Loop2 ).Width;
 							}
 							// calculate the surface Zmin and Zmax

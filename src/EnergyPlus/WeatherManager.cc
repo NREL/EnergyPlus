@@ -112,7 +112,7 @@ namespace WeatherManager {
 	Real64 const Sigma( 5.6697e-8 ); // Stefan-Boltzmann constant
 	Real64 const TKelvin( KelvinConv ); // conversion from Kelvin to Celsius
 
-	std::string const Blank;
+	static std::string const BlankString;
 	FArray1D_string const DaysOfWeek( 7, { "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY" } );
 
 	bool Debugout( false );
@@ -876,7 +876,7 @@ namespace WeatherManager {
 
 						// Report Actual Dates for Daylight Saving and Special Days
 						if ( ! KickOffSimulation ) {
-							Source = Blank;
+							Source = BlankString;
 							if ( UseDaylightSaving ) {
 								if ( EPWDaylightSaving ) {
 									Source = "WeatherFile";
@@ -2030,11 +2030,11 @@ namespace WeatherManager {
 
 		// Humidity Ratio and Wet Bulb are derived
 		OutHumRat = PsyWFnTdbRhPb( OutDryBulbTemp, OutRelHumValue, OutBaroPress, RoutineName );
-		OutWetBulbTemp = PsyTwbFnTdbWPb( OutDryBulbTemp, OutHumRat, OutBaroPress );
+		OutWetBulbTemp = PsyTwbFnTdbWPb( OutDryBulbTemp, OutHumRat, OutBaroPress, BlankString );
 		if ( OutDryBulbTemp < OutWetBulbTemp ) {
 			OutWetBulbTemp = OutDryBulbTemp;
-			TempVal = PsyWFnTdbTwbPb( OutDryBulbTemp, OutWetBulbTemp, OutBaroPress );
-			TempDPVal = PsyTdpFnWPb( TempVal, OutBaroPress );
+			TempVal = PsyWFnTdbTwbPb( OutDryBulbTemp, OutWetBulbTemp, OutBaroPress, BlankString );
+			TempDPVal = PsyTdpFnWPb( TempVal, OutBaroPress, BlankString );
 			OutDewPointTemp = TempDPVal;
 		}
 
@@ -2111,7 +2111,7 @@ namespace WeatherManager {
 
 		// Calc some values
 		OutEnthalpy = PsyHFnTdbW( OutDryBulbTemp, OutHumRat );
-		OutAirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, OutDryBulbTemp, OutHumRat );
+		OutAirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, OutDryBulbTemp, OutHumRat, BlankString );
 
 		// Make sure outwetbulbtemp is valid.  And that no error occurs here.
 		if ( OutDryBulbTemp < OutWetBulbTemp ) OutWetBulbTemp = OutDryBulbTemp;
@@ -2425,7 +2425,7 @@ namespace WeatherManager {
 					}
 				}
 				if ( ReadStatus != 0 ) {
-					BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + Blank + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
+					BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + BlankString + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
 					gio::write( ErrOut, "*" ) << ReadStatus;
 					strip( ErrOut );
 					ShowFatalError( "Error occured on EPW while searching for first day, stopped at " + BadRecord + " IO Error=" + RoundSigDigits( ReadStatus ), OutputFileStandard );
@@ -2465,7 +2465,7 @@ namespace WeatherManager {
 						{ IOFlags flags; gio::read( WeatherFileUnitNumber, DataFmt, flags ) >> WeatherDataLine; ReadStatus = flags.ios(); }
 						if ( ReadStatus != 0 ) {
 							gio::read( WeatherDataLine, "*" ) >> WYear >> WMonth >> WDay >> WHour >> WMinute;
-							BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + Blank + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
+							BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + BlankString + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
 							ShowFatalError( "Error occured on EPW while searching for first day, stopped at " + BadRecord + " IO Error=" + RoundSigDigits( ReadStatus ), OutputFileStandard );
 						}
 					}
@@ -2473,7 +2473,7 @@ namespace WeatherManager {
 						{ IOFlags flags; gio::read( WeatherFileUnitNumber, DataFmt, flags ) >> WeatherDataLine; ReadStatus = flags.ios(); }
 						if ( ReadStatus != 0 ) {
 							gio::read( WeatherDataLine, "*" ) >> WYear >> WMonth >> WDay >> WHour >> WMinute;
-							BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + Blank + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
+							BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + BlankString + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
 							ShowFatalError( "Error occured on EPW while searching for first day, stopped at " + BadRecord + " IO Error=" + RoundSigDigits( ReadStatus ), OutputFileStandard );
 						}
 					}
@@ -2530,8 +2530,8 @@ namespace WeatherManager {
 				for ( CurTimeStep = 1; CurTimeStep <= NumIntervalsPerHour; ++CurTimeStep ) {
 					HourRep = double( Hour - 1 ) + ( CurTime * double( CurTimeStep ) );
 					{ IOFlags flags; gio::read( WeatherFileUnitNumber, DataFmt, flags ) >> WeatherDataLine; ReadStatus = flags.ios(); }
-					if ( ReadStatus != 0 ) WeatherDataLine = Blank;
-					if ( WeatherDataLine == Blank ) {
+					if ( ReadStatus != 0 ) WeatherDataLine = BlankString;
+					if ( WeatherDataLine == BlankString ) {
 						if ( Hour == 1 ) {
 							ReadStatus = -1;
 						} else {
@@ -2549,17 +2549,17 @@ namespace WeatherManager {
 
 								InterpretWeatherDataLine( WeatherDataLine, ErrorFound, WYear, WMonth, WDay, WHour, WMinute, DryBulb, DewPoint, RelHum, AtmPress, ETHoriz, ETDirect, IRHoriz, GLBHoriz, DirectRad, DiffuseRad, GLBHorizIllum, DirectNrmIllum, DiffuseHorizIllum, ZenLum, WindDir, WindSpeed, TotalSkyCover, OpaqueSkyCover, Visibility, CeilHeight, PresWeathObs, PresWeathConds, PrecipWater, AerosolOptDepth, SnowDepth, DaysSinceLastSnow, Albedo, LiquidPrecip );
 							} else {
-								BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + Blank + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
+								BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + BlankString + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
 								ShowFatalError( "End-of-File encountered after " + BadRecord + ", starting from first day of " "Weather File would not be \"next day\"" );
 							}
 						} else {
-							BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + Blank + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
+							BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + BlankString + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
 							ShowFatalError( "Unexpected error condition in middle of reading EPW file, stopped at " + BadRecord, OutputFileStandard );
 						}
 					}
 
 					if ( Hour != WHour ) {
-						BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + Blank + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
+						BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + BlankString + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
 						ShowFatalError( "Unexpected error condition in middle of reading EPW file, " + BadRecord, OutputFileStandard );
 					}
 
@@ -3497,8 +3497,8 @@ Label903: ;
 		// verify that design WB or DP <= design DB
 		if ( DesDayInput( EnvrnNum ).HumIndType == DDHumIndType_DewPoint && DesDayInput( EnvrnNum ).DewPointNeedsSet ) {
 			// dew-point
-			testval = PsyWFnTdbRhPb( DesDayInput( EnvrnNum ).MaxDryBulb, 1.0, DesDayInput( EnvrnNum ).PressBarom );
-			DesDayInput( EnvrnNum ).HumIndValue = PsyTdpFnWPb( testval, DesDayInput( EnvrnNum ).PressBarom );
+			testval = PsyWFnTdbRhPb( DesDayInput( EnvrnNum ).MaxDryBulb, 1.0, DesDayInput( EnvrnNum ).PressBarom, BlankString );
+			DesDayInput( EnvrnNum ).HumIndValue = PsyTdpFnWPb( testval, DesDayInput( EnvrnNum ).PressBarom, BlankString );
 		}
 
 		// Day of week defaults to Monday, if day type specified, then that is used.
@@ -3692,26 +3692,26 @@ Label903: ;
 				if ( DesDayInput( EnvrnNum ).HumIndType == DDHumIndType_WBProfDef || DesDayInput( EnvrnNum ).HumIndType == DDHumIndType_WBProfDif || DesDayInput( EnvrnNum ).HumIndType == DDHumIndType_WBProfMul ) {
 					WetBulb = DesDayInput( EnvrnNum ).HumIndValue - DDHumIndModifier( EnvrnNum, Hour, TS ) * WBRange;
 					WetBulb = min( WetBulb, TomorrowOutDryBulbTemp( Hour, TS ) ); // WB must be <= DB
-					OutHumRat = PsyWFnTdbTwbPb( TomorrowOutDryBulbTemp( Hour, TS ), WetBulb, DesDayInput( EnvrnNum ).PressBarom );
-					TomorrowOutDewPointTemp( Hour, TS ) = PsyTdpFnWPb( OutHumRat, DesDayInput( EnvrnNum ).PressBarom );
+					OutHumRat = PsyWFnTdbTwbPb( TomorrowOutDryBulbTemp( Hour, TS ), WetBulb, DesDayInput( EnvrnNum ).PressBarom, BlankString );
+					TomorrowOutDewPointTemp( Hour, TS ) = PsyTdpFnWPb( OutHumRat, DesDayInput( EnvrnNum ).PressBarom, BlankString );
 					TomorrowOutRelHum( Hour, TS ) = PsyRhFnTdbWPb( TomorrowOutDryBulbTemp( Hour, TS ), OutHumRat, DesDayInput( EnvrnNum ).PressBarom, WeatherManager ) * 100.0;
 				} else if ( ConstantHumidityRatio ) {
 					//  Need Dew Point Temperature.  Use Relative Humidity to get Humidity Ratio, unless Humidity Ratio is constant
 					//BG 9-26-07  moved following inside this IF statment; when HumIndType is 'Schedule' HumidityRatio wasn't being initialized
 					WetBulb = PsyTwbFnTdbWPb( TomorrowOutDryBulbTemp( Hour, TS ), HumidityRatio, DesDayInput( EnvrnNum ).PressBarom, RoutineNameLong );
 
-					OutHumRat = PsyWFnTdpPb( TomorrowOutDryBulbTemp( Hour, TS ), DesDayInput( EnvrnNum ).PressBarom );
+					OutHumRat = PsyWFnTdpPb( TomorrowOutDryBulbTemp( Hour, TS ), DesDayInput( EnvrnNum ).PressBarom, BlankString );
 					if ( HumidityRatio > OutHumRat ) {
 						WetBulb = TomorrowOutDryBulbTemp( Hour, TS );
 					} else {
-						OutHumRat = PsyWFnTdbTwbPb( TomorrowOutDryBulbTemp( Hour, TS ), WetBulb, DesDayInput( EnvrnNum ).PressBarom );
+						OutHumRat = PsyWFnTdbTwbPb( TomorrowOutDryBulbTemp( Hour, TS ), WetBulb, DesDayInput( EnvrnNum ).PressBarom, BlankString );
 					}
-					TomorrowOutDewPointTemp( Hour, TS ) = PsyTdpFnWPb( OutHumRat, DesDayInput( EnvrnNum ).PressBarom );
+					TomorrowOutDewPointTemp( Hour, TS ) = PsyTdpFnWPb( OutHumRat, DesDayInput( EnvrnNum ).PressBarom, BlankString );
 					TomorrowOutRelHum( Hour, TS ) = PsyRhFnTdbWPb( TomorrowOutDryBulbTemp( Hour, TS ), OutHumRat, DesDayInput( EnvrnNum ).PressBarom, WeatherManager ) * 100.0;
 				} else {
-					HumidityRatio = PsyWFnTdbRhPb( TomorrowOutDryBulbTemp( Hour, TS ), DDHumIndModifier( EnvrnNum, Hour, TS ) / 100.0, DesDayInput( EnvrnNum ).PressBarom );
+					HumidityRatio = PsyWFnTdbRhPb( TomorrowOutDryBulbTemp( Hour, TS ), DDHumIndModifier( EnvrnNum, Hour, TS ) / 100.0, DesDayInput( EnvrnNum ).PressBarom, BlankString );
 					// TomorrowOutRelHum values set earlier
-					TomorrowOutDewPointTemp( Hour, TS ) = PsyTdpFnWPb( HumidityRatio, DesDayInput( EnvrnNum ).PressBarom );
+					TomorrowOutDewPointTemp( Hour, TS ) = PsyTdpFnWPb( HumidityRatio, DesDayInput( EnvrnNum ).PressBarom, BlankString );
 				}
 
 				// Determine Sky Temp ==>
@@ -4609,7 +4609,7 @@ Label9999: ;
 		if ( ! ErrorsFound ) {
 			StdBaroPress = 101.325 * std::pow( ( 1.0 - 2.25577e-05 * Elevation ), 5.2559 );
 			StdBaroPress *= 1000.;
-			StdRhoAir = PsyRhoAirFnPbTdbW( StdBaroPress, constant_twenty, constant_zero );
+			StdRhoAir = PsyRhoAirFnPbTdbW( StdBaroPress, constant_twenty, constant_zero, BlankString );
 			// Write Final Location Information to the initialization output file
 			gio::write( OutputFileInits, LocHdFormat );
 			gio::write( OutputFileInits, LocFormat ) << LocationTitle << RoundSigDigits( Latitude, 2 ) << RoundSigDigits( Longitude, 2 ) << RoundSigDigits( TimeZoneNumber, 2 ) << RoundSigDigits( Elevation, 2 ) << RoundSigDigits( StdBaroPress, 0 ) << RoundSigDigits( StdRhoAir, 4 );
@@ -5034,7 +5034,7 @@ Label9999: ;
 		SPSiteScheduleUnits.allocate( TotDesDays * 5 );
 
 		SPSiteScheduleNamePtr = 0;
-		SPSiteScheduleUnits = Blank;
+		SPSiteScheduleUnits = BlankString;
 
 		//Allocate the Design Day and Environment array to the # of DD's or/and
 		// Annual runs on input file
@@ -6974,7 +6974,7 @@ Label9999: ;
 					if ( Environment( Count ).KindOfEnvrn != ksRunPeriodWeather ) continue;
 					if ( Environment( Count ).WP_Type1 != 0 ) {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", indicated Environment Name already assigned." );
-						if ( Environment( Count ).Title != Blank ) {
+						if ( Environment( Count ).Title != BlankString ) {
 							ShowContinueError( "...Environment=\"" + Environment( Count ).Title + "\", already using " + cCurrentModuleObject + "=\"" + WPSkyTemperature( Environment( Count ).WP_Type1 ).Name + "\"." );
 						} else {
 							ShowContinueError( "... Runperiod Environment, already using " + cCurrentModuleObject + "=\"" + WPSkyTemperature( Environment( Count ).WP_Type1 ).Name + "\"." );
@@ -8163,7 +8163,7 @@ Label9999: ;
 						}
 					}
 				} else {
-					ShowWarningError( "ProcessEPWHeader: Invalid Typical/Extreme Periods Header(WeatherFile)=" + TypicalExtremePeriods( Count ).Title + Blank + Line.substr( 0, Pos ) );
+					ShowWarningError( "ProcessEPWHeader: Invalid Typical/Extreme Periods Header(WeatherFile)=" + TypicalExtremePeriods( Count ).Title + BlankString + Line.substr( 0, Pos ) );
 					ShowContinueError( "...on processing Typical/Extreme period #" + RoundSigDigits( Count ) );
 					NumEPWTypExtSets = Count - 1;
 					break;
@@ -8297,7 +8297,7 @@ Label9999: ;
 					for ( Count = 1; Count <= 4; ++Count ) {
 						Pos = index( Line, ',' );
 						if ( Pos == std::string::npos ) {
-							Line = Blank;
+							Line = BlankString;
 							break;
 						}
 						Line.erase( 0, Pos + 1 );
@@ -9281,7 +9281,7 @@ Label9998: ;
 			}
 			Environment( Envrn ).UseDST = RunPeriodInput( Loop ).UseDST;
 			Environment( Envrn ).UseHolidays = RunPeriodInput( Loop ).UseHolidays;
-			if ( RunPeriodInput( Loop ).Title == Blank ) {
+			if ( RunPeriodInput( Loop ).Title == BlankString ) {
 				Environment( Envrn ).Title = WeatherFileLocationTitle;
 			} else {
 				Environment( Envrn ).Title = RunPeriodInput( Loop ).Title;

@@ -98,6 +98,8 @@ namespace HeatBalanceHAMTManager {
 	Real64 const qvplim( 100000. ); // Maximum latent heat W
 	Real64 const rhmax( 1.01 ); // Maximum RH value
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -1139,7 +1141,7 @@ namespace HeatBalanceHAMTManager {
 			cells( ExtConcell( sid ) ).vtc = extvtc( sid );
 		} else {
 			if ( cells( ExtConcell( sid ) ).rh > 0 ) {
-				cells( ExtConcell( sid ) ).vtc = HMassConvExtFD( sid ) * RhoOut / ( PsyPsatFnTemp( TempOutsideAirFD( sid ) ) * cells( ExtConcell( sid ) ).rh );
+				cells( ExtConcell( sid ) ).vtc = HMassConvExtFD( sid ) * RhoOut / ( PsyPsatFnTemp( TempOutsideAirFD( sid ), BlankString ) * cells( ExtConcell( sid ) ).rh );
 			} else {
 				cells( ExtConcell( sid ) ).vtc = 10000.0;
 			}
@@ -1147,10 +1149,10 @@ namespace HeatBalanceHAMTManager {
 
 		if ( intvtcflag( sid ) ) {
 			cells( IntConcell( sid ) ).vtc = intvtc( sid );
-			HMassConvInFD( sid ) = cells( IntConcell( sid ) ).vtc * PsyPsatFnTemp( MAT( Surface( sid ).Zone ) ) * cells( IntConcell( sid ) ).rh / RhoIn;
+			HMassConvInFD( sid ) = cells( IntConcell( sid ) ).vtc * PsyPsatFnTemp( MAT( Surface( sid ).Zone ), BlankString ) * cells( IntConcell( sid ) ).rh / RhoIn;
 		} else {
 			if ( cells( IntConcell( sid ) ).rh > 0 ) {
-				cells( IntConcell( sid ) ).vtc = HMassConvInFD( sid ) * RhoIn / ( PsyPsatFnTemp( MAT( Surface( sid ).Zone ) ) * cells( IntConcell( sid ) ).rh );
+				cells( IntConcell( sid ) ).vtc = HMassConvInFD( sid ) * RhoIn / ( PsyPsatFnTemp( MAT( Surface( sid ).Zone ), BlankString ) * cells( IntConcell( sid ) ).rh );
 			} else {
 				cells( IntConcell( sid ) ).vtc = 10000.0;
 			}
@@ -1180,7 +1182,7 @@ namespace HeatBalanceHAMTManager {
 				matid = cells( cid ).matid;
 				cells( cid ).vp = RHtoVP( cells( cid ).rh, cells( cid ).temp );
 				cells( cid ).vpp1 = RHtoVP( cells( cid ).rhp1, cells( cid ).tempp1 );
-				cells( cid ).vpsat = PsyPsatFnTemp( cells( cid ).tempp1 );
+				cells( cid ).vpsat = PsyPsatFnTemp( cells( cid ).tempp1, BlankString );
 				if ( matid > 0 ) {
 					interp( Material( matid ).niso, Material( matid ).isorh, Material( matid ).isodata, cells( cid ).rhp1, cells( cid ).water, cells( cid ).dwdphi );
 					if ( IsRain && rainswitch ) {
@@ -1401,7 +1403,7 @@ namespace HeatBalanceHAMTManager {
 		TempSurfOutTmp = cells( Extcell( sid ) ).tempp1;
 		TempSurfInTmp = cells( Intcell( sid ) ).tempp1;
 
-		TempSurfInP = cells( Intcell( sid ) ).rhp1 * PsyPsatFnTemp( cells( Intcell( sid ) ).tempp1 );
+		TempSurfInP = cells( Intcell( sid ) ).rhp1 * PsyPsatFnTemp( cells( Intcell( sid ) ).tempp1, BlankString );
 
 		RhoVaporSurfIn( sid ) = TempSurfInP / ( 461.52 * ( MAT( Surface( sid ).Zone ) + KelvinConv ) );
 
@@ -1601,7 +1603,7 @@ namespace HeatBalanceHAMTManager {
 
 		Real64 VPSat;
 
-		VPSat = PsyPsatFnTemp( Temperature );
+		VPSat = PsyPsatFnTemp( Temperature, BlankString );
 
 		RHtoVP = RH * VPSat;
 

@@ -713,7 +713,7 @@ namespace Humidifiers {
 				// This point isn't quite on the saturation curve since we made a linear approximation of the curve,
 				// but the temperature should be very close to the correct outlet temperature. We will use this temperature
 				// as the outlet temperature and move to the saturation curve for the outlet humidity and enthalpy
-				AirOutHumRat = PsyWFnTdbRhPb( AirOutTemp, 1.0, OutBaroPress ); // *&^unique^&* "CalcElecSteamHumidifier"
+				AirOutHumRat = PsyWFnTdbRhPb( AirOutTemp, 1.0, OutBaroPress, RoutineName );
 				AirOutEnthalpy = PsyHFnTdbW( AirOutTemp, AirOutHumRat ); // *&^unique^&* "CalcElecSteamHumidifier"
 				WaterAddRate = AirMassFlowRate * ( AirOutHumRat - Humidifier( HumNum ).AirInHumRat );
 			}

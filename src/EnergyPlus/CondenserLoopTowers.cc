@@ -125,6 +125,8 @@ namespace CondenserLoopTowers {
 	int const CellCtrl_MinCell( 1 );
 	int const CellCtrl_MaxCell( 2 );
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -393,7 +395,6 @@ namespace CondenserLoopTowers {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt const OutputFormat( "(F5.2)" );
-		static std::string const Blank;
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -521,7 +522,7 @@ namespace CondenserLoopTowers {
 				}
 			}
 
-			if ( AlphArray( 5 ) != Blank ) {
+			if ( AlphArray( 5 ) != BlankString ) {
 				SimpleTower( TowerNum ).BasinHeaterSchedulePtr = GetScheduleIndex( AlphArray( 5 ) );
 				if ( SimpleTower( TowerNum ).BasinHeaterSchedulePtr == 0 ) {
 					ShowWarningError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" basin heater schedule name \"" + AlphArray( 5 ) + "\" was not found. Basin heater operation will not be modeled and the simulation continues" );
@@ -533,7 +534,7 @@ namespace CondenserLoopTowers {
 				SimpleTower( TowerNum ).EvapLossMode = EvapLossByUserFactor;
 			} else if ( SameString( AlphArray( 6 ), "SaturatedExit" ) ) {
 				SimpleTower( TowerNum ).EvapLossMode = EvapLossByMoistTheory;
-			} else if ( AlphArray( 6 ) == Blank ) {
+			} else if ( AlphArray( 6 ) == BlankString ) {
 				SimpleTower( TowerNum ).EvapLossMode = EvapLossByMoistTheory;
 			} else {
 				ShowSevereError( cCurrentModuleObject + '=' + AlphArray( 1 ) );
@@ -557,7 +558,7 @@ namespace CondenserLoopTowers {
 				SimpleTower( TowerNum ).BlowdownMode = BlowdownBySchedule;
 			} else if ( SameString( AlphArray( 7 ), "ConcentrationRatio" ) ) {
 				SimpleTower( TowerNum ).BlowdownMode = BlowdownByConcentration;
-			} else if ( AlphArray( 7 ) == Blank ) {
+			} else if ( AlphArray( 7 ) == BlankString ) {
 				SimpleTower( TowerNum ).BlowdownMode = BlowdownByConcentration;
 				if ( ( NumNums < 17 ) && ( SimpleTower( TowerNum ).ConcentrationRatio == 0.0 ) ) {
 					// assume Concetratino ratio was omitted and should be defaulted
@@ -575,7 +576,7 @@ namespace CondenserLoopTowers {
 				ErrorsFound = true;
 			}
 
-			if ( AlphArray( 9 ) == Blank ) {
+			if ( AlphArray( 9 ) == BlankString ) {
 				SimpleTower( TowerNum ).SuppliedByWaterSystem = false;
 			} else { // water from storage tank
 				SetupTankDemandComponent( AlphArray( 1 ), cCurrentModuleObject, AlphArray( 9 ), ErrorsFound, SimpleTower( TowerNum ).WaterTankID, SimpleTower( TowerNum ).WaterTankDemandARRID );
@@ -596,7 +597,7 @@ namespace CondenserLoopTowers {
 			}
 
 			//   fluid bypass for single speed tower
-			if ( lAlphaFieldBlanks( 11 ) || AlphArray( 11 ) == Blank ) {
+			if ( lAlphaFieldBlanks( 11 ) || AlphArray( 11 ) == BlankString ) {
 				SimpleTower( TowerNum ).CapacityControl = CapacityControl_FanCycling; // FanCycling
 			} else {
 				{ auto const SELECT_CASE_var( MakeUPPERCase( AlphArray( 11 ) ) );
@@ -628,7 +629,7 @@ namespace CondenserLoopTowers {
 			}
 
 			if ( NumAlphas >= 12 ) {
-				if ( lAlphaFieldBlanks( 12 ) || AlphArray( 12 ) == Blank ) {
+				if ( lAlphaFieldBlanks( 12 ) || AlphArray( 12 ) == BlankString ) {
 					SimpleTower( TowerNum ).CellCtrl = "MaximalCell";
 					SimpleTower( TowerNum ).CellCtrl_Num = CellCtrl_MaxCell;
 				} else {
@@ -793,7 +794,7 @@ namespace CondenserLoopTowers {
 				}
 			}
 
-			if ( AlphArray( 5 ) != Blank ) {
+			if ( AlphArray( 5 ) != BlankString ) {
 				SimpleTower( TowerNum ).BasinHeaterSchedulePtr = GetScheduleIndex( AlphArray( 5 ) );
 				if ( SimpleTower( TowerNum ).BasinHeaterSchedulePtr == 0 ) {
 					ShowWarningError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" basin heater schedule name \"" + AlphArray( 5 ) + "\" was not found. Basin heater operation will not be modeled and the simulation continues" );
@@ -864,7 +865,7 @@ namespace CondenserLoopTowers {
 			}
 
 			if ( NumAlphas >= 11 ) {
-				if ( lAlphaFieldBlanks( 11 ) || AlphArray( 11 ) == Blank ) {
+				if ( lAlphaFieldBlanks( 11 ) || AlphArray( 11 ) == BlankString ) {
 					SimpleTower( TowerNum ).CellCtrl = "MaximalCell";
 					SimpleTower( TowerNum ).CellCtrl_Num = CellCtrl_MaxCell;
 				} else {
@@ -1479,7 +1480,7 @@ namespace CondenserLoopTowers {
 			//       ErrorsFound = .TRUE.
 			//     END IF
 
-			if ( AlphArray( 7 ) != Blank ) {
+			if ( AlphArray( 7 ) != BlankString ) {
 				SimpleTower( TowerNum ).BasinHeaterSchedulePtr = GetScheduleIndex( AlphArray( 7 ) );
 				if ( SimpleTower( TowerNum ).BasinHeaterSchedulePtr == 0 ) {
 					ShowWarningError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" basin heater schedule name \"" + AlphArray( 7 ) + "\" was not found. Basin heater operation will not be modeled and the simulation continues" );
@@ -1550,7 +1551,7 @@ namespace CondenserLoopTowers {
 			}
 
 			if ( NumAlphas >= 13 ) {
-				if ( lAlphaFieldBlanks( 13 ) || AlphArray( 13 ) == Blank ) {
+				if ( lAlphaFieldBlanks( 13 ) || AlphArray( 13 ) == BlankString ) {
 					SimpleTower( TowerNum ).CellCtrl = "MaximalCell";
 					SimpleTower( TowerNum ).CellCtrl_Num = CellCtrl_MaxCell;
 				} else {
@@ -1695,7 +1696,7 @@ namespace CondenserLoopTowers {
 				}
 			}
 
-			if ( AlphArray( 9 ) != Blank ) {
+			if ( AlphArray( 9 ) != BlankString ) {
 				SimpleTower( TowerNum ).BasinHeaterSchedulePtr = GetScheduleIndex( AlphArray( 9 ) );
 				if ( SimpleTower( TowerNum ).BasinHeaterSchedulePtr == 0 ) {
 					ShowWarningError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" basin heater schedule name \"" + AlphArray( 9 ) + "\" was not found. Basin heater operation will not be modeled and the simulation continues" );
@@ -1766,7 +1767,7 @@ namespace CondenserLoopTowers {
 			}
 			SimpleTower( TowerNum ).TowerMassFlowRateMultiplier = SimpleTower( TowerNum ).MaxFracFlowRate;
 			if ( NumAlphas >= 15 ) {
-				if ( lAlphaFieldBlanks( 15 ) || AlphArray( 15 ) == Blank ) {
+				if ( lAlphaFieldBlanks( 15 ) || AlphArray( 15 ) == BlankString ) {
 					SimpleTower( TowerNum ).CellCtrl = "MaximalCell";
 					SimpleTower( TowerNum ).CellCtrl_Num = CellCtrl_MaxCell;
 				} else {
@@ -2349,7 +2350,7 @@ namespace CondenserLoopTowers {
 					SimpleTowerInlet( TowerNum ).AirTemp = 35.;
 					SimpleTowerInlet( TowerNum ).AirWetBulb = 25.6;
 					SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
-					SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
+					SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress, BlankString );
 					//        SimpleTowerInlet(TowerNum)%AirHumRat = PsyWFnTdbTwbPb(35.,25.6,StdBaroPress)
 					SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 					if ( SolFla == -1 ) {
@@ -2402,7 +2403,7 @@ namespace CondenserLoopTowers {
 				SimpleTowerInlet( TowerNum ).AirTemp = 35.; // 95F design inlet air dry-bulb temp
 				SimpleTowerInlet( TowerNum ).AirWetBulb = 25.6; // 78F design inlet air wet-bulb temp
 				SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
-				SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
+				SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress, BlankString );
 				//      SimpleTowerInlet(TowerNum)%AirHumRat = PsyWFnTdbTwbPb(35.,25.6,StdBaroPress)
 				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
@@ -2478,7 +2479,7 @@ namespace CondenserLoopTowers {
 				SimpleTowerInlet( TowerNum ).AirTemp = 35.; // 95F design inlet air dry-bulb temp
 				SimpleTowerInlet( TowerNum ).AirWetBulb = 25.6; // 78F design inlet air wet-bulb temp
 				SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
-				SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
+				SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress, BlankString );
 				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating tower UA" );
@@ -2525,7 +2526,7 @@ namespace CondenserLoopTowers {
 				SimpleTowerInlet( TowerNum ).AirTemp = 35.; // 95F design inlet air dry-bulb temp
 				SimpleTowerInlet( TowerNum ).AirWetBulb = 25.6; // 78F design inlet air wet-bulb temp
 				SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
-				SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
+				SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress, BlankString );
 				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating tower UA" );
@@ -2833,7 +2834,7 @@ namespace CondenserLoopTowers {
 				SimpleTowerInlet( TowerNum ).AirTemp = 35.;
 				SimpleTowerInlet( TowerNum ).AirWetBulb = 25.6;
 				SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
-				SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
+				SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress, BlankString );
 				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating tower UA" );
@@ -2859,7 +2860,7 @@ namespace CondenserLoopTowers {
 				SimpleTowerInlet( TowerNum ).AirTemp = 35.;
 				SimpleTowerInlet( TowerNum ).AirWetBulb = 25.6;
 				SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
-				SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
+				SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress, BlankString );
 				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating tower free convection UA" );
@@ -2961,7 +2962,7 @@ namespace CondenserLoopTowers {
 					SimpleTowerInlet( TowerNum ).AirTemp = 35.;
 					SimpleTowerInlet( TowerNum ).AirWetBulb = 25.6;
 					SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
-					SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
+					SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress, BlankString );
 					SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 					if ( SolFla == -1 ) {
 						ShowSevereError( "Iteration limit exceeded in calculating tower UA" );
@@ -2984,7 +2985,7 @@ namespace CondenserLoopTowers {
 					SimpleTowerInlet( TowerNum ).AirTemp = 35.;
 					SimpleTowerInlet( TowerNum ).AirWetBulb = 25.6;
 					SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
-					SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
+					SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress, BlankString );
 					SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 					if ( SolFla == -1 ) {
 						ShowSevereError( "Iteration limit exceeded in calculating tower free convection UA" );
@@ -3051,7 +3052,7 @@ namespace CondenserLoopTowers {
 					SimpleTowerInlet( TowerNum ).AirTemp = 35.;
 					SimpleTowerInlet( TowerNum ).AirWetBulb = 25.6;
 					SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
-					SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
+					SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress, BlankString );
 					SimSimpleTower( TowerNum, rho * tmpDesignWaterFlowRate, SimpleTower( TowerNum ).HighSpeedAirFlowRate, SimpleTower( TowerNum ).HighSpeedTowerUA, OutWaterTemp );
 					tmpNomTowerCap = Cp * rho * tmpDesignWaterFlowRate * ( SimpleTowerInlet( TowerNum ).WaterTemp - OutWaterTemp );
 					tmpNomTowerCap /= SimpleTower( TowerNum ).HeatRejectCapNomCapSizingRatio;
@@ -4313,9 +4314,9 @@ namespace CondenserLoopTowers {
 		Qactual = WaterMassFlowRate * CpWater * ( Node( WaterInletNode ).Temp - OutletWaterTemp );
 		SimpleTower( TowerNum ).NumCellOn = NumCellOn;
 		// Set water and air properties
-		AirDensity = PsyRhoAirFnPbTdbW( SimpleTowerInlet( TowerNum ).AirPress, SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirHumRat );
+		AirDensity = PsyRhoAirFnPbTdbW( SimpleTowerInlet( TowerNum ).AirPress, SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirHumRat, BlankString );
 		AirMassFlowRate = AirFlowRateRatio * SimpleTower( TowerNum ).HighSpeedAirFlowRate * AirDensity * SimpleTower( TowerNum ).NumCellOn / SimpleTower( TowerNum ).NumCell;
-		InletAirEnthalpy = PsyHFnTdbRhPb( SimpleTowerInlet( TowerNum ).AirWetBulb, 1.0, SimpleTowerInlet( TowerNum ).AirPress );
+		InletAirEnthalpy = PsyHFnTdbRhPb( SimpleTowerInlet( TowerNum ).AirWetBulb, 1.0, SimpleTowerInlet( TowerNum ).AirPress, BlankString );
 
 		//   calculate end time of current time step
 		CurrentEndTime = CurrentTime + SysTimeElapsed;
@@ -4455,11 +4456,11 @@ namespace CondenserLoopTowers {
 		if ( UAdesign == 0.0 ) return;
 
 		// set water and air properties
-		AirDensity = PsyRhoAirFnPbTdbW( SimpleTowerInlet( TowerNum ).AirPress, InletAirTemp, SimpleTowerInlet( TowerNum ).AirHumRat );
+		AirDensity = PsyRhoAirFnPbTdbW( SimpleTowerInlet( TowerNum ).AirPress, InletAirTemp, SimpleTowerInlet( TowerNum ).AirHumRat, BlankString );
 		AirMassFlowRate = AirFlowRate * AirDensity;
 		CpAir = PsyCpAirFnWTdb( SimpleTowerInlet( TowerNum ).AirHumRat, InletAirTemp );
 		CpWater = GetSpecificHeatGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, SimpleTowerInlet( TowerNum ).WaterTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
-		InletAirEnthalpy = PsyHFnTdbRhPb( SimpleTowerInlet( TowerNum ).AirWetBulb, 1.0, SimpleTowerInlet( TowerNum ).AirPress );
+		InletAirEnthalpy = PsyHFnTdbRhPb( SimpleTowerInlet( TowerNum ).AirWetBulb, 1.0, SimpleTowerInlet( TowerNum ).AirPress, BlankString );
 
 		// initialize exiting wet bulb temperature before iterating on final solution
 		OutletAirWetBulb = InletAirWetBulb + 6.0;
@@ -4475,7 +4476,7 @@ namespace CondenserLoopTowers {
 		while ( ( WetBulbError > WetBulbTolerance ) && ( Iter <= IterMax ) && ( DeltaTwb > DeltaTwbTolerance ) ) {
 			++Iter;
 			//        OutletAirEnthalpy = PsyHFnTdbRhPb(OutletAirWetBulb,1.0,OutBaroPress)
-			OutletAirEnthalpy = PsyHFnTdbRhPb( OutletAirWetBulb, 1.0, SimpleTowerInlet( TowerNum ).AirPress );
+			OutletAirEnthalpy = PsyHFnTdbRhPb( OutletAirWetBulb, 1.0, SimpleTowerInlet( TowerNum ).AirPress, BlankString );
 			// calculate the airside specific heat and capacity
 			CpAirside = ( OutletAirEnthalpy - InletAirEnthalpy ) / ( OutletAirWetBulb - InletAirWetBulb );
 			AirCapacity = AirMassFlowRate * CpAirside;
@@ -5182,16 +5183,16 @@ namespace CondenserLoopTowers {
 		// Set water and air properties
 		if ( SimpleTower( TowerNum ).EvapLossMode == EvapLossByMoistTheory ) {
 
-			AirDensity = PsyRhoAirFnPbTdbW( SimpleTowerInlet( TowerNum ).AirPress, SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirHumRat );
+			AirDensity = PsyRhoAirFnPbTdbW( SimpleTowerInlet( TowerNum ).AirPress, SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirHumRat, BlankString );
 			AirMassFlowRate = AirFlowRateRatio * SimpleTower( TowerNum ).HighSpeedAirFlowRate * AirDensity * SimpleTower( TowerNum ).NumCellOn / SimpleTower( TowerNum ).NumCell;
-			InletAirEnthalpy = PsyHFnTdbRhPb( SimpleTowerInlet( TowerNum ).AirWetBulb, 1.0, SimpleTowerInlet( TowerNum ).AirPress );
+			InletAirEnthalpy = PsyHFnTdbRhPb( SimpleTowerInlet( TowerNum ).AirWetBulb, 1.0, SimpleTowerInlet( TowerNum ).AirPress, BlankString );
 
 			if ( AirMassFlowRate > 0.0 ) {
 				// Calculate outlet air conditions for determining water usage
 
 				OutletAirEnthalpy = InletAirEnthalpy + Qactual / AirMassFlowRate;
-				OutletAirTSat = PsyTsatFnHPb( OutletAirEnthalpy, SimpleTowerInlet( TowerNum ).AirPress );
-				OutletAirHumRatSat = PsyWFnTdbH( OutletAirTSat, OutletAirEnthalpy );
+				OutletAirTSat = PsyTsatFnHPb( OutletAirEnthalpy, SimpleTowerInlet( TowerNum ).AirPress, BlankString );
+				OutletAirHumRatSat = PsyWFnTdbH( OutletAirTSat, OutletAirEnthalpy, BlankString );
 
 				// calculate specific humidity ratios (HUMRAT to mass of moist air not dry air)
 				InSpecificHumRat = SimpleTowerInlet( TowerNum ).AirHumRat / ( 1 + SimpleTowerInlet( TowerNum ).AirHumRat );

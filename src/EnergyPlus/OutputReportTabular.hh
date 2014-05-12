@@ -65,8 +65,6 @@ namespace OutputReportTabular {
 	extern int const numResourceTypes;
 	extern int const numSourceTypes;
 
-	extern std::string const validChars;
-
 	//MODULE VARIABLE DECLARATIONS:
 
 	// The Binned table type is different and only references one variable and its structure is very

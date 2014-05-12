@@ -13,7 +13,7 @@ namespace PlantPressureSystem {
 
 	// Data
 	// MODULE PARAMETER/ENUMERATIONS DEFINITIONS:
-	extern std::string const Blank;
+	// na
 
 	// DERIVED TYPE DEFINITIONS:
 	//TYPE, PUBLIC:: PlantPressureCurveData

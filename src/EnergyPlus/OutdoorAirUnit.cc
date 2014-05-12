@@ -128,6 +128,7 @@ namespace OutdoorAirUnit {
 
 	static std::string const fluidNameSteam( "STEAM" );
 	static std::string const fluidNameWater( "WATER" );
+	static std::string const BlankString;
 
 	// Parameters below (CO - Current module Object.  used primarily in Get Inputs)
 	// Multiple Get Input routines in this module or these would be in individual routines.
@@ -316,7 +317,6 @@ namespace OutdoorAirUnit {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
 		static std::string const RoutineName( "GetOutdoorAirUnitInputs: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS

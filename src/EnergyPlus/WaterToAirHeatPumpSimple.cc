@@ -82,6 +82,7 @@ namespace WaterToAirHeatPumpSimple {
 	// Data
 	//MODULE PARAMETER DEFINITIONS
 	Real64 const CelsiustoKelvin( KelvinConv ); // Conversion from Celsius to Kelvin
+	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -184,7 +185,7 @@ namespace WaterToAirHeatPumpSimple {
 		// shut off after compressor cycle off  [s]
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -217,7 +218,7 @@ namespace WaterToAirHeatPumpSimple {
 			if ( HPNum > NumWatertoAirHPs || HPNum < 1 ) {
 				ShowFatalError( "SimWatertoAirHPSimple: Invalid CompIndex passed=" + TrimSigDigits( HPNum ) + ", Number of Water to Air HPs=" + TrimSigDigits( NumWatertoAirHPs ) + ", WaterToAir HP name=" + CompName );
 			}
-			if ( CompName != Blank && CompName != SimpleWatertoAirHP( HPNum ).Name ) {
+			if ( CompName != BlankString && CompName != SimpleWatertoAirHP( HPNum ).Name ) {
 				ShowFatalError( "SimWatertoAirHPSimple: Invalid CompIndex passed=" + TrimSigDigits( HPNum ) + ", WaterToAir HP name=" + CompName + ", stored WaterToAir HP Name for that index=" + SimpleWatertoAirHP( HPNum ).Name );
 			}
 		}
@@ -786,10 +787,10 @@ namespace WaterToAirHeatPumpSimple {
 			// So always start the calculations by setting the air flow rate to design flow rate.
 
 			//    SimpleWatertoAirHP(HPNum)%AirMassFlowRate   = Node(AirInletNode)%MassFlowRate
-			SimpleWatertoAirHP( HPNum ).AirMassFlowRate = SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat );
+			SimpleWatertoAirHP( HPNum ).AirMassFlowRate = SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat, BlankString );
 			//If air flow is less than 25% rated flow. Then set air flow to the 25% of rated conditions
-			if ( SimpleWatertoAirHP( HPNum ).AirMassFlowRate < 0.25 * SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat ) ) {
-				SimpleWatertoAirHP( HPNum ).AirMassFlowRate = 0.25 * SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat );
+			if ( SimpleWatertoAirHP( HPNum ).AirMassFlowRate < 0.25 * SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat, BlankString ) ) {
+				SimpleWatertoAirHP( HPNum ).AirMassFlowRate = 0.25 * SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat, BlankString );
 			}
 			SimpleWatertoAirHP( HPNum ).WaterFlowMode = true;
 		} else { //heat pump is off
@@ -1809,7 +1810,7 @@ namespace WaterToAirHeatPumpSimple {
 			ratioTDB = ( ( LoadSideInletDBTemp + CelsiustoKelvin ) / Tref );
 			ratioTWB = ( ( LoadSideInletWBTemp + CelsiustoKelvin ) / Tref );
 			ratioTS = ( ( SourceSideInletTemp + CelsiustoKelvin ) / Tref );
-			ratioVL = ( LoadSideMassFlowRate / ( AirVolFlowRateRated * PsyRhoAirFnPbTdbW( StdBaroPress, LoadSideInletDBTemp, LoadSideInletHumRat ) ) );
+			ratioVL = ( LoadSideMassFlowRate / ( AirVolFlowRateRated * PsyRhoAirFnPbTdbW( StdBaroPress, LoadSideInletDBTemp, LoadSideInletHumRat, BlankString ) ) );
 
 			if ( WaterPartLoad > 0.0 && SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate > 0.0 ) {
 				ratioVS = ( SourceSideMassFlowRate ) / ( SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate * WaterPartLoad );

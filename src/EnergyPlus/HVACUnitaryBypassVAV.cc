@@ -140,6 +140,7 @@ namespace HVACUnitaryBypassVAV {
 	int const UseCompressorOffFlow( 2 ); // Set compressor OFF air flow rate equal to user defined value
 
 	static std::string const fluidNameSteam( "STEAM" );
+	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -2163,9 +2164,9 @@ namespace HVACUnitaryBypassVAV {
 						// based on CONTROLLER:SIMPLE TEMPANDHUMRAT control type.
 
 						// Calculate the approach temperature (difference between SA dry-bulb temp and SA dew point temp)
-						ApproachTemp = Node( CBVAV( CBVAVNum ).DXCoilOutletNode ).Temp - PsyTdpFnWPb( Node( OutletNode ).HumRat, OutdoorBaroPress );
+						ApproachTemp = Node( CBVAV( CBVAVNum ).DXCoilOutletNode ).Temp - PsyTdpFnWPb( Node( OutletNode ).HumRat, OutdoorBaroPress, BlankString );
 						// Calculate the dew point temperature at the SA humidity ratio setpoint
-						DesiredDewPoint = PsyTdpFnWPb( Node( OutletNode ).HumRatMax, OutdoorBaroPress );
+						DesiredDewPoint = PsyTdpFnWPb( Node( OutletNode ).HumRatMax, OutdoorBaroPress, BlankString );
 						// Adjust the calculated dew point temperature by the approach temp
 						CBVAV( CBVAVNum ).CoilTempSetPoint = min( CBVAV( CBVAVNum ).CoilTempSetPoint, ( DesiredDewPoint + ApproachTemp ) );
 

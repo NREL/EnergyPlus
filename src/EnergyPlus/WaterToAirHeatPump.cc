@@ -71,6 +71,7 @@ namespace WaterToAirHeatPump {
 	int const CompressorType_Scroll( 3 );
 
 	static std::string const fluidNameWater( "WATER" );
+	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -150,7 +151,7 @@ namespace WaterToAirHeatPump {
 		//cycling fan/cycling compressor
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -182,7 +183,7 @@ namespace WaterToAirHeatPump {
 				ShowFatalError( "SimWatertoAirHP: Invalid CompIndex passed=" + TrimSigDigits( HPNum ) + ", Number of Water to Air HPs=" + TrimSigDigits( NumWatertoAirHPs ) + ", WaterToAir HP name=" + CompName );
 			}
 			if ( CheckEquipName( HPNum ) ) {
-				if ( CompName != Blank && CompName != WatertoAirHP( HPNum ).Name ) {
+				if ( CompName != BlankString && CompName != WatertoAirHP( HPNum ).Name ) {
 					ShowFatalError( "SimWatertoAirHP: Invalid CompIndex passed=" + TrimSigDigits( HPNum ) + ", WaterToAir HP name=" + CompName + ", stored WaterToAir HP Name for that index=" + WatertoAirHP( HPNum ).Name );
 				}
 				CheckEquipName( HPNum ) = false;
@@ -1195,7 +1196,7 @@ namespace WaterToAirHeatPump {
 					//        END IF
 					//      END DO LOOP1
 
-					EffectiveSurfaceTemp = PsyTsatFnHPb( EffectiveSatEnth, PB );
+					EffectiveSurfaceTemp = PsyTsatFnHPb( EffectiveSatEnth, PB, BlankString );
 
 					QSensible = LoadSideMassFlowRate * CpAir * ( LoadSideInletDBTemp - EffectiveSurfaceTemp ) * LoadSideEffec;
 					ANTUWET = LoadSideTotalUA / ( LoadSideMassFlowRate * CpAir );
@@ -1226,7 +1227,7 @@ namespace WaterToAirHeatPump {
 					//        END IF
 					//      END DO LOOP2
 
-					EvapTemp = PsyTsatFnHPb( EvapSatEnth, PB );
+					EvapTemp = PsyTsatFnHPb( EvapSatEnth, PB, BlankString );
 
 					// Load Side Saturated Temperature (Evaporating Temp in this case)
 					LoadSideTemp = EvapTemp;
@@ -1391,7 +1392,7 @@ namespace WaterToAirHeatPump {
 				} else if ( NumIteration4 == 2 ) {
 					QLatActual = QLoadTotal - QSensible;
 					SHRss = QSensible / QLoadTotal;
-					LoadSideInletWBTemp = PsyTwbFnTdbWPb( LoadSideInletDBTemp, LoadSideInletHumRat, PB );
+					LoadSideInletWBTemp = PsyTwbFnTdbWPb( LoadSideInletDBTemp, LoadSideInletHumRat, PB, BlankString );
 					SHReff = CalcEffectiveSHR( HPNum, SHRss, CyclingScheme, RuntimeFrac, QLatRated, QLatActual, LoadSideInletDBTemp, LoadSideInletWBTemp );
 					//   Update sensible capacity based on effective SHR
 					QSensible = QLoadTotal * SHReff;
@@ -1409,7 +1410,7 @@ namespace WaterToAirHeatPump {
 		//calculate coil outlet state variables
 		LoadSideAirOutletEnth = LoadSideAirInletEnth - QLoadTotal / LoadSideMassFlowRate;
 		LoadSideOutletDBTemp = LoadSideInletDBTemp - QSensible / ( LoadSideMassFlowRate * CpAir );
-		LoadSideOutletHumRat = PsyWFnTdbH( LoadSideOutletDBTemp, LoadSideAirOutletEnth );
+		LoadSideOutletHumRat = PsyWFnTdbH( LoadSideOutletDBTemp, LoadSideAirOutletEnth, BlankString );
 		SourceSideOutletTemp = SourceSideInletTemp + QSource / ( SourceSideMassFlowRate * CpWater );
 
 		// Actual outlet conditions are "average" for time step
@@ -1922,7 +1923,7 @@ namespace WaterToAirHeatPump {
 		//calculate coil outlet state variables
 		LoadSideAirOutletEnth = LoadSideAirInletEnth + QLoadTotal / LoadSideMassFlowRate;
 		LoadSideOutletDBTemp = LoadSideInletDBTemp + QLoadTotal / ( LoadSideMassFlowRate * CpAir );
-		LoadSideOutletHumRat = PsyWFnTdbH( LoadSideOutletDBTemp, LoadSideAirOutletEnth );
+		LoadSideOutletHumRat = PsyWFnTdbH( LoadSideOutletDBTemp, LoadSideAirOutletEnth, BlankString );
 		SourceSideOutletTemp = SourceSideInletTemp - QSource / ( SourceSideMassFlowRate * CpWater );
 
 		// Calculate actual outlet conditions for the run time fraction

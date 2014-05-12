@@ -146,6 +146,7 @@ namespace LowTempRadiantSystem {
 	Real64 HighTempCooling( 200.0 ); // Used to indicate that a user does not have a cooling control temperature
 
 	static std::string const fluidNameWater( "WATER" );
+	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -2422,7 +2423,7 @@ namespace LowTempRadiantSystem {
 			// A safety parameter is added (hardwired parameter) to avoid getting too close to condensation
 			// conditions.
 			HydrRadSys( RadSysNum ).CondCausedShutDown = false;
-			DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( ZoneNum ), OutBaroPress );
+			DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( ZoneNum ), OutBaroPress, BlankString );
 
 			if ( ( OperatingMode == CoolingMode ) && ( HydrRadSys( RadSysNum ).CondCtrlType == CondCtrlSimpleOff ) ) {
 
@@ -3468,7 +3469,7 @@ namespace LowTempRadiantSystem {
 			// A safety parameter is added (hardwired parameter) to avoid getting too close to condensation
 			// conditions.
 			CFloRadSys( RadSysNum ).CondCausedShutDown = false;
-			DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( CFloRadSys( RadSysNum ).ZonePtr ), OutBaroPress );
+			DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( CFloRadSys( RadSysNum ).ZonePtr ), OutBaroPress, BlankString );
 
 			if ( ( OperatingMode == CoolingMode ) && ( CFloRadSys( RadSysNum ).CondCtrlType == CondCtrlSimpleOff ) ) {
 

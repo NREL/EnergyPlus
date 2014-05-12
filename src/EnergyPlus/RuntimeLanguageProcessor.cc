@@ -74,6 +74,8 @@ namespace RuntimeLanguageProcessor {
 	int const ParenthesisLeft( 10 ); // indicates left side parenthesis found in parsing
 	int const ParenthesisRight( 11 ); // indicates right side parenthesis found in parsing
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE TYPE DECLARATIONS:
@@ -2267,7 +2269,7 @@ namespace RuntimeLanguageProcessor {
 			} else if ( SELECT_CASE_var == FuncHFnTdbW ) {
 				ReturnValue = SetErlValueNumber( PsyHFnTdbW( Operand( 1 ).Number, Operand( 2 ).Number ) ); // result =>  enthalpy (J/kg) | drybulb (C) | Humidity ratio (kg water vapor/kg dry air) // *&^unique^&* "EMS Built-In Function"
 			} else if ( SELECT_CASE_var == FuncHFnTdbRhPb ) {
-				ReturnValue = SetErlValueNumber( PsyHFnTdbRhPb( Operand( 1 ).Number, Operand( 2 ).Number, Operand( 3 ).Number ) ); // result =>  enthalpy (J/kg) | drybulb (C) | relative humidity value (0.0 - 1.0) | pressure (Pa) // *&^unique^&* "EMS Built-In Function"
+				ReturnValue = SetErlValueNumber( PsyHFnTdbRhPb( Operand( 1 ).Number, Operand( 2 ).Number, Operand( 3 ).Number, EMSBuiltInFunction ) ); // result =>  enthalpy (J/kg) | drybulb (C) | relative humidity value (0.0 - 1.0) | pressure (Pa)
 			} else if ( SELECT_CASE_var == FuncTdbFnHW ) {
 				ReturnValue = SetErlValueNumber( PsyTdbFnHW( Operand( 1 ).Number, Operand( 2 ).Number ) ); // result =>  dry-bulb temperature {C} | enthalpy (J/kg) | Humidity ratio (kg water vapor/kg dry air) // *&^unique^&* "EMS Built-In Function"
 			} else if ( SELECT_CASE_var == FuncRhovFnTdbRh ) {
@@ -2527,7 +2529,6 @@ namespace RuntimeLanguageProcessor {
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
 		static std::string const RoutineName( "GetRuntimeLanguageUserInput: " );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:

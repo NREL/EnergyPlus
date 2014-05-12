@@ -68,7 +68,7 @@ namespace MicroturbineElectricGenerator {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
-	std::string const Blank;
+	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -408,7 +408,7 @@ namespace MicroturbineElectricGenerator {
 			} else {
 				//      Barometric pressure adjusted for elevation
 				RefBaroPressure = 101325.0 * std::pow( ( 1.0 - 2.25577e-05 * MTGenerator( GeneratorNum ).RefElevation ), 5.2559 );
-				MTGenerator( GeneratorNum ).RefCombustAirInletDensity = PsyRhoAirFnPbTdbW( RefBaroPressure, MTGenerator( GeneratorNum ).RefCombustAirInletTemp, MTGenerator( GeneratorNum ).RefCombustAirInletHumRat );
+				MTGenerator( GeneratorNum ).RefCombustAirInletDensity = PsyRhoAirFnPbTdbW( RefBaroPressure, MTGenerator( GeneratorNum ).RefCombustAirInletTemp, MTGenerator( GeneratorNum ).RefCombustAirInletHumRat, BlankString );
 			}
 
 			MTGenerator( GeneratorNum ).ElecPowFTempElevCurveNum = GetCurveIndex( AlphArray( 2 ) ); // Convert curve name to number
@@ -1741,7 +1741,7 @@ namespace MicroturbineElectricGenerator {
 			//     Calculate exhaust air mass flow, accounting for temperature and PLR modifier factors
 			ExhAirMassFlowRate = MTGenerator( GeneratorNum ).RefExhaustAirMassFlowRate * ExhFlowFTemp * ExhFlowFPLR;
 			//     Adjust for difference in air density at reference conditions versus actual inlet air conditions
-			AirDensity = PsyRhoAirFnPbTdbW( CombustionAirInletPress, CombustionAirInletTemp, CombustionAirInletW );
+			AirDensity = PsyRhoAirFnPbTdbW( CombustionAirInletPress, CombustionAirInletTemp, CombustionAirInletW, BlankString );
 			if ( MTGenerator( GeneratorNum ).RefCombustAirInletDensity >= 0.0 ) {
 				ExhAirMassFlowRate = max( 0.0, ExhAirMassFlowRate * AirDensity / MTGenerator( GeneratorNum ).RefCombustAirInletDensity );
 			} else {

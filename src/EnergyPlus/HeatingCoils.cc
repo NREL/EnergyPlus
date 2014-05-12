@@ -88,6 +88,8 @@ namespace HeatingCoils {
 	Real64 const MinAirMassFlow( 0.001 );
 	int NumDesuperheaterCoil; // Total number of desuperheater heating coil objects in input
 
+	static std::string const BlankString;
+
 	// reclaim heat object types
 	int const COMPRESSORRACK_REFRIGERATEDCASE( 1 );
 	int const COIL_DX_COOLING( 2 );
@@ -168,7 +170,7 @@ namespace HeatingCoils {
 		// in a unitary system
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -204,7 +206,7 @@ namespace HeatingCoils {
 					ShowFatalError( "SimulateHeatingCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Number of Heating Coils=" + TrimSigDigits( NumHeatingCoils ) + ", Coil name=" + CompName );
 				}
 				if ( CheckEquipName( CoilNum ) ) {
-					if ( CompName != Blank && CompName != HeatingCoil( CoilNum ).Name ) {
+					if ( CompName != BlankString && CompName != HeatingCoil( CoilNum ).Name ) {
 						ShowFatalError( "SimulateHeatingCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + HeatingCoil( CoilNum ).Name );
 					}
 					CheckEquipName( CoilNum ) = false;

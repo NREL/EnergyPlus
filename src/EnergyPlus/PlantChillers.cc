@@ -89,6 +89,8 @@ namespace PlantChillers {
 	int const NotModulated( 202 );
 	int const LeavingSetPointModulated( 203 );
 
+	static std::string const BlankString;
+
 	// MODULE VARIABLE DECLARATIONS:
 	int NumElectricChillers( 0 ); // number of Electric chillers specified in input
 	Real64 CondMassFlowRate( 0.0 ); // Kg/s - condenser mass flow rate, water side
@@ -4278,7 +4280,7 @@ namespace PlantChillers {
 		} else if ( ElectricChiller( ChillNum ).Base.CondenserType == EvapCooled ) { //Condenser inlet temp = (outdoor wet bulb)
 			Node( CondInletNode ).Temp = Node( CondInletNode ).OutAirWetBulb;
 			//  line above assumes evaporation pushes condenser inlet air humidity ratio to saturation
-			CondOutletHumRat = PsyWFnTdbTwbPb( Node( CondInletNode ).Temp, Node( CondInletNode ).Temp, Node( CondInletNode ).Press );
+			CondOutletHumRat = PsyWFnTdbTwbPb( Node( CondInletNode ).Temp, Node( CondInletNode ).Temp, Node( CondInletNode ).Press, BlankString );
 			//  Warn user if evap condenser wet bulb temperature falls below 10C
 			if ( Node( CondInletNode ).Temp < 10.0 && ! WarmupFlag ) {
 				ElectricChiller( ChillNum ).Base.PrintMessage = true;

@@ -71,7 +71,7 @@ namespace PipeHeatTransfer {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	std::string const Blank;
+	static std::string const BlankString;
 
 	int const None( 0 );
 	int const ZoneEnv( 1 );

@@ -93,6 +93,7 @@ namespace ChillerAbsorption {
 	Real64 QCondenser( 0.0 ); // W - rate of heat transfer to the condenser coil
 	Real64 CondenserEnergy( 0.0 ); // J - heat transfer to the condenser coil
 
+	static std::string const BlankString;
 	static std::string const fluidNameSteam( "STEAM" );
 	static std::string const fluidNameWater( "WATER" );
 	static std::string const moduleObjectType( "Chiller:Absorption" );
@@ -281,7 +282,6 @@ namespace ChillerAbsorption {
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
 		static std::string const RoutineName( "GetBLASTAbsorberInput: " ); // include trailing blank space
 
 		//LOCAL VARIABLES
@@ -352,7 +352,7 @@ namespace ChillerAbsorption {
 			if ( NumAlphas > 8 ) {
 				if ( SameString( cAlphaArgs( 9 ), "HotWater" ) || SameString( cAlphaArgs( 9 ), "HotWater" ) ) {
 					BLASTAbsorber( AbsorberNum ).GenHeatSourceType = NodeType_Water;
-				} else if ( SameString( cAlphaArgs( 9 ), "Steam" ) || SameString( cAlphaArgs( 9 ), Blank ) ) {
+				} else if ( SameString( cAlphaArgs( 9 ), "Steam" ) || SameString( cAlphaArgs( 9 ), BlankString ) ) {
 					BLASTAbsorber( AbsorberNum ).GenHeatSourceType = NodeType_Steam;
 				} else {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 9 ) + '=' + cAlphaArgs( 9 ) );
