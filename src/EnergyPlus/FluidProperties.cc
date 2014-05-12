@@ -5299,7 +5299,7 @@ namespace FluidProperties {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const TempToler( 0.001 ); // Some reasonable value for comparisons
+		static Real64 const TempToler( 0.001 ); // Some reasonable value for comparisons
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na

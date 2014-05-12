@@ -591,6 +591,7 @@ namespace RefrigeratedCase {
 		static std::string const TrackMessage( "from refrigerated case" );
 		static std::string const RoutineName( "GetRefrigerationInput: " );
 		static std::string const TrackMessageAlt( "GetInput in RefrigeratedCase" );
+		static std::string const RoutineNameNoColon( "GetRefrigerationInput" );
 
 		int const AlwaysOn( -1 ); // -1 pointer sent to schedule manager returns a value of 1.0
 		//unused INTEGER, Parameter   ::  InputTypeSecond = 1  ! Indicator that flow used to specify capacity of secondary heat exchanger
@@ -5353,7 +5354,7 @@ namespace RefrigeratedCase {
 						CompNum = TransSystem( TransRefrigSysNum ).CompressorNumHP( CompIndex );
 
 						if ( Compressor( CompNum ).TransFlag ) { //  Calculate nominal capacity of transcritical Compressor
-							GCOutletH = GetSupHeatEnthalpyRefrig( TransSystem( TransRefrigSysNum ).RefrigerantName, GasCooler( TransSystem( TransRefrigSysNum ).GasCoolerNum( 1 ) ).RatedOutletT, GasCooler( TransSystem( TransRefrigSysNum ).GasCoolerNum( 1 ) ).RatedOutletP, RefrigIndex, "GetRefrigerationInput" );
+							GCOutletH = GetSupHeatEnthalpyRefrig( TransSystem( TransRefrigSysNum ).RefrigerantName, GasCooler( TransSystem( TransRefrigSysNum ).GasCoolerNum( 1 ) ).RatedOutletT, GasCooler( TransSystem( TransRefrigSysNum ).GasCoolerNum( 1 ) ).RatedOutletP, RefrigIndex, RoutineNameNoColon );
 							Compressor( CompNum ).NomCap = CurveValue( Compressor( CompNum ).TransCapacityCurvePtr, TransSystem( TransRefrigSysNum ).TEvapDesignMT, GCOutletH );
 							NominalTotalCompCapHP += Compressor( CompNum ).NomCap;
 							++Compressor( CompNum ).NumSysAttach;
@@ -5415,7 +5416,7 @@ namespace RefrigeratedCase {
 				}
 
 				// Check receiver temperature against minimum condensing temperature (from gas cooler input) and design evaporator temperatures
-				TransSystem( TransRefrigSysNum ).TReceiver = GetSatTemperatureRefrig( TransSystem( TransRefrigSysNum ).RefrigerantName, TransSystem( TransRefrigSysNum ).PReceiver, RefrigIndex, "GetRefrigerationInput" );
+				TransSystem( TransRefrigSysNum ).TReceiver = GetSatTemperatureRefrig( TransSystem( TransRefrigSysNum ).RefrigerantName, TransSystem( TransRefrigSysNum ).PReceiver, RefrigIndex, RoutineNameNoColon );
 				if ( TransSystem( TransRefrigSysNum ).TReceiver > GasCooler( TransSystem( TransRefrigSysNum ).GasCoolerNum( NumGasCoolers ) ).MinCondTemp ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + TransSystem( TransRefrigSysNum ).Name + ": The receiver temperature (" + RoundSigDigits( TransSystem( TransRefrigSysNum ).TReceiver, 2 ) + "C) is greater than the minimum condensing temperature specified for subcritical operation (" + RoundSigDigits( GasCooler( TransSystem( TransRefrigSysNum ).GasCoolerNum( NumGasCoolers ) ).MinCondTemp, 2 ) + "C)." );
 					ShowContinueError( "  The minimum condensing temperature will be set at 5C greater than the receiver temperature." );

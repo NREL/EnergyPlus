@@ -1233,7 +1233,7 @@ namespace WaterToAirHeatPump {
 
 					// Determine the Load Side and Source Side Saturated Temp (evaporating and condensing pressures)
 					SourceSidePressure = GetSatPressureRefrig( Refrigerant, SourceSideTemp, RefrigIndex, RoutineNameSourceSideTemp );
-					LoadSidePressure = GetSatPressureRefrig( Refrigerant, LoadSideTemp, RefrigIndex, "CalcWatertoAirHPCooling:LoadSideTemp" );
+					LoadSidePressure = GetSatPressureRefrig( Refrigerant, LoadSideTemp, RefrigIndex, RoutineNameLoadSideTemp );
 
 					if ( LoadSidePressure < LowPressCutoff && ! FirstHVACIteration ) {
 						if ( ! WarmupFlag ) {
@@ -1489,7 +1489,7 @@ namespace WaterToAirHeatPump {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "CalcWaterToAirHPHeating:CalcCompSuctionTemp" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1509,7 +1509,7 @@ namespace WaterToAirHeatPump {
 		RefrigIndex = int( Par()( 2 ) );
 		SuperHeatEnth = Par()( 3 );
 
-		CompSuctionEnth = GetSupHeatEnthalpyRefrig( Refrigerant, CompSuctionTemp, SuctionPr, RefrigIndex, "CalcWaterToAirHPHeating:CalcCompSuctionTemp" );
+		CompSuctionEnth = GetSupHeatEnthalpyRefrig( Refrigerant, CompSuctionTemp, SuctionPr, RefrigIndex, RoutineName );
 
 		// Calculate residual based on output calculation flag
 		Residuum = ( CompSuctionEnth - SuperHeatEnth ) / SuperHeatEnth;
