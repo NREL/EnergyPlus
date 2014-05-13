@@ -45,6 +45,41 @@ ConvertCaseToLower(
 std::string::size_type
 FindNonSpace( std::string const & String ); // String to be scanned
 
+inline
+double
+power( double baseValue, int exponentValue)
+{
+	double result = 1.0;
+	if ( exponentValue > 0)
+		for (int i = 0; i < exponentValue; i++)
+			result *= baseValue;
+	else
+		for (int i = 0; i > exponentValue; i--)
+			result /= baseValue;
+	return result;
+}
+
+inline
+double
+power( double baseValue, double exponentValue)
+{
+	return std::okpow( baseValue, exponentValue );
+}
+
+inline
+float
+power( float baseValue, float exponentValue)
+{
+	return std::okpow( baseValue, exponentValue );
+}
+
+inline
+long double
+power( long double baseValue, long double exponentValue)
+{
+	return std::okpow( baseValue, exponentValue );
+}
+
 bool
 env_var_on( std::string const & env_var_str );
 
@@ -111,9 +146,9 @@ ShowRecurringSevereErrorAtEnd(
 	Optional< Real64 const > ReportMaxOf = _, // Track and report the max of the values passed to this argument
 	Optional< Real64 const > ReportMinOf = _, // Track and report the min of the values passed to this argument
 	Optional< Real64 const > ReportSumOf = _, // Track and report the sum of the values passed to this argument
-	Optional_string_const ReportMaxUnits = _, // optional char string (<=15 length) of units for max value
-	Optional_string_const ReportMinUnits = _, // optional char string (<=15 length) of units for min value
-	Optional_string_const ReportSumUnits = _ // optional char string (<=15 length) of units for sum value
+	std::string const & ReportMaxUnits = "", // optional char string (<=15 length) of units for max value
+	std::string const & ReportMinUnits = "", // optional char string (<=15 length) of units for min value
+	std::string const & ReportSumUnits = "" // optional char string (<=15 length) of units for sum value
 );
 
 void
@@ -123,9 +158,9 @@ ShowRecurringWarningErrorAtEnd(
 	Optional< Real64 const > ReportMaxOf = _, // Track and report the max of the values passed to this argument
 	Optional< Real64 const > ReportMinOf = _, // Track and report the min of the values passed to this argument
 	Optional< Real64 const > ReportSumOf = _, // Track and report the sum of the values passed to this argument
-	Optional_string_const ReportMaxUnits = _, // optional char string (<=15 length) of units for max value
-	Optional_string_const ReportMinUnits = _, // optional char string (<=15 length) of units for min value
-	Optional_string_const ReportSumUnits = _ // optional char string (<=15 length) of units for sum value
+	std::string const & ReportMaxUnits = "", // optional char string (<=15 length) of units for max value
+	std::string const & ReportMinUnits = "", // optional char string (<=15 length) of units for min value
+	std::string const & ReportSumUnits = "" // optional char string (<=15 length) of units for sum value
 );
 
 void
@@ -135,9 +170,9 @@ ShowRecurringContinueErrorAtEnd(
 	Optional< Real64 const > ReportMaxOf = _, // Track and report the max of the values passed to this argument
 	Optional< Real64 const > ReportMinOf = _, // Track and report the min of the values passed to this argument
 	Optional< Real64 const > ReportSumOf = _, // Track and report the sum of the values passed to this argument
-	Optional_string_const ReportMaxUnits = _, // optional char string (<=15 length) of units for max value
-	Optional_string_const ReportMinUnits = _, // optional char string (<=15 length) of units for min value
-	Optional_string_const ReportSumUnits = _ // optional char string (<=15 length) of units for sum value
+	std::string const & ReportMaxUnits = "", // optional char string (<=15 length) of units for max value
+	std::string const & ReportMinUnits = "", // optional char string (<=15 length) of units for min value
+	std::string const & ReportSumUnits = "" // optional char string (<=15 length) of units for sum value
 );
 
 void
@@ -147,9 +182,9 @@ StoreRecurringErrorMessage(
 	Optional< Real64 const > ErrorReportMaxOf = _, // Track and report the max of the values passed to this argument
 	Optional< Real64 const > ErrorReportMinOf = _, // Track and report the min of the values passed to this argument
 	Optional< Real64 const > ErrorReportSumOf = _, // Track and report the sum of the values passed to this argument
-	Optional_string_const ErrorReportMaxUnits = _, // Units for "max" reporting
-	Optional_string_const ErrorReportMinUnits = _, // Units for "min" reporting
-	Optional_string_const ErrorReportSumUnits = _ // Units for "sum" reporting
+	std::string const & ErrorReportMaxUnits = "", // Units for "max" reporting
+	std::string const & ErrorReportMinUnits = "", // Units for "min" reporting
+	std::string const & ErrorReportSumUnits = "" // Units for "sum" reporting
 );
 
 void

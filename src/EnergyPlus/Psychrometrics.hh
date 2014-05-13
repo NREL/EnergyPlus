@@ -7,6 +7,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
+#include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -193,24 +194,26 @@ namespace Psychrometrics {
 		// USAGE:  hfg = PsyHfgAirFnWTdb(w,T)
 
 		// Return value
-		Real64 hfg; // result => heat of vaporization for moist air {J/kg}
+		// result => heat of vaporization for moist air {J/kg}
 
 		// Locals
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 hg; // enthalpy of the gas
-		Real64 hf; // enthalpy of the fluid
-		Real64 Temperature; // input temperature {Celsius} - corrected for >= 0C
+		// Real64 hg; // enthalpy of the gas
+		// Real64 hf; // enthalpy of the fluid
+		// Real64 Temperature; // input temperature {Celsius} - corrected for >= 0C
 
 		// This formulation currently does not use W since it returns results that are in J/kg and the
 		//  amount of energy is on a per unit of moisture basis.
 
-		Temperature = max( T, 0.0 );
-		hg = 2500940.0 + 1858.95 * Temperature;
-		hf = 4180.0 * Temperature;
-		hfg = hg - hf;
+		double Temperature = max( T, 0.0 ); // input temperature {Celsius} - corrected for >= 0C
+		// hg = 2500940.0 + 1858.95 * Temperature;
+		// hf = 4180.0 * Temperature;
+		// hfg = hg - hf;
+		return ( 2500940.0 + 1858.95 * Temperature ) - // enthalpy of the gas
+				( 4180.0 * Temperature ); // enthalpy of the fluid
 		//4/8/08 - pending comments      hfg = hg
 
-		return hfg;
+		// return hfg;
 	}
 
 	inline
@@ -279,17 +282,17 @@ namespace Psychrometrics {
 		// ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P100, EQN 32
 
 		// Return value
-		Real64 H; // enthalpy {J/kg}
+		// Real64 H; // enthalpy {J/kg}
 
 		// Locals
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 W; // humidity ratio
+		// Real64 W; // humidity ratio
 
 		//                           calculate enthalpy
 
-		W = max( dW, 1.0e-5 );
-		H = 1.00484e3 * TDB + W * ( 2.50094e6 + 1.85895e3 * TDB );
-		return H;
+		double W = max( dW, 1.0e-5 ); // humidity ratio
+		return 1.00484e3 * TDB + W * ( 2.50094e6 + 1.85895e3 * TDB ); // enthalpy {J/kg}
+		// return H;
 	}
 
 	Real64
@@ -321,15 +324,15 @@ namespace Psychrometrics {
 		//   by inverting function PsyHFnTdbW
 
 		// Return value
-		Real64 TDB; // result=> dry-bulb temperature {C}
+		// Real64 TDB; // result=> dry-bulb temperature {C}
 
 		// Locals
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 W; // humidity ratio
+		// Real64 W; // humidity ratio
 
-		W = max( dW, 1.0e-5 );
-		TDB = ( H - 2.50094e6 * W ) / ( 1.00484e3 + 1.85895e3 * W );
-		return TDB;
+		double W = max( dW, 1.0e-5 ); // humidity ratio
+		return ( H - 2.50094e6 * W ) / ( 1.00484e3 + 1.85895e3 * W ); // result=> dry-bulb temperature {C}
+		// return TDB;
 	}
 
 	Real64
@@ -560,7 +563,7 @@ namespace Psychrometrics {
 		//     Density of water [kg/m3]
 		//     (RANGE: KelvinConv - 423.15 DEG. K) (convert to C first)
 
-		return 1000.1207 + 8.3215874e-04 * TB - 4.929976e-03 * ( TB * TB ) + 8.4791863e-06 * ( TB * TB * TB );
+		return 1000.1207 + 8.3215874e-04 * TB - 4.929976e-03 * std::pow( TB, 2 ) + 8.4791863e-06 * std::pow( TB, 3 );
 	}
 
 	//     NOTICE

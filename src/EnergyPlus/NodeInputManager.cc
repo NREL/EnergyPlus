@@ -1094,6 +1094,7 @@ namespace NodeInputManager {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcMoreNodeInfo" );
+		static std::string const NodeReportingCalc( "NodeReportingCalc:" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1112,6 +1113,8 @@ namespace NodeInputManager {
 		static FArray1D_int NodeRelHumiditySchedPtr;
 		static FArray1D_bool NodeDewPointRepReq;
 		static FArray1D_int NodeDewPointSchedPtr;
+		static std::vector<std::string> nodeReportingStrings;
+		static std::vector<std::string> nodeFluidNames;
 		bool ReportWetBulb;
 		bool ReportRelHumidity;
 		bool ReportDewPoint;
@@ -1120,8 +1123,6 @@ namespace NodeInputManager {
 		Real64 RhoAirCurrent; // temporary value for current air density f(baro, db , W)
 		//  REAL(r64)     :: rRhoVapor
 		//  INTEGER,save :: Count=0
-		std::string NodeReportingString;
-		std::string FluidName;
 		Real64 rho;
 		Real64 Cp;
 		Real64 rhoStd;
@@ -1135,6 +1136,8 @@ namespace NodeInputManager {
 			NodeRelHumiditySchedPtr.allocate( NumOfNodes );
 			NodeDewPointRepReq.allocate( NumOfNodes );
 			NodeDewPointSchedPtr.allocate( NumOfNodes );
+			nodeReportingStrings.reserve( NumOfNodes );
+			nodeFluidNames.reserve( NumOfNodes );
 			NodeWetBulbRepReq = false;
 			NodeWetBulbSchedPtr = 0;
 			NodeRelHumidityRepReq = false;
@@ -1143,36 +1146,29 @@ namespace NodeInputManager {
 			NodeDewPointSchedPtr = 0;
 
 			for ( iNode = 1; iNode <= NumOfNodes; ++iNode ) {
+				nodeReportingStrings.push_back( std::string( NodeReportingCalc + NodeID( iNode ) ) );
+				nodeFluidNames.push_back( GetGlycolNameByIndex( Node( iNode ).FluidIndex ) );
 				for ( iReq = 1; iReq <= NumOfReqVariables; ++iReq ) {
-					if ( SameString( ReqRepVars( iReq ).VarName, "System Node Wetbulb Temperature" ) && ( SameString( ReqRepVars( iReq ).Key, NodeID( iNode ) ) || SameString( ReqRepVars( iReq ).Key, BlankString ) ) ) {
-						NodeWetBulbRepReq( iNode ) = true;
-						NodeWetBulbSchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
-						break;
-					}
-				}
-			}
-			for ( iNode = 1; iNode <= NumOfNodes; ++iNode ) {
-				for ( iReq = 1; iReq <= NumOfReqVariables; ++iReq ) {
-					if ( SameString( ReqRepVars( iReq ).VarName, "System Node Relative Humidity" ) && ( SameString( ReqRepVars( iReq ).Key, NodeID( iNode ) ) || SameString( ReqRepVars( iReq ).Key, BlankString ) ) ) {
-						NodeRelHumidityRepReq( iNode ) = true;
-						NodeRelHumiditySchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
-						break;
-					}
-				}
-			}
-			for ( iNode = 1; iNode <= NumOfNodes; ++iNode ) {
-				for ( iReq = 1; iReq <= NumOfReqVariables; ++iReq ) {
-					if ( SameString( ReqRepVars( iReq ).VarName, "System Node Dewpoint Temperature" ) && ( SameString( ReqRepVars( iReq ).Key, NodeID( iNode ) ) || SameString( ReqRepVars( iReq ).Key, BlankString ) ) ) {
-						NodeDewPointRepReq( iNode ) = true;
-						NodeDewPointSchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
-						break;
+					if( SameString( ReqRepVars( iReq ).Key, NodeID( iNode ) ) || SameString( ReqRepVars( iReq ).Key, BlankString ) ) {
+						if( SameString( ReqRepVars( iReq ).VarName, "System Node Wetbulb Temperature" ) ) {
+							NodeWetBulbRepReq( iNode ) = true;
+							NodeWetBulbSchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
+						}
+						else if( SameString( ReqRepVars( iReq ).VarName, "System Node Relative Humidity" ) ) {
+							NodeRelHumidityRepReq( iNode ) = true;
+							NodeRelHumiditySchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
+						}
+						else if( SameString( ReqRepVars( iReq ).VarName, "System Node Dewpoint Temperature" ) ) {
+							NodeDewPointRepReq( iNode ) = true;
+							NodeDewPointSchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
+						}
 					}
 				}
 			}
 			MyOneTimeFlag = false;
 		}
+
 		for ( iNode = 1; iNode <= NumOfNodes; ++iNode ) {
-			NodeReportingString = "NodeReportingCalc:" + NodeID( iNode );
 			ReportWetBulb = false;
 			ReportRelHumidity = false;
 			ReportDewPoint = false;
@@ -1203,7 +1199,7 @@ namespace NodeInputManager {
 				MoreNodeInfo( iNode ).ReportEnthalpy = PsyHFnTdbW( Node( iNode ).Temp, Node( iNode ).HumRat );
 				if ( ReportWetBulb ) {
 					// if Node%Press was reliable could be used here.
-					MoreNodeInfo( iNode ).WetBulbTemp = PsyTwbFnTdbWPb( Node( iNode ).Temp, Node( iNode ).HumRat, OutBaroPress, NodeReportingString );
+					MoreNodeInfo( iNode ).WetBulbTemp = PsyTwbFnTdbWPb( Node( iNode ).Temp, Node( iNode ).HumRat, OutBaroPress, nodeReportingStrings[iNode - 1] );
 				} else {
 					MoreNodeInfo( iNode ).WetBulbTemp = 0.0;
 				}
@@ -1215,7 +1211,7 @@ namespace NodeInputManager {
 				if ( ReportRelHumidity ) {
 					// if Node%Press was reliable could be used here.
 					// following routines don't issue psych errors and may be more reliable.
-					MoreNodeInfo( iNode ).RelHumidity = 100.0 * PsyRhFnTdbWPb( Node( iNode ).Temp, Node( iNode ).HumRat, OutBaroPress, NodeReportingString );
+					MoreNodeInfo( iNode ).RelHumidity = 100.0 * PsyRhFnTdbWPb( Node( iNode ).Temp, Node( iNode ).HumRat, OutBaroPress, nodeReportingStrings[iNode - 1] );
 					//        rRhoVapor=PsyRhovFnTdbWPb(Node(iNode)%Temp,Node(iNode)%HumRat,OutBaroPress,'NodeReportingCalc:'//TRIM(NodeID(iNode)))
 					//        MoreNodeInfo(iNode)%RelHumidity = 100.0 * PsyRhFnTdbRhov(Node(iNode)%Temp,rRhoVapor,  &
 					//              'NodeReportingCalc:'//TRIM(NodeID(iNode)))
@@ -1230,10 +1226,9 @@ namespace NodeInputManager {
 					rhoStd = RhoWaterStdInit;
 					Cp = CPCW( Node( iNode ).Temp );
 				} else {
-					FluidName = GetGlycolNameByIndex( Node( iNode ).FluidIndex );
-					Cp = GetSpecificHeatGlycol( FluidName, Node( iNode ).Temp, Node( iNode ).FluidIndex, NodeReportingString );
-					rhoStd = GetDensityGlycol( FluidName, InitConvTemp, Node( iNode ).FluidIndex, NodeReportingString );
-					rho = GetDensityGlycol( FluidName, Node( iNode ).Temp, Node( iNode ).FluidIndex, NodeReportingString );
+					Cp = GetSpecificHeatGlycol( nodeFluidNames[iNode - 1], Node( iNode ).Temp, Node( iNode ).FluidIndex, nodeReportingStrings[iNode - 1] );
+					rhoStd = GetDensityGlycol( nodeFluidNames[iNode - 1], InitConvTemp, Node( iNode ).FluidIndex, nodeReportingStrings[iNode - 1] );
+					rho = GetDensityGlycol( nodeFluidNames[iNode - 1], Node( iNode ).Temp, Node( iNode ).FluidIndex, nodeReportingStrings[iNode - 1] );
 				}
 
 				MoreNodeInfo( iNode ).VolFlowRateStdRho = Node( iNode ).MassFlowRate / rhoStd;

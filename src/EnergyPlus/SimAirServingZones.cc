@@ -2682,8 +2682,8 @@ namespace SimAirServingZones {
 		// SUBROUTINE LOCAL VARIABLE DEFINITIONS: None
 		int BranchNum; // Branch DO loop index
 		int CompNum; // Component DO loop index
-		std::string CompType; // Component type
-		std::string CompName; // Component name
+		// std::string CompType; // Component type
+		// std::string CompName; // Component name
 		int CompType_Num; // Numeric equivalent for CompType
 
 		for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNum ).NumBranches; ++BranchNum ) { // loop over all branches in air system
@@ -2695,12 +2695,12 @@ namespace SimAirServingZones {
 
 			// Loop over components in branch
 			for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-				CompType = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf;
-				CompName = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).Name;
+				// CompType = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf;
+				// CompName = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).Name;
 				CompType_Num = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num;
 
 				// Simulate each component on PrimaryAirSystem(AirLoopNum)%Branch(BranchNum)%Name
-				SimAirLoopComponent( CompName, CompType_Num, FirstHVACIteration, AirLoopNum, PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).CompIndex );
+				SimAirLoopComponent( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).Name, CompType_Num, FirstHVACIteration, AirLoopNum, PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).CompIndex );
 			} // End of component loop
 
 			// Enforce continuity through the splitter

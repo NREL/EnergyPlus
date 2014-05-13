@@ -5273,7 +5273,6 @@ namespace FluidProperties {
 		Real64 const Xhi // value of property at Thi
 	)
 	{
-
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Rick Strand
 		//       DATE WRITTEN   June 2004
@@ -5293,7 +5292,7 @@ namespace FluidProperties {
 		// na
 
 		// Return value
-		Real64 ReturnValue;
+		// na
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -5312,14 +5311,11 @@ namespace FluidProperties {
 
 		// FLOW:
 		if ( std::abs( Thi - Tlo ) > TempToler ) {
-			ReturnValue = Xhi - ( ( ( Thi - Tact ) / ( Thi - Tlo ) ) * ( Xhi - Xlo ) );
+			return Xhi - ( ( ( Thi - Tact ) / ( Thi - Tlo ) ) * ( Xhi - Xlo ) );
 		} else {
 			ShowFatalError( "GetInterpValue: Temperatures for fluid property data too close together, division by zero" );
-			ReturnValue = 0.0;
+			return 0.0;
 		}
-
-		return ReturnValue;
-
 	}
 
 	//*****************************************************************************
@@ -5582,7 +5578,6 @@ namespace FluidProperties {
 	std::string
 	GetGlycolNameByIndex( int const Idx ) // carries in substance index
 	{
-
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Edwin Lee
 		//       DATE WRITTEN   May 2009
@@ -5608,7 +5603,7 @@ namespace FluidProperties {
 		// na
 
 		// Return value
-		std::string GetGlycolNameByIndex;
+		// na
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -5631,13 +5626,10 @@ namespace FluidProperties {
 		//  ArrayLength = SIZE(GlycolData)
 
 		if ( Idx > 0 && Idx <= NumOfGlycols ) {
-			GetGlycolNameByIndex = GlycolData( Idx ).Name;
+			return GlycolData( Idx ).Name;
 		} else { // return blank - error checking in calling proceedure
-			GetGlycolNameByIndex = "";
+			return "";
 		}
-
-		return GetGlycolNameByIndex;
-
 	}
 
 	//*****************************************************************************
