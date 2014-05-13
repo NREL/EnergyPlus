@@ -1404,8 +1404,8 @@ namespace PlantHeatExchangerFluidToFluid {
 			if ( SELECT_CASE_var == CrossFlowBothUnMixed ) {
 				NTU = FluidHX( CompNum ).UA / MinCapRate;
 				CapRatio = MinCapRate / MaxCapRate;
-				ExpCheckValue1 = std::pow( NTU, 0.22 ) / CapRatio;
-				ExpCheckValue2 = -CapRatio * std::pow( NTU, 0.78 );
+				ExpCheckValue1 = power( NTU, 0.22 ) / CapRatio;
+				ExpCheckValue2 = -CapRatio * power( NTU, 0.78 );
 				if ( ( ExpCheckValue1 > EXP_UpperLimit ) || ( ExpCheckValue2 > EXP_UpperLimit ) ) {
 					if ( -NTU >= EXP_LowerLimit ) {
 						Effectiveness = 1.0 - std::exp( -NTU );
@@ -1414,7 +1414,7 @@ namespace PlantHeatExchangerFluidToFluid {
 						Effectiveness = 1.0;
 					}
 				} else {
-					Effectiveness = 1.0 - std::exp( ( std::pow( NTU, 0.22 ) / CapRatio ) * ( std::exp( -CapRatio * std::pow( NTU, 0.78 ) ) - 1.0 ) );
+					Effectiveness = 1.0 - std::exp( ( power( NTU, 0.22 ) / CapRatio ) * ( std::exp( -CapRatio * power( NTU, 0.78 ) ) - 1.0 ) );
 					Effectiveness = min( 1.0, Effectiveness );
 				}
 

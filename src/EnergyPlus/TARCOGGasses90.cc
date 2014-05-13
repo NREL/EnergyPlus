@@ -7,6 +7,7 @@
 #include <TARCOGGasses90.hh>
 #include <DataGlobals.hh>
 #include <TARCOGGassesParams.hh>
+#include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -130,14 +131,14 @@ namespace TARCOGGasses90 {
 		//Simon: remove this when assigned properly
 		grho = 0.0;
 
-		fcon( 1 ) = xgcon( iprop( 1 ), 1 ) + xgcon( iprop( 1 ), 2 ) * tmean + xgcon( iprop( 1 ), 3 ) * std::pow( tmean, 2 );
-		fvis( 1 ) = xgvis( iprop( 1 ), 1 ) + xgvis( iprop( 1 ), 2 ) * tmean + xgvis( iprop( 1 ), 3 ) * std::pow( tmean, 2 );
-		fcp( 1 ) = xgcp( iprop( 1 ), 1 ) + xgcp( iprop( 1 ), 2 ) * tmean + xgcp( iprop( 1 ), 3 ) * std::pow( tmean, 2 );
+		fcon( 1 ) = xgcon( iprop( 1 ), 1 ) + xgcon( iprop( 1 ), 2 ) * tmean + xgcon( iprop( 1 ), 3 ) * power( tmean, 2 );
+		fvis( 1 ) = xgvis( iprop( 1 ), 1 ) + xgvis( iprop( 1 ), 2 ) * tmean + xgvis( iprop( 1 ), 3 ) * power( tmean, 2 );
+		fcp( 1 ) = xgcp( iprop( 1 ), 1 ) + xgcp( iprop( 1 ), 2 ) * tmean + xgcp( iprop( 1 ), 3 ) * power( tmean, 2 );
 		// Density using ideal gas law: rho=(presure*mol. weight)/(gas const*Tmean)
 		fdens( 1 ) = pres * xwght( iprop( 1 ) ) / ( UniversalGasConst * tmean );
 		// Mollecular weights in kg/kmol
 		if ( ( standard == EN673 ) || ( standard == EN673Design ) ) {
-			//fdens( 1 ) = xgrho( iprop( 1 ), 1 ) + xgrho( iprop( 1 ), 2 ) * tmean + xgrho( iprop( 1 ), 3 ) * std::pow( tmean, 2 ); //Autodesk:Uninit xgrho was uninitialized
+			//fdens( 1 ) = xgrho( iprop( 1 ), 1 ) + xgrho( iprop( 1 ), 2 ) * tmean + xgrho( iprop( 1 ), 3 ) * power( tmean, 2 ); //Autodesk:Uninit xgrho was uninitialized
 //			fdens( i ) = ENpressure * xwght( iprop( i ) ) / ( gaslaw * tmean );
 			fdens( 1 ) = ENpressure * xwght( iprop( 1 ) ) / ( gaslaw * tmean ); //Autodesk:Init Guess patch for line above (i is uninitialized)
 		}
@@ -166,12 +167,12 @@ namespace TARCOGGasses90 {
 					return;
 				}
 				// calculate properties of mixture constituents:
-				fcon( i ) = xgcon( iprop( i ), 1 ) + xgcon( iprop( i ), 2 ) * tmean + xgcon( iprop( i ), 3 ) * std::pow( tmean, 2.0 );
-				fvis( i ) = xgvis( iprop( i ), 1 ) + xgvis( iprop( i ), 2 ) * tmean + xgvis( iprop( i ), 3 ) * std::pow( tmean, 2.0 );
-				fcp( i ) = xgcp( iprop( i ), 1 ) + xgcp( iprop( i ), 2 ) * tmean + xgcp( iprop( i ), 3 ) * std::pow( tmean, 2.0 );
+				fcon( i ) = xgcon( iprop( i ), 1 ) + xgcon( iprop( i ), 2 ) * tmean + xgcon( iprop( i ), 3 ) * power( tmean, 2 );
+				fvis( i ) = xgvis( iprop( i ), 1 ) + xgvis( iprop( i ), 2 ) * tmean + xgvis( iprop( i ), 3 ) * power( tmean, 2 );
+				fcp( i ) = xgcp( iprop( i ), 1 ) + xgcp( iprop( i ), 2 ) * tmean + xgcp( iprop( i ), 3 ) * power( tmean, 2 );
 				fdens( i ) = pres * xwght( iprop( i ) ) / ( UniversalGasConst * tmean );
 				if ( ( standard == EN673 ) || ( standard == EN673Design ) ) {
-					//fdens( i ) = grho( iprop( i ), 1 ) + grho( iprop( i ), 2 ) * tmean + grho( iprop( i ), 3 ) * std::pow( tmean, 2 );
+					//fdens( i ) = grho( iprop( i ), 1 ) + grho( iprop( i ), 2 ) * tmean + grho( iprop( i ), 3 ) * power( tmean, 2 );
 					fdens( 1 ) = ENpressure * xwght( iprop( 1 ) ) / ( gaslaw * tmean ); // Density using ideal gas law: rho=(presure*mol. weight)/(gas const*Tmean)
 				}
 				molmix += frct( i ) * xwght( iprop( i ) ); // equation 56
@@ -188,24 +189,24 @@ namespace TARCOGGasses90 {
 				for ( i = 1; i <= nmix; ++i ) {
 					for ( j = 1; j <= nmix; ++j ) {
 						// numerator of equation 61
-						phimup = std::pow( ( 1.0 + std::pow( ( fvis( i ) / fvis( j ) ), 0.5 ) * std::pow( ( xwght( iprop( j ) ) / xwght( iprop( i ) ) ), 0.25 ) ), 2.0 );
+						phimup = power( ( 1.0 + power( ( fvis( i ) / fvis( j ) ), 0.5 ) * power( ( xwght( iprop( j ) ) / xwght( iprop( i ) ) ), 0.25 ) ), 2 );
 
 						// denominator of equation 61, 64 and 66
-						downer = 2.0 * std::sqrt( 2.0 ) * std::pow( ( 1.0 + ( xwght( iprop( i ) ) / xwght( iprop( j ) ) ) ), 0.5 );
+						downer = 2.0 * std::sqrt( 2.0 ) * power( ( 1.0 + ( xwght( iprop( i ) ) / xwght( iprop( j ) ) ) ), 0.5 );
 
 						// calculate the denominator of equation 60
 						if ( i != j ) mukpdwn( i ) += phimup / downer * frct( j ) / frct( i );
 
 						// numerator of equation 64, psiterm is the multiplied term in backets
-						psiup = std::pow( ( 1.0 + std::pow( ( kprime( i ) / kprime( j ) ), 0.5 ) * std::pow( ( xwght( iprop( i ) ) / xwght( iprop( j ) ) ), 0.25 ) ), 2.0 );
+						psiup = power( ( 1.0 + power( ( kprime( i ) / kprime( j ) ), 0.5 ) * power( ( xwght( iprop( i ) ) / xwght( iprop( j ) ) ), 0.25 ) ), 2 );
 
-						psiterm = 1.0 + 2.41 * ( xwght( iprop( i ) ) - xwght( iprop( j ) ) ) * ( xwght( iprop( i ) ) - 0.142 * xwght( iprop( j ) ) ) / std::pow( ( xwght( iprop( i ) ) + xwght( iprop( j ) ) ), 2.0 );
+						psiterm = 1.0 + 2.41 * ( xwght( iprop( i ) ) - xwght( iprop( j ) ) ) * ( xwght( iprop( i ) ) - 0.142 * xwght( iprop( j ) ) ) / power( ( xwght( iprop( i ) ) + xwght( iprop( j ) ) ), 2.0 );
 
 						// using the common denominator downer calculate the denominator for equation 63
 						if ( i != j ) kpdown( i ) += psiup * psiterm / downer * frct( j ) / frct( i );
 
 						// calculate the numerator of equation 66
-						phikup = std::pow( ( 1.0 + std::pow( ( kprime( i ) / kprime( j ) ), 0.5 ) * std::pow( ( xwght( iprop( i ) ) / xwght( iprop( j ) ) ), 0.25 ) ), 2.0 );
+						phikup = power( ( 1.0 + power( ( kprime( i ) / kprime( j ) ), 0.5 ) * power( ( xwght( iprop( i ) ) / xwght( iprop( j ) ) ), 0.25 ) ), 2 );
 
 						// using the common denominator downer calculat the denominator for equation 65
 						if ( i != j ) kdpdown( i ) += phikup / downer * frct( j ) / frct( i );
@@ -265,7 +266,7 @@ namespace TARCOGGasses90 {
 			return;
 		}
 
-		B = alpha * ( gama + 1 ) / ( gama - 1 ) * std::pow( ( UniversalGasConst / ( 8 * Pi * mwght * tmean ) ), 0.5 );
+		B = alpha * ( gama + 1 ) / ( gama - 1 ) * power( ( UniversalGasConst / ( 8 * Pi * mwght * tmean ) ), 0.5 );
 
 		cond = B * pressure;
 

@@ -727,10 +727,10 @@ namespace PipeHeatTransfer {
 			PipeHT( Item ).OutsideArea = Pi * ( PipeHT( Item ).PipeOD + 2 * PipeHT( Item ).InsulationThickness ) * PipeHT( Item ).Length / NumSections;
 
 			// cross sectional area
-			PipeHT( Item ).SectionArea = Pi * 0.25 * std::pow( PipeHT( Item ).PipeID, 2 );
+			PipeHT( Item ).SectionArea = Pi * 0.25 * power( PipeHT( Item ).PipeID, 2 );
 
 			// pipe & insulation mass
-			PipeHT( Item ).PipeHeatCapacity = PipeHT( Item ).PipeCp * PipeHT( Item ).PipeDensity * ( Pi * 0.25 * std::pow( PipeHT( Item ).PipeOD, 2 ) - PipeHT( Item ).SectionArea ); // the metal component
+			PipeHT( Item ).PipeHeatCapacity = PipeHT( Item ).PipeCp * PipeHT( Item ).PipeDensity * ( Pi * 0.25 * power( PipeHT( Item ).PipeOD, 2 ) - PipeHT( Item ).SectionArea ); // the metal component
 		}
 
 		// final error check
@@ -1527,7 +1527,7 @@ namespace PipeHeatTransfer {
 		static Real64 Cp( 0.0 ); // Placeholder for soil specific heat
 
 		// There are a number of coefficients which change through the simulation, and they are updated here
-		PipeHT( PipeHTNum ).FourierDS = PipeHT( PipeHTNum ).SoilDiffusivity * DeltaTime / ( std::pow( PipeHT( PipeHTNum ).dSregular, 2 ) ); //Eq. D4
+		PipeHT( PipeHTNum ).FourierDS = PipeHT( PipeHTNum ).SoilDiffusivity * DeltaTime / ( power( PipeHT( PipeHTNum ).dSregular, 2 ) ); //Eq. D4
 		PipeHT( PipeHTNum ).CoefA1 = PipeHT( PipeHTNum ).FourierDS / ( 1 + 4 * PipeHT( PipeHTNum ).FourierDS ); //Eq. D2
 		PipeHT( PipeHTNum ).CoefA2 = 1 / ( 1 + 4 * PipeHT( PipeHTNum ).FourierDS ); //Eq. D3
 
@@ -1570,7 +1570,7 @@ namespace PipeHeatTransfer {
 
 							// thermal radiation coefficient using surf temp from past time step
 							if ( std::abs( PastNodeTempAbs - SkyTempAbs ) > rTinyValue ) {
-								RadCoef = StefBoltzmann * TopThermAbs * ( ( std::pow( PastNodeTempAbs, 4 ) ) - ( std::pow( SkyTempAbs, 4 ) ) ) / ( PastNodeTempAbs - SkyTempAbs );
+								RadCoef = StefBoltzmann * TopThermAbs * ( ( power( PastNodeTempAbs, 4 ) ) - ( power( SkyTempAbs, 4 ) ) ) / ( PastNodeTempAbs - SkyTempAbs );
 							} else {
 								RadCoef = 0.0;
 							}
@@ -1946,7 +1946,7 @@ namespace PipeHeatTransfer {
 		} else { // Calculate the Nusselt number based on what flow regime one is in
 
 			if ( ReD >= MaxLaminarRe ) { // Turbulent flow --> use Colburn equation
-				NuD = 0.023 * ( std::pow( ReD, ( 0.8 ) ) ) * ( std::pow( PRactual, ( 1.0 / 3.0 ) ) );
+				NuD = 0.023 * ( power( ReD, ( 0.8 ) ) ) * ( power( PRactual, ( 1.0 / 3.0 ) ) );
 			} else { // Laminar flow --> use constant surface temperature relation
 				NuD = 3.66;
 			}
@@ -2098,7 +2098,7 @@ namespace PipeHeatTransfer {
 		}
 
 		// Calculate the Nusselt number
-		NuD = Coef * ( std::pow( ReD, ( rExp ) ) ) * ( std::pow( Pr, ( 1.0 / 3.0 ) ) );
+		NuD = Coef * ( power( ReD, ( rExp ) ) ) * ( power( Pr, ( 1.0 / 3.0 ) ) );
 
 		// If the wind speed is too small, we need to use natural convection behavior:
 		NuD = max( NuD, NaturalConvNusselt );
@@ -2140,7 +2140,7 @@ namespace PipeHeatTransfer {
 		Real64 TBND;
 
 		//Kusuda and Achenbach
-		TBND = PipeHT( PipeHTNum ).AvgGroundTemp - PipeHT( PipeHTNum ).AvgGndTempAmp * std::exp( -z * ( std::pow( ( Pi / ( 365.0 * PipeHT( PipeHTNum ).SoilDiffusivityPerDay ) ), ( 0.5 ) ) ) ) * std::cos( ( 2.0 * Pi / 365.0 ) * ( DayOfSim - PipeHT( PipeHTNum ).PhaseShiftDays - ( z / 2.0 ) * ( std::pow( ( 365.0 / ( Pi * PipeHT( PipeHTNum ).SoilDiffusivityPerDay ) ), ( 0.5 ) ) ) ) );
+		TBND = PipeHT( PipeHTNum ).AvgGroundTemp - PipeHT( PipeHTNum ).AvgGndTempAmp * std::exp( -z * ( power( ( Pi / ( 365.0 * PipeHT( PipeHTNum ).SoilDiffusivityPerDay ) ), ( 0.5 ) ) ) ) * std::cos( ( 2.0 * Pi / 365.0 ) * ( DayOfSim - PipeHT( PipeHTNum ).PhaseShiftDays - ( z / 2.0 ) * ( power( ( 365.0 / ( Pi * PipeHT( PipeHTNum ).SoilDiffusivityPerDay ) ), ( 0.5 ) ) ) ) );
 
 		return TBND;
 

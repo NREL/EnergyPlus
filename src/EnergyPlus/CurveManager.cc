@@ -3469,7 +3469,7 @@ Label999: ;
 			auto const V3s( V3 * V3 );
 			CurveValue = Tri2ndOrder.CoeffA0 + Tri2ndOrder.CoeffA1 * V1s + Tri2ndOrder.CoeffA2 * V1 + Tri2ndOrder.CoeffA3 * V2s + Tri2ndOrder.CoeffA4 * V2 + Tri2ndOrder.CoeffA5 * V3s + Tri2ndOrder.CoeffA6 * V3 + Tri2ndOrder.CoeffA7 * V1s * V2s + Tri2ndOrder.CoeffA8 * V1 * V2 + Tri2ndOrder.CoeffA9 * V1 * V2s + Tri2ndOrder.CoeffA10 * V1s * V2 + Tri2ndOrder.CoeffA11 * V1s * V3s + Tri2ndOrder.CoeffA12 * V1 * V3 + Tri2ndOrder.CoeffA13 * V1 * V3s + Tri2ndOrder.CoeffA14 * V1s * V3 + Tri2ndOrder.CoeffA15 * V2s * V3s + Tri2ndOrder.CoeffA16 * V2 * V3 + Tri2ndOrder.CoeffA17 * V2 * V3s + Tri2ndOrder.CoeffA18 * V2s * V3 + Tri2ndOrder.CoeffA19 * V1s * V2s * V3s + Tri2ndOrder.CoeffA20 * V1s * V2s * V3 + Tri2ndOrder.CoeffA21 * V1s * V2 * V3s + Tri2ndOrder.CoeffA22 * V1 * V2s * V3s + Tri2ndOrder.CoeffA23 * V1s * V2 * V3 + Tri2ndOrder.CoeffA24 * V1 * V2s * V3 + Tri2ndOrder.CoeffA25 * V1 * V2 * V3s + Tri2ndOrder.CoeffA26 * V1 * V2 * V3;
 		} else if ( SELECT_CASE_var == Exponent ) {
-			CurveValue = Curve.Coeff1 + Curve.Coeff2 * std::pow( V1, Curve.Coeff3 );
+			CurveValue = Curve.Coeff1 + Curve.Coeff2 * power( V1, Curve.Coeff3 );
 		} else if ( SELECT_CASE_var == FanPressureRise ) { //cpw22Aug2010 Added Fan Pressure Rise curve
 			CurveValue = V1 * ( Curve.Coeff1 * V1 + Curve.Coeff2 + Curve.Coeff3 * std::sqrt( V2 ) ) + Curve.Coeff4 * V2;
 		} else if ( SELECT_CASE_var == ExponentialSkewNormal ) { //cpw22Aug2010 Added Exponential Skew Normal curve
@@ -3483,7 +3483,7 @@ Label999: ;
 			CurveValue = CurveValueNumer / CurveValueDenom;
 		} else if ( SELECT_CASE_var == Sigmoid ) { //cpw22Aug2010 Added Sigmoid curve
 			CurveValueExp = std::exp( ( Curve.Coeff3 - V1 ) / Curve.Coeff4 );
-			CurveValue = Curve.Coeff1 + Curve.Coeff2 / ( std::pow( ( 1.0 + CurveValueExp ), Curve.Coeff5 ) );
+			CurveValue = Curve.Coeff1 + Curve.Coeff2 / ( power( ( 1.0 + CurveValueExp ), Curve.Coeff5 ) );
 		} else if ( SELECT_CASE_var == RectangularHyperbola1 ) { //cpw22Aug2010 Added Rectangular Hyperbola Type 1 curve
 			CurveValueNumer = Curve.Coeff1 * V1;
 			CurveValueDenom = Curve.Coeff2 + V1;
@@ -5395,7 +5395,7 @@ Label999: ;
 		ConstantF = PressureCurve( PressureCurveIndex ).ConstantF;
 
 		//Intermediate calculations
-		CrossSectArea = ( Pi / 4.0 ) * std::pow( Diameter, 2 );
+		CrossSectArea = ( Pi / 4.0 ) * power( Diameter, 2 );
 		Velocity = MassFlow / ( Density * CrossSectArea );
 		ReynoldsNumber = Density * Diameter * Velocity / Viscosity; //assuming mu here
 		RoughnessRatio = Roughness / Diameter;
@@ -5418,7 +5418,7 @@ Label999: ;
 		}
 
 		//Pressure drop calculation
-		PressureCurveValue = ( FrictionFactor * ( Length / Diameter ) + MinorLossCoeff ) * ( Density * std::pow( Velocity, 2 ) ) / 2.0;
+		PressureCurveValue = ( FrictionFactor * ( Length / Diameter ) + MinorLossCoeff ) * ( Density * power( Velocity, 2 ) ) / 2.0;
 
 		if ( PressureCurve( PressureCurveIndex ).EMSOverrideOn ) PressureCurveValue = PressureCurve( PressureCurveIndex ).EMSOverrideCurveValue;
 
@@ -5492,11 +5492,11 @@ Label999: ;
 		}
 
 		//Calculate the friction factor
-		Term1 = std::pow( ( RoughnessRatio / 3.7 ), ( 1.11 ) );
+		Term1 = power( ( RoughnessRatio / 3.7 ), ( 1.11 ) );
 		Term2 = 6.9 / ReynoldsNumber;
 		Term3 = -1.8 * std::log10( Term1 + Term2 );
 		if ( Term3 != 0.0 ) {
-			CalculateMoodyFrictionFactor = std::pow( Term3, ( -2.0 ) );
+			CalculateMoodyFrictionFactor = power( Term3, ( -2 ) );
 		} else {
 			if ( ! FrictionFactorErrorHasOccurred ) {
 				RR = RoundSigDigits( RoughnessRatio, 7 );

@@ -470,7 +470,7 @@ namespace EarthTube {
 				EarthTubeSys( Loop ).FanPower = EAMFL( NZ ) * EarthTubeSys( Loop ).FanPressure / ( EarthTubeSys( Loop ).FanEfficiency * AirDensity );
 			}
 
-			AverPipeAirVel = EVF( NZ ) / Pi / ( std::pow( EarthTubeSys( Loop ).r1, 2 ) );
+			AverPipeAirVel = EVF( NZ ) / Pi / ( power( EarthTubeSys( Loop ).r1, 2 ) );
 			AirMassFlowRate = EVF( NZ ) * AirDensity;
 
 			// Calculation of Average Ground Temperature between Depth z1 and z2 at time t
@@ -486,12 +486,12 @@ namespace EarthTube {
 			if ( Re <= 2300. ) {
 				Nu = 3.66;
 			} else if ( Re <= 4000. ) {
-				fa = std::pow( ( 1.58 * std::log( Re ) - 3.28 ), ( -2. ) );
-				Process1 = ( fa / 2.0 ) * ( Re - 1000.0 ) * Pr / ( 1.0 + 12.7 * ( std::pow( ( fa / 2.0 ), 0.5 ) ) * ( std::pow( Pr, ( 2.0 / 3.0 ) ) - 1.0 ) );
+				fa = power( ( 1.58 * std::log( Re ) - 3.28 ), ( -2 ) );
+				Process1 = ( fa / 2.0 ) * ( Re - 1000.0 ) * Pr / ( 1.0 + 12.7 * ( power( ( fa / 2.0 ), 0.5 ) ) * ( power( Pr, ( 2.0 / 3.0 ) ) - 1.0 ) );
 				Nu = ( Process1 - 3.66 ) / ( 1700. ) * Re + ( 4000. * 3.66 - 2300. * Process1 ) / 1700.;
 			} else {
-				fa = std::pow( ( 1.58 * std::log( Re ) - 3.28 ), ( -2. ) );
-				Nu = ( fa / 2.0 ) * ( Re - 1000.0 ) * Pr / ( 1.0 + 12.7 * ( std::pow( ( fa / 2.0 ), 0.5 ) ) * ( std::pow( Pr, ( 2.0 / 3.0 ) ) - 1.0 ) );
+				fa = power( ( 1.58 * std::log( Re ) - 3.28 ), ( -2 ) );
+				Nu = ( fa / 2.0 ) * ( Re - 1000.0 ) * Pr / ( 1.0 + 12.7 * ( power( ( fa / 2.0 ), 0.5 ) ) * ( power( Pr, ( 2.0 / 3.0 ) ) - 1.0 ) );
 			}
 			PipeHeatTransCoef = Nu * AirThermCond / 2. / EarthTubeSys( Loop ).r1;
 

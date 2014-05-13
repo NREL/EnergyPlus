@@ -766,10 +766,10 @@ namespace DisplacementVentMgr {
 			// The system will mix
 			HeightFrac = 0.0;
 		} else {
-			HeightFrac = min( 24.55 * std::pow( ( MCp_Total * 0.000833 / ( NumberOfPlumes * std::pow( PowerPerPlume, ( 1.0 / 3.0 ) ) ) ), 0.6 ) / CeilingHeight, 1.0 );
+			HeightFrac = min( 24.55 * power( ( MCp_Total * 0.000833 / ( NumberOfPlumes * power( PowerPerPlume, ( 1.0 / 3.0 ) ) ) ), 0.6 ) / CeilingHeight, 1.0 );
 			for ( Ctd = 1; Ctd <= 4; ++Ctd ) {
 				HcUCSDDV( ZoneNum, HeightFrac );
-				HeightFrac = min( 24.55 * std::pow( ( MCp_Total * 0.000833 / ( NumberOfPlumes * std::pow( PowerPerPlume, ( 1.0 / 3.0 ) ) ) ), 0.6 ) / CeilingHeight, 1.0 );
+				HeightFrac = min( 24.55 * power( ( MCp_Total * 0.000833 / ( NumberOfPlumes * power( PowerPerPlume, ( 1.0 / 3.0 ) ) ) ), 0.6 ) / CeilingHeight, 1.0 );
 				//EPTeam-replaces above (cause diffs)      HeightFrac = MIN(24.55d0*(MCp_Total*0.000833d0/(NumberOfPlumes*PowerPerPlume**(1.0d0/3.d0)))**0.6 / CeilingHeight , 1.0d0)
 				HeightTransition( ZoneNum ) = HeightFrac * CeilingHeight;
 				AIRRATFloor( ZoneNum ) = Zone( ZoneNum ).Volume * min( HeightTransition( ZoneNum ), HeightFloorSubzoneTop ) / CeilingHeight * ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATFloor( ZoneNum ), ZoneAirHumRat( ZoneNum ), BlankString ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATFloor( ZoneNum ) ) / ( TimeStepSys * SecInHour );
@@ -865,7 +865,7 @@ namespace DisplacementVentMgr {
 			}
 
 			// MinFlow for interface layer at z = 1.0
-			MinFlow = std::pow( ( 1.0 / 24.55 * 1.0 ), ( 1.0 / 0.6 ) ) * NumberOfPlumes * std::pow( PowerPerPlume, ( 1.0 / 3.0 ) );
+			MinFlow = power( ( 1.0 / 24.55 * 1.0 ), ( 1.0 / 0.6 ) ) * NumberOfPlumes * power( PowerPerPlume, ( 1.0 / 3.0 ) );
 			//EPTeam above replaces (cause diffs?)   MinFlow = (1.0d0/24.55d0*1.0d0)**(1.0d0/0.6d0)*NumberOfPlumes*PowerPerPlume**(1.0/3.0)
 			if ( MinFlow != 0.0 ) {
 				FracMinFlow( ZoneNum ) = MCp_Total * 0.000833 / MinFlow;

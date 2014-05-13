@@ -1571,7 +1571,7 @@ namespace HeatRecovery {
 			// calculate the UA for this time step
 			QuotSup = SafeDiv( ExchCond( ExNum ).mTSup0, UnitSupMassFlow * ( ExchCond( ExNum ).SupInTemp + KELVZERO ) );
 			QuotExh = SafeDiv( ExchCond( ExNum ).mTSec0, UnitSecMassFlow * ( ExchCond( ExNum ).SecInTemp + KELVZERO ) );
-			Deno = std::pow( QuotSup, 0.78 ) + ExchCond( ExNum ).hARatio * std::pow( QuotExh, 0.78 );
+			Deno = power( QuotSup, 0.78 ) + ExchCond( ExNum ).hARatio * power( QuotExh, 0.78 );
 			UA = ExchCond( ExNum ).UA0 * ( ExchCond( ExNum ).hARatio + 1.0 ) / Deno;
 			// calculate the NTU
 			CSup = UnitSupMassFlow * PsyCpAirFnWTdb( ExchCond( ExNum ).SupInHumRat, ExchCond( ExNum ).SupInTemp );
@@ -2922,7 +2922,7 @@ namespace HeatRecovery {
 				Temp = ( 1.0 + Z );
 				Eps = ( 1.0 - std::exp( -NTU * Temp ) ) / Temp;
 			} else if ( SELECT_CASE_var == Cross_Flow_Both_Unmixed ) { // CROSS FLOW BOTH UNMIXED
-				Temp = Z * std::pow( NTU, ( -0.22 ) );
+				Temp = Z * power( NTU, ( -0.22 ) );
 				Eps = 1.0 - std::exp( ( std::exp( -NTU * Temp ) - 1.0 ) / Temp );
 			} else if ( SELECT_CASE_var == Cross_Flow_Other ) { // CROSS FLOW, Cmax MIXED, Cmin UNMIXED
 				Eps = ( 1.0 - std::exp( -Z * ( 1.0 - std::exp( -NTU ) ) ) ) / Z;
@@ -3160,7 +3160,7 @@ namespace HeatRecovery {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		Residuum = 1.0 - std::exp( ( std::exp( -std::pow( NTU, 0.78 ) * Par()( 2 ) ) - 1.0 ) / Par()( 2 ) * std::pow( NTU, 0.22 ) ) - Par()( 1 );
+		Residuum = 1.0 - std::exp( ( std::exp( -power( NTU, 0.78 ) * Par()( 2 ) ) - 1.0 ) / Par()( 2 ) * power( NTU, 0.22 ) ) - Par()( 1 );
 
 		return Residuum;
 

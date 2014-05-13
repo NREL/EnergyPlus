@@ -9,6 +9,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
+#include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -248,7 +249,7 @@ namespace DataEnvironment {
 				if ( Z <= 0.0 ) {
 					LocalWindSpeed( i ) = 0.0;
 				} else {
-					LocalWindSpeed( i ) = WindSpeed * WeatherFileWindModCoeff * std::pow( ( Z / SiteWindBLHeight ), SiteWindExp );
+					LocalWindSpeed( i ) = WindSpeed * WeatherFileWindModCoeff * power( ( Z / SiteWindBLHeight ), SiteWindExp );
 				}
 			}
 		}

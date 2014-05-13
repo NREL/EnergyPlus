@@ -990,7 +990,7 @@ namespace EvaporativeCoolers {
 			//******************************************************************************
 			//   SAT EFF IS FOR DIFFERENT THICKNESS CELDEK PAD (CURVE FIT FROM DATA)
 			//******************************************************************************
-			SatEff = 0.792714 + 0.958569 * PadDepth - 0.25193 * AirVel - 1.03215 * std::pow( PadDepth, 2 ) + 2.62659e-2 * std::pow( AirVel, 2 ) + 0.914869 * PadDepth * AirVel - 1.48241 * AirVel * std::pow( PadDepth, 2 ) - 1.89919e-2 * std::pow( AirVel, 3 ) * PadDepth + 1.13137 * std::pow( PadDepth, 3 ) * AirVel + 3.27622e-2 * std::pow( AirVel, 3 ) * std::pow( PadDepth, 2 ) - 0.145384 * std::pow( PadDepth, 3 ) * std::pow( AirVel, 2 );
+			SatEff = 0.792714 + 0.958569 * PadDepth - 0.25193 * AirVel - 1.03215 * power( PadDepth, 2 ) + 2.62659e-2 * power( AirVel, 2 ) + 0.914869 * PadDepth * AirVel - 1.48241 * AirVel * power( PadDepth, 2 ) - 1.89919e-2 * power( AirVel, 3 ) * PadDepth + 1.13137 * power( PadDepth, 3 ) * AirVel + 3.27622e-2 * power( AirVel, 3 ) * power( PadDepth, 2 ) - 0.145384 * power( PadDepth, 3 ) * power( AirVel, 2 );
 
 			if ( SatEff >= 1.0 ) SatEff = 1.0;
 			if ( SatEff < 0.0 ) { // we have a serious problem.  Pad Area and/or depth not suitable for system air flow rates
@@ -1122,7 +1122,7 @@ namespace EvaporativeCoolers {
 			//******************************************************************************
 			//   SAT EFF IS FOR DIFFERENT THICKNESS CELDEK PAD (CURVE FIT FROM DATA)
 			//******************************************************************************
-			SatEff = 0.792714 + 0.958569 * PadDepth - 0.25193 * AirVel - 1.03215 * std::pow( PadDepth, 2 ) + 2.62659e-2 * std::pow( AirVel, 2 ) + 0.914869 * PadDepth * AirVel - 1.48241 * AirVel * std::pow( PadDepth, 2 ) - 1.89919e-2 * std::pow( AirVel, 3 ) * PadDepth + 1.13137 * std::pow( PadDepth, 3 ) * AirVel + 3.27622e-2 * std::pow( AirVel, 3 ) * std::pow( PadDepth, 2 ) - 0.145384 * std::pow( PadDepth, 3 ) * std::pow( AirVel, 2 );
+			SatEff = 0.792714 + 0.958569 * PadDepth - 0.25193 * AirVel - 1.03215 * power( PadDepth, 2 ) + 2.62659e-2 * power( AirVel, 2 ) + 0.914869 * PadDepth * AirVel - 1.48241 * AirVel * power( PadDepth, 2 ) - 1.89919e-2 * power( AirVel, 3 ) * PadDepth + 1.13137 * power( PadDepth, 3 ) * AirVel + 3.27622e-2 * power( AirVel, 3 ) * power( PadDepth, 2 ) - 0.145384 * power( PadDepth, 3 ) * power( AirVel, 2 );
 
 			if ( SatEff >= 1.0 ) SatEff = 1.0;
 			EvapCond( EvapCoolNum ).SatEff = SatEff;

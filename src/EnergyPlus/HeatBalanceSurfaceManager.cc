@@ -5304,12 +5304,12 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 						TempSurfIn( SurfNum ) = TempSurfInTmp( SurfNum );
 
 						// Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
-						WinHeatGain( SurfNum ) = WinTransSolar( SurfNum ) + HConvIn( SurfNum ) * Surface( SurfNum ).Area * ( TempSurfIn( SurfNum ) - RefAirTemp( SurfNum ) ) + Construct( Surface( SurfNum ).Construction ).InsideAbsorpThermal * Surface( SurfNum ).Area * ( Sigma * std::pow( TempSurfIn( SurfNum ), 4 ) - ( SurfaceWindow( SurfNum ).IRfromParentZone + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) ) ) - QS( Surface( SurfNum ).Zone ) * Surface( SurfNum ).Area * Construct( Surface( SurfNum ).Construction ).TransDiff; // Transmitted solar | Convection | IR exchange | IR
+						WinHeatGain( SurfNum ) = WinTransSolar( SurfNum ) + HConvIn( SurfNum ) * Surface( SurfNum ).Area * ( TempSurfIn( SurfNum ) - RefAirTemp( SurfNum ) ) + Construct( Surface( SurfNum ).Construction ).InsideAbsorpThermal * Surface( SurfNum ).Area * ( Sigma * power( TempSurfIn( SurfNum ), 4 ) - ( SurfaceWindow( SurfNum ).IRfromParentZone + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) ) ) - QS( Surface( SurfNum ).Zone ) * Surface( SurfNum ).Area * Construct( Surface( SurfNum ).Construction ).TransDiff; // Transmitted solar | Convection | IR exchange | IR
 						// Zone diffuse interior shortwave reflected back into the TDD
 
 						//fill out report vars for components of Window Heat Gain
 						WinGainConvGlazToZoneRep( SurfNum ) = HConvIn( SurfNum ) * Surface( SurfNum ).Area * ( TempSurfIn( SurfNum ) - RefAirTemp( SurfNum ) );
-						WinGainIRGlazToZoneRep( SurfNum ) = Construct( Surface( SurfNum ).Construction ).InsideAbsorpThermal * Surface( SurfNum ).Area * ( Sigma * std::pow( TempSurfIn( SurfNum ), 4 ) - ( SurfaceWindow( SurfNum ).IRfromParentZone + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) ) );
+						WinGainIRGlazToZoneRep( SurfNum ) = Construct( Surface( SurfNum ).Construction ).InsideAbsorpThermal * Surface( SurfNum ).Area * ( Sigma * power( TempSurfIn( SurfNum ), 4 ) - ( SurfaceWindow( SurfNum ).IRfromParentZone + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) ) );
 						WinLossSWZoneToOutWinRep( SurfNum ) = QS( Surface( SurfNum ).Zone ) * Surface( SurfNum ).Area * Construct( Surface( SurfNum ).Construction ).TransDiff;
 						if ( WinHeatGain( SurfNum ) >= 0.0 ) {
 							WinHeatGainRep( SurfNum ) = WinHeatGain( SurfNum );

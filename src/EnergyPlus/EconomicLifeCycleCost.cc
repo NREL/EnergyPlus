@@ -1252,9 +1252,9 @@ namespace EconomicLifeCycleCost {
 			// to allocate an interest rate (in this case inflation) cannot just use 1/12
 			// for the monthly value since it will be slightly wrong. Instead use inverse of
 			// formula from Newnan (4-32) which is r = m x (ia + 1)^(1/m) - 1)
-			inflationPerMonth = ( std::pow( ( inflation + 1.0 ), ( 1.0 / 12.0 ) ) ) - 1;
+			inflationPerMonth = ( power( ( inflation + 1.0 ), ( 1.0 / 12.0 ) ) ) - 1;
 			for ( jMonth = 1; jMonth <= lengthStudyTotalMonths; ++jMonth ) {
-				monthlyInflationFactor( jMonth ) = std::pow( ( 1.0 + inflationPerMonth ), ( jMonth - 1 ) );
+				monthlyInflationFactor( jMonth ) = power( ( 1.0 + inflationPerMonth ), ( jMonth - 1 ) );
 			}
 		}
 
@@ -1488,7 +1488,7 @@ namespace EconomicLifeCycleCost {
 				effectiveYear = double( jYear );
 			} else {
 			}}
-			SPV( jYear ) = 1.0 / ( std::pow( ( 1.0 + curDiscountRate ), effectiveYear ) );
+			SPV( jYear ) = 1.0 / ( power( ( 1.0 + curDiscountRate ), effectiveYear ) );
 		}
 		//use SPV as default values for all energy types
 		for ( jYear = 1; jYear <= lengthStudyYears; ++jYear ) {
@@ -1511,7 +1511,7 @@ namespace EconomicLifeCycleCost {
 						effectiveYear = double( jYear );
 					} else {
 					}}
-					energySPV( curResource, jYear ) = UsePriceEscalation( nUsePriceEsc ).Escalation( jYear ) / ( std::pow( ( 1.0 + curDiscountRate ), effectiveYear ) );
+					energySPV( curResource, jYear ) = UsePriceEscalation( nUsePriceEsc ).Escalation( jYear ) / ( power( ( 1.0 + curDiscountRate ), effectiveYear ) );
 				}
 			}
 		}

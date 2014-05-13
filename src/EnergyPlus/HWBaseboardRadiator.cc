@@ -1016,13 +1016,13 @@ namespace HWBaseboardRadiator {
 			// Effectiveness = 1. - EXP((1./CapacityRatio)*(NTU)**0.22*(EXP(-CapacityRatio*(NTU)**0.78)-1.))
 			// To prevent possible underflows (numbers smaller than the computer can handle) we must break
 			// the calculation up into steps and check the size of the exponential arguments.
-			AA = -CapacityRatio * std::pow( ( NTU ), 0.78 );
+			AA = -CapacityRatio * power( ( NTU ), 0.78 );
 			if ( AA < -20.0 ) {
 				BB = 0.0;
 			} else {
 				BB = std::exp( AA );
 			}
-			CC = ( 1.0 / CapacityRatio ) * std::pow( ( NTU ), 0.22 ) * ( BB - 1.0 );
+			CC = ( 1.0 / CapacityRatio ) * power( ( NTU ), 0.22 ) * ( BB - 1.0 );
 			if ( CC < -20. ) {
 				Effectiveness = 1.0;
 			} else {

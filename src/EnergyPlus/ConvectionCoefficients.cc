@@ -571,7 +571,7 @@ namespace ConvectionCoefficients {
 				}
 
 				// NOTE: Movable insulation is not taken into account here
-				HExt = std::sqrt( std::pow( ( MoWiTTTurbulentConstant * std::pow( ( std::abs( TAir - TSurf ) ), OneThird ) ), 2 ) + std::pow( ( ConstantA * std::pow( SurfWindSpeed, ConstantB ) ), 2 ) );
+				HExt = std::sqrt( power( ( MoWiTTTurbulentConstant * power( ( std::abs( TAir - TSurf ) ), OneThird ) ), 2 ) + power( ( ConstantA * power( SurfWindSpeed, ConstantB ) ), 2 ) );
 
 			} else if ( SELECT_CASE_var1 == DOE2HcOutside ) {
 				//   The DOE-2 convection model is a combination of the MoWiTT and the BLAST
@@ -589,7 +589,7 @@ namespace ConvectionCoefficients {
 				}
 
 				Hn = CalcHnASHRAETARPExterior( TSurf, TAir, Surface( SurfNum ).CosTilt );
-				HcGlass = std::sqrt( std::pow( Hn, 2 ) + std::pow( ( ConstantA * std::pow( SurfWindSpeed, ConstantB ) ), 2 ) );
+				HcGlass = std::sqrt( power( Hn, 2 ) + power( ( ConstantA * power( SurfWindSpeed, ConstantB ) ), 2 ) );
 				Hf = RoughnessMultiplier( Roughness ) * ( HcGlass - Hn );
 				if ( HMovInsul > 0.0 ) {
 					TSurf = ( HMovInsul * TSurf + Hf * TAir ) / ( HMovInsul + Hf );
@@ -614,7 +614,7 @@ namespace ConvectionCoefficients {
 				HSky = 0.0;
 			} else {
 				// Compute sky radiation coefficient
-				HSky = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorSkyIR * AirSkyRadSplit( SurfNum ) * ( ( std::pow( TSurf, 4 ) ) - ( std::pow( SkyTempKelvin, 4 ) ) ) / ( TSurf - SkyTempKelvin );
+				HSky = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorSkyIR * AirSkyRadSplit( SurfNum ) * ( ( power( TSurf, 4 ) ) - ( power( SkyTempKelvin, 4 ) ) ) / ( TSurf - SkyTempKelvin );
 			}
 
 			if ( TSurf == TAir || std::abs( Surface( SurfNum ).ExtConvCoeff ) == ASHRAESimple ) {
@@ -622,10 +622,10 @@ namespace ConvectionCoefficients {
 				HAir = 0.0;
 			} else {
 				// Compute ground radiation coefficient
-				HGround = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorGroundIR * ( ( std::pow( TSurf, 4 ) ) - ( std::pow( TAir, 4 ) ) ) / ( TSurf - TAir );
+				HGround = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorGroundIR * ( ( power( TSurf, 4 ) ) - ( power( TAir, 4 ) ) ) / ( TSurf - TAir );
 
 				// Compute air radiation coefficient
-				HAir = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorSkyIR * ( 1.0 - AirSkyRadSplit( SurfNum ) ) * ( ( std::pow( TSurf, 4 ) ) - ( std::pow( TAir, 4 ) ) ) / ( TSurf - TAir );
+				HAir = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorSkyIR * ( 1.0 - AirSkyRadSplit( SurfNum ) ) * ( ( power( TSurf, 4 ) ) - ( power( TAir, 4 ) ) ) / ( TSurf - TAir );
 			}
 
 		} else if ( SELECT_CASE_var == 0 ) { // Not set by user  -- uses Zone setting
@@ -681,7 +681,7 @@ namespace ConvectionCoefficients {
 				}
 
 				// NOTE: Movable insulation is not taken into account here
-				HExt = std::sqrt( std::pow( ( MoWiTTTurbulentConstant * std::pow( ( std::abs( TAir - TSurf ) ), OneThird ) ), 2 ) + std::pow( ( ConstantA * std::pow( SurfWindSpeed, ConstantB ) ), 2 ) );
+				HExt = std::sqrt( power( ( MoWiTTTurbulentConstant * power( ( std::abs( TAir - TSurf ) ), OneThird ) ), 2 ) + power( ( ConstantA * power( SurfWindSpeed, ConstantB ) ), 2 ) );
 
 			} else if ( SELECT_CASE_var1 == DOE2HcOutside ) {
 				//   The DOE-2 convection model is a combination of the MoWiTT and the BLAST
@@ -699,7 +699,7 @@ namespace ConvectionCoefficients {
 				}
 
 				Hn = CalcHnASHRAETARPExterior( TSurf, TAir, Surface( SurfNum ).CosTilt );
-				HcGlass = std::sqrt( std::pow( Hn, 2 ) + std::pow( ( ConstantA * std::pow( SurfWindSpeed, ConstantB ) ), 2 ) );
+				HcGlass = std::sqrt( power( Hn, 2 ) + power( ( ConstantA * power( SurfWindSpeed, ConstantB ) ), 2 ) );
 				Hf = RoughnessMultiplier( Roughness ) * ( HcGlass - Hn );
 				if ( HMovInsul > 0.0 ) {
 					TSurf = ( HMovInsul * TSurf + Hf * TAir ) / ( HMovInsul + Hf );
@@ -724,7 +724,7 @@ namespace ConvectionCoefficients {
 				HSky = 0.0;
 			} else {
 				// Compute sky radiation coefficient
-				HSky = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorSkyIR * AirSkyRadSplit( SurfNum ) * ( ( std::pow( TSurf, 4 ) ) - ( std::pow( SkyTempKelvin, 4 ) ) ) / ( TSurf - SkyTempKelvin );
+				HSky = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorSkyIR * AirSkyRadSplit( SurfNum ) * ( ( power( TSurf, 4 ) ) - ( power( SkyTempKelvin, 4 ) ) ) / ( TSurf - SkyTempKelvin );
 			}
 
 			if ( TSurf == TAir || Zone( Surface( SurfNum ).Zone ).OutsideConvectionAlgo == ASHRAESimple ) {
@@ -732,10 +732,10 @@ namespace ConvectionCoefficients {
 				HAir = 0.0;
 			} else {
 				// Compute ground radiation coefficient
-				HGround = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorGroundIR * ( ( std::pow( TSurf, 4 ) ) - ( std::pow( TAir, 4 ) ) ) / ( TSurf - TAir );
+				HGround = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorGroundIR * ( ( power( TSurf, 4 ) ) - ( power( TAir, 4 ) ) ) / ( TSurf - TAir );
 
 				// Compute air radiation coefficient
-				HAir = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorSkyIR * ( 1.0 - AirSkyRadSplit( SurfNum ) ) * ( ( std::pow( TSurf, 4 ) ) - ( std::pow( TAir, 4 ) ) ) / ( TSurf - TAir );
+				HAir = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorSkyIR * ( 1.0 - AirSkyRadSplit( SurfNum ) ) * ( ( power( TSurf, 4 ) ) - ( power( TAir, 4 ) ) ) / ( TSurf - TAir );
 			}
 
 		} else { // Exterior convection scheme for this surface has been set by user
@@ -748,7 +748,7 @@ namespace ConvectionCoefficients {
 				HSky = 0.0;
 			} else {
 				// Compute sky radiation coefficient
-				HSky = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorSkyIR * AirSkyRadSplit( SurfNum ) * ( ( std::pow( TSurf, 4 ) ) - ( std::pow( SkyTempKelvin, 4 ) ) ) / ( TSurf - SkyTempKelvin );
+				HSky = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorSkyIR * AirSkyRadSplit( SurfNum ) * ( ( power( TSurf, 4 ) ) - ( power( SkyTempKelvin, 4 ) ) ) / ( TSurf - SkyTempKelvin );
 			}
 
 			if ( TSurf == TAir || Zone( Surface( SurfNum ).Zone ).OutsideConvectionAlgo == ASHRAESimple ) {
@@ -756,10 +756,10 @@ namespace ConvectionCoefficients {
 				HAir = 0.0;
 			} else {
 				// Compute ground radiation coefficient
-				HGround = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorGroundIR * ( ( std::pow( TSurf, 4 ) ) - ( std::pow( TAir, 4 ) ) ) / ( TSurf - TAir );
+				HGround = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorGroundIR * ( ( power( TSurf, 4 ) ) - ( power( TAir, 4 ) ) ) / ( TSurf - TAir );
 
 				// Compute air radiation coefficient
-				HAir = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorSkyIR * ( 1.0 - AirSkyRadSplit( SurfNum ) ) * ( ( std::pow( TSurf, 4 ) ) - ( std::pow( TAir, 4 ) ) ) / ( TSurf - TAir );
+				HAir = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorSkyIR * ( 1.0 - AirSkyRadSplit( SurfNum ) ) * ( ( power( TSurf, 4 ) ) - ( power( TAir, 4 ) ) ) / ( TSurf - TAir );
 			}
 
 		}}
@@ -896,15 +896,15 @@ namespace ConvectionCoefficients {
 
 		if ( CosTilt == 0.0 ) { // Vertical Surface
 
-			Hn = 1.31 * ( std::pow( std::abs( ( TOutSurf - TAir ) ), OneThird ) );
+			Hn = 1.31 * ( power( std::abs( ( TOutSurf - TAir ) ), OneThird ) );
 
 		} else if ( ( ( CosTilt < 0.0 ) && ( TOutSurf < TAir ) ) || ( ( CosTilt > 0.0 ) && ( TOutSurf > TAir ) ) ) { // Enhanced convection
 
-			Hn = 9.482 * ( std::pow( std::abs( ( TOutSurf - TAir ) ), OneThird ) ) / ( 7.238 - std::abs( CosTilt ) );
+			Hn = 9.482 * ( power( std::abs( ( TOutSurf - TAir ) ), OneThird ) ) / ( 7.238 - std::abs( CosTilt ) );
 
 		} else if ( ( ( CosTilt < 0.0 ) && ( TOutSurf > TAir ) ) || ( ( CosTilt > 0.0 ) && ( TOutSurf < TAir ) ) ) { // Reduced convection
 
-			Hn = 1.810 * ( std::pow( std::abs( ( TOutSurf - TAir ) ), OneThird ) ) / ( 1.382 + std::abs( CosTilt ) );
+			Hn = 1.810 * ( power( std::abs( ( TOutSurf - TAir ) ), OneThird ) ) / ( 1.382 + std::abs( CosTilt ) );
 
 		} // Only other condition is TOutSurf=TAir, in which case there is no natural convection part.
 
@@ -3581,7 +3581,7 @@ namespace ConvectionCoefficients {
 		// na
 
 		// FLOW:
-		CalcASHRAESimpExtConvectCoeff = D( Roughness ) + E( Roughness ) * SurfWindSpeed + F( Roughness ) * std::pow( SurfWindSpeed, 2 );
+		CalcASHRAESimpExtConvectCoeff = D( Roughness ) + E( Roughness ) * SurfWindSpeed + F( Roughness ) * power( SurfWindSpeed, 2 );
 
 		return CalcASHRAESimpExtConvectCoeff;
 
@@ -3832,15 +3832,15 @@ namespace ConvectionCoefficients {
 
 				} else if ( ( DeltaTemp == 0.0 ) || ( Surface( SurfNum ).CosTilt == 0.0 ) ) { // Vertical Surface
 
-					HcIn( SurfNum ) = 1.31 * ( std::pow( ( std::abs( DeltaTemp ) ), OneThird ) );
+					HcIn( SurfNum ) = 1.31 * ( power( ( std::abs( DeltaTemp ) ), OneThird ) );
 
 				} else if ( ( ( DeltaTemp < 0.0 ) && ( Surface( SurfNum ).CosTilt > 0.0 ) ) || ( ( DeltaTemp > 0.0 ) && ( Surface( SurfNum ).CosTilt < 0.0 ) ) ) { // Enhanced Convection
 
-					HcIn( SurfNum ) = 9.482 * ( std::pow( ( std::abs( DeltaTemp ) ), OneThird ) ) / ( 7.283 - std::abs( Surface( SurfNum ).CosTilt ) );
+					HcIn( SurfNum ) = 9.482 * ( power( ( std::abs( DeltaTemp ) ), OneThird ) ) / ( 7.283 - std::abs( Surface( SurfNum ).CosTilt ) );
 
 				} else if ( ( ( DeltaTemp > 0.0 ) && ( Surface( SurfNum ).CosTilt > 0.0 ) ) || ( ( DeltaTemp < 0.0 ) && ( Surface( SurfNum ).CosTilt < 0.0 ) ) ) { // Reduced Convection
 
-					HcIn( SurfNum ) = 1.810 * ( std::pow( ( std::abs( DeltaTemp ) ), OneThird ) ) / ( 1.382 + std::abs( Surface( SurfNum ).CosTilt ) );
+					HcIn( SurfNum ) = 1.810 * ( power( ( std::abs( DeltaTemp ) ), OneThird ) ) / ( 1.382 + std::abs( Surface( SurfNum ).CosTilt ) );
 
 				} // ...end of IF-THEN block to set HConvIn
 
@@ -3855,19 +3855,19 @@ namespace ConvectionCoefficients {
 
 				} else if ( ( DeltaTemp == 0.0 ) || ( Surface( SurfNum ).CosTilt == 0.0 ) ) { // Vertical Surface
 
-					HcIn( SurfNum ) = 1.31 * ( std::pow( ( std::abs( DeltaTemp ) ), OneThird ) );
+					HcIn( SurfNum ) = 1.31 * ( power( ( std::abs( DeltaTemp ) ), OneThird ) );
 
-					HcIn( SurfNum ) = std::pow( ( std::pow( HcIn( SurfNum ), 3.2 ) + std::pow( Hf, 3.2 ) ), ( 1.0 / 3.2 ) );
+					HcIn( SurfNum ) = power( ( power( HcIn( SurfNum ), 3.2 ) + power( Hf, 3.2 ) ), ( 1.0 / 3.2 ) );
 
 				} else if ( ( ( DeltaTemp < 0.0 ) && ( Surface( SurfNum ).CosTilt > 0.0 ) ) || ( ( DeltaTemp > 0.0 ) && ( Surface( SurfNum ).CosTilt < 0.0 ) ) ) { // Enhanced Convection
 
-					HcIn( SurfNum ) = 9.482 * ( std::pow( ( std::abs( DeltaTemp ) ), ( 1.0 / 3.0 ) ) ) / ( 7.283 - std::abs( Surface( SurfNum ).CosTilt ) );
-					HcIn( SurfNum ) = std::pow( ( std::pow( HcIn( SurfNum ), 3.2 ) + std::pow( Hf, 3.2 ) ), ( 1.0 / 3.2 ) );
+					HcIn( SurfNum ) = 9.482 * ( power( ( std::abs( DeltaTemp ) ), ( 1.0 / 3.0 ) ) ) / ( 7.283 - std::abs( Surface( SurfNum ).CosTilt ) );
+					HcIn( SurfNum ) = power( ( power( HcIn( SurfNum ), 3.2 ) + power( Hf, 3.2 ) ), ( 1.0 / 3.2 ) );
 
 				} else if ( ( ( DeltaTemp > 0.0 ) && ( Surface( SurfNum ).CosTilt > 0.0 ) ) || ( ( DeltaTemp < 0.0 ) && ( Surface( SurfNum ).CosTilt < 0.0 ) ) ) { // Reduced Convection
 
-					HcIn( SurfNum ) = 1.810 * ( std::pow( ( std::abs( DeltaTemp ) ), OneThird ) ) / ( 1.382 + std::abs( Surface( SurfNum ).CosTilt ) );
-					HcIn( SurfNum ) = std::pow( ( std::pow( HcIn( SurfNum ), 3.2 ) + std::pow( Hf, 3.2 ) ), ( 1.0 / 3.2 ) );
+					HcIn( SurfNum ) = 1.810 * ( power( ( std::abs( DeltaTemp ) ), OneThird ) ) / ( 1.382 + std::abs( Surface( SurfNum ).CosTilt ) );
+					HcIn( SurfNum ) = power( ( power( HcIn( SurfNum ), 3.2 ) + power( Hf, 3.2 ) ), ( 1.0 / 3.2 ) );
 
 				} // ...end of IF-THEN block to set HConvIn
 
@@ -4059,11 +4059,11 @@ namespace ConvectionCoefficients {
 				// assume that reference air temp for user defined convection coefficient is the mean air temperature (=MAT)
 				// Calculate the convection coefficient based on inlet (supply) air conditions
 				if ( Tilt < 45.0 ) {
-					HConvIn( SurfNum ) = 0.49 * std::pow( ACH, 0.8 ); // Ceiling correlation
+					HConvIn( SurfNum ) = 0.49 * power( ACH, 0.8 ); // Ceiling correlation
 				} else if ( Tilt > 135.0 ) {
-					HConvIn( SurfNum ) = 0.13 * std::pow( ACH, 0.8 ); // Floor correlation
+					HConvIn( SurfNum ) = 0.13 * power( ACH, 0.8 ); // Floor correlation
 				} else {
-					HConvIn( SurfNum ) = 0.19 * std::pow( ACH, 0.8 ); // Wall correlation
+					HConvIn( SurfNum ) = 0.19 * power( ACH, 0.8 ); // Wall correlation
 				}
 				// set flag for reference air temperature
 				Surface( SurfNum ).TAirRef = ZoneSupplyAirTemp;
@@ -4202,7 +4202,7 @@ namespace ConvectionCoefficients {
 
 			beta = 2.0 / ( Tso + Tsi );
 
-			Gr = ( g * beta * std::abs( Tsi - Tso ) * std::pow( gapW, 3 ) ) / ( std::pow( v, 2 ) ); // curve fit for v = v(T)?
+			Gr = ( g * beta * std::abs( Tsi - Tso ) * power( gapW, 3 ) ) / ( power( v, 2 ) ); // curve fit for v = v(T)?
 
 			CalcNusselt( SurfNum, asp, Tso, Tsi, Gr, Pr, Nu ); // curve fit for Pr = Pr(T)?
 
@@ -4301,23 +4301,23 @@ namespace ConvectionCoefficients {
 		ra = gr * pr;
 		//!fw if (ra > 2.0e6): error that outside range of Rayleigh number?
 
-		if ( ra <= 1.0e4 ) gnu901 = 1.0 + 1.7596678e-10 * std::pow( ra, 2.2984755 ); // eq. 51
-		if ( ra > 1.0e4 && ra <= 5.0e4 ) gnu901 = 0.028154 * std::pow( ra, 0.4134 ); // eq. 50
-		if ( ra > 5.0e4 ) gnu901 = 0.0673838 * std::pow( ra, ( 1.0 / 3.0 ) ); // eq. 49
+		if ( ra <= 1.0e4 ) gnu901 = 1.0 + 1.7596678e-10 * power( ra, 2.2984755 ); // eq. 51
+		if ( ra > 1.0e4 && ra <= 5.0e4 ) gnu901 = 0.028154 * power( ra, 0.4134 ); // eq. 50
+		if ( ra > 5.0e4 ) gnu901 = 0.0673838 * power( ra, ( 1.0 / 3.0 ) ); // eq. 49
 
-		gnu902 = 0.242 * std::pow( ( ra / asp ), .272 ); // eq. 52
+		gnu902 = 0.242 * power( ( ra / asp ), .272 ); // eq. 52
 		gnu90 = max( gnu901, gnu902 );
 
 		if ( tso > tsi ) { // window heated from above
 			gnu = 1.0 + ( gnu90 - 1.0 ) * sintilt; // eq. 53
 		} else { // window heated from below
 			if ( tilt >= 60.0 ) {
-				g = 0.5 * std::pow( ( 1.0 + std::pow( ( ra / 3160. ), 20.6 ) ), ( -0.1 ) ); // eq. 47
-				gnu601a = 1.0 + std::pow( ( 0.0936 * ( std::pow( ra, 0.314 ) ) / ( 1.0 + g ) ), 7 ); // eq. 45
-				gnu601 = std::pow( gnu601a, 0.142857 );
+				g = 0.5 * power( ( 1.0 + power( ( ra / 3160. ), 20.6 ) ), ( -0.1 ) ); // eq. 47
+				gnu601a = 1.0 + power( ( 0.0936 * ( power( ra, 0.314 ) ) / ( 1.0 + g ) ), 7 ); // eq. 45
+				gnu601 = power( gnu601a, 0.142857 );
 
 				// For any aspect ratio
-				gnu602 = ( 0.104 + 0.175 / asp ) * std::pow( ra, 0.283 ); // eq. 46
+				gnu602 = ( 0.104 + 0.175 / asp ) * power( ra, 0.283 ); // eq. 46
 				gnu60 = max( gnu601, gnu602 );
 
 				// linear interpolation for layers inclined at angles between 60 and 90 deg
@@ -4326,10 +4326,10 @@ namespace ConvectionCoefficients {
 			if ( tilt < 60.0 ) { // eq. 42
 				cra = ra * costilt;
 				a = 1.0 - 1708.0 / cra;
-				b = std::pow( ( cra / 5830.0 ), 0.33333 ) - 1.0; // LKL- replace .333 with OneThird?
+				b = power( ( cra / 5830.0 ), 0.33333 ) - 1.0; // LKL- replace .333 with OneThird?
 				gnua = ( std::abs( a ) + a ) / 2.0;
 				gnub = ( std::abs( b ) + b ) / 2.0;
-				ang = 1708.0 * std::pow( ( std::sin( 1.8 * tiltr ) ), 1.6 );
+				ang = 1708.0 * power( ( std::sin( 1.8 * tiltr ) ), 1.6 );
 				gnu = 1.0 + 1.44 * gnua * ( 1.0 - ang / cra ) + gnub;
 			}
 		}
@@ -4581,42 +4581,42 @@ namespace ConvectionCoefficients {
 		// four cases depending on tilt and DeltaTemp (heat flow direction )
 		if ( DeltaTemp > 0.0 ) TiltDeg = 180.0 - TiltDeg; // complement angle if cooling situation
 
-		RaH = ( std::pow( rho, 2 ) * std::pow( Height, 3 ) * g * Cp * ( std::abs( SurfTempKelvin - AirTempKelvin ) ) ) / ( TmeanFilmKelvin * mu * lambda ); // eq 132 in ISO 15099
+		RaH = ( power( rho, 2 ) * power( Height, 3 ) * g * Cp * ( std::abs( SurfTempKelvin - AirTempKelvin ) ) ) / ( TmeanFilmKelvin * mu * lambda ); // eq 132 in ISO 15099
 
 		// case a)
 		if ( ( 0.0 <= TiltDeg ) && ( TiltDeg < 15.0 ) ) {
 
-			Nuint = 0.13 * std::pow( ( RaH ), OneThird );
+			Nuint = 0.13 * power( ( RaH ), OneThird );
 
 			// case b)
 		} else if ( ( 15.0 <= TiltDeg ) && ( TiltDeg <= 90.0 ) ) {
 
-			RaCV = 2.5E+5 * std::pow( ( std::exp( 0.72 * TiltDeg ) / sineTilt ), 0.2 ); // eq. 137
+			RaCV = 2.5E+5 * power( ( std::exp( 0.72 * TiltDeg ) / sineTilt ), 0.2 ); // eq. 137
 
 			if ( RaH <= RaCV ) {
-				Nuint = 0.56 * std::pow( ( RaH * sineTilt ), 0.25 ); // eq. 135 in ISO 15099
+				Nuint = 0.56 * power( ( RaH * sineTilt ), 0.25 ); // eq. 135 in ISO 15099
 			} else {
-				Nuint = 0.13 * ( std::pow( RaH, OneThird ) - std::pow( RaCV, OneThird ) ) + 0.56 * std::pow( ( RaCV * sineTilt ), 0.25 ); // eq. 136 in ISO 15099
+				Nuint = 0.13 * ( power( RaH, OneThird ) - power( RaCV, OneThird ) ) + 0.56 * power( ( RaCV * sineTilt ), 0.25 ); // eq. 136 in ISO 15099
 			}
 
 			//case c)
 		} else if ( ( 90.0 < TiltDeg ) && ( TiltDeg <= 179.0 ) ) {
 			// bound by applicability
 			if ( RaH * sineTilt < 1.0E+5 ) {
-				Nuint = 0.56 * std::pow( ( 1.0E+5 ), 0.25 ); // bounded
+				Nuint = 0.56 * power( ( 1.0E+5 ), 0.25 ); // bounded
 			} else if ( RaH * sineTilt >= 1.0E+11 ) {
-				Nuint = 0.56 * std::pow( ( 1.0E+11 ), 0.25 ); // bounded
+				Nuint = 0.56 * power( ( 1.0E+11 ), 0.25 ); // bounded
 			} else {
-				Nuint = 0.56 * std::pow( ( RaH * sineTilt ), 0.25 ); // eq.. 138
+				Nuint = 0.56 * power( ( RaH * sineTilt ), 0.25 ); // eq.. 138
 			}
 
 			// case d)
 		} else if ( ( 179.0 < TiltDeg ) && ( TiltDeg <= 180.0 ) ) {
 
 			if ( RaH > 1.0E+11 ) {
-				Nuint = 0.58 * std::pow( 1E+11, 0.2 ); // bounded
+				Nuint = 0.58 * power( 1E+11, 0.2 ); // bounded
 			} else {
-				Nuint = 0.58 * std::pow( RaH, 0.2 );
+				Nuint = 0.58 * power( RaH, 0.2 );
 			}
 
 		}
@@ -4866,7 +4866,7 @@ namespace ConvectionCoefficients {
 			}
 		} //loop over zones for inside face parameters
 
-		CubeRootOfOverallBuildingVolume = std::pow( ( BldgVolumeSum ), OneThird );
+		CubeRootOfOverallBuildingVolume = power( ( BldgVolumeSum ), OneThird );
 
 		// first pass over surfaces for outside face params
 		for ( SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop ) {
@@ -5066,28 +5066,28 @@ namespace ConvectionCoefficients {
 			}
 		} // fist loop over surfaces for outside face params
 
-		NorthFacade.Perimeter = 2. * ( std::pow( ( std::pow( ( NorthFacade.Xmax - NorthFacade.Xmin ), 2 ) + std::pow( ( NorthFacade.Ymax - NorthFacade.Ymin ), 2 ) ), 0.5 ) ) + 2. * ( NorthFacade.Zmax - NorthFacade.Zmin );
+		NorthFacade.Perimeter = 2. * ( power( ( power( ( NorthFacade.Xmax - NorthFacade.Xmin ), 2 ) + power( ( NorthFacade.Ymax - NorthFacade.Ymin ), 2 ) ), 0.5 ) ) + 2. * ( NorthFacade.Zmax - NorthFacade.Zmin );
 		NorthFacade.Height = NorthFacade.Zmax - NorthFacade.Zmin;
 
-		NorthEastFacade.Perimeter = 2. * ( std::pow( ( std::pow( ( NorthEastFacade.Xmax - NorthEastFacade.Xmin ), 2 ) + std::pow( ( NorthEastFacade.Ymax - NorthEastFacade.Ymin ), 2 ) ), 0.5 ) ) + 2. * ( NorthEastFacade.Zmax - NorthEastFacade.Zmin );
+		NorthEastFacade.Perimeter = 2. * ( power( ( power( ( NorthEastFacade.Xmax - NorthEastFacade.Xmin ), 2 ) + power( ( NorthEastFacade.Ymax - NorthEastFacade.Ymin ), 2 ) ), 0.5 ) ) + 2. * ( NorthEastFacade.Zmax - NorthEastFacade.Zmin );
 		NorthEastFacade.Height = NorthEastFacade.Zmax - NorthEastFacade.Zmin;
 
-		EastFacade.Perimeter = 2. * ( std::pow( ( std::pow( ( EastFacade.Xmax - EastFacade.Xmin ), 2 ) + std::pow( ( EastFacade.Ymax - EastFacade.Ymin ), 2 ) ), 0.5 ) ) + 2. * ( EastFacade.Zmax - EastFacade.Zmin );
+		EastFacade.Perimeter = 2. * ( power( ( power( ( EastFacade.Xmax - EastFacade.Xmin ), 2 ) + power( ( EastFacade.Ymax - EastFacade.Ymin ), 2 ) ), 0.5 ) ) + 2. * ( EastFacade.Zmax - EastFacade.Zmin );
 		EastFacade.Height = EastFacade.Zmax - EastFacade.Zmin;
 
-		SouthEastFacade.Perimeter = 2. * ( std::pow( ( std::pow( ( SouthEastFacade.Xmax - SouthEastFacade.Xmin ), 2 ) + std::pow( ( SouthEastFacade.Ymax - SouthEastFacade.Ymin ), 2 ) ), 0.5 ) ) + 2. * ( SouthEastFacade.Zmax - SouthEastFacade.Zmin );
+		SouthEastFacade.Perimeter = 2. * ( power( ( power( ( SouthEastFacade.Xmax - SouthEastFacade.Xmin ), 2 ) + power( ( SouthEastFacade.Ymax - SouthEastFacade.Ymin ), 2 ) ), 0.5 ) ) + 2. * ( SouthEastFacade.Zmax - SouthEastFacade.Zmin );
 		SouthEastFacade.Height = SouthEastFacade.Zmax - SouthEastFacade.Zmin;
 
-		SouthFacade.Perimeter = 2. * ( std::pow( ( std::pow( ( SouthFacade.Xmax - SouthFacade.Xmin ), 2 ) + std::pow( ( SouthFacade.Ymax - SouthFacade.Ymin ), 2 ) ), 0.5 ) ) + 2. * ( SouthFacade.Zmax - SouthFacade.Zmin );
+		SouthFacade.Perimeter = 2. * ( power( ( power( ( SouthFacade.Xmax - SouthFacade.Xmin ), 2 ) + power( ( SouthFacade.Ymax - SouthFacade.Ymin ), 2 ) ), 0.5 ) ) + 2. * ( SouthFacade.Zmax - SouthFacade.Zmin );
 		SouthFacade.Height = SouthFacade.Zmax - SouthFacade.Zmin;
 
-		SouthWestFacade.Perimeter = 2. * ( std::pow( ( std::pow( ( SouthWestFacade.Xmax - SouthWestFacade.Xmin ), 2 ) + std::pow( ( SouthWestFacade.Ymax - SouthWestFacade.Ymin ), 2 ) ), 0.5 ) ) + 2. * ( SouthWestFacade.Zmax - SouthWestFacade.Zmin );
+		SouthWestFacade.Perimeter = 2. * ( power( ( power( ( SouthWestFacade.Xmax - SouthWestFacade.Xmin ), 2 ) + power( ( SouthWestFacade.Ymax - SouthWestFacade.Ymin ), 2 ) ), 0.5 ) ) + 2. * ( SouthWestFacade.Zmax - SouthWestFacade.Zmin );
 		SouthWestFacade.Height = SouthWestFacade.Zmax - SouthWestFacade.Zmin;
 
-		WestFacade.Perimeter = 2. * ( std::pow( ( std::pow( ( WestFacade.Xmax - WestFacade.Xmin ), 2 ) + std::pow( ( WestFacade.Ymax - WestFacade.Ymin ), 2 ) ), 0.5 ) ) + 2. * ( WestFacade.Zmax - WestFacade.Zmin );
+		WestFacade.Perimeter = 2. * ( power( ( power( ( WestFacade.Xmax - WestFacade.Xmin ), 2 ) + power( ( WestFacade.Ymax - WestFacade.Ymin ), 2 ) ), 0.5 ) ) + 2. * ( WestFacade.Zmax - WestFacade.Zmin );
 		WestFacade.Height = WestFacade.Zmax - WestFacade.Zmin;
 
-		NorthWestFacade.Perimeter = 2. * ( std::pow( ( std::pow( ( NorthWestFacade.Xmax - NorthWestFacade.Xmin ), 2 ) + std::pow( ( NorthWestFacade.Ymax - NorthWestFacade.Ymin ), 2 ) ), 0.5 ) ) + 2. * ( NorthWestFacade.Zmax - NorthWestFacade.Zmin );
+		NorthWestFacade.Perimeter = 2. * ( power( ( power( ( NorthWestFacade.Xmax - NorthWestFacade.Xmin ), 2 ) + power( ( NorthWestFacade.Ymax - NorthWestFacade.Ymin ), 2 ) ), 0.5 ) ) + 2. * ( NorthWestFacade.Zmax - NorthWestFacade.Zmin );
 		NorthWestFacade.Height = NorthWestFacade.Zmax - NorthWestFacade.Zmin;
 
 		//now model roof perimeter
@@ -6444,18 +6444,18 @@ namespace ConvectionCoefficients {
 			//Grashof for zone air based on largest delta T between surfaces and zone height
 			Tmin = minval( TH( {Zone( ZoneNum ).SurfaceFirst,Zone( ZoneNum ).SurfaceLast}, 1, 2 ) );
 			Tmax = maxval( TH( {Zone( ZoneNum ).SurfaceFirst,Zone( ZoneNum ).SurfaceLast}, 1, 2 ) );
-			GrH = ( g * ( Tmax - Tmin ) * ( std::pow( Zone( ZoneNum ).CeilingHeight, 3 ) ) ) / ( ( MAT( ZoneNum ) + KelvinConv ) * ( std::pow( v, 2 ) ) );
+			GrH = ( g * ( Tmax - Tmin ) * ( power( Zone( ZoneNum ).CeilingHeight, 3 ) ) ) / ( ( MAT( ZoneNum ) + KelvinConv ) * ( power( v, 2 ) ) );
 
 			// Reynolds number = Vdot supply / v * cube root of zone volume (Goldstein and Noveselac 2010)
 			if ( Node( ZoneNode ).MassFlowRate > 0.0 ) {
 				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress, BlankString ), BlankString );
-				Re = Node( ZoneNode ).MassFlowRate / ( v * AirDensity * ( std::pow( Zone( ZoneNum ).Volume, OneThird ) ) );
+				Re = Node( ZoneNode ).MassFlowRate / ( v * AirDensity * ( power( Zone( ZoneNum ).Volume, OneThird ) ) );
 			} else {
 				Re = 0.0;
 			}
 
 			if ( Re > 0.0 ) {
-				Ri = GrH / ( std::pow( Re, 2 ) ); //Richardson Number
+				Ri = GrH / ( power( Re, 2 ) ); //Richardson Number
 				if ( Ri > 10. ) { // natural convection expected
 					FinalFlowRegime = InConvFlowRegime_A3;
 				} else if ( Ri < 0.1 ) { //forced
@@ -7442,7 +7442,7 @@ namespace ConvectionCoefficients {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
-		Hn = 1.31 * ( std::pow( ( std::abs( DeltaTemp ) ), OneThird ) );
+		Hn = 1.31 * ( power( ( std::abs( DeltaTemp ) ), OneThird ) );
 
 		return Hn;
 
@@ -7490,7 +7490,7 @@ namespace ConvectionCoefficients {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
-		Hn = 9.482 * ( std::pow( ( std::abs( DeltaTemp ) ), OneThird ) ) / ( 7.283 - std::abs( CosineTilt ) );
+		Hn = 9.482 * ( power( ( std::abs( DeltaTemp ) ), OneThird ) ) / ( 7.283 - std::abs( CosineTilt ) );
 
 		return Hn;
 
@@ -7538,7 +7538,7 @@ namespace ConvectionCoefficients {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
-		Hn = 1.810 * ( std::pow( ( std::abs( DeltaTemp ) ), OneThird ) ) / ( 1.382 + std::abs( CosineTilt ) );
+		Hn = 1.810 * ( power( ( std::abs( DeltaTemp ) ), OneThird ) ) / ( 1.382 + std::abs( CosineTilt ) );
 
 		return Hn;
 
@@ -7582,7 +7582,7 @@ namespace ConvectionCoefficients {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
-		Hc = 3.873 + 0.082 * ( std::pow( AirChangeRate, 0.98 ) );
+		Hc = 3.873 + 0.082 * ( power( AirChangeRate, 0.98 ) );
 
 		return Hc;
 
@@ -7626,7 +7626,7 @@ namespace ConvectionCoefficients {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
-		Hc = 2.234 + 4.099 * ( std::pow( AirChangeRate, 0.503 ) );
+		Hc = 2.234 + 4.099 * ( power( AirChangeRate, 0.503 ) );
 
 		return Hc;
 
@@ -7670,7 +7670,7 @@ namespace ConvectionCoefficients {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
-		Hc = 1.208 + 1.012 * ( std::pow( AirChangeRate, 0.604 ) );
+		Hc = 1.208 + 1.012 * ( power( AirChangeRate, 0.604 ) );
 
 		return Hc;
 
@@ -7724,7 +7724,7 @@ namespace ConvectionCoefficients {
 		static int ErrorIndex( 0 );
 
 		if ( HydraulicDiameter > 0.0 ) {
-			Hn = std::pow( ( ( std::pow( ( 1.4 * ( std::pow( ( std::abs( DeltaTemp ) / HydraulicDiameter ), OneFourth ) ) ), 6 ) ) + ( ( 1.63 * std::pow( ( std::pow( ( std::abs( DeltaTemp ) ), OneThird ) ), 6 ) ) ) ), OneSixth );
+			Hn = power( ( ( power( ( 1.4 * ( power( ( std::abs( DeltaTemp ) / HydraulicDiameter ), OneFourth ) ) ), 6 ) ) + ( ( 1.63 * power( ( power( ( std::abs( DeltaTemp ) ), OneThird ) ), 6 ) ) ) ), OneSixth );
 		} else {
 			Hn = 9.999;
 			if ( ErrorIndex == 0 ) {
@@ -7788,7 +7788,7 @@ namespace ConvectionCoefficients {
 		static int ErrorIndex( 0 );
 
 		if ( HydraulicDiameter > 0.0 ) {
-			Hn = 0.6 * ( std::pow( ( std::abs( DeltaTemp ) / ( std::pow( HydraulicDiameter, 2 ) ) ), OneFifth ) );
+			Hn = 0.6 * ( power( ( std::abs( DeltaTemp ) / ( power( HydraulicDiameter, 2 ) ) ), OneFifth ) );
 		} else {
 			Hn = 9.999;
 			if ( ErrorIndex == 0 ) {
@@ -7851,7 +7851,7 @@ namespace ConvectionCoefficients {
 		static int ErrorIndex( 0 );
 
 		if ( Height > 0.0 ) {
-			Hn = std::pow( ( ( std::pow( ( 1.5 * ( std::pow( ( std::abs( DeltaTemp ) / Height ), OneFourth ) ) ), 6 ) ) + ( ( 1.23 * std::pow( ( std::pow( ( std::abs( DeltaTemp ) ), OneThird ) ), 6 ) ) ) ), OneSixth );
+			Hn = power( ( ( power( ( 1.5 * ( power( ( std::abs( DeltaTemp ) / Height ), OneFourth ) ) ), 6 ) ) + ( ( 1.23 * power( ( power( ( std::abs( DeltaTemp ) ), OneThird ) ), 6 ) ) ) ), OneSixth );
 		} else {
 			Hn = 9.999;
 			if ( ErrorIndex == 0 ) {
@@ -7910,7 +7910,7 @@ namespace ConvectionCoefficients {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		Hc = 2.07 * ( std::pow( ( std::abs( DeltaTemp ) ), 0.23 ) );
+		Hc = 2.07 * ( power( ( std::abs( DeltaTemp ) ), 0.23 ) );
 
 		return Hc;
 
@@ -7960,7 +7960,7 @@ namespace ConvectionCoefficients {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		Hc = 2.72 * ( std::pow( ( std::abs( DeltaTemp ) ), 0.13 ) );
+		Hc = 2.72 * ( power( ( std::abs( DeltaTemp ) ), 0.13 ) );
 
 		return Hc;
 
@@ -8010,7 +8010,7 @@ namespace ConvectionCoefficients {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		Hc = 1.98 * ( std::pow( ( std::abs( DeltaTemp ) ), 0.32 ) );
+		Hc = 1.98 * ( power( ( std::abs( DeltaTemp ) ), 0.32 ) );
 
 		return Hc;
 
@@ -8060,7 +8060,7 @@ namespace ConvectionCoefficients {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		Hc = 2.30 * ( std::pow( ( std::abs( DeltaTemp ) ), 0.24 ) );
+		Hc = 2.30 * ( power( ( std::abs( DeltaTemp ) ), 0.24 ) );
 
 		return Hc;
 
@@ -8110,7 +8110,7 @@ namespace ConvectionCoefficients {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		Hc = 3.10 * ( std::pow( ( std::abs( DeltaTemp ) ), 0.17 ) );
+		Hc = 3.10 * ( power( ( std::abs( DeltaTemp ) ), 0.17 ) );
 
 		return Hc;
 
@@ -8161,9 +8161,9 @@ namespace ConvectionCoefficients {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		if ( HydraulicDiameter > 1.0 ) {
-			Hc = 2.175 * ( std::pow( ( std::abs( DeltaTemp ) ), 0.308 ) ) / ( std::pow( HydraulicDiameter, 0.076 ) );
+			Hc = 2.175 * ( power( ( std::abs( DeltaTemp ) ), 0.308 ) ) / ( power( HydraulicDiameter, 0.076 ) );
 		} else {
-			Hc = 2.175 * ( std::pow( ( std::abs( DeltaTemp ) ), 0.308 ) ) / ( std::pow( 1.0, 0.076 ) );
+			Hc = 2.175 * ( power( ( std::abs( DeltaTemp ) ), 0.308 ) ) / ( power( 1.0, 0.076 ) );
 		}
 
 		return Hc;
@@ -8214,9 +8214,9 @@ namespace ConvectionCoefficients {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		if ( HydraulicDiameter > 1.0 ) {
-			Hc = 1.823 * ( std::pow( ( std::abs( DeltaTemp ) ), 0.293 ) ) / ( std::pow( HydraulicDiameter, 0.121 ) );
+			Hc = 1.823 * ( power( ( std::abs( DeltaTemp ) ), 0.293 ) ) / ( power( HydraulicDiameter, 0.121 ) );
 		} else {
-			Hc = 1.823 * ( std::pow( ( std::abs( DeltaTemp ) ), 0.293 ) ) / ( std::pow( 1.0, 0.121 ) );
+			Hc = 1.823 * ( power( ( std::abs( DeltaTemp ) ), 0.293 ) ) / ( power( 1.0, 0.121 ) );
 		}
 
 		return Hc;
@@ -8274,7 +8274,7 @@ namespace ConvectionCoefficients {
 		static int ErrorIndex( 0 );
 
 		if ( ( DeltaTemp != 0.0 ) && ( Height != 0.0 ) ) {
-			Hc = std::pow( ( ( std::pow( ( ( std::pow( ( 1.5 * ( std::pow( ( std::abs( DeltaTemp ) / Height ), OneFourth ) ) ), 6 ) ) + std::pow( ( ( 1.23 * std::pow( ( std::pow( ( std::abs( DeltaTemp ) ), OneThird ) ), 6 ) ) ), OneSixth ) ), 0.5 ) + ( std::pow( ( ( ( SurfTemp - SupplyAirTemp ) / std::abs( DeltaTemp ) ) * ( -0.199 + 0.190 * ( std::pow( AirChangeRate, 0.8 ) ) ) ), 3 ) ) ) ), OneThird );
+			Hc = power( ( ( power( ( ( power( ( 1.5 * ( power( ( std::abs( DeltaTemp ) / Height ), OneFourth ) ) ), 6 ) ) + power( ( ( 1.23 * power( ( power( ( std::abs( DeltaTemp ) ), OneThird ) ), 6 ) ) ), OneSixth ) ), 0.5 ) + ( power( ( ( ( SurfTemp - SupplyAirTemp ) / std::abs( DeltaTemp ) ) * ( -0.199 + 0.190 * ( power( AirChangeRate, 0.8 ) ) ) ), 3 ) ) ) ), OneThird );
 		} else {
 			Hc = 9.999;
 			if ( Height == 0.0 ) {
@@ -8355,9 +8355,9 @@ namespace ConvectionCoefficients {
 		if ( ( DeltaTemp != 0.0 ) ) { // protect divide by zero
 
 			if ( Height != 0.0 ) {
-				HcTmp1 = std::pow( ( ( std::pow( ( ( std::pow( ( 1.5 * ( std::pow( ( std::abs( DeltaTemp ) / Height ), OneFourth ) ) ), 6 ) ) + std::pow( ( ( 1.23 * std::pow( ( std::pow( ( std::abs( DeltaTemp ) ), OneThird ) ), 6 ) ) ), OneSixth ) ), 0.5 ) - ( std::pow( ( ( ( SurfTemp - SupplyAirTemp ) / std::abs( DeltaTemp ) ) * ( -0.199 + 0.190 * ( std::pow( AirChangeRate, 0.8 ) ) ) ), 3 ) ) ) ), OneThird );
+				HcTmp1 = power( ( ( power( ( ( power( ( 1.5 * ( power( ( std::abs( DeltaTemp ) / Height ), OneFourth ) ) ), 6 ) ) + power( ( ( 1.23 * power( ( power( ( std::abs( DeltaTemp ) ), OneThird ) ), 6 ) ) ), OneSixth ) ), 0.5 ) - ( power( ( ( ( SurfTemp - SupplyAirTemp ) / std::abs( DeltaTemp ) ) * ( -0.199 + 0.190 * ( power( AirChangeRate, 0.8 ) ) ) ), 3 ) ) ) ), OneThird );
 
-				HcTmp2 = 0.8 * ( std::pow( ( ( std::pow( ( 1.5 * ( std::pow( ( std::abs( DeltaTemp ) / Height ), OneFourth ) ) ), 6 ) ) + ( ( 1.23 * std::pow( ( std::pow( ( std::abs( DeltaTemp ) ), OneThird ) ), 6 ) ) ) ), OneSixth ) );
+				HcTmp2 = 0.8 * ( power( ( ( power( ( 1.5 * ( power( ( std::abs( DeltaTemp ) / Height ), OneFourth ) ) ), 6 ) ) + ( ( 1.23 * power( ( power( ( std::abs( DeltaTemp ) ), OneThird ) ), 6 ) ) ) ), OneSixth ) );
 			} else {
 				HcTmp1 = 9.999;
 				HcTmp2 = 9.999;
@@ -8370,7 +8370,7 @@ namespace ConvectionCoefficients {
 				ShowRecurringSevereErrorAtEnd( "CalcBeausoleilMorrisonMixedOpposingWall: Convection model not evaluated because " " of zero height and set to 9.999 [W/m2-K]", ErrorIndex2 );
 
 			}
-			HcTmp3 = 0.8 * ( ( SurfTemp - SupplyAirTemp ) / std::abs( DeltaTemp ) ) * ( -0.199 + 0.190 * ( std::pow( AirChangeRate, 0.8 ) ) );
+			HcTmp3 = 0.8 * ( ( SurfTemp - SupplyAirTemp ) / std::abs( DeltaTemp ) ) * ( -0.199 + 0.190 * ( power( AirChangeRate, 0.8 ) ) );
 
 			Hc = max( max( HcTmp1, HcTmp2 ), HcTmp3 );
 
@@ -8442,7 +8442,7 @@ namespace ConvectionCoefficients {
 		static int ErrorIndex( 0 );
 
 		if ( ( HydraulicDiameter != 0.0 ) && ( DeltaTemp != 0.0 ) ) {
-			Hc = std::pow( ( std::pow( ( 0.6 * std::pow( ( std::abs( DeltaTemp ) / HydraulicDiameter ), OneFifth ) ), 3 ) + std::pow( ( ( ( SurfTemp - SupplyAirTemp ) / std::abs( DeltaTemp ) ) * ( 0.159 + 0.116 * ( std::pow( AirChangeRate, 0.8 ) ) ) ), 3 ) ), OneThird );
+			Hc = power( ( power( ( 0.6 * power( ( std::abs( DeltaTemp ) / HydraulicDiameter ), OneFifth ) ), 3 ) + power( ( ( ( SurfTemp - SupplyAirTemp ) / std::abs( DeltaTemp ) ) * ( 0.159 + 0.116 * ( power( AirChangeRate, 0.8 ) ) ) ), 3 ) ), OneThird );
 		} else {
 			Hc = 9.999;
 			if ( HydraulicDiameter == 0.0 ) {
@@ -8517,7 +8517,7 @@ namespace ConvectionCoefficients {
 		static int ErrorIndex( 0 );
 
 		if ( ( HydraulicDiameter != 0.0 ) && ( DeltaTemp != 0.0 ) ) {
-			Hc = std::pow( ( std::pow( ( std::pow( ( 1.4 * std::pow( ( std::abs( DeltaTemp ) / HydraulicDiameter ), OneFourth ) ), 6 ) + std::pow( ( 1.63 * ( std::pow( std::abs( DeltaTemp ), OneThird ) ) ), 6 ) ), 0.5 ) + std::pow( ( ( ( SurfTemp - SupplyAirTemp ) / std::abs( DeltaTemp ) ) * ( 0.159 + 0.116 * ( std::pow( AirChangeRate, 0.8 ) ) ) ), 3 ) ), OneThird );
+			Hc = power( ( power( ( power( ( 1.4 * power( ( std::abs( DeltaTemp ) / HydraulicDiameter ), OneFourth ) ), 6 ) + power( ( 1.63 * ( power( std::abs( DeltaTemp ), OneThird ) ) ), 6 ) ), 0.5 ) + power( ( ( ( SurfTemp - SupplyAirTemp ) / std::abs( DeltaTemp ) ) * ( 0.159 + 0.116 * ( power( AirChangeRate, 0.8 ) ) ) ), 3 ) ), OneThird );
 		} else {
 			Hc = 9.999;
 			if ( HydraulicDiameter == 0.0 ) {
@@ -8593,7 +8593,7 @@ namespace ConvectionCoefficients {
 		static int ErrorIndex( 0 );
 
 		if ( ( HydraulicDiameter != 0.0 ) && ( DeltaTemp != 0.0 ) ) {
-			Hc = std::pow( ( std::pow( ( 0.6 * std::pow( ( std::abs( DeltaTemp ) / HydraulicDiameter ), OneFifth ) ), 3 ) + std::pow( ( ( ( SurfTemp - SupplyAirTemp ) / std::abs( DeltaTemp ) ) * ( -0.166 + 0.484 * ( std::pow( AirChangeRate, 0.8 ) ) ) ), 3 ) ), OneThird );
+			Hc = power( ( power( ( 0.6 * power( ( std::abs( DeltaTemp ) / HydraulicDiameter ), OneFifth ) ), 3 ) + power( ( ( ( SurfTemp - SupplyAirTemp ) / std::abs( DeltaTemp ) ) * ( -0.166 + 0.484 * ( power( AirChangeRate, 0.8 ) ) ) ), 3 ) ), OneThird );
 		} else {
 			Hc = 9.999;
 			if ( HydraulicDiameter == 0.0 ) {
@@ -8668,7 +8668,7 @@ namespace ConvectionCoefficients {
 		static int ErrorIndex( 0 );
 
 		if ( ( HydraulicDiameter != 0.0 ) && ( DeltaTemp != 0.0 ) ) {
-			Hc = std::pow( ( std::pow( ( std::pow( ( 1.4 * std::pow( ( std::abs( DeltaTemp ) / HydraulicDiameter ), OneFourth ) ), 6 ) + std::pow( ( 1.63 * ( std::pow( std::abs( DeltaTemp ), OneThird ) ) ), 6 ) ), 0.5 ) + std::pow( ( ( ( SurfTemp - SupplyAirTemp ) / std::abs( DeltaTemp ) ) * ( -0.166 + 0.484 * ( std::pow( AirChangeRate, 0.8 ) ) ) ), 3 ) ), OneThird );
+			Hc = power( ( power( ( power( ( 1.4 * power( ( std::abs( DeltaTemp ) / HydraulicDiameter ), OneFourth ) ), 6 ) + power( ( 1.63 * ( power( std::abs( DeltaTemp ), OneThird ) ) ), 6 ) ), 0.5 ) + power( ( ( ( SurfTemp - SupplyAirTemp ) / std::abs( DeltaTemp ) ) * ( -0.166 + 0.484 * ( power( AirChangeRate, 0.8 ) ) ) ), 3 ) ), OneThird );
 		} else {
 			Hc = 9.999;
 			if ( HydraulicDiameter == 0.0 ) {
@@ -8744,12 +8744,12 @@ namespace ConvectionCoefficients {
 
 		BetaFilm = 1.0 / ( KelvinConv + SurfTemp + 0.5 * DeltaTemp ); // TODO check sign on DeltaTemp
 		if ( Height > 0.0 ) {
-			RaH = ( g * BetaFilm * QdotConv * ( std::pow( Height, 4 ) ) * Pr ) / ( k * std::pow( v, 2 ) );
+			RaH = ( g * BetaFilm * QdotConv * ( power( Height, 4 ) ) * Pr ) / ( k * power( v, 2 ) );
 
 			if ( RaH <= 6.3e09 ) {
-				Hn = 1.332 * ( std::pow( ( std::abs( DeltaTemp ) / Height ), OneFourth ) );
+				Hn = 1.332 * ( power( ( std::abs( DeltaTemp ) / Height ), OneFourth ) );
 			} else {
-				Hn = 1.235 * std::exp( 0.0467 * Height ) * std::pow( ( std::abs( DeltaTemp ) ), 0.316 );
+				Hn = 1.235 * std::exp( 0.0467 * Height ) * power( ( std::abs( DeltaTemp ) ), 0.316 );
 			}
 		} else {
 			// bad value for Height, but we have little info to identify calling culprit
@@ -8808,7 +8808,7 @@ namespace ConvectionCoefficients {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		Hn = 3.1 * std::pow( ( std::abs( DeltaTemp ) ), 0.22 );
+		Hn = 3.1 * power( ( std::abs( DeltaTemp ) ), 0.22 );
 
 		return Hn;
 
@@ -8866,13 +8866,13 @@ namespace ConvectionCoefficients {
 			if ( WindWallRatio <= 0.5 ) {
 
 				if ( WindowLocationType == InConvWinLoc_UpperPartOfExteriorWall ) {
-					Hc = 0.117 * ( std::pow( ( AirSystemFlowRate / ZoneExtPerimLength ), 0.8 ) );
+					Hc = 0.117 * ( power( ( AirSystemFlowRate / ZoneExtPerimLength ), 0.8 ) );
 				} else if ( WindowLocationType == InConvWinLoc_LowerPartOfExteriorWall ) {
-					Hc = 0.093 * ( std::pow( ( AirSystemFlowRate / ZoneExtPerimLength ), 0.8 ) );
+					Hc = 0.093 * ( power( ( AirSystemFlowRate / ZoneExtPerimLength ), 0.8 ) );
 				} else if ( WindowLocationType == InConvWinLoc_LargePartOfExteriorWall ) {
-					Hc = 0.117 * ( std::pow( ( AirSystemFlowRate / ZoneExtPerimLength ), 0.8 ) ); // assumption for case not covered by model
+					Hc = 0.117 * ( power( ( AirSystemFlowRate / ZoneExtPerimLength ), 0.8 ) ); // assumption for case not covered by model
 				} else if ( WindowLocationType == InConvWinLoc_NotSet ) {
-					Hc = 0.117 * ( std::pow( ( AirSystemFlowRate / ZoneExtPerimLength ), 0.8 ) ); // assumption for case not covered by model
+					Hc = 0.117 * ( power( ( AirSystemFlowRate / ZoneExtPerimLength ), 0.8 ) ); // assumption for case not covered by model
 				} else {
 					//shouldn'tcome
 					Hc = 9.999;
@@ -8885,7 +8885,7 @@ namespace ConvectionCoefficients {
 					ShowRecurringSevereErrorAtEnd( "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated because " "bad window location and set to 9.999 [W/m2-K]", ErrorIndex );
 				}
 			} else {
-				Hc = 0.103 * ( std::pow( ( AirSystemFlowRate / ZoneExtPerimLength ), 0.8 ) );
+				Hc = 0.103 * ( power( ( AirSystemFlowRate / ZoneExtPerimLength ), 0.8 ) );
 			}
 		} else {
 			Hc = 9.999;
@@ -8950,11 +8950,11 @@ namespace ConvectionCoefficients {
 
 		if ( ZoneExtPerimLength > 0.0 ) {
 			if ( WindowLocationType == InConvWinLoc_WindowAboveThis ) {
-				Hc = 0.063 * ( std::pow( ( AirSystemFlowRate / ZoneExtPerimLength ), 0.8 ) );
+				Hc = 0.063 * ( power( ( AirSystemFlowRate / ZoneExtPerimLength ), 0.8 ) );
 			} else if ( WindowLocationType == InConvWinLoc_WindowBelowThis ) {
-				Hc = 0.093 * ( std::pow( ( AirSystemFlowRate / ZoneExtPerimLength ), 0.8 ) );
+				Hc = 0.093 * ( power( ( AirSystemFlowRate / ZoneExtPerimLength ), 0.8 ) );
 			} else if ( WindowLocationType == InConvWinLoc_NotSet ) {
-				Hc = 0.063 * ( std::pow( ( AirSystemFlowRate / ZoneExtPerimLength ), 0.8 ) ); // assumption for case not covered by model
+				Hc = 0.063 * ( power( ( AirSystemFlowRate / ZoneExtPerimLength ), 0.8 ) ); // assumption for case not covered by model
 			} else {
 				Hc = 9.999;
 				if ( ErrorIndex == 0 ) {
@@ -9027,7 +9027,7 @@ namespace ConvectionCoefficients {
 		static int ErrorIndex( 0 );
 
 		if ( ZoneExtPerimLength > 0.0 ) {
-			Hc = 0.048 * ( std::pow( ( AirSystemFlowRate / ZoneExtPerimLength ), 0.8 ) );
+			Hc = 0.048 * ( power( ( AirSystemFlowRate / ZoneExtPerimLength ), 0.8 ) );
 		} else {
 			if ( ErrorIndex == 0 ) {
 				ShowSevereMessage( "CalcGoldsteinNovoselacCeilingDiffuserFloor: Convection model not evaluated " "(zero zone exterior perimeter length)" );
@@ -9098,7 +9098,7 @@ namespace ConvectionCoefficients {
 		static int ErrorIndex( 0 );
 
 		if ( FaceArea > 0.0 ) {
-			Hf = 2.53 * RoughnessMultiplier( RoughnessIndex ) * ( std::pow( ( FacePerimeter * WindAtZ / FaceArea ), 0.5 ) );
+			Hf = 2.53 * RoughnessMultiplier( RoughnessIndex ) * ( power( ( FacePerimeter * WindAtZ / FaceArea ), 0.5 ) );
 
 		} else {
 			if ( ErrorIndex == 0 ) {
@@ -9169,7 +9169,7 @@ namespace ConvectionCoefficients {
 		static int ErrorIndex( 0 );
 
 		if ( FaceArea > 0.0 ) {
-			Hf = 2.53 * 0.5 * RoughnessMultiplier( RoughnessIndex ) * ( std::pow( ( FacePerimeter * WindAtZ / FaceArea ), 0.5 ) );
+			Hf = 2.53 * 0.5 * RoughnessMultiplier( RoughnessIndex ) * ( power( ( FacePerimeter * WindAtZ / FaceArea ), 0.5 ) );
 		} else {
 			if ( ErrorIndex == 0 ) {
 				ShowSevereMessage( "CalcSparrowLeeward: Convection model not evaluated (bad face area)" );
@@ -9230,7 +9230,7 @@ namespace ConvectionCoefficients {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		Hc = std::pow( ( std::pow( ( 0.84 * ( std::pow( ( std::abs( DeltaTemp ) ), OneThird ) ) ), 2 ) + std::pow( ( 3.26 * ( std::pow( WindAtZ, 0.89 ) ) ), 2 ) ), 0.5 );
+		Hc = power( ( power( ( 0.84 * ( power( ( std::abs( DeltaTemp ) ), OneThird ) ) ), 2 ) + power( ( 3.26 * ( power( WindAtZ, 0.89 ) ) ), 2 ) ), 0.5 );
 
 		return Hc;
 
@@ -9281,7 +9281,7 @@ namespace ConvectionCoefficients {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		Hc = std::pow( ( std::pow( ( 0.84 * ( std::pow( ( std::abs( DeltaTemp ) ), OneThird ) ) ), 2 ) + std::pow( ( 3.55 * ( std::pow( WindAtZ, 0.617 ) ) ), 2 ) ), 0.5 );
+		Hc = power( ( power( ( 0.84 * ( power( ( std::abs( DeltaTemp ) ), OneThird ) ) ), 2 ) + power( ( 3.55 * ( power( WindAtZ, 0.617 ) ) ), 2 ) ), 0.5 );
 
 		return Hc;
 
@@ -9342,7 +9342,7 @@ namespace ConvectionCoefficients {
 
 		Hn = CalcHnASHRAETARPExterior( SurfaceTemp, AirTemp, CosineTilt );
 
-		HcSmooth = std::sqrt( std::pow( Hn, 2 ) + std::pow( ( 3.26 * std::pow( WindAtZ, 0.89 ) ), 2 ) );
+		HcSmooth = std::sqrt( power( Hn, 2 ) + power( ( 3.26 * power( WindAtZ, 0.89 ) ), 2 ) );
 
 		Hf = RoughnessMultiplier( RoughnessIndex ) * ( HcSmooth - Hn );
 
@@ -9405,7 +9405,7 @@ namespace ConvectionCoefficients {
 
 		Hn = CalcHnASHRAETARPExterior( SurfaceTemp, AirTemp, CosineTilt );
 
-		HcSmooth = std::sqrt( std::pow( Hn, 2 ) + std::pow( ( 3.55 * std::pow( WindAtZ, 0.617 ) ), 2 ) );
+		HcSmooth = std::sqrt( power( Hn, 2 ) + power( ( 3.55 * power( WindAtZ, 0.617 ) ), 2 ) );
 
 		Hf = RoughnessMultiplier( RoughnessIndex ) * ( HcSmooth - Hn );
 
@@ -9559,7 +9559,7 @@ namespace ConvectionCoefficients {
 		static int ErrorIndex( 0 );
 
 		if ( LengthScale > 0.0 ) {
-			Hf = 8.6 * ( std::pow( WindAtZ, 0.6 ) ) / ( std::pow( LengthScale, 0.4 ) );
+			Hf = 8.6 * ( power( WindAtZ, 0.6 ) ) / ( power( LengthScale, 0.4 ) );
 		} else {
 			if ( ErrorIndex == 0 ) {
 				ShowSevereMessage( "CalcMitchell: Convection model not evaluated (bad length scale)" );
@@ -9625,16 +9625,16 @@ namespace ConvectionCoefficients {
 		if ( Theta > 180.0 ) Theta -= 360.0;
 
 		if ( Theta <= 11.25 ) {
-			Hf = 4.6 * ( std::pow( WindAt10m, 0.89 ) );
+			Hf = 4.6 * ( power( WindAt10m, 0.89 ) );
 		} else if ( ( 11.25 < Theta ) && ( Theta <= 33.75 ) ) {
-			Hf = 5. * ( std::pow( WindAt10m, 0.8 ) );
+			Hf = 5. * ( power( WindAt10m, 0.8 ) );
 		} else if ( ( 33.75 < Theta ) && ( Theta <= 56.25 ) ) {
-			Hf = 4.6 * ( std::pow( WindAt10m, 0.84 ) );
+			Hf = 4.6 * ( power( WindAt10m, 0.84 ) );
 		} else if ( ( 56.25 < Theta ) && ( Theta <= 100. ) ) {
-			Hf = 4.5 * ( std::pow( WindAt10m, 0.81 ) );
+			Hf = 4.5 * ( power( WindAt10m, 0.81 ) );
 		} else {
 			// should not be used for leeward... check why come here?
-			Hf = 3.54 * ( std::pow( WindAt10m, 0.76 ) ); //emmel model for robustness?
+			Hf = 3.54 * ( power( WindAt10m, 0.76 ) ); //emmel model for robustness?
 		}
 		return Hf;
 
@@ -9693,15 +9693,15 @@ namespace ConvectionCoefficients {
 		if ( Theta > 180.0 ) Theta -= 360.0;
 
 		if ( Theta <= 22.5 ) {
-			Hf = 5.15 * ( std::pow( WindAt10m, 0.81 ) );
+			Hf = 5.15 * ( power( WindAt10m, 0.81 ) );
 		} else if ( ( 22.5 < Theta ) && ( Theta <= 67.5 ) ) {
-			Hf = 3.34 * ( std::pow( WindAt10m, 0.84 ) );
+			Hf = 3.34 * ( power( WindAt10m, 0.84 ) );
 		} else if ( ( 67.5 < Theta ) && ( Theta <= 112.5 ) ) {
-			Hf = 4.78 * ( std::pow( WindAt10m, 0.71 ) );
+			Hf = 4.78 * ( power( WindAt10m, 0.71 ) );
 		} else if ( ( 112.5 < Theta ) && ( Theta <= 157.5 ) ) {
-			Hf = 4.05 * ( std::pow( WindAt10m, 0.77 ) );
+			Hf = 4.05 * ( power( WindAt10m, 0.77 ) );
 		} else if ( ( 157.5 < Theta ) && ( Theta <= 180. ) ) {
-			Hf = 3.54 * ( std::pow( WindAt10m, 0.76 ) );
+			Hf = 3.54 * ( power( WindAt10m, 0.76 ) );
 
 		} else {
 			if ( ErrorIndex == 0 ) {
@@ -9711,7 +9711,7 @@ namespace ConvectionCoefficients {
 				ShowContinueError( "Convection model uses high theta correlation and the simulation continues" );
 			}
 			ShowRecurringSevereErrorAtEnd( "CalcEmmelVertical: Convection model wind angle calculation suspect" " and high theta correlation", ErrorIndex );
-			Hf = 3.54 * ( std::pow( WindAt10m, 0.76 ) );
+			Hf = 3.54 * ( power( WindAt10m, 0.76 ) );
 		}
 		return Hf;
 
@@ -9770,15 +9770,15 @@ namespace ConvectionCoefficients {
 		if ( Theta > 180.0 ) Theta -= 360.0;
 
 		if ( Theta <= 22.5 ) {
-			Hf = 5.15 * ( std::pow( WindAt10m, 0.81 ) );
+			Hf = 5.15 * ( power( WindAt10m, 0.81 ) );
 		} else if ( ( 22.5 < Theta ) && ( Theta <= 67.5 ) ) {
-			Hf = 3.34 * ( std::pow( WindAt10m, 0.84 ) );
+			Hf = 3.34 * ( power( WindAt10m, 0.84 ) );
 		} else if ( ( 67.5 < Theta ) && ( Theta <= 112.5 ) ) {
-			Hf = 4.78 * ( std::pow( WindAt10m, 0.71 ) );
+			Hf = 4.78 * ( power( WindAt10m, 0.71 ) );
 		} else if ( ( 112.5 < Theta ) && ( Theta <= 157.5 ) ) {
-			Hf = 4.05 * ( std::pow( WindAt10m, 0.77 ) );
+			Hf = 4.05 * ( power( WindAt10m, 0.77 ) );
 		} else if ( ( 157.5 < Theta ) && ( Theta <= 180. ) ) {
-			Hf = 3.54 * ( std::pow( WindAt10m, 0.76 ) );
+			Hf = 3.54 * ( power( WindAt10m, 0.76 ) );
 
 		} else {
 			if ( ErrorIndex == 0 ) {
@@ -9789,7 +9789,7 @@ namespace ConvectionCoefficients {
 			}
 			ShowRecurringSevereErrorAtEnd( "CalcEmmelRoof: Convection model wind angle calculation suspect" " and high theta correlation", ErrorIndex );
 
-			Hf = 3.54 * ( std::pow( WindAt10m, 0.76 ) );
+			Hf = 3.54 * ( power( WindAt10m, 0.76 ) );
 		}
 		return Hf;
 
@@ -9874,19 +9874,19 @@ namespace ConvectionCoefficients {
 		BetaFilm = 1.0 / ( KelvinConv + SurfTemp + 0.5 * DeltaTemp );
 		AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, AirTemp, OutHumRat, BlankString );
 
-		GrLn = g * ( std::pow( AirDensity, 2 ) ) * ( std::pow( Ln, 3 ) ) * std::abs( DeltaTemp ) * BetaFilm / std::pow( v, 2 );
+		GrLn = g * ( power( AirDensity, 2 ) ) * ( power( Ln, 3 ) ) * std::abs( DeltaTemp ) * BetaFilm / power( v, 2 );
 		RaLn = GrLn * Pr;
 
 		Rex = WindAtZ * AirDensity * x / v;
 
 		if ( Rex > 0.1 ) { //avoid zero and crazy small denominators
-			eta = ( std::log( 1.0 + GrLn / std::pow( Rex, 2 ) ) ) / ( 1.0 + std::log( 1.0 + GrLn / ( std::pow( Rex, 2 ) ) ) );
+			eta = ( std::log( 1.0 + GrLn / power( Rex, 2 ) ) ) / ( 1.0 + std::log( 1.0 + GrLn / ( power( Rex, 2 ) ) ) );
 		} else {
 			eta = 1.0; // forced convection gone because no wind
 		}
 
 		if ( x > 0.0 ) {
-			Hc = eta * ( k / Ln ) * 0.15 * ( std::pow( RaLn, OneThird ) ) + ( k / x ) * Rf * 0.0296 * ( std::pow( Rex, FourFifths ) ) * ( std::pow( Pr, OneThird ) );
+			Hc = eta * ( k / Ln ) * 0.15 * ( power( RaLn, OneThird ) ) + ( k / x ) * Rf * 0.0296 * ( power( Rex, FourFifths ) ) * ( power( Pr, OneThird ) );
 		} else {
 			if ( ErrorIndex == 0 ) {
 				ShowSevereMessage( "CalcClearRoof: Convection model not evaluated (bad value for distance to roof edge)" );

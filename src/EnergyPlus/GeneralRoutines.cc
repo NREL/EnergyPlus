@@ -286,7 +286,7 @@ ControlCompOutput(
 			//Record the minimum results and set flow to half way between the max and min and find results
 		} else if ( ZoneInterHalf.MinFlowResult ) {
 			ZoneInterHalf.MinResult = ZoneController.SensedValue;
-			HalvingPrec = ( ZoneInterHalf.MaxResult - ZoneInterHalf.MinResult ) * ( 1.0 / float( std::pow( 2, ( MaxIter - 3 ) ) ) );
+			HalvingPrec = ( ZoneInterHalf.MaxResult - ZoneInterHalf.MinResult ) * ( 1.0 / float( power( 2, ( MaxIter - 3 ) ) ) );
 			ZoneInterHalf.MidFlow = ( ZoneInterHalf.MaxFlow + ZoneInterHalf.MinFlow ) / 2.0;
 			ZoneController.CalculatedSetPoint = ( ZoneInterHalf.MaxFlow + ZoneInterHalf.MinFlow ) / 2.0;
 			ZoneInterHalf.MinFlowResult = false;
@@ -1023,7 +1023,7 @@ CalcPassiveExteriorBaffleGap(
 		if ( TsBaffK == TsoK ) { // avoid divide by zero
 			HPlenARR( ThisSurf ) = 0.0; // no net heat transfer if same temperature
 		} else {
-			HPlenARR( ThisSurf ) = Sigma * AbsExt * AbsThermSurf * ( std::pow( TsBaffK, 4 ) - std::pow( TsoK, 4 ) ) / ( TsBaffK - TsoK );
+			HPlenARR( ThisSurf ) = Sigma * AbsExt * AbsThermSurf * ( power( TsBaffK, 4 ) - power( TsoK, 4 ) ) / ( TsBaffK - TsoK );
 		}
 		// Added for ICS collector OSCM
 		if ( Surface( SurfPtr ).IsICS ) {
@@ -1078,7 +1078,7 @@ CalcPassiveExteriorBaffleGap(
 
 	TmeanK = 0.5 * ( TmpTsBaf + Tso ) + KelvinConv;
 
-	Gr = g * std::pow( GapThick, 3 ) * std::abs( Tso - TmpTsBaf ) * std::pow( RhoAir, 2 ) / ( TmeanK * std::pow( nu, 2 ) );
+	Gr = g * power( GapThick, 3 ) * std::abs( Tso - TmpTsBaf ) * power( RhoAir, 2 ) / ( TmeanK * power( nu, 2 ) );
 
 	PassiveGapNusseltNumber( AspRat, Tilt, TmpTsBaf, Tso, Gr, NuPlen ); //intentionally switch Tso to Tsi
 
@@ -1088,14 +1088,14 @@ CalcPassiveExteriorBaffleGap(
 	VdotWind = Cv * ( VentArea / 2.0 ) * Vwind;
 
 	if ( TaGap > Tamb ) {
-		VdotThermal = Cd * ( VentArea / 2. ) * std::pow( ( 2. * g * HdeltaNPL * ( TaGap - Tamb ) / ( TaGap + KelvinConv ) ), 0.5 );
+		VdotThermal = Cd * ( VentArea / 2. ) * power( ( 2. * g * HdeltaNPL * ( TaGap - Tamb ) / ( TaGap + KelvinConv ) ), 0.5 );
 	} else if ( TaGap == Tamb ) {
 		VdotThermal = 0.0;
 	} else {
 		if ( ( std::abs( Tilt ) < 5.0 ) || ( std::abs( Tilt - 180 ) < 5.0 ) ) {
 			VdotThermal = 0.0; // stable bouyancy situation
 		} else {
-			VdotThermal = Cd * ( VentArea / 2. ) * std::pow( ( 2. * g * HdeltaNPL * ( Tamb - TaGap ) / ( Tamb + KelvinConv ) ), 0.5 );
+			VdotThermal = Cd * ( VentArea / 2. ) * power( ( 2. * g * HdeltaNPL * ( Tamb - TaGap ) / ( Tamb + KelvinConv ) ), 0.5 );
 		}
 	}
 
@@ -1193,24 +1193,24 @@ PassiveGapNusseltNumber(
 	}
 
 	if ( Ra <= 1.0e4 ) {
-		gnu901 = 1.0 + 1.7596678e-10 * std::pow( Ra, 2.2984755 ); // eq. 51
+		gnu901 = 1.0 + 1.7596678e-10 * power( Ra, 2.2984755 ); // eq. 51
 	}
-	if ( Ra > 1.0e4 && Ra <= 5.0e4 ) gnu901 = 0.028154 * std::pow( Ra, 0.4134 ); // eq. 50
-	if ( Ra > 5.0e4 ) gnu901 = 0.0673838 * std::pow( Ra, ( 1.0 / 3.0 ) ); // eq. 49
+	if ( Ra > 1.0e4 && Ra <= 5.0e4 ) gnu901 = 0.028154 * power( Ra, 0.4134 ); // eq. 50
+	if ( Ra > 5.0e4 ) gnu901 = 0.0673838 * power( Ra, ( 1.0 / 3.0 ) ); // eq. 49
 
-	gnu902 = 0.242 * std::pow( ( Ra / AspRat ), .272 ); // eq. 52
+	gnu902 = 0.242 * power( ( Ra / AspRat ), .272 ); // eq. 52
 	gnu90 = max( gnu901, gnu902 );
 
 	if ( Tso > Tsi ) { // window heated from above
 		gNu = 1.0 + ( gnu90 - 1.0 ) * std::sin( tiltr ); // eq. 53
 	} else { // window heated from below
 		if ( Tilt >= 60.0 ) {
-			g = 0.5 * std::pow( ( 1.0 + std::pow( ( Ra / 3160. ), 20.6 ) ), ( -0.1 ) ); // eq. 47
-			gnu601a = 1.0 + std::pow( ( 0.0936 * ( std::pow( Ra, 0.314 ) ) / ( 1.0 + g ) ), 7 ); // eq. 45
-			gnu601 = std::pow( gnu601a, 0.142857 );
+			g = 0.5 * power( ( 1.0 + power( ( Ra / 3160. ), 20.6 ) ), ( -0.1 ) ); // eq. 47
+			gnu601a = 1.0 + power( ( 0.0936 * ( power( Ra, 0.314 ) ) / ( 1.0 + g ) ), 7 ); // eq. 45
+			gnu601 = power( gnu601a, 0.142857 );
 
 			// For any aspect ratio
-			gnu602 = ( 0.104 + 0.175 / AspRat ) * std::pow( Ra, 0.283 ); // eq. 46
+			gnu602 = ( 0.104 + 0.175 / AspRat ) * power( Ra, 0.283 ); // eq. 46
 			gnu60 = max( gnu601, gnu602 );
 
 			// linear interpolation for layers inclined at angles between 60 and 90 deg
@@ -1219,10 +1219,10 @@ PassiveGapNusseltNumber(
 		if ( Tilt < 60.0 ) { // eq. 42
 			cra = Ra * std::cos( tiltr );
 			a = 1.0 - 1708.0 / cra;
-			b = std::pow( ( cra / 5830.0 ), 0.33333 ) - 1.0;
+			b = power( ( cra / 5830.0 ), 0.33333 ) - 1.0;
 			gnua = ( std::abs( a ) + a ) / 2.0;
 			gnub = ( std::abs( b ) + b ) / 2.0;
-			ang = 1708.0 * std::pow( ( std::sin( 1.8 * tiltr ) ), 1.6 );
+			ang = 1708.0 * power( ( std::sin( 1.8 * tiltr ) ), 1.6 );
 			gNu = 1.0 + 1.44 * gnua * ( 1.0 - ang / cra ) + gnub;
 		}
 	}

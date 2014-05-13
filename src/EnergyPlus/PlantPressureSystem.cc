@@ -508,7 +508,7 @@ namespace PlantPressureSystem {
 
 		//Update the effective K-value for this branch
 		if ( NodeMassFlow > 0.0 ) {
-			PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).PressureEffectiveK = BranchDeltaPress / ( std::pow( NodeMassFlow, 2.0 ) );
+			PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).PressureEffectiveK = BranchDeltaPress / ( power( NodeMassFlow, 2 ) );
 		} else {
 			PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).PressureEffectiveK = 0.0;
 		}
@@ -868,7 +868,7 @@ namespace PlantPressureSystem {
 			}
 
 			//Add parallel branches if they are greater than zero, by taking the sum and performing (1/(SUM^2))
-			if ( TempVal_SumOfOneByRootK > 0.0 ) EffectiveLoopSideKValue += ( 1.0 / ( std::pow( TempVal_SumOfOneByRootK, 2 ) ) );
+			if ( TempVal_SumOfOneByRootK > 0.0 ) EffectiveLoopSideKValue += ( 1.0 / ( power( TempVal_SumOfOneByRootK, 2 ) ) );
 
 			//Always take the last branch K, it will be in series
 			BranchNum = size( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch );
@@ -1347,7 +1347,7 @@ namespace PlantPressureSystem {
 		//Get loop level data
 		FluidIndex = PlantLoop( LoopNum ).FluidIndex;
 		LoopEffectiveK = PlantLoop( LoopNum ).PressureEffectiveK;
-		SystemPressureDrop = LoopEffectiveK * std::pow( SystemMassFlow, 2.0 );
+		SystemPressureDrop = LoopEffectiveK * power( SystemMassFlow, 2 );
 
 		//Read data off the node data structure
 		NodeTemperature = Node( PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNumIn ).Temp;
@@ -1398,7 +1398,7 @@ namespace PlantPressureSystem {
 			PsiPump = CurveValue( PumpCurveNum, PhiPump );
 
 			//Calcuate Pump Pressure rise
-			PumpPressureRise = PsiPump * NodeDensity * ( std::pow( PumpSpeed, 2 ) ) * ( std::pow( PumpImpellerDia, 2 ) );
+			PumpPressureRise = PsiPump * NodeDensity * ( power( PumpSpeed, 2 ) ) * ( power( PumpImpellerDia, 2 ) );
 
 			//Convergence Criteria Based on Pressure
 			if ( std::abs( SystemPressureDrop - PumpPressureRise ) < ( PressureConvergeCriteria ) ) {

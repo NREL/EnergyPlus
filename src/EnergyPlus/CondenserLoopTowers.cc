@@ -4242,7 +4242,7 @@ namespace CondenserLoopTowers {
 				if ( OutletWaterTempMIN < TempSetPoint ) {
 					//         if setpoint was exceeded, cycle the fan at minimum air flow to meet the setpoint temperature
 					if ( SimpleTower( TowerNum ).FanPowerfAirFlowCurve == 0 ) {
-						CTFanPower = std::pow( AirFlowRateRatio, 3 ) * SimpleTower( TowerNum ).HighSpeedFanPower * NumCellOn / SimpleTower( TowerNum ).NumCell;
+						CTFanPower = power( AirFlowRateRatio, 3 ) * SimpleTower( TowerNum ).HighSpeedFanPower * NumCellOn / SimpleTower( TowerNum ).NumCell;
 					} else {
 						FanCurveValue = CurveValue( SimpleTower( TowerNum ).FanPowerfAirFlowCurve, AirFlowRateRatio );
 						CTFanPower = max( 0.0, ( SimpleTower( TowerNum ).HighSpeedFanPower * FanCurveValue ) ) * NumCellOn / SimpleTower( TowerNum ).NumCell;
@@ -4298,7 +4298,7 @@ namespace CondenserLoopTowers {
 
 					//         Use theoretical cubic for deterination of fan power if user has not specified a fan power ratio curve
 					if ( SimpleTower( TowerNum ).FanPowerfAirFlowCurve == 0 ) {
-						CTFanPower = std::pow( AirFlowRateRatio, 3 ) * SimpleTower( TowerNum ).HighSpeedFanPower * NumCellOn / SimpleTower( TowerNum ).NumCell;
+						CTFanPower = power( AirFlowRateRatio, 3 ) * SimpleTower( TowerNum ).HighSpeedFanPower * NumCellOn / SimpleTower( TowerNum ).NumCell;
 					} else {
 						FanCurveValue = CurveValue( SimpleTower( TowerNum ).FanPowerfAirFlowCurve, AirFlowRateRatio );
 						CTFanPower = max( 0.0, ( SimpleTower( TowerNum ).HighSpeedFanPower * FanCurveValue ) ) * NumCellOn / SimpleTower( TowerNum ).NumCell;
@@ -4661,7 +4661,7 @@ namespace CondenserLoopTowers {
 		} else { // empirical model is CoolTools format
 
 			//     the CoolTools model actually uses PctFanPower = AirFlowRatio^3 as an input to the model
-			PctAirFlow = std::pow( AirFlowRatio, 3 );
+			PctAirFlow = power( AirFlowRatio, 3 );
 			Approach = VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 1 ) + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 2 ) * PctAirFlow + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 3 ) * PctAirFlow * PctAirFlow + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 4 ) * PctAirFlow * PctAirFlow * PctAirFlow + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 5 ) * PctWaterFlow + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 6 ) * PctAirFlow * PctWaterFlow + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 7 ) * PctAirFlow * PctAirFlow * PctWaterFlow + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 8 ) * PctWaterFlow * PctWaterFlow + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 9 ) * PctAirFlow * PctWaterFlow * PctWaterFlow + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 10 ) * PctWaterFlow * PctWaterFlow * PctWaterFlow + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 11 ) * Twb + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 12 ) * PctAirFlow * Twb + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 13 ) * PctAirFlow * PctAirFlow * Twb + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 14 ) * PctWaterFlow * Twb + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 15 ) * PctAirFlow * PctWaterFlow * Twb + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 16 ) * PctWaterFlow * PctWaterFlow * Twb + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 17 ) * Twb * Twb + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 18 ) * PctAirFlow * Twb * Twb + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 19 ) * PctWaterFlow * Twb * Twb + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 20 ) * Twb * Twb * Twb + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 21 ) * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 22 ) * PctAirFlow * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 23 ) * PctAirFlow * PctAirFlow * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 24 ) * PctWaterFlow * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 25 ) * PctAirFlow * PctWaterFlow * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 26 ) * PctWaterFlow * PctWaterFlow * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 27 ) * Twb * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 28 ) * PctAirFlow * Twb * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 29 ) * PctWaterFlow * Twb * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 30 ) * Twb * Twb * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 31 ) * Tr * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 32 ) * PctAirFlow * Tr * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 33 ) * PctWaterFlow * Tr * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 34 ) * Twb * Tr * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 35 ) * Tr * Tr * Tr;
 		}
 		//    capping approach to 0 results in failure of RegulaFalsi routine

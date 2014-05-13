@@ -1315,9 +1315,9 @@ namespace SolarShading {
 		if ( ZenithAngDeg <= 75. ) {
 			AirMass = AirMassH / CosZenithAng;
 		} else {
-			AirMass = AirMassH / ( CosZenithAng + 0.15 * std::pow( ( 93.9 - ZenithAngDeg ), ( -1.253 ) ) );
+			AirMass = AirMassH / ( CosZenithAng + 0.15 * power( ( 93.9 - ZenithAngDeg ), ( -1.253 ) ) );
 		}
-		KappaZ3 = 1.041 * std::pow( ZenithAng, 3 );
+		KappaZ3 = 1.041 * power( ZenithAng, 3 );
 		Epsilon = ( ( BeamSolarRad + DifSolarRad ) / DifSolarRad + KappaZ3 ) / ( 1.0 + KappaZ3 );
 		Delta = DifSolarRad * AirMass / 1353.; // 1353 is average extraterrestrial irradiance (W/m2)
 		//           Circumsolar (F1) and horizon/zenith (F2) brightening coefficients
@@ -7173,11 +7173,11 @@ namespace SolarShading {
 
 				//  Compute Period Values
 				AvgSinSolarDeclin = SumDec / double( ShadowingDaysLeft );
-				AvgCosSolarDeclin = std::sqrt( 1.0 - std::pow( AvgSinSolarDeclin, 2 ) );
+				AvgCosSolarDeclin = std::sqrt( 1.0 - power( AvgSinSolarDeclin, 2 ) );
 				AvgEqOfTime = SumET / double( ShadowingDaysLeft );
 			} else {
 				SUN3( DayOfYear, AvgSinSolarDeclin, AvgEqOfTime );
-				AvgCosSolarDeclin = std::sqrt( 1.0 - std::pow( AvgSinSolarDeclin, 2 ) );
+				AvgCosSolarDeclin = std::sqrt( 1.0 - power( AvgSinSolarDeclin, 2 ) );
 			}
 
 			CalcPerSolarBeam( AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin );
@@ -7641,9 +7641,9 @@ namespace SolarShading {
 		SineX = std::sin( X );
 		CosX = std::cos( X );
 
-		SineOfSolarDeclination = SineSolDeclCoef( 1 ) + SineSolDeclCoef( 2 ) * SineX + SineSolDeclCoef( 3 ) * CosX + SineSolDeclCoef( 4 ) * ( SineX * CosX * 2.0 ) + SineSolDeclCoef( 5 ) * ( std::pow( CosX, 2 ) - std::pow( SineX, 2 ) ) + SineSolDeclCoef( 6 ) * ( SineX * ( std::pow( CosX, 2 ) - std::pow( SineX, 2 ) ) + CosX * ( SineX * CosX * 2. ) ) + SineSolDeclCoef( 7 ) * ( CosX * ( std::pow( CosX, 2 ) - std::pow( SineX, 2 ) ) - SineX * ( SineX * CosX * 2. ) ) + SineSolDeclCoef( 8 ) * ( 2. * ( SineX * CosX * 2. ) * ( std::pow( CosX, 2 ) - std::pow( SineX, 2 ) ) ) + SineSolDeclCoef( 9 ) * ( std::pow( ( std::pow( CosX, 2 ) - std::pow( SineX, 2 ) ), 2 ) - std::pow( ( SineX * CosX * 2. ), 2 ) );
+		SineOfSolarDeclination = SineSolDeclCoef( 1 ) + SineSolDeclCoef( 2 ) * SineX + SineSolDeclCoef( 3 ) * CosX + SineSolDeclCoef( 4 ) * ( SineX * CosX * 2.0 ) + SineSolDeclCoef( 5 ) * ( power( CosX, 2 ) - power( SineX, 2 ) ) + SineSolDeclCoef( 6 ) * ( SineX * ( power( CosX, 2 ) - power( SineX, 2 ) ) + CosX * ( SineX * CosX * 2. ) ) + SineSolDeclCoef( 7 ) * ( CosX * ( power( CosX, 2 ) - power( SineX, 2 ) ) - SineX * ( SineX * CosX * 2. ) ) + SineSolDeclCoef( 8 ) * ( 2. * ( SineX * CosX * 2. ) * ( power( CosX, 2 ) - power( SineX, 2 ) ) ) + SineSolDeclCoef( 9 ) * ( power( ( power( CosX, 2 ) - power( SineX, 2 ) ), 2 ) - power( ( SineX * CosX * 2. ), 2 ) );
 
-		EquationOfTime = EqOfTimeCoef( 1 ) + EqOfTimeCoef( 2 ) * SineX + EqOfTimeCoef( 3 ) * CosX + EqOfTimeCoef( 4 ) * ( SineX * CosX * 2. ) + EqOfTimeCoef( 5 ) * ( std::pow( CosX, 2 ) - std::pow( SineX, 2 ) ) + EqOfTimeCoef( 6 ) * ( SineX * ( std::pow( CosX, 2 ) - std::pow( SineX, 2 ) ) + CosX * ( SineX * CosX * 2. ) ) + EqOfTimeCoef( 7 ) * ( CosX * ( std::pow( CosX, 2 ) - std::pow( SineX, 2 ) ) - SineX * ( SineX * CosX * 2. ) ) + EqOfTimeCoef( 8 ) * ( 2. * ( SineX * CosX * 2. ) * ( std::pow( CosX, 2 ) - std::pow( SineX, 2 ) ) ) + EqOfTimeCoef( 9 ) * ( std::pow( ( std::pow( CosX, 2 ) - std::pow( SineX, 2 ) ), 2 ) - std::pow( ( SineX * CosX * 2. ), 2 ) );
+		EquationOfTime = EqOfTimeCoef( 1 ) + EqOfTimeCoef( 2 ) * SineX + EqOfTimeCoef( 3 ) * CosX + EqOfTimeCoef( 4 ) * ( SineX * CosX * 2. ) + EqOfTimeCoef( 5 ) * ( power( CosX, 2 ) - power( SineX, 2 ) ) + EqOfTimeCoef( 6 ) * ( SineX * ( power( CosX, 2 ) - power( SineX, 2 ) ) + CosX * ( SineX * CosX * 2. ) ) + EqOfTimeCoef( 7 ) * ( CosX * ( power( CosX, 2 ) - power( SineX, 2 ) ) - SineX * ( SineX * CosX * 2. ) ) + EqOfTimeCoef( 8 ) * ( 2. * ( SineX * CosX * 2. ) * ( power( CosX, 2 ) - power( SineX, 2 ) ) ) + EqOfTimeCoef( 9 ) * ( power( ( power( CosX, 2 ) - power( SineX, 2 ) ), 2 ) - power( ( SineX * CosX * 2. ), 2 ) );
 
 	}
 
@@ -9060,14 +9060,14 @@ namespace SolarShading {
 
 					if ( d2prime <= d2 ) {
 						if ( d12 * TanAlpha <= L ) {
-							A1sh = 0.5 * TanAlpha * std::pow( d1, 2 );
-							A2sh = d2prime * L + 0.5 * TanAlpha * std::pow( d12, 2 ) - A1sh;
+							A1sh = 0.5 * TanAlpha * power( d1, 2 );
+							A2sh = d2prime * L + 0.5 * TanAlpha * power( d12, 2 ) - A1sh;
 						} else { // d12*TanAlpha > L
 							if ( d1 * TanAlpha <= L ) {
-								A1sh = 0.5 * TanAlpha * std::pow( d1, 2 );
-								A2sh = d2 * L - 0.5 * TanAlpha * std::pow( ( L / TanAlpha - d1 ), 2 );
+								A1sh = 0.5 * TanAlpha * power( d1, 2 );
+								A2sh = d2 * L - 0.5 * TanAlpha * power( ( L / TanAlpha - d1 ), 2 );
 							} else { // d1*TanAlpha > L
-								A1sh = d1 * L - ( 0.5 / TanAlpha ) * std::pow( L, 2 );
+								A1sh = d1 * L - ( 0.5 / TanAlpha ) * power( L, 2 );
 								A2sh = d2 * L;
 							}
 						}
@@ -9075,9 +9075,9 @@ namespace SolarShading {
 						A2sh = d2 * L;
 						if ( d2prime < d1 + d2 ) {
 							if ( d12 * TanAlpha <= L ) {
-								A1sh = L * ( d2prime - d2 ) + 0.5 * TanAlpha * std::pow( d12, 2 );
+								A1sh = L * ( d2prime - d2 ) + 0.5 * TanAlpha * power( d12, 2 );
 							} else { // d12*TanAlpha > L
-								A1sh = d1 * L - 0.5 * std::pow( L, 2 ) / TanAlpha;
+								A1sh = d1 * L - 0.5 * power( L, 2 ) / TanAlpha;
 							}
 						} else { // d2prime >= d1+d2
 							A1sh = d1 * L;
@@ -9109,10 +9109,10 @@ namespace SolarShading {
 					if ( d2prime <= f2 ) { // Shadow from opposing reveal does not go beyond inside surface of frame
 
 						if ( d12 * TanAlpha <= L ) {
-							A1sh = 0.5 * TanAlpha * std::pow( f1, 2 );
+							A1sh = 0.5 * TanAlpha * power( f1, 2 );
 							L1 = f1 * ( f1 * TanAlpha / ( 6. * L ) + 0.5 );
 							if ( d2 - ( d2prime + d2prime2 + P2 ) >= 0.0 ) {
-								A2sh = ( d2prime + d2prime2 ) * L + 0.5 * TanAlpha * ( std::pow( ( d1 + d2 - d2prime ), 2 ) - std::pow( ( d1 + P2 + d2prime2 ), 2 ) );
+								A2sh = ( d2prime + d2prime2 ) * L + 0.5 * TanAlpha * ( power( ( d1 + d2 - d2prime ), 2 ) - power( ( d1 + P2 + d2prime2 ), 2 ) );
 								L2 = d2prime2 + 0.5 * ( d2 - ( d2prime + d2prime2 + P2 ) );
 							} else { // d2-(d2prime+d2prime2+P2) < 0.  ! Inside reveal is fully shadowed by frame and/or opposing reveal
 								A2sh = f2 * L;
@@ -9120,23 +9120,23 @@ namespace SolarShading {
 							}
 						} else { // d12*TanAlpha >= L
 							if ( ( d1 + P2 ) * TanAlpha <= L ) {
-								A1sh = 0.5 * TanAlpha * std::pow( f1, 2 );
+								A1sh = 0.5 * TanAlpha * power( f1, 2 );
 								L1 = f1 * ( ( f1 * TanAlpha ) / ( 6. * L ) + 0.5 );
 								if ( ( d1 + P2 + d2prime2 ) * TanAlpha >= L ) {
 									A2sh = f2 * L;
 									L2 = f2;
 								} else { // (d1+P2+d2prime2)*TanAlpha < L
-									A2sh = f2 * L - 0.5 * std::pow( ( L - ( d1 + P2 ) * TanAlpha ), 2 ) / TanAlpha + d2prime2 * ( L - ( d1 + P2 + d2prime2 / 2. ) * TanAlpha );
+									A2sh = f2 * L - 0.5 * power( ( L - ( d1 + P2 ) * TanAlpha ), 2 ) / TanAlpha + d2prime2 * ( L - ( d1 + P2 + d2prime2 / 2. ) * TanAlpha );
 									L2 = d2prime2 + ( L / TanAlpha - ( d1 + P2 + d2prime2 ) ) / 3.;
 								}
 							} else { // (d1+P2)*TanAlpha > L
 								L2 = f2;
 								A2sh = f2 * L;
 								if ( f1 * TanAlpha <= L ) {
-									A1sh = 0.5 * TanAlpha * std::pow( f1, 2 );
+									A1sh = 0.5 * TanAlpha * power( f1, 2 );
 									L1 = f1 * ( ( f1 * TanAlpha ) / ( 6. * L ) + 0.5 );
 								} else { // f1*TanAlpha > L
-									A1sh = f1 * L - 0.5 * std::pow( L, 2 ) / TanAlpha;
+									A1sh = f1 * L - 0.5 * power( L, 2 ) / TanAlpha;
 									L1 = f1 - ( L / TanAlpha ) / 3.;
 								}
 							}
@@ -9152,18 +9152,18 @@ namespace SolarShading {
 						} else { // d2prime < d1+d2
 							if ( d2prime <= d2 + P1 ) {
 								if ( f1 * TanAlpha <= L ) {
-									A1sh = 0.5 * TanAlpha * std::pow( f1, 2 );
+									A1sh = 0.5 * TanAlpha * power( f1, 2 );
 									L1 = f1 * ( ( f1 * TanAlpha ) / ( 6. * L ) + 0.5 );
 								} else { // f1*TanAlpha > L
-									A1sh = f1 * L - 0.5 * std::pow( L, 2 ) / TanAlpha;
+									A1sh = f1 * L - 0.5 * power( L, 2 ) / TanAlpha;
 									L1 = f1 - ( L / TanAlpha ) / 3.;
 								}
 							} else { // d2prime > d2+P1
 								if ( d12 * TanAlpha <= L ) {
-									A1sh = L * ( d2prime - ( d2 + P1 ) ) + 0.5 * TanAlpha * std::pow( d12, 2 );
+									A1sh = L * ( d2prime - ( d2 + P1 ) ) + 0.5 * TanAlpha * power( d12, 2 );
 									L1 = ( L * ( f1 - d12 / 2. ) - d12 * TanAlpha * ( f1 / 2 - d12 / 3. ) ) / ( L - d12 * TanAlpha / 2. );
 								} else { // d12*TanAlpha > L
-									A1sh = f1 * L - 0.5 * std::pow( L, 2 ) / TanAlpha;
+									A1sh = f1 * L - 0.5 * power( L, 2 ) / TanAlpha;
 									L1 = f1 - ( L / TanAlpha ) / 3.;
 								}
 							}

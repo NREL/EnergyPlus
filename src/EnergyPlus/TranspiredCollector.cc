@@ -562,9 +562,9 @@ namespace TranspiredCollector {
 			//  need to update this for slots as well as holes
 			{ auto const SELECT_CASE_var( UTSC( Item ).Layout );
 			if ( SELECT_CASE_var == Layout_Triangle ) { // 'TRIANGLE'
-				UTSC( Item ).Porosity = 0.907 * std::pow( ( UTSC( Item ).HoleDia / UTSC( Item ).Pitch ), 2.0 ); //Kutscher equation, Triangle layout
+				UTSC( Item ).Porosity = 0.907 * power( ( UTSC( Item ).HoleDia / UTSC( Item ).Pitch ), 2 ); //Kutscher equation, Triangle layout
 			} else if ( SELECT_CASE_var == Layout_Square ) { // 'SQUARE'
-				UTSC( Item ).Porosity = ( Pi / 4. ) * ( std::pow( UTSC( Item ).HoleDia, 2.0 ) ) / ( std::pow( UTSC( Item ).Pitch, 2.0 ) ); //Waterloo equation, square layout
+				UTSC( Item ).Porosity = ( Pi / 4. ) * ( power( UTSC( Item ).HoleDia, 2 ) ) / ( power( UTSC( Item ).Pitch, 2 ) ); //Waterloo equation, square layout
 			}}
 			TiltRads = std::abs( AvgTilt ) * DegToRadians;
 			tempHdeltaNPL = std::sin( TiltRads ) * UTSC( Item ).Height / 4.0;
@@ -936,7 +936,7 @@ namespace TranspiredCollector {
 			AbsThermSurf = Material( Construct( ConstrNum ).LayerPoint( 1 ) ).AbsorpThermal;
 			TsoK = TH( SurfPtr, 1, 1 ) + KelvinConv;
 			TscollK = UTSC( UTSCNum ).TcollLast + KelvinConv;
-			HPlenARR( ThisSurf ) = Sigma * AbsExt * AbsThermSurf * ( std::pow( TscollK, 4 ) - std::pow( TsoK, 4 ) ) / ( TscollK - TsoK );
+			HPlenARR( ThisSurf ) = Sigma * AbsExt * AbsThermSurf * ( power( TscollK, 4 ) - power( TsoK, 4 ) ) / ( TscollK - TsoK );
 		}
 //		AreaSum = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
 		auto Area( array_sub( Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) ); //Autodesk:F2C++ Copy of subscripted Area array for use below: This makes a copy so review wrt performance
@@ -979,7 +979,7 @@ namespace TranspiredCollector {
 
 			AlessHoles = A - holeArea;
 
-			NuD = 2.75 * ( ( ( std::pow( ( P / D ), ( -1.2 ) ) ) * ( std::pow( ReD, 0.43 ) ) ) + ( 0.011 * Por * ReD * ( std::pow( ( Vwind / Vsuction ), 0.48 ) ) ) );
+			NuD = 2.75 * ( ( ( power( ( P / D ), ( -1.2 ) ) ) * ( power( ReD, 0.43 ) ) ) + ( 0.011 * Por * ReD * ( power( ( Vwind / Vsuction ), 0.48 ) ) ) );
 			U = k * NuD / D;
 			HXeff = 1.0 - std::exp( -1.0 * ( ( U * AlessHoles ) / ( Mdot * CpAir ) ) );
 
@@ -991,9 +991,9 @@ namespace TranspiredCollector {
 			ReH = ( Vsuction * D ) / ( nu * Por );
 			if ( ReD > 0.0 ) {
 				if ( ReW > 0.0 ) {
-					HXeff = ( 1.0 - std::pow( ( 1.0 + ReS * max( 1.733 * std::pow( ReW, ( -0.5 ) ), 0.02136 ) ), ( -1.0 ) ) ) * ( 1.0 - std::pow( ( 1.0 + 0.2273 * ( std::pow( ReB, 0.5 ) ) ), ( -1.0 ) ) ) * std::exp( -0.01895 * ( P / D ) - ( 20.62 / ReH ) * ( t / D ) );
+					HXeff = ( 1.0 - power( ( 1.0 + ReS * max( 1.733 * power( ReW, ( -0.5 ) ), 0.02136 ) ), ( -1 ) ) ) * ( 1.0 - power( ( 1.0 + 0.2273 * ( power( ReB, 0.5 ) ) ), ( -1 ) ) ) * std::exp( -0.01895 * ( P / D ) - ( 20.62 / ReH ) * ( t / D ) );
 				} else {
-					HXeff = ( 1.0 - std::pow( ( 1.0 + ReS * 0.02136 ), ( -1.0 ) ) ) * ( 1.0 - std::pow( ( 1.0 + 0.2273 * std::pow( ReB, 0.5 ) ), ( -1.0 ) ) ) * std::exp( -0.01895 * ( P / D ) - ( 20.62 / ReH ) * ( t / D ) );
+					HXeff = ( 1.0 - power( ( 1.0 + ReS * 0.02136 ), ( -1 ) ) ) * ( 1.0 - power( ( 1.0 + 0.2273 * power( ReB, 0.5 ) ), ( -1 ) ) ) * std::exp( -0.01895 * ( P / D ) - ( 20.62 / ReH ) * ( t / D ) );
 				}
 			} else {
 				HXeff = 0.0;

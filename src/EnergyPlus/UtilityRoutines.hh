@@ -1,6 +1,8 @@
 #ifndef UtilityRoutines_hh_INCLUDED
 #define UtilityRoutines_hh_INCLUDED
 
+#include <cmath>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Optional.hh>
 
@@ -45,39 +47,83 @@ ConvertCaseToLower(
 std::string::size_type
 FindNonSpace( std::string const & String ); // String to be scanned
 
+
+/** This function takes a baseValue and raises it to the exponentValue power.
+  * This implementation has a speed advantage over std::pow for low integer
+  * values of exponentValue where this unrolls the multiplication. Certain
+  * compilers may perform this exact optimization, but not all. **/
 inline
 double
-power( double baseValue, int exponentValue)
+power( double const & baseValue, int const & exponentValue)
 {
+	if ( exponentValue == 0 ) { return 1.0; }
 	double result = 1.0;
-	if ( exponentValue > 0)
-		for (int i = 0; i < exponentValue; i++)
-			result *= baseValue;
-	else
-		for (int i = 0; i > exponentValue; i--)
-			result /= baseValue;
-	return result;
+	if ( exponentValue > 0 ) {
+		switch( exponentValue ) {
+			case 1: return baseValue;
+			case 2: return baseValue * baseValue;
+			case 3: return baseValue * baseValue * baseValue;
+			case 4:
+				result = baseValue * baseValue;
+				return result * result;
+			case 5:
+				result = baseValue * baseValue;
+				return result * result * baseValue;
+			case 6:
+				result = baseValue * baseValue;
+				return result * result * result;
+			case 7:
+				result = baseValue * baseValue;
+				return result * result * result * baseValue;
+			default: return std::pow( baseValue, exponentValue );
+		}
+	} else {
+		switch( -exponentValue ) {
+			case 1: return result / baseValue;
+			case 2: return baseValue / baseValue;
+			case 3: return baseValue / baseValue / baseValue;
+			case 4:
+				result = baseValue / baseValue;
+				return result / result;
+			case 5:
+				result = baseValue / baseValue;
+				return result / result / baseValue;
+			case 6:
+				result = baseValue / baseValue;
+				return result / result / result;
+			case 7:
+				result = baseValue / baseValue;
+				return result / result / result / baseValue;
+			default: return std::pow( baseValue, exponentValue );
+		}
+	}
 }
 
+/** This function overloads power() so std::pow is used. This allows all
+  * calls to use power() instead of std::pow in the code. **/
 inline
 double
-power( double baseValue, double exponentValue)
+power( double const & baseValue, double const & exponentValue)
 {
-	return std::okpow( baseValue, exponentValue );
+	return std::pow( baseValue, exponentValue );
 }
 
+/** This function overloads power() so std::pow is used. This allows all
+  * calls to use power() instead of std::pow in the code. **/
 inline
 float
-power( float baseValue, float exponentValue)
+power( float const & baseValue, float const & exponentValue)
 {
-	return std::okpow( baseValue, exponentValue );
+	return std::pow( baseValue, exponentValue );
 }
 
+/** This function overloads power() so std::pow is used. This allows all
+  * calls to use power() instead of std::pow in the code. **/
 inline
 long double
-power( long double baseValue, long double exponentValue)
+power( long double const & baseValue, long double const & exponentValue)
 {
-	return std::okpow( baseValue, exponentValue );
+	return std::pow( baseValue, exponentValue );
 }
 
 bool

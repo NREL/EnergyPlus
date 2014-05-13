@@ -846,14 +846,14 @@ namespace HeatPumpWaterToWaterCOOLING {
 
 			// Determine the Mass flow rate of refrigerant
 			CompSuctionDensity = GetSupHeatDensityRefrig( GSHPRefrigerant, CompSuctionTemp, SuctionPr, GSHPRefrigIndex, RoutineNameCompSuctionTemp );
-			MassRef = PistonDisp * CompSuctionDensity * ( 1 + ClearanceFactor - ClearanceFactor * ( std::pow( ( DischargePr / SuctionPr ), ( 1 / gamma ) ) ) );
+			MassRef = PistonDisp * CompSuctionDensity * ( 1 + ClearanceFactor - ClearanceFactor * ( power( ( DischargePr / SuctionPr ), ( 1 / gamma ) ) ) );
 
 			// Find the Source Side Heat Transfer
 
 			QLoad = MassRef * ( LoadSideOutletEnth - SourceSideOutletEnth );
 
 			// Determine the theoretical power
-			Power = PowerLosses + ( MassRef * gamma / ( gamma - 1 ) * SuctionPr / CompSuctionDensity / LosFac * ( std::pow( ( DischargePr / SuctionPr ), ( ( gamma - 1 ) / gamma ) ) - 1 ) );
+			Power = PowerLosses + ( MassRef * gamma / ( gamma - 1 ) * SuctionPr / CompSuctionDensity / LosFac * ( power( ( DischargePr / SuctionPr ), ( ( gamma - 1 ) / gamma ) ) - 1 ) );
 
 			// Determine the Loadside HeatRate (QLoad)
 			QSource = Power + QLoad;

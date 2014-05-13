@@ -572,7 +572,7 @@ namespace DaylightingDevices {
 					ErrorsFound = true;
 				}
 
-				PipeArea = 0.25 * Pi * std::pow( TDDPipe( PipeNum ).Diameter, 2 );
+				PipeArea = 0.25 * Pi * power( TDDPipe( PipeNum ).Diameter, 2 );
 				if ( TDDPipe( PipeNum ).Dome > 0 && std::abs( PipeArea - Surface( TDDPipe( PipeNum ).Dome ).Area ) > 0.1 ) {
 					if ( SafeDivide( std::abs( PipeArea - Surface( TDDPipe( PipeNum ).Dome ).Area ), Surface( TDDPipe( PipeNum ).Dome ).Area ) > .1 ) { // greater than 10%
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Pipe and dome/diffuser areas are significantly different (>10%)." );
@@ -896,7 +896,7 @@ namespace DaylightingDevices {
 		T = 0.0;
 		i = 1.0 / N;
 
-		xLimit = ( std::log( std::pow( N, 2.0 ) * myLocalTiny ) / std::log( R ) ) / xTol;
+		xLimit = ( std::log( power( N, 2 ) * myLocalTiny ) / std::log( R ) ) / xTol;
 
 		c1 = A * std::tan( Theta );
 		c2 = 4.0 / Pi;
@@ -906,7 +906,7 @@ namespace DaylightingDevices {
 			x = c1 / s;
 
 			if ( x < xLimit ) {
-				dT = c2 * ( std::pow( R, int( x ) ) ) * ( 1.0 - ( 1.0 - R ) * ( x - int( x ) ) ) * ( std::pow( s, 2 ) ) / std::sqrt( 1.0 - std::pow( s, 2 ) );
+				dT = c2 * ( power( R, int( x ) ) ) * ( 1.0 - ( 1.0 - R ) * ( x - int( x ) ) ) * ( power( s, 2 ) ) / std::sqrt( 1.0 - power( s, 2 ) );
 				T += dT;
 			}
 
@@ -1491,10 +1491,10 @@ namespace DaylightingDevices {
 		M = H / W;
 		N = L / W;
 
-		E1 = M * std::atan( ( 1.0 / M ) ) + N * std::atan( ( 1.0 / N ) ) - ( std::sqrt( std::pow( N, 2 ) + std::pow( M, 2 ) ) ) * std::atan( std::pow( ( ( std::pow( N, 2 ) + std::pow( M, 2 ) ) ), ( -0.5 ) ) );
-		E2 = ( ( 1.0 + std::pow( M, 2 ) ) * ( 1.0 + std::pow( N, 2 ) ) ) / ( 1.0 + std::pow( M, 2 ) + std::pow( N, 2 ) );
-		E3 = std::pow( ( ( std::pow( M, 2 ) ) * ( 1.0 + std::pow( M, 2 ) + std::pow( N, 2 ) ) / ( ( 1.0 + std::pow( M, 2 ) ) * ( std::pow( M, 2 ) + std::pow( N, 2 ) ) ) ), ( std::pow( M, 2 ) ) );
-		E4 = std::pow( ( ( std::pow( N, 2 ) ) * ( 1.0 + std::pow( M, 2 ) + std::pow( N, 2 ) ) / ( ( 1.0 + std::pow( N, 2 ) ) * ( std::pow( M, 2 ) + std::pow( N, 2 ) ) ) ), ( std::pow( N, 2 ) ) );
+		E1 = M * std::atan( ( 1.0 / M ) ) + N * std::atan( ( 1.0 / N ) ) - ( std::sqrt( power( N, 2 ) + power( M, 2 ) ) ) * std::atan( power( ( ( power( N, 2 ) + power( M, 2 ) ) ), ( -0.5 ) ) );
+		E2 = ( ( 1.0 + power( M, 2 ) ) * ( 1.0 + power( N, 2 ) ) ) / ( 1.0 + power( M, 2 ) + power( N, 2 ) );
+		E3 = power( ( ( power( M, 2 ) ) * ( 1.0 + power( M, 2 ) + power( N, 2 ) ) / ( ( 1.0 + power( M, 2 ) ) * ( power( M, 2 ) + power( N, 2 ) ) ) ), ( power( M, 2 ) ) );
+		E4 = power( ( ( power( N, 2 ) ) * ( 1.0 + power( M, 2 ) + power( N, 2 ) ) / ( ( 1.0 + power( N, 2 ) ) * ( power( M, 2 ) + power( N, 2 ) ) ) ), ( power( N, 2 ) ) );
 
 		Shelf( ShelfNum ).ViewFactor = ( 1.0 / ( Pi * M ) ) * ( E1 + 0.25 * std::log( E2 * E3 * E4 ) );
 

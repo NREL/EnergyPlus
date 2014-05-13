@@ -1994,7 +1994,7 @@ namespace Psychrometrics {
 			A = phi2 + N1 * phi + N2;
 			B = N3 * phi2 + N4 * phi + N5;
 			C = N6 * phi2 + N7 * phi + N8;
-			Pascal = 1000000. * std::pow( ( ( 2. * C ) / ( -B + std::sqrt( std::pow( B, 2 ) - 4. * A * C ) ) ), 4 );
+			Pascal = 1000000. * power( ( ( 2. * C ) / ( -B + std::sqrt( power( B, 2 ) - 4. * A * C ) ) ), 4 );
 #endif
 			// If above 200C, set value of Pressure corresponding to Saturation Temperature of 200C.
 		} else if ( ( Tkel > 473.15 ) ) {

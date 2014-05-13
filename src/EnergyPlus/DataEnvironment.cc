@@ -369,7 +369,7 @@ namespace DataEnvironment {
 			//  [Met] - at meterological Station, Height of measurement is usually 10m above ground
 			//  LocalWindSpeed = Windspeed [Met] * (Wind Boundary LayerThickness [Met]/Height [Met])**Wind Exponent[Met] &
 			//                     * (Height above ground / Site Wind Boundary Layer Thickness) ** Site Wind Exponent
-			LocalWindSpeed = WindSpeed * WeatherFileWindModCoeff * std::pow( ( Z / SiteWindBLHeight ), SiteWindExp );
+			LocalWindSpeed = WindSpeed * WeatherFileWindModCoeff * power( ( Z / SiteWindBLHeight ), SiteWindExp );
 		}
 
 		return LocalWindSpeed;
@@ -418,7 +418,7 @@ namespace DataEnvironment {
 		} else if ( SiteTempGradient == 0.0 ) {
 			LocalAirPressure = OutBaroPress;
 		} else {
-			LocalAirPressure = StdBaroPress * std::pow( ( BaseTemp / ( BaseTemp + TempGradient * ( Z - GeopotentialH ) ) ), ( ( StdGravity * AirMolarMass ) / ( GasConstant * TempGradient ) ) );
+			LocalAirPressure = StdBaroPress * power( ( BaseTemp / ( BaseTemp + TempGradient * ( Z - GeopotentialH ) ) ), ( ( StdGravity * AirMolarMass ) / ( GasConstant * TempGradient ) ) );
 		}
 
 		return LocalAirPressure;
@@ -570,7 +570,7 @@ namespace DataEnvironment {
 					//  [Met] - at meterological Station, Height of measurement is usually 10m above ground
 					//  LocalWindSpeed = Windspeed [Met] * (Wind Boundary LayerThickness [Met]/Height [Met])**Wind Exponent[Met] &
 					//                     * (Height above ground / Site Wind Boundary Layer Thickness) ** Site Wind Exponent
-					LocalWindSpeed( i ) = WindSpeed * WeatherFileWindModCoeff * std::pow( ( Z / SiteWindBLHeight ), SiteWindExp );
+					LocalWindSpeed( i ) = WindSpeed * WeatherFileWindModCoeff * power( ( Z / SiteWindBLHeight ), SiteWindExp );
 				}
 			}
 		}

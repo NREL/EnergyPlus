@@ -563,7 +563,7 @@ namespace Psychrometrics {
 		//     Density of water [kg/m3]
 		//     (RANGE: KelvinConv - 423.15 DEG. K) (convert to C first)
 
-		return 1000.1207 + 8.3215874e-04 * TB - 4.929976e-03 * std::pow( TB, 2 ) + 8.4791863e-06 * std::pow( TB, 3 );
+		return 1000.1207 + 8.3215874e-04 * TB - 4.929976e-03 * power( TB, 2 ) + 8.4791863e-06 * power( TB, 3 );
 	}
 
 	//     NOTICE

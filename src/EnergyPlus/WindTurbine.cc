@@ -694,7 +694,7 @@ namespace WindTurbine {
 		// Factor differences between TMY wind data and local wind data once
 		if ( AnnualTMYWS > 0.0 && WindTurbineSys( WindTurbineNum ).WSFactor == 0.0 && WindTurbineSys( WindTurbineNum ).LocalAnnualAvgWS > 0 ) {
 			// Convert the annual wind speed to the local wind speed at the height of the local station, then factor
-			LocalTMYWS = AnnualTMYWS * WeatherFileWindModCoeff * std::pow( ( WindTurbineSys( WindTurbineNum ).HeightForLocalWS / SiteWindBLHeight ), SiteWindExp );
+			LocalTMYWS = AnnualTMYWS * WeatherFileWindModCoeff * power( ( WindTurbineSys( WindTurbineNum ).HeightForLocalWS / SiteWindBLHeight ), SiteWindExp );
 			WindTurbineSys( WindTurbineNum ).WSFactor = LocalTMYWS / WindTurbineSys( WindTurbineNum ).LocalAnnualAvgWS;
 		}
 		// Assign factor of 1.0 if no stat file or no input of local average wind speed
@@ -826,7 +826,7 @@ namespace WindTurbine {
 			// System is on
 			Period = 2.0 * Pi;
 			Omega = ( RotorSpeed * Period ) / SecInMin;
-			SweptArea = ( Pi * std::pow( RotorD, 2.0 ) ) / 4;
+			SweptArea = ( Pi * power( RotorD, 2 ) ) / 4;
 			TipSpeedRatio = ( Omega * ( RotorD / 2.0 ) ) / LocalWindSpeed;
 
 			// Limit maximum tip speed ratio
@@ -849,20 +849,20 @@ namespace WindTurbine {
 				if ( C1 > 0.0 && C2 > 0.0 && C3 > 0.0 && C4 >= 0.0 && C5 > 0.0 && C6 > 0.0 ) {
 					// Analytical approximation
 					// Maximum power, i.e., rotor speed is at maximum, and pitch angle is zero
-					TipSpeedRatioAtI = 1.0 / ( ( 1.0 / ( TipSpeedRatio + 0.08 * PitchAngle ) ) - ( 0.035 / ( std::pow( PitchAngle, 3 ) + 1.0 ) ) );
-					PowerCoeff = C1 * ( ( C2 / TipSpeedRatioAtI ) - ( C3 * PitchAngle ) - ( C4 * std::pow( PitchAngle, 1.5 ) ) - C5 ) * ( std::exp( -( C6 / TipSpeedRatioAtI ) ) );
+					TipSpeedRatioAtI = 1.0 / ( ( 1.0 / ( TipSpeedRatio + 0.08 * PitchAngle ) ) - ( 0.035 / ( power( PitchAngle, 3 ) + 1.0 ) ) );
+					PowerCoeff = C1 * ( ( C2 / TipSpeedRatioAtI ) - ( C3 * PitchAngle ) - ( C4 * power( PitchAngle, 1.5 ) ) - C5 ) * ( std::exp( -( C6 / TipSpeedRatioAtI ) ) );
 					if ( PowerCoeff > MaxPowerCoeff ) {
 						PowerCoeff = MaxPowerCoeff;
 					}
-					WTPower = 0.5 * LocalAirDensity * PowerCoeff * SweptArea * std::pow( LocalWindSpeed, 3 );
+					WTPower = 0.5 * LocalAirDensity * PowerCoeff * SweptArea * power( LocalWindSpeed, 3 );
 				} else { // Simple approximation
-					WTPower = 0.5 * LocalAirDensity * SweptArea * std::pow( LocalWindSpeed, 3 ) * MaxPowerCoeff;
+					WTPower = 0.5 * LocalAirDensity * SweptArea * power( LocalWindSpeed, 3 ) * MaxPowerCoeff;
 					PowerCoeff = MaxPowerCoeff;
 				}
 				// Maximum of rated power
 				if ( LocalWindSpeed >= WindTurbineSys( WindTurbineNum ).RatedWindSpeed || WTPower > WindTurbineSys( WindTurbineNum ).RatedPower ) {
 					WTPower = WindTurbineSys( WindTurbineNum ).RatedPower;
-					PowerCoeff = WTPower / ( 0.5 * LocalAirDensity * SweptArea * std::pow( LocalWindSpeed, 3.0 ) );
+					PowerCoeff = WTPower / ( 0.5 * LocalAirDensity * SweptArea * power( LocalWindSpeed, 3 ) );
 				}
 				// Recalculated Cp at the rated power
 				WindTurbineSys( WindTurbineNum ).PowerCoeff = PowerCoeff;
@@ -890,7 +890,7 @@ namespace WindTurbine {
 				// Velocity components
 				ChordalVel = RotorVel + InducedVel * std::cos( AzimuthAng * DegToRadians );
 				NormalVel = InducedVel * std::sin( AzimuthAng * DegToRadians );
-				RelFlowVel = std::sqrt( std::pow( ChordalVel, 2 ) + std::pow( NormalVel, 2 ) );
+				RelFlowVel = std::sqrt( power( ChordalVel, 2 ) + power( NormalVel, 2 ) );
 
 				// Angle of attack
 				AngOfAttack = std::atan( ( std::sin( AzimuthAng * DegToRadians ) / ( ( RotorVel / LocalWindSpeed ) / ( InducedVel / LocalWindSpeed ) + std::cos( AzimuthAng * DegToRadians ) ) ) );
@@ -900,14 +900,14 @@ namespace WindTurbine {
 				NorForceCoeff = WindTurbineSys( WindTurbineNum ).LiftCoeff * std::cos( AngOfAttack * DegToRadians ) + WindTurbineSys( WindTurbineNum ).DragCoeff * std::sin( AngOfAttack * DegToRadians );
 
 				// Net tangential and normal forces
-				TanForce = TanForceCoeff * 0.5 * LocalAirDensity * WindTurbineSys( WindTurbineNum ).ChordArea * std::pow( RelFlowVel, 2 );
-				NorForce = NorForceCoeff * 0.5 * LocalAirDensity * WindTurbineSys( WindTurbineNum ).ChordArea * std::pow( RelFlowVel, 2 );
-				Constant = ( 1.0 / Period ) * ( TanForce / std::pow( RelFlowVel, 2 ) );
+				TanForce = TanForceCoeff * 0.5 * LocalAirDensity * WindTurbineSys( WindTurbineNum ).ChordArea * power( RelFlowVel, 2 );
+				NorForce = NorForceCoeff * 0.5 * LocalAirDensity * WindTurbineSys( WindTurbineNum ).ChordArea * power( RelFlowVel, 2 );
+				Constant = ( 1.0 / Period ) * ( TanForce / power( RelFlowVel, 2 ) );
 
 				// Relative flow velocity is the only function of theta in net tangential force
 				// Integral of cos(theta) on zero to 2pi goes to zero
 				// Integrate constants only
-				IntRelFlowVel = std::pow( RotorVel, 2 ) * Period + std::pow( InducedVel, 2 ) * Period;
+				IntRelFlowVel = power( RotorVel, 2 ) * Period + power( InducedVel, 2 ) * Period;
 
 				// Average tangential force on a single blade
 				AvgTanForce = Constant * IntRelFlowVel;

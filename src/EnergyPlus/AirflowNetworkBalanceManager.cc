@@ -3677,7 +3677,7 @@ namespace AirflowNetworkBalanceManager {
 
 					if ( SameString( AirflowNetworkSimu.BldgType, "LowRise" ) && FacadeNum <= 4 ) {
 						IncRad = IncAng * DegToRadians;
-						MultizoneCPValueData( FacadeNum ).CPValue( WindDirNum ) = 0.6 * std::log( 1.248 - 0.703 * std::sin( IncRad / 2. ) - 1.175 * std::pow( std::sin( IncRad ), 2 ) + 0.131 * std::pow( std::sin( 2. * IncRad * SideRatioFac ), 3 ) + 0.769 * std::cos( IncRad / 2. ) + 0.07 * std::pow( ( SideRatioFac * std::sin( IncRad / 2. ) ), 2 ) + 0.717 * std::pow( std::cos( IncRad / 2. ), 2 ) );
+						MultizoneCPValueData( FacadeNum ).CPValue( WindDirNum ) = 0.6 * std::log( 1.248 - 0.703 * std::sin( IncRad / 2. ) - 1.175 * power( std::sin( IncRad ), 2 ) + 0.131 * power( std::sin( 2. * IncRad * SideRatioFac ), 3 ) + 0.769 * std::cos( IncRad / 2. ) + 0.07 * power( ( SideRatioFac * std::sin( IncRad / 2. ) ), 2 ) + 0.717 * power( std::cos( IncRad / 2. ), 2 ) );
 					}
 
 					// Wind-pressure coefficients for vertical facades, high-rise building
@@ -3752,7 +3752,7 @@ namespace AirflowNetworkBalanceManager {
 					WtAng = 1.0 - DelAng / 10.0;
 					// Wind-pressure coefficients for vertical facades, low-rise building
 					IncRad = IncAng * DegToRadians;
-					MultizoneCPValueData( FacadeNum ).CPValue( WindDirNum ) = 0.6 * std::log( 1.248 - 0.703 * std::sin( IncRad / 2. ) - 1.175 * std::pow( std::sin( IncRad ), 2 ) + 0.131 * std::pow( std::sin( 2. * IncRad * SideRatioFac ), 3 ) + 0.769 * std::cos( IncRad / 2. ) + 0.07 * std::pow( ( SideRatioFac * std::sin( IncRad / 2. ) ), 2 ) + 0.717 * std::pow( std::cos( IncRad / 2. ), 2 ) );
+					MultizoneCPValueData( FacadeNum ).CPValue( WindDirNum ) = 0.6 * std::log( 1.248 - 0.703 * std::sin( IncRad / 2. ) - 1.175 * power( std::sin( IncRad ), 2 ) + 0.131 * power( std::sin( 2. * IncRad * SideRatioFac ), 3 ) + 0.769 * std::cos( IncRad / 2. ) + 0.07 * power( ( SideRatioFac * std::sin( IncRad / 2. ) ), 2 ) + 0.717 * power( std::cos( IncRad / 2. ), 2 ) );
 				} // End of wind direction loop
 			} // End of facade number loop
 			CalcSingleSidedCps(); //run the advanced single sided subroutine if at least one zone calls for it
@@ -7078,7 +7078,7 @@ Label90: ;
 					ShowContinueError( "The openings should be coplanar for the model to be valid. Simulation Continues." );
 				}
 				ZoneAng( ZnNum ) = ZoneAng1;
-				Sprime( ZnNum ) = std::sqrt( std::pow( std::abs( X1 - X2 ), 2 ) + std::pow( std::abs( Y1 - Y2 ), 2 ) ) / MultizoneZoneData( ZnNum ).BuildWidth;
+				Sprime( ZnNum ) = std::sqrt( power( std::abs( X1 - X2 ), 2 ) + power( std::abs( Y1 - Y2 ), 2 ) ) / MultizoneZoneData( ZnNum ).BuildWidth;
 				//Calculate DeltaCp for each wind direction for each zone
 				for ( WindDirNum = 1; WindDirNum <= AirflowNetworkNumofWindDir; ++WindDirNum ) {
 					WindDir = ( WindDirNum - 1 ) * 10.0;
@@ -7126,12 +7126,12 @@ Label90: ;
 				OpenNuminZone = 1;
 				for ( ExtOpenNum = 1; ExtOpenNum <= AFNNumOfExtOpenings; ++ExtOpenNum ) {
 					if ( AFNExtSurfaces( ExtOpenNum ).MZDZoneNum == ZnNum ) {
-						VelRatio = std::pow( ( 10 / AFNExtSurfaces( ExtOpenNum ).NodeHeight ), SiteWindExp );
+						VelRatio = power( ( 10 / AFNExtSurfaces( ExtOpenNum ).NodeHeight ), SiteWindExp );
 						if ( OpenNuminZone == 1 ) {
 							for ( WindDirNum = 1; WindDirNum <= MultizoneCPArrayData( 1 ).NumWindDir; ++WindDirNum ) {
-								MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum ) = MultizoneCPValueData( AFNExtSurfaces( ExtOpenNum ).CPVNum ).CPValue( WindDirNum ) + 0.5 * ( 1 / std::pow( AFNExtSurfaces( ExtOpenNum ).DischCoeff, 2 ) ) * DeltaCp( ZnNum ).WindDir( WindDirNum );
+								MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum ) = MultizoneCPValueData( AFNExtSurfaces( ExtOpenNum ).CPVNum ).CPValue( WindDirNum ) + 0.5 * ( 1 / power( AFNExtSurfaces( ExtOpenNum ).DischCoeff, 2 ) ) * DeltaCp( ZnNum ).WindDir( WindDirNum );
 								MultizoneCPValueDataTempUnMod( SrfNum ).Name = AFNExtSurfaces( ExtOpenNum ).SurfName;
-								MultizoneCPValueDataTemp( SrfNum ).CPValue( WindDirNum ) = ( std::pow( VelRatio, 2 ) ) * MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum );
+								MultizoneCPValueDataTemp( SrfNum ).CPValue( WindDirNum ) = ( power( VelRatio, 2 ) ) * MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum );
 								MultizoneCPValueDataTemp( SrfNum ).Name = AFNExtSurfaces( ExtOpenNum ).SurfName;
 								CPV1( WindDirNum ) = MultizoneCPValueDataTemp( SrfNum ).CPValue( WindDirNum );
 							}
@@ -7141,9 +7141,9 @@ Label90: ;
 							++SrfNum;
 						} else if ( OpenNuminZone == 2 ) {
 							for ( WindDirNum = 1; WindDirNum <= MultizoneCPArrayData( 1 ).NumWindDir; ++WindDirNum ) {
-								MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum ) = MultizoneCPValueData( AFNExtSurfaces( ExtOpenNum ).CPVNum ).CPValue( WindDirNum ) - 0.5 * ( 1 / std::pow( AFNExtSurfaces( ExtOpenNum ).DischCoeff, 2 ) ) * DeltaCp( ZnNum ).WindDir( WindDirNum );
+								MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum ) = MultizoneCPValueData( AFNExtSurfaces( ExtOpenNum ).CPVNum ).CPValue( WindDirNum ) - 0.5 * ( 1 / power( AFNExtSurfaces( ExtOpenNum ).DischCoeff, 2 ) ) * DeltaCp( ZnNum ).WindDir( WindDirNum );
 								MultizoneCPValueDataTempUnMod( SrfNum ).Name = AFNExtSurfaces( ExtOpenNum ).SurfName;
-								MultizoneCPValueDataTemp( SrfNum ).CPValue( WindDirNum ) = ( std::pow( VelRatio, 2 ) ) * MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum );
+								MultizoneCPValueDataTemp( SrfNum ).CPValue( WindDirNum ) = ( power( VelRatio, 2 ) ) * MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum );
 								MultizoneCPValueDataTemp( SrfNum ).Name = AFNExtSurfaces( ExtOpenNum ).SurfName;
 								CPV2( WindDirNum ) = MultizoneCPValueDataTemp( SrfNum ).CPValue( WindDirNum );
 								EPDeltaCP( ZnNum ).WindDir( WindDirNum ) = std::abs( CPV2( WindDirNum ) - CPV1( WindDirNum ) );

@@ -313,7 +313,7 @@ namespace GroundHeatExchangers {
 		GroundDiffusivity = VerticalGlhe( GlheNum ).KGround / VerticalGlhe( GlheNum ).CpRhoGround;
 
 		// calculate annual time constant for ground conduction
-		TimeSS = ( std::pow( VerticalGlhe( GlheNum ).BoreholeLength, 2 ) / ( 9. * GroundDiffusivity ) ) / SecInHour / 8760.0;
+		TimeSS = ( power( VerticalGlhe( GlheNum ).BoreholeLength, 2 ) / ( 9. * GroundDiffusivity ) ) / SecInHour / 8760.0;
 		TimeSS_Factor = TimeSS * 8760.;
 
 		GlheOutletNode = VerticalGlhe( GlheNum ).GlheOutletNodeNum;
@@ -941,10 +941,10 @@ namespace GroundHeatExchangers {
 		PipeInnerRad = PipeOuterRad - ThickPipe;
 		PipeInnerDia = 2.0 * PipeInnerRad;
 		//Re=Rho*V*D/Mu
-		ReynoldsNum = FluidDensity * PipeInnerDia * ( BholeMdot / FluidDensity / ( Pi * std::pow( PipeInnerRad, 2 ) ) ) / FluidViscosity;
+		ReynoldsNum = FluidDensity * PipeInnerDia * ( BholeMdot / FluidDensity / ( Pi * power( PipeInnerRad, 2 ) ) ) / FluidViscosity;
 		PrandlNum = ( Cp_Fluid * FluidViscosity ) / ( K_Fluid );
 		//   Convection Resistance
-		NusseltNum = 0.023 * ( std::pow( ReynoldsNum, 0.8 ) ) * ( std::pow( PrandlNum, 0.35 ) );
+		NusseltNum = 0.023 * ( power( ReynoldsNum, 0.8 ) ) * ( power( PrandlNum, 0.35 ) );
 		hci = NusseltNum * K_Fluid / PipeInnerDia;
 		if ( BholeMdot == 0.0 ) {
 			Rconv = 0.0;
@@ -973,7 +973,7 @@ namespace GroundHeatExchangers {
 			B1 = -0.3796;
 		}
 
-		Rgrout = 1.0 / ( K_Grout * ( B0 * std::pow( ( BholeRadius / PipeOuterRad ), B1 ) ) );
+		Rgrout = 1.0 / ( K_Grout * ( B0 * power( ( BholeRadius / PipeOuterRad ), B1 ) ) );
 		ResistanceBhole = Rcond + Rconv + Rgrout;
 	}
 

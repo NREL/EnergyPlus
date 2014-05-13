@@ -2336,7 +2336,7 @@ namespace WaterToAirHeatPumpSimple {
 		}
 
 		//  Use sucessive substitution to solve for To
-		aa = ( Gamma * Toffa ) - ( 0.25 / Twet ) * ( std::pow( Gamma, 2 ) ) * ( std::pow( Toffa, 2 ) );
+		aa = ( Gamma * Toffa ) - ( 0.25 / Twet ) * ( power( Gamma, 2 ) ) * ( power( Toffa, 2 ) );
 
 		To1 = aa + HPTimeConstant;
 		Error = 1.0;

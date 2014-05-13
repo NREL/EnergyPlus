@@ -8160,7 +8160,7 @@ namespace SurfaceGeometry {
 				}
 			} else {
 				if ( SurfCount > 0 ) {
-					MinimumVolume = std::pow( std::sqrt( SumAreas / SurfCount ), 3 );
+					MinimumVolume = power( std::sqrt( SumAreas / SurfCount ), 3 );
 				} else {
 					MinimumVolume = 0.0;
 				}
@@ -8584,7 +8584,7 @@ namespace SurfaceGeometry {
 						} else {
 							SurfaceWindow( ThisSurf ).GlazedFrac = Surface( ThisSurf ).Area / ( Surface( ThisSurf ).Area + SurfaceWindow( ThisSurf ).DividerArea );
 							// Correction factor for portion of divider subject to divider projection correction
-							DivFrac = ( 1.0 - FrameDivider( FrDivNum ).HorDividers * FrameDivider( FrDivNum ).VertDividers * std::pow( DivWidth, 2 ) / DivArea );
+							DivFrac = ( 1.0 - FrameDivider( FrDivNum ).HorDividers * FrameDivider( FrDivNum ).VertDividers * power( DivWidth, 2 ) / DivArea );
 							SurfaceWindow( ThisSurf ).ProjCorrDivOut = DivFrac * FrameDivider( FrDivNum ).DividerProjectionOut / DivWidth;
 							SurfaceWindow( ThisSurf ).ProjCorrDivIn = DivFrac * FrameDivider( FrDivNum ).DividerProjectionIn / DivWidth;
 							// Correction factor for portion of frame subject to frame projection correction
@@ -10610,8 +10610,8 @@ namespace SurfaceGeometry {
 		SurfCollinearWarning = false;
 		for ( n = 1; n <= NSides; ++n ) { // perform convexity test in the plane determined above.
 			DotProd = ( A( n + 1 ) - A( n ) ) * ( B( n + 2 ) - B( n + 1 ) ) - ( B( n + 1 ) - B( n ) ) * ( A( n + 2 ) - A( n + 1 ) );
-			V1len = std::sqrt( std::pow( ( A( n + 1 ) - A( n ) ), 2 ) + std::pow( ( B( n + 1 ) - B( n ) ), 2 ) );
-			V2len = std::sqrt( std::pow( ( A( n + 2 ) - A( n + 1 ) ), 2 ) + std::pow( ( B( n + 2 ) - B( n + 1 ) ), 2 ) );
+			V1len = std::sqrt( power( ( A( n + 1 ) - A( n ) ), 2 ) + power( ( B( n + 1 ) - B( n ) ), 2 ) );
+			V2len = std::sqrt( power( ( A( n + 2 ) - A( n + 1 ) ), 2 ) + power( ( B( n + 2 ) - B( n + 1 ) ), 2 ) );
 			if ( V1len <= 1.e-8 || V2len <= 1.e-8 ) continue;
 			cosarg = DotProd / ( V1len * V2len );
 			if ( cosarg < -1.0 ) {

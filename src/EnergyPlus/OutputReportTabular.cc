@@ -6461,8 +6461,8 @@ namespace OutputReportTabular {
 				//per Applied Regression Analysis and Other Multivariate Methods, Kleinburger/Kupper, 1978
 				//first check if very large constant number has caused the second part to be larger than the first
 				if ( BinStatistics( repIndex ).n > 1 ) {
-					if ( BinStatistics( repIndex ).sum2 > ( ( std::pow( BinStatistics( repIndex ).sum, 2 ) ) / BinStatistics( repIndex ).n ) ) {
-						repStDev = std::sqrt( ( BinStatistics( repIndex ).sum2 - ( ( std::pow( BinStatistics( repIndex ).sum, 2 ) ) / BinStatistics( repIndex ).n ) ) / ( BinStatistics( repIndex ).n - 1 ) );
+					if ( BinStatistics( repIndex ).sum2 > ( ( power( BinStatistics( repIndex ).sum, 2 ) ) / BinStatistics( repIndex ).n ) ) {
+						repStDev = std::sqrt( ( BinStatistics( repIndex ).sum2 - ( ( power( BinStatistics( repIndex ).sum, 2 ) ) / BinStatistics( repIndex ).n ) ) / ( BinStatistics( repIndex ).n - 1 ) );
 					} else {
 						repStDev = 0.0;
 					}

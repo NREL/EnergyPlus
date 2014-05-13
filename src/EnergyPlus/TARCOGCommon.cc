@@ -8,6 +8,7 @@
 #include <DataGlobals.hh>
 #include <DataPrecisionGlobals.hh>
 #include <TARCOGParams.hh>
+#include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -84,7 +85,7 @@ namespace TARCOGCommon {
 		LDSumMax = 0.0;
 		for ( i = 1; i <= mmax; i += 2 ) {
 			for ( j = 1; j <= nmax; j += 2 ) {
-				LDSumMax += ( std::sin( i * Pi / 2 ) * std::sin( j * Pi / 2 ) ) / ( i * j * std::pow( ( std::pow( ( i / Width ), 2 ) + std::pow( ( j / Height ), 2 ) ), 2 ) );
+				LDSumMax += ( std::sin( i * Pi / 2 ) * std::sin( j * Pi / 2 ) ) / ( i * j * power( ( power( ( i / Width ), 2 ) + power( ( j / Height ), 2 ) ), 2 ) );
 			} //do j = 1, nmax, 2
 		} //do i = 1, mmax, 2
 
@@ -116,7 +117,7 @@ namespace TARCOGCommon {
 		LDSumMean = 0.0;
 		for ( i = 1; i <= mmax; i += 2 ) {
 			for ( j = 1; j <= nmax; j += 2 ) {
-				LDSumMean += 4 / ( std::pow( i, 2 ) * std::pow( j, 2 ) * std::pow( Pi, 2 ) * std::pow( ( std::pow( ( i / Width ), 2 ) + std::pow( ( j / Height ), 2 ) ), 2 ) );
+				LDSumMean += 4 / ( power( i, 2 ) * power( j, 2 ) * power( Pi, 2 ) * power( ( power( ( i / Width ), 2 ) + power( ( j / Height ), 2 ) ), 2 ) );
 			} //do j = 1, nmax, 2
 		} //do i = 1, mmax, 2
 
@@ -213,9 +214,9 @@ namespace TARCOGCommon {
 			a( k + 1, k ) = scon( i ) / thick( i ) + hcgas( i );
 			a( k + 1, k + 1 ) = -scon( i ) / thick( i );
 			a( k + 1, k + 2 ) = 1.0;
-			a( k + 2, k ) = emis( front ) * StefanBoltzmann * std::pow( theta( front ), 3.0 );
+			a( k + 2, k ) = emis( front ) * StefanBoltzmann * power( theta( front ), 3 );
 			a( k + 2, k + 2 ) = -1.0;
-			a( k + 3, k + 1 ) = emis( back ) * StefanBoltzmann * std::pow( theta( back ), 3.0 );
+			a( k + 3, k + 1 ) = emis( back ) * StefanBoltzmann * power( theta( back ), 3 );
 			a( k + 3, k + 3 ) = -1.0;
 		}
 
