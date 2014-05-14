@@ -5031,7 +5031,7 @@ namespace HVACVariableRefrigerantFlow {
 		SensibleConditioning = VRFTU( VRFTUNum ).TerminalUnitSensibleRate;
 		LatentConditioning = VRFTU( VRFTUNum ).TerminalUnitLatentRate;
 		// convert latent in kg/s to watts
-		H2OHtOfVap = PsyHfgAirFnWTdb( Node( VRFTU( VRFTUNum ).VRFTUOutletNodeNum ).HumRat, Node( VRFTU( VRFTUNum ).VRFTUOutletNodeNum ).Temp ); // *&^unique^&* "ReportVRFTerminalUnit"
+		H2OHtOfVap = PsyHfgAirFnWTdb( Node( VRFTU( VRFTUNum ).VRFTUOutletNodeNum ).HumRat, Node( VRFTU( VRFTUNum ).VRFTUOutletNodeNum ).Temp );
 		TotalConditioning = SensibleConditioning + ( LatentConditioning * H2OHtOfVap );
 
 		if ( TotalConditioning <= 0.0 ) {

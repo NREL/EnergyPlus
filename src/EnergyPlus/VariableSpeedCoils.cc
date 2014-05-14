@@ -2541,9 +2541,9 @@ namespace VariableSpeedCoils {
 					}
 					OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
 					rhoair = PsyRhoAirFnPbTdbW( OutBaroPress, MixTemp, MixHumRat, RoutineName );
-					MixEnth = PsyHFnTdbW( MixTemp, MixHumRat ); // *&^unique^&* RoutineName
+					MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
 					MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, OutBaroPress, RoutineName );
-					SupEnth = PsyHFnTdbW( SupTemp, SupHumRat ); // *&^unique^&* RoutineName
+					SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
 
 					TotCapTempModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapFTemp( VarSpeedCoil( DXCoilNum ).NormSpedLevel ), MixWetBulb, RatedInletWaterTemp );
 					//       The mixed air temp for zone equipment without an OA mixer is 0.
@@ -2596,9 +2596,9 @@ namespace VariableSpeedCoils {
 						OutTemp = 0.0;
 					}
 					rhoair = PsyRhoAirFnPbTdbW( OutBaroPress, MixTemp, MixHumRat, RoutineName );
-					MixEnth = PsyHFnTdbW( MixTemp, MixHumRat ); // *&^unique^&* RoutineName
+					MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
 					MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, OutBaroPress, RoutineName );
-					SupEnth = PsyHFnTdbW( SupTemp, SupHumRat ); // *&^unique^&* RoutineName
+					SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
 
 					TotCapTempModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapFTemp( VarSpeedCoil( DXCoilNum ).NormSpedLevel ), MixWetBulb, RatedInletWaterTemp );
 					//       The mixed air temp for zone equipment without an OA mixer is 0.
@@ -2942,7 +2942,7 @@ namespace VariableSpeedCoils {
 
 		if ( VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate >= SmallAirVolFlow && VarSpeedCoil( DXCoilNum ).CoolHeatType == "COOLING" ) {
 			RatedAirMassFlowRate = VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName );
-			RatedInletEnth = PsyHFnTdbW( RatedInletAirTemp, RatedInletAirHumRat ); // *&^unique^&* RoutineName
+			RatedInletEnth = PsyHFnTdbW( RatedInletAirTemp, RatedInletAirHumRat );
 			CBFRated = AdjustCBF( VarSpeedCoil( DXCoilNum ).MSRatedCBF( NormSpeed ), VarSpeedCoil( DXCoilNum ).MSRatedAirMassFlowRate( NormSpeed ), RatedAirMassFlowRate );
 			if ( CBFRated > 0.999 ) CBFRated = 0.999;
 			AirMassFlowRatio = VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate / VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( NormSpeed );
@@ -3266,8 +3266,8 @@ namespace VariableSpeedCoils {
 			//Set indoor air conditions to the rated condition
 			LoadSideInletDBTemp_Init = 26.7;
 			LoadSideInletHumRat_Init = 0.0111;
-			LoadSideInletEnth_Init = PsyHFnTdbW( LoadSideInletDBTemp_Init, LoadSideInletHumRat_Init ); // *&^unique^&* RoutineName + ":Init"
-			CpAir_Init = PsyCpAirFnWTdb( LoadSideInletHumRat_Init, LoadSideInletDBTemp_Init ); // *&^unique^&* RoutineName + ":Init"
+			LoadSideInletEnth_Init = PsyHFnTdbW( LoadSideInletDBTemp_Init, LoadSideInletHumRat_Init );
+			CpAir_Init = PsyCpAirFnWTdb( LoadSideInletHumRat_Init, LoadSideInletDBTemp_Init );
 			firstTime = false;
 		}
 		LoadSideInletWBTemp_Init = PsyTwbFnTdbWPb( LoadSideInletDBTemp_Init, LoadSideInletHumRat_Init, OutBaroPress, RoutineName );
@@ -3332,8 +3332,8 @@ namespace VariableSpeedCoils {
 
 			SourceSideMassFlowRate = CondAirMassFlow;
 			SourceSideInletTemp = CondInletTemp;
-			SourceSideInletEnth = PsyHFnTdbW( CondInletTemp, CondInletHumRat ); // *&^unique^&* RoutineName
-			CpSource = PsyCpAirFnWTdb( CondInletHumRat, CondInletTemp ); // *&^unique^&* RoutineName
+			SourceSideInletEnth = PsyHFnTdbW( CondInletTemp, CondInletHumRat );
+			CpSource = PsyCpAirFnWTdb( CondInletHumRat, CondInletTemp );
 			VarSpeedCoil( DXCoilNum ).CondInletTemp = CondInletTemp;
 
 			// If used in a heat pump, the value of MaxOAT in the heating coil overrides that in the cooling coil (in GetInput)
@@ -3603,7 +3603,7 @@ namespace VariableSpeedCoils {
 		LoadSideOutletDBTemp = LoadSideInletDBTemp - QSensible / ( LoadSideMassFlowRate * CpAir );
 
 		MaxHumRat = PsyWFnTdbRhPb( LoadSideOutletDBTemp, 0.9999, VarSpeedCoil( DXCoilNum ).InletAirPressure, RoutineName );
-		MaxOutletEnth = PsyHFnTdbW( LoadSideOutletDBTemp, MaxHumRat ); // *&^unique^&* RoutineName
+		MaxOutletEnth = PsyHFnTdbW( LoadSideOutletDBTemp, MaxHumRat );
 		if ( LoadSideOutletEnth > MaxOutletEnth ) {
 			LoadSideOutletEnth = MaxOutletEnth;
 			//QLoadTotal = LoadSideMassFlowRate * (LoadSideInletEnth - LoadSideOutletEnth)
@@ -3619,7 +3619,7 @@ namespace VariableSpeedCoils {
 			// continuous fan, cycling compressor
 			VarSpeedCoil( DXCoilNum ).OutletAirEnthalpy = PartLoadRatio * LoadSideOutletEnth + ( 1.0 - PartLoadRatio ) * LoadSideInletEnth;
 			VarSpeedCoil( DXCoilNum ).OutletAirHumRat = PartLoadRatio * LoadSideOutletHumRat + ( 1.0 - PartLoadRatio ) * LoadSideInletHumRat;
-			VarSpeedCoil( DXCoilNum ).OutletAirDBTemp = PsyTdbFnHW( VarSpeedCoil( DXCoilNum ).OutletAirEnthalpy, VarSpeedCoil( DXCoilNum ).OutletAirHumRat ); // *&^unique^&* RoutineName
+			VarSpeedCoil( DXCoilNum ).OutletAirDBTemp = PsyTdbFnHW( VarSpeedCoil( DXCoilNum ).OutletAirEnthalpy, VarSpeedCoil( DXCoilNum ).OutletAirHumRat );
 			PLRCorrLoadSideMdot = LoadSideMassFlowRate;
 		} else {
 			// default to cycling fan, cycling compressor
@@ -3803,7 +3803,7 @@ namespace VariableSpeedCoils {
 
 		LoadSideInletWBTemp = PsyTwbFnTdbWPb( LoadSideInletDBTemp, LoadSideInletHumRat, OutBaroPress, RoutineName );
 		LoadSideInletEnth = VarSpeedCoil( DXCoilNum ).InletAirEnthalpy;
-		CpAir = PsyCpAirFnWTdb( LoadSideInletHumRat, LoadSideInletDBTemp ); // *&^unique^&* RoutineName
+		CpAir = PsyCpAirFnWTdb( LoadSideInletHumRat, LoadSideInletDBTemp );
 
 		if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_HeatingAirToAirVariableSpeed ) {
 			// Get condenser outdoor node info from DX Heating Coil
@@ -3820,8 +3820,8 @@ namespace VariableSpeedCoils {
 			}
 			SourceSideMassFlowRate = 1.0; // not used and avoid divided by zero
 			SourceSideInletTemp = OutdoorDryBulb;
-			SourceSideInletEnth = PsyHFnTdbW( OutdoorDryBulb, OutdoorHumRat ); // *&^unique^&* RoutineName
-			CpSource = PsyCpAirFnWTdb( OutHumRat, OutdoorDryBulb ); // *&^unique^&* RoutineName
+			SourceSideInletEnth = PsyHFnTdbW( OutdoorDryBulb, OutdoorHumRat );
+			CpSource = PsyCpAirFnWTdb( OutHumRat, OutdoorDryBulb );
 
 			// Initialize crankcase heater, operates below OAT defined in input deck for HP DX heating coil
 			if ( OutdoorDryBulb < VarSpeedCoil( DXCoilNum ).MaxOATCrankcaseHeater ) {
@@ -4071,7 +4071,7 @@ namespace VariableSpeedCoils {
 			// continuous fan, cycling compressor
 			VarSpeedCoil( DXCoilNum ).OutletAirEnthalpy = PartLoadRatio * LoadSideOutletEnth + ( 1.0 - PartLoadRatio ) * LoadSideInletEnth;
 			VarSpeedCoil( DXCoilNum ).OutletAirHumRat = PartLoadRatio * LoadSideOutletHumRat + ( 1.0 - PartLoadRatio ) * LoadSideInletHumRat;
-			VarSpeedCoil( DXCoilNum ).OutletAirDBTemp = PsyTdbFnHW( VarSpeedCoil( DXCoilNum ).OutletAirEnthalpy, VarSpeedCoil( DXCoilNum ).OutletAirHumRat ); // *&^unique^&* RoutineName
+			VarSpeedCoil( DXCoilNum ).OutletAirDBTemp = PsyTdbFnHW( VarSpeedCoil( DXCoilNum ).OutletAirEnthalpy, VarSpeedCoil( DXCoilNum ).OutletAirHumRat );
 			PLRCorrLoadSideMdot = LoadSideMassFlowRate;
 		} else {
 			// default to cycling fan, cycling compressor

@@ -4492,7 +4492,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 			if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CondFD ) {
 				// Set variables used in the FD moisture balance
 				TempOutsideAirFD( SurfNum ) = GroundTemp;
-				RhoVaporAirOut( SurfNum ) = PsyRhovFnTdbRhLBnd0C( GroundTemp, 1.0 ); // *&^unique^&* "HBSurfMan:Ground:CondFD"
+				RhoVaporAirOut( SurfNum ) = PsyRhovFnTdbRhLBnd0C( GroundTemp, 1.0 );
 				HConvExtFD( SurfNum ) = HighHConvLimit;
 				HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, GroundTemp, PsyWFnTdbRhPb( GroundTemp, 1.0, OutBaroPress, RoutineNameGroundTemp ), BlankString ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, GroundTemp ) );
 				HSkyFD( SurfNum ) = HSky;
@@ -4524,7 +4524,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 			if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CondFD ) {
 				// Set variables used in the FD moisture balance
 				TempOutsideAirFD( SurfNum ) = GroundTempFC;
-				RhoVaporAirOut( SurfNum ) = PsyRhovFnTdbRhLBnd0C( GroundTempFC, 1.0 ); // *&^unique^&* "HBSurfMan:Ground:CondFD"
+				RhoVaporAirOut( SurfNum ) = PsyRhovFnTdbRhLBnd0C( GroundTempFC, 1.0 );
 				HConvExtFD( SurfNum ) = HighHConvLimit;
 				HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, GroundTempFC, PsyWFnTdbRhPb( GroundTempFC, 1.0, OutBaroPress, RoutineNameGroundTempFC ), BlankString ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, GroundTempFC ) );
 				HSkyFD( SurfNum ) = HSky;
@@ -4713,7 +4713,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 					if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CondFD ) {
 						// Set variables used in the FD moisture balance
 						TempOutsideAirFD( SurfNum ) = TempExt;
-						RhoVaporAirOut( SurfNum ) = PsyRhovFnTdbRhLBnd0C( TempOutsideAirFD( SurfNum ), 1.0 ); // *&^unique^&* "HBSurfMan:Rain:CondFD"
+						RhoVaporAirOut( SurfNum ) = PsyRhovFnTdbRhLBnd0C( TempOutsideAirFD( SurfNum ), 1.0 );
 						HConvExtFD( SurfNum ) = HcExtSurf( SurfNum );
 						HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, TempOutsideAirFD( SurfNum ), PsyWFnTdbRhPb( TempOutsideAirFD( SurfNum ), 1.0, OutBaroPress, RoutineNameExtEnvWetSurf ), BlankString ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, TempOutsideAirFD( SurfNum ) ) );
 						HSkyFD( SurfNum ) = HSkyExtSurf( SurfNum );

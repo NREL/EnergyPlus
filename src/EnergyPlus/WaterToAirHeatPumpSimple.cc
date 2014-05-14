@@ -1095,9 +1095,9 @@ namespace WaterToAirHeatPumpSimple {
 						}
 						OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
 						rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat ); // *&^unique^&* RoutineName
+						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
 						MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-						SupEnth = PsyHFnTdbW( SupTemp, SupHumRat ); // *&^unique^&* RoutineName
+						SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
 						TotalCapCoeff1 = SimpleWatertoAirHP( HPNum ).TotalCoolCap1;
 						TotalCapCoeff2 = SimpleWatertoAirHP( HPNum ).TotalCoolCap2;
 						TotalCapCoeff3 = SimpleWatertoAirHP( HPNum ).TotalCoolCap3;
@@ -1156,9 +1156,9 @@ namespace WaterToAirHeatPumpSimple {
 							OutTemp = 0.0;
 						}
 						rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat ); // *&^unique^&* RoutineName
+						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
 						MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-						SupEnth = PsyHFnTdbW( SupTemp, SupHumRat ); // *&^unique^&* RoutineName
+						SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
 						TotalCapCoeff1 = SimpleWatertoAirHP( HPNum ).TotalCoolCap1;
 						TotalCapCoeff2 = SimpleWatertoAirHP( HPNum ).TotalCoolCap2;
 						TotalCapCoeff3 = SimpleWatertoAirHP( HPNum ).TotalCoolCap3;
@@ -1263,9 +1263,9 @@ namespace WaterToAirHeatPumpSimple {
 						}
 						OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
 						rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat ); // *&^unique^&* RoutineName
+						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
 						MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-						SupEnth = PsyHFnTdbW( SupTemp, SupHumRat ); // *&^unique^&* RoutineName
+						SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
 						SensCapCoeff1 = SimpleWatertoAirHP( HPNum ).SensCoolCap1;
 						SensCapCoeff2 = SimpleWatertoAirHP( HPNum ).SensCoolCap2;
 						SensCapCoeff3 = SimpleWatertoAirHP( HPNum ).SensCoolCap3;
@@ -1276,7 +1276,7 @@ namespace WaterToAirHeatPumpSimple {
 						ratioTWB = ( MixWetBulb + 273.15 ) / 283.15;
 						// rated condenser water inlet temperature of 85F
 						ratioTS = ( ( ( 85.0 - 32.0 ) / 1.8 ) + 273.15 ) / 283.15;
-						CpAir = PsyCpAirFnWTdb( SupHumRat, SupTemp ); // *&^unique^&* RoutineName
+						CpAir = PsyCpAirFnWTdb( SupHumRat, SupTemp );
 						SensCapTempModFac = SensCapCoeff1 + ( ratioTDB * SensCapCoeff2 ) + ( ratioTWB * SensCapCoeff3 ) + ( ratioTS * SensCapCoeff4 ) + ( 1.0 * SensCapCoeff5 ) + ( 1.0 * SensCapCoeff6 );
 						//       The mixed air temp for zone equipment without an OA mixer is 0.
 						//       This test avoids a negative capacity until a solution can be found.
@@ -1323,9 +1323,9 @@ namespace WaterToAirHeatPumpSimple {
 							OutTemp = 0.0;
 						}
 						rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat ); // *&^unique^&* RoutineName
+						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
 						MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-						SupEnth = PsyHFnTdbW( SupTemp, SupHumRat ); // *&^unique^&* RoutineName
+						SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
 						SensCapCoeff1 = SimpleWatertoAirHP( HPNum ).SensCoolCap1;
 						SensCapCoeff2 = SimpleWatertoAirHP( HPNum ).SensCoolCap2;
 						SensCapCoeff3 = SimpleWatertoAirHP( HPNum ).SensCoolCap3;
@@ -1336,7 +1336,7 @@ namespace WaterToAirHeatPumpSimple {
 						ratioTWB = ( MixWetBulb + 273.15 ) / 283.15;
 						// rated condenser water inlet temperature of 85F
 						ratioTS = ( ( ( 85.0 - 32.0 ) / 1.8 ) + 273.15 ) / 283.15;
-						CpAir = PsyCpAirFnWTdb( SupHumRat, SupTemp ); // *&^unique^&* RoutineName
+						CpAir = PsyCpAirFnWTdb( SupHumRat, SupTemp );
 						SensCapTempModFac = SensCapCoeff1 + ( ratioTDB * SensCapCoeff2 ) + ( ratioTWB * SensCapCoeff3 ) + ( ratioTS * SensCapCoeff4 ) + ( 1.0 * SensCapCoeff5 ) + ( 1.0 * SensCapCoeff6 );
 						//       The mixed air temp for zone equipment without an OA mixer is 0.
 						//       This test avoids a negative capacity until a solution can be found.
@@ -1717,8 +1717,8 @@ namespace WaterToAirHeatPumpSimple {
 			//Set indoor air conditions to the rated condition
 			LoadSideInletDBTemp_Init = 26.7;
 			LoadSideInletHumRat_Init = 0.0111;
-			LoadSideInletEnth_Init = PsyHFnTdbW( LoadSideInletDBTemp_Init, LoadSideInletHumRat_Init ); // *&^unique^&* RoutineName + ":Init"
-			CpAir_Init = PsyCpAirFnWTdb( LoadSideInletHumRat_Init, LoadSideInletDBTemp_Init ); // *&^unique^&* RoutineName + ":Init"
+			LoadSideInletEnth_Init = PsyHFnTdbW( LoadSideInletDBTemp_Init, LoadSideInletHumRat_Init );
+			CpAir_Init = PsyCpAirFnWTdb( LoadSideInletHumRat_Init, LoadSideInletDBTemp_Init );
 			firstTime = false;
 		}
 		LoadSideInletWBTemp_Init = PsyTwbFnTdbWPb( LoadSideInletDBTemp_Init, LoadSideInletHumRat_Init, OutBaroPress, RoutineName );
@@ -1859,7 +1859,7 @@ namespace WaterToAirHeatPumpSimple {
 			// continuous fan, cycling compressor
 			SimpleWatertoAirHP( HPNum ).OutletAirEnthalpy = PartLoadRatio * LoadSideOutletEnth + ( 1.0 - PartLoadRatio ) * LoadSideInletEnth;
 			SimpleWatertoAirHP( HPNum ).OutletAirHumRat = PartLoadRatio * LoadSideOutletHumRat + ( 1.0 - PartLoadRatio ) * LoadSideInletHumRat;
-			SimpleWatertoAirHP( HPNum ).OutletAirDBTemp = PsyTdbFnHW( SimpleWatertoAirHP( HPNum ).OutletAirEnthalpy, SimpleWatertoAirHP( HPNum ).OutletAirHumRat ); // *&^unique^&* RoutineName
+			SimpleWatertoAirHP( HPNum ).OutletAirDBTemp = PsyTdbFnHW( SimpleWatertoAirHP( HPNum ).OutletAirEnthalpy, SimpleWatertoAirHP( HPNum ).OutletAirHumRat );
 			PLRCorrLoadSideMdot = LoadSideMassFlowRate;
 		} else {
 			// default to cycling fan, cycling compressor
@@ -2016,7 +2016,7 @@ namespace WaterToAirHeatPumpSimple {
 
 		LoadSideInletWBTemp = PsyTwbFnTdbWPb( LoadSideInletDBTemp, LoadSideInletHumRat, OutBaroPress, RoutineName );
 		LoadSideInletEnth = SimpleWatertoAirHP( HPNum ).InletAirEnthalpy;
-		CpAir = PsyCpAirFnWTdb( LoadSideInletHumRat, LoadSideInletDBTemp ); // *&^unique^&* RoutineName
+		CpAir = PsyCpAirFnWTdb( LoadSideInletHumRat, LoadSideInletDBTemp );
 		SourceSideMassFlowRate = SimpleWatertoAirHP( HPNum ).WaterMassFlowRate;
 		SourceSideInletTemp = SimpleWatertoAirHP( HPNum ).InletWaterTemp;
 		SourceSideInletEnth = SimpleWatertoAirHP( HPNum ).InletWaterEnthalpy;
@@ -2059,7 +2059,7 @@ namespace WaterToAirHeatPumpSimple {
 			// continuous fan, cycling compressor
 			SimpleWatertoAirHP( HPNum ).OutletAirEnthalpy = PartLoadRatio * LoadSideOutletEnth + ( 1.0 - PartLoadRatio ) * LoadSideInletEnth;
 			SimpleWatertoAirHP( HPNum ).OutletAirHumRat = PartLoadRatio * LoadSideOutletHumRat + ( 1.0 - PartLoadRatio ) * LoadSideInletHumRat;
-			SimpleWatertoAirHP( HPNum ).OutletAirDBTemp = PsyTdbFnHW( SimpleWatertoAirHP( HPNum ).OutletAirEnthalpy, SimpleWatertoAirHP( HPNum ).OutletAirHumRat ); // *&^unique^&* RoutineName
+			SimpleWatertoAirHP( HPNum ).OutletAirDBTemp = PsyTdbFnHW( SimpleWatertoAirHP( HPNum ).OutletAirEnthalpy, SimpleWatertoAirHP( HPNum ).OutletAirHumRat );
 			PLRCorrLoadSideMdot = LoadSideMassFlowRate;
 		} else {
 			// default to cycling fan, cycling compressor

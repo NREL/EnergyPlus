@@ -985,7 +985,7 @@ CalcPassiveExteriorBaffleGap(
 	LocalOutHumRat = PsyWFnTdbTwbPb( LocalOutDryBulbTemp, LocalWetBulbTemp, OutBaroPress, RoutineName );
 
 	RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, LocalOutDryBulbTemp, LocalOutHumRat, RoutineName );
-	CpAir = PsyCpAirFnWTdb( LocalOutHumRat, LocalOutDryBulbTemp ); // *&^unique^&* "CalcPassiveExteriorBaffleGap"
+	CpAir = PsyCpAirFnWTdb( LocalOutHumRat, LocalOutDryBulbTemp );
 	if ( ! IsRain ) {
 		Tamb = LocalOutDryBulbTemp;
 	} else { // when raining we use wetbulb not drybulb

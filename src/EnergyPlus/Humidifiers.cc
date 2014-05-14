@@ -690,7 +690,7 @@ namespace Humidifiers {
 			// outlet conditions
 			AirOutEnthalpy = ( AirMassFlowRate * Humidifier( HumNum ).AirInEnthalpy + WaterAddNeededMax * WaterInEnthalpy ) / AirMassFlowRate;
 			AirOutHumRat = ( AirMassFlowRate * Humidifier( HumNum ).AirInHumRat + WaterAddNeededMax ) / AirMassFlowRate;
-			AirOutTemp = PsyTdbFnHW( AirOutEnthalpy, AirOutHumRat ); // *&^unique^&* "CalcElecSteamHumidifier"
+			AirOutTemp = PsyTdbFnHW( AirOutEnthalpy, AirOutHumRat );
 			HumRatSatOut = PsyWFnTdbRhPb( AirOutTemp, 1.0, OutBaroPress, RoutineName );
 			if ( AirOutHumRat <= HumRatSatOut ) {
 				// If the outlet condition is below the saturation curve, the desired moisture addition rate can be met.
@@ -714,7 +714,7 @@ namespace Humidifiers {
 				// but the temperature should be very close to the correct outlet temperature. We will use this temperature
 				// as the outlet temperature and move to the saturation curve for the outlet humidity and enthalpy
 				AirOutHumRat = PsyWFnTdbRhPb( AirOutTemp, 1.0, OutBaroPress, RoutineName );
-				AirOutEnthalpy = PsyHFnTdbW( AirOutTemp, AirOutHumRat ); // *&^unique^&* "CalcElecSteamHumidifier"
+				AirOutEnthalpy = PsyHFnTdbW( AirOutTemp, AirOutHumRat );
 				WaterAddRate = AirMassFlowRate * ( AirOutHumRat - Humidifier( HumNum ).AirInHumRat );
 			}
 

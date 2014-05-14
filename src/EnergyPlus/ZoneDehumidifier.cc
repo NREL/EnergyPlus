@@ -757,7 +757,7 @@ namespace ZoneDehumidifier {
 
 			WaterRemovalVolRate = WaterRemovalRateFactor * ZoneDehumid( ZoneDehumNum ).RatedWaterRemoval;
 
-			WaterRemovalMassRate = WaterRemovalVolRate / ( 24.0 * SecInHour * 1000.0 ) * RhoH2O( max( ( InletAirTemp - 11.0 ), 1.0 ) ); //(L/d)/(24 hr/day *3600 sec/hr * 1000 L/m3) | Density of water, minimum temp = 1.0C // *&^unique^&* "CalcZoneDehumidifier"
+			WaterRemovalMassRate = WaterRemovalVolRate / ( 24.0 * SecInHour * 1000.0 ) * RhoH2O( max( ( InletAirTemp - 11.0 ), 1.0 ) ); //(L/d)/(24 hr/day *3600 sec/hr * 1000 L/m3) | Density of water, minimum temp = 1.0C
 
 			if ( WaterRemovalMassRate > 0.0 ) {
 				PLR = max( 0.0, min( 1.0, - QZnDehumidReq / WaterRemovalMassRate ) );
@@ -891,7 +891,7 @@ namespace ZoneDehumidifier {
 
 		// Use inlet air temperature in outlet air enthalpy calculation... since the sensible heat output
 		// from the dehumidifier is being sent directly to the zone air heat balance for next hvac simulation time step
-		ZoneDehumid( ZoneDehumNum ).OutletAirEnthalpy = PsyHFnTdbW( InletAirTemp, OutletAirHumRat ); // *&^unique^&* "CalcZoneDehumidifier"
+		ZoneDehumid( ZoneDehumNum ).OutletAirEnthalpy = PsyHFnTdbW( InletAirTemp, OutletAirHumRat );
 
 		ZoneDehumid( ZoneDehumNum ).SensHeatingRate = SensibleOutput; // Report variable update, W,  avg sens output when unit is 'on'
 		ZoneDehumid( ZoneDehumNum ).WaterRemovalRate = LatentOutput; // Report variable update, kg/s
@@ -1028,7 +1028,7 @@ namespace ZoneDehumidifier {
 			AirInletNodeNum = ZoneDehumid( DehumidNum ).AirInletNodeNum;
 			InletAirTemp = Node( AirInletNodeNum ).Temp;
 			OutletAirTemp = max( ( InletAirTemp - 11.0 ), 1.0 ); // Assume coil outlet air is 11C (20F) lower than inlet air temp
-			RhoWater = RhoH2O( OutletAirTemp ); // Density of water, minimum temp = 1.0 C // *&^unique^&* "ReportZoneDehumidifier"
+			RhoWater = RhoH2O( OutletAirTemp ); // Density of water, minimum temp = 1.0 C
 
 			if ( RhoWater > 0.0 ) {
 				ZoneDehumid( DehumidNum ).DehumidCondVolFlowRate = ZoneDehumid( DehumidNum ).WaterRemovalRate / RhoWater;
