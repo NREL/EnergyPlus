@@ -33,6 +33,7 @@ namespace InputProcessor {
 	extern std::string::size_type const MaxAlphaArgLength; // Maximum number of characters in an Alpha Argument
 	extern std::string::size_type const MaxInputLineLength; // Maximum number of characters in an input line (in.idf, energy+.idd)
 	extern std::string::size_type const MaxFieldNameLength; // Maximum number of characters in a field name string
+	extern std::string const Blank;
 	extern gio::Fmt const fmta;
 	extern Real64 const DefAutoSizeValue;
 	extern Real64 const DefAutoCalculateValue;
@@ -131,7 +132,7 @@ namespace InputProcessor {
 		RangeCheckDef() :
 			MinMaxChk( false ),
 			FieldNumber( 0 ),
-			MinMaxString( 2, "" ),
+			MinMaxString( 2, Blank ),
 			MinMaxValue( 2, 0.0 ),
 			WhichMinMax( 2, 0 ),
 			DefaultChk( false ),
