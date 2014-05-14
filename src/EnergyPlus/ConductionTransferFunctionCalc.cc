@@ -680,9 +680,9 @@ namespace ConductionTransferFunctionCalc {
 					for ( Layer = 1; Layer <= LayersInConstruct; ++Layer ) {
 						if ( Nodes( Layer ) >= MaxCTFTerms ) {
 							if ( Construct( ConstrNum ).SolutionDimensions == 1 ) {
-								dtn = rho( Layer ) * cp( Layer ) * power( dx( Layer ), 2 ) / rk( Layer );
+								dtn = rho( Layer ) * cp( Layer ) * second_power( dx( Layer ) ) / rk( Layer );
 							} else { // 2-D solution requested-->this changes length parameter in Fourier number calculation
-								dtn = rho( Layer ) * cp( Layer ) * ( ( power( dx( Layer ), 2 ) ) + ( power( dyn, 2 ) ) ) / rk( Layer );
+								dtn = rho( Layer ) * cp( Layer ) * ( ( second_power( dx( Layer ) ) ) + ( second_power( dyn ) ) ) / rk( Layer );
 							}
 							if ( dtn > Construct( ConstrNum ).CTFTimeStep ) Construct( ConstrNum ).CTFTimeStep = dtn;
 						}
@@ -1316,7 +1316,7 @@ namespace ConductionTransferFunctionCalc {
 		// takes advantage of the fact that AMat is tridiagonal.  Thus, it
 		// only factors the elements of the AMat that are known to be non-zero.
 
-		fact = delt / ( power( 2.0, k ) ); // Start of Step 3 ...
+		fact = delt / ( std::pow( 2.0, k ) ); // Start of Step 3 ...
 		AMat1 *= fact; // ... end of Step 3.
 
 		// Step 4, page 128:  Calculate l, the highest power to which AMat

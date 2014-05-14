@@ -9442,13 +9442,13 @@ namespace RefrigeratedCase {
 				if ( Condenser( CondID ).CondenserType == RefrigCondenserTypeAir ) {
 					CurMaxCapacity = CurveValue( Condenser( CondID ).CapCurvePtr, ( System( SysNum ).TCondenseMin - OutDbTemp ) );
 					CapFac = TotalCondenserHeat / CurMaxCapacity;
-					AirVolRatio = max( FanMinAirFlowRatio, power( CapFac, CondAirVolExponentDry ) ); //Fans limited by minimum air flow ratio
+					AirVolRatio = max( FanMinAirFlowRatio, std::pow( CapFac, CondAirVolExponentDry ) ); //Fans limited by minimum air flow ratio
 					AirVolRatio = min( AirVolRatio, 1.0 );
 				} else { // Condenser(CondID)%CondenserType == RefrigCondenserTypeEvap
 					HRCFFullFlow = HRCF;
 					//if evap condenser need to back calculate the operating capacity using HRCF relationship, given known Tcond
 					QuadBterm = Condenser( CondID ).EvapCoeff1 - ( System( SysNum ).TCondense - SinkTemp ) + Condenser( CondID ).EvapCoeff4 * SinkTemp;
-					Sqrtterm = power( QuadBterm, 2 ) - 4. * Condenser( CondID ).EvapCoeff2 * Condenser( CondID ).EvapCoeff3;
+					Sqrtterm = second_power( QuadBterm ) - 4. * Condenser( CondID ).EvapCoeff2 * Condenser( CondID ).EvapCoeff3;
 					if ( Sqrtterm < 0.0 ) { // only happens for very high wet bulb temps
 						HRCF = Condenser( CondID ).EvapElevFact * Condenser( CondID ).MaxCapFacEvap;
 						if ( ! EvapAvail ) HRCF /= 3.0;
@@ -9461,16 +9461,16 @@ namespace RefrigeratedCase {
 					} //sqrtterm
 					CapFac = HRCF / HRCFFullFlow; //note, HRCFFullFlow previously limited between min and max,so can't be zero
 					if ( EvapAvail ) {
-						AirVolRatio = max( FanMinAirFlowRatio, power( CapFac, CondAirVolExponentEvap ) ); //Fans limited by minimum air flow ratio
+						AirVolRatio = max( FanMinAirFlowRatio, std::pow( CapFac, CondAirVolExponentEvap ) ); //Fans limited by minimum air flow ratio
 					} else { //evap not available
-						AirVolRatio = max( FanMinAirFlowRatio, power( CapFac, CondAirVolExponentDry ) ); //Fans limited by minimum air flow ratio
+						AirVolRatio = max( FanMinAirFlowRatio, std::pow( CapFac, CondAirVolExponentDry ) ); //Fans limited by minimum air flow ratio
 					} //evap available
 					AirVolRatio = min( AirVolRatio, 1.0 );
 				} // condenser type = RefrigCondenserTypeAir with else for evap
 
 				{ auto const SELECT_CASE_var( Condenser( CondID ).FanSpeedControlType );
 				if ( SELECT_CASE_var == FanVariableSpeed ) { //fan power law, adjusted for reality, applies
-					FanPowerRatio = power( AirVolRatio, 2.5 );
+					FanPowerRatio = std::pow( AirVolRatio, 2.5 );
 					ActualFanPower = FanPowerRatio * RatedFanPower;
 				} else if ( SELECT_CASE_var == FanConstantSpeed ) {
 					ActualFanPower = AirVolRatio * std::exp( 1.0 - AirVolRatio ) * RatedFanPower;
@@ -9725,11 +9725,11 @@ namespace RefrigeratedCase {
 		}
 
 		// Gas cooler fan energy calculations
-		AirVolRatio = max( FanMinAirFlowRatio, power( CapFac, CondAirVolExponentDry ) ); //Fans limited by minimum air flow ratio
+		AirVolRatio = max( FanMinAirFlowRatio, std::pow( CapFac, CondAirVolExponentDry ) ); //Fans limited by minimum air flow ratio
 
 		{ auto const SELECT_CASE_var( GasCooler( GasCoolerID ).FanSpeedControlType );
 		if ( SELECT_CASE_var == FanVariableSpeed ) { //fan power law, adjusted for reality, applies
-			FanPowerRatio = power( AirVolRatio, 2.5 );
+			FanPowerRatio = std::pow( AirVolRatio, 2.5 );
 			ActualFanPower = FanPowerRatio * RatedFanPower;
 		} else if ( SELECT_CASE_var == FanConstantSpeed ) {
 			ActualFanPower = AirVolRatio * std::exp( 1.0 - AirVolRatio ) * RatedFanPower;
@@ -11303,7 +11303,7 @@ namespace RefrigeratedCase {
 		HumRatioAirWalkIn = PsyWFnTdbH( TWalkIn, EnthalpyAirWalkIn, BlankString );
 		DensityAirWalkIn = PsyRhoAirFnPbTdbW( OutBaroPress, TWalkIn, HumRatioAirWalkIn, BlankString );
 		Conv = Latitude * 2.0 * Pi / 360.0; //Convert Latitude to radians
-		Gravity = 9.780373 * ( 1.0 + 0.0052891 * power( ( std::sin( Conv ) ), 2 ) - 0.0000059 * power( ( std::sin( 2.0 * Conv ) ), 2 ) );
+		Gravity = 9.780373 * ( 1.0 + 0.0052891 * second_power( ( std::sin( Conv ) ) ) - 0.0000059 * second_power( ( std::sin( 2.0 * Conv ) ) ) );
 
 		// CALCULATE ALL LOADS INFLUENCED BY ZONE TEMPERATURE AND RH
 		//set to zero before summing over zones
@@ -11338,14 +11338,14 @@ namespace RefrigeratedCase {
 				HumRatioZoneAir = PsyWFnTdbH( ZoneDryBulb, EnthalpyZoneAir, RoutineName );
 				DensityZoneAir = PsyRhoAirFnPbTdbW( OutBaroPress, ZoneDryBulb, HumRatioZoneAir, RoutineName );
 				if ( DensityZoneAir < DensityAirWalkIn ) { //usual case when walk in is colder than zone
-					DensitySqRtFactor = power( ( 1.0 - DensityZoneAir / DensityAirWalkIn ), 0.5 );
-					DensityFactorFm = power( ( 2.0 / ( 1.0 + power( ( DensityAirWalkIn / DensityZoneAir ), 0.333 ) ) ), 1.5 );
+					DensitySqRtFactor = std::pow( ( 1.0 - DensityZoneAir / DensityAirWalkIn ), 0.5 );
+					DensityFactorFm = std::pow( ( 2.0 / ( 1.0 + std::pow( ( DensityAirWalkIn / DensityZoneAir ), 0.333 ) ) ), 1.5 );
 				} else { //temperature inversion with zone colder and/or drier than walk-in, infiltration in reverse direction
 					//The enthalpy difference will show whether the energy transport is reversed
 					//(same air mass exchange in either direction )
 					//That is, these factors establish the magnitude of the exchange air flow, not direction
-					DensitySqRtFactor = power( ( 1.0 - DensityAirWalkIn / DensityZoneAir ), 0.5 );
-					DensityFactorFm = power( ( 2.0 / ( 1.0 + power( ( DensityZoneAir / DensityAirWalkIn ), 0.333 ) ) ), 1.5 );
+					DensitySqRtFactor = std::pow( ( 1.0 - DensityAirWalkIn / DensityZoneAir ), 0.5 );
+					DensityFactorFm = std::pow( ( 2.0 / ( 1.0 + std::pow( ( DensityZoneAir / DensityAirWalkIn ), 0.333 ) ) ), 1.5 );
 				} // check for density in zone and in walk-in to avoid taking sqrt of neg number
 				GlassDoorInfLoad = 0.0;
 				StockDoorInfLoad = 0.0;
@@ -11367,7 +11367,7 @@ namespace RefrigeratedCase {
 					DoorOpenFactor = DefaultWalkInDoorOpenFactor;
 					if ( WalkIn( WalkInID ).StockDoorOpenSchedPtr( ZoneID ) > 0 ) DoorOpenFactor = GetCurrentScheduleValue( WalkIn( WalkInID ).StockDoorOpenSchedPtr( ZoneID ) );
 
-					FullFlowInfLoad = 0.221 * DrArea * ( EnthalpyZoneAir - EnthalpyAirWalkIn ) * DensityAirWalkIn * DensitySqRtFactor * ( power( ( Gravity * DrHeight ), 0.5 ) ) * DensityFactorFm;
+					FullFlowInfLoad = 0.221 * DrArea * ( EnthalpyZoneAir - EnthalpyAirWalkIn ) * DensityAirWalkIn * DensitySqRtFactor * ( std::pow( ( Gravity * DrHeight ), 0.5 ) ) * DensityFactorFm;
 					StockDoorInfLoad = FullFlowInfLoad * DoorOpenFactor * DoorFlowFactor * ( 1.0 - DoorProtectEff );
 					StockDoorSensHeat = DrArea * WalkIn( WalkInID ).UValueStockDr( ZoneID ) * DelTemp;
 				} //have stock doors
@@ -11380,7 +11380,7 @@ namespace RefrigeratedCase {
 					DoorOpenFactor = DefaultWalkInDoorOpenFactor; //default value
 					if ( WalkIn( WalkInID ).GlassDoorOpenSchedPtr( ZoneID ) > 0 ) DoorOpenFactor = GetCurrentScheduleValue( WalkIn( WalkInID ).GlassDoorOpenSchedPtr( ZoneID ) );
 
-					FullFlowInfLoad = 0.221 * DrArea * ( EnthalpyZoneAir - EnthalpyAirWalkIn ) * DensityAirWalkIn * DensitySqRtFactor * ( power( ( Gravity * DrHeight ), 0.5 ) ) * DensityFactorFm;
+					FullFlowInfLoad = 0.221 * DrArea * ( EnthalpyZoneAir - EnthalpyAirWalkIn ) * DensityAirWalkIn * DensitySqRtFactor * ( std::pow( ( Gravity * DrHeight ), 0.5 ) ) * DensityFactorFm;
 					GlassDoorInfLoad = FullFlowInfLoad * DoorOpenFactor * DoorFlowFactor * ( 1.0 - DoorProtectEff );
 					GlassDoorSensHeat = DrArea * WalkIn( WalkInID ).UValueGlassDr( ZoneID ) * DelTemp;
 				} //have Glass doors
@@ -12675,12 +12675,12 @@ namespace RefrigeratedCase {
 				//don't need full chiller power, reduce fan speed to reduce air flow
 				// move fan to part power if need to
 				CapFac = SensLoadRequestedGross / SensLoadGross;
-				AirVolRatio = max( FanMinAirFlowRatio, power( CapFac, EvaporatorAirVolExponent ) );
+				AirVolRatio = max( FanMinAirFlowRatio, std::pow( CapFac, EvaporatorAirVolExponent ) );
 				//Fans limited by minimum air flow ratio
 
 				{ auto const SELECT_CASE_var( FanSpeedControlType );
 				if ( SELECT_CASE_var == FanVariableSpeed ) { //fan power law, adjusted for reality, applies
-					FanPowerRatio = power( AirVolRatio, 2.5 );
+					FanPowerRatio = std::pow( AirVolRatio, 2.5 );
 					FanPowerActual = FanPowerRatio * FanPowerMax;
 				} else if ( SELECT_CASE_var == FanConstantSpeed ) {
 					FanPowerActual = AirVolRatio * std::exp( 1.0 - AirVolRatio ) * FanPowerMax;

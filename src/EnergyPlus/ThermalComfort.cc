@@ -605,7 +605,7 @@ namespace ThermalComfort {
 			P2 = CloInsul * 3.96;
 			P3 = CloInsul * 100.;
 			P1 = CloInsul * AbsAirTemp;
-			P4 = 308.7 - 0.028 * IntHeatProd + P2 * power( ( AbsRadTemp / 100. ), 4 );
+			P4 = 308.7 - 0.028 * IntHeatProd + P2 * fourth_power( ( AbsRadTemp / 100. ) );
 
 			// First guess for clothed surface tempeature
 			AbsCloSurfTemp = AbsAirTemp + ( 35.5 - AirTemp ) / ( 3.5 * ( CloUnit + 0.1 ) );
@@ -617,9 +617,9 @@ namespace ThermalComfort {
 			// COMPUTE SURFACE TEMPERATURE OF CLOTHING BY ITERATIONS
 			while ( ( ( std::abs( XN - XF ) > StopIterCrit ) || ( IterNum == 0 ) ) && ( IterNum < MaxIter ) ) {
 				XF = ( XF + XN ) / 2.;
-				HcNat = 2.38 * power( std::abs( 100. * XF - AbsAirTemp ), 0.25 ); // Heat transfer coefficient by natural convection
+				HcNat = 2.38 * std::pow( std::abs( 100. * XF - AbsAirTemp ), 0.25 ); // Heat transfer coefficient by natural convection
 				Hc = max( HcFor, HcNat ); // Determination of convective heat transfer coefficient
-				XN = ( P4 + P1 * Hc - P2 * power( XF, 4 ) ) / ( 100. + P3 * Hc );
+				XN = ( P4 + P1 * Hc - P2 * fourth_power( XF ) ) / ( 100. + P3 * Hc );
 				++IterNum;
 				if ( IterNum > MaxIter ) {
 					ShowWarningError( "Max iteration exceeded in CalcThermalFanger" );
@@ -634,7 +634,7 @@ namespace ThermalComfort {
 			//                            (AbsCloSurfTemp**4 - AbsRadTemp**4) ! Heat loss by radiation
 
 			// following line is ln 480 in ASHRAE 55 append. D
-			RadHeatLoss = 3.96 * CloBodyRat * ( power( ( AbsCloSurfTemp / 100. ), 4 ) - power( ( AbsRadTemp / 100. ), 4 ) );
+			RadHeatLoss = 3.96 * CloBodyRat * ( fourth_power( ( AbsCloSurfTemp / 100. ) ) - fourth_power( ( AbsRadTemp / 100. ) ) );
 
 			ConvHeatLoss = CloBodyRat * Hc * ( CloSurfTemp - AirTemp ); // Heat loss by convection
 
@@ -680,7 +680,7 @@ namespace ThermalComfort {
 			ThermalComfortData( PeopleNum ).CloSurfTemp = CloSurfTemp;
 
 			// Calculate the Fanger PPD (Predicted Percentage of Dissatisfied), as a %
-			PPD = 100.0 - 95.0 * std::exp( -0.03353 * power( PMV, 4 ) - 0.2179 * power( PMV, 2 ) );
+			PPD = 100.0 - 95.0 * std::exp( -0.03353 * fourth_power( PMV ) - 0.2179 * second_power( PMV ) );
 			if ( PPD < 0.0 ) PPD = 0.0;
 			if ( PPD > 100.0 ) PPD = 100.0;
 
@@ -854,9 +854,9 @@ namespace ThermalComfort {
 			// INITIALIZE THE POLLOWING VARIABLES
 			if ( AirVel < .137 ) AirVel = .137;
 
-			Hc = 8.6 * power( AirVel, 0.53 );
+			Hc = 8.6 * std::pow( AirVel, 0.53 );
 			if ( ActMet > .9 ) {
-				HcAct = 5.66 * power( ( ActMet - 0.85 ), 0.39 );
+				HcAct = 5.66 * std::pow( ( ActMet - 0.85 ), 0.39 );
 				Hc = max( HcAct, Hc );
 			}
 
@@ -900,7 +900,7 @@ namespace ThermalComfort {
 				while ( ( std::abs( CloSurfTemp - CloSurfTempOld ) > 0.01 ) || FirstMinIter ) {
 					FirstMinIter = false;
 					CloSurfTempOld = CloSurfTemp;
-					Hr = 4. * RadSurfEff * StefanBoltz * power( ( ( CloSurfTemp + RadTemp ) / 2. + TAbsConv ), 3 );
+					Hr = 4. * RadSurfEff * StefanBoltz * third_power( ( ( CloSurfTemp + RadTemp ) / 2. + TAbsConv ) );
 					CloSurfTemp = ( CloCond * SkinTemp + CloBodyRat * ( Hc * AirTemp + Hr * RadTemp ) ) / ( CloCond + CloBodyRat * ( Hc + Hr ) );
 				}
 
@@ -1072,7 +1072,7 @@ namespace ThermalComfort {
 			HrStd = Hr;
 			// HcStd = standard conv. heat tr. coeff. (level walking/still air)
 			if ( ActMet <= 0.86 ) ActMet = 0.86;
-			HcStd = 5.66 * power( ( ActMet - 0.85 ), 0.39 );
+			HcStd = 5.66 * std::pow( ( ActMet - 0.85 ), 0.39 );
 
 			// minimum value of Hc at sea leAirVel = 3.0 (AirVel = .137 m/s)
 			if ( HcStd <= 3. ) HcStd = 3.;
@@ -1321,7 +1321,7 @@ namespace ThermalComfort {
 					//  OTHERWISE NORMAL BLOOD FLOW OR VASODILATION OCCURS AND RESULTS IN
 					//  THERMAL NEUTRALITY OR WARM SENSATION.
 					if ( VasodilationFac < 0 ) {
-						ThermalComfortData( PeopleNum ).KsuTSV = -1.46153 * VasoconstrictFac + 3.74721 * power( VasoconstrictFac, 2 ) - 6.168856 * power( VasoconstrictFac, 3 );
+						ThermalComfortData( PeopleNum ).KsuTSV = -1.46153 * VasoconstrictFac + 3.74721 * second_power( VasoconstrictFac ) - 6.168856 * third_power( VasoconstrictFac );
 					} else {
 						ThermalComfortData( PeopleNum ).KsuTSV = ( 5. - 6.56 * ( RelHum - 0.50 ) ) * SkinWetFac;
 						if ( ThermalComfortData( PeopleNum ).KsuTSV > TSVMax ) ThermalComfortData( PeopleNum ).KsuTSV = TSVMax;
@@ -1464,7 +1464,7 @@ namespace ThermalComfort {
 
 		// SWEAT FUNCTION IN W/M**2.
 		WeighFac = 260. + 70. * AcclPattern;
-		SweatCtrlFac = 1.0 + 0.05 * power( SkinSignalSweatColdMax, 2.4 );
+		SweatCtrlFac = 1.0 + 0.05 * std::pow( SkinSignalSweatColdMax, 2.4 );
 
 		// EvapHeatLossDrySweat = SWEAT WHEN SkinWetTot < 0.4.
 		EvapHeatLossDrySweat = ( ( WeighFac * CoreSignalSweatMax + 0.1 * WeighFac * SkinSignalSweatMax ) * std::exp( SkinSignalSweatMax / 8.5 ) ) / SweatCtrlFac;
@@ -1533,7 +1533,7 @@ namespace ThermalComfort {
 		// OVERALL SKIN CONDUCTANCE, KS, IN W/M**2/C.
 		// SkinCndctDilation = EFFECT DUE TO VASODILATION.
 		// SkinCndctConstriction = EFFECT DUE TO VASOCONSTRICTION.
-		SkinCndctDilation = 42.45 * CoreSignalWarmMax + 8.15 * power( CoreSignalSkinSens, 0.8 ) * SkinSignalWarmMax;
+		SkinCndctDilation = 42.45 * CoreSignalWarmMax + 8.15 * std::pow( CoreSignalSkinSens, 0.8 ) * SkinSignalWarmMax;
 		SkinCndctConstriction = 1.0 + 0.4 * SkinSignalColdMax;
 		// ThermCndct IS EQUIVALENT TO KS
 		ThermCndct = 5.3 + ( 6.75 + SkinCndctDilation ) / SkinCndctConstriction;
@@ -1896,7 +1896,7 @@ namespace ThermalComfort {
 		// FLOW
 
 		XT = Temp / 100.;
-		CalcSatVapPressFromTemp = 6.16796 + 358.1855 * power( XT, 2 ) - 550.3543 * power( XT, 3 ) + 1048.8115 * power( XT, 4 );
+		CalcSatVapPressFromTemp = 6.16796 + 358.1855 * second_power( XT ) - 550.3543 * third_power( XT ) + 1048.8115 * fourth_power( XT );
 
 		return CalcSatVapPressFromTemp;
 
@@ -1986,7 +1986,7 @@ namespace ThermalComfort {
 		// If high temperature radiant heater present and on, then must account for this in MRT calculation
 		if ( QHTRadSysToPerson( ZoneNum ) > 0.0 || QHWBaseboardToPerson( ZoneNum ) > 0.0 || QSteamBaseboardToPerson( ZoneNum ) > 0.0 || QElecBaseboardToPerson( ZoneNum ) > 0.0 ) {
 			RadTemp += KelvinConv; // Convert to Kelvin
-			RadTemp = power( ( ( power( RadTemp, 4 ) ) + ( ( QHTRadSysToPerson( ZoneNum ) + QHWBaseboardToPerson( ZoneNum ) + QSteamBaseboardToPerson( ZoneNum ) + QElecBaseboardToPerson( ZoneNum ) ) / AreaEff / StefanBoltzmannConst ) ), ( 1.0 / 4.0 ) );
+			RadTemp = std::pow( ( ( fourth_power( RadTemp ) ) + ( ( QHTRadSysToPerson( ZoneNum ) + QHWBaseboardToPerson( ZoneNum ) + QSteamBaseboardToPerson( ZoneNum ) + QElecBaseboardToPerson( ZoneNum ) ) / AreaEff / StefanBoltzmannConst ) ), ( 1.0 / 4.0 ) );
 			RadTemp -= KelvinConv; // Convert back to Celsius
 		}
 
@@ -2741,7 +2741,7 @@ namespace ThermalComfort {
 							dryBulb = StrToReal( epwLine.substr( 0, pos ) );
 							avgDryBulbCEN += ( dryBulb / 24.0 );
 						}
-						runningAverageCEN += power( alpha, ( 7 - i ) ) * avgDryBulbCEN;
+						runningAverageCEN += std::pow( alpha, ( 7 - i ) ) * avgDryBulbCEN;
 					}
 				} else { // Do special things for wrapping the epw
 					calcEndDay = jStartDay;
@@ -2760,7 +2760,7 @@ namespace ThermalComfort {
 							dryBulb = StrToReal( epwLine.substr( 0, pos ) );
 							avgDryBulbCEN += ( dryBulb / 24.0 );
 						}
-						runningAverageCEN += power( alpha, ( calcEndDay - i ) ) * avgDryBulbCEN;
+						runningAverageCEN += std::pow( alpha, ( calcEndDay - i ) ) * avgDryBulbCEN;
 					}
 					for ( i = calcEndHr + 1; i <= calcStartHr - 1; ++i ) {
 						{ IOFlags flags; gio::read( epwFile, "(A)", flags ); readStat = flags.ios(); }
@@ -2777,7 +2777,7 @@ namespace ThermalComfort {
 							dryBulb = StrToReal( epwLine.substr( 0, pos ) );
 							avgDryBulbCEN += ( dryBulb / 24.0 );
 						}
-						runningAverageCEN += power( alpha, ( 7 - i ) ) * avgDryBulbCEN;
+						runningAverageCEN += std::pow( alpha, ( 7 - i ) ) * avgDryBulbCEN;
 					}
 				}
 				runningAverageCEN *= ( 1.0 - alpha );
@@ -2911,7 +2911,7 @@ namespace ThermalComfort {
 			ThermalComfortData( PeopleNum ).ClothingValue = 0.818 - 0.0364 * TemporarySixAMTemperature;
 		} else if ( ( TemporarySixAMTemperature >= 5.0 ) && ( TemporarySixAMTemperature < 26.0 ) ) {
 			TemporaryVariable = -0.1635 - 0.0066 * TemporarySixAMTemperature;
-			ThermalComfortData( PeopleNum ).ClothingValue = power( 10.0, ( TemporaryVariable ) );
+			ThermalComfortData( PeopleNum ).ClothingValue = std::pow( 10.0, ( TemporaryVariable ) );
 		} else if ( TemporarySixAMTemperature >= 26.0 ) {
 			ThermalComfortData( PeopleNum ).ClothingValue = 0.46;
 		}

@@ -747,7 +747,7 @@ namespace HVACCooledBeam {
 						DesLoadPerBeam = DesCoilLoad / NumBeams;
 						DesAirFlowPerBeam = CoolBeam( CBNum ).MaxAirVolFlow / NumBeams;
 						WaterVolFlowPerBeam = CoolBeam( CBNum ).MaxCoolWaterVolFlow / NumBeams;
-						WaterVel = WaterVolFlowPerBeam / ( Pi * power( ( CoolBeam( CBNum ).InDiam ), 2 ) / 4.0 );
+						WaterVel = WaterVolFlowPerBeam / ( Pi * second_power( ( CoolBeam( CBNum ).InDiam ) ) / 4.0 );
 						if ( FinalZoneSizing( CurZoneEqNum ).ZoneTempAtCoolPeak > 0.0 ) {
 							DT = FinalZoneSizing( CurZoneEqNum ).ZoneTempAtCoolPeak - 0.5 * ( CoolBeam( CBNum ).DesInletWaterTemp + CoolBeam( CBNum ).DesOutletWaterTemp );
 							if ( DT <= 0.0 ) {
@@ -758,12 +758,12 @@ namespace HVACCooledBeam {
 						}
 						LengthX = 1.0;
 						for ( Iter = 1; Iter <= 100; ++Iter ) {
-							IndAirFlowPerBeamL = CoolBeam( CBNum ).K1 * power( DT, CoolBeam( CBNum ).n ) + CoolBeam( CBNum ).Kin * DesAirFlowPerBeam / LengthX;
+							IndAirFlowPerBeamL = CoolBeam( CBNum ).K1 * std::pow( DT, CoolBeam( CBNum ).n ) + CoolBeam( CBNum ).Kin * DesAirFlowPerBeam / LengthX;
 							ConvFlow = ( IndAirFlowPerBeamL / CoolBeam( CBNum ).a0 ) * RhoAir;
 							if ( WaterVel > MinWaterVel ) {
-								K = CoolBeam( CBNum ).a * power( DT, CoolBeam( CBNum ).n1 ) * power( ConvFlow, CoolBeam( CBNum ).n2 ) * power( WaterVel, CoolBeam( CBNum ).n3 );
+								K = CoolBeam( CBNum ).a * std::pow( DT, CoolBeam( CBNum ).n1 ) * std::pow( ConvFlow, CoolBeam( CBNum ).n2 ) * std::pow( WaterVel, CoolBeam( CBNum ).n3 );
 							} else {
-								K = CoolBeam( CBNum ).a * power( DT, CoolBeam( CBNum ).n1 ) * power( ConvFlow, CoolBeam( CBNum ).n2 ) * power( MinWaterVel, CoolBeam( CBNum ).n3 ) * ( WaterVel / MinWaterVel );
+								K = CoolBeam( CBNum ).a * std::pow( DT, CoolBeam( CBNum ).n1 ) * std::pow( ConvFlow, CoolBeam( CBNum ).n2 ) * std::pow( MinWaterVel, CoolBeam( CBNum ).n3 ) * ( WaterVel / MinWaterVel );
 							}
 							Length = DesLoadPerBeam / ( K * CoolBeam( CBNum ).CoilArea * DT );
 							if ( CoolBeam( CBNum ).Kin <= 0.0 ) break;
@@ -1038,13 +1038,13 @@ namespace HVACCooledBeam {
 
 			WaterCoolPower = CWFlowPerBeam * Cp * ( TWOut - TWIn );
 			DT = max( ZTemp - 0.5 * ( TWIn + TWOut ), 0.0 );
-			IndFlow = CoolBeam( CBNum ).K1 * power( DT, CoolBeam( CBNum ).n ) + CoolBeam( CBNum ).Kin * CoolBeam( CBNum ).BeamFlow / CoolBeam( CBNum ).BeamLength;
+			IndFlow = CoolBeam( CBNum ).K1 * std::pow( DT, CoolBeam( CBNum ).n ) + CoolBeam( CBNum ).Kin * CoolBeam( CBNum ).BeamFlow / CoolBeam( CBNum ).BeamLength;
 			CoilFlow = ( IndFlow / CoolBeam( CBNum ).a0 ) * StdRhoAir;
-			WaterVel = CWFlowPerBeam / ( rho * Pi * power( ( CoolBeam( CBNum ).InDiam ), 2 ) / 4.0 );
+			WaterVel = CWFlowPerBeam / ( rho * Pi * second_power( ( CoolBeam( CBNum ).InDiam ) ) / 4.0 );
 			if ( WaterVel > MinWaterVel ) {
-				K = CoolBeam( CBNum ).a * power( DT, CoolBeam( CBNum ).n1 ) * power( CoilFlow, CoolBeam( CBNum ).n2 ) * power( WaterVel, CoolBeam( CBNum ).n3 );
+				K = CoolBeam( CBNum ).a * std::pow( DT, CoolBeam( CBNum ).n1 ) * std::pow( CoilFlow, CoolBeam( CBNum ).n2 ) * std::pow( WaterVel, CoolBeam( CBNum ).n3 );
 			} else {
-				K = CoolBeam( CBNum ).a * power( DT, CoolBeam( CBNum ).n1 ) * power( CoilFlow, CoolBeam( CBNum ).n2 ) * power( MinWaterVel, CoolBeam( CBNum ).n3 ) * ( WaterVel / MinWaterVel );
+				K = CoolBeam( CBNum ).a * std::pow( DT, CoolBeam( CBNum ).n1 ) * std::pow( CoilFlow, CoolBeam( CBNum ).n2 ) * std::pow( MinWaterVel, CoolBeam( CBNum ).n3 ) * ( WaterVel / MinWaterVel );
 			}
 			AirCoolPower = K * CoolBeam( CBNum ).CoilArea * DT * CoolBeam( CBNum ).BeamLength;
 			Diff = WaterCoolPower - AirCoolPower;

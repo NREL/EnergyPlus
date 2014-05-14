@@ -1282,7 +1282,7 @@ namespace WaterUse {
 			} else if ( SELECT_CASE_var == HeatRecoveryHXCrossFlow ) { // Unmixed
 				CapacityRatio = MinCapacityRate / max( DrainCapacityRate, HXCapacityRate );
 				NTU = WaterConnections( WaterConnNum ).HXUA / MinCapacityRate;
-				WaterConnections( WaterConnNum ).Effectiveness = 1.0 - std::exp( ( power( NTU, 0.22 ) / CapacityRatio ) * ( std::exp( -CapacityRatio * power( NTU, 0.78 ) ) - 1.0 ) );
+				WaterConnections( WaterConnNum ).Effectiveness = 1.0 - std::exp( ( std::pow( NTU, 0.22 ) / CapacityRatio ) * ( std::exp( -CapacityRatio * std::pow( NTU, 0.78 ) ) - 1.0 ) );
 			}}
 
 			WaterConnections( WaterConnNum ).RecoveryRate = WaterConnections( WaterConnNum ).Effectiveness * MinCapacityRate * ( WaterConnections( WaterConnNum ).DrainTemp - WaterConnections( WaterConnNum ).ColdSupplyTemp );

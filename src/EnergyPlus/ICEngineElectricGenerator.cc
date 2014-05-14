@@ -694,7 +694,7 @@ namespace ICEngineElectricGenerator {
 				ExhaustGasFlow = QExhaustTotal / ( ExhaustCP * ( ExhaustTemp - ReferenceTemp ) );
 
 				//Use Curve fit to determine stack temp after heat recovery
-				UA = ICEngineGenerator( GeneratorNum ).UACoef( 1 ) * power( RatedPowerOutput, ICEngineGenerator( GeneratorNum ).UACoef( 2 ) );
+				UA = ICEngineGenerator( GeneratorNum ).UACoef( 1 ) * std::pow( RatedPowerOutput, ICEngineGenerator( GeneratorNum ).UACoef( 2 ) );
 
 				DesignMinExitGasTemp = ICEngineGenerator( GeneratorNum ).DesignMinExitGasTemp;
 

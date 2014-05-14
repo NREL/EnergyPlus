@@ -1160,7 +1160,7 @@ namespace WaterToAirHeatPump {
 						SourceSideEffect = 1.0 - std::exp( -SourceSideUA / ( CpFluid * SourceSideMassFlowRate ) );
 					} else {
 						DegradFactor = DegradF( SourceSideFluidName, SourceSideInletTemp, SourceSideFluidIndex );
-						SourceSideEffect = 1.0 / ( ( SourceSideHTRes1 * power( SourceSideVolFlowRate, ( -0.8 ) ) ) / DegradFactor + SourceSideHTRes2 );
+						SourceSideEffect = 1.0 / ( ( SourceSideHTRes1 * std::pow( SourceSideVolFlowRate, ( -0.8 ) ) ) / DegradFactor + SourceSideHTRes2 );
 					}
 
 					// Determine Source Side Tempertaure (Condensing Temp in this case)
@@ -1326,7 +1326,7 @@ namespace WaterToAirHeatPump {
 					// Find Refrigerant Flow Rate
 					{ auto const SELECT_CASE_var( CompressorType );
 					if ( SELECT_CASE_var == CompressorType_Reciprocating ) { // RECIPROCATING
-						MassRef = PistonDisp * CompSuctionDensity * ( 1.0 + ClearanceFactor - ClearanceFactor * ( power( ( DischargePr / SuctionPr ), ( 1.0 / gamma ) ) ) );
+						MassRef = PistonDisp * CompSuctionDensity * ( 1.0 + ClearanceFactor - ClearanceFactor * ( std::pow( ( DischargePr / SuctionPr ), ( 1.0 / gamma ) ) ) );
 					} else if ( SELECT_CASE_var == CompressorType_Rotary ) { // ROTARY
 						MassRef = PistonDisp * CompSuctionDensity;
 					} else if ( SELECT_CASE_var == CompressorType_Scroll ) { // SCROLL
@@ -1349,11 +1349,11 @@ namespace WaterToAirHeatPump {
 				// Determine the Power Consumption
 				{ auto const SELECT_CASE_var( CompressorType );
 				if ( SELECT_CASE_var == CompressorType_Reciprocating ) { // RECIPROCATING
-					Power = PowerLos + ( 1.0 / LosFac ) * ( MassRef * gamma / ( gamma - 1.0 ) * SuctionPr / CompSuctionDensity * ( ( power( ( DischargePr / SuctionPr ), ( ( gamma - 1.0 ) / gamma ) ) ) - 1.0 ) );
+					Power = PowerLos + ( 1.0 / LosFac ) * ( MassRef * gamma / ( gamma - 1.0 ) * SuctionPr / CompSuctionDensity * ( ( std::pow( ( DischargePr / SuctionPr ), ( ( gamma - 1.0 ) / gamma ) ) ) - 1.0 ) );
 				} else if ( SELECT_CASE_var == CompressorType_Rotary ) { // ROTARY
-					Power = PowerLos + ( 1.0 / LosFac ) * ( MassRef * gamma / ( gamma - 1.0 ) * SuctionPr / CompSuctionDensity * ( ( power( ( DischargePr / SuctionPr ), ( ( gamma - 1.0 ) / gamma ) ) ) - 1.0 ) );
+					Power = PowerLos + ( 1.0 / LosFac ) * ( MassRef * gamma / ( gamma - 1.0 ) * SuctionPr / CompSuctionDensity * ( ( std::pow( ( DischargePr / SuctionPr ), ( ( gamma - 1.0 ) / gamma ) ) ) - 1.0 ) );
 				} else if ( SELECT_CASE_var == CompressorType_Scroll ) { // SCROLL
-					Power = PowerLos + ( 1.0 / LosFac ) * ( gamma / ( gamma - 1.0 ) ) * SuctionPr * RefVolFlowRate * ( ( ( gamma - 1.0 ) / gamma ) * ( ( DischargePr / SuctionPr ) / VolumeRatio ) + ( ( 1.0 / gamma ) * power( VolumeRatio, ( gamma - 1.0 ) ) ) - 1.0 );
+					Power = PowerLos + ( 1.0 / LosFac ) * ( gamma / ( gamma - 1.0 ) ) * SuctionPr * RefVolFlowRate * ( ( ( gamma - 1.0 ) / gamma ) * ( ( DischargePr / SuctionPr ) / VolumeRatio ) + ( ( 1.0 / gamma ) * std::pow( VolumeRatio, ( gamma - 1.0 ) ) ) - 1.0 );
 				}}
 
 				// Determine the Sourceside Heat Rate
@@ -1749,7 +1749,7 @@ namespace WaterToAirHeatPump {
 					SourceSideEffect = 1.0 - std::exp( -SourceSideUA / ( CpFluid * SourceSideMassFlowRate ) ); // SourceSideFluidName=='Water'
 				} else {
 					DegradFactor = DegradF( SourceSideFluidName, SourceSideInletTemp, SourceSideFluidIndex );
-					SourceSideEffect = 1 / ( ( SourceSideHTRes1 * power( SourceSideVolFlowRate, ( -0.8 ) ) ) / DegradFactor + SourceSideHTRes2 );
+					SourceSideEffect = 1 / ( ( SourceSideHTRes1 * std::pow( SourceSideVolFlowRate, ( -0.8 ) ) ) / DegradFactor + SourceSideHTRes2 );
 				}
 
 				// Determine Load Side Effectiveness
@@ -1864,7 +1864,7 @@ namespace WaterToAirHeatPump {
 				// Find Refrigerant Flow Rate
 				{ auto const SELECT_CASE_var( CompressorType );
 				if ( SELECT_CASE_var == CompressorType_Reciprocating ) { // RECIPROCATING
-					MassRef = PistonDisp * CompSuctionDensity * ( 1 + ClearanceFactor - ClearanceFactor * ( power( ( DischargePr / SuctionPr ), ( 1 / gamma ) ) ) );
+					MassRef = PistonDisp * CompSuctionDensity * ( 1 + ClearanceFactor - ClearanceFactor * ( std::pow( ( DischargePr / SuctionPr ), ( 1 / gamma ) ) ) );
 				} else if ( SELECT_CASE_var == CompressorType_Rotary ) { // ROTARY
 					MassRef = PistonDisp * CompSuctionDensity;
 				} else if ( SELECT_CASE_var == CompressorType_Scroll ) { // SCROLL
@@ -1887,11 +1887,11 @@ namespace WaterToAirHeatPump {
 			// Determine the Power Consumption
 			{ auto const SELECT_CASE_var( CompressorType );
 			if ( SELECT_CASE_var == CompressorType_Reciprocating ) { // RECIPROCATING
-				Power = PowerLos + ( 1 / LosFac ) * ( MassRef * gamma / ( gamma - 1 ) * SuctionPr / CompSuctionDensity * ( ( power( ( DischargePr / SuctionPr ), ( ( gamma - 1 ) / gamma ) ) ) - 1 ) );
+				Power = PowerLos + ( 1 / LosFac ) * ( MassRef * gamma / ( gamma - 1 ) * SuctionPr / CompSuctionDensity * ( ( std::pow( ( DischargePr / SuctionPr ), ( ( gamma - 1 ) / gamma ) ) ) - 1 ) );
 			} else if ( SELECT_CASE_var == CompressorType_Rotary ) { // ROTARY
-				Power = PowerLos + ( 1 / LosFac ) * ( MassRef * gamma / ( gamma - 1 ) * SuctionPr / CompSuctionDensity * ( ( power( ( DischargePr / SuctionPr ), ( ( gamma - 1 ) / gamma ) ) ) - 1 ) );
+				Power = PowerLos + ( 1 / LosFac ) * ( MassRef * gamma / ( gamma - 1 ) * SuctionPr / CompSuctionDensity * ( ( std::pow( ( DischargePr / SuctionPr ), ( ( gamma - 1 ) / gamma ) ) ) - 1 ) );
 			} else if ( SELECT_CASE_var == CompressorType_Scroll ) { // SCROLL
-				Power = PowerLos + ( 1 / LosFac ) * ( gamma / ( gamma - 1 ) ) * SuctionPr * RefVolFlowRate * ( ( ( gamma - 1 ) / gamma ) * ( ( DischargePr / SuctionPr ) / VolumeRatio ) + ( ( 1 / gamma ) * power( VolumeRatio, ( gamma - 1 ) ) ) - 1 );
+				Power = PowerLos + ( 1 / LosFac ) * ( gamma / ( gamma - 1 ) ) * SuctionPr * RefVolFlowRate * ( ( ( gamma - 1 ) / gamma ) * ( ( DischargePr / SuctionPr ) / VolumeRatio ) + ( ( 1 / gamma ) * std::pow( VolumeRatio, ( gamma - 1 ) ) ) - 1 );
 			}}
 
 			// Determine the Load Side Heat Rate
@@ -2205,7 +2205,7 @@ namespace WaterToAirHeatPump {
 		}
 
 		//  Use sucessive substitution to solve for To
-		aa = ( Gamma * Toffa ) - ( 0.25 / Twet ) * ( power( Gamma, 2 ) ) * ( power( Toffa, 2 ) );
+		aa = ( Gamma * Toffa ) - ( 0.25 / Twet ) * ( second_power( Gamma ) ) * ( second_power( Toffa ) );
 
 		To1 = aa + HPTimeConstant;
 		Error = 1.0;
@@ -2292,7 +2292,7 @@ namespace WaterToAirHeatPump {
 		CpCoolant = GetSpecificHeatGlycol( FluidName, Temp, FluidIndex, CalledFrom );
 		CondCoolant = GetConductivityGlycol( FluidName, Temp, FluidIndex, CalledFrom );
 
-		DegradF = power( ( VisCoolant / VisWater ), ( -0.47 ) ) * power( ( DensityCoolant / DensityWater ), 0.8 ) * power( ( CpCoolant / CpWater ), 0.33 ) * power( ( CondCoolant / CondWater ), 0.67 );
+		DegradF = std::pow( ( VisCoolant / VisWater ), ( -0.47 ) ) * std::pow( ( DensityCoolant / DensityWater ), 0.8 ) * std::pow( ( CpCoolant / CpWater ), 0.33 ) * std::pow( ( CondCoolant / CondWater ), 0.67 );
 
 		return DegradF;
 	}

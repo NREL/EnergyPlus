@@ -876,8 +876,8 @@ namespace HeatBalFiniteDiffManager {
 
 				dxn = Material( CurrentLayer ).Thickness / double( Ipts1 ); // full node thickness
 
-				StabilityTemp = Alpha * Delt / power( dxn, 2 );
-				StabilityMoist = mAlpha * Delt / power( dxn, 2 );
+				StabilityTemp = Alpha * Delt / second_power( dxn );
+				StabilityMoist = mAlpha * Delt / second_power( dxn );
 				ConstructFD( ConstrNum ).TempStability( Layer ) = StabilityTemp;
 				ConstructFD( ConstrNum ).MoistStability( Layer ) = StabilityMoist;
 				ConstructFD( ConstrNum ).DelX( Layer ) = dxn;
@@ -1665,7 +1665,7 @@ namespace HeatBalFiniteDiffManager {
 
 						} else if ( SELECT_CASE_var == FullyImplicitFirstOrder ) {
 							//   First Order
-							TDT( i ) = ( 2.0 * Delt * DelX * QRadSWOutFD + Cp * power( DelX, 2 ) * RhoS * TD( i ) + 2.0 * Delt * kt * TDT( i + 1 ) + 2.0 * Delt * DelX * hgnd * Tgnd + 2.0 * Delt * DelX * hconvo * Toa + 2.0 * Delt * DelX * hrad * Toa + 2.0 * Delt * DelX * hsky * Tsky ) / ( 2.0 * Delt * DelX * hconvo + 2.0 * Delt * DelX * hgnd + 2.0 * Delt * DelX * hrad + 2.0 * Delt * DelX * hsky + 2.0 * Delt * kt + Cp * power( DelX, 2 ) * RhoS );
+							TDT( i ) = ( 2.0 * Delt * DelX * QRadSWOutFD + Cp * second_power( DelX ) * RhoS * TD( i ) + 2.0 * Delt * kt * TDT( i + 1 ) + 2.0 * Delt * DelX * hgnd * Tgnd + 2.0 * Delt * DelX * hconvo * Toa + 2.0 * Delt * DelX * hrad * Toa + 2.0 * Delt * DelX * hsky * Tsky ) / ( 2.0 * Delt * DelX * hconvo + 2.0 * Delt * DelX * hgnd + 2.0 * Delt * DelX * hrad + 2.0 * Delt * DelX * hsky + 2.0 * Delt * kt + Cp * second_power( DelX ) * RhoS );
 
 						}}
 
@@ -1684,11 +1684,11 @@ namespace HeatBalFiniteDiffManager {
 						// Wall first node temperature behind Movable insulation
 						{ auto const SELECT_CASE_var( CondFDSchemeType );
 						if ( SELECT_CASE_var == CrankNicholsonSecondOrder ) {
-							TDT( i ) = ( 2 * Delt * DelX * QRadSWOutFD + Cp * power( DelX, 2 ) * RhoS * TD( i ) + 2 * Delt * kt * TDT( i + 1 ) + 2 * Delt * DelX * HMovInsul * TInsulOut ) / ( 2 * Delt * DelX * HMovInsul + 2 * Delt * kt + Cp * power( DelX, 2 ) * RhoS );
+							TDT( i ) = ( 2 * Delt * DelX * QRadSWOutFD + Cp * second_power( DelX ) * RhoS * TD( i ) + 2 * Delt * kt * TDT( i + 1 ) + 2 * Delt * DelX * HMovInsul * TInsulOut ) / ( 2 * Delt * DelX * HMovInsul + 2 * Delt * kt + Cp * second_power( DelX ) * RhoS );
 
 						} else if ( SELECT_CASE_var == FullyImplicitFirstOrder ) {
 							// Currently same as Crank Nicholson, need fully implicit formulation
-							TDT( i ) = ( 2 * Delt * DelX * QRadSWOutFD + Cp * power( DelX, 2 ) * RhoS * TD( i ) + 2 * Delt * kt * TDT( i + 1 ) + 2 * Delt * DelX * HMovInsul * TInsulOut ) / ( 2 * Delt * DelX * HMovInsul + 2 * Delt * kt + Cp * power( DelX, 2 ) * RhoS );
+							TDT( i ) = ( 2 * Delt * DelX * QRadSWOutFD + Cp * second_power( DelX ) * RhoS * TD( i ) + 2 * Delt * kt * TDT( i + 1 ) + 2 * Delt * DelX * HMovInsul * TInsulOut ) / ( 2 * Delt * DelX * HMovInsul + 2 * Delt * kt + Cp * second_power( DelX ) * RhoS );
 
 						}}
 
@@ -2024,11 +2024,11 @@ namespace HeatBalFiniteDiffManager {
 				{ auto const SELECT_CASE_var( CondFDSchemeType );
 				if ( SELECT_CASE_var == CrankNicholsonSecondOrder ) {
 
-					TDT( i ) = ( 2. * Delt * Delx2 * QSSFlux * Rlayer - Delt * Delx2 * TD( i ) - Delt * kt2 * Rlayer * TD( i ) + Cp2 * power( Delx2, 2 ) * RhoS2 * Rlayer * TD( i ) + Delt * Delx2 * TD( i - 1 ) + Delt * kt2 * Rlayer * TD( i + 1 ) + Delt * Delx2 * TDT( i - 1 ) + Delt * kt2 * Rlayer * TDT( i + 1 ) ) / ( Delt * Delx2 + Delt * kt2 * Rlayer + Cp2 * power( Delx2, 2 ) * RhoS2 * Rlayer );
+					TDT( i ) = ( 2. * Delt * Delx2 * QSSFlux * Rlayer - Delt * Delx2 * TD( i ) - Delt * kt2 * Rlayer * TD( i ) + Cp2 * second_power( Delx2 ) * RhoS2 * Rlayer * TD( i ) + Delt * Delx2 * TD( i - 1 ) + Delt * kt2 * Rlayer * TD( i + 1 ) + Delt * Delx2 * TDT( i - 1 ) + Delt * kt2 * Rlayer * TDT( i + 1 ) ) / ( Delt * Delx2 + Delt * kt2 * Rlayer + Cp2 * second_power( Delx2 ) * RhoS2 * Rlayer );
 
 				} else if ( SELECT_CASE_var == FullyImplicitFirstOrder ) {
 
-					TDT( i ) = ( 2. * Delt * Delx2 * QSSFlux * Rlayer + Cp2 * power( Delx2, 2 ) * RhoS2 * Rlayer * TD( i ) + 2. * Delt * Delx2 * TDT( i - 1 ) + 2. * Delt * kt2 * Rlayer * TDT( i + 1 ) ) / ( 2. * Delt * Delx2 + 2. * Delt * kt2 * Rlayer + Cp2 * power( Delx2, 2 ) * RhoS2 * Rlayer );
+					TDT( i ) = ( 2. * Delt * Delx2 * QSSFlux * Rlayer + Cp2 * second_power( Delx2 ) * RhoS2 * Rlayer * TD( i ) + 2. * Delt * Delx2 * TDT( i - 1 ) + 2. * Delt * kt2 * Rlayer * TDT( i + 1 ) ) / ( 2. * Delt * Delx2 + 2. * Delt * kt2 * Rlayer + Cp2 * second_power( Delx2 ) * RhoS2 * Rlayer );
 
 				}}
 
@@ -2060,9 +2060,9 @@ namespace HeatBalFiniteDiffManager {
 				{ auto const SELECT_CASE_var( CondFDSchemeType );
 
 				if ( SELECT_CASE_var == CrankNicholsonSecondOrder ) {
-					TDT( i ) = ( 2. * Delt * Delx1 * QSSFlux * Rlayer2 - Delt * Delx1 * TD( i ) - Delt * kt1 * Rlayer2 * TD( i ) + Cp1 * power( Delx1, 2 ) * RhoS1 * Rlayer2 * TD( i ) + Delt * kt1 * Rlayer2 * TD( i - 1 ) + Delt * Delx1 * TD( i + 1 ) + Delt * kt1 * Rlayer2 * TDT( i - 1 ) + Delt * Delx1 * TDT( i + 1 ) ) / ( Delt * Delx1 + Delt * kt1 * Rlayer2 + Cp1 * power( Delx1, 2 ) * RhoS1 * Rlayer2 );
+					TDT( i ) = ( 2. * Delt * Delx1 * QSSFlux * Rlayer2 - Delt * Delx1 * TD( i ) - Delt * kt1 * Rlayer2 * TD( i ) + Cp1 * second_power( Delx1 ) * RhoS1 * Rlayer2 * TD( i ) + Delt * kt1 * Rlayer2 * TD( i - 1 ) + Delt * Delx1 * TD( i + 1 ) + Delt * kt1 * Rlayer2 * TDT( i - 1 ) + Delt * Delx1 * TDT( i + 1 ) ) / ( Delt * Delx1 + Delt * kt1 * Rlayer2 + Cp1 * second_power( Delx1 ) * RhoS1 * Rlayer2 );
 				} else if ( SELECT_CASE_var == FullyImplicitFirstOrder ) {
-					TDT( i ) = ( 2. * Delt * Delx1 * QSSFlux * Rlayer2 + Cp1 * power( Delx1, 2 ) * RhoS1 * Rlayer2 * TD( i ) + 2. * Delt * kt1 * Rlayer2 * TDT( i - 1 ) + 2. * Delt * Delx1 * TDT( i + 1 ) ) / ( 2. * Delt * Delx1 + 2. * Delt * kt1 * Rlayer2 + Cp1 * power( Delx1, 2 ) * RhoS1 * Rlayer2 );
+					TDT( i ) = ( 2. * Delt * Delx1 * QSSFlux * Rlayer2 + Cp1 * second_power( Delx1 ) * RhoS1 * Rlayer2 * TD( i ) + 2. * Delt * kt1 * Rlayer2 * TDT( i - 1 ) + 2. * Delt * Delx1 * TDT( i + 1 ) ) / ( 2. * Delt * Delx1 + 2. * Delt * kt1 * Rlayer2 + Cp1 * second_power( Delx1 ) * RhoS1 * Rlayer2 );
 
 				}}
 
@@ -2133,11 +2133,11 @@ namespace HeatBalFiniteDiffManager {
 
 				if ( SELECT_CASE_var == CrankNicholsonSecondOrder ) {
 					//     Regular Internal Interface Node with Source/sink using Adams Moulton second order
-					TDT( i ) = ( 2. * Delt * Delx1 * Delx2 * QSSFlux - Delt * Delx2 * kt1 * TD( i ) - Delt * Delx1 * kt2 * TD( i ) + Cp1 * power( Delx1, 2 ) * Delx2 * RhoS1 * TD( i ) + Cp2 * Delx1 * power( Delx2, 2 ) * RhoS2 * TD( i ) + Delt * Delx2 * kt1 * TD( i - 1 ) + Delt * Delx1 * kt2 * TD( i + 1 ) + Delt * Delx2 * kt1 * TDT( i - 1 ) + Delt * Delx1 * kt2 * TDT( i + 1 ) ) / ( Delt * Delx2 * kt1 + Delt * Delx1 * kt2 + Cp1 * power( Delx1, 2 ) * Delx2 * RhoS1 + Cp2 * Delx1 * power( Delx2, 2 ) * RhoS2 );
+					TDT( i ) = ( 2. * Delt * Delx1 * Delx2 * QSSFlux - Delt * Delx2 * kt1 * TD( i ) - Delt * Delx1 * kt2 * TD( i ) + Cp1 * second_power( Delx1 ) * Delx2 * RhoS1 * TD( i ) + Cp2 * Delx1 * second_power( Delx2 ) * RhoS2 * TD( i ) + Delt * Delx2 * kt1 * TD( i - 1 ) + Delt * Delx1 * kt2 * TD( i + 1 ) + Delt * Delx2 * kt1 * TDT( i - 1 ) + Delt * Delx1 * kt2 * TDT( i + 1 ) ) / ( Delt * Delx2 * kt1 + Delt * Delx1 * kt2 + Cp1 * second_power( Delx1 ) * Delx2 * RhoS1 + Cp2 * Delx1 * second_power( Delx2 ) * RhoS2 );
 
 				} else if ( SELECT_CASE_var == FullyImplicitFirstOrder ) {
 					// first order adams moulton
-					TDT( i ) = ( 2. * Delt * Delx1 * Delx2 * QSSFlux + Cp1 * power( Delx1, 2 ) * Delx2 * RhoS1 * TD( i ) + Cp2 * Delx1 * power( Delx2, 2 ) * RhoS2 * TD( i ) + 2. * Delt * Delx2 * kt1 * TDT( i - 1 ) + 2. * Delt * Delx1 * kt2 * TDT( i + 1 ) ) / ( 2. * Delt * Delx2 * kt1 + 2. * Delt * Delx1 * kt2 + Cp1 * power( Delx1, 2 ) * Delx2 * RhoS1 + Cp2 * Delx1 * power( Delx2, 2 ) * RhoS2 );
+					TDT( i ) = ( 2. * Delt * Delx1 * Delx2 * QSSFlux + Cp1 * second_power( Delx1 ) * Delx2 * RhoS1 * TD( i ) + Cp2 * Delx1 * second_power( Delx2 ) * RhoS2 * TD( i ) + 2. * Delt * Delx2 * kt1 * TDT( i - 1 ) + 2. * Delt * Delx1 * kt2 * TDT( i + 1 ) ) / ( 2. * Delt * Delx2 * kt1 + 2. * Delt * Delx1 * kt2 + Cp1 * second_power( Delx1 ) * Delx2 * RhoS1 + Cp2 * Delx1 * second_power( Delx2 ) * RhoS2 );
 
 				}}
 
@@ -2337,20 +2337,20 @@ namespace HeatBalFiniteDiffManager {
 
 					if ( SELECT_CASE_var == CrankNicholsonSecondOrder ) {
 						// Adams-Moulton second order
-						TDT( i ) = ( 2. * Delt * DelX * NetLWRadToSurfFD + 2. * Delt * DelX * QHtRadSysSurfFD + 2. * Delt * DelX * QHWBaseboardSurfFD + 2. * Delt * DelX * QSteamBaseboardSurfFD + 2. * Delt * DelX * QElecBaseboardSurfFD + 2. * Delt * DelX * QRadSWInFD + 2. * Delt * DelX * QRadThermInFD - Delt * DelX * hconvi * TD( i ) - Delt * kt * TD( i ) + Cp * power( DelX, 2 ) * RhoS * TD( i ) + Delt * kt * TD( i + 1 ) + Delt * kt * TDT( i + 1 ) + 2. * Delt * DelX * hconvi * Tia ) / ( Delt * DelX * hconvi + Delt * kt + Cp * power( DelX, 2 ) * RhoS );
+						TDT( i ) = ( 2. * Delt * DelX * NetLWRadToSurfFD + 2. * Delt * DelX * QHtRadSysSurfFD + 2. * Delt * DelX * QHWBaseboardSurfFD + 2. * Delt * DelX * QSteamBaseboardSurfFD + 2. * Delt * DelX * QElecBaseboardSurfFD + 2. * Delt * DelX * QRadSWInFD + 2. * Delt * DelX * QRadThermInFD - Delt * DelX * hconvi * TD( i ) - Delt * kt * TD( i ) + Cp * second_power( DelX ) * RhoS * TD( i ) + Delt * kt * TD( i + 1 ) + Delt * kt * TDT( i + 1 ) + 2. * Delt * DelX * hconvi * Tia ) / ( Delt * DelX * hconvi + Delt * kt + Cp * second_power( DelX ) * RhoS );
 
 					} else if ( SELECT_CASE_var == FullyImplicitFirstOrder ) {
 						// Adams-Moulton First order
-						TDT( i ) = ( 2. * Delt * DelX * NetLWRadToSurfFD + 2. * Delt * DelX * QHtRadSysSurfFD + 2. * Delt * DelX * QHWBaseboardSurfFD + 2. * Delt * DelX * QSteamBaseboardSurfFD + 2. * Delt * DelX * QElecBaseboardSurfFD + 2. * Delt * DelX * QRadSWInFD + 2. * Delt * DelX * QRadThermInFD + Cp * power( DelX, 2 ) * RhoS * TD( i ) + 2. * Delt * kt * TDT( i + 1 ) + 2. * Delt * DelX * hconvi * Tia ) / ( 2. * Delt * DelX * hconvi + 2. * Delt * kt + Cp * power( DelX, 2 ) * RhoS );
+						TDT( i ) = ( 2. * Delt * DelX * NetLWRadToSurfFD + 2. * Delt * DelX * QHtRadSysSurfFD + 2. * Delt * DelX * QHWBaseboardSurfFD + 2. * Delt * DelX * QSteamBaseboardSurfFD + 2. * Delt * DelX * QElecBaseboardSurfFD + 2. * Delt * DelX * QRadSWInFD + 2. * Delt * DelX * QRadThermInFD + Cp * second_power( DelX ) * RhoS * TD( i ) + 2. * Delt * kt * TDT( i + 1 ) + 2. * Delt * DelX * hconvi * Tia ) / ( 2. * Delt * DelX * hconvi + 2. * Delt * kt + Cp * second_power( DelX ) * RhoS );
 					}}
 
 				} else { // for regular or interzone walls
 					{ auto const SELECT_CASE_var( CondFDSchemeType );
 
 					if ( SELECT_CASE_var == CrankNicholsonSecondOrder ) {
-						TDT( i ) = ( 2. * Delt * DelX * NetLWRadToSurfFD + 2. * Delt * DelX * QHtRadSysSurfFD + 2. * Delt * DelX * QHWBaseboardSurfFD + 2. * Delt * DelX * QSteamBaseboardSurfFD + 2. * Delt * DelX * QElecBaseboardSurfFD + 2. * Delt * DelX * QRadSWInFD + 2. * Delt * DelX * QRadThermInFD - Delt * DelX * hconvi * TD( i ) - Delt * kt * TD( i ) + Cp * power( DelX, 2 ) * RhoS * TD( i ) + Delt * kt * TD( i - 1 ) + Delt * kt * TDT( i - 1 ) + 2. * Delt * DelX * hconvi * Tia ) / ( Delt * DelX * hconvi + Delt * kt + Cp * power( DelX, 2 ) * RhoS );
+						TDT( i ) = ( 2. * Delt * DelX * NetLWRadToSurfFD + 2. * Delt * DelX * QHtRadSysSurfFD + 2. * Delt * DelX * QHWBaseboardSurfFD + 2. * Delt * DelX * QSteamBaseboardSurfFD + 2. * Delt * DelX * QElecBaseboardSurfFD + 2. * Delt * DelX * QRadSWInFD + 2. * Delt * DelX * QRadThermInFD - Delt * DelX * hconvi * TD( i ) - Delt * kt * TD( i ) + Cp * second_power( DelX ) * RhoS * TD( i ) + Delt * kt * TD( i - 1 ) + Delt * kt * TDT( i - 1 ) + 2. * Delt * DelX * hconvi * Tia ) / ( Delt * DelX * hconvi + Delt * kt + Cp * second_power( DelX ) * RhoS );
 					} else if ( SELECT_CASE_var == FullyImplicitFirstOrder ) {
-						TDT( i ) = ( 2. * Delt * DelX * NetLWRadToSurfFD + 2. * Delt * DelX * QHtRadSysSurfFD + 2. * Delt * DelX * QHWBaseboardSurfFD + 2. * Delt * DelX * QSteamBaseboardSurfFD + 2. * Delt * DelX * QElecBaseboardSurfFD + 2. * Delt * DelX * QRadSWInFD + 2. * Delt * DelX * QRadThermInFD + Cp * power( DelX, 2 ) * RhoS * TD( i ) + 2. * Delt * kt * TDT( i - 1 ) + 2. * Delt * DelX * hconvi * Tia ) / ( 2. * Delt * DelX * hconvi + 2. * Delt * kt + Cp * power( DelX, 2 ) * RhoS );
+						TDT( i ) = ( 2. * Delt * DelX * NetLWRadToSurfFD + 2. * Delt * DelX * QHtRadSysSurfFD + 2. * Delt * DelX * QHWBaseboardSurfFD + 2. * Delt * DelX * QSteamBaseboardSurfFD + 2. * Delt * DelX * QElecBaseboardSurfFD + 2. * Delt * DelX * QRadSWInFD + 2. * Delt * DelX * QRadThermInFD + Cp * second_power( DelX ) * RhoS * TD( i ) + 2. * Delt * kt * TDT( i - 1 ) + 2. * Delt * DelX * hconvi * Tia ) / ( 2. * Delt * DelX * hconvi + 2. * Delt * kt + Cp * second_power( DelX ) * RhoS );
 					}}
 				}
 

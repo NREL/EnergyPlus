@@ -2007,7 +2007,7 @@ namespace PlantPipingSystemsManager {
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
 
-		RetVal = 3.14159 * ( ( power( r.OuterRadius, 2 ) ) - ( power( r.InnerRadius, 2 ) ) );
+		RetVal = 3.14159 * ( ( second_power( r.OuterRadius ) ) - ( second_power( r.InnerRadius ) ) );
 
 		return RetVal;
 
@@ -3123,7 +3123,7 @@ namespace PlantPipingSystemsManager {
 		}
 
 		//'also assign the interface cell surrounding the radial system
-		c.InterfaceVolume = ( 1.0 - ( 3.1415926535 / 4.0 ) ) * ( power( GridCellWidth, 2 ) ) * CellDepth;
+		c.InterfaceVolume = ( 1.0 - ( 3.1415926535 / 4.0 ) ) * ( second_power( GridCellWidth ) ) * CellDepth;
 
 	}
 
@@ -3189,7 +3189,7 @@ namespace PlantPipingSystemsManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		c.PipeInnerRadius = m_PipeInnerRadius;
-		c.Volume = 3.1415926535 * ( power( m_PipeInnerRadius, 2 ) ) * m_CellDepth;
+		c.Volume = 3.1415926535 * ( second_power( m_PipeInnerRadius ) ) * m_CellDepth;
 
 	}
 
@@ -4598,7 +4598,7 @@ namespace PlantPipingSystemsManager {
 			//'calculate geometric series
 			SummationTerm = 0.0;
 			for ( I = 1; I <= NumCellsOnEachSide; ++I ) {
-				SummationTerm += power( ThisMesh.GeometricSeriesCoefficient, ( I - 1 ) );
+				SummationTerm += std::pow( ThisMesh.GeometricSeriesCoefficient, ( I - 1 ) );
 			}
 
 			//'set up a list of cell widths for this region
@@ -5034,11 +5034,11 @@ namespace PlantPipingSystemsManager {
 		Hour_Angle = Pi / 12.0 * ( ( ( HourOfDay - 0.5 ) + 0.06667 * ( StMeridian_Degrees - Longitude_Degrees ) + Sc ) - 12.0 );
 
 		// Calculate sunset something, and constrain to a minimum of 0.000001
-		X_sunset = 1.0 - power( std::tan( Latitude_Radians ), 2 ) * power( std::tan( Declination ), 2 );
+		X_sunset = 1.0 - second_power( std::tan( Latitude_Radians ) ) * second_power( std::tan( Declination ) );
 		X_sunset = max( X_sunset, 0.000001 );
 
 		// Find sunset angle
-		Sunset_Angle = Pi / 2.0 - std::atan( -std::tan( Latitude_Radians ) * std::tan( Declination ) / power( X_sunset, 0.5 ) );
+		Sunset_Angle = Pi / 2.0 - std::atan( -std::tan( Latitude_Radians ) * std::tan( Declination ) / std::pow( X_sunset, 0.5 ) );
 
 		// Find the current sun angle
 		Altitude_Angle = std::asin( std::sin( Latitude_Radians ) * std::sin( Declination ) + std::cos( Latitude_Radians ) * std::cos( Declination ) * std::cos( Hour_Angle ) );
@@ -5090,7 +5090,7 @@ namespace PlantPipingSystemsManager {
 		VaporPressureActual_kPa = VaporPressureSaturated_kPa * PipingSystemDomains( DomainNum ).Cur.CurRelativeHumidity / 100.0;
 
 		// Calculate another Q term, [MJ/m2-hr]
-		QRAD_NL = 2.042E-10 * power( CurAirTempK, 4 ) * ( 0.34 - 0.14 * std::sqrt( VaporPressureActual_kPa ) ) * ( 1.35 * Ratio_SO - 0.35 );
+		QRAD_NL = 2.042E-10 * fourth_power( CurAirTempK ) * ( 0.34 - 0.14 * std::sqrt( VaporPressureActual_kPa ) ) * ( 1.35 * Ratio_SO - 0.35 );
 
 		// Calculate another Q term, [MJ/hr]
 		NetIncidentRadiation_MJhr = AbsorbedIncidentSolar_MJhrmin - QRAD_NL;
@@ -5110,7 +5110,7 @@ namespace PlantPipingSystemsManager {
 		// Just For Check
 		// Lu Xing Sep 22 2009
 
-		Slope_S = 2503.0 * std::exp( 17.27 * PipingSystemDomains( DomainNum ).Cur.CurAirTemp / ( PipingSystemDomains( DomainNum ).Cur.CurAirTemp + 237.3 ) ) / power( ( PipingSystemDomains( DomainNum ).Cur.CurAirTemp + 237.3 ), 2 );
+		Slope_S = 2503.0 * std::exp( 17.27 * PipingSystemDomains( DomainNum ).Cur.CurAirTemp / ( PipingSystemDomains( DomainNum ).Cur.CurAirTemp + 237.3 ) ) / second_power( ( PipingSystemDomains( DomainNum ).Cur.CurAirTemp + 237.3 ) );
 		Pressure = 98.0;
 		PsychrometricConstant = 0.665e-3 * Pressure;
 
@@ -5840,7 +5840,7 @@ namespace PlantPipingSystemsManager {
 		SpecificHeat = PipingSystemCircuits( CircuitNum ).CurFluidPropertySet.MyBase.SpecificHeat;
 
 		//Flow calculations
-		Area_c = ( Pi / 4.0 ) * power( PipingSystemCircuits( CircuitNum ).PipeSize.InnerDia, 2 );
+		Area_c = ( Pi / 4.0 ) * second_power( PipingSystemCircuits( CircuitNum ).PipeSize.InnerDia );
 		Velocity = PipingSystemCircuits( CircuitNum ).CurCircuitFlowRate / ( Density * Area_c );
 
 		//Determine convection coefficient based on flow conditions
@@ -5851,7 +5851,7 @@ namespace PlantPipingSystemsManager {
 			} else {
 				ExponentTerm = 0.4;
 			}
-			Nusselt = 0.023 * power( Reynolds, ( 4.0 / 5.0 ) ) * power( Prandtl, ExponentTerm );
+			Nusselt = 0.023 * std::pow( Reynolds, ( 4.0 / 5.0 ) ) * std::pow( Prandtl, ExponentTerm );
 			ConvCoefficient = Nusselt * Conductivity / PipingSystemCircuits( DomainNum ).PipeSize.InnerDia;
 		} else {
 			ConvCoefficient = StagnantFluidConvCoeff;

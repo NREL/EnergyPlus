@@ -435,8 +435,8 @@ namespace MoistureBalanceEMPDManager {
 			if ( RHaver > 1.0 ) RHaver = 1.0;
 			if ( RHaver < 0.0 ) RHaver = 0.00001;
 
-			AT = ( Material( MatNum ).MoistACoeff * Material( MatNum ).MoistBCoeff * power( RHaver, Material( MatNum ).MoistBCoeff ) + Material( MatNum ).MoistCCoeff * Material( MatNum ).MoistDCoeff * power( RHaver, Material( MatNum ).MoistDCoeff ) ) / RVaver;
-			BR = ( 4111.0 / power( ( Taver + 237.7 ), 2 ) - ( 1.0 / ( Taver + KelvinConv ) ) ) * AT * RVaver;
+			AT = ( Material( MatNum ).MoistACoeff * Material( MatNum ).MoistBCoeff * std::pow( RHaver, Material( MatNum ).MoistBCoeff ) + Material( MatNum ).MoistCCoeff * Material( MatNum ).MoistDCoeff * std::pow( RHaver, Material( MatNum ).MoistDCoeff ) ) / RVaver;
+			BR = ( 4111.0 / second_power( ( Taver + 237.7 ) ) - ( 1.0 / ( Taver + KelvinConv ) ) ) * AT * RVaver;
 			RHOBULK = Material( MatNum ).Density;
 			HM = HConvIn( SurfNum ) / ( PsyRhoAirFnPbTdbW( OutBaroPress, TempZone, ZoneAirHumRat( ZoneNum ), RoutineName ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), TempZone ) );
 			ZoneNum = Surface( SurfNum ).Zone;

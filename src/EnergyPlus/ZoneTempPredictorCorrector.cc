@@ -4990,7 +4990,7 @@ namespace ZoneTempPredictorCorrector {
 
 			// throw warning if seriously out of balance (this may need to be removed if too noisy... )
 			// formulate dynamic threshold value based on 20% of quadrature sum of components
-			Threshold = 0.2 * std::sqrt( power( SumIntGains, 2 ) + power( SumHADTsurfs, 2 ) + power( SumMCpDTzones, 2 ) + power( SumMCpDtInfil, 2 ) + power( SumMCpDTsystem, 2 ) + power( SumNonAirSystem, 2 ) + power( CzdTdt, 2 ) );
+			Threshold = 0.2 * std::sqrt( second_power( SumIntGains ) + second_power( SumHADTsurfs ) + second_power( SumMCpDTzones ) + second_power( SumMCpDtInfil ) + second_power( SumMCpDTsystem ) + second_power( SumNonAirSystem ) + second_power( CzdTdt ) );
 			if ( ( std::abs( imBalance ) > Threshold ) && ( ! WarmupFlag ) && ( ! DoingSizing ) ) { // air balance is out by more than threshold
 				if ( Zone( ZoneNum ).AirHBimBalanceErrIndex == 0 ) {
 					ShowWarningMessage( "Zone Air Heat Balance is out of balance for zone named " + Zone( ZoneNum ).Name );

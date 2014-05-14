@@ -1117,9 +1117,9 @@ namespace UFADManager {
 			// The system will mix
 			HeightFrac = 0.0;
 		} else {
-			Gamma = power( ( TotSysFlow * std::cos( ThrowAngle ) ), 1.5 ) / ( NumberOfPlumes * power( ( NumDiffusersPerPlume * DiffArea ), 1.25 ) * power( ( 0.0281 * 0.001 * PowerInPlumes ), 0.5 ) );
+			Gamma = std::pow( ( TotSysFlow * std::cos( ThrowAngle ) ), 1.5 ) / ( NumberOfPlumes * std::pow( ( NumDiffusersPerPlume * DiffArea ), 1.25 ) * std::pow( ( 0.0281 * 0.001 * PowerInPlumes ), 0.5 ) );
 			if ( ZoneUCSDUI( UINum ).CalcTransHeight ) {
-				HeightFrac = ( power( ( NumDiffusersPerPlume * DiffArea ), 0.5 ) * ( 7.43 * std::log( Gamma ) - 1.35 ) + 0.5 * SourceHeight ) / CeilingHeight;
+				HeightFrac = ( std::pow( ( NumDiffusersPerPlume * DiffArea ), 0.5 ) * ( 7.43 * std::log( Gamma ) - 1.35 ) + 0.5 * SourceHeight ) / CeilingHeight;
 			} else {
 				HeightFrac = ZoneUCSDUI( UINum ).TransHeight / CeilingHeight;
 			}
@@ -1135,15 +1135,15 @@ namespace UFADManager {
 					NumDiffusersPerPlume = 1.0;
 				}
 				if ( PowerInPlumes <= 0.0 ) break;
-				Gamma = power( ( TotSysFlow * std::cos( ThrowAngle ) ), 1.5 ) / ( NumberOfPlumes * power( ( NumDiffusersPerPlume * DiffArea ), 1.25 ) * power( ( 0.0281 * 0.001 * PowerInPlumes ), 0.5 ) );
+				Gamma = std::pow( ( TotSysFlow * std::cos( ThrowAngle ) ), 1.5 ) / ( NumberOfPlumes * std::pow( ( NumDiffusersPerPlume * DiffArea ), 1.25 ) * std::pow( ( 0.0281 * 0.001 * PowerInPlumes ), 0.5 ) );
 				if ( ZoneUCSDUI( UINum ).CalcTransHeight ) {
-					HeightFrac = ( power( ( NumDiffusersPerPlume * DiffArea ), 0.5 ) * ( 7.43 * std::log( Gamma ) - 1.35 ) + 0.5 * SourceHeight ) / CeilingHeight;
+					HeightFrac = ( std::pow( ( NumDiffusersPerPlume * DiffArea ), 0.5 ) * ( 7.43 * std::log( Gamma ) - 1.35 ) + 0.5 * SourceHeight ) / CeilingHeight;
 				} else {
 					HeightFrac = ZoneUCSDUI( UINum ).TransHeight / CeilingHeight;
 				}
 				HeightFrac = max( 0.0, min( 1.0, HeightFrac ) );
 				HeightTransition( ZoneNum ) = HeightFrac * CeilingHeight;
-				GainsFrac = ZoneUCSDUI( UINum ).A_Kc * power( Gamma, ZoneUCSDUI( UINum ).B_Kc ) + ZoneUCSDUI( UINum ).C_Kc + ZoneUCSDUI( UINum ).D_Kc * Gamma + ZoneUCSDUI( UINum ).E_Kc * power( Gamma, 2 );
+				GainsFrac = ZoneUCSDUI( UINum ).A_Kc * std::pow( Gamma, ZoneUCSDUI( UINum ).B_Kc ) + ZoneUCSDUI( UINum ).C_Kc + ZoneUCSDUI( UINum ).D_Kc * Gamma + ZoneUCSDUI( UINum ).E_Kc * second_power( Gamma );
 				GainsFrac = max( 0.6, min( GainsFrac, 1.0 ) );
 				AIRRATOC( ZoneNum ) = Zone( ZoneNum ).Volume * ( HeightTransition( ZoneNum ) - min( HeightTransition( ZoneNum ), 0.2 ) ) / CeilingHeight * ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATOC( ZoneNum ), ZoneAirHumRat( ZoneNum ), BlankString ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATOC( ZoneNum ) ) / ( TimeStepSys * SecInHour );
 				AIRRATMX( ZoneNum ) = Zone( ZoneNum ).Volume * ( CeilingHeight - HeightTransition( ZoneNum ) ) / CeilingHeight * ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATMX( ZoneNum ), ZoneAirHumRat( ZoneNum ), BlankString ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATMX( ZoneNum ) ) / ( TimeStepSys * SecInHour );
@@ -1544,24 +1544,24 @@ namespace UFADManager {
 			if ( PowerInPlumes > 0.0 ) {
 				if ( ZoneUCSDUE( UINum ).WinWidth > 0.0 ) { // exterior zone formula
 					PowerInPlumesPerMeter = PowerInPlumes / ZoneUCSDUE( UINum ).WinWidth;
-					Gamma = ( TotSysFlow * std::cos( ThrowAngle ) ) / ( NumDiffusers * DiffArea * power( ( 0.0281 * 0.001 * PowerInPlumesPerMeter ), 0.333333 ) );
+					Gamma = ( TotSysFlow * std::cos( ThrowAngle ) ) / ( NumDiffusers * DiffArea * std::pow( ( 0.0281 * 0.001 * PowerInPlumesPerMeter ), 0.333333 ) );
 				} else { // interior zone formula
-					Gamma = power( ( TotSysFlow * std::cos( ThrowAngle ) ), 1.5 ) / ( NumberOfPlumes * power( ( NumDiffusersPerPlume * DiffArea ), 1.25 ) * power( ( 0.0281 * 0.001 * PowerInPlumes ), 0.5 ) );
+					Gamma = std::pow( ( TotSysFlow * std::cos( ThrowAngle ) ), 1.5 ) / ( NumberOfPlumes * std::pow( ( NumDiffusersPerPlume * DiffArea ), 1.25 ) * std::pow( ( 0.0281 * 0.001 * PowerInPlumes ), 0.5 ) );
 				}
 			} else {
 				Gamma = 1000.;
 			}
 			if ( ZoneUCSDUE( UINum ).CalcTransHeight ) {
 				if ( ZoneUCSDUE( UINum ).WinWidth > 0.0 ) { // use exterior zone formula
-					HeightFrac = ( power( DiffArea, 0.5 ) * ( 11.03 * std::log( Gamma ) - 10.73 ) + 0.5 * SourceHeight ) / CeilingHeight;
+					HeightFrac = ( std::pow( DiffArea, 0.5 ) * ( 11.03 * std::log( Gamma ) - 10.73 ) + 0.5 * SourceHeight ) / CeilingHeight;
 				} else { // use interior zone formula
-					HeightFrac = ( power( ( NumDiffusersPerPlume * DiffArea ), 0.5 ) * ( 7.43 * std::log( Gamma ) - 1.35 ) + 0.5 * SourceHeight ) / CeilingHeight;
+					HeightFrac = ( std::pow( ( NumDiffusersPerPlume * DiffArea ), 0.5 ) * ( 7.43 * std::log( Gamma ) - 1.35 ) + 0.5 * SourceHeight ) / CeilingHeight;
 				}
 			} else {
 				HeightFrac = ZoneUCSDUE( UINum ).TransHeight / CeilingHeight;
 			}
 			HeightFrac = max( 0.0, min( 1.0, HeightFrac ) );
-			GainsFrac = ZoneUCSDUE( UINum ).A_Kc * power( Gamma, ZoneUCSDUE( UINum ).B_Kc ) + ZoneUCSDUE( UINum ).C_Kc + ZoneUCSDUE( UINum ).D_Kc * Gamma + ZoneUCSDUE( UINum ).E_Kc * power( Gamma, 2 );
+			GainsFrac = ZoneUCSDUE( UINum ).A_Kc * std::pow( Gamma, ZoneUCSDUE( UINum ).B_Kc ) + ZoneUCSDUE( UINum ).C_Kc + ZoneUCSDUE( UINum ).D_Kc * Gamma + ZoneUCSDUE( UINum ).E_Kc * second_power( Gamma );
 			GainsFrac = max( 0.7, min( GainsFrac, 1.0 ) );
 			if ( ZoneUCSDUE( UINum ).ShadeDown ) {
 				GainsFrac -= 0.2;
@@ -1577,22 +1577,22 @@ namespace UFADManager {
 				if ( PowerInPlumes <= 0.0 ) break;
 				if ( ZoneUCSDUE( UINum ).WinWidth > 0.0 ) { // use exterior zone formula
 					PowerInPlumesPerMeter = PowerInPlumes / ZoneUCSDUE( UINum ).WinWidth;
-					Gamma = ( TotSysFlow * std::cos( ThrowAngle ) ) / ( NumDiffusers * DiffArea * power( ( 0.0281 * 0.001 * PowerInPlumesPerMeter ), 0.333333 ) );
+					Gamma = ( TotSysFlow * std::cos( ThrowAngle ) ) / ( NumDiffusers * DiffArea * std::pow( ( 0.0281 * 0.001 * PowerInPlumesPerMeter ), 0.333333 ) );
 				} else { // use interior zone formula
-					Gamma = power( ( TotSysFlow * std::cos( ThrowAngle ) ), 1.5 ) / ( NumberOfPlumes * power( ( NumDiffusersPerPlume * DiffArea ), 1.25 ) * power( ( 0.0281 * 0.001 * PowerInPlumes ), 0.5 ) );
+					Gamma = std::pow( ( TotSysFlow * std::cos( ThrowAngle ) ), 1.5 ) / ( NumberOfPlumes * std::pow( ( NumDiffusersPerPlume * DiffArea ), 1.25 ) * std::pow( ( 0.0281 * 0.001 * PowerInPlumes ), 0.5 ) );
 				}
 				if ( ZoneUCSDUE( UINum ).CalcTransHeight ) {
 					if ( ZoneUCSDUE( UINum ).WinWidth > 0.0 ) { // exterior zone formula
-						HeightFrac = ( power( DiffArea, 0.5 ) * ( 11.03 * std::log( Gamma ) - 10.73 ) + 0.5 * SourceHeight ) / CeilingHeight;
+						HeightFrac = ( std::pow( DiffArea, 0.5 ) * ( 11.03 * std::log( Gamma ) - 10.73 ) + 0.5 * SourceHeight ) / CeilingHeight;
 					} else { // interior zone formula
-						HeightFrac = ( power( ( NumDiffusersPerPlume * DiffArea ), 0.5 ) * ( 7.43 * std::log( Gamma ) - 1.35 ) + 0.5 * SourceHeight ) / CeilingHeight;
+						HeightFrac = ( std::pow( ( NumDiffusersPerPlume * DiffArea ), 0.5 ) * ( 7.43 * std::log( Gamma ) - 1.35 ) + 0.5 * SourceHeight ) / CeilingHeight;
 					}
 				} else {
 					HeightFrac = ZoneUCSDUE( UINum ).TransHeight / CeilingHeight;
 				}
 				HeightFrac = min( 1.0, HeightFrac );
 				HeightTransition( ZoneNum ) = HeightFrac * CeilingHeight;
-				GainsFrac = ZoneUCSDUE( UINum ).A_Kc * power( Gamma, ZoneUCSDUE( UINum ).B_Kc ) + ZoneUCSDUE( UINum ).C_Kc + ZoneUCSDUE( UINum ).D_Kc * Gamma + ZoneUCSDUE( UINum ).E_Kc * power( Gamma, 2 );
+				GainsFrac = ZoneUCSDUE( UINum ).A_Kc * std::pow( Gamma, ZoneUCSDUE( UINum ).B_Kc ) + ZoneUCSDUE( UINum ).C_Kc + ZoneUCSDUE( UINum ).D_Kc * Gamma + ZoneUCSDUE( UINum ).E_Kc * second_power( Gamma );
 				GainsFrac = max( 0.7, min( GainsFrac, 1.0 ) );
 				if ( ZoneUCSDUE( UINum ).ShadeDown ) {
 					GainsFrac -= 0.2;

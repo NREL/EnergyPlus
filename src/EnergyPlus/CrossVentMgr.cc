@@ -558,11 +558,11 @@ namespace CrossVentMgr {
 				YY_Wall = sum( Surface( APos_Wall( Ctd ) ).Vertex( {1,NSides} ).y() ) / double( NSides );
 				ZZ_Wall = sum( Surface( APos_Wall( Ctd ) ).Vertex( {1,NSides} ).z() ) / double( NSides );
 			}
-			auto DroomTemp = std::sqrt( power( ( XX - XX_Wall ), 2 ) + power( ( YY - YY_Wall ), 2 ) + power( ( ZZ - ZZ_Wall ), 2 ) );
+			auto DroomTemp = std::sqrt( second_power( ( XX - XX_Wall ) ) + second_power( ( YY - YY_Wall ) ) + second_power( ( ZZ - ZZ_Wall ) ) );
 			if ( DroomTemp > Droom( ZoneNum ) ) {
 				Droom( ZoneNum ) = DroomTemp;
 			}
-			Dstar( ZoneNum ) = min( Droom( ZoneNum ) / CosPhi, std::sqrt( power( Wroom, 2 ) + power( Droom( ZoneNum ), 2 ) ) );
+			Dstar( ZoneNum ) = min( Droom( ZoneNum ) / CosPhi, std::sqrt( second_power( Wroom ) + second_power( Droom( ZoneNum ) ) ) );
 		}
 
 		// Room area

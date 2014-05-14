@@ -2757,10 +2757,10 @@ namespace WeatherManager {
 							// Missing, use sky cover
 							OSky = OpaqueSkyCover;
 							TDewK = min( DryBulb, DewPoint ) + TKelvin;
-							ESky = ( 0.787 + 0.764 * std::log( ( TDewK ) / TKelvin ) ) * ( 1.0 + .0224 * OSky - 0.0035 * ( power( OSky, 2 ) ) + 0.00028 * ( power( OSky, 3 ) ) );
-							SkyTemp = ( DryBulb + TKelvin ) * ( power( ESky, 0.25 ) ) - TKelvin;
+							ESky = ( 0.787 + 0.764 * std::log( ( TDewK ) / TKelvin ) ) * ( 1.0 + .0224 * OSky - 0.0035 * ( second_power( OSky ) ) + 0.00028 * ( third_power( OSky ) ) );
+							SkyTemp = ( DryBulb + TKelvin ) * ( std::pow( ESky, 0.25 ) ) - TKelvin;
 						} else { // Valid IR from Sky
-							SkyTemp = power( ( IRHoriz / Sigma ), .25 ) - TKelvin;
+							SkyTemp = std::pow( ( IRHoriz / Sigma ), .25 ) - TKelvin;
 						}
 					} else {
 						SkyTemp = 0.0; // dealt with later
@@ -3740,13 +3740,13 @@ Label903: ;
 
 				if ( Environment( EnvrnNum ).WP_Type1 == 0 ) {
 					TDewK = min( TomorrowOutDryBulbTemp( Hour, TS ), TomorrowOutDewPointTemp( Hour, TS ) ) + TKelvin;
-					ESky = ( 0.787 + 0.764 * std::log( ( TDewK ) / TKelvin ) ) * ( 1.0 + 0.0224 * OSky - 0.0035 * ( power( OSky, 2 ) ) + 0.00028 * ( power( OSky, 3 ) ) );
-					TomorrowHorizIRSky( Hour, TS ) = ESky * Sigma * power( ( TomorrowOutDryBulbTemp( Hour, TS ) + TKelvin ), 4 );
-					TomorrowSkyTemp( Hour, TS ) = ( TomorrowOutDryBulbTemp( Hour, TS ) + TKelvin ) * ( power( ESky, .25 ) ) - TKelvin;
+					ESky = ( 0.787 + 0.764 * std::log( ( TDewK ) / TKelvin ) ) * ( 1.0 + 0.0224 * OSky - 0.0035 * ( second_power( OSky ) ) + 0.00028 * ( third_power( OSky ) ) );
+					TomorrowHorizIRSky( Hour, TS ) = ESky * Sigma * fourth_power( ( TomorrowOutDryBulbTemp( Hour, TS ) + TKelvin ) );
+					TomorrowSkyTemp( Hour, TS ) = ( TomorrowOutDryBulbTemp( Hour, TS ) + TKelvin ) * ( std::pow( ESky, .25 ) ) - TKelvin;
 				} else {
 					TDewK = min( TomorrowOutDryBulbTemp( Hour, TS ), TomorrowOutDewPointTemp( Hour, TS ) ) + TKelvin;
-					ESky = ( 0.787 + 0.764 * std::log( ( TDewK ) / TKelvin ) ) * ( 1.0 + 0.0224 * OSky - 0.0035 * ( power( OSky, 2 ) ) + 0.00028 * ( power( OSky, 3 ) ) );
-					TomorrowHorizIRSky( Hour, TS ) = ESky * Sigma * power( ( TomorrowOutDryBulbTemp( Hour, TS ) + TKelvin ), 4 );
+					ESky = ( 0.787 + 0.764 * std::log( ( TDewK ) / TKelvin ) ) * ( 1.0 + 0.0224 * OSky - 0.0035 * ( second_power( OSky ) ) + 0.00028 * ( third_power( OSky ) ) );
+					TomorrowHorizIRSky( Hour, TS ) = ESky * Sigma * fourth_power( ( TomorrowOutDryBulbTemp( Hour, TS ) + TKelvin ) );
 				}
 
 				// Generate solar values for timestep
@@ -3793,15 +3793,15 @@ Label903: ;
 						} else if ( SELECT_CASE_var == Zhang_Huang ) {
 							Hour3Ago = mod( Hour + 20, 24 ) + 1; // hour 3 hours before
 							TotSkyCover = max( 1.0 - DesDayInput( EnvrnNum ).SkyClear, 0.0 );
-							GloHorzRad = ( ZHGlobalSolarConstant * SinSolarAltitude * ( ZhangHuangModCoeff_C0 + ZhangHuangModCoeff_C1 * TotSkyCover + ZhangHuangModCoeff_C2 * power( ( TotSkyCover ), 2 ) + ZhangHuangModCoeff_C3 * ( TomorrowOutDryBulbTemp( Hour, TS ) - TomorrowOutDryBulbTemp( Hour3Ago, TS ) ) + ZhangHuangModCoeff_C4 * TomorrowOutRelHum( Hour, TS ) + ZhangHuangModCoeff_C5 * TomorrowWindSpeed( Hour, TS ) ) + ZhangHuangModCoeff_D ) / ZhangHuangModCoeff_K;
+							GloHorzRad = ( ZHGlobalSolarConstant * SinSolarAltitude * ( ZhangHuangModCoeff_C0 + ZhangHuangModCoeff_C1 * TotSkyCover + ZhangHuangModCoeff_C2 * second_power( ( TotSkyCover ) ) + ZhangHuangModCoeff_C3 * ( TomorrowOutDryBulbTemp( Hour, TS ) - TomorrowOutDryBulbTemp( Hour3Ago, TS ) ) + ZhangHuangModCoeff_C4 * TomorrowOutRelHum( Hour, TS ) + ZhangHuangModCoeff_C5 * TomorrowWindSpeed( Hour, TS ) ) + ZhangHuangModCoeff_D ) / ZhangHuangModCoeff_K;
 							GloHorzRad = max( GloHorzRad, 0.0 );
 							ClearnessIndex_kt = GloHorzRad / ( GlobalSolarConstant * SinSolarAltitude );
 							//          ClearnessIndex_kt=DesDayInput(EnvrnNum)%SkyClear
 							ClearnessIndex_ktc = 0.4268 + 0.1934 * SinSolarAltitude;
 							if ( ClearnessIndex_kt < ClearnessIndex_ktc ) {
-								ClearnessIndex_kds = ( 3.996 - 3.862 * SinSolarAltitude + 1.54 * power( SinSolarAltitude, 2 ) ) * power( ClearnessIndex_kt, 3 );
+								ClearnessIndex_kds = ( 3.996 - 3.862 * SinSolarAltitude + 1.54 * second_power( SinSolarAltitude ) ) * third_power( ClearnessIndex_kt );
 							} else {
-								ClearnessIndex_kds = ClearnessIndex_kt - ( 1.107 + 0.03569 * SinSolarAltitude + 1.681 * power( SinSolarAltitude, 2 ) ) * power( ( 1.0 - ClearnessIndex_kt ), 3 );
+								ClearnessIndex_kds = ClearnessIndex_kt - ( 1.107 + 0.03569 * SinSolarAltitude + 1.681 * second_power( SinSolarAltitude ) ) * third_power( ( 1.0 - ClearnessIndex_kt ) );
 							}
 							// Calculate direct normal radiation, W/m2
 							BeamRad = ZHGlobalSolarConstant * SinSolarAltitude * ClearnessIndex_kds * ( ( 1.0 - ClearnessIndex_kt ) / ( 1.0 - ClearnessIndex_kds ) );
@@ -3925,7 +3925,7 @@ Label903: ;
 		} else {
 			// note: COS( Zen) = SIN( Alt)
 			SunAltD = std::asin( CosZen ) / DegToRadians; // altitude, degrees
-			AirMass = 1.0 / ( CosZen + 0.50572 * power( ( 6.07995 + SunAltD ), ( -1.6364 ) ) );
+			AirMass = 1.0 / ( CosZen + 0.50572 * std::pow( ( 6.07995 + SunAltD ), ( -1.6364 ) ) );
 		}
 		return AirMass;
 	}
@@ -3988,8 +3988,8 @@ Label903: ;
 			AB = 1.219 - 0.043 * TauB - 0.151 * TauD - 0.204 * TauB * TauD;
 			AD = 0.202 + 0.852 * TauB - 0.007 * TauD - 0.357 * TauB * TauD;
 			M = AirMass( CosZen );
-			IDirN = ETR * std::exp( -TauB * power( M, AB ) );
-			IDifH = ETR * std::exp( -TauD * power( M, AD ) );
+			IDirN = ETR * std::exp( -TauB * std::pow( M, AB ) );
+			IDifH = ETR * std::exp( -TauD * std::pow( M, AD ) );
 			IGlbH = IDirN * CosZen + IDifH;
 		}
 
@@ -4170,14 +4170,14 @@ Label903: ;
 		SinX = std::sin( X );
 		CosX = std::cos( X );
 
-		SineSolarDeclination = SineSolDeclCoef( 1 ) + SineSolDeclCoef( 2 ) * SinX + SineSolDeclCoef( 3 ) * CosX + SineSolDeclCoef( 4 ) * ( SinX * CosX * 2.0 ) + SineSolDeclCoef( 5 ) * ( power( CosX, 2 ) - power( SinX, 2 ) ) + SineSolDeclCoef( 6 ) * ( SinX * ( power( CosX, 2 ) - power( SinX, 2 ) ) + CosX * ( SinX * CosX * 2.0 ) ) + SineSolDeclCoef( 7 ) * ( CosX * ( power( CosX, 2 ) - power( SinX, 2 ) ) - SinX * ( SinX * CosX * 2.0 ) ) + SineSolDeclCoef( 8 ) * ( 2.0 * ( SinX * CosX * 2.0 ) * ( power( CosX, 2 ) - power( SinX, 2 ) ) ) + SineSolDeclCoef( 9 ) * ( power( ( power( CosX, 2 ) - power( SinX, 2 ) ), 2 ) - power( ( SinX * CosX * 2.0 ), 2 ) );
-		CosineSolarDeclination = std::sqrt( 1.0 - power( SineSolarDeclination, 2 ) );
+		SineSolarDeclination = SineSolDeclCoef( 1 ) + SineSolDeclCoef( 2 ) * SinX + SineSolDeclCoef( 3 ) * CosX + SineSolDeclCoef( 4 ) * ( SinX * CosX * 2.0 ) + SineSolDeclCoef( 5 ) * ( second_power( CosX ) - second_power( SinX ) ) + SineSolDeclCoef( 6 ) * ( SinX * ( second_power( CosX ) - second_power( SinX ) ) + CosX * ( SinX * CosX * 2.0 ) ) + SineSolDeclCoef( 7 ) * ( CosX * ( second_power( CosX ) - second_power( SinX ) ) - SinX * ( SinX * CosX * 2.0 ) ) + SineSolDeclCoef( 8 ) * ( 2.0 * ( SinX * CosX * 2.0 ) * ( second_power( CosX ) - second_power( SinX ) ) ) + SineSolDeclCoef( 9 ) * ( second_power( ( second_power( CosX ) - second_power( SinX ) ) ) - second_power( ( SinX * CosX * 2.0 ) ) );
+		CosineSolarDeclination = std::sqrt( 1.0 - second_power( SineSolarDeclination ) );
 
-		EquationOfTime = EqOfTimeCoef( 1 ) + EqOfTimeCoef( 2 ) * SinX + EqOfTimeCoef( 3 ) * CosX + EqOfTimeCoef( 4 ) * ( SinX * CosX * 2.0 ) + EqOfTimeCoef( 5 ) * ( power( CosX, 2 ) - power( SinX, 2 ) ) + EqOfTimeCoef( 6 ) * ( SinX * ( power( CosX, 2 ) - power( SinX, 2 ) ) + CosX * ( SinX * CosX * 2.0 ) ) + EqOfTimeCoef( 7 ) * ( CosX * ( power( CosX, 2 ) - power( SinX, 2 ) ) - SinX * ( SinX * CosX * 2.0 ) ) + EqOfTimeCoef( 8 ) * ( 2.0 * ( SinX * CosX * 2.0 ) * ( power( CosX, 2 ) - power( SinX, 2 ) ) ) + EqOfTimeCoef( 9 ) * ( power( ( power( CosX, 2 ) - power( SinX, 2 ) ), 2 ) - power( ( SinX * CosX * 2.0 ), 2 ) );
+		EquationOfTime = EqOfTimeCoef( 1 ) + EqOfTimeCoef( 2 ) * SinX + EqOfTimeCoef( 3 ) * CosX + EqOfTimeCoef( 4 ) * ( SinX * CosX * 2.0 ) + EqOfTimeCoef( 5 ) * ( second_power( CosX ) - second_power( SinX ) ) + EqOfTimeCoef( 6 ) * ( SinX * ( second_power( CosX ) - second_power( SinX ) ) + CosX * ( SinX * CosX * 2.0 ) ) + EqOfTimeCoef( 7 ) * ( CosX * ( second_power( CosX ) - second_power( SinX ) ) - SinX * ( SinX * CosX * 2.0 ) ) + EqOfTimeCoef( 8 ) * ( 2.0 * ( SinX * CosX * 2.0 ) * ( second_power( CosX ) - second_power( SinX ) ) ) + EqOfTimeCoef( 9 ) * ( second_power( ( second_power( CosX ) - second_power( SinX ) ) ) - second_power( ( SinX * CosX * 2.0 ) ) );
 
 		AnnVarSolConstant = 1.000047 + .000352615 * SinX + .0334454 * CosX;
 
-		A = ASHRAE_A_Coef( 1 ) + ASHRAE_A_Coef( 2 ) * SinX + ASHRAE_A_Coef( 3 ) * CosX + ASHRAE_A_Coef( 4 ) * ( SinX * CosX * 2.0 ) + ASHRAE_A_Coef( 5 ) * ( power( CosX, 2 ) - power( SinX, 2 ) ) + ASHRAE_A_Coef( 6 ) * ( SinX * ( power( CosX, 2 ) - power( SinX, 2 ) ) + CosX * ( SinX * CosX * 2.0 ) ) + ASHRAE_A_Coef( 7 ) * ( CosX * ( power( CosX, 2 ) - power( SinX, 2 ) ) - SinX * ( SinX * CosX * 2.0 ) ) + ASHRAE_A_Coef( 8 ) * ( 2.0 * ( SinX * CosX * 2.0 ) * ( power( CosX, 2 ) - power( SinX, 2 ) ) ) + ASHRAE_A_Coef( 9 ) * ( power( ( power( CosX, 2 ) - power( SinX, 2 ) ), 2 ) - power( ( SinX * CosX * 2.0 ), 2 ) );
+		A = ASHRAE_A_Coef( 1 ) + ASHRAE_A_Coef( 2 ) * SinX + ASHRAE_A_Coef( 3 ) * CosX + ASHRAE_A_Coef( 4 ) * ( SinX * CosX * 2.0 ) + ASHRAE_A_Coef( 5 ) * ( second_power( CosX ) - second_power( SinX ) ) + ASHRAE_A_Coef( 6 ) * ( SinX * ( second_power( CosX ) - second_power( SinX ) ) + CosX * ( SinX * CosX * 2.0 ) ) + ASHRAE_A_Coef( 7 ) * ( CosX * ( second_power( CosX ) - second_power( SinX ) ) - SinX * ( SinX * CosX * 2.0 ) ) + ASHRAE_A_Coef( 8 ) * ( 2.0 * ( SinX * CosX * 2.0 ) * ( second_power( CosX ) - second_power( SinX ) ) ) + ASHRAE_A_Coef( 9 ) * ( second_power( ( second_power( CosX ) - second_power( SinX ) ) ) - second_power( ( SinX * CosX * 2.0 ) ) );
 
 		//                        Compute B and C coefficients
 
@@ -4188,9 +4188,9 @@ Label903: ;
 			CosX = std::cos( X );
 		}
 
-		B = ASHRAE_B_Coef( 1 ) + ASHRAE_B_Coef( 2 ) * SinX + ASHRAE_B_Coef( 3 ) * CosX + ASHRAE_B_Coef( 4 ) * ( SinX * CosX * 2.0 ) + ASHRAE_B_Coef( 5 ) * ( power( CosX, 2 ) - power( SinX, 2 ) ) + ASHRAE_B_Coef( 6 ) * ( SinX * ( power( CosX, 2 ) - power( SinX, 2 ) ) + CosX * ( SinX * CosX * 2.0 ) ) + ASHRAE_B_Coef( 7 ) * ( CosX * ( power( CosX, 2 ) - power( SinX, 2 ) ) - SinX * ( SinX * CosX * 2.0 ) ) + ASHRAE_B_Coef( 8 ) * ( 2.0 * ( SinX * CosX * 2.0 ) * ( power( CosX, 2 ) - power( SinX, 2 ) ) ) + ASHRAE_B_Coef( 9 ) * ( power( ( power( CosX, 2 ) - power( SinX, 2 ) ), 2 ) - power( ( SinX * CosX * 2.0 ), 2 ) );
+		B = ASHRAE_B_Coef( 1 ) + ASHRAE_B_Coef( 2 ) * SinX + ASHRAE_B_Coef( 3 ) * CosX + ASHRAE_B_Coef( 4 ) * ( SinX * CosX * 2.0 ) + ASHRAE_B_Coef( 5 ) * ( second_power( CosX ) - second_power( SinX ) ) + ASHRAE_B_Coef( 6 ) * ( SinX * ( second_power( CosX ) - second_power( SinX ) ) + CosX * ( SinX * CosX * 2.0 ) ) + ASHRAE_B_Coef( 7 ) * ( CosX * ( second_power( CosX ) - second_power( SinX ) ) - SinX * ( SinX * CosX * 2.0 ) ) + ASHRAE_B_Coef( 8 ) * ( 2.0 * ( SinX * CosX * 2.0 ) * ( second_power( CosX ) - second_power( SinX ) ) ) + ASHRAE_B_Coef( 9 ) * ( second_power( ( second_power( CosX ) - second_power( SinX ) ) ) - second_power( ( SinX * CosX * 2.0 ) ) );
 
-		C = ASHRAE_C_Coef( 1 ) + ASHRAE_C_Coef( 2 ) * SinX + ASHRAE_C_Coef( 3 ) * CosX + ASHRAE_C_Coef( 4 ) * ( SinX * CosX * 2.0 ) + ASHRAE_C_Coef( 5 ) * ( power( CosX, 2 ) - power( SinX, 2 ) ) + ASHRAE_C_Coef( 6 ) * ( SinX * ( power( CosX, 2 ) - power( SinX, 2 ) ) + CosX * ( SinX * CosX * 2.0 ) ) + ASHRAE_C_Coef( 7 ) * ( CosX * ( power( CosX, 2 ) - power( SinX, 2 ) ) - SinX * ( SinX * CosX * 2.0 ) ) + ASHRAE_C_Coef( 8 ) * ( 2.0 * ( SinX * CosX * 2.0 ) * ( power( CosX, 2 ) - power( SinX, 2 ) ) ) + ASHRAE_C_Coef( 9 ) * ( power( ( power( CosX, 2 ) - power( SinX, 2 ) ), 2 ) - power( ( SinX * CosX * 2.0 ), 2 ) );
+		C = ASHRAE_C_Coef( 1 ) + ASHRAE_C_Coef( 2 ) * SinX + ASHRAE_C_Coef( 3 ) * CosX + ASHRAE_C_Coef( 4 ) * ( SinX * CosX * 2.0 ) + ASHRAE_C_Coef( 5 ) * ( second_power( CosX ) - second_power( SinX ) ) + ASHRAE_C_Coef( 6 ) * ( SinX * ( second_power( CosX ) - second_power( SinX ) ) + CosX * ( SinX * CosX * 2.0 ) ) + ASHRAE_C_Coef( 7 ) * ( CosX * ( second_power( CosX ) - second_power( SinX ) ) - SinX * ( SinX * CosX * 2.0 ) ) + ASHRAE_C_Coef( 8 ) * ( 2.0 * ( SinX * CosX * 2.0 ) * ( second_power( CosX ) - second_power( SinX ) ) ) + ASHRAE_C_Coef( 9 ) * ( second_power( ( second_power( CosX ) - second_power( SinX ) ) ) - second_power( ( SinX * CosX * 2.0 ) ) );
 
 	}
 
@@ -4607,7 +4607,7 @@ Label9999: ;
 		}
 
 		if ( ! ErrorsFound ) {
-			StdBaroPress = 101.325 * power( ( 1.0 - 2.25577e-05 * Elevation ), 5.2559 );
+			StdBaroPress = 101.325 * std::pow( ( 1.0 - 2.25577e-05 * Elevation ), 5.2559 );
 			StdBaroPress *= 1000.;
 			StdRhoAir = PsyRhoAirFnPbTdbW( StdBaroPress, constant_twenty, constant_zero, BlankString );
 			// Write Final Location Information to the initialization output file
@@ -7649,7 +7649,7 @@ Label9999: ;
 			ErrorsFound = true;
 		}
 
-		WeatherFileWindModCoeff = power( ( WeatherFileWindBLHeight / WeatherFileWindSensorHeight ), WeatherFileWindExp );
+		WeatherFileWindModCoeff = std::pow( ( WeatherFileWindBLHeight / WeatherFileWindSensorHeight ), WeatherFileWindExp );
 		WeatherFileTempModCoeff = AtmosphericTempGradient * EarthRadius * WeatherFileTempSensorHeight / ( EarthRadius + WeatherFileTempSensorHeight );
 
 		// Write to the initialization output file
@@ -7710,7 +7710,7 @@ Label9999: ;
 			SDIRH = BeamSolarRad * SOLCOS( 3 );
 			SDIFH = DifSolarRad;
 			//              Fraction of sky covered by clouds
-			CloudFraction = power( ( SDIFH / ( SDIRH + SDIFH + 0.0001 ) ), 2 );
+			CloudFraction = second_power( ( SDIFH / ( SDIRH + SDIFH + 0.0001 ) ) );
 			//              Luminous efficacy of sky diffuse solar and beam solar (lumens/W);
 			//              Horizontal illuminance from sky and horizontal beam illuminance (lux)
 			//              obtained from solar quantities on weather file and luminous efficacy.
@@ -7801,9 +7801,9 @@ Label9999: ;
 		//              SkyClearness > 6 is a clear sky.
 		//              DifSolarRad is the diffuse horizontal irradiance.
 		//              BeamSolarRad is the direct normal irradiance.
-		Zeta = 1.041 * power( SunZenith, 3 );
+		Zeta = 1.041 * third_power( SunZenith );
 		SkyClearness = ( ( DifSolarRad + BeamSolarRad ) / ( DifSolarRad + 0.0001 ) + Zeta ) / ( 1.0 + Zeta );
-		AirMass = ( 1.0 - 0.1 * Elevation / 1000.0 ) / ( SinSunAltitude + 0.15 / power( ( SunAltitude / DegToRadians + 3.885 ), 1.253 ) );
+		AirMass = ( 1.0 - 0.1 * Elevation / 1000.0 ) / ( SinSunAltitude + 0.15 / std::pow( ( SunAltitude / DegToRadians + 3.885 ), 1.253 ) );
 		//              In the following, 93.73 is the extraterrestrial luminous efficacy
 		SkyBrightness = ( DifSolarRad * 93.73 ) * AirMass / ExtraDirNormIll( Month );
 		if ( SkyClearness <= 1.065 ) {

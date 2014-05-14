@@ -1637,7 +1637,7 @@ namespace FluidCoolers {
 
 		// Calculate number of transfer units (NTU)
 		NumTransferUnits = UAdesign / CapacityRatioMin;
-		ETA = power( NumTransferUnits, 0.22 );
+		ETA = std::pow( NumTransferUnits, 0.22 );
 		A = CapacityRatio * NumTransferUnits / ETA;
 		effectiveness = 1.0 - std::exp( ( std::exp( -A ) - 1.0 ) / ( CapacityRatio / ETA ) );
 

@@ -4213,7 +4213,7 @@ namespace LowTempRadiantSystem {
 		// Calculate the Nusselt number based on what flow regime one is in
 		if ( ReD >= MaxLaminarRe ) { // Turbulent flow --> use Colburn equation
 
-			NuD = 0.023 * ( power( ReD, ( 0.8 ) ) ) * ( power( PRactual, ( 1.0 / 3.0 ) ) );
+			NuD = 0.023 * ( std::pow( ReD, ( 0.8 ) ) ) * ( std::pow( PRactual, ( 1.0 / 3.0 ) ) );
 
 		} else { // Laminar flow --> use constant surface temperature relation
 

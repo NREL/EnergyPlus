@@ -1654,7 +1654,7 @@ namespace HeatBalanceHAMTManager {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		WVDC = ( 2.e-7 * power( ( Temperature + KelvinConv ), 0.81 ) ) / ambp;
+		WVDC = ( 2.e-7 * std::pow( ( Temperature + KelvinConv ), 0.81 ) ) / ambp;
 
 		return WVDC;
 	}

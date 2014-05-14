@@ -531,7 +531,7 @@ namespace PondGroundHeatExchanger {
 			}
 			rho = GetDensityGlycol( PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidName, constant_zero, PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidIndex, RoutineName );
 			Cp = GetSpecificHeatGlycol( PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidName, constant_zero, PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidIndex, RoutineName );
-			PondGHE( PondGHENum ).DesignMassFlowRate = Pi / 4.0 * power( PondGHE( PondGHENum ).TubeInDiameter, 2 ) * DesignVelocity * rho * PondGHE( PondGHENum ).NumCircuits;
+			PondGHE( PondGHENum ).DesignMassFlowRate = Pi / 4.0 * second_power( PondGHE( PondGHENum ).TubeInDiameter ) * DesignVelocity * rho * PondGHE( PondGHENum ).NumCircuits;
 			PondGHE( PondGHENum ).DesignCapacity = PondGHE( PondGHENum ).DesignMassFlowRate * Cp * 10.; //assume 10C delta T?
 			InitComponentNodes( 0.0, PondGHE( PondGHENum ).DesignMassFlowRate, PondGHE( PondGHENum ).InletNodeNum, PondGHE( PondGHENum ).OutletNodeNum, PondGHE( PondGHENum ).LoopNum, PondGHE( PondGHENum ).LoopSideNum, PondGHE( PondGHENum ).BranchNum, PondGHE( PondGHENum ).CompNum );
 			RegisterPlantCompDesignFlow( PondGHE( PondGHENum ).InletNodeNum, PondGHE( PondGHENum ).DesignMassFlowRate / rho );
@@ -782,7 +782,7 @@ namespace PondGroundHeatExchanger {
 		FluxConvect = ConvCoef * ( PondBulkTemp - ExternalTemp );
 
 		// long-wave radiation between pond and sky.
-		FluxLongwave = StefBoltzmann * ThermalAbs * ( ( power( SurfTempAbs, 4 ) ) - ( power( SkyTempAbs, 4 ) ) );
+		FluxLongwave = StefBoltzmann * ThermalAbs * ( ( fourth_power( SurfTempAbs ) ) - ( fourth_power( SkyTempAbs ) ) );
 
 		// total absorbed solar using function - no ground solar
 		FluxSolAbsorbed = CalcSolarFlux();
@@ -801,7 +801,7 @@ namespace PondGroundHeatExchanger {
 		SpecHeatAir = PsyCpAirFnWTdb( HumRatioAir, OutDryBulb );
 		LatentHeatAir = PsyHfgAirFnWTdb( HumRatioAir, OutDryBulb );
 
-		FluxEvap = power( ( PrantlAir / SchmidtAir ), 2 ) / 3.0 * ConvCoef / SpecHeatAir * ( HumRatioFilm - HumRatioAir ) * LatentHeatAir;
+		FluxEvap = second_power( ( PrantlAir / SchmidtAir ) ) / 3.0 * ConvCoef / SpecHeatAir * ( HumRatioFilm - HumRatioAir ) * LatentHeatAir;
 
 		// ground heat transfer flux
 		Perimeter = 4.0 * std::sqrt( PondArea ); // square assumption
@@ -897,8 +897,8 @@ namespace PondGroundHeatExchanger {
 		Absorbtance = std::exp( -PondExtCoef * PondDepth / std::cos( RefractAngle ) );
 
 		// parallel and perpendicular components
-		ParallelRad = power( std::tan( RefractAngle - IncidAngle ), 2 ) / power( std::tan( RefractAngle + IncidAngle ), 2 );
-		PerpendRad = power( std::sin( RefractAngle - IncidAngle ), 2 ) / power( std::sin( RefractAngle + IncidAngle ), 2 );
+		ParallelRad = second_power( std::tan( RefractAngle - IncidAngle ) ) / second_power( std::tan( RefractAngle + IncidAngle ) );
+		PerpendRad = second_power( std::sin( RefractAngle - IncidAngle ) ) / second_power( std::sin( RefractAngle + IncidAngle ) );
 
 		// transmittance: Tau
 		Transmitance = 0.5 * Absorbtance * ( ( 1.0 - ParallelRad ) / ( 1.0 + ParallelRad ) + ( 1.0 - PerpendRad ) / ( 1.0 + PerpendRad ) );
@@ -1012,7 +1012,7 @@ namespace PondGroundHeatExchanger {
 
 		// Calculate the Nusselt number based on what flow regime one is in. h = (k)(Nu)/D
 		if ( ReynoldsNum >= MaxLaminarRe ) { // Turbulent flow --> use Dittus-Boelter equation
-			NuseltNum = 0.023 * ( power( ReynoldsNum, ( 0.8 ) ) ) * ( power( PrantlNum, ( 0.3 ) ) );
+			NuseltNum = 0.023 * ( std::pow( ReynoldsNum, ( 0.8 ) ) ) * ( std::pow( PrantlNum, ( 0.3 ) ) );
 		} else { // Laminar flow --> use constant surface temperature relation
 			NuseltNum = 3.66;
 		}
@@ -1036,10 +1036,10 @@ namespace PondGroundHeatExchanger {
 		ThermDiff = Conductivity / ( Density * WaterSpecHeat );
 		PrantlNum = Viscosity * WaterSpecHeat / Conductivity;
 
-		RayleighNum = Density * GravConst * ExpansionCoef * std::abs( InsideTemperature - PondTemperature ) * power( TubeOutDiameter, 3 ) / ( Viscosity * ThermDiff );
+		RayleighNum = Density * GravConst * ExpansionCoef * std::abs( InsideTemperature - PondTemperature ) * third_power( TubeOutDiameter ) / ( Viscosity * ThermDiff );
 
 		// Calculate the Nusselt number for natural convection at outside of pipe
-		NuseltNum = power( ( 0.6 + ( 0.387 * power( RayleighNum, ( 1.0 / 6.0 ) ) / ( power( ( 1.0 + 0.559 / power( PrantlNum, ( 9.0 / 16.0 ) ) ), ( 8.0 / 27.0 ) ) ) ) ), 2 );
+		NuseltNum = second_power( ( 0.6 + ( 0.387 * std::pow( RayleighNum, ( 1.0 / 6.0 ) ) / ( std::pow( ( 1.0 + 0.559 / std::pow( PrantlNum, ( 9.0 / 16.0 ) ) ), ( 8.0 / 27.0 ) ) ) ) ) );
 
 		// outside convection resistance, from Nu
 		ConvCoefOut = Conductivity * NuseltNum / TubeOutDiameter;

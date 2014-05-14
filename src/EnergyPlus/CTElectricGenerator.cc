@@ -651,7 +651,7 @@ namespace CTElectricGenerator {
 
 			ExhaustTemp = CurveValue( CTGenerator( GeneratorNum ).PLBasedExhaustTempCurve, PLR ) * CurveValue( CTGenerator( GeneratorNum ).TempBasedExhaustTempCurve, AmbientDeltaT );
 
-			UA = CTGenerator( GeneratorNum ).UACoef( 1 ) * power( RatedPowerOutput, CTGenerator( GeneratorNum ).UACoef( 2 ) );
+			UA = CTGenerator( GeneratorNum ).UACoef( 1 ) * std::pow( RatedPowerOutput, CTGenerator( GeneratorNum ).UACoef( 2 ) );
 
 			DesignMinExitGasTemp = CTGenerator( GeneratorNum ).DesignMinExitGasTemp;
 			ExhaustStackTemp = DesignMinExitGasTemp + ( ExhaustTemp - DesignMinExitGasTemp ) / std::exp( UA / ( max( ExhaustFlow, MaxExhaustperCTPower * RatedPowerOutput ) * ExhaustCP ) );

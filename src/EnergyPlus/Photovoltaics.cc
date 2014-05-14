@@ -1300,7 +1300,7 @@ namespace Photovoltaics {
 				//  temperature depencence
 				IL = PVarray( PVnum ).TRNSYSPVcalc.Insolation / PVarray( PVnum ).TRNSYSPVModule.RefInsolation * ( ILRef + PVarray( PVnum ).TRNSYSPVModule.TempCoefIsc * ( CellTemp - PVarray( PVnum ).TRNSYSPVModule.RefTemperature ) );
 				AA = AARef * CellTemp / PVarray( PVnum ).TRNSYSPVModule.RefTemperature;
-				IO = IORef * power( ( CellTemp / PVarray( PVnum ).TRNSYSPVModule.RefTemperature ), 3 ) * std::exp( PVarray( PVnum ).TRNSYSPVModule.SemiConductorBandgap * PVarray( PVnum ).TRNSYSPVModule.CellsInSeries / AARef * ( 1.0 - PVarray( PVnum ).TRNSYSPVModule.RefTemperature / CellTemp ) );
+				IO = IORef * third_power( ( CellTemp / PVarray( PVnum ).TRNSYSPVModule.RefTemperature ) ) * std::exp( PVarray( PVnum ).TRNSYSPVModule.SemiConductorBandgap * PVarray( PVnum ).TRNSYSPVModule.CellsInSeries / AARef * ( 1.0 - PVarray( PVnum ).TRNSYSPVModule.RefTemperature / CellTemp ) );
 
 				//  compute short curcuit current and open circuit voltage
 
@@ -2093,7 +2093,7 @@ namespace Photovoltaics {
 		Real64 AM; // air mass working variable
 
 		if ( SolZen < 89.9 ) {
-			AM = power( ( std::cos( SolZen * DegToRadians ) + 0.5057 * power( ( 96.08 - SolZen ), ( -1.634 ) ) ), ( -1.0 ) );
+			AM = std::pow( ( std::cos( SolZen * DegToRadians ) + 0.5057 * std::pow( ( 96.08 - SolZen ), ( -1.634 ) ) ), ( -1.0 ) );
 
 			AbsoluteAirMass = std::exp( -0.0001184 * Altitude ) * AM;
 		} else {
@@ -2157,7 +2157,7 @@ namespace Photovoltaics {
 
 		Real64 F1; // working variable for function result
 
-		F1 = a0 + a1 * AMa + a2 * power( AMa, 2 ) + a3 * power( AMa, 3 ) + a4 * power( AMa, 4 );
+		F1 = a0 + a1 * AMa + a2 * second_power( AMa ) + a3 * third_power( AMa ) + a4 * fourth_power( AMa );
 
 		if ( F1 > 0.0 ) {
 			SandiaF1 = F1;
@@ -2220,7 +2220,7 @@ namespace Photovoltaics {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 F2; // working variable for function result
 
-		F2 = b0 + b1 * IncAng + b2 * power( IncAng, 2 ) + b3 * power( IncAng, 3 ) + b4 * power( IncAng, 4 ) + b5 * power( IncAng, 5 );
+		F2 = b0 + b1 * IncAng + b2 * second_power( IncAng ) + b3 * third_power( IncAng ) + b4 * fourth_power( IncAng ) + b5 * fifth_power( IncAng );
 
 		if ( F2 > 0.0 ) {
 			SandiaF2 = F2;
@@ -2281,7 +2281,7 @@ namespace Photovoltaics {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		SandiaImp = Imp0 * ( C0 * Ee + C1 * power( Ee, 2 ) ) * ( 1.0 + aImp * ( Tc - 25 ) );
+		SandiaImp = Imp0 * ( C0 * Ee + C1 * second_power( Ee ) ) * ( 1.0 + aImp * ( Tc - 25 ) );
 		// why hardwire T0 at 25.0?  can this change? seems okay, fewer args
 		return SandiaImp;
 	}
@@ -2396,7 +2396,7 @@ namespace Photovoltaics {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		SandiaIx = Ix0 * ( C4 * Ee + C5 * power( Ee, 2 ) ) * ( 1.0 + ( ( aIsc + aImp ) / 2.0 * ( Tc - 25.0 ) ) );
+		SandiaIx = Ix0 * ( C4 * Ee + C5 * second_power( Ee ) ) * ( 1.0 + ( ( aIsc + aImp ) / 2.0 * ( Tc - 25.0 ) ) );
 
 		return SandiaIx;
 	}
@@ -2449,7 +2449,7 @@ namespace Photovoltaics {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		SandiaIxx = Ixx0 * ( C6 * Ee + C7 * power( Ee, 2 ) ) * ( 1.0 + aImp * ( Tc - 25.0 ) );
+		SandiaIxx = Ixx0 * ( C6 * Ee + C7 * second_power( Ee ) ) * ( 1.0 + aImp * ( Tc - 25.0 ) );
 
 		return SandiaIxx;
 	}
@@ -2513,7 +2513,7 @@ namespace Photovoltaics {
 
 			BVmpEe = BVmp0 + mBVmp * ( 1.0 - Ee );
 
-			SandiaVmp = Vmp0 + C2 * NcellSer * dTc * std::log( Ee ) + C3 * NcellSer * power( ( dTc * std::log( Ee ) ), 2 ) + BVmpEe * ( Tc - 25.0 );
+			SandiaVmp = Vmp0 + C2 * NcellSer * dTc * std::log( Ee ) + C3 * NcellSer * second_power( ( dTc * std::log( Ee ) ) ) + BVmpEe * ( Tc - 25.0 );
 		} else {
 			SandiaVmp = 0.0;
 		}

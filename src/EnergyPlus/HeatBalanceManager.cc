@@ -1681,16 +1681,16 @@ namespace HeatBalanceManager {
 			// index of refraction and extinction coefficient. With the alternative input the front and back
 			// properties are assumed to be the same.
 
-			ReflectivitySol = power( ( ( MaterialProps( 2 ) - 1.0 ) / ( MaterialProps( 2 ) + 1.0 ) ), 2 );
-			ReflectivityVis = power( ( ( MaterialProps( 4 ) - 1.0 ) / ( MaterialProps( 4 ) + 1.0 ) ), 2 );
+			ReflectivitySol = second_power( ( ( MaterialProps( 2 ) - 1.0 ) / ( MaterialProps( 2 ) + 1.0 ) ) );
+			ReflectivityVis = second_power( ( ( MaterialProps( 4 ) - 1.0 ) / ( MaterialProps( 4 ) + 1.0 ) ) );
 			TransmittivitySol = std::exp( -MaterialProps( 3 ) * MaterialProps( 1 ) );
 			TransmittivityVis = std::exp( -MaterialProps( 5 ) * MaterialProps( 1 ) );
-			Material( MaterNum ).Trans = TransmittivitySol * ( power( ( 1.0 - ReflectivitySol ), 2 ) ) / ( 1.0 - power( ( ReflectivitySol * TransmittivitySol ), 2 ) );
-			Material( MaterNum ).ReflectSolBeamFront = ReflectivitySol * ( 1.0 + ( power( ( 1.0 - ReflectivitySol ), 2 ) ) * ( power( TransmittivitySol, 2 ) ) / ( 1.0 - power( ( ReflectivitySol * TransmittivitySol ), 2 ) ) );
+			Material( MaterNum ).Trans = TransmittivitySol * ( second_power( ( 1.0 - ReflectivitySol ) ) ) / ( 1.0 - second_power( ( ReflectivitySol * TransmittivitySol ) ) );
+			Material( MaterNum ).ReflectSolBeamFront = ReflectivitySol * ( 1.0 + ( second_power( ( 1.0 - ReflectivitySol ) ) ) * ( second_power( TransmittivitySol ) ) / ( 1.0 - second_power( ( ReflectivitySol * TransmittivitySol ) ) ) );
 			Material( MaterNum ).ReflectSolBeamBack = Material( MaterNum ).ReflectSolBeamFront;
-			Material( MaterNum ).TransVis = TransmittivityVis * ( power( ( 1.0 - ReflectivityVis ), 2 ) ) / ( 1.0 - power( ( ReflectivityVis * TransmittivityVis ), 2 ) );
+			Material( MaterNum ).TransVis = TransmittivityVis * ( second_power( ( 1.0 - ReflectivityVis ) ) ) / ( 1.0 - second_power( ( ReflectivityVis * TransmittivityVis ) ) );
 
-			Material( MaterNum ).ReflectVisBeamFront = ReflectivityVis * ( 1.0 + ( power( ( 1.0 - ReflectivityVis ), 2 ) ) * ( power( TransmittivityVis, 2 ) ) / ( 1.0 - power( ( ReflectivityVis * TransmittivityVis ), 2 ) ) );
+			Material( MaterNum ).ReflectVisBeamFront = ReflectivityVis * ( 1.0 + ( second_power( ( 1.0 - ReflectivityVis ) ) ) * ( second_power( TransmittivityVis ) ) / ( 1.0 - second_power( ( ReflectivityVis * TransmittivityVis ) ) ) );
 			Material( MaterNum ).ReflectVisBeamBack = Material( MaterNum ).ReflectSolBeamFront;
 			Material( MaterNum ).TransThermal = MaterialProps( 6 );
 			Material( MaterNum ).AbsorpThermalFront = MaterialProps( 7 );
@@ -2363,7 +2363,7 @@ namespace HeatBalanceManager {
 					ShowContinueError( cNumericFieldNames( 6 ) + " must be less than " + cNumericFieldNames( 5 ) );
 				} else {
 					//       Calculate direct normal transmittance (open area fraction)
-					Material( MaterNum ).Trans = power( ( 1.0 - MaterialProps( 6 ) / MaterialProps( 5 ) ), 2 );
+					Material( MaterNum ).Trans = second_power( ( 1.0 - MaterialProps( 6 ) / MaterialProps( 5 ) ) );
 				}
 			} else {
 				ErrorsFound = true;
@@ -2548,7 +2548,7 @@ namespace HeatBalanceManager {
 					ShowContinueError( cNumericFieldNames( 10 ) + " must be less than " + cNumericFieldNames( 9 ) );
 				} else {
 					//  Calculate direct normal transmittance (open area fraction)
-					Openness = power( ( 1.0 - Material( MaterNum ).ScreenWireDiameter / Material( MaterNum ).ScreenWireSpacing ), 2 );
+					Openness = second_power( ( 1.0 - Material( MaterNum ).ScreenWireDiameter / Material( MaterNum ).ScreenWireSpacing ) );
 					if ( ( Material( MaterNum ).TausFrontBeamBeam - Openness ) / Openness > 0.01 ) {
 						ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", screen openness specified." );
 						ShowContinueError( cNumericFieldNames( 1 ) + " is > 1.0% of the value calculated from input fields:" );
@@ -4871,8 +4871,8 @@ namespace HeatBalanceManager {
 				StdDevZoneTemp = 0.0;
 				StdDevZoneLoad = 0.0;
 				for ( Num = 1; Num <= CountWarmupDayPoints; ++Num ) {
-					TempZoneRptStdDev( Num ) = power( ( TempZoneRpt( Num, ZoneNum ) - AverageZoneTemp ), 2 );
-					LoadZoneRptStdDev( Num ) = power( ( LoadZoneRpt( Num, ZoneNum ) - AverageZoneLoad ), 2 );
+					TempZoneRptStdDev( Num ) = second_power( ( TempZoneRpt( Num, ZoneNum ) - AverageZoneTemp ) );
+					LoadZoneRptStdDev( Num ) = second_power( ( LoadZoneRpt( Num, ZoneNum ) - AverageZoneLoad ) );
 				}
 				StdDevZoneTemp = std::sqrt( sum( TempZoneRptStdDev( {1,CountWarmupDayPoints} ) ) / double( CountWarmupDayPoints ) );
 				StdDevZoneLoad = std::sqrt( sum( LoadZoneRptStdDev( {1,CountWarmupDayPoints} ) ) / double( CountWarmupDayPoints ) );
@@ -6903,7 +6903,7 @@ Label1000: ;
 
 			if ( Material( MaterNum ).SimpleWindowSHGC < 0.7206 ) {
 
-				Material( MaterNum ).Trans = 0.939998 * power( Material( MaterNum ).SimpleWindowSHGC, 2 ) + 0.20332 * Material( MaterNum ).SimpleWindowSHGC;
+				Material( MaterNum ).Trans = 0.939998 * second_power( Material( MaterNum ).SimpleWindowSHGC ) + 0.20332 * Material( MaterNum ).SimpleWindowSHGC;
 			} else { // >= 0.7206
 
 				Material( MaterNum ).Trans = 1.30415 * Material( MaterNum ).SimpleWindowSHGC - 0.30515;
@@ -6915,12 +6915,12 @@ Label1000: ;
 			if ( Material( MaterNum ).SimpleWindowSHGC <= 0.15 ) {
 				Material( MaterNum ).Trans = 0.41040 * Material( MaterNum ).SimpleWindowSHGC;
 			} else { // > 0.15
-				Material( MaterNum ).Trans = 0.085775 * ( power( Material( MaterNum ).SimpleWindowSHGC, 2 ) ) + 0.963954 * Material( MaterNum ).SimpleWindowSHGC - 0.084958;
+				Material( MaterNum ).Trans = 0.085775 * ( second_power( Material( MaterNum ).SimpleWindowSHGC ) ) + 0.963954 * Material( MaterNum ).SimpleWindowSHGC - 0.084958;
 			}
 		} else { // interpolate. 3.4 <= Ufactor <= 4.5
 
 			if ( Material( MaterNum ).SimpleWindowSHGC < 0.7206 ) {
-				TsolHiSide = 0.939998 * power( Material( MaterNum ).SimpleWindowSHGC, 2 ) + 0.20332 * Material( MaterNum ).SimpleWindowSHGC;
+				TsolHiSide = 0.939998 * second_power( Material( MaterNum ).SimpleWindowSHGC ) + 0.20332 * Material( MaterNum ).SimpleWindowSHGC;
 			} else { // >= 0.7206
 				TsolHiSide = 1.30415 * Material( MaterNum ).SimpleWindowSHGC - 0.30515;
 			}
@@ -6928,7 +6928,7 @@ Label1000: ;
 			if ( Material( MaterNum ).SimpleWindowSHGC <= 0.15 ) {
 				TsolLowSide = 0.41040 * Material( MaterNum ).SimpleWindowSHGC;
 			} else { // > 0.15
-				TsolLowSide = 0.085775 * ( power( Material( MaterNum ).SimpleWindowSHGC, 2 ) ) + 0.963954 * Material( MaterNum ).SimpleWindowSHGC - 0.084958;
+				TsolLowSide = 0.085775 * ( second_power( Material( MaterNum ).SimpleWindowSHGC ) ) + 0.963954 * Material( MaterNum ).SimpleWindowSHGC - 0.084958;
 			}
 
 			Material( MaterNum ).Trans = ( ( Material( MaterNum ).SimpleWindowUfactor - 3.4 ) / ( 4.5 - 3.4 ) ) * ( TsolHiSide - TsolLowSide ) + TsolLowSide;
@@ -6942,16 +6942,16 @@ Label1000: ;
 
 		if ( Material( MaterNum ).SimpleWindowUfactor > 4.5 ) {
 
-			Ris = 1.0 / ( 29.436546 * power( DeltaSHGCandTsol, 3 ) - 21.943415 * power( DeltaSHGCandTsol, 2 ) + 9.945872 * DeltaSHGCandTsol + 7.426151 );
+			Ris = 1.0 / ( 29.436546 * third_power( DeltaSHGCandTsol ) - 21.943415 * second_power( DeltaSHGCandTsol ) + 9.945872 * DeltaSHGCandTsol + 7.426151 );
 			Ros = 1.0 / ( 2.225824 * DeltaSHGCandTsol + 20.577080 );
 		} else if ( Material( MaterNum ).SimpleWindowUfactor < 3.4 ) {
 
-			Ris = 1.0 / ( 199.8208128 * power( DeltaSHGCandTsol, 3 ) - 90.639733 * power( DeltaSHGCandTsol, 2 ) + 19.737055 * DeltaSHGCandTsol + 6.766575 );
+			Ris = 1.0 / ( 199.8208128 * third_power( DeltaSHGCandTsol ) - 90.639733 * second_power( DeltaSHGCandTsol ) + 19.737055 * DeltaSHGCandTsol + 6.766575 );
 			Ros = 1.0 / ( 5.763355 * DeltaSHGCandTsol + 20.541528 );
 		} else { // interpolate. 3.4 <= Ufactor <= 4.5
 			//inside first
-			RLowSide = 1.0 / ( 199.8208128 * power( DeltaSHGCandTsol, 3 ) - 90.639733 * power( DeltaSHGCandTsol, 2 ) + 19.737055 * DeltaSHGCandTsol + 6.766575 );
-			RHiSide = 1.0 / ( 29.436546 * power( DeltaSHGCandTsol, 3 ) - 21.943415 * power( DeltaSHGCandTsol, 2 ) + 9.945872 * DeltaSHGCandTsol + 7.426151 );
+			RLowSide = 1.0 / ( 199.8208128 * third_power( DeltaSHGCandTsol ) - 90.639733 * second_power( DeltaSHGCandTsol ) + 19.737055 * DeltaSHGCandTsol + 6.766575 );
+			RHiSide = 1.0 / ( 29.436546 * third_power( DeltaSHGCandTsol ) - 21.943415 * second_power( DeltaSHGCandTsol ) + 9.945872 * DeltaSHGCandTsol + 7.426151 );
 			Ris = ( ( Material( MaterNum ).SimpleWindowUfactor - 3.4 ) / ( 4.5 - 3.4 ) ) * ( RLowSide - RHiSide ) + RLowSide;
 			// then outside
 			RLowSide = 1.0 / ( 5.763355 * DeltaSHGCandTsol + 20.541528 );
@@ -6969,12 +6969,12 @@ Label1000: ;
 		//step 6. determine visible properties.
 		if ( Material( MaterNum ).SimpleWindowVTinputByUser ) {
 			Material( MaterNum ).TransVis = Material( MaterNum ).SimpleWindowVisTran;
-			Material( MaterNum ).ReflectVisBeamBack = -0.7409 * power( Material( MaterNum ).TransVis, 3 ) + 1.6531 * power( Material( MaterNum ).TransVis, 2 ) - 1.2299 * Material( MaterNum ).TransVis + 0.4545;
+			Material( MaterNum ).ReflectVisBeamBack = -0.7409 * third_power( Material( MaterNum ).TransVis ) + 1.6531 * second_power( Material( MaterNum ).TransVis ) - 1.2299 * Material( MaterNum ).TransVis + 0.4545;
 			if ( Material( MaterNum ).TransVis + Material( MaterNum ).ReflectVisBeamBack >= 1.0 ) {
 				Material( MaterNum ).ReflectVisBeamBack = 0.999 - Material( MaterNum ).TransVis;
 			}
 
-			Material( MaterNum ).ReflectVisBeamFront = -0.0622 * power( Material( MaterNum ).TransVis, 3 ) + 0.4277 * power( Material( MaterNum ).TransVis, 2 ) - 0.4169 * Material( MaterNum ).TransVis + 0.2399;
+			Material( MaterNum ).ReflectVisBeamFront = -0.0622 * third_power( Material( MaterNum ).TransVis ) + 0.4277 * second_power( Material( MaterNum ).TransVis ) - 0.4169 * Material( MaterNum ).TransVis + 0.2399;
 			if ( Material( MaterNum ).TransVis + Material( MaterNum ).ReflectVisBeamFront >= 1.0 ) {
 				Material( MaterNum ).ReflectVisBeamFront = 0.999 - Material( MaterNum ).TransVis;
 			}

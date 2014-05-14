@@ -1652,7 +1652,7 @@ namespace DaylightingManager {
 		if ( ExtWinType == AdjZoneExtWin ) {
 			// Adjust number of exterior window elements to give acceptable number of rays through
 			// interior windows in the zone (for accuracy of interior window daylighting calculation)
-			SolidAngExtWin = SafeDivide( ( ( Surface( IWin ).Area + SurfaceWindow( IWin ).DividerArea ) / Surface( IWin ).Multiplier ), power( ALF, 2 ) );
+			SolidAngExtWin = SafeDivide( ( ( Surface( IWin ).Area + SurfaceWindow( IWin ).DividerArea ) / Surface( IWin ).Multiplier ), second_power( ALF ) );
 			SolidAngMinIntWin = ZoneDaylight( ZoneNum ).MinIntWinSolidAng;
 			SolidAngRatio = max( 1.0, SolidAngExtWin / SolidAngMinIntWin );
 			NDIVX *= std::sqrt( SolidAngRatio );
@@ -1821,7 +1821,7 @@ namespace DaylightingManager {
 		if ( Rectangle ) {
 			DAXY = DWX * DWY;
 		} else if ( Triangle ) {
-			SinCornerAng = std::sqrt( 1.0 - power( dot( W21, W23 ), 2 ) );
+			SinCornerAng = std::sqrt( 1.0 - second_power( dot( W21, W23 ) ) );
 			DAXY = DWX * DWY * SinCornerAng;
 		}
 
@@ -2333,7 +2333,7 @@ namespace DaylightingManager {
 
 		WinElArea = DWX * DWY;
 		if ( Surface( IWin ).Sides == 3 ) {
-			WinElArea *= std::sqrt( 1.0 - power( dot( W21, W23 ), 2 ) );
+			WinElArea *= std::sqrt( 1.0 - second_power( dot( W21, W23 ) ) );
 		}
 
 		if ( CalledFrom == CalledForMapPoint ) {
@@ -3594,7 +3594,7 @@ namespace DaylightingManager {
 							// direct normal solar illuminance = 1.0.
 							// Solid angle subtended by sun is 0.000068 steradians
 
-							XAVWL = 14700. * std::sqrt( 0.000068 * POSFAC ) * double( NWX * NWY ) / power( WindowSolidAngleDaylightPoint, 0.8 );
+							XAVWL = 14700. * std::sqrt( 0.000068 * POSFAC ) * double( NWX * NWY ) / std::pow( WindowSolidAngleDaylightPoint, 0.8 );
 							AVWLSUdisk( 1, iHour ) = XAVWL * TVISS * ObTransDisk; // Bare window
 
 							if ( ShType == WSC_ST_ExteriorBlind || ShType == WSC_ST_InteriorBlind || ShType == WSC_ST_BetweenGlassBlind ) {
@@ -3738,7 +3738,7 @@ namespace DaylightingManager {
 								YR = std::tan( PHSUNrefl + 0.001 );
 								POSFAC = DayltgGlarePositionFactor( XR, YR );
 								if ( POSFAC != 0.0 && SurfaceWindow( IWin ).SolidAngAtRefPtWtd( iRefPoint ) > 0.000001 ) {
-									XAVWL = 14700.0 * std::sqrt( 0.000068 * POSFAC ) * double( NWX * NWY ) / power( SurfaceWindow( IWin ).SolidAngAtRefPtWtd( iRefPoint ), 0.8 );
+									XAVWL = 14700.0 * std::sqrt( 0.000068 * POSFAC ) * double( NWX * NWY ) / std::pow( SurfaceWindow( IWin ).SolidAngAtRefPtWtd( iRefPoint ), 0.8 );
 									AVWLSUdisk( 1, iHour ) += XAVWL * TVisRefl * SpecReflectance; // Bare window
 									if ( ShType == WSC_ST_ExteriorBlind || ShType == WSC_ST_InteriorBlind || ShType == WSC_ST_BetweenGlassBlind ) {
 										for ( JB = 1; JB <= MaxSlatAngs; ++JB ) {
@@ -5228,8 +5228,8 @@ namespace DaylightingManager {
 			if ( ( SurfaceWindow( IWin ).ShadingFlag >= 1 && SurfaceWindow( IWin ).ShadingFlag <= 9 ) || SurfaceWindow( IWin ).SolarDiffusing ) IS = 2;
 			// Conversion from ft-L to cd/m2, with cd/m2 = 0.2936 ft-L, gives the 0.4794 factor
 			// below, which is (0.2936)**0.6
-			GTOT1 = 0.4794 * ( power( ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, IS, loop ), 1.6 ) ) * power( ZoneDaylight( ZoneNum ).SolidAngAtRefPtWtd( IL, loop ), 0.8 );
-			GTOT2 = BLUM + 0.07 * ( power( ZoneDaylight( ZoneNum ).SolidAngAtRefPt( IL, loop ), 0.5 ) ) * ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, IS, loop );
+			GTOT1 = 0.4794 * ( std::pow( ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, IS, loop ), 1.6 ) ) * std::pow( ZoneDaylight( ZoneNum ).SolidAngAtRefPtWtd( IL, loop ), 0.8 );
+			GTOT2 = BLUM + 0.07 * ( std::pow( ZoneDaylight( ZoneNum ).SolidAngAtRefPt( IL, loop ), 0.5 ) ) * ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, IS, loop );
 			GTOT += GTOT1 / ( GTOT2 + 0.000001 );
 		}
 
@@ -5307,8 +5307,8 @@ namespace DaylightingManager {
 				if ( ( SurfaceWindow( IWin ).ShadingFlag >= 1 && SurfaceWindow( IWin ).ShadingFlag <= 9 ) || SurfaceWindow( IWin ).SolarDiffusing ) IS = 2;
 				// Conversion from ft-L to cd/m2, with cd/m2 = 0.2936 ft-L, gives the 0.4794 factor
 				// below, which is (0.2936)**0.6
-				GTOT1 = 0.4794 * ( power( ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, IS, loop ), 1.6 ) ) * power( ZoneDaylight( ZoneNum ).SolidAngAtRefPtWtd( IL, loop ), 0.8 );
-				GTOT2 = BacLum + 0.07 * ( power( ZoneDaylight( ZoneNum ).SolidAngAtRefPt( IL, loop ), 0.5 ) ) * ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, IS, loop );
+				GTOT1 = 0.4794 * ( std::pow( ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, IS, loop ), 1.6 ) ) * std::pow( ZoneDaylight( ZoneNum ).SolidAngAtRefPtWtd( IL, loop ), 0.8 );
+				GTOT2 = BacLum + 0.07 * ( std::pow( ZoneDaylight( ZoneNum ).SolidAngAtRefPt( IL, loop ), 0.5 ) ) * ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, IS, loop );
 				GTOT += GTOT1 / ( GTOT2 + 0.000001 );
 			}
 
@@ -8514,7 +8514,7 @@ namespace DaylightingManager {
 
 					DayltgHitObstruction( iHour, iWin, RWin, V, TransBeam );
 
-					WinLumSunDisk += ( 14700.0 * std::sqrt( 0.000068 * PosFac ) * double( NumEl ) / power( WindowSolidAngleDaylightPoint, 0.8 ) ) * dirTrans * LambdaTrn * TransBeam;
+					WinLumSunDisk += ( 14700.0 * std::sqrt( 0.000068 * PosFac ) * double( NumEl ) / std::pow( WindowSolidAngleDaylightPoint, 0.8 ) ) * dirTrans * LambdaTrn * TransBeam;
 
 					ELumSunDisk += RayZ * dirTrans * LambdaTrn * TransBeam;
 				}
@@ -9253,8 +9253,8 @@ namespace DaylightingManager {
 
 					// Conversion from ft-L to cd/m2, with cd/m2 = 0.2936 ft-L, gives the 0.4794 factor
 					// below, which is (0.2936)**0.6
-					GTOT1 = 0.4794 * ( power( ( VTMULT * IllumMapCalc( MapNum ).SourceLumFromWinAtMapPt( IL, IS, loop ) ), 1.6 ) ) * power( IllumMapCalc( MapNum ).SolidAngAtMapPtWtd( IL, loop ), 0.8 );
-					GTOT2 = BACLUM( IL ) + 0.07 * ( power( IllumMapCalc( MapNum ).SolidAngAtMapPt( IL, loop ), 0.5 ) ) * VTMULT * IllumMapCalc( MapNum ).SourceLumFromWinAtMapPt( IL, IS, loop );
+					GTOT1 = 0.4794 * ( std::pow( ( VTMULT * IllumMapCalc( MapNum ).SourceLumFromWinAtMapPt( IL, IS, loop ) ), 1.6 ) ) * std::pow( IllumMapCalc( MapNum ).SolidAngAtMapPtWtd( IL, loop ), 0.8 );
+					GTOT2 = BACLUM( IL ) + 0.07 * ( std::pow( IllumMapCalc( MapNum ).SolidAngAtMapPt( IL, loop ), 0.5 ) ) * VTMULT * IllumMapCalc( MapNum ).SourceLumFromWinAtMapPt( IL, IS, loop );
 					GTOT += GTOT1 / ( GTOT2 + 0.000001 );
 				}
 
@@ -10196,7 +10196,7 @@ Label903: ;
 							if ( COSB > 0.01765 ) { // 0 <= B < 89 deg
 								// Above test avoids case where ref point cannot receive daylight directly from the
 								// interior window
-								IntWinSolidAng = COSB * Surface( IWin ).Area / ( power( DIS, 2 ) + 0.001 );
+								IntWinSolidAng = COSB * Surface( IWin ).Area / ( second_power( DIS ) + 0.001 );
 								ZoneDaylight( ZoneNum ).MinIntWinSolidAng = min( ZoneDaylight( ZoneNum ).MinIntWinSolidAng, IntWinSolidAng );
 							}
 						} // End of loop over reference points
