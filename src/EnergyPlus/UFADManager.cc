@@ -236,7 +236,7 @@ namespace UFADManager {
 			SurfNum = APos_Window( Ctd );
 			if ( SurfNum == 0 ) continue;
 			if ( Surface( SurfNum ).ExtBoundCond == ExternalEnvironment || Surface( SurfNum ).ExtBoundCond == OtherSideCoefNoCalcExt || Surface( SurfNum ).ExtBoundCond == OtherSideCoefCalcExt || Surface( SurfNum ).ExtBoundCond == OtherSideCondModeledExt ) {
-				if ( SurfaceWindow( SurfNum ).ShadingFlag == IntShadeOn || SurfaceWindow( SurfNum ).ShadingFlag == IntBlindOn ) {
+				if ( SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() == IntShadeOn || SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() == IntBlindOn ) {
 					++NumShadesDown;
 				}
 			}
@@ -1792,7 +1792,7 @@ namespace UFADManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

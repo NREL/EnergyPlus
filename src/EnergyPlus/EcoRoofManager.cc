@@ -388,7 +388,7 @@ namespace EcoRoofManager {
 			if ( Construct( ConstrNum ).CTFCross( 0 ) > 0.01 ) {
 				QuickConductionSurf = true;
 				F1temp = Construct( ConstrNum ).CTFCross( 0 ) / ( Construct( ConstrNum ).CTFInside( 0 ) + HConvIn( SurfNum ) );
-				Qsoilpart1 = -CTFConstOutPart( SurfNum ) + F1temp * ( CTFConstInPart( SurfNum ) + QRadSWInAbs( SurfNum ) + QRadThermInAbs( SurfNum ) + Construct( ConstrNum ).CTFSourceIn( 0 ) * QsrcHist( SurfNum, 1 ) + HConvIn( SurfNum ) * MAT( ZoneNum ) + NetLWRadToSurf( SurfNum ) );
+				Qsoilpart1 = -CTFConstOutPart( SurfNum ) + F1temp * ( CTFConstInPart( SurfNum ) + QRadSWInAbs( SurfNum ) + QRadThermInAbs( SurfNum ) + Construct( ConstrNum ).CTFSourceIn( 0 ) * QsrcHist( SurfNum, 1 ) + HConvIn( SurfNum ) * MAT( ZoneNum ) + NetLWRadToSurf[ SurfNum - 1 ] );
 			} else {
 				Qsoilpart1 = -CTFConstOutPart( SurfNum ) + Construct( ConstrNum ).CTFCross( 0 ) * TempSurfIn( SurfNum );
 				F1temp = 0.0;
@@ -858,7 +858,7 @@ namespace EcoRoofManager {
 
 			//NEXT redistribute the moisture in the soil based on:
 			//Marcel G Schaap and Martinus Th van Genuchten, 2006, 'A modified Maulem-van
-			//Genuchten Formulation for Improved Description of the Hydraulic Conductivity Near Saturation’.
+			//Genuchten Formulation for Improved Description of the Hydraulic Conductivity Near SaturationÂ’.
 			//Written in MATLAB by Vishal Sharma (of Portland State) and modified for FORTRAN by Stephen Forner Summer 2010
 			//This model is based on curve fit data that describes the capillary motion of the water in combination with the gravitational
 			//forces on the water.
@@ -1037,7 +1037,7 @@ namespace EcoRoofManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

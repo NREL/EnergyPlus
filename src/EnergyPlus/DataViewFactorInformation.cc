@@ -1,6 +1,7 @@
 // EnergyPlus Headers
 #include <DataViewFactorInformation.hh>
 #include <DataPrecisionGlobals.hh>
+#include <DataSurfaces.hh>
 
 namespace EnergyPlus {
 
@@ -43,10 +44,10 @@ namespace DataViewFactorInformation {
 	// MODULE VARIABLE DECLARATIONS:
 
 	// Object Data
-	FArray1D< ZoneViewFactorInformation > ZoneInfo;
-
+        std::vector< ZoneViewFactorInformation > ZoneInfo;
+        std::vector<reSurface> VfSurfaces;
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
@@ -63,6 +64,22 @@ namespace DataViewFactorInformation {
 	//     distribute copies to the public, perform publicly and display publicly, and to
 	//     permit others to do so.
 	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+
+  void
+  ZoneViewFactorInformation::setShadeChanged(int globSurf){
+    using DataSurfaces::IntShadeOn;
+    using DataSurfaces::IntBlindOn;
+    int ShadeFlag = DataSurfaces::SurfaceRadiantWin[ globSurf - 1 ].getShadingFlag();
+    int ShadeFlagPrev = DataSurfaces::SurfaceWindow( globSurf ).ExtIntShadePrevTS;
+    if ( ( ShadeFlagPrev != IntShadeOn && ShadeFlag == IntShadeOn ) || 
+	 ( ShadeFlagPrev != IntBlindOn && ShadeFlag == IntBlindOn ) || 
+	 ( ShadeFlagPrev == IntShadeOn && ShadeFlag != IntShadeOn ) || 
+				 ( ShadeFlagPrev == IntBlindOn && ShadeFlag != IntBlindOn ) ){
+			shadeChanged = true;
+		}else{
+			shadeChanged = false;
+		}
+  }
 
 } // DataViewFactorInformation
 

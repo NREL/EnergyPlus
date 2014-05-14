@@ -1015,7 +1015,7 @@ CalcPassiveExteriorBaffleGap(
 		HMovInsul = 0.0;
 		LocalWindArr( ThisSurf ) = Surface( SurfPtr ).WindSpeed;
 		InitExteriorConvectionCoeff( SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR( ThisSurf ), HSkyARR( ThisSurf ), HGroundARR( ThisSurf ), HAirARR( ThisSurf ) );
-		ConstrNum = Surface( SurfPtr ).Construction;
+		ConstrNum = DataSurfaces::Construction[ SurfPtr  - 1];
 		AbsThermSurf = Material( Construct( ConstrNum ).LayerPoint( 1 ) ).AbsorpThermal;
 		TsoK = TH( SurfPtr, 1, 1 ) + KelvinConv;
 		TsBaffK = TmpTsBaf + KelvinConv;
@@ -2049,7 +2049,7 @@ TestReturnAirPathIntegrity(
 }
 
 //     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted

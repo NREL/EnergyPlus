@@ -498,10 +498,10 @@ namespace SolarReflectionManager {
 						if ( dot( VNorm, -RayVec ) < 0.0 ) VNorm = -VNorm;
 						SolReflRecSurf( RecSurfNum ).HitPtNormVec( {1,3}, RecPtNum, RayNum ) = VNorm;
 						// Get solar and visible beam-to-diffuse reflectance at nearest hit point
-						ObsConstrNum = Surface( NearestHitSurfNum ).Construction;
+						ObsConstrNum = Construction[ NearestHitSurfNum  - 1];
 						if ( ObsConstrNum > 0 ) {
 							// Exterior building surface is nearest hit
-							if ( ! Construct( ObsConstrNum ).TypeIsWindow ) {
+							if ( ! ConstrWin[ ObsConstrNum  - 1 ].TypeIsWindow ) {
 								// Obstruction is not a window, i.e., is an opaque surface
 								SolReflRecSurf( RecSurfNum ).HitPtSolRefl( RecPtNum, RayNum ) = 1.0 - Construct( ObsConstrNum ).OutsideAbsorpSolar;
 							} else {
@@ -1042,7 +1042,7 @@ namespace SolarReflectionManager {
 								// No obstructions. Calculate reflected beam irradiance at receiving pt. from this reflecting surface.
 								SpecReflectance = 0.0;
 								if ( Surface( ReflSurfNum ).Class == SurfaceClass_Window ) {
-									ConstrNumRefl = Surface( ReflSurfNum ).Construction;
+									ConstrNumRefl = Construction[ ReflSurfNum  - 1];
 									SpecReflectance = POLYF( std::abs( CosIncAngRefl ), Construct( ConstrNumRefl ).ReflSolBeamFrontCoef( {1,6} ) );
 								}
 								if ( Surface( ReflSurfNum ).ShadowingSurf && Surface( ReflSurfNum ).ShadowSurfGlazingConstruct > 0 ) {
@@ -1519,7 +1519,7 @@ namespace SolarReflectionManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

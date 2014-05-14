@@ -2087,7 +2087,7 @@ namespace ZoneTempPredictorCorrector {
 
 			for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
 				FirstSurfFlag = true;
-				for ( SurfNum = Zone( Loop ).SurfaceFirst; SurfNum <= Zone( Loop ).SurfaceLast; ++SurfNum ) {
+				for ( SurfNum = ZoneSpecs[ Loop  - 1].SurfaceFirst; SurfNum <= ZoneSpecs[ Loop  - 1].SurfaceLast; ++SurfNum ) {
 					if ( ! Surface( SurfNum ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
 
 					if ( FirstSurfFlag ) {
@@ -3363,7 +3363,7 @@ namespace ZoneTempPredictorCorrector {
 			// are currently set to zero when the CTF only version is used.
 
 			// if no surface in the zone uses EMPD or HAMT then zero
-			if ( ( ! any_eq( Surface( {Zone( ZoneNum ).SurfaceFirst,Zone( ZoneNum ).SurfaceLast} ).HeatTransferAlgorithm(), HeatTransferModel_EMPD ) ) && ( ! any_eq( Surface( {Zone( ZoneNum ).SurfaceFirst,Zone( ZoneNum ).SurfaceLast} ).HeatTransferAlgorithm(), HeatTransferModel_HAMT ) ) ) {
+			if ( ( ! any_eq( Surface( {ZoneSpecs[ ZoneNum  - 1].SurfaceFirst,ZoneSpecs[ ZoneNum  - 1].SurfaceLast} ).HeatTransferAlgorithm(), HeatTransferModel_EMPD ) ) && ( ! any_eq( Surface( {ZoneSpecs[ ZoneNum  - 1].SurfaceFirst,ZoneSpecs[ ZoneNum  - 1].SurfaceLast} ).HeatTransferAlgorithm(), HeatTransferModel_HAMT ) ) ) {
 				SumHmARaW( ZoneNum ) = 0.0;
 				SumHmARa( ZoneNum ) = 0.0;
 			}
@@ -4202,7 +4202,7 @@ namespace ZoneTempPredictorCorrector {
 		// operating and system shutdown.
 		// SumHmARaW and SumHmARa will be used with the moisture balance on the building elements and
 		// are currently set to zero to remind us where they need to be in the future
-		if ( ( ! any_eq( Surface( {Zone( ZoneNum ).SurfaceFirst,Zone( ZoneNum ).SurfaceLast} ).HeatTransferAlgorithm(), HeatTransferModel_EMPD ) ) && ( ! any_eq( Surface( {Zone( ZoneNum ).SurfaceFirst,Zone( ZoneNum ).SurfaceLast} ).HeatTransferAlgorithm(), HeatTransferModel_HAMT ) ) ) {
+		if ( ( ! any_eq( Surface( {ZoneSpecs[ ZoneNum  - 1].SurfaceFirst,ZoneSpecs[ ZoneNum  - 1].SurfaceLast} ).HeatTransferAlgorithm(), HeatTransferModel_EMPD ) ) && ( ! any_eq( Surface( {ZoneSpecs[ ZoneNum  - 1].SurfaceFirst,ZoneSpecs[ ZoneNum  - 1].SurfaceLast} ).HeatTransferAlgorithm(), HeatTransferModel_HAMT ) ) ) {
 			SumHmARaW( ZoneNum ) = 0.0;
 			SumHmARa( ZoneNum ) = 0.0;
 		}
@@ -4582,7 +4582,7 @@ namespace ZoneTempPredictorCorrector {
 		SumSysMCpT /= ZoneMult;
 
 		// Sum all surface convection: SumHA, SumHATsurf, SumHATref (and additional contributions to SumIntGain)
-		for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
+		for ( SurfNum = ZoneSpecs[ZoneNum - 1].SurfaceFirst; SurfNum <= ZoneSpecs[ZoneNum - 1].SurfaceLast; ++SurfNum ) {
 
 			if ( ! Surface( SurfNum ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
 
@@ -4592,7 +4592,7 @@ namespace ZoneTempPredictorCorrector {
 			if ( Surface( SurfNum ).Class == SurfaceClass_Window ) {
 
 				// Add to the convective internal gains
-				if ( SurfaceWindow( SurfNum ).ShadingFlag == IntShadeOn || SurfaceWindow( SurfNum ).ShadingFlag == IntBlindOn ) {
+				if ( SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() == IntShadeOn || SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() == IntBlindOn ) {
 					// The shade area covers the area of the glazing plus the area of the dividers.
 					Area += SurfaceWindow( SurfNum ).DividerArea;
 					// If interior shade or blind is present it is assumed that both the convective and IR radiative gain
@@ -4606,7 +4606,7 @@ namespace ZoneTempPredictorCorrector {
 				if ( Construct( Surface( SurfNum ).Construction ).WindowTypeEQL ) SumIntGain += SurfaceWindow( SurfNum ).OtherConvHeatGain;
 
 				// Convective heat gain from natural convection in gap between glass and interior shade or blind
-				if ( SurfaceWindow( SurfNum ).ShadingFlag == IntShadeOn || SurfaceWindow( SurfNum ).ShadingFlag == IntBlindOn ) SumIntGain += SurfaceWindow( SurfNum ).ConvHeatFlowNatural;
+				if ( SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() == IntShadeOn || SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() == IntBlindOn ) SumIntGain += SurfaceWindow( SurfNum ).ConvHeatFlowNatural;
 
 				// Convective heat gain from airflow window
 				if ( SurfaceWindow( SurfNum ).AirflowThisTS > 0.0 ) {
@@ -4631,7 +4631,7 @@ namespace ZoneTempPredictorCorrector {
 					HA += HConvIn( SurfNum ) * SurfaceWindow( SurfNum ).FrameArea * ( 1.0 + SurfaceWindow( SurfNum ).ProjCorrFrIn );
 				}
 
-				if ( SurfaceWindow( SurfNum ).DividerArea > 0.0 && SurfaceWindow( SurfNum ).ShadingFlag != IntShadeOn && SurfaceWindow( SurfNum ).ShadingFlag != IntBlindOn ) {
+				if ( SurfaceWindow( SurfNum ).DividerArea > 0.0 && SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() != IntShadeOn && SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() != IntBlindOn ) {
 					// Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
 					SumHATsurf += HConvIn( SurfNum ) * SurfaceWindow( SurfNum ).DividerArea * ( 1.0 + 2.0 * SurfaceWindow( SurfNum ).ProjCorrDivIn ) * SurfaceWindow( SurfNum ).DividerTempSurfIn;
 					HA += HConvIn( SurfNum ) * SurfaceWindow( SurfNum ).DividerArea * ( 1.0 + 2.0 * SurfaceWindow( SurfNum ).ProjCorrDivIn );
@@ -4879,7 +4879,7 @@ namespace ZoneTempPredictorCorrector {
 		SumNonAirSystem = NonAirSystemResponse( ZoneNum ) + SumConvHTRadSys( ZoneNum );
 
 		// Sum all surface convection: SumHA, SumHATsurf, SumHATref (and additional contributions to SumIntGain)
-		for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
+		for ( SurfNum = ZoneSpecs[ZoneNum - 1].SurfaceFirst; SurfNum <= ZoneSpecs[ZoneNum - 1].SurfaceLast; ++SurfNum ) {
 
 			if ( ! Surface( SurfNum ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
 
@@ -4924,7 +4924,7 @@ namespace ZoneTempPredictorCorrector {
 			if ( Surface( SurfNum ).Class == SurfaceClass_Window ) {
 
 				// Add to the convective internal gains
-				if ( SurfaceWindow( SurfNum ).ShadingFlag == IntShadeOn || SurfaceWindow( SurfNum ).ShadingFlag == IntBlindOn ) {
+				if ( SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() == IntShadeOn || SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() == IntBlindOn ) {
 					// The shade area covers the area of the glazing plus the area of the dividers.
 					Area += SurfaceWindow( SurfNum ).DividerArea;
 					// If interior shade or blind is present it is assumed that both the convective and IR radiative gain
@@ -4938,7 +4938,7 @@ namespace ZoneTempPredictorCorrector {
 				if ( Construct( Surface( SurfNum ).Construction ).WindowTypeEQL ) SumIntGains += SurfaceWindow( SurfNum ).OtherConvHeatGain;
 
 				// Convective heat gain from natural convection in gap between glass and interior shade or blind
-				if ( SurfaceWindow( SurfNum ).ShadingFlag == IntShadeOn || SurfaceWindow( SurfNum ).ShadingFlag == IntBlindOn ) SumIntGains += SurfaceWindow( SurfNum ).ConvHeatFlowNatural;
+				if ( SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() == IntShadeOn || SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() == IntBlindOn ) SumIntGains += SurfaceWindow( SurfNum ).ConvHeatFlowNatural;
 
 				// Convective heat gain from airflow window
 				if ( SurfaceWindow( SurfNum ).AirflowThisTS > 0.0 ) {
@@ -4956,7 +4956,7 @@ namespace ZoneTempPredictorCorrector {
 
 				}
 
-				if ( SurfaceWindow( SurfNum ).DividerArea > 0.0 && SurfaceWindow( SurfNum ).ShadingFlag != IntShadeOn && SurfaceWindow( SurfNum ).ShadingFlag != IntBlindOn ) {
+				if ( SurfaceWindow( SurfNum ).DividerArea > 0.0 && SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() != IntShadeOn && SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() != IntBlindOn ) {
 					// Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
 					SumHADTsurfs += HConvIn( SurfNum ) * SurfaceWindow( SurfNum ).DividerArea * ( 1.0 + 2.0 * SurfaceWindow( SurfNum ).ProjCorrDivIn ) * ( SurfaceWindow( SurfNum ).DividerTempSurfIn - RefAirTemp );
 
@@ -5820,7 +5820,7 @@ namespace ZoneTempPredictorCorrector {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

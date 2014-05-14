@@ -424,6 +424,8 @@ namespace DataSurfaces {
 	// Object Data
 	FArray1D< SurfaceData > Surface;
 	FArray1D< SurfaceWindowCalc > SurfaceWindow;
+        std::vector< SurfaceWinRad > SurfaceRadiantWin;
+        EppPerformance::perTArray< Real64 > IRfromParentZone;
 	FArray1D< FrameDividerProperties > FrameDivider;
 	FArray1D< StormWindowData > StormWindow;
 	FArray1D< WindowShadingControlData > WindowShadingControl;
@@ -433,8 +435,9 @@ namespace DataSurfaces {
 	FArray1D< ConvectionCoefficient > UserExtConvectionCoeffs;
 	FArray1D< ShadingVertexData > ShadeV;
 	FArray1D< ExtVentedCavityStruct > ExtVentedCavity;
-	FArray1D< SurfaceSolarIncident > SurfIncSolSSG;
-	FArray1D< FenestrationSolarAbsorbed > FenLayAbsSSG;
+
+        std::vector< int > Construction;
+  
 
 	// Functions
 
@@ -523,10 +526,18 @@ namespace DataSurfaces {
 		return ClassName;
 
 	}
+        // void
+	// SurfaceWinRad::setShadingFlag(int val){
+	//   ShadingFlag = val;
+	//   func(shadeChangedCallback);
+	//   //we'll perhaps do a better check as to whether it actually changed, but we'll test for now like this
+	//   //TODO
+	// }
+
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

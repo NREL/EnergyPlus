@@ -60,6 +60,7 @@ namespace RoomAirModelManager {
 	using InputProcessor::SameString;
 	using namespace DataRoomAirModel;
 	using General::RoundSigDigits;
+        using DataHeatBalance::ZoneSpecs;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
@@ -367,13 +368,13 @@ namespace RoomAirModelManager {
 			AirPatternZoneInfo( ZoneNum ).ZoneID = ZoneNum;
 
 			//   figure number of surfaces for this zone
-			AirPatternZoneInfo( ZoneNum ).totNumSurfs = Zone( ZoneNum ).SurfaceLast - Zone( ZoneNum ).SurfaceFirst + 1;
+			AirPatternZoneInfo( ZoneNum ).totNumSurfs = ZoneSpecs[ZoneNum - 1].SurfaceLast - ZoneSpecs[ZoneNum - 1].SurfaceFirst + 1;
 			//   allocate nested derived type for surface info
 			AirPatternZoneInfo( ZoneNum ).Surf.allocate( AirPatternZoneInfo( ZoneNum ).totNumSurfs );
 
 			//   Fill in what we know for nested structure for surfaces
 			for ( thisSurfinZone = 1; thisSurfinZone <= AirPatternZoneInfo( ZoneNum ).totNumSurfs; ++thisSurfinZone ) {
-				thisHBsurfID = Zone( ZoneNum ).SurfaceFirst + thisSurfinZone - 1;
+				thisHBsurfID = ZoneSpecs[ZoneNum - 1].SurfaceFirst + thisSurfinZone - 1;
 				if ( Surface( thisHBsurfID ).Class == SurfaceClass_IntMass ) {
 					AirPatternZoneInfo( ZoneNum ).Surf( thisSurfinZone ).SurfID = thisHBsurfID;
 					AirPatternZoneInfo( ZoneNum ).Surf( thisSurfinZone ).Zeta = 0.5;
@@ -694,7 +695,7 @@ namespace RoomAirModelManager {
 				ErrorsFound = true;
 			} else {
 				ZoneNum = AirNode( AirNodeNum ).ZonePtr;
-				NumOfSurfs = Zone( ZoneNum ).SurfaceLast - Zone( ZoneNum ).SurfaceFirst + 1;
+				NumOfSurfs = ZoneSpecs[ZoneNum - 1].SurfaceLast - ZoneSpecs[ZoneNum - 1].SurfaceFirst + 1;
 				AirNode( AirNodeNum ).SurfMask.allocate( NumOfSurfs );
 			}
 
@@ -770,8 +771,8 @@ namespace RoomAirModelManager {
 
 					// this air node is in this zone; hence, first get name of all surfaces in this zone
 					ZoneNum = AirNode( AirNodeNum ).ZonePtr;
-					SurfFirst = Zone( ZoneNum ).SurfaceFirst;
-					NumOfSurfs = Zone( ZoneNum ).SurfaceLast - Zone( ZoneNum ).SurfaceFirst + 1;
+					SurfFirst = ZoneSpecs[ZoneNum - 1].SurfaceFirst;
+					NumOfSurfs = ZoneSpecs[ZoneNum - 1].SurfaceLast - ZoneSpecs[ZoneNum - 1].SurfaceFirst + 1;
 
 					// terminate the program due to a severe error in the specified input
 					if ( ( NumSurfsInvolved ) > NumOfSurfs ) {
@@ -1510,7 +1511,7 @@ namespace RoomAirModelManager {
 				SetZoneAux = true;
 
 				// cycle in this zone for all the surfaces
-				for ( SurfNum = Zone( ZNum ).SurfaceFirst; SurfNum <= Zone( ZNum ).SurfaceLast; ++SurfNum ) {
+				for ( SurfNum = ZoneSpecs[ ZNum  - 1].SurfaceFirst; SurfNum <= ZoneSpecs[ ZNum  - 1].SurfaceLast; ++SurfNum ) {
 					if ( Surface( SurfNum ).Class != SurfaceClass_IntMass ) {
 						// Recalculate lowest and highest height for the zone
 						Z1Zone = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
@@ -2121,7 +2122,7 @@ namespace RoomAirModelManager {
 	//*****************************************************************************************
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -556,10 +556,10 @@ namespace LowTempRadiantSystem {
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 					ErrorsFound = true;
 				}
-				if ( Surface( HydrRadSys( Item ).SurfacePtr( SurfNum ) ).Construction == 0 ) continue; // Invalid construction -- detected earlier
-				if ( ! Construct( Surface( HydrRadSys( Item ).SurfacePtr( SurfNum ) ).Construction ).SourceSinkPresent ) {
+				if ( Construction[ HydrRadSys( Item ).SurfacePtr( SurfNum )  - 1] == 0 ) continue; // Invalid construction -- detected earlier
+				if ( ! Construct( Construction[ HydrRadSys( Item ).SurfacePtr( SurfNum )  - 1] ).SourceSinkPresent ) {
 					ShowSevereError( "Construction referenced in Hydronic Radiant System Surface does not have a source/sink present" );
-					ShowContinueError( "Surface name= " + Surface( HydrRadSys( Item ).SurfacePtr( SurfNum ) ).Name + "  Construction name = " + Construct( Surface( HydrRadSys( Item ).SurfacePtr( SurfNum ) ).Construction ).Name );
+					ShowContinueError( "Surface name= " + Surface( HydrRadSys( Item ).SurfacePtr( SurfNum ) ).Name + "  Construction name = " + Construct( Construction[ HydrRadSys( Item ).SurfacePtr( SurfNum ) - 1]  ).Name );
 					ShowContinueError( "Construction needs to be defined with a \"Construction:InternalSource\" object." );
 					ErrorsFound = true;
 				}
@@ -776,10 +776,10 @@ namespace LowTempRadiantSystem {
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 					ErrorsFound = true;
 				}
-				if ( Surface( CFloRadSys( Item ).SurfacePtr( SurfNum ) ).Construction == 0 ) continue; // invalid construction, detected earlier
-				if ( ! Construct( Surface( CFloRadSys( Item ).SurfacePtr( SurfNum ) ).Construction ).SourceSinkPresent ) {
+				if ( Construction[ CFloRadSys( Item ).SurfacePtr( SurfNum )  - 1] == 0 ) continue; // invalid construction, detected earlier
+				if ( ! Construct( Construction[ CFloRadSys( Item ).SurfacePtr( SurfNum )  - 1] ).SourceSinkPresent ) {
 					ShowSevereError( "Construction referenced in Constant Flow Radiant System Surface does not have a source/sink" );
-					ShowContinueError( "Surface name= " + Surface( CFloRadSys( Item ).SurfacePtr( SurfNum ) ).Name + "  Construction name = " + Construct( Surface( CFloRadSys( Item ).SurfacePtr( SurfNum ) ).Construction ).Name );
+					ShowContinueError( "Surface name= " + Surface( CFloRadSys( Item ).SurfacePtr( SurfNum ) ).Name + "  Construction name = " + Construct( Construction[ CFloRadSys( Item ).SurfacePtr( SurfNum ) - 1 ] ).Name );
 					ShowContinueError( "Construction needs to be defined with a \"Construction:InternalSource\" object." );
 					ErrorsFound = true;
 				}
@@ -1017,10 +1017,10 @@ namespace LowTempRadiantSystem {
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 					ErrorsFound = true;
 				}
-				if ( Surface( ElecRadSys( Item ).SurfacePtr( SurfNum ) ).Construction == 0 ) continue; // invalid construction -- detected earlier
-				if ( ! Construct( Surface( ElecRadSys( Item ).SurfacePtr( SurfNum ) ).Construction ).SourceSinkPresent ) {
+				if ( Construction[ ElecRadSys( Item ).SurfacePtr( SurfNum )  - 1] == 0 ) continue; // invalid construction -- detected earlier
+				if ( ! Construct( Construction[ ElecRadSys( Item ).SurfacePtr( SurfNum )  - 1] ).SourceSinkPresent ) {
 					ShowSevereError( "Construction referenced in Electric Radiant System Surface does not have a source/sink present" );
-					ShowContinueError( "Surface name= " + Surface( ElecRadSys( Item ).SurfacePtr( SurfNum ) ).Name + "  Construction name = " + Construct( Surface( ElecRadSys( Item ).SurfacePtr( SurfNum ) ).Construction ).Name );
+					ShowContinueError( "Surface name= " + Surface( ElecRadSys( Item ).SurfacePtr( SurfNum ) ).Name + "  Construction name = " + Construct( Construction[ ElecRadSys( Item ).SurfacePtr( SurfNum ) - 1 ] ).Name );
 					ShowContinueError( "Construction needs to be defined with a \"Construction:InternalSource\" object." );
 					ErrorsFound = true;
 				}
@@ -2352,7 +2352,7 @@ namespace LowTempRadiantSystem {
 				// which is the desired result, that is the heat source or sink to the radiant
 				// system as a function of the water inlet temperature (flow rate is also in there
 				// as well as all of the heat balance terms "hidden" in Ck and Cl).
-				ConstrNum = Surface( SurfNum ).Construction;
+				ConstrNum = DataSurfaces::Construction[ SurfNum  - 1];
 
 				if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CTF ) {
 
@@ -3329,7 +3329,7 @@ namespace LowTempRadiantSystem {
 				// system as a function of the water inlet temperature (flow rate is also in there
 				// as well as all of the heat balance terms "hidden" in Ck and Cl).
 
-				ConstrNum = Surface( SurfNum ).Construction;
+				ConstrNum = DataSurfaces::Construction[ SurfNum  - 1];
 
 				Ca = RadSysTiHBConstCoef( SurfNum );
 				Cb = RadSysTiHBToutCoef( SurfNum );
@@ -4348,13 +4348,13 @@ namespace LowTempRadiantSystem {
 		// FLOW:
 		SumHATsurf = 0.0;
 
-		for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
+		for ( SurfNum = ZoneSpecs[ ZoneNum  - 1].SurfaceFirst; SurfNum <= ZoneSpecs[ ZoneNum  - 1].SurfaceLast; ++SurfNum ) {
 			if ( ! Surface( SurfNum ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
 
 			Area = Surface( SurfNum ).Area;
 
 			if ( Surface( SurfNum ).Class == SurfaceClass_Window ) {
-				if ( SurfaceWindow( SurfNum ).ShadingFlag == IntShadeOn || SurfaceWindow( SurfNum ).ShadingFlag == IntBlindOn ) {
+				if ( SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() == IntShadeOn || SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() == IntBlindOn ) {
 					// The area is the shade or blind are = sum of the glazing area and the divider area (which is zero if no divider)
 					Area += SurfaceWindow( SurfNum ).DividerArea;
 				}
@@ -4364,7 +4364,7 @@ namespace LowTempRadiantSystem {
 					SumHATsurf += HConvIn( SurfNum ) * SurfaceWindow( SurfNum ).FrameArea * ( 1.0 + SurfaceWindow( SurfNum ).ProjCorrFrIn ) * SurfaceWindow( SurfNum ).FrameTempSurfIn;
 				}
 
-				if ( SurfaceWindow( SurfNum ).DividerArea > 0.0 && SurfaceWindow( SurfNum ).ShadingFlag != IntShadeOn && SurfaceWindow( SurfNum ).ShadingFlag != IntBlindOn ) {
+				if ( SurfaceWindow( SurfNum ).DividerArea > 0.0 && SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() != IntShadeOn && SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() != IntBlindOn ) {
 					// Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
 					SumHATsurf += HConvIn( SurfNum ) * SurfaceWindow( SurfNum ).DividerArea * ( 1.0 + 2.0 * SurfaceWindow( SurfNum ).ProjCorrDivIn ) * SurfaceWindow( SurfNum ).DividerTempSurfIn;
 				}
@@ -4555,7 +4555,7 @@ namespace LowTempRadiantSystem {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

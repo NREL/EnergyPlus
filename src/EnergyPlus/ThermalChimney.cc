@@ -506,13 +506,13 @@ namespace ThermalChimney {
 
 			ZoneNum = ThermalChimneySys( Loop ).RealZonePtr;
 			// start off with first surface in zone widths
-			majorW = Surface( Zone( ZoneNum ).SurfaceFirst ).Width;
+			majorW = Surface( ZoneSpecs[ZoneNum - 1].SurfaceFirst ).Width;
 			minorW = majorW;
 			TempmajorW = 0.0;
 			TemporaryWallSurfTemp = -10000.0;
 
 			// determine major width and minor width
-			for ( SurfNum = Zone( ZoneNum ).SurfaceFirst + 1; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
+			for ( SurfNum = ZoneSpecs[ZoneNum - 1].SurfaceFirst + 1; SurfNum <= ZoneSpecs[ZoneNum - 1].SurfaceLast; ++SurfNum ) {
 				if ( Surface( SurfNum ).Class != SurfaceClass_Wall ) continue;
 
 				if ( Surface( SurfNum ).Width > majorW ) {
@@ -524,7 +524,7 @@ namespace ThermalChimney {
 				}
 			}
 
-			for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
+			for ( SurfNum = ZoneSpecs[ZoneNum - 1].SurfaceFirst; SurfNum <= ZoneSpecs[ZoneNum - 1].SurfaceLast; ++SurfNum ) {
 				if ( Surface( SurfNum ).Width == majorW ) {
 					if ( TempSurfIn( SurfNum ) > TemporaryWallSurfTemp ) {
 						TemporaryWallSurfTemp = TempSurfIn( SurfNum );
@@ -534,7 +534,7 @@ namespace ThermalChimney {
 				}
 			}
 
-			for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
+			for ( SurfNum = ZoneSpecs[ZoneNum - 1].SurfaceFirst; SurfNum <= ZoneSpecs[ZoneNum - 1].SurfaceLast; ++SurfNum ) {
 
 				if ( ! Surface( SurfNum ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
 
@@ -872,7 +872,7 @@ namespace ThermalChimney {
 	//*****************************************************************************************
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

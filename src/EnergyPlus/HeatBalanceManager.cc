@@ -3551,7 +3551,7 @@ namespace HeatBalanceManager {
 						Construct( ConstrNum ).TCMasterConst = ConstrNum;
 						Construct( ConstrNum ).TCGlassID = iMatGlass; // the TC glass layer ID
 						Construct( ConstrNum ).TCLayerID = Layer;
-						Construct( ConstrNum ).TypeIsWindow = true;
+						ConstrWin[ ConstrNum  - 1 ].TypeIsWindow = true;
 					}
 				}
 
@@ -4277,8 +4277,8 @@ namespace HeatBalanceManager {
 			MaxLoadZoneRpt = 0.0;
 			CountWarmupDayPoints = 0;
 
-			SurfaceWindow.ThetaFace() = 296.15;
-			SurfaceWindow.EffInsSurfTemp() = 23.;
+			for(auto& srw : DataSurfaces::SurfaceRadiantWin) srw.EffInsSurfTemp = 23.0;
+			//SurfaceWindow.EffInsSurfTemp() = 23.;
 
 		}
 
@@ -5731,6 +5731,7 @@ Label20: ;
 			NominalU.deallocate();
 			TotConstructs += NGlSys;
 			Construct.allocate( TotConstructs );
+			ConstrWin.resize( TotConstructs );
 			NominalRforNominalUCalculation.allocate( TotConstructs );
 			NominalU.allocate( TotConstructs );
 			for ( loop = 1; loop <= TotConstructs - NGlSys; ++loop ) {
@@ -5806,7 +5807,7 @@ Label20: ;
 				Construct( ConstrNum ).ReflSolBeamBackCoef = 0.0;
 				Construct( ConstrNum ).W5FrameDivider = 0;
 				Construct( ConstrNum ).TotLayers = NGlass( IGlSys ) + NGaps( IGlSys );
-				Construct( ConstrNum ).TotGlassLayers = NGlass( IGlSys );
+				ConstrWin[ ConstrNum  - 1 ].TotGlassLayers = NGlass( IGlSys );
 				Construct( ConstrNum ).TotSolidLayers = NGlass( IGlSys );
 
 				for ( IGlass = 1; IGlass <= NGlass( IGlSys ); ++IGlass ) {
@@ -5815,9 +5816,9 @@ Label20: ;
 				}
 
 				Construct( ConstrNum ).OutsideRoughness = VerySmooth;
-				Construct( ConstrNum ).InsideAbsorpThermal = Material( TotMaterialsPrev + NGlass( IGlSys ) ).AbsorpThermalBack;
+				ConstrWin[ ConstrNum  - 1 ].InsideAbsorpThermal = Material( TotMaterialsPrev + NGlass( IGlSys ) ).AbsorpThermalBack;
 				Construct( ConstrNum ).OutsideAbsorpThermal = Material( TotMaterialsPrev + 1 ).AbsorpThermalFront;
-				Construct( ConstrNum ).TypeIsWindow = true;
+				ConstrWin[ ConstrNum  - 1 ].TypeIsWindow = true;
 				Construct( ConstrNum ).FromWindow5DataFile = true;
 				Construct( ConstrNum ).W5FileGlazingSysHeight = WinHeight( IGlSys );
 				Construct( ConstrNum ).W5FileGlazingSysWidth = WinWidth( IGlSys );
@@ -6770,6 +6771,7 @@ Label1000: ;
 		NominalU.deallocate();
 		Construct.allocate( TotConstructs + NumNewConst );
 		NominalRforNominalUCalculation.allocate( TotConstructs + NumNewConst );
+		ConstrWin.resize( TotConstructs + NumNewConst );
 		NominalU.allocate( TotConstructs + NumNewConst );
 		for ( Loop = 1; Loop <= TotConstructs; ++Loop ) {
 			Construct( Loop ) = ConstructSave( Loop );
@@ -6796,7 +6798,7 @@ Label1000: ;
 					Construct( NumNewConst ).TCMasterConst = Loop;
 					Construct( NumNewConst ).TCLayerID = Construct( Loop ).TCLayerID;
 					Construct( NumNewConst ).TCGlassID = Construct( Loop ).TCGlassID;
-					Construct( NumNewConst ).TypeIsWindow = true;
+					ConstrWin[ NumNewConst  - 1 ].TypeIsWindow = true;
 				}
 			}
 		}
@@ -8043,7 +8045,7 @@ Label1000: ;
 
 				BSDFTempMtrx.deallocate();
 			}
-			Construct( ConstrNum ).TypeIsWindow = true;
+			ConstrWin[ ConstrNum  - 1 ].TypeIsWindow = true;
 			Construct( ConstrNum ).WindowTypeBSDF = true;
 		}
 
@@ -8063,7 +8065,7 @@ Label1000: ;
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

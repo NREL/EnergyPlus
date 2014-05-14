@@ -553,9 +553,9 @@ namespace HeatBalFiniteDiffManager {
 		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
 			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 				if ( Surface( SurfNum ).HeatTransferAlgorithm != HeatTransferModel_CondFD ) continue;
-				if ( Surface( SurfNum ).Construction <= 0 ) continue; // Shading surface, not really a heat transfer surface
-				ConstrNum = Surface( SurfNum ).Construction;
-				if ( Construct( ConstrNum ).TypeIsWindow ) continue; //  Windows simulated in Window module
+				if ( Construction[ SurfNum  - 1] <= 0 ) continue; // Shading surface, not really a heat transfer surface
+				ConstrNum = Construction[ SurfNum  - 1];
+				if ( ConstrWin[ ConstrNum  - 1 ].TypeIsWindow ) continue; //  Windows simulated in Window module
 				SurfaceFD( SurfNum ).T = TempInitValue;
 				SurfaceFD( SurfNum ).TOld = TempInitValue;
 				SurfaceFD( SurfNum ).TT = TempInitValue;
@@ -596,9 +596,9 @@ namespace HeatBalFiniteDiffManager {
 
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			if ( Surface( SurfNum ).HeatTransferAlgorithm != HeatTransferModel_CondFD ) continue;
-			if ( Surface( SurfNum ).Construction <= 0 ) continue; // Shading surface, not really a heat transfer surface
-			ConstrNum = Surface( SurfNum ).Construction;
-			if ( Construct( ConstrNum ).TypeIsWindow ) continue; //  Windows simulated in Window module
+			if ( Construction[ SurfNum  - 1] <= 0 ) continue; // Shading surface, not really a heat transfer surface
+			ConstrNum = Construction[ SurfNum  - 1];
+			if ( ConstrWin[ ConstrNum  - 1 ].TypeIsWindow ) continue; //  Windows simulated in Window module
 			SurfaceFD( SurfNum ).T = SurfaceFD( SurfNum ).TOld;
 			SurfaceFD( SurfNum ).Rhov = SurfaceFD( SurfNum ).RhovOld;
 			SurfaceFD( SurfNum ).TD = SurfaceFD( SurfNum ).TDOld;
@@ -637,6 +637,7 @@ namespace HeatBalFiniteDiffManager {
 		using DataSurfaces::HeatTransferModel_CondFD;
 		using DataHeatBalance::HighDiffusivityThreshold;
 		using DataHeatBalance::ThinMaterialLayerThreshold;
+		using DataSurfaces::Construction;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -724,7 +725,7 @@ namespace HeatBalFiniteDiffManager {
 
 		for ( ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum ) {
 			//Need to skip window constructions and eventually window materials
-			if ( Construct( ConstrNum ).TypeIsWindow ) continue;
+		  if ( DataHeatBalance::ConstrWin[ ConstrNum  - 1 ].TypeIsWindow ) continue;
 
 			ConstructFD( ConstrNum ).Name.allocate( Construct( ConstrNum ).TotLayers );
 			ConstructFD( ConstrNum ).Thickness.allocate( Construct( ConstrNum ).TotLayers );
@@ -926,9 +927,9 @@ namespace HeatBalFiniteDiffManager {
 			if ( ! Surface( Surf ).HeatTransSurf ) continue;
 			if ( Surface( Surf ).Class == SurfaceClass_Window ) continue;
 			if ( Surface( Surf ).HeatTransferAlgorithm != HeatTransferModel_CondFD ) continue;
-			//    IF(Surface(Surf)%Construction <= 0) CYCLE  ! Shading surface, not really a heat transfer surface
-			ConstrNum = Surface( Surf ).Construction;
-			//    IF(Construct(ConstrNum)%TypeIsWindow) CYCLE  !  Windows simulated in Window module
+			//    IF(Construction[ Surf - 1 ] <= 0) CYCLE  ! Shading surface, not really a heat transfer surface
+			ConstrNum = DataSurfaces::Construction[ Surf  - 1];
+			//    IF(ConstrWin[ ConstrNum - 1 ].TypeIsWindow) CYCLE  !  Windows simulated in Window module
 			TotNodes = ConstructFD( ConstrNum ).TotNodes;
 
 			//Allocate the Surface Arrays
@@ -984,7 +985,7 @@ namespace HeatBalFiniteDiffManager {
 
 			SetupOutputVariable( "CondFD Inner Solver Loop Iteration Count [ ]", SurfaceFD( SurfNum ).GSloopCounter, "Zone", "Sum", Surface( SurfNum ).Name );
 
-			TotNodes = ConstructFD( Surface( SurfNum ).Construction ).TotNodes; // Full size nodes, start with outside face.
+			TotNodes = ConstructFD( Construction[ SurfNum  - 1] ).TotNodes; // Full size nodes, start with outside face.
 			for ( Lay = 1; Lay <= TotNodes + 1; ++Lay ) { // include inside face node
 				SetupOutputVariable( "CondFD Surface Temperature Node " + TrimSigDigits( Lay ) + " [C]", SurfaceFD( SurfNum ).TDreport( Lay ), "Zone", "State", Surface( SurfNum ).Name );
 			}
@@ -1032,6 +1033,7 @@ namespace HeatBalFiniteDiffManager {
 		using DataHeatBalance::CondFDRelaxFactor;
 		using DataGlobals::KickOffSimulation;
 		using DataSurfaces::HeatTransferModel_CondFD;
+		using DataSurfaces::Construction;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1064,7 +1066,7 @@ namespace HeatBalFiniteDiffManager {
 		static Real64 MaxDelTemp( 0.0 );
 		int NodeNum;
 
-		ConstrNum = Surface( Surf ).Construction;
+		ConstrNum = Construction[ Surf  - 1 ];
 
 		TotNodes = ConstructFD( ConstrNum ).TotNodes;
 		TotLayers = Construct( ConstrNum ).TotLayers;
@@ -1211,7 +1213,7 @@ namespace HeatBalFiniteDiffManager {
 		// Locals
 		int ConstrNum;
 
-		ConstrNum = Surface( Surf ).Construction;
+		ConstrNum = DataSurfaces::Construction[ Surf  - 1 ];
 		SurfaceFD( Surf ).TOld = SurfaceFD( Surf ).T;
 		SurfaceFD( Surf ).RhovOld = SurfaceFD( Surf ).Rhov;
 		SurfaceFD( Surf ).TDOld = SurfaceFD( Surf ).TDreport;
@@ -1245,6 +1247,7 @@ namespace HeatBalFiniteDiffManager {
 		using DataHeatBalance::MaxAllowedDelTempCondFD;
 		using DataHeatBalance::CondFDRelaxFactorInput;
 		using DataHeatBalance::HeatTransferAlgosUsed;
+		using DataHeatBalance::ConstrWin;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1286,7 +1289,7 @@ namespace HeatBalFiniteDiffManager {
 			if ( any_eq( HeatTransferAlgosUsed, UseCondFD ) ) gio::write( OutputFileInits, "(A)" ) << "! <ConductionFiniteDifference Node>,Node Identifier, " " Node Distance From Outside Face {m}, Construction Name, Outward Material Name (or Face), Inward Material Name (or Face)";
 			for ( ThisNum = 1; ThisNum <= TotConstructs; ++ThisNum ) {
 
-				if ( Construct( ThisNum ).TypeIsWindow ) continue;
+				if ( ConstrWin[ ThisNum  - 1 ].TypeIsWindow ) continue;
 				if ( Construct( ThisNum ).TypeIsIRT ) continue;
 
 				gio::write( OutputFileInits, Format_700 ) << Construct( ThisNum ).Name << RoundSigDigits( ThisNum ) << RoundSigDigits( Construct( ThisNum ).TotLayers ) << RoundSigDigits( int( ConstructFD( ThisNum ).TotNodes + 1 ) ) << RoundSigDigits( ConstructFD( ThisNum ).DeltaTime / SecInHour, 6 );
@@ -1453,6 +1456,7 @@ namespace HeatBalFiniteDiffManager {
 		using DataHeatBalSurface::QdotRadOutRepPerArea;
 		using DataHeatBalSurface::QdotRadOutRep;
 		using DataHeatBalSurface::QRadOutReport;
+		using DataSurfaces::Construction;
 
 		// Argument array dimensioning
 
@@ -1502,7 +1506,7 @@ namespace HeatBalFiniteDiffManager {
 		int LayIn; // layer number for call to interior eqs
 		int NodeIn; // node number "I" for call to interior eqs
 
-		ConstrNum = Surface( Surf ).Construction;
+		ConstrNum = Construction[ Surf  - 1 ];
 
 		//Boundary Conditions from Simulation for Exterior
 		hconvo = HConvExtFD( Surf );
@@ -1540,8 +1544,8 @@ namespace HeatBalFiniteDiffManager {
 			// this is actually the inside face of another surface, or maybe this same surface if adiabatic
 			// switch around arguments for the other surf and call routines as for interior side BC from opposite face
 
-			LayIn = Construct( Surface( Surface( Surf ).ExtBoundCond ).Construction ).TotLayers;
-			NodeIn = ConstructFD( Surface( Surface( Surf ).ExtBoundCond ).Construction ).TotNodes + 1;
+			LayIn = Construct( Construction[ Surface( Surf ).ExtBoundCond  - 1] ).TotLayers;
+			NodeIn = ConstructFD( Construction[ Surface( Surf ).ExtBoundCond  - 1] ).TotNodes + 1;
 
 			if ( Surface( Surf ).ExtBoundCond == Surf ) { //adiabatic surface, PT addded since it is not the same as interzone wall
 				// as Outside Boundary Condition Object can be left blank.
@@ -1790,7 +1794,7 @@ namespace HeatBalFiniteDiffManager {
 		Real64 Cpo; // Const Cp from input
 		Real64 RhoS;
 
-		ConstrNum = Surface( Surf ).Construction;
+		ConstrNum = DataSurfaces::Construction[ Surf  - 1 ];
 
 		MatLay = Construct( ConstrNum ).LayerPoint( Lay );
 
@@ -1936,7 +1940,7 @@ namespace HeatBalFiniteDiffManager {
 		static bool RLayerPresent( false );
 		static bool RLayer2Present( false );
 
-		ConstrNum = Surface( Surf ).Construction;
+		ConstrNum = DataSurfaces::Construction[ Surf  - 1 ];
 
 		MatLay = Construct( ConstrNum ).LayerPoint( Lay );
 		MatLay2 = Construct( ConstrNum ).LayerPoint( Lay + 1 );
@@ -2248,12 +2252,12 @@ namespace HeatBalFiniteDiffManager {
 		Real64 SigmaCLoc;
 		Real64 QNetSurfInside;
 
-		ConstrNum = Surface( Surf ).Construction;
+		ConstrNum = DataSurfaces::Construction[ Surf  - 1 ];
 		SigmaRLoc = SigmaR( ConstrNum );
 		SigmaCLoc = SigmaC( ConstrNum );
 
 		//Set the internal conditions to local variables
-		NetLWRadToSurfFD = NetLWRadToSurf( Surf );
+		NetLWRadToSurfFD = NetLWRadToSurf[ Surf - 1 ];
 		QRadSWInFD = QRadSWInAbs( Surf );
 		QHtRadSysSurfFD = QHTRadSysSurf( Surf );
 		QHWBaseboardSurfFD = QHWBaseboardSurf( Surf );
@@ -2492,7 +2496,7 @@ namespace HeatBalFiniteDiffManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

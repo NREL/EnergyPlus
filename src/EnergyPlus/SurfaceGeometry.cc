@@ -107,6 +107,8 @@ namespace SurfaceGeometry {
 	FArray1D< SurfaceData > SurfaceTmp; // Allocated/Deallocated during input processing
 	FArray1D< SurfaceData > SurfaceTmpSave; // Allocated/Deallocated during input processing
 
+        std::vector<int> TmpConstruction;
+
 	// Functions
 
 	void
@@ -277,12 +279,12 @@ namespace SurfaceGeometry {
 			if ( ! Surface( SurfNum ).HeatTransSurf ) continue; // Skip shadowing (sub)surfaces
 			ZoneNum = Surface( SurfNum ).Zone;
 			Zone( ZoneNum ).TotalSurfArea += Surface( SurfNum ).Area;
-			if ( Construct( Surface( SurfNum ).Construction ).TypeIsWindow ) {
+			if ( ConstrWin[ Construction[ SurfNum  - 1]  - 1 ].TypeIsWindow ) {
 				Zone( ZoneNum ).TotalSurfArea += SurfaceWindow( SurfNum ).FrameArea;
 				Zone( ZoneNum ).HasWindow = true;
 			}
 			if ( Surface( SurfNum ).Class == SurfaceClass_Roof ) ZoneCeilingArea( ZoneNum ) += Surface( SurfNum ).Area;
-			if ( ! Construct( Surface( SurfNum ).Construction ).TypeIsWindow ) {
+			if ( ! ConstrWin[ Construction[ SurfNum  - 1]  - 1 ].TypeIsWindow ) {
 				if ( Surface( SurfNum ).ExtBoundCond == ExternalEnvironment || Surface( SurfNum ).ExtBoundCond == OtherSideCondModeledExt ) {
 					Zone( ZoneNum ).ExteriorTotalSurfArea += Surface( SurfNum ).GrossArea;
 					if ( Surface( SurfNum ).Class == SurfaceClass_Wall ) {
@@ -346,7 +348,7 @@ namespace SurfaceGeometry {
 			if ( DetailedWWR ) {
 				gio::write( OutputFileDebug, "(A)" ) << Zone( ZoneNum ).Name + ',' + RoundSigDigits( Zone( ZoneNum ).ExtGrossWallArea, 2 ) + ',' + RoundSigDigits( Zone( ZoneNum ).ExtWindowArea, 2 );
 			}
-			for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
+			for ( SurfNum = ZoneSpecs[ZoneNum - 1].SurfaceFirst; SurfNum <= ZoneSpecs[ZoneNum - 1].SurfaceLast; ++SurfNum ) {
 				if ( Surface( SurfNum ).Class == SurfaceClass_Roof ) {
 					// Use Average Z for surface, more important for roofs than floors...
 					++CeilCount;
@@ -415,15 +417,15 @@ namespace SurfaceGeometry {
 			nonInternalMassSurfacesPresent = false;
 			TotSurfArea = 0.0;
 			Zone( ZoneNum ).Centroid = Vector( 0.0, 0.0, 0.0 );
-			if ( Surface( Zone( ZoneNum ).SurfaceFirst ).Sides > 0 ) {
-				Zone( ZoneNum ).MinimumX = Surface( Zone( ZoneNum ).SurfaceFirst ).Vertex( 1 ).x;
-				Zone( ZoneNum ).MaximumX = Surface( Zone( ZoneNum ).SurfaceFirst ).Vertex( 1 ).x;
-				Zone( ZoneNum ).MinimumY = Surface( Zone( ZoneNum ).SurfaceFirst ).Vertex( 1 ).y;
-				Zone( ZoneNum ).MaximumY = Surface( Zone( ZoneNum ).SurfaceFirst ).Vertex( 1 ).y;
-				Zone( ZoneNum ).MinimumZ = Surface( Zone( ZoneNum ).SurfaceFirst ).Vertex( 1 ).z;
-				Zone( ZoneNum ).MaximumZ = Surface( Zone( ZoneNum ).SurfaceFirst ).Vertex( 1 ).z;
+			if ( Surface( ZoneSpecs[ZoneNum - 1].SurfaceFirst ).Sides > 0 ) {
+				Zone( ZoneNum ).MinimumX = Surface( ZoneSpecs[ZoneNum - 1].SurfaceFirst ).Vertex( 1 ).x;
+				Zone( ZoneNum ).MaximumX = Surface( ZoneSpecs[ZoneNum - 1].SurfaceFirst ).Vertex( 1 ).x;
+				Zone( ZoneNum ).MinimumY = Surface( ZoneSpecs[ZoneNum - 1].SurfaceFirst ).Vertex( 1 ).y;
+				Zone( ZoneNum ).MaximumY = Surface( ZoneSpecs[ZoneNum - 1].SurfaceFirst ).Vertex( 1 ).y;
+				Zone( ZoneNum ).MinimumZ = Surface( ZoneSpecs[ZoneNum - 1].SurfaceFirst ).Vertex( 1 ).z;
+				Zone( ZoneNum ).MaximumZ = Surface( ZoneSpecs[ZoneNum - 1].SurfaceFirst ).Vertex( 1 ).z;
 			}
-			for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
+			for ( SurfNum = ZoneSpecs[ZoneNum - 1].SurfaceFirst; SurfNum <= ZoneSpecs[ZoneNum - 1].SurfaceLast; ++SurfNum ) {
 				if ( Surface( SurfNum ).Class == SurfaceClass_IntMass ) continue;
 				nonInternalMassSurfacesPresent = true;
 				if ( Surface( SurfNum ).Class == SurfaceClass_Wall || ( Surface( SurfNum ).Class == SurfaceClass_Roof ) || ( Surface( SurfNum ).Class == SurfaceClass_Floor ) ) {
@@ -487,7 +489,7 @@ namespace SurfaceGeometry {
 					// SurfaceClass_Window also covers glass doors and TDD:Diffusers
 					cNominalU = "N/A";
 				} else {
-					cNominalU = RoundSigDigits( NominalU( Surface( SurfNum ).Construction ), 3 );
+					cNominalU = RoundSigDigits( NominalU( Construction[ SurfNum  - 1] ), 3 );
 				}
 			} else {
 				cNominalUwithConvCoeffs = "**";
@@ -943,6 +945,7 @@ namespace SurfaceGeometry {
 		TotSurfaces = ( TotDetachedFixed + TotDetachedBldg + TotRectDetachedFixed + TotRectDetachedBldg ) * 2 + TotHTSurfs + TotHTSubs + TotShdSubs * 2 + TotIntMass + TotOverhangs * 2 + TotOverhangsProjection * 2 + TotFins * 4 + TotFinsProjection * 4 + TotDetailedWalls + TotDetailedRoofs + TotDetailedFloors + TotRectWindows + TotRectDoors + TotRectGlazedDoors + TotRectIZWindows + TotRectIZDoors + TotRectIZGlazedDoors + TotRectExtWalls + TotRectIntWalls + TotRectIZWalls + TotRectUGWalls + TotRectRoofs + TotRectCeilings + TotRectIZCeilings + TotRectGCFloors + TotRectIntFloors + TotRectIZFloors;
 
 		SurfaceTmp.allocate( TotSurfaces ); // Allocate the Surface derived type appropriately
+		TmpConstruction.resize( TotSurfaces);
 		// SurfaceTmp structure is allocated via derived type initialization.
 
 		SurfNum = 0;
@@ -985,6 +988,10 @@ namespace SurfaceGeometry {
 		}
 
 		SurfaceWindow.allocate( TotSurfaces );
+		SurfaceRadiantWin.resize( TotSurfaces );
+		IRfromParentZone = HeatBalanceIntRadExchange::GetHBREWriteVector< Real64 >( TotSurfaces );
+		IRfromParentZone.clear(0.0);
+		TmpConstruction.resize( TotSurfaces);
 
 		// add the "need to add" surfaces
 		//Debug    write(outputfiledebug,*) ' need to add ',NeedtoAddSurfaces+NeedToAddSubSurfaces
@@ -1001,8 +1008,8 @@ namespace SurfaceGeometry {
 			SurfaceTmp( CurNewSurf ).Zone = Found;
 			SurfaceTmp( CurNewSurf ).ZoneName = Zone( Found ).Name;
 			// Reverse Construction
-			SurfaceTmp( CurNewSurf ).Construction = AssignReverseConstructionNumber( SurfaceTmp( SurfNum ).Construction, SurfError );
-			SurfaceTmp( CurNewSurf ).ConstructionStoredInputValue = SurfaceTmp( CurNewSurf ).Construction;
+			TmpConstruction[ CurNewSurf  - 1] = AssignReverseConstructionNumber( TmpConstruction[ SurfNum  - 1], SurfError );
+			SurfaceTmp( CurNewSurf ).ConstructionStoredInputValue = TmpConstruction[ CurNewSurf  - 1];
 			// Reverse Vertices
 			NVert = SurfaceTmp( SurfNum ).Sides;
 			for ( Vert = 1; Vert <= SurfaceTmp( SurfNum ).Sides; ++Vert ) {
@@ -1245,6 +1252,7 @@ namespace SurfaceGeometry {
 
 		MovedSurfs = 0;
 		Surface.allocate( TotSurfaces ); // Allocate the Surface derived type appropriately
+		Construction.resize( TotSurfaces );
 
 		// Move all Detached Surfaces to Front
 
@@ -1255,6 +1263,7 @@ namespace SurfaceGeometry {
 
 			++MovedSurfs;
 			Surface( MovedSurfs ) = SurfaceTmp( SurfNum );
+			Construction[ MovedSurfs  - 1] = TmpConstruction[ SurfNum  - 1];
 			SurfaceTmp( SurfNum ).Class = SurfaceClass_Moved; //'Moved'
 		}
 
@@ -1275,6 +1284,7 @@ namespace SurfaceGeometry {
 
 					++MovedSurfs;
 					Surface( MovedSurfs ) = SurfaceTmp( SurfNum );
+					Construction[ MovedSurfs  - 1] = TmpConstruction[ SurfNum  - 1];
 					SurfaceTmp( SurfNum ).Class = SurfaceClass_Moved; // 'Moved'
 					SurfaceTmp( SurfNum ).BaseSurf = -1; // Default has base surface = base surface
 					BaseSurfNum = MovedSurfs;
@@ -1288,6 +1298,7 @@ namespace SurfaceGeometry {
 
 						++MovedSurfs;
 						Surface( MovedSurfs ) = SurfaceTmp( SubSurfNum );
+						Construction[ MovedSurfs  - 1] = TmpConstruction[ SubSurfNum  - 1];
 						SurfaceTmp( SubSurfNum ).Class = SurfaceClass_Moved; // 'Moved'
 						Surface( MovedSurfs ).BaseSurf = BaseSurfNum;
 						SurfaceTmp( SubSurfNum ).BaseSurf = -1;
@@ -1302,6 +1313,7 @@ namespace SurfaceGeometry {
 
 				++MovedSurfs;
 				Surface( MovedSurfs ) = SurfaceTmp( SurfNum );
+				Construction[ MovedSurfs  - 1] = TmpConstruction[ SurfNum  - 1];
 				Surface( MovedSurfs ).BaseSurf = MovedSurfs;
 				SurfaceTmp( SurfNum ).Class = SurfaceClass_Moved; // 'Moved'
 			}
@@ -1438,8 +1450,8 @@ namespace SurfaceGeometry {
 									ShowContinueError( "Surface=" + Surface( Found ).Name + ", Zone=" + Surface( Found ).ZoneName );
 								}
 							}
-							ConstrNum = Surface( SurfNum ).Construction;
-							ConstrNumFound = Surface( Found ).Construction;
+							ConstrNum = Construction[ SurfNum  - 1];
+							ConstrNumFound = Construction[ Found  - 1];
 							if ( ConstrNum <= 0 || ConstrNumFound <= 0 ) continue;
 							if ( Construct( ConstrNum ).ReverseConstructionNumLayersWarning && Construct( ConstrNumFound ).ReverseConstructionNumLayersWarning ) continue;
 							if ( Construct( ConstrNum ).ReverseConstructionLayersOrderWarning && Construct( ConstrNumFound ).ReverseConstructionLayersOrderWarning ) continue;
@@ -1698,8 +1710,8 @@ namespace SurfaceGeometry {
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 			for ( SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum ) { //TotSurfaces
 				if ( Surface( SurfNum ).Zone == ZoneNum ) {
-					if ( Zone( ZoneNum ).SurfaceFirst == 0 ) {
-						Zone( ZoneNum ).SurfaceFirst = SurfNum;
+					if ( ZoneSpecs[ZoneNum - 1].SurfaceFirst == 0 ) {
+						ZoneSpecs[ ZoneNum  - 1].SurfaceFirst = SurfNum;
 						break;
 					}
 				}
@@ -1707,14 +1719,14 @@ namespace SurfaceGeometry {
 		}
 		//  Surface First pointers are set, set last
 		if ( NumOfZones > 0 ) {
-			Zone( NumOfZones ).SurfaceLast = TotSurfaces;
+			ZoneSpecs[ NumOfZones  - 1].SurfaceLast = TotSurfaces;
 		}
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones - 1; ++ZoneNum ) {
-			Zone( ZoneNum ).SurfaceLast = Zone( ZoneNum + 1 ).SurfaceFirst - 1;
+			ZoneSpecs[ ZoneNum  - 1].SurfaceLast = ZoneSpecs[ ZoneNum + 1  - 1].SurfaceFirst - 1;
 		}
 
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-			if ( Zone( ZoneNum ).SurfaceFirst == 0 ) {
+			if ( ZoneSpecs[ZoneNum - 1].SurfaceFirst == 0 ) {
 				ShowSevereError( RoutineName + "Zone has no surfaces, Zone=" + Zone( ZoneNum ).Name );
 				SurfError = true;
 			}
@@ -1723,7 +1735,7 @@ namespace SurfaceGeometry {
 		// Set up Floor Areas for Zones
 		if ( ! SurfError ) {
 			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-				for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
+				for ( SurfNum = ZoneSpecs[ZoneNum - 1].SurfaceFirst; SurfNum <= ZoneSpecs[ZoneNum - 1].SurfaceLast; ++SurfNum ) {
 					if ( Surface( SurfNum ).Class == SurfaceClass_Floor ) {
 						Zone( ZoneNum ).FloorArea += Surface( SurfNum ).Area;
 						Zone( ZoneNum ).HasFloor = true;
@@ -1778,7 +1790,7 @@ namespace SurfaceGeometry {
 			// GLASSDOORs and TDD:DIFFUSERs will be treated as windows in the subsequent heat transfer and daylighting
 			// calculations. Reset class to 'Window' after saving the original designation in SurfaceWindow.
 
-			SurfaceWindow( SurfNum ).OriginalClass = Surface( SurfNum ).Class;
+			SurfaceRadiantWin[ SurfNum  - 1].OriginalClass = Surface( SurfNum ).Class;
 
 			if ( Surface( SurfNum ).Class == SurfaceClass_GlassDoor || Surface( SurfNum ).Class == SurfaceClass_TDD_Diffuser ) Surface( SurfNum ).Class = SurfaceClass_Window;
 
@@ -1798,12 +1810,12 @@ namespace SurfaceGeometry {
 
 				// no need to set the below -- it is the default
 				// Set variable that indicates if shading device has movable slats
-				//      SurfaceWindow(SurfNum)%MovableSlats = .FALSE.
+				//      SurfaceRadiantWin[SurfNum - 1].MovableSlats = .FALSE.
 
 				// TH 2/9/2010. Fixed for CR 8010 for speed up purpose rather than fixing the problem
 				WinShadingControlPtr = Surface( SurfNum ).WindowShadingControlPtr;
 				if ( WinShadingControlPtr != 0 ) {
-					if ( WindowShadingControl( WinShadingControlPtr ).SlatAngleControlForBlinds != WSC_SAC_FixedSlatAngle ) SurfaceWindow( SurfNum ).MovableSlats = true;
+					if ( WindowShadingControl( WinShadingControlPtr ).SlatAngleControlForBlinds != WSC_SAC_FixedSlatAngle ) SurfaceRadiantWin[ SurfNum  - 1].MovableSlats = true;
 					// for a constant schedule of slat angle, it acts the same way as fixed angle
 					// TH 3/14/2011, CR 8347. Code was commented out due to the use of ExternalInterface (BCVTB)
 					//IF(WindowShadingControl(WinShadingControlPtr)%SlatAngleControlForBlinds == WSC_SAC_ScheduledSlatAngle) THEN
@@ -1812,7 +1824,7 @@ namespace SurfaceGeometry {
 					//  IF (SchID /= 0 ) THEN
 					//    SchSlatAngle = GetScheduleMinValue(SchID)
 					//    IF (SchSlatAngle == GetScheduleMaxValue(SchID)) THEN
-					//      SurfaceWindow(SurfNum)%MovableSlats = .FALSE.
+					//      SurfaceRadiantWin[SurfNum - 1].MovableSlats = .FALSE.
 					//    ENDIF
 					//  ENDIF
 					//ENDIF
@@ -1837,7 +1849,7 @@ namespace SurfaceGeometry {
 							// TH 2/18/2010. CR 8010
 							// if it is a blind with movable slats, create one new blind and set it to VariableSlat if not done so yet.
 							//  the new blind is created only once, it can be shared by multiple windows though.
-							if ( SurfaceWindow( SurfNum ).MovableSlats && Blind( BlNum ).SlatAngleType != VariableSlats ) {
+							if ( SurfaceRadiantWin[ SurfNum  - 1].MovableSlats && Blind( BlNum ).SlatAngleType != VariableSlats ) {
 								errFlag = false;
 								AddVariableSlatBlind( BlNum, BlNumNew, errFlag );
 								// point to the new blind
@@ -1857,7 +1869,7 @@ namespace SurfaceGeometry {
 					// TH 5/17/2010. Fixed for CR 8121. Overwrite the blind slat angle with the constant scheduled value
 					// TH 3/14/2011. With fix for CR 8347, the following code is no longer needed.
 					//IF (SurfaceWindow(SurfNum)%BlindNumber >0 .AND. WinShadingControlPtr >0 ) THEN
-					//  IF (.NOT. SurfaceWindow(SurfNum)%MovableSlats .AND. &
+					//  IF (.NOT. SurfaceRadiantWin[SurfNum - 1].MovableSlats .AND. &
 					//    WindowShadingControl(WinShadingControlPtr)%SlatAngleControlForBlinds == WSC_SAC_ScheduledSlatAngle) THEN
 					//    Blind(SurfaceWindow(SurfNum)%BlindNumber)%SlatAngle = SchSlatAngle
 					//  ENDIF
@@ -1885,8 +1897,8 @@ namespace SurfaceGeometry {
 			OpaqueHTSurfs = 0;
 			OpaqueHTSurfsWithWin = 0;
 			InternalMassSurfs = 0;
-			if ( Zone( ZoneNum ).SurfaceFirst == 0 ) continue; // Zone with no surfaces
-			for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
+			if ( ZoneSpecs[ZoneNum - 1].SurfaceFirst == 0 ) continue; // Zone with no surfaces
+			for ( SurfNum = ZoneSpecs[ZoneNum - 1].SurfaceFirst; SurfNum <= ZoneSpecs[ZoneNum - 1].SurfaceLast; ++SurfNum ) {
 				if ( Surface( SurfNum ).Class == SurfaceClass_Floor || Surface( SurfNum ).Class == SurfaceClass_Wall || Surface( SurfNum ).Class == SurfaceClass_Roof ) ++OpaqueHTSurfs;
 				if ( Surface( SurfNum ).Class == SurfaceClass_IntMass ) ++InternalMassSurfs;
 				if ( Surface( SurfNum ).Class == SurfaceClass_Window ) {
@@ -1915,13 +1927,13 @@ namespace SurfaceGeometry {
 			// Check for EcoRoof and only 1 allowed to be used.
 			if ( ! Surface( SurfNum ).ExtEcoRoof ) continue;
 			if ( LayNumOutside == 0 ) {
-				LayNumOutside = Construct( Surface( SurfNum ).Construction ).LayerPoint( 1 );
+				LayNumOutside = Construct( Construction[ SurfNum  - 1] ).LayerPoint( 1 );
 				continue;
 			}
-			if ( LayNumOutside != Construct( Surface( SurfNum ).Construction ).LayerPoint( 1 ) ) {
+			if ( LayNumOutside != Construct( Construction[ SurfNum  - 1] ).LayerPoint( 1 ) ) {
 				ShowSevereError( RoutineName + "Only one EcoRoof Material is currently allowed for all constructions." );
 				ShowContinueError( "... first material=" + Material( LayNumOutside ).Name );
-				ShowContinueError( "... conflicting Construction=" + Construct( Surface( SurfNum ).Construction ).Name + " uses material=" + Material( Construct( Surface( SurfNum ).Construction ).LayerPoint( 1 ) ).Name );
+				ShowContinueError( "... conflicting Construction=" + Construct( Construction[ SurfNum  - 1] ).Name + " uses material=" + Material( Construct( Construction[ SurfNum  - 1]).LayerPoint( 1 ) ).Name );
 				ErrorsFound = true;
 			}
 		}
@@ -1952,7 +1964,7 @@ namespace SurfaceGeometry {
 			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 				if ( ! Surface( SurfNum ).HeatTransSurf ) continue; // ignore shading surfaces
 				if ( Surface( SurfNum ).ExtBoundCond > 0 && Surface( SurfNum ).ExtBoundCond != SurfNum ) continue; // interzone, not adiabatic surface
-				if ( ! Construct( Surface( SurfNum ).Construction ).TypeIsIRT ) continue;
+				if ( ! Construct( Construction[ SurfNum  - 1] ).TypeIsIRT ) continue;
 				if ( ! DisplayExtraWarnings ) {
 					++iTmp1;
 				} else {
@@ -2815,12 +2827,14 @@ namespace SurfaceGeometry {
 					SurfaceTmp( SurfNum ).Class = BaseSurfIDs( ClassItem );
 				}
 
-				SurfaceTmp( SurfNum ).Construction = FindItemInList( cAlphaArgs( ArgPointer ), Construct.Name(), TotConstructs );
+				//SurfaceTmp( SurfNum ).Construction 
+				TmpConstruction[ SurfNum  - 1] = FindItemInList( cAlphaArgs( ArgPointer ), Construct.Name(), TotConstructs );
 
-				if ( SurfaceTmp( SurfNum ).Construction == 0 ) {
+				//				if ( SurfaceTmp( SurfNum ).Construction == 0 ) {
+				if( TmpConstruction[ SurfNum  - 1] == 0){
 					ErrorsFound = true;
 					ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( ArgPointer ) + "=\"" + cAlphaArgs( ArgPointer ) + "\"." );
-				} else if ( Construct( SurfaceTmp( SurfNum ).Construction ).TypeIsWindow ) {
+				} else if ( ConstrWin[ TmpConstruction[ SurfNum  - 1] - 1].TypeIsWindow ) {
 					ErrorsFound = true;
 					ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( ArgPointer ) + "=\"" + cAlphaArgs( ArgPointer ) + "\" - has Window materials." );
 					if ( Item == 1 ) {
@@ -2829,8 +2843,8 @@ namespace SurfaceGeometry {
 						ShowContinueError( "...because Surface Type=" + BaseSurfCls( ClassItem ) );
 					}
 				} else {
-					Construct( SurfaceTmp( SurfNum ).Construction ).IsUsed = true;
-					SurfaceTmp( SurfNum ).ConstructionStoredInputValue = SurfaceTmp( SurfNum ).Construction;
+				  Construct( TmpConstruction[ SurfNum  - 1] ).IsUsed = true; //SurfaceTmp( SurfNum ).Construction ).IsUsed = true;
+				  SurfaceTmp( SurfNum ).ConstructionStoredInputValue = TmpConstruction[ SurfNum  - 1]; //SurfaceTmp( SurfNum ).Construction;
 				}
 				SurfaceTmp( SurfNum ).HeatTransSurf = true;
 				SurfaceTmp( SurfNum ).BaseSurf = SurfNum;
@@ -2885,15 +2899,15 @@ namespace SurfaceGeometry {
 							NoFCGroundTempObjWarning = false;
 						}
 					}
-					if ( SurfaceTmp( SurfNum ).Construction > 0 ) {
-						if ( SurfaceTmp( SurfNum ).Class == SurfaceClass_Wall && ! Construct( SurfaceTmp( SurfNum ).Construction ).TypeIsCfactorWall ) {
+					if ( TmpConstruction[ SurfNum  - 1] > 0 ) { //SurfaceTmp( SurfNum ).Construction > 0 ) {
+					  if ( SurfaceTmp( SurfNum ).Class == SurfaceClass_Wall && ! Construct( TmpConstruction[ SurfNum  - 1] ).TypeIsCfactorWall ) { //SurfaceTmp( SurfNum ).Construction ).TypeIsCfactorWall ) {
 							ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( ArgPointer ) );
-							ShowContinueError( "Construction=\"" + Construct( SurfaceTmp( SurfNum ).Construction ).Name + "\" is not type Construction:CfactorUndergroundWall." );
+							ShowContinueError( "Construction=\"" + Construct( TmpConstruction[ SurfNum  - 1] ).Name + "\" is not type Construction:CfactorUndergroundWall." );  //SurfaceTmp( SurfNum ).Construction ).Name ) + "\" is not type Construction:CfactorUndergroundWall." );
 							ErrorsFound = true;
 						}
-						if ( SurfaceTmp( SurfNum ).Class == SurfaceClass_Floor && ! Construct( SurfaceTmp( SurfNum ).Construction ).TypeIsFfactorFloor ) {
+					  if ( SurfaceTmp( SurfNum ).Class == SurfaceClass_Floor && ! Construct( TmpConstruction[ SurfNum  - 1]).TypeIsFfactorFloor ) {  ////SurfaceTmp( SurfNum ).Construction ).TypeIsFfactorFloor ) {
 							ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( ArgPointer ) );
-							ShowContinueError( "Construction=\"" + Construct( SurfaceTmp( SurfNum ).Construction ).Name + "\" is not type Construction:FfactorGroundFloor." );
+							ShowContinueError( "Construction=\"" + Construct( TmpConstruction[ SurfNum  - 1] ).Name + "\" is not type Construction:FfactorGroundFloor." );  //SurfaceTmp( SurfNum ).Construction ).Name ) + "\" is not type Construction:FfactorGroundFloor." );
 							ErrorsFound = true;
 						}
 					}
@@ -2989,7 +3003,8 @@ namespace SurfaceGeometry {
 				}
 
 				//Set the logical flag for the EcoRoof presented, this is only based on the flag in the construction type
-				if ( SurfaceTmp( SurfNum ).Construction > 0 ) SurfaceTmp( SurfNum ).ExtEcoRoof = Construct( SurfaceTmp( SurfNum ).Construction ).TypeIsEcoRoof;
+				if ( TmpConstruction[ SurfNum  - 1] > 0 ) SurfaceTmp( SurfNum ).ExtEcoRoof = Construct( TmpConstruction[ SurfNum  - 1] ).TypeIsEcoRoof;
+				//				if ( SurfaceTmp( SurfNum ).Construction > 0 ) SurfaceTmp( SurfNum ).ExtEcoRoof = Construct( SurfaceTmp( SurfNum ).Construction ).TypeIsEcoRoof;
 
 				SurfaceTmp( SurfNum ).ViewFactorGround = rNumericArgs( 1 );
 				if ( lNumericFieldBlanks( 1 ) ) SurfaceTmp( SurfNum ).ViewFactorGround = AutoCalculate;
@@ -3020,22 +3035,23 @@ namespace SurfaceGeometry {
 				}
 
 				CheckConvexity( SurfNum, SurfaceTmp( SurfNum ).Sides );
-				if ( SurfaceTmp( SurfNum ).Construction > 0 ) {
+				if ( TmpConstruction[ SurfNum  - 1] > 0 ) {
+				  //				if ( SurfaceTmp( SurfNum ).Construction > 0 ) {
 					//Check wall height for the CFactor walls
-					if ( SurfaceTmp( SurfNum ).Class == SurfaceClass_Wall && Construct( SurfaceTmp( SurfNum ).Construction ).TypeIsCfactorWall ) {
-						if ( std::abs( SurfaceTmp( SurfNum ).Height - Construct( SurfaceTmp( SurfNum ).Construction ).Height ) > 0.05 ) {
+				  if ( SurfaceTmp( SurfNum ).Class == SurfaceClass_Wall && Construct( TmpConstruction[ SurfNum  - 1] ).TypeIsCfactorWall ) {  //SurfaceTmp( SurfNum ).Construction ).TypeIsCfactorWall ) {
+				    if ( std::abs( SurfaceTmp( SurfNum ).Height - Construct( TmpConstruction[ SurfNum  - 1] ).Height ) > 0.05 ) {  //SurfaceTmp( SurfNum ).Construction ).Height ) > 0.05 ) {
 							ShowWarningError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", underground Wall Height = " + TrimSigDigits( SurfaceTmp( SurfNum ).Height, 2 ) );
 							ShowContinueError( "..which does not match its construction height." );
 						}
 					}
 
 					//Check area and perimeter for the FFactor floors
-					if ( SurfaceTmp( SurfNum ).Class == SurfaceClass_Floor && Construct( SurfaceTmp( SurfNum ).Construction ).TypeIsFfactorFloor ) {
-						if ( std::abs( SurfaceTmp( SurfNum ).Area - Construct( SurfaceTmp( SurfNum ).Construction ).Area ) > 0.1 ) {
+				  if ( SurfaceTmp( SurfNum ).Class == SurfaceClass_Floor && Construct( TmpConstruction[ SurfNum  - 1] ).TypeIsFfactorFloor ) {  //SurfaceTmp( SurfNum ).Construction ).TypeIsFfactorFloor ) {
+				    if ( std::abs( SurfaceTmp( SurfNum ).Area - Construct( TmpConstruction[ SurfNum  - 1] ).Area ) > 0.1 ) {  //SurfaceTmp( SurfNum ).Construction ).Area ) > 0.1 ) {
 							ShowWarningError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", underground Floor Area = " + TrimSigDigits( SurfaceTmp( SurfNum ).Area, 2 ) );
 							ShowContinueError( "..which does not match its construction area." );
 						}
-						if ( SurfaceTmp( SurfNum ).Perimeter < Construct( SurfaceTmp( SurfNum ).Construction ).PerimeterExposed - 0.1 ) {
+				    if ( SurfaceTmp( SurfNum ).Perimeter < Construct( TmpConstruction[ SurfNum  - 1] ).PerimeterExposed - 0.1 ) {  //SurfaceTmp( SurfNum ).Construction ).PerimeterExposed - 0.1 ) {
 							ShowWarningError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", underground Floor Perimeter = " + TrimSigDigits( SurfaceTmp( SurfNum ).Perimeter, 2 ) );
 							ShowContinueError( "..which is less than its construction exposed perimeter." );
 						}
@@ -3208,18 +3224,19 @@ namespace SurfaceGeometry {
 				SurfaceTmp( SurfNum ).Name = cAlphaArgs( 1 ); // Set the Surface Name in the Derived Type
 				SurfaceTmp( SurfNum ).Class = BaseSurfIDs( ClassItem ); // Set class number
 
-				SurfaceTmp( SurfNum ).Construction = FindItemInList( cAlphaArgs( 2 ), Construct.Name(), TotConstructs );
+				TmpConstruction[ SurfNum  - 1] = FindItemInList( cAlphaArgs( 2 ), Construct.Name(), TotConstructs );//SurfaceTmp( SurfNum ).Construction = FindItemInList( cAlphaArgs( 2 ), Construct.Name(), TotConstructs );
 
-				if ( SurfaceTmp( SurfNum ).Construction == 0 ) {
+				if ( TmpConstruction[ SurfNum  - 1] == 0 ) {
+				  //				if ( SurfaceTmp( SurfNum ).Construction == 0 ) {
 					ErrorsFound = true;
 					ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
-				} else if ( Construct( SurfaceTmp( SurfNum ).Construction ).TypeIsWindow ) {
+				} else if ( ConstrWin[ TmpConstruction[ SurfNum  - 1] - 1].TypeIsWindow ) {  //SurfaceTmp( SurfNum ).Construction ].TypeIsWindow ) {
 					ErrorsFound = true;
 					ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 2 ) + "\" - has Window materials." );
 					ShowContinueError( "...because " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
 				} else {
-					Construct( SurfaceTmp( SurfNum ).Construction ).IsUsed = true;
-					SurfaceTmp( SurfNum ).ConstructionStoredInputValue = SurfaceTmp( SurfNum ).Construction;
+				  Construct( TmpConstruction[ SurfNum  - 1] ).IsUsed = true;  //Construct( SurfaceTmp( SurfNum ).Construction ).IsUsed = true;
+				  SurfaceTmp( SurfNum ).ConstructionStoredInputValue = TmpConstruction[ SurfNum  - 1];  //SurfaceTmp( SurfNum ).Construction;
 				}
 				SurfaceTmp( SurfNum ).HeatTransSurf = true;
 				SurfaceTmp( SurfNum ).BaseSurf = SurfNum;
@@ -3238,16 +3255,17 @@ namespace SurfaceGeometry {
 				}
 
 				SurfaceTmp( SurfNum ).ExtBoundCond = ExtBoundCondition;
-				if ( SurfaceTmp( SurfNum ).Construction > 0 ) {
-					if ( SurfaceTmp( SurfNum ).Class == SurfaceClass_Wall && Construct( SurfaceTmp( SurfNum ).Construction ).TypeIsCfactorWall && SurfaceTmp( SurfNum ).ExtBoundCond == Ground ) {
+				if ( TmpConstruction[ SurfNum  - 1] > 0 ) {
+				  //				if ( SurfaceTmp( SurfNum ).Construction > 0 ) {
+				  if ( SurfaceTmp( SurfNum ).Class == SurfaceClass_Wall && Construct( TmpConstruction[ SurfNum  - 1] ).TypeIsCfactorWall && SurfaceTmp( SurfNum ).ExtBoundCond == Ground ) {  //SurfaceTmp( SurfNum ).Construction ).TypeIsCfactorWall && SurfaceTmp( SurfNum ).ExtBoundCond == Ground ) {
 						SurfaceTmp( SurfNum ).ExtBoundCond = GroundFCfactorMethod;
-					} else if ( Construct( SurfaceTmp( SurfNum ).Construction ).TypeIsCfactorWall ) {
+				  } else if ( Construct( TmpConstruction[ SurfNum  - 1] ).TypeIsCfactorWall ) {  //SurfaceTmp( SurfNum ).Construction ).TypeIsCfactorWall ) {
 						ErrorsFound = true;
 						ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", Construction type is \"Construction:CfactorUndergroundWall\" but invalid for this object." );
 					}
-					if ( SurfaceTmp( SurfNum ).Class == SurfaceClass_Floor && Construct( SurfaceTmp( SurfNum ).Construction ).TypeIsFfactorFloor && SurfaceTmp( SurfNum ).ExtBoundCond == Ground ) {
+				  if ( SurfaceTmp( SurfNum ).Class == SurfaceClass_Floor && Construct( TmpConstruction[ SurfNum  - 1] ).TypeIsFfactorFloor && SurfaceTmp( SurfNum ).ExtBoundCond == Ground ) {  //SurfaceTmp( SurfNum ).Construction ).TypeIsFfactorFloor && SurfaceTmp( SurfNum ).ExtBoundCond == Ground ) {
 						SurfaceTmp( SurfNum ).ExtBoundCond = GroundFCfactorMethod;
-					} else if ( Construct( SurfaceTmp( SurfNum ).Construction ).TypeIsFfactorFloor ) {
+				  } else if ( Construct( TmpConstruction[ SurfNum  - 1] ).TypeIsFfactorFloor ) {  //SurfaceTmp( SurfNum ).Construction ).TypeIsFfactorFloor ) {
 						ErrorsFound = true;
 						ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", Construction type is \"Construction:FfactorGroundFloor\" but invalid for this object." );
 					}
@@ -3261,7 +3279,8 @@ namespace SurfaceGeometry {
 					SurfaceTmp( SurfNum ).ExtWind = true;
 
 					//Set the logical flag for the EcoRoof presented, this is only based on the flag in the construction type
-					if ( SurfaceTmp( SurfNum ).Construction > 0 ) SurfaceTmp( SurfNum ).ExtEcoRoof = Construct( SurfaceTmp( SurfNum ).Construction ).TypeIsEcoRoof;
+					if ( TmpConstruction[ SurfNum  - 1] > 0 ) SurfaceTmp( SurfNum ).ExtEcoRoof = Construct( TmpConstruction[ SurfNum  - 1] ).TypeIsEcoRoof;
+					//					if ( SurfaceTmp( SurfNum ).Construction > 0 ) SurfaceTmp( SurfNum ).ExtEcoRoof = Construct( SurfaceTmp( SurfNum ).Construction ).TypeIsEcoRoof;
 
 				} else if ( SurfaceTmp( SurfNum ).ExtBoundCond == UnreconciledZoneSurface ) {
 					if ( GettingIZSurfaces ) {
@@ -3323,7 +3342,7 @@ namespace SurfaceGeometry {
 
 				//Check wall height for the CFactor walls
 				if ( SurfaceTmp( SurfNum ).Class == SurfaceClass_Wall && SurfaceTmp( SurfNum ).ExtBoundCond == GroundFCfactorMethod ) {
-					if ( std::abs( SurfaceTmp( SurfNum ).Height - Construct( SurfaceTmp( SurfNum ).Construction ).Height ) > 0.05 ) {
+				  if ( std::abs( SurfaceTmp( SurfNum ).Height - Construct( TmpConstruction[ SurfNum  - 1] ).Height ) > 0.05 ) {  //SurfaceTmp( SurfNum ).Construction ).Height ) > 0.05 ) {
 						ShowWarningError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", underground Wall Height = " + TrimSigDigits( SurfaceTmp( SurfNum ).Height, 2 ) );
 						ShowContinueError( "..which deos not match its construction height." );
 					}
@@ -3331,12 +3350,12 @@ namespace SurfaceGeometry {
 
 				//Check area and perimeter for the FFactor floors
 				if ( SurfaceTmp( SurfNum ).Class == SurfaceClass_Floor && SurfaceTmp( SurfNum ).ExtBoundCond == GroundFCfactorMethod ) {
-					if ( std::abs( SurfaceTmp( SurfNum ).Area - Construct( SurfaceTmp( SurfNum ).Construction ).Area ) > 0.1 ) {
+				  if ( std::abs( SurfaceTmp( SurfNum ).Area - Construct( TmpConstruction[ SurfNum  - 1] ).Area ) > 0.1 ) {  //SurfaceTmp( SurfNum ).Construction ).Area ) > 0.1 ) {
 						ShowWarningError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", underground Floor Area = " + TrimSigDigits( SurfaceTmp( SurfNum ).Area, 2 ) );
 						ShowContinueError( "..which does not match its construction area." );
 					}
-					if ( SurfaceTmp( SurfNum ).Perimeter < Construct( SurfaceTmp( SurfNum ).Construction ).PerimeterExposed - 0.1 ) {
-						ShowWarningError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", underground Floor Perimeter = " + TrimSigDigits( SurfaceTmp( SurfNum ).Perimeter, 2 ) );
+				  if ( SurfaceTmp( SurfNum ).Perimeter < Construct( TmpConstruction[ SurfNum  - 1] ).PerimeterExposed - 0.1 ) {  //SurfaceTmp( SurfNum ).Construction ).PerimeterExposed - 0.1 ) {
+						ShowWarningError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", underground Floor Perimeter = " + TrimSigDigits( SurfaceTmp( SurfNum ).Perimeter, 2 )  );
 						ShowContinueError( "..which is less than its construction exposed perimeter." );
 					}
 				}
@@ -3700,27 +3719,34 @@ namespace SurfaceGeometry {
 				SurfaceTmp( SurfNum ).Class = SubSurfIDs( ValidChk ); // Set class number
 			}
 
-			SurfaceTmp( SurfNum ).Construction = FindItemInList( cAlphaArgs( 3 ), Construct.Name(), TotConstructs );
+			TmpConstruction[ SurfNum  - 1] = FindItemInList( cAlphaArgs( 3 ), Construct.Name(), TotConstructs );
+			//			SurfaceTmp( SurfNum ).Construction = FindItemInList( cAlphaArgs( 3 ), Construct.Name(), TotConstructs );
 
-			if ( SurfaceTmp( SurfNum ).Construction == 0 ) {
+			if ( TmpConstruction[ SurfNum  - 1] == 0 ) {
+			  //			if ( SurfaceTmp( SurfNum ).Construction == 0 ) {
 				ErrorsFound = true;
 				ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
 			} else {
-				Construct( SurfaceTmp( SurfNum ).Construction ).IsUsed = true;
-				SurfaceTmp( SurfNum ).ConstructionStoredInputValue = SurfaceTmp( SurfNum ).Construction;
+				Construct( TmpConstruction[ SurfNum  - 1] ).IsUsed = true;
+				//				Construct( SurfaceTmp( SurfNum ).Construction ).IsUsed = true;
+				SurfaceTmp( SurfNum ).ConstructionStoredInputValue = TmpConstruction[ SurfNum  - 1];  //SurfaceTmp( SurfNum ).Construction;
 			}
 
 			if ( SurfaceTmp( SurfNum ).Class == SurfaceClass_Window || SurfaceTmp( SurfNum ).Class == SurfaceClass_GlassDoor || SurfaceTmp( SurfNum ).Class == SurfaceClass_TDD_Diffuser || SurfaceTmp( SurfNum ).Class == SurfaceClass_TDD_Dome ) {
 
-				if ( SurfaceTmp( SurfNum ).Construction != 0 ) {
-					if ( ! Construct( SurfaceTmp( SurfNum ).Construction ).TypeIsWindow ) {
+				if ( TmpConstruction[ SurfNum  - 1] != 0 ) {
+				  //				if ( SurfaceTmp( SurfNum ).Construction != 0 ) {
+					if ( ! ConstrWin[ TmpConstruction[ SurfNum  - 1]  - 1 ].TypeIsWindow ) {
+					  //					if ( ! ConstrWin[ SurfaceTmp( SurfNum ).Construction  - 1 ].TypeIsWindow ) {
 						ErrorsFound = true;
 						ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\" has an opaque surface construction; it should have a window construction." );
 					}
 				}
 
-			} else if ( SurfaceTmp( SurfNum ).Construction != 0 ) {
-				if ( Construct( SurfaceTmp( SurfNum ).Construction ).TypeIsWindow ) {
+			} else if ( TmpConstruction[ SurfNum  - 1] != 0 ) {
+			  //			} else if ( SurfaceTmp( SurfNum ).Construction != 0 ) {
+				if ( ConstrWin[ TmpConstruction[ SurfNum  - 1]  - 1 ].TypeIsWindow ) {
+				  //				if ( ConstrWin[ SurfaceTmp( SurfNum ).Construction  - 1 ].TypeIsWindow ) {
 					ErrorsFound = true;
 					ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\" - has Window materials." );
 					ShowContinueError( "...because " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
@@ -4042,27 +4068,34 @@ namespace SurfaceGeometry {
 				SurfaceTmp( SurfNum ).Name = cAlphaArgs( 1 ); // Set the Surface Name in the Derived Type
 				SurfaceTmp( SurfNum ).Class = SubSurfIDs( ClassItem ); // Set class number
 
-				SurfaceTmp( SurfNum ).Construction = FindItemInList( cAlphaArgs( 2 ), Construct.Name(), TotConstructs );
+				TmpConstruction[ SurfNum  - 1] = FindItemInList( cAlphaArgs( 2 ), Construct.Name(), TotConstructs );
+				//				SurfaceTmp( SurfNum ).Construction = FindItemInList( cAlphaArgs( 2 ), Construct.Name(), TotConstructs );
 
-				if ( SurfaceTmp( SurfNum ).Construction == 0 ) {
+				if ( TmpConstruction[ SurfNum  - 1]== 0 ) {
+				  //				if ( SurfaceTmp( SurfNum ).Construction == 0 ) {
 					ErrorsFound = true;
 					ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				} else {
-					Construct( SurfaceTmp( SurfNum ).Construction ).IsUsed = true;
-					SurfaceTmp( SurfNum ).ConstructionStoredInputValue = SurfaceTmp( SurfNum ).Construction;
+					Construct( TmpConstruction[ SurfNum  - 1] ).IsUsed = true;
+					//					Construct( SurfaceTmp( SurfNum ).Construction ).IsUsed = true;
+					SurfaceTmp( SurfNum ).ConstructionStoredInputValue = TmpConstruction[ SurfNum  - 1];  //SurfaceTmp( SurfNum ).Construction;
 				}
 
 				if ( SurfaceTmp( SurfNum ).Class == SurfaceClass_Window || SurfaceTmp( SurfNum ).Class == SurfaceClass_GlassDoor ) {
 
-					if ( SurfaceTmp( SurfNum ).Construction != 0 ) {
-						if ( ! Construct( SurfaceTmp( SurfNum ).Construction ).TypeIsWindow ) {
+					if ( TmpConstruction[ SurfNum  - 1] != 0 ) {
+					  //					if ( SurfaceTmp( SurfNum ).Construction != 0 ) {
+						if ( ! ConstrWin[ TmpConstruction[ SurfNum  - 1]  - 1 ].TypeIsWindow ) {
+						  //						if ( ! ConstrWin[ SurfaceTmp( SurfNum ).Construction  - 1 ].TypeIsWindow ) {
 							ErrorsFound = true;
 							ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\" has an opaque surface construction; it should have a window construction." );
 						}
 					}
 
-				} else if ( SurfaceTmp( SurfNum ).Construction != 0 ) {
-					if ( Construct( SurfaceTmp( SurfNum ).Construction ).TypeIsWindow ) {
+				} else if ( TmpConstruction[ SurfNum  - 1] != 0 ) {
+				  //				} else if ( SurfaceTmp( SurfNum ).Construction != 0 ) {
+					if ( ConstrWin[ TmpConstruction[ SurfNum  - 1]  - 1 ].TypeIsWindow ) {
+					  //					if ( ConstrWin[ SurfaceTmp( SurfNum ).Construction  - 1 ].TypeIsWindow ) {
 						ErrorsFound = true;
 						ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" - has Window materials." );
 					}
@@ -4296,7 +4329,8 @@ namespace SurfaceGeometry {
 
 		// Error checks for shades and blinds
 
-		ConstrNum = SurfaceTmp( SurfNum ).Construction;
+		ConstrNum =  TmpConstruction[ SurfNum  - 1];
+		//		ConstrNum = SurfaceTmp( SurfNum ).Construction;
 		if ( ! ErrorsFound && WSCPtr > 0 && ConstrNum > 0 && ConstrNumSh > 0 ) {
 
 			if ( WindowShadingControl( WSCPtr ).ShadingType == WSC_ST_InteriorShade || WindowShadingControl( WSCPtr ).ShadingType == WSC_ST_InteriorBlind ) {
@@ -4304,8 +4338,8 @@ namespace SurfaceGeometry {
 				TotShLayers = Construct( ConstrNumSh ).TotLayers;
 				if ( TotShLayers - 1 != TotLayers ) {
 					ShowWarningError( "WindowProperty:ShadingControl: Interior shade or blind: Potential problem in match of " "unshaded/shaded constructions, shaded should have 1 more layers than unshaded." );
-					ShowContinueError( "Unshaded construction=" + Construct( ConstrNum ).Name );
-					ShowContinueError( "Shaded construction=" + Construct( ConstrNumSh ).Name );
+					ShowContinueError( "Unshaded construction=" + trim( Construct( ConstrNum ).Name ) );
+					ShowContinueError( "Shaded construction=" + trim( Construct( ConstrNumSh ).Name ) );
 					ShowContinueError( "If preceding two constructions are same name, you have likely specified a " "WindowProperty:ShadingControl (Field #3) with the Window Construction rather than " "a shaded construction." );
 				}
 				for ( Lay = 1; Lay <= Construct( ConstrNum ).TotLayers; ++Lay ) {
@@ -4350,7 +4384,7 @@ namespace SurfaceGeometry {
 					}
 				}
 				// Check consistency of gap widths between unshaded and shaded constructions
-				TotGlassLayers = Construct( ConstrNum ).TotGlassLayers;
+				TotGlassLayers = ConstrWin[ ConstrNum  - 1 ].TotGlassLayers;
 				TotLayers = Construct( ConstrNum ).TotLayers;
 				TotShLayers = Construct( ConstrNumSh ).TotLayers;
 				if ( TotShLayers - 2 != TotLayers ) {
@@ -4412,13 +4446,14 @@ namespace SurfaceGeometry {
 			// associated frame or divider. Note that if there is a FrameDivider candidate for this
 			// window from the Window5 data file it is used instead of the window's input FrameDivider.
 
-			if ( SurfaceTmp( SurfNum ).Construction != 0 ) {
-				SurfaceTmp( SurfNum ).FrameDivider = Construct( SurfaceTmp( SurfNum ).Construction ).W5FrameDivider;
+			if ( TmpConstruction[ SurfNum  - 1] != 0 ) {
+			  //			if ( SurfaceTmp( SurfNum ).Construction != 0 ) {
+			  SurfaceTmp( SurfNum ).FrameDivider = Construct( TmpConstruction[ SurfNum  - 1] ).W5FrameDivider;  //SurfaceTmp( SurfNum ).Construction ).W5FrameDivider;
 
 				// Warning if FrameAndDivider for this window is over-ridden by one from Window5 Data File
 				if ( SurfaceTmp( SurfNum ).FrameDivider > 0 && ! lAlphaFieldBlanks( FrameField ) ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", " + cAlphaFieldNames( FrameField ) + "=\"" + cAlphaArgs( FrameField ) + "\"" );
-					ShowContinueError( "will be replaced with FrameAndDivider from Window5 Data File entry " + Construct( SurfaceTmp( SurfNum ).Construction ).Name );
+					ShowContinueError( "will be replaced with FrameAndDivider from Window5 Data File entry " + Construct( TmpConstruction[ SurfNum  - 1] ).Name );  //SurfaceTmp( SurfNum ).Construction ).Name ) );
 				}
 
 				if ( ! lAlphaFieldBlanks( FrameField ) && SurfaceTmp( SurfNum ).FrameDivider == 0 ) {
@@ -4528,7 +4563,8 @@ namespace SurfaceGeometry {
 
 		//  Require that a construction referenced by a surface that is a window
 		//  NOT have a shading device layer; use WindowShadingControl to specify a shading device.
-		ConstrNum = SurfaceTmp( SurfNum ).Construction;
+		ConstrNum = TmpConstruction[ SurfNum  - 1];
+		//		ConstrNum = SurfaceTmp( SurfNum ).Construction;
 		if ( ConstrNum > 0 ) {
 			NumShades = 0;
 			for ( Lay = 1; Lay <= Construct( ConstrNum ).TotLayers; ++Lay ) {
@@ -4547,7 +4583,8 @@ namespace SurfaceGeometry {
 		// Disallow glass transmittance dirt factor for interior windows and glass doors
 
 		if ( SurfaceTmp( SurfNum ).ExtBoundCond != ExternalEnvironment && ( SurfaceTmp( SurfNum ).Class == SurfaceClass_Window || SurfaceTmp( SurfNum ).Class == SurfaceClass_GlassDoor ) ) {
-			ConstrNum = SurfaceTmp( SurfNum ).Construction;
+			ConstrNum = TmpConstruction[ SurfNum  - 1];
+			//			ConstrNum = SurfaceTmp( SurfNum ).Construction;
 			if ( ConstrNum > 0 ) {
 				for ( Lay = 1; Lay <= Construct( ConstrNum ).TotLayers; ++Lay ) {
 					LayerPtr = Construct( ConstrNum ).LayerPoint( Lay );
@@ -4567,9 +4604,11 @@ namespace SurfaceGeometry {
 		// (2) if two glazing systems (separated by a mullion) on Data File, create a second window
 		//     and adjust the dimensions of the original and second windows to those on the Data File
 
-		if ( SurfaceTmp( SurfNum ).Construction != 0 ) {
+		if ( TmpConstruction[ SurfNum  - 1] != 0 ) {
+		  //		if ( SurfaceTmp( SurfNum ).Construction != 0 ) {
 
-			if ( Construct( SurfaceTmp( SurfNum ).Construction ).FromWindow5DataFile ) {
+			if ( Construct( TmpConstruction[ SurfNum  - 1] ).FromWindow5DataFile ) {
+			  //			if ( Construct( SurfaceTmp( SurfNum ).Construction ).FromWindow5DataFile ) {
 
 				ModifyWindow( SurfNum, ErrorsFound, AddedSubSurfaces );
 
@@ -5431,17 +5470,18 @@ namespace SurfaceGeometry {
 			SurfaceTmp( SurfNum ).Name = cAlphaArgs( 1 ); // Set the Surface Name in the Derived Type
 			SurfaceTmp( SurfNum ).Class = SurfaceClass_IntMass;
 			SurfaceTmp( SurfNum ).HeatTransSurf = true;
-			SurfaceTmp( SurfNum ).Construction = FindItemInList( cAlphaArgs( 2 ), Construct.Name(), TotConstructs );
+			TmpConstruction[  SurfNum  - 1] = FindItemInList( cAlphaArgs( 2 ), Construct.Name(), TotConstructs );
+			//			SurfaceTmp( SurfNum ).Construction = FindItemInList( cAlphaArgs( 2 ), Construct.Name(), TotConstructs );
 
-			if ( SurfaceTmp( SurfNum ).Construction == 0 ) {
+			if ( TmpConstruction[ SurfNum  - 1] == 0 ) {
 				ErrorsFound = true;
 				ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", " + cAlphaFieldNames( 2 ) + " not found=" + cAlphaArgs( 2 ) );
-			} else if ( Construct( SurfaceTmp( SurfNum ).Construction ).TypeIsWindow ) {
+			} else if ( ConstrWin[ TmpConstruction[ SurfNum  - 1]  - 1 ].TypeIsWindow ) {
 				ErrorsFound = true;
 				ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" - has Window materials." );
 			} else {
-				Construct( SurfaceTmp( SurfNum ).Construction ).IsUsed = true;
-				SurfaceTmp( SurfNum ).ConstructionStoredInputValue = SurfaceTmp( SurfNum ).Construction;
+				Construct( TmpConstruction[ SurfNum  - 1] ).IsUsed = true;
+				SurfaceTmp( SurfNum ).ConstructionStoredInputValue = TmpConstruction[ SurfNum  - 1];
 			}
 			SurfaceTmp( SurfNum ).ZoneName = cAlphaArgs( 3 );
 			ZoneNum = FindItemInList( SurfaceTmp( SurfNum ).ZoneName, Zone.Name(), NumOfZones );
@@ -5999,7 +6039,7 @@ namespace SurfaceGeometry {
 				for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 					if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
 					if ( Surface( SurfNum ).ExtBoundCond > 0 ) continue; // Interior surfaces
-					if ( Construct( Surface( SurfNum ).Construction ).TypeIsWindow ) continue;
+					if ( ConstrWin[ Construction[ SurfNum  - 1]  - 1 ].TypeIsWindow ) continue;
 					SurfacesOfType = true;
 					Surface( SurfNum ).HeatTransferAlgorithm = tmpAlgoInput;
 				}
@@ -6010,7 +6050,7 @@ namespace SurfaceGeometry {
 					if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
 					if ( Surface( SurfNum ).ExtBoundCond > 0 ) continue; // Interior surfaces
 					if ( Surface( SurfNum ).Class != SurfaceClass_Wall ) continue;
-					if ( Construct( Surface( SurfNum ).Construction ).TypeIsWindow ) continue;
+					if ( ConstrWin[ Construction[ SurfNum  - 1]  - 1 ].TypeIsWindow ) continue;
 					SurfacesOfType = true;
 					Surface( SurfNum ).HeatTransferAlgorithm = tmpAlgoInput;
 				}
@@ -6021,7 +6061,7 @@ namespace SurfaceGeometry {
 					if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
 					if ( Surface( SurfNum ).ExtBoundCond > 0 ) continue; // Interior surfaces
 					if ( Surface( SurfNum ).Class != SurfaceClass_Roof ) continue;
-					if ( Construct( Surface( SurfNum ).Construction ).TypeIsWindow ) continue;
+					if ( ConstrWin[ Construction[ SurfNum  - 1]  - 1 ].TypeIsWindow ) continue;
 					SurfacesOfType = true;
 					Surface( SurfNum ).HeatTransferAlgorithm = tmpAlgoInput;
 				}
@@ -6032,7 +6072,7 @@ namespace SurfaceGeometry {
 					if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
 					if ( Surface( SurfNum ).ExtBoundCond > 0 ) continue; // Interior surfaces
 					if ( Surface( SurfNum ).Class != SurfaceClass_Floor ) continue;
-					if ( Construct( Surface( SurfNum ).Construction ).TypeIsWindow ) continue;
+					if ( ConstrWin[ Construction[ SurfNum  - 1]  - 1 ].TypeIsWindow ) continue;
 					SurfacesOfType = true;
 					Surface( SurfNum ).HeatTransferAlgorithm = tmpAlgoInput;
 				}
@@ -6042,7 +6082,7 @@ namespace SurfaceGeometry {
 				for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 					if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
 					if ( Surface( SurfNum ).ExtBoundCond != Ground ) continue; // ground BC
-					if ( Construct( Surface( SurfNum ).Construction ).TypeIsWindow ) continue;
+					if ( ConstrWin[ Construction[ SurfNum  - 1]  - 1 ].TypeIsWindow ) continue;
 					SurfacesOfType = true;
 					Surface( SurfNum ).HeatTransferAlgorithm = tmpAlgoInput;
 				}
@@ -6051,7 +6091,7 @@ namespace SurfaceGeometry {
 				for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 					if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
 					if ( Surface( SurfNum ).ExtBoundCond <= 0 ) continue; // Exterior surfaces
-					if ( Construct( Surface( SurfNum ).Construction ).TypeIsWindow ) continue;
+					if ( ConstrWin[ Construction[ SurfNum  - 1]  - 1 ].TypeIsWindow ) continue;
 					SurfacesOfType = true;
 					Surface( SurfNum ).HeatTransferAlgorithm = tmpAlgoInput;
 				}
@@ -6062,7 +6102,7 @@ namespace SurfaceGeometry {
 					if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
 					if ( Surface( SurfNum ).ExtBoundCond <= 0 ) continue; // Exterior surfaces
 					if ( Surface( SurfNum ).Class != SurfaceClass_Wall ) continue;
-					if ( Construct( Surface( SurfNum ).Construction ).TypeIsWindow ) continue;
+					if ( ConstrWin[ Construction[ SurfNum  - 1]  - 1 ].TypeIsWindow ) continue;
 					SurfacesOfType = true;
 					Surface( SurfNum ).HeatTransferAlgorithm = tmpAlgoInput;
 				}
@@ -6073,7 +6113,7 @@ namespace SurfaceGeometry {
 					if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
 					if ( Surface( SurfNum ).ExtBoundCond <= 0 ) continue; // Exterior surfaces
 					if ( Surface( SurfNum ).Class != SurfaceClass_Roof ) continue;
-					if ( Construct( Surface( SurfNum ).Construction ).TypeIsWindow ) continue;
+					if ( ConstrWin[ Construction[ SurfNum  - 1]  - 1 ].TypeIsWindow ) continue;
 					SurfacesOfType = true;
 					Surface( SurfNum ).HeatTransferAlgorithm = tmpAlgoInput;
 				}
@@ -6084,7 +6124,7 @@ namespace SurfaceGeometry {
 					if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
 					if ( Surface( SurfNum ).ExtBoundCond <= 0 ) continue; // Exterior surfaces
 					if ( Surface( SurfNum ).Class != SurfaceClass_Floor ) continue;
-					if ( Construct( Surface( SurfNum ).Construction ).TypeIsWindow ) continue;
+					if ( ConstrWin[ Construction[ SurfNum  - 1]  - 1 ].TypeIsWindow ) continue;
 					SurfacesOfType = true;
 					Surface( SurfNum ).HeatTransferAlgorithm = tmpAlgoInput;
 				}
@@ -6192,7 +6232,7 @@ namespace SurfaceGeometry {
 
 			if ( ! ErrorsFoundByConstruct ) {
 				for ( Item1 = 1; Item1 <= TotSurfaces; ++Item1 ) {
-					if ( Surface( Item1 ).Construction == Found ) {
+					if ( Construction[ Item1  - 1] == Found ) {
 						Surface( Item1 ).HeatTransferAlgorithm = tmpAlgoInput;
 						if ( ! any_eq( HeatTransferAlgosUsed, tmpAlgoInput ) ) { // add new algo
 							tmpHeatTransferAlgosUsed.allocate( NumberOfHeatTransferAlgosUsed );
@@ -6733,7 +6773,8 @@ namespace SurfaceGeometry {
 		SurfaceTmp( SurfNum + 1 ).Vertex.allocate( NVert );
 		// doesn't work when Vertex are pointers  SurfaceTmp(SurfNum+1)=SurfaceTmp(SurfNum)
 		SurfaceTmp( SurfNum + 1 ).Name = SurfaceTmp( SurfNum ).Name;
-		SurfaceTmp( SurfNum + 1 ).Construction = SurfaceTmp( SurfNum ).Construction;
+		TmpConstruction[ SurfNum + 1  - 1] = TmpConstruction[ SurfNum  - 1];
+		//		SurfaceTmp( SurfNum + 1 ).Construction = TmpConstruction[ SurfNum  - 1];
 		SurfaceTmp( SurfNum + 1 ).ConstructionStoredInputValue = SurfaceTmp( SurfNum ).ConstructionStoredInputValue;
 		SurfaceTmp( SurfNum + 1 ).Class = SurfaceTmp( SurfNum ).Class;
 		SurfaceTmp( SurfNum + 1 ).GrossArea = SurfaceTmp( SurfNum ).GrossArea;
@@ -7437,12 +7478,16 @@ namespace SurfaceGeometry {
 			if ( SurfNum != 0 ) {
 				if ( Surface( SurfNum ).Class != SurfaceClass_Window ) WrongSurfaceType = true;
 				if ( Surface( SurfNum ).Class == SurfaceClass_Window ) {
-					ConstrNum = Surface( SurfNum ).Construction;
-					if ( Construct( ConstrNum ).TotGlassLayers != 2 && Construct( ConstrNum ).TotGlassLayers != 3 ) WrongSurfaceType = true;
+					ConstrNum = Construction[ SurfNum  - 1];
+					if ( ConstrWin[ ConstrNum - 1].TotGlassLayers != 2 && ConstrWin[ ConstrNum  - 1 ].TotGlassLayers != 3 ) WrongSurfaceType = true;
 					if ( Surface( SurfNum ).ExtBoundCond != ExternalEnvironment ) WrongSurfaceType = true;
 				}
 				if ( WrongSurfaceType ) {
+<<<<<<< variant A
 					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" is not an exterior window with 2 or 3 glass layers." );
+>>>>>>> variant B
+					ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" is not an exterior window with 2 or 3 glass layers." );
+======= end
 					ErrorsFound = true;
 				}
 			}
@@ -7539,7 +7584,7 @@ namespace SurfaceGeometry {
 				if ( ! ErrorsFound ) {
 					// Require that gas in airflow gap has type = air
 					MatGapFlow = Construct( ConstrNum ).LayerPoint( 2 );
-					if ( Construct( ConstrNum ).TotGlassLayers == 3 ) MatGapFlow = Construct( ConstrNum ).LayerPoint( 4 );
+					if ( ConstrWin[ ConstrNum  - 1 ].TotGlassLayers == 3 ) MatGapFlow = Construct( ConstrNum ).LayerPoint( 4 );
 					if ( Material( MatGapFlow ).GasType( 1 ) != 1 ) {
 						ErrorsFound = true;
 						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", Gas type not air in airflow gap of construction " + Construct( ConstrNum ).Name );
@@ -7549,7 +7594,7 @@ namespace SurfaceGeometry {
 					if ( WSCPtr > 0 ) {
 						if ( WindowShadingControl( WSCPtr ).ShadingType == WSC_ST_BetweenGlassShade || WindowShadingControl( WSCPtr ).ShadingType == WSC_ST_BetweenGlassBlind ) {
 							ConstrNumSh = WindowShadingControl( WSCPtr ).ShadedConstruction;
-							if ( Construct( ConstrNum ).TotGlassLayers == 2 ) {
+							if ( ConstrWin[ ConstrNum  - 1 ].TotGlassLayers == 2 ) {
 								MatGapFlow1 = Construct( ConstrNumSh ).LayerPoint( 2 );
 								MatGapFlow2 = Construct( ConstrNumSh ).LayerPoint( 4 );
 							} else {
@@ -8123,7 +8168,7 @@ namespace SurfaceGeometry {
 
 			SumAreas = 0.0;
 			SurfCount = 0.0;
-			NFaces = Zone( ZoneNum ).SurfaceLast - Zone( ZoneNum ).SurfaceFirst + 1;
+			NFaces = ZoneSpecs[ZoneNum - 1].SurfaceLast - ZoneSpecs[ZoneNum - 1].SurfaceFirst + 1;
 			notused = 0;
 			ZoneStruct.NumSurfaceFaces = NFaces;
 			ZoneStruct.SurfaceFace.allocate( NFaces );
@@ -8131,7 +8176,7 @@ namespace SurfaceGeometry {
 			surfacenotused.allocate( NFaces );
 			surfacenotused = 0;
 
-			for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
+			for ( SurfNum = ZoneSpecs[ZoneNum - 1].SurfaceFirst; SurfNum <= ZoneSpecs[ZoneNum - 1].SurfaceLast; ++SurfNum ) {
 
 				// Only include Base Surfaces in Calc.
 
@@ -8919,7 +8964,7 @@ namespace SurfaceGeometry {
 		//  INTEGER :: loop                            ! DO loop index
 
 		ShDevName = Material( ShDevNum ).Name;
-		ConstrNum = SurfaceTmp( SurfNum ).Construction;
+		ConstrNum = TmpConstruction[ SurfNum  - 1];
 		ConstrName = Construct( ConstrNum ).Name;
 		if ( WindowShadingControl( WSCPtr ).ShadingType == WSC_ST_InteriorShade || WindowShadingControl( WSCPtr ).ShadingType == WSC_ST_InteriorBlind ) {
 			ConstrNameSh = ConstrName + ':' + ShDevName + ":INT";
@@ -8950,7 +8995,7 @@ namespace SurfaceGeometry {
 			NominalU.deallocate();
 			TotConstructs = ConstrNewSh;
 			Construct.allocate( TotConstructs );
-			NominalRforNominalUCalculation.allocate( TotConstructs );
+			ConstrWin.resize( TotConstructs );
 			NominalU.allocate( TotConstructs );
 			NominalRforNominalUCalculation = 0.0;
 			NominalU = 0.0;
@@ -8983,7 +9028,7 @@ namespace SurfaceGeometry {
 			}
 			// The following InsideAbsorpThermal applies only to inside glass; it is corrected
 			//  later in InitGlassOpticalCalculations if construction has inside shade or blind.
-			Construct( ConstrNewSh ).InsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( TotLayersOld ) ).AbsorpThermalBack;
+			ConstrWin[ ConstrNewSh  - 1 ].InsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( TotLayersOld ) ).AbsorpThermalBack;
 			Construct( ConstrNewSh ).OutsideRoughness = VerySmooth;
 			Construct( ConstrNewSh ).DayltPropPtr = 0;
 			Construct( ConstrNewSh ).CTFCross = 0.0;
@@ -9031,8 +9076,8 @@ namespace SurfaceGeometry {
 			Construct( ConstrNewSh ).Name = ConstrNameSh;
 			Construct( ConstrNewSh ).TotLayers = TotLayersNew;
 			Construct( ConstrNewSh ).TotSolidLayers = Construct( ConstrNum ).TotSolidLayers + 1;
-			Construct( ConstrNewSh ).TotGlassLayers = Construct( ConstrNum ).TotGlassLayers;
-			Construct( ConstrNewSh ).TypeIsWindow = true;
+			ConstrWin[ ConstrNewSh ].TotGlassLayers = ConstrWin[ ConstrNum  - 1 ].TotGlassLayers;
+			ConstrWin[ ConstrNewSh  - 1 ].TypeIsWindow = true;
 			Construct( ConstrNewSh ).IsUsed = true;
 
 		}
@@ -9099,9 +9144,9 @@ namespace SurfaceGeometry {
 
 		for ( StormWinNum = 1; StormWinNum <= TotStormWin; ++StormWinNum ) {
 			SurfNum = StormWindow( StormWinNum ).BaseWindowNum;
-			ConstrNum = Surface( SurfNum ).Construction;
+			ConstrNum = Construction[ SurfNum  - 1];
 			// Fatal error if base construction has more than three glass layers
-			if ( Construct( ConstrNum ).TotGlassLayers > 3 ) {
+			if ( ConstrWin[ ConstrNum  - 1 ].TotGlassLayers > 3 ) {
 				ShowFatalError( "Window=" + Surface( SurfNum ).Name + " has more than 3 glass layers; a storm window cannot be applied." );
 			}
 			ConstrNumSh = Surface( SurfNum ).ShadedConstruction;
@@ -9117,7 +9162,7 @@ namespace SurfaceGeometry {
 			if ( ConstrNumSh > 0 ) {
 				ConstrNameSh = Construct( ConstrNumSh ).Name;
 				TotLayers = Construct( ConstrNumSh ).TotLayers;
-				TotGlassLayers = Construct( ConstrNumSh ).TotGlassLayers;
+				TotGlassLayers = ConstrWin[ ConstrNumSh  - 1 ].TotGlassLayers;
 				MatIntSh = Construct( ConstrNumSh ).LayerPoint( TotLayers );
 				MatBGsh = 0;
 				if ( TotLayers == 5 ) MatBGsh = Construct( ConstrNumSh ).LayerPoint( 3 );
@@ -9261,7 +9306,7 @@ namespace SurfaceGeometry {
 					NominalU.deallocate();
 					TotConstructs = ConstrNew;
 					Construct.allocate( TotConstructs );
-					NominalRforNominalUCalculation.allocate( TotConstructs );
+					ConstrWin.resize( TotConstructs );
 					NominalU.allocate( TotConstructs );
 					Construct( {1,TotConstructs - 1} ) = ConstructSave( {1,TotConstructs - 1} );
 					NominalRforNominalUCalculation( {1,TotConstructs - 1} ) = NominalRSave( {1,TotConstructs - 1} );
@@ -9281,13 +9326,13 @@ namespace SurfaceGeometry {
 					if ( loop == 2 ) Construct( ConstrNew ).Name = ConstrNameStSh;
 					Construct( ConstrNew ).TotLayers = TotLayersOld + 2;
 					Construct( ConstrNew ).TotSolidLayers = Construct( ConstrOld ).TotSolidLayers + 1;
-					Construct( ConstrNew ).TotGlassLayers = Construct( ConstrOld ).TotGlassLayers + 1;
-					Construct( ConstrNew ).TypeIsWindow = true;
+					ConstrWin[ ConstrNew - 1].TotGlassLayers = ConstrWin[ ConstrOld  - 1 ].TotGlassLayers + 1;
+					ConstrWin[ ConstrNew  - 1 ].TypeIsWindow = true;
 					Construct( ConstrNew ).InsideAbsorpVis = 0.0;
 					Construct( ConstrNew ).OutsideAbsorpVis = 0.0;
 					Construct( ConstrNew ).InsideAbsorpSolar = 0.0;
 					Construct( ConstrNew ).OutsideAbsorpSolar = 0.0;
-					Construct( ConstrNew ).InsideAbsorpThermal = Construct( ConstrOld ).InsideAbsorpThermal;
+					ConstrWin[ ConstrNew - 1 ].InsideAbsorpThermal = ConstrWin[ ConstrOld  - 1 ].InsideAbsorpThermal;
 					Construct( ConstrNew ).OutsideAbsorpThermal = Material( StormWinMatNum ).AbsorpThermalFront;
 					Construct( ConstrNew ).OutsideRoughness = VerySmooth;
 					Construct( ConstrNew ).DayltPropPtr = 0;
@@ -9432,7 +9477,7 @@ namespace SurfaceGeometry {
 		Vector TVect;
 		rectangularwindow OriginalCoord;
 
-		IConst = SurfaceTmp( SurfNum ).Construction;
+		IConst = TmpConstruction[ SurfNum  - 1];
 
 		// Height and width of original window
 		TVect = SurfaceTmp( SurfNum ).Vertex( 3 ) - SurfaceTmp( SurfNum ).Vertex( 2 );
@@ -9617,7 +9662,7 @@ namespace SurfaceGeometry {
 		rectangularwindow NewCoord;
 		rectangularwindow OriginalCoord;
 
-		IConst = SurfaceTmp( SurfNum ).Construction;
+		IConst = TmpConstruction[ SurfNum  - 1];
 
 		// Height and width of original window
 		TVect = SurfaceTmp( SurfNum ).Vertex( 3 ) - SurfaceTmp( SurfNum ).Vertex( 2 );
@@ -9649,10 +9694,13 @@ namespace SurfaceGeometry {
 		}
 		SurfaceTmpSave.deallocate();
 
+		TmpConstruction.resize(TotSurfaces);
+
 		SurfaceTmp( TotSurfaces ).Vertex.allocate( 4 );
 
 		SurfaceTmp( TotSurfaces ).Name = SurfaceTmp( SurfNum ).Name + ":2";
-		SurfaceTmp( TotSurfaces ).Construction = IConst2;
+		TmpConstruction[ TotSurfaces  - 1] = IConst2;
+		//		SurfaceTmp( TotSurfaces ).Construction = IConst2;
 		SurfaceTmp( TotSurfaces ).ConstructionStoredInputValue = IConst2;
 		SurfaceTmp( TotSurfaces ).Class = SurfaceTmp( SurfNum ).Class;
 		SurfaceTmp( TotSurfaces ).Azimuth = SurfaceTmp( SurfNum ).Azimuth;
@@ -10695,7 +10743,7 @@ namespace SurfaceGeometry {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

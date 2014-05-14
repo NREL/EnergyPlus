@@ -290,7 +290,7 @@ namespace ConductionTransferFunctionCalc {
 
 			AdjacentResLayerNum = 0; // Zero this out for each construct
 
-			if ( Construct( ConstrNum ).TypeIsWindow ) continue;
+			if ( ConstrWin[ ConstrNum  - 1 ].TypeIsWindow ) continue;
 
 			// Initialize construct parameters
 
@@ -2134,7 +2134,7 @@ namespace ConductionTransferFunctionCalc {
 
 			for ( ThisNum = 1; ThisNum <= TotConstructs; ++ThisNum ) {
 
-				if ( Construct( ThisNum ).TypeIsWindow ) continue;
+				if ( ConstrWin[ ThisNum  - 1 ].TypeIsWindow ) continue;
 
 				gio::write( OutputFileInits, Format_700 ) << Construct( ThisNum ).Name << ThisNum << Construct( ThisNum ).TotLayers << Construct( ThisNum ).NumCTFTerms << Construct( ThisNum ).CTFTimeStep << Construct( ThisNum ).UValue << Construct( ThisNum ).OutsideAbsorpThermal << Construct( ThisNum ).InsideAbsorpThermal << Construct( ThisNum ).OutsideAbsorpSolar << Construct( ThisNum ).InsideAbsorpSolar << DisplayMaterialRoughness( Construct( ThisNum ).OutsideRoughness );
 
@@ -2181,7 +2181,7 @@ namespace ConductionTransferFunctionCalc {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

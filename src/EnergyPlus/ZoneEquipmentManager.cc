@@ -3537,7 +3537,7 @@ namespace ZoneEquipmentManager {
 				WinGapTtoRA = 0.0;
 				WinGapFlowTtoRA = 0.0;
 
-				for ( SurfNum = Zone( ActualZoneNum ).SurfaceFirst; SurfNum <= Zone( ActualZoneNum ).SurfaceLast; ++SurfNum ) {
+				for ( SurfNum = ZoneSpecs[ ActualZoneNum  - 1].SurfaceFirst; SurfNum <= ZoneSpecs[ ActualZoneNum  - 1].SurfaceLast; ++SurfNum ) {
 					if ( SurfaceWindow( SurfNum ).AirflowThisTS > 0.0 && SurfaceWindow( SurfNum ).AirflowDestination == AirFlowWindow_Destination_ReturnAir ) {
 						FlowThisTS = PsyRhoAirFnPbTdbW( OutBaroPress, SurfaceWindow( SurfNum ).TAirflowGapOutlet, Node( ZoneNode ).HumRat ) * SurfaceWindow( SurfNum ).AirflowThisTS * Surface( SurfNum ).Width;
 						WinGapFlowToRA += FlowThisTS;
@@ -3730,7 +3730,7 @@ namespace ZoneEquipmentManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

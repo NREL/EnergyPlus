@@ -60,6 +60,7 @@ namespace RoomAirModelUserTempPattern {
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::DisplayExtraWarnings;
 	using namespace DataRoomAirModel;
+        using DataHeatBalance::ZoneSpecs;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -850,7 +851,7 @@ namespace RoomAirModelUserTempPattern {
 		ZMax = 0.0;
 		ZMin = 0.0;
 		Count = 0;
-		for ( SurfNum = Zone( thisZone ).SurfaceFirst; SurfNum <= Zone( thisZone ).SurfaceLast; ++SurfNum ) {
+		for ( SurfNum = ZoneSpecs[ thisZone  - 1].SurfaceFirst; SurfNum <= ZoneSpecs[ thisZone  - 1].SurfaceLast; ++SurfNum ) {
 			if ( Surface( SurfNum ).Class == SurfaceClass_Floor ) {
 				// Use Average Z for surface, more important for roofs than floors...
 				++FloorCount;
@@ -1005,8 +1006,8 @@ namespace RoomAirModelUserTempPattern {
 
 		// FLOW:
 
-		SurfFirst = Zone( ZoneNum ).SurfaceFirst;
-		SurfLast = Zone( ZoneNum ).SurfaceLast;
+		SurfFirst = ZoneSpecs[ ZoneNum  - 1].SurfaceFirst;
+		SurfLast = ZoneSpecs[ ZoneNum  - 1].SurfaceLast;
 
 		// set air system leaving node conditions
 		// this is not so easy.  THis task is normally done in CalcZoneLeavingConditions
@@ -1042,7 +1043,7 @@ namespace RoomAirModelUserTempPattern {
 			WinGapTtoRA = 0.0;
 			WinGapFlowTtoRA = 0.0;
 
-			for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
+			for ( SurfNum = ZoneSpecs[ ZoneNum  - 1].SurfaceFirst; SurfNum <= ZoneSpecs[ ZoneNum - 1].SurfaceLast; ++SurfNum ) {
 				if ( SurfaceWindow( SurfNum ).AirflowThisTS > 0.0 && SurfaceWindow( SurfNum ).AirflowDestination == AirFlowWindow_Destination_ReturnAir ) {
 					FlowThisTS = PsyRhoAirFnPbTdbW( OutBaroPress, SurfaceWindow( SurfNum ).TAirflowGapOutlet, Node( ZoneNode ).HumRat ) * SurfaceWindow( SurfNum ).AirflowThisTS * Surface( SurfNum ).Width;
 					WinGapFlowToRA += FlowThisTS;
@@ -1149,7 +1150,7 @@ namespace RoomAirModelUserTempPattern {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

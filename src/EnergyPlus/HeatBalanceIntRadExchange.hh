@@ -1,6 +1,10 @@
 #ifndef HeatBalanceIntRadExchange_hh_INCLUDED
 #define HeatBalanceIntRadExchange_hh_INCLUDED
 
+// C++
+#include <forward_list>
+#include <vector>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1A.hh>
 #include <ObjexxFCL/FArray1S.hh>
@@ -11,12 +15,18 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
+#include <DataViewFactorInformation.hh>
+
+//Speedup Helpers
+#include <SpeedupHelpers/perTArray.hh>
 
 namespace EnergyPlus {
 
 #define EP_HBIRE_SEQ
 
 namespace HeatBalanceIntRadExchange {
+
+  using namespace DataViewFactorInformation;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
@@ -28,19 +38,83 @@ namespace HeatBalanceIntRadExchange {
 
 	// MODULE VARIABLE DECLARATIONS:
 	extern int MaxNumOfZoneSurfaces; // Max saved to get large enough space for user input view factors
+        extern std::vector<size_t> LoadBalanceVector;
+        extern std::forward_list<EppPerformance::genPerTArray*> WriteVectors;
+  extern std::vector<std::pair<std::vector<reSurface>::iterator,
+			       std::vector<reSurface>::iterator>> threadSurfIterators;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceIntRadExchange
 
 	// Functions
 
+	struct badLU : std::exception{
+		const char* what() const noexcept {return "LU Decomposition in CalcScriptF failed\n";}
+	};
+	 
+	struct noMoreMemCalcSF : std::exception{
+		const char* what() const noexcept {return "'new' failed in CalcScript\n";}
+	};
+
+        inline 
+	std::vector<reSurface>::iterator surfBegin(int tid, int ZoneToResimulate){
+	  if(tid != -1){
+	    return threadSurfIterators[tid].first;
+	  }else{
+	    return ZoneInfo[ ZoneToResimulate - 1 ].surfBegin;
+	  }
+	}
+
+        inline 
+	std::vector<reSurface>::iterator surfEnd(int tid, int ZoneToResimulate){
+	  if(tid != -1){
+	    return threadSurfIterators[tid].second;
+	  }else{
+	    return ZoneInfo[ ZoneToResimulate - 1].surfEnd;
+	  }
+	}
+
+        //a factory function for dependent write vectors (specialized for parallel performance,
+        //written from this 'module'.  We may need to issue these vectors before we know the
+        //load balancing semantics for them, so we will manage them from here and release from
+        //our collection once InitInteriorRadExchange has been called
+        template<typename T>
+        EppPerformance::perTArray< T >&
+	GetHBREWriteVector(size_t size){
+	  using namespace EppPerformance;
+	  perTArray< T > *retVal;
+	  if(LoadBalanceVector.size() == Perf_Thread_Count){
+	    retVal =  new perTArray< T >(Perf_Thread_Count,   
+						      LoadBalanceVector);
+	    assert(size <= std::accumulate(LoadBalanceVector.begin(), LoadBalanceVector.end(), std::plus<size_t>()));
+				    
+	  }else{
+	    size_t cellSize = size / Perf_Thread_Count;
+	    if (cellSize * Perf_Thread_Count < size)
+	      cellSize = (cellSize + 1) * Perf_Thread_Count / Perf_Thread_Count;
+	    retVal = new perTArray< T >(Perf_Thread_Count, cellSize);
+	  }
+	  WriteVectors.push_front(retVal);
+	  return dynamic_cast<perTArray< T >&>(*WriteVectors.front());
+	  //return WriteVectors.front();
+	}
+
+	
+
+        void
+	DoCalcInteriorRadExchange(const int SurfIterations, const int ZoneToResimulate,
+		       const int tid = -1);
+
 	void
 	CalcInteriorRadExchange(
-		FArray1S< Real64 > const SurfaceTemp, // Current surface temperatures
 		int const SurfIterations, // Number of iterations in calling subroutine
-		FArray1S< Real64 > NetLWRadToSurf, // Net long wavelength radiant exchange from other surfaces
-		Optional_int_const ZoneToResimulate = _, // if passed in, then only calculate for this zone
-		Optional_string CalledFrom = _
+		int const ZoneToResimulate = -1 // if passed in, then only calculate for this zone
 	);
+
+        void
+	CalcSurfaceTemp(ZoneViewFactorInformation& zone, const int SurfaceIterations);
+
+        void
+	CalcSurfaceEmiss(ZoneViewFactorInformation& zone);
 
 	void
 	InitInteriorRadExchange();
@@ -90,22 +164,23 @@ namespace HeatBalanceIntRadExchange {
 
 	void
 	CalcScriptF(
-		int const N, // Number of surfaces
-		FArray1A< Real64 > const A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
-		FArray2A< Real64 > const F, // DIRECT VIEW FACTOR MATRIX (N X N)
-		FArray1A< Real64 > EMISS, // VECTOR OF SURFACE EMISSIVITIES
-		FArray2A< Real64 > ScriptF // MATRIX OF SCRIPT F FACTORS (N X N)
+		    ZoneViewFactorInformation & zone
+		// int const N, // Number of surfaces
+		// FArray1A< Real64 > const A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+		// FArray2A< Real64 > const F, // DIRECT VIEW FACTOR MATRIX (N X N)
+		// FArray1A< Real64 > EMISS, // VECTOR OF SURFACE EMISSIVITIES
+		// FArray2A< Real64 > ScriptF // MATRIX OF SCRIPT F FACTORS (N X N)
 	);
 
-	void
-	CalcMatrixInverse(
-		FArray2S< Real64 > Matrix, // Input Matrix
-		FArray2S< Real64 > InvMatrix // Inverse of Matrix
-	);
+	// void
+	// CalcMatrixInverse(
+	// 	FArray2S< Real64 > Matrix, // Input Matrix
+	// 	FArray2S< Real64 > InvMatrix // Inverse of Matrix
+	// );
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

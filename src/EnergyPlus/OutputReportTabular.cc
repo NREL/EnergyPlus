@@ -10291,17 +10291,23 @@ namespace OutputReportTabular {
 		//   Write out tables based on which surfaces shade subsurfaces.
 
 		// METHODOLOGY EMPLOYED:
-		//   Create arrays for the call to WriteTable and then call it.
+		//   Create arrays for the call to writeTable and then call it.
 		//   Use <br> tag to put multiple rows into a single cell.
 
 		// REFERENCES:
 		// na
 
+		// USE STATEMENTS:
 		// Using/Aliasing
 		using DataSurfaces::Surface;
 		using DataSurfaces::TotSurfaces;
 		using namespace DataShadowingCombinations;
 		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
+		using EppPerformance::Timer;
+
+		static Timer timer(__PRETTY_FUNCTION__);
+
+		timer.startTimer();
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -10318,114 +10324,68 @@ namespace OutputReportTabular {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// all arrays are in the format: (row, column)
-		FArray1D_string columnHead;
+		FArray1D_Fstring columnHead( sFstring( MaxNameLength ) );
 		FArray1D_int columnWidth;
-		FArray1D_string rowHead;
-		FArray2D_string tableBody;
-		//CHARACTER(len=MaxNameLength),ALLOCATABLE, DIMENSION(:)     :: unique
-		FArray1D_int unique;
+		FArray1D_Fstring rowHead( sFstring( MaxNameLength ) );
+		FArray2D_Fstring tableBody( sFstring( 2000 ) );
 		int numUnique;
-		//CHARACTER(len=MaxNameLength)                               :: curRecSurf
-		int curRecSurf;
-		std::string listOfSurf;
-		int found;
+		Fstring listOfSurf( 2000 );
 		int iShadRel;
-		int jUnique;
 		int iKindRec;
-		int numreceivingfields;
 		int HTS;
-		int NGSS;
+		int lastSurface, castSurf;
 
-		//displaySurfaceShadowing=.FALSE.  for debugging
+		//displaySurfaceShadowing=.false.  for debugging
 		if ( displaySurfaceShadowing ) {
-			numreceivingfields = 0;
-			for ( HTS = 1; HTS <= TotSurfaces; ++HTS ) {
-				for ( NGSS = 1; NGSS <= ShadowComb( HTS ).NumGenSurf; ++NGSS ) {
-					++numreceivingfields;
-				}
-				for ( NGSS = 1; NGSS <= ShadowComb( HTS ).NumSubSurf; ++NGSS ) {
-					++numreceivingfields;
-				}
+		  WriteReportHeaders( "Surface Shadowing Summary", "Entire Facility", isAverage );
+		  //do entire process twice, once with surfaces receiving, once with subsurfaces receiving
+		  for ( iKindRec = recKindSurface; iKindRec <= recKindSubsurface; ++iKindRec ) {
+		    numUnique = TotSurfaces;
+		    rowHead.allocate( numUnique );
+		    columnHead.allocate( 1 );
+		    columnWidth.allocate( 1 );
+		    columnWidth = 14; //array assignment - same for all columns
+		    tableBody.allocate( numUnique, 1 );
+		    columnHead( 1 ) = "Possible Shadow Receivers";
+		    for (HTS = 1; HTS <= TotSurfaces; ++HTS){
+		      rowHead(HTS) = Surface( HTS ).Name;
+		      listOfSurf = "";
+		      if(iKindRec == recKindSurface){
+			lastSurface = ShadowComb( HTS ).NumGenSurf;
+		      }else{
+			lastSurface = ShadowComb( HTS ).NumSubSurf;
+		      }
+		      for(iShadRel = 1; iShadRel <= lastSurface; ++iShadRel){
+			if(iKindRec == recKindSurface){
+			  castSurf = ShadowComb( HTS ).GenSurf( iShadRel );
+			}else{
+			  castSurf = ShadowComb( HTS ).SubSurf( iShadRel );
 			}
-
-			ShadowRelate.allocate( numreceivingfields );
-			numShadowRelate = 0;
-			for ( HTS = 1; HTS <= TotSurfaces; ++HTS ) {
-				for ( NGSS = 1; NGSS <= ShadowComb( HTS ).NumGenSurf; ++NGSS ) {
-					++numShadowRelate;
-					ShadowRelate( numShadowRelate ).castSurf = ShadowComb( HTS ).GenSurf( NGSS );
-					ShadowRelate( numShadowRelate ).recSurf = HTS;
-					ShadowRelate( numShadowRelate ).recKind = recKindSurface;
-				}
-				for ( NGSS = 1; NGSS <= ShadowComb( HTS ).NumSubSurf; ++NGSS ) {
-					++numShadowRelate;
-					ShadowRelate( numShadowRelate ).castSurf = ShadowComb( HTS ).SubSurf( NGSS );
-					ShadowRelate( numShadowRelate ).recSurf = HTS;
-					ShadowRelate( numShadowRelate ).recKind = recKindSubsurface;
-				}
-			}
-
-			WriteReportHeaders( "Surface Shadowing Summary", "Entire Facility", isAverage );
-			unique.allocate( numShadowRelate );
-			//do entire process twice, once with surfaces receiving, once with subsurfaces receiving
-			for ( iKindRec = recKindSurface; iKindRec <= recKindSubsurface; ++iKindRec ) {
-				numUnique = 0;
-				//first find the number of unique
-				for ( iShadRel = 1; iShadRel <= numShadowRelate; ++iShadRel ) {
-					if ( ShadowRelate( iShadRel ).recKind == iKindRec ) {
-						curRecSurf = ShadowRelate( iShadRel ).recSurf;
-						found = 0;
-						for ( jUnique = 1; jUnique <= numUnique; ++jUnique ) {
-							if ( curRecSurf == unique( jUnique ) ) {
-								found = jUnique;
-								break;
-							}
-						}
-						if ( found == 0 ) {
-							++numUnique;
-							unique( numUnique ) = curRecSurf;
-						}
-					}
-				}
-				rowHead.allocate( numUnique );
-				columnHead.allocate( 1 );
-				columnWidth.allocate( 1 );
-				columnWidth = 14; //array assignment - same for all columns
-				tableBody.allocate( numUnique, 1 );
-				columnHead( 1 ) = "Possible Shadow Receivers";
-				if ( numUnique == 0 ) columnHead( 1 ) = "None";
-				for ( jUnique = 1; jUnique <= numUnique; ++jUnique ) {
-					curRecSurf = unique( jUnique );
-					rowHead( jUnique ) = Surface( curRecSurf ).Name;
-					listOfSurf = "";
-					for ( iShadRel = 1; iShadRel <= numShadowRelate; ++iShadRel ) {
-						if ( ShadowRelate( iShadRel ).recKind == iKindRec ) {
-							if ( curRecSurf == ShadowRelate( iShadRel ).recSurf ) {
-								listOfSurf += Surface( ShadowRelate( iShadRel ).castSurf ).Name + " | "; //'<br>'
-							}
-						}
-					}
-					tableBody( jUnique, 1 ) = listOfSurf;
-				}
-				//write the table
-				{ auto const SELECT_CASE_var( iKindRec );
-				if ( SELECT_CASE_var == recKindSurface ) {
-					WriteSubtitle( "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces" );
-					CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SurfaceShadowingSummary", "Entire Facility", "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces" );
-				} else if ( SELECT_CASE_var == recKindSubsurface ) {
-					WriteSubtitle( "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces" );
-					CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SurfaceShadowingSummary", "Entire Facility", "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces" );
-				}}
-				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				//deallocate these arrays since they are used to create the next
-				//table
-				rowHead.deallocate();
-				columnHead.deallocate();
-				columnWidth.deallocate();
-				tableBody.deallocate();
-			}
-			unique.deallocate();
+			listOfSurf = trim( listOfSurf ) + trim( Surface( castSurf ).Name) + " | ";
+		      }
+		      tableBody( HTS, 1 ) = listOfSurf;
+		    }
+		    if (iKindRec == recKindSurface)
+		      {
+			writeSubtitle("Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces " );
+			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, 
+							"SurfaceShadowingSummary", "Entire Facility", 
+							"Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces " );
+		      }else{
+		        writeSubtitle( "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces " );
+		      
+			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, 
+							"SurfaceShadowingSummary", "Entire Facility", 
+							"Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces " );
+		    }
+		    WriteTable( tableBody, rowHead, columnHead, columnWidth );
+		    rowHead.deallocate();
+		    columnHead.deallocate();
+		    columnWidth.deallocate();
+		    tableBody.deallocate();
+		  }
 		}
+		timer.stopTimer();
 	}
 
 	void

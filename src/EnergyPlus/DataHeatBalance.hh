@@ -16,7 +16,9 @@
 #include <DataGlobals.hh>
 #include <DataSurfaces.hh>
 #include <DataVectorTypes.hh>
-#include <DataWindowEquivalentLayer.hh>
+
+// C++ stdlib
+#include <vector>
 
 namespace EnergyPlus {
 
@@ -1236,6 +1238,18 @@ namespace DataHeatBalance {
 
 	};
 
+        struct WindowAbsThermLay
+	{
+	  bool TypeIsWindow;
+	  Real64 InsideAbsorpThermal;
+	  int TotGlassLayers;
+	  WindowAbsThermLay() :
+	    TypeIsWindow(false),
+	    InsideAbsorpThermal(0.0),
+	    TotGlassLayers(0)
+	  {}
+	};
+
 	struct ConstructionData
 	{
 		// Members
@@ -1808,6 +1822,15 @@ namespace DataHeatBalance {
 
 	};
 
+        struct GenZone{
+		int SurfaceFirst; // First Surface in Zone
+		int SurfaceLast; // Last Surface in Zone
+                GenZone(): //default construct
+			SurfaceFirst( 0 ),
+			SurfaceLast( 0 )
+	  {}
+	  
+	};
 	struct ZoneData
 	{
 		// Members
@@ -1847,8 +1870,6 @@ namespace DataHeatBalance {
 		bool IsControlled; // True when this is a controlled zone.
 		int TempControlledZoneIndex; // this is the index number for TempControlledZone structure for lookup
 		//            Pointers to Surface Data Structure
-		int SurfaceFirst; // First Surface in Zone
-		int SurfaceLast; // Last Surface in Zone
 		int InsideConvectionAlgo; // Ref: appropriate values for Inside Convection solution
 		int NumSurfaces; // Number of surfaces for this zone
 		int NumSubSurfaces; // Number of subsurfaces for this zone (windows, doors, tdd dome and diffusers)
@@ -1982,8 +2003,6 @@ namespace DataHeatBalance {
 			int const SystemZoneNodeNumber, // This is the zone node number for the system for a controlled zone
 			bool const IsControlled, // True when this is a controlled zone.
 			int const TempControlledZoneIndex, // this is the index number for TempControlledZone structure for lookup
-			int const SurfaceFirst, // First Surface in Zone
-			int const SurfaceLast, // Last Surface in Zone
 			int const InsideConvectionAlgo, // Ref: appropriate values for Inside Convection solution
 			int const NumSurfaces, // Number of surfaces for this zone
 			int const NumSubSurfaces, // Number of subsurfaces for this zone (windows, doors, tdd dome and diffusers)
@@ -2046,8 +2065,6 @@ namespace DataHeatBalance {
 			SystemZoneNodeNumber( SystemZoneNodeNumber ),
 			IsControlled( IsControlled ),
 			TempControlledZoneIndex( TempControlledZoneIndex ),
-			SurfaceFirst( SurfaceFirst ),
-			SurfaceLast( SurfaceLast ),
 			InsideConvectionAlgo( InsideConvectionAlgo ),
 			NumSurfaces( NumSurfaces ),
 			NumSubSurfaces( NumSubSurfaces ),
@@ -5134,9 +5151,11 @@ namespace DataHeatBalance {
 	extern FArray1D< MaterialProperties > Material;
 	extern FArray1D< GapSupportPillar > SupportPillar;
 	extern FArray1D< GapDeflectionState > DeflectionState;
+        extern std::vector< WindowAbsThermLay > ConstrWin;
 	extern FArray1D< ConstructionData > Construct;
 	extern FArray1D< SpectralDataProperties > SpectralData;
 	extern FArray1D< ZoneData > Zone;
+        extern std::vector< GenZone > ZoneSpecs;
 	extern FArray1D< ZoneListData > ZoneList;
 	extern FArray1D< ZoneGroupData > ZoneGroup;
 	extern FArray1D< PeopleData > People;
@@ -5219,7 +5238,7 @@ namespace DataHeatBalance {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

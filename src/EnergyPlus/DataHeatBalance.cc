@@ -567,6 +567,7 @@ namespace DataHeatBalance {
 	FArray1D< MaterialProperties > Material;
 	FArray1D< GapSupportPillar > SupportPillar;
 	FArray1D< GapDeflectionState > DeflectionState;
+        std::vector< WindowAbsThermLay > ConstrWin;
 	FArray1D< ConstructionData > Construct;
 	FArray1D< SpectralDataProperties > SpectralData;
 	FArray1D< ZoneData > Zone;
@@ -577,6 +578,7 @@ namespace DataHeatBalance {
 	FArray1D< ZoneEquipData > ZoneElectric;
 	FArray1D< ZoneEquipData > ZoneGas;
 	FArray1D< ZoneEquipData > ZoneOtherEq;
+        std::vector< GenZone > ZoneSpecs;
 	FArray1D< ZoneEquipData > ZoneHWEq;
 	FArray1D< ZoneEquipData > ZoneSteamEq;
 	FArray1D< BBHeatData > ZoneBBHeat;
@@ -697,23 +699,23 @@ namespace DataHeatBalance {
 		}
 
 		Construct( ConstrNum ).TotSolidLayers = 0;
-		Construct( ConstrNum ).TotGlassLayers = 0;
+		ConstrWin[ ConstrNum  - 1 ].TotGlassLayers = 0;
 		Construct( ConstrNum ).AbsDiffShade = 0.0;
 
 		// Check if any layer is glass, gas, shade, screen or blind; if so it is considered a window construction for
 		// purposes of error checking.
 
-		Construct( ConstrNum ).TypeIsWindow = false;
+		ConstrWin[ ConstrNum  - 1 ].TypeIsWindow = false;
 		for ( Layer = 1; Layer <= TotLayers; ++Layer ) {
 			MaterNum = Construct( ConstrNum ).LayerPoint( Layer );
 			if ( MaterNum == 0 ) continue; // error -- has been caught will stop program later
-			if ( Material( MaterNum ).Group == WindowGlass || Material( MaterNum ).Group == WindowGas || Material( MaterNum ).Group == WindowGasMixture || Material( MaterNum ).Group == Shade || Material( MaterNum ).Group == WindowBlind || Material( MaterNum ).Group == Screen || Material( MaterNum ).Group == WindowSimpleGlazing || Material( MaterNum ).Group == ComplexWindowShade || Material( MaterNum ).Group == ComplexWindowGap || Material( MaterNum ).Group == GlassEquivalentLayer || Material( MaterNum ).Group == ShadeEquivalentLayer || Material( MaterNum ).Group == DrapeEquivalentLayer || Material( MaterNum ).Group == ScreenEquivalentLayer || Material( MaterNum ).Group == BlindEquivalentLayer || Material( MaterNum ).Group == GapEquivalentLayer ) Construct( ConstrNum ).TypeIsWindow = true;
+			if ( Material( MaterNum ).Group == WindowGlass || Material( MaterNum ).Group == WindowGas || Material( MaterNum ).Group == WindowGasMixture || Material( MaterNum ).Group == Shade || Material( MaterNum ).Group == WindowBlind || Material( MaterNum ).Group == Screen || Material( MaterNum ).Group == WindowSimpleGlazing || Material( MaterNum ).Group == ComplexWindowShade || Material( MaterNum ).Group == ComplexWindowGap ) ConstrWin[ ConstrNum  - 1 ].TypeIsWindow = true;
 		}
 
 		if ( InsideMaterNum == 0 ) return;
 		if ( OutsideMaterNum == 0 ) return;
 
-		if ( Construct( ConstrNum ).TypeIsWindow ) {
+		if ( ConstrWin[ ConstrNum  - 1 ].TypeIsWindow ) {
 
 			Construct( ConstrNum ).NumCTFTerms = 0;
 			Construct( ConstrNum ).NumHistories = 0;
@@ -764,15 +766,9 @@ namespace DataHeatBalance {
 			// It is not necessary to check rest of BSDF window structure since that is performed inside TARCOG90 routine.
 			// That routine also allow structures which are not allowed in rest of this routine
 			if ( Construct( ConstrNum ).WindowTypeBSDF ) {
-				Construct( ConstrNum ).TotGlassLayers = TotGlassLayers;
+				ConstrWin[ ConstrNum  - 1 ].TotGlassLayers = TotGlassLayers;
 				Construct( ConstrNum ).TotSolidLayers = TotGlassLayers + TotShadeLayers;
-				Construct( ConstrNum ).InsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( InsideLayer ) ).AbsorpThermalBack;
-				Construct( ConstrNum ).OutsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( 1 ) ).AbsorpThermalFront;
-				return;
-			}
-
-			if ( Construct( ConstrNum ).WindowTypeEQL ) {
-				Construct( ConstrNum ).InsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( InsideLayer ) ).AbsorpThermalBack;
+				ConstrWin[ ConstrNum  - 1 ].InsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( InsideLayer ) ).AbsorpThermalBack;
 				Construct( ConstrNum ).OutsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( 1 ) ).AbsorpThermalFront;
 				return;
 			}
@@ -938,7 +934,7 @@ namespace DataHeatBalance {
 				ErrorsFound = true;
 			}
 
-			Construct( ConstrNum ).TotGlassLayers = TotGlassLayers;
+			ConstrWin[ ConstrNum  - 1 ].TotGlassLayers = TotGlassLayers;
 			Construct( ConstrNum ).TotSolidLayers = TotGlassLayers + TotShadeLayers;
 
 			// In following, InsideLayer is layer number of inside glass and InsideAbsorpThermal applies
@@ -949,7 +945,7 @@ namespace DataHeatBalance {
 			}
 			if ( InsideLayer > 0 ) {
 				InsideMaterNum = Construct( ConstrNum ).LayerPoint( InsideLayer );
-				Construct( ConstrNum ).InsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( InsideLayer ) ).AbsorpThermalBack;
+				ConstrWin[ ConstrNum  - 1 ].InsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( InsideLayer ) ).AbsorpThermalBack;
 			}
 			if ( InsideMaterNum != 0 ) {
 				Construct( ConstrNum ).InsideAbsorpVis = Material( InsideMaterNum ).AbsorpVisible;
@@ -963,7 +959,7 @@ namespace DataHeatBalance {
 			}
 
 		} else { //Opaque surface
-			Construct( ConstrNum ).InsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( InsideLayer ) ).AbsorpThermal;
+			ConstrWin[ ConstrNum  - 1 ].InsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( InsideLayer ) ).AbsorpThermal;
 			Construct( ConstrNum ).OutsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( 1 ) ).AbsorpThermal;
 		}
 
@@ -1098,6 +1094,7 @@ namespace DataHeatBalance {
 			NominalRforNominalUCalculation.deallocate();
 			NominalU.deallocate();
 			Construct.allocate( TotConstructs );
+			ConstrWin.resize( TotConstructs );
 			Construct = ConstructSave;
 			ConstructSave.deallocate();
 			NominalRforNominalUCalculation.allocate( TotConstructs );
@@ -1736,11 +1733,11 @@ namespace DataHeatBalance {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
+	//     Portions of the EnergyPlus software package have been developed and copyrighted7
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
 	//     list of contributors, see "Notice" located in EnergyPlus.f90.

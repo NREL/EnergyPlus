@@ -1767,7 +1767,7 @@ namespace EMSManager {
 
 			SetupEMSActuator( "Window Shading Control", Surface( loopSurfNum ).Name, "Control Status", "[ShadeStatus]", SurfaceWindow( loopSurfNum ).ShadingFlagEMSOn, SurfaceWindow( loopSurfNum ).ShadingFlagEMSValue );
 
-			if ( SurfaceWindow( loopSurfNum ).MovableSlats ) {
+			if ( DataSurfaces::SurfaceRadiantWin[ loopSurfNum  - 1].MovableSlats ) {
 				SetupEMSActuator( "Window Shading Control", Surface( loopSurfNum ).Name, "Slat Angle", "[degrees]", SurfaceWindow( loopSurfNum ).SlatAngThisTSDegEMSon, SurfaceWindow( loopSurfNum ).SlatAngThisTSDegEMSValue );
 
 			}
@@ -2044,7 +2044,7 @@ namespace EMSManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

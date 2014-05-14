@@ -92,7 +92,7 @@ namespace HeatBalanceSurfaceManager {
 	UpdateThermalHistories();
 
 	void
-	CalculateZoneMRT( Optional_int_const ZoneToResimulate = _ ); // if passed in, then only calculate surfaces that have this zone
+	CalculateZoneMRT( const int ZoneToResimulate = -1 ); // if passed in, then only calculate surfaces that have this zone
 
 	// End of Record Keeping subroutines for the HB Module
 	// *****************************************************************************
@@ -116,10 +116,10 @@ namespace HeatBalanceSurfaceManager {
 // EXTERNAL SUBROUTINES (heavily related to HeatBalanceSurfaceManager)
 
 void
-CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate = _ ); // if passed in, then only calculate surfaces that have this zone
+CalcHeatBalanceOutsideSurf( const int ZoneToResimulate = -1); // if passed in, then only calculate surfaces that have this zone
 
 void
-CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate = _ ); // if passed in, then only calculate surfaces that have this zone
+CalcHeatBalanceInsideSurf( const int ZoneToResimulate = -1 ); // if passed in, then only calculate surfaces that have this zone
 
 void
 CalcOutsideSurfTemp(
@@ -142,7 +142,7 @@ GatherComponentLoadsSurfAbsFact();
 // *****************************************************************************
 
 //     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted
