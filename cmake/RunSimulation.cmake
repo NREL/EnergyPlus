@@ -34,6 +34,7 @@ if (BUILD_FORTRAN)
     endif ()
 endif ()
 
+set( ENV{DDONLY} Y )
 execute_process(COMMAND "${ENERGYPLUS_EXE}" WORKING_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}")
 
 execute_process(COMMAND "${CMAKE_COMMAND}" -E remove 
