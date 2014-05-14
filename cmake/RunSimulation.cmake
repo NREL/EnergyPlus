@@ -5,6 +5,7 @@
 # ENERGYPLUS_EXE
 # EXPANDOBJECTS_EXE
 # IDF_FILE
+# EPW_FILE
 
 get_filename_component(IDF_NAME "${IDF_FILE}" NAME_WE)
 
@@ -15,7 +16,7 @@ execute_process(COMMAND "${CMAKE_COMMAND}" -E copy
                 "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf" )
 
 execute_process(COMMAND "${CMAKE_COMMAND}" -E copy 
-                "${SOURCE_DIR}/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw" 
+                "${SOURCE_DIR}/weather/${EPW_FILE}" 
                 "${BINARY_DIR}/testfiles/${IDF_NAME}/in.epw" )
 
 execute_process(COMMAND "${CMAKE_COMMAND}" -E copy 

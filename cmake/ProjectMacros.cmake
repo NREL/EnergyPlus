@@ -53,7 +53,7 @@ macro( CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES )
   endif()
 endmacro()
 
-macro( ADD_SIMULATION_TEST IDF_FILE )
+macro( ADD_SIMULATION_TEST IDF_FILE EPW_FILE )
   get_filename_component(IDF_NAME "${IDF_FILE}" NAME_WE)
   if (BUILD_FORTRAN) #only do ExpandObjects in Fortran/Full builds
       add_test(NAME "integration.${IDF_NAME}" COMMAND ${CMAKE_COMMAND}
@@ -62,6 +62,7 @@ macro( ADD_SIMULATION_TEST IDF_FILE )
 	       -DENERGYPLUS_EXE=$<TARGET_FILE:EnergyPlus>
 	       -DEXPANDOBJECTS_EXE=$<TARGET_FILE:ExpandObjects>
 	       -DIDF_FILE=${IDF_FILE}
+	       -DEPW_FILE=${EPW_FILE}
 	       -P ${CMAKE_SOURCE_DIR}/cmake/RunSimulation.cmake
       )
   else ()
@@ -70,6 +71,7 @@ macro( ADD_SIMULATION_TEST IDF_FILE )
 	       -DBINARY_DIR=${CMAKE_BINARY_DIR}
 	       -DENERGYPLUS_EXE=$<TARGET_FILE:EnergyPlus>
 	       -DIDF_FILE=${IDF_FILE}
+	       -DEPW_FILE=${EPW_FILE}
 	       -P ${CMAKE_SOURCE_DIR}/cmake/RunSimulation.cmake
       )  
   endif ()
