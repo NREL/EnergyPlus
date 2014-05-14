@@ -58,45 +58,41 @@ power( double const & baseValue, int const & exponentValue)
 {
 	if ( exponentValue == 0 ) { return 1.0; }
 	double result = 1.0;
-	if ( exponentValue > 0 ) {
-		switch( exponentValue ) {
-			case 1: return baseValue;
-			case 2: return baseValue * baseValue;
-			case 3: return baseValue * baseValue * baseValue;
-			case 4:
-				result = baseValue * baseValue;
-				return result * result;
-			case 5:
-				result = baseValue * baseValue;
-				return result * result * baseValue;
-			case 6:
-				result = baseValue * baseValue;
-				return result * result * result;
-			case 7:
-				result = baseValue * baseValue;
-				return result * result * result * baseValue;
-			default: return std::pow( baseValue, exponentValue );
-		}
-	} else {
-		switch( -exponentValue ) {
-			case 1: return result / baseValue;
-			case 2: return baseValue / baseValue;
-			case 3: return baseValue / baseValue / baseValue;
-			case 4:
-				result = baseValue / baseValue;
-				return result / result;
-			case 5:
-				result = baseValue / baseValue;
-				return result / result / baseValue;
-			case 6:
-				result = baseValue / baseValue;
-				return result / result / result;
-			case 7:
-				result = baseValue / baseValue;
-				return result / result / result / baseValue;
-			default: return std::pow( baseValue, exponentValue );
-		}
+	bool const negative = exponentValue < 0;
+	switch( negative ? -exponentValue : exponentValue ) {
+		case 1:
+			result = baseValue;
+			break;
+		case 2:
+			result = baseValue * baseValue;
+			break;
+		case 3:
+			result = baseValue * baseValue;
+			result *= baseValue;
+			break;
+		case 4:
+			result = baseValue * baseValue;
+			result *= result;
+			break;
+		case 5:
+			result = baseValue * baseValue;
+			result *= result;
+			result *= baseValue;
+			break;
+		case 6:
+			result = baseValue * baseValue;
+			result *= result;
+			result *= result;
+			break;
+		case 7:
+			result = baseValue * baseValue;
+			result *= result;
+			result *= result;
+			result *= baseValue;
+			break;
+		default: return std::pow( baseValue, exponentValue );
 	}
+	return negative ? 1.0 / result : result;
 }
 
 /** This function overloads power() so std::pow is used. This allows all
