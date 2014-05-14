@@ -2031,15 +2031,15 @@ namespace IceThermalStorage {
 		{ auto const SELECT_CASE_var( IceStorage( IceNum ).ITSType_Num );
 		if ( SELECT_CASE_var == ITSType_IceOnCoilInternal ) {
 			y = XCurIceFrac;
-			UAIceCh = ( 1.3879 - 7.6333 * y + 26.3423 * second_power( y ) - 47.6084 * third_power( y ) + 41.8498 * fourth_power( y ) - 14.2948 * fifth_power( y ) ) * IceStorage( IceNum ).ITSNomCap / TimeInterval / 10.0; // [W/C]
+			UAIceCh = ( ( ( ( -14.2948 * y + 41.8498 ) * y - 47.6084 ) * y + 26.3423 ) * y - 7.6333 ) * y + 1.3879 ) * IceStorage( IceNum ).ITSNomCap / TimeInterval / 10.0; // [W/C]
 			y = 1.0 - XCurIceFrac;
-			UAIceDisCh = ( 1.3879 - 7.6333 * y + 26.3423 * second_power( y ) - 47.6084 * third_power( y ) + 41.8498 * fourth_power( y ) - 14.2948 * fifth_power( y ) ) * IceStorage( IceNum ).ITSNomCap / TimeInterval / 10.0; // [W/C]
+			UAIceDisCh = ( ( ( ( -14.2948 * y + 41.8498 ) * y - 47.6084 ) * y + 26.3423 ) * y - 7.6333 ) * y + 1.3879 ) * IceStorage( IceNum ).ITSNomCap / TimeInterval / 10.0; // [W/C]
 			HLoss = 0.0;
 		} else if ( SELECT_CASE_var == ITSType_IceOnCoilExternal ) {
 			y = XCurIceFrac;
-			UAIceCh = ( 1.3879 - 7.6333 * y + 26.3423 * second_power( y ) - 47.6084 * third_power( y ) + 41.8498 * fourth_power( y ) - 14.2948 * fifth_power( y ) ) * IceStorage( IceNum ).ITSNomCap / TimeInterval / 10.0; // [W/C]
+			UAIceCh = ( ( ( ( -14.2948 * y + 41.8498 ) * y - 47.6084 ) * y + 26.3423 ) * y - 7.6333 ) * y + 1.3879 ) * IceStorage( IceNum ).ITSNomCap / TimeInterval / 10.0; // [W/C]
 			y = 1.0 - XCurIceFrac;
-			UAIceDisCh = ( 1.1756 - 5.3689 * y + 17.3602 * second_power( y ) - 30.1077 * third_power( y ) + 25.6387 * fourth_power( y ) - 8.5102 * fifth_power( y ) ) * IceStorage( IceNum ).ITSNomCap / TimeInterval / 10.0; // [W/C]
+			UAIceDisCh = ( ( ( ( -8.5102 * y + 25.6387 ) * y - 30.1077 ) * y + 17.3602 ) * y - 5.3689 ) * y + 1.1756 ) * IceStorage( IceNum ).ITSNomCap / TimeInterval / 10.0; // [W/C]
 			HLoss = 0.0;
 
 		}}

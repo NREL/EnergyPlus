@@ -1321,7 +1321,7 @@ namespace ThermalComfort {
 					//  OTHERWISE NORMAL BLOOD FLOW OR VASODILATION OCCURS AND RESULTS IN
 					//  THERMAL NEUTRALITY OR WARM SENSATION.
 					if ( VasodilationFac < 0 ) {
-						ThermalComfortData( PeopleNum ).KsuTSV = -1.46153 * VasoconstrictFac + 3.74721 * second_power( VasoconstrictFac ) - 6.168856 * third_power( VasoconstrictFac );
+						ThermalComfortData( PeopleNum ).KsuTSV = ( ( ( -6.168856 * VasoconstrictFac + 3.74721 ) * VasoconstrictFac - 1.46153 ) * VasoconstrictFac;
 					} else {
 						ThermalComfortData( PeopleNum ).KsuTSV = ( 5. - 6.56 * ( RelHum - 0.50 ) ) * SkinWetFac;
 						if ( ThermalComfortData( PeopleNum ).KsuTSV > TSVMax ) ThermalComfortData( PeopleNum ).KsuTSV = TSVMax;
@@ -1896,7 +1896,7 @@ namespace ThermalComfort {
 		// FLOW
 
 		XT = Temp / 100.;
-		CalcSatVapPressFromTemp = 6.16796 + 358.1855 * second_power( XT ) - 550.3543 * third_power( XT ) + 1048.8115 * fourth_power( XT );
+		CalcSatVapPressFromTemp = ( ( ( 1048.8115 * XT - 550.3543 ) * XT + 358.1855 ) * XT ) * XT + 6.16796;
 
 		return CalcSatVapPressFromTemp;
 

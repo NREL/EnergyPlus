@@ -6305,7 +6305,7 @@ namespace WindowEquivalentLayer {
 			beta = 1.0 / Tavg; // thermal expansion coef(/K)
 			dvisc = ( 18.05 + ( ( Tavg - 290. ) / 10. ) * ( 18.53 - 18.05 ) ) * 1.0e-6;
 			//  dynamic viscosity (kg/m.sec) or (N.sec/m2)
-			Cp = 1044.66 - 0.31597 * Tavg + 0.000707908 * second_power( Tavg ) - 0.00000027034 * third_power( Tavg );
+			Cp = ( ( ( -0.00000027034 * Tavg + 0.000707908 ) * Tavg - 0.31597 ) * Tavg + 1044.66;
 			//  specific heat at constant pressure (J/kg.K)
 			k = 0.02538 + ( ( Tavg - 290. ) / 10. ) * ( 0.02614 - 0.02538 ); // conductivity (W/m.K)
 
@@ -6382,7 +6382,7 @@ namespace WindowEquivalentLayer {
 			beta = 1.0 / Tavg; // thermal expansion coef(/K)
 			dvisc = ( 18.05 + ( ( Tavg - 290. ) / 10. ) * ( 18.53 - 18.05 ) ) * 1.0e-6;
 			//  dynamic viscosity (kg/m.sec) or (N.sec/m2)
-			Cp = 1044.66 - 0.31597 * Tavg + 0.000707908 * second_power( Tavg ) - 0.00000027034 * third_power( Tavg );
+			Cp = ( ( ( -0.00000027034 * Tavg + 0.000707908 ) * Tavg - 0.31597 ) * Tavg + 1044.66;
 			//  specific heat at constant pressure (J/kg.K)
 			k = 0.02538 + ( ( Tavg - 290. ) / 10. ) * ( 0.02614 - 0.02538 ); // conductivity (W/m.K)
 
@@ -6411,7 +6411,7 @@ namespace WindowEquivalentLayer {
 			beta = 1.0 / Tavg; // thermal expansion coef(/K)
 			dvisc = ( 18.05 + ( ( Tavg - 290.0 ) / 10.0 ) * ( 18.53 - 18.05 ) ) * 1.0e-6;
 			//  dynamic viscosity (kg/m.sec) or (N.sec/m2)
-			Cp = 1044.66 - 0.31597 * Tavg + 0.000707908 * second_power( Tavg ) - 0.00000027034 * third_power( Tavg );
+			Cp = ( ( ( -0.00000027034 * Tavg + 0.000707908 ) * Tavg - 0.31597 ) * Tavg + 1044.66;
 			//  specific heat at constant pressure (J/kg.K)
 			k = 0.02538 + ( ( Tavg - 290.0 ) / 10.0 ) * ( 0.02614 - 0.02538 ); // conductivity (W/m.K)
 
@@ -6510,7 +6510,7 @@ namespace WindowEquivalentLayer {
 			beta = 1.0 / Tavg; // thermal expansion coef(/K)
 			dvisc = ( 18.05 + ( ( Tavg - 290. ) / 10. ) * ( 18.53 - 18.05 ) ) * 1.0e-6;
 			//  dynamic viscosity (kg/m.sec) or (N.sec/m2)
-			Cp = 1044.66 - 0.31597 * Tavg + 0.000707908 * second_power( Tavg ) - 0.00000027034 * third_power( Tavg );
+			Cp = ( ( ( -0.00000027034 * Tavg + 0.000707908 ) * Tavg - 0.31597 ) * Tavg + 1044.66;
 			//  specific heat at constant pressure (J/kg.K)
 			k = 0.02538 + ( ( Tavg - 290. ) / 10. ) * ( 0.02614 - 0.02538 ); // conductivity (W/m.K)
 
@@ -6535,7 +6535,7 @@ namespace WindowEquivalentLayer {
 			beta = 1.0 / Tavg; // thermal expansion coef(/K)
 			dvisc = ( 18.05 + ( ( Tavg - 290.0 ) / 10.0 ) * ( 18.53 - 18.05 ) ) * 1.0e-6;
 			//  dynamic viscosity (kg/m.sec) or (N.sec/m2)
-			Cp = 1044.66 - 0.31597 * Tavg + 0.000707908 * second_power( Tavg ) - 0.00000027034 * third_power( Tavg );
+			Cp = ( ( ( -0.00000027034 * Tavg + 0.000707908 ) * Tavg - 0.31597 ) * Tavg + 1044.66;
 			//  specific heat at constant pressure (J/kg.K)
 			k = 0.02538 + ( ( Tavg - 290.0 ) / 10.0 ) * ( 0.02614 - 0.02538 ); // conductivity (W/m.K)
 

@@ -1712,7 +1712,7 @@ namespace Fans {
 			if ( NightVentOn && NVPerfNum > 0 ) {
 				PartLoadFrac = 1.0;
 			} else {
-				PartLoadFrac = Fan( FanNum ).FanCoeff( 1 ) + Fan( FanNum ).FanCoeff( 2 ) * FlowFracForPower + Fan( FanNum ).FanCoeff( 3 ) * second_power( FlowFracForPower ) + Fan( FanNum ).FanCoeff( 4 ) * third_power( FlowFracForPower ) + Fan( FanNum ).FanCoeff( 5 ) * fourth_power( FlowFracForPower );
+				PartLoadFrac = ( ( ( Fan( FanNum ).FanCoeff( 5 ) * FlowFracForPower + Fan( FanNum ).FanCoeff( 4 ) ) * FlowFracForPower + Fan( FanNum ).FanCoeff( 3 ) ) * FlowFracForPower + Fan( FanNum ).FanCoeff( 2 ) ) * FlowFracForPower + Fan( FanNum ).FanCoeff( 1 );
 			}
 
 			Fan( FanNum ).FanPower = PartLoadFrac * MaxAirMassFlowRate * DeltaPress / ( FanEff * RhoAir ); // total fan power (PH 7/13/03)
@@ -1736,11 +1736,11 @@ namespace Fans {
 			if ( DeltaTAcrossFan > 20.0 ) {
 				MinFlowFracLimitFanHeat = 0.10;
 				if ( FlowFracForPower < MinFlowFracLimitFanHeat ) {
-					PartLoadFracatLowMin = Fan( FanNum ).FanCoeff( 1 ) + Fan( FanNum ).FanCoeff( 2 ) * MinFlowFracLimitFanHeat + Fan( FanNum ).FanCoeff( 3 ) * second_power( MinFlowFracLimitFanHeat ) + Fan( FanNum ).FanCoeff( 4 ) * third_power( MinFlowFracLimitFanHeat ) + Fan( FanNum ).FanCoeff( 5 ) * fourth_power( MinFlowFracLimitFanHeat );
+					PartLoadFracatLowMin = ( ( ( Fan( FanNum ).FanCoeff( 5 ) * MinFlowFracLimitFanHeat + Fan( FanNum ).FanCoeff( 4 ) ) * MinFlowFracLimitFanHeat + Fan( FanNum ).FanCoeff( 3 ) ) * MinFlowFracLimitFanHeat + Fan( FanNum ).FanCoeff( 2 ) ) * MinFlowFracLimitFanHeat + Fan( FanNum ).FanCoeff( 1 );
 					FanPoweratLowMinimum = PartLoadFracatLowMin * MaxAirMassFlowRate * DeltaPress / ( FanEff * RhoAir );
 					Fan( FanNum ).FanPower = FlowFracForPower * FanPoweratLowMinimum / MinFlowFracLimitFanHeat;
 				} else if ( FlowFracActual < MinFlowFracLimitFanHeat ) {
-					PartLoadFracatLowMin = Fan( FanNum ).FanCoeff( 1 ) + Fan( FanNum ).FanCoeff( 2 ) * MinFlowFracLimitFanHeat + Fan( FanNum ).FanCoeff( 3 ) * second_power( MinFlowFracLimitFanHeat ) + Fan( FanNum ).FanCoeff( 4 ) * third_power( MinFlowFracLimitFanHeat ) + Fan( FanNum ).FanCoeff( 5 ) * fourth_power( MinFlowFracLimitFanHeat );
+					PartLoadFracatLowMin = ( ( ( Fan( FanNum ).FanCoeff( 5 ) * MinFlowFracLimitFanHeat + Fan( FanNum ).FanCoeff( 4 ) ) * MinFlowFracLimitFanHeat + Fan( FanNum ).FanCoeff( 3 ) ) * MinFlowFracLimitFanHeat + Fan( FanNum ).FanCoeff( 2 ) ) * MinFlowFracLimitFanHeat + Fan( FanNum ).FanCoeff( 1 );
 					FanPoweratLowMinimum = PartLoadFracatLowMin * MaxAirMassFlowRate * DeltaPress / ( FanEff * RhoAir );
 					Fan( FanNum ).FanPower = FlowFracActual * FanPoweratLowMinimum / MinFlowFracLimitFanHeat;
 				}
