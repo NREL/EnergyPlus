@@ -470,7 +470,7 @@ namespace EarthTube {
 				EarthTubeSys( Loop ).FanPower = EAMFL( NZ ) * EarthTubeSys( Loop ).FanPressure / ( EarthTubeSys( Loop ).FanEfficiency * AirDensity );
 			}
 
-			AverPipeAirVel = EVF( NZ ) / Pi / ( second_power( EarthTubeSys( Loop ).r1 ) );
+			AverPipeAirVel = EVF( NZ ) / Pi / ( pow2( EarthTubeSys( Loop ).r1 ) );
 			AirMassFlowRate = EVF( NZ ) * AirDensity;
 
 			// Calculation of Average Ground Temperature between Depth z1 and z2 at time t

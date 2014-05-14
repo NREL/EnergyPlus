@@ -276,9 +276,9 @@ namespace HeatBalanceIntRadExchange {
 					SendSurfTemp = SurfaceWindow( SendSurfNum ).EffInsSurfTemp;
 				}
 #ifdef EP_HBIRE_SEQ
-				SendSurfaceTempInKto4thPrecalc( SendZoneSurfNum ) = fourth_power( ( SendSurfTemp + KelvinConv ) );
+				SendSurfaceTempInKto4thPrecalc( SendZoneSurfNum ) = pow4( ( SendSurfTemp + KelvinConv ) );
 #else
-				SendSurfaceTempInKto4thPrecalc( SendSurfNum ) = fourth_power( ( SendSurfTemp + KelvinConv ) );
+				SendSurfaceTempInKto4thPrecalc( SendSurfNum ) = pow4( ( SendSurfTemp + KelvinConv ) );
 #endif
 			}
 
@@ -305,7 +305,7 @@ namespace HeatBalanceIntRadExchange {
 					RecSurfTemp = SurfaceWindow( RecSurfNum ).EffInsSurfTemp;
 				}
 				// precalculate the fourth power of surface temperature as part of strategy to reduce calculation time - Glazer 2011-04-22
-				RecSurfTempInKTo4th = fourth_power( ( RecSurfTemp + KelvinConv ) );
+				RecSurfTempInKTo4th = pow4( ( RecSurfTemp + KelvinConv ) );
 				//      IF (ABS(RecSurfTempInKTo4th) > 1.d100) THEN
 				//        SendZoneSurfNum=1
 				//      ENDIF
@@ -733,9 +733,9 @@ namespace HeatBalanceIntRadExchange {
 
 			GetObjectItem( "ZoneProperty:UserViewFactors", UserFZoneIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			if ( NumNums < 3 * second_power( ( N ) ) ) {
+			if ( NumNums < 3 * pow2( ( N ) ) ) {
 				ShowSevereError( "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", not enough values." );
-				ShowContinueError( "...Number of input values [" + TrimSigDigits( NumNums ) + "] is less than the required number=[" + TrimSigDigits( 3 * second_power( ( N ) ) ) + "]." );
+				ShowContinueError( "...Number of input values [" + TrimSigDigits( NumNums ) + "] is less than the required number=[" + TrimSigDigits( 3 * pow2( ( N ) ) ) + "]." );
 				ErrorsFound = true;
 				NumNums = 0;
 			}
@@ -821,9 +821,9 @@ namespace HeatBalanceIntRadExchange {
 
 			GetObjectItem( "ZoneProperty:UserViewFactors:bySurfaceName", UserFZoneIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			if ( NumNums < second_power( N ) ) {
+			if ( NumNums < pow2( N ) ) {
 				ShowSevereError( "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", not enough values." );
-				ShowContinueError( "...Number of input values [" + TrimSigDigits( NumNums ) + "] is less than the required number=[" + TrimSigDigits( second_power( N ) ) + "]." );
+				ShowContinueError( "...Number of input values [" + TrimSigDigits( NumNums ) + "] is less than the required number=[" + TrimSigDigits( pow2( N ) ) + "]." );
 				ErrorsFound = true;
 				NumNums = 0; // cancel getting any coordinates
 			}

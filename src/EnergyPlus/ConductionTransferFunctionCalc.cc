@@ -680,9 +680,9 @@ namespace ConductionTransferFunctionCalc {
 					for ( Layer = 1; Layer <= LayersInConstruct; ++Layer ) {
 						if ( Nodes( Layer ) >= MaxCTFTerms ) {
 							if ( Construct( ConstrNum ).SolutionDimensions == 1 ) {
-								dtn = rho( Layer ) * cp( Layer ) * second_power( dx( Layer ) ) / rk( Layer );
+								dtn = rho( Layer ) * cp( Layer ) * pow2( dx( Layer ) ) / rk( Layer );
 							} else { // 2-D solution requested-->this changes length parameter in Fourier number calculation
-								dtn = rho( Layer ) * cp( Layer ) * ( ( second_power( dx( Layer ) ) ) + ( second_power( dyn ) ) ) / rk( Layer );
+								dtn = rho( Layer ) * cp( Layer ) * ( ( pow2( dx( Layer ) ) ) + ( pow2( dyn ) ) ) / rk( Layer );
 							}
 							if ( dtn > Construct( ConstrNum ).CTFTimeStep ) Construct( ConstrNum ).CTFTimeStep = dtn;
 						}

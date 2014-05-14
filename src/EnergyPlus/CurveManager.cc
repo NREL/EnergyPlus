@@ -5395,7 +5395,7 @@ Label999: ;
 		ConstantF = PressureCurve( PressureCurveIndex ).ConstantF;
 
 		//Intermediate calculations
-		CrossSectArea = ( Pi / 4.0 ) * second_power( Diameter );
+		CrossSectArea = ( Pi / 4.0 ) * pow2( Diameter );
 		Velocity = MassFlow / ( Density * CrossSectArea );
 		ReynoldsNumber = Density * Diameter * Velocity / Viscosity; //assuming mu here
 		RoughnessRatio = Roughness / Diameter;
@@ -5418,7 +5418,7 @@ Label999: ;
 		}
 
 		//Pressure drop calculation
-		PressureCurveValue = ( FrictionFactor * ( Length / Diameter ) + MinorLossCoeff ) * ( Density * second_power( Velocity ) ) / 2.0;
+		PressureCurveValue = ( FrictionFactor * ( Length / Diameter ) + MinorLossCoeff ) * ( Density * pow2( Velocity ) ) / 2.0;
 
 		if ( PressureCurve( PressureCurveIndex ).EMSOverrideOn ) PressureCurveValue = PressureCurve( PressureCurveIndex ).EMSOverrideCurveValue;
 

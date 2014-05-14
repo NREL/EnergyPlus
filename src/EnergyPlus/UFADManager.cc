@@ -1143,7 +1143,7 @@ namespace UFADManager {
 				}
 				HeightFrac = max( 0.0, min( 1.0, HeightFrac ) );
 				HeightTransition( ZoneNum ) = HeightFrac * CeilingHeight;
-				GainsFrac = ZoneUCSDUI( UINum ).A_Kc * std::pow( Gamma, ZoneUCSDUI( UINum ).B_Kc ) + ZoneUCSDUI( UINum ).C_Kc + ZoneUCSDUI( UINum ).D_Kc * Gamma + ZoneUCSDUI( UINum ).E_Kc * second_power( Gamma );
+				GainsFrac = ZoneUCSDUI( UINum ).A_Kc * std::pow( Gamma, ZoneUCSDUI( UINum ).B_Kc ) + ZoneUCSDUI( UINum ).C_Kc + ZoneUCSDUI( UINum ).D_Kc * Gamma + ZoneUCSDUI( UINum ).E_Kc * pow2( Gamma );
 				GainsFrac = max( 0.6, min( GainsFrac, 1.0 ) );
 				AIRRATOC( ZoneNum ) = Zone( ZoneNum ).Volume * ( HeightTransition( ZoneNum ) - min( HeightTransition( ZoneNum ), 0.2 ) ) / CeilingHeight * ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATOC( ZoneNum ), ZoneAirHumRat( ZoneNum ), BlankString ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATOC( ZoneNum ) ) / ( TimeStepSys * SecInHour );
 				AIRRATMX( ZoneNum ) = Zone( ZoneNum ).Volume * ( CeilingHeight - HeightTransition( ZoneNum ) ) / CeilingHeight * ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATMX( ZoneNum ), ZoneAirHumRat( ZoneNum ), BlankString ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATMX( ZoneNum ) ) / ( TimeStepSys * SecInHour );
@@ -1561,7 +1561,7 @@ namespace UFADManager {
 				HeightFrac = ZoneUCSDUE( UINum ).TransHeight / CeilingHeight;
 			}
 			HeightFrac = max( 0.0, min( 1.0, HeightFrac ) );
-			GainsFrac = ZoneUCSDUE( UINum ).A_Kc * std::pow( Gamma, ZoneUCSDUE( UINum ).B_Kc ) + ZoneUCSDUE( UINum ).C_Kc + ZoneUCSDUE( UINum ).D_Kc * Gamma + ZoneUCSDUE( UINum ).E_Kc * second_power( Gamma );
+			GainsFrac = ZoneUCSDUE( UINum ).A_Kc * std::pow( Gamma, ZoneUCSDUE( UINum ).B_Kc ) + ZoneUCSDUE( UINum ).C_Kc + ZoneUCSDUE( UINum ).D_Kc * Gamma + ZoneUCSDUE( UINum ).E_Kc * pow2( Gamma );
 			GainsFrac = max( 0.7, min( GainsFrac, 1.0 ) );
 			if ( ZoneUCSDUE( UINum ).ShadeDown ) {
 				GainsFrac -= 0.2;
@@ -1592,7 +1592,7 @@ namespace UFADManager {
 				}
 				HeightFrac = min( 1.0, HeightFrac );
 				HeightTransition( ZoneNum ) = HeightFrac * CeilingHeight;
-				GainsFrac = ZoneUCSDUE( UINum ).A_Kc * std::pow( Gamma, ZoneUCSDUE( UINum ).B_Kc ) + ZoneUCSDUE( UINum ).C_Kc + ZoneUCSDUE( UINum ).D_Kc * Gamma + ZoneUCSDUE( UINum ).E_Kc * second_power( Gamma );
+				GainsFrac = ZoneUCSDUE( UINum ).A_Kc * std::pow( Gamma, ZoneUCSDUE( UINum ).B_Kc ) + ZoneUCSDUE( UINum ).C_Kc + ZoneUCSDUE( UINum ).D_Kc * Gamma + ZoneUCSDUE( UINum ).E_Kc * pow2( Gamma );
 				GainsFrac = max( 0.7, min( GainsFrac, 1.0 ) );
 				if ( ZoneUCSDUE( UINum ).ShadeDown ) {
 					GainsFrac -= 0.2;

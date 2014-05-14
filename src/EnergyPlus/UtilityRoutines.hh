@@ -49,128 +49,53 @@ FindNonSpace( std::string const & String ); // String to be scanned
 
 inline
 double
-second_power( double const & baseValue )
+pow2( double const & x )
 {
-	return baseValue * baseValue;
+	return x * x;
 }
 
 inline
 double
-third_power( double const & baseValue )
+pow3( double const & x )
 {
-	return baseValue * baseValue * baseValue;
+	return x * x * x;
 }
 
 inline
 double
-fourth_power( double const & baseValue )
+pow4( double const & x )
 {
-	double result = baseValue * baseValue;
-	return result * result;
+	double y = x * x;
+	return y * y;
 }
 
 inline
 double
-fifth_power( double const & baseValue )
+pow5( double const & x )
 {
-	double result = baseValue * baseValue;
-	result *= result;
-	return result * baseValue;
+	double y = x * x;
+	y *= y;
+	return y * x;
 }
 
 inline
 double
-sixth_power( double const & baseValue )
+pow6( double const & x )
 {
-	double result = baseValue * baseValue;
-	result *= result;
-	return result * result;
+	double y = x * x;
+	y *= y;
+	return y * y;
 }
 
 inline
 double
-seventh_power( double const & baseValue )
+pow7( double const & x )
 {
-	double result = baseValue * baseValue;
-	result *= result;
-	result *= result;
-	return result * baseValue;
+	double y = x * x;
+	y *= y;
+	y *= y;
+	return y * x;
 }
-
-
-/** This function takes a baseValue and raises it to the exponentValue power.
-  * This implementation has a speed advantage over std::pow for low integer
-  * values of exponentValue where this unrolls the multiplication. Certain
-  * compilers may perform this exact optimization, but not all. **/
-// inline
-// double
-// power( double const & baseValue, int const & exponentValue)
-// {
-// 	if ( exponentValue == 0 ) { return 1.0; }
-// 	double result = 1.0;
-// 	bool const negative = exponentValue < 0;
-// 	switch( negative ? -exponentValue : exponentValue ) {
-// 		case 1:
-// 			result = baseValue;
-// 			break;
-// 		case 2:
-// 			result = baseValue * baseValue;
-// 			break;
-// 		case 3:
-// 			result = baseValue * baseValue;
-// 			result *= baseValue;
-// 			break;
-// 		case 4:
-// 			result = baseValue * baseValue;
-// 			result *= result;
-// 			break;
-// 		case 5:
-// 			result = baseValue * baseValue;
-// 			result *= result;
-// 			result *= baseValue;
-// 			break;
-// 		case 6:
-// 			result = baseValue * baseValue;
-// 			result *= result;
-// 			result *= result;
-// 			break;
-// 		case 7:
-// 			result = baseValue * baseValue;
-// 			result *= result;
-// 			result *= result;
-// 			result *= baseValue;
-// 			break;
-// 		default: return std::pow( baseValue, exponentValue );
-// 	}
-// 	return negative ? 1.0 / result : result;
-// }
-
-/** This function overloads std::pow() so std::pow is used. This allows all
-  * calls to use std::pow() instead of std::pow in the code. **/
-// inline
-// double
-// power( double const & baseValue, double const & exponentValue)
-// {
-// 	return std::pow( baseValue, exponentValue );
-// }
-
-/** This function overloads std::pow() so std::pow is used. This allows all
-  * calls to use std::pow() instead of std::pow in the code. **/
-// inline
-// float
-// power( float const & baseValue, float const & exponentValue)
-// {
-// 	return std::pow( baseValue, exponentValue );
-// }
-
-/** This function overloads std::pow() so std::pow is used. This allows all
-  * calls to use std::pow() instead of std::pow in the code. **/
-// inline
-// long double
-// power( long double const & baseValue, long double const & exponentValue)
-// {
-// 	return std::pow( baseValue, exponentValue );
-// }
 
 bool
 env_var_on( std::string const & env_var_str );

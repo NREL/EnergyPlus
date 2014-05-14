@@ -8185,7 +8185,7 @@ namespace WaterThermalTanks {
 		// if stratified, might set height.
 		if ( ( SizeVolume ) && ( WaterThermalTank( WaterThermalTankNum ).TypeNum == StratifiedWaterHeater ) && PlantSizesOkayToFinalize ) { // might set height
 			if ( ( WaterThermalTank( WaterThermalTankNum ).Height == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Volume != AutoSize ) ) {
-				WaterThermalTank( WaterThermalTankNum ).Height = std::pow( ( ( 4.0 * WaterThermalTank( WaterThermalTankNum ).Volume * ( second_power( WaterThermalTank( WaterThermalTankNum ).Sizing.HeightAspectRatio ) ) ) / Pi ), 0.33333333333333 );
+				WaterThermalTank( WaterThermalTankNum ).Height = std::pow( ( ( 4.0 * WaterThermalTank( WaterThermalTankNum ).Volume * ( pow2( WaterThermalTank( WaterThermalTankNum ).Sizing.HeightAspectRatio ) ) ) / Pi ), 0.33333333333333 );
 				ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Tank Height [m]", WaterThermalTank( WaterThermalTankNum ).Height );
 				// check if autocalculate Use outlet and source inlet are still set to autosize by earlier
 				if ( WaterThermalTank( WaterThermalTankNum ).UseOutletHeight == AutoSize ) {
@@ -8313,7 +8313,7 @@ namespace WaterThermalTanks {
 
 		if ( ( SizeVolume ) && ( WaterThermalTank( WaterThermalTankNum ).TypeNum == StratifiedWaterHeater ) && PlantSizesOkayToFinalize ) { // might set height
 			if ( ( WaterThermalTank( WaterThermalTankNum ).Height == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Volume != AutoSize ) ) {
-				WaterThermalTank( WaterThermalTankNum ).Height = std::pow( ( ( 4.0 * WaterThermalTank( WaterThermalTankNum ).Volume * ( second_power( WaterThermalTank( WaterThermalTankNum ).Sizing.HeightAspectRatio ) ) ) / Pi ), 0.33333333333333 );
+				WaterThermalTank( WaterThermalTankNum ).Height = std::pow( ( ( 4.0 * WaterThermalTank( WaterThermalTankNum ).Volume * ( pow2( WaterThermalTank( WaterThermalTankNum ).Sizing.HeightAspectRatio ) ) ) / Pi ), 0.33333333333333 );
 				ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Tank Height [m]", WaterThermalTank( WaterThermalTankNum ).Height );
 			}
 		}

@@ -1253,7 +1253,7 @@ namespace Fans {
 			//   and Sherman-Wray system curve model (assumes static pressure surrounding air distribution system is zero)
 			DuctStaticPress = CurveValue( Fan( FanNum ).PressResetCurveIndex, FanVolFlow ); //Duct static pressure setpoint [Pa]
 			DeltaPressTot = CurveValue( Fan( FanNum ).PressRiseCurveIndex, FanVolFlow, DuctStaticPress ); //Max fan total pressure rise [Pa]
-			FanOutletVelPress = 0.5 * RhoAir * second_power( ( FanVolFlow / Fan( FanNum ).FanOutletArea ) ); //Max fan outlet velocity pressure [Pa]
+			FanOutletVelPress = 0.5 * RhoAir * pow2( ( FanVolFlow / Fan( FanNum ).FanOutletArea ) ); //Max fan outlet velocity pressure [Pa]
 			//Outlet velocity pressure cannot exceed total pressure rise
 			FanOutletVelPress = min( FanOutletVelPress, DeltaPressTot );
 			Fan( FanNum ).DeltaPress = DeltaPressTot - FanOutletVelPress; //Max fan static pressure rise [Pa]
@@ -1263,7 +1263,7 @@ namespace Fans {
 
 			// Calculate fan wheel efficiency at max fan volumetric flow and corresponding fan static pressure rise,
 			//   using fan characteristics and Wray dimensionless fan static efficiency model
-			EulerNum = ( Fan( FanNum ).DeltaPress * fourth_power( Fan( FanNum ).FanWheelDia ) ) / ( RhoAir * second_power( FanVolFlow ) ); //[-]
+			EulerNum = ( Fan( FanNum ).DeltaPress * pow4( Fan( FanNum ).FanWheelDia ) ) / ( RhoAir * pow2( FanVolFlow ) ); //[-]
 			NormalizedEulerNum = std::log10( EulerNum / Fan( FanNum ).EuMaxEff );
 			if ( NormalizedEulerNum <= 0.0 ) {
 				Fan( FanNum ).FanWheelEff = CurveValue( Fan( FanNum ).PLFanEffNormCurveIndex, NormalizedEulerNum );
@@ -1284,7 +1284,7 @@ namespace Fans {
 			} else {
 				FanDimFlow = CurveValue( Fan( FanNum ).DimFlowStallCurveIndex, NormalizedEulerNum ); //[-]
 			}
-			FanSpdRadS = FanVolFlow / ( FanDimFlow * Fan( FanNum ).FanMaxDimFlow * third_power( Fan( FanNum ).FanWheelDia ) ); //[rad/s]
+			FanSpdRadS = FanVolFlow / ( FanDimFlow * Fan( FanNum ).FanMaxDimFlow * pow3( Fan( FanNum ).FanWheelDia ) ); //[rad/s]
 			Fan( FanNum ).FanSpd = FanSpdRadS * 9.549296586; //[rpm, conversion factor is 30/PI]
 
 			if ( Fan( FanNum ).PulleyDiaRatio == AutoSize ) {
@@ -2198,7 +2198,7 @@ namespace Fans {
 			FanVolFlow = MassFlow / RhoAir; //[m3/s at standard conditions]
 			DuctStaticPress = CurveValue( Fan( FanNum ).PressResetCurveIndex, FanVolFlow ); //Duct static pressure setpoint [Pa]
 			DeltaPressTot = CurveValue( Fan( FanNum ).PressRiseCurveIndex, FanVolFlow, DuctStaticPress ); //Fan total pressure rise [Pa]
-			FanOutletVelPress = 0.5 * RhoAir * second_power( ( FanVolFlow / Fan( FanNum ).FanOutletArea ) ); //Fan outlet velocity pressure [Pa]
+			FanOutletVelPress = 0.5 * RhoAir * pow2( ( FanVolFlow / Fan( FanNum ).FanOutletArea ) ); //Fan outlet velocity pressure [Pa]
 			//Outlet velocity pressure cannot exceed total pressure rise
 			FanOutletVelPress = min( FanOutletVelPress, DeltaPressTot );
 			Fan( FanNum ).DeltaPress = DeltaPressTot - FanOutletVelPress; //Fan static pressure rise [Pa]
@@ -2210,7 +2210,7 @@ namespace Fans {
 
 			// Calculate fan wheel efficiency using fan volumetric flow, fan static pressure rise,
 			//   fan characteristics, and Wray dimensionless fan static efficiency model
-			EulerNum = ( Fan( FanNum ).DeltaPress * fourth_power( Fan( FanNum ).FanWheelDia ) ) / ( RhoAir * second_power( FanVolFlow ) ); //[-]
+			EulerNum = ( Fan( FanNum ).DeltaPress * pow4( Fan( FanNum ).FanWheelDia ) ) / ( RhoAir * pow2( FanVolFlow ) ); //[-]
 			NormalizedEulerNum = std::log10( EulerNum / Fan( FanNum ).EuMaxEff );
 			if ( NormalizedEulerNum <= 0.0 ) {
 				Fan( FanNum ).FanWheelEff = CurveValue( Fan( FanNum ).PLFanEffNormCurveIndex, NormalizedEulerNum );
@@ -2229,7 +2229,7 @@ namespace Fans {
 			} else {
 				FanDimFlow = CurveValue( Fan( FanNum ).DimFlowStallCurveIndex, NormalizedEulerNum ); //[-]
 			}
-			FanSpdRadS = FanVolFlow / ( FanDimFlow * Fan( FanNum ).FanMaxDimFlow * third_power( Fan( FanNum ).FanWheelDia ) ); //[rad/s]
+			FanSpdRadS = FanVolFlow / ( FanDimFlow * Fan( FanNum ).FanMaxDimFlow * pow3( Fan( FanNum ).FanWheelDia ) ); //[rad/s]
 			Fan( FanNum ).FanTrq = Fan( FanNum ).FanShaftPower / FanSpdRadS; //[N-m]
 			Fan( FanNum ).FanSpd = FanSpdRadS * 9.549296586; //[rpm, conversion factor is 30/PI]
 			MotorSpeed = Fan( FanNum ).FanSpd * Fan( FanNum ).PulleyDiaRatio; //[rpm]

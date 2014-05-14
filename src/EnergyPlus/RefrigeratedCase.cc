@@ -9448,7 +9448,7 @@ namespace RefrigeratedCase {
 					HRCFFullFlow = HRCF;
 					//if evap condenser need to back calculate the operating capacity using HRCF relationship, given known Tcond
 					QuadBterm = Condenser( CondID ).EvapCoeff1 - ( System( SysNum ).TCondense - SinkTemp ) + Condenser( CondID ).EvapCoeff4 * SinkTemp;
-					Sqrtterm = second_power( QuadBterm ) - 4. * Condenser( CondID ).EvapCoeff2 * Condenser( CondID ).EvapCoeff3;
+					Sqrtterm = pow2( QuadBterm ) - 4. * Condenser( CondID ).EvapCoeff2 * Condenser( CondID ).EvapCoeff3;
 					if ( Sqrtterm < 0.0 ) { // only happens for very high wet bulb temps
 						HRCF = Condenser( CondID ).EvapElevFact * Condenser( CondID ).MaxCapFacEvap;
 						if ( ! EvapAvail ) HRCF /= 3.0;
@@ -11303,7 +11303,7 @@ namespace RefrigeratedCase {
 		HumRatioAirWalkIn = PsyWFnTdbH( TWalkIn, EnthalpyAirWalkIn, BlankString );
 		DensityAirWalkIn = PsyRhoAirFnPbTdbW( OutBaroPress, TWalkIn, HumRatioAirWalkIn, BlankString );
 		Conv = Latitude * 2.0 * Pi / 360.0; //Convert Latitude to radians
-		Gravity = 9.780373 * ( 1.0 + 0.0052891 * second_power( ( std::sin( Conv ) ) ) - 0.0000059 * second_power( ( std::sin( 2.0 * Conv ) ) ) );
+		Gravity = 9.780373 * ( 1.0 + 0.0052891 * pow2( ( std::sin( Conv ) ) ) - 0.0000059 * pow2( ( std::sin( 2.0 * Conv ) ) ) );
 
 		// CALCULATE ALL LOADS INFLUENCED BY ZONE TEMPERATURE AND RH
 		//set to zero before summing over zones

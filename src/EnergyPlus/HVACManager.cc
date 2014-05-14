@@ -960,7 +960,7 @@ namespace HVACManager {
 									}
 								}
 								if ( ! FoundOscillationByDuplicate ) {
-									SlopeHumRat = ( sum( ConvergLogStackARR ) * sum( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).HumidityRatio ) - double( ConvergLogStackDepth ) * sum( ( ConvergLogStackARR * ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).HumidityRatio ) ) ) / ( second_power( sum( ConvergLogStackARR ) ) - double( ConvergLogStackDepth ) * sum( pow( ConvergLogStackARR, 2 ) ) );
+									SlopeHumRat = ( sum( ConvergLogStackARR ) * sum( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).HumidityRatio ) - double( ConvergLogStackDepth ) * sum( ( ConvergLogStackARR * ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).HumidityRatio ) ) ) / ( pow2( sum( ConvergLogStackARR ) ) - double( ConvergLogStackDepth ) * sum( pow( ConvergLogStackARR, 2 ) ) );
 									if ( std::abs( SlopeHumRat ) > HVACHumRatSlopeToler ) {
 
 										if ( SlopeHumRat < 0.0 ) { // check for monotic decrease
@@ -1016,7 +1016,7 @@ namespace HVACManager {
 									}
 								}
 								if ( ! FoundOscillationByDuplicate ) {
-									SlopeMdot = ( sum( ConvergLogStackARR ) * sum( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).MassFlowRate ) - double( ConvergLogStackDepth ) * sum( ( ConvergLogStackARR * ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).MassFlowRate ) ) ) / ( second_power( sum( ConvergLogStackARR ) ) - double( ConvergLogStackDepth ) * sum( pow( ConvergLogStackARR, 2 ) ) );
+									SlopeMdot = ( sum( ConvergLogStackARR ) * sum( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).MassFlowRate ) - double( ConvergLogStackDepth ) * sum( ( ConvergLogStackARR * ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).MassFlowRate ) ) ) / ( pow2( sum( ConvergLogStackARR ) ) - double( ConvergLogStackDepth ) * sum( pow( ConvergLogStackARR, 2 ) ) );
 									if ( std::abs( SlopeMdot ) > HVACFlowRateSlopeToler ) {
 										ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).NotConvergedMassFlow = true;
 										if ( SlopeMdot < 0.0 ) { // check for monotic decrease
@@ -1072,7 +1072,7 @@ namespace HVACManager {
 									}
 								}
 								if ( ! FoundOscillationByDuplicate ) {
-									SlopeTemps = ( sum( ConvergLogStackARR ) * sum( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).Temperature ) - double( ConvergLogStackDepth ) * sum( ( ConvergLogStackARR * ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).Temperature ) ) ) / ( second_power( sum( ConvergLogStackARR ) ) - double( ConvergLogStackDepth ) * sum( pow( ConvergLogStackARR, 2 ) ) );
+									SlopeTemps = ( sum( ConvergLogStackARR ) * sum( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).Temperature ) - double( ConvergLogStackDepth ) * sum( ( ConvergLogStackARR * ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).Temperature ) ) ) / ( pow2( sum( ConvergLogStackARR ) ) - double( ConvergLogStackDepth ) * sum( pow( ConvergLogStackARR, 2 ) ) );
 									if ( std::abs( SlopeTemps ) > HVACTemperatureSlopeToler ) {
 										ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).NotConvergedTemp = true;
 										if ( SlopeTemps < 0.0 ) { // check for monotic decrease
@@ -1148,7 +1148,7 @@ namespace HVACManager {
 									}
 								}
 								if ( ! FoundOscillationByDuplicate ) {
-									SlopeMdot = ( sum( ConvergenceHistoryARR ) * sum( PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).InletNode.MassFlowRateHistory ) - double( NumConvergenceHistoryTerms ) * sum( ( ConvergenceHistoryARR * PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).InletNode.MassFlowRateHistory ) ) ) / ( second_power( sum( ConvergenceHistoryARR ) ) - double( NumConvergenceHistoryTerms ) * sum( pow( ConvergenceHistoryARR, 2 ) ) );
+									SlopeMdot = ( sum( ConvergenceHistoryARR ) * sum( PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).InletNode.MassFlowRateHistory ) - double( NumConvergenceHistoryTerms ) * sum( ( ConvergenceHistoryARR * PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).InletNode.MassFlowRateHistory ) ) ) / ( pow2( sum( ConvergenceHistoryARR ) ) - double( NumConvergenceHistoryTerms ) * sum( pow( ConvergenceHistoryARR, 2 ) ) );
 									if ( std::abs( SlopeMdot ) > PlantFlowRateSlopeToler ) {
 										if ( SlopeMdot < 0.0 ) { // check for monotonic decrease
 											MonotonicDecreaseFound = true;
@@ -1201,7 +1201,7 @@ namespace HVACManager {
 									}
 								}
 								if ( ! FoundOscillationByDuplicate ) {
-									SlopeMdot = ( sum( ConvergenceHistoryARR ) * sum( PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).OutletNode.MassFlowRateHistory ) - double( NumConvergenceHistoryTerms ) * sum( ( ConvergenceHistoryARR * PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).OutletNode.MassFlowRateHistory ) ) ) / ( second_power( sum( ConvergenceHistoryARR ) ) - double( NumConvergenceHistoryTerms ) * sum( pow( ConvergenceHistoryARR, 2 ) ) );
+									SlopeMdot = ( sum( ConvergenceHistoryARR ) * sum( PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).OutletNode.MassFlowRateHistory ) - double( NumConvergenceHistoryTerms ) * sum( ( ConvergenceHistoryARR * PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).OutletNode.MassFlowRateHistory ) ) ) / ( pow2( sum( ConvergenceHistoryARR ) ) - double( NumConvergenceHistoryTerms ) * sum( pow( ConvergenceHistoryARR, 2 ) ) );
 									if ( std::abs( SlopeMdot ) > PlantFlowRateSlopeToler ) {
 										if ( SlopeMdot < 0.0 ) { // check for monotonic decrease
 											MonotonicDecreaseFound = true;
@@ -1274,7 +1274,7 @@ namespace HVACManager {
 									}
 								}
 								if ( ! FoundOscillationByDuplicate ) {
-									SlopeTemps = ( sum( ConvergenceHistoryARR ) * sum( PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).InletNode.TemperatureHistory ) - double( NumConvergenceHistoryTerms ) * sum( ( ConvergenceHistoryARR * PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).InletNode.TemperatureHistory ) ) ) / ( second_power( sum( ConvergenceHistoryARR ) ) - double( NumConvergenceHistoryTerms ) * sum( pow( ConvergenceHistoryARR, 2 ) ) );
+									SlopeTemps = ( sum( ConvergenceHistoryARR ) * sum( PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).InletNode.TemperatureHistory ) - double( NumConvergenceHistoryTerms ) * sum( ( ConvergenceHistoryARR * PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).InletNode.TemperatureHistory ) ) ) / ( pow2( sum( ConvergenceHistoryARR ) ) - double( NumConvergenceHistoryTerms ) * sum( pow( ConvergenceHistoryARR, 2 ) ) );
 									if ( std::abs( SlopeTemps ) > PlantTemperatureSlopeToler ) {
 										if ( SlopeTemps < 0.0 ) { // check for monotic decrease
 											MonotonicDecreaseFound = true;
@@ -1327,7 +1327,7 @@ namespace HVACManager {
 									}
 								}
 								if ( ! FoundOscillationByDuplicate ) {
-									SlopeTemps = ( sum( ConvergenceHistoryARR ) * sum( PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).OutletNode.TemperatureHistory ) - double( NumConvergenceHistoryTerms ) * sum( ( ConvergenceHistoryARR * PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).OutletNode.TemperatureHistory ) ) ) / ( second_power( sum( ConvergenceHistoryARR ) ) - double( NumConvergenceHistoryTerms ) * sum( pow( ConvergenceHistoryARR, 2 ) ) );
+									SlopeTemps = ( sum( ConvergenceHistoryARR ) * sum( PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).OutletNode.TemperatureHistory ) - double( NumConvergenceHistoryTerms ) * sum( ( ConvergenceHistoryARR * PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).OutletNode.TemperatureHistory ) ) ) / ( pow2( sum( ConvergenceHistoryARR ) ) - double( NumConvergenceHistoryTerms ) * sum( pow( ConvergenceHistoryARR, 2 ) ) );
 									if ( std::abs( SlopeTemps ) > PlantFlowRateSlopeToler ) {
 										if ( SlopeTemps < 0.0 ) { // check for monotic decrease
 											MonotonicDecreaseFound = true;
@@ -2790,13 +2790,13 @@ namespace HVACManager {
 			} else if ( SELECT_CASE_var == InfiltrationShermanGrimsrud ) {
 				// Sherman Grimsrud model as formulated in ASHRAE HoF
 				WindExt = WindSpeed; // formulated to use wind at Meterological Station rather than local
-				IVF = GetCurrentScheduleValue( Infiltration( j ).SchedPtr ) * Infiltration( j ).LeakageArea / 1000.0 * std::sqrt( Infiltration( j ).BasicStackCoefficient * std::abs( TempExt - ZMAT( NZ ) ) + Infiltration( j ).BasicWindCoefficient * second_power( WindExt ) );
+				IVF = GetCurrentScheduleValue( Infiltration( j ).SchedPtr ) * Infiltration( j ).LeakageArea / 1000.0 * std::sqrt( Infiltration( j ).BasicStackCoefficient * std::abs( TempExt - ZMAT( NZ ) ) + Infiltration( j ).BasicWindCoefficient * pow2( WindExt ) );
 				if ( IVF < 0.0 ) IVF = 0.0;
 				MCpI_temp = IVF * AirDensity * CpAir;
 				if ( MCpI_temp < 0.0 ) MCpI_temp = 0.0;
 			} else if ( SELECT_CASE_var == InfiltrationAIM2 ) {
 				// Walker Wilson model as formulated in ASHRAE HoF
-				IVF = GetCurrentScheduleValue( Infiltration( j ).SchedPtr ) * std::sqrt( second_power( ( Infiltration( j ).FlowCoefficient * Infiltration( j ).AIM2StackCoefficient * std::pow( ( std::abs( TempExt - ZMAT( NZ ) ) ), Infiltration( j ).PressureExponent ) ) ) + second_power( ( Infiltration( j ).FlowCoefficient * Infiltration( j ).AIM2WindCoefficient * std::pow( ( Infiltration( j ).ShelterFactor * WindExt ), ( 2.0 * Infiltration( j ).PressureExponent ) ) ) ) );
+				IVF = GetCurrentScheduleValue( Infiltration( j ).SchedPtr ) * std::sqrt( pow2( ( Infiltration( j ).FlowCoefficient * Infiltration( j ).AIM2StackCoefficient * std::pow( ( std::abs( TempExt - ZMAT( NZ ) ) ), Infiltration( j ).PressureExponent ) ) ) + pow2( ( Infiltration( j ).FlowCoefficient * Infiltration( j ).AIM2WindCoefficient * std::pow( ( Infiltration( j ).ShelterFactor * WindExt ), ( 2.0 * Infiltration( j ).PressureExponent ) ) ) ) );
 				if ( IVF < 0.0 ) IVF = 0.0;
 				MCpI_temp = IVF * AirDensity * CpAir;
 				if ( MCpI_temp < 0.0 ) MCpI_temp = 0.0;
@@ -2842,7 +2842,7 @@ namespace HVACManager {
 				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Zone( NZ ).OutDryBulbTemp, OutHumRat, RoutineNameZoneAirBalance );
 				CpAir = PsyCpAirFnWTdb( OutHumRat, Zone( NZ ).OutDryBulbTemp );
 				ZoneAirBalance( j ).ERVMassFlowRate *= AirDensity;
-				MDotOA( NZ ) = std::sqrt( second_power( ( ZoneAirBalance( j ).NatMassFlowRate ) ) + second_power( ( ZoneAirBalance( j ).IntMassFlowRate ) ) + second_power( ( ZoneAirBalance( j ).ExhMassFlowRate ) ) + second_power( ( ZoneAirBalance( j ).ERVMassFlowRate ) ) + second_power( ( ZoneAirBalance( j ).InfMassFlowRate ) ) + second_power( ( AirDensity * ZoneAirBalance( j ).InducedAirRate * GetCurrentScheduleValue( ZoneAirBalance( j ).InducedAirSchedPtr ) ) ) ) + ZoneAirBalance( j ).BalMassFlowRate;
+				MDotOA( NZ ) = std::sqrt( pow2( ( ZoneAirBalance( j ).NatMassFlowRate ) ) + pow2( ( ZoneAirBalance( j ).IntMassFlowRate ) ) + pow2( ( ZoneAirBalance( j ).ExhMassFlowRate ) ) + pow2( ( ZoneAirBalance( j ).ERVMassFlowRate ) ) + pow2( ( ZoneAirBalance( j ).InfMassFlowRate ) ) + pow2( ( AirDensity * ZoneAirBalance( j ).InducedAirRate * GetCurrentScheduleValue( ZoneAirBalance( j ).InducedAirSchedPtr ) ) ) ) + ZoneAirBalance( j ).BalMassFlowRate;
 				MDotCPOA( NZ ) = MDotOA( NZ ) * CpAir;
 			}
 		}

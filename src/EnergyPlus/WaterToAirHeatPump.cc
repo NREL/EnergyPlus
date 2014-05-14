@@ -2205,7 +2205,7 @@ namespace WaterToAirHeatPump {
 		}
 
 		//  Use sucessive substitution to solve for To
-		aa = ( Gamma * Toffa ) - ( 0.25 / Twet ) * ( second_power( Gamma ) ) * ( second_power( Toffa ) );
+		aa = ( Gamma * Toffa ) - ( 0.25 / Twet ) * ( pow2( Gamma ) ) * ( pow2( Toffa ) );
 
 		To1 = aa + HPTimeConstant;
 		Error = 1.0;

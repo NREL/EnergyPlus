@@ -1407,7 +1407,7 @@ namespace Pumps {
 
 			VolFlowRate = PumpMassFlowRate / LoopDensity;
 			PartLoadRatio = min( 1.0, ( VolFlowRate / PumpEquip( PumpNum ).NomVolFlowRate ) );
-			FracFullLoadPower = ( ( ( PumpEquip( PumpNum ).PartLoadCoef( 4 ) * PartLoadRatio + PumpEquip( PumpNum ).PartLoadCoef( 3 ) ) * PartLoadRatio + PumpEquip( PumpNum ).PartLoadCoef( 2 ) ) * PartLoadRatio + PumpEquip( PumpNum ).PartLoadCoef( 1 );
+			FracFullLoadPower = ( ( PumpEquip( PumpNum ).PartLoadCoef( 4 ) * PartLoadRatio + PumpEquip( PumpNum ).PartLoadCoef( 3 ) ) * PartLoadRatio + PumpEquip( PumpNum ).PartLoadCoef( 2 ) ) * PartLoadRatio + PumpEquip( PumpNum ).PartLoadCoef( 1 );
 			Power = FracFullLoadPower * PumpEquip( PumpNum ).NomPowerUse;
 
 		} else if ( PumpType == PumpBank_ConSpeed || PumpType == PumpBank_VarSpeed ) {
@@ -1421,7 +1421,7 @@ namespace Pumps {
 			FullLoadPower = PumpEquip( PumpNum ).NomPowerUse / PumpEquip( PumpNum ).NumPumpsInBank;
 			FullLoadPowerRatio = PumpEquip( PumpNum ).PartLoadCoef( 1 ) + PumpEquip( PumpNum ).PartLoadCoef( 2 ) + PumpEquip( PumpNum ).PartLoadCoef( 3 ) + PumpEquip( PumpNum ).PartLoadCoef( 4 );
 			PartLoadRatio = min( 1.0, ( PartLoadVolFlowRate / FullLoadVolFlowRate ) );
-			FracFullLoadPower = ( ( ( PumpEquip( PumpNum ).PartLoadCoef( 4 ) * PartLoadRatio + PumpEquip( PumpNum ).PartLoadCoef( 3 ) ) * PartLoadRatio + PumpEquip( PumpNum ).PartLoadCoef( 2 ) ) * PartLoadRatio + PumpEquip( PumpNum ).PartLoadCoef( 1 );
+			FracFullLoadPower = ( ( PumpEquip( PumpNum ).PartLoadCoef( 4 ) * PartLoadRatio + PumpEquip( PumpNum ).PartLoadCoef( 3 ) ) * PartLoadRatio + PumpEquip( PumpNum ).PartLoadCoef( 2 ) ) * PartLoadRatio + PumpEquip( PumpNum ).PartLoadCoef( 1 );
 			Power = ( FullLoadPowerRatio * NumPumpsFullLoad + FracFullLoadPower ) * FullLoadPower;
 
 		}

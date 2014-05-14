@@ -627,7 +627,7 @@ namespace ThermalChimney {
 				if ( ThermChimSubTemp( NTC ) <= RoomAirTemp ) {
 					TempTCVolumeAirFlowRate( IterationLoop ) = 0.0;
 				} else {
-					TempTCVolumeAirFlowRate( IterationLoop ) = DischargeCoeffTC * AirOutletCrossAreaTC * ( std::pow( ( 2.0 * ( ( ThermChimSubTemp( NTC ) - RoomAirTemp ) / RoomAirTemp ) * 9.8 * OverallThermalChimLength / ( second_power( ( 1.0 + AirRelativeCrossArea ) ) ) ), 0.5 ) );
+					TempTCVolumeAirFlowRate( IterationLoop ) = DischargeCoeffTC * AirOutletCrossAreaTC * ( std::pow( ( 2.0 * ( ( ThermChimSubTemp( NTC ) - RoomAirTemp ) / RoomAirTemp ) * 9.8 * OverallThermalChimLength / ( pow2( ( 1.0 + AirRelativeCrossArea ) ) ) ), 0.5 ) );
 				}
 
 			} // DO IterationLoop = 1,10
@@ -657,7 +657,7 @@ namespace ThermalChimney {
 			if ( ThermChimSubTemp( NTC ) <= RoomAirTemp ) {
 				TCVolumeAirFlowRate = 0.0;
 			} else {
-				TCVolumeAirFlowRate = DischargeCoeffTC * AirOutletCrossAreaTC * ( std::pow( ( 2.0 * ( ( ThermChimSubTemp( NTC ) - RoomAirTemp ) / RoomAirTemp ) * 9.8 * OverallThermalChimLength / ( second_power( ( 1.0 + AirRelativeCrossArea ) ) ) ), 0.5 ) );
+				TCVolumeAirFlowRate = DischargeCoeffTC * AirOutletCrossAreaTC * ( std::pow( ( 2.0 * ( ( ThermChimSubTemp( NTC ) - RoomAirTemp ) / RoomAirTemp ) * 9.8 * OverallThermalChimLength / ( pow2( ( 1.0 + AirRelativeCrossArea ) ) ) ), 0.5 ) );
 			}
 
 			// Now assignment of the overall mass flow rate into each zone

@@ -92,7 +92,7 @@ namespace TARCOGDeflection {
 		i = 0;
 		// first calculate D coefficients since that will be necessary for any of selected standards
 		for ( i = 1; i <= nlayer; ++i ) {
-			DCoeff( i ) = YoungsMod( i ) * third_power( PaneThickness( i ) ) / ( 12 * ( 1 - second_power( PoissonsRat( i ) ) ) );
+			DCoeff( i ) = YoungsMod( i ) * pow3( PaneThickness( i ) ) / ( 12 * ( 1 - pow2( PoissonsRat( i ) ) ) );
 		}
 
 		{ auto const SELECT_CASE_var( DeflectionStandard );
@@ -195,7 +195,7 @@ namespace TARCOGDeflection {
 		} //do i = 1, nlayer
 
 		for ( i = 1; i <= nlayer; ++i ) {
-			LayerDeflection( i ) += DeflectionRelaxation * MaxLDSum * 16 * DPressure( i ) / ( sixth_power( Pi ) * DCoeff( i ) );
+			LayerDeflection( i ) += DeflectionRelaxation * MaxLDSum * 16 * DPressure( i ) / ( pow6( Pi ) * DCoeff( i ) );
 		}
 
 		for ( i = 1; i <= nlayer - 1; ++i ) {

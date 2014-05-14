@@ -1023,7 +1023,7 @@ CalcPassiveExteriorBaffleGap(
 		if ( TsBaffK == TsoK ) { // avoid divide by zero
 			HPlenARR( ThisSurf ) = 0.0; // no net heat transfer if same temperature
 		} else {
-			HPlenARR( ThisSurf ) = Sigma * AbsExt * AbsThermSurf * ( fourth_power( TsBaffK ) - fourth_power( TsoK ) ) / ( TsBaffK - TsoK );
+			HPlenARR( ThisSurf ) = Sigma * AbsExt * AbsThermSurf * ( pow4( TsBaffK ) - pow4( TsoK ) ) / ( TsBaffK - TsoK );
 		}
 		// Added for ICS collector OSCM
 		if ( Surface( SurfPtr ).IsICS ) {
@@ -1078,7 +1078,7 @@ CalcPassiveExteriorBaffleGap(
 
 	TmeanK = 0.5 * ( TmpTsBaf + Tso ) + KelvinConv;
 
-	Gr = g * third_power( GapThick ) * std::abs( Tso - TmpTsBaf ) * second_power( RhoAir ) / ( TmeanK * second_power( nu ) );
+	Gr = g * pow3( GapThick ) * std::abs( Tso - TmpTsBaf ) * pow2( RhoAir ) / ( TmeanK * pow2( nu ) );
 
 	PassiveGapNusseltNumber( AspRat, Tilt, TmpTsBaf, Tso, Gr, NuPlen ); //intentionally switch Tso to Tsi
 
@@ -1206,7 +1206,7 @@ PassiveGapNusseltNumber(
 	} else { // window heated from below
 		if ( Tilt >= 60.0 ) {
 			g = 0.5 * std::pow( ( 1.0 + std::pow( ( Ra / 3160. ), 20.6 ) ), ( -0.1 ) ); // eq. 47
-			gnu601a = 1.0 + seventh_power( ( 0.0936 * ( std::pow( Ra, 0.314 ) ) / ( 1.0 + g ) ) ); // eq. 45
+			gnu601a = 1.0 + pow7( ( 0.0936 * ( std::pow( Ra, 0.314 ) ) / ( 1.0 + g ) ) ); // eq. 45
 			gnu601 = std::pow( gnu601a, 0.142857 );
 
 			// For any aspect ratio

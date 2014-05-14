@@ -1652,7 +1652,7 @@ namespace DaylightingManager {
 		if ( ExtWinType == AdjZoneExtWin ) {
 			// Adjust number of exterior window elements to give acceptable number of rays through
 			// interior windows in the zone (for accuracy of interior window daylighting calculation)
-			SolidAngExtWin = SafeDivide( ( ( Surface( IWin ).Area + SurfaceWindow( IWin ).DividerArea ) / Surface( IWin ).Multiplier ), second_power( ALF ) );
+			SolidAngExtWin = SafeDivide( ( ( Surface( IWin ).Area + SurfaceWindow( IWin ).DividerArea ) / Surface( IWin ).Multiplier ), pow2( ALF ) );
 			SolidAngMinIntWin = ZoneDaylight( ZoneNum ).MinIntWinSolidAng;
 			SolidAngRatio = max( 1.0, SolidAngExtWin / SolidAngMinIntWin );
 			NDIVX *= std::sqrt( SolidAngRatio );
@@ -1821,7 +1821,7 @@ namespace DaylightingManager {
 		if ( Rectangle ) {
 			DAXY = DWX * DWY;
 		} else if ( Triangle ) {
-			SinCornerAng = std::sqrt( 1.0 - second_power( dot( W21, W23 ) ) );
+			SinCornerAng = std::sqrt( 1.0 - pow2( dot( W21, W23 ) ) );
 			DAXY = DWX * DWY * SinCornerAng;
 		}
 
@@ -2333,7 +2333,7 @@ namespace DaylightingManager {
 
 		WinElArea = DWX * DWY;
 		if ( Surface( IWin ).Sides == 3 ) {
-			WinElArea *= std::sqrt( 1.0 - second_power( dot( W21, W23 ) ) );
+			WinElArea *= std::sqrt( 1.0 - pow2( dot( W21, W23 ) ) );
 		}
 
 		if ( CalledFrom == CalledForMapPoint ) {
@@ -10196,7 +10196,7 @@ Label903: ;
 							if ( COSB > 0.01765 ) { // 0 <= B < 89 deg
 								// Above test avoids case where ref point cannot receive daylight directly from the
 								// interior window
-								IntWinSolidAng = COSB * Surface( IWin ).Area / ( second_power( DIS ) + 0.001 );
+								IntWinSolidAng = COSB * Surface( IWin ).Area / ( pow2( DIS ) + 0.001 );
 								ZoneDaylight( ZoneNum ).MinIntWinSolidAng = min( ZoneDaylight( ZoneNum ).MinIntWinSolidAng, IntWinSolidAng );
 							}
 						} // End of loop over reference points

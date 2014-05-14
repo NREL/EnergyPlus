@@ -1993,14 +1993,7 @@ namespace FuelCellElectricGenerator {
 					D = GasPhaseThermoChemistryData( gasID ).ShomateD;
 					E = GasPhaseThermoChemistryData( gasID ).ShomateE;
 
-					((a3*x + a2)*x + a1)*x + a0;
-					A + Tsho * ( B + Tsho * ( C + D * Tsho) )
-					A + Tsho * ( B + C )
-
-
-					tempCp += ( ( ( ( D * Tsho + C ) * Tsho + B ) * Tsho + A + E / ( second_power( Tsho ) ) ) * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit ) );
-
-					tempCp += ( ( ( ( D * Tsho + C ) * Tsho + B ) * Tsho + A + E / ( second_power( Tsho ) ) ) * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit ) );
+					tempCp += ( ( ( ( D * Tsho + C ) * Tsho + B ) * Tsho + A + E / ( pow2( Tsho ) ) ) * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit ) );
 				}
 
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
@@ -2195,7 +2188,7 @@ namespace FuelCellElectricGenerator {
 					D = GasPhaseThermoChemistryData( gasID ).ShomateD;
 					E = GasPhaseThermoChemistryData( gasID ).ShomateE;
 
-					tempCp += ( ( ( ( D * Tsho + C ) * Tsho + B ) * Tsho + A + E / ( second_power( Tsho ) ) ) * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit ) );
+					tempCp += ( ( ( ( D * Tsho + C ) * Tsho + B ) * Tsho + A + E / ( pow2( Tsho ) ) ) * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit ) );
 				}
 
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
@@ -2499,7 +2492,7 @@ namespace FuelCellElectricGenerator {
 					D = GasPhaseThermoChemistryData( gasID ).ShomateD;
 					E = GasPhaseThermoChemistryData( gasID ).ShomateE;
 
-					tempCp += ( ( ( ( D * Tsho + C ) * Tsho + B ) * Tsho + A + E / ( second_power( Tsho ) ) ) * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit ) );
+					tempCp += ( ( ( ( D * Tsho + C ) * Tsho + B ) * Tsho + A + E / ( pow2( Tsho ) ) ) * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit ) );
 				}
 
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
@@ -2606,7 +2599,7 @@ namespace FuelCellElectricGenerator {
 					D = GasPhaseThermoChemistryData( gasID ).ShomateD;
 					E = GasPhaseThermoChemistryData( gasID ).ShomateE;
 
-					tempCp += ( ( ( ( D * Tsho + C ) * Tsho + B ) * Tsho + A + E / ( second_power( Tsho ) ) ) * FuelCell( GeneratorNum ).AuxilHeat.ConstitMolalFract( thisConstit ) );
+					tempCp += ( ( ( ( D * Tsho + C ) * Tsho + B ) * Tsho + A + E / ( pow2( Tsho ) ) ) * FuelCell( GeneratorNum ).AuxilHeat.ConstitMolalFract( thisConstit ) );
 				}
 
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
@@ -2713,7 +2706,7 @@ namespace FuelCellElectricGenerator {
 					D = GasPhaseThermoChemistryData( gasID ).ShomateD;
 					E = GasPhaseThermoChemistryData( gasID ).ShomateE;
 
-					tempCp += ( ( ( ( D * Tsho + C ) * Tsho + B ) * Tsho + A + E / ( second_power( Tsho ) ) ) * FuelCell( GeneratorNum ).ExhaustHX.ConstitMolalFract( thisConstit ) );
+					tempCp += ( ( ( ( D * Tsho + C ) * Tsho + B ) * Tsho + A + E / ( pow2( Tsho ) ) ) * FuelCell( GeneratorNum ).ExhaustHX.ConstitMolalFract( thisConstit ) );
 				}
 
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
@@ -2922,7 +2915,7 @@ namespace FuelCellElectricGenerator {
 		D = 2474.455;
 		E = 3.85533;
 
-		Cp = ( ( D * Tsho + C ) * Tsho + B ) * Tsho + A + E / ( second_power( Tsho ) );
+		Cp = ( ( D * Tsho + C ) * Tsho + B ) * Tsho + A + E / ( pow2( Tsho ) );
 
 	}
 

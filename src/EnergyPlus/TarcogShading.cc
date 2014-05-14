@@ -583,10 +583,10 @@ namespace TarcogShading {
 			}
 
 			B1 = dens1 / 2;
-			B2 = ( dens2 / 2 ) * ( second_power( ( s1 / s2 ) ) );
+			B2 = ( dens2 / 2 ) * ( pow2( ( s1 / s2 ) ) );
 
-			C1 = 12 * visc1 * H / ( second_power( s1 ) );
-			C2 = 12 * visc2 * ( H / ( second_power( s2 ) ) ) * ( s1 / s2 );
+			C1 = 12 * visc1 * H / ( pow2( s1 ) );
+			C2 = 12 * visc2 * ( H / ( pow2( s2 ) ) ) * ( s1 / s2 );
 
 			if ( Tgap1 >= Tgap2 ) {
 				A1eqin = Abot + 0.5 * Atop * ( Al + Ar + Ah ) / ( Abot + Atop );
@@ -600,18 +600,18 @@ namespace TarcogShading {
 				A2eqout = Atop + 0.5 * Abot * ( Al + Ar + Ah ) / ( Abot + Atop );
 			}
 
-			Zin1 = second_power( ( ( s1 * L / ( 0.6 * A1eqin ) ) - 1.0 ) );
-			Zin2 = second_power( ( ( s2 * L / ( 0.6 * A2eqin ) ) - 1.0 ) );
-			Zout1 = second_power( ( ( s1 * L / ( 0.6 * A1eqout ) ) - 1.0 ) );
-			Zout2 = second_power( ( ( s2 * L / ( 0.6 * A2eqout ) ) - 1.0 ) );
+			Zin1 = pow2( ( ( s1 * L / ( 0.6 * A1eqin ) ) - 1.0 ) );
+			Zin2 = pow2( ( ( s2 * L / ( 0.6 * A2eqin ) ) - 1.0 ) );
+			Zout1 = pow2( ( ( s1 * L / ( 0.6 * A1eqout ) ) - 1.0 ) );
+			Zout2 = pow2( ( ( s2 * L / ( 0.6 * A2eqout ) ) - 1.0 ) );
 
 			D1 = ( dens1 / 2.0 ) * ( Zin1 + Zout1 );
-			D2 = ( dens2 / 2.0 ) * ( second_power( ( s1 / s2 ) ) ) * ( Zin2 + Zout2 );
+			D2 = ( dens2 / 2.0 ) * ( pow2( ( s1 / s2 ) ) ) * ( Zin2 + Zout2 );
 
 			A1 = B1 + D1 + B2 + D2;
 			A2 = C1 + C2;
 
-			speed1 = ( std::sqrt( ( second_power( A2 ) ) + std::abs( 4.0 * A * A1 ) ) - A2 ) / ( 2.0 * A1 );
+			speed1 = ( std::sqrt( ( pow2( A2 ) ) + std::abs( 4.0 * A * A1 ) ) - A2 ) / ( 2.0 * A1 );
 			speed2 = speed1 * s1 / s2;
 
 			H01 = ( dens1 * cp1 * s1 * speed1 ) / ( 4.0 * hc1 + 8.0 * speed1 );
@@ -849,7 +849,7 @@ namespace TarcogShading {
 			//  A = dens0 * T0 * GravityConstant * H * ABS(cos(tilt)) * (Tgap - Tenv) / (Tgap * Tenv)
 
 			B1 = dens2 / 2;
-			C1 = 12.0 * visc2 * H / ( second_power( s ) );
+			C1 = 12.0 * visc2 * H / ( pow2( s ) );
 
 			if ( Tgap > Tenv ) {
 				A1eqin = Abot + 0.5 * Atop * ( Al + Ar + Ah ) / ( Abot + Atop );
@@ -859,8 +859,8 @@ namespace TarcogShading {
 				A1eqin = Atop + 0.5 * Abot * ( Al + Ar + Ah ) / ( Abot + Atop );
 			}
 
-			Zin1 = second_power( ( ( s * L / ( 0.6 * A1eqin ) ) - 1 ) );
-			Zout1 = second_power( ( ( s * L / ( 0.6 * A1eqout ) ) - 1 ) );
+			Zin1 = pow2( ( ( s * L / ( 0.6 * A1eqin ) ) - 1 ) );
+			Zout1 = pow2( ( ( s * L / ( 0.6 * A1eqout ) ) - 1 ) );
 
 			D1 = ( dens2 / 2.0 ) * ( Zin1 + Zout1 );
 
@@ -873,7 +873,7 @@ namespace TarcogShading {
 			if ( ( forcedspeed != 0.0 ) && ( CalcForcedVentilation != 0 ) ) {
 				speed = forcedspeed;
 			} else {
-				speed = ( std::sqrt( ( second_power( A2 ) ) + std::abs( 4.0 * A * A1 ) ) - A2 ) / ( 2.0 * A1 );
+				speed = ( std::sqrt( ( pow2( A2 ) ) + std::abs( 4.0 * A * A1 ) ) - A2 ) / ( 2.0 * A1 );
 				//  speed = ABS((SQRT((A2 ** 2) + (4 * A * A1)) - A2) / (2 * A1))
 			}
 

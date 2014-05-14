@@ -533,7 +533,7 @@ namespace SurfaceGroundHeatExchanger {
 				ShowFatalError( "InitSurfaceGroundHeatExchanger: Program terminated due to previous condition(s)." );
 			}
 			rho = GetDensityGlycol( PlantLoop( SurfaceGHE( SurfaceGHENum ).LoopNum ).FluidName, constant_zero, PlantLoop( SurfaceGHE( SurfaceGHENum ).LoopNum ).FluidIndex, RoutineName );
-			SurfaceGHE( SurfaceGHENum ).DesignMassFlowRate = Pi / 4.0 * second_power( SurfaceGHE( SurfaceGHENum ).TubeDiameter ) * DesignVelocity * rho * SurfaceGHE( SurfaceGHENum ).TubeCircuits;
+			SurfaceGHE( SurfaceGHENum ).DesignMassFlowRate = Pi / 4.0 * pow2( SurfaceGHE( SurfaceGHENum ).TubeDiameter ) * DesignVelocity * rho * SurfaceGHE( SurfaceGHENum ).TubeCircuits;
 			InitComponentNodes( 0.0, SurfaceGHE( SurfaceGHENum ).DesignMassFlowRate, SurfaceGHE( SurfaceGHENum ).InletNodeNum, SurfaceGHE( SurfaceGHENum ).OutletNodeNum, SurfaceGHE( SurfaceGHENum ).LoopNum, SurfaceGHE( SurfaceGHENum ).LoopSideNum, SurfaceGHE( SurfaceGHENum ).BranchNum, SurfaceGHE( SurfaceGHENum ).CompNum );
 			RegisterPlantCompDesignFlow( SurfaceGHE( SurfaceGHENum ).InletNodeNum, SurfaceGHE( SurfaceGHENum ).DesignMassFlowRate / rho );
 
@@ -1482,7 +1482,7 @@ namespace SurfaceGroundHeatExchanger {
 		ConvCoef = CalcASHRAESimpExtConvectCoeff( TopRoughness, ThisWindSpeed );
 		// radiation coefficient using surf temp from past time step
 		if ( std::abs( SurfTempAbs - SkyTempAbs ) > SmallNum ) {
-			RadCoef = StefBoltzmann * TopThermAbs * ( ( fourth_power( SurfTempAbs ) ) - ( fourth_power( SkyTempAbs ) ) ) / ( SurfTempAbs - SkyTempAbs );
+			RadCoef = StefBoltzmann * TopThermAbs * ( ( pow4( SurfTempAbs ) ) - ( pow4( SkyTempAbs ) ) ) / ( SurfTempAbs - SkyTempAbs );
 		} else {
 			RadCoef = 0.0;
 		}
@@ -1558,7 +1558,7 @@ namespace SurfaceGroundHeatExchanger {
 
 			// radiation coefficient using surf temp from past time step
 			if ( std::abs( SurfTempAbs - ExtTempAbs ) > SmallNum ) {
-				RadCoef = StefBoltzmann * TopThermAbs * ( ( fourth_power( SurfTempAbs ) ) - ( fourth_power( ExtTempAbs ) ) ) / ( SurfTempAbs - ExtTempAbs );
+				RadCoef = StefBoltzmann * TopThermAbs * ( ( pow4( SurfTempAbs ) ) - ( pow4( ExtTempAbs ) ) ) / ( SurfTempAbs - ExtTempAbs );
 			} else {
 				RadCoef = 0.0;
 			}

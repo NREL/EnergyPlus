@@ -9850,7 +9850,7 @@ Label50: ;
 		}
 
 		//  Use sucessive substitution to solve for To
-		aa = ( Gamma * Toffa ) - ( 0.25 / Twet ) * ( second_power( Gamma ) ) * ( second_power( Toffa ) );
+		aa = ( Gamma * Toffa ) - ( 0.25 / Twet ) * ( pow2( Gamma ) ) * ( pow2( Toffa ) );
 		To1 = aa + Tcl;
 		Error = 1.0;
 		while ( Error > 0.001 ) {
@@ -11734,7 +11734,7 @@ Label50: ;
 				SupplyAirVolFlowRate = PartLoadAirMassFlowRate / SupplyAirRho;
 
 				if ( DXCoil( DXCoilNum ).RateWithInternalStaticAndFanObject ) {
-					FanStaticPressureRise = DXCoil( DXCoilNum ).InternalStaticPressureDrop + ( ExternalStatic * ( second_power( AirMassFlowRatio ) ) );
+					FanStaticPressureRise = DXCoil( DXCoilNum ).InternalStaticPressureDrop + ( ExternalStatic * ( pow2( AirMassFlowRatio ) ) );
 					Node( FanInletNode ).MassFlowRate = PartLoadAirMassFlowRate;
 					Node( FanInletNode ).Temp = CoolingCoilInletAirDryBulbTempRated;
 					Node( FanInletNode ).HumRat = SupplyAirHumRat;
@@ -12086,7 +12086,7 @@ Label50: ;
 
 		if ( DXCoil( DXCoilNum ).RateWithInternalStaticAndFanObject ) {
 			// modify external static per AHRI 340/360, Table 6, note 1.
-			FanStaticPressureRise = DXCoil( DXCoilNum ).InternalStaticPressureDrop + ( FanExternalStaticFull * ( second_power( AirMassFlowRatio ) ) );
+			FanStaticPressureRise = DXCoil( DXCoilNum ).InternalStaticPressureDrop + ( FanExternalStaticFull * ( pow2( AirMassFlowRatio ) ) );
 			Node( FanInletNodeNum ).MassFlowRate = SupplyAirMassFlowRate;
 			Node( FanOutletNodeNum ).MassFlowRate = SupplyAirMassFlowRate;
 			Node( FanInletNodeNum ).Temp = IndoorUnitInletDryBulb;

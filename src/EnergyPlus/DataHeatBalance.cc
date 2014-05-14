@@ -1434,7 +1434,7 @@ namespace DataHeatBalance {
 		if ( Beta > Small ) {
 			if ( std::abs( SunAltitudeToScreenNormal - PiOvr2 ) > Small ) {
 				AlphaDblPrime = std::atan( std::tan( SunAltitudeToScreenNormal ) / std::cos( SunAzimuthToScreenNormal ) );
-				TransYDir = 1.0 - Gamma * ( std::cos( AlphaDblPrime ) + std::sin( AlphaDblPrime ) * std::tan( SunAltitudeToScreenNormal ) * std::sqrt( 1.0 + second_power( ( 1.0 / std::tan( Beta ) ) ) ) );
+				TransYDir = 1.0 - Gamma * ( std::cos( AlphaDblPrime ) + std::sin( AlphaDblPrime ) * std::tan( SunAltitudeToScreenNormal ) * std::sqrt( 1.0 + pow2( ( 1.0 / std::tan( Beta ) ) ) ) );
 				TransYDir = max( 0.0, TransYDir );
 			} else {
 				TransYDir = 0.0;
@@ -1443,14 +1443,14 @@ namespace DataHeatBalance {
 			TransYDir = 0.0;
 		}
 
-		COSMu = std::sqrt( second_power( std::cos( SunAltitudeToScreenNormal ) ) * second_power( std::cos( SunAzimuthToScreenNormal ) ) + second_power( std::sin( SunAltitudeToScreenNormal ) ) );
+		COSMu = std::sqrt( pow2( std::cos( SunAltitudeToScreenNormal ) ) * pow2( std::cos( SunAzimuthToScreenNormal ) ) + pow2( std::sin( SunAltitudeToScreenNormal ) ) );
 		if ( COSMu > Small ) {
 			Epsilon = std::acos( std::cos( SunAltitudeToScreenNormal ) * std::cos( SunAzimuthToScreenNormal ) / COSMu );
 			Eta = PiOvr2 - Epsilon;
 			if ( std::cos( Epsilon ) != 0.0 ) {
 				MuPrime = std::atan( std::tan( std::acos( COSMu ) ) / std::cos( Epsilon ) );
 				if ( Eta != 0.0 ) {
-					TransXDir = 1.0 - Gamma * ( std::cos( MuPrime ) + std::sin( MuPrime ) * std::tan( std::acos( COSMu ) ) * std::sqrt( 1.0 + second_power( ( 1.0 / std::tan( Eta ) ) ) ) );
+					TransXDir = 1.0 - Gamma * ( std::cos( MuPrime ) + std::sin( MuPrime ) * std::tan( std::acos( COSMu ) ) * std::sqrt( 1.0 + pow2( ( 1.0 / std::tan( Eta ) ) ) ) );
 					TransXDir = max( 0.0, TransXDir );
 				} else {
 					TransXDir = 0.0;
@@ -1476,11 +1476,11 @@ namespace DataHeatBalance {
 		} else {
 			//   DeltaMax and Delta are in degrees
 			DeltaMax = 89.7 - ( 10.0 * Gamma / 0.16 );
-			Delta = std::sqrt( second_power( ( SunAzimuthToScreenNormal / DegToRadians ) ) + second_power( ( SunAltitudeToScreenNormal / DegToRadians ) ) );
+			Delta = std::sqrt( pow2( ( SunAzimuthToScreenNormal / DegToRadians ) ) + pow2( ( SunAltitudeToScreenNormal / DegToRadians ) ) );
 
 			//   Use empirical model to determine maximum (peak) scattering
-			Tscattermax = 0.0229 * Gamma + 0.2971 * ReflectCyl - 0.03624 * second_power( Gamma ) + 0.04763 * second_power( ReflectCyl ) - 0.44416 * Gamma * ReflectCyl;
-			TscattermaxVis = 0.0229 * Gamma + 0.2971 * ReflectCylVis - 0.03624 * second_power( Gamma ) + 0.04763 * second_power( ReflectCylVis ) - 0.44416 * Gamma * ReflectCylVis;
+			Tscattermax = 0.0229 * Gamma + 0.2971 * ReflectCyl - 0.03624 * pow2( Gamma ) + 0.04763 * pow2( ReflectCyl ) - 0.44416 * Gamma * ReflectCyl;
+			TscattermaxVis = 0.0229 * Gamma + 0.2971 * ReflectCylVis - 0.03624 * pow2( Gamma ) + 0.04763 * pow2( ReflectCylVis ) - 0.44416 * Gamma * ReflectCylVis;
 
 			//   Vary slope of interior and exterior surface of scattering model
 			ExponentInterior = ( -std::pow( ( std::abs( Delta - DeltaMax ) ), 2 ) ) / 600.0;

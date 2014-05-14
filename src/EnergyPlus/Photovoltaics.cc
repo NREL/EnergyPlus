@@ -1300,7 +1300,7 @@ namespace Photovoltaics {
 				//  temperature depencence
 				IL = PVarray( PVnum ).TRNSYSPVcalc.Insolation / PVarray( PVnum ).TRNSYSPVModule.RefInsolation * ( ILRef + PVarray( PVnum ).TRNSYSPVModule.TempCoefIsc * ( CellTemp - PVarray( PVnum ).TRNSYSPVModule.RefTemperature ) );
 				AA = AARef * CellTemp / PVarray( PVnum ).TRNSYSPVModule.RefTemperature;
-				IO = IORef * third_power( ( CellTemp / PVarray( PVnum ).TRNSYSPVModule.RefTemperature ) ) * std::exp( PVarray( PVnum ).TRNSYSPVModule.SemiConductorBandgap * PVarray( PVnum ).TRNSYSPVModule.CellsInSeries / AARef * ( 1.0 - PVarray( PVnum ).TRNSYSPVModule.RefTemperature / CellTemp ) );
+				IO = IORef * pow3( ( CellTemp / PVarray( PVnum ).TRNSYSPVModule.RefTemperature ) ) * std::exp( PVarray( PVnum ).TRNSYSPVModule.SemiConductorBandgap * PVarray( PVnum ).TRNSYSPVModule.CellsInSeries / AARef * ( 1.0 - PVarray( PVnum ).TRNSYSPVModule.RefTemperature / CellTemp ) );
 
 				//  compute short curcuit current and open circuit voltage
 
@@ -2281,7 +2281,7 @@ namespace Photovoltaics {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		SandiaImp = Imp0 * ( C0 * Ee + C1 * second_power( Ee ) ) * ( 1.0 + aImp * ( Tc - 25 ) );
+		SandiaImp = Imp0 * ( C0 * Ee + C1 * pow2( Ee ) ) * ( 1.0 + aImp * ( Tc - 25 ) );
 		// why hardwire T0 at 25.0?  can this change? seems okay, fewer args
 		return SandiaImp;
 	}
@@ -2396,7 +2396,7 @@ namespace Photovoltaics {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		SandiaIx = Ix0 * ( C4 * Ee + C5 * second_power( Ee ) ) * ( 1.0 + ( ( aIsc + aImp ) / 2.0 * ( Tc - 25.0 ) ) );
+		SandiaIx = Ix0 * ( C4 * Ee + C5 * pow2( Ee ) ) * ( 1.0 + ( ( aIsc + aImp ) / 2.0 * ( Tc - 25.0 ) ) );
 
 		return SandiaIx;
 	}
@@ -2449,7 +2449,7 @@ namespace Photovoltaics {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		SandiaIxx = Ixx0 * ( C6 * Ee + C7 * second_power( Ee ) ) * ( 1.0 + aImp * ( Tc - 25.0 ) );
+		SandiaIxx = Ixx0 * ( C6 * Ee + C7 * pow2( Ee ) ) * ( 1.0 + aImp * ( Tc - 25.0 ) );
 
 		return SandiaIxx;
 	}
@@ -2513,7 +2513,7 @@ namespace Photovoltaics {
 
 			BVmpEe = BVmp0 + mBVmp * ( 1.0 - Ee );
 
-			SandiaVmp = Vmp0 + C2 * NcellSer * dTc * std::log( Ee ) + C3 * NcellSer * second_power( ( dTc * std::log( Ee ) ) ) + BVmpEe * ( Tc - 25.0 );
+			SandiaVmp = Vmp0 + C2 * NcellSer * dTc * std::log( Ee ) + C3 * NcellSer * pow2( ( dTc * std::log( Ee ) ) ) + BVmpEe * ( Tc - 25.0 );
 		} else {
 			SandiaVmp = 0.0;
 		}

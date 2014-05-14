@@ -1406,14 +1406,14 @@ namespace AirflowNetworkSolver {
 				// Turbulent flow; test when Re>10.
 				if ( RE >= 10.0 ) {
 					S2 = std::sqrt( 2.0 * RHOZ( n ) * PDROP ) * DisSysCompDuctData( CompNum ).A;
-					FTT = S2 / std::sqrt( ld / second_power( g ) + DisSysCompDuctData( CompNum ).TurDynCoef );
+					FTT = S2 / std::sqrt( ld / pow2( g ) + DisSysCompDuctData( CompNum ).TurDynCoef );
 					if ( LIST >= 4 ) gio::write( Unit21, Format_901 ) << " dwt:" << i << S2 << FTT << g;
 					while ( true ) {
 						FT = FTT;
 						B = ( 9.3 * VISCZ( n ) * DisSysCompDuctData( CompNum ).A ) / ( FT * DisSysCompDuctData( CompNum ).Rough );
 						D = 1.0 + g * B;
 						g -= ( g - AA1 + C * std::log( D ) ) / ( 1.0 + C * B / D );
-						FTT = S2 / std::sqrt( ld / second_power( g ) + DisSysCompDuctData( CompNum ).TurDynCoef );
+						FTT = S2 / std::sqrt( ld / pow2( g ) + DisSysCompDuctData( CompNum ).TurDynCoef );
 						if ( LIST >= 4 ) gio::write( Unit21, Format_901 ) << " dwt:" << i << B << FTT << g;
 						if ( std::abs( FTT - FT ) / FTT < EPS ) break;
 					}
@@ -1440,14 +1440,14 @@ namespace AirflowNetworkSolver {
 				// Turbulent flow; test when Re>10.
 				if ( RE >= 10.0 ) {
 					S2 = std::sqrt( -2.0 * RHOZ( M ) * PDROP ) * DisSysCompDuctData( CompNum ).A;
-					FTT = S2 / std::sqrt( ld / second_power( g ) + DisSysCompDuctData( CompNum ).TurDynCoef );
+					FTT = S2 / std::sqrt( ld / pow2( g ) + DisSysCompDuctData( CompNum ).TurDynCoef );
 					if ( LIST >= 4 ) gio::write( Unit21, Format_901 ) << " dwt:" << i << S2 << FTT << g;
 					while ( true ) {
 						FT = FTT;
 						B = ( 9.3 * VISCZ( M ) * DisSysCompDuctData( CompNum ).A ) / ( FT * DisSysCompDuctData( CompNum ).Rough );
 						D = 1.0 + g * B;
 						g -= ( g - AA1 + C * std::log( D ) ) / ( 1.0 + C * B / D );
-						FTT = S2 / std::sqrt( ld / second_power( g ) + DisSysCompDuctData( CompNum ).TurDynCoef );
+						FTT = S2 / std::sqrt( ld / pow2( g ) + DisSysCompDuctData( CompNum ).TurDynCoef );
 						if ( LIST >= 4 ) gio::write( Unit21, Format_901 ) << " dwt:" << i << B << FTT << g;
 						if ( std::abs( FTT - FT ) / FTT < EPS ) break;
 					}
@@ -1850,7 +1850,7 @@ namespace AirflowNetworkSolver {
 		}
 		// Pressure rise at reference fan speed.
 		if ( AFECTL( i ) >= DisSysCompDetFanData( CompNum ).TranRat ) {
-			PRISE = -PDROP * ( DisSysCompDetFanData( CompNum ).RhoAir / RHOZ( n ) ) / second_power( AFECTL( i ) );
+			PRISE = -PDROP * ( DisSysCompDetFanData( CompNum ).RhoAir / RHOZ( n ) ) / pow2( AFECTL( i ) );
 		} else {
 			PRISE = -PDROP * ( DisSysCompDetFanData( CompNum ).RhoAir / RHOZ( n ) ) / ( DisSysCompDetFanData( CompNum ).TranRat * AFECTL( i ) );
 		}
@@ -2468,7 +2468,7 @@ Label999: ;
 		// Get component properties
 		CompNum = AirflowNetworkCompData( j ).TypeNum;
 		ed = Rough / DisSysCompDuctData( CompNum ).D;
-		area = second_power( ( DisSysCompCoilData( CompNum ).D ) ) * Pi;
+		area = pow2( ( DisSysCompCoilData( CompNum ).D ) ) * Pi;
 		ld = DisSysCompCoilData( CompNum ).L / DisSysCompCoilData( CompNum ).D;
 		g = 1.14 - 0.868589 * std::log( ed );
 		AA1 = g;
@@ -2504,14 +2504,14 @@ Label999: ;
 				// Turbulent flow; test when Re>10.
 				if ( RE >= 10.0 ) {
 					S2 = std::sqrt( 2. * RHOZ( n ) * PDROP ) * area;
-					FTT = S2 / std::sqrt( ld / second_power( g ) + TurDynCoef );
+					FTT = S2 / std::sqrt( ld / pow2( g ) + TurDynCoef );
 					if ( LIST >= 4 ) gio::write( Unit21, Format_901 ) << " dwt:" << i << S2 << FTT << g;
 					while ( true ) {
 						FT = FTT;
 						B = ( 9.3 * VISCZ( n ) * area ) / ( FT * Rough );
 						D = 1.0 + g * B;
 						g -= ( g - AA1 + C * std::log( D ) ) / ( 1.0 + C * B / D );
-						FTT = S2 / std::sqrt( ld / second_power( g ) + TurDynCoef );
+						FTT = S2 / std::sqrt( ld / pow2( g ) + TurDynCoef );
 						if ( LIST >= 4 ) gio::write( Unit21, Format_901 ) << " dwt:" << i << B << FTT << g;
 						if ( std::abs( FTT - FT ) / FTT < EPS ) break;
 					}
@@ -2538,14 +2538,14 @@ Label999: ;
 				// Turbulent flow; test when Re>10.
 				if ( RE >= 10.0 ) {
 					S2 = std::sqrt( -2.0 * RHOZ( M ) * PDROP ) * area;
-					FTT = S2 / std::sqrt( ld / second_power( g ) + TurDynCoef );
+					FTT = S2 / std::sqrt( ld / pow2( g ) + TurDynCoef );
 					if ( LIST >= 4 ) gio::write( Unit21, Format_901 ) << " dwt:" << i << S2 << FTT << g;
 					while ( true ) {
 						FT = FTT;
 						B = ( 9.3 * VISCZ( M ) * area ) / ( FT * Rough );
 						D = 1.0 + g * B;
 						g -= ( g - AA1 + C * std::log( D ) ) / ( 1.0 + C * B / D );
-						FTT = S2 / std::sqrt( ld / second_power( g ) + TurDynCoef );
+						FTT = S2 / std::sqrt( ld / pow2( g ) + TurDynCoef );
 						if ( LIST >= 4 ) gio::write( Unit21, Format_901 ) << " dwt:" << i << B << FTT << g;
 						if ( std::abs( FTT - FT ) / FTT < EPS ) break;
 					}
@@ -2648,7 +2648,7 @@ Label999: ;
 		// Get component properties
 		CompNum = AirflowNetworkCompData( j ).TypeNum;
 		ed = Rough / DisSysCompTermUnitData( CompNum ).D;
-		area = second_power( ( DisSysCompTermUnitData( CompNum ).D ) ) * Pi;
+		area = pow2( ( DisSysCompTermUnitData( CompNum ).D ) ) * Pi;
 		ld = DisSysCompTermUnitData( CompNum ).L / DisSysCompTermUnitData( CompNum ).D;
 		g = 1.14 - 0.868589 * std::log( ed );
 		AA1 = g;
@@ -2684,14 +2684,14 @@ Label999: ;
 				// Turbulent flow; test when Re>10.
 				if ( RE >= 10.0 ) {
 					S2 = std::sqrt( 2. * RHOZ( n ) * PDROP ) * area;
-					FTT = S2 / std::sqrt( ld / second_power( g ) + TurDynCoef );
+					FTT = S2 / std::sqrt( ld / pow2( g ) + TurDynCoef );
 					if ( LIST >= 4 ) gio::write( Unit21, Format_901 ) << " dwt:" << i << S2 << FTT << g;
 					while ( true ) {
 						FT = FTT;
 						B = ( 9.3 * VISCZ( n ) * area ) / ( FT * Rough );
 						D = 1.0 + g * B;
 						g -= ( g - AA1 + C * std::log( D ) ) / ( 1.0 + C * B / D );
-						FTT = S2 / std::sqrt( ld / second_power( g ) + TurDynCoef );
+						FTT = S2 / std::sqrt( ld / pow2( g ) + TurDynCoef );
 						if ( LIST >= 4 ) gio::write( Unit21, Format_901 ) << " dwt:" << i << B << FTT << g;
 						if ( std::abs( FTT - FT ) / FTT < EPS ) break;
 					}
@@ -2718,14 +2718,14 @@ Label999: ;
 				// Turbulent flow; test when Re>10.
 				if ( RE >= 10.0 ) {
 					S2 = std::sqrt( -2.0 * RHOZ( M ) * PDROP ) * area;
-					FTT = S2 / std::sqrt( ld / second_power( g ) + TurDynCoef );
+					FTT = S2 / std::sqrt( ld / pow2( g ) + TurDynCoef );
 					if ( LIST >= 4 ) gio::write( Unit21, Format_901 ) << " dwt:" << i << S2 << FTT << g;
 					while ( true ) {
 						FT = FTT;
 						B = ( 9.3 * VISCZ( M ) * area ) / ( FT * Rough );
 						D = 1.0 + g * B;
 						g -= ( g - AA1 + C * std::log( D ) ) / ( 1.0 + C * B / D );
-						FTT = S2 / std::sqrt( ld / second_power( g ) + TurDynCoef );
+						FTT = S2 / std::sqrt( ld / pow2( g ) + TurDynCoef );
 						if ( LIST >= 4 ) gio::write( Unit21, Format_901 ) << " dwt:" << i << B << FTT << g;
 						if ( std::abs( FTT - FT ) / FTT < EPS ) break;
 					}
@@ -2981,7 +2981,7 @@ Label999: ;
 		// Get component properties
 		CompNum = AirflowNetworkCompData( j ).TypeNum;
 		ed = Rough / DisSysCompHXData( CompNum ).D;
-		area = second_power( ( DisSysCompHXData( CompNum ).D ) ) * Pi;
+		area = pow2( ( DisSysCompHXData( CompNum ).D ) ) * Pi;
 		ld = DisSysCompHXData( CompNum ).L / DisSysCompHXData( CompNum ).D;
 		g = 1.14 - 0.868589 * std::log( ed );
 		AA1 = g;
@@ -3015,13 +3015,13 @@ Label999: ;
 				// Turbulent flow; test when Re>10.
 				if ( RE >= 10.0 ) {
 					S2 = std::sqrt( 2. * RHOZ( n ) * PDROP ) * area;
-					FTT = S2 / std::sqrt( ld / second_power( g ) + TurDynCoef );
+					FTT = S2 / std::sqrt( ld / pow2( g ) + TurDynCoef );
 					while ( true ) {
 						FT = FTT;
 						B = ( 9.3 * VISCZ( n ) * area ) / ( FT * Rough );
 						D = 1.0 + g * B;
 						g -= ( g - AA1 + C * std::log( D ) ) / ( 1.0 + C * B / D );
-						FTT = S2 / std::sqrt( ld / second_power( g ) + TurDynCoef );
+						FTT = S2 / std::sqrt( ld / pow2( g ) + TurDynCoef );
 						if ( std::abs( FTT - FT ) / FTT < EPS ) break;
 					}
 					FT = FTT;
@@ -3046,13 +3046,13 @@ Label999: ;
 				// Turbulent flow; test when Re>10.
 				if ( RE >= 10. ) {
 					S2 = std::sqrt( -2.0 * RHOZ( M ) * PDROP ) * area;
-					FTT = S2 / std::sqrt( ld / second_power( g ) + TurDynCoef );
+					FTT = S2 / std::sqrt( ld / pow2( g ) + TurDynCoef );
 					while ( true ) {
 						FT = FTT;
 						B = ( 9.3 * VISCZ( M ) * area ) / ( FT * Rough );
 						D = 1.0 + g * B;
 						g -= ( g - AA1 + C * std::log( D ) ) / ( 1.0 + C * B / D );
-						FTT = S2 / std::sqrt( ld / second_power( g ) + TurDynCoef );
+						FTT = S2 / std::sqrt( ld / pow2( g ) + TurDynCoef );
 						if ( std::abs( FTT - FT ) / FTT < EPS ) break;
 					}
 					FT = -FTT;
@@ -3176,8 +3176,8 @@ Label999: ;
 		if ( AirflowNetworkLinkageData( i ).NodeHeights( 1 ) > AirflowNetworkLinkageData( i ).NodeHeights( 2 ) ) {
 			// Node N is upper zone
 			if ( RHOZ( n ) > RHOZ( M ) ) {
-				BuoFlowMax = RhozAver * 0.055 * std::sqrt( 9.81 * std::abs( RHOZ( n ) - RHOZ( M ) ) * fifth_power( DH ) / RhozAver );
-				PurgedP = Cshape * Cshape * 9.81 * std::abs( RHOZ( n ) - RHOZ( M ) ) * fifth_power( DH ) / ( 2.0 * second_power( ( OpenArea ) ) );
+				BuoFlowMax = RhozAver * 0.055 * std::sqrt( 9.81 * std::abs( RHOZ( n ) - RHOZ( M ) ) * pow5( DH ) / RhozAver );
+				PurgedP = Cshape * Cshape * 9.81 * std::abs( RHOZ( n ) - RHOZ( M ) ) * pow5( DH ) / ( 2.0 * pow2( ( OpenArea ) ) );
 				if ( std::abs( PDROP ) <= PurgedP ) {
 					BuoFlow = BuoFlowMax * ( 1.0 - std::abs( PDROP ) / PurgedP );
 					dPBuoFlow = BuoFlowMax / PurgedP;
@@ -3186,8 +3186,8 @@ Label999: ;
 		} else {
 			// Node M is upper zone
 			if ( RHOZ( n ) < RHOZ( M ) ) {
-				BuoFlowMax = RhozAver * 0.055 * std::sqrt( 9.81 * std::abs( RHOZ( n ) - RHOZ( M ) ) * fifth_power( DH ) / RhozAver );
-				PurgedP = Cshape * Cshape * 9.81 * std::abs( RHOZ( n ) - RHOZ( M ) ) * fifth_power( DH ) / ( 2.0 * second_power( ( OpenArea ) ) );
+				BuoFlowMax = RhozAver * 0.055 * std::sqrt( 9.81 * std::abs( RHOZ( n ) - RHOZ( M ) ) * pow5( DH ) / RhozAver );
+				PurgedP = Cshape * Cshape * 9.81 * std::abs( RHOZ( n ) - RHOZ( M ) ) * pow5( DH ) / ( 2.0 * pow2( ( OpenArea ) ) );
 				if ( std::abs( PDROP ) <= PurgedP ) {
 					BuoFlow = BuoFlowMax * ( 1.0 - std::abs( PDROP ) / PurgedP );
 					dPBuoFlow = BuoFlowMax / PurgedP;
@@ -4467,7 +4467,7 @@ Label999: ;
 			RhoProfF( i + Pprof ) = RhoStF( lF ) + BetaF( lF ) * delzF;
 			RhoProfT( i + Pprof ) = RhoStT( lT ) + BetaT( lT ) * delzT;
 
-			DpProf( i + Pprof ) = DpF( lF ) - DpT( lT ) - G * ( RhoStF( lF ) * delzF + BetaF( lF ) * second_power( delzF ) / 2.0 ) + G * ( RhoStT( lT ) * delzT + BetaT( lT ) * second_power( delzT ) / 2.0 );
+			DpProf( i + Pprof ) = DpF( lF ) - DpT( lT ) - G * ( RhoStF( lF ) * delzF + BetaF( lF ) * pow2( delzF ) / 2.0 ) + G * ( RhoStT( lT ) * delzT + BetaT( lT ) * pow2( delzT ) / 2.0 );
 		}
 
 	}
@@ -4568,7 +4568,7 @@ Label999: ;
 		RhoREF = PsyRhoAirFnPbTdbW( PSea, OutDryBulbTemp, OutHumRat, BlankString );
 
 		CONV = Latitude * 2.0 * Pi / 360.0;
-		G = 9.780373 * ( 1.0 + 0.0052891 * second_power( ( std::sin( CONV ) ) ) - 0.0000059 * second_power( std::sin( 2.0 * CONV ) ) );
+		G = 9.780373 * ( 1.0 + 0.0052891 * pow2( ( std::sin( CONV ) ) ) - 0.0000059 * pow2( std::sin( 2.0 * CONV ) ) );
 
 		Hfl = 1.0;
 		Pbz = OutBaroPress;
