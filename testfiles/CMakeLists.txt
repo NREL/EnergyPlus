@@ -153,7 +153,6 @@ ADD_SIMULATION_TEST(EMSDiscreteAirSystemSizes.idf)
 ADD_SIMULATION_TEST(EMSPlantLoopOverrideControl.idf)
 ADD_SIMULATION_TEST(EMSPlantOperation_largeOff.idf)
 ADD_SIMULATION_TEST(EMSReplaceTraditionalManagers_LargeOffice.idf)
-ADD_SIMULATION_TEST(EMSTestMathAndKill.idf)
 ADD_SIMULATION_TEST(EMSThermochromicWindow.idf)
 ADD_SIMULATION_TEST(EMSUserDefined5ZoneAirCooled.idf)
 ADD_SIMULATION_TEST(EMSUserDefinedWindACAuto.idf)
@@ -476,6 +475,10 @@ IF (BUILD_FORTRAN)
     ADD_SIMULATION_TEST(LBuilding-G270.idf)
     ADD_SIMULATION_TEST(LBuildingAppGRotPar.idf)
 ENDIF ()
+
+## Files to handle specially
+##   This file is expected to fail...
+#ADD_SIMULATION_TEST(EMSTestMathAndKill.idf)
 
 ## Other files that won't run in the current state
 ##   Parametric preprocessor files
