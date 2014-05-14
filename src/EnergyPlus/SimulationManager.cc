@@ -458,7 +458,7 @@ namespace SimulationManager {
 						// Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
 						// SubTimeStepFlags can/will be set/reset in the HVAC Manager.
 
-						if ( ( TimeStep == NumOfTimeStepInHour ) ) {
+						if ( TimeStep == NumOfTimeStepInHour ) {
 							EndHourFlag = true;
 							if ( HourOfDay == 24 ) {
 								EndDayFlag = true;

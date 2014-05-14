@@ -2996,7 +2996,7 @@ namespace HeatBalanceAirManager {
 			if ( TotRefDoorMixing > 0 ) {
 				for ( NZ = 1; NZ <= ( NumOfZones - 1 ); ++NZ ) { // Can't have %ZonePtr==NumOfZones because lesser zone # of pair placed in ZonePtr in input
 					if ( ! RefDoorMixing( NZ ).RefDoorMixFlag ) continue;
-					if ( ( RefDoorMixing( NZ ).ZonePtr == NZ ) ) {
+					if ( RefDoorMixing( NZ ).ZonePtr == NZ ) {
 						for ( J = 1; J <= RefDoorMixing( NZ ).NumRefDoorConnections; ++J ) {
 							RefDoorMixing( NZ ).VolRefDoorFlowRate( J ) = 0.0;
 							if ( RefDoorMixing( NZ ).EMSRefDoorMixingOn( J ) ) RefDoorMixing( NZ ).VolRefDoorFlowRate( J ) = RefDoorMixing( NZ ).EMSRefDoorFlowRate( J );

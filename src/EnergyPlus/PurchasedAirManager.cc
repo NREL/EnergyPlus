@@ -2106,11 +2106,11 @@ namespace PurchasedAirManager {
 
 		if ( PurchAir( PurchAirNum ).OutdoorAir && ( OAMassFlowRate > 0.0 ) ) {
 			// Determine if heat recovery is beneficial
-			if ( ( PurchAir( PurchAirNum ).HtRecType == Sensible ) ) {
+			if ( PurchAir( PurchAirNum ).HtRecType == Sensible ) {
 				if ( ( OperatingMode == Heat ) && ( RecircTemp > OAInletTemp ) ) HeatRecOn = true;
 				if ( ( OperatingMode == Cool ) && ( RecircTemp < OAInletTemp ) ) HeatRecOn = true;
 			}
-			if ( ( PurchAir( PurchAirNum ).HtRecType == Enthalpy ) ) {
+			if ( PurchAir( PurchAirNum ).HtRecType == Enthalpy ) {
 				if ( ( OperatingMode == Heat ) && ( RecircEnthalpy > OAInletEnthalpy ) ) HeatRecOn = true;
 				if ( ( OperatingMode == Cool ) && ( RecircEnthalpy < OAInletEnthalpy ) ) HeatRecOn = true;
 			}

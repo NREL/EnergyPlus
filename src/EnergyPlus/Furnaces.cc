@@ -6174,7 +6174,7 @@ namespace Furnaces {
 			Furnace( FurnaceNum ).HeatPartLoadRatio = max( PartLoadRatio, Furnace( FurnaceNum ).HeatPartLoadRatio );
 			CalcFurnaceOutput( FurnaceNum, FirstHVACIteration, OpMode, CompOp, 0.0, Furnace( FurnaceNum ).HeatPartLoadRatio, HeatCoilLoad, 0.0, HeatingSensibleOutput, HeatingLatentOutput, OnOffAirFlowRatio, false );
 
-			if ( Furnace( FurnaceNum ).FurnaceType_Num == UnitarySys_HeatPump_AirToAir || ( Furnace( FurnaceNum ).FurnaceType_Num == UnitarySys_HeatPump_WaterToAir && Furnace( FurnaceNum ).WatertoAirHPType == WatertoAir_Simple ) && CoolingLoad ) {
+			if ( Furnace( FurnaceNum ).FurnaceType_Num == UnitarySys_HeatPump_AirToAir || ( Furnace( FurnaceNum ).FurnaceType_Num == UnitarySys_HeatPump_WaterToAir && Furnace( FurnaceNum ).WatertoAirHPType == WatertoAir_Simple && CoolingLoad) ) {
 				HeatingSensibleOutput = 0.0;
 				HeatingLatentOutput = 0.0;
 			}
