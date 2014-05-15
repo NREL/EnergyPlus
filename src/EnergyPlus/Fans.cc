@@ -719,12 +719,6 @@ namespace Fans {
 		// input the night ventilation performance objects
 		for ( NVPerfNum = 1; NVPerfNum <= NumNightVentPerf; ++NVPerfNum ) {
 			GetObjectItem( cCurrentModuleObject, NVPerfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-// *** RAR night vent uses a different structure to hold data ***
-//			FanNumericFields( FanNum ).FieldNames.allocate( MaxNumbers );
-//			FanNumericFields( FanNum ).FieldNames = "";
-//			FanNumericFields( FanNum ).FieldNames = cNumericFieldNames;
-
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( cAlphaArgs( 1 ), NightVentPerf.FanName(), NVPerfNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
@@ -1118,7 +1112,6 @@ namespace Fans {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 FanMinAirFlowRate; // minimum air flow rate [m3/s]
 		int NVPerfNum; // Index to night ventialation performance object
 		std::string equipName; // Equipment name
 		Real64 RatedPower; // Rated fan power [W]
@@ -1140,16 +1133,6 @@ namespace Fans {
 		Real64 MotorPLEff; // Motor normalized (part-load) efficiency [-]
 		static Real64 VFDSpdRatio( 0.0 ); // Ratio of motor speed to motor max speed [-]
 		static Real64 VFDOutPwrRatio( 0.0 ); // Ratio of VFD output power to max VFD output power [-]
-		bool OASysFlag; // Logical flag determines if parent object set OA Sys coil property
-		bool AirLoopSysFlag; // Logical flag determines if parent object set air loop coil property
-		Real64 MaxAirFlowRateDes; // Design maximum air flow rate for reporting
-		Real64 MaxAirFlowRateUser; // User hard-sized maximum air flow rate for reproting
-		Real64 MinAirFlowRateDes; // Design minimum air flow rate for reporting
-		Real64 MinAirFlowRateUser; // User hard-sized minimum air flow rate for reproting
-		bool IsAutoSize; // Indicator to autosize
-		bool HardSizeNoDesRun; // Indicator to hardsize with no disign run
-		bool SizingDesRunThisAirSys; // true if a particular air system had a Sizing:System object and system sizing done
-		bool SizingDesRunThisZone; // true if a particular zone had a Sizing:Zone object and zone sizing was done
 		std::string CompName; // component name
 		std::string	CompType; // component type
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
@@ -1177,126 +1160,9 @@ namespace Fans {
 		DataEMSOverride = Fan( FanNum ).MaxAirFlowRateEMSOverrideValue;
 		RequestSizing( CompType, CompName, SystemAirflowSizing, SizingString, TempFlow, bPRINT, RoutineName );
 		Fan( FanNum ).MaxAirFlowRate = TempFlow;
-//		RequestSizing( CompType, CompName, 3, SizingString, TempFlow, bPRINT, RoutineName );
 		DataAutosizable = true;
 		DataEMSOverrideON = false;
 		DataEMSOverride = 0.0;
-
-		FanMinAirFlowRate = 0.0;
-		NVPerfNum = Fan( FanNum ).NVPerfNum;
-//		MaxAirFlowRateDes = 0.0;
-//		MaxAirFlowRateUser = 0.0;
-//		IsAutoSize = false;
-//		if ( SysSizingRunDone || ZoneSizingRunDone ) {
-//			HardSizeNoDesRun = false;
-//		} else {
-//			HardSizeNoDesRun = true;
-//		}
-//
-//		if ( CurSysNum > 0 ) {
-//			CheckThisAirSystemForSizing( CurSysNum, SizingDesRunThisAirSys );
-//		} else {
-//			SizingDesRunThisAirSys = false;
-//		}
-//		if ( CurZoneEqNum > 0 ) {
-//			CheckThisZoneForSizing( CurZoneEqNum, SizingDesRunThisZone );
-//		} else {
-//			SizingDesRunThisZone = false;
-//		}
-//
-//		if ( Fan( FanNum ).MaxAirFlowRate == AutoSize ) {
-//			IsAutoSize = true;
-//		}
-//
-//		if ( CurSysNum > 0 ) {
-//			if ( ! IsAutoSize && ! SizingDesRunThisAirSys ) { // Simulation continue
-//				HardSizeNoDesRun = true;
-//				if ( Fan( FanNum ).MaxAirFlowRate > 0.0 ) {
-//					ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "User-Specified Maximum Flow Rate [m3/s]", Fan( FanNum ).MaxAirFlowRate );
-//				}
-//			} else { // AutoSize or hardsize with sizing run
-//
-//				OASysFlag = false;
-//				AirLoopSysFlag = false;
-//				// logicals used when parent sizes fan
-//				if ( CurOASysNum > 0 ) OASysFlag = OASysEqSizing( CurOASysNum ).AirFlow;
-//				if ( CurSysNum > 0 ) AirLoopSysFlag = UnitarySysEqSizing( CurSysNum ).AirFlow;
-//
-//				CheckSysSizing( Fan( FanNum ).FanType, Fan( FanNum ).FanName );
-//
-//				if ( OASysFlag ) {
-//					MaxAirFlowRateDes = OASysEqSizing( CurOASysNum ).AirVolFlow;
-//				} else if ( AirLoopSysFlag ) {
-//					MaxAirFlowRateDes = UnitarySysEqSizing( CurSysNum ).AirVolFlow;
-//				} else {
-//					{ auto const SELECT_CASE_var( CurDuctType );
-//					if ( SELECT_CASE_var == Main ) {
-//						MaxAirFlowRateDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-//					} else if ( SELECT_CASE_var == Cooling ) {
-//						// MaxAirFlowRateDes = FinalSysSizing(CurSysNum)%DesCoolVolFlow
-//						MaxAirFlowRateDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-//					} else if ( SELECT_CASE_var == Heating ) {
-//						// MaxAirFlowRateDes = FinalSysSizing(CurSysNum)%DesHeatVolFlow
-//						MaxAirFlowRateDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-//					} else if ( SELECT_CASE_var == Other ) {
-//						MaxAirFlowRateDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-//					} else {
-//						MaxAirFlowRateDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-//					}}
-//				}
-//
-//				FanMinAirFlowRate = Fan( FanNum ).MinAirFlowRate;
-//			}
-//		} else if ( CurZoneEqNum > 0 ) {
-//			if ( ! IsAutoSize && ! SizingDesRunThisZone ) { // Simulation continue
-//				HardSizeNoDesRun = true;
-//				if ( Fan( FanNum ).MaxAirFlowRate > 0.0 ) {
-//					ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "User-Specified Maximum Flow Rate [m3/s]", Fan( FanNum ).MaxAirFlowRate );
-//				}
-//			} else { // AutoSize or hardsize with sizing run
-//				CheckZoneSizing( Fan( FanNum ).FanType, Fan( FanNum ).FanName );
-//				if ( ZoneEqSizing( CurZoneEqNum ).AirFlow ) {
-//					MaxAirFlowRateDes = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
-//				} else {
-//					if ( ZoneCoolingOnlyFan ) {
-//						MaxAirFlowRateDes = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
-//					} else if ( ZoneHeatingOnlyFan ) {
-//						MaxAirFlowRateDes = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
-//					} else {
-//						MaxAirFlowRateDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
-//					}
-//				}
-//			}
-//		}
-//
-//		if ( MaxAirFlowRateDes < SmallAirVolFlow ) {
-//			MaxAirFlowRateDes = 0.0;
-//		}
-//
-//		if ( Fan( FanNum ).MaxAirFlowRateEMSOverrideOn ) {
-//			MaxAirFlowRateDes = Fan( FanNum ).MaxAirFlowRateEMSOverrideValue;
-//		}
-//
-//		if ( ! HardSizeNoDesRun ) {
-//			if ( IsAutoSize ) {
-//				Fan( FanNum ).MaxAirFlowRate = MaxAirFlowRateDes;
-//				ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design Size Maximum Flow Rate [m3/s]", MaxAirFlowRateDes );
-//			} else {
-//				if ( Fan( FanNum ).MaxAirFlowRate > 0.0 && Fan( FanNum ).MaxAirFlowRateIsAutosizable && MaxAirFlowRateDes > 0.0 ) {
-//					MaxAirFlowRateUser = Fan( FanNum ).MaxAirFlowRate;
-//					ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design Size Maximum Flow Rate [m3/s]", MaxAirFlowRateDes, "User-Specified Maximum Flow Rate [m3/s]", MaxAirFlowRateUser );
-//					if ( DisplayExtraWarnings ) {
-//						if ( ( std::abs( MaxAirFlowRateDes - MaxAirFlowRateUser ) / MaxAirFlowRateUser ) > AutoVsHardSizingThreshold ) {
-//							ShowMessage( "SizeHVACFans: Potential issue with equipment sizing for " + Fan( FanNum ).FanType + " = \"" + Fan( FanNum ).FanName + "\"." );
-//							ShowContinueError( "User-Specified Maximum Flow Rate of " + RoundSigDigits( MaxAirFlowRateUser, 5 ) + " [m3/s]" );
-//							ShowContinueError( "differs from Design Size Maximum Flow Rate of " + RoundSigDigits( MaxAirFlowRateDes, 5 ) + " [m3/s]" );
-//							ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-//							ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-//						}
-//					}
-//				}
-//			}
-//		}
 
 		//cpw31Aug2010 Add fan, belt, motor and VFD component autosizing and maximum efficiency calculations
 		FanVolFlow = Fan( FanNum ).MaxAirFlowRate; //Maximum volumetric airflow through fan [m3/s at standard conditions]
@@ -1538,6 +1404,7 @@ namespace Fans {
 		PreDefTableEntry( pdchFanMotorIn, equipName, Fan( FanNum ).MotInAirFrac );
 		PreDefTableEntry( pdchFanEndUse, equipName, Fan( FanNum ).EndUseSubcategoryName );
 
+		NVPerfNum = Fan( FanNum ).NVPerfNum;
 		if ( NVPerfNum > 0 ) {
 			if ( NightVentPerf( NVPerfNum ).MaxAirFlowRate == AutoSize ) {
 				NightVentPerf( NVPerfNum ).MaxAirFlowRate = Fan( FanNum ).MaxAirFlowRate;

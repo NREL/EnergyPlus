@@ -5197,7 +5197,7 @@ namespace DXCoils {
 				DataFlowUsedForSizing = DXCoil ( DXCoilNum ).RatedAirVolFlowRate ( Mode );
 				// get autosized air flow for capacity calc's if capacity is not autosized
 				// *** RAR this if block is a last minute addition to correct capacity reporting when not autosized and a sizing run is done. Test suite was not run with this code included. ***
-				if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) /= AutoSize && ( ( SysSizingRunDone && CurSysNum > 0 ) || ( ZoneSizingRunDone && CurZoneEqNum > 0 ) ) ) {
+				if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) != AutoSize && ( ( SysSizingRunDone && CurSysNum > 0 ) || ( ZoneSizingRunDone && CurZoneEqNum > 0 ) ) ) {
 					if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
 						SizingMethod = CoolingAirflowSizing;
 						DataBypassFrac = DXCoil ( DXCoilNum ).BypassedFlowFrac ( Mode );
