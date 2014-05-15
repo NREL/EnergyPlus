@@ -3,7 +3,17 @@
 # SOURCE_DIR
 # BINARY_DIR
 # ENERGYPLUS_EXE
+# EXPANDOBJECTS_EXE
 # IDF_FILE
+# EPW_FILE
+# ANNUAL_SIMULATION
+# BUILD_FORTRAN
+
+if(ANNUAL_SIMULATION)
+ set( ENV{FULLANNUALRUN} y )
+else()
+ set( ENV{DDONLY} y)
+endif()
 
 get_filename_component(IDF_NAME "${IDF_FILE}" NAME_WE)
 
@@ -14,12 +24,23 @@ execute_process(COMMAND "${CMAKE_COMMAND}" -E copy
                 "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf" )
 
 execute_process(COMMAND "${CMAKE_COMMAND}" -E copy 
-                "${SOURCE_DIR}/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw" 
+                "${SOURCE_DIR}/weather/${EPW_FILE}" 
                 "${BINARY_DIR}/testfiles/${IDF_NAME}/in.epw" )
 
 execute_process(COMMAND "${CMAKE_COMMAND}" -E copy 
                 "${SOURCE_DIR}/idd/Energy+.idd" 
                 "${BINARY_DIR}/testfiles/${IDF_NAME}/Energy+.idd" )
+
+if(BUILD_FORTRAN)
+  # ExpandObjects (and other preprocessors) as necessary
+  execute_process(COMMAND "${EXPANDOBJECTS_EXE}" WORKING_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}")
+  if (EXISTS "${BINARY_DIR}/testfiles/${IDF_NAME}/expanded.idf")
+    if (EXISTS "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf")
+        file(REMOVE "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf")
+    endif()
+    file(RENAME "${BINARY_DIR}/testfiles/${IDF_NAME}/expanded.idf" "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf")
+  endif()
+endif()
 
 execute_process(COMMAND "${ENERGYPLUS_EXE}" WORKING_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}")
 
