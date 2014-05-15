@@ -3,7 +3,6 @@
 # SOURCE_DIR
 # BINARY_DIR
 # ENERGYPLUS_EXE
-# EXPANDOBJECTS_EXE
 # IDF_FILE
 # EPW_FILE
 # ANNUAL_SIMULATION
@@ -33,6 +32,7 @@ execute_process(COMMAND "${CMAKE_COMMAND}" -E copy
 
 if(BUILD_FORTRAN)
   # ExpandObjects (and other preprocessors) as necessary
+  find_program(EXPANDOBJECTS_EXE ExpandObjects PATHS "${BINARY_DIR}/Products/")
   execute_process(COMMAND "${EXPANDOBJECTS_EXE}" WORKING_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}")
   if (EXISTS "${BINARY_DIR}/testfiles/${IDF_NAME}/expanded.idf")
     if (EXISTS "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf")
