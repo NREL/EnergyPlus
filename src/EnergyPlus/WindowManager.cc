@@ -2211,7 +2211,7 @@ namespace WindowManager {
 				for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneEquipConfigNum ).NumInletNodes; ++NodeNum ) {
 					NodeTemp = Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).Temp;
 					MassFlowRate = Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).MassFlowRate;
-					CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), NodeTemp ); // *&^unique^&* "CalcWindowHeatBalance"
+					CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), NodeTemp );
 					SumSysMCp += MassFlowRate * CpAir;
 					SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
 				}
@@ -2425,7 +2425,7 @@ namespace WindowManager {
 					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneEquipConfigNum ).NumInletNodes; ++NodeNum ) {
 						NodeTemp = Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).Temp;
 						MassFlowRate = Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).MassFlowRate;
-						CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNumAdj ), NodeTemp ); // *&^unique^&* "CalcWindowHeatBalance"
+						CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNumAdj ), NodeTemp );
 						SumSysMCp += MassFlowRate * CpAir;
 						SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
 					}

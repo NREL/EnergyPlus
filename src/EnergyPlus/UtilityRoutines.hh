@@ -45,41 +45,6 @@ ConvertCaseToLower(
 std::string::size_type
 FindNonSpace( std::string const & String ); // String to be scanned
 
-inline
-double
-power( double baseValue, int exponentValue)
-{
-	double result = 1.0;
-	if ( exponentValue > 0)
-		for (int i = 0; i < exponentValue; i++)
-			result *= baseValue;
-	else
-		for (int i = 0; i > exponentValue; i--)
-			result /= baseValue;
-	return result;
-}
-
-inline
-double
-power( double baseValue, double exponentValue)
-{
-	return std::okpow( baseValue, exponentValue );
-}
-
-inline
-float
-power( float baseValue, float exponentValue)
-{
-	return std::okpow( baseValue, exponentValue );
-}
-
-inline
-long double
-power( long double baseValue, long double exponentValue)
-{
-	return std::okpow( baseValue, exponentValue );
-}
-
 bool
 env_var_on( std::string const & env_var_str );
 
