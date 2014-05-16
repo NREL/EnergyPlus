@@ -872,7 +872,7 @@ namespace SolarCollectors {
 
 			// transmittance-absorptance product for sky diffuse radiation.  Uses equivalent incident angle
 			// of sky radiation (radians), and is calculated according to Brandemuehl and Beckman (1980):
-			Theta = ( 59.68 - 0.1388 * Tilt + 0.001497 * pow2( Tilt ) ) * DegToRadians;
+			Theta = ( 59.68 - 0.1388 * Tilt + 0.001497 * std::pow( Tilt, 2 ) ) * DegToRadians;
 			CalcTransRefAbsOfCover( CollectorNum, Theta, TransSys, RefSys, AbsCover1, AbsCover2 );
 			Collector( CollectorNum ).TauAlphaSkyDiffuse = TransSys * Parameters( ParamNum ).AbsorOfAbsPlate / ( 1.0 - ( 1.0 - Parameters( ParamNum ).AbsorOfAbsPlate ) * Collector( CollectorNum ).RefDiffInnerCover );
 			Collector( CollectorNum ).CoversAbsSkyDiffuse( 1 ) = AbsCover1;
@@ -880,7 +880,7 @@ namespace SolarCollectors {
 
 			// transmittance-absorptance product for ground diffuse radiation.  Uses equivalent incident angle
 			// of ground radiation (radians), and is calculated according to Brandemuehl and Beckman (1980):
-			Theta = ( 90.0 - 0.5788 * Tilt + 0.002693 * pow2( Tilt ) ) * DegToRadians;
+			Theta = ( 90.0 - 0.5788 * Tilt + 0.002693 * std::pow( Tilt, 2 ) ) * DegToRadians;
 			CalcTransRefAbsOfCover( CollectorNum, Theta, TransSys, RefSys, AbsCover1, AbsCover2 );
 			Collector( CollectorNum ).TauAlphaGndDiffuse = TransSys * Parameters( ParamNum ).AbsorOfAbsPlate / ( 1.0 - ( 1.0 - Parameters( ParamNum ).AbsorOfAbsPlate ) * Collector( CollectorNum ).RefDiffInnerCover );
 			Collector( CollectorNum ).CoversAbsGndDiffuse( 1 ) = AbsCover1;
@@ -1012,8 +1012,8 @@ namespace SolarCollectors {
 
 			// Calculate equivalent incident angles for sky and ground radiation according to Brandemuehl and Beckman (1980)
 			Tilt = Surface( SurfNum ).Tilt;
-			ThetaSky = ( 59.68 - 0.1388 * Tilt + 0.001497 * pow2( Tilt ) ) * DegToRadians;
-			ThetaGnd = ( 90.0 - 0.5788 * Tilt + 0.002693 * pow2( Tilt ) ) * DegToRadians;
+			ThetaSky = ( 59.68 - 0.1388 * Tilt + 0.001497 * std::pow( Tilt, 2 ) ) * DegToRadians;
+			ThetaGnd = ( 90.0 - 0.5788 * Tilt + 0.002693 * std::pow( Tilt, 2 ) ) * DegToRadians;
 
 			IncidentAngleModifier = ( QRadSWOutIncidentBeam( SurfNum ) * IAM( ParamNum, ThetaBeam ) + QRadSWOutIncidentSkyDiffuse( SurfNum ) * IAM( ParamNum, ThetaSky ) + QRadSWOutIncidentGndDiffuse( SurfNum ) * IAM( ParamNum, ThetaGnd ) ) / QRadSWOutIncident( SurfNum );
 		} else {
@@ -1111,8 +1111,8 @@ namespace SolarCollectors {
 				// Calculate temperature of stagnant fluid in collector
 				A = -FRULT;
 				B = -FRUL + 2.0 * FRULT * Surface( SurfNum ).OutDryBulbTemp;
-				C = -FRULT * pow2( Surface( SurfNum ).OutDryBulbTemp ) + FRUL * Surface( SurfNum ).OutDryBulbTemp - FRTAN * IncidentAngleModifier * QRadSWOutIncident( SurfNum );
-				qEquation = ( pow2( B ) - 4.0 * A * C );
+				C = -FRULT * std::pow( Surface( SurfNum ).OutDryBulbTemp, 2 ) + FRUL * Surface( SurfNum ).OutDryBulbTemp - FRTAN * IncidentAngleModifier * QRadSWOutIncident( SurfNum );
+				qEquation = ( std::pow( B, 2 ) - 4.0 * A * C );
 				if ( qEquation < 0.0 ) {
 					if ( Collector( CollectorNum ).ErrIndex == 0 ) {
 						ShowSevereMessage( "CalcSolarCollector: " + ccSimPlantEquipTypes( Collector( CollectorNum ).TypeNum ) + "=\"" + Collector( CollectorNum ).Name + "\", possible bad input coefficients." );
@@ -1201,7 +1201,7 @@ namespace SolarCollectors {
 
 			s = ( 1.0 / std::cos( IncidentAngle ) ) - 1.0;
 
-			IAM = 1.0 + Parameters( ParamNum ).iam1 * s + Parameters( ParamNum ).iam2 * ( pow2( s ) );
+			IAM = 1.0 + Parameters( ParamNum ).iam1 * s + Parameters( ParamNum ).iam2 * ( std::pow( s, 2 ) );
 			IAM = max( IAM, 0.0 ); // Never allow to be less than zero, but greater than one is a possibility
 
 			if ( IAM > 10.0 ) { // Greater than 10 is probably not a possibility
@@ -1456,7 +1456,7 @@ namespace SolarCollectors {
 			a = 1.0;
 			b = -( a1 + b2 );
 			c = a1 * b2 - a2 * b1;
-			BSquareM4TimesATimesC = pow2( b ) - 4.0 * a * c;
+			BSquareM4TimesATimesC = std::pow( b, 2 ) - 4.0 * a * c;
 			if ( BSquareM4TimesATimesC > 0.0 ) {
 				lamda1 = ( -b + std::sqrt( BSquareM4TimesATimesC ) ) / ( 2. * a );
 				lamda2 = ( -b - std::sqrt( BSquareM4TimesATimesC ) ) / ( 2. * a );
@@ -1674,19 +1674,19 @@ namespace SolarCollectors {
 
 			// parallel and perpendicular reflection components:
 			if ( IncAngle == 0.0 ) {
-				ParaRad = pow2( ( ( CoverRefrIndex - AirRefIndex ) / ( CoverRefrIndex + AirRefIndex ) ) );
-				PerpRad = pow2( ( ( CoverRefrIndex - AirRefIndex ) / ( CoverRefrIndex + AirRefIndex ) ) );
+				ParaRad = std::pow( ( ( CoverRefrIndex - AirRefIndex ) / ( CoverRefrIndex + AirRefIndex ) ), 2 );
+				PerpRad = std::pow( ( ( CoverRefrIndex - AirRefIndex ) / ( CoverRefrIndex + AirRefIndex ) ), 2 );
 			} else {
-				ParaRad = pow2( std::tan( RefrAngle - IncAngle ) ) / pow2( std::tan( RefrAngle + IncAngle ) );
-				PerpRad = pow2( std::sin( RefrAngle - IncAngle ) ) / pow2( std::sin( RefrAngle + IncAngle ) );
+				ParaRad = std::pow( std::tan( RefrAngle - IncAngle ), 2 ) / std::pow( std::tan( RefrAngle + IncAngle ), 2 );
+				PerpRad = std::pow( std::sin( RefrAngle - IncAngle ), 2 ) / std::pow( std::sin( RefrAngle + IncAngle ), 2 );
 			}
 
 			// parallel and perpendicular transmitted components:
-			TransPerp( nCover ) = TransAbsOnly( nCover ) * ( ( 1.0 - PerpRad ) / ( 1.0 + PerpRad ) ) * ( ( 1.0 - pow2( PerpRad ) ) / ( 1.0 - pow2( ( PerpRad * TransAbsOnly( nCover ) ) ) ) );
-			TransPara( nCover ) = TransAbsOnly( nCover ) * ( ( 1.0 - ParaRad ) / ( 1.0 + ParaRad ) ) * ( ( 1.0 - pow2( ParaRad ) ) / ( 1.0 - pow2( ( ParaRad * TransAbsOnly( nCover ) ) ) ) );
+			TransPerp( nCover ) = TransAbsOnly( nCover ) * ( ( 1.0 - PerpRad ) / ( 1.0 + PerpRad ) ) * ( ( 1.0 - std::pow( PerpRad, 2 ) ) / ( 1.0 - std::pow( ( PerpRad * TransAbsOnly( nCover ) ), 2 ) ) );
+			TransPara( nCover ) = TransAbsOnly( nCover ) * ( ( 1.0 - ParaRad ) / ( 1.0 + ParaRad ) ) * ( ( 1.0 - std::pow( ParaRad, 2 ) ) / ( 1.0 - std::pow( ( ParaRad * TransAbsOnly( nCover ) ), 2 ) ) );
 
-			ReflPerp( nCover ) = ( PerpRad + ( ( pow2( ( 1.0 - PerpRad ) ) ) * ( pow2( TransAbsOnly( nCover ) ) ) * PerpRad ) / ( 1.0 - pow2( ( PerpRad * TransAbsOnly( nCover ) ) ) ) );
-			ReflPara( nCover ) = ( ParaRad + ( ( pow2( ( 1.0 - ParaRad ) ) ) * ( pow2( TransAbsOnly( nCover ) ) ) * ParaRad ) / ( 1.0 - pow2( ( ParaRad * TransAbsOnly( nCover ) ) ) ) );
+			ReflPerp( nCover ) = ( PerpRad + ( ( std::pow( ( 1.0 - PerpRad ), 2 ) ) * ( std::pow( TransAbsOnly( nCover ), 2 ) ) * PerpRad ) / ( 1.0 - std::pow( ( PerpRad * TransAbsOnly( nCover ) ), 2 ) ) );
+			ReflPara( nCover ) = ( ParaRad + ( ( std::pow( ( 1.0 - ParaRad ), 2 ) ) * ( std::pow( TransAbsOnly( nCover ), 2 ) ) * ParaRad ) / ( 1.0 - std::pow( ( ParaRad * TransAbsOnly( nCover ) ), 2 ) ) );
 
 			AbsorPerp( nCover ) = 1.0 - TransPerp( nCover ) - ReflPerp( nCover );
 			AbsorPara( nCover ) = 1.0 - TransPara( nCover ) - ReflPara( nCover );
@@ -1788,7 +1788,7 @@ namespace SolarCollectors {
 		{ auto const SELECT_CASE_var( NumCovers );
 		if ( SELECT_CASE_var == 1 ) {
 			// calc linearized radiation coefficient
-			tempnom = StefanBoltzmann * ( ( TempAbsPlate + KelvinConv ) + ( TempOuterCover + KelvinConv ) ) * ( pow2( ( TempAbsPlate + KelvinConv ) ) + pow2( ( TempOuterCover + KelvinConv ) ) );
+			tempnom = StefanBoltzmann * ( ( TempAbsPlate + KelvinConv ) + ( TempOuterCover + KelvinConv ) ) * ( std::pow( ( TempAbsPlate + KelvinConv ), 2 ) + std::pow( ( TempOuterCover + KelvinConv ), 2 ) );
 			tempdenom = 1.0 / EmissOfAbsPlate + 1.0 / EmissOfOuterCover - 1.0;
 			hRadCoefA2C = tempnom / tempdenom;
 			hRadCoefC2C = 0.0;
@@ -1799,14 +1799,14 @@ namespace SolarCollectors {
 			for ( CoverNum = 1; CoverNum <= NumCovers; ++CoverNum ) {
 				if ( CoverNum == 1 ) {
 					// calc linearized radiation coefficient
-					tempnom = StefanBoltzmann * ( ( TempAbsPlate + KelvinConv ) + ( TempInnerCover + KelvinConv ) ) * ( pow2( ( TempAbsPlate + KelvinConv ) ) + pow2( ( TempInnerCover + KelvinConv ) ) );
+					tempnom = StefanBoltzmann * ( ( TempAbsPlate + KelvinConv ) + ( TempInnerCover + KelvinConv ) ) * ( std::pow( ( TempAbsPlate + KelvinConv ), 2 ) + std::pow( ( TempInnerCover + KelvinConv ), 2 ) );
 					tempdenom = 1.0 / EmissOfAbsPlate + 1.0 / EmissOfInnerCover - 1.0;
 					hRadCoefA2C = tempnom / tempdenom;
 					// Calc convection heat transfer coefficient:
 					hConvCoefA2C = CalcConvCoeffBetweenPlates( TempAbsPlate, TempOuterCover, AirGapDepth, Collector( ColleNum ).CosTilt, Collector( ColleNum ).SinTilt );
 				} else {
 					// calculate the linearized radiation coeff.
-					tempnom = StefanBoltzmann * ( ( TempInnerCover + KelvinConv ) + ( TempOuterCover + KelvinConv ) ) * ( pow2( ( TempInnerCover + KelvinConv ) ) + pow2( ( TempOuterCover + KelvinConv ) ) );
+					tempnom = StefanBoltzmann * ( ( TempInnerCover + KelvinConv ) + ( TempOuterCover + KelvinConv ) ) * ( std::pow( ( TempInnerCover + KelvinConv ), 2 ) + std::pow( ( TempOuterCover + KelvinConv ), 2 ) );
 					tempdenom = 1.0 / EmissOfInnerCover + 1.0 / EmissOfOuterCover - 1.0;
 					hRadCoefC2C = tempnom / tempdenom;
 					// Calc convection heat transfer coefficient:
@@ -1819,7 +1819,7 @@ namespace SolarCollectors {
 		hConvCoefC2O = 2.8 + 3.0 * Surface( SurfNum ).WindSpeed;
 
 		// Calc linearized radiation coefficient between outer cover and the surrounding:
-		tempnom = Surface( SurfNum ).ViewFactorSky * EmissOfOuterCover * StefanBoltzmann * ( ( TempOuterCover + KelvinConv ) + SkyTempKelvin ) * ( pow2( ( TempOuterCover + KelvinConv ) ) + pow2( SkyTempKelvin ) );
+		tempnom = Surface( SurfNum ).ViewFactorSky * EmissOfOuterCover * StefanBoltzmann * ( ( TempOuterCover + KelvinConv ) + SkyTempKelvin ) * ( std::pow( ( TempOuterCover + KelvinConv ), 2 ) + std::pow( SkyTempKelvin, 2 ) );
 		tempdenom = ( TempOuterCover - TempOutdoorAir ) / ( TempOuterCover - SkyTemp );
 		if ( tempdenom < 0.0 ) {
 			// use approximate linearized radiation coefficient
@@ -1831,7 +1831,7 @@ namespace SolarCollectors {
 			hRadCoefC2Sky = tempnom / tempdenom;
 		}
 
-		tempnom = Surface( SurfNum ).ViewFactorGround * EmissOfOuterCover * StefanBoltzmann * ( ( TempOuterCover + KelvinConv ) + GroundTempKelvin ) * ( pow2( ( TempOuterCover + KelvinConv ) ) + pow2( GroundTempKelvin ) );
+		tempnom = Surface( SurfNum ).ViewFactorGround * EmissOfOuterCover * StefanBoltzmann * ( ( TempOuterCover + KelvinConv ) + GroundTempKelvin ) * ( std::pow( ( TempOuterCover + KelvinConv ), 2 ) + std::pow( GroundTempKelvin, 2 ) );
 		tempdenom = ( TempOuterCover - TempOutdoorAir ) / ( TempOuterCover - GroundTemp );
 		if ( tempdenom < 0.0 ) {
 			// use approximate linearized radiation coefficient
@@ -1990,7 +1990,7 @@ namespace SolarCollectors {
 
 		VolExpAir = 1.0 / ( Tref + KelvinConv );
 
-		RaNum = gravity * ( pow2( DensOfAir ) ) * VolExpAir * PrOfAir * DeltaT * ( pow3( AirGap ) ) / ( pow2( VisDOfAir ) );
+		RaNum = gravity * ( std::pow( DensOfAir, 2 ) ) * VolExpAir * PrOfAir * DeltaT * ( std::pow( AirGap, 3 ) ) / ( std::pow( VisDOfAir, 2 ) );
 		RaNumCosTilt = RaNum * CosTilt;
 		if ( RaNum == 0.0 ) {
 			NuL = 0.0;
@@ -2091,7 +2091,7 @@ namespace SolarCollectors {
 		TReference = TWater - 0.25 * ( TWater - TAbsorber );
 		VolExpWater = -( GetDensityGlycol( fluidNameWater, max( TReference, 10.0 ) + 5.0, WaterIndex, CalledFrom ) - GetDensityGlycol( fluidNameWater, max( TReference, 10.0 ) - 5.0, WaterIndex, CalledFrom ) ) / ( 10.0 * DensOfWater );
 
-		GrNum = gravity * VolExpWater * DensOfWater * DensOfWater * PrOfWater * DeltaT * ( pow3( Lc ) ) / ( pow2( VisOfWater ) );
+		GrNum = gravity * VolExpWater * DensOfWater * DensOfWater * PrOfWater * DeltaT * ( std::pow( Lc, 3 ) ) / ( std::pow( VisOfWater, 2 ) );
 		CosTilt = std::cos( TiltR2V * DegToRadians );
 		if ( TAbsorber > TWater ) {
 			// hot absorber plate facing down

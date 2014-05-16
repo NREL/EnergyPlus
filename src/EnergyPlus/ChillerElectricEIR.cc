@@ -1847,7 +1847,7 @@ namespace ChillerElectricEIR {
 			if ( ElectricEIRChiller( EIRChillNum ).HeatRecActive ) EIRChillerHeatRecovery( EIRChillNum, QCondenser, CondMassFlowRate, CondInletTemp, QHeatRecovered );
 
 			if ( CondMassFlowRate > 0.0 ) {
-				Cp = PsyCpAirFnWTdb( Node( CondInletNode ).HumRat, CondInletTemp );
+				Cp = PsyCpAirFnWTdb( Node( CondInletNode ).HumRat, CondInletTemp ); // *&^unique^&* RoutineName
 				CondOutletTemp = CondInletTemp + QCondenser / CondMassFlowRate / Cp;
 			} else {
 				CondOutletTemp = CondInletTemp;

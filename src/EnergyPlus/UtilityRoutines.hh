@@ -1,8 +1,6 @@
 #ifndef UtilityRoutines_hh_INCLUDED
 #define UtilityRoutines_hh_INCLUDED
 
-#include <cmath>
-
 // ObjexxFCL Headers
 #include <ObjexxFCL/Optional.hh>
 
@@ -47,60 +45,39 @@ ConvertCaseToLower(
 std::string::size_type
 FindNonSpace( std::string const & String ); // String to be scanned
 
-template< typename T >
 inline
-T
-pow2( T const & x )
+double
+power( double baseValue, int exponentValue)
 {
-	return x * x;
+	double result = 1.0;
+	if ( exponentValue > 0)
+		for (int i = 0; i < exponentValue; i++)
+			result *= baseValue;
+	else
+		for (int i = 0; i > exponentValue; i--)
+			result /= baseValue;
+	return result;
 }
 
-template< typename T >
 inline
-T
-pow3( T const & x )
+double
+power( double baseValue, double exponentValue)
 {
-	return x * x * x;
+	return std::okpow( baseValue, exponentValue );
 }
 
-template< typename T >
 inline
-T
-pow4( T const & x )
+float
+power( float baseValue, float exponentValue)
 {
-	T y( x * x );
-	return y * y;
+	return std::okpow( baseValue, exponentValue );
 }
 
-template< typename T >
 inline
-T
-pow5( T const & x )
+long double
+power( long double baseValue, long double exponentValue)
 {
-	T y( x * x );
-	y *= y;
-	return y * x;
-}
-
-template< typename T >
-inline
-T
-pow6( T const & x )
-{
-	T y( x * x );
-	y *= y;
-	return y * y;
-}
-
-template< typename T >
-inline
-T
-pow7( T const & x )
-{
-	T y( x * x );
-	y *= y;
-	y *= y;
-	return y * x;
+	return std::okpow( baseValue, exponentValue );
 }
 
 bool

@@ -18,7 +18,6 @@
 #include <TARCOGOutput.hh>
 #include <TARCOGParams.hh>
 #include <TarcogShading.hh>
-#include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -124,7 +123,7 @@ namespace ThermalISO15099Calc {
 				acoef = 2.86;
 				bexp = 0.617;
 			}
-			hcout = std::pow( ( pow2( ( 0.84 * std::pow( ( tw - tex ), 0.33 ) ) ) + pow2( ( acoef * std::pow( ws, bexp ) ) ) ), 0.5 );
+			hcout = std::pow( ( std::pow( ( 0.84 * std::pow( ( tw - tex ), 0.33 ) ), 2 ) + std::pow( ( acoef * std::pow( ws, bexp ) ), 2 ) ), 0.5 );
 		} else if ( SELECT_CASE_var == -3 ) { // Kimura correlation (Section 8.4.2.3 in ISO 15099-2001):
 			if ( iwd == 0 ) { // windward
 				if ( ws > 2.0 ) {
@@ -1422,8 +1421,8 @@ namespace ThermalISO15099Calc {
 			k = 2 * i - 1;
 			Rf( i ) = Radiation( k );
 			Rb( i ) = Radiation( k + 1 );
-			Ebf( i ) = StefanBoltzmann * pow4( theta( k ) );
-			Ebb( i ) = StefanBoltzmann * pow4( theta( k + 1 ) );
+			Ebf( i ) = StefanBoltzmann * std::pow( theta( k ), 4 );
+			Ebb( i ) = StefanBoltzmann * std::pow( theta( k + 1 ), 4 );
 		}
 		//end if
 
@@ -1438,7 +1437,7 @@ namespace ThermalISO15099Calc {
 			qr_gap_in = Rf( nlayer ) - Rb( nlayer - 1 );
 
 			if ( IsShadingLayer( LayerType( 1 ) ) ) {
-				ShadeEmisRatioOut = qr_gap_out / ( emis( 3 ) * StefanBoltzmann * ( pow4( theta( 3 ) ) - pow4( trmout ) ) );
+				ShadeEmisRatioOut = qr_gap_out / ( emis( 3 ) * StefanBoltzmann * ( std::pow( theta( 3 ), 4 ) - std::pow( trmout, 4 ) ) );
 				//qc_gap_out = qprim(3) - qr_gap_out
 				//qcgapout2 = qcgas(1)
 				//Hc_modified_out = (qc_gap_out / (theta(3) - tout))
@@ -1446,7 +1445,7 @@ namespace ThermalISO15099Calc {
 			}
 
 			if ( IsShadingLayer( LayerType( nlayer ) ) ) {
-				ShadeEmisRatioIn = qr_gap_in / ( emis( 2 * nlayer - 2 ) * StefanBoltzmann * ( pow4( trmin ) - pow4( theta( 2 * nlayer - 2 ) ) ) );
+				ShadeEmisRatioIn = qr_gap_in / ( emis( 2 * nlayer - 2 ) * StefanBoltzmann * ( std::pow( trmin, 4 ) - std::pow( theta( 2 * nlayer - 2 ), 4 ) ) );
 				qc_gap_in = q( 2 * nlayer - 1 ) - qr_gap_in;
 				hc_modified_in = ( qc_gap_in / ( tind - theta( 2 * nlayer - 2 ) ) );
 				ShadeHcModifiedIn = hc_modified_in;
@@ -1555,8 +1554,8 @@ namespace ThermalISO15099Calc {
 			j = 2 * i;
 			theta( j - 1 ) = tout + x( j - 1 ) * delta;
 			theta( j ) = tout + x( j ) * delta;
-			Ebf( i ) = StefanBoltzmann * pow4( theta( j - 1 ) );
-			Ebb( i ) = StefanBoltzmann * pow4( theta( j ) );
+			Ebf( i ) = StefanBoltzmann * std::pow( theta( j - 1 ), 4 );
+			Ebb( i ) = StefanBoltzmann * std::pow( theta( j ), 4 );
 		}
 
 		for ( i = 1; i <= nlayer + 1; ++i ) {
@@ -2114,7 +2113,7 @@ namespace ThermalISO15099Calc {
 
 			//   Calculate grashoff number:
 			//   The grashoff number is the Rayleigh Number (equation 5.29) in SPC142 divided by the Prandtl Number (prand):
-			gr = GravityConstant * pow3( height ) * delt * pow2( dens ) / ( tmean * pow2( visc ) );
+			gr = GravityConstant * std::pow( height, 3 ) * delt * std::pow( dens, 2 ) / ( tmean * std::pow( visc, 2 ) );
 
 			RaL = gr * pr;
 			//   write(*,*)' RaCrit,RaL,gr,pr '
@@ -2257,7 +2256,7 @@ namespace ThermalISO15099Calc {
 
 				// Calculate grashoff number:
 				// The grashoff number is the Rayleigh Number (equation 5.29) in SPC142 divided by the Prandtl Number (prand):
-				ra = GravityConstant * pow3( gap( i ) ) * delt * cp * pow2( dens ) / ( tmean * visc * con );
+				ra = GravityConstant * std::pow( gap( i ), 3 ) * delt * cp * std::pow( dens, 2 ) / ( tmean * visc * con );
 				Rayleigh( i ) = ra;
 				// write(*,*) 'height,gap(i),asp',height,gap(i),asp
 				//asp = 1
@@ -2334,7 +2333,7 @@ namespace ThermalISO15099Calc {
 				//Average glass conductivity is taken as average from both glass surrounding gap
 				aveGlassConductivity = ( scon( i ) + scon( i + 1 ) ) / 2;
 
-				cpa = 2.0 * aveGlassConductivity * PillarRadius( i ) / ( ( pow2( PillarSpacing( i ) ) ) * ( 1.0 + 2.0 * gap( i ) / ( Pi * PillarRadius( i ) ) ) );
+				cpa = 2.0 * aveGlassConductivity * PillarRadius( i ) / ( ( std::pow( PillarSpacing( i ), 2 ) ) * ( 1.0 + 2.0 * gap( i ) / ( Pi * PillarRadius( i ) ) ) );
 
 				//It is important to add on prevoius values caluculated for gas
 				hcgas( i + 1 ) += cpa;
@@ -2405,13 +2404,13 @@ namespace ThermalISO15099Calc {
 			}
 		} else if ( tilt == 60.0 ) { //ISO/DIS 15099 - chapter 5.3.3.2
 			G = 0.5 / ( std::pow( ( 1.0 + std::pow( ( ra / 3160.0 ), 20.6 ) ), 0.1 ) ); //equation 47
-			Nu1 = std::pow( ( 1.0 + pow7( ( ( 0.0936 * std::pow( ra, 0.314 ) ) / ( 1.0 + G ) ) ) ), ( 0.1428571 ) ); //equation 45
+			Nu1 = std::pow( ( 1.0 + std::pow( ( ( 0.0936 * std::pow( ra, 0.314 ) ) / ( 1.0 + G ) ), 7 ) ), ( 0.1428571 ) ); //equation 45
 			Nu2 = ( 0.104 + 0.175 / asp ) * ( std::pow( ra, 0.283 ) ); //equation 46
 			gnu = max( Nu1, Nu2 ); //equation 44
 		} else if ( ( tilt > 60.0 ) && ( tilt < 90.0 ) ) { //ISO/DIS 15099 - chapter 5.3.3.3
 			if ( ( ra > 100.0 ) && ( ra < 2.0e7 ) && ( asp > 5.0 ) && ( asp < 100.0 ) ) {
 				G = 0.5 / ( std::pow( ( 1.0 + std::pow( ( ra / 3160.0 ), 20.6 ) ), 0.1 ) ); //equation 47
-				Nu1 = std::pow( ( 1.0 + pow7( ( ( 0.0936 * std::pow( ra, 0.314 ) ) / ( 1.0 + G ) ) ) ), ( 0.1428571 ) ); //equation 45
+				Nu1 = std::pow( ( 1.0 + std::pow( ( ( 0.0936 * std::pow( ra, 0.314 ) ) / ( 1.0 + G ) ), 7 ) ), ( 0.1428571 ) ); //equation 45
 				Nu2 = ( 0.104 + 0.175 / asp ) * ( std::pow( ra, 0.283 ) ); //equation 46
 				Nu60 = max( Nu1, Nu2 ); //equation 44
 				Nu2 = 0.242 * std::pow( ( ra / asp ), 0.272 ); //equation 52
@@ -2424,7 +2423,7 @@ namespace ThermalISO15099Calc {
 				}
 			} else if ( ra <= 100.0 ) {
 				G = 0.5 / ( std::pow( ( 1.0 + std::pow( ( ra / 3160.0 ), 20.6 ) ), 0.1 ) ); //equation 47
-				Nu1 = std::pow( ( 1.0 + pow7( ( ( 0.0936 * std::pow( ra, 0.314 ) ) / ( 1.0 + G ) ) ) ), ( 0.1428571 ) ); //equation 45
+				Nu1 = std::pow( ( 1.0 + std::pow( ( ( 0.0936 * std::pow( ra, 0.314 ) ) / ( 1.0 + G ) ), 7 ) ), ( 0.1428571 ) ); //equation 45
 				Nu2 = ( 0.104 + 0.175 / asp ) * ( std::pow( ra, 0.283 ) ); //equation 46
 				Nu60 = max( Nu1, Nu2 ); //equation 44
 				Nu2 = 0.242 * std::pow( ( ra / asp ), 0.272 ); //equation 52
@@ -2433,7 +2432,7 @@ namespace ThermalISO15099Calc {
 				ErrorMessage = "Rayleigh number is less than 100 in Nusselt number calculations for gaps " "(angle between 60 and 90 degrees).";
 			} else if ( ra > 2.0e7 ) {
 				G = 0.5 / ( std::pow( ( 1.0 + std::pow( ( ra / 3160.0 ), 20.6 ) ), 0.1 ) ); //equation 47
-				Nu1 = std::pow( ( 1.0 + pow7( ( ( 0.0936 * std::pow( ra, 0.314 ) ) / ( 1.0 + G ) ) ) ), ( 0.1428571 ) ); //equation 45
+				Nu1 = std::pow( ( 1.0 + std::pow( ( ( 0.0936 * std::pow( ra, 0.314 ) ) / ( 1.0 + G ) ), 7 ) ), ( 0.1428571 ) ); //equation 45
 				Nu2 = ( 0.104 + 0.175 / asp ) * ( std::pow( ra, 0.283 ) ); //equation 46
 				Nu60 = max( Nu1, Nu2 ); //equation 44
 				Nu2 = 0.242 * std::pow( ( ra / asp ), 0.272 ); //equation 52
@@ -2442,7 +2441,7 @@ namespace ThermalISO15099Calc {
 				ErrorMessage = "Rayleigh number is greater than 2e7 in Nusselt number calculations for gaps" " (angle between 60 and 90 degrees).";
 			} else if ( ( asp <= 5.0 ) || ( asp >= 100.0 ) ) {
 				G = 0.5 / ( std::pow( ( 1.0 + std::pow( ( ra / 3160.0 ), 20.6 ) ), 0.1 ) ); //equation 47
-				Nu1 = std::pow( ( 1.0 + pow7( ( ( 0.0936 * std::pow( ra, 0.314 ) ) / ( 1.0 + G ) ) ) ), ( 0.1428571 ) ); //equation 45
+				Nu1 = std::pow( ( 1.0 + std::pow( ( ( 0.0936 * std::pow( ra, 0.314 ) ) / ( 1.0 + G ) ), 7 ) ), ( 0.1428571 ) ); //equation 45
 				Nu2 = ( 0.104 + 0.175 / asp ) * ( std::pow( ra, 0.283 ) ); //equation 46
 				Nu60 = max( Nu1, Nu2 ); //equation 44
 				Nu2 = 0.242 * std::pow( ( ra / asp ), 0.272 ); //equation 52
@@ -2665,7 +2664,7 @@ namespace ThermalISO15099Calc {
 			GASSES90( tmean, ipropg, frctg, presure( i + 1 ), nmix( i + 1 ), wght, gcon, gvis, gcp, con, visc, dens, cp, pr, ISO15099, nperr, ErrorMessage );
 			gap_NOSD = gap( SDLayerIndex - 1 ) + gap( SDLayerIndex ) + thick( SDLayerIndex );
 			// determine the Rayleigh number:
-			rayl = GravityConstant * pow3( gap_NOSD ) * delt * cp * pow2( dens ) / ( tmean * visc * con );
+			rayl = GravityConstant * std::pow( gap_NOSD, 3 ) * delt * cp * std::pow( dens, 2 ) / ( tmean * visc * con );
 			asp = height / gap_NOSD;
 			// determine the Nusselt number:
 			nusselt( tilt, rayl, asp, gnu, nperr, ErrorMessage );

@@ -452,7 +452,7 @@ namespace UserDefinedComponents {
 		AirMassFlow = min( Node( UserZoneAirHVAC( CompNum ).ZoneAir.InletNodeNum ).MassFlowRate, Node( UserZoneAirHVAC( CompNum ).ZoneAir.OutletNodeNum ).MassFlowRate );
 		// calculate sensible load met using delta enthalpy at a constant (minimum) humidity ratio)
 		MinHumRat = min( Node( UserZoneAirHVAC( CompNum ).ZoneAir.InletNodeNum ).HumRat, Node( UserZoneAirHVAC( CompNum ).ZoneAir.OutletNodeNum ).HumRat );
-		SensibleOutputProvided = AirMassFlow * ( PsyHFnTdbW( Node( UserZoneAirHVAC( CompNum ).ZoneAir.OutletNodeNum ).Temp, MinHumRat ) - PsyHFnTdbW( Node( UserZoneAirHVAC( CompNum ).ZoneAir.InletNodeNum ).Temp, MinHumRat ) );
+		SensibleOutputProvided = AirMassFlow * ( PsyHFnTdbW( Node( UserZoneAirHVAC( CompNum ).ZoneAir.OutletNodeNum ).Temp, MinHumRat ) - PsyHFnTdbW( Node( UserZoneAirHVAC( CompNum ).ZoneAir.InletNodeNum ).Temp, MinHumRat ) ); // *&^unique^&* "SimZoneAirUserDefined"
 
 		// CR9155 Remove specific humidity calculations
 		SpecHumOut = Node( UserZoneAirHVAC( CompNum ).ZoneAir.OutletNodeNum ).HumRat;
@@ -1426,7 +1426,7 @@ namespace UserDefinedComponents {
 		UserPlantComp( CompNum ).Loop( LoopNum ).InletTemp = Node( UserPlantComp( CompNum ).Loop( LoopNum ).InletNodeNum ).Temp;
 		if ( UserPlantComp( CompNum ).Air.InletNodeNum > 0 ) {
 			UserPlantComp( CompNum ).Air.InletRho = PsyRhoAirFnPbTdbW( OutBaroPress, Node( UserPlantComp( CompNum ).Air.InletNodeNum ).Temp, Node( UserPlantComp( CompNum ).Air.InletNodeNum ).HumRat, RoutineName );
-			UserPlantComp( CompNum ).Air.InletCp = PsyCpAirFnWTdb( Node( UserPlantComp( CompNum ).Air.InletNodeNum ).HumRat, Node( UserPlantComp( CompNum ).Air.InletNodeNum ).Temp );
+			UserPlantComp( CompNum ).Air.InletCp = PsyCpAirFnWTdb( Node( UserPlantComp( CompNum ).Air.InletNodeNum ).HumRat, Node( UserPlantComp( CompNum ).Air.InletNodeNum ).Temp ); // *&^unique^&* "InitPlantUserComponent"
 			UserPlantComp( CompNum ).Air.InletTemp = Node( UserPlantComp( CompNum ).Air.InletNodeNum ).Temp;
 			UserPlantComp( CompNum ).Air.InletMassFlowRate = Node( UserPlantComp( CompNum ).Air.InletNodeNum ).MassFlowRate;
 			UserPlantComp( CompNum ).Air.InletHumRat = Node( UserPlantComp( CompNum ).Air.InletNodeNum ).HumRat;
@@ -1505,7 +1505,7 @@ namespace UserDefinedComponents {
 		for ( Loop = 1; Loop <= UserCoil( CompNum ).NumAirConnections; ++Loop ) {
 			UserCoil( CompNum ).Air( Loop ).InletRho = PsyRhoAirFnPbTdbW( OutBaroPress, Node( UserCoil( CompNum ).Air( Loop ).InletNodeNum ).Temp, Node( UserCoil( CompNum ).Air( Loop ).InletNodeNum ).HumRat, RoutineName );
 
-			UserCoil( CompNum ).Air( Loop ).InletCp = PsyCpAirFnWTdb( Node( UserCoil( CompNum ).Air( Loop ).InletNodeNum ).HumRat, Node( UserCoil( CompNum ).Air( Loop ).InletNodeNum ).Temp );
+			UserCoil( CompNum ).Air( Loop ).InletCp = PsyCpAirFnWTdb( Node( UserCoil( CompNum ).Air( Loop ).InletNodeNum ).HumRat, Node( UserCoil( CompNum ).Air( Loop ).InletNodeNum ).Temp ); // *&^unique^&* "InitCoilUserDefined"
 			UserCoil( CompNum ).Air( Loop ).InletTemp = Node( UserCoil( CompNum ).Air( Loop ).InletNodeNum ).Temp;
 			UserCoil( CompNum ).Air( Loop ).InletMassFlowRate = Node( UserCoil( CompNum ).Air( Loop ).InletNodeNum ).MassFlowRate;
 			UserCoil( CompNum ).Air( Loop ).InletHumRat = Node( UserCoil( CompNum ).Air( Loop ).InletNodeNum ).HumRat;
@@ -1599,13 +1599,13 @@ namespace UserDefinedComponents {
 		UserZoneAirHVAC( CompNum ).RemainingOutputReqToHumidSP = ZoneSysMoistureDemand( ZoneNum ).RemainingOutputReqToHumidSP;
 
 		UserZoneAirHVAC( CompNum ).ZoneAir.InletRho = PsyRhoAirFnPbTdbW( OutBaroPress, Node( UserZoneAirHVAC( CompNum ).ZoneAir.InletNodeNum ).Temp, Node( UserZoneAirHVAC( CompNum ).ZoneAir.InletNodeNum ).HumRat, RoutineName );
-		UserZoneAirHVAC( CompNum ).ZoneAir.InletCp = PsyCpAirFnWTdb( Node( UserZoneAirHVAC( CompNum ).ZoneAir.InletNodeNum ).HumRat, Node( UserZoneAirHVAC( CompNum ).ZoneAir.InletNodeNum ).Temp );
+		UserZoneAirHVAC( CompNum ).ZoneAir.InletCp = PsyCpAirFnWTdb( Node( UserZoneAirHVAC( CompNum ).ZoneAir.InletNodeNum ).HumRat, Node( UserZoneAirHVAC( CompNum ).ZoneAir.InletNodeNum ).Temp ); // *&^unique^&* "InitZoneAirUserDefined"
 		UserZoneAirHVAC( CompNum ).ZoneAir.InletTemp = Node( UserZoneAirHVAC( CompNum ).ZoneAir.InletNodeNum ).Temp;
 		UserZoneAirHVAC( CompNum ).ZoneAir.InletHumRat = Node( UserZoneAirHVAC( CompNum ).ZoneAir.InletNodeNum ).HumRat;
 
 		if ( UserZoneAirHVAC( CompNum ).SourceAir.InletNodeNum > 0 ) {
 			UserZoneAirHVAC( CompNum ).SourceAir.InletRho = PsyRhoAirFnPbTdbW( OutBaroPress, Node( UserZoneAirHVAC( CompNum ).SourceAir.InletNodeNum ).Temp, Node( UserZoneAirHVAC( CompNum ).SourceAir.InletNodeNum ).HumRat, RoutineName );
-			UserZoneAirHVAC( CompNum ).SourceAir.InletCp = PsyCpAirFnWTdb( Node( UserZoneAirHVAC( CompNum ).SourceAir.InletNodeNum ).HumRat, Node( UserZoneAirHVAC( CompNum ).SourceAir.InletNodeNum ).Temp );
+			UserZoneAirHVAC( CompNum ).SourceAir.InletCp = PsyCpAirFnWTdb( Node( UserZoneAirHVAC( CompNum ).SourceAir.InletNodeNum ).HumRat, Node( UserZoneAirHVAC( CompNum ).SourceAir.InletNodeNum ).Temp ); // *&^unique^&* "InitZoneAirUserDefined"
 			UserZoneAirHVAC( CompNum ).SourceAir.InletTemp = Node( UserZoneAirHVAC( CompNum ).SourceAir.InletNodeNum ).Temp;
 			UserZoneAirHVAC( CompNum ).SourceAir.InletHumRat = Node( UserZoneAirHVAC( CompNum ).SourceAir.InletNodeNum ).HumRat;
 		}
@@ -1700,13 +1700,13 @@ namespace UserDefinedComponents {
 		UserAirTerminal( CompNum ).RemainingOutputReqToHumidSP = ZoneSysMoistureDemand( ZoneNum ).RemainingOutputReqToHumidSP;
 
 		UserAirTerminal( CompNum ).AirLoop.InletRho = PsyRhoAirFnPbTdbW( OutBaroPress, Node( UserAirTerminal( CompNum ).AirLoop.InletNodeNum ).Temp, Node( UserAirTerminal( CompNum ).AirLoop.InletNodeNum ).HumRat, RoutineName );
-		UserAirTerminal( CompNum ).AirLoop.InletCp = PsyCpAirFnWTdb( Node( UserAirTerminal( CompNum ).AirLoop.InletNodeNum ).HumRat, Node( UserAirTerminal( CompNum ).AirLoop.InletNodeNum ).Temp );
+		UserAirTerminal( CompNum ).AirLoop.InletCp = PsyCpAirFnWTdb( Node( UserAirTerminal( CompNum ).AirLoop.InletNodeNum ).HumRat, Node( UserAirTerminal( CompNum ).AirLoop.InletNodeNum ).Temp ); // *&^unique^&* "InitAirTerminalUserDefined"
 		UserAirTerminal( CompNum ).AirLoop.InletTemp = Node( UserAirTerminal( CompNum ).AirLoop.InletNodeNum ).Temp;
 		UserAirTerminal( CompNum ).AirLoop.InletHumRat = Node( UserAirTerminal( CompNum ).AirLoop.InletNodeNum ).HumRat;
 
 		if ( UserAirTerminal( CompNum ).SourceAir.InletNodeNum > 0 ) {
 			UserAirTerminal( CompNum ).SourceAir.InletRho = PsyRhoAirFnPbTdbW( OutBaroPress, Node( UserAirTerminal( CompNum ).SourceAir.InletNodeNum ).Temp, Node( UserAirTerminal( CompNum ).SourceAir.InletNodeNum ).HumRat, RoutineName );
-			UserAirTerminal( CompNum ).SourceAir.InletCp = PsyCpAirFnWTdb( Node( UserAirTerminal( CompNum ).SourceAir.InletNodeNum ).HumRat, Node( UserAirTerminal( CompNum ).SourceAir.InletNodeNum ).Temp );
+			UserAirTerminal( CompNum ).SourceAir.InletCp = PsyCpAirFnWTdb( Node( UserAirTerminal( CompNum ).SourceAir.InletNodeNum ).HumRat, Node( UserAirTerminal( CompNum ).SourceAir.InletNodeNum ).Temp ); // *&^unique^&* "InitAirTerminalUserDefined"
 			UserAirTerminal( CompNum ).SourceAir.InletTemp = Node( UserAirTerminal( CompNum ).SourceAir.InletNodeNum ).Temp;
 			UserAirTerminal( CompNum ).SourceAir.InletHumRat = Node( UserAirTerminal( CompNum ).SourceAir.InletNodeNum ).HumRat;
 		}
@@ -1776,7 +1776,7 @@ namespace UserDefinedComponents {
 			Node( UserPlantComp( CompNum ).Air.OutletNodeNum ).Temp = UserPlantComp( CompNum ).Air.OutletTemp;
 			Node( UserPlantComp( CompNum ).Air.OutletNodeNum ).HumRat = UserPlantComp( CompNum ).Air.OutletHumRat;
 			Node( UserPlantComp( CompNum ).Air.OutletNodeNum ).MassFlowRate = UserPlantComp( CompNum ).Air.OutletMassFlowRate;
-			Node( UserPlantComp( CompNum ).Air.OutletNodeNum ).Enthalpy = PsyHFnTdbW( UserPlantComp( CompNum ).Air.OutletTemp, UserPlantComp( CompNum ).Air.OutletHumRat );
+			Node( UserPlantComp( CompNum ).Air.OutletNodeNum ).Enthalpy = PsyHFnTdbW( UserPlantComp( CompNum ).Air.OutletTemp, UserPlantComp( CompNum ).Air.OutletHumRat ); // *&^unique^&* "ReportPlantUserComponent"
 		}
 
 		if ( UserPlantComp( CompNum ).Water.SuppliedByWaterSystem ) {
@@ -1841,7 +1841,7 @@ namespace UserDefinedComponents {
 				Node( UserCoil( CompNum ).Air( Loop ).OutletNodeNum ).Temp = UserCoil( CompNum ).Air( Loop ).OutletTemp;
 				Node( UserCoil( CompNum ).Air( Loop ).OutletNodeNum ).HumRat = UserCoil( CompNum ).Air( Loop ).OutletHumRat;
 				Node( UserCoil( CompNum ).Air( Loop ).OutletNodeNum ).MassFlowRate = UserCoil( CompNum ).Air( Loop ).OutletMassFlowRate;
-				Node( UserCoil( CompNum ).Air( Loop ).OutletNodeNum ).Enthalpy = PsyHFnTdbW( UserCoil( CompNum ).Air( Loop ).OutletTemp, UserCoil( CompNum ).Air( Loop ).OutletHumRat );
+				Node( UserCoil( CompNum ).Air( Loop ).OutletNodeNum ).Enthalpy = PsyHFnTdbW( UserCoil( CompNum ).Air( Loop ).OutletTemp, UserCoil( CompNum ).Air( Loop ).OutletHumRat ); // *&^unique^&* "ReportCoilUserDefined"
 			}
 		}
 
@@ -1907,12 +1907,12 @@ namespace UserDefinedComponents {
 		Node( UserZoneAirHVAC( CompNum ).ZoneAir.OutletNodeNum ).Temp = UserZoneAirHVAC( CompNum ).ZoneAir.OutletTemp;
 		Node( UserZoneAirHVAC( CompNum ).ZoneAir.OutletNodeNum ).HumRat = UserZoneAirHVAC( CompNum ).ZoneAir.OutletHumRat;
 		Node( UserZoneAirHVAC( CompNum ).ZoneAir.OutletNodeNum ).MassFlowRate = UserZoneAirHVAC( CompNum ).ZoneAir.OutletMassFlowRate;
-		Node( UserZoneAirHVAC( CompNum ).ZoneAir.OutletNodeNum ).Enthalpy = PsyHFnTdbW( UserZoneAirHVAC( CompNum ).ZoneAir.OutletTemp, UserZoneAirHVAC( CompNum ).ZoneAir.OutletHumRat );
+		Node( UserZoneAirHVAC( CompNum ).ZoneAir.OutletNodeNum ).Enthalpy = PsyHFnTdbW( UserZoneAirHVAC( CompNum ).ZoneAir.OutletTemp, UserZoneAirHVAC( CompNum ).ZoneAir.OutletHumRat ); // *&^unique^&* "ReportZoneAirUserDefined"
 		if ( UserZoneAirHVAC( CompNum ).SourceAir.OutletNodeNum > 0 ) {
 			Node( UserZoneAirHVAC( CompNum ).SourceAir.OutletNodeNum ).Temp = UserZoneAirHVAC( CompNum ).SourceAir.OutletTemp;
 			Node( UserZoneAirHVAC( CompNum ).SourceAir.OutletNodeNum ).HumRat = UserZoneAirHVAC( CompNum ).SourceAir.OutletHumRat;
 			Node( UserZoneAirHVAC( CompNum ).SourceAir.OutletNodeNum ).MassFlowRate = UserZoneAirHVAC( CompNum ).SourceAir.OutletMassFlowRate;
-			Node( UserZoneAirHVAC( CompNum ).SourceAir.OutletNodeNum ).Enthalpy = PsyHFnTdbW( UserZoneAirHVAC( CompNum ).SourceAir.OutletTemp, UserZoneAirHVAC( CompNum ).SourceAir.OutletHumRat );
+			Node( UserZoneAirHVAC( CompNum ).SourceAir.OutletNodeNum ).Enthalpy = PsyHFnTdbW( UserZoneAirHVAC( CompNum ).SourceAir.OutletTemp, UserZoneAirHVAC( CompNum ).SourceAir.OutletHumRat ); // *&^unique^&* "ReportZoneAirUserDefined"
 		}
 
 		if ( UserZoneAirHVAC( CompNum ).NumPlantConnections > 0 ) {
@@ -1980,12 +1980,12 @@ namespace UserDefinedComponents {
 		Node( UserAirTerminal( CompNum ).AirLoop.OutletNodeNum ).Temp = UserAirTerminal( CompNum ).AirLoop.OutletTemp;
 		Node( UserAirTerminal( CompNum ).AirLoop.OutletNodeNum ).HumRat = UserAirTerminal( CompNum ).AirLoop.OutletHumRat;
 		Node( UserAirTerminal( CompNum ).AirLoop.OutletNodeNum ).MassFlowRate = UserAirTerminal( CompNum ).AirLoop.OutletMassFlowRate;
-		Node( UserAirTerminal( CompNum ).AirLoop.OutletNodeNum ).Enthalpy = PsyHFnTdbW( UserAirTerminal( CompNum ).AirLoop.OutletTemp, UserAirTerminal( CompNum ).AirLoop.OutletHumRat );
+		Node( UserAirTerminal( CompNum ).AirLoop.OutletNodeNum ).Enthalpy = PsyHFnTdbW( UserAirTerminal( CompNum ).AirLoop.OutletTemp, UserAirTerminal( CompNum ).AirLoop.OutletHumRat ); // *&^unique^&* "ReportAirTerminalUserDefined"
 		if ( UserAirTerminal( CompNum ).SourceAir.OutletNodeNum > 0 ) {
 			Node( UserAirTerminal( CompNum ).SourceAir.OutletNodeNum ).Temp = UserAirTerminal( CompNum ).SourceAir.OutletTemp;
 			Node( UserAirTerminal( CompNum ).SourceAir.OutletNodeNum ).HumRat = UserAirTerminal( CompNum ).SourceAir.OutletHumRat;
 			Node( UserAirTerminal( CompNum ).SourceAir.OutletNodeNum ).MassFlowRate = UserAirTerminal( CompNum ).SourceAir.OutletMassFlowRate;
-			Node( UserAirTerminal( CompNum ).SourceAir.OutletNodeNum ).Enthalpy = PsyHFnTdbW( UserAirTerminal( CompNum ).SourceAir.OutletTemp, UserAirTerminal( CompNum ).SourceAir.OutletHumRat );
+			Node( UserAirTerminal( CompNum ).SourceAir.OutletNodeNum ).Enthalpy = PsyHFnTdbW( UserAirTerminal( CompNum ).SourceAir.OutletTemp, UserAirTerminal( CompNum ).SourceAir.OutletHumRat ); // *&^unique^&* "ReportAirTerminalUserDefined"
 		}
 
 		if ( UserAirTerminal( CompNum ).NumPlantConnections > 0 ) {

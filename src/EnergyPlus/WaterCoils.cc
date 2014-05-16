@@ -1032,7 +1032,7 @@ namespace WaterCoils {
 				if ( TubeToFinDiamRatio > 1.0 ) {
 					ShowWarningError( "InitWaterCoil: Detailed Flat Fin Coil, TubetoFinDiamRatio > 1.0, [" + RoundSigDigits( TubeToFinDiamRatio, 4 ) + ']' );
 					// reset tube depth spacing and recalc dependent parameters
-					WaterCoil( CoilNum ).TubeDepthSpacing *= ( pow2( TubeToFinDiamRatio ) + 0.1 );
+					WaterCoil( CoilNum ).TubeDepthSpacing *= ( std::pow( TubeToFinDiamRatio, 2 ) + 0.1 );
 					WaterCoil( CoilNum ).CoilDepth = WaterCoil( CoilNum ).TubeDepthSpacing * WaterCoil( CoilNum ).NumOfTubeRows;
 					WaterCoil( CoilNum ).EffectiveFinDiam = std::sqrt( 4. * WaterCoil( CoilNum ).FinDiam * WaterCoil( CoilNum ).CoilDepth / ( Pi * WaterCoil( CoilNum ).NumOfTubeRows * WaterCoil( CoilNum ).NumOfTubesPerRow ) );
 					WaterCoil( CoilNum ).CoilEffectiveInsideDiam = 4. * WaterCoil( CoilNum ).MinAirFlowArea * WaterCoil( CoilNum ).CoilDepth / WaterCoil( CoilNum ).TotCoilOutsideSurfArea;
@@ -1365,10 +1365,10 @@ namespace WaterCoils {
 				WaterCoil( CoilNum ).InletAirHumRat = PsyWFnTdbTwbPb( 26.67, 19.44, StdBaroPress, RoutineName );
 				WaterCoil( CoilNum ).InletWaterTemp = 6.67;
 			}
-			WaterCoil( CoilNum ).InletAirEnthalpy = PsyHFnTdbW( WaterCoil( CoilNum ).InletAirTemp, WaterCoil( CoilNum ).InletAirHumRat );
+			WaterCoil( CoilNum ).InletAirEnthalpy = PsyHFnTdbW( WaterCoil( CoilNum ).InletAirTemp, WaterCoil( CoilNum ).InletAirHumRat ); // *&^unique^&* "InitWaterCoil"
 			WaterCoil( CoilNum ).InletWaterMassFlowRate = WaterCoil( CoilNum ).MaxWaterMassFlowRate;
 			WaterCoil( CoilNum ).InletAirMassFlowRate = StdRhoAir * WaterCoil( CoilNum ).DesAirVolFlowRate;
-			CapacitanceAir = WaterCoil( CoilNum ).InletAirMassFlowRate * PsyCpAirFnWTdb( WaterCoil( CoilNum ).InletAirHumRat, WaterCoil( CoilNum ).InletAirTemp );
+			CapacitanceAir = WaterCoil( CoilNum ).InletAirMassFlowRate * PsyCpAirFnWTdb( WaterCoil( CoilNum ).InletAirHumRat, WaterCoil( CoilNum ).InletAirTemp ); // *&^unique^&* "InitWaterCoil"
 
 			Cp = GetSpecificHeatGlycol( PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidName, WaterCoil( CoilNum ).InletWaterTemp, PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidIndex, RoutineName );
 
@@ -3881,8 +3881,8 @@ namespace WaterCoils {
 			//        known thermodynamic functions
 			// All coil calcs are done in KJoules.  Convert to KJ here and then convert
 			//  back to Joules at the end of the Subroutine.
-			DryAirSpecHeat = PsyCpAirFnWTdb( zero, TempAirIn ) * ConvK;
-			MoistAirSpecificHeat = PsyCpAirFnWTdb( InletAirHumRat, TempAirIn ) * ConvK;
+			DryAirSpecHeat = PsyCpAirFnWTdb( zero, TempAirIn ) * ConvK; // *&^unique^&* "CalcDetailFlatFinCoolingCoil"
+			MoistAirSpecificHeat = PsyCpAirFnWTdb( InletAirHumRat, TempAirIn ) * ConvK; // *&^unique^&* "CalcDetailFlatFinCoolingCoil"
 			InletAirEnthalpy = WaterCoil( CoilNum ).InletAirEnthalpy * ConvK;
 
 			EnterAirDewPoint = PsyTdpFnWPb( InletAirHumRat, OutBaroPress, RoutineName );
@@ -3926,7 +3926,7 @@ namespace WaterCoils {
 			}
 
 			RsdInletWaterTempSatAirHumRat = PsyWFnTdbRhPb( RaisedInletWaterTemp, unity, OutBaroPress, RoutineName );
-			AirEnthAtRsdInletWaterTemp = PsyHFnTdbW( RaisedInletWaterTemp, RsdInletWaterTempSatAirHumRat ) * ConvK;
+			AirEnthAtRsdInletWaterTemp = PsyHFnTdbW( RaisedInletWaterTemp, RsdInletWaterTempSatAirHumRat ) * ConvK; // *&^unique^&* "CalcDetailFlatFinCoolingCoil"
 
 			SensToTotEnthDiffRatio = DryAirSpecHeat * ( TempAirIn - RaisedInletWaterTemp ) / ( InletAirEnthalpy - AirEnthAtRsdInletWaterTemp );
 
@@ -4218,7 +4218,7 @@ namespace WaterCoils {
 				//       Implementation of epsilon*NTU method
 				TempAirOut = AirExitCoilSurfTemp + ( AirWetDryInterfcTemp - AirExitCoilSurfTemp ) * y;
 				OutletAirHumRat = PsyWFnTdbH( TempAirOut, 1000. * OutletAirEnthalpy, RoutineName );
-				SenWaterCoilLoad = AirMassFlow * ( PsyCpAirFnWTdb( InletAirHumRat, TempAirIn ) * TempAirIn - PsyCpAirFnWTdb( OutletAirHumRat, TempAirOut ) * TempAirOut ) * ConvK;
+				SenWaterCoilLoad = AirMassFlow * ( PsyCpAirFnWTdb( InletAirHumRat, TempAirIn ) * TempAirIn - PsyCpAirFnWTdb( OutletAirHumRat, TempAirOut ) * TempAirOut ) * ConvK; // *&^unique^&* "CalcDetailFlatFinCoolingCoil"
 			}
 
 			if ( FanOpMode == CycFanCycCoil ) {
@@ -5575,7 +5575,7 @@ Label999: ;
 					IBessFunc *= std::exp( BessFuncArg ) / std::sqrt( 2. * Pi * BessFuncArg );
 					return;
 				}
-				TERM *= 0.125 / BessFuncArg * ( pow2( ( 2 * LoopCount - 1 ) ) - 4 * BessFuncOrd * BessFuncOrd ) / double( LoopCount );
+				TERM *= 0.125 / BessFuncArg * ( std::pow( ( 2 * LoopCount - 1 ), 2 ) - 4 * BessFuncOrd * BessFuncOrd ) / double( LoopCount );
 				IBessFunc += TERM;
 			} // End of 1st LoopCount loop
 		}
@@ -5597,7 +5597,7 @@ Label999: ;
 		for ( LoopCount = 1; LoopCount <= 1000; ++LoopCount ) { //Start of 3rd LoopCount Loop
 			if ( std::abs( TERM ) <= std::abs( IBessFunc * ErrorTol ) ) return;
 			FK = LoopCount * ( BessFuncOrd + LoopCount );
-			TERM *= ( pow2( BessFuncArg ) / ( 4. * FK ) );
+			TERM *= ( std::pow( BessFuncArg, 2 ) / ( 4. * FK ) );
 			IBessFunc += TERM;
 		} //End of  3rd LoopCount loop
 
@@ -5725,8 +5725,8 @@ Label999: ;
 				FACT = 1.0;
 				HJ = 0.0;
 				for ( LoopCount = 1; LoopCount <= 6; ++LoopCount ) {
-					X2J *= pow2( BessFuncArg ) / 4.0;
-					FACT *= pow2( ( 1.0 / double( LoopCount ) ) );
+					X2J *= std::pow( BessFuncArg, 2 ) / 4.0;
+					FACT *= std::pow( ( 1.0 / double( LoopCount ) ), 2 );
 					HJ += 1.0 / double( LoopCount );
 					G0 += X2J * FACT * ( HJ - ( 0.5772157 + std::log( BessFuncArg / 2.0 ) ) );
 				} //End of LoopCount Loop
@@ -5743,8 +5743,8 @@ Label999: ;
 			HJ = 1.0;
 			G1 = 1.0 / BessFuncArg + X2J * ( 0.5 + ( 0.5772157 + std::log( BessFuncArg / 2.0 ) ) - HJ );
 			for ( LoopCount = 2; LoopCount <= 8; ++LoopCount ) {
-				X2J *= pow2( BessFuncArg ) / 4.0;
-				FACT *= pow2( ( 1.0 / double( LoopCount ) ) );
+				X2J *= std::pow( BessFuncArg, 2 ) / 4.0;
+				FACT *= std::pow( ( 1.0 / double( LoopCount ) ), 2 );
 				HJ += 1.0 / double( LoopCount );
 				G1 += X2J * FACT * ( 0.5 + ( ( 0.5772157 + std::log( BessFuncArg / 2.0 ) ) - HJ ) * double( LoopCount ) );
 			} //End of LoopCount Loop
@@ -6166,7 +6166,7 @@ Label10: ;
 			}
 
 			// Validity Check for Imaginary roots, In this case go back to linear fit.
-			check = pow2( QuadCoefTwo ) - 4.0 * QuadCoefOne * QuadCoefThree;
+			check = std::pow( QuadCoefTwo, 2 ) - 4.0 * QuadCoefOne * QuadCoefThree;
 			// Imaginary Root Exist
 			if ( check < 0 ) {
 				mode = 2;

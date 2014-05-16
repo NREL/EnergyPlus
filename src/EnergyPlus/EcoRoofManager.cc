@@ -285,7 +285,7 @@ namespace EcoRoofManager {
 
 		RS = BeamSolarRad + AnisoSkyMult( SurfNum ) * DifSolarRad;
 
-		Latm = 1.0 * Sigma * 1.0 * Surface( SurfNum ).ViewFactorGround * ( pow4( ( GroundTempKelvin ) ) ) + 1.0 * Sigma * 1.0 * Surface( SurfNum ).ViewFactorSky * pow4( ( SkyTempKelvin ) );
+		Latm = 1.0 * Sigma * 1.0 * Surface( SurfNum ).ViewFactorGround * ( std::pow( ( GroundTempKelvin ), 4 ) ) + 1.0 * Sigma * 1.0 * Surface( SurfNum ).ViewFactorSky * std::pow( ( SkyTempKelvin ), 4 );
 
 		if ( EcoRoofbeginFlag ) {
 			EcoRoofbeginFlag = false;
@@ -423,7 +423,7 @@ namespace EcoRoofManager {
 			if ( Zo < 0.02 ) Zo = 0.02; // limit based on p.7 TR-04-25 and Table 2
 
 			//transfer coefficient at near-neutral condition Cfhn
-			Cfhn = pow2( ( Kv / std::log( ( Za - Zd ) / Zo ) ) ); //Equation 12, page 7, FASST Model
+			Cfhn = std::pow( ( Kv / std::log( ( Za - Zd ) / Zo ) ), 2 ); //Equation 12, page 7, FASST Model
 			Waf = 0.83 * std::pow( Cfhn, 0.5 ) * sigmaf * Ws + ( 1.0 - sigmaf ) * Ws; // Wind Speed inside foliage. Equation #6, FASST model
 			Cf = 0.01 * ( 1.0 + 0.3 / Waf ); // The bulk Transfer coefficient, equation 10 page 6.
 			sheatf = e0 + 1.1 * LAI * Rhoaf * Cpa * Cf * Waf; // Intermediate calculation for Sensible Heat Transfer
@@ -470,7 +470,7 @@ namespace EcoRoofManager {
 
 			//Latent heat of vaporation at leaf surface temperature. The source of this
 			//equation is Henderson-Sellers (1984)
-			Lef = 1.91846e6 * pow2( ( ( Tif + KelvinConv ) / ( Tif + KelvinConv - 33.91 ) ) );
+			Lef = 1.91846e6 * std::pow( ( ( Tif + KelvinConv ) / ( Tif + KelvinConv - 33.91 ) ), 2 );
 			//Check to see if ice is sublimating or frost is forming.
 			if ( Tfold < 0.0 ) Lef = 2.838e6; // per FASST documentation p.15 after eqn. 37.
 
@@ -478,19 +478,19 @@ namespace EcoRoofManager {
 			//derivative of saturation specific humidity.
 
 			Desf = 611.2 * std::exp( 17.67 * ( Tf / ( Tf + KelvinConv - 29.65 ) ) ) * ( 17.67 * Tf * ( -1.0 ) * std::pow( ( Tf + KelvinConv - 29.65 ), ( -2 ) ) + 17.67 / ( KelvinConv - 29.65 + Tf ) );
-			dqf = ( ( 0.622 * Pa ) / pow2( ( Pa - esf ) ) ) * Desf; //Derivative of saturation specific humidity
+			dqf = ( ( 0.622 * Pa ) / std::pow( ( Pa - esf ), 2 ) ) * Desf; //Derivative of saturation specific humidity
 			esg = 611.2 * std::exp( 17.67 * ( Tg / ( ( Tg + KelvinConv ) - 29.65 ) ) ); //Pa saturation vapor pressure
 			// From Garratt - eqn. A21, p284.
 			// Note that Tg and Tg+KelvinConv usage is correct.
 			qsg = 0.622 * esg / ( Pa - esg ); //Saturation mixing ratio at ground surface temperature.
 
 			//Latent heat vaporization  at the ground temperature
-			Leg = 1.91846e6 * pow2( ( Tgk / ( Tgk - 33.91 ) ) );
+			Leg = 1.91846e6 * std::pow( ( Tgk / ( Tgk - 33.91 ) ), 2 );
 			//Check to see if ice is sublimating or frost is forming.
 			if ( Tgold < 0.0 ) Leg = 2.838e6; // per FASST documentation p.15 after eqn. 37.
 
 			Desg = 611.2 * std::exp( 17.67 * ( Tg / ( Tg + KelvinConv - 29.65 ) ) ) * ( 17.67 * Tg * ( -1.0 ) * std::pow( ( Tg + KelvinConv - 29.65 ), ( -2 ) ) + 17.67 / ( KelvinConv - 29.65 + Tg ) );
-			dqg = ( 0.622 * Pa / pow2( ( Pa - esg ) ) ) * Desg;
+			dqg = ( 0.622 * Pa / std::pow( ( Pa - esg ), 2 ) ) * Desg;
 
 			//Final Ground Atmosphere Energy Balance
 			//Density of air at the soil surface temperature
@@ -498,7 +498,7 @@ namespace EcoRoofManager {
 
 			//Average density of air with respect to ground surface and air temperature
 			Rhoag = ( Rhoa + Rhog ) / 2.;
-			Rib = 2.0 * g1 * Za * ( Taf - Tg ) / ( ( Tafk + Tgk ) * pow2( Waf ) ); //Richardson Number
+			Rib = 2.0 * g1 * Za * ( Taf - Tg ) / ( ( Tafk + Tgk ) * std::pow( Waf, 2 ) ); //Richardson Number
 
 			// Compute the stability factor Gammah
 			if ( Rib < 0.0 ) {
@@ -524,12 +524,12 @@ namespace EcoRoofManager {
 				Zog = 0.005;
 			}
 
-			Chng = pow2( ( Kv / std::log( Za / Zog ) ) ) / rch; // bulk transfer coefficient near ground
+			Chng = std::pow( ( Kv / std::log( Za / Zog ) ), 2 ) / rch; // bulk transfer coefficient near ground
 			Chg = Gammah * ( ( 1.0 - sigmaf ) * Chng + sigmaf * Cfhn );
 			sheatg = e0 + Rhoag * Cpa * Chg * Waf; // added the e0 windless correction
 			sensibleg = sheatg * ( Taf - Tg ); // sensible flux TO soil (W/m^2) DJS Jan 2011 (eqn. 32 in Frankenstein 2004)
 
-			Chne = pow2( ( Kv / std::log( Za / Zog ) ) ) / rche;
+			Chne = std::pow( ( Kv / std::log( Za / Zog ) ), 2 ) / rche;
 			Ce = Gammah * ( ( 1.0 - sigmaf ) * Chne + sigmaf * Cfhn ); // this is in fact Ceg in eq (28)
 
 			//we can approximate Gammae by Gammah (Supported by FASST Veg Models p. 15)
@@ -563,20 +563,20 @@ namespace EcoRoofManager {
 			SoilTK = Tg + KelvinConv;
 
 			for ( EcoLoop = 1; EcoLoop <= 3; ++EcoLoop ) {
-				P1 = sigmaf * ( RS * ( 1.0 - Alphaf ) + epsilonf * Latm ) - 3.0 * sigmaf * epsilonf * epsilong * Sigma * pow4( ( SoilTK ) ) / EpsilonOne - 3.0 * ( -sigmaf * epsilonf * Sigma - sigmaf * epsilonf * epsilong * Sigma / EpsilonOne ) * pow4( ( LeafTK ) ) + sheatf * ( 1.0 - 0.7 * sigmaf ) * ( Ta + KelvinConv ) + LAI * Rhoaf * Cf * Lef * Waf * rn * ( ( 1.0 - 0.7 * sigmaf ) / dOne ) * qa + LAI * Rhoaf * Cf * Lef * Waf * rn * ( ( ( 0.6 * sigmaf * rn ) / dOne ) - 1.0 ) * ( qsf - ( LeafTK ) * dqf ) + LAI * Rhoaf * Cf * Lef * Waf * rn * ( ( 0.1 * sigmaf * Mg ) / dOne ) * ( qsg - ( SoilTK ) * dqg );
+				P1 = sigmaf * ( RS * ( 1.0 - Alphaf ) + epsilonf * Latm ) - 3.0 * sigmaf * epsilonf * epsilong * Sigma * std::pow( ( SoilTK ), 4 ) / EpsilonOne - 3.0 * ( -sigmaf * epsilonf * Sigma - sigmaf * epsilonf * epsilong * Sigma / EpsilonOne ) * std::pow( ( LeafTK ), 4 ) + sheatf * ( 1.0 - 0.7 * sigmaf ) * ( Ta + KelvinConv ) + LAI * Rhoaf * Cf * Lef * Waf * rn * ( ( 1.0 - 0.7 * sigmaf ) / dOne ) * qa + LAI * Rhoaf * Cf * Lef * Waf * rn * ( ( ( 0.6 * sigmaf * rn ) / dOne ) - 1.0 ) * ( qsf - ( LeafTK ) * dqf ) + LAI * Rhoaf * Cf * Lef * Waf * rn * ( ( 0.1 * sigmaf * Mg ) / dOne ) * ( qsg - ( SoilTK ) * dqg );
 				P2 = 4.0 * ( sigmaf * epsilonf * epsilong * Sigma ) * std::pow( ( SoilTK ), ( 3 ) ) / EpsilonOne + 0.1 * sigmaf * sheatf + LAI * Rhoaf * Cf * Lef * Waf * rn * ( 0.1 * sigmaf * Mg ) / dOne * dqg;
-				P3 = 4.0 * ( -sigmaf * epsilonf * Sigma - ( sigmaf * epsilonf * Sigma * epsilong ) / EpsilonOne ) * pow3( ( LeafTK ) ) + ( 0.6 * sigmaf - 1.0 ) * sheatf + LAI * Rhoaf * Cf * Lef * Waf * rn * ( ( ( 0.6 * sigmaf * rn ) / dOne ) - 1.0 ) * dqf;
+				P3 = 4.0 * ( -sigmaf * epsilonf * Sigma - ( sigmaf * epsilonf * Sigma * epsilong ) / EpsilonOne ) * std::pow( ( LeafTK ), 3 ) + ( 0.6 * sigmaf - 1.0 ) * sheatf + LAI * Rhoaf * Cf * Lef * Waf * rn * ( ( ( 0.6 * sigmaf * rn ) / dOne ) - 1.0 ) * dqf;
 
 				//T1G, T2G, & T3G corresponds to first, second & third terms of equation 38
 				//in the main report.
 				//  as with the equations for vegetation the first term in the ground eqn in FASST has a
 				//  term starting with gamma_p --- if no precip this vanishes. Again, revisit this issue later.
 
-				T1G = ( 1.0 - sigmaf ) * ( RS * ( 1.0 - Alphag ) + epsilong * Latm ) - ( 3.0 * ( sigmaf * epsilonf * epsilong * Sigma ) / EpsilonOne ) * pow4( ( LeafTK ) ) - 3.0 * ( -( 1.0 - sigmaf ) * epsilong * Sigma - sigmaf * epsilonf * epsilong * Sigma / EpsilonOne ) * pow4( ( SoilTK ) ) + sheatg * ( 1.0 - 0.7 * sigmaf ) * ( Ta + KelvinConv ) + Rhoag * Ce * Leg * Waf * Mg * ( ( 1.0 - 0.7 * sigmaf ) / dOne ) * qa + Rhoag * Ce * Leg * Waf * Mg * ( 0.1 * sigmaf * Mg / dOne - Mg ) * ( qsg - ( SoilTK ) * dqg ) + Rhoag * Ce * Leg * Waf * Mg * ( 0.6 * sigmaf * rn / dOne ) * ( qsf - ( LeafTK ) * dqf ) + Qsoilpart1 + Qsoilpart2 * ( KelvinConv ); //finished by T1G
+				T1G = ( 1.0 - sigmaf ) * ( RS * ( 1.0 - Alphag ) + epsilong * Latm ) - ( 3.0 * ( sigmaf * epsilonf * epsilong * Sigma ) / EpsilonOne ) * std::pow( ( LeafTK ), 4 ) - 3.0 * ( -( 1.0 - sigmaf ) * epsilong * Sigma - sigmaf * epsilonf * epsilong * Sigma / EpsilonOne ) * std::pow( ( SoilTK ), 4 ) + sheatg * ( 1.0 - 0.7 * sigmaf ) * ( Ta + KelvinConv ) + Rhoag * Ce * Leg * Waf * Mg * ( ( 1.0 - 0.7 * sigmaf ) / dOne ) * qa + Rhoag * Ce * Leg * Waf * Mg * ( 0.1 * sigmaf * Mg / dOne - Mg ) * ( qsg - ( SoilTK ) * dqg ) + Rhoag * Ce * Leg * Waf * Mg * ( 0.6 * sigmaf * rn / dOne ) * ( qsf - ( LeafTK ) * dqf ) + Qsoilpart1 + Qsoilpart2 * ( KelvinConv ); //finished by T1G
 
-				T2G = 4.0 * ( -( 1.0 - sigmaf ) * epsilong * Sigma - sigmaf * epsilonf * epsilong * Sigma / EpsilonOne ) * pow3( ( SoilTK ) ) + ( 0.1 * sigmaf - 1.0 ) * sheatg + Rhoag * Ce * Leg * Waf * Mg * ( 0.1 * sigmaf * Mg / dOne - Mg ) * dqg - Qsoilpart2;
+				T2G = 4.0 * ( -( 1.0 - sigmaf ) * epsilong * Sigma - sigmaf * epsilonf * epsilong * Sigma / EpsilonOne ) * std::pow( ( SoilTK ), 3 ) + ( 0.1 * sigmaf - 1.0 ) * sheatg + Rhoag * Ce * Leg * Waf * Mg * ( 0.1 * sigmaf * Mg / dOne - Mg ) * dqg - Qsoilpart2;
 
-				T3G = ( 4.0 * ( sigmaf * epsilong * epsilonf * Sigma ) / EpsilonOne ) * pow3( ( LeafTK ) ) + 0.6 * sigmaf * sheatg + Rhoag * Ce * Leg * Waf * Mg * ( 0.6 * sigmaf * rn / dOne ) * dqf;
+				T3G = ( 4.0 * ( sigmaf * epsilong * epsilonf * Sigma ) / EpsilonOne ) * std::pow( ( LeafTK ), 3 ) + 0.6 * sigmaf * sheatg + Rhoag * Ce * Leg * Waf * Mg * ( 0.6 * sigmaf * rn / dOne ) * dqf;
 
 				LeafTK = 0.5 * ( LeafTK + ( P1 * T2G - P2 * T1G ) / ( -P3 * T2G + T3G * P2 ) ); // take avg of old and new each iteration
 				SoilTK = 0.5 * ( SoilTK + ( P1 * T3G - P3 * T1G ) / ( -P2 * T3G + P3 * T2G ) ); // take avg of old and new each iteration
@@ -879,12 +879,12 @@ namespace EcoRoofManager {
 				ShowRecurringWarningErrorAtEnd( "EcoRoof: UpdateSoilProps: Relative Soil Saturation Top Moisture < 0. continues", ErrIndex, RelativeSoilSaturationTop, RelativeSoilSaturationTop );
 				RelativeSoilSaturationTop = 0.0001;
 			}
-			SoilHydroConductivityTop = SoilConductivitySaturation * ( std::pow( RelativeSoilSaturationTop, lambda ) ) * pow2( ( 1.0 - std::pow( ( 1.0 - std::pow( ( RelativeSoilSaturationTop ), ( n / ( n - 1.0 ) ) ) ), ( ( n - 1.0 ) / n ) ) ) );
+			SoilHydroConductivityTop = SoilConductivitySaturation * ( std::pow( RelativeSoilSaturationTop, lambda ) ) * std::pow( ( 1.0 - std::pow( ( 1.0 - std::pow( ( RelativeSoilSaturationTop ), ( n / ( n - 1.0 ) ) ) ), ( ( n - 1.0 ) / n ) ) ), 2 );
 			CapillaryPotentialTop = ( -1.0 / alpha ) * ( std::pow( ( ( std::pow( ( 1.0 / RelativeSoilSaturationTop ), ( n / ( n - 1.0 ) ) ) ) - 1.0 ), ( 1.0 / n ) ) );
 
 			//Then the soil parameters for the root soil layer
 			RelativeSoilSaturationRoot = ( MeanRootMoisture - MoistureResidual ) / ( MoistureMax - MoistureResidual );
-			SoilHydroConductivityRoot = SoilConductivitySaturation * ( std::pow( RelativeSoilSaturationRoot, lambda ) ) * pow2( ( 1.0 - std::pow( ( 1.0 - std::pow( ( RelativeSoilSaturationRoot ), ( n / ( n - 1.0 ) ) ) ), ( ( n - 1.0 ) / n ) ) ) );
+			SoilHydroConductivityRoot = SoilConductivitySaturation * ( std::pow( RelativeSoilSaturationRoot, lambda ) ) * std::pow( ( 1.0 - std::pow( ( 1.0 - std::pow( ( RelativeSoilSaturationRoot ), ( n / ( n - 1.0 ) ) ) ), ( ( n - 1.0 ) / n ) ) ), 2 );
 			CapillaryPotentialRoot = ( -1.0 / alpha ) * ( std::pow( ( ( std::pow( ( 1.0 / RelativeSoilSaturationRoot ), ( n / ( n - 1.0 ) ) ) ) - 1.0 ), ( 1.0 / n ) ) );
 
 			//Next, using the soil parameters, solve for the soil moisture

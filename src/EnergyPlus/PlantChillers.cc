@@ -4313,12 +4313,12 @@ namespace PlantChillers {
 
 		// model should have bounds on DeltaTemp and check them (also needs engineering ref content)
 		//  from BLAST...RCAV=RCAVC(1)+RCAVC(2)*Z+RCAVC(3)*Z**2
-		AvailNomCapRat = CapacityRat( 1 ) + CapacityRat( 2 ) * DeltaTemp + CapacityRat( 3 ) * pow2( DeltaTemp );
+		AvailNomCapRat = CapacityRat( 1 ) + CapacityRat( 2 ) * DeltaTemp + CapacityRat( 3 ) * std::pow( DeltaTemp, 2. );
 
 		AvailChillerCap = ChillerNomCap * AvailNomCapRat;
 
 		// from BLAST...G=ADJEC(1)+ADJEC(2)*RCAV+ADJEC(3)*RCAV**2.
-		FullLoadPowerRat = PowerRat( 1 ) + PowerRat( 2 ) * AvailNomCapRat + PowerRat( 3 ) * pow2( AvailNomCapRat );
+		FullLoadPowerRat = PowerRat( 1 ) + PowerRat( 2 ) * AvailNomCapRat + PowerRat( 3 ) * std::pow( AvailNomCapRat, 2. );
 
 		//  from BLAST...RCLOAD=AMAX1(MINCHFR(I,IPLCTR),AMIN1(CHLRLOAD(I)/CHLROCAP(I) &
 		//         /RCAV,MAXCHFR(I,IPLCTR)))
@@ -4331,7 +4331,7 @@ namespace PlantChillers {
 		}
 
 		// from BLAST...RPOWER=RPWRC(1)+RPWRC(2)*RCLOAD+RPWRC(3)*RCLOAD**2
-		FracFullLoadPower = FullLoadFactor( 1 ) + FullLoadFactor( 2 ) * PartLoadRat + FullLoadFactor( 3 ) * pow2( PartLoadRat );
+		FracFullLoadPower = FullLoadFactor( 1 ) + FullLoadFactor( 2 ) * PartLoadRat + FullLoadFactor( 3 ) * std::pow( PartLoadRat, 2 );
 
 		//If the PLR is less than Min PLR calculate the actual PLR for calculations. The power will then adjust for
 		//the cycling.
@@ -4558,7 +4558,7 @@ namespace PlantChillers {
 			// If Heat Recovery specified for this vapor compression chiller, then Qcondenser will be adjusted by this subroutine
 			if ( ElectricChiller( ChillNum ).HeatRecActive ) CalcElectricChillerHeatRecovery( ChillNum, QCondenser, CondMassFlowRate, CondInletTemp, QHeatRecovered );
 			if ( CondMassFlowRate > 0.0 ) {
-				CpCond = PsyCpAirFnWTdb( Node( CondInletNode ).HumRat, CondInletTemp );
+				CpCond = PsyCpAirFnWTdb( Node( CondInletNode ).HumRat, CondInletTemp ); // *&^unique^&* "CalcElectricChillerModel"
 				CondOutletTemp = CondInletTemp + QCondenser / CondMassFlowRate / CpCond;
 			} else {
 				CondOutletTemp = CondInletTemp;
@@ -4880,12 +4880,12 @@ namespace PlantChillers {
 		DeltaTemp = ( TempCondIn - TempCondInDesign ) / TempRiseRat - ( TempEvapOut - TempEvapOutDesign );
 
 		//  from BLAST...RCAV=RCAVC(1)+RCAVC(2)*Z+RCAVC(3)*Z**2
-		AvailNomCapRat = CapacityRat( 1 ) + CapacityRat( 2 ) * DeltaTemp + CapacityRat( 3 ) * pow2( DeltaTemp );
+		AvailNomCapRat = CapacityRat( 1 ) + CapacityRat( 2 ) * DeltaTemp + CapacityRat( 3 ) * std::pow( DeltaTemp, 2 );
 
 		AvailChillerCap = ChillerNomCap * AvailNomCapRat;
 
 		// from BLAST...G=ADJEC(1)+ADJEC(2)*RCAV+ADJEC(3)*RCAV**2.
-		FullLoadPowerRat = PowerRat( 1 ) + PowerRat( 2 ) * AvailNomCapRat + PowerRat( 3 ) * pow2( AvailNomCapRat );
+		FullLoadPowerRat = PowerRat( 1 ) + PowerRat( 2 ) * AvailNomCapRat + PowerRat( 3 ) * std::pow( AvailNomCapRat, 2 );
 
 		//  from BLAST...RCLOAD=AMAX1(MINCHFR(I,IPLCTR),AMIN1(CHLRLOAD(I)/CHLROCAP(I) &
 		//         /RCAV,MAXCHFR(I,IPLCTR)))
@@ -4893,7 +4893,7 @@ namespace PlantChillers {
 			PartLoadRat = max( MinPartLoadRat, min( std::abs( MyLoad ) / AvailChillerCap, MaxPartLoadRat ) );
 		}
 		// from BLAST...RPOWER=RPWRC(1)+RPWRC(2)*RCLOAD+RPWRC(3)*RCLOAD**2
-		FracFullLoadPower = FullLoadFactor( 1 ) + FullLoadFactor( 2 ) * PartLoadRat + FullLoadFactor( 3 ) * pow2( PartLoadRat );
+		FracFullLoadPower = FullLoadFactor( 1 ) + FullLoadFactor( 2 ) * PartLoadRat + FullLoadFactor( 3 ) * std::pow( PartLoadRat, 2 );
 
 		if ( AvailChillerCap > 0.0 ) {
 			if ( std::abs( MyLoad ) / AvailChillerCap < MinPartLoadRat ) {
@@ -5477,12 +5477,12 @@ namespace PlantChillers {
 		DeltaTemp = ( TempCondIn - TempCondInDesign ) / TempRiseRat - ( TempEvapOut - TempEvapOutDesign );
 
 		//  from BLAST...RCAV=RCAVC(1)+RCAVC(2)*Z+RCAVC(3)*Z**2
-		AvailNomCapRat = CapacityRat( 1 ) + CapacityRat( 2 ) * DeltaTemp + CapacityRat( 3 ) * pow2( DeltaTemp );
+		AvailNomCapRat = CapacityRat( 1 ) + CapacityRat( 2 ) * DeltaTemp + CapacityRat( 3 ) * std::pow( DeltaTemp, 2 );
 
 		AvailChillerCap = ChillerNomCap * AvailNomCapRat;
 
 		// from BLAST...G=ADJEC(1)+ADJEC(2)*RCAV+ADJEC(3)*RCAV**2.
-		FullLoadPowerRat = PowerRat( 1 ) + PowerRat( 2 ) * AvailNomCapRat + PowerRat( 3 ) * pow2( AvailNomCapRat );
+		FullLoadPowerRat = PowerRat( 1 ) + PowerRat( 2 ) * AvailNomCapRat + PowerRat( 3 ) * std::pow( AvailNomCapRat, 2 );
 
 		//  from BLAST...RCLOAD=AMAX1(MINCHFR(I,IPLCTR),AMIN1(CHLRLOAD(I)/CHLROCAP(I) &
 		//         /RCAV,MAXCHFR(I,IPLCTR)))
@@ -5491,7 +5491,7 @@ namespace PlantChillers {
 		}
 
 		// from BLAST...RPOWER=RPWRC(1)+RPWRC(2)*RCLOAD+RPWRC(3)*RCLOAD**2
-		FracFullLoadPower = FullLoadFactor( 1 ) + FullLoadFactor( 2 ) * PartLoadRat + FullLoadFactor( 3 ) * pow2( PartLoadRat );
+		FracFullLoadPower = FullLoadFactor( 1 ) + FullLoadFactor( 2 ) * PartLoadRat + FullLoadFactor( 3 ) * std::pow( PartLoadRat, 2 );
 
 		if ( AvailChillerCap > 0.0 ) {
 			if ( std::abs( MyLoad ) / AvailChillerCap < MinPartLoadRat ) {
@@ -5729,7 +5729,7 @@ namespace PlantChillers {
 
 			// RL = MAX(PLoad/GTEngineCapacity, MinPartLoadRat * ChillerNomCap)
 			RL = max( PLoad / ChillerNomCap, MinPartLoadRat );
-			RL2 = pow2( RL );
+			RL2 = std::pow( RL, 2 );
 
 			//     ATAIR = DELTA TEMPERATURE. ACTUAL - 25 DEG.C (77 DEG.F)
 			//                                RATING POINT
@@ -5749,19 +5749,19 @@ namespace PlantChillers {
 			//                              (FUL2GC(1,IPLCTR)+FUL2GC(2,IPLCTR)*ATAIR+  &
 			//                              FUL2GC(3,IPLCTR)*TAR2)
 
-			FuelEnergyIn = PLoad * ( GTChiller( ChillerNum ).PLBasedFuelInputCoef( 1 ) + GTChiller( ChillerNum ).PLBasedFuelInputCoef( 2 ) * RL + GTChiller( ChillerNum ).PLBasedFuelInputCoef( 3 ) * RL2 ) * ( GTChiller( ChillerNum ).TempBasedFuelInputCoef( 1 ) + GTChiller( ChillerNum ).TempBasedFuelInputCoef( 2 ) * AmbientDeltaT + GTChiller( ChillerNum ).TempBasedFuelInputCoef( 3 ) * pow2( AmbientDeltaT ) );
+			FuelEnergyIn = PLoad * ( GTChiller( ChillerNum ).PLBasedFuelInputCoef( 1 ) + GTChiller( ChillerNum ).PLBasedFuelInputCoef( 2 ) * RL + GTChiller( ChillerNum ).PLBasedFuelInputCoef( 3 ) * RL2 ) * ( GTChiller( ChillerNum ).TempBasedFuelInputCoef( 1 ) + GTChiller( ChillerNum ).TempBasedFuelInputCoef( 2 ) * AmbientDeltaT + GTChiller( ChillerNum ).TempBasedFuelInputCoef( 3 ) * std::pow( AmbientDeltaT, 2 ) );
 
 			//                        FEX=GTDSLCAP(IS,TypeIndex,IPLCTR)*(FEXGC(1,IPLCTR)+      &
 			//                            FEXGC(2,IPLCTR)*ATAIR+FEXGC(3,IPLCTR)*TAR2)
 
-			ExhaustFlow = GTEngineCapacity * ( GTChiller( ChillerNum ).ExhaustFlowCoef( 1 ) + GTChiller( ChillerNum ).ExhaustFlowCoef( 2 ) * AmbientDeltaT + GTChiller( ChillerNum ).ExhaustFlowCoef( 3 ) * pow2( AmbientDeltaT ) );
+			ExhaustFlow = GTEngineCapacity * ( GTChiller( ChillerNum ).ExhaustFlowCoef( 1 ) + GTChiller( ChillerNum ).ExhaustFlowCoef( 2 ) * AmbientDeltaT + GTChiller( ChillerNum ).ExhaustFlowCoef( 3 ) * std::pow( AmbientDeltaT, 2 ) );
 
 			//                        TEX=(TEX1GC(1,IPLCTR)+TEX1GC(2,IPLCTR)*RLOAD+    &
 			//                            TEX1GC(3,IPLCTR)*RLD2)*(TEX2GC(1,IPLCTR)+    &
 			//                            TEX2GC(2,IPLCTR)*ATAIR+TEX2GC(3,IPLCTR)*     &
 			//                            TAR2)-273.
 
-			ExhaustTemp = ( GTChiller( ChillerNum ).PLBasedExhaustTempCoef( 1 ) + GTChiller( ChillerNum ).PLBasedExhaustTempCoef( 2 ) * RL + GTChiller( ChillerNum ).PLBasedExhaustTempCoef( 3 ) * RL2 ) * ( GTChiller( ChillerNum ).TempBasedExhaustTempCoef( 1 ) + GTChiller( ChillerNum ).TempBasedExhaustTempCoef( 2 ) * AmbientDeltaT + GTChiller( ChillerNum ).TempBasedExhaustTempCoef( 3 ) * pow2( AmbientDeltaT ) ) - 273;
+			ExhaustTemp = ( GTChiller( ChillerNum ).PLBasedExhaustTempCoef( 1 ) + GTChiller( ChillerNum ).PLBasedExhaustTempCoef( 2 ) * RL + GTChiller( ChillerNum ).PLBasedExhaustTempCoef( 3 ) * RL2 ) * ( GTChiller( ChillerNum ).TempBasedExhaustTempCoef( 1 ) + GTChiller( ChillerNum ).TempBasedExhaustTempCoef( 2 ) * AmbientDeltaT + GTChiller( ChillerNum ).TempBasedExhaustTempCoef( 3 ) * std::pow( AmbientDeltaT, 2 ) ) - 273;
 
 			//                        UAG=UACGC(1,IPLCTR)*GTDSLCAP(IS,TypeIndex,IPLCTR)**      &
 			//                            UACGC(2,IPLCTR)
@@ -6344,7 +6344,7 @@ namespace PlantChillers {
 		if ( ElectricChiller( ChillNum ).Base.CondenserType == WaterCooled ) {
 			CpCond = GetSpecificHeatGlycol( PlantLoop( ElectricChiller( ChillNum ).Base.CDLoopNum ).FluidName, CondInletTemp, PlantLoop( ElectricChiller( ChillNum ).Base.CDLoopNum ).FluidIndex, RoutineName );
 		} else {
-			CpCond = PsyCpAirFnWTdb( Node( CondInletNode ).HumRat, CondInletTemp );
+			CpCond = PsyCpAirFnWTdb( Node( CondInletNode ).HumRat, CondInletTemp ); // *&^unique^&* "ElecChillerHeatRecovery"
 		}
 
 		// Before we modify the QCondenser, the total or original value is transferred to QTot

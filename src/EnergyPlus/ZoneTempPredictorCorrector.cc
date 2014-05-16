@@ -3372,7 +3372,7 @@ namespace ZoneTempPredictorCorrector {
 
 			// The density of air and latent heat of vaporization are calculated as functions.
 			RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName );
-			H2OHtOfVap = PsyHgAirFnWTdb( ZoneAirHumRat( ZoneNum ), ZT( ZoneNum ) );
+			H2OHtOfVap = PsyHgAirFnWTdb( ZoneAirHumRat( ZoneNum ), ZT( ZoneNum ) ); // *&^unique^&* "CalcPredictedHumidityRatio"
 
 			// Assume that the system will have flow
 			if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
@@ -3603,7 +3603,7 @@ namespace ZoneTempPredictorCorrector {
 
 			}
 
-			AIRRAT( ZoneNum ) = Zone( ZoneNum ).Volume * ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) ) / ( TimeStepSys * SecInHour );
+			AIRRAT( ZoneNum ) = Zone( ZoneNum ).Volume * ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) ) / ( TimeStepSys * SecInHour ); // *&^unique^&* "CorrectZoneAirTemp"
 
 			AirCap = AIRRAT( ZoneNum );
 
@@ -4210,7 +4210,7 @@ namespace ZoneTempPredictorCorrector {
 		}
 
 		RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName );
-		H2OHtOfVap = PsyHgAirFnWTdb( ZoneAirHumRat( ZoneNum ), ZT( ZoneNum ) );
+		H2OHtOfVap = PsyHgAirFnWTdb( ZoneAirHumRat( ZoneNum ), ZT( ZoneNum ) ); // *&^unique^&* "CorrectZoneHumRat"
 
 		// Check for the flow and NO flow condition
 		if ( ZoneMassFlowRate > 0.0 ) {
@@ -4990,7 +4990,7 @@ namespace ZoneTempPredictorCorrector {
 
 			// throw warning if seriously out of balance (this may need to be removed if too noisy... )
 			// formulate dynamic threshold value based on 20% of quadrature sum of components
-			Threshold = 0.2 * std::sqrt( pow2( SumIntGains ) + pow2( SumHADTsurfs ) + pow2( SumMCpDTzones ) + pow2( SumMCpDtInfil ) + pow2( SumMCpDTsystem ) + pow2( SumNonAirSystem ) + pow2( CzdTdt ) );
+			Threshold = 0.2 * std::sqrt( std::pow( SumIntGains, 2 ) + std::pow( SumHADTsurfs, 2 ) + std::pow( SumMCpDTzones, 2 ) + std::pow( SumMCpDtInfil, 2 ) + std::pow( SumMCpDTsystem, 2 ) + std::pow( SumNonAirSystem, 2 ) + std::pow( CzdTdt, 2 ) );
 			if ( ( std::abs( imBalance ) > Threshold ) && ( ! WarmupFlag ) && ( ! DoingSizing ) ) { // air balance is out by more than threshold
 				if ( Zone( ZoneNum ).AirHBimBalanceErrIndex == 0 ) {
 					ShowWarningMessage( "Zone Air Heat Balance is out of balance for zone named " + Zone( ZoneNum ).Name );

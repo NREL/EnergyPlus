@@ -4492,7 +4492,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 			if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CondFD ) {
 				// Set variables used in the FD moisture balance
 				TempOutsideAirFD( SurfNum ) = GroundTemp;
-				RhoVaporAirOut( SurfNum ) = PsyRhovFnTdbRhLBnd0C( GroundTemp, 1.0 );
+				RhoVaporAirOut( SurfNum ) = PsyRhovFnTdbRhLBnd0C( GroundTemp, 1.0 ); // *&^unique^&* "HBSurfMan:Ground:CondFD"
 				HConvExtFD( SurfNum ) = HighHConvLimit;
 				HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, GroundTemp, PsyWFnTdbRhPb( GroundTemp, 1.0, OutBaroPress, RoutineNameGroundTemp ), BlankString ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, GroundTemp ) );
 				HSkyFD( SurfNum ) = HSky;
@@ -4524,7 +4524,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 			if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CondFD ) {
 				// Set variables used in the FD moisture balance
 				TempOutsideAirFD( SurfNum ) = GroundTempFC;
-				RhoVaporAirOut( SurfNum ) = PsyRhovFnTdbRhLBnd0C( GroundTempFC, 1.0 );
+				RhoVaporAirOut( SurfNum ) = PsyRhovFnTdbRhLBnd0C( GroundTempFC, 1.0 ); // *&^unique^&* "HBSurfMan:Ground:CondFD"
 				HConvExtFD( SurfNum ) = HighHConvLimit;
 				HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, GroundTempFC, PsyWFnTdbRhPb( GroundTempFC, 1.0, OutBaroPress, RoutineNameGroundTempFC ), BlankString ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, GroundTempFC ) );
 				HSkyFD( SurfNum ) = HSky;
@@ -4713,7 +4713,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 					if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CondFD ) {
 						// Set variables used in the FD moisture balance
 						TempOutsideAirFD( SurfNum ) = TempExt;
-						RhoVaporAirOut( SurfNum ) = PsyRhovFnTdbRhLBnd0C( TempOutsideAirFD( SurfNum ), 1.0 );
+						RhoVaporAirOut( SurfNum ) = PsyRhovFnTdbRhLBnd0C( TempOutsideAirFD( SurfNum ), 1.0 ); // *&^unique^&* "HBSurfMan:Rain:CondFD"
 						HConvExtFD( SurfNum ) = HcExtSurf( SurfNum );
 						HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, TempOutsideAirFD( SurfNum ), PsyWFnTdbRhPb( TempOutsideAirFD( SurfNum ), 1.0, OutBaroPress, RoutineNameExtEnvWetSurf ), BlankString ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, TempOutsideAirFD( SurfNum ) ) );
 						HSkyFD( SurfNum ) = HSkyExtSurf( SurfNum );
@@ -5304,12 +5304,12 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 						TempSurfIn( SurfNum ) = TempSurfInTmp( SurfNum );
 
 						// Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
-						WinHeatGain( SurfNum ) = WinTransSolar( SurfNum ) + HConvIn( SurfNum ) * Surface( SurfNum ).Area * ( TempSurfIn( SurfNum ) - RefAirTemp( SurfNum ) ) + Construct( Surface( SurfNum ).Construction ).InsideAbsorpThermal * Surface( SurfNum ).Area * ( Sigma * pow4( TempSurfIn( SurfNum ) ) - ( SurfaceWindow( SurfNum ).IRfromParentZone + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) ) ) - QS( Surface( SurfNum ).Zone ) * Surface( SurfNum ).Area * Construct( Surface( SurfNum ).Construction ).TransDiff; // Transmitted solar | Convection | IR exchange | IR
+						WinHeatGain( SurfNum ) = WinTransSolar( SurfNum ) + HConvIn( SurfNum ) * Surface( SurfNum ).Area * ( TempSurfIn( SurfNum ) - RefAirTemp( SurfNum ) ) + Construct( Surface( SurfNum ).Construction ).InsideAbsorpThermal * Surface( SurfNum ).Area * ( Sigma * std::pow( TempSurfIn( SurfNum ), 4 ) - ( SurfaceWindow( SurfNum ).IRfromParentZone + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) ) ) - QS( Surface( SurfNum ).Zone ) * Surface( SurfNum ).Area * Construct( Surface( SurfNum ).Construction ).TransDiff; // Transmitted solar | Convection | IR exchange | IR
 						// Zone diffuse interior shortwave reflected back into the TDD
 
 						//fill out report vars for components of Window Heat Gain
 						WinGainConvGlazToZoneRep( SurfNum ) = HConvIn( SurfNum ) * Surface( SurfNum ).Area * ( TempSurfIn( SurfNum ) - RefAirTemp( SurfNum ) );
-						WinGainIRGlazToZoneRep( SurfNum ) = Construct( Surface( SurfNum ).Construction ).InsideAbsorpThermal * Surface( SurfNum ).Area * ( Sigma * pow4( TempSurfIn( SurfNum ) ) - ( SurfaceWindow( SurfNum ).IRfromParentZone + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) ) );
+						WinGainIRGlazToZoneRep( SurfNum ) = Construct( Surface( SurfNum ).Construction ).InsideAbsorpThermal * Surface( SurfNum ).Area * ( Sigma * std::pow( TempSurfIn( SurfNum ), 4 ) - ( SurfaceWindow( SurfNum ).IRfromParentZone + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) ) );
 						WinLossSWZoneToOutWinRep( SurfNum ) = QS( Surface( SurfNum ).Zone ) * Surface( SurfNum ).Area * Construct( Surface( SurfNum ).Construction ).TransDiff;
 						if ( WinHeatGain( SurfNum ) >= 0.0 ) {
 							WinHeatGainRep( SurfNum ) = WinHeatGain( SurfNum );

@@ -990,7 +990,7 @@ namespace EvaporativeCoolers {
 			//******************************************************************************
 			//   SAT EFF IS FOR DIFFERENT THICKNESS CELDEK PAD (CURVE FIT FROM DATA)
 			//******************************************************************************
-			SatEff = 0.792714 + 0.958569 * PadDepth - 0.25193 * AirVel - 1.03215 * pow2( PadDepth ) + 2.62659e-2 * pow2( AirVel ) + 0.914869 * PadDepth * AirVel - 1.48241 * AirVel * pow2( PadDepth ) - 1.89919e-2 * pow3( AirVel ) * PadDepth + 1.13137 * pow3( PadDepth ) * AirVel + 3.27622e-2 * pow3( AirVel ) * pow2( PadDepth ) - 0.145384 * pow3( PadDepth ) * pow2( AirVel );
+			SatEff = 0.792714 + 0.958569 * PadDepth - 0.25193 * AirVel - 1.03215 * std::pow( PadDepth, 2 ) + 2.62659e-2 * std::pow( AirVel, 2 ) + 0.914869 * PadDepth * AirVel - 1.48241 * AirVel * std::pow( PadDepth, 2 ) - 1.89919e-2 * std::pow( AirVel, 3 ) * PadDepth + 1.13137 * std::pow( PadDepth, 3 ) * AirVel + 3.27622e-2 * std::pow( AirVel, 3 ) * std::pow( PadDepth, 2 ) - 0.145384 * std::pow( PadDepth, 3 ) * std::pow( AirVel, 2 );
 
 			if ( SatEff >= 1.0 ) SatEff = 1.0;
 			if ( SatEff < 0.0 ) { // we have a serious problem.  Pad Area and/or depth not suitable for system air flow rates
@@ -1122,7 +1122,7 @@ namespace EvaporativeCoolers {
 			//******************************************************************************
 			//   SAT EFF IS FOR DIFFERENT THICKNESS CELDEK PAD (CURVE FIT FROM DATA)
 			//******************************************************************************
-			SatEff = 0.792714 + 0.958569 * PadDepth - 0.25193 * AirVel - 1.03215 * pow2( PadDepth ) + 2.62659e-2 * pow2( AirVel ) + 0.914869 * PadDepth * AirVel - 1.48241 * AirVel * pow2( PadDepth ) - 1.89919e-2 * pow3( AirVel ) * PadDepth + 1.13137 * pow3( PadDepth ) * AirVel + 3.27622e-2 * pow3( AirVel ) * pow2( PadDepth ) - 0.145384 * pow3( PadDepth ) * pow2( AirVel );
+			SatEff = 0.792714 + 0.958569 * PadDepth - 0.25193 * AirVel - 1.03215 * std::pow( PadDepth, 2 ) + 2.62659e-2 * std::pow( AirVel, 2 ) + 0.914869 * PadDepth * AirVel - 1.48241 * AirVel * std::pow( PadDepth, 2 ) - 1.89919e-2 * std::pow( AirVel, 3 ) * PadDepth + 1.13137 * std::pow( PadDepth, 3 ) * AirVel + 3.27622e-2 * std::pow( AirVel, 3 ) * std::pow( PadDepth, 2 ) - 0.145384 * std::pow( PadDepth, 3 ) * std::pow( AirVel, 2 );
 
 			if ( SatEff >= 1.0 ) SatEff = 1.0;
 			EvapCond( EvapCoolNum ).SatEff = SatEff;
@@ -3156,7 +3156,7 @@ namespace EvaporativeCoolers {
 		AirMassFlow = Node( UnitOutletNodeNum ).MassFlowRate;
 		QTotUnitOut = AirMassFlow * ( Node( UnitOutletNodeNum ).Enthalpy - Node( ZoneNodeNum ).Enthalpy );
 		MinHumRat = min( Node( ZoneNodeNum ).HumRat, Node( UnitOutletNodeNum ).HumRat );
-		QSensUnitOut = AirMassFlow * ( PsyHFnTdbW( Node( UnitOutletNodeNum ).Temp, MinHumRat ) - PsyHFnTdbW( Node( ZoneNodeNum ).Temp, MinHumRat ) );
+		QSensUnitOut = AirMassFlow * ( PsyHFnTdbW( Node( UnitOutletNodeNum ).Temp, MinHumRat ) - PsyHFnTdbW( Node( ZoneNodeNum ).Temp, MinHumRat ) ); // *&^unique^&* "ReportZoneEvaporativeCoolerUnit"
 
 		ZoneEvapUnit( UnitNum ).UnitTotalCoolingRate = std::abs( min( 0.0, QTotUnitOut ) );
 		ZoneEvapUnit( UnitNum ).UnitTotalCoolingEnergy = ZoneEvapUnit( UnitNum ).UnitTotalCoolingRate * TimeStepSys * SecInHour;

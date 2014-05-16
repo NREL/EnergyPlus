@@ -472,8 +472,8 @@ namespace WindowEquivalentLayer {
 		for ( I = 1; I <= 10; ++I ) {
 			TGO = TOUT + U * DT / HXO; // update glazing surface temps
 			TGI = TIN - U * DT / HXI;
-			HRO = StefanBoltzmann * EO * ( pow2( ( TGO + KelvinConv ) ) + pow2( ( TOUT + KelvinConv ) ) ) * ( ( TGO + KelvinConv ) + ( TOUT + KelvinConv ) );
-			HRI = StefanBoltzmann * EI * ( pow2( ( TGI + KelvinConv ) ) + pow2( ( TIN + KelvinConv ) ) ) * ( ( TGI + KelvinConv ) + ( TIN + KelvinConv ) );
+			HRO = StefanBoltzmann * EO * ( std::pow( ( TGO + KelvinConv ), 2 ) + std::pow( ( TOUT + KelvinConv ), 2 ) ) * ( ( TGO + KelvinConv ) + ( TOUT + KelvinConv ) );
+			HRI = StefanBoltzmann * EI * ( std::pow( ( TGI + KelvinConv ), 2 ) + std::pow( ( TIN + KelvinConv ), 2 ) ) * ( ( TGI + KelvinConv ) + ( TIN + KelvinConv ) );
 			//HCI = HIC_ASHRAE( Height, TGI, TI)  ! BAN June 2103 Raplaced with ISO Std 15099
 			TGIK = TGI + KelvinConv;
 			TIK = TIN + KelvinConv;
@@ -843,7 +843,7 @@ namespace WindowEquivalentLayer {
 				for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneEquipConfigNum ).NumInletNodes; ++NodeNum ) {
 					NodeTemp = Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).Temp;
 					MassFlowRate = Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).MassFlowRate;
-					CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), NodeTemp );
+					CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), NodeTemp ); // *&^unique^&* "EQLWindowSurfaceHeatBalance"
 					SumSysMCp += MassFlowRate * CpAir;
 					SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
 				}
@@ -881,7 +881,7 @@ namespace WindowEquivalentLayer {
 					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneEquipConfigNum ).NumInletNodes; ++NodeNum ) {
 						NodeTemp = Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).Temp;
 						MassFlowRate = Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).MassFlowRate;
-						CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNumAdj ), NodeTemp );
+						CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNumAdj ), NodeTemp ); // *&^unique^&* "EQLWindowSurfaceHeatBalance"
 						SumSysMCp += MassFlowRate * CpAir;
 						SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
 					}
@@ -911,9 +911,9 @@ namespace WindowEquivalentLayer {
 					Tout = Surface( SurfNum ).OutDryBulbTemp + KelvinConv;
 				}
 				tsky = SkyTempKelvin;
-				Ebout = StefanBoltzmann * pow4( Tout );
+				Ebout = StefanBoltzmann * std::pow( Tout, 4 );
 				// ASHWAT model may be slightly different
-				outir = Surface( SurfNum ).ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * StefanBoltzmann * pow4( tsky ) + ( 1. - AirSkyRadSplit( SurfNum ) ) * Ebout ) + Surface( SurfNum ).ViewFactorGroundIR * Ebout;
+				outir = Surface( SurfNum ).ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * StefanBoltzmann * std::pow( tsky, 4 ) + ( 1. - AirSkyRadSplit( SurfNum ) ) * Ebout ) + Surface( SurfNum ).ViewFactorGroundIR * Ebout;
 			}
 		}
 		// Outdoor conditions
@@ -952,7 +952,7 @@ namespace WindowEquivalentLayer {
 			ConvHeatFlowNatural = Surface( SurfNum ).Area * QOCFRoom;
 		}
 		SurfaceWindow( SurfNum ).EffInsSurfTemp = SurfInsideTemp;
-		NetIRHeatGainWindow = Surface( SurfNum ).Area * LWAbsIn * ( StefanBoltzmann * pow4( ( SurfInsideTemp + KelvinConv ) ) - rmir );
+		NetIRHeatGainWindow = Surface( SurfNum ).Area * LWAbsIn * ( StefanBoltzmann * std::pow( ( SurfInsideTemp + KelvinConv ), 4 ) - rmir );
 		ConvHeatGainWindow = Surface( SurfNum ).Area * HcIn * ( SurfInsideTemp - TaIn );
 		// Window heat gain (or loss) is calculated here
 		WinHeatGain( SurfNum ) = WinTransSolar( SurfNum ) + ConvHeatGainWindow + NetIRHeatGainWindow + ConvHeatFlowNatural;
@@ -1611,7 +1611,7 @@ namespace WindowEquivalentLayer {
 		// Flow
 
 		if ( S > 0.0 ) {
-			IS_OPENNESS = pow2( ( max( S - D, 0.0 ) / S ) );
+			IS_OPENNESS = std::pow( ( max( S - D, 0.0 ) / S ), 2 );
 		} else {
 			IS_OPENNESS = 0.0;
 		}
@@ -4076,8 +4076,8 @@ namespace WindowEquivalentLayer {
 		Real64 DEN;
 		// flow
 
-		CD = std::sqrt( pow2( ( W * std::cos( PHI ) ) ) + pow2( ( S + W * std::sin( PHI ) ) ) );
-		AF = std::sqrt( pow2( ( W * std::cos( PHI ) ) ) + pow2( ( S - W * std::sin( PHI ) ) ) );
+		CD = std::sqrt( std::pow( ( W * std::cos( PHI ) ), 2 ) + std::pow( ( S + W * std::sin( PHI ) ), 2 ) );
+		AF = std::sqrt( std::pow( ( W * std::cos( PHI ) ), 2 ) + std::pow( ( S - W * std::sin( PHI ) ), 2 ) );
 
 		F13 = ( W + S - CD ) / ( 2. * S ); // SHAPE FACTOR FRONT OPENING TO TOP SLAT
 		F14 = ( W + S - AF ) / ( 2. * S ); // SHAPE FACTOR FRONT OPENING TO BOTTOM SLAT
@@ -4250,7 +4250,7 @@ namespace WindowEquivalentLayer {
 				XB = -XA; //Indoor-side end coordinate
 				YB = YA;
 				YC = SL_RAD * std::cos( PHI + OMEGA ); //Tangent to slat in irradiance direction
-				XC = std::sqrt( pow2( SL_RAD ) - pow2( YC ) );
+				XC = std::sqrt( std::pow( SL_RAD, 2 ) - std::pow( YC, 2 ) );
 				Slope = - XC / YC;
 				if ( std::abs( Slope ) < SMALL_ERROR ) {
 					XD = 0.0;
@@ -4274,8 +4274,8 @@ namespace WindowEquivalentLayer {
 					YF = - XF / Slope;
 				}
 
-				T_CORR_D = std::sqrt( pow2( ( XC - XD ) ) + pow2( ( YC - YD ) ) ); //Slat thickness perpendicular to light direction
-				T_CORR_F = std::sqrt( pow2( ( XC - XF ) ) + pow2( ( YC - YF ) ) );
+				T_CORR_D = std::sqrt( std::pow( ( XC - XD ), 2 ) + std::pow( ( YC - YD ), 2 ) ); //Slat thickness perpendicular to light direction
+				T_CORR_F = std::sqrt( std::pow( ( XC - XF ), 2 ) + std::pow( ( YC - YF ), 2 ) );
 
 				TAU_BB = 1.0 - T_CORR_D / ( S * std::cos( OMEGA ) );
 
@@ -4323,7 +4323,7 @@ namespace WindowEquivalentLayer {
 					XB = -XA; //Indoor-side end coordinate
 					YB = YA;
 					YC = SL_RAD * std::cos( PHI + OMEGA ); //Tangent to slat in irradiance direction
-					XC = std::sqrt( pow2( SL_RAD ) - pow2( YC ) );
+					XC = std::sqrt( std::pow( SL_RAD, 2 ) - std::pow( YC, 2 ) );
 					Slope = - XC / YC;
 					if ( std::abs( Slope ) < SMALL_ERROR ) {
 						XD = 0.0;
@@ -4346,8 +4346,8 @@ namespace WindowEquivalentLayer {
 						YE = - XE / Slope;
 						YF = - XF / Slope;
 					}
-					T_CORR_D = std::sqrt( pow2( ( XC - XD ) ) + pow2( ( YC - YD ) ) ); // Slat thickness perpendicular to light direction
-					T_CORR_F = std::sqrt( pow2( ( XC - XF ) ) + pow2( ( YC - YF ) ) );
+					T_CORR_D = std::sqrt( std::pow( ( XC - XD ), 2 ) + std::pow( ( YC - YD ), 2 ) ); // Slat thickness perpendicular to light direction
+					T_CORR_F = std::sqrt( std::pow( ( XC - XF ), 2 ) + std::pow( ( YC - YF ), 2 ) );
 
 					if ( ( PHI + OMEGA ) >= 0.0 ) { // Slat is lit from above
 						DE = XC - XA;
@@ -4481,8 +4481,8 @@ namespace WindowEquivalentLayer {
 		Real64 C4;
 		// flow
 
-		AF = std::sqrt( pow2( ( W * std::cos( PHI ) ) ) + pow2( ( S - W * std::sin( PHI ) ) ) );
-		CD = std::sqrt( pow2( ( W * std::cos( PHI ) ) ) + pow2( ( S + W * std::sin( PHI ) ) ) );
+		AF = std::sqrt( std::pow( ( W * std::cos( PHI ) ), 2 ) + std::pow( ( S - W * std::sin( PHI ) ), 2 ) );
+		CD = std::sqrt( std::pow( ( W * std::cos( PHI ) ), 2 ) + std::pow( ( S + W * std::sin( PHI ) ), 2 ) );
 		//  CHECK TO SEE WHICH SIDE OF SLAT IS SUNLIT
 		if ( ( PHI + OMEGA ) >= 0.0 ) { // SUN SHINES ON TOP OF SLAT
 
@@ -4645,14 +4645,14 @@ namespace WindowEquivalentLayer {
 
 		} else { //VENETIAN BLIND IS OPENED
 			AB = DE;
-			AF = std::sqrt( pow2( ( W * std::cos( PHI ) ) ) + pow2( ( S - W * std::sin( PHI ) ) ) );
+			AF = std::sqrt( std::pow( ( W * std::cos( PHI ) ), 2 ) + std::pow( ( S - W * std::sin( PHI ) ), 2 ) );
 			BC = W - AB;
 			EF = BC;
-			BD = std::sqrt( pow2( ( DE * std::cos( PHI ) ) ) + pow2( ( S + DE * std::sin( PHI ) ) ) );
-			BF = std::sqrt( pow2( ( EF * std::cos( PHI ) ) ) + pow2( ( S - EF * std::sin( PHI ) ) ) );
-			CD = std::sqrt( pow2( ( W * std::cos( PHI ) ) ) + pow2( ( S + W * std::sin( PHI ) ) ) );
-			CE = std::sqrt( pow2( ( EF * std::cos( PHI ) ) ) + pow2( ( S + EF * std::sin( PHI ) ) ) );
-			AE = std::sqrt( pow2( ( DE * std::cos( PHI ) ) ) + pow2( ( S - DE * std::sin( PHI ) ) ) );
+			BD = std::sqrt( std::pow( ( DE * std::cos( PHI ) ), 2 ) + std::pow( ( S + DE * std::sin( PHI ) ), 2 ) );
+			BF = std::sqrt( std::pow( ( EF * std::cos( PHI ) ), 2 ) + std::pow( ( S - EF * std::sin( PHI ) ), 2 ) );
+			CD = std::sqrt( std::pow( ( W * std::cos( PHI ) ), 2 ) + std::pow( ( S + W * std::sin( PHI ) ), 2 ) );
+			CE = std::sqrt( std::pow( ( EF * std::cos( PHI ) ), 2 ) + std::pow( ( S + EF * std::sin( PHI ) ), 2 ) );
+			AE = std::sqrt( std::pow( ( DE * std::cos( PHI ) ), 2 ) + std::pow( ( S - DE * std::sin( PHI ) ), 2 ) );
 
 			F13 = ( S + AB - BD ) / ( 2. * S );
 			F14 = ( S + DE - AE ) / ( 2. * S );
@@ -5027,8 +5027,8 @@ namespace WindowEquivalentLayer {
 
 		ITRY = 0;
 
-		EB( 0 ) = StefanBoltzmann * pow4( TOUT );
-		EB( NL + 1 ) = StefanBoltzmann * pow4( TIN );
+		EB( 0 ) = StefanBoltzmann * std::pow( TOUT, 4 );
+		EB( NL + 1 ) = StefanBoltzmann * std::pow( TIN, 4 );
 
 		ADIM = 3 * NL + 2; // DIMENSION OF A-MATRIX
 
@@ -5068,7 +5068,7 @@ namespace WindowEquivalentLayer {
 		//   FIRST ESTIMATE OF GLAZING TEMPERATURES AND BLACK EMISSIVE POWERS
 		for ( I = 1; I <= NL; ++I ) {
 			T( I ) = TOUT + double( I ) / double( NL + 1 ) * ( TIN - TOUT );
-			EB( I ) = StefanBoltzmann * pow4( T( I ) );
+			EB( I ) = StefanBoltzmann * std::pow( T( I ), 4 );
 		}
 
 		CONVRG = 0;
@@ -5163,13 +5163,13 @@ namespace WindowEquivalentLayer {
 			//  CONVERT TEMPERATURE POTENTIAL CONVECTIVE COEFFICIENTS to
 			//  BLACK EMISSIVE POWER POTENTIAL CONVECTIVE COEFFICIENTS
 
-			HHAT( 0 ) = HC( 0 ) * ( 1.0 / StefanBoltzmann ) / ( ( ( pow2( TOUT ) + pow2( T( 1 ) ) ) ) * ( ( TOUT + T( 1 ) ) ) );
+			HHAT( 0 ) = HC( 0 ) * ( 1.0 / StefanBoltzmann ) / ( ( ( std::pow( TOUT, 2 ) + std::pow( T( 1 ), 2 ) ) ) * ( ( TOUT + T( 1 ) ) ) );
 
 			for ( I = 1; I <= NL - 1; ++I ) { // Scan the cavities
-				HHAT( I ) = HC( I ) * ( 1.0 / StefanBoltzmann ) / ( ( ( pow2( T( I ) ) + pow2( T( I + 1 ) ) ) ) * ( ( T( I ) + T( I + 1 ) ) ) );
+				HHAT( I ) = HC( I ) * ( 1.0 / StefanBoltzmann ) / ( ( ( std::pow( T( I ), 2 ) + std::pow( T( I + 1 ), 2 ) ) ) * ( ( T( I ) + T( I + 1 ) ) ) );
 			}
 
-			HHAT( NL ) = HC( NL ) * ( 1.0 / StefanBoltzmann ) / ( ( ( pow2( T( NL ) ) + pow2( TIN ) ) ) * ( ( T( NL ) + TIN ) ) );
+			HHAT( NL ) = HC( NL ) * ( 1.0 / StefanBoltzmann ) / ( ( ( std::pow( T( NL ), 2 ) + std::pow( TIN, 2 ) ) ) * ( ( T( NL ) + TIN ) ) );
 
 			//  SET UP MATRIX
 			XSOL = 0.0;
@@ -5178,7 +5178,7 @@ namespace WindowEquivalentLayer {
 			L = 1;
 			A( L, 1 ) = 1.0;
 			A( L, 2 ) = - 1.0 * RHOB( 0 ); //  -1.0 * RHOB_OUT
-			A( L, ADIM + 1 ) = EPSB_OUT * StefanBoltzmann * pow4( TRMOUT );
+			A( L, ADIM + 1 ) = EPSB_OUT * StefanBoltzmann * std::pow( TRMOUT, 4 );
 
 			for ( I = 1; I <= NL; ++I ) {
 				L = 3 * I - 1;
@@ -5233,7 +5233,7 @@ namespace WindowEquivalentLayer {
 			L = 3 * NL + 2;
 			A( L, 3 * NL + 1 ) = - 1.0 * RHOF( NL + 1 ); //   - 1.0 * RHOF_ROOM
 			A( L, 3 * NL + 2 ) = 1.0;
-			A( L, ADIM + 1 ) = EPSF_ROOM * StefanBoltzmann * pow4( TRMIN );
+			A( L, ADIM + 1 ) = EPSF_ROOM * StefanBoltzmann * std::pow( TRMIN, 4 );
 
 			//  SOLVE MATRIX
 
@@ -5271,7 +5271,7 @@ namespace WindowEquivalentLayer {
 			//  UPDATE GLAZING TEMPERATURES AND BLACK EMISSIVE POWERS
 			for ( I = 1; I <= NL; ++I ) {
 				T( I ) += ALPHA * ( TNEW( I ) - T( I ) );
-				EB( I ) = StefanBoltzmann * pow4( T( I ) );
+				EB( I ) = StefanBoltzmann * std::pow( T( I ), 4 );
 			}
 
 			//  CHECK FOR CONVERGENCE
@@ -5897,10 +5897,10 @@ namespace WindowEquivalentLayer {
 		//         then q_xy will also be zero
 		//  Note:  This code has no problem with temperatures being equal
 
-		hr_gm = Epsg * Epsm * FSg_m * StefanBoltzmann * ( Tg + Tm ) * ( pow2( Tg ) + pow2( Tm ) );
-		hr_gd = Epsg * Epsdf * FSg_df * StefanBoltzmann * ( Td + Tg ) * ( pow2( Td ) + pow2( Tg ) ) + Epsg * Epsdb * FSg_db * StefanBoltzmann * ( Td + Tg ) * ( pow2( Td ) + pow2( Tg ) );
+		hr_gm = Epsg * Epsm * FSg_m * StefanBoltzmann * ( Tg + Tm ) * ( std::pow( Tg, 2 ) + std::pow( Tm, 2 ) );
+		hr_gd = Epsg * Epsdf * FSg_df * StefanBoltzmann * ( Td + Tg ) * ( std::pow( Td, 2 ) + std::pow( Tg, 2 ) ) + Epsg * Epsdb * FSg_db * StefanBoltzmann * ( Td + Tg ) * ( std::pow( Td, 2 ) + std::pow( Tg, 2 ) );
 
-		hr_md = Epsm * Epsdf * FSm_df * StefanBoltzmann * ( Td + Tm ) * ( pow2( Td ) + pow2( Tm ) ) + Epsm * Epsdb * FSm_db * StefanBoltzmann * ( Td + Tm ) * ( pow2( Td ) + pow2( Tm ) );
+		hr_md = Epsm * Epsdf * FSm_df * StefanBoltzmann * ( Td + Tm ) * ( std::pow( Td, 2 ) + std::pow( Tm, 2 ) ) + Epsm * Epsdb * FSm_db * StefanBoltzmann * ( Td + Tm ) * ( std::pow( Td, 2 ) + std::pow( Tm, 2 ) );
 	}
 
 	void
@@ -6182,7 +6182,7 @@ namespace WindowEquivalentLayer {
 		HRadPar = 0.0;
 		if ( ( E1 > 0.001 ) && ( E2 > 0.001 ) ) {
 			DV = ( 1.0 / E1 ) + ( 1.0 / E2 ) - 1.0;
-			HRadPar = ( StefanBoltzmann / DV ) * ( T1 + T2 ) * ( pow2( T1 ) + pow2( T2 ) );
+			HRadPar = ( StefanBoltzmann / DV ) * ( T1 + T2 ) * ( std::pow( T1, 2 ) + std::pow( T2, 2 ) );
 		}
 		return HRadPar;
 	}
@@ -6305,11 +6305,11 @@ namespace WindowEquivalentLayer {
 			beta = 1.0 / Tavg; // thermal expansion coef(/K)
 			dvisc = ( 18.05 + ( ( Tavg - 290. ) / 10. ) * ( 18.53 - 18.05 ) ) * 1.0e-6;
 			//  dynamic viscosity (kg/m.sec) or (N.sec/m2)
-			Cp = ( ( -0.00000027034 * Tavg + 0.000707908 ) * Tavg - 0.31597 ) * Tavg + 1044.66;
+			Cp = 1044.66 - 0.31597 * Tavg + 0.000707908 * std::pow( Tavg, 2 ) - 0.00000027034 * std::pow( Tavg, 3 );
 			//  specific heat at constant pressure (J/kg.K)
 			k = 0.02538 + ( ( Tavg - 290. ) / 10. ) * ( 0.02614 - 0.02538 ); // conductivity (W/m.K)
 
-			Rabsg = ( 9.81 * beta * ( pow3( b ) ) * std::abs( Ts - Tg ) * ( pow2( rho ) ) * Cp ) / ( dvisc * k );
+			Rabsg = ( 9.81 * beta * ( std::pow( b, 3 ) ) * std::abs( Ts - Tg ) * ( std::pow( rho, 2 ) ) * Cp ) / ( dvisc * k );
 			Nubsg = 1.0 + 0.2 * ( 1.0 - std::exp( -0.005 * Rabsg ) );
 
 			hsg = Nubsg * k / b;
@@ -6382,11 +6382,11 @@ namespace WindowEquivalentLayer {
 			beta = 1.0 / Tavg; // thermal expansion coef(/K)
 			dvisc = ( 18.05 + ( ( Tavg - 290. ) / 10. ) * ( 18.53 - 18.05 ) ) * 1.0e-6;
 			//  dynamic viscosity (kg/m.sec) or (N.sec/m2)
-			Cp = ( ( -0.00000027034 * Tavg + 0.000707908 ) * Tavg - 0.31597 ) * Tavg + 1044.66;
+			Cp = 1044.66 - 0.31597 * Tavg + 0.000707908 * std::pow( Tavg, 2 ) - 0.00000027034 * std::pow( Tavg, 3 );
 			//  specific heat at constant pressure (J/kg.K)
 			k = 0.02538 + ( ( Tavg - 290. ) / 10. ) * ( 0.02614 - 0.02538 ); // conductivity (W/m.K)
 
-			Rabsa = ( 9.81 * beta * ( pow3( b ) ) * std::abs( Ts - Tamb ) * ( pow2( rho ) ) * Cp ) / ( dvisc * k );
+			Rabsa = ( 9.81 * beta * ( std::pow( b, 3 ) ) * std::abs( Ts - Tamb ) * ( std::pow( rho, 2 ) ) * Cp ) / ( dvisc * k );
 			if ( Rabsa <= 1.0 ) {
 				Rabsa = 1.0;
 			}
@@ -6411,11 +6411,11 @@ namespace WindowEquivalentLayer {
 			beta = 1.0 / Tavg; // thermal expansion coef(/K)
 			dvisc = ( 18.05 + ( ( Tavg - 290.0 ) / 10.0 ) * ( 18.53 - 18.05 ) ) * 1.0e-6;
 			//  dynamic viscosity (kg/m.sec) or (N.sec/m2)
-			Cp = ( ( -0.00000027034 * Tavg + 0.000707908 ) * Tavg - 0.31597 ) * Tavg + 1044.66;
+			Cp = 1044.66 - 0.31597 * Tavg + 0.000707908 * std::pow( Tavg, 2 ) - 0.00000027034 * std::pow( Tavg, 3 );
 			//  specific heat at constant pressure (J/kg.K)
 			k = 0.02538 + ( ( Tavg - 290.0 ) / 10.0 ) * ( 0.02614 - 0.02538 ); // conductivity (W/m.K)
 
-			Rabsa = ( 9.81 * beta * ( pow3( b ) ) * std::abs( Ts - Tamb ) * ( pow2( rho ) ) * Cp ) / ( dvisc * k );
+			Rabsa = ( 9.81 * beta * ( std::pow( b, 3 ) ) * std::abs( Ts - Tamb ) * ( std::pow( rho, 2 ) ) * Cp ) / ( dvisc * k );
 			if ( Rabsa <= 1.0 ) {
 				Rabsa = 1.0;
 			}
@@ -6510,11 +6510,11 @@ namespace WindowEquivalentLayer {
 			beta = 1.0 / Tavg; // thermal expansion coef(/K)
 			dvisc = ( 18.05 + ( ( Tavg - 290. ) / 10. ) * ( 18.53 - 18.05 ) ) * 1.0e-6;
 			//  dynamic viscosity (kg/m.sec) or (N.sec/m2)
-			Cp = ( ( -0.00000027034 * Tavg + 0.000707908 ) * Tavg - 0.31597 ) * Tavg + 1044.66;
+			Cp = 1044.66 - 0.31597 * Tavg + 0.000707908 * std::pow( Tavg, 2 ) - 0.00000027034 * std::pow( Tavg, 3 );
 			//  specific heat at constant pressure (J/kg.K)
 			k = 0.02538 + ( ( Tavg - 290. ) / 10. ) * ( 0.02614 - 0.02538 ); // conductivity (W/m.K)
 
-			Rabga = ( 9.81 * beta * ( pow3( b ) ) * std::abs( Tg - Tamb ) * ( pow2( rho ) ) * Cp ) / ( dvisc * k );
+			Rabga = ( 9.81 * beta * ( std::pow( b, 3 ) ) * std::abs( Tg - Tamb ) * ( std::pow( rho, 2 ) ) * Cp ) / ( dvisc * k );
 			if ( Rabga <= 1.0 ) {
 				Rabga = 1.0;
 			}
@@ -6535,11 +6535,11 @@ namespace WindowEquivalentLayer {
 			beta = 1.0 / Tavg; // thermal expansion coef(/K)
 			dvisc = ( 18.05 + ( ( Tavg - 290.0 ) / 10.0 ) * ( 18.53 - 18.05 ) ) * 1.0e-6;
 			//  dynamic viscosity (kg/m.sec) or (N.sec/m2)
-			Cp = ( ( -0.00000027034 * Tavg + 0.000707908 ) * Tavg - 0.31597 ) * Tavg + 1044.66;
+			Cp = 1044.66 - 0.31597 * Tavg + 0.000707908 * std::pow( Tavg, 2 ) - 0.00000027034 * std::pow( Tavg, 3 );
 			//  specific heat at constant pressure (J/kg.K)
 			k = 0.02538 + ( ( Tavg - 290.0 ) / 10.0 ) * ( 0.02614 - 0.02538 ); // conductivity (W/m.K)
 
-			Rabga = ( 9.81 * beta * ( pow3( b ) ) * std::abs( Tg - Tamb ) * ( pow2( rho ) ) * Cp ) / ( dvisc * k );
+			Rabga = ( 9.81 * beta * ( std::pow( b, 3 ) ) * std::abs( Tg - Tamb ) * ( std::pow( rho, 2 ) ) * Cp ) / ( dvisc * k );
 			if ( Rabga <= 1.0 ) {
 				Rabga = 1.0;
 			}
@@ -7270,13 +7270,13 @@ namespace WindowEquivalentLayer {
 			N2 = 1.526;
 			KL = 55. * 0.006;
 			TAU_A = std::exp( -1.0 * KL );
-			RPERP = pow2( ( ( N2 - 1.0 ) / ( N2 + 1.0 ) ) );
+			RPERP = std::pow( ( ( N2 - 1.0 ) / ( N2 + 1.0 ) ), 2 );
 			TAU0 = TAU_A * ( 1.0 - RPERP ) * ( 1.0 - RPERP ) / ( 1.0 - ( RPERP * RPERP * TAU_A * TAU_A ) );
 			RHO0 = RPERP * ( 1.0 + ( TAU_A * TAU0 ) );
 			THETA2 = std::asin( ( std::sin( THETA1 ) ) / N2 );
 			TAU_A = std::exp( -1.0 * KL / std::cos( THETA2 ) );
-			RPERP = pow2( ( ( std::sin( THETA2 - THETA1 ) ) / ( std::sin( THETA2 + THETA1 ) ) ) );
-			RPARL = pow2( ( ( std::tan( THETA2 - THETA1 ) ) / ( std::tan( THETA2 + THETA1 ) ) ) );
+			RPERP = std::pow( ( ( std::sin( THETA2 - THETA1 ) ) / ( std::sin( THETA2 + THETA1 ) ) ), 2 );
+			RPARL = std::pow( ( ( std::tan( THETA2 - THETA1 ) ) / ( std::tan( THETA2 + THETA1 ) ) ), 2 );
 			TAUPERP = TAU_A * ( 1.0 - RPERP ) * ( 1.0 - RPERP ) / ( 1.0 - ( RPERP * RPERP * TAU_A * TAU_A ) );
 			TAUPARL = TAU_A * ( 1.0 - RPARL ) * ( 1.0 - RPARL ) / ( 1.0 - ( RPARL * RPARL * TAU_A * TAU_A ) );
 			RHOPERP = RPERP * ( 1.0 + ( TAU_A * TAUPERP ) );
@@ -9476,7 +9476,7 @@ namespace WindowEquivalentLayer {
 		mu = 3.723E-6 + 4.94E-8 * TmeanFilmKelvin; // Table B.2 in ISO 15099
 		Cp = 1002.737 + 1.2324E-2 * TmeanFilmKelvin; // Table B.3 in ISO 15099
 
-		RaH = ( pow2( rho ) * pow3( Height ) * GravityConstant * Cp * ( std::abs( TSurfIn - TAirIn ) ) ) / ( TmeanFilmKelvin * mu * lambda ); // eq 132 in ISO 15099
+		RaH = ( std::pow( rho, 2 ) * std::pow( Height, 3 ) * GravityConstant * Cp * ( std::abs( TSurfIn - TAirIn ) ) ) / ( TmeanFilmKelvin * mu * lambda ); // eq 132 in ISO 15099
 
 		// eq. 135 in ISO 15099 (only need this one because tilt is 90 deg)
 		Nuint = 0.56 * std::pow( ( RaH * sineTilt ), 0.25 );

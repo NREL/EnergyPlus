@@ -941,7 +941,7 @@ namespace BoilerSteam {
 		TheorFuelUse = BoilerLoad / BoilerEff;
 
 		// Calculate fuel used
-		FuelUsed = TheorFuelUse / ( LoadCoef( 1 ) + LoadCoef( 2 ) * OperPLR + LoadCoef( 3 ) * pow2( OperPLR ) );
+		FuelUsed = TheorFuelUse / ( LoadCoef( 1 ) + LoadCoef( 2 ) * OperPLR + LoadCoef( 3 ) * std::pow( OperPLR, 2 ) );
 
 	}
 

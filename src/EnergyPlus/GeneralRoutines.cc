@@ -985,7 +985,7 @@ CalcPassiveExteriorBaffleGap(
 	LocalOutHumRat = PsyWFnTdbTwbPb( LocalOutDryBulbTemp, LocalWetBulbTemp, OutBaroPress, RoutineName );
 
 	RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, LocalOutDryBulbTemp, LocalOutHumRat, RoutineName );
-	CpAir = PsyCpAirFnWTdb( LocalOutHumRat, LocalOutDryBulbTemp );
+	CpAir = PsyCpAirFnWTdb( LocalOutHumRat, LocalOutDryBulbTemp ); // *&^unique^&* "CalcPassiveExteriorBaffleGap"
 	if ( ! IsRain ) {
 		Tamb = LocalOutDryBulbTemp;
 	} else { // when raining we use wetbulb not drybulb
@@ -1023,7 +1023,7 @@ CalcPassiveExteriorBaffleGap(
 		if ( TsBaffK == TsoK ) { // avoid divide by zero
 			HPlenARR( ThisSurf ) = 0.0; // no net heat transfer if same temperature
 		} else {
-			HPlenARR( ThisSurf ) = Sigma * AbsExt * AbsThermSurf * ( pow4( TsBaffK ) - pow4( TsoK ) ) / ( TsBaffK - TsoK );
+			HPlenARR( ThisSurf ) = Sigma * AbsExt * AbsThermSurf * ( std::pow( TsBaffK, 4 ) - std::pow( TsoK, 4 ) ) / ( TsBaffK - TsoK );
 		}
 		// Added for ICS collector OSCM
 		if ( Surface( SurfPtr ).IsICS ) {
@@ -1078,7 +1078,7 @@ CalcPassiveExteriorBaffleGap(
 
 	TmeanK = 0.5 * ( TmpTsBaf + Tso ) + KelvinConv;
 
-	Gr = g * pow3( GapThick ) * std::abs( Tso - TmpTsBaf ) * pow2( RhoAir ) / ( TmeanK * pow2( nu ) );
+	Gr = g * std::pow( GapThick, 3 ) * std::abs( Tso - TmpTsBaf ) * std::pow( RhoAir, 2 ) / ( TmeanK * std::pow( nu, 2 ) );
 
 	PassiveGapNusseltNumber( AspRat, Tilt, TmpTsBaf, Tso, Gr, NuPlen ); //intentionally switch Tso to Tsi
 
@@ -1206,7 +1206,7 @@ PassiveGapNusseltNumber(
 	} else { // window heated from below
 		if ( Tilt >= 60.0 ) {
 			g = 0.5 * std::pow( ( 1.0 + std::pow( ( Ra / 3160. ), 20.6 ) ), ( -0.1 ) ); // eq. 47
-			gnu601a = 1.0 + pow7( ( 0.0936 * ( std::pow( Ra, 0.314 ) ) / ( 1.0 + g ) ) ); // eq. 45
+			gnu601a = 1.0 + std::pow( ( 0.0936 * ( std::pow( Ra, 0.314 ) ) / ( 1.0 + g ) ), 7 ); // eq. 45
 			gnu601 = std::pow( gnu601a, 0.142857 );
 
 			// For any aspect ratio

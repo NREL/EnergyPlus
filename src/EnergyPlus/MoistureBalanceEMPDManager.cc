@@ -423,7 +423,7 @@ namespace MoistureBalanceEMPDManager {
 
 		ZoneNum = Surface( SurfNum ).Zone;
 		if ( Material( MatNum ).EMPDVALUE <= 0.0 ) {
-			MoistEMPDNew( SurfNum ) = PsyRhovFnTdbWPb( TempZone, ZoneAirHumRat( ZoneNum ), OutBaroPress );
+			MoistEMPDNew( SurfNum ) = PsyRhovFnTdbWPb( TempZone, ZoneAirHumRat( ZoneNum ), OutBaroPress ); // *&^unique^&* "CalcMoistureEMPD"
 			return;
 		}
 
@@ -436,9 +436,9 @@ namespace MoistureBalanceEMPDManager {
 			if ( RHaver < 0.0 ) RHaver = 0.00001;
 
 			AT = ( Material( MatNum ).MoistACoeff * Material( MatNum ).MoistBCoeff * std::pow( RHaver, Material( MatNum ).MoistBCoeff ) + Material( MatNum ).MoistCCoeff * Material( MatNum ).MoistDCoeff * std::pow( RHaver, Material( MatNum ).MoistDCoeff ) ) / RVaver;
-			BR = ( 4111.0 / pow2( ( Taver + 237.7 ) ) - ( 1.0 / ( Taver + KelvinConv ) ) ) * AT * RVaver;
+			BR = ( 4111.0 / std::pow( ( Taver + 237.7 ), 2 ) - ( 1.0 / ( Taver + KelvinConv ) ) ) * AT * RVaver;
 			RHOBULK = Material( MatNum ).Density;
-			HM = HConvIn( SurfNum ) / ( PsyRhoAirFnPbTdbW( OutBaroPress, TempZone, ZoneAirHumRat( ZoneNum ), RoutineName ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), TempZone ) );
+			HM = HConvIn( SurfNum ) / ( PsyRhoAirFnPbTdbW( OutBaroPress, TempZone, ZoneAirHumRat( ZoneNum ), RoutineName ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), TempZone ) ); // *&^unique^&* "CalcMoistureEMPD"
 			ZoneNum = Surface( SurfNum ).Zone;
 			RALPHA = ZoneAirHumRat( ZoneNum ) * OutBaroPress / ( 461.52 * ( TempZone + KelvinConv ) * ( ZoneAirHumRat( ZoneNum ) + 0.62198 ) );
 			BB = HM / ( RHOBULK * Material( MatNum ).EMPDVALUE * AT );

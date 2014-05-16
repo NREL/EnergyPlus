@@ -1054,7 +1054,7 @@ namespace HVACUnitarySystem {
 			}
 
 			if ( UnitarySystem( UnitarySysNum ).DehumidControlType_Num != DehumidControl_None ) {
-				H2OHtOfVap = PsyHfgAirFnWTdb( Node( UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone ).HumRat, Node( UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone ).Temp );
+				H2OHtOfVap = PsyHfgAirFnWTdb( Node( UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone ).HumRat, Node( UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone ).Temp ); // *&^unique^&* "RUpdateUnitarySystemControl"
 
 				// positive MoistureLoad means no dehumidification load
 				MoistureLoad = min( 0.0, MoistureLoad * H2OHtOfVap );
@@ -1863,9 +1863,9 @@ namespace HVACUnitarySystem {
 						SupHumRat = FinalSysSizing( CurSysNum ).PrecoolHumRat;
 						OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
 						rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat ); // *&^unique^&* RoutineName
 						MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-						SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+						SupEnth = PsyHFnTdbW( SupTemp, SupHumRat ); // *&^unique^&* RoutineName
 						if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
 							CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrFound );
 							TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
@@ -1917,9 +1917,9 @@ namespace HVACUnitarySystem {
 						SupHumRat = FinalSysSizing( CurSysNum ).PrecoolHumRat;
 						OutTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
 						rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat ); // *&^unique^&* RoutineName
 						MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-						SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+						SupEnth = PsyHFnTdbW( SupTemp, SupHumRat ); // *&^unique^&* RoutineName
 						if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
 							CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
 							TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
@@ -1970,9 +1970,9 @@ namespace HVACUnitarySystem {
 						SupHumRat = FinalSysSizing( CurSysNum ).PrecoolHumRat;
 						OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
 						rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat ); // *&^unique^&* RoutineName
 						MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-						SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+						SupEnth = PsyHFnTdbW( SupTemp, SupHumRat ); // *&^unique^&* RoutineName
 						if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
 							CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrFound );
 							TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
@@ -2019,9 +2019,9 @@ namespace HVACUnitarySystem {
 						SupHumRat = FinalSysSizing( CurSysNum ).PrecoolHumRat;
 						OutTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
 						rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat ); // *&^unique^&* RoutineName
 						MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-						SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+						SupEnth = PsyHFnTdbW( SupTemp, SupHumRat ); // *&^unique^&* RoutineName
 						if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
 							CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
 							TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
@@ -2092,9 +2092,9 @@ namespace HVACUnitarySystem {
 							}
 							OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
 							rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat ); // *&^unique^&* RoutineName
 							MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat ); // *&^unique^&* RoutineName
 							if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
 								CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrFound );
 								TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
@@ -2159,9 +2159,9 @@ namespace HVACUnitarySystem {
 							}
 							OutTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
 							rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat ); // *&^unique^&* RoutineName
 							MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat ); // *&^unique^&* RoutineName
 							if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
 								CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
 								TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
@@ -2225,9 +2225,9 @@ namespace HVACUnitarySystem {
 							}
 							OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
 							rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat ); // *&^unique^&* RoutineName
 							MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat ); // *&^unique^&* RoutineName
 							if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
 								CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrFound );
 								TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
@@ -2285,9 +2285,9 @@ namespace HVACUnitarySystem {
 							}
 							OutTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
 							rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat ); // *&^unique^&* RoutineName
 							MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat ); // *&^unique^&* RoutineName
 							if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
 								CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
 								TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
@@ -2363,9 +2363,9 @@ namespace HVACUnitarySystem {
 								OutTemp = 0.0;
 							}
 							rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat ); // *&^unique^&* RoutineName
 							MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat ); // *&^unique^&* RoutineName
 							if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
 								CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrFound );
 								TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
@@ -2436,9 +2436,9 @@ namespace HVACUnitarySystem {
 								OutTemp = 0.0;
 							}
 							rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat ); // *&^unique^&* RoutineName
 							MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat ); // *&^unique^&* RoutineName
 							if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
 								CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
 								TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
@@ -2505,9 +2505,9 @@ namespace HVACUnitarySystem {
 								OutTemp = 0.0;
 							}
 							rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat ); // *&^unique^&* RoutineName
 							MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat ); // *&^unique^&* RoutineName
 							if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
 								CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrFound );
 								TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
@@ -2570,9 +2570,9 @@ namespace HVACUnitarySystem {
 								OutTemp = 0.0;
 							}
 							rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat ); // *&^unique^&* RoutineName
 							MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat ); // *&^unique^&* RoutineName
 							if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
 								CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
 								TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
@@ -3199,9 +3199,9 @@ namespace HVACUnitarySystem {
 										}
 									}
 									rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-									MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+									MixEnth = PsyHFnTdbW( MixTemp, MixHumRat ); // *&^unique^&* RoutineName
 									MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-									SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+									SupEnth = PsyHFnTdbW( SupTemp, SupHumRat ); // *&^unique^&* RoutineName
 									if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
 										CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
 										TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
@@ -3267,9 +3267,9 @@ namespace HVACUnitarySystem {
 									}
 								}
 								rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-								MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+								MixEnth = PsyHFnTdbW( MixTemp, MixHumRat ); // *&^unique^&* RoutineName
 								MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-								SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+								SupEnth = PsyHFnTdbW( SupTemp, SupHumRat ); // *&^unique^&* RoutineName
 								if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
 									CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
 									TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );

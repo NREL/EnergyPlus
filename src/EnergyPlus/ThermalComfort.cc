@@ -605,7 +605,7 @@ namespace ThermalComfort {
 			P2 = CloInsul * 3.96;
 			P3 = CloInsul * 100.;
 			P1 = CloInsul * AbsAirTemp;
-			P4 = 308.7 - 0.028 * IntHeatProd + P2 * pow4( ( AbsRadTemp / 100. ) );
+			P4 = 308.7 - 0.028 * IntHeatProd + P2 * std::pow( ( AbsRadTemp / 100. ), 4 );
 
 			// First guess for clothed surface tempeature
 			AbsCloSurfTemp = AbsAirTemp + ( 35.5 - AirTemp ) / ( 3.5 * ( CloUnit + 0.1 ) );
@@ -619,7 +619,7 @@ namespace ThermalComfort {
 				XF = ( XF + XN ) / 2.;
 				HcNat = 2.38 * std::pow( std::abs( 100. * XF - AbsAirTemp ), 0.25 ); // Heat transfer coefficient by natural convection
 				Hc = max( HcFor, HcNat ); // Determination of convective heat transfer coefficient
-				XN = ( P4 + P1 * Hc - P2 * pow4( XF ) ) / ( 100. + P3 * Hc );
+				XN = ( P4 + P1 * Hc - P2 * std::pow( XF, 4 ) ) / ( 100. + P3 * Hc );
 				++IterNum;
 				if ( IterNum > MaxIter ) {
 					ShowWarningError( "Max iteration exceeded in CalcThermalFanger" );
@@ -634,7 +634,7 @@ namespace ThermalComfort {
 			//                            (AbsCloSurfTemp**4 - AbsRadTemp**4) ! Heat loss by radiation
 
 			// following line is ln 480 in ASHRAE 55 append. D
-			RadHeatLoss = 3.96 * CloBodyRat * ( pow4( ( AbsCloSurfTemp / 100. ) ) - pow4( ( AbsRadTemp / 100. ) ) );
+			RadHeatLoss = 3.96 * CloBodyRat * ( std::pow( ( AbsCloSurfTemp / 100. ), 4.0 ) - std::pow( ( AbsRadTemp / 100. ), 4.0 ) );
 
 			ConvHeatLoss = CloBodyRat * Hc * ( CloSurfTemp - AirTemp ); // Heat loss by convection
 
@@ -680,7 +680,7 @@ namespace ThermalComfort {
 			ThermalComfortData( PeopleNum ).CloSurfTemp = CloSurfTemp;
 
 			// Calculate the Fanger PPD (Predicted Percentage of Dissatisfied), as a %
-			PPD = 100.0 - 95.0 * std::exp( -0.03353 * pow4( PMV ) - 0.2179 * pow2( PMV ) );
+			PPD = 100.0 - 95.0 * std::exp( -0.03353 * std::pow( PMV, 4 ) - 0.2179 * std::pow( PMV, 2 ) );
 			if ( PPD < 0.0 ) PPD = 0.0;
 			if ( PPD > 100.0 ) PPD = 100.0;
 
@@ -900,7 +900,7 @@ namespace ThermalComfort {
 				while ( ( std::abs( CloSurfTemp - CloSurfTempOld ) > 0.01 ) || FirstMinIter ) {
 					FirstMinIter = false;
 					CloSurfTempOld = CloSurfTemp;
-					Hr = 4. * RadSurfEff * StefanBoltz * pow3( ( ( CloSurfTemp + RadTemp ) / 2. + TAbsConv ) );
+					Hr = 4. * RadSurfEff * StefanBoltz * std::pow( ( ( CloSurfTemp + RadTemp ) / 2. + TAbsConv ), 3 );
 					CloSurfTemp = ( CloCond * SkinTemp + CloBodyRat * ( Hc * AirTemp + Hr * RadTemp ) ) / ( CloCond + CloBodyRat * ( Hc + Hr ) );
 				}
 
@@ -1321,7 +1321,7 @@ namespace ThermalComfort {
 					//  OTHERWISE NORMAL BLOOD FLOW OR VASODILATION OCCURS AND RESULTS IN
 					//  THERMAL NEUTRALITY OR WARM SENSATION.
 					if ( VasodilationFac < 0 ) {
-						ThermalComfortData( PeopleNum ).KsuTSV = ( ( -6.168856 * VasoconstrictFac + 3.74721 ) * VasoconstrictFac - 1.46153 ) * VasoconstrictFac;
+						ThermalComfortData( PeopleNum ).KsuTSV = -1.46153 * VasoconstrictFac + 3.74721 * std::pow( VasoconstrictFac, 2 ) - 6.168856 * std::pow( VasoconstrictFac, 3 );
 					} else {
 						ThermalComfortData( PeopleNum ).KsuTSV = ( 5. - 6.56 * ( RelHum - 0.50 ) ) * SkinWetFac;
 						if ( ThermalComfortData( PeopleNum ).KsuTSV > TSVMax ) ThermalComfortData( PeopleNum ).KsuTSV = TSVMax;
@@ -1896,7 +1896,7 @@ namespace ThermalComfort {
 		// FLOW
 
 		XT = Temp / 100.;
-		CalcSatVapPressFromTemp = ( ( ( 1048.8115 * XT - 550.3543 ) * XT + 358.1855 ) * XT ) * XT + 6.16796;
+		CalcSatVapPressFromTemp = 6.16796 + 358.1855 * std::pow( XT, 2 ) - 550.3543 * std::pow( XT, 3 ) + 1048.8115 * std::pow( XT, 4 );
 
 		return CalcSatVapPressFromTemp;
 
@@ -1986,7 +1986,7 @@ namespace ThermalComfort {
 		// If high temperature radiant heater present and on, then must account for this in MRT calculation
 		if ( QHTRadSysToPerson( ZoneNum ) > 0.0 || QHWBaseboardToPerson( ZoneNum ) > 0.0 || QSteamBaseboardToPerson( ZoneNum ) > 0.0 || QElecBaseboardToPerson( ZoneNum ) > 0.0 ) {
 			RadTemp += KelvinConv; // Convert to Kelvin
-			RadTemp = std::pow( ( ( pow4( RadTemp ) ) + ( ( QHTRadSysToPerson( ZoneNum ) + QHWBaseboardToPerson( ZoneNum ) + QSteamBaseboardToPerson( ZoneNum ) + QElecBaseboardToPerson( ZoneNum ) ) / AreaEff / StefanBoltzmannConst ) ), ( 1.0 / 4.0 ) );
+			RadTemp = std::pow( ( ( std::pow( RadTemp, 4 ) ) + ( ( QHTRadSysToPerson( ZoneNum ) + QHWBaseboardToPerson( ZoneNum ) + QSteamBaseboardToPerson( ZoneNum ) + QElecBaseboardToPerson( ZoneNum ) ) / AreaEff / StefanBoltzmannConst ) ), ( 1.0 / 4.0 ) );
 			RadTemp -= KelvinConv; // Convert back to Celsius
 		}
 

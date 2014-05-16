@@ -353,7 +353,7 @@ namespace Furnaces {
 			MoistureLoad = ZoneSysMoistureDemand( Furnace( FurnaceNum ).ControlZoneNum ).OutputRequiredToDehumidifyingSP;
 		}
 
-		H2OHtOfVap = PsyHfgAirFnWTdb( Node( Furnace( FurnaceNum ).NodeNumOfControlledZone ).HumRat, Node( Furnace( FurnaceNum ).NodeNumOfControlledZone ).Temp );
+		H2OHtOfVap = PsyHfgAirFnWTdb( Node( Furnace( FurnaceNum ).NodeNumOfControlledZone ).HumRat, Node( Furnace( FurnaceNum ).NodeNumOfControlledZone ).Temp ); // *&^unique^&* "SimFurnace"
 
 		MoistureLoad *= H2OHtOfVap;
 

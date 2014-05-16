@@ -12,7 +12,6 @@
 #include <TARCOGCommon.hh>
 #include <TARCOGOutput.hh>
 #include <TARCOGParams.hh>
-#include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -324,7 +323,7 @@ namespace ThermalEN673Calc {
 						frctg( j ) = frct( i + 1, j );
 					}
 					GASSES90( Tm, ipropg, frctg, presure( i + 1 ), nmix( i + 1 ), xwght, xgcon, xgvis, xgcp, con, visc, dens, cp, pr, standard, nperr, ErrorMessage );
-					Gr( i ) = ( GravityConstant * pow3( gap( i ) ) * dT( i ) * pow2( dens ) ) / ( Tm * pow2( visc ) );
+					Gr( i ) = ( GravityConstant * std::pow( gap( i ), 3.0 ) * dT( i ) * std::pow( dens, 2 ) ) / ( Tm * std::pow( visc, 2 ) );
 					Ra( i ) = Gr( i ) * pr;
 					Nu( i ) = A * std::pow( Ra( i ), n );
 					if ( Nu( i ) < 1.0 ) {
@@ -339,7 +338,7 @@ namespace ThermalEN673Calc {
 				}
 			}
 			for ( i = 1; i <= nlayer - 1; ++i ) {
-				hr( i ) = 4.0 * StefanBoltzmann * std::pow( ( 1.0 / emis( 2 * i ) + 1.0 / emis( 2 * i + 1 ) - 1.0 ), ( -1 ) ) * pow3( Tm );
+				hr( i ) = 4.0 * StefanBoltzmann * std::pow( ( 1.0 / emis( 2 * i ) + 1.0 / emis( 2 * i + 1 ) - 1.0 ), ( -1.0 ) ) * std::pow( Tm, 3 );
 				hs( i ) = hg( i ) + hr( i );
 				rs( 2 * i + 1 ) = 1.0 / hs( i ); // Thermal resistance of each gap
 				sumRs += rs( 2 * i + 1 );
@@ -376,7 +375,7 @@ namespace ThermalEN673Calc {
 								frctg( j ) = frct( i + 1, j );
 							} // j, gas mix
 							GASSES90( Tm, ipropg, frctg, presure( i + 1 ), nmix( i + 1 ), xwght, xgcon, xgvis, xgcp, con, visc, dens, cp, pr, standard, nperr, ErrorMessage );
-							Gr( i ) = ( GravityConstant * pow3( gap( i ) ) * dT( i ) * pow2( dens ) ) / ( Tm * pow2( visc ) );
+							Gr( i ) = ( GravityConstant * std::pow( gap( i ), 3.0 ) * dT( i ) * std::pow( dens, 2.0 ) ) / ( Tm * std::pow( visc, 2.0 ) );
 							Ra( i ) = Gr( i ) * pr;
 							Nu( i ) = A * std::pow( Ra( i ), n );
 							if ( Nu( i ) < 1.0 ) {
