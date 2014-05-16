@@ -2676,6 +2676,14 @@ namespace DataHeatBalance {
 		Real64 HighTemperature;
 		bool EMSZoneBaseboardOverrideOn; // EMS actuating equipment power if .TRUE.
 		Real64 EMSZoneBaseboardPower; // Value EMS is directing to use for override
+		Real64 ZnHtgSetTemp;		// Design zone heating setpoint temperature
+		Real64 ZnMinOutTemp;		// Minimum outdoor temperature over design days
+		Real64 ExtSurfCondLoad;		// Conductional load through exterior surfaces by max temp diff
+		bool IsThisSized;			// True if called once
+		bool InfilVentDone;			// True if infiltration / ventilation loads were determined
+									// It is also used to skip second sizing call if necessary
+		bool CapatLowTempAutosize;	// Flag to indicate autosize of the field in second sizing call
+		bool CapatHighTempAutosize;	// Flag to indicate autosize of the field in second sizing call
 		Real64 FractionRadiant;
 		Real64 FractionConvected;
 		bool ManageDemand; // Flag to indicate whether to use demand limiting
@@ -2702,6 +2710,13 @@ namespace DataHeatBalance {
 			EMSZoneBaseboardOverrideOn( false ),
 			EMSZoneBaseboardPower( 0.0 ),
 			FractionRadiant( 0.0 ),
+			ZnHtgSetTemp( 0.0 ),
+			ZnMinOutTemp( 0.0 ),
+			ExtSurfCondLoad( 0.0 ),
+			IsThisSized( false ),
+			InfilVentDone( false ),
+			CapatLowTempAutosize( false ),
+			CapatHighTempAutosize( false ), 
 			FractionConvected( 0.0 ),
 			ManageDemand( false ),
 			DemandLimit( 0.0 ),
@@ -2726,6 +2741,14 @@ namespace DataHeatBalance {
 			Real64 const HighTemperature,
 			bool const EMSZoneBaseboardOverrideOn, // EMS actuating equipment power if .TRUE.
 			Real64 const EMSZoneBaseboardPower, // Value EMS is directing to use for override
+			Real64 const ZnHtgSetTemp,			// Design zone heating setpoint temperature
+			Real64 const ZnMinOutTemp,			// Minimum outdoor temperature over design days
+			Real64 const ExtSurfCondLoad,		// Conductional load through exterior surfaces by max temp diff
+			bool const IsThisSized,				// True if called once
+			bool const InfilVentDone,			// True if infiltration / ventilation loads were determined
+												// It is also used to skip second sizing call if necessary
+			bool const CapatLowTempAutosize,	// Flag to indicate autosize of the field in second sizing call
+			bool const CapatHighTempAutosize,	// Flag to indicate autosize of the field in second sizing call
 			Real64 const FractionRadiant,
 			Real64 const FractionConvected,
 			bool const ManageDemand, // Flag to indicate whether to use demand limiting
@@ -2750,6 +2773,13 @@ namespace DataHeatBalance {
 			EMSZoneBaseboardOverrideOn( EMSZoneBaseboardOverrideOn ),
 			EMSZoneBaseboardPower( EMSZoneBaseboardPower ),
 			FractionRadiant( FractionRadiant ),
+			ZnHtgSetTemp( ZnHtgSetTemp ),
+			ZnMinOutTemp( ZnMinOutTemp ),
+			ExtSurfCondLoad( ExtSurfCondLoad ),
+			IsThisSized( IsThisSized ),
+			InfilVentDone( InfilVentDone ),
+			CapatLowTempAutosize( CapatLowTempAutosize ),
+			CapatHighTempAutosize( CapatHighTempAutosize ),
 			FractionConvected( FractionConvected ),
 			ManageDemand( ManageDemand ),
 			DemandLimit( DemandLimit ),
