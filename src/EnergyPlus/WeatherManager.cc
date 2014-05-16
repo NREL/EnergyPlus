@@ -2757,7 +2757,7 @@ namespace WeatherManager {
 							// Missing, use sky cover
 							OSky = OpaqueSkyCover;
 							TDewK = min( DryBulb, DewPoint ) + TKelvin;
-							ESky = ( 0.787 + 0.764 * std::log( ( TDewK ) / TKelvin ) ) * ( ( ( 0.00028 * OSky - 0.0035 ) * OSky + 0.0224 ) * OSky + 1.0 );
+							ESky = ( 0.787 + 0.764 * std::log( ( TDewK ) / TKelvin ) ) * ( 1.0 + .0224 * OSky - 0.0035 * ( std::pow( OSky, 2 ) ) + 0.00028 * ( std::pow( OSky, 3 ) ) );
 							SkyTemp = ( DryBulb + TKelvin ) * ( std::pow( ESky, 0.25 ) ) - TKelvin;
 						} else { // Valid IR from Sky
 							SkyTemp = std::pow( ( IRHoriz / Sigma ), .25 ) - TKelvin;
@@ -3740,12 +3740,12 @@ Label903: ;
 
 				if ( Environment( EnvrnNum ).WP_Type1 == 0 ) {
 					TDewK = min( TomorrowOutDryBulbTemp( Hour, TS ), TomorrowOutDewPointTemp( Hour, TS ) ) + TKelvin;
-					ESky = ( 0.787 + 0.764 * std::log( ( TDewK ) / TKelvin ) ) * ( ( ( 0.00028 * OSky - 0.0035 ) * OSky + 0.0224 ) * OSky + 1.0 );
+					ESky = ( 0.787 + 0.764 * std::log( ( TDewK ) / TKelvin ) ) * ( 1.0 + 0.0224 * OSky - 0.0035 * ( std::pow( OSky, 2 ) ) + 0.00028 * ( std::pow( OSky, 3 ) ) );
 					TomorrowHorizIRSky( Hour, TS ) = ESky * Sigma * std::pow( ( TomorrowOutDryBulbTemp( Hour, TS ) + TKelvin ), 4 );
 					TomorrowSkyTemp( Hour, TS ) = ( TomorrowOutDryBulbTemp( Hour, TS ) + TKelvin ) * ( std::pow( ESky, .25 ) ) - TKelvin;
 				} else {
 					TDewK = min( TomorrowOutDryBulbTemp( Hour, TS ), TomorrowOutDewPointTemp( Hour, TS ) ) + TKelvin;
-					ESky = ( 0.787 + 0.764 * std::log( ( TDewK ) / TKelvin ) ) * ( ( ( 0.00028 * OSky - 0.0035 ) * OSky + 0.0224 ) * OSky + 1.0 );
+					ESky = ( 0.787 + 0.764 * std::log( ( TDewK ) / TKelvin ) ) * ( 1.0 + 0.0224 * OSky - 0.0035 * ( std::pow( OSky, 2 ) ) + 0.00028 * ( std::pow( OSky, 3 ) ) );
 					TomorrowHorizIRSky( Hour, TS ) = ESky * Sigma * std::pow( ( TomorrowOutDryBulbTemp( Hour, TS ) + TKelvin ), 4 );
 				}
 
@@ -3799,9 +3799,9 @@ Label903: ;
 							//          ClearnessIndex_kt=DesDayInput(EnvrnNum)%SkyClear
 							ClearnessIndex_ktc = 0.4268 + 0.1934 * SinSolarAltitude;
 							if ( ClearnessIndex_kt < ClearnessIndex_ktc ) {
-								ClearnessIndex_kds = ( ( 1.54 * SinSolarAltitude - 3.862 ) * SinSolarAltitude + 3.996 ) * std::pow( ClearnessIndex_kt, 3 );
+								ClearnessIndex_kds = ( 3.996 - 3.862 * SinSolarAltitude + 1.54 * std::pow( SinSolarAltitude, 2 ) ) * std::pow( ClearnessIndex_kt, 3 );
 							} else {
-								ClearnessIndex_kds = ClearnessIndex_kt - ( ( 1.681 * SinSolarAltitude + 0.03569 ) * SinSolarAltitude + 1.107 ) * std::pow( ( 1.0 - ClearnessIndex_kt ), 3 );
+								ClearnessIndex_kds = ClearnessIndex_kt - ( 1.107 + 0.03569 * SinSolarAltitude + 1.681 * std::pow( SinSolarAltitude, 2 ) ) * std::pow( ( 1.0 - ClearnessIndex_kt ), 3 );
 							}
 							// Calculate direct normal radiation, W/m2
 							BeamRad = ZHGlobalSolarConstant * SinSolarAltitude * ClearnessIndex_kds * ( ( 1.0 - ClearnessIndex_kt ) / ( 1.0 - ClearnessIndex_kds ) );

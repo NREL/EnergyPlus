@@ -2157,7 +2157,7 @@ namespace Photovoltaics {
 
 		Real64 F1; // working variable for function result
 
-		F1 = ( ( ( ( a4 * AMa + a3 ) * AMa + a2 ) * AMa + a1 ) * AMa + a0 );
+		F1 = a0 + a1 * AMa + a2 * std::pow( AMa, 2 ) + a3 * std::pow( AMa, 3 ) + a4 * std::pow( AMa, 4 );
 
 		if ( F1 > 0.0 ) {
 			SandiaF1 = F1;
@@ -2220,7 +2220,7 @@ namespace Photovoltaics {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 F2; // working variable for function result
 
-		F2 = ( ( ( ( b5 * IncAng + b4 ) * IncAng + b3 ) * IncAng + b2 ) * IncAng + b1 ) * IncAng + b0;
+		F2 = b0 + b1 * IncAng + b2 * std::pow( IncAng, 2 ) + b3 * std::pow( IncAng, 3 ) + b4 * std::pow( IncAng, 4 ) + b5 * std::pow( IncAng, 5 );
 
 		if ( F2 > 0.0 ) {
 			SandiaF2 = F2;
