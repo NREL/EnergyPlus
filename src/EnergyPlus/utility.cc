@@ -6,10 +6,10 @@
 #include <fstream>
 #include "utility.hh"
 
-#include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/DataHeatBalSurface.hh>
-#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
+#include <DataHeatBalance.hh>
+#include <DataSurfaces.hh>
+#include <DataHeatBalSurface.hh>
+#include <HeatBalanceIntRadExchange.hh>
 
 namespace EppPerformance
 {

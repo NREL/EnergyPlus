@@ -8,7 +8,7 @@
 #include <memory>
 #include <new>
 
-#include <SpeedupHelpers/utility.hh>
+#include <utility.hh>
 
 //we'll have to deal with portability on this one.  
 //While there's a pointer alignment for c++11, std::align,

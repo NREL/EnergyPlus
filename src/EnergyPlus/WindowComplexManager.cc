@@ -3945,8 +3945,8 @@ namespace WindowComplexManager {
 			}
 
 			for ( k = 1; k <= nlayer; ++k ) {
-				SurfaceWindow( SurfNum ).ThetaFace( 2 * k - 1 ) = theta( 2 * k - 1 );
-				SurfaceWindow( SurfNum ).ThetaFace( 2 * k ) = theta( 2 * k );
+				SurfaceRadiantWin[ SurfNum - 1 ].ThetaFace( 2 * k - 1 ) = theta( 2 * k - 1 );
+				SurfaceRadiantWin[ SurfNum - 1 ].ThetaFace( 2 * k ) = theta( 2 * k );
 
 				// temperatures for reporting
 				FenLaySurfTempFront( SurfNum, k ) = theta( 2 * k - 1 ) - KelvinConv;

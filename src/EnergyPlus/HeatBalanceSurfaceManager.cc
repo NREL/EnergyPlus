@@ -2337,7 +2337,7 @@ namespace HeatBalanceSurfaceManager {
 									}
 									QRadSWwinAbsTotEnergy( SurfNum ) = QRadSWwinAbsTot( SurfNum ) * TimeStepZone * SecInHour;
 
-									ShadeFlag = SurfaceWindow( SurfNum ).ShadingFlag;
+									ShadeFlag = SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag(); //SurfaceWindow( SurfNum ).ShadingFlag;
 
 								} else if ( SurfaceWindow( SurfNum ).WindowModelType == WindowEQLModel ) {
 									QRadSWwinAbsTot( SurfNum ) = 0.0;
@@ -2730,7 +2730,7 @@ namespace HeatBalanceSurfaceManager {
 						QRadSWwinAbs( SurfNum, IGlass ) += QS( ZoneNum ) * Construct( ConstrNum ).AbsDiffBack( IGlass );
 					}
 					TotGlassLayers = Construct( ConstrNum ).TotGlassLayers;
-					ShadeFlag = SurfaceWindow( SurfNum ).ShadingFlag;
+					ShadeFlag = SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag(); //SurfaceWindow( SurfNum ).ShadingFlag;
 
 					// These calculations are repeated from InitInternalHeatGains for the Zone Component Loads Report
 					pulseMultipler = 0.01; // the W/sqft pulse for the zone
@@ -2756,19 +2756,19 @@ namespace HeatBalanceSurfaceManager {
 						for ( IGlass = 1; IGlass <= Construct( ConstrNumSh ).TotGlassLayers; ++IGlass ) {
 							if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn ) QRadSWwinAbs( SurfNum, IGlass ) += QS( ZoneNum ) * Construct( ConstrNumSh ).AbsDiffBack( IGlass );
 							if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn ) {
-								BlAbsDiffBk = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiffBack( IGlass, {1,MaxSlatAngs} ) );
+								BlAbsDiffBk = InterpSlatAng(SurfaceRadiantWin[ SurfNum - 1 ].SlatAngThisTS, SurfaceRadiantWin[ SurfNum - 1 ].MovableSlats, Construct( ConstrNumSh ).BlAbsDiffBack( IGlass, {1,MaxSlatAngs} ) );
 								QRadSWwinAbs( SurfNum, IGlass ) += QS( ZoneNum ) * BlAbsDiffBk;
 							}
 						}
 						BlNum = SurfaceWindow( SurfNum ).BlindNumber;
 						if ( ShadeFlag == IntShadeOn ) SurfaceWindow( SurfNum ).IntLWAbsByShade = QL( ZoneNum ) * Construct( ConstrNumSh ).ShadeAbsorpThermal * TMULT( ZoneNum );
 						if ( ShadeFlag == IntBlindOn ) {
-							EffBlEmiss = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, SurfaceWindow( SurfNum ).EffShBlindEmiss );
+							EffBlEmiss = InterpSlatAng(SurfaceRadiantWin[ SurfNum - 1 ].SlatAngThisTS, SurfaceRadiantWin[ SurfNum - 1 ].MovableSlats, SurfaceRadiantWin[ SurfNum - 1 ].EffShBlindEmiss );
 							SurfaceWindow( SurfNum ).IntLWAbsByShade = QL( ZoneNum ) * EffBlEmiss * TMULT( ZoneNum );
 						}
 						if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn ) SurfaceWindow( SurfNum ).IntSWAbsByShade = QS( ZoneNum ) * Construct( ConstrNumSh ).AbsDiffBackShade;
 						if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) {
-							AbsDiffBkBl = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).AbsDiffBackBlind );
+							AbsDiffBkBl = InterpSlatAng( SurfaceRadiantWin[ SurfNum - 1 ].SlatAngThisTS, SurfaceRadiantWin[ SurfNum - 1 ].MovableSlats, Construct( ConstrNumSh ).AbsDiffBackBlind );
 							SurfaceWindow( SurfNum ).IntSWAbsByShade = QS( ZoneNum ) * AbsDiffBkBl;
 						}
 						// Correct for divider shadowing
@@ -2801,8 +2801,8 @@ namespace HeatBalanceSurfaceManager {
 							DividerSolAbs *= Material( MatNumSh ).Trans;
 							DividerThermAbs *= Material( MatNumSh ).TransThermal;
 						} else if ( ShadeFlag == IntBlindOn ) {
-							DividerSolAbs *= InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Blind( BlNum ).SolBackDiffDiffTrans );
-							DividerThermAbs *= InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Blind( BlNum ).IRBackTrans );
+							DividerSolAbs *= InterpSlatAng(SurfaceRadiantWin[ SurfNum - 1 ].SlatAngThisTS, SurfaceRadiantWin[ SurfNum - 1 ].MovableSlats, Blind( BlNum ).SolBackDiffDiffTrans );
+							DividerThermAbs *= InterpSlatAng(SurfaceRadiantWin[ SurfNum - 1 ].SlatAngThisTS, SurfaceRadiantWin[ SurfNum - 1 ].MovableSlats, Blind( BlNum ).IRBackTrans );
 						}
 						// Note that DividerQRadInAbs is initially calculated in InitSolarHeatGains
 						SurfaceWindow( SurfNum ).DividerQRadInAbs += ( QS( ZoneNum ) * DividerSolAbs + ( QL( ZoneNum ) * TMULT( ZoneNum ) + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) ) * DividerThermAbs ) * ( 1.0 + SurfaceWindow( SurfNum ).ProjCorrDivIn );
@@ -2902,7 +2902,7 @@ namespace HeatBalanceSurfaceManager {
 						ConstrNumSh = Surface( SurfNum ).StormWinShadedConstruction;
 					}
 					TotGlassLayers = Construct( ConstrNum ).TotGlassLayers;
-					ShadeFlag = SurfaceWindow( SurfNum ).ShadingFlag;
+					ShadeFlag = SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag(); //SurfaceWindow( SurfNum ).ShadingFlag;
 					if ( ShadeFlag <= 0 ) { // No window shading
 						for ( IGlass = 1; IGlass <= TotGlassLayers; ++IGlass ) {
 							QRadSWwinAbs( SurfNum, IGlass ) += InitialDifSolwinAbs( SurfNum, IGlass );
@@ -2968,7 +2968,7 @@ namespace HeatBalanceSurfaceManager {
 					} else {
 						TotGlassLayers = Construct( ConstrNum ).TotGlassLayers;
 					}
-					ShadeFlag = SurfaceWindow( SurfNum ).ShadingFlag;
+					ShadeFlag = SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag(); //SurfaceWindow( SurfNum ).ShadingFlag;
 					if ( ShadeFlag <= 0 ) { // No window shading
 						for ( IGlass = 1; IGlass <= TotGlassLayers; ++IGlass ) {
 							// Initial Transmitted Diffuse Solar Absorbed on Inside of Surface[W]
@@ -3278,7 +3278,7 @@ namespace HeatBalanceSurfaceManager {
 
 					// Window
 					if ( ! Construct( Surface( SurfNum ).Construction ).WindowTypeEQL ) {
-						ShadeFlag = SurfaceWindow( SurfNum ).ShadingFlag;
+						ShadeFlag = SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag(); //SurfaceWindow( SurfNum ).ShadingFlag;
 						AbsDiffTotWin = 0.0;
 						ConstrNumSh = Surface( SurfNum ).ShadedConstruction;
 						if ( SurfaceWindow( SurfNum ).StormWinFlag == 1 ) {
@@ -3295,7 +3295,7 @@ namespace HeatBalanceSurfaceManager {
 							if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn ) {
 								AbsDiffLayWin = Construct( ConstrNumSh ).AbsDiffBack( Lay );
 							} else if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) {
-								AbsDiffLayWin = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiffBack( Lay, {1,MaxSlatAngs} ) );
+								AbsDiffLayWin = InterpSlatAng(SurfaceRadiantWin[ SurfNum - 1 ].SlatAngThisTS, SurfaceRadiantWin[ SurfNum - 1 ].MovableSlats, Construct( ConstrNumSh ).BlAbsDiffBack( Lay, {1,MaxSlatAngs} ) );
 							}
 
 							// Switchable glazing
@@ -3313,8 +3313,8 @@ namespace HeatBalanceSurfaceManager {
 							TransDiffWin = Construct( ConstrNumSh ).TransDiff;
 							DiffAbsShade = Construct( ConstrNumSh ).AbsDiffBackShade;
 						} else if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) {
-							TransDiffWin = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlTransDiff );
-							DiffAbsShade = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).AbsDiffBackBlind );
+							TransDiffWin = InterpSlatAng(SurfaceRadiantWin[ SurfNum - 1 ].SlatAngThisTS, SurfaceRadiantWin[ SurfNum - 1 ].MovableSlats, Construct( ConstrNumSh ).BlTransDiff );
+							DiffAbsShade = InterpSlatAng( SurfaceRadiantWin[ SurfNum - 1 ].SlatAngThisTS, SurfaceRadiantWin[ SurfNum - 1 ].MovableSlats, Construct( ConstrNumSh ).AbsDiffBackBlind );
 						}
 
 						// Switchable glazing
@@ -3691,7 +3691,9 @@ namespace HeatBalanceSurfaceManager {
 							if ( Construct( Construction[ SurfNum  - 1] ).NumCTFTerms != Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).NumCTFTerms ) {
 								//thow warning, but allow
 								ShowWarningError( "InitEMSControlledConstructions: EMS Construction State Actuator may be unrealistic, " "incompatible CTF terms are being used." );
-								ShowContinueError( "Construction named = " + Construct( Construction[ SurfNum - 1 ] ).Name + " has number of CTF terms = " + TrimSigDigits( Construction[ SurfNum - 1 ] ).NumCTFTerms ) );
+								ShowContinueError( "Construction named = " + Construct( Construction[ SurfNum - 1 ] ).Name + 
+																	 " has number of CTF terms = " + 
+																	 TrimSigDigits( Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).NumCTFTerms ) );
 								ShowContinueError( "While construction named = " + Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).Name + " has number of CTF terms = " + TrimSigDigits( Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).NumCTFTerms ) );
 								ShowContinueError( "The actuator is allowed but the transient heat transfer modeling may not be valid for" " surface name = " + Surface( SurfNum ).Name + ", and the simulation continues" );
 
@@ -4063,7 +4065,7 @@ namespace HeatBalanceSurfaceManager {
 	}
 
 	void
-	CalculateZoneMRT( Optional_int_const ZoneToResimulate ) // if passed in, then only calculate surfaces that have this zone
+	CalculateZoneMRT( int ZoneToResimulate ) // if passed in, then only calculate surfaces that have this zone
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -4317,7 +4319,7 @@ namespace HeatBalanceSurfaceManager {
 // EXTERNAL SUBROUTINES (heavily related to HeatBalanceSurfaceManager)
 
 void
-CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed in, then only calculate surfaces that have this zone
+CalcHeatBalanceOutsideSurf( int ZoneToResimulate ) // if passed in, then only calculate surfaces that have this zone
 {
 
 	// SUBROUTINE INFORMATION:
@@ -4805,7 +4807,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 }
 
 void
-CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in, then only calculate surfaces that have this zone
+CalcHeatBalanceInsideSurf( int ZoneToResimulate ) // if passed in, then only calculate surfaces that have this zone
 {
 
 	// SUBROUTINE INFORMATION:

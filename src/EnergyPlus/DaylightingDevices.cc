@@ -412,7 +412,7 @@ namespace DaylightingDevices {
 		using DataDaylighting::ZoneDaylight;
 		using General::RoundSigDigits;
 		using General::SafeDivide;
-
+		using DataSurfaces::Construction;
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS: na
 
@@ -514,7 +514,7 @@ namespace DaylightingDevices {
 					}
 
 					if ( DataHeatBalance::ConstrWin[ Construction[ SurfNum  - 1]  - 1 ].TotGlassLayers > 1 ) {
-						ShowSevereError( cCurrentModuleObject  + " = " +  cAlphaArgs( 1 ) + ":  Diffuser " + trim( cAlphaArgs( 3 ) ) + " construction (" + Construct( Construction[ SurfNum  - 1] .Name ) + ") must have only 1 glass layer." );
+						ShowSevereError( cCurrentModuleObject  + " = " +  cAlphaArgs( 1 ) + ":  Diffuser " + trim( cAlphaArgs( 3 ) ) + " construction (" + Construct( Construction[ SurfNum  - 1] ) .Name  + ") must have only 1 glass layer." );
 						ErrorsFound = true;
 					}
 

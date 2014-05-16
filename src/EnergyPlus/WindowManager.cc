@@ -2101,7 +2101,7 @@ namespace WindowManager {
 			ngllayer = Construct( ConstrNum ).TotSolidLayers; // Simon: This is necessary to keep for frame calculations
 			// Simon: need to transfer surface temperatures because of frames calculation
 			for ( i = 1; i <= 2 * Construct( ConstrNum ).TotSolidLayers; ++i ) {
-				thetas( i ) = SurfaceWindow( SurfNum ).ThetaFace( i );
+				thetas( i ) = SurfaceRadiantWin[ SurfNum - 1].ThetaFace( i );
 			}
 			hcout = HextConvCoeff;
 
@@ -3786,7 +3786,7 @@ namespace WindowManager {
 		int IGapInc; // Gap increment (0 or 1)
 
 		ConstrNumSh = Surface( SurfNum ).ShadedConstruction;
-		ShadeFlag = SurfaceWindow( SurfNum ).ShadingFlag;
+		ShadeFlag = SurfaceRadiantWin[ SurfNum - 1 ].getShadingFlag();
 		nglassfaces = 2 * Construct( ConstrNumSh ).TotGlassLayers;
 
 		if ( Construct( ConstrNumSh ).TotGlassLayers == 2 ) { // Double glazing
@@ -4114,7 +4114,7 @@ namespace WindowManager {
 		//DATA AirProps / 1.29, -0.4d-2, 2.41d-2, 7.6d-5, 1.73d-5, 1.0d-7, 0.72,   1.8d-3  /
 
 		ConstrNumSh = Surface( SurfNum ).ShadedConstruction;
-		ShadeFlag = SurfaceWindow( SurfNum ).ShadingFlag;
+		ShadeFlag = SurfaceRadiantWin[ SurfNum - 1 ].getShadingFlag();
 
 		if ( Construct( ConstrNumSh ).TotGlassLayers == 2 ) { // Double glazing
 			MatNumSh = Construct( ConstrNumSh ).LayerPoint( 3 );

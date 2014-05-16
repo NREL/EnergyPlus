@@ -304,6 +304,7 @@ DXFOut(
 	using DataStringGlobals::VerString;
 	using namespace DXFEarClipping;
 	using General::TrimSigDigits;
+	using DataHeatBalance::ZoneSpecs;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:

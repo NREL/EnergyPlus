@@ -379,6 +379,7 @@ namespace AirflowNetworkBalanceManager {
 		using DataHeatBalance::People;
 		using DataHeatBalance::TotPeople;
 		using ThermalComfort::ThermalComfortData;
+		using DataSurfaces::SurfaceRadiantWin;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3403,6 +3404,7 @@ namespace AirflowNetworkBalanceManager {
 		using DataHVACGlobals::TurnFansOn;
 		using DataHVACGlobals::TurnFansOff;
 		using InputProcessor::SameString; // NEEDS TO BE CHANGED after V1.3 release!!!
+		using DataSurfaces::SurfaceRadiantWin;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6682,6 +6684,7 @@ Label90: ;
 		using DataHVACGlobals::HybridVentSysAvailWindModifier;
 		using DataHVACGlobals::HybridVentSysAvailActualZoneNum;
 		using DataZoneEquipment::ZoneEquipConfig;
+		using DataSurfaces::SurfaceRadiantWin;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6750,7 +6753,10 @@ Label90: ;
 								if ( ControlType == GlobalCtrlType ) {
 									MultizoneSurfaceData( ANSurfaceNum ).HybridCtrlGlobal = true;
 									if ( HybridVentSysAvailMaster( SysAvailNum ) == ActualZoneNum ) {
-										if ( ( SurfaceWindow( SurfNum ).OriginalClass == SurfaceClass_Window || SurfaceWindow( SurfNum ).OriginalClass == SurfaceClass_Door || SurfaceWindow( SurfNum ).OriginalClass == SurfaceClass_GlassDoor ) && Surface( SurfNum ).ExtBoundCond == ExternalEnvironment ) {
+										if ( ( SurfaceRadiantWin[ SurfNum - 1 ].OriginalClass == SurfaceClass_Window || 
+													 SurfaceRadiantWin[ SurfNum - 1 ].OriginalClass == SurfaceClass_Door || 
+													 SurfaceRadiantWin[ SurfNum - 1 ].OriginalClass == SurfaceClass_GlassDoor ) && 
+												 Surface( SurfNum ).ExtBoundCond == ExternalEnvironment ) {
 											MultizoneSurfaceData( ANSurfaceNum ).HybridCtrlMaster = true;
 											Found = true;
 										}

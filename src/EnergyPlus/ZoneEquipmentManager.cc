@@ -3461,6 +3461,7 @@ namespace ZoneEquipmentManager {
 		using InternalHeatGains::SumAllReturnAirLatentGains;
 		using DataHVACGlobals::RetTempMax;
 		using DataHVACGlobals::RetTempMin;
+		using DataHeatBalance::ZoneSpecs;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

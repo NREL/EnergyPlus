@@ -524,6 +524,8 @@ namespace HeatBalFiniteDiffManager {
 
 		// Using/Aliasing
 		using DataSurfaces::HeatTransferModel_CondFD;
+		using DataSurfaces::Construction;
+		using DataHeatBalance::ConstrWin;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:

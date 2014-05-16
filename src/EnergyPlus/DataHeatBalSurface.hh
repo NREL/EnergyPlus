@@ -9,7 +9,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 
-#include <SpeedupHelpers/perTArray.hh>
+#include <perTArray.hh>
 
 namespace EnergyPlus {
 

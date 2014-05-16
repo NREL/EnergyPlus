@@ -23,6 +23,7 @@
 #include <DisplayRoutines.hh>
 #include <EMSManager.hh>
 #include <General.hh>
+#include <HeatBalanceIntRadExchange.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -7483,11 +7484,7 @@ namespace SurfaceGeometry {
 					if ( Surface( SurfNum ).ExtBoundCond != ExternalEnvironment ) WrongSurfaceType = true;
 				}
 				if ( WrongSurfaceType ) {
-<<<<<<< variant A
 					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" is not an exterior window with 2 or 3 glass layers." );
->>>>>>> variant B
-					ShowSevereError( trim( cCurrentModuleObject ) + "=\"" + trim( cAlphaArgs( 1 ) ) + "\" is not an exterior window with 2 or 3 glass layers." );
-======= end
 					ErrorsFound = true;
 				}
 			}

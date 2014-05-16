@@ -6644,14 +6644,14 @@ Label1000: ;
 		ZoneUnscheduled = false;
 		ZoneScheduled = false;
 
-		for ( iSurf = Zone( ZoneNum ).SurfaceFirst; iSurf <= Zone( ZoneNum ).SurfaceLast; ++iSurf ) {
+		for ( iSurf = ZoneSpecs[ ZoneNum - 1 ].SurfaceFirst; iSurf <= ZoneSpecs[ ZoneNum - 1 ].SurfaceLast; ++iSurf ) {
 			iConst = Surface( iSurf ).Construction;
 			if ( Surface( iSurf ).Class == SurfaceClass_Window ) {
 				SchedPtr = WindowScheduledSolarAbs( iSurf, iConst );
 			} else {
 				SchedPtr = SurfaceScheduledSolarInc( iSurf, iConst );
 			}
-			if ( iSurf == Zone( ZoneNum ).SurfaceFirst ) {
+			if ( iSurf == ZoneSpecs[ ZoneNum - 1 ].SurfaceFirst ) {
 				if ( SchedPtr != 0 ) {
 					ZoneScheduled = true;
 					ZoneUnscheduled = false;
@@ -6679,7 +6679,7 @@ Label1000: ;
 		}
 
 		if ( ( ! ZoneScheduled ) && ( ! ZoneUnscheduled ) ) {
-			for ( iSurf = Zone( ZoneNum ).SurfaceFirst; iSurf <= Zone( ZoneNum ).SurfaceLast; ++iSurf ) {
+			for ( iSurf = ZoneSpecs[ ZoneNum - 1 ].SurfaceFirst; iSurf <= ZoneSpecs[ ZoneNum - 1 ].SurfaceLast; ++iSurf ) {
 				iConst = Surface( iSurf ).Construction;
 				if ( Surface( iSurf ).Class == SurfaceClass_Window ) {
 					SchedPtr = WindowScheduledSolarAbs( iSurf, iConst );

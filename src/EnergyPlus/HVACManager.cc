@@ -3284,6 +3284,7 @@ namespace HVACManager {
 		using ScheduleManager::GetScheduleMaxValue;
 		using DataSurfaces::SurfaceWindow;
 		using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
+		using DataHeatBalance::ZoneSpecs;
 
 		// Locals
 		// SUBROUTINE ARGUMENTS:
@@ -3359,7 +3360,7 @@ namespace HVACManager {
 							break;
 						}
 					}
-					for ( SurfNum = ZoneSpecs[ ZoneNum  - 1].SurfaceFirst; SurfNum <= ZoneSpecs[ ZoneNum  - 1].SurfaceLast; ++SurfNum ) {
+					for ( SurfNum = ZoneSpecs[ ZoneNum  - 1 ].SurfaceFirst; SurfNum <= ZoneSpecs[ ZoneNum  - 1 ].SurfaceLast; ++SurfNum ) {
 						if ( SurfaceWindow( SurfNum ).AirflowDestination == AirFlowWindow_Destination_ReturnAir ) {
 							ShowWarningError( "For zone=" + Zone( ZoneNum ).Name + " return air heat gain from air flow windows will be applied to the zone air." );
 							ShowContinueError( "  This zone has no return air or is served by an on/off HVAC system." );

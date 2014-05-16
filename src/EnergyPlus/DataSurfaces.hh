@@ -412,7 +412,7 @@ namespace DataSurfaces {
 	extern FArray1D< Real64 > WinShadingAbsorbedSolarEnergy; // Energy of WinShadingAbsorbedSolar [J]
 	extern FArray1D< Real64 > WinGapConvHtFlowRepEnergy; // Energy of WinGapConvHtFlowRep [J]
 
-        extern std::vector< int > Construction;  // Pointer to the construction in the Construct derived type
+	extern std::vector< int > Construction;  // Pointer to the construction in the Construct derived type
 	// SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaces:
 
 	// Types
@@ -588,11 +588,6 @@ namespace DataSurfaces {
 
 		// Default Constructor
 		SurfaceData() :
-<<<<<<< variant A
-			Construction( 0 ),
->>>>>>> variant B
-			Name( MaxNameLength ),
-======= end
 			EMSConstructionOverrideON( false ),
 			EMSConstructionOverrideValue( 0 ),
 			ConstructionStoredInputValue( 0 ),
@@ -709,7 +704,7 @@ namespace DataSurfaces {
 
 		// Member Constructor
 		SurfaceData(
-			Fstring const & Name, // User supplied name of the surface (must be unique)
+			std::string const & Name, // User supplied name of the surface (must be unique)
 			bool const EMSConstructionOverrideON, // if true, EMS is calling to override the construction value
 			int const EMSConstructionOverrideValue, // pointer value to use for Construction when overridden
 			int const ConstructionStoredInputValue, // holds the original value for Construction per surface input
@@ -948,7 +943,7 @@ namespace DataSurfaces {
 
 	};
 
-        struct SurfaceWinRad
+	struct SurfaceWinRad
 	{
 	private:
 		int ShadingFlag; // -1: window has no shading device
@@ -997,11 +992,11 @@ namespace DataSurfaces {
 		    shadeChangedCallback();
 		  }
 		}
-	        inline const int&
-	        getShadingFlag(){return ShadingFlag;}
+		inline const int&
+		getShadingFlag(){return ShadingFlag;}
 		SurfaceWinRad():
 			ShadingFlag( ShadeOff ),
-//put this back in SurfaceWindowCalc, trade with EffInsSurfTemp
+			//put this back in SurfaceWindowCalc, trade with EffInsSurfTemp
 			MovableSlats( false ),
 			EffGlassEmiss( MaxSlatAngs, 0.0 ),
 			OriginalClass( 0),
@@ -1122,9 +1117,9 @@ namespace DataSurfaces {
 		Real64 DividerConduction; // Conduction through divider from outside to inside face (W)
 		Real64 OtherConvHeatGain; // other convective = total conv - standard model prediction for EQL window model (W)
 		int BlindNumber; // Blind number for a window with a blind
+		Real64 SlatAngThisTSDeg;
 		bool SlatAngThisTSDegEMSon; // flag that indicate EMS system is actuating SlatAngThisTSDeg
 		Real64 SlatAngThisTSDegEMSValue; // value that EMS sets for slat angle in degrees
-                Real64 SlatAngThisTSDeg;
 		bool SlatsBlockBeam; // True if blind slats block incident beam solar
 		Real64 BlindAirFlowPermeability; // Blind air-flow permeability for calculation of convective flow
 		//  in gap between blind and glass
@@ -2476,9 +2471,9 @@ namespace DataSurfaces {
 
 	// Object Data
 	extern FArray1D< SurfaceData > Surface;
-        extern std::vector < SurfaceWinRad > SurfaceRadiantWin; //allocated in SurfaceGeometry.cc
+	extern std::vector < SurfaceWinRad > SurfaceRadiantWin; //allocated in SurfaceGeometry.cc
 	extern FArray1D< SurfaceWindowCalc > SurfaceWindow;
-        extern EppPerformance::perTArray< Real64 > IRfromParentZone;
+	extern EppPerformance::perTArray< Real64 > IRfromParentZone;
 	extern FArray1D< FrameDividerProperties > FrameDivider;
 	extern FArray1D< StormWindowData > StormWindow;
 	extern FArray1D< WindowShadingControlData > WindowShadingControl;
@@ -2500,7 +2495,7 @@ namespace DataSurfaces {
 	  DataViewFactorInformation::ZoneInfo[ zone ].shadeChanged = true;
 	}
 
-	Fstring
+	std::string
 	cSurfaceClass( int const ClassNo );
 
 	//     NOTICE

@@ -207,6 +207,8 @@ namespace LowTempRadiantSystem {
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
+		using DataSurfaces::Construction;
+
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -338,6 +340,7 @@ namespace LowTempRadiantSystem {
 		using ScheduleManager::GetScheduleIndex;
 		using namespace DataLoopNode;
 		using namespace DataSurfaceLists;
+		using DataSurfaces::Construction;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

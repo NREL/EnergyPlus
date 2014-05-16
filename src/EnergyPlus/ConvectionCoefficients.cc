@@ -198,7 +198,7 @@ namespace ConvectionCoefficients {
 	void
 	InitInteriorConvectionCoeffs(
 		FArray1S< Real64 > const SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
-		Optional_int_const ZoneToResimulate // if passed in, then only calculate surfaces that have this zone
+		int ZoneToResimulate // if passed in, then only calculate surfaces that have this zone
 	)
 	{
 

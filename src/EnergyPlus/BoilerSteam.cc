@@ -751,7 +751,7 @@ namespace BoilerSteam {
 		Real64 EnthSteamOutDry;
 		Real64 EnthSteamOutWet;
 		Real64 LatentEnthSteam;
-		Real64 QualitySteam;
+		//Real64 QualitySteam; //unused but set
 		FArray1D< Real64 > LoadCoef( 3 ); // coefficients of the fuel use/part load curve
 		Real64 CpWater; // Heat capacity of condensed steam
 		int BoilerInletNode; // Boiler inlet node number
@@ -763,7 +763,7 @@ namespace BoilerSteam {
 
 		//Loading the variables derived type in to local variables
 		BoilerLoad = 0.0;
-		BoilerMassFlowRate = 0.0;
+		//		BoilerMassFlowRate = 0.0;
 		BoilerInletNode = Boiler( BoilerNum ).BoilerInletNodeNum;
 		BoilerOutletNode = Boiler( BoilerNum ).BoilerOutletNodeNum;
 		BoilerNomCap = Boiler( BoilerNum ).NomCap;
@@ -775,7 +775,7 @@ namespace BoilerSteam {
 		BoilerMaxPress = Boiler( BoilerNum ).BoilerMaxOperPress;
 		BoilerEff = Boiler( BoilerNum ).Effic;
 
-		QualitySteam = Node( BoilerInletNode ).Quality;
+		//		QualitySteam = Node( BoilerInletNode ).Quality; //unused but set
 		LoopNum = Boiler( BoilerNum ).LoopNum;
 		LoopSideNum = Boiler( BoilerNum ).LoopSideNum;
 		{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
@@ -841,7 +841,7 @@ namespace BoilerSteam {
 			{ auto const SELECT_CASE_var( PlantLoop( Boiler( BoilerNum ).LoopNum ).LoopDemandCalcScheme );
 			if ( SELECT_CASE_var == SingleSetPoint ) {
 				BoilerDeltaTemp = Node( BoilerOutletNode ).TempSetPoint - Node( BoilerInletNode ).Temp;
-			} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
+			} else if ( SELECT_CASE_var == DualSetPointDeadBand ) { 
 				BoilerDeltaTemp = Node( BoilerOutletNode ).TempSetPointLo - Node( BoilerInletNode ).Temp;
 			}}
 			//If boiler outlet temp is already greater than setpoint than it does not need to operate this iteration
@@ -990,8 +990,8 @@ namespace BoilerSteam {
 		int BoilerInletNode; // Boiler inlet node number
 		int BoilerOutletNode; // Boiler outlet node number
 		Real64 ReportingConstant;
-		int LoopNum;
-		int LoopSideNum;
+		// int LoopNum; //set but unused
+		//int LoopSideNum; //set but unused
 
 		ReportingConstant = TimeStepSys * SecInHour;
 
@@ -1025,8 +1025,8 @@ namespace BoilerSteam {
 
 		BoilerReport( Num ).BoilerInletTemp = Node( BoilerInletNode ).Temp;
 		BoilerReport( Num ).Mdot = Node( BoilerOutletNode ).MassFlowRate;
-		LoopNum = Boiler( Num ).LoopNum;
-		LoopSideNum = Boiler( Num ).LoopSideNum;
+		//		LoopNum = Boiler( Num ).LoopNum; //set but unused
+		// LoopSideNum = Boiler( Num ).LoopSideNum;  //set but unused
 
 		BoilerReport( Num ).BoilerEnergy = BoilerReport( Num ).BoilerLoad * ReportingConstant;
 		BoilerReport( Num ).FuelConsumed = BoilerReport( Num ).FuelUsed * ReportingConstant;

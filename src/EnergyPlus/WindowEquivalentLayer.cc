@@ -897,7 +897,7 @@ namespace WindowEquivalentLayer {
 
 				// The IR radiance of this window's "exterior" surround is the IR radiance
 				// from surfaces and high-temp radiant sources in the adjacent zone
-				outir = SurfaceWindow( SurfNumAdj ).IRfromParentZone + QHTRadSysSurf( SurfNumAdj ) + QHWBaseboardSurf( SurfNumAdj ) + QRadThermInAbs( SurfNumAdj );
+				outir = IRfromParentZone[ SurfNumAdj - 1 ] + QHTRadSysSurf( SurfNumAdj ) + QHWBaseboardSurf( SurfNumAdj ) + QRadThermInAbs( SurfNumAdj );
 
 			} else { // Exterior window (ExtBoundCond = 0)
 
@@ -924,7 +924,7 @@ namespace WindowEquivalentLayer {
 		SurfOutsideEmiss = LWAbsOut;
 		// Indoor mean radiant temperature.
 		// IR incident on window from zone surfaces and high-temp radiant sources
-		rmir = SurfaceWindow( SurfNum ).IRfromParentZone + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) + QRadThermInAbs( SurfNum );
+		rmir = IRfromParentZone[ SurfNum - 1 ] + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) + QRadThermInAbs( SurfNum );
 		TRMIN = std::pow( ( rmir / StefanBoltzmann ), 0.25 ); // TODO check model equation.
 
 		NL = CFS( EQLNum ).NL;
@@ -951,7 +951,7 @@ namespace WindowEquivalentLayer {
 		} else {
 			ConvHeatFlowNatural = Surface( SurfNum ).Area * QOCFRoom;
 		}
-		SurfaceWindow( SurfNum ).EffInsSurfTemp = SurfInsideTemp;
+		SurfaceRadiantWin[ SurfNum - 1 ].EffInsSurfTemp = SurfInsideTemp;
 		NetIRHeatGainWindow = Surface( SurfNum ).Area * LWAbsIn * ( StefanBoltzmann * std::pow( ( SurfInsideTemp + KelvinConv ), 4 ) - rmir );
 		ConvHeatGainWindow = Surface( SurfNum ).Area * HcIn * ( SurfInsideTemp - TaIn );
 		// Window heat gain (or loss) is calculated here

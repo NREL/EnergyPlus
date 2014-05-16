@@ -39,6 +39,7 @@
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
 #include <SQLiteProcedures.hh>
+#include <timers.hh>
 #include <UtilityRoutines.hh>
 #include <VentilatedSlab.hh>
 #include <ZonePlenum.hh>
@@ -10324,12 +10325,12 @@ namespace OutputReportTabular {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// all arrays are in the format: (row, column)
-		FArray1D_Fstring columnHead( sFstring( MaxNameLength ) );
+		FArray1D_string columnHead;
 		FArray1D_int columnWidth;
-		FArray1D_Fstring rowHead( sFstring( MaxNameLength ) );
-		FArray2D_Fstring tableBody( sFstring( 2000 ) );
+		FArray1D_string rowHead;
+		FArray2D_string tableBody;
 		int numUnique;
-		Fstring listOfSurf( 2000 );
+		std::string listOfSurf;
 		int iShadRel;
 		int iKindRec;
 		int HTS;
@@ -10367,12 +10368,12 @@ namespace OutputReportTabular {
 		    }
 		    if (iKindRec == recKindSurface)
 		      {
-			writeSubtitle("Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces " );
+			WriteSubtitle("Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces " );
 			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, 
 							"SurfaceShadowingSummary", "Entire Facility", 
 							"Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces " );
 		      }else{
-		        writeSubtitle( "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces " );
+		        WriteSubtitle( "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces " );
 		      
 			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, 
 							"SurfaceShadowingSummary", "Entire Facility", 

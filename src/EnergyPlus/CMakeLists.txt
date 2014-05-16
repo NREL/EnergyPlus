@@ -1,4 +1,5 @@
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
+INCLUDE_DIRECTORIES(  /usr/include/atlas )
 
 if(MSVC)
   add_definitions(/Za)
@@ -337,6 +338,8 @@ SET( SRC
   PackagedTerminalHeatPump.hh
   PackagedThermalStorageCoil.cc
   PackagedThermalStorageCoil.hh
+	perTArray.cc
+	perTArray.hh
   PhotovoltaicThermalCollectors.cc
   PhotovoltaicThermalCollectors.hh
   Photovoltaics.cc
@@ -463,6 +466,8 @@ SET( SRC
   ThermalEN673Calc.hh
   ThermalISO15099Calc.cc
   ThermalISO15099Calc.hh
+	timers.cc
+	timers.hh
   TranspiredCollector.cc
   TranspiredCollector.hh
   UFADManager.cc
@@ -475,6 +480,8 @@ SET( SRC
   UserDefinedComponents.hh
   UtilityRoutines.cc
   UtilityRoutines.hh
+	utility.cc
+	utility.hh
   VariableSpeedCoils.cc
   VariableSpeedCoils.hh
   Vectors.cc
@@ -529,5 +536,9 @@ ADD_EXECUTABLE(EnergyPlus ${SRC})
 #TARGET_LINK_LIBRARIES( EnergyPlus epfmiimport)
 #TARGET_LINK_LIBRARIES( EnergyPlus DElight )
 TARGET_LINK_LIBRARIES( EnergyPlus objexx )
+LINK_DIRECTORIES( /usr/lib/atlas-base/ )
+LINK_DIRECTORIES( /usr/lib/x86_64-linux-gnu/ )
+TARGET_LINK_LIBRARIES( EnergyPlus lapack_atlas )
+TARGET_LINK_LIBRARIES( EnergyPlus rt )
 
 INSTALL( TARGETS EnergyPlus DESTINATION ./ )

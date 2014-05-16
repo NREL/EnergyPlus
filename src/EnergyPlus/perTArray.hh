@@ -12,7 +12,7 @@
 #include <vector>
 #include <iostream>
 
-#include <SpeedupHelpers/alloc.hh>
+#include <alloc.hh>
 
 
 namespace EppPerformance{
@@ -41,12 +41,13 @@ public:
     data_ = nullptr;
   }
 
-  perTArray( perTArray&& a): threads(a.threads), 
-			     length(a.length), 
-			     el_size(a.el_size),
-			     sizes(a.sizes),
-			     firstIndex(a.firstIndex),
-			     genPerTArray(std::move(a))
+  perTArray( perTArray&& a): 
+		threads(a.threads), 
+		el_size(a.el_size),
+		length(a.length), 
+		sizes(a.sizes),
+		firstIndex(a.firstIndex),
+		genPerTArray(std::move(a))
   {
     data_ = a.data_;
     a.data_ = nullptr;
@@ -63,13 +64,17 @@ public:
       doAllocation();
       std::copy(begin(), end(), const_cast<perTArray&>(a).begin());
     }
+		return *this;
   }
 
   //NOTE threads * size must always be less or equal to the actual number
   //of elements used in the optimized version
   //(This constructs an unoptimized version, for when the optimization
   //info is unavailable at the time of construction)
-  perTArray(int threads, size_t size):el_size(size),threads(threads){
+  perTArray(int threads, size_t size):
+		threads(threads),
+		el_size(size)
+	{
     AlignedAlloc<T> a(Utility::getL1CacheLineSize());
     data_ = new T*[threads];
     sizes = vector<size_t>(threads, size);
@@ -78,7 +83,9 @@ public:
   }
   
   perTArray(int threads, const vector<size_t>& sizes):
-    el_size(0), sizes(sizes), threads(threads)
+		threads(threads),
+    el_size(0), 
+		sizes(sizes)
   {
     doAllocation();
     setFirstIndex();   
@@ -192,6 +199,7 @@ private:
       retVal += sizes[i];
     }
     retVal += p.index;
+		return retVal;
   }
 
   int
@@ -199,11 +207,10 @@ private:
     if(el_size != 0){
       return index / el_size;
     }else{
-      int aIndx = 0;
       for(int x = 1; x < firstIndex.size(); ++x){
-	if(firstIndex[x] > index){
-	  return x - 1;
-	}
+				if(firstIndex[x] > index){
+					return x - 1;
+				}
       }
       return firstIndex.size() - 1;
     }
@@ -218,7 +225,7 @@ private:
       firstIndex.push_back(accum);
     }
   }
-
+	
 public:
   bool isOptimized(){ return optimized;}
   inline

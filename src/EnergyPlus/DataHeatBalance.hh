@@ -16,6 +16,7 @@
 #include <DataGlobals.hh>
 #include <DataSurfaces.hh>
 #include <DataVectorTypes.hh>
+#include <DataWindowEquivalentLayer.hh>
 
 // C++ stdlib
 #include <vector>
@@ -1822,14 +1823,13 @@ namespace DataHeatBalance {
 
 	};
 
-        struct GenZone{
+	struct GenZone{
 		int SurfaceFirst; // First Surface in Zone
 		int SurfaceLast; // Last Surface in Zone
-                GenZone(): //default construct
+		GenZone(): //default construct
 			SurfaceFirst( 0 ),
 			SurfaceLast( 0 )
 	  {}
-	  
 	};
 	struct ZoneData
 	{
@@ -1936,8 +1936,8 @@ namespace DataHeatBalance {
 			SystemZoneNodeNumber( 0 ),
 			IsControlled( false ),
 			TempControlledZoneIndex( 0 ),
-			SurfaceFirst( 0 ),
-			SurfaceLast( 0 ),
+			// SurfaceFirst( 0 ),
+			// SurfaceLast( 0 ),
 			InsideConvectionAlgo( ASHRAESimple ),
 			NumSurfaces( 0 ),
 			NumSubSurfaces( 0 ),
@@ -5155,7 +5155,7 @@ namespace DataHeatBalance {
 	extern FArray1D< ConstructionData > Construct;
 	extern FArray1D< SpectralDataProperties > SpectralData;
 	extern FArray1D< ZoneData > Zone;
-        extern std::vector< GenZone > ZoneSpecs;
+	extern std::vector< GenZone > ZoneSpecs;
 	extern FArray1D< ZoneListData > ZoneList;
 	extern FArray1D< ZoneGroupData > ZoneGroup;
 	extern FArray1D< PeopleData > People;

@@ -18,7 +18,7 @@
 #include <DataViewFactorInformation.hh>
 
 //Speedup Helpers
-#include <SpeedupHelpers/perTArray.hh>
+#include <perTArray.hh>
 
 namespace EnergyPlus {
 
@@ -38,10 +38,10 @@ namespace HeatBalanceIntRadExchange {
 
 	// MODULE VARIABLE DECLARATIONS:
 	extern int MaxNumOfZoneSurfaces; // Max saved to get large enough space for user input view factors
-        extern std::vector<size_t> LoadBalanceVector;
-        extern std::forward_list<EppPerformance::genPerTArray*> WriteVectors;
-  extern std::vector<std::pair<std::vector<reSurface>::iterator,
-			       std::vector<reSurface>::iterator>> threadSurfIterators;
+        extern std::vector< size_t > LoadBalanceVector;
+        extern std::forward_list< EppPerformance::genPerTArray* > WriteVectors;
+  extern std::vector<std::pair< std::vector< ReSurface >::iterator,
+			       std::vector< ReSurface >::iterator >> threadSurfIterators;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceIntRadExchange
 
@@ -56,7 +56,7 @@ namespace HeatBalanceIntRadExchange {
 	};
 
         inline 
-	std::vector<reSurface>::iterator surfBegin(int tid, int ZoneToResimulate){
+	std::vector< ReSurface >::iterator surfBegin(int tid, int ZoneToResimulate){
 	  if(tid != -1){
 	    return threadSurfIterators[tid].first;
 	  }else{
@@ -65,7 +65,7 @@ namespace HeatBalanceIntRadExchange {
 	}
 
         inline 
-	std::vector<reSurface>::iterator surfEnd(int tid, int ZoneToResimulate){
+	std::vector< ReSurface >::iterator surfEnd(int tid, int ZoneToResimulate){
 	  if(tid != -1){
 	    return threadSurfIterators[tid].second;
 	  }else{

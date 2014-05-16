@@ -34,6 +34,14 @@
 #include <WindowEquivalentLayer.hh>
 #include <Timer.h>
 
+// SpeedupHelpers
+#include <timers.hh>
+
+// Linear LU Solver
+extern "C"{
+#include <clapack.h>
+}
+
 namespace EnergyPlus {
 
 #define EP_HBIRE_SEQ
@@ -93,8 +101,8 @@ namespace HeatBalanceIntRadExchange {
 
 	std::forward_list<EppPerformance::genPerTArray*> WriteVectors;
 
-	std::vector<std::pair<std::vector<reSurface>::iterator,
-												std::vector<reSurface>::iterator>> threadSurfIterators;	// SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceIntRadExchange
+	std::vector<std::pair<std::vector< ReSurface >::iterator,
+												std::vector< ReSurface >::iterator>> threadSurfIterators;	// SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceIntRadExchange
 
 	// Functions
 
@@ -432,7 +440,7 @@ namespace HeatBalanceIntRadExchange {
 #endif    
 		//tid will be -1 when ZoneToResimulate != -1
 		for(auto s = surfBegin(tid, ZoneToResimulate); s != surfEnd(tid, ZoneToResimulate); s++){
-			reSurface& recv = (*s);
+			ReSurface& recv = (*s);
 			//if(!s.isHeatTransSurf) continue; //I think this is superfluous, as it should have been checked before adding the surface
 			ZoneViewFactorInformation& zone = ZoneInfo[ (*s).zone ];
 			if(ZoneToResimulate == -1){
@@ -849,10 +857,10 @@ namespace HeatBalanceIntRadExchange {
 					RowSum = sum( SaveApproximateViewFactors( Findex, _ ) );
 					gio::write( OutputFileInits, "(A,3(',',A),$)" )
 						<< "View Factor"
-						<< Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Name
-						<< cSurfaceClass( Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Class )
+						<< Surface( ZoneInfo[ ZoneNum - 1 ].SurfacePtr( Findex ) ).Name
+						<< cSurfaceClass( Surface( ZoneInfo[ ZoneNum - 1 ].SurfacePtr( Findex ) ).Class )
 						<< RoundSigDigits( RowSum, 4 );
-					for ( SurfNum = 1; SurfNum <= ZoneInfo( ZoneNum ).NumOfSurfaces; ++SurfNum ) {
+					for ( SurfNum = 1; SurfNum <= ZoneInfo[ ZoneNum - 1 ].NumOfSurfaces; ++SurfNum ) {
 						gio::write( OutputFileInits, "(',',A,$)" )
 							<< RoundSigDigits( SaveApproximateViewFactors( Findex, SurfNum ), 4 );
 					} gio::write( OutputFileInits );
