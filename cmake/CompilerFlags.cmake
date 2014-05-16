@@ -21,7 +21,7 @@ IF ( MSVC ) # visual c++ (VS 2013)
 
     ADD_CXX_DEFINITIONS("-wd4244 -wd4258 -wd4355 -wd4996") # Disables warning messages listed above 
     ADD_CXX_DEFINITIONS("-DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
-    ADD_CXX_DEFINITIONS("-W3")
+    ADD_CXX_DEFINITIONS("-W1")
 
     # -D_CRT_SECURE_NO_DEPRECATE hides function calls which make the library thread-unsafe
     # -D_SCL_SECURE_NO_DEPRECATE is itself deprecated and replaced by _SCL_SECURE_NO_WARNING which is made irrelevant by -wd4996 above
@@ -37,6 +37,7 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     ADD_CXX_DEFINITIONS("-std=c++11") # Enable C++11 features in g++
     ADD_CXX_DEFINITIONS("-pedantic") # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
     ADD_CXX_DEFINITIONS("-Wall -Wextra -Wno-unused-parameter") # Turn on warnings (all, extra, "???don't warn about unused parameters???")
+    ADD_CXX_DEFINITIONS("-Wno-invalid-source-encoding")
     
     # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
     ADD_CXX_DEBUG_DEFINITIONS("-fsignaling-nans") # Disable optimizations that may have concealed NaN behavior
