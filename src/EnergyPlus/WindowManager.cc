@@ -5025,30 +5025,30 @@ namespace WindowManager {
 
 		if ( SimpleGlazingSystem ) { // use alternate angular dependence model for block model of simple glazing input
 
-			TransCurveA = 1.4703E-02 * std::pow( cs, 4 ) + 1.4858 * std::pow( cs, 3 ) - 3.852 * std::pow( cs, 2 ) + 3.3549 * cs - 1.4739E-03;
-			TransCurveB = 5.5455E-01 * std::pow( cs, 4 ) + 3.563E-02 * std::pow( cs, 3 ) - 2.4157 * std::pow( cs, 2 ) + 2.8305 * cs - 2.0373E-03;
-			TransCurveC = 7.7087E-01 * std::pow( cs, 4 ) - 6.3831E-01 * std::pow( cs, 3 ) - 1.5755 * std::pow( cs, 2 ) + 2.4482 * cs - 2.042E-03;
-			TransCurveD = 3.4624E-01 * std::pow( cs, 4 ) + 3.9626E-01 * std::pow( cs, 3 ) - 2.5819 * std::pow( cs, 2 ) + 2.845 * cs - 2.8036E-04;
-			TransCurveE = 2.8825 * std::pow( cs, 4 ) - 5.8734 * std::pow( cs, 3 ) + 2.4887 * std::pow( cs, 2 ) + 1.510 * cs - 2.5766E-03;
-			TransCurveF = 3.0254 * std::pow( cs, 4 ) - 6.3664 * std::pow( cs, 3 ) + 3.1371 * std::pow( cs, 2 ) + 1.213 * cs - 1.3667E-03;
-			TransCurveG = 3.2292 * std::pow( cs, 4 ) - 6.844 * std::pow( cs, 3 ) + 3.5351 * std::pow( cs, 2 ) + 1.0881 * cs - 2.8905E-03;
-			TransCurveH = 3.3341 * std::pow( cs, 4 ) - 7.1306 * std::pow( cs, 3 ) + 3.8287 * std::pow( cs, 2 ) + 9.7663E-01 * cs - 2.9521E-03;
-			TransCurveI = 3.1464 * std::pow( cs, 4 ) - 6.8549 * std::pow( cs, 3 ) + 3.9311 * std::pow( cs, 2 ) + 7.85950E-01 * cs - 2.9344E-03;
-			TransCurveJ = 3.744 * std::pow( cs, 4 ) - 8.8364 * std::pow( cs, 3 ) + 6.0178 * std::pow( cs, 2 ) + 8.4071E-02 * cs + 4.825E-04;
+			TransCurveA = ( ( ( 1.4703E-02 * cs + 1.4858 ) * cs - 3.852 ) * cs + 3.3549 ) * cs - 1.4739E-03;
+			TransCurveB = ( ( ( 5.5455E-01 * cs + 3.563E-02 ) * cs - 2.4157 ) * cs + 2.8305 ) * cs - 2.0373E-03;
+			TransCurveC = ( ( ( 7.7087E-01 * cs - 6.3831E-01 ) * cs - 1.5755 ) * cs + 2.4482 ) * cs - 2.042E-03;
+			TransCurveD = ( ( ( 3.4624E-01 * cs + 3.9626E-01 ) * cs - 2.5819 ) * cs + 2.845 ) * cs - 2.8036E-04;
+			TransCurveE = ( ( ( 2.8825 * cs - 5.8734 ) * cs + 2.4887 ) * cs + 1.510 ) * cs - 2.5766E-03;
+			TransCurveF = ( ( ( 3.0254 * cs - 6.3664 ) * cs + 3.1371 ) * cs + 1.213 ) * cs - 1.3667E-03;
+			TransCurveG = ( ( ( 3.2292 * cs - 6.844 ) * cs + 3.5351 ) * cs + 1.0881 ) * cs - 2.8905E-03;
+			TransCurveH = ( ( ( 3.3341 * cs - 7.1306 ) * cs + 3.8287 ) * cs + 9.7663E-01 ) * cs - 2.9521E-03;
+			TransCurveI = ( ( ( 3.1464 * cs - 6.8549 ) * cs + 3.9311 ) * cs + 7.85950E-01 ) * cs - 2.9344E-03;
+			TransCurveJ = ( ( ( 3.744 * cs - 8.8364 ) * cs + 6.0178 ) * cs + 8.4071E-02 ) * cs + 4.825E-04;
 			TransCurveFGHI = ( TransCurveF + TransCurveG + TransCurveH + TransCurveI ) / 4.0;
 			TransCurveFH = ( TransCurveF + TransCurveH ) / 2.0;
 			TransCurveBDCD = ( TransCurveB + TransCurveD + TransCurveC + TransCurveD ) / 4.0;
 
-			ReflectCurveA = 1.6322E+01 * std::pow( cs, 4 ) - 5.7819E+01 * std::pow( cs, 3 ) + 7.9244E+01 * std::pow( cs, 2 ) - 5.0081E+01 * cs + 1.3335E+01;
-			ReflectCurveB = 4.0478E+01 * std::pow( cs, 4 ) - 1.1934E+02 * std::pow( cs, 3 ) + 1.3477E+02 * std::pow( cs, 2 ) - 7.0973E+01 * cs + 1.6112E+01;
-			ReflectCurveC = 5.749E+01 * std::pow( cs, 4 ) - 1.6451E+02 * std::pow( cs, 3 ) + 1.780E+02 * std::pow( cs, 2 ) - 8.8748E+01 * cs + 1.8839E+01;
-			ReflectCurveD = 5.7139 * std::pow( cs, 4 ) - 1.6666E+01 * std::pow( cs, 3 ) + 1.8627E+01 * std::pow( cs, 2 ) - 9.7561 * cs + 3.0743;
-			ReflectCurveE = -5.4884E-01 * std::pow( cs, 4 ) - 6.4976 * std::pow( cs, 3 ) + 2.11990E+01 * std::pow( cs, 2 ) - 2.0971E+01 * cs + 7.8138;
-			ReflectCurveF = 4.2902 * std::pow( cs, 4 ) - 1.2671E+01 * std::pow( cs, 3 ) + 1.4656E+01 * std::pow( cs, 2 ) - 8.1534 * cs + 2.8711;
-			ReflectCurveG = 2.174E+01 * std::pow( cs, 4 ) - 6.4436E+01 * std::pow( cs, 3 ) + 7.4893E+01 * std::pow( cs, 2 ) - 4.1792E+01 * cs + 1.0624E+01;
-			ReflectCurveH = 4.3405 * std::pow( cs, 4 ) - 1.280E+01 * std::pow( cs, 3 ) + 1.4777E+01 * std::pow( cs, 2 ) - 8.2034 * cs + 2.8793;
-			ReflectCurveI = 4.1357E+01 * std::pow( cs, 4 ) - 1.1775E+02 * std::pow( cs, 3 ) + 1.2756E+02 * std::pow( cs, 2 ) - 6.4373E+01 * cs + 1.426E+01;
-			ReflectCurveJ = 4.4901 * std::pow( cs, 4 ) - 1.2658E+01 * std::pow( cs, 3 ) + 1.3969E+01 * std::pow( cs, 2 ) - 7.501 * cs + 2.6928;
+			ReflectCurveA = ( ( ( 1.6322E+01 * cs - 5.7819E+01 ) * cs + 7.9244E+01 ) * cs - 5.0081E+01 ) * cs + 1.3335E+01;
+			ReflectCurveB = ( ( ( 4.0478E+01 * cs - 1.1934E+02 ) * cs + 1.3477E+02 ) * cs - 7.0973E+01 ) * cs + 1.6112E+01;
+			ReflectCurveC = ( ( ( 5.749E+01 * cs - 1.6451E+02 ) * cs + 1.780E+02 ) * cs - 8.8748E+01 ) * cs + 1.8839E+01;
+			ReflectCurveD = ( ( ( 5.7139 * cs - 1.6666E+01 ) * cs + 1.8627E+01 ) * cs - 9.7561 ) * cs + 3.0743;
+			ReflectCurveE = ( ( ( -5.4884E-01 * cs - 6.4976 ) * cs + 2.11990E+01 ) * cs - 2.0971E+01 ) * cs + 7.8138;
+			ReflectCurveF = ( ( ( 4.2902 * cs - 1.2671E+01 ) * cs + 1.4656E+01 ) * cs - 8.1534 ) * cs + 2.8711;
+			ReflectCurveG = ( ( ( 2.174E+01 * cs - 6.4436E+01 ) * cs + 7.4893E+01 ) * cs - 4.1792E+01 ) * cs + 1.0624E+01;
+			ReflectCurveH = ( ( ( 4.3405 * cs - 1.280E+01 ) * cs + 1.4777E+01 ) * cs - 8.2034 ) * cs + 2.8793;
+			ReflectCurveI = ( ( ( 4.1357E+01 * cs - 1.1775E+02 ) * cs + 1.2756E+02 ) * cs - 6.4373E+01 ) * cs + 1.426E+01;
+			ReflectCurveJ = ( ( ( 4.4901 * cs - 1.2658E+01 ) * cs + 1.3969E+01 ) * cs - 7.501 ) * cs + 2.6928;
 			ReflectCurveFGHI = ( ReflectCurveF + ReflectCurveG + ReflectCurveH + ReflectCurveI ) / 4.0;
 			ReflectCurveFH = ( ReflectCurveF + ReflectCurveH ) / 2.0;
 			ReflectCurveBDCD = ( ReflectCurveB + ReflectCurveD + ReflectCurveC + ReflectCurveD ) / 4.0;

@@ -7,7 +7,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
-#include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -563,7 +562,7 @@ namespace Psychrometrics {
 		//     Density of water [kg/m3]
 		//     (RANGE: KelvinConv - 423.15 DEG. K) (convert to C first)
 
-		return 1000.1207 + 8.3215874e-04 * TB - 4.929976e-03 * std::pow( TB, 2 ) + 8.4791863e-06 * std::pow( TB, 3 );
+		return ( ( 8.4791863e-06 * TB + 4.929976e-03 ) * TB + 8.3215874e-04 ) * TB + 1000.1207;
 	}
 
 	//     NOTICE

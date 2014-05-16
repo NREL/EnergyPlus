@@ -6942,16 +6942,16 @@ Label1000: ;
 
 		if ( Material( MaterNum ).SimpleWindowUfactor > 4.5 ) {
 
-			Ris = 1.0 / ( 29.436546 * std::pow( DeltaSHGCandTsol, 3.0 ) - 21.943415 * std::pow( DeltaSHGCandTsol, 2 ) + 9.945872 * DeltaSHGCandTsol + 7.426151 );
+			Ris = 1.0 / ( ( ( 29.436546 * DeltaSHGCandTsol - 21.943415 ) * DeltaSHGCandTsol + 9.945872 ) * DeltaSHGCandTsol + 7.426151 );
 			Ros = 1.0 / ( 2.225824 * DeltaSHGCandTsol + 20.577080 );
 		} else if ( Material( MaterNum ).SimpleWindowUfactor < 3.4 ) {
 
-			Ris = 1.0 / ( 199.8208128 * std::pow( DeltaSHGCandTsol, 3.0 ) - 90.639733 * std::pow( DeltaSHGCandTsol, 2 ) + 19.737055 * DeltaSHGCandTsol + 6.766575 );
+			Ris = 1.0 / ( ( ( 199.8208128 * DeltaSHGCandTsol - 90.639733 ) * DeltaSHGCandTsol + 19.737055 ) * DeltaSHGCandTsol + 6.766575 );
 			Ros = 1.0 / ( 5.763355 * DeltaSHGCandTsol + 20.541528 );
 		} else { // interpolate. 3.4 <= Ufactor <= 4.5
 			//inside first
-			RLowSide = 1.0 / ( 199.8208128 * std::pow( DeltaSHGCandTsol, 3.0 ) - 90.639733 * std::pow( DeltaSHGCandTsol, 2 ) + 19.737055 * DeltaSHGCandTsol + 6.766575 );
-			RHiSide = 1.0 / ( 29.436546 * std::pow( DeltaSHGCandTsol, 3 ) - 21.943415 * std::pow( DeltaSHGCandTsol, 2 ) + 9.945872 * DeltaSHGCandTsol + 7.426151 );
+			RLowSide = 1.0 / ( ( ( 199.8208128 * DeltaSHGCandTsol - 90.639733 ) * DeltaSHGCandTsol + 19.737055 ) * DeltaSHGCandTsol + 6.766575 );
+			RHiSide = 1.0 / ( ( ( 29.436546 * DeltaSHGCandTsol - 21.943415 ) * DeltaSHGCandTsol + 9.945872 ) * DeltaSHGCandTsol + 7.426151 );
 			Ris = ( ( Material( MaterNum ).SimpleWindowUfactor - 3.4 ) / ( 4.5 - 3.4 ) ) * ( RLowSide - RHiSide ) + RLowSide;
 			// then outside
 			RLowSide = 1.0 / ( 5.763355 * DeltaSHGCandTsol + 20.541528 );
@@ -6969,12 +6969,12 @@ Label1000: ;
 		//step 6. determine visible properties.
 		if ( Material( MaterNum ).SimpleWindowVTinputByUser ) {
 			Material( MaterNum ).TransVis = Material( MaterNum ).SimpleWindowVisTran;
-			Material( MaterNum ).ReflectVisBeamBack = -0.7409 * std::pow( Material( MaterNum ).TransVis, 3 ) + 1.6531 * std::pow( Material( MaterNum ).TransVis, 2 ) - 1.2299 * Material( MaterNum ).TransVis + 0.4545;
+			Material( MaterNum ).ReflectVisBeamBack = ( ( -0.7409 * Material( MaterNum ).TransVis + 1.6531 ) * Material( MaterNum ).TransVis - 1.2299 ) * Material( MaterNum ).TransVis + 0.4545;
 			if ( Material( MaterNum ).TransVis + Material( MaterNum ).ReflectVisBeamBack >= 1.0 ) {
 				Material( MaterNum ).ReflectVisBeamBack = 0.999 - Material( MaterNum ).TransVis;
 			}
 
-			Material( MaterNum ).ReflectVisBeamFront = -0.0622 * std::pow( Material( MaterNum ).TransVis, 3 ) + 0.4277 * std::pow( Material( MaterNum ).TransVis, 2 ) - 0.4169 * Material( MaterNum ).TransVis + 0.2399;
+			Material( MaterNum ).ReflectVisBeamFront = ( ( -0.0622 * Material( MaterNum ).TransVis + 0.4277 ) * Material( MaterNum ).TransVis - 0.4169 ) * Material( MaterNum ).TransVis + 0.2399;
 			if ( Material( MaterNum ).TransVis + Material( MaterNum ).ReflectVisBeamFront >= 1.0 ) {
 				Material( MaterNum ).ReflectVisBeamFront = 0.999 - Material( MaterNum ).TransVis;
 			}
