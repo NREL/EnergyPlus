@@ -4971,7 +4971,7 @@ namespace VariableSpeedCoils {
 		}
 
 		//  Use sucessive substitution to solve for To
-		aa = ( Gamma * Toffa ) - ( 0.25 / Twet ) * ( pow2( Gamma ) ) * ( pow2( Toffa ) );
+		aa = ( Gamma * Toffa ) - ( 0.25 / Twet ) * ( std::pow( Gamma, 2 ) ) * ( std::pow( Toffa, 2 ) );
 
 		To1 = aa + HPTimeConstant;
 		Error = 1.0;

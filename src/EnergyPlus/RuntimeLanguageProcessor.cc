@@ -2443,7 +2443,7 @@ namespace RuntimeLanguageProcessor {
 
 						if ( thisIndex <= TrendVariable( thisTrend ).LogDepth ) {
 							// closed form solution for slope of linear least squares fit
-							thisSlope = ( sum( TrendVariable( thisTrend ).TimeARR( {1,thisIndex} ) ) * sum( TrendVariable( thisTrend ).TrendValARR( {1,thisIndex} ) ) - thisIndex * sum( ( TrendVariable( thisTrend ).TimeARR( {1,thisIndex} ) * TrendVariable( thisTrend ).TrendValARR( {1,thisIndex} ) ) ) ) / ( pow2( sum( TrendVariable( thisTrend ).TimeARR( {1,thisIndex} ) ) ) - thisIndex * sum( pow( TrendVariable( thisTrend ).TimeARR( {1,thisIndex} ), 2 ) ) );
+							thisSlope = ( sum( TrendVariable( thisTrend ).TimeARR( {1,thisIndex} ) ) * sum( TrendVariable( thisTrend ).TrendValARR( {1,thisIndex} ) ) - thisIndex * sum( ( TrendVariable( thisTrend ).TimeARR( {1,thisIndex} ) * TrendVariable( thisTrend ).TrendValARR( {1,thisIndex} ) ) ) ) / ( std::pow( sum( TrendVariable( thisTrend ).TimeARR( {1,thisIndex} ) ), 2 ) - thisIndex * sum( pow( TrendVariable( thisTrend ).TimeARR( {1,thisIndex} ), 2 ) ) );
 							ReturnValue = SetErlValueNumber( thisSlope, Operand( 1 ) ); // rate of change per hour
 						} else {
 							ReturnValue.Type = ValueError;

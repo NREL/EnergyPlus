@@ -1300,7 +1300,7 @@ namespace Photovoltaics {
 				//  temperature depencence
 				IL = PVarray( PVnum ).TRNSYSPVcalc.Insolation / PVarray( PVnum ).TRNSYSPVModule.RefInsolation * ( ILRef + PVarray( PVnum ).TRNSYSPVModule.TempCoefIsc * ( CellTemp - PVarray( PVnum ).TRNSYSPVModule.RefTemperature ) );
 				AA = AARef * CellTemp / PVarray( PVnum ).TRNSYSPVModule.RefTemperature;
-				IO = IORef * pow3( ( CellTemp / PVarray( PVnum ).TRNSYSPVModule.RefTemperature ) ) * std::exp( PVarray( PVnum ).TRNSYSPVModule.SemiConductorBandgap * PVarray( PVnum ).TRNSYSPVModule.CellsInSeries / AARef * ( 1.0 - PVarray( PVnum ).TRNSYSPVModule.RefTemperature / CellTemp ) );
+				IO = IORef * std::pow( ( CellTemp / PVarray( PVnum ).TRNSYSPVModule.RefTemperature ), 3 ) * std::exp( PVarray( PVnum ).TRNSYSPVModule.SemiConductorBandgap * PVarray( PVnum ).TRNSYSPVModule.CellsInSeries / AARef * ( 1.0 - PVarray( PVnum ).TRNSYSPVModule.RefTemperature / CellTemp ) );
 
 				//  compute short curcuit current and open circuit voltage
 
@@ -2157,7 +2157,7 @@ namespace Photovoltaics {
 
 		Real64 F1; // working variable for function result
 
-		F1 = ( ( ( ( a4 * AMa + a3 ) * AMa + a2 ) * AMa + a1 ) * AMa + a0 );
+		F1 = a0 + a1 * AMa + a2 * std::pow( AMa, 2 ) + a3 * std::pow( AMa, 3 ) + a4 * std::pow( AMa, 4 );
 
 		if ( F1 > 0.0 ) {
 			SandiaF1 = F1;
@@ -2220,7 +2220,7 @@ namespace Photovoltaics {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 F2; // working variable for function result
 
-		F2 = ( ( ( ( b5 * IncAng + b4 ) * IncAng + b3 ) * IncAng + b2 ) * IncAng + b1 ) * IncAng + b0;
+		F2 = b0 + b1 * IncAng + b2 * std::pow( IncAng, 2 ) + b3 * std::pow( IncAng, 3 ) + b4 * std::pow( IncAng, 4 ) + b5 * std::pow( IncAng, 5 );
 
 		if ( F2 > 0.0 ) {
 			SandiaF2 = F2;
@@ -2281,7 +2281,7 @@ namespace Photovoltaics {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		SandiaImp = Imp0 * ( C0 * Ee + C1 * pow2( Ee ) ) * ( 1.0 + aImp * ( Tc - 25 ) );
+		SandiaImp = Imp0 * ( C0 * Ee + C1 * std::pow( Ee, 2 ) ) * ( 1.0 + aImp * ( Tc - 25 ) );
 		// why hardwire T0 at 25.0?  can this change? seems okay, fewer args
 		return SandiaImp;
 	}
@@ -2396,7 +2396,7 @@ namespace Photovoltaics {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		SandiaIx = Ix0 * ( C4 * Ee + C5 * pow2( Ee ) ) * ( 1.0 + ( ( aIsc + aImp ) / 2.0 * ( Tc - 25.0 ) ) );
+		SandiaIx = Ix0 * ( C4 * Ee + C5 * std::pow( Ee, 2 ) ) * ( 1.0 + ( ( aIsc + aImp ) / 2.0 * ( Tc - 25.0 ) ) );
 
 		return SandiaIx;
 	}
@@ -2449,7 +2449,7 @@ namespace Photovoltaics {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		SandiaIxx = Ixx0 * ( C6 * Ee + C7 * pow2( Ee ) ) * ( 1.0 + aImp * ( Tc - 25.0 ) );
+		SandiaIxx = Ixx0 * ( C6 * Ee + C7 * std::pow( Ee, 2 ) ) * ( 1.0 + aImp * ( Tc - 25.0 ) );
 
 		return SandiaIxx;
 	}
@@ -2513,7 +2513,7 @@ namespace Photovoltaics {
 
 			BVmpEe = BVmp0 + mBVmp * ( 1.0 - Ee );
 
-			SandiaVmp = Vmp0 + C2 * NcellSer * dTc * std::log( Ee ) + C3 * NcellSer * pow2( ( dTc * std::log( Ee ) ) ) + BVmpEe * ( Tc - 25.0 );
+			SandiaVmp = Vmp0 + C2 * NcellSer * dTc * std::log( Ee ) + C3 * NcellSer * std::pow( ( dTc * std::log( Ee ) ), 2 ) + BVmpEe * ( Tc - 25.0 );
 		} else {
 			SandiaVmp = 0.0;
 		}

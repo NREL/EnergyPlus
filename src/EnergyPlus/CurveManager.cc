@@ -5395,7 +5395,7 @@ Label999: ;
 		ConstantF = PressureCurve( PressureCurveIndex ).ConstantF;
 
 		//Intermediate calculations
-		CrossSectArea = ( Pi / 4.0 ) * pow2( Diameter );
+		CrossSectArea = ( Pi / 4.0 ) * std::pow( Diameter, 2 );
 		Velocity = MassFlow / ( Density * CrossSectArea );
 		ReynoldsNumber = Density * Diameter * Velocity / Viscosity; //assuming mu here
 		RoughnessRatio = Roughness / Diameter;
@@ -5418,7 +5418,7 @@ Label999: ;
 		}
 
 		//Pressure drop calculation
-		PressureCurveValue = ( FrictionFactor * ( Length / Diameter ) + MinorLossCoeff ) * ( Density * pow2( Velocity ) ) / 2.0;
+		PressureCurveValue = ( FrictionFactor * ( Length / Diameter ) + MinorLossCoeff ) * ( Density * std::pow( Velocity, 2 ) ) / 2.0;
 
 		if ( PressureCurve( PressureCurveIndex ).EMSOverrideOn ) PressureCurveValue = PressureCurve( PressureCurveIndex ).EMSOverrideCurveValue;
 
@@ -5496,7 +5496,7 @@ Label999: ;
 		Term2 = 6.9 / ReynoldsNumber;
 		Term3 = -1.8 * std::log10( Term1 + Term2 );
 		if ( Term3 != 0.0 ) {
-			CalculateMoodyFrictionFactor = std::pow( Term3, ( -2 ) );
+			CalculateMoodyFrictionFactor = std::pow( Term3, ( -2.0 ) );
 		} else {
 			if ( ! FrictionFactorErrorHasOccurred ) {
 				RR = RoundSigDigits( RoughnessRatio, 7 );

@@ -727,10 +727,10 @@ namespace PipeHeatTransfer {
 			PipeHT( Item ).OutsideArea = Pi * ( PipeHT( Item ).PipeOD + 2 * PipeHT( Item ).InsulationThickness ) * PipeHT( Item ).Length / NumSections;
 
 			// cross sectional area
-			PipeHT( Item ).SectionArea = Pi * 0.25 * pow2( PipeHT( Item ).PipeID );
+			PipeHT( Item ).SectionArea = Pi * 0.25 * std::pow( PipeHT( Item ).PipeID, 2 );
 
 			// pipe & insulation mass
-			PipeHT( Item ).PipeHeatCapacity = PipeHT( Item ).PipeCp * PipeHT( Item ).PipeDensity * ( Pi * 0.25 * pow2( PipeHT( Item ).PipeOD ) - PipeHT( Item ).SectionArea ); // the metal component
+			PipeHT( Item ).PipeHeatCapacity = PipeHT( Item ).PipeCp * PipeHT( Item ).PipeDensity * ( Pi * 0.25 * std::pow( PipeHT( Item ).PipeOD, 2 ) - PipeHT( Item ).SectionArea ); // the metal component
 		}
 
 		// final error check
@@ -1527,7 +1527,7 @@ namespace PipeHeatTransfer {
 		static Real64 Cp( 0.0 ); // Placeholder for soil specific heat
 
 		// There are a number of coefficients which change through the simulation, and they are updated here
-		PipeHT( PipeHTNum ).FourierDS = PipeHT( PipeHTNum ).SoilDiffusivity * DeltaTime / ( pow2( PipeHT( PipeHTNum ).dSregular ) ); //Eq. D4
+		PipeHT( PipeHTNum ).FourierDS = PipeHT( PipeHTNum ).SoilDiffusivity * DeltaTime / ( std::pow( PipeHT( PipeHTNum ).dSregular, 2 ) ); //Eq. D4
 		PipeHT( PipeHTNum ).CoefA1 = PipeHT( PipeHTNum ).FourierDS / ( 1 + 4 * PipeHT( PipeHTNum ).FourierDS ); //Eq. D2
 		PipeHT( PipeHTNum ).CoefA2 = 1 / ( 1 + 4 * PipeHT( PipeHTNum ).FourierDS ); //Eq. D3
 
@@ -1570,7 +1570,7 @@ namespace PipeHeatTransfer {
 
 							// thermal radiation coefficient using surf temp from past time step
 							if ( std::abs( PastNodeTempAbs - SkyTempAbs ) > rTinyValue ) {
-								RadCoef = StefBoltzmann * TopThermAbs * ( ( pow4( PastNodeTempAbs ) ) - ( pow4( SkyTempAbs ) ) ) / ( PastNodeTempAbs - SkyTempAbs );
+								RadCoef = StefBoltzmann * TopThermAbs * ( ( std::pow( PastNodeTempAbs, 4 ) ) - ( std::pow( SkyTempAbs, 4 ) ) ) / ( PastNodeTempAbs - SkyTempAbs );
 							} else {
 								RadCoef = 0.0;
 							}

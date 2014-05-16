@@ -8,7 +8,6 @@
 #include <DataGlobals.hh>
 #include <TARCOGCommon.hh>
 #include <TARCOGParams.hh>
-#include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -92,7 +91,7 @@ namespace TARCOGDeflection {
 		i = 0;
 		// first calculate D coefficients since that will be necessary for any of selected standards
 		for ( i = 1; i <= nlayer; ++i ) {
-			DCoeff( i ) = YoungsMod( i ) * pow3( PaneThickness( i ) ) / ( 12 * ( 1 - pow2( PoissonsRat( i ) ) ) );
+			DCoeff( i ) = YoungsMod( i ) * std::pow( PaneThickness( i ), 3.0 ) / ( 12 * ( 1 - std::pow( PoissonsRat( i ), 2.0 ) ) );
 		}
 
 		{ auto const SELECT_CASE_var( DeflectionStandard );
@@ -195,7 +194,7 @@ namespace TARCOGDeflection {
 		} //do i = 1, nlayer
 
 		for ( i = 1; i <= nlayer; ++i ) {
-			LayerDeflection( i ) += DeflectionRelaxation * MaxLDSum * 16 * DPressure( i ) / ( pow6( Pi ) * DCoeff( i ) );
+			LayerDeflection( i ) += DeflectionRelaxation * MaxLDSum * 16 * DPressure( i ) / ( std::pow( Pi, 6 ) * DCoeff( i ) );
 		}
 
 		for ( i = 1; i <= nlayer - 1; ++i ) {

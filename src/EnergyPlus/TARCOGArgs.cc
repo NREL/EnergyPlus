@@ -11,7 +11,6 @@
 #include <TARCOGGassesParams.hh>
 #include <TARCOGOutput.hh>
 #include <TARCOGParams.hh>
-#include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -549,12 +548,12 @@ namespace TARCOGArgs {
 			Gout = outir;
 			trmout = std::pow( ( Gout / StefanBoltzmann ), ( 0.25 ) );
 		} else if ( SELECT_CASE_var == 2 ) { // effective clear sky emittance from swinbank (SPC142/ISO15099 equations 131, 132, ...)
-			Rsky = 5.31e-13 * pow6( tout );
-			esky = Rsky / ( StefanBoltzmann * pow4( tout ) ); // check esky const, also check what esky to use when tsky input...
+			Rsky = 5.31e-13 * std::pow( tout, 6 );
+			esky = Rsky / ( StefanBoltzmann * std::pow( tout, 4 ) ); // check esky const, also check what esky to use when tsky input...
 		} else if ( SELECT_CASE_var == 1 ) {
-			esky = pow4( tsky ) / pow4( tout );
+			esky = std::pow( tsky, 4 ) / std::pow( tout, 4 );
 		} else if ( SELECT_CASE_var == 0 ) { // for isky=0 it is assumed that actual values for esky and Tsky are specified
-			esky *= pow4( tsky ) / pow4( tout );
+			esky *= std::pow( tsky, 4 ) / std::pow( tout, 4 );
 		} else {
 			nperr = 1; // error 2010: isky can be: 0(esky,Tsky input), 1(Tsky input), or 2(Swinbank model)
 			return;
@@ -575,7 +574,7 @@ namespace TARCOGArgs {
 				trmout = tout * std::pow( e0, 0.25 );
 			}
 
-			Gout = StefanBoltzmann * pow4( trmout );
+			Gout = StefanBoltzmann * std::pow( trmout, 4 );
 		} //if (isky.ne.3) then
 
 		ebsky = Gout;
@@ -593,7 +592,7 @@ namespace TARCOGArgs {
 			trmin = tind;
 		}
 
-		Gin = StefanBoltzmann * pow4( trmin );
+		Gin = StefanBoltzmann * std::pow( trmin, 4.0 );
 		ebroom = Gin;
 
 		// calculate ir reflectance:

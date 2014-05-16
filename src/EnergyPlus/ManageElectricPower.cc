@@ -3175,8 +3175,8 @@ namespace ManageElectricPower {
 			ElecStorage( ElecStorNum ).FractionSOC = TotalSOC / qmax;
 			ElecStorage( ElecStorNum ).BatteryCurrent = I0 * Numpar;
 			ElecStorage( ElecStorNum ).BatteryVoltage = Volt * Numser;
-			ElecStorage( ElecStorNum ).ThermLossRate = InternalR * pow2( I0 ) * Numbattery;
-			ElecStorage( ElecStorNum ).ThermLossEnergy = InternalR * pow2( I0 ) * TimeStepSys * SecInHour * Numbattery;
+			ElecStorage( ElecStorNum ).ThermLossRate = InternalR * std::pow( I0, 2 ) * Numbattery;
+			ElecStorage( ElecStorNum ).ThermLossEnergy = InternalR * std::pow( I0, 2 ) * TimeStepSys * SecInHour * Numbattery;
 
 			if ( ElecStorage( ElecStorNum ).ZoneNum > 0 ) { // set values for zone heat gains
 				ElecStorage( ElecStorNum ).QdotConvZone = ( ( 1.0 - ElecStorage( ElecStorNum ).ZoneRadFract ) * ElecStorage( ElecStorNum ).ThermLossRate ) * Numbattery;
@@ -3329,10 +3329,10 @@ namespace ManageElectricPower {
 
 					Capacity = Transformer( TransfNum ).RatedCapacity;
 					Numerator = Capacity * Transformer( TransfNum ).RatedPUL * ( 1.0 - Transformer( TransfNum ).RatedEfficiency );
-					Denominator = Transformer( TransfNum ).RatedEfficiency * ( 1.0 + pow2( ( Transformer( TransfNum ).RatedPUL / Transformer( TransfNum ).MaxPUL ) ) );
+					Denominator = Transformer( TransfNum ).RatedEfficiency * ( 1.0 + std::pow( ( Transformer( TransfNum ).RatedPUL / Transformer( TransfNum ).MaxPUL ), 2 ) );
 
 					Transformer( TransfNum ).RatedNL = Numerator / Denominator;
-					Transformer( TransfNum ).RatedLL = Transformer( TransfNum ).RatedNL / ( FactorTempCorr * pow2( ( Transformer( TransfNum ).MaxPUL ) ) );
+					Transformer( TransfNum ).RatedLL = Transformer( TransfNum ).RatedNL / ( FactorTempCorr * std::pow( ( Transformer( TransfNum ).MaxPUL ), 2 ) );
 
 				}
 			}
@@ -3419,7 +3419,7 @@ namespace ManageElectricPower {
 				ResRatio = ResSpecified / ResRef;
 				FactorTempCorr = ( 1.0 - Transformer( TransfNum ).EddyFrac ) * ResRatio + Transformer( TransfNum ).EddyFrac * ( 1.0 / ResRatio );
 
-				Transformer( TransfNum ).LoadLossRate = Transformer( TransfNum ).RatedLL * ( pow2( PUL ) ) * FactorTempCorr;
+				Transformer( TransfNum ).LoadLossRate = Transformer( TransfNum ).RatedLL * ( std::pow( PUL, 2 ) ) * FactorTempCorr;
 				Transformer( TransfNum ).NoLoadLossRate = Transformer( TransfNum ).RatedNL;
 			} else { //Transformer is not available.
 				Transformer( TransfNum ).LoadLossRate = 0.0;
