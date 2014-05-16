@@ -36,7 +36,7 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     # COMPILER FLAGS
     ADD_CXX_DEFINITIONS("-std=c++11") # Enable C++11 features in g++
     ADD_CXX_DEFINITIONS("-pedantic") # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
-    ADD_CXX_DEFINITIONS("-Wall -Wextra -Wno-unused-parameter") # Turn on warnings (all, extra, "???don't warn about unused parameters???")
+    # ADD_CXX_DEFINITIONS("-Wall -Wextra -Wno-unused-parameter") # Turn on warnings (all, extra, "???don't warn about unused parameters???")
     ADD_CXX_DEFINITIONS("-Wno-invalid-source-encoding")
     
     # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
