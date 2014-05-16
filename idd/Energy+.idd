@@ -19658,29 +19658,41 @@ ZoneBaseboard:OutdoorTemperatureControlled,
        \type real
        \units W
        \minimum> 0
+       \autosizable
+       \default autosize
   N2 , \field Low Temperature
        \required-field
        \units C
        \type real
+       \autosizable
+       \default autosize	
   N3 , \field Capacity at High Temperature
        \required-field
        \type real
        \units W
        \minimum 0
+       \autosizable
+       \default autosize
   N4 , \field High Temperature
        \required-field
        \units C
        \type real
+       \autosizable
+       \default autosize
   N5 , \field Fraction Radiant
        \required-field
        \type real
        \minimum 0.0
        \maximum 1.0
        \default 0
-  A4 ; \field End-Use Subcategory
+  A4 , \field End-Use Subcategory
        \type alpha
        \retaincase
        \default General
+  N6 ; \field Design Zone Heating Setpoint 
+       \type real
+       \units C
+       \default 20.0
 
 ZoneContaminantSourceAndSink:CarbonDioxide,
    \memo Represents internal CO2 gains and sinks in the zone.
