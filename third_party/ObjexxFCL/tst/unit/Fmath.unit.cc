@@ -161,8 +161,8 @@ TEST( FmathTest, Square )
 TEST( FmathTest, Cube )
 {
 	EXPECT_EQ( -11*11*11, cube( -11 ) );
-	EXPECT_EQ( 11*11*11, cube( 11u ) );
-	EXPECT_EQ( -11L*11L*11L, cube( -11L ) );
+	EXPECT_EQ( 11u*11u*11u, cube( 11u ) );
+	EXPECT_EQ( -11l*11l*11l, cube( -11l ) );
 	EXPECT_EQ( 11ul*11ul*11ul, cube( 11ul ) );
 	EXPECT_EQ( -11.0f * 11.0f * 11.0f, cube( -11.0f ) );
 	EXPECT_EQ( -11.0f * 11.0 * 11.0, cube( -11.0 ) );
@@ -213,12 +213,12 @@ TEST( FmathTest, Nearest )
 	EXPECT_EQ( -3, nearest< int >( -3.4999 ) );
 	EXPECT_EQ( -3.4999, nearest< double >( -3.4999 ) );
 
-	EXPECT_EQ( 3, nearest_size( 3.123 ) );
-	EXPECT_EQ( 3, nearest_size( 3.4999 ) );
-	EXPECT_EQ( 4, nearest_size( 3.5 ) );
-	EXPECT_EQ( 0, nearest_size( -3.123 ) );
-	EXPECT_EQ( 0, nearest_size( -3.4999 ) );
-	EXPECT_EQ( 0, nearest_size( -3.5 ) );
+	EXPECT_EQ( 3u, nearest_size( 3.123 ) );
+	EXPECT_EQ( 3u, nearest_size( 3.4999 ) );
+	EXPECT_EQ( 4u, nearest_size( 3.5 ) );
+	EXPECT_EQ( 0u, nearest_size( -3.123 ) );
+	EXPECT_EQ( 0u, nearest_size( -3.4999 ) );
+	EXPECT_EQ( 0u, nearest_size( -3.5 ) );
 
 	EXPECT_EQ( 3, nearest_ssize( 3.123 ) );
 	EXPECT_EQ( 3, nearest_ssize( 3.4999 ) );

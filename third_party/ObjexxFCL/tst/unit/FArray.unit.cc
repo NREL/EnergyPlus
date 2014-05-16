@@ -229,8 +229,8 @@ TEST( FArrayTest, Transpose )
 	A( 2, 2 ) = 2;
 	A( 2, 3 ) = 8;
 	FArray2D_int B( transpose( A ) );
-	EXPECT_EQ( 3, B.size1() );
-	EXPECT_EQ( 2, B.size2() );
+	EXPECT_EQ( 3u, B.size1() );
+	EXPECT_EQ( 2u, B.size2() );
 	EXPECT_EQ( A( 1, 1 ), B( 1, 1 ) );
 	EXPECT_EQ( A( 1, 2 ), B( 2, 1 ) );
 	EXPECT_EQ( A( 1, 3 ), B( 3, 1 ) );
@@ -254,9 +254,9 @@ TEST( FArrayTest, Redimension3DFill )
 	EXPECT_EQ( DRange( 1, 5 ), A.I1() );
 	EXPECT_EQ( DRange( 1, 5 ), A.I2() );
 	EXPECT_EQ( DRange( 1, 5 ), A.I3() );
-	EXPECT_EQ( 5U, A.size1() );
-	EXPECT_EQ( 5U, A.size2() );
-	EXPECT_EQ( 5U, A.size3() );
+	EXPECT_EQ( 5u, A.size1() );
+	EXPECT_EQ( 5u, A.size2() );
+	EXPECT_EQ( 5u, A.size3() );
 	EXPECT_EQ( 5u * 5u * 5u, A.size() );
 	for ( int i3 = A.l3(); i3 <= A.u3(); ++i3 ) {
 		for ( int i2 = A.l2(); i2 <= A.u2(); ++i2 ) {
@@ -278,10 +278,10 @@ TEST( FArrayTest, Swap3D )
 	EXPECT_EQ( DRange( 1, 5 ), A.I1() );
 	EXPECT_EQ( DRange( 1, 5 ), A.I2() );
 	EXPECT_EQ( DRange( 1, 5 ), A.I3() );
-	EXPECT_EQ( 5U, A.size1() );
-	EXPECT_EQ( 5U, A.size2() );
-	EXPECT_EQ( 5U, A.size3() );
-	EXPECT_EQ( 5U * 5U * 5U, A.size() );
+	EXPECT_EQ( 5u, A.size1() );
+	EXPECT_EQ( 5u, A.size2() );
+	EXPECT_EQ( 5u, A.size3() );
+	EXPECT_EQ( 5u * 5u * 5u, A.size() );
 	for ( std::size_t i = 0; i < A.size(); ++i ) {
 		EXPECT_EQ( 55, A[ i ] );
 	}

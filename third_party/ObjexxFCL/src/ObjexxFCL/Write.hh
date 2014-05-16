@@ -21,10 +21,11 @@
 #include <ObjexxFCL/gio_Fmt.hh>
 #include <ObjexxFCL/IOFlags.hh>
 #include <ObjexxFCL/MArray.all.hh>
+#include <ObjexxFCL/stream.functions.hh>
 
 // C++ Headers
 #include <complex>
-#include <ostream>
+#include <fstream>
 #include <sstream>
 #include <string>
 #include <type_traits>
@@ -50,6 +51,7 @@ public: // Creation
 	virtual
 	~WriteBase()
 	{}
+
 private: // Creation
 
 	// Copy Constructor
@@ -103,6 +105,14 @@ protected: // Properties
 	IOFlags &
 	flags() = 0;
 
+	// Line Terminator
+	inline
+	std::string const &
+	ter() const
+	{
+		return flags().ter();
+	}
+
 	// Reversion Count Before Last next()
 	inline
 	Format::Size
@@ -122,13 +132,14 @@ public: // Operators
 		if ( stream() && format() ) {
 			reverts_ = format()->reverts();
 			Format * active( format()->current() );
-			while ( stream() && active && active->no_arg() && ( format()->reverts() == reverts_ ) && active->output( stream(), pos() ) ) { // Outputs up to arg-based format
+			std::string const & ter_( ter() );
+			while ( stream() && active && active->no_arg() && ( format()->reverts() == reverts_ ) && active->output_no_arg( stream(), pos(), ter_ ) ) { // Outputs up to arg-based format
 				active = active->next();
 			}
-			if ( stream() && active && active->uses_arg() && active->output( stream(), pos(), t ) ) { // Output arg using active format
+			if ( stream() && active && active->uses_arg() && active->output_val( stream(), pos(), t ) ) { // Output arg using active format
 				reverts_ = format()->reverts();
 				active = active->next();
-				while ( stream() && active && active->no_arg() && ( format()->reverts() == reverts_ ) && format()->not_colon_terminated() && active->output( stream(), pos() ) ) { // Outputs up to next arg-based format if not : terminated
+				while ( stream() && active && active->no_arg() && ( format()->reverts() == reverts_ ) && format()->not_colon_terminated() && active->output_no_arg( stream(), pos(), ter_ ) ) { // Outputs up to next arg-based format if not : terminated
 					active = active->next();
 				}
 			}
@@ -503,13 +514,14 @@ public: // Creation
 		if ( format_ ) {
 			if ( stream_ ) {
 				Format * active( format_->current() );
-				while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts() ) && active->output( stream_, pos_ ) ) { // Outputs up to arg-based format
+				std::string const & ter_( flags_.ter() );
+				while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts() ) && active->output_no_arg( stream_, pos_, ter_ ) ) { // Outputs up to arg-based format
 					active = active->next();
 				}
 				if ( format_->non_advancing() ) { // Non-advancing
 					format_->output_pos( stream_, pos_ ); // Move to virtual position
 				} else { // Advancing
-					stream_ << '\n'; // Add newline
+					stream_ << ter_; // Add line terminator
 				}
 				flags_.set_status( stream_ );
 			}
@@ -629,7 +641,7 @@ public: // Creation
 		if ( format_ ) {
 			if ( stream_ ) {
 				Format * active( format_->current() );
-				while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts() ) && active->output( stream_, pos_ ) ) { // Outputs up to arg-based format
+				while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts() ) && active->output_no_arg( stream_, pos_ ) ) { // Outputs up to arg-based format
 					active = active->next();
 				}
 				format_->output_pos( stream_, pos_ ); // Move to virtual position
@@ -751,7 +763,7 @@ public: // Creation
 		if ( format_ ) {
 			if ( stream_ ) {
 				Format * active( format_->current() );
-				while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts() ) && active->output( stream_, pos_ ) ) { // Outputs up to arg-based format
+				while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts() ) && active->output_no_arg( stream_, pos_ ) ) { // Outputs up to arg-based format
 					active = active->next();
 				}
 				format_->output_pos( stream_, pos_ ); // Move to virtual position
@@ -866,30 +878,180 @@ public: // Creation
 		write_( nullptr )
 	{}
 
+	// File Stream + Format Constructor
+	inline
+	Write( std::fstream & stream, std::string const & fmt ) :
+		flags_( IOFlags::handler() ),
+		write_( new WriteStream( stream, fmt, flags_ ) )
+	{}
+
+	// File Stream + Format Constructor
+	inline
+	Write( std::fstream & stream, gio::Fmt const & fmt ) :
+		flags_( IOFlags::handler() ),
+		write_( new WriteStream( stream, fmt, flags_ ) )
+	{}
+
+	// Output File Stream + Format Constructor
+	inline
+	Write( std::ofstream & stream, std::string const & fmt ) :
+		flags_( IOFlags::handler() ),
+		write_( new WriteStream( stream, fmt, flags_ ) )
+	{}
+
+	// Output File Stream + Format Constructor
+	inline
+	Write( std::ofstream & stream, gio::Fmt const & fmt ) :
+		flags_( IOFlags::handler() ),
+		write_( new WriteStream( stream, fmt, flags_ ) )
+	{}
+
+	// String Stream + Format Constructor
+	inline
+	Write( std::stringstream & stream, std::string const & fmt ) :
+		flags_( IOFlags::handler( LF ) ),
+		write_( new WriteStream( stream, fmt, flags_ ) )
+	{}
+
+	// String Stream + Format Constructor
+	inline
+	Write( std::stringstream & stream, gio::Fmt const & fmt ) :
+		flags_( IOFlags::handler( LF ) ),
+		write_( new WriteStream( stream, fmt, flags_ ) )
+	{}
+
+	// String Stream + Format Constructor
+	inline
+	Write( std::ostringstream & stream, std::string const & fmt ) :
+		flags_( IOFlags::handler( LF ) ),
+		write_( new WriteStream( stream, fmt, flags_ ) )
+	{}
+
+	// String Stream + Format Constructor
+	inline
+	Write( std::ostringstream & stream, gio::Fmt const & fmt ) :
+		flags_( IOFlags::handler( LF ) ),
+		write_( new WriteStream( stream, fmt, flags_ ) )
+	{}
+
 	// Stream + Format Constructor
 	inline
 	Write( std::ostream & stream, std::string const & fmt ) :
 		flags_( IOFlags::handler() ),
 		write_( new WriteStream( stream, fmt, flags_ ) )
-	{}
+	{
+		if ( ! is_fstream( stream ) ) flags_.ter_lf();
+	}
 
 	// Stream + Format Constructor
 	inline
 	Write( std::ostream & stream, gio::Fmt const & fmt ) :
 		flags_( IOFlags::handler() ),
 		write_( new WriteStream( stream, fmt, flags_ ) )
+	{
+		if ( ! is_fstream( stream ) ) flags_.ter_lf();
+	}
+
+	// File Stream + Format + Flags Constructor
+	inline
+	Write( std::fstream & stream, std::string const & fmt, IOFlags & flags ) :
+		write_( new WriteStream( stream, fmt, flags ) )
 	{}
+
+	// File Stream + Format + Flags Constructor
+	inline
+	Write( std::fstream & stream, gio::Fmt const & fmt, IOFlags & flags ) :
+		write_( new WriteStream( stream, fmt, flags ) )
+	{}
+
+	// Output File Stream + Format + Flags Constructor
+	inline
+	Write( std::ofstream & stream, std::string const & fmt, IOFlags & flags ) :
+		write_( new WriteStream( stream, fmt, flags ) )
+	{}
+
+	// Output File Stream + Format + Flags Constructor
+	inline
+	Write( std::ofstream & stream, gio::Fmt const & fmt, IOFlags & flags ) :
+		write_( new WriteStream( stream, fmt, flags ) )
+	{}
+
+	// String Stream + Format + Flags Constructor
+	inline
+	Write( std::stringstream & stream, std::string const & fmt, IOFlags & flags ) :
+		write_( new WriteStream( stream, fmt, flags ) )
+	{
+		flags.ter_lf();
+	}
+
+	// String Stream + Format + Flags Constructor
+	inline
+	Write( std::stringstream & stream, gio::Fmt const & fmt, IOFlags & flags ) :
+		write_( new WriteStream( stream, fmt, flags ) )
+	{
+		flags.ter_lf();
+	}
+
+	// Output String Stream + Format + Flags Constructor
+	inline
+	Write( std::ostringstream & stream, std::string const & fmt, IOFlags & flags ) :
+		write_( new WriteStream( stream, fmt, flags ) )
+	{
+		flags.ter_lf();
+	}
+
+	// Output String Stream + Format + Flags Constructor
+	inline
+	Write( std::ostringstream & stream, gio::Fmt const & fmt, IOFlags & flags ) :
+		write_( new WriteStream( stream, fmt, flags ) )
+	{
+		flags.ter_lf();
+	}
 
 	// Stream + Format + Flags Constructor
 	inline
 	Write( std::ostream & stream, std::string const & fmt, IOFlags & flags ) :
 		write_( new WriteStream( stream, fmt, flags ) )
-	{}
+	{
+		if ( ! is_fstream( stream ) ) flags.ter_lf();
+	}
 
 	// Stream + Format + Flags Constructor
 	inline
 	Write( std::ostream & stream, gio::Fmt const & fmt, IOFlags & flags ) :
 		write_( new WriteStream( stream, fmt, flags ) )
+	{
+		if ( ! is_fstream( stream ) ) flags.ter_lf();
+	}
+
+	// Stream + Format + Flags Constructor
+	inline
+	Write( std::ostream & stream, std::string const & fmt, IOFlags & flags, std::string const & ter ) :
+		write_( new WriteStream( stream, fmt, flags ) )
+	{
+		flags.ter( ter );
+	}
+
+	// Stream + Format + Flags Constructor
+	inline
+	Write( std::ostream & stream, gio::Fmt const & fmt, IOFlags & flags, std::string const & ter ) :
+		write_( new WriteStream( stream, fmt, flags ) )
+	{
+		flags.ter( ter );
+	}
+
+	// Stream + Format + Terminator Constructor
+	inline
+	Write( std::ostream & stream, std::string const & fmt, std::string const & ter ) :
+		flags_( IOFlags::handler( ter ) ),
+		write_( new WriteStream( stream, fmt, flags_ ) )
+	{}
+
+	// Stream + Format + Terminator Constructor
+	inline
+	Write( std::ostream & stream, gio::Fmt const & fmt, std::string const & ter ) :
+		flags_( IOFlags::handler( ter ) ),
+		write_( new WriteStream( stream, fmt, flags_ ) )
 	{}
 
 	// String + Format Constructor
@@ -996,6 +1158,10 @@ private: // Data
 
 	IOFlags flags_; // Internal i/o flags
 	WriteBase * write_; // Implementation object
+
+public: // Static Data
+
+	static std::string const LF;
 
 }; // Write
 

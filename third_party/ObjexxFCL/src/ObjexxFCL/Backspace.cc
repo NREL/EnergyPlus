@@ -40,8 +40,7 @@ Backspace( std::istream & stream )
 	while ( g1 > g0 ) {
 		stream.seekg( --g1, std::ios::beg ); // Backup by 1
 		if ( stream.peek() == '\n' ) { // Found end of previous record
-			++g1;
-			stream.seekg( g1, std::ios::beg ); // Backup by 1
+			stream.seekg( ++g1, std::ios::beg );
 			break;
 		}
 	}

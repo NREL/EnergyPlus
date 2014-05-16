@@ -57,7 +57,7 @@ TEST( FArraySTest, FArray1SEmptySlice )
 	EXPECT_EQ( 0u, s.size() );
 	EXPECT_EQ( 1, s.l() );
 	EXPECT_EQ( 0, s.u() );
-	EXPECT_EQ( 0, s.size() );
+	EXPECT_EQ( 0u, s.size() );
 }
 
 TEST( FArraySTest, FArray1SEmptySliceOfEmptyArray )
@@ -67,7 +67,7 @@ TEST( FArraySTest, FArray1SEmptySliceOfEmptyArray )
 	EXPECT_EQ( 0u, s.size() );
 	EXPECT_EQ( 1, s.l() );
 	EXPECT_EQ( 0, s.u() );
-	EXPECT_EQ( 0, s.size() );
+	EXPECT_EQ( 0u, s.size() );
 }
 
 TEST( FArraySTest, FArray1SSliceOfUnboundedArray )

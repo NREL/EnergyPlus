@@ -65,6 +65,16 @@ TEST( ReadTest, ReadStringFromMultilineStream )
 	EXPECT_EQ( "XYZ", s );
 }
 
+TEST( ReadTest, ReadStringFromMultilineCRLFStream )
+{
+	std::istringstream stream( "ABC\r\nXYZ" );
+	std::string s;
+	Read( stream, "*" ) >> s;
+	EXPECT_EQ( "ABC", s );
+	Read( stream, "*" ) >> s;
+	EXPECT_EQ( "XYZ", s );
+}
+
 TEST( ReadTest, ReadFloatFromStream )
 {
 	std::istringstream stream( "1.125" );

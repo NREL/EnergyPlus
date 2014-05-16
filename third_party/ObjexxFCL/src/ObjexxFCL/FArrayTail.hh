@@ -62,17 +62,17 @@ public: // Creation
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	{}
 
-	// Copy from Non-Const Constructor
+#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
+	// Non-Const Copy Constructor
 	inline
 	FArrayTail( FArrayTail & s ) :
 		data_( s.data_ ),
-		size_( s.size_ )
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		, const_proxy_( false )
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
+		size_( s.size_ ),
+		const_proxy_( false )
 	{}
+#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
-	// Const Pointer + Size Constructor
+	// Pointer + Size Constructor
 	inline
 	FArrayTail( T const * array, size_type const size ) :
 		data_( const_cast< T * >( array ) ),
@@ -82,15 +82,15 @@ public: // Creation
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	{}
 
-	// Pointer + Size Constructor
+#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
+	// Non-Const Pointer + Size Constructor
 	inline
 	FArrayTail( T * array, size_type const size ) :
 		data_( array ),
-		size_( size )
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		, const_proxy_( false )
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
+		size_( size ),
+		const_proxy_( false )
 	{}
+#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
 	// Destructor
 	inline

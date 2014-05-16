@@ -27,7 +27,7 @@
 #include <string>
 #include <sys/types.h>
 #include <sys/stat.h>
-#ifdef WIN32
+#ifdef _WIN32
 #define stat _stat
 #endif
 
@@ -48,11 +48,10 @@ protected: // Creation
 	// Name Constructor
 	inline
 	explicit
-	Stream( Name name = Name(), bool const binary = false ) :
+	Stream( Name name = Name() ) :
 		name_( stripped_whitespace( name ) )
 	{
 		flags_.name( name_ );
-		flags_.binary( binary );
 	}
 
 	// Name + Flags Constructor
@@ -82,12 +81,28 @@ public: // Properties
 		return name_;
 	}
 
+	// Flags
+	inline
+	IOFlags const &
+	flags() const
+	{
+		return flags_;
+	}
+
 	// Old?
 	inline
 	bool
 	old() const
 	{
 		return flags_.old();
+	}
+
+	// Scratch?
+	inline
+	bool
+	scratch() const
+	{
+		return flags_.scratch();
 	}
 
 	// Binary?
@@ -112,6 +127,14 @@ public: // Properties
 	asis() const
 	{
 		return flags_.asis();
+	}
+
+	// Delete?
+	inline
+	bool
+	del() const
+	{
+		return flags_.del();
 	}
 
 	// Stream
@@ -163,6 +186,14 @@ public: // Properties
 	virtual
 	Pos
 	pos() const = 0;
+
+	// Terminator
+	inline
+	std::string const &
+	ter() const
+	{
+		return flags_.ter();
+	}
 
 	// AsIs Compatible?
 	inline
@@ -251,14 +282,23 @@ public: // Methods
 		return flags_.asis_update( flags );
 	}
 
+public: // Static Methods
+
+	// Scratch File Name
+	static
+	std::string
+	scratch_name();
+
 protected: // Properties
 
-	// Flags
+	// Name Set
 	inline
-	IOFlags const &
-	flags() const
+	Stream &
+	name( Name const & name )
 	{
-		return flags_;
+		name_ = name;
+		flags_.name( name );
+		return *this;
 	}
 
 	// Flags
@@ -431,7 +471,9 @@ public: // Creation
 	OStream( std::ostream & stream, Name const & name = Name() ) :
 		Stream( name ),
 		stream_( stream )
-	{}
+	{
+		flags().ter_lf();
+	}
 
 	// Destructor
 	inline
@@ -574,7 +616,9 @@ public: // Creation
 	IOStream( std::iostream & stream, Name const & name = Name() ) :
 		Stream( name ),
 		stream_( stream )
-	{}
+	{
+		flags().ter_lf();
+	}
 
 	// Destructor
 	inline
@@ -852,7 +896,9 @@ public: // Creation
 	explicit
 	OStringStream( std::string const & s = std::string() ) :
 		stream_( s )
-	{}
+	{
+		flags().ter_lf();
+	}
 
 	// Destructor
 	inline
@@ -987,7 +1033,9 @@ public: // Creation
 	explicit
 	StringStream( Name const & name = Name() ) :
 		Stream( name )
-	{}
+	{
+		flags().ter_lf();
+	}
 
 	// Destructor
 	inline
@@ -1121,8 +1169,8 @@ public: // Creation
 	// Name Constructor
 	inline
 	explicit
-	IFileStream( Name const & name, bool const binary = false ) :
-		Stream( name, binary )
+	IFileStream( Name const & name ) :
+		Stream( name )
 	{
 		assert( ! name.empty() );
 		if ( ! name.empty() ) stream_.open( name, mode() );
@@ -1134,6 +1182,7 @@ public: // Creation
 		Stream( name, flags )
 	{
 		assert( ! name.empty() );
+		assert( ! flags.scratch() );
 		if ( ! name.empty() ) stream_.open( name, mode() );
 	}
 
@@ -1231,12 +1280,7 @@ public: // Properties
 	std::ios_base::openmode
 	mode() const
 	{
-		std::ios_base::openmode m( std::ios_base::in );
-#ifdef OBJEXXFCL_BINARY_STREAM_OPTIONAL
-		if ( binary() ) m |= std::ios_base::binary;
-#else
-		m |= std::ios_base::binary; // Force binary for reliable format positioning: Requires input files to have *nix \n line terminators
-#endif
+		std::ios_base::openmode m( std::ios_base::in | std::ios_base::binary ); // Binary mode for reliable format positioning and line terminator control
 		if ( append() ) m |= std::ios_base::app;
 		return m;
 	}
@@ -1281,7 +1325,7 @@ public: // Methods
 	open()
 	{
 		if ( stream_.is_open() ) close();
-		stream_.open( name(), mode() );
+		if ( ! name().empty() ) stream_.open( name(), mode() );
 		return !!stream_;
 	}
 
@@ -1301,7 +1345,8 @@ public: // Methods
 	close()
 	{
 		if ( stream_.is_open() ) stream_.close();
-		if ( ! name().empty() && ( flags().del() || flags().scratch() ) ) std::remove( name().c_str() );
+		stream_.clear();
+		if ( ! name().empty() && del() ) std::remove( name().c_str() );
 	}
 
 private: // Data
@@ -1319,11 +1364,11 @@ public: // Creation
 	// Name Constructor
 	inline
 	explicit
-	OFileStream( Name const & name, bool const binary = false ) :
-		Stream( name, binary )
+	OFileStream( Name const & name ) :
+		Stream( name )
 	{
 		assert( ! name.empty() );
-		if ( ! name.empty() ) stream_.open( name, mode() );
+		open_file();
 	}
 
 	// Name + Flags Constructor
@@ -1332,7 +1377,7 @@ public: // Creation
 		Stream( name, flags )
 	{
 		assert( ! name.empty() );
-		if ( ! name.empty() ) stream_.open( name, mode() );
+		open_file();
 	}
 
 	// Destructor
@@ -1429,13 +1474,12 @@ public: // Properties
 	std::ios_base::openmode
 	mode() const
 	{
-		std::ios_base::openmode m( std::ios_base::out );
-#ifdef OBJEXXFCL_BINARY_STREAM_OPTIONAL
-		if ( binary() ) m |= std::ios_base::binary;
-#else
-		m |= std::ios_base::binary; // Force binary for reliable format positioning: Requires input files to have *nix \n line terminators
-#endif
-		if ( append() ) m |= std::ios_base::app;
+		std::ios_base::openmode m( std::ios_base::out | std::ios_base::binary ); // Binary mode for reliable format positioning and line terminator control
+		if ( scratch() ) { // Overwrite if happens to exist
+			m |= std::ios_base::trunc;
+		} else if ( append() ) { // Ignore append for scratch files
+			m |= std::ios_base::app;
+		}
 		return m;
 	}
 
@@ -1479,7 +1523,7 @@ public: // Methods
 	open()
 	{
 		if ( stream_.is_open() ) close();
-		stream_.open( name(), mode() );
+		open_file();
 		return !!stream_;
 	}
 
@@ -1491,8 +1535,9 @@ public: // Methods
 		stream_.clear();
 		stream_.seekp( 0, std::ios::beg );
 		if ( truncate && stream_.is_open() ) { // Fortran only truncates on WRITE after REWIND but we can't do that portably in C++
-			close();
-			stream_.open( name(), mode() | std::ios_base::trunc );
+			stream_.close();
+			stream_.clear();
+			if ( ! name().empty() ) stream_.open( name(), mode() | std::ios_base::trunc );
 		}
 		return true;
 	}
@@ -1503,8 +1548,15 @@ public: // Methods
 	close()
 	{
 		if ( stream_.is_open() ) stream_.close();
-		if ( ! name().empty() && ( flags().del() || flags().scratch() ) ) std::remove( name().c_str() );
+		stream_.clear();
+		if ( ! name().empty() && ( del() || scratch() ) ) std::remove( name().c_str() );
 	}
+
+private: // Methods
+
+	// Open
+	void
+	open_file();
 
 private: // Data
 
@@ -1521,17 +1573,11 @@ public: // Creation
 	// Name Constructor
 	inline
 	explicit
-	FileStream( Name const & name, bool const binary = false ) :
-		Stream( name, binary )
+	FileStream( Name const & name ) :
+		Stream( name )
 	{
 		assert( ! name.empty() );
-		if ( ! name.empty() ) {
-			stream_.open( name, mode() );
-			if ( ( ! stream_.is_open() ) && ( ! std::ifstream( name ).good() ) ) { // Didn't open and doesn't exist
-				stream_.clear();
-				stream_.open( name, mode() | std::ios_base::trunc ); // Try as a new file
-			}
-		}
+		open_file();
 	}
 
 	// Name + Flags Constructor
@@ -1540,13 +1586,7 @@ public: // Creation
 		Stream( name, flags )
 	{
 		assert( ! name.empty() );
-		if ( ! name.empty() ) {
-			stream_.open( name, mode() );
-			if ( ( ! stream_.is_open() ) && ( ! old() ) && ( ! std::ifstream( name ).good() ) ) { // Didn't open and doesn't exist
-				stream_.clear();
-				stream_.open( name, mode() | std::ios_base::trunc ); // Try as a new file
-			}
-		}
+		open_file();
 	}
 
 	// Destructor
@@ -1643,13 +1683,12 @@ public: // Properties
 	std::ios_base::openmode
 	mode() const
 	{
-		std::ios_base::openmode m( std::ios_base::in | std::ios_base::out );
-#ifdef OBJEXXFCL_BINARY_STREAM_OPTIONAL
-		if ( binary() ) m |= std::ios_base::binary;
-#else
-		m |= std::ios_base::binary; // Force binary for reliable format positioning: Requires input files to have *nix \n line terminators
-#endif
-		if ( append() ) m |= std::ios_base::app;
+		std::ios_base::openmode m( std::ios_base::in | std::ios_base::out | std::ios_base::binary ); // Binary mode for reliable format positioning and line terminator control
+		if ( scratch() ) { // Overwrite if happens to exist
+			m |= std::ios_base::trunc;
+		} else if ( append() ) { // Ignore append for scratch files
+			m |= std::ios_base::app;
+		}
 		return m;
 	}
 
@@ -1693,11 +1732,7 @@ public: // Methods
 	open()
 	{
 		if ( stream_.is_open() ) close();
-		stream_.open( name(), mode() );
-		if ( ( ! stream_.is_open() ) && ( ! old() ) && ( ! std::ifstream( name() ).good() ) ) { // Didn't open and doesn't exist
-			stream_.clear();
-			stream_.open( name(), mode() | std::ios_base::trunc ); // Try as a new file
-		}
+		open_file();
 		return !!stream_;
 	}
 
@@ -1710,8 +1745,9 @@ public: // Methods
 		stream_.seekg( 0, std::ios::beg );
 		stream_.seekp( 0, std::ios::beg );
 		if ( truncate && stream_.is_open() ) { // Fortran only truncates on WRITE after REWIND but we can't do that portably in C++
-			close();
-			stream_.open( name(), mode() | std::ios_base::trunc );
+			stream_.close();
+			stream_.clear();
+			if ( ! name().empty() ) stream_.open( name(), mode() | std::ios_base::trunc );
 		}
 		return true;
 	}
@@ -1722,76 +1758,21 @@ public: // Methods
 	close()
 	{
 		if ( stream_.is_open() ) stream_.close();
-		if ( ! name().empty() && ( flags().del() || flags().scratch() ) ) std::remove( name().c_str() );
+		stream_.clear();
+		if ( ! name().empty() && ( del() || scratch() ) ) std::remove( name().c_str() );
 	}
+
+private: // Methods
+
+	// Open
+	void
+	open_file();
 
 private: // Data
 
 	std::fstream stream_; // Stream
 
 }; // FileStream
-
-// Methods
-
-#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) // VC++2013 covariant return bug work-around
-
-	// Stream
-	inline
-	std::ios const &
-	Stream::stream() const
-	{
-		if ( IStream const * p = dynamic_cast< IStream const * >( this ) ) {
-			return p->stream();
-		} else if ( OStream const * p = dynamic_cast< OStream const * >( this ) ) {
-			return p->stream();
-		} else if ( IOStream const * p = dynamic_cast< IOStream const * >( this ) ) {
-			return p->stream();
-		} else if ( IStringStream const * p = dynamic_cast< IStringStream const * >( this ) ) {
-			return p->stream();
-		} else if ( OStringStream const * p = dynamic_cast< OStringStream const * >( this ) ) {
-			return p->stream();
-		} else if ( StringStream const * p = dynamic_cast< StringStream const * >( this ) ) {
-			return p->stream();
-		} else if ( IFileStream const * p = dynamic_cast< IFileStream const * >( this ) ) {
-			return p->stream();
-		} else if ( OFileStream const * p = dynamic_cast< OFileStream const * >( this ) ) {
-			return p->stream();
-		} else if ( FileStream const * p = dynamic_cast< FileStream const * >( this ) ) {
-			return p->stream();
-		} else {
-			return dynamic_cast< FileStream const * >( this )->stream();
-		}
-	}
-
-	// Stream
-	inline
-	std::ios &
-	Stream::stream()
-	{
-		if ( IStream * p = dynamic_cast< IStream * >( this ) ) {
-			return p->stream();
-		} else if ( OStream * p = dynamic_cast< OStream * >( this ) ) {
-			return p->stream();
-		} else if ( IOStream * p = dynamic_cast< IOStream * >( this ) ) {
-			return p->stream();
-		} else if ( IStringStream * p = dynamic_cast< IStringStream * >( this ) ) {
-			return p->stream();
-		} else if ( OStringStream * p = dynamic_cast< OStringStream * >( this ) ) {
-			return p->stream();
-		} else if ( StringStream * p = dynamic_cast< StringStream * >( this ) ) {
-			return p->stream();
-		} else if ( IFileStream * p = dynamic_cast< IFileStream * >( this ) ) {
-			return p->stream();
-		} else if ( OFileStream * p = dynamic_cast< OFileStream * >( this ) ) {
-			return p->stream();
-		} else if ( FileStream * p = dynamic_cast< FileStream * >( this ) ) {
-			return p->stream();
-		} else {
-			return dynamic_cast< FileStream * >( this )->stream();
-		}
-	}
-
-#endif
 
 // Functions
 
