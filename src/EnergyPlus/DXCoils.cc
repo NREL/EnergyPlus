@@ -5163,6 +5163,7 @@ namespace DXCoils {
 						SizingMethod = HeatingAirflowSizing;
 						CompName = DXCoil( DXCoilNum ).Name;
 						FieldNum = 3;
+						// doesn't look like this is needed for air flow sizing, only for heating capacity sizing
 						DataCoolCoilCap = DXCoolCap; // pass global variable used only for heat pumps (i.e., DX cooling and heating coils)
 					}
 					else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Heating ) {
@@ -5182,7 +5183,7 @@ namespace DXCoils {
 					}
 					TempSize = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode );
 					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [m3/s]";
-					CompType = trim( DXCoil( DXCoilNum ).DXCoilType );
+					CompType = DXCoil( DXCoilNum ).DXCoilType;
 					DataIsDXCoil = true;
 					DataEMSOverrideON = DXCoil ( DXCoilNum ).RatedAirVolFlowRateEMSOverrideON ( Mode );
 					DataEMSOverride = DXCoil( DXCoilNum ).RatedAirVolFlowRateEMSOverrideValue( Mode );
@@ -5197,6 +5198,7 @@ namespace DXCoils {
 				DataFlowUsedForSizing = DXCoil ( DXCoilNum ).RatedAirVolFlowRate ( Mode );
 				// get autosized air flow for capacity calc's if capacity is not autosized
 				// *** RAR this if block is a last minute addition to correct capacity reporting when not autosized and a sizing run is done. Test suite was not run with this code included. ***
+<<<<<<< HEAD
 				if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) != AutoSize && ( ( SysSizingRunDone && CurSysNum > 0 ) || ( ZoneSizingRunDone && CurZoneEqNum > 0 ) ) ) {
 					if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
 						SizingMethod = CoolingAirflowSizing;
@@ -5230,6 +5232,42 @@ namespace DXCoils {
 					DataEMSOverride = 0.0;
 					DataBypassFrac = 0.0;
 				}
+=======
+                // The question here is if the autosized air flow rate or the user specified air flow rate should be used to calculate capacity
+				// removing this for now until more is known
+//				if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) != AutoSize && ( ( SysSizingRunDone && CurSysNum > 0 ) || ( ZoneSizingRunDone && CurZoneEqNum > 0 ) ) ) {
+//					if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+//						SizingMethod = CoolingAirflowSizing;
+//						DataBypassFrac = DXCoil ( DXCoilNum ).BypassedFlowFrac ( Mode );
+//					}
+//					else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatingEmpirical ) {
+//						SizingMethod = HeatingAirflowSizing;
+////						DataCoolCoilCap = DXCoolCap; // pass global variable used only for heat pumps (i.e., DX cooling and heating coils)
+//					}
+//					else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Heating ) {
+//						SizingMethod = HeatingAirflowSizing;
+//					}
+//					else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling ) {
+//						SizingMethod = CoolingAirflowSizing;
+//					}
+//					else {
+//						SizingMethod = CoolingAirflowSizing;
+//					}
+//					CompName = DXCoil( DXCoilNum ).Name;
+//					TempSize = AutoSize;
+//					SizingString = " "; // don't care
+//					CompType = DXCoil( DXCoilNum ).DXCoilType;
+//					DataIsDXCoil = true;
+//					DataEMSOverrideON = DXCoil ( DXCoilNum ).RatedAirVolFlowRateEMSOverrideON ( Mode );
+//					DataEMSOverride = DXCoil( DXCoilNum ).RatedAirVolFlowRateEMSOverrideValue( Mode );
+//					RequestSizing( CompType, CompName, SizingMethod, trim(SizingString ), TempSize, false , RoutineName );
+//					DataFlowUsedForSizing = TempSize;
+//					DataIsDXCoil = false; // don't need this and next 2, they are just overwritten below. Delete on next pass so testing will show problems if any.
+//					DataEMSOverrideON = false;
+//					DataEMSOverride = 0.0;
+//					DataBypassFrac = 0.0;
+//				}
+>>>>>>> 68302452_RRSizingConsolidation
 
 				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
 					SizingMethod = CoolingCapacitySizing;
@@ -5253,15 +5291,16 @@ namespace DXCoils {
 				}
 				CompType = DXCoil( DXCoilNum ).DXCoilType;
 				DataIsDXCoil = true;
-				DataDXCT = DXCT;
+//				DataDXCT = DXCT;
 				DataTotCapCurveIndex = DXCoil ( DXCoilNum ).CCapFTemp ( Mode );
 				DataEMSOverrideON = DXCoil( DXCoilNum ).RatedTotCapEMSOverrideOn( Mode );
 				DataEMSOverride = DXCoil( DXCoilNum ).RatedTotCapEMSOverrideValue( Mode );
 				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName );
 				DXCoil( DXCoilNum ).RatedTotCap ( Mode ) = TempSize;
 				DataIsDXCoil = false;
-				DataDXCT = 1;
+//				DataDXCT = 1;
 				DataFlowUsedForSizing = 0.0;
+				DataCoolCoilCap - 0.0;
 				DataTotCapCurveIndex = 0;
 				DataEMSOverrideON = false;
 				DataEMSOverride = 0.0;
@@ -5287,8 +5326,10 @@ namespace DXCoils {
 					DataCapacityUsedForSizing = DXCoil ( DXCoilNum ).RatedTotCap ( Mode );
 					DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
 					DataEMSOverride = DXCoil( DXCoilNum ).RatedSHREMSOverrideValue( Mode );
+//					DataDXCT = DXCT;
 					RequestSizing( CompType, CompName, SizingMethod, trim(SizingString ), TempSize, bPRINT, RoutineName );
 					DXCoil ( DXCoilNum ).RatedSHR ( Mode ) = TempSize;
+//					DataDXCT = 1;
 					DataFlowUsedForSizing = 0.0;
 					DataCapacityUsedForSizing = 0.0;
 					DataEMSOverrideON = false;

@@ -153,10 +153,78 @@ namespace ReportSizingManager {
 		// RE - ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE :
-		// This function returns the load sizing result.
+		// This function returns the sizing result.
 
 		// METHODOLOGY EMPLOYED :
-		// Same as currently used.
+		// Sizing calculations for component and parent models are now consolidated into a common routine. The parent or component will
+		// specify global variables (instead of using optional arguments) to set up the input required for specific sizing calculations.
+		//
+		// GLOBAL VARIABLES:
+		// DataCoilIsSuppHeater; // TRUE if heating coil used as supplemental heater
+		// DataIsDXCoil; // TRUE if direct-expansion coil
+		// DataAutosizable; // TRUE if component is autosizable
+		// DataDXCT; // 1 if regular DX coil, 2 if 100% DOAS DX coil (not needed, DXCT is already a global in DataHVACGlobals)
+		// DataTotCapCurveIndex; // index to total capacity as a function of temperature curve
+		// DataCoolCoilCap; // cooling coil capacity used for sizing with scalable inputs
+		// DataFlowUsedForSizing; // air flow rate used for sizing with scalable inputs [m3/s]
+		// DataCapacityUsedForSizing; // capacity used for sizing with scalable inputs [W]
+		// DataHeatSizeRatio; // heating coil size as a ratio of cooling coil capacity
+		// DataEMSOverride; // value of EMS variable used to override autosizing
+		// DataEMSOverrideON; // boolean determines if user relies on EMS to override autosizing
+		// DataBypassFrac; // value of bypass fraction for Coil:Cooling:DX:TwoStageWithHumidityControlMode coils
+		//
+		// EXAMPLE setup in DXCoils:
+		//			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+		//				SizingMethod = CoolingAirflowSizing;
+		//				CompName = DXCoil( DXCoilNum ).Name + ":" + DXCoil( DXCoilNum ).CoilPerformanceName( Mode );
+		//				FieldNum = 4;
+		//				DataBypassFrac = DXCoil ( DXCoilNum ).BypassedFlowFrac ( Mode );
+		//			}
+		//			else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatingEmpirical ) {
+		//				SizingMethod = HeatingAirflowSizing;
+		//				CompName = DXCoil( DXCoilNum ).Name;
+		//				FieldNum = 3;
+		//			}
+		//			else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Heating ) {
+		//				SizingMethod = HeatingAirflowSizing;
+		//				CompName = DXCoil( DXCoilNum ).Name;
+		//				FieldNum = 2;
+		//			}
+		//			else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling ) {
+		//				SizingMethod = CoolingAirflowSizing;
+		//				CompName = DXCoil( DXCoilNum ).Name;
+		//				FieldNum = 3;
+		//			}
+		//			else {
+		//				SizingMethod = CoolingAirflowSizing;
+		//				CompName = DXCoil( DXCoilNum ).Name;
+		//				FieldNum = 4;
+		//			}
+		//			TempSize = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode );
+		//			SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [m3/s]";
+		//			CompType = trim( DXCoil( DXCoilNum ).DXCoilType );
+		//			DataIsDXCoil = true;
+		//			DataEMSOverrideON = DXCoil ( DXCoilNum ).RatedAirVolFlowRateEMSOverrideON ( Mode );
+		//			DataEMSOverride = DXCoil( DXCoilNum ).RatedAirVolFlowRateEMSOverrideValue( Mode );
+		//			RequestSizing( CompType, CompName, SizingMethod, trim(SizingString ), TempSize, bPRINT, RoutineName );
+		//			DXCoil ( DXCoilNum ).RatedAirVolFlowRate ( Mode ) = TempSize;
+		//			DataIsDXCoil = false;
+		//			DataEMSOverrideON = false;
+		//			DataEMSOverride = 0.0;
+		//			DataBypassFrac = 0.0;
+		//
+		// PARENT OBJECT OVERRIDES:
+		//
+		// Parent objects can override sizing calculations using a combination of boolean and Real64 variables.
+		//
+		// Zone Equipment (eg):
+		// Boolean - ZoneEqSizing( CurZoneEqNum ).CoolingCapacity and Real64 - ZoneEqSizing ( CurZoneEqNum ).DesCoolingLoad;
+		//
+		// AirloopHVAC Equipment (eg):
+		// Boolean - UnitarySysEqSizing(CurSysNum).HeatingAirFlow and Real64 - UnitarySysEqSizing(CurSysNum).HeatingAirVolFlow
+		//
+		// Outside Air System Equipment (eg):
+		// Boolean - OASysEqSizing( CurOASysNum ).CoolingAirFlow and Real64 - OASysEqSizing ( CurOASysNum ).CoolingAirVolFlow
 
 		// REFERENCES :
 		// na
@@ -651,13 +719,14 @@ namespace ReportSizingManager {
 		}
 
 		if ( SizingResult == AutoSize ) {
-			SizingResult = AutosizeDes;
+			if ( DataEMSOverrideON ) {
+				SizingResult = DataEMSOverride;
+			} else {
+				SizingResult = AutosizeDes;
+			}
 		} else {
 			AutosizeUser = SizingResult;
 		}
-
-		// put EMS override here?
-		// EMS override code
 
 		if ( PrintWarningFlag ) {
 			if ( !HardSizeNoDesRun ) {
@@ -665,29 +734,29 @@ namespace ReportSizingManager {
 					// check capacity to make sure design volume flow per total capacity is within range
 					if ( DataIsDXCoil && ( SizingType == CoolingCapacitySizing || SizingType == HeatingCapacitySizing ) ) {
 						RatedVolFlowPerRatedTotCap = DesVolFlow / SizingResult;
-						if ( RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap( DataDXCT ) ) {
+						if ( RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap( DXCT ) ) {
 							if ( !DataEMSOverride && DisplayExtraWarnings ) {
 								ShowWarningError( CallString + " " + CompType + " " + CompName );
 								ShowContinueError( "..." + SizingString + " will be limited by the minimum rated volume flow per rated total capacity ratio." );
 								ShowContinueError( "...DX coil volume flow rate (m3/s ) = " + TrimSigDigits( DesVolFlow, 6 ) );
 								ShowContinueError( "...Requested capacity (W ) = " + TrimSigDigits( SizingResult, 3 ) );
 								ShowContinueError( "...Requested flow/capacity ratio (m3/s/W ) = " + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) );
-								ShowContinueError( "...Minimum flow/capacity ratio (m3/s/W ) = " + TrimSigDigits( MinRatedVolFlowPerRatedTotCap( DataDXCT ), 3 ) );
+								ShowContinueError( "...Minimum flow/capacity ratio (m3/s/W ) = " + TrimSigDigits( MinRatedVolFlowPerRatedTotCap( DXCT ), 3 ) );
 							}
-							SizingResult = DesVolFlow / MinRatedVolFlowPerRatedTotCap( DataDXCT );
+							SizingResult = DesVolFlow / MinRatedVolFlowPerRatedTotCap( DXCT );
 							if ( !DataEMSOverride && DisplayExtraWarnings ) {
 								ShowContinueError( "...Adjusted capacity ( W ) = " + TrimSigDigits( SizingResult, 3 ) );
 							}
-						} else if ( RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap( DataDXCT ) ) {
+						} else if ( RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap( DXCT ) ) {
 							if ( !DataEMSOverride && DisplayExtraWarnings ) {
 								ShowWarningError( CallString + " " + CompType + " " + CompName );
 								ShowContinueError( "..." + SizingString + " will be limited by the maximum rated volume flow per rated total capacity ratio." );
 								ShowContinueError( "...DX coil volume flow rate ( m3/s ) = " + TrimSigDigits( DesVolFlow, 6 ) );
 								ShowContinueError( "...Requested capacity ( W ) = " + TrimSigDigits( SizingResult, 3 ) );
 								ShowContinueError( "...Requested flow/capacity ratio ( m3/s/W ) = " + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) );
-								ShowContinueError( "...Maximum flow/capacity ratio ( m3/s/W ) = " + TrimSigDigits( MaxRatedVolFlowPerRatedTotCap( DataDXCT ), 3 ) );
+								ShowContinueError( "...Maximum flow/capacity ratio ( m3/s/W ) = " + TrimSigDigits( MaxRatedVolFlowPerRatedTotCap( DXCT ), 3 ) );
 							}
-							SizingResult = DesVolFlow / MaxRatedVolFlowPerRatedTotCap( DataDXCT );
+							SizingResult = DesVolFlow / MaxRatedVolFlowPerRatedTotCap( DXCT );
 							if ( !DataEMSOverride && DisplayExtraWarnings ) {
 								ShowContinueError( "...Adjusted capacity ( W ) = " + TrimSigDigits( SizingResult, 3 ) );
 							}
