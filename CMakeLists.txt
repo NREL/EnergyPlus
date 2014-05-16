@@ -29,11 +29,8 @@ include(cmake/CompilerFlags.cmake)
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/gtest/include/ SYSTEM )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/ObjexxFCL/src/ )
 
-if( BUILD_PACKAGE )
-  include(CPack.cmake)
-endif()
-
 if( BUILD_TESTING )
+  option( TEST_ANNUAL_SIMULATION "Use annual simulations for tests instead of only design days" OFF )
   enable_testing()
   include(CTest) 
   ADD_SUBDIRECTORY(third_party/gtest)
@@ -43,9 +40,22 @@ ADD_SUBDIRECTORY(third_party/ObjexxFCL)
 ADD_SUBDIRECTORY(src/EnergyPlus)
 ADD_SUBDIRECTORY(testfiles)
 
-
-if ( BUILD_FORTRAN )
-    ENABLE_LANGUAGE(Fortran)
-    ADD_SUBDIRECTORY(src/ExpandObjects)
-    ADD_SUBDIRECTORY(src/ReadVars)
+if( BUILD_FORTRAN )
+  include(CMakeAddFortranSubdirectory)
+  cmake_add_fortran_subdirectory(src/ExpandObjects PROJECT ExpandObjects NO_EXTERNAL_INSTALL )
+  cmake_add_fortran_subdirectory(src/ReadVars PROJECT ReadVars NO_EXTERNAL_INSTALL )
 endif()
+
+if( BUILD_PACKAGE )
+  set(CPACK_INSTALL_CMAKE_PROJECTS
+    "${CMAKE_BINARY_DIR};EnergyPLus;ALL;/"
+  )
+
+  if( BUILD_FORTRAN )
+    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ExpandObjects/;ExpandObjects;ALL;/")
+    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ReadVars/;ReadVars;ALL;/")
+  endif()
+
+  include(CPack.cmake)
+endif()
+
