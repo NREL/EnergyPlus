@@ -45,6 +45,62 @@ ConvertCaseToLower(
 std::string::size_type
 FindNonSpace( std::string const & String ); // String to be scanned
 
+template< typename T >
+inline
+T
+pow2( T const & x )
+{
+	return x * x;
+}
+
+template< typename T >
+inline
+T
+pow3( T const & x )
+{
+	return x * x * x;
+}
+
+template< typename T >
+inline
+T
+pow4( T const & x )
+{
+	T y( x * x );
+	return y * y;
+}
+
+template< typename T >
+inline
+T
+pow5( T const & x )
+{
+	T y( x * x );
+	y *= y;
+	return y * x;
+}
+
+template< typename T >
+inline
+T
+pow6( T const & x )
+{
+	T y( x * x );
+	y *= y;
+	return y * y;
+}
+
+template< typename T >
+inline
+T
+pow7( T const & x )
+{
+	T y( x * x );
+	y *= y;
+	y *= y;
+	return y * x;
+}
+
 bool
 env_var_on( std::string const & env_var_str );
 
