@@ -556,7 +556,114 @@ CEILING( T const & x )
 // square( x ) == x^2
 template< typename T >
 inline
-T
+typename std::enable_if< std::is_arithmetic< T >::value, T >::type
+square( T const x )
+{
+	return x * x;
+}
+
+// cube( x ) == x^3
+template< typename T >
+inline
+typename std::enable_if< std::is_arithmetic< T >::value, T >::type
+cube( T const x )
+{
+	return x * x * x;
+}
+
+// quad( x ) == x^4
+template< typename T >
+inline
+typename std::enable_if< std::is_arithmetic< T >::value, T >::type
+quad( T const x )
+{
+	T const t( x * x );
+	return t * t;
+}
+
+// pow_2( x ) == x^2
+template< typename T >
+inline
+typename std::enable_if< std::is_arithmetic< T >::value, T >::type
+pow_2( T const x )
+{
+	return x * x;
+}
+
+// pow_3( x ) == x^3
+template< typename T >
+inline
+typename std::enable_if< std::is_arithmetic< T >::value, T >::type
+pow_3( T const x )
+{
+	return x * x * x;
+}
+
+// pow_4( x ) == x^4
+template< typename T >
+inline
+typename std::enable_if< std::is_arithmetic< T >::value, T >::type
+pow_4( T const x )
+{
+	T const t( x * x );
+	return t * t;
+}
+
+// pow_5( x ) == x^5
+template< typename T >
+inline
+typename std::enable_if< std::is_arithmetic< T >::value, T >::type
+pow_5( T const x )
+{
+	T const t( x * x );
+	return t * t * x;
+}
+
+// pow_6( x ) == x^6
+template< typename T >
+inline
+typename std::enable_if< std::is_arithmetic< T >::value, T >::type
+pow_6( T const x )
+{
+	T const t( x * x * x );
+	return t * t;
+}
+
+// pow_7( x ) == x^7
+template< typename T >
+inline
+typename std::enable_if< std::is_arithmetic< T >::value, T >::type
+pow_7( T const x )
+{
+	T const t( x * x * x );
+	return t * t * x;
+}
+
+// pow_8( x ) == x^8
+template< typename T >
+inline
+typename std::enable_if< std::is_arithmetic< T >::value, T >::type
+pow_8( T const x )
+{
+	T t( x * x );
+	t *= t;
+	return t * t;
+}
+
+// pow_9( x ) == x^9
+template< typename T >
+inline
+typename std::enable_if< std::is_arithmetic< T >::value, T >::type
+pow_9( T const x )
+{
+	T const t( x * x * x );
+	return t * t * t;
+}
+
+// square( x ) == x^2
+template< typename T >
+inline
+typename std::enable_if< ! std::is_arithmetic< T >::value, T >::type
 square( T const & x )
 {
 	return x * x;
@@ -565,10 +672,99 @@ square( T const & x )
 // cube( x ) == x^3
 template< typename T >
 inline
-T
+typename std::enable_if< ! std::is_arithmetic< T >::value, T >::type
 cube( T const & x )
 {
 	return x * x * x;
+}
+
+// quad( x ) == x^4
+template< typename T >
+inline
+typename std::enable_if< ! std::is_arithmetic< T >::value, T >::type
+quad( T const & x )
+{
+	T const t( x * x );
+	return t * t;
+}
+
+// pow_2( x ) == x^2
+template< typename T >
+inline
+typename std::enable_if< ! std::is_arithmetic< T >::value, T >::type
+pow_2( T const & x )
+{
+	return x * x;
+}
+
+// pow_3( x ) == x^3
+template< typename T >
+inline
+typename std::enable_if< ! std::is_arithmetic< T >::value, T >::type
+pow_3( T const & x )
+{
+	return x * x * x;
+}
+
+// pow_4( x ) == x^4
+template< typename T >
+inline
+typename std::enable_if< ! std::is_arithmetic< T >::value, T >::type
+pow_4( T const & x )
+{
+	T const t( x * x );
+	return t * t;
+}
+
+// pow_5( x ) == x^5
+template< typename T >
+inline
+typename std::enable_if< ! std::is_arithmetic< T >::value, T >::type
+pow_5( T const & x )
+{
+	T const t( x * x );
+	return t * t * x;
+}
+
+// pow_6( x ) == x^6
+template< typename T >
+inline
+typename std::enable_if< ! std::is_arithmetic< T >::value, T >::type
+pow_6( T const & x )
+{
+	T const t( x * x * x );
+	return t * t;
+}
+
+// pow_7( x ) == x^7
+template< typename T >
+inline
+typename std::enable_if< ! std::is_arithmetic< T >::value, T >::type
+pow_7( T const & x )
+{
+	T const t( x * x * x );
+	return t * t * x;
+}
+
+// pow_8( x ) == x^8
+template< typename T >
+inline
+typename std::enable_if< ! std::is_arithmetic< T >::value, T >::type
+pow_8( T const & x )
+{
+	T t( x * x );
+	t *= t;
+	return t * t;
+}
+
+// pow_9( x ) == x^9
+template< typename T >
+inline
+typename std::enable_if< ! std::is_arithmetic< T >::value, T >::type
+pow_9( T const & x )
+{
+	T const t( x * x * x );
+	return t * t * t;
 }
 
 // sign( x )

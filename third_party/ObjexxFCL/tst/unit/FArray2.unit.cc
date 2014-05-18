@@ -1339,7 +1339,7 @@ TEST( FArray2Test, SubscriptOperator )
 	EXPECT_EQ( 13, A1[ 4 ] );
 	EXPECT_EQ( 23, A1[ 5 ] );
 
-	for ( std::size_t i = 0; i < A1.size(); ++i ) A1[ i ] = i * 10;
+	for ( std::size_t i = 0; i < A1.size(); ++i ) A1[ i ] = static_cast< int >( i * 10 );
 	EXPECT_EQ( 0, A1[ 0 ] );
 	EXPECT_EQ( 10, A1[ 1 ] );
 	EXPECT_EQ( 20, A1[ 2 ] );

@@ -47,7 +47,20 @@ inline
 bool
 equali( std::string const & s, std::string const & t )
 {
+#if defined(__linux__) || defined(__INTEL_COMPILER) // This is faster
+	std::string::size_type const s_len( s.length() );
+	if ( s_len != t.length() ) return false;
+	for ( std::string::size_type i = 0; i < s_len; ++i ) {
+		if ( to_lower( s[ i ] ) != to_lower( t[ i ] ) ) return false;
+		if ( ++i == s_len ) break; // Unroll
+		if ( to_lower( s[ i ] ) != to_lower( t[ i ] ) ) return false;
+		if ( ++i == s_len ) break; // Unroll
+		if ( to_lower( s[ i ] ) != to_lower( t[ i ] ) ) return false;
+	}
+	return true;
+#else
 	return ( s.length() == t.length() ? std::equal( s.begin(), s.end(), t.begin(), equali_char ) : false );
+#endif
 }
 
 // string == cstring Case-Insensitively?
@@ -55,15 +68,47 @@ inline
 bool
 equali( std::string const & s, c_cstring const t )
 {
+#if defined(__linux__) || defined(__INTEL_COMPILER) // This is faster
+	std::string::size_type const s_len( s.length() );
+	std::string::size_type i( 0 );
+	char c( to_lower( t[ 0 ] ) );
+	while ( ( i < s_len ) && ( c != '\0' ) && ( to_lower( s[ i ] ) == c ) ) {
+		c = to_lower( t[ ++i ] );
+		if ( ( i == s_len ) || ( c == '\0' ) || ( to_lower( s[ i ] ) != c ) ) break; // Unroll
+		c = to_lower( t[ ++i ] );
+		if ( ( i == s_len ) || ( c == '\0' ) || ( to_lower( s[ i ] ) != c ) ) break; // Unroll
+		c = to_lower( t[ ++i ] );
+		if ( ( i == s_len ) || ( c == '\0' ) || ( to_lower( s[ i ] ) != c ) ) break; // Unroll
+		c = to_lower( t[ ++i ] );
+	}
+	return ( ( i == s_len ) && ( c == '\0' ) );
+#else
 	return ( s.length() == std::strlen( t ) ? std::equal( s.begin(), s.end(), t, equali_char ) : false );
+#endif
 }
 
 // cstring == string Case-Insensitively?
 inline
 bool
-equali( c_cstring const s, std::string const & t )
+equali( c_cstring const t, std::string const & s )
 {
-	return ( std::strlen( s ) == t.length() ? std::equal( t.begin(), t.end(), s, equali_char ) : false );
+#if defined(__linux__) || defined(__INTEL_COMPILER) // This is faster
+	std::string::size_type const s_len( s.length() );
+	std::string::size_type i( 0 );
+	char c( to_lower( t[ 0 ] ) );
+	while ( ( i < s_len ) && ( c != '\0' ) && ( to_lower( s[ i ] ) == c ) ) {
+		c = to_lower( t[ ++i ] );
+		if ( ( i == s_len ) || ( c == '\0' ) || ( to_lower( s[ i ] ) != c ) ) break; // Unroll
+		c = to_lower( t[ ++i ] );
+		if ( ( i == s_len ) || ( c == '\0' ) || ( to_lower( s[ i ] ) != c ) ) break; // Unroll
+		c = to_lower( t[ ++i ] );
+		if ( ( i == s_len ) || ( c == '\0' ) || ( to_lower( s[ i ] ) != c ) ) break; // Unroll
+		c = to_lower( t[ ++i ] );
+	}
+	return ( ( i == s_len ) && ( c == '\0' ) );
+#else
+	return ( std::strlen( t ) == s.length() ? std::equal( s.begin(), s.end(), t, equali_char ) : false );
+#endif
 }
 
 // cstring == cstring Case-Insensitively?
@@ -71,8 +116,16 @@ inline
 bool
 equali( c_cstring const s, c_cstring const t )
 {
-	auto const s_len( std::strlen( s ) );
-	return ( s_len == std::strlen( t ) ? std::equal( s, s + s_len, t, equali_char ) : false );
+	std::string::size_type i( 0 );
+	char c( to_lower( s[ 0 ] ) );
+	while ( c == to_lower( t[ i ] ) ) {
+		if ( c == '\0' ) return true;
+		c = to_lower( s[ ++i ] );
+		if ( c != to_lower( t[ i ] ) ) break; // Unroll
+		if ( c == '\0' ) return true;
+		c = to_lower( s[ ++i ] );
+	}
+	return false;
 }
 
 // string == string Case-Optionally?
@@ -83,7 +136,7 @@ equal( std::string const & s, std::string const & t, bool const exact_case = tru
 	return ( exact_case ? s == t : equali( s, t ) );
 }
 
-// string == string Case-Optionally?
+// string == cstring Case-Optionally?
 inline
 bool
 equal( std::string const & s, c_cstring const t, bool const exact_case = true )
@@ -91,15 +144,15 @@ equal( std::string const & s, c_cstring const t, bool const exact_case = true )
 	return ( exact_case ? s == t : equali( s, t ) );
 }
 
-// string == string Case-Optionally?
+// cstring == string Case-Optionally?
 inline
 bool
 equal( c_cstring const s, std::string const & t, bool const exact_case = true )
 {
-	return ( std::strlen( s ) == t.length() ? ( exact_case ? std::equal( t.begin(), t.end(), s ) : std::equal( t.begin(), t.end(), s, equali_char ) ) : false );
+	return ( exact_case ? s == t : equali( s, t ) );
 }
 
-// string == string Case-Optionally?
+// cstring == cstring Case-Optionally?
 inline
 bool
 equal( c_cstring const s, c_cstring const t, bool const exact_case = true )
@@ -894,8 +947,8 @@ inline
 std::string
 general_string_of(
 	T const & t,
-	int const w = TypeTraits< T >::width(), // Minimum width
-	int const p = TypeTraits< T >::precision() // Precision
+	int const w = TypeTraits< T >::iwidth(), // Minimum width
+	std::streamsize const p = TypeTraits< T >::precision() // Precision
 )
 {
 	std::ostringstream t_stream;
@@ -910,8 +963,8 @@ inline
 std::string
 fixed_string_of(
 	T const & t,
-	int const w = TypeTraits< T >::width(), // Minimum width
-	int const p = TypeTraits< T >::precision() // Precision
+	int const w = TypeTraits< T >::iwidth(), // Minimum width
+	std::streamsize const p = TypeTraits< T >::precision() // Precision
 )
 {
 	std::ostringstream t_stream;
@@ -926,8 +979,8 @@ inline
 std::string
 scientific_string_of(
 	T const & t,
-	int const w = TypeTraits< T >::width(), // Minimum width
-	int const p = TypeTraits< T >::precision() // Precision
+	int const w = TypeTraits< T >::iwidth(), // Minimum width
+	std::streamsize const p = TypeTraits< T >::precision() // Precision
 )
 {
 	std::ostringstream t_stream;

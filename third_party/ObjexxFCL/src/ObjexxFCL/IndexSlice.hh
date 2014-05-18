@@ -433,6 +433,14 @@ public: // Inspector
 		return size_;
 	}
 
+	// Size
+	inline
+	int
+	isize() const
+	{
+		return static_cast< int >( size_ );
+	}
+
 	// Last Index
 	inline
 	int

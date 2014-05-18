@@ -6983,7 +6983,7 @@ namespace HVACUnitarySystem {
 			} else {
 				UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac = 1.0;
 			}
-			CompOn = 0;
+			if ( present( CompOn ) ) CompOn = 0;
 			return;
 		}
 

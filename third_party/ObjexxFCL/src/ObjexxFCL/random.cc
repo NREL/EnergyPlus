@@ -102,7 +102,7 @@ RANDOM_SEED( Optional< int > size, Optional< FArray1< int > const > put, Optiona
 	static std::vector< int > seed_vals{ int( std::time( NULL ) ), int( std::time( NULL ) ) }; // C++ doesn't provide access to the seed values so we cache them here
 	if ( size.present() ) {
 		assert( ( ! put.present() ) && ( ! get.present() ) ); // At most one arg allowed
-		size = seed_vals.size();
+		size = static_cast< int >( seed_vals.size() );
 	} else if ( put.present() ) {
 		assert( ( ! size.present() ) && ( ! get.present() ) ); // At most one arg allowed
 		seed_vals.clear();

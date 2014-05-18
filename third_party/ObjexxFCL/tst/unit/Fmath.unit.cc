@@ -169,6 +169,24 @@ TEST( FmathTest, Cube )
 	EXPECT_EQ( -11.0l * 11.0l * 11.0l, cube( -11.0l ) );
 }
 
+TEST( FmathTest, Pow )
+{
+	EXPECT_EQ( 11*11, pow_2( -11 ) );
+	EXPECT_EQ( -11*11*11, pow_3( -11 ) );
+	EXPECT_EQ( 11u*11u*11u, pow_3( 11u ) );
+	EXPECT_EQ( -11l*11l*11l, pow_3( -11l ) );
+	EXPECT_EQ( 11ul*11ul*11ul, pow_3( 11ul ) );
+	EXPECT_EQ( -11.0f * 11.0f * 11.0f, pow_3( -11.0f ) );
+	EXPECT_EQ( -11.0f * 11.0 * 11.0, pow_3( -11.0 ) );
+	EXPECT_EQ( -11.0l * 11.0l * 11.0l, pow_3( -11.0l ) );
+	EXPECT_EQ( 16, pow_4( 2.0 ) );
+	EXPECT_EQ( 32, pow_5( 2.0 ) );
+	EXPECT_EQ( 64, pow_6( 2.0 ) );
+	EXPECT_EQ( 128, pow_7( 2.0 ) );
+	EXPECT_EQ( 256, pow_8( 2.0 ) );
+	EXPECT_EQ( 512, pow_9( 2.0 ) );
+}
+
 TEST( FmathTest, Sign )
 {
 	EXPECT_EQ( 1, sign( 11 ) );

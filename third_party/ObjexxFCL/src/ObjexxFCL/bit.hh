@@ -147,7 +147,7 @@ bool
 bit_test( T const & x, T const & pos )
 {
 	assert( pos >= T( 0 ) );
-	return ( x & ( T( 1 ) << pos ) );
+	return ( ( x & ( T( 1 ) << pos ) ) != T( 0 ) );
 }
 
 // Bitwise Not
