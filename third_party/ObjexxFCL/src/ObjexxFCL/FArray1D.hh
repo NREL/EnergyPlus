@@ -70,6 +70,7 @@ public: // Types
 	typedef  typename Initializer::Function  InitializerFunction;
 
 	using Super::conformable;
+	using Super::isize1;
 	using Super::l;
 	using Super::operator ();
 	using Super::reassign;
@@ -191,7 +192,7 @@ public: // Creation
 	inline
 	FArray1D( std::initializer_list< U > const l, typename std::enable_if< std::is_constructible< T, U >::value && ! ( std::is_same< U, int >::value || std::is_same< U, Index >::value ) >::type * = 0 ) :
 		Super( l ),
-		I_( l.size() )
+		I_( static_cast< int >( l.size() ) )
 	{
 		setup_real();
 		insert_as_observer();
@@ -202,7 +203,7 @@ public: // Creation
 	inline
 	FArray1D( std::initializer_list< U > const l, typename std::enable_if< std::is_constructible< T, U >::value && ( std::is_same< U, int >::value || std::is_same< U, Index >::value ) >::type * = 0 ) :
 		Super( l ),
-		I_( l.size() )
+		I_( static_cast< int >( l.size() ) )
 	{ // Note: 2 item lists treated as index range: Others treated as values: See ObjexxFCL.Users.FArray.html
 #ifdef OBJEXXFCL_DISALLOW_AMBIGUOUS_INITIALIZER_LIST_CONSTRUCTORS
 		assert( l.size() != 2 ); // Avoid ambiguity with IndexRange {l,u} usage
@@ -313,7 +314,7 @@ public: // Creation
 	inline
 	FArray1D( std::vector< U > const & v ) :
 		Super( v ),
-		I_( v.size() )
+		I_( static_cast< int >( v.size() ) )
 	{
 		setup_real();
 		insert_as_observer();
@@ -568,7 +569,7 @@ public: // Creation
 	FArray1D
 	shape( FArray1< U > const & a )
 	{
-		return FArray1D( a.size() );
+		return FArray1D( a.isize() );
 	}
 
 	// Array Shape + Initializer Value Named Constructor Template
@@ -578,7 +579,7 @@ public: // Creation
 	FArray1D
 	shape( FArray1< U > const & a, T const & t )
 	{
-		return FArray1D( a.size(), t );
+		return FArray1D( a.isize(), t );
 	}
 
 	// Slice Shape Named Constructor Template
@@ -588,7 +589,7 @@ public: // Creation
 	FArray1D
 	shape( FArray1S< U > const & a )
 	{
-		return FArray1D( a.size() );
+		return FArray1D( a.isize() );
 	}
 
 	// Slice Shape + Initializer Value Named Constructor Template
@@ -598,7 +599,7 @@ public: // Creation
 	FArray1D
 	shape( FArray1S< U > const & a, T const & t )
 	{
-		return FArray1D( a.size(), t );
+		return FArray1D( a.isize(), t );
 	}
 
 	// MArray Shape Named Constructor Template
@@ -608,7 +609,7 @@ public: // Creation
 	FArray1D
 	shape( MArray1< A, M > const & a )
 	{
-		return FArray1D( a.size() );
+		return FArray1D( a.isize() );
 	}
 
 	// MArray Shape + Initializer Value Named Constructor Template
@@ -618,7 +619,7 @@ public: // Creation
 	FArray1D
 	shape( MArray1< A, M > const & a, T const & t )
 	{
-		return FArray1D( a.size(), t );
+		return FArray1D( a.isize(), t );
 	}
 
 	// One-Based Copy Named Constructor Template
@@ -628,7 +629,7 @@ public: // Creation
 	FArray1D
 	one_based( FArray1< U > const & a )
 	{
-		return FArray1D( a.size(), a );
+		return FArray1D( a.isize(), a );
 	}
 
 	// One-Based Slice Named Constructor Template
@@ -638,7 +639,7 @@ public: // Creation
 	FArray1D
 	one_based( FArray1S< U > const & a )
 	{
-		return FArray1D( a.size(), a );
+		return FArray1D( a.isize(), a );
 	}
 
 	// One-Based MArray Named Constructor Template
@@ -648,7 +649,7 @@ public: // Creation
 	FArray1D
 	one_based( MArray1< A, M > const & a )
 	{
-		return FArray1D( a.size(), a );
+		return FArray1D( a.isize(), a );
 	}
 
 	// Initializer List One-Based Named Constructor Template
@@ -658,7 +659,7 @@ public: // Creation
 	FArray1D
 	one_based( std::initializer_list< U > const l )
 	{
-		return FArray1D( l.size(), l );
+		return FArray1D( static_cast< int >( l.size() ), l );
 	}
 
 	// Destructor
@@ -1028,6 +1029,14 @@ public: // Inspector
 	size1() const
 	{
 		return I_.size();
+	}
+
+	// Size of Dimension 1
+	inline
+	int
+	isize1() const
+	{
+		return I_.isize();
 	}
 
 public: // Modifier

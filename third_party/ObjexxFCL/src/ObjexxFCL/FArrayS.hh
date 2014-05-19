@@ -192,6 +192,14 @@ public: // Inspector
 		return size_;
 	}
 
+	// Active Array Size
+	inline
+	int
+	isize() const
+	{
+		return static_cast< int >( size_ );
+	}
+
 	// Lower Index of a Dimension
 	virtual
 	int
@@ -206,6 +214,11 @@ public: // Inspector
 	virtual
 	size_type
 	size( int const d ) const = 0;
+
+	// Size of a Dimension
+	virtual
+	int
+	isize( int const d ) const = 0;
 
 	// Array Data Pointer
 	inline

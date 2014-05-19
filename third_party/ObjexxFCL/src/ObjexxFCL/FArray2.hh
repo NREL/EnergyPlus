@@ -78,6 +78,7 @@ public: // Types
 	typedef  typename Super::Difference  Difference;
 
 	using Super::dimensions_initialized;
+	using Super::isize;
 	using Super::npos;
 	using Super::overlap;
 	using Super::size;
@@ -164,21 +165,9 @@ protected: // Creation
 		Super( a, proxy )
 	{}
 
-	// Non-Const Copy Proxy Constructor
-	inline
-	FArray2( FArray2 & a, ProxySentinel const & proxy ) :
-		Super( a, proxy )
-	{}
-
 	// Base Proxy Constructor
 	inline
 	FArray2( Base const & a, ProxySentinel const & proxy ) :
-		Super( a, proxy )
-	{}
-
-	// Non-Const Base Proxy Constructor
-	inline
-	FArray2( Base & a, ProxySentinel const & proxy ) :
 		Super( a, proxy )
 	{}
 
@@ -188,16 +177,30 @@ protected: // Creation
 		Super( s, proxy )
 	{}
 
-	// Non-Const Tail Proxy Constructor
-	inline
-	FArray2( Tail & s, ProxySentinel const & proxy ) :
-		Super( s, proxy )
-	{}
-
 	// Value Proxy Constructor
 	inline
 	FArray2( T const & t, ProxySentinel const & proxy ) :
 		Super( t, proxy )
+	{}
+
+#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
+
+	// Non-Const Copy Proxy Constructor
+	inline
+	FArray2( FArray2 & a, ProxySentinel const & proxy ) :
+		Super( a, proxy )
+	{}
+
+	// Non-Const Base Proxy Constructor
+	inline
+	FArray2( Base & a, ProxySentinel const & proxy ) :
+		Super( a, proxy )
+	{}
+
+	// Non-Const Tail Proxy Constructor
+	inline
+	FArray2( Tail & s, ProxySentinel const & proxy ) :
+		Super( s, proxy )
 	{}
 
 	// Non-Const Value Proxy Constructor
@@ -205,6 +208,8 @@ protected: // Creation
 	FArray2( T & t, ProxySentinel const & proxy ) :
 		Super( t, proxy )
 	{}
+
+#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
 public: // Creation
 
@@ -1093,6 +1098,22 @@ public: // Inspector
 		}
 	}
 
+	// Size of a Dimension
+	inline
+	int
+	isize( int const d ) const
+	{
+		switch ( d ) {
+		case 1:
+			return isize1();
+		case 2:
+			return isize2();
+		default:
+			assert( false );
+			return isize1();
+		}
+	}
+
 	// IndexRange of Dimension 1
 	virtual
 	IR const &
@@ -1116,6 +1137,14 @@ public: // Inspector
 		return z1_;
 	}
 
+	// Size of Dimension 1
+	inline
+	int
+	isize1() const
+	{
+		return static_cast< int >( z1_ );
+	}
+
 	// IndexRange of Dimension 2
 	virtual
 	IR const &
@@ -1135,6 +1164,11 @@ public: // Inspector
 	virtual
 	size_type
 	size2() const = 0;
+
+	// Size of Dimension 2
+	virtual
+	int
+	isize2() const = 0;
 
 public: // Modifier
 
