@@ -3074,7 +3074,7 @@ namespace VariableSpeedCoils {
 		//END SIZING DEFROST HEATER
 
 		// test autosized sensible and total cooling capacity for total > sensible
-		if ( RatedCapCoolSensAutoSized && RatedCapCoolTotalAutoSized || RatedCapCoolSensAutoSized ) {
+		if ( RatedCapCoolSensAutoSized && RatedCapCoolTotalAutoSized ) {
 			if ( VarSpeedCoil( DXCoilNum ).RatedCapCoolSens > VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal ) {
 				ShowWarningError( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + ":WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT \"" + VarSpeedCoil( DXCoilNum ).Name + "\"" );
 				ShowContinueError( RoutineName + ": Rated Sensible Cooling Capacity > Rated Total Cooling Capacity" );
