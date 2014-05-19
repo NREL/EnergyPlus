@@ -29,7 +29,7 @@ TEST( GioTest, BasicLF )
 	IOFlags flags;
 	int unit1( gio::get_unit() );
 	EXPECT_TRUE( unit1 > 0 );
-	std::string const name1( "GioTest.txt" );
+	std::string const name1( "GioTestLF.txt" );
 	inquire( name1, flags );
 	if ( flags.exists() ) std::remove( name1.c_str() ); // Clean up from prior aborted run
 	flags.ter_lf();
@@ -66,7 +66,7 @@ TEST( GioTest, BasicCRLF )
 	IOFlags flags;
 	int unit1( gio::get_unit() );
 	EXPECT_TRUE( unit1 > 0 );
-	std::string const name1( "GioTest.txt" );
+	std::string const name1( "GioTestCRLF.txt" );
 	flags.ter_crlf();
 	open( unit1, name1, flags );
 	EXPECT_FALSE( flags.err() );
@@ -101,7 +101,7 @@ TEST( GioTest, BasicEOF )
 	IOFlags flags;
 	int unit1( gio::get_unit() );
 	EXPECT_TRUE( unit1 > 0 );
-	std::string const name1( "GioTest.txt" );
+	std::string const name1( "GioTestBasicEOF.txt" );
 	flags.ter_lf();
 	open( unit1, name1, flags );
 	EXPECT_FALSE( flags.err() );
@@ -139,7 +139,7 @@ TEST( GioTest, InquireByName )
 	IOFlags flags;
 	int unit1( gio::get_unit() );
 	EXPECT_TRUE( unit1 > 0 );
-	std::string const name1( "GioTest.txt" );
+	std::string const name1( "GioTestInquireByName.txt" );
 	flags.ter_lf();
 	open( unit1, name1, flags );
 	EXPECT_FALSE( flags.err() );
@@ -166,7 +166,7 @@ TEST( GioTest, AsIsOn )
 	int unit1( gio::get_unit() );
 	EXPECT_TRUE( unit1 > 0 );
 	EXPECT_TRUE( flags.asis() );
-	std::string const name1( "GioTest.txt" );
+	std::string const name1( "GioTestAsIsOn.txt" );
 	flags.ter_lf();
 	open( unit1, name1, flags );
 	write( unit1, "(A)" ) << "Line 1";
@@ -193,7 +193,7 @@ TEST( GioTest, AsIsOff )
 	int unit1( gio::get_unit() );
 	EXPECT_TRUE( unit1 > 0 );
 	EXPECT_TRUE( flags.asis() );
-	std::string const name1( "GioTest.txt" );
+	std::string const name1( "GioTestAsIsOff.txt" );
 	flags.ter_lf();
 	open( unit1, name1, flags );
 	write( unit1, "(A)" ) << "Line 1";
@@ -219,7 +219,7 @@ TEST( GioTest, EndOfFile )
 	IOFlags flags;
 	int unit1( gio::get_unit() );
 	EXPECT_TRUE( unit1 > 0 );
-	std::string const name1( "GioTest.txt" );
+	std::string const name1( "GioTestEndOfFile.txt" );
 	flags.ter_lf();
 	open( unit1, name1, flags );
 	write( unit1, "(A)" ) << "Line 1";
