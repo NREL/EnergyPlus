@@ -3121,7 +3121,7 @@ namespace HVACVariableRefrigerantFlow {
 		// providing more capacity than allowed. Example: TU loads are 1-ton, 2-ton, 3-ton, and 4-ton connected
 		// to a condenser having only 9-tons available. This variable will be set to 3-tons and the 4-ton
 		// terminal unit will be limited to 3-tons (see SimVRFCondenser where this variable is calculated).
-		if ( CurrentEndTime > CurrentEndTimeLast || TimeStepSysLast > TimeStepSys || ( FirstHVACIteration && MyBeginTimeStepFlag( VRFCond ) ) ) { //Autodesk Is && condition intended to AND with the whole OR condition or just the last (which it does now)?
+		if ( CurrentEndTime > CurrentEndTimeLast || TimeStepSysLast > TimeStepSys || ( FirstHVACIteration && MyBeginTimeStepFlag( VRFCond ) ) ) { 
 			MaxCoolingCapacity( VRFCond ) = MaxCap;
 			MaxHeatingCapacity( VRFCond ) = MaxCap;
 			MyBeginTimeStepFlag( VRFCond ) = false;

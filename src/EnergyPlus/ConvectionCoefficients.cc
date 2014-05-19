@@ -1831,7 +1831,7 @@ namespace ConvectionCoefficients {
 				// Tests show that Zone will override the simple convection specification of global.
 				if ( SurfNum <= 0 ) continue; // ignore this error condition
 				if ( Surface( SurfNum ).Zone == 0 ) continue; // ignore this error condition
-				if ( Zone( Surface( SurfNum ).Zone ).OutsideConvectionAlgo == ASHRAESimple && ( ( UserExtConvectionCoeffs( Loop ).OverrideType == ConvCoefSpecifiedModel && UserExtConvectionCoeffs( Loop ).HcModelEq != ASHRAESimple ) || UserExtConvectionCoeffs( Loop ).OverrideType != ConvCoefSpecifiedModel ) ) { //Autodesk Parens don't match actual logic
+				if ( Zone( Surface( SurfNum ).Zone ).OutsideConvectionAlgo == ASHRAESimple && ( ( UserExtConvectionCoeffs( Loop ).OverrideType == ConvCoefSpecifiedModel && UserExtConvectionCoeffs( Loop ).HcModelEq != ASHRAESimple ) || UserExtConvectionCoeffs( Loop ).OverrideType != ConvCoefSpecifiedModel ) ) { 
 					++Count;
 					if ( DisplayExtraWarnings ) {
 						ShowSevereError( RoutineName + "Surface=\"" + UserExtConvectionCoeffs( Loop ).SurfaceName + "\", mixed algorithms." );
