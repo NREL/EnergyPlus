@@ -2148,7 +2148,7 @@ namespace LowTempRadiantSystem {
 			}
 
 			// Now simulate the system...
-			if ( ( OperatingMode == HeatingMode ) || ( OperatingMode == CoolingMode ) && SysRunning ) CalcLowTempHydrRadSysComps( RadSysNum, LoadMet );
+			if ( ( ( OperatingMode == HeatingMode ) || ( OperatingMode == CoolingMode ) ) && SysRunning ) CalcLowTempHydrRadSysComps( RadSysNum, LoadMet );
 
 		}
 

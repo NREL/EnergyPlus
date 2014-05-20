@@ -61,8 +61,8 @@ TEST( StreamTest, OStringStream )
 
 TEST( StreamTest, OFileStream )
 {
-	OFileStream stream( "StreamTest.txt" );
-	EXPECT_EQ( stream.name(), "StreamTest.txt" );
+	OFileStream stream( "StreamTestOFileStream.txt" );
+	EXPECT_EQ( stream.name(), "StreamTestOFileStream.txt" );
 	EXPECT_TRUE( stream.is_file() );
 	EXPECT_TRUE( stream.is_open() );
 #if defined(_MSC_VER) && !defined(__INTEL_COMPILER) // VC++2013 bug work-around
@@ -77,8 +77,20 @@ TEST( StreamTest, OFileStream )
 
 TEST( StreamTest, IFileStream )
 {
-	IFileStream stream( "StreamTest.txt" );
-	EXPECT_EQ( "StreamTest.txt", stream.name() );
+	{
+		OFileStream stream( "StreamTestIFileStream.txt" );
+#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) // VC++2013 bug work-around
+		stream.operator ()() << "This is line 1" << std::endl;
+		stream.operator ()() << "This is line 2" << std::endl;
+#else
+		stream() << "This is line 1" << std::endl;
+		stream() << "This is line 2" << std::endl;
+#endif
+		stream.close();
+	}
+
+	IFileStream stream( "StreamTestIFileStream.txt" );
+	EXPECT_EQ( "StreamTestIFileStream.txt", stream.name() );
 	EXPECT_TRUE( stream.is_file() );
 	EXPECT_TRUE( stream.is_open() );
 	std::string line;
