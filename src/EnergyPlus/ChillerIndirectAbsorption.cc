@@ -1168,7 +1168,7 @@ namespace ChillerIndirectAbsorption {
 		if ( IndirectAbsorber( ChillNum ).GeneratorVolFlowRate == AutoSize ) {
 			IsAutoSize = true;
 		}
-		if ( PltSizSteamNum > 0 && IndirectAbsorber( ChillNum ).GenHeatSourceType == NodeType_Steam || PltSizHeatingNum > 0 && IndirectAbsorber( ChillNum ).GenHeatSourceType == NodeType_Water ) {
+		if ( (PltSizSteamNum > 0 && IndirectAbsorber( ChillNum ).GenHeatSourceType == NodeType_Steam) || (PltSizHeatingNum > 0 && IndirectAbsorber( ChillNum ).GenHeatSourceType == NodeType_Water) ) {
 			if ( IndirectAbsorber( ChillNum ).EvapVolFlowRate >= SmallWaterVolFlow && tmpNomCap > 0.0 ) {
 				if ( IndirectAbsorber( ChillNum ).GenHeatSourceType == NodeType_Water ) {
 					CpWater = GetSpecificHeatGlycol( PlantLoop( IndirectAbsorber( ChillNum ).GenLoopNum ).FluidName, PlantSizData( PltSizHeatingNum ).ExitTemp, PlantLoop( IndirectAbsorber( ChillNum ).GenLoopNum ).FluidIndex, RoutineName );

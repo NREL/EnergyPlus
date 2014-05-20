@@ -410,7 +410,13 @@ ADD_SIMULATION_TEST(IDF_FILE WaterHeaterHeatPumpStratifiedTank.idf EPW_FILE USA_
 ADD_SIMULATION_TEST(IDF_FILE WaterHeaterStandAlone.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE WaterSideEconomizer_Integrated.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE WaterSideEconomizer_NonIntegrated.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
-ADD_SIMULATION_TEST(IDF_FILE WeatherTimeBins.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+
+if (TEST_ANNUAL_SIMULATION)
+  ADD_SIMULATION_TEST(IDF_FILE WeatherTimeBins.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+else()
+  message("Skipping WeatherTimeBins.idf because annual simulation is disabled")
+endif()
+
 ADD_SIMULATION_TEST(IDF_FILE WindACAuto.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE WindACRHControl.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE WindowTests.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)

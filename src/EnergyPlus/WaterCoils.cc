@@ -1196,7 +1196,7 @@ namespace WaterCoils {
 							}
 
 							// If not converged due to low Humidity Ratio approximate value at outlet conditions
-							if ( ( iter == itmax ) ) {
+							if ( iter == itmax ) {
 								NoSatCurveIntersect = true;
 								DesAirTempApparatusDewPt = PsyTdpFnWPb( WaterCoil( CoilNum ).DesOutletAirHumRat, OutBaroPress, BlankString );
 								DesAirHumRatApparatusDewPt = PsyWFnTdpPb( DesAirTempApparatusDewPt, OutBaroPress, BlankString );

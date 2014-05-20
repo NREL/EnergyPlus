@@ -3721,8 +3721,8 @@ namespace CondenserLoopTowers {
 		Real64 TempSetPoint;
 		Real64 WaterMassFlowRatePerCellMin;
 		Real64 WaterMassFlowRatePerCellMax;
-		int NumCellMin;
-		int NumCellMax;
+		int NumCellMin = 0;
+		int NumCellMax = 0;
 		int NumCellOn;
 		Real64 WaterMassFlowRatePerCell;
 		Real64 UAdesignPerCell;

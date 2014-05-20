@@ -1388,7 +1388,7 @@ namespace WaterToAirHeatPumpSimple {
 			}
 
 			// test autosized sensible and total cooling capacity for total > sensible
-			if ( RatedCapCoolSensAutoSized && RatedCapCoolTotalAutoSized || RatedCapCoolSensAutoSized ) {
+			if ( (RatedCapCoolSensAutoSized && RatedCapCoolTotalAutoSized) || RatedCapCoolSensAutoSized ) {
 				if ( SimpleWatertoAirHP( HPNum ).RatedCapCoolSens > SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal ) {
 					ShowWarningError( "COIL:" + SimpleWatertoAirHP( HPNum ).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" + SimpleWatertoAirHP( HPNum ).Name + "\"" );
 					ShowContinueError( RoutineName + ": Rated Sensible Cooling Capacity > Rated Total Cooling Capacity" );

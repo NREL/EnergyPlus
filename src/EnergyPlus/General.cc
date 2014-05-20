@@ -1347,7 +1347,7 @@ namespace General {
 		int TokenDay;
 		int TokenMonth;
 		int TokenWeekday;
-		int TokenYear;
+		int TokenYear; // what should this be initialized to?
 
 		FstNum = int( ProcessNumber( String, errFlag ) );
 		DateType = -1;

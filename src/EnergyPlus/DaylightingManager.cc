@@ -4266,13 +4266,11 @@ namespace DaylightingManager {
 					// Is the current line a Warning message?
 					if ( has_prefix( cErrorLine, "WARNING: " ) ) {
 						cErrorMsg = cErrorLine.substr( 9 );
-						cErrorMsg = cErrorMsg;
 						ShowWarningError( cErrorMsg );
 					}
 					// Is the current line an Error message?
 					if ( has_prefix( cErrorLine, "ERROR: " ) ) {
 						cErrorMsg = cErrorLine.substr( 7 );
-						cErrorMsg = cErrorMsg;
 						ShowSevereError( cErrorMsg );
 						iErrorFlag = 1;
 					}

@@ -1983,7 +1983,7 @@ namespace Fans {
 		Real64 MassFlow; // [kg/sec]
 		Real64 Tin; // [C]
 		Real64 PowerLossToAir; // fan and motor loss to air stream (watts)
-		bool FanIsRunning;
+		bool FanIsRunning = false; // There seems to be a missing else case below unless false is assumed
 
 		DeltaPress = Fan( FanNum ).DeltaPress;
 		if ( Fan( FanNum ).EMSFanPressureOverrideOn ) DeltaPress = Fan( FanNum ).EMSFanPressureValue;
