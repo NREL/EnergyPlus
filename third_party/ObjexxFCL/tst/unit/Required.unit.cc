@@ -93,7 +93,7 @@ TEST( RequiredTest, FstringFromLiteral )
 
 TEST( RequiredTest, FstringAssignment )
 {
-	static Fstring s( "A literal string" );
+	Fstring s( "A literal string" );
 	Required_Fstring o( s );
 	EXPECT_EQ( Fstring( "A literal string" ), o );
 	EXPECT_EQ( "A literal string", o() ); // Need the () on o() when types don't match exactly
