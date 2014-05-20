@@ -3308,7 +3308,7 @@ namespace FuelCellElectricGenerator {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "CalcFuelCellGenHeatRecovery" );
 
 		// DERIVED TYPE DEFINITIONS
 		// na
@@ -3373,7 +3373,7 @@ namespace FuelCellElectricGenerator {
 
 			THXexh = TprodGasIn - qHX / ( NdotGas * CpProdGasMol * 1000.0 );
 
-			Cp = GetSpecificHeatGlycol( PlantLoop( FuelCell( Num ).CWLoopNum ).FluidName, TwaterIn, PlantLoop( FuelCell( Num ).CWLoopNum ).FluidIndex, "CalcFuelCellGenHeatRecovery" );
+			Cp = GetSpecificHeatGlycol( PlantLoop( FuelCell( Num ).CWLoopNum ).FluidName, TwaterIn, PlantLoop( FuelCell( Num ).CWLoopNum ).FluidIndex, RoutineName );
 
 			if ( MdotWater * Cp <= 0.0 ) {
 				TwaterOut = TwaterIn;
@@ -3741,7 +3741,7 @@ namespace FuelCellElectricGenerator {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "InitFuelCellGenerators" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3840,7 +3840,7 @@ namespace FuelCellElectricGenerator {
 			FuelCell( FCnum ).Inverter.PCUlosses = 0.0;
 			FuelCell( FCnum ).Inverter.QairIntake = 0.0;
 
-			rho = GetDensityGlycol( PlantLoop( FuelCell( FCnum ).CWLoopNum ).FluidName, InitHRTemp, PlantLoop( FuelCell( FCnum ).CWLoopNum ).FluidIndex, "InitFuelCellGenerators" );
+			rho = GetDensityGlycol( PlantLoop( FuelCell( FCnum ).CWLoopNum ).FluidName, InitHRTemp, PlantLoop( FuelCell( FCnum ).CWLoopNum ).FluidIndex, RoutineName );
 
 			FuelCell( FCnum ).ExhaustHX.WaterMassFlowRateDesign = FuelCell( FCnum ).ExhaustHX.WaterVolumeFlowMax * rho;
 			FuelCell( FCnum ).ExhaustHX.WaterMassFlowRate = FuelCell( FCnum ).ExhaustHX.WaterMassFlowRateDesign;

@@ -244,6 +244,7 @@ namespace GroundHeatExchangers {
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS
+		static std::string const RoutineName( "CalcVerticalGroundHeatExchanger" );
 
 		//LOCAL BHORE HOLE PARAMETERS
 		int NumBholes;
@@ -301,10 +302,10 @@ namespace GroundHeatExchangers {
 		BholeLength = VerticalGlhe( GlheNum ).BoreholeLength;
 		GlheInletNode = VerticalGlhe( GlheNum ).GlheInletNodeNum;
 		GlheInletTemp = Node( GlheInletNode ).Temp;
-		Cp_Fluid = GetSpecificHeatGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, "CalcVerticalGroundHeatExchanger" );
+		Cp_Fluid = GetSpecificHeatGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, RoutineName );
 
 		Tground = VerticalGlhe( GlheNum ).TempGround;
-		FluidDensity = GetDensityGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, "CalcVerticalGroundHeatExchanger" );
+		FluidDensity = GetDensityGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, RoutineName );
 		K_Ground = VerticalGlhe( GlheNum ).KGround;
 		K_Ground_Factor = 2.0 * Pi * K_Ground;
 		AGG = VerticalGlhe( GlheNum ).AGG;
@@ -872,7 +873,7 @@ namespace GroundHeatExchangers {
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "CalcVerticalGroundHeatExchanger" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -919,15 +920,15 @@ namespace GroundHeatExchangers {
 		K_Ground = VerticalGlhe( GlheNum ).KGround;
 		Cp_Ground = VerticalGlhe( GlheNum ).CpRhoGround;
 
-		Cp_Fluid = GetSpecificHeatGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, "CalcVerticalGroundHeatExchanger" );
+		Cp_Fluid = GetSpecificHeatGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, RoutineName );
 
 		Tground = VerticalGlhe( GlheNum ).TempGround;
 		K_Grout = VerticalGlhe( GlheNum ).KGrout;
 		K_Pipe = VerticalGlhe( GlheNum ).KPipe;
-		K_Fluid = GetConductivityGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, "CalcVerticalGroundHeatExchanger" );
-		FluidDensity = GetDensityGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, "CalcVerticalGroundHeatExchanger" );
+		K_Fluid = GetConductivityGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, RoutineName );
+		FluidDensity = GetDensityGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, RoutineName );
 
-		FluidViscosity = GetViscosityGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, "CalcVerticalGroundHeatExchanger" );
+		FluidViscosity = GetViscosityGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, RoutineName );
 
 		PipeOuterDia = VerticalGlhe( GlheNum ).PipeOutDia;
 		DistUtube = VerticalGlhe( GlheNum ).UtubeDist;
@@ -1154,6 +1155,7 @@ namespace GroundHeatExchangers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "InitBoreholeHXSimVars" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1192,7 +1194,7 @@ namespace GroundHeatExchangers {
 			MyEnvrnFlag( GlheNum ) = false;
 
 			if ( ! allocated( LastQnSubHr ) ) LastQnSubHr.allocate( NumVerticalGlhes );
-			FluidDensity = GetDensityGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, 20., PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, "InitBoreholeHXSimVars" );
+			FluidDensity = GetDensityGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, 20., PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, RoutineName );
 			VerticalGlhe( GlheNum ).DesignMassFlow = VerticalGlhe( GlheNum ).DesignFlow * FluidDensity;
 			InitComponentNodes( 0.0, VerticalGlhe( GlheNum ).DesignMassFlow, VerticalGlhe( GlheNum ).GlheInletNodeNum, VerticalGlhe( GlheNum ).GlheOutletNodeNum, VerticalGlhe( GlheNum ).LoopNum, VerticalGlhe( GlheNum ).LoopSideNum, VerticalGlhe( GlheNum ).BranchNum, VerticalGlhe( GlheNum ).CompNum );
 
@@ -1254,6 +1256,7 @@ namespace GroundHeatExchangers {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const DeltaTempLimit( 100. ); // temp limit for warnings
+		static std::string const RoutineName( "UpdateVerticalGroundHeatExchanger" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1277,7 +1280,7 @@ namespace GroundHeatExchangers {
 		SafeCopyPlantNode( GlheInletNode, GlheOutletNode );
 
 		Node( GlheOutletNode ).Temp = GlheOutletTemp;
-		Node( GlheOutletNode ).Enthalpy = GlheOutletTemp * GetSpecificHeatGlycol( PlantLoop( VerticalGlhe( Num ).LoopNum ).FluidName, GlheOutletTemp, PlantLoop( VerticalGlhe( Num ).LoopNum ).FluidIndex, "UpdateVerticalGroundHeatExchanger" );
+		Node( GlheOutletNode ).Enthalpy = GlheOutletTemp * GetSpecificHeatGlycol( PlantLoop( VerticalGlhe( Num ).LoopNum ).FluidName, GlheOutletTemp, PlantLoop( VerticalGlhe( Num ).LoopNum ).FluidIndex, RoutineName );
 		GlhedeltaTemp = std::abs( GlheOutletTemp - GlheInletTemp );
 		VerticalGlheReport( Num ).GlheBoreholeTemp = GlheBoreholeTemp;
 		VerticalGlheReport( Num ).GlheOutletTemp = GlheOutletTemp;
@@ -1288,7 +1291,7 @@ namespace GroundHeatExchangers {
 		VerticalGlheReport( Num ).GlheAveFluidTemp = GlheAveFluidTemp;
 
 		if ( GlhedeltaTemp > DeltaTempLimit && NumErrorCalls < NumVerticalGlhes && ! WarmupFlag ) {
-			FluidDensity = GetDensityGlycol( PlantLoop( VerticalGlhe( Num ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( Num ).LoopNum ).FluidIndex, "UpdateVerticalGroundHeatExchanger" );
+			FluidDensity = GetDensityGlycol( PlantLoop( VerticalGlhe( Num ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( Num ).LoopNum ).FluidIndex, RoutineName );
 			DesignMassFlow = VerticalGlhe( Num ).DesignFlow * FluidDensity;
 			ShowWarningError( "Check GLHE design inputs & g-functions for consistency" );
 			ShowContinueError( "For GroundHeatExchanger:Vertical " + VerticalGlhe( Num ).Name + "GLHE delta Temp > 100C." );

@@ -52,7 +52,7 @@ namespace General {
 	// parts of the simulation.
 
 	// MODULE PARAMETER DEFINITIONS
-	// na
+	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS
 	// na
@@ -1423,7 +1423,6 @@ namespace General {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
 		static int const NumSingleChars( 3 );
 		static FArray1D_string const SingleChars( NumSingleChars, { "/", ":", "-" } );
 		static int const NumDoubleChars( 6 );
@@ -1479,13 +1478,13 @@ namespace General {
 		}
 
 		strip( CurrentString );
-		if ( CurrentString == Blank ) {
+		if ( CurrentString == BlankString ) {
 			ShowSevereError( "Invalid date field=" + String );
 			ErrorsFound = true;
 		} else {
 			Loop = 0;
 			while ( Loop < 3 ) { // Max of 3 fields
-				if ( CurrentString == Blank ) break;
+				if ( CurrentString == BlankString ) break;
 				Pos = index( CurrentString, ' ' );
 				++Loop;
 				if ( Pos == std::string::npos ) Pos = CurrentString.length();

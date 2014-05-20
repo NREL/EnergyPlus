@@ -66,6 +66,8 @@ namespace ExteriorEnergyUse {
 	int const ScheduleOnly( 1 ); // exterior lights only on schedule
 	int const AstroClockOverride( 2 ); // exterior lights controlled to turn off during day.
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -168,7 +170,6 @@ namespace ExteriorEnergyUse {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetExteriorEnergyUseInput: " );
-		static std::string const Blank;
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na

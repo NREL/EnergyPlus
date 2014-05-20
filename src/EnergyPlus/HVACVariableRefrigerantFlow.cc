@@ -135,6 +135,8 @@ namespace HVACVariableRefrigerantFlow {
 	// curve type for equivalent piping losses (not necessarily the same value used in CurveManager)
 	int const BiQuadratic( 4 );
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:
@@ -232,7 +234,7 @@ namespace HVACVariableRefrigerantFlow {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS
 
@@ -270,7 +272,7 @@ namespace HVACVariableRefrigerantFlow {
 				ShowFatalError( "SimulateVRF: Invalid CompIndex passed=" + TrimSigDigits( VRFTUNum ) + ", Number of VRF Terminal Units = " + TrimSigDigits( NumVRFTU ) + ", VRF Terminal Unit name = " + CompName );
 			}
 			if ( CheckEquipName( VRFTUNum ) ) {
-				if ( CompName != Blank && CompName != VRFTU( VRFTUNum ).Name ) {
+				if ( CompName != BlankString && CompName != VRFTU( VRFTUNum ).Name ) {
 					ShowFatalError( "SimulateVRF: Invalid CompIndex passed=" + TrimSigDigits( VRFTUNum ) + ", VRF Terminal Unit name=" + CompName + ", stored VRF TU Name for that index=" + VRFTU( VRFTUNum ).Name );
 				}
 				CheckEquipName( VRFTUNum ) = false;
@@ -465,7 +467,7 @@ namespace HVACVariableRefrigerantFlow {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "VRFCondenser" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -628,11 +630,11 @@ namespace HVACVariableRefrigerantFlow {
 		if ( VRF( VRFCond ).CondenserType == AirCooled ) {
 			CondInletTemp = OutdoorDryBulb; // Outdoor dry-bulb temp
 		} else if ( VRF( VRFCond ).CondenserType == EvapCooled ) {
-			RhoAir = PsyRhoAirFnPbTdbW( OutdoorPressure, OutdoorDryBulb, OutdoorHumRat );
+			RhoAir = PsyRhoAirFnPbTdbW( OutdoorPressure, OutdoorDryBulb, OutdoorHumRat, BlankString );
 			CondAirMassFlow = RhoAir * VRF( VRFCond ).EvapCondAirVolFlowRate;
 			// (Outdoor wet-bulb temp from DataEnvironment) + (1.0-EvapCondEffectiveness) * (drybulb - wetbulb)
 			CondInletTemp = OutdoorWetBulb + ( OutdoorDryBulb - OutdoorWetBulb ) * ( 1.0 - VRF( VRFCond ).EvapCondEffectiveness );
-			CondInletHumRat = PsyWFnTdbTwbPb( CondInletTemp, OutdoorWetBulb, OutdoorPressure );
+			CondInletHumRat = PsyWFnTdbTwbPb( CondInletTemp, OutdoorWetBulb, OutdoorPressure, BlankString );
 		} else if ( VRF( VRFCond ).CondenserType == WaterCooled ) {
 			CondInletTemp = OutdoorDryBulb; // node inlet temp from above
 			CondWaterMassFlow = VRF( VRFCond ).WaterCondenserDesignMassFlow;
@@ -735,7 +737,7 @@ namespace HVACVariableRefrigerantFlow {
 				// Calculating adjustment factors for defrost
 				// Calculate delta w through outdoor coil by assuming a coil temp of 0.82*DBT-9.7(F) per DOE2.1E
 				OutdoorCoilT = 0.82 * OutdoorDryBulb - 8.589;
-				OutdoorCoildw = max( 1.0e-6, ( OutdoorHumRat - PsyWFnTdpPb( OutdoorCoilT, OutdoorPressure ) ) );
+				OutdoorCoildw = max( 1.0e-6, ( OutdoorHumRat - PsyWFnTdpPb( OutdoorCoilT, OutdoorPressure, BlankString ) ) );
 
 				// Calculate defrost adjustment factors depending on defrost control type
 				if ( VRF( VRFCond ).DefrostControl == Timed ) {
@@ -1082,7 +1084,7 @@ namespace HVACVariableRefrigerantFlow {
 			VRF( VRFCond ).CondenserInletTemp = Node( VRF( VRFCond ).CondenserNodeNum ).Temp;
 			VRF( VRFCond ).WaterCondenserMassFlow = Node( VRF( VRFCond ).CondenserNodeNum ).MassFlowRate;
 
-			CpCond = GetSpecificHeatGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, VRF( VRFCond ).CondenserInletTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, "VRFCondenser" );
+			CpCond = GetSpecificHeatGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, VRF( VRFCond ).CondenserInletTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, RoutineName );
 			if ( CondWaterMassFlow > 0.0 ) {
 				CondOutletTemp = VRF( VRFCond ).QCondenser / ( CondWaterMassFlow * CpCond ) + CondInletTemp;
 			} else {
@@ -2822,7 +2824,7 @@ namespace HVACVariableRefrigerantFlow {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "InitVRF" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3014,7 +3016,7 @@ namespace HVACVariableRefrigerantFlow {
 			MyEnvrnFlag( VRFTUNum ) = false;
 
 			if ( VRF( VRFCond ).CondenserType == WaterCooled ) {
-				rho = GetDensityGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, InitConvTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, "InitVRF" );
+				rho = GetDensityGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, InitConvTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, RoutineName );
 				VRF( VRFCond ).WaterCondenserDesignMassFlow = VRF( VRFCond ).WaterCondVolFlowRate * rho;
 
 				InitComponentNodes( 0.0, VRF( VRFCond ).WaterCondenserDesignMassFlow, VRF( VRFCond ).CondenserNodeNum, VRF( VRFCond ).CondenserOutletNodeNum, VRF( VRFCond ).SourceLoopNum, VRF( VRFCond ).SourceLoopSideNum, VRF( VRFCond ).SourceBranchNum, VRF( VRFCond ).SourceCompNum );
@@ -4379,7 +4381,7 @@ namespace HVACVariableRefrigerantFlow {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "SizeVRFCondenser" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -4403,9 +4405,9 @@ namespace HVACVariableRefrigerantFlow {
 			if ( VRF( VRFCond ).WaterCondVolFlowRate == AutoSize ) {
 				if ( VRF( VRFCond ).SourceLoopNum > 0 ) PltSizCondNum = PlantLoop( VRF( VRFCond ).SourceLoopNum ).PlantSizNum;
 				if ( PltSizCondNum > 0 ) {
-					rho = GetDensityGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, "SizeVRFCondenser" );
+					rho = GetDensityGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, RoutineName );
 
-					Cp = GetSpecificHeatGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, "SizeVRFCondenser" );
+					Cp = GetSpecificHeatGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, RoutineName );
 					tmpCondVolFlowRate = VRF( VRFCond ).HeatingCapacity / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );
 					if ( VRF( VRFCond ).HeatingCapacity != AutoSize ) {
 						VRF( VRFCond ).WaterCondVolFlowRate = tmpCondVolFlowRate;
@@ -4766,7 +4768,6 @@ namespace HVACVariableRefrigerantFlow {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIte( 500 ); // maximum number of iterations
-		static std::string const Blank; // subroutine argument when coil index is known
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -5030,7 +5031,7 @@ namespace HVACVariableRefrigerantFlow {
 		SensibleConditioning = VRFTU( VRFTUNum ).TerminalUnitSensibleRate;
 		LatentConditioning = VRFTU( VRFTUNum ).TerminalUnitLatentRate;
 		// convert latent in kg/s to watts
-		H2OHtOfVap = PsyHfgAirFnWTdb( Node( VRFTU( VRFTUNum ).VRFTUOutletNodeNum ).HumRat, Node( VRFTU( VRFTUNum ).VRFTUOutletNodeNum ).Temp, "ReportVRFTerminalUnit" );
+		H2OHtOfVap = PsyHfgAirFnWTdb( Node( VRFTU( VRFTUNum ).VRFTUOutletNodeNum ).HumRat, Node( VRFTU( VRFTUNum ).VRFTUOutletNodeNum ).Temp );
 		TotalConditioning = SensibleConditioning + ( LatentConditioning * H2OHtOfVap );
 
 		if ( TotalConditioning <= 0.0 ) {

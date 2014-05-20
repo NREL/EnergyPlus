@@ -81,6 +81,8 @@ namespace PlantManager {
 	bool InitLoopEquip( true );
 	bool GetCompSizFac( false );
 
+	static std::string const fluidNameSteam( "STEAM" );
+
 	//MODULE DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DEFINITIONS
@@ -364,14 +366,14 @@ namespace PlantManager {
 
 			this_loop.Name = Alpha( 1 ); // Load the Plant Loop Name
 
-			if ( Alpha( 2 ) == "STEAM" ) {
+			if ( SameString( Alpha( 2 ), "STEAM" ) ) {
 				this_loop.FluidType = NodeType_Steam;
 				this_loop.FluidName = Alpha( 2 );
-			} else if ( Alpha( 2 ) == "WATER" ) {
+			} else if ( SameString( Alpha( 2 ), "WATER" ) ) {
 				this_loop.FluidType = NodeType_Water;
 				this_loop.FluidName = Alpha( 2 );
 				this_loop.FluidIndex = FindGlycol( Alpha( 2 ) );
-			} else if ( Alpha( 2 ) == "USERDEFINEDFLUIDTYPE" ) {
+			} else if ( SameString( Alpha( 2 ), "USERDEFINEDFLUIDTYPE" ) ) {
 				this_loop.FluidType = NodeType_Water;
 				this_loop.FluidName = Alpha( 3 );
 				// check for valid fluid name
@@ -2271,6 +2273,8 @@ namespace PlantManager {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const StartQuality( 1.0 );
 		Real64 const StartHumRat( 0.0 );
+		static std::string const RoutineNameAlt( "InitializeLoops" );
+		static std::string const RoutineName( "PlantManager:InitializeLoop" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2359,12 +2363,12 @@ namespace PlantManager {
 					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).OutletNode.MassFlowRateHistory = 0.0;
 
 					if ( PlantLoop( LoopNum ).FluidType != NodeType_Steam ) {
-						Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, LoopSetPointTemp, PlantLoop( LoopNum ).FluidIndex, "InitializeLoops" );
+						Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, LoopSetPointTemp, PlantLoop( LoopNum ).FluidIndex, RoutineNameAlt );
 						StartEnthalpy = Cp * LoopSetPointTemp;
 					}
 					// Use Min/Max flow rates to initialize loop
 					if ( PlantLoop( LoopNum ).FluidType == NodeType_Water ) {
-						rho = GetDensityGlycol( PlantLoop( LoopNum ).FluidName, LoopSetPointTemp, PlantLoop( LoopNum ).FluidIndex, "InitializeLoops" );
+						rho = GetDensityGlycol( PlantLoop( LoopNum ).FluidName, LoopSetPointTemp, PlantLoop( LoopNum ).FluidIndex, RoutineNameAlt );
 
 						LoopMaxMassFlowRate = PlantLoop( LoopNum ).MaxVolFlowRate * rho;
 						LoopMinMassFlowRate = PlantLoop( LoopNum ).MinVolFlowRate * rho;
@@ -2373,9 +2377,9 @@ namespace PlantManager {
 					//use saturated liquid of steam at the loop setpoint temp as the starting enthalpy for a water loop
 					if ( PlantLoop( LoopNum ).FluidType == NodeType_Steam ) {
 						SteamTemp = 100.0;
-						SteamDensity = GetSatDensityRefrig( "STEAM", SteamTemp, 1.0, PlantLoop( LoopNum ).FluidIndex, "PlantManager:InitializeLoop" );
+						SteamDensity = GetSatDensityRefrig( fluidNameSteam, SteamTemp, 1.0, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 						LoopMaxMassFlowRate = PlantLoop( LoopNum ).MaxVolFlowRate * SteamDensity;
-						StartEnthalpy = GetSatEnthalpyRefrig( "STEAM", LoopSetPointTemp, 0.0, PlantLoop( LoopNum ).FluidIndex, "PlantManager:InitializeLoop" );
+						StartEnthalpy = GetSatEnthalpyRefrig( fluidNameSteam, LoopSetPointTemp, 0.0, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 						LoopMinMassFlowRate = PlantLoop( LoopNum ).MinVolFlowRate * SteamDensity;
 					}
 
@@ -2946,7 +2950,7 @@ namespace PlantManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "SizePlantLoop" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3100,9 +3104,9 @@ namespace PlantManager {
 
 		//should now have plant volume, calculate plant volume's mass for fluid type
 		if ( PlantLoop( LoopNum ).FluidType == NodeType_Water ) {
-			FluidDensity = GetDensityGlycol( PlantLoop( LoopNum ).FluidName, InitConvTemp, PlantLoop( LoopNum ).FluidIndex, "SizePlantLoop" );
+			FluidDensity = GetDensityGlycol( PlantLoop( LoopNum ).FluidName, InitConvTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 		} else if ( PlantLoop( LoopNum ).FluidType == NodeType_Steam ) {
-			FluidDensity = GetSatDensityRefrig( "STEAM", 100.0, 1.0, PlantLoop( LoopNum ).FluidIndex, "SizePlantLoop" );
+			FluidDensity = GetSatDensityRefrig( fluidNameSteam, 100.0, 1.0, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 		}
 
 		PlantLoop( LoopNum ).Mass = PlantLoop( LoopNum ).Volume * FluidDensity;

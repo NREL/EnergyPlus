@@ -1266,9 +1266,9 @@ ShowRecurringSevereErrorAtEnd(
 	Optional< Real64 const > ReportMaxOf, // Track and report the max of the values passed to this argument
 	Optional< Real64 const > ReportMinOf, // Track and report the min of the values passed to this argument
 	Optional< Real64 const > ReportSumOf, // Track and report the sum of the values passed to this argument
-	Optional_string_const ReportMaxUnits, // optional char string (<=15 length) of units for max value
-	Optional_string_const ReportMinUnits, // optional char string (<=15 length) of units for min value
-	Optional_string_const ReportSumUnits // optional char string (<=15 length) of units for sum value
+	std::string const & ReportMaxUnits, // optional char string (<=15 length) of units for max value
+	std::string const & ReportMinUnits, // optional char string (<=15 length) of units for min value
+	std::string const & ReportSumUnits // optional char string (<=15 length) of units for sum value
 )
 {
 
@@ -1326,9 +1326,9 @@ ShowRecurringWarningErrorAtEnd(
 	Optional< Real64 const > ReportMaxOf, // Track and report the max of the values passed to this argument
 	Optional< Real64 const > ReportMinOf, // Track and report the min of the values passed to this argument
 	Optional< Real64 const > ReportSumOf, // Track and report the sum of the values passed to this argument
-	Optional_string_const ReportMaxUnits, // optional char string (<=15 length) of units for max value
-	Optional_string_const ReportMinUnits, // optional char string (<=15 length) of units for min value
-	Optional_string_const ReportSumUnits // optional char string (<=15 length) of units for sum value
+	std::string const & ReportMaxUnits, // optional char string (<=15 length) of units for max value
+	std::string const & ReportMinUnits, // optional char string (<=15 length) of units for min value
+	std::string const & ReportSumUnits // optional char string (<=15 length) of units for sum value
 )
 {
 
@@ -1386,9 +1386,9 @@ ShowRecurringContinueErrorAtEnd(
 	Optional< Real64 const > ReportMaxOf, // Track and report the max of the values passed to this argument
 	Optional< Real64 const > ReportMinOf, // Track and report the min of the values passed to this argument
 	Optional< Real64 const > ReportSumOf, // Track and report the sum of the values passed to this argument
-	Optional_string_const ReportMaxUnits, // optional char string (<=15 length) of units for max value
-	Optional_string_const ReportMinUnits, // optional char string (<=15 length) of units for min value
-	Optional_string_const ReportSumUnits // optional char string (<=15 length) of units for sum value
+	std::string const & ReportMaxUnits, // optional char string (<=15 length) of units for max value
+	std::string const & ReportMinUnits, // optional char string (<=15 length) of units for min value
+	std::string const & ReportSumUnits // optional char string (<=15 length) of units for sum value
 )
 {
 
@@ -1445,9 +1445,9 @@ StoreRecurringErrorMessage(
 	Optional< Real64 const > ErrorReportMaxOf, // Track and report the max of the values passed to this argument
 	Optional< Real64 const > ErrorReportMinOf, // Track and report the min of the values passed to this argument
 	Optional< Real64 const > ErrorReportSumOf, // Track and report the sum of the values passed to this argument
-	Optional_string_const ErrorReportMaxUnits, // Units for "max" reporting
-	Optional_string_const ErrorReportMinUnits, // Units for "min" reporting
-	Optional_string_const ErrorReportSumUnits // Units for "sum" reporting
+	std::string const & ErrorReportMaxUnits, // Units for "max" reporting
+	std::string const & ErrorReportMinUnits, // Units for "min" reporting
+	std::string const & ErrorReportSumUnits // Units for "sum" reporting
 )
 {
 
@@ -1516,21 +1516,21 @@ StoreRecurringErrorMessage(
 		if ( present( ErrorReportMaxOf ) ) {
 			RecurringErrors( ErrorMsgIndex ).MaxValue = ErrorReportMaxOf;
 			RecurringErrors( ErrorMsgIndex ).ReportMax = true;
-			if ( present( ErrorReportMaxUnits ) ) {
+			if ( ! ErrorReportMaxUnits.empty() ) {
 				RecurringErrors( ErrorMsgIndex ).MaxUnits = ErrorReportMaxUnits;
 			}
 		}
 		if ( present( ErrorReportMinOf ) ) {
 			RecurringErrors( ErrorMsgIndex ).MinValue = ErrorReportMinOf;
 			RecurringErrors( ErrorMsgIndex ).ReportMin = true;
-			if ( present( ErrorReportMinUnits ) ) {
+			if ( ! ErrorReportMinUnits.empty() ) {
 				RecurringErrors( ErrorMsgIndex ).MinUnits = ErrorReportMinUnits;
 			}
 		}
 		if ( present( ErrorReportSumOf ) ) {
 			RecurringErrors( ErrorMsgIndex ).SumValue = ErrorReportSumOf;
 			RecurringErrors( ErrorMsgIndex ).ReportSum = true;
-			if ( present( ErrorReportSumUnits ) ) {
+			if ( ! ErrorReportSumUnits.empty() ) {
 				RecurringErrors( ErrorMsgIndex ).SumUnits = ErrorReportSumUnits;
 			}
 		}

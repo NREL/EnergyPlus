@@ -2887,6 +2887,7 @@ namespace HVACDXSystem {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const RunOnSensible( 1 ); // identifier for temperature (sensible load) control
 		int const RunOnLatent( 2 ); // identifier for humidity (latent load) control
+		static std::string const RoutineName( "FrostControlSetPointLimit" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2903,7 +2904,7 @@ namespace HVACDXSystem {
 				DXCoolingSystem( DXSystemNum ).FrostControlStatus = 1;
 			}
 		} else if ( ControlMode == RunOnLatent && AirMassFlow > MinAirMassFlow && HumRatSetPoint < Node( DXCoolingSystem( DXSystemNum ).DXCoolingCoilInletNodeNum ).HumRat ) {
-			HumRatioSat = PsyWFnTdpPb( TfrostControl, BaroPress, "FrostControlSetPointLimit" );
+			HumRatioSat = PsyWFnTdpPb( TfrostControl, BaroPress, RoutineName );
 			if ( HumRatioSat > HumRatSetPoint ) {
 				HumRatSetPoint = HumRatioSat;
 				DXCoolingSystem( DXSystemNum ).FrostControlStatus = 2;

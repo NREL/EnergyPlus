@@ -126,6 +126,10 @@ namespace OutdoorAirUnit {
 
 	FArray1D_string const CurrentModuleObjects( 2, { "ZoneHVAC:OutdoorAirUnit", "ZoneHVAC:OutdoorAirUnit:EquipmentList" } );
 
+	static std::string const fluidNameSteam( "STEAM" );
+	static std::string const fluidNameWater( "WATER" );
+	static std::string const BlankString;
+
 	// Parameters below (CO - Current module Object.  used primarily in Get Inputs)
 	// Multiple Get Input routines in this module or these would be in individual routines.
 	int const CO_OAUnit( 1 );
@@ -313,7 +317,6 @@ namespace OutdoorAirUnit {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
 		static std::string const RoutineName( "GetOutdoorAirUnitInputs: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -829,6 +832,7 @@ namespace OutdoorAirUnit {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const CurrentModuleObject( "ZoneHVAC:OutdoorAirUnit" );
+		static std::string const RoutineName( "SizeOutdoorAirUnit" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -944,7 +948,7 @@ namespace OutdoorAirUnit {
 			if ( ! MyPlantScanFlag( OAUnitNum ) ) {
 				for ( compLoop = 1; compLoop <= OutAirUnit( OAUnitNum ).NumComponents; ++compLoop ) {
 					if ( ( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CoilPlantTypeOfNum == TypeOf_CoilWaterCooling ) || ( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CoilPlantTypeOfNum == TypeOf_CoilWaterDetailedFlatCooling ) ) {
-						rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum ).FluidName, 5., PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum ).FluidIndex, "SizeOutdoorAirUnit" );
+						rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum ).FluidName, 5., PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum ).FluidIndex, RoutineName );
 						OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxWaterMassFlow = rho * OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxVolWaterFlow;
 						OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MinWaterMassFlow = rho * OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MinVolWaterFlow;
 						InitComponentNodes( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MinWaterMassFlow, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxWaterMassFlow, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CoilWaterInletNode, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CoilWaterOutletNode, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopSideNum, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).BranchNum, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CompNum );
@@ -952,14 +956,14 @@ namespace OutdoorAirUnit {
 					}
 
 					if ( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CoilPlantTypeOfNum == TypeOf_CoilWaterSimpleHeating ) {
-						rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum ).FluidName, 60., PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum ).FluidIndex, "SizeOutdoorAirUnit" );
+						rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum ).FluidName, 60., PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum ).FluidIndex, RoutineName );
 						OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxWaterMassFlow = rho * OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxVolWaterFlow;
 						OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MinWaterMassFlow = rho * OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MinVolWaterFlow;
 						InitComponentNodes( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MinWaterMassFlow, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxWaterMassFlow, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CoilWaterInletNode, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CoilWaterOutletNode, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopSideNum, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).BranchNum, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CompNum );
 					}
 					if ( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CoilPlantTypeOfNum == TypeOf_CoilSteamAirHeating ) {
 						//DSU deal with steam mass flow rate , currenlty just like hot water  DSU?
-						rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum ).FluidName, 60., PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum ).FluidIndex, "SizeOutdoorAirUnit" );
+						rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum ).FluidName, 60., PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum ).FluidIndex, RoutineName );
 						OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxWaterMassFlow = rho * OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxVolWaterFlow;
 						OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MinWaterMassFlow = rho * OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MinVolWaterFlow;
 						InitComponentNodes( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MinWaterMassFlow, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxWaterMassFlow, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CoilWaterInletNode, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CoilWaterOutletNode, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopSideNum, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).BranchNum, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CompNum );
@@ -1093,7 +1097,7 @@ namespace OutdoorAirUnit {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "SizeOutdoorAirUnit" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1281,9 +1285,9 @@ namespace OutdoorAirUnit {
 										CoilInHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
 										DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow * ( PsyHFnTdbW( CoilInTemp, CoilInHumRat ) - PsyHFnTdbW( CoilOutTemp, CoilOutHumRat ) );
 										DesCoilLoad = max( 0.0, DesCoilLoad );
-										rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 5., PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, "SizeOutdoorAirUnit" );
+										rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 5., PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, RoutineName );
 
-										Cp = GetSpecificHeatGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 5., PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, "SizeOutdoorAirUnit" );
+										Cp = GetSpecificHeatGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 5., PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, RoutineName );
 
 										MaxVolWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizCoolNum ).DeltaT * Cp * rho );
 									} else {
@@ -1342,9 +1346,9 @@ namespace OutdoorAirUnit {
 										CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
 										DesCoilLoad = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow * ( CoilOutTemp - CoilInTemp );
 										DesCoilLoad = max( 0.0, DesCoilLoad );
-										rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 60., PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, "SizeOutdoorAirUnit" );
+										rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 60., PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, RoutineName );
 
-										Cp = GetSpecificHeatGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 60., PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, "SizeOutdoorAirUnit" );
+										Cp = GetSpecificHeatGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 60., PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, RoutineName );
 
 										MaxVolWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 									} else {
@@ -1402,13 +1406,13 @@ namespace OutdoorAirUnit {
 										DesCoilLoad = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow * ( CoilOutTemp - CoilInTemp );
 										DesCoilLoad = max( 0.0, DesCoilLoad );
 										TempSteamIn = 100.00;
-										EnthSteamInDry = GetSatEnthalpyRefrig( "STEAM", TempSteamIn, 1.0, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).FluidIndex, "SizeOutdoorAirUnit" );
-										EnthSteamOutWet = GetSatEnthalpyRefrig( "STEAM", TempSteamIn, 0.0, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).FluidIndex, "SizeOutdoorAirUnit" );
+										EnthSteamInDry = GetSatEnthalpyRefrig( fluidNameSteam, TempSteamIn, 1.0, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).FluidIndex, RoutineName );
+										EnthSteamOutWet = GetSatEnthalpyRefrig( fluidNameSteam, TempSteamIn, 0.0, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).FluidIndex, RoutineName );
 										LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-										SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).FluidIndex, "SizeOutdoorAirUnit" );
+										SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).FluidIndex, RoutineName );
 										//DSU?  deal with steam properties
-										Cp = GetSpecificHeatGlycol( "WATER", 60., DummyWaterIndex, "SizeOutdoorAirUnit" );
-										rho = GetDensityGlycol( "WATER", 60., DummyWaterIndex, "SizeOutdoorAirUnit" );
+										Cp = GetSpecificHeatGlycol( fluidNameWater, 60., DummyWaterIndex, RoutineName );
+										rho = GetDensityGlycol( fluidNameWater, 60., DummyWaterIndex, RoutineName );
 										MaxVolWaterFlowDes = DesCoilLoad / ( ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho ) + SteamDensity * LatentHeatSteam );
 									} else {
 										MaxVolWaterFlowDes = 0.0;
@@ -1464,9 +1468,9 @@ namespace OutdoorAirUnit {
 										CoilInHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
 										DesCoilLoad = SizeAirMassFlow * ( PsyHFnTdbW( CoilInTemp, CoilInHumRat ) - PsyHFnTdbW( CoilOutTemp, CoilOutHumRat ) );
 										DesCoilLoad = max( 0.0, DesCoilLoad );
-										rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 5., PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, "SizeOutdoorAirUnit" );
+										rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 5., PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, RoutineName );
 
-										Cp = GetSpecificHeatGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 5., PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, "SizeOutdoorAirUnit" );
+										Cp = GetSpecificHeatGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 5., PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, RoutineName );
 
 										MaxVolWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizCoolNum ).DeltaT * Cp * rho );
 									} else {
@@ -1525,9 +1529,9 @@ namespace OutdoorAirUnit {
 										CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
 										CoilInHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
 										DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow * ( PsyHFnTdbW( CoilInTemp, CoilInHumRat ) - PsyHFnTdbW( CoilOutTemp, CoilOutHumRat ) );
-										rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 5., PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, "SizeOutdoorAirUnit" );
+										rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 5., PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, RoutineName );
 
-										Cp = GetSpecificHeatGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 5., PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, "SizeOutdoorAirUnit" );
+										Cp = GetSpecificHeatGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 5., PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, RoutineName );
 
 										MaxVolWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizCoolNum ).DeltaT * Cp * rho );
 									} else {

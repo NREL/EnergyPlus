@@ -94,6 +94,7 @@ namespace Fans {
 
 	int const ExhaustFanCoupledToAvailManagers( 150 );
 	int const ExhaustFanDecoupledFromAvailManagers( 151 );
+	static std::string const BlankString;
 
 	//na
 
@@ -167,7 +168,7 @@ namespace Fans {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS
 
@@ -197,7 +198,7 @@ namespace Fans {
 				ShowFatalError( "SimulateFanComponents: Invalid CompIndex passed=" + TrimSigDigits( FanNum ) + ", Number of Fans=" + TrimSigDigits( NumFans ) + ", Fan name=" + CompName );
 			}
 			if ( CheckEquipName( FanNum ) ) {
-				if ( CompName != Blank && CompName != Fan( FanNum ).FanName ) {
+				if ( CompName != BlankString && CompName != Fan( FanNum ).FanName ) {
 					ShowFatalError( "SimulateFanComponents: Invalid CompIndex passed=" + TrimSigDigits( FanNum ) + ", Fan name=" + CompName + ", stored Fan Name for that index=" + Fan( FanNum ).FanName );
 				}
 				CheckEquipName( FanNum ) = false;

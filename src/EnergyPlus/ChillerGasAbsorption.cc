@@ -572,7 +572,7 @@ namespace ChillerGasAbsorption {
 		// side of chiller-heater is being called
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "InitGasAbsorber" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -697,7 +697,7 @@ namespace ChillerGasAbsorption {
 			if ( GasAbsorber( ChillNum ).isWaterCooled ) {
 				// init max available condenser water flow rate
 				if ( GasAbsorber( ChillNum ).CDLoopNum > 0 ) {
-					rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidName, InitConvTemp, PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidIndex, "InitGasAbsorber" );
+					rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidName, InitConvTemp, PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 				} else {
 					rho = RhoH2O( InitConvTemp );
 
@@ -708,7 +708,7 @@ namespace ChillerGasAbsorption {
 			}
 
 			if ( GasAbsorber( ChillNum ).HWLoopNum > 0 ) {
-				rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).HWLoopNum ).FluidName, InitConvTemp, PlantLoop( GasAbsorber( ChillNum ).HWLoopNum ).FluidIndex, "InitGasAbsorber" );
+				rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).HWLoopNum ).FluidName, InitConvTemp, PlantLoop( GasAbsorber( ChillNum ).HWLoopNum ).FluidIndex, RoutineName );
 			} else {
 				rho = RhoH2O( InitConvTemp );
 			}
@@ -717,7 +717,7 @@ namespace ChillerGasAbsorption {
 			InitComponentNodes( 0.0, GasAbsorber( ChillNum ).DesHeatMassFlowRate, HeatInletNode, HeatOutletNode, GasAbsorber( ChillNum ).HWLoopNum, GasAbsorber( ChillNum ).HWLoopSideNum, GasAbsorber( ChillNum ).HWBranchNum, GasAbsorber( ChillNum ).HWCompNum );
 
 			if ( GasAbsorber( ChillNum ).CWLoopNum > 0 ) {
-				rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, "InitGasAbsorber" );
+				rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 			} else {
 				rho = RhoH2O( InitConvTemp );
 			}
@@ -795,7 +795,7 @@ namespace ChillerGasAbsorption {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "SizeGasAbsorber" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -854,8 +854,8 @@ namespace ChillerGasAbsorption {
 		}
 		if ( PltSizCoolNum > 0 ) {
 			if ( PlantSizData( PltSizCoolNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
-				Cp = GetSpecificHeatGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, "SizeGasAbsorber" );
-				rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, "SizeGasAbsorber" );
+				Cp = GetSpecificHeatGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * PlantSizData( PltSizCoolNum ).DeltaT * PlantSizData( PltSizCoolNum ).DesVolFlowRate * GasAbsorber( ChillNum ).SizFac;
 				if ( ! IsAutoSize ) tmpNomCap = GasAbsorber( ChillNum ).NomCoolingCap;
 				//IF (PlantSizesOkayToFinalize) GasAbsorber(ChillNum)%NomCoolingCap = tmpNomCap
@@ -1020,8 +1020,8 @@ namespace ChillerGasAbsorption {
 		if ( PltSizCondNum > 0 && PltSizCoolNum > 0 ) {
 			if ( PlantSizData( PltSizCoolNum ).DesVolFlowRate >= SmallWaterVolFlow && tmpNomCap > 0.0 ) {
 
-				Cp = GetSpecificHeatGlycol( PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidName, GasAbsorber( ChillNum ).TempDesCondReturn, PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidIndex, "SizeGasAbsorber" );
-				rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidName, GasAbsorber( ChillNum ).TempDesCondReturn, PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidIndex, "SizeGasAbsorber" );
+				Cp = GetSpecificHeatGlycol( PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidName, GasAbsorber( ChillNum ).TempDesCondReturn, PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidName, GasAbsorber( ChillNum ).TempDesCondReturn, PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 				tmpCondVolFlowRate = tmpNomCap * ( 1.0 + GasAbsorber( ChillNum ).FuelCoolRatio ) / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );
 				if ( ! IsAutoSize ) tmpCondVolFlowRate = GasAbsorber( ChillNum ).CondVolFlowRate;
 				//IF (PlantSizesOkayToFinalize) GasAbsorber(ChillNum)%CondVolFlowRate = tmpCondVolFlowRate
@@ -1134,6 +1134,7 @@ namespace ChillerGasAbsorption {
 		// FlowLock = 1  if mass flow rates may not be changed by loop components
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "CalcGasAbsorberChillerModel" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1287,10 +1288,10 @@ namespace ChillerGasAbsorption {
 		}}
 		ChillDeltaTemp = std::abs( lChillReturnTemp - ChillSupplySetPointTemp );
 
-		rhoCW = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, lChillReturnTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, "CalcGasAbsorberChillerModel" );
-		Cp_CW = GetSpecificHeatGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, lChillReturnTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, "CalcGasAbsorberChillerModel" );
-		rhoCD = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidName, lChillReturnTemp, PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidIndex, "CalcGasAbsorberChillerModel" );
-		Cp_CD = GetSpecificHeatGlycol( PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidName, lChillReturnTemp, PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidIndex, "CalcGasAbsorberChillerModel" );
+		rhoCW = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, lChillReturnTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+		Cp_CW = GetSpecificHeatGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, lChillReturnTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+		rhoCD = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidName, lChillReturnTemp, PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
+		Cp_CD = GetSpecificHeatGlycol( PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidName, lChillReturnTemp, PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 
 		//If no loop demand or Absorber OFF, return
 		// will need to modify when absorber can act as a boiler
@@ -1547,6 +1548,7 @@ namespace ChillerGasAbsorption {
 		//                 below Setpoint
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "CalcGasAbsorberHeaterModel" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1644,8 +1646,8 @@ namespace ChillerGasAbsorption {
 		LoopNum = GasAbsorber( ChillNum ).HWLoopNum;
 		LoopSideNum = GasAbsorber( ChillNum ).HWLoopSideNum;
 
-		Cp_HW = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, lHotWaterReturnTemp, PlantLoop( LoopNum ).FluidIndex, "CalcGasAbsorberHeaterModel" );
-		rhoHW = GetDensityGlycol( PlantLoop( LoopNum ).FluidName, lHotWaterReturnTemp, PlantLoop( LoopNum ).FluidIndex, "CalcGasAbsorberHeaterModel" );
+		Cp_HW = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, lHotWaterReturnTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
+		rhoHW = GetDensityGlycol( PlantLoop( LoopNum ).FluidName, lHotWaterReturnTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 
 		lCoolElectricPower = GasAbsorberReport( ChillNum ).CoolElectricPower;
 		lCoolFuelUseRate = GasAbsorberReport( ChillNum ).CoolFuelUseRate;

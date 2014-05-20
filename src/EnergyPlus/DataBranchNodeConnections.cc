@@ -30,7 +30,7 @@ namespace DataBranchNodeConnections {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
-	std::string const Blank;
+	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS:
 

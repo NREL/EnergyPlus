@@ -80,7 +80,7 @@ namespace CurveManager {
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
-	std::string const Blank;
+	static std::string const BlankString;
 
 	// Curve Type parameters, these can differ from object types (e.g. a CurveType_TableOneIV can be linear, quadratic, etc)
 	int const Linear( 1 );

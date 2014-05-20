@@ -100,6 +100,8 @@ namespace UnitHeater {
 	std::string const WaterCoil( "WaterCoil" );
 	std::string const SteamCoil( "SteamCoil" );
 
+	static std::string const fluidNameSteam( "STEAM" );
+
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -606,7 +608,7 @@ namespace UnitHeater {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "InitUnitHeater" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -697,7 +699,7 @@ namespace UnitHeater {
 			Node( InNode ).MassFlowRateMin = 0.0;
 
 			if ( UnitHeat( UnitHeatNum ).HCoilType == WaterCoil ) {
-				rho = GetDensityGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, 60., PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, "InitUnitHeater" );
+				rho = GetDensityGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, 60., PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 				UnitHeat( UnitHeatNum ).MaxHotWaterFlow = rho * UnitHeat( UnitHeatNum ).MaxVolHotWaterFlow;
 				UnitHeat( UnitHeatNum ).MinHotWaterFlow = rho * UnitHeat( UnitHeatNum ).MinVolHotWaterFlow;
@@ -705,7 +707,7 @@ namespace UnitHeater {
 			}
 			if ( UnitHeat( UnitHeatNum ).HCoilType == SteamCoil ) {
 				TempSteamIn = 100.00;
-				SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, UnitHeat( UnitHeatNum ).HCoil_FluidIndex, "InitUnitHeater" );
+				SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, UnitHeat( UnitHeatNum ).HCoil_FluidIndex, RoutineName );
 				UnitHeat( UnitHeatNum ).MaxHotSteamFlow = SteamDensity * UnitHeat( UnitHeatNum ).MaxVolHotSteamFlow;
 				UnitHeat( UnitHeatNum ).MinHotSteamFlow = SteamDensity * UnitHeat( UnitHeatNum ).MinVolHotSteamFlow;
 
@@ -813,7 +815,7 @@ namespace UnitHeater {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "SizeUnitHeater" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -914,8 +916,8 @@ namespace UnitHeater {
 							DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad;
 							if ( DesCoilLoad >= SmallLoad ) {
 
-								rho = GetDensityGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, 60., PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, "SizeUnitHeater" );
-								Cp = GetSpecificHeatGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, 60., PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, "SizeUnitHeater" );
+								rho = GetDensityGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, 60., PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, RoutineName );
+								Cp = GetSpecificHeatGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, 60., PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 								MaxVolHotWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 							} else {
@@ -974,10 +976,10 @@ namespace UnitHeater {
 							DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad;
 							if ( DesCoilLoad >= SmallLoad ) {
 								TempSteamIn = 100.00;
-								EnthSteamInDry = GetSatEnthalpyRefrig( "STEAM", TempSteamIn, 1.0, RefrigIndex, "SizeUnitHeater" );
-								EnthSteamOutWet = GetSatEnthalpyRefrig( "STEAM", TempSteamIn, 0.0, RefrigIndex, "SizeUnitHeater" );
+								EnthSteamInDry = GetSatEnthalpyRefrig( fluidNameSteam, TempSteamIn, 1.0, RefrigIndex, RoutineName );
+								EnthSteamOutWet = GetSatEnthalpyRefrig( fluidNameSteam, TempSteamIn, 0.0, RefrigIndex, RoutineName );
 								LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-								SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, RefrigIndex, "SizeUnitHeater" );
+								SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, RefrigIndex, RoutineName );
 								MaxVolHotSteamFlowDes = DesCoilLoad / ( SteamDensity * ( LatentHeatSteam + PlantSizData( PltSizHeatNum ).DeltaT * CPHW( PlantSizData( PltSizHeatNum ).ExitTemp ) ) );
 							} else {
 								MaxVolHotSteamFlowDes = 0.0;
