@@ -1163,6 +1163,12 @@ TEST( FArray2Test, AssignOtherData )
 		}
 	}
 
+// These unit tests can generate warnings for certain templated types, that's fine
+#ifdef __llvm__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wliteral-conversion"
+#endif
+
 	A1 = 2.718; // May cause warnings about conversion
 	for ( int i2 = A1.l2(); i2 <= A1.u2(); ++i2 ) {
 		for ( int i1 = A1.l1(); i1 <= A1.u1(); ++i1 ) {
@@ -1176,6 +1182,11 @@ TEST( FArray2Test, AssignOtherData )
 			EXPECT_EQ( i1, A1( i1, i2 ) );
 		}
 	}
+
+#ifdef __llvm__
+#pragma clang diagnostic pop
+#endif
+
 }
 
 TEST( FArray2Test, AssignProxy )

@@ -514,7 +514,7 @@ TEST( FArrayTest, UboundOfUnbounded )
 	EXPECT_EQ( 1, lbound( u, 1 ) );
 	EXPECT_EQ( 1, lbound( u, 2 ) );
 	EXPECT_EQ( 3, ubound( u, 1 ) );
-	EXPECT_DEATH( ubound( u, 2 ), ".*Assertion.*" ); // Can't take ubound of unbounded dimension
+	EXPECT_DEBUG_DEATH( ubound( u, 2 ), ".*Assertion.*" ); // Can't take ubound of unbounded dimension
 }
 
 TEST( FArrayTest, EmptyComparisonPredicate )
@@ -544,7 +544,7 @@ TEST( FArrayTest, Unallocated )
 	FArray1D_int a; // Empty
 	EXPECT_FALSE( a.allocated() );
 	EXPECT_FALSE( allocated( a ) );
-	EXPECT_DEATH( a( 1 ), ".*Assertion.*" );
+	EXPECT_DEBUG_DEATH( a( 1 ), ".*Assertion.*" );
 }
 
 TEST( FArrayTest, AnyOp2D )

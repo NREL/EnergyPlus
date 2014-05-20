@@ -2145,7 +2145,6 @@ namespace ManageElectricPower {
 			}
 		}
 
-		ThermalLoad = ThermalLoad;
 
 	}
 

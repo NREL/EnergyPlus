@@ -1257,7 +1257,7 @@ namespace OutdoorAirUnit {
 				// Coil Types
 				if ( SELECT_CASE_var == "COIL:COOLING:WATER" ) {
 					OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = WaterCoil_Cooling;
-					if ( ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow == AutoSize ) ) {
+					if ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow == AutoSize ) {
 						IsAutoSize = true;
 					}
 					if ( CurZoneEqNum > 0 ) {
@@ -1321,7 +1321,7 @@ namespace OutdoorAirUnit {
 
 				} else if ( SELECT_CASE_var == "COIL:HEATING:WATER" ) {
 					OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = WaterCoil_SimpleHeat;
-					if ( ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow == AutoSize ) ) {
+					if ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow == AutoSize ) {
 						IsAutoSize = true;
 					}
 					if ( CurZoneEqNum > 0 ) {
@@ -1380,7 +1380,7 @@ namespace OutdoorAirUnit {
 
 				} else if ( SELECT_CASE_var == "COIL:HEATING:STEAM" ) {
 					OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = SteamCoil_AirHeat;
-					if ( ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow == AutoSize ) ) {
+					if ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow == AutoSize ) {
 						IsAutoSize = true;
 					}
 					if ( CurZoneEqNum > 0 ) {
@@ -1442,7 +1442,7 @@ namespace OutdoorAirUnit {
 
 				} else if ( SELECT_CASE_var == "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) {
 					OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = WaterCoil_DetailedCool;
-					if ( ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow == AutoSize ) ) {
+					if ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow == AutoSize ) {
 						IsAutoSize = true;
 					}
 					if ( CurZoneEqNum > 0 ) {
@@ -1502,7 +1502,7 @@ namespace OutdoorAirUnit {
 
 				} else if ( SELECT_CASE_var == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED" ) {
 					OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = WaterCoil_CoolingHXAsst;
-					if ( ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow == AutoSize ) ) {
+					if ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow == AutoSize ) {
 						IsAutoSize = true;
 					}
 					if ( CurZoneEqNum > 0 ) {
