@@ -32,6 +32,31 @@ IF ( MSVC ) # visual c++ (VS 2013)
     ADD_CXX_RELEASE_DEFINITIONS("-GS-") # Disable buffer overrun checks for performance in release mode
     
 ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) # g++/Clang
+    option(ENABLE_THREAD_SANITIZER "Enable thread sanitizer testing in gcc/clang" FALSE)
+    set(LINKER_FLAGS "")
+    if(ENABLE_THREAD_SANITIZER)
+      ADD_CXX_DEFINITIONS(-fsanitize=thread -g)
+      set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=thread")
+    endif()
+
+    option(ENABLE_ADDRESS_SANITIZER "Enable address sanitizer testing in gcc/clang" FALSE)
+    if(ENABLE_ADDRESS_SANITIZER)
+      ADD_CXX_DEFINITIONS(-fsanitize=address -g)
+      set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=address")
+    endif()
+
+    option(ENABLE_UNDEFINED_SANITIZER "Enable undefined behavior sanitizer testing in gcc/clang" FALSE)
+    if(ENABLE_UNDEFINED_SANITIZER)
+      ADD_CXX_DEFINITIONS(-fsanitize=undefined -g)
+      set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=undefined")
+    endif()
+
+    mark_as_advanced(ENABLE_THREAD_SANITIZER ENABLE_ADDRESS_SANITIZER ENABLE_UNDEFINED_SANITIZER)
+
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LINKER_FLAGS}")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LINKER_FLAGS}")
+    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${LINKER_FLAGS}")
+
 
     # COMPILER FLAGS
     ADD_CXX_DEFINITIONS("-std=c++11") # Enable C++11 features in g++
