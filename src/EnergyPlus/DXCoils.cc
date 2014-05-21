@@ -3194,8 +3194,7 @@ namespace DXCoils {
 
 			GetObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-			// *** will have to circle back to this one to fix since the multispeed coil has all fields in this coil object ***
-			// allocate single performance mode for numeric field strings used for sizing routine
+			// allocate single performance mode for numeric field strings used for sizing routine (all fields are in this object)
 			DXCoilNumericFields ( DXCoilNum ).PerfMode.allocate ( 1 );
 			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate ( MaxNumbers );
 			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
@@ -4959,8 +4958,9 @@ namespace DXCoils {
 		//                        Add new coil type COIL:DX:HEATPUMPWATERHEATER
 		//                      June 2007 L. Gu, FSEC
 		//                        Add new coil type COIL:DX:MULTISPEED:COOLING and HEATING
-		//                      January 2011, B. Griffithn NREL. add EMS overrides for autosized fields. 1`
+		//                      January 2011, B. Griffithn NREL. add EMS overrides for autosized fields.
 		//                      August 2013 Daeho Kang, add component sizing table entries
+		//						May 2014 R Raustad, FSEC, moved sizing calculations to common routine
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -5070,7 +5070,8 @@ namespace DXCoils {
 		bool bPRINT = true; // TRUE if sizing is reported to output (eio)
 		Real64 TempSize; // autosized value of coil input field
 		int FieldNum = 2; // IDD numeric field number where input field description is found
-		int SizingMethod;
+		int SizingMethod; // Integer representation of sizing method (e.g., CoolingAirflowSizing, HeatingCapacitySizing, etc.)
+		bool PrintFlag; // TRUE when sizing information is reported in the eio file
 
 		// Initiate all reporting variables
 		if ( SysSizingRunDone || ZoneSizingRunDone ) {
@@ -5181,13 +5182,14 @@ namespace DXCoils {
 						CompName = DXCoil( DXCoilNum ).Name;
 						FieldNum = 4;
 					}
+					PrintFlag = true;
 					TempSize = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode );
 					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [m3/s]";
 					CompType = DXCoil( DXCoilNum ).DXCoilType;
 					DataIsDXCoil = true;
 					DataEMSOverrideON = DXCoil ( DXCoilNum ).RatedAirVolFlowRateEMSOverrideON ( Mode );
 					DataEMSOverride = DXCoil( DXCoilNum ).RatedAirVolFlowRateEMSOverrideValue( Mode );
-					RequestSizing( CompType, CompName, SizingMethod, trim(SizingString ), TempSize, bPRINT, RoutineName );
+					RequestSizing( CompType, CompName, SizingMethod, trim(SizingString ), TempSize, PrintFlag, RoutineName );
 					DXCoil ( DXCoilNum ).RatedAirVolFlowRate ( Mode ) = TempSize;
 					DataIsDXCoil = false;
 					DataEMSOverrideON = false;
@@ -5198,41 +5200,6 @@ namespace DXCoils {
 				DataFlowUsedForSizing = DXCoil ( DXCoilNum ).RatedAirVolFlowRate ( Mode );
 				// get autosized air flow for capacity calc's if capacity is not autosized
 				// *** RAR this if block is a last minute addition to correct capacity reporting when not autosized and a sizing run is done. Test suite was not run with this code included. ***
-<<<<<<< HEAD
-				if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) != AutoSize && ( ( SysSizingRunDone && CurSysNum > 0 ) || ( ZoneSizingRunDone && CurZoneEqNum > 0 ) ) ) {
-					if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
-						SizingMethod = CoolingAirflowSizing;
-						DataBypassFrac = DXCoil ( DXCoilNum ).BypassedFlowFrac ( Mode );
-					}
-					else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatingEmpirical ) {
-						SizingMethod = HeatingAirflowSizing;
-						DataCoolCoilCap = DXCoolCap; // pass global variable used only for heat pumps (i.e., DX cooling and heating coils)
-					}
-					else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Heating ) {
-						SizingMethod = HeatingAirflowSizing;
-					}
-					else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling ) {
-						SizingMethod = CoolingAirflowSizing;
-					}
-					else {
-						SizingMethod = CoolingAirflowSizing;
-					}
-					CompName = DXCoil( DXCoilNum ).Name;
-					FieldNum = 1; // don't care, not printing
-					TempSize = AutoSize;
-					SizingString = " "; // don't care
-					CompType = DXCoil( DXCoilNum ).DXCoilType;
-					DataIsDXCoil = true;
-					DataEMSOverrideON = DXCoil ( DXCoilNum ).RatedAirVolFlowRateEMSOverrideON ( Mode );
-					DataEMSOverride = DXCoil( DXCoilNum ).RatedAirVolFlowRateEMSOverrideValue( Mode );
-					RequestSizing( CompType, CompName, SizingMethod, trim(SizingString ), TempSize, false , RoutineName );
-					DataFlowUsedForSizing = TempSize;
-					DataIsDXCoil = false; // don't need this and next 2 of they are just overwritten. Delete on next pass so testing will show problems if any.
-					DataEMSOverrideON = false;
-					DataEMSOverride = 0.0;
-					DataBypassFrac = 0.0;
-				}
-=======
                 // The question here is if the autosized air flow rate or the user specified air flow rate should be used to calculate capacity
 				// removing this for now until more is known
 //				if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) != AutoSize && ( ( SysSizingRunDone && CurSysNum > 0 ) || ( ZoneSizingRunDone && CurZoneEqNum > 0 ) ) ) {
@@ -5267,8 +5234,7 @@ namespace DXCoils {
 //					DataEMSOverride = 0.0;
 //					DataBypassFrac = 0.0;
 //				}
->>>>>>> 68302452_RRSizingConsolidation
-
+				PrintFlag = true;
 				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
 					SizingMethod = CoolingCapacitySizing;
 					CompName = DXCoil( DXCoilNum ).Name + ":" + DXCoil( DXCoilNum ).CoilPerformanceName( Mode );
@@ -5282,6 +5248,13 @@ namespace DXCoils {
 					TempSize = DXCoil( DXCoilNum ).RatedTotCap( Mode );
 					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [W]";
 					DataCoolCoilCap = DXCoolCap;
+				} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeater ) {
+					SizingMethod = HeatingCapacitySizing;
+					CompName = DXCoil( DXCoilNum ).Name;
+					FieldNum = 1;
+					TempSize = DXCoil( DXCoilNum ).RatedTotCap( Mode );
+					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [W]";
+					PrintFlag = false;
 				} else {
 					SizingMethod = CoolingCapacitySizing;
 					CompName = DXCoil( DXCoilNum ).Name;
@@ -5291,16 +5264,14 @@ namespace DXCoils {
 				}
 				CompType = DXCoil( DXCoilNum ).DXCoilType;
 				DataIsDXCoil = true;
-//				DataDXCT = DXCT;
 				DataTotCapCurveIndex = DXCoil ( DXCoilNum ).CCapFTemp ( Mode );
 				DataEMSOverrideON = DXCoil( DXCoilNum ).RatedTotCapEMSOverrideOn( Mode );
 				DataEMSOverride = DXCoil( DXCoilNum ).RatedTotCapEMSOverrideValue( Mode );
-				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName );
+				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 				DXCoil( DXCoilNum ).RatedTotCap ( Mode ) = TempSize;
 				DataIsDXCoil = false;
-//				DataDXCT = 1;
 				DataFlowUsedForSizing = 0.0;
-				DataCoolCoilCap - 0.0;
+				DataCoolCoilCap = 0.0;
 				DataTotCapCurveIndex = 0;
 				DataEMSOverrideON = false;
 				DataEMSOverride = 0.0;
@@ -5309,6 +5280,8 @@ namespace DXCoils {
 				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingSingleSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling ) {
 					DXCoolCap = DXCoil( DXCoilNum ).RatedTotCap( Mode );
 				}
+
+				// Sizing DX cooling coil SHR
 				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingSingleSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling ) {
 
 					if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
@@ -5326,10 +5299,8 @@ namespace DXCoils {
 					DataCapacityUsedForSizing = DXCoil ( DXCoilNum ).RatedTotCap ( Mode );
 					DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
 					DataEMSOverride = DXCoil( DXCoilNum ).RatedSHREMSOverrideValue( Mode );
-//					DataDXCT = DXCT;
-					RequestSizing( CompType, CompName, SizingMethod, trim(SizingString ), TempSize, bPRINT, RoutineName );
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName );
 					DXCoil ( DXCoilNum ).RatedSHR ( Mode ) = TempSize;
-//					DataDXCT = 1;
 					DataFlowUsedForSizing = 0.0;
 					DataCapacityUsedForSizing = 0.0;
 					DataEMSOverrideON = false;
@@ -5337,213 +5308,120 @@ namespace DXCoils {
 				} // End of Rated SHR
 
 				// Sizing evaporator condenser air flow
-				IsAutoSize = false;
-				if ( DXCoil( DXCoilNum ).EvapCondAirFlow( Mode ) == AutoSize ) {
-					IsAutoSize = true;
-				}
+				if ( DXCoil( DXCoilNum ).CondenserType( 1 ) == EvapCooled && DXCoil( DXCoilNum ).EvapCondAirFlow( Mode ) != 0.0 && ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingSingleSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) ) {
 
-				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingSingleSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
-
-					// Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
-					EvapCondAirFlowDes = DXCoil( DXCoilNum ).RatedTotCap( Mode ) * 0.000114;
-					// Design data is always available
-					if ( IsAutoSize ) {
-						DXCoil( DXCoilNum ).EvapCondAirFlow( Mode ) = EvapCondAirFlowDes;
-						if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
-							ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name + ':' + DXCoil( DXCoilNum ).CoilPerformanceName( Mode ), "Design Size Evaporative Condenser Air Flow Rate [m3/s]", EvapCondAirFlowDes );
-
-						} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
-							ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size High Speed Evaporative Condenser Air Flow Rate [m3/s]", EvapCondAirFlowDes );
-						} else {
-							ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Evaporative Condenser Air Flow Rate [m3/s]", EvapCondAirFlowDes );
-						}
-					} else { // Hard size with sizig data
-						if ( DXCoil( DXCoilNum ).EvapCondAirFlow( Mode ) > 0.0 && EvapCondAirFlowDes > 0.0 ) {
-							EvapCondAirFlowUser = DXCoil( DXCoilNum ).EvapCondAirFlow( Mode );
-							if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
-								ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name + ':' + DXCoil( DXCoilNum ).CoilPerformanceName( Mode ), "Design Size Evaporative Condenser Air Flow Rate [m3/s]", EvapCondAirFlowDes, "User-Specified Evaporative Condenser Air Flow Rate [m3/s]", EvapCondAirFlowUser );
-							} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
-								ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size High Speed Evaporative Condenser Air Flow Rate [m3/s]", EvapCondAirFlowDes, "User-Specified High Speed Evaporative Condenser Air Flow Rate [m3/s]", EvapCondAirFlowUser );
-							} else {
-								ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Evaporative Condenser Air Flow Rate [m3/s]", EvapCondAirFlowDes, "User-Specified Evaporative Condenser Air Flow Rate [m3/s]", EvapCondAirFlowUser );
-							}
-							if ( DisplayExtraWarnings ) {
-								if ( ( std::abs( EvapCondAirFlowDes - EvapCondAirFlowUser ) / EvapCondAirFlowUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeDxCoil: Potential issue with equipment sizing for " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name );
-									ShowContinueError( "User-Specified Evaporative Condenser Air Flow Rate of " + RoundSigDigits( EvapCondAirFlowUser, 5 ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Evaporative Condenser Air Flow Rate of " + RoundSigDigits( EvapCondAirFlowDes, 5 ) + " [m3/s]" );
-									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-								}
-							}
-						}
+					if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+						CompName = DXCoil( DXCoilNum ).Name + ":" + DXCoil( DXCoilNum ).CoilPerformanceName( Mode );
+						FieldNum = 11;
+						SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [m3/s]";
+					} else {
+						CompName = DXCoil( DXCoilNum ).Name;
+						FieldNum = 11;
+						SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [m3/s]";
 					}
+					SizingMethod = AutoCalculateSizing;
+					CompType = DXCoil( DXCoilNum ).DXCoilType;
+//					// Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
+					DataConstantUsedForSizing = DXCoil( DXCoilNum ).RatedTotCap( Mode );
+					DataFractionUsedForSizing = 0.000114;
+					TempSize = DXCoil( DXCoilNum ).EvapCondAirFlow( Mode );
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName );
+					DXCoil( DXCoilNum ).EvapCondAirFlow( Mode ) = TempSize;
+					DataConstantUsedForSizing = 0.0;
+					DataFractionUsedForSizing = 0.0;
 				}
 
 				// Sizing evaporative condenser air flow 2
-				IsAutoSize = false;
-				if ( DXCoil( DXCoilNum ).EvapCondAirFlow2 == AutoSize ) {
-					IsAutoSize = true;
-				}
-
-				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
+				PrintFlag = true;
+				if ( DXCoil( DXCoilNum ).CondenserType( 1 ) == EvapCooled && DXCoil( DXCoilNum ).EvapCondAirFlow2 != 0.0 && DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
+					CompName = DXCoil( DXCoilNum ).Name;
+					FieldNum = 14;
+					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [m3/s]";
+					SizingMethod = AutoCalculateSizing;
+					CompType = DXCoil( DXCoilNum ).DXCoilType;
 					// Auto size low speed condenser air flow to 1/3 Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
-					EvapCondAirFlow2Des = 0.3333 * DXCoil( DXCoilNum ).RatedTotCap( Mode ) * 0.000114;
-
-					// Design Size data is always available
-					if ( IsAutoSize ) {
-						DXCoil( DXCoilNum ).EvapCondAirFlow2 = EvapCondAirFlow2Des;
-						ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Low Speed Evaporative Condenser Air Flow Rate [m3/s]", DXCoil( DXCoilNum ).EvapCondAirFlow2 );
-					} else {
-						if ( DXCoil( DXCoilNum ).EvapCondAirFlow2 > 0.0 && EvapCondAirFlow2Des > 0.0 ) {
-							EvapCondAirFlow2User = DXCoil( DXCoilNum ).EvapCondAirFlow2;
-							ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Low Speed Evaporative Condenser Air Flow Rate [m3/s]", EvapCondAirFlow2Des, "User-Specified Low Speed Evaporative Condenser Air Flow Rate [m3/s]", EvapCondAirFlow2User );
-							if ( DisplayExtraWarnings ) {
-								if ( ( std::abs( EvapCondAirFlow2Des - EvapCondAirFlow2User ) / EvapCondAirFlow2User ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeDxCoil: Potential issue with equipment sizing for " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name );
-									ShowContinueError( "User-Specified Low Speed Evaporative Condenser Air Flow Rate of " + RoundSigDigits( EvapCondAirFlow2User, 5 ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Low Speed Evaporative Condenser Air Flow Rate of " + RoundSigDigits( EvapCondAirFlow2Des, 5 ) + " [m3/s]" );
-									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-								}
-							}
-						}
-					}
+					DataConstantUsedForSizing = DXCoil( DXCoilNum ).RatedTotCap( Mode );
+					DataFractionUsedForSizing = 0.000114 * 0.3333;
+					TempSize = DXCoil( DXCoilNum ).EvapCondAirFlow2;
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+					DXCoil( DXCoilNum ).EvapCondAirFlow2 = TempSize;
+					DataConstantUsedForSizing = 0.0;
+					DataFractionUsedForSizing = 0.0;
 				}
 
 				// Sizing evaporative condenser pump electric nominal power
-				IsAutoSize = false;
-				if ( DXCoil( DXCoilNum ).EvapCondPumpElecNomPower( Mode ) == AutoSize ) {
-					IsAutoSize = true;
-				}
+				if ( DXCoil( DXCoilNum ).CondenserType( 1 ) == EvapCooled && DXCoil( DXCoilNum ).EvapCondPumpElecNomPower( Mode ) != 0.0 && (DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingSingleSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) ) {
 
-				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingSingleSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
-
-					// Auto size high speed evap condenser pump power to Total Capacity * 0.004266 w/w (15 w/ton)
-					EvapCondPumpElecNomPowerDes = DXCoil( DXCoilNum ).RatedTotCap( Mode ) * 0.004266;
-
-					if ( IsAutoSize ) {
-						DXCoil( DXCoilNum ).EvapCondPumpElecNomPower( Mode ) = EvapCondPumpElecNomPowerDes;
-						if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
-							ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name + ':' + DXCoil( DXCoilNum ).CoilPerformanceName( Mode ), "Design Size Evaporative Condenser Pump Rated Power Consumption [W]", EvapCondPumpElecNomPowerDes );
-						} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
-							ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size High Speed Evaporative Condenser Pump Rated Power Consumption [W]", EvapCondPumpElecNomPowerDes );
-						} else {
-							ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Evaporative Condenser Pump Rated Power Consumption [W]", EvapCondPumpElecNomPowerDes );
-						}
-
+					if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+						CompName = DXCoil( DXCoilNum ).Name + ":" + DXCoil( DXCoilNum ).CoilPerformanceName( Mode );
+						FieldNum = 12;
+						SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [W]";
 					} else {
-						if ( DXCoil( DXCoilNum ).EvapCondPumpElecNomPower( Mode ) > 0.0 && EvapCondPumpElecNomPowerDes > 0.0 && ! HardSizeNoDesRun ) {
-							EvapCondPumpElecNomPowerUser = DXCoil( DXCoilNum ).EvapCondPumpElecNomPower( Mode );
-							if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
-								ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name + ':' + DXCoil( DXCoilNum ).CoilPerformanceName( Mode ), "Design Size Evaporative Condenser Pump Rated Power Consumption [W]", EvapCondPumpElecNomPowerDes, "User-Specified Evaporative Condenser Pump Rated Power Consumption [W]", EvapCondPumpElecNomPowerUser );
-							} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
-								ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size High Speed Evaporative Condenser Pump Rated Power Consumption [W]", EvapCondPumpElecNomPowerDes, "User-Specified High Speed Evaporative Condenser Pump Rated Power Consumption [W]", EvapCondPumpElecNomPowerUser );
-							} else {
-								ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Evaporative Condenser Pump Rated Power Consumption [W]", EvapCondPumpElecNomPowerDes, "User-Specified Evaporative Condenser Pump Rated Power Consumption [W]", EvapCondPumpElecNomPowerUser );
-							}
-							if ( DisplayExtraWarnings ) {
-								if ( ( std::abs( EvapCondPumpElecNomPowerDes - EvapCondPumpElecNomPowerUser ) / EvapCondPumpElecNomPowerUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeDxCoil: Potential issue with equipment sizing for " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name );
-									ShowContinueError( "User-Specified Evaporative Condenser Pump Rated Power Consumption of " + RoundSigDigits( EvapCondPumpElecNomPowerUser, 2 ) + " [W]" );
-									ShowContinueError( "differs from Design Size Evaporative Condenser Pump Rated Power Consumption of " + RoundSigDigits( EvapCondPumpElecNomPowerDes, 2 ) + " [W]" );
-									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-								}
-							}
-						}
+						CompName = DXCoil( DXCoilNum ).Name;
+						FieldNum = 12;
+						SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [W]";
 					}
+					SizingMethod = AutoCalculateSizing;
+					CompType = DXCoil( DXCoilNum ).DXCoilType;
+					// Auto size high speed evap condenser pump power to Total Capacity * 0.004266 w/w (15 w/ton)
+					DataConstantUsedForSizing = DXCoil( DXCoilNum ).RatedTotCap( Mode );
+					DataFractionUsedForSizing = 0.004266;
+					TempSize = DXCoil( DXCoilNum ).EvapCondPumpElecNomPower( Mode );
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+					DXCoil( DXCoilNum ).EvapCondPumpElecNomPower( Mode ) = TempSize;
+					DataConstantUsedForSizing = 0.0;
+					DataFractionUsedForSizing = 0.0;
 				}
 
 				// Sizing low speed evaporative condenser pump electric nominal power
-				IsAutoSize = false;
-				if ( DXCoil( DXCoilNum ).EvapCondPumpElecNomPower2 == AutoSize ) {
-					IsAutoSize = true;
-				}
-
-				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
-
+				if ( DXCoil( DXCoilNum ).CondenserType( 1 ) == EvapCooled && DXCoil( DXCoilNum ).EvapCondPumpElecNomPower2 != 0.0 && DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
+					CompName = DXCoil( DXCoilNum ).Name;
+					FieldNum = 15;
+					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [W]";
+					SizingMethod = AutoCalculateSizing;
+					CompType = DXCoil( DXCoilNum ).DXCoilType;
 					//Auto size low speed evap condenser pump power to 1/3 Total Capacity * 0.004266 w/w (15 w/ton)
-					EvapCondPumpElecNomPower2Des = 0.3333 * DXCoil( DXCoilNum ).RatedTotCap( Mode ) * 0.004266;
-
-					if ( IsAutoSize ) {
-						DXCoil( DXCoilNum ).EvapCondPumpElecNomPower2 = EvapCondPumpElecNomPower2Des;
-						ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Low Speed Evaporative Condenser Pump Rated Power Consumption [W]", EvapCondPumpElecNomPower2Des );
-					} else {
-						if ( DXCoil( DXCoilNum ).EvapCondPumpElecNomPower2 > 0.0 && EvapCondPumpElecNomPower2Des > 0.0 && ! HardSizeNoDesRun ) {
-							EvapCondPumpElecNomPower2User = DXCoil( DXCoilNum ).EvapCondPumpElecNomPower2;
-							ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Low Speed Evaporative Condenser Pump Rated Power Consumption [W]", EvapCondPumpElecNomPower2Des, "User-Specified Low Speed Evaporative Condenser Pump Rated Power Consumption [W]", EvapCondPumpElecNomPower2User );
-							if ( DisplayExtraWarnings ) {
-								if ( ( std::abs( EvapCondPumpElecNomPower2Des - EvapCondPumpElecNomPower2User ) / EvapCondPumpElecNomPower2User ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeDxCoil: Potential issue with equipment sizing for " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name );
-									ShowContinueError( "User-Specified Low Speed Evaporative Condenser Pump Rated Power Consumption of " + RoundSigDigits( EvapCondPumpElecNomPower2User, 2 ) + " [W]" );
-									ShowContinueError( "differs from Design Size Low Speed Evaporative Condenser Pump Rated Power Consumption" " of " + RoundSigDigits( EvapCondPumpElecNomPower2Des, 2 ) + " [W]" );
-									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-								}
-							}
-						}
-					}
+					DataConstantUsedForSizing = DXCoil( DXCoilNum ).RatedTotCap( Mode );
+					DataFractionUsedForSizing = 0.004266 * 0.3333;
+					TempSize = DXCoil( DXCoilNum ).EvapCondPumpElecNomPower2;
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+					DXCoil( DXCoilNum ).EvapCondPumpElecNomPower2 = TempSize;
+					DataConstantUsedForSizing = 0.0;
+					DataFractionUsedForSizing = 0.0;
 				}
 
-				// Sizing rated low speed air flow rate
-				IsAutoSize = false;
-				if ( DXCoil( DXCoilNum ).RatedAirVolFlowRate2 == AutoSize ) {
-					IsAutoSize = true;
-				}
-
+//				// Sizing rated low speed air flow rate
 				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
-					RatedAirVolFlowRate2Des = 0.3333 * DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode );
-
-					// Design Size data is always available
-					if ( IsAutoSize ) {
-						DXCoil( DXCoilNum ).RatedAirVolFlowRate2 = RatedAirVolFlowRate2Des;
-						ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated Low Speed Air Flow Rate [m3/s]", RatedAirVolFlowRate2Des );
-					} else {
-						if ( DXCoil( DXCoilNum ).RatedAirVolFlowRate2 > 0.0 && RatedAirVolFlowRate2Des > 0.0 && ! HardSizeNoDesRun ) {
-							RatedAirVolFlowRate2User = DXCoil( DXCoilNum ).RatedAirVolFlowRate2;
-							ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated Low Speed Air Flow Rate [m3/s]", RatedAirVolFlowRate2Des, "User-Specified Rated Low Speed Air Flow Rate [m3/s]", RatedAirVolFlowRate2User );
-							if ( DisplayExtraWarnings ) {
-								if ( ( std::abs( RatedAirVolFlowRate2Des - RatedAirVolFlowRate2User ) / RatedAirVolFlowRate2User ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeDxCoil: Potential issue with equipment sizing for " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name );
-									ShowContinueError( "User-Specified Rated Low Speed Air Flow Rate of " + RoundSigDigits( RatedAirVolFlowRate2User, 5 ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Rated Low Speed Air Flow Rate  of " + RoundSigDigits( RatedAirVolFlowRate2Des, 5 ) + " [m3/s]" );
-									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-								}
-							}
-						}
-					}
+					CompName = DXCoil( DXCoilNum ).Name;
+					FieldNum = 9;
+					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [m3/s]";
+					SizingMethod = AutoCalculateSizing;
+					CompType = DXCoil( DXCoilNum ).DXCoilType;
+					//Auto size low speed air flow rate to 1/3 high speed air flow rate
+					DataConstantUsedForSizing = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode );
+					DataFractionUsedForSizing = 0.3333;
+					TempSize = DXCoil( DXCoilNum ).RatedAirVolFlowRate2;
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+					DXCoil( DXCoilNum ).RatedAirVolFlowRate2 = TempSize;
+					DataConstantUsedForSizing = 0.0;
+					DataFractionUsedForSizing = 0.0;
 				}
 
-				// Sizing rated low speed total cooling capacity
-				IsAutoSize = false;
-				if ( DXCoil( DXCoilNum ).RatedTotCap2 == AutoSize ) {
-					IsAutoSize = true;
-				}
-
+//				// Sizing rated low speed total cooling capacity
 				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
-					RatedTotCap2Des = 0.3333 * DXCoil( DXCoilNum ).RatedTotCap( Mode );
-
-					// Design Size data is always available
-					if ( IsAutoSize ) {
-						DXCoil( DXCoilNum ).RatedTotCap2 = RatedTotCap2Des;
-						ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated Low Speed Total Cooling Capacity (gross) [W]", RatedTotCap2Des );
-					} else {
-						if ( DXCoil( DXCoilNum ).RatedTotCap2 > 0.0 && RatedTotCap2Des > 0.0 && ! HardSizeNoDesRun ) {
-							RatedTotCap2User = DXCoil( DXCoilNum ).RatedTotCap2;
-							ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated Low Speed Total Cooling Capacity (gross) [W]", RatedTotCap2Des, "User-Specified Rated Low Speed Total Cooling Capacity (gross) [W]", RatedTotCap2User );
-							if ( DisplayExtraWarnings ) {
-								if ( ( std::abs( RatedTotCap2Des - RatedTotCap2User ) / RatedTotCap2User ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeDxCoil: Potential issue with equipment sizing for " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name );
-									ShowContinueError( "User-Specified Rated Low Speed Total Cooling Capacity (gross) of " + RoundSigDigits( RatedTotCap2User, 2 ) + " [W]" );
-									ShowContinueError( "differs from Design Size Rated Low Speed Total Cooling Capacity (gross) of " + RoundSigDigits( RatedTotCap2Des, 2 ) + " [W]" );
-									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-								}
-							}
-						}
-					}
+					CompName = DXCoil( DXCoilNum ).Name;
+					FieldNum = 6;
+					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [W]";
+					SizingMethod = AutoCalculateSizing;
+					CompType = DXCoil( DXCoilNum ).DXCoilType;
+					//Auto size low speed capacity to 1/3 high speed capacity
+					DataConstantUsedForSizing = DXCoil( DXCoilNum ).RatedTotCap( Mode );
+					DataFractionUsedForSizing = 0.3333;
+					TempSize = DXCoil( DXCoilNum ).RatedTotCap2;
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+					DXCoil( DXCoilNum ).RatedTotCap2 = TempSize;
+					DataConstantUsedForSizing = 0.0;
+					DataFractionUsedForSizing = 0.0;
 				}
 
 				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
@@ -5572,63 +5450,41 @@ namespace DXCoils {
 					}
 				}
 
-				// Sizing rated low speed SHR2
-				IsAutoSize = false;
-				if ( DXCoil( DXCoilNum ).RatedSHR2 == AutoSize ) {
-					IsAutoSize = true;
-				}
-
+//				// Sizing rated low speed SHR2
 				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
-					RatedSHR2Des = DXCoil( DXCoilNum ).RatedSHR( Mode );
-					// Design Size data is always available
-					if ( IsAutoSize ) {
-						DXCoil( DXCoilNum ).RatedSHR2 = RatedSHR2Des;
-						ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated Low Speed Sensible Heat Ratio", RatedSHR2Des );
-					} else {
-						if ( DXCoil( DXCoilNum ).RatedSHR2 > 0.0 && RatedSHR2Des > 0.0 && ! HardSizeNoDesRun ) {
-							RatedSHR2User = DXCoil( DXCoilNum ).RatedSHR2;
-							ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Rated Low Speed Sensible Heat Ratio", RatedSHR2Des, "User-Specified Rated Low Speed Sensible Heat Ratio", RatedSHR2User );
-							if ( DisplayExtraWarnings ) {
-								if ( ( std::abs( RatedSHR2Des - RatedSHR2User ) / RatedSHR2User ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeDxCoil: Potential issue with equipment sizing for " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name );
-									ShowContinueError( "User-Specified Rated Low Speed Sensible Heat Ratio of " + RoundSigDigits( RatedSHR2User, 3 ) );
-									ShowContinueError( "differs from Design Size Rated Low Speed Sensible Heat Ratio of " + RoundSigDigits( RatedSHR2Des, 3 ) );
-									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-								}
-							}
-						}
-					}
+					CompName = DXCoil( DXCoilNum ).Name;
+					FieldNum = 7;
+					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum );
+					SizingMethod = AutoCalculateSizing;
+					CompType = DXCoil( DXCoilNum ).DXCoilType;
+					//Auto size low speed SHR to be the same as high speed SHR
+					DataConstantUsedForSizing = DXCoil( DXCoilNum ).RatedSHR( Mode );
+					DataFractionUsedForSizing = 1.0;
+					TempSize = DXCoil( DXCoilNum ).RatedSHR2;
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+					DXCoil( DXCoilNum ).RatedSHR2 = TempSize;
+					DataConstantUsedForSizing = 0.0;
+					DataFractionUsedForSizing = 0.0;
 				}
 
-				// Sizing resistive defrost heater capacity
-				IsAutoSize = false;
-				if ( DXCoil( DXCoilNum ).DefrostCapacity == AutoSize ) {
-					IsAutoSize = true;
-				}
+//				// Sizing resistive defrost heater capacity
 				if ( DXCoil( DXCoilNum ).DXCoilType_Num != CoilVRF_Heating ) {
 					//IF (DXCoil(DXCoilNum)%DXCoilType_Num == CoilDX_MultiSpeedHeating .OR. &
 					//    DXCoil(DXCoilNum)%DXCoilType_Num == Coil_HeatingAirToAirVariableSpeed) THEN
 					if ( DXCoil( DXCoilNum ).DefrostStrategy == Resistive ) {
-						DefrostCapacityDes = DXCoolCap;
-						if ( IsAutoSize ) {
-							DXCoil( DXCoilNum ).DefrostCapacity = DefrostCapacityDes;
-							ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Resistive Defrost Heater Capacity [W]", DefrostCapacityDes );
-						} else {
-							if ( DXCoil( DXCoilNum ).DefrostCapacity > 0.0 && DefrostCapacityDes > 0.0 && ! HardSizeNoDesRun ) {
-								DefrostCapacityUser = DXCoil( DXCoilNum ).DefrostCapacity;
-								ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Resistive Defrost Heater Capacity [W]", DefrostCapacityDes, "User-Specified Resistive Defrost Heater Capacity [W]", DefrostCapacityUser );
-								if ( DisplayExtraWarnings ) {
-									if ( ( std::abs( DefrostCapacityDes - DefrostCapacityUser ) / DefrostCapacityUser ) > AutoVsHardSizingThreshold ) {
-										ShowMessage( "SizeDxCoil: Potential issue with equipment sizing for " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name );
-										ShowContinueError( "User-Specified Resistive Defrost Heater Capacity of " + RoundSigDigits( DefrostCapacityUser, 2 ) + " [W]" );
-										ShowContinueError( "differs from Design Size Resistive Defrost Heater Capacity of " + RoundSigDigits( DefrostCapacityDes, 2 ) + " [W]" );
-										ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-										ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-									}
-								}
-							}
-						}
+						CompName = DXCoil( DXCoilNum ).Name;
+						FieldNum = 11;
+						SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [W]";
+						SizingMethod = AutoCalculateSizing;
+						CompType = DXCoil( DXCoilNum ).DXCoilType;
+						//Auto size low speed capacity to 1/3 high speed capacity
+						DataConstantUsedForSizing = DXCoolCap;
+						DataFractionUsedForSizing = 1.0;
+						TempSize = DXCoil( DXCoilNum ).DefrostCapacity;
+						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+						DXCoil( DXCoilNum ).DefrostCapacity = TempSize;
+						DataConstantUsedForSizing = 0.0;
+						DataFractionUsedForSizing = 0.0;
 					} else {
 						DXCoil( DXCoilNum ).DefrostCapacity = 0.0;
 					}
@@ -5648,58 +5504,35 @@ namespace DXCoils {
 				}
 
 				if ( Mode == DXCoil( DXCoilNum ).NumOfSpeeds ) {
-					if ( CurSysNum > 0 ) {
-						if ( SizingDesRunThisAirSys ) HardSizeNoDesRun = false;
-						if ( ! IsAutoSize && ! SizingDesRunThisAirSys ) {
-							HardSizeNoDesRun = true;
-							if ( DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) > 0.0 ) {
-								ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Speed " + TrimSigDigits( Mode ) + " User-Specified Rated Air Flow Rate [m3/s]", DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) );
-							}
-						} else {
-							CheckSysSizing( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name );
-							if ( CurOASysNum > 0 ) {
-								MSRatedAirVolFlowRateDes = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
-							} else {
-								MSRatedAirVolFlowRateDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-							}
-						}
-					} else if ( CurZoneEqNum > 0 ) {
-						if ( SizingDesRunThisZone ) HardSizeNoDesRun = false;
-						if ( ! IsAutoSize && ! SizingDesRunThisZone ) {
-							HardSizeNoDesRun = true;
-							if ( DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) > 0.0 ) {
-								ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Speed " + TrimSigDigits( Mode ) + " User-Specified Rated Air Flow Rate [m3/s]", DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) );
-							}
-						} else {
-							CheckZoneSizing( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name );
-							MSRatedAirVolFlowRateDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
-						}
-					}
-					if ( MSRatedAirVolFlowRateDes < SmallAirVolFlow ) {
-						MSRatedAirVolFlowRateDes = 0.0;
-					}
+					CompName = DXCoil( DXCoilNum ).Name;
+					FieldNum = 9 + ( Mode - 1) * 13;
+					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames( FieldNum ) + " [m3/s]";
+					SizingMethod = CoolingAirflowSizing;
+					CompType = DXCoil( DXCoilNum ).DXCoilType;
+					TempSize = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode );
+					DataIsDXCoil = true;
+					DataEMSOverrideON = DXCoil ( DXCoilNum ).RatedAirVolFlowRateEMSOverrideON ( Mode );
+					DataEMSOverride = DXCoil( DXCoilNum ).RatedAirVolFlowRateEMSOverrideValue( Mode );
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+					DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) = TempSize;
+					DataIsDXCoil = false;
+					DataEMSOverrideON = false;
+					DataEMSOverride = 0.0;
 				} else {
 					MSRatedAirVolFlowRateDes = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( DXCoil( DXCoilNum ).NumOfSpeeds ) * Mode / DXCoil( DXCoilNum ).NumOfSpeeds;
-				}
-				if ( ! HardSizeNoDesRun ) {
-					if ( IsAutoSize ) {
-						DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) = MSRatedAirVolFlowRateDes;
-						ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Speed " + TrimSigDigits( Mode ) + " Design Size Rated Air Flow Rate [m3/s]", MSRatedAirVolFlowRateDes );
-					} else {
-						if ( DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) > 0.0 && MSRatedAirVolFlowRateDes > 0.0 && ! HardSizeNoDesRun ) {
-							MSRatedAirVolFlowRateUser = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode );
-							ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Speed " + TrimSigDigits( Mode ) + " Design Size Rated Air Flow Rate [m3/s]", MSRatedAirVolFlowRateDes, "Speed " + TrimSigDigits( Mode ) + " User-Specified Rated Air Flow Rate [m3/s]", MSRatedAirVolFlowRateUser );
-							if ( DisplayExtraWarnings ) {
-								if ( ( std::abs( MSRatedAirVolFlowRateDes - MSRatedAirVolFlowRateUser ) / MSRatedAirVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeDxCoil: Potential issue with equipment sizing for " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name );
-									ShowContinueError( "User-Specified Rated Air Volume Flow Rate of " + RoundSigDigits( MSRatedAirVolFlowRateUser, 5 ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Rated Air Volume Flow Rate of " + RoundSigDigits( MSRatedAirVolFlowRateDes, 5 ) + " [m3/s]" );
-									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-								}
-							}
-						}
-					}
+					CompName = DXCoil( DXCoilNum ).Name;
+					FieldNum = 9 + ( Mode - 1) * 13;
+					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames( FieldNum ) + " [m3/s]";
+					SizingMethod = AutoCalculateSizing;
+					CompType = DXCoil( DXCoilNum ).DXCoilType;
+					//Auto size low speed capacity to 1/3 high speed capacity
+					DataConstantUsedForSizing = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( DXCoil( DXCoilNum ).NumOfSpeeds );
+					DataFractionUsedForSizing = (float)Mode / DXCoil( DXCoilNum ).NumOfSpeeds;
+					TempSize = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode );
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName );
+					DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) = TempSize;
+					DataConstantUsedForSizing = 0.0;
+					DataFractionUsedForSizing = 0.0;
 				}
 			}
 

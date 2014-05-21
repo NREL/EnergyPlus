@@ -159,19 +159,35 @@ namespace ReportSizingManager {
 		// Sizing calculations for component and parent models are now consolidated into a common routine. The parent or component will
 		// specify global variables (instead of using optional arguments) to set up the input required for specific sizing calculations.
 		//
-		// GLOBAL VARIABLES:
-		// DataCoilIsSuppHeater; // TRUE if heating coil used as supplemental heater
-		// DataIsDXCoil; // TRUE if direct-expansion coil
-		// DataAutosizable; // TRUE if component is autosizable
-		// DataDXCT; // 1 if regular DX coil, 2 if 100% DOAS DX coil (not needed, DXCT is already a global in DataHVACGlobals)
-		// DataTotCapCurveIndex; // index to total capacity as a function of temperature curve
-		// DataCoolCoilCap; // cooling coil capacity used for sizing with scalable inputs
-		// DataFlowUsedForSizing; // air flow rate used for sizing with scalable inputs [m3/s]
-		// DataCapacityUsedForSizing; // capacity used for sizing with scalable inputs [W]
-		// DataHeatSizeRatio; // heating coil size as a ratio of cooling coil capacity
-		// DataEMSOverride; // value of EMS variable used to override autosizing
-		// DataEMSOverrideON; // boolean determines if user relies on EMS to override autosizing
-		// DataBypassFrac; // value of bypass fraction for Coil:Cooling:DX:TwoStageWithHumidityControlMode coils
+		// SIZING TYPES (selects the specific sizing calculations):
+		// (other sizing types may be added as needed)
+		//
+		// CoolingAirflowSizing( 1 ); // request sizing for cooling air flow rate
+		// HeatingAirflowSizing( 2 ); // request sizing for heating air flow rate
+		// SystemAirflowSizing( 3 ); // request sizing for system air flow rate
+		// CoolingCapacitySizing( 4 ); // request sizing for cooling capacity
+		// HeatingCapacitySizing( 5 ); // request sizing for heating capacity
+		// SystemCapacitySizing( 6 ); // request sizing for system capacity
+		// CoolingSHRSizing( 7 ); // request sizing for cooling SHR
+		// HeatingDefrostSizing( 8 ); // request sizing for heating defrost capacity
+		// AutoCalculateSizing ( 9 ); // identifies an autocalulate input (requires DataConstantUsedForSizing > 0 and DataFractionUsedForSizing > 0)
+		//
+		// GLOBAL VARIABLES (previously used as optional arguments):
+		// (other global variables may be added as needed)
+		//
+		// DataCoilIsSuppHeater( false ); // TRUE if heating coil used as supplemental heater
+		// DataIsDXCoil( false ); // TRUE if direct-expansion coil
+		// DataAutosizable( true ); // TRUE if component is autosizable
+		// DataTotCapCurveIndex( 0 ); // index to total capacity as a function of temperature curve
+		// DataCoolCoilCap( 0.0 ); // cooling coil capacity used for sizing with scalable inputs
+		// DataFlowUsedForSizing( 0.0 ); // air flow rate used for sizing with scalable inputs [m3/s]
+		// DataCapacityUsedForSizing( 0.0 ); // capacity used for sizing with scalable inputs [W]
+		// DataHeatSizeRatio ( 1.0 ); // heating coil size as a ratio of cooling coil capacity
+		// DataEMSOverride( 0.0 ); // value of EMS variable used to override autosizing
+		// DataEMSOverrideON( false ); // boolean determines if user relies on EMS to override autosizing
+		// DataBypassFrac( 0.0 ); // value of bypass fraction for Coil:Cooling:DX:TwoStageWithHumidityControlMode coils
+		// DataConstantUsedForSizing( 0.0 ); // base value used for sizing inputs that are ratios of other inputs (requires SizingType == AutoCalculateSizing)
+		// DataFractionUsedForSizing( 0.0 ); // fractional value of base value used for sizing inputs that are ratios of other inputs (requires SizingType == AutoCalculateSizing)
 		//
 		// EXAMPLE setup in DXCoils:
 		//			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
@@ -247,8 +263,7 @@ namespace ReportSizingManager {
 		using Psychrometrics::PsyTwbFnTdbWPb;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "RequestSizing: " ); // include trailing blank space
-		static std::string const CallString( RoutineName + CallingRoutine ); // include trailing blank space
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -320,7 +335,16 @@ namespace ReportSizingManager {
 			if ( !SizingDesRunThisZone && CurZoneEqNum > 0 && SizingResult == AutoSize )CheckZoneSizing ( CompType, CompName );
 		}
 
-		if ( CurZoneEqNum > 0 ) {
+		if ( SizingType == AutoCalculateSizing ) {
+			if ( DataConstantUsedForSizing > 0.0 && DataFractionUsedForSizing > 0.0 ){
+				AutosizeDes = DataConstantUsedForSizing * DataFractionUsedForSizing;
+				HardSizeNoDesRun = false;
+			} else {
+				ShowSevereError( CallingRoutine + " " + CompType + " " + CompName );
+				ShowContinueError( "... DataConstantUsedForSizing and DataFractionUsedForSizing " + SizingString + " must both be greater than 0." );
+				ShowFatalError( "Preceding conditions cause termination." );
+			}
+		} else if ( CurZoneEqNum > 0 ) {
 			if ( !IsAutoSize && !SizingDesRunThisZone ) {
 				HardSizeNoDesRun = true;
 				AutosizeUser = SizingResult;
@@ -408,10 +432,10 @@ namespace ReportSizingManager {
 							} else {
 								OutTemp = 0.0;
 							}
-							rhoair = PsyRhoAirFnPbTdbW ( StdBaroPress, CoilInTemp, CoilInHumRat, CallString );
-							CoilInEnth = PsyHFnTdbW ( CoilInTemp, CoilInHumRat, CallString );
-							CoilInWetBulb = PsyTwbFnTdbWPb ( CoilInTemp, CoilInHumRat, StdBaroPress, CallString );
-							CoilOutEnth = PsyHFnTdbW ( CoilOutTemp, CoilOutHumRat, CallString );
+							rhoair = PsyRhoAirFnPbTdbW ( StdBaroPress, CoilInTemp, CoilInHumRat, CallingRoutine );
+							CoilInEnth = PsyHFnTdbW ( CoilInTemp, CoilInHumRat, CallingRoutine );
+							CoilInWetBulb = PsyTwbFnTdbWPb ( CoilInTemp, CoilInHumRat, StdBaroPress, CallingRoutine );
+							CoilOutEnth = PsyHFnTdbW ( CoilOutTemp, CoilOutHumRat, CallingRoutine );
 							if ( DataTotCapCurveIndex > 0 ) {
 								TotCapTempModFac = CurveValue ( DataTotCapCurveIndex, CoilInWetBulb, OutTemp );
 							} else {
@@ -597,10 +621,10 @@ namespace ReportSizingManager {
 									}
 								}
 								OutTemp = FinalSysSizing ( CurSysNum ).CoolOutTemp;
-								rhoair = PsyRhoAirFnPbTdbW ( StdBaroPress, CoilInTemp, CoilInHumRat, CallString );
-								CoilInEnth = PsyHFnTdbW ( CoilInTemp, CoilInHumRat, CallString );
-								CoilInWetBulb = PsyTwbFnTdbWPb ( CoilInTemp, CoilInHumRat, StdBaroPress, CallString );
-								CoilOutEnth = PsyHFnTdbW ( CoilOutTemp, CoilOutHumRat, CallString );
+								rhoair = PsyRhoAirFnPbTdbW ( StdBaroPress, CoilInTemp, CoilInHumRat, CallingRoutine );
+								CoilInEnth = PsyHFnTdbW ( CoilInTemp, CoilInHumRat, CallingRoutine );
+								CoilInWetBulb = PsyTwbFnTdbWPb ( CoilInTemp, CoilInHumRat, StdBaroPress, CallingRoutine );
+								CoilOutEnth = PsyHFnTdbW ( CoilOutTemp, CoilOutHumRat, CallingRoutine );
 								if ( DataTotCapCurveIndex > 0 ) {
 									TotCapTempModFac = CurveValue ( DataTotCapCurveIndex, CoilInWetBulb, OutTemp );
 								} else {
@@ -736,7 +760,7 @@ namespace ReportSizingManager {
 						RatedVolFlowPerRatedTotCap = DesVolFlow / SizingResult;
 						if ( RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap( DXCT ) ) {
 							if ( !DataEMSOverride && DisplayExtraWarnings ) {
-								ShowWarningError( CallString + " " + CompType + " " + CompName );
+								ShowWarningError( CallingRoutine + " " + CompType + " " + CompName );
 								ShowContinueError( "..." + SizingString + " will be limited by the minimum rated volume flow per rated total capacity ratio." );
 								ShowContinueError( "...DX coil volume flow rate (m3/s ) = " + TrimSigDigits( DesVolFlow, 6 ) );
 								ShowContinueError( "...Requested capacity (W ) = " + TrimSigDigits( SizingResult, 3 ) );
@@ -749,7 +773,7 @@ namespace ReportSizingManager {
 							}
 						} else if ( RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap( DXCT ) ) {
 							if ( !DataEMSOverride && DisplayExtraWarnings ) {
-								ShowWarningError( CallString + " " + CompType + " " + CompName );
+								ShowWarningError( CallingRoutine + " " + CompType + " " + CompName );
 								ShowContinueError( "..." + SizingString + " will be limited by the maximum rated volume flow per rated total capacity ratio." );
 								ShowContinueError( "...DX coil volume flow rate ( m3/s ) = " + TrimSigDigits( DesVolFlow, 6 ) );
 								ShowContinueError( "...Requested capacity ( W ) = " + TrimSigDigits( SizingResult, 3 ) );
@@ -774,7 +798,7 @@ namespace ReportSizingManager {
 						}
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( AutosizeDes - AutosizeUser ) / AutosizeUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( CallString + ": Potential issue with equipment sizing for " + CompType + " " + CompName );
+								ShowMessage( CallingRoutine + ": Potential issue with equipment sizing for " + CompType + " " + CompName );
 								ShowContinueError( "User-Specified " + SizingString + " = " + RoundSigDigits( AutosizeUser, 5 ) );
 								ShowContinueError( "differs from Design Size " + SizingString + " = " + RoundSigDigits( AutosizeDes, 5 ) );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
@@ -795,7 +819,7 @@ namespace ReportSizingManager {
 						ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, AutosizeDes, "User-Specified " + SizingString, AutosizeUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( AutosizeDes - AutosizeUser ) / AutosizeUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( CallString + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName );
+								ShowMessage( CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName );
 								ShowContinueError( "User-Specified " + SizingString + " = " + RoundSigDigits( AutosizeUser, 5 ) );
 								ShowContinueError( "differs from Design Size " + SizingString + " = " + RoundSigDigits( AutosizeDes, 5 ) );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );

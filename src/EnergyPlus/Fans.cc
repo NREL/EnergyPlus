@@ -1143,15 +1143,11 @@ namespace Fans {
 
 		if ( Fan( FanNum ).FanType_Num == FanType_ComponentModel ) {
 			FieldNum = 1;
-			TempFlow = Fan( FanNum ).MaxAirFlowRate;
-		} else if (Fan( FanNum ).FanType_Num == FanType_ZoneExhaust ) {
-			FieldNum = 3;
-			TempFlow = Fan( FanNum ).MaxAirFlowRate;
-			DataAutosizable = false;
 		} else {
 			FieldNum = 3;
-			TempFlow = Fan( FanNum ).MaxAirFlowRate;
 		}
+		TempFlow = Fan( FanNum ).MaxAirFlowRate;
+		DataAutosizable = Fan( FanNum ).MaxAirFlowRateIsAutosizable;
 		SizingString = FanNumericFields( FanNum ).FieldNames( FieldNum ) + " [m3/s]";
 		CompType = Fan( FanNum ).FanType;
 		CompName = Fan( FanNum ).FanName;
