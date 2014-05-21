@@ -62,6 +62,7 @@ public: // Types
 
 	// Using
 	using Super::in_range;
+	using Super::isize;
 	using Super::l;
 	using Super::u;
 	using Super::size;
@@ -394,7 +395,7 @@ public: // Inspector
 	int
 	u() const
 	{
-		return array_.size();
+		return array_.isize1();
 	}
 
 	// IndexRange of Dimension 1
@@ -418,7 +419,7 @@ public: // Inspector
 	int
 	u1() const
 	{
-		return array_.size1();
+		return array_.isize1();
 	}
 
 	// Size of Dimension 1
@@ -427,6 +428,14 @@ public: // Inspector
 	size1() const
 	{
 		return array_.size1();
+	}
+
+	// Size of Dimension 1
+	inline
+	int
+	isize1() const
+	{
+		return array_.isize1();
 	}
 
 	// Length

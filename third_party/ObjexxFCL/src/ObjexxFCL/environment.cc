@@ -28,7 +28,7 @@ get_environment_variable( Fstring const & name, Optional< Fstring > value, Optio
 	if ( cval ) val = cval;
 	if ( ( ! trim_name.present() ) || ( trim_name() ) ) rstrip( val ); // Strip any trailing spaces
 	if ( value.present() ) value = val;
-	if ( length.present() ) length = val.length();
+	if ( length.present() ) length = static_cast< int >( val.length() );
 	if ( status.present() ) {
 		if ( cval == nullptr ) { // Env var does not exist
 			status = 1;
@@ -79,7 +79,7 @@ get_environment_variable( std::string const & name, Optional< std::string > valu
 	if ( cval ) val = cval;
 	if ( ( ! trim_name.present() ) || ( trim_name() ) ) rstrip( val ); // Strip any trailing spaces
 	if ( value.present() ) value = val;
-	if ( length.present() ) length = val.length();
+	if ( length.present() ) length = static_cast< int >( val.length() );
 	if ( status.present() ) {
 		if ( cval == nullptr ) { // Env var does not exist
 			status = 1;

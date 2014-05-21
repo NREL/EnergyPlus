@@ -21,11 +21,8 @@
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
-#include <type_traits>
-#if defined(_MSC_VER) && !defined(__INTEL_COMPILER)
-#include <bitset>
 #include <limits>
-#endif
+#include <type_traits>
 
 namespace ObjexxFCL {
 
@@ -115,9 +112,18 @@ namespace bit { // Protect from collisions with C++11 <functional> functors
 template< typename T >
 inline
 int
-bit_size( T )
+bit_size( T, typename std::enable_if< std::is_unsigned< T >::value >::type * = 0 )
 {
-	return 8 * sizeof( T ); // Assumes 8-bit byte architecture
+	return std::numeric_limits< T >::digits;
+}
+
+// Bit Size
+template< typename T >
+inline
+int
+bit_size( T, typename std::enable_if< std::is_signed< T >::value >::type * = 0 )
+{
+	return std::numeric_limits< T >::digits + 1;
 }
 
 // Bit Value Set to 1
@@ -147,7 +153,7 @@ bool
 bit_test( T const & x, T const & pos )
 {
 	assert( pos >= T( 0 ) );
-	return ( x & ( T( 1 ) << pos ) );
+	return ( ( x & ( T( 1 ) << pos ) ) != T( 0 ) );
 }
 
 // Bitwise Not
@@ -192,13 +198,8 @@ inline
 T
 bit_shift( T const & x, S const & shift, typename std::enable_if< std::is_unsigned< T >::value >::type * = 0 )
 {
-	assert( std::abs( shift ) <= bit_size( x ) );
-#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) // VC++2013 bug work-around
-	std::bitset< std::numeric_limits< T >::digits > b( x );
-	return ( shift >= S( 0 ) ? b <<= shift : b >>= -shift ).to_ullong();
-#else
-	return ( shift >= S( 0 ) ? x << shift : x >> -shift );
-#endif
+	static auto const x_bits( std::numeric_limits< T >::digits );
+	return ( shift >= S( 0 ) ? ( shift < x_bits ? x << shift : T( 0 ) ) : ( -shift < x_bits ? x >> -shift : T( 0 ) ) );
 }
 
 // Bit Shifted
@@ -207,14 +208,9 @@ inline
 T
 bit_shift( T const & x, S const & shift, typename std::enable_if< std::is_signed< T >::value >::type * = 0 ) // x<0 behavior varies in Fortran ISHFT: We do a logical shift like Intel Fortran and GFortran
 {
-	assert( std::abs( shift ) <= bit_size( x ) );
-#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) // VC++2013 bug work-around
-	std::bitset< std::numeric_limits< T >::digits + 1 > b( x );
-	return ( shift >= S( 0 ) ? b <<= shift : b >>= -shift ).to_ullong();
-#else
+	static auto const x_bits( std::numeric_limits< T >::digits + 1 );
 	auto const & u( *reinterpret_cast< typename std::make_unsigned< T const >::type * >( &x ) );
-	return ( shift >= S( 0 ) ? u << shift : u >> -shift );
-#endif
+	return ( shift >= S( 0 ) ? ( shift < x_bits ? u << shift : T( 0 ) ) : ( -shift < x_bits ? u >> -shift : T( 0 ) ) );
 }
 
 // Bit Left Shifted
@@ -224,13 +220,8 @@ T
 bit_lshift( T const & x, S const & shift, typename std::enable_if< std::is_unsigned< T >::value >::type * = 0 )
 {
 	assert( shift >= S( 0 ) );
-	assert( shift <= bit_size( x ) );
-#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) // VC++2013 bug work-around
-	std::bitset< std::numeric_limits< T >::digits > b( x );
-	return ( b <<= shift ).to_ullong();
-#else
-	return x << shift;
-#endif
+	static auto const x_bits( std::numeric_limits< T >::digits );
+	return ( shift < x_bits ? x << shift : T( 0 ) );
 }
 
 // Bit Left Shifted
@@ -240,13 +231,8 @@ T
 bit_lshift( T const & x, S const & shift, typename std::enable_if< std::is_signed< T >::value >::type * = 0 ) // x<0 behavior varies in Fortran LSHFT/LSHIFT: We do a logical shift like Intel Fortran and GFortran
 {
 	assert( shift >= S( 0 ) );
-	assert( shift <= bit_size( x ) );
-#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) // VC++2013 bug work-around
-	std::bitset< std::numeric_limits< T >::digits + 1 > b( x );
-	return ( b <<= shift ).to_ullong();
-#else
-	return *reinterpret_cast< typename std::make_unsigned< T const >::type * >( &x ) << shift;
-#endif
+	static auto const x_bits( std::numeric_limits< T >::digits + 1 );
+	return ( shift < x_bits ? *reinterpret_cast< typename std::make_unsigned< T const >::type * >( &x ) << shift : T( 0 ) );
 }
 
 // Bit Right Shifted
@@ -256,8 +242,8 @@ T
 bit_rshift( T const & x, S const & shift, typename std::enable_if< std::is_unsigned< T >::value >::type * = 0 )
 {
 	assert( shift >= S( 0 ) );
-	assert( shift <= bit_size( x ) );
-	return x >> shift;
+	static auto const x_bits( std::numeric_limits< T >::digits );
+	return ( shift < x_bits ? x >> shift : T( 0 ) );
 }
 
 // Bit Right Shifted
@@ -267,8 +253,8 @@ T
 bit_rshift( T const & x, S const & shift, typename std::enable_if< std::is_signed< T >::value >::type * = 0 ) // x<0 behavior varies in Fortran RSHFT/RSHIFT: We do a logical shift like Intel Fortran and GFortran
 {
 	assert( shift >= S( 0 ) );
-	assert( shift <= bit_size( x ) );
-	return *reinterpret_cast< typename std::make_unsigned< T const >::type * >( &x ) >> shift;
+	static auto const x_bits( std::numeric_limits< T >::digits + 1 );
+	return ( shift < x_bits ? *reinterpret_cast< typename std::make_unsigned< T const >::type * >( &x ) >> shift : T( 0 ) );
 }
 
 // Bit Circularly Shifted
@@ -277,13 +263,14 @@ inline
 T
 bit_cshift( T const & x, S const & shift, typename std::enable_if< std::is_unsigned< T >::value >::type * = 0 )
 {
-	assert( std::abs( shift ) <= bit_size( x ) );
-#if (defined(__clang__) && defined(__APPLE__)) || (defined(_MSC_VER) && !defined(__INTEL_COMPILER)) // VC++2013 bug work-around
-	std::bitset< std::numeric_limits< T >::digits > const b( x );
-	return ( shift >= S( 0 ) ? b << shift | b >> ( bit_size( x ) - shift ) : b >> -shift | b << ( bit_size( x ) + shift ) ).to_ullong();
-#else
-	return ( shift >= S( 0 ) ? x << shift | x >> ( bit_size( x ) - shift ) : x >> -shift | x << ( bit_size( x ) + shift ) );
-#endif
+	static auto const x_bits( std::numeric_limits< T >::digits );
+	if ( shift >= S( 0 ) ) {
+		S const s( shift % x_bits );
+		return ( s > S( 0 ) ? x << s | x >> ( x_bits - s ) : x );
+	} else { // Negative (right) shift
+		S const s( -shift % x_bits );
+		return ( s > S( 0 ) ? x >> s | x << ( x_bits - s ) : x );
+	}
 }
 
 // Bit Circularly Shifted
@@ -292,14 +279,15 @@ inline
 T
 bit_cshift( T const & x, S const & shift, typename std::enable_if< std::is_signed< T >::value >::type * = 0 ) // x<0 behavior varies in Fortran ISHFTC: We do a logical shift like Intel Fortran and GFortran
 {
-	assert( std::abs( shift ) <= bit_size( x ) );
-#if (defined(__clang__) && defined(__APPLE__)) || (defined(_MSC_VER) && !defined(__INTEL_COMPILER)) // VC++2013 bug work-around
-	std::bitset< std::numeric_limits< T >::digits + 1 > const b( x );
-	return ( shift >= S( 0 ) ? b << shift | b >> ( bit_size( x ) - shift ) : b >> -shift | b << ( bit_size( x ) + shift ) ).to_ullong();
-#else
+	static auto const x_bits( std::numeric_limits< T >::digits + 1 );
 	auto const & u( *reinterpret_cast< typename std::make_unsigned< T const >::type * >( &x ) );
-	return ( shift >= S( 0 ) ? u << shift | u >> ( bit_size( x ) - shift ) : u >> -shift | u << ( bit_size( x ) + shift ) );
-#endif
+	if ( shift >= S( 0 ) ) {
+		S const s( shift % x_bits );
+		return ( s > S( 0 ) ? u << s | u >> ( x_bits - s ) : x );
+	} else { // Negative (right) shift
+		S const s( -shift % x_bits );
+		return ( s > S( 0 ) ? u >> s | u << ( x_bits - s ) : x );
+	}
 }
 
 // Bit Arithmetic Shifted
@@ -308,14 +296,14 @@ inline
 T
 bit_ashift( T const & x, S const & shift )
 {
-	assert( std::abs( shift ) <= bit_size( x ) );
+	static auto const x_bits( bit_size( x ) );
 	if ( shift >= S( 0 ) ) {
-		return x << shift;
+		return ( shift < x_bits ? x << shift : T( 0 ) );
 	} else { // Negative (right) shift
 		if ( x >= T( 0 ) ) {
-			return x >> -shift;
+			return ( -shift < x_bits ? x >> -shift : T( 0 ) );
 		} else {
-			return x >> -shift | ~( ( S( 1 ) << ( bit_size( x ) + shift ) ) - 1 );
+			return ( -shift < x_bits ? x >> -shift | ~( ( S( 1 ) << ( x_bits + shift ) ) - 1 ) : T( 0 ) );
 		}
 	}
 }
@@ -327,11 +315,11 @@ T
 bit_arshift( T const & x, S const & shift )
 {
 	assert( shift >= S( 0 ) );
-	assert( shift <= bit_size( x ) );
+	static auto const x_bits( bit_size( x ) );
 	if ( x >= T( 0 ) ) {
-		return x >> shift;
+		return ( shift < x_bits ? x >> shift : T( 0 ) );
 	} else {
-		return x >> shift | ~( ( S( 1 ) << ( bit_size( x ) - shift ) ) - 1 );
+		return ( shift < x_bits ? x >> shift | ~( ( S( 1 ) << ( bit_size( x ) - shift ) ) - 1 ) : T( 0 ) );
 	}
 }
 

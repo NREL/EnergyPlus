@@ -61,6 +61,7 @@ public: // Types
 
 	// Using
 	using Super::in_range;
+	using Super::isize;
 	using Super::overlap;
 	using Super::size;
 	using Super::slice_k;

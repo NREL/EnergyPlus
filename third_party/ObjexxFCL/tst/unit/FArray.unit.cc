@@ -319,6 +319,13 @@ TEST( FArrayTest, Cshift2DDim2 )
 	EXPECT_TRUE( eq( B, cshift( A, -2, 2 ) ) );
 }
 
+TEST( FArrayTest, Cshift2DNonSquareDim2 )
+{
+	FArray2D_int A( 3, 2, reshape( { 11, 21, 31, 12, 22, 32 }, std::array< int, 2 >{ { 3, 2 } } ) );
+	FArray2D_int B( 3, 2, reshape( { 12, 22, 32, 11, 21, 31 }, std::array< int, 2 >{ { 3, 2 } } ) );
+	EXPECT_TRUE( eq( B, cshift( A, -1, 2 ) ) );
+}
+
 TEST( FArrayTest, Cshift2DDim1Array )
 {
 	FArray2D_int A( 3, 3, reshape( { 11, 21, 31, 12, 22, 32, 13, 23, 33 }, std::array< int, 2 >{ { 3, 3 } } ) );

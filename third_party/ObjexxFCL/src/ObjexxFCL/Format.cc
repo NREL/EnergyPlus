@@ -1131,7 +1131,7 @@ alpha_token( Tokens const & tokens )
 		Tokens tokens;
 		Token token;
 		char const dq( '"' ), sq( '\'' ), bs( '\\' );
-		bool const nested( p );
+		bool const nested( p != nullptr );
 		int in_paren( 0 );
 		bool in_dq( false ); // In double-quoted literal?
 		bool in_sq( false ); // In single-quoted literal?
