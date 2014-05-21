@@ -9,10 +9,10 @@ IF ( MSVC ) # visual c++ (VS 2013)
     #  4258  Definition from the loop is ignored
     #  4355  Passing this pointer in class initializer (object is incomplete so bases/members can only use this in limited ways)
     #  4996  Deprecated" STL functions (that MS has safer, non-std alternatives for)
-    
+
     # need to figure out how to set this to avoid the major slow-down in debugging:
     # Configuration Properties ->Debugging -> Environment, use drop-down list to choose <Edit> and type _NO_DEBUG_HEAP=1 then click OK 
-            
+
     # COMPILER FLAGS
     ADD_CXX_DEFINITIONS("-MP") # Enables multi-processor compilation of source within a single project
 
@@ -35,20 +35,23 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     option(ENABLE_THREAD_SANITIZER "Enable thread sanitizer testing in gcc/clang" FALSE)
     set(LINKER_FLAGS "")
     if(ENABLE_THREAD_SANITIZER)
-      ADD_CXX_DEFINITIONS(-fsanitize=thread -g)
-      set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=thread")
+      ADD_CXX_DEFINITIONS(-fsanitize=thread )
+      add_definitions(-ggdb -fno-omit-frame-pointer)
+      set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=thread -ggdb")
     endif()
 
     option(ENABLE_ADDRESS_SANITIZER "Enable address sanitizer testing in gcc/clang" FALSE)
     if(ENABLE_ADDRESS_SANITIZER)
-      ADD_CXX_DEFINITIONS(-fsanitize=address -g)
-      set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=address")
+      ADD_CXX_DEFINITIONS(-fsanitize=address)
+      add_definitions(-ggdb -fno-omit-frame-pointer)
+      set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=address -ggdb")
     endif()
 
     option(ENABLE_UNDEFINED_SANITIZER "Enable undefined behavior sanitizer testing in gcc/clang" FALSE)
     if(ENABLE_UNDEFINED_SANITIZER)
-      ADD_CXX_DEFINITIONS(-fsanitize=undefined -g)
-      set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=undefined")
+      ADD_CXX_DEFINITIONS(-fsanitize=undefined )
+      add_definitions(-ggdb -fno-omit-frame-pointer)
+      set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=undefined -ggdb")
     endif()
 
     mark_as_advanced(ENABLE_THREAD_SANITIZER ENABLE_ADDRESS_SANITIZER ENABLE_UNDEFINED_SANITIZER)
