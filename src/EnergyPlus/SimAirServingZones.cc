@@ -3158,6 +3158,9 @@ namespace SimAirServingZones {
 			if ( std::abs( MassFlowRateOutSum - Node( InletNodeNum ).MassFlowRate ) > SmallMassFlow ) SysReSim = true;
 		}
 
+		//// Resimulate if the zone air mass flow conservation convergence critreon is not met
+		if ( ZoneMassBalanceHVACReSim ) SysReSim = true;
+
 		// If mass balance failed, resimulation is needed. Impose a mass balance for the new simulation.
 		if ( SysReSim ) {
 			// Set the MassFlowRateMaxAvail on each node to the minimum MassFlowRateMaxAvail for the branch.

@@ -196,6 +196,8 @@ namespace HeatBalanceAirManager {
 		CrossMixingFlag = false;
 		GetAirFlowFlag( ErrorsFound );
 
+		SetZoneMassConservationFlag();
+
 		// get input parameters for modeling of room air flow
 		GetRoomAirModelParameters( ErrorsFound );
 
@@ -257,6 +259,62 @@ namespace HeatBalanceAirManager {
 
 	}
 
+
+	void
+		SetZoneMassConservationFlag()
+	{
+
+			// SUBROUTINE INFORMATION :
+			// AUTHOR         Bereket Nigusse, FSEC
+			// DATE WRITTEN   February 2014
+			// MODIFIED
+
+			// RE - ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE :
+			// This subroutine sets the zone mass conservation flag to true.
+
+			// METHODOLOGY EMPLOYED :
+			// na
+
+			// REFERENCES :
+			// na
+
+			// Using/Aliasing
+			using DataHeatBalance::TotMixing;
+			using DataHeatBalance::Mixing;
+			using DataHeatBalance::ZoneAirMassFlow;
+			using DataHeatBalFanSys::MixingMassFlowZone;
+			using DataHeatBalFanSys::ZoneMassBalanceFlag;
+
+
+			// locals
+			// SUBROUTINE ARGUMENT DEFINITIONS :
+			// na
+
+			// SUBROUTINE PARAMETER DEFINITIONS :
+			// na
+
+			// INTERFACE BLOCK SPECIFICATIONS :
+			// na
+
+			// DERIVED TYPE DEFINITIONS :
+			// na
+
+			// SUBROUTINE LOCAL VARIABLE DECLARATIONS :
+			int Loop;
+
+			// flow
+
+			if (ZoneAirMassFlow.EnforceZoneMassBalance) {
+				for (Loop = 1; Loop <= TotMixing; ++Loop) {
+					ZoneMassBalanceFlag(Mixing(Loop).ZonePtr) = true;
+					ZoneMassBalanceFlag(Mixing(Loop).FromZone) = true;
+				}
+			}
+
+		}
+
 	void
 	GetSimpleAirModelInputs( bool & ErrorsFound ) // IF errors found in input
 	{
@@ -303,7 +361,7 @@ namespace HeatBalanceAirManager {
 		using General::CheckCreatedZoneItemName;
 		//  USE DataIPShortCuts
 		using SystemAvailabilityManager::GetHybridVentilationControlStatus;
-
+		using DataGlobals::NumOfZones;
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -363,6 +421,7 @@ namespace HeatBalanceAirManager {
 		int ZLItem;
 		FArray1D< Real64 > TotInfilVentFlow;
 		FArray1D< Real64 > TotMixingFlow;
+		FArray1D< Real64 > ZoneMixingNum;
 		int ConnectTest;
 		int ConnectionNumber;
 		int NumbNum;
@@ -371,6 +430,10 @@ namespace HeatBalanceAirManager {
 		int Zone2Num;
 		int ZoneNumA;
 		int ZoneNumB;
+		int MixingNum;
+		int SourceCount;
+		int ReceivingCount;
+		int IsSourceZone;
 
 		// Formats
 		static gio::Fmt const Format_720( "(' ',A,' Airflow Stats, ',A,',',A,',',A,',',A,',',A,',')" );
@@ -1844,6 +1907,110 @@ namespace HeatBalanceAirManager {
 
 		}
 
+		//allocate MassConservation
+		MassConservation.allocate( NumOfZones );
+
+		// added by BAN, 02/14
+		if ( TotMixing > 0 ) {
+		   ZoneMixingNum.allocate( TotMixing );
+		   // get source zones mixing objects index
+		   for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+			   SourceCount = 0;
+			   for ( Loop = 1; Loop <= TotMixing; ++Loop ) {
+				   if ( ZoneNum == Mixing( Loop ).FromZone ) {
+					  SourceCount += 1;
+					  ZoneMixingNum( SourceCount ) = Loop;
+					}
+				}
+				// save mixing objects index for zones which serve as a source zone
+				MassConservation( ZoneNum ).NumSourceZonesMixingObject = SourceCount;
+				if ( SourceCount > 0 ) {
+				   MassConservation( ZoneNum ).ZoneMixingSourcesPtr.allocate( SourceCount );
+				   for ( Loop = 1; Loop <= SourceCount; ++Loop ) {
+					   MassConservation( ZoneNum ).ZoneMixingSourcesPtr( Loop ) = ZoneMixingNum( Loop );
+					}
+				}
+			}
+
+			// check zones which are used only as a source zones      
+			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+				IsSourceZone = false;
+				for ( Loop = 1; Loop <= TotMixing; ++Loop ) {
+				    if (ZoneNum != Mixing( Loop ).FromZone ) continue;
+					MassConservation( ZoneNum ).IsOnlySourceZone = true;
+					for ( Loop1 = 1; Loop1 <= TotMixing; ++Loop1 ) {
+					    if ( ZoneNum == Mixing(Loop1).ZonePtr ) {
+						   MassConservation( ZoneNum ).IsOnlySourceZone = false;
+						   break;
+						}
+					}
+				}
+			}
+			// get receiving zones mixing objects index
+			ZoneMixingNum = 0;
+			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+				ReceivingCount = 0;
+				for ( Loop = 1; Loop <= TotMixing; ++Loop ) {
+				    if ( ZoneNum == Mixing( Loop ).ZonePtr ) {
+						 ReceivingCount += 1;
+						 ZoneMixingNum( ReceivingCount ) = Loop;
+					}
+				}
+				// save mixing objects index for zones which serve as a receiving zone
+				MassConservation( ZoneNum ).NumReceivingZonesMixingObject = ReceivingCount;
+				if ( ReceivingCount > 0 ) {
+					 MassConservation( ZoneNum ).ZoneMixingReceivingPtr.allocate( ReceivingCount );
+					 MassConservation( ZoneNum ).ZoneMixingReceivingFr.allocate( ReceivingCount );
+					 for ( Loop = 1; Loop <= ReceivingCount; ++Loop ) {
+						 MassConservation( ZoneNum ).ZoneMixingReceivingPtr( Loop ) = ZoneMixingNum( Loop );
+					}
+				}
+			}
+			if ( allocated( ZoneMixingNum ) ) ZoneMixingNum.deallocate();
+		}
+
+		// zone mass conservation calculation order starts with receiving zones
+		// and then proceeds to source zones 
+		Loop = 0;
+		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+			if ( ! MassConservation( ZoneNum ).IsOnlySourceZone ) {
+				Loop += 1;
+				ZoneReOrder( Loop ) = ZoneNum;
+			}
+		}
+		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+			if ( MassConservation( ZoneNum ).IsOnlySourceZone ) {
+			   Loop += 1;
+			   ZoneReOrder( Loop ) = ZoneNum;
+			}
+		}
+		if ( TotMixing > 0 ) {
+			for ( Loop = 1; Loop <= TotMixing; ++Loop ) {
+
+				if (ZoneMassBalanceRepVarFlag( Mixing( Loop ).ZonePtr ) ) {
+					ZoneMassBalanceRepVarFlag( Mixing( Loop ).ZonePtr ) = false;
+					SetupOutputVariable("Zone Supply Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).ZonePtr).InMassFlowRate, "System", "Average", Zone(Mixing(Loop).ZonePtr).Name);
+					SetupOutputVariable("Zone Exhaust Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).ZonePtr).ExhMassFlowRate, "System", "Average", Zone(Mixing(Loop).ZonePtr).Name);
+					SetupOutputVariable("Zone Return Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).ZonePtr).RetMassFlowRate, "System", "Average", Zone(Mixing(Loop).ZonePtr).Name);
+					SetupOutputVariable("Zone Mixing Receiving Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).ZonePtr).MixingMassFlowRate, "System", "Average", Zone(Mixing(Loop).ZonePtr).Name);
+					SetupOutputVariable("Zone Mixing Source Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).ZonePtr).MixingSourceMassFlowRate, "System", "Average", Zone(Mixing(Loop).ZonePtr).Name);
+					SetupOutputVariable("Zone Infiltration Air Mass Flow Balance Status []", MassConservation(Mixing(Loop).ZonePtr).IncludeInfilToZoneMassBal, "System", "Average", Zone(Mixing(Loop).ZonePtr).Name);
+				}
+
+				if (ZoneMassBalanceRepVarFlag( Mixing( Loop ).FromZone ) ) {
+					ZoneMassBalanceRepVarFlag( Mixing( Loop ).FromZone ) = false;
+					SetupOutputVariable("Zone Supply Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).FromZone).InMassFlowRate, "System", "Average", Zone(Mixing(Loop).FromZone).Name);
+					SetupOutputVariable("Zone Exhaust Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).FromZone).ExhMassFlowRate, "System", "Average", Zone(Mixing(Loop).FromZone).Name);
+					SetupOutputVariable("Zone Return Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).FromZone).RetMassFlowRate, "System", "Average", Zone(Mixing(Loop).FromZone).Name);
+					SetupOutputVariable("Zone Mixing Receiving Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).FromZone).MixingMassFlowRate, "System", "Average", Zone(Mixing(Loop).FromZone).Name);
+					SetupOutputVariable("Zone Mixing Source Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).FromZone).MixingSourceMassFlowRate, "System", "Average", Zone(Mixing(Loop).FromZone).Name);
+					SetupOutputVariable("Zone Infiltration Air Mass Flow Balance Status []", MassConservation(Mixing(Loop).FromZone).IncludeInfilToZoneMassBal, "System", "Average", Zone(Mixing(Loop).FromZone).Name);
+				}
+			}
+		}
+		if (allocated( ZoneMassBalanceRepVarFlag ) ) ZoneMassBalanceRepVarFlag.deallocate();
+
+
 		cCurrentModuleObject = "ZoneCrossMixing";
 		TotCrossMixing = GetNumObjectsFound( cCurrentModuleObject );
 		CrossMixing.allocate( TotCrossMixing );
@@ -2402,6 +2569,12 @@ namespace HeatBalanceAirManager {
 			gio::write( OutputFileInits, fmta ) << StringOut;
 		}
 
+		for (Loop = 1; Loop <= TotInfiltration; ++Loop) {
+			ZoneNum = Infiltration(Loop).ZonePtr;
+			MassConservation(ZoneNum).InfiltrationPtr = Loop;
+			SetupOutputVariable("Zone Mass Balance Infiltration Air Mass Flow Rate [kg/s]", MassConservation(Infiltration(Loop).ZonePtr).InfiltrationMassFlowRate, "System", "Average", Zone(Infiltration(Loop).ZonePtr).Name);
+		}
+
 		for ( Loop = 1; Loop <= TotVentilation; ++Loop ) {
 			if ( Loop == 1 ) gio::write( OutputFileInits, Format_721 ) << "ZoneVentilation" << "Design Volume Flow Rate {m3/s}," "Volume Flow Rate/Floor Area {m3/s/m2},Volume Flow Rate/person Area {m3/s/person}," "ACH - Air Changes per Hour,Fan Type {Exhaust;Intake;Natural},Fan Pressure Rise {Pa}," "Fan Efficiency {},Equation A - Constant Term Coefficient {}," "Equation B - Temperature Term Coefficient {1/C}," "Equation C - Velocity Term Coefficient {s/m}, Equation D - Velocity Squared Term Coefficient {s2/m2}," "Minimum Indoor Temperature{C}/Schedule,Maximum Indoor Temperature{C}/Schedule,Delta Temperature{C}/Schedule," "Minimum Outdoor Temperature{C}/Schedule,Maximum Outdoor Temperature{C}/Schedule,Maximum WindSpeed{m/s}";
 
@@ -2575,6 +2748,17 @@ namespace HeatBalanceAirManager {
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 			Zone( ZoneNum ).NominalInfilVent = TotInfilVentFlow( ZoneNum );
 			Zone( ZoneNum ).NominalMixing = TotMixingFlow( ZoneNum );
+		}
+
+		if (ZoneAirMassFlow.EnforceZoneMassBalance) {
+			for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+				if (MassConservation(ZoneNum).IsOnlySourceZone) {
+					if (MassConservation(ZoneNum).InfiltrationPtr == 0) {
+						ShowSevereError(RoutineName + ": Infiltration object is not defined for zone = " + Zone(ZoneNum).Name);
+						ShowContinueError("Zone air mass flow balance requires infiltration object for source zones of mixing objects");
+					}
+				}
+			}
 		}
 
 		TotInfilVentFlow.deallocate();
@@ -2963,6 +3147,10 @@ namespace HeatBalanceAirManager {
 		int NZ; // local index for zone number
 		int J; // local index for second zone in refrig door pair
 
+		int ZoneNum;               // zone counter
+		Real64 ZoneMixingFlowSum;  // sum of zone mixing flows for a zone
+		int NumOfMixingObjects;    // number of mixing objects for a receiving zone
+
 		//  Zero out time step variables
 		MTC = 0.0;
 		MVFC = 0.0;
@@ -2977,6 +3165,24 @@ namespace HeatBalanceAirManager {
 				NZ = Mixing( Loop ).ZonePtr;
 				Mixing( Loop ).DesiredAirFlowRate = Mixing( Loop ).DesignLevel * GetCurrentScheduleValue( Mixing( Loop ).SchedPtr );
 				if ( Mixing( Loop ).EMSSimpleMixingOn ) Mixing( Loop ).DesiredAirFlowRate = Mixing( Loop ).EMSimpleMixingFlowRate;
+				Mixing(Loop).DesiredAirFlowRateSaved = Mixing(Loop).DesiredAirFlowRate;
+			}
+
+			// if zone air mass flow balance enforced calculate the fraction of
+			// contribution of each mixing object to a zone mixed flow rate, BAN Feb 2014
+			if (ZoneAirMassFlow.EnforceZoneMassBalance) {
+				for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+					ZoneMixingFlowSum = 0.0;
+					NumOfMixingObjects = MassConservation(ZoneNum).NumReceivingZonesMixingObject;
+					for (Loop = 1; Loop <= NumOfMixingObjects; ++Loop) {
+						ZoneMixingFlowSum = ZoneMixingFlowSum + Mixing(Loop).DesignLevel;
+					}
+					if (ZoneMixingFlowSum > 0.0) {
+						for (Loop = 1; Loop <= NumOfMixingObjects; ++Loop) {
+							MassConservation(ZoneNum).ZoneMixingReceivingFr(Loop) = Mixing(Loop).DesignLevel / ZoneMixingFlowSum;
+						}
+					}
+				}
 			}
 
 			// Process the scheduled CrossMixing for air heat balance

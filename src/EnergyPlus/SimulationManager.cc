@@ -79,6 +79,7 @@
 #include <WeatherManager.hh>
 #include <ZoneContaminantPredictorCorrector.hh>
 #include <ZoneTempPredictorCorrector.hh>
+#include <ZoneEquipmentManager.hh>
 #include <Timer.h>
 
 namespace EnergyPlus {
@@ -2726,16 +2727,21 @@ Resimulate(
 	using DataHeatBalFanSys::iPredictStep;
 	using DataHeatBalFanSys::iCorrectStep;
 	using HVACManager::SimHVAC;
-	using HVACManager::CalcAirFlowSimple;
+	//using HVACManager::CalcAirFlowSimple;
 	using DataHVACGlobals::UseZoneTimeStepHistory; // , InitDSwithZoneHistory
 	using ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates;
 	using DataContaminantBalance::Contaminant;
+
+	using DataHeatBalance::ZoneAirMassFlow;
+	using namespace ZoneEquipmentManager;
+	//using ZoneEquipmentManager::CalcAirFlowSimple;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	Real64 ZoneTempChange( 0.0 ); // Dummy variable needed for calling ManageZoneAirUpdates
+	bool AdjustZoneMixingFlowFlag(true);  // holds zone mixing flow calc status
 
 	// FLOW:
 	if ( ResimExt ) {
@@ -2762,7 +2768,13 @@ Resimulate(
 		// HVAC simulation
 		ManageZoneAirUpdates( iGetZoneSetPoints, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0 );
 		if ( Contaminant.SimulateContaminants ) ManageZoneContaminanUpdates( iGetZoneSetPoints, false, UseZoneTimeStepHistory, 0.0 );
-		CalcAirFlowSimple();
+		//CalcAirFlowSimple();
+		if (ZoneAirMassFlow.EnforceZoneMassBalance) {
+			CalcAirFlowSimple(AdjustZoneMixingFlowFlag = true);
+		}
+		else {
+			CalcAirFlowSimple();
+		}
 		ManageZoneAirUpdates( iPredictStep, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0 );
 		if ( Contaminant.SimulateContaminants ) ManageZoneContaminanUpdates( iPredictStep, false, UseZoneTimeStepHistory, 0.0 );
 		SimHVAC();

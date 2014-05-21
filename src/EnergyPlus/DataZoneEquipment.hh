@@ -80,6 +80,11 @@ namespace DataZoneEquipment {
 	extern int NumOfZoneEquipLists; // The Number of Zone Equipment List objects
 	extern FArray1D_int ZoneEquipAvail;
 
+	// moved from HVACManager.hh to avoid circular call, B Nigusse, 05/14
+	extern FArray1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
+	extern FArray1D_bool MixingReportFlag; // TRUE when Mixing is active based on controls
+	extern FArray1D< Real64 > VentMCP; // product of mass rate and Cp for each Venitlation object
+
 	// Utility routines for module
 
 	// Types
