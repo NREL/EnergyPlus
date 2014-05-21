@@ -12560,7 +12560,7 @@ namespace RefrigeratedCase {
 					case Ceiling:
 						// purposely fall through
 					case Middle:
-					    CoilInletTemp = ZoneMixedAirDryBulb;
+						CoilInletTemp = ZoneMixedAirDryBulb;
 						CoilInletEnthalpy = ZoneMixedAirEnthalpy;
 						CoilInletRHFrac = ZoneMixedAirRHFrac;
 						CoilInletDensity = ZoneMixedAirDensity;
