@@ -68,7 +68,7 @@ namespace SurfaceGeometry {
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
-	std::string const Blank;
+	static std::string const BlankString;
 	FArray1D_string const BaseSurfCls( 3, { "WALL", "FLOOR", "ROOF" } );
 	FArray1D_string const SubSurfCls( 6, { "WINDOW", "DOOR", "GLASSDOOR", "SHADING", "TUBULARDAYLIGHTDOME", "TUBULARDAYLIGHTDIFFUSER" } );
 	FArray1D_int const BaseSurfIDs( 3, { SurfaceClass_Wall, SurfaceClass_Floor, SurfaceClass_Roof } );
@@ -2200,7 +2200,7 @@ namespace SurfaceGeometry {
 				OutMsg += "WorldCoordinateSystem" ",";
 				OK = true;
 			}
-			if ( has_prefixi( GAlphas( 4 ), "Rel" ) || has_prefixi( GAlphas( 4 ), "Relative" ) || SameString( GAlphas( 4 ), "Local" ) || GAlphas( 4 ) == Blank ) {
+			if ( has_prefixi( GAlphas( 4 ), "Rel" ) || has_prefixi( GAlphas( 4 ), "Relative" ) || SameString( GAlphas( 4 ), "Local" ) || GAlphas( 4 ) == BlankString ) {
 				DaylRefWorldCoordSystem = false;
 				OutMsg += "RelativeCoordinateSystem" ",";
 				OK = true;
@@ -2218,7 +2218,7 @@ namespace SurfaceGeometry {
 				OutMsg += "WorldCoordinateSystem";
 				OK = true;
 			}
-			if ( has_prefixi( GAlphas( 5 ), "Rel" ) || has_prefixi( GAlphas( 5 ), "Relative" ) || SameString( GAlphas( 5 ), "Local" ) || GAlphas( 5 ) == Blank ) {
+			if ( has_prefixi( GAlphas( 5 ), "Rel" ) || has_prefixi( GAlphas( 5 ), "Relative" ) || SameString( GAlphas( 5 ), "Local" ) || GAlphas( 5 ) == BlankString ) {
 				RectSurfRefWorldCoordSystem = false;
 				OutMsg += "RelativeToZoneOrigin";
 				OK = true;
@@ -3834,7 +3834,7 @@ namespace SurfaceGeometry {
 				SurfaceTmp( SurfNum ).ExtBoundCond = ExternalEnvironment;
 			}
 
-			if ( SurfaceTmp( SurfNum ).ExtBoundCondName == Blank ) {
+			if ( SurfaceTmp( SurfNum ).ExtBoundCondName == BlankString ) {
 				SurfaceTmp( SurfNum ).ExtBoundCondName = SurfaceTmp( SurfNum ).Name;
 			}
 			SurfaceTmp( SurfNum ).ViewFactorGround = rNumericArgs( 1 );
@@ -3885,7 +3885,7 @@ namespace SurfaceGeometry {
 					ErrorsFound = true;
 				}
 
-				if ( cAlphaArgs( 6 ) != Blank ) {
+				if ( cAlphaArgs( 6 ) != BlankString ) {
 					if ( TotWinShadingControl > 0 ) {
 						SurfaceTmp( SurfNum ).WindowShadingControlPtr = FindItemInList( cAlphaArgs( 6 ), WindowShadingControl.Name(), TotWinShadingControl );
 					}
@@ -3913,7 +3913,7 @@ namespace SurfaceGeometry {
 				CheckWindowShadingControlFrameDivider( "GetHTSubSurfaceData", ErrorsFound, SurfNum, 7 );
 
 				if ( SurfaceTmp( SurfNum ).Sides == 3 ) { // Triangular window
-					if ( cAlphaArgs( 7 ) != Blank ) {
+					if ( cAlphaArgs( 7 ) != BlankString ) {
 						ShowWarningError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\"." );
 						ShowContinueError( ".. because it is a triangular window and cannot have a frame or divider or reveal reflection." );
 						ShowContinueError( "Frame, divider and reveal reflection will be ignored for this window." );
@@ -4139,7 +4139,7 @@ namespace SurfaceGeometry {
 						ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid use of object" );
 						ShowContinueError( "...when Base surface uses \"Surface\" as " + cAlphaFieldNames( 5 ) + ", subsurfaces must also specify specific surfaces in the adjacent zone." );
 						ShowContinueError( "...Please use " + cCurrentModuleObject + ":Interzone to enter this surface." );
-						SurfaceTmp( SurfNum ).ExtBoundCondName = Blank; // putting it as blank will not confuse things later.
+						SurfaceTmp( SurfNum ).ExtBoundCondName = BlankString; // putting it as blank will not confuse things later.
 						ErrorsFound = true;
 					}
 				}
@@ -4219,7 +4219,7 @@ namespace SurfaceGeometry {
 						ErrorsFound = true;
 					}
 
-					if ( cAlphaArgs( WindowShadingField ) != Blank ) {
+					if ( cAlphaArgs( WindowShadingField ) != BlankString ) {
 						if ( TotWinShadingControl > 0 ) {
 							SurfaceTmp( SurfNum ).WindowShadingControlPtr = FindItemInList( cAlphaArgs( WindowShadingField ), WindowShadingControl.Name(), TotWinShadingControl );
 						}
@@ -7748,7 +7748,7 @@ namespace SurfaceGeometry {
 
 			if ( ( ! lAlphaFieldBlanks( 2 ) ) && ( NumAlphas != 1 ) ) { //  Const temp will come from schedule specified below.
 				OSC( OSCNum ).ConstTempScheduleName = cAlphaArgs( 2 );
-				if ( OSC( OSCNum ).ConstTempScheduleName != Blank ) {
+				if ( OSC( OSCNum ).ConstTempScheduleName != BlankString ) {
 					OSC( OSCNum ).ConstTempScheduleIndex = GetScheduleIndex( OSC( OSCNum ).ConstTempScheduleName );
 					if ( OSC( OSCNum ).ConstTempScheduleIndex == 0 ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) );
@@ -10313,7 +10313,7 @@ namespace SurfaceGeometry {
 
 			} else {
 
-				if ( Surface( ThisSurf ).Name != Blank ) {
+				if ( Surface( ThisSurf ).Name != BlankString ) {
 					ShowWarningError( "CalcSurfaceCentroid: caught problem with # of sides, for surface=" + Surface( ThisSurf ).Name );
 					ShowContinueError( "... number of sides must be >= 3, this surface # sides=" + RoundSigDigits( Surface( ThisSurf ).Sides ) );
 				} else {

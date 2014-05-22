@@ -370,6 +370,7 @@ namespace MoistureBalanceEMPDManager {
 		Real64 const Error( 0.01 ); // Totlarence (%)
 		Real64 const RLXM( 0.3 ); // Relaxation factor (0-1)
 		Real64 const Lam( 2.5e6 ); // Heat of vaporization (J/kg)
+		static std::string const RoutineName( "CalcMoistureEMPD" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -424,7 +425,7 @@ namespace MoistureBalanceEMPDManager {
 
 		ZoneNum = Surface( SurfNum ).Zone;
 		if ( Material( MatNum ).EMPDVALUE <= 0.0 ) {
-			MoistEMPDNew( SurfNum ) = PsyRhovFnTdbWPb( TempZone, ZoneAirHumRat( ZoneNum ), OutBaroPress, "CalcMoistureEMPD" );
+			MoistEMPDNew( SurfNum ) = PsyRhovFnTdbWPb( TempZone, ZoneAirHumRat( ZoneNum ), OutBaroPress );
 			return;
 		}
 
@@ -439,7 +440,7 @@ namespace MoistureBalanceEMPDManager {
 			AT = ( Material( MatNum ).MoistACoeff * Material( MatNum ).MoistBCoeff * std::pow( RHaver, Material( MatNum ).MoistBCoeff ) + Material( MatNum ).MoistCCoeff * Material( MatNum ).MoistDCoeff * std::pow( RHaver, Material( MatNum ).MoistDCoeff ) ) / RVaver;
 			BR = ( 4111.0 / std::pow( ( Taver + 237.7 ), 2 ) - ( 1.0 / ( Taver + KelvinConv ) ) ) * AT * RVaver;
 			RHOBULK = Material( MatNum ).Density;
-			HM = HConvIn( SurfNum ) / ( PsyRhoAirFnPbTdbW( OutBaroPress, TempZone, ZoneAirHumRat( ZoneNum ), "CalcMoistureEMPD" ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), TempZone, "CalcMoistureEMPD" ) );
+			HM = HConvIn( SurfNum ) / ( PsyRhoAirFnPbTdbW( OutBaroPress, TempZone, ZoneAirHumRat( ZoneNum ), RoutineName ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), TempZone ) );
 			ZoneNum = Surface( SurfNum ).Zone;
 			RALPHA = ZoneAirHumRat( ZoneNum ) * OutBaroPress / ( 461.52 * ( TempZone + KelvinConv ) * ( ZoneAirHumRat( ZoneNum ) + 0.62198 ) );
 			BB = HM / ( RHOBULK * Material( MatNum ).EMPDVALUE * AT );
@@ -464,14 +465,14 @@ namespace MoistureBalanceEMPDManager {
 		// Calculate latent load
 		PVsurf = RHaver * std::exp( 23.7093 - 4111.0 / ( Taver + 237.7 ) );
 		Wsurf = 0.62198 * RHaver / ( std::exp( -23.7093 + 4111.0 / ( Taver + 237.7 ) ) * OutBaroPress - RHaver );
-		MoistEMPDFlux( SurfNum ) = HM * ( MoistEMPDNew( SurfNum ) - PsyRhoAirFnPbTdbW( OutBaroPress, TempZone, ZoneAirHumRat( ZoneNum ), "CalcMoistureEMPD" ) * ZoneAirHumRat( ZoneNum ) ) * Lam;
+		MoistEMPDFlux( SurfNum ) = HM * ( MoistEMPDNew( SurfNum ) - PsyRhoAirFnPbTdbW( OutBaroPress, TempZone, ZoneAirHumRat( ZoneNum ), RoutineName ) * ZoneAirHumRat( ZoneNum ) ) * Lam;
 		// Calculate surface dew point temperature based on surface vapor density
 		TempSat = 4111.0 / ( 23.7093 - std::log( PVsurf ) ) + 35.45 - KelvinConv;
 
 		// Put results in the single precision reporting variable
 		RhoVapEMPD( SurfNum ) = MoistEMPDNew( SurfNum );
-		RHEMPD( SurfNum ) = PsyRhFnTdbRhovLBnd0C( TempSurfIn, RhoVapEMPD( SurfNum ), "CalcMoistureEMPD" ) * 100.0;
-		WSurfEMPD( SurfNum ) = PsyWFnTdbRhPb( TempSurfIn, RHEMPD( SurfNum ) / 100.0, OutBaroPress, "CalcMoistureEMPD" );
+		RHEMPD( SurfNum ) = PsyRhFnTdbRhovLBnd0C( TempSurfIn, RhoVapEMPD( SurfNum ), RoutineName ) * 100.0;
+		WSurfEMPD( SurfNum ) = PsyWFnTdbRhPb( TempSurfIn, RHEMPD( SurfNum ) / 100.0, OutBaroPress, RoutineName );
 
 	}
 

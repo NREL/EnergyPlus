@@ -92,6 +92,8 @@ namespace DualDuct {
 	int const PerPersonDCVByCurrentLevel( 21 );
 	int const PerPersonByDesignLevel( 22 );
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:
@@ -1700,7 +1702,7 @@ namespace DualDuct {
 			// Calculate outdoor air flow rate, zone multipliers are applied in GetInput
 			if ( AirLoopOAFrac > 0.0 ) {
 				OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir( Damper( DamperNum ).OARequirementsPtr, Damper( DamperNum ).ActualZoneNum, AirLoopControlInfo( AirLoopNum ).AirLoopDCVFlag, UseMinOASchFlag );
-				RhoAir = PsyRhoAirFnPbTdbW( Node( Damper( DamperNum ).OutletNodeNum ).Press, Node( Damper( DamperNum ).OutletNodeNum ).Temp, Node( Damper( DamperNum ).OutletNodeNum ).HumRat );
+				RhoAir = PsyRhoAirFnPbTdbW( Node( Damper( DamperNum ).OutletNodeNum ).Press, Node( Damper( DamperNum ).OutletNodeNum ).Temp, Node( Damper( DamperNum ).OutletNodeNum ).HumRat, BlankString );
 				OAMassFlow = OAVolumeFlowRate * RhoAir;
 
 				// convert OA mass flow rate to supply air flow rate based on air loop OA fraction
@@ -1745,6 +1747,7 @@ namespace DualDuct {
 
 		// FUNCTION PARAMETER DEFINITIONS:
 		bool const UseMinOASchFlag( true ); // Always use min OA schedule in calculations.
+		static std::string const RoutineName( "HVACDualDuctSystem:CalcOAOnlyMassFlow" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1780,7 +1783,7 @@ namespace DualDuct {
 
 		OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir( Damper( DamperNum ).OARequirementsPtr, Damper( DamperNum ).ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, PerPersonNotSet );
 
-		RhoAir = PsyRhoAirFnPbTdbW( Node( Damper( DamperNum ).OutletNodeNum ).Press, Node( Damper( DamperNum ).OutletNodeNum ).Temp, Node( Damper( DamperNum ).OutletNodeNum ).HumRat, "HVACDualDuctSystem:CalcOAOnlyMassFlow" );
+		RhoAir = PsyRhoAirFnPbTdbW( Node( Damper( DamperNum ).OutletNodeNum ).Press, Node( Damper( DamperNum ).OutletNodeNum ).Temp, Node( Damper( DamperNum ).OutletNodeNum ).HumRat, RoutineName );
 
 		OAMassFlow = OAVolumeFlowRate * RhoAir;
 

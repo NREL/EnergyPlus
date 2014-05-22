@@ -28,7 +28,6 @@ namespace ConvectionCoefficients {
 
 	extern Real64 const MinFlow; // Minimum mass flow rate
 	extern Real64 const MaxACH; // Maximum ceiling diffuser correlation limit
-	extern std::string const Blank;
 
 	extern Real64 const OneThird; // 1/3 in highest precision
 	extern Real64 const OneFourth; // 1/4 in highest precision

@@ -21,7 +21,6 @@ namespace ScheduleManager {
 	// Data
 	//MODULE PARAMETER DEFINITIONS
 	extern int const MaxDayTypes;
-	extern std::string const Blank;
 	extern FArray1D_string const ValidDayTypes;
 
 	extern int const NumScheduleTypeLimitUnitTypes;

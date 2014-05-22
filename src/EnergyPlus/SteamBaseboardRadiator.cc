@@ -87,6 +87,7 @@ namespace SteamBaseboardRadiator {
 	// Data
 	//MODULE PARAMETER DEFINITIONS
 	std::string const cCMO_BBRadiator_Steam( "ZoneHVAC:Baseboard:RadiantConvective:Steam" );
+	static std::string const fluidNameSteam( "STEAM" );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -543,6 +544,7 @@ namespace SteamBaseboardRadiator {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "InitSteamCoil" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -621,8 +623,8 @@ namespace SteamBaseboardRadiator {
 			SteamInletNode = SteamBaseboard( BaseboardNum ).SteamInletNode;
 			Node( SteamInletNode ).Temp = 100.0;
 			Node( SteamInletNode ).Press = 101325.0;
-			SteamDensity = GetSatDensityRefrig( "STEAM", Node( SteamInletNode ).Temp, 1.0, Node( SteamInletNode ).FluidIndex, "InitSteamCoil" );
-			StartEnthSteam = GetSatEnthalpyRefrig( "STEAM", Node( SteamInletNode ).Temp, 1.0, Node( SteamInletNode ).FluidIndex, "InitSteamCoil" );
+			SteamDensity = GetSatDensityRefrig( fluidNameSteam, Node( SteamInletNode ).Temp, 1.0, Node( SteamInletNode ).FluidIndex, RoutineName );
+			StartEnthSteam = GetSatEnthalpyRefrig( fluidNameSteam, Node( SteamInletNode ).Temp, 1.0, Node( SteamInletNode ).FluidIndex, RoutineName );
 			SteamBaseboard( BaseboardNum ).SteamMassFlowRateMax = SteamDensity * SteamBaseboard( BaseboardNum ).SteamVolFlowRateMax;
 			InitComponentNodes( 0.0, SteamBaseboard( BaseboardNum ).SteamMassFlowRateMax, SteamBaseboard( BaseboardNum ).SteamInletNode, SteamBaseboard( BaseboardNum ).SteamOutletNode, SteamBaseboard( BaseboardNum ).LoopNum, SteamBaseboard( BaseboardNum ).LoopSideNum, SteamBaseboard( BaseboardNum ).BranchNum, SteamBaseboard( BaseboardNum ).CompNum );
 			Node( SteamInletNode ).Enthalpy = StartEnthSteam;
@@ -707,6 +709,7 @@ namespace SteamBaseboardRadiator {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "SizeSteamBaseboard" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -758,11 +761,11 @@ namespace SteamBaseboardRadiator {
 					DesCoilLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
 					if ( DesCoilLoad >= SmallLoad ) {
 						SteamInletTemp = 100.0;
-						EnthSteamInDry = GetSatEnthalpyRefrig( "STEAM", SteamInletTemp, 1.0, SteamBaseboard( BaseboardNum ).FluidIndex, "SizeSteamBaseboard" );
-						EnthSteamOutWet = GetSatEnthalpyRefrig( "STEAM", SteamInletTemp, 0.0, SteamBaseboard( BaseboardNum ).FluidIndex, "SizeSteamBaseboard" );
+						EnthSteamInDry = GetSatEnthalpyRefrig( fluidNameSteam, SteamInletTemp, 1.0, SteamBaseboard( BaseboardNum ).FluidIndex, RoutineName );
+						EnthSteamOutWet = GetSatEnthalpyRefrig( fluidNameSteam, SteamInletTemp, 0.0, SteamBaseboard( BaseboardNum ).FluidIndex, RoutineName );
 						LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-						SteamDensity = GetSatDensityRefrig( "STEAM", SteamInletTemp, 1.0, SteamBaseboard( BaseboardNum ).FluidIndex, "SizeSteamBaseboard" );
-						Cp = GetSatSpecificHeatRefrig( "STEAM", SteamInletTemp, 0.0, SteamBaseboard( BaseboardNum ).FluidIndex, "SizeSteamBaseboard" );
+						SteamDensity = GetSatDensityRefrig( fluidNameSteam, SteamInletTemp, 1.0, SteamBaseboard( BaseboardNum ).FluidIndex, RoutineName );
+						Cp = GetSatSpecificHeatRefrig( fluidNameSteam, SteamInletTemp, 0.0, SteamBaseboard( BaseboardNum ).FluidIndex, RoutineName );
 
 						SteamVolFlowRateMaxDes = DesCoilLoad / ( SteamDensity * ( LatentHeatSteam + SteamBaseboard( BaseboardNum ).DegOfSubcooling * Cp ) );
 					} else {
@@ -845,6 +848,7 @@ namespace SteamBaseboardRadiator {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "CalcSteamBaseboard" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -875,10 +879,10 @@ namespace SteamBaseboardRadiator {
 
 		if ( QZnReq > SmallLoad && ! CurDeadBandOrSetback( ZoneNum ) && SteamMassFlowRate > 0.0 && GetCurrentScheduleValue( SteamBaseboard( BaseboardNum ).SchedPtr ) > 0 ) {
 			// Unit is on
-			EnthSteamInDry = GetSatEnthalpyRefrig( "STEAM", SteamInletTemp, 1.0, SteamBaseboard( BaseboardNum ).FluidIndex, "CalcSteamBaseboard" );
-			EnthSteamOutWet = GetSatEnthalpyRefrig( "STEAM", SteamInletTemp, 0.0, SteamBaseboard( BaseboardNum ).FluidIndex, "CalcSteamBaseboard" );
+			EnthSteamInDry = GetSatEnthalpyRefrig( fluidNameSteam, SteamInletTemp, 1.0, SteamBaseboard( BaseboardNum ).FluidIndex, RoutineName );
+			EnthSteamOutWet = GetSatEnthalpyRefrig( fluidNameSteam, SteamInletTemp, 0.0, SteamBaseboard( BaseboardNum ).FluidIndex, RoutineName );
 			LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-			Cp = GetSatSpecificHeatRefrig( "STEAM", SteamInletTemp, 0.0, SteamBaseboard( BaseboardNum ).FluidIndex, "CalcSteamBaseboard" );
+			Cp = GetSatSpecificHeatRefrig( fluidNameSteam, SteamInletTemp, 0.0, SteamBaseboard( BaseboardNum ).FluidIndex, RoutineName );
 			SteamBBHeat = SteamMassFlowRate * ( LatentHeatSteam + SubcoolDeltaT * Cp ); // Baseboard heating rate
 			SteamOutletTemp = SteamInletTemp - SubcoolDeltaT; // Outlet temperature of steam
 			// Estimate radiant heat addition

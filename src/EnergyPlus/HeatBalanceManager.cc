@@ -127,7 +127,7 @@ namespace HeatBalanceManager {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	std::string const Blank;
+	static std::string const BlankString;
 	gio::Fmt const fmtA( "(A)" );
 
 	FArray1D_string const PassFail( 2, { "Fail", "Pass" } );
@@ -3877,7 +3877,6 @@ namespace HeatBalanceManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const BlankString;
 		static std::string const RoutineName( "GetZoneData: " );
 		//  INTEGER, PARAMETER :: MaxZonesInList = 100 ! This is to allow DIMENSIONing below
 

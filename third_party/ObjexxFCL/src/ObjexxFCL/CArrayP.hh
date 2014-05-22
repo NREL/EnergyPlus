@@ -95,15 +95,14 @@ public: // Creation
 		}
 	}
 
+#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
 	// Non-Const Copy Constructor
 	inline
 	CArrayP( CArrayP & a ) :
 		size_( a.size_ ),
 		data_( a.owner_ ? ( size_ > 0u ? new T[ size_ ] : nullptr ) : a.data_ ),
-		owner_( a.owner_ )
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		, const_proxy_( a.const_proxy_ )
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
+		owner_( a.owner_ ),
+		const_proxy_( a.const_proxy_ )
 	{
 		if ( owner_ ) {
 			for ( size_type i = 0; i < size_; ++i ) {
@@ -111,6 +110,7 @@ public: // Creation
 			}
 		}
 	}
+#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
 	// Copy Constructor Template
 	template< typename U >
@@ -188,7 +188,7 @@ public: // Creation
 	}
 
 	// Size Constructor
-	// Built-in value types are not initialized
+	//  Built-in value types are not initialized
 	inline
 	explicit
 	CArrayP( size_type const size ) :
@@ -232,7 +232,7 @@ public: // Creation
 		std::copy( l.begin(), l.end(), data_ );
 	}
 
-	// Proxy const Copy Named Constructor
+	// Proxy Copy Named Constructor
 	static
 	inline
 	CArrayP
@@ -248,7 +248,8 @@ public: // Creation
 		return p;
 	}
 
-	// Proxy copy Named Constructor
+#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
+	// Non-Const Proxy Copy Named Constructor
 	static
 	inline
 	CArrayP
@@ -258,13 +259,12 @@ public: // Creation
 		p.size_ = a.size_;
 		p.data_ = a.data_;
 		p.owner_ = false;
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
 		p.const_proxy_ = a.const_proxy_;
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 		return p;
 	}
+#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
-	// Proxy const Copy + Size Named Constructor
+	// Proxy Copy + Size Named Constructor
 	static
 	inline
 	CArrayP
@@ -284,7 +284,8 @@ public: // Creation
 		return p;
 	}
 
-	// Proxy Copy + Size Named Constructor
+#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
+	// Non-Const Proxy Copy + Size Named Constructor
 	static
 	inline
 	CArrayP
@@ -298,11 +299,10 @@ public: // Creation
 		p.size_ = size;
 		p.data_ = a.data_;
 		p.owner_ = false;
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
 		p.const_proxy_ = a.const_proxy_;
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 		return p;
 	}
+#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
 	// Destructor
 	inline

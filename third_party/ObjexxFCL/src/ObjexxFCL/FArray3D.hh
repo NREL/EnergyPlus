@@ -70,6 +70,9 @@ public: // Types
 	typedef  typename Initializer::Function  InitializerFunction;
 
 	using Super::conformable;
+	using Super::isize1;
+	using Super::isize2;
+	using Super::isize3;
 	using Super::l;
 	using Super::operator ();
 	using Super::reassign;
@@ -479,7 +482,7 @@ public: // Creation
 	FArray3D
 	shape( FArray3< U > const & a )
 	{
-		return FArray3D( a.size1(), a.size2(), a.size3() );
+		return FArray3D( a.isize1(), a.isize2(), a.isize3() );
 	}
 
 	// Array Shape + Initializer Value Named Constructor Template
@@ -489,7 +492,7 @@ public: // Creation
 	FArray3D
 	shape( FArray3< U > const & a, T const & t )
 	{
-		return FArray3D( a.size1(), a.size2(), a.size3(), t );
+		return FArray3D( a.isize1(), a.isize2(), a.isize3(), t );
 	}
 
 	// Slice Shape Named Constructor Template
@@ -499,7 +502,7 @@ public: // Creation
 	FArray3D
 	shape( FArray3S< U > const & a )
 	{
-		return FArray3D( a.size1(), a.size2(), a.size3() );
+		return FArray3D( a.isize1(), a.isize2(), a.isize3() );
 	}
 
 	// Slice Shape + Initializer Value Named Constructor Template
@@ -509,7 +512,7 @@ public: // Creation
 	FArray3D
 	shape( FArray3S< U > const & a, T const & t )
 	{
-		return FArray3D( a.size1(), a.size2(), a.size3(), t );
+		return FArray3D( a.isize1(), a.isize2(), a.isize3(), t );
 	}
 
 	// MArray Shape Named Constructor Template
@@ -519,7 +522,7 @@ public: // Creation
 	FArray3D
 	shape( MArray3< A, M > const & a )
 	{
-		return FArray3D( a.size1(), a.size2(), a.size3() );
+		return FArray3D( a.isize1(), a.isize2(), a.isize3() );
 	}
 
 	// MArray Shape + Initializer Value Named Constructor Template
@@ -529,7 +532,7 @@ public: // Creation
 	FArray3D
 	shape( MArray3< A, M > const & a, T const & t )
 	{
-		return FArray3D( a.size1(), a.size2(), a.size3(), t );
+		return FArray3D( a.isize1(), a.isize2(), a.isize3(), t );
 	}
 
 	// One-Based Copy Named Constructor Template
@@ -539,7 +542,7 @@ public: // Creation
 	FArray3D
 	one_based( FArray3< U > const & a )
 	{
-		return FArray3D( a, a.size1(), a.size2(), a.size3() );
+		return FArray3D( a, a.isize1(), a.isize2(), a.isize3() );
 	}
 
 	// One-Based Slice Named Constructor Template
@@ -549,7 +552,7 @@ public: // Creation
 	FArray3D
 	one_based( FArray3S< U > const & a )
 	{
-		return FArray3D( a.size1(), a.size2(), a.size3(), a );
+		return FArray3D( a.isize1(), a.isize2(), a.isize3(), a );
 	}
 
 	// One-Based MArray Named Constructor Template
@@ -559,7 +562,7 @@ public: // Creation
 	FArray3D
 	one_based( MArray3< A, M > const & a )
 	{
-		return FArray3D( a.size1(), a.size2(), a.size3(), a );
+		return FArray3D( a.isize1(), a.isize2(), a.isize3(), a );
 	}
 
 	// Destructor
@@ -955,6 +958,14 @@ public: // Inspector
 	size3() const
 	{
 		return I3_.size();
+	}
+
+	// Size of Dimension 3
+	inline
+	int
+	isize3() const
+	{
+		return I3_.isize();
 	}
 
 public: // Modifier

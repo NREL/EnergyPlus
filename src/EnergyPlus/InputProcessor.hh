@@ -34,7 +34,6 @@ namespace InputProcessor {
 	extern std::string::size_type const MaxInputLineLength; // Maximum number of characters in an input line (in.idf, energy+.idd)
 	extern std::string::size_type const MaxFieldNameLength; // Maximum number of characters in a field name string
 	extern std::string const Blank;
-	extern std::string const AlphaNum; // Valid indicators for Alpha or Numeric fields (A or N)
 	extern gio::Fmt const fmta;
 	extern Real64 const DefAutoSizeValue;
 	extern Real64 const DefAutoCalculateValue;
@@ -618,11 +617,39 @@ namespace InputProcessor {
 	std::string
 	MakeUPPERCase( std::string const & InputString ); // Input String
 
+	typedef char const * c_cstring;
+
+	inline
 	bool
-	SameString(
-		std::string const & TestString1, // First String to Test
-		std::string const & TestString2 // Second String to Test
-	);
+	SameString( std::string const & s,  std::string const & t )
+	{
+		// case insensitive comparison
+		return equali( s, t );
+	}
+
+	inline
+	bool
+	SameString( std::string const & s,  c_cstring const & t )
+	{
+		// case insensitive comparison
+		return equali( s, t );
+	}
+
+	inline
+	bool
+	SameString( c_cstring const & s,  std::string const & t )
+	{
+		// case insensitive comparison
+		return equali( s, t );
+	}
+
+	inline
+	bool
+	SameString( c_cstring const & s,  c_cstring const & t )
+	{
+		// case insensitive comparison
+		return equali( s, t );
+	}
 
 	void
 	VerifyName(

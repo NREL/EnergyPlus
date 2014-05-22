@@ -173,7 +173,7 @@ public: // Properties
 	bool
 	associated() const
 	{
-		return ptr_;
+		return ( ptr_ != nullptr );
 	}
 
 	// Associated with a Given Value?
@@ -197,7 +197,7 @@ public: // Properties
 	bool
 	attached() const
 	{
-		return ptr_;
+		return ( ptr_ != nullptr );
 	}
 
 	// Attached to a Given Value?

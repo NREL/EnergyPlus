@@ -86,27 +86,9 @@ public: // Creation
 		shift_set( a.shift_ );
 	}
 
-	// Non-Const Copy Constructor
-	inline
-	FArray1A( FArray1A & a ) :
-		Super( a, ProxySentinel() ),
-		I_( a.I_ )
-	{
-		shift_set( a.shift_ );
-	}
-
 	// Real Constructor
 	inline
 	FArray1A( real_FArray const & a ) :
-		Super( a, ProxySentinel() ),
-		I_( a.I_ )
-	{
-		shift_set( a.shift_ );
-	}
-
-	// Non-Const Real Constructor
-	inline
-	FArray1A( real_FArray & a ) :
 		Super( a, ProxySentinel() ),
 		I_( a.I_ )
 	{
@@ -122,27 +104,9 @@ public: // Creation
 		shift_set( a.shift_ );
 	}
 
-	// Non-Const Proxy Constructor
-	inline
-	FArray1A( proxy_FArray & a ) :
-		Super( a, ProxySentinel() ),
-		I_( a.I_ )
-	{
-		shift_set( a.shift_ );
-	}
-
 	// Super Constructor
 	inline
 	FArray1A( Super const & a ) :
-		Super( a, ProxySentinel() ),
-		I_( a.I() )
-	{
-		shift_set( a.shift_ );
-	}
-
-	// Non-Const Super Constructor
-	inline
-	FArray1A( Super & a ) :
 		Super( a, ProxySentinel() ),
 		I_( a.I() )
 	{
@@ -153,16 +117,7 @@ public: // Creation
 	inline
 	FArray1A( Base const & a ) :
 		Super( a, ProxySentinel() ),
-		I_( a.size() )
-	{
-		shift_set( 1 );
-	}
-
-	// Non-Const Base Constructor
-	inline
-	FArray1A( Base & a ) :
-		Super( a, ProxySentinel() ),
-		I_( a.size() )
+		I_( a.isize() )
 	{
 		shift_set( 1 );
 	}
@@ -171,16 +126,7 @@ public: // Creation
 	inline
 	FArray1A( Tail const & s ) :
 		Super( s, ProxySentinel() ),
-		I_( s.size() )
-	{
-		shift_set( 1 );
-	}
-
-	// Non-Const Tail Constructor
-	inline
-	FArray1A( Tail & s ) :
-		Super( s, ProxySentinel() ),
-		I_( s.size() )
+		I_( s.isize() )
 	{
 		shift_set( 1 );
 	}
@@ -188,15 +134,6 @@ public: // Creation
 	// Value Constructor
 	inline
 	FArray1A( T const & t ) :
-		Super( t, ProxySentinel() ),
-		I_( star ) // Unbounded
-	{
-		shift_set( 1 );
-	}
-
-	// Non-Const Value Constructor
-	inline
-	FArray1A( T & t ) :
 		Super( t, ProxySentinel() ),
 		I_( star ) // Unbounded
 	{
@@ -212,27 +149,9 @@ public: // Creation
 		dimension_argument();
 	}
 
-	// Non-Const Copy + IndexRange Constructor
-	inline
-	FArray1A( FArray1A & a, IR const & I ) :
-		Super( a, ProxySentinel() ),
-		I_( I )
-	{
-		dimension_argument();
-	}
-
 	// Real + IndexRange Constructor
 	inline
 	FArray1A( real_FArray const & a, IR const & I ) :
-		Super( a, ProxySentinel() ),
-		I_( I )
-	{
-		dimension_argument();
-	}
-
-	// Non-Const Real + IndexRange Constructor
-	inline
-	FArray1A( real_FArray & a, IR const & I ) :
 		Super( a, ProxySentinel() ),
 		I_( I )
 	{
@@ -248,27 +167,9 @@ public: // Creation
 		dimension_argument();
 	}
 
-	// Non-Const Proxy + IndexRange Constructor
-	inline
-	FArray1A( proxy_FArray & a, IR const & I ) :
-		Super( a, ProxySentinel() ),
-		I_( I )
-	{
-		dimension_argument();
-	}
-
 	// Super + IndexRange Constructor
 	inline
 	FArray1A( Super const & a, IR const & I ) :
-		Super( a, ProxySentinel() ),
-		I_( I )
-	{
-		dimension_argument();
-	}
-
-	// Non-Const Super + IndexRange Constructor
-	inline
-	FArray1A( Super & a, IR const & I ) :
 		Super( a, ProxySentinel() ),
 		I_( I )
 	{
@@ -284,27 +185,9 @@ public: // Creation
 		dimension_argument();
 	}
 
-	// Non-Const Base + IndexRange Constructor
-	inline
-	FArray1A( Base & a, IR const & I ) :
-		Super( a, ProxySentinel() ),
-		I_( I )
-	{
-		dimension_argument();
-	}
-
 	// Tail + IndexRange Constructor
 	inline
 	FArray1A( Tail const & s, IR const & I ) :
-		Super( s, ProxySentinel() ),
-		I_( I )
-	{
-		dimension_argument();
-	}
-
-	// Non-Const Tail + IndexRange Constructor
-	inline
-	FArray1A( Tail & s, IR const & I ) :
 		Super( s, ProxySentinel() ),
 		I_( I )
 	{
@@ -320,6 +203,125 @@ public: // Creation
 		dimension_argument();
 	}
 
+#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
+
+	// Non-Const Copy Constructor
+	inline
+	FArray1A( FArray1A & a ) :
+		Super( a, ProxySentinel() ),
+		I_( a.I_ )
+	{
+		shift_set( a.shift_ );
+	}
+
+	// Non-Const Real Constructor
+	inline
+	FArray1A( real_FArray & a ) :
+		Super( a, ProxySentinel() ),
+		I_( a.I_ )
+	{
+		shift_set( a.shift_ );
+	}
+
+	// Non-Const Proxy Constructor
+	inline
+	FArray1A( proxy_FArray & a ) :
+		Super( a, ProxySentinel() ),
+		I_( a.I_ )
+	{
+		shift_set( a.shift_ );
+	}
+
+	// Non-Const Super Constructor
+	inline
+	FArray1A( Super & a ) :
+		Super( a, ProxySentinel() ),
+		I_( a.I() )
+	{
+		shift_set( a.shift_ );
+	}
+
+	// Non-Const Base Constructor
+	inline
+	FArray1A( Base & a ) :
+		Super( a, ProxySentinel() ),
+		I_( a.isize() )
+	{
+		shift_set( 1 );
+	}
+
+	// Non-Const Tail Constructor
+	inline
+	FArray1A( Tail & s ) :
+		Super( s, ProxySentinel() ),
+		I_( s.isize() )
+	{
+		shift_set( 1 );
+	}
+
+	// Non-Const Value Constructor
+	inline
+	FArray1A( T & t ) :
+		Super( t, ProxySentinel() ),
+		I_( star ) // Unbounded
+	{
+		shift_set( 1 );
+	}
+
+	// Non-Const Copy + IndexRange Constructor
+	inline
+	FArray1A( FArray1A & a, IR const & I ) :
+		Super( a, ProxySentinel() ),
+		I_( I )
+	{
+		dimension_argument();
+	}
+
+	// Non-Const Real + IndexRange Constructor
+	inline
+	FArray1A( real_FArray & a, IR const & I ) :
+		Super( a, ProxySentinel() ),
+		I_( I )
+	{
+		dimension_argument();
+	}
+
+	// Non-Const Proxy + IndexRange Constructor
+	inline
+	FArray1A( proxy_FArray & a, IR const & I ) :
+		Super( a, ProxySentinel() ),
+		I_( I )
+	{
+		dimension_argument();
+	}
+
+	// Non-Const Super + IndexRange Constructor
+	inline
+	FArray1A( Super & a, IR const & I ) :
+		Super( a, ProxySentinel() ),
+		I_( I )
+	{
+		dimension_argument();
+	}
+
+	// Non-Const Base + IndexRange Constructor
+	inline
+	FArray1A( Base & a, IR const & I ) :
+		Super( a, ProxySentinel() ),
+		I_( I )
+	{
+		dimension_argument();
+	}
+
+	// Non-Const Tail + IndexRange Constructor
+	inline
+	FArray1A( Tail & s, IR const & I ) :
+		Super( s, ProxySentinel() ),
+		I_( I )
+	{
+		dimension_argument();
+	}
+
 	// Non-Const Value + IndexRange Constructor
 	inline
 	FArray1A( T & t, IR const & I ) :
@@ -328,6 +330,8 @@ public: // Creation
 	{
 		dimension_argument();
 	}
+
+#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
 	// Destructor
 	inline
@@ -680,6 +684,14 @@ public: // Inspector
 		return I_.size();
 	}
 
+	// Size
+	inline
+	int
+	isize1() const
+	{
+		return I_.isize();
+	}
+
 public: // Modifier
 
 	// Clear
@@ -904,7 +916,7 @@ private: // Functions
 			size_set( I_.size() );
 		} else if ( data_size_ != npos ) { // Unbounded with bounded data array
 			// Infer upper index and size
-			I_.u( I_.lz() + data_size_ - 1 );
+			I_.u( I_.lz() + static_cast< int >( data_size_ ) - 1 );
 			size_set( I_.size() );
 		} else { // Unbounded with unbounded data array
 			size_set( npos );

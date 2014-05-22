@@ -217,9 +217,9 @@ protected: // Creation
 		shift_( 0 ),
 		sdata_( nullptr )
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT
+#if defined(OBJEXXFCL_FARRAY_INIT) || defined(OBJEXXFCL_FARRAY_INIT_DEBUG)
 		std::fill_n( data_, size_, Traits::initial_array_value() );
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT || OBJEXXFCL_FARRAY_INIT_DEBUG
 #ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
 		size_report();
 #endif // OBJEXXFCL_FARRAY_SIZE_REPORT
@@ -340,20 +340,6 @@ protected: // Creation
 		sdata_( nullptr )
 	{}
 
-	// Non-Const Array Proxy Constructor
-	inline
-	FArray( FArray & a, ProxySentinel const & ) :
-		data_size_( a.data_size_ ),
-		data_( a.data_ ),
-		size_( a.size_ ),
-		owner_( false ),
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		const_proxy_( a.const_proxy_ ),
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
-		shift_( 0 ),
-		sdata_( nullptr )
-	{}
-
 	// Tail Proxy Constructor
 	inline
 	FArray( Tail const & s, ProxySentinel const & ) :
@@ -363,20 +349,6 @@ protected: // Creation
 		owner_( false ),
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
 		const_proxy_( true ),
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
-		shift_( 0 ),
-		sdata_( nullptr )
-	{}
-
-	// Non-Const Tail Proxy Constructor
-	inline
-	FArray( Tail & s, ProxySentinel const & ) :
-		data_size_( s.size() ),
-		data_( s.data_ ),
-		size_( data_size_ ),
-		owner_( false ),
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		const_proxy_( s.const_proxy_ ),
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
 		shift_( 0 ),
 		sdata_( nullptr )
@@ -396,6 +368,32 @@ protected: // Creation
 		sdata_( nullptr )
 	{}
 
+#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
+
+	// Non-Const Array Proxy Constructor
+	inline
+	FArray( FArray & a, ProxySentinel const & ) :
+		data_size_( a.data_size_ ),
+		data_( a.data_ ),
+		size_( a.size_ ),
+		owner_( false ),
+		const_proxy_( a.const_proxy_ ),
+		shift_( 0 ),
+		sdata_( nullptr )
+	{}
+
+	// Non-Const Tail Proxy Constructor
+	inline
+	FArray( Tail & s, ProxySentinel const & ) :
+		data_size_( s.size() ),
+		data_( s.data_ ),
+		size_( data_size_ ),
+		owner_( false ),
+		const_proxy_( s.const_proxy_ ),
+		shift_( 0 ),
+		sdata_( nullptr )
+	{}
+
 	// Non-Const Value Proxy Constructor
 	inline
 	FArray( T & t, ProxySentinel const & ) :
@@ -403,28 +401,12 @@ protected: // Creation
 		data_( &t ),
 		size_( npos ), // Unbounded
 		owner_( false ),
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
 		const_proxy_( false ),
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 		shift_( 0 ),
 		sdata_( nullptr )
 	{}
 
-	// Switch to Size Construction
-	void
-	reconstruct_by_size( size_type const size )
-	{
-		delete[] data_;
-		data_size_ = size;
-		size_ = data_size_;
-		data_ = new T[ data_size_ ];
-#ifdef OBJEXXFCL_FARRAY_INIT
-		reassign( Traits::initial_array_value() );
-#endif // OBJEXXFCL_FARRAY_INIT
-#ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
-		size_report();
-#endif // OBJEXXFCL_FARRAY_SIZE_REPORT
-	}
+#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
 public: // Creation
 
@@ -919,7 +901,7 @@ public: // Predicate
 	is_uniform() const
 	{
 		if ( size_ <= 1 ) return true;
-		T const t( data_[ 0 ] );
+		T const & t( data_[ 0 ] );
 		for ( size_type i = 1; i < size_; ++i ) {
 			if ( data_[ i ] != t ) return false;
 		}
@@ -990,6 +972,14 @@ public: // Inspector
 		return size_;
 	}
 
+	// Active Array Size
+	inline
+	int
+	isize() const
+	{
+		return static_cast< int >( size_ );
+	}
+
 	// IndexRange of a Dimension
 	virtual
 	IR const &
@@ -1009,6 +999,11 @@ public: // Inspector
 	virtual
 	size_type
 	size( int const d ) const = 0;
+
+	// Size of a Dimension
+	virtual
+	int
+	isize( int const d ) const = 0;
 
 	// Array Data Pointer
 	inline
@@ -2209,9 +2204,9 @@ protected: // Methods
 			size_report();
 #endif // OBJEXXFCL_FARRAY_SIZE_REPORT
 		}
-#ifdef OBJEXXFCL_FARRAY_INIT
+#if defined(OBJEXXFCL_FARRAY_INIT) || defined(OBJEXXFCL_FARRAY_INIT_DEBUG)
 		if ( ! initializer_active() ) std::fill_n( data_, size_, Traits::initial_array_value() );
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT || OBJEXXFCL_FARRAY_INIT_DEBUG
 		return *this;
 	}
 
@@ -2448,6 +2443,22 @@ protected: // Methods
 	reassign( size_type const i, U const & u, typename std::enable_if< ! Has_reassign< U >::value >::type * = 0 )
 	{
 		operator []( i ) = u;
+	}
+
+	// Switch to Size Construction
+	void
+	reconstruct_by_size( size_type const size )
+	{
+		delete[] data_;
+		data_size_ = size;
+		size_ = data_size_;
+		data_ = new T[ data_size_ ];
+#if defined(OBJEXXFCL_FARRAY_INIT) || defined(OBJEXXFCL_FARRAY_INIT_DEBUG)
+		reassign( Traits::initial_array_value() );
+#endif // OBJEXXFCL_FARRAY_INIT || OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
+		size_report();
+#endif // OBJEXXFCL_FARRAY_SIZE_REPORT
 	}
 
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS

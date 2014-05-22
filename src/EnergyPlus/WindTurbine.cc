@@ -67,6 +67,8 @@ namespace WindTurbine {
 	int const VSFP( 3 ); // 'VariableSpeedFixedPitch'
 	int const VSVP( 4 ); // 'VariableSpeedVariablePitch'
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLES DECLARATIONS:
@@ -241,7 +243,6 @@ namespace WindTurbine {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
 		static std::string const CurrentModuleObject( "Generator:WindTurbine" );
 		Real64 const SysEffDefault( 0.835 ); // Default value of overall system efficiency
 		Real64 const MaxTSR( 12.0 ); // Maximum tip speed ratio
@@ -598,7 +599,6 @@ namespace WindTurbine {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
 		static char const TabChr( '\t' ); // Tab character
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -651,7 +651,7 @@ namespace WindTurbine {
 						for ( mon = 1; mon <= 12; ++mon ) {
 							lnPtr = index( lineIn, TabChr );
 							if ( lnPtr != 1 ) {
-								if ( ( lnPtr == std::string::npos ) || ( stripped( lineIn.substr( 0, lnPtr ) ) != Blank ) ) {
+								if ( ( lnPtr == std::string::npos ) || ( stripped( lineIn.substr( 0, lnPtr ) ) != BlankString ) ) {
 									if ( lnPtr != std::string::npos ) {
 										gio::read( lineIn.substr( 0, lnPtr ), "*" ) >> MonthWS( mon );
 										lineIn.erase( 0, lnPtr + 1 );
@@ -814,8 +814,8 @@ namespace WindTurbine {
 		RotorSpeed = WindTurbineSys( WindTurbineNum ).RatedRotorSpeed;
 		LocalTemp = OutDryBulbTempAt( RotorH );
 		LocalPress = OutBaroPressAt( RotorH );
-		LocalHumRat = PsyWFnTdbTwbPb( LocalTemp, OutWetBulbTempAt( RotorH ), LocalPress );
-		LocalAirDensity = PsyRhoAirFnPbTdbW( LocalPress, LocalTemp, LocalHumRat );
+		LocalHumRat = PsyWFnTdbTwbPb( LocalTemp, OutWetBulbTempAt( RotorH ), LocalPress, BlankString );
+		LocalAirDensity = PsyRhoAirFnPbTdbW( LocalPress, LocalTemp, LocalHumRat, BlankString );
 		LocalWindSpeed = WindSpeedAt( RotorH );
 		LocalWindSpeed /= WindTurbineSys( WindTurbineNum ).WSFactor;
 

@@ -60,7 +60,7 @@ namespace PlantPressureSystem {
 
 	// Data
 	// MODULE PARAMETER/ENUMERATIONS DEFINITIONS:
-	std::string const Blank;
+	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS:
 	//TYPE, PUBLIC:: PlantPressureCurveData

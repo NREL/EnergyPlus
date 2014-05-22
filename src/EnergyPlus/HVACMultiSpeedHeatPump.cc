@@ -144,6 +144,8 @@ namespace HVACMultiSpeedHeatPump {
 	int const On( 1 ); // normal compressor operation
 	int const Off( 0 ); // signal DXCoil that compressor shouldn't run
 
+	static std::string const fluidNameSteam( "STEAM" );
+
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -524,6 +526,7 @@ namespace HVACMultiSpeedHeatPump {
 		// Locals
 		// PARAMETERS
 		static std::string const RoutineName( "GetMSHeatPumpInput: " ); // include trailing blank space
+		static std::string const RoutineNameNoColon( "GetMSHeatPumpInput" );
 
 		// LOCAL VARIABLES
 		int MSHPNum; // Engine driven heat pump count
@@ -925,7 +928,7 @@ namespace HVACMultiSpeedHeatPump {
 					MSHeatPump( MSHPNum ).MaxCoilFluidFlow = GetCoilMaxSteamFlowRate( MSHeatPump( MSHPNum ).HeatCoilNum, errFlag );
 					if ( MSHeatPump( MSHPNum ).MaxCoilFluidFlow > 0.0 ) {
 						SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-						SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "GetMSHeatPumpInput" );
+						SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineNameNoColon );
 						MSHeatPump( MSHPNum ).MaxCoilFluidFlow *= SteamDensity;
 					}
 
@@ -1152,7 +1155,7 @@ namespace HVACMultiSpeedHeatPump {
 					MSHeatPump( MSHPNum ).MaxSuppCoilFluidFlow = GetCoilMaxSteamFlowRate( MSHeatPump( MSHPNum ).SuppHeatCoilNum, errFlag );
 					if ( MSHeatPump( MSHPNum ).MaxSuppCoilFluidFlow > 0.0 ) {
 						SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-						SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "GetMSHeatPumpInput" );
+						SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineNameNoColon );
 						MSHeatPump( MSHPNum ).MaxSuppCoilFluidFlow *= SteamDensity;
 					}
 
@@ -1548,6 +1551,7 @@ namespace HVACMultiSpeedHeatPump {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static std::string const RoutineName( "InitMSHeatPump" );
 		int InNode; // Inlet node number in MSHP loop
 		int OutNode; // Outlet node number in MSHP loop
 		int ZoneInNode; // Zone inlet node number in the controlled zone for MSHP
@@ -1642,7 +1646,7 @@ namespace HVACMultiSpeedHeatPump {
 				MSHeatPump( MSHeatPumpNum ).MaxCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", MSHeatPump( MSHeatPumpNum ).HeatCoilName, ErrorsFound );
 
 				if ( MSHeatPump( MSHeatPumpNum ).MaxCoilFluidFlow > 0.0 ) {
-					rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).LoopNum ).FluidIndex, "InitMSHeatPump" );
+					rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).LoopNum ).FluidIndex, RoutineName );
 					MSHeatPump( MSHeatPumpNum ).MaxCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", MSHeatPump( MSHeatPumpNum ).HeatCoilName, ErrorsFound ) * rho;
 				}
 				// fill outlet node for coil
@@ -1658,7 +1662,7 @@ namespace HVACMultiSpeedHeatPump {
 				MSHeatPump( MSHeatPumpNum ).MaxCoilFluidFlow = GetCoilMaxSteamFlowRate( MSHeatPump( MSHeatPumpNum ).HeatCoilNum, ErrorsFound );
 				if ( MSHeatPump( MSHeatPumpNum ).MaxCoilFluidFlow > 0.0 ) {
 					SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-					SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "InitMSHeatPump" );
+					SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName );
 					MSHeatPump( MSHeatPumpNum ).MaxCoilFluidFlow *= SteamDensity;
 				}
 
@@ -1676,7 +1680,7 @@ namespace HVACMultiSpeedHeatPump {
 				MSHeatPump( MSHeatPumpNum ).MaxSuppCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", MSHeatPump( MSHeatPumpNum ).SuppHeatCoilName, ErrorsFound );
 
 				if ( MSHeatPump( MSHeatPumpNum ).MaxSuppCoilFluidFlow > 0.0 ) {
-					rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).SuppLoopNum ).FluidName, InitConvTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).SuppLoopNum ).FluidIndex, "InitMSHeatPump" );
+					rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).SuppLoopNum ).FluidName, InitConvTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).SuppLoopNum ).FluidIndex, RoutineName );
 					MSHeatPump( MSHeatPumpNum ).MaxSuppCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", MSHeatPump( MSHeatPumpNum ).SuppHeatCoilName, ErrorsFound ) * rho;
 				}
 				// fill outlet node for coil
@@ -1692,7 +1696,7 @@ namespace HVACMultiSpeedHeatPump {
 				MSHeatPump( MSHeatPumpNum ).MaxSuppCoilFluidFlow = GetCoilMaxSteamFlowRate( MSHeatPump( MSHeatPumpNum ).SuppHeatCoilNum, ErrorsFound );
 				if ( MSHeatPump( MSHeatPumpNum ).MaxSuppCoilFluidFlow > 0.0 ) {
 					SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-					SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "InitMSHeatPump" );
+					SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName );
 					MSHeatPump( MSHeatPumpNum ).MaxSuppCoilFluidFlow *= SteamDensity;
 				}
 
@@ -1821,7 +1825,7 @@ namespace HVACMultiSpeedHeatPump {
 
 			if ( ( MSHeatPump( MSHeatPumpNum ).HeatRecActive ) && ( ! MyPlantScantFlag( MSHeatPumpNum ) ) ) {
 
-				rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidName, 60., PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidIndex, "InitMSHeatPump" );
+				rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidName, 60., PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidIndex, RoutineName );
 
 				MSHeatPump( MSHeatPumpNum ).DesignHeatRecMassFlowRate = MSHeatPump( MSHeatPumpNum ).DesignHeatRecFlowRate * rho;
 
@@ -1834,7 +1838,7 @@ namespace HVACMultiSpeedHeatPump {
 
 						CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", MSHeatPump( MSHeatPumpNum ).HeatCoilName, ErrorsFound );
 						if ( CoilMaxVolFlowRate != AutoSize ) {
-							rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).LoopNum ).FluidIndex, "InitMSHeatPump" );
+							rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).LoopNum ).FluidIndex, RoutineName );
 							MSHeatPump( MSHeatPumpNum ).MaxCoilFluidFlow = CoilMaxVolFlowRate * rho;
 						}
 						InitComponentNodes( 0.0, MSHeatPump( MSHeatPumpNum ).MaxCoilFluidFlow, MSHeatPump( MSHeatPumpNum ).CoilControlNode, MSHeatPump( MSHeatPumpNum ).CoilOutletNode, MSHeatPump( MSHeatPumpNum ).LoopNum, MSHeatPump( MSHeatPumpNum ).LoopSide, MSHeatPump( MSHeatPumpNum ).BranchNum, MSHeatPump( MSHeatPumpNum ).CompNum );
@@ -1846,7 +1850,7 @@ namespace HVACMultiSpeedHeatPump {
 
 						if ( CoilMaxVolFlowRate != AutoSize ) {
 							SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-							SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "InitMSHeatPump" );
+							SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName );
 							MSHeatPump( MSHeatPumpNum ).MaxCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
 						}
 						InitComponentNodes( 0.0, MSHeatPump( MSHeatPumpNum ).MaxCoilFluidFlow, MSHeatPump( MSHeatPumpNum ).CoilControlNode, MSHeatPump( MSHeatPumpNum ).CoilOutletNode, MSHeatPump( MSHeatPumpNum ).LoopNum, MSHeatPump( MSHeatPumpNum ).LoopSide, MSHeatPump( MSHeatPumpNum ).BranchNum, MSHeatPump( MSHeatPumpNum ).CompNum );
@@ -1860,7 +1864,7 @@ namespace HVACMultiSpeedHeatPump {
 
 						CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", MSHeatPump( MSHeatPumpNum ).SuppHeatCoilName, ErrorsFound );
 						if ( CoilMaxVolFlowRate != AutoSize ) {
-							rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).SuppLoopNum ).FluidName, InitConvTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).SuppLoopNum ).FluidIndex, "InitMSHeatPump" );
+							rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).SuppLoopNum ).FluidName, InitConvTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).SuppLoopNum ).FluidIndex, RoutineName );
 							MSHeatPump( MSHeatPumpNum ).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
 						}
 						InitComponentNodes( 0.0, MSHeatPump( MSHeatPumpNum ).MaxSuppCoilFluidFlow, MSHeatPump( MSHeatPumpNum ).SuppCoilControlNode, MSHeatPump( MSHeatPumpNum ).SuppCoilOutletNode, MSHeatPump( MSHeatPumpNum ).SuppLoopNum, MSHeatPump( MSHeatPumpNum ).SuppLoopSide, MSHeatPump( MSHeatPumpNum ).SuppBranchNum, MSHeatPump( MSHeatPumpNum ).SuppCompNum );
@@ -1872,7 +1876,7 @@ namespace HVACMultiSpeedHeatPump {
 
 						if ( CoilMaxVolFlowRate != AutoSize ) {
 							SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-							SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "InitMSHeatPump" );
+							SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName );
 							MSHeatPump( MSHeatPumpNum ).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
 						}
 						InitComponentNodes( 0.0, MSHeatPump( MSHeatPumpNum ).MaxSuppCoilFluidFlow, MSHeatPump( MSHeatPumpNum ).SuppCoilControlNode, MSHeatPump( MSHeatPumpNum ).SuppCoilOutletNode, MSHeatPump( MSHeatPumpNum ).SuppLoopNum, MSHeatPump( MSHeatPumpNum ).SuppLoopSide, MSHeatPump( MSHeatPumpNum ).SuppBranchNum, MSHeatPump( MSHeatPumpNum ).SuppCompNum );
@@ -3193,7 +3197,7 @@ namespace HVACMultiSpeedHeatPump {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		//  na
+		static std::string const RoutineName( "MSHPHeatRecovery" );
 
 		// DERIVMS TYPE DEFINITIONS:
 		//  na
@@ -3223,7 +3227,7 @@ namespace HVACMultiSpeedHeatPump {
 
 		if ( HeatRecMassFlowRate > 0.0 ) {
 
-			CpHeatRec = GetSpecificHeatGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidName, HeatRecInletTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidIndex, "MSHPHeatRecovery" );
+			CpHeatRec = GetSpecificHeatGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidName, HeatRecInletTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidIndex, RoutineName );
 
 			HeatRecOutletTemp = QHeatRec / ( HeatRecMassFlowRate * CpHeatRec ) + HeatRecInletTemp;
 			if ( HeatRecOutletTemp > MSHeatPump( MSHeatPumpNum ).MaxHeatRecOutletTemp ) HeatRecOutletTemp = MSHeatPump( MSHeatPumpNum ).MaxHeatRecOutletTemp;
