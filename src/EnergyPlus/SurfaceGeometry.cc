@@ -479,7 +479,7 @@ namespace SurfaceGeometry {
 		} // zones
 
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
-			if ( Surface( SurfNum ).Construction > 0 && Surface( SurfNum ).Construction <= TotConstructs ) {
+			if ( Construction[ SurfNum - 1 ] > 0 && Construction[ SurfNum - 1 ] <= TotConstructs ) {
 				NominalUwithConvCoeffs = ComputeNominalUwithConvCoeffs( SurfNum, isWithConvCoefValid );
 				if ( isWithConvCoefValid ) {
 					cNominalUwithConvCoeffs = RoundSigDigits( NominalUwithConvCoeffs, 3 );
@@ -3901,7 +3901,7 @@ namespace SurfaceGeometry {
 						ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( 6 ) + " because it is not an exterior window." );
 						ErrorsFound = true;
 
-					} else if ( Construct( SurfaceTmp( SurfNum ).Construction ).WindowTypeEQL && SurfaceTmp( SurfNum ).WindowShadingControlPtr > 0 ) {
+					} else if ( Construct( TmpConstruction[ SurfNum - 1 ] ).WindowTypeEQL && SurfaceTmp( SurfNum ).WindowShadingControlPtr > 0 ) {
 
 						ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\"." );
 						ShowContinueError( ".. equivalent layer window model does not use shading control object." );
@@ -4460,7 +4460,7 @@ namespace SurfaceGeometry {
 				if ( ! lAlphaFieldBlanks( FrameField ) && SurfaceTmp( SurfNum ).FrameDivider == 0 ) {
 					SurfaceTmp( SurfNum ).FrameDivider = FindItemInList( cAlphaArgs( FrameField ), FrameDivider.Name(), TotFrameDivider );
 					if ( SurfaceTmp( SurfNum ).FrameDivider == 0 ) {
-						if ( ! Construct( SurfaceTmp( SurfNum ).Construction ).WindowTypeEQL ) {
+						if ( ! Construct( TmpConstruction[ SurfNum - 1 ] ).WindowTypeEQL ) {
 							ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( FrameField ) + "=\"" + cAlphaArgs( FrameField ) + "\"" );
 							ErrorsFound = true;
 						} else {
@@ -4486,7 +4486,7 @@ namespace SurfaceGeometry {
 			} // End of check if window has a construction
 		}
 
-		if ( Construct( SurfaceTmp( SurfNum ).Construction ).WindowTypeEQL ) {
+		if ( Construct( TmpConstruction[ SurfNum - 1 ] ).WindowTypeEQL ) {
 			if ( SurfaceTmp( SurfNum ).FrameDivider > 0 ) {
 				// Equivalent Layer window does not have frame/divider model
 				ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( FrameField ) + "=\"" + cAlphaArgs( FrameField ) + "\"" );
@@ -9073,7 +9073,7 @@ namespace SurfaceGeometry {
 			Construct( ConstrNewSh ).Name = ConstrNameSh;
 			Construct( ConstrNewSh ).TotLayers = TotLayersNew;
 			Construct( ConstrNewSh ).TotSolidLayers = Construct( ConstrNum ).TotSolidLayers + 1;
-			ConstrWin[ ConstrNewSh ].TotGlassLayers = ConstrWin[ ConstrNum  - 1 ].TotGlassLayers;
+			ConstrWin[ ConstrNewSh - 1 ].TotGlassLayers = ConstrWin[ ConstrNum  - 1 ].TotGlassLayers;
 			ConstrWin[ ConstrNewSh  - 1 ].TypeIsWindow = true;
 			Construct( ConstrNewSh ).IsUsed = true;
 
@@ -9323,7 +9323,7 @@ namespace SurfaceGeometry {
 					if ( loop == 2 ) Construct( ConstrNew ).Name = ConstrNameStSh;
 					Construct( ConstrNew ).TotLayers = TotLayersOld + 2;
 					Construct( ConstrNew ).TotSolidLayers = Construct( ConstrOld ).TotSolidLayers + 1;
-					ConstrWin[ ConstrNew - 1].TotGlassLayers = ConstrWin[ ConstrOld  - 1 ].TotGlassLayers + 1;
+					ConstrWin[ ConstrNew - 1 ].TotGlassLayers = ConstrWin[ ConstrOld  - 1 ].TotGlassLayers + 1;
 					ConstrWin[ ConstrNew  - 1 ].TypeIsWindow = true;
 					Construct( ConstrNew ).InsideAbsorpVis = 0.0;
 					Construct( ConstrNew ).OutsideAbsorpVis = 0.0;

@@ -622,13 +622,13 @@ namespace WindowComplexManager {
 		CurrentCFSState = SurfaceWindow( iSurf ).ComplexFen.CurrentState;
 
 		// Check if EMS changed construction number
-		if ( Surface( iSurf ).Construction != SurfaceWindow( iSurf ).ComplexFen.State( CurrentCFSState ).Konst ) {
+		if ( Construction[ iSurf - 1 ] != SurfaceWindow( iSurf ).ComplexFen.State( CurrentCFSState ).Konst ) {
 
 			// If construction number changed then take new state
 			// First search for existing states. Maybe state is already added in previous timestep
 			NumOfStates = SurfaceWindow( iSurf ).ComplexFen.NumStates;
 			for ( i = 1; i <= NumOfStates; ++i ) {
-				if ( Surface( iSurf ).Construction == SurfaceWindow( iSurf ).ComplexFen.State( i ).Konst ) {
+				if ( Construction[ iSurf - 1 ] == SurfaceWindow( iSurf ).ComplexFen.State( i ).Konst ) {
 					StateFound = true;
 					CurrentCFSState = i;
 					SurfaceWindow( iSurf ).ComplexFen.CurrentState = i;
@@ -640,7 +640,7 @@ namespace WindowComplexManager {
 
 		// If new state is not found in the list of current states, then create new one, initialize and make it active
 		if ( ! StateFound ) {
-			ExpandComplexState( iSurf, Surface( iSurf ).Construction );
+			ExpandComplexState( iSurf, Construction[ iSurf - 1 ] );
 			CurrentCFSState = SurfaceWindow( iSurf ).ComplexFen.NumStates;
 			SurfaceWindow( iSurf ).ComplexFen.CurrentState = CurrentCFSState;
 		}

@@ -468,8 +468,8 @@ namespace DaylightingDevices {
 						ErrorsFound = true;
 					}
 
-					if ( Construct( Surface( SurfNum ).Construction ).TotGlassLayers > 1 ) {
-						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Dome " + cAlphaArgs( 2 ) + " construction (" + Construct( Surface( SurfNum ).Construction ).Name + ") must have only 1 glass layer." );
+					if ( Construct( Construction[ SurfNum - 1 ] ).TotGlassLayers > 1 ) {
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Dome " + cAlphaArgs( 2 ) + " construction (" + Construct( Construction[ SurfNum - 1 ] ).Name + ") must have only 1 glass layer." );
 						ErrorsFound = true;
 					}
 
@@ -483,7 +483,7 @@ namespace DaylightingDevices {
 						ErrorsFound = true;
 					}
 
-					if ( Construct( Surface( SurfNum ).Construction ).WindowTypeEQL ) {
+					if ( Construct( Construction[ SurfNum - 1 ] ).WindowTypeEQL ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Dome " + cAlphaArgs( 2 ) + " Equivalent Layer Window is not supported." );
 						ErrorsFound = true;
 					}
@@ -728,7 +728,7 @@ namespace DaylightingDevices {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Window " + cAlphaArgs( 2 ) + " must have 4 sides." );
 						ErrorsFound = true;
 					}
-					if ( Construct( Surface( SurfNum ).Construction ).WindowTypeEQL ) {
+					if ( Construct( Construction[ SurfNum - 1 ] ).WindowTypeEQL ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Window " + cAlphaArgs( 2 ) + " Equivalent Layer Window is not supported." );
 						ErrorsFound = true;
 					}

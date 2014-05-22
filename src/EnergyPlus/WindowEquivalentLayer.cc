@@ -181,8 +181,8 @@ namespace WindowEquivalentLayer {
 		} //  end do for TotConstructs
 
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
-			if ( ! Construct( Surface( SurfNum ).Construction ).TypeIsWindow ) continue;
-			if ( ! Construct( Surface( SurfNum ).Construction ).WindowTypeEQL ) continue;
+			if ( ! Construct( Construction[ SurfNum - 1 ] ).TypeIsWindow ) continue;
+			if ( ! Construct( Construction[ SurfNum - 1 ] ).WindowTypeEQL ) continue;
 
 			SurfaceWindow( SurfNum ).WindowModelType = WindowEQLModel;
 
@@ -814,7 +814,7 @@ namespace WindowEquivalentLayer {
 
 		if ( CalcCondition != noCondition ) return;
 
-		ConstrNum = Surface( SurfNum ).Construction;
+		ConstrNum = Construction[ SurfNum - 1 ];
 		QXConv = 0.0;
 		ConvHeatFlowNatural = 0.0;
 
@@ -9215,8 +9215,8 @@ namespace WindowEquivalentLayer {
 		CFSAbs = 0.0;
 		ProfAngHor = 0.0;
 		ProfAngVer = 0.0;
-		ConstrNum = Surface( SurfNum ).Construction;
-		EQLNum = Construct( Surface( SurfNum ).Construction ).EQLConsPtr;
+		ConstrNum = Construction[ SurfNum - 1 ];
+		EQLNum = Construct( Construction[ SurfNum - 1 ] ).EQLConsPtr;
 
 		if ( BeamDIffFlag != isDIFF ) {
 			if ( CosIncAng( SurfNum, HourOfDay, TimeStep ) <= 0.0 ) return;

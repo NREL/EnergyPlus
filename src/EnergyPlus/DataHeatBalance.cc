@@ -1665,6 +1665,7 @@ namespace DataHeatBalance {
 		using DataSurfaces::Ground;
 		using DataSurfaces::GroundFCfactorMethod;
 		using DataSurfaces::SurfaceClass_Door;
+		using DataSurfaces::Construction;
 
 		// Return value
 		Real64 NominalUwithConvCoeffs; // return value
@@ -1710,7 +1711,7 @@ namespace DataHeatBalance {
 			}
 		}}
 		// interior conditions
-		if ( NominalU( Surface( numSurf ).Construction ) > 0.0 ) {
+		if ( NominalU( Construction[ numSurf - 1 ] ) > 0.0 ) {
 			{ auto const SELECT_CASE_var( Surface( numSurf ).Class );
 			if ( ( SELECT_CASE_var == SurfaceClass_Wall ) || ( SELECT_CASE_var == SurfaceClass_Door ) ) { // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
 				insideFilm = 0.1197548;
@@ -1722,10 +1723,10 @@ namespace DataHeatBalance {
 				insideFilm = 0.0;
 				outsideFilm = 0.0;
 			}}
-			NominalUwithConvCoeffs = 1.0 / ( insideFilm + ( 1.0 / NominalU( Surface( numSurf ).Construction ) ) + outsideFilm );
+			NominalUwithConvCoeffs = 1.0 / ( insideFilm + ( 1.0 / NominalU( Construction[ numSurf - 1 ] ) ) + outsideFilm );
 		} else {
 			isValid = false;
-			NominalUwithConvCoeffs = NominalU( Surface( numSurf ).Construction );
+			NominalUwithConvCoeffs = NominalU( Construction[ numSurf - 1 ] );
 		}
 
 		return NominalUwithConvCoeffs;

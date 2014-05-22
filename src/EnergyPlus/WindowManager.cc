@@ -1294,7 +1294,7 @@ namespace WindowManager {
 			if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
 			if ( ! ConstrWin[ Construction[ SurfNum  - 1]  - 1 ].TypeIsWindow ) continue;
 			if ( SurfaceWindow( SurfNum ).WindowModelType == WindowBSDFModel ) continue; //Irrelevant for Complex Fen
-			if ( Construct( Surface( SurfNum ).Construction ).WindowTypeEQL ) continue; // not required
+			if ( Construct( Construction[ SurfNum - 1 ] ).WindowTypeEQL ) continue; // not required
 			ConstrNumSh = SurfaceWindow( SurfNum ).ShadedConstruction;
 			if ( ConstrNumSh == 0 ) continue;
 			TotLay = Construct( ConstrNumSh ).TotLayers;
@@ -2538,7 +2538,7 @@ namespace WindowManager {
 
 		// Set condensation flag to 1 if condensation expected to occur on the innermost glass face,
 		// or, for airflow windows, on either or the two glass faces in the airflow gap
-		if ( ! Construct( Surface( SurfNum ).Construction ).WindowTypeEQL ) {
+		if ( ! Construct( Construction[ SurfNum - 1 ] ).WindowTypeEQL ) {
 			InsideGlassTemp = thetas( 2 * ngllayer ) - TKelvin;
 			RoomHumRat = ZoneAirHumRat( Surface( SurfNum ).Zone );
 			RoomDewPoint = PsyTdpFnWPb( RoomHumRat, OutBaroPress );
@@ -3938,6 +3938,7 @@ namespace WindowManager {
 		// Using/Aliasing
 		using ScheduleManager::GetCurrentScheduleValue;
 		using InputProcessor::SameString;
+		using DataSurfaces::Construction;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3979,7 +3980,7 @@ namespace WindowManager {
 		//               Dens  dDens/dT  Con    dCon/dT   Vis    dVis/dT Prandtl dPrandtl/dT
 		//DATA AirProps / 1.29, -0.4d-2, 2.41d-2, 7.6d-5, 1.73d-5, 1.0d-7, 0.72,   1.8d-3  /
 
-		ConstrNum = Surface( SurfNum ).Construction;
+		ConstrNum = Construction[ SurfNum - 1 ];
 		NGlass = Construct( ConstrNum ).TotGlassLayers;
 		TGlassFace1 = thetas( 2 * NGlass - 2 );
 		TGlassFace2 = thetas( 2 * NGlass - 1 );

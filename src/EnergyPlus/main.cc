@@ -29,6 +29,9 @@
 #include <SimulationManager.hh>
 #include <UtilityRoutines.hh>
 
+//speedup
+#include <timers.hh>
+
 int
 main()
 {
@@ -212,6 +215,7 @@ main()
 	using ScheduleManager::ReportOrphanSchedules;
 	using FluidProperties::ReportOrphanFluids;
 	using Psychrometrics::ShowPsychrometricSummary;
+	using EppPerformance::Timer;
 
 // Enable floating point exceptions
 #ifndef NDEBUG
@@ -399,6 +403,8 @@ main()
 	ReportOrphanRecordObjects();
 	ReportOrphanFluids();
 	ReportOrphanSchedules();
+
+	Timer::printTimerData();
 
 	EndEnergyPlus();
 }

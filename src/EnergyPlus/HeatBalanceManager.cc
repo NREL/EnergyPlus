@@ -3483,6 +3483,7 @@ namespace HeatBalanceManager {
 
 		//Allocate the array to the number of constructions/initialize selected variables
 		Construct.allocate( TotConstructs );
+		ConstrWin.resize( TotConstructs );
 		//Note: If TotWindow5Constructs > 0, additional constructions are created in
 		//subr. SearchWindow5DataFile corresponding to those found on the data file.
 		//Initialize CTF and History terms.
@@ -3906,6 +3907,7 @@ namespace HeatBalanceManager {
 		NumOfZones = GetNumObjectsFound( cCurrentModuleObject );
 
 		Zone.allocate( NumOfZones );
+		ZoneSpecs.resize( NumOfZones );
 
 		ZoneDaylight.allocate( NumOfZones );
 
@@ -6645,7 +6647,7 @@ Label1000: ;
 		ZoneScheduled = false;
 
 		for ( iSurf = ZoneSpecs[ ZoneNum - 1 ].SurfaceFirst; iSurf <= ZoneSpecs[ ZoneNum - 1 ].SurfaceLast; ++iSurf ) {
-			iConst = Surface( iSurf ).Construction;
+			iConst = Construction[ iSurf - 1];
 			if ( Surface( iSurf ).Class == SurfaceClass_Window ) {
 				SchedPtr = WindowScheduledSolarAbs( iSurf, iConst );
 			} else {
@@ -6680,7 +6682,7 @@ Label1000: ;
 
 		if ( ( ! ZoneScheduled ) && ( ! ZoneUnscheduled ) ) {
 			for ( iSurf = ZoneSpecs[ ZoneNum - 1 ].SurfaceFirst; iSurf <= ZoneSpecs[ ZoneNum - 1 ].SurfaceLast; ++iSurf ) {
-				iConst = Surface( iSurf ).Construction;
+				iConst = Construction[ iSurf - 1 ];
 				if ( Surface( iSurf ).Class == SurfaceClass_Window ) {
 					SchedPtr = WindowScheduledSolarAbs( iSurf, iConst );
 				} else {

@@ -4603,7 +4603,7 @@ namespace ZoneTempPredictorCorrector {
 				}
 
 				// Other convection term is applicable to equivalent layer window (ASHWAT) model
-				if ( Construct( Surface( SurfNum ).Construction ).WindowTypeEQL ) SumIntGain += SurfaceWindow( SurfNum ).OtherConvHeatGain;
+				if ( Construct( Construction[ SurfNum - 1 ] ).WindowTypeEQL ) SumIntGain += SurfaceWindow( SurfNum ).OtherConvHeatGain;
 
 				// Convective heat gain from natural convection in gap between glass and interior shade or blind
 				if ( SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() == IntShadeOn || SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() == IntBlindOn ) SumIntGain += SurfaceWindow( SurfNum ).ConvHeatFlowNatural;
@@ -4935,7 +4935,7 @@ namespace ZoneTempPredictorCorrector {
 				}
 
 				// Other convection term is applicable to equivalent layer window (ASHWAT) model
-				if ( Construct( Surface( SurfNum ).Construction ).WindowTypeEQL ) SumIntGains += SurfaceWindow( SurfNum ).OtherConvHeatGain;
+				if ( Construct( Construction[ SurfNum - 1 ] ).WindowTypeEQL ) SumIntGains += SurfaceWindow( SurfNum ).OtherConvHeatGain;
 
 				// Convective heat gain from natural convection in gap between glass and interior shade or blind
 				if ( SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() == IntShadeOn || SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() == IntBlindOn ) SumIntGains += SurfaceWindow( SurfNum ).ConvHeatFlowNatural;

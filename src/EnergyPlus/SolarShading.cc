@@ -956,7 +956,7 @@ namespace SolarShading {
 					SetupOutputVariable( "Surface Window Total Glazing Layers Absorbed Solar Radiation Rate [W]", QRadSWwinAbsTot( SurfLoop ), "Zone", "Average", Surface( SurfLoop ).Name );
 					SetupOutputVariable( "Surface Window Total Glazing Layers Absorbed Shortwave Radiation Rate [W]", SWwinAbsTotalReport( SurfLoop ), "Zone", "Average", Surface( SurfLoop ).Name );
 
-					if ( Construct( Surface( SurfLoop ).Construction ).WindowTypeBSDF ) {
+					if ( Construct( Construction[ SurfLoop - 1 ] ).WindowTypeBSDF ) {
 						NumOfLayers = Construct( Construction[ SurfLoop - 1 ] ).TotSolidLayers;
 					} else {
 						NumOfLayers = Construct( Construction[ SurfLoop - 1 ] ).TotLayers;
@@ -989,7 +989,7 @@ namespace SolarShading {
 						SetupOutputVariable( "Surface Window Inside Face Gap between Shade and Glazing Zone Convection Heat Gain Rate [W]", WinGainConvGlazShadGapToZoneRep( SurfLoop ), "Zone", "Average", Surface( SurfLoop ).Name );
 						SetupOutputVariable( "Surface Window Inside Face Shade Zone Convection Heat Gain Rate [W]", WinGainConvShadeToZoneRep( SurfLoop ), "Zone", "Average", Surface( SurfLoop ).Name );
 						SetupOutputVariable( "Surface Window Inside Face Shade Net Infrared Heat Transfer Rate [W]", WinGainIRShadeToZoneRep( SurfLoop ), "Zone", "Average", Surface( SurfLoop ).Name );
-						if ( Construct( Surface( SurfLoop ).Construction ).WindowTypeEQL ) {
+						if ( Construct( Construction[ SurfLoop - 1 ] ).WindowTypeEQL ) {
 							SetupOutputVariable( "Surface Window Inside Face Other Convection Heat Gain Rate [W]", OtherConvGainInsideFaceToZoneRep( SurfLoop ), "Zone", "Average", Surface( SurfLoop ).Name );
 						}
 					}
@@ -5564,7 +5564,7 @@ namespace SolarShading {
 
 						// recalcuate the diffuse absorptance and transmittance of the
 						// the equivalent layer window model if there is shade control
-						EQLNum = Construct( Surface( SurfNum ).Construction ).EQLConsPtr;
+						EQLNum = Construct( Construction[ SurfNum - 1 ] ).EQLConsPtr;
 						if ( CFS( EQLNum ).ISControlled ) {
 							CalcEQLOpticalProperty( SurfNum, isDIFF, AbsSolDiffEQL );
 						} else {
@@ -6631,7 +6631,7 @@ namespace SolarShading {
 								if ( BackSurfNum == 0 ) break; // No more irradiated back surfaces for this exterior window
 								if ( SurfaceWindow( IBack ).WindowModelType != WindowEQLModel ) continue; // only EQL back window is allowed
 
-								ConstrNumBack = Surface( BackSurfNum ).Construction;
+								ConstrNumBack = Construction[ BackSurfNum - 1 ];
 								NBackGlass = Construct( ConstrNumBack ).TotGlassLayers;
 								// Irradiated (overlap) area for this back surface, projected onto window plane
 								// (includes effect of shadowing on exterior window)
@@ -6748,7 +6748,7 @@ namespace SolarShading {
 							// In following, ISABSF is zero except for nominal floor surfaces
 							if ( ! Surface( FloorNum ).HeatTransSurf ) continue;
 							if ( ISABSF( FloorNum ) <= 0.0 || FloorNum == SurfNum ) continue; // Keep only floor surfaces
-							FlConstrNum = Surface( FloorNum ).Construction;
+							FlConstrNum = Construction[ FloorNum - 1 ];
 
 							BTOTWinZone = TBm * SunLitFract * Surface( SurfNum ).Area * CosInc * InOutProjSLFracMult; //[m2]
 
@@ -6809,9 +6809,9 @@ namespace SolarShading {
 			for ( iSSG = 1; iSSG <= TotSurfIncSolSSG; ++iSSG ) {
 				SurfNum = SurfIncSolSSG( iSSG ).SurfPtr;
 				// do calculation only if construction number match.
-				if ( SurfIncSolSSG( iSSG ).ConstrPtr == Surface( SurfNum ).Construction ) {
+				if ( SurfIncSolSSG( iSSG ).ConstrPtr == Construction[ SurfNum - 1 ] ) {
 					if ( Surface( SurfNum ).Zone == ZoneNum ) {
-						AbsIntSurf = Construct( Surface( SurfNum ).Construction ).InsideAbsorpSolar;
+						AbsIntSurf = Construct( Construction[ SurfNum - 1 ] ).InsideAbsorpSolar;
 						//SolarIntoZone = GetCurrentScheduleValue(SurfIncSolSSG(iSSG)%SchedPtr) * Surface(SurfNum)%Area
 						SolarIntoZone = GetCurrentScheduleValue( SurfIncSolSSG( iSSG ).SchedPtr );
 						AISurf( SurfNum ) = SolarIntoZone * AbsIntSurf;
@@ -10837,7 +10837,7 @@ namespace SolarShading {
 			for ( KBkSurf = 1; KBkSurf <= Window.NBkSurf; ++KBkSurf ) { //back surf loop
 				BackSurfaceNumber = ShadowComb( BaseSurf ).BackSurf( KBkSurf );
 				CurBaseSurf = Surface( BackSurfaceNumber ).BaseSurf;
-				IConst = Surface( BackSurfaceNumber ).Construction;
+				IConst = Construction[ BackSurfaceNumber - 1 ];
 				InsideConLay = Construct( IConst ).TotLayers;
 				if ( SurfaceWindow( BackSurfaceNumber ).WindowModelType == WindowBSDFModel ) {
 					VisibleReflectance = Construct( IConst ).ReflectVisDiffBack;

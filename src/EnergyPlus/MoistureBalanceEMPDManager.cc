@@ -110,6 +110,7 @@ namespace MoistureBalanceEMPDManager {
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::FindItemInList;
 		using DataSurfaces::HeatTransferModel_EMPD;
+		using DataSurfaces::Construction;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -198,7 +199,7 @@ namespace MoistureBalanceEMPDManager {
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			if ( ! Surface( SurfNum ).HeatTransSurf || Surface( SurfNum ).Class == SurfaceClass_Window ) continue; // Heat transfer surface only and not a window
 			if ( Surface( SurfNum ).HeatTransferAlgorithm != HeatTransferModel_EMPD ) continue;
-			ConstrNum = Surface( SurfNum ).Construction;
+			ConstrNum = Construction[ SurfNum - 1 ];
 			MatNum = Construct( ConstrNum ).LayerPoint( Construct( ConstrNum ).TotLayers );
 			if ( Material( MatNum ).EMPDVALUE > 0.0 && Surface( SurfNum ).Zone > 0 ) {
 				EMPDzone( Surface( SurfNum ).Zone ) = true;
@@ -360,6 +361,7 @@ namespace MoistureBalanceEMPDManager {
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using Psychrometrics::PsyRhovFnTdbWPb;
+		using DataSurfaces::Construction;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -417,7 +419,7 @@ namespace MoistureBalanceEMPDManager {
 		if ( ! Surface( SurfNum ).HeatTransSurf ) {
 			return;
 		}
-		ConstrNum = Surface( SurfNum ).Construction;
+		ConstrNum = Construction[ SurfNum - 1 ];
 		MatNum = Construct( ConstrNum ).LayerPoint( Construct( ConstrNum ).TotLayers ); // Then find the material pointer
 
 		ZoneNum = Surface( SurfNum ).Zone;

@@ -537,6 +537,11 @@ namespace HeatBalanceIntRadExchange {
 
 	void
 	CalcScriptF(ZoneViewFactorInformation& Zone){
+		using EppPerformance::Timer;
+    
+		thread_local static Timer timer(__PRETTY_FUNCTION__);
+		timer.startTimer();
+
 		CalcSurfaceEmiss(Zone);
 		Real64 const StefanBoltzmannConst( 5.6697e-8 ); // Stefan-Boltzmann constant in W/(m2*K4)
 		Real64 const MAX_EMISS( 0.9999 );
@@ -544,6 +549,8 @@ namespace HeatBalanceIntRadExchange {
 		int surfCount = Zone.NumOfSurfaces;
 		cMatrix = new Real64[surfCount * surfCount];
 		jMatrix = new Real64[surfCount * surfCount];
+
+
 
 		if(cMatrix == nullptr || jMatrix == nullptr){
 			throw noMoreMemCalcSF();
@@ -633,6 +640,7 @@ namespace HeatBalanceIntRadExchange {
 // 			std::cout << std::endl; 
 // 		}
 // #endif
+		timer.stopTimer();
 	}
 	void
 	InitInteriorRadExchange()
