@@ -32,6 +32,7 @@
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
 #include <Psychrometrics.hh>
+#include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <SteamCoils.hh>
 #include <UtilityRoutines.hh>
@@ -559,7 +560,14 @@ namespace DesiccantDehumidifiers {
 			DesicDehum( DesicDehumNum ).NomRotorPower = Numbers( 4 );
 			DesicDehum( DesicDehumNum ).RegenFanType = Alphas( 10 );
 			DesicDehum( DesicDehumNum ).RegenFanName = Alphas( 11 );
-
+			DesicDehum( DesicDehumNum ).NomPwrPerAirFlow   = Numbers( 6 );
+			if ( DesicDehum( DesicDehumNum ).NomPwrPerAirFlow <= 0.0 ) {
+				if ( DesicDehum( DesicDehumNum ).NomRotorPower <= 0.0 ) {
+					ShowWarningError( CurrentModuleObject + " = " + Alphas(1) );
+					ShowContinueError( "Invalid input." );
+					ShowContinueError( "Rotor power or nominal power per air flow rate is needed." );
+				}  
+			}
 			TestCompSet( DesicDehum( DesicDehumNum ).DehumType, DesicDehum( DesicDehumNum ).Name, Alphas( 3 ), Alphas( 4 ), "Process Air Nodes" );
 
 			// Set up component set for regen coil
@@ -1368,6 +1376,7 @@ namespace DesiccantDehumidifiers {
 		static bool MySetPointCheckFlag( true );
 		static bool MyOneTimeFlag( true );
 		static FArray1D_bool MyEnvrnFlag;
+		static FArray1D_bool MySizeFlag;
 		static FArray1D_bool MyPlantScanFlag; // Used for init plant component for heating coils
 
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
@@ -1383,9 +1392,10 @@ namespace DesiccantDehumidifiers {
 
 			// initialize the environment and sizing flags
 			MyEnvrnFlag.allocate( NumDesicDehums );
+			MySizeFlag.allocate( NumDesicDehums );
 			MyPlantScanFlag.allocate( NumDesicDehums );
 			MyEnvrnFlag = true;
-
+			MySizeFlag = true;
 			MyOneTimeFlag = false;
 			MyPlantScanFlag = true;
 
@@ -1435,6 +1445,11 @@ namespace DesiccantDehumidifiers {
 			}
 		} else if ( MyPlantScanFlag( DesicDehumNum ) && ! AnyPlantInModel ) {
 			MyPlantScanFlag( DesicDehumNum ) = false;
+		}
+
+		if (!SysSizingCalc && MySizeFlag( DesicDehumNum ) ) {
+			SizeDesiccantDehumidifier( DesicDehumNum );
+			MySizeFlag( DesicDehumNum ) = false;
 		}
 
 		{ auto const SELECT_CASE_var( ( DesicDehum( DesicDehumNum ).DehumTypeCode ) );
@@ -1564,6 +1579,138 @@ namespace DesiccantDehumidifiers {
 
 		}}
 
+	}
+
+	void
+	SizeDesiccantDehumidifier ( int const DesicDehumNum )
+	{
+		// SUBROUTINE INFORMATION:
+        //       AUTHOR         Daeho Kang
+        //       DATE WRITTEN   March 2014
+        //       MODIFIED        
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine is for sizing desiccant dehumidifier components for which flow rates have not been
+        // specified in the input. 
+
+        // METHODOLOGY EMPLOYED:
+        // Obtains flow rates from corresponding air stream
+
+        // REFERENCES:
+        // na
+
+        // USE STATEMENTS:
+		using DataSizing::AutoSize;
+		using DataSizing::CurZoneEqNum;
+		using DataSizing::ZoneSizingRunDone;
+		using DataSizing::CurSysNum;
+		using DataSizing::SysSizingRunDone;
+		using DataSizing::CurOASysNum;
+		using DataSizing::CurSysNum;
+		using DataSizing::AutoVsHardSizingThreshold;
+		using DataSizing::FinalSysSizing;
+		using DataSizing::FinalZoneSizing;
+		using DataSizing::CurDuctType;
+		using DataHVACGlobals::SmallAirVolFlow;
+		using DataHVACGlobals::Main;
+		using DataHVACGlobals::Heating;
+		using DataHVACGlobals::Cooling;
+		using DataHVACGlobals::Other;
+		using ReportSizingManager::ReportSizingOutput;
+        
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		bool IsAutosize;               // Indicator to autosize
+		Real64 NomProcAirVolFlowDes;   // Autosized supply air flow rate for reproting
+		Real64 NomProcAirVolFlowUser;  // Hard-sized supply air flow rate for reproting
+  
+		IsAutosize = false;
+		NomProcAirVolFlowDes = 0.0;
+		NomProcAirVolFlowUser = 0.0;
+
+		if ( DesicDehum( DesicDehumNum ).NomProcAirVolFlow == AutoSize) {
+			IsAutosize = true;
+		}
+
+		if ( CurZoneEqNum > 0 ) {
+			if ( !IsAutosize && !ZoneSizingRunDone ) { // Hardsize with no sizing run
+				if ( DesicDehum( DesicDehumNum ).NomProcAirVolFlow > 0.0 ) {
+					ReportSizingOutput( DesicDehum( DesicDehumNum ).DehumType, DesicDehum( DesicDehumNum ).Name, 
+						"User-Specified Nominal Process Air Flow Rate [m3/s]", DesicDehum( DesicDehumNum ).NomProcAirVolFlow );
+				}
+			} else {  // Sizing run done  
+				CheckZoneSizing( DesicDehum( DesicDehumNum ).DehumType, DesicDehum( DesicDehumNum ).Name );
+				NomProcAirVolFlowDes = max ( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+			}
+		}
+
+		if ( CurSysNum > 0 ) {
+			if ( !IsAutosize && !SysSizingRunDone ) {
+				if ( DesicDehum( DesicDehumNum ).NomProcAirVolFlow > 0.0 ) {
+					ReportSizingOutput( DesicDehum( DesicDehumNum ).DehumType, DesicDehum( DesicDehumNum ).Name, 
+						"User-Specified Nominal Process Air Flow Rate [m3/s]", DesicDehum( DesicDehumNum ).NomProcAirVolFlow );
+				}
+			} else {
+				CheckSysSizing( DesicDehum( DesicDehumNum ).DehumType, DesicDehum( DesicDehumNum ).Name);
+				if ( CurOASysNum > 0 ) {
+					// size to outdoor air volume flow rate if available
+					if ( FinalSysSizing (CurSysNum ).DesOutAirVolFlow > 0.0 ) {
+						NomProcAirVolFlowDes = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+					} else {
+						// ELSE size to supply air duct flow rate
+						{ auto const SELECT_CASE_var ( CurDuctType );
+						if ( SELECT_CASE_var == Main ) {
+							NomProcAirVolFlowDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+						} else if ( SELECT_CASE_var == Cooling ) {
+							NomProcAirVolFlowDes = FinalSysSizing( CurSysNum ).DesCoolVolFlow;
+						} else if ( SELECT_CASE_var == Heating ) {
+							NomProcAirVolFlowDes = FinalSysSizing( CurSysNum ).DesHeatVolFlow;
+						} else if ( SELECT_CASE_var == Other ) {
+							NomProcAirVolFlowDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+						} else {
+							NomProcAirVolFlowDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+						}}
+					}
+				}
+
+				{ auto const SELECT_CASE_var ( CurDuctType );
+				if ( SELECT_CASE_var == Main ) {
+					NomProcAirVolFlowDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+				} else if ( SELECT_CASE_var == Cooling ) {
+					NomProcAirVolFlowDes = FinalSysSizing( CurSysNum ).DesCoolVolFlow;
+				} else if ( SELECT_CASE_var == Heating ) {
+					NomProcAirVolFlowDes = FinalSysSizing( CurSysNum ).DesHeatVolFlow;
+				} else if ( SELECT_CASE_var == Other ) {
+					NomProcAirVolFlowDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+				} else {
+					NomProcAirVolFlowDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+				}}
+			}
+		}
+
+		if ( IsAutosize ) {
+			DesicDehum( DesicDehumNum ).NomProcAirVolFlow = NomProcAirVolFlowDes;
+			ReportSizingOutput(DesicDehum( DesicDehumNum ).DehumType, DesicDehum( DesicDehumNum ).Name, 
+				"Design Size Nominal Process Air Flow Rate [m3/s]", NomProcAirVolFlowDes );
+		} else {
+			if ( DesicDehum( DesicDehumNum ).NomProcAirVolFlow > 0.0 && NomProcAirVolFlowDes > 0.0 ) {
+				NomProcAirVolFlowUser = DesicDehum( DesicDehumNum ).NomProcAirVolFlow;
+				ReportSizingOutput( DesicDehum( DesicDehumNum ).DehumType, DesicDehum( DesicDehumNum ).Name, 
+					"Design Size Nominal Process Air Flow Rate [m3/s]", NomProcAirVolFlowDes, 
+					"User-Specified Nominal Process Air Flow Rate [m3/s]", NomProcAirVolFlowUser);
+				if (DisplayExtraWarnings) {
+					if ( std::abs( NomProcAirVolFlowDes - NomProcAirVolFlowUser )/NomProcAirVolFlowUser > AutoVsHardSizingThreshold ) {
+						ShowMessage("Size:" + DesicDehum( DesicDehumNum ).DehumType + ":Potential issue with equipment sizing for " + 
+							DesicDehum( DesicDehumNum ).Name );
+						ShowContinueError("User-Specified Nominal Process Air Flow Rate of " + RoundSigDigits( NomProcAirVolFlowUser, 5 ) + " [m3/s]" );
+						ShowContinueError("differs from Design Size Nominal Process Air Flow Rate of " +
+							RoundSigDigits( NomProcAirVolFlowDes, 5 ) + " [m3/s]" );
+						ShowContinueError("This may, or may not, indicate mismatched component sizes.");
+						ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+					}
+				}
+			}
+		}
 	}
 
 	void
@@ -1745,7 +1892,7 @@ namespace DesiccantDehumidifiers {
 		// Using/Aliasing
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
-		//unused  USE DataEnvironment, ONLY: StdBaroPress
+		using DataEnvironment::OutBaroPress;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1779,6 +1926,7 @@ namespace DesiccantDehumidifiers {
 		Real64 ElecUseRate; // electricity consumption rate [W]
 		Real64 PartLoad; // fraction of dehumidification capacity required to meet setpoint
 		bool UnitOn; // unit on flag
+		Real64 AirDensity; // density of air
 
 		static bool MyOneTimeFlag( true ); // one time flag
 		static Real64 RhoAirStdInit;
@@ -2013,6 +2161,14 @@ namespace DesiccantDehumidifiers {
 
 			// Above curves are based on a 90deg regen angle and 245deg process air angle
 			RegenAirMassFlowRate = ProcAirMassFlowRate * 90. / 245. * RegenAirVel / ProcAirVel;
+
+			// Calculate electricity use once if no rotor power was entered
+			if ( DesicDehum( DesicDehumNum ).NomRotorPower <= 0.0) {
+				if ( DesicDehum( DesicDehumNum ).NomPwrPerAirFlow > 0.0) {  
+				  AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, ProcAirOutTemp, ProcAirOutHumRat );  
+				  DesicDehum( DesicDehumNum ).NomRotorPower = (ProcAirMassFlowRate / AirDensity) * DesicDehum( DesicDehumNum ).NomPwrPerAirFlow;
+				}
+			}
 
 			ElecUseRate = DesicDehum( DesicDehumNum ).NomRotorPower;
 
