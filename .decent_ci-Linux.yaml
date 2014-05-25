@@ -3,4 +3,4 @@ compilers:
     version: "4.8"
     cmake_extra_flags: -DBUILD_TESTING:BOOL=ON
   - name: cppcheck
-    compiler_extra_flags: --enable=warning  --suppress="*:*gtest*" --suppress="constStatement:*Objex*" --suppress="cppcheckError:*" --suppres="uninitvar:*"
+    compiler_extra_flags: --enable=warning  --suppress="*:*gtest*" --suppress="constStatement:*Objex*" --suppress="cppcheckError:*" --suppress="uninitvar:*"
