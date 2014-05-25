@@ -179,7 +179,7 @@ namespace HVACHXAssistedCoolingCoil {
 				ShowFatalError( "SimHXAssistedCoolingCoil: Invalid CompIndex passed=" + TrimSigDigits( HXAssistedCoilNum ) + ", Number of HX Assisted Cooling Coils=" + TrimSigDigits( TotalNumHXAssistedCoils ) + ", Coil name=" + HXAssistedCoilName );
 			}
 			if ( CheckEquipName( HXAssistedCoilNum ) ) {
-				if ( HXAssistedCoilName != BlankString && HXAssistedCoilName != HXAssistedCoil( HXAssistedCoilNum ).Name ) {
+				if ( ! HXAssistedCoilName.empty() && HXAssistedCoilName != HXAssistedCoil( HXAssistedCoilNum ).Name ) {
 					ShowFatalError( "SimHXAssistedCoolingCoil: Invalid CompIndex passed=" + TrimSigDigits( HXAssistedCoilNum ) + ", Coil name=" + HXAssistedCoilName + ", stored Coil Name for that index=" + HXAssistedCoil( HXAssistedCoilNum ).Name );
 				}
 				CheckEquipName( HXAssistedCoilNum ) = false;

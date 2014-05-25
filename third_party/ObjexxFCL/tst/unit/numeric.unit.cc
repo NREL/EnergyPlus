@@ -254,7 +254,7 @@ TEST( NumericTest, selectedCharKind )
 	}
 	// selected_char_kind(Fstring)
 	for ( int i = 0; i < N; ++i ) {
-		EXPECT_EQ( tests[ i ].output, selected_char_kind( Fstring( strlen( tests[ i ].input ), tests[ i ].input ) ) );
+		EXPECT_EQ( tests[ i ].output, selected_char_kind( Fstring( std::strlen( tests[ i ].input ), tests[ i ].input ) ) );
 	}
 
 	// SELECTED_CHAR_KIND(std::string)
@@ -263,7 +263,7 @@ TEST( NumericTest, selectedCharKind )
 	}
 	// SELECTED_CHAR_KIND(Fstring)
 	for ( int i = 0; i < N; ++i ) {
-		EXPECT_EQ( tests[ i ].output, SELECTED_CHAR_KIND( Fstring( strlen( tests[ i ].input ), tests[ i ].input ) ) );
+		EXPECT_EQ( tests[ i ].output, SELECTED_CHAR_KIND( Fstring( std::strlen( tests[ i ].input ), tests[ i ].input ) ) );
 	}
 }
 

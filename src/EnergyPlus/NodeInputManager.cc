@@ -289,7 +289,7 @@ namespace NodeInputManager {
 			GetNodeNums( Name, NumNodes, NodeNumbers, errFlag, NodeFluidType, NodeObjectType, NodeObjectName, NodeConnectionType, NodeFluidStream, ObjectIsParent, _, InputFieldName );
 		} else {
 			// only valid "error" here is when the Node List is blank
-			if ( Name != BlankString ) {
+			if ( ! Name.empty() ) {
 				ShowSevereError( RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid data." );
 				if ( present( InputFieldName ) ) ShowContinueError( "...Ref field=" + InputFieldName );
 				ShowContinueError( "NodeList not found=\"" + Name + "\"." );
@@ -535,7 +535,7 @@ namespace NodeInputManager {
 			//  Put all in, then determine unique
 			for ( Loop1 = 1; Loop1 <= NumAlphas - 1; ++Loop1 ) {
 				NodeLists( NCount ).NodeNames( Loop1 ) = cAlphas( Loop1 + 1 );
-				if ( cAlphas( Loop1 + 1 ) == BlankString ) {
+				if ( cAlphas( Loop1 + 1 ).empty() ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphas( 1 ) + "\", blank node name in list." );
 					--NodeLists( NCount ).NumOfNodesInList;
 					if ( NodeLists( NCount ).NumOfNodesInList <= 0 ) {
@@ -857,7 +857,7 @@ namespace NodeInputManager {
 			GetNodeInputFlag = false;
 		}
 
-		if ( CurCheckContextName != BlankString ) {
+		if ( ! CurCheckContextName.empty() ) {
 			ShowFatalError( "Init Uniqueness called for \"" + ContextName + ", but checks for \"" + CurCheckContextName + "\" was already in progress." );
 		}
 		if ( ContextName == BlankString ) {
@@ -929,11 +929,11 @@ namespace NodeInputManager {
 
 		{ auto const nodeType( CheckType );
 
-		if ( SameString(nodeType, "NODENAME") || SameString(nodeType, "NODENAMES") || SameString(nodeType, "NODE NAME") || SameString(nodeType, "NODE NAMES") ) {
+		if ( nodeType == "NodeName" ) {
 			if ( ! present( CheckName ) ) {
-				ShowFatalError( "Routine CheckUniqueNodes called with Nodetypes=NodeName, " "but did not include CheckName argument." );
+				ShowFatalError( "Routine CheckUniqueNodes called with Nodetypes=NodeName, but did not include CheckName argument." );
 			}
-			if ( CheckName != BlankString ) {
+			if ( ! CheckName().empty() ) {
 				Found = FindItemInList( CheckName, UniqueNodeNames, NumCheckNodes );
 				if ( Found != 0 ) {
 					ShowSevereError( CurCheckContextName + "=\"" + ObjectName + "\", duplicate node names found." );
@@ -958,9 +958,9 @@ namespace NodeInputManager {
 				}
 			}
 
-		} else if (  SameString(nodeType, "NODENUMBER") ||  SameString(nodeType, "NODENUMBERS") ||  SameString(nodeType, "NODE NUMBER") ||  SameString(nodeType, "NODE NUMBERS") ) {
+		} else if ( nodeType == "NodeNumber" ) {
 			if ( ! present( CheckNumber ) ) {
-				ShowFatalError( "Routine CheckUniqueNodes called with Nodetypes=NodeNumber, " "but did not include CheckNumber argument." );
+				ShowFatalError( "Routine CheckUniqueNodes called with Nodetypes=NodeNumber, but did not include CheckNumber argument." );
 			}
 			if ( CheckNumber != 0 ) {
 				Found = FindItemInList( NodeID( CheckNumber ), UniqueNodeNames, NumCheckNodes );
@@ -1149,7 +1149,7 @@ namespace NodeInputManager {
 				nodeReportingStrings.push_back( std::string( NodeReportingCalc + NodeID( iNode ) ) );
 				nodeFluidNames.push_back( GetGlycolNameByIndex( Node( iNode ).FluidIndex ) );
 				for ( iReq = 1; iReq <= NumOfReqVariables; ++iReq ) {
-					if( SameString( ReqRepVars( iReq ).Key, NodeID( iNode ) ) || SameString( ReqRepVars( iReq ).Key, BlankString ) ) {
+					if( SameString( ReqRepVars( iReq ).Key, NodeID( iNode ) ) || ReqRepVars( iReq ).Key.empty() ) {
 						if( SameString( ReqRepVars( iReq ).VarName, "System Node Wetbulb Temperature" ) ) {
 							NodeWetBulbRepReq( iNode ) = true;
 							NodeWetBulbSchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
@@ -1193,7 +1193,7 @@ namespace NodeInputManager {
 			if ( Node( iNode ).FluidType == NodeType_Air ) {
 				MoreNodeInfo( iNode ).VolFlowRateStdRho = Node( iNode ).MassFlowRate / RhoAirStdInit;
 				// if Node%Press was reliable could be used here.
-				RhoAirCurrent = PsyRhoAirFnPbTdbW( OutBaroPress, Node( iNode ).Temp, Node( iNode ).HumRat, BlankString );
+				RhoAirCurrent = PsyRhoAirFnPbTdbW( OutBaroPress, Node( iNode ).Temp, Node( iNode ).HumRat );
 				MoreNodeInfo( iNode ).Density = RhoAirCurrent;
 				if ( RhoAirCurrent != 0.0 ) MoreNodeInfo( iNode ).VolFlowRateCrntRho = Node( iNode ).MassFlowRate / RhoAirCurrent;
 				MoreNodeInfo( iNode ).ReportEnthalpy = PsyHFnTdbW( Node( iNode ).Temp, Node( iNode ).HumRat );
@@ -1204,7 +1204,7 @@ namespace NodeInputManager {
 					MoreNodeInfo( iNode ).WetBulbTemp = 0.0;
 				}
 				if ( ReportDewPoint ) {
-					MoreNodeInfo( iNode ).AirDewPointTemp = PsyTdpFnWPb( Node( iNode ).HumRat, OutBaroPress, BlankString );
+					MoreNodeInfo( iNode ).AirDewPointTemp = PsyTdpFnWPb( Node( iNode ).HumRat, OutBaroPress );
 				} else {
 					MoreNodeInfo( iNode ).AirDewPointTemp = 0.0;
 				}
@@ -1261,7 +1261,7 @@ namespace NodeInputManager {
 				if ( Node( iNode ).HumRat > 0.0 ) {
 					MoreNodeInfo( iNode ).ReportEnthalpy = PsyHFnTdbW( Node( iNode ).Temp, Node( iNode ).HumRat );
 					if ( ReportWetBulb ) {
-						MoreNodeInfo( iNode ).WetBulbTemp = PsyTwbFnTdbWPb( Node( iNode ).Temp, Node( iNode ).HumRat, StdBaroPress, BlankString );
+						MoreNodeInfo( iNode ).WetBulbTemp = PsyTwbFnTdbWPb( Node( iNode ).Temp, Node( iNode ).HumRat, StdBaroPress );
 					} else {
 						MoreNodeInfo( iNode ).WetBulbTemp = 0.0;
 					}

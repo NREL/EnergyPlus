@@ -2539,7 +2539,7 @@ namespace WindowManager {
 		if ( ! Construct( Surface( SurfNum ).Construction ).WindowTypeEQL ) {
 			InsideGlassTemp = thetas( 2 * ngllayer ) - TKelvin;
 			RoomHumRat = ZoneAirHumRat( Surface( SurfNum ).Zone );
-			RoomDewPoint = PsyTdpFnWPb( RoomHumRat, OutBaroPress, BlankString );
+			RoomDewPoint = PsyTdpFnWPb( RoomHumRat, OutBaroPress );
 			InsideGlassCondensationFlag( SurfNum ) = 0;
 			if ( InsideGlassTemp < RoomDewPoint ) InsideGlassCondensationFlag( SurfNum ) = 1;
 			// If airflow window, is there condensation on either glass face of the airflow gap?

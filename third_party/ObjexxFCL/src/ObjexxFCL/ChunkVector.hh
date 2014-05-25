@@ -1045,7 +1045,7 @@ private: // Functions
 		return *this;
 	}
 
-private: // Static Functions
+private: // Static Methods
 
 	// square( x ) == x^2
 	inline

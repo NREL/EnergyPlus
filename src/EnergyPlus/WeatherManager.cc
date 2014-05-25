@@ -245,7 +245,6 @@ namespace WeatherManager {
 	FArray1D_string SPSiteScheduleUnits; // SP Site Schedule Units
 	int NumSPSiteScheduleNamePtrs( 0 ); // Number of SP Site Schedules (DesignDay only)
 	int NumMissing( 0 ); // Number of hours of missing data
-	bool StripCR( false ); // If true, strip last character (<cr> off each EPW line)
 	FArray1D< Real64 > Interpolation; // Interpolation values based on Number of Time Steps in Hour
 	FArray1D< Real64 > SolarInterpolation; // Solar Interpolation values based on
 	//      Number of Time Steps in Hour
@@ -574,7 +573,7 @@ namespace WeatherManager {
 					MaxNumberSimYears = max( MaxNumberSimYears, Environment( Loop ).NumSimYears );
 				}
 			}
-			DisplaySimDaysProgress( CurrentOverallSimDay, TotalOverallSimDays );
+//			DisplaySimDaysProgress( CurrentOverallSimDay, TotalOverallSimDays ); // Doesn't do anything!
 		}
 
 		CloseWeatherFile(); // will only close if opened.
@@ -2030,11 +2029,11 @@ namespace WeatherManager {
 
 		// Humidity Ratio and Wet Bulb are derived
 		OutHumRat = PsyWFnTdbRhPb( OutDryBulbTemp, OutRelHumValue, OutBaroPress, RoutineName );
-		OutWetBulbTemp = PsyTwbFnTdbWPb( OutDryBulbTemp, OutHumRat, OutBaroPress, BlankString );
+		OutWetBulbTemp = PsyTwbFnTdbWPb( OutDryBulbTemp, OutHumRat, OutBaroPress );
 		if ( OutDryBulbTemp < OutWetBulbTemp ) {
 			OutWetBulbTemp = OutDryBulbTemp;
-			TempVal = PsyWFnTdbTwbPb( OutDryBulbTemp, OutWetBulbTemp, OutBaroPress, BlankString );
-			TempDPVal = PsyTdpFnWPb( TempVal, OutBaroPress, BlankString );
+			TempVal = PsyWFnTdbTwbPb( OutDryBulbTemp, OutWetBulbTemp, OutBaroPress );
+			TempDPVal = PsyTdpFnWPb( TempVal, OutBaroPress );
 			OutDewPointTemp = TempDPVal;
 		}
 
@@ -2111,7 +2110,7 @@ namespace WeatherManager {
 
 		// Calc some values
 		OutEnthalpy = PsyHFnTdbW( OutDryBulbTemp, OutHumRat );
-		OutAirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, OutDryBulbTemp, OutHumRat, BlankString );
+		OutAirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, OutDryBulbTemp, OutHumRat );
 
 		// Make sure outwetbulbtemp is valid.  And that no error occurs here.
 		if ( OutDryBulbTemp < OutWetBulbTemp ) OutWetBulbTemp = OutDryBulbTemp;
@@ -3121,10 +3120,6 @@ namespace WeatherManager {
 		bool DateInError;
 
 		++LCount;
-		if ( StripCR ) {
-			Pos = len( Line );
-			if ( ( Pos > 0 ) && ( int( Line[ Pos - 1 ] ) == iASCII_CR ) ) Line.erase( Pos - 1 );
-		}
 		ErrorFound = false;
 		std::string const SaveLine = Line; // in case of errors
 
@@ -3497,8 +3492,8 @@ Label903: ;
 		// verify that design WB or DP <= design DB
 		if ( DesDayInput( EnvrnNum ).HumIndType == DDHumIndType_DewPoint && DesDayInput( EnvrnNum ).DewPointNeedsSet ) {
 			// dew-point
-			testval = PsyWFnTdbRhPb( DesDayInput( EnvrnNum ).MaxDryBulb, 1.0, DesDayInput( EnvrnNum ).PressBarom, BlankString );
-			DesDayInput( EnvrnNum ).HumIndValue = PsyTdpFnWPb( testval, DesDayInput( EnvrnNum ).PressBarom, BlankString );
+			testval = PsyWFnTdbRhPb( DesDayInput( EnvrnNum ).MaxDryBulb, 1.0, DesDayInput( EnvrnNum ).PressBarom );
+			DesDayInput( EnvrnNum ).HumIndValue = PsyTdpFnWPb( testval, DesDayInput( EnvrnNum ).PressBarom );
 		}
 
 		// Day of week defaults to Monday, if day type specified, then that is used.
@@ -3692,26 +3687,26 @@ Label903: ;
 				if ( DesDayInput( EnvrnNum ).HumIndType == DDHumIndType_WBProfDef || DesDayInput( EnvrnNum ).HumIndType == DDHumIndType_WBProfDif || DesDayInput( EnvrnNum ).HumIndType == DDHumIndType_WBProfMul ) {
 					WetBulb = DesDayInput( EnvrnNum ).HumIndValue - DDHumIndModifier( EnvrnNum, Hour, TS ) * WBRange;
 					WetBulb = min( WetBulb, TomorrowOutDryBulbTemp( Hour, TS ) ); // WB must be <= DB
-					OutHumRat = PsyWFnTdbTwbPb( TomorrowOutDryBulbTemp( Hour, TS ), WetBulb, DesDayInput( EnvrnNum ).PressBarom, BlankString );
-					TomorrowOutDewPointTemp( Hour, TS ) = PsyTdpFnWPb( OutHumRat, DesDayInput( EnvrnNum ).PressBarom, BlankString );
+					OutHumRat = PsyWFnTdbTwbPb( TomorrowOutDryBulbTemp( Hour, TS ), WetBulb, DesDayInput( EnvrnNum ).PressBarom );
+					TomorrowOutDewPointTemp( Hour, TS ) = PsyTdpFnWPb( OutHumRat, DesDayInput( EnvrnNum ).PressBarom );
 					TomorrowOutRelHum( Hour, TS ) = PsyRhFnTdbWPb( TomorrowOutDryBulbTemp( Hour, TS ), OutHumRat, DesDayInput( EnvrnNum ).PressBarom, WeatherManager ) * 100.0;
 				} else if ( ConstantHumidityRatio ) {
 					//  Need Dew Point Temperature.  Use Relative Humidity to get Humidity Ratio, unless Humidity Ratio is constant
 					//BG 9-26-07  moved following inside this IF statment; when HumIndType is 'Schedule' HumidityRatio wasn't being initialized
 					WetBulb = PsyTwbFnTdbWPb( TomorrowOutDryBulbTemp( Hour, TS ), HumidityRatio, DesDayInput( EnvrnNum ).PressBarom, RoutineNameLong );
 
-					OutHumRat = PsyWFnTdpPb( TomorrowOutDryBulbTemp( Hour, TS ), DesDayInput( EnvrnNum ).PressBarom, BlankString );
+					OutHumRat = PsyWFnTdpPb( TomorrowOutDryBulbTemp( Hour, TS ), DesDayInput( EnvrnNum ).PressBarom );
 					if ( HumidityRatio > OutHumRat ) {
 						WetBulb = TomorrowOutDryBulbTemp( Hour, TS );
 					} else {
-						OutHumRat = PsyWFnTdbTwbPb( TomorrowOutDryBulbTemp( Hour, TS ), WetBulb, DesDayInput( EnvrnNum ).PressBarom, BlankString );
+						OutHumRat = PsyWFnTdbTwbPb( TomorrowOutDryBulbTemp( Hour, TS ), WetBulb, DesDayInput( EnvrnNum ).PressBarom );
 					}
-					TomorrowOutDewPointTemp( Hour, TS ) = PsyTdpFnWPb( OutHumRat, DesDayInput( EnvrnNum ).PressBarom, BlankString );
+					TomorrowOutDewPointTemp( Hour, TS ) = PsyTdpFnWPb( OutHumRat, DesDayInput( EnvrnNum ).PressBarom );
 					TomorrowOutRelHum( Hour, TS ) = PsyRhFnTdbWPb( TomorrowOutDryBulbTemp( Hour, TS ), OutHumRat, DesDayInput( EnvrnNum ).PressBarom, WeatherManager ) * 100.0;
 				} else {
-					HumidityRatio = PsyWFnTdbRhPb( TomorrowOutDryBulbTemp( Hour, TS ), DDHumIndModifier( EnvrnNum, Hour, TS ) / 100.0, DesDayInput( EnvrnNum ).PressBarom, BlankString );
+					HumidityRatio = PsyWFnTdbRhPb( TomorrowOutDryBulbTemp( Hour, TS ), DDHumIndModifier( EnvrnNum, Hour, TS ) / 100.0, DesDayInput( EnvrnNum ).PressBarom );
 					// TomorrowOutRelHum values set earlier
-					TomorrowOutDewPointTemp( Hour, TS ) = PsyTdpFnWPb( HumidityRatio, DesDayInput( EnvrnNum ).PressBarom, BlankString );
+					TomorrowOutDewPointTemp( Hour, TS ) = PsyTdpFnWPb( HumidityRatio, DesDayInput( EnvrnNum ).PressBarom );
 				}
 
 				// Determine Sky Temp ==>
@@ -4459,10 +4454,6 @@ Label903: ;
 				{ IOFlags flags; gio::read( WeatherFileUnitNumber, AFormat, flags ) >> Line; if ( flags.end() ) goto Label9998; }
 				endcol = len( Line );
 				if ( endcol > 0 ) {
-					if ( int( Line[ endcol - 1 ] ) == iASCII_CR ) {
-						StripCR = true;
-						Line.erase( endcol - 1 );
-					}
 					if ( int( Line[ endcol - 1 ] ) == iUnicode_end ) {
 						goto Label9997;
 					}
@@ -4609,7 +4600,7 @@ Label9999: ;
 		if ( ! ErrorsFound ) {
 			StdBaroPress = 101.325 * std::pow( ( 1.0 - 2.25577e-05 * Elevation ), 5.2559 );
 			StdBaroPress *= 1000.;
-			StdRhoAir = PsyRhoAirFnPbTdbW( StdBaroPress, constant_twenty, constant_zero, BlankString );
+			StdRhoAir = PsyRhoAirFnPbTdbW( StdBaroPress, constant_twenty, constant_zero );
 			// Write Final Location Information to the initialization output file
 			gio::write( OutputFileInits, LocHdFormat );
 			gio::write( OutputFileInits, LocFormat ) << LocationTitle << RoundSigDigits( Latitude, 2 ) << RoundSigDigits( Longitude, 2 ) << RoundSigDigits( TimeZoneNumber, 2 ) << RoundSigDigits( Elevation, 2 ) << RoundSigDigits( StdBaroPress, 0 ) << RoundSigDigits( StdRhoAir, 4 );
@@ -6974,7 +6965,7 @@ Label9999: ;
 					if ( Environment( Count ).KindOfEnvrn != ksRunPeriodWeather ) continue;
 					if ( Environment( Count ).WP_Type1 != 0 ) {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", indicated Environment Name already assigned." );
-						if ( Environment( Count ).Title != BlankString ) {
+						if ( ! Environment( Count ).Title.empty() ) {
 							ShowContinueError( "...Environment=\"" + Environment( Count ).Title + "\", already using " + cCurrentModuleObject + "=\"" + WPSkyTemperature( Environment( Count ).WP_Type1 ).Name + "\"." );
 						} else {
 							ShowContinueError( "... Runperiod Environment, already using " + cCurrentModuleObject + "=\"" + WPSkyTemperature( Environment( Count ).WP_Type1 ).Name + "\"." );
@@ -8008,12 +7999,6 @@ Label9999: ;
 						while ( Pos == std::string::npos ) {
 							gio::read( WeatherFileUnitNumber, AFormat ) >> Line;
 							strip( Line );
-							if ( StripCR ) {
-								endcol = len( Line );
-								if ( endcol > 0 ) {
-									if ( int( Line[ endcol - 1 ] ) == iASCII_CR ) Line.erase( endcol - 1 );
-								}
-							}
 							uppercase( Line );
 							Pos = index( Line, ',' );
 						}
@@ -8348,12 +8333,6 @@ Label9999: ;
 					if ( len( Line ) == 0 ) {
 						while ( Pos == std::string::npos ) {
 							gio::read( WeatherFileUnitNumber, AFormat ) >> Line;
-							if ( StripCR ) {
-								endcol = len( Line );
-								if ( endcol > 0 ) {
-									if ( int( Line[ endcol - 1 ] ) == iASCII_CR ) Line.erase( endcol - 1 );
-								}
-							}
 							strip( Line );
 							uppercase( Line );
 							Pos = index( Line, ',' );
@@ -8501,12 +8480,6 @@ Label9999: ;
 					if ( len( Line ) == 0 ) {
 						while ( Pos == std::string::npos ) {
 							gio::read( WeatherFileUnitNumber, AFormat ) >> Line;
-							if ( StripCR ) {
-								endcol = len( Line );
-								if ( endcol > 0 ) {
-									if ( int( Line[ endcol - 1 ] ) == iASCII_CR ) Line.erase( endcol - 1 );
-								}
-							}
 							strip( Line );
 							uppercase( Line );
 							Pos = index( Line, ',' );
@@ -8708,12 +8681,6 @@ Label9999: ;
 				if ( len( Line ) == 0 ) {
 					while ( Pos == std::string::npos ) {
 						gio::read( WeatherFileUnitNumber, AFormat ) >> Line;
-						if ( StripCR ) {
-							std::string::size_type const endcol = len( Line );
-							if ( endcol > 0 ) {
-								if ( int( Line[ endcol - 1 ] ) == iASCII_CR ) Line.erase( endcol - 1 );
-							}
-						}
 						strip( Line );
 						uppercase( Line );
 						Pos = index( Line, ',' );

@@ -2021,7 +2021,7 @@ namespace MixedAir {
 							++MechVentZoneCount;
 							VentilationMechanical( VentMechNum ).Zone( MechVentZoneCount ) = ZoneNum;
 							// Populating new temp array to hold design spec OA object for each zone
-							if ( DesignSpecOAObjName( groupNum ) != BlankString ) {
+							if ( ! DesignSpecOAObjName( groupNum ).empty() ) {
 								VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( MechVentZoneCount ) = DesignSpecOAObjName( groupNum );
 								VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex( MechVentZoneCount ) = DesignSpecOAObjIndex( groupNum );
 								VentilationMechanical( VentMechNum ).ZoneOAAreaRate( MechVentZoneCount ) = VentMechZoneOAAreaRate( groupNum );
@@ -2053,8 +2053,8 @@ namespace MixedAir {
 									}
 								}
 							}
-							//!!! Zone Air Distribution inputs.
-							if ( DesignSpecZoneADObjName( groupNum ) != BlankString ) {
+							// Zone Air Distribution inputs
+							if ( ! DesignSpecZoneADObjName( groupNum ).empty() ) {
 								// new DCV inputs
 								VentilationMechanical( VentMechNum ).ZoneADEffCooling( MechVentZoneCount ) = VentMechZoneADEffCooling( groupNum );
 								VentilationMechanical( VentMechNum ).ZoneADEffHeating( MechVentZoneCount ) = VentMechZoneADEffHeating( groupNum );
@@ -2095,7 +2095,7 @@ namespace MixedAir {
 									++MechVentZoneCount;
 									VentilationMechanical( VentMechNum ).Zone( MechVentZoneCount ) = ZoneNum;
 									// Populating new temp array to hold design spec OA object for each zone
-									if ( DesignSpecOAObjName( groupNum ) != BlankString ) {
+									if ( ! DesignSpecOAObjName( groupNum ).empty() ) {
 										VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( MechVentZoneCount ) = DesignSpecOAObjName( groupNum );
 										VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex( MechVentZoneCount ) = DesignSpecOAObjIndex( groupNum );
 										ObjIndex = VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex( MechVentZoneCount );
@@ -2133,7 +2133,7 @@ namespace MixedAir {
 										//              ErrorsFound = .TRUE.
 									}
 
-									if ( VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName( MechVentZoneCount ) != BlankString ) {
+									if ( ! VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName( MechVentZoneCount ).empty() ) {
 										// new DCV inputs
 										VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName( MechVentZoneCount ) = DesignSpecZoneADObjName( groupNum );
 										VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjIndex( MechVentZoneCount ) = DesignSpecZoneADObjIndex( groupNum );
@@ -2243,7 +2243,7 @@ namespace MixedAir {
 							}
 						}
 					}
-					if ( VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( jZone ) == BlankString ) {
+					if ( VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( jZone ).empty() ) {
 						ShowSevereError( CurrentModuleObject + "=\"" + VentilationMechanical( VentMechNum ).Name + "\", Design Specification Outdoor Air Object Name blank" );
 						ShowContinueError( "For Zone=\"" + Zone( VentilationMechanical( VentMechNum ).Zone( jZone ) ).Name + "\"." );
 						ShowContinueError( "This field either needs to be filled in in this object or Sizing:Zone object." );
@@ -2281,7 +2281,7 @@ namespace MixedAir {
 			// Link OA controller object with mechanical ventilation object
 			for ( OAControllerNum = 1; OAControllerNum <= NumOAControllers; ++OAControllerNum ) {
 				OAController( OAControllerNum ).VentMechObjectNum = FindItemInList( OAController( OAControllerNum ).VentilationMechanicalName, VentilationMechanical.Name(), NumVentMechControllers );
-				if ( OAController( OAControllerNum ).VentMechObjectNum == 0 && OAController( OAControllerNum ).VentilationMechanicalName != BlankString ) {
+				if ( OAController( OAControllerNum ).VentMechObjectNum == 0 && ! OAController( OAControllerNum ).VentilationMechanicalName.empty() ) {
 					ShowSevereError( CurrentModuleObject + "=\"" + OAController( OAControllerNum ).VentilationMechanicalName + "\", non-match to Controller:OutdoorAir" );
 					ShowContinueError( "Invalid specified in Controller:OutdoorAir object = " + OAController( OAControllerNum ).Name );
 					ShowContinueError( CurrentModuleObject + " object name must match the " + CurrentModuleObject + " object name specified in Controller:OutdoorAir." );
@@ -3857,7 +3857,7 @@ namespace MixedAir {
 										MassFlowRate = 0.0;
 									}
 									// total primary air to terminal units of the zone
-									if ( MassFlowRate > 0.0 ) ZonePA += MassFlowRate / PsyRhoAirFnPbTdbW( OutBaroPress, NodeTemp, NodeHumRat, BlankString );
+									if ( MassFlowRate > 0.0 ) ZonePA += MassFlowRate / PsyRhoAirFnPbTdbW( OutBaroPress, NodeTemp, NodeHumRat );
 
 									// or InletNode = ZoneEquipConfig(ZoneEquipConfigNum)%AirDistUnitCool(InNodeIndex)%OutNode
 									InletNode = ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( InNodeIndex );
@@ -3869,7 +3869,7 @@ namespace MixedAir {
 										MassFlowRate = 0.0;
 									}
 									// total supply air to the zone
-									if ( MassFlowRate > 0.0 ) ZoneSA += MassFlowRate / PsyRhoAirFnPbTdbW( OutBaroPress, NodeTemp, NodeHumRat, BlankString );
+									if ( MassFlowRate > 0.0 ) ZoneSA += MassFlowRate / PsyRhoAirFnPbTdbW( OutBaroPress, NodeTemp, NodeHumRat );
 								}
 
 								// calc zone primary air fraction
@@ -6125,7 +6125,7 @@ namespace MixedAir {
 		}
 
 		if ( OAController( OAControllerNum ).DPTempLim != BlankNumeric ) {
-			OADPTemp = PsyTdpFnWPb( OAController( OAControllerNum ).OAHumRat, OAController( OAControllerNum ).OAPress, BlankString );
+			OADPTemp = PsyTdpFnWPb( OAController( OAControllerNum ).OAHumRat, OAController( OAControllerNum ).OAPress );
 			if ( OADPTemp > OAController( OAControllerNum ).DPTempLim ) {
 				OutAirSignal = OutAirMinFrac;
 				EconomizerOperationFlag = false;

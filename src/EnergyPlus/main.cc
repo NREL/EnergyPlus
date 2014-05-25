@@ -267,62 +267,62 @@ main()
 	}
 
 	get_environment_variable( cDisplayExtraWarnings, cEnvValue );
-	if ( cEnvValue != BlankString ) DisplayExtraWarnings = env_var_on( cEnvValue ); // Yes or True
+	if ( ! cEnvValue.empty() ) DisplayExtraWarnings = env_var_on( cEnvValue ); // Yes or True
 
 	get_environment_variable( cDisplayUnusedObjects, cEnvValue );
-	if ( cEnvValue != BlankString ) DisplayUnusedObjects = env_var_on( cEnvValue ); // Yes or True
+	if ( ! cEnvValue.empty() ) DisplayUnusedObjects = env_var_on( cEnvValue ); // Yes or True
 
 	get_environment_variable( cDisplayUnusedSchedules, cEnvValue );
-	if ( cEnvValue != BlankString ) DisplayUnusedSchedules = env_var_on( cEnvValue ); // Yes or True
+	if ( ! cEnvValue.empty() ) DisplayUnusedSchedules = env_var_on( cEnvValue ); // Yes or True
 
 	get_environment_variable( cDisplayZoneAirHeatBalanceOffBalance, cEnvValue );
-	if ( cEnvValue != BlankString ) DisplayZoneAirHeatBalanceOffBalance = env_var_on( cEnvValue ); // Yes or True
+	if ( ! cEnvValue.empty() ) DisplayZoneAirHeatBalanceOffBalance = env_var_on( cEnvValue ); // Yes or True
 
 	get_environment_variable( cDisplayAdvancedReportVariables, cEnvValue );
-	if ( cEnvValue != BlankString ) DisplayAdvancedReportVariables = env_var_on( cEnvValue ); // Yes or True
+	if ( ! cEnvValue.empty() ) DisplayAdvancedReportVariables = env_var_on( cEnvValue ); // Yes or True
 
 	get_environment_variable( cReportDuringWarmup, cEnvValue );
-	if ( cEnvValue != BlankString ) ReportDuringWarmup = env_var_on( cEnvValue ); // Yes or True
+	if ( ! cEnvValue.empty() ) ReportDuringWarmup = env_var_on( cEnvValue ); // Yes or True
 
 	get_environment_variable( cIgnoreSolarRadiation, cEnvValue );
-	if ( cEnvValue != BlankString ) IgnoreSolarRadiation = env_var_on( cEnvValue ); // Yes or True
+	if ( ! cEnvValue.empty() ) IgnoreSolarRadiation = env_var_on( cEnvValue ); // Yes or True
 
 	get_environment_variable( cMinimalSurfaceVariables, cEnvValue );
-	if ( cEnvValue != BlankString ) CreateMinimalSurfaceVariables = env_var_on( cEnvValue ); // Yes or True
+	if ( ! cEnvValue.empty() ) CreateMinimalSurfaceVariables = env_var_on( cEnvValue ); // Yes or True
 
 	get_environment_variable( cSortIDD, cEnvValue );
-	if ( cEnvValue != BlankString ) SortedIDD = env_var_on( cEnvValue ); // Yes or True
+	if ( ! cEnvValue.empty() ) SortedIDD = env_var_on( cEnvValue ); // Yes or True
 
 	get_environment_variable( MinReportFrequencyEnvVar, cEnvValue );
-	if ( cEnvValue != BlankString ) cMinReportFrequency = cEnvValue; // turned into value later
+	if ( ! cEnvValue.empty() ) cMinReportFrequency = cEnvValue; // turned into value later
 
 	get_environment_variable( cDeveloperFlag, cEnvValue );
-	if ( cEnvValue != BlankString ) DeveloperFlag = env_var_on( cEnvValue ); // Yes or True
+	if ( ! cEnvValue.empty() ) DeveloperFlag = env_var_on( cEnvValue ); // Yes or True
 
 	get_environment_variable( cIgnoreBeamRadiation, cEnvValue );
-	if ( cEnvValue != BlankString ) IgnoreBeamRadiation = env_var_on( cEnvValue ); // Yes or True
+	if ( ! cEnvValue.empty() ) IgnoreBeamRadiation = env_var_on( cEnvValue ); // Yes or True
 
 	get_environment_variable( cIgnoreDiffuseRadiation, cEnvValue );
-	if ( cEnvValue != BlankString ) IgnoreDiffuseRadiation = env_var_on( cEnvValue ); // Yes or True
+	if ( ! cEnvValue.empty() ) IgnoreDiffuseRadiation = env_var_on( cEnvValue ); // Yes or True
 
 	get_environment_variable( cSutherlandHodgman, cEnvValue );
-	if ( cEnvValue != BlankString ) SutherlandHodgman = env_var_on( cEnvValue ); // Yes or True
+	if ( ! cEnvValue.empty() ) SutherlandHodgman = env_var_on( cEnvValue ); // Yes or True
 
 	get_environment_variable( cMinimalShadowing, cEnvValue );
-	if ( cEnvValue != BlankString ) lMinimalShadowing = env_var_on( cEnvValue ); // Yes or True
+	if ( ! cEnvValue.empty() ) lMinimalShadowing = env_var_on( cEnvValue ); // Yes or True
 
 	get_environment_variable( cTimingFlag, cEnvValue );
-	if ( cEnvValue != BlankString ) TimingFlag = env_var_on( cEnvValue ); // Yes or True
+	if ( ! cEnvValue.empty() ) TimingFlag = env_var_on( cEnvValue ); // Yes or True
 
 	// Initialize env flags for air loop simulation debugging
 	get_environment_variable( TrackAirLoopEnvVar, cEnvValue );
-	if ( cEnvValue != BlankString ) TrackAirLoopEnvFlag = env_var_on( cEnvValue ); // Yes or True
+	if ( ! cEnvValue.empty() ) TrackAirLoopEnvFlag = env_var_on( cEnvValue ); // Yes or True
 
 	get_environment_variable( TraceAirLoopEnvVar, cEnvValue );
-	if ( cEnvValue != BlankString ) TraceAirLoopEnvFlag = env_var_on( cEnvValue ); // Yes or True
+	if ( ! cEnvValue.empty() ) TraceAirLoopEnvFlag = env_var_on( cEnvValue ); // Yes or True
 
 	get_environment_variable( TraceHVACControllerEnvVar, cEnvValue );
-	if ( cEnvValue != BlankString ) TraceHVACControllerEnvFlag = env_var_on( cEnvValue ); // Yes or True
+	if ( ! cEnvValue.empty() ) TraceHVACControllerEnvFlag = env_var_on( cEnvValue ); // Yes or True
 
 	{ IOFlags flags; gio::inquire( "eplusout.end", flags ); FileExists = flags.exists(); }
 	if ( FileExists ) {
@@ -452,7 +452,7 @@ CreateCurrentDateTimeString( std::string & CurrentDateTimeString )
 	//value(8)   Milliseconds (0-999)
 
 	date_and_time_string( datestring, _, _, value );
-	if ( datestring != BlankString ) {
+	if ( ! datestring.empty() ) {
 		gio::write( CurrentDateTimeString, "(1X,'YMD=',I4,'.',I2.2,'.',I2.2,1X,I2.2,':',I2.2)" ) << value( 1 ) << value( 2 ) << value( 3 ) << value( 5 ) << value( 6 );
 	} else {
 		CurrentDateTimeString = " unknown date/time";

@@ -2481,7 +2481,7 @@ protected: // Methods
 
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
-protected: // Static Functions
+protected: // Static Methods
 
 	// Array Size Product of Specified Bounded Dimensional Sizes
 	inline

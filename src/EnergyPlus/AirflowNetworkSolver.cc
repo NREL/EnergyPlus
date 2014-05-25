@@ -473,9 +473,9 @@ namespace AirflowNetworkSolver {
 		// FLOW:
 		// Compute zone air properties.
 		for ( n = 1; n <= NetworkNumOfNodes; ++n ) {
-			RHOZ( n ) = PsyRhoAirFnPbTdbW( StdBaroPress + PZ( n ), TZ( n ), WZ( n ), BlankString );
+			RHOZ( n ) = PsyRhoAirFnPbTdbW( StdBaroPress + PZ( n ), TZ( n ), WZ( n ) );
 			if ( AirflowNetworkNodeData( n ).ExtNodeNum > 0 ) {
-				RHOZ( n ) = PsyRhoAirFnPbTdbW( StdBaroPress + PZ( n ), OutDryBulbTemp, OutHumRat, BlankString );
+				RHOZ( n ) = PsyRhoAirFnPbTdbW( StdBaroPress + PZ( n ), OutDryBulbTemp, OutHumRat );
 				TZ( n ) = OutDryBulbTemp;
 				WZ( n ) = OutHumRat;
 			}
@@ -1096,7 +1096,7 @@ namespace AirflowNetworkSolver {
 		// FLOW:
 		// Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
 		CompNum = AirflowNetworkCompData( j ).TypeNum;
-		RhozNorm = PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0, BlankString );
+		RhozNorm = PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 );
 		VisczNorm = 1.71432e-5 + 4.828e-8 * 20.0;
 		expn = DisSysCompLeakData( CompNum ).FlowExpo;
 		coef = DisSysCompLeakData( CompNum ).FlowCoef;
@@ -1225,7 +1225,7 @@ namespace AirflowNetworkSolver {
 		// Crack standard condition from given inputs
 		Corr = MultizoneSurfaceData( i ).Factor;
 		CompNum = AirflowNetworkCompData( j ).TypeNum;
-		RhozNorm = PsyRhoAirFnPbTdbW( MultizoneSurfaceCrackData( CompNum ).StandardP, MultizoneSurfaceCrackData( CompNum ).StandardT, MultizoneSurfaceCrackData( CompNum ).StandardW, BlankString );
+		RhozNorm = PsyRhoAirFnPbTdbW( MultizoneSurfaceCrackData( CompNum ).StandardP, MultizoneSurfaceCrackData( CompNum ).StandardT, MultizoneSurfaceCrackData( CompNum ).StandardW );
 		VisczNorm = 1.71432e-5 + 4.828e-8 * MultizoneSurfaceCrackData( CompNum ).StandardT;
 
 		expn = MultizoneSurfaceCrackData( CompNum ).FlowExpo;
@@ -2835,7 +2835,7 @@ Label999: ;
 			// Treat the component as a surface crack
 			// Crack standard condition from given inputs
 			Corr = MultizoneSurfaceData( i ).Factor;
-			RhozNorm = PsyRhoAirFnPbTdbW( MultizoneCompExhaustFanData( CompNum ).StandardP, MultizoneCompExhaustFanData( CompNum ).StandardT, MultizoneCompExhaustFanData( CompNum ).StandardW, BlankString );
+			RhozNorm = PsyRhoAirFnPbTdbW( MultizoneCompExhaustFanData( CompNum ).StandardP, MultizoneCompExhaustFanData( CompNum ).StandardT, MultizoneCompExhaustFanData( CompNum ).StandardW );
 			VisczNorm = 1.71432e-5 + 4.828e-8 * MultizoneCompExhaustFanData( CompNum ).StandardT;
 
 			expn = MultizoneCompExhaustFanData( CompNum ).FlowExpo;
@@ -3292,7 +3292,7 @@ Label999: ;
 
 		// FLOW:
 		// Calculate normal density and viscocity at Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
-		RhozNorm = PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0, BlankString );
+		RhozNorm = PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 );
 		VisczNorm = 1.71432e-5 + 4.828e-8 * 20.0;
 		VisAve = ( VISCZ( n ) + VISCZ( M ) ) / 2.0;
 		Tave = ( TZ( n ) + TZ( M ) ) / 2.0;
@@ -4565,7 +4565,7 @@ Label999: ;
 		Real64 CONV;
 
 		// FLOW:
-		RhoREF = PsyRhoAirFnPbTdbW( PSea, OutDryBulbTemp, OutHumRat, BlankString );
+		RhoREF = PsyRhoAirFnPbTdbW( PSea, OutDryBulbTemp, OutHumRat );
 
 		CONV = Latitude * 2.0 * Pi / 360.0;
 		G = 9.780373 * ( 1.0 + 0.0052891 * std::pow( ( std::sin( CONV ) ), 2 ) - 0.0000059 * std::pow( std::sin( 2.0 * CONV ), 2 ) );
@@ -4644,8 +4644,8 @@ Label999: ;
 			}
 
 			// RhoDrL is Rho at link level without pollutant but with humidity
-			RhoDrL( 1, i ) = PsyRhoAirFnPbTdbW( OutBaroPress + PzFrom, TempL1, Xhl1, BlankString );
-			RhoDrL( 2, i ) = PsyRhoAirFnPbTdbW( OutBaroPress + PzTo, TempL2, Xhl2, BlankString );
+			RhoDrL( 1, i ) = PsyRhoAirFnPbTdbW( OutBaroPress + PzFrom, TempL1, Xhl1 );
+			RhoDrL( 2, i ) = PsyRhoAirFnPbTdbW( OutBaroPress + PzTo, TempL2, Xhl2 );
 
 			// End initialisation
 
@@ -4937,15 +4937,15 @@ Label999: ;
 					Htop = Z;
 					P = PZ + Dp;
 					if ( Htop != Hbot ) {
-						Rho0 = PsyRhoAirFnPbTdbW( Pbz + P, T, X, BlankString );
+						Rho0 = PsyRhoAirFnPbTdbW( Pbz + P, T, X );
 						T += ( Htop - Hbot ) * BetaT;
 						X += ( Htop - Hbot ) * BetaXfct * X0;
-						Rho1 = PsyRhoAirFnPbTdbW( Pbz + P, T, X , BlankString);
+						Rho1 = PsyRhoAirFnPbTdbW( Pbz + P, T, X );
 						BetaRho = ( Rho1 - Rho0 ) / ( Htop - Hbot );
 						Dp += psz( Pbz + P, Rho0, BetaRho, Hbot, Htop, G );
 					}
-					RhoDr = PsyRhoAirFnPbTdbW( Pbz + PZ + Dp, T, X, BlankString );
-					Rho = PsyRhoAirFnPbTdbW( Pbz + PZ + Dp, T, X, BlankString );
+					RhoDr = PsyRhoAirFnPbTdbW( Pbz + PZ + Dp, T, X );
+					Rho = PsyRhoAirFnPbTdbW( Pbz + PZ + Dp, T, X );
 					return;
 
 				} else {
@@ -4954,16 +4954,16 @@ Label999: ;
 					// P is the pressure up to the start height of the layer we just reached
 					P = PZ + Dp;
 					if ( Htop != Hbot ) {
-						Rho0 = PsyRhoAirFnPbTdbW( Pbz + P, T, X, BlankString );
+						Rho0 = PsyRhoAirFnPbTdbW( Pbz + P, T, X );
 						T += ( Htop - Hbot ) * BetaT;
 						X += ( Htop - Hbot ) * BetaXfct * X0;
-						Rho1 = PsyRhoAirFnPbTdbW( Pbz + P, T, X, BlankString );
+						Rho1 = PsyRhoAirFnPbTdbW( Pbz + P, T, X );
 						BetaRho = ( Rho1 - Rho0 ) / ( Htop - Hbot );
 						Dp += psz( Pbz + P, Rho0, BetaRho, Hbot, Htop, G );
 					}
 
-					RhoDr = PsyRhoAirFnPbTdbW( Pbz + PZ + Dp, T, X, BlankString );
-					Rho = PsyRhoAirFnPbTdbW( Pbz + PZ + Dp, T, X, BlankString );
+					RhoDr = PsyRhoAirFnPbTdbW( Pbz + PZ + Dp, T, X );
+					Rho = PsyRhoAirFnPbTdbW( Pbz + PZ + Dp, T, X );
 
 					// place current values Hbot and Beta's
 					Hbot = H;
@@ -5015,31 +5015,31 @@ Label999: ;
 					Hbot = Z;
 					P = PZ + Dp;
 					if ( Htop != Hbot ) {
-						Rho1 = PsyRhoAirFnPbTdbW( Pbz + P, T, X, BlankString );
+						Rho1 = PsyRhoAirFnPbTdbW( Pbz + P, T, X );
 						T += ( Hbot - Htop ) * BetaT;
 						X += ( Hbot - Htop ) * BetaXfct * X0;
-						Rho0 = PsyRhoAirFnPbTdbW( Pbz + P, T, X, BlankString );
+						Rho0 = PsyRhoAirFnPbTdbW( Pbz + P, T, X );
 						BetaRho = ( Rho1 - Rho0 ) / ( Htop - Hbot );
 						Dp -= psz( Pbz + P, Rho0, BetaRho, Hbot, Htop, G );
 					}
-					RhoDr = PsyRhoAirFnPbTdbW( Pbz + PZ + Dp, T, X, BlankString );
-					Rho = PsyRhoAirFnPbTdbW( Pbz + PZ + Dp, T, X, BlankString );
+					RhoDr = PsyRhoAirFnPbTdbW( Pbz + PZ + Dp, T, X );
+					Rho = PsyRhoAirFnPbTdbW( Pbz + PZ + Dp, T, X );
 					return;
 				} else {
 					// bottom of the layer is below Z  (Z below ref)
 					Hbot = H;
 					P = PZ + Dp;
 					if ( Htop != Hbot ) {
-						Rho1 = PsyRhoAirFnPbTdbW( Pbz + P, T, X, BlankString );
+						Rho1 = PsyRhoAirFnPbTdbW( Pbz + P, T, X );
 						// T,X,C calculated for the lower height
 						T += ( Hbot - Htop ) * BetaT;
 						X += ( Hbot - Htop ) * BetaXfct * X0;
-						Rho0 = PsyRhoAirFnPbTdbW( Pbz + P, T, X, BlankString );
+						Rho0 = PsyRhoAirFnPbTdbW( Pbz + P, T, X );
 						BetaRho = ( Rho1 - Rho0 ) / ( Htop - Hbot );
 						Dp -= psz( Pbz + P, Rho0, BetaRho, Hbot, Htop, G );
 					}
-					RhoDr = PsyRhoAirFnPbTdbW( Pbz + PZ + Dp, T, X, BlankString );
-					Rho = PsyRhoAirFnPbTdbW( Pbz + PZ + Dp, T, X, BlankString );
+					RhoDr = PsyRhoAirFnPbTdbW( Pbz + PZ + Dp, T, X );
+					Rho = PsyRhoAirFnPbTdbW( Pbz + PZ + Dp, T, X );
 
 					// place current values Hbot and Beta's
 					Htop = H;

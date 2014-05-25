@@ -1149,9 +1149,9 @@ namespace HVACControllers {
 					// See routine CalcSimpleController() for the sequence of operations.
 					if ( ControllerProps( ControlNum ).NextActuatedValue == RootFinders( ControlNum ).MaxPoint.X ) {
 						// Calculate the approach temperature (difference between SA dry-bulb temp and SA dew point temp)
-						ApproachTemp = Node( SensedNode ).Temp - PsyTdpFnWPb( Node( SensedNode ).HumRat, OutBaroPress, BlankString );
+						ApproachTemp = Node( SensedNode ).Temp - PsyTdpFnWPb( Node( SensedNode ).HumRat, OutBaroPress );
 						// Calculate the dew point temperature at the SA humidity ratio setpoint
-						DesiredDewPoint = PsyTdpFnWPb( Node( SensedNode ).HumRatMax, OutBaroPress, BlankString );
+						DesiredDewPoint = PsyTdpFnWPb( Node( SensedNode ).HumRatMax, OutBaroPress );
 						// Adjust the calculated dew point temperature by the approach temp
 						HumidityControlTempSetPoint = DesiredDewPoint + ApproachTemp;
 						// NOTE: The next line introduces a potential discontinuity into the residual function
