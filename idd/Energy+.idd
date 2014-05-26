@@ -46656,6 +46656,7 @@ Dehumidifier:Desiccant:NoFans,
        \type real
        \units m3/s
        \minimum> 0.0
+       \autosizable
    N3, \field Nominal Process Air Velocity
        \note Process air velocity at nominal flow
        \note When using Performance Model Type of Default, must be 2.032 to 4.064 m/s (400 to 800 fpm)
@@ -46663,6 +46664,7 @@ Dehumidifier:Desiccant:NoFans,
        \units m/s
        \minimum> 0.0
        \maximum 6
+       \default 3.0
    N4, \field Rotor Power
        \note Power input to wheel rotor motor
        \type real
@@ -46769,7 +46771,7 @@ Dehumidifier:Desiccant:NoFans,
        \object-list QuadraticCurves
        \note curve = C1 + C2*v + C3*v**2
        \note v = process air velocity [m/s]
-   N5; \field Nominal Regeneration Temperature
+   N5, \field Nominal Regeneration Temperature
        \note Nominal regen temperature upon which the regen energy modifier
        \note  curve is based.  Not used if Default if chosen for the field Performance Mode Type.
        \note 121 C is a commonly used value.
@@ -46777,6 +46779,12 @@ Dehumidifier:Desiccant:NoFans,
        \units C
        \minimum 40
        \maximum 250
+   N6; \field Nominal Power Per Unit Air Flow Rate
+       \note This field is used to calculate electricity usage when no rotor power is entered.
+       \note If rotor power is specified, the value will be used.
+       \type real
+       \units W/(m3/s)
+       \minimum 0
 
 Dehumidifier:Desiccant:System,
       \memo This compound object models a desiccant heat exchanger, an optional
