@@ -2,5 +2,5 @@ results_repository : NREL/EnergyPlusBuildResults
 results_path : _posts
 results_base_url : https://nrel.github.io/EnergyPlusBuildResults
 regression_repository : NREL/EnergyPlusDevSupport
-regression_script : Testing/RegressionSuite/Scripts/build_files_to_run.py && Testing/RegressionSuite/Scripts/CIRegressions.py $REGRESSION_NUM_PROCESSES  $REGRESSION_BASE_INSTALL $REGRESSION_BASE_SRC $REGRESSION_CUR_INSTALL $REGRESSION_CUR_SRC 25
+regression_script : Testing/RegressionSuite/Scripts/build_files_to_run.py && Testing/RegressionSuite/Scripts/CIRegressions.py $REGRESSION_NUM_PROCESSES  $REGRESSION_BASE_INSTALL $REGRESSION_BASE_SRC $REGRESSION_CUR_INSTALL $REGRESSION_CUR_SRC 20
 
