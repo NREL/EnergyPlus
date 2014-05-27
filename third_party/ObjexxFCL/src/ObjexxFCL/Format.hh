@@ -671,17 +671,17 @@ public: // Output Methods
 	// Output without Argument
 	inline
 	std::ostream &
-	output( std::ostream & stream, std::streampos & pos )
+	output_no_arg( std::ostream & stream, std::streampos & pos, std::string const & ter = LF )
 	{
-		out( stream, pos );
+		out( stream, pos, ter );
 		return stream;
 	}
 
-	// Output with Argument
+	// Output a Value
 	template< typename T >
 	inline
 	std::ostream &
-	output( std::ostream & stream, std::streampos & pos, T const t )
+	output_val( std::ostream & stream, std::streampos & pos, T const & t )
 	{
 		output_pad( stream, pos );
 		out( stream, t );
@@ -705,7 +705,7 @@ public: // Output Methods
 	inline
 	virtual
 	void
-	out( std::ostream &, std::streampos & )
+	out( std::ostream &, std::streampos &, std::string const & )
 	{} // Default implementation
 
 	// Output
@@ -1032,6 +1032,7 @@ private: // Data
 protected: // Static Data
 
 	static Size const NOSIZE = static_cast< Size >( -1 );
+	static std::string const LF;
 
 }; // Format
 
@@ -1796,10 +1797,10 @@ public: // Methods
 	// Output
 	inline
 	void
-	out( std::ostream & stream, std::streampos & pos )
+	out( std::ostream & stream, std::streampos & pos, std::string const & )
 	{
 		output_pad( stream, pos );
-		stream << spc() + s_;
+		stream << spc() << s_;
 		pos = stream.tellp();
 	}
 
@@ -1863,10 +1864,10 @@ public: // Methods
 	// Output
 	inline
 	void
-	out( std::ostream & stream, std::streampos & pos )
+	out( std::ostream & stream, std::streampos & pos, std::string const & )
 	{
 		output_pad( stream, pos );
-		stream << spc() + s_;
+		stream << spc() << s_;
 		pos = stream.tellp();
 	}
 
@@ -2170,7 +2171,7 @@ public: // Methods
 	// Output
 	inline
 	void
-	out( std::ostream &, std::streampos & por )
+	out( std::ostream &, std::streampos & por, std::string const & )
 	{
 		por += n_;
 	}
@@ -2277,10 +2278,10 @@ public: // Methods
 	// Output
 	inline
 	void
-	out( std::ostream & stream, std::streampos & pos )
+	out( std::ostream & stream, std::streampos & pos, std::string const & ter )
 	{
 		output_pad( stream, pos );
-		stream << spc() + '\n';
+		stream << spc() << ter;
 		pos = stream.tellp();
 	}
 
@@ -2338,7 +2339,7 @@ public: // Methods
 	// Output
 	inline
 	void
-	out( std::ostream &, std::streampos & )
+	out( std::ostream &, std::streampos &, std::string const & )
 	{
 		colon_terminated() = true;
 	}
@@ -2388,7 +2389,7 @@ public: // Methods
 	// Output
 	inline
 	void
-	out( std::ostream &, std::streampos & )
+	out( std::ostream &, std::streampos &, std::string const & )
 	{
 		non_advancing() = true;
 	}
@@ -2448,7 +2449,7 @@ public: // Methods
 	// Output
 	inline
 	void
-	out( std::ostream &, std::streampos & pos )
+	out( std::ostream &, std::streampos & pos, std::string const & )
 	{
 		pos = n_ - 1; // Stream positions are zero-based but Fortran tab positions are 1-based
 	}
@@ -2512,7 +2513,7 @@ public: // Methods
 	// Output
 	inline
 	void
-	out( std::ostream &, std::streampos & pos )
+	out( std::ostream &, std::streampos & pos, std::string const & )
 	{
 		pos -= n_;
 	}
@@ -2576,7 +2577,7 @@ public: // Methods
 	// Output
 	inline
 	void
-	out( std::ostream &, std::streampos & pos )
+	out( std::ostream &, std::streampos & pos, std::string const & )
 	{
 		pos += n_;
 	}
@@ -2881,7 +2882,7 @@ public: // Methods
 	void
 	out( std::ostream & stream, char const c )
 	{
-		stream << spc() + std::string( ( has_w() && ( w_ > 1ul ) ? w_ - 1ul : 0ul ), ' ' ) + c;
+		stream << spc() << std::string( ( has_w() && ( w_ > 1ul ) ? w_ - 1ul : 0ul ), ' ' ) << c;
 	}
 
 	// Output
@@ -2890,7 +2891,7 @@ public: // Methods
 	out( std::ostream & stream, std::string const & s )
 	{
 		std::string::size_type const l( s.length() );
-		stream << spc() + std::string( ( has_w() && ( w_ > l ) ? w_ - l : 0ul ), ' ' ) + s;
+		stream << spc() << std::string( ( has_w() && ( w_ > l ) ? w_ - l : 0ul ), ' ' ) << s;
 	}
 
 	// Output
@@ -2930,7 +2931,7 @@ private: // Methods
 		std::string s( ww, ' ' );
 		void const * vp( &t );
 		s.replace( 0, wt, reinterpret_cast< c_cstring >( vp ), wt );
-		stream << spc() + s;
+		stream << spc() << s;
 	}
 
 	// Write bool Value Reinterpreted as String to Stream: Override to Treat bool as 4 Byte Equivalent of LOGICAL(4)
@@ -2951,7 +2952,7 @@ private: // Methods
 			s.replace( 0, l, reinterpret_cast< c_cstring >( vp ), l );
 			s.replace( l, n, n, '\0' );
 		}
-		stream << spc() + s;
+		stream << spc() << s;
 	}
 
 	// Width for I/O
@@ -3038,7 +3039,7 @@ public: // Methods
 	void
 	out( std::ostream & stream, bool const b )
 	{
-		stream << spc() + std::string( has_w() && ( w_ > 0ul ) ? w_ - 1ul : 0ul, ' ' ) + ( b ? 'T' : 'F' );
+		stream << spc() << std::string( has_w() && ( w_ > 0ul ) ? w_ - 1ul : 0ul, ' ' ) << ( b ? 'T' : 'F' );
 	}
 
 private: // Methods
@@ -3958,7 +3959,7 @@ public: // Methods
 	// Output
 	inline
 	void
-	out( std::ostream &, std::streampos & )
+	out( std::ostream &, std::streampos &, std::string const & )
 	{
 		P() = k_; // Set P scaling
 	}

@@ -74,6 +74,9 @@ namespace Humidifiers {
 
 	FArray1D_string const HumidifierType( 1, std::string( "Humidifier:Steam:Electric" ) );
 
+	static std::string const fluidNameSteam( "STEAM" );
+	static std::string const fluidNameWater( "WATER" );
+
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -528,11 +531,11 @@ namespace Humidifiers {
 		if ( Humidifier( HumNum ).HumType_Code == Humidifier_Steam_Electric ) {
 			Humidifier( HumNum ).NomCap = RhoH2O( InitConvTemp ) * Humidifier( HumNum ).NomCapVol;
 
-			RefrigerantIndex = FindRefrigerant( "STEAM" );
-			WaterIndex = FindGlycol( "WATER" );
-			SteamSatEnthalpy = GetSatEnthalpyRefrig( "STEAM", TSteam, 1.0, RefrigerantIndex, CalledFrom );
-			WaterSatEnthalpy = GetSatEnthalpyRefrig( "STEAM", TSteam, 0.0, RefrigerantIndex, CalledFrom );
-			WaterSpecHeatAvg = 0.5 * ( GetSpecificHeatGlycol( "WATER", TSteam, WaterIndex, CalledFrom ) + GetSpecificHeatGlycol( "WATER", Tref, WaterIndex, CalledFrom ) );
+			RefrigerantIndex = FindRefrigerant( fluidNameSteam );
+			WaterIndex = FindGlycol( fluidNameWater );
+			SteamSatEnthalpy = GetSatEnthalpyRefrig( fluidNameSteam, TSteam, 1.0, RefrigerantIndex, CalledFrom );
+			WaterSatEnthalpy = GetSatEnthalpyRefrig( fluidNameSteam, TSteam, 0.0, RefrigerantIndex, CalledFrom );
+			WaterSpecHeatAvg = 0.5 * ( GetSpecificHeatGlycol( fluidNameWater, TSteam, WaterIndex, CalledFrom ) + GetSpecificHeatGlycol( fluidNameWater, Tref, WaterIndex, CalledFrom ) );
 
 			NominalPower = Humidifier( HumNum ).NomCap * ( ( SteamSatEnthalpy - WaterSatEnthalpy ) + WaterSpecHeatAvg * ( TSteam - Tref ) );
 
@@ -580,6 +583,7 @@ namespace Humidifiers {
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
+		static std::string const RoutineName( "ControlHumidifier" );
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// na
@@ -602,7 +606,7 @@ namespace Humidifiers {
 		if ( AirMassFlowRate <= SmallMassFlow ) UnitOn = false;
 		if ( GetCurrentScheduleValue( Humidifier( HumNum ).SchedPtr ) <= 0.0 ) UnitOn = false;
 		if ( Humidifier( HumNum ).AirInHumRat >= Humidifier( HumNum ).HumRatSet ) UnitOn = false;
-		HumRatSatIn = PsyWFnTdbRhPb( Humidifier( HumNum ).AirInTemp, 1.0, OutBaroPress, "ControlHumidifier" );
+		HumRatSatIn = PsyWFnTdbRhPb( Humidifier( HumNum ).AirInTemp, 1.0, OutBaroPress, RoutineName );
 		if ( Humidifier( HumNum ).AirInHumRat >= HumRatSatIn ) UnitOn = false;
 		if ( UnitOn ) {
 			// AirMassFlowRate*AirInHumRat + WaterAddNeeded = AirMassFlowRate*HumRatSet
@@ -647,7 +651,7 @@ namespace Humidifiers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "CalcElecSteamHumidifier" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -671,7 +675,7 @@ namespace Humidifiers {
 		Real64 WaterDens; // density of liquid water [kg/m3]
 
 		AirMassFlowRate = Humidifier( HumNum ).AirInMassFlowRate;
-		HumRatSatIn = PsyWFnTdbRhPb( Humidifier( HumNum ).AirInTemp, 1.0, OutBaroPress, "CalcElecSteamHumidifier" );
+		HumRatSatIn = PsyWFnTdbRhPb( Humidifier( HumNum ).AirInTemp, 1.0, OutBaroPress, RoutineName );
 		HumRatSatOut = 0.0;
 		HumRatSatApp = 0.0;
 		WaterInEnthalpy = 2676125.; // At 100 C
@@ -686,8 +690,8 @@ namespace Humidifiers {
 			// outlet conditions
 			AirOutEnthalpy = ( AirMassFlowRate * Humidifier( HumNum ).AirInEnthalpy + WaterAddNeededMax * WaterInEnthalpy ) / AirMassFlowRate;
 			AirOutHumRat = ( AirMassFlowRate * Humidifier( HumNum ).AirInHumRat + WaterAddNeededMax ) / AirMassFlowRate;
-			AirOutTemp = PsyTdbFnHW( AirOutEnthalpy, AirOutHumRat, "CalcElecSteamHumidifier" );
-			HumRatSatOut = PsyWFnTdbRhPb( AirOutTemp, 1.0, OutBaroPress, "CalcElecSteamHumidifier" );
+			AirOutTemp = PsyTdbFnHW( AirOutEnthalpy, AirOutHumRat );
+			HumRatSatOut = PsyWFnTdbRhPb( AirOutTemp, 1.0, OutBaroPress, RoutineName );
 			if ( AirOutHumRat <= HumRatSatOut ) {
 				// If the outlet condition is below the saturation curve, the desired moisture addition rate can be met.
 				WaterAddRate = WaterAddNeededMax;
@@ -709,8 +713,8 @@ namespace Humidifiers {
 				// This point isn't quite on the saturation curve since we made a linear approximation of the curve,
 				// but the temperature should be very close to the correct outlet temperature. We will use this temperature
 				// as the outlet temperature and move to the saturation curve for the outlet humidity and enthalpy
-				AirOutHumRat = PsyWFnTdbRhPb( AirOutTemp, 1.0, OutBaroPress, "CalcElecSteamHumidifier" );
-				AirOutEnthalpy = PsyHFnTdbW( AirOutTemp, AirOutHumRat, "CalcElecSteamHumidifier" );
+				AirOutHumRat = PsyWFnTdbRhPb( AirOutTemp, 1.0, OutBaroPress, RoutineName );
+				AirOutEnthalpy = PsyHFnTdbW( AirOutTemp, AirOutHumRat );
 				WaterAddRate = AirMassFlowRate * ( AirOutHumRat - Humidifier( HumNum ).AirInHumRat );
 			}
 

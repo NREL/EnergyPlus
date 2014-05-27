@@ -1519,6 +1519,7 @@ namespace PlantUtilities {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "UpdateChillerComponentCondenserSide" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1558,7 +1559,7 @@ namespace PlantUtilities {
 			// use current mass flow rate and inlet temp from Node and recalculate outlet temp
 			if ( Node( InletNodeNum ).MassFlowRate > MassFlowTolerance ) {
 				// update node outlet conditions
-				Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, ModelInletTemp, PlantLoop( LoopNum ).FluidIndex, "UpdateChillerComponentCondenserSide" );
+				Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, ModelInletTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 				Node( OutletNodeNum ).Temp = Node( InletNodeNum ).Temp + ModelCondenserHeatRate / ( Node( InletNodeNum ).MassFlowRate * Cp );
 
 			}
@@ -1625,6 +1626,7 @@ namespace PlantUtilities {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "UpdateComponentHeatRecoverySide" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1664,7 +1666,7 @@ namespace PlantUtilities {
 			// use current mass flow rate and inlet temp from Node and recalculate outlet temp
 			if ( Node( InletNodeNum ).MassFlowRate > MassFlowTolerance ) {
 				// update node outlet conditions
-				Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, ModelInletTemp, PlantLoop( LoopNum ).FluidIndex, "UpdateComponentHeatRecoverySide" );
+				Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, ModelInletTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 				Node( OutletNodeNum ).Temp = Node( InletNodeNum ).Temp + ModelRecoveryHeatRate / ( Node( InletNodeNum ).MassFlowRate * Cp );
 
 			}

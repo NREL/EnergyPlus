@@ -141,6 +141,8 @@ namespace DXCoils {
 	int const NumValidOutputFuelTypes( 9 );
 	FArray1D_string const cValidOutputFuelTypes( NumValidOutputFuelTypes, { "Electricity", "Gas", "Propane", "Diesel", "Gasoline", "FuelOil#1", "FuelOil#2", "OtherFuel1", "OtherFuel2" } );
 
+	static std::string const BlankString;
+
 	// Fuel Types
 	int const FuelTypeElectricity( 1 ); // Fuel type for electricity
 	int const FuelTypeNaturalGas( 2 ); // Fuel type for natural gas
@@ -242,7 +244,7 @@ namespace DXCoils {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -275,7 +277,7 @@ namespace DXCoils {
 				ShowFatalError( "SimDXCoil: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) + ", Number of DX Coils=" + TrimSigDigits( NumDXCoils ) + ", Coil name=" + CompName );
 			}
 			if ( CheckEquipName( DXCoilNum ) ) {
-				if ( CompName != Blank && CompName != DXCoil( DXCoilNum ).Name ) {
+				if ( CompName != BlankString && CompName != DXCoil( DXCoilNum ).Name ) {
 					ShowFatalError( "SimDXCoil: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + DXCoil( DXCoilNum ).Name );
 				}
 				CheckEquipName( DXCoilNum ) = false;
@@ -382,7 +384,7 @@ namespace DXCoils {
 		// or 2 speed compressors
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -415,7 +417,7 @@ namespace DXCoils {
 				ShowFatalError( "SimDXCoilMultiSpeed: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) + ", Number of DX Coils=" + TrimSigDigits( NumDXCoils ) + ", Coil name=" + CompName );
 			}
 			if ( CheckEquipName( DXCoilNum ) ) {
-				if ( CompName != Blank && CompName != DXCoil( DXCoilNum ).Name ) {
+				if ( CompName != BlankString && CompName != DXCoil( DXCoilNum ).Name ) {
 					ShowFatalError( "SimDXCoilMultiSpeed: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + DXCoil( DXCoilNum ).Name );
 				}
 				CheckEquipName( DXCoilNum ) = false;
@@ -705,7 +707,7 @@ namespace DXCoils {
 				// Determine combined performance
 				DXCoil( DXCoilNum ).OutletAirEnthalpy = ( 1.0 - S12RuntimeFraction ) * S1OutletAirEnthalpy + S12RuntimeFraction * S12OutletAirEnthalpy;
 				DXCoil( DXCoilNum ).OutletAirHumRat = ( 1.0 - S12RuntimeFraction ) * S1OutletAirHumRat + S12RuntimeFraction * S12OutletAirHumRat;
-				DXCoil( DXCoilNum ).OutletAirTemp = PsyTdbFnHW( DXCoil( DXCoilNum ).OutletAirEnthalpy, DXCoil( DXCoilNum ).OutletAirHumRat, RoutineName );
+				DXCoil( DXCoilNum ).OutletAirTemp = PsyTdbFnHW( DXCoil( DXCoilNum ).OutletAirEnthalpy, DXCoil( DXCoilNum ).OutletAirHumRat );
 				// Check for saturation error and modify temperature at constant enthalpy
 				if ( DXCoil( DXCoilNum ).CondenserInletNodeNum( PerfMode ) != 0 ) {
 					NodePress = Node( DXCoil( DXCoilNum ).CondenserInletNodeNum( PerfMode ) ).Press;
@@ -745,7 +747,7 @@ namespace DXCoils {
 				AirMassFlow = DXCoil( DXCoilNum ).InletAirMassFlowRate;
 				DXCoil( DXCoilNum ).TotalCoolingEnergyRate = AirMassFlow * ( DXCoil( DXCoilNum ).InletAirEnthalpy - DXCoil( DXCoilNum ).OutletAirEnthalpy );
 				MinAirHumRat = min( DXCoil( DXCoilNum ).InletAirHumRat, DXCoil( DXCoilNum ).OutletAirHumRat );
-				DXCoil( DXCoilNum ).SensCoolingEnergyRate = AirMassFlow * ( PsyHFnTdbW( DXCoil( DXCoilNum ).InletAirTemp, MinAirHumRat, RoutineName ) - PsyHFnTdbW( DXCoil( DXCoilNum ).OutletAirTemp, MinAirHumRat, RoutineName ) );
+				DXCoil( DXCoilNum ).SensCoolingEnergyRate = AirMassFlow * ( PsyHFnTdbW( DXCoil( DXCoilNum ).InletAirTemp, MinAirHumRat ) - PsyHFnTdbW( DXCoil( DXCoilNum ).OutletAirTemp, MinAirHumRat ) );
 				//  Don't let sensible capacity be greater than total capacity
 				if ( DXCoil( DXCoilNum ).SensCoolingEnergyRate > DXCoil( DXCoilNum ).TotalCoolingEnergyRate ) {
 					DXCoil( DXCoilNum ).SensCoolingEnergyRate = DXCoil( DXCoilNum ).TotalCoolingEnergyRate;
@@ -849,7 +851,6 @@ namespace DXCoils {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
 		static std::string const RoutineName( "GetDXCoils: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -1807,7 +1808,7 @@ namespace DXCoils {
 				} // End of multimode DX capacity stages loop
 				// Warn if inputs entered for unused capacity stages
 				for ( CapacityStageNum = ( DXCoil( DXCoilNum ).NumCapacityStages + 1 ); CapacityStageNum <= MaxCapacityStages; ++CapacityStageNum ) {
-					if ( ( AlphaIndex <= NumAlphas ) && ( ( Alphas( AlphaIndex ) != Blank ) || ( Alphas( AlphaIndex + 1 ) != Blank ) ) ) {
+					if ( ( AlphaIndex <= NumAlphas ) && ( ( Alphas( AlphaIndex ) != BlankString ) || ( Alphas( AlphaIndex + 1 ) != BlankString ) ) ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\":" );
 						ShowContinueError( "...Capacity Stage " + TrimSigDigits( CapacityStageNum ) + " not active. Therefore," + cAlphaFields( AlphaIndex ) );
 						ShowContinueError( "... and " + cAlphaFields( AlphaIndex + 1 ) + " fields will be ignored." );
@@ -1817,7 +1818,7 @@ namespace DXCoils {
 			} // End of multimode DX dehumidification modes loop
 
 			//  ! Warn if excess fields entered
-			//  IF (NumAlphas .GE. AlphaIndex .and. ANY(Alphas(AlphaIndex:) /= Blank)) THEN
+			//  IF (NumAlphas .GE. AlphaIndex .and. ANY(Alphas(AlphaIndex:) /= BlankString)) THEN
 			//    CALL ShowWarningError(RoutineName//TRIM(CurrentModuleObject)//'="'//TRIM(DXCoil(DXCoilNum)%Name)//'":')
 			//    CALL ShowContinueError('...too many remaining fields for specified Capacity Stages and Dehumidification Modes.')
 			//    CALL ShowContinueError('...Excess Coil Performance Object Type and Coil Performance Object Name fields will be ignored.')
@@ -5187,7 +5188,7 @@ namespace DXCoils {
 					DataIsDXCoil = true;
 					DataEMSOverrideON = DXCoil ( DXCoilNum ).RatedAirVolFlowRateEMSOverrideON ( Mode );
 					DataEMSOverride = DXCoil( DXCoilNum ).RatedAirVolFlowRateEMSOverrideValue( Mode );
-					RequestSizing( CompType, CompName, SizingMethod, trim(SizingString ), TempSize, bPRINT, RoutineName );
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName );
 					DXCoil ( DXCoilNum ).RatedAirVolFlowRate ( Mode ) = TempSize;
 					DataIsDXCoil = false;
 					DataEMSOverrideON = false;
@@ -5273,6 +5274,7 @@ namespace DXCoils {
 				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingSingleSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling ) {
 					DXCoolCap = DXCoil( DXCoilNum ).RatedTotCap( Mode );
 				}
+
 				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingSingleSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling ) {
 
 					if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
@@ -5291,13 +5293,14 @@ namespace DXCoils {
 					DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
 					DataEMSOverride = DXCoil( DXCoilNum ).RatedSHREMSOverrideValue( Mode );
 //					DataDXCT = DXCT;
-					RequestSizing( CompType, CompName, SizingMethod, trim(SizingString ), TempSize, bPRINT, RoutineName );
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName );
 					DXCoil ( DXCoilNum ).RatedSHR ( Mode ) = TempSize;
 //					DataDXCT = 1;
 					DataFlowUsedForSizing = 0.0;
 					DataCapacityUsedForSizing = 0.0;
 					DataEMSOverrideON = false;
 					DataEMSOverride = 0.0;
+
 				} // End of Rated SHR
 
 				// Sizing evaporator condenser air flow
@@ -5718,9 +5721,9 @@ namespace DXCoils {
 								}
 								OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
 								rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-								MixEnth = PsyHFnTdbW( MixTemp, MixHumRat, RoutineName );
+								MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
 								MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-								SupEnth = PsyHFnTdbW( SupTemp, SupHumRat, RoutineName );
+								SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
 								TotCapTempModFac = CurveValue( DXCoil( DXCoilNum ).MSCCapFTemp( Mode ), MixWetBulb, OutTemp );
 								CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
 								if ( TotCapTempModFac > 0.0 ) {
@@ -5791,9 +5794,9 @@ namespace DXCoils {
 									OutTemp = 0.0;
 								}
 								rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-								MixEnth = PsyHFnTdbW( MixTemp, MixHumRat, RoutineName );
+								MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
 								MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-								SupEnth = PsyHFnTdbW( SupTemp, SupHumRat, RoutineName );
+								SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
 								TotCapTempModFac = CurveValue( DXCoil( DXCoilNum ).MSCCapFTemp( Mode ), MixWetBulb, OutTemp );
 								CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
 								if ( TotCapTempModFac > 0.0 ) {
@@ -6616,6 +6619,7 @@ namespace DXCoils {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcDoe2DXCoil: " );
+		static std::string const calcDoe2DXCoil( "CalcDoe2DXCoil" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -6777,11 +6781,11 @@ namespace DXCoils {
 			CondInletTemp = OutdoorDryBulb; // Outdoor dry-bulb temp
 			CompAmbTemp = OutdoorDryBulb;
 		} else if ( DXCoil( DXCoilNum ).CondenserType( Mode ) == EvapCooled ) {
-			RhoAir = PsyRhoAirFnPbTdbW( OutdoorPressure, OutdoorDryBulb, OutdoorHumRat );
+			RhoAir = PsyRhoAirFnPbTdbW( OutdoorPressure, OutdoorDryBulb, OutdoorHumRat, BlankString );
 			CondAirMassFlow = RhoAir * DXCoil( DXCoilNum ).EvapCondAirFlow( Mode );
 			// (Outdoor wet-bulb temp from DataEnvironment) + (1.0-EvapCondEffectiveness) * (drybulb - wetbulb)
 			CondInletTemp = OutdoorWetBulb + ( OutdoorDryBulb - OutdoorWetBulb ) * ( 1.0 - DXCoil( DXCoilNum ).EvapCondEffect( Mode ) );
-			CondInletHumRat = PsyWFnTdbTwbPb( CondInletTemp, OutdoorWetBulb, OutdoorPressure );
+			CondInletHumRat = PsyWFnTdbTwbPb( CondInletTemp, OutdoorWetBulb, OutdoorPressure, BlankString );
 			CompAmbTemp = CondInletTemp;
 		} else if ( DXCoil( DXCoilNum ).CondenserType( Mode ) == WaterHeater ) {
 			CompAmbTemp = HPWHCrankcaseDBTemp; // Temperature at HP water heater compressor
@@ -6851,8 +6855,8 @@ namespace DXCoils {
 			// for some reason there are diff's when using coil inlet air pressure
 			// these lines (more to follow) are commented out for the time being
 
-			InletAirWetBulbC = PsyTwbFnTdbWPb( InletAirDryBulbTemp, InletAirHumRat, OutdoorPressure );
-			AirVolumeFlowRate = AirMassFlow / PsyRhoAirFnPbTdbW( OutdoorPressure, InletAirDryBulbTemp, InletAirHumRat );
+			InletAirWetBulbC = PsyTwbFnTdbWPb( InletAirDryBulbTemp, InletAirHumRat, OutdoorPressure, BlankString );
+			AirVolumeFlowRate = AirMassFlow / PsyRhoAirFnPbTdbW( OutdoorPressure, InletAirDryBulbTemp, InletAirHumRat, BlankString );
 			//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 			//  InletAirWetBulbC = PsyTwbFnTdbWPb(InletAirDryBulbTemp,InletAirHumRat,InletAirPressure)
 			//  AirVolumeFlowRate = AirMassFlow/ PsyRhoAirFnPbTdbW(InletAirPressure,InletAirDryBulbTemp, InletAirHumRat)
@@ -6981,11 +6985,11 @@ namespace DXCoils {
 					// Calculate apparatus dew point conditions using TotCap and CBF
 					hDelta = TotCap / AirMassFlow;
 					hADP = InletAirEnthalpy - hDelta / ( 1.0 - CBF );
-					tADP = PsyTsatFnHPb( hADP, OutdoorPressure, "CalcDoe2DXCoil" );
+					tADP = PsyTsatFnHPb( hADP, OutdoorPressure, calcDoe2DXCoil );
 					//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 					//  tADP = PsyTsatFnHPb(hADP,InletAirPressure)
-					wADP = PsyWFnTdbH( tADP, hADP, "CalcDoe2DXCoil" );
-					hTinwADP = PsyHFnTdbW( InletAirDryBulbTemp, wADP, "CalcDoe2DXCoil" );
+					wADP = PsyWFnTdbH( tADP, hADP, calcDoe2DXCoil );
+					hTinwADP = PsyHFnTdbW( InletAirDryBulbTemp, wADP );
 					if ( ( InletAirEnthalpy - hADP ) > 1.e-10 ) {
 						SHR = min( ( hTinwADP - hADP ) / ( InletAirEnthalpy - hADP ), 1.0 );
 					} else {
@@ -6999,7 +7003,7 @@ namespace DXCoils {
 						// capacity at the dry-out point to determine exiting conditions from coil. This is required
 						// since the TotCapTempModFac doesn't work properly with dry-coil conditions.
 						InletAirHumRatTemp = RF * wADP + ( 1.0 - RF ) * InletAirHumRatTemp;
-						InletAirWetBulbC = PsyTwbFnTdbWPb( InletAirDryBulbTemp, InletAirHumRatTemp, OutdoorPressure );
+						InletAirWetBulbC = PsyTwbFnTdbWPb( InletAirDryBulbTemp, InletAirHumRatTemp, OutdoorPressure, BlankString );
 						//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 						//  InletAirWetBulbC = PsyTwbFnTdbWPb(InletAirDryBulbTemp,InletAirHumRatTemp,InletAirPressure)
 						++Counter;
@@ -7075,7 +7079,7 @@ namespace DXCoils {
 				FullLoadOutAirEnth = InletAirEnthalpy - hDelta;
 				if ( SHR < 1.0 ) {
 					hTinwout = InletAirEnthalpy - ( 1.0 - SHR ) * hDelta;
-					FullLoadOutAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout );
+					FullLoadOutAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout, BlankString );
 					if ( FullLoadOutAirHumRat <= 0.0 ) {
 						FullLoadOutAirHumRat = min( DryCoilOutletHumRatioMin, InletAirHumRat );
 					}
@@ -7088,7 +7092,7 @@ namespace DXCoils {
 				FullLoadOutAirEnth = InletAirEnthalpy - TotCap / AirMassFlow;
 				hTinwout = InletAirEnthalpy - ( 1.0 - SHR ) * hDelta;
 				if ( SHR < 1.0 ) {
-					FullLoadOutAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout );
+					FullLoadOutAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout, BlankString );
 				} else {
 					FullLoadOutAirHumRat = InletAirHumRat;
 				}
@@ -7096,12 +7100,12 @@ namespace DXCoils {
 			FullLoadOutAirTemp = PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat );
 
 			// Check for saturation error and modify temperature at constant enthalpy
-			if ( FullLoadOutAirTemp < PsyTsatFnHPb( FullLoadOutAirEnth, OutdoorPressure ) ) {
-				FullLoadOutAirTemp = PsyTsatFnHPb( FullLoadOutAirEnth, OutdoorPressure );
+			if ( FullLoadOutAirTemp < PsyTsatFnHPb( FullLoadOutAirEnth, OutdoorPressure, BlankString ) ) {
+				FullLoadOutAirTemp = PsyTsatFnHPb( FullLoadOutAirEnth, OutdoorPressure, BlankString );
 				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 				//   IF(FullLoadOutAirTemp .LT. PsyTsatFnHPb(FullLoadOutAirEnth,InletAirPressure)) THEN
 				//    FullLoadOutAirTemp = PsyTsatFnHPb(FullLoadOutAirEnth,InletAirPressure)
-				FullLoadOutAirHumRat = PsyWFnTdbH( FullLoadOutAirTemp, FullLoadOutAirEnth );
+				FullLoadOutAirHumRat = PsyWFnTdbH( FullLoadOutAirTemp, FullLoadOutAirEnth, BlankString );
 			}
 
 			// Store actual outlet conditions when DX coil is ON for use in heat recovery module
@@ -7138,7 +7142,7 @@ namespace DXCoils {
 					FullLoadOutAirEnth = InletAirEnthalpy - hDelta;
 					if ( SHR < 1.0 ) {
 						hTinwout = InletAirEnthalpy - ( 1.0 - SHR ) * hDelta;
-						FullLoadOutAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout );
+						FullLoadOutAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout, BlankString );
 						if ( FullLoadOutAirHumRat <= 0.0 ) {
 							FullLoadOutAirHumRat = min( DryCoilOutletHumRatioMin, InletAirHumRat );
 						}
@@ -7151,7 +7155,7 @@ namespace DXCoils {
 					FullLoadOutAirEnth = InletAirEnthalpy - TotCap / AirMassFlow;
 					hTinwout = InletAirEnthalpy - ( 1.0 - SHR ) * hDelta;
 					if ( SHR < 1.0 ) {
-						FullLoadOutAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout );
+						FullLoadOutAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout, BlankString );
 					} else {
 						FullLoadOutAirHumRat = InletAirHumRat;
 					}
@@ -7176,7 +7180,7 @@ namespace DXCoils {
 						FullLoadOutAirEnth = InletAirEnthalpy - hDelta;
 						if ( SHR < 1.0 ) {
 							hTinwout = InletAirEnthalpy - ( 1.0 - SHR ) * hDelta;
-							FullLoadOutAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout );
+							FullLoadOutAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout, BlankString );
 							if ( FullLoadOutAirHumRat <= 0.0 ) {
 								FullLoadOutAirHumRat = min( DryCoilOutletHumRatioMin, InletAirHumRat );
 							}
@@ -7189,7 +7193,7 @@ namespace DXCoils {
 						FullLoadOutAirEnth = InletAirEnthalpy - TotCap / AirMassFlow;
 						hTinwout = InletAirEnthalpy - ( 1.0 - SHR ) * hDelta;
 						if ( SHR < 1.0 ) {
-							FullLoadOutAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout );
+							FullLoadOutAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout, BlankString );
 						} else {
 							FullLoadOutAirHumRat = InletAirHumRat;
 						}
@@ -7219,12 +7223,12 @@ namespace DXCoils {
 			}
 
 			// Check for saturation error and modify temperature at constant enthalpy
-			if ( OutletAirTemp < PsyTsatFnHPb( OutletAirEnthalpy, OutdoorPressure, "CalcDOE2DXCoil" ) ) {
-				OutletAirTemp = PsyTsatFnHPb( OutletAirEnthalpy, OutdoorPressure );
+			if ( OutletAirTemp < PsyTsatFnHPb( OutletAirEnthalpy, OutdoorPressure, calcDoe2DXCoil ) ) {
+				OutletAirTemp = PsyTsatFnHPb( OutletAirEnthalpy, OutdoorPressure, BlankString );
 				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 				//   IF(OutletAirTemp .LT. PsyTsatFnHPb(OutletAirEnthalpy,InletAirPressure)) THEN
 				//    OutletAirTemp = PsyTsatFnHPb(OutletAirEnthalpy,InletAirPressure)
-				OutletAirHumRat = PsyWFnTdbH( OutletAirTemp, OutletAirEnthalpy );
+				OutletAirHumRat = PsyWFnTdbH( OutletAirTemp, OutletAirEnthalpy, BlankString );
 			}
 
 			// Mix with air that was bypassed around coil, if any
@@ -7233,12 +7237,12 @@ namespace DXCoils {
 				OutletAirHumRat = ( 1.0 - BypassFlowFraction ) * OutletAirHumRat + BypassFlowFraction * InletAirHumRat;
 				OutletAirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
 				// Check for saturation error and modify temperature at constant enthalpy
-				if ( OutletAirTemp < PsyTsatFnHPb( OutletAirEnthalpy, OutdoorPressure ) ) {
-					OutletAirTemp = PsyTsatFnHPb( OutletAirEnthalpy, OutdoorPressure );
+				if ( OutletAirTemp < PsyTsatFnHPb( OutletAirEnthalpy, OutdoorPressure, BlankString ) ) {
+					OutletAirTemp = PsyTsatFnHPb( OutletAirEnthalpy, OutdoorPressure, BlankString );
 					//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 					//     IF(OutletAirTemp .LT. PsyTsatFnHPb(OutletAirEnthalpy,InletAirPressure)) THEN
 					//       OutletAirTemp = PsyTsatFnHPb(OutletAirEnthalpy,InletAirPressure)
-					OutletAirHumRat = PsyWFnTdbH( OutletAirTemp, OutletAirEnthalpy );
+					OutletAirHumRat = PsyWFnTdbH( OutletAirTemp, OutletAirEnthalpy, BlankString );
 				}
 			}
 
@@ -7593,11 +7597,11 @@ namespace DXCoils {
 		}
 
 		if ( DXCoil( DXCoilNum ).CondenserType( Mode ) == EvapCooled ) {
-			RhoAir = PsyRhoAirFnPbTdbW( OutdoorPressure, OutdoorDryBulb, OutdoorHumRat );
+			RhoAir = PsyRhoAirFnPbTdbW( OutdoorPressure, OutdoorDryBulb, OutdoorHumRat, BlankString );
 			CondAirMassFlow = RhoAir * DXCoil( DXCoilNum ).EvapCondAirFlow( Mode );
 			// (Outdoor wet-bulb temp from DataEnvironment) + (1.0-EvapCondEffectiveness) * (drybulb - wetbulb)
 			CondInletTemp = OutdoorWetBulb + ( OutdoorDryBulb - OutdoorWetBulb ) * ( 1.0 - DXCoil( DXCoilNum ).EvapCondEffect( Mode ) );
-			CondInletHumRat = PsyWFnTdbTwbPb( CondInletTemp, OutdoorWetBulb, OutdoorPressure );
+			CondInletHumRat = PsyWFnTdbTwbPb( CondInletTemp, OutdoorWetBulb, OutdoorPressure, BlankString );
 			CompAmbTemp = OutdoorDryBulb;
 		} else { // for air or water-cooled, inlet temp is stored in OutdoorDryBulb temp
 			CondInletTemp = OutdoorDryBulb; // Outdoor dry-bulb temp or water inlet temp
@@ -7679,8 +7683,8 @@ namespace DXCoils {
 			// for some reason there are diff's when using coil inlet air pressure
 			// these lines (more to follow) are commented out for the time being
 
-			InletAirWetBulbC = PsyTwbFnTdbWPb( InletAirDryBulbTemp, InletAirHumRat, OutdoorPressure );
-			AirVolumeFlowRate = AirMassFlow / PsyRhoAirFnPbTdbW( OutdoorPressure, InletAirDryBulbTemp, InletAirHumRat );
+			InletAirWetBulbC = PsyTwbFnTdbWPb( InletAirDryBulbTemp, InletAirHumRat, OutdoorPressure, BlankString );
+			AirVolumeFlowRate = AirMassFlow / PsyRhoAirFnPbTdbW( OutdoorPressure, InletAirDryBulbTemp, InletAirHumRat, BlankString );
 			VolFlowperRatedTotCap = AirVolumeFlowRate / DXCoil( DXCoilNum ).RatedTotCap( Mode );
 
 			if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) <= 0.0 ) {
@@ -7701,7 +7705,7 @@ namespace DXCoils {
 					ShowContinueError( "...Volume Flow Rate = Air Mass Flow Rate / Air Density" );
 					ShowContinueError( "...Volume Flow Rate   = " + RoundSigDigits( AirVolumeFlowRate, 8 ) + " m3/s." );
 					ShowContinueError( "...Air Mass Flow Rate = " + RoundSigDigits( AirMassFlow, 8 ) + " kg/s." );
-					ShowContinueError( "...Air Density        = " + RoundSigDigits( PsyRhoAirFnPbTdbW( OutdoorPressure, InletAirDryBulbTemp, InletAirHumRat ), 8 ) + " kg/m3." );
+					ShowContinueError( "...Air Density        = " + RoundSigDigits( PsyRhoAirFnPbTdbW( OutdoorPressure, InletAirDryBulbTemp, InletAirHumRat, BlankString ), 8 ) + " kg/m3." );
 					ShowContinueError( "...Data used for air density calculation:" );
 					ShowContinueError( "...Outdoor Air Pressure     = " + RoundSigDigits( OutdoorPressure, 3 ) + " Pa." );
 					ShowContinueError( "...Inlet Air Dry-Bulb Temp  = " + RoundSigDigits( InletAirDryBulbTemp, 3 ) + " C." );
@@ -7801,11 +7805,11 @@ Label50: ;
 			// there is an issue here with using CBF to calculate the ADP enthalpy.
 			// at low loads the bypass factor increases significantly.
 			hADP = InletAirEnthalpy - hDelta / ( 1.0 - CBF );
-			tADP = PsyTsatFnHPb( hADP, OutdoorPressure, "CalcVRFCoolingCoil" );
+			tADP = PsyTsatFnHPb( hADP, OutdoorPressure, RoutineName );
 			//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 			//  tADP = PsyTsatFnHPb(hADP,InletAirPressure)
-			wADP = min( InletAirHumRat, PsyWFnTdbH( tADP, hADP, "CalcVRFCoolingCoil" ) );
-			hTinwADP = PsyHFnTdbW( InletAirDryBulbTemp, wADP, "CalcVRFCoolingCoil" );
+			wADP = min( InletAirHumRat, PsyWFnTdbH( tADP, hADP, RoutineName ) );
+			hTinwADP = PsyHFnTdbW( InletAirDryBulbTemp, wADP );
 			if ( ( InletAirEnthalpy - hADP ) > 1.e-10 ) {
 				SHR = min( ( hTinwADP - hADP ) / ( InletAirEnthalpy - hADP ), 1.0 );
 			} else {
@@ -7819,7 +7823,7 @@ Label50: ;
 				// capacity at the dry-out point to determine exiting conditions from coil. This is required
 				// since the TotCapTempModFac doesn't work properly with dry-coil conditions.
 				InletAirHumRatTemp = RF * wADP + ( 1.0 - RF ) * InletAirHumRatTemp;
-				InletAirWetBulbC = PsyTwbFnTdbWPb( InletAirDryBulbTemp, InletAirHumRatTemp, OutdoorPressure );
+				InletAirWetBulbC = PsyTwbFnTdbWPb( InletAirDryBulbTemp, InletAirHumRatTemp, OutdoorPressure, BlankString );
 				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 				//     InletAirWetBulbC = PsyTwbFnTdbWPb(InletAirDryBulbTemp,InletAirHumRatTemp,InletAirPressure)
 				++Counter;
@@ -7866,19 +7870,19 @@ Label50: ;
 			FullLoadOutAirEnth = InletAirEnthalpy - TotCap / AirMassFlow;
 			hTinwout = InletAirEnthalpy - ( 1.0 - SHR ) * hDelta;
 			if ( SHR < 1.0 ) {
-				FullLoadOutAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout );
+				FullLoadOutAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout, BlankString );
 			} else {
 				FullLoadOutAirHumRat = InletAirHumRat;
 			}
 			FullLoadOutAirTemp = PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat );
 
 			// Check for saturation error and modify temperature at constant enthalpy
-			if ( FullLoadOutAirTemp < PsyTsatFnHPb( FullLoadOutAirEnth, OutdoorPressure ) ) {
-				FullLoadOutAirTemp = PsyTsatFnHPb( FullLoadOutAirEnth, OutdoorPressure );
+			if ( FullLoadOutAirTemp < PsyTsatFnHPb( FullLoadOutAirEnth, OutdoorPressure, BlankString ) ) {
+				FullLoadOutAirTemp = PsyTsatFnHPb( FullLoadOutAirEnth, OutdoorPressure, BlankString );
 				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 				//   IF(FullLoadOutAirTemp .LT. PsyTsatFnHPb(FullLoadOutAirEnth,InletAirPressure)) THEN
 				//    FullLoadOutAirTemp = PsyTsatFnHPb(FullLoadOutAirEnth,InletAirPressure)
-				FullLoadOutAirHumRat = PsyWFnTdbH( FullLoadOutAirTemp, FullLoadOutAirEnth );
+				FullLoadOutAirHumRat = PsyWFnTdbH( FullLoadOutAirTemp, FullLoadOutAirEnth, BlankString );
 			}
 
 			// Store actual outlet conditions when DX coil is ON for use in heat recovery module
@@ -7909,7 +7913,7 @@ Label50: ;
 				FullLoadOutAirEnth = InletAirEnthalpy - TotCap / AirMassFlow;
 				hTinwout = InletAirEnthalpy - ( 1.0 - SHR ) * hDelta;
 				if ( SHR < 1.0 ) {
-					FullLoadOutAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout );
+					FullLoadOutAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout, BlankString );
 				} else {
 					FullLoadOutAirHumRat = InletAirHumRat;
 				}
@@ -7933,12 +7937,12 @@ Label50: ;
 			}
 
 			// Check for saturation error and modify temperature at constant enthalpy
-			if ( OutletAirTemp < PsyTsatFnHPb( OutletAirEnthalpy, OutdoorPressure, "CalcVRFCoolingCoil" ) ) {
-				OutletAirTemp = PsyTsatFnHPb( OutletAirEnthalpy, OutdoorPressure );
+			if ( OutletAirTemp < PsyTsatFnHPb( OutletAirEnthalpy, OutdoorPressure, RoutineName ) ) {
+				OutletAirTemp = PsyTsatFnHPb( OutletAirEnthalpy, OutdoorPressure, BlankString );
 				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 				//   IF(OutletAirTemp .LT. PsyTsatFnHPb(OutletAirEnthalpy,InletAirPressure)) THEN
 				//    OutletAirTemp = PsyTsatFnHPb(OutletAirEnthalpy,InletAirPressure)
-				OutletAirHumRat = PsyWFnTdbH( OutletAirTemp, OutletAirEnthalpy );
+				OutletAirHumRat = PsyWFnTdbH( OutletAirTemp, OutletAirEnthalpy, BlankString );
 			}
 
 			// Reset AirMassFlow to inlet node air mass flow for final total, sensible and latent calculations
@@ -7994,7 +7998,7 @@ Label50: ;
 		DXCoilFanOpMode( DXCoilNum ) = FanOpMode;
 		DXCoil( DXCoilNum ).CondInletTemp = CondInletTemp;
 		DXCoilTotalCooling( DXCoilNum ) = DXCoil( DXCoilNum ).TotalCoolingEnergyRate;
-		DXCoilCoolInletAirWBTemp( DXCoilNum ) = PsyTwbFnTdbWPb( InletAirDryBulbTemp, InletAirHumRat, OutdoorPressure );
+		DXCoilCoolInletAirWBTemp( DXCoilNum ) = PsyTwbFnTdbWPb( InletAirDryBulbTemp, InletAirHumRat, OutdoorPressure, BlankString );
 
 	}
 
@@ -8056,6 +8060,7 @@ Label50: ;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcDXHeatingCoil" );
+		static std::string const RoutineNameFullLoad( "CalcDXHeatingCoil:fullload" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -8147,7 +8152,7 @@ Label50: ;
 		//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 		//InletAirPressure = DXCoil(DXCoilNum)%InletAirPressure
 		//InletAirWetBulbC = PsyTwbFnTdbWPb(InletAirDryBulbTemp,InletAirHumRat,InletAirPressure)
-		InletAirWetBulbC = PsyTwbFnTdbWPb( InletAirDryBulbTemp, InletAirHumRat, OutdoorPressure );
+		InletAirWetBulbC = PsyTwbFnTdbWPb( InletAirDryBulbTemp, InletAirHumRat, OutdoorPressure, BlankString );
 		PLRHeating = 0.0;
 		DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction = 0.0;
 		// Initialize crankcase heater, operates below OAT defined in input deck for HP DX heating coil
@@ -8162,7 +8167,7 @@ Label50: ;
 			if ( FanOpMode == CycFanCycCoil ) AirMassFlow /= PartLoadRatio;
 			if ( FanOpMode == ContFanCycCoil ) AirMassFlow *= AirFlowRatio;
 			// Check for valid air volume flow per rated total cooling capacity (200 - 600 cfm/ton)
-			AirVolumeFlowRate = AirMassFlow / PsyRhoAirFnPbTdbW( OutdoorPressure, InletAirDryBulbTemp, InletAirHumRat );
+			AirVolumeFlowRate = AirMassFlow / PsyRhoAirFnPbTdbW( OutdoorPressure, InletAirDryBulbTemp, InletAirHumRat, BlankString );
 			//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 			//  AirVolumeFlowRate = AirMassFlow/PsyRhoAirFnPbTdbW(InletAirPressure,InletAirDryBulbTemp, InletAirHumRat)
 			VolFlowperRatedTotCap = AirVolumeFlowRate / DXCoil( DXCoilNum ).RatedTotCap( Mode );
@@ -8220,7 +8225,7 @@ Label50: ;
 			// Calculating adjustment factors for defrost
 			// Calculate delta w through outdoor coil by assuming a coil temp of 0.82*DBT-9.7(F) per DOE2.1E
 			OutdoorCoilT = 0.82 * OutdoorDryBulb - 8.589;
-			OutdoorCoildw = max( 1.0e-6, ( OutdoorHumRat - PsyWFnTdpPb( OutdoorCoilT, OutdoorPressure ) ) );
+			OutdoorCoildw = max( 1.0e-6, ( OutdoorHumRat - PsyWFnTdpPb( OutdoorCoilT, OutdoorPressure, BlankString ) ) );
 
 			// Initializing defrost adjustment factors
 			LoadDueToDefrost = 0.0;
@@ -8269,14 +8274,14 @@ Label50: ;
 			FullLoadOutAirEnth = InletAirEnthalpy + TotCap / AirMassFlow;
 			FullLoadOutAirHumRat = InletAirHumRat;
 			FullLoadOutAirTemp = PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat );
-			FullLoadOutAirRH = PsyRhFnTdbWPb( FullLoadOutAirTemp, FullLoadOutAirHumRat, OutdoorPressure, "CalcDXHeatingCoil:fullload" );
+			FullLoadOutAirRH = PsyRhFnTdbWPb( FullLoadOutAirTemp, FullLoadOutAirHumRat, OutdoorPressure, RoutineNameFullLoad );
 			//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 			//  FullLoadOutAirRH = PsyRhFnTdbWPb(FullLoadOutAirTemp,FullLoadOutAirHumRat,InletAirPressure)
 			if ( FullLoadOutAirRH > 1.0 ) { // Limit to saturated conditions at FullLoadOutAirEnth
-				FullLoadOutAirTemp = PsyTsatFnHPb( FullLoadOutAirEnth, OutdoorPressure );
+				FullLoadOutAirTemp = PsyTsatFnHPb( FullLoadOutAirEnth, OutdoorPressure, BlankString );
 				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 				//    FullLoadOutAirTemp = PsyTsatFnHPb(FullLoadOutAirEnth,InletAirPressure)
-				FullLoadOutAirHumRat = PsyWFnTdbH( FullLoadOutAirTemp, FullLoadOutAirEnth );
+				FullLoadOutAirHumRat = PsyWFnTdbH( FullLoadOutAirTemp, FullLoadOutAirEnth, BlankString );
 			}
 
 			// Calculate actual outlet conditions for the input part load ratio
@@ -8433,6 +8438,9 @@ Label50: ;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcMultiSpeedDXCoil" );
+		static std::string const RoutineNameHighSpeedOutlet( "CalcMultiSpeedDXCoil:highspeedoutlet" );
+		static std::string const RoutineNameLowSpeedOutlet( "CalcMultiSpeedDXCoil:lowspeedoutlet" );
+		static std::string const RoutineNameNewDewPointConditions( "CalcMultiSpeedDXCoil:newdewpointconditions" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -8517,7 +8525,7 @@ Label50: ;
 			} else {
 				OutdoorDryBulb = Node( DXCoil( DXCoilNum ).CondenserInletNodeNum( Mode ) ).Temp;
 				OutdoorHumRat = Node( DXCoil( DXCoilNum ).CondenserInletNodeNum( Mode ) ).HumRat;
-				OutdoorWetBulb = PsyTwbFnTdbWPb( OutdoorDryBulb, OutdoorHumRat, OutdoorPressure );
+				OutdoorWetBulb = PsyTwbFnTdbWPb( OutdoorDryBulb, OutdoorHumRat, OutdoorPressure, BlankString );
 			}
 		} else {
 			OutdoorDryBulb = OutDryBulbTemp;
@@ -8536,18 +8544,18 @@ Label50: ;
 		//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 		//InletAirPressure = DXCoil(DXCoilNum)%InletAirPressure
 		//InletAirWetBulbC = PsyTwbFnTdbWPb(InletAirDryBulbTemp,InletAirHumRat,InletAirPressure)
-		InletAirWetBulbC = PsyTwbFnTdbWPb( InletAirDryBulbTemp, InletAirHumRat, OutdoorPressure );
+		InletAirWetBulbC = PsyTwbFnTdbWPb( InletAirDryBulbTemp, InletAirHumRat, OutdoorPressure, BlankString );
 		if ( DXCoil( DXCoilNum ).CondenserType( Mode ) == AirCooled ) {
 			CondInletTemp = OutdoorDryBulb; // Outdoor dry-bulb temp
 		} else if ( DXCoil( DXCoilNum ).CondenserType( Mode ) == EvapCooled ) {
 			// Outdoor wet-bulb temp from DataEnvironment + (1.0-EvapCondEffectiveness) * (drybulb - wetbulb)
 			CondInletTemp = OutdoorWetBulb + ( OutdoorDryBulb - OutdoorWetBulb ) * ( 1.0 - DXCoil( DXCoilNum ).EvapCondEffect( Mode ) );
-			CondInletHumRat = PsyWFnTdbTwbPb( CondInletTemp, OutdoorWetBulb, OutdoorPressure );
+			CondInletHumRat = PsyWFnTdbTwbPb( CondInletTemp, OutdoorWetBulb, OutdoorPressure, BlankString );
 		}
 
 		if ( ( AirMassFlow > 0.0 ) && ( ( GetCurrentScheduleValue( DXCoil( DXCoilNum ).SchedPtr ) > 0.0 ) || ( LocalForceOn ) ) && ( SpeedRatio > 0.0 || CycRatio > 0.0 ) ) {
 
-			RhoAir = PsyRhoAirFnPbTdbW( OutdoorPressure, OutdoorDryBulb, OutdoorHumRat );
+			RhoAir = PsyRhoAirFnPbTdbW( OutdoorPressure, OutdoorDryBulb, OutdoorHumRat, BlankString );
 			if ( SpeedRatio > 0.0 ) {
 				// Adjust high speed coil bypass factor for actual maximum air flow rate.
 				RatedCBFHS = DXCoil( DXCoilNum ).RatedCBF( Mode );
@@ -8605,7 +8613,7 @@ Label50: ;
 					OutletAirEnthalpy = InletAirEnthalpy - hDelta;
 					if ( SHR < 1.0 ) {
 						hTinwout = InletAirEnthalpy - ( 1.0 - SHR ) * hDelta;
-						OutletAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout );
+						OutletAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout, BlankString );
 						if ( OutletAirHumRat <= 0.0 ) {
 							OutletAirHumRat = min( DryCoilOutletHumRatioMin, InletAirHumRat );
 						}
@@ -8613,11 +8621,11 @@ Label50: ;
 						SHR = 1.0;
 						OutletAirHumRat = InletAirHumRat;
 					}
-					OutletAirDryBulbTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat, "CalcMultiSpeedDXCoil:highspeedoutlet" );
-					OutletAirDryBulbTempSat = PsyTdpFnWPb( OutletAirHumRat, OutdoorPressure, "CalcMultiSpeedDXCoil:highspeedoutlet" );
+					OutletAirDryBulbTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
+					OutletAirDryBulbTempSat = PsyTdpFnWPb( OutletAirHumRat, OutdoorPressure, RoutineNameHighSpeedOutlet );
 					if ( OutletAirDryBulbTempSat > OutletAirDryBulbTemp ) {
 						OutletAirDryBulbTemp = OutletAirDryBulbTempSat;
-						OutletAirHumRat = PsyWFnTdbH( OutletAirDryBulbTemp, OutletAirEnthalpy, "CalcMultiSpeedDXCoil:highspeedoutlet" );
+						OutletAirHumRat = PsyWFnTdbH( OutletAirDryBulbTemp, OutletAirEnthalpy, RoutineNameHighSpeedOutlet );
 					}
 					//LSOutletAirRH = PsyRhFnTdbWPb(OutletAirDryBulbTemp,OutletAirHumRat,OutdoorPressure,'CalcMultiSpeedDXCoil:highspeedoutlet')
 				} else {
@@ -8625,10 +8633,10 @@ Label50: ;
 					CBF = AdjustCBF( CBFNom, AirMassFlowNom, AirMassFlow );
 					// Calculate new apparatus dew point conditions
 					hADP = InletAirEnthalpy - hDelta / ( 1.0 - CBF );
-					tADP = PsyTsatFnHPb( hADP, OutdoorPressure );
+					tADP = PsyTsatFnHPb( hADP, OutdoorPressure, BlankString );
 					//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 					//    tADP = PsyTsatFnHPb(hADP,InletAirPressure)
-					wADP = PsyWFnTdbH( tADP, hADP );
+					wADP = PsyWFnTdbH( tADP, hADP, BlankString );
 					hTinwADP = PsyHFnTdbW( InletAirDryBulbTemp, wADP );
 					// get corresponding SHR
 					if ( ( InletAirEnthalpy - hADP ) > 1.e-10 ) {
@@ -8641,7 +8649,7 @@ Label50: ;
 					OutletAirEnthalpy = InletAirEnthalpy - hDelta;
 					// get outlet conditions
 					hTinwout = InletAirEnthalpy - ( 1.0 - SHR ) * hDelta;
-					OutletAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout );
+					OutletAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout, BlankString );
 
 					OutletAirDryBulbTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
 					// OutletAirRH = PsyRhFnTdbWPb(OutletAirDryBulbTemp,OutletAirHumRat,OutBaroPress)
@@ -8649,12 +8657,12 @@ Label50: ;
 					//   OutletAirDryBulbTemp = PsyTsatFnHPb(OutletAirEnthalpy,OutBaroPress)
 					//    OutletAirHumRat  = PsyWFnTdbH(OutletAirDryBulbTemp,OutletAirEnthalpy)
 					//  END IF
-					OutletAirDryBulbTempSat = PsyTsatFnHPb( OutletAirEnthalpy, OutdoorPressure );
+					OutletAirDryBulbTempSat = PsyTsatFnHPb( OutletAirEnthalpy, OutdoorPressure , BlankString);
 					//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 					//    OutletAirDryBulbTempSat = PsyTsatFnHPb(OutletAirEnthalpy,InletAirPressure)
 					if ( OutletAirDryBulbTemp < OutletAirDryBulbTempSat ) { // Limit to saturated conditions at OutletAirEnthalpy
 						OutletAirDryBulbTemp = OutletAirDryBulbTempSat;
-						OutletAirHumRat = PsyWFnTdbH( OutletAirDryBulbTemp, OutletAirEnthalpy );
+						OutletAirHumRat = PsyWFnTdbH( OutletAirDryBulbTemp, OutletAirEnthalpy, BlankString );
 					}
 				}
 				// calculate cooling rate and electrical power
@@ -8681,7 +8689,7 @@ Label50: ;
 				if ( DXCoil( DXCoilNum ).CondenserType( Mode ) == EvapCooled ) {
 					// Outdoor wet-bulb temp from DataEnvironment + (1.0-EvapCondEffectiveness) * (drybulb - wetbulb)
 					CondInletTemp = OutdoorWetBulb + ( OutdoorDryBulb - OutdoorWetBulb ) * ( 1.0 - DXCoil( DXCoilNum ).EvapCondEffect2 );
-					CondInletHumRat = PsyWFnTdbTwbPb( CondInletTemp, OutdoorWetBulb, OutdoorPressure );
+					CondInletHumRat = PsyWFnTdbTwbPb( CondInletTemp, OutdoorWetBulb, OutdoorPressure, BlankString );
 				}
 
 				// Adjust low speed coil bypass factor for actual flow rate.
@@ -8700,7 +8708,7 @@ Label50: ;
 					LSOutletAirEnthalpy = InletAirEnthalpy - hDelta;
 					if ( SHR < 1.0 ) {
 						hTinwout = InletAirEnthalpy - ( 1.0 - SHR ) * hDelta;
-						LSOutletAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout );
+						LSOutletAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout, BlankString );
 						if ( LSOutletAirHumRat <= 0.0 ) {
 							LSOutletAirHumRat = min( DryCoilOutletHumRatioMin, InletAirHumRat );
 						}
@@ -8708,23 +8716,23 @@ Label50: ;
 						SHR = 1.0;
 						LSOutletAirHumRat = InletAirHumRat;
 					}
-					LSOutletAirDryBulbTemp = PsyTdbFnHW( LSOutletAirEnthalpy, LSOutletAirHumRat, "CalcMultiSpeedDXCoil:lowspeedoutlet" );
-					OutletAirDryBulbTempSat = PsyTdpFnWPb( LSOutletAirHumRat, OutdoorPressure, "CalcMultiSpeedDXCoil:lowspeedoutlet" );
+					LSOutletAirDryBulbTemp = PsyTdbFnHW( LSOutletAirEnthalpy, LSOutletAirHumRat );
+					OutletAirDryBulbTempSat = PsyTdpFnWPb( LSOutletAirHumRat, OutdoorPressure, RoutineNameLowSpeedOutlet );
 					if ( OutletAirDryBulbTempSat > LSOutletAirDryBulbTemp ) {
 						LSOutletAirDryBulbTemp = OutletAirDryBulbTempSat;
-						LSOutletAirHumRat = PsyWFnTdbH( LSOutletAirDryBulbTemp, LSOutletAirEnthalpy, "CalcMultiSpeedDXCoil:lowspeedoutlet" );
+						LSOutletAirHumRat = PsyWFnTdbH( LSOutletAirDryBulbTemp, LSOutletAirEnthalpy, RoutineNameLowSpeedOutlet );
 					}
-					LSOutletAirRH = PsyRhFnTdbWPb( LSOutletAirDryBulbTemp, LSOutletAirHumRat, OutdoorPressure, "CalcMultiSpeedDXCoil:lowspeedoutlet" );
+					LSOutletAirRH = PsyRhFnTdbWPb( LSOutletAirDryBulbTemp, LSOutletAirHumRat, OutdoorPressure, RoutineNameLowSpeedOutlet );
 				} else {
 					// Adjust CBF for off-nominal flow
 					CBF = AdjustCBF( DXCoil( DXCoilNum ).RatedCBF2, DXCoil( DXCoilNum ).RatedAirMassFlowRate2, AirMassFlow );
 					// Calculate new apparatus dew point conditions
 					hADP = InletAirEnthalpy - hDelta / ( 1.0 - CBF );
-					tADP = PsyTsatFnHPb( hADP, OutdoorPressure, "CalcMultiSpeedDXCoil:newdewpointconditions" );
+					tADP = PsyTsatFnHPb( hADP, OutdoorPressure, RoutineNameNewDewPointConditions );
 					//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 					//    tADP = PsyTsatFnHPb(hADP,InletAirPressure)
-					wADP = PsyWFnTdbH( tADP, hADP, "CalcMultiSpeedDXCoil:newdewpointconditions" );
-					hTinwADP = PsyHFnTdbW( InletAirDryBulbTemp, wADP, "CalcMultiSpeedDXCoil:newdewpointconditions" );
+					wADP = PsyWFnTdbH( tADP, hADP, RoutineNameNewDewPointConditions );
+					hTinwADP = PsyHFnTdbW( InletAirDryBulbTemp, wADP );
 					// get corresponding SHR
 					if ( ( InletAirEnthalpy - hADP ) > 1.e-10 ) {
 						SHR = min( ( hTinwADP - hADP ) / ( InletAirEnthalpy - hADP ), 1.0 );
@@ -8735,16 +8743,16 @@ Label50: ;
 					// get low speed outlet conditions
 					LSOutletAirEnthalpy = InletAirEnthalpy - hDelta;
 					hTinwout = InletAirEnthalpy - ( 1.0 - SHR ) * hDelta;
-					LSOutletAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout );
-					LSOutletAirDryBulbTemp = PsyTdbFnHW( LSOutletAirEnthalpy, LSOutletAirHumRat, "CalcMultiSpeedDXCoil:lowspeedoutlet" );
-					LSOutletAirRH = PsyRhFnTdbWPb( LSOutletAirDryBulbTemp, LSOutletAirHumRat, OutdoorPressure, "CalcMultiSpeedDXCoil:lowspeedoutlet" );
-					OutletAirDryBulbTempSat = PsyTsatFnHPb( LSOutletAirEnthalpy, OutdoorPressure, "CalcMultiSpeedDXCoil:lowspeedoutlet" );
+					LSOutletAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout, BlankString );
+					LSOutletAirDryBulbTemp = PsyTdbFnHW( LSOutletAirEnthalpy, LSOutletAirHumRat );
+					LSOutletAirRH = PsyRhFnTdbWPb( LSOutletAirDryBulbTemp, LSOutletAirHumRat, OutdoorPressure, RoutineNameLowSpeedOutlet );
+					OutletAirDryBulbTempSat = PsyTsatFnHPb( LSOutletAirEnthalpy, OutdoorPressure, RoutineNameLowSpeedOutlet );
 					//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 					//    LSOutletAirRH = PsyRhFnTdbWPb(LSOutletAirDryBulbTemp,LSOutletAirHumRat,InletAirPressure)
 					//    OutletAirDryBulbTempSat = PsyTsatFnHPb(LSOutletAirEnthalpy,InletAirPressure)
 					if ( LSOutletAirDryBulbTemp < OutletAirDryBulbTempSat ) { // Limit to saturated conditions at OutletAirEnthalpy
 						LSOutletAirDryBulbTemp = OutletAirDryBulbTempSat;
-						LSOutletAirHumRat = PsyWFnTdbH( LSOutletAirDryBulbTemp, LSOutletAirEnthalpy, "CalcMultiSpeedDXCoil:lowspeedoutlet" );
+						LSOutletAirHumRat = PsyWFnTdbH( LSOutletAirDryBulbTemp, LSOutletAirEnthalpy, RoutineNameLowSpeedOutlet );
 					}
 				}
 				// outlet conditions are average of inlet and low speed weighted by CycRatio
@@ -9046,13 +9054,13 @@ Label50: ;
 		DeltaH = TotCap / AirMassFlowRate;
 		InletAirEnthalpy = PsyHFnTdbW( InletAirTemp, InletAirHumRat );
 		HTinHumRatOut = InletAirEnthalpy - ( 1.0 - SHR ) * DeltaH;
-		OutletAirHumRat = PsyWFnTdbH( InletAirTemp, HTinHumRatOut );
+		OutletAirHumRat = PsyWFnTdbH( InletAirTemp, HTinHumRatOut, BlankString );
 		DeltaHumRat = InletAirHumRat - OutletAirHumRat;
 		OutletAirEnthalpy = InletAirEnthalpy - DeltaH;
 		OutletAirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
 		//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 		//  Pressure will have to be pass into this subroutine to fix this one
-		OutletAirRH = PsyRhFnTdbWPb( OutletAirTemp, OutletAirHumRat, StdBaroPress, "CalcCBF" );
+		OutletAirRH = PsyRhFnTdbWPb( OutletAirTemp, OutletAirHumRat, StdBaroPress, RoutineName );
 		if ( OutletAirRH >= 1.0 ) {
 			ShowSevereError( "For object = " + UnitType + ", name = \"" + UnitName + "\"" );
 			ShowContinueError( "Calculated outlet air relative humidity greater than 1. The combination of" );
@@ -9129,7 +9137,7 @@ Label50: ;
 			//   First guess for Tadp is outlet air dew point
 			//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 			//  Pressure will have to be pass into this subroutine to fix this one
-			ADPTemp = PsyTdpFnWPb( OutletAirHumRat, StdBaroPress );
+			ADPTemp = PsyTdpFnWPb( OutletAirHumRat, StdBaroPress, BlankString );
 
 			Tolerance = 1.0; // initial conditions for iteration
 			ErrorLast = 100.;
@@ -9144,7 +9152,7 @@ Label50: ;
 
 				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 				//  Pressure will have to be pass into this subroutine to fix this one
-				ADPHumRat = PsyWFnTdpPb( ADPTemp, StdBaroPress );
+				ADPHumRat = PsyWFnTdpPb( ADPTemp, StdBaroPress, BlankString );
 				Slope = ( InletAirHumRat - ADPHumRat ) / ( InletAirTemp - ADPTemp );
 
 				//     check for convergence (slopes are equal to within error tolerance)
@@ -9458,8 +9466,8 @@ Label50: ;
 			//   Calculate apparatus dew point conditions using TotCap and CBF
 			hDelta = TotCapCalc / AirMassFlow;
 			hADP = InletEnthalpy - hDelta / ( 1.0 - CBF );
-			tADP = PsyTsatFnHPb( hADP, Pressure );
-			wADP = PsyWFnTdbH( tADP, hADP );
+			tADP = PsyTsatFnHPb( hADP, Pressure, BlankString );
+			wADP = PsyWFnTdbH( tADP, hADP, BlankString );
 			hTinwADP = PsyHFnTdbW( InletDryBulb, wADP );
 			if ( ( InletEnthalpy - hADP ) > 1.e-10 ) {
 				SHRCalc = min( ( hTinwADP - hADP ) / ( InletEnthalpy - hADP ), 1.0 );
@@ -9476,7 +9484,7 @@ Label50: ;
 				//     capacity at the dry-out point to determine exiting conditions from coil. This is required
 				//     since the TotCapTempModFac doesn't work properly with dry-coil conditions.
 				InletHumRatCalc = RF * wADP + ( 1.0 - RF ) * InletHumRatCalc;
-				InletWetBulbCalc = PsyTwbFnTdbWPb( InletDryBulb, InletHumRatCalc, Pressure );
+				InletWetBulbCalc = PsyTwbFnTdbWPb( InletDryBulb, InletHumRatCalc, Pressure, BlankString );
 				++Counter;
 				if ( std::abs( werror ) > Tolerance ) continue; // Recalculate with modified inlet conditions
 				break; // conditions are satisfied
@@ -9537,6 +9545,10 @@ Label50: ;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcMultiSpeedDXCoilCooling" );
+		static std::string const RoutineNameHighSpeed( "CalcMultiSpeedDXCoilCooling:highspeed" );
+		static std::string const RoutineNameHighSpeedAlt( "CalcMultiSpeedDXCoilCooling highspeed" );
+		static std::string const RoutineNameHighSpeedOutlet( "CalcMultiSpeedDXCoilCooling:highspeedoutlet" );
+		static std::string const RoutineNameLowSpeedOutlet( "CalcMultiSpeedDXCoilCooling:lowspeedoutlet" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -9728,11 +9740,11 @@ Label50: ;
 				hDelta = TotCapLS / MSHPMassFlowRateLow;
 				// Calculate new apparatus dew point conditions
 				hADP = InletAirEnthalpy - hDelta / ( 1.0 - CBFLS );
-				tADP = PsyTsatFnHPb( hADP, OutdoorPressure, "CalcMultiSpeedDXCoilCooling highspeed" );
+				tADP = PsyTsatFnHPb( hADP, OutdoorPressure, RoutineNameHighSpeedAlt );
 				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 				//  tADP = PsyTsatFnHPb(hADP,InletAirPressure)
-				wADP = PsyWFnTdbH( tADP, hADP, "CalcMultiSpeedDXCoilCooling" );
-				hTinwADP = PsyHFnTdbW( InletAirDryBulbTemp, wADP, "CalcMultiSpeedDXCoilCooling highspeed" );
+				wADP = PsyWFnTdbH( tADP, hADP, RoutineName );
+				hTinwADP = PsyHFnTdbW( InletAirDryBulbTemp, wADP );
 				// get corresponding SHR
 				if ( ( InletAirEnthalpy - hADP ) > 1.e-10 ) {
 					SHRLS = min( ( hTinwADP - hADP ) / ( InletAirEnthalpy - hADP ), 1.0 );
@@ -9744,8 +9756,8 @@ Label50: ;
 				LSOutletAirEnthalpy = InletAirEnthalpy - hDelta;
 				hTinwout = InletAirEnthalpy - ( 1.0 - SHRLS ) * hDelta;
 				LSOutletAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout, RoutineName );
-				LSOutletAirDryBulbTemp = PsyTdbFnHW( LSOutletAirEnthalpy, LSOutletAirHumRat, RoutineName );
-				LSOutletAirRH = PsyRhFnTdbWPb( LSOutletAirDryBulbTemp, LSOutletAirHumRat, OutdoorPressure, "CalcMultiSpeedDXCoilCooling:highspeed" );
+				LSOutletAirDryBulbTemp = PsyTdbFnHW( LSOutletAirEnthalpy, LSOutletAirHumRat );
+				LSOutletAirRH = PsyRhFnTdbWPb( LSOutletAirDryBulbTemp, LSOutletAirHumRat, OutdoorPressure, RoutineNameHighSpeed );
 				OutletAirDryBulbTempSat = PsyTsatFnHPb( LSOutletAirEnthalpy, OutdoorPressure, RoutineName );
 				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 				//    LSOutletAirRH = PsyRhFnTdbWPb(LSOutletAirDryBulbTemp,LSOutletAirHumRat,InletAirPressure)
@@ -9765,7 +9777,7 @@ Label50: ;
 				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 				//  tADP = PsyTsatFnHPb(hADP,InletAirPressure)
 				wADP = PsyWFnTdbH( tADP, hADP, RoutineName );
-				hTinwADP = PsyHFnTdbW( InletAirDryBulbTemp, wADP, RoutineName );
+				hTinwADP = PsyHFnTdbW( InletAirDryBulbTemp, wADP );
 				// get corresponding SHR
 				if ( ( InletAirEnthalpy - hADP ) > 1.e-10 ) {
 					SHRHS = min( ( hTinwADP - hADP ) / ( InletAirEnthalpy - hADP ), 1.0 );
@@ -9790,8 +9802,8 @@ Label50: ;
 				HSOutletAirEnthalpy = InletAirEnthalpy - hDelta;
 				hTinwout = InletAirEnthalpy - ( 1.0 - SHRHS ) * hDelta;
 				HSOutletAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout, RoutineName );
-				HSOutletAirDryBulbTemp = PsyTdbFnHW( HSOutletAirEnthalpy, HSOutletAirHumRat, RoutineName );
-				HSOutletAirRH = PsyRhFnTdbWPb( HSOutletAirDryBulbTemp, HSOutletAirHumRat, OutdoorPressure, RoutineName + ":highspeedoutlet" );
+				HSOutletAirDryBulbTemp = PsyTdbFnHW( HSOutletAirEnthalpy, HSOutletAirHumRat );
+				HSOutletAirRH = PsyRhFnTdbWPb( HSOutletAirDryBulbTemp, HSOutletAirHumRat, OutdoorPressure, RoutineNameHighSpeedOutlet );
 				OutletAirDryBulbTempSat = PsyTsatFnHPb( HSOutletAirEnthalpy, OutdoorPressure, RoutineName );
 				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 				//    LSOutletAirRH = PsyRhFnTdbWPb(LSOutletAirDryBulbTemp,LSOutletAirHumRat,InletAirPressure)
@@ -9816,7 +9828,7 @@ Label50: ;
 					} else {
 						HSOutletAirHumRat = InletAirHumRat;
 					}
-					HSOutletAirDryBulbTemp = PsyTdbFnHW( HSOutletAirEnthalpy, HSOutletAirHumRat, RoutineName );
+					HSOutletAirDryBulbTemp = PsyTdbFnHW( HSOutletAirEnthalpy, HSOutletAirHumRat );
 				}
 
 				// get high speed EIR at current conditions
@@ -9845,7 +9857,7 @@ Label50: ;
 				// Average outlet enthalpy
 				OutletAirEnthalpy = InletAirEnthalpy - DXCoil( DXCoilNum ).TotalCoolingEnergyRate / DXCoil( DXCoilNum ).InletAirMassFlowRate;
 				MinAirHumRat = min( InletAirHumRat, SpeedRatio * HSOutletAirHumRat + ( 1.0 - SpeedRatio ) * LSOutletAirHumRat );
-				DXCoil( DXCoilNum ).SensCoolingEnergyRate = MSHPMassFlowRateHigh * ( PsyHFnTdbW( InletAirDryBulbTemp, MinAirHumRat, RoutineName ) - PsyHFnTdbW( HSOutletAirDryBulbTemp, MinAirHumRat, RoutineName ) ) * SpeedRatio + MSHPMassFlowRateLow * ( PsyHFnTdbW( InletAirDryBulbTemp, MinAirHumRat, RoutineName ) - PsyHFnTdbW( LSOutletAirDryBulbTemp, MinAirHumRat, RoutineName ) ) * ( 1.0 - SpeedRatio );
+				DXCoil( DXCoilNum ).SensCoolingEnergyRate = MSHPMassFlowRateHigh * ( PsyHFnTdbW( InletAirDryBulbTemp, MinAirHumRat ) - PsyHFnTdbW( HSOutletAirDryBulbTemp, MinAirHumRat ) ) * SpeedRatio + MSHPMassFlowRateLow * ( PsyHFnTdbW( InletAirDryBulbTemp, MinAirHumRat ) - PsyHFnTdbW( LSOutletAirDryBulbTemp, MinAirHumRat ) ) * ( 1.0 - SpeedRatio );
 				if ( DXCoil( DXCoilNum ).SensCoolingEnergyRate > DXCoil( DXCoilNum ).TotalCoolingEnergyRate ) {
 					DXCoil( DXCoilNum ).SensCoolingEnergyRate = DXCoil( DXCoilNum ).TotalCoolingEnergyRate;
 				}
@@ -9862,15 +9874,15 @@ Label50: ;
 					OutletAirHumRat = HSOutletAirHumRat;
 					OutletAirDryBulbTemp = HSOutletAirDryBulbTemp;
 				} else {
-					Hfg = PsyHfgAirFnWTdb( MinAirHumRat, HSOutletAirDryBulbTemp * SpeedRatio + ( 1.0 - SpeedRatio ) * LSOutletAirDryBulbTemp, RoutineName + ":highspeed" );
+					Hfg = PsyHfgAirFnWTdb( MinAirHumRat, HSOutletAirDryBulbTemp * SpeedRatio + ( 1.0 - SpeedRatio ) * LSOutletAirDryBulbTemp );
 					// Average outlet HR
 					OutletAirHumRat = InletAirHumRat - DXCoil( DXCoilNum ).LatCoolingEnergyRate / Hfg / DXCoil( DXCoilNum ).InletAirMassFlowRate;
-					OutletAirDryBulbTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat, RoutineName );
+					OutletAirDryBulbTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
 					if ( OutletAirDryBulbTemp < OutletAirDryBulbTempSat ) { // Limit to saturated conditions at OutletAirEnthalpy
 						OutletAirDryBulbTemp = OutletAirDryBulbTempSat;
 						OutletAirHumRat = PsyWFnTdbH( OutletAirDryBulbTemp, OutletAirEnthalpy, RoutineName );
 						MinAirHumRat = min( InletAirHumRat, OutletAirHumRat );
-						DXCoil( DXCoilNum ).SensCoolingEnergyRate = AirMassFlow * ( PsyHFnTdbW( InletAirDryBulbTemp, MinAirHumRat, RoutineName ) - PsyHFnTdbW( OutletAirDryBulbTemp, MinAirHumRat, RoutineName ) );
+						DXCoil( DXCoilNum ).SensCoolingEnergyRate = AirMassFlow * ( PsyHFnTdbW( InletAirDryBulbTemp, MinAirHumRat ) - PsyHFnTdbW( OutletAirDryBulbTemp, MinAirHumRat ) );
 						if ( DXCoil( DXCoilNum ).SensCoolingEnergyRate > DXCoil( DXCoilNum ).TotalCoolingEnergyRate ) {
 							DXCoil( DXCoilNum ).SensCoolingEnergyRate = DXCoil( DXCoilNum ).TotalCoolingEnergyRate;
 						}
@@ -9951,7 +9963,7 @@ Label50: ;
 				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 				//  tADP = PsyTsatFnHPb(hADP,InletAirPressure)
 				wADP = PsyWFnTdbH( tADP, hADP, RoutineName );
-				hTinwADP = PsyHFnTdbW( InletAirDryBulbTemp, wADP, RoutineName );
+				hTinwADP = PsyHFnTdbW( InletAirDryBulbTemp, wADP );
 				// get corresponding SHR
 				if ( ( InletAirEnthalpy - hADP ) > 1.e-10 ) {
 					SHR = min( ( hTinwADP - hADP ) / ( InletAirEnthalpy - hADP ), 1.0 );
@@ -9987,8 +9999,8 @@ Label50: ;
 				LSOutletAirEnthalpy = InletAirEnthalpy - hDelta;
 				hTinwout = InletAirEnthalpy - ( 1.0 - SHR ) * hDelta;
 				LSOutletAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout, RoutineName );
-				LSOutletAirDryBulbTemp = PsyTdbFnHW( LSOutletAirEnthalpy, LSOutletAirHumRat, RoutineName );
-				LSOutletAirRH = PsyRhFnTdbWPb( LSOutletAirDryBulbTemp, LSOutletAirHumRat, OutdoorPressure, RoutineName + ":lowspeedoutlet" );
+				LSOutletAirDryBulbTemp = PsyTdbFnHW( LSOutletAirEnthalpy, LSOutletAirHumRat );
+				LSOutletAirRH = PsyRhFnTdbWPb( LSOutletAirDryBulbTemp, LSOutletAirHumRat, OutdoorPressure, RoutineNameLowSpeedOutlet );
 				OutletAirDryBulbTempSat = PsyTsatFnHPb( LSOutletAirEnthalpy, OutdoorPressure, RoutineName );
 				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 				//    LSOutletAirRH = PsyRhFnTdbWPb(LSOutletAirDryBulbTemp,LSOutletAirHumRat,InletAirPressure)
@@ -10013,7 +10025,7 @@ Label50: ;
 					} else {
 						LSOutletAirHumRat = InletAirHumRat;
 					}
-					LSOutletAirDryBulbTemp = PsyTdbFnHW( LSOutletAirEnthalpy, LSOutletAirHumRat, RoutineName );
+					LSOutletAirDryBulbTemp = PsyTdbFnHW( LSOutletAirEnthalpy, LSOutletAirHumRat );
 				}
 
 				if ( FanOpMode == CycFanCycCoil ) OnOffFanPartLoadFraction = PLF;
@@ -10034,20 +10046,20 @@ Label50: ;
 				if ( FanOpMode == ContFanCycCoil ) {
 					OutletAirEnthalpy = InletAirEnthalpy - DXCoil( DXCoilNum ).TotalCoolingEnergyRate / DXCoil( DXCoilNum ).InletAirMassFlowRate;
 					MinAirHumRat = min( InletAirHumRat, LSOutletAirHumRat );
-					DXCoil( DXCoilNum ).SensCoolingEnergyRate = AirMassFlow * ( PsyHFnTdbW( InletAirDryBulbTemp, MinAirHumRat, RoutineName ) - PsyHFnTdbW( LSOutletAirDryBulbTemp, MinAirHumRat, RoutineName ) ) * CycRatio;
+					DXCoil( DXCoilNum ).SensCoolingEnergyRate = AirMassFlow * ( PsyHFnTdbW( InletAirDryBulbTemp, MinAirHumRat ) - PsyHFnTdbW( LSOutletAirDryBulbTemp, MinAirHumRat ) ) * CycRatio;
 					if ( DXCoil( DXCoilNum ).SensCoolingEnergyRate > DXCoil( DXCoilNum ).TotalCoolingEnergyRate ) {
 						DXCoil( DXCoilNum ).SensCoolingEnergyRate = DXCoil( DXCoilNum ).TotalCoolingEnergyRate;
 					}
 					DXCoil( DXCoilNum ).LatCoolingEnergyRate = DXCoil( DXCoilNum ).TotalCoolingEnergyRate - DXCoil( DXCoilNum ).SensCoolingEnergyRate;
 					// Calculate avarage outlet conditions
-					Hfg = PsyHfgAirFnWTdb( MinAirHumRat, OutletAirDryBulbTemp * CycRatio + ( 1.0 - CycRatio ) * InletAirDryBulbTemp, "MultiSpeedCooling " );
+					Hfg = PsyHfgAirFnWTdb( MinAirHumRat, OutletAirDryBulbTemp * CycRatio + ( 1.0 - CycRatio ) * InletAirDryBulbTemp );
 					OutletAirHumRat = InletAirHumRat - DXCoil( DXCoilNum ).LatCoolingEnergyRate / Hfg / DXCoil( DXCoilNum ).InletAirMassFlowRate;
-					OutletAirDryBulbTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat, RoutineName );
+					OutletAirDryBulbTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
 					if ( OutletAirDryBulbTemp < OutletAirDryBulbTempSat ) { // Limit to saturated conditions at OutletAirEnthalpy
 						OutletAirDryBulbTemp = OutletAirDryBulbTempSat;
 						OutletAirHumRat = PsyWFnTdbH( OutletAirDryBulbTemp, OutletAirEnthalpy, RoutineName );
 						MinAirHumRat = min( InletAirHumRat, OutletAirHumRat );
-						DXCoil( DXCoilNum ).SensCoolingEnergyRate = DXCoil( DXCoilNum ).InletAirMassFlowRate * ( PsyHFnTdbW( InletAirDryBulbTemp, MinAirHumRat, RoutineName ) - PsyHFnTdbW( OutletAirDryBulbTemp, MinAirHumRat, RoutineName ) );
+						DXCoil( DXCoilNum ).SensCoolingEnergyRate = DXCoil( DXCoilNum ).InletAirMassFlowRate * ( PsyHFnTdbW( InletAirDryBulbTemp, MinAirHumRat ) - PsyHFnTdbW( OutletAirDryBulbTemp, MinAirHumRat ) );
 						if ( DXCoil( DXCoilNum ).SensCoolingEnergyRate > DXCoil( DXCoilNum ).TotalCoolingEnergyRate ) {
 							DXCoil( DXCoilNum ).SensCoolingEnergyRate = DXCoil( DXCoilNum ).TotalCoolingEnergyRate;
 						}
@@ -10055,7 +10067,7 @@ Label50: ;
 					}
 				} else {
 					MinAirHumRat = min( InletAirHumRat, OutletAirHumRat );
-					DXCoil( DXCoilNum ).SensCoolingEnergyRate = AirMassFlow * ( PsyHFnTdbW( InletAirDryBulbTemp, MinAirHumRat, RoutineName ) - PsyHFnTdbW( LSOutletAirDryBulbTemp, MinAirHumRat, RoutineName ) ) * CycRatio;
+					DXCoil( DXCoilNum ).SensCoolingEnergyRate = AirMassFlow * ( PsyHFnTdbW( InletAirDryBulbTemp, MinAirHumRat ) - PsyHFnTdbW( LSOutletAirDryBulbTemp, MinAirHumRat ) ) * CycRatio;
 					// Don't let sensible capacity be greater than total capacity
 					if ( DXCoil( DXCoilNum ).SensCoolingEnergyRate > DXCoil( DXCoilNum ).TotalCoolingEnergyRate ) {
 						DXCoil( DXCoilNum ).SensCoolingEnergyRate = DXCoil( DXCoilNum ).TotalCoolingEnergyRate;
@@ -10182,6 +10194,8 @@ Label50: ;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcMultiSpeedDXCoilHeating" );
+		static std::string const RoutineNameAverageLoad( "CalcMultiSpeedDXCoilHeating:Averageload" );
+		static std::string const RoutineNameFullLoad( "CalcMultiSpeedDXCoilHeating:fullload" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -10480,8 +10494,8 @@ Label50: ;
 
 				DXCoil( DXCoilNum ).TotalHeatingEnergyRate = MSHPMassFlowRateHigh * ( HSFullLoadOutAirEnth - InletAirEnthalpy ) * SpeedRatio + MSHPMassFlowRateLow * ( LSFullLoadOutAirEnth - InletAirEnthalpy ) * ( 1.0 - SpeedRatio );
 				OutletAirEnthalpy = InletAirEnthalpy + DXCoil( DXCoilNum ).TotalHeatingEnergyRate / DXCoil( DXCoilNum ).InletAirMassFlowRate;
-				OutletAirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat, RoutineName );
-				FullLoadOutAirRH = PsyRhFnTdbWPb( OutletAirTemp, OutletAirHumRat, OutdoorPressure, RoutineName + ":Averageload" );
+				OutletAirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
+				FullLoadOutAirRH = PsyRhFnTdbWPb( OutletAirTemp, OutletAirHumRat, OutdoorPressure, RoutineNameAverageLoad );
 				if ( FullLoadOutAirRH > 1.0 ) { // Limit to saturated conditions at FullLoadOutAirEnth
 					OutletAirTemp = PsyTsatFnHPb( FullLoadOutAirEnth, OutdoorPressure, RoutineName ); //Autodesk:Uninit FullLoadOutAirEnth was possibly uninitialized
 					OutletAirHumRat = PsyWFnTdbH( OutletAirTemp, FullLoadOutAirEnth, RoutineName ); //Autodesk:Uninit FullLoadOutAirEnth was possibly uninitialized
@@ -10596,8 +10610,8 @@ Label50: ;
 				// Calculate full load outlet conditions
 				FullLoadOutAirEnth = InletAirEnthalpy + TotCap / AirMassFlow;
 				FullLoadOutAirHumRat = InletAirHumRat;
-				FullLoadOutAirTemp = PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat, RoutineName );
-				FullLoadOutAirRH = PsyRhFnTdbWPb( FullLoadOutAirTemp, FullLoadOutAirHumRat, OutdoorPressure, RoutineName + ":fullload" );
+				FullLoadOutAirTemp = PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat );
+				FullLoadOutAirRH = PsyRhFnTdbWPb( FullLoadOutAirTemp, FullLoadOutAirHumRat, OutdoorPressure, RoutineNameFullLoad );
 				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 				//  FullLoadOutAirRH = PsyRhFnTdbWPb(FullLoadOutAirTemp,FullLoadOutAirHumRat,InletAirPressure)
 				if ( FullLoadOutAirRH > 1.0 ) { // Limit to saturated conditions at FullLoadOutAirEnth
@@ -10675,7 +10689,7 @@ Label50: ;
 				DXCoil( DXCoilNum ).TotalHeatingEnergyRate = AirMassFlow * ( FullLoadOutAirEnth - InletAirEnthalpy ) * CycRatio;
 				if ( FanOpMode == ContFanCycCoil ) {
 					OutletAirEnthalpy = InletAirEnthalpy + DXCoil( DXCoilNum ).TotalHeatingEnergyRate / DXCoil( DXCoilNum ).InletAirMassFlowRate;
-					OutletAirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat, RoutineName );
+					OutletAirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
 				}
 				MSHPWasteHeat = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumLS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumLS ) * DXCoil( DXCoilNum ).ElecHeatingPower;
 
@@ -10979,6 +10993,7 @@ Label50: ;
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static std::string const RoutineName( "CalcTwoSpeedDXCoilStandardRating" );
 
 		static Real64 NetCoolingCapRated( 0.0 ); // Net Cooling Coil capacity at Rated conditions, accounting for supply fan heat [W]
 		static Real64 EER( 0.0 ); // Energy Efficiency Ratio in SI [W/W]
@@ -11084,8 +11099,8 @@ Label50: ;
 				Node( FanInletNode ).MassFlowRate = DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 );
 				Node( FanOutletNode ).MassFlowRate = DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 );
 				Node( FanInletNode ).Temp = CoolingCoilInletAirDryBulbTempRated;
-				Node( FanInletNode ).HumRat = PsyWFnTdbTwbPb( CoolingCoilInletAirDryBulbTempRated, CoolingCoilInletAirWetBulbTempRated, OutBaroPress, "CalcTwoSpeedDXCoilStandardRating" );
-				Node( FanInletNode ).Enthalpy = PsyHFnTdbW( CoolingCoilInletAirDryBulbTempRated, Node( FanInletNode ).HumRat, "CalcTwoSpeedDXCoilStandardRating" );
+				Node( FanInletNode ).HumRat = PsyWFnTdbTwbPb( CoolingCoilInletAirDryBulbTempRated, CoolingCoilInletAirWetBulbTempRated, OutBaroPress, RoutineName );
+				Node( FanInletNode ).Enthalpy = PsyHFnTdbW( CoolingCoilInletAirDryBulbTempRated, Node( FanInletNode ).HumRat );
 
 				SimulateFanComponents( DXCoil( DXCoilNum ).SupplyFanName, true, DXCoil( DXCoilNum ).SupplyFanIndex, _, true, false, FanStaticPressureRise );
 				FanHeatCorrection = Node( FanOutletNode ).Enthalpy - Node( FanInletNode ).Enthalpy;
@@ -11131,8 +11146,8 @@ Label50: ;
 		DXCoil( DXCoilNum ).InletAirMassFlowRate = DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 );
 		DXCoil( DXCoilNum ).InletAirMassFlowRateMax = DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 );
 		DXCoil( DXCoilNum ).InletAirTemp = 26.7;
-		DXCoil( DXCoilNum ).InletAirHumRat = PsyWFnTdbTwbPb( 26.7, 19.4, OutBaroPress, "CalcTwoSpeedDXCoilStandardRating" );
-		DXCoil( DXCoilNum ).InletAirEnthalpy = PsyHFnTdbW( 26.7, DXCoil( DXCoilNum ).InletAirHumRat, "CalcTwoSpeedDXCoilStandardRating" );
+		DXCoil( DXCoilNum ).InletAirHumRat = PsyWFnTdbTwbPb( 26.7, 19.4, OutBaroPress, RoutineName );
+		DXCoil( DXCoilNum ).InletAirEnthalpy = PsyHFnTdbW( 26.7, DXCoil( DXCoilNum ).InletAirHumRat );
 
 		if ( DXCoil( DXCoilNum ).CondenserInletNodeNum( 1 ) != 0 ) {
 			Node( DXCoil( DXCoilNum ).CondenserInletNodeNum( 1 ) ).Temp = OutdoorUnitInletAirDryBulbTempRated;
@@ -11201,8 +11216,8 @@ Label50: ;
 				// now we have the supply air flow rate
 				SupAirMdot_TestPoint( 1 + PartLoadTestPoint ) = PartLoadAirMassFlowRate;
 				AirMassFlowRatio = PartLoadAirMassFlowRate / DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 );
-				SupplyAirHumRat = PsyWFnTdbTwbPb( CoolingCoilInletAirDryBulbTempRated, CoolingCoilInletAirWetBulbTempRated, OutBaroPress, "CalcTwoSpeedDXCoilStandardRating" );
-				SupplyAirRho = PsyRhoAirFnPbTdbW( OutBaroPress, CoolingCoilInletAirDryBulbTempRated, SupplyAirHumRat, "CalcTwoSpeedDXCoilStandardRating" );
+				SupplyAirHumRat = PsyWFnTdbTwbPb( CoolingCoilInletAirDryBulbTempRated, CoolingCoilInletAirWetBulbTempRated, OutBaroPress, RoutineName );
+				SupplyAirRho = PsyRhoAirFnPbTdbW( OutBaroPress, CoolingCoilInletAirDryBulbTempRated, SupplyAirHumRat, RoutineName );
 				SupplyAirVolFlowRate = PartLoadAirMassFlowRate / SupplyAirRho;
 
 				if ( DXCoil( DXCoilNum ).RateWithInternalStaticAndFanObject ) {
@@ -11210,7 +11225,7 @@ Label50: ;
 					Node( FanInletNode ).MassFlowRate = PartLoadAirMassFlowRate;
 					Node( FanInletNode ).Temp = CoolingCoilInletAirDryBulbTempRated;
 					Node( FanInletNode ).HumRat = SupplyAirHumRat;
-					Node( FanInletNode ).Enthalpy = PsyHFnTdbW( CoolingCoilInletAirDryBulbTempRated, SupplyAirHumRat, "CalcTwoSpeedDXCoilStandardRating" );
+					Node( FanInletNode ).Enthalpy = PsyHFnTdbW( CoolingCoilInletAirDryBulbTempRated, SupplyAirHumRat );
 					SimulateFanComponents( DXCoil( DXCoilNum ).SupplyFanName, true, DXCoil( DXCoilNum ).SupplyFanIndex, _, true, false, FanStaticPressureRise );
 					FanHeatCorrection = Node( FanOutletNode ).Enthalpy - Node( FanInletNode ).Enthalpy;
 					GetFanPower( DXCoil( DXCoilNum ).SupplyFanIndex, FanPowerCorrection );
@@ -11506,6 +11521,7 @@ Label50: ;
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		static std::string const RoutineName( "CalcTwoSpeedDXCoilIEERResidual" );
 		int DXCoilNum; // index of this coil
 		Real64 OutletAirTemp; // outlet air temperature [C]
 		Real64 TargetCoilLeavingDryBulb;
@@ -11550,8 +11566,8 @@ Label50: ;
 		} else {
 			AirMassFlowRatio = 0.0;
 		}
-		SupplyAirHumRat = PsyWFnTdbTwbPb( IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, OutBaroPress, "CalcTwoSpeedDXCoilIEERResidual" );
-		SupplyAirRho = PsyRhoAirFnPbTdbW( OutBaroPress, IndoorUnitInletDryBulb, SupplyAirHumRat, "CalcTwoSpeedDXCoilIEERResidual" );
+		SupplyAirHumRat = PsyWFnTdbTwbPb( IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, OutBaroPress, RoutineName );
+		SupplyAirRho = PsyRhoAirFnPbTdbW( OutBaroPress, IndoorUnitInletDryBulb, SupplyAirHumRat, RoutineName );
 
 		SupplyAirVolFlowRate = SupplyAirMassFlowRate / SupplyAirRho;
 
@@ -11561,8 +11577,8 @@ Label50: ;
 			Node( FanInletNodeNum ).MassFlowRate = SupplyAirMassFlowRate;
 			Node( FanOutletNodeNum ).MassFlowRate = SupplyAirMassFlowRate;
 			Node( FanInletNodeNum ).Temp = IndoorUnitInletDryBulb;
-			Node( FanInletNodeNum ).HumRat = PsyWFnTdbTwbPb( IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, OutBaroPress, "CalcTwoSpeedDXCoilIEERResidual" );
-			Node( FanInletNodeNum ).Enthalpy = PsyHFnTdbW( IndoorUnitInletDryBulb, Node( FanInletNodeNum ).HumRat, "CalcTwoSpeedDXCoilIEERResidual" );
+			Node( FanInletNodeNum ).HumRat = PsyWFnTdbTwbPb( IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, OutBaroPress, RoutineName );
+			Node( FanInletNodeNum ).Enthalpy = PsyHFnTdbW( IndoorUnitInletDryBulb, Node( FanInletNodeNum ).HumRat );
 			SimulateFanComponents( DXCoil( DXCoilNum ).SupplyFanName, true, DXCoil( DXCoilNum ).SupplyFanIndex, _, true, false, FanStaticPressureRise );
 			FanHeatCorrection = Node( FanOutletNodeNum ).Enthalpy - Node( FanInletNodeNum ).Enthalpy;
 

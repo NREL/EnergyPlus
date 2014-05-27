@@ -70,6 +70,12 @@ public: // Types
 	typedef  typename Initializer::Function  InitializerFunction;
 
 	using Super::conformable;
+	using Super::isize1;
+	using Super::isize2;
+	using Super::isize3;
+	using Super::isize4;
+	using Super::isize5;
+	using Super::isize6;
 	using Super::l;
 	using Super::operator ();
 	using Super::reassign;
@@ -566,7 +572,7 @@ public: // Creation
 	FArray6D
 	shape( FArray6< U > const & a )
 	{
-		return FArray6D( a.size1(), a.size2(), a.size3(), a.size4(), a.size5(), a.size6() );
+		return FArray6D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), a.isize6() );
 	}
 
 	// Array Shape + Initializer Value Named Constructor Template
@@ -576,7 +582,7 @@ public: // Creation
 	FArray6D
 	shape( FArray6< U > const & a, T const & t )
 	{
-		return FArray6D( a.size1(), a.size2(), a.size3(), a.size4(), a.size5(), a.size6(), t );
+		return FArray6D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), a.isize6(), t );
 	}
 
 	// Slice Shape Named Constructor Template
@@ -586,7 +592,7 @@ public: // Creation
 	FArray6D
 	shape( FArray6S< U > const & a )
 	{
-		return FArray6D( a.size1(), a.size2(), a.size3(), a.size4(), a.size5(), a.size6() );
+		return FArray6D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), a.isize6() );
 	}
 
 	// Slice Shape + Initializer Value Named Constructor Template
@@ -596,7 +602,7 @@ public: // Creation
 	FArray6D
 	shape( FArray6S< U > const & a, T const & t )
 	{
-		return FArray6D( a.size1(), a.size2(), a.size3(), a.size4(), a.size5(), a.size6(), t );
+		return FArray6D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), a.isize6(), t );
 	}
 
 	// MArray Shape Named Constructor Template
@@ -606,7 +612,7 @@ public: // Creation
 	FArray6D
 	shape( MArray6< A, M > const & a )
 	{
-		return FArray6D( a.size1(), a.size2(), a.size3(), a.size4(), a.size5(), a.size6() );
+		return FArray6D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), a.isize6() );
 	}
 
 	// MArray Shape + Initializer Value Named Constructor Template
@@ -616,7 +622,7 @@ public: // Creation
 	FArray6D
 	shape( MArray6< A, M > const & a, T const & t )
 	{
-		return FArray6D( a.size1(), a.size2(), a.size3(), a.size4(), a.size5(), a.size6(), t );
+		return FArray6D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), a.isize6(), t );
 	}
 
 	// One-Based Copy Named Constructor Template
@@ -626,7 +632,7 @@ public: // Creation
 	FArray6D
 	one_based( FArray6< U > const & a )
 	{
-		return FArray6D( a, a.size1(), a.size2(), a.size3(), a.size4(), a.size5(), a.size6() );
+		return FArray6D( a, a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), a.isize6() );
 	}
 
 	// One-Based Slice Named Constructor Template
@@ -636,7 +642,7 @@ public: // Creation
 	FArray6D
 	one_based( FArray6S< U > const & a )
 	{
-		return FArray6D( a.size1(), a.size2(), a.size3(), a.size4(), a.size5(), a.size6(), a );
+		return FArray6D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), a.isize6(), a );
 	}
 
 	// One-Based MArray Named Constructor Template
@@ -646,7 +652,7 @@ public: // Creation
 	FArray6D
 	one_based( MArray6< A, M > const & a )
 	{
-		return FArray6D( a.size1(), a.size2(), a.size3(), a.size4(), a.size5(), a.size6(), a );
+		return FArray6D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), a.isize6(), a );
 	}
 
 	// Destructor
@@ -1114,6 +1120,14 @@ public: // Inspector
 	size6() const
 	{
 		return I6_.size();
+	}
+
+	// Size of Dimension 6
+	inline
+	int
+	isize6() const
+	{
+		return I6_.isize();
 	}
 
 public: // Modifier

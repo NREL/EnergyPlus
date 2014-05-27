@@ -121,6 +121,7 @@ namespace DesiccantDehumidifiers {
 	// Performance Model
 	int const PM_Default( 1 ); // Performance Model = default
 	int const PM_UserCurves( 2 ); // Performance Model = user curve
+	static std::string const fluidNameSteam( "STEAM" );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -304,6 +305,7 @@ namespace DesiccantDehumidifiers {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetDesiccantDehumidifierInput: " ); // include trailing blank space
+		static std::string const dehumidifierDesiccantNoFans( "Dehumidifier:Desiccant:NoFans" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -353,13 +355,13 @@ namespace DesiccantDehumidifiers {
 		static Real64 SteamDensity( 0.0 ); // density of steam at 100C
 		int SteamIndex; // steam coil Index
 
-		NumSolidDesicDehums = GetNumObjectsFound( "Dehumidifier:Desiccant:NoFans" );
+		NumSolidDesicDehums = GetNumObjectsFound( dehumidifierDesiccantNoFans );
 		NumGenericDesicDehums = GetNumObjectsFound( "Dehumidifier:Desiccant:System" );
 		NumDesicDehums = NumSolidDesicDehums + NumGenericDesicDehums;
 		// allocate the data array
 		DesicDehum.allocate( NumDesicDehums );
 
-		GetObjectDefMaxArgs( "Dehumidifier:Desiccant:NoFans", TotalArgs, NumAlphas, NumNumbers );
+		GetObjectDefMaxArgs( dehumidifierDesiccantNoFans, TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		GetObjectDefMaxArgs( "Dehumidifier:Desiccant:System", TotalArgs, NumAlphas, NumNumbers );
@@ -380,7 +382,7 @@ namespace DesiccantDehumidifiers {
 		lNumericBlanks = true;
 
 		// loop over solid desiccant dehumidifiers and load the input data
-		CurrentModuleObject = "Dehumidifier:Desiccant:NoFans";
+		CurrentModuleObject = dehumidifierDesiccantNoFans;
 		for ( DesicDehumIndex = 1; DesicDehumIndex <= NumSolidDesicDehums; ++DesicDehumIndex ) {
 			RegenCoilAirInletNode = 0;
 			RegenCoilAirOutletNode = 0;
@@ -527,7 +529,7 @@ namespace DesiccantDehumidifiers {
 					DesicDehum( DesicDehumNum ).MaxCoilFluidFlow = GetCoilMaxSteamFlowRate( DesicDehum( DesicDehumNum ).RegenCoilIndex, errFlag );
 					if ( DesicDehum( DesicDehumNum ).MaxCoilFluidFlow > 0.0 ) {
 						SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-						SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "Dehumidifier:Desiccant:NoFans" );
+						SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, dehumidifierDesiccantNoFans );
 						DesicDehum( DesicDehumNum ).MaxCoilFluidFlow *= SteamDensity;
 					}
 
@@ -953,7 +955,7 @@ namespace DesiccantDehumidifiers {
 						DesicDehum( DesicDehumNum ).MaxCoilFluidFlow = GetCoilMaxSteamFlowRate( DesicDehum( DesicDehumNum ).RegenCoilIndex, errFlag );
 						if ( DesicDehum( DesicDehumNum ).MaxCoilFluidFlow > 0.0 ) {
 							SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-							SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "Dehumidifier:Desiccant:NoFans" );
+							SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, dehumidifierDesiccantNoFans );
 							DesicDehum( DesicDehumNum ).MaxCoilFluidFlow *= SteamDensity;
 						}
 
@@ -1353,7 +1355,8 @@ namespace DesiccantDehumidifiers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "InitDesiccantDehumidifier" );
+		static std::string const initCBVAV( "InitCBVAV" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1403,7 +1406,7 @@ namespace DesiccantDehumidifiers {
 					ErrorFlag = false;
 					DesicDehum( DesicDehumNum ).MaxCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", DesicDehum( DesicDehumNum ).RegenCoilName, ErrorFlag );
 					if ( DesicDehum( DesicDehumNum ).MaxCoilFluidFlow > 0.0 ) {
-						FluidDensity = GetDensityGlycol( PlantLoop( DesicDehum( DesicDehumNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( DesicDehum( DesicDehumNum ).LoopNum ).FluidIndex, "InitCBVAV" );
+						FluidDensity = GetDensityGlycol( PlantLoop( DesicDehum( DesicDehumNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( DesicDehum( DesicDehumNum ).LoopNum ).FluidIndex, initCBVAV );
 						DesicDehum( DesicDehumNum ).MaxCoilFluidFlow *= FluidDensity;
 					}
 
@@ -1420,7 +1423,7 @@ namespace DesiccantDehumidifiers {
 
 					if ( DesicDehum( DesicDehumNum ).MaxCoilFluidFlow > 0.0 ) {
 						SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-						FluidDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "InitDesiccantDehumidifier" );
+						FluidDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName );
 						DesicDehum( DesicDehumNum ).MaxCoilFluidFlow *= FluidDensity;
 					}
 
@@ -1506,7 +1509,7 @@ namespace DesiccantDehumidifiers {
 								ErrorsFound = true;
 							}
 							if ( CoilMaxVolFlowRate != AutoSize ) {
-								FluidDensity = GetDensityGlycol( PlantLoop( DesicDehum( DesicDehumNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( DesicDehum( DesicDehumNum ).LoopNum ).FluidIndex, "InitDesiccantDehumidifier" );
+								FluidDensity = GetDensityGlycol( PlantLoop( DesicDehum( DesicDehumNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( DesicDehum( DesicDehumNum ).LoopNum ).FluidIndex, RoutineName );
 								DesicDehum( DesicDehumNum ).MaxCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;
 							}
 						}
@@ -1519,7 +1522,7 @@ namespace DesiccantDehumidifiers {
 							}
 							if ( CoilMaxVolFlowRate != AutoSize ) {
 								SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-								FluidDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "InitDesiccantDehumidifier" );
+								FluidDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName );
 								DesicDehum( DesicDehumNum ).MaxCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;
 							}
 						}

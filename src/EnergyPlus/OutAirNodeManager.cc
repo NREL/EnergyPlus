@@ -53,6 +53,7 @@ namespace OutAirNodeManager {
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS:
+	static std::string const BlankString;
 
 	//Type declarations in OutAirNodeManager module
 
@@ -372,7 +373,7 @@ namespace OutAirNodeManager {
 
 			if ( Node( NodeNum ).EMSOverrideOutAirWetBulb ) {
 				Node( NodeNum ).OutAirWetBulb = Node( NodeNum ).EMSValueForOutAirWetBulb;
-				Node( NodeNum ).HumRat = PsyWFnTdbTwbPb( Node( NodeNum ).OutAirDryBulb, Node( NodeNum ).OutAirWetBulb, OutBaroPress );
+				Node( NodeNum ).HumRat = PsyWFnTdbTwbPb( Node( NodeNum ).OutAirDryBulb, Node( NodeNum ).OutAirWetBulb, OutBaroPress, BlankString );
 				Node( NodeNum ).Enthalpy = PsyHFnTdbW( Node( NodeNum ).OutAirDryBulb, Node( NodeNum ).HumRat );
 			} else {
 				Node( NodeNum ).HumRat = OutHumRat;

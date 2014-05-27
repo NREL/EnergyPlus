@@ -72,6 +72,8 @@ namespace SolarCollectors {
 	int const ICSRectangularTank( 1 );
 	//INTEGER, PARAMETER :: ICSProgressiveTube = 2
 
+	static std::string const fluidNameWater( "WATER" );
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE TYPE DECLARATIONS:
@@ -759,6 +761,7 @@ namespace SolarCollectors {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static std::string const RoutineName( "InitSolarCollector" );
 		int InletNode;
 		int OutletNode;
 
@@ -815,7 +818,7 @@ namespace SolarCollectors {
 		if ( BeginEnvrnFlag && Collector( CollectorNum ).Init ) {
 			// Clear node initial conditions
 			if ( Collector( CollectorNum ).VolFlowRateMax > 0 ) { //CR7425
-				rho = GetDensityGlycol( PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidName, InitConvTemp, PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidIndex, "InitSolarCollector" );
+				rho = GetDensityGlycol( PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidName, InitConvTemp, PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidIndex, RoutineName );
 
 				Collector( CollectorNum ).MassFlowRateMax = Collector( CollectorNum ).VolFlowRateMax * rho;
 			} else { //CR7425
@@ -968,6 +971,7 @@ namespace SolarCollectors {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static std::string const RoutineName( "CalcSolarCollector" );
 		int SurfNum; // Surface object number for collector
 		int ParamNum; // Collector parameters object number
 		Real64 Tilt; // Surface tilt angle (degrees)
@@ -1020,7 +1024,7 @@ namespace SolarCollectors {
 
 		MassFlowRate = Collector( CollectorNum ).MassFlowRate;
 
-		Cp = GetSpecificHeatGlycol( PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidName, InletTemp, PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidIndex, "CalcSolarCollector" );
+		Cp = GetSpecificHeatGlycol( PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidName, InletTemp, PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidIndex, RoutineName );
 
 		Area = Surface( SurfNum ).Area;
 		mCpA = MassFlowRate * Cp / Area;
@@ -1262,7 +1266,7 @@ namespace SolarCollectors {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "CalcICSSolarCollector" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//  REAL(r64) :: TimeElapsed             ! Fraction of the current hour that has elapsed (h)
@@ -1329,9 +1333,9 @@ namespace SolarCollectors {
 
 		MassFlowRate = Collector( ColleNum ).MassFlowRate;
 
-		Cpw = GetSpecificHeatGlycol( PlantLoop( Collector( ColleNum ).WLoopNum ).FluidName, InletTemp, PlantLoop( Collector( ColleNum ).WLoopNum ).FluidIndex, "CalcICSSolarCollector" );
+		Cpw = GetSpecificHeatGlycol( PlantLoop( Collector( ColleNum ).WLoopNum ).FluidName, InletTemp, PlantLoop( Collector( ColleNum ).WLoopNum ).FluidIndex, RoutineName );
 
-		Rhow = GetDensityGlycol( PlantLoop( Collector( ColleNum ).WLoopNum ).FluidName, InletTemp, PlantLoop( Collector( ColleNum ).WLoopNum ).FluidIndex, "CalcICSSolarCollector" );
+		Rhow = GetDensityGlycol( PlantLoop( Collector( ColleNum ).WLoopNum ).FluidName, InletTemp, PlantLoop( Collector( ColleNum ).WLoopNum ).FluidIndex, RoutineName );
 
 		// calculate heat transfer coefficients and covers temperature:
 		CalcHeatTransCoeffAndCoverTemp( ColleNum );
@@ -2076,16 +2080,16 @@ namespace SolarCollectors {
 		DeltaT = std::abs( TAbsorber - TWater );
 		TReference = TAbsorber - 0.25 * ( TAbsorber - TWater );
 		// record fluid prop index for water
-		WaterIndex = FindGlycol( "WATER" );
+		WaterIndex = FindGlycol( fluidNameWater );
 		// find properties of water - always assume water
-		WaterSpecHeat = GetSpecificHeatGlycol( "WATER", max( TReference, 0.0 ), WaterIndex, CalledFrom );
-		CondOfWater = GetConductivityGlycol( "WATER", max( TReference, 0.0 ), WaterIndex, CalledFrom );
-		VisOfWater = GetViscosityGlycol( "WATER", max( TReference, 0.0 ), WaterIndex, CalledFrom );
-		DensOfWater = GetDensityGlycol( "WATER", max( TReference, 0.0 ), WaterIndex, CalledFrom );
+		WaterSpecHeat = GetSpecificHeatGlycol( fluidNameWater, max( TReference, 0.0 ), WaterIndex, CalledFrom );
+		CondOfWater = GetConductivityGlycol( fluidNameWater, max( TReference, 0.0 ), WaterIndex, CalledFrom );
+		VisOfWater = GetViscosityGlycol( fluidNameWater, max( TReference, 0.0 ), WaterIndex, CalledFrom );
+		DensOfWater = GetDensityGlycol( fluidNameWater, max( TReference, 0.0 ), WaterIndex, CalledFrom );
 		PrOfWater = VisOfWater * WaterSpecHeat / CondOfWater;
 		// Requires a different reference temperature for volumetric expansion coefficient
 		TReference = TWater - 0.25 * ( TWater - TAbsorber );
-		VolExpWater = -( GetDensityGlycol( "WATER", max( TReference, 10.0 ) + 5.0, WaterIndex, CalledFrom ) - GetDensityGlycol( "WATER", max( TReference, 10.0 ) - 5.0, WaterIndex, CalledFrom ) ) / ( 10.0 * DensOfWater );
+		VolExpWater = -( GetDensityGlycol( fluidNameWater, max( TReference, 10.0 ) + 5.0, WaterIndex, CalledFrom ) - GetDensityGlycol( fluidNameWater, max( TReference, 10.0 ) - 5.0, WaterIndex, CalledFrom ) ) / ( 10.0 * DensOfWater );
 
 		GrNum = gravity * VolExpWater * DensOfWater * DensOfWater * PrOfWater * DeltaT * ( std::pow( Lc, 3 ) ) / ( std::pow( VisOfWater, 2 ) );
 		CosTilt = std::cos( TiltR2V * DegToRadians );
@@ -2148,6 +2152,7 @@ namespace SolarCollectors {
 		// SUBROUTINE ARGUMENT DEFINITIONS: na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static std::string const RoutineName( "UpdateSolarCollector" );
 		int InletNode;
 		int OutletNode;
 		Real64 Cp;
@@ -2159,7 +2164,7 @@ namespace SolarCollectors {
 		SafeCopyPlantNode( InletNode, OutletNode );
 		// Set outlet node variables that are possibly changed
 		Node( OutletNode ).Temp = Collector( CollectorNum ).OutletTemp;
-		Cp = GetSpecificHeatGlycol( PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidName, Collector( CollectorNum ).OutletTemp, PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidIndex, "UpdateSolarCollector" );
+		Cp = GetSpecificHeatGlycol( PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidName, Collector( CollectorNum ).OutletTemp, PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidIndex, RoutineName );
 		Node( OutletNode ).Enthalpy = Cp * Node( OutletNode ).Temp;
 
 	}

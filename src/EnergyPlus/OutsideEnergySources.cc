@@ -506,7 +506,7 @@ namespace OutsideEnergySources {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "SimDistrictEnergy" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -539,7 +539,7 @@ namespace OutsideEnergySources {
 		LoopMinTemp = PlantLoop( LoopNum ).MinTemp;
 		LoopMaxTemp = PlantLoop( LoopNum ).MaxTemp;
 
-		Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, InletTemp, PlantLoop( LoopNum ).FluidIndex, "SimDistrictEnergy" );
+		Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, InletTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 
 		//  apply power limit from input
 		CapFraction = GetCurrentScheduleValue( EnergySource( DistrictEqNum ).CapFractionSchedNum );

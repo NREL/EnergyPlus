@@ -409,9 +409,9 @@ namespace ReportSizingManager {
 								OutTemp = 0.0;
 							}
 							rhoair = PsyRhoAirFnPbTdbW ( StdBaroPress, CoilInTemp, CoilInHumRat, CallString );
-							CoilInEnth = PsyHFnTdbW ( CoilInTemp, CoilInHumRat, CallString );
+							CoilInEnth = PsyHFnTdbW ( CoilInTemp, CoilInHumRat );
 							CoilInWetBulb = PsyTwbFnTdbWPb ( CoilInTemp, CoilInHumRat, StdBaroPress, CallString );
-							CoilOutEnth = PsyHFnTdbW ( CoilOutTemp, CoilOutHumRat, CallString );
+							CoilOutEnth = PsyHFnTdbW ( CoilOutTemp, CoilOutHumRat );
 							if ( DataTotCapCurveIndex > 0 ) {
 								TotCapTempModFac = CurveValue ( DataTotCapCurveIndex, CoilInWetBulb, OutTemp );
 							} else {
@@ -598,9 +598,9 @@ namespace ReportSizingManager {
 								}
 								OutTemp = FinalSysSizing ( CurSysNum ).CoolOutTemp;
 								rhoair = PsyRhoAirFnPbTdbW ( StdBaroPress, CoilInTemp, CoilInHumRat, CallString );
-								CoilInEnth = PsyHFnTdbW ( CoilInTemp, CoilInHumRat, CallString );
+								CoilInEnth = PsyHFnTdbW ( CoilInTemp, CoilInHumRat );
 								CoilInWetBulb = PsyTwbFnTdbWPb ( CoilInTemp, CoilInHumRat, StdBaroPress, CallString );
-								CoilOutEnth = PsyHFnTdbW ( CoilOutTemp, CoilOutHumRat, CallString );
+								CoilOutEnth = PsyHFnTdbW ( CoilOutTemp, CoilOutHumRat );
 								if ( DataTotCapCurveIndex > 0 ) {
 									TotCapTempModFac = CurveValue ( DataTotCapCurveIndex, CoilInWetBulb, OutTemp );
 								} else {

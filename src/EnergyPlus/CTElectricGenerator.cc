@@ -527,6 +527,7 @@ namespace CTElectricGenerator {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const ExhaustCP( 1.047 ); // Exhaust Gas Specific Heat (J/kg-K)
 		Real64 const KJtoJ( 1000. ); // convert Kjoules to joules
+		static std::string const RoutineName( "CalcCTGeneratorModel" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// INTERFACE
@@ -585,7 +586,7 @@ namespace CTElectricGenerator {
 			HeatRecInNode = CTGenerator( GeneratorNum ).HeatRecInletNodeNum;
 			HeatRecInTemp = Node( HeatRecInNode ).Temp;
 
-			HeatRecCp = GetSpecificHeatGlycol( PlantLoop( CTGenerator( GeneratorNum ).HRLoopNum ).FluidName, HeatRecInTemp, PlantLoop( CTGenerator( GeneratorNum ).HRLoopNum ).FluidIndex, "CalcCTGeneratorModel" );
+			HeatRecCp = GetSpecificHeatGlycol( PlantLoop( CTGenerator( GeneratorNum ).HRLoopNum ).FluidName, HeatRecInTemp, PlantLoop( CTGenerator( GeneratorNum ).HRLoopNum ).FluidIndex, RoutineName );
 			if ( FirstHVACIteration && RunFlag ) {
 				HeatRecMdot = CTGenerator( GeneratorNum ).DesignHeatRecMassFlowRate;
 			} else {
@@ -769,7 +770,7 @@ namespace CTElectricGenerator {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "InitICEngineGenerators" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -817,7 +818,7 @@ namespace CTElectricGenerator {
 			HeatRecOutletNode = CTGenerator( GeneratorNum ).HeatRecOutletNodeNum;
 
 			//size mass flow rate
-			rho = GetDensityGlycol( PlantLoop( CTGenerator( GeneratorNum ).HRLoopNum ).FluidName, InitConvTemp, PlantLoop( CTGenerator( GeneratorNum ).HRLoopNum ).FluidIndex, "InitICEngineGenerators" );
+			rho = GetDensityGlycol( PlantLoop( CTGenerator( GeneratorNum ).HRLoopNum ).FluidName, InitConvTemp, PlantLoop( CTGenerator( GeneratorNum ).HRLoopNum ).FluidIndex, RoutineName );
 
 			CTGenerator( GeneratorNum ).DesignHeatRecMassFlowRate = rho * CTGenerator( GeneratorNum ).DesignHeatRecVolFlowRate;
 
