@@ -185,6 +185,7 @@ namespace Pumps {
 		bool HeatLossesToZone; // if true then pump losses added to surrounding zone
 		int ZoneNum; // index for zone surrounding pump
 		Real64 SkinLossRadFraction; // radiative split for skin losses to zone
+		bool LoopSolverOverwriteFlag; // loop solver overwrite for determining pump minimum flow rate
 
 		// Default Constructor
 		PumpSpecs() :
@@ -236,64 +237,66 @@ namespace Pumps {
 			OneTimePressureWarning( true ),
 			HeatLossesToZone( false ),
 			ZoneNum( 0 ),
-			SkinLossRadFraction( 0.0 )
+			SkinLossRadFraction( 0.0 ),
+			LoopSolverOverwriteFlag( false )
 		{}
 
 		// Member Constructor
-		PumpSpecs(
-			std::string const & Name, // user identifier
-			std::string const & PumpSchedule, // Schedule to modify the design nominal capacity of the pump
-			std::string const & PressureCurve_Name, // - placeholder for pump curve name
-			int const PumpType, // pump type integer, based on local parameter values, used to identify
-			int const TypeOf_Num, // pump type of number in reference to the dataplant values
-			int const LoopNum, // loop where pump is located
-			int const LoopSideNum, // LoopSide index on loop where pump is located
-			int const BranchNum, // branch index on LoopSide where pump is located
-			int const CompNum, // component index on branch where pump is located
-			int const PumpControl, // Integer equivalent of PumpControlType
-			int const PumpScheduleIndex, // Schedule Pointer
-			int const InletNodeNum, // Node number on the inlet side of the plant
-			int const OutletNodeNum, // Node number on the outlet side of the plant
-			int const SequencingScheme, // Optimal, Sequential, User-Defined
-			int const FluidIndex, // Index for Fluid Properties
-			int const NumPumpsInBank, // Node number on the inlet side of the plant
-			int const PowerErrIndex1, // for recurring errors
-			int const PowerErrIndex2, // for recurring errors
-			Real64 const MinVolFlowRateFrac, // minimum schedule value fraction modifier
-			Real64 const NomVolFlowRate, // design nominal capacity of Pump
-			Real64 const MassFlowRateMax, // design nominal capacity of Pump
-			bool const EMSMassFlowOverrideOn, // if true, then EMS is calling to override flow requests.
-			Real64 const EMSMassFlowValue, // EMS value to use for mass flow rate [kg/s]
-			Real64 const NomSteamVolFlowRate, // For Steam Pump
-			Real64 const MinVolFlowRate, // For a Variable Flow Pump this is the minimum capacity during operation.
-			Real64 const MassFlowRateMin, // For a Variable Flow Pump this is the minimum capacity during operation.
-			Real64 const NomPumpHead, // design nominal head pressure of Pump, [Pa]
-			bool const EMSPressureOverrideOn, // if true, EMS is calling to override pump pressure
-			Real64 const EMSPressureOverrideValue, // EMS value to use for pressure [Pa]
-			Real64 const NomPowerUse, // design nominal capacity of Pump
-			Real64 const MotorEffic, // efficiency of the motor
-			Real64 const PumpEffic, // efficiency of the pump
-			Real64 const FracMotorLossToFluid, // ?????
-			Real64 const Energy, // Energy consumed
-			Real64 const Power, // Power used
-			FArray1< Real64 > const & PartLoadCoef, // Pump Curve Coefficients
-			int const PressureCurve_Index, // Pointer to a pump coefficient curve
-			Real64 const PumpMassFlowRateMaxRPM, // Mass flow rate calculated from maximum rpm
-			Real64 const PumpMassFlowRateMinRPM, // Mass flow rate calculated from minimum rpm
-			Real64 const MinPhiValue, // Minimum value of Phi (from CurveManager)
-			Real64 const MaxPhiValue, // Maximum value of Phi (from CurveManager)
-			Real64 const ImpellerDiameter, // Pump Impeller Diameter [m]
-			Real64 const RotSpeed_RPM, // Rotational speed used for input in revs/min
-			Real64 const RotSpeed, // Rotational speed for calculations in revs/sec
-			bool const PumpInitFlag,
-			bool const PumpOneTimeFlag,
-			bool const CheckEquipName,
-			bool const HasVFD,
-			PumpVFDControlData const & VFD,
-			bool const OneTimePressureWarning,
-			bool const HeatLossesToZone, // if true then pump losses added to surrounding zone
-			int const ZoneNum, // index for zone surrounding pump
-			Real64 const SkinLossRadFraction // radiative split for skin losses to zone
+			PumpSpecs(
+				std::string const & Name, // user identifier
+				std::string const & PumpSchedule, // Schedule to modify the design nominal capacity of the pump
+				std::string const & PressureCurve_Name, // - placeholder for pump curve name
+				int const PumpType, // pump type integer, based on local parameter values, used to identify
+				int const TypeOf_Num, // pump type of number in reference to the dataplant values
+				int const LoopNum, // loop where pump is located
+				int const LoopSideNum, // LoopSide index on loop where pump is located
+				int const BranchNum, // branch index on LoopSide where pump is located
+				int const CompNum, // component index on branch where pump is located
+				int const PumpControl, // Integer equivalent of PumpControlType
+				int const PumpScheduleIndex, // Schedule Pointer
+				int const InletNodeNum, // Node number on the inlet side of the plant
+				int const OutletNodeNum, // Node number on the outlet side of the plant
+				int const SequencingScheme, // Optimal, Sequential, User-Defined
+				int const FluidIndex, // Index for Fluid Properties
+				int const NumPumpsInBank, // Node number on the inlet side of the plant
+				int const PowerErrIndex1, // for recurring errors
+				int const PowerErrIndex2, // for recurring errors
+				Real64 const MinVolFlowRateFrac, // minimum schedule value fraction modifier
+				Real64 const NomVolFlowRate, // design nominal capacity of Pump
+				Real64 const MassFlowRateMax, // design nominal capacity of Pump
+				bool const EMSMassFlowOverrideOn, // if true, then EMS is calling to override flow requests.
+				Real64 const EMSMassFlowValue, // EMS value to use for mass flow rate [kg/s]
+				Real64 const NomSteamVolFlowRate, // For Steam Pump
+				Real64 const MinVolFlowRate, // For a Variable Flow Pump this is the minimum capacity during operation.
+				Real64 const MassFlowRateMin, // For a Variable Flow Pump this is the minimum capacity during operation.
+				Real64 const NomPumpHead, // design nominal head pressure of Pump, [Pa]
+				bool const EMSPressureOverrideOn, // if true, EMS is calling to override pump pressure
+				Real64 const EMSPressureOverrideValue, // EMS value to use for pressure [Pa]
+				Real64 const NomPowerUse, // design nominal capacity of Pump
+				Real64 const MotorEffic, // efficiency of the motor
+				Real64 const PumpEffic, // efficiency of the pump
+				Real64 const FracMotorLossToFluid, // ?????
+				Real64 const Energy, // Energy consumed
+				Real64 const Power, // Power used
+				FArray1< Real64 > const & PartLoadCoef, // Pump Curve Coefficients
+				int const PressureCurve_Index, // Pointer to a pump coefficient curve
+				Real64 const PumpMassFlowRateMaxRPM, // Mass flow rate calculated from maximum rpm
+				Real64 const PumpMassFlowRateMinRPM, // Mass flow rate calculated from minimum rpm
+				Real64 const MinPhiValue, // Minimum value of Phi (from CurveManager)
+				Real64 const MaxPhiValue, // Maximum value of Phi (from CurveManager)
+				Real64 const ImpellerDiameter, // Pump Impeller Diameter [m]
+				Real64 const RotSpeed_RPM, // Rotational speed used for input in revs/min
+				Real64 const RotSpeed, // Rotational speed for calculations in revs/sec
+				bool const PumpInitFlag,
+				bool const PumpOneTimeFlag,
+				bool const CheckEquipName,
+				bool const HasVFD,
+				PumpVFDControlData const & VFD,
+				bool const OneTimePressureWarning,
+				bool const HeatLossesToZone, // if true then pump losses added to surrounding zone
+				int const ZoneNum, // index for zone surrounding pump
+				Real64 const SkinLossRadFraction, // radiative split for skin losses to zone
+				bool const LoopSolverOverwriteFlag
 		) :
 			Name( Name ),
 			PumpSchedule( PumpSchedule ),
@@ -347,7 +350,8 @@ namespace Pumps {
 			OneTimePressureWarning( OneTimePressureWarning ),
 			HeatLossesToZone( HeatLossesToZone ),
 			ZoneNum( ZoneNum ),
-			SkinLossRadFraction( SkinLossRadFraction )
+			SkinLossRadFraction( SkinLossRadFraction ),
+			LoopSolverOverwriteFlag( LoopSolverOverwriteFlag )
 		{}
 
 	};
