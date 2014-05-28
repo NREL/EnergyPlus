@@ -1152,7 +1152,6 @@ namespace Fans {
 		SizingString = FanNumericFields( FanNum ).FieldNames( FieldNum ) + " [m3/s]";
 		CompType = Fan( FanNum ).FanType;
 		CompName = Fan( FanNum ).FanName;
-		Fan ( FanNum ).MaxAirFlowRateEMSOverrideOn;
 		DataEMSOverrideON = Fan( FanNum ).MaxAirFlowRateEMSOverrideOn;
 		DataEMSOverride = Fan( FanNum ).MaxAirFlowRateEMSOverrideValue;
 		RequestSizing( CompType, CompName, SystemAirflowSizing, SizingString, TempFlow, bPRINT, RoutineName );
