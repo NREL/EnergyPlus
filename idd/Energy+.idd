@@ -57865,7 +57865,7 @@ ChillerHeaterPerformance:Electric:EIR,
        \type real
        \units m3/s
        \minimum 0.0
-       \default 0.0
+       \autosizable
        \ip-units gal/min
   N15, \field Compressor Motor Efficiency
        \type real
