@@ -54,7 +54,7 @@ TEST( TypeTraitsTest, TypeTests )
 	EXPECT_FALSE( extends_type_of( b, d ) );
 
 //	B * p( &d ); // polymorphic pointer
-//	EXPECT_DEATH( extends_type_of( d, *p ), "Assertion failed!" );
+//	EXPECT_DEBUG_DEATH( extends_type_of( d, *p ), "Assertion failed!" );
 
 	EXPECT_TRUE( is_a< B >( d ) );
 	EXPECT_TRUE( is_a< D >( d ) );

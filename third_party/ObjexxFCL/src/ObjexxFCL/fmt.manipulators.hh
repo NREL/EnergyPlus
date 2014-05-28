@@ -16,6 +16,7 @@
 // C++ Headers
 #include <climits>
 #include <cmath>
+#include <cstddef>
 #include <cstdlib>
 #include <iomanip>
 #include <sstream>
@@ -82,6 +83,8 @@ struct Signed< true >
 // Binary Formatted Output Facet
 struct Binary_num_put : std::num_put< char >
 {
+
+	typedef  std::size_t  Size;
 
 	using std::num_put< char >::do_put;
 
@@ -150,7 +153,7 @@ private: // Static Methods
 			v /= 2;
 		}
 		std::ios_base::fmtflags const flags( str.flags() );
-		bool const showplus( flags & std::ios::showpos );
+		bool const showplus( ( flags & std::ios::showpos ) != 0 );
 		std::streamsize const v_wid( i + ( negative || showplus ? 1ul : 0ul ) );
 		std::streamsize const str_wid( str.width() );
 		if ( ( str_wid > 0 ) && ( v_wid > str_wid ) ) { // Fortran *-fills when output is too wide
@@ -158,7 +161,7 @@ private: // Static Methods
 			str.width( 0 ); // Reset the width
 			return out;
 		}
-		unsigned long int const fill_width( str_wid >= v_wid ? str_wid - v_wid : 0 );
+		Size const fill_width( str_wid >= v_wid ? str_wid - v_wid : 0ul );
 		if ( ( flags & std::ios::right ) || ( ! ( flags & ( std::ios::internal | std::ios::left ) ) ) ) std::fill_n( out, fill_width, fill ); // Front fill
 		if ( negative ) {
 			*out++ = '-';
@@ -178,12 +181,14 @@ private: // Static Methods
 struct Exponent_num_put : std::num_put< char >
 {
 
+	typedef  std::size_t  Size;
+
 	using std::num_put< char >::do_put;
 
 	// Constructor
 	inline
 	explicit
-	Exponent_num_put( unsigned int const d, unsigned int const e = 2u, int const k = 0, char const E = 'E' ) :
+	Exponent_num_put( Size const d, Size const e = 2ul, int const k = 0, char const E = 'E' ) :
 		d_( d ),
 		e_( e ),
 		k_( k ),
@@ -303,7 +308,7 @@ private: // Static Methods
 #ifdef OBJEXXFCL_FMT_STRICT_EXPONENTS
 		if ( ( e_ == 2 ) && ( std::abs( vexp ) > 99 ) ) { // Use compact +eee or -eee exponent: Fortran Ew.d and Dw.d behavior
 #else
-		if ( ( vexp != 0 ) && ( static_cast< unsigned int >( std::log10( std::abs( vexp ) ) ) + 1u > e_ ) ) { // Use compact exponent whenever it helps
+		if ( ( vexp != 0 ) && ( static_cast< Size >( std::log10( std::abs( vexp ) ) ) + 1ul > e_ ) ) { // Use compact exponent whenever it helps
 #endif
 			s << std::setw( e_ + 2 ) << vexp;
 		} else { // Use normal exponent with specified width
@@ -311,7 +316,7 @@ private: // Static Methods
 		}
 		std::string v_str( s.str() );
 		std::ios_base::fmtflags const flags( str.flags() );
-		bool const showplus( flags & std::ios::showpos );
+		bool const showplus( ( flags & std::ios::showpos ) != 0 );
 		std::streamsize v_wid( v_str.length() + ( negative || showplus ? 1ul : 0ul ) );
 		std::streamsize const str_wid( str.width() );
 		if ( ( str_wid > 0 ) && ( v_wid > str_wid ) && ( v_str.substr( 0, 2 ) == "0." ) ) { // Drop leading 0 to narrow output
@@ -323,7 +328,7 @@ private: // Static Methods
 			str.width( 0 ); // Reset the width
 			return out;
 		}
-		unsigned long int const fill_width( str_wid >= v_wid ? str_wid - v_wid : 0 );
+		Size const fill_width( str_wid >= v_wid ? str_wid - v_wid : 0ul );
 		if ( ( flags & std::ios::right ) || ( ! ( flags & ( std::ios::internal | std::ios::left ) ) ) ) std::fill_n( out, fill_width, fill ); // Front fill
 		if ( negative ) {
 			*out++ = '-';
@@ -331,7 +336,7 @@ private: // Static Methods
 			*out++ = '+';
 		}
 		if ( flags & std::ios::internal ) std::fill_n( out, fill_width, fill ); // Internal fill
-		for ( int i = 0, e = v_str.length(); i < e; ++i ) *out++ = v_str[ i ];
+		for ( std::string::size_type i = 0, e = v_str.length(); i < e; ++i ) *out++ = v_str[ i ];
 		if ( flags & std::ios::left ) std::fill_n( out, fill_width, fill ); // Back fill
 		str.width( 0 ); // Reset the width
 		return out;
@@ -339,8 +344,8 @@ private: // Static Methods
 
 private: // Data
 
-	unsigned int d_; // Digits after decimal point
-	unsigned int e_; // Exponent width
+	Size d_; // Digits after decimal point
+	Size e_; // Exponent width
 	int k_; // Scale factor
 	char E_; // Exponent prefix character
 
@@ -350,12 +355,14 @@ private: // Data
 struct Engineering_num_put : std::num_put< char >
 {
 
+	typedef  std::size_t  Size;
+
 	using std::num_put< char >::do_put;
 
 	// Constructor
 	inline
 	explicit
-	Engineering_num_put( unsigned int const d, unsigned int const e = 2u ) :
+	Engineering_num_put( Size const d, Size const e = 2ul ) :
 		d_( d ),
 		e_( e )
 	{}
@@ -451,7 +458,7 @@ private: // Static Methods
 #ifdef OBJEXXFCL_FMT_STRICT_EXPONENTS
 		if ( ( e_ == 2 ) && ( std::abs( vexp ) > 99 ) ) { // Use compact +eee or -eee exponent: Fortran Ew.d and Dw.d behavior
 #else
-		if ( ( vexp != 0 ) && ( static_cast< unsigned int >( std::log10( std::abs( vexp ) ) ) + 1u > e_ ) ) { // Use compact exponent whenever it helps
+		if ( ( vexp != 0 ) && ( static_cast< Size >( std::log10( std::abs( vexp ) ) ) + 1ul > e_ ) ) { // Use compact exponent whenever it helps
 #endif
 			s << std::setw( e_ + 2 ) << vexp;
 		} else { // Use normal exponent with specified width
@@ -459,7 +466,7 @@ private: // Static Methods
 		}
 		std::string const v_str( s.str() );
 		std::ios_base::fmtflags const flags( str.flags() );
-		bool const showplus( flags & std::ios::showpos );
+		bool const showplus( ( flags & std::ios::showpos ) != 0 );
 		std::streamsize const v_wid( v_str.length() + ( negative || showplus ? 1ul : 0ul ) );
 		std::streamsize const str_wid( str.width() );
 		if ( ( str_wid > 0 ) && ( v_wid > str_wid ) ) { // Fortran *-fills when output is too wide
@@ -467,7 +474,7 @@ private: // Static Methods
 			str.width( 0 ); // Reset the width
 			return out;
 		}
-		unsigned long int const fill_width( str_wid >= v_wid ? str_wid - v_wid : 0 );
+		Size const fill_width( str_wid >= v_wid ? str_wid - v_wid : 0ul );
 		if ( ( flags & std::ios::right ) || ( ! ( flags & ( std::ios::internal | std::ios::left ) ) ) ) std::fill_n( out, fill_width, fill ); // Front fill
 		if ( negative ) {
 			*out++ = '-';
@@ -475,7 +482,7 @@ private: // Static Methods
 			*out++ = '+';
 		}
 		if ( flags & std::ios::internal ) std::fill_n( out, fill_width, fill ); // Internal fill
-		for ( int i = 0, e = v_str.length(); i < e; ++i ) *out++ = v_str[ i ];
+		for ( std::string::size_type i = 0, e = v_str.length(); i < e; ++i ) *out++ = v_str[ i ];
 		if ( flags & std::ios::left ) std::fill_n( out, fill_width, fill ); // Back fill
 		str.width( 0 ); // Reset the width
 		return out;
@@ -483,8 +490,8 @@ private: // Static Methods
 
 private: // Data
 
-	unsigned int d_; // Digits after decimal point
-	unsigned int e_; // Exponent width
+	Size d_; // Digits after decimal point
+	Size e_; // Exponent width
 
 }; // Engineering_num_put
 
@@ -492,12 +499,14 @@ private: // Data
 struct Scientific_num_put : std::num_put< char >
 {
 
+	typedef  std::size_t  Size;
+
 	using std::num_put< char >::do_put;
 
 	// Constructor
 	inline
 	explicit
-	Scientific_num_put( unsigned int const d, unsigned int const e = 2u ) :
+	Scientific_num_put( Size const d, Size const e = 2ul ) :
 		d_( d ),
 		e_( e )
 	{}
@@ -592,7 +601,7 @@ private: // Static Methods
 #ifdef OBJEXXFCL_FMT_STRICT_EXPONENTS
 		if ( ( e_ == 2 ) && ( std::abs( vexp ) > 99 ) ) { // Use compact +eee or -eee exponent: Fortran Ew.d and Dw.d behavior
 #else
-		if ( ( vexp != 0 ) && ( static_cast< unsigned int >( std::log10( std::abs( vexp ) ) ) + 1u > e_ ) ) { // Use compact exponent whenever it helps
+		if ( ( vexp != 0 ) && ( static_cast< Size >( std::log10( std::abs( vexp ) ) ) + 1ul > e_ ) ) { // Use compact exponent whenever it helps
 #endif
 			s << std::setw( e_ + 2 ) << vexp;
 		} else { // Use normal exponent with specified width
@@ -600,7 +609,7 @@ private: // Static Methods
 		}
 		std::string const v_str( s.str() );
 		std::ios_base::fmtflags const flags( str.flags() );
-		bool const showplus( flags & std::ios::showpos );
+		bool const showplus( ( flags & std::ios::showpos ) != 0 );
 		std::streamsize const v_wid( v_str.length() + ( negative || showplus ? 1ul : 0ul ) );
 		std::streamsize const str_wid( str.width() );
 		if ( ( str_wid > 0 ) && ( v_wid > str_wid ) ) { // Fortran *-fills when output is too wide
@@ -608,7 +617,7 @@ private: // Static Methods
 			str.width( 0 ); // Reset the width
 			return out;
 		}
-		unsigned long int const fill_width( str_wid >= v_wid ? str_wid - v_wid : 0 );
+		Size const fill_width( str_wid >= v_wid ? str_wid - v_wid : 0ul );
 		if ( ( flags & std::ios::right ) || ( ! ( flags & ( std::ios::internal | std::ios::left ) ) ) ) std::fill_n( out, fill_width, fill ); // Front fill
 		if ( negative ) {
 			*out++ = '-';
@@ -616,7 +625,7 @@ private: // Static Methods
 			*out++ = '+';
 		}
 		if ( flags & std::ios::internal ) std::fill_n( out, fill_width, fill ); // Internal fill
-		for ( int i = 0, e = v_str.length(); i < e; ++i ) *out++ = v_str[ i ];
+		for ( std::string::size_type i = 0, e = v_str.length(); i < e; ++i ) *out++ = v_str[ i ];
 		if ( flags & std::ios::left ) std::fill_n( out, fill_width, fill ); // Back fill
 		str.width( 0 ); // Reset the width
 		return out;
@@ -624,8 +633,8 @@ private: // Static Methods
 
 private: // Data
 
-	unsigned int d_; // Digits after decimal point
-	unsigned int e_; // Exponent width
+	Size d_; // Digits after decimal point
+	Size e_; // Exponent width
 
 }; // Scientific_num_put
 

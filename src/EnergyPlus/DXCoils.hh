@@ -1099,7 +1099,7 @@ namespace DXCoils {
 
 		// Default Constructor
 		PerfModeData ():
-			FieldNames( {""} )  // ESL1: What to use for a default constructor here?  This works, but not right.
+			FieldNames( )  
 		{}
 
 		// Member Constructor

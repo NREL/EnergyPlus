@@ -57,8 +57,6 @@ namespace HVACUnitarySystem {
 	extern int const LoadBased; // control system based on zone load
 	extern int const SetPointBased; // control system based on coil set point manager
 
-	extern std::string const Blank;
-
 	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:

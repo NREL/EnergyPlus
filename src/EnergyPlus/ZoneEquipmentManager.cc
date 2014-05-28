@@ -118,7 +118,7 @@ namespace ZoneEquipmentManager {
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
-	// na
+	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -1743,6 +1743,7 @@ namespace ZoneEquipmentManager {
 		static gio::Fmt const ZSizeFmt31( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)" );
 		static gio::Fmt const ZSizeFmt40( "(/'Peak Vol Flow (m3/s)')" );
 		static gio::Fmt const ZSizeFmt41( "(A1,A1,A1,ES12.6,A1,ES12.6)" );
+		static std::string const RoutineName( "UpdateZoneSizing" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2360,7 +2361,7 @@ namespace ZoneEquipmentManager {
 						FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak = ZoneSizing( CtrlZoneNum, DDNumF ).DesCoolSetPtSeq( TimeStepAtPeakF );
 						FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak = ZoneSizing( CtrlZoneNum, DDNumF ).CoolZoneHumRatSeq( TimeStepAtPeakF );
 						if ( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak > 0.0 ) {
-							FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak = min( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak, PsyWFnTdpPb( FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak, StdBaroPress, "UpdateZoneSizing" ) );
+							FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak = min( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak, PsyWFnTdpPb( FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak, StdBaroPress, RoutineName ) );
 
 						} else {
 							FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak = ZoneSizing( CtrlZoneNum, DDNumF ).CoolDesHumRat;
@@ -2480,7 +2481,7 @@ namespace ZoneEquipmentManager {
 						FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak = ZoneSizing( CtrlZoneNum, DDNumF ).DesHeatSetPtSeq( TimeStepAtPeakF );
 						FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak = ZoneSizing( CtrlZoneNum, DDNumF ).HeatZoneHumRatSeq( TimeStepAtPeakF );
 						if ( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak > 0.0 ) {
-							FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak = min( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak, PsyWFnTdpPb( FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak, StdBaroPress, "UpdateZoneSizing" ) );
+							FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak = min( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak, PsyWFnTdpPb( FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak, StdBaroPress, RoutineName ) );
 						} else {
 							FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak = ZoneSizing( CtrlZoneNum, DDNumF ).HeatDesHumRat;
 						}
@@ -3540,7 +3541,7 @@ namespace ZoneEquipmentManager {
 
 				for ( SurfNum = Zone( ActualZoneNum ).SurfaceFirst; SurfNum <= Zone( ActualZoneNum ).SurfaceLast; ++SurfNum ) {
 					if ( SurfaceWindow( SurfNum ).AirflowThisTS > 0.0 && SurfaceWindow( SurfNum ).AirflowDestination == AirFlowWindow_Destination_ReturnAir ) {
-						FlowThisTS = PsyRhoAirFnPbTdbW( OutBaroPress, SurfaceWindow( SurfNum ).TAirflowGapOutlet, Node( ZoneNode ).HumRat ) * SurfaceWindow( SurfNum ).AirflowThisTS * Surface( SurfNum ).Width;
+						FlowThisTS = PsyRhoAirFnPbTdbW( OutBaroPress, SurfaceWindow( SurfNum ).TAirflowGapOutlet, Node( ZoneNode ).HumRat, BlankString ) * SurfaceWindow( SurfNum ).AirflowThisTS * Surface( SurfNum ).Width;
 						WinGapFlowToRA += FlowThisTS;
 						WinGapFlowTtoRA += FlowThisTS * SurfaceWindow( SurfNum ).TAirflowGapOutlet;
 					}
@@ -3593,7 +3594,7 @@ namespace ZoneEquipmentManager {
 				Node( ReturnNode ).Press = Node( ZoneNode ).Press;
 
 				H2OHtOfVap = PsyHgAirFnWTdb( Node( ZoneNode ).HumRat, Node( ReturnNode ).Temp );
-				RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ReturnNode ).Temp, Node( ZoneNode ).HumRat );
+				RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ReturnNode ).Temp, Node( ZoneNode ).HumRat, BlankString );
 
 				// Include impact of under case returns for refrigerated display case when updating the return air node humidity
 				if ( ! Zone( ActualZoneNum ).NoHeatToReturnAir ) {

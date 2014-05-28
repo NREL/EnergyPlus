@@ -2891,8 +2891,8 @@ inline
 Fstring
 general_Fstring_of(
 	T const & t,
-	int const w = TypeTraits< T >::width(), // Minimum width
-	int const p = TypeTraits< T >::precision() // Precision
+	int const w = TypeTraits< T >::iwidth(), // Minimum width
+	std::streamsize const p = TypeTraits< T >::precision() // Precision
 )
 {
 	std::ostringstream t_stream;
@@ -2907,8 +2907,8 @@ inline
 Fstring
 fixed_Fstring_of(
 	T const & t,
-	int const w = TypeTraits< T >::width(), // Minimum width
-	int const p = TypeTraits< T >::precision() // Precision
+	int const w = TypeTraits< T >::iwidth(), // Minimum width
+	std::streamsize const p = TypeTraits< T >::precision() // Precision
 )
 {
 	std::ostringstream t_stream;
@@ -2923,8 +2923,8 @@ inline
 Fstring
 scientific_Fstring_of(
 	T const & t,
-	int const w = TypeTraits< T >::width(), // Minimum width
-	int const p = TypeTraits< T >::precision() // Precision
+	int const w = TypeTraits< T >::iwidth(), // Minimum width
+	std::streamsize const p = TypeTraits< T >::precision() // Precision
 )
 {
 	std::ostringstream t_stream;

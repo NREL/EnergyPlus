@@ -179,6 +179,7 @@ namespace RefrigeratedCase {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
+	static std::string const BlankString;
 
 	// Anti-sweat heater control type
 	int const ASNone( 0 );
@@ -590,6 +591,9 @@ namespace RefrigeratedCase {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const TrackMessage( "from refrigerated case" );
 		static std::string const RoutineName( "GetRefrigerationInput: " );
+		static std::string const TrackMessageAlt( "GetInput in RefrigeratedCase" );
+		static std::string const RoutineNameNoColon( "GetRefrigerationInput" );
+
 		int const AlwaysOn( -1 ); // -1 pointer sent to schedule manager returns a value of 1.0
 		//unused INTEGER, Parameter   ::  InputTypeSecond = 1  ! Indicator that flow used to specify capacity of secondary heat exchanger
 		//unused INTEGER, Parameter   ::  InputTypeFirst = 2   ! Indicator that capacity of secondary heat exchanger is input directly
@@ -1012,7 +1016,7 @@ namespace RefrigeratedCase {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + RefrigCase( CaseNum ).Name + "\", " + cNumericFieldNames( 2 ) + " must be greater than 0% and less than 100%" );
 					ErrorsFound = true;
 				}
-				RefrigCase( CaseNum ).RatedAmbientDewPoint = PsyTdpFnWPb( PsyWFnTdbRhPb( RefrigCase( CaseNum ).RatedAmbientTemp, ( RefrigCase( CaseNum ).RatedAmbientRH / 100.0 ), StdBaroPress ), StdBaroPress );
+				RefrigCase( CaseNum ).RatedAmbientDewPoint = PsyTdpFnWPb( PsyWFnTdbRhPb( RefrigCase( CaseNum ).RatedAmbientTemp, ( RefrigCase( CaseNum ).RatedAmbientRH / 100.0 ), StdBaroPress, BlankString ), StdBaroPress, BlankString );
 
 				RefrigCase( CaseNum ).RateTotCapPerLength = Numbers( 3 );
 				if ( Numbers( 3 ) <= 0.0 ) {
@@ -3876,8 +3880,8 @@ namespace RefrigeratedCase {
 						Secondary( SecondaryNum ).CircRate = DefaultCircRate;
 						if ( ! lNumericBlanks( 10 ) ) Secondary( SecondaryNum ).CircRate = Numbers( 10 );
 
-						DensityPhaseChange = GetSatDensityRefrig( Secondary( SecondaryNum ).FluidName, Secondary( SecondaryNum ).TCondense, 0.0, Secondary( SecondaryNum ).FluidID, "GetInput in RefrigeratedCase" );
-						DeltaHPhaseChange = GetSatEnthalpyRefrig( Secondary( SecondaryNum ).FluidName, Secondary( SecondaryNum ).TCondense, 1.0, Secondary( SecondaryNum ).FluidID, "GetInput in RefrigeratedCase" ) - GetSatEnthalpyRefrig( Secondary( SecondaryNum ).FluidName, Secondary( SecondaryNum ).TCondense, 0.0, Secondary( SecondaryNum ).FluidID, "GetInput in RefrigeratedCase" );
+						DensityPhaseChange = GetSatDensityRefrig( Secondary( SecondaryNum ).FluidName, Secondary( SecondaryNum ).TCondense, 0.0, Secondary( SecondaryNum ).FluidID, TrackMessageAlt );
+						DeltaHPhaseChange = GetSatEnthalpyRefrig( Secondary( SecondaryNum ).FluidName, Secondary( SecondaryNum ).TCondense, 1.0, Secondary( SecondaryNum ).FluidID, TrackMessageAlt ) - GetSatEnthalpyRefrig( Secondary( SecondaryNum ).FluidName, Secondary( SecondaryNum ).TCondense, 0.0, Secondary( SecondaryNum ).FluidID, TrackMessageAlt );
 
 						//TotRatedFlowVol= capacity*circrate/deltahphasechange/density
 						CalcTotFlowVol = Secondary( SecondaryNum ).CoolingLoadRated * Secondary( SecondaryNum ).CircRate / ( DensityPhaseChange * DeltaHPhaseChange );
@@ -5351,7 +5355,7 @@ namespace RefrigeratedCase {
 						CompNum = TransSystem( TransRefrigSysNum ).CompressorNumHP( CompIndex );
 
 						if ( Compressor( CompNum ).TransFlag ) { //  Calculate nominal capacity of transcritical Compressor
-							GCOutletH = GetSupHeatEnthalpyRefrig( TransSystem( TransRefrigSysNum ).RefrigerantName, GasCooler( TransSystem( TransRefrigSysNum ).GasCoolerNum( 1 ) ).RatedOutletT, GasCooler( TransSystem( TransRefrigSysNum ).GasCoolerNum( 1 ) ).RatedOutletP, RefrigIndex, "GetRefrigerationInput" );
+							GCOutletH = GetSupHeatEnthalpyRefrig( TransSystem( TransRefrigSysNum ).RefrigerantName, GasCooler( TransSystem( TransRefrigSysNum ).GasCoolerNum( 1 ) ).RatedOutletT, GasCooler( TransSystem( TransRefrigSysNum ).GasCoolerNum( 1 ) ).RatedOutletP, RefrigIndex, RoutineNameNoColon );
 							Compressor( CompNum ).NomCap = CurveValue( Compressor( CompNum ).TransCapacityCurvePtr, TransSystem( TransRefrigSysNum ).TEvapDesignMT, GCOutletH );
 							NominalTotalCompCapHP += Compressor( CompNum ).NomCap;
 							++Compressor( CompNum ).NumSysAttach;
@@ -5413,7 +5417,7 @@ namespace RefrigeratedCase {
 				}
 
 				// Check receiver temperature against minimum condensing temperature (from gas cooler input) and design evaporator temperatures
-				TransSystem( TransRefrigSysNum ).TReceiver = GetSatTemperatureRefrig( TransSystem( TransRefrigSysNum ).RefrigerantName, TransSystem( TransRefrigSysNum ).PReceiver, RefrigIndex, "GetRefrigerationInput" );
+				TransSystem( TransRefrigSysNum ).TReceiver = GetSatTemperatureRefrig( TransSystem( TransRefrigSysNum ).RefrigerantName, TransSystem( TransRefrigSysNum ).PReceiver, RefrigIndex, RoutineNameNoColon );
 				if ( TransSystem( TransRefrigSysNum ).TReceiver > GasCooler( TransSystem( TransRefrigSysNum ).GasCoolerNum( NumGasCoolers ) ).MinCondTemp ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + TransSystem( TransRefrigSysNum ).Name + ": The receiver temperature (" + RoundSigDigits( TransSystem( TransRefrigSysNum ).TReceiver, 2 ) + "C) is greater than the minimum condensing temperature specified for subcritical operation (" + RoundSigDigits( GasCooler( TransSystem( TransRefrigSysNum ).GasCoolerNum( NumGasCoolers ) ).MinCondTemp, 2 ) + "C)." );
 					ShowContinueError( "  The minimum condensing temperature will be set at 5C greater than the receiver temperature." );
@@ -7264,7 +7268,7 @@ namespace RefrigeratedCase {
 				} else {
 					HumRatIn = OutHumRat;
 				} //outsideairnode
-				OutWbTemp = PsyTwbFnTdbWPb( OutDbTemp, HumRatIn, BPress );
+				OutWbTemp = PsyTwbFnTdbWPb( OutDbTemp, HumRatIn, BPress, BlankString );
 				EffectTemp = OutWbTemp + ( 1.0 - RefrigRack( RackNum ).EvapEffect ) * ( OutDbTemp - OutWbTemp );
 			} //evapAvail
 
@@ -7324,8 +7328,8 @@ namespace RefrigeratedCase {
 		// assumes pump runs whenever evap cooling is available to minimize scaling
 		if ( RefrigRack( RackNum ).CondenserType == RefrigCondenserTypeEvap && EvapAvail ) {
 			TotalCondenserPumpPower = RefrigRack( RackNum ).EvapPumpPower;
-			HumRatOut = PsyWFnTdbTwbPb( EffectTemp, OutWbTemp, BPress );
-			TotalEvapWaterUseRate = RefrigRack( RackNum ).CondenserAirFlowRate * CondenserFrac * PsyRhoAirFnPbTdbW( BPress, OutDbTemp, HumRatIn ) * ( HumRatOut - HumRatIn ) / RhoH2O( EffectTemp );
+			HumRatOut = PsyWFnTdbTwbPb( EffectTemp, OutWbTemp, BPress, BlankString );
+			TotalEvapWaterUseRate = RefrigRack( RackNum ).CondenserAirFlowRate * CondenserFrac * PsyRhoAirFnPbTdbW( BPress, OutDbTemp, HumRatIn, BlankString ) * ( HumRatOut - HumRatIn ) / RhoH2O( EffectTemp );
 		} //evapAvail
 		// calculate basin water heater load
 		if ( RefrigRack( RackNum ).CondenserType == RefrigCondenserTypeEvap ) {
@@ -7615,8 +7619,8 @@ namespace RefrigeratedCase {
 		//Set local subroutine variables for convenience
 		ActualZoneNum = RefrigCase( CaseID ).ActualZoneNum;
 		ZoneNodeNum = RefrigCase( CaseID ).ZoneNodeNum;
-		ZoneRHPercent = PsyRhFnTdbWPb( Node( ZoneNodeNum ).Temp, Node( ZoneNodeNum ).HumRat, OutBaroPress ) * 100.0;
-		ZoneDewPoint = PsyTdpFnWPb( Node( ZoneNodeNum ).HumRat, OutBaroPress );
+		ZoneRHPercent = PsyRhFnTdbWPb( Node( ZoneNodeNum ).Temp, Node( ZoneNodeNum ).HumRat, OutBaroPress, BlankString ) * 100.0;
+		ZoneDewPoint = PsyTdpFnWPb( Node( ZoneNodeNum ).HumRat, OutBaroPress, BlankString );
 		Length = RefrigCase( CaseID ).Length;
 		TCase = RefrigCase( CaseID ).Temperature;
 		DesignRatedCap = RefrigCase( CaseID ).DesignRatedCap;
@@ -7994,6 +7998,7 @@ namespace RefrigeratedCase {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static std::string const RoutineName( "SimRefrigCondenser" );
 		static Real64 DeltaT( 0.0 );
 		static Real64 InletTemp( 0.0 );
 		static Real64 DesVolFlowRate( 0.0 );
@@ -8142,8 +8147,8 @@ namespace RefrigeratedCase {
 		// Make demand request on first HVAC iteration
 
 		//get cooling fluid properties
-		rho = GetDensityGlycol( PlantLoop( PlantLoopIndex ).FluidName, InletTemp, PlantLoop( PlantLoopIndex ).FluidIndex, "SimRefrigCondenser" );
-		Cp = GetSpecificHeatGlycol( PlantLoop( PlantLoopIndex ).FluidName, InletTemp, PlantLoop( PlantLoopIndex ).FluidIndex, "SimRefrigCondenser" );
+		rho = GetDensityGlycol( PlantLoop( PlantLoopIndex ).FluidName, InletTemp, PlantLoop( PlantLoopIndex ).FluidIndex, RoutineName );
+		Cp = GetSpecificHeatGlycol( PlantLoop( PlantLoopIndex ).FluidName, InletTemp, PlantLoop( PlantLoopIndex ).FluidIndex, RoutineName );
 
 		// first determine desired flow
 		if ( FlowType == VariableFlow && TotalCondenserHeat > 0.0 ) {
@@ -9379,8 +9384,8 @@ namespace RefrigeratedCase {
 				BPress = OutBaroPress;
 				HumRatIn = OutHumRat;
 			}
-			AirDensity = PsyRhoAirFnPbTdbW( BPress, OutDbTemp, HumRatIn );
-			AirDensityDry = PsyRhoAirFnPbTdbW( BPress, OutDbTemp, 0.0 );
+			AirDensity = PsyRhoAirFnPbTdbW( BPress, OutDbTemp, HumRatIn, BlankString );
+			AirDensityDry = PsyRhoAirFnPbTdbW( BPress, OutDbTemp, 0.0, BlankString );
 			// Evaporative condensers will have their water flow shut off in cold months to avoid
 			//  'spectacular' icing problems.  Ideally, the user will use the evaporative schedule input
 			//  to set such a schedule.  However, sometimes, users will use a single input deck to model
@@ -9409,7 +9414,7 @@ namespace RefrigeratedCase {
 				HRCF = min( HRCF, Condenser( CondID ).MaxCapFacEvap );
 				HRCF = max( HRCF, Condenser( CondID ).MinCapFacEvap );
 				if ( EvapAvail ) {
-					OutWbTemp = PsyTwbFnTdbWPb( OutDbTemp, HumRatIn, BPress );
+					OutWbTemp = PsyTwbFnTdbWPb( OutDbTemp, HumRatIn, BPress, BlankString );
 					SinkTemp = OutWbTemp;
 				} else { //evaporative condenser with water spray scheduled off so use Tdb
 					HRCF /= 3.0; //reference Menske, cap of evap cond operating dry about 1/3 of rated cap
@@ -9490,14 +9495,14 @@ namespace RefrigeratedCase {
 				PurgeRate = TotalCondenserHeat * BleedRateConstant;
 				EnthalpyAirIn = PsyHFnTdbW( OutDbTemp, HumRatIn );
 				//calculate effectiveness at rated conditions, so use Tcondcalc)
-				EnthalpyAtTcond = PsyHFnTdbRhPb( TCondCalc, 1.0, BPress );
+				EnthalpyAtTcond = PsyHFnTdbRhPb( TCondCalc, 1.0, BPress, BlankString );
 				Effectiveness = TotalCondenserHeat / ( RatedAirFlowRate * AirDensity * ( EnthalpyAtTcond - EnthalpyAirIn ) );
 				//need to limit max effectiveness for errors due to working beyond limits of HRCF in manuf data
 				Effectiveness = min( Effectiveness, 0.9 );
 				EnthalpyAirOut = EnthalpyAirIn + Effectiveness * ( EnthalpyAtTcond - EnthalpyAirIn );
 				//Air leaving the evaporative condenser is saturated
-				TAirOut = PsyTsatFnHPb( EnthalpyAirOut, BPress );
-				HumRatOut = PsyWFnTdpPb( TAirOut, BPress );
+				TAirOut = PsyTsatFnHPb( EnthalpyAirOut, BPress, BlankString );
+				HumRatOut = PsyWFnTdpPb( TAirOut, BPress, BlankString );
 				TotalEvapWaterUseRate = PurgeRate + RatedAirFlowRate * AirVolRatio * AirDensityDry * ( HumRatOut - HumRatIn ) / RhoH2O( OutWbTemp );
 				// assumes evap water pump runs whenever evap cooling is available to minimize scaling
 				TotalCondenserPumpPower = Condenser( CondID ).EvapPumpPower;
@@ -11294,9 +11299,9 @@ namespace RefrigeratedCase {
 		DefrostCap = WalkIn( WalkInID ).DefrostCapacity;
 		// %DefrostCapacity already set to zero for WalkInDefrostNone , WalkInDefrostOffCycle
 		DesignLighting = WalkIn( WalkInID ).DesignLighting;
-		EnthalpyAirWalkIn = PsyHFnTdbRhPb( TWalkIn, 0.9, OutBaroPress ); //assume 90%RH in cooler
-		HumRatioAirWalkIn = PsyWFnTdbH( TWalkIn, EnthalpyAirWalkIn );
-		DensityAirWalkIn = PsyRhoAirFnPbTdbW( OutBaroPress, TWalkIn, HumRatioAirWalkIn );
+		EnthalpyAirWalkIn = PsyHFnTdbRhPb( TWalkIn, 0.9, OutBaroPress, BlankString ); //assume 90%RH in cooler
+		HumRatioAirWalkIn = PsyWFnTdbH( TWalkIn, EnthalpyAirWalkIn, BlankString );
+		DensityAirWalkIn = PsyRhoAirFnPbTdbW( OutBaroPress, TWalkIn, HumRatioAirWalkIn, BlankString );
 		Conv = Latitude * 2.0 * Pi / 360.0; //Convert Latitude to radians
 		Gravity = 9.780373 * ( 1.0 + 0.0052891 * std::pow( ( std::sin( Conv ) ), 2 ) - 0.0000059 * std::pow( ( std::sin( 2.0 * Conv ) ), 2 ) );
 
@@ -12543,7 +12548,7 @@ namespace RefrigeratedCase {
 				ZoneMixedAirEnthalpy = PsyHFnTdbRhPb( ZoneMixedAirDryBulb, ZoneMixedAirRHFrac, OutBaroPress, TrackMessage );
 				ZoneMixedAirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, ZoneMixedAirDryBulb, ZoneMixedAirHumRatio, TrackMessage );
 				ZoneDryAirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, ZoneMixedAirDryBulb, 0.0, TrackMessage );
-				ZoneMixedAirCp = PsyCpAirFnWTdb( ZoneMixedAirHumRatio, ZoneMixedAirDryBulb, TrackMessage );
+				ZoneMixedAirCp = PsyCpAirFnWTdb( ZoneMixedAirHumRatio, ZoneMixedAirDryBulb );
 				DryAirMassFlowRated = AirVolumeFlowRated * ZoneDryAirDensity;
 				//calc t inlet to coil assuming at middle/mixed point in room  bbb -
 				//    later need to do for hottest/coolest in room where Tin /= Tzonemixed
@@ -12558,7 +12563,7 @@ namespace RefrigeratedCase {
 					CoilInletCp = ZoneMixedAirCp;
 					CoilInletHumRatio = ZoneMixedAirHumRatio;
 					CoilInletDryAirDensity = ZoneDryAirDensity;
-					CoilInletDryAirCp = PsyCpAirFnWTdb( 0.0, CoilInletTemp, TrackMessage );
+					CoilInletDryAirCp = PsyCpAirFnWTdb( 0.0, CoilInletTemp );
 				} else if ( SELECT_CASE_var == Floor ) {
 				} else if ( SELECT_CASE_var == Ceiling ) {
 				}}
@@ -12594,7 +12599,7 @@ namespace RefrigeratedCase {
 						CoilCapTotEstimate = ( CoilInletEnthalpy - ExitEnthalpyEstimate ) * AirVolumeFlowMax * CoilInletDensity;
 					} else {
 						// Assume no water is extracted from flow
-						ExitEnthalpyEstimate = PsyHFnTdbW( ExitTemperatureEstimate, CoilInletHumRatio, TrackMessage );
+						ExitEnthalpyEstimate = PsyHFnTdbW( ExitTemperatureEstimate, CoilInletHumRatio );
 						CoilCapTotEstimate = ( CoilInletEnthalpy - ExitEnthalpyEstimate ) * AirVolumeFlowMax * CoilInletDensity;
 					}
 					if ( SensibleCapacityMax > CoilCapTotEstimate ) SensibleCapacityMax = CoilCapTotEstimate;

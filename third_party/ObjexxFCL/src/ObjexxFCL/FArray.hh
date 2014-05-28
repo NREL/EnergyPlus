@@ -340,20 +340,6 @@ protected: // Creation
 		sdata_( nullptr )
 	{}
 
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-	// Non-Const Array Proxy Constructor
-	inline
-	FArray( FArray & a, ProxySentinel const & ) :
-		data_size_( a.data_size_ ),
-		data_( a.data_ ),
-		size_( a.size_ ),
-		owner_( false ),
-		const_proxy_( a.const_proxy_ ),
-		shift_( 0 ),
-		sdata_( nullptr )
-	{}
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
-
 	// Tail Proxy Constructor
 	inline
 	FArray( Tail const & s, ProxySentinel const & ) :
@@ -367,20 +353,6 @@ protected: // Creation
 		shift_( 0 ),
 		sdata_( nullptr )
 	{}
-
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-	// Non-Const Tail Proxy Constructor
-	inline
-	FArray( Tail & s, ProxySentinel const & ) :
-		data_size_( s.size() ),
-		data_( s.data_ ),
-		size_( data_size_ ),
-		owner_( false ),
-		const_proxy_( s.const_proxy_ ),
-		shift_( 0 ),
-		sdata_( nullptr )
-	{}
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
 	// Value Proxy Constructor
 	inline
@@ -397,6 +369,31 @@ protected: // Creation
 	{}
 
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
+
+	// Non-Const Array Proxy Constructor
+	inline
+	FArray( FArray & a, ProxySentinel const & ) :
+		data_size_( a.data_size_ ),
+		data_( a.data_ ),
+		size_( a.size_ ),
+		owner_( false ),
+		const_proxy_( a.const_proxy_ ),
+		shift_( 0 ),
+		sdata_( nullptr )
+	{}
+
+	// Non-Const Tail Proxy Constructor
+	inline
+	FArray( Tail & s, ProxySentinel const & ) :
+		data_size_( s.size() ),
+		data_( s.data_ ),
+		size_( data_size_ ),
+		owner_( false ),
+		const_proxy_( s.const_proxy_ ),
+		shift_( 0 ),
+		sdata_( nullptr )
+	{}
+
 	// Non-Const Value Proxy Constructor
 	inline
 	FArray( T & t, ProxySentinel const & ) :
@@ -408,23 +405,8 @@ protected: // Creation
 		shift_( 0 ),
 		sdata_( nullptr )
 	{}
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
-	// Switch to Size Construction
-	void
-	reconstruct_by_size( size_type const size )
-	{
-		delete[] data_;
-		data_size_ = size;
-		size_ = data_size_;
-		data_ = new T[ data_size_ ];
-#if defined(OBJEXXFCL_FARRAY_INIT) || defined(OBJEXXFCL_FARRAY_INIT_DEBUG)
-		reassign( Traits::initial_array_value() );
-#endif // OBJEXXFCL_FARRAY_INIT || OBJEXXFCL_FARRAY_INIT_DEBUG
-#ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
-		size_report();
-#endif // OBJEXXFCL_FARRAY_SIZE_REPORT
-	}
+#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
 public: // Creation
 
@@ -990,6 +972,14 @@ public: // Inspector
 		return size_;
 	}
 
+	// Active Array Size
+	inline
+	int
+	isize() const
+	{
+		return static_cast< int >( size_ );
+	}
+
 	// IndexRange of a Dimension
 	virtual
 	IR const &
@@ -1009,6 +999,11 @@ public: // Inspector
 	virtual
 	size_type
 	size( int const d ) const = 0;
+
+	// Size of a Dimension
+	virtual
+	int
+	isize( int const d ) const = 0;
 
 	// Array Data Pointer
 	inline
@@ -2448,6 +2443,22 @@ protected: // Methods
 	reassign( size_type const i, U const & u, typename std::enable_if< ! Has_reassign< U >::value >::type * = 0 )
 	{
 		operator []( i ) = u;
+	}
+
+	// Switch to Size Construction
+	void
+	reconstruct_by_size( size_type const size )
+	{
+		delete[] data_;
+		data_size_ = size;
+		size_ = data_size_;
+		data_ = new T[ data_size_ ];
+#if defined(OBJEXXFCL_FARRAY_INIT) || defined(OBJEXXFCL_FARRAY_INIT_DEBUG)
+		reassign( Traits::initial_array_value() );
+#endif // OBJEXXFCL_FARRAY_INIT || OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
+		size_report();
+#endif // OBJEXXFCL_FARRAY_SIZE_REPORT
 	}
 
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS

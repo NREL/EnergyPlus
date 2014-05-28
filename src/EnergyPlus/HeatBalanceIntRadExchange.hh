@@ -39,7 +39,7 @@ namespace HeatBalanceIntRadExchange {
 		int const SurfIterations, // Number of iterations in calling subroutine
 		FArray1S< Real64 > NetLWRadToSurf, // Net long wavelength radiant exchange from other surfaces
 		Optional_int_const ZoneToResimulate = _, // if passed in, then only calculate for this zone
-		Optional_string CalledFrom = _
+		std::string const & CalledFrom = ""
 	);
 
 	void

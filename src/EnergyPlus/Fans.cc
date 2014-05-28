@@ -94,6 +94,7 @@ namespace Fans {
 
 	int const ExhaustFanCoupledToAvailManagers( 150 );
 	int const ExhaustFanDecoupledFromAvailManagers( 151 );
+	static std::string const BlankString;
 
 	//na
 
@@ -168,7 +169,7 @@ namespace Fans {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS
 
@@ -198,7 +199,7 @@ namespace Fans {
 				ShowFatalError( "SimulateFanComponents: Invalid CompIndex passed=" + TrimSigDigits( FanNum ) + ", Number of Fans=" + TrimSigDigits( NumFans ) + ", Fan name=" + CompName );
 			}
 			if ( CheckEquipName( FanNum ) ) {
-				if ( CompName != Blank && CompName != Fan( FanNum ).FanName ) {
+				if ( CompName != BlankString && CompName != Fan( FanNum ).FanName ) {
 					ShowFatalError( "SimulateFanComponents: Invalid CompIndex passed=" + TrimSigDigits( FanNum ) + ", Fan name=" + CompName + ", stored Fan Name for that index=" + Fan( FanNum ).FanName );
 				}
 				CheckEquipName( FanNum ) = false;
@@ -1912,7 +1913,7 @@ namespace Fans {
 		Real64 MassFlow; // [kg/sec]
 		Real64 Tin; // [C]
 		Real64 PowerLossToAir; // fan and motor loss to air stream (watts)
-		bool FanIsRunning;
+		bool FanIsRunning = false; // There seems to be a missing else case below unless false is assumed
 
 		DeltaPress = Fan( FanNum ).DeltaPress;
 		if ( Fan( FanNum ).EMSFanPressureOverrideOn ) DeltaPress = Fan( FanNum ).EMSFanPressureValue;

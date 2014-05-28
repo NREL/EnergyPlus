@@ -59,6 +59,7 @@ public: // Types
 
 	// Using
 	using Super::in_range;
+	using Super::isize;
 	using Super::l;
 	using Super::u;
 	using Super::size;
@@ -500,7 +501,7 @@ public: // Inspector
 	int
 	u1() const
 	{
-		return array_.size1();
+		return array_.isize1();
 	}
 
 	// Size of Dimension 1
@@ -509,6 +510,14 @@ public: // Inspector
 	size1() const
 	{
 		return array_.size1();
+	}
+
+	// Size of Dimension 1
+	inline
+	int
+	isize1() const
+	{
+		return array_.isize1();
 	}
 
 	// IndexRange of Dimension 2
@@ -524,7 +533,7 @@ public: // Inspector
 	int
 	l2() const
 	{
-		return 2;
+		return 1;
 	}
 
 	// Upper Index of Dimension 2
@@ -532,7 +541,7 @@ public: // Inspector
 	int
 	u2() const
 	{
-		return array_.size2();
+		return array_.isize2();
 	}
 
 	// Size of Dimension 2
@@ -541,6 +550,14 @@ public: // Inspector
 	size2() const
 	{
 		return array_.size2();
+	}
+
+	// Size of Dimension 2
+	inline
+	int
+	isize2() const
+	{
+		return array_.isize2();
 	}
 
 	// IndexRange of Dimension 3
@@ -556,7 +573,7 @@ public: // Inspector
 	int
 	l3() const
 	{
-		return 3;
+		return 1;
 	}
 
 	// Upper Index of Dimension 3
@@ -564,7 +581,7 @@ public: // Inspector
 	int
 	u3() const
 	{
-		return array_.size3();
+		return array_.isize3();
 	}
 
 	// Size of Dimension 3
@@ -573,6 +590,14 @@ public: // Inspector
 	size3() const
 	{
 		return array_.size3();
+	}
+
+	// Size of Dimension 3
+	inline
+	int
+	isize3() const
+	{
+		return array_.isize3();
 	}
 
 	// IndexRange of Dimension 4
@@ -588,7 +613,7 @@ public: // Inspector
 	int
 	l4() const
 	{
-		return 4;
+		return 1;
 	}
 
 	// Upper Index of Dimension 4
@@ -596,7 +621,7 @@ public: // Inspector
 	int
 	u4() const
 	{
-		return array_.size4();
+		return array_.isize4();
 	}
 
 	// Size of Dimension 4
@@ -605,6 +630,14 @@ public: // Inspector
 	size4() const
 	{
 		return array_.size4();
+	}
+
+	// Size of Dimension 4
+	inline
+	int
+	isize4() const
+	{
+		return array_.isize4();
 	}
 
 public: // Modifier

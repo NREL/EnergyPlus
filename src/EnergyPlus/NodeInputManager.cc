@@ -58,7 +58,8 @@ namespace NodeInputManager {
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
-	std::string const Blank;
+	static std::string const BlankString;
+	static std::string const fluidNameSteam( "STEAM" );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -288,7 +289,7 @@ namespace NodeInputManager {
 			GetNodeNums( Name, NumNodes, NodeNumbers, errFlag, NodeFluidType, NodeObjectType, NodeObjectName, NodeConnectionType, NodeFluidStream, ObjectIsParent, _, InputFieldName );
 		} else {
 			// only valid "error" here is when the Node List is blank
-			if ( Name != Blank ) {
+			if ( Name != BlankString ) {
 				ShowSevereError( RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid data." );
 				if ( present( InputFieldName ) ) ShowContinueError( "...Ref field=" + InputFieldName );
 				ShowContinueError( "NodeList not found=\"" + Name + "\"." );
@@ -534,7 +535,7 @@ namespace NodeInputManager {
 			//  Put all in, then determine unique
 			for ( Loop1 = 1; Loop1 <= NumAlphas - 1; ++Loop1 ) {
 				NodeLists( NCount ).NodeNames( Loop1 ) = cAlphas( Loop1 + 1 );
-				if ( cAlphas( Loop1 + 1 ) == Blank ) {
+				if ( cAlphas( Loop1 + 1 ) == BlankString ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphas( 1 ) + "\", blank node name in list." );
 					--NodeLists( NCount ).NumOfNodesInList;
 					if ( NodeLists( NCount ).NumOfNodesInList <= 0 ) {
@@ -856,10 +857,10 @@ namespace NodeInputManager {
 			GetNodeInputFlag = false;
 		}
 
-		if ( CurCheckContextName != Blank ) {
+		if ( CurCheckContextName != BlankString ) {
 			ShowFatalError( "Init Uniqueness called for \"" + ContextName + ", but checks for \"" + CurCheckContextName + "\" was already in progress." );
 		}
-		if ( ContextName == Blank ) {
+		if ( ContextName == BlankString ) {
 			ShowFatalError( "Init Uniqueness called with Blank Context Name" );
 		}
 		if ( allocated( UniqueNodeNames ) ) {
@@ -869,7 +870,7 @@ namespace NodeInputManager {
 		NumCheckNodes = 0;
 		MaxCheckNodes = 100;
 		UniqueNodeNames.allocate( MaxCheckNodes );
-		UniqueNodeNames = Blank;
+		UniqueNodeNames = BlankString;
 		CurCheckContextName = ContextName;
 
 	}
@@ -926,13 +927,13 @@ namespace NodeInputManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Found;
 
-		{ auto const SELECT_CASE_var( MakeUPPERCase( CheckType ) );
+		{ auto const nodeType( CheckType );
 
-		if ( ( SELECT_CASE_var == "NODENAME" ) || ( SELECT_CASE_var == "NODENAMES" ) || ( SELECT_CASE_var == "NODE NAME" ) || ( SELECT_CASE_var == "NODE NAMES" ) ) {
+		if ( SameString(nodeType, "NODENAME") || SameString(nodeType, "NODENAMES") || SameString(nodeType, "NODE NAME") || SameString(nodeType, "NODE NAMES") ) {
 			if ( ! present( CheckName ) ) {
 				ShowFatalError( "Routine CheckUniqueNodes called with Nodetypes=NodeName, " "but did not include CheckName argument." );
 			}
-			if ( CheckName != Blank ) {
+			if ( CheckName != BlankString ) {
 				Found = FindItemInList( CheckName, UniqueNodeNames, NumCheckNodes );
 				if ( Found != 0 ) {
 					ShowSevereError( CurCheckContextName + "=\"" + ObjectName + "\", duplicate node names found." );
@@ -945,7 +946,7 @@ namespace NodeInputManager {
 					++NumCheckNodes;
 					if ( NumCheckNodes > MaxCheckNodes ) {
 						TmpNodeID.allocate( MaxCheckNodes + 100 );
-						TmpNodeID = Blank;
+						TmpNodeID = BlankString;
 						TmpNodeID( {1,NumCheckNodes - 1} ) = UniqueNodeNames;
 						UniqueNodeNames.deallocate();
 						MaxCheckNodes += 100;
@@ -957,7 +958,7 @@ namespace NodeInputManager {
 				}
 			}
 
-		} else if ( ( SELECT_CASE_var == "NODENUMBER" ) || ( SELECT_CASE_var == "NODENUMBERS" ) || ( SELECT_CASE_var == "NODE NUMBER" ) || ( SELECT_CASE_var == "NODE NUMBERS" ) ) {
+		} else if (  SameString(nodeType, "NODENUMBER") ||  SameString(nodeType, "NODENUMBERS") ||  SameString(nodeType, "NODE NUMBER") ||  SameString(nodeType, "NODE NUMBERS") ) {
 			if ( ! present( CheckNumber ) ) {
 				ShowFatalError( "Routine CheckUniqueNodes called with Nodetypes=NodeNumber, " "but did not include CheckNumber argument." );
 			}
@@ -974,7 +975,7 @@ namespace NodeInputManager {
 					++NumCheckNodes;
 					if ( NumCheckNodes > MaxCheckNodes ) {
 						TmpNodeID.allocate( MaxCheckNodes + 100 );
-						TmpNodeID = Blank;
+						TmpNodeID = BlankString;
 						TmpNodeID( {1,NumCheckNodes - 1} ) = UniqueNodeNames;
 						UniqueNodeNames.deallocate();
 						MaxCheckNodes += 100;
@@ -1034,10 +1035,10 @@ namespace NodeInputManager {
 		if ( CurCheckContextName != ContextName ) {
 			ShowFatalError( "End Uniqueness called for \"" + ContextName + ", but checks for \"" + CurCheckContextName + "\" was in progress." );
 		}
-		if ( ContextName == Blank ) {
+		if ( ContextName == BlankString ) {
 			ShowFatalError( "End Uniqueness called with Blank Context Name" );
 		}
-		CurCheckContextName = Blank;
+		CurCheckContextName = BlankString;
 		if ( allocated( UniqueNodeNames ) ) {
 			UniqueNodeNames.deallocate();
 		}
@@ -1092,7 +1093,8 @@ namespace NodeInputManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "CalcMoreNodeInfo" );
+		static std::string const NodeReportingCalc( "NodeReportingCalc:" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1111,6 +1113,8 @@ namespace NodeInputManager {
 		static FArray1D_int NodeRelHumiditySchedPtr;
 		static FArray1D_bool NodeDewPointRepReq;
 		static FArray1D_int NodeDewPointSchedPtr;
+		static std::vector<std::string> nodeReportingStrings;
+		static std::vector<std::string> nodeFluidNames;
 		bool ReportWetBulb;
 		bool ReportRelHumidity;
 		bool ReportDewPoint;
@@ -1119,8 +1123,6 @@ namespace NodeInputManager {
 		Real64 RhoAirCurrent; // temporary value for current air density f(baro, db , W)
 		//  REAL(r64)     :: rRhoVapor
 		//  INTEGER,save :: Count=0
-		std::string NodeReportingString;
-		std::string FluidName;
 		Real64 rho;
 		Real64 Cp;
 		Real64 rhoStd;
@@ -1134,6 +1136,8 @@ namespace NodeInputManager {
 			NodeRelHumiditySchedPtr.allocate( NumOfNodes );
 			NodeDewPointRepReq.allocate( NumOfNodes );
 			NodeDewPointSchedPtr.allocate( NumOfNodes );
+			nodeReportingStrings.reserve( NumOfNodes );
+			nodeFluidNames.reserve( NumOfNodes );
 			NodeWetBulbRepReq = false;
 			NodeWetBulbSchedPtr = 0;
 			NodeRelHumidityRepReq = false;
@@ -1142,36 +1146,29 @@ namespace NodeInputManager {
 			NodeDewPointSchedPtr = 0;
 
 			for ( iNode = 1; iNode <= NumOfNodes; ++iNode ) {
+				nodeReportingStrings.push_back( std::string( NodeReportingCalc + NodeID( iNode ) ) );
+				nodeFluidNames.push_back( GetGlycolNameByIndex( Node( iNode ).FluidIndex ) );
 				for ( iReq = 1; iReq <= NumOfReqVariables; ++iReq ) {
-					if ( SameString( ReqRepVars( iReq ).VarName, "System Node Wetbulb Temperature" ) && ( SameString( ReqRepVars( iReq ).Key, NodeID( iNode ) ) || SameString( ReqRepVars( iReq ).Key, Blank ) ) ) {
-						NodeWetBulbRepReq( iNode ) = true;
-						NodeWetBulbSchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
-						break;
-					}
-				}
-			}
-			for ( iNode = 1; iNode <= NumOfNodes; ++iNode ) {
-				for ( iReq = 1; iReq <= NumOfReqVariables; ++iReq ) {
-					if ( SameString( ReqRepVars( iReq ).VarName, "System Node Relative Humidity" ) && ( SameString( ReqRepVars( iReq ).Key, NodeID( iNode ) ) || SameString( ReqRepVars( iReq ).Key, Blank ) ) ) {
-						NodeRelHumidityRepReq( iNode ) = true;
-						NodeRelHumiditySchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
-						break;
-					}
-				}
-			}
-			for ( iNode = 1; iNode <= NumOfNodes; ++iNode ) {
-				for ( iReq = 1; iReq <= NumOfReqVariables; ++iReq ) {
-					if ( SameString( ReqRepVars( iReq ).VarName, "System Node Dewpoint Temperature" ) && ( SameString( ReqRepVars( iReq ).Key, NodeID( iNode ) ) || SameString( ReqRepVars( iReq ).Key, Blank ) ) ) {
-						NodeDewPointRepReq( iNode ) = true;
-						NodeDewPointSchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
-						break;
+					if( SameString( ReqRepVars( iReq ).Key, NodeID( iNode ) ) || SameString( ReqRepVars( iReq ).Key, BlankString ) ) {
+						if( SameString( ReqRepVars( iReq ).VarName, "System Node Wetbulb Temperature" ) ) {
+							NodeWetBulbRepReq( iNode ) = true;
+							NodeWetBulbSchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
+						}
+						else if( SameString( ReqRepVars( iReq ).VarName, "System Node Relative Humidity" ) ) {
+							NodeRelHumidityRepReq( iNode ) = true;
+							NodeRelHumiditySchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
+						}
+						else if( SameString( ReqRepVars( iReq ).VarName, "System Node Dewpoint Temperature" ) ) {
+							NodeDewPointRepReq( iNode ) = true;
+							NodeDewPointSchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
+						}
 					}
 				}
 			}
 			MyOneTimeFlag = false;
 		}
+
 		for ( iNode = 1; iNode <= NumOfNodes; ++iNode ) {
-			NodeReportingString = "NodeReportingCalc:" + NodeID( iNode );
 			ReportWetBulb = false;
 			ReportRelHumidity = false;
 			ReportDewPoint = false;
@@ -1196,25 +1193,25 @@ namespace NodeInputManager {
 			if ( Node( iNode ).FluidType == NodeType_Air ) {
 				MoreNodeInfo( iNode ).VolFlowRateStdRho = Node( iNode ).MassFlowRate / RhoAirStdInit;
 				// if Node%Press was reliable could be used here.
-				RhoAirCurrent = PsyRhoAirFnPbTdbW( OutBaroPress, Node( iNode ).Temp, Node( iNode ).HumRat );
+				RhoAirCurrent = PsyRhoAirFnPbTdbW( OutBaroPress, Node( iNode ).Temp, Node( iNode ).HumRat, BlankString );
 				MoreNodeInfo( iNode ).Density = RhoAirCurrent;
 				if ( RhoAirCurrent != 0.0 ) MoreNodeInfo( iNode ).VolFlowRateCrntRho = Node( iNode ).MassFlowRate / RhoAirCurrent;
 				MoreNodeInfo( iNode ).ReportEnthalpy = PsyHFnTdbW( Node( iNode ).Temp, Node( iNode ).HumRat );
 				if ( ReportWetBulb ) {
 					// if Node%Press was reliable could be used here.
-					MoreNodeInfo( iNode ).WetBulbTemp = PsyTwbFnTdbWPb( Node( iNode ).Temp, Node( iNode ).HumRat, OutBaroPress, NodeReportingString );
+					MoreNodeInfo( iNode ).WetBulbTemp = PsyTwbFnTdbWPb( Node( iNode ).Temp, Node( iNode ).HumRat, OutBaroPress, nodeReportingStrings[iNode - 1] );
 				} else {
 					MoreNodeInfo( iNode ).WetBulbTemp = 0.0;
 				}
 				if ( ReportDewPoint ) {
-					MoreNodeInfo( iNode ).AirDewPointTemp = PsyTdpFnWPb( Node( iNode ).HumRat, OutBaroPress );
+					MoreNodeInfo( iNode ).AirDewPointTemp = PsyTdpFnWPb( Node( iNode ).HumRat, OutBaroPress, BlankString );
 				} else {
 					MoreNodeInfo( iNode ).AirDewPointTemp = 0.0;
 				}
 				if ( ReportRelHumidity ) {
 					// if Node%Press was reliable could be used here.
 					// following routines don't issue psych errors and may be more reliable.
-					MoreNodeInfo( iNode ).RelHumidity = 100.0 * PsyRhFnTdbWPb( Node( iNode ).Temp, Node( iNode ).HumRat, OutBaroPress, NodeReportingString );
+					MoreNodeInfo( iNode ).RelHumidity = 100.0 * PsyRhFnTdbWPb( Node( iNode ).Temp, Node( iNode ).HumRat, OutBaroPress, nodeReportingStrings[iNode - 1] );
 					//        rRhoVapor=PsyRhovFnTdbWPb(Node(iNode)%Temp,Node(iNode)%HumRat,OutBaroPress,'NodeReportingCalc:'//TRIM(NodeID(iNode)))
 					//        MoreNodeInfo(iNode)%RelHumidity = 100.0 * PsyRhFnTdbRhov(Node(iNode)%Temp,rRhoVapor,  &
 					//              'NodeReportingCalc:'//TRIM(NodeID(iNode)))
@@ -1229,10 +1226,9 @@ namespace NodeInputManager {
 					rhoStd = RhoWaterStdInit;
 					Cp = CPCW( Node( iNode ).Temp );
 				} else {
-					FluidName = GetGlycolNameByIndex( Node( iNode ).FluidIndex );
-					Cp = GetSpecificHeatGlycol( FluidName, Node( iNode ).Temp, Node( iNode ).FluidIndex, NodeReportingString );
-					rhoStd = GetDensityGlycol( FluidName, InitConvTemp, Node( iNode ).FluidIndex, NodeReportingString );
-					rho = GetDensityGlycol( FluidName, Node( iNode ).Temp, Node( iNode ).FluidIndex, NodeReportingString );
+					Cp = GetSpecificHeatGlycol( nodeFluidNames[iNode - 1], Node( iNode ).Temp, Node( iNode ).FluidIndex, nodeReportingStrings[iNode - 1] );
+					rhoStd = GetDensityGlycol( nodeFluidNames[iNode - 1], InitConvTemp, Node( iNode ).FluidIndex, nodeReportingStrings[iNode - 1] );
+					rho = GetDensityGlycol( nodeFluidNames[iNode - 1], Node( iNode ).Temp, Node( iNode ).FluidIndex, nodeReportingStrings[iNode - 1] );
 				}
 
 				MoreNodeInfo( iNode ).VolFlowRateStdRho = Node( iNode ).MassFlowRate / rhoStd;
@@ -1243,8 +1239,8 @@ namespace NodeInputManager {
 				MoreNodeInfo( iNode ).RelHumidity = 100.0;
 			} else if ( Node( iNode ).FluidType == NodeType_Steam ) {
 				if ( Node( iNode ).Quality == 1.0 ) {
-					SteamDensity = GetSatDensityRefrig( "STEAM", Node( iNode ).Temp, Node( iNode ).Quality, Node( iNode ).FluidIndex, "CalcMoreNodeInfo" );
-					EnthSteamInDry = GetSatEnthalpyRefrig( "STEAM", Node( iNode ).Temp, Node( iNode ).Quality, Node( iNode ).FluidIndex, "CalcMoreNodeInfo" );
+					SteamDensity = GetSatDensityRefrig( fluidNameSteam, Node( iNode ).Temp, Node( iNode ).Quality, Node( iNode ).FluidIndex, RoutineName );
+					EnthSteamInDry = GetSatEnthalpyRefrig( fluidNameSteam, Node( iNode ).Temp, Node( iNode ).Quality, Node( iNode ).FluidIndex, RoutineName );
 					MoreNodeInfo( iNode ).VolFlowRateStdRho = Node( iNode ).MassFlowRate / SteamDensity;
 					MoreNodeInfo( iNode ).ReportEnthalpy = EnthSteamInDry;
 					MoreNodeInfo( iNode ).WetBulbTemp = 0.0;
@@ -1265,7 +1261,7 @@ namespace NodeInputManager {
 				if ( Node( iNode ).HumRat > 0.0 ) {
 					MoreNodeInfo( iNode ).ReportEnthalpy = PsyHFnTdbW( Node( iNode ).Temp, Node( iNode ).HumRat );
 					if ( ReportWetBulb ) {
-						MoreNodeInfo( iNode ).WetBulbTemp = PsyTwbFnTdbWPb( Node( iNode ).Temp, Node( iNode ).HumRat, StdBaroPress );
+						MoreNodeInfo( iNode ).WetBulbTemp = PsyTwbFnTdbWPb( Node( iNode ).Temp, Node( iNode ).HumRat, StdBaroPress, BlankString );
 					} else {
 						MoreNodeInfo( iNode ).WetBulbTemp = 0.0;
 					}

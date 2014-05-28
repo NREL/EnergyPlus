@@ -62,16 +62,6 @@ public: // Creation
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	{}
 
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-	// Non-Const Copy Constructor
-	inline
-	FArrayTail( FArrayTail & s ) :
-		data_( s.data_ ),
-		size_( s.size_ ),
-		const_proxy_( false )
-	{}
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
-
 	// Pointer + Size Constructor
 	inline
 	FArrayTail( T const * array, size_type const size ) :
@@ -83,6 +73,15 @@ public: // Creation
 	{}
 
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
+
+	// Non-Const Copy Constructor
+	inline
+	FArrayTail( FArrayTail & s ) :
+		data_( s.data_ ),
+		size_( s.size_ ),
+		const_proxy_( false )
+	{}
+
 	// Non-Const Pointer + Size Constructor
 	inline
 	FArrayTail( T * array, size_type const size ) :
@@ -90,6 +89,7 @@ public: // Creation
 		size_( size ),
 		const_proxy_( false )
 	{}
+
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
 	// Destructor
@@ -122,6 +122,14 @@ public: // Inspector
 	size() const
 	{
 		return size_;
+	}
+
+	// Size
+	inline
+	int
+	isize() const
+	{
+		return static_cast< int >( size_ );
 	}
 
 private: // Data

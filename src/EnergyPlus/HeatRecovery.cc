@@ -101,6 +101,8 @@ namespace HeatRecovery {
 	int const EconoLockOut_No( 0 );
 	int const EconoLockOut_Yes( 1 );
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -1592,18 +1594,18 @@ namespace HeatRecovery {
 			HumRatSupOut = ExchCond( ExNum ).SupInHumRat;
 			EnthSupOut = PsyHFnTdbW( TempSupOut, HumRatSupOut );
 			// check for saturation in supply outlet
-			TempSupOutSat = PsyTsatFnHPb( EnthSupOut, OutBaroPress );
+			TempSupOutSat = PsyTsatFnHPb( EnthSupOut, OutBaroPress, BlankString );
 			if ( TempSupOutSat > TempSupOut ) {
 				TempSupOut = TempSupOutSat;
-				HumRatSupOut = PsyWFnTdbH( TempSupOut, EnthSupOut );
+				HumRatSupOut = PsyWFnTdbH( TempSupOut, EnthSupOut, BlankString );
 			}
 			HumRatSecOut = ExchCond( ExNum ).SecInHumRat;
 			EnthSecOut = PsyHFnTdbW( TempSecOut, HumRatSecOut );
 			// check for saturation in secondary outlet
-			TempSecOutSat = PsyTsatFnHPb( EnthSecOut, OutBaroPress );
+			TempSecOutSat = PsyTsatFnHPb( EnthSecOut, OutBaroPress, BlankString );
 			if ( TempSecOutSat > TempSecOut ) {
 				TempSecOut = TempSecOutSat;
-				HumRatSecOut = PsyWFnTdbH( TempSecOut, EnthSecOut );
+				HumRatSecOut = PsyWFnTdbH( TempSecOut, EnthSecOut, BlankString );
 			}
 			// calculate outlet conditions by mixing bypass air stream with air that went through the
 			// heat exchanger core.
@@ -1805,7 +1807,7 @@ namespace HeatRecovery {
 		if ( UnitOn ) {
 			// Unit is on.
 			// In the future, use actual node pressures in the following air density calls
-			RhoStd = PsyRhoAirFnPbTdbW( OutBaroPress, 20.0, 0.0 );
+			RhoStd = PsyRhoAirFnPbTdbW( OutBaroPress, 20.0, 0.0, BlankString );
 			HXSupAirVolFlowRate = ExchCond( ExNum ).SupOutMassFlow / RhoStd; // volume flow using standard density
 			HXSecAirVolFlowRate = ExchCond( ExNum ).SecOutMassFlow / RhoStd;
 			// Limit unbalanced volumetric flow ratio to 2:1
@@ -1841,8 +1843,8 @@ namespace HeatRecovery {
 
 			// Determine heat exchanger effectiveness using avg air volume flow rate based on actual inlet air density
 			// Linearly interpolate and extrapolate (within limits) from effectiveness input values
-			RhoSup = PsyRhoAirFnPbTdbW( OutBaroPress, ExchCond( ExNum ).SupInTemp, ExchCond( ExNum ).SupInHumRat );
-			RhoSec = PsyRhoAirFnPbTdbW( OutBaroPress, ExchCond( ExNum ).SecInTemp, ExchCond( ExNum ).SecInHumRat );
+			RhoSup = PsyRhoAirFnPbTdbW( OutBaroPress, ExchCond( ExNum ).SupInTemp, ExchCond( ExNum ).SupInHumRat, BlankString );
+			RhoSec = PsyRhoAirFnPbTdbW( OutBaroPress, ExchCond( ExNum ).SecInTemp, ExchCond( ExNum ).SecInHumRat, BlankString );
 			HXSupAirVolFlowRate = ExchCond( ExNum ).SupOutMassFlow / RhoSup;
 			HXSecAirVolFlowRate = ExchCond( ExNum ).SecOutMassFlow / RhoSec;
 			HXAvgAirVolFlowRate = ( HXSecAirVolFlowRate + HXSupAirVolFlowRate ) / 2.0;
@@ -1878,15 +1880,15 @@ namespace HeatRecovery {
 			ExchCond( ExNum ).SupOutEnth = PsyHFnTdbW( ExchCond( ExNum ).SupOutTemp, ExchCond( ExNum ).SupOutHumRat );
 
 			//   Check for saturation in supply outlet and reset temp, then humidity ratio at constant enthalpy
-			if ( PsyTsatFnHPb( ExchCond( ExNum ).SupOutEnth, OutBaroPress ) > ExchCond( ExNum ).SupOutTemp ) {
-				ExchCond( ExNum ).SupOutTemp = PsyTsatFnHPb( ExchCond( ExNum ).SupOutEnth, OutBaroPress );
-				ExchCond( ExNum ).SupOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SupOutTemp, ExchCond( ExNum ).SupOutEnth );
+			if ( PsyTsatFnHPb( ExchCond( ExNum ).SupOutEnth, OutBaroPress, BlankString ) > ExchCond( ExNum ).SupOutTemp ) {
+				ExchCond( ExNum ).SupOutTemp = PsyTsatFnHPb( ExchCond( ExNum ).SupOutEnth, OutBaroPress, BlankString );
+				ExchCond( ExNum ).SupOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SupOutTemp, ExchCond( ExNum ).SupOutEnth, BlankString );
 			}
 			QSensTrans = CSup * ( ExchCond( ExNum ).SupInTemp - ExchCond( ExNum ).SupOutTemp );
 			ExchCond( ExNum ).SecOutTemp = ExchCond( ExNum ).SecInTemp + QSensTrans / CSec;
 			QTotTrans = ExchCond( ExNum ).SupOutMassFlow * ( ExchCond( ExNum ).SupInEnth - ExchCond( ExNum ).SupOutEnth );
 			ExchCond( ExNum ).SecOutEnth = ExchCond( ExNum ).SecInEnth + QTotTrans / ExchCond( ExNum ).SecOutMassFlow;
-			ExchCond( ExNum ).SecOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SecOutTemp, ExchCond( ExNum ).SecOutEnth );
+			ExchCond( ExNum ).SecOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SecOutTemp, ExchCond( ExNum ).SecOutEnth, BlankString );
 			//   Control the supply air outlet temperature to a setpoint for Heating Mode only
 			//   (ControlFraction = 0 HX fully bypassed, ControlFraction = 1 air passed entirely through HX)
 			//   (supply air stream bypass mass flow rate proportional to ControlFraction except when frost control is active)
@@ -1972,16 +1974,16 @@ namespace HeatRecovery {
 				ExchCond( ExNum ).SupOutEnth = PsyHFnTdbW( ExchCond( ExNum ).SupOutTemp, ExchCond( ExNum ).SupOutHumRat );
 
 				//     Check for saturation in supply outlet and reset temp, then humidity ratio at constant enthalpy
-				if ( PsyTsatFnHPb( ExchCond( ExNum ).SupOutEnth, OutBaroPress ) > ExchCond( ExNum ).SupOutTemp ) {
-					ExchCond( ExNum ).SupOutTemp = PsyTsatFnHPb( ExchCond( ExNum ).SupOutEnth, OutBaroPress );
-					ExchCond( ExNum ).SupOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SupOutTemp, ExchCond( ExNum ).SupOutEnth );
+				if ( PsyTsatFnHPb( ExchCond( ExNum ).SupOutEnth, OutBaroPress, BlankString ) > ExchCond( ExNum ).SupOutTemp ) {
+					ExchCond( ExNum ).SupOutTemp = PsyTsatFnHPb( ExchCond( ExNum ).SupOutEnth, OutBaroPress, BlankString );
+					ExchCond( ExNum ).SupOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SupOutTemp, ExchCond( ExNum ).SupOutEnth, BlankString );
 				}
 
 				QSensTrans = CSup * ( ExchCond( ExNum ).SupInTemp - ExchCond( ExNum ).SupOutTemp );
 				ExchCond( ExNum ).SecOutTemp = ExchCond( ExNum ).SecInTemp + QSensTrans / CSec;
 				QTotTrans = ExchCond( ExNum ).SupOutMassFlow * ( ExchCond( ExNum ).SupInEnth - ExchCond( ExNum ).SupOutEnth );
 				ExchCond( ExNum ).SecOutEnth = ExchCond( ExNum ).SecInEnth + QTotTrans / ExchCond( ExNum ).SecOutMassFlow;
-				ExchCond( ExNum ).SecOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SecOutTemp, ExchCond( ExNum ).SecOutEnth );
+				ExchCond( ExNum ).SecOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SecOutTemp, ExchCond( ExNum ).SecOutEnth, BlankString );
 
 			} //ENDIF for "IF(ExchCond(ExNum)%ControlToTemperatureSetPoint .AND... THEN, ELSE"
 
@@ -1991,10 +1993,10 @@ namespace HeatRecovery {
 			}
 
 			// check for saturation in secondary outlet
-			TempSecOutSat = PsyTsatFnHPb( ExchCond( ExNum ).SecOutEnth, OutBaroPress );
+			TempSecOutSat = PsyTsatFnHPb( ExchCond( ExNum ).SecOutEnth, OutBaroPress, BlankString );
 			if ( TempSecOutSat > ExchCond( ExNum ).SecOutTemp ) {
 				ExchCond( ExNum ).SecOutTemp = TempSecOutSat;
-				ExchCond( ExNum ).SecOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SecOutTemp, ExchCond( ExNum ).SecOutEnth );
+				ExchCond( ExNum ).SecOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SecOutTemp, ExchCond( ExNum ).SecOutEnth, BlankString );
 			}
 
 			// calculate outlet conditions by mixing bypass air stream with air that went through the
@@ -2137,7 +2139,14 @@ namespace HeatRecovery {
 		Real64 MinHumRatNeeded; // minimum humidity ratio setpoint for balanced desiccant HX [kg/kg]
 		Real64 HXPartLoadRatio; // local heat exchanger part-load ratio
 		Real64 TestSaturationEnthalpy; // enthalpy used to test for regeneration outlet condition over saturation curve (J/kg)
-		static std::string ThisSub( "CalcDesiccantBalancedHeatExch:  " ); // Used to pass to Psyc routines
+		static std::string const ThisSub( "CalcDesiccantBalancedHeatExch:  " ); // Used to pass to Psyc routines
+		static std::string const ThisSubTSat( "CalcDesiccantBalancedHeatExch:   TSat" );
+		static std::string const ThisSubTSatFullLoadOutTemp( "CalcDesiccantBalancedHeatExch:   TSat-FullLoadOutTemp" );
+		static std::string const ThisSubTSatFullLoadOutHumRat( "CalcDesiccantBalancedHeatExch:   TSat-FullLoadOutHumRat" );
+		static std::string const ThisSubSecOutHumRat( "CalcDesiccantBalancedHeatExch:   SecOutHumRat" );
+		static std::string const ThisSubTestSatSec( "CalcDesiccantBalancedHeatExch:   TestSatSec" );
+		static std::string const ThisSubTSatSecOutHumRat( "CalcDesiccantBalancedHeatExch:   TSat-SecOutHumRat" );
+
 		Real64 AverageMassFlowRate; // average of supply (regen) and secondary (process) mass flow rates [kg/s]
 		bool EconomizerActiveFlag; // local representing the economizer status when PRESENT
 		bool HighHumCtrlActiveFlag; // local representing high humidity control when PRESENT
@@ -2277,10 +2286,10 @@ namespace HeatRecovery {
 
 				//     Check for saturation in the model's calculated supply outlet and reset temp, then humidity ratio at constant enthalpy
 				//     Reset delta T and delta W such that the model does not allow an outlet condition over saturation
-				TestSaturationEnthalpy = PsyHFnTdbW( FullLoadSupOutTemp, FullLoadSupOutHumRat, ThisSub + " TestSatSup" );
-				if ( PsyTsatFnHPb( TestSaturationEnthalpy, OutBaroPress, ThisSub + " TSat" ) > FullLoadSupOutTemp ) {
-					FullLoadSupOutTemp = PsyTsatFnHPb( TestSaturationEnthalpy, OutBaroPress, ThisSub + " TSat-FullLoadOutTemp" );
-					FullLoadSupOutHumRat = PsyWFnTdbH( FullLoadSupOutTemp, TestSaturationEnthalpy, ThisSub + " TSat-FullLoadOutHumRat" );
+				TestSaturationEnthalpy = PsyHFnTdbW( FullLoadSupOutTemp, FullLoadSupOutHumRat );
+				if ( PsyTsatFnHPb( TestSaturationEnthalpy, OutBaroPress, ThisSubTSat ) > FullLoadSupOutTemp ) {
+					FullLoadSupOutTemp = PsyTsatFnHPb( TestSaturationEnthalpy, OutBaroPress, ThisSubTSatFullLoadOutTemp );
+					FullLoadSupOutHumRat = PsyWFnTdbH( FullLoadSupOutTemp, TestSaturationEnthalpy, ThisSubTSatFullLoadOutHumRat );
 					FullLoadDeltaT = FullLoadSupOutTemp - ExchCond( ExNum ).SupInTemp;
 					FullLoadDeltaW = FullLoadSupOutHumRat - ExchCond( ExNum ).SupInHumRat;
 				}
@@ -2334,10 +2343,10 @@ namespace HeatRecovery {
 				//     the mass flow rate on the process and secondary side of HX may be imbalanced when the HX is used in the OA branch
 				//     use the average mass flow rate to avoid psych warnings, mass flow rates will converge at the end of the iteration
 				//     if the air mass flow rates do not converge, this model should not be used
-				CSup = AverageMassFlowRate * PsyCpAirFnWTdb( ExchCond( ExNum ).SupInHumRat, ExchCond( ExNum ).SupInTemp, ThisSub + " CSup" );
-				CSec = AverageMassFlowRate * PsyCpAirFnWTdb( ExchCond( ExNum ).SecInHumRat, ExchCond( ExNum ).SecInTemp, ThisSub + " CSec" );
+				CSup = AverageMassFlowRate * PsyCpAirFnWTdb( ExchCond( ExNum ).SupInHumRat, ExchCond( ExNum ).SupInTemp );
+				CSec = AverageMassFlowRate * PsyCpAirFnWTdb( ExchCond( ExNum ).SecInHumRat, ExchCond( ExNum ).SecInTemp );
 
-				ExchCond( ExNum ).SupOutEnth = PsyHFnTdbW( ExchCond( ExNum ).SupOutTemp, ExchCond( ExNum ).SupOutHumRat, ThisSub + " SupOutEnth" );
+				ExchCond( ExNum ).SupOutEnth = PsyHFnTdbW( ExchCond( ExNum ).SupOutTemp, ExchCond( ExNum ).SupOutHumRat );
 
 				SensHeatRecRate = CSup * ( ExchCond( ExNum ).SupOutTemp - ExchCond( ExNum ).SupInTemp );
 
@@ -2349,15 +2358,15 @@ namespace HeatRecovery {
 
 				ExchCond( ExNum ).SecOutTemp = ExchCond( ExNum ).SecInTemp - SensHeatRecRate / CSec;
 
-				ExchCond( ExNum ).SecOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SecOutTemp, ExchCond( ExNum ).SecOutEnth, ThisSub + " SecOutHumRat" );
+				ExchCond( ExNum ).SecOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SecOutTemp, ExchCond( ExNum ).SecOutEnth, ThisSubSecOutHumRat );
 
 				// check for saturation in process (secondary) outlet
 				// The process outlet conditions should never be over the saturation curve for the balanced desiccant model
 				// although this may occur during warmup. This check is included here for consistency.
-				TempSecOutSat = PsyTsatFnHPb( ExchCond( ExNum ).SecOutEnth, OutBaroPress, ThisSub + " TestSatSec" );
+				TempSecOutSat = PsyTsatFnHPb( ExchCond( ExNum ).SecOutEnth, OutBaroPress, ThisSubTestSatSec );
 				if ( TempSecOutSat > ExchCond( ExNum ).SecOutTemp ) {
 					ExchCond( ExNum ).SecOutTemp = TempSecOutSat;
-					ExchCond( ExNum ).SecOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SecOutTemp, ExchCond( ExNum ).SecOutEnth, ThisSub + " TSat-SecOutHumRat" );
+					ExchCond( ExNum ).SecOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SecOutTemp, ExchCond( ExNum ).SecOutEnth, ThisSubTSatSecOutHumRat );
 				}
 
 				ExchCond( ExNum ).ElecUseRate = BalDesDehumPerfData( ExchCond( ExNum ).PerfDataIndex ).NomElecPower * HXPartLoadRatio;
@@ -2369,7 +2378,7 @@ namespace HeatRecovery {
 		} //ENDIF for "IF (UnitOn) THEN"
 
 		// Report the process side heat transfer
-		CSec = AverageMassFlowRate * PsyCpAirFnWTdb( ExchCond( ExNum ).SecInHumRat, ExchCond( ExNum ).SecInTemp, ThisSub );
+		CSec = AverageMassFlowRate * PsyCpAirFnWTdb( ExchCond( ExNum ).SecInHumRat, ExchCond( ExNum ).SecInTemp );
 		ProcessSensHeatRecRate = CSec * ( ExchCond( ExNum ).SecOutTemp - ExchCond( ExNum ).SecInTemp );
 
 		ProcessTotHeatRecRate = ExchCond( ExNum ).SecOutMassFlow * ( ExchCond( ExNum ).SecOutEnth - ExchCond( ExNum ).SecInEnth );
@@ -2468,8 +2477,8 @@ namespace HeatRecovery {
 		ExchCond( ExNum ).SecOutMassFlow = ExchCond( ExNum ).SecInMassFlow;
 		ExchCond( ExNum ).SupBypassMassFlow = 0.0;
 		ExchCond( ExNum ).SecBypassMassFlow = 0.0;
-		RhoSup = PsyRhoAirFnPbTdbW( OutBaroPress, ExchCond( ExNum ).SupInTemp, ExchCond( ExNum ).SupInHumRat );
-		RhoSec = PsyRhoAirFnPbTdbW( OutBaroPress, ExchCond( ExNum ).SecInTemp, ExchCond( ExNum ).SecInHumRat );
+		RhoSup = PsyRhoAirFnPbTdbW( OutBaroPress, ExchCond( ExNum ).SupInTemp, ExchCond( ExNum ).SupInHumRat, BlankString );
+		RhoSec = PsyRhoAirFnPbTdbW( OutBaroPress, ExchCond( ExNum ).SecInTemp, ExchCond( ExNum ).SecInHumRat, BlankString );
 		CSup = ExchCond( ExNum ).SupOutMassFlow * PsyCpAirFnWTdb( ExchCond( ExNum ).SupInHumRat, ExchCond( ExNum ).SupInTemp );
 		CSec = ExchCond( ExNum ).SecOutMassFlow * PsyCpAirFnWTdb( ExchCond( ExNum ).SecInHumRat, ExchCond( ExNum ).SecInTemp );
 		CMin = min( CSup, CSec );
@@ -2490,16 +2499,16 @@ namespace HeatRecovery {
 			ExchCond( ExNum ).SupOutEnth = PsyHFnTdbW( ExchCond( ExNum ).SupOutTemp, ExchCond( ExNum ).SupOutHumRat );
 
 			//   Check for saturation in supply outlet and reset temp, then humidity ratio at constant enthalpy
-			if ( PsyTsatFnHPb( ExchCond( ExNum ).SupOutEnth, OutBaroPress ) > ExchCond( ExNum ).SupOutTemp ) {
-				ExchCond( ExNum ).SupOutTemp = PsyTsatFnHPb( ExchCond( ExNum ).SupOutEnth, OutBaroPress );
-				ExchCond( ExNum ).SupOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SupOutTemp, ExchCond( ExNum ).SupOutEnth );
+			if ( PsyTsatFnHPb( ExchCond( ExNum ).SupOutEnth, OutBaroPress, BlankString ) > ExchCond( ExNum ).SupOutTemp ) {
+				ExchCond( ExNum ).SupOutTemp = PsyTsatFnHPb( ExchCond( ExNum ).SupOutEnth, OutBaroPress, BlankString );
+				ExchCond( ExNum ).SupOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SupOutTemp, ExchCond( ExNum ).SupOutEnth , BlankString);
 			}
 
 			QSensTrans = CSup * ( ExchCond( ExNum ).SupInTemp - ExchCond( ExNum ).SupOutTemp );
 			ExchCond( ExNum ).SecOutTemp = ExchCond( ExNum ).SecInTemp + QSensTrans / CSec;
 			QTotTrans = ExchCond( ExNum ).SupOutMassFlow * ( ExchCond( ExNum ).SupInEnth - ExchCond( ExNum ).SupOutEnth );
 			ExchCond( ExNum ).SecOutEnth = ExchCond( ExNum ).SecInEnth + QTotTrans / ExchCond( ExNum ).SecOutMassFlow;
-			ExchCond( ExNum ).SecOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SecOutTemp, ExchCond( ExNum ).SecOutEnth );
+			ExchCond( ExNum ).SecOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SecOutTemp, ExchCond( ExNum ).SecOutEnth, BlankString );
 		}
 
 		// Check frost control by type
@@ -2562,16 +2571,16 @@ namespace HeatRecovery {
 			ExchCond( ExNum ).SupOutEnth = PsyHFnTdbW( ExchCond( ExNum ).SupOutTemp, ExchCond( ExNum ).SupOutHumRat );
 
 			//   Check for saturation in supply outlet and reset temp, then humidity ratio at constant enthalpy
-			if ( PsyTsatFnHPb( ExchCond( ExNum ).SupOutEnth, OutBaroPress ) > ExchCond( ExNum ).SupOutTemp ) {
-				ExchCond( ExNum ).SupOutTemp = PsyTsatFnHPb( ExchCond( ExNum ).SupOutEnth, OutBaroPress );
-				ExchCond( ExNum ).SupOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SupOutTemp, ExchCond( ExNum ).SupOutEnth );
+			if ( PsyTsatFnHPb( ExchCond( ExNum ).SupOutEnth, OutBaroPress, BlankString ) > ExchCond( ExNum ).SupOutTemp ) {
+				ExchCond( ExNum ).SupOutTemp = PsyTsatFnHPb( ExchCond( ExNum ).SupOutEnth, OutBaroPress, BlankString );
+				ExchCond( ExNum ).SupOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SupOutTemp, ExchCond( ExNum ).SupOutEnth, BlankString );
 			}
 
 			QSensTrans = CSup * ( ExchCond( ExNum ).SupInTemp - ExchCond( ExNum ).SupOutTemp );
 			ExchCond( ExNum ).SecOutTemp = ExchCond( ExNum ).SecInTemp + QSensTrans / CSec;
 			QTotTrans = ExchCond( ExNum ).SupOutMassFlow * ( ExchCond( ExNum ).SupInEnth - ExchCond( ExNum ).SupOutEnth );
 			ExchCond( ExNum ).SecOutEnth = ExchCond( ExNum ).SecInEnth + QTotTrans / ExchCond( ExNum ).SecOutMassFlow;
-			ExchCond( ExNum ).SecOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SecOutTemp, ExchCond( ExNum ).SecOutEnth );
+			ExchCond( ExNum ).SecOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SecOutTemp, ExchCond( ExNum ).SecOutEnth, BlankString );
 
 			//   Perform mixing of core air stream and bypass air stream and set mass flow rates at outlet nodes
 			ExchCond( ExNum ).SupOutEnth = ( ExchCond( ExNum ).SupOutMassFlow * ExchCond( ExNum ).SupOutEnth + ExchCond( ExNum ).SupBypassMassFlow * ExchCond( ExNum ).SupInEnth ) / ExchCond( ExNum ).SupInMassFlow;
@@ -2636,18 +2645,18 @@ namespace HeatRecovery {
 			ExchCond( ExNum ).SupBypassMassFlow = ExchCond( ExNum ).SupInMassFlow * DFFraction;
 			ExchCond( ExNum ).SupOutTemp = ExchCond( ExNum ).SupInTemp - QSensTrans / CSup;
 			ExchCond( ExNum ).SupOutEnth = ExchCond( ExNum ).SupInEnth - QTotTrans / ExchCond( ExNum ).SupOutMassFlow;
-			ExchCond( ExNum ).SupOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SupOutTemp, ExchCond( ExNum ).SupOutEnth );
+			ExchCond( ExNum ).SupOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SupOutTemp, ExchCond( ExNum ).SupOutEnth, BlankString );
 
-			if ( PsyTsatFnHPb( ExchCond( ExNum ).SupOutEnth, OutBaroPress ) > ExchCond( ExNum ).SupOutTemp ) {
-				ExchCond( ExNum ).SupOutTemp = PsyTsatFnHPb( ExchCond( ExNum ).SupOutEnth, OutBaroPress );
-				ExchCond( ExNum ).SupOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SupOutTemp, ExchCond( ExNum ).SupOutEnth );
+			if ( PsyTsatFnHPb( ExchCond( ExNum ).SupOutEnth, OutBaroPress, BlankString ) > ExchCond( ExNum ).SupOutTemp ) {
+				ExchCond( ExNum ).SupOutTemp = PsyTsatFnHPb( ExchCond( ExNum ).SupOutEnth, OutBaroPress, BlankString );
+				ExchCond( ExNum ).SupOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SupOutTemp, ExchCond( ExNum ).SupOutEnth, BlankString );
 				QSensTrans = CSup * ( ExchCond( ExNum ).SupInTemp - ExchCond( ExNum ).SupOutTemp );
 				// Should we be updating the sensible and latent effectiveness values also?
 			}
 
 			ExchCond( ExNum ).SecOutEnth = ExchCond( ExNum ).SecInEnth + QTotTrans / ExchCond( ExNum ).SecOutMassFlow;
 			ExchCond( ExNum ).SecOutTemp = ExchCond( ExNum ).SecInTemp + QSensTrans / CSec;
-			ExchCond( ExNum ).SecOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SecOutTemp, ExchCond( ExNum ).SecOutEnth );
+			ExchCond( ExNum ).SecOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SecOutTemp, ExchCond( ExNum ).SecOutEnth, BlankString );
 		} // End of IF (Exhaust Only)
 
 		ExchCond( ExNum ).DefrostFraction = DFFraction;
@@ -4113,7 +4122,7 @@ namespace HeatRecovery {
 		//               *  |
 		//                  |
 		//                T_Temp
-		if ( T_RegenInHumRat > PsyWFnTdpPb( T_RegenInTemp, OutBaroPress ) || T_ProcInHumRat > PsyWFnTdpPb( T_ProcInTemp, OutBaroPress ) ) {
+		if ( T_RegenInHumRat > PsyWFnTdpPb( T_RegenInTemp, OutBaroPress, BlankString ) || T_ProcInHumRat > PsyWFnTdpPb( T_ProcInTemp, OutBaroPress, BlankString ) ) {
 			//       reset RH print flags just in case
 			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintRegenInRelHumTempMess = false;
 			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintProcInRelHumTempMess = false;
@@ -4127,8 +4136,8 @@ namespace HeatRecovery {
 			return;
 		}
 
-		RegenInletRH = PsyRhFnTdbWPb( T_RegenInTemp, T_RegenInHumRat, OutBaroPress );
-		ProcInletRH = min( 1.0, PsyRhFnTdbWPb( T_ProcInTemp, T_ProcInHumRat, OutBaroPress ) );
+		RegenInletRH = PsyRhFnTdbWPb( T_RegenInTemp, T_RegenInHumRat, OutBaroPress, BlankString );
+		ProcInletRH = min( 1.0, PsyRhFnTdbWPb( T_ProcInTemp, T_ProcInHumRat, OutBaroPress, BlankString ) );
 
 		// checking if regeneration inlet relative humidity is within model boundaries
 		if ( RegenInletRH < BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_MinRegenAirInRelHum || RegenInletRH > BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).T_MaxRegenAirInRelHum ) {
@@ -4276,7 +4285,7 @@ namespace HeatRecovery {
 		//               *  |
 		//                  |
 		//                H_Temp
-		if ( H_RegenInHumRat > PsyWFnTdpPb( H_RegenInTemp, OutBaroPress ) || H_ProcInHumRat > PsyWFnTdpPb( H_ProcInTemp, OutBaroPress ) ) {
+		if ( H_RegenInHumRat > PsyWFnTdpPb( H_RegenInTemp, OutBaroPress, BlankString ) || H_ProcInHumRat > PsyWFnTdpPb( H_ProcInTemp, OutBaroPress, BlankString ) ) {
 			//       reset RH print flags just in case
 			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintRegenInRelHumHumRatMess = false;
 			BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).PrintProcInRelHumHumRatMess = false;
@@ -4290,8 +4299,8 @@ namespace HeatRecovery {
 			return;
 		}
 
-		RegenInletRH = PsyRhFnTdbWPb( H_RegenInTemp, H_RegenInHumRat, OutBaroPress );
-		ProcInletRH = min( 1.0, PsyRhFnTdbWPb( H_ProcInTemp, H_ProcInHumRat, OutBaroPress ) );
+		RegenInletRH = PsyRhFnTdbWPb( H_RegenInTemp, H_RegenInHumRat, OutBaroPress, BlankString );
+		ProcInletRH = min( 1.0, PsyRhFnTdbWPb( H_ProcInTemp, H_ProcInHumRat, OutBaroPress, BlankString ) );
 
 		// checking if regeneration inlet relative humidity is within model boundaries
 		if ( RegenInletRH < BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_MinRegenAirInRelHum || RegenInletRH > BalDesDehumPerfData( ExchCond( ExchNum ).PerfDataIndex ).H_MaxRegenAirInRelHum ) {

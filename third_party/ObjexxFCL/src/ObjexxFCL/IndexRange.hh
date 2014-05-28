@@ -511,6 +511,15 @@ public: // Inspector
 		return size_; // Unbounded => npos
 	}
 
+	// Size
+	inline
+	int
+	isize() const
+	{
+		assert( size_ != npos );
+		return static_cast< int >( size_ );
+	}
+
 	// Offset of an Index
 	inline
 	int

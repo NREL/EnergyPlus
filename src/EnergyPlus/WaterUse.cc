@@ -59,6 +59,8 @@ namespace WaterUse {
 	int const HeatRecoveryConfigEquipment( 2 );
 	int const HeatRecoveryConfigPlantAndEquip( 3 );
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE TYPE DECLARATIONS:
@@ -348,7 +350,7 @@ namespace WaterUse {
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
@@ -878,6 +880,8 @@ namespace WaterUse {
 		Real64 FlowMassMax;
 		Real64 MoistureMassMax;
 
+		static std::string const RoutineName( "CalcEquipmentDrainTemp" );
+
 		// FLOW:
 
 		WaterEquipment( WaterEquipNum ).SensibleRate = 0.0;
@@ -906,8 +910,8 @@ namespace WaterUse {
 				WaterEquipment( WaterEquipNum ).LatentEnergy = 0.0;
 			} else {
 				ZoneHumRat = ZoneAirHumRat( ZoneNum );
-				ZoneHumRatSat = PsyWFnTdbRhPb( ZoneMAT, 1.0, OutBaroPress, "CalcEquipmentDrainTemp" ); // Humidratio at 100% relative humidity
-				RhoAirDry = PsyRhoAirFnPbTdbW( OutBaroPress, ZoneMAT, 0.0 );
+				ZoneHumRatSat = PsyWFnTdbRhPb( ZoneMAT, 1.0, OutBaroPress, RoutineName ); // Humidratio at 100% relative humidity
+				RhoAirDry = PsyRhoAirFnPbTdbW( OutBaroPress, ZoneMAT, 0.0, BlankString );
 
 				ZoneMassMax = ( ZoneHumRatSat - ZoneHumRat ) * RhoAirDry * Zone( ZoneNum ).Volume; // Max water that can be evaporated to zone
 				FlowMassMax = WaterEquipment( WaterEquipNum ).TotalMassFlowRate * TimeStepSys * SecInHour; // Max water in flow

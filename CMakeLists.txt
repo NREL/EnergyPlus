@@ -8,6 +8,7 @@ set( CMAKE_VERSION_PATCH 0 )
 
 option( BUILD_PACKAGE "Build package" OFF )
 option( BUILD_TESTING "Build testing targets" OFF )
+option( BUILD_FORTRAN "Build Fortran stuff" OFF )
 
 # Not yet released by CMake, but is being developed
 # This will help us set the proper options for c++11 across various configurations
@@ -28,11 +29,8 @@ include(cmake/CompilerFlags.cmake)
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/gtest/include/ SYSTEM )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/ObjexxFCL/src/ )
 
-if( BUILD_PACKAGE )
-  include(CPack.cmake)
-endif()
-
 if( BUILD_TESTING )
+  option( TEST_ANNUAL_SIMULATION "Use annual simulations for tests instead of only design days" OFF )
   enable_testing()
   include(CTest) 
   ADD_SUBDIRECTORY(third_party/gtest)
@@ -42,4 +40,22 @@ ADD_SUBDIRECTORY(third_party/ObjexxFCL)
 ADD_SUBDIRECTORY(src/EnergyPlus)
 ADD_SUBDIRECTORY(testfiles)
 
+if( BUILD_FORTRAN )
+  include(CMakeAddFortranSubdirectory)
+  cmake_add_fortran_subdirectory(src/ExpandObjects PROJECT ExpandObjects NO_EXTERNAL_INSTALL )
+  cmake_add_fortran_subdirectory(src/ReadVars PROJECT ReadVars NO_EXTERNAL_INSTALL )
+endif()
+
+if( BUILD_PACKAGE )
+  set(CPACK_INSTALL_CMAKE_PROJECTS
+    "${CMAKE_BINARY_DIR};EnergyPLus;ALL;/"
+  )
+
+  if( BUILD_FORTRAN )
+    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ExpandObjects/;ExpandObjects;ALL;/")
+    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ReadVars/;ReadVars;ALL;/")
+  endif()
+
+  include(CPack.cmake)
+endif()
 

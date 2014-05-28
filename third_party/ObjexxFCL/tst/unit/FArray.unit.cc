@@ -319,6 +319,13 @@ TEST( FArrayTest, Cshift2DDim2 )
 	EXPECT_TRUE( eq( B, cshift( A, -2, 2 ) ) );
 }
 
+TEST( FArrayTest, Cshift2DNonSquareDim2 )
+{
+	FArray2D_int A( 3, 2, reshape( { 11, 21, 31, 12, 22, 32 }, std::array< int, 2 >{ { 3, 2 } } ) );
+	FArray2D_int B( 3, 2, reshape( { 12, 22, 32, 11, 21, 31 }, std::array< int, 2 >{ { 3, 2 } } ) );
+	EXPECT_TRUE( eq( B, cshift( A, -1, 2 ) ) );
+}
+
 TEST( FArrayTest, Cshift2DDim1Array )
 {
 	FArray2D_int A( 3, 3, reshape( { 11, 21, 31, 12, 22, 32, 13, 23, 33 }, std::array< int, 2 >{ { 3, 3 } } ) );
@@ -514,7 +521,7 @@ TEST( FArrayTest, UboundOfUnbounded )
 	EXPECT_EQ( 1, lbound( u, 1 ) );
 	EXPECT_EQ( 1, lbound( u, 2 ) );
 	EXPECT_EQ( 3, ubound( u, 1 ) );
-	EXPECT_DEATH( ubound( u, 2 ), ".*Assertion.*" ); // Can't take ubound of unbounded dimension
+	EXPECT_DEBUG_DEATH( ubound( u, 2 ), ".*Assertion.*" ); // Can't take ubound of unbounded dimension
 }
 
 TEST( FArrayTest, EmptyComparisonPredicate )
@@ -544,7 +551,7 @@ TEST( FArrayTest, Unallocated )
 	FArray1D_int a; // Empty
 	EXPECT_FALSE( a.allocated() );
 	EXPECT_FALSE( allocated( a ) );
-	EXPECT_DEATH( a( 1 ), ".*Assertion.*" );
+	EXPECT_DEBUG_DEATH( a( 1 ), ".*Assertion.*" );
 }
 
 TEST( FArrayTest, AnyOp2D )

@@ -128,7 +128,7 @@ namespace SimulationManager {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
-	// na
+	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS:
 	// na
@@ -458,7 +458,7 @@ namespace SimulationManager {
 						// Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
 						// SubTimeStepFlags can/will be set/reset in the HVAC Manager.
 
-						if ( ( TimeStep == NumOfTimeStepInHour ) ) {
+						if ( TimeStep == NumOfTimeStepInHour ) {
 							EndHourFlag = true;
 							if ( HourOfDay == 24 ) {
 								EndDayFlag = true;
@@ -597,7 +597,6 @@ namespace SimulationManager {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static FArray1D_int const Div60( 12, { 1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60 } );
-		static std::string const Blank;
 		static gio::Fmt const fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -870,7 +869,7 @@ namespace SimulationManager {
 					//             TRIM(Alphas(NumA))//'', prior set=true for this condition reverts to false.')
 					//        ENDIF
 					//        CreateMinimalSurfaceVariables=.FALSE.
-				} else if ( Alphas( NumA ) != Blank ) {
+				} else if ( Alphas( NumA ) != BlankString ) {
 					ShowWarningError( "GetProjectData: " + CurrentModuleObject + "=\"" + Alphas( NumA ) + "\", Invalid value for field, entered value ignored." );
 				}
 			}
@@ -1750,7 +1749,6 @@ namespace SimulationManager {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const errstring( "**error**" );
-		static std::string const Blank;
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1884,8 +1882,8 @@ namespace SimulationManager {
 						gio::write( OutputFileBNDetails, Format_713 ) << "   Plant Loop Connector,Splitter," + PlantLoop( Count ).LoopSide( LoopSideNum ).Splitter( Num ).Name + ',' + PlantLoop( Count ).Name + ',' + LoopString + ',' + stripped( ChrOut );
 						for ( Count1 = 1; Count1 <= PlantLoop( Count ).LoopSide( LoopSideNum ).Splitter( Num ).TotalOutletNodes; ++Count1 ) {
 							gio::write( ChrOut, "*" ) << Count1;
-							ChrOut2 = Blank;
-							ChrOut3 = Blank;
+							ChrOut2 = BlankString;
+							ChrOut3 = BlankString;
 							if ( PlantLoop( Count ).LoopSide( LoopSideNum ).Splitter( Num ).BranchNumIn <= 0 ) {
 								ChrOut2 = errstring;
 							}
@@ -1914,8 +1912,8 @@ namespace SimulationManager {
 						gio::write( OutputFileBNDetails, Format_713 ) << "   Plant Loop Connector,Mixer," + PlantLoop( Count ).LoopSide( LoopSideNum ).Mixer( Num ).Name + ',' + PlantLoop( Count ).Name + ',' + LoopString + ',' + stripped( ChrOut ); //',Supply,'//  &
 						for ( Count1 = 1; Count1 <= PlantLoop( Count ).LoopSide( LoopSideNum ).Mixer( Num ).TotalInletNodes; ++Count1 ) {
 							gio::write( ChrOut, "*" ) << Count1;
-							ChrOut2 = Blank;
-							ChrOut3 = Blank;
+							ChrOut2 = BlankString;
+							ChrOut3 = BlankString;
 							if ( PlantLoop( Count ).LoopSide( LoopSideNum ).Mixer( Num ).BranchNumIn( Count1 ) <= 0 ) {
 								ChrOut2 = errstring;
 							}
@@ -1974,8 +1972,8 @@ namespace SimulationManager {
 						gio::write( OutputFileBNDetails, Format_713 ) << "   Plant Loop Connector,Splitter," + PlantLoop( Count ).LoopSide( LoopSideNum ).Splitter( Num ).Name + ',' + PlantLoop( Count ).Name + ',' + LoopString + ',' + stripped( ChrOut );
 						for ( Count1 = 1; Count1 <= PlantLoop( Count ).LoopSide( LoopSideNum ).Splitter( Num ).TotalOutletNodes; ++Count1 ) {
 							gio::write( ChrOut, "*" ) << Count1;
-							ChrOut2 = Blank;
-							ChrOut3 = Blank;
+							ChrOut2 = BlankString;
+							ChrOut3 = BlankString;
 							if ( PlantLoop( Count ).LoopSide( LoopSideNum ).Splitter( Num ).BranchNumIn <= 0 ) {
 								ChrOut2 = errstring;
 							}
@@ -2004,8 +2002,8 @@ namespace SimulationManager {
 						gio::write( OutputFileBNDetails, Format_713 ) << "   Plant Loop Connector,Mixer," + PlantLoop( Count ).LoopSide( LoopSideNum ).Mixer( Num ).Name + ',' + PlantLoop( Count ).Name + ',' + LoopString + ',' + stripped( ChrOut ); //',Supply,'//  &
 						for ( Count1 = 1; Count1 <= PlantLoop( Count ).LoopSide( LoopSideNum ).Mixer( Num ).TotalInletNodes; ++Count1 ) {
 							gio::write( ChrOut, "*" ) << Count1;
-							ChrOut2 = Blank;
-							ChrOut3 = Blank;
+							ChrOut2 = BlankString;
+							ChrOut3 = BlankString;
 							if ( PlantLoop( Count ).LoopSide( LoopSideNum ).Mixer( Num ).BranchNumIn( Count1 ) <= 0 ) {
 								ChrOut2 = errstring;
 							}
@@ -2141,7 +2139,7 @@ namespace SimulationManager {
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// na
@@ -2175,10 +2173,10 @@ namespace SimulationManager {
 				ChildOutNodeName.allocate( NumChildren );
 				ChildInNodeNum.allocate( NumChildren );
 				ChildOutNodeNum.allocate( NumChildren );
-				ChildCType = Blank;
-				ChildCName = Blank;
-				ChildInNodeName = Blank;
-				ChildOutNodeName = Blank;
+				ChildCType = BlankString;
+				ChildCName = BlankString;
+				ChildInNodeName = BlankString;
+				ChildOutNodeName = BlankString;
 				ChildInNodeNum = 0;
 				ChildOutNodeNum = 0;
 				GetChildrenData( ParentNodeList( Loop ).CType, ParentNodeList( Loop ).CName, NumChildren, ChildCType, ChildCName, ChildInNodeName, ChildInNodeNum, ChildOutNodeName, ChildOutNodeNum, ErrorsFound );
@@ -2515,7 +2513,7 @@ namespace SimulationManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2584,7 +2582,7 @@ namespace SimulationManager {
 		Threading = true;
 
 		get_environment_variable( cNumThreads, cEnvValue );
-		if ( cEnvValue != Blank ) {
+		if ( cEnvValue != BlankString ) {
 			lEnvSetThreadsInput = true;
 			{ IOFlags flags; gio::read( cEnvValue, "*", flags ) >> iEnvSetThreads; ios = flags.ios(); }
 			if ( ios != 0 ) iEnvSetThreads = MaxNumberOfThreads;
@@ -2592,7 +2590,7 @@ namespace SimulationManager {
 		}
 
 		get_environment_variable( cepNumThreads, cEnvValue );
-		if ( cEnvValue != Blank ) {
+		if ( cEnvValue != BlankString ) {
 			lepSetThreadsInput = true;
 			{ IOFlags flags; gio::read( cEnvValue, "*", flags ) >> iepEnvSetThreads; ios = flags.ios(); }
 			if ( ios != 0 ) iepEnvSetThreads = MaxNumberOfThreads;
@@ -2641,7 +2639,7 @@ namespace SimulationManager {
 #endif
 		// just reporting
 		get_environment_variable( cNumActiveSims, cEnvValue );
-		if ( cEnvValue != Blank ) {
+		if ( cEnvValue != BlankString ) {
 			lnumActiveSims = true;
 			{ IOFlags flags; gio::read( cEnvValue, "*", flags ) >> inumActiveSims; ios = flags.ios(); }
 		}

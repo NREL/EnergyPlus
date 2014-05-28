@@ -56,6 +56,8 @@ namespace MundtSimMgr {
 	Real64 const MinSlope( 0.001 ); // Bound on result from Mundt model
 	Real64 const MaxSlope( 5.0 ); // Bound on result from Mundt Model
 
+	static std::string const BlankString;
+
 	// MODULE DERIVED TYPE DEFINITIONS:
 
 	// INTERFACE BLOCK SPECIFICATIONS:
@@ -463,7 +465,7 @@ namespace MundtSimMgr {
 
 		// supply air flowrate is the same as zone air flowrate
 		ZoneNode = Zone( ZoneNum ).SystemZoneNodeNumber;
-		ZoneAirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneNum ), PsyWFnTdpPb( MAT( ZoneNum ), OutBaroPress ) );
+		ZoneAirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneNum ), PsyWFnTdpPb( MAT( ZoneNum ), OutBaroPress, BlankString ), BlankString );
 		ZoneMassFlowRate = Node( ZoneNode ).MassFlowRate;
 		SupplyAirVolumeRate = ZoneMassFlowRate / ZoneAirDensity;
 		if ( ZoneMassFlowRate <= 0.0001 ) {

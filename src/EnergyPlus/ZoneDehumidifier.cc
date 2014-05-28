@@ -529,7 +529,7 @@ namespace ZoneDehumidifier {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "InitZoneDehumidifier" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -574,8 +574,8 @@ namespace ZoneDehumidifier {
 			// Might default back to STP later after discussion with M. Witte, use StdRhoAir instead of calc'd RhoAir at rated conditions
 			RatedAirDBTemp = 26.6667; // 26.6667 C, 80F
 			RatedAirRH = 0.6; // 60% RH
-			RatedAirHumrat = PsyWFnTdbRhPb( RatedAirDBTemp, RatedAirRH, StdBaroPress, "InitZoneDehumidifier" );
-			ZoneDehumid( ZoneDehumNum ).RatedAirMassFlow = PsyRhoAirFnPbTdbW( StdBaroPress, RatedAirDBTemp, RatedAirHumrat, "InitZoneDehumidifier" ) * ZoneDehumid( ZoneDehumNum ).RatedAirVolFlow;
+			RatedAirHumrat = PsyWFnTdbRhPb( RatedAirDBTemp, RatedAirRH, StdBaroPress, RoutineName );
+			ZoneDehumid( ZoneDehumNum ).RatedAirMassFlow = PsyRhoAirFnPbTdbW( StdBaroPress, RatedAirDBTemp, RatedAirHumrat, RoutineName ) * ZoneDehumid( ZoneDehumNum ).RatedAirVolFlow;
 
 			// Set the node max and min mass flow rates on inlet node... outlet node gets updated in UPDATE subroutine
 			Node( AirInletNode ).MassFlowRateMax = ZoneDehumid( ZoneDehumNum ).RatedAirMassFlow;
@@ -688,7 +688,7 @@ namespace ZoneDehumidifier {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "CalcZoneDehumidifier" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -734,7 +734,7 @@ namespace ZoneDehumidifier {
 
 		InletAirTemp = Node( AirInletNodeNum ).Temp;
 		InletAirHumRat = Node( AirInletNodeNum ).HumRat;
-		InletAirRH = 100.0 * PsyRhFnTdbWPb( InletAirTemp, InletAirHumRat, OutBaroPress, "CalcZoneDehumidifier" ); // RH in percent (%)
+		InletAirRH = 100.0 * PsyRhFnTdbWPb( InletAirTemp, InletAirHumRat, OutBaroPress, RoutineName ); // RH in percent (%)
 
 		if ( QZnDehumidReq < 0.0 && GetCurrentScheduleValue( ZoneDehumid( ZoneDehumNum ).SchedPtr ) > 0.0 && InletAirTemp >= ZoneDehumid( ZoneDehumNum ).MinInletAirTemp && InletAirTemp <= ZoneDehumid( ZoneDehumNum ).MaxInletAirTemp ) {
 			// A dehumidification load is being requested and dehumidifier is available (schedule value > 0)
@@ -757,7 +757,7 @@ namespace ZoneDehumidifier {
 
 			WaterRemovalVolRate = WaterRemovalRateFactor * ZoneDehumid( ZoneDehumNum ).RatedWaterRemoval;
 
-			WaterRemovalMassRate = WaterRemovalVolRate / ( 24.0 * SecInHour * 1000.0 ) * RhoH2O( max( ( InletAirTemp - 11.0 ), 1.0 ), "CalcZoneDehumidifier" ); //(L/d)/(24 hr/day *3600 sec/hr * 1000 L/m3) | Density of water, minimum temp = 1.0C
+			WaterRemovalMassRate = WaterRemovalVolRate / ( 24.0 * SecInHour * 1000.0 ) * RhoH2O( max( ( InletAirTemp - 11.0 ), 1.0 ) ); //(L/d)/(24 hr/day *3600 sec/hr * 1000 L/m3) | Density of water, minimum temp = 1.0C
 
 			if ( WaterRemovalMassRate > 0.0 ) {
 				PLR = max( 0.0, min( 1.0, - QZnDehumidReq / WaterRemovalMassRate ) );
@@ -891,7 +891,7 @@ namespace ZoneDehumidifier {
 
 		// Use inlet air temperature in outlet air enthalpy calculation... since the sensible heat output
 		// from the dehumidifier is being sent directly to the zone air heat balance for next hvac simulation time step
-		ZoneDehumid( ZoneDehumNum ).OutletAirEnthalpy = PsyHFnTdbW( InletAirTemp, OutletAirHumRat, "CalcZoneDehumidifier" );
+		ZoneDehumid( ZoneDehumNum ).OutletAirEnthalpy = PsyHFnTdbW( InletAirTemp, OutletAirHumRat );
 
 		ZoneDehumid( ZoneDehumNum ).SensHeatingRate = SensibleOutput; // Report variable update, W,  avg sens output when unit is 'on'
 		ZoneDehumid( ZoneDehumNum ).WaterRemovalRate = LatentOutput; // Report variable update, kg/s
@@ -1028,7 +1028,7 @@ namespace ZoneDehumidifier {
 			AirInletNodeNum = ZoneDehumid( DehumidNum ).AirInletNodeNum;
 			InletAirTemp = Node( AirInletNodeNum ).Temp;
 			OutletAirTemp = max( ( InletAirTemp - 11.0 ), 1.0 ); // Assume coil outlet air is 11C (20F) lower than inlet air temp
-			RhoWater = RhoH2O( OutletAirTemp, "ReportZoneDehumidifier" ); // Density of water, minimum temp = 1.0 C
+			RhoWater = RhoH2O( OutletAirTemp ); // Density of water, minimum temp = 1.0 C
 
 			if ( RhoWater > 0.0 ) {
 				ZoneDehumid( DehumidNum ).DehumidCondVolFlowRate = ZoneDehumid( DehumidNum ).WaterRemovalRate / RhoWater;

@@ -63,7 +63,6 @@ namespace WeatherManager {
 	extern Real64 const Sigma; // Stefan-Boltzmann constant
 	extern Real64 const TKelvin; // conversion from Kelvin to Celsius
 
-	extern std::string const Blank;
 	extern FArray1D_string const DaysOfWeek;
 
 	extern bool Debugout;
@@ -251,8 +250,8 @@ namespace WeatherManager {
 
 		// Default Constructor
 		EnvironmentData() :
-			Title( Blank ),
-			cKindOfEnvrn( Blank ),
+			Title( "" ),
+			cKindOfEnvrn( "" ),
 			KindOfEnvrn( 0 ),
 			TotalDays( 0 ),
 			StartJDay( 0 ),
