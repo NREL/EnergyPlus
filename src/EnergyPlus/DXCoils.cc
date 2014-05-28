@@ -5265,7 +5265,7 @@ namespace DXCoils {
 				DataIsDXCoil = false;
 //				DataDXCT = 1;
 				DataFlowUsedForSizing = 0.0;
-				DataCoolCoilCap - 0.0;
+				DataCoolCoilCap = 0.0;
 				DataTotCapCurveIndex = 0;
 				DataEMSOverrideON = false;
 				DataEMSOverride = 0.0;
