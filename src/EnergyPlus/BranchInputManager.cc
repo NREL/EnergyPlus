@@ -1873,7 +1873,7 @@ namespace BranchInputManager {
 					if ( NumOfBranches == 0 ) {
 						GetBranchInput();
 					}
-					if ( BranchList( BCount ).BranchNames( Loop ) != BlankString ) {
+					if ( ! BranchList( BCount ).BranchNames( Loop ).empty() ) {
 						Found = FindItemInList( BranchList( BCount ).BranchNames( Loop ), Branch.Name(), NumOfBranches );
 						if ( Found == 0 ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + BranchList( BCount ).Name + "\", invalid data." );
@@ -2336,7 +2336,7 @@ namespace BranchInputManager {
 				}
 			}
 
-			if ( BranchListName != BlankString ) {
+			if ( ! BranchListName.empty() ) {
 				FoundSupplyDemandAir = BlankString;
 				FoundLoop = BlankString;
 				MatchedLoop = false;
@@ -2367,7 +2367,7 @@ namespace BranchInputManager {
 					}
 				}
 
-				if ( BranchListName != BlankString ) {
+				if ( ! BranchListName.empty() ) {
 					FoundSupplyDemandAir = BlankString;
 					FoundLoop = BlankString;
 					MatchedLoop = false;
@@ -2577,7 +2577,7 @@ namespace BranchInputManager {
 				}
 			}
 
-			if ( BranchListName != BlankString ) {
+			if ( ! BranchListName.empty() ) {
 				FoundSupplyDemandAir = BlankString;
 				FoundLoop = BlankString;
 				MatchedLoop = false;
@@ -2608,7 +2608,7 @@ namespace BranchInputManager {
 					}
 				}
 
-				if ( BranchListName != BlankString ) {
+				if ( ! BranchListName.empty() ) {
 					FoundSupplyDemandAir = BlankString;
 					FoundLoop = BlankString;
 					MatchedLoop = false;

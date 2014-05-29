@@ -1501,7 +1501,7 @@ namespace ChillerElectricEIR {
 			//    Node(CondInletNode)%Temp = OutWetBulbTemp
 			Node( CondInletNode ).Temp = Node( CondInletNode ).OutAirWetBulb;
 			//  line above assumes evaporation pushes condenser inlet air humidity ratio to saturation
-			CondOutletHumRat = PsyWFnTdbTwbPb( Node( CondInletNode ).Temp, Node( CondInletNode ).Temp, Node( CondInletNode ).Press, BlankString );
+			CondOutletHumRat = PsyWFnTdbTwbPb( Node( CondInletNode ).Temp, Node( CondInletNode ).Temp, Node( CondInletNode ).Press );
 
 			// Warn user if evap condenser wet-bulb temperature falls below 10 C
 			if ( Node( CondInletNode ).Temp < 10.0 && std::abs( MyLoad ) > 0 && RunFlag && ! WarmupFlag ) {

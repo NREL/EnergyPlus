@@ -1279,6 +1279,9 @@ cshift( FArray1< T > const & a, int const shift, int const dim = 1 )
 {
 	assert( a.size_bounded() );
 	assert( dim == 1 );
+#ifdef NDEBUG
+	static_cast< void >( dim ); // Suppress unused warning
+#endif
 	FArray1D< T > o( FArray1D< T >::shape( a ) );
 	if ( a.dimensions_initialized() ) {
 		if ( o.dimensions_initialized() ) {
@@ -1369,6 +1372,9 @@ eoshift( FArray1< T > const & a, int const shift, T const bdy = TypeTraits< T >:
 {
 	assert( a.size_bounded() );
 	assert( dim == 1 );
+#ifdef NDEBUG
+	static_cast< void >( dim ); // Suppress unused warning
+#endif
 	FArray1D< T > o( FArray1D< T >::shape( a, bdy ) );
 	if ( a.dimensions_initialized() ) {
 		if ( o.dimensions_initialized() ) {
@@ -1465,6 +1471,9 @@ sum( FArray1< T > const & a, int const dim )
 {
 	assert( a.size_bounded() );
 	assert( dim == 1 );
+#ifdef NDEBUG
+	static_cast< void >( dim ); // Suppress unused warning
+#endif
 	typedef  typename FArray< T >::size_type  size_type;
 	size_type const as( a.size() );
 	T r( 0 );
@@ -1556,6 +1565,9 @@ product( FArray1< T > const & a, int const dim )
 {
 	assert( a.size_bounded() );
 	assert( dim == 1 );
+#ifdef NDEBUG
+	static_cast< void >( dim ); // Suppress unused warning
+#endif
 	typedef  typename FArray< T >::size_type  size_type;
 	size_type const as( a.size() );
 	T r( 1 );

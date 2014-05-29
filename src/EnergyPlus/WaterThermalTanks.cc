@@ -1719,7 +1719,7 @@ namespace WaterThermalTanks {
 					}
 
 					//       set the max mass flow rate for outdoor fans
-					Node( HPWaterHeater( HPWaterHeaterNum ).FanOutletNode ).MassFlowRateMax = HPWaterHeater( HPWaterHeaterNum ).OperatingAirFlowRate * PsyRhoAirFnPbTdbW( OutBaroPress, 20.0, 0.0, BlankString );
+					Node( HPWaterHeater( HPWaterHeaterNum ).FanOutletNode ).MassFlowRateMax = HPWaterHeater( HPWaterHeaterNum ).OperatingAirFlowRate * PsyRhoAirFnPbTdbW( OutBaroPress, 20.0, 0.0 );
 
 					if ( HPWaterHeater( HPWaterHeaterNum ).FanPlacement == BlowThru ) {
 						if ( HPWaterHeater( HPWaterHeaterNum ).InletAirMixerNode > 0 ) {
@@ -1954,7 +1954,7 @@ namespace WaterThermalTanks {
 						ErrorsFound = true;
 					}
 
-					if ( cAlphaArgs( 5 ) != BlankString ) {
+					if ( ! cAlphaArgs( 5 ).empty() ) {
 						WaterThermalTank( WaterThermalTankNum ).PLFCurve = GetCurveIndex( cAlphaArgs( 5 ) );
 						if ( WaterThermalTank( WaterThermalTankNum ).PLFCurve == 0 ) {
 							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Part Load Factor curve not found = " + cAlphaArgs( 5 ) );
@@ -2119,8 +2119,8 @@ namespace WaterThermalTanks {
 					rho = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineNameNoColon );
 					WaterThermalTank( WaterThermalTankNum ).MassFlowRateMax = rNumericArgs( 17 ) * rho;
 
-					if ( ( cAlphaArgs( 14 ) == BlankString ) && ( cAlphaArgs( 15 ) == BlankString ) ) {
-						if ( cAlphaArgs( 12 ) != BlankString ) {
+					if ( ( cAlphaArgs( 14 ).empty() ) && ( cAlphaArgs( 15 ).empty() ) ) {
+						if ( ! cAlphaArgs( 12 ).empty() ) {
 							WaterThermalTank( WaterThermalTankNum ).FlowRateSchedule = GetScheduleIndex( cAlphaArgs( 12 ) );
 							if ( WaterThermalTank( WaterThermalTankNum ).FlowRateSchedule == 0 ) {
 								ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Flow Rate Schedule not found = " + cAlphaArgs( 12 ) );
@@ -2129,7 +2129,7 @@ namespace WaterThermalTanks {
 						}
 					}
 
-					if ( cAlphaArgs( 13 ) != BlankString ) {
+					if ( ! cAlphaArgs( 13 ).empty() ) {
 						WaterThermalTank( WaterThermalTankNum ).UseInletTempSchedule = GetScheduleIndex( cAlphaArgs( 13 ) );
 						if ( WaterThermalTank( WaterThermalTankNum ).UseInletTempSchedule == 0 ) {
 							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Cold Water Supply Temperature Schedule not found = " + cAlphaArgs( 13 ) );
@@ -2154,7 +2154,7 @@ namespace WaterThermalTanks {
 					WaterThermalTank( WaterThermalTankNum ).SourceEffectiveness = rNumericArgs( 19 );
 
 					// If no plant nodes are connected, simulate in stand-alone mode.
-					if ( cAlphaArgs( 14 ) == BlankString && cAlphaArgs( 15 ) == BlankString && cAlphaArgs( 16 ) == BlankString && cAlphaArgs( 17 ) == BlankString ) {
+					if ( cAlphaArgs( 14 ).empty() && cAlphaArgs( 15 ).empty() && cAlphaArgs( 16 ).empty() && cAlphaArgs( 17 ).empty() ) {
 						WaterThermalTank( WaterThermalTankNum ).StandAlone = true;
 					}
 
@@ -2178,7 +2178,7 @@ namespace WaterThermalTanks {
 						WaterThermalTank( WaterThermalTankNum ).SizingRecoveryTime = 1.5;
 					}
 
-					if ( ( cAlphaArgs( 14 ) != BlankString ) || ( cAlphaArgs( 15 ) != BlankString ) ) {
+					if ( ( ! cAlphaArgs( 14 ).empty() ) || ( ! cAlphaArgs( 15 ).empty() ) ) {
 						WaterThermalTank( WaterThermalTankNum ).UseInletNode = GetOnlySingleNode( cAlphaArgs( 14 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 						WHSaveNodeNames( WaterThermalTankNum ).InletNodeName1 = cAlphaArgs( 14 );
 						WaterThermalTank( WaterThermalTankNum ).UseOutletNode = GetOnlySingleNode( cAlphaArgs( 15 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
@@ -2197,7 +2197,7 @@ namespace WaterThermalTanks {
 						}
 					}
 
-					if ( ( cAlphaArgs( 16 ) != BlankString ) || ( cAlphaArgs( 17 ) != BlankString ) ) {
+					if ( ( ! cAlphaArgs( 16 ).empty() ) || ( ! cAlphaArgs( 17 ).empty() ) ) {
 						WaterThermalTank( WaterThermalTankNum ).SourceInletNode = GetOnlySingleNode( cAlphaArgs( 16 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
 						WHSaveNodeNames( WaterThermalTankNum ).InletNodeName2 = cAlphaArgs( 16 );
 						WaterThermalTank( WaterThermalTankNum ).SourceOutletNode = GetOnlySingleNode( cAlphaArgs( 17 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
@@ -2570,8 +2570,8 @@ namespace WaterThermalTanks {
 					rho = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineNameNoColon );
 					WaterThermalTank( WaterThermalTankNum ).MassFlowRateMax = rNumericArgs( 22 ) * rho;
 
-					if ( ( cAlphaArgs( 16 ) == BlankString ) && ( cAlphaArgs( 17 ) == BlankString ) ) {
-						if ( cAlphaArgs( 14 ) != BlankString ) {
+					if ( ( cAlphaArgs( 16 ).empty() ) && ( cAlphaArgs( 17 ).empty() ) ) {
+						if ( ! cAlphaArgs( 14 ).empty() ) {
 							WaterThermalTank( WaterThermalTankNum ).FlowRateSchedule = GetScheduleIndex( cAlphaArgs( 14 ) );
 							if ( WaterThermalTank( WaterThermalTankNum ).FlowRateSchedule == 0 ) {
 								ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Flow Rate Schedule not found = " + cAlphaArgs( 14 ) );
@@ -2580,7 +2580,7 @@ namespace WaterThermalTanks {
 						}
 					}
 
-					if ( cAlphaArgs( 15 ) != BlankString ) {
+					if ( ! cAlphaArgs( 15 ).empty() ) {
 						WaterThermalTank( WaterThermalTankNum ).UseInletTempSchedule = GetScheduleIndex( cAlphaArgs( 15 ) );
 						if ( WaterThermalTank( WaterThermalTankNum ).UseInletTempSchedule == 0 ) {
 							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Cold Water Supply Temperature Schedule not found = " + cAlphaArgs( 15 ) );
@@ -2653,7 +2653,7 @@ namespace WaterThermalTanks {
 					}
 
 					// If no plant nodes are connected, simulate in stand-alone mode.
-					if ( cAlphaArgs( 16 ) == BlankString && cAlphaArgs( 17 ) == BlankString && cAlphaArgs( 18 ) == BlankString && cAlphaArgs( 19 ) == BlankString ) WaterThermalTank( WaterThermalTankNum ).StandAlone = true;
+					if ( cAlphaArgs( 16 ).empty() && cAlphaArgs( 17 ).empty() && cAlphaArgs( 18 ).empty() && cAlphaArgs( 19 ).empty() ) WaterThermalTank( WaterThermalTankNum ).StandAlone = true;
 
 					if ( ! lNumericFieldBlanks( 29 ) ) {
 						WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate = rNumericArgs( 29 );
@@ -2677,7 +2677,7 @@ namespace WaterThermalTanks {
 
 					WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopSide = DemandSupply_No;
 
-					if ( ( cAlphaArgs( 16 ) != BlankString ) || ( cAlphaArgs( 17 ) != BlankString ) ) {
+					if ( ( ! cAlphaArgs( 16 ).empty() ) || ( ! cAlphaArgs( 17 ).empty() ) ) {
 						WaterThermalTank( WaterThermalTankNum ).UseInletNode = GetOnlySingleNode( cAlphaArgs( 16 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 						WHSaveNodeNames( WaterThermalTankNum ).InletNodeName1 = cAlphaArgs( 16 );
 						WaterThermalTank( WaterThermalTankNum ).UseOutletNode = GetOnlySingleNode( cAlphaArgs( 17 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
@@ -2696,7 +2696,7 @@ namespace WaterThermalTanks {
 						}
 					}
 
-					if ( ( cAlphaArgs( 18 ) != BlankString ) || ( cAlphaArgs( 19 ) != BlankString ) ) {
+					if ( ( ! cAlphaArgs( 18 ).empty() ) || ( ! cAlphaArgs( 19 ).empty() ) ) {
 						WaterThermalTank( WaterThermalTankNum ).SourceInletNode = GetOnlySingleNode( cAlphaArgs( 18 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
 						WHSaveNodeNames( WaterThermalTankNum ).InletNodeName2 = cAlphaArgs( 18 );
 						WaterThermalTank( WaterThermalTankNum ).SourceOutletNode = GetOnlySingleNode( cAlphaArgs( 19 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
@@ -4813,7 +4813,7 @@ namespace WaterThermalTanks {
 
 			}}
 
-			MdotAir = HPWaterHeater( HPNum ).OperatingAirFlowRate * PsyRhoAirFnPbTdbW( OutBaroPress, HPInletDryBulbTemp, HPInletHumRat, BlankString );
+			MdotAir = HPWaterHeater( HPNum ).OperatingAirFlowRate * PsyRhoAirFnPbTdbW( OutBaroPress, HPInletDryBulbTemp, HPInletHumRat );
 
 			//   set up initial conditions on nodes
 			if ( InletAirMixerNode > 0 ) {
@@ -4853,7 +4853,7 @@ namespace WaterThermalTanks {
 			//   Curve objects in CalcHPWHDXCoil will use inlet conditions to HPWH not inlet air conditions to DX Coil
 			//   HPWHInletDBTemp and HPWHInletWBTemp are DataHVACGlobals to pass info to HPWHDXCoil
 			HPWHInletDBTemp = HPInletDryBulbTemp;
-			HPWHInletWBTemp = PsyTwbFnTdbWPb( HPWHInletDBTemp, HPInletHumRat, OutBaroPress, BlankString );
+			HPWHInletWBTemp = PsyTwbFnTdbWPb( HPWHInletDBTemp, HPInletHumRat, OutBaroPress );
 
 		} //  IF(WaterThermalTank(WaterThermalTankNum)%HeatPumpNum .GT. 0)THEN
 
@@ -9103,7 +9103,7 @@ namespace WaterThermalTanks {
 
 					//       set the heat pump air- and water-side mass flow rate
 					MdotWater = HPWaterHeater( HPNum ).OperatingWaterFlowRate * RhoH2O( WaterThermalTank( WaterThermalTankNum ).TankTemp );
-					MdotAir = HPWaterHeater( HPNum ).OperatingAirFlowRate * PsyRhoAirFnPbTdbW( OutBaroPress, WaterThermalTank( WaterThermalTankNum ).AmbientTemp, AmbientHumRat, BlankString );
+					MdotAir = HPWaterHeater( HPNum ).OperatingAirFlowRate * PsyRhoAirFnPbTdbW( OutBaroPress, WaterThermalTank( WaterThermalTankNum ).AmbientTemp, AmbientHumRat );
 
 					//       set the condenser inlet node mass flow rate and temperature
 					Node( HPWaterHeater( HPNum ).CondWaterInletNode ).MassFlowRate = MdotWater;
@@ -9111,7 +9111,7 @@ namespace WaterThermalTanks {
 
 					//       initialize temperatures for HPWH DX Coil heating capacity and COP curves
 					HPWHInletDBTemp = WaterThermalTank( WaterThermalTankNum ).AmbientTemp;
-					HPWHInletWBTemp = PsyTwbFnTdbWPb( HPWHInletDBTemp, AmbientHumRat, OutBaroPress, BlankString );
+					HPWHInletWBTemp = PsyTwbFnTdbWPb( HPWHInletDBTemp, AmbientHumRat, OutBaroPress );
 
 					//       set up full air flow on DX coil inlet node
 					if ( HPWaterHeater( HPNum ).InletAirMixerNode > 0 ) {

@@ -41,7 +41,7 @@ template< typename T, typename std::enable_if< std::is_unsigned< T >::value, int
 inline
 static
 void
-negate_value( T & v )
+negate_value( T & )
 {}
 
 // Signed Discriminator Template

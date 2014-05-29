@@ -199,7 +199,7 @@ namespace Fans {
 				ShowFatalError( "SimulateFanComponents: Invalid CompIndex passed=" + TrimSigDigits( FanNum ) + ", Number of Fans=" + TrimSigDigits( NumFans ) + ", Fan name=" + CompName );
 			}
 			if ( CheckEquipName( FanNum ) ) {
-				if ( CompName != BlankString && CompName != Fan( FanNum ).FanName ) {
+				if ( ! CompName.empty() && CompName != Fan( FanNum ).FanName ) {
 					ShowFatalError( "SimulateFanComponents: Invalid CompIndex passed=" + TrimSigDigits( FanNum ) + ", Fan name=" + CompName + ", stored Fan Name for that index=" + Fan( FanNum ).FanName );
 				}
 				CheckEquipName( FanNum ) = false;

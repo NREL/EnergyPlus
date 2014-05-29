@@ -1,7 +1,8 @@
+// C++ Headers
+#include <iostream>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <DisplayRoutines.hh>
@@ -37,7 +38,6 @@ DisplayString( std::string const & String ) // String to be displayed
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	static gio::Fmt const FmtA( "(1X,A)" );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 	// na
@@ -49,7 +49,7 @@ DisplayString( std::string const & String ) // String to be displayed
 	// na
 
 	if ( KickOffSimulation && ! DeveloperFlag ) return;
-	gio::write( FmtA ) << String;
+	std::cout << String << '\n';
 
 }
 
@@ -84,7 +84,6 @@ DisplayNumberAndString(
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	static gio::Fmt const FmtA( "(1X,A)" );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 	// na
@@ -93,17 +92,13 @@ DisplayNumberAndString(
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	std::string NumString;
 
 	if ( KickOffSimulation && ! DeveloperFlag ) return;
-	gio::write( NumString, "*" ) << Number;
-	strip( NumString );
-
-	gio::write( FmtA ) << String + NumString;
+	std::cout << String << ' ' << Number << '\n';
 }
 
 void
-DisplaySimDaysProgress(
+DisplaySimDaysProgress( // This doesn't do anything!
 	int const CurrentSimDay, // Current Simulation Day
 	int const TotalSimDays // Total number of Simulation Days
 )

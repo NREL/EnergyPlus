@@ -6,6 +6,7 @@
 #include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/gio_Fmt.hh>
 #include <ObjexxFCL/Optional.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -102,7 +103,6 @@ namespace InputProcessor {
 	extern bool RequiredObject; // Set to true when ReadInputLine has a required object
 	extern bool UniqueObject; // Set to true when ReadInputLine has a unique object
 	extern bool ExtensibleObject; // Set to true when ReadInputLine has an extensible object
-	extern bool StripCR; // If true, strip last character (<cr> off each schedule:file line)
 	extern int ExtensibleNumFields; // set to number when ReadInputLine has an extensible object
 	extern FArray1D_bool IDFRecordsGotten; // Denotes that this record has been "gotten" from the IDF
 
@@ -522,17 +522,26 @@ namespace InputProcessor {
 		std::string::size_type & CurPos,
 		bool & BlankLine,
 		int & InputLineLength,
+		bool & EndofFile
+	);
+
+	void
+	ReadInputLine(
+		int const UnitNumber,
+		std::string::size_type & CurPos,
+		bool & BlankLine,
+		int & InputLineLength,
 		bool & EndofFile,
-		Optional_bool MinMax = _,
-		Optional_int WhichMinMax = _, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max< //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_string MinMaxString = _, //Autodesk:OPTIONAL Used without PRESENT check
-		Optional< Real64 > Value = _, //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_bool Default = _,
-		Optional_string DefString = _, //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_bool AutoSizable = _,
-		Optional_bool AutoCalculatable = _,
-		Optional_bool RetainCase = _, //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_bool ErrorsFound = _ //Autodesk:OPTIONAL Used without PRESENT check
+		bool MinMax,
+		int & WhichMinMax, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
+		std::string & MinMaxString,
+		Real64 & Value,
+		bool & Default,
+		std::string & DefString,
+		bool & AutoSizable,
+		bool & AutoCalculatable,
+		bool & RetainCase,
+		bool & ErrorsFound
 	);
 
 	void
@@ -549,7 +558,7 @@ namespace InputProcessor {
 
 	void
 	ProcessMinMaxDefLine(
-		std::string const & UCInputLine, // part of input line starting \min or \max
+		std::string const & partLine, // part of input line starting \min or \max
 		int & WhichMinMax, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
 		std::string & MinMaxString,
 		Real64 & Value,
@@ -573,7 +582,10 @@ namespace InputProcessor {
 		int const NumItems
 	)
 	{
-		return FindItemInList( String, FArray1D_string( ListOfItems ), NumItems );
+		for ( int Count = 1; Count <= NumItems; ++Count ) {
+			if ( String == ListOfItems( Count ) ) return Count;
+		}
+		return 0; // Not found
 	}
 
 	int
@@ -592,7 +604,24 @@ namespace InputProcessor {
 		int const NumItems
 	)
 	{
-		return FindItemInSortedList( String, FArray1D_string( ListOfItems ), NumItems );
+		int Probe( 0 );
+		int LBnd( 0 );
+		int UBnd( NumItems + 1 );
+		bool Found( false );
+		while ( ( ! Found ) || ( Probe != 0 ) ) {
+			Probe = ( UBnd - LBnd ) / 2;
+			if ( Probe == 0 ) break;
+			Probe += LBnd;
+			if ( equali( String, ListOfItems( Probe ) ) ) {
+				Found = true;
+				break;
+			} else if ( lessthani( String, ListOfItems( Probe ) ) ) {
+				UBnd = Probe;
+			} else {
+				LBnd = Probe;
+			}
+		}
+		return Probe;
 	}
 
 	int
@@ -611,7 +640,12 @@ namespace InputProcessor {
 		int const NumItems
 	)
 	{
-		return FindItem( String, FArray1D_string( ListOfItems ), NumItems );
+		int const item_number( FindItemInList( String, ListOfItems, NumItems ) );
+		if ( item_number != 0 ) return item_number;
+		for ( int Count = 1; Count <= NumItems; ++Count ) {
+			if ( equali( String, ListOfItems( Count ) ) ) return Count;
+		}
+		return 0; // Not found
 	}
 
 	std::string
@@ -621,7 +655,7 @@ namespace InputProcessor {
 
 	inline
 	bool
-	SameString( std::string const & s,  std::string const & t )
+	SameString( std::string const & s, std::string const & t )
 	{
 		// case insensitive comparison
 		return equali( s, t );
@@ -629,7 +663,7 @@ namespace InputProcessor {
 
 	inline
 	bool
-	SameString( std::string const & s,  c_cstring const & t )
+	SameString( std::string const & s, c_cstring const & t )
 	{
 		// case insensitive comparison
 		return equali( s, t );
@@ -637,7 +671,7 @@ namespace InputProcessor {
 
 	inline
 	bool
-	SameString( c_cstring const & s,  std::string const & t )
+	SameString( c_cstring const & s, std::string const & t )
 	{
 		// case insensitive comparison
 		return equali( s, t );
@@ -645,7 +679,7 @@ namespace InputProcessor {
 
 	inline
 	bool
-	SameString( c_cstring const & s,  c_cstring const & t )
+	SameString( c_cstring const & s, c_cstring const & t )
 	{
 		// case insensitive comparison
 		return equali( s, t );

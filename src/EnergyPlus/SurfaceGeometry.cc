@@ -2187,7 +2187,7 @@ namespace SurfaceGeometry {
 				OutMsg += "WorldCoordinateSystem" ",";
 				OK = true;
 			}
-			if ( has_prefixi( GAlphas( 4 ), "Rel" ) || has_prefixi( GAlphas( 4 ), "Relative" ) || SameString( GAlphas( 4 ), "Local" ) || GAlphas( 4 ) == BlankString ) {
+			if ( has_prefixi( GAlphas( 4 ), "Rel" ) || has_prefixi( GAlphas( 4 ), "Relative" ) || SameString( GAlphas( 4 ), "Local" ) || GAlphas( 4 ).empty() ) {
 				DaylRefWorldCoordSystem = false;
 				OutMsg += "RelativeCoordinateSystem" ",";
 				OK = true;
@@ -2205,7 +2205,7 @@ namespace SurfaceGeometry {
 				OutMsg += "WorldCoordinateSystem";
 				OK = true;
 			}
-			if ( has_prefixi( GAlphas( 5 ), "Rel" ) || has_prefixi( GAlphas( 5 ), "Relative" ) || SameString( GAlphas( 5 ), "Local" ) || GAlphas( 5 ) == BlankString ) {
+			if ( has_prefixi( GAlphas( 5 ), "Rel" ) || has_prefixi( GAlphas( 5 ), "Relative" ) || SameString( GAlphas( 5 ), "Local" ) || GAlphas( 5 ).empty() ) {
 				RectSurfRefWorldCoordSystem = false;
 				OutMsg += "RelativeToZoneOrigin";
 				OK = true;
@@ -3858,7 +3858,7 @@ namespace SurfaceGeometry {
 					ErrorsFound = true;
 				}
 
-				if ( cAlphaArgs( 6 ) != BlankString ) {
+				if ( ! cAlphaArgs( 6 ).empty() ) {
 					if ( TotWinShadingControl > 0 ) {
 						SurfaceTmp( SurfNum ).WindowShadingControlPtr = FindItemInList( cAlphaArgs( 6 ), WindowShadingControl.Name(), TotWinShadingControl );
 					}
@@ -3886,7 +3886,7 @@ namespace SurfaceGeometry {
 				CheckWindowShadingControlFrameDivider( "GetHTSubSurfaceData", ErrorsFound, SurfNum, 7 );
 
 				if ( SurfaceTmp( SurfNum ).Sides == 3 ) { // Triangular window
-					if ( cAlphaArgs( 7 ) != BlankString ) {
+					if ( ! cAlphaArgs( 7 ).empty() ) {
 						ShowWarningError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\"." );
 						ShowContinueError( ".. because it is a triangular window and cannot have a frame or divider or reveal reflection." );
 						ShowContinueError( "Frame, divider and reveal reflection will be ignored for this window." );
@@ -4185,7 +4185,7 @@ namespace SurfaceGeometry {
 						ErrorsFound = true;
 					}
 
-					if ( cAlphaArgs( WindowShadingField ) != BlankString ) {
+					if ( ! cAlphaArgs( WindowShadingField ).empty() ) {
 						if ( TotWinShadingControl > 0 ) {
 							SurfaceTmp( SurfNum ).WindowShadingControlPtr = FindItemInList( cAlphaArgs( WindowShadingField ), WindowShadingControl.Name(), TotWinShadingControl );
 						}
@@ -7706,7 +7706,7 @@ namespace SurfaceGeometry {
 
 			if ( ( ! lAlphaFieldBlanks( 2 ) ) && ( NumAlphas != 1 ) ) { //  Const temp will come from schedule specified below.
 				OSC( OSCNum ).ConstTempScheduleName = cAlphaArgs( 2 );
-				if ( OSC( OSCNum ).ConstTempScheduleName != BlankString ) {
+				if ( ! OSC( OSCNum ).ConstTempScheduleName.empty() ) {
 					OSC( OSCNum ).ConstTempScheduleIndex = GetScheduleIndex( OSC( OSCNum ).ConstTempScheduleName );
 					if ( OSC( OSCNum ).ConstTempScheduleIndex == 0 ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) );
@@ -10268,7 +10268,7 @@ namespace SurfaceGeometry {
 
 			} else {
 
-				if ( Surface( ThisSurf ).Name != BlankString ) {
+				if ( ! Surface( ThisSurf ).Name.empty() ) {
 					ShowWarningError( "CalcSurfaceCentroid: caught problem with # of sides, for surface=" + Surface( ThisSurf ).Name );
 					ShowContinueError( "... number of sides must be >= 3, this surface # sides=" + RoundSigDigits( Surface( ThisSurf ).Sides ) );
 				} else {

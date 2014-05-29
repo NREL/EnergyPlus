@@ -77,7 +77,7 @@ namespace TranspiredCollector {
 	int const Layout_Triangle( 2 );
 	int const Correlation_Kutscher1994( 1 );
 	int const Correlation_VanDeckerHollandsBrunger2001( 2 );
-	
+
 	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS:
@@ -860,7 +860,7 @@ namespace TranspiredCollector {
 			Tamb = sum_product_sub( Surface.OutWetBulbTemp(), Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) / sum_sub( Surface.Area(), UTSC( UTSCNum ).SurfPtrs ); //Autodesk:F2C++ Functions handle array subscript usage
 		}
 
-		RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, Tamb, OutHumRat, BlankString );
+		RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, Tamb, OutHumRat );
 
 		CpAir = PsyCpAirFnWTdb( OutHumRat, Tamb );
 
@@ -1116,9 +1116,9 @@ namespace TranspiredCollector {
 		Tamb = sum_product_sub( Surface.OutDryBulbTemp(), Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) / sum_sub( Surface.Area(), UTSC( UTSCNum ).SurfPtrs ); //Autodesk:F2C++ Functions handle array subscript usage
 //		Twbamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutWetBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum( Surface( UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
 		Twbamb = sum_product_sub( Surface.OutWetBulbTemp(), Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) / sum_sub( Surface.Area(), UTSC( UTSCNum ).SurfPtrs ); //Autodesk:F2C++ Functions handle array subscript usage
-		OutHumRatAmb = PsyWFnTdbTwbPb( Tamb, Twbamb, OutBaroPress, BlankString );
+		OutHumRatAmb = PsyWFnTdbTwbPb( Tamb, Twbamb, OutBaroPress );
 
-		RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, Tamb, OutHumRatAmb, BlankString );
+		RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, Tamb, OutHumRatAmb );
 		holeArea = UTSC( UTSCNum ).ActualArea * UTSC( UTSCNum ).Porosity;
 
 		AspRat = UTSC( UTSCNum ).Height / UTSC( UTSCNum ).PlenGapThick;

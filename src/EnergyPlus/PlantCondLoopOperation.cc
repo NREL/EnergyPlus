@@ -446,34 +446,34 @@ namespace PlantCondLoopOperation {
 
 						{ auto const plantLoopOperation( PlantLoop( LoopNum ).OpScheme( Num ).TypeOf );
 
-						if ( SameString(plantLoopOperation, "LOAD RANGE BASED OPERATION") ) { // Deprecated
+						if ( plantLoopOperation == "LOAD RANGE BASED OPERATION" ) { // Deprecated
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = LoadRBOpSchemeType; // Deprecated
 							ShowSevereError( CurrentModuleObject + " = \"" + cAlphaArgs( 1 ) + "\" deprecated field value =\"" + PlantLoop( LoopNum ).OpScheme( Num ).TypeOf + "\"." );
 							ShowContinueError( "... should be replaced with PlantEquipmentOperation:CoolingLoad or " "PlantEquipmentOperation:HeatingLoad" );
-						} else if ( SameString(plantLoopOperation, "PLANTEQUIPMENTOPERATION:COOLINGLOAD") ) {
+						} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:COOLINGLOAD" ) {
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = CoolingRBOpSchemeType;
-						} else if ( SameString(plantLoopOperation, "PLANTEQUIPMENTOPERATION:HEATINGLOAD") ) {
+						} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:HEATINGLOAD" ) {
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = HeatingRBOpSchemeType;
-						} else if ( SameString(plantLoopOperation, "PLANTEQUIPMENTOPERATION:COMPONENTSETPOINT") ) { //* Temp Based Control
+						} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:COMPONENTSETPOINT" ) { //* Temp Based Control
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = CompSetPtBasedSchemeType;
-						} else if ( SameString(plantLoopOperation, "PLANTEQUIPMENTOPERATION:USERDEFINED") ) {
+						} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:USERDEFINED" ) {
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = EMSOpSchemeType;
 							AnyEMSPlantOpSchemesInModel = true;
-						} else if ( SameString(plantLoopOperation, "PLANTEQUIPMENTOPERATION:OUTDOORDRYBULB") ) {
+						} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORDRYBULB" ) {
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = DryBulbRBOpSchemeType;
-						} else if ( SameString(plantLoopOperation, "PLANTEQUIPMENTOPERATION:OUTDOORWETBULB") ) {
+						} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORWETBULB" ) {
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = WetBulbRBOpSchemeType;
-						} else if ( SameString(plantLoopOperation, "PLANTEQUIPMENTOPERATION:OUTDOORDEWPOINT") ) {
+						} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORDEWPOINT" ) {
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = DewPointRBOpSchemeType;
-						} else if ( SameString(plantLoopOperation, "PLANTEQUIPMENTOPERATION:OUTDOORRELATIVEHUMIDITY") ) {
+						} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORRELATIVEHUMIDITY" ) {
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = RelHumRBOpSchemeType;
-						} else if ( SameString(plantLoopOperation, "PLANTEQUIPMENTOPERATION:OUTDOORDRYBULBDIFFERENCE") ) {
+						} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORDRYBULBDIFFERENCE" ) {
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = DryBulbTDBOpSchemeType;
-						} else if ( SameString(plantLoopOperation, "PLANTEQUIPMENTOPERATION:OUTDOORWETBULBDIFFERENCE") ) {
+						} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORWETBULBDIFFERENCE" ) {
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = WetBulbTDBOpSchemeType;
-						} else if ( SameString(plantLoopOperation, "PLANTEQUIPMENTOPERATION:OUTDOORDEWPOINTDIFFERENCE") ) {
+						} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORDEWPOINTDIFFERENCE" ) {
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = DewPointTDBOpSchemeType;
-						} else if ( SameString(plantLoopOperation, "PLANTEQUIPMENTOPERATION:UNCONTROLLED") ) {
+						} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:UNCONTROLLED" ) {
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = UncontrolledOpSchemeType;
 						} else { // invalid op scheme type for plant loop
 							ShowSevereError( RoutineName + "Invalid " + cAlphaFieldNames( Num * 3 - 1 ) + '=' + cAlphaArgs( Num * 3 - 1 ) + ", entered in " + CurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -695,51 +695,51 @@ namespace PlantCondLoopOperation {
 
 				{ auto const plantLoopOperation( PlantLoop( LoopNum ).OpScheme( SchemeNum ).TypeOf );
 
-				if ( SameString(plantLoopOperation, "PLANTEQUIPMENTOPERATION:COOLINGLOAD") ) {
+				if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:COOLINGLOAD" ) {
 					CurrentModuleObject = "PlantEquipmentOperation:CoolingLoad";
 					FindRangeBasedOrUncontrolledInput( CurrentModuleObject, CLRBO, LoopNum, SchemeNum, ErrorsFound );
 
-				} else if ( SameString(plantLoopOperation, "PLANTEQUIPMENTOPERATION:HEATINGLOAD") ) {
+				} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:HEATINGLOAD" ) {
 					CurrentModuleObject = "PlantEquipmentOperation:HeatingLoad";
 					FindRangeBasedOrUncontrolledInput( CurrentModuleObject, HLRBO, LoopNum, SchemeNum, ErrorsFound );
 
-				} else if ( SameString(plantLoopOperation, "PLANTEQUIPMENTOPERATION:COMPONENTSETPOINT") ) { //* Temp Based Control
+				} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:COMPONENTSETPOINT" ) { //* Temp Based Control
 					CurrentModuleObject = "PlantEquipmentOperation:ComponentSetPoint";
 					FindCompSPInput( CurrentModuleObject, CSPBO, LoopNum, SchemeNum, ErrorsFound );
 
-				} else if ( SameString(plantLoopOperation, "PLANTEQUIPMENTOPERATION:USERDEFINED") ) {
+				} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:USERDEFINED" ) {
 					CurrentModuleObject = "PlantEquipmentOperation:UserDefined";
 					GetUserDefinedOpSchemeInput( CurrentModuleObject, NumUserDefOpSchemes, LoopNum, SchemeNum, ErrorsFound );
 
-				} else if ( SameString(plantLoopOperation, "PLANTEQUIPMENTOPERATION:OUTDOORDRYBULB") ) {
+				} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORDRYBULB" ) {
 					CurrentModuleObject = "PlantEquipmentOperation:OutdoorDryBulb";
 					FindRangeBasedOrUncontrolledInput( CurrentModuleObject, DBRBO, LoopNum, SchemeNum, ErrorsFound );
 
-				} else if ( SameString(plantLoopOperation, "PLANTEQUIPMENTOPERATION:OUTDOORWETBULB") ) {
+				} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORWETBULB" ) {
 					CurrentModuleObject = "PlantEquipmentOperation:OutdoorWetBulb";
 					FindRangeBasedOrUncontrolledInput( CurrentModuleObject, WBRBO, LoopNum, SchemeNum, ErrorsFound );
 
-				} else if ( SameString(plantLoopOperation, "PLANTEQUIPMENTOPERATION:OUTDOORDEWPOINT") ) {
+				} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORDEWPOINT" ) {
 					CurrentModuleObject = "PlantEquipmentOperation:OutdoorDewPoint";
 					FindRangeBasedOrUncontrolledInput( CurrentModuleObject, DPRBO, LoopNum, SchemeNum, ErrorsFound );
 
-				} else if ( SameString(plantLoopOperation, "PLANTEQUIPMENTOPERATION:OUTDOORRELATIVEHUMIDITY") ) {
+				} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORRELATIVEHUMIDITY" ) {
 					CurrentModuleObject = "PlantEquipmentOperation:OutdoorrelativeHumidity";
 					FindRangeBasedOrUncontrolledInput( CurrentModuleObject, RHRBO, LoopNum, SchemeNum, ErrorsFound );
 
-				} else if ( SameString(plantLoopOperation, "PLANTEQUIPMENTOPERATION:OUTDOORDRYBULBDIFFERENCE") ) {
+				} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORDRYBULBDIFFERENCE" ) {
 					CurrentModuleObject = "PlantEquipmentOperation:OutdoorDryBulbDifference";
 					FindDeltaTempRangeInput( CurrentModuleObject, DBTDBO, LoopNum, SchemeNum, ErrorsFound );
 
-				} else if ( SameString(plantLoopOperation, "PLANTEQUIPMENTOPERATION:OUTDOORWETBULBDIFFERENCE") ) {
+				} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORWETBULBDIFFERENCE" ) {
 					CurrentModuleObject = "PlantEquipmentOperation:OutdoorWetBulbDifference";
 					FindDeltaTempRangeInput( CurrentModuleObject, WBTDBO, LoopNum, SchemeNum, ErrorsFound );
 
-				} else if ( SameString(plantLoopOperation, "PLANTEQUIPMENTOPERATION:OUTDOORDEWPOINTDIFFERENCE") ) {
+				} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORDEWPOINTDIFFERENCE" ) {
 					CurrentModuleObject = "PlantEquipmentOperation:OutdoorDewPointDifference";
 					FindDeltaTempRangeInput( CurrentModuleObject, DPTDBO, LoopNum, SchemeNum, ErrorsFound );
 
-				} else if ( SameString(plantLoopOperation, "PLANTEQUIPMENTOPERATION:UNCONTROLLED") ) {
+				} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:UNCONTROLLED" ) {
 					CurrentModuleObject = "PlantEquipmentOperation:Uncontrolled";
 					FindRangeBasedOrUncontrolledInput( CurrentModuleObject, NumUncontrolledSchemes, LoopNum, SchemeNum, ErrorsFound );
 
@@ -888,7 +888,7 @@ namespace PlantCondLoopOperation {
 
 							{ auto const plantLoopOperation( CurrentModuleObject ); // different op schemes have different lower limit check values
 
-							if ( SameString(plantLoopOperation, "PlantEquipmentOperation:CoolingLoad") || SameString(plantLoopOperation, "PlantEquipmentOperation:HeatingLoad") || SameString(plantLoopOperation, "PlantEquipmentOperation:OutdoorrelativeHumidity") ) {
+							if ( plantLoopOperation == "PlantEquipmentOperation:CoolingLoad" || plantLoopOperation == "PlantEquipmentOperation:HeatingLoad" || plantLoopOperation == "PlantEquipmentOperation:OutdoorrelativeHumidity" ) {
 								// these should not be less than zero
 								if ( PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( ListNum ).RangeLowerLimit < 0.0 ) {
 									ShowSevereError( LoopOpSchemeObj + " = \"" + PlantLoop( LoopNum ).OperationScheme + "\", found a negative value for a lower limit in " + CurrentModuleObject + " = \"" + PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + "\"." );
@@ -1379,11 +1379,11 @@ namespace PlantCondLoopOperation {
 						}
 
 						{ auto const controlType( cAlphaArgs( CompNum * 5 + 1 ) );
-						if ( SameString(controlType, "COOLING") ) {
+						if ( controlType == "COOLING" ) {
 							PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).CtrlTypeNum = CoolingOp;
-						} else if ( SameString(controlType, "HEATING") ) {
+						} else if ( controlType == "HEATING" ) {
 							PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).CtrlTypeNum = HeatingOp;
-						} else if ( SameString(controlType, "DUAL") ) {
+						} else if ( controlType == "DUAL" ) {
 							PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).CtrlTypeNum = DualOp;
 						}}
 
@@ -1979,7 +1979,7 @@ namespace PlantCondLoopOperation {
 							for ( CompNum = 1; CompNum <= this_equip_list.NumComps; ++CompNum ) {
 
 								// set up a reference to the component instance on the list data structure
-								auto & this_list_component( this_equip_list.Comp( CompNum ) ); 
+								auto & this_list_component( this_equip_list.Comp( CompNum ) );
 
 								// then look up the component topological position from this structure
 								LoopPtr = this_list_component.LoopNumPtr;
@@ -2084,7 +2084,7 @@ namespace PlantCondLoopOperation {
 		auto & this_loop( PlantLoop( LoopNum ) );
 		auto & this_loopside( this_loop.LoopSide( LoopSideNum ) );
 		auto & this_equiplist( this_loop.OpScheme( CurSchemePtr ).EquipList( ListPtr ) );
-        
+
 		// load local variables
 		NumCompsOnList = this_equiplist.NumComps;
 		RemLoopDemand = LoopDemand;
@@ -2180,7 +2180,7 @@ namespace PlantCondLoopOperation {
 
 					BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
 					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
-					
+
 					// create a reference to the component itself
 					auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
 

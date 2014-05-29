@@ -423,13 +423,13 @@ namespace InternalHeatGains {
 
 					// Number of people calculation method.
 					{ auto const peopleMethod( AlphaName( 4 ) );
-					if ( SameString(peopleMethod, "PEOPLE") ) {
+					if ( peopleMethod == "PEOPLE" ) {
 						People( Loop ).NumberOfPeople = IHGNumbers( 1 );
 						if ( lNumericFieldBlanks( 1 ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + People( Loop ).Name + "\", specifies " + cNumericFieldNames( 1 ) + ", but that field is blank.  0 People will result." );
 						}
 
-					} else if ( SameString(peopleMethod, "PEOPLE/AREA") ) {
+					} else if ( peopleMethod == "PEOPLE/AREA" ) {
 						if ( People( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 2 ) >= 0.0 ) {
 								People( Loop ).NumberOfPeople = IHGNumbers( 2 ) * Zone( People( Loop ).ZonePtr ).FloorArea;
@@ -445,7 +445,7 @@ namespace InternalHeatGains {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + People( Loop ).Name + "\", specifies " + cNumericFieldNames( 2 ) + ", but that field is blank.  0 People will result." );
 						}
 
-					} else if ( SameString(peopleMethod, "AREA/PERSON") ) {
+					} else if ( peopleMethod == "AREA/PERSON" ) {
 						if ( People( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 3 ) > 0.0 ) {
 								People( Loop ).NumberOfPeople = Zone( People( Loop ).ZonePtr ).FloorArea / IHGNumbers( 3 );
@@ -562,34 +562,34 @@ namespace InternalHeatGains {
 
 							{ auto const thermalComfortType( AlphaName( OptionNum ) );
 
-							if ( SameString(thermalComfortType, "FANGER") ) {
+							if ( thermalComfortType == "FANGER" ) {
 								People( Loop ).Fanger = true;
 								MustInpSch = true;
 								UsingThermalComfort = true;
 
-							} else if ( SameString(thermalComfortType, "PIERCE") ) {
+							} else if ( thermalComfortType == "PIERCE" ) {
 								People( Loop ).Pierce = true;
 								MustInpSch = true;
 								UsingThermalComfort = true;
 
-							} else if ( SameString(thermalComfortType, "KSU") ) {
+							} else if ( thermalComfortType == "KSU" ) {
 								People( Loop ).KSU = true;
 								MustInpSch = true;
 								UsingThermalComfort = true;
 
-							} else if ( SameString(thermalComfortType, "ADAPTIVEASH55") ) {
+							} else if ( thermalComfortType == "ADAPTIVEASH55" ) {
 								People( Loop ).AdaptiveASH55 = true;
 								AdaptiveComfortRequested_ASH55 = true;
 								MustInpSch = true;
 								UsingThermalComfort = true;
 
-							} else if ( SameString(thermalComfortType, "ADAPTIVECEN15251") ) {
+							} else if ( thermalComfortType == "ADAPTIVECEN15251" ) {
 								People( Loop ).AdaptiveCEN15251 = true;
 								AdaptiveComfortRequested_CEN15251 = true;
 								MustInpSch = true;
 								UsingThermalComfort = true;
 
-							} else if ( SameString(thermalComfortType, "") ) { // Blank input field--just ignore this
+							} else if ( thermalComfortType == "" ) { // Blank input field--just ignore this
 
 							} else { // An invalid keyword was entered--warn but ignore
 								if ( Item1 == 1 ) {
@@ -608,10 +608,10 @@ namespace InternalHeatGains {
 							// MRT Calculation Type and Surface Name
 							{ auto const mrtType( AlphaName( 7 ) );
 
-							if ( SameString(mrtType, "ZONEAVERAGED") ) {
+							if ( mrtType == "ZONEAVERAGED" ) {
 								People( Loop ).MRTCalcType = ZoneAveraged;
 
-							} else if ( SameString(mrtType, "SURFACEWEIGHTED") ) {
+							} else if ( mrtType == "SURFACEWEIGHTED" ) {
 								People( Loop ).MRTCalcType = SurfaceWeighted;
 								People( Loop ).SurfacePtr = FindItemInList( AlphaName( 8 ), Surface.Name(), TotSurfaces );
 								if ( People( Loop ).SurfacePtr == 0 ) {
@@ -625,11 +625,11 @@ namespace InternalHeatGains {
 									ErrorsFound = true;
 								}
 
-							} else if ( SameString(mrtType, "ANGLEFACTOR") ) {
+							} else if ( mrtType == "ANGLEFACTOR" ) {
 								People( Loop ).MRTCalcType = AngleFactor;
 								People( Loop ).AngleFactorListName = AlphaName( 8 );
 
-							} else if ( SameString(mrtType, "") ) { // Blank input field--just ignore this
+							} else if ( mrtType == "" ) { // Blank input field--just ignore this
 								if ( MustInpSch && Item1 == 1 ) ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", blank " + cAlphaFieldNames( 7 ) );
 
 							} else { // An invalid keyword was entered--warn but ignore
@@ -681,7 +681,7 @@ namespace InternalHeatGains {
 
 							if ( ! lAlphaFieldBlanks( 10 ) || AlphaName( 10 ) != "" ) {
 								{ auto const clothingType( AlphaName( 10 ) );
-								if ( SameString(clothingType, "CLOTHINGINSULATIONSCHEDULE") ) {
+								if ( clothingType == "CLOTHINGINSULATIONSCHEDULE" ) {
 									People( Loop ).ClothingType = 1;
 									People( Loop ).ClothingPtr = GetScheduleIndex( AlphaName( 12 ) );
 									if ( People( Loop ).ClothingPtr == 0 ) {
@@ -716,10 +716,10 @@ namespace InternalHeatGains {
 										}
 									}
 
-								} else if ( SameString(clothingType, "DYNAMICCLOTHINGMODELASHRAE55") ) {
+								} else if ( clothingType == "DYNAMICCLOTHINGMODELASHRAE55" ) {
 									People( Loop ).ClothingType = 2;
 
-								} else if ( SameString(clothingType, "CALCULATIONMETHODSCHEDULE") ) {
+								} else if ( clothingType == "CALCULATIONMETHODSCHEDULE" ) {
 									People( Loop ).ClothingType = 3;
 									People( Loop ).ClothingMethodPtr = GetScheduleIndex( AlphaName( 11 ) );
 									if ( People( Loop ).ClothingMethodPtr == 0 ) {
@@ -971,13 +971,13 @@ namespace InternalHeatGains {
 
 					// Lights Design Level calculation method.
 					{ auto const lightingLevel( AlphaName( 4 ) );
-					if ( SameString(lightingLevel, "LIGHTINGLEVEL") ) {
+					if ( lightingLevel == "LIGHTINGLEVEL" ) {
 						Lights( Loop ).DesignLevel = IHGNumbers( 1 );
 						if ( lNumericFieldBlanks( 1 ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Lights( Loop ).Name + "\", specifies " + cNumericFieldNames( 1 ) + ", but that field is blank.  0 Lights will result." );
 						}
 
-					} else if ( SameString(lightingLevel, "WATTS/AREA") ) {
+					} else if ( lightingLevel == "WATTS/AREA" ) {
 						if ( Lights( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 2 ) >= 0.0 ) {
 								Lights( Loop ).DesignLevel = IHGNumbers( 2 ) * Zone( Lights( Loop ).ZonePtr ).FloorArea;
@@ -993,7 +993,7 @@ namespace InternalHeatGains {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Lights( Loop ).Name + "\", specifies " + cNumericFieldNames( 2 ) + ", but that field is blank.  0 Lights will result." );
 						}
 
-					} else if ( SameString(lightingLevel, "WATTS/PERSON") ) {
+					} else if ( lightingLevel == "WATTS/PERSON" ) {
 						if ( Lights( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 3 ) >= 0.0 ) {
 								Lights( Loop ).DesignLevel = IHGNumbers( 3 ) * Zone( Lights( Loop ).ZonePtr ).TotOccupants;
@@ -1232,13 +1232,13 @@ namespace InternalHeatGains {
 
 					// Electric equipment design level calculation method.
 					{ auto const equipmentLevel( AlphaName( 4 ) );
-					if ( SameString(equipmentLevel, "EQUIPMENTLEVEL") ) {
+					if ( equipmentLevel == "EQUIPMENTLEVEL" ) {
 						ZoneElectric( Loop ).DesignLevel = IHGNumbers( 1 );
 						if ( lNumericFieldBlanks( 1 ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 1 ) + ", but that field is blank.  0 Electric Equipment will result." );
 						}
 
-					} else if ( SameString(equipmentLevel, "WATTS/AREA") ) {
+					} else if ( equipmentLevel == "WATTS/AREA" ) {
 						if ( ZoneElectric( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 2 ) >= 0.0 ) {
 								ZoneElectric( Loop ).DesignLevel = IHGNumbers( 2 ) * Zone( ZoneElectric( Loop ).ZonePtr ).FloorArea;
@@ -1254,7 +1254,7 @@ namespace InternalHeatGains {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 2 ) + ", but that field is blank.  0 Electric Equipment will result." );
 						}
 
-					} else if ( SameString(equipmentLevel, "WATTS/PERSON") ) {
+					} else if ( equipmentLevel == "WATTS/PERSON" ) {
 						if ( ZoneElectric( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 3 ) >= 0.0 ) {
 								ZoneElectric( Loop ).DesignLevel = IHGNumbers( 3 ) * Zone( ZoneElectric( Loop ).ZonePtr ).TotOccupants;
@@ -1448,13 +1448,13 @@ namespace InternalHeatGains {
 
 					// equipment design level calculation method.
 					{ auto const equipmentLevel( AlphaName( 4 ) );
-					if ( SameString(equipmentLevel, "EQUIPMENTLEVEL") ) {
+					if ( equipmentLevel == "EQUIPMENTLEVEL" ) {
 						ZoneGas( Loop ).DesignLevel = IHGNumbers( 1 );
 						if ( lNumericFieldBlanks( 1 ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + ZoneGas( Loop ).Name + "\", specifies " + cNumericFieldNames( 1 ) + ", but that field is blank.  0 Gas Equipment will result." );
 						}
 
-					} else if ( SameString(equipmentLevel, "WATTS/AREA") || SameString(equipmentLevel, "POWER/AREA") ) {
+					} else if ( equipmentLevel == "WATTS/AREA" || equipmentLevel == "POWER/AREA" ) {
 						if ( ZoneGas( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 2 ) >= 0.0 ) {
 								ZoneGas( Loop ).DesignLevel = IHGNumbers( 2 ) * Zone( ZoneGas( Loop ).ZonePtr ).FloorArea;
@@ -1470,7 +1470,7 @@ namespace InternalHeatGains {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + ZoneGas( Loop ).Name + "\", specifies " + cNumericFieldNames( 2 ) + ", but that field is blank.  0 Gas Equipment will result." );
 						}
 
-					} else if ( SameString(equipmentLevel, "WATTS/PERSON") || SameString(equipmentLevel, "POWER/PERSON") ) {
+					} else if ( equipmentLevel == "WATTS/PERSON" || equipmentLevel == "POWER/PERSON" ) {
 						if ( ZoneGas( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 3 ) >= 0.0 ) {
 								ZoneGas( Loop ).DesignLevel = IHGNumbers( 3 ) * Zone( ZoneGas( Loop ).ZonePtr ).TotOccupants;
@@ -1673,13 +1673,13 @@ namespace InternalHeatGains {
 
 					// Hot Water equipment design level calculation method.
 					{ auto const equipmentLevel( AlphaName( 4 ) );
-					if ( SameString(equipmentLevel, "EQUIPMENTLEVEL") ) {
+					if ( equipmentLevel == "EQUIPMENTLEVEL" ) {
 						ZoneHWEq( Loop ).DesignLevel = IHGNumbers( 1 );
 						if ( lNumericFieldBlanks( 1 ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 1 ) + ", but that field is blank.  0 Hot Water Equipment will result." );
 						}
 
-					} else if ( SameString(equipmentLevel, "WATTS/AREA") || SameString(equipmentLevel, "POWER/AREA") ) {
+					} else if ( equipmentLevel == "WATTS/AREA" || equipmentLevel == "POWER/AREA" ) {
 						if ( ZoneHWEq( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 2 ) >= 0.0 ) {
 								ZoneHWEq( Loop ).DesignLevel = IHGNumbers( 2 ) * Zone( ZoneHWEq( Loop ).ZonePtr ).FloorArea;
@@ -1695,7 +1695,7 @@ namespace InternalHeatGains {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 2 ) + ", but that field is blank.  0 Hot Water Equipment will result." );
 						}
 
-					} else if ( SameString(equipmentLevel, "WATTS/PERSON") || SameString(equipmentLevel, "POWER/PERSON") ) {
+					} else if ( equipmentLevel == "WATTS/PERSON" || equipmentLevel == "POWER/PERSON" ) {
 						if ( ZoneHWEq( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 3 ) >= 0.0 ) {
 								ZoneHWEq( Loop ).DesignLevel = IHGNumbers( 3 ) * Zone( ZoneHWEq( Loop ).ZonePtr ).TotOccupants;
@@ -1883,13 +1883,13 @@ namespace InternalHeatGains {
 
 					// Hot Water equipment design level calculation method.
 					{ auto const equipmentLevel( AlphaName( 4 ) );
-					if ( SameString(equipmentLevel, "EQUIPMENTLEVEL") ) {
+					if ( equipmentLevel == "EQUIPMENTLEVEL" ) {
 						ZoneSteamEq( Loop ).DesignLevel = IHGNumbers( 1 );
 						if ( lNumericFieldBlanks( 1 ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 1 ) + ", but that field is blank.  0 Hot Water Equipment will result." );
 						}
 
-					} else if ( SameString(equipmentLevel, "WATTS/AREA") || SameString(equipmentLevel, "POWER/AREA") ) {
+					} else if ( equipmentLevel == "WATTS/AREA" || equipmentLevel == "POWER/AREA" ) {
 						if ( ZoneSteamEq( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 2 ) >= 0.0 ) {
 								ZoneSteamEq( Loop ).DesignLevel = IHGNumbers( 2 ) * Zone( ZoneSteamEq( Loop ).ZonePtr ).FloorArea;
@@ -1905,7 +1905,7 @@ namespace InternalHeatGains {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 2 ) + ", but that field is blank.  0 Hot Water Equipment will result." );
 						}
 
-					} else if ( SameString(equipmentLevel, "WATTS/PERSON") || SameString(equipmentLevel, "POWER/PERSON") ) {
+					} else if ( equipmentLevel == "WATTS/PERSON" || equipmentLevel == "POWER/PERSON" ) {
 						if ( ZoneSteamEq( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 3 ) >= 0.0 ) {
 								ZoneSteamEq( Loop ).DesignLevel = IHGNumbers( 3 ) * Zone( ZoneSteamEq( Loop ).ZonePtr ).TotOccupants;
@@ -2081,13 +2081,13 @@ namespace InternalHeatGains {
 
 					// Hot Water equipment design level calculation method.
 					{ auto const equipmentLevel( AlphaName( 4 ) );
-					if ( SameString(equipmentLevel, "EQUIPMENTLEVEL") ) {
+					if ( equipmentLevel == "EQUIPMENTLEVEL" ) {
 						ZoneOtherEq( Loop ).DesignLevel = IHGNumbers( 1 );
 						if ( lNumericFieldBlanks( 1 ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 1 ) + ", but that field is blank.  0 Hot Water Equipment will result." );
 						}
 
-					} else if ( SameString(equipmentLevel, "WATTS/AREA") || SameString(equipmentLevel, "POWER/AREA") ) {
+					} else if ( equipmentLevel == "WATTS/AREA" || equipmentLevel == "POWER/AREA" ) {
 						if ( ZoneOtherEq( Loop ).ZonePtr != 0 ) {
 							ZoneOtherEq( Loop ).DesignLevel = IHGNumbers( 2 ) * Zone( ZoneOtherEq( Loop ).ZonePtr ).FloorArea;
 							if ( Zone( ZoneOtherEq( Loop ).ZonePtr ).FloorArea <= 0.0 ) {
@@ -2098,7 +2098,7 @@ namespace InternalHeatGains {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 2 ) + ", but that field is blank.  0 Hot Water Equipment will result." );
 						}
 
-					} else if ( SameString(equipmentLevel, "WATTS/PERSON") || SameString(equipmentLevel, "POWER/PERSON") ) {
+					} else if ( equipmentLevel == "WATTS/PERSON" || equipmentLevel == "POWER/PERSON" ) {
 						if ( ZoneOtherEq( Loop ).ZonePtr != 0 ) {
 							ZoneOtherEq( Loop ).DesignLevel = IHGNumbers( 3 ) * Zone( ZoneOtherEq( Loop ).ZonePtr ).TotOccupants;
 							if ( Zone( ZoneOtherEq( Loop ).ZonePtr ).TotOccupants <= 0.0 ) {

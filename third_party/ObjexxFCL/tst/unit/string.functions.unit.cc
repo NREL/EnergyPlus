@@ -45,6 +45,10 @@ TEST( StringFunctionsTest, CaseChange )
 	EXPECT_FALSE( equali( "FISH ", "fiSh" ) );
 	EXPECT_EQ( "fish", lowercased( s ) );
 	EXPECT_EQ( "FISH", uppercased( s ) );
+	EXPECT_TRUE( lessthani( s, "fiShY" ) );
+	EXPECT_FALSE( lessthani( s, "fiSh" ) );
+	EXPECT_TRUE( lessthani( s, "GISH" ) );
+	EXPECT_TRUE( lessthani( "aaa", "Z" ) );
 }
 
 TEST( StringFunctionsTest, JustificationTrimming )

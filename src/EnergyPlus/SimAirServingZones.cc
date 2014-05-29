@@ -749,28 +749,28 @@ namespace SimAirServingZones {
 							ErrorsFound = true;
 						}
 					}
-					{ auto const componentType( CompTypes( CompNum ) );
-					if ( SameString(componentType, "COILSYSTEM:COOLING:DX") ) {
+					{ auto const componentType( uppercased( CompTypes( CompNum ) ) );
+					if ( componentType == "COILSYSTEM:COOLING:DX" ) {
 						PackagedUnit( AirSysNum ) = true;
-					} else if ( SameString(componentType, "COILSYSTEM:HEATING:DX") ) {
+					} else if ( componentType == "COILSYSTEM:HEATING:DX" ) {
 						PackagedUnit( AirSysNum ) = true;
-					} else if ( SameString(componentType, "AIRLOOPHVAC:UNITARYSYSTEM") ) {
+					} else if ( componentType == "AIRLOOPHVAC:UNITARYSYSTEM" ) {
 						PackagedUnit( AirSysNum ) = true;
-					} else if ( SameString(componentType, "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY") ) {
+					} else if ( componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY" ) {
 						PackagedUnit( AirSysNum ) = true;
-					} else if ( SameString(componentType, "AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL") ) {
+					} else if ( componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL" ) {
 						PackagedUnit( AirSysNum ) = true;
-					} else if ( SameString(componentType, "AIRLOOPHVAC:UNITARYHEATONLY") ) {
+					} else if ( componentType == "AIRLOOPHVAC:UNITARYHEATONLY" ) {
 						PackagedUnit( AirSysNum ) = true;
-					} else if ( SameString(componentType, "AIRLOOPHVAC:UNITARYHEATCOOL") ) {
+					} else if ( componentType == "AIRLOOPHVAC:UNITARYHEATCOOL" ) {
 						PackagedUnit( AirSysNum ) = true;
-					} else if ( SameString(componentType, "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR") ) {
+					} else if ( componentType == "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR" ) {
 						PackagedUnit( AirSysNum ) = true;
-					} else if ( SameString(componentType, "AIRLOOPHVAC:UNITARYHEATPUMP:WATERTOAIR") ) {
+					} else if ( componentType == "AIRLOOPHVAC:UNITARYHEATPUMP:WATERTOAIR" ) {
 						PackagedUnit( AirSysNum ) = true;
-					} else if ( SameString(componentType, "AIRLOOPHVAC:UNITARYHEATCOOL:VAVCHANGEOVERBYPASS") ) {
+					} else if ( componentType == "AIRLOOPHVAC:UNITARYHEATCOOL:VAVCHANGEOVERBYPASS" ) {
 						PackagedUnit( AirSysNum ) = true;
-					} else if ( SameString(componentType, "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR:MULTISPEED") ) {
+					} else if ( componentType == "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR:MULTISPEED" ) {
 						PackagedUnit( AirSysNum ) = true;
 					}}
 
@@ -1083,106 +1083,106 @@ namespace SimAirServingZones {
 			for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirSysNum ).NumBranches; ++BranchNum ) {
 				for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
 
-					{ auto const componentType( PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf );
+					{ auto const componentType( uppercased( PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf ) );
 
-					if ( SameString(componentType, "AIRLOOPHVAC:OUTDOORAIRSYSTEM") ) {
+					if ( componentType == "AIRLOOPHVAC:OUTDOORAIRSYSTEM" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = OAMixer_Num;
 
 						// Fan Types for the air sys simulation
-					} else if ( SameString(componentType, "FAN:CONSTANTVOLUME") ) {
+					} else if ( componentType == "FAN:CONSTANTVOLUME" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Fan_Simple_CV;
 
-					} else if ( SameString(componentType, "FAN:VARIABLEVOLUME") ) {
+					} else if ( componentType == "FAN:VARIABLEVOLUME" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Fan_Simple_VAV;
 
 						// cpw22Aug2010 Add Fan_ComponentModel type (new num=24)
-					} else if ( SameString(componentType, "FAN:COMPONENTMODEL") ) {
+					} else if ( componentType == "FAN:COMPONENTMODEL" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Fan_ComponentModel;
 
 						// Coil Types for the air sys simulation
 						//        HX Assisted coils are not allowed on a branch at this time
 						//        CASE('COILSYSTEM:COOLING:DX:HEATEXCHANGERASSISTED')
 						//          PrimaryAirSystem(AirSysNum)%Branch(BranchNum)%Comp(CompNum)%CompType_Num=DXCoil_CoolingHXAsst
-					} else if ( SameString(componentType, "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED") ) {
+					} else if ( componentType == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = WaterCoil_CoolingHXAsst;
-					} else if ( SameString(componentType, "COIL:HEATING:WATER") ) {
+					} else if ( componentType == "COIL:HEATING:WATER" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = WaterCoil_SimpleHeat;
-					} else if ( SameString(componentType, "COIL:HEATING:STEAM") ) {
+					} else if ( componentType == "COIL:HEATING:STEAM" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = SteamCoil_AirHeat;
-					} else if ( SameString(componentType, "COIL:COOLING:WATER:DETAILEDGEOMETRY") ) {
+					} else if ( componentType == "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = WaterCoil_DetailedCool;
-					} else if ( SameString(componentType, "COIL:COOLING:WATER") ) {
+					} else if ( componentType == "COIL:COOLING:WATER" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = WaterCoil_Cooling;
-					} else if ( SameString(componentType, "COIL:HEATING:ELECTRIC") ) {
+					} else if ( componentType == "COIL:HEATING:ELECTRIC" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Coil_ElectricHeat;
-					} else if ( SameString(componentType, "COIL:HEATING:GAS") ) {
+					} else if ( componentType == "COIL:HEATING:GAS" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Coil_GasHeat;
 
 						// Heat reclaim
-					} else if ( SameString(componentType, "COIL:HEATING:DESUPERHEATER") ) {
+					} else if ( componentType == "COIL:HEATING:DESUPERHEATER" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Coil_DeSuperHeat;
 
-					} else if ( SameString(componentType, "COILSYSTEM:COOLING:DX") ) {
+					} else if ( componentType == "COILSYSTEM:COOLING:DX" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = DXSystem;
-					} else if ( SameString(componentType, "COILSYSTEM:HEATING:DX") ) {
+					} else if ( componentType == "COILSYSTEM:HEATING:DX" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = DXHeatPumpSystem;
-					} else if ( SameString(componentType, "COIL:USERDEFINED") ) {
+					} else if ( componentType == "COIL:USERDEFINED" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = CoilUserDefined;
-					} else if ( SameString(componentType, "AIRLOOPHVAC:UNITARYSYSTEM") ) {
+					} else if ( componentType == "AIRLOOPHVAC:UNITARYSYSTEM" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = UnitarySystem;
-					} else if ( SameString(componentType, "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY") ) {
+					} else if ( componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Furnace_UnitarySys;
-					} else if ( SameString(componentType, "AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL") ) {
+					} else if ( componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Furnace_UnitarySys;
-					} else if ( SameString(componentType, "AIRLOOPHVAC:UNITARYHEATONLY") ) {
+					} else if ( componentType == "AIRLOOPHVAC:UNITARYHEATONLY" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Furnace_UnitarySys;
-					} else if ( SameString(componentType, "AIRLOOPHVAC:UNITARYHEATCOOL") ) {
+					} else if ( componentType == "AIRLOOPHVAC:UNITARYHEATCOOL" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Furnace_UnitarySys;
-					} else if ( SameString(componentType, "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR") ) {
+					} else if ( componentType == "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Furnace_UnitarySys;
-					} else if ( SameString(componentType, "AIRLOOPHVAC:UNITARYHEATPUMP:WATERTOAIR") ) {
+					} else if ( componentType == "AIRLOOPHVAC:UNITARYHEATPUMP:WATERTOAIR" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Furnace_UnitarySys;
 
-					} else if ( SameString(componentType, "AIRLOOPHVAC:UNITARYHEATCOOL:VAVCHANGEOVERBYPASS") ) {
+					} else if ( componentType == "AIRLOOPHVAC:UNITARYHEATCOOL:VAVCHANGEOVERBYPASS" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = UnitarySystem_BypassVAVSys;
 
 						// Humidifier Types for the air system simulation
-					} else if ( SameString(componentType, "HUMIDIFIER:STEAM:ELECTRIC") ) {
+					} else if ( componentType == "HUMIDIFIER:STEAM:ELECTRIC" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Humidifier;
 
 						// Evap Cooler Types for the air system simulation
-					} else if ( SameString(componentType, "EVAPORATIVECOOLER:DIRECT:CELDEKPAD") ) {
+					} else if ( componentType == "EVAPORATIVECOOLER:DIRECT:CELDEKPAD" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = EvapCooler;
-					} else if ( SameString(componentType, "EVAPORATIVECOOLER:INDIRECT:CELDEKPAD") ) {
+					} else if ( componentType == "EVAPORATIVECOOLER:INDIRECT:CELDEKPAD" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = EvapCooler;
-					} else if ( SameString(componentType, "EVAPORATIVECOOLER:INDIRECT:WETCOIL") ) {
+					} else if ( componentType == "EVAPORATIVECOOLER:INDIRECT:WETCOIL" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = EvapCooler;
-					} else if ( SameString(componentType, "EVAPORATIVECOOLER:INDIRECT:RESEARCHSPECIAL") ) {
+					} else if ( componentType == "EVAPORATIVECOOLER:INDIRECT:RESEARCHSPECIAL" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = EvapCooler;
-					} else if ( SameString(componentType, "EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL") ) {
+					} else if ( componentType == "EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = EvapCooler;
 
 						// Desiccant Dehumidifier Types for the air system simulation
-					} else if ( SameString(componentType, "DEHUMIDIFIER:DESICCANT:NOFANS") ) {
+					} else if ( componentType == "DEHUMIDIFIER:DESICCANT:NOFANS" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Desiccant;
-					} else if ( SameString(componentType, "DEHUMIDIFIER:DESICCANT:SYSTEM") ) {
+					} else if ( componentType == "DEHUMIDIFIER:DESICCANT:SYSTEM" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Desiccant;
 
 						// Heat recovery
-					} else if ( SameString(componentType, "HEATEXCHANGER:AIRTOAIR:FLATPLATE") ) {
+					} else if ( componentType == "HEATEXCHANGER:AIRTOAIR:FLATPLATE" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = HeatXchngr;
 
-					} else if ( SameString(componentType, "HEATEXCHANGER:DESICCANT:BALANCEDFLOW") ) {
+					} else if ( componentType == "HEATEXCHANGER:DESICCANT:BALANCEDFLOW" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = HeatXchngr;
 
 						// Ducts
-					} else if ( SameString(componentType, "DUCT") ) {
+					} else if ( componentType == "DUCT" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Duct;
 
-					} else if ( SameString(componentType, "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR:MULTISPEED") ) {
+					} else if ( componentType == "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR:MULTISPEED" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = UnitarySystem_MSHeatPump;
 
-					} else if ( SameString(componentType, "FAN:ONOFF") || SameString(componentType, "COIL:COOLING:DX:SINGLESPEED") || SameString(componentType, "COIL:HEATING:DX:SINGLESPEED") || SameString(componentType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") || SameString(componentType, "COIL:COOLING:DX:MULTISPEED") || SameString(componentType, "COIL:HEATING:DX:MULTISPEED") ) {
+					} else if ( componentType == "FAN:ONOFF" || componentType == "COIL:COOLING:DX:SINGLESPEED" || componentType == "COIL:HEATING:DX:SINGLESPEED" || componentType == "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" || componentType == "COIL:COOLING:DX:MULTISPEED" || componentType == "COIL:HEATING:DX:MULTISPEED" ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + PrimaryAirSystem( AirSysNum ).Name + "\"." );
 						ShowContinueError( "..Invalid Air Loop Component Type = \"" + PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf + "\"." );
 						ShowContinueError( "..Air Loop Component Name = \"" + PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).Name + "\"." );

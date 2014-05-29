@@ -61,7 +61,7 @@ namespace EarthTube {
 
 	// MODULE VARIABLES DECLARATIONS:
 	static std::string const BlankString;
-	
+
 	int TotEarthTube( 0 ); // Total EarthTube Statements in input
 	// Parameters for Ventilation
 	int const NaturalEarthTube( 0 );
@@ -460,7 +460,7 @@ namespace EarthTube {
 			// Skip if below the temperature difference limit
 			if ( std::abs( MAT( NZ ) - OutDryBulbTemp ) < EarthTubeSys( Loop ).DelTemperature ) continue;
 
-			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, OutDryBulbTemp, OutHumRat, BlankString );
+			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, OutDryBulbTemp, OutHumRat );
 			AirSpecHeat = PsyCpAirFnWTdb( OutHumRat, OutDryBulbTemp );
 			EVF( NZ ) = EarthTubeSys( Loop ).DesignLevel * GetCurrentScheduleValue( EarthTubeSys( Loop ).SchedPtr );
 			MCPE( NZ ) = EVF( NZ ) * AirDensity * AirSpecHeat * ( EarthTubeSys( Loop ).ConstantTermCoef + std::abs( OutDryBulbTemp - MAT( NZ ) ) * EarthTubeSys( Loop ).TemperatureTermCoef + WindSpeed * ( EarthTubeSys( Loop ).VelocityTermCoef + WindSpeed * EarthTubeSys( Loop ).VelocitySQTermCoef ) );
@@ -520,7 +520,7 @@ namespace EarthTube {
 
 			}
 
-			InsideDewPointTemp = PsyTdpFnWPb( OutHumRat, OutBaroPress, BlankString );
+			InsideDewPointTemp = PsyTdpFnWPb( OutHumRat, OutBaroPress );
 
 			if ( EarthTubeSys( Loop ).InsideAirTemp >= InsideDewPointTemp ) {
 				InsideEnthalpy = PsyHFnTdbW( EarthTubeSys( Loop ).InsideAirTemp, OutHumRat );
@@ -538,7 +538,7 @@ namespace EarthTube {
 				MCPTE( NZ ) = MCPE( NZ ) * EarthTubeSys( Loop ).AirTemp;
 
 			} else {
-				InsideHumRat = PsyWFnTdpPb( EarthTubeSys( Loop ).InsideAirTemp, OutBaroPress, BlankString );
+				InsideHumRat = PsyWFnTdpPb( EarthTubeSys( Loop ).InsideAirTemp, OutBaroPress );
 				InsideEnthalpy = PsyHFnTdbW( EarthTubeSys( Loop ).InsideAirTemp, InsideHumRat );
 				// Intake fans will add some heat to the air, raising the temperature for an intake fan...
 				if ( EarthTubeSys( Loop ).FanType == IntakeEarthTube ) {
@@ -606,7 +606,7 @@ namespace EarthTube {
 		for ( ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop ) { // Start of zone loads report variable update loop ...
 
 			// Break the infiltration load into heat gain and loss components.
-			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, OutDryBulbTemp, OutHumRat, BlankString );
+			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, OutDryBulbTemp, OutHumRat );
 			CpAir = PsyCpAirFnWTdb( OutHumRat, OutDryBulbTemp );
 			ZnRptET( ZoneLoop ).EarthTubeVolume = ( MCPE( ZoneLoop ) / CpAir / AirDensity ) * ReportingConstant;
 			ZnRptET( ZoneLoop ).EarthTubeMass = ( MCPE( ZoneLoop ) / CpAir ) * ReportingConstant;

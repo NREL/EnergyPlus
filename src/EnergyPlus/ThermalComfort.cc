@@ -523,9 +523,9 @@ namespace ThermalComfort {
 			RadTemp = CalcRadTemp( PeopleNum );
 			// Use mean air temp for calculating RH when thermal comfort control is used
 			if ( present( PNum ) ) {
-				RelHum = PsyRhFnTdbWPb( MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress, BlankString );
+				RelHum = PsyRhFnTdbWPb( MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress );
 			} else {
-				RelHum = PsyRhFnTdbWPb( ZTAVComf( ZoneNum ), ZoneAirHumRatAvgComf( ZoneNum ), OutBaroPress, BlankString );
+				RelHum = PsyRhFnTdbWPb( ZTAVComf( ZoneNum ), ZoneAirHumRatAvgComf( ZoneNum ), OutBaroPress );
 			}
 			People( PeopleNum ).TemperatureInZone = AirTemp;
 			People( PeopleNum ).RelativeHumidityInZone = RelHum * 100.0;
@@ -585,7 +585,7 @@ namespace ThermalComfort {
 			// VapPress    = CalcSatVapPressFromTemp(AirTemp)  !original
 			// VapPress    = RelHum*VapPress                   !original might be in torrs
 
-			VapPress = PsyPsatFnTemp( AirTemp, BlankString ); // use psych routines inside E+ , returns Pa
+			VapPress = PsyPsatFnTemp( AirTemp ); // use psych routines inside E+ , returns Pa
 
 			VapPress *= RelHum; // in units of [Pa]
 
@@ -805,7 +805,7 @@ namespace ThermalComfort {
 				AirTemp = ZTAV( ZoneNum );
 			}
 			RadTemp = CalcRadTemp( PeopleNum );
-			RelHum = PsyRhFnTdbWPb( ZTAV( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress, BlankString );
+			RelHum = PsyRhFnTdbWPb( ZTAV( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress );
 			// Metabolic rate of body (W/m2)
 			ActLevel = GetCurrentScheduleValue( People( PeopleNum ).ActivityLevelPtr ) / BodySurfArea;
 			// Energy consumption by external work (W/m2)
@@ -1232,7 +1232,7 @@ namespace ThermalComfort {
 				AirTemp = ZTAV( ZoneNum );
 			}
 			RadTemp = CalcRadTemp( PeopleNum );
-			RelHum = PsyRhFnTdbWPb( ZTAV( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress, BlankString );
+			RelHum = PsyRhFnTdbWPb( ZTAV( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress );
 			ActLevel = GetCurrentScheduleValue( People( PeopleNum ).ActivityLevelPtr ) / BodySurfArea;
 			WorkEff = GetCurrentScheduleValue( People( PeopleNum ).WorkEffPtr ) * ActLevel;
 			{ auto const SELECT_CASE_var( People( PeopleNum ).ClothingType );
