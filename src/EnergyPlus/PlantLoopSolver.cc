@@ -11,6 +11,7 @@
 // EnergyPlus Headers
 #include <PlantLoopSolver.hh>
 #include <DataBranchAirLoopPlant.hh>
+#include <DataConvergParams.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
 #include <DataLoopNode.hh>
@@ -562,6 +563,7 @@ namespace PlantLoopSolver {
 		using Pumps::PumpEquip;
 		using PlantUtilities::IntegerIsWithinTwoValues;
 		using DataHVACGlobals::SmallLoad;
+		using DataConvergParams::PlantLowFlowRateToler;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -755,21 +757,20 @@ namespace PlantLoopSolver {
 										ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax / this_pump.NumPumpsInBank );
 									}
 								}
-							}}
-						
-							//overrides the loop solver flow request to allow pump to turn off when not in use
-							auto const SELECT_CASE_var( component.TypeOf_Num );
-							if ( (SELECT_CASE_var == TypeOf_PumpVariableSpeed) || (SELECT_CASE_var == TypeOf_PumpBankVariableSpeed) ) {
-								if (CompIndex > 0){
-									auto & this_pump( PumpEquip( CompIndex ) );
-									this_pump.LoopSolverOverwriteFlag = false;
-									if (ThisBranchFlowRequestNeedIfOn == 0.0){
-										this_pump.LoopSolverOverwriteFlag = true;
-									}															
-								}
-							
 							}
+						
+							//overwrite here for branch pumps
+							if ( ( SELECT_CASE_var == TypeOf_PumpVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpBankVariableSpeed ) ) {
+								CompIndex = component.CompNum;
+								if ( CompIndex > 0 ) {
+									auto & this_pump(PumpEquip( CompIndex ) );
+									this_pump.LoopSolverOverwriteFlag = false;
+								}
+								
+
+							}}
 						}
+						
 					}
 
 				}
@@ -885,6 +886,33 @@ namespace PlantLoopSolver {
 			LoopFlow = EachSideFlowRequestFinal( ThisSide );
 			ThisLoopHasCommonPipe = true;
 		}
+
+		
+		
+		//overrides the loop solver flow request to allow loop pump to turn off when not in use
+		if ( PlantLoop( LoopNum ).LoopSide( ThisSide ).TotalPumps == 1) {
+			if ( LoopFlow < PlantLowFlowRateToler ) {  //Update from dataconvergetols...
+				auto & loop_side( PlantLoop( LoopNum ).LoopSide( ThisSide ) );
+				NumBranchesOnThisLoopSide = loop_side.TotalBranches;
+				for ( BranchCounter = 1; BranchCounter <= NumBranchesOnThisLoopSide; ++BranchCounter ) {
+					// reference
+					auto & branch( loop_side.Branch( BranchCounter ) );
+					NumCompsOnThisBranch = branch.TotalComponents;
+					for ( CompCounter = 1; CompCounter <= NumCompsOnThisBranch; ++CompCounter ) {
+						auto & component( branch.Comp( CompCounter ) );
+						auto const SELECT_CASE_var( component.TypeOf_Num );
+						if ( ( SELECT_CASE_var == TypeOf_PumpVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpBankVariableSpeed ) ) {
+							CompIndex = component.CompNum;
+							if ( CompIndex > 0 ){
+								auto & this_pump( PumpEquip( CompIndex ) );
+								this_pump.LoopSolverOverwriteFlag = true;
+							}
+						}
+					}
+				}
+			}
+		}
+
 
 		// do some diagnostic that are easy and fast at this point, the rest of this routine could be moved
 		//?  should be caught previously in input~ Check erroneous conditions first before we do the logic below
