@@ -464,7 +464,7 @@ count( FArray2S< bool > const & a, int const dim )
 template< typename T >
 inline
 bool
-is_contiguous( FArrayS< T > const & a )
+is_contiguous( FArrayS< T > const & )
 {
 	return false; //Do Replace by method call once we support it
 }
@@ -474,7 +474,7 @@ is_contiguous( FArrayS< T > const & a )
 template< typename T >
 inline
 FArray1D< int >
-lbound( FArray1S< T > const & a )
+lbound( FArray1S< T > const & )
 {
 	return FArray1D< int >( 1, 1 );
 }
@@ -482,7 +482,7 @@ lbound( FArray1S< T > const & a )
 template< typename T >
 inline
 FArray1D< int >
-lbound( FArray2S< T > const & a )
+lbound( FArray2S< T > const & )
 {
 	return FArray1D< int >( 2, 1 );
 }
@@ -490,7 +490,7 @@ lbound( FArray2S< T > const & a )
 template< typename T >
 inline
 FArray1D< int >
-lbound( FArray3S< T > const & a )
+lbound( FArray3S< T > const & )
 {
 	return FArray1D< int >( 3, 1 );
 }
@@ -498,7 +498,7 @@ lbound( FArray3S< T > const & a )
 template< typename T >
 inline
 FArray1D< int >
-lbound( FArray4S< T > const & a )
+lbound( FArray4S< T > const & )
 {
 	return FArray1D< int >( 4, 1 );
 }
@@ -506,7 +506,7 @@ lbound( FArray4S< T > const & a )
 template< typename T >
 inline
 FArray1D< int >
-lbound( FArray5S< T > const & a )
+lbound( FArray5S< T > const & )
 {
 	return FArray1D< int >( 5, 1 );
 }
@@ -514,7 +514,7 @@ lbound( FArray5S< T > const & a )
 template< typename T >
 inline
 FArray1D< int >
-lbound( FArray6S< T > const & a )
+lbound( FArray6S< T > const & )
 {
 	return FArray1D< int >( 6, 1 );
 }
@@ -522,7 +522,7 @@ lbound( FArray6S< T > const & a )
 template< typename T >
 inline
 int
-lbound( FArray1S< T > const & a, int const dim )
+lbound( FArray1S< T > const &, int const dim )
 {
 	switch ( dim ) {
 	case 1:
@@ -536,7 +536,7 @@ lbound( FArray1S< T > const & a, int const dim )
 template< typename T >
 inline
 int
-lbound( FArray2S< T > const & a, int const dim )
+lbound( FArray2S< T > const &, int const dim )
 {
 	switch ( dim ) {
 	case 1:
@@ -552,7 +552,7 @@ lbound( FArray2S< T > const & a, int const dim )
 template< typename T >
 inline
 int
-lbound( FArray3S< T > const & a, int const dim )
+lbound( FArray3S< T > const &, int const dim )
 {
 	switch ( dim ) {
 	case 1:
@@ -570,7 +570,7 @@ lbound( FArray3S< T > const & a, int const dim )
 template< typename T >
 inline
 int
-lbound( FArray4S< T > const & a, int const dim )
+lbound( FArray4S< T > const &, int const dim )
 {
 	switch ( dim ) {
 	case 1:
@@ -590,7 +590,7 @@ lbound( FArray4S< T > const & a, int const dim )
 template< typename T >
 inline
 int
-lbound( FArray5S< T > const & a, int const dim )
+lbound( FArray5S< T > const &, int const dim )
 {
 	switch ( dim ) {
 	case 1:
@@ -612,7 +612,7 @@ lbound( FArray5S< T > const & a, int const dim )
 template< typename T >
 inline
 int
-lbound( FArray6S< T > const & a, int const dim )
+lbound( FArray6S< T > const &, int const dim )
 {
 	switch ( dim ) {
 	case 1:
@@ -1287,6 +1287,9 @@ FArray1D< T >
 cshift( FArray1S< T > const & a, int const shift, int const dim = 1 )
 {
 	assert( dim == 1 );
+#ifdef NDEBUG
+	static_cast< void >( dim ); // Suppress unused warning
+#endif
 	FArray1D< T > o( FArray1D< T >::shape( a ) );
 	if ( a.dimensions_initialized() ) {
 		if ( o.dimensions_initialized() ) {
@@ -1374,6 +1377,9 @@ FArray1D< T >
 eoshift( FArray1S< T > const & a, int const shift, T const bdy = TypeTraits< T >::initial_value(), int const dim = 1 )
 {
 	assert( dim == 1 );
+#ifdef NDEBUG
+	static_cast< void >( dim ); // Suppress unused warning
+#endif
 	FArray1D< T > o( FArray1D< T >::shape( a, bdy ) );
 	if ( a.dimensions_initialized() ) {
 		if ( o.dimensions_initialized() ) {
@@ -1554,6 +1560,9 @@ T
 sum( FArray1S< T > const & a, int const dim )
 {
 	assert( dim == 1 );
+#ifdef NDEBUG
+	static_cast< void >( dim ); // Suppress unused warning
+#endif
 	T s( 0 );
 	for ( int i = 1, e = a.u(); i <= e; ++i ) {
 		s += a( i );
@@ -1815,6 +1824,9 @@ T
 product( FArray1S< T > const & a, int const dim )
 {
 	assert( dim == 1 );
+#ifdef NDEBUG
+	static_cast< void >( dim ); // Suppress unused warning
+#endif
 	T p( 1 );
 	for ( int i = 1, e = a.u(); i <= e; ++i ) {
 		p *= a( i );

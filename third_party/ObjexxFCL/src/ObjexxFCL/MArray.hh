@@ -167,6 +167,10 @@ public: // Inspector
 	int
 	l( int const d ) const
 	{
+		assert( ( 1 <= d ) && ( d <= rank() ) );
+#ifdef NDEBUG
+		static_cast< void >( d ); // Suppress unused warning
+#endif
 		return 1;
 	}
 

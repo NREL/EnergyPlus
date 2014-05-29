@@ -1094,7 +1094,7 @@ is_type< long int >( std::string const & s )
 {
 	c_cstring str( s.c_str() );
 	cstring end;
-	std::strtol( str, &end, 10 );
+	static_cast< void >( std::strtol( str, &end, 10 ) );
 	return ( ( end != str ) && is_tail( end ) );
 }
 
@@ -1106,7 +1106,7 @@ is_type< long long int >( std::string const & s )
 {
 	c_cstring str( s.c_str() );
 	cstring end;
-	std::strtoll( str, &end, 10 );
+	static_cast< void >( std::strtoll( str, &end, 10 ) );
 	return ( ( end != str ) && is_tail( end ) );
 }
 
@@ -1142,7 +1142,7 @@ is_type< unsigned long int >( std::string const & s )
 {
 	c_cstring str( s.c_str() );
 	cstring end;
-	std::strtoul( str, &end, 10 );
+	static_cast< void >( std::strtoul( str, &end, 10 ) );
 	return ( ( end != str ) && is_tail( end ) );
 }
 
@@ -1154,7 +1154,7 @@ is_type< unsigned long long int >( std::string const & s )
 {
 	c_cstring str( s.c_str() );
 	cstring end;
-	std::strtoull( str, &end, 10 );
+	static_cast< void >( std::strtoull( str, &end, 10 ) );
 	return ( ( end != str ) && is_tail( end ) );
 }
 
@@ -1166,7 +1166,7 @@ is_type< float >( std::string const & s )
 {
 	c_cstring str( s.c_str() );
 	cstring end;
-	std::strtof( str, &end );
+	static_cast< void >( std::strtof( str, &end ) );
 	return ( ( end != str ) && is_tail( end ) );
 }
 
@@ -1178,7 +1178,7 @@ is_type< double >( std::string const & s )
 {
 	c_cstring str( s.c_str() );
 	cstring end;
-	std::strtod( str, &end );
+	static_cast< void >( std::strtod( str, &end ) );
 	return ( ( end != str ) && is_tail( end ) );
 }
 
@@ -1190,7 +1190,7 @@ is_type< long double >( std::string const & s )
 {
 	c_cstring str( s.c_str() );
 	cstring end;
-	std::strtold( str, &end );
+	static_cast< void >( std::strtold( str, &end ) );
 	return ( ( end != str ) && is_tail( end ) );
 }
 
