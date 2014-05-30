@@ -21,10 +21,6 @@ namespace HVACManager {
 	extern int HVACManageIteration; // counts iterations to enforce maximum iteration limit
 	extern int RepIterAir;
 
-	extern FArray1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
-	extern FArray1D_bool MixingReportFlag; // TRUE when Mixing is active based on controls
-	extern FArray1D< Real64 > VentMCP; // product of mass rate and Cp for each Venitlation object
-
 	//SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
 	// and zone equipment simulations
 
@@ -66,16 +62,10 @@ namespace HVACManager {
 	UpdateZoneListAndGroupLoads();
 
 	void
-	CalcAirFlowSimple( Optional_int_const SysTimestepLoop = _ ); // System time step index
-
-	void
 	ReportAirHeatBalance();
 
 	void
 	SetHeatToReturnAirFlag();
-
-	void
-	GetStandAloneERVNodes( int const OutdoorNum ); // Zone Air Balance Outdoor index
 
 	void
 	UpdateZoneInletConvergenceLog();

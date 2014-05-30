@@ -117,6 +117,11 @@ namespace DataHeatBalFanSys {
 	FArray1D< Real64 > MixingMassFlowZone; // Mixing MASS FLOW
 	FArray1D< Real64 > MixingMassFlowXHumRat; // Mixing MASS FLOW * Humidity Ratio
 
+	FArray1D_bool ZoneMassBalanceFlag;  // zone mass flow balance flag
+	FArray1D_bool ZoneInfiltrationFlag; // Zone Infiltration flag
+	FArray1D_bool ZoneMassBalanceRepVarFlag; // zone mass flow balance reporting flag
+	FArray1D_int ZoneReOrder;           // zone number reordered for zone mass balance
+
 	//REAL Variables for the Heat Balance Simulation
 
 	FArray1D< Real64 > QRadSysSource; // Current source/sink for a particular surface (radiant sys)

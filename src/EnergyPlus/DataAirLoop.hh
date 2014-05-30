@@ -365,6 +365,7 @@ namespace DataAirLoop {
 		Real64 RecircFlow; // sum of zone plenum recirculated flows
 		Real64 FanPLR; // Operating PLR of air loop fan
 		Real64 OAFrac; // fraction of outside air to mixed air mass flow rate
+		Real64 ZoneMixingFlow; // total zone mixing net flow used to cap the return flow
 		bool FlowError; // error flag for flow error message
 
 		// Default Constructor
@@ -385,6 +386,7 @@ namespace DataAirLoop {
 			RecircFlow( 0.0 ),
 			FanPLR( 0.0 ),
 			OAFrac( 0.0 ),
+			ZoneMixingFlow( 0.0 ),
 			FlowError( false )
 		{}
 
@@ -406,6 +408,7 @@ namespace DataAirLoop {
 			Real64 const RecircFlow, // sum of zone plenum recirculated flows
 			Real64 const FanPLR, // Operating PLR of air loop fan
 			Real64 const OAFrac, // fraction of outside air to mixed air mass flow rate
+			Real64 const ZoneMixingFlow, // total zone mixing net flow used to cap the return flow
 			bool const FlowError // error flag for flow error message
 		) :
 			ZoneExhaust( ZoneExhaust ),
@@ -424,6 +427,7 @@ namespace DataAirLoop {
 			RecircFlow( RecircFlow ),
 			FanPLR( FanPLR ),
 			OAFrac( OAFrac ),
+			ZoneMixingFlow( ZoneMixingFlow ),
 			FlowError( FlowError )
 		{}
 

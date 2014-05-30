@@ -296,6 +296,7 @@ namespace DataHVACGlobals {
 	bool SimPlantLoopsFlag; // True when the main plant loops need to be (re)simulated
 	bool SimZoneEquipmentFlag; // True when zone equipment components need to be (re)simulated
 	bool SimNonZoneEquipmentFlag; // True when non-zone equipment components need to be (re)simulated
+	bool ZoneMassBalanceHVACReSim; // True when zone air mass flow balance and air loop needs (re)simulated
 
 	// Object Data
 	FArray1D< ZoneCompTypeData > ZoneComp;
