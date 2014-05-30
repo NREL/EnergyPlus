@@ -46,6 +46,8 @@ if( BUILD_FORTRAN )
   cmake_add_fortran_subdirectory(src/ReadVars PROJECT ReadVars NO_EXTERNAL_INSTALL )
 endif()
 
+install( FILES idd/Energy+.idd DESTINATION ./ )
+
 if( BUILD_PACKAGE )
   set(CPACK_INSTALL_CMAKE_PROJECTS
     "${CMAKE_BINARY_DIR};EnergyPLus;ALL;/"
