@@ -115,6 +115,8 @@ namespace ManageElectricPower {
 	int const Battery_LifeCalculation_Yes( 1 );
 	int const Battery_LifeCalculation_No( 2 );
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -891,7 +893,6 @@ namespace ManageElectricPower {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
 		static std::string const RoutineName( "GetPowerManagerInput: " );
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1646,7 +1647,7 @@ namespace ManageElectricPower {
 				ElecLoadCenter( Count ).InverterPresent = true;
 				ElecLoadCenter( Count ).StoragePresent = true;
 				cAlphaArgs( 6 ) = "DirectCurrentWithInverterACStorage";
-			} else if ( SameString( cAlphaArgs( 6 ), Blank ) ) {
+			} else if ( cAlphaArgs( 6 ).empty() ) {
 				ElecLoadCenter( Count ).BussType = ACBuss;
 				cAlphaArgs( 6 ) = "AlternatingCurrent (field was blank)";
 			} else {
@@ -2145,7 +2146,6 @@ namespace ManageElectricPower {
 			}
 		}
 
-		ThermalLoad = ThermalLoad;
 
 	}
 

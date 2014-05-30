@@ -70,6 +70,8 @@ public: // Types
 	typedef  typename Initializer::Function  InitializerFunction;
 
 	using Super::conformable;
+	using Super::isize1;
+	using Super::isize2;
 	using Super::l;
 	using Super::operator ();
 	using Super::reassign;
@@ -450,7 +452,7 @@ public: // Creation
 	FArray2D
 	shape( FArray2< U > const & a )
 	{
-		return FArray2D( a.size1(), a.size2() );
+		return FArray2D( a.isize1(), a.isize2() );
 	}
 
 	// Array Shape + Initializer Value Named Constructor Template
@@ -460,7 +462,7 @@ public: // Creation
 	FArray2D
 	shape( FArray2< U > const & a, T const & t )
 	{
-		return FArray2D( a.size1(), a.size2(), t );
+		return FArray2D( a.isize1(), a.isize2(), t );
 	}
 
 	// Slice Shape Named Constructor Template
@@ -470,7 +472,7 @@ public: // Creation
 	FArray2D
 	shape( FArray2S< U > const & a )
 	{
-		return FArray2D( a.size1(), a.size2() );
+		return FArray2D( a.isize1(), a.isize2() );
 	}
 
 	// Slice Shape + Initializer Value Named Constructor Template
@@ -480,7 +482,7 @@ public: // Creation
 	FArray2D
 	shape( FArray2S< U > const & a, T const & t )
 	{
-		return FArray2D( a.size1(), a.size2(), t );
+		return FArray2D( a.isize1(), a.isize2(), t );
 	}
 
 	// MArray Shape Named Constructor Template
@@ -490,7 +492,7 @@ public: // Creation
 	FArray2D
 	shape( MArray2< A, M > const & a )
 	{
-		return FArray2D( a.size1(), a.size2() );
+		return FArray2D( a.isize1(), a.isize2() );
 	}
 
 	// MArray Shape + Initializer Value Named Constructor Template
@@ -500,7 +502,7 @@ public: // Creation
 	FArray2D
 	shape( MArray2< A, M > const & a, T const & t )
 	{
-		return FArray2D( a.size1(), a.size2(), t );
+		return FArray2D( a.isize1(), a.isize2(), t );
 	}
 
 	// One-Based Copy Named Constructor Template
@@ -510,7 +512,7 @@ public: // Creation
 	FArray2D
 	one_based( FArray2< U > const & a )
 	{
-		return FArray2D( a, a.size1(), a.size2() );
+		return FArray2D( a, a.isize1(), a.isize2() );
 	}
 
 	// One-Based Slice Named Constructor Template
@@ -520,7 +522,7 @@ public: // Creation
 	FArray2D
 	one_based( FArray2S< U > const & a )
 	{
-		return FArray2D( a.size1(), a.size2(), a );
+		return FArray2D( a.isize1(), a.isize2(), a );
 	}
 
 	// One-Based MArray Named Constructor Template
@@ -530,7 +532,7 @@ public: // Creation
 	FArray2D
 	one_based( MArray2< A, M > const & a )
 	{
-		return FArray2D( a.size1(), a.size2(), a );
+		return FArray2D( a.isize1(), a.isize2(), a );
 	}
 
 	// Diagonal Matrix Named Constructor
@@ -924,6 +926,14 @@ public: // Inspector
 	size2() const
 	{
 		return I2_.size();
+	}
+
+	// Size of Dimension 2
+	inline
+	int
+	isize2() const
+	{
+		return I2_.isize();
 	}
 
 public: // Modifier
@@ -2642,7 +2652,7 @@ transpose( FArray2< T > const & a )
 	typedef  typename FArray2D< T >::size_type  size_type;
 	size_type const as1( a.size1() );
 	size_type const as2( a.size2() );
-	FArray2D< T > aT( as2, as1 );
+	FArray2D< T > aT( a.I2(), a.I1() );
 	for ( size_type i2 = 0, l = 0; i2 < as2; ++i2 ) {
 		for ( size_type i1 = 0, lT = i2; i1 < as1; ++i1, ++l, lT += as2 ) {
 			aT[ lT ] = a[ l ];

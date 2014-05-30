@@ -62,6 +62,8 @@ namespace ThermalChimney {
 
 	int TotThermalChimney( 0 ); // Total ThermalChimney Statements in input
 
+	static std::string const BlankString;
+
 	// Subroutine Specifications for the Heat Balance Module
 	// Driver Routines
 	// Get Input routines for module
@@ -167,7 +169,6 @@ namespace ThermalChimney {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
 		Real64 const FlowFractionTolerance( 0.0001 ); // Smallest deviation from unity for the sum of all fractions
 
 		// INTERFACE BLOCK SPECIFICATIONS

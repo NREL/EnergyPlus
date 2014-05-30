@@ -53,6 +53,7 @@ namespace OutAirNodeManager {
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS:
+	static std::string const BlankString;
 
 	//Type declarations in OutAirNodeManager module
 

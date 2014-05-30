@@ -114,6 +114,9 @@ namespace PackagedTerminalHeatPump {
 	int const PTACUnit( 2 ); // equivalent to PackagedTerminal:AirConditioner
 	int const PTWSHPUnit( 3 ); // equivalent to WaterToAirHeatPump
 
+	static std::string const fluidNameSteam( "STEAM" );
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -533,6 +536,7 @@ namespace PackagedTerminalHeatPump {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetPTUnit: " ); // include trailing blank space
+		static std::string const RoutineNameFull( "GetPackagedTerminalHeatPumpInput" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -949,7 +953,7 @@ namespace PackagedTerminalHeatPump {
 					PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow = GetCoilMaxSteamFlowRate( PTUnit( PTUnitNum ).SuppHeatCoilIndex, errFlag );
 					if ( PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow > 0.0 ) {
 						SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-						SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "GetPackagedTerminalHeatPumpInput" );
+						SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineNameFull );
 						PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow = GetCoilMaxSteamFlowRate( PTUnit( PTUnitNum ).SuppHeatCoilIndex, errFlag ) * SteamDensity;
 					}
 					errFlag = false;
@@ -1442,7 +1446,7 @@ namespace PackagedTerminalHeatPump {
 					PTUnit( PTUnitNum ).HWCoilSteamInletNode = GetCoilSteamInletNode( PTUnit( PTUnitNum ).ACHeatCoilIndex, ACHeatCoilName, errFlag );
 					PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow = GetCoilMaxSteamFlowRate( PTUnit( PTUnitNum ).ACHeatCoilIndex, errFlag );
 					SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-					SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "GetPackagedTerminalHeatPumpInput" );
+					SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineNameFull );
 					if ( PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow > 0.0 ) {
 						PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow = GetCoilMaxSteamFlowRate( PTUnit( PTUnitNum ).ACHeatCoilIndex, errFlag ) * SteamDensity;
 					}
@@ -2073,7 +2077,7 @@ namespace PackagedTerminalHeatPump {
 					PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow = GetCoilMaxSteamFlowRate( PTUnit( PTUnitNum ).SuppHeatCoilIndex, errFlag );
 					if ( PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow > 0.0 ) {
 						SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-						SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "GetPackagedTerminalHeatPumpInput" );
+						SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineNameFull );
 						PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow = GetCoilMaxSteamFlowRate( PTUnit( PTUnitNum ).SuppHeatCoilIndex, errFlag ) * SteamDensity;
 					}
 					errFlag = false;
@@ -2702,7 +2706,8 @@ namespace PackagedTerminalHeatPump {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "InitPTUnit" );
+		static std::string const RoutineNameSpace( " InitPTUnit" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2783,7 +2788,7 @@ namespace PackagedTerminalHeatPump {
 					PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", PTUnit( PTUnitNum ).ACHeatCoilName, ErrorsFound );
 
 					if ( PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow > 0.0 ) {
-						rho = GetDensityGlycol( PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidIndex, "InitPTUnit" );
+						rho = GetDensityGlycol( PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidIndex, RoutineName );
 
 						PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", PTUnit( PTUnitNum ).ACHeatCoilName, ErrorsFound ) * rho;
 					}
@@ -2801,7 +2806,7 @@ namespace PackagedTerminalHeatPump {
 
 					if ( PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow > 0.0 ) {
 						SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-						SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "InitPTUnit" );
+						SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName );
 						PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow = GetCoilMaxSteamFlowRate( PTUnit( PTUnitNum ).ACHeatCoilIndex, ErrorsFound ) * SteamDensity;
 					}
 
@@ -2821,7 +2826,7 @@ namespace PackagedTerminalHeatPump {
 					PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", PTUnit( PTUnitNum ).SuppHeatCoilName, ErrorsFound );
 
 					if ( PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow > 0.0 ) {
-						rho = GetDensityGlycol( PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidIndex, "InitPTUnit" );
+						rho = GetDensityGlycol( PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidIndex, RoutineName );
 						PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", PTUnit( PTUnitNum ).SuppHeatCoilName, ErrorsFound ) * rho;
 					}
 				} else if ( PTUnit( PTUnitNum ).SuppHeatCoilType_Num == Coil_HeatingSteam ) {
@@ -2833,7 +2838,7 @@ namespace PackagedTerminalHeatPump {
 					PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow = GetCoilMaxSteamFlowRate( PTUnit( PTUnitNum ).SuppHeatCoilIndex, ErrorsFound );
 					if ( PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow > 0.0 ) {
 						SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-						SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "InitPTUnit" );
+						SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName );
 						PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow = GetCoilMaxSteamFlowRate( PTUnit( PTUnitNum ).SuppHeatCoilIndex, ErrorsFound ) * SteamDensity;
 					}
 				}
@@ -3087,7 +3092,7 @@ namespace PackagedTerminalHeatPump {
 					CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", PTUnit( PTUnitNum ).ACHeatCoilName, ErrorsFound );
 					if ( CoilMaxVolFlowRate != AutoSize ) {
 
-						rho = GetDensityGlycol( PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidIndex, " InitPTUnit" );
+						rho = GetDensityGlycol( PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidIndex, RoutineNameSpace );
 						PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * rho;
 
 					}
@@ -3099,7 +3104,7 @@ namespace PackagedTerminalHeatPump {
 					SimulateWaterCoilComponents( PTUnit( PTUnitNum ).SuppHeatCoilName, FirstHVACIteration, PTUnit( PTUnitNum ).SuppHeatCoilIndex );
 					CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", PTUnit( PTUnitNum ).SuppHeatCoilName, ErrorsFound );
 					if ( CoilMaxVolFlowRate != AutoSize ) {
-						rho = GetDensityGlycol( PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidIndex, " InitPTUnit" );
+						rho = GetDensityGlycol( PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidIndex, RoutineNameSpace );
 						PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
 					}
 				}
@@ -3114,7 +3119,7 @@ namespace PackagedTerminalHeatPump {
 
 					if ( CoilMaxVolFlowRate != AutoSize ) {
 						SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-						SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "InitPTUnit" );
+						SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName );
 						PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
 					}
 					InitComponentNodes( 0.0, PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow, PTUnit( PTUnitNum ).HWCoilSteamInletNode, PTUnit( PTUnitNum ).PlantCoilOutletNode, PTUnit( PTUnitNum ).LoopNum, PTUnit( PTUnitNum ).LoopSide, PTUnit( PTUnitNum ).BranchNum, PTUnit( PTUnitNum ).CompNum );
@@ -3126,7 +3131,7 @@ namespace PackagedTerminalHeatPump {
 
 					if ( CoilMaxVolFlowRate != AutoSize ) {
 						SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-						SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, SteamIndex, "InitPTUnit" );
+						SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName );
 						PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
 					}
 					InitComponentNodes( 0.0, PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow, PTUnit( PTUnitNum ).HWCoilSteamInletNode, PTUnit( PTUnitNum ).PlantCoilOutletNode, PTUnit( PTUnitNum ).LoopNum, PTUnit( PTUnitNum ).LoopSide, PTUnit( PTUnitNum ).BranchNum, PTUnit( PTUnitNum ).CompNum );
@@ -4076,7 +4081,6 @@ namespace PackagedTerminalHeatPump {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIte( 500 ); // maximum number of iterations
-		static std::string const Blank; // subroutine argument when coil index is known
 		Real64 const ErrTolerance( 0.001 ); // convergence limit for hotwater coil
 		int const SolveMaxIter( 50 );
 
@@ -4160,7 +4164,7 @@ namespace PackagedTerminalHeatPump {
 				SaveCompressorPLR = DXCoilPartLoadRatio( PTUnit( PTUnitNum ).DXCoolCoilIndexNum );
 			} else if ( SELECT_CASE_var == PTWSHPUnit ) {
 				HeatPumpRunFrac( PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac );
-				SimWatertoAirHPSimple( Blank, PTUnit( PTUnitNum ).DXCoolCoilIndexNum, QZnReq, 1.0, OpMode, WSHPRuntimeFrac, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 1, PartLoadFrac, FirstHVACIteration, OnOffAirFlowRatio );
+				SimWatertoAirHPSimple( BlankString, PTUnit( PTUnitNum ).DXCoolCoilIndexNum, QZnReq, 1.0, OpMode, WSHPRuntimeFrac, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 1, PartLoadFrac, FirstHVACIteration, OnOffAirFlowRatio );
 				SaveCompressorPLR = PartLoadFrac;
 			} else {
 			}}
@@ -4173,7 +4177,7 @@ namespace PackagedTerminalHeatPump {
 					SimDXCoil( PTUnit( PTUnitNum ).DXCoolCoilName, Off, FirstHVACIteration, PTUnit( PTUnitNum ).CoolCoilCompIndex, PTUnit( PTUnitNum ).OpMode, 0.0, OnOffAirFlowRatio );
 				}
 			} else if ( SELECT_CASE_var == PTWSHPUnit ) {
-				SimWatertoAirHPSimple( Blank, PTUnit( PTUnitNum ).DXCoolCoilIndexNum, 0.0, 0.0, OpMode, 0.0, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 0, 0.0, FirstHVACIteration );
+				SimWatertoAirHPSimple( BlankString, PTUnit( PTUnitNum ).DXCoolCoilIndexNum, 0.0, 0.0, OpMode, 0.0, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 0, 0.0, FirstHVACIteration );
 			} else {
 			}}
 		}
@@ -4204,7 +4208,7 @@ namespace PackagedTerminalHeatPump {
 						SaveCompressorPLR = DXCoilPartLoadRatio( PTUnit( PTUnitNum ).DXHeatCoilIndexNum );
 					} else if ( SELECT_CASE_var == PTWSHPUnit ) {
 						HeatPumpRunFrac( PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac );
-						SimWatertoAirHPSimple( Blank, PTUnit( PTUnitNum ).DXHeatCoilIndex, QZnReq, 0.0, OpMode, WSHPRuntimeFrac, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 1, PartLoadFrac, FirstHVACIteration, OnOffAirFlowRatio );
+						SimWatertoAirHPSimple( BlankString, PTUnit( PTUnitNum ).DXHeatCoilIndex, QZnReq, 0.0, OpMode, WSHPRuntimeFrac, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 1, PartLoadFrac, FirstHVACIteration, OnOffAirFlowRatio );
 						SaveCompressorPLR = PartLoadFrac;
 					} else {
 					}}
@@ -4213,7 +4217,7 @@ namespace PackagedTerminalHeatPump {
 					if ( SELECT_CASE_var == PTHPUnit ) {
 						SimDXCoil( PTUnit( PTUnitNum ).DXHeatCoilName, Off, FirstHVACIteration, PTUnit( PTUnitNum ).DXHeatCoilIndex, PTUnit( PTUnitNum ).OpMode, 0.0, OnOffAirFlowRatio );
 					} else if ( SELECT_CASE_var == PTWSHPUnit ) {
-						SimWatertoAirHPSimple( Blank, PTUnit( PTUnitNum ).DXHeatCoilIndex, 0.0, 0.0, OpMode, 0.0, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 0, 0.0, FirstHVACIteration );
+						SimWatertoAirHPSimple( BlankString, PTUnit( PTUnitNum ).DXHeatCoilIndex, 0.0, 0.0, OpMode, 0.0, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 0, 0.0, FirstHVACIteration );
 
 					} else {
 					}}
@@ -4241,7 +4245,7 @@ namespace PackagedTerminalHeatPump {
 				if ( SELECT_CASE_var == PTHPUnit ) {
 					SimDXCoil( PTUnit( PTUnitNum ).DXHeatCoilName, Off, FirstHVACIteration, PTUnit( PTUnitNum ).DXHeatCoilIndex, PTUnit( PTUnitNum ).OpMode, 0.0, OnOffAirFlowRatio );
 				} else if ( SELECT_CASE_var == PTWSHPUnit ) {
-					SimWatertoAirHPSimple( Blank, PTUnit( PTUnitNum ).DXHeatCoilIndex, 0.0, 0.0, OpMode, 0.0, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 0, 0.0, FirstHVACIteration );
+					SimWatertoAirHPSimple( BlankString, PTUnit( PTUnitNum ).DXHeatCoilIndex, 0.0, 0.0, OpMode, 0.0, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 0, 0.0, FirstHVACIteration );
 
 				} else {
 				}}
@@ -5981,7 +5985,6 @@ namespace PackagedTerminalHeatPump {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank; // subroutine argument when coil index is known
 		static std::string const RoutineName( "CalcVarSpeedHeatPump: " ); // for error messages
 		Real64 const ErrTolerance( 0.001 ); // convergence limit for hotwater coil
 		int const SolveMaxIter( 50 );
@@ -6054,21 +6057,21 @@ namespace PackagedTerminalHeatPump {
 		}
 
 		if ( CoolingLoad && OutsideDryBulbTemp > PTUnit( PTUnitNum ).MinOATCompressor ) {
-			SimVariableSpeedCoils( Blank, PTUnit( PTUnitNum ).DXCoolCoilIndexNum, PTUnit( PTUnitNum ).OpMode, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, CompOp, PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq, OnOffAirFlowRatio );
+			SimVariableSpeedCoils( BlankString, PTUnit( PTUnitNum ).DXCoolCoilIndexNum, PTUnit( PTUnitNum ).OpMode, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, CompOp, PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq, OnOffAirFlowRatio );
 
 			SaveCompressorPLR = PartLoadFrac;
 		} else { // cooling coil is off
-			SimVariableSpeedCoils( Blank, PTUnit( PTUnitNum ).DXCoolCoilIndexNum, PTUnit( PTUnitNum ).OpMode, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRatio );
+			SimVariableSpeedCoils( BlankString, PTUnit( PTUnitNum ).DXCoolCoilIndexNum, PTUnit( PTUnitNum ).OpMode, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRatio );
 		}
 
 		if ( PTUnit( PTUnitNum ).UnitType_Num != PTACUnit ) { // PTHP
 			if ( HeatingLoad ) {
-				SimVariableSpeedCoils( Blank, PTUnit( PTUnitNum ).DXHeatCoilIndex, PTUnit( PTUnitNum ).OpMode, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, CompOp, PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq, OnOffAirFlowRatio );
+				SimVariableSpeedCoils( BlankString, PTUnit( PTUnitNum ).DXHeatCoilIndex, PTUnit( PTUnitNum ).OpMode, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, CompOp, PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq, OnOffAirFlowRatio );
 
 				SaveCompressorPLR = PartLoadFrac;
 			} else {
 				//   heating coil is off
-				SimVariableSpeedCoils( Blank, PTUnit( PTUnitNum ).DXHeatCoilIndex, PTUnit( PTUnitNum ).OpMode, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRatio );
+				SimVariableSpeedCoils( BlankString, PTUnit( PTUnitNum ).DXHeatCoilIndex, PTUnit( PTUnitNum ).OpMode, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRatio );
 			}
 		} else { //PTAC
 			if ( HeatingLoad ) {

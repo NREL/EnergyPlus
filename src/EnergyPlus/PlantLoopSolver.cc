@@ -58,6 +58,8 @@ namespace PlantLoopSolver {
 	Real64 InitialDemandToLoopSetPointSAVED;
 	int RefrigIndex( 0 ); // Index denoting refrigerant used (possibly steam)
 
+	static std::string const fluidNameSteam( "STEAM" );
+
 	// SUBROUTINE SPECIFICATIONS:
 	//PRIVATE EvaluatePumpFlowConditions
 
@@ -1533,6 +1535,9 @@ namespace PlantLoopSolver {
 		int BranchIndex; // ~ This is a 1 - n value within the current branch group
 		int StartingComponent; // ~ The component which "would" be simulated next
 
+		static std::string const RoutineName( "PlantLoopSolver::EvaluateLoopSetPointLoad" );
+		static std::string const RoutineNameAlt( "PlantSupplySide:EvaluateLoopSetPointLoad" );
+
 		//~ General variables
 		Real64 EnteringTemperature;
 		Real64 MassFlowRate;
@@ -1584,7 +1589,7 @@ namespace PlantLoopSolver {
 
 		if ( PlantLoop( LoopNum ).FluidType == NodeType_Water ) {
 
-			Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, WeightedInletTemp, PlantLoop( LoopNum ).FluidIndex, "PlantLoopSolver::EvaluateLoopSetPointLoad" );
+			Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, WeightedInletTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 
 			{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
 
@@ -1646,7 +1651,7 @@ namespace PlantLoopSolver {
 
 		} else if ( PlantLoop( LoopNum ).FluidType == NodeType_Steam ) {
 
-			Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, WeightedInletTemp, PlantLoop( LoopNum ).FluidIndex, "PlantLoopSolver::EvaluateLoopSetPointLoad" );
+			Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, WeightedInletTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 
 			{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
 
@@ -1658,8 +1663,8 @@ namespace PlantLoopSolver {
 				// Calculate the delta temperature
 				DeltaTemp = LoopSetPointTemperature - WeightedInletTemp;
 
-				EnthalpySteamSatVapor = GetSatEnthalpyRefrig( "STEAM", LoopSetPointTemperature, 1.0, RefrigIndex, "PlantSupplySide:EvaluateLoopSetPointLoad" );
-				EnthalpySteamSatLiquid = GetSatEnthalpyRefrig( "STEAM", LoopSetPointTemperature, 0.0, RefrigIndex, "PlantSupplySide:EvaluateLoopSetPointLoad" );
+				EnthalpySteamSatVapor = GetSatEnthalpyRefrig( fluidNameSteam, LoopSetPointTemperature, 1.0, RefrigIndex, RoutineNameAlt );
+				EnthalpySteamSatLiquid = GetSatEnthalpyRefrig( fluidNameSteam, LoopSetPointTemperature, 0.0, RefrigIndex, RoutineNameAlt );
 
 				LatentHeatSteam = EnthalpySteamSatVapor - EnthalpySteamSatLiquid;
 
@@ -1735,7 +1740,7 @@ namespace PlantLoopSolver {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "PlantLoopSolver::UpdateAnyLoopDemandAlterations" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1796,7 +1801,7 @@ namespace PlantLoopSolver {
 		InletTemp = Node( InletNode ).Temp;
 		OutletTemp = Node( OutletNode ).Temp;
 		AverageTemp = ( InletTemp + OutletTemp ) / 2;
-		ComponentCp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, AverageTemp, PlantLoop( LoopNum ).FluidIndex, "PlantLoopSolver::UpdateAnyLoopDemandAlterations" );
+		ComponentCp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, AverageTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 
 		// Calculate the load altered by this component
 		LoadAlteration = ComponentMassFlowRate * ComponentCp * ( OutletTemp - InletTemp );
@@ -2619,7 +2624,8 @@ namespace PlantLoopSolver {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "PlantLoopSolver::EvaluateLoopSetPointLoad" );
+		static std::string const RoutineNameAlt( "PlantSupplySide:EvaluateLoopSetPointLoad" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2652,7 +2658,7 @@ namespace PlantLoopSolver {
 
 		if ( this_loop.FluidType == NodeType_Water ) {
 
-			Cp = GetSpecificHeatGlycol( this_loop.FluidName, TargetTemp, this_loop.FluidIndex, "PlantLoopSolver::EvaluateLoopSetPointLoad" );
+			Cp = GetSpecificHeatGlycol( this_loop.FluidName, TargetTemp, this_loop.FluidIndex, RoutineName );
 
 			{ auto const SELECT_CASE_var( this_loop.LoopDemandCalcScheme );
 
@@ -2696,7 +2702,7 @@ namespace PlantLoopSolver {
 
 		} else if ( this_loop.FluidType == NodeType_Steam ) {
 
-			Cp = GetSpecificHeatGlycol( this_loop.FluidName, TargetTemp, this_loop.FluidIndex, "PlantLoopSolver::EvaluateLoopSetPointLoad" );
+			Cp = GetSpecificHeatGlycol( this_loop.FluidName, TargetTemp, this_loop.FluidIndex, RoutineName );
 
 			{ auto const SELECT_CASE_var( this_loop.LoopDemandCalcScheme );
 
@@ -2708,8 +2714,8 @@ namespace PlantLoopSolver {
 				// Calculate the delta temperature
 				DeltaTemp = LoopSetPointTemperature - TargetTemp;
 
-				EnthalpySteamSatVapor = GetSatEnthalpyRefrig( "STEAM", LoopSetPointTemperature, 1.0, RefrigIndex, "PlantSupplySide:EvaluateLoopSetPointLoad" );
-				EnthalpySteamSatLiquid = GetSatEnthalpyRefrig( "STEAM", LoopSetPointTemperature, 0.0, RefrigIndex, "PlantSupplySide:EvaluateLoopSetPointLoad" );
+				EnthalpySteamSatVapor = GetSatEnthalpyRefrig( fluidNameSteam, LoopSetPointTemperature, 1.0, RefrigIndex, RoutineNameAlt );
+				EnthalpySteamSatLiquid = GetSatEnthalpyRefrig( fluidNameSteam, LoopSetPointTemperature, 0.0, RefrigIndex, RoutineNameAlt );
 
 				LatentHeatSteam = EnthalpySteamSatVapor - EnthalpySteamSatLiquid;
 

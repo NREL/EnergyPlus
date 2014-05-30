@@ -21,6 +21,7 @@
 #include <ObjexxFCL/gio_Fmt.hh>
 #include <ObjexxFCL/IOFlags.hh>
 #include <ObjexxFCL/MArray.all.hh>
+#include <ObjexxFCL/stream.functions.hh>
 
 // C++ Headers
 #include <algorithm>
@@ -1178,7 +1179,7 @@ public: // Creation
 	{
 		if ( stream.rdbuf() == std::cin.rdbuf() ) { // Do the stdin read
 			std::string s;
-			std::getline( stream, s );
+			cross_platform_get_line( stream, s );
 			read_ = new ReadString( s, fmt, flags_ );
 			flags_.set_status( stream );
 		}
@@ -1192,7 +1193,7 @@ public: // Creation
 	{
 		if ( stream.rdbuf() == std::cin.rdbuf() ) { // Do the stdin read
 			std::string s;
-			std::getline( stream, s );
+			cross_platform_get_line( stream, s );
 			read_ = new ReadString( s, fmt, flags_ );
 			flags_.set_status( stream );
 		}
@@ -1205,7 +1206,7 @@ public: // Creation
 	{
 		if ( stream.rdbuf() == std::cin.rdbuf() ) { // Do the stdin read
 			std::string s;
-			std::getline( stream, s );
+			cross_platform_get_line( stream, s );
 			read_ = new ReadString( s, fmt, flags );
 			flags.set_status( stream );
 		}
@@ -1218,7 +1219,7 @@ public: // Creation
 	{
 		if ( stream.rdbuf() == std::cin.rdbuf() ) { // Do the stdin read
 			std::string s;
-			std::getline( stream, s );
+			cross_platform_get_line( stream, s );
 			read_ = new ReadString( s, fmt, flags );
 			flags.set_status( stream );
 		}

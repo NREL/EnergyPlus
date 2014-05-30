@@ -73,7 +73,7 @@ namespace HeatBalanceAirManager {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
-	// na
+	static std::string const BlankString;
 
 	//         Subroutine Specifications for the Heat Balance Module
 	// Driver Routines
@@ -366,7 +366,6 @@ namespace HeatBalanceAirManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
 		static gio::Fmt const fmta( "(A)" );
 		Real64 const VentilTempLimit( 100.0 ); // degrees Celsius
 		Real64 const MixingTempLimit( 100.0 ); // degrees Celsius
@@ -1122,7 +1121,7 @@ namespace HeatBalanceAirManager {
 						Ventilation( Loop ).FanType = ExhaustVentilation;
 					} else if ( SELECT_CASE_var == "INTAKE" ) {
 						Ventilation( Loop ).FanType = IntakeVentilation;
-					} else if ( ( SELECT_CASE_var == "NATURAL" ) || ( SELECT_CASE_var == "NONE" ) || ( SELECT_CASE_var == Blank ) ) {
+					} else if ( ( SELECT_CASE_var == "NATURAL" ) || ( SELECT_CASE_var == "NONE" ) || ( SELECT_CASE_var == BlankString ) ) {
 						Ventilation( Loop ).FanType = NaturalVentilation;
 					} else if ( SELECT_CASE_var == "BALANCED" ) {
 						Ventilation( Loop ).FanType = BalancedVentilation;
@@ -1215,7 +1214,7 @@ namespace HeatBalanceAirManager {
 						}
 					}
 					// Check Minimum indoor temperature value and schedule fields
-					if ( ! lNumericFieldBlanks( 11 ) && ( cAlphaArgs( 6 ) != Blank && Ventilation( Loop ).MinIndoorTempSchedPtr == 0 ) ) {
+					if ( ! lNumericFieldBlanks( 11 ) && ( ! cAlphaArgs( 6 ).empty() && Ventilation( Loop ).MinIndoorTempSchedPtr == 0 ) ) {
 						if ( Item1 == 1 ) {
 							ShowWarningError( RoutineName + cAlphaFieldNames( 6 ) + " = " + cAlphaArgs( 6 ) + " is invalid. The constant value will be used at " + RoundSigDigits( rNumericArgs( 11 ), 1 ) + " degrees C " );
 							ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
@@ -1285,7 +1284,7 @@ namespace HeatBalanceAirManager {
 					}
 
 					// Check delta temperature value and schedule fields
-					//    IF (lNumericFieldBlanks(13) .AND. cAlphaArgs(8) .EQ. Blank) THEN
+					//    IF (lNumericFieldBlanks(13) .AND. cAlphaArgs(8) .EQ. BlankString) THEN
 					//      CALL ShowWarningError(RoutineName//'Both the delta temperature value and delta schedule are blank. ')
 					//      CALL ShowContinueError('Will set the temperature to a constant value of '//TRIM(RoundSigDigits(-VentilTempLimit,1)) &
 					//           //' degrees C ')
@@ -1506,7 +1505,7 @@ namespace HeatBalanceAirManager {
 				ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 			}
 			// Check Minimum indoor temperature value and schedule fields
-			if ( ! lNumericFieldBlanks( 6 ) && ( cAlphaArgs( 4 ) != Blank && Ventilation( VentiCount ).MinIndoorTempSchedPtr == 0 ) ) {
+			if ( ! lNumericFieldBlanks( 6 ) && ( ! cAlphaArgs( 4 ).empty() && Ventilation( VentiCount ).MinIndoorTempSchedPtr == 0 ) ) {
 				ShowWarningError( RoutineName + cAlphaFieldNames( 4 ) + " = " + cAlphaArgs( 4 ) + " is invalid. The constant value will be used at " + RoundSigDigits( rNumericArgs( 11 ), 1 ) + " degrees C " );
 				ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 			}
@@ -2817,7 +2816,6 @@ namespace HeatBalanceAirManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
 		static gio::Fmt const RoomAirHeader( "('! <RoomAir Model>, Zone Name, Mixing/Mundt/UCSDDV/UCSDCV/UCSDUFI/UCSDUFE/User Defined')" );
 		static gio::Fmt const RoomAirZoneFmt( "('RoomAir Model,',A,',',A)" );
 
@@ -2856,7 +2854,7 @@ namespace HeatBalanceAirManager {
 			GetObjectItem( cCurrentModuleObject, AirModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
 			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
 			if ( ZoneNum != 0 ) {
-				if ( AirModel( ZoneNum ).AirModelName != Blank ) {
+				if ( ! AirModel( ZoneNum ).AirModelName.empty() ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ShowContinueError( "Duplicate zone name, only one type of roomair model is allowed per zone" );
@@ -2953,7 +2951,7 @@ namespace HeatBalanceAirManager {
 			if ( NumOfAirModels == 0 ) {
 				AirModel( ZoneNum ).AirModelName = "MIXING AIR MODEL FOR " + Zone( ZoneNum ).Name;
 				AirModel( ZoneNum ).ZoneName = Zone( ZoneNum ).Name;
-			} else if ( AirModel( ZoneNum ).ZoneName == Blank ) {
+			} else if ( AirModel( ZoneNum ).ZoneName == BlankString ) {
 				// no 'select air model' object for this zone so the mixing model is used for this zone
 				AirModel( ZoneNum ).AirModelName = "MIXING AIR MODEL FOR " + Zone( ZoneNum ).Name;
 				AirModel( ZoneNum ).ZoneName = Zone( ZoneNum ).Name;
@@ -3202,7 +3200,7 @@ namespace HeatBalanceAirManager {
 			if ( TotRefDoorMixing > 0 ) {
 				for ( NZ = 1; NZ <= ( NumOfZones - 1 ); ++NZ ) { // Can't have %ZonePtr==NumOfZones because lesser zone # of pair placed in ZonePtr in input
 					if ( ! RefDoorMixing( NZ ).RefDoorMixFlag ) continue;
-					if ( ( RefDoorMixing( NZ ).ZonePtr == NZ ) ) {
+					if ( RefDoorMixing( NZ ).ZonePtr == NZ ) {
 						for ( J = 1; J <= RefDoorMixing( NZ ).NumRefDoorConnections; ++J ) {
 							RefDoorMixing( NZ ).VolRefDoorFlowRate( J ) = 0.0;
 							if ( RefDoorMixing( NZ ).EMSRefDoorMixingOn( J ) ) RefDoorMixing( NZ ).VolRefDoorFlowRate( J ) = RefDoorMixing( NZ ).EMSRefDoorFlowRate( J );

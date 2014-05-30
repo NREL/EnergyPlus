@@ -82,6 +82,8 @@ namespace SystemReports {
 	int const HeatAndCool( 3 );
 	int const MaxSetBackCount( 3 );
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -3525,6 +3527,7 @@ namespace SystemReports {
 		using namespace DataZoneEnergyDemands;
 		using namespace DataGlobalConstants;
 		using InputProcessor::FindItemInList;
+		using InputProcessor::SameString;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3580,10 +3583,9 @@ namespace SystemReports {
 			firstTime = false;
 		}
 
-		{ auto const SELECT_CASE_var( CompType );
-
+		{ auto const componentType( CompType );
 		// Outside Air System
-		if ( SELECT_CASE_var == "AIRLOOPHVAC:OUTDOORAIRSYSTEM" ) {
+		if ( componentType == "AIRLOOPHVAC:OUTDOORAIRSYSTEM" ) {
 			if ( CompLoadFlag ) {
 				if ( CompLoad > 0.0 ) {
 					SysOALoadCLNG( AirLoopNum ) += std::abs( CompLoad );
@@ -3592,23 +3594,23 @@ namespace SystemReports {
 				}
 			}
 			// Outdoor Air Mixer
-		} else if ( SELECT_CASE_var == "OUTDOORAIR:MIXER" ) {
+		} else if ( componentType == "OUTDOORAIR:MIXER" ) {
 			//No energy transfers to account for
 
-		} else if ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:INLETSIDEMIXER" ) {
+		} else if ( componentType == "AIRTERMINAL:SINGLEDUCT:INLETSIDEMIXER" ) {
 			//No energy transfers to account for
 
-		} else if ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:SUPPLYSIDEMIXER" ) {
+		} else if ( componentType == "AIRTERMINAL:SINGLEDUCT:SUPPLYSIDEMIXER" ) {
 			//No energy transfers to account for
 
 			// Fan Types for the air sys simulation
-		} else if ( ( SELECT_CASE_var == "FAN:CONSTANTVOLUME" ) || ( SELECT_CASE_var == "FAN:VARIABLEVOLUME" ) || ( SELECT_CASE_var == "FAN:ONOFF" ) || ( SELECT_CASE_var == "FAN:COMPONENTMODEL" ) ) { //cpw22Aug2010 Add 'FAN:COMPONENTMODEL')
+		} else if ( componentType == "FAN:CONSTANTVOLUME" || componentType == "FAN:VARIABLEVOLUME" || componentType == "FAN:ONOFF" || componentType == "FAN:COMPONENTMODEL"  ) { //cpw22Aug2010 Add 'FAN:COMPONENTMODEL')
 
 			if ( CompLoadFlag ) SysFANCompHTNG( AirLoopNum ) += std::abs( CompLoad );
 			SysFANCompElec( AirLoopNum ) += CompEnergy;
 
 			// Cooling Coil Types for the air sys simulation
-		} else if ( ( SELECT_CASE_var == "COILSYSTEM:COOLING:DX:HEATEXCHANGERASSISTED" ) || ( SELECT_CASE_var == "COIL:COOLING:DX:SINGLESPEED" ) || ( SELECT_CASE_var == "COIL:COOLING:DX:TWOSPEED" ) || ( SELECT_CASE_var == "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) || ( SELECT_CASE_var == "COIL:COOLING:DX:MULTISPEED" ) || ( SELECT_CASE_var == "COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT" ) || ( SELECT_CASE_var == "COIL:COOLING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION" ) || ( SELECT_CASE_var == "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) || ( SELECT_CASE_var == "COIL:COOLING:DX:VARIABLESPEED" ) || ( SELECT_CASE_var == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED" ) || ( SELECT_CASE_var == "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) || ( SELECT_CASE_var == "COIL:COOLING:WATER" ) || ( SELECT_CASE_var == "COIL:COOLING:DX:SINGLESPEED:THERMALSTORAGE" ) ) {
+		} else if ( componentType == "COILSYSTEM:COOLING:DX:HEATEXCHANGERASSISTED" || componentType == "COIL:COOLING:DX:SINGLESPEED" || componentType == "COIL:COOLING:DX:TWOSPEED" || componentType == "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" || componentType == "COIL:COOLING:DX:MULTISPEED" || componentType == "COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT" || componentType == "COIL:COOLING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION" || componentType == "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" || componentType == "COIL:COOLING:DX:VARIABLESPEED" || componentType == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED" || componentType == "COIL:COOLING:WATER:DETAILEDGEOMETRY" || componentType == "COIL:COOLING:WATER" || componentType == "COIL:COOLING:DX:SINGLESPEED:THERMALSTORAGE" ) {
 
 			if ( CompLoadFlag ) SysCCCompCLNG( AirLoopNum ) += std::abs( CompLoad );
 			{ auto const SELECT_CASE_var1( EnergyType );
@@ -3619,7 +3621,7 @@ namespace SystemReports {
 			}}
 
 			// Heating Coil Types for the air sys simulation
-		} else if ( ( SELECT_CASE_var == "COIL:HEATING:WATER" ) || ( SELECT_CASE_var == "COIL:HEATING:DX:SINGLESPEED" ) || ( SELECT_CASE_var == "COIL:HEATING:DX:MULTISPEED" ) || ( SELECT_CASE_var == "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT" ) || ( SELECT_CASE_var == "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION" ) || ( SELECT_CASE_var == "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) || ( SELECT_CASE_var == "COIL:HEATING:DX:VARIABLESPEED" ) || ( SELECT_CASE_var == "COIL:HEATING:STEAM" ) || ( SELECT_CASE_var == "COIL:HEATING:GAS" ) || ( SELECT_CASE_var == "COIL:HEATING:GAS:MULTISTAGE" ) || ( SELECT_CASE_var == "COIL:HEATING:DESUPERHEATER" ) ) {
+		} else if ( componentType == "COIL:HEATING:WATER" || componentType == "COIL:HEATING:DX:SINGLESPEED" || componentType == "COIL:HEATING:DX:MULTISPEED" || componentType == "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT" || componentType == "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION" || componentType == "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" || componentType == "COIL:HEATING:DX:VARIABLESPEED" || componentType == "COIL:HEATING:STEAM" || componentType == "COIL:HEATING:GAS" || componentType == "COIL:HEATING:GAS:MULTISTAGE" || componentType == "COIL:HEATING:DESUPERHEATER" ) {
 
 			if ( CompLoadFlag ) SysHCCompHTNG( AirLoopNum ) += std::abs( CompLoad );
 			{ auto const SELECT_CASE_var1( EnergyType );
@@ -3633,7 +3635,7 @@ namespace SystemReports {
 				SysHCCompGas( AirLoopNum ) += CompEnergy;
 			}}
 
-		} else if ( ( SELECT_CASE_var == "COIL:HEATING:ELECTRIC" ) || ( SELECT_CASE_var == "COIL:HEATING:ELECTRIC:MULTISTAGE" ) ) {
+		} else if ( componentType == "COIL:HEATING:ELECTRIC" || componentType == "COIL:HEATING:ELECTRIC:MULTISTAGE" ) {
 
 			if ( CompLoadFlag ) SysHCCompHTNG( AirLoopNum ) += std::abs( CompLoad );
 			{ auto const SELECT_CASE_var1( EnergyType );
@@ -3642,7 +3644,7 @@ namespace SystemReports {
 			} else {
 			}}
 
-		} else if ( SELECT_CASE_var == "COIL:USERDEFINED" ) {
+		} else if ( componentType == "COIL:USERDEFINED" ) {
 
 			if ( CompLoadFlag ) {
 				if ( CompLoad > 0.0 ) {
@@ -3669,31 +3671,31 @@ namespace SystemReports {
 			}}
 
 			//DX Systems
-		} else if ( SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM" ) {
+		} else if ( componentType == "AIRLOOPHVAC:UNITARYSYSTEM" ) {
 			//All energy transfers accounted for in subcomponent models
-		} else if ( SELECT_CASE_var == "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR" ) {
+		} else if ( componentType == "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR" ) {
 			//All energy transfers accounted for in subcomponent models
-		} else if ( SELECT_CASE_var == "AIRLOOPHVAC:UNITARYHEATPUMP:WATERTOAIR" ) {
+		} else if ( componentType == "AIRLOOPHVAC:UNITARYHEATPUMP:WATERTOAIR" ) {
 			//All energy transfers accounted for in subcomponent models
-		} else if ( SELECT_CASE_var == "COILSYSTEM:COOLING:DX" ) {
+		} else if ( componentType == "COILSYSTEM:COOLING:DX" ) {
 			//All energy transfers accounted for in subcomponent models
-		} else if ( SELECT_CASE_var == "COILSYSTEM:HEATING:DX" ) {
+		} else if ( componentType == "COILSYSTEM:HEATING:DX" ) {
 			//All energy transfers accounted for in subcomponent models
-		} else if ( SELECT_CASE_var == "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY" ) {
+		} else if ( componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY" ) {
 			//All energy transfers accounted for in subcomponent models
-		} else if ( SELECT_CASE_var == "AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL" ) {
+		} else if ( componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL" ) {
 			//All energy transfers accounted for in subcomponent models
-		} else if ( SELECT_CASE_var == "AIRLOOPHVAC:UNITARYHEATONLY" ) {
+		} else if ( componentType == "AIRLOOPHVAC:UNITARYHEATONLY" ) {
 			//All energy transfers accounted for in subcomponent models
-		} else if ( SELECT_CASE_var == "AIRLOOPHVAC:UNITARYHEATCOOL" ) {
+		} else if ( componentType == "AIRLOOPHVAC:UNITARYHEATCOOL" ) {
 			//All energy transfers accounted for in subcomponent models
-		} else if ( SELECT_CASE_var == "AIRLOOPHVAC:UNITARYHEATCOOL:VAVCHANGEOVERBYPASS" ) {
+		} else if ( componentType == "AIRLOOPHVAC:UNITARYHEATCOOL:VAVCHANGEOVERBYPASS" ) {
 			//All energy transfers accounted for in subcomponent models
-		} else if ( SELECT_CASE_var == "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR:MULTISPEED" ) {
+		} else if ( componentType == "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR:MULTISPEED" ) {
 			//All energy transfers accounted for in subcomponent models
 
 			// Humidifier Types for the air system simulation
-		} else if ( SELECT_CASE_var == "HUMIDIFIER:STEAM:ELECTRIC" ) {
+		} else if ( componentType == "HUMIDIFIER:STEAM:ELECTRIC" ) {
 			if ( CompLoadFlag ) SysHumidHTNG( AirLoopNum ) += std::abs( CompLoad );
 			{ auto const SELECT_CASE_var1( EnergyType );
 			if ( SELECT_CASE_var1 == iRT_Water ) {
@@ -3703,7 +3705,7 @@ namespace SystemReports {
 			}}
 
 			// Evap Cooler Types for the air system simulation
-		} else if ( ( SELECT_CASE_var == "EVAPORATIVECOOLER:DIRECT:CELDEKPAD" ) || ( SELECT_CASE_var == "EVAPORATIVECOOLER:INDIRECT:CELDEKPAD" ) || ( SELECT_CASE_var == "EVAPORATIVECOOLER:INDIRECT:WETCOIL" ) || ( SELECT_CASE_var == "EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL" ) || ( SELECT_CASE_var == "EVAPORATIVECOOLER:INDIRECT:RESEARCHSPECIAL" ) ) {
+		} else if ( componentType == "EVAPORATIVECOOLER:DIRECT:CELDEKPAD" || componentType == "EVAPORATIVECOOLER:INDIRECT:CELDEKPAD" || componentType == "EVAPORATIVECOOLER:INDIRECT:WETCOIL" || componentType == "EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL" || componentType == "EVAPORATIVECOOLER:INDIRECT:RESEARCHSPECIAL" ) {
 			if ( CompLoadFlag ) SysEvapCLNG( AirLoopNum ) += std::abs( CompLoad );
 			{ auto const SELECT_CASE_var1( EnergyType );
 			if ( SELECT_CASE_var1 == iRT_Water ) {
@@ -3713,7 +3715,7 @@ namespace SystemReports {
 			}}
 
 			// Desiccant Dehumidifier Types for the air system simulation
-		} else if ( ( SELECT_CASE_var == "DEHUMIDIFIER:DESICCANT:NOFANS" ) || ( SELECT_CASE_var == "DEHUMIDIFIER:DESICCANT:SYSTEM" ) ) {
+		} else if ( componentType == "DEHUMIDIFIER:DESICCANT:NOFANS" || componentType == "DEHUMIDIFIER:DESICCANT:SYSTEM" ) {
 			if ( CompLoadFlag ) DesDehumidCLNG( AirLoopNum ) += std::abs( CompLoad );
 			{ auto const SELECT_CASE_var1( EnergyType );
 			if ( SELECT_CASE_var1 == iRT_Electricity ) {
@@ -3721,7 +3723,7 @@ namespace SystemReports {
 			}}
 
 			// Heat Exchanger Types
-		} else if ( ( SELECT_CASE_var == "HEATEXCHANGER:AIRTOAIR:FLATPLATE" ) || ( SELECT_CASE_var == "HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT" ) || ( SELECT_CASE_var == "HEATEXCHANGER:DESICCANT:BALANCEDFLOW" ) ) {
+		} else if ( componentType == "HEATEXCHANGER:AIRTOAIR:FLATPLATE" || componentType == "HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT" || componentType == "HEATEXCHANGER:DESICCANT:BALANCEDFLOW" ) {
 			if ( CompLoadFlag ) {
 				if ( CompLoad > 0.0 ) {
 					SysHeatExCLNG( AirLoopNum ) += std::abs( CompLoad );
@@ -3731,11 +3733,11 @@ namespace SystemReports {
 			}
 
 			// Air Terminal Types
-		} else if ( ( SELECT_CASE_var == "AIRTERMINAL:DUALDUCT:CONSTANTVOLUME:COOL" ) || ( SELECT_CASE_var == "AIRTERMINAL:DUALDUCT:CONSTANTVOLUME:HEAT" ) || ( SELECT_CASE_var == "AIRTERMINAL:DUALDUCT:VAV:COOL" ) || ( SELECT_CASE_var == "AIRTERMINAL:DUALDUCT:VAV:HEAT" ) || ( SELECT_CASE_var == "AIRTERMINAL:DUALDUCT:VAV:OUTDOORAIR:OUTDOORAIR" ) || ( SELECT_CASE_var == "AIRTERMINAL:DUALDUCT:VAV:OUTDOORAIR:RECIRCULATEDAIR" ) || ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEINDUCTION" ) || ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:REHEAT" ) || ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT" ) || ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT" ) || ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:UNCONTROLLED" ) || ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:NOREHEAT" ) || ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:REHEAT" ) || ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:VAV:NOREHEAT" ) || ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:VAV:REHEAT" ) || ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:VAV:REHEAT:VARIABLESPEEDFAN" ) || ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:COOLEDBEAM" ) || ( SELECT_CASE_var == "ZONEHVAC:AIRDISTRIBUTIONUNIT" ) ) {
+		} else if ( componentType == "AIRTERMINAL:DUALDUCT:CONSTANTVOLUME:COOL" || componentType == "AIRTERMINAL:DUALDUCT:CONSTANTVOLUME:HEAT" || componentType == "AIRTERMINAL:DUALDUCT:VAV:COOL" || componentType == "AIRTERMINAL:DUALDUCT:VAV:HEAT" || componentType == "AIRTERMINAL:DUALDUCT:VAV:OUTDOORAIR:OUTDOORAIR" || componentType == "AIRTERMINAL:DUALDUCT:VAV:OUTDOORAIR:RECIRCULATEDAIR" || componentType == "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEINDUCTION" || componentType == "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:REHEAT" || componentType == "AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT" || componentType == "AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT" || componentType == "AIRTERMINAL:SINGLEDUCT:UNCONTROLLED" || componentType == "AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:NOREHEAT" || componentType == "AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:REHEAT" || componentType == "AIRTERMINAL:SINGLEDUCT:VAV:NOREHEAT" || componentType == "AIRTERMINAL:SINGLEDUCT:VAV:REHEAT" || componentType == "AIRTERMINAL:SINGLEDUCT:VAV:REHEAT:VARIABLESPEEDFAN" || componentType == "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:COOLEDBEAM" || componentType == "ZONEHVAC:AIRDISTRIBUTIONUNIT" ) {
 			//All energy transfers accounted for in component models
 
 			// Duct Types
-		} else if ( SELECT_CASE_var == "DUCT" ) {
+		} else if ( componentType == "DUCT" ) {
 			// duct losses should be accounted for here ???
 			// requires addition of a new variable to sum duct losses
 			// Example:
@@ -3746,7 +3748,7 @@ namespace SystemReports {
 			//      ENDIF
 
 			// Solar Collector Types
-		} else if ( ( SELECT_CASE_var == "SOLARCOLLECTOR:FLATPLATE:PHOTOVOLTAICTHERMAL" ) || ( SELECT_CASE_var == "SOLARCOLLECTOR:UNGLAZEDTRANSPIRED" ) ) {
+		} else if ( componentType == "SOLARCOLLECTOR:FLATPLATE:PHOTOVOLTAICTHERMAL" || componentType == "SOLARCOLLECTOR:UNGLAZEDTRANSPIRED" ) {
 			if ( CompLoadFlag ) {
 				if ( CompLoad > 0.0 ) {
 					SysSolarCollectCooling( AirLoopNum ) += std::abs( CompLoad );
@@ -3755,7 +3757,7 @@ namespace SystemReports {
 				}
 			}
 
-		} else if ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:USERDEFINED" ) {
+		} else if ( componentType == "AIRTERMINAL:SINGLEDUCT:USERDEFINED" ) {
 			// User component model energy use should be accounted for here
 			if ( CompLoadFlag ) {
 				if ( CompLoad > 0.0 ) {

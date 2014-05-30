@@ -142,7 +142,7 @@ public: // Creation
 	}
 
 	// Size Constructor
-	// Built-in value types are not initialized
+	//  Built-in value types are not initialized
 	inline
 	explicit
 	CArray( size_type const size ) :
@@ -640,7 +640,7 @@ public: // Array Accessor
 		return data_;
 	}
 
-private: // Static Functions
+private: // Static Methods
 
 	// square( x ) == x^2
 	inline

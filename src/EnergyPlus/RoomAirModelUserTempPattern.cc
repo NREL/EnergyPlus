@@ -63,6 +63,7 @@ namespace RoomAirModelUserTempPattern {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
+	static std::string const BlankString;
 
 	// MODULE DERIVED TYPE DEFINITIONS:
 

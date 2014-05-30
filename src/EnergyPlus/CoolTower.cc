@@ -59,6 +59,8 @@ namespace CoolTower {
 	int const WaterFlowSchedule( 0 );
 	int const WindDrivenFlow( 1 );
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLES DECLARATIONS:
@@ -163,7 +165,6 @@ namespace CoolTower {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
 		static std::string const CurrentModuleObject( "ZoneCoolTower:Shower" );
 		Real64 const MaximumWaterFlowRate( 0.016667 ); // Maximum limit of water flow rate in m3/s (1000 l/min)
 		Real64 const MinimumWaterFlowRate( 0.0 ); // Minimum limit of water flow rate

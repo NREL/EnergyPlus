@@ -115,7 +115,7 @@ namespace OutputProcessor {
 	gio::Fmt const RunPeriodStampFormat( "(A,',',A)" );
 	gio::Fmt const fmta( "(A)" );
 	FArray1D_string const DayTypes( 12, { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2" } );
-	std::string const BlankString;
+	static std::string const BlankString;
 	int const UnitsStringLength( 16 );
 
 	int const RVarAllocInc( 1000 );
@@ -643,7 +643,7 @@ namespace OutputProcessor {
 		FArray1D_int TmpReportList;
 
 		for ( Loop = MinIndx; Loop <= MaxIndx; ++Loop ) {
-			if ( ReqRepVars( Loop ).Key != BlankString ) continue;
+			if ( ! ReqRepVars( Loop ).Key.empty() ) continue;
 			if ( ! SameString( ReqRepVars( Loop ).VarName, VariableName ) ) continue;
 
 			//   A match.  Make sure doesnt duplicate
@@ -1664,6 +1664,7 @@ namespace OutputProcessor {
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
 		using namespace InputProcessor;
+		using InputProcessor::SameString;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2145,7 +2146,7 @@ namespace OutputProcessor {
 	void
 	GetStandardMeterResourceType(
 		std::string & OutResourceType,
-		std::string const & UserInputResourceType,
+		std::string const & UserInputResourceType, // Passed uppercase
 		bool & ErrorsFound
 	)
 	{
@@ -2167,7 +2168,7 @@ namespace OutputProcessor {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::MakeUPPERCase;
+		using InputProcessor::SameString;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2186,148 +2187,148 @@ namespace OutputProcessor {
 
 		ErrorsFound = false;
 
-		//!!! Basic ResourceType for Meters
-		{ auto const SELECT_CASE_var( MakeUPPERCase( UserInputResourceType ) );
+		// Basic ResourceType for Meters
+		{ auto const meterType( UserInputResourceType );
 
-		if ( ( SELECT_CASE_var == "ELECTRICITY" ) || ( SELECT_CASE_var == "ELECTRIC" ) || ( SELECT_CASE_var == "ELEC" ) ) {
+		if ( meterType == "ELECTRICITY" || meterType == "ELECTRIC" || meterType == "ELEC" ) {
 			OutResourceType = "Electricity";
 
-		} else if ( ( SELECT_CASE_var == "GAS" ) || ( SELECT_CASE_var == "NATURALGAS" ) || ( SELECT_CASE_var == "NATURAL GAS" ) ) {
+		} else if ( meterType == "GAS" || meterType == "NATURALGAS" || meterType == "NATURAL GAS" ) {
 			OutResourceType = "Gas";
 
-		} else if ( SELECT_CASE_var == "GASOLINE" ) {
+		} else if ( meterType == "GASOLINE" ) {
 			OutResourceType = "Gasoline";
 
-		} else if ( SELECT_CASE_var == "DIESEL" ) {
+		} else if ( meterType == "DIESEL" ) {
 			OutResourceType = "Diesel";
 
-		} else if ( SELECT_CASE_var == "COAL" ) {
+		} else if ( meterType == "COAL" ) {
 			OutResourceType = "Coal";
 
-		} else if ( ( SELECT_CASE_var == "FUEL OIL #1" ) || ( SELECT_CASE_var == "FUELOIL#1" ) || ( SELECT_CASE_var == "FUEL OIL" ) || ( SELECT_CASE_var == "DISTILLATE OIL" ) ) {
+		} else if ( meterType == "FUEL OIL #1" || meterType == "FUELOIL#1" || meterType == "FUEL OIL" || meterType == "DISTILLATE OIL" ) {
 			OutResourceType = "FuelOil#1";
 
-		} else if ( ( SELECT_CASE_var == "FUEL OIL #2" ) || ( SELECT_CASE_var == "FUELOIL#2" ) || ( SELECT_CASE_var == "RESIDUAL OIL" ) ) {
+		} else if ( meterType == "FUEL OIL #2" || meterType == "FUELOIL#2" || meterType == "RESIDUAL OIL" ) {
 			OutResourceType = "FuelOil#2";
 
-		} else if ( ( SELECT_CASE_var == "PROPANE" ) || ( SELECT_CASE_var == "LPG" ) || ( SELECT_CASE_var == "PROPANEGAS" ) || ( SELECT_CASE_var == "PROPANE GAS" ) ) {
+		} else if ( meterType == "PROPANE" || meterType == "LPG" || meterType == "PROPANEGAS" || meterType == "PROPANE GAS" ) {
 			OutResourceType = "Propane";
 
-		} else if ( ( SELECT_CASE_var == "WATER" ) || ( SELECT_CASE_var == "H2O" ) ) {
+		} else if ( meterType == "WATER" || meterType == "H2O" ) {
 			OutResourceType = "Water"; // this is water "use"
 
-		} else if ( ( SELECT_CASE_var == "ONSITEWATER" ) || ( SELECT_CASE_var == "WATERPRODUCED" ) || ( SELECT_CASE_var == "ONSITE WATER" ) ) {
+		} else if ( meterType == "ONSITEWATER" || meterType == "WATERPRODUCED" || meterType == "ONSITE WATER" ) {
 			OutResourceType = "OnSiteWater"; // these are for supply record keeping
 
-		} else if ( ( SELECT_CASE_var == "MAINSWATER" ) || ( SELECT_CASE_var == "WATERSUPPLY" ) ) {
+		} else if ( meterType == "MAINSWATER" || meterType == "WATERSUPPLY" ) {
 			OutResourceType = "MainsWater"; // record keeping
 
-		} else if ( ( SELECT_CASE_var == "RAINWATER" ) || ( SELECT_CASE_var == "PRECIPITATION" ) ) {
+		} else if ( meterType == "RAINWATER" || meterType == "PRECIPITATION" ) {
 			OutResourceType = "RainWater"; // record keeping
 
-		} else if ( ( SELECT_CASE_var == "WELLWATER" ) || ( SELECT_CASE_var == "GROUNDWATER" ) ) {
+		} else if ( meterType == "WELLWATER" || meterType == "GROUNDWATER" ) {
 			OutResourceType = "WellWater"; // record keeping
 
-		} else if ( SELECT_CASE_var == "CONDENSATE" ) {
+		} else if ( meterType == "CONDENSATE" ) {
 			OutResourceType = "Condensate"; // record keeping
 
-		} else if ( ( SELECT_CASE_var == "ENERGYTRANSFER" ) || ( SELECT_CASE_var == "ENERGYXFER" ) || ( SELECT_CASE_var == "XFER" ) ) {
+		} else if ( meterType == "ENERGYTRANSFER" || meterType == "ENERGYXFER" || meterType == "XFER" ) {
 			OutResourceType = "EnergyTransfer";
 
-		} else if ( SELECT_CASE_var == "STEAM" ) {
+		} else if ( meterType == "STEAM" ) {
 			OutResourceType = "Steam";
 
-		} else if ( SELECT_CASE_var == "DISTRICTCOOLING" ) {
+		} else if ( meterType == "DISTRICTCOOLING" ) {
 			OutResourceType = "DistrictCooling";
 
-		} else if ( SELECT_CASE_var == "DISTRICTHEATING" ) {
+		} else if ( meterType == "DISTRICTHEATING" ) {
 			OutResourceType = "DistrictHeating";
 
-		} else if ( SELECT_CASE_var == "ELECTRICITYPRODUCED" ) {
+		} else if ( meterType == "ELECTRICITYPRODUCED" ) {
 			OutResourceType = "ElectricityProduced";
 
-		} else if ( SELECT_CASE_var == "ELECTRICITYPURCHASED" ) {
+		} else if ( meterType == "ELECTRICITYPURCHASED" ) {
 			OutResourceType = "ElectricityPurchased";
 
-		} else if ( SELECT_CASE_var == "ELECTRICITYSURPLUSSOLD" ) {
+		} else if ( meterType == "ELECTRICITYSURPLUSSOLD" ) {
 			OutResourceType = "ElectricitySurplusSold";
 
-		} else if ( SELECT_CASE_var == "ELECTRICITYNET" ) {
+		} else if ( meterType == "ELECTRICITYNET" ) {
 			OutResourceType = "ElectricityNet";
 
-		} else if ( SELECT_CASE_var == "SOLARWATER" ) {
+		} else if ( meterType == "SOLARWATER" ) {
 			OutResourceType = "SolarWater";
 
-		} else if ( SELECT_CASE_var == "SOLARAIR" ) {
+		} else if ( meterType == "SOLARAIR" ) {
 			OutResourceType = "SolarAir";
 
-		} else if ( SELECT_CASE_var == "SO2" ) {
+		} else if ( meterType == "SO2" ) {
 			OutResourceType = "SO2";
 
-		} else if ( SELECT_CASE_var == "NOX" ) {
+		} else if ( meterType == "NOX" ) {
 			OutResourceType = "NOx";
 
-		} else if ( SELECT_CASE_var == "N2O" ) {
+		} else if ( meterType == "N2O" ) {
 			OutResourceType = "N2O";
 
-		} else if ( SELECT_CASE_var == "PM" ) {
+		} else if ( meterType == "PM" ) {
 			OutResourceType = "PM";
 
-		} else if ( SELECT_CASE_var == "PM2.5" ) {
+		} else if ( meterType == "PM2.5" ) {
 			OutResourceType = "PM2.5";
 
-		} else if ( SELECT_CASE_var == "PM10" ) {
+		} else if ( meterType == "PM10" ) {
 			OutResourceType = "PM10";
 
-		} else if ( SELECT_CASE_var == "CO" ) {
+		} else if ( meterType == "CO" ) {
 			OutResourceType = "CO";
 
-		} else if ( SELECT_CASE_var == "CO2" ) {
+		} else if ( meterType == "CO2" ) {
 			OutResourceType = "CO2";
 
-		} else if ( SELECT_CASE_var == "CH4" ) {
+		} else if ( meterType == "CH4" ) {
 			OutResourceType = "CH4";
 
-		} else if ( SELECT_CASE_var == "NH3" ) {
+		} else if ( meterType == "NH3" ) {
 			OutResourceType = "NH3";
 
-		} else if ( SELECT_CASE_var == "NMVOC" ) {
+		} else if ( meterType == "NMVOC" ) {
 			OutResourceType = "NMVOC";
 
-		} else if ( SELECT_CASE_var == "HG" ) {
+		} else if ( meterType == "HG" ) {
 			OutResourceType = "Hg";
 
-		} else if ( SELECT_CASE_var == "PB" ) {
+		} else if ( meterType == "PB" ) {
 			OutResourceType = "Pb";
 
-		} else if ( SELECT_CASE_var == "NUCLEAR HIGH" ) {
+		} else if ( meterType == "NUCLEAR HIGH" ) {
 			OutResourceType = "Nuclear High";
 
-		} else if ( SELECT_CASE_var == "NUCLEAR LOW" ) {
+		} else if ( meterType == "NUCLEAR LOW" ) {
 			OutResourceType = "Nuclear Low";
 
-		} else if ( SELECT_CASE_var == "WATERENVIRONMENTALFACTORS" ) {
+		} else if ( meterType == "WATERENVIRONMENTALFACTORS" ) {
 			OutResourceType = "WaterEnvironmentalFactors";
 
-		} else if ( SELECT_CASE_var == "CARBON EQUIVALENT" ) {
+		} else if ( meterType == "CARBON EQUIVALENT" ) {
 			OutResourceType = "Carbon Equivalent";
 
-		} else if ( SELECT_CASE_var == "SOURCE" ) {
+		} else if ( meterType == "SOURCE" ) {
 			OutResourceType = "Source";
 
-		} else if ( SELECT_CASE_var == "PLANTLOOPHEATINGDEMAND" ) {
+		} else if ( meterType == "PLANTLOOPHEATINGDEMAND" ) {
 			OutResourceType = "PlantLoopHeatingDemand";
 
-		} else if ( SELECT_CASE_var == "PLANTLOOPCOOLINGDEMAND" ) {
+		} else if ( meterType == "PLANTLOOPCOOLINGDEMAND" ) {
 			OutResourceType = "PlantLoopCoolingDemand";
 
-		} else if ( SELECT_CASE_var == "GENERIC" ) { // only used by custom meters
+		} else if ( meterType == "GENERIC" ) { // only used by custom meters
 			OutResourceType = "Generic";
 
-		} else if ( SELECT_CASE_var == "OTHERFUEL1" ) { // other fuel type (defined by user)
+		} else if ( meterType == "OTHERFUEL1" ) { // other fuel type (defined by user)
 			OutResourceType = "OtherFuel1";
 
-		} else if ( SELECT_CASE_var == "OTHERFUEL2" ) { // other fuel type (defined by user)
+		} else if ( meterType == "OTHERFUEL2" ) { // other fuel type (defined by user)
 			OutResourceType = "OtherFuel2";
 
 		} else {
@@ -2468,7 +2469,7 @@ namespace OutputProcessor {
 		} else {
 			ShowFatalError( "Requested to Add Meter which was already present=" + Name );
 		}
-		if ( ResourceType != BlankString ) {
+		if ( ! ResourceType.empty() ) {
 			DetermineMeterIPUnits( EnergyMeters( NumEnergyMeters ).RT_forIPUnits, ResourceType, MtrUnits, errFlag );
 			if ( errFlag ) {
 				ShowContinueError( "..on Meter=\"" + Name + "\"." );
@@ -2561,7 +2562,7 @@ namespace OutputProcessor {
 			++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
 			VarMeterArrays( NumVarMeterArrays ).OnMeters( VarMeterArrays( NumVarMeterArrays ).NumOnMeters ) = Found;
 		}
-		if ( Group != BlankString ) {
+		if ( ! Group.empty() ) {
 			Found = FindItem( ResourceType + ':' + Group, EnergyMeters.Name(), NumEnergyMeters );
 			if ( Found != 0 ) {
 				++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
@@ -2577,7 +2578,7 @@ namespace OutputProcessor {
 		}
 
 		//!! Following if EndUse is by ResourceType
-		if ( EndUse != BlankString ) {
+		if ( ! EndUse.empty() ) {
 			Found = FindItem( EndUse + ':' + ResourceType, EnergyMeters.Name(), NumEnergyMeters );
 			if ( Found != 0 ) {
 				++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
@@ -2592,7 +2593,7 @@ namespace OutputProcessor {
 			}
 
 			// End use subcategory
-			if ( EndUseSub != BlankString ) {
+			if ( ! EndUseSub.empty() ) {
 				Found = FindItem( EndUseSub + ':' + EndUse + ':' + ResourceType, EnergyMeters.Name(), NumEnergyMeters );
 				if ( Found != 0 ) {
 					++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
@@ -2734,6 +2735,7 @@ namespace OutputProcessor {
 		using InputProcessor::MakeUPPERCase;
 		using InputProcessor::FindItem;
 		using DataHeatBalance::Zone;
+		using InputProcessor::SameString;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2753,7 +2755,7 @@ namespace OutputProcessor {
 		std::string MeterName;
 
 		LocalErrorsFound = false;
-		//!!! Basic ResourceType Meters
+		// Basic ResourceType Meters
 		GetStandardMeterResourceType( ResourceType, MakeUPPERCase( ResourceType ), LocalErrorsFound );
 
 		if ( ! LocalErrorsFound ) {
@@ -2765,18 +2767,18 @@ namespace OutputProcessor {
 			if ( Found == 0 ) AddMeter( ResourceType + ":Facility", MtrUnits, ResourceType, "", "", "" );
 		}
 
-		//!!!  Group Meters
-		{ auto const SELECT_CASE_var( MakeUPPERCase( Group ) );
+		//!  Group Meters
+		{ auto const groupMeter( uppercased( Group ) );
 
-		if ( SELECT_CASE_var == BlankString ) {
+		if ( groupMeter.empty() ) {
 
-		} else if ( SELECT_CASE_var == "BUILDING" ) {
+		} else if ( groupMeter == "BUILDING" ) {
 			Group = "Building";
 
-		} else if ( ( SELECT_CASE_var == "HVAC" ) || ( SELECT_CASE_var == "SYSTEM" ) ) {
+		} else if ( groupMeter == "HVAC" || groupMeter == "SYSTEM" ) {
 			Group = "HVAC";
 
-		} else if ( SELECT_CASE_var == "PLANT" ) {
+		} else if ( groupMeter == "PLANT" ) {
 			Group = "Plant";
 
 		} else {
@@ -2785,7 +2787,7 @@ namespace OutputProcessor {
 
 		}}
 
-		if ( ! LocalErrorsFound && Group != BlankString ) {
+		if ( ! LocalErrorsFound && ! Group.empty() ) {
 			Found = FindItem( ResourceType + ':' + Group, EnergyMeters.Name(), NumEnergyMeters );
 			if ( Found == 0 ) AddMeter( ResourceType + ':' + Group, MtrUnits, ResourceType, "", "", Group );
 			if ( Group == "Building" ) {
@@ -2797,155 +2799,155 @@ namespace OutputProcessor {
 		}
 
 		//!!! EndUse Meters
-		{ auto const SELECT_CASE_var( MakeUPPERCase( EndUse ) );
+		{ auto const endUseMeter( uppercased( EndUse ) );
 
-		if ( SELECT_CASE_var == BlankString ) {
+		if ( endUseMeter.empty() ) {
 
-		} else if ( ( SELECT_CASE_var == "INTERIOR LIGHTS" ) || ( SELECT_CASE_var == "INTERIORLIGHTS" ) ) {
+		} else if ( endUseMeter == "INTERIOR LIGHTS" || endUseMeter == "INTERIORLIGHTS" ) {
 			EndUse = "InteriorLights";
 
-		} else if ( ( SELECT_CASE_var == "EXTERIOR LIGHTS" ) || ( SELECT_CASE_var == "EXTERIORLIGHTS" ) ) {
+		} else if ( endUseMeter == "EXTERIOR LIGHTS" || endUseMeter == "EXTERIORLIGHTS" ) {
 			EndUse = "ExteriorLights";
 
-		} else if ( ( SELECT_CASE_var == "HEATING" ) || ( SELECT_CASE_var == "HTG" ) ) {
+		} else if ( endUseMeter == "HEATING" || endUseMeter == "HTG" ) {
 			EndUse = "Heating";
 
-		} else if ( SELECT_CASE_var == "HEATPRODUCED" ) {
+		} else if ( endUseMeter == "HEATPRODUCED" ) {
 			EndUse = "HeatProduced";
 
-		} else if ( ( SELECT_CASE_var == "COOLING" ) || ( SELECT_CASE_var == "CLG" ) ) {
+		} else if ( endUseMeter == "COOLING" || endUseMeter == "CLG" ) {
 			EndUse = "Cooling";
 
-		} else if ( ( SELECT_CASE_var == "DOMESTICHOTWATER" ) || ( SELECT_CASE_var == "DHW" ) || ( SELECT_CASE_var == "DOMESTIC HOT WATER" ) ) {
+		} else if ( endUseMeter == "DOMESTICHOTWATER" || endUseMeter == "DHW" || endUseMeter == "DOMESTIC HOT WATER" ) {
 			EndUse = "WaterSystems";
 
-		} else if ( ( SELECT_CASE_var == "COGEN" ) || ( SELECT_CASE_var == "COGENERATION" ) ) {
+		} else if ( endUseMeter == "COGEN" || endUseMeter == "COGENERATION" ) {
 			EndUse = "Cogeneration";
 
-		} else if ( ( SELECT_CASE_var == "INTERIOREQUIPMENT" ) || ( SELECT_CASE_var == "INTERIOR EQUIPMENT" ) ) {
+		} else if ( endUseMeter == "INTERIOREQUIPMENT" || endUseMeter == "INTERIOR EQUIPMENT" ) {
 			EndUse = "InteriorEquipment";
 
-		} else if ( ( SELECT_CASE_var == "EXTERIOREQUIPMENT" ) || ( SELECT_CASE_var == "EXTERIOR EQUIPMENT" ) || ( SELECT_CASE_var == "EXT EQ" ) || ( SELECT_CASE_var == "EXTERIOREQ" ) ) {
+		} else if ( endUseMeter == "EXTERIOREQUIPMENT" || endUseMeter == "EXTERIOR EQUIPMENT" || endUseMeter == "EXT EQ" || endUseMeter == "EXTERIOREQ" ) {
 			EndUse = "ExteriorEquipment";
 
-		} else if ( SELECT_CASE_var == "EXTERIOR:WATEREQUIPMENT" ) {
+		} else if ( endUseMeter == "EXTERIOR:WATEREQUIPMENT" ) {
 			EndUse = "ExteriorEquipment";
 
-		} else if ( ( SELECT_CASE_var == "PURCHASEDHOTWATER" ) || ( SELECT_CASE_var == "DISTRICTHOTWATER" ) || ( SELECT_CASE_var == "PURCHASED HEATING" ) ) {
+		} else if ( endUseMeter == "PURCHASEDHOTWATER" || endUseMeter == "DISTRICTHOTWATER" || endUseMeter == "PURCHASED HEATING" ) {
 			EndUse = "DistrictHotWater";
 
-		} else if ( ( SELECT_CASE_var == "PURCHASEDCOLDWATER" ) || ( SELECT_CASE_var == "DISTRICTCHILLEDWATER" ) || ( SELECT_CASE_var == "PURCHASEDCHILLEDWATER" ) || ( SELECT_CASE_var == "PURCHASED COLD WATER" ) || ( SELECT_CASE_var == "PURCHASED COOLING" ) ) {
+		} else if ( endUseMeter == "PURCHASEDCOLDWATER" || endUseMeter == "DISTRICTCHILLEDWATER" || endUseMeter == "PURCHASEDCHILLEDWATER" || endUseMeter == "PURCHASED COLD WATER" || endUseMeter == "PURCHASED COOLING" ) {
 			EndUse = "DistrictChilledWater";
 
-		} else if ( ( SELECT_CASE_var == "FANS" ) || ( SELECT_CASE_var == "FAN" ) ) {
+		} else if ( endUseMeter == "FANS" || endUseMeter == "FAN" ) {
 			EndUse = "Fans";
 
-		} else if ( ( SELECT_CASE_var == "HEATINGCOILS" ) || ( SELECT_CASE_var == "HEATINGCOIL" ) || ( SELECT_CASE_var == "HEATING COILS" ) || ( SELECT_CASE_var == "HEATING COIL" ) ) {
+		} else if ( endUseMeter == "HEATINGCOILS" || endUseMeter == "HEATINGCOIL" || endUseMeter == "HEATING COILS" || endUseMeter == "HEATING COIL" ) {
 			EndUse = "HeatingCoils";
 
-		} else if ( ( SELECT_CASE_var == "COOLINGCOILS" ) || ( SELECT_CASE_var == "COOLINGCOIL" ) || ( SELECT_CASE_var == "COOLING COILS" ) || ( SELECT_CASE_var == "COOLING COIL" ) ) {
+		} else if ( endUseMeter == "COOLINGCOILS" || endUseMeter == "COOLINGCOIL" || endUseMeter == "COOLING COILS" || endUseMeter == "COOLING COIL" ) {
 			EndUse = "CoolingCoils";
 
-		} else if ( ( SELECT_CASE_var == "PUMPS" ) || ( SELECT_CASE_var == "PUMP" ) ) {
+		} else if ( endUseMeter == "PUMPS" || endUseMeter == "PUMP" ) {
 			EndUse = "Pumps";
 
-		} else if ( ( SELECT_CASE_var == "FREECOOLING" ) || ( SELECT_CASE_var == "FREE COOLING" ) ) {
+		} else if ( endUseMeter == "FREECOOLING" || endUseMeter == "FREE COOLING" ) {
 			EndUse = "Freecooling";
 
-		} else if ( SELECT_CASE_var == "LOOPTOLOOP" ) {
+		} else if ( endUseMeter == "LOOPTOLOOP" ) {
 			EndUse = "LoopToLoop";
 
-		} else if ( ( SELECT_CASE_var == "CHILLERS" ) || ( SELECT_CASE_var == "CHILLER" ) ) {
+		} else if ( endUseMeter == "CHILLERS" || endUseMeter == "CHILLER" ) {
 			EndUse = "Chillers";
 
-		} else if ( ( SELECT_CASE_var == "BOILERS" ) || ( SELECT_CASE_var == "BOILER" ) ) {
+		} else if ( endUseMeter == "BOILERS" || endUseMeter == "BOILER" ) {
 			EndUse = "Boilers";
 
-		} else if ( ( SELECT_CASE_var == "BASEBOARD" ) || ( SELECT_CASE_var == "BASEBOARDS" ) ) {
+		} else if ( endUseMeter == "BASEBOARD" || endUseMeter == "BASEBOARDS" ) {
 			EndUse = "Baseboard";
 
-		} else if ( ( SELECT_CASE_var == "HEATREJECTION" ) || ( SELECT_CASE_var == "HEAT REJECTION" ) ) {
+		} else if ( endUseMeter == "HEATREJECTION" || endUseMeter == "HEAT REJECTION" ) {
 			EndUse = "HeatRejection";
 
-		} else if ( ( SELECT_CASE_var == "HUMIDIFIER" ) || ( SELECT_CASE_var == "HUMIDIFIERS" ) ) {
+		} else if ( endUseMeter == "HUMIDIFIER" || endUseMeter == "HUMIDIFIERS" ) {
 			EndUse = "Humidifier";
 
-		} else if ( ( SELECT_CASE_var == "HEATRECOVERY" ) || ( SELECT_CASE_var == "HEAT RECOVERY" ) ) {
+		} else if ( endUseMeter == "HEATRECOVERY" || endUseMeter == "HEAT RECOVERY" ) {
 			EndUse = "HeatRecovery";
 
-		} else if ( ( SELECT_CASE_var == "PHOTOVOLTAICS" ) || ( SELECT_CASE_var == "PV" ) || ( SELECT_CASE_var == "PHOTOVOLTAIC" ) ) {
+		} else if ( endUseMeter == "PHOTOVOLTAICS" || endUseMeter == "PV" || endUseMeter == "PHOTOVOLTAIC" ) {
 			EndUse = "Photovoltaic";
 
-		} else if ( ( SELECT_CASE_var == "WINDTURBINES" ) || ( SELECT_CASE_var == "WT" ) || ( SELECT_CASE_var == "WINDTURBINE" ) ) {
+		} else if ( endUseMeter == "WINDTURBINES" || endUseMeter == "WT" || endUseMeter == "WINDTURBINE" ) {
 			EndUse = "WindTurbine";
 
-		} else if ( ( SELECT_CASE_var == "HEAT RECOVERY FOR COOLING" ) || ( SELECT_CASE_var == "HEATRECOVERYFORCOOLING" ) || ( SELECT_CASE_var == "HEATRECOVERYCOOLING" ) ) {
+		} else if ( endUseMeter == "HEAT RECOVERY FOR COOLING" || endUseMeter == "HEATRECOVERYFORCOOLING" || endUseMeter == "HEATRECOVERYCOOLING" ) {
 			EndUse = "HeatRecoveryForCooling";
 
-		} else if ( ( SELECT_CASE_var == "HEAT RECOVERY FOR HEATING" ) || ( SELECT_CASE_var == "HEATRECOVERYFORHEATING" ) || ( SELECT_CASE_var == "HEATRECOVERYHEATING" ) ) {
+		} else if ( endUseMeter == "HEAT RECOVERY FOR HEATING" || endUseMeter == "HEATRECOVERYFORHEATING" || endUseMeter == "HEATRECOVERYHEATING" ) {
 			EndUse = "HeatRecoveryForHeating";
 
-		} else if ( SELECT_CASE_var == "ELECTRICEMISSIONS" ) {
+		} else if ( endUseMeter == "ELECTRICEMISSIONS" ) {
 			EndUse = "ElectricEmissions";
 
-		} else if ( SELECT_CASE_var == "PURCHASEDELECTRICEMISSIONS" ) {
+		} else if ( endUseMeter == "PURCHASEDELECTRICEMISSIONS" ) {
 			EndUse = "PurchasedElectricEmissions";
 
-		} else if ( SELECT_CASE_var == "SOLDELECTRICEMISSIONS" ) {
+		} else if ( endUseMeter == "SOLDELECTRICEMISSIONS" ) {
 			EndUse = "SoldElectricEmissions";
 
-		} else if ( SELECT_CASE_var == "NATURALGASEMISSIONS" ) {
+		} else if ( endUseMeter == "NATURALGASEMISSIONS" ) {
 			EndUse = "NaturalGasEmissions";
 
-		} else if ( SELECT_CASE_var == "FUELOIL#1EMISSIONS" ) {
+		} else if ( endUseMeter == "FUELOIL#1EMISSIONS" ) {
 			EndUse = "FuelOil#1Emissions";
 
-		} else if ( SELECT_CASE_var == "FUELOIL#2EMISSIONS" ) {
+		} else if ( endUseMeter == "FUELOIL#2EMISSIONS" ) {
 			EndUse = "FuelOil#2Emissions";
 
-		} else if ( SELECT_CASE_var == "COALEMISSIONS" ) {
+		} else if ( endUseMeter == "COALEMISSIONS" ) {
 			EndUse = "CoalEmissions";
 
-		} else if ( SELECT_CASE_var == "GASOLINEEMISSIONS" ) {
+		} else if ( endUseMeter == "GASOLINEEMISSIONS" ) {
 			EndUse = "GasolineEmissions";
 
-		} else if ( SELECT_CASE_var == "PROPANEEMISSIONS" ) {
+		} else if ( endUseMeter == "PROPANEEMISSIONS" ) {
 			EndUse = "PropaneEmissions";
 
-		} else if ( SELECT_CASE_var == "DIESELEMISSIONS" ) {
+		} else if ( endUseMeter == "DIESELEMISSIONS" ) {
 			EndUse = "DieselEmissions";
 
-		} else if ( SELECT_CASE_var == "OTHERFUEL1EMISSIONS" ) {
+		} else if ( endUseMeter == "OTHERFUEL1EMISSIONS" ) {
 			EndUse = "OtherFuel1Emissions";
 
-		} else if ( SELECT_CASE_var == "OTHERFUEL2EMISSIONS" ) {
+		} else if ( endUseMeter == "OTHERFUEL2EMISSIONS" ) {
 			EndUse = "OtherFuel2Emissions";
 
-		} else if ( SELECT_CASE_var == "CARBONEQUIVALENTEMISSIONS" ) {
+		} else if ( endUseMeter == "CARBONEQUIVALENTEMISSIONS" ) {
 			EndUse = "CarbonEquivalentEmissions";
 
-		} else if ( SELECT_CASE_var == "REFRIGERATION" ) {
+		} else if ( endUseMeter == "REFRIGERATION" ) {
 			EndUse = "Refrigeration";
 
-		} else if ( SELECT_CASE_var == "COLDSTORAGECHARGE" ) {
+		} else if ( endUseMeter == "COLDSTORAGECHARGE" ) {
 			EndUse = "ColdStorageCharge";
 
-		} else if ( SELECT_CASE_var == "COLDSTORAGEDISCHARGE" ) {
+		} else if ( endUseMeter == "COLDSTORAGEDISCHARGE" ) {
 			EndUse = "ColdStorageDischarge";
 
-		} else if ( ( SELECT_CASE_var == "WATERSYSTEMS" ) || ( SELECT_CASE_var == "WATERSYSTEM" ) || ( SELECT_CASE_var == "Water System" ) ) {
+		} else if ( endUseMeter == "WATERSYSTEMS" || endUseMeter == "WATERSYSTEM" || endUseMeter == "Water System" ) {
 			EndUse = "WaterSystems";
 
-		} else if ( SELECT_CASE_var == "RAINWATER" ) {
+		} else if ( endUseMeter == "RAINWATER" ) {
 			EndUse = "Rainwater";
 
-		} else if ( SELECT_CASE_var == "CONDENSATE" ) {
+		} else if ( endUseMeter == "CONDENSATE" ) {
 			EndUse = "Condensate";
 
-		} else if ( SELECT_CASE_var == "WELLWATER" ) {
+		} else if ( endUseMeter == "WELLWATER" ) {
 			EndUse = "Wellwater";
 
-		} else if ( ( SELECT_CASE_var == "MAINSWATER" ) || ( SELECT_CASE_var == "PURCHASEDWATER" ) ) {
+		} else if ( endUseMeter == "MAINSWATER" || endUseMeter == "PURCHASEDWATER" ) {
 			EndUse = "MainsWater";
 
 		} else {
@@ -2955,7 +2957,7 @@ namespace OutputProcessor {
 		}}
 
 		//!! Following if we do EndUse by ResourceType
-		if ( ! LocalErrorsFound && EndUse != BlankString ) {
+		if ( ! LocalErrorsFound && ! EndUse.empty() ) {
 			Found = FindItem( EndUse + ':' + ResourceType, EnergyMeters.Name(), NumEnergyMeters );
 			if ( Found == 0 ) AddMeter( EndUse + ':' + ResourceType, MtrUnits, ResourceType, EndUse, "", "" );
 
@@ -2970,7 +2972,7 @@ namespace OutputProcessor {
 		}
 
 		// End-Use Subcategories
-		if ( ! LocalErrorsFound && EndUseSub != BlankString ) {
+		if ( ! LocalErrorsFound && ! EndUseSub.empty() ) {
 			MeterName = EndUseSub + ':' + EndUse + ':' + ResourceType;
 			Found = FindItem( MeterName, EnergyMeters.Name(), NumEnergyMeters );
 			if ( Found == 0 ) AddMeter( MeterName, MtrUnits, ResourceType, EndUse, EndUseSub, "" );
@@ -5404,7 +5406,7 @@ SetupOutputVariable(
 		if ( Loop == 1 && VariableType == SummedVar ) {
 			++NumOfRVariable_Sum;
 			if ( present( ResourceTypeKey ) ) {
-				if ( ResourceTypeKey != BlankString ) ++NumOfRVariable_Meter;
+				if ( ! ResourceTypeKey().empty() ) ++NumOfRVariable_Meter;
 			}
 		}
 		if ( NumOfRVariable > MaxRVariable ) {

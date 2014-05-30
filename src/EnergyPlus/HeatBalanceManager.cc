@@ -127,7 +127,7 @@ namespace HeatBalanceManager {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	std::string const Blank;
+	static std::string const BlankString;
 	gio::Fmt const fmtA( "(A)" );
 
 	FArray1D_string const PassFail( 2, { "Fail", "Pass" } );
@@ -3937,7 +3937,6 @@ namespace HeatBalanceManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const BlankString;
 		static std::string const RoutineName( "GetZoneData: " );
 		//  INTEGER, PARAMETER :: MaxZonesInList = 100 ! This is to allow DIMENSIONing below
 
@@ -5335,7 +5334,6 @@ namespace HeatBalanceManager {
 		FArray1D< Real64 > DividerVisAbsorp( 2 );
 		FArray1D< Real64 > DividerEmis( 2 );
 		std::string::size_type endcol;
-		bool StripCR;
 
 		// Object Data
 		FArray1D< FrameDividerProperties > FrameDividerSave;
@@ -5361,13 +5359,9 @@ namespace HeatBalanceManager {
 
 		W5DataFileNum = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "read" ); gio::open( W5DataFileNum, TempFullFileName, flags ); if ( flags.err() ) goto Label999; }
-		StripCR = false;
 		gio::read( W5DataFileNum, fmtA ) >> NextLine;
 		endcol = len( NextLine );
 		if ( endcol > 0 ) {
-			if ( int( NextLine[ endcol - 1 ] ) == iASCII_CR ) {
-				StripCR = true;
-			}
 			if ( int( NextLine[ endcol - 1 ] ) == iUnicode_end ) {
 				ShowSevereError( "SearchWindow5DataFile: For \"" + DesiredConstructionName + "\" in " + DesiredFileName + " fiile, appears to be a Unicode or binary file." );
 				ShowContinueError( "...This file cannot be read by this program. Please save as PC or Unix file and try again" );
@@ -5380,10 +5374,6 @@ namespace HeatBalanceManager {
 
 		{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 		if ( ReadStat < GoodIOStatValue ) goto Label1000;
-		if ( StripCR ) {
-			endcol = len( NextLine );
-			if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-		}
 		++FileLineCount;
 		if ( ! has_prefixi( NextLine, "WINDOW5" ) ) {
 			ShowSevereError( "HeatBalanceManager: SearchWindow5DataFile: Error in Data File=" + DesiredFileName );
@@ -5394,10 +5384,6 @@ Label10: ;
 		for ( LineNum = 2; LineNum <= 5; ++LineNum ) {
 			{ IOFlags flags; gio::read( W5DataFileNum, "(A)", flags ) >> DataLine( LineNum ); ReadStat = flags.ios(); }
 			if ( ReadStat < GoodIOStatValue ) goto Label1000;
-			if ( StripCR ) {
-				endcol = len( DataLine( LineNum ) );
-				if ( endcol > 0 ) DataLine( LineNum ).erase( endcol - 1 );
-			}
 			++FileLineCount;
 		}
 
@@ -5409,10 +5395,6 @@ Label10: ;
 Label20: ;
 			{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 			if ( ReadStat < GoodIOStatValue ) goto Label1000;
-			if ( StripCR ) {
-				endcol = len( NextLine );
-				if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-			}
 			++FileLineCount;
 			if ( ! has_prefixi( NextLine, "WINDOW5" ) ) goto Label20;
 			// Beginning of next window entry found
@@ -5426,10 +5408,6 @@ Label20: ;
 
 			{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 			if ( ReadStat < GoodIOStatValue ) goto Label1000;
-			if ( StripCR ) {
-				endcol = len( NextLine );
-				if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-			}
 			++FileLineCount;
 			gio::read( NextLine.substr( 19 ), "*" ) >> NGlSys;
 			if ( NGlSys <= 0 || NGlSys > 2 ) {
@@ -5437,18 +5415,10 @@ Label20: ;
 			}
 			{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 			if ( ReadStat < GoodIOStatValue ) goto Label1000;
-			if ( StripCR ) {
-				endcol = len( NextLine );
-				if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-			}
 			++FileLineCount;
 			for ( IGlSys = 1; IGlSys <= NGlSys; ++IGlSys ) {
 				{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 				if ( ReadStat < GoodIOStatValue ) goto Label1000;
-				if ( StripCR ) {
-					endcol = len( NextLine );
-					if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-				}
 				++FileLineCount;
 				{ IOFlags flags; gio::read( NextLine.substr( 19 ), "*", flags ) >> WinHeight( IGlSys ) >> WinWidth( IGlSys ) >> NGlass( IGlSys ) >> UValCenter( IGlSys ) >> SCCenter( IGlSys ) >> SHGCCenter( IGlSys ) >> TVisCenter( IGlSys ); ReadStat = flags.ios(); }
 				if ( ReadStat != 0 ) {
@@ -5482,10 +5452,6 @@ Label20: ;
 			for ( LineNum = 1; LineNum <= 11; ++LineNum ) {
 				{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> DataLine( LineNum ); ReadStat = flags.ios(); }
 				if ( ReadStat == -1 ) goto Label1000;
-				if ( StripCR ) {
-					endcol = len( DataLine( LineNum ) );
-					if ( endcol > 0 ) DataLine( LineNum ).erase( endcol - 1 );
-				}
 			}
 
 			// Mullion width and orientation
@@ -5550,10 +5516,6 @@ Label20: ;
 
 			{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 			if ( ReadStat < GoodIOStatValue ) goto Label1000;
-			if ( StripCR ) {
-				endcol = len( NextLine );
-				if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-			}
 			++FileLineCount;
 
 			// Divider data for each glazing system
@@ -5704,10 +5666,6 @@ Label20: ;
 			// Glass objects
 			{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 			if ( ReadStat < GoodIOStatValue ) goto Label1000;
-			if ( StripCR ) {
-				endcol = len( NextLine );
-				if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-			}
 			++FileLineCount;
 			MaterNum = TotMaterialsPrev;
 			for ( IGlSys = 1; IGlSys <= NGlSys; ++IGlSys ) {
@@ -5740,10 +5698,6 @@ Label20: ;
 			// Gap objects
 			{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 			if ( ReadStat < GoodIOStatValue ) goto Label1000;
-			if ( StripCR ) {
-				endcol = len( NextLine );
-				if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-			}
 			++FileLineCount;
 			for ( IGlSys = 1; IGlSys <= NGlSys; ++IGlSys ) {
 				for ( IGap = 1; IGap <= NGaps( IGlSys ); ++IGap ) {
@@ -5764,10 +5718,6 @@ Label20: ;
 
 			{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 			if ( ReadStat < GoodIOStatValue ) goto Label1000;
-			if ( StripCR ) {
-				endcol = len( NextLine );
-				if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-			}
 			++FileLineCount;
 			for ( IGlSys = 1; IGlSys <= NGlSys; ++IGlSys ) {
 				for ( IGap = 1; IGap <= NGaps( IGlSys ); ++IGap ) {
@@ -5814,10 +5764,6 @@ Label20: ;
 
 			{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 			if ( ReadStat < GoodIOStatValue ) goto Label1000;
-			if ( StripCR ) {
-				endcol = len( NextLine );
-				if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-			}
 			++FileLineCount;
 
 			for ( IGlSys = 1; IGlSys <= NGlSys; ++IGlSys ) {
@@ -5907,26 +5853,14 @@ Label20: ;
 
 				{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 				if ( ReadStat < GoodIOStatValue ) goto Label1000;
-				if ( StripCR ) {
-					endcol = len( NextLine );
-					if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-				}
 				++FileLineCount;
 				if ( IGlSys == 1 ) {
 					{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 					if ( ReadStat < GoodIOStatValue ) goto Label1000;
-					if ( StripCR ) {
-						endcol = len( NextLine );
-						if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-					}
 					++FileLineCount;
 				}
 				{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 				if ( ReadStat < GoodIOStatValue ) goto Label1000;
-				if ( StripCR ) {
-					endcol = len( NextLine );
-					if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-				}
 				++FileLineCount;
 				{ IOFlags flags; gio::read( NextLine.substr( 5 ), "*", flags ) >> Tsol; ReadStat = flags.ios(); }
 				if ( ReadStat != 0 ) {
@@ -5940,10 +5874,6 @@ Label20: ;
 				}
 				for ( IGlass = 1; IGlass <= NGlass( IGlSys ); ++IGlass ) {
 					{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
-					if ( StripCR ) {
-						endcol = len( NextLine );
-						if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-					}
 					++FileLineCount;
 					{ IOFlags flags; gio::read( NextLine.substr( 5 ), "*", flags ) >> AbsSol( IGlass, _ ); ReadStat = flags.ios(); }
 					if ( ReadStat != 0 ) {
@@ -5958,10 +5888,6 @@ Label20: ;
 				}
 				for ( ILine = 1; ILine <= 5; ++ILine ) {
 					{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> DataLine( ILine ); ReadStat = flags.ios(); }
-					if ( StripCR ) {
-						endcol = len( DataLine( ILine ) );
-						if ( endcol > 0 ) DataLine( ILine ).erase( endcol - 1 );
-					}
 				}
 				{ IOFlags flags; gio::read( DataLine( 1 ).substr( 5 ), "*", flags ) >> Rfsol; ReadStat = flags.ios(); }
 				if ( ReadStat != 0 ) {

@@ -146,6 +146,14 @@ public: // Inspector
 		return array_.size();
 	}
 
+	// Size
+	inline
+	int
+	isize() const
+	{
+		return array_.isize();
+	}
+
 	// IndexRange of a Dimension
 	inline
 	IR
@@ -159,6 +167,10 @@ public: // Inspector
 	int
 	l( int const d ) const
 	{
+		assert( ( 1 <= d ) && ( d <= rank() ) );
+#ifdef NDEBUG
+		static_cast< void >( d ); // Suppress unused warning
+#endif
 		return 1;
 	}
 
@@ -167,7 +179,7 @@ public: // Inspector
 	int
 	u( int const d ) const
 	{
-		return array_.size( d );
+		return array_.isize( d );
 	}
 
 	// Size of a Dimension
@@ -176,6 +188,14 @@ public: // Inspector
 	size( int const d ) const
 	{
 		return array_.size( d );
+	}
+
+	// Size of a Dimension
+	inline
+	int
+	isize( int const d ) const
+	{
+		return array_.isize( d );
 	}
 
 	// Proxied Array

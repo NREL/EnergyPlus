@@ -89,6 +89,8 @@ namespace EvaporativeCoolers {
 	int const ZoneCoolingLoadOnOffCycling( 21 );
 	int const ZoneCoolingLoadVariableSpeedFan( 22 );
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -250,7 +252,7 @@ namespace EvaporativeCoolers {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3154,7 +3156,7 @@ namespace EvaporativeCoolers {
 		AirMassFlow = Node( UnitOutletNodeNum ).MassFlowRate;
 		QTotUnitOut = AirMassFlow * ( Node( UnitOutletNodeNum ).Enthalpy - Node( ZoneNodeNum ).Enthalpy );
 		MinHumRat = min( Node( ZoneNodeNum ).HumRat, Node( UnitOutletNodeNum ).HumRat );
-		QSensUnitOut = AirMassFlow * ( PsyHFnTdbW( Node( UnitOutletNodeNum ).Temp, MinHumRat, "ReportZoneEvaporativeCoolerUnit" ) - PsyHFnTdbW( Node( ZoneNodeNum ).Temp, MinHumRat, "ReportZoneEvaporativeCoolerUnit" ) );
+		QSensUnitOut = AirMassFlow * ( PsyHFnTdbW( Node( UnitOutletNodeNum ).Temp, MinHumRat ) - PsyHFnTdbW( Node( ZoneNodeNum ).Temp, MinHumRat ) );
 
 		ZoneEvapUnit( UnitNum ).UnitTotalCoolingRate = std::abs( min( 0.0, QTotUnitOut ) );
 		ZoneEvapUnit( UnitNum ).UnitTotalCoolingEnergy = ZoneEvapUnit( UnitNum ).UnitTotalCoolingRate * TimeStepSys * SecInHour;

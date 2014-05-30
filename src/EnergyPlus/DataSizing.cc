@@ -133,11 +133,11 @@ namespace DataSizing {
 	int CurOverallSimDay( 0 );
 	int NumTimeStepsInAvg( 0 ); // number of time steps in the averaging window for the design flow and load sequences
 	int SaveNumPlantComps( 0 ); // Number of components using water as an energy source or sink (e.g. water coils)
-	int DataDXCT( 1 ); // 1 if regular DX coil, 2 if 100% DOAS DX coil
+	int DataTotCapCurveIndex ( 0 ); // index to total capacity as a function of temperature curve
 	bool DataCoilIsSuppHeater( false ); // TRUE if heating coil used as supplemental heater
 	bool DataIsDXCoil( false ); // TRUE if direct-expansion coil
 	bool DataAutosizable( true ); // TRUE if component is autosizable
-	bool DataEMSOverride( false ); // TRUE if EMS overrides component sizing
+	bool DataEMSOverrideON( false ); // boolean determines if user relies on EMS to override autosizing
 	bool SysSizingRunDone( false ); // True if a system sizing run is successfully completed.
 	bool TermUnitSingDuct( false ); // TRUE if a non-induction single duct terminal unit
 	bool TermUnitPIU( false ); // TRUE if a powered induction terminal unit
@@ -151,7 +151,12 @@ namespace DataSizing {
 	Real64 AutoVsHardSizingDeltaTempThreshold( 1.5 ); // temperature criteria threshold for autosize versus hard size [C]
 	Real64 DataCoolCoilCap( 0.0 ); // cooling coil capacity used for sizing with scalable inputs [W]
 	Real64 DataFlowUsedForSizing( 0.0 ); // air flow rate used for sizing with scalable inputs [m3/s]
+	Real64 DataCapacityUsedForSizing( 0.0 ); //capacity used for sizing with scalable inputs [W]
 	Real64 DataHeatSizeRatio( 1.0 ); // heating coil size as a ratio of cooling coil capacity
+	Real64 DataEMSOverride ( 0.0 ); // value of EMS variable used to override autosizing
+	Real64 DataBypassFrac ( 0.0 ); // value of bypass fraction for Coil:Cooling:DX:TwoStageWithHumidityControlMode coils
+	Real64 DataConstantUsedForSizing ( 0.0 ); // base value used for sizing inputs that are ratios of other inputs
+	Real64 DataFractionUsedForSizing ( 0.0 ); // fractional value of base value used for sizing inputs that are ratios of other inputs
 	Real64 DXCoolCap( 0.0 ); // The ARI cooling capacity of a DX unit.
 	Real64 GlobalHeatSizingFactor( 0.0 ); // the global heating sizing ratio
 	Real64 GlobalCoolSizingFactor( 0.0 ); // the global cooling sizing ratio

@@ -80,6 +80,7 @@ public: // Types
 	typedef  typename Super::Difference  Difference;
 
 	using Super::dimensions_initialized;
+	using Super::isize;
 	using Super::npos;
 	using Super::overlap;
 	using Super::size;
@@ -179,21 +180,9 @@ protected: // Creation
 		Super( a, proxy )
 	{}
 
-	// Non-Const Copy Proxy Constructor
-	inline
-	FArray1( FArray1 & a, ProxySentinel const & proxy ) :
-		Super( a, proxy )
-	{}
-
 	// Base Proxy Constructor
 	inline
 	FArray1( Base const & a, ProxySentinel const & proxy ) :
-		Super( a, proxy )
-	{}
-
-	// Non-Const Base Proxy Constructor
-	inline
-	FArray1( Base & a, ProxySentinel const & proxy ) :
 		Super( a, proxy )
 	{}
 
@@ -203,16 +192,30 @@ protected: // Creation
 		Super( s, proxy )
 	{}
 
-	// Non-Const Tail Proxy Constructor
-	inline
-	FArray1( Tail & s, ProxySentinel const & proxy ) :
-		Super( s, proxy )
-	{}
-
 	// Value Proxy Constructor
 	inline
 	FArray1( T const & t, ProxySentinel const & proxy ) :
 		Super( t, proxy )
+	{}
+
+#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
+
+	// Non-Const Copy Proxy Constructor
+	inline
+	FArray1( FArray1 & a, ProxySentinel const & proxy ) :
+		Super( a, proxy )
+	{}
+
+	// Non-Const Base Proxy Constructor
+	inline
+	FArray1( Base & a, ProxySentinel const & proxy ) :
+		Super( a, proxy )
+	{}
+
+	// Non-Const Tail Proxy Constructor
+	inline
+	FArray1( Tail & s, ProxySentinel const & proxy ) :
+		Super( s, proxy )
 	{}
 
 	// Non-Const Value Proxy Constructor
@@ -220,6 +223,8 @@ protected: // Creation
 	FArray1( T & t, ProxySentinel const & proxy ) :
 		Super( t, proxy )
 	{}
+
+#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
 public: // Creation
 
@@ -997,6 +1002,20 @@ public: // Inspector
 		}
 	}
 
+	// Size of a Dimension
+	inline
+	int
+	isize( int const d ) const
+	{
+		switch ( d ) {
+		case 1:
+			return isize1();
+		default:
+			assert( false );
+			return isize1();
+		}
+	}
+
 	// IndexRange
 	virtual
 	IR const &
@@ -1031,6 +1050,11 @@ public: // Inspector
 	virtual
 	size_type
 	size1() const = 0;
+
+	// Size of Dimension 1
+	virtual
+	int
+	isize1() const = 0;
 
 	// Length
 	inline

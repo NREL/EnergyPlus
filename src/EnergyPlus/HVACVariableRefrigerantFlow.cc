@@ -135,6 +135,8 @@ namespace HVACVariableRefrigerantFlow {
 	// curve type for equivalent piping losses (not necessarily the same value used in CurveManager)
 	int const BiQuadratic( 4 );
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:
@@ -232,7 +234,7 @@ namespace HVACVariableRefrigerantFlow {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS
 
@@ -270,7 +272,7 @@ namespace HVACVariableRefrigerantFlow {
 				ShowFatalError( "SimulateVRF: Invalid CompIndex passed=" + TrimSigDigits( VRFTUNum ) + ", Number of VRF Terminal Units = " + TrimSigDigits( NumVRFTU ) + ", VRF Terminal Unit name = " + CompName );
 			}
 			if ( CheckEquipName( VRFTUNum ) ) {
-				if ( CompName != Blank && CompName != VRFTU( VRFTUNum ).Name ) {
+				if ( ! CompName.empty() && CompName != VRFTU( VRFTUNum ).Name ) {
 					ShowFatalError( "SimulateVRF: Invalid CompIndex passed=" + TrimSigDigits( VRFTUNum ) + ", VRF Terminal Unit name=" + CompName + ", stored VRF TU Name for that index=" + VRFTU( VRFTUNum ).Name );
 				}
 				CheckEquipName( VRFTUNum ) = false;
@@ -465,7 +467,7 @@ namespace HVACVariableRefrigerantFlow {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "VRFCondenser" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1082,7 +1084,7 @@ namespace HVACVariableRefrigerantFlow {
 			VRF( VRFCond ).CondenserInletTemp = Node( VRF( VRFCond ).CondenserNodeNum ).Temp;
 			VRF( VRFCond ).WaterCondenserMassFlow = Node( VRF( VRFCond ).CondenserNodeNum ).MassFlowRate;
 
-			CpCond = GetSpecificHeatGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, VRF( VRFCond ).CondenserInletTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, "VRFCondenser" );
+			CpCond = GetSpecificHeatGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, VRF( VRFCond ).CondenserInletTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, RoutineName );
 			if ( CondWaterMassFlow > 0.0 ) {
 				CondOutletTemp = VRF( VRFCond ).QCondenser / ( CondWaterMassFlow * CpCond ) + CondInletTemp;
 			} else {
@@ -2822,7 +2824,7 @@ namespace HVACVariableRefrigerantFlow {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "InitVRF" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3014,7 +3016,7 @@ namespace HVACVariableRefrigerantFlow {
 			MyEnvrnFlag( VRFTUNum ) = false;
 
 			if ( VRF( VRFCond ).CondenserType == WaterCooled ) {
-				rho = GetDensityGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, InitConvTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, "InitVRF" );
+				rho = GetDensityGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, InitConvTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, RoutineName );
 				VRF( VRFCond ).WaterCondenserDesignMassFlow = VRF( VRFCond ).WaterCondVolFlowRate * rho;
 
 				InitComponentNodes( 0.0, VRF( VRFCond ).WaterCondenserDesignMassFlow, VRF( VRFCond ).CondenserNodeNum, VRF( VRFCond ).CondenserOutletNodeNum, VRF( VRFCond ).SourceLoopNum, VRF( VRFCond ).SourceLoopSideNum, VRF( VRFCond ).SourceBranchNum, VRF( VRFCond ).SourceCompNum );
@@ -3121,7 +3123,7 @@ namespace HVACVariableRefrigerantFlow {
 		// providing more capacity than allowed. Example: TU loads are 1-ton, 2-ton, 3-ton, and 4-ton connected
 		// to a condenser having only 9-tons available. This variable will be set to 3-tons and the 4-ton
 		// terminal unit will be limited to 3-tons (see SimVRFCondenser where this variable is calculated).
-		if ( CurrentEndTime > CurrentEndTimeLast || TimeStepSysLast > TimeStepSys || FirstHVACIteration && MyBeginTimeStepFlag( VRFCond ) ) { //Autodesk Is && condition intended to AND with the whole OR condition or just the last (which it does now)?
+		if ( CurrentEndTime > CurrentEndTimeLast || TimeStepSysLast > TimeStepSys || ( FirstHVACIteration && MyBeginTimeStepFlag( VRFCond ) ) ) {
 			MaxCoolingCapacity( VRFCond ) = MaxCap;
 			MaxHeatingCapacity( VRFCond ) = MaxCap;
 			MyBeginTimeStepFlag( VRFCond ) = false;
@@ -4379,7 +4381,7 @@ namespace HVACVariableRefrigerantFlow {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "SizeVRFCondenser" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -4403,9 +4405,9 @@ namespace HVACVariableRefrigerantFlow {
 			if ( VRF( VRFCond ).WaterCondVolFlowRate == AutoSize ) {
 				if ( VRF( VRFCond ).SourceLoopNum > 0 ) PltSizCondNum = PlantLoop( VRF( VRFCond ).SourceLoopNum ).PlantSizNum;
 				if ( PltSizCondNum > 0 ) {
-					rho = GetDensityGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, "SizeVRFCondenser" );
+					rho = GetDensityGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, RoutineName );
 
-					Cp = GetSpecificHeatGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, "SizeVRFCondenser" );
+					Cp = GetSpecificHeatGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, RoutineName );
 					tmpCondVolFlowRate = VRF( VRFCond ).HeatingCapacity / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );
 					if ( VRF( VRFCond ).HeatingCapacity != AutoSize ) {
 						VRF( VRFCond ).WaterCondVolFlowRate = tmpCondVolFlowRate;
@@ -4766,7 +4768,6 @@ namespace HVACVariableRefrigerantFlow {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIte( 500 ); // maximum number of iterations
-		static std::string const Blank; // subroutine argument when coil index is known
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -5030,7 +5031,7 @@ namespace HVACVariableRefrigerantFlow {
 		SensibleConditioning = VRFTU( VRFTUNum ).TerminalUnitSensibleRate;
 		LatentConditioning = VRFTU( VRFTUNum ).TerminalUnitLatentRate;
 		// convert latent in kg/s to watts
-		H2OHtOfVap = PsyHfgAirFnWTdb( Node( VRFTU( VRFTUNum ).VRFTUOutletNodeNum ).HumRat, Node( VRFTU( VRFTUNum ).VRFTUOutletNodeNum ).Temp, "ReportVRFTerminalUnit" );
+		H2OHtOfVap = PsyHfgAirFnWTdb( Node( VRFTU( VRFTUNum ).VRFTUOutletNodeNum ).HumRat, Node( VRFTU( VRFTUNum ).VRFTUOutletNodeNum ).Temp );
 		TotalConditioning = SensibleConditioning + ( LatentConditioning * H2OHtOfVap );
 
 		if ( TotalConditioning <= 0.0 ) {

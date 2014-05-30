@@ -72,7 +72,7 @@ namespace ConvectionCoefficients {
 
 	Real64 const MinFlow( 0.01 ); // Minimum mass flow rate
 	Real64 const MaxACH( 100.0 ); // Maximum ceiling diffuser correlation limit
-	std::string const Blank;
+	static std::string const BlankString;
 
 	Real64 const OneThird( ( 1.0 / 3. ) ); // 1/3 in highest precision
 	Real64 const OneFourth( ( 1.0 / 4. ) ); // 1/4 in highest precision
@@ -1588,7 +1588,7 @@ namespace ConvectionCoefficients {
 						Surface( Found ).IntConvCoeff = PotentialAssignedValue;
 					}
 
-				} else if ( SELECT_CASE_var == "" ) { // Blank
+				} else if ( SELECT_CASE_var == BlankString ) { // Blank
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", invalid value" );
@@ -1788,7 +1788,7 @@ namespace ConvectionCoefficients {
 						}
 					}
 
-				} else if ( SELECT_CASE_var == "" ) { // Blank
+				} else if ( SELECT_CASE_var == BlankString ) { // Blank
 
 				} else { // Error Case
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", invalid value" );
@@ -1831,7 +1831,7 @@ namespace ConvectionCoefficients {
 				// Tests show that Zone will override the simple convection specification of global.
 				if ( SurfNum <= 0 ) continue; // ignore this error condition
 				if ( Surface( SurfNum ).Zone == 0 ) continue; // ignore this error condition
-				if ( Zone( Surface( SurfNum ).Zone ).OutsideConvectionAlgo == ASHRAESimple && ( UserExtConvectionCoeffs( Loop ).OverrideType == ConvCoefSpecifiedModel && UserExtConvectionCoeffs( Loop ).HcModelEq != ASHRAESimple ) || UserExtConvectionCoeffs( Loop ).OverrideType != ConvCoefSpecifiedModel ) { //Autodesk Parens don't match actual logic
+				if ( Zone( Surface( SurfNum ).Zone ).OutsideConvectionAlgo == ASHRAESimple && ( ( UserExtConvectionCoeffs( Loop ).OverrideType == ConvCoefSpecifiedModel && UserExtConvectionCoeffs( Loop ).HcModelEq != ASHRAESimple ) || UserExtConvectionCoeffs( Loop ).OverrideType != ConvCoefSpecifiedModel ) ) {
 					++Count;
 					if ( DisplayExtraWarnings ) {
 						ShowSevereError( RoutineName + "Surface=\"" + UserExtConvectionCoeffs( Loop ).SurfaceName + "\", mixed algorithms." );
@@ -4509,6 +4509,7 @@ namespace ConvectionCoefficients {
 
 		// Locals
 		Real64 const OneThird( ( 1.0 / 3.0 ) ); // 1/3 in highest precision
+		static std::string const RoutineName( "WindowTempsForNominalCond" );
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -4564,7 +4565,7 @@ namespace ConvectionCoefficients {
 		TmeanFilmKelvin = AirTempKelvin + 0.25 * ( SurfTempKelvin - AirTempKelvin ); // eq. 133 in ISO 15099
 		TmeanFilm = TmeanFilmKelvin - 273.15;
 
-		rho = PsyRhoAirFnPbTdbW( OutBaroPress, TmeanFilm, AirHumRat, "WindowTempsForNominalCond" );
+		rho = PsyRhoAirFnPbTdbW( OutBaroPress, TmeanFilm, AirHumRat, RoutineName );
 		g = 9.81;
 		Height = Surface( SurfNum ).Height;
 
@@ -4572,7 +4573,7 @@ namespace ConvectionCoefficients {
 		lambda = 2.873E-3 + 7.76E-5 * TmeanFilmKelvin; // Table B.1 in ISO 15099,
 		mu = 3.723E-6 + 4.94E-8 * TmeanFilmKelvin; // Table B.2 in ISO 15099
 
-		Cp = PsyCpAirFnWTdb( AirHumRat, TmeanFilm, "WindowTempsForNominalCond" );
+		Cp = PsyCpAirFnWTdb( AirHumRat, TmeanFilm );
 
 		TiltDeg = Surface( SurfNum ).Tilt;
 		sineTilt = Surface( SurfNum ).SinTilt;

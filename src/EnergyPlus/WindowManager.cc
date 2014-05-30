@@ -77,6 +77,7 @@ namespace WindowManager {
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS:
+	static std::string const BlankString;
 
 	Real64 const sigma( 5.6697e-8 ); // Stefan-Boltzmann constant
 	Real64 const TKelvin( KelvinConv ); // conversion from Kelvin to Celsius
@@ -2210,7 +2211,7 @@ namespace WindowManager {
 				for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneEquipConfigNum ).NumInletNodes; ++NodeNum ) {
 					NodeTemp = Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).Temp;
 					MassFlowRate = Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).MassFlowRate;
-					CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), NodeTemp, "CalcWindowHeatBalance" );
+					CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), NodeTemp );
 					SumSysMCp += MassFlowRate * CpAir;
 					SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
 				}
@@ -2424,7 +2425,7 @@ namespace WindowManager {
 					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneEquipConfigNum ).NumInletNodes; ++NodeNum ) {
 						NodeTemp = Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).Temp;
 						MassFlowRate = Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).MassFlowRate;
-						CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNumAdj ), NodeTemp, "CalcWindowHeatBalance" );
+						CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNumAdj ), NodeTemp );
 						SumSysMCp += MassFlowRate * CpAir;
 						SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
 					}
@@ -6711,6 +6712,7 @@ namespace WindowManager {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIterations( 100 ); // Maximum allowed number of iterations
 		Real64 const errtemptol( 0.02 ); // Tolerance on errtemp for convergence
+		static std::string const RoutineName( "WindowTempsForNominalCond" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -6781,7 +6783,7 @@ namespace WindowManager {
 			TmeanFilmKelvin = tin + 0.25 * ( thetas( nglface ) - tin ); // eq. 133 in ISO 15099
 			TmeanFilm = TmeanFilmKelvin - 273.15;
 			// the following properties are constants or linear relations for "standard" type reporting
-			rho = PsyRhoAirFnPbTdbW( 101325.0, TmeanFilm, 0.0, "WindowTempsForNominalCond" ); // dry air assumption
+			rho = PsyRhoAirFnPbTdbW( 101325.0, TmeanFilm, 0.0, RoutineName ); // dry air assumption
 			g = 9.81;
 			Height = 1.0; // standard window rating practice is to use 1 meter (rather than actual)
 

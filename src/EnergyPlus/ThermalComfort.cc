@@ -100,6 +100,8 @@ namespace ThermalComfort {
 	Real64 const RadSurfEff( 0.72 ); // Fraction of surface effective for radiation
 	Real64 const StefanBoltz( 5.67e-8 ); // Stefan-Boltzmann constant (W/m2K4)
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -1684,7 +1686,6 @@ namespace ThermalComfort {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const AngleFacLimit( 0.01 ); // To set the limit of sum of angle factors
-		static std::string const Blank;
 		int const MaxSurfaces( 20 ); // Maximum number of surfaces in each AngleFactor List
 
 		// INTERFACE BLOCK SPECIFICATIONS:

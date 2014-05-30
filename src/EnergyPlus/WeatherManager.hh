@@ -63,7 +63,6 @@ namespace WeatherManager {
 	extern Real64 const Sigma; // Stefan-Boltzmann constant
 	extern Real64 const TKelvin; // conversion from Kelvin to Celsius
 
-	extern std::string const Blank;
 	extern FArray1D_string const DaysOfWeek;
 
 	extern bool Debugout;
@@ -196,7 +195,6 @@ namespace WeatherManager {
 	extern FArray1D_string SPSiteScheduleUnits; // SP Site Schedule Units
 	extern int NumSPSiteScheduleNamePtrs; // Number of SP Site Schedules (DesignDay only)
 	extern int NumMissing; // Number of hours of missing data
-	extern bool StripCR; // If true, strip last character (<cr> off each EPW line)
 	extern FArray1D< Real64 > Interpolation; // Interpolation values based on Number of Time Steps in Hour
 	extern FArray1D< Real64 > SolarInterpolation; // Solar Interpolation values based on
 	//      Number of Time Steps in Hour
@@ -251,8 +249,8 @@ namespace WeatherManager {
 
 		// Default Constructor
 		EnvironmentData() :
-			Title( Blank ),
-			cKindOfEnvrn( Blank ),
+			Title( "" ),
+			cKindOfEnvrn( "" ),
 			KindOfEnvrn( 0 ),
 			TotalDays( 0 ),
 			StartJDay( 0 ),

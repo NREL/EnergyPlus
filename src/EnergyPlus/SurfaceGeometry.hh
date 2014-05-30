@@ -21,7 +21,6 @@ namespace SurfaceGeometry {
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
-	extern std::string const Blank;
 	extern FArray1D_string const BaseSurfCls;
 	extern FArray1D_string const SubSurfCls;
 	extern FArray1D_int const BaseSurfIDs;

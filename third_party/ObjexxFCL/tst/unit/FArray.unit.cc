@@ -229,8 +229,8 @@ TEST( FArrayTest, Transpose )
 	A( 2, 2 ) = 2;
 	A( 2, 3 ) = 8;
 	FArray2D_int B( transpose( A ) );
-	EXPECT_EQ( 3, B.size1() );
-	EXPECT_EQ( 2, B.size2() );
+	EXPECT_EQ( 3u, B.size1() );
+	EXPECT_EQ( 2u, B.size2() );
 	EXPECT_EQ( A( 1, 1 ), B( 1, 1 ) );
 	EXPECT_EQ( A( 1, 2 ), B( 2, 1 ) );
 	EXPECT_EQ( A( 1, 3 ), B( 3, 1 ) );
@@ -254,9 +254,9 @@ TEST( FArrayTest, Redimension3DFill )
 	EXPECT_EQ( DRange( 1, 5 ), A.I1() );
 	EXPECT_EQ( DRange( 1, 5 ), A.I2() );
 	EXPECT_EQ( DRange( 1, 5 ), A.I3() );
-	EXPECT_EQ( 5U, A.size1() );
-	EXPECT_EQ( 5U, A.size2() );
-	EXPECT_EQ( 5U, A.size3() );
+	EXPECT_EQ( 5u, A.size1() );
+	EXPECT_EQ( 5u, A.size2() );
+	EXPECT_EQ( 5u, A.size3() );
 	EXPECT_EQ( 5u * 5u * 5u, A.size() );
 	for ( int i3 = A.l3(); i3 <= A.u3(); ++i3 ) {
 		for ( int i2 = A.l2(); i2 <= A.u2(); ++i2 ) {
@@ -278,10 +278,10 @@ TEST( FArrayTest, Swap3D )
 	EXPECT_EQ( DRange( 1, 5 ), A.I1() );
 	EXPECT_EQ( DRange( 1, 5 ), A.I2() );
 	EXPECT_EQ( DRange( 1, 5 ), A.I3() );
-	EXPECT_EQ( 5U, A.size1() );
-	EXPECT_EQ( 5U, A.size2() );
-	EXPECT_EQ( 5U, A.size3() );
-	EXPECT_EQ( 5U * 5U * 5U, A.size() );
+	EXPECT_EQ( 5u, A.size1() );
+	EXPECT_EQ( 5u, A.size2() );
+	EXPECT_EQ( 5u, A.size3() );
+	EXPECT_EQ( 5u * 5u * 5u, A.size() );
 	for ( std::size_t i = 0; i < A.size(); ++i ) {
 		EXPECT_EQ( 55, A[ i ] );
 	}
@@ -317,6 +317,13 @@ TEST( FArrayTest, Cshift2DDim2 )
 	FArray2D_int A( 3, 3, reshape( { 11, 21, 31, 12, 22, 32, 13, 23, 33 }, std::array< int, 2 >{ { 3, 3 } } ) );
 	FArray2D_int B( 3, 3, reshape( { 12, 22, 32, 13, 23, 33, 11, 21, 31 }, std::array< int, 2 >{ { 3, 3 } } ) );
 	EXPECT_TRUE( eq( B, cshift( A, -2, 2 ) ) );
+}
+
+TEST( FArrayTest, Cshift2DNonSquareDim2 )
+{
+	FArray2D_int A( 3, 2, reshape( { 11, 21, 31, 12, 22, 32 }, std::array< int, 2 >{ { 3, 2 } } ) );
+	FArray2D_int B( 3, 2, reshape( { 12, 22, 32, 11, 21, 31 }, std::array< int, 2 >{ { 3, 2 } } ) );
+	EXPECT_TRUE( eq( B, cshift( A, -1, 2 ) ) );
 }
 
 TEST( FArrayTest, Cshift2DDim1Array )
@@ -514,7 +521,7 @@ TEST( FArrayTest, UboundOfUnbounded )
 	EXPECT_EQ( 1, lbound( u, 1 ) );
 	EXPECT_EQ( 1, lbound( u, 2 ) );
 	EXPECT_EQ( 3, ubound( u, 1 ) );
-	EXPECT_DEATH( ubound( u, 2 ), ".*Assertion.*" ); // Can't take ubound of unbounded dimension
+	EXPECT_DEBUG_DEATH( ubound( u, 2 ), ".*Assertion.*" ); // Can't take ubound of unbounded dimension
 }
 
 TEST( FArrayTest, EmptyComparisonPredicate )
@@ -544,7 +551,7 @@ TEST( FArrayTest, Unallocated )
 	FArray1D_int a; // Empty
 	EXPECT_FALSE( a.allocated() );
 	EXPECT_FALSE( allocated( a ) );
-	EXPECT_DEATH( a( 1 ), ".*Assertion.*" );
+	EXPECT_DEBUG_DEATH( a( 1 ), ".*Assertion.*" );
 }
 
 TEST( FArrayTest, AnyOp2D )

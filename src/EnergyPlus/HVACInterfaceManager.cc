@@ -360,7 +360,7 @@ namespace HVACInterfaceManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "UpdatePlantLoopInterface" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -393,7 +393,7 @@ namespace HVACInterfaceManager {
 		OldTankOutletTemp = Node( OtherLoopSideInletNode ).Temp;
 
 		//calculate the specific heat
-		Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, OldTankOutletTemp, PlantLoop( LoopNum ).FluidIndex, "UpdatePlantLoopInterface" );
+		Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, OldTankOutletTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 
 		//update the enthalpy
 		Node( OtherLoopSideInletNode ).Enthalpy = Cp * Node( OtherLoopSideInletNode ).Temp;
@@ -545,6 +545,7 @@ namespace HVACInterfaceManager {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const FracTotLoopMass( 0.5 ); // Fraction of total loop mass assigned to the half loop
+		static std::string const RoutineName( "UpdateHalfLoopInletTemp" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -587,7 +588,7 @@ namespace HVACInterfaceManager {
 		LastTankOutletTemp = PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LastTempInterfaceTankOutlet;
 
 		//calculate the specific heat for the capacitance calculation
-		Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, LastTankOutletTemp, PlantLoop( LoopNum ).FluidIndex, "UpdateHalfLoopInletTemp" );
+		Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, LastTankOutletTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 		//set the fraction of loop mass assigned to each half loop outlet capacitance ('tank') calculation
 
 		//calculate new loop inlet temperature.  The calculation is a simple 'tank' (thermal capacitance) calculation that includes:
@@ -686,6 +687,7 @@ namespace HVACInterfaceManager {
 		// SUBROUTINE ARGUMENTS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "UpdateCommonPipe" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -738,7 +740,7 @@ namespace HVACInterfaceManager {
 		LastTankOutletTemp = PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LastTempInterfaceTankOutlet;
 
 		//calculate the specific heat for the capacitance calculation
-		Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, LastTankOutletTemp, PlantLoop( LoopNum ).FluidIndex, "UpdateCommonPipe" );
+		Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, LastTankOutletTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 
 		//set the fraction of loop mass assigned to each half loop outlet capacitance ('tank') calculation
 

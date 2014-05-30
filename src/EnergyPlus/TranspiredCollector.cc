@@ -78,6 +78,8 @@ namespace TranspiredCollector {
 	int const Correlation_Kutscher1994( 1 );
 	int const Correlation_VanDeckerHollandsBrunger2001( 2 );
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:

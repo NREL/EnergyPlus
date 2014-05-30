@@ -88,6 +88,8 @@ namespace HeatingCoils {
 	Real64 const MinAirMassFlow( 0.001 );
 	int NumDesuperheaterCoil; // Total number of desuperheater heating coil objects in input
 
+	static std::string const BlankString;
+
 	// reclaim heat object types
 	int const COMPRESSORRACK_REFRIGERATEDCASE( 1 );
 	int const COIL_DX_COOLING( 2 );
@@ -168,7 +170,7 @@ namespace HeatingCoils {
 		// in a unitary system
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -204,7 +206,7 @@ namespace HeatingCoils {
 					ShowFatalError( "SimulateHeatingCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Number of Heating Coils=" + TrimSigDigits( NumHeatingCoils ) + ", Coil name=" + CompName );
 				}
 				if ( CheckEquipName( CoilNum ) ) {
-					if ( CompName != Blank && CompName != HeatingCoil( CoilNum ).Name ) {
+					if ( ! CompName.empty() && CompName != HeatingCoil( CoilNum ).Name ) {
 						ShowFatalError( "SimulateHeatingCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + HeatingCoil( CoilNum ).Name );
 					}
 					CheckEquipName( CoilNum ) = false;
@@ -1131,6 +1133,7 @@ namespace HeatingCoils {
 		CompType = "Coil:" + HeatingCoil( CoilNum ).HeatingCoilType + ':' + HeatingCoil( CoilNum ).HeatingCoilModel;
 		CompName = HeatingCoil( CoilNum ).Name;
 		DataCoilIsSuppHeater = CoilIsSuppHeater; // set global instead of using optional argument
+		DataCoolCoilCap = 0.0; // global only used for heat pump heating coils, non-HP heating coils are sized with other global variables
 		RequestSizing( CompType, CompName, HeatingCapacitySizing, SizingString, TempCap, bPRINT, RoutineName );
 		DataCoilIsSuppHeater = false; // reset global to false so other heating coils are not affected
 
@@ -1191,8 +1194,7 @@ namespace HeatingCoils {
 			HeatingCoil( CoilNum ).NominalCapacity = TempCap;
 		}
 
-		++NumCoilsSized;
-		if ( NumCoilsSized == NumHeatingCoils ) HeatingCoilNumericFields.deallocate(); // remove temporary array for field names at end of sizing
+		if ( ++NumCoilsSized == NumHeatingCoils ) HeatingCoilNumericFields.deallocate(); // remove temporary array for field names at end of sizing
 
 		//create predefined report entries
 		{ auto const SELECT_CASE_var( HeatingCoil( CoilNum ).HCoilType_Num );
@@ -1416,6 +1418,8 @@ namespace HeatingCoils {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcMultiStageElectricHeatingCoil" );
+		static std::string const RoutineNameAverageLoad( "CalcMultiStageElectricHeatingCoil:Averageload" );
+		static std::string const RoutineNameFullLoad( "CalcMultiStageElectricHeatingCoil:fullload" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1496,8 +1500,8 @@ namespace HeatingCoils {
 				HeatingCoil( CoilNum ).HeatingCoilLoad = MSHPMassFlowRateHigh * ( HSFullLoadOutAirEnth - InletAirEnthalpy ) * SpeedRatio + MSHPMassFlowRateLow * ( LSFullLoadOutAirEnth - InletAirEnthalpy ) * ( 1.0 - SpeedRatio );
 
 				OutletAirEnthalpy = InletAirEnthalpy + HeatingCoil( CoilNum ).HeatingCoilLoad / HeatingCoil( CoilNum ).InletAirMassFlowRate;
-				OutletAirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat, RoutineName );
-				FullLoadOutAirRH = PsyRhFnTdbWPb( OutletAirTemp, OutletAirHumRat, OutdoorPressure, RoutineName + ":Averageload" );
+				OutletAirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
+				FullLoadOutAirRH = PsyRhFnTdbWPb( OutletAirTemp, OutletAirHumRat, OutdoorPressure, RoutineNameAverageLoad );
 
 				if ( FullLoadOutAirRH > 1.0 ) { // Limit to saturated conditions at FullLoadOutAirEnth
 					OutletAirTemp = PsyTsatFnHPb( OutletAirEnthalpy, OutdoorPressure, RoutineName );
@@ -1523,8 +1527,8 @@ namespace HeatingCoils {
 				// Calculate full load outlet conditions
 				FullLoadOutAirEnth = InletAirEnthalpy + TotCap / AirMassFlow;
 				FullLoadOutAirHumRat = InletAirHumRat;
-				FullLoadOutAirTemp = PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat, RoutineName );
-				FullLoadOutAirRH = PsyRhFnTdbWPb( FullLoadOutAirTemp, FullLoadOutAirHumRat, OutdoorPressure, RoutineName + ":fullload" );
+				FullLoadOutAirTemp = PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat );
+				FullLoadOutAirRH = PsyRhFnTdbWPb( FullLoadOutAirTemp, FullLoadOutAirHumRat, OutdoorPressure, RoutineNameFullLoad );
 
 				if ( FullLoadOutAirRH > 1.0 ) { // Limit to saturated conditions at FullLoadOutAirEnth
 					FullLoadOutAirTemp = PsyTsatFnHPb( FullLoadOutAirEnth, OutdoorPressure, RoutineName );
@@ -1817,6 +1821,8 @@ namespace HeatingCoils {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcMultiStageGasHeatingCoil" );
+		static std::string const RoutineNameAverageLoad( "CalcMultiStageGasHeatingCoil:Averageload" );
+		static std::string const RoutineNameFullLoad( "CalcMultiStageGasHeatingCoil:fullload" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1903,8 +1909,8 @@ namespace HeatingCoils {
 				HeatingCoil( CoilNum ).ParasiticGasRate = 0.0;
 
 				OutletAirEnthalpy = InletAirEnthalpy + HeatingCoil( CoilNum ).HeatingCoilLoad / HeatingCoil( CoilNum ).InletAirMassFlowRate;
-				OutletAirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat, RoutineName );
-				FullLoadOutAirRH = PsyRhFnTdbWPb( OutletAirTemp, OutletAirHumRat, OutdoorPressure, RoutineName + ":Averageload" );
+				OutletAirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
+				FullLoadOutAirRH = PsyRhFnTdbWPb( OutletAirTemp, OutletAirHumRat, OutdoorPressure, RoutineNameAverageLoad );
 
 				if ( FullLoadOutAirRH > 1.0 ) { // Limit to saturated conditions at FullLoadOutAirEnth
 					OutletAirTemp = PsyTsatFnHPb( OutletAirEnthalpy, OutdoorPressure, RoutineName );
@@ -1930,8 +1936,8 @@ namespace HeatingCoils {
 				// Calculate full load outlet conditions
 				FullLoadOutAirEnth = InletAirEnthalpy + TotCap / AirMassFlow;
 				FullLoadOutAirHumRat = InletAirHumRat;
-				FullLoadOutAirTemp = PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat, RoutineName );
-				FullLoadOutAirRH = PsyRhFnTdbWPb( FullLoadOutAirTemp, FullLoadOutAirHumRat, OutdoorPressure, RoutineName + ":fullload" );
+				FullLoadOutAirTemp = PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat );
+				FullLoadOutAirRH = PsyRhFnTdbWPb( FullLoadOutAirTemp, FullLoadOutAirHumRat, OutdoorPressure, RoutineNameFullLoad );
 
 				if ( FullLoadOutAirRH > 1.0 ) { // Limit to saturated conditions at FullLoadOutAirEnth
 					FullLoadOutAirTemp = PsyTsatFnHPb( FullLoadOutAirEnth, OutdoorPressure, RoutineName );

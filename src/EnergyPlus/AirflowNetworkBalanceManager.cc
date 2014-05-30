@@ -154,6 +154,7 @@ namespace AirflowNetworkBalanceManager {
 	int const VentCtrNum_ZoneLevel( 7 ); // ZoneLevel control for a heat transfer subsurface
 	int const VentCtrNum_AdjTemp( 8 ); // Temperature venting control based on adjacent zone conditions
 	int const VentCtrNum_AdjEnth( 9 ); // Enthalpy venting control based on adjacent zone conditions
+	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS:
 	// Report variables
@@ -385,7 +386,6 @@ namespace AirflowNetworkBalanceManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
 		static gio::Fmt const fmta( "(A)" );
 		static std::string const RoutineName( "GetAirflowNetworkInput: " ); // include trailing blank space
 
@@ -766,7 +766,7 @@ namespace AirflowNetworkBalanceManager {
 						}
 					}
 				} else {
-					MultizoneZoneData( i ).VentingSchName = Blank;
+					MultizoneZoneData( i ).VentingSchName = BlankString;
 					MultizoneZoneData( i ).VentingSchNum = 0;
 				}
 			}
@@ -798,7 +798,7 @@ namespace AirflowNetworkBalanceManager {
 				//SameString(MultizoneZoneData(i)%VentControl,'ASHRAE55Adaptive') .or. &
 				//SameString(MultizoneZoneData(i)%VentControl,'CEN15251Adaptive')) then
 				MultizoneZoneData( i ).VentSchNum = GetScheduleIndex( MultizoneZoneData( i ).VentSchName );
-				if ( MultizoneZoneData( i ).VentSchName == Blank ) {
+				if ( MultizoneZoneData( i ).VentSchName == BlankString ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + " object, " "No " + cAlphaFields( 3 ) + " was found, but is required when " + cAlphaFields( 2 ) + " is Temperature or Enthalpy." );
 					ShowContinueError( "..for " + cAlphaFields( 1 ) + " = \"" + MultizoneZoneData( i ).ZoneName + "\", with " + cAlphaFields( 2 ) + " = \"" + MultizoneZoneData( i ).VentControl + "\"" );
 					ErrorsFound = true;
@@ -815,7 +815,7 @@ namespace AirflowNetworkBalanceManager {
 					ShowContinueError( ".." + cAlphaFields( 3 ) + " specified = " + MultizoneZoneData( i ).VentSchName );
 					ShowContinueError( "..for " + cAlphaFields( 1 ) + " = \"" + MultizoneZoneData( i ).ZoneName + "\", with " + cAlphaFields( 2 ) + " = \"" + MultizoneZoneData( i ).VentControl + "\"" );
 					MultizoneZoneData( i ).VentSchNum = 0;
-					MultizoneZoneData( i ).VentSchName = Blank;
+					MultizoneZoneData( i ).VentSchName = BlankString;
 				}
 			}
 			if ( MultizoneZoneData( i ).OpenFactor > 1.0 || MultizoneZoneData( i ).OpenFactor < 0.0 ) {
@@ -1479,7 +1479,7 @@ namespace AirflowNetworkBalanceManager {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + MultizoneSurfaceData( i ).SurfName + "\"." );
 					ShowContinueError( "The opening is a Triangular subsurface. A rectangular subsurface should be used." );
 				}
-				if ( MultizoneSurfaceData( i ).VentingSchName != Blank ) {
+				if ( ! MultizoneSurfaceData( i ).VentingSchName.empty() ) {
 					MultizoneSurfaceData( i ).VentingSchNum = GetScheduleIndex( MultizoneSurfaceData( i ).VentingSchName );
 					if ( MultizoneSurfaceData( i ).VentingSchNum == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + MultizoneSurfaceData( i ).SurfName + "\", invalid schedule." );
@@ -1493,7 +1493,7 @@ namespace AirflowNetworkBalanceManager {
 				{ auto const SELECT_CASE_var( MultizoneSurfaceData( i ).VentSurfCtrNum );
 				if ( ( SELECT_CASE_var == VentCtrNum_Temp ) || ( SELECT_CASE_var == VentCtrNum_AdjTemp ) ) {
 					MultizoneSurfaceData( i ).VentSchNum = GetScheduleIndex( MultizoneSurfaceData( i ).VentSchName );
-					if ( MultizoneSurfaceData( i ).VentSchName == Blank ) {
+					if ( MultizoneSurfaceData( i ).VentSchName == BlankString ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + " object, " "No Ventilation Schedule was found, but is required when ventilation control is Temperature." );
 						ShowContinueError( "..for Surface = \"" + MultizoneSurfaceData( i ).SurfName + "\"" );
 						ErrorsFound = true;
@@ -1524,7 +1524,7 @@ namespace AirflowNetworkBalanceManager {
 
 				} else if ( ( SELECT_CASE_var == VentCtrNum_Enth ) || ( SELECT_CASE_var == VentCtrNum_AdjEnth ) ) {
 					MultizoneSurfaceData( i ).VentSchNum = GetScheduleIndex( MultizoneSurfaceData( i ).VentSchName );
-					if ( MultizoneSurfaceData( i ).VentSchName == Blank ) {
+					if ( MultizoneSurfaceData( i ).VentSchName == BlankString ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + " object, " "No Ventilation Schedule was found, but is required when ventilation control is Enthalpy." );
 						ShowContinueError( "..for Surface = \"" + MultizoneSurfaceData( i ).SurfName + "\"" );
 						ErrorsFound = true;
@@ -3851,7 +3851,7 @@ namespace AirflowNetworkBalanceManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3888,7 +3888,7 @@ namespace AirflowNetworkBalanceManager {
 			CompName = AirflowNetworkCompData( CompNum ).EPlusName;
 			CpAir = PsyCpAirFnWTdb( ( AirflowNetworkNodeSimu( AirflowNetworkLinkageData( i ).NodeNums( 1 ) ).WZ + AirflowNetworkNodeSimu( AirflowNetworkLinkageData( i ).NodeNums( 2 ) ).WZ ) / 2.0, ( AirflowNetworkNodeSimu( AirflowNetworkLinkageData( i ).NodeNums( 1 ) ).TZ + AirflowNetworkNodeSimu( AirflowNetworkLinkageData( i ).NodeNums( 2 ) ).TZ ) / 2.0 );
 			// Calculate duct conduction loss
-			if ( CompTypeNum == CompTypeNum_DWC && CompName == Blank ) { // Duct element only
+			if ( CompTypeNum == CompTypeNum_DWC && CompName == BlankString ) { // Duct element only
 				TypeNum = AirflowNetworkCompData( CompNum ).TypeNum;
 				if ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) { // flow direction is the same as input from node 1 to node 2
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
@@ -3957,7 +3957,7 @@ namespace AirflowNetworkBalanceManager {
 				//        MV(LT) = MV(LT)+ABS(AirflowNetworkLinkSimu(I)%FLOW)*Tamb*(1.0-Ei)*CpAir
 			}
 			// Calculate temp in a constant pressure drop element
-			if ( CompTypeNum == CompTypeNum_CPD && CompName == Blank ) { // constant pressure element only
+			if ( CompTypeNum == CompTypeNum_CPD && CompName == BlankString ) { // constant pressure element only
 				if ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) { // flow direction is the same as input from node 1 to node 2
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
@@ -3970,7 +3970,7 @@ namespace AirflowNetworkBalanceManager {
 				MV( LT ) = 0.0;
 			}
 			// Calculate return leak
-			if ( ( CompTypeNum == CompTypeNum_PLR || CompTypeNum == CompTypeNum_ELR ) && CompName == Blank ) {
+			if ( ( CompTypeNum == CompTypeNum_PLR || CompTypeNum == CompTypeNum_ELR ) && CompName == BlankString ) {
 				// Return leak element only
 				if ( ( AirflowNetworkNodeData( AirflowNetworkLinkageData( i ).NodeNums( 1 ) ).EPlusZoneNum > 0 ) && ( AirflowNetworkNodeData( AirflowNetworkLinkageData( i ).NodeNums( 2 ) ).EPlusZoneNum == 0 ) && ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) ) {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
@@ -4125,7 +4125,7 @@ namespace AirflowNetworkBalanceManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -4160,7 +4160,7 @@ namespace AirflowNetworkBalanceManager {
 			CompTypeNum = AirflowNetworkCompData( CompNum ).CompTypeNum;
 			CompName = AirflowNetworkCompData( CompNum ).EPlusName;
 			// Calculate duct moisture diffusion loss
-			if ( CompTypeNum == CompTypeNum_DWC && CompName == Blank ) { // Duct component only
+			if ( CompTypeNum == CompTypeNum_DWC && CompName == BlankString ) { // Duct component only
 				TypeNum = AirflowNetworkCompData( CompNum ).TypeNum;
 				if ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) { // flow direction is the same as input from node 1 to node 2
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
@@ -4220,7 +4220,7 @@ namespace AirflowNetworkBalanceManager {
 				//        MV(LT) = MV(LT)+ABS(AirflowNetworkLinkSimu(I)%FLOW)*Wamb*(1.0-Ei)
 			}
 			// Calculate temp in a constant pressure drop component
-			if ( CompTypeNum == CompTypeNum_CPD && CompName == Blank ) { // constant pressure element only
+			if ( CompTypeNum == CompTypeNum_CPD && CompName == BlankString ) { // constant pressure element only
 				if ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) { // flow direction is the same as input from node 1 to node 2
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
@@ -4233,7 +4233,7 @@ namespace AirflowNetworkBalanceManager {
 				MV( LT ) = 0.0;
 			}
 			// Calculate return leak
-			if ( ( CompTypeNum == CompTypeNum_PLR || CompTypeNum == CompTypeNum_ELR ) && CompName == Blank ) {
+			if ( ( CompTypeNum == CompTypeNum_PLR || CompTypeNum == CompTypeNum_ELR ) && CompName == BlankString ) {
 				// Return leak component only
 				if ( ( AirflowNetworkNodeData( AirflowNetworkLinkageData( i ).NodeNums( 1 ) ).EPlusZoneNum > 0 ) && ( AirflowNetworkNodeData( AirflowNetworkLinkageData( i ).NodeNums( 2 ) ).EPlusZoneNum == 0 ) && ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) ) {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
@@ -4386,7 +4386,7 @@ namespace AirflowNetworkBalanceManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -4418,7 +4418,7 @@ namespace AirflowNetworkBalanceManager {
 			CompTypeNum = AirflowNetworkCompData( CompNum ).CompTypeNum;
 			CompName = AirflowNetworkCompData( CompNum ).EPlusName;
 			// Calculate duct moisture diffusion loss
-			if ( CompTypeNum == CompTypeNum_DWC && CompName == Blank ) { // Duct component only
+			if ( CompTypeNum == CompTypeNum_DWC && CompName == BlankString ) { // Duct component only
 				TypeNum = AirflowNetworkCompData( CompNum ).TypeNum;
 				if ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) { // flow direction is the same as input from node 1 to node 2
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
@@ -4459,7 +4459,7 @@ namespace AirflowNetworkBalanceManager {
 				}
 			}
 			// Calculate temp in a constant pressure drop component
-			if ( CompTypeNum == CompTypeNum_CPD && CompName == Blank ) { // constant pressure element only
+			if ( CompTypeNum == CompTypeNum_CPD && CompName == BlankString ) { // constant pressure element only
 				if ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) { // flow direction is the same as input from node 1 to node 2
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
@@ -4472,7 +4472,7 @@ namespace AirflowNetworkBalanceManager {
 				MV( LT ) = 0.0;
 			}
 			// Calculate return leak
-			if ( ( CompTypeNum == CompTypeNum_PLR || CompTypeNum == CompTypeNum_ELR ) && CompName == Blank ) {
+			if ( ( CompTypeNum == CompTypeNum_PLR || CompTypeNum == CompTypeNum_ELR ) && CompName == BlankString ) {
 				// Return leak component only
 				if ( ( AirflowNetworkNodeData( AirflowNetworkLinkageData( i ).NodeNums( 1 ) ).EPlusZoneNum > 0 ) && ( AirflowNetworkNodeData( AirflowNetworkLinkageData( i ).NodeNums( 2 ) ).EPlusZoneNum == 0 ) && ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) ) {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
@@ -4601,7 +4601,7 @@ namespace AirflowNetworkBalanceManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -4633,7 +4633,7 @@ namespace AirflowNetworkBalanceManager {
 			CompTypeNum = AirflowNetworkCompData( CompNum ).CompTypeNum;
 			CompName = AirflowNetworkCompData( CompNum ).EPlusName;
 			// Calculate duct moisture diffusion loss
-			if ( CompTypeNum == CompTypeNum_DWC && CompName == Blank ) { // Duct component only
+			if ( CompTypeNum == CompTypeNum_DWC && CompName == BlankString ) { // Duct component only
 				TypeNum = AirflowNetworkCompData( CompNum ).TypeNum;
 				if ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) { // flow direction is the same as input from node 1 to node 2
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
@@ -4674,7 +4674,7 @@ namespace AirflowNetworkBalanceManager {
 				}
 			}
 			// Calculate temp in a constant pressure drop component
-			if ( CompTypeNum == CompTypeNum_CPD && CompName == Blank ) { // constant pressure element only
+			if ( CompTypeNum == CompTypeNum_CPD && CompName == BlankString ) { // constant pressure element only
 				if ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) { // flow direction is the same as input from node 1 to node 2
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
@@ -4687,7 +4687,7 @@ namespace AirflowNetworkBalanceManager {
 				MV( LT ) = 0.0;
 			}
 			// Calculate return leak
-			if ( ( CompTypeNum == CompTypeNum_PLR || CompTypeNum == CompTypeNum_ELR ) && CompName == Blank ) {
+			if ( ( CompTypeNum == CompTypeNum_PLR || CompTypeNum == CompTypeNum_ELR ) && CompName == BlankString ) {
 				// Return leak component only
 				if ( ( AirflowNetworkNodeData( AirflowNetworkLinkageData( i ).NodeNums( 1 ) ).EPlusZoneNum > 0 ) && ( AirflowNetworkNodeData( AirflowNetworkLinkageData( i ).NodeNums( 2 ) ).EPlusZoneNum == 0 ) && ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) ) {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );

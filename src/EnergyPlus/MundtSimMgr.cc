@@ -56,6 +56,8 @@ namespace MundtSimMgr {
 	Real64 const MinSlope( 0.001 ); // Bound on result from Mundt model
 	Real64 const MaxSlope( 5.0 ); // Bound on result from Mundt Model
 
+	static std::string const BlankString;
+
 	// MODULE DERIVED TYPE DEFINITIONS:
 
 	// INTERFACE BLOCK SPECIFICATIONS:

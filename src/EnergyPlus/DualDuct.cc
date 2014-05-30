@@ -92,6 +92,8 @@ namespace DualDuct {
 	int const PerPersonDCVByCurrentLevel( 21 );
 	int const PerPersonByDesignLevel( 22 );
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:
@@ -1745,6 +1747,7 @@ namespace DualDuct {
 
 		// FUNCTION PARAMETER DEFINITIONS:
 		bool const UseMinOASchFlag( true ); // Always use min OA schedule in calculations.
+		static std::string const RoutineName( "HVACDualDuctSystem:CalcOAOnlyMassFlow" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1780,7 +1783,7 @@ namespace DualDuct {
 
 		OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir( Damper( DamperNum ).OARequirementsPtr, Damper( DamperNum ).ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, PerPersonNotSet );
 
-		RhoAir = PsyRhoAirFnPbTdbW( Node( Damper( DamperNum ).OutletNodeNum ).Press, Node( Damper( DamperNum ).OutletNodeNum ).Temp, Node( Damper( DamperNum ).OutletNodeNum ).HumRat, "HVACDualDuctSystem:CalcOAOnlyMassFlow" );
+		RhoAir = PsyRhoAirFnPbTdbW( Node( Damper( DamperNum ).OutletNodeNum ).Press, Node( Damper( DamperNum ).OutletNodeNum ).Temp, Node( Damper( DamperNum ).OutletNodeNum ).HumRat, RoutineName );
 
 		OAMassFlow = OAVolumeFlowRate * RhoAir;
 

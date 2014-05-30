@@ -66,6 +66,7 @@ public: // Types
 
 	// Using
 	using Super::in_range;
+	using Super::isize;
 	using Super::overlap;
 	using Super::size;
 	using Super::slice_k;
@@ -169,12 +170,12 @@ public: // Creation
 		m5_( a.size4() * m4_ ),
 		m6_( a.size5() * m5_ ),
 		k_( -( m1_ + m2_ + m3_ + m4_ + m5_ + m6_ ) ),
-		u1_( a.size1() ),
-		u2_( a.size2() ),
-		u3_( a.size3() ),
-		u4_( a.size4() ),
-		u5_( a.size5() ),
-		u6_( a.size6() )
+		u1_( a.isize1() ),
+		u2_( a.isize2() ),
+		u3_( a.isize3() ),
+		u4_( a.isize4() ),
+		u5_( a.isize5() ),
+		u6_( a.isize6() )
 	{
 		data_set();
 	}
@@ -2927,30 +2928,6 @@ public: // Inspector
 		}
 	}
 
-	// Lower Index of a Dimension
-	inline
-	int
-	l( int const d ) const
-	{
-		switch ( d ) {
-		case 1:
-			return 1;
-		case 2:
-			return 1;
-		case 3:
-			return 1;
-		case 4:
-			return 1;
-		case 5:
-			return 1;
-		case 6:
-			return 1;
-		default:
-			assert( false );
-			return 1;
-		}
-	}
-
 	// Upper Index of Dimension
 	inline
 	int
@@ -2999,6 +2976,30 @@ public: // Inspector
 		}
 	}
 
+	// Size of a Dimension
+	inline
+	int
+	isize( int const d ) const
+	{
+		switch ( d ) {
+		case 1:
+			return isize1();
+		case 2:
+			return isize2();
+		case 3:
+			return isize3();
+		case 4:
+			return isize4();
+		case 5:
+			return isize5();
+		case 6:
+			return isize6();
+		default:
+			assert( false );
+			return isize1();
+		}
+	}
+
 	// IndexRange of Dimension 1
 	inline
 	IR
@@ -3027,6 +3028,14 @@ public: // Inspector
 	inline
 	size_type
 	size1() const
+	{
+		return u1_;
+	}
+
+	// Size of Dimension 1
+	inline
+	int
+	isize1() const
 	{
 		return u1_;
 	}
@@ -3063,6 +3072,14 @@ public: // Inspector
 		return u2_;
 	}
 
+	// Size of Dimension 2
+	inline
+	int
+	isize2() const
+	{
+		return u2_;
+	}
+
 	// IndexRange of Dimension 3
 	inline
 	IR
@@ -3091,6 +3108,14 @@ public: // Inspector
 	inline
 	size_type
 	size3() const
+	{
+		return u3_;
+	}
+
+	// Size of Dimension 3
+	inline
+	int
+	isize3() const
 	{
 		return u3_;
 	}
@@ -3127,6 +3152,14 @@ public: // Inspector
 		return u4_;
 	}
 
+	// Size of Dimension 4
+	inline
+	int
+	isize4() const
+	{
+		return u4_;
+	}
+
 	// IndexRange of Dimension 5
 	inline
 	IR
@@ -3159,6 +3192,14 @@ public: // Inspector
 		return u5_;
 	}
 
+	// Size of Dimension 5
+	inline
+	int
+	isize5() const
+	{
+		return u5_;
+	}
+
 	// IndexRange of Dimension 6
 	inline
 	IR
@@ -3187,6 +3228,14 @@ public: // Inspector
 	inline
 	size_type
 	size6() const
+	{
+		return u6_;
+	}
+
+	// Size of Dimension 6
+	inline
+	int
+	isize6() const
 	{
 		return u6_;
 	}

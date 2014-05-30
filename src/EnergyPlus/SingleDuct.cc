@@ -123,6 +123,10 @@ namespace SingleDuct {
 	int const FixedMin( 3 );
 	int NumATMixers( 0 );
 
+	static std::string const fluidNameSteam( "STEAM" );
+	static std::string const fluidNameWater( "WATER" );
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:
@@ -1471,7 +1475,8 @@ namespace SingleDuct {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "InitSys" );
+		static std::string const RoutineNameFull( "InitHVACSingleDuct" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1578,7 +1583,7 @@ namespace SingleDuct {
 			MassFlowDiff( SysNum ) = 1.0e-10 * Sys( SysNum ).AirMassFlowRateMax;
 
 			if ( Sys( SysNum ).HWLoopNum > 0 && Sys( SysNum ).ReheatComp_Num != HCoilType_SteamAirHeating ) { //protect early calls before plant is setup
-				rho = GetDensityGlycol( PlantLoop( Sys( SysNum ).HWLoopNum ).FluidName, InitConvTemp, PlantLoop( Sys( SysNum ).HWLoopNum ).FluidIndex, "InitSys" );
+				rho = GetDensityGlycol( PlantLoop( Sys( SysNum ).HWLoopNum ).FluidName, InitConvTemp, PlantLoop( Sys( SysNum ).HWLoopNum ).FluidIndex, RoutineName );
 			} else {
 				rho = 1000.;
 			}
@@ -1598,7 +1603,7 @@ namespace SingleDuct {
 
 			if ( Sys( SysNum ).ReheatComp_Num == HCoilType_SteamAirHeating ) {
 				SteamTemp = 100.;
-				SteamDensity = GetSatDensityRefrig( "STEAM", SteamTemp, 1.0, Sys( SysNum ).FluidIndex, "InitHVACSingleDuct" );
+				SteamDensity = GetSatDensityRefrig( fluidNameSteam, SteamTemp, 1.0, Sys( SysNum ).FluidIndex, RoutineNameFull );
 				Sys( SysNum ).MaxReheatSteamFlow = SteamDensity * Sys( SysNum ).MaxReheatSteamVolFlow;
 				Sys( SysNum ).MinReheatSteamFlow = SteamDensity * Sys( SysNum ).MinReheatSteamVolFlow;
 			}
@@ -1737,7 +1742,8 @@ namespace SingleDuct {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "SizeSys" );
+		static std::string const RoutineNameFull( "SizeHVACSingleDuct" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2045,9 +2051,9 @@ namespace SingleDuct {
 							DesCoilLoad = DesZoneHeatLoad + PsyCpAirFnWTdb( ZoneDesHumRat, 0.5 * ( CoilInTemp + ZoneDesTemp ) ) * DesMassFlow * ( ZoneDesTemp - CoilInTemp );
 							if ( DesCoilLoad >= SmallLoad ) {
 
-								rho = GetDensityGlycol( PlantLoop( Sys( SysNum ).HWLoopNum ).FluidName, 60., PlantLoop( Sys( SysNum ).HWLoopNum ).FluidIndex, "SizeSys" );
+								rho = GetDensityGlycol( PlantLoop( Sys( SysNum ).HWLoopNum ).FluidName, 60., PlantLoop( Sys( SysNum ).HWLoopNum ).FluidIndex, RoutineName );
 
-								Cp = GetSpecificHeatGlycol( PlantLoop( Sys( SysNum ).HWLoopNum ).FluidName, 60., PlantLoop( Sys( SysNum ).HWLoopNum ).FluidIndex, "SizeSys" );
+								Cp = GetSpecificHeatGlycol( PlantLoop( Sys( SysNum ).HWLoopNum ).FluidName, 60., PlantLoop( Sys( SysNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 								MaxReheatWaterVolFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 							} else {
@@ -2115,12 +2121,12 @@ namespace SingleDuct {
 							DesCoilLoad = DesZoneHeatLoad + PsyCpAirFnWTdb( ZoneDesHumRat, 0.5 * ( CoilInTemp + ZoneDesTemp ) ) * DesMassFlow * ( ZoneDesTemp - CoilInTemp );
 							if ( DesCoilLoad >= SmallLoad ) {
 								TempSteamIn = 100.00;
-								EnthSteamInDry = GetSatEnthalpyRefrig( "STEAM", TempSteamIn, 1.0, Sys( SysNum ).FluidIndex, "SizeHVACSingleDuct" );
-								EnthSteamOutWet = GetSatEnthalpyRefrig( "STEAM", TempSteamIn, 0.0, Sys( SysNum ).FluidIndex, "SizeHVACSingleDuct" );
+								EnthSteamInDry = GetSatEnthalpyRefrig( fluidNameSteam, TempSteamIn, 1.0, Sys( SysNum ).FluidIndex, RoutineNameFull );
+								EnthSteamOutWet = GetSatEnthalpyRefrig( fluidNameSteam, TempSteamIn, 0.0, Sys( SysNum ).FluidIndex, RoutineNameFull );
 								LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-								SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, Sys( SysNum ).FluidIndex, "SizeHVACSingleDuct" );
+								SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, Sys( SysNum ).FluidIndex, RoutineNameFull );
 
-								Cp = GetSpecificHeatGlycol( "WATER", PlantSizData( PltSizHeatNum ).ExitTemp, DummyWaterIndex, "SizeSys" );
+								Cp = GetSpecificHeatGlycol( fluidNameWater, PlantSizData( PltSizHeatNum ).ExitTemp, DummyWaterIndex, RoutineName );
 								MaxReheatSteamVolFlowDes = DesCoilLoad / ( SteamDensity * ( LatentHeatSteam + PlantSizData( PltSizHeatNum ).DeltaT * Cp ) );
 							} else {
 								MaxReheatSteamVolFlowDes = 0.0;

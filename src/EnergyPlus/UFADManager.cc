@@ -77,6 +77,8 @@ namespace UFADManager {
 
 	// Data
 	// MODULE VARIABLE DECLARATIONS:
+	static std::string const BlankString;
+
 	Real64 HAT_MX( 0.0 ); // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone
 	Real64 HAT_MXWin( 0.0 ); // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone (windows only)
 	Real64 HA_MX( 0.0 ); // HA_MX Convection Coefficient times Area for the upper subzone

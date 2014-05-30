@@ -26,7 +26,7 @@ namespace fmt {
 std::istream &
 operator >>( std::istream & stream, Skip const & skip )
 {
-	static std::string const STOPPERS( '\n' + std::string( 1, std::istream::traits_type::eof() ) );
+	static std::string const STOPPERS( "\r\n" + std::string( 1, std::istream::traits_type::eof() ) );
 	char c;
 	Size i( 0 );
 	while ( ( i < skip.w_ ) && stream && not_any_of( stream.peek(), STOPPERS ) ) {

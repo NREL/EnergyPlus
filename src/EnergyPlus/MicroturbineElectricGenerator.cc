@@ -68,7 +68,7 @@ namespace MicroturbineElectricGenerator {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
-	std::string const Blank;
+	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -1114,7 +1114,7 @@ namespace MicroturbineElectricGenerator {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		//  na
+		static std::string const RoutineName( "InitMTGenerators" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		//  na
@@ -1163,7 +1163,7 @@ namespace MicroturbineElectricGenerator {
 			HeatRecOutletNode = MTGenerator( GenNum ).HeatRecOutletNodeNum;
 
 			//size mass flow rate
-			rho = GetDensityGlycol( PlantLoop( MTGenerator( GenNum ).HRLoopNum ).FluidName, InitConvTemp, PlantLoop( MTGenerator( GenNum ).HRLoopNum ).FluidIndex, "InitMTGenerators" );
+			rho = GetDensityGlycol( PlantLoop( MTGenerator( GenNum ).HRLoopNum ).FluidName, InitConvTemp, PlantLoop( MTGenerator( GenNum ).HRLoopNum ).FluidIndex, RoutineName );
 
 			MTGenerator( GenNum ).DesignHeatRecMassFlowRate = rho * MTGenerator( GenNum ).RefHeatRecVolFlowRate;
 			MTGenerator( GenNum ).HeatRecMaxMassFlowRate = rho * MTGenerator( GenNum ).HeatRecMaxVolFlowRate;
@@ -1286,6 +1286,7 @@ namespace MicroturbineElectricGenerator {
 		int const MaxAncPowerIter( 50 ); // Maximum number of iteration (subroutine ancillary power iteration loop)
 		Real64 const AncPowerDiffToler( 5.0 ); // Tolerance for Ancillary Power Difference (W)
 		Real64 const RelaxFactor( 0.7 ); // Relaxation factor for iteration loop
+		static std::string const RoutineName( "CalcMTGeneratorModel" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		//  na
@@ -1370,7 +1371,7 @@ namespace MicroturbineElectricGenerator {
 		if ( MTGenerator( GeneratorNum ).HeatRecActive ) {
 			HeatRecInNode = MTGenerator( GeneratorNum ).HeatRecInletNodeNum;
 			HeatRecInTemp = Node( HeatRecInNode ).Temp;
-			HeatRecCp = GetSpecificHeatGlycol( PlantLoop( MTGenerator( GeneratorNum ).HRLoopNum ).FluidName, HeatRecInTemp, PlantLoop( MTGenerator( GeneratorNum ).HRLoopNum ).FluidIndex, "CalcMTGeneratorModel" );
+			HeatRecCp = GetSpecificHeatGlycol( PlantLoop( MTGenerator( GeneratorNum ).HRLoopNum ).FluidName, HeatRecInTemp, PlantLoop( MTGenerator( GeneratorNum ).HRLoopNum ).FluidIndex, RoutineName );
 			HeatRecMdot = Node( HeatRecInNode ).MassFlowRate;
 		} else {
 			HeatRecInTemp = 0.0;
@@ -1618,7 +1619,7 @@ namespace MicroturbineElectricGenerator {
 
 			//     Calculate heat recovery rate modifier curve output (function of water [volumetric] flow rate)
 			if ( MTGenerator( GeneratorNum ).HeatRecRateFWaterFlowCurveNum > 0 ) {
-				rho = GetDensityGlycol( PlantLoop( MTGenerator( GeneratorNum ).HRLoopNum ).FluidName, HeatRecInTemp, PlantLoop( MTGenerator( GeneratorNum ).HRLoopNum ).FluidIndex, "CalcMTGeneratorModel" );
+				rho = GetDensityGlycol( PlantLoop( MTGenerator( GeneratorNum ).HRLoopNum ).FluidName, HeatRecInTemp, PlantLoop( MTGenerator( GeneratorNum ).HRLoopNum ).FluidIndex, RoutineName );
 
 				HeatRecVolFlowRate = HeatRecMdot / rho;
 				HeatRecRateFFlow = CurveValue( MTGenerator( GeneratorNum ).HeatRecRateFWaterFlowCurveNum, HeatRecVolFlowRate );
@@ -1797,7 +1798,7 @@ namespace MicroturbineElectricGenerator {
 					}
 				}
 				//       Calculate exhaust air humidity ratio
-				H2OHtOfVap = PsyHfgAirFnWTdb( 1.0, 16.0, "CalcMTGeneratorModel" ); // W not used, passing 1.0 as dummy.
+				H2OHtOfVap = PsyHfgAirFnWTdb( 1.0, 16.0 ); // W not used, passing 1.0 as dummy.
 				// Assume fuel is at 16C (ASHRAE HOF)
 				if ( H2OHtOfVap > 0.0 ) {
 					MTGenerator( GeneratorNum ).ExhaustAirHumRat = CombustionAirInletW + MTGenerator( GeneratorNum ).FuelMdot * ( ( FuelHigherHeatingValue - FuelLowerHeatingValue ) * KJtoJ / H2OHtOfVap ) / ExhAirMassFlowRate;

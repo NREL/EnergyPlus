@@ -71,6 +71,8 @@ namespace SystemAvailabilityManager {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
+	static std::string const BlankString;
+
 	int const MaxDayTypes( 12 );
 	int const StayOff( 0 );
 	int const CycleOnAny( 1 );

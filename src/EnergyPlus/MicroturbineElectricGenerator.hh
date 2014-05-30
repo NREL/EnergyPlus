@@ -18,7 +18,7 @@ namespace MicroturbineElectricGenerator {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
-	extern std::string const Blank;
+	// na
 
 	// DERIVED TYPE DEFINITIONS:
 

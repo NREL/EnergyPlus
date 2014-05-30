@@ -65,6 +65,7 @@ public: // Types
 
 	// Using
 	using Super::in_range;
+	using Super::isize;
 	using Super::overlap;
 	using Super::size;
 	using Super::slice_k;
@@ -123,7 +124,7 @@ public: // Creation
 		Super( a.data(), a.size() ),
 		m_( 1 ),
 		k_( -m_ ),
-		u_( a.size() )
+		u_( a.isize() )
 	{
 		data_set();
 	}
@@ -652,20 +653,6 @@ public: // Inspector
 		}
 	}
 
-	// Lower Index of a Dimension
-	inline
-	int
-	l( int const d ) const
-	{
-		switch ( d ) {
-		case 1:
-			return 1;
-		default:
-			assert( false );
-			return 1;
-		}
-	}
-
 	// Upper Index of Dimension
 	inline
 	int
@@ -684,6 +671,20 @@ public: // Inspector
 	inline
 	size_type
 	size( int const d ) const
+	{
+		switch ( d ) {
+		case 1:
+			return u_;
+		default:
+			assert( false );
+			return u_;
+		}
+	}
+
+	// Size of a Dimension
+	inline
+	int
+	isize( int const d ) const
 	{
 		switch ( d ) {
 		case 1:
@@ -746,6 +747,14 @@ public: // Inspector
 	inline
 	size_type
 	size1() const
+	{
+		return u_;
+	}
+
+	// Size of Dimension 1
+	inline
+	int
+	isize1() const
 	{
 		return u_;
 	}

@@ -573,7 +573,7 @@ namespace PlantHeatExchangerFluidToFluid {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineNameNoColon( "InitFluidHeatExchanger" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -586,7 +586,7 @@ namespace PlantHeatExchangerFluidToFluid {
 		static FArray1D_bool MyEnvrnFlag; // environment flag
 		static FArray1D_bool MyFlag;
 		bool errFlag;
-		static std::string RoutineName( "InitFluidHeatExchanger: " );
+		static std::string const RoutineName( "InitFluidHeatExchanger: " );
 		Real64 rho;
 		int LoopNum2;
 		int LoopSideNum;
@@ -679,11 +679,11 @@ namespace PlantHeatExchangerFluidToFluid {
 
 		if ( BeginEnvrnFlag && MyEnvrnFlag( CompNum ) && ( PlantSizesOkayToFinalize ) ) {
 			if ( PlantSizeNotComplete ) SizeFluidHeatExchanger( CompNum );
-			rho = GetDensityGlycol( PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).FluidName, InitConvTemp, PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).FluidIndex, "InitFluidHeatExchanger" );
+			rho = GetDensityGlycol( PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).FluidName, InitConvTemp, PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).FluidIndex, RoutineNameNoColon );
 			FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax = rho * FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate;
 			InitComponentNodes( FluidHX( CompNum ).DemandSideLoop.MassFlowRateMin, FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum );
 
-			rho = GetDensityGlycol( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidName, InitConvTemp, PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidIndex, "InitFluidHeatExchanger" );
+			rho = GetDensityGlycol( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidName, InitConvTemp, PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidIndex, RoutineNameNoColon );
 			FluidHX( CompNum ).SupplySideLoop.MassFlowRateMax = rho * FluidHX( CompNum ).SupplySideLoop.DesignVolumeFlowRate;
 			InitComponentNodes( FluidHX( CompNum ).SupplySideLoop.MassFlowRateMin, FluidHX( CompNum ).SupplySideLoop.MassFlowRateMax, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, FluidHX( CompNum ).SupplySideLoop.OutletNodeNum, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum );
 			MyEnvrnFlag( CompNum ) = false;
@@ -745,7 +745,7 @@ namespace PlantHeatExchangerFluidToFluid {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "SizeFluidHeatExchanger" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -827,9 +827,9 @@ namespace PlantHeatExchangerFluidToFluid {
 				tmpDeltaTSupLoop = PlantSizData( PltSizNumSupSide ).DeltaT;
 				if ( tmpSupSideDesignVolFlowRate >= SmallWaterVolFlow ) {
 
-					Cp = GetSpecificHeatGlycol( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidName, InitConvTemp, PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidIndex, "SizeFluidHeatExchanger" );
+					Cp = GetSpecificHeatGlycol( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidName, InitConvTemp, PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidIndex, RoutineName );
 
-					rho = GetDensityGlycol( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidName, InitConvTemp, PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidIndex, "SizeFluidHeatExchanger" );
+					rho = GetDensityGlycol( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidName, InitConvTemp, PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidIndex, RoutineName );
 
 					tmpDesCap = Cp * rho * tmpDeltaTSupLoop * tmpSupSideDesignVolFlowRate;
 					tmpUA = tmpDesCap / tmpDeltaTloopToLoop;
@@ -886,9 +886,9 @@ namespace PlantHeatExchangerFluidToFluid {
 				}
 			}
 
-			rho = GetDensityGlycol( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidName, InitConvTemp, PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidIndex, "SizeFluidHeatExchanger" );
+			rho = GetDensityGlycol( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidName, InitConvTemp, PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidIndex, RoutineName );
 			SupSideMdot = FluidHX( CompNum ).SupplySideLoop.DesignVolumeFlowRate * rho;
-			rho = GetDensityGlycol( PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).FluidName, InitConvTemp, PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).FluidIndex, "SizeFluidHeatExchanger" );
+			rho = GetDensityGlycol( PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).FluidName, InitConvTemp, PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).FluidIndex, RoutineName );
 			DmdSideMdot = FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate * rho;
 
 			CalcFluidHeatExchanger( CompNum, SupSideMdot, DmdSideMdot );
@@ -939,7 +939,7 @@ namespace PlantHeatExchangerFluidToFluid {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "ControlFluidHeatExchanger" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1011,7 +1011,7 @@ namespace PlantHeatExchangerFluidToFluid {
 							SetComponentFlowRate( mdotSupSide, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, FluidHX( CompNum ).SupplySideLoop.OutletNodeNum, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum );
 							if ( mdotSupSide > MassFlowTolerance ) {
 								// if supply side loop has massflow, request demand side flow
-								cp = GetSpecificHeatGlycol( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidName, FluidHX( CompNum ).SupplySideLoop.InletTemp, PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidIndex, "ControlFluidHeatExchanger" );
+								cp = GetSpecificHeatGlycol( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidName, FluidHX( CompNum ).SupplySideLoop.InletTemp, PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidIndex, RoutineName );
 								TargetLeavingTemp = FluidHX( CompNum ).SupplySideLoop.InletTemp - std::abs( MyLoad ) / ( cp * mdotSupSide );
 
 								FindHXDemandSideLoopFlow( CompNum, TargetLeavingTemp, CoolingSupplySideLoop );
@@ -1032,7 +1032,7 @@ namespace PlantHeatExchangerFluidToFluid {
 							mdotSupSide = FluidHX( CompNum ).SupplySideLoop.MassFlowRateMax;
 							SetComponentFlowRate( mdotSupSide, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, FluidHX( CompNum ).SupplySideLoop.OutletNodeNum, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum );
 							if ( mdotSupSide > MassFlowTolerance ) {
-								cp = GetSpecificHeatGlycol( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidName, FluidHX( CompNum ).SupplySideLoop.InletTemp, PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidIndex, "ControlFluidHeatExchanger" );
+								cp = GetSpecificHeatGlycol( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidName, FluidHX( CompNum ).SupplySideLoop.InletTemp, PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidIndex, RoutineName );
 								TargetLeavingTemp = FluidHX( CompNum ).SupplySideLoop.InletTemp + std::abs( MyLoad ) / ( cp * mdotSupSide );
 
 								FindHXDemandSideLoopFlow( CompNum, TargetLeavingTemp, HeatingSupplySideLoop );
@@ -1358,6 +1358,7 @@ namespace PlantHeatExchangerFluidToFluid {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const CmaxMixedCminUnmixed( 40 );
 		int const CmaxUnMixedCminMixed( 41 );
+		static std::string const RoutineName( "CalcFluidHeatExchanger" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1388,8 +1389,8 @@ namespace PlantHeatExchangerFluidToFluid {
 		SupSideLoopInletTemp = Node( FluidHX( CompNum ).SupplySideLoop.InletNodeNum ).Temp;
 		DmdSideLoopInletTemp = Node( FluidHX( CompNum ).DemandSideLoop.InletNodeNum ).Temp;
 
-		SupSideLoopInletCp = GetSpecificHeatGlycol( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidName, SupSideLoopInletTemp, PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidIndex, "CalcFluidHeatExchanger" );
-		DmdSideLoopInletCp = GetSpecificHeatGlycol( PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).FluidName, DmdSideLoopInletTemp, PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).FluidIndex, "CalcFluidHeatExchanger" );
+		SupSideLoopInletCp = GetSpecificHeatGlycol( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidName, SupSideLoopInletTemp, PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidIndex, RoutineName );
+		DmdSideLoopInletCp = GetSpecificHeatGlycol( PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).FluidName, DmdSideLoopInletTemp, PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).FluidIndex, RoutineName );
 
 		SupSideCapRate = SupSideMdot * SupSideLoopInletCp;
 		DmdSideCapRate = DmdSideMdot * DmdSideLoopInletCp;

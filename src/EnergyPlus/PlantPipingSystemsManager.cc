@@ -524,10 +524,10 @@ namespace PlantPipingSystemsManager {
 
 			//X direction mesh inputs, validated by IP
 			PipingSystemDomains( DomainNum ).Mesh.X.RegionMeshCount = rNumericArgs( 4 );
-			{ auto const SELECT_CASE_var( MakeUPPERCase( cAlphaArgs( 2 ) ) );
-			if ( SELECT_CASE_var == "UNIFORM" ) {
+			{ auto const meshDistribution( uppercased( cAlphaArgs( 2 ) ) );
+			if ( meshDistribution == "UNIFORM" ) {
 				PipingSystemDomains( DomainNum ).Mesh.X.MeshDistribution = MeshDistribution_Uniform;
-			} else if ( SELECT_CASE_var == "SYMMETRICGEOMETRIC" ) {
+			} else if ( meshDistribution == "SYMMETRICGEOMETRIC" ) {
 				PipingSystemDomains( DomainNum ).Mesh.X.MeshDistribution = MeshDistribution_SymmetricGeometric;
 				if ( mod( PipingSystemDomains( DomainNum ).Mesh.X.RegionMeshCount, 2 ) != 0 ) {
 					ShowWarningError( "PipingSystems:" + RoutineName + ": Invalid mesh type-count combination." );
@@ -545,10 +545,10 @@ namespace PlantPipingSystemsManager {
 
 			//Y direction mesh inputs, validated by IP
 			PipingSystemDomains( DomainNum ).Mesh.Y.RegionMeshCount = rNumericArgs( 6 );
-			{ auto const SELECT_CASE_var( stripped( cAlphaArgs( 3 ) ) );
-			if ( SELECT_CASE_var == "UNIFORM" ) {
+			{ auto const meshDistribution( stripped( cAlphaArgs( 3 ) ) );
+			if ( meshDistribution == "UNIFORM" ) {
 				PipingSystemDomains( DomainNum ).Mesh.Y.MeshDistribution = MeshDistribution_Uniform;
-			} else if ( SELECT_CASE_var == "SYMMETRICGEOMETRIC" ) {
+			} else if ( meshDistribution == "SYMMETRICGEOMETRIC" ) {
 				PipingSystemDomains( DomainNum ).Mesh.Y.MeshDistribution = MeshDistribution_SymmetricGeometric;
 				if ( mod( PipingSystemDomains( DomainNum ).Mesh.Y.RegionMeshCount, 2 ) != 0 ) {
 					ShowWarningError( "PipingSystems:" + RoutineName + ": Invalid mesh type-count combination." );
@@ -566,10 +566,10 @@ namespace PlantPipingSystemsManager {
 
 			//Z direction mesh inputs, validated by IP
 			PipingSystemDomains( DomainNum ).Mesh.Z.RegionMeshCount = rNumericArgs( 8 );
-			{ auto const SELECT_CASE_var( stripped( cAlphaArgs( 4 ) ) );
-			if ( SELECT_CASE_var == "UNIFORM" ) {
+			{ auto const meshDistribution( stripped( cAlphaArgs( 4 ) ) );
+			if ( meshDistribution == "UNIFORM" ) {
 				PipingSystemDomains( DomainNum ).Mesh.Z.MeshDistribution = MeshDistribution_Uniform;
-			} else if ( SELECT_CASE_var == "SYMMETRICGEOMETRIC" ) {
+			} else if ( meshDistribution == "SYMMETRICGEOMETRIC" ) {
 				PipingSystemDomains( DomainNum ).Mesh.Z.MeshDistribution = MeshDistribution_SymmetricGeometric;
 				if ( mod( PipingSystemDomains( DomainNum ).Mesh.Z.RegionMeshCount, 2 ) != 0 ) {
 					ShowWarningError( "PipingSystems:" + RoutineName + ": Invalid mesh type-count combination." );
@@ -6969,6 +6969,7 @@ namespace PlantPipingSystemsManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static std::string const RoutineName( "PipingSystemCircuit::DoStartOfTimeStepInitializations" );
 		int X;
 		int Y;
 		int Z;
@@ -6992,10 +6993,10 @@ namespace PlantPipingSystemsManager {
 
 		//retreive fluid properties based on the circuit inlet temperature -- which varies during the simulation
 		// but need to verify the value of inlet temperature during warmup, etc.
-		FluidCp = GetSpecificHeatGlycol( PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidName, PipingSystemCircuits( CircuitNum ).InletTemperature, PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidIndex, "PipingSystemCircuit::DoStartOfTimeStepInitializations" );
-		FluidDensity = GetDensityGlycol( PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidName, PipingSystemCircuits( CircuitNum ).InletTemperature, PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidIndex, "PipingSystemCircuit::DoStartOfTimeStepInitializations" );
-		FluidConductivity = GetConductivityGlycol( PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidName, PipingSystemCircuits( CircuitNum ).InletTemperature, PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidIndex, "PipingSystemCircuit::DoStartOfTimeStepInitializations" );
-		FluidViscosity = GetViscosityGlycol( PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidName, PipingSystemCircuits( CircuitNum ).InletTemperature, PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidIndex, "PipingSystemCircuit::DoStartOfTimeStepInitializations" );
+		FluidCp = GetSpecificHeatGlycol( PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidName, PipingSystemCircuits( CircuitNum ).InletTemperature, PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidIndex, RoutineName );
+		FluidDensity = GetDensityGlycol( PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidName, PipingSystemCircuits( CircuitNum ).InletTemperature, PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidIndex, RoutineName );
+		FluidConductivity = GetConductivityGlycol( PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidName, PipingSystemCircuits( CircuitNum ).InletTemperature, PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidIndex, RoutineName );
+		FluidViscosity = GetViscosityGlycol( PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidName, PipingSystemCircuits( CircuitNum ).InletTemperature, PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidIndex, RoutineName );
 
 		//Doesn't anyone care about poor Ludwig Prandtl?
 		FluidPrandtl = 3.0;

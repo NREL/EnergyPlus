@@ -66,6 +66,7 @@ namespace DisplacementVentMgr {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
+	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS:
 	// na

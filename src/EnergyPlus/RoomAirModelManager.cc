@@ -63,7 +63,7 @@ namespace RoomAirModelManager {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	// na
+	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS
 	// na
@@ -698,18 +698,18 @@ namespace RoomAirModelManager {
 				AirNode( AirNodeNum ).SurfMask.allocate( NumOfSurfs );
 			}
 
-			{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );
-			if ( SELECT_CASE_var == "INLET" ) {
+			{ auto const nodeType( cAlphaArgs( 2 ) );
+			if ( nodeType == "INLET" ) {
 				AirNode( AirNodeNum ).ClassType = InletAirNode;
-			} else if ( SELECT_CASE_var == "FLOOR" ) {
+			} else if ( nodeType == "FLOOR" ) {
 				AirNode( AirNodeNum ).ClassType = FloorAirNode;
-			} else if ( SELECT_CASE_var == "CONTROL" ) {
+			} else if ( nodeType == "CONTROL" ) {
 				AirNode( AirNodeNum ).ClassType = ControlAirNode;
-			} else if ( SELECT_CASE_var == "CEILING" ) {
+			} else if ( nodeType == "CEILING" ) {
 				AirNode( AirNodeNum ).ClassType = CeilingAirNode;
-			} else if ( SELECT_CASE_var == "MUNDTROOM" ) {
+			} else if ( nodeType == "MUNDTROOM" ) {
 				AirNode( AirNodeNum ).ClassType = MundtRoomAirNode;
-			} else if ( SELECT_CASE_var == "RETURN" ) {
+			} else if ( nodeType == "RETURN" ) {
 				AirNode( AirNodeNum ).ClassType = ReturnAirNode;
 				//            CASE ('PLUME1')
 				//                AirNode(AirNodeNum)%ClassType   = PlumeAirNode1
@@ -742,8 +742,8 @@ namespace RoomAirModelManager {
 			if ( NumSurfsInvolved <= 0 ) {
 
 				// report severe error since the following air nodes require surfaces associated with them
-				{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );
-				if ( ( SELECT_CASE_var == "FLOOR" ) || ( SELECT_CASE_var == "CEILING" ) || ( SELECT_CASE_var == "MUNDTROOM" ) || ( SELECT_CASE_var == "PLUME4" ) || ( SELECT_CASE_var == "REESROOM1" ) || ( SELECT_CASE_var == "REESROOM2" ) || ( SELECT_CASE_var == "REESROOM3" ) || ( SELECT_CASE_var == "REESROOM4" ) ) {
+				{ auto const nodeType( cAlphaArgs( 2 ) );
+				if ( nodeType == "FLOOR" || nodeType == "CEILING" || nodeType == "MUNDTROOM" || nodeType == "PLUME4" || nodeType == "REESROOM1" || nodeType == "REESROOM2" || nodeType == "REESROOM3" || nodeType == "REESROOM4" ) {
 					// terminate the program due to a severe error in the specified input
 					ShowSevereError( "GetAirNodeData: " + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid air node specification." );
 					ShowContinueError( "Mundt Room Air Model: No surface names specified.  " "Air node=\"" + AirNode( AirNodeNum ).Name + " requires name of surfaces associated with it." );
@@ -758,8 +758,8 @@ namespace RoomAirModelManager {
 
 				// report warning error since the following air nodes do not require surfaces associated with them
 				// and assign .FALSE. to 'SurfNeeded'
-				{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );
-				if ( ( SELECT_CASE_var == "INLET" ) || ( SELECT_CASE_var == "CONTROL" ) || ( SELECT_CASE_var == "RETURN" ) || ( SELECT_CASE_var == "PLUME1" ) || ( SELECT_CASE_var == "PLUME2" ) || ( SELECT_CASE_var == "PLUME3" ) ) {
+				{ auto const nodeType( cAlphaArgs( 2 ) );
+				if ( nodeType == "INLET" || nodeType == "CONTROL" || nodeType == "RETURN" || nodeType == "PLUME1" || nodeType == "PLUME2" || nodeType == "PLUME3" ) {
 					ShowWarningError( "GetAirNodeData: " + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid linkage" );
 					ShowContinueError( "Mundt Room Air Model: No surface names needed.  " "Air node=\"" + AirNode( AirNodeNum ).Name + " does not relate to any surfaces." );
 					SurfNeeded = false;
@@ -949,7 +949,7 @@ namespace RoomAirModelManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS
-		static std::string const Blank;
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

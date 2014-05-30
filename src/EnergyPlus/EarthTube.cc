@@ -60,6 +60,8 @@ namespace EarthTube {
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLES DECLARATIONS:
+	static std::string const BlankString;
+
 	int TotEarthTube( 0 ); // Total EarthTube Statements in input
 	// Parameters for Ventilation
 	int const NaturalEarthTube( 0 );
@@ -173,7 +175,6 @@ namespace EarthTube {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
 		Real64 const EarthTubeTempLimit( 100.0 ); // degrees Celsius
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -249,7 +250,7 @@ namespace EarthTube {
 				EarthTubeSys( Loop ).FanType = ExhaustEarthTube;
 			} else if ( SELECT_CASE_var == "INTAKE" ) {
 				EarthTubeSys( Loop ).FanType = IntakeEarthTube;
-			} else if ( ( SELECT_CASE_var == "NATURAL" ) || ( SELECT_CASE_var == "NONE" ) || ( SELECT_CASE_var == Blank ) ) {
+			} else if ( ( SELECT_CASE_var == "NATURAL" ) || ( SELECT_CASE_var == "NONE" ) || ( SELECT_CASE_var == BlankString ) ) {
 				EarthTubeSys( Loop ).FanType = NaturalEarthTube;
 			} else {
 				ShowSevereError( cCurrentModuleObject + ": " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) + ", " + cAlphaFieldNames( 3 ) + " invalid=" + cAlphaArgs( 3 ) );

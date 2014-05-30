@@ -76,6 +76,8 @@ namespace AirflowNetworkSolver {
 
 	int const NrInt( 20 ); // Number of intervals for a large opening
 
+	static std::string const BlankString;
+
 	// Common block AFEDAT
 	FArray1D< Real64 > AFECTL;
 	FArray1D< Real64 > AFLOW2;

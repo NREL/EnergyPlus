@@ -2008,8 +2008,6 @@ namespace HVACManager {
 
 	}
 
-
-
 	void
 	ReportAirHeatBalance()
 	{

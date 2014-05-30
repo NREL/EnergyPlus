@@ -125,11 +125,16 @@ namespace DataSizing {
 	extern bool DataCoilIsSuppHeater; // TRUE if heating coil used as supplemental heater
 	extern bool DataIsDXCoil; // TRUE if direct-expansion coil
 	extern bool DataAutosizable; // TRUE if component is autosizable
-	extern bool DataEMSOverride; // TRUE if EMS overrides component sizing
-	extern int DataDXCT; // 1 if regular DX coil, 2 if 100% DOAS DX coil
+	extern int DataTotCapCurveIndex; // index to total capacity as a function of temperature curve
 	extern Real64 DataCoolCoilCap; // cooling coil capacity used for sizing with scalable inputs
 	extern Real64 DataFlowUsedForSizing; // air flow rate used for sizing with scalable inputs [m3/s]
+	extern Real64 DataCapacityUsedForSizing; // capacity used for sizing with scalable inputs [W]
 	extern Real64 DataHeatSizeRatio; // heating coil size as a ratio of cooling coil capacity
+	extern Real64 DataEMSOverride; // value of EMS variable used to override autosizing
+	extern Real64 DataBypassFrac; // value of bypass fraction for Coil:Cooling:DX:TwoStageWithHumidityControlMode coils
+	extern bool DataEMSOverrideON; // boolean determines if user relies on EMS to override autosizing
+	extern Real64 DataConstantUsedForSizing; // base value used for sizing inputs that are ratios of other inputs
+	extern Real64 DataFractionUsedForSizing; // fractional value of base value used for sizing inputs that are ratios of other inputs
 	extern bool TermUnitSingDuct; // TRUE if a non-induction single duct terminal unit
 	extern bool TermUnitPIU; // TRUE if a powered induction terminal unit
 	extern bool TermUnitIU; // TRUE if an unpowered induction terminal unit
@@ -912,8 +917,17 @@ namespace DataSizing {
 		Real64 OAVolFlow; // design outside air flow for zone equipment unit [m3/s]
 		Real64 DesCoolingLoad; // design cooling load used for zone equipment [W]
 		Real64 DesHeatingLoad; // design heating load used for zone equipment [W]
+		Real64 CoolingAirVolFlow; // design cooling air vol flow rate for equipment[m3/s]
+		Real64 HeatingAirVolFlow; // design heating air vol flow rate for equipment[m3/s]
+		Real64 SystemAirVolFlow; // design heating air vol flow rate for equipment[m3/s]
 		bool AirFlow; // TRUE if AirloopHVAC system air flow rate is calcualted
+		bool CoolingAirFlow; // TRUE if AirloopHVAC system cooling air flow rate is calcualted
+		bool HeatingAirFlow; // TRUE if AirloopHVAC system heating air flow rate is calcualted
+		bool SystemAirFlow; // TRUE if AirloopHVAC system heating air flow rate is calcualted
 		bool Capacity; // TRUE if AirloopHVAC system capacity is calculated
+		bool CoolingCapacity; // TRUE if AirloopHVAC system cooling capacity is calculated
+		bool HeatingCapacity; // TRUE if AirloopHVAC system heating capacity is calculated
+		bool SystemCapacity; // TRUE if AirloopHVAC system heating capacity is calculated
 
 		// Default Constructor
 		ZoneEqSizingData() :
@@ -921,10 +935,19 @@ namespace DataSizing {
 			MaxHWVolFlow( 0.0 ),
 			MaxCWVolFlow( 0.0 ),
 			OAVolFlow( 0.0 ),
-			DesCoolingLoad( 0.0 ),
-			DesHeatingLoad( 0.0 ),
-			AirFlow( false ),
-			Capacity( false )
+			DesCoolingLoad( 0.0 ), // design cooling load used for zone equipment [W]
+			DesHeatingLoad( 0.0 ), // design heating load used for zone equipment [W]
+			CoolingAirVolFlow( 0.0 ), // design cooling air vol flow rate for equipment[m3/s]
+			HeatingAirVolFlow( 0.0 ), // design heating air vol flow rate for equipment[m3/s]
+			SystemAirVolFlow( 0.0 ), // design heating air vol flow rate for equipment[m3/s]
+			AirFlow( false ), // TRUE if AirloopHVAC system air flow rate is calcualted
+			CoolingAirFlow( false ), // TRUE if AirloopHVAC system cooling air flow rate is calcualted
+			HeatingAirFlow( false ), // TRUE if AirloopHVAC system heating air flow rate is calcualted
+			SystemAirFlow( false ), // TRUE if AirloopHVAC system heating air flow rate is calcualted
+			Capacity( false ), // TRUE if AirloopHVAC system capacity is calculated
+			CoolingCapacity( false ), // TRUE if AirloopHVAC system cooling capacity is calculated
+			HeatingCapacity( false ), // TRUE if AirloopHVAC system heating capacity is calculated
+			SystemCapacity( false ) // TRUE if AirloopHVAC system heating capacity is calculated
 		{}
 
 		// Member Constructor
@@ -935,8 +958,17 @@ namespace DataSizing {
 			Real64 const OAVolFlow, // design outside air flow for zone equipment unit [m3/s]
 			Real64 const DesCoolingLoad, // design cooling load used for zone equipment [W]
 			Real64 const DesHeatingLoad, // design heating load used for zone equipment [W]
-			bool const AirFlow, // TRUE if AirloopHVAC system air flow rate is calcualted
-			bool const Capacity // TRUE if AirloopHVAC system capacity is calculated
+			Real64 const  CoolingAirVolFlow, // design cooling air vol flow rate for equipment[m3/s]
+			Real64 const  HeatingAirVolFlow, // design heating air vol flow rate for equipment[m3/s]
+			Real64 const  SystemAirVolFlow, // design heating air vol flow rate for equipment[m3/s]
+			bool const  AirFlow, // TRUE if AirloopHVAC system air flow rate is calcualted
+			bool const  CoolingAirFlow, // TRUE if AirloopHVAC system cooling air flow rate is calcualted
+			bool const  HeatingAirFlow, // TRUE if AirloopHVAC system heating air flow rate is calcualted
+			bool const  SystemAirFlow, // TRUE if AirloopHVAC system heating air flow rate is calcualted
+			bool const  Capacity, // TRUE if AirloopHVAC system capacity is calculated
+			bool const  CoolingCapacity, // TRUE if AirloopHVAC system cooling capacity is calculated
+			bool const  HeatingCapacity, // TRUE if AirloopHVAC system heating capacity is calculated
+			bool const  SystemCapacity // TRUE if AirloopHVAC system heating capacity is calculated
 		) :
 			AirVolFlow( AirVolFlow ),
 			MaxHWVolFlow( MaxHWVolFlow ),
@@ -944,8 +976,17 @@ namespace DataSizing {
 			OAVolFlow( OAVolFlow ),
 			DesCoolingLoad( DesCoolingLoad ),
 			DesHeatingLoad( DesHeatingLoad ),
+			CoolingAirVolFlow( CoolingAirVolFlow ),
+			HeatingAirVolFlow( HeatingAirVolFlow ),
+			SystemAirVolFlow( SystemAirVolFlow ),
 			AirFlow( AirFlow ),
-			Capacity( Capacity )
+			CoolingAirFlow( CoolingAirFlow ),
+			HeatingAirFlow( HeatingAirFlow ),
+			SystemAirFlow( SystemAirFlow ),
+			Capacity( Capacity ),
+			CoolingCapacity( CoolingCapacity ),
+			HeatingCapacity( HeatingCapacity ),
+			SystemCapacity( SystemCapacity )
 		{}
 
 	};

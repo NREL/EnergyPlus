@@ -549,7 +549,7 @@ namespace MicroCHPElectricGenerator {
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "InitMicroCHPNoNormalizeGenerators" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -599,7 +599,7 @@ namespace MicroCHPElectricGenerator {
 		}
 
 		if ( ! SysSizingCalc && MySizeFlag( GeneratorNum ) && ! MyPlantScanFlag( GeneratorNum ) && ( PlantSizesOkayToFinalize ) ) {
-			rho = GetDensityGlycol( PlantLoop( MicroCHP( GeneratorNum ).CWLoopNum ).FluidName, Node( MicroCHP( GeneratorNum ).PlantInletNodeID ).Temp, PlantLoop( MicroCHP( GeneratorNum ).CWLoopNum ).FluidIndex, "InitMicroCHPNoNormalizeGenerators" );
+			rho = GetDensityGlycol( PlantLoop( MicroCHP( GeneratorNum ).CWLoopNum ).FluidName, Node( MicroCHP( GeneratorNum ).PlantInletNodeID ).Temp, PlantLoop( MicroCHP( GeneratorNum ).CWLoopNum ).FluidIndex, RoutineName );
 			if ( MicroCHP( GeneratorNum ).A42Model.InternalFlowControl ) { // got a curve
 				MicroCHP( GeneratorNum ).PlantMassFlowRateMax = 2.0 * CurveValue( MicroCHP( GeneratorNum ).A42Model.WaterFlowCurveID, MicroCHP( GeneratorNum ).A42Model.MaxElecPower, Node( MicroCHP( GeneratorNum ).PlantInletNodeID ).Temp );
 			} else if ( MicroCHP( GeneratorNum ).CWLoopSideNum == SupplySide ) {
@@ -744,7 +744,7 @@ namespace MicroCHPElectricGenerator {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "CalcMicroCHPNoNormalizeGeneratorModel" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1082,7 +1082,7 @@ namespace MicroCHPElectricGenerator {
 
 			Teng = FuncDetermineEngineTemp( TcwOut, MicroCHP( GeneratorNum ).A42Model.MCeng, MicroCHP( GeneratorNum ).A42Model.UAhx, MicroCHP( GeneratorNum ).A42Model.UAskin, thisAmbientTemp, Qgenss, MicroCHP( GeneratorNum ).A42Model.TengLast, dt );
 
-			Cp = GetSpecificHeatGlycol( PlantLoop( MicroCHP( GeneratorNum ).CWLoopNum ).FluidName, TcwIn, PlantLoop( MicroCHP( GeneratorNum ).CWLoopNum ).FluidIndex, "CalcMicroCHPNoNormalizeGeneratorModel" );
+			Cp = GetSpecificHeatGlycol( PlantLoop( MicroCHP( GeneratorNum ).CWLoopNum ).FluidName, TcwIn, PlantLoop( MicroCHP( GeneratorNum ).CWLoopNum ).FluidIndex, RoutineName );
 
 			TcwOut = FuncDetermineCoolantWaterExitTemp( TcwIn, MicroCHP( GeneratorNum ).A42Model.MCcw, MicroCHP( GeneratorNum ).A42Model.UAhx, MdotCW * Cp, Teng, MicroCHP( GeneratorNum ).A42Model.TempCWOutLast, dt );
 
@@ -1420,7 +1420,7 @@ namespace MicroCHPElectricGenerator {
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "CalcUpdateHeatRecovery" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1442,7 +1442,7 @@ namespace MicroCHPElectricGenerator {
 
 		Node( OutNodeNum ).Temp = MicroCHP( Num ).A42Model.TcwOut;
 
-		Cp = GetSpecificHeatGlycol( PlantLoop( MicroCHP( Num ).CWLoopNum ).FluidName, MicroCHP( Num ).A42Model.TcwIn, PlantLoop( MicroCHP( Num ).CWLoopNum ).FluidIndex, "CalcUpdateHeatRecovery" );
+		Cp = GetSpecificHeatGlycol( PlantLoop( MicroCHP( Num ).CWLoopNum ).FluidName, MicroCHP( Num ).A42Model.TcwIn, PlantLoop( MicroCHP( Num ).CWLoopNum ).FluidIndex, RoutineName );
 
 		Node( OutNodeNum ).Enthalpy = MicroCHP( Num ).A42Model.TcwOut * Cp;
 
@@ -1557,7 +1557,7 @@ namespace MicroCHPElectricGenerator {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "UpdateMicroCHPGeneratorRecords" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1582,7 +1582,7 @@ namespace MicroCHPElectricGenerator {
 		MicroCHP( Num ).Report.Qgenss = MicroCHP( Num ).A42Model.Qgenss;
 		MicroCHP( Num ).Report.QdotHX = MicroCHP( Num ).A42Model.UAhx * ( MicroCHP( Num ).A42Model.Teng - MicroCHP( Num ).A42Model.TcwOut ); //  heat recovered rate (W)
 
-		Cp = GetSpecificHeatGlycol( PlantLoop( MicroCHP( Num ).CWLoopNum ).FluidName, MicroCHP( Num ).A42Model.TcwIn, PlantLoop( MicroCHP( Num ).CWLoopNum ).FluidIndex, "UpdateMicroCHPGeneratorRecords" );
+		Cp = GetSpecificHeatGlycol( PlantLoop( MicroCHP( Num ).CWLoopNum ).FluidName, MicroCHP( Num ).A42Model.TcwIn, PlantLoop( MicroCHP( Num ).CWLoopNum ).FluidIndex, RoutineName );
 
 		MicroCHP( Num ).Report.QdotHR = MicroCHP( Num ).PlantMassFlowRate * Cp * ( MicroCHP( Num ).A42Model.TcwOut - MicroCHP( Num ).A42Model.TcwIn );
 		MicroCHP( Num ).Report.TotalHeatEnergyRec = MicroCHP( Num ).Report.QdotHR * TimeStepSys * SecInHour; // heat recovered energy (J)

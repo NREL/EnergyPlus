@@ -19,6 +19,8 @@
 
 // C++ Headers
 #include <complex>
+#include <cstddef>
+#include <ios>
 #include <limits>
 #include <typeinfo>
 
@@ -55,7 +57,10 @@ extends_type_of( A const & a, B const & b )
 	}
 #else // Support for static type of b
 	assert( typeid( b ) == typeid( B ) ); // Check that we are safe using simple support
-	return dynamic_cast< B const * >( &a );
+#ifdef NDEBUG
+	static_cast< void >( b ); // Suppress unused warning
+#endif
+	return ( dynamic_cast< B const * >( &a ) != nullptr );
 #endif
 }
 
@@ -73,7 +78,7 @@ inline
 bool
 is_a( A const & a )
 {
-	return dynamic_cast< B const * >( &a );
+	return ( dynamic_cast< B const * >( &a ) != nullptr );
 }
 
 // is_a: Type Test for non-const Reference Argument
@@ -82,7 +87,7 @@ inline
 bool
 is_a( A & a )
 {
-	return dynamic_cast< B * >( &a );
+	return ( dynamic_cast< B * >( &a ) != nullptr );
 }
 
 // is_a: Type Test for const Pointer Argument
@@ -91,7 +96,7 @@ inline
 bool
 is_a( A const * a )
 {
-	return dynamic_cast< B const * >( a );
+	return ( dynamic_cast< B const * >( a ) != nullptr );
 }
 
 // is_a: Type Test for non-const Pointer Argument
@@ -100,7 +105,7 @@ inline
 bool
 is_a( A * a )
 {
-	return dynamic_cast< B * >( a );
+	return ( dynamic_cast< B * >( a ) != nullptr );
 }
 
 // TypeTraits: Type Traits Template
@@ -108,7 +113,7 @@ template< typename T >
 struct TypeTraits
 {
 	typedef  T  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Initial Value
 	inline
@@ -138,13 +143,13 @@ struct TypeTraits
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
 	inline
 	static
-	Size
+	std::streamsize
 	precision()
 	{
 		return 0; // No precision for generic types
@@ -159,6 +164,15 @@ struct TypeTraits
 		return 0; // No minimum width for generic types
 	}
 
+	// Field Width
+	inline
+	static
+	int
+	iwidth()
+	{
+		return 0; // No minimum width for generic types
+	}
+
 }; // TypeTraits
 
 // TypeTraits: Type Traits char Specialization
@@ -166,7 +180,7 @@ template<>
 struct TypeTraits< char >
 {
 	typedef  char  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Initial Value
 	inline
@@ -196,13 +210,13 @@ struct TypeTraits< char >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
 	inline
 	static
-	Size
+	std::streamsize
 	precision()
 	{
 		return 0;
@@ -213,6 +227,15 @@ struct TypeTraits< char >
 	static
 	Size
 	width()
+	{
+		return 1;
+	}
+
+	// Field Width
+	inline
+	static
+	int
+	iwidth()
 	{
 		return 1;
 	}
@@ -224,7 +247,7 @@ template<>
 struct TypeTraits< signed char >
 {
 	typedef  signed char  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Initial Value
 	inline
@@ -254,13 +277,13 @@ struct TypeTraits< signed char >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
 	inline
 	static
-	Size
+	std::streamsize
 	precision()
 	{
 		return 0;
@@ -271,6 +294,15 @@ struct TypeTraits< signed char >
 	static
 	Size
 	width()
+	{
+		return 1;
+	}
+
+	// Field Width
+	inline
+	static
+	int
+	iwidth()
 	{
 		return 1;
 	}
@@ -282,7 +314,7 @@ template<>
 struct TypeTraits< unsigned char >
 {
 	typedef  unsigned char  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Initial Value
 	inline
@@ -312,13 +344,13 @@ struct TypeTraits< unsigned char >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
 	inline
 	static
-	Size
+	std::streamsize
 	precision()
 	{
 		return 0;
@@ -333,6 +365,15 @@ struct TypeTraits< unsigned char >
 		return 1;
 	}
 
+	// Field Width
+	inline
+	static
+	int
+	iwidth()
+	{
+		return 1;
+	}
+
 }; // TypeTraits
 
 // TypeTraits: Type Traits bool Specialization
@@ -340,7 +381,7 @@ template<>
 struct TypeTraits< bool >
 {
 	typedef  bool  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Initial Value
 	inline
@@ -370,13 +411,13 @@ struct TypeTraits< bool >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
 	inline
 	static
-	Size
+	std::streamsize
 	precision()
 	{
 		return 0;
@@ -391,6 +432,15 @@ struct TypeTraits< bool >
 		return 2;
 	}
 
+	// Field Width
+	inline
+	static
+	int
+	iwidth()
+	{
+		return 2;
+	}
+
 }; // TypeTraits
 
 // TypeTraits: Type Traits byte Specialization
@@ -398,7 +448,7 @@ template<>
 struct TypeTraits< byte >
 {
 	typedef  byte  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Initial Value
 	inline
@@ -428,13 +478,13 @@ struct TypeTraits< byte >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
 	inline
 	static
-	Size
+	std::streamsize
 	precision()
 	{
 		return 0;
@@ -445,6 +495,15 @@ struct TypeTraits< byte >
 	static
 	Size
 	width()
+	{
+		return 7;
+	}
+
+	// Field Width
+	inline
+	static
+	int
+	iwidth()
 	{
 		return 7;
 	}
@@ -456,7 +515,7 @@ template<>
 struct TypeTraits< ubyte >
 {
 	typedef  ubyte  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Initial Value
 	inline
@@ -486,13 +545,13 @@ struct TypeTraits< ubyte >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
 	inline
 	static
-	Size
+	std::streamsize
 	precision()
 	{
 		return 0;
@@ -503,6 +562,15 @@ struct TypeTraits< ubyte >
 	static
 	Size
 	width()
+	{
+		return 7;
+	}
+
+	// Field Width
+	inline
+	static
+	int
+	iwidth()
 	{
 		return 7;
 	}
@@ -514,7 +582,7 @@ template<>
 struct TypeTraits< short int >
 {
 	typedef  short int  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Initial Value
 	inline
@@ -544,13 +612,13 @@ struct TypeTraits< short int >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
 	inline
 	static
-	Size
+	std::streamsize
 	precision()
 	{
 		return 0;
@@ -561,6 +629,15 @@ struct TypeTraits< short int >
 	static
 	Size
 	width()
+	{
+		return 7;
+	}
+
+	// Field Width
+	inline
+	static
+	int
+	iwidth()
 	{
 		return 7;
 	}
@@ -572,7 +649,7 @@ template<>
 struct TypeTraits< unsigned short int >
 {
 	typedef  unsigned short int  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Initial Value
 	inline
@@ -602,13 +679,13 @@ struct TypeTraits< unsigned short int >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
 	inline
 	static
-	Size
+	std::streamsize
 	precision()
 	{
 		return 0;
@@ -623,6 +700,15 @@ struct TypeTraits< unsigned short int >
 		return 7;
 	}
 
+	// Field Width
+	inline
+	static
+	int
+	iwidth()
+	{
+		return 7;
+	}
+
 }; // TypeTraits
 
 // TypeTraits: Type Traits int Specialization
@@ -630,7 +716,7 @@ template<>
 struct TypeTraits< int >
 {
 	typedef  int  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Initial Value
 	inline
@@ -660,13 +746,13 @@ struct TypeTraits< int >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
 	inline
 	static
-	Size
+	std::streamsize
 	precision()
 	{
 		return 0;
@@ -677,6 +763,15 @@ struct TypeTraits< int >
 	static
 	Size
 	width()
+	{
+		return 12;
+	}
+
+	// Field Width
+	inline
+	static
+	int
+	iwidth()
 	{
 		return 12;
 	}
@@ -688,7 +783,7 @@ template<>
 struct TypeTraits< unsigned int >
 {
 	typedef  unsigned int  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Initial Value
 	inline
@@ -718,13 +813,13 @@ struct TypeTraits< unsigned int >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
 	inline
 	static
-	Size
+	std::streamsize
 	precision()
 	{
 		return 0;
@@ -739,6 +834,15 @@ struct TypeTraits< unsigned int >
 		return 12;
 	}
 
+	// Field Width
+	inline
+	static
+	int
+	iwidth()
+	{
+		return 12;
+	}
+
 }; // TypeTraits
 
 // TypeTraits: Type Traits long int Specialization
@@ -746,7 +850,7 @@ template<>
 struct TypeTraits< long int >
 {
 	typedef  long int  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Initial Value
 	inline
@@ -776,13 +880,13 @@ struct TypeTraits< long int >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
 	inline
 	static
-	Size
+	std::streamsize
 	precision()
 	{
 		return 0;
@@ -793,6 +897,15 @@ struct TypeTraits< long int >
 	static
 	Size
 	width()
+	{
+		return 23; // Big enough for 64-bit LP64 representation
+	}
+
+	// Field Width
+	inline
+	static
+	int
+	iwidth()
 	{
 		return 23; // Big enough for 64-bit LP64 representation
 	}
@@ -804,7 +917,7 @@ template<>
 struct TypeTraits< unsigned long int >
 {
 	typedef  unsigned long int  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Initial Value
 	inline
@@ -834,13 +947,13 @@ struct TypeTraits< unsigned long int >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
 	inline
 	static
-	Size
+	std::streamsize
 	precision()
 	{
 		return 0;
@@ -851,6 +964,15 @@ struct TypeTraits< unsigned long int >
 	static
 	Size
 	width()
+	{
+		return 23; // Big enough for 64-bit LP64 representation
+	}
+
+	// Field Width
+	inline
+	static
+	int
+	iwidth()
 	{
 		return 23; // Big enough for 64-bit LP64 representation
 	}
@@ -862,7 +984,7 @@ template<>
 struct TypeTraits< long long int >
 {
 	typedef  long long int  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Initial Value
 	inline
@@ -892,13 +1014,13 @@ struct TypeTraits< long long int >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
 	inline
 	static
-	Size
+	std::streamsize
 	precision()
 	{
 		return 0;
@@ -909,6 +1031,15 @@ struct TypeTraits< long long int >
 	static
 	Size
 	width()
+	{
+		return 23; // Big enough for 64-bit LP64 representation
+	}
+
+	// Field Width
+	inline
+	static
+	int
+	iwidth()
 	{
 		return 23; // Big enough for 64-bit LP64 representation
 	}
@@ -920,7 +1051,7 @@ template<>
 struct TypeTraits< unsigned long long int >
 {
 	typedef  unsigned long long int  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Initial Value
 	inline
@@ -950,13 +1081,13 @@ struct TypeTraits< unsigned long long int >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
 	inline
 	static
-	Size
+	std::streamsize
 	precision()
 	{
 		return 0;
@@ -971,6 +1102,15 @@ struct TypeTraits< unsigned long long int >
 		return 23; // Big enough for 64-bit LP64 representation
 	}
 
+	// Field Width
+	inline
+	static
+	int
+	iwidth()
+	{
+		return 23; // Big enough for 64-bit LP64 representation
+	}
+
 }; // TypeTraits
 
 // TypeTraits: Type Traits float Specialization
@@ -978,7 +1118,7 @@ template<>
 struct TypeTraits< float >
 {
 	typedef  float  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Initial Value
 	inline
@@ -1008,13 +1148,13 @@ struct TypeTraits< float >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
 	inline
 	static
-	Size
+	std::streamsize
 	precision()
 	{
 		return 8;
@@ -1029,6 +1169,15 @@ struct TypeTraits< float >
 		return 15;
 	}
 
+	// Field Width
+	inline
+	static
+	int
+	iwidth()
+	{
+		return 15;
+	}
+
 }; // TypeTraits
 
 // TypeTraits: Type Traits double Specialization
@@ -1036,7 +1185,7 @@ template<>
 struct TypeTraits< double >
 {
 	typedef  double  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Initial Value
 	inline
@@ -1066,13 +1215,13 @@ struct TypeTraits< double >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
 	inline
 	static
-	Size
+	std::streamsize
 	precision()
 	{
 		return 16;
@@ -1087,6 +1236,15 @@ struct TypeTraits< double >
 		return 23;
 	}
 
+	// Field Width
+	inline
+	static
+	int
+	iwidth()
+	{
+		return 23;
+	}
+
 }; // TypeTraits
 
 // TypeTraits: Type Traits long double Specialization
@@ -1094,7 +1252,7 @@ template<>
 struct TypeTraits< long double >
 {
 	typedef  long double  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Initial Value
 	inline
@@ -1124,13 +1282,13 @@ struct TypeTraits< long double >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
 	inline
 	static
-	Size
+	std::streamsize
 	precision()
 	{
 		return 33; // Big enough for 128-bit representation
@@ -1145,6 +1303,15 @@ struct TypeTraits< long double >
 		return 42; // Big enough for 128-bit representation
 	}
 
+	// Field Width
+	inline
+	static
+	int
+	iwidth()
+	{
+		return 42; // Big enough for 128-bit representation
+	}
+
 }; // TypeTraits
 
 // TypeTraits: Type Traits std::complex< float > Specialization
@@ -1153,7 +1320,7 @@ struct TypeTraits< std::complex< float > >
 {
 	typedef  float  value_type;
 	typedef  std::complex< float >  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Initial Value
 	inline
@@ -1183,13 +1350,13 @@ struct TypeTraits< std::complex< float > >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
 	inline
 	static
-	Size
+	std::streamsize
 	precision()
 	{
 		return 8;
@@ -1204,6 +1371,15 @@ struct TypeTraits< std::complex< float > >
 		return 33;
 	}
 
+	// Field Width
+	inline
+	static
+	int
+	iwidth()
+	{
+		return 33;
+	}
+
 }; // TypeTraits
 
 // TypeTraits: Type Traits std::complex< double > Specialization
@@ -1212,7 +1388,7 @@ struct TypeTraits< std::complex< double > >
 {
 	typedef  double  value_type;
 	typedef  std::complex< double >  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Initial Value
 	inline
@@ -1242,13 +1418,13 @@ struct TypeTraits< std::complex< double > >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
 	inline
 	static
-	Size
+	std::streamsize
 	precision()
 	{
 		return 16;
@@ -1263,6 +1439,15 @@ struct TypeTraits< std::complex< double > >
 		return 49;
 	}
 
+	// Field Width
+	inline
+	static
+	int
+	iwidth()
+	{
+		return 49;
+	}
+
 }; // TypeTraits
 
 // TypeTraits: Type Traits std::complex< long double > Specialization
@@ -1271,7 +1456,7 @@ struct TypeTraits< std::complex< long double > >
 {
 	typedef  long double  value_type;
 	typedef  std::complex< long double >  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Initial Value
 	inline
@@ -1301,13 +1486,13 @@ struct TypeTraits< std::complex< long double > >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT
+#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
 	}
 
 	// Precision
 	inline
 	static
-	Size
+	std::streamsize
 	precision()
 	{
 		return 33; // Big enough for 128-bit representation
@@ -1318,6 +1503,15 @@ struct TypeTraits< std::complex< long double > >
 	static
 	Size
 	width()
+	{
+		return 83; // Big enough for 128-bit representation
+	}
+
+	// Field Width
+	inline
+	static
+	int
+	iwidth()
 	{
 		return 83; // Big enough for 128-bit representation
 	}
