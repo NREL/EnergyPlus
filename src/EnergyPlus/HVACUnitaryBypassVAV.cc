@@ -2164,9 +2164,9 @@ namespace HVACUnitaryBypassVAV {
 						// based on CONTROLLER:SIMPLE TEMPANDHUMRAT control type.
 
 						// Calculate the approach temperature (difference between SA dry-bulb temp and SA dew point temp)
-						ApproachTemp = Node( CBVAV( CBVAVNum ).DXCoilOutletNode ).Temp - PsyTdpFnWPb( Node( OutletNode ).HumRat, OutdoorBaroPress, BlankString );
+						ApproachTemp = Node( CBVAV( CBVAVNum ).DXCoilOutletNode ).Temp - PsyTdpFnWPb( Node( OutletNode ).HumRat, OutdoorBaroPress );
 						// Calculate the dew point temperature at the SA humidity ratio setpoint
-						DesiredDewPoint = PsyTdpFnWPb( Node( OutletNode ).HumRatMax, OutdoorBaroPress, BlankString );
+						DesiredDewPoint = PsyTdpFnWPb( Node( OutletNode ).HumRatMax, OutdoorBaroPress );
 						// Adjust the calculated dew point temperature by the approach temp
 						CBVAV( CBVAVNum ).CoilTempSetPoint = min( CBVAV( CBVAVNum ).CoilTempSetPoint, ( DesiredDewPoint + ApproachTemp ) );
 

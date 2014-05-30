@@ -2701,6 +2701,7 @@ namespace ZoneEquipmentManager {
 				EquipPtr = PrioritySimOrder( EquipTypeNum ).EquipPtr;
 				SysOutputProvided = 0.0;
 				LatOutputProvided = 0.0;
+				DataCoolCoilCap = 0.0; // reset global variable used only for heat pumps (i.e., DX cooling and heating coils)
 
 				ZoneEquipTypeNum = PrioritySimOrder( EquipTypeNum ).EquipType_Num;
 
@@ -3540,7 +3541,7 @@ namespace ZoneEquipmentManager {
 
 				for ( SurfNum = Zone( ActualZoneNum ).SurfaceFirst; SurfNum <= Zone( ActualZoneNum ).SurfaceLast; ++SurfNum ) {
 					if ( SurfaceWindow( SurfNum ).AirflowThisTS > 0.0 && SurfaceWindow( SurfNum ).AirflowDestination == AirFlowWindow_Destination_ReturnAir ) {
-						FlowThisTS = PsyRhoAirFnPbTdbW( OutBaroPress, SurfaceWindow( SurfNum ).TAirflowGapOutlet, Node( ZoneNode ).HumRat, BlankString ) * SurfaceWindow( SurfNum ).AirflowThisTS * Surface( SurfNum ).Width;
+						FlowThisTS = PsyRhoAirFnPbTdbW( OutBaroPress, SurfaceWindow( SurfNum ).TAirflowGapOutlet, Node( ZoneNode ).HumRat ) * SurfaceWindow( SurfNum ).AirflowThisTS * Surface( SurfNum ).Width;
 						WinGapFlowToRA += FlowThisTS;
 						WinGapFlowTtoRA += FlowThisTS * SurfaceWindow( SurfNum ).TAirflowGapOutlet;
 					}
@@ -3593,7 +3594,7 @@ namespace ZoneEquipmentManager {
 				Node( ReturnNode ).Press = Node( ZoneNode ).Press;
 
 				H2OHtOfVap = PsyHgAirFnWTdb( Node( ZoneNode ).HumRat, Node( ReturnNode ).Temp );
-				RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ReturnNode ).Temp, Node( ZoneNode ).HumRat, BlankString );
+				RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ReturnNode ).Temp, Node( ZoneNode ).HumRat );
 
 				// Include impact of under case returns for refrigerated display case when updating the return air node humidity
 				if ( ! Zone( ActualZoneNum ).NoHeatToReturnAir ) {

@@ -556,7 +556,7 @@ namespace ThermalChimney {
 				AbsorberWallWidthTC = ThermalChimneySys( Loop ).AbsorberWallWidth;
 			}
 
-			AirDensityThermalChim = PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), BlankString );
+			AirDensityThermalChim = PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ) );
 			AirSpecHeatThermalChim = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) );
 			AirOutletCrossAreaTC = ThermalChimneySys( Loop ).AirOutletCrossArea;
 			DischargeCoeffTC = ThermalChimneySys( Loop ).DischargeCoeff;
@@ -663,7 +663,7 @@ namespace ThermalChimney {
 			// Now assignment of the overall mass flow rate into each zone
 			for ( TCZoneNum = 1; TCZoneNum <= ThermalChimneySys( Loop ).TotZoneToDistrib; ++TCZoneNum ) {
 				TCZoneNumCounter = ThermalChimneySys( Loop ).ZonePtr( TCZoneNum );
-				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, MAT( TCZoneNumCounter ), ZoneAirHumRat( TCZoneNumCounter ), BlankString );
+				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, MAT( TCZoneNumCounter ), ZoneAirHumRat( TCZoneNumCounter ) );
 				CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( TCZoneNumCounter ), MAT( TCZoneNumCounter ) );
 				MCPThermChim( TCZoneNumCounter ) = TCVolumeAirFlowRate * AirDensity * CpAir * ThermalChimneySys( Loop ).RatioThermChimAirFlow( TCZoneNum );
 				if ( MCPThermChim( TCZoneNumCounter ) <= 0.0 ) {
@@ -754,7 +754,7 @@ namespace ThermalChimney {
 		for ( ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop ) { // Start of zone loads report variable update loop ...
 
 			// Break the infiltration load into heat gain and loss components.
-			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneLoop ), ZoneAirHumRat( ZoneLoop ), BlankString );
+			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneLoop ), ZoneAirHumRat( ZoneLoop ) );
 			CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneLoop ), MAT( ZoneLoop ) );
 			ZnRptThermChim( ZoneLoop ).ThermalChimneyVolume = ( MCPThermChim( ZoneLoop ) / CpAir / AirDensity ) * TSMult;
 			ZnRptThermChim( ZoneLoop ).ThermalChimneyMass = ( MCPThermChim( ZoneLoop ) / CpAir ) * TSMult;

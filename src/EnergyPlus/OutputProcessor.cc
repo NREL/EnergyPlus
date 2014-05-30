@@ -643,7 +643,7 @@ namespace OutputProcessor {
 		FArray1D_int TmpReportList;
 
 		for ( Loop = MinIndx; Loop <= MaxIndx; ++Loop ) {
-			if ( ReqRepVars( Loop ).Key != BlankString ) continue;
+			if ( ! ReqRepVars( Loop ).Key.empty() ) continue;
 			if ( ! SameString( ReqRepVars( Loop ).VarName, VariableName ) ) continue;
 
 			//   A match.  Make sure doesnt duplicate
@@ -2146,7 +2146,7 @@ namespace OutputProcessor {
 	void
 	GetStandardMeterResourceType(
 		std::string & OutResourceType,
-		std::string const & UserInputResourceType,
+		std::string const & UserInputResourceType, // Passed uppercase
 		bool & ErrorsFound
 	)
 	{
@@ -2187,148 +2187,148 @@ namespace OutputProcessor {
 
 		ErrorsFound = false;
 
-		//!!! Basic ResourceType for Meters
+		// Basic ResourceType for Meters
 		{ auto const meterType( UserInputResourceType );
 
-		if ( SameString(meterType, "ELECTRICITY") || SameString(meterType, "ELECTRIC") || SameString(meterType, "ELEC") ) {
+		if ( meterType == "ELECTRICITY" || meterType == "ELECTRIC" || meterType == "ELEC" ) {
 			OutResourceType = "Electricity";
 
-		} else if ( SameString(meterType, "GAS") || SameString(meterType, "NATURALGAS") || SameString(meterType, "NATURAL GAS") ) {
+		} else if ( meterType == "GAS" || meterType == "NATURALGAS" || meterType == "NATURAL GAS" ) {
 			OutResourceType = "Gas";
 
-		} else if ( SameString(meterType, "GASOLINE") ) {
+		} else if ( meterType == "GASOLINE" ) {
 			OutResourceType = "Gasoline";
 
-		} else if ( SameString(meterType, "DIESEL") ) {
+		} else if ( meterType == "DIESEL" ) {
 			OutResourceType = "Diesel";
 
-		} else if ( SameString(meterType, "COAL") ) {
+		} else if ( meterType == "COAL" ) {
 			OutResourceType = "Coal";
 
-		} else if ( SameString(meterType, "FUEL OIL #1") || SameString(meterType, "FUELOIL#1") || SameString(meterType, "FUEL OIL") || SameString(meterType, "DISTILLATE OIL") ) {
+		} else if ( meterType == "FUEL OIL #1" || meterType == "FUELOIL#1" || meterType == "FUEL OIL" || meterType == "DISTILLATE OIL" ) {
 			OutResourceType = "FuelOil#1";
 
-		} else if ( SameString(meterType, "FUEL OIL #2") || SameString(meterType, "FUELOIL#2") || SameString(meterType, "RESIDUAL OIL") ) {
+		} else if ( meterType == "FUEL OIL #2" || meterType == "FUELOIL#2" || meterType == "RESIDUAL OIL" ) {
 			OutResourceType = "FuelOil#2";
 
-		} else if ( SameString(meterType, "PROPANE") || SameString(meterType, "LPG") || SameString(meterType, "PROPANEGAS") || SameString(meterType, "PROPANE GAS") ) {
+		} else if ( meterType == "PROPANE" || meterType == "LPG" || meterType == "PROPANEGAS" || meterType == "PROPANE GAS" ) {
 			OutResourceType = "Propane";
 
-		} else if ( SameString(meterType, "WATER") || SameString(meterType, "H2O") ) {
+		} else if ( meterType == "WATER" || meterType == "H2O" ) {
 			OutResourceType = "Water"; // this is water "use"
 
-		} else if ( SameString(meterType, "ONSITEWATER") || SameString(meterType, "WATERPRODUCED") || SameString(meterType, "ONSITE WATER") ) {
+		} else if ( meterType == "ONSITEWATER" || meterType == "WATERPRODUCED" || meterType == "ONSITE WATER" ) {
 			OutResourceType = "OnSiteWater"; // these are for supply record keeping
 
-		} else if ( SameString(meterType, "MAINSWATER") || SameString(meterType, "WATERSUPPLY") ) {
+		} else if ( meterType == "MAINSWATER" || meterType == "WATERSUPPLY" ) {
 			OutResourceType = "MainsWater"; // record keeping
 
-		} else if ( SameString(meterType, "RAINWATER") || SameString(meterType, "PRECIPITATION") ) {
+		} else if ( meterType == "RAINWATER" || meterType == "PRECIPITATION" ) {
 			OutResourceType = "RainWater"; // record keeping
 
-		} else if ( SameString(meterType, "WELLWATER") || SameString(meterType, "GROUNDWATER") ) {
+		} else if ( meterType == "WELLWATER" || meterType == "GROUNDWATER" ) {
 			OutResourceType = "WellWater"; // record keeping
 
-		} else if ( SameString(meterType, "CONDENSATE") ) {
+		} else if ( meterType == "CONDENSATE" ) {
 			OutResourceType = "Condensate"; // record keeping
 
-		} else if ( SameString(meterType, "ENERGYTRANSFER") || SameString(meterType, "ENERGYXFER") || SameString(meterType, "XFER") ) {
+		} else if ( meterType == "ENERGYTRANSFER" || meterType == "ENERGYXFER" || meterType == "XFER" ) {
 			OutResourceType = "EnergyTransfer";
 
-		} else if ( SameString(meterType, "STEAM") ) {
+		} else if ( meterType == "STEAM" ) {
 			OutResourceType = "Steam";
 
-		} else if ( SameString(meterType, "DISTRICTCOOLING") ) {
+		} else if ( meterType == "DISTRICTCOOLING" ) {
 			OutResourceType = "DistrictCooling";
 
-		} else if ( SameString(meterType, "DISTRICTHEATING") ) {
+		} else if ( meterType == "DISTRICTHEATING" ) {
 			OutResourceType = "DistrictHeating";
 
-		} else if ( SameString(meterType, "ELECTRICITYPRODUCED") ) {
+		} else if ( meterType == "ELECTRICITYPRODUCED" ) {
 			OutResourceType = "ElectricityProduced";
 
-		} else if ( SameString(meterType, "ELECTRICITYPURCHASED") ) {
+		} else if ( meterType == "ELECTRICITYPURCHASED" ) {
 			OutResourceType = "ElectricityPurchased";
 
-		} else if ( SameString(meterType, "ELECTRICITYSURPLUSSOLD") ) {
+		} else if ( meterType == "ELECTRICITYSURPLUSSOLD" ) {
 			OutResourceType = "ElectricitySurplusSold";
 
-		} else if ( SameString(meterType, "ELECTRICITYNET") ) {
+		} else if ( meterType == "ELECTRICITYNET" ) {
 			OutResourceType = "ElectricityNet";
 
-		} else if ( SameString(meterType, "SOLARWATER") ) {
+		} else if ( meterType == "SOLARWATER" ) {
 			OutResourceType = "SolarWater";
 
-		} else if ( SameString(meterType, "SOLARAIR") ) {
+		} else if ( meterType == "SOLARAIR" ) {
 			OutResourceType = "SolarAir";
 
-		} else if ( SameString(meterType, "SO2") ) {
+		} else if ( meterType == "SO2" ) {
 			OutResourceType = "SO2";
 
-		} else if ( SameString(meterType, "NOX") ) {
+		} else if ( meterType == "NOX" ) {
 			OutResourceType = "NOx";
 
-		} else if ( SameString(meterType, "N2O") ) {
+		} else if ( meterType == "N2O" ) {
 			OutResourceType = "N2O";
 
-		} else if ( SameString(meterType, "PM") ) {
+		} else if ( meterType == "PM" ) {
 			OutResourceType = "PM";
 
-		} else if ( SameString(meterType, "PM2.5") ) {
+		} else if ( meterType == "PM2.5" ) {
 			OutResourceType = "PM2.5";
 
-		} else if ( SameString(meterType, "PM10") ) {
+		} else if ( meterType == "PM10" ) {
 			OutResourceType = "PM10";
 
-		} else if ( SameString(meterType, "CO") ) {
+		} else if ( meterType == "CO" ) {
 			OutResourceType = "CO";
 
-		} else if ( SameString(meterType, "CO2") ) {
+		} else if ( meterType == "CO2" ) {
 			OutResourceType = "CO2";
 
-		} else if ( SameString(meterType, "CH4") ) {
+		} else if ( meterType == "CH4" ) {
 			OutResourceType = "CH4";
 
-		} else if ( SameString(meterType, "NH3") ) {
+		} else if ( meterType == "NH3" ) {
 			OutResourceType = "NH3";
 
-		} else if ( SameString(meterType, "NMVOC") ) {
+		} else if ( meterType == "NMVOC" ) {
 			OutResourceType = "NMVOC";
 
-		} else if ( SameString(meterType, "HG") ) {
+		} else if ( meterType == "HG" ) {
 			OutResourceType = "Hg";
 
-		} else if ( SameString(meterType, "PB") ) {
+		} else if ( meterType == "PB" ) {
 			OutResourceType = "Pb";
 
-		} else if ( SameString(meterType, "NUCLEAR HIGH") ) {
+		} else if ( meterType == "NUCLEAR HIGH" ) {
 			OutResourceType = "Nuclear High";
 
-		} else if ( SameString(meterType, "NUCLEAR LOW") ) {
+		} else if ( meterType == "NUCLEAR LOW" ) {
 			OutResourceType = "Nuclear Low";
 
-		} else if ( SameString(meterType, "WATERENVIRONMENTALFACTORS") ) {
+		} else if ( meterType == "WATERENVIRONMENTALFACTORS" ) {
 			OutResourceType = "WaterEnvironmentalFactors";
 
-		} else if ( SameString(meterType, "CARBON EQUIVALENT") ) {
+		} else if ( meterType == "CARBON EQUIVALENT" ) {
 			OutResourceType = "Carbon Equivalent";
 
-		} else if ( SameString(meterType, "SOURCE") ) {
+		} else if ( meterType == "SOURCE" ) {
 			OutResourceType = "Source";
 
-		} else if ( SameString(meterType, "PLANTLOOPHEATINGDEMAND") ) {
+		} else if ( meterType == "PLANTLOOPHEATINGDEMAND" ) {
 			OutResourceType = "PlantLoopHeatingDemand";
 
-		} else if ( SameString(meterType, "PLANTLOOPCOOLINGDEMAND") ) {
+		} else if ( meterType == "PLANTLOOPCOOLINGDEMAND" ) {
 			OutResourceType = "PlantLoopCoolingDemand";
 
-		} else if ( SameString(meterType, "GENERIC") ) { // only used by custom meters
+		} else if ( meterType == "GENERIC" ) { // only used by custom meters
 			OutResourceType = "Generic";
 
-		} else if ( SameString(meterType, "OTHERFUEL1") ) { // other fuel type (defined by user)
+		} else if ( meterType == "OTHERFUEL1" ) { // other fuel type (defined by user)
 			OutResourceType = "OtherFuel1";
 
-		} else if ( SameString(meterType, "OTHERFUEL2") ) { // other fuel type (defined by user)
+		} else if ( meterType == "OTHERFUEL2" ) { // other fuel type (defined by user)
 			OutResourceType = "OtherFuel2";
 
 		} else {
@@ -2469,7 +2469,7 @@ namespace OutputProcessor {
 		} else {
 			ShowFatalError( "Requested to Add Meter which was already present=" + Name );
 		}
-		if ( ResourceType != BlankString ) {
+		if ( ! ResourceType.empty() ) {
 			DetermineMeterIPUnits( EnergyMeters( NumEnergyMeters ).RT_forIPUnits, ResourceType, MtrUnits, errFlag );
 			if ( errFlag ) {
 				ShowContinueError( "..on Meter=\"" + Name + "\"." );
@@ -2562,7 +2562,7 @@ namespace OutputProcessor {
 			++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
 			VarMeterArrays( NumVarMeterArrays ).OnMeters( VarMeterArrays( NumVarMeterArrays ).NumOnMeters ) = Found;
 		}
-		if ( Group != BlankString ) {
+		if ( ! Group.empty() ) {
 			Found = FindItem( ResourceType + ':' + Group, EnergyMeters.Name(), NumEnergyMeters );
 			if ( Found != 0 ) {
 				++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
@@ -2578,7 +2578,7 @@ namespace OutputProcessor {
 		}
 
 		//!! Following if EndUse is by ResourceType
-		if ( EndUse != BlankString ) {
+		if ( ! EndUse.empty() ) {
 			Found = FindItem( EndUse + ':' + ResourceType, EnergyMeters.Name(), NumEnergyMeters );
 			if ( Found != 0 ) {
 				++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
@@ -2593,7 +2593,7 @@ namespace OutputProcessor {
 			}
 
 			// End use subcategory
-			if ( EndUseSub != BlankString ) {
+			if ( ! EndUseSub.empty() ) {
 				Found = FindItem( EndUseSub + ':' + EndUse + ':' + ResourceType, EnergyMeters.Name(), NumEnergyMeters );
 				if ( Found != 0 ) {
 					++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
@@ -2755,7 +2755,7 @@ namespace OutputProcessor {
 		std::string MeterName;
 
 		LocalErrorsFound = false;
-		//!!! Basic ResourceType Meters
+		// Basic ResourceType Meters
 		GetStandardMeterResourceType( ResourceType, MakeUPPERCase( ResourceType ), LocalErrorsFound );
 
 		if ( ! LocalErrorsFound ) {
@@ -2767,18 +2767,18 @@ namespace OutputProcessor {
 			if ( Found == 0 ) AddMeter( ResourceType + ":Facility", MtrUnits, ResourceType, "", "", "" );
 		}
 
-		//!!!  Group Meters
-		{ auto const groupMeter( Group );
+		//!  Group Meters
+		{ auto const groupMeter( uppercased( Group ) );
 
-		if ( SameString(groupMeter, BlankString) ) {
+		if ( groupMeter.empty() ) {
 
-		} else if ( SameString(groupMeter, "BUILDING") ) {
+		} else if ( groupMeter == "BUILDING" ) {
 			Group = "Building";
 
-		} else if ( SameString(groupMeter, "HVAC") || SameString(groupMeter, "SYSTEM") ) {
+		} else if ( groupMeter == "HVAC" || groupMeter == "SYSTEM" ) {
 			Group = "HVAC";
 
-		} else if ( SameString(groupMeter, "PLANT") ) {
+		} else if ( groupMeter == "PLANT" ) {
 			Group = "Plant";
 
 		} else {
@@ -2787,7 +2787,7 @@ namespace OutputProcessor {
 
 		}}
 
-		if ( ! LocalErrorsFound && Group != BlankString ) {
+		if ( ! LocalErrorsFound && ! Group.empty() ) {
 			Found = FindItem( ResourceType + ':' + Group, EnergyMeters.Name(), NumEnergyMeters );
 			if ( Found == 0 ) AddMeter( ResourceType + ':' + Group, MtrUnits, ResourceType, "", "", Group );
 			if ( Group == "Building" ) {
@@ -2799,155 +2799,155 @@ namespace OutputProcessor {
 		}
 
 		//!!! EndUse Meters
-		{ auto const endUseMeter( EndUse );
+		{ auto const endUseMeter( uppercased( EndUse ) );
 
-		if ( SameString(endUseMeter, BlankString) ) {
+		if ( endUseMeter.empty() ) {
 
-		} else if ( SameString(endUseMeter, "INTERIOR LIGHTS") || SameString(endUseMeter, "INTERIORLIGHTS") ) {
+		} else if ( endUseMeter == "INTERIOR LIGHTS" || endUseMeter == "INTERIORLIGHTS" ) {
 			EndUse = "InteriorLights";
 
-		} else if ( SameString(endUseMeter, "EXTERIOR LIGHTS") || SameString(endUseMeter, "EXTERIORLIGHTS") ) {
+		} else if ( endUseMeter == "EXTERIOR LIGHTS" || endUseMeter == "EXTERIORLIGHTS" ) {
 			EndUse = "ExteriorLights";
 
-		} else if ( SameString(endUseMeter, "HEATING") || SameString(endUseMeter, "HTG") ) {
+		} else if ( endUseMeter == "HEATING" || endUseMeter == "HTG" ) {
 			EndUse = "Heating";
 
-		} else if ( SameString(endUseMeter, "HEATPRODUCED") ) {
+		} else if ( endUseMeter == "HEATPRODUCED" ) {
 			EndUse = "HeatProduced";
 
-		} else if ( SameString(endUseMeter, "COOLING") || SameString(endUseMeter, "CLG") ) {
+		} else if ( endUseMeter == "COOLING" || endUseMeter == "CLG" ) {
 			EndUse = "Cooling";
 
-		} else if ( SameString(endUseMeter, "DOMESTICHOTWATER") || SameString(endUseMeter, "DHW") || SameString(endUseMeter, "DOMESTIC HOT WATER") ) {
+		} else if ( endUseMeter == "DOMESTICHOTWATER" || endUseMeter == "DHW" || endUseMeter == "DOMESTIC HOT WATER" ) {
 			EndUse = "WaterSystems";
 
-		} else if ( SameString(endUseMeter, "COGEN") || SameString(endUseMeter, "COGENERATION") ) {
+		} else if ( endUseMeter == "COGEN" || endUseMeter == "COGENERATION" ) {
 			EndUse = "Cogeneration";
 
-		} else if ( SameString(endUseMeter, "INTERIOREQUIPMENT") || SameString(endUseMeter, "INTERIOR EQUIPMENT") ) {
+		} else if ( endUseMeter == "INTERIOREQUIPMENT" || endUseMeter == "INTERIOR EQUIPMENT" ) {
 			EndUse = "InteriorEquipment";
 
-		} else if ( SameString(endUseMeter, "EXTERIOREQUIPMENT") || SameString(endUseMeter, "EXTERIOR EQUIPMENT") || SameString(endUseMeter, "EXT EQ") || SameString(endUseMeter, "EXTERIOREQ") ) {
+		} else if ( endUseMeter == "EXTERIOREQUIPMENT" || endUseMeter == "EXTERIOR EQUIPMENT" || endUseMeter == "EXT EQ" || endUseMeter == "EXTERIOREQ" ) {
 			EndUse = "ExteriorEquipment";
 
-		} else if ( SameString(endUseMeter, "EXTERIOR:WATEREQUIPMENT") ) {
+		} else if ( endUseMeter == "EXTERIOR:WATEREQUIPMENT" ) {
 			EndUse = "ExteriorEquipment";
 
-		} else if ( SameString(endUseMeter, "PURCHASEDHOTWATER") || SameString(endUseMeter, "DISTRICTHOTWATER") || SameString(endUseMeter, "PURCHASED HEATING") ) {
+		} else if ( endUseMeter == "PURCHASEDHOTWATER" || endUseMeter == "DISTRICTHOTWATER" || endUseMeter == "PURCHASED HEATING" ) {
 			EndUse = "DistrictHotWater";
 
-		} else if ( SameString(endUseMeter, "PURCHASEDCOLDWATER") || SameString(endUseMeter, "DISTRICTCHILLEDWATER") || SameString(endUseMeter, "PURCHASEDCHILLEDWATER") || SameString(endUseMeter, "PURCHASED COLD WATER") || SameString(endUseMeter, "PURCHASED COOLING") ) {
+		} else if ( endUseMeter == "PURCHASEDCOLDWATER" || endUseMeter == "DISTRICTCHILLEDWATER" || endUseMeter == "PURCHASEDCHILLEDWATER" || endUseMeter == "PURCHASED COLD WATER" || endUseMeter == "PURCHASED COOLING" ) {
 			EndUse = "DistrictChilledWater";
 
-		} else if ( SameString(endUseMeter, "FANS") || SameString(endUseMeter, "FAN") ) {
+		} else if ( endUseMeter == "FANS" || endUseMeter == "FAN" ) {
 			EndUse = "Fans";
 
-		} else if ( SameString(endUseMeter, "HEATINGCOILS") || SameString(endUseMeter, "HEATINGCOIL") || SameString(endUseMeter, "HEATING COILS") || SameString(endUseMeter, "HEATING COIL") ) {
+		} else if ( endUseMeter == "HEATINGCOILS" || endUseMeter == "HEATINGCOIL" || endUseMeter == "HEATING COILS" || endUseMeter == "HEATING COIL" ) {
 			EndUse = "HeatingCoils";
 
-		} else if ( SameString(endUseMeter, "COOLINGCOILS") || SameString(endUseMeter, "COOLINGCOIL") || SameString(endUseMeter, "COOLING COILS") || SameString(endUseMeter, "COOLING COIL") ) {
+		} else if ( endUseMeter == "COOLINGCOILS" || endUseMeter == "COOLINGCOIL" || endUseMeter == "COOLING COILS" || endUseMeter == "COOLING COIL" ) {
 			EndUse = "CoolingCoils";
 
-		} else if ( SameString(endUseMeter, "PUMPS") || SameString(endUseMeter, "PUMP") ) {
+		} else if ( endUseMeter == "PUMPS" || endUseMeter == "PUMP" ) {
 			EndUse = "Pumps";
 
-		} else if ( SameString(endUseMeter, "FREECOOLING") || SameString(endUseMeter, "FREE COOLING") ) {
+		} else if ( endUseMeter == "FREECOOLING" || endUseMeter == "FREE COOLING" ) {
 			EndUse = "Freecooling";
 
-		} else if ( SameString(endUseMeter, "LOOPTOLOOP") ) {
+		} else if ( endUseMeter == "LOOPTOLOOP" ) {
 			EndUse = "LoopToLoop";
 
-		} else if ( SameString(endUseMeter, "CHILLERS") || SameString(endUseMeter, "CHILLER") ) {
+		} else if ( endUseMeter == "CHILLERS" || endUseMeter == "CHILLER" ) {
 			EndUse = "Chillers";
 
-		} else if ( SameString(endUseMeter, "BOILERS") || SameString(endUseMeter, "BOILER") ) {
+		} else if ( endUseMeter == "BOILERS" || endUseMeter == "BOILER" ) {
 			EndUse = "Boilers";
 
-		} else if ( SameString(endUseMeter, "BASEBOARD") || SameString(endUseMeter, "BASEBOARDS") ) {
+		} else if ( endUseMeter == "BASEBOARD" || endUseMeter == "BASEBOARDS" ) {
 			EndUse = "Baseboard";
 
-		} else if ( SameString(endUseMeter, "HEATREJECTION") || SameString(endUseMeter, "HEAT REJECTION") ) {
+		} else if ( endUseMeter == "HEATREJECTION" || endUseMeter == "HEAT REJECTION" ) {
 			EndUse = "HeatRejection";
 
-		} else if ( SameString(endUseMeter, "HUMIDIFIER") || SameString(endUseMeter, "HUMIDIFIERS") ) {
+		} else if ( endUseMeter == "HUMIDIFIER" || endUseMeter == "HUMIDIFIERS" ) {
 			EndUse = "Humidifier";
 
-		} else if ( SameString(endUseMeter, "HEATRECOVERY") || SameString(endUseMeter, "HEAT RECOVERY") ) {
+		} else if ( endUseMeter == "HEATRECOVERY" || endUseMeter == "HEAT RECOVERY" ) {
 			EndUse = "HeatRecovery";
 
-		} else if ( SameString(endUseMeter, "PHOTOVOLTAICS") || SameString(endUseMeter, "PV") || SameString(endUseMeter, "PHOTOVOLTAIC") ) {
+		} else if ( endUseMeter == "PHOTOVOLTAICS" || endUseMeter == "PV" || endUseMeter == "PHOTOVOLTAIC" ) {
 			EndUse = "Photovoltaic";
 
-		} else if ( SameString(endUseMeter, "WINDTURBINES") || SameString(endUseMeter, "WT") || SameString(endUseMeter, "WINDTURBINE") ) {
+		} else if ( endUseMeter == "WINDTURBINES" || endUseMeter == "WT" || endUseMeter == "WINDTURBINE" ) {
 			EndUse = "WindTurbine";
 
-		} else if ( SameString(endUseMeter, "HEAT RECOVERY FOR COOLING") || SameString(endUseMeter, "HEATRECOVERYFORCOOLING") || SameString(endUseMeter, "HEATRECOVERYCOOLING") ) {
+		} else if ( endUseMeter == "HEAT RECOVERY FOR COOLING" || endUseMeter == "HEATRECOVERYFORCOOLING" || endUseMeter == "HEATRECOVERYCOOLING" ) {
 			EndUse = "HeatRecoveryForCooling";
 
-		} else if ( SameString(endUseMeter, "HEAT RECOVERY FOR HEATING") || SameString(endUseMeter, "HEATRECOVERYFORHEATING") || SameString(endUseMeter, "HEATRECOVERYHEATING") ) {
+		} else if ( endUseMeter == "HEAT RECOVERY FOR HEATING" || endUseMeter == "HEATRECOVERYFORHEATING" || endUseMeter == "HEATRECOVERYHEATING" ) {
 			EndUse = "HeatRecoveryForHeating";
 
-		} else if ( SameString(endUseMeter, "ELECTRICEMISSIONS") ) {
+		} else if ( endUseMeter == "ELECTRICEMISSIONS" ) {
 			EndUse = "ElectricEmissions";
 
-		} else if ( SameString(endUseMeter, "PURCHASEDELECTRICEMISSIONS") ) {
+		} else if ( endUseMeter == "PURCHASEDELECTRICEMISSIONS" ) {
 			EndUse = "PurchasedElectricEmissions";
 
-		} else if ( SameString(endUseMeter, "SOLDELECTRICEMISSIONS") ) {
+		} else if ( endUseMeter == "SOLDELECTRICEMISSIONS" ) {
 			EndUse = "SoldElectricEmissions";
 
-		} else if ( SameString(endUseMeter, "NATURALGASEMISSIONS") ) {
+		} else if ( endUseMeter == "NATURALGASEMISSIONS" ) {
 			EndUse = "NaturalGasEmissions";
 
-		} else if ( SameString(endUseMeter, "FUELOIL#1EMISSIONS") ) {
+		} else if ( endUseMeter == "FUELOIL#1EMISSIONS" ) {
 			EndUse = "FuelOil#1Emissions";
 
-		} else if ( SameString(endUseMeter, "FUELOIL#2EMISSIONS") ) {
+		} else if ( endUseMeter == "FUELOIL#2EMISSIONS" ) {
 			EndUse = "FuelOil#2Emissions";
 
-		} else if ( SameString(endUseMeter, "COALEMISSIONS") ) {
+		} else if ( endUseMeter == "COALEMISSIONS" ) {
 			EndUse = "CoalEmissions";
 
-		} else if ( SameString(endUseMeter, "GASOLINEEMISSIONS") ) {
+		} else if ( endUseMeter == "GASOLINEEMISSIONS" ) {
 			EndUse = "GasolineEmissions";
 
-		} else if ( SameString(endUseMeter, "PROPANEEMISSIONS") ) {
+		} else if ( endUseMeter == "PROPANEEMISSIONS" ) {
 			EndUse = "PropaneEmissions";
 
-		} else if ( SameString(endUseMeter, "DIESELEMISSIONS") ) {
+		} else if ( endUseMeter == "DIESELEMISSIONS" ) {
 			EndUse = "DieselEmissions";
 
-		} else if ( SameString(endUseMeter, "OTHERFUEL1EMISSIONS") ) {
+		} else if ( endUseMeter == "OTHERFUEL1EMISSIONS" ) {
 			EndUse = "OtherFuel1Emissions";
 
-		} else if ( SameString(endUseMeter, "OTHERFUEL2EMISSIONS") ) {
+		} else if ( endUseMeter == "OTHERFUEL2EMISSIONS" ) {
 			EndUse = "OtherFuel2Emissions";
 
-		} else if ( SameString(endUseMeter, "CARBONEQUIVALENTEMISSIONS") ) {
+		} else if ( endUseMeter == "CARBONEQUIVALENTEMISSIONS" ) {
 			EndUse = "CarbonEquivalentEmissions";
 
-		} else if ( SameString(endUseMeter, "REFRIGERATION") ) {
+		} else if ( endUseMeter == "REFRIGERATION" ) {
 			EndUse = "Refrigeration";
 
-		} else if ( SameString(endUseMeter, "COLDSTORAGECHARGE") ) {
+		} else if ( endUseMeter == "COLDSTORAGECHARGE" ) {
 			EndUse = "ColdStorageCharge";
 
-		} else if ( SameString(endUseMeter, "COLDSTORAGEDISCHARGE") ) {
+		} else if ( endUseMeter == "COLDSTORAGEDISCHARGE" ) {
 			EndUse = "ColdStorageDischarge";
 
-		} else if ( SameString(endUseMeter, "WATERSYSTEMS") || SameString(endUseMeter, "WATERSYSTEM") || SameString(endUseMeter, "Water System") ) {
+		} else if ( endUseMeter == "WATERSYSTEMS" || endUseMeter == "WATERSYSTEM" || endUseMeter == "Water System" ) {
 			EndUse = "WaterSystems";
 
-		} else if ( SameString(endUseMeter, "RAINWATER") ) {
+		} else if ( endUseMeter == "RAINWATER" ) {
 			EndUse = "Rainwater";
 
-		} else if ( SameString(endUseMeter, "CONDENSATE") ) {
+		} else if ( endUseMeter == "CONDENSATE" ) {
 			EndUse = "Condensate";
 
-		} else if ( SameString(endUseMeter, "WELLWATER") ) {
+		} else if ( endUseMeter == "WELLWATER" ) {
 			EndUse = "Wellwater";
 
-		} else if ( SameString(endUseMeter, "MAINSWATER") || SameString(endUseMeter, "PURCHASEDWATER") ) {
+		} else if ( endUseMeter == "MAINSWATER" || endUseMeter == "PURCHASEDWATER" ) {
 			EndUse = "MainsWater";
 
 		} else {
@@ -2957,7 +2957,7 @@ namespace OutputProcessor {
 		}}
 
 		//!! Following if we do EndUse by ResourceType
-		if ( ! LocalErrorsFound && EndUse != BlankString ) {
+		if ( ! LocalErrorsFound && ! EndUse.empty() ) {
 			Found = FindItem( EndUse + ':' + ResourceType, EnergyMeters.Name(), NumEnergyMeters );
 			if ( Found == 0 ) AddMeter( EndUse + ':' + ResourceType, MtrUnits, ResourceType, EndUse, "", "" );
 
@@ -2972,7 +2972,7 @@ namespace OutputProcessor {
 		}
 
 		// End-Use Subcategories
-		if ( ! LocalErrorsFound && EndUseSub != BlankString ) {
+		if ( ! LocalErrorsFound && ! EndUseSub.empty() ) {
 			MeterName = EndUseSub + ':' + EndUse + ':' + ResourceType;
 			Found = FindItem( MeterName, EnergyMeters.Name(), NumEnergyMeters );
 			if ( Found == 0 ) AddMeter( MeterName, MtrUnits, ResourceType, EndUse, EndUseSub, "" );
@@ -5406,7 +5406,7 @@ SetupOutputVariable(
 		if ( Loop == 1 && VariableType == SummedVar ) {
 			++NumOfRVariable_Sum;
 			if ( present( ResourceTypeKey ) ) {
-				if ( ResourceTypeKey != BlankString ) ++NumOfRVariable_Meter;
+				if ( ! ResourceTypeKey().empty() ) ++NumOfRVariable_Meter;
 			}
 		}
 		if ( NumOfRVariable > MaxRVariable ) {

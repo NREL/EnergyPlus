@@ -422,7 +422,7 @@ namespace SimulationManager {
 				strip( DayOfSimChr );
 				if ( ! WarmupFlag ) {
 					++CurrentOverallSimDay;
-					DisplaySimDaysProgress( CurrentOverallSimDay, TotalOverallSimDays );
+//					DisplaySimDaysProgress( CurrentOverallSimDay, TotalOverallSimDays ); // Doesn't do anything!
 				} else {
 					DayOfSimChr = "0";
 				}
@@ -869,7 +869,7 @@ namespace SimulationManager {
 					//             TRIM(Alphas(NumA))//'', prior set=true for this condition reverts to false.')
 					//        ENDIF
 					//        CreateMinimalSurfaceVariables=.FALSE.
-				} else if ( Alphas( NumA ) != BlankString ) {
+				} else if ( ! Alphas( NumA ).empty() ) {
 					ShowWarningError( "GetProjectData: " + CurrentModuleObject + "=\"" + Alphas( NumA ) + "\", Invalid value for field, entered value ignored." );
 				}
 			}
@@ -2582,7 +2582,7 @@ namespace SimulationManager {
 		Threading = true;
 
 		get_environment_variable( cNumThreads, cEnvValue );
-		if ( cEnvValue != BlankString ) {
+		if ( ! cEnvValue.empty() ) {
 			lEnvSetThreadsInput = true;
 			{ IOFlags flags; gio::read( cEnvValue, "*", flags ) >> iEnvSetThreads; ios = flags.ios(); }
 			if ( ios != 0 ) iEnvSetThreads = MaxNumberOfThreads;
@@ -2590,7 +2590,7 @@ namespace SimulationManager {
 		}
 
 		get_environment_variable( cepNumThreads, cEnvValue );
-		if ( cEnvValue != BlankString ) {
+		if ( ! cEnvValue.empty() ) {
 			lepSetThreadsInput = true;
 			{ IOFlags flags; gio::read( cEnvValue, "*", flags ) >> iepEnvSetThreads; ios = flags.ios(); }
 			if ( ios != 0 ) iepEnvSetThreads = MaxNumberOfThreads;
@@ -2639,7 +2639,7 @@ namespace SimulationManager {
 #endif
 		// just reporting
 		get_environment_variable( cNumActiveSims, cEnvValue );
-		if ( cEnvValue != BlankString ) {
+		if ( ! cEnvValue.empty() ) {
 			lnumActiveSims = true;
 			{ IOFlags flags; gio::read( cEnvValue, "*", flags ) >> inumActiveSims; ios = flags.ios(); }
 		}

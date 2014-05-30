@@ -911,7 +911,7 @@ namespace WaterUse {
 			} else {
 				ZoneHumRat = ZoneAirHumRat( ZoneNum );
 				ZoneHumRatSat = PsyWFnTdbRhPb( ZoneMAT, 1.0, OutBaroPress, RoutineName ); // Humidratio at 100% relative humidity
-				RhoAirDry = PsyRhoAirFnPbTdbW( OutBaroPress, ZoneMAT, 0.0, BlankString );
+				RhoAirDry = PsyRhoAirFnPbTdbW( OutBaroPress, ZoneMAT, 0.0 );
 
 				ZoneMassMax = ( ZoneHumRatSat - ZoneHumRat ) * RhoAirDry * Zone( ZoneNum ).Volume; // Max water that can be evaporated to zone
 				FlowMassMax = WaterEquipment( WaterEquipNum ).TotalMassFlowRate * TimeStepSys * SecInHour; // Max water in flow

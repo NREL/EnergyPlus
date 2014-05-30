@@ -689,7 +689,7 @@ namespace EMSManager {
 					}
 				}
 
-				if ( cAlphaArgs( 2 ) == "*" ) cAlphaArgs( 2 ) = BlankString;
+				if ( cAlphaArgs( 2 ) == "*" ) cAlphaArgs( 2 ).clear();
 				Sensor( SensorNum ).UniqueKeyName = cAlphaArgs( 2 );
 				Sensor( SensorNum ).OutputVarName = cAlphaArgs( 3 );
 

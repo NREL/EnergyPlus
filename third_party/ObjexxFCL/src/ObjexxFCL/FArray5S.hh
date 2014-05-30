@@ -1825,28 +1825,6 @@ public: // Inspector
 		}
 	}
 
-	// Lower Index of a Dimension
-	inline
-	int
-	l( int const d ) const
-	{
-		switch ( d ) {
-		case 1:
-			return 1;
-		case 2:
-			return 1;
-		case 3:
-			return 1;
-		case 4:
-			return 1;
-		case 5:
-			return 1;
-		default:
-			assert( false );
-			return 1;
-		}
-	}
-
 	// Upper Index of Dimension
 	inline
 	int

@@ -4280,7 +4280,7 @@ namespace PlantChillers {
 		} else if ( ElectricChiller( ChillNum ).Base.CondenserType == EvapCooled ) { //Condenser inlet temp = (outdoor wet bulb)
 			Node( CondInletNode ).Temp = Node( CondInletNode ).OutAirWetBulb;
 			//  line above assumes evaporation pushes condenser inlet air humidity ratio to saturation
-			CondOutletHumRat = PsyWFnTdbTwbPb( Node( CondInletNode ).Temp, Node( CondInletNode ).Temp, Node( CondInletNode ).Press, BlankString );
+			CondOutletHumRat = PsyWFnTdbTwbPb( Node( CondInletNode ).Temp, Node( CondInletNode ).Temp, Node( CondInletNode ).Press );
 			//  Warn user if evap condenser wet bulb temperature falls below 10C
 			if ( Node( CondInletNode ).Temp < 10.0 && ! WarmupFlag ) {
 				ElectricChiller( ChillNum ).Base.PrintMessage = true;

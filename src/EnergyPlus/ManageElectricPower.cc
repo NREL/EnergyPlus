@@ -1647,7 +1647,7 @@ namespace ManageElectricPower {
 				ElecLoadCenter( Count ).InverterPresent = true;
 				ElecLoadCenter( Count ).StoragePresent = true;
 				cAlphaArgs( 6 ) = "DirectCurrentWithInverterACStorage";
-			} else if ( SameString( cAlphaArgs( 6 ), BlankString ) ) {
+			} else if ( cAlphaArgs( 6 ).empty() ) {
 				ElecLoadCenter( Count ).BussType = ACBuss;
 				cAlphaArgs( 6 ) = "AlternatingCurrent (field was blank)";
 			} else {

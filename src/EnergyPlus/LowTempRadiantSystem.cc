@@ -2423,7 +2423,7 @@ namespace LowTempRadiantSystem {
 			// A safety parameter is added (hardwired parameter) to avoid getting too close to condensation
 			// conditions.
 			HydrRadSys( RadSysNum ).CondCausedShutDown = false;
-			DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( ZoneNum ), OutBaroPress, BlankString );
+			DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( ZoneNum ), OutBaroPress );
 
 			if ( ( OperatingMode == CoolingMode ) && ( HydrRadSys( RadSysNum ).CondCtrlType == CondCtrlSimpleOff ) ) {
 
@@ -3469,7 +3469,7 @@ namespace LowTempRadiantSystem {
 			// A safety parameter is added (hardwired parameter) to avoid getting too close to condensation
 			// conditions.
 			CFloRadSys( RadSysNum ).CondCausedShutDown = false;
-			DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( CFloRadSys( RadSysNum ).ZonePtr ), OutBaroPress, BlankString );
+			DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( CFloRadSys( RadSysNum ).ZonePtr ), OutBaroPress );
 
 			if ( ( OperatingMode == CoolingMode ) && ( CFloRadSys( RadSysNum ).CondCtrlType == CondCtrlSimpleOff ) ) {
 

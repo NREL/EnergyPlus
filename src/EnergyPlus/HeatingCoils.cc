@@ -206,7 +206,7 @@ namespace HeatingCoils {
 					ShowFatalError( "SimulateHeatingCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Number of Heating Coils=" + TrimSigDigits( NumHeatingCoils ) + ", Coil name=" + CompName );
 				}
 				if ( CheckEquipName( CoilNum ) ) {
-					if ( CompName != BlankString && CompName != HeatingCoil( CoilNum ).Name ) {
+					if ( ! CompName.empty() && CompName != HeatingCoil( CoilNum ).Name ) {
 						ShowFatalError( "SimulateHeatingCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + HeatingCoil( CoilNum ).Name );
 					}
 					CheckEquipName( CoilNum ) = false;
@@ -1133,6 +1133,7 @@ namespace HeatingCoils {
 		CompType = "Coil:" + HeatingCoil( CoilNum ).HeatingCoilType + ':' + HeatingCoil( CoilNum ).HeatingCoilModel;
 		CompName = HeatingCoil( CoilNum ).Name;
 		DataCoilIsSuppHeater = CoilIsSuppHeater; // set global instead of using optional argument
+		DataCoolCoilCap = 0.0; // global only used for heat pump heating coils, non-HP heating coils are sized with other global variables
 		RequestSizing( CompType, CompName, HeatingCapacitySizing, SizingString, TempCap, bPRINT, RoutineName );
 		DataCoilIsSuppHeater = false; // reset global to false so other heating coils are not affected
 
@@ -1193,8 +1194,7 @@ namespace HeatingCoils {
 			HeatingCoil( CoilNum ).NominalCapacity = TempCap;
 		}
 
-		++NumCoilsSized;
-		if ( NumCoilsSized == NumHeatingCoils ) HeatingCoilNumericFields.deallocate(); // remove temporary array for field names at end of sizing
+		if ( ++NumCoilsSized == NumHeatingCoils ) HeatingCoilNumericFields.deallocate(); // remove temporary array for field names at end of sizing
 
 		//create predefined report entries
 		{ auto const SELECT_CASE_var( HeatingCoil( CoilNum ).HCoilType_Num );

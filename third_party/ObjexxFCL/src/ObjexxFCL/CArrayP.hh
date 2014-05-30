@@ -897,7 +897,7 @@ private: // Functions
 
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
-private: // Static Functions
+private: // Static Methods
 
 	// square( x ) == x^2
 	inline

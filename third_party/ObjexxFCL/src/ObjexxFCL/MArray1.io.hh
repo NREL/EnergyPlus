@@ -38,7 +38,7 @@ template< class A, typename T >
 std::ostream &
 operator <<( std::ostream & stream, MArray1< A, T > const & a )
 {
-	if ( ( stream ) && ( a.size() > 0u ) ) { // Write array to stream in row-major order
+	if ( ( stream ) && ( a.size() > 0u ) ) { // Write array to stream
 
 		// Types
 		using std::setw;

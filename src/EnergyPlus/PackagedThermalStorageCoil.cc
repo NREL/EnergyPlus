@@ -179,7 +179,7 @@ namespace PackagedThermalStorageCoil {
 				ShowFatalError( "SimTESCoil: Invalid CompIndex passed=" + TrimSigDigits( TESCoilNum ) + ", Number of Thermal Energy Storage Cooling Coil Coils=" + TrimSigDigits( NumTESCoils ) + ", Coil name=" + CompName );
 			}
 			if ( CheckEquipName( TESCoilNum ) ) {
-				if ( CompName != BlankString && CompName != TESCoil( TESCoilNum ).Name ) {
+				if ( ! CompName.empty() && CompName != TESCoil( TESCoilNum ).Name ) {
 					ShowFatalError( "SimTESCoil: Invalid CompIndex passed=" + TrimSigDigits( TESCoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + TESCoil( TESCoilNum ).Name );
 				}
 				CheckEquipName( TESCoilNum ) = false;

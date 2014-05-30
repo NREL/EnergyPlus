@@ -663,7 +663,7 @@ namespace SteamCoils {
 		MinFlowFrac = 0.0;
 		DesMassFlow = 0.0;
 		CpWater = 0.0;
-		RhoAirStd = PsyRhoAirFnPbTdbW( StdBaroPress, 20.0, 0.0, BlankString );
+		RhoAirStd = PsyRhoAirFnPbTdbW( StdBaroPress, 20.0, 0.0 );
 		CpAirStd = PsyCpAirFnWTdb( 0.0, 20.0 );
 
 		// If this is a steam coil

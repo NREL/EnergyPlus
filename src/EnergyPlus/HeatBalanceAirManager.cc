@@ -1151,7 +1151,7 @@ namespace HeatBalanceAirManager {
 						}
 					}
 					// Check Minimum indoor temperature value and schedule fields
-					if ( ! lNumericFieldBlanks( 11 ) && ( cAlphaArgs( 6 ) != BlankString && Ventilation( Loop ).MinIndoorTempSchedPtr == 0 ) ) {
+					if ( ! lNumericFieldBlanks( 11 ) && ( ! cAlphaArgs( 6 ).empty() && Ventilation( Loop ).MinIndoorTempSchedPtr == 0 ) ) {
 						if ( Item1 == 1 ) {
 							ShowWarningError( RoutineName + cAlphaFieldNames( 6 ) + " = " + cAlphaArgs( 6 ) + " is invalid. The constant value will be used at " + RoundSigDigits( rNumericArgs( 11 ), 1 ) + " degrees C " );
 							ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
@@ -1442,7 +1442,7 @@ namespace HeatBalanceAirManager {
 				ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 			}
 			// Check Minimum indoor temperature value and schedule fields
-			if ( ! lNumericFieldBlanks( 6 ) && ( cAlphaArgs( 4 ) != BlankString && Ventilation( VentiCount ).MinIndoorTempSchedPtr == 0 ) ) {
+			if ( ! lNumericFieldBlanks( 6 ) && ( ! cAlphaArgs( 4 ).empty() && Ventilation( VentiCount ).MinIndoorTempSchedPtr == 0 ) ) {
 				ShowWarningError( RoutineName + cAlphaFieldNames( 4 ) + " = " + cAlphaArgs( 4 ) + " is invalid. The constant value will be used at " + RoundSigDigits( rNumericArgs( 11 ), 1 ) + " degrees C " );
 				ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 			}
@@ -2670,7 +2670,7 @@ namespace HeatBalanceAirManager {
 			GetObjectItem( cCurrentModuleObject, AirModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
 			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
 			if ( ZoneNum != 0 ) {
-				if ( AirModel( ZoneNum ).AirModelName != BlankString ) {
+				if ( ! AirModel( ZoneNum ).AirModelName.empty() ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ShowContinueError( "Duplicate zone name, only one type of roomair model is allowed per zone" );
@@ -3115,7 +3115,7 @@ namespace HeatBalanceAirManager {
 			ZnAirRpt( ZoneLoop ).MeanAirTemp = ZTAV( ZoneLoop );
 			ZnAirRpt( ZoneLoop ).MeanAirHumRat = ZoneAirHumRatAvg( ZoneLoop );
 			ZnAirRpt( ZoneLoop ).OperativeTemp = 0.5 * ( ZTAV( ZoneLoop ) + MRT( ZoneLoop ) );
-			ZnAirRpt( ZoneLoop ).MeanAirDewPointTemp = PsyTdpFnWPb( ZnAirRpt( ZoneLoop ).MeanAirHumRat, OutBaroPress, BlankString );
+			ZnAirRpt( ZoneLoop ).MeanAirDewPointTemp = PsyTdpFnWPb( ZnAirRpt( ZoneLoop ).MeanAirHumRat, OutBaroPress );
 
 			// if operative temperature control is being used, then radiative fraction/weighting
 			//  might be defined by user to be something different than 0.5, even scheduled over simulation period
