@@ -1702,7 +1702,7 @@ namespace DualDuct {
 			// Calculate outdoor air flow rate, zone multipliers are applied in GetInput
 			if ( AirLoopOAFrac > 0.0 ) {
 				OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir( Damper( DamperNum ).OARequirementsPtr, Damper( DamperNum ).ActualZoneNum, AirLoopControlInfo( AirLoopNum ).AirLoopDCVFlag, UseMinOASchFlag );
-				RhoAir = PsyRhoAirFnPbTdbW( Node( Damper( DamperNum ).OutletNodeNum ).Press, Node( Damper( DamperNum ).OutletNodeNum ).Temp, Node( Damper( DamperNum ).OutletNodeNum ).HumRat, BlankString );
+				RhoAir = PsyRhoAirFnPbTdbW( Node( Damper( DamperNum ).OutletNodeNum ).Press, Node( Damper( DamperNum ).OutletNodeNum ).Temp, Node( Damper( DamperNum ).OutletNodeNum ).HumRat );
 				OAMassFlow = OAVolumeFlowRate * RhoAir;
 
 				// convert OA mass flow rate to supply air flow rate based on air loop OA fraction

@@ -72,7 +72,7 @@ namespace SystemAvailabilityManager {
 	// Data
 	// MODULE PARAMETER DEFINITIONS
 	static std::string const BlankString;
-	
+
 	int const MaxDayTypes( 12 );
 	int const StayOff( 0 );
 	int const CycleOnAny( 1 );
@@ -4584,8 +4584,8 @@ namespace SystemAvailabilityManager {
 
 			// Dew point control mode
 			if ( HybridVentSysAvailMgrData( SysAvailNum ).ControlMode == HybridVentMode_DewPoint ) {
-				ZoneAirRH = PsyRhFnTdbWPb( MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress, BlankString ) * 100.0;
-				ZoneAirDewPoint = PsyTdpFnWPb( ZoneAirHumRat( ZoneNum ), OutBaroPress, BlankString );
+				ZoneAirRH = PsyRhFnTdbWPb( MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress ) * 100.0;
+				ZoneAirDewPoint = PsyTdpFnWPb( ZoneAirHumRat( ZoneNum ), OutBaroPress );
 				if ( NumHumidityControlZones == 0 ) {
 					++HybridVentSysAvailMgrData( SysAvailNum ).DewPointNoRHErrCount;
 					if ( HybridVentSysAvailMgrData( SysAvailNum ).DewPointNoRHErrCount < 2 ) {
@@ -4604,10 +4604,10 @@ namespace SystemAvailabilityManager {
 						ZoneRHHumidifyingSetPoint = GetCurrentScheduleValue( HumidityControlZone( HStatZoneNum ).HumidifyingSchedIndex );
 						ZoneRHDehumidifyingSetPoint = GetCurrentScheduleValue( HumidityControlZone( HStatZoneNum ).DehumidifyingSchedIndex );
 						if ( ZoneAirRH > ZoneRHDehumidifyingSetPoint ) { // Need dehumidification
-							WSetPoint = PsyWFnTdbRhPb( MAT( ZoneNum ), ( ZoneRHDehumidifyingSetPoint / 100.0 ), OutBaroPress, BlankString );
+							WSetPoint = PsyWFnTdbRhPb( MAT( ZoneNum ), ( ZoneRHDehumidifyingSetPoint / 100.0 ), OutBaroPress );
 							if ( WSetPoint < OutHumRat ) HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
 						} else if ( ZoneAirRH < ZoneRHHumidifyingSetPoint ) { // Need humidification
-							WSetPoint = PsyWFnTdbRhPb( MAT( ZoneNum ), ( ZoneRHHumidifyingSetPoint / 100.0 ), OutBaroPress, BlankString );
+							WSetPoint = PsyWFnTdbRhPb( MAT( ZoneNum ), ( ZoneRHHumidifyingSetPoint / 100.0 ), OutBaroPress );
 							if ( WSetPoint > OutHumRat ) HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
 						} else {
 							HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;

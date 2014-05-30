@@ -699,17 +699,17 @@ namespace RoomAirModelManager {
 			}
 
 			{ auto const nodeType( cAlphaArgs( 2 ) );
-			if ( SameString(nodeType, "INLET") ) {
+			if ( nodeType == "INLET" ) {
 				AirNode( AirNodeNum ).ClassType = InletAirNode;
-			} else if ( SameString(nodeType, "FLOOR") ) {
+			} else if ( nodeType == "FLOOR" ) {
 				AirNode( AirNodeNum ).ClassType = FloorAirNode;
-			} else if ( SameString(nodeType, "CONTROL") ) {
+			} else if ( nodeType == "CONTROL" ) {
 				AirNode( AirNodeNum ).ClassType = ControlAirNode;
-			} else if ( SameString(nodeType, "CEILING") ) {
+			} else if ( nodeType == "CEILING" ) {
 				AirNode( AirNodeNum ).ClassType = CeilingAirNode;
-			} else if ( SameString(nodeType, "MUNDTROOM") ) {
+			} else if ( nodeType == "MUNDTROOM" ) {
 				AirNode( AirNodeNum ).ClassType = MundtRoomAirNode;
-			} else if ( SameString(nodeType, "RETURN") ) {
+			} else if ( nodeType == "RETURN" ) {
 				AirNode( AirNodeNum ).ClassType = ReturnAirNode;
 				//            CASE ('PLUME1')
 				//                AirNode(AirNodeNum)%ClassType   = PlumeAirNode1
@@ -743,7 +743,7 @@ namespace RoomAirModelManager {
 
 				// report severe error since the following air nodes require surfaces associated with them
 				{ auto const nodeType( cAlphaArgs( 2 ) );
-				if ( SameString(nodeType, "FLOOR") || SameString(nodeType, "CEILING") || SameString(nodeType, "MUNDTROOM") || SameString(nodeType, "PLUME4") || SameString(nodeType, "REESROOM1") || SameString(nodeType, "REESROOM2") || SameString(nodeType, "REESROOM3") || SameString(nodeType, "REESROOM4") ) {
+				if ( nodeType == "FLOOR" || nodeType == "CEILING" || nodeType == "MUNDTROOM" || nodeType == "PLUME4" || nodeType == "REESROOM1" || nodeType == "REESROOM2" || nodeType == "REESROOM3" || nodeType == "REESROOM4" ) {
 					// terminate the program due to a severe error in the specified input
 					ShowSevereError( "GetAirNodeData: " + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid air node specification." );
 					ShowContinueError( "Mundt Room Air Model: No surface names specified.  " "Air node=\"" + AirNode( AirNodeNum ).Name + " requires name of surfaces associated with it." );
@@ -759,7 +759,7 @@ namespace RoomAirModelManager {
 				// report warning error since the following air nodes do not require surfaces associated with them
 				// and assign .FALSE. to 'SurfNeeded'
 				{ auto const nodeType( cAlphaArgs( 2 ) );
-				if ( SameString(nodeType, "INLET") || SameString(nodeType, "CONTROL") || SameString(nodeType, "RETURN") || SameString(nodeType, "PLUME1") || SameString(nodeType, "PLUME2") || SameString(nodeType, "PLUME3") ) {
+				if ( nodeType == "INLET" || nodeType == "CONTROL" || nodeType == "RETURN" || nodeType == "PLUME1" || nodeType == "PLUME2" || nodeType == "PLUME3" ) {
 					ShowWarningError( "GetAirNodeData: " + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid linkage" );
 					ShowContinueError( "Mundt Room Air Model: No surface names needed.  " "Air node=\"" + AirNode( AirNodeNum ).Name + " does not relate to any surfaces." );
 					SurfNeeded = false;
@@ -1664,7 +1664,7 @@ namespace RoomAirModelManager {
 								SurfParametersCVDV( Loop2 ).Height = HeightFactMax * Surface( MultizoneSurfaceData( Loop2 ).SurfNum ).Height;
 							} else if ( AirflowNetworkCompData( CompNum ).CompTypeNum == CompTypeNum_SCR ) { // surface type = CRACK
 								SurfParametersCVDV( Loop2 ).Width = Surface( MultizoneSurfaceData( Loop2 ).SurfNum ).Width / 2;
-								AinCV = MultizoneSurfaceCrackData( TypeNum ).FlowCoef / ( BaseDischargeCoef * std::sqrt( 2.0 / PsyRhoAirFnPbTdbW( OutBaroPress, MAT( Loop ), ZoneAirHumRat( Loop ), BlankString ) ) );
+								AinCV = MultizoneSurfaceCrackData( TypeNum ).FlowCoef / ( BaseDischargeCoef * std::sqrt( 2.0 / PsyRhoAirFnPbTdbW( OutBaroPress, MAT( Loop ), ZoneAirHumRat( Loop ) ) ) );
 								SurfParametersCVDV( Loop2 ).Height = AinCV / SurfParametersCVDV( Loop2 ).Width;
 							}
 							// calculate the surface Zmin and Zmax

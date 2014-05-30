@@ -4479,7 +4479,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 				RhoVaporAirOut( SurfNum ) = PsyRhovFnTdbRh( GroundTemp, 1.0, HBSurfManGroundHAMT );
 				HConvExtFD( SurfNum ) = HighHConvLimit;
 
-				HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, GroundTemp, PsyWFnTdbRhPb( GroundTemp, 1.0, OutBaroPress, RoutineNameGroundTemp ), BlankString ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, GroundTemp ) );
+				HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, GroundTemp, PsyWFnTdbRhPb( GroundTemp, 1.0, OutBaroPress, RoutineNameGroundTemp ) ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, GroundTemp ) );
 
 				HSkyFD( SurfNum ) = HSky;
 				HGrndFD( SurfNum ) = HGround;
@@ -4492,7 +4492,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 				TempOutsideAirFD( SurfNum ) = GroundTemp;
 				RhoVaporAirOut( SurfNum ) = PsyRhovFnTdbRhLBnd0C( GroundTemp, 1.0 );
 				HConvExtFD( SurfNum ) = HighHConvLimit;
-				HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, GroundTemp, PsyWFnTdbRhPb( GroundTemp, 1.0, OutBaroPress, RoutineNameGroundTemp ), BlankString ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, GroundTemp ) );
+				HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, GroundTemp, PsyWFnTdbRhPb( GroundTemp, 1.0, OutBaroPress, RoutineNameGroundTemp ) ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, GroundTemp ) );
 				HSkyFD( SurfNum ) = HSky;
 				HGrndFD( SurfNum ) = HGround;
 				HAirFD( SurfNum ) = HAir;
@@ -4512,7 +4512,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 				RhoVaporAirOut( SurfNum ) = PsyRhovFnTdbRh( GroundTempFC, 1.0, HBSurfManGroundHAMT );
 				HConvExtFD( SurfNum ) = HighHConvLimit;
 
-				HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, GroundTempFC, PsyWFnTdbRhPb( GroundTempFC, 1.0, OutBaroPress, RoutineNameGroundTempFC ), BlankString ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, GroundTempFC ) );
+				HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, GroundTempFC, PsyWFnTdbRhPb( GroundTempFC, 1.0, OutBaroPress, RoutineNameGroundTempFC ) ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, GroundTempFC ) );
 
 				HSkyFD( SurfNum ) = HSky;
 				HGrndFD( SurfNum ) = HGround;
@@ -4524,7 +4524,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 				TempOutsideAirFD( SurfNum ) = GroundTempFC;
 				RhoVaporAirOut( SurfNum ) = PsyRhovFnTdbRhLBnd0C( GroundTempFC, 1.0 );
 				HConvExtFD( SurfNum ) = HighHConvLimit;
-				HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, GroundTempFC, PsyWFnTdbRhPb( GroundTempFC, 1.0, OutBaroPress, RoutineNameGroundTempFC ), BlankString ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, GroundTempFC ) );
+				HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, GroundTempFC, PsyWFnTdbRhPb( GroundTempFC, 1.0, OutBaroPress, RoutineNameGroundTempFC ) ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, GroundTempFC ) );
 				HSkyFD( SurfNum ) = HSky;
 				HGrndFD( SurfNum ) = HGround;
 				HAirFD( SurfNum ) = HAir;
@@ -4567,7 +4567,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 				TempOutsideAirFD( SurfNum ) = TH( SurfNum, 1, 1 );
 				RhoVaporAirOut( SurfNum ) = PsyRhovFnTdbWPb( TempOutsideAirFD( SurfNum ), OutHumRat, OutBaroPress );
 				HConvExtFD( SurfNum ) = HighHConvLimit;
-				HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, TempOutsideAirFD( SurfNum ), PsyWFnTdbRhPb( TempOutsideAirFD( SurfNum ), 1.0, OutBaroPress, RoutineNameOtherSideCoefNoCalcExt ), BlankString ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, TempOutsideAirFD( SurfNum ) ) );
+				HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, TempOutsideAirFD( SurfNum ), PsyWFnTdbRhPb( TempOutsideAirFD( SurfNum ), 1.0, OutBaroPress, RoutineNameOtherSideCoefNoCalcExt ) ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, TempOutsideAirFD( SurfNum ) ) );
 				HSkyFD( SurfNum ) = HSky;
 				HGrndFD( SurfNum ) = HGround;
 				HAirFD( SurfNum ) = HAir;
@@ -4607,7 +4607,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 				TempOutsideAirFD( SurfNum ) = TempExt;
 				RhoVaporAirOut( SurfNum ) = PsyRhovFnTdbWPb( TempOutsideAirFD( SurfNum ), OutHumRat, OutBaroPress );
 				HConvExtFD( SurfNum ) = HcExtSurf( SurfNum );
-				HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, TempOutsideAirFD( SurfNum ), PsyWFnTdbRhPb( TempOutsideAirFD( SurfNum ), 1.0, OutBaroPress, RoutineNameOtherSideCoefCalcExt ), BlankString ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, TempOutsideAirFD( SurfNum ) ) );
+				HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, TempOutsideAirFD( SurfNum ), PsyWFnTdbRhPb( TempOutsideAirFD( SurfNum ), 1.0, OutBaroPress, RoutineNameOtherSideCoefCalcExt ) ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, TempOutsideAirFD( SurfNum ) ) );
 				HSkyFD( SurfNum ) = HSkyExtSurf( SurfNum );
 				HGrndFD( SurfNum ) = HGrdExtSurf( SurfNum );
 				HAirFD( SurfNum ) = HAirExtSurf( SurfNum );
@@ -4641,7 +4641,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 				TempOutsideAirFD( SurfNum ) = TempExt;
 				RhoVaporAirOut( SurfNum ) = PsyRhovFnTdbWPb( TempOutsideAirFD( SurfNum ), OutHumRat, OutBaroPress );
 				HConvExtFD( SurfNum ) = HcExtSurf( SurfNum );
-				HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, TempOutsideAirFD( SurfNum ), PsyWFnTdbRhPb( TempOutsideAirFD( SurfNum ), 1.0, OutBaroPress, RoutineNameOSCM ), BlankString ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, TempOutsideAirFD( SurfNum ) ) );
+				HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, TempOutsideAirFD( SurfNum ), PsyWFnTdbRhPb( TempOutsideAirFD( SurfNum ), 1.0, OutBaroPress, RoutineNameOSCM ) ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, TempOutsideAirFD( SurfNum ) ) );
 				HSkyFD( SurfNum ) = OSCM( OPtr ).HRad; //CR 8046, use sky term for surface to baffle IR
 				HGrndFD( SurfNum ) = 0.0; //CR 8046, null out and use only sky term for surface to baffle IR
 				HAirFD( SurfNum ) = 0.0; //CR 8046, null out and use only sky term for surface to baffle IR
@@ -4701,7 +4701,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 						TempOutsideAirFD( SurfNum ) = TempExt;
 						RhoVaporAirOut( SurfNum ) = PsyRhovFnTdbRh( TempOutsideAirFD( SurfNum ), 1.0, HBSurfManRainHAMT );
 						HConvExtFD( SurfNum ) = HcExtSurf( SurfNum );
-						HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, TempOutsideAirFD( SurfNum ), PsyWFnTdbRhPb( TempOutsideAirFD( SurfNum ), 1.0, OutBaroPress, RoutineNameExtEnvWetSurf ), BlankString ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, TempOutsideAirFD( SurfNum ) ) );
+						HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, TempOutsideAirFD( SurfNum ), PsyWFnTdbRhPb( TempOutsideAirFD( SurfNum ), 1.0, OutBaroPress, RoutineNameExtEnvWetSurf ) ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, TempOutsideAirFD( SurfNum ) ) );
 						HSkyFD( SurfNum ) = HSkyExtSurf( SurfNum );
 						HGrndFD( SurfNum ) = HGrdExtSurf( SurfNum );
 						HAirFD( SurfNum ) = HAirExtSurf( SurfNum );
@@ -4713,7 +4713,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 						TempOutsideAirFD( SurfNum ) = TempExt;
 						RhoVaporAirOut( SurfNum ) = PsyRhovFnTdbRhLBnd0C( TempOutsideAirFD( SurfNum ), 1.0 );
 						HConvExtFD( SurfNum ) = HcExtSurf( SurfNum );
-						HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, TempOutsideAirFD( SurfNum ), PsyWFnTdbRhPb( TempOutsideAirFD( SurfNum ), 1.0, OutBaroPress, RoutineNameExtEnvWetSurf ), BlankString ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, TempOutsideAirFD( SurfNum ) ) );
+						HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, TempOutsideAirFD( SurfNum ), PsyWFnTdbRhPb( TempOutsideAirFD( SurfNum ), 1.0, OutBaroPress, RoutineNameExtEnvWetSurf ) ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, TempOutsideAirFD( SurfNum ) ) );
 						HSkyFD( SurfNum ) = HSkyExtSurf( SurfNum );
 						HGrndFD( SurfNum ) = HGrdExtSurf( SurfNum );
 						HAirFD( SurfNum ) = HAirExtSurf( SurfNum );
@@ -4728,7 +4728,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 						TempOutsideAirFD( SurfNum ) = TempExt;
 						RhoVaporAirOut( SurfNum ) = PsyRhovFnTdbWPb( TempOutsideAirFD( SurfNum ), OutHumRat, OutBaroPress );
 						HConvExtFD( SurfNum ) = HcExtSurf( SurfNum );
-						HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, TempOutsideAirFD( SurfNum ), PsyWFnTdbRhPb( TempOutsideAirFD( SurfNum ), 1.0, OutBaroPress, RoutineNameExtEnvDrySurf ), BlankString ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, TempOutsideAirFD( SurfNum ) ) );
+						HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, TempOutsideAirFD( SurfNum ), PsyWFnTdbRhPb( TempOutsideAirFD( SurfNum ), 1.0, OutBaroPress, RoutineNameExtEnvDrySurf ) ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, TempOutsideAirFD( SurfNum ) ) );
 						//  check for saturation conditions of air
 						RhoVaporSat = PsyRhovFnTdbRh( TempOutsideAirFD( SurfNum ), 1.0, HBSurfManDrySurfCondFD );
 						if ( RhoVaporAirOut( SurfNum ) > RhoVaporSat ) RhoVaporAirOut( SurfNum ) = RhoVaporSat;
@@ -4751,7 +4751,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 					TempOutsideAirFD( SurfNum ) = TempExt;
 					RhoVaporAirOut( SurfNum ) = PsyRhovFnTdbWPb( TempOutsideAirFD( SurfNum ), OutHumRat, OutBaroPress );
 					HConvExtFD( SurfNum ) = HcExtSurf( SurfNum );
-					HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, TempOutsideAirFD( SurfNum ), PsyWFnTdbRhPb( TempOutsideAirFD( SurfNum ), 1.0, OutBaroPress, RoutineNameNoWind ), BlankString ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, TempOutsideAirFD( SurfNum ) ) );
+					HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, TempOutsideAirFD( SurfNum ), PsyWFnTdbRhPb( TempOutsideAirFD( SurfNum ), 1.0, OutBaroPress, RoutineNameNoWind ) ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, TempOutsideAirFD( SurfNum ) ) );
 					HSkyFD( SurfNum ) = HSkyExtSurf( SurfNum );
 					HGrndFD( SurfNum ) = HGrdExtSurf( SurfNum );
 					HAirFD( SurfNum ) = HAirExtSurf( SurfNum );
@@ -4774,7 +4774,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 					TempOutsideAirFD( SurfNum ) = TempSurfIn( SurfNum );
 					RhoVaporAirOut( SurfNum ) = RhoVaporAirIn( SurfNum );
 					HConvExtFD( SurfNum ) = HConvIn( SurfNum );
-					HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, TempOutsideAirFD( SurfNum ), PsyWFnTdbRhPb( TempOutsideAirFD( SurfNum ), 1.0, OutBaroPress, RoutineNameOther ), BlankString ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, TempOutsideAirFD( SurfNum ) ) );
+					HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, TempOutsideAirFD( SurfNum ), PsyWFnTdbRhPb( TempOutsideAirFD( SurfNum ), 1.0, OutBaroPress, RoutineNameOther ) ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, TempOutsideAirFD( SurfNum ) ) );
 					HSkyFD( SurfNum ) = 0.0;
 					HGrndFD( SurfNum ) = 0.0;
 					HAirFD( SurfNum ) = 0.0;
@@ -4791,7 +4791,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 					TempOutsideAirFD( SurfNum ) = TH( Surface( SurfNum ).ExtBoundCond, 1, 2 );
 					RhoVaporAirOut( SurfNum ) = RhoVaporAirIn( Surface( SurfNum ).ExtBoundCond );
 					HConvExtFD( SurfNum ) = HConvIn( Surface( SurfNum ).ExtBoundCond );
-					HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, TempOutsideAirFD( SurfNum ), PsyWFnTdbRhPb( TempOutsideAirFD( SurfNum ), 1.0, OutBaroPress, RoutineNameIZPart ), BlankString ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, TempOutsideAirFD( SurfNum ) ) );
+					HMassConvExtFD( SurfNum ) = HConvExtFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, TempOutsideAirFD( SurfNum ), PsyWFnTdbRhPb( TempOutsideAirFD( SurfNum ), 1.0, OutBaroPress, RoutineNameIZPart ) ) + RhoVaporAirOut( SurfNum ) ) * PsyCpAirFnWTdb( OutHumRat, TempOutsideAirFD( SurfNum ) ) );
 					HSkyFD( SurfNum ) = 0.0;
 					HGrndFD( SurfNum ) = 0.0;
 					HAirFD( SurfNum ) = 0.0;
@@ -5136,7 +5136,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 			RhoVaporSat = PsyRhovFnTdbRh( MAT( ZoneNum ), 1.0, HBSurfManInsideSurf );
 			if ( RhoVaporAirIn( SurfNum ) > RhoVaporSat ) RhoVaporAirIn( SurfNum ) = RhoVaporSat;
 			HConvInFD( SurfNum ) = HConvIn( SurfNum );
-			HMassConvInFD( SurfNum ) = HConvInFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), BlankString ) + RhoVaporAirIn( SurfNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) ) );
+			HMassConvInFD( SurfNum ) = HConvInFD( SurfNum ) / ( ( PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) + RhoVaporAirIn( SurfNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) ) );
 
 			// Perform heat balance on the inside face of the surface ...
 			// The following are possibilities here:
@@ -5151,6 +5151,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 			//   (c) the CondFD calc (SolutionAlgo = UseCondFD)
 			//   (d) the HAMT calc (solutionalgo = UseHAMT).
 
+			auto const & zone( Zone( ZoneNum ) );
 			if ( Surface( SurfNum ).ExtBoundCond == SurfNum && Surface( SurfNum ).Class != SurfaceClass_Window ) {
 				//CR6869 -- let Window HB take care of it      IF (Surface(SurfNum)%ExtBoundCond == SurfNum) THEN
 				// Surface is a partition
@@ -5168,8 +5169,12 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 						}
 					}
 					// if any mixed heat transfer models in zone, apply limits to CTF result
-					if ( any_eq( Surface( {Zone( ZoneNum ).SurfaceFirst,Zone( ZoneNum ).SurfaceLast} ).HeatTransferAlgorithm(), HeatTransferModel_CondFD ) || any_eq( Surface( {Zone( ZoneNum ).SurfaceFirst,Zone( ZoneNum ).SurfaceLast} ).HeatTransferAlgorithm(), HeatTransferModel_HAMT ) ) {
-						TempSurfInTmp( SurfNum ) = max( MinSurfaceTempLimit, min( MaxSurfaceTempLimit, TempSurfInTmp( SurfNum ) ) ); //Limit Check
+					for ( int iSurf = zone.SurfaceFirst, eSurf = zone.SurfaceLast; iSurf <= eSurf; ++iSurf ) { //Tuned Replaced any_eq and array slicing and member array usage
+						auto const & alg( Surface( iSurf ).HeatTransferAlgorithm );
+						if ( ( alg == HeatTransferModel_CondFD ) || ( alg == HeatTransferModel_HAMT ) ) {
+							TempSurfInTmp( SurfNum ) = max( MinSurfaceTempLimit, min( MaxSurfaceTempLimit, TempSurfInTmp( SurfNum ) ) ); // Limit Check
+							break;
+						}
 					}
 
 					if ( Construct( ConstrNum ).SourceSinkPresent ) { // Set the appropriate parameters for the radiant system
@@ -5219,8 +5224,12 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 								}
 							}
 							// if any mixed heat transfer models in zone, apply limits to CTF result
-							if ( any_eq( Surface( {Zone( ZoneNum ).SurfaceFirst,Zone( ZoneNum ).SurfaceLast} ).HeatTransferAlgorithm(), HeatTransferModel_CondFD ) || any_eq( Surface( {Zone( ZoneNum ).SurfaceFirst,Zone( ZoneNum ).SurfaceLast} ).HeatTransferAlgorithm(), HeatTransferModel_HAMT ) ) {
-								TempSurfInTmp( SurfNum ) = max( MinSurfaceTempLimit, min( MaxSurfaceTempLimit, TempSurfInTmp( SurfNum ) ) ); //Limit Check
+							for ( int iSurf = zone.SurfaceFirst, eSurf = zone.SurfaceLast; iSurf <= eSurf; ++iSurf ) { //Tuned Replaced any_eq and array slicing and member array usage
+								auto const & alg( Surface( iSurf ).HeatTransferAlgorithm );
+								if ( ( alg == HeatTransferModel_CondFD ) || ( alg == HeatTransferModel_HAMT ) ) {
+									TempSurfInTmp( SurfNum ) = max( MinSurfaceTempLimit, min( MaxSurfaceTempLimit, TempSurfInTmp( SurfNum ) ) ); // Limit Check
+									break;
+								}
 							}
 
 							if ( Construct( ConstrNum ).SourceSinkPresent ) { // Set the appropriate parameters for the radiant system
@@ -5279,8 +5288,12 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 						TempSurfInTmp( SurfNum ) = ( Construct( ConstrNum ).CTFInside( 0 ) * TempSurfIn( SurfNum ) + HMovInsul * TempSurfIn( SurfNum ) - QRadSWInAbs( SurfNum ) - CTFConstInPart( SurfNum ) - Construct( ConstrNum ).CTFCross( 0 ) * TH( SurfNum, 1, 1 ) ) / ( HMovInsul );
 						// if any mixed heat transfer models in zone, apply limits to CTF result
-						if ( any_eq( Surface( {Zone( ZoneNum ).SurfaceFirst,Zone( ZoneNum ).SurfaceLast} ).HeatTransferAlgorithm(), HeatTransferModel_CondFD ) || any_eq( Surface( {Zone( ZoneNum ).SurfaceFirst,Zone( ZoneNum ).SurfaceLast} ).HeatTransferAlgorithm(), HeatTransferModel_HAMT ) ) {
-							TempSurfInTmp( SurfNum ) = max( MinSurfaceTempLimit, min( MaxSurfaceTempLimit, TempSurfInTmp( SurfNum ) ) ); //Limit Check
+						for ( int iSurf = zone.SurfaceFirst, eSurf = zone.SurfaceLast; iSurf <= eSurf; ++iSurf ) { //Tuned Replaced any_eq and array slicing and member array usage
+							auto const & alg( Surface( iSurf ).HeatTransferAlgorithm );
+							if ( ( alg == HeatTransferModel_CondFD ) || ( alg == HeatTransferModel_HAMT ) ) {
+								TempSurfInTmp( SurfNum ) = max( MinSurfaceTempLimit, min( MaxSurfaceTempLimit, TempSurfInTmp( SurfNum ) ) ); // Limit Check
+								break;
+							}
 						}
 					}
 
@@ -5642,10 +5655,10 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 				++ErrCount;
 				if ( ErrCount < 16 ) {
 					if ( ! any_eq( HeatTransferAlgosUsed, UseCondFD ) ) {
-						ShowWarningError( "Inside surface heat balance did not converge " "with Max Temp Difference [C] =" + RoundSigDigits( MaxDelTemp, 3 ) + " vs Max Allowed Temp Diff [C] =" + RoundSigDigits( MaxAllowedDelTemp, 3 ) );
+						ShowWarningError( "Inside surface heat balance did not converge with Max Temp Difference [C] =" + RoundSigDigits( MaxDelTemp, 3 ) + " vs Max Allowed Temp Diff [C] =" + RoundSigDigits( MaxAllowedDelTemp, 3 ) );
 						ShowContinueErrorTimeStamp( "" );
 					} else {
-						ShowWarningError( "Inside surface heat balance did not converge " "with Max Temp Difference [C] =" + RoundSigDigits( MaxDelTemp, 3 ) + " vs Max Allowed Temp Diff [C] =" + RoundSigDigits( MaxAllowedDelTempCondFD, 6 ) );
+						ShowWarningError( "Inside surface heat balance did not converge with Max Temp Difference [C] =" + RoundSigDigits( MaxDelTemp, 3 ) + " vs Max Allowed Temp Diff [C] =" + RoundSigDigits( MaxAllowedDelTempCondFD, 6 ) );
 						ShowContinueErrorTimeStamp( "" );
 					}
 				} else {
@@ -5676,9 +5689,9 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 				SumHmAW( ZoneNum ) += HMassConvInFD( SurfNum ) * Surface( SurfNum ).Area * ( RhoVaporSurfIn( SurfNum ) - RhoVaporAirIn( SurfNum ) );
 
-				RhoAirZone = PsyRhoAirFnPbTdbW( OutBaroPress, MAT( Surface( SurfNum ).Zone ), PsyWFnTdbRhPb( MAT( Surface( SurfNum ).Zone ), PsyRhFnTdbRhov( MAT( Surface( SurfNum ).Zone ), RhoVaporAirIn( SurfNum ), rhoAirZone ), OutBaroPress, BlankString ), BlankString );
+				RhoAirZone = PsyRhoAirFnPbTdbW( OutBaroPress, MAT( Surface( SurfNum ).Zone ), PsyWFnTdbRhPb( MAT( Surface( SurfNum ).Zone ), PsyRhFnTdbRhov( MAT( Surface( SurfNum ).Zone ), RhoVaporAirIn( SurfNum ), rhoAirZone ), OutBaroPress ) );
 
-				Wsurf = PsyWFnTdbRhPb( TempSurfInTmp( SurfNum ), PsyRhFnTdbRhov( TempSurfInTmp( SurfNum ), RhoVaporSurfIn( SurfNum ), wsurf ), OutBaroPress, BlankString );
+				Wsurf = PsyWFnTdbRhPb( TempSurfInTmp( SurfNum ), PsyRhFnTdbRhov( TempSurfInTmp( SurfNum ), RhoVaporSurfIn( SurfNum ), wsurf ), OutBaroPress );
 
 				SumHmARa( ZoneNum ) += HMassConvInFD( SurfNum ) * Surface( SurfNum ).Area * RhoAirZone;
 
@@ -5699,7 +5712,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 				//SUMC(ZoneNum) = SUMC(ZoneNum)-MoistEMPDFlux(SurfNum)*Surface(SurfNum)%Area
 
 				SumHmAW( ZoneNum ) += HMassConvInFD( SurfNum ) * Surface( SurfNum ).Area * ( RhoVaporSurfIn( SurfNum ) - RhoVaporAirIn( SurfNum ) );
-				SumHmARa( ZoneNum ) += HMassConvInFD( SurfNum ) * Surface( SurfNum ).Area * PsyRhoAirFnPbTdbW( OutBaroPress, TempSurfInTmp( SurfNum ), PsyWFnTdbRhPb( TempSurfInTmp( SurfNum ), PsyRhFnTdbRhovLBnd0C( TempSurfInTmp( SurfNum ), RhoVaporAirIn( SurfNum ), BlankString ), OutBaroPress, BlankString ), BlankString );
+				SumHmARa( ZoneNum ) += HMassConvInFD( SurfNum ) * Surface( SurfNum ).Area * PsyRhoAirFnPbTdbW( OutBaroPress, TempSurfInTmp( SurfNum ), PsyWFnTdbRhPb( TempSurfInTmp( SurfNum ), PsyRhFnTdbRhovLBnd0C( TempSurfInTmp( SurfNum ), RhoVaporAirIn( SurfNum ) ), OutBaroPress ) );
 				SumHmARaW( ZoneNum ) += HMassConvInFD( SurfNum ) * Surface( SurfNum ).Area * RhoVaporSurfIn( SurfNum );
 			}
 		}
@@ -6019,9 +6032,9 @@ CalcExteriorVentedCavity( int const SurfNum ) // index of surface
 
 	TempExt = Surface( SurfNum ).OutDryBulbTemp;
 
-	OutHumRatExt = PsyWFnTdbTwbPb( Surface( SurfNum ).OutDryBulbTemp, Surface( SurfNum ).OutWetBulbTemp, OutBaroPress, BlankString );
+	OutHumRatExt = PsyWFnTdbTwbPb( Surface( SurfNum ).OutDryBulbTemp, Surface( SurfNum ).OutWetBulbTemp, OutBaroPress );
 
-	RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, TempExt, OutHumRatExt, BlankString );
+	RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, TempExt, OutHumRatExt );
 
 	holeArea = ExtVentedCavity( CavNum ).ActualArea * ExtVentedCavity( CavNum ).Porosity;
 

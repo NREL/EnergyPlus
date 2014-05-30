@@ -199,7 +199,7 @@ typedef  std::vector< Format * >  Formats;
 		static std::string const STOPPERS( "\r\n" + std::string( 1, eof ) );
 		std::string s;
 		if ( ! stream ) return s; // Leave stream state alone
-		if ( stream && ( stream.peek() == eof ) ) return s; // At eof: Want eof bit set
+		if ( stream.peek() == eof ) return s; // At eof: Want eof bit set
 		char c;
 		Size i( 0 );
 		while ( ( ( w == NOSIZE ) || ( i < w ) ) && stream && not_any_of( stream.peek(), STOPPERS ) ) {

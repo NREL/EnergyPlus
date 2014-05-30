@@ -651,7 +651,7 @@ namespace WindTurbine {
 						for ( mon = 1; mon <= 12; ++mon ) {
 							lnPtr = index( lineIn, TabChr );
 							if ( lnPtr != 1 ) {
-								if ( ( lnPtr == std::string::npos ) || ( stripped( lineIn.substr( 0, lnPtr ) ) != BlankString ) ) {
+								if ( ( lnPtr == std::string::npos ) || ( ! stripped( lineIn.substr( 0, lnPtr ) ).empty() ) ) {
 									if ( lnPtr != std::string::npos ) {
 										gio::read( lineIn.substr( 0, lnPtr ), "*" ) >> MonthWS( mon );
 										lineIn.erase( 0, lnPtr + 1 );
@@ -814,8 +814,8 @@ namespace WindTurbine {
 		RotorSpeed = WindTurbineSys( WindTurbineNum ).RatedRotorSpeed;
 		LocalTemp = OutDryBulbTempAt( RotorH );
 		LocalPress = OutBaroPressAt( RotorH );
-		LocalHumRat = PsyWFnTdbTwbPb( LocalTemp, OutWetBulbTempAt( RotorH ), LocalPress, BlankString );
-		LocalAirDensity = PsyRhoAirFnPbTdbW( LocalPress, LocalTemp, LocalHumRat, BlankString );
+		LocalHumRat = PsyWFnTdbTwbPb( LocalTemp, OutWetBulbTempAt( RotorH ), LocalPress );
+		LocalAirDensity = PsyRhoAirFnPbTdbW( LocalPress, LocalTemp, LocalHumRat );
 		LocalWindSpeed = WindSpeedAt( RotorH );
 		LocalWindSpeed /= WindTurbineSys( WindTurbineNum ).WSFactor;
 

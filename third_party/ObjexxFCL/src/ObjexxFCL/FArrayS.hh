@@ -201,9 +201,16 @@ public: // Inspector
 	}
 
 	// Lower Index of a Dimension
-	virtual
+	inline
 	int
-	l( int const d ) const = 0;
+	l( int const d ) const
+	{
+		assert( ( 1 <= d ) && ( d <= rank() ) );
+#ifdef NDEBUG
+		static_cast< void >( d ); // Suppress unused warning
+#endif
+		return 1;
+	}
 
 	// Upper Index of Dimension
 	virtual

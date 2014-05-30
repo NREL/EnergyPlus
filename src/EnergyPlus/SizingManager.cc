@@ -420,7 +420,7 @@ namespace SizingManager {
 		DayOfMonth = LastDayOfMonth;
 
 		if ( ( DoSystemSizing ) && ( NumSysSizInput == 0 ) && ( NumAirLoops > 0 ) ) {
-			ShowWarningError( RoutineName + "For a system sizing run, there must be at least 1 Sizing:System object input." " SimulationControl System Sizing option ignored." );
+			ShowWarningError( RoutineName + "For a system sizing run, there must be at least 1 Sizing:System object input. SimulationControl System Sizing option ignored." );
 		}
 
 		if ( ( NumSysSizInput > 0 ) && ( DoSystemSizing || DoPlantSizing ) && ! ErrorsFound ) {
@@ -1302,9 +1302,9 @@ namespace SizingManager {
 					//      \key TemperatureDifference
 					//      \default SupplyAirTemperature
 					{ auto const coolingSATMethod( cAlphaArgs( 2 ) );
-					if ( SameString(coolingSATMethod, "SUPPLYAIRTEMPERATURE") ) {
+					if ( coolingSATMethod == "SUPPLYAIRTEMPERATURE" ) {
 						ZoneSizingInput( ZoneSizIndex ).ZnCoolDgnSAMethod = SupplyAirTemperature;
-					} else if ( SameString(coolingSATMethod, "TEMPERATUREDIFFERENCE") ) {
+					} else if ( coolingSATMethod == "TEMPERATUREDIFFERENCE" ) {
 						ZoneSizingInput( ZoneSizIndex ).ZnCoolDgnSAMethod = TemperatureDifference;
 					} else {
 						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
@@ -1349,9 +1349,9 @@ namespace SizingManager {
 					//      \key TemperatureDifference
 					//      \default SupplyAirTemperature
 					{ auto const heatingSATMethod( cAlphaArgs( 3 ) );
-					if ( SameString(heatingSATMethod, "SUPPLYAIRTEMPERATURE") ) {
+					if ( heatingSATMethod == "SUPPLYAIRTEMPERATURE" ) {
 						ZoneSizingInput( ZoneSizIndex ).ZnHeatDgnSAMethod = SupplyAirTemperature;
-					} else if ( SameString(heatingSATMethod, "TEMPERATUREDIFFERENCE") ) {
+					} else if ( heatingSATMethod == "TEMPERATUREDIFFERENCE" ) {
 						ZoneSizingInput( ZoneSizIndex ).ZnHeatDgnSAMethod = TemperatureDifference;
 					} else {
 						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
@@ -1635,11 +1635,11 @@ namespace SizingManager {
 					}
 
 					{ auto const coolAirDesMethod( cAlphaArgs( 5 ) );
-					if ( SameString(coolAirDesMethod, "DESIGNDAY") ) {
+					if ( coolAirDesMethod == "DESIGNDAY" ) {
 						ZoneSizingInput( ZoneSizIndex ).CoolAirDesMethod = FromDDCalc;
-					} else if ( SameString(coolAirDesMethod, "FLOW/ZONE") ) {
+					} else if ( coolAirDesMethod == "FLOW/ZONE" ) {
 						ZoneSizingInput( ZoneSizIndex ).CoolAirDesMethod = InpDesAirFlow;
-					} else if ( SameString(coolAirDesMethod, "DESIGNDAYWITHLIMIT") ) {
+					} else if ( coolAirDesMethod == "DESIGNDAYWITHLIMIT" ) {
 						ZoneSizingInput( ZoneSizIndex ).CoolAirDesMethod = DesAirFlowWithLim;
 					} else {
 						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
@@ -1648,11 +1648,11 @@ namespace SizingManager {
 						ErrorsFound = true;
 					}}
 					{ auto const heatAirDesMethod( cAlphaArgs( 6 ) );
-					if ( SameString(heatAirDesMethod, "DESIGNDAY") ) {
+					if ( heatAirDesMethod == "DESIGNDAY" ) {
 						ZoneSizingInput( ZoneSizIndex ).HeatAirDesMethod = FromDDCalc;
-					} else if ( SameString(heatAirDesMethod, "FLOW/ZONE") ) {
+					} else if ( heatAirDesMethod == "FLOW/ZONE" ) {
 						ZoneSizingInput( ZoneSizIndex ).HeatAirDesMethod = InpDesAirFlow;
-					} else if ( SameString(heatAirDesMethod, "DESIGNDAYWITHLIMIT") ) {
+					} else if ( heatAirDesMethod == "DESIGNDAYWITHLIMIT" ) {
 						ZoneSizingInput( ZoneSizIndex ).HeatAirDesMethod = DesAirFlowWithLim;
 					} else {
 						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
@@ -1842,13 +1842,13 @@ namespace SizingManager {
 
 			SysSizInput( SysSizIndex ).AirPriLoopName = cAlphaArgs( 1 );
 			{ auto const loadSizeType( cAlphaArgs( 2 ) );
-			if ( SameString(loadSizeType, "SENSIBLE") ) {
+			if ( loadSizeType == "SENSIBLE" ) {
 				SysSizInput( SysSizIndex ).LoadSizeType = Sensible;
-			} else if ( SameString(loadSizeType, "LATENT") ) {
+			} else if ( loadSizeType == "LATENT" ) {
 				SysSizInput( SysSizIndex ).LoadSizeType = Latent;
-			} else if ( SameString(loadSizeType, "TOTAL") ) {
+			} else if ( loadSizeType == "TOTAL" ) {
 				SysSizInput( SysSizIndex ).LoadSizeType = Total;
-			} else if ( SameString(loadSizeType, "VENTILATIONREQUIREMENT") ) {
+			} else if ( loadSizeType == "VENTILATIONREQUIREMENT" ) {
 				SysSizInput( SysSizIndex ).LoadSizeType = Ventilation;
 			} else {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
@@ -1857,9 +1857,9 @@ namespace SizingManager {
 				ErrorsFound = true;
 			}}
 			{ auto const sizingOption( cAlphaArgs( 3 ) );
-			if ( SameString(sizingOption, "COINCIDENT") ) {
+			if ( sizingOption == "COINCIDENT" ) {
 				SysSizInput( SysSizIndex ).SizingOption = Coincident;
-			} else if ( SameString(sizingOption, "NONCOINCIDENT") ) {
+			} else if ( sizingOption == "NONCOINCIDENT" ) {
 				SysSizInput( SysSizIndex ).SizingOption = NonCoincident;
 			} else {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
@@ -1868,9 +1868,9 @@ namespace SizingManager {
 				ErrorsFound = true;
 			}}
 			{ auto const coolOAOption( cAlphaArgs( 4 ) );
-			if ( SameString(coolOAOption, "YES") ) {
+			if ( coolOAOption == "YES" ) {
 				SysSizInput( SysSizIndex ).CoolOAOption = 1;
-			} else if ( SameString(coolOAOption, "NO") ) {
+			} else if ( coolOAOption == "NO" ) {
 				SysSizInput( SysSizIndex ).CoolOAOption = 2;
 			} else {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
@@ -1879,9 +1879,9 @@ namespace SizingManager {
 				ErrorsFound = true;
 			}}
 			{ auto const heatOAOption( cAlphaArgs( 5 ) );
-			if ( SameString(heatOAOption, "YES") ) {
+			if ( heatOAOption == "YES" ) {
 				SysSizInput( SysSizIndex ).HeatOAOption = 1;
-			} else if ( SameString(heatOAOption, "NO") ) {
+			} else if ( heatOAOption == "NO" ) {
 				SysSizInput( SysSizIndex ).HeatOAOption = 2;
 			} else {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
@@ -1978,9 +1978,9 @@ namespace SizingManager {
 				SysSizInput( SysSizIndex ).MaxZoneOAFraction = rNumericArgs( 13 );
 			}
 			{ auto const coolAirDesMethod( cAlphaArgs( 6 ) );
-			if ( SameString(coolAirDesMethod, "DESIGNDAY") ) {
+			if ( coolAirDesMethod == "DESIGNDAY" ) {
 				SysSizInput( SysSizIndex ).CoolAirDesMethod = FromDDCalc;
-			} else if ( SameString(coolAirDesMethod, "FLOW/SYSTEM") ) {
+			} else if ( coolAirDesMethod == "FLOW/SYSTEM" ) {
 				SysSizInput( SysSizIndex ).CoolAirDesMethod = InpDesAirFlow;
 			} else {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
@@ -1989,9 +1989,9 @@ namespace SizingManager {
 				ErrorsFound = true;
 			}}
 			{ auto const heatAirDesMethod( cAlphaArgs( 7 ) );
-			if ( SameString(heatAirDesMethod, "DESIGNDAY") ) {
+			if ( heatAirDesMethod == "DESIGNDAY" ) {
 				SysSizInput( SysSizIndex ).HeatAirDesMethod = FromDDCalc;
-			} else if ( SameString(heatAirDesMethod, "FLOW/SYSTEM") ) {
+			} else if ( heatAirDesMethod == "FLOW/SYSTEM" ) {
 				SysSizInput( SysSizIndex ).HeatAirDesMethod = InpDesAirFlow;
 			} else {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
@@ -2000,9 +2000,9 @@ namespace SizingManager {
 				ErrorsFound = true;
 			}}
 			{ auto const systemOAMethod( cAlphaArgs( 8 ) );
-			if ( SameString(systemOAMethod, "ZONESUM") ) {
+			if ( systemOAMethod == "ZONESUM" ) {
 				SysSizInput( SysSizIndex ).SystemOAMethod = SOAM_ZoneSum;
-			} else if ( SameString(systemOAMethod, "VENTILATIONRATEPROCEDURE") ) {
+			} else if ( systemOAMethod == "VENTILATIONRATEPROCEDURE" ) {
 				SysSizInput( SysSizIndex ).SystemOAMethod = SOAM_VRP;
 				if ( SysSizInput( SysSizIndex ).DesOutAirVolFlow > 0 ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
@@ -2102,13 +2102,13 @@ namespace SizingManager {
 			PlantSizData( PltSizIndex ).ExitTemp = rNumericArgs( 1 );
 			PlantSizData( PltSizIndex ).DeltaT = rNumericArgs( 2 );
 			{ auto const loopType( cAlphaArgs( 2 ) );
-			if ( SameString(loopType, "HEATING") ) {
+			if ( loopType == "HEATING" ) {
 				PlantSizData( PltSizIndex ).LoopType = HeatingLoop;
-			} else if ( SameString(loopType, "COOLING") ) {
+			} else if ( loopType == "COOLING" ) {
 				PlantSizData( PltSizIndex ).LoopType = CoolingLoop;
-			} else if ( SameString(loopType, "CONDENSER") ) {
+			} else if ( loopType == "CONDENSER" ) {
 				PlantSizData( PltSizIndex ).LoopType = CondenserLoop;
-			} else if ( SameString(loopType, "STEAM") ) {
+			} else if ( loopType == "STEAM" ) {
 				PlantSizData( PltSizIndex ).LoopType = SteamLoop;
 			} else {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );

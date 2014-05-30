@@ -125,7 +125,6 @@ namespace DataSizing {
 	extern bool DataCoilIsSuppHeater; // TRUE if heating coil used as supplemental heater
 	extern bool DataIsDXCoil; // TRUE if direct-expansion coil
 	extern bool DataAutosizable; // TRUE if component is autosizable
-	extern int DataDXCT; // 1 if regular DX coil, 2 if 100% DOAS DX coil
 	extern int DataTotCapCurveIndex; // index to total capacity as a function of temperature curve
 	extern Real64 DataCoolCoilCap; // cooling coil capacity used for sizing with scalable inputs
 	extern Real64 DataFlowUsedForSizing; // air flow rate used for sizing with scalable inputs [m3/s]
@@ -134,6 +133,8 @@ namespace DataSizing {
 	extern Real64 DataEMSOverride; // value of EMS variable used to override autosizing
 	extern Real64 DataBypassFrac; // value of bypass fraction for Coil:Cooling:DX:TwoStageWithHumidityControlMode coils
 	extern bool DataEMSOverrideON; // boolean determines if user relies on EMS to override autosizing
+	extern Real64 DataConstantUsedForSizing; // base value used for sizing inputs that are ratios of other inputs
+	extern Real64 DataFractionUsedForSizing; // fractional value of base value used for sizing inputs that are ratios of other inputs
 	extern bool TermUnitSingDuct; // TRUE if a non-induction single duct terminal unit
 	extern bool TermUnitPIU; // TRUE if a powered induction terminal unit
 	extern bool TermUnitIU; // TRUE if an unpowered induction terminal unit

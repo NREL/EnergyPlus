@@ -1479,7 +1479,7 @@ namespace AirflowNetworkBalanceManager {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + MultizoneSurfaceData( i ).SurfName + "\"." );
 					ShowContinueError( "The opening is a Triangular subsurface. A rectangular subsurface should be used." );
 				}
-				if ( MultizoneSurfaceData( i ).VentingSchName != BlankString ) {
+				if ( ! MultizoneSurfaceData( i ).VentingSchName.empty() ) {
 					MultizoneSurfaceData( i ).VentingSchNum = GetScheduleIndex( MultizoneSurfaceData( i ).VentingSchName );
 					if ( MultizoneSurfaceData( i ).VentingSchNum == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + MultizoneSurfaceData( i ).SurfName + "\", invalid schedule." );
@@ -3805,7 +3805,7 @@ namespace AirflowNetworkBalanceManager {
 
 		//     CODE  ************************************************************
 		// Calculate outdoor density
-		RhoOut = PsyRhoAirFnPbTdbW( OutBaroPress, OutDryBulbTempAt( Height ), OutHumRat, BlankString );
+		RhoOut = PsyRhoAirFnPbTdbW( OutBaroPress, OutDryBulbTempAt( Height ), OutHumRat );
 
 		NWind = AirflowNetworkSimu.NWind;
 		// Calculate dynamic pressure
@@ -5241,7 +5241,7 @@ Label90: ;
 		for ( i = 1; i <= NumOfZones; ++i ) { // Start of zone loads report variable update loop ...
 			Tamb = Zone( i ).OutDryBulbTemp;
 			CpAir = PsyCpAirFnWTdb( ZoneAirHumRatAvg( i ), MAT( i ) );
-			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, MAT( i ), ZoneAirHumRatAvg( i ), BlankString );
+			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, MAT( i ), ZoneAirHumRatAvg( i ) );
 			if ( MAT( i ) > Tamb ) {
 				AirflowNetworkZnRpt( i ).InfilHeatLoss = AirflowNetworkExchangeData( i ).SumMCp * ( MAT( i ) - Tamb ) * ReportingConstant;
 				AirflowNetworkZnRpt( i ).InfilHeatGain = 0.0;
@@ -5266,7 +5266,7 @@ Label90: ;
 		// Rewrite AirflowNetwork airflow rate
 		for ( i = 1; i <= NumOfLinksMultiZone; ++i ) {
 			Tamb = OutDryBulbTempAt( AirflowNetworkLinkageData( i ).NodeHeights( 1 ) );
-			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Tamb, OutHumRat, BlankString );
+			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Tamb, OutHumRat );
 			if ( SupplyFanType == FanType_SimpleOnOff && OnOffFanRunTimeFraction < 1.0 && OnOffFanRunTimeFraction > 0.0 ) {
 				AirflowNetworkLinkReport( i ).VolFLOW = AirflowNetworkLinkReport1( i ).FLOW / AirDensity;
 				AirflowNetworkLinkReport( i ).VolFLOW2 = AirflowNetworkLinkReport1( i ).FLOW2 / AirDensity;
@@ -5280,7 +5280,7 @@ Label90: ;
 			for ( i = NumOfLinksMultiZone + 1; i <= AirflowNetworkNumOfLinks; ++i ) {
 				n = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 				M = AirflowNetworkLinkageData( i ).NodeNums( 2 );
-				AirDensity = PsyRhoAirFnPbTdbW( ( AirflowNetworkNodeSimu( n ).PZ + AirflowNetworkNodeSimu( M ).PZ ) / 2. + OutBaroPress, ( AirflowNetworkNodeSimu( n ).TZ + AirflowNetworkNodeSimu( M ).TZ ) / 2., ( AirflowNetworkNodeSimu( n ).WZ + AirflowNetworkNodeSimu( M ).WZ ) / 2., BlankString );
+				AirDensity = PsyRhoAirFnPbTdbW( ( AirflowNetworkNodeSimu( n ).PZ + AirflowNetworkNodeSimu( M ).PZ ) / 2. + OutBaroPress, ( AirflowNetworkNodeSimu( n ).TZ + AirflowNetworkNodeSimu( M ).TZ ) / 2., ( AirflowNetworkNodeSimu( n ).WZ + AirflowNetworkNodeSimu( M ).WZ ) / 2. );
 				if ( SupplyFanType == FanType_SimpleOnOff && OnOffFanRunTimeFraction < 1.0 && OnOffFanRunTimeFraction > 0.0 ) {
 					AirflowNetworkLinkReport( i ).VolFLOW = AirflowNetworkLinkReport( i ).FLOW / AirDensity * ( 1.0 - OnOffFanRunTimeFraction );
 					AirflowNetworkLinkReport( i ).VolFLOW2 = AirflowNetworkLinkReport( i ).FLOW2 / AirDensity * ( 1.0 - OnOffFanRunTimeFraction );
@@ -5454,7 +5454,7 @@ Label90: ;
 		// Rewrite AirflowNetwork airflow rate
 		for ( i = 1; i <= NumOfLinksMultiZone; ++i ) {
 			Tamb = OutDryBulbTempAt( AirflowNetworkLinkageData( i ).NodeHeights( 1 ) );
-			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Tamb, OutHumRat, BlankString );
+			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Tamb, OutHumRat );
 			AirflowNetworkLinkSimu( i ).VolFLOW = AirflowNetworkLinkSimu( i ).FLOW / AirDensity;
 			AirflowNetworkLinkSimu( i ).VolFLOW2 = AirflowNetworkLinkSimu( i ).FLOW2 / AirDensity;
 		}
@@ -7225,7 +7225,7 @@ Label90: ;
 		Real64 CpAir; // Zone air specific heat
 
 		CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) );
-		RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), BlankString );
+		RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ) );
 		InfilVolume = ( AirflowNetworkExchangeData( ZoneNum ).SumMCp / CpAir / RhoAir ) * TimeStepSys * SecInHour;
 		ACH = InfilVolume / ( TimeStepSys * Zone( ZoneNum ).Volume );
 

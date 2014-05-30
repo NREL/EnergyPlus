@@ -88,6 +88,7 @@ namespace Psychrometrics {
 	int const iPsyTwbFnTdbWPb_cache( 18 );
 	int const iPsyPsatFnTemp_cache( 19 );
 	int const NumPsychMonitors( 19 ); // Parameterization of Number of psychrometric routines that
+	std::string const blank_string;
 #ifdef EP_psych_stats
 	FArray1D_string const PsyRoutineNames( NumPsychMonitors, { "PsyTdpFnTdbTwbPb", "PsyRhFnTdbWPb", "PsyTwbFnTdbWPb", "PsyVFnTdbWPb", "PsyWFnTdpPb", "PsyWFnTdbH", "PsyWFnTdbTwbPb", "PsyWFnTdbRhPb", "PsyPsatFnTemp", "PsyTsatFnHPb", "PsyTsatFnPb", "PsyRhFnTdbRhov", "PsyRhFnTdbRhovLBnd0C", "PsyTwbFnTdbWPb", "PsyTwbFnTdbWPb", "PsyWFnTdbTwbPb", "PsyTsatFnPb", "PsyTwbFnTdbWPb_cache", "PsyPsatFnTemp_cache" } ); // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 - HR | 15 - max iter | 16 - HR | 17 - max iter | 18 - PsyTwbFnTdbWPb_raw (raw calc) | 19 - PsyPsatFnTemp_raw (raw calc)
 
@@ -2166,13 +2167,13 @@ Label120: ;
 		if ( std::abs( PB - 1.0133e5 ) / 1.0133e5 <= 0.01 ) goto Label170;
 		IterCount = 0;
 		T1 = T;
-		H1 = PsyHFnTdbW( T1, PsyWFnTdbTwbPb( T1, T1, PB, BlankString ) );
+		H1 = PsyHFnTdbW( T1, PsyWFnTdbTwbPb( T1, T1, PB ) );
 		Y1 = H1 - Hloc;
 		if ( std::abs( Y1 / Hloc ) <= 0.1e-4 ) goto Label140;
 		T2 = T1 * 0.9;
 Label130: ;
 		++IterCount;
-		H2 = PsyHFnTdbW( T2, PsyWFnTdbTwbPb( T2, T2, PB, BlankString ) );
+		H2 = PsyHFnTdbW( T2, PsyWFnTdbTwbPb( T2, T2, PB ) );
 		Y2 = H2 - Hloc;
 		if ( std::abs( Y2 / Hloc ) <= 0.1e-4 ) goto Label150;
 		if ( Y2 == Y1 ) goto Label150;

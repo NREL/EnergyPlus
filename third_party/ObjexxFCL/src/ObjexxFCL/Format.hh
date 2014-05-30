@@ -110,6 +110,9 @@ protected: // Creation
 		i_( 0ul )
 	{
 		assert( star == '*' );
+#ifdef NDEBUG
+		static_cast< void const >( star ); // Suppress unused warning
+#endif
 	}
 
 	// Copy Constructor

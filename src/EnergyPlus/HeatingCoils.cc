@@ -206,7 +206,7 @@ namespace HeatingCoils {
 					ShowFatalError( "SimulateHeatingCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Number of Heating Coils=" + TrimSigDigits( NumHeatingCoils ) + ", Coil name=" + CompName );
 				}
 				if ( CheckEquipName( CoilNum ) ) {
-					if ( CompName != BlankString && CompName != HeatingCoil( CoilNum ).Name ) {
+					if ( ! CompName.empty() && CompName != HeatingCoil( CoilNum ).Name ) {
 						ShowFatalError( "SimulateHeatingCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + HeatingCoil( CoilNum ).Name );
 					}
 					CheckEquipName( CoilNum ) = false;
